@@ -643,7 +643,7 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
       </div>
     </div>
     <div style="margin-top:1.2rem;text-align:center;padding:1rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:10px;">
-      <div style="font-size:.82rem;color:var(--tx2);">Need 200+ youth? <strong style="color:var(--tx);">Enterprise pricing</strong> — <a href="/cdn-cgi/l/email-protection#147d7a727b547f7d7a73707b793977667175607d6271673a777b79" style="color:var(--cyan);">Contact us</a> for a custom quote.</div>
+      <div style="font-size:.82rem;color:var(--tx2);">Need 200+ youth? <strong style="color:var(--tx);">Enterprise pricing</strong> — <a href="/cdn-cgi/l/email-protection#dfb6b1b9b09fb4b6b1b8bbb0b2f2bcadbabeabb6a9baacf1bcb0b2" style="color:var(--cyan);">Contact us</a> for a custom quote.</div>
     </div>
     <div style="margin-top:2rem;padding:1.5rem;background:rgba(6,214,160,.04);border:1px solid rgba(6,214,160,.12);border-radius:var(--r);max-width:700px;margin-left:auto;margin-right:auto;">
       <div style="font-family:var(--fh);font-weight:700;margin-bottom:.3rem;">🤝 How Church Licensing Works</div>
@@ -949,7 +949,7 @@ iv>
       <div class="fq"><div class="fq-q" onclick="tFaq(this)">Can students earn money by referring friends? <span class="arr">▼</span></div><div class="fq-a"><p>Yes! Students earn $5 for every friend who signs up through their referral link. Earnings are credited to their account and paid out at age 18+ or applied as account credit. Parents earn $10 per referral. Church partners earn 20% commission.</p></div></div>
       <div class="fq"><div class="fq-q" onclick="tFaq(this)">What devices does it work on? <span class="arr">▼</span></div><div class="fq-a"><p>Any device with a browser — phones, tablets, laptops, desktops. No app store download. Just log in.</p></div></div>
       <div class="fq"><div class="fq-q" onclick="tFaq(this)">Is this faith-based? <span class="arr">▼</span></div><div class="fq-a"><p>YourLife CC includes an optional Faith & Purpose category. The other 17 categories cover universal life skills. Faith content is clearly labeled and entirely optional.</p></div></div>
-      <div class="fq"><div class="fq-q" onclick="tFaq(this)">What if I'm not satisfied? <span class="arr">▼</span></div><div class="fq-a"><p>30-day money-back guarantee, no questions asked. Email <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4821262e27082321262f2c2725652b3a2d293c213e2d3b662b2725">[email&#160;protected]</a> and we'll refund you immediately.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">What if I'm not satisfied? <span class="arr">▼</span></div><div class="fq-a"><p>30-day money-back guarantee, no questions asked. Email <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="751c1b131a351e1c1b12111a185816071014011c0310065b161a18">[email&#160;protected]</a> and we'll refund you immediately.</p></div></div>
     </div>
   </div>
 </section>
@@ -1086,11 +1086,11 @@ iv>
         <h4>Company</h4>
         <a href="#affiliate">Affiliate Program</a>
         <a href="#faq">FAQ</a>
-        <a href="/cdn-cgi/l/email-protection#a9c0c7cfc6e9c2c0c7cecdc6c484cadbccc8ddc0dfccda87cac6c4">Contact</a>
+        <a href="/cdn-cgi/l/email-protection#71181f171e311a181f16151e1c5c1203141005180714025f121e1c">Contact</a>
       </div>
       <div class="ft-col">
         <h4>Support</h4>
-        <a href="/cdn-cgi/l/email-protection#2940474f46694240474e4d4644044a5b4c485d405f4c5a074a4644"><span class="__cf_email__" data-cfemail="224b4c444d62494b4c45464d4f0f41504743564b5447510c414d4f">[email&#160;protected]</span></a>
+        <a href="/cdn-cgi/l/email-protection#177e797178577c7e797073787a3a74657276637e6172643974787a"><span class="__cf_email__" data-cfemail="d8b1b6beb798b3b1b6bfbcb7b5f5bbaabdb9acb1aebdabf6bbb7b5">[email&#160;protected]</span></a>
         <a href="#">Forgot Password</a>
         <a href="#">Account Login</a>
         <a href="#">Privacy Policy</a>
@@ -1338,10 +1338,16 @@ function resetSponsorForm(){
 
 // ═══ FAQ ═══
 function tFaq(el){
-  const a=el.nextElementSibling;const o=el.classList.contains('on');
-  document.querySelectorAll('.fq-q').forEach(q=>q.classList.remove('on'));
-  document.querySelectorAll('.fq-a').forEach(a=>a.classList.remove('on'));
-  if(!o){el.classList.add('on');a.classList.add('on');}
+  var a = el.nextElementSibling;
+  var isOpen = el.classList.contains('on');
+  document.querySelectorAll('.fq-q').forEach(function(q){ q.classList.remove('on'); });
+  document.querySelectorAll('.fq-a').forEach(function(x){ x.classList.remove('on'); x.style.maxHeight='0'; x.style.padding='0 1.2rem'; });
+  if(!isOpen){
+    el.classList.add('on');
+    a.classList.add('on');
+    a.style.maxHeight = a.scrollHeight + 'px';
+    a.style.padding = '0 1.2rem 1rem';
+  }
 }
 
 // ═══ SCROLL REVEAL ═══
