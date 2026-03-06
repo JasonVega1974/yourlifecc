@@ -18480,19 +18480,6 @@ function renderHeroMotivation(){
   }
 }
 
-function toggleTranslateDropdown(){
-  const el = document.getElementById('google_translate_element');
-  if(!el) return;
-  if(el.style.display === 'none'){
-    el.style.display = 'block';
-    // Auto-click the select if it exists
-    const sel = el.querySelector('select');
-    if(sel) sel.focus();
-  } else {
-    el.style.display = 'none';
-  }
-}
-
 function toggleCustomMessage(){
   const current = D.heroCustomMsg || '';
   const msg = prompt('Set a custom message for your dashboard:\n(Leave empty to show daily quote/scripture)', current);
@@ -20683,10 +20670,6 @@ function resetAllData(){
 }
 
 
-</script>
-</body>
-</html>
-<script>
 
 function googleTranslateElementInit(){
   new google.translate.TranslateElement({
@@ -20718,7 +20701,7 @@ function toggleTranslateDropdown(){
 </script>
 <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
-</html
+</html>
 <!-- GLOBAL LESSON MODAL -->
 <div id="charModal" class="mo" onclick="if(event.target===this)closeModal('charModal')">
   <div class="md" style="max-width:620px;padding:0;overflow:hidden;">
@@ -20733,4 +20716,3 @@ function toggleTranslateDropdown(){
   </div>
 </div>
 
->
