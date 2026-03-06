@@ -1416,17 +1416,34 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .nav-child:hover{opacity:1;}
 
 /* Google Translate compact styling */
-#google_translate_element select{background:#1a1a2e;border:1px solid rgba(255,255,255,.15);color:#e0e0e0;border-radius:8px;padding:6px 10px;font-size:.72rem;font-family:var(--fn);cursor:pointer;outline:none;min-width:140px;}
-#google_translate_element .goog-te-gadget{font-size:0!important;color:transparent!important;}
-#google_translate_element .goog-te-gadget span{display:none!important;}
-#google_translate_element .goog-te-gadget .goog-te-combo{margin:0!important;color:#e0e0e0!important;background:#1a1a2e!important;}
+/* Hide the Google branding/logo junk but keep the select visible */
+#google_translate_element .goog-te-gadget-simple{background:#1e1e3a!important;border:1px solid rgba(255,255,255,.2)!important;border-radius:8px!important;padding:4px 8px!important;cursor:pointer!important;}
+#google_translate_element .goog-te-gadget-simple .goog-te-menu-value{color:#e0e0e0!important;font-size:.75rem!important;font-family:var(--fn)!important;}
+#google_translate_element .goog-te-gadget-simple .goog-te-menu-value span{color:#e0e0e0!important;}
+#google_translate_element .goog-te-gadget-simple img{display:none!important;}
+/* For SIMPLE/COMBO layout */
+#google_translate_element .goog-te-gadget{color:transparent!important;font-size:0!important;}
+#google_translate_element .goog-te-gadget>span>a{display:none!important;}
+#google_translate_element .goog-te-combo{
+  display:block!important;
+  background:#1e1e3a!important;
+  border:1px solid rgba(255,255,255,.2)!important;
+  color:#e0e0e0!important;
+  border-radius:8px!important;
+  padding:6px 10px!important;
+  font-size:.78rem!important;
+  font-family:var(--fn)!important;
+  cursor:pointer!important;
+  outline:none!important;
+  min-width:160px!important;
+  margin:0!important;
+}
+/* Hide the annoying top banner */
 .goog-te-banner-frame{display:none!important;}
-body{top:0!important;}
-/* Do NOT hide .skiptranslate globally — Google wraps the widget in it */
 iframe.skiptranslate{display:none!important;}
+body{top:0!important;}
 #goog-gt-tt{display:none!important;}
 .goog-tooltip{display:none!important;}
-.goog-tooltip:hover{display:none!important;}
 
 </style>
 </head>
@@ -20681,7 +20698,7 @@ function googleTranslateElementInit(){
   new google.translate.TranslateElement({
     pageLanguage:'en',
     includedLanguages:'en,es,fr,de,pt,zh-CN,zh-TW,ar,hi,ko,ja,ru,it,pl,vi,tl,sw,ha',
-    layout:google.translate.TranslateElement.InlineLayout.SIMPLE,
+
     autoDisplay:false
   },'google_translate_element');
   // Hide after widget has rendered
