@@ -1416,34 +1416,14 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .nav-child:hover{opacity:1;}
 
 /* Google Translate compact styling */
-/* Hide the Google branding/logo junk but keep the select visible */
-#google_translate_element .goog-te-gadget-simple{background:#1e1e3a!important;border:1px solid rgba(255,255,255,.2)!important;border-radius:8px!important;padding:4px 8px!important;cursor:pointer!important;}
-#google_translate_element .goog-te-gadget-simple .goog-te-menu-value{color:#e0e0e0!important;font-size:.75rem!important;font-family:var(--fn)!important;}
-#google_translate_element .goog-te-gadget-simple .goog-te-menu-value span{color:#e0e0e0!important;}
-#google_translate_element .goog-te-gadget-simple img{display:none!important;}
-/* For SIMPLE/COMBO layout */
-#google_translate_element .goog-te-gadget{color:transparent!important;font-size:0!important;}
-#google_translate_element .goog-te-gadget>span>a{display:none!important;}
-#google_translate_element .goog-te-combo{
-  display:block!important;
-  background:#1e1e3a!important;
-  border:1px solid rgba(255,255,255,.2)!important;
-  color:#e0e0e0!important;
-  border-radius:8px!important;
-  padding:6px 10px!important;
-  font-size:.78rem!important;
-  font-family:var(--fn)!important;
-  cursor:pointer!important;
-  outline:none!important;
-  min-width:160px!important;
-  margin:0!important;
-}
-/* Hide the annoying top banner */
+#google_translate_element select{background:#1a1a2e;border:1px solid rgba(255,255,255,.15);color:#e0e0e0;border-radius:8px;padding:6px 10px;font-size:.72rem;font-family:var(--fn);cursor:pointer;outline:none;min-width:140px;}
+#google_translate_element .goog-te-gadget{font-size:0!important;color:transparent!important;}
+#google_translate_element .goog-te-gadget span{display:none!important;}
+#google_translate_element .goog-te-gadget .goog-te-combo{margin:0!important;}
 .goog-te-banner-frame{display:none!important;}
-iframe.skiptranslate{display:none!important;}
 body{top:0!important;}
+.skiptranslate{display:none!important;}
 #goog-gt-tt{display:none!important;}
-.goog-tooltip{display:none!important;}
 
 </style>
 </head>
@@ -1681,7 +1661,7 @@ body{top:0!important;}
       <svg width="14" height="14" viewBox="0 0 24 24" style="flex-shrink:0;"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       <span style="font-size:.68rem;">Language</span>
     </button>
-    <div id="google_translate_element" style="position:absolute;top:100%;right:0;margin-top:4px;z-index:999;min-width:160px;display:none;"></div>
+    <div id="google_translate_element" style="position:absolute;top:100%;right:0;margin-top:4px;z-index:999;display:none;"></div>
   </div>
   <button onclick="quickParentHub()" style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.2);color:#a78bfa;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:var(--fn);display:flex;align-items:center;gap:.3rem;transition:all .15s;" onmouseenter="this.style.background='rgba(139,92,246,.2)'" onmouseleave="this.style.background='rgba(139,92,246,.12)'">👨‍👩‍👧 Parent</button>
   <button onclick="quickSettings()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--tx2);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:var(--fn);display:flex;align-items:center;gap:.3rem;transition:all .15s;" onmouseenter="this.style.background='rgba(255,255,255,.12)'" onmouseleave="this.style.background='rgba(255,255,255,.06)'">⚙ Settings</button>
@@ -18500,6 +18480,19 @@ function renderHeroMotivation(){
   }
 }
 
+function toggleTranslateDropdown(){
+  const el = document.getElementById('google_translate_element');
+  if(!el) return;
+  if(el.style.display === 'none'){
+    el.style.display = 'block';
+    // Auto-click the select if it exists
+    const sel = el.querySelector('select');
+    if(sel) sel.focus();
+  } else {
+    el.style.display = 'none';
+  }
+}
+
 function toggleCustomMessage(){
   const current = D.heroCustomMsg || '';
   const msg = prompt('Set a custom message for your dashboard:\n(Leave empty to show daily quote/scripture)', current);
@@ -20690,42 +20683,42 @@ function resetAllData(){
 }
 
 
+</script>
+</body>
+</html>
+<script>
 
 function googleTranslateElementInit(){
-  // Briefly show the container so Google can render the widget into it
-  var wrap = document.getElementById('google_translate_element');
-  if(wrap){ wrap.style.display = 'block'; }
   new google.translate.TranslateElement({
     pageLanguage:'en',
     includedLanguages:'en,es,fr,de,pt,zh-CN,zh-TW,ar,hi,ko,ja,ru,it,pl,vi,tl,sw,ha',
-
+    layout:google.translate.TranslateElement.InlineLayout.SIMPLE,
     autoDisplay:false
   },'google_translate_element');
-  // Hide after widget has rendered
+  // Show the element briefly then hide so widget fully renders
   setTimeout(function(){
-    if(wrap){ wrap.style.display = 'none'; }
-  }, 500);
+    var el = document.getElementById('google_translate_element');
+    if(el){ el.style.display='block'; setTimeout(function(){ el.style.display='none'; },100); }
+  },1500);
 }
 
 function toggleTranslateDropdown(){
-  var wrap = document.getElementById('google_translate_element');
-  if(!wrap) return;
-  var isHidden = wrap.style.display === 'none' || wrap.style.display === '';
-  if(isHidden){
-    wrap.style.display = 'block';
-    // Find and programmatically open the select
-    var sel = wrap.querySelector('select');
-    if(sel){
-      sel.focus();
-      // Dispatch a mousedown to open the native dropdown
-      sel.dispatchEvent(new MouseEvent('mousedown',{bubbles:true}));
-    }
+  var el = document.getElementById('google_translate_element');
+  if(!el) return;
+  var sel = el.querySelector('select');
+  if(el.style.display === 'none' || el.style.display === ''){
+    el.style.display = 'block';
+    if(sel){ setTimeout(function(){ sel.focus(); sel.size=8; },50); }
   } else {
-    wrap.style.display = 'none';
+    el.style.display = 'none';
+    if(sel) sel.size=1;
   }
 }
 
 </script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html
 <!-- GLOBAL LESSON MODAL -->
 <div id="charModal" class="mo" onclick="if(event.target===this)closeModal('charModal')">
   <div class="md" style="max-width:620px;padding:0;overflow:hidden;">
@@ -20739,6 +20732,5 @@ function toggleTranslateDropdown(){
     <div id="charQuiz" style="padding:0 1.5rem 1.2rem;"></div>
   </div>
 </div>
-<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-</body>
-</html>
+
+>
