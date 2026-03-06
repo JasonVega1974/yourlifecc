@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>LIFE OS — Your Command Center</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 
 
@@ -1429,71 +1428,6 @@ body{top:0!important;}
 </style>
 </head>
 <body>
-
-<!-- ══════════════════════════════════════════════════════════
-     SUPABASE AUTH GATE
-     ══════════════════════════════════════════════════════════ -->
-<div id="authGate" style="display:flex;position:fixed;inset:0;z-index:99999;background:#0d1117;align-items:center;justify-content:center;font-family:'Inter',sans-serif;">
-  <div style="width:100%;max-width:420px;padding:2rem;text-align:center;">
-    <!-- Logo -->
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:.12em;background:linear-gradient(135deg,#38bdf8,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.25rem;">LIFE OS</div>
-    <div style="font-size:.75rem;letter-spacing:.25em;color:#64748b;text-transform:uppercase;margin-bottom:2.5rem;">Your Command Center</div>
-
-    <!-- Tab switcher -->
-    <div style="display:flex;background:#161b27;border-radius:12px;padding:4px;margin-bottom:1.5rem;border:1px solid rgba(255,255,255,.06);">
-      <button id="tabLogin" onclick="switchAuthTab('login')" style="flex:1;padding:.6rem;border:none;border-radius:9px;background:#38bdf8;color:#0d1117;font-weight:700;font-size:.82rem;cursor:pointer;transition:all .2s;">Sign In</button>
-      <button id="tabSignup" onclick="switchAuthTab('signup')" style="flex:1;padding:.6rem;border:none;border-radius:9px;background:transparent;color:#94a3b8;font-weight:600;font-size:.82rem;cursor:pointer;transition:all .2s;">Create Account</button>
-    </div>
-
-    <!-- Login form -->
-    <div id="authLoginForm">
-      <input id="authEmail" type="email" placeholder="Email address" autocomplete="email"
-        style="width:100%;box-sizing:border-box;padding:.75rem 1rem;background:#161b27;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#f1f5f9;font-size:.9rem;margin-bottom:.75rem;outline:none;"
-        onkeyup="if(event.key==='Enter')document.getElementById('authPass').focus()">
-      <input id="authPass" type="password" placeholder="Password" autocomplete="current-password"
-        style="width:100%;box-sizing:border-box;padding:.75rem 1rem;background:#161b27;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#f1f5f9;font-size:.9rem;margin-bottom:.5rem;outline:none;"
-        onkeyup="if(event.key==='Enter')doLogin()">
-      <div style="text-align:right;margin-bottom:1rem;">
-        <a href="#" onclick="doForgotPassword();return false;" style="font-size:.75rem;color:#38bdf8;text-decoration:none;">Forgot password?</a>
-      </div>
-      <button onclick="doLogin()" style="width:100%;padding:.8rem;background:linear-gradient(135deg,#38bdf8,#0ea5e9);border:none;border-radius:10px;color:#0d1117;font-weight:800;font-size:.95rem;cursor:pointer;letter-spacing:.04em;">SIGN IN</button>
-    </div>
-
-    <!-- Signup form -->
-    <div id="authSignupForm" style="display:none;">
-      <input id="authSignupName" type="text" placeholder="Your name (e.g. Alex)" autocomplete="name"
-        style="width:100%;box-sizing:border-box;padding:.75rem 1rem;background:#161b27;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#f1f5f9;font-size:.9rem;margin-bottom:.75rem;outline:none;"
-        onkeyup="if(event.key==='Enter')document.getElementById('authSignupEmail').focus()">
-      <input id="authSignupEmail" type="email" placeholder="Email address" autocomplete="email"
-        style="width:100%;box-sizing:border-box;padding:.75rem 1rem;background:#161b27;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#f1f5f9;font-size:.9rem;margin-bottom:.75rem;outline:none;"
-        onkeyup="if(event.key==='Enter')document.getElementById('authSignupPass').focus()">
-      <input id="authSignupPass" type="password" placeholder="Password (min 6 characters)" autocomplete="new-password"
-        style="width:100%;box-sizing:border-box;padding:.75rem 1rem;background:#161b27;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#f1f5f9;font-size:.9rem;margin-bottom:1rem;outline:none;"
-        onkeyup="if(event.key==='Enter')doSignup()">
-      <button onclick="doSignup()" style="width:100%;padding:.8rem;background:linear-gradient(135deg,#a78bfa,#7c3aed);border:none;border-radius:10px;color:#fff;font-weight:800;font-size:.95rem;cursor:pointer;letter-spacing:.04em;">CREATE ACCOUNT</button>
-    </div>
-
-    <!-- Status message -->
-    <div id="authMsg" style="margin-top:1rem;font-size:.8rem;min-height:1.2rem;color:#94a3b8;"></div>
-
-    <!-- Divider -->
-    <div style="display:flex;align-items:center;gap:.75rem;margin:1.5rem 0;color:#2a3652;">
-      <div style="flex:1;height:1px;background:#1c2333;"></div>
-      <span style="font-size:.7rem;color:#475569;">or continue without account</span>
-      <div style="flex:1;height:1px;background:#1c2333;"></div>
-    </div>
-    <button onclick="doGuestMode()" style="width:100%;padding:.65rem;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#64748b;font-size:.82rem;cursor:pointer;transition:all .2s;" onmouseover="this.style.borderColor='rgba(255,255,255,.25)';this.style.color='#94a3b8'" onmouseout="this.style.borderColor='rgba(255,255,255,.1)';this.style.color='#64748b'">
-      Continue as Guest (data stays on this device only)
-    </button>
-  </div>
-</div>
-
-<!-- User badge shown in app (top-right area) -->
-<div id="userBadge" style="display:none;position:fixed;top:12px;right:16px;z-index:9000;display:none;align-items:center;gap:.5rem;">
-  <div id="userBadgeName" style="font-size:.7rem;color:#64748b;font-family:'Inter',sans-serif;"></div>
-  <button onclick="doSignOut()" style="font-size:.65rem;padding:.25rem .55rem;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:6px;color:#f87171;cursor:pointer;font-family:'Inter',sans-serif;">Sign Out</button>
-</div>
-
 <!-- FIRST TIME PARENT PIN SETUP -->
 <div id="firstTimeGate" style="display:none;position:fixed;inset:0;z-index:9999;background:var(--bg);align-items:center;justify-content:center;">
   <div style="text-align:center;max-width:400px;padding:2rem;">
@@ -20757,154 +20691,32 @@ function resetAllData(){
 function googleTranslateElementInit(){
   new google.translate.TranslateElement({
     pageLanguage:'en',
+    includedLanguages:'en,es,fr,de,pt,zh-CN,zh-TW,ar,hi,ko,ja,ru,it,pl,vi,tl,sw,ha',
     layout:google.translate.TranslateElement.InlineLayout.SIMPLE,
     autoDisplay:false
   },'google_translate_element');
+  // Show the element briefly then hide so widget fully renders
+  setTimeout(function(){
+    var el = document.getElementById('google_translate_element');
+    if(el){ el.style.display='block'; setTimeout(function(){ el.style.display='none'; },100); }
+  },1500);
+}
+
+function toggleTranslateDropdown(){
+  var el = document.getElementById('google_translate_element');
+  if(!el) return;
+  var sel = el.querySelector('select');
+  if(el.style.display === 'none' || el.style.display === ''){
+    el.style.display = 'block';
+    if(sel){ setTimeout(function(){ sel.focus(); sel.size=8; },50); }
+  } else {
+    el.style.display = 'none';
+    if(sel) sel.size=1;
+  }
 }
 
 </script>
 <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-
-<script>
-// ══════════════════════════════════════════════════════════════
-//  SUPABASE AUTH — LifeOS
-// ══════════════════════════════════════════════════════════════
-const SUPA_URL  = 'https://hrohgwcbfgywkpnvqxhk.supabase.co';
-const SUPA_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhyb2hnd2NiZmd5d2twbnZxeGhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MjcxNDYsImV4cCI6MjA4ODQwMzE0Nn0.PuWtBpiMw2DiCLp26ZP_Rd9BwzFvWT0sNZrDUNdULyo';
-const _supa     = supabase.createClient(SUPA_URL, SUPA_KEY);
-let   _supaUser = null;
-
-// ── Tab switcher ───────────────────────────────────────────
-function switchAuthTab(tab){
-  const isLogin = tab === 'login';
-  document.getElementById('authLoginForm').style.display  = isLogin ? '' : 'none';
-  document.getElementById('authSignupForm').style.display = isLogin ? 'none' : '';
-  const tl = document.getElementById('tabLogin');
-  const ts = document.getElementById('tabSignup');
-  tl.style.background    = isLogin ? '#38bdf8' : 'transparent';
-  tl.style.color         = isLogin ? '#0d1117' : '#94a3b8';
-  ts.style.background    = isLogin ? 'transparent' : '#a78bfa';
-  ts.style.color         = isLogin ? '#94a3b8' : '#fff';
-  setAuthMsg('');
-}
-
-function setAuthMsg(msg, isErr){
-  const el = document.getElementById('authMsg');
-  if(!el) return;
-  el.textContent  = msg;
-  el.style.color  = isErr ? '#f87171' : '#34d399';
-}
-
-// ── Sign In ────────────────────────────────────────────────
-async function doLogin(){
-  const email = (document.getElementById('authEmail').value||'').trim();
-  const pass  = (document.getElementById('authPass').value||'').trim();
-  if(!email || !pass){ setAuthMsg('Please enter email and password.', true); return; }
-  setAuthMsg('Signing in…');
-  const { data, error } = await _supa.auth.signInWithPassword({ email, password: pass });
-  if(error){ setAuthMsg(error.message, true); return; }
-  _supaUser = data.user;
-  onAuthSuccess(data.user);
-}
-
-// ── Sign Up ────────────────────────────────────────────────
-async function doSignup(){
-  const name  = (document.getElementById('authSignupName').value||'').trim();
-  const email = (document.getElementById('authSignupEmail').value||'').trim();
-  const pass  = (document.getElementById('authSignupPass').value||'').trim();
-  if(!name)            { setAuthMsg('Please enter your name.', true); return; }
-  if(!email)           { setAuthMsg('Please enter your email.', true); return; }
-  if(pass.length < 6)  { setAuthMsg('Password must be at least 6 characters.', true); return; }
-  setAuthMsg('Creating account…');
-  const { data, error } = await _supa.auth.signUp({
-    email, password: pass,
-    options: { data: { display_name: name } }
-  });
-  if(error){ setAuthMsg(error.message, true); return; }
-  // If email confirmation is on, tell user; otherwise log them in
-  if(data.user && !data.session){
-    setAuthMsg('✅ Check your email to confirm your account, then sign in!');
-    switchAuthTab('login');
-    return;
-  }
-  _supaUser = data.user;
-  // Pre-fill name in app data
-  if(name && typeof D !== 'undefined') D.name = name;
-  onAuthSuccess(data.user);
-}
-
-// ── Forgot Password ────────────────────────────────────────
-async function doForgotPassword(){
-  const email = (document.getElementById('authEmail').value||'').trim();
-  if(!email){ setAuthMsg('Enter your email first, then click Forgot Password.', true); return; }
-  setAuthMsg('Sending reset link…');
-  const { error } = await _supa.auth.resetPasswordForEmail(email);
-  if(error){ setAuthMsg(error.message, true); return; }
-  setAuthMsg('✅ Reset link sent — check your inbox!');
-}
-
-// ── Guest Mode ─────────────────────────────────────────────
-function doGuestMode(){
-  _supaUser = null;
-  hideAuthGate();
-}
-
-// ── Sign Out ───────────────────────────────────────────────
-async function doSignOut(){
-  await _supa.auth.signOut();
-  _supaUser = null;
-  document.getElementById('userBadge').style.display = 'none';
-  showAuthGate();
-}
-
-// ── Show / Hide gate ───────────────────────────────────────
-function showAuthGate(){
-  const el = document.getElementById('authGate');
-  if(el){ el.style.display = 'flex'; el.style.opacity = '1'; }
-}
-function hideAuthGate(){
-  const el = document.getElementById('authGate');
-  if(!el) return;
-  el.style.transition = 'opacity .4s';
-  el.style.opacity = '0';
-  setTimeout(()=>{ el.style.display = 'none'; }, 400);
-}
-
-// ── On successful auth ─────────────────────────────────────
-function onAuthSuccess(user){
-  hideAuthGate();
-  // Show user badge
-  const badge = document.getElementById('userBadge');
-  const badgeName = document.getElementById('userBadgeName');
-  if(badge){ badge.style.display = 'flex'; }
-  if(badgeName){
-    const name = user.user_metadata?.display_name || user.email?.split('@')[0] || 'User';
-    badgeName.textContent = '👤 ' + name;
-    // Also pre-fill app name if not set
-    if(typeof D !== 'undefined' && !D.name && name) D.name = name;
-  }
-}
-
-// ── Check for existing session on load ────────────────────
-(async function checkSession(){
-  const { data } = await _supa.auth.getSession();
-  if(data?.session?.user){
-    _supaUser = data.session.user;
-    onAuthSuccess(data.session.user);
-  } else {
-    showAuthGate();
-  }
-  // Listen for auth state changes
-  _supa.auth.onAuthStateChange((event, session) => {
-    if(event === 'SIGNED_IN' && session?.user){
-      _supaUser = session.user;
-      onAuthSuccess(session.user);
-    } else if(event === 'SIGNED_OUT'){
-      _supaUser = null;
-    }
-  });
-})();
-</script>
 </body>
 </html
 <!-- GLOBAL LESSON MODAL -->
