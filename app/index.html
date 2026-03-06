@@ -1415,6 +1415,11 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .nav-child{opacity:.9;font-size:.76rem!important;}
 .nav-child:hover{opacity:1;}
 
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.child-pin-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;border-radius:12px;padding:.9rem;font-size:1.1rem;font-weight:700;cursor:pointer;transition:all .1s;font-family:var(--fn);}
+.child-pin-btn:hover{background:rgba(255,255,255,.15);}
+.child-pin-btn:active{transform:scale(.94);}
+#childLoginScreen{display:none;}
 /* Google Translate */
 #google_translate_element .goog-te-gadget{font-size:0!important;color:transparent!important;}
 #google_translate_element .goog-te-gadget select,
@@ -1676,6 +1681,7 @@ body{top:0!important;}
     </button>
     <div id="google_translate_element" style="position:absolute;top:100%;right:0;margin-top:4px;z-index:9999;background:#1e1e3a;border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:6px;display:none;min-width:180px;box-shadow:0 8px 32px rgba(0,0,0,.5);"></div>
   </div>
+  <button onclick="openChildLogin()" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.15);color:#38bdf8;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:var(--fn);display:flex;align-items:center;gap:.3rem;transition:all .15s;" onmouseenter="this.style.background='rgba(56,189,248,.16)'" onmouseleave="this.style.background='rgba(56,189,248,.08)'">👤 Child Login</button>
   <button onclick="quickParentHub()" style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.2);color:#a78bfa;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:var(--fn);display:flex;align-items:center;gap:.3rem;transition:all .15s;" onmouseenter="this.style.background='rgba(139,92,246,.2)'" onmouseleave="this.style.background='rgba(139,92,246,.12)'">👨‍👩‍👧 Parent</button>
   <button onclick="quickSettings()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--tx2);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:var(--fn);display:flex;align-items:center;gap:.3rem;transition:all .15s;" onmouseenter="this.style.background='rgba(255,255,255,.12)'" onmouseleave="this.style.background='rgba(255,255,255,.06)'">⚙ Settings</button>
 </div>
@@ -4812,18 +4818,12 @@ body{top:0!important;}
       <select id="parentChildSelect" onchange="switchParentView(this.value)" style="flex:1;font-size:.8rem;font-weight:700;"></select>
     </div>
 
-    <!-- CHILD MANAGEMENT -->
-    <div style="display:flex;gap:.4rem;margin-bottom:.7rem;">
-      <button class="btn bp bs" onclick="addChildProfile()" style="flex:1;font-size:.72rem;">👶 + Add Child</button>
-      <button class="btn bs" onclick="removeChildProfile()" style="font-size:.72rem;background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.25);color:#f87171;">🗑 Remove Child</button>
-      <button class="btn bgh bs" onclick="resetAllPins()" style="font-size:.72rem;">🔑 Reset PINs</button>
-    </div>
-
     <!-- LEFT NAV + RIGHT CONTENT LAYOUT -->
     <div style="display:flex;gap:.7rem;min-height:500px;" id="phLayout">
       
       <!-- LEFT PANEL -->
       <div style="width:180px;flex-shrink:0;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:.5rem;overflow-y:auto;" id="phLeftNav">
+        <div onclick="phNav('users')" class="ph-nav-item" id="phn-users">👥 Manage Users</div>
         <div onclick="phNav('overview')" class="ph-nav-item active" id="phn-overview">📊 Overview</div>
         <div onclick="phNav('chores')" class="ph-nav-item" id="phn-chores">✅ Chores & Deeds</div>
         <div onclick="phNav('contests')" class="ph-nav-item" id="phn-contests">🏆 Contests</div>
@@ -4837,6 +4837,51 @@ body{top:0!important;}
 
       <!-- RIGHT CONTENT -->
       <div style="flex:1;min-width:0;">
+
+        <!-- MANAGE USERS -->
+        <div id="ph-users" style="display:none;">
+          <div style="font-size:.85rem;font-weight:800;color:#e0e0e0;margin-bottom:.8rem;display:flex;align-items:center;gap:.4rem;">👥 Manage Users</div>
+
+          <!-- CURRENT USERS LIST -->
+          <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:1rem 1.2rem;margin-bottom:.8rem;">
+            <div style="font-size:.75rem;font-weight:700;color:var(--tx2);margin-bottom:.6rem;text-transform:uppercase;letter-spacing:1px;">Current Users</div>
+            <div id="manageUsersList"></div>
+          </div>
+
+          <!-- ADD CHILD -->
+          <div style="background:rgba(56,189,248,.03);border:1px solid rgba(56,189,248,.1);border-radius:14px;padding:1rem 1.2rem;margin-bottom:.8rem;">
+            <div style="font-size:.75rem;font-weight:700;color:#38bdf8;margin-bottom:.5rem;text-transform:uppercase;letter-spacing:1px;">➕ Add New Child</div>
+            <div style="display:flex;gap:.4rem;align-items:flex-end;">
+              <div style="flex:1;">
+                <label style="font-size:.65rem;color:var(--tx2);display:block;margin-bottom:.2rem;">Child's Name</label>
+                <input type="text" id="newChildName" placeholder="e.g. Emma" style="width:100%;font-size:.8rem;">
+              </div>
+              <div>
+                <label style="font-size:.65rem;color:var(--tx2);display:block;margin-bottom:.2rem;">4-Digit PIN</label>
+                <input type="text" id="newChildPin" placeholder="auto" maxlength="4" style="width:80px;font-size:.8rem;text-align:center;letter-spacing:.2rem;">
+              </div>
+              <button class="btn bp bs" onclick="addChildFromHub()" style="font-size:.72rem;white-space:nowrap;">👶 Add Child</button>
+            </div>
+            <div style="font-size:.62rem;color:var(--tx3);margin-top:.35rem;">Leave PIN blank to auto-generate. Child uses this 4-digit PIN to log in.</div>
+          </div>
+
+          <!-- PARENT PIN -->
+          <div style="background:rgba(139,92,246,.03);border:1px solid rgba(139,92,246,.1);border-radius:14px;padding:1rem 1.2rem;">
+            <div style="font-size:.75rem;font-weight:700;color:#a78bfa;margin-bottom:.5rem;text-transform:uppercase;letter-spacing:1px;">🔒 Parent PIN</div>
+            <div style="font-size:.72rem;color:var(--tx2);margin-bottom:.5rem;">Your 6-digit PIN protects the Parent Hub. Change it here.</div>
+            <div style="display:flex;gap:.4rem;align-items:flex-end;">
+              <div>
+                <label style="font-size:.65rem;color:var(--tx2);display:block;margin-bottom:.2rem;">New 6-Digit PIN</label>
+                <input type="password" id="newParentPin" placeholder="••••••" maxlength="6" style="width:120px;font-size:.9rem;text-align:center;letter-spacing:.3rem;">
+              </div>
+              <div>
+                <label style="font-size:.65rem;color:var(--tx2);display:block;margin-bottom:.2rem;">Confirm PIN</label>
+                <input type="password" id="confirmParentPin" placeholder="••••••" maxlength="6" style="width:120px;font-size:.9rem;text-align:center;letter-spacing:.3rem;">
+              </div>
+              <button class="btn bs" onclick="changeParentPin()" style="font-size:.72rem;background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.25);color:#a78bfa;">🔑 Update PIN</button>
+            </div>
+          </div>
+        </div>
 
         <!-- OVERVIEW -->
         <div id="ph-overview">
@@ -12179,6 +12224,43 @@ ${(b.showQR&&b.qrUrl&&qrSvgInline)?`<div class="section">
 
 
 
+
+<!-- ═══ CHILD LOGIN SCREEN ═══ -->
+<div id="childLoginScreen" style="display:none;position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#0f0f1a,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;flex-direction:column;">
+  <div style="text-align:center;max-width:340px;width:90%;">
+    <div style="font-size:2.5rem;margin-bottom:.3rem;">👤</div>
+    <div style="font-size:1.3rem;font-weight:900;color:#fff;margin-bottom:.2rem;">Child Login</div>
+    <div style="font-size:.8rem;color:rgba(255,255,255,.5);margin-bottom:1.5rem;">Enter your 4-digit PIN</div>
+
+    <!-- PIN DOTS -->
+    <div style="display:flex;justify-content:center;gap:.6rem;margin-bottom:1.5rem;" id="childPinDots">
+      <div style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.3);background:transparent;" id="cd0"></div>
+      <div style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.3);background:transparent;" id="cd1"></div>
+      <div style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.3);background:transparent;" id="cd2"></div>
+      <div style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.3);background:transparent;" id="cd3"></div>
+    </div>
+
+    <!-- NUMPAD -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;max-width:240px;margin:0 auto 1rem;">
+      <button onclick="childPinInput('1')" class="child-pin-btn">1</button>
+      <button onclick="childPinInput('2')" class="child-pin-btn">2</button>
+      <button onclick="childPinInput('3')" class="child-pin-btn">3</button>
+      <button onclick="childPinInput('4')" class="child-pin-btn">4</button>
+      <button onclick="childPinInput('5')" class="child-pin-btn">5</button>
+      <button onclick="childPinInput('6')" class="child-pin-btn">6</button>
+      <button onclick="childPinInput('7')" class="child-pin-btn">7</button>
+      <button onclick="childPinInput('8')" class="child-pin-btn">8</button>
+      <button onclick="childPinInput('9')" class="child-pin-btn">9</button>
+      <button onclick="childPinClear()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--tx2);border-radius:12px;padding:.9rem;font-size:.8rem;font-weight:700;cursor:pointer;">Clear</button>
+      <button onclick="childPinInput('0')" class="child-pin-btn">0</button>
+      <button onclick="childPinDelete()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--tx2);border-radius:12px;padding:.9rem;font-size:1rem;cursor:pointer;">⌫</button>
+    </div>
+
+    <div id="childLoginMsg" style="font-size:.75rem;color:#f87171;min-height:1.2rem;margin-bottom:.8rem;"></div>
+    <button onclick="closeChildLogin()" style="font-size:.72rem;color:var(--tx3);background:none;border:none;cursor:pointer;text-decoration:underline;">Cancel</button>
+  </div>
+</div>
+
 </body>
 </html>`;
 }
@@ -14945,6 +15027,166 @@ function addChildProfile(){
   }
 }
 
+// ── CHILD LOGIN SYSTEM ──────────────────────────────────────
+let _childPinBuffer = '';
+
+function openChildLogin(){
+  _childPinBuffer = '';
+  updateChildPinDots();
+  document.getElementById('childLoginMsg').textContent = '';
+  document.getElementById('childLoginScreen').style.display = 'flex';
+}
+
+function closeChildLogin(){
+  document.getElementById('childLoginScreen').style.display = 'none';
+  _childPinBuffer = '';
+  updateChildPinDots();
+}
+
+function childPinInput(digit){
+  if(_childPinBuffer.length >= 4) return;
+  _childPinBuffer += digit;
+  updateChildPinDots();
+  if(_childPinBuffer.length === 4) setTimeout(validateChildPin, 200);
+}
+
+function childPinDelete(){
+  _childPinBuffer = _childPinBuffer.slice(0,-1);
+  updateChildPinDots();
+}
+
+function childPinClear(){
+  _childPinBuffer = '';
+  updateChildPinDots();
+}
+
+function updateChildPinDots(){
+  for(let i=0;i<4;i++){
+    const d = document.getElementById('cd'+i);
+    if(d){
+      d.style.background = i < _childPinBuffer.length ? '#38bdf8' : 'transparent';
+      d.style.borderColor = i < _childPinBuffer.length ? '#38bdf8' : 'rgba(255,255,255,.3)';
+    }
+  }
+}
+
+function validateChildPin(){
+  // Find child profile matching this 4-digit PIN
+  const children = _profiles.filter((p,i) => i > 0); // skip parent (index 0)
+  const match = children.find(p => p.id === _childPinBuffer);
+  if(match){
+    closeChildLogin();
+    switchToProfile(match.id);
+    showToast('Welcome, ' + match.name + '! 👋');
+  } else {
+    document.getElementById('childLoginMsg').textContent = 'Incorrect PIN — try again';
+    _childPinBuffer = '';
+    updateChildPinDots();
+    // Shake animation
+    const dots = document.getElementById('childPinDots');
+    dots.style.animation = 'none';
+    dots.offsetHeight;
+    dots.style.animation = 'shake .3s ease';
+  }
+}
+
+// ── MANAGE USERS (Parent Hub tab) ──────────────────────────
+function renderManageUsers(){
+  const el = document.getElementById('manageUsersList');
+  if(!el) return;
+  const colors = ['#a78bfa','#4f8fff','#06d6a0','#f5a623','#f472b6','#22d3ee','#ef4444'];
+  if(_profiles.length === 0){ el.innerHTML = '<div style="font-size:.75rem;color:var(--tx3);">No profiles yet.</div>'; return; }
+  el.innerHTML = _profiles.map((p,i) => {
+    const isParent = i === 0;
+    const c = colors[i % colors.length];
+    return `<div style="display:flex;align-items:center;gap:.6rem;padding:.6rem .4rem;border-bottom:1px solid rgba(255,255,255,.05);">
+      <div style="width:32px;height:32px;border-radius:50%;background:${c}22;border:2px solid ${c};display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;color:${c};">${p.name.charAt(0).toUpperCase()}</div>
+      <div style="flex:1;">
+        <div style="font-size:.8rem;font-weight:700;color:#e0e0e0;">${p.name} ${isParent?'<span style="font-size:.58rem;background:rgba(139,92,246,.2);color:#a78bfa;border-radius:4px;padding:1px 5px;margin-left:3px;">PARENT</span>':''}</div>
+        <div style="font-size:.65rem;color:var(--tx3);">${isParent ? '6-digit PIN (set in Settings)' : '4-digit PIN: <span style="font-family:monospace;letter-spacing:.1rem;color:#38bdf8;">'+p.id+'</span>'}</div>
+      </div>
+      <div style="display:flex;gap:.3rem;">
+        ${!isParent ? `<button onclick="resetChildPin('${p.id}')" style="font-size:.62rem;padding:3px 7px;border-radius:6px;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.2);color:#fbbf24;cursor:pointer;">🔄 New PIN</button>` : ''}
+        ${!isParent ? `<button onclick="removeChildById('${p.id}')" style="font-size:.62rem;padding:3px 7px;border-radius:6px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#f87171;cursor:pointer;">🗑 Remove</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function addChildFromHub(){
+  const nameEl = document.getElementById('newChildName');
+  const pinEl = document.getElementById('newChildPin');
+  const name = nameEl ? nameEl.value.trim() : '';
+  if(!name){ showToast('Enter a name for the child'); return; }
+
+  let pin = pinEl ? pinEl.value.trim() : '';
+  if(pin && (pin.length !== 4 || isNaN(pin))){ showToast('PIN must be exactly 4 digits'); return; }
+  if(!pin){
+    // Auto-generate unique 4-digit PIN
+    let attempts = 0;
+    do { pin = String(Math.floor(1000 + Math.random()*9000)); attempts++; }
+    while(_profiles.find(p=>p.id===pin) && attempts < 100);
+  }
+  if(_profiles.find(p=>p.id===pin)){ showToast('That PIN is already in use'); return; }
+
+  if(_activeProfileId){
+    const cur = _profiles.find(p=>p.id===_activeProfileId);
+    if(cur) cur.data = JSON.parse(JSON.stringify(D));
+  }
+  _profiles.push({id:pin, name, data:{name, streak:0, mode:'mid_hs'}});
+  saveProfiles();
+  if(nameEl) nameEl.value = '';
+  if(pinEl) pinEl.value = '';
+  renderManageUsers();
+  renderProfileSwitcher();
+  showToast(name + ' added! PIN: ' + pin);
+  alert('✅ Child Profile Created!\n\nName: ' + name + '\n4-Digit PIN: ' + pin + '\n\n📝 Write this PIN down and give it to ' + name + '.\nThey use this on the Child Login screen.');
+}
+
+function resetChildPin(id){
+  const p = _profiles.find(x=>x.id===id);
+  if(!p) return;
+  if(!confirm('Reset PIN for ' + p.name + '?\n\nA new 4-digit PIN will be generated.')) return;
+  // Generate new unique 4-digit PIN
+  let newPin;
+  let attempts = 0;
+  do { newPin = String(Math.floor(1000 + Math.random()*9000)); attempts++; }
+  while(_profiles.find(x=>x.id===newPin) && attempts < 100);
+  // Update profile id (the id IS the pin)
+  if(_activeProfileId === id) _activeProfileId = newPin;
+  p.id = newPin;
+  saveProfiles();
+  renderManageUsers();
+  renderProfileSwitcher();
+  alert('New PIN for ' + p.name + ': ' + newPin + '\n\n📝 Give this new PIN to ' + p.name + '.');
+}
+
+function removeChildById(id){
+  const p = _profiles.find(x=>x.id===id);
+  if(!p) return;
+  if(!confirm('Remove ' + p.name + '?\n\nAll their data will be permanently deleted.')) return;
+  if(_activeProfileId === id) switchToProfile(_profiles[0].id);
+  _profiles = _profiles.filter(x=>x.id!==id);
+  saveProfiles();
+  renderManageUsers();
+  renderProfileSwitcher();
+  showToast(p.name + ' removed');
+}
+
+function changeParentPin(){
+  const np = document.getElementById('newParentPin');
+  const cp = document.getElementById('confirmParentPin');
+  if(!np||!cp) return;
+  const pin = np.value.trim();
+  const conf = cp.value.trim();
+  if(pin.length !== 6 || isNaN(pin)){ showToast('PIN must be exactly 6 digits'); return; }
+  if(pin !== conf){ showToast('PINs do not match'); return; }
+  D.parentPin = pin;
+  saveData();
+  np.value=''; cp.value='';
+  showToast('Parent PIN updated ✓');
+}
+
 function removeChildProfile(){
   // Get list of child profiles (all except the first/parent profile)
   const children = _profiles.filter(p => p.id !== _profiles[0].id);
@@ -17560,7 +17802,7 @@ function renderParentDashboard(){ renderParentDash(); }
 
 // ── PARENT HUB NAVIGATION ──
 function phNav(tab){
-  const panels = ['overview','chores','contests','quizzes','controls','behavior','activity','learning','growth'];
+  const panels = ['users','overview','chores','contests','quizzes','controls','behavior','activity','learning','growth'];
   panels.forEach(p=>{
     const el = document.getElementById('ph-'+p);
     if(el) el.style.display = p===tab ? 'block' : 'none';
@@ -17568,6 +17810,7 @@ function phNav(tab){
     if(nav) nav.classList.toggle('active', p===tab);
   });
   // Trigger renders for the active panel
+  if(tab==='users'){ renderManageUsers(); }
   if(tab==='overview'){ renderParentGettingStarted(); renderParentMultiChild(); renderParentScore(); renderParentOverview(); renderWeeklyReportCard(); }
   if(tab==='chores'){ renderParentChoreList(); renderParentSelfChores(); renderParentDeeds(); }
   if(tab==='contests'){ renderParentLeaderboard(); renderParentContests(); renderParentFamilyRewards(); }
