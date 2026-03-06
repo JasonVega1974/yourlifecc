@@ -4823,8 +4823,8 @@ body{top:0!important;}
       
       <!-- LEFT PANEL -->
       <div style="width:180px;flex-shrink:0;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:.5rem;overflow-y:auto;" id="phLeftNav">
-        <div onclick="phNav('users')" class="ph-nav-item" id="phn-users">👥 Manage Users</div>
-        <div onclick="phNav('overview')" class="ph-nav-item active" id="phn-overview">📊 Overview</div>
+        <div onclick="phNav('users')" class="ph-nav-item active" id="phn-users">👥 Manage Users</div>
+        <div onclick="phNav('overview')" class="ph-nav-item" id="phn-overview">📊 Overview</div>
         <div onclick="phNav('chores')" class="ph-nav-item" id="phn-chores">✅ Chores & Deeds</div>
         <div onclick="phNav('contests')" class="ph-nav-item" id="phn-contests">🏆 Contests</div>
         <div onclick="phNav('quizzes')" class="ph-nav-item" id="phn-quizzes">📝 Quizzes</div>
@@ -13268,7 +13268,7 @@ function renderParentDash(){
   renderParentContests();
   renderParentFamilyRewards();
   renderParentActivityFeed();
-  phNav('overview');
+  phNav('users');
 }
 
 // ── PARENT SCORE — THE BIG NUMBER ────────────────────────────
