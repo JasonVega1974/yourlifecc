@@ -4815,6 +4815,7 @@ body{top:0!important;}
     <!-- CHILD MANAGEMENT -->
     <div style="display:flex;gap:.4rem;margin-bottom:.7rem;">
       <button class="btn bp bs" onclick="addChildProfile()" style="flex:1;font-size:.72rem;">👶 + Add Child</button>
+      <button class="btn bs" onclick="removeChildProfile()" style="font-size:.72rem;background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.25);color:#f87171;">🗑 Remove Child</button>
       <button class="btn bgh bs" onclick="resetAllPins()" style="font-size:.72rem;">🔑 Reset PINs</button>
     </div>
 
@@ -14942,6 +14943,42 @@ function addChildProfile(){
     switchToProfile(cleanCode);
     showToast(name.trim() + '\'s profile created ✓');
   }
+}
+
+function removeChildProfile(){
+  // Get list of child profiles (all except the first/parent profile)
+  const children = _profiles.filter(p => p.id !== _profiles[0].id);
+  if(children.length === 0){
+    showToast('No child profiles to remove');
+    return;
+  }
+
+  // Build selection list
+  const names = children.map((p,i) => (i+1) + '. ' + p.name + ' (Code: ' + p.id + ')').join('\n');
+  const input = prompt('SELECT CHILD TO REMOVE\n\nEnter the number of the child to deactivate:\n\n' + names + '\n\n⚠️ This will permanently delete all their data.');
+  if(!input) return;
+
+  const idx = parseInt(input.trim()) - 1;
+  if(isNaN(idx) || idx < 0 || idx >= children.length){
+    showToast('Invalid selection');
+    return;
+  }
+
+  const child = children[idx];
+  const confirm1 = confirm('⚠️ REMOVE CHILD PROFILE\n\nAre you sure you want to permanently remove:\n\n' + child.name + ' (Code: ' + child.id + ')\n\nAll their progress, data, and history will be deleted.\nThis cannot be undone.');
+  if(!confirm1) return;
+
+  // If currently viewing this child, switch back to parent first
+  if(_activeProfileId === child.id){
+    switchToProfile(_profiles[0].id);
+  }
+
+  // Remove from profiles array
+  _profiles = _profiles.filter(p => p.id !== child.id);
+  saveProfiles();
+  renderProfileSwitcher();
+  renderParentMultiChild();
+  showToast(child.name + '\'s profile removed ✓');
 }
 
 function unlockProfile(id){
