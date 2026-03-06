@@ -196,7 +196,8 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
 .ft-bottom{text-align:center;border-top:1px solid rgba(255,255,255,.04);padding-top:1.5rem;font-size:.78rem;color:var(--tx3);}
 
 /* Animations */
-.rv{opacity:0;transform:translateY(20px);transition:all .5s ease-out;}
+.rv{opacity:1;transform:none;transition:all .5s ease-out;}
+.rv.anim{opacity:0;transform:translateY(20px);}
 .rv.in{opacity:1;transform:none;}
 </style>
 </head>
@@ -1345,9 +1346,9 @@ function tFaq(el){
 }
 
 // ═══ SCROLL REVEAL ═══
-const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');obs.unobserve(e.target);}});},{threshold:0,rootMargin:'0px 0px 50px 0px'});
-document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
-// Fallback: show all rv elements after 2s in case observer fails
-setTimeout(()=>{document.querySelectorAll('.rv').forEach(el=>el.classList.add('in'));},2000);
+document.querySelectorAll('.rv').forEach(el=>{if(el.getBoundingClientRect().top>window.innerHeight)el.classList.add('anim');});
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.remove('anim');obs.unobserve(e.target);}});},{threshold:0,rootMargin:'0px 0px 60px 0px'});
+document.querySelectorAll('.rv.anim').forEach(el=>obs.observe(el));
+setTimeout(()=>{document.querySelectorAll('.rv').forEach(el=>el.classList.remove('anim'));},3000);
 
 // ═══ SMOOTH SCROLL 
