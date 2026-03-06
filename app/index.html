@@ -20706,18 +20706,16 @@ function toggleTranslateDropdown(){
   if(!wrap) return;
   var open = wrap.style.display === 'block';
   wrap.style.display = open ? 'none' : 'block';
-  // Close when clicking outside
-  if(!open){
-    setTimeout(function(){
-      document.addEventListener('click', function handler(e){
-        if(!document.getElementById('translateWrap').contains(e.target)){
-          wrap.style.display = 'none';
-        }
-        document.removeEventListener('click', handler);
-      });
-    }, 50);
-  }
 }
+
+document.addEventListener('click', function(e){
+  var tw = document.getElementById('translateWrap');
+  var wrap = document.getElementById('google_translate_element');
+  if(!wrap || !tw) return;
+  if(!tw.contains(e.target)){
+    wrap.style.display = 'none';
+  }
+});
 
 </script>
 <!-- GLOBAL LESSON MODAL -->
