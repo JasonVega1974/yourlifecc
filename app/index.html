@@ -1419,11 +1419,14 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 #google_translate_element select{background:#1a1a2e;border:1px solid rgba(255,255,255,.15);color:#e0e0e0;border-radius:8px;padding:6px 10px;font-size:.72rem;font-family:var(--fn);cursor:pointer;outline:none;min-width:140px;}
 #google_translate_element .goog-te-gadget{font-size:0!important;color:transparent!important;}
 #google_translate_element .goog-te-gadget span{display:none!important;}
-#google_translate_element .goog-te-gadget .goog-te-combo{margin:0!important;}
+#google_translate_element .goog-te-gadget .goog-te-combo{margin:0!important;color:#e0e0e0!important;background:#1a1a2e!important;}
 .goog-te-banner-frame{display:none!important;}
 body{top:0!important;}
-.skiptranslate{display:none!important;}
+/* Do NOT hide .skiptranslate globally — Google wraps the widget in it */
+iframe.skiptranslate{display:none!important;}
 #goog-gt-tt{display:none!important;}
+.goog-tooltip{display:none!important;}
+.goog-tooltip:hover{display:none!important;}
 
 </style>
 </head>
@@ -20686,22 +20689,22 @@ function googleTranslateElementInit(){
 }
 
 function toggleTranslateDropdown(){
-  var el = document.getElementById('google_translate_element');
-  if(!el) return;
-  var sel = el.querySelector('select');
-  if(el.style.display === 'none' || el.style.display === ''){
-    el.style.display = 'block';
-    if(sel){ setTimeout(function(){ sel.focus(); sel.size=8; },50); }
+  var wrap = document.getElementById('google_translate_element');
+  if(!wrap) return;
+  var isHidden = wrap.style.display === 'none' || wrap.style.display === '';
+  if(isHidden){
+    wrap.style.display = 'block';
+    // Try to trigger the select dropdown open
+    var sel = wrap.querySelector('select.goog-te-combo') || wrap.querySelector('select');
+    if(sel){
+      setTimeout(function(){ sel.focus(); }, 100);
+    }
   } else {
-    el.style.display = 'none';
-    if(sel) sel.size=1;
+    wrap.style.display = 'none';
   }
 }
 
 </script>
-<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-</body>
-</html>
 <!-- GLOBAL LESSON MODAL -->
 <div id="charModal" class="mo" onclick="if(event.target===this)closeModal('charModal')">
   <div class="md" style="max-width:620px;padding:0;overflow:hidden;">
@@ -20715,4 +20718,6 @@ function toggleTranslateDropdown(){
     <div id="charQuiz" style="padding:0 1.5rem 1.2rem;"></div>
   </div>
 </div>
-
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>
