@@ -1653,15 +1653,16 @@ body{top:0!important;}
 
 <!-- ═══ TOP-RIGHT QUICK BUTTONS ═══ -->
 <div id="topQuickBtns" style="position:fixed;top:12px;right:16px;z-index:95;display:flex;gap:.4rem;align-items:center;">
-  <div id="translateWrap" style="display:flex;align-items:center;">
-    <div id="google_translate_element"></div>
-  </div>
   <button onclick="quickParentHub()" style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.2);color:#a78bfa;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:var(--fn);display:flex;align-items:center;gap:.3rem;transition:all .15s;" onmouseenter="this.style.background='rgba(139,92,246,.2)'" onmouseleave="this.style.background='rgba(139,92,246,.12)'">👨‍👩‍👧 Parent</button>
   <button onclick="quickSettings()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--tx2);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:var(--fn);display:flex;align-items:center;gap:.3rem;transition:all .15s;" onmouseenter="this.style.background='rgba(255,255,255,.12)'" onmouseleave="this.style.background='rgba(255,255,255,.06)'">⚙ Settings</button>
 </div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
+<!-- TRANSLATE WIDGET - fixed top right, below topQuickBtns -->
+<div id="translateWrap" style="position:fixed;top:48px;right:16px;z-index:94;">
+  <div id="google_translate_element"></div>
+</div>
 
 <div id="mainWrap"><div id="app">
 
@@ -14890,7 +14891,9 @@ function addChildProfile(){
       'Your child will need this code to switch to their profile.\n' +
       'Each child has their own private code that unlocks their data.');
     
-    switchToProfile(id);
+    // Stay on current (parent) profile — don't auto-switch
+    renderProfileSwitcher();
+    showToast(name.trim() + '\'s profile created ✓ — use Parent Hub to switch');
     
   } else {
     // Enter existing access code
@@ -14990,8 +14993,8 @@ function renderProfileSwitcher(){
   const tabs = document.getElementById('profileTabs');
   if(!el || !tabs) return;
 
-  // Profile switcher is managed in Parent Hub only - hidden from hero
-  el.style.display = 'none';
+  // Show profile switcher when multiple profiles exist
+  el.style.display = _profiles.length > 1 ? 'block' : 'none';
   const colors = ['#4f8fff','#06d6a0','#f5a623','#f472b6','#a78bfa','#22d3ee','#ef4444'];
 
   tabs.innerHTML = _profiles.map((p,i)=>{
