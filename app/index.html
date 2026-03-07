@@ -1560,17 +1560,17 @@ body{top:0!important;}
 }
 
 /* Slide container */
+.ob-slides-wrap {
+  flex:1; overflow:hidden; min-height:0; position:relative;
+}
 .ob-slides {
   display:flex;
   transition:transform .45s cubic-bezier(.4,0,.2,1);
   will-change:transform;
-  flex:1;
-  overflow:hidden;
-  min-height:0;
+  height:100%;
 }
 .ob-slide {
-  min-width:100%; flex-shrink:0;
-  width:100%;
+  min-width:100%; flex-shrink:0; width:100%;
   padding:1.5rem 1.5rem 1rem;
   box-sizing:border-box;
   overflow-y:auto;
@@ -6188,7 +6188,7 @@ body{top:0!important;}
 <!-- ═══ PARENT ONBOARDING WIZARD ═══ -->
 <div id="parentOnboard">
 <div class="ob-box">
-  <div class="ob-slides" id="pobSlides">
+  <div class="ob-slides-wrap"><div class="ob-slides" id="pobSlides">
 
     <!-- SLIDE 0: WELCOME -->
     <div class="ob-slide">
@@ -6302,13 +6302,14 @@ body{top:0!important;}
     </div>
     <button class="ob-nav-btn" id="pobNext" onclick="pobNav(1)">Next ›</button>
   </div>
+</div></div><!-- /ob-slides-wrap -->
 </div><!-- /ob-box -->
 </div><!-- /parentOnboard -->
 
 <!-- ═══ KID ONBOARDING WIZARD ═══ -->
 <div id="kidOnboard">
 <div class="ob-box">
-  <div class="ob-slides" id="kobSlides">
+  <div class="ob-slides-wrap"><div class="ob-slides" id="kobSlides">
 
     <!-- SLIDE 0: HI THERE! -->
     <div class="ob-slide">
@@ -6418,6 +6419,7 @@ body{top:0!important;}
     </div>
     <button class="ob-nav-btn" id="kobNext" onclick="kobNav(1)" style="background:linear-gradient(135deg,#f59e0b,#ef4444);">Next ›</button>
   </div>
+</div></div><!-- /ob-slides-wrap -->
 </div><!-- /ob-box -->
 </div><!-- /kidOnboard -->
 
@@ -12392,13 +12394,14 @@ function initPobDots(){
 function pobNav(dir){
   _pobStep = Math.max(0, Math.min(POB_TOTAL-1, _pobStep + dir));
   const slides = document.getElementById('pobSlides'); if(!slides) return;
-  slides.style.transform = `translateX(-${_pobStep * 100}%)`;
+  const w = slides.parentElement.offsetWidth || slides.offsetWidth;
+  slides.style.transform = `translateX(-${_pobStep * w}px)`;
   document.querySelectorAll('#pobDots .ob-dot').forEach((d,i)=>d.classList.toggle('act',i===_pobStep));
   const prev = document.getElementById('pobPrev');
   const next = document.getElementById('pobNext');
-  if(prev) prev.disabled = _pobStep === 0;
+  if(prev){ prev.disabled = _pobStep===0; prev.style.opacity=_pobStep===0?'0.3':'1'; }
   if(next){
-    next.textContent = _pobStep === POB_TOTAL-1 ? '✓ Done' : 'Next ›';
+    next.textContent = _pobStep === POB_TOTAL-1 ? '🎉 Done!' : 'Next ›';
     if(_pobStep === POB_TOTAL-1){ next.onclick = closeParentOnboard; } else { next.onclick = ()=>pobNav(1); }
   }
 }
@@ -12406,7 +12409,7 @@ function showParentOnboard(){
   _pobStep = 0;
   initPobDots();
   const slides = document.getElementById('pobSlides');
-  if(slides) slides.style.transform='translateX(0)';
+  if(slides) slides.style.transform='translateX(0px)';
   const prev = document.getElementById('pobPrev');
   if(prev){ prev.disabled=true; prev.style.opacity='0.35'; }
   const next = document.getElementById('pobNext');
@@ -12440,20 +12443,21 @@ function initKobDots(){
 function kobNav(dir){
   _kobStep = Math.max(0, Math.min(KOB_TOTAL-1, _kobStep + dir));
   const slides = document.getElementById('kobSlides'); if(!slides) return;
-  slides.style.transform = `translateX(-${_kobStep * 100}%)`;
+  const w = slides.parentElement.offsetWidth || slides.offsetWidth;
+  slides.style.transform = `translateX(-${_kobStep * w}px)`;
   document.querySelectorAll('#kobDots .ob-dot').forEach((d,i)=>d.classList.toggle('act',i===_kobStep));
   const prev = document.getElementById('kobPrev');
   const next = document.getElementById('kobNext');
-  if(prev) prev.disabled = _kobStep === 0;
+  if(prev){ prev.disabled = _kobStep===0; prev.style.opacity=_kobStep===0?'0.3':'1'; }
   if(next){
-    next.textContent = _kobStep === KOB_TOTAL-1 ? '✓ Done' : 'Next ›';
+    next.textContent = _kobStep === KOB_TOTAL-1 ? "🚀 Let's Go!" : 'Next ›';
     if(_kobStep === KOB_TOTAL-1){ next.onclick = closeKidOnboard; } else { next.onclick = ()=>kobNav(1); }
   }
 }
 function showKidOnboard(){
   _kobStep = 0;
   initKobDots();
-  const slides = document.getElementById('kobSlides'); if(slides) slides.style.transform='translateX(0)';
+  const slides = document.getElementById('kobSlides'); if(slides) slides.style.transform='translateX(0px)';
   const prev = document.getElementById('kobPrev'); if(prev){ prev.disabled=true; prev.style.opacity='0.35'; }
   const next = document.getElementById('kobNext'); if(next){ next.textContent='Next ›'; next.onclick=()=>kobNav(1); }
   const modal = document.getElementById('kidOnboard');
