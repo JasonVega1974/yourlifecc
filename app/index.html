@@ -21939,37 +21939,25 @@ function googleTranslateElementInit(){
 }
 
 function toggleMobTranslate(){
-  const d = document.getElementById('mob_translate_element');
+  // Use the REAL google_translate_element — repositioned fixed under the mobile lang button
+  const d = document.getElementById('google_translate_element');
   if(!d) return;
-  if(d.style.display === 'none' || !d.style.display){
-    // Copy the Google Translate select into mobile slot if needed
-    const desktopEl = document.getElementById('google_translate_element');
-    const sel = desktopEl ? desktopEl.querySelector('select') : null;
-    if(sel){
-      d.innerHTML = '';
-      const clone = sel.cloneNode(true);
-      clone.style.cssText = 'width:100%;font-size:.85rem;padding:.4rem .5rem;background:#0d1b2a;color:#fff;border:1px solid rgba(56,189,248,.2);border-radius:6px;cursor:pointer;';
-      clone.onchange = () => { sel.value = clone.value; sel.dispatchEvent(new Event('change')); d.style.display='none'; };
-      d.appendChild(clone);
-    }
-    // Position fixed under the language button
-    const langBtn = document.querySelector('#mobileQuickRow .mqb-lang');
-    if(langBtn){
-      const r = langBtn.getBoundingClientRect();
-      d.style.top = (r.bottom + 6) + 'px';
-      d.style.left = Math.max(8, r.left - 10) + 'px';
-    } else {
-      d.style.top = '100px';
-      d.style.left = '8px';
-    }
-    d.style.display = 'block';
-    setTimeout(()=>document.addEventListener('click', closeMobTranslate, {once:true, capture:true}), 50);
-  } else {
-    d.style.display = 'none';
+  const isOpen = d.style.display === 'block';
+  if(isOpen){ d.style.display = 'none'; return; }
+  const langBtn = document.querySelector('#mobileQuickRow .mqb-lang');
+  if(langBtn){
+    const r = langBtn.getBoundingClientRect();
+    d.style.position = 'fixed';
+    d.style.top = (r.bottom + 6) + 'px';
+    d.style.left = Math.max(8, r.left - 10) + 'px';
+    d.style.right = 'auto';
+    d.style.zIndex = '999999';
   }
+  d.style.display = 'block';
+  setTimeout(()=>document.addEventListener('click', closeMobTranslate, {once:true, capture:true}), 50);
 }
 function closeMobTranslate(e){
-  const d = document.getElementById('mob_translate_element');
+  const d = document.getElementById('google_translate_element');
   if(!d) return;
   const langBtn = document.querySelector('#mobileQuickRow .mqb-lang');
   if(langBtn && langBtn.contains(e.target)) return;
