@@ -12218,48 +12218,6 @@ ${(b.showQR&&b.qrUrl&&qrSvgInline)?`<div class="section">
 
 <!-- ═══ SCRATCH CARD OVERLAY ═══ -->
 
-
-
-
-
-
-
-<!-- ═══ CHILD LOGIN SCREEN ═══ -->
-<div id="childLoginScreen" style="visibility:hidden;opacity:0;pointer-events:none;position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#0f0f1a,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity .2s;">
-  <div style="text-align:center;max-width:340px;width:90%;">
-    <div style="font-size:2.5rem;margin-bottom:.3rem;">👤</div>
-    <div style="font-size:1.3rem;font-weight:900;color:#fff;margin-bottom:.2rem;">Child Login</div>
-    <div style="font-size:.8rem;color:rgba(255,255,255,.5);margin-bottom:1.5rem;">Enter your 4-digit PIN</div>
-
-    <!-- PIN DOTS -->
-    <div style="display:flex;justify-content:center;gap:.6rem;margin-bottom:1.5rem;" id="childPinDots">
-      <div style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.3);background:transparent;" id="cd0"></div>
-      <div style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.3);background:transparent;" id="cd1"></div>
-      <div style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.3);background:transparent;" id="cd2"></div>
-      <div style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.3);background:transparent;" id="cd3"></div>
-    </div>
-
-    <!-- NUMPAD -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;max-width:240px;margin:0 auto 1rem;">
-      <button onclick="childPinInput('1')" class="child-pin-btn">1</button>
-      <button onclick="childPinInput('2')" class="child-pin-btn">2</button>
-      <button onclick="childPinInput('3')" class="child-pin-btn">3</button>
-      <button onclick="childPinInput('4')" class="child-pin-btn">4</button>
-      <button onclick="childPinInput('5')" class="child-pin-btn">5</button>
-      <button onclick="childPinInput('6')" class="child-pin-btn">6</button>
-      <button onclick="childPinInput('7')" class="child-pin-btn">7</button>
-      <button onclick="childPinInput('8')" class="child-pin-btn">8</button>
-      <button onclick="childPinInput('9')" class="child-pin-btn">9</button>
-      <button onclick="childPinClear()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--tx2);border-radius:12px;padding:.9rem;font-size:.8rem;font-weight:700;cursor:pointer;">Clear</button>
-      <button onclick="childPinInput('0')" class="child-pin-btn">0</button>
-      <button onclick="childPinDelete()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--tx2);border-radius:12px;padding:.9rem;font-size:1rem;cursor:pointer;">⌫</button>
-    </div>
-
-    <div id="childLoginMsg" style="font-size:.75rem;color:#f87171;min-height:1.2rem;margin-bottom:.8rem;"></div>
-    <button onclick="closeChildLogin()" style="font-size:.72rem;color:var(--tx3);background:none;border:none;cursor:pointer;text-decoration:underline;">Cancel</button>
-  </div>
-</div>
-
 </body>
 </html>`;
 }
@@ -14939,12 +14897,17 @@ let _activeProfileId = null;
 function initProfiles(){
   try {
     _profiles = JSON.parse(localStorage.getItem('ylcc_profiles')||'[]');
+    // Migration: first profile is always parent if no isParent flag set
+    if(_profiles.length > 0 && _profiles[0].isParent === undefined){
+      _profiles[0].isParent = true;
+      _profiles.slice(1).forEach(p => { if(p.isParent===undefined) p.isParent=false; });
+    }
     _activeProfileId = localStorage.getItem('ylcc_active_profile')||null;
   } catch(e){ _profiles=[]; }
   // Auto-create first profile from existing data if none exist
   if(_profiles.length === 0 && D.name){
     const id = generateProfileId();
-    _profiles.push({id, name:D.name, data:JSON.parse(JSON.stringify(D))});
+    _profiles.push({id, name:D.name, isParent:true, data:JSON.parse(JSON.stringify(D))});
     _activeProfileId = id;
     saveProfiles();
   }
@@ -15071,7 +15034,7 @@ function updateChildPinDots(){
 
 function validateChildPin(){
   // Children have 4-digit PINs, parents have 6-digit
-  const children = _profiles.filter(p => p.id && p.id.length === 4);
+  const children = _profiles.filter(p => !p.isParent);
   const match = children.find(p => p.id === _childPinBuffer);
   if(match){
     closeChildLogin();
@@ -15096,7 +15059,7 @@ function renderManageUsers(){
   const colors = ['#a78bfa','#4f8fff','#06d6a0','#f5a623','#f472b6','#22d3ee','#ef4444'];
   if(_profiles.length === 0){ el.innerHTML = '<div style="font-size:.75rem;color:var(--tx3);">No profiles yet.</div>'; return; }
   el.innerHTML = _profiles.map((p,i) => {
-    const isParent = p.id && p.id.length !== 4;
+    const isParent = p.id && p.isParent;
     const c = colors[i % colors.length];
     return `<div style="display:flex;align-items:center;gap:.6rem;padding:.6rem .4rem;border-bottom:1px solid rgba(255,255,255,.05);">
       <div style="width:32px;height:32px;border-radius:50%;background:${c}22;border:2px solid ${c};display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;color:${c};">${p.name.charAt(0).toUpperCase()}</div>
@@ -15132,7 +15095,7 @@ function addChildFromHub(){
     const cur = _profiles.find(p=>p.id===_activeProfileId);
     if(cur) cur.data = JSON.parse(JSON.stringify(D));
   }
-  _profiles.push({id:pin, name, data:{name, streak:0, mode:'mid_hs'}});
+  _profiles.push({id:pin, name, isParent:false, data:{name, streak:0, mode:'mid_hs'}});
   saveProfiles();
   if(nameEl) nameEl.value = '';
   if(pinEl) pinEl.value = '';
@@ -15188,7 +15151,7 @@ function changeParentPin(){
 
 function removeChildProfile(){
   // Get list of child profiles (all except the first/parent profile)
-  const children = _profiles.filter(p => p.id && p.id.length === 4);
+  const children = _profiles.filter(p => !p.isParent);
   if(children.length === 0){
     showToast('No child profiles to remove');
     return;
@@ -15314,7 +15277,7 @@ function renderParentMultiChild(){
   el.innerHTML = `
     <div style="font-family:var(--fh);font-size:.7rem;letter-spacing:1.5px;color:#fb923c;margin-bottom:.6rem;">👨‍👩‍👧‍👦 ALL CHILDREN OVERVIEW</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.6rem;margin-bottom:1.2rem;">
-      ${_profiles.filter(p => p.id && p.id.length === 4).map((p,i)=>{
+      ${_profiles.filter(p => !p.isParent).map((p,i)=>{
         const d = p.data||{};
         const c = colors[i%colors.length];
         // Calculate Life Score for this child
@@ -21010,5 +20973,42 @@ document.addEventListener('click', function(e){
   </div>
 </div>
 <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<!-- ═══ CHILD LOGIN SCREEN ═══ -->
+<div id="childLoginScreen" style="visibility:hidden;opacity:0;pointer-events:none;position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#0f0f1a,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity .2s;">
+  <div style="text-align:center;max-width:340px;width:90%;">
+    <div style="font-size:2.5rem;margin-bottom:.3rem;">👤</div>
+    <div style="font-size:1.3rem;font-weight:900;color:#fff;margin-bottom:.2rem;">Child Login</div>
+    <div style="font-size:.8rem;color:rgba(255,255,255,.5);margin-bottom:1.5rem;">Enter your 4-digit PIN</div>
+
+    <!-- PIN DOTS -->
+    <div style="display:flex;justify-content:center;gap:.6rem;margin-bottom:1.5rem;" id="childPinDots">
+      <div style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.3);background:transparent;" id="cd0"></div>
+      <div style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.3);background:transparent;" id="cd1"></div>
+      <div style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.3);background:transparent;" id="cd2"></div>
+      <div style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.3);background:transparent;" id="cd3"></div>
+    </div>
+
+    <!-- NUMPAD -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;max-width:240px;margin:0 auto 1rem;">
+      <button onclick="childPinInput('1')" class="child-pin-btn">1</button>
+      <button onclick="childPinInput('2')" class="child-pin-btn">2</button>
+      <button onclick="childPinInput('3')" class="child-pin-btn">3</button>
+      <button onclick="childPinInput('4')" class="child-pin-btn">4</button>
+      <button onclick="childPinInput('5')" class="child-pin-btn">5</button>
+      <button onclick="childPinInput('6')" class="child-pin-btn">6</button>
+      <button onclick="childPinInput('7')" class="child-pin-btn">7</button>
+      <button onclick="childPinInput('8')" class="child-pin-btn">8</button>
+      <button onclick="childPinInput('9')" class="child-pin-btn">9</button>
+      <button onclick="childPinClear()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--tx2);border-radius:12px;padding:.9rem;font-size:.8rem;font-weight:700;cursor:pointer;">Clear</button>
+      <button onclick="childPinInput('0')" class="child-pin-btn">0</button>
+      <button onclick="childPinDelete()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--tx2);border-radius:12px;padding:.9rem;font-size:1rem;cursor:pointer;">⌫</button>
+    </div>
+
+    <div id="childLoginMsg" style="font-size:.75rem;color:#f87171;min-height:1.2rem;margin-bottom:.8rem;"></div>
+    <button onclick="closeChildLogin()" style="font-size:.72rem;color:var(--tx3);background:none;border:none;cursor:pointer;text-decoration:underline;">Cancel</button>
+  </div>
+</div>
+
 </body>
 </html>
