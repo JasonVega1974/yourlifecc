@@ -103,11 +103,22 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 #mobileQuickRow .mqb-parent{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.2);color:#a78bfa;}
 #mobileQuickRow .mqb-lang{background:rgba(255,255,255,.05);}
 #mobileQuickRow .mob-translate-wrap{position:relative;flex-shrink:0;}
-#mobileQuickRow #mob_translate_element{
-  position:absolute;top:100%;left:0;margin-top:4px;z-index:9999;
-  background:#1e1e3a;border:1px solid rgba(255,255,255,.15);
-  border-radius:8px;padding:6px;display:none;min-width:180px;
-  box-shadow:0 8px 32px rgba(0,0,0,.5);
+/* mob_translate_element is now position:fixed — see #mob_translate_element below */
+
+/* Mobile translate dropdown — fixed position so it floats ABOVE everything */
+#mob_translate_element{
+  position:fixed;
+  top:100px;left:8px;
+  z-index:999999;
+  background:#1e1e3a;border:1px solid rgba(56,189,248,.3);
+  border-radius:10px;padding:8px;display:none;
+  min-width:200px;
+  box-shadow:0 16px 48px rgba(0,0,0,.85);
+}
+#mob_translate_element select{
+  width:100%;font-size:.85rem;padding:.4rem .5rem;
+  background:#0d1b2a;color:#fff;border:1px solid rgba(56,189,248,.2);
+  border-radius:6px;cursor:pointer;
 }
 
 .hamb{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:8px;
@@ -2086,7 +2097,7 @@ body{top:0!important;}
       <svg width="13" height="13" viewBox="0 0 24 24" style="flex-shrink:0;"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Language
     </button>
-    <div id="mob_translate_element" style=""></div>
+
   </div>
   <button class="mqb mqb-child" onclick="openChildLogin()">👤 Child Login</button>
   <button class="mqb mqb-parent" onclick="quickParentHub()">👨‍👩‍👧 Parent</button>
@@ -2110,6 +2121,9 @@ body{top:0!important;}
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
+
+<!-- MOBILE TRANSLATE DROPDOWN — fixed, outside all overflow containers -->
+<div id="mob_translate_element"></div>
 
 <div id="mainWrap"><div id="app">
 
@@ -21931,22 +21945,35 @@ function toggleMobTranslate(){
     // Copy the Google Translate select into mobile slot if needed
     const desktopEl = document.getElementById('google_translate_element');
     const sel = desktopEl ? desktopEl.querySelector('select') : null;
-    if(sel && !d.querySelector('select')){
+    if(sel){
+      d.innerHTML = '';
       const clone = sel.cloneNode(true);
-      clone.onchange = () => { sel.value = clone.value; sel.dispatchEvent(new Event('change')); };
+      clone.style.cssText = 'width:100%;font-size:.85rem;padding:.4rem .5rem;background:#0d1b2a;color:#fff;border:1px solid rgba(56,189,248,.2);border-radius:6px;cursor:pointer;';
+      clone.onchange = () => { sel.value = clone.value; sel.dispatchEvent(new Event('change')); d.style.display='none'; };
       d.appendChild(clone);
     }
+    // Position fixed under the language button
+    const langBtn = document.querySelector('#mobileQuickRow .mqb-lang');
+    if(langBtn){
+      const r = langBtn.getBoundingClientRect();
+      d.style.top = (r.bottom + 6) + 'px';
+      d.style.left = Math.max(8, r.left - 10) + 'px';
+    } else {
+      d.style.top = '100px';
+      d.style.left = '8px';
+    }
     d.style.display = 'block';
-    document.addEventListener('click', closeMobTranslate, {once:true, capture:true});
+    setTimeout(()=>document.addEventListener('click', closeMobTranslate, {once:true, capture:true}), 50);
   } else {
     d.style.display = 'none';
   }
 }
 function closeMobTranslate(e){
   const d = document.getElementById('mob_translate_element');
-  const wrap = d?.closest('.mob-translate-wrap');
-  if(wrap && wrap.contains(e.target)) return;
-  if(d) d.style.display = 'none';
+  if(!d) return;
+  const langBtn = document.querySelector('#mobileQuickRow .mqb-lang');
+  if(langBtn && langBtn.contains(e.target)) return;
+  d.style.display = 'none';
 }
 
 function toggleTranslateDropdown(){
