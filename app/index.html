@@ -1702,8 +1702,6 @@ body{top:0!important;}
   <div class="mBar-title">LIFE OS</div>
   <div style="display:flex;gap:.4rem;align-items:center;">
     <span id="svi2" style="font-size:.62rem;color:var(--gr);opacity:0;transition:opacity .3s;">✓</span>
-
-    <button class="btn bgh bs" onclick="openSettings()" style="padding:.28rem .6rem;font-size:.75rem;">⚙</button>
     <button class="hamb" onclick="toggleSidebar()">☰</button>
   </div>
 </div>
@@ -4868,6 +4866,12 @@ body{top:0!important;}
   <!-- PARENT DASHBOARD (after PIN unlock) -->
   <div id="parentDashContent" style="display:none;">
 
+    <!-- BACK + LOCK ROW -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem;gap:.5rem;">
+      <button onclick="showSection('s-hero')" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--tx2);padding:.35rem .8rem;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:var(--fn);display:flex;align-items:center;gap:.35rem;">← Dashboard</button>
+      <button onclick="lockParentDash();showSection('s-hero');" style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);color:#f87171;padding:.35rem .8rem;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:var(--fn);display:flex;align-items:center;gap:.35rem;">🔒 Lock Hub</button>
+    </div>
+
     <!-- CHILD SELECTOR (always visible at top) -->
     <div style="background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.1);border-radius:10px;padding:.5rem .8rem;margin-bottom:.7rem;display:flex;align-items:center;gap:.5rem;">
       <span style="font-size:.75rem;font-weight:700;">👤 Viewing:</span>
@@ -6812,8 +6816,8 @@ function showSection(id, fromMobile){
   // Scroll to top of main
   window.scrollTo(0,0);
 
-  // Auto-unlock Parent Hub gate if PIN is disabled
-  if(id==='s-parent' && typeof D!=='undefined' && D.parentPinDisabled && !_parentDashUnlocked){
+  // Auto-unlock Parent Hub gate if already unlocked this session or PIN disabled
+  if(id==='s-parent' && !_parentDashUnlocked && typeof D!=='undefined' && (D.parentPinDisabled || sessionStorage.getItem('parentUnlocked')==='1')){
     _parentDashUnlocked = true;
     const gate = document.getElementById('parentGate');
     const content = document.getElementById('parentDashContent');
@@ -13389,13 +13393,14 @@ function renderChores(){
 }
 
 // ── PARENT DASHBOARD ─────────────────────────────────────────
-let _parentDashUnlocked = false;
+let _parentDashUnlocked = sessionStorage.getItem('parentUnlocked') === '1';
 
 function unlockParentDash(){
   initChoreData();
   // Skip PIN if disabled
   if(D.parentPinDisabled){
     _parentDashUnlocked = true;
+    sessionStorage.setItem('parentUnlocked','1');
     document.getElementById('parentGate').style.display='none';
     document.getElementById('parentDashContent').style.display='block';
     updateIncConditions();
@@ -13411,6 +13416,7 @@ function unlockParentDash(){
     showToast('Incorrect PIN'); return;
   }
   _parentDashUnlocked = true;
+  sessionStorage.setItem('parentUnlocked','1');
   document.getElementById('parentGate').style.display='none';
   document.getElementById('parentDashContent').style.display='block';
   document.getElementById('parentPinInput').value='';
@@ -13421,6 +13427,7 @@ function unlockParentDash(){
 
 function lockParentDash(){
   _parentDashUnlocked = false;
+  sessionStorage.removeItem('parentUnlocked');
   document.getElementById('parentGate').style.display='';
   document.getElementById('parentDashContent').style.display='none';
 }
