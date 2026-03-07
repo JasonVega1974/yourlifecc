@@ -1464,7 +1464,7 @@ body{top:0!important;}
 /* ════ FLOATING START-HERE BUTTON ════════════════════════ */
 #startHereBtn{
   position:fixed;bottom:80px;right:18px;z-index:8800;
-  display:none;flex-direction:column;align-items:center;gap:3px;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
   cursor:pointer;
 }
 #startHereBtn .sh-bubble{
@@ -1506,74 +1506,207 @@ body{top:0!important;}
 @keyframes fadeInModal{from{opacity:0;transform:scale(.96);}to{opacity:1;transform:none;}}
 
 /* ════ SHARED WIZARD STYLES ═════════════════════════════ */
-.ob-box{
-  background:linear-gradient(160deg,#0c1525 0%,#111827 100%);
-  border-radius:22px;max-width:520px;width:100%;
-  max-height:90vh;overflow:hidden;display:flex;flex-direction:column;
-  box-shadow:0 30px 80px rgba(0,0,0,.7);
+/* ═══════════════════════════════════════════════════════
+   ONBOARDING WIZARD — FULL REWRITE (bigger, animated)
+═══════════════════════════════════════════════════════ */
+
+/* Backdrop */
+#parentOnboard, #kidOnboard {
+  display:none; position:fixed; inset:0; z-index:99999;
+  background:rgba(0,0,0,.88);
+  backdrop-filter:blur(20px);
+  align-items:center; justify-content:center; padding:1rem;
+}
+#parentOnboard.open, #kidOnboard.open {
+  display:flex;
+  animation:obBackdropIn .3s ease;
+}
+@keyframes obBackdropIn {
+  from{opacity:0;} to{opacity:1;}
+}
+
+/* Main box */
+.ob-box {
+  background:linear-gradient(145deg,#0d1b2a 0%,#1a2640 50%,#0d1b2a 100%);
+  border:1px solid rgba(56,189,248,.2);
+  border-radius:24px;
+  width:min(600px, 96vw);
+  max-height:92vh;
+  display:flex; flex-direction:column;
+  box-shadow:0 40px 120px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.04), inset 0 1px 0 rgba(255,255,255,.07);
+  overflow:hidden;
+  animation:obBoxIn .4s cubic-bezier(.34,1.56,.64,1);
   position:relative;
 }
-.ob-slides{display:flex;transition:transform .4s cubic-bezier(.4,0,.2,1);will-change:transform;}
-.ob-slide{min-width:100%;padding:2rem 2rem 1rem;box-sizing:border-box;overflow-y:auto;max-height:80vh;}
-.ob-slide::-webkit-scrollbar{width:3px;}
-.ob-slide::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px;}
-.ob-hero{text-align:center;margin-bottom:1.5rem;}
-.ob-hero-emoji{font-size:3.5rem;display:block;margin-bottom:.6rem;
-  animation:obFloat 3s ease-in-out infinite;}
-@keyframes obFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
-.ob-hero-title{font-family:var(--fh);font-size:1.5rem;letter-spacing:2px;color:var(--c);margin-bottom:.3rem;}
-.ob-hero-sub{font-size:.82rem;color:var(--tx2);line-height:1.6;max-width:380px;margin:0 auto;}
-.ob-steps-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1rem;}
-.ob-step-card{
-  background:rgba(255,255,255,.04);border-radius:12px;padding:.85rem .8rem;
-  border:1px solid rgba(255,255,255,.07);transition:all .2s;cursor:default;
-  position:relative;overflow:hidden;
+@keyframes obBoxIn {
+  from{opacity:0; transform:scale(.88) translateY(24px);}
+  to{opacity:1; transform:none;}
 }
-.ob-step-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+
+/* Animated top border glow */
+.ob-box::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,transparent,#38bdf8,#818cf8,#34d399,transparent);
+  background-size:200% 100%;
+  animation:obBorderFlow 3s linear infinite;
+}
+@keyframes obBorderFlow {
+  0%{background-position:200% 0;} 100%{background-position:-200% 0;}
+}
+
+/* Slide container */
+.ob-slides {
+  display:flex;
+  transition:transform .45s cubic-bezier(.4,0,.2,1);
+  will-change:transform;
+  flex:1;
+  overflow:hidden;
+  min-height:0;
+}
+.ob-slide {
+  min-width:100%; flex-shrink:0;
+  padding:2rem 2.2rem 1.2rem;
+  box-sizing:border-box;
+  overflow-y:auto;
+  max-height:calc(92vh - 80px);
+}
+.ob-slide::-webkit-scrollbar{width:4px;}
+.ob-slide::-webkit-scrollbar-thumb{background:rgba(56,189,248,.3);border-radius:2px;}
+
+/* Hero section per slide */
+.ob-hero { text-align:center; margin-bottom:1.6rem; }
+.ob-hero-emoji {
+  font-size:4rem; display:block; margin-bottom:.7rem;
+  animation:obFloat 2.8s ease-in-out infinite;
+  filter:drop-shadow(0 8px 24px rgba(56,189,248,.3));
+}
+@keyframes obFloat {
+  0%,100%{transform:translateY(0) rotate(-2deg);}
+  50%{transform:translateY(-14px) rotate(2deg);}
+}
+.ob-hero-title {
+  font-family:var(--fh); font-size:1.7rem; letter-spacing:3px;
+  color:var(--c); margin-bottom:.5rem;
+  text-shadow:0 0 40px rgba(56,189,248,.4);
+}
+.ob-hero-sub {
+  font-size:.9rem; color:var(--tx2); line-height:1.65;
+  max-width:440px; margin:0 auto;
+}
+
+/* Feature cards grid */
+.ob-steps-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:.7rem; margin-bottom:1.1rem;
+}
+.ob-step-card:nth-child(1){animation:obFadeUp .35s ease .05s both;}
+.ob-step-card:nth-child(2){animation:obFadeUp .35s ease .1s both;}
+.ob-step-card:nth-child(3){animation:obFadeUp .35s ease .15s both;}
+.ob-step-card:nth-child(4){animation:obFadeUp .35s ease .2s both;}
+.ob-step-card:nth-child(5){animation:obFadeUp .35s ease .25s both;}
+.ob-step-card:nth-child(6){animation:obFadeUp .35s ease .3s both;}
+@keyframes obFadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+.ob-step-card {
+  background:rgba(255,255,255,.04);
+  border-radius:14px; padding:1rem .9rem;
+  border:1px solid rgba(255,255,255,.07);
+  position:relative; overflow:hidden;
+  transition:transform .2s, border-color .2s, background .2s;
+  cursor:default;
+}
+.ob-step-card:hover {
+  transform:translateY(-2px);
+  border-color:rgba(56,189,248,.25);
+  background:rgba(56,189,248,.05);
+}
+.ob-step-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
   background:linear-gradient(90deg,var(--accent,#38bdf8),transparent);
 }
-.ob-step-card .osc-icon{font-size:1.4rem;margin-bottom:.35rem;display:block;}
-.ob-step-card .osc-title{font-size:.8rem;font-weight:700;margin-bottom:.2rem;color:#fff;}
-.ob-step-card .osc-desc{font-size:.7rem;color:var(--tx2);line-height:1.55;}
-.ob-checklist{list-style:none;display:flex;flex-direction:column;gap:.45rem;margin-bottom:1rem;}
-.ob-checklist li{display:flex;align-items:flex-start;gap:.6rem;font-size:.8rem;color:var(--tx2);line-height:1.55;
-  background:rgba(255,255,255,.03);border-radius:8px;padding:.5rem .7rem;}
-.ob-checklist li .obc-n{
-  background:linear-gradient(135deg,#38bdf8,#818cf8);color:#06101e;
-  border-radius:50%;width:20px;height:20px;font-size:.65rem;font-weight:900;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;
-}
-.ob-checklist b{color:#fff;}
-.ob-tip{background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.15);border-radius:10px;
-  padding:.65rem .8rem;font-size:.75rem;color:#fde68a;margin-bottom:.8rem;line-height:1.6;}
-.ob-tip strong{color:#fbbf24;}
-.ob-footer{
-  padding:.9rem 1.5rem 1.2rem;border-top:1px solid rgba(255,255,255,.06);
-  display:flex;align-items:center;justify-content:space-between;gap:.6rem;
-  background:rgba(0,0,0,.2);flex-shrink:0;
-}
-.ob-dots{display:flex;gap:.4rem;}
-.ob-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.15);transition:all .25s;}
-.ob-dot.act{background:var(--c);width:18px;border-radius:3px;}
-.ob-nav-btn{
-  background:var(--c);color:#06101e;border:none;border-radius:9px;
-  padding:.5rem 1.3rem;font-size:.82rem;font-weight:800;cursor:pointer;
-  font-family:var(--fn);transition:all .2s;
-}
-.ob-nav-btn:hover{filter:brightness(1.12);}
-.ob-nav-btn.ghost{background:rgba(255,255,255,.07);color:var(--tx2);border:1px solid rgba(255,255,255,.1);}
-.ob-nav-btn.ghost:hover{background:rgba(255,255,255,.12);}
-.ob-nav-btn:disabled{opacity:.35;cursor:not-allowed;}
-.ob-skip{font-size:.68rem;color:var(--tx3);cursor:pointer;text-decoration:underline;transition:color .15s;}
-.ob-skip:hover{color:var(--tx2);}
+.ob-step-card .osc-icon { font-size:1.6rem; margin-bottom:.4rem; display:block; }
+.ob-step-card .osc-title { font-size:.85rem; font-weight:800; margin-bottom:.25rem; color:#fff; }
+.ob-step-card .osc-desc { font-size:.73rem; color:var(--tx2); line-height:1.6; }
 
-/* Kid-specific colors */
-#kidOnboard .ob-hero-title{color:#f59e0b;}
-#kidOnboard .ob-dot.act{background:#f59e0b;}
-#kidOnboard .ob-nav-btn{background:linear-gradient(135deg,#f59e0b,#ef4444);}
-#kidOnboard .ob-step-card{border-color:rgba(245,158,11,.15);}
-#kidOnboard .obc-n{background:linear-gradient(135deg,#f59e0b,#ef4444);}
+/* Numbered checklist */
+.ob-checklist { list-style:none; display:flex; flex-direction:column; gap:.5rem; margin-bottom:1.1rem; }
+.ob-checklist li {
+  display:flex; align-items:flex-start; gap:.7rem;
+  font-size:.84rem; color:var(--tx2); line-height:1.6;
+  background:rgba(255,255,255,.03); border-radius:10px; padding:.6rem .8rem;
+  border:1px solid rgba(255,255,255,.04);
+  animation:obSlideIn .3s ease both;
+}
+.ob-checklist li:nth-child(1){animation-delay:.05s;}
+.ob-checklist li:nth-child(2){animation-delay:.1s;}
+.ob-checklist li:nth-child(3){animation-delay:.15s;}
+.ob-checklist li:nth-child(4){animation-delay:.2s;}
+.ob-checklist li:nth-child(5){animation-delay:.25s;}
+@keyframes obSlideIn {
+  from{opacity:0; transform:translateX(-12px);}
+  to{opacity:1; transform:none;}
+}
+.ob-checklist li .obc-n {
+  background:linear-gradient(135deg,#38bdf8,#818cf8); color:#06101e;
+  border-radius:50%; width:22px; height:22px; font-size:.68rem; font-weight:900;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px;
+  box-shadow:0 2px 8px rgba(56,189,248,.4);
+}
+.ob-checklist b { color:#fff; }
+
+/* Tip box */
+.ob-tip {
+  background:rgba(251,191,36,.06); border:1px solid rgba(251,191,36,.2);
+  border-radius:12px; padding:.75rem 1rem; font-size:.79rem; color:#fde68a;
+  margin-bottom:.9rem; line-height:1.65;
+  display:flex; align-items:flex-start; gap:.5rem;
+}
+.ob-tip strong { color:#fbbf24; }
+
+/* Footer nav */
+.ob-footer {
+  padding:1rem 1.5rem 1.2rem;
+  border-top:1px solid rgba(255,255,255,.07);
+  display:flex; align-items:center; justify-content:space-between; gap:.6rem;
+  background:rgba(0,0,0,.25); flex-shrink:0;
+}
+.ob-dots { display:flex; gap:.45rem; align-items:center; }
+.ob-dot {
+  width:7px; height:7px; border-radius:50%;
+  background:rgba(255,255,255,.15); transition:all .3s cubic-bezier(.34,1.56,.64,1);
+}
+.ob-dot.act { background:var(--c); width:22px; border-radius:4px; box-shadow:0 0 8px var(--c); }
+
+.ob-nav-btn {
+  background:linear-gradient(135deg,var(--c),var(--p));
+  color:#06101e; border:none; border-radius:12px;
+  padding:.65rem 1.6rem; font-size:.88rem; font-weight:900; cursor:pointer;
+  font-family:var(--fn); transition:all .2s;
+  box-shadow:0 4px 16px rgba(56,189,248,.35);
+  letter-spacing:.3px;
+}
+.ob-nav-btn:hover { transform:translateY(-1px); box-shadow:0 6px 22px rgba(56,189,248,.5); filter:brightness(1.1); }
+.ob-nav-btn:active { transform:translateY(0); }
+.ob-nav-btn.ghost {
+  background:rgba(255,255,255,.08); color:var(--tx2);
+  border:1px solid rgba(255,255,255,.12); box-shadow:none;
+}
+.ob-nav-btn.ghost:hover { background:rgba(255,255,255,.14); transform:none; }
+.ob-nav-btn:disabled { opacity:.3; cursor:not-allowed; transform:none !important; }
+.ob-skip {
+  font-size:.7rem; color:var(--tx3); cursor:pointer;
+  text-decoration:underline; transition:color .15s;
+}
+.ob-skip:hover { color:var(--tx2); }
+
+/* Kid wizard overrides */
+#kidOnboard .ob-box { border-color:rgba(245,158,11,.25); }
+#kidOnboard .ob-box::before { background:linear-gradient(90deg,transparent,#f59e0b,#ef4444,#f59e0b,transparent); }
+#kidOnboard .ob-hero-title { color:#f59e0b; text-shadow:0 0 40px rgba(245,158,11,.4); }
+#kidOnboard .ob-dot.act { background:#f59e0b; box-shadow:0 0 8px #f59e0b; }
+#kidOnboard .ob-nav-btn { background:linear-gradient(135deg,#f59e0b,#ef4444); box-shadow:0 4px 16px rgba(245,158,11,.35); }
+#kidOnboard .ob-step-card:hover { border-color:rgba(245,158,11,.3); background:rgba(245,158,11,.05); }
+#kidOnboard .obc-n { background:linear-gradient(135deg,#f59e0b,#ef4444); box-shadow:0 2px 8px rgba(245,158,11,.4); }
+#kidOnboard .ob-hero-emoji { filter:drop-shadow(0 8px 24px rgba(245,158,11,.3)); }
+
 
 /* ════ ENHANCED TUTORIAL MODAL ══════════════════════════ */
 #tutModal{
@@ -1677,7 +1810,7 @@ body{top:0!important;}
 
   <!-- Tutorial launcher -->
 
-  <button class="btn bg_" style="width:100%;margin-bottom:.5rem;font-size:.75rem;white-space:normal;line-height:1.3;padding:.45rem .5rem;text-align:center;" onclick="closeSettings();showParentOnboard()">🚀 Quick Start Wizard</button>
+  <button class="btn bg_" style="width:100%;margin-bottom:.5rem;font-size:.75rem;white-space:normal;line-height:1.3;padding:.45rem .5rem;text-align:center;" onclick="closeSettings();D.parentWizardDone=false;setTimeout(showParentOnboard,100)">🚀 Quick Start Wizard</button>
     <button class="btn bg_" style="width:100%;margin-bottom:.85rem;font-size:.75rem;white-space:normal;line-height:1.3;padding:.45rem .5rem;text-align:center;" onclick="closeSettings();openTutorial()">🎓 How to Use Life OS &mdash; Full Tutorial</button>
   <div style="background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.15);border-radius:10px;padding:.9rem;margin-bottom:.85rem;">
     <label style="margin-top:0;">👤 Your Name</label>
@@ -6031,6 +6164,250 @@ body{top:0!important;}
     </div>
   </div>
 </div>
+
+<!-- ═══ ONBOARDING WELCOME MODAL ═══ -->
+<!-- ═══ FLOATING START HERE BUTTON ═══ -->
+<div id="startHereBtn" onclick="showParentOnboard()" title="Start Here!">
+  <div class="sh-bubble">✨ Start Here!</div>
+  <div class="sh-emoji">👆</div>
+</div>
+
+<!-- ═══ PARENT ONBOARDING WIZARD ═══ -->
+<div id="parentOnboard">
+<div class="ob-box">
+  <div class="ob-slides" id="pobSlides">
+
+    <!-- SLIDE 0: WELCOME -->
+    <div class="ob-slide">
+      <div class="ob-hero">
+        <span class="ob-hero-emoji">👋</span>
+        <div class="ob-hero-title">WELCOME TO LIFE OS</div>
+        <div class="ob-hero-sub">Your family's complete command center. This quick guide will have your whole family up and running in just a few minutes.</div>
+      </div>
+      <div class="ob-steps-grid">
+        <div class="ob-step-card" style="--accent:#38bdf8"><span class="osc-icon">👨‍👩‍👧</span><div class="osc-title">Parent Hub</div><div class="osc-desc">Your private control center — PIN protected so only you can access it.</div></div>
+        <div class="ob-step-card" style="--accent:#818cf8"><span class="osc-icon">👤</span><div class="osc-title">Child Profiles</div><div class="osc-desc">Each kid gets their own 4-digit PIN and completely separate dashboard.</div></div>
+        <div class="ob-step-card" style="--accent:#34d399"><span class="osc-icon">🧠</span><div class="osc-title">140+ Lessons</div><div class="osc-desc">Life skills from cooking to budgeting. Kids earn real certificates.</div></div>
+        <div class="ob-step-card" style="--accent:#f59e0b"><span class="osc-icon">✅</span><div class="osc-title">Chores & Rewards</div><div class="osc-desc">Assign chores with point values. Kids earn Parent Bucks and screen time.</div></div>
+      </div>
+      <div class="ob-tip">💡 <strong>Tip:</strong> This whole guide takes about 2 minutes. You can reopen it anytime from Settings.</div>
+    </div>
+
+    <!-- SLIDE 1: FIRST STEPS -->
+    <div class="ob-slide">
+      <div class="ob-hero">
+        <span class="ob-hero-emoji">🚀</span>
+        <div class="ob-hero-title">STEP 1 — SET UP YOUR FAMILY</div>
+        <div class="ob-hero-sub">Before your kids can log in, you need to add them. Here's how:</div>
+      </div>
+      <ul class="ob-checklist">
+        <li><div class="obc-n">1</div><div>Tap the <b>👨‍👩‍👧 Parent</b> button at the top of the screen to open the Parent Hub.</div></li>
+        <li><div class="obc-n">2</div><div>You'll be asked to create a <b>6-digit Parent PIN</b> — this keeps your parent controls private from the kids.</div></li>
+        <li><div class="obc-n">3</div><div>Once inside, go to <b>👥 Manage Users</b> on the left side menu.</div></li>
+        <li><div class="obc-n">4</div><div>Tap <b>"+ Add Child"</b> and type your child's name. A <b>4-digit PIN</b> will be created — write it down or share it with your child.</div></li>
+        <li><div class="obc-n">5</div><div>Repeat for each child in your family. You can add as many as you need!</div></li>
+      </ul>
+      <div class="ob-tip">💡 <strong>Each child has their own private space.</strong> When a child logs in, they only see their own data — not their siblings'.</div>
+    </div>
+
+    <!-- SLIDE 2: PARENT HUB TOUR -->
+    <div class="ob-slide">
+      <div class="ob-hero">
+        <span class="ob-hero-emoji">🔐</span>
+        <div class="ob-hero-title">YOUR PARENT HUB</div>
+        <div class="ob-hero-sub">Everything you need to guide and monitor your kids — all in one place.</div>
+      </div>
+      <div class="ob-steps-grid">
+        <div class="ob-step-card" style="--accent:#38bdf8"><span class="osc-icon">📊</span><div class="osc-title">Overview</div><div class="osc-desc">See your child's Life Score — a real grade (A+ to F) across 6 life categories.</div></div>
+        <div class="ob-step-card" style="--accent:#34d399"><span class="osc-icon">✅</span><div class="osc-title">Chores & Deeds</div><div class="osc-desc">Create and assign chores. Kids complete them and earn Parent Bucks.</div></div>
+        <div class="ob-step-card" style="--accent:#f59e0b"><span class="osc-icon">📱</span><div class="osc-title">Screen Time</div><div class="osc-desc">Kids earn screen time by completing chores. You control the balance.</div></div>
+        <div class="ob-step-card" style="--accent:#818cf8"><span class="osc-icon">📋</span><div class="osc-title">Behavior Log</div><div class="osc-desc">Record positive moments and areas to work on. Feeds into their Life Score.</div></div>
+        <div class="ob-step-card" style="--accent:#ef4444"><span class="osc-icon">📈</span><div class="osc-title">Report Card</div><div class="osc-desc">Weekly snapshot of each child's progress across every section.</div></div>
+        <div class="ob-step-card" style="--accent:#06b6d4"><span class="osc-icon">🎮</span><div class="osc-title">Prize Store</div><div class="osc-desc">Build a custom reward store — kids spend their Parent Bucks here.</div></div>
+      </div>
+      <div class="ob-tip">💡 <strong>Back button:</strong> Use the <b>← Dashboard</b> button inside the Parent Hub to return to the main screen anytime.</div>
+    </div>
+
+    <!-- SLIDE 3: CHORES & REWARDS -->
+    <div class="ob-slide">
+      <div class="ob-hero">
+        <span class="ob-hero-emoji">⭐</span>
+        <div class="ob-hero-title">CHORES & REWARDS</div>
+        <div class="ob-hero-sub">The most powerful motivation system you'll ever use at home.</div>
+      </div>
+      <ul class="ob-checklist">
+        <li><div class="obc-n">1</div><div>Go to <b>Parent Hub → Chores & Deeds</b>. Tap <b>"+ Add Chore"</b> and give it a name, point value, and how often it repeats (daily, weekly, one-time).</div></li>
+        <li><div class="obc-n">2</div><div>Your child will see the chore in their <b>✅ Chores</b> section. When they finish it, they tap <b>"Mark Done"</b>.</div></li>
+        <li><div class="obc-n">3</div><div>You verify it in the Parent Hub. Once approved, they earn <b>Parent Bucks 🪙</b> and <b>Screen Time ⏱</b> automatically.</div></li>
+        <li><div class="obc-n">4</div><div>Build a <b>Prize Store</b> — add prizes like "Movie Night", "Extra Screen Time", or real rewards. Kids spend their Parent Bucks to claim them.</div></li>
+      </ul>
+      <div class="ob-tip">💡 <strong>Fun extras:</strong> Your kids can also spin a reward wheel 🎰 or scratch a virtual card 🎫 to win bonus Parent Bucks!</div>
+    </div>
+
+    <!-- SLIDE 4: LANGUAGE & SETTINGS -->
+    <div class="ob-slide">
+      <div class="ob-hero">
+        <span class="ob-hero-emoji">⚙️</span>
+        <div class="ob-hero-title">SETTINGS & LANGUAGE</div>
+        <div class="ob-hero-sub">Make Life OS feel like it was built for your family.</div>
+      </div>
+      <ul class="ob-checklist">
+        <li><div class="obc-n">🌐</div><div><b>Language:</b> Tap the <b>🌐 Language</b> button at the top. Pick any language from the list and the ENTIRE app translates instantly. Tap again and choose English to switch back.</div></li>
+        <li><div class="obc-n">⚙</div><div><b>Settings:</b> Tap <b>⚙ Settings</b> in the top bar. Change your name, pick a color theme, show or hide sections your family doesn't need, and back up your data.</div></li>
+        <li><div class="obc-n">🎨</div><div><b>Themes:</b> Inside Settings → Appearance, choose from 10 background styles and 10 accent colors to match your family's vibe.</div></li>
+        <li><div class="obc-n">💾</div><div><b>Backup:</b> Inside Settings → Data, tap <b>Export Backup</b> to save your family data as a file. Keep it safe — import it anytime to restore everything.</div></li>
+      </ul>
+      <div class="ob-tip">💡 <strong>Faith features:</strong> Bible verses, devotionals, and scripture sections can be toggled on or off in Settings for families of all backgrounds.</div>
+    </div>
+
+    <!-- SLIDE 5: YOU'RE READY -->
+    <div class="ob-slide">
+      <div class="ob-hero">
+        <span class="ob-hero-emoji">🎉</span>
+        <div class="ob-hero-title">YOU'RE ALL SET!</div>
+        <div class="ob-hero-sub">Here's your quick-start checklist to get the whole family going today.</div>
+      </div>
+      <ul class="ob-checklist">
+        <li><div class="obc-n">✓</div><div>Open <b>Parent Hub</b> → <b>Manage Users</b> → Add each child with a 4-digit PIN</div></li>
+        <li><div class="obc-n">✓</div><div>Share each child's PIN with them and have them tap <b>👤 Child Login</b></div></li>
+        <li><div class="obc-n">✓</div><div>Add at least 3 chores in <b>Parent Hub → Chores & Deeds</b></div></li>
+        <li><div class="obc-n">✓</div><div>Build a Prize Store with at least 1 reward your kid will want</div></li>
+        <li><div class="obc-n">✓</div><div>Open the <b>Full Tutorial</b> below to explore every single section in detail</div></li>
+      </ul>
+      <div style="display:flex;flex-direction:column;gap:.5rem;margin-top:.5rem;">
+        <button onclick="closeParentOnboard();setTimeout(openTutorial,200);" style="background:linear-gradient(135deg,#38bdf8,#818cf8);color:#06101e;border:none;border-radius:10px;padding:.65rem 1rem;font-size:.83rem;font-weight:800;cursor:pointer;font-family:var(--fn);">📖 Open Full Detailed Tutorial</button>
+        <button onclick="closeParentOnboard();" style="background:rgba(255,255,255,.07);color:var(--tx2);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fn);">✓ Got It — Take Me to Life OS</button>
+      </div>
+    </div>
+
+  </div><!-- /ob-slides -->
+  <div class="ob-footer">
+    <button class="ob-nav-btn ghost" id="pobPrev" onclick="pobNav(-1)" disabled>‹ Back</button>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:.3rem;">
+      <div class="ob-dots" id="pobDots"></div>
+      <span class="ob-skip" onclick="closeParentOnboard()">Skip for now</span>
+    </div>
+    <button class="ob-nav-btn" id="pobNext" onclick="pobNav(1)">Next ›</button>
+  </div>
+</div><!-- /ob-box -->
+</div><!-- /parentOnboard -->
+
+<!-- ═══ KID ONBOARDING WIZARD ═══ -->
+<div id="kidOnboard">
+<div class="ob-box">
+  <div class="ob-slides" id="kobSlides">
+
+    <!-- SLIDE 0: HI THERE! -->
+    <div class="ob-slide">
+      <div class="ob-hero">
+        <span class="ob-hero-emoji" style="animation-duration:2s;">🌟</span>
+        <div class="ob-hero-title" style="color:#f59e0b;">HEY! WELCOME!</div>
+        <div class="ob-hero-sub">Life OS is YOUR personal command center. Let's take a super quick tour so you know exactly where everything is!</div>
+      </div>
+      <div class="ob-steps-grid">
+        <div class="ob-step-card" style="--accent:#f59e0b"><span class="osc-icon">📊</span><div class="osc-title">Your Dashboard</div><div class="osc-desc">Your home base — streaks, stats, and your daily wins all in one spot.</div></div>
+        <div class="ob-step-card" style="--accent:#34d399"><span class="osc-icon">✅</span><div class="osc-title">Daily Habits</div><div class="osc-desc">Check off habits every day to build your streak. Miss a day = streak reset!</div></div>
+        <div class="ob-step-card" style="--accent:#38bdf8"><span class="osc-icon">🧠</span><div class="osc-title">Life Skills</div><div class="osc-desc">140+ lessons with real certificates you can print. Learn stuff that actually matters.</div></div>
+        <div class="ob-step-card" style="--accent:#ef4444"><span class="osc-icon">🪙</span><div class="osc-title">Earn Rewards</div><div class="osc-desc">Finish chores → earn Parent Bucks → spend them on prizes in the store!</div></div>
+      </div>
+      <div class="ob-tip" style="background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.2);color:#fde68a;">💡 This is YOUR space. Your data is private — your parents can't see your journal entries!</div>
+    </div>
+
+    <!-- SLIDE 1: GETTING AROUND -->
+    <div class="ob-slide">
+      <div class="ob-hero">
+        <span class="ob-hero-emoji">🧭</span>
+        <div class="ob-hero-title" style="color:#f59e0b;">HOW TO GET AROUND</div>
+        <div class="ob-hero-sub">Everything in Life OS is organized into sections. Here's how to navigate:</div>
+      </div>
+      <ul class="ob-checklist">
+        <li><div class="obc-n">☰</div><div>Tap the <b>☰ menu button</b> in the top-right corner to open the navigation. All your sections are listed there with emojis.</div></li>
+        <li><div class="obc-n">🏠</div><div>Tap <b>🏠 Dashboard</b> at the top of the menu to return home anytime from anywhere in the app.</div></li>
+        <li><div class="obc-n">❓</div><div>See a <b>? button</b> anywhere? Tap it! It gives you a quick explanation of exactly what that section does.</div></li>
+        <li><div class="obc-n">⚙</div><div>Tap <b>⚙ Settings</b> in the quick bar to change your name, pick your grade level, choose a color theme, and more.</div></li>
+      </ul>
+      <div class="ob-tip" style="background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.2);color:#fde68a;">💡 <strong>Lost?</strong> Just tap ☰ → Dashboard and you'll always get back home!</div>
+    </div>
+
+    <!-- SLIDE 2: DAILY HABITS & STREAKS -->
+    <div class="ob-slide">
+      <div class="ob-hero">
+        <span class="ob-hero-emoji">🔥</span>
+        <div class="ob-hero-title" style="color:#f59e0b;">DAILY HABITS & STREAKS</div>
+        <div class="ob-hero-sub">This is the #1 thing to check every single day.</div>
+      </div>
+      <ul class="ob-checklist">
+        <li><div class="obc-n">1</div><div>On your <b>Dashboard</b>, find the <b>Daily W's</b> card. These are your habits — things like drinking water, praying, studying, working out.</div></li>
+        <li><div class="obc-n">2</div><div>Tap each habit to check it off with a ✅. The habit turns green and locks until midnight.</div></li>
+        <li><div class="obc-n">3</div><div>Complete <b>4 or more habits</b> in a day to count it as a streak day. Your streak number shows at the top.</div></li>
+        <li><div class="obc-n">4</div><div>Want to add your own habit? Tap the <b>+ Habit</b> button and create a custom one with your own emoji!</div></li>
+      </ul>
+      <div class="ob-tip" style="background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.2);color:#fde68a;">🔥 <strong>Challenge:</strong> Try to build a 7-day streak in your first week. You'll unlock your first badge!</div>
+    </div>
+
+    <!-- SLIDE 3: CHORES & EARNING -->
+    <div class="ob-slide">
+      <div class="ob-hero">
+        <span class="ob-hero-emoji">💰</span>
+        <div class="ob-hero-title" style="color:#f59e0b;">CHORES & EARNING REWARDS</div>
+        <div class="ob-hero-sub">The more you do, the more you earn. Here's how it works:</div>
+      </div>
+      <ul class="ob-checklist">
+        <li><div class="obc-n">1</div><div>Tap <b>✅ Chores</b> in the menu. Your parent has added chores for you with point values.</div></li>
+        <li><div class="obc-n">2</div><div>Finish a chore in real life, then tap <b>"Mark Done"</b> in the app. Your parent will verify it.</div></li>
+        <li><div class="obc-n">3</div><div>Once approved, you earn <b>🪙 Parent Bucks</b> and <b>⏱ Screen Time</b> automatically!</div></li>
+        <li><div class="obc-n">4</div><div>Tap <b>🪙 Parent Bucks</b> to see your balance and visit the <b>Prize Store</b> — spend your bucks on prizes your parent added.</div></li>
+        <li><div class="obc-n">5</div><div>Check the <b>🎰 Wheel</b> and <b>🎫 Scratch Card</b> tabs for bonus ways to earn extra Parent Bucks!</div></li>
+      </ul>
+    </div>
+
+    <!-- SLIDE 4: SCHOOL & LIFE SKILLS -->
+    <div class="ob-slide">
+      <div class="ob-hero">
+        <span class="ob-hero-emoji">📚</span>
+        <div class="ob-hero-title" style="color:#f59e0b;">SCHOOL & LIFE SKILLS</div>
+        <div class="ob-hero-sub">Two sections that help you actually get smarter — for real life, not just class.</div>
+      </div>
+      <ul class="ob-checklist">
+        <li><div class="obc-n">📖</div><div><b>School section:</b> Add your classes and grades — your GPA calculates automatically! Track assignments by due date so you never miss a deadline.</div></li>
+        <li><div class="obc-n">⏱</div><div><b>Study Timer:</b> In the School section, tap Study Timer. Set a Pomodoro timer (25 min focused work) and it logs every session automatically.</div></li>
+        <li><div class="obc-n">🧠</div><div><b>Life Skills Academy:</b> Find this in the menu. 140+ lessons on cooking, budgeting, car care, mental health, and more. Complete a category to earn a printable certificate!</div></li>
+        <li><div class="obc-n">🏅</div><div><b>Badges:</b> Check the Badges section to see what achievements you've unlocked and what challenges are still left to complete.</div></li>
+      </ul>
+      <div class="ob-tip" style="background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.2);color:#fde68a;">🎓 <strong>Pro tip:</strong> Earn 3 Life Skills certificates and unlock a special badge!</div>
+    </div>
+
+    <!-- SLIDE 5: YOU GOT THIS -->
+    <div class="ob-slide">
+      <div class="ob-hero">
+        <span class="ob-hero-emoji" style="animation-duration:1.5s;">🚀</span>
+        <div class="ob-hero-title" style="color:#f59e0b;">YOU'VE GOT THIS!</div>
+        <div class="ob-hero-sub">You're ready to start. Here are your first 3 missions:</div>
+      </div>
+      <ul class="ob-checklist">
+        <li><div class="obc-n">🎯</div><div>Go to <b>⚙ Settings</b> and set your <b>name</b> and pick a <b>color theme</b> you like</div></li>
+        <li><div class="obc-n">🎯</div><div>Check off all your <b>Daily Habits</b> today to start your streak</div></li>
+        <li><div class="obc-n">🎯</div><div>Complete your first <b>chore</b> and earn your first Parent Bucks 🪙</div></li>
+      </ul>
+      <div class="ob-tip" style="background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.2);color:#fde68a;">💡 <strong>Remember:</strong> Tap the <b>☰ menu</b> to explore ALL sections — there are 20+ areas to discover!</div>
+      <div style="display:flex;flex-direction:column;gap:.5rem;margin-top:.7rem;">
+        <button onclick="closeKidOnboard();setTimeout(openTutorial,200);" style="background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;border:none;border-radius:10px;padding:.65rem 1rem;font-size:.83rem;font-weight:800;cursor:pointer;font-family:var(--fn);">📖 Show Me Everything (Full Tour)</button>
+        <button onclick="closeKidOnboard();" style="background:rgba(255,255,255,.07);color:var(--tx2);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fn);">Let's Go! I'm Ready 🚀</button>
+      </div>
+    </div>
+
+  </div><!-- /ob-slides -->
+  <div class="ob-footer">
+    <button class="ob-nav-btn ghost" id="kobPrev" onclick="kobNav(-1)" disabled style="background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.2);color:#f59e0b;">‹ Back</button>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:.3rem;">
+      <div class="ob-dots" id="kobDots"></div>
+      <span class="ob-skip" onclick="closeKidOnboard()">Skip for now</span>
+    </div>
+    <button class="ob-nav-btn" id="kobNext" onclick="kobNav(1)" style="background:linear-gradient(135deg,#f59e0b,#ef4444);">Next ›</button>
+  </div>
+</div><!-- /ob-box -->
+</div><!-- /kidOnboard -->
+
 <script>
 // ── FIRST TIME PARENT PIN SETUP ──────────────────────────────
 function showFirstTimeGate(){
@@ -6059,6 +6436,9 @@ function setupFirstPin(){
   
   // Now finish initializing the app
   finishInit();
+  
+  // Show the parent onboarding wizard for new users
+  setTimeout(showParentOnboard, 600);
 }
 
 
@@ -12012,12 +12392,16 @@ function pobNav(dir){
 function showParentOnboard(){
   _pobStep = 0;
   initPobDots();
-  const slides = document.getElementById('pobSlides'); if(slides) slides.style.transform='translateX(0)';
-  const prev = document.getElementById('pobPrev'); if(prev){ prev.disabled=true; prev.style.opacity='0.35'; }
-  const next = document.getElementById('pobNext'); if(next){ next.textContent='Next ›'; next.onclick=()=>pobNav(1); }
+  const slides = document.getElementById('pobSlides');
+  if(slides) slides.style.transform='translateX(0)';
+  const prev = document.getElementById('pobPrev');
+  if(prev){ prev.disabled=true; prev.style.opacity='0.35'; }
+  const next = document.getElementById('pobNext');
+  if(next){ next.textContent='Next ›'; next.onclick=()=>pobNav(1); }
   const modal = document.getElementById('parentOnboard');
-  if(!modal){ console.warn('parentOnboard modal not found'); return; }
-  modal.style.display='flex';  // force visible in case class toggle fails
+  if(!modal){ alert('Wizard not found — please refresh the page'); return; }
+  // Force show with both inline style AND class (belt AND suspenders)
+  modal.style.cssText = 'display:flex !important; position:fixed; inset:0; z-index:99998; background:rgba(0,0,0,.93); align-items:center; justify-content:center; padding:1rem;';
   modal.classList.add('open');
   document.body.style.overflow='hidden';
 }
@@ -12078,10 +12462,9 @@ function closeKidOnboard(){
 // ══════════════════════════════════════════════════════════
 function updateStartHereBtn(){
   const btn = document.getElementById('startHereBtn'); if(!btn) return;
-  // Show for parent profiles always (persistent helper)
+  // Hide only when a child profile is active
   const profile = _profiles && _activeProfileId ? _profiles.find(p=>p.id===_activeProfileId) : null;
-  const isParent = !profile || profile.isParent;
-  btn.style.display = isParent ? 'flex' : 'none';
+  btn.style.display = (profile && !profile.isParent) ? 'none' : 'flex';
 }
 
 const TUT_STEPS = [
@@ -12679,249 +13062,6 @@ ${(b.showQR&&b.qrUrl&&qrSvgInline)?`<div class="section">
 
 <div id="hlpBox"><div class="hb-t" id="hlpT"></div><div id="hlpB"></div></div>
 
-
-<!-- ═══ ONBOARDING WELCOME MODAL ═══ -->
-<!-- ═══ FLOATING START HERE BUTTON ═══ -->
-<div id="startHereBtn" onclick="showParentOnboard()" title="Start Here!">
-  <div class="sh-bubble">✨ Start Here!</div>
-  <div class="sh-emoji">👆</div>
-</div>
-
-<!-- ═══ PARENT ONBOARDING WIZARD ═══ -->
-<div id="parentOnboard">
-<div class="ob-box">
-  <div class="ob-slides" id="pobSlides">
-
-    <!-- SLIDE 0: WELCOME -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji">👋</span>
-        <div class="ob-hero-title">WELCOME TO LIFE OS</div>
-        <div class="ob-hero-sub">Your family's complete command center. This quick guide will have your whole family up and running in just a few minutes.</div>
-      </div>
-      <div class="ob-steps-grid">
-        <div class="ob-step-card" style="--accent:#38bdf8"><span class="osc-icon">👨‍👩‍👧</span><div class="osc-title">Parent Hub</div><div class="osc-desc">Your private control center — PIN protected so only you can access it.</div></div>
-        <div class="ob-step-card" style="--accent:#818cf8"><span class="osc-icon">👤</span><div class="osc-title">Child Profiles</div><div class="osc-desc">Each kid gets their own 4-digit PIN and completely separate dashboard.</div></div>
-        <div class="ob-step-card" style="--accent:#34d399"><span class="osc-icon">🧠</span><div class="osc-title">140+ Lessons</div><div class="osc-desc">Life skills from cooking to budgeting. Kids earn real certificates.</div></div>
-        <div class="ob-step-card" style="--accent:#f59e0b"><span class="osc-icon">✅</span><div class="osc-title">Chores & Rewards</div><div class="osc-desc">Assign chores with point values. Kids earn Parent Bucks and screen time.</div></div>
-      </div>
-      <div class="ob-tip">💡 <strong>Tip:</strong> This whole guide takes about 2 minutes. You can reopen it anytime from Settings.</div>
-    </div>
-
-    <!-- SLIDE 1: FIRST STEPS -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji">🚀</span>
-        <div class="ob-hero-title">STEP 1 — SET UP YOUR FAMILY</div>
-        <div class="ob-hero-sub">Before your kids can log in, you need to add them. Here's how:</div>
-      </div>
-      <ul class="ob-checklist">
-        <li><div class="obc-n">1</div><div>Tap the <b>👨‍👩‍👧 Parent</b> button at the top of the screen to open the Parent Hub.</div></li>
-        <li><div class="obc-n">2</div><div>You'll be asked to create a <b>6-digit Parent PIN</b> — this keeps your parent controls private from the kids.</div></li>
-        <li><div class="obc-n">3</div><div>Once inside, go to <b>👥 Manage Users</b> on the left side menu.</div></li>
-        <li><div class="obc-n">4</div><div>Tap <b>"+ Add Child"</b> and type your child's name. A <b>4-digit PIN</b> will be created — write it down or share it with your child.</div></li>
-        <li><div class="obc-n">5</div><div>Repeat for each child in your family. You can add as many as you need!</div></li>
-      </ul>
-      <div class="ob-tip">💡 <strong>Each child has their own private space.</strong> When a child logs in, they only see their own data — not their siblings'.</div>
-    </div>
-
-    <!-- SLIDE 2: PARENT HUB TOUR -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji">🔐</span>
-        <div class="ob-hero-title">YOUR PARENT HUB</div>
-        <div class="ob-hero-sub">Everything you need to guide and monitor your kids — all in one place.</div>
-      </div>
-      <div class="ob-steps-grid">
-        <div class="ob-step-card" style="--accent:#38bdf8"><span class="osc-icon">📊</span><div class="osc-title">Overview</div><div class="osc-desc">See your child's Life Score — a real grade (A+ to F) across 6 life categories.</div></div>
-        <div class="ob-step-card" style="--accent:#34d399"><span class="osc-icon">✅</span><div class="osc-title">Chores & Deeds</div><div class="osc-desc">Create and assign chores. Kids complete them and earn Parent Bucks.</div></div>
-        <div class="ob-step-card" style="--accent:#f59e0b"><span class="osc-icon">📱</span><div class="osc-title">Screen Time</div><div class="osc-desc">Kids earn screen time by completing chores. You control the balance.</div></div>
-        <div class="ob-step-card" style="--accent:#818cf8"><span class="osc-icon">📋</span><div class="osc-title">Behavior Log</div><div class="osc-desc">Record positive moments and areas to work on. Feeds into their Life Score.</div></div>
-        <div class="ob-step-card" style="--accent:#ef4444"><span class="osc-icon">📈</span><div class="osc-title">Report Card</div><div class="osc-desc">Weekly snapshot of each child's progress across every section.</div></div>
-        <div class="ob-step-card" style="--accent:#06b6d4"><span class="osc-icon">🎮</span><div class="osc-title">Prize Store</div><div class="osc-desc">Build a custom reward store — kids spend their Parent Bucks here.</div></div>
-      </div>
-      <div class="ob-tip">💡 <strong>Back button:</strong> Use the <b>← Dashboard</b> button inside the Parent Hub to return to the main screen anytime.</div>
-    </div>
-
-    <!-- SLIDE 3: CHORES & REWARDS -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji">⭐</span>
-        <div class="ob-hero-title">CHORES & REWARDS</div>
-        <div class="ob-hero-sub">The most powerful motivation system you'll ever use at home.</div>
-      </div>
-      <ul class="ob-checklist">
-        <li><div class="obc-n">1</div><div>Go to <b>Parent Hub → Chores & Deeds</b>. Tap <b>"+ Add Chore"</b> and give it a name, point value, and how often it repeats (daily, weekly, one-time).</div></li>
-        <li><div class="obc-n">2</div><div>Your child will see the chore in their <b>✅ Chores</b> section. When they finish it, they tap <b>"Mark Done"</b>.</div></li>
-        <li><div class="obc-n">3</div><div>You verify it in the Parent Hub. Once approved, they earn <b>Parent Bucks 🪙</b> and <b>Screen Time ⏱</b> automatically.</div></li>
-        <li><div class="obc-n">4</div><div>Build a <b>Prize Store</b> — add prizes like "Movie Night", "Extra Screen Time", or real rewards. Kids spend their Parent Bucks to claim them.</div></li>
-      </ul>
-      <div class="ob-tip">💡 <strong>Fun extras:</strong> Your kids can also spin a reward wheel 🎰 or scratch a virtual card 🎫 to win bonus Parent Bucks!</div>
-    </div>
-
-    <!-- SLIDE 4: LANGUAGE & SETTINGS -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji">⚙️</span>
-        <div class="ob-hero-title">SETTINGS & LANGUAGE</div>
-        <div class="ob-hero-sub">Make Life OS feel like it was built for your family.</div>
-      </div>
-      <ul class="ob-checklist">
-        <li><div class="obc-n">🌐</div><div><b>Language:</b> Tap the <b>🌐 Language</b> button at the top. Pick any language from the list and the ENTIRE app translates instantly. Tap again and choose English to switch back.</div></li>
-        <li><div class="obc-n">⚙</div><div><b>Settings:</b> Tap <b>⚙ Settings</b> in the top bar. Change your name, pick a color theme, show or hide sections your family doesn't need, and back up your data.</div></li>
-        <li><div class="obc-n">🎨</div><div><b>Themes:</b> Inside Settings → Appearance, choose from 10 background styles and 10 accent colors to match your family's vibe.</div></li>
-        <li><div class="obc-n">💾</div><div><b>Backup:</b> Inside Settings → Data, tap <b>Export Backup</b> to save your family data as a file. Keep it safe — import it anytime to restore everything.</div></li>
-      </ul>
-      <div class="ob-tip">💡 <strong>Faith features:</strong> Bible verses, devotionals, and scripture sections can be toggled on or off in Settings for families of all backgrounds.</div>
-    </div>
-
-    <!-- SLIDE 5: YOU'RE READY -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji">🎉</span>
-        <div class="ob-hero-title">YOU'RE ALL SET!</div>
-        <div class="ob-hero-sub">Here's your quick-start checklist to get the whole family going today.</div>
-      </div>
-      <ul class="ob-checklist">
-        <li><div class="obc-n">✓</div><div>Open <b>Parent Hub</b> → <b>Manage Users</b> → Add each child with a 4-digit PIN</div></li>
-        <li><div class="obc-n">✓</div><div>Share each child's PIN with them and have them tap <b>👤 Child Login</b></div></li>
-        <li><div class="obc-n">✓</div><div>Add at least 3 chores in <b>Parent Hub → Chores & Deeds</b></div></li>
-        <li><div class="obc-n">✓</div><div>Build a Prize Store with at least 1 reward your kid will want</div></li>
-        <li><div class="obc-n">✓</div><div>Open the <b>Full Tutorial</b> below to explore every single section in detail</div></li>
-      </ul>
-      <div style="display:flex;flex-direction:column;gap:.5rem;margin-top:.5rem;">
-        <button onclick="closeParentOnboard();setTimeout(openTutorial,200);" style="background:linear-gradient(135deg,#38bdf8,#818cf8);color:#06101e;border:none;border-radius:10px;padding:.65rem 1rem;font-size:.83rem;font-weight:800;cursor:pointer;font-family:var(--fn);">📖 Open Full Detailed Tutorial</button>
-        <button onclick="closeParentOnboard();" style="background:rgba(255,255,255,.07);color:var(--tx2);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fn);">✓ Got It — Take Me to Life OS</button>
-      </div>
-    </div>
-
-  </div><!-- /ob-slides -->
-  <div class="ob-footer">
-    <button class="ob-nav-btn ghost" id="pobPrev" onclick="pobNav(-1)" disabled>‹ Back</button>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:.3rem;">
-      <div class="ob-dots" id="pobDots"></div>
-      <span class="ob-skip" onclick="closeParentOnboard()">Skip for now</span>
-    </div>
-    <button class="ob-nav-btn" id="pobNext" onclick="pobNav(1)">Next ›</button>
-  </div>
-</div><!-- /ob-box -->
-</div><!-- /parentOnboard -->
-
-<!-- ═══ KID ONBOARDING WIZARD ═══ -->
-<div id="kidOnboard">
-<div class="ob-box">
-  <div class="ob-slides" id="kobSlides">
-
-    <!-- SLIDE 0: HI THERE! -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji" style="animation-duration:2s;">🌟</span>
-        <div class="ob-hero-title" style="color:#f59e0b;">HEY! WELCOME!</div>
-        <div class="ob-hero-sub">Life OS is YOUR personal command center. Let's take a super quick tour so you know exactly where everything is!</div>
-      </div>
-      <div class="ob-steps-grid">
-        <div class="ob-step-card" style="--accent:#f59e0b"><span class="osc-icon">📊</span><div class="osc-title">Your Dashboard</div><div class="osc-desc">Your home base — streaks, stats, and your daily wins all in one spot.</div></div>
-        <div class="ob-step-card" style="--accent:#34d399"><span class="osc-icon">✅</span><div class="osc-title">Daily Habits</div><div class="osc-desc">Check off habits every day to build your streak. Miss a day = streak reset!</div></div>
-        <div class="ob-step-card" style="--accent:#38bdf8"><span class="osc-icon">🧠</span><div class="osc-title">Life Skills</div><div class="osc-desc">140+ lessons with real certificates you can print. Learn stuff that actually matters.</div></div>
-        <div class="ob-step-card" style="--accent:#ef4444"><span class="osc-icon">🪙</span><div class="osc-title">Earn Rewards</div><div class="osc-desc">Finish chores → earn Parent Bucks → spend them on prizes in the store!</div></div>
-      </div>
-      <div class="ob-tip" style="background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.2);color:#fde68a;">💡 This is YOUR space. Your data is private — your parents can't see your journal entries!</div>
-    </div>
-
-    <!-- SLIDE 1: GETTING AROUND -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji">🧭</span>
-        <div class="ob-hero-title" style="color:#f59e0b;">HOW TO GET AROUND</div>
-        <div class="ob-hero-sub">Everything in Life OS is organized into sections. Here's how to navigate:</div>
-      </div>
-      <ul class="ob-checklist">
-        <li><div class="obc-n">☰</div><div>Tap the <b>☰ menu button</b> in the top-right corner to open the navigation. All your sections are listed there with emojis.</div></li>
-        <li><div class="obc-n">🏠</div><div>Tap <b>🏠 Dashboard</b> at the top of the menu to return home anytime from anywhere in the app.</div></li>
-        <li><div class="obc-n">❓</div><div>See a <b>? button</b> anywhere? Tap it! It gives you a quick explanation of exactly what that section does.</div></li>
-        <li><div class="obc-n">⚙</div><div>Tap <b>⚙ Settings</b> in the quick bar to change your name, pick your grade level, choose a color theme, and more.</div></li>
-      </ul>
-      <div class="ob-tip" style="background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.2);color:#fde68a;">💡 <strong>Lost?</strong> Just tap ☰ → Dashboard and you'll always get back home!</div>
-    </div>
-
-    <!-- SLIDE 2: DAILY HABITS & STREAKS -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji">🔥</span>
-        <div class="ob-hero-title" style="color:#f59e0b;">DAILY HABITS & STREAKS</div>
-        <div class="ob-hero-sub">This is the #1 thing to check every single day.</div>
-      </div>
-      <ul class="ob-checklist">
-        <li><div class="obc-n">1</div><div>On your <b>Dashboard</b>, find the <b>Daily W's</b> card. These are your habits — things like drinking water, praying, studying, working out.</div></li>
-        <li><div class="obc-n">2</div><div>Tap each habit to check it off with a ✅. The habit turns green and locks until midnight.</div></li>
-        <li><div class="obc-n">3</div><div>Complete <b>4 or more habits</b> in a day to count it as a streak day. Your streak number shows at the top.</div></li>
-        <li><div class="obc-n">4</div><div>Want to add your own habit? Tap the <b>+ Habit</b> button and create a custom one with your own emoji!</div></li>
-      </ul>
-      <div class="ob-tip" style="background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.2);color:#fde68a;">🔥 <strong>Challenge:</strong> Try to build a 7-day streak in your first week. You'll unlock your first badge!</div>
-    </div>
-
-    <!-- SLIDE 3: CHORES & EARNING -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji">💰</span>
-        <div class="ob-hero-title" style="color:#f59e0b;">CHORES & EARNING REWARDS</div>
-        <div class="ob-hero-sub">The more you do, the more you earn. Here's how it works:</div>
-      </div>
-      <ul class="ob-checklist">
-        <li><div class="obc-n">1</div><div>Tap <b>✅ Chores</b> in the menu. Your parent has added chores for you with point values.</div></li>
-        <li><div class="obc-n">2</div><div>Finish a chore in real life, then tap <b>"Mark Done"</b> in the app. Your parent will verify it.</div></li>
-        <li><div class="obc-n">3</div><div>Once approved, you earn <b>🪙 Parent Bucks</b> and <b>⏱ Screen Time</b> automatically!</div></li>
-        <li><div class="obc-n">4</div><div>Tap <b>🪙 Parent Bucks</b> to see your balance and visit the <b>Prize Store</b> — spend your bucks on prizes your parent added.</div></li>
-        <li><div class="obc-n">5</div><div>Check the <b>🎰 Wheel</b> and <b>🎫 Scratch Card</b> tabs for bonus ways to earn extra Parent Bucks!</div></li>
-      </ul>
-    </div>
-
-    <!-- SLIDE 4: SCHOOL & LIFE SKILLS -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji">📚</span>
-        <div class="ob-hero-title" style="color:#f59e0b;">SCHOOL & LIFE SKILLS</div>
-        <div class="ob-hero-sub">Two sections that help you actually get smarter — for real life, not just class.</div>
-      </div>
-      <ul class="ob-checklist">
-        <li><div class="obc-n">📖</div><div><b>School section:</b> Add your classes and grades — your GPA calculates automatically! Track assignments by due date so you never miss a deadline.</div></li>
-        <li><div class="obc-n">⏱</div><div><b>Study Timer:</b> In the School section, tap Study Timer. Set a Pomodoro timer (25 min focused work) and it logs every session automatically.</div></li>
-        <li><div class="obc-n">🧠</div><div><b>Life Skills Academy:</b> Find this in the menu. 140+ lessons on cooking, budgeting, car care, mental health, and more. Complete a category to earn a printable certificate!</div></li>
-        <li><div class="obc-n">🏅</div><div><b>Badges:</b> Check the Badges section to see what achievements you've unlocked and what challenges are still left to complete.</div></li>
-      </ul>
-      <div class="ob-tip" style="background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.2);color:#fde68a;">🎓 <strong>Pro tip:</strong> Earn 3 Life Skills certificates and unlock a special badge!</div>
-    </div>
-
-    <!-- SLIDE 5: YOU GOT THIS -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji" style="animation-duration:1.5s;">🚀</span>
-        <div class="ob-hero-title" style="color:#f59e0b;">YOU'VE GOT THIS!</div>
-        <div class="ob-hero-sub">You're ready to start. Here are your first 3 missions:</div>
-      </div>
-      <ul class="ob-checklist">
-        <li><div class="obc-n">🎯</div><div>Go to <b>⚙ Settings</b> and set your <b>name</b> and pick a <b>color theme</b> you like</div></li>
-        <li><div class="obc-n">🎯</div><div>Check off all your <b>Daily Habits</b> today to start your streak</div></li>
-        <li><div class="obc-n">🎯</div><div>Complete your first <b>chore</b> and earn your first Parent Bucks 🪙</div></li>
-      </ul>
-      <div class="ob-tip" style="background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.2);color:#fde68a;">💡 <strong>Remember:</strong> Tap the <b>☰ menu</b> to explore ALL sections — there are 20+ areas to discover!</div>
-      <div style="display:flex;flex-direction:column;gap:.5rem;margin-top:.7rem;">
-        <button onclick="closeKidOnboard();setTimeout(openTutorial,200);" style="background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;border:none;border-radius:10px;padding:.65rem 1rem;font-size:.83rem;font-weight:800;cursor:pointer;font-family:var(--fn);">📖 Show Me Everything (Full Tour)</button>
-        <button onclick="closeKidOnboard();" style="background:rgba(255,255,255,.07);color:var(--tx2);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fn);">Let's Go! I'm Ready 🚀</button>
-      </div>
-    </div>
-
-  </div><!-- /ob-slides -->
-  <div class="ob-footer">
-    <button class="ob-nav-btn ghost" id="kobPrev" onclick="kobNav(-1)" disabled style="background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.2);color:#f59e0b;">‹ Back</button>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:.3rem;">
-      <div class="ob-dots" id="kobDots"></div>
-      <span class="ob-skip" onclick="closeKidOnboard()">Skip for now</span>
-    </div>
-    <button class="ob-nav-btn" id="kobNext" onclick="kobNav(1)" style="background:linear-gradient(135deg,#f59e0b,#ef4444);">Next ›</button>
-  </div>
-</div><!-- /ob-box -->
-</div><!-- /kidOnboard -->
 
 </body>
 </html>`;
