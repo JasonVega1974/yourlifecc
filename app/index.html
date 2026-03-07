@@ -285,6 +285,13 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 ::-webkit-scrollbar-thumb{background:var(--s4);border-radius:3px;}
 
 /* ── TOOLTIPS ───────────────────────────────────── */
+/* ── INLINE HELP BUTTONS ─────────────────────────────────── */
+.hlp{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);color:#38bdf8;font-size:.58rem;font-weight:900;cursor:pointer;flex-shrink:0;vertical-align:middle;margin-left:4px;transition:all .15s;user-select:none;line-height:1;}
+.hlp:hover{background:rgba(56,189,248,.32);transform:scale(1.2);}
+#hlpBox{position:fixed;z-index:99998;background:#0c1422;border:1px solid rgba(56,189,248,.35);border-radius:10px;padding:.7rem .9rem;max-width:270px;font-size:.76rem;color:#c8d4e8;line-height:1.6;box-shadow:0 6px 28px rgba(0,0,0,.7);pointer-events:none;transition:opacity .12s;opacity:0;}
+#hlpBox.show{opacity:1;}
+#hlpBox .hb-t{font-weight:800;color:#38bdf8;font-size:.78rem;margin-bottom:.28rem;}
+
 .tip-wrap{position:relative;display:inline-flex;align-items:center;gap:.3rem;}
 .tip-btn{width:17px;height:17px;border-radius:50%;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.35);color:var(--c);font-size:.65rem;font-weight:800;cursor:help;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s;font-family:var(--fm);line-height:1;}
 .tip-btn:hover{background:rgba(56,189,248,.4);}
@@ -1474,7 +1481,7 @@ body{top:0!important;}
 
   <!-- Tutorial launcher -->
 
-  <button class="btn bg_" style="width:100%;margin-bottom:.85rem;font-size:.82rem;" onclick="closeSettings();openTutorial()">🎓 HOW TO USE LIFE OS — Full Tutorial</button>
+  <button class="btn bg_" style="width:100%;margin-bottom:.85rem;font-size:.75rem;white-space:normal;line-height:1.3;padding:.45rem .5rem;text-align:center;" onclick="closeSettings();openTutorial()">🎓 How to Use Life OS &mdash; Full Tutorial</button>
   <div style="background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.15);border-radius:10px;padding:.9rem;margin-bottom:.85rem;">
     <label style="margin-top:0;">👤 Your Name</label>
     <input type="text" id="settingsName" placeholder="Enter your name">
@@ -1680,7 +1687,7 @@ body{top:0!important;}
     </button>
     <div id="google_translate_element" style="position:absolute;top:100%;right:0;margin-top:4px;z-index:9999;background:#1e1e3a;border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:6px;display:none;min-width:180px;box-shadow:0 8px 32px rgba(0,0,0,.5);"></div>
   </div>
-  <button onclick="openChildLogin()" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.15);color:#38bdf8;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:var(--fn);display:flex;align-items:center;gap:.3rem;transition:all .15s;" onmouseenter="this.style.background='rgba(56,189,248,.16)'" onmouseleave="this.style.background='rgba(56,189,248,.08)'">👤 Child Login</button>
+  <button onclick="openChildLogin()" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.15);color:#38bdf8;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:var(--fn);display:flex;align-items:center;gap:.3rem;transition:all .15s;" onmouseenter="this.style.background='rgba(56,189,248,.16)'" onmouseleave="this.style.background='rgba(56,189,248,.08)'">👤 Child Login <span class="hlp" onmouseenter="hlp('childlogin',this,event)" onmouseleave="hlpHide()">?</span></button>
   <button onclick="quickParentHub()" style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.2);color:#a78bfa;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:var(--fn);display:flex;align-items:center;gap:.3rem;transition:all .15s;" onmouseenter="this.style.background='rgba(139,92,246,.2)'" onmouseleave="this.style.background='rgba(139,92,246,.12)'">👨‍👩‍👧 Parent</button>
   <button onclick="quickSettings()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--tx2);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:var(--fn);display:flex;align-items:center;gap:.3rem;transition:all .15s;" onmouseenter="this.style.background='rgba(255,255,255,.12)'" onmouseleave="this.style.background='rgba(255,255,255,.06)'">⚙ Settings</button>
 </div>
@@ -1779,7 +1786,7 @@ body{top:0!important;}
     <div class="dcard" onclick="showSection('s-parent')" style="background:linear-gradient(135deg,rgba(139,92,246,.06),rgba(56,189,248,.04));border-color:rgba(139,92,246,.15);">
       <div class="dcard-status" id="dcLifeScoreStatus"></div>
       <div class="dcard-icon">🏆</div>
-      <div class="dcard-label">LIFE SCORE</div>
+      <div class="dcard-label">LIFE SCORE <span class="hlp" onmouseenter="hlp('lifescore',this,event)" onmouseleave="hlpHide()">?</span></div>
       <div class="dcard-value" id="qsLifeScore" style="font-size:2rem;">—</div>
       <div class="dcard-sub" id="qsLifeScoreLabel">Unlock Parent Hub</div>
     </div>
@@ -1950,7 +1957,7 @@ body{top:0!important;}
   <!-- DAILY W's -->
   <div style="background:rgba(251,191,36,.03);border:1px solid rgba(251,191,36,.08);border-radius:12px;padding:.7rem .9rem;margin-bottom:.7rem;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.35rem;">
-      <span style="font-size:.75rem;font-weight:700;letter-spacing:1px;">⚡ DAILY W's</span>
+      <span style="font-size:.75rem;font-weight:700;letter-spacing:1px;">⚡ DAILY W's</span><span class="hlp" onmouseenter="hlp('habits',this,event)" onmouseleave="hlpHide()" onclick="hlp('habits',this,event)">?</span>
       <button class="btn bgh bs" onclick="addHabit()" style="font-size:.65rem;">+ Habit</button>
     </div>
     <div id="checkinGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:.3rem;"></div>
@@ -4416,7 +4423,8 @@ body{top:0!important;}
 <section id="s-scripture" class="sec">
   <div class="sh">
     <div class="si">✝️</div>
-    <div class="st">Bible & Faith</div>
+    <div class="st">Bible &amp; Faith</div>
+    <span class="tip-wrap"><span class="tip-btn" onmouseenter="hlp('scripture',this,event)" onmouseleave="hlpHide()">?</span></span>
     <div class="sl"></div>
   </div>
 
@@ -4796,6 +4804,7 @@ body{top:0!important;}
   <div class="sh">
     <div class="si">👨‍👩‍👧</div>
     <div class="st">Parent Hub</div>
+    <span class="tip-wrap"><span class="tip-btn" onmouseenter="hlp('parenthub',this,event)" onmouseleave="hlpHide()">?</span></span>
     <div class="sl"></div>
   </div>
 
@@ -4825,7 +4834,7 @@ body{top:0!important;}
       
       <!-- LEFT PANEL -->
       <div style="width:180px;flex-shrink:0;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:.5rem;overflow-y:auto;" id="phLeftNav">
-        <div onclick="phNav('users')" class="ph-nav-item active" id="phn-users">👥 Manage Users</div>
+        <div onclick="phNav('users')" class="ph-nav-item active" id="phn-users">👥 Manage Users <span class="hlp" onmouseenter="hlp('manageusers',this,event)" onmouseleave="hlpHide()">?</span></div>
         <div onclick="phNav('overview')" class="ph-nav-item" id="phn-overview">📊 Overview</div>
         <div onclick="phNav('chores')" class="ph-nav-item" id="phn-chores">✅ Chores & Deeds</div>
         <div onclick="phNav('contests')" class="ph-nav-item" id="phn-contests">🏆 Contests</div>
@@ -5196,170 +5205,203 @@ body{top:0!important;}
 
   <div class="tut-body">
 
-    <!-- STEP 1: WELCOME -->
+    <!-- STEP 0: WELCOME -->
     <div class="tut-step active" data-step="0">
       <h3>👋 WELCOME TO LIFE OS</h3>
-      <p>LIFE OS is your personal command center — built to help you track your money, school, health, schedule, goals, and faith all in one place. Think of it as your digital life headquarters.</p>
-      <div class="tut-row"><div class="tut-icon">💡</div><div class="tut-row-text"><b>How it works</b>Everything saves automatically to your browser. You can also sync to the cloud via Settings so your data follows you across devices.</div></div>
-      <div class="tut-row"><div class="tut-icon">🧭</div><div class="tut-row-text"><b>Getting around</b>Use the emoji buttons in the top nav bar to jump to any section instantly. Or just scroll down.</div></div>
-      <div class="tut-row"><div class="tut-icon">⚙️</div><div class="tut-row-text"><b>Customize everything</b>Open Settings (top right) to set your name, show/hide sections, manage scriptures, and add custom schedule activities.</div></div>
-      <div class="tut-row"><div class="tut-icon">❓</div><div class="tut-row-text"><b>Quick help tooltips</b>Look for the <span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;background:rgba(56,189,248,.3);border-radius:50%;color:var(--c);font-size:.65rem;font-weight:800;">?</span> icons next to section headers throughout the app — hover over them for instant tips.</div></div>
+      <p>Life OS is your personal command center — built for young people to track money, school, health, goals, habits, and more. Everything saves automatically right in your browser.</p>
+      <div class="tut-row"><div class="tut-icon">🧭</div><div class="tut-row-text"><b>Navigate anywhere</b> Use the emoji nav bar at the top to jump to any section. Or just scroll down through all your sections.</div></div>
+      <div class="tut-row"><div class="tut-icon">❓</div><div class="tut-row-text"><b>Help is everywhere</b> Look for the <span style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;background:rgba(56,189,248,.25);border-radius:50%;color:#38bdf8;font-size:.58rem;font-weight:900;">?</span> buttons throughout the app. Hover or tap any one for an instant explanation of that section.</div></div>
+      <div class="tut-row"><div class="tut-icon">👤</div><div class="tut-row-text"><b>Child profiles</b> Parents go to Parent Hub → Manage Users first to add each child with a 4-digit PIN. Kids tap "Child Login" to access their own dashboard.</div></div>
+      <div class="tut-row"><div class="tut-icon">💾</div><div class="tut-row-text"><b>Your data is safe</b> Everything saves locally and automatically. Use Settings → Backup to export, or Settings → Cloud Sync to keep data across devices.</div></div>
+      <div class="tut-row"><div class="tut-icon">⚙️</div><div class="tut-row-text"><b>Make it yours</b> Open Settings to set your name, life stage, theme colors, show/hide sections, manage scriptures, and customize schedule activities.</div></div>
     </div>
 
-    <!-- STEP 2: DASHBOARD -->
+    <!-- STEP 1: DASHBOARD -->
     <div class="tut-step" data-step="1">
       <h3>🏠 DASHBOARD HUB</h3>
-      <p>The hero section at the top is your daily home base. It greets you by name, shows the time, and keeps your most important stats front and center.</p>
-      <div class="tut-row"><div class="tut-icon">✝️</div><div class="tut-row-text"><b>Scripture Banner</b>Shows a rotating Bible verse. Use › to go to the next one. Auto-rotates every 60 seconds by default. Add your own verses in Settings.</div></div>
-      <div class="tut-row"><div class="tut-icon">📊</div><div class="tut-row-text"><b>Quick Stats Row</b>Shows your Bank balance, Savings Account, Goal Savings total, GPA, and Streak — all pulled live from your data.</div></div>
-      <div class="tut-row"><div class="tut-icon">⚡</div><div class="tut-row-text"><b>Daily Wins</b>Check off habits each day. Complete 4+ to extend your streak. Your streak counter updates automatically. Click "+ Add Habit" to create custom ones.</div></div>
-      <div class="tut-row"><div class="tut-icon">✏️</div><div class="tut-row-text"><b>Edit your name</b>Click your name at the top to edit it inline — or go to Settings to change it and your level (Middle School / High School / College / Adult).</div></div>
+      <p>The top section is your daily home base — it greets you by name, shows live stats, and keeps your most important info front and center.</p>
+      <div class="tut-row"><div class="tut-icon">📊</div><div class="tut-row-text"><b>Quick Stats Row</b> Shows your Bank balance, Savings, Goal total, GPA, and Streak — all pulled live from your data. Updates the moment anything changes.</div></div>
+      <div class="tut-row"><div class="tut-icon">✝️</div><div class="tut-row-text"><b>Scripture Banner</b> Rotating Bible verse. Hit › to skip ahead. Auto-rotates every 60 seconds. Add your own verses in Settings.</div></div>
+      <div class="tut-row"><div class="tut-icon">💬</div><div class="tut-row-text"><b>Daily Prompt</b> A new journaling prompt each day. Tap it to open the Journal section with that prompt pre-filled.</div></div>
+      <div class="tut-row"><div class="tut-icon">✏️</div><div class="tut-row-text"><b>Edit your name</b> Click your name at the top of the hero card to edit it inline. Or change it in Settings along with your life stage.</div></div>
+      <div class="tut-row"><div class="tut-icon">🎨</div><div class="tut-row-text"><b>Background themes</b> Open Settings → Appearance to choose from 10 dashboard background presets and 10 accent colors.</div></div>
+    </div>
+
+    <!-- STEP 2: DAILY HABITS -->
+    <div class="tut-step" data-step="2">
+      <h3>⚡ DAILY WINS</h3>
+      <p>The Daily W's card on your dashboard is your habit tracker. Completing it every day builds your streak and earns points.</p>
+      <div class="tut-row"><div class="tut-icon">✅</div><div class="tut-row-text"><b>How to check in</b> Tap each habit to mark it complete for today. A green checkmark appears and the habit locks until midnight.</div></div>
+      <div class="tut-row"><div class="tut-icon">🔥</div><div class="tut-row-text"><b>Your streak</b> Complete 4 or more habits in a single day to count as a "streak day." The counter on your dashboard shows your current streak. Miss a day and it resets to zero.</div></div>
+      <div class="tut-row"><div class="tut-icon">➕</div><div class="tut-row-text"><b>Add custom habits</b> Hit the "+ Habit" button on the Daily W's card to create your own habit with a custom emoji. It'll appear in your grid every day.</div></div>
+      <div class="tut-row"><div class="tut-icon">💪</div><div class="tut-row-text"><b>Included habits</b> Prayer, Bible reading, workout, drink water, no doom-scrolling, journaling, studying, and gratitude — toggle faith habits on/off in Settings.</div></div>
     </div>
 
     <!-- STEP 3: MONEY -->
-    <div class="tut-step" data-step="2">
+    <div class="tut-step" data-step="3">
       <h3>💰 MONEY MANAGER</h3>
-      <p>Track your real money — balances, bills, every transaction, and savings goals — all in one place. Six tabs cover everything.</p>
-      <div class="tut-row"><div class="tut-icon">📊</div><div class="tut-row-text"><b>Overview tab</b>Enter your Checking and Savings Account balances here. These show up on your dashboard instantly. Past entries are saved in history.</div></div>
-      <div class="tut-row"><div class="tut-icon">🧾</div><div class="tut-row-text"><b>Bills tab</b>Add every recurring bill with its name, amount, and due date. Tap a bill to mark it paid. Total auto-calculates. Unpaid count shows on the dashboard.</div></div>
-      <div class="tut-row"><div class="tut-icon">💳</div><div class="tut-row-text"><b>Transactions tab</b>Log every income or expense. Filter by type. Month totals calculate automatically and feed into your Net Left Over stat.</div></div>
-      <div class="tut-row"><div class="tut-icon">💚</div><div class="tut-row-text"><b>Goal Savings tab</b>See your overall savings progress and quick-add money to any goal. Three starter goals included — add your own from Sav. Goals tab.</div></div>
-      <div class="tut-row"><div class="tut-icon">🎯</div><div class="tut-row-text"><b>Sav. Goals tab</b>Create savings goals with emoji, target amount, and current balance. Each goal shows a progress bar. Edit or delete anytime.</div></div>
-      <div class="tut-row"><div class="tut-icon">📋</div><div class="tut-row-text"><b>Budget tab</b>Enter your monthly take-home and savings target. The 50/30/20 rule calculates automatically and flags if your bills exceed 50% of income.</div></div>
+      <p>Track real money — balances, every bill, every transaction, and your savings goals — all in one place across 6 tabs.</p>
+      <div class="tut-row"><div class="tut-icon">🏦</div><div class="tut-row-text"><b>Overview</b> Enter your Checking and Savings balances here. They appear on your dashboard stats row instantly. History is saved every time you update.</div></div>
+      <div class="tut-row"><div class="tut-icon">🧾</div><div class="tut-row-text"><b>Bills</b> Add recurring bills with name, amount, and due date. Tap a bill to mark it paid. Total auto-calculates. Unpaid count shows on the dashboard.</div></div>
+      <div class="tut-row"><div class="tut-icon">💳</div><div class="tut-row-text"><b>Transactions</b> Log every income or expense. Filter by type. Month totals auto-calculate and feed into your Net Left Over stat.</div></div>
+      <div class="tut-row"><div class="tut-icon">🎯</div><div class="tut-row-text"><b>Savings Goals</b> Create goals with emoji, target, and current amount. Progress bars show how close you are. Quick-add money from the Goal Savings tab.</div></div>
+      <div class="tut-row"><div class="tut-icon">📋</div><div class="tut-row-text"><b>Budget Planner</b> Enter your monthly income and the 50/30/20 rule calculates automatically. Flags if your bills exceed 50% of income.</div></div>
+      <div class="tut-row"><div class="tut-icon">📚</div><div class="tut-row-text"><b>Tax & Finance Ed</b> A full financial education section — tax dates, deductions, retirement accounts, self-employment taxes, and a quick tax estimator.</div></div>
     </div>
 
     <!-- STEP 4: SCHOOL -->
-    <div class="tut-step" data-step="3">
+    <div class="tut-step" data-step="4">
       <h3>📚 SCHOOL</h3>
-      <p>Track every class, assignment, and study session — and watch your GPA calculate in real time.</p>
-      <div class="tut-row"><div class="tut-icon">📖</div><div class="tut-row-text"><b>My Classes</b>Click "+ Add Class" to add each subject with teacher, room, grade %, and a color. Your grade letter and GPA update instantly. Click ✎ to edit any class.</div></div>
-      <div class="tut-row"><div class="tut-icon">📝</div><div class="tut-row-text"><b>Assignments</b>Add tasks with a due date and priority (High/Medium/Low). Color-coded by priority — red = high. Check the box when done. Overdue assignments show a red warning.</div></div>
-      <div class="tut-row"><div class="tut-icon">🎓</div><div class="tut-row-text"><b>GPA tab</b>Automatically calculated from all your class grades. Shows honor roll status and a visual breakdown per class. Updates whenever you edit a grade.</div></div>
-      <div class="tut-row"><div class="tut-icon">⏱</div><div class="tut-row-text"><b>Study Timer</b>Set a Pomodoro timer (25, 45, 60, or 90 min), name what you're studying, and start. Completed sessions are logged with subject and duration.</div></div>
+      <p>Manage your academic life — classes, grades, assignments, study sessions, and GPA — all in one place.</p>
+      <div class="tut-row"><div class="tut-icon">📖</div><div class="tut-row-text"><b>My Classes</b> Click "+ Add Class" to add each subject with teacher, room, grade %, and a color. Grade letter and GPA update instantly every time you change a grade.</div></div>
+      <div class="tut-row"><div class="tut-icon">📝</div><div class="tut-row-text"><b>Assignments</b> Add tasks with a due date and priority (High/Medium/Low). Color-coded by urgency — red for high priority. Overdue tasks show a red warning. Check the box when done.</div></div>
+      <div class="tut-row"><div class="tut-icon">🎓</div><div class="tut-row-text"><b>GPA Tab</b> Live GPA calculated from all your class grades. Shows honor roll status and a per-class visual breakdown.</div></div>
+      <div class="tut-row"><div class="tut-icon">⏱</div><div class="tut-row-text"><b>Study Timer</b> Set a Pomodoro timer (25, 45, 60, or 90 min), name what you're studying, and start. Sessions are automatically logged with subject and duration.</div></div>
     </div>
 
     <!-- STEP 5: SCHEDULE -->
-    <div class="tut-step" data-step="4">
-      <h3>📅 MONTHLY SCHEDULE</h3>
-      <p>A visual 28-day grid showing every hour from 6 AM to 11 PM. Today's column is highlighted in blue. Everything saves automatically as you fill it in.</p>
-      <div class="tut-row"><div class="tut-icon">🖱️</div><div class="tut-row-text"><b>How to fill it</b>Click any time slot cell and pick an activity from the dropdown. The cell immediately color-codes to match the activity type.</div></div>
-      <div class="tut-row"><div class="tut-icon">🎨</div><div class="tut-row-text"><b>Color coding</b>Each activity type has its own color — cyan for Work, green for School/Gym, pink for Jiu Jitsu, purple for Church/Prayer, gold for Study, etc.</div></div>
-      <div class="tut-row"><div class="tut-icon">➕</div><div class="tut-row-text"><b>Add your own activities</b>Go to Settings → Schedule Activities to add custom activities with your own emoji and color. They appear in every dropdown instantly.</div></div>
-      <div class="tut-row"><div class="tut-icon">🗑️</div><div class="tut-row-text"><b>Clear schedule</b>The 🗑 Clear button clears only the current month — past months stay intact. Use Save to force-save immediately.</div></div>
-    </div>
-
-    <!-- STEP 6: CALENDAR -->
     <div class="tut-step" data-step="5">
-      <h3>🗓️ CALENDAR</h3>
-      <p>A monthly event calendar for gigs, tournaments, school events, church, and anything else you want to track by date.</p>
-      <div class="tut-row"><div class="tut-icon">➕</div><div class="tut-row-text"><b>Add an event</b>Click "+ Event" or tap any date on the calendar. Fill in the title, date, time, category, and notes. Events show as color chips on the calendar grid.</div></div>
-      <div class="tut-row"><div class="tut-icon">🎨</div><div class="tut-row-text"><b>Categories</b>DJ/Gig (cyan), Sports/Martial Arts (pink), Work (purple), Church/Faith (gold), School (green), Other (gray). Each gets its own color on the calendar.</div></div>
-      <div class="tut-row"><div class="tut-icon">📌</div><div class="tut-row-text"><b>Upcoming events</b>The right panel shows your next 15 events in chronological order. Click ✕ to delete. Events on past dates disappear from this list automatically.</div></div>
-      <div class="tut-row"><div class="tut-icon">‹ ›</div><div class="tut-row-text"><b>Navigate months</b>Use the Prev / Next buttons to browse any month. Today is always highlighted with a cyan border.</div></div>
+      <h3>📅 MONTHLY SCHEDULE</h3>
+      <p>A visual 28-day grid from 6 AM to 11 PM. Today's column is highlighted. Everything saves automatically as you fill it in.</p>
+      <div class="tut-row"><div class="tut-icon">🖱️</div><div class="tut-row-text"><b>Fill it in</b> Click any time slot and pick an activity from the dropdown. The cell color-codes automatically to match the activity type.</div></div>
+      <div class="tut-row"><div class="tut-icon">🎨</div><div class="tut-row-text"><b>Color coding</b> Each activity type has its own color — cyan for Work, green for School, pink for Jiu Jitsu, purple for Church/Prayer, gold for Study, etc.</div></div>
+      <div class="tut-row"><div class="tut-icon">➕</div><div class="tut-row-text"><b>Custom activities</b> Go to Settings → Schedule Activities to add activities with your own emoji and color. They appear in every dropdown immediately.</div></div>
+      <div class="tut-row"><div class="tut-icon">🗓️</div><div class="tut-row-text"><b>Calendar tab</b> Track events (gigs, tournaments, school, church) on a monthly calendar. Upcoming events panel shows your next 15 events in chronological order.</div></div>
     </div>
 
-    <!-- STEP 7: HEALTH -->
+    <!-- STEP 6: HEALTH -->
     <div class="tut-step" data-step="6">
-      <h3>💪 HEALTH & FITNESS</h3>
-      <p>Three tabs to track your weight progress, daily nutrition, and habit streaks — all tied back to your dashboard.</p>
-      <div class="tut-row"><div class="tut-icon">⚖️</div><div class="tut-row-text"><b>Weight tracker</b>Enter your current weight and goal weight, pick a date, and log it. A progress bar shows how far you've come. The chart shows your last 30 entries with weight and date on each dot.</div></div>
-      <div class="tut-row"><div class="tut-icon">🍽</div><div class="tut-row-text"><b>Nutrition</b>Log food with calories, protein, carbs, and fat. Daily macro totals update instantly with progress bars against your goals. Set custom daily goals at the bottom.</div></div>
-      <div class="tut-row"><div class="tut-icon">✅</div><div class="tut-row-text"><b>Daily Habits</b>Same habits as your dashboard check-ins — synced. Check off anything here and it counts toward your streak too.</div></div>
+      <h3>❤️ HEALTH & FITNESS</h3>
+      <p>Track your physical and mental wellbeing — weight, nutrition, workouts, and mood — all with progress charts.</p>
+      <div class="tut-row"><div class="tut-icon">⚖️</div><div class="tut-row-text"><b>Weight Tracker</b> Log your weight and goal weight by date. A progress bar shows how far you've come. Chart shows your last 30 entries labeled with date.</div></div>
+      <div class="tut-row"><div class="tut-icon">🍽</div><div class="tut-row-text"><b>Nutrition Log</b> Log meals with calories, protein, carbs, and fat. Daily macro totals update instantly with progress bars against your custom goals.</div></div>
+      <div class="tut-row"><div class="tut-icon">✅</div><div class="tut-row-text"><b>Daily Habits</b> The same habits as your dashboard Daily W's — fully synced. Check here, it counts on the dashboard too.</div></div>
+      <div class="tut-row"><div class="tut-icon">📚</div><div class="tut-row-text"><b>Learn Tab</b> Nutrition education cards — macros explained, portion sizes, hydration, reading labels, and more. Practical information for everyday eating.</div></div>
     </div>
 
-    <!-- STEP 8: GOALS -->
+    <!-- STEP 7: GOALS -->
     <div class="tut-step" data-step="7">
       <h3>🎯 GOALS & VISION</h3>
-      <p>Write down your goals so they're real. Long-term and short-term, across every area of your life.</p>
-      <div class="tut-row"><div class="tut-icon">➕</div><div class="tut-row-text"><b>Add a goal</b>Click "+ Add Goal" and write your goal, pick Long-Term (1+ years) or Short-Term (weeks/months), and choose a life category like Faith, Fitness, Money, or DJ/Music.</div></div>
-      <div class="tut-row"><div class="tut-icon">✅</div><div class="tut-row-text"><b>Mark achieved</b>Click the circle on any goal to mark it done. It moves to the Achieved tab and records the date you completed it. Can be unchecked if needed.</div></div>
-      <div class="tut-row"><div class="tut-icon">💼</div><div class="tut-row-text"><b>Career Explorer</b>Tap career cards to mark ones you're interested in. Add custom career ideas. This is your vision board for your professional future.</div></div>
+      <p>Write down your goals so they're real. Long-term and short-term, across every area of life — from faith to finances to career.</p>
+      <div class="tut-row"><div class="tut-icon">📝</div><div class="tut-row-text"><b>Vision Statement</b> Write your big-picture life vision at the top. 1-year, 3-year, 5-year, and 10-year goal slots give you a full timeline.</div></div>
+      <div class="tut-row"><div class="tut-icon">➕</div><div class="tut-row-text"><b>Add a goal</b> Click "+ Add Goal" and pick Long-Term or Short-Term and a life category (Faith, Fitness, Money, School, Career, etc.).</div></div>
+      <div class="tut-row"><div class="tut-icon">✅</div><div class="tut-row-text"><b>Mark achieved</b> Click the circle on any goal to mark it done. It moves to the Achieved tab with the completion date. Can be unchecked if needed.</div></div>
+      <div class="tut-row"><div class="tut-icon">💼</div><div class="tut-row-text"><b>Career Explorer</b> Tap careers to mark your interests. Includes 35 career profiles with salary ranges, day-in-the-life, how to start, and a faith angle.</div></div>
     </div>
 
-    <!-- STEP 9: LIFE SKILLS -->
+    <!-- STEP 8: LIFE SKILLS -->
     <div class="tut-step" data-step="8">
       <h3>🧠 LIFE SKILLS ACADEMY</h3>
-      <p>100+ practical lessons across 16 categories — the stuff school never taught you but you absolutely need to know.</p>
-      <div class="tut-row"><div class="tut-icon">📖</div><div class="tut-row-text"><b>How to use it</b>Tap any category card (Taxes, Car, Health, Credit, Faith, etc.) to open the full lesson guide. Each category has 6–9 detailed lessons with real tips.</div></div>
-      <div class="tut-row"><div class="tut-icon">💡</div><div class="tut-row-text"><b>Pro tips</b>Gold tip boxes inside each lesson give you the single most important action to take. Read one category a week — 16 weeks = seriously ahead of your peers.</div></div>
-      <div class="tut-row"><div class="tut-icon">🎓</div><div class="tut-row-text"><b>Categories include</b>Taxes & Filing, Car & Driving, Credit & Banking, Home & Renting, Career & Work, Faith & Purpose, Mental Health, Emergency Skills, Digital Life, and more.</div></div>
-      <div class="tut-row"><div class="tut-icon">🏆</div><div class="tut-row-text"><b>Quizzes & Certificates</b>Each category has a 5-question quiz. Score 80%+ to earn a certificate you can share. Track your progress on the stats bar at the top.</div></div>
+      <p>140+ practical lessons across 16 categories — the stuff school never taught you but you absolutely need to know to thrive as an adult.</p>
+      <div class="tut-row"><div class="tut-icon">📖</div><div class="tut-row-text"><b>How to use it</b> Tap any subject card to open the full lesson guide. Categories include Taxes, Car & Driving, Credit, Home & Renting, Career, Faith, Mental Health, Emergency Skills, Digital Life, and more.</div></div>
+      <div class="tut-row"><div class="tut-icon">🏆</div><div class="tut-row-text"><b>Quizzes & Certificates</b> Each category has a 5-question quiz. Score 80%+ to earn a shareable certificate. Your completion stats appear on a progress bar at the top.</div></div>
+      <div class="tut-row"><div class="tut-icon">💡</div><div class="tut-row-text"><b>Pro Tips</b> Gold tip boxes inside each lesson give you the single most important action to take. One category a week = 16 weeks to seriously ahead of your peers.</div></div>
+      <div class="tut-row"><div class="tut-icon">🗂️</div><div class="tut-row-text"><b>Categories include</b> Cooking Basics, Home Maintenance, Car Care, Personal Finance, Time Management, Communication, Digital Literacy, Faith & Purpose, First Aid, and more.</div></div>
     </div>
 
-    <!-- STEP 10: GROWING UP -->
+    <!-- STEP 9: GROWING UP -->
     <div class="tut-step" data-step="9">
       <h3>🌱 GROWING UP</h3>
-      <p>12 real-talk guides on your body, your mind, relationships, and finding who you are — the stuff that matters most.</p>
-      <div class="tut-row"><div class="tut-icon">💪</div><div class="tut-row-text"><b>Body & brain</b>Age-appropriate guides on puberty, emotions, and what's happening in your brain during these years. Filtered by gender for relevance. No awkwardness — just facts.</div></div>
-      <div class="tut-row"><div class="tut-icon">🧠</div><div class="tut-row-text"><b>Mental health</b>Depression, anxiety, self-worth, social pressure, and suicidal thoughts — written so you actually understand what's going on and what to do about it.</div></div>
-      <div class="tut-row"><div class="tut-icon">🚫</div><div class="tut-row-text"><b>Real-world topics</b>Alcohol & drugs, consent & relationship boundaries, screen/gaming addiction, and identity & purpose. Honest, practical, no judgment.</div></div>
-      <div class="tut-row"><div class="tut-icon">🆘</div><div class="tut-row-text"><b>Crisis resources</b>24/7 helplines are visible throughout. 988 Suicide & Crisis Lifeline, Crisis Text Line (text HOME to 741741), SAMHSA (1-800-662-4357). You are never alone.</div></div>
+      <p>Real-talk guides on the topics no one always explains clearly — your body, your mind, relationships, and finding who you are.</p>
+      <div class="tut-row"><div class="tut-icon">💪</div><div class="tut-row-text"><b>Body & Brain</b> Age-appropriate guides on puberty, emotions, and brain development. Filtered by gender for relevance. Honest, factual, no awkwardness.</div></div>
+      <div class="tut-row"><div class="tut-icon">🧠</div><div class="tut-row-text"><b>Mental Health</b> Depression, anxiety, self-worth, social pressure — written so you actually understand what's happening and what to do. Never preachy, always practical.</div></div>
+      <div class="tut-row"><div class="tut-icon">🚫</div><div class="tut-row-text"><b>Real-World Topics</b> Alcohol & drugs, consent & relationships, screen/gaming addiction, identity & purpose. Honest, practical, no judgment.</div></div>
+      <div class="tut-row"><div class="tut-icon">🆘</div><div class="tut-row-text"><b>Crisis Resources</b> 988 Suicide & Crisis Lifeline, Crisis Text Line (text HOME to 741741), SAMHSA (1-800-662-4357). These are always visible throughout this section. You are never alone.</div></div>
     </div>
 
-    <!-- STEP 11: CRAFT / GALLERY / JOURNAL -->
+    <!-- STEP 10: JOURNAL -->
     <div class="tut-step" data-step="10">
-      <h3>🎵 MUSIC & PRACTICE</h3>
-      <p>Your personal music hub for learning, practicing, and tracking progress on any instrument.</p>
-      <div class="tut-row"><div class="tut-icon">🎯</div><div class="tut-row-text"><b>Practice Hub</b> — Add your instruments, set weekly minute goals, and use the practice timer. Sessions log automatically.</div></div>
-      <div class="tut-row"><div class="tut-icon">🎸</div><div class="tut-row-text"><b>Instrument Guides</b> — 14 detailed profiles covering range, difficulty, start age, and practice tips.</div></div>
-      <div class="tut-row"><div class="tut-icon">🎼</div><div class="tut-row-text"><b>Music Theory</b> — Notes, rhythm, scales, and chords explained simply. The 4-chord trick for playing hundreds of songs.</div></div>
-      <div class="tut-row"><div class="tut-icon">🎧</div><div class="tut-row-text"><b>My Tracks</b> — Upload audio, play with the vinyl player, and discover free learning resources.</div></div>
+      <h3>✍️ JOURNAL</h3>
+      <p>Your private journal. Write entries, reflect on daily prompts, and build a habit of self-awareness over time.</p>
+      <div class="tut-row"><div class="tut-icon">📝</div><div class="tut-row-text"><b>Write an entry</b> Pick a category (Reflection, Gratitude, Prayer, Idea, Win, Lesson Learned), write your title and entry, and save. All entries are private and stored locally.</div></div>
+      <div class="tut-row"><div class="tut-icon">💬</div><div class="tut-row-text"><b>Daily Prompts</b> A new prompt appears on your dashboard every day. Tap it to open the journal with the prompt pre-filled. 31 prompts rotate monthly.</div></div>
+      <div class="tut-row"><div class="tut-icon">📚</div><div class="tut-row-text"><b>Entry history</b> All saved entries appear below the editor. Tap any entry to expand and re-read. Entries are sorted by most recent.</div></div>
+      <div class="tut-row"><div class="tut-icon">🏅</div><div class="tut-row-text"><b>Earn badges</b> Write 5 journal entries to earn the "Deep Thinker" badge. Keep journaling to unlock more achievements.</div></div>
     </div>
 
+    <!-- STEP 11: SCRIPTURE -->
     <div class="tut-step" data-step="11">
-      <h3>🚗 DRIVING & 🏆 SPORTS</h3>
-      <p>Two sections preparing you for the road and the field.</p>
-      <div class="tut-row"><div class="tut-icon">🚗</div><div class="tut-row-text"><b>Driving</b> — License prep (permit test, practice hours, road test), safety (distracted/drunk driving, defensive techniques), car maintenance (oil, tires, fluids), insurance and costs, and accident procedures. Interactive checklist tracks your progress.</div></div>
-      <div class="tut-row"><div class="tut-icon">🏆</div><div class="tut-row-text"><b>Sports</b> — 14 sport profiles with preparation tips, health/safety info, participation stats, and scholarship details. Filter by boys/girls and level (middle school, high school, college).</div></div>
+      <h3>✝️ BIBLE & FAITH</h3>
+      <p>Daily scripture reading, devotionals, and faith-based guides — all organized to help you grow spiritually every day.</p>
+      <div class="tut-row"><div class="tut-icon">📖</div><div class="tut-row-text"><b>365 Daily Scriptures</b> One verse per day, organized by monthly theme. Earn 5 points each day you read. A full-year calendar tracks your reading streaks.</div></div>
+      <div class="tut-row"><div class="tut-icon">🕊️</div><div class="tut-row-text"><b>Devotionals</b> Multi-part devotional series covering topics like identity, purpose, anxiety, faith in hard times, and more. Read at your own pace.</div></div>
+      <div class="tut-row"><div class="tut-icon">✝️</div><div class="tut-row-text"><b>Jesus & Purpose</b> A guide to faith foundations — who Jesus is, what salvation means, how to pray, and how faith connects to your everyday life.</div></div>
+      <div class="tut-row"><div class="tut-icon">⚙️</div><div class="tut-row-text"><b>Toggle it on/off</b> If faith content isn't relevant for a profile, you can hide this entire section from Settings. Scripture banner on the dashboard also toggles independently.</div></div>
     </div>
 
+    <!-- STEP 12: DRIVING -->
     <div class="tut-step" data-step="12">
-      <h3>✝️ SCRIPTURE & 🏅 BADGES</h3>
-      <p>Daily spiritual growth and achievement tracking.</p>
-      <div class="tut-row"><div class="tut-icon">✝️</div><div class="tut-row-text"><b>365 Daily Scriptures</b> — One verse per day, organized by monthly themes. Earn 5 points for each day you read. Build streaks. Calendar view tracks your entire year. Can be toggled on/off in Settings.</div></div>
-      <div class="tut-row"><div class="tut-icon">🏅</div><div class="tut-row-text"><b>Badges</b> — 20 achievements to earn: streak milestones, certificates, books, goals, journal entries, and more. Full badge gallery shows earned vs locked with descriptions of how to unlock each one.</div></div>
+      <h3>🚗 DRIVING</h3>
+      <p>Everything you need to get your license, stay safe on the road, and take care of your car — without the boring DMV booklet.</p>
+      <div class="tut-row"><div class="tut-icon">🪪</div><div class="tut-row-text"><b>License Prep</b> Permit test prep, practice hours tracker, and road test checklist. Track exactly where you are in the licensing process.</div></div>
+      <div class="tut-row"><div class="tut-icon">🛡️</div><div class="tut-row-text"><b>Safety</b> Distracted driving stats, drunk driving consequences, defensive techniques, and what to do in emergencies. This section could literally save your life.</div></div>
+      <div class="tut-row"><div class="tut-icon">🔧</div><div class="tut-row-text"><b>Car Maintenance</b> Oil changes, tire pressure, fluid checks, battery — when to do what, and how to do it yourself. Save hundreds of dollars annually.</div></div>
+      <div class="tut-row"><div class="tut-icon">💰</div><div class="tut-row-text"><b>Costs & Insurance</b> The real cost of owning a car. How insurance works, what affects your rate, and how to compare coverage. Plus accident procedures step by step.</div></div>
     </div>
 
+    <!-- STEP 13: SPORTS -->
     <div class="tut-step" data-step="13">
-      <h3>📄 JOBS, RESUME & BIO</h3>
-      <p>Career tools for building your professional future.</p>
-      <div class="tut-row"><div class="tut-icon">💼</div><div class="tut-row-text"><b>Career Explorer</b> — 35 fully detailed profiles with salary ranges, day-in-the-life descriptions, how to start, skills required, timelines, resources, and a faith angle.</div></div>
-      <div class="tut-row"><div class="tut-icon">📄</div><div class="tut-row-text"><b>Resume Builder</b> — Create a professional resume with experience, skills, and education sections. Job tracker and interview prep with STAR method.</div></div>
-      <div class="tut-row"><div class="tut-icon">🪪</div><div class="tut-row-text"><b>Bio Page</b> — Build a shareable personal page with your stats, portfolio, and a QR code.</div></div>
+      <h3>🏆 SPORTS</h3>
+      <p>14 sport profiles with everything you need to know about playing, training, and advancing at any level.</p>
+      <div class="tut-row"><div class="tut-icon">🔍</div><div class="tut-row-text"><b>Browse sports</b> Filter by Boys, Girls, or Both and by level (Middle School, High School, College). Each card shows the sport's key details at a glance.</div></div>
+      <div class="tut-row"><div class="tut-icon">📋</div><div class="tut-row-text"><b>Each profile includes</b> Prep tips, what coaches look for, training schedule, participation stats, health & safety info, and scholarship opportunities.</div></div>
+      <div class="tut-row"><div class="tut-icon">🏅</div><div class="tut-row-text"><b>Scholarship info</b> Every profile shows college scholarship availability, odds, and what programs typically look for in recruits.</div></div>
     </div>
 
+    <!-- STEP 14: BADGES -->
     <div class="tut-step" data-step="14">
-      <h3>✅ CHORES, REWARDS & GAMES</h3>
-      <p>The complete reward ecosystem — chores, earnings, screen time, Parent Bucks, and games.</p>
-      <div class="tut-row"><div class="tut-icon">✅</div><div class="tut-row-text"><b>Chores</b> — Parents add chores with point values. Complete them, get verified, earn points and level up.</div></div>
-      <div class="tut-row"><div class="tut-icon">📱</div><div class="tut-row-text"><b>Screen Time</b> — Earn minutes for Video Games, TV, Phone, and Tablet. Use the countdown timer when playing. Parents control the time.</div></div>
-      <div class="tut-row"><div class="tut-icon">💰</div><div class="tut-row-text"><b>Earnings & Savings Jar</b> — Track cash earned from chores and behavior. Visual jar fills up as you save toward a goal.</div></div>
-      <div class="tut-row"><div class="tut-icon">🪙</div><div class="tut-row-text"><b>Parent Bucks</b> — Virtual currency earned from activities. Spend in the store for prizes parents set up. Exchange for real rewards!</div></div>
-      <div class="tut-row"><div class="tut-icon">🎰</div><div class="tut-row-text"><b>Spinner & Scratch Cards</b> — Earn game tickets from achievements. Spin the wheel for PB/screen time. Scratch 3 matching symbols to win!</div></div>
+      <h3>🏅 BADGES</h3>
+      <p>20 achievements to unlock as you use the app — streak milestones, certificates, goals completed, journal entries, and more.</p>
+      <div class="tut-row"><div class="tut-icon">🏆</div><div class="tut-row-text"><b>How to earn badges</b> Badges are awarded automatically when you hit milestones — 7-day streak, first certificate, first goal completed, 5 journal entries, and more.</div></div>
+      <div class="tut-row"><div class="tut-icon">🔒</div><div class="tut-row-text"><b>Locked vs earned</b> The badge gallery shows all 20 achievements. Locked badges show exactly what you need to do to unlock them. Earned badges show the date you got them.</div></div>
+      <div class="tut-row"><div class="tut-icon">📊</div><div class="tut-row-text"><b>Point system</b> Earning badges and completing activities earns Life OS points. Points contribute to your Life Score visible in the Parent Hub.</div></div>
     </div>
 
+    <!-- STEP 15: JOBS & BIO -->
     <div class="tut-step" data-step="15">
-      <h3>👨‍👩‍👧 PARENT HUB</h3>
-      <p>PIN-protected parent dashboard with complete visibility and control.</p>
-      <div class="tut-row"><div class="tut-icon">🏆</div><div class="tut-row-text"><b>Life Score</b> — Weighted grade (A+ through F, or N/A for new users) across academics, responsibility, growth, wellbeing, character, and engagement.</div></div>
-      <div class="tut-row"><div class="tut-icon">👧👦</div><div class="tut-row-text"><b>Multi-Child</b> — Add multiple children from the profile switcher. Each gets a unique ID. Parent Hub shows all children's stats at a glance.</div></div>
-      <div class="tut-row"><div class="tut-icon">📱</div><div class="tut-row-text"><b>Screen Time Controls</b> — Add earned minutes per category. Reset anytime.</div></div>
-      <div class="tut-row"><div class="tut-icon">🪙</div><div class="tut-row-text"><b>Parent Bucks</b> — Add PB, grant spin/scratch tickets, build the store with redeemable prizes.</div></div>
-      <div class="tut-row"><div class="tut-icon">💰</div><div class="tut-row-text"><b>Earnings</b> — Add cash rewards, set savings goals. Weekly report card and behavior log included.</div></div>
+      <h3>💼 JOBS, RESUME & BIO</h3>
+      <p>Build your professional future — explore careers, create a real resume, track applications, and build a shareable Bio Page.</p>
+      <div class="tut-row"><div class="tut-icon">💼</div><div class="tut-row-text"><b>Career Explorer</b> 35 fully detailed career profiles — salary ranges, day-in-the-life, how to start, required skills, timelines, and a faith angle. Mark careers you're interested in.</div></div>
+      <div class="tut-row"><div class="tut-icon">📄</div><div class="tut-row-text"><b>Resume Builder</b> Create a professional resume with experience, education, and skills sections. Print or export as PDF when you're ready to apply.</div></div>
+      <div class="tut-row"><div class="tut-icon">📋</div><div class="tut-row-text"><b>Job Tracker & Interview Prep</b> Log every job application with status. Interview prep includes the STAR method, common questions, and how to answer them.</div></div>
+      <div class="tut-row"><div class="tut-icon">🪪</div><div class="tut-row-text"><b>Bio Page</b> Build a shareable personal profile page with your stats, portfolio links, and a QR code. Export as PDF to hand out at auditions, interviews, or events.</div></div>
     </div>
 
+    <!-- STEP 16: CHORES & REWARDS -->
     <div class="tut-step" data-step="16">
-      <h3>⚡ POWER TIPS</h3>
-      <p>Get the most out of YourLife CC.</p>
-      <div class="tut-row"><div class="tut-icon">📱</div><div class="tut-row-text"><b>Works on any device</b> — Phone, tablet, laptop, desktop. Just open in a browser. No app download needed.</div></div>
-      <div class="tut-row"><div class="tut-icon">🎨</div><div class="tut-row-text"><b>Customize</b> — Change accent colors and dark/light mode in Settings. Choose from 10 dashboard background presets.</div></div>
-      <div class="tut-row"><div class="tut-icon">🎯</div><div class="tut-row-text"><b>Monthly Challenges</b> — A new challenge every month with 3 tasks. Complete them for streaks and growth.</div></div>
-      <div class="tut-row"><div class="tut-icon">💭</div><div class="tut-row-text"><b>Daily Prompts</b> — 31 journal prompts rotate daily on your dashboard. Tap to open the journal.</div></div>
-      <div class="tut-row"><div class="tut-icon">📊</div><div class="tut-row-text"><b>Status Colors</b> — Dashboard cards show green (doing great), yellow (neutral), or red (needs attention) at a glance.</div></div>
-      <div class="tut-row"><div class="tut-icon">💾</div><div class="tut-row-text"><b>Backup</b> — Export your data in Settings. Import on any device to restore everything.</div></div>
+      <h3>✅ CHORES & REWARDS</h3>
+      <p>The complete reward ecosystem — chores, screen time, Parent Bucks, a prize store, and bonus games.</p>
+      <div class="tut-row"><div class="tut-icon">✅</div><div class="tut-row-text"><b>Chores</b> Parents assign chores with point values in Parent Hub. Complete them and hit "Done" to request verification. Completing chores earns Parent Bucks and screen time.</div></div>
+      <div class="tut-row"><div class="tut-icon">📱</div><div class="tut-row-text"><b>Screen Time</b> Earn minutes for Video Games, TV, Phone, and Tablet. Hit "Use Time" and start the countdown timer. Time runs out — it stops automatically.</div></div>
+      <div class="tut-row"><div class="tut-icon">🪙</div><div class="tut-row-text"><b>Parent Bucks</b> Virtual currency earned from chores and behavior. Spend in the Prize Store for rewards your parent sets up — real prizes, extra privileges, and more.</div></div>
+      <div class="tut-row"><div class="tut-icon">💰</div><div class="tut-row-text"><b>Earnings & Savings Jar</b> Track cash you earn from chores. Visual savings jar fills toward your goal. Set a goal, save up, reach it!</div></div>
+      <div class="tut-row"><div class="tut-icon">🎰</div><div class="tut-row-text"><b>Spinner & Scratch Cards</b> Earn game tickets from achievements. Spin the wheel for bonus PB or screen time. Scratch 3 matching symbols to win — pure luck!</div></div>
     </div>
 
-    </div><!-- /tut-body -->
+    <!-- STEP 17: PARENT HUB -->
+    <div class="tut-step" data-step="17">
+      <h3>👨‍👩‍👧 PARENT HUB</h3>
+      <p>PIN-protected parent dashboard with full visibility and control over every child's progress and rewards.</p>
+      <div class="tut-row"><div class="tut-icon">👥</div><div class="tut-row-text"><b>Manage Users</b> Add children with a 4-digit PIN. They use Child Login to access their dashboard. Parents get a 6-digit PIN. Toggle PIN requirement on/off for easy access.</div></div>
+      <div class="tut-row"><div class="tut-icon">📊</div><div class="tut-row-text"><b>Life Score & Report Card</b> Weighted grade (A+ to F) across Academics, Responsibility, Growth, Wellbeing, Character, and Engagement. Weekly report card shows trends over time.</div></div>
+      <div class="tut-row"><div class="tut-icon">✅</div><div class="tut-row-text"><b>Chores & Deeds</b> Add chores with point values, verify completions, and log good/bad behavior. Behavior log feeds directly into the Life Score.</div></div>
+      <div class="tut-row"><div class="tut-icon">📱</div><div class="tut-row-text"><b>Screen Time Controls</b> Add earned minutes per category (Video Games, TV, Phone, Tablet). Reset all timers. View current time balances at a glance.</div></div>
+      <div class="tut-row"><div class="tut-icon">🪙</div><div class="tut-row-text"><b>Parent Bucks & Store</b> Award PB, grant Spin/Scratch tickets, and build a Prize Store with custom rewards your child can spend their PB on.</div></div>
+    </div>
+
+    <!-- STEP 18: POWER TIPS -->
+    <div class="tut-step" data-step="18">
+      <h3>⚡ POWER TIPS</h3>
+      <p>Get the absolute most out of Life OS — the tricks that make the biggest difference.</p>
+      <div class="tut-row"><div class="tut-icon">📱</div><div class="tut-row-text"><b>Works on any device</b> Phone, tablet, laptop, desktop — open in any browser, no app download needed. Add to home screen for a native app feel.</div></div>
+      <div class="tut-row"><div class="tut-icon">❓</div><div class="tut-row-text"><b>Hover ? buttons</b> Every section has a <span style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;background:rgba(56,189,248,.25);border-radius:50%;color:#38bdf8;font-size:.55rem;font-weight:900;">?</span> button. Hover or tap any one for an instant tip. No need to come back to the tutorial — help is always one tap away.</div></div>
+      <div class="tut-row"><div class="tut-icon">🎨</div><div class="tut-row-text"><b>Themes & Colors</b> Settings → Appearance: 10 dashboard backgrounds, 10 accent colors, dark/light mode toggle. Make it look exactly how you want.</div></div>
+      <div class="tut-row"><div class="tut-icon">💾</div><div class="tut-row-text"><b>Backup everything</b> Settings → Export Data saves a JSON file of all your data. Import it on any device to restore everything exactly as it was.</div></div>
+      <div class="tut-row"><div class="tut-icon">☁️</div><div class="tut-row-text"><b>Cloud sync</b> Settings → Cloud Sync lets you use Life OS on multiple devices with the same data. Enter your sync key on each device.</div></div>
+      <div class="tut-row"><div class="tut-icon">🌐</div><div class="tut-row-text"><b>Translate the whole app</b> The 🌐 Language button at the top translates every word instantly using Google Translate. Supports 100+ languages.</div></div>
+    </div>
+
+  </div><!-- /tut-body -->
 
   <div class="tut-foot">
     <button class="btn bgh" id="tutPrevBtn" onclick="tutNav(-1)">‹ Back</button>
@@ -11690,9 +11732,56 @@ function applyTheme(){
 }
 // ── TUTORIAL ─────────────────────────────────────────────────
 const TUT_STEPS = [
-  'Welcome','Dashboard','Money','School','Schedule','Calendar','Health','Goals','Life Skills','Growing Up','Music & Practice','Driving & Sports','Scripture & Badges','Jobs/Resume','Chores','Parent Hub','Power Tips'
+  'Welcome','Dashboard','Daily Habits','Money','School','Schedule','Health','Goals','Life Skills','Growing Up','Journal','Scripture','Driving','Sports','Badges','Jobs & Bio','Chores & Rewards','Parent Hub','Power Tips'
 ];
 let _tutStep = 0;
+
+// ══ HELP TOOLTIP SYSTEM ════════════════════════════════════
+const HTIPS = {
+  dashboard:  ["🏠 Dashboard","Your daily home base. Streak counter, quick stats (bank, GPA, goals), Daily Wins habit tracker, scripture banner, and motivational quote. Everything updates live."],
+  habits:     ["⚡ Daily Wins","Tap each habit to check it off. Complete 4+ per day to keep your streak alive. Hit '+ Habit' to add your own. Streak resets at midnight if you miss a day."],
+  money:      ["💰 Money Manager","6 tabs: Overview (balances) · Bills (recurring bills, mark paid) · Transactions (log income/expenses) · Goal Savings (quick-add) · Sav. Goals (create goals) · Budget (50/30/20)."],
+  school:     ["📚 School","Add classes with grade %, and GPA calculates instantly. Track assignments by due date and priority. Use the Study Timer (Pomodoro) to log focused sessions automatically."],
+  schedule:   ["📅 Schedule","28-day visual grid, 6 AM to 11 PM. Click any cell to assign an activity. Color-codes automatically. Add custom activities in Settings > Schedule Activities."],
+  health:     ["❤️ Health & Fitness","Log weight, nutrition (calories/macros), and mood. Progress charts update with each entry. Daily habits here sync with your dashboard streak."],
+  goals:      ["🎯 Goals & Vision","Write your life vision, then add long-term and short-term goals by category. Click the circle to mark achieved. Career Explorer lets you save careers of interest."],
+  skills:     ["🧠 Life Skills Academy","140+ lessons across 16 categories. Tap a card to open the full guide. Pass the 5-question quiz (80%+) to earn a shareable certificate for that category."],
+  growing:    ["🌱 Growing Up","Real-talk guides on puberty, mental health, relationships, substance use, and identity — filtered by gender. Crisis helplines (988, 741741) are always visible."],
+  journal:    ["✍️ Journal","Pick a category, write your entry, and save. All entries are private and saved locally. Tap any saved entry to re-read it. Daily prompts appear on your dashboard."],
+  scripture:  ["✝️ Bible & Faith","365 daily verses by monthly theme. Earn 5 pts per day you read. Calendar shows your full year. Devotionals, Jesus & Purpose, and faith guides are in the tabs."],
+  driving:    ["🚗 Driving","License prep (permit test + practice hours) · Safety · Car maintenance · Costs & insurance · Accident procedures. Interactive checklists track your progress."],
+  sports:     ["🏆 Sports","14 sport profiles: prep tips, scholarship info, health & safety, participation stats. Filter by Boys / Girls / Both and by school level."],
+  chores:     ["✅ Chores","Parents assign chores with point values in Parent Hub. Complete them and hit Done to request verification. Earn Parent Bucks, screen time, and cash rewards."],
+  screentime: ["📱 Screen Time","Earn minutes by completing chores. Hit Use Time and start the countdown timer when playing. Parents add time and reset balances from Parent Hub."],
+  parentbucks:["🪙 Parent Bucks","Virtual currency parents award for good behavior and chores. Spend in the Prize Store. Earn bonus PB from Spin the Wheel and Scratch Cards."],
+  parenthub:  ["👨‍👩‍👧 Parent Hub","PIN-protected parent dashboard. View Life Scores, manage users, assign chores, control screen time, add Parent Bucks, log behavior, and review weekly report cards."],
+  manageusers:["👥 Manage Users","Add children here — give each a name and 4-digit PIN. Kids tap Child Login at the top to access their dashboard. Toggle parent PIN requirement on/off."],
+  lifescore:  ["📊 Life Score","Weighted grade (A+ to F) across 6 categories: Academics, Responsibility, Growth, Wellbeing, Character, Engagement. Updates live. Visible in Parent Hub Overview."],
+  childlogin: ["👤 Child Login","Children tap their name, then enter their 4-digit PIN to load their personal dashboard. PINs are set and reset in Parent Hub > Manage Users."],
+  badges:     ["🏅 Badges","20 achievements to unlock — streak milestones, certificates earned, books read, goals completed, journal entries, and more. Badge gallery shows earned vs locked."],
+  settings:   ["⚙️ Settings","Change your name and life stage, toggle sections on/off, manage themes and colors, set parent PIN, backup/restore data, and sync to cloud."],
+  language:   ["🌐 Language","Powered by Google Translate. Click to select any language — the entire app translates instantly. Select English to switch back."],
+};
+
+function hlp(key, el, evt){
+  if(evt) evt.stopPropagation();
+  const tip = HTIPS[key]; if(!tip) return;
+  const box = document.getElementById('hlpBox');
+  const t = document.getElementById('hlpT');
+  const b = document.getElementById('hlpB');
+  if(!box||!t||!b) return;
+  t.textContent = tip[0]; b.textContent = tip[1];
+  const r = el.getBoundingClientRect();
+  let top = r.bottom + 6;
+  let left = r.left;
+  if(top + 140 > window.innerHeight) top = r.top - 148;
+  if(left + 278 > window.innerWidth) left = window.innerWidth - 282;
+  if(left < 4) left = 4;
+  box.style.top = top + 'px'; box.style.left = left + 'px';
+  box.classList.add('show');
+}
+function hlpHide(){ document.getElementById('hlpBox')?.classList.remove('show'); }
+document.addEventListener('click', hlpHide);
 
 function openTutorial(){
   _tutStep = 0;
@@ -12234,6 +12323,66 @@ ${(b.showQR&&b.qrUrl&&qrSvgInline)?`<div class="section">
 <!-- ═══ REWARD SPINNER OVERLAY ═══ -->
 
 <!-- ═══ SCRATCH CARD OVERLAY ═══ -->
+
+<div id="hlpBox"><div class="hb-t" id="hlpT"></div><div id="hlpB"></div></div>
+
+
+<!-- ═══ ONBOARDING WELCOME MODAL ═══ -->
+<div id="onboardModal" style="display:none;position:fixed;inset:0;z-index:99997;background:rgba(0,0,0,.88);backdrop-filter:blur(14px);align-items:center;justify-content:center;padding:1rem;">
+  <div style="background:linear-gradient(145deg,#0c1525,#1a1a2e);border:1px solid rgba(56,189,248,.2);border-radius:18px;max-width:500px;width:100%;max-height:88vh;overflow-y:auto;padding:1.8rem 1.8rem 1.4rem;">
+    <div style="text-align:center;margin-bottom:1.3rem;">
+      <div style="font-size:2.6rem;margin-bottom:.4rem;">🎓</div>
+      <div style="font-family:var(--fh);font-size:1.35rem;letter-spacing:2px;color:var(--c);">WELCOME TO LIFE OS</div>
+      <div style="font-size:.8rem;color:var(--tx2);margin-top:.35rem;line-height:1.55;">Your child's complete command center. Here's everything you need to know before your first use.</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.55rem;margin-bottom:1.2rem;">
+      <div style="background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.15);border-radius:11px;padding:.75rem .85rem;">
+        <div style="font-size:1rem;margin-bottom:.25rem;">👤 Child Login</div>
+        <div style="font-size:.69rem;color:var(--tx2);line-height:1.5;">First go to <b>Manage Users</b> and add each child with a 4-digit PIN. Kids tap <b>Child Login</b> at the top to access their dashboard.</div>
+      </div>
+      <div style="background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.15);border-radius:11px;padding:.75rem .85rem;">
+        <div style="font-size:1rem;margin-bottom:.25rem;">👨‍👩‍👧 Parent Hub</div>
+        <div style="font-size:.69rem;color:var(--tx2);line-height:1.5;">Your control center — Life Scores, chores, screen time, behavior logs, earnings, and full progress tracking for every child.</div>
+      </div>
+      <div style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15);border-radius:11px;padding:.75rem .85rem;">
+        <div style="font-size:1rem;margin-bottom:.25rem;">📊 Life Score</div>
+        <div style="font-size:.69rem;color:var(--tx2);line-height:1.5;">A weighted A+ to F grade across 6 life categories — academics, responsibility, growth, wellbeing, character & engagement. Updates live.</div>
+      </div>
+      <div style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.15);border-radius:11px;padding:.75rem .85rem;">
+        <div style="font-size:1rem;margin-bottom:.25rem;">✅ Chores & Rewards</div>
+        <div style="font-size:.69rem;color:var(--tx2);line-height:1.5;">Assign chores with point values. Kids earn Parent Bucks, screen time, and cash. Build a custom Prize Store for your family.</div>
+      </div>
+      <div style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);border-radius:11px;padding:.75rem .85rem;">
+        <div style="font-size:1rem;margin-bottom:.25rem;">🧠 140+ Lessons</div>
+        <div style="font-size:.69rem;color:var(--tx2);line-height:1.5;">Cooking, car care, budgeting, mental health, communication, faith, and more. Kids earn certificates by completing each category.</div>
+      </div>
+      <div style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.15);border-radius:11px;padding:.75rem .85rem;">
+        <div style="font-size:1rem;margin-bottom:.25rem;">❓ Help Everywhere</div>
+        <div style="font-size:.69rem;color:var(--tx2);line-height:1.5;">Every section has a <span style="display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;background:rgba(56,189,248,.3);border-radius:50%;color:#38bdf8;font-size:.52rem;font-weight:900;">?</span> button — hover or tap for an instant tip about that feature.</div>
+      </div>
+    </div>
+
+    <div style="background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.12);border-radius:10px;padding:.8rem 1rem;margin-bottom:1.2rem;">
+      <div style="font-size:.75rem;font-weight:700;color:#fde68a;margin-bottom:.4rem;">⚡ Quick Start</div>
+      <div style="font-size:.71rem;color:var(--tx2);line-height:2.1;">
+        <span style="color:#22c55e;font-weight:700;">①</span> Go to <b>Manage Users</b> → add each child with a 4-digit PIN<br>
+        <span style="color:#22c55e;font-weight:700;">②</span> Have each child tap <b>Child Login</b> and enter their PIN<br>
+        <span style="color:#22c55e;font-weight:700;">③</span> Child sets their name & level in <b>⚙️ Settings</b><br>
+        <span style="color:#22c55e;font-weight:700;">④</span> Add chores in <b>Parent Hub → Chores & Deeds</b><br>
+        <span style="color:#22c55e;font-weight:700;">⑤</span> Child begins completing habits, lessons, and goals
+      </div>
+    </div>
+
+    <div style="display:flex;gap:.6rem;">
+      <button onclick="document.getElementById('onboardModal').style.display='none';document.body.style.overflow='';setTimeout(openTutorial,150);" class="btn bp" style="flex:1;font-size:.8rem;">📖 Open Full Tutorial</button>
+      <button onclick="document.getElementById('onboardModal').style.display='none';document.body.style.overflow='';D.onboardDone=true;save();" class="btn bgh" style="flex:1;font-size:.8rem;">✓ Got It — Let's Go</button>
+    </div>
+    <div style="text-align:center;margin-top:.7rem;">
+      <span onclick="document.getElementById('onboardModal').style.display='none';document.body.style.overflow='';D.onboardDone=true;save();" style="font-size:.65rem;color:var(--tx3);cursor:pointer;text-decoration:underline;">Skip for now</span>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>`;
@@ -13212,6 +13361,7 @@ function unlockParentDash(){
   document.getElementById('parentPinInput').value='';
   updateIncConditions();
   renderParentDash();
+  if(!D.onboardDone){ setTimeout(()=>{ const m=document.getElementById('onboardModal'); if(m){m.style.display='flex';document.body.style.overflow='hidden';} },700); }
 }
 
 function lockParentDash(){
