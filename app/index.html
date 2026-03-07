@@ -84,7 +84,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 /* ── MOBILE QUICK ROW (below mBar) ─────────────── */
 #mobileQuickRow{
   display:none;
-  position:fixed;top:54px;left:0;right:0;z-index:909;
+  position:fixed;top:54px;left:0;right:0;z-index:99985;
   background:rgba(13,17,23,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   border-bottom:1px solid rgba(255,255,255,.07);
   padding:6px 10px;gap:6px;align-items:center;
@@ -103,11 +103,22 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 #mobileQuickRow .mqb-parent{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.2);color:#a78bfa;}
 #mobileQuickRow .mqb-lang{background:rgba(255,255,255,.05);}
 #mobileQuickRow .mob-translate-wrap{position:relative;flex-shrink:0;}
-#mobileQuickRow #mob_translate_element{
-  position:absolute;top:100%;left:0;margin-top:4px;z-index:9999;
-  background:#1e1e3a;border:1px solid rgba(255,255,255,.15);
-  border-radius:8px;padding:6px;display:none;min-width:180px;
-  box-shadow:0 8px 32px rgba(0,0,0,.5);
+/* mob_translate_element is now position:fixed — see #mob_translate_element below */
+
+/* Mobile translate dropdown — fixed position so it floats ABOVE everything */
+#mob_translate_element{
+  position:fixed;
+  top:100px;left:8px;
+  z-index:999999;
+  background:#1e1e3a;border:1px solid rgba(56,189,248,.3);
+  border-radius:10px;padding:8px;display:none;
+  min-width:200px;
+  box-shadow:0 16px 48px rgba(0,0,0,.85);
+}
+#mob_translate_element select{
+  width:100%;font-size:.85rem;padding:.4rem .5rem;
+  background:#0d1b2a;color:#fff;border:1px solid rgba(56,189,248,.2);
+  border-radius:6px;cursor:pointer;
 }
 
 .hamb{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:8px;
@@ -121,13 +132,13 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 #sideOverlay.open{display:block;}
 
 /* ─── MAIN CONTENT ────────────────────────────── */
-#mainWrap{margin-left:220px;min-height:100vh;position:relative;z-index:1;width:calc(100vw - 220px);}
+#mainWrap{margin-left:220px;min-height:100vh;position:relative;width:calc(100vw - 220px);}
 #app{padding:1.6rem 1.8rem 6rem;max-width:100%;}
 
 /* ─── SECTIONS (SPA — only active shows) ─────── */
 .sec{display:none;}
-.sec.active{display:block;animation:fadeUp .2s ease;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.sec.active{display:block;}
+/* fadeUp animation removed — was creating stacking contexts trapping fixed dropdowns */
 
 /* ─── RESPONSIVE ──────────────────────────────── */
 
@@ -1495,10 +1506,10 @@ body{top:0!important;}
   filter:drop-shadow(0 6px 12px rgba(56,189,248,.5));
 }
 @keyframes shBounce{
-  0%,100%{transform:translateY(0) rotate(-8deg);}
-  25%{transform:translateY(-18px) rotate(6deg);}
-  60%{transform:translateY(-8px) rotate(-4deg);}
-  80%{transform:translateY(-14px) rotate(3deg);}
+  0%,100%{transform:translateY(0) rotate(0deg);}
+  30%{transform:translateY(-12px) rotate(-5deg);}
+  60%{transform:translateY(-5px) rotate(3deg);}
+  80%{transform:translateY(-9px) rotate(-2deg);}
 }
 #startHereBtn:hover .sh-emoji{animation-play-state:paused;transform:scale(1.2) rotate(0);}
 @media(max-width:860px){
@@ -1537,6 +1548,18 @@ body{top:0!important;}
   padding:1rem;
   overflow:hidden;
   box-sizing:border-box;
+}
+@media(max-width:860px){
+  #parentOnboard, #kidOnboard {
+    align-items:flex-start;
+    padding-top:112px;
+    padding-bottom:1rem;
+    overflow-y:auto;
+  }
+  .ob-box {
+    margin-top:0;
+    max-height:calc(100vh - 124px);
+  }
 }
 #parentOnboard.open, #kidOnboard.open {
   display:flex;
@@ -1593,6 +1616,12 @@ body{top:0!important;}
   box-sizing:border-box;
   overflow-y:auto;
   max-height:calc(88vh - 80px);
+}
+@media(max-width:860px){
+  .ob-slide { padding-top:2rem; }
+  .ob-hero { padding-top:.5rem; }
+  .ob-hero-emoji { font-size:2.4rem; margin-bottom:.3rem; }
+  .ob-hero-title { font-size:1.15rem; }
 }
 .ob-slide::-webkit-scrollbar{width:4px;}
 .ob-slide::-webkit-scrollbar-thumb{background:rgba(56,189,248,.3);border-radius:2px;}
@@ -1866,7 +1895,8 @@ body{top:0!important;}
   <!-- Tutorial launcher -->
 
   <button class="btn bg_" style="width:100%;margin-bottom:.5rem;font-size:.75rem;white-space:normal;line-height:1.3;padding:.45rem .5rem;text-align:center;" onclick="closeSettings();D.parentWizardDone=false;setTimeout(showParentOnboard,100)">🚀 Quick Start Wizard</button>
-    <button class="btn bg_" style="width:100%;margin-bottom:.85rem;font-size:.75rem;white-space:normal;line-height:1.3;padding:.45rem .5rem;text-align:center;" onclick="closeSettings();openTutorial()">🎓 How to Use Life OS &mdash; Full Tutorial</button>
+    <button style="width:100%;margin-bottom:.5rem;font-size:.75rem;white-space:normal;line-height:1.3;padding:.5rem .5rem;text-align:center;background:linear-gradient(135deg,#f59e0b,#f97316);color:#000;font-weight:900;border:none;border-radius:9px;cursor:pointer;font-family:var(--fn);box-shadow:0 3px 12px rgba(245,158,11,.4);" onclick="closeSettings();setTimeout(openTutorial,320)">📖 Full Detailed Tutorial</button>
+    <button class="btn bg_" style="width:100%;margin-bottom:.85rem;font-size:.75rem;white-space:normal;line-height:1.3;padding:.45rem .5rem;text-align:center;display:none;" onclick="closeSettings();setTimeout(openTutorial,320)">🎓 How to Use Life OS &mdash; Full Tutorial</button>
   <div style="background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.15);border-radius:10px;padding:.9rem;margin-bottom:.85rem;">
     <label style="margin-top:0;">👤 Your Name</label>
     <input type="text" id="settingsName" placeholder="Enter your name">
@@ -2067,7 +2097,7 @@ body{top:0!important;}
       <svg width="13" height="13" viewBox="0 0 24 24" style="flex-shrink:0;"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Language
     </button>
-    <div id="mob_translate_element" style=""></div>
+
   </div>
   <button class="mqb mqb-child" onclick="openChildLogin()">👤 Child Login</button>
   <button class="mqb mqb-parent" onclick="quickParentHub()">👨‍👩‍👧 Parent</button>
@@ -2076,13 +2106,13 @@ body{top:0!important;}
 
 
 <!-- ═══ TOP-RIGHT QUICK BUTTONS ═══ -->
-<div id="topQuickBtns" style="position:fixed;top:12px;right:16px;z-index:95;display:flex;gap:.4rem;align-items:center;">
+<div id="topQuickBtns" style="position:fixed;top:12px;right:16px;z-index:99990;display:flex;gap:.4rem;align-items:center;">
   <div style="position:relative;display:flex;align-items:center;" id="translateWrap">
     <button onclick="toggleTranslateDropdown()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--tx2);padding:5px 10px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:var(--fn);display:flex;align-items:center;gap:.35rem;transition:all .15s;" onmouseenter="this.style.background='rgba(255,255,255,.12)'" onmouseleave="this.style.background='rgba(255,255,255,.06)'" title="Translate">
       <svg width="14" height="14" viewBox="0 0 24 24" style="flex-shrink:0;"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       <span style="font-size:.68rem;">Language</span>
     </button>
-    <div id="google_translate_element" style="position:absolute;top:100%;right:0;margin-top:4px;z-index:9999;background:#1e1e3a;border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:6px;display:none;min-width:180px;box-shadow:0 8px 32px rgba(0,0,0,.5);"></div>
+    <div id="google_translate_element" style="position:fixed;top:50px;right:16px;z-index:999999;background:#1e1e3a;border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:6px;display:none;min-width:200px;box-shadow:0 12px 48px rgba(0,0,0,.8);"></div>
   </div>
   <button onclick="openChildLogin()" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.15);color:#38bdf8;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:var(--fn);display:flex;align-items:center;gap:.3rem;transition:all .15s;" onmouseenter="this.style.background='rgba(56,189,248,.16)'" onmouseleave="this.style.background='rgba(56,189,248,.08)'">👤 Child Login <span class="hlp" onmouseenter="hlp('childlogin',this,event)" onmouseleave="hlpHide()">?</span></button>
   <button onclick="quickParentHub()" style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.2);color:#a78bfa;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:var(--fn);display:flex;align-items:center;gap:.3rem;transition:all .15s;" onmouseenter="this.style.background='rgba(139,92,246,.2)'" onmouseleave="this.style.background='rgba(139,92,246,.12)'">👨‍👩‍👧 Parent</button>
@@ -2091,6 +2121,9 @@ body{top:0!important;}
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
+
+<!-- MOBILE TRANSLATE DROPDOWN — fixed, outside all overflow containers -->
+<div id="mob_translate_element"></div>
 
 <div id="mainWrap"><div id="app">
 
@@ -6227,8 +6260,8 @@ body{top:0!important;}
 <!-- ═══ ONBOARDING WELCOME MODAL ═══ -->
 <!-- ═══ FLOATING START HERE BUTTON ═══ -->
 <div id="startHereBtn" onclick="showParentOnboard()" title="Start Here!">
-  <div class="sh-emoji">👆</div>
   <div class="sh-bubble">✨ Start Here!</div>
+  <div class="sh-emoji">👆</div>
 </div>
 
 <!-- ═══ PARENT ONBOARDING WIZARD ═══ -->
@@ -21890,61 +21923,102 @@ function resetAllData(){
 
 
 
+// ── CUSTOM LANGUAGE PICKER ──────────────────────────────
+const LANGS = [
+  {code:'en',  label:'🇺🇸 English'},
+  {code:'es',  label:'🇪🇸 Español'},
+  {code:'fr',  label:'🇫🇷 Français'},
+  {code:'de',  label:'🇩🇪 Deutsch'},
+  {code:'pt',  label:'🇧🇷 Português'},
+  {code:'it',  label:'🇮🇹 Italiano'},
+  {code:'pl',  label:'🇵🇱 Polski'},
+  {code:'ru',  label:'🇷🇺 Русский'},
+  {code:'ar',  label:'🇸🇦 العربية'},
+  {code:'hi',  label:'🇮🇳 हिन्दी'},
+  {code:'zh-CN',label:'🇨🇳 中文(简体)'},
+  {code:'zh-TW',label:'🇹🇼 中文(繁體)'},
+  {code:'ko',  label:'🇰🇷 한국어'},
+  {code:'ja',  label:'🇯🇵 日本語'},
+  {code:'vi',  label:'🇻🇳 Tiếng Việt'},
+  {code:'tl',  label:'🇵🇭 Filipino'},
+  {code:'sw',  label:'🇰🇪 Kiswahili'},
+  {code:'ha',  label:'🇳🇬 Hausa'},
+];
+
 function googleTranslateElementInit(){
-  // Must be visible for Google to render into it
-  var wrap = document.getElementById('google_translate_element');
-  if(wrap) wrap.style.display = 'block';
+  // Init hidden — we use our own picker UI
   new google.translate.TranslateElement({
     pageLanguage:'en',
     includedLanguages:'en,es,fr,de,pt,zh-CN,zh-TW,ar,hi,ko,ja,ru,it,pl,vi,tl,sw,ha',
     autoDisplay:false
   },'google_translate_element');
-  // Hide after rendering — user opens via Language button
-  setTimeout(function(){
-    if(wrap) wrap.style.display = 'none';
-  }, 800);
+}
+
+function doTranslate(langCode){
+  // Set the googtrans cookie and reload — most reliable method
+  if(langCode === 'en'){
+    // Remove translation
+    document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + location.hostname;
+  } else {
+    const val = '/en/' + langCode;
+    document.cookie = 'googtrans=' + val + '; path=/';
+    document.cookie = 'googtrans=' + val + '; path=/; domain=' + location.hostname;
+  }
+  // Trigger via the hidden select if available, else reload
+  const sel = document.querySelector('#google_translate_element select, .goog-te-combo');
+  if(sel){
+    sel.value = langCode;
+    sel.dispatchEvent(new Event('change'));
+  } else {
+    location.reload();
+  }
+  closeLangPicker();
+}
+
+function buildLangPicker(){
+  let el = document.getElementById('langPickerDropdown');
+  if(el) return;
+  el = document.createElement('div');
+  el.id = 'langPickerDropdown';
+  el.style.cssText = 'position:fixed;z-index:2147483647;isolation:isolate;background:#0d1b2a;border:1px solid rgba(56,189,248,.3);border-radius:12px;padding:6px;min-width:210px;box-shadow:0 16px 48px rgba(0,0,0,.85);display:none;max-height:320px;overflow-y:auto;';
+  el.innerHTML = LANGS.map(l =>
+    `<div onclick="doTranslate('${l.code}')" style="padding:8px 12px;border-radius:8px;cursor:pointer;font-size:.83rem;color:#e0e8f0;font-family:var(--fn);display:flex;align-items:center;gap:.5rem;transition:background .12s;" onmouseenter="this.style.background='rgba(56,189,248,.12)'" onmouseleave="this.style.background=''">${l.label}</div>`
+  ).join('');
+  document.body.appendChild(el);
+  document.addEventListener('click', function closeOnOutside(e){
+    if(!el.contains(e.target) && !e.target.closest('#translateWrap') && !e.target.closest('.mqb-lang')){
+      el.style.display = 'none';
+    }
+  });
+}
+
+function toggleLangPicker(anchorEl){
+  buildLangPicker();
+  const el = document.getElementById('langPickerDropdown');
+  if(el.style.display === 'block'){ el.style.display='none'; return; }
+  const r = anchorEl.getBoundingClientRect();
+  el.style.top = (r.bottom + 6) + 'px';
+  // Align right edge to anchor right edge, but keep on screen
+  const left = Math.max(8, Math.min(r.right - 210, window.innerWidth - 218));
+  el.style.left = left + 'px';
+  el.style.display = 'block';
+}
+
+function closeLangPicker(){
+  const el = document.getElementById('langPickerDropdown');
+  if(el) el.style.display = 'none';
 }
 
 function toggleMobTranslate(){
-  const d = document.getElementById('mob_translate_element');
-  if(!d) return;
-  if(d.style.display === 'none' || !d.style.display){
-    // Copy the Google Translate select into mobile slot if needed
-    const desktopEl = document.getElementById('google_translate_element');
-    const sel = desktopEl ? desktopEl.querySelector('select') : null;
-    if(sel && !d.querySelector('select')){
-      const clone = sel.cloneNode(true);
-      clone.onchange = () => { sel.value = clone.value; sel.dispatchEvent(new Event('change')); };
-      d.appendChild(clone);
-    }
-    d.style.display = 'block';
-    document.addEventListener('click', closeMobTranslate, {once:true, capture:true});
-  } else {
-    d.style.display = 'none';
-  }
-}
-function closeMobTranslate(e){
-  const d = document.getElementById('mob_translate_element');
-  const wrap = d?.closest('.mob-translate-wrap');
-  if(wrap && wrap.contains(e.target)) return;
-  if(d) d.style.display = 'none';
+  const btn = document.querySelector('#mobileQuickRow .mqb-lang');
+  toggleLangPicker(btn || document.body);
 }
 
 function toggleTranslateDropdown(){
-  var wrap = document.getElementById('google_translate_element');
-  if(!wrap) return;
-  var open = wrap.style.display === 'block';
-  wrap.style.display = open ? 'none' : 'block';
+  const btn = document.getElementById('translateWrap');
+  toggleLangPicker(btn || document.body);
 }
-
-document.addEventListener('click', function(e){
-  var tw = document.getElementById('translateWrap');
-  var wrap = document.getElementById('google_translate_element');
-  if(!wrap || !tw) return;
-  if(!tw.contains(e.target)){
-    wrap.style.display = 'none';
-  }
-});
 
 </script>
 <!-- GLOBAL LESSON MODAL -->
