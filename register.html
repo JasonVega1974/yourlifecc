@@ -197,8 +197,17 @@ select option{background:#0c1220;}
             <div id="cardElement" style="padding:.5rem 0;"></div>
             <div id="cardErrors" style="font-size:.75rem;color:var(--err);margin-top:.4rem;"></div>
           </div>
+          <!-- COUPON CODE -->
+          <div style="margin-bottom:1rem;">
+            <div style="display:flex;gap:.5rem;">
+              <input type="text" id="couponInput" placeholder="Coupon code (optional)" style="flex:1;text-transform:uppercase;letter-spacing:1px;">
+              <button onclick="applyCoupon()" style="background:var(--card);border:1px solid var(--border);border-radius:9px;padding:.65rem 1rem;color:var(--tx);font-family:inherit;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap;">Apply</button>
+            </div>
+            <div id="couponMsg" style="font-size:.75rem;margin-top:.3rem;display:none;"></div>
+          </div>
           <div id="orderSummary" style="background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.12);border-radius:10px;padding:.9rem;margin-bottom:1.1rem;font-size:.82rem;">
             <div style="display:flex;justify-content:space-between;margin-bottom:.3rem;"><span>Plan</span><span id="osPlan" style="font-weight:700;"></span></div>
+            <div id="discountRow" style="display:none;justify-content:space-between;margin-bottom:.3rem;color:var(--ok);"><span>Discount</span><span id="discountAmt"></span></div>
             <div style="display:flex;justify-content:space-between;"><span>Total today</span><span id="osPrice" style="color:var(--c1);font-weight:700;"></span></div>
           </div>
         </div>
@@ -283,6 +292,7 @@ let cardElement;
 let currentStep = 1;
 let selectedPlan = 'free';
 let sponsorData = null;
+let appliedCoupon = null; // {id, percent_off}
 let createdFamilyId = null;
 
 // Read plan from URL
@@ -310,6 +320,45 @@ function goStep(n){
 function toggleSponsor(){
   const s = document.getElementById('sponsorSection');
   s.style.display = s.style.display==='none'?'block':'none';
+}
+
+async function applyCoupon(){
+  const code = document.getElementById('couponInput').value.trim().toUpperCase();
+  const msg = document.getElementById('couponMsg');
+  if(!code){ msg.style.display='none'; appliedCoupon=null; updateOrderSummary(); return; }
+  msg.style.display='block'; msg.style.color='var(--tx2)'; msg.textContent='Applying...';
+  // Store the code — it will be validated server-side when payment processes
+  // For display, apply a visual discount if it matches known test codes
+  const KNOWN_COUPONS = { 'TEST': {id:'TEST', percent_off:99} };
+  if(KNOWN_COUPONS[code]){
+    appliedCoupon = KNOWN_COUPONS[code];
+    msg.style.color='var(--ok)'; msg.textContent=`✓ ${appliedCoupon.percent_off}% off applied!`;
+  } else {
+    // Accept any code optimistically — edge function validates it
+    appliedCoupon = {id: code, percent_off: null};
+    msg.style.color='var(--ok)'; msg.textContent=`✓ Coupon "${code}" will be applied at checkout.`;
+  }
+  updateOrderSummary();
+}
+
+function updateOrderSummary(){
+  const plan = sponsorData ? 'sponsored' : selectedPlan;
+  if(!PLAN_INFO[plan]) return;
+  document.getElementById('osPlan').textContent = PLAN_INFO[plan].name;
+  let priceStr = PLAN_INFO[plan].price;
+  if(appliedCoupon && appliedCoupon.percent_off && selectedPlan !== 'free'){
+    const prices = { monthly:9.99, yearly:79.99, lifetime:149 };
+    const orig = prices[selectedPlan];
+    if(orig){
+      const discounted = (orig * (1 - appliedCoupon.percent_off/100)).toFixed(2);
+      document.getElementById('discountRow').style.display='flex';
+      document.getElementById('discountAmt').textContent=`-${appliedCoupon.percent_off}%`;
+      priceStr = `$${discounted}${selectedPlan==='monthly'?'/mo':selectedPlan==='yearly'?'/yr':''}`;
+    }
+  } else {
+    document.getElementById('discountRow').style.display='none';
+  }
+  document.getElementById('osPrice').textContent = priceStr;
 }
 
 function selectPlan(plan){
@@ -413,7 +462,7 @@ async function createAccount(){
       btn.innerHTML='<span class="spinner"></span>Processing payment...';
       // Create payment intent via your backend / Supabase Edge Function
       const {data:piData, error:piError} = await _sb.functions.invoke('create-payment-intent', {
-        body:{plan, email, name, familyId}
+        body:{plan, email, name, familyId, couponCode: appliedCoupon?.id || null}
       });
       if(piError) throw new Error('Payment setup failed. Please try again.');
 
