@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Become a Sponsor — Life OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://js.stripe.com/v3/"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#060a12;--bg2:#0c1220;--c1:#38bdf8;--c2:#818cf8;--c3:#34d399;--tx:#f0f6ff;--tx2:#8fa3bf;--tx3:#4a6080;--border:rgba(255,255,255,.07);--card:rgba(255,255,255,.04);}
+body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;}
+a{color:var(--c1);text-decoration:none;}
+.top-bar{padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.logo{font-family:'Syne',sans-serif;font-weight:900;font-size:1.1rem;letter-spacing:2px;color:var(--c1);}
+.logo span{color:var(--tx2);font-weight:400;}
+.hero{text-align:center;padding:4rem 1.5rem 2rem;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(129,140,248,.1),transparent);}
+h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3rem);font-weight:900;margin-bottom:.8rem;}
+.sub{color:var(--tx2);font-size:1rem;max-width:520px;margin:0 auto 3rem;line-height:1.7;font-weight:300;}
+.container{max-width:920px;margin:0 auto;padding:0 1.5rem 4rem;}
+
+/* bundles */
+.bundle-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-bottom:3rem;}
+.bundle{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:1.8rem;cursor:pointer;transition:all .2s;position:relative;}
+.bundle:hover,.bundle.sel{border-color:var(--c2);background:rgba(129,140,248,.06);}
+.bundle.sel::after{content:'✓ Selected';position:absolute;top:-10px;right:12px;background:var(--c2);color:#06101e;font-size:.62rem;font-weight:800;padding:2px 8px;border-radius:100px;}
+.bundle-icon{font-size:1.8rem;margin-bottom:.7rem;}
+.bundle-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;margin-bottom:.3rem;}
+.bundle-price{font-size:1.6rem;font-weight:900;color:var(--c2);margin-bottom:.3rem;}
+.bundle-families{font-size:.78rem;color:var(--c3);font-weight:600;margin-bottom:.5rem;}
+.bundle-desc{font-size:.75rem;color:var(--tx2);line-height:1.6;}
+
+/* form */
+.form-section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2rem;}
+.section-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:1.3rem;}
+.field{margin-bottom:1rem;}
+label{display:block;font-size:.73rem;font-weight:600;color:var(--tx2);margin-bottom:.3rem;letter-spacing:.3px;}
+input,select,textarea{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:9px;padding:.65rem .9rem;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;transition:border-color .2s;resize:vertical;}
+input:focus,select:focus,textarea:focus{border-color:rgba(129,140,248,.4);}
+input::placeholder,textarea::placeholder{color:var(--tx3);}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;}
+.btn{width:100%;padding:.75rem;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:700;cursor:pointer;transition:all .2s;border:none;background:var(--c2);color:#fff;margin-top:.5rem;}
+.btn:hover{background:#a5b4fc;}
+.btn:disabled{background:var(--tx3);cursor:not-allowed;}
+.err-msg{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:8px;padding:.6rem .9rem;font-size:.8rem;color:#f87171;margin-bottom:1rem;display:none;}
+
+/* order summary */
+.order-box{background:rgba(129,140,248,.05);border:1px solid rgba(129,140,248,.15);border-radius:10px;padding:1rem;margin:1rem 0;font-size:.82rem;}
+.order-row{display:flex;justify-content:space-between;margin-bottom:.3rem;}
+.order-row.total{font-weight:700;color:var(--c2);border-top:1px solid var(--border);padding-top:.5rem;margin-top:.3rem;}
+
+/* success */
+#successState{display:none;text-align:center;padding:2rem;}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+<div class="top-bar">
+  <a href="index.html" class="logo">LIFE<span> OS</span></a>
+  <a href="index.html" style="font-size:.82rem;color:var(--tx2);">← Back to Home</a>
+</div>
+
+<div class="hero">
+  <h1>Sponsor families in<br>your community.</h1>
+  <p class="sub">Purchase a bundle and your organization gets a custom sponsor code. Families enter it at registration for completely free full access to Life OS — sponsored by you.</p>
+</div>
+
+<div class="container">
+
+  <!-- BUNDLE SELECTION -->
+  <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;margin-bottom:1rem;text-align:center;color:var(--tx2);text-transform:uppercase;letter-spacing:1px;">Choose a bundle</div>
+  <div class="bundle-grid" id="bundleGrid">
+    <div class="bundle" id="b-starter" onclick="selectBundle('starter')">
+      <div class="bundle-icon">🌱</div>
+      <div class="bundle-name">Starter</div>
+      <div class="bundle-price">$99</div>
+      <div class="bundle-families">10 families · 1 year</div>
+      <div class="bundle-desc">Perfect for small groups, Sunday school classes, or a handful of families in your congregation.</div>
+    </div>
+    <div class="bundle" id="b-community" onclick="selectBundle('community')">
+      <div class="bundle-icon">🏘️</div>
+      <div class="bundle-name">Community</div>
+      <div class="bundle-price">$299</div>
+      <div class="bundle-families">50 families · 1 year</div>
+      <div class="bundle-desc">Ideal for mid-size churches, school programs, or nonprofits serving a broader community.</div>
+    </div>
+    <div class="bundle" id="b-church" onclick="selectBundle('church')">
+      <div class="bundle-icon">⛪</div>
+      <div class="bundle-name">Church / School</div>
+      <div class="bundle-price">$599</div>
+      <div class="bundle-families">150 families · 1 year</div>
+      <div class="bundle-desc">Built for large congregations, schools, or organizations reaching hundreds of families.</div>
+    </div>
+    <div class="bundle" id="b-custom" onclick="selectBundle('custom')">
+      <div class="bundle-icon">🤝</div>
+      <div class="bundle-name">Custom</div>
+      <div class="bundle-price">Let's talk</div>
+      <div class="bundle-families">500+ families or multi-year</div>
+      <div class="bundle-desc">Need a larger bundle, multi-year access, or a branded experience? We'll build something custom.</div>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div class="form-section" id="sponsorForm" style="display:none;">
+    <div class="section-title" id="formTitle">Organization Details</div>
+    <div id="errMsg" class="err-msg"></div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>ORGANIZATION NAME</label>
+        <input type="text" id="orgName" placeholder="Grace Community Church">
+      </div>
+      <div class="field">
+        <label>ORGANIZATION TYPE</label>
+        <select id="orgType">
+          <option value="church">Church</option>
+          <option value="school">School</option>
+          <option value="nonprofit">Nonprofit</option>
+          <option value="business">Business</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>CONTACT NAME</label>
+        <input type="text" id="contactName" placeholder="Your full name">
+      </div>
+      <div class="field">
+        <label>CONTACT EMAIL</label>
+        <input type="email" id="contactEmail" placeholder="you@organization.org">
+      </div>
+    </div>
+    <div class="field">
+      <label>PREFERRED SPONSOR CODE (optional)</label>
+      <input type="text" id="preferredCode" placeholder="e.g. GRACECHURCH — leave blank for auto-generated" style="text-transform:uppercase;">
+      <div style="font-size:.7rem;color:var(--tx3);margin-top:.3rem;">Families enter this code at registration. Must be unique. Letters and numbers only.</div>
+    </div>
+
+    <div id="paySection">
+      <div class="order-box" id="orderBox">
+        <div class="order-row"><span>Bundle</span><span id="oBundle">—</span></div>
+        <div class="order-row"><span>Families</span><span id="oFamilies">—</span></div>
+        <div class="order-row"><span>Access duration</span><span>1 year</span></div>
+        <div class="order-row total"><span>Total today</span><span id="oTotal">—</span></div>
+      </div>
+
+      <div style="font-size:.73rem;color:var(--tx2);margin-bottom:.7rem;">Payment processed securely via Stripe.</div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.8rem;margin-bottom:.8rem;">
+        <div style="font-size:.72rem;color:var(--tx3);margin-bottom:.5rem;">CARD DETAILS</div>
+        <div id="cardElement"></div>
+        <div id="cardErrors" style="font-size:.75rem;color:#f87171;margin-top:.4rem;"></div>
+      </div>
+    </div>
+
+    <div id="customSection" style="display:none;">
+      <div class="field">
+        <label>TELL US ABOUT YOUR NEEDS</label>
+        <textarea id="customMsg" placeholder="How many families, what duration, any special requirements..." rows="3"></textarea>
+      </div>
+    </div>
+
+    <button class="btn" id="sponsorBtn" onclick="submitSponsor()">🤝 Complete Sponsorship</button>
+  </div>
+
+  <!-- SUCCESS -->
+  <div id="successState">
+    <div style="font-size:3rem;margin-bottom:1rem;">🎉</div>
+    <div style="font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:900;margin-bottom:.5rem;">Thank you!</div>
+    <div style="color:var(--tx2);font-size:.9rem;margin-bottom:1.5rem;line-height:1.6;max-width:440px;margin-left:auto;margin-right:auto;">Your sponsorship is confirmed. Share the code below with families in your organization.</div>
+    <div style="background:var(--card);border:1px solid rgba(129,140,248,.2);border-radius:14px;padding:1.5rem;max-width:380px;margin:0 auto 1.5rem;">
+      <div style="font-size:.7rem;color:var(--tx3);margin-bottom:.5rem;">YOUR SPONSOR CODE</div>
+      <div id="displayCode" style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:900;color:var(--c2);letter-spacing:3px;"></div>
+      <button onclick="copyCode()" style="margin-top:.7rem;background:rgba(129,140,248,.15);border:1px solid rgba(129,140,248,.25);color:var(--c2);border-radius:6px;padding:.3rem .9rem;font-size:.72rem;cursor:pointer;font-family:'DM Sans',sans-serif;">Copy Code</button>
+    </div>
+    <div style="font-size:.78rem;color:var(--tx2);line-height:1.7;">A confirmation email with your code and sharing instructions<br>has been sent to your contact email address.</div>
+    <a href="index.html" style="display:inline-block;margin-top:1.5rem;background:var(--c2);color:#fff;border-radius:8px;padding:.55rem 1.5rem;font-weight:700;font-size:.85rem;text-decoration:none;">Back to Home</a>
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL = 'https://hrohgwcbfgywkpnvqxhk.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhyb2hnd2NiZmd5d2twbnZxeGhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MjcxNDYsImV4cCI6MjA4ODQwMzE0Nn0.PuWtBpiMw2DiCLp26ZP_Rd9BwzFvWT0sNZrDUNdULyo';
+const STRIPE_PK = 'pk_live_51T8Sqi5KkDVrunQt8krQPr8spkmx7zYjHbcdE0pbliCqNuxJD8rUZXjJ1b3dLYNZKsSNfDY3BDHNhfYcs85bTJGy00KFAdAWUS';
+
+const BUNDLE_INFO = {
+  starter:   {name:'Starter',      families:10,  price:9900,  display:'$99'},
+  community: {name:'Community',    families:50,  price:29900, display:'$299'},
+  church:    {name:'Church/School',families:150, price:59900, display:'$599'},
+  custom:    {name:'Custom',       families:500, price:0,     display:'Custom'},
+};
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const stripe = Stripe(STRIPE_PK);
+const elements = stripe.elements();
+let cardElement;
+let selectedBundle = null;
+
+function selectBundle(type){
+  selectedBundle = type;
+  document.querySelectorAll('.bundle').forEach(b=>b.classList.remove('sel'));
+  document.getElementById('b-'+type).classList.add('sel');
+  document.getElementById('sponsorForm').style.display='block';
+  const info = BUNDLE_INFO[type];
+  document.getElementById('formTitle').textContent = `${info.name} Bundle — ${info.display}`;
+  document.getElementById('oBundle').textContent = info.name;
+  document.getElementById('oFamilies').textContent = info.families;
+  document.getElementById('oTotal').textContent = info.display;
+  if(type==='custom'){
+    document.getElementById('paySection').style.display='none';
+    document.getElementById('customSection').style.display='block';
+    document.getElementById('sponsorBtn').textContent='📩 Send Inquiry';
+  } else {
+    document.getElementById('paySection').style.display='block';
+    document.getElementById('customSection').style.display='none';
+    document.getElementById('sponsorBtn').textContent='🤝 Complete Sponsorship';
+    if(!cardElement){
+      cardElement = elements.create('card',{style:{base:{color:'#f0f6ff',fontFamily:'DM Sans, sans-serif',fontSize:'15px','::placeholder':{color:'#4a6080'}}}});
+      cardElement.mount('#cardElement');
+      cardElement.on('change',e=>{ document.getElementById('cardErrors').textContent=e.error?e.error.message:''; });
+    }
+  }
+  document.getElementById('sponsorForm').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+async function submitSponsor(){
+  const orgName = document.getElementById('orgName').value.trim();
+  const orgType = document.getElementById('orgType').value;
+  const contactName = document.getElementById('contactName').value.trim();
+  const email = document.getElementById('contactEmail').value.trim();
+  const prefCode = document.getElementById('preferredCode').value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+  const errEl = document.getElementById('errMsg');
+  errEl.style.display='none';
+
+  if(!orgName||!contactName||!email){ errEl.textContent='Please fill in all required fields.'; errEl.style.display='block'; return; }
+  if(!selectedBundle){ errEl.textContent='Please select a bundle.'; errEl.style.display='block'; return; }
+
+  const btn = document.getElementById('sponsorBtn');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Processing...';
+
+  if(selectedBundle==='custom'){
+    // Send inquiry via Supabase function
+    const msg = document.getElementById('customMsg').value.trim();
+    await supabase.functions.invoke('send-sponsor-inquiry',{body:{orgName,orgType,contactName,email,msg}});
+    document.getElementById('sponsorForm').style.display='none';
+    document.getElementById('successState').style.display='block';
+    document.getElementById('displayCode').textContent='CUSTOM';
+    return;
+  }
+
+  try {
+    // Process payment
+    const {data:piData, error} = await supabase.functions.invoke('create-sponsor-payment',{
+      body:{bundle:selectedBundle, orgName, orgType, contactName, email, prefCode}
+    });
+    if(error) throw new Error(error.message);
+
+    const {error:stripeErr} = await stripe.confirmCardPayment(piData.clientSecret,{
+      payment_method:{card:cardElement,billing_details:{name:contactName,email}}
+    });
+    if(stripeErr) throw new Error(stripeErr.message);
+
+    // Show success
+    document.getElementById('sponsorForm').style.display='none';
+    document.getElementById('successState').style.display='block';
+    document.getElementById('displayCode').textContent = piData.sponsorCode;
+  } catch(err){
+    errEl.textContent = err.message;
+    errEl.style.display='block';
+    btn.disabled=false;
+    btn.innerHTML='🤝 Complete Sponsorship';
+  }
+}
+
+function copyCode(){
+  const code = document.getElementById('displayCode').textContent;
+  navigator.clipboard.writeText(code).then(()=>{
+    const btn=event.target; btn.textContent='Copied!'; setTimeout(()=>btn.textContent='Copy Code',2000);
+  });
+}
+</script>
+</body>
+</html>

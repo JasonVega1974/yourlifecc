@@ -1,0 +1,189 @@
+<!-- ═══════════════════════════════════════════════════════
+  LIFE OS — SUPABASE DATA BRIDGE
+  Paste this ENTIRE block at the very top of app.html,
+  right after <head> opens, BEFORE any other scripts.
+
+  What it does:
+  - Reads family data from sessionStorage (set by app/index.html)
+  - Overrides the save() function to sync to Supabase
+  - Gates premium features based on plan
+  - Shows upgrade prompts for free users
+  - Auto-saves to Supabase every 30 seconds + on page hide
+════════════════════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  // ── CONFIG ──────────────────────────────────────────────
+  const SUPABASE_URL = 'https://hrohgwcbfgywkpnvqxhk.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhyb2hnd2NiZmd5d2twbnZxeGhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MjcxNDYsImV4cCI6MjA4ODQwMzE0Nn0.PuWtBpiMw2DiCLp26ZP_Rd9BwzFvWT0sNZrDUNdULyo';
+
+  // Which sections require a paid plan
+  const PREMIUM_SECTIONS = [
+    's-skills','s-chores','s-driving','s-sports',
+    's-growing','s-music','s-jobs','s-scripture',
+  ];
+  const PREMIUM_PARENT_TABS = ['chores','screentime','earnings','parentbucks','store'];
+
+  // ── INIT ────────────────────────────────────────────────
+  const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // Get family ID from URL
+  const _familyId = new URLSearchParams(location.search).get('id');
+  if(!_familyId){
+    location.href = '../login.html';
+    throw new Error('No family ID');
+  }
+
+  // Get plan info from sessionStorage
+  const _plan = sessionStorage.getItem('lifeos_plan') || 'free';
+  const _isPaid = _plan !== 'free';
+  const _lsKey = `lifeos_${_familyId}`;
+
+  // ── EXPOSE GLOBALS THE APP NEEDS ────────────────────────
+  window._LIFEOS_FAMILY_ID = _familyId;
+  window._LIFEOS_PLAN = _plan;
+  window._LIFEOS_IS_PAID = _isPaid;
+
+  // ── OVERRIDE LOCALSTORAGE READS/WRITES ──────────────────
+  // The app uses localStorage.getItem('lifeOSData') and localStorage.setItem(...)
+  // We redirect those to family-scoped keys
+
+  const _origGetItem = Storage.prototype.getItem;
+  const _origSetItem = Storage.prototype.setItem;
+
+  Storage.prototype.getItem = function(key){
+    if(key === 'lifeOSData') key = _lsKey;
+    return _origGetItem.call(this, key);
+  };
+  Storage.prototype.setItem = function(key, val){
+    if(key === 'lifeOSData') key = _lsKey;
+    _origSetItem.call(this, key, val);
+    // Queue a Supabase sync when app data changes
+    if(key === _lsKey) queueSupabaseSync(val);
+  };
+
+  // ── SUPABASE SYNC ────────────────────────────────────────
+  let _syncTimeout = null;
+  let _syncPending = false;
+
+  function queueSupabaseSync(dataStr){
+    _syncPending = true;
+    clearTimeout(_syncTimeout);
+    _syncTimeout = setTimeout(()=>syncToSupabase(dataStr), 5000); // debounce 5s
+  }
+
+  async function syncToSupabase(dataStr){
+    if(!_syncPending) return;
+    _syncPending = false;
+    try {
+      const data = typeof dataStr === 'string' ? JSON.parse(dataStr) : dataStr;
+      await _supabase.from('family_data').upsert({
+        family_id: _familyId,
+        data: data,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'family_id' });
+    } catch(e){
+      console.warn('Supabase sync failed (data saved locally):', e.message);
+    }
+  }
+
+  // Sync on page hide/close
+  document.addEventListener('visibilitychange', ()=>{
+    if(document.visibilityState === 'hidden' && _syncPending){
+      const d = localStorage.getItem(_lsKey);
+      if(d) syncToSupabase(d);
+    }
+  });
+
+  // Periodic sync every 60s
+  setInterval(()=>{
+    const d = localStorage.getItem(_lsKey);
+    if(d && _syncPending) syncToSupabase(d);
+  }, 60000);
+
+  // ── FEATURE GATING ───────────────────────────────────────
+  // Called after DOM loads — hides premium sections for free users
+  function applyFeatureGating(){
+    if(_isPaid) return; // paid users see everything
+
+    // Lock premium nav buttons
+    PREMIUM_SECTIONS.forEach(id => {
+      // Find nav button for this section
+      const navBtns = document.querySelectorAll(`[onclick*="${id}"], [data-section="${id}"]`);
+      navBtns.forEach(btn => {
+        btn.style.position = 'relative';
+        btn.setAttribute('title','Upgrade to access');
+        btn.style.opacity = '0.5';
+        btn.onclick = (e) => { e.preventDefault(); e.stopPropagation(); showUpgradePrompt(); };
+      });
+
+      // Lock the section itself
+      const section = document.getElementById(id);
+      if(section){
+        section.style.position = 'relative';
+        // Add overlay
+        if(!section.querySelector('.premium-overlay')){
+          const overlay = document.createElement('div');
+          overlay.className = 'premium-overlay';
+          overlay.innerHTML = `
+            <div style="text-align:center;padding:3rem 1.5rem;">
+              <div style="font-size:2rem;margin-bottom:.7rem;">🔒</div>
+              <div style="font-family:var(--fh,sans-serif);font-size:1.1rem;font-weight:800;margin-bottom:.4rem;">Premium Feature</div>
+              <div style="font-size:.82rem;color:#8fa3bf;margin-bottom:1.2rem;line-height:1.6;">This section is available on paid plans.<br>Upgrade to unlock everything.</div>
+              <button onclick="showUpgradePrompt()" style="background:#38bdf8;color:#06101e;border:none;border-radius:8px;padding:.6rem 1.5rem;font-weight:700;cursor:pointer;font-size:.85rem;">Upgrade Now →</button>
+              <div style="margin-top:.7rem;font-size:.72rem;color:#4a6080;">Starting at $9.99/month for your whole family</div>
+            </div>`;
+          overlay.style.cssText = 'position:absolute;inset:0;background:rgba(6,10,18,.92);backdrop-filter:blur(4px);z-index:999;display:flex;align-items:center;justify-content:center;border-radius:12px;';
+          section.appendChild(overlay);
+        }
+      }
+    });
+  }
+
+  window.showUpgradePrompt = function(){
+    const existing = document.getElementById('upgradeModal');
+    if(existing){ existing.style.display='flex'; return; }
+    const modal = document.createElement('div');
+    modal.id = 'upgradeModal';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:1rem;';
+    modal.innerHTML = `
+      <div style="background:#0c1220;border:1px solid rgba(56,189,248,.2);border-radius:18px;max-width:420px;width:100%;padding:2rem;text-align:center;">
+        <div style="font-size:2.5rem;margin-bottom:.6rem;">🚀</div>
+        <div style="font-family:var(--fh,sans-serif);font-size:1.3rem;font-weight:900;margin-bottom:.4rem;">Unlock Everything</div>
+        <div style="font-size:.82rem;color:#8fa3bf;margin-bottom:1.5rem;line-height:1.6;">Upgrade to access all 20+ sections, unlimited children, Life Skills Academy, Chores & Rewards, Parent Hub, and cloud sync.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1.2rem;">
+          <a href="../register.html?plan=monthly&upgrade=${_familyId}" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);border-radius:10px;padding:.9rem;text-decoration:none;display:block;">
+            <div style="font-weight:700;font-size:.82rem;color:#f0f6ff;">Monthly</div>
+            <div style="color:#38bdf8;font-size:1.1rem;font-weight:900;">$9.99<span style="font-size:.7rem;color:#8fa3bf;">/mo</span></div>
+          </a>
+          <a href="../register.html?plan=lifetime&upgrade=${_familyId}" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);border-radius:10px;padding:.9rem;text-decoration:none;display:block;">
+            <div style="font-weight:700;font-size:.82rem;color:#f0f6ff;">Lifetime</div>
+            <div style="color:#38bdf8;font-size:1.1rem;font-weight:900;">$149<span style="font-size:.7rem;color:#8fa3bf;"> once</span></div>
+          </a>
+        </div>
+        <button onclick="document.getElementById('upgradeModal').style.display='none'" style="background:none;border:1px solid rgba(255,255,255,.08);color:#8fa3bf;border-radius:8px;padding:.45rem 1.2rem;cursor:pointer;font-size:.78rem;font-family:inherit;">Maybe Later</button>
+      </div>`;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', e=>{ if(e.target===modal) modal.style.display='none'; });
+  };
+
+  // ── SHOW PLAN BADGE IN UI ────────────────────────────────
+  function showPlanBadge(){
+    const badgeColors = { free:'#6b7280', monthly:'#38bdf8', yearly:'#38bdf8', lifetime:'#f59e0b', sponsored:'#818cf8' };
+    const badge = document.createElement('div');
+    badge.id = 'planBadge';
+    badge.style.cssText = `position:fixed;bottom:12px;right:12px;z-index:9000;background:${badgeColors[_plan]||'#6b7280'};color:#06101e;font-size:.62rem;font-weight:800;padding:3px 9px;border-radius:100px;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;`;
+    badge.textContent = _plan === 'free' ? '⬆ Upgrade' : _plan.charAt(0).toUpperCase()+_plan.slice(1);
+    badge.onclick = _isPaid ? ()=>{} : showUpgradePrompt;
+    if(!_isPaid) document.body.appendChild(badge);
+  }
+
+  // ── WAIT FOR DOM, THEN APPLY ─────────────────────────────
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', ()=>{ applyFeatureGating(); showPlanBadge(); });
+  } else {
+    applyFeatureGating(); showPlanBadge();
+  }
+
+})();
+</script>
