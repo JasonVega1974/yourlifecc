@@ -101,23 +101,24 @@ h2{font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;line-h
 .fc p{font-size:.73rem;color:var(--tx2);line-height:1.5;}
 
 /* PRICING */
-.price-tabs{display:flex;justify-content:center;gap:.5rem;margin-bottom:2rem;}
-.ptab{padding:10px 22px;border-radius:10px;font-size:.82rem;font-weight:600;cursor:pointer;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:var(--tx2);transition:all .2s;}
+.price-tabs{display:flex;justify-content:center;gap:.5rem;margin-bottom:2.5rem;}
+.ptab{padding:11px 26px;border-radius:10px;font-size:.85rem;font-weight:600;cursor:pointer;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:var(--tx2);transition:all .2s;}
 .ptab.on{background:rgba(79,143,255,.1);border-color:rgba(79,143,255,.25);color:var(--blue);}
-.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.3rem;max-width:950px;margin:0 auto;}
-@media(max-width:768px){.price-grid{grid-template-columns:1fr;max-width:380px;}}
-.pc{background:var(--bg2);border:1px solid rgba(255,255,255,.05);border-radius:18px;padding:2rem 1.5rem;text-align:center;position:relative;transition:all .25s;}
-.pc:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.25);}
-.pc.pop{border-color:rgba(79,143,255,.25);background:linear-gradient(180deg,rgba(79,143,255,.04) 0%,var(--bg2) 100%);box-shadow:0 0 40px rgba(79,143,255,.06);}
-.pc.pop::before{content:'🔥 MOST POPULAR';position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--grad);color:#fff;font-size:.6rem;font-weight:800;padding:4px 14px;border-radius:100px;letter-spacing:1px;white-space:nowrap;}
-.pc-name{font-family:var(--fh);font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.6rem;}
-.pc-price{font-family:var(--fh);font-size:2.8rem;font-weight:800;margin-bottom:.15rem;}
-.pc-per{font-size:.82rem;color:var(--tx2);margin-bottom:.4rem;}
+.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.8rem;max-width:1060px;margin:0 auto;}
+@media(max-width:768px){.price-grid{grid-template-columns:1fr;max-width:400px;}}
+.pc{background:var(--bg2);border:1px solid rgba(255,255,255,.05);border-radius:20px;padding:2.4rem 2rem;text-align:center;position:relative;transition:all .3s;}
+.pc:hover{transform:translateY(-5px);border-color:rgba(56,189,248,.35);box-shadow:0 0 40px rgba(56,189,248,.12),0 16px 40px rgba(0,0,0,.3);}
+.pc.pop{border-color:rgba(79,143,255,.25);background:linear-gradient(180deg,rgba(79,143,255,.05) 0%,var(--bg2) 100%);box-shadow:0 0 40px rgba(79,143,255,.08);}
+.pc.pop:hover{border-color:rgba(56,189,248,.5);box-shadow:0 0 60px rgba(56,189,248,.18),0 16px 40px rgba(0,0,0,.3);}
+.pc.pop::before{content:'🔥 MOST POPULAR';position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--grad);color:#fff;font-size:.6rem;font-weight:800;padding:5px 16px;border-radius:100px;letter-spacing:1px;white-space:nowrap;}
+.pc-name{font-family:var(--fh);font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.8rem;}
+.pc-price{font-family:var(--fh);font-size:3.2rem;font-weight:800;margin-bottom:.2rem;}
+.pc-per{font-size:.85rem;color:var(--tx2);margin-bottom:.5rem;}
 .pc-orig{text-decoration:line-through;color:var(--tx3);font-size:.85rem;}
-.pc-save{display:inline-block;background:rgba(34,197,94,.1);color:var(--green);font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:6px;margin:.4rem 0 1rem;}
-.pc ul{text-align:left;margin:1rem 0;display:flex;flex-direction:column;gap:.45rem;list-style:none;}
-.pc li{display:flex;gap:.45rem;font-size:.8rem;color:var(--tx2);}
-.pc li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0;}
+.pc-save{display:inline-block;background:rgba(34,197,94,.1);color:var(--green);font-size:.68rem;font-weight:700;padding:4px 12px;border-radius:6px;margin:.5rem 0 1.2rem;}
+.pc ul{text-align:left;margin:1.2rem 0 1.6rem;display:flex;flex-direction:column;gap:.6rem;list-style:none;}
+.pc li{display:flex;gap:.5rem;font-size:.83rem;color:var(--tx2);line-height:1.5;}
+.pc li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0;margin-top:.1rem;}
 
 /* ORG */
 .org-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:2rem;}
@@ -186,7 +187,7 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
       <a href="#church">Churches</a>
       <a href="#faq">FAQ</a>
       <a href="login.html">Sign In</a>
-      <a href="register.html" class="nav-cta">Start Free →</a>
+      <a href="register.html" class="nav-cta">Get Family Access →</a>
     </div>
     <button class="mobtn" onclick="document.getElementById('navLinks').classList.toggle('on')">☰</button>
   </div>
@@ -373,15 +374,15 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
         <div class="pc-price">$9.99</div>
         <div class="pc-per">/month · Full access</div>
         <div class="pc-save">MOST POPULAR</div>
-        <ul><li>All 28 sections unlocked</li><li>Unlimited children</li><li>Life Skills Academy</li><li>Chores & Rewards</li><li>Parent Hub with Life Score</li><li>Cloud sync across all devices</li></ul>
-        <a href="register.html?plan=monthly" class="btn bp" style="width:100%;">Start Free →</a>
+        <ul><li>All 28 sections unlocked</li><li>Unlimited family members</li><li>Life Skills Academy</li><li>Chores & Rewards</li><li>Parent Hub with Life Score</li><li>Cloud sync across all devices</li></ul>
+        <a href="register.html?plan=monthly" class="btn bp" style="width:100%;">Get Family Access →</a>
       </div>
       <div class="pc">
         <div class="pc-name" style="color:var(--green);">Lifetime</div>
         <div class="pc-price">$149</div>
         <div class="pc-per">one-time · pay once</div>
         <div class="pc-save">NEVER PAY AGAIN</div>
-        <ul><li>Everything in Monthly</li><li>All future updates included</li><li>Unlimited children forever</li><li>Priority support</li></ul>
+        <ul><li>Everything in Monthly, forever</li><li>Unlimited family members — all ages</li><li>All future updates always free</li><li>One payment, no renewals ever</li><li>Priority support</li></ul>
         <a href="register.html?plan=lifetime" class="btn bp" style="width:100%;">Get Lifetime Access →</a>
       </div>
     </div>
@@ -398,15 +399,15 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
         <div class="pc-price">$79.99</div>
         <div class="pc-per">/year · Save $40</div>
         <div class="pc-save">BEST VALUE — SAVE 33%</div>
-        <ul><li>Everything in Monthly</li><li>Unlimited children</li><li>2 months free vs monthly</li><li>Cloud sync across all devices</li><li>Priority support</li></ul>
-        <a href="register.html?plan=yearly" class="btn bp" style="width:100%;">Start Free →</a>
+        <ul><li>Everything in Monthly</li><li>Unlimited family members</li><li>2 months free vs monthly</li><li>Cloud sync across all devices</li><li>Priority support</li></ul>
+        <a href="register.html?plan=yearly" class="btn bp" style="width:100%;">Get Family Access →</a>
       </div>
       <div class="pc">
         <div class="pc-name" style="color:var(--green);">Lifetime</div>
         <div class="pc-price">$149</div>
         <div class="pc-per">one-time · pay once</div>
         <div class="pc-save">NEVER PAY AGAIN</div>
-        <ul><li>Everything in Monthly</li><li>All future updates included</li><li>Unlimited children forever</li><li>Priority support</li></ul>
+        <ul><li>Everything in Monthly, forever</li><li>Unlimited family members — all ages</li><li>All future updates always free</li><li>One payment, no renewals ever</li><li>Priority support</li></ul>
         <a href="register.html?plan=lifetime" class="btn bp" style="width:100%;">Get Lifetime Access →</a>
       </div>
     </div>
@@ -422,15 +423,15 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
         <div class="pc-name" style="color:var(--blue);">Family Monthly</div>
         <div class="pc-price">$9.99</div>
         <div class="pc-per">/month · cancel anytime</div>
-        <ul><li>All 28 sections unlocked</li><li>Unlimited children</li><li>Life Skills Academy</li><li>Parent Hub with Life Score</li></ul>
-        <a href="register.html?plan=monthly" class="btn bp" style="width:100%;">Start Free →</a>
+        <ul><li>All 28 sections unlocked</li><li>Unlimited family members</li><li>Life Skills Academy</li><li>Parent Hub with Life Score</li></ul>
+        <a href="register.html?plan=monthly" class="btn bp" style="width:100%;">Get Family Access →</a>
       </div>
       <div class="pc">
         <div class="pc-name" style="color:var(--green);">Lifetime</div>
         <div class="pc-price">$149</div>
         <div class="pc-per">one-time · pay once forever</div>
         <div class="pc-save">NEVER PAY AGAIN</div>
-        <ul><li>Everything unlocked forever</li><li>All future updates free</li><li>Unlimited children</li><li>Priority support</li></ul>
+        <ul><li>Everything unlocked forever</li><li>All future updates free</li><li>Unlimited family members</li><li>Priority support</li></ul>
         <a href="register.html?plan=lifetime" class="btn bp" style="width:100%;">Get Lifetime Access →</a>
       </div>
     </div>
@@ -494,7 +495,7 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
       <div class="fq"><div class="fq-q" onclick="tFaq(this)">Is my child's data private? <span class="arr">▼</span></div><div class="fq-a"><p>Yes. Each account is private and encrypted. Your unique URL is yours alone — no one else can access your family's data.</p></div></div>
       <div class="fq"><div class="fq-q" onclick="tFaq(this)">What devices does it work on? <span class="arr">▼</span></div><div class="fq-a"><p>Any device with a browser — phones, tablets, laptops, desktops. No app download required. Just log in from yourlifecc.vercel.app.</p></div></div>
       <div class="fq"><div class="fq-q" onclick="tFaq(this)">Is this faith-based? <span class="arr">▼</span></div><div class="fq-a"><p>YourLife CC includes an optional Faith & Purpose section with 365 scriptures, 30 devotionals, and Bible content. A Faith Mode toggle lets you turn it ON or OFF. The other 17 categories cover universal life skills for all families.</p></div></div>
-      <div class="fq"><div class="fq-q" onclick="tFaq(this)">What if I'm not satisfied? <span class="arr">▼</span></div><div class="fq-a"><p>30-day money-back guarantee, no questions asked. Email support@yourlifecc.com and we'll refund you immediately.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">What if I'm not satisfied? <span class="arr">▼</span></div><div class="fq-a"><p>30-day money-back guarantee, no questions asked. Email <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="05767075756a7771457c6a7077696c636066662b666a68">[email&#160;protected]</a> and we'll refund you immediately.</p></div></div>
     </div>
   </div>
 </section>
@@ -530,7 +531,7 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
         <a href="register.html">Sign Up Free</a>
         <a href="login.html">Sign In</a>
         <a href="#faq">FAQ</a>
-        <a href="mailto:support@yourlifecc.com">Contact</a>
+        <a href="/cdn-cgi/l/email-protection#a1d2d4d1d1ced3d5e1d8ced4d3cdc8c7c4c2c28fc2cecc">Contact</a>
       </div>
       <div class="ft-col">
         <h4>Legal</h4>
@@ -543,7 +544,7 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
   </div>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 function showPricing(type, btn){
   document.getElementById('price-monthly').style.display = type==='monthly'?'grid':'none';
   document.getElementById('price-yearly').style.display = type==='yearly'?'grid':'none';
@@ -556,14 +557,4 @@ function tFaq(el){
   var a = el.nextElementSibling;
   var isOpen = el.classList.contains('on');
   document.querySelectorAll('.fq-q').forEach(function(q){ q.classList.remove('on'); });
-  document.querySelectorAll('.fq-a').forEach(function(x){ x.classList.remove('on'); x.style.maxHeight='0'; x.style.padding='0 1.2rem'; });
-  if(!isOpen){
-    el.classList.add('on');
-    a.classList.add('on');
-    a.style.maxHeight = a.scrollHeight + 'px';
-    a.style.padding = '0 1.2rem 1rem';
-  }
-}
-</script>
-</body>
-</html>
+  document.querySelectorAll('.fq-a').forEach(func
