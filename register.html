@@ -329,7 +329,7 @@ async function applyCoupon(){
   msg.style.display='block'; msg.style.color='var(--tx2)'; msg.textContent='Applying...';
   // Store the code — it will be validated server-side when payment processes
   // For display, apply a visual discount if it matches known test codes
-  const KNOWN_COUPONS = { 'TEST': {id:'TEST', percent_off:99} };
+  const KNOWN_COUPONS = { 'TEST99': {id:'TEST99', percent_off:99} };
   if(KNOWN_COUPONS[code]){
     appliedCoupon = KNOWN_COUPONS[code];
     msg.style.color='var(--ok)'; msg.textContent=`✓ ${appliedCoupon.percent_off}% off applied!`;
