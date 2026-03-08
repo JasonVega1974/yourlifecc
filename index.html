@@ -31,17 +31,13 @@ img{max-width:100%;}
 .tag{font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;display:inline-block;margin-bottom:1rem;}
 h2{font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;line-height:1.15;margin-bottom:1rem;letter-spacing:-.02em;}
 .sub{font-size:1.05rem;color:var(--tx2);max-width:580px;line-height:1.75;}
-
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:14px 30px;border-radius:12px;font-family:var(--fn);font-weight:700;font-size:.95rem;border:none;cursor:pointer;transition:all .25s;text-decoration:none;}
 .btn:hover{transform:translateY(-2px);}
 .bp{background:var(--grad);color:#fff;box-shadow:0 4px 24px rgba(79,143,255,.25);}
 .bp:hover{box-shadow:0 8px 32px rgba(79,143,255,.35);}
 .bo{background:transparent;color:var(--tx);border:1.5px solid rgba(255,255,255,.12);}
 .bo:hover{border-color:var(--blue);color:var(--blue);}
-.bg{background:var(--green);color:#000;box-shadow:0 4px 20px rgba(34,197,94,.25);}
-.bg:hover{box-shadow:0 8px 28px rgba(34,197,94,.35);}
 .blg{padding:18px 40px;font-size:1.05rem;border-radius:14px;}
-
 /* NAV */
 .nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 0;backdrop-filter:blur(24px);background:rgba(6,9,15,.75);border-bottom:1px solid rgba(255,255,255,.03);}
 .nav .wrap{display:flex;align-items:center;justify-content:space-between;}
@@ -52,7 +48,6 @@ h2{font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;line-h
 .nav-cta{background:var(--grad);color:#fff!important;padding:9px 22px;border-radius:10px;font-weight:700;font-size:.82rem;}
 .mobtn{display:none;background:none;border:none;color:var(--tx);font-size:1.4rem;cursor:pointer;}
 @media(max-width:768px){.nav-links{display:none;}.nav-links.on{display:flex;flex-direction:column;position:absolute;top:100%;left:0;right:0;background:var(--bg2);padding:1.2rem;border-bottom:1px solid rgba(255,255,255,.05);gap:.8rem;}.mobtn{display:block;}}
-
 /* HERO */
 .hero{padding:150px 0 90px;text-align:center;position:relative;}
 .hero::before{content:'';position:absolute;top:-300px;left:50%;transform:translateX(-50%);width:900px;height:900px;background:radial-gradient(ellipse,rgba(79,143,255,.07) 0%,rgba(6,214,160,.03) 40%,transparent 70%);pointer-events:none;}
@@ -66,12 +61,10 @@ h2{font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;line-h
 .hero-stats{display:flex;justify-content:center;gap:clamp(1.5rem,4vw,3.5rem);flex-wrap:wrap;}
 .hs-num{font-family:var(--fh);font-size:1.9rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 .hs-lbl{font-size:.72rem;color:var(--tx3);font-weight:500;letter-spacing:.5px;}
-
 /* TRUST */
 .trust{text-align:center;padding:40px 0;border-top:1px solid rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.03);background:var(--bg2);}
 .trust-items{display:flex;justify-content:center;gap:2.5rem;flex-wrap:wrap;align-items:center;}
 .trust-item{display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--tx2);font-weight:500;}
-
 /* PROBLEM */
 .prob-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.2rem;margin-top:2.2rem;}
 .prob-card{background:var(--bg2);border:1px solid rgba(239,68,68,.08);border-radius:var(--r);padding:1.4rem;transition:all .3s;}
@@ -80,7 +73,6 @@ h2{font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;line-h
 .prob-card h3{font-family:var(--fh);font-size:1rem;font-weight:700;margin-bottom:.35rem;}
 .prob-card p{font-size:.84rem;color:var(--tx2);line-height:1.6;}
 @media(max-width:600px){.prob-grid{grid-template-columns:1fr;}}
-
 /* SOLUTION */
 .sol-grid{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;align-items:start;margin-top:2.5rem;}
 @media(max-width:768px){.sol-grid{grid-template-columns:1fr;}}
@@ -90,23 +82,15 @@ h2{font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;line-h
 .sol-item h4{font-size:.92rem;font-weight:700;margin-bottom:.15rem;}
 .sol-item p{font-size:.8rem;color:var(--tx2);}
 .sol-vis{background:var(--bg3);border:1px solid rgba(255,255,255,.05);border-radius:18px;padding:2rem;position:relative;overflow:hidden;}
-.sol-vis::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(6,214,160,.08),transparent);pointer-events:none;}
-
 /* FEATURES */
 .feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:.9rem;margin-top:2rem;}
-.fc{background:var(--bg2);border:1px solid rgba(255,255,255,.04);border-radius:var(--r);padding:1.1rem;transition:all .25s;cursor:default;}
-.fc:hover{border-color:rgba(79,143,255,.15);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.25);}
-.fc .em{font-size:1.5rem;margin-bottom:.4rem;}
-.fc h3{font-family:var(--fh);font-size:.85rem;font-weight:700;margin-bottom:.2rem;}
-.fc p{font-size:.73rem;color:var(--tx2);line-height:1.5;}
-
-/* PRICING */
+/* PRICING — key: .pg is always display:grid, .pg.hide overrides to none */
 .price-tabs{display:flex;justify-content:center;gap:.5rem;margin-bottom:2.5rem;}
 .ptab{padding:11px 26px;border-radius:10px;font-size:.85rem;font-weight:600;cursor:pointer;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:var(--tx2);transition:all .2s;}
 .ptab.on{background:rgba(79,143,255,.1);border-color:rgba(79,143,255,.25);color:var(--blue);}
-.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.8rem;max-width:1060px;margin:0 auto;}
-.price-grid.hidden{display:none;}
-@media(max-width:768px){.price-grid{grid-template-columns:1fr;max-width:400px;}}
+.pg{display:grid;grid-template-columns:repeat(3,1fr);gap:1.8rem;max-width:1060px;margin:0 auto;}
+.pg.hide{display:none;}
+@media(max-width:768px){.pg{grid-template-columns:1fr;max-width:400px;}}
 .pc{background:var(--bg2);border:1px solid rgba(255,255,255,.05);border-radius:20px;padding:2.4rem 2rem;text-align:center;position:relative;transition:all .3s;}
 .pc:hover{transform:translateY(-5px);border-color:rgba(56,189,248,.35);box-shadow:0 0 40px rgba(56,189,248,.12),0 16px 40px rgba(0,0,0,.3);}
 .pc.pop{border-color:rgba(79,143,255,.25);background:linear-gradient(180deg,rgba(79,143,255,.05) 0%,var(--bg2) 100%);box-shadow:0 0 40px rgba(79,143,255,.08);}
@@ -115,12 +99,10 @@ h2{font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;line-h
 .pc-name{font-family:var(--fh);font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.8rem;}
 .pc-price{font-family:var(--fh);font-size:3.2rem;font-weight:800;margin-bottom:.2rem;}
 .pc-per{font-size:.85rem;color:var(--tx2);margin-bottom:.5rem;}
-.pc-orig{text-decoration:line-through;color:var(--tx3);font-size:.85rem;}
 .pc-save{display:inline-block;background:rgba(34,197,94,.1);color:var(--green);font-size:.68rem;font-weight:700;padding:4px 12px;border-radius:6px;margin:.5rem 0 1.2rem;}
 .pc ul{text-align:left;margin:1.2rem 0 1.6rem;display:flex;flex-direction:column;gap:.6rem;list-style:none;}
 .pc li{display:flex;gap:.5rem;font-size:.83rem;color:var(--tx2);line-height:1.5;}
 .pc li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0;margin-top:.1rem;}
-
 /* ORG */
 .org-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:2rem;}
 @media(max-width:768px){.org-grid{grid-template-columns:1fr;}}
@@ -133,7 +115,6 @@ h2{font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;line-h
 .org-card ul{text-align:left;margin:1rem 0;list-style:none;display:flex;flex-direction:column;gap:.35rem;}
 .org-card li{font-size:.78rem;color:var(--tx2);display:flex;gap:.4rem;}
 .org-card li::before{content:'✓';color:var(--cyan);font-weight:700;}
-
 /* REVIEWS */
 .rev-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1.2rem;margin-top:2rem;}
 .rc{background:var(--bg2);border:1px solid rgba(255,255,255,.04);border-radius:var(--r);padding:1.4rem;}
@@ -141,7 +122,6 @@ h2{font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;line-h
 .rc-text{font-size:.88rem;color:var(--tx2);line-height:1.7;margin-bottom:1rem;font-style:italic;}
 .rc-who{display:flex;align-items:center;gap:.6rem;}
 .rc-av{width:38px;height:38px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.8rem;color:#fff;flex-shrink:0;}
-
 /* FAQ */
 .faq-list{max-width:680px;margin:2rem auto 0;}
 .fq{background:var(--bg2);border:1px solid rgba(255,255,255,.04);border-radius:12px;margin-bottom:.5rem;overflow:hidden;}
@@ -152,19 +132,12 @@ h2{font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;line-h
 .fq-a{max-height:0;overflow:hidden;transition:max-height .35s ease;padding:0 1.2rem;}
 .fq-a.on{max-height:500px;padding:0 1.2rem 1rem;}
 .fq-a p{font-size:.85rem;color:var(--tx2);line-height:1.7;}
-
-/* LS CATS */
-.ls-cats{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:1.5rem;}
-.ls-cat{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:.5rem .8rem;font-size:.72rem;font-weight:600;transition:all .2s;}
-.ls-cat:hover{background:rgba(79,143,255,.06);border-color:rgba(79,143,255,.15);}
-
 /* VIDEO */
 .vid-wrap{max-width:780px;margin:2rem auto 0;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.06);aspect-ratio:16/9;background:#000;position:relative;}
 .vid-wrap iframe{width:100%;height:100%;border:none;}
 .vid-ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--bg3),var(--bg2));cursor:pointer;}
 .vid-ph .play{width:72px;height:72px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin-bottom:.8rem;box-shadow:0 0 40px rgba(79,143,255,.25);transition:transform .2s;}
 .vid-ph:hover .play{transform:scale(1.08);}
-
 /* FOOTER */
 footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:50px 0 30px;}
 .ft-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2rem;margin-bottom:2rem;}
@@ -199,7 +172,7 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
   <div class="wrap">
     <div class="hero-pill"><span class="dot"></span> Now Live — Family Plans Starting at $9.99/mo</div>
     <h1>Everything School<br><em>Doesn't Teach.</em></h1>
-    <p>140+ life lessons, career explorer, 365 daily scriptures, parent dashboard with Life Score, chores & rewards, and everything young people need to grow up ready for real life.</p>
+    <p>140+ life lessons, career explorer, 365 daily scriptures, parent dashboard with Life Score, chores &amp; rewards, and everything young people need to grow up ready for real life.</p>
     <div style="height:1.5rem;"></div>
     <div class="hero-btns">
       <a href="register.html" class="btn bp blg">Start Free Today →</a>
@@ -293,37 +266,37 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;" class="feat-cols">
       <div>
-        <div style="font-size:.85rem;font-weight:800;color:var(--blue);margin-bottom:.8rem;border-bottom:2px solid var(--blue);padding-bottom:.4rem;">🧠 EDUCATION & SKILLS</div>
+        <div style="font-size:.85rem;font-weight:800;color:var(--blue);margin-bottom:.8rem;border-bottom:2px solid var(--blue);padding-bottom:.4rem;">🧠 EDUCATION &amp; SKILLS</div>
         <div style="display:flex;flex-direction:column;gap:.5rem;">
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>140+ Life Skill Lessons</b> across 18 categories — taxes, credit, cooking, home repairs, career, communication & more</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>43 Growing Up Topics</b> — puberty, emotions, bullying, drugs, sleep, hygiene & more</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>140+ Life Skill Lessons</b> across 18 categories — taxes, credit, cooking, home repairs, career, communication &amp; more</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>43 Growing Up Topics</b> — puberty, emotions, bullying, drugs, sleep, hygiene &amp; more</span></div>
           <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>22 Character Lessons</b> — kindness, honesty, responsibility, empathy, leadership, resilience</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>35 Career Profiles</b> with salary ranges, day-in-the-life & roadmaps</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>14 Sports Profiles</b> with scholarship info & recruiting timelines</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>35 Career Profiles</b> with salary ranges, day-in-the-life &amp; roadmaps</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>14 Sports Profiles</b> with scholarship info &amp; recruiting timelines</span></div>
           <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Driving Education</b> — license prep, safety, car maintenance, insurance</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Music & Practice Hub</b> — 14 instrument guides, practice timer, session logging</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Music &amp; Practice Hub</b> — 14 instrument guides, practice timer, session logging</span></div>
         </div>
       </div>
       <div>
-        <div style="font-size:.85rem;font-weight:800;color:var(--purple);margin-bottom:.8rem;border-bottom:2px solid var(--purple);padding-bottom:.4rem;">✝️ FAITH & DAILY TOOLS</div>
+        <div style="font-size:.85rem;font-weight:800;color:var(--purple);margin-bottom:.8rem;border-bottom:2px solid var(--purple);padding-bottom:.4rem;">✝️ FAITH &amp; DAILY TOOLS</div>
         <div style="display:flex;flex-direction:column;gap:.5rem;">
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>365 Daily Scriptures</b> with point tracking & streaks</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>30 Daily Devotionals</b> with scripture, reflection & application</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Bible Reading Log</b> — all 66 books with chapters & notes</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>365 Daily Scriptures</b> with point tracking &amp; streaks</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>30 Daily Devotionals</b> with scripture, reflection &amp; application</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Bible Reading Log</b> — all 66 books with chapters &amp; notes</span></div>
           <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Faith Mode Toggle</b> — ON for Bible content, OFF for secular</span></div>
           <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>School Tracker</b> — classes, GPA, assignments, study timer</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Goal Setting & Tracking</b> with completion celebrations</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Journal & Mood Tracker</b> with daily prompts</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Resume Builder & Bio Page</b> with shareable QR code</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Goal Setting &amp; Tracking</b> with completion celebrations</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Journal &amp; Mood Tracker</b> with daily prompts</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Resume Builder &amp; Bio Page</b> with shareable QR code</span></div>
         </div>
       </div>
       <div>
-        <div style="font-size:.85rem;font-weight:800;color:var(--green);margin-bottom:.8rem;border-bottom:2px solid var(--green);padding-bottom:.4rem;">👨‍👩‍👧 PARENT & REWARDS</div>
+        <div style="font-size:.85rem;font-weight:800;color:var(--green);margin-bottom:.8rem;border-bottom:2px solid var(--green);padding-bottom:.4rem;">👨‍👩‍👧 PARENT &amp; REWARDS</div>
         <div style="display:flex;flex-direction:column;gap:.5rem;">
           <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Life Score Dashboard</b> — weighted grade (A+ to F) across 6 dimensions</span></div>
           <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Multi-Child Profiles</b> — separate data per child with PIN protection</span></div>
           <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Parent Bucks Economy</b> — virtual currency, redeemable store</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Spinner & Scratch Cards</b> — reward games earned through achievements</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Spinner &amp; Scratch Cards</b> — reward games earned through achievements</span></div>
           <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Screen Time Manager</b> — earn minutes for games, TV, phone</span></div>
           <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Parent Quiz System</b> — send quizzes based on completed content</span></div>
           <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Activity Audit Trail</b> — timestamped log, anti-cheating controls</span></div>
@@ -362,12 +335,14 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
       <div class="ptab" onclick="showPricing('yearly',this)">Yearly (Save 33%)</div>
       <div class="ptab" onclick="showPricing('lifetime',this)">Lifetime</div>
     </div>
-    <div id="price-monthly" class="price-grid">
+
+    <!-- MONTHLY -->
+    <div id="pg-monthly" class="pg">
       <div class="pc">
         <div class="pc-name" style="color:var(--cyan);">Free</div>
         <div class="pc-price">$0</div>
         <div class="pc-per">forever</div>
-        <ul><li>Core dashboard & habits</li><li>School tracker</li><li>Basic money tools</li><li>Journal & goals</li><li>1 child profile</li></ul>
+        <ul><li>Core dashboard &amp; habits</li><li>School tracker</li><li>Basic money tools</li><li>Journal &amp; goals</li><li>1 child profile</li></ul>
         <a href="register.html" class="btn bo" style="width:100%;">Get Started Free →</a>
       </div>
       <div class="pc pop">
@@ -375,7 +350,7 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
         <div class="pc-price">$9.99</div>
         <div class="pc-per">/month · Full access</div>
         <div class="pc-save">MOST POPULAR</div>
-        <ul><li>All 28 sections unlocked</li><li>Unlimited family members</li><li>Life Skills Academy</li><li>Chores & Rewards</li><li>Parent Hub with Life Score</li><li>Cloud sync across all devices</li></ul>
+        <ul><li>All 28 sections unlocked</li><li>Unlimited family members</li><li>Life Skills Academy</li><li>Chores &amp; Rewards</li><li>Parent Hub with Life Score</li><li>Cloud sync across all devices</li></ul>
         <a href="register.html?plan=monthly" class="btn bp" style="width:100%;">Get Family Access →</a>
       </div>
       <div class="pc">
@@ -387,12 +362,14 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
         <a href="register.html?plan=lifetime" class="btn bp" style="width:100%;">Get Lifetime Access →</a>
       </div>
     </div>
-    <div id="price-yearly" class="price-grid hidden">
+
+    <!-- YEARLY -->
+    <div id="pg-yearly" class="pg hide">
       <div class="pc">
         <div class="pc-name" style="color:var(--cyan);">Free</div>
         <div class="pc-price">$0</div>
         <div class="pc-per">forever</div>
-        <ul><li>Core dashboard & habits</li><li>School tracker</li><li>Basic money tools</li><li>Journal & goals</li><li>1 child profile</li></ul>
+        <ul><li>Core dashboard &amp; habits</li><li>School tracker</li><li>Basic money tools</li><li>Journal &amp; goals</li><li>1 child profile</li></ul>
         <a href="register.html" class="btn bo" style="width:100%;">Get Started Free →</a>
       </div>
       <div class="pc pop">
@@ -412,12 +389,14 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
         <a href="register.html?plan=lifetime" class="btn bp" style="width:100%;">Get Lifetime Access →</a>
       </div>
     </div>
-    <div id="price-lifetime" class="price-grid hidden">
+
+    <!-- LIFETIME TAB -->
+    <div id="pg-lifetime" class="pg hide">
       <div class="pc">
         <div class="pc-name" style="color:var(--cyan);">Free</div>
         <div class="pc-price">$0</div>
         <div class="pc-per">forever</div>
-        <ul><li>Core dashboard & habits</li><li>School tracker</li><li>Basic money tools</li><li>Journal & goals</li><li>1 child profile</li></ul>
+        <ul><li>Core dashboard &amp; habits</li><li>School tracker</li><li>Basic money tools</li><li>Journal &amp; goals</li><li>1 child profile</li></ul>
         <a href="register.html" class="btn bo" style="width:100%;">Get Started Free →</a>
       </div>
       <div class="pc pop">
@@ -432,10 +411,11 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
         <div class="pc-price">$149</div>
         <div class="pc-per">one-time · pay once forever</div>
         <div class="pc-save">NEVER PAY AGAIN</div>
-        <ul><li>Everything unlocked forever</li><li>All future updates free</li><li>Unlimited family members</li><li>Priority support</li></ul>
+        <ul><li>Everything in Monthly, forever</li><li>Unlimited family members — all ages</li><li>All future updates always free</li><li>One payment, no renewals ever</li><li>Priority support</li></ul>
         <a href="register.html?plan=lifetime" class="btn bp" style="width:100%;">Get Lifetime Access →</a>
       </div>
     </div>
+
   </div>
 </section>
 
@@ -495,8 +475,8 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
       <div class="fq"><div class="fq-q" onclick="tFaq(this)">How does the parent dashboard work? <span class="arr">▼</span></div><div class="fq-a"><p>It's PIN-protected inside the app. Parents see a Life Score, behavior logs, chore verification, grade monitor, screen time controls, and weekly reports — without accessing the child's private journal entries.</p></div></div>
       <div class="fq"><div class="fq-q" onclick="tFaq(this)">Is my child's data private? <span class="arr">▼</span></div><div class="fq-a"><p>Yes. Each account is private and encrypted. Your unique URL is yours alone — no one else can access your family's data.</p></div></div>
       <div class="fq"><div class="fq-q" onclick="tFaq(this)">What devices does it work on? <span class="arr">▼</span></div><div class="fq-a"><p>Any device with a browser — phones, tablets, laptops, desktops. No app download required. Just log in from yourlifecc.vercel.app.</p></div></div>
-      <div class="fq"><div class="fq-q" onclick="tFaq(this)">Is this faith-based? <span class="arr">▼</span></div><div class="fq-a"><p>YourLife CC includes an optional Faith & Purpose section with 365 scriptures, 30 devotionals, and Bible content. A Faith Mode toggle lets you turn it ON or OFF. The other 17 categories cover universal life skills for all families.</p></div></div>
-      <div class="fq"><div class="fq-q" onclick="tFaq(this)">What if I'm not satisfied? <span class="arr">▼</span></div><div class="fq-a"><p>30-day money-back guarantee, no questions asked. Email <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="05767075756a7771457c6a7077696c636066662b666a68">[email&#160;protected]</a> and we'll refund you immediately.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">Is this faith-based? <span class="arr">▼</span></div><div class="fq-a"><p>YourLife CC includes an optional Faith &amp; Purpose section with 365 scriptures, 30 devotionals, and Bible content. A Faith Mode toggle lets you turn it ON or OFF. The other 17 categories cover universal life skills for all families.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">What if I'm not satisfied? <span class="arr">▼</span></div><div class="fq-a"><p>30-day money-back guarantee, no questions asked. Email support@yourlifecc.com and we'll refund you immediately.</p></div></div>
     </div>
   </div>
 </section>
@@ -532,7 +512,7 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
         <a href="register.html">Sign Up Free</a>
         <a href="login.html">Sign In</a>
         <a href="#faq">FAQ</a>
-        <a href="/cdn-cgi/l/email-protection#a1d2d4d1d1ced3d5e1d8ced4d3cdc8c7c4c2c28fc2cecc">Contact</a>
+        <a href="mailto:support@yourlifecc.com">Contact</a>
       </div>
       <div class="ft-col">
         <h4>Legal</h4>
@@ -545,19 +525,28 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-function showPricing(type, btn){
-  ['monthly','yearly','lifetime'].forEach(function(t){
-    var el = document.getElementById('price-'+t);
-    if(t === type){ el.classList.remove('hidden'); }
-    else { el.classList.add('hidden'); }
-  });
-  document.querySelectorAll('.ptab').forEach(function(t){t.classList.remove('on');});
+<script>
+function showPricing(type, btn) {
+  document.getElementById('pg-monthly').classList.add('hide');
+  document.getElementById('pg-yearly').classList.add('hide');
+  document.getElementById('pg-lifetime').classList.add('hide');
+  document.getElementById('pg-' + type).classList.remove('hide');
+  document.querySelectorAll('.ptab').forEach(function(t){ t.classList.remove('on'); });
   btn.classList.add('on');
 }
 
-function tFaq(el){
+function tFaq(el) {
   var a = el.nextElementSibling;
   var isOpen = el.classList.contains('on');
   document.querySelectorAll('.fq-q').forEach(function(q){ q.classList.remove('on'); });
-  document.querySelectorAll('.fq-a').forEach(func
+  document.querySelectorAll('.fq-a').forEach(function(x){ x.classList.remove('on'); x.style.maxHeight='0'; x.style.padding='0 1.2rem'; });
+  if (!isOpen) {
+    el.classList.add('on');
+    a.classList.add('on');
+    a.style.maxHeight = a.scrollHeight + 'px';
+    a.style.padding = '0 1.2rem 1rem';
+  }
+}
+</script>
+</body>
+</html>
