@@ -905,7 +905,12 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
   min-width:24px;height:24px;border-radius:7px;background:rgba(255,255,255,.1);
   font-size:.7rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
-.sq-correct{background:rgba(52,211,153,.15)!important;border-color:rgba(52,211,153,.5)!important;color:var(--gr)!important;}
+.sq-correct{background:rgba(52,211,153,.15)!important;border-color:rgba(52,211,153,.5)!important;color:var(--gr)!important;animation:sqCorrectPop .4s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes sqCorrectPop{0%{transform:scale(1)}50%{transform:scale(1.04)}100%{transform:scale(1)}}
+@keyframes cfFadeIn{from{opacity:0;transform:translateY(12px) scale(.95)}to{opacity:1;transform:none}}
+.sk-result-pass{animation:cfFadeIn .5s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes resultBounce{0%{transform:scale(0)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+.sk-result-emoji{animation:resultBounce .6s cubic-bezier(.34,1.56,.64,1) .1s both;}
 .sq-correct .sk-q-opt-letter{background:rgba(52,211,153,.3)!important;color:#fff!important;}
 .sq-wrong{background:rgba(248,113,113,.12)!important;border-color:rgba(248,113,113,.4)!important;color:#fca5a5!important;}
 .sq-wrong .sk-q-opt-letter{background:rgba(248,113,113,.3)!important;color:#fff!important;}
@@ -2167,6 +2172,11 @@ body{top:0!important;}
     <div class="sid-status">
       <span id="svi" style="color:var(--gr);opacity:0;transition:opacity .3s;">✓ Saved</span>
       <span id="syncSt">💾 Local</span>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:.3rem;padding:.25rem 0 .1rem;font-size:.64rem;color:var(--tx3);border-top:1px solid rgba(255,255,255,.05);margin-top:.3rem;">
+      <span style="opacity:.6;">⏱</span>
+      <span id="sessionTimerDisplay" style="font-weight:700;color:var(--tx2);">0s</span>
+      <span style="opacity:.4;">this session</span>
     </div>
 
     </div>
@@ -5550,6 +5560,17 @@ body{top:0!important;}
           <!-- WEEKLY REPORT -->
           <div id="weeklyReportCard" style="margin-bottom:1rem;"></div>
 
+
+          <!-- SESSION TIMER -->
+          <div style="background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.12);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;">
+              <div style="font-size:.6rem;text-transform:uppercase;letter-spacing:2px;color:#38bdf8;font-weight:700;">⏱ SESSION TIME</div>
+              <div style="font-size:1.4rem;font-weight:900;color:var(--tx);" id="phSessionTime">—</div>
+            </div>
+            <div style="font-size:.7rem;color:var(--tx2);margin-bottom:.7rem;">Active time in app this session. Pauses automatically after 1 minute of inactivity.</div>
+            <div style="font-size:.65rem;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:1px;margin-bottom:.4rem;">Recent Sessions</div>
+            <div id="phSessionLog"></div>
+          </div>
           <!-- QUICK NAV TO OTHER TABS -->
           <div style="font-size:.72rem;font-weight:700;color:var(--tx2);margin-bottom:.4rem;">📋 Quick Access</div>
           <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.4rem;margin-bottom:.5rem;">
@@ -6942,7 +6963,7 @@ const STAGE_CONFIG = {
   middle:{
     label:'Middle School',emoji:'🎒',
     sections:['s-hero','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-reading','s-mood','s-chores','s-sports','s-parent'],
-    skillCats:['health','dental','cooking','relationships','faith','mental','emergency','family','digital'],
+    skillCats:['health','dental','cooking','relationships','faith','mental','emergency','family','digital','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
       {name:'Freshman Foundations',icon:'🎒',desc:'Get ready for high school',items:[
@@ -6960,7 +6981,7 @@ const STAGE_CONFIG = {
   fresh:{
     label:'9th Grade',emoji:'📚',
     sections:['s-hero','s-finance','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-reading','s-mentors','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-badges','s-driving','s-sports','s-parent'],
-    skillCats:['health','dental','cooking','car','relationships','faith','mental','emergency','family','digital','civic','credit'],
+    skillCats:['health','dental','cooking','car','relationships','faith','mental','emergency','family','digital','civic','credit','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
       {name:'High School Launch',icon:'🚀',desc:'Own your freshman year',items:[
@@ -6978,7 +6999,7 @@ const STAGE_CONFIG = {
   mid_hs:{
     label:'10th–11th Grade',emoji:'📖',
     sections:['s-hero','s-finance','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-badges','s-driving','s-sports','s-parent'],
-    skillCats:['taxes','car','health','dental','cooking','home','career','credit','relationships','faith','mental','civic','emergency','digital','family','college','adulting'],
+    skillCats:['taxes','car','health','dental','cooking','home','career','credit','relationships','faith','mental','civic','emergency','digital','family','college','adulting','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
       {name:'College & Career Prep',icon:'🎓',desc:'Start planning your future',items:[
@@ -6996,7 +7017,7 @@ const STAGE_CONFIG = {
   senior:{
     label:'Senior Year',emoji:'🎓',
     sections:['s-hero','s-finance','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-badges','s-driving','s-sports','s-parent'],
-    skillCats:['taxes','car','health','dental','cooking','home','career','credit','relationships','faith','mental','civic','emergency','digital','family','college','legal','adulting'],
+    skillCats:['taxes','car','health','dental','cooking','home','career','credit','relationships','faith','mental','civic','emergency','digital','family','college','legal','adulting','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
       {name:'Launch Year',icon:'🚀',desc:'Everything you need before you leave',items:[
@@ -7016,7 +7037,7 @@ const STAGE_CONFIG = {
   college:{
     label:'College',emoji:'🏛️',
     sections:['s-hero','s-finance','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-badges','s-driving','s-sports','s-parent'],
-    skillCats:['taxes','car','health','dental','cooking','home','career','credit','relationships','faith','mental','civic','emergency','digital','family','college','legal','adulting'],
+    skillCats:['taxes','car','health','dental','cooking','home','career','credit','relationships','faith','mental','civic','emergency','digital','family','college','legal','adulting','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
       {name:'College Success',icon:'🏛️',desc:'Thrive in college and prepare for what is next',items:[
@@ -7035,7 +7056,7 @@ const STAGE_CONFIG = {
   adult:{
     label:'Young Adult',emoji:'💼',
     sections:['s-hero','s-finance','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-badges','s-driving','s-sports','s-parent'],
-    skillCats:['taxes','car','health','dental','cooking','home','career','credit','relationships','faith','mental','civic','emergency','digital','family','college','legal','adulting'],
+    skillCats:['taxes','car','health','dental','cooking','home','career','credit','relationships','faith','mental','civic','emergency','digital','family','college','legal','adulting','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
       {name:'Adulting Mastery',icon:'💼',desc:'Own your life like a pro',items:[
@@ -9296,6 +9317,10 @@ const SK_CATS=[
   {icon:'🧹',name:'Cleaning & Home Care',key:'cleaning',color:'#22d3ee'},
   {icon:'⏰',name:'Time Management',key:'timemanage',color:'#f59e0b'},
   {icon:'📋',name:'Organization',key:'organize',color:'#10b981'},
+  {icon:'🛡️',name:'Personal Safety & Self-Defense',key:'safety',color:'#ef4444'},
+  {icon:'📈',name:'Investing & Retirement',key:'investing',color:'#10b981'},
+  {icon:'🏥',name:'Insurance Explained',key:'insurance',color:'#60a5fa'},
+  {icon:'✈️', name:'Travel & World Readiness', key:'travel', color:'#f59e0b'},
 ];
 
 // (Skills data preserved — 100+ lessons)
@@ -11156,7 +11181,547 @@ adulting:[
    b:`<p><b>Schedule your own appointments:</b> Doctor, dentist, eye doctor — you're in charge now. <b>Register to vote</b> when you turn 18. <b>Know your blood type.</b> <b>Learn to cook 5 meals</b> you can rotate. <b>Keep a basic toolkit.</b> <b>Build an emergency fund</b> ($1,000 minimum, then 3 months of expenses). <b>Check your bank account weekly.</b> <b>File your taxes</b> — don't fear them, they're simpler than you think for a single filer. <b>Update your address</b> when you move: bank, employer, DMV, subscriptions, insurance.</p>`},
   {h:'Building Credit From Zero — Your Financial Reputation',
    b:`<p><b>Start at 18:</b> Get a secured credit card ($200-500 deposit). Use it for ONE recurring bill (like gas or a subscription). Pay the FULL balance every month — never carry a balance. <b>After 6-12 months:</b> Your score builds. Apply for a regular card with a small limit. <b>The rules:</b> Never use more than 30% of your limit. Never miss a payment. Never close your oldest card. <b>Why it matters:</b> Your credit score determines your interest rates on everything — car loans, apartments, mortgages, even insurance. Good credit saves you tens of thousands of dollars over your lifetime.</p>`}
-]};
+],
+
+safety:[
+  {
+    h:'Situational Awareness — The Foundation of Personal Safety',
+    b:`<p>Situational awareness is the single most powerful personal safety skill you can develop. It costs nothing, requires no physical strength, and works in every environment.</p>
+<p><strong>Jeff Cooper\'s Color Code:</strong></p>
+<ul>
+  <li><strong>White (unaware):</strong> Head down, headphones in, phone out. Most dangerous state.</li>
+  <li><strong>Yellow (relaxed awareness):</strong> Calm but present. Notice who\'s around you, where exits are. This is the target state for everyday life.</li>
+  <li><strong>Orange (specific alert):</strong> Something caught your attention. You\'re watching it. Making a plan.</li>
+  <li><strong>Red (action):</strong> Threat is real and immediate. Escape, defend, or call for help.</li>
+</ul>
+<p><strong>Daily habits:</strong> When you enter any space, locate the exits. Sit facing the door in restaurants. Keep your phone in your pocket when walking. Don\'t wear both earbuds in public.</p>`,
+    tip:'Most violent incidents have warning signs. Awareness lets you see them and leave before anything happens.',
+    q:[
+      {q:'Which color in Cooper\'s code describes ideal everyday awareness?',a:['White','Yellow','Orange','Red'],c:1,e:'Yellow is relaxed but present — calm awareness without paranoia. White is dangerous; Orange and Red are reactive states.'},
+      {q:'What is the single most dangerous awareness state in everyday life?',a:['Orange','Red','White','Yellow'],c:2,e:'White means you\'re unaware of your surroundings — head down, distracted. This is when people get caught off guard.'},
+      {q:'What should you do first when entering any new space?',a:['Check your phone','Order food or sit down','Locate the exits','Look for familiar faces'],c:2,e:'Knowing your exits is automatic for situationally aware people. It costs nothing and could save your life.'},
+      {q:'Why is wearing both earbuds in public a safety risk?',a:['It\'s rude to others','It kills your battery','It eliminates one of your warning systems — hearing','It can damage your ears'],c:2,e:'Sound is a critical early-warning system. Footsteps behind you, voices, breaking glass — these all reach you through hearing first.'},
+      {q:'Situational awareness is best described as:',a:['Constant fear and suspicion of everyone','Calm observation of your environment without paranoia','Keeping your eyes closed and trusting instincts','Only necessary in dangerous neighborhoods'],c:1,e:'The goal is calm, relaxed observation — not anxiety. You\'re simply present and noticing, which is how humans lived for most of history.'}
+    ]
+  },
+  {
+    h:'Trusting Your Gut — What Fear Is Really Telling You',
+    b:`<p>Your brain processes thousands of environmental signals below your conscious awareness. When something feels wrong — even if you can\'t explain why — that feeling is real data, not irrational anxiety.</p>
+<p><strong>The Gift of Fear (Gavin de Becker\'s research):</strong> Genuine fear is a survival signal. The problem is that most people override it because they don\'t want to seem rude, paranoid, or dramatic.</p>
+<p><strong>Red flags that should make you leave:</strong></p>
+<ul>
+  <li>Someone is ignoring your "no" — a person who won\'t accept a polite refusal is revealing something important about how they view your boundaries</li>
+  <li>Unsolicited help with strings attached — "let me help you with that" followed by asking for something</li>
+  <li>Charm that feels performed or excessive — predators are often unusually charming</li>
+  <li>Trying to isolate you from others or from public spaces</li>
+  <li>Loan sharking — small favors designed to create a sense of obligation</li>
+</ul>
+<p><strong>The override problem:</strong> We override gut feelings to avoid awkwardness. It\'s okay to be rude. It\'s okay to leave. It\'s okay to say "I\'m not interested" and walk away.</p>`,
+    tip:'You don\'t owe anyone an explanation for feeling unsafe. "I have to go" is a complete sentence.',
+    q:[
+      {q:'According to Gavin de Becker, what is genuine fear?',a:['A sign of weakness','Irrational anxiety','A survival signal based on real data','Something to be ignored'],c:2,e:'de Becker\'s research shows fear is the brain\'s rapid-processing system flagging real environmental cues. It deserves attention, not dismissal.'},
+      {q:'Someone keeps offering to help you despite your polite refusals. What does this signal?',a:['They\'re just being kind','They don\'t understand social cues','They are ignoring your "no" — a significant red flag','They need your approval'],c:2,e:'A person who won\'t accept a refusal is showing you they prioritize their agenda over your comfort. This is a key warning sign.'},
+      {q:'What is "loan sharking" in the context of predatory behavior?',a:['Lending money at high rates','Small unsolicited favors designed to create obligation','Asking for money directly','Offering to drive you somewhere'],c:1,e:'Small favors without your request create a psychological sense of debt. Predators use this to manufacture a reason for you to comply with larger asks.'},
+      {q:'Why do most people override genuine fear signals?',a:['They have no survival instincts','Fear is always irrational','They don\'t want to seem rude or paranoid','They\'re trained to ignore feelings'],c:2,e:'Social conditioning to be polite and not overreact causes people to suppress real warning signals. This is the override problem de Becker identifies.'},
+      {q:'Which statement is TRUE about leaving an uncomfortable situation?',a:['You must explain your reason clearly','You owe the other person an apology','You need a good excuse to leave','Leaving without explanation is completely acceptable'],c:3,e:'"I have to go" is a complete sentence. You never owe an explanation to someone who makes you feel unsafe. Your comfort and safety come first.'}
+    ]
+  },
+  {
+    h:'Online Safety & Predator Awareness',
+    b:`<p>The internet didn\'t create predatory behavior — it just gave predators access to more potential victims with less risk of being seen. Understanding how online grooming works is the best protection.</p>
+<p><strong>The 6-stage grooming pattern:</strong></p>
+<ol>
+  <li><strong>Target selection:</strong> Predators target young people who appear lonely, lack parental attention, or post about problems</li>
+  <li><strong>Gaining trust:</strong> Excessive compliments, being "the only one who understands you," gift-giving</li>
+  <li><strong>Filling a need:</strong> Becoming an emotional support, financial help, or source of validation</li>
+  <li><strong>Isolation:</strong> "Don\'t tell your parents — they wouldn\'t understand us"</li>
+  <li><strong>Desensitization:</strong> Gradual introduction of inappropriate topics, testing boundaries</li>
+  <li><strong>Maintaining control:</strong> Secrets, guilt, shame, threats</li>
+</ol>
+<p><strong>Hard rules for online safety:</strong></p>
+<ul>
+  <li>Never share your location, school name, or daily schedule with online contacts</li>
+  <li>Anyone asking you to keep your relationship secret from your family is a red flag — always</li>
+  <li>Screenshots protect you — if someone sends something inappropriate, document it</li>
+  <li>You can block anyone for any reason without explanation</li>
+</ul>`,
+    tip:'Anyone who asks you to keep your relationship secret from your parents is telling you something is wrong.',
+    q:[
+      {q:'What is the first stage of online grooming?',a:['Isolation from family','Target selection','Asking for photos','Building a secret relationship'],c:1,e:'Predators begin by identifying targets — often young people who appear lonely, post about problems, or seem to lack close adult connections.'},
+      {q:'An online contact says "your parents wouldn\'t understand our friendship." This is:',a:['Probably true — parents overreact','A normal boundary to have','A major red flag — isolation tactic','Fine if they\'re only a few years older'],c:2,e:'Asking you to hide the relationship from family is a textbook isolation tactic. Safe relationships don\'t require secrecy from your parents.'},
+      {q:'Someone online you\'ve never met is sending you gifts and saying you\'re special. You should:',a:['Feel grateful — they really like you','Recognize this as a grooming tactic','Send something back to be polite','Meet them to thank them in person'],c:1,e:'Excessive flattery, gifts, and "you\'re special" messaging toward people they\'ve never met is a trust-building grooming tactic, not genuine friendship.'},
+      {q:'What should you do if someone online sends you inappropriate content?',a:['Delete it immediately so no one sees','Reply asking them to stop','Screenshot it for documentation, then report and block','Ignore it and hope it stops'],c:2,e:'Documentation protects you. Screenshot before blocking. Report to the platform and tell a trusted adult. Evidence matters if authorities need to be involved.'},
+      {q:'Which piece of personal information is MOST dangerous to share online?',a:['Your favorite movie','Your first name','Your daily schedule and school name','Your opinion on current events'],c:2,e:'Your location, schedule, and school name allow someone to find you in person. First names and opinions carry far less risk than location-revealing information.'}
+    ]
+  },
+  {
+    h:'What To Do If You\'re Being Followed',
+    b:`<p>Most people don\'t have a plan for this scenario, which means they freeze when it happens. Having a mental plan means you can act immediately instead of standing there panicking.</p>
+<p><strong>If you\'re on foot:</strong></p>
+<ul>
+  <li><strong>The 4-direction test:</strong> Make 4 turns in the same direction (always turning right, for example). If they\'re still behind you after 4 turns, it\'s not coincidence.</li>
+  <li>Enter a busy public place — a store, restaurant, or any business with other people and staff</li>
+  <li>Call someone and describe where you are and what\'s happening out loud — this deters most followers and creates a witness</li>
+  <li>Go to any house and knock — most people will help you. Don\'t worry about being embarrassed.</li>
+  <li>Do NOT go home — you don\'t want someone to know where you live</li>
+</ul>
+<p><strong>If you\'re in a car:</strong></p>
+<ul>
+  <li>Make 4 right turns (driving in a circle). A follower will still be behind you.</li>
+  <li>Drive to a police station, fire station, or busy gas station — do NOT pull over in an isolated area</li>
+  <li>Call 911 while driving — describe your location and the vehicle following you</li>
+  <li>If you\'re cut off and approached, lock doors, keep engine running, and call 911 immediately</li>
+</ul>`,
+    tip:'Never go home if you think you\'re being followed. Lead them to a police station instead.',
+    q:[
+      {q:'The 4-direction test helps you determine if you\'re being followed by:',a:['Walking faster than them','Making 4 turns to see if they follow','Calling a friend','Making eye contact'],c:1,e:'Making 4 deliberate turns (like 4 rights, forming a circle) rules out coincidence. If someone is still behind you after that, they\'re following you intentionally.'},
+      {q:'If you\'re on foot and believe you\'re being followed, where should you go?',a:['Home quickly','A quiet side street','A busy public place with staff','An empty park to hide'],c:2,e:'You want witnesses and people who can help. A store, restaurant, or any business with employees and other customers provides both. Home reveals your address.'},
+      {q:'Why should you NOT go home if you think you\'re being followed?',a:['It\'s too far away','Your family will worry','You don\'t want to reveal where you live','You might be wrong about being followed'],c:2,e:'Leading someone to your home tells them exactly where to find you again. Always divert to a public place first. You can call home from there.'},
+      {q:'If followed in a car and someone cuts you off and approaches your vehicle, you should:',a:['Get out to confront them','Unlock your door to talk through the window','Roll down your window to ask what they want','Lock doors, keep engine running, call 911'],c:3,e:'Your car is a protective barrier. Keep it locked, keep the engine running (option to drive away), and call 911 immediately to create an official record.'},
+      {q:'What is the FIRST thing you should say when calling 911 while being followed?',a:['Your name','Your exact location','A description of the follower','How long you\'ve been followed'],c:1,e:'Location first, always. If the call drops, dispatchers need to know where to send help. Give your location before anything else.'}
+    ]
+  },
+  {
+    h:'Self-Defense Basics — What Actually Works',
+    b:`<p>Self-defense isn\'t about winning a fight. It\'s about creating enough time and distance to escape. You don\'t need strength — you need to hit the right targets.</p>
+<p><strong>The goal is always escape, not victory.</strong></p>
+<p><strong>High-value targets that work regardless of size:</strong></p>
+<ul>
+  <li><strong>Eyes:</strong> Temporary or permanent blindness. Even the threat of it causes flinching. Thumb jab, fingers spread, or any spray.</li>
+  <li><strong>Throat:</strong> Even a moderate strike disrupts breathing. An open palm strike or elbow strike to the throat creates immediate reaction.</li>
+  <li><strong>Groin (if applicable):</strong> Works immediately and creates opening to escape.</li>
+  <li><strong>Knees:</strong> The knee joint only bends one direction. A sharp kick sideways damages it regardless of attacker size.</li>
+  <li><strong>Instep/top of foot:</strong> Effective if grabbed from behind. Stomp hard.</li>
+</ul>
+<p><strong>Wrist grab escape:</strong> Rotate your arm toward the attacker\'s thumb — the weakest point of any grip. This works regardless of strength difference.</p>
+<p><strong>Bear hug escape:</strong> Drop your weight, tuck your chin, rotate, then strike groin or stomp instep.</p>
+<p><strong>Most important rule:</strong> Make noise. Yell "FIRE" or "STOP" — not just screaming. Specific words activate bystanders.</p>`,
+    tip:'You only need 2-3 seconds of distraction to create escape distance. Strike, break grip, run.',
+    q:[
+      {q:'The primary goal of self-defense is to:',a:['Win the fight decisively','Hurt the attacker as much as possible','Create time and distance to escape','Prove you can handle yourself'],c:2,e:'You\'re not trying to win — you\'re trying to escape. A few seconds of disruption is all you need. Get away and call for help.'},
+      {q:'The wrist grab escape works by rotating your arm toward:',a:['The attacker\'s pinky side','The attacker\'s thumb — the weakest grip point','Straight up','Straight down'],c:1,e:'The thumb cannot hold a grip against rotational force. Rotating toward the thumb breaks any wrist grab regardless of how much stronger the attacker is.'},
+      {q:'Why is yelling "FIRE" more effective than just screaming?',a:['It\'s louder','It\'s a specific word that activates bystander response','It confuses the attacker','It signals police specifically'],c:1,e:'Vague screaming often triggers bystander paralysis. Specific words like "FIRE" or "STOP" activate people to respond. Bystanders need to know what\'s happening.'},
+      {q:'Which body target works regardless of the attacker\'s size or strength?',a:['The chest','The shoulders','The eyes or throat','The stomach'],c:2,e:'Eyes and throat are vulnerable regardless of physical size. They don\'t require strength to affect — even moderate pressure or contact causes a significant reaction.'},
+      {q:'If grabbed from behind in a bear hug, your first physical move should be to:',a:['Try to flip them over your shoulder','Drop your weight and tuck your chin','Scream for help only','Try to run immediately'],c:1,e:'Dropping your weight makes you harder to carry or move. Tucking your chin protects your neck. These create the setup for strikes to the instep or groin.'}
+    ]
+  },
+  {
+    h:'Emergency Preparedness — Before Disaster Strikes',
+    b:`<p>Most people are not prepared for 72 hours without power, water, or emergency services. Most disasters last less than 72 hours — but in that window, unprepared people make desperate decisions.</p>
+<p><strong>The 72-hour kit (minimum):</strong></p>
+<ul>
+  <li>Water: 1 gallon per person per day (3 gallons minimum per person)</li>
+  <li>Food: non-perishable, easy to prepare — granola bars, peanut butter, canned goods with a pull tab</li>
+  <li>First aid kit with any prescription medications (2-week supply is better)</li>
+  <li>Flashlight, extra batteries, or hand-crank flashlight</li>
+  <li>Phone charger and portable battery bank</li>
+  <li>Cash in small bills (ATMs go down when power fails)</li>
+  <li>Copies of important documents in a waterproof bag</li>
+</ul>
+<p><strong>Scenario protocols:</strong></p>
+<ul>
+  <li><strong>Tornado:</strong> Lowest floor, interior room, away from windows. A bathroom or closet is better than an open room.</li>
+  <li><strong>Earthquake:</strong> Drop, cover, hold on. Under a sturdy table or against an interior wall. Don\'t run outside during shaking.</li>
+  <li><strong>House fire:</strong> Stay low, feel doors before opening, meet at a designated outdoor location. Never re-enter.</li>
+  <li><strong>Power outage:</strong> Unplug electronics (surge when power returns). Generator use outdoors only — CO2 kills silently.</li>
+</ul>`,
+    tip:'Cash in small bills is one of the most overlooked emergency supplies. ATMs and card readers fail when power does.',
+    q:[
+      {q:'The minimum water supply recommended per person for a 72-hour emergency kit is:',a:['1 gallon total','1 cup per day','1 gallon per person per day','2 liters per week'],c:2,e:'FEMA recommends 1 gallon per person per day for drinking and sanitation. For 3 days, that\'s 3 gallons per person minimum.'},
+      {q:'During an earthquake, the correct response is:',a:['Run outside immediately','Stand in a doorframe','Drop, cover, and hold on under something sturdy','Run to an open field'],c:2,e:'Drop, Cover, Hold On is the scientifically supported protocol. Doorframes offer no special protection. Running outside risks falling debris.'},
+      {q:'Why is cash in small bills considered a critical emergency supply?',a:['Stores prefer cash payments','ATMs and card readers fail during power outages','It\'s easier to carry','Credit cards have fees'],c:1,e:'When power fails, electronic payment systems go down. Small bills let you buy food, fuel, or supplies when digital payments are unavailable.'},
+      {q:'During a house fire, if you must open a door, you should first:',a:['Open it quickly and run','Feel it for heat before opening','Break a window instead','Call 911 first'],c:1,e:'A hot door means fire is on the other side. Opening it would introduce oxygen and potentially engulf you in flames. Always feel doors before opening during a fire.'},
+      {q:'Why must generators always be used outdoors?',a:['They\'re too loud for indoors','They require fresh air intake','They produce carbon monoxide which is odorless and can kill silently','They might overheat'],c:2,e:'Carbon monoxide is invisible and odorless. A generator running indoors can reach lethal levels within minutes. CO poisoning is responsible for many storm-related deaths.'}
+    ]
+  }
+],
+
+investing:[
+  {
+    h:'Why Investing Is the Most Important Financial Skill You\'ll Ever Learn',
+    b:`<p>Most people think investing is for wealthy people or finance professionals. It isn\'t. It\'s for anyone who wants to have more money in the future than they have today.</p>
+<p><strong>The core idea:</strong> Put money to work so it earns more money — without you doing anything additional. This is called compound growth, and it is the closest thing to a financial superpower that exists.</p>
+<p><strong>The Rule of 72:</strong> Divide 72 by your annual return to find how many years it takes to double your money. At 8% return (roughly the S&P 500 average), your money doubles every 9 years.</p>
+<p><strong>Why starting young is everything:</strong></p>
+<ul>
+  <li>$150/month starting at age 16 → approximately $1.7 million by age 65 (at 8% avg return)</li>
+  <li>$150/month starting at age 30 → approximately $440,000 by age 65</li>
+  <li>Same contribution. 14-year head start. $1.26 million difference.</li>
+</ul>
+<p><strong>Why NOT investing is a guaranteed loss:</strong> Inflation runs about 3% per year. Cash in a checking account loses purchasing power every year. Not investing is not "playing it safe" — it\'s a guaranteed slow loss.</p>`,
+    tip:'Time in the market beats timing the market. The best time to start was yesterday. The second best time is today.',
+    q:[
+      {q:'At an 8% annual return, how long does it take to double your money (Rule of 72)?',a:['4 years','6 years','9 years','12 years'],c:2,e:'Rule of 72: divide 72 by the return rate. 72 ÷ 8 = 9 years. This rule works for any interest or return rate estimate.'},
+      {q:'Why is NOT investing often described as a guaranteed slow loss?',a:['The stock market always crashes','Banks charge fees on savings','Inflation erodes purchasing power of cash every year','Taxes take too much of savings'],c:2,e:'Inflation averages ~3%/year. Money sitting in a checking account loses 3% of its purchasing power annually. Not investing means falling behind.'},
+      {q:'Someone starts investing $150/month at 16 vs someone who starts at 30. The main advantage of starting at 16 is:',a:['Lower tax rates','More time for compound growth to work','Better investment options','Lower fund fees'],c:1,e:'Compound growth is exponential, not linear. The extra 14 years don\'t add 14 years of contributions — they create decades of additional growth ON the earlier growth.'},
+      {q:'What does "putting money to work" mean in investing?',a:['Getting a higher-paying job','Spending money on tools that earn income','Deploying capital into assets that grow in value or generate returns','Working more hours'],c:2,e:'Your money "works" when it\'s invested — growing through price appreciation, dividends, or interest. Unlike wages, this doesn\'t require your active time.'},
+      {q:'The best description of compound growth is:',a:['Earning interest only on your original investment','Earning returns on your returns over time, creating exponential growth','Getting a guaranteed return from the government','A type of savings account'],c:1,e:'Compound growth means your earnings generate their own earnings. Year 1 earnings are invested and generate Year 2 earnings, which generate Year 3 earnings — exponentially.'}
+    ]
+  },
+  {
+    h:'Understanding Stocks — Owning a Piece of Real Companies',
+    b:`<p>When you buy stock, you\'re buying a small ownership stake in a real company. If that company grows and becomes more valuable, your stake grows too.</p>
+<p><strong>How stocks make you money:</strong></p>
+<ul>
+  <li><strong>Price appreciation:</strong> The stock price rises as the company becomes more valuable</li>
+  <li><strong>Dividends:</strong> Some companies pay shareholders a portion of profits regularly (like Apple, Coca-Cola, Johnson & Johnson)</li>
+</ul>
+<p><strong>Index funds vs. individual stocks:</strong></p>
+<ul>
+  <li><strong>Individual stocks:</strong> Higher risk, higher potential reward. Requires research. Even professionals mostly fail to beat the market long-term.</li>
+  <li><strong>Index funds:</strong> Buy a tiny piece of 500+ companies at once. When the whole market grows, you grow. Lower fees, lower risk, better average performance than most active traders.</li>
+</ul>
+<p><strong>S&P 500 history:</strong> The index of America\'s 500 largest companies has averaged ~10% annual return over 100 years. There have been crashes — but the long-term trend is always up. Anyone who stayed invested through 2008 and 2020 came out ahead.</p>
+<p><strong>Fractional shares:</strong> You don\'t need $200+ to buy one share of Amazon. Most brokerages now let you buy $5 or $10 worth of any stock.</p>`,
+    tip:'Most professional fund managers fail to beat the S&P 500 index over 10+ years. Simple index investing outperforms complexity.',
+    q:[
+      {q:'When you buy a stock, you are:',a:['Lending money to a company','Buying a small ownership stake in that company','Paying for a guaranteed return','Purchasing a government bond'],c:1,e:'Shareholders are part-owners of the company. If the company grows and becomes more valuable, so does your ownership stake.'},
+      {q:'What is a dividend?',a:['A fee charged by the brokerage','A guaranteed return on investment','A portion of company profits paid to shareholders','A type of bond payment'],c:2,e:'Some profitable companies share earnings with shareholders through regular dividend payments. This creates income even if the stock price doesn\'t move.'},
+      {q:'Why do index funds typically outperform most actively managed funds?',a:['Index funds have famous managers','They own only the best stocks','Lower fees and broad diversification — most active managers can\'t consistently beat the market','The government guarantees their returns'],c:2,e:'Over 10+ years, ~80-90% of active fund managers underperform a simple S&P 500 index fund. Low fees and broad diversification compound into a significant advantage.'},
+      {q:'The S&P 500 represents:',a:['The 500 oldest American companies','America\'s 500 largest publicly traded companies','The top 500 tech companies','Government bonds from 500 states'],c:1,e:'The S&P 500 tracks America\'s 500 largest companies by market cap, spanning every major industry. It\'s the standard benchmark for measuring investment performance.'},
+      {q:'What are fractional shares?',a:['Stocks that have split into smaller pieces','The ability to buy a dollar amount of stock instead of full shares','Shares that have lower dividends','Stocks that can only be sold in portions'],c:1,e:'Fractional shares let you invest any dollar amount — like $10 in Amazon — without needing to afford a full share. This makes investing accessible from day one.'}
+    ]
+  },
+  {
+    h:'Retirement Accounts — Your Greatest Financial Tool',
+    b:`<p>A retirement account isn\'t just a place to save money — it\'s a legal tax shelter that can add hundreds of thousands of dollars to your wealth over a lifetime. Not using one is leaving real money on the table.</p>
+<p><strong>401(k) — Through your employer:</strong></p>
+<ul>
+  <li>Contributions come out of your paycheck before taxes — lowers your taxable income now</li>
+  <li><strong>Employer match is a guaranteed 100% return:</strong> If your employer matches 50% of contributions up to 6% of salary, contributing 6% of your $60K salary means they add $1,800 free. Never leave this uncollected.</li>
+  <li>2024 contribution limit: $23,000 per year</li>
+</ul>
+<p><strong>Roth IRA — Best account for young people:</strong></p>
+<ul>
+  <li>Contribute after-tax money now. All growth is completely tax-free forever.</li>
+  <li>$7,000/year contribution limit (2024)</li>
+  <li>$7,000 at age 18, growing at 8% for 47 years = approximately $243,000 — all tax-free</li>
+  <li>Because you\'re young, your tax rate is likely the lowest it\'ll ever be. Paying taxes now and never again is a great deal.</li>
+</ul>
+<p><strong>The contribution order:</strong></p>
+<ol>
+  <li>401(k) up to the employer match (free money — always first)</li>
+  <li>Max Roth IRA ($7,000/year)</li>
+  <li>Back to 401(k) if you have more to contribute</li>
+</ol>`,
+    tip:'An employer match on a 401(k) is a guaranteed 50-100% instant return on your contribution. It\'s the best investment you\'ll ever make.',
+    q:[
+      {q:'Why is collecting your full 401(k) employer match described as the best investment available?',a:['It grows tax-free forever','It\'s a guaranteed 50-100% instant return on your contribution','It has no contribution limit','It can be withdrawn anytime'],c:1,e:'If your employer matches 50 cents per dollar up to 6% of salary, you\'re getting a guaranteed 50% return on that portion before any market growth. No investment reliably beats that.'},
+      {q:'What makes a Roth IRA especially valuable for young people?',a:['Higher contribution limits than 401(k)','Employer matching contributions','Growth and withdrawals in retirement are completely tax-free, and your tax rate is low now','Government-guaranteed returns'],c:2,e:'Roth accounts are funded with after-tax money. Since young people are usually in lower tax brackets, paying taxes now and never paying again on decades of growth is an excellent deal.'},
+      {q:'What is the correct contribution priority order for retirement accounts?',a:['Roth IRA first, then 401(k)','401(k) to employer match → Roth IRA → more 401(k)','Max both simultaneously','Savings account first, then retirement accounts'],c:1,e:'Always capture free employer match money first (guaranteed return), then max the Roth IRA (tax-free growth), then return to 401(k). This order maximizes every dollar.'},
+      {q:'Traditional 401(k) contributions reduce your taxes because:',a:['The government subsidizes them','They come out pre-tax, lowering your taxable income in the current year','You can deduct them at any age','Employers pay the taxes for you'],c:1,e:'Pre-tax 401(k) contributions reduce your taxable income in the year you contribute. If you\'re in the 22% bracket and contribute $5,000, you save $1,100 in taxes that year.'},
+      {q:'The 2024 annual contribution limit for a Roth IRA is approximately:',a:['$3,000','$7,000','$15,000','$23,000'],c:1,e:'The 2024 Roth IRA limit is $7,000 per year ($8,000 if you\'re 50+). The 401(k) limit is $23,000. Both have income eligibility requirements for the Roth.'}
+    ]
+  },
+  {
+    h:'Mutual Funds, ETFs & The Power of Not Trying to Be Smart',
+    b:`<p>The investment industry spends billions of dollars convincing you that you need their experts to beat the market. The data disagrees. Simple, boring, low-cost index investing outperforms nearly every other strategy over 20+ years.</p>
+<p><strong>Mutual Funds:</strong> A pooled investment vehicle where many investors\' money is combined and managed by a professional who picks stocks. Usually has higher fees (1-2% expense ratio).</p>
+<p><strong>ETFs (Exchange-Traded Funds):</strong> Similar to mutual funds, but traded on the stock exchange like a stock. Usually track an index automatically. Lower fees (0.03-0.20% for index ETFs).</p>
+<p><strong>The fee impact is enormous:</strong></p>
+<ul>
+  <li>$10,000 invested for 30 years at 8% return with 0.05% fee → approximately $99,500</li>
+  <li>$10,000 invested for 30 years at 8% return with 1% fee → approximately $76,100</li>
+  <li>That 0.95% fee difference costs you $23,400 on a single $10,000 investment</li>
+</ul>
+<p><strong>Dollar-Cost Averaging (DCA):</strong> Invest the same amount every month regardless of market conditions. When prices are high, you buy fewer shares. When prices drop, you buy more. Over time, you automatically avoid the mistake of trying to time the market.</p>`,
+    tip:'Lower fees are the only guaranteed return in investing. Every 1% in fees you avoid keeps that 1% compounding for you instead.',
+    q:[
+      {q:'What is the primary advantage of ETFs over traditional mutual funds?',a:['They\'re government guaranteed','They have professional managers who pick stocks','They typically have much lower fees and trade on exchanges like stocks','They pay higher dividends'],c:2,e:'Index ETFs charge as little as 0.03% annually vs 1-2% for actively managed mutual funds. Over decades, this fee difference compounds into a massive wealth gap.'},
+      {q:'Dollar-cost averaging means:',a:['Buying stocks only when prices are low','Investing the same amount on a regular schedule regardless of market conditions','Averaging your gains and losses annually','Using a financial advisor to time markets'],c:1,e:'DCA removes emotion and timing guesswork. You invest consistently regardless of whether markets are up or down. Over time, you naturally buy more when prices are low.'},
+      {q:'On a $10,000 investment over 30 years, a 1% annual fee vs a 0.05% fee costs approximately:',a:['$500','$5,000','$23,000','$50,000'],c:2,e:'Fees compound against you just like returns compound for you. A seemingly small 1% annual fee extracts tens of thousands of dollars from your portfolio over decades.'},
+      {q:'Why do most actively managed mutual funds underperform index funds over 20+ years?',a:['Fund managers invest poorly on purpose','Higher fees and the near-impossibility of consistently predicting markets create a drag on returns','Active funds only hold bonds','They have too many investors'],c:1,e:'After fees (1-2%/year), active managers need to outperform the market by that margin just to match index funds. Over 20 years, roughly 80-90% of active funds fail to do this.'},
+      {q:'An index ETF like VOO or SPY is designed to:',a:['Beat the market every year','Track the performance of an index like the S&P 500','Invest only in tech companies','Guarantee no losses'],c:1,e:'Index ETFs simply mirror an index — they hold the same stocks in the same proportions. No active management, minimal fees, and historically strong long-term returns.'}
+    ]
+  },
+  {
+    h:'Planning for Retirement — The Numbers That Actually Matter',
+    b:`<p>Retirement planning doesn\'t require a financial advisor to understand. It requires knowing a few key numbers and starting early enough for them to work.</p>
+<p><strong>The 4% Rule:</strong> You can withdraw 4% of your portfolio annually in retirement without running out of money over 30 years. This means:</p>
+<ul>
+  <li>If you spend $40,000/year in retirement → you need $1,000,000 saved ($40K ÷ 0.04)</li>
+  <li>If you spend $60,000/year in retirement → you need $1,500,000 saved</li>
+  <li>Your target number = annual expenses × 25</li>
+</ul>
+<p><strong>Monthly contributions needed by starting age (to reach $1M at 65, assuming 8% return):</strong></p>
+<ul>
+  <li>Start at 20: ~$200/month</li>
+  <li>Start at 25: ~$300/month</li>
+  <li>Start at 30: ~$435/month</li>
+  <li>Start at 35: ~$670/month</li>
+  <li>Start at 40: ~$1,050/month</li>
+</ul>
+<p><strong>Social Security is not a retirement plan:</strong> The average Social Security benefit is approximately $1,900/month. Most Americans need significantly more. Treat it as a bonus, not a strategy.</p>
+<p><strong>The 15-20% rule:</strong> Save 15-20% of gross income for retirement throughout your working life. Automate it so it happens before you can spend it.</p>`,
+    tip:'Your target retirement number is your annual expenses multiplied by 25. That\'s it. That\'s the math.',
+    q:[
+      {q:'Using the 4% rule, how much do you need saved if you plan to spend $50,000 per year in retirement?',a:['$500,000','$750,000','$1,250,000','$2,000,000'],c:2,e:'4% rule: target = annual expenses ÷ 0.04 = annual expenses × 25. $50,000 × 25 = $1,250,000. This amount, withdrawn at 4% annually, historically lasts 30+ years.'},
+      {q:'How much MORE does waiting from age 20 to age 30 cost you per month to still reach $1M by 65?',a:['About $50 more','About $100 more','About $235 more','About $850 more'],c:2,e:'Starting at 20 requires ~$200/month. Starting at 30 requires ~$435/month — about $235 more monthly to reach the same goal. That\'s the real cost of a 10-year delay.'},
+      {q:'The standard recommendation for retirement savings as a percentage of gross income is:',a:['5%','10%','15-20%','25-30%'],c:2,e:'Most financial planners recommend 15-20% of gross income for retirement savings throughout your working years. Automating this ensures it happens before lifestyle inflation sets in.'},
+      {q:'Social Security should be treated as:',a:['Your primary retirement income source','A guaranteed supplement to personal retirement savings','The only retirement planning you need','Something only poor people rely on'],c:1,e:'Average Social Security benefit is ~$1,900/month — not enough for most people. It\'s a supplement to personal savings, not a complete retirement plan. Never rely on it alone.'},
+      {q:'The formula for calculating your personal retirement target number is:',a:['Current savings × 10','Annual income × 15','Annual expenses × 25','Monthly expenses × 300'],c:2,e:'Annual expenses × 25 gives you the portfolio size from which you can safely withdraw 4% annually. This is the standard application of the 4% rule.'}
+    ]
+  }
+],
+
+insurance:[
+  {
+    h:'Health Insurance — The System You Must Understand to Survive Adulthood',
+    b:`<p>Health insurance is one of the most complex and expensive systems you\'ll navigate as an adult. Most people don\'t understand it until they get a $4,000 bill they weren\'t expecting.</p>
+<p><strong>The key terms:</strong></p>
+<ul>
+  <li><strong>Premium:</strong> What you pay monthly just to have the insurance (whether or not you use it)</li>
+  <li><strong>Deductible:</strong> What you pay out-of-pocket before insurance starts paying. A $2,000 deductible means you pay the first $2,000 of costs yourself.</li>
+  <li><strong>Copay:</strong> A fixed amount you pay per visit (e.g., $30 per doctor visit)</li>
+  <li><strong>Coinsurance:</strong> After your deductible, you and insurance split costs — e.g., you pay 20%, insurance pays 80%</li>
+  <li><strong>Out-of-pocket maximum:</strong> The most you\'ll pay in a year. After this, insurance covers 100%.</li>
+</ul>
+<p><strong>HMO vs PPO vs HDHP:</strong></p>
+<ul>
+  <li><strong>HMO:</strong> Must use network providers and get referrals. Lower premiums.</li>
+  <li><strong>PPO:</strong> More flexibility to see any doctor. Higher premiums.</li>
+  <li><strong>HDHP (High Deductible):</strong> Lower premiums, high deductible. Best paired with an HSA.</li>
+</ul>
+<p><strong>HSA (Health Savings Account):</strong> Available with HDHPs. Triple tax advantage — contributions tax-free, growth tax-free, withdrawals for medical expenses tax-free. Unspent money rolls over forever.</p>
+<p><strong>Stay on your parent\'s plan until 26.</strong> Under the ACA, you can remain on a parent\'s health insurance until your 26th birthday. Almost always cheaper than your own plan.</p>`,
+    tip:'Always understand your out-of-pocket maximum before choosing a plan. That\'s the worst-case number you need to be prepared for.',
+    q:[
+      {q:'What is a health insurance deductible?',a:['The monthly premium you pay','The total cost of all your medical care','The amount you pay out-of-pocket before insurance begins covering costs','The maximum you\'ll ever pay in a year'],c:2,e:'The deductible is the threshold you must pay before insurance kicks in. A $3,000 deductible means the first $3,000 of medical costs each year are entirely your responsibility.'},
+      {q:'Until what age can you stay on a parent\'s health insurance plan under the ACA?',a:['21','23','25','26'],c:3,e:'The Affordable Care Act requires insurers to allow adult children to remain on a parent\'s plan until age 26. This is almost always the cheapest option for young adults.'},
+      {q:'An HSA (Health Savings Account) has which major tax advantage?',a:['You pay no taxes ever on any investments','Contributions, growth, and qualified medical withdrawals are all tax-free','Only contributions are tax-free','The government matches your contributions'],c:1,e:'The HSA is the only account with triple tax benefits: pre-tax contributions, tax-free growth, and tax-free withdrawals for medical costs. Unused funds roll over and can invest.'},
+      {q:'What does your out-of-pocket maximum represent?',a:['Your monthly premium','The most you will pay in medical costs in a year — after this insurance covers 100%','Your annual deductible','The maximum insurance will pay'],c:1,e:'The OOP maximum caps your annual exposure. After reaching it, your insurance covers 100% of covered services. This is the worst-case number for any given year.'},
+      {q:'Which insurance plan type typically offers the lowest monthly premium?',a:['PPO','HMO','HDHP (High Deductible)','Any plan with an HSA'],c:2,e:'HDHPs have the lowest premiums because you accept higher out-of-pocket costs before coverage kicks in. This trade-off works well for healthy young people with emergency savings.'}
+    ]
+  },
+  {
+    h:'Car Insurance — What You\'re Actually Required to Have',
+    b:`<p>Car insurance is legally required in almost every state. But "legally required" and "adequately protected" are very different things. Understanding what each coverage type does could save you tens of thousands of dollars.</p>
+<p><strong>The 6 coverage types:</strong></p>
+<ul>
+  <li><strong>Liability:</strong> Pays for damage you cause to OTHER people and their property. This is what\'s legally required. Low minimums are dangerously insufficient.</li>
+  <li><strong>Collision:</strong> Pays for damage to YOUR car from a collision, regardless of who\'s at fault</li>
+  <li><strong>Comprehensive:</strong> Pays for non-collision damage to your car — theft, weather, animals, falling objects</li>
+  <li><strong>Uninsured/Underinsured Motorist:</strong> Protects you when the at-fault driver has no insurance or insufficient coverage</li>
+  <li><strong>Medical Payments/PIP:</strong> Covers medical bills for you and passengers regardless of fault</li>
+  <li><strong>Gap Insurance:</strong> Covers the difference between what you owe on a car loan and the car\'s actual value after an accident</li>
+</ul>
+<p><strong>Teen premium reality:</strong> A 16-year-old added to a parent\'s policy typically adds $1,500-$2,500 per year. Your own policy could be $3,000-$6,000 annually.</p>
+<p><strong>Good student discount:</strong> Most insurers offer 5-25% discounts for maintaining a B average or above. This is thousands of dollars — keep your grades up.</p>`,
+    tip:'State minimum liability is almost always dangerously low. If you cause an accident and exceed those limits, you\'re personally liable for the rest.',
+    q:[
+      {q:'Which type of car insurance coverage is legally required in almost every state?',a:['Collision','Comprehensive','Liability','Gap insurance'],c:2,e:'Liability insurance is mandatory because it protects OTHER people from damage you cause. Collision and comprehensive protect your own car and are optional (unless required by a lender).'},
+      {q:'Gap insurance covers:',a:['Damage to other vehicles','Medical bills for your passengers','The difference between your loan balance and the car\'s market value after a total loss','Accidents that aren\'t your fault'],c:2,e:'If you owe $25,000 on a car loan but your totaled car is only worth $18,000, gap insurance covers that $7,000 difference. Without it, you\'d pay it out of pocket while having no car.'},
+      {q:'Why is state minimum liability coverage considered dangerous?',a:['It costs too much','It only covers the other driver, not you','Minimums are often far below the cost of a serious accident — you\'re personally liable for the excess','It doesn\'t cover property damage'],c:2,e:'Many state minimums are $25,000-$50,000 for bodily injury. A serious accident can cost $200,000+. You\'re personally responsible for anything above your coverage limit.'},
+      {q:'What does uninsured motorist coverage protect you from?',a:['Your own medical bills from any cause','Accidents where the at-fault driver has no or insufficient insurance','Theft of your vehicle','Weather-related damage'],c:1,e:'About 1 in 8 drivers is uninsured. If an uninsured driver hits you, your UM coverage pays for your damages and medical bills — otherwise you could be left with no compensation.'},
+      {q:'A good student discount on car insurance is available because:',a:['Students drive less','Insurers are legally required to offer it','Statistics show students with good grades are lower-risk drivers','Schools negotiate rates on behalf of students'],c:2,e:'Actuarial data shows students with strong grades tend to be more responsible drivers. Most major insurers offer 5-25% discounts for a B average or above — worth thousands annually.'}
+    ]
+  },
+  {
+    h:'Life Insurance — Who Needs It and What to Actually Buy',
+    b:`<p>Life insurance is one of the most misunderstood financial products, and the insurance industry profits from that confusion. Here\'s the clear version.</p>
+<p><strong>What life insurance actually does:</strong> It pays a lump sum to your beneficiaries when you die. The question is: who depends on your income?</p>
+<p><strong>Who needs life insurance:</strong></p>
+<ul>
+  <li>Anyone whose death would leave dependents without income (spouse, children, parents who depend on you)</li>
+  <li>Anyone with significant debt that would pass to a cosigner</li>
+</ul>
+<p><strong>Who probably doesn\'t need it yet:</strong> Single young adults with no dependents and no cosigned debt.</p>
+<p><strong>Term vs. Whole Life:</strong></p>
+<ul>
+  <li><strong>Term life:</strong> Coverage for a specific period (10, 20, 30 years). Pure death benefit. Cheap. $500,000 of coverage for a healthy 30-year-old: ~$25-35/month.</li>
+  <li><strong>Whole life:</strong> Permanent coverage with a cash value component. Much more expensive (5-10x). The investment component underperforms simple investing.</li>
+</ul>
+<p><strong>The expert consensus:</strong> Buy term and invest the difference. A $500,000 term policy at $30/month vs. whole life at $250/month — the $220 monthly difference invested in an index fund will almost always outperform the whole life cash value.</p>
+<p><strong>How much coverage:</strong> A common guideline is 10-12 times your annual income.</p>`,
+    tip:'If an insurance agent pushes hard on whole life, ask them to show you the internal rate of return. It\'s almost never competitive with simple index fund investing.',
+    q:[
+      {q:'Who most clearly NEEDS life insurance?',a:['All young adults as soon as they turn 18','A single 22-year-old with no dependents and no debt','A parent with a spouse and two children who depend on their income','Someone who already has significant savings'],c:2,e:'Life insurance exists to replace income that dependents rely on. A parent with a family depending on their paycheck has the clearest need. Single adults with no dependents rarely do.'},
+      {q:'The "buy term and invest the difference" strategy means:',a:['Invest in term life funds','Buy cheap term coverage and invest the premium savings from not buying expensive whole life','Buy both term and whole life','Invest only in insurance companies'],c:1,e:'Term insurance is 5-10x cheaper than whole life. The monthly savings, invested in index funds, typically generate more wealth than whole life\'s cash value component over the same period.'},
+      {q:'A standard guideline for how much life insurance coverage to purchase is:',a:['$1 million regardless of income','5 times your annual income','10-12 times your annual income','Enough to cover your mortgage only'],c:2,e:'10-12x annual income gives dependents enough to replace your earnings for a decade or more while invested assets grow. This gives surviving family time to adjust financially.'},
+      {q:'What is the main criticism of whole life insurance as an investment?',a:['It has no death benefit','The coverage expires after 20 years','The investment component\'s returns are consistently outperformed by simple index fund investing','It\'s only available to wealthy people'],c:2,e:'Whole life cash value grows slowly, fees are high, and the internal rate of return typically ranges from 1-4%. An S&P 500 index fund has averaged ~10% annually over decades.'},
+      {q:'A $500,000 term life policy for a healthy 30-year-old typically costs approximately:',a:['$5-10 per month','$25-35 per month','$100-150 per month','$250-400 per month'],c:1,e:'Term life is genuinely affordable for young healthy people. $25-35/month for $500K in coverage is common. This is why term is the recommended choice for pure protection needs.'}
+    ]
+  },
+  {
+    h:'Dental & Vision Insurance — Use Your Benefits Before You Lose Them',
+    b:`<p>Dental and vision insurance work differently from health insurance — and most people don\'t use them correctly, leaving hundreds or thousands of dollars of benefits unused every year.</p>
+<p><strong>How dental insurance actually works:</strong></p>
+<ul>
+  <li>Most plans cover preventive care (cleanings, X-rays) at 100%</li>
+  <li>Basic restorative (fillings) typically at 80%</li>
+  <li>Major work (crowns, root canals) typically at 50%</li>
+  <li><strong>Annual maximum:</strong> Most plans cap total coverage at $1,000-$2,000/year. Unlike health insurance, you lose unused benefits — they don\'t roll over.</li>
+</ul>
+<p><strong>The math on dental insurance:</strong></p>
+<ul>
+  <li>Annual premium: ~$250-400</li>
+  <li>Two cleanings per year: ~$200-300 each without insurance → $400-600 value</li>
+  <li>Two cleanings alone often covers the premium. Early cavity detection prevents $800-3,000 root canals.</li>
+</ul>
+<p><strong>How vision insurance works:</strong></p>
+<ul>
+  <li>Typically covers one eye exam per year (worth $100-200)</li>
+  <li>Allowance toward frames/contacts (usually $150-200 credit)</li>
+  <li>Premium is usually $15-25/month — use your exam and allowance and it almost always pays for itself</li>
+</ul>
+<p><strong>Critical rule:</strong> Use your dental and vision benefits every single year. They reset annually, and any unused value is simply gone.</p>`,
+    tip:'Your annual dental cleanings cost the insurer money — it\'s the insurer\'s financial incentive to keep you from needing expensive work. Use them every year.',
+    q:[
+      {q:'What happens to unused dental insurance benefits at the end of the year?',a:['They roll over to next year','They accumulate into a larger benefit','They are permanently lost — dental benefits reset annually','They can be converted to cash'],c:2,e:'Unlike FSA funds or HSA balances, standard dental insurance benefits don\'t roll over. Your annual maximum resets, and any unused portion simply disappears.'},
+      {q:'Most dental plans cover preventive care (cleanings and X-rays) at what percentage?',a:['50%','70%','80%','100%'],c:3,e:'Preventive care is typically covered at 100% because insurers benefit from catching problems early. A $300 cleaning prevents $3,000 root canals — it\'s in their financial interest too.'},
+      {q:'The annual maximum on most dental plans ($1,000-$2,000) means:',a:['You must pay the first $1,000-$2,000','The plan covers a maximum of $1,000-$2,000 in benefits per year','You can only visit the dentist $1,000-$2,000 worth of times','Your premium cannot exceed this amount'],c:1,e:'The annual maximum is the ceiling on what your insurance will pay out in a year. After that limit, you pay 100% of additional costs. Health insurance works the opposite way (OOP maximum).'},
+      {q:'Vision insurance typically covers:',a:['Laser eye surgery at no cost','One eye exam per year plus a frame/contact lens allowance','Unlimited eye exams','All prescription eyewear at 100%'],c:1,e:'Standard vision plans cover one annual exam and provide an allowance ($150-200) toward glasses or contacts. Premiums are low enough that using both benefits almost always covers the cost.'},
+      {q:'Why do two dental cleanings per year matter even beyond insurance?',a:['They whiten your teeth','They prevent bad breath only','They catch problems early, preventing expensive procedures that far exceed your annual premiums','Dentists are legally required to see you twice yearly'],c:2,e:'Early cavity detection means a $150 filling instead of an $1,800 root canal. Gum disease caught early prevents $3,000-$8,000 periodontal treatment. Prevention returns 10x or more in savings.'}
+    ]
+  }
+],
+
+travel:[
+  {
+    h:'Passports, Visas & ID — The Documents That Let You Travel',
+    b:`<p>Running out of passport pages, applying too late, or not knowing you need a visa are among the most common — and most preventable — travel disasters. Document preparation is the foundation of every international trip.</p>
+<p><strong>US Passport basics:</strong></p>
+<ul>
+  <li>Valid for 10 years (adults) or 5 years (under 16)</li>
+  <li>Apply 6+ months before travel — processing currently takes 6-12 weeks routine, 2-3 weeks expedited ($60 extra)</li>
+  <li>Many countries require 6 months of validity beyond your travel dates — a "valid" passport expiring in 3 months may still be refused</li>
+  <li>Cost: ~$165 for new passport (application + execution fee)</li>
+</ul>
+<p><strong>Visas:</strong></p>
+<ul>
+  <li>A visa is permission from another country to enter. Without it, you can be turned back at the border or denied boarding.</li>
+  <li>US citizens get visa-free or visa-on-arrival access to 180+ countries, but some popular destinations (China, Russia, India, Brazil, Saudi Arabia) require advance visas</li>
+  <li>Always check requirements at travel.state.gov — requirements change</li>
+  <li>Some visas take weeks or months to process. Apply early.</li>
+</ul>
+<p><strong>Real ID & Domestic travel:</strong></p>
+<ul>
+  <li>Starting May 2025, a Real ID-compliant driver\'s license (or passport) is required for domestic flights</li>
+  <li>Check for the star in the upper corner of your license</li>
+</ul>`,
+    tip:'Check your passport expiration date and the 6-month rule for your destination before booking any international trip. Rebooking fees cost far more than a passport renewal.',
+    q:[
+      {q:'How many months of passport validity do most countries require beyond your travel dates?',a:['1 month','3 months','6 months','12 months'],c:2,e:'Many countries require 6 months of passport validity beyond your intended stay. A passport expiring 3 months after your trip may result in being denied boarding or entry.'},
+      {q:'What is a visa?',a:['A type of credit card for travelers','Permission granted by a country for you to enter','Your passport photo page','Travel insurance documentation'],c:1,e:'A visa is official permission from a foreign government to enter their country. Without the required visa, you can be denied boarding before you even board the plane.'},
+      {q:'Where should you verify current visa requirements for international travel?',a:['The destination country\'s tourism website','Your airline\'s website','travel.state.gov — the official US State Department resource','A travel blog or social media post'],c:2,e:'travel.state.gov is the official, accurate, and current source for US passport holders. Travel blogs and tourism sites may be outdated. Requirements change with diplomatic relationships.'},
+      {q:'The Real ID requirement (starting May 2025) affects:',a:['International travel only','Passports renewals','Domestic US flights — non-compliant IDs won\'t be accepted at airport security','All government building access'],c:2,e:'Real ID-compliant licenses have a star in the upper corner. Without one (or a passport), you\'ll be denied through TSA security for domestic flights starting May 2025.'},
+      {q:'Standard US passport processing currently takes approximately:',a:['1-2 weeks','2-4 weeks','6-12 weeks (routine)','6 months minimum'],c:2,e:'Routine processing currently takes 6-12 weeks. Expedited service costs $60 extra and takes 2-3 weeks. Apply 6+ months before your trip to avoid paying rush fees or missing travel.'}
+    ]
+  },
+  {
+    h:'Travel Safety & Situational Awareness Abroad',
+    b:`<p>Most travel is safe. But being in an unfamiliar place where you don\'t speak the language and can\'t read signs creates vulnerability that smart preparation eliminates.</p>
+<p><strong>Before you leave:</strong></p>
+<ul>
+  <li>Register your trip at step.state.gov (Smart Traveler Enrollment Program) — free, takes 5 minutes, allows the embassy to contact you in emergencies</li>
+  <li>Know the local emergency number (not always 911 — it\'s 112 in Europe, 999 in UK, 110 in Japan for police)</li>
+  <li>Save your country\'s embassy address and phone number in your phone</li>
+  <li>Share your itinerary with someone at home including accommodation addresses</li>
+</ul>
+<p><strong>On the ground:</strong></p>
+<ul>
+  <li>Use hotel safes for passports — carry a color photocopy instead day-to-day</li>
+  <li>Keep one credit card and some cash in a separate location from your wallet</li>
+  <li>Look up your destination on travel.state.gov for current advisories before you go</li>
+  <li>Download offline maps (Google Maps works offline when downloaded in advance)</li>
+  <li>Avoid walking with your phone out in unfamiliar areas — phone theft is among the most common crimes against tourists</li>
+</ul>
+<p><strong>Common tourist scams:</strong></p>
+<ul>
+  <li>The "friendship bracelet" — someone puts it on your wrist then demands payment</li>
+  <li>Fake police officers asking to inspect your wallet</li>
+  <li>Taxi drivers "meters are broken" and quote outrageous fares</li>
+  <li>Distractions designed to draw your attention while an accomplice reaches for your bag</li>
+</ul>`,
+    tip:'A color photocopy of your passport stored separately from the original is invaluable if your passport is lost or stolen. It speeds up emergency replacement significantly.',
+    q:[
+      {q:'What is the STEP program (step.state.gov) and why should you register?',a:['A travel rewards program','A flight tracking service','Smart Traveler Enrollment — allows the US embassy to contact you in emergencies abroad','A visa application system'],c:2,e:'STEP is free and takes 5 minutes. In a natural disaster, civil unrest, or family emergency abroad, the embassy can reach you directly. It\'s one of the highest-value pre-trip steps you can take.'},
+      {q:'What is the emergency number in most of Europe?',a:['911','999','112','110'],c:2,e:'112 is the standard emergency number across the EU. 999 is the UK. 911 only works in North America. Knowing the local emergency number before you need it could save your life.'},
+      {q:'Why should you carry a photocopy of your passport instead of the original when sightseeing?',a:['The photocopy is legally accepted everywhere','Originals get damaged in humidity','If stolen or lost, a photocopy speeds up emergency replacement significantly','Originals are too heavy to carry'],c:2,e:'Your original passport is irreplaceable abroad. A photocopy keeps the original safe in the hotel safe while giving you ID documentation. Emergency passport replacement is much faster with a photocopy.'},
+      {q:'Someone in a popular tourist area approaches you and ties a bracelet on your wrist. You should:',a:['Accept it as a cultural gesture','Buy something from them out of politeness','Recognize it as a common scam and firmly decline before it\'s on your wrist','Report them to police immediately'],c:2,e:'The friendship bracelet scam works by creating a sense of obligation once the bracelet is on. The solution is to physically prevent it from being placed. "No thank you" while stepping back is effective.'},
+      {q:'Before traveling internationally, you should download offline maps because:',a:['Roaming charges make online maps expensive','Foreign maps aren\'t available online','In areas without reliable data or Wi-Fi, offline maps work without any connection','GPS doesn\'t work internationally'],c:0,e:'International roaming data can be expensive, and you\'ll often be in areas with poor connectivity. Google Maps allows you to download entire regions in advance for offline use.'}
+    ]
+  },
+  {
+    h:'Money Abroad — Currency, Cards & Not Getting Ripped Off',
+    b:`<p>Currency confusion and bad exchange rates are among the most expensive travel mistakes. Understanding how money moves internationally saves you real money on every trip.</p>
+<p><strong>Currency exchange — ranked worst to best:</strong></p>
+<ol>
+  <li><strong>Airport exchange kiosks:</strong> Worst rates. Markups of 10-15%. Use only in emergencies for a small amount.</li>
+  <li><strong>Hotel exchange desks:</strong> Slightly better but still poor rates.</li>
+  <li><strong>Local ATMs:</strong> Generally best rates — they use the real interbank exchange rate. Use your bank\'s network or one that reimburses ATM fees.</li>
+  <li><strong>Credit cards with no foreign transaction fees:</strong> Best for purchases. Cards like Chase Sapphire, Capital One, and Schwab debit give real exchange rates with zero markup.</li>
+</ol>
+<p><strong>Foreign transaction fees:</strong> Many US credit/debit cards charge 1-3% on every international purchase. On a $3,000 trip, that\'s $30-90 in invisible fees. Get a no-foreign-transaction-fee card before traveling.</p>
+<p><strong>Dynamic Currency Conversion (DCA) scam:</strong> When a merchant abroad asks "Would you like to pay in US Dollars or local currency?" — always choose LOCAL currency. Paying in USD at the point of sale lets the merchant apply their own (terrible) exchange rate.</p>
+<p><strong>Always carry some local cash:</strong> Small businesses, markets, street food, and taxis often don\'t accept cards. Have $50-100 equivalent in local currency at all times.</p>`,
+    tip:'When asked "pay in dollars or local currency?" abroad, always choose local currency. Choosing dollars gives the merchant control over the exchange rate — and they\'ll use a bad one.',
+    q:[
+      {q:'What is generally the BEST way to get local currency when traveling internationally?',a:['Airport exchange kiosks','Traveler\'s checks','Local ATMs using your bank card','Hotel exchange desks'],c:2,e:'Local ATMs use real interbank exchange rates — the best available rate. Airport kiosks apply 10-15% markups. Always use a bank card that reimburses or waives international ATM fees.'},
+      {q:'Dynamic Currency Conversion means:',a:['Your bank converts currency automatically','The merchant offers to charge you in your home currency, applying their own exchange rate','A fee for using foreign ATMs','Currency that changes value daily'],c:1,e:'DCA lets merchants apply their own exchange rate when you pay in your home currency. Their rate is always worse than your card\'s rate. Always choose to pay in local currency.'},
+      {q:'A foreign transaction fee of 3% on a $3,000 international trip costs you:',a:['$3','$30','$90','$300'],c:2,e:'3% × $3,000 = $90. This fee is invisible — it appears as a slightly different exchange rate, not a labeled charge. Using a no-foreign-transaction-fee card eliminates this entirely.'},
+      {q:'Why should you always carry some local cash when traveling internationally?',a:['Credit cards don\'t work internationally','Cash gets better exchange rates than cards','Many small businesses, markets, and taxis don\'t accept cards','ATMs aren\'t available outside major cities'],c:2,e:'Street food, local markets, small restaurants, and many taxis are cash-only worldwide. Running out of local cash in a remote area can leave you unable to pay for food or transportation.'},
+      {q:'Airport currency exchange kiosks should be used:',a:['For all currency needs — they\'re most convenient','Never under any circumstances','Only in emergencies for a small amount to cover immediate needs','They offer the best exchange rates'],c:2,e:'Airport kiosks offer the worst rates (10-15% markup) but are sometimes the only option on arrival. Use them for a minimal amount to get to your hotel or ATM, then get cash from a local ATM.'}
+    ]
+  },
+  {
+    h:'Packing Smart & Travel Health',
+    b:`<p>How you pack determines how miserable or comfortable your trip is. And being sick abroad — without knowing the healthcare system, the language, or your coverage — is one of the most stressful travel experiences possible.</p>
+<p><strong>The carry-on rule:</strong> Never check anything you can\'t afford to lose or wait 3 days to get. Airlines lose and delay bags routinely. Pack essentials (medications, valuables, one outfit) in your carry-on no matter what.</p>
+<p><strong>Packing principles:</strong></p>
+<ul>
+  <li><strong>Pack half, bring double the money:</strong> You\'ll buy things. You\'ll need less clothing than you think.</li>
+  <li><strong>Wear your heaviest items on the plane</strong> — shoes, jackets, jeans</li>
+  <li><strong>Roll, don\'t fold</strong> — more fits, less wrinkling</li>
+  <li><strong>A packing cube system</strong> separates categories and compresses clothing</li>
+  <li><strong>Power adapters:</strong> Different regions use different outlet types. Europe is Type C/E, UK is Type G, Australia is Type I.</li>
+</ul>
+<p><strong>Travel health essentials:</strong></p>
+<ul>
+  <li>Check CDC.gov for destination-specific vaccine recommendations — some are required, some strongly advised</li>
+  <li>Prescription medications: bring more than you need, keep in original packaging, carry in hand luggage</li>
+  <li><strong>Travel insurance:</strong> Costs $50-200 and covers trip cancellation, medical evacuation ($25,000-$100,000+ events), and lost luggage. Medical evacuation alone can cost $50,000-$200,000 without coverage.</li>
+  <li>Notify your bank before traveling internationally — otherwise they may freeze your card for suspected fraud</li>
+</ul>`,
+    tip:'Medical evacuation from a remote international destination can cost $50,000-$200,000. Travel insurance that covers this costs $50-200. It\'s one of the clearest value propositions in insurance.',
+    q:[
+      {q:'What is the most important reason to pack essential items in your carry-on?',a:['Carry-ons are free; checked bags cost money','Airlines lose and delay checked bags — you cannot afford to be without medications or valuables','Security checks carry-ons less thoroughly','Carry-ons arrive faster at the destination'],c:1,e:'Checked bag delays and losses are common. Medications, valuables, travel documents, and one set of clothes in your carry-on ensure you can function even if your checked bag is lost for days.'},
+      {q:'Before traveling internationally, you should notify your bank because:',a:['They need to update your address','International purchases may trigger fraud alerts and freeze your card','They charge less for international transactions when notified','It\'s legally required'],c:1,e:'Banks\' fraud detection flags unusual international transactions. A frozen card abroad is a serious problem. A 5-minute call or app notification before departure prevents this.'},
+      {q:'Travel insurance is especially valuable for covering:',a:['Normal medical care at your destination','Lost phone replacement','Medical evacuation — which can cost $50,000-$200,000 without coverage','Lost souvenirs'],c:2,e:'Repatriation and medical evacuation costs are catastrophic without insurance. A helicopter evacuation from a remote area or a medical flight home can cost six figures. Travel insurance covering this costs $50-200.'},
+      {q:'For international destination-specific vaccine requirements and recommendations, you should check:',a:['The airline\'s website','Your travel agent','cdc.gov — the CDC\'s official travel health resource','The destination country\'s embassy'],c:2,e:'CDC.gov maintains current vaccine requirements and recommendations by destination. Some are legally required for entry (yellow fever in certain countries); others are strongly advised for your safety.'},
+      {q:'Which outlet type is used in most of continental Europe?',a:['Type A (US standard)','Type G (UK)','Type C/E (continental Europe)','Type I (Australia)'],c:2,e:'Continental Europe uses Type C/E outlets. UK uses Type G (the 3-rectangular-pin plug). Australia and New Zealand use Type I. A universal adapter covers all types and is worth buying before departure.'}
+    ]
+  },
+  {
+    h:'Travel Budgeting & Booking Smart',
+    b:`<p>Travel doesn\'t have to be expensive. How you book, when you book, and how you structure your budget determines whether travel enriches your life regularly or feels like a once-a-decade luxury.</p>
+<p><strong>The booking timeline:</strong></p>
+<ul>
+  <li><strong>International flights:</strong> 2-6 months in advance is generally optimal. The "cheapest day" myth is largely false — use Google Flights\'s price tracking feature instead.</li>
+  <li><strong>Domestic flights:</strong> 1-3 months out. Tuesday/Wednesday departures are often cheaper.</li>
+  <li><strong>Hotels:</strong> Book refundable rates unless you\'re certain of your plans. Hotels can be booked closer to arrival than flights.</li>
+</ul>
+<p><strong>Travel budget categories to plan for:</strong></p>
+<ul>
+  <li>Flights (often 30-40% of budget)</li>
+  <li>Accommodation</li>
+  <li>Food (budget $30-60/day in most countries; less in Southeast Asia, more in Scandinavia)</li>
+  <li>Transportation (local transit, rideshare, rental cars)</li>
+  <li>Activities and entrance fees</li>
+  <li>Buffer (10-15% for unexpected costs — always include this)</li>
+</ul>
+<p><strong>Credit card travel rewards:</strong> Travel credit cards (Chase Sapphire, Capital One Venture, Amex Gold) earn points on everyday spending that can pay for flights and hotels. Used responsibly (paid in full monthly), they\'re a significant travel subsidy.</p>
+<p><strong>Travel hacking basics:</strong> Book award flights with points during off-peak periods. Fly into secondary airports (cheaper than main hubs). Stay slightly outside city centers (30% cheaper, often 10-minute transit ride).</p>`,
+    tip:'Always include a 10-15% buffer in your travel budget. Unexpected costs — a cab, a replacement item, a meal when nothing else is open — are guaranteed on any trip.',
+    q:[
+      {q:'When is the generally optimal time to book international flights?',a:['12+ months in advance for lowest prices','The day before for last-minute deals','2-6 months in advance','1 week before departure'],c:2,e:'Research shows 2-6 months is generally the sweet spot for international airfare. Booking too early or too late often results in higher prices. Google Flights price tracking helps you monitor trends.'},
+      {q:'A 10-15% budget buffer is recommended for travel because:',a:['Airlines charge surprise fees','Prices change after booking','Unexpected costs are guaranteed on any trip — small emergencies, replacements, unplanned needs','Currency exchange always costs 10-15%'],c:2,e:'No trip goes exactly as planned. A taxi when transit is closed, a replacement adapter, a meal when the original plan falls through — the buffer absorbs these without derailing your budget.'},
+      {q:'Travel credit card rewards are most beneficial when:',a:['You carry a balance to maximize points earned','You use the card only for travel purchases','You pay the balance in full monthly — earning rewards without paying interest','You apply for multiple cards simultaneously'],c:2,e:'Credit card rewards only make financial sense when paid in full. Interest charges at 20%+ APR erase all reward value instantly. Full monthly payment turns rewards into pure upside.'},
+      {q:'When booking hotels, booking a refundable rate is generally wise because:',a:['Refundable rates are always cheaper','Hotels don\'t honor non-refundable bookings','Plans change — a refundable rate preserves flexibility without financial penalty','Non-refundable hotels have worse service'],c:2,e:'Unless you\'re certain your plans are fixed, refundable rates give you flexibility. The price difference is usually small. Non-refundable rates can cost you the full amount if plans change.'},
+      {q:'Staying slightly outside the city center (10-15 minute transit ride) often saves:',a:['5%','10%','20-30% on accommodation costs','50% or more'],c:2,e:'Accommodation prices drop significantly just outside the tourist core — often 20-30% for the same quality. With a 10-minute metro ride, you get the full city experience at a much lower price.'}
+    ]
+  }
+],};
 
 let _quizAnswered = false;
 let _quizShuffled = [];
@@ -11328,11 +11893,35 @@ timemanage:[
   {q:'Best time to plan your week:',opts:['Monday morning','Friday afternoon','Sunday evening','Never'],ans:2,explain:'Sunday planning makes you 3x more likely to complete goals.'},
   {q:'The 5-minute start helps with:',opts:['Sleep','Procrastination','Cooking','Exercise'],ans:1,explain:'Commit to 5 min. Momentum carries you.'}
 ],
-organize:[
-  {q:'Average daily time looking for things:',opts:['10 min','30 min','2.5 hours','5 hours'],ans:2,explain:'2.5 hrs/day wasted.'},
-  {q:'#1 organization rule:',opts:['Buy storage','Every item has a spot','Label everything','Color code'],ans:1,explain:'When every item has a home, clutter is impossible.'},
-  {q:'Systems beat motivation because:',opts:['Easier','Work regardless of feelings','More fun','Motivation bad'],ans:1,explain:'Systems work every day regardless of mood.'}
+safety:[
+  {q:'What color in Cooper\'s Code describes ideal everyday awareness?',opts:['White','Yellow','Orange','Red'],ans:1,explain:'Yellow is relaxed but alert — calm, present, and aware.'},
+  {q:'Primary goal of self-defense is to:',opts:['Win the fight','Hurt attacker','Create time and distance to escape','Confront attacker'],ans:2,explain:'Strike to create distance then escape — not to win.'},
+  {q:'If followed on foot you should:',opts:['Go home fast','Make 4 turns then go to a busy public place','Confront them','Hide'],ans:1,explain:'4 turns confirm following. Busy public place provides safety. Never go home.'},
+  {q:'Yelling FIRE instead of just screaming works because:',opts:['Louder','Activates bystanders with specific call to action','Police respond faster','Confuses attacker'],ans:1,explain:'Specific words prompt bystanders to act. Vague screaming causes paralysis.'},
+  {q:'An online contact asking you to hide the friendship from parents is showing:',opts:['Privacy preference','A red flag isolation tactic','Shyness','Loyalty testing'],ans:1,explain:'Safe relationships never require hiding from family. Classic grooming tactic.'}
+],
+investing:[
+  {q:'Rule of 72 at 8 percent return means your money doubles every:',opts:['4 years','6 years','9 years','12 years'],ans:2,explain:'72 divided by 8 equals 9 years to double.'},
+  {q:'The 401k employer match is top priority because it is a:',opts:['Tax shelter first','Guaranteed 50-100 percent instant return','Premium reduction','Legal requirement'],ans:1,explain:'Employer match is a guaranteed return before any market movement.'},
+  {q:'Index funds beat most active funds because of:',opts:['Famous managers','Lower fees and diversification compounding over time','Government guarantees','Only safe stocks'],ans:1,explain:'0.05 vs 1-2 percent fees compounded over 20 plus years outperforms 80-90 percent of active managers.'},
+  {q:'Dollar cost averaging means:',opts:['Buy only at low prices','Invest fixed amount regularly regardless of market','Average annual gains','Time the market with an advisor'],ans:1,explain:'Regular fixed investing automatically buys more shares when prices drop.'},
+  {q:'Your retirement target using the 4 percent rule equals:',opts:['Annual income x 10','Annual expenses x 25','Monthly savings x 100','Current savings x 5'],ans:1,explain:'Annual expenses times 25 lets you safely withdraw 4 percent annually indefinitely.'}
+],
+insurance:[
+  {q:'A health insurance deductible is:',opts:['Monthly premium','What insurance pays first','Amount you pay before coverage starts','Annual spending maximum'],ans:2,explain:'Pay the deductible first — then insurance begins sharing costs with you.'},
+  {q:'Under the ACA you can stay on parent health insurance until age:',opts:['21','23','25','26'],ans:3,explain:'ACA extends parent coverage to age 26. Almost always cheapest option for young adults.'},
+  {q:'Legally required car insurance in most states is:',opts:['Collision','Comprehensive','Liability','Gap insurance'],ans:2,explain:'Liability is mandatory — protects others from damage you cause.'},
+  {q:'Buy term invest the difference means:',opts:['Buy whole life early','Buy cheap term and invest the monthly savings','Buy both types','Skip life insurance'],ans:1,explain:'Term is 5-10x cheaper. Investing savings typically outperforms whole life cash value.'},
+  {q:'Unused dental benefits at year end are:',opts:['Rolled over','Accumulated into a larger amount','Permanently lost','Converted to premium credits'],ans:2,explain:'Dental benefits reset every year. Any unused portion is simply gone.'}
+],
+travel:[
+  {q:'Most countries require passport validity beyond travel dates of:',opts:['1 month','3 months','6 months','12 months'],ans:2,explain:'6 month rule — too-soon expiration can get you denied boarding even with valid passport.'},
+  {q:'When asked dollars or local currency abroad always choose:',opts:['Dollars always safer','Local currency for better exchange rate','Whatever merchant recommends','It does not matter'],ans:1,explain:'Choosing dollars lets merchant apply bad exchange rate. Local currency uses your card real rate.'},
+  {q:'STEP program at step.state.gov lets the US embassy:',opts:['Give travel rewards','Contact you in emergencies abroad','Help skip customs','Issue cheaper visas'],ans:1,explain:'Free 5-minute enrollment ensures embassy can reach you during disasters abroad.'},
+  {q:'Best source for local currency internationally is:',opts:['Airport exchange kiosks','Hotel exchange desks','Local ATMs with your bank card','Traveler checks'],ans:2,explain:'Local ATMs use real interbank rates. Airport kiosks charge 10-15 percent markup.'},
+  {q:'Travel insurance is most critical for covering:',opts:['Normal doctor visits','Lost souvenirs','Medical evacuation which can cost up to 200000 dollars','Cancelled dinner reservations'],ans:2,explain:'Medical evacuation can cost six figures. Insurance covering it costs only 50-200 dollars.'}
 ]
+
 };
 
 
@@ -11446,6 +12035,8 @@ function answerQuestion(chosen){
       ? `<div class="sk-fb-emoji">🎉</div><div><b style="color:var(--gr);">Great job! That's correct.</b><br><span style="font-size:.79rem;color:var(--tx2);">${q.explain}</span></div>`
       : `<div class="sk-fb-emoji">❌</div><div><b style="color:#f87171;">Not quite — correct answer: <span style="color:var(--gr);">${q.correct}</span>.</b><br><span style="font-size:.79rem;color:var(--tx2);">${q.explain}</span></div>`;
   }
+  // 🎉 Confetti on correct answer
+  if(isCorrect && typeof launchSideConfetti === 'function') launchSideConfetti();
 
   const nb = document.getElementById('sqNextBtn');
   if(nb) nb.style.display = 'inline-flex';
@@ -11466,6 +12057,8 @@ function finishSkillQuiz(){
     D.skillCerts[_quizKey] = new Date().toLocaleDateString();
     const certBtn = document.getElementById('skViewCertBtn');
     if(certBtn) certBtn.style.display = 'inline-flex';
+    // 🏆 Big confetti burst on quiz pass
+    setTimeout(()=>{ if(typeof launchBigConfetti==='function') launchBigConfetti(); }, 300);
   }
   save();
 
@@ -11743,8 +12336,11 @@ function printCert(key){
     <div style="font-size:.8rem;color:rgba(255,255,255,.5);margin-bottom:1rem;">Tap the button to spin the wheel</div>
     <div style="position:relative;width:300px;height:300px;margin:0 auto;">
       <canvas id="spinnerCanvas" width="300" height="300" style="border-radius:50%;"></canvas>
-      <!-- Pointer -->
-      <div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-top:24px solid #fde68a;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));z-index:2;"></div>
+      <!-- Pointer needle -->
+      <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);z-index:3;filter:drop-shadow(0 3px 6px rgba(0,0,0,.6));">
+        <div style="width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:30px solid #fde68a;margin:0 auto;"></div>
+        <div style="width:10px;height:10px;background:#fde68a;border-radius:50%;margin:-3px auto 0;"></div>
+      </div>
     </div>
     <div id="spinnerResult" style="margin-top:1rem;font-size:1.1rem;font-weight:700;color:#fff;min-height:2.5rem;"></div>
     <button id="spinnerBtn" class="btn" onclick="doSpin()" style="margin-top:.5rem;font-size:1rem;padding:.7rem 2rem;background:linear-gradient(135deg,#fde68a,#f59e0b);color:#1a1a2e;font-weight:800;border:none;border-radius:12px;cursor:pointer;letter-spacing:1px;">🎰 SPIN!</button>
@@ -11753,6 +12349,29 @@ function printCert(key){
 </div>
 
 <!-- ═══ SCRATCH CARD OVERLAY ═══ -->
+<div id="scratchOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,rgba(10,5,30,.97),rgba(5,3,20,.99));z-index:9999;align-items:center;justify-content:center;flex-direction:column;">
+  <div style="text-align:center;width:100%;max-width:420px;padding:1.2rem;">
+    <div style="font-family:var(--fh);font-size:1.6rem;font-weight:900;color:#f472b6;margin-bottom:.2rem;letter-spacing:2px;text-shadow:0 2px 10px rgba(244,114,182,.3);">🎴 SCRATCH CARD</div>
+    <div style="font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:1.2rem;">Scratch all 3 panels — match to win!</div>
+
+    <!-- 3 scratch panels -->
+    <div style="display:flex;gap:1rem;justify-content:center;margin-bottom:1rem;">
+      <div style="text-align:center;">
+        <canvas id="scratch0" width="100" height="100" style="border-radius:14px;cursor:pointer;border:2px solid rgba(244,114,182,.3);display:block;touch-action:none;"></canvas>
+      </div>
+      <div style="text-align:center;">
+        <canvas id="scratch1" width="100" height="100" style="border-radius:14px;cursor:pointer;border:2px solid rgba(244,114,182,.3);display:block;touch-action:none;"></canvas>
+      </div>
+      <div style="text-align:center;">
+        <canvas id="scratch2" width="100" height="100" style="border-radius:14px;cursor:pointer;border:2px solid rgba(244,114,182,.3);display:block;touch-action:none;"></canvas>
+      </div>
+    </div>
+
+    <div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:.8rem;">Tap or drag to scratch</div>
+    <div id="scratchResult" style="min-height:2.5rem;font-size:1rem;font-weight:700;color:#fff;margin-bottom:.8rem;"></div>
+    <button onclick="closeScratch()" style="font-size:.75rem;color:rgba(255,255,255,.4);background:none;border:1px solid rgba(255,255,255,.1);padding:.4rem 1rem;border-radius:8px;cursor:pointer;">Close</button>
+  </div>
+</div>
 
 
 
@@ -11839,6 +12458,8 @@ function finishInit(){
   applyChildAvatar();
   renderVerse();
   startVerseAutoRotation();
+  // Start session timer
+  if(typeof startSessionTimer === 'function') startSessionTimer();
   buildCheckins();
   updateStreak();
   updateQuickStats();
@@ -13456,7 +14077,26 @@ function exportBioPDF(){
   win.document.write(`<!DOCTYPE html><html><head><title>${b.name} — Bio</title>
     <style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#fff;}
     @page{size:letter;margin:.5in;}
-    @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}</style>
+    @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}
+/* ─── SPIN WHEEL & SCRATCH CARD ANIMATIONS ─────────────── */
+#spinnerCanvas { transition: filter .3s ease; }
+@keyframes needlePulse {
+  0%,100%{ transform:translateX(-50%) scaleY(1); }
+  50%{ transform:translateX(-50%) scaleY(1.15); }
+}
+@keyframes scratchShimmer {
+  0%{ background-position: -200% center; }
+  100%{ background-position: 200% center; }
+}
+@keyframes overlayFadeIn {
+  from{ opacity:0; transform:scale(.97); }
+  to{ opacity:1; transform:scale(1); }
+}
+#spinnerOverlay > div,
+#scratchOverlay > div {
+  animation: overlayFadeIn .25s cubic-bezier(.34,1.2,.64,1) both;
+}
+</style>
   </head><body>${renderBioHTML(b, true)}
 
 
@@ -14421,6 +15061,15 @@ function renderParentDash(){
   renderParentContests();
   renderParentFamilyRewards();
   renderParentActivityFeed();
+  // Render session log in parent hub
+  if(typeof renderSessionLog === 'function') renderSessionLog();
+  // Update live session time display
+  const phST = document.getElementById('phSessionTime');
+  if(phST && typeof getSessionSeconds === 'function'){
+    const s = getSessionSeconds();
+    const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+    phST.textContent = h>0 ? h+'h '+m+'m' : m>0 ? m+'m '+String(sec).padStart(2,'0')+'s' : sec+'s';
+  }
   phNav('users');
 }
 
@@ -18593,49 +19242,100 @@ function drawSpinner(angle){
   const c = document.getElementById('spinnerCanvas');
   if(!c) return;
   const ctx = c.getContext('2d');
-  const cx = 150, cy = 150, r = 140;
+  const cx = 150, cy = 150, r = 136;
   const slices = (D.pb&&D.pb.spinnerSlices&&D.pb.spinnerSlices.length) ? D.pb.spinnerSlices : DEFAULT_SPINNER;
   const n = slices.length;
   const arc = (Math.PI*2)/n;
 
   ctx.clearRect(0,0,300,300);
+
+  // Outer glow ring
+  const ringGrad = ctx.createRadialGradient(cx,cy,r-4,cx,cy,r+14);
+  ringGrad.addColorStop(0,'rgba(253,230,138,.35)');
+  ringGrad.addColorStop(1,'rgba(253,230,138,0)');
+  ctx.beginPath();
+  ctx.arc(cx,cy,r+14,0,Math.PI*2);
+  ctx.fillStyle = ringGrad;
+  ctx.fill();
+
+  // Outer border ring
+  ctx.beginPath();
+  ctx.arc(cx,cy,r+6,0,Math.PI*2);
+  ctx.strokeStyle = 'rgba(253,230,138,.6)';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
   ctx.save();
   ctx.translate(cx,cy);
   ctx.rotate(angle * Math.PI/180);
 
   for(let i=0;i<n;i++){
+    // Slice fill
     ctx.beginPath();
     ctx.moveTo(0,0);
     ctx.arc(0,0,r,i*arc,(i+1)*arc);
     ctx.closePath();
+    // Alternate slight brightness
     ctx.fillStyle = slices[i].color;
     ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,.4)';
+    // Divider lines
+    ctx.strokeStyle = 'rgba(15,10,30,.5)';
     ctx.lineWidth = 2;
     ctx.stroke();
-    // Label
+
+    // Label text
     ctx.save();
     ctx.rotate(i*arc + arc/2);
-    ctx.fillStyle = '#1a1a2e';
-    ctx.font = 'bold 12px Inter,sans-serif';
+    ctx.translate(r*0.62, 0);
+    ctx.rotate(Math.PI/2);
+    ctx.fillStyle = 'rgba(15,10,40,.85)';
+    ctx.font = 'bold 11px Inter,sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(slices[i].label, r*0.6, 4);
+    ctx.textBaseline = 'middle';
+    // Word wrap if needed
+    const words = slices[i].label.split(' ');
+    if(words.length > 1){
+      ctx.fillText(words[0], 0, -6);
+      ctx.fillText(words.slice(1).join(' '), 0, 7);
+    } else {
+      ctx.fillText(slices[i].label, 0, 0);
+    }
     ctx.restore();
   }
   ctx.restore();
 
-  // Center circle
+  // Outer beveled ring decoration (tick marks)
+  for(let i=0;i<n*2;i++){
+    const a = (i / (n*2)) * Math.PI*2;
+    const x1 = cx + Math.cos(a)*(r+2);
+    const y1 = cy + Math.sin(a)*(r+2);
+    const x2 = cx + Math.cos(a)*(r+7);
+    const y2 = cy + Math.sin(a)*(r+7);
+    ctx.beginPath();
+    ctx.moveTo(x1,y1);
+    ctx.lineTo(x2,y2);
+    ctx.strokeStyle = 'rgba(253,230,138,.5)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+
+  // Center hub
+  const hubGrad = ctx.createRadialGradient(cx-4,cy-4,2,cx,cy,24);
+  hubGrad.addColorStop(0,'#fef3c7');
+  hubGrad.addColorStop(.5,'#f59e0b');
+  hubGrad.addColorStop(1,'#92400e');
   ctx.beginPath();
   ctx.arc(cx,cy,22,0,Math.PI*2);
-  ctx.fillStyle = '#1a1a2e';
+  ctx.fillStyle = hubGrad;
   ctx.fill();
   ctx.strokeStyle = '#fde68a';
-  ctx.lineWidth = 3;
+  ctx.lineWidth = 2;
   ctx.stroke();
-  ctx.fillStyle = '#fde68a';
-  ctx.font = 'bold 14px sans-serif';
+  ctx.fillStyle = '#1a1a2e';
+  ctx.font = 'bold 12px Inter,sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('GO', cx, cy+5);
+  ctx.textBaseline = 'middle';
+  ctx.fillText('SPIN', cx, cy);
 }
 
 function doSpin(){
@@ -18657,6 +19357,8 @@ function doSpin(){
   document.getElementById('spinnerBtn').disabled = true;
   document.getElementById('spinnerBtn').textContent = '🎰 Spinning...';
   document.getElementById('spinnerResult').textContent = '';
+  const spinCanvas = document.getElementById('spinnerCanvas');
+  if(spinCanvas) spinCanvas.style.filter = 'drop-shadow(0 0 18px rgba(253,230,138,.4))';
 
   function animate(){
     const elapsed = Date.now()-startTime;
@@ -18670,6 +19372,7 @@ function doSpin(){
     } else {
       _spinning = false;
       _spinAngle = _spinAngle % 360;
+      if(spinCanvas) spinCanvas.style.filter = 'drop-shadow(0 0 8px rgba(253,230,138,.2))';
       const prize = slices[targetIdx];
       // Award prize
       if(prize.type === 'pb'){
@@ -18677,7 +19380,14 @@ function doSpin(){
       } else if(prize.type === 'screen'){
         addScreenTimeReward('games', prize.value);
       }
-      document.getElementById('spinnerResult').innerHTML = `<div style="font-size:1.3rem;">🎉</div><div style="color:${prize.color};font-weight:800;">You won: ${prize.label}!</div>`;
+      const isJackpot = prize.value >= 100 || prize.label.includes('!!');
+      document.getElementById('spinnerResult').innerHTML =
+        `<div style="font-size:${isJackpot?'2':'1.4'}rem;margin-bottom:.2rem;">${isJackpot?'🏆🎉🏆':'🎉'}</div>
+         <div style="color:${prize.color};font-weight:900;font-size:${isJackpot?'1.3':'1.1'}rem;">${isJackpot?'JACKPOT! ':''} ${prize.label}!</div>
+         ${isJackpot?'<div style="color:rgba(255,255,255,.5);font-size:.75rem;margin-top:.2rem;">Amazing!</div>':''}`;
+      if(typeof launchBigConfetti==='function'){
+        isJackpot ? launchBigConfetti() : launchSideConfetti();
+      }
       document.getElementById('spinnerBtn').textContent = '✓ Collected!';
     }
   }
@@ -18687,7 +19397,13 @@ function doSpin(){
 // ── SCRATCH CARD ─────────────────────────────────────────────
 const SCRATCH_SYMBOLS = ['🌟','💎','🔥','💰','🎯','⭐','🏆','💪'];
 let _scratchRevealed = [false,false,false];
-let _scratchValues = [];
+let _scratchValues   = [];
+let _scratchDone     = false;
+
+// Track per-canvas scratch coverage
+const _scratchCoverage = [0,0,0];  // 0-100 % revealed per panel
+const _scratchCtxs     = [null,null,null];
+const _scratchDrawing  = [false,false,false];
 
 function openScratch(){
   if(!D.pb || (D.pb.scratchTickets||0) <= 0){ showToast('No scratch cards!'); return; }
@@ -18695,75 +19411,183 @@ function openScratch(){
   save(); renderGameTickets();
 
   document.getElementById('scratchOverlay').style.display = 'flex';
-  document.getElementById('scratchResult').textContent = '';
+  document.getElementById('scratchResult').innerHTML = '';
   _scratchRevealed = [false,false,false];
+  _scratchDone     = false;
+  _scratchCoverage[0] = _scratchCoverage[1] = _scratchCoverage[2] = 0;
 
-  // Generate 3 values - 40% chance of match
-  const match = Math.random() < 0.4;
-  if(match){
+  // Generate 3 values — 35% chance of win (3 of a kind)
+  const win = Math.random() < 0.35;
+  if(win){
     const sym = SCRATCH_SYMBOLS[Math.floor(Math.random()*SCRATCH_SYMBOLS.length)];
     _scratchValues = [sym, sym, sym];
   } else {
-    const shuffled = [...SCRATCH_SYMBOLS].sort(()=>Math.random()-.5);
-    _scratchValues = [shuffled[0], shuffled[1], shuffled[2]];
-    // Make sure not accidentally 3 of a kind
-    if(_scratchValues[0]===_scratchValues[1]&&_scratchValues[1]===_scratchValues[2]){
-      _scratchValues[2] = shuffled[3];
+    const pool = [...SCRATCH_SYMBOLS].sort(()=>Math.random()-.5);
+    _scratchValues = [pool[0], pool[1], pool[2]];
+    if(_scratchValues[0]===_scratchValues[1] && _scratchValues[1]===_scratchValues[2])
+      _scratchValues[2] = pool[3] || pool[0];
+  }
+
+  for(let i=0;i<3;i++) _initScratchCanvas(i);
+}
+
+function _initScratchCanvas(i){
+  const c = document.getElementById('scratch'+i);
+  if(!c) return;
+  const W = c.width, H = c.height;
+  const ctx = c.getContext('2d');
+  _scratchCtxs[i] = ctx;
+
+  // Layer 1 — prize background
+  ctx.clearRect(0,0,W,H);
+  const grad = ctx.createRadialGradient(W/2,H/2,10,W/2,H/2,W/2);
+  grad.addColorStop(0,'#1e1b4b');
+  grad.addColorStop(1,'#0f0a2e');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,W,H);
+  ctx.font = '46px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(_scratchValues[i], W/2, H/2+2);
+
+  // Layer 2 — scratch cover (drawn on top using globalCompositeOperation trick)
+  // We use a second off-screen canvas as the cover mask
+  const cover = document.createElement('canvas');
+  cover.width = W; cover.height = H;
+  const cCtx = cover.getContext('2d');
+  // Silver gradient scratch surface
+  const sg = cCtx.createLinearGradient(0,0,W,H);
+  sg.addColorStop(0,'#6b7280');
+  sg.addColorStop(.4,'#9ca3af');
+  sg.addColorStop(.6,'#d1d5db');
+  sg.addColorStop(1,'#6b7280');
+  cCtx.fillStyle = sg;
+  cCtx.fillRect(0,0,W,H);
+  // "SCRATCH HERE" text on cover
+  cCtx.fillStyle = 'rgba(15,10,40,.55)';
+  cCtx.font = 'bold 10px Inter,sans-serif';
+  cCtx.textAlign = 'center';
+  cCtx.textBaseline = 'middle';
+  cCtx.fillText('SCRATCH', W/2, H/2-7);
+  cCtx.fillText('HERE ✨', W/2, H/2+8);
+  // Store cover on canvas element for later compositing
+  c._cover = cover;
+  c._coverCtx = cCtx;
+  c._scratchIdx = i;
+
+  // Draw the cover on top of prize
+  ctx.drawImage(cover, 0, 0);
+
+  // Remove old listeners, add fresh ones
+  const newC = c.cloneNode(true);
+  c.parentNode.replaceChild(newC, c);
+  const nc = document.getElementById('scratch'+i);
+  nc._cover = cover;
+  nc._coverCtx = cCtx;
+  nc._scratchIdx = i;
+  _scratchCtxs[i] = nc.getContext('2d');
+  // Redraw prize + cover on fresh canvas
+  const nCtx = _scratchCtxs[i];
+  nCtx.clearRect(0,0,W,H);
+  nCtx.fillStyle = grad;
+  nCtx.fillRect(0,0,W,H);
+  nCtx.font = '46px sans-serif';
+  nCtx.textAlign = 'center';
+  nCtx.textBaseline = 'middle';
+  nCtx.fillText(_scratchValues[i], W/2, H/2+2);
+  nCtx.drawImage(cover, 0, 0);
+
+  _attachScratchListeners(nc, i);
+}
+
+function _attachScratchListeners(c, idx){
+  let painting = false;
+
+  function getPos(e){
+    const rect = c.getBoundingClientRect();
+    const scaleX = c.width / rect.width;
+    const scaleY = c.height / rect.height;
+    if(e.touches){
+      return {
+        x: (e.touches[0].clientX - rect.left) * scaleX,
+        y: (e.touches[0].clientY - rect.top)  * scaleY
+      };
+    }
+    return {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top)  * scaleY
+    };
+  }
+
+  function scratch(pos){
+    if(_scratchDone) return;
+    const ctx = _scratchCtxs[idx];
+    if(!ctx) return;
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, 18, 0, Math.PI*2);
+    ctx.fill();
+    ctx.globalCompositeOperation = 'source-over';
+    _checkRevealCoverage(idx);
+  }
+
+  c.addEventListener('mousedown', e=>{ painting=true; scratch(getPos(e)); });
+  c.addEventListener('mousemove', e=>{ if(painting) scratch(getPos(e)); });
+  c.addEventListener('mouseup',   ()=>{ painting=false; });
+  c.addEventListener('mouseleave',()=>{ painting=false; });
+  c.addEventListener('touchstart',e=>{ e.preventDefault(); painting=true; scratch(getPos(e)); },{passive:false});
+  c.addEventListener('touchmove', e=>{ e.preventDefault(); if(painting) scratch(getPos(e)); },{passive:false});
+  c.addEventListener('touchend',  ()=>{ painting=false; });
+}
+
+function _checkRevealCoverage(idx){
+  // Sample pixel coverage — check how many cover pixels remain
+  const c = document.getElementById('scratch'+idx);
+  if(!c) return;
+  const ctx = _scratchCtxs[idx];
+  const W = c.width, H = c.height;
+  const data = ctx.getImageData(0,0,W,H).data;
+  let transparent = 0;
+  const sample = 4; // check every 4th pixel for speed
+  const total = (W/sample) * (H/sample);
+  for(let x=0;x<W;x+=sample){
+    for(let y=0;y<H;y+=sample){
+      const i = (y*W+x)*4;
+      if(data[i+3] < 50) transparent++;
     }
   }
-
-  // Draw scratch surfaces
-  for(let i=0;i<3;i++){
-    const c = document.getElementById('scratch'+i);
-    const ctx = c.getContext('2d');
-    // Draw hidden prize underneath
-    ctx.fillStyle = '#1a2540';
-    ctx.fillRect(0,0,90,90);
-    ctx.font = '36px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(_scratchValues[i], 45, 55);
-    // Cover with scratch layer
-    ctx.fillStyle = '#4a5568';
-    ctx.fillRect(0,0,90,90);
-    ctx.fillStyle = '#718096';
-    ctx.font = 'bold 11px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('SCRATCH', 45, 42);
-    ctx.fillText('HERE', 45, 56);
-    // Add scratch listener
-    c.onclick = function(){ revealScratch(i); };
+  const pct = (transparent/total)*100;
+  if(pct > 60 && !_scratchRevealed[idx]){
+    _scratchRevealed[idx] = true;
+    _scratchCoverage[idx] = 100;
+    _checkAllRevealed();
   }
 }
 
-function revealScratch(idx){
-  if(_scratchRevealed[idx]) return;
-  _scratchRevealed[idx] = true;
-  const c = document.getElementById('scratch'+idx);
-  const ctx = c.getContext('2d');
-  // Animate reveal
-  ctx.clearRect(0,0,90,90);
-  ctx.fillStyle = '#0f172a';
-  ctx.fillRect(0,0,90,90);
-  ctx.font = '40px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText(_scratchValues[idx], 45, 58);
-
-  // Check if all revealed
-  if(_scratchRevealed.every(Boolean)){
-    setTimeout(()=>{
-      if(_scratchValues[0]===_scratchValues[1]&&_scratchValues[1]===_scratchValues[2]){
-        // WIN!
-        const prize = 25 + Math.floor(Math.random()*76); // 25-100 PB
-        earnPB(prize, 'Scratch card win!');
-        document.getElementById('scratchResult').innerHTML = `<div style="font-size:1.5rem;">🎉🎉🎉</div><div style="color:#22c55e;font-weight:800;font-size:1.1rem;">THREE ${_scratchValues[0]}! You won ${prize} Parent Bucks!</div>`;
-      } else {
-        document.getElementById('scratchResult').innerHTML = '<div style="color:var(--tx2);font-size:.85rem;">No match this time. Keep earning scratch cards!</div>';
-      }
-    }, 400);
-  }
+function _checkAllRevealed(){
+  if(_scratchDone) return;
+  if(!_scratchRevealed.every(Boolean)) return;
+  _scratchDone = true;
+  setTimeout(()=>{
+    if(_scratchValues[0]===_scratchValues[1] && _scratchValues[1]===_scratchValues[2]){
+      const prize = 25 + Math.floor(Math.random()*76);
+      earnPB(prize, 'Scratch card win!');
+      document.getElementById('scratchResult').innerHTML =
+        `<div style="font-size:1.8rem;margin-bottom:.3rem;">🎉🎉🎉</div>
+         <div style="color:#22c55e;font-weight:800;font-size:1.05rem;">THREE ${_scratchValues[0]}!</div>
+         <div style="color:#4ade80;font-size:.85rem;margin-top:.2rem;">+${prize} Parent Bucks!</div>`;
+      if(typeof launchBigConfetti==='function') launchBigConfetti();
+    } else {
+      document.getElementById('scratchResult').innerHTML =
+        '<div style="color:var(--tx2);font-size:.85rem;padding:.5rem;">No match this time 😅<br>Keep earning scratch cards!</div>';
+    }
+  }, 300);
 }
 
-function closeScratch(){ document.getElementById('scratchOverlay').style.display = 'none'; }
+function closeScratch(){
+  document.getElementById('scratchOverlay').style.display = 'none';
+  _scratchDone = true;
+}
 
 // ── GAME TRIGGERS — award spins/scratches on achievements ────
 function awardGameTicket(type){
@@ -20809,6 +21633,214 @@ document.addEventListener('keydown', e=>{
   if(e.key==='ArrowLeft'||e.key==='ArrowUp') tutNav(-1);
   if(e.key==='Escape') closeTutorial();
 });
+
+
+// ══════════════════════════════════════════════════════════════
+// CONFETTI SYSTEM
+// ══════════════════════════════════════════════════════════════
+(function(){
+  const COLORS = ['#38bdf8','#818cf8','#f472b6','#34d399','#fbbf24','#fb923c','#a78bfa','#4ade80'];
+  let _cfCanvas, _cfCtx, _cfParticles=[], _cfRunning=false, _cfRaf=null;
+
+  function ensureCanvas(){
+    if(_cfCanvas) return;
+    _cfCanvas = document.createElement('canvas');
+    _cfCanvas.id = 'confettiCanvas';
+    Object.assign(_cfCanvas.style,{
+      position:'fixed',top:'0',left:'0',width:'100%',height:'100%',
+      pointerEvents:'none',zIndex:'99999'
+    });
+    document.body.appendChild(_cfCanvas);
+    _cfCtx = _cfCanvas.getContext('2d');
+  }
+
+  function resize(){
+    if(!_cfCanvas) return;
+    _cfCanvas.width  = window.innerWidth;
+    _cfCanvas.height = window.innerHeight;
+  }
+
+  window.launchConfetti = function(opts){
+    opts = opts||{};
+    const count   = opts.count   || 120;
+    const origin  = opts.origin  || {x:.5, y:.4};
+    const spread  = opts.spread  || 70;
+    const decay   = opts.decay   || .93;
+    const gravity = opts.gravity || .6;
+    const scalar  = opts.scalar  || 1;
+
+    ensureCanvas();
+    resize();
+
+    for(let i=0;i<count;i++){
+      const angle = (Math.random()*spread - spread/2) * (Math.PI/180);
+      const vel   = (Math.random()*18 + 8) * scalar;
+      _cfParticles.push({
+        x   : _cfCanvas.width  * origin.x,
+        y   : _cfCanvas.height * origin.y,
+        vx  : Math.cos(angle + Math.PI/2 * (Math.random()>.5?-1:1)) * vel * (Math.random()*.8+.6),
+        vy  : Math.sin(angle - Math.PI/2) * vel * (Math.random()*.8+.6) - (Math.random()*4+2),
+        color: COLORS[Math.floor(Math.random()*COLORS.length)],
+        w   : (Math.random()*10+5) * scalar,
+        h   : (Math.random()*5+3) * scalar,
+        rot : Math.random()*360,
+        rotV: (Math.random()-0.5)*8,
+        decay,
+        gravity,
+        alpha: 1,
+        shape: Math.random()>.4 ? 'rect' : 'circle'
+      });
+    }
+    if(!_cfRunning){ _cfRunning=true; _cfLoop(); }
+  };
+
+  window.launchBigConfetti = function(){
+    // Big burst — used for quiz pass / cert earn
+    launchConfetti({count:200, origin:{x:.5,y:.5}, spread:120, scalar:1.2, decay:.91});
+    setTimeout(()=>launchConfetti({count:80, origin:{x:.2,y:.6}, spread:60}), 200);
+    setTimeout(()=>launchConfetti({count:80, origin:{x:.8,y:.6}, spread:60}), 350);
+  };
+
+  window.launchSideConfetti = function(){
+    // Small side burst — used for single correct answer
+    launchConfetti({count:40, origin:{x:.5,y:.6}, spread:50, scalar:.9, decay:.94});
+  };
+
+  function _cfLoop(){
+    if(!_cfCanvas) return;
+    _cfCtx.clearRect(0,0,_cfCanvas.width,_cfCanvas.height);
+    _cfParticles = _cfParticles.filter(p=>{
+      p.x  += p.vx;
+      p.y  += p.vy;
+      p.vy += p.gravity * .1;
+      p.vx *= p.decay;
+      p.vy *= p.decay;
+      p.rot+= p.rotV;
+      p.alpha = Math.max(0, p.alpha - .012);
+      if(p.alpha <= 0) return false;
+      _cfCtx.save();
+      _cfCtx.globalAlpha = p.alpha;
+      _cfCtx.fillStyle = p.color;
+      _cfCtx.translate(p.x, p.y);
+      _cfCtx.rotate(p.rot * Math.PI/180);
+      if(p.shape==='circle'){
+        _cfCtx.beginPath();
+        _cfCtx.arc(0,0,p.w/2,0,Math.PI*2);
+        _cfCtx.fill();
+      } else {
+        _cfCtx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      }
+      _cfCtx.restore();
+      return true;
+    });
+    if(_cfParticles.length > 0){
+      _cfRaf = requestAnimationFrame(_cfLoop);
+    } else {
+      _cfRunning = false;
+      _cfCtx.clearRect(0,0,_cfCanvas.width,_cfCanvas.height);
+    }
+  }
+  window.addEventListener('resize', resize);
+})();
+
+// ══════════════════════════════════════════════════════════════
+// SESSION TIMER
+// ══════════════════════════════════════════════════════════════
+(function(){
+  let _sessStart = null;
+  let _sessActive = false;
+  let _sessTotal  = 0;    // seconds accumulated this session
+  let _sessInterval = null;
+  let _lastActivity = Date.now();
+  const IDLE_THRESHOLD = 60000; // 1 min idle = pause timer
+  const TICK = 1000;
+
+  function _tick(){
+    const now = Date.now();
+    if(now - _lastActivity > IDLE_THRESHOLD){
+      // User is idle — pause accumulating
+      return;
+    }
+    _sessTotal++;
+    _updateDisplay();
+    _autosaveSession();
+  }
+
+  function _updateDisplay(){
+    const el = document.getElementById('sessionTimerDisplay');
+    const elP = document.getElementById('phSessionTime');
+    const str = _formatTime(_sessTotal);
+    if(el)  el.textContent = str;
+    if(elP) elP.textContent = str;
+  }
+
+  function _formatTime(secs){
+    const h = Math.floor(secs/3600);
+    const m = Math.floor((secs%3600)/60);
+    const s = secs%60;
+    if(h>0) return `${h}h ${m}m`;
+    if(m>0) return `${m}m ${String(s).padStart(2,'0')}s`;
+    return `${s}s`;
+  }
+
+  function _autosaveSession(){
+    // Save to D every 30 seconds
+    if(_sessTotal % 30 === 0){
+      if(!D.sessionLog) D.sessionLog = [];
+      const today = new Date().toLocaleDateString();
+      const existing = D.sessionLog.find(e=>e.date===today);
+      if(existing){
+        existing.secs = (existing.secs||0) + 30;
+      } else {
+        D.sessionLog.push({date:today, secs:30});
+      }
+      // Keep last 30 days only
+      if(D.sessionLog.length > 30) D.sessionLog = D.sessionLog.slice(-30);
+      save();
+    }
+  }
+
+  // Track any user activity
+  ['click','keydown','touchstart','scroll','mousemove'].forEach(evt=>{
+    document.addEventListener(evt, ()=>{ _lastActivity = Date.now(); }, {passive:true});
+  });
+
+  window.startSessionTimer = function(){
+    if(_sessInterval) return; // already running
+    _sessStart  = Date.now();
+    _lastActivity = Date.now();
+    _sessInterval = setInterval(_tick, TICK);
+    _sessActive = true;
+  };
+
+  window.getSessionSeconds = function(){ return _sessTotal; };
+
+  window.getSessionLog = function(){
+    return (D.sessionLog||[]).slice().reverse(); // newest first
+  };
+
+  window.renderSessionLog = function(){
+    const el = document.getElementById('phSessionLog');
+    if(!el) return;
+    const log = getSessionLog();
+    if(!log.length){
+      el.innerHTML = '<div style="color:var(--tx3);font-size:.75rem;text-align:center;padding:.5rem;">No sessions recorded yet.</div>';
+      return;
+    }
+    el.innerHTML = log.slice(0,14).map(e=>{
+      const mins = Math.round((e.secs||0)/60);
+      const bar = Math.min(100, Math.round(mins/60*100));
+      return `<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.35rem;">
+        <span style="font-size:.7rem;color:var(--tx2);width:72px;flex-shrink:0;">${e.date}</span>
+        <div style="flex:1;height:6px;background:rgba(255,255,255,.07);border-radius:10px;overflow:hidden;">
+          <div style="height:100%;width:${bar}%;background:var(--c);border-radius:10px;transition:width .4s;"></div>
+        </div>
+        <span style="font-size:.72rem;font-weight:700;color:var(--tx);width:44px;text-align:right;">${mins<1?'<1':mins}m</span>
+      </div>`;
+    }).join('');
+  };
+})();
+
 
 document.addEventListener('DOMContentLoaded', ()=>{
   // Show verse immediately before async operations
