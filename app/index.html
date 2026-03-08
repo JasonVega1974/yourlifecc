@@ -6845,13 +6845,121 @@ function showSaved(){
 }
 
 // ── CLOUD ────────────────────────────────────────────────────
-function getCC(){ const u=localStorage.getItem(CU)||'',k=localStorage.getItem(CK)||''; return (u&&k)?{url:u.replace(/\/$/,'')+'/wp-json/dd/v1/sync',key:k}:null; }
-function setSyncSt(s){ const m={loading:['⟳','#888'],cloud:['☁ Synced','var(--gr)'],local:['💾 Local','var(--tx2)']}; const[t,col]=m[s]||m.local; ['syncSt','syncSt2'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent=t;el.style.color=col;}}); }
-async function cloudSync(){ const cfg=getCC(); if(!cfg) return; try{ const r=await fetch(cfg.url,{method:'POST',headers:{'Content-Type':'application/json','X-DD-Key':cfg.key},body:JSON.stringify({action:'save',payload:D})}); const j=await r.json(); setSyncSt(j?.success?'cloud':'local'); }catch(e){ setSyncSt('local'); } }
-async function cloudLoad(){ const cfg=getCC(); if(!cfg) return false; try{ const r=await fetch(cfg.url+'?action=load',{headers:{'X-DD-Key':cfg.key}}); const j=await r.json(); if(j?.success&&j.data){ for(const k of Object.keys(DEF)){ if(k in j.data) D[k]=j.data[k]; } return true; } }catch(e){} return false; }
-function saveCloud(){ const u=(document.getElementById('wpUrl').value||'').trim(),k=(document.getElementById('wpKey').value||'').trim(); if(!u||!k){showToast('Enter URL and key');return;} localStorage.setItem(CU,u); localStorage.setItem(CK,k); closeSettings(); showToast('Cloud sync saved! ☁'); cloudSync(); }
-async function testCloud(){ const u=(document.getElementById('wpUrl').value||'').trim(),k=(document.getElementById('wpKey').value||'').trim(),el=document.getElementById('cloudMsg'); if(!u||!k){el.textContent='Enter URL and key';return;} el.textContent='Testing...'; try{ const r=await fetch(u.replace(/\/$/,'')+'/wp-json/dd/v1/sync?action=ping',{headers:{'X-DD-Key':k}}); const j=await r.json(); el.style.color=j?.success?'var(--gr)':'var(--pk)'; el.textContent=j?.success?'✅ Connected!':'❌ '+(j?.message||'Error'); }catch(e){ el.style.color='var(--pk)'; el.textContent='❌ '+e.message; } }
+function setSyncSt(s){ 
+  const labels={loading:['⟳','#888'],cloud:['☁ Cloud Saved','var(--gr)'],local:['💾 Local Only','var(--tx2)']};
+  const[t,col]=labels[s]||labels.local; 
+  ['syncSt','syncSt2'].forEach(function(id){var el=document.getElementById(id);if(el){el.textContent=t;el.style.color=col;}});
+  var emailEl=document.getElementById('authUserEmail');
+  if(emailEl) emailEl.textContent=_supaUser?_supaUser.email:'';
+  var sob=document.getElementById('sideSignOutBtn');
+  if(sob) sob.style.display=_supaUser?'block':'none';
+}
 
+const SUPA_URL = 'https://hrohgwcbfgywkpnvqxhk.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhyb2hnd2NiZmd5d2twbnZxeGhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MjcxNDYsImV4cCI6MjA4ODQwMzE0Nn0.PuWtBpiMw2DiCLp26ZP_Rd9BwzFvWT0sNZrDUNdULyo';
+let _supa=null,_supaUser=null;
+function getSupabase(){if(!_supa&&window.supabase){_supa=window.supabase.createClient(SUPA_URL,SUPA_KEY);}return _supa;}
+function getCC(){ return null; }
+async function cloudSync(){
+  console.log('[LifeOS Sync] cloudSync called. user:',_supaUser?_supaUser.email:'NULL');
+  const supa=getSupabase();
+  if(!supa||!_supaUser){setSyncSt('local');return;}
+  try{
+    const{error}=await supa.from('profiles').upsert({user_id:_supaUser.id,email:_supaUser.email,data:D,updated_at:new Date().toISOString()},{onConflict:'user_id'});
+    console.log('[LifeOS Sync] upsert error:',error);
+    setSyncSt(error?'local':'cloud');
+  }catch(e){console.error('[LifeOS Sync]',e);setSyncSt('local');}
+}
+async function cloudLoad(){
+  const supa=getSupabase();
+  if(!supa||!_supaUser)return false;
+  try{
+    const{data,error}=await supa.from('profiles').select('data').eq('user_id',_supaUser.id).single();
+    if(error||!data?.data)return false;
+    for(const k of Object.keys(DEF)){if(k in data.data)D[k]=data.data[k];}
+    return true;
+  }catch(e){return false;}
+}
+function authSwitchTab(tab){
+  const s=tab==='signup';
+  document.getElementById('authConfirmWrap').style.display=s?'block':'none';
+  document.getElementById('authForgotWrap').style.display=s?'none':'block';
+  document.getElementById('authBtn').textContent=s?'Create Account':'Sign In';
+  document.getElementById('authTabLogin').style.background=s?'transparent':'var(--c)';
+  document.getElementById('authTabLogin').style.color=s?'var(--tx2)':'#000';
+  document.getElementById('authTabSignup').style.background=s?'var(--c)':'transparent';
+  document.getElementById('authTabSignup').style.color=s?'#000':'var(--tx2)';
+  document.getElementById('authBtn').dataset.tab=tab;
+  document.getElementById('authMsg').textContent='';
+}
+function authSetMsg(msg,color){const el=document.getElementById('authMsg');if(el){el.textContent=msg;el.style.color=color||'#f87171';}}
+function authSetLoading(on){const el=document.getElementById('authLoading');if(el)el.style.display=on?'flex':'none';}
+async function authSubmit(){
+  const supa=getSupabase();
+  if(!supa){authContinueLocal();return;}
+  const email=(document.getElementById('authEmail')||{}).value?.trim();
+  const pass=(document.getElementById('authPassword')||{}).value;
+  const confirm=(document.getElementById('authConfirm')||{}).value;
+  const tab=document.getElementById('authBtn').dataset.tab||'login';
+  if(!email||!pass){authSetMsg('Please enter email and password.');return;}
+  if(pass.length<6){authSetMsg('Password must be at least 6 characters.');return;}
+  if(tab==='signup'&&pass!==confirm){authSetMsg('Passwords do not match.');return;}
+  authSetLoading(true);authSetMsg('');
+  try{
+    let result;
+    if(tab==='signup'){
+      result=await supa.auth.signUp({email,password:pass});
+      if(result.error)throw result.error;
+      _supaUser=result.data.user;
+      authSetMsg('Account created!','var(--gr)');
+      setTimeout(()=>authComplete(false),1200);
+    }else{
+      result=await supa.auth.signInWithPassword({email,password:pass});
+      if(result.error)throw result.error;
+      _supaUser=result.data.user;
+      authSetMsg('Signed in!','var(--gr)');
+      setTimeout(()=>authComplete(true),600);
+    }
+  }catch(err){
+    authSetLoading(false);
+    const msg=err.message||'Something went wrong.';
+    if(msg.includes('Invalid login'))authSetMsg('Incorrect email or password.');
+    else authSetMsg(msg);
+  }
+}
+async function authForgotPassword(){
+  const supa=getSupabase();if(!supa)return;
+  const email=(document.getElementById('authEmail')||{}).value?.trim();
+  if(!email){authSetMsg('Enter your email first.');return;}
+  authSetLoading(true);
+  const{error}=await supa.auth.resetPasswordForEmail(email);
+  authSetLoading(false);
+  if(error)authSetMsg(error.message);else authSetMsg('Reset email sent!','var(--gr)');
+}
+async function authComplete(isReturning){
+  const loaded=isReturning?await cloudLoad():false;
+  document.getElementById('authScreen').style.display='none';
+  authSetLoading(false);
+  setSyncSt(loaded?'cloud':'local');
+  if(!D.chorePin&&!D.parentPIN){showFirstTimeGate();return;}
+  finishInit();
+  setTimeout(function(){if(_supaUser)cloudSync();},2000);
+}
+function authContinueLocal(){
+  _supaUser=null;
+  document.getElementById('authScreen').style.display='none';
+  loadData();setSyncSt('local');
+  if(!D.chorePin&&!D.parentPIN){showFirstTimeGate();return;}
+  finishInit();
+}
+async function signOut(){
+  const supa=getSupabase();
+  if(supa&&_supaUser)await supa.auth.signOut();
+  _supaUser=null;D=JSON.parse(JSON.stringify(DEF));
+  localStorage.removeItem(LS);
+  document.getElementById('authScreen').style.display='flex';
+  setSyncSt('local');
+}
 // ── CLOCK ────────────────────────────────────────────────────
 function startClock(){
   function tick(){
