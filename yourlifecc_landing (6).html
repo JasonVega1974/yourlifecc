@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>YourLife CC — The Life Operating System for the Next Generation</title>
+<meta name="description" content="159+ life skill lessons across 30 categories, parent dashboard with Life Score, chores and rewards. Free plan available.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#06090f;--bg2:#0c1220;--bg3:#131c30;
+  --tx:#eef2f7;--tx2:#8b9ab8;--tx3:#5a6a85;
+  --blue:#4f8fff;--cyan:#06d6a0;--green:#22c55e;
+  --gold:#f5a623;--purple:#a78bfa;--red:#ef4444;
+  --grad:linear-gradient(135deg,#4f8fff,#06d6a0);
+  --fn:'DM Sans',sans-serif;--fh:'Sora',sans-serif;
+}
+html{scroll-behavior:smooth;}
+body{font-family:var(--fn);background:var(--bg);color:var(--tx);line-height:1.7;overflow-x:hidden;}
+a{color:var(--blue);text-decoration:none;}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px;}
+.sec{padding:88px 0;}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 0;backdrop-filter:blur(20px);background:rgba(6,9,15,.8);border-bottom:1px solid rgba(255,255,255,.04);}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-family:var(--fh);font-size:1.3rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.nav-links{display:flex;gap:1.8rem;align-items:center;}
+.nav-links a{color:var(--tx2);font-size:.85rem;font-weight:500;}
+.nav-links a:hover{color:var(--tx);}
+.nav-cta{background:var(--grad);color:#fff!important;padding:9px 20px;border-radius:10px;font-weight:700!important;}
+
+/* HERO */
+.hero{padding:148px 0 90px;text-align:center;}
+.hero h1{font-family:var(--fh);font-size:clamp(2.4rem,5.5vw,4.2rem);font-weight:800;line-height:1.1;margin-bottom:1.2rem;letter-spacing:-.025em;}
+.hero h1 em{font-style:normal;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hero p{font-size:1.1rem;color:var(--tx2);max-width:560px;margin:0 auto 2rem;line-height:1.75;}
+.hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:.8rem;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:15px 32px;border-radius:13px;font-family:var(--fn);font-weight:700;font-size:.95rem;border:none;cursor:pointer;transition:all .25s;text-decoration:none;}
+.btn:hover{transform:translateY(-2px);}
+.bp{background:var(--grad);color:#fff;box-shadow:0 6px 24px rgba(79,143,255,.3);}
+.bp:hover{box-shadow:0 10px 36px rgba(79,143,255,.45);}
+.bo{background:transparent;color:var(--tx);border:1.5px solid rgba(255,255,255,.15);}
+.bo:hover{border-color:var(--blue);color:var(--blue);}
+.hero-note{font-size:.8rem;color:var(--tx3);margin-bottom:3rem;}
+.hero-stats{display:flex;justify-content:center;gap:clamp(1.5rem,4vw,3.5rem);flex-wrap:wrap;}
+.hs-num{font-family:var(--fh);font-size:2rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hs-lbl{font-size:.7rem;color:var(--tx3);font-weight:500;letter-spacing:.5px;}
+
+/* TRUST BAR */
+.trust{padding:36px 0;background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.03);}
+.trust-items{display:flex;justify-content:center;gap:2.5rem;flex-wrap:wrap;}
+.trust-item{display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--tx2);font-weight:500;}
+
+/* ══════════════════
+   PRICING
+══════════════════ */
+.price-head{text-align:center;margin-bottom:2.2rem;}
+.price-head .tag{font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--gold);display:block;margin-bottom:.8rem;}
+.price-head h2{font-family:var(--fh);font-size:clamp(2rem,4vw,3rem);font-weight:800;margin-bottom:.8rem;letter-spacing:-.02em;}
+.price-head p{color:var(--tx2);font-size:1rem;max-width:560px;margin:0 auto;}
+
+/* Tab bar */
+.btabs{display:flex;justify-content:center;gap:3px;margin-bottom:44px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:13px;padding:4px;width:fit-content;margin-left:auto;margin-right:auto;}
+.btab{position:relative;padding:10px 28px;border-radius:10px;border:none;font-family:var(--fn);font-size:.85rem;font-weight:700;cursor:pointer;color:var(--tx3);background:transparent;transition:all .2s;}
+.btab.on{background:var(--bg3);color:var(--tx);box-shadow:0 2px 12px rgba(0,0,0,.5);}
+.save-pip{position:absolute;top:-10px;right:-6px;background:var(--green);color:#000;font-size:.5rem;font-weight:900;padding:2px 7px;border-radius:100px;letter-spacing:.04em;white-space:nowrap;}
+
+/* 3-column grid */
+.pg{display:grid;grid-template-columns:1fr 1.06fr 1fr;gap:16px;max-width:1060px;margin:0 auto;align-items:start;}
+.pg.hide{display:none!important;}
+@media(max-width:860px){.pg{grid-template-columns:1fr;max-width:420px;}}
+
+/* Card base */
+.pc{background:var(--bg2);border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:2.2rem 1.9rem 2.4rem;position:relative;transition:transform .25s,box-shadow .25s;}
+.pc:hover{transform:translateY(-4px);}
+
+/* Popular center card */
+.pc.pop{border-color:rgba(79,143,255,.3);background:linear-gradient(160deg,rgba(79,143,255,.07),var(--bg2) 60%);box-shadow:0 0 0 1px rgba(79,143,255,.3),0 24px 60px rgba(79,143,255,.1);margin-top:-14px;padding-top:2.6rem;padding-bottom:2.8rem;}
+.pc.pop:hover{box-shadow:0 0 0 1px rgba(79,143,255,.45),0 32px 80px rgba(79,143,255,.2);}
+
+/* Gold lifetime card */
+.pc.ltm{border-color:rgba(245,166,35,.25);background:linear-gradient(160deg,rgba(245,166,35,.06),var(--bg2) 60%);box-shadow:0 0 0 1px rgba(245,166,35,.25),0 20px 50px rgba(245,166,35,.07);}
+.pc.ltm:hover{box-shadow:0 0 0 1px rgba(245,166,35,.4),0 28px 70px rgba(245,166,35,.14);}
+
+/* Badge */
+.pc-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-family:var(--fh);font-size:.6rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:.38rem 1.2rem;border-radius:100px;white-space:nowrap;}
+.pc-badge.bb{background:var(--grad);color:#fff;box-shadow:0 4px 16px rgba(79,143,255,.45);}
+.pc-badge.bg{background:linear-gradient(90deg,#f5a623,#e09010);color:#000;box-shadow:0 4px 14px rgba(245,166,35,.4);}
+
+.pc-name{font-family:var(--fh);font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:.9rem;color:var(--tx3);}
+.pc.pop .pc-name{color:var(--blue);}
+.pc.ltm .pc-name{color:var(--gold);}
+
+.pc-price{font-family:var(--fh);font-weight:800;line-height:1;margin-bottom:.3rem;}
+.pc-price .dl{font-size:1.5rem;vertical-align:top;margin-top:.55rem;font-weight:700;}
+.pc-price .am{font-size:3.6rem;letter-spacing:-.03em;}
+.pc-price .ct{font-size:1.7rem;font-weight:600;}
+.pc.ltm .pc-price{color:var(--gold);}
+.pc-per{font-size:.8rem;color:var(--tx3);margin-bottom:1.2rem;min-height:2.2rem;line-height:1.5;}
+
+.pc-who{font-size:.82rem;color:var(--tx2);line-height:1.55;padding:.85rem 0 1rem;border-top:1px solid rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.05);margin-bottom:1.3rem;}
+.pc.pop .pc-who{border-color:rgba(79,143,255,.12);}
+.pc.ltm .pc-who{border-color:rgba(245,166,35,.12);}
+
+.math-box{background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.18);border-radius:10px;padding:.7rem 1rem;margin-bottom:1.1rem;font-size:.76rem;color:rgba(255,235,160,.6);line-height:1.6;}
+.math-box strong{color:var(--gold);}
+
+.pc ul{list-style:none;display:flex;flex-direction:column;gap:.72rem;margin-bottom:1.9rem;}
+.pc li{display:flex;align-items:flex-start;gap:.6rem;font-size:.83rem;color:var(--tx2);line-height:1.5;}
+.ck{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.62rem;flex-shrink:0;margin-top:1px;background:rgba(255,255,255,.06);color:var(--tx3);}
+.pc.pop .ck{background:rgba(79,143,255,.15);color:var(--blue);}
+.pc.ltm .ck{background:rgba(245,166,35,.12);color:var(--gold);}
+.pc li strong{color:var(--tx);font-weight:600;}
+.flbl{font-size:.58rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);padding:.4rem 0 0;margin-top:.2rem;}
+
+/* All CTA buttons are solid — no ghost */
+.pc-btn{width:100%;padding:.95rem;border-radius:13px;border:none;font-family:var(--fn);font-size:.92rem;font-weight:700;cursor:pointer;transition:all .22s;display:flex;align-items:center;justify-content:center;gap:.5rem;text-decoration:none;}
+.b-free{background:rgba(255,255,255,.08);color:var(--tx);border:1px solid rgba(255,255,255,.12);}
+.b-free:hover{background:rgba(255,255,255,.14);transform:translateY(-1px);}
+.b-fam{background:var(--grad);color:#fff;box-shadow:0 8px 24px rgba(79,143,255,.3);}
+.b-fam:hover{box-shadow:0 14px 36px rgba(79,143,255,.45);transform:translateY(-2px);}
+.b-life{background:linear-gradient(135deg,#f5a623,#e08c0a);color:#000;box-shadow:0 8px 24px rgba(245,166,35,.3);}
+.b-life:hover{box-shadow:0 14px 36px rgba(245,166,35,.45);transform:translateY(-2px);}
+.blue{background:var(--grad);color:#fff;box-shadow:0 8px 24px rgba(79,143,255,.3);}
+.blue:hover{box-shadow:0 14px 36px rgba(79,143,255,.45);transform:translateY(-2px);}
+.gold{background:linear-gradient(135deg,#f5a623,#e08c0a);color:#000;box-shadow:0 8px 24px rgba(245,166,35,.3);}
+.gold:hover{box-shadow:0 14px 36px rgba(245,166,35,.45);transform:translateY(-2px);}
+.pc-note{text-align:center;font-size:.67rem;color:var(--tx3);margin-top:.5rem;}
+
+/* Helper strip */
+.helper{max-width:860px;margin:36px auto 0;background:var(--bg2);border:1px solid rgba(255,255,255,.05);border-radius:15px;padding:1.4rem 2rem;display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;text-align:center;}
+@media(max-width:700px){.helper{grid-template-columns:1fr;}}
+.helper strong{display:block;font-family:var(--fh);font-size:.88rem;font-weight:700;margin-bottom:.25rem;}
+.helper p{font-size:.78rem;color:var(--tx3);line-height:1.5;}
+
+/* COMING SOON */
+.cs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-bottom:2.5rem;}
+@media(max-width:768px){.cs-grid{grid-template-columns:1fr;}}
+.cs-card{background:var(--bg3);border:1px solid rgba(167,139,250,.12);border-radius:16px;padding:1.5rem;text-align:left;}
+.cs-card h4{font-family:var(--fh);font-size:.95rem;font-weight:800;margin-bottom:.4rem;}
+.cs-card p{font-size:.8rem;color:var(--tx2);line-height:1.6;}
+.cs-tag{font-size:.58rem;letter-spacing:2px;color:var(--purple);font-weight:700;margin-bottom:.4rem;text-transform:uppercase;}
+
+/* CHURCH */
+.org-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:2rem;}
+@media(max-width:768px){.org-grid{grid-template-columns:1fr;}}
+.org-card{background:var(--bg2);border:1px solid rgba(255,255,255,.05);border-radius:14px;padding:1.5rem;text-align:center;transition:all .25s;}
+.org-card:hover{border-color:rgba(6,214,160,.15);transform:translateY(-2px);}
+.org-card h3{font-family:var(--fh);font-size:1rem;font-weight:700;margin-bottom:.2rem;}
+.org-pr{font-family:var(--fh);font-size:1.8rem;font-weight:800;color:var(--cyan);margin:.5rem 0;}
+.org-per{font-size:.78rem;color:var(--tx2);}
+.org-card ul{text-align:left;margin:1rem 0;list-style:none;display:flex;flex-direction:column;gap:.35rem;}
+.org-card li{font-size:.78rem;color:var(--tx2);display:flex;gap:.4rem;}
+.org-card li::before{content:'✓';color:var(--cyan);font-weight:700;}
+
+/* REVIEWS */
+.rev-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1.2rem;margin-top:2rem;}
+.rc{background:var(--bg2);border:1px solid rgba(255,255,255,.04);border-radius:14px;padding:1.4rem;}
+.rc-stars{color:var(--gold);margin-bottom:.6rem;}
+.rc-text{font-size:.88rem;color:var(--tx2);line-height:1.7;margin-bottom:1rem;font-style:italic;}
+.rc-who{display:flex;align-items:center;gap:.6rem;}
+.rc-av{width:38px;height:38px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.8rem;color:#fff;flex-shrink:0;}
+
+/* FAQ */
+.faq-list{max-width:700px;margin:2rem auto 0;}
+.fq{background:var(--bg2);border:1px solid rgba(255,255,255,.04);border-radius:12px;margin-bottom:.5rem;overflow:hidden;}
+.fq-q{padding:1rem 1.3rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-weight:600;font-size:.9rem;transition:background .2s;}
+.fq-q:hover{background:rgba(255,255,255,.015);}
+.fq-q .arr{transition:transform .3s;font-size:.75rem;color:var(--tx3);}
+.fq-q.on .arr{transform:rotate(180deg);}
+.fq-a{max-height:0;overflow:hidden;transition:max-height .35s ease;padding:0 1.3rem;}
+.fq-a.on{max-height:400px;padding:0 1.3rem 1rem;}
+.fq-a p{font-size:.85rem;color:var(--tx2);line-height:1.7;}
+
+/* FOOTER */
+footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:50px 0 28px;}
+.ft-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2rem;margin-bottom:2rem;}
+@media(max-width:768px){.ft-grid{grid-template-columns:1fr 1fr;}}
+.ft-col h4{font-family:var(--fh);font-size:.8rem;font-weight:700;margin-bottom:.8rem;}
+.ft-col a{display:block;font-size:.82rem;color:var(--tx3);margin-bottom:.4rem;}
+.ft-col a:hover{color:var(--tx);}
+.ft-bottom{text-align:center;border-top:1px solid rgba(255,255,255,.04);padding-top:1.5rem;font-size:.78rem;color:var(--tx3);}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="wrap">
+    <span class="nav-logo">YourLife CC</span>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#church">Churches</a>
+      <a href="#faq">FAQ</a>
+      <a href="login.html">Sign In</a>
+      <a href="register.html" class="nav-cta">Get Started Free</a>
+    </div>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="wrap">
+    <h1>Everything School<br><em>Doesn't Teach.</em></h1>
+    <p>159+ life skill lessons across 30 categories, career explorer, 365 daily scriptures, parent dashboard with Life Score, chores and rewards — everything young people need to grow up ready for real life.</p>
+    <div class="hero-btns">
+      <a href="register.html" class="btn bp">Start Free Today →</a>
+      <a href="#video" class="btn bo">▶ Watch Demo</a>
+    </div>
+    <div class="hero-note">Free plan available · No credit card required · Upgrade anytime</div>
+    <div class="hero-stats">
+      <div style="text-align:center;"><div class="hs-num">159+</div><div class="hs-lbl">Life Skill Lessons</div></div>
+      <div style="text-align:center;"><div class="hs-num">30</div><div class="hs-lbl">Skill Categories</div></div>
+      <div style="text-align:center;"><div class="hs-num">134+</div><div class="hs-lbl">Quiz Questions</div></div>
+      <div style="text-align:center;"><div class="hs-num">365</div><div class="hs-lbl">Daily Scriptures</div></div>
+      <div style="text-align:center;"><div class="hs-num">51</div><div class="hs-lbl">App Sections</div></div>
+      <div style="text-align:center;"><div class="hs-num">35</div><div class="hs-lbl">Career Profiles</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="trust">
+  <div class="wrap">
+    <div class="trust-items">
+      <div class="trust-item">🔒 Bank-Level Security</div>
+      <div class="trust-item">📱 Any Device</div>
+      <div class="trust-item">⛪ Church Licenses</div>
+      <div class="trust-item">💯 30-Day Guarantee</div>
+      <div class="trust-item">⭐ 4.9/5 Rating</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features" class="sec" style="background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);">
+  <div class="wrap">
+    <div style="text-align:center;margin-bottom:3rem;">
+      <div style="font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--blue);margin-bottom:.8rem;">EVERYTHING THEY NEED</div>
+      <h2 style="font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;line-height:1.15;letter-spacing:-.02em;margin-bottom:.8rem;">51 Sections. 159+ Lessons. One Platform.</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;" class="fc">
+      <div>
+        <div style="font-size:.85rem;font-weight:800;color:var(--blue);margin-bottom:.8rem;border-bottom:2px solid var(--blue);padding-bottom:.4rem;">🧠 EDUCATION &amp; SKILLS</div>
+        <div style="display:flex;flex-direction:column;gap:.45rem;">
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>159+ Life Skill Lessons</b> across 30 categories</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>43 Growing Up Topics</b> — puberty, emotions, drugs, hygiene</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>22 Character Lessons</b> — kindness, resilience, leadership</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>35 Career Profiles</b> with salary ranges and roadmaps</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>14 Sports Profiles</b> with scholarship timelines</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Driving Education</b> — license prep, car maintenance</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Music Hub</b> — 14 instrument guides, practice timer</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:.85rem;font-weight:800;color:var(--purple);margin-bottom:.8rem;border-bottom:2px solid var(--purple);padding-bottom:.4rem;">✝️ FAITH &amp; DAILY TOOLS</div>
+        <div style="display:flex;flex-direction:column;gap:.45rem;">
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>365 Daily Scriptures</b> with streaks</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>30 Daily Devotionals</b> with reflection and application</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Bible Reading Log</b> — all 66 books</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Faith Mode Toggle</b> — ON or OFF per family</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>School Tracker</b> — GPA, assignments, study timer</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Journal and Mood Tracker</b> with daily prompts</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Resume Builder and Bio Page</b> with QR code</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:.85rem;font-weight:800;color:var(--green);margin-bottom:.8rem;border-bottom:2px solid var(--green);padding-bottom:.4rem;">👨‍👩‍👧 PARENT &amp; REWARDS</div>
+        <div style="display:flex;flex-direction:column;gap:.45rem;">
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Life Score Dashboard</b> — weighted A+ to F grade</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Multi-Child Profiles</b> — separate PIN-protected dashboards</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Parent Bucks Economy</b> — virtual currency, redeemable store</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Spin Wheel and Scratch Cards</b> — reward games</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Screen Time Manager</b> — earn minutes for games and TV</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Parent Quiz System</b> — send quizzes to kids</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Activity Audit Trail</b> — timestamped, anti-cheating</span></div>
+        </div>
+      </div>
+    </div>
+    <style>@media(max-width:768px){.fc{grid-template-columns:1fr!important;}}</style>
+  </div>
+</section>
+
+<!-- VIDEO -->
+<section class="sec" id="video" style="text-align:center;">
+  <div class="wrap">
+    <div style="font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--gold);margin-bottom:.8rem;">🎬 SEE IT IN ACTION</div>
+    <h2 style="font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;margin-bottom:.8rem;">Watch How It Works</h2>
+    <div style="max-width:780px;margin:2rem auto 0;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.06);aspect-ratio:16/9;background:#111;">
+      <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--bg3),var(--bg2));cursor:pointer;" onclick="this.innerHTML='<iframe src=\'https://www.youtube.com/embed/YOUR_VIDEO_ID?autoplay=1\' allowfullscreen style=\'width:100%;height:100%;border:none;\'></iframe>'">
+        <div style="width:72px;height:72px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin-bottom:.8rem;">▶</div>
+        <div style="font-weight:700;">Click to Play Demo</div>
+        <div style="font-size:.82rem;color:var(--tx2);margin-top:.3rem;">Full walkthrough · Under 5 min</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="sec" id="pricing" style="background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);">
+  <div class="wrap">
+    <div class="price-head">
+      <span class="tag">💰 PRICING</span>
+      <h2>Start Free. Upgrade When You're Ready.</h2>
+      <p>No credit card to start. Monthly cancel anytime. Lifetime is a one-time purchase — no subscription, no auto-charges ever.</p>
+    </div>
+
+    <div class="btabs">
+      <button class="btab on" onclick="showPricing('monthly',this)">Monthly</button>
+      <button class="btab" onclick="showPricing('yearly',this)">Yearly <span class="save-pip">SAVE 33%</span></button>
+      <button class="btab" onclick="showPricing('lifetime',this)">Lifetime</button>
+    </div>
+
+    <!-- MONTHLY -->
+    <div id="pg-monthly" class="pg">
+
+      <div class="pc">
+        <div class="pc-name">Individual</div>
+        <div class="pc-price"><span class="dl">$</span><span class="am">4</span><span class="ct">.99</span></div>
+        <div class="pc-per">per month · 1 child profile</div>
+        <div class="pc-who">Perfect for a single child. Full access to every lesson, section, and tool.</div>
+        <ul>
+          <li><span class="ck">✓</span><div><strong>1 child profile</strong> with private PIN login</div></li>
+          <li><span class="ck">✓</span><div><strong>All 51 sections unlocked</strong></div></li>
+          <li><span class="ck">✓</span><div><strong>159+ life skill lessons + 134 quizzes</strong></div></li>
+          <li><span class="ck">✓</span><div>Chores, rewards, habits, goals, journal</div></li>
+          <li><span class="ck">✓</span><div>Parent Hub with Life Score</div></li>
+        </ul>
+        <a href="register.html?plan=monthly-individual" class="pc-btn blue">Start 3-Day Trial →</a>
+        <p class="pc-note">Free for 3 days · then $4.99/mo · cancel anytime</p>
+      </div>
+
+      <div class="pc pop">
+        <div class="pc-badge bb">🔥 Most Popular</div>
+        <div class="pc-name">Family</div>
+        <div class="pc-price"><span class="dl">$</span><span class="am">9</span><span class="ct">.99</span></div>
+        <div class="pc-per">per month · unlimited children</div>
+        <div class="pc-who">Every kid gets their own dashboard. Full Parent Hub shows you what's actually going on.</div>
+        <ul>
+          <li><span class="ck">✓</span><div><strong>Unlimited child profiles</strong> — every kid, private PIN-protected</div></li>
+          <li><span class="ck">✓</span><div><strong>All 51 sections unlocked</strong> for every child</div></li>
+          <li><span class="ck">✓</span><div><strong>159+ lessons + 134 quizzes</strong></div></li>
+          <li><span class="ck">✓</span><div><strong>Full chore system</strong> with Parent Bucks + rewards</div></li>
+          <li><span class="ck">✓</span><div><strong>Parent Hub</strong> — Life Score, weekly reports, screen time</div></li>
+          <li><span class="ck">✓</span><div>Spin wheel, scratch cards, streak leaderboard</div></li>
+        </ul>
+        <a href="register.html?plan=monthly-family" class="pc-btn blue" style="font-size:.96rem;padding:1.05rem;">Start 3-Day Trial →</a>
+        <p class="pc-note">Free for 3 days · then $9.99/mo · cancel anytime</p>
+      </div>
+
+      <div class="pc">
+        <div class="pc-badge" style="background:rgba(6,214,160,.12);color:var(--cyan);border:1px solid rgba(6,214,160,.25);">⛪ Church &amp; Group</div>
+        <div class="pc-name">Church / Group</div>
+        <div class="pc-price"><span class="dl">$</span><span class="am">29</span><span class="ct">.99</span></div>
+        <div class="pc-per">per month · up to 10 youth</div>
+        <div class="pc-who">Issue access to your youth group. Track onboarding and engagement across your whole cohort.</div>
+        <ul>
+          <li><span class="ck">✓</span><div><strong>Up to 10 youth profiles</strong></div></li>
+          <li><span class="ck">✓</span><div><strong>Admin dashboard</strong> — onboarding status, engagement</div></li>
+          <li><span class="ck">✓</span><div><strong>Bulk QR invite codes</strong></div></li>
+          <li><span class="ck">✓</span><div>All 51 sections + 159+ lessons for every youth</div></li>
+          <li><span class="ck">✓</span><div>Faith mode toggle for every profile</div></li>
+          <li><span class="ck">✓</span><div>Priority support &amp; onboarding call</div></li>
+        </ul>
+        <a href="register.html?plan=monthly-church" class="pc-btn blue">Start 3-Day Trial →</a>
+        <p class="pc-note">Free for 3 days · then $29.99/mo · cancel anytime</p>
+      </div>
+
+    </div>
+
+    <!-- YEARLY -->
+    <div id="pg-yearly" class="pg hide">
+
+      <div class="pc">
+        <div class="pc-name">Individual</div>
+        <div class="pc-price"><span class="dl">$</span><span class="am">39</span><span class="ct">.99</span></div>
+        <div class="pc-per">per year · save $20 vs monthly</div>
+        <div class="pc-who">1 child, full access, 2 months free every year.</div>
+        <ul>
+          <li><span class="ck">✓</span><div><strong>1 child profile</strong> with private PIN login</div></li>
+          <li><span class="ck">✓</span><div><strong>All 51 sections unlocked</strong></div></li>
+          <li><span class="ck">✓</span><div><strong>159+ lessons + 134 quizzes</strong></div></li>
+          <li><span class="ck">✓</span><div>Chores, rewards, habits, goals, journal</div></li>
+          <li><span class="ck">✓</span><div>Parent Hub with Life Score</div></li>
+          <li><span class="ck">✓</span><div><strong>Save $20</strong> vs monthly billing</div></li>
+        </ul>
+        <a href="register.html?plan=yearly-individual" class="pc-btn blue">Start 3-Day Trial →</a>
+        <p class="pc-note">Free for 3 days · then $39.99/yr · cancel anytime</p>
+      </div>
+
+      <div class="pc pop">
+        <div class="pc-badge bg">💰 Best Value</div>
+        <div class="pc-name">Family</div>
+        <div class="pc-price"><span class="dl">$</span><span class="am">79</span><span class="ct">.99</span></div>
+        <div class="pc-per">per year · that's $6.67/mo · save $40</div>
+        <div class="pc-who">All the power of Family Monthly at 33% off. Two months free every year.</div>
+        <ul>
+          <li><span class="ck">✓</span><div><strong>Unlimited child profiles</strong></div></li>
+          <li><span class="ck">✓</span><div><strong>All 51 sections + 159+ lessons</strong></div></li>
+          <li><span class="ck">✓</span><div><strong>Full chores &amp; rewards system</strong></div></li>
+          <li><span class="ck">✓</span><div><strong>Parent Hub</strong> — Life Score, reports, screen time</div></li>
+          <li><span class="ck">✓</span><div><strong>Save $40</strong> — 2 months completely free</div></li>
+          <li><span class="ck">✓</span><div><strong>Rate locked</strong> while on annual billing</div></li>
+        </ul>
+        <a href="register.html?plan=yearly-family" class="pc-btn blue" style="font-size:.96rem;padding:1.05rem;">Start 3-Day Trial →</a>
+        <p class="pc-note">Free for 3 days · then $79.99/yr · cancel anytime</p>
+      </div>
+
+      <div class="pc">
+        <div class="pc-badge" style="background:rgba(6,214,160,.12);color:var(--cyan);border:1px solid rgba(6,214,160,.25);">⛪ Church &amp; Group</div>
+        <div class="pc-name">Church / Group</div>
+        <div class="pc-price"><span class="dl">$</span><span class="am">249</span><span class="ct">.99</span></div>
+        <div class="pc-per">per year · save $110 vs monthly</div>
+        <div class="pc-who">Up to 10 youth. Full admin dashboard. Save $110 compared to paying monthly.</div>
+        <ul>
+          <li><span class="ck">✓</span><div><strong>Up to 10 youth profiles</strong></div></li>
+          <li><span class="ck">✓</span><div><strong>Admin dashboard + reporting</strong></div></li>
+          <li><span class="ck">✓</span><div>Bulk QR invite codes</div></li>
+          <li><span class="ck">✓</span><div>All 51 sections for every youth</div></li>
+          <li><span class="ck">✓</span><div><strong>Save $110</strong> vs monthly billing</div></li>
+          <li><span class="ck">✓</span><div>Priority support &amp; onboarding call</div></li>
+        </ul>
+        <a href="register.html?plan=yearly-church" class="pc-btn blue">Start 3-Day Trial →</a>
+        <p class="pc-note">Free for 3 days · then $249.99/yr · cancel anytime</p>
+      </div>
+
+    </div>
+
+    <!-- LIFETIME TAB -->
+    <div id="pg-lifetime" class="pg hide">
+
+      <div class="pc">
+        <div class="pc-name">Individual</div>
+        <div class="pc-price"><span class="dl">$</span><span class="am">59</span></div>
+        <div class="pc-per">one payment · 1 child · yours forever</div>
+        <div class="pc-who">One payment and you never think about it again. Every future update included automatically.</div>
+        <ul>
+          <li><span class="ck">✓</span><div><strong>1 child profile</strong> — never pay again</div></li>
+          <li><span class="ck">✓</span><div><strong>All 51 sections unlocked forever</strong></div></li>
+          <li><span class="ck">✓</span><div><strong>All future updates free, forever</strong></div></li>
+          <li><span class="ck">✓</span><div>159+ lessons — every new lesson included</div></li>
+          <li><span class="ck">✓</span><div><strong>30-day money-back guarantee</strong></div></li>
+        </ul>
+        <a href="register.html?plan=lifetime-individual" class="pc-btn blue">Buy Now — $59 Once →</a>
+        <p class="pc-note">30-day money-back guarantee · no subscription · yours forever</p>
+      </div>
+
+      <div class="pc pop">
+        <div class="pc-badge bg">⚡ Pay Once Forever</div>
+        <div class="pc-name">Family</div>
+        <div class="pc-price"><span class="dl">$</span><span class="am">149</span></div>
+        <div class="pc-per">one payment · unlimited family · forever</div>
+        <div class="math-box">Monthly = <strong>$9.99/mo forever</strong>. Lifetime = <strong>$149 once</strong>. Break-even: <strong>15 months</strong>. A 12-yr-old through 18 = <strong>$600+ saved</strong>.</div>
+        <div class="pc-who">Pay once, own it forever. Every future update, your whole family — included for life.</div>
+        <ul>
+          <li><span class="ck">✓</span><div><strong>Unlimited family members</strong> — never pay again</div></li>
+          <li><span class="ck">✓</span><div><strong>All 51 sections + all future updates</strong></div></li>
+          <li><span class="ck">✓</span><div><strong>Full Parent Hub forever</strong></div></li>
+          <li><span class="ck">✓</span><div><strong>Priority support</strong></div></li>
+          <li><span class="ck">✓</span><div><strong>Price locked forever</strong></div></li>
+          <li><span class="ck">✓</span><div><strong>30-day money-back guarantee</strong></div></li>
+        </ul>
+        <a href="register.html?plan=lifetime-family" class="pc-btn gold" style="font-size:.96rem;padding:1.05rem;">Buy Now — $149 Once →</a>
+        <p class="pc-note">30-day money-back guarantee · no subscription · yours forever</p>
+      </div>
+
+      <div class="pc">
+        <div class="pc-badge" style="background:rgba(6,214,160,.12);color:var(--cyan);border:1px solid rgba(6,214,160,.25);">⛪ Best for Ministries</div>
+        <div class="pc-name">Church / Group</div>
+        <div class="pc-price"><span class="dl">$</span><span class="am">599</span></div>
+        <div class="pc-per">one payment · up to 10 youth · forever</div>
+        <div class="pc-who">Issue lifetime access to your core youth group. No annual renewals, no per-student costs.</div>
+        <ul>
+          <li><span class="ck">✓</span><div><strong>Up to 10 youth profiles forever</strong></div></li>
+          <li><span class="ck">✓</span><div><strong>Admin dashboard + reporting</strong></div></li>
+          <li><span class="ck">✓</span><div>All future lessons &amp; updates included</div></li>
+          <li><span class="ck">✓</span><div>Bulk QR invite codes</div></li>
+          <li><span class="ck">✓</span><div>Priority support &amp; onboarding call</div></li>
+          <li><span class="ck">✓</span><div><strong>30-day money-back guarantee</strong></div></li>
+        </ul>
+        <a href="register.html?plan=lifetime-church" class="pc-btn blue">Buy Now — $599 Once →</a>
+        <p class="pc-note">30-day money-back guarantee · no subscription · yours forever</p>
+      </div>
+
+    </div>
+
+    <div class="helper">
+      <div><div style="font-size:1.3rem;margin-bottom:.4rem;">👋</div><strong>Start with Free</strong><p>Try with one child before spending anything. Free is genuinely useful.</p></div>
+      <div><div style="font-size:1.3rem;margin-bottom:.4rem;">👨‍👩‍👧</div><strong>Choose Monthly or Yearly</strong><p>More than one kid, or want chores and the Parent Hub. Yearly saves $40.</p></div>
+      <div><div style="font-size:1.3rem;margin-bottom:.4rem;">⚡</div><strong>Go Lifetime</strong><p>Your kids are young and you never want to think about a subscription again.</p></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- COMING SOON -->
+<section class="sec" style="text-align:center;">
+  <div class="wrap">
+    <div style="font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--purple);margin-bottom:.8rem;">🚀 WHAT'S NEXT</div>
+    <h2 style="font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;margin-bottom:.8rem;">We're Just Getting Started.</h2>
+    <p style="color:var(--tx2);max-width:580px;margin:0 auto 3rem;line-height:1.75;">YourLife CC is a living platform. We ship new lessons, features and tools continuously. Every plan gets every update automatically — free, forever.</p>
+    <div class="cs-grid">
+      <div class="cs-card"><div style="font-size:1.6rem;margin-bottom:.5rem;">📱</div><div class="cs-tag">COMING SOON</div><h4>Native Mobile App</h4><p>iOS and Android with push notifications, offline lessons, and home screen access.</p></div>
+      <div class="cs-card"><div style="font-size:1.6rem;margin-bottom:.5rem;">🤖</div><div class="cs-tag">COMING SOON</div><h4>AI Life Coach</h4><p>A personalized AI assistant that answers questions and gives tailored guidance based on life stage and goals.</p></div>
+      <div class="cs-card"><div style="font-size:1.6rem;margin-bottom:.5rem;">👥</div><div class="cs-tag">COMING SOON</div><h4>Community and Mentors</h4><p>Peer leaderboards, group challenges, and mentor-matching with verified adults in career areas of interest.</p></div>
+      <div class="cs-card"><div style="font-size:1.6rem;margin-bottom:.5rem;">🎓</div><div class="cs-tag">COMING SOON</div><h4>Verified Certificates</h4><p>Shareable, printable certificates for each completed skill category — real credentials for college apps and resumes.</p></div>
+      <div class="cs-card"><div style="font-size:1.6rem;margin-bottom:.5rem;">🏦</div><div class="cs-tag">COMING SOON</div><h4>Financial Simulations</h4><p>Interactive budgeting, tax return practice, investment calculators, and mock loan applications.</p></div>
+      <div class="cs-card"><div style="font-size:1.6rem;margin-bottom:.5rem;">📖</div><div class="cs-tag">COMING SOON</div><h4>300+ More Lessons</h4><p>Entrepreneurship, coding, mental health, first apartment, interview skills — shipping constantly.</p></div>
+    </div>
+    <div style="background:linear-gradient(135deg,rgba(167,139,250,.06),rgba(79,143,255,.04));border:1px solid rgba(167,139,250,.15);border-radius:14px;padding:1.2rem 2rem;display:inline-block;max-width:600px;">
+      <p style="font-size:.88rem;color:var(--tx2);line-height:1.7;"><strong style="color:var(--tx);">Every update ships free to all plans.</strong> No upsells, no add-ons, no upgrade required.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CHURCH -->
+<section class="sec" id="church" style="background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);text-align:center;">
+  <div class="wrap">
+    <div style="font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--cyan);margin-bottom:.8rem;">⛪ CHURCHES · SCHOOLS · YOUTH GROUPS</div>
+    <h2 style="font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;margin-bottom:.8rem;">Equip Your Entire Community</h2>
+    <p style="color:var(--tx2);max-width:560px;margin:0 auto;">Bulk licensing for organizations. Issue codes, track onboarding, see aggregate progress across your youth group.</p>
+    <div class="org-grid">
+      <div class="org-card"><div style="font-size:2rem;margin-bottom:.7rem;">⛪</div><h3>Starter</h3><div class="org-pr">$399</div><div class="org-per">/year — up to 20 youth</div><ul><li>20 unique access codes</li><li>Admin dashboard</li><li>Bulk QR code generation</li><li>Aggregate engagement stats</li></ul><a href="register.html" class="btn bo" style="width:100%;margin-top:.8rem;">Get Started →</a></div>
+      <div class="org-card" style="border-color:rgba(6,214,160,.2);"><div style="font-size:2rem;margin-bottom:.7rem;">🏛️</div><h3>Growth</h3><div class="org-pr">$799</div><div class="org-per">/year — up to 50 youth</div><ul><li>50 unique access codes</li><li>Admin dashboard + reporting</li><li>Custom QR invite codes</li><li>Your org branding on login</li><li>Youth leader sub-accounts</li></ul><a href="register.html" class="btn bp" style="width:100%;margin-top:.8rem;">Get Started →</a></div>
+      <div class="org-card"><div style="font-size:2rem;margin-bottom:.7rem;">🎓</div><h3>Unlimited</h3><div class="org-pr">$1,499</div><div class="org-per">/year — up to 200 youth</div><ul><li>Up to 200 access codes</li><li>Full analytics dashboard</li><li>Custom branding everywhere</li><li>Onboarding support call</li><li>Dedicated account manager</li></ul><a href="register.html" class="btn bo" style="width:100%;margin-top:.8rem;">Get Started →</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="sec" id="reviews" style="text-align:center;">
+  <div class="wrap">
+    <div style="font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--gold);margin-bottom:.8rem;">⭐ REVIEWS</div>
+    <h2 style="font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;margin-bottom:1rem;">What Families Are Saying</h2>
+    <div class="rev-grid">
+      <div class="rc"><div class="rc-stars">★★★★★</div><div class="rc-text">"My son learned more about credit and taxes in two weeks than I learned in my twenties. The parent dashboard shows me his progress without hovering."</div><div class="rc-who"><div class="rc-av">SM</div><div><div style="font-weight:700;font-size:.82rem;">Sarah M.</div><div style="font-size:.7rem;color:var(--tx3);">Mom of 2 · Texas</div></div></div></div>
+      <div class="rc"><div class="rc-stars">★★★★★</div><div class="rc-text">"The career explorer alone is worth it. The chore system with points has been a game-changer — she actually does them without being asked."</div><div class="rc-who"><div class="rc-av">DW</div><div><div style="font-weight:700;font-size:.82rem;">David W.</div><div style="font-size:.7rem;color:var(--tx3);">Dad of 3 · Ohio</div></div></div></div>
+      <div class="rc"><div class="rc-stars">★★★★★</div><div class="rc-text">"Our youth group uses the church license. 30 teens onboarded in one Sunday. Kids are competing on streaks and bringing lessons up in small groups."</div><div class="rc-who"><div class="rc-av">PR</div><div><div style="font-weight:700;font-size:.82rem;">Pastor Ryan D.</div><div style="font-size:.7rem;color:var(--tx3);">Youth Pastor · Georgia</div></div></div></div>
+      <div class="rc"><div class="rc-stars">★★★★★</div><div class="rc-text">"I homeschool three kids. This replaces five different apps I was paying for separately. The Life Score gives me a real picture of each child."</div><div class="rc-who"><div class="rc-av">JH</div><div><div style="font-weight:700;font-size:.82rem;">Jessica H.</div><div style="font-size:.7rem;color:var(--tx3);">Homeschool Mom · Idaho</div></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="sec" id="faq" style="background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);text-align:center;">
+  <div class="wrap">
+    <div style="font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--tx2);margin-bottom:.8rem;">❓ FAQ</div>
+    <h2 style="font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;margin-bottom:1rem;">Common Questions</h2>
+    <div class="faq-list">
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">Is "Free" actually free — is there a catch? <span class="arr">▼</span></div><div class="fq-a"><p>Actually free. No credit card, no trial period, no expiration. The free tier gives one child access to the personal dashboard, school tracker, habit tracker, journal, money basics, and goals — permanently. We make money when families upgrade, not by trapping them.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">Will I be charged automatically? <span class="arr">▼</span></div><div class="fq-a"><p>No. The free plan requires no card at all. If you choose Monthly or Yearly, you only get charged when you enter payment details and confirm. Lifetime is a one-time checkout — no subscription, no renewal, no auto-charge. You will never be surprised by a charge on YourLife CC.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">What's the difference between Monthly and Lifetime? <span class="arr">▼</span></div><div class="fq-a"><p>Monthly is $9.99/month — full access for as long as you pay, cancel anytime. Lifetime is $149 once — same full access forever, including every future update. Break-even is 15 months. A family with kids under 15 today will almost certainly save money going Lifetime.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">What age range is this for? <span class="arr">▼</span></div><div class="fq-a"><p>Ages 11–22+. YourLife CC has four life stages — Middle School, High School, College, and Young Adult — and content adapts automatically. The same app grows with your child for years.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">How does the Parent Hub work? <span class="arr">▼</span></div><div class="fq-a"><p>PIN-protected inside the app. Parents see a Life Score (weighted grade per child), behavior logs, chore verification, grade monitor, screen time controls, and weekly reports — without accessing the child's private journal.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">How do multiple kids work? <span class="arr">▼</span></div><div class="fq-a"><p>Every child gets their own 4-digit PIN and completely separate dashboard. Free plan: 1 child. Family Monthly, Yearly, and Lifetime: unlimited children, no extra charge.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">What if I cancel my subscription? <span class="arr">▼</span></div><div class="fq-a"><p>You drop to the free tier automatically. Your family's data is never deleted — re-subscribe anytime and pick up where you left off.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">Is this faith-based? <span class="arr">▼</span></div><div class="fq-a"><p>YourLife CC includes an optional Faith and Purpose section with 365 scriptures, 30 devotionals, and Bible content. A Faith Mode toggle lets you turn it ON or OFF. The other 29 skill categories are universal — for all families.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">What if I'm not satisfied? <span class="arr">▼</span></div><div class="fq-a"><p>30-day money-back guarantee on all paid plans, no questions asked. Email support@yourlifecc.com and we'll refund you immediately — even on the Lifetime plan.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="sec" style="text-align:center;background:linear-gradient(180deg,var(--bg2),var(--bg));">
+  <div class="wrap">
+    <div style="font-size:2.5rem;margin-bottom:.8rem;">🚀</div>
+    <h2 style="font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;margin-bottom:1rem;">Give Your Child the Unfair Advantage.</h2>
+    <p style="color:var(--tx2);font-size:1.05rem;max-width:520px;margin:0 auto 2rem;line-height:1.7;">159+ life lessons. Career tools. Goal tracking. Parent visibility. Everything they need — and everything school forgot to teach.</p>
+    <a href="register.html" class="btn bp" style="padding:18px 40px;font-size:1.05rem;border-radius:14px;">Start Free Today →</a>
+    <div style="margin-top:1rem;color:var(--tx3);font-size:.82rem;">Free plan available · No credit card required · 30-day guarantee on paid plans</div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="ft-grid">
+      <div class="ft-col"><div style="font-family:var(--fh);font-size:1.3rem;font-weight:800;margin-bottom:.5rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:inline-block;">YourLife CC</div><p style="font-size:.82rem;color:var(--tx3);max-width:280px;">The complete life operating system for the next generation. A product of Kingdom Creatives.</p></div>
+      <div class="ft-col"><h4>Product</h4><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#church">Church Licenses</a><a href="#video">Demo</a></div>
+      <div class="ft-col"><h4>Account</h4><a href="register.html">Sign Up Free</a><a href="login.html">Sign In</a><a href="#faq">FAQ</a><a href="mailto:support@yourlifecc.com">Contact</a></div>
+      <div class="ft-col"><h4>Legal</h4><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">30-Day Guarantee</a></div>
+    </div>
+    <div class="ft-bottom">© 2026 Kingdom Creatives. All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+function showPricing(type, btn) {
+  document.getElementById('pg-monthly').classList.add('hide');
+  document.getElementById('pg-yearly').classList.add('hide');
+  document.getElementById('pg-lifetime').classList.add('hide');
+  document.getElementById('pg-' + type).classList.remove('hide');
+  document.querySelectorAll('.btab').forEach(function(t){ t.classList.remove('on'); });
+  btn.classList.add('on');
+}
+function tFaq(el) {
+  var a = el.nextElementSibling;
+  var open = el.classList.contains('on');
+  document.querySelectorAll('.fq-q').forEach(function(q){ q.classList.remove('on'); });
+  document.querySelectorAll('.fq-a').forEach(function(x){ x.classList.remove('on'); x.style.maxHeight='0'; x.style.padding='0 1.3rem'; });
+  if (!open) {
+    el.classList.add('on');
+    a.classList.add('on');
+    a.style.maxHeight = a.scrollHeight + 'px';
+    a.style.padding = '0 1.3rem 1rem';
+  }
+}
+</script>
+</body>
+</html>
