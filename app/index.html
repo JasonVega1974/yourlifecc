@@ -5742,25 +5742,83 @@ let _wpTimer=null;
 // ── STORAGE ─────────────────────────────────────────────────
 const LS='lifeos_v2', CU='lifeos_cu', CK='lifeos_ck';
 
+// Supabase config
+const SB_URL='https://hrohgwcbfgywkpnvqxhk.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhyb2hnd2NiZmd5d2twbnZxeGhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MjcxNDYsImV4cCI6MjA4ODQwMzE0Nn0.PuWtBpiMw2DiCLp26ZP_Rd9BwzFvWT0sNZrDUNdULyo';
+
+// Get family ID from URL: /app?id=XXXX
+function getFamilyId(){
+  return new URLSearchParams(window.location.search).get('id') || localStorage.getItem('ylcc_family_id') || null;
+}
+
+// Save to both localStorage (instant) and Supabase (cross-device)
+let _sbSaveTimer = null;
 function save(){
   // Sync resume fields to D before saving
   const rFields=['rName','rTitle','rEmail','rPhone','rLocation','rLinkedin','rWebsite','rSummary','rSkills','rCerts','rLangs'];
   if(document.getElementById('rName')){
     if(!D.resume) D.resume={};
     rFields.forEach(id=>{ const el=document.getElementById(id); if(el) D.resume[id.slice(1).toLowerCase()]=el.value; });
-    // Special case field name mappings
     const m={name:'rName',title:'rTitle',email:'rEmail',phone:'rPhone',location:'rLocation',linkedin:'rLinkedin',website:'rWebsite',summary:'rSummary',skills:'rSkills',certs:'rCerts',langs:'rLangs'};
     Object.entries(m).forEach(([k,id])=>{ const el=document.getElementById(id); if(el) D.resume[k]=el.value; });
     D.resume.experience=collectEntries('exp');
     D.resume.education=collectEntries('edu');
   }
+  // Always save locally first for instant feedback
   localStorage.setItem(LS, JSON.stringify(D));
   showSaved();
-  clearTimeout(_wpTimer);
-  _wpTimer = setTimeout(cloudSync, 1800);
+  // Debounce Supabase save — push to cloud 1.5s after last change
+  clearTimeout(_sbSaveTimer);
+  _sbSaveTimer = setTimeout(saveToSupabase, 1500);
 }
 
-function loadData(){
+async function saveToSupabase(){
+  const fid = getFamilyId();
+  if(!fid) return;
+  try {
+    await fetch(`${SB_URL}/rest/v1/families?id=eq.${fid}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SB_KEY,
+        'Authorization': `Bearer ${SB_KEY}`,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ data: JSON.stringify(D) })
+    });
+    setSyncSt('cloud');
+  } catch(e) {
+    setSyncSt('local');
+  }
+}
+
+async function loadFromSupabase(){
+  const fid = getFamilyId();
+  if(!fid) return false;
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/families?id=eq.${fid}&select=data`, {
+      headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
+    });
+    const rows = await r.json();
+    if(rows && rows[0] && rows[0].data){
+      const p = typeof rows[0].data === 'string' ? JSON.parse(rows[0].data) : rows[0].data;
+      if(p && typeof p === 'object'){
+        for(const key of Object.keys(DEF)){ if(key in p) D[key]=p[key]; }
+        // Cache locally for offline use
+        localStorage.setItem(LS, JSON.stringify(D));
+        return true;
+      }
+    }
+  } catch(e) {}
+  return false;
+}
+
+async function loadData(){
+  setSyncSt('loading');
+  // Try Supabase first (cross-device source of truth)
+  const loaded = await loadFromSupabase();
+  if(loaded){ setSyncSt('cloud'); return; }
+  // Fall back to localStorage if offline or no cloud data yet
   const keys=[LS,'lifeos_p1','lifeos_v1','dominic_v1','levelup_v3'];
   for(const k of keys){
     try{
@@ -5768,9 +5826,13 @@ function loadData(){
       const p=JSON.parse(r); if(!p||typeof p!=='object') continue;
       for(const key of Object.keys(DEF)){ if(key in p) D[key]=p[key]; }
       if(k!==LS){ localStorage.setItem(LS,JSON.stringify(D)); }
+      setSyncSt('local');
+      // Push local data up to Supabase so it's available on other devices
+      setTimeout(saveToSupabase, 1000);
       return;
     }catch(e){}
   }
+  setSyncSt('local');
 }
 
 function showSaved(){
@@ -5784,7 +5846,7 @@ function showSaved(){
 
 // ── CLOUD ────────────────────────────────────────────────────
 function getCC(){ const u=localStorage.getItem(CU)||'',k=localStorage.getItem(CK)||''; return (u&&k)?{url:u.replace(/\/$/,'')+'/wp-json/dd/v1/sync',key:k}:null; }
-function setSyncSt(s){ const m={loading:['⟳','#888'],cloud:['☁ Synced','var(--gr)'],local:['💾 Local','var(--tx2)']}; const[t,col]=m[s]||m.local; ['syncSt','syncSt2'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent=t;el.style.color=col;}}); }
+function setSyncSt(s){ const m={loading:['⟳ Syncing...','#888'],cloud:['☁ Synced','var(--gr)'],local:['💾 Local','var(--tx2)']}; const[t,col]=m[s]||m.local; ['syncSt','syncSt2'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent=t;el.style.color=col;}}); }
 async function cloudSync(){ const cfg=getCC(); if(!cfg) return; try{ const r=await fetch(cfg.url,{method:'POST',headers:{'Content-Type':'application/json','X-DD-Key':cfg.key},body:JSON.stringify({action:'save',payload:D})}); const j=await r.json(); setSyncSt(j?.success?'cloud':'local'); }catch(e){ setSyncSt('local'); } }
 async function cloudLoad(){ const cfg=getCC(); if(!cfg) return false; try{ const r=await fetch(cfg.url+'?action=load',{headers:{'X-DD-Key':cfg.key}}); const j=await r.json(); if(j?.success&&j.data){ for(const k of Object.keys(DEF)){ if(k in j.data) D[k]=j.data[k]; } return true; } }catch(e){} return false; }
 function saveCloud(){ const u=(document.getElementById('wpUrl').value||'').trim(),k=(document.getElementById('wpKey').value||'').trim(); if(!u||!k){showToast('Enter URL and key');return;} localStorage.setItem(CU,u); localStorage.setItem(CK,k); closeSettings(); showToast('Cloud sync saved! ☁'); cloudSync(); }
@@ -10704,12 +10766,13 @@ function renderMotivation(){ const el=document.getElementById('motivationWall');
 
 // ── INIT ──────────────────────────────────────────────────────
 async function init(){
-
   setSyncSt('loading');
-  const cfg=getCC();
-  if(cfg){ const ok=await cloudLoad(); setSyncSt(ok?'cloud':'local'); if(!ok) loadData(); }
-  else{ loadData(); setSyncSt('local'); }
+  // Store family ID from URL into localStorage for offline fallback
+  const fid = new URLSearchParams(window.location.search).get('id');
+  if(fid) localStorage.setItem('ylcc_family_id', fid);
 
+  // Load from Supabase (cross-device) with localStorage fallback
+  await loadData();
 
   // Check if parent PIN exists - if not, show setup gate
   if(!D.chorePin && !D.parentPIN){
