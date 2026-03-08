@@ -8061,6 +8061,32 @@ function buildSideNav(){
   });
   
   el.innerHTML = navHTML;
+
+  // Force-inject CBT button if missing (immune to section visibility settings)
+  if(!document.getElementById('ni-s-cbt')){
+    const schoolGroup = el.querySelector('[onclick*="_group_school"] + .nav-group-items, [id*="SchoolCareer"]');
+    const cbtBtn = document.createElement('button');
+    cbtBtn.className = 'nav-item nav-child' + ('s-cbt'===_activeSection?' active':'');
+    cbtBtn.id = 'ni-s-cbt';
+    cbtBtn.setAttribute('onclick', "showSection('s-cbt')");
+    cbtBtn.style.cssText = 'padding-left:2.2rem;font-size:.78rem;';
+    cbtBtn.innerHTML = '<span class="ni">💻</span><span>CBT Training</span>';
+    // Find the School & Career group items div and append to it
+    const allGroupDivs = el.querySelectorAll('.nav-group-items');
+    let inserted = false;
+    allGroupDivs.forEach(div => {
+      if(!inserted && div.innerHTML.includes('s-resources')) {
+        div.appendChild(cbtBtn);
+        inserted = true;
+      }
+    });
+    // Fallback: add as standalone item before first group
+    if(!inserted){
+      const firstGroup = el.querySelector('.nav-group');
+      if(firstGroup) el.insertBefore(cbtBtn, firstGroup);
+      else el.appendChild(cbtBtn);
+    }
+  }
 }
 
 function toggleNavGroup(label){
