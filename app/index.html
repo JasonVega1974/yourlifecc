@@ -1946,12 +1946,38 @@ body{top:0!important;}
 </head>
 <body>
 <!-- FIRST TIME PARENT PIN SETUP -->
+<div id="authScreen" style="display:none;position:fixed;inset:0;z-index:10000;background:linear-gradient(145deg,#050d1a,#0d1b2a);align-items:center;justify-content:center;">
+  <div style="text-align:center;max-width:420px;width:92vw;padding:2.5rem 2rem;background:rgba(255,255,255,.03);border:1px solid rgba(56,189,248,.15);border-radius:24px;box-shadow:0 40px 100px rgba(0,0,0,.6);position:relative;">
+    <div style="font-size:3rem;margin-bottom:.6rem;">🧠</div>
+    <div style="font-family:var(--fh);font-size:1.4rem;letter-spacing:2px;color:var(--c);margin-bottom:.3rem;">LIFE OS</div>
+    <div style="font-size:.75rem;color:var(--tx2);margin-bottom:1.8rem;">The complete life skills platform for the next generation.</div>
+    <div style="display:flex;background:rgba(255,255,255,.05);border-radius:10px;padding:3px;margin-bottom:1.4rem;gap:3px;">
+      <button id="authTabLogin" onclick="authSwitchTab('login')" style="flex:1;padding:.55rem;border:none;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;background:var(--c);color:#000;">Sign In</button>
+      <button id="authTabSignup" onclick="authSwitchTab('signup')" style="flex:1;padding:.55rem;border:none;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;background:transparent;color:var(--tx2);">Create Account</button>
+    </div>
+    <input id="authEmail" type="email" placeholder="Email address" style="width:100%;padding:.75rem 1rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#fff;font-size:.88rem;margin-bottom:.6rem;box-sizing:border-box;outline:none;">
+    <input id="authPassword" type="password" placeholder="Password" style="width:100%;padding:.75rem 1rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#fff;font-size:.88rem;margin-bottom:.6rem;box-sizing:border-box;outline:none;">
+    <div id="authConfirmWrap" style="display:none;">
+      <input id="authConfirm" type="password" placeholder="Confirm password" style="width:100%;padding:.75rem 1rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#fff;font-size:.88rem;margin-bottom:.6rem;box-sizing:border-box;outline:none;">
+    </div>
+    <button id="authBtn" data-tab="login" onclick="authSubmit()" style="width:100%;padding:.9rem;background:linear-gradient(135deg,#38bdf8,#4f8fff);border:none;border-radius:12px;color:#000;font-weight:800;font-size:.95rem;cursor:pointer;margin-bottom:.7rem;">Sign In</button>
+    <div id="authForgotWrap">
+      <button onclick="authForgotPassword()" style="background:none;border:none;color:var(--c);font-size:.75rem;cursor:pointer;text-decoration:underline;">Forgot password?</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:.7rem;margin:.8rem 0;opacity:.3;">
+      <div style="flex:1;height:1px;background:#fff;"></div><span style="font-size:.7rem;color:#fff;">OR</span><div style="flex:1;height:1px;background:#fff;"></div>
+    </div>
+    <button onclick="authContinueLocal()" style="width:100%;padding:.75rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:var(--tx2);font-size:.82rem;font-weight:600;cursor:pointer;">Continue without account (local only)</button>
+    <div id="authMsg" style="font-size:.75rem;color:#f87171;margin-top:.8rem;min-height:1.1rem;font-weight:600;"></div>
+    <div id="authLoading" style="display:none;position:absolute;inset:0;background:rgba(5,13,26,.7);border-radius:24px;align-items:center;justify-content:center;font-size:1.5rem;">⟳</div>
+  </div>
+</div>
+
 <div id="firstTimeGate" style="display:none;position:fixed;inset:0;z-index:9999;background:linear-gradient(145deg,#050d1a,#0d1b2a);align-items:center;justify-content:center;">
   <div style="text-align:center;max-width:420px;width:92vw;padding:2.5rem 2rem;background:rgba(255,255,255,.03);border:1px solid rgba(56,189,248,.15);border-radius:24px;box-shadow:0 40px 100px rgba(0,0,0,.6);">
     <div style="font-size:3.5rem;margin-bottom:.6rem;animation:obFloat 3s ease-in-out infinite;display:inline-block;">🔒</div>
     <div style="font-family:var(--fh);font-size:1.4rem;letter-spacing:2px;color:var(--c);margin-bottom:.4rem;">WELCOME TO LIFE OS</div>
     <div style="font-size:.83rem;color:var(--tx2);margin-bottom:1.8rem;line-height:1.75;">You're almost in! Create a <strong style="color:#fff;">6-digit Parent PIN</strong> to protect the Parent Hub and all parental controls. Kids will never see this PIN.</div>
-
     <div style="font-size:.72rem;font-weight:700;color:var(--c);letter-spacing:1px;text-transform:uppercase;margin-bottom:.5rem;">Create Your 6-Digit PIN</div>
     <div style="display:flex;justify-content:center;gap:.45rem;margin-bottom:.7rem;" id="ftDots1">
       <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd1_0"></div>
@@ -1962,7 +1988,6 @@ body{top:0!important;}
       <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd1_5"></div>
     </div>
     <input type="password" id="ftPinInput" maxlength="6" placeholder="••••••" style="width:200px;text-align:center;font-size:1.6rem;letter-spacing:.8rem;margin-bottom:.8rem;padding:.65rem;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(56,189,248,.2);color:#fff;outline:none;" oninput="ftUpdateDots(1)" onkeyup="if(event.key==='Enter')document.getElementById('ftPinConfirm').focus()">
-
     <div style="font-size:.72rem;font-weight:700;color:var(--c);letter-spacing:1px;text-transform:uppercase;margin-bottom:.5rem;margin-top:.4rem;">Confirm Your PIN</div>
     <div style="display:flex;justify-content:center;gap:.45rem;margin-bottom:.7rem;" id="ftDots2">
       <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd2_0"></div>
@@ -1973,13 +1998,11 @@ body{top:0!important;}
       <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd2_5"></div>
     </div>
     <input type="password" id="ftPinConfirm" maxlength="6" placeholder="••••••" style="width:200px;text-align:center;font-size:1.6rem;letter-spacing:.8rem;margin-bottom:1.2rem;padding:.65rem;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(56,189,248,.2);color:#fff;outline:none;" oninput="ftUpdateDots(2)" onkeyup="if(event.key==='Enter')setupFirstPin()">
-
     <br>
     <button class="btn bp" onclick="setupFirstPin()" style="font-size:.95rem;padding:.75rem 2.5rem;border-radius:14px;font-weight:900;letter-spacing:.5px;box-shadow:0 4px 20px rgba(56,189,248,.35);">🔓 Set PIN &amp; Get Started</button>
     <div id="ftPinError" style="font-size:.75rem;color:#f87171;margin-top:.7rem;min-height:1.2rem;font-weight:600;"></div>
   </div>
 </div>
-
 
 <!-- SETTINGS OVERLAY -->
 <div id="so" onclick="closeSettings()"></div>
@@ -12536,20 +12559,26 @@ function renderMotivation(){ const el=document.getElementById('motivationWall');
 
 // ── INIT ──────────────────────────────────────────────────────
 async function init(){
-
   setSyncSt('loading');
-  const cfg=getCC();
-  if(cfg){ const ok=await cloudLoad(); setSyncSt(ok?'cloud':'local'); if(!ok) loadData(); }
-  else{ loadData(); setSyncSt('local'); }
-
-
-  // Check if parent PIN exists - if not, show setup gate
-  if(!D.chorePin && !D.parentPIN){
-    showFirstTimeGate();
-    return; // Wait for PIN setup, then finishInit() is called
+  const supa=getSupabase();
+  if(supa){
+    const{data:{session}}=await supa.auth.getSession();
+    if(session?.user){
+      _supaUser=session.user;
+      const loaded=await cloudLoad();
+      if(!loaded)loadData();
+      setSyncSt(loaded?'cloud':'local');
+      if(!D.chorePin&&!D.parentPIN){showFirstTimeGate();return;}
+      finishInit();
+      return;
+    }
+  }else{
+    loadData();setSyncSt('local');
+    if(!D.chorePin&&!D.parentPIN){showFirstTimeGate();return;}
+    finishInit();
+    return;
   }
-  
-  finishInit();
+  document.getElementById('authScreen').style.display='flex';
 }
 
 function finishInit(){
@@ -23727,4 +23756,5 @@ function applyChildAvatar(){
 
 </body>
 </html>
+
 
