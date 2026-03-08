@@ -12,8 +12,8 @@
 :root{
   --bg:#0d1117;--s1:#161b27;--s2:#1c2333;--s3:#232d42;--s4:#2a3652;
   --c:#38bdf8;--g:#fbbf24;--gr:#34d399;--p:#a78bfa;--pk:#f472b6;--or:#fb923c;
-  --tx:#f1f5f9;--tx2:#94a3b8;--mt:#64748b;--br:rgba(56,189,248,0.15);--r:14px;
-  --fh:'Bebas Neue',sans-serif;--fm:'Inter',sans-serif;--fn:'Orbitron',sans-serif;
+  --tx:#f1f5f9;--tx2:#94a3b8;--tx3:#475569;--mt:#64748b;--br:rgba(56,189,248,0.15);--r:14px;
+  --fh:'Bebas Neue',sans-serif;--fm:'Inter',sans-serif;--fn:'Orbitron',sans-serif;--f:'Inter',sans-serif;
   --card-shadow:0 4px 24px rgba(0,0,0,.5);
   --sidebar:220px;
   --card-bg:rgba(255,255,255,.07);--card-border:rgba(255,255,255,.1);
@@ -1941,43 +1941,76 @@ body{top:0!important;}
 :root.light .tut-row-text b{color:#0f172a;}
 :root.light #tutInner{background:linear-gradient(160deg,#f8fafc,#f1f5f9);}
 :root.light .tut-header{background:rgba(56,189,248,.04);}
+
+/* ── AUTH SCREEN ─────────────────────────────────────────────── */
+#authScreen input:focus {
+  border-color: rgba(56,189,248,.5) !important;
+  background: rgba(255,255,255,.09) !important;
+}
+#authScreen button:hover { opacity: .88; transform: translateY(-1px); }
+#authLoading { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <!-- FIRST TIME PARENT PIN SETUP -->
 <div id="authScreen" style="display:none;position:fixed;inset:0;z-index:10000;background:linear-gradient(145deg,#050d1a,#0d1b2a);align-items:center;justify-content:center;">
-  <div style="text-align:center;max-width:420px;width:92vw;padding:2.5rem 2rem;background:rgba(255,255,255,.03);border:1px solid rgba(56,189,248,.15);border-radius:24px;box-shadow:0 40px 100px rgba(0,0,0,.6);position:relative;">
-    <div style="font-size:3rem;margin-bottom:.6rem;">🧠</div>
+  <div style="text-align:center;max-width:420px;width:92vw;padding:2.5rem 2rem;background:rgba(255,255,255,.03);border:1px solid rgba(56,189,248,.15);border-radius:24px;box-shadow:0 40px 100px rgba(0,0,0,.6);">
+    <div style="font-size:3rem;margin-bottom:.6rem;animation:obFloat 3s ease-in-out infinite;display:inline-block;">🧠</div>
     <div style="font-family:var(--fh);font-size:1.4rem;letter-spacing:2px;color:var(--c);margin-bottom:.3rem;">LIFE OS</div>
-    <div style="font-size:.75rem;color:var(--tx2);margin-bottom:1.8rem;">The complete life skills platform for the next generation.</div>
+    <div style="font-size:.75rem;color:var(--tx2);margin-bottom:1.8rem;line-height:1.7;">The complete life skills platform for the next generation.</div>
+
+    <!-- Tab toggle -->
     <div style="display:flex;background:rgba(255,255,255,.05);border-radius:10px;padding:3px;margin-bottom:1.4rem;gap:3px;">
-      <button id="authTabLogin" onclick="authSwitchTab('login')" style="flex:1;padding:.55rem;border:none;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;background:var(--c);color:#000;">Sign In</button>
-      <button id="authTabSignup" onclick="authSwitchTab('signup')" style="flex:1;padding:.55rem;border:none;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;background:transparent;color:var(--tx2);">Create Account</button>
+      <button id="authTabLogin" onclick="authSwitchTab('login')" style="flex:1;padding:.55rem;border:none;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s;background:var(--c);color:#000;">Sign In</button>
+      <button id="authTabSignup" onclick="authSwitchTab('signup')" style="flex:1;padding:.55rem;border:none;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s;background:transparent;color:var(--tx2);">Create Account</button>
     </div>
+
+    <!-- Email -->
     <input id="authEmail" type="email" placeholder="Email address" style="width:100%;padding:.75rem 1rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#fff;font-size:.88rem;margin-bottom:.6rem;box-sizing:border-box;outline:none;">
+
+    <!-- Password -->
     <input id="authPassword" type="password" placeholder="Password" style="width:100%;padding:.75rem 1rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#fff;font-size:.88rem;margin-bottom:.6rem;box-sizing:border-box;outline:none;">
+
+    <!-- Confirm password (signup only) -->
     <div id="authConfirmWrap" style="display:none;">
       <input id="authConfirm" type="password" placeholder="Confirm password" style="width:100%;padding:.75rem 1rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#fff;font-size:.88rem;margin-bottom:.6rem;box-sizing:border-box;outline:none;">
     </div>
-    <button id="authBtn" data-tab="login" onclick="authSubmit()" style="width:100%;padding:.9rem;background:linear-gradient(135deg,#38bdf8,#4f8fff);border:none;border-radius:12px;color:#000;font-weight:800;font-size:.95rem;cursor:pointer;margin-bottom:.7rem;">Sign In</button>
-    <div id="authForgotWrap">
+
+    <!-- Primary button -->
+    <button id="authBtn" onclick="authSubmit()" style="width:100%;padding:.9rem;background:linear-gradient(135deg,#38bdf8,#4f8fff);border:none;border-radius:12px;color:#000;font-weight:800;font-size:.95rem;cursor:pointer;margin-bottom:.7rem;transition:all .2s;">Sign In</button>
+
+    <!-- Forgot password -->
+    <div id="authForgotWrap" style="margin-bottom:.5rem;">
       <button onclick="authForgotPassword()" style="background:none;border:none;color:var(--c);font-size:.75rem;cursor:pointer;text-decoration:underline;">Forgot password?</button>
     </div>
+
+    <!-- Divider -->
     <div style="display:flex;align-items:center;gap:.7rem;margin:.8rem 0;opacity:.3;">
-      <div style="flex:1;height:1px;background:#fff;"></div><span style="font-size:.7rem;color:#fff;">OR</span><div style="flex:1;height:1px;background:#fff;"></div>
+      <div style="flex:1;height:1px;background:#fff;"></div>
+      <span style="font-size:.7rem;color:#fff;">OR</span>
+      <div style="flex:1;height:1px;background:#fff;"></div>
     </div>
-    <button onclick="authContinueLocal()" style="width:100%;padding:.75rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:var(--tx2);font-size:.82rem;font-weight:600;cursor:pointer;">Continue without account (local only)</button>
+
+    <!-- Continue without account -->
+    <button onclick="authContinueLocal()" style="width:100%;padding:.75rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:var(--tx2);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;">Continue without account (local only)</button>
+
+    <!-- Status message -->
     <div id="authMsg" style="font-size:.75rem;color:#f87171;margin-top:.8rem;min-height:1.1rem;font-weight:600;"></div>
+
+    <!-- Loading spinner overlay -->
     <div id="authLoading" style="display:none;position:absolute;inset:0;background:rgba(5,13,26,.7);border-radius:24px;align-items:center;justify-content:center;font-size:1.5rem;">⟳</div>
   </div>
 </div>
 
+<!-- Keep old firstTimeGate for PIN setup (shown after auth for new users) -->
 <div id="firstTimeGate" style="display:none;position:fixed;inset:0;z-index:9999;background:linear-gradient(145deg,#050d1a,#0d1b2a);align-items:center;justify-content:center;">
   <div style="text-align:center;max-width:420px;width:92vw;padding:2.5rem 2rem;background:rgba(255,255,255,.03);border:1px solid rgba(56,189,248,.15);border-radius:24px;box-shadow:0 40px 100px rgba(0,0,0,.6);">
     <div style="font-size:3.5rem;margin-bottom:.6rem;animation:obFloat 3s ease-in-out infinite;display:inline-block;">🔒</div>
     <div style="font-family:var(--fh);font-size:1.4rem;letter-spacing:2px;color:var(--c);margin-bottom:.4rem;">WELCOME TO LIFE OS</div>
     <div style="font-size:.83rem;color:var(--tx2);margin-bottom:1.8rem;line-height:1.75;">You're almost in! Create a <strong style="color:#fff;">6-digit Parent PIN</strong> to protect the Parent Hub and all parental controls. Kids will never see this PIN.</div>
+
     <div style="font-size:.72rem;font-weight:700;color:var(--c);letter-spacing:1px;text-transform:uppercase;margin-bottom:.5rem;">Create Your 6-Digit PIN</div>
     <div style="display:flex;justify-content:center;gap:.45rem;margin-bottom:.7rem;" id="ftDots1">
       <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd1_0"></div>
@@ -1988,6 +2021,7 @@ body{top:0!important;}
       <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd1_5"></div>
     </div>
     <input type="password" id="ftPinInput" maxlength="6" placeholder="••••••" style="width:200px;text-align:center;font-size:1.6rem;letter-spacing:.8rem;margin-bottom:.8rem;padding:.65rem;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(56,189,248,.2);color:#fff;outline:none;" oninput="ftUpdateDots(1)" onkeyup="if(event.key==='Enter')document.getElementById('ftPinConfirm').focus()">
+
     <div style="font-size:.72rem;font-weight:700;color:var(--c);letter-spacing:1px;text-transform:uppercase;margin-bottom:.5rem;margin-top:.4rem;">Confirm Your PIN</div>
     <div style="display:flex;justify-content:center;gap:.45rem;margin-bottom:.7rem;" id="ftDots2">
       <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd2_0"></div>
@@ -1998,11 +2032,13 @@ body{top:0!important;}
       <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd2_5"></div>
     </div>
     <input type="password" id="ftPinConfirm" maxlength="6" placeholder="••••••" style="width:200px;text-align:center;font-size:1.6rem;letter-spacing:.8rem;margin-bottom:1.2rem;padding:.65rem;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(56,189,248,.2);color:#fff;outline:none;" oninput="ftUpdateDots(2)" onkeyup="if(event.key==='Enter')setupFirstPin()">
+
     <br>
     <button class="btn bp" onclick="setupFirstPin()" style="font-size:.95rem;padding:.75rem 2.5rem;border-radius:14px;font-weight:900;letter-spacing:.5px;box-shadow:0 4px 20px rgba(56,189,248,.35);">🔓 Set PIN &amp; Get Started</button>
     <div id="ftPinError" style="font-size:.75rem;color:#f87171;margin-top:.7rem;min-height:1.2rem;font-weight:600;"></div>
   </div>
 </div>
+
 
 <!-- SETTINGS OVERLAY -->
 <div id="so" onclick="closeSettings()"></div>
@@ -2197,13 +2233,16 @@ body{top:0!important;}
       <span id="svi" style="color:var(--gr);opacity:0;transition:opacity .3s;">✓ Saved</span>
       <span id="syncSt">💾 Local</span>
     </div>
+    <div id="sideSignOutBtn" style="display:none;margin-top:.4rem;">
+      <div id="authUserEmail" style="font-size:.6rem;color:var(--tx3);margin-bottom:.2rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px;"></div>
+      <button onclick="signOut()" style="width:100%;padding:.35rem;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);border-radius:7px;color:#f87171;font-size:.68rem;font-weight:700;cursor:pointer;">Sign Out</button>
+    </div>
     <div style="display:flex;align-items:center;justify-content:center;gap:.3rem;padding:.25rem 0 .1rem;font-size:.64rem;color:var(--tx3);border-top:1px solid rgba(255,255,255,.05);margin-top:.3rem;">
       <span style="opacity:.6;">⏱</span>
       <span id="sessionTimerDisplay" style="font-weight:700;color:var(--tx2);">0s</span>
       <span style="opacity:.4;">this session</span>
     </div>
 
-    </div>
     </div>
 </div>
 <div id="sideOverlay" onclick="closeSidebar()"></div>
@@ -2254,11 +2293,12 @@ body{top:0!important;}
   <div style="background:#0f1523;border:1px solid rgba(56,189,248,.2);border-radius:20px;padding:2rem 1.8rem;width:92%;max-width:340px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.85);">
     <div style="font-size:2.5rem;margin-bottom:.6rem;">🚀</div>
     <div style="font-family:var(--fn);font-size:.8rem;font-weight:700;letter-spacing:2px;color:var(--c);margin-bottom:.3rem;">WELCOME TO LIFE OS</div>
-    <div style="font-size:.8rem;color:var(--tx2);margin-bottom:1.2rem;">What's your name? (You are the parent.)</div>
-    <input id="welcomeNameInput" type="text" placeholder="Enter your name" autocomplete="off"
+    <div style="font-size:.8rem;color:var(--tx2);margin-bottom:1.2rem;">Enter a name for the child using this account, or leave blank to use "Champion".</div>
+    <input id="welcomeNameInput" type="text" placeholder="Child's name (optional)" autocomplete="off"
       style="width:100%;padding:.65rem .8rem;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff;font-size:.95rem;font-family:var(--fn);text-align:center;margin-bottom:1rem;box-sizing:border-box;"
       onkeydown="if(event.key==='Enter')welcomeSubmit()">
     <button onclick="welcomeSubmit()" class="btn bp" style="width:100%;font-size:.8rem;">Let's Go →</button>
+    <button onclick="document.getElementById('welcomeModal').style.display='none'" style="background:none;border:none;color:var(--tx3);font-size:.72rem;cursor:pointer;margin-top:.5rem;">Skip — use Champion</button>
   </div>
 </div>
 
@@ -4814,6 +4854,128 @@ body{top:0!important;}
   </div>
 </section>
 
+<!-- ════ CBT — COMPUTER BASED TRAINING ════ -->
+<section id="s-cbt" class="sec">
+  <div class="sh">
+    <div class="si">💻</div>
+    <div class="st">Computer Based Training</div>
+    <span class="tip-wrap"><span class="tip-btn">?</span><span class="tip-box tip-right"><span class="tip-title">HOW TO USE</span><br>Six modules: <b>Typing</b> tests your speed and accuracy · <b>Computer Basics</b> covers hardware and software · <b>Windows</b> teaches the OS · <b>Linux</b> intro to the command line · <b>Coding</b> programming fundamentals · <b>Internet & Security</b> safe browsing and cybersecurity.</span></span>
+    <div class="sl"></div>
+  </div>
+
+  <!-- CBT Tab Bar -->
+  <div class="tabs cbtTabs" style="margin-bottom:1rem;">
+    <button class="tab active" onclick="cbtTab('typing',this)">⌨️ Typing</button>
+    <button class="tab" onclick="cbtTab('basics',this)">🖥️ Basics</button>
+    <button class="tab" onclick="cbtTab('windows',this)">🪟 Windows</button>
+    <button class="tab" onclick="cbtTab('linux',this)">🐧 Linux</button>
+    <button class="tab" onclick="cbtTab('coding',this)">💾 Coding</button>
+    <button class="tab" onclick="cbtTab('internet',this)">🌐 Internet</button>
+  </div>
+
+  <!-- ══ TYPING TAB ══ -->
+  <div id="cbt-typing">
+    <div class="card" style="margin-bottom:1rem;">
+      <div class="ct">⌨️ Typing Speed & Accuracy Test</div>
+      <div style="font-size:.75rem;color:var(--tx2);margin-bottom:1rem;">Type the passage below as fast and accurately as you can. Press Start when ready.</div>
+
+      <!-- Stats bar -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-bottom:1rem;">
+        <div class="fst" style="border-top:3px solid var(--c);text-align:center;">
+          <div class="stat-lbl">WPM</div>
+          <div class="stat-val" id="typingWpm" style="color:var(--c);">—</div>
+        </div>
+        <div class="fst" style="border-top:3px solid var(--gr);text-align:center;">
+          <div class="stat-lbl">Accuracy</div>
+          <div class="stat-val" id="typingAcc" style="color:var(--gr);">—</div>
+        </div>
+        <div class="fst" style="border-top:3px solid var(--or);text-align:center;">
+          <div class="stat-lbl">Time</div>
+          <div class="stat-val" id="typingTime" style="color:var(--or);">0s</div>
+        </div>
+        <div class="fst" style="border-top:3px solid var(--pk);text-align:center;">
+          <div class="stat-lbl">Errors</div>
+          <div class="stat-val" id="typingErrors" style="color:var(--pk);">0</div>
+        </div>
+      </div>
+
+      <!-- Passage display -->
+      <div id="typingPassage" style="font-size:.95rem;line-height:1.9;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:1rem 1.2rem;margin-bottom:.8rem;font-family:'Courier New',monospace;letter-spacing:.03em;min-height:80px;"></div>
+
+      <!-- Input area -->
+      <textarea id="typingInput" placeholder="Click Start, then type here..." rows="4"
+        style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#fff;font-size:.9rem;font-family:'Courier New',monospace;padding:.8rem;box-sizing:border-box;resize:none;outline:none;letter-spacing:.03em;"
+        oninput="typingOnInput()" disabled></textarea>
+
+      <div style="display:flex;gap:.5rem;margin-top:.7rem;flex-wrap:wrap;">
+        <button class="btn bp" id="typingStartBtn" onclick="typingStart()" style="flex:1;">▶ Start Test</button>
+        <button class="btn" onclick="typingReset()" style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--tx2);">↺ New Passage</button>
+        <select id="typingDifficulty" onchange="typingReset()" style="background:var(--s2);color:var(--tx);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.4rem .6rem;font-size:.75rem;">
+          <option value="easy">Easy</option>
+          <option value="medium" selected>Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+      </div>
+
+      <!-- Result banner -->
+      <div id="typingResult" style="display:none;margin-top:1rem;padding:1rem;background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.15);border-radius:12px;text-align:center;"></div>
+    </div>
+
+    <!-- Personal Best -->
+    <div class="card">
+      <div class="ct">🏆 Personal Bests</div>
+      <div id="typingBests" style="display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:.5rem;"></div>
+    </div>
+  </div>
+
+  <!-- ══ COMPUTER BASICS TAB ══ -->
+  <div id="cbt-basics" style="display:none;">
+    <div class="card" style="margin-bottom:.8rem;">
+      <div class="ct">🖥️ Computer Basics</div>
+      <div style="font-size:.78rem;color:var(--tx2);margin-bottom:1rem;">The foundation of all technology literacy. Master these concepts first.</div>
+      <div id="cbtBasicsContent"></div>
+    </div>
+  </div>
+
+  <!-- ══ WINDOWS TAB ══ -->
+  <div id="cbt-windows" style="display:none;">
+    <div class="card" style="margin-bottom:.8rem;">
+      <div class="ct">🪟 Windows OS</div>
+      <div style="font-size:.78rem;color:var(--tx2);margin-bottom:1rem;">Learn to navigate, customize, and master Microsoft Windows.</div>
+      <div id="cbtWindowsContent"></div>
+    </div>
+  </div>
+
+  <!-- ══ LINUX TAB ══ -->
+  <div id="cbt-linux" style="display:none;">
+    <div class="card" style="margin-bottom:.8rem;">
+      <div class="ct">🐧 Linux & Command Line</div>
+      <div style="font-size:.78rem;color:var(--tx2);margin-bottom:1rem;">The operating system that powers servers, supercomputers, and Android. Learn the terminal.</div>
+      <div id="cbtLinuxContent"></div>
+    </div>
+  </div>
+
+  <!-- ══ CODING TAB ══ -->
+  <div id="cbt-coding" style="display:none;">
+    <div class="card" style="margin-bottom:.8rem;">
+      <div class="ct">💾 Programming Fundamentals</div>
+      <div style="font-size:.78rem;color:var(--tx2);margin-bottom:1rem;">Learn to think like a programmer — logic, variables, loops, and functions.</div>
+      <div id="cbtCodingContent"></div>
+    </div>
+  </div>
+
+  <!-- ══ INTERNET TAB ══ -->
+  <div id="cbt-internet" style="display:none;">
+    <div class="card" style="margin-bottom:.8rem;">
+      <div class="ct">🌐 Internet & Cybersecurity</div>
+      <div style="font-size:.78rem;color:var(--tx2);margin-bottom:1rem;">Stay safe online. Learn how the internet works and how to protect yourself.</div>
+      <div id="cbtInternetContent"></div>
+    </div>
+  </div>
+
+</section>
+
+
 <!-- ════ CHORES & REWARDS ════ -->
 <section id="s-chores" class="sec">
   <div class="sh">
@@ -4965,6 +5127,8 @@ body{top:0!important;}
     <div style="font-size:2.5rem;margin-bottom:.5rem;">🔒</div>
     <div style="font-size:1rem;font-weight:700;margin-bottom:.3rem;">Rewards Locked</div>
     <div style="font-size:.8rem;color:var(--tx2);margin-bottom:1rem;">Tap the 🔒 button above to unlock with your parent PIN.</div>
+    <!-- Ticket preview visible even when locked -->
+    <div id="rewardsTicketPreview" style="display:flex;justify-content:center;gap:1rem;margin-bottom:.8rem;"></div>
     <button class="btn bp" onclick="toggleRewardsLock()" style="font-size:.85rem;">🔓 Unlock Rewards</button>
     <div style="font-size:.65rem;color:var(--tx3);margin-top:.6rem;">First time? You'll create a 6-digit PIN. Remember it — you'll need it for Parent Hub too.</div>
   </div>
@@ -6777,6 +6941,8 @@ function setupFirstPin(){
   D.chorePin = pin;
   D.parentPIN = pin;
   save();
+  // Force immediate cloud sync so PIN is saved before user closes tab
+  if(_supaUser) cloudSync();
   hideFirstTimeGate();
   
   // Finish initializing the app
@@ -6841,8 +7007,9 @@ function save(){
   }
   localStorage.setItem(LS, JSON.stringify(D));
   showSaved();
+  // Sync to Supabase if logged in (debounced 2s)
   clearTimeout(_wpTimer);
-  _wpTimer = setTimeout(cloudSync, 1800);
+  _wpTimer = setTimeout(cloudSync, 2000);
 }
 
 function loadData(){
@@ -6878,111 +7045,195 @@ function setSyncSt(s){
   if(sob) sob.style.display=_supaUser?'block':'none';
 }
 
+// ── SUPABASE CONFIG ───────────────────────────────────────────
+// Replace these two values with your actual Supabase project credentials
 const SUPA_URL = 'https://hrohgwcbfgywkpnvqxhk.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhyb2hnd2NiZmd5d2twbnZxeGhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MjcxNDYsImV4cCI6MjA4ODQwMzE0Nn0.PuWtBpiMw2DiCLp26ZP_Rd9BwzFvWT0sNZrDUNdULyo';
-let _supa=null,_supaUser=null;
-function getSupabase(){if(!_supa&&window.supabase){_supa=window.supabase.createClient(SUPA_URL,SUPA_KEY);}return _supa;}
-function getCC(){ return null; }
-async function cloudSync(){
-  console.log('[LifeOS Sync] cloudSync called. user:',_supaUser?_supaUser.email:'NULL');
-  const supa=getSupabase();
-  if(!supa||!_supaUser){setSyncSt('local');return;}
-  try{
-    const{error}=await supa.from('profiles').upsert({user_id:_supaUser.id,email:_supaUser.email,data:D,updated_at:new Date().toISOString()},{onConflict:'user_id'});
-    console.log('[LifeOS Sync] upsert error:',error);
-    setSyncSt(error?'local':'cloud');
-  }catch(e){console.error('[LifeOS Sync]',e);setSyncSt('local');}
+
+let _supa = null;
+let _supaUser = null;
+
+function getSupabase(){
+  if(!_supa && window.supabase){
+    _supa = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+  }
+  return _supa;
 }
-async function cloudLoad(){
-  const supa=getSupabase();
-  if(!supa||!_supaUser)return false;
-  try{
-    const{data,error}=await supa.from('profiles').select('data').eq('user_id',_supaUser.id).single();
-    if(error||!data?.data)return false;
-    for(const k of Object.keys(DEF)){if(k in data.data)D[k]=data.data[k];}
-    return true;
-  }catch(e){return false;}
-}
+
+// ── AUTH FUNCTIONS ─────────────────────────────────────────────
 function authSwitchTab(tab){
-  const s=tab==='signup';
-  document.getElementById('authConfirmWrap').style.display=s?'block':'none';
-  document.getElementById('authForgotWrap').style.display=s?'none':'block';
-  document.getElementById('authBtn').textContent=s?'Create Account':'Sign In';
-  document.getElementById('authTabLogin').style.background=s?'transparent':'var(--c)';
-  document.getElementById('authTabLogin').style.color=s?'var(--tx2)':'#000';
-  document.getElementById('authTabSignup').style.background=s?'var(--c)':'transparent';
-  document.getElementById('authTabSignup').style.color=s?'#000':'var(--tx2)';
-  document.getElementById('authBtn').dataset.tab=tab;
-  document.getElementById('authMsg').textContent='';
+  const isSignup = tab === 'signup';
+  document.getElementById('authConfirmWrap').style.display = isSignup ? 'block' : 'none';
+  document.getElementById('authForgotWrap').style.display = isSignup ? 'none' : 'block';
+  document.getElementById('authBtn').textContent = isSignup ? 'Create Account' : 'Sign In';
+  document.getElementById('authTabLogin').style.background = isSignup ? 'transparent' : 'var(--c)';
+  document.getElementById('authTabLogin').style.color = isSignup ? 'var(--tx2)' : '#000';
+  document.getElementById('authTabSignup').style.background = isSignup ? 'var(--c)' : 'transparent';
+  document.getElementById('authTabSignup').style.color = isSignup ? '#000' : 'var(--tx2)';
+  document.getElementById('authBtn').dataset.tab = tab;
+  document.getElementById('authMsg').textContent = '';
 }
-function authSetMsg(msg,color){const el=document.getElementById('authMsg');if(el){el.textContent=msg;el.style.color=color||'#f87171';}}
-function authSetLoading(on){const el=document.getElementById('authLoading');if(el)el.style.display=on?'flex':'none';}
+
+function authSetMsg(msg, color){ 
+  const el = document.getElementById('authMsg');
+  if(el){ el.textContent = msg; el.style.color = color || '#f87171'; }
+}
+
+function authSetLoading(on){
+  const el = document.getElementById('authLoading');
+  if(el) el.style.display = on ? 'flex' : 'none';
+}
+
 async function authSubmit(){
-  const supa=getSupabase();
-  if(!supa){authContinueLocal();return;}
-  const email=(document.getElementById('authEmail')||{}).value?.trim();
-  const pass=(document.getElementById('authPassword')||{}).value;
-  const confirm=(document.getElementById('authConfirm')||{}).value;
-  const tab=document.getElementById('authBtn').dataset.tab||'login';
-  if(!email||!pass){authSetMsg('Please enter email and password.');return;}
-  if(pass.length<6){authSetMsg('Password must be at least 6 characters.');return;}
-  if(tab==='signup'&&pass!==confirm){authSetMsg('Passwords do not match.');return;}
-  authSetLoading(true);authSetMsg('');
-  try{
+  const supa = getSupabase();
+  if(!supa){ authContinueLocal(); return; }
+
+  const email = (document.getElementById('authEmail')||{}).value?.trim();
+  const pass = (document.getElementById('authPassword')||{}).value;
+  const confirm = (document.getElementById('authConfirm')||{}).value;
+  const tab = document.getElementById('authBtn').dataset.tab || 'login';
+
+  if(!email || !pass){ authSetMsg('Please enter email and password.'); return; }
+  if(pass.length < 6){ authSetMsg('Password must be at least 6 characters.'); return; }
+  if(tab === 'signup' && pass !== confirm){ authSetMsg('Passwords do not match.'); return; }
+
+  authSetLoading(true);
+  authSetMsg('');
+
+  try {
     let result;
-    if(tab==='signup'){
-      result=await supa.auth.signUp({email,password:pass});
-      if(result.error)throw result.error;
-      _supaUser=result.data.user;
-      authSetMsg('Account created!','var(--gr)');
-      setTimeout(()=>authComplete(false),1200);
-    }else{
-      result=await supa.auth.signInWithPassword({email,password:pass});
-      if(result.error)throw result.error;
-      _supaUser=result.data.user;
-      authSetMsg('Signed in!','var(--gr)');
-      setTimeout(()=>authComplete(true),600);
+    if(tab === 'signup'){
+      result = await supa.auth.signUp({ email, password: pass });
+      if(result.error) throw result.error;
+      if(result.data?.user?.identities?.length === 0){
+        authSetMsg('Account already exists. Please sign in.', '#fbbf24');
+        authSwitchTab('login');
+        authSetLoading(false);
+        return;
+      }
+      authSetMsg('Account created! Check your email to confirm, or continue now.', 'var(--gr)');
+      // Auto continue after signup
+      _supaUser = result.data.user;
+      setTimeout(() => authComplete(false), 1200);
+    } else {
+      result = await supa.auth.signInWithPassword({ email, password: pass });
+      if(result.error) throw result.error;
+      _supaUser = result.data.user;
+      authSetMsg('Signed in!', 'var(--gr)');
+      setTimeout(() => authComplete(true), 600);
     }
-  }catch(err){
+  } catch(err) {
     authSetLoading(false);
-    const msg=err.message||'Something went wrong.';
-    if(msg.includes('Invalid login'))authSetMsg('Incorrect email or password.');
+    const msg = err.message || 'Something went wrong.';
+    if(msg.includes('Invalid login')) authSetMsg('Incorrect email or password.');
+    else if(msg.includes('Email not confirmed')) authSetMsg('Please confirm your email first, or continue below.', '#fbbf24');
     else authSetMsg(msg);
   }
 }
+
 async function authForgotPassword(){
-  const supa=getSupabase();if(!supa)return;
-  const email=(document.getElementById('authEmail')||{}).value?.trim();
-  if(!email){authSetMsg('Enter your email first.');return;}
+  const supa = getSupabase();
+  if(!supa){ authSetMsg('Not connected.'); return; }
+  const email = (document.getElementById('authEmail')||{}).value?.trim();
+  if(!email){ authSetMsg('Enter your email address first.'); return; }
   authSetLoading(true);
-  const{error}=await supa.auth.resetPasswordForEmail(email);
+  const { error } = await supa.auth.resetPasswordForEmail(email);
   authSetLoading(false);
-  if(error)authSetMsg(error.message);else authSetMsg('Reset email sent!','var(--gr)');
+  if(error) authSetMsg(error.message);
+  else authSetMsg('Password reset email sent!', 'var(--gr)');
 }
-async function authComplete(isReturning){
-  const loaded=isReturning?await cloudLoad():false;
-  document.getElementById('authScreen').style.display='none';
+
+async function authComplete(isReturningUser){
+  // Try to load cloud data for returning users
+  const loaded = isReturningUser ? await cloudLoad() : false;
+  
+  document.getElementById('authScreen').style.display = 'none';
   authSetLoading(false);
-  setSyncSt(loaded?'cloud':'local');
-  if(!D.chorePin&&!D.parentPIN){showFirstTimeGate();return;}
+
+  setSyncSt(loaded ? 'cloud' : 'local');
+
+  // New user or no data yet - check if PIN setup needed
+  if(!D.chorePin && !D.parentPIN){
+    showFirstTimeGate();
+    return;
+  }
   finishInit();
-  setTimeout(function(){if(_supaUser)cloudSync();},2000);
+  // Force sync after login so data appears in Supabase immediately
+  setTimeout(function(){ if(_supaUser) cloudSync(); }, 2000);
 }
+
 function authContinueLocal(){
-  _supaUser=null;
-  document.getElementById('authScreen').style.display='none';
-  loadData();setSyncSt('local');
-  if(!D.chorePin&&!D.parentPIN){showFirstTimeGate();return;}
+  // Skip auth, use localStorage only
+  _supaUser = null;
+  document.getElementById('authScreen').style.display = 'none';
+  loadData();
+  setSyncSt('local');
+  if(!D.chorePin && !D.parentPIN){
+    showFirstTimeGate();
+    return;
+  }
   finishInit();
 }
+
+// ── SIGN OUT ──────────────────────────────────────────────────
 async function signOut(){
-  const supa=getSupabase();
-  if(supa&&_supaUser)await supa.auth.signOut();
-  _supaUser=null;D=JSON.parse(JSON.stringify(DEF));
+  const supa = getSupabase();
+  if(supa && _supaUser) await supa.auth.signOut();
+  _supaUser = null;
+  D = JSON.parse(JSON.stringify(DEF));
   localStorage.removeItem(LS);
-  document.getElementById('authScreen').style.display='flex';
+  document.getElementById('authScreen').style.display = 'flex';
   setSyncSt('local');
 }
+
+// ── CLOUD SYNC (Supabase) ─────────────────────────────────────
+async function cloudSync(){
+  console.log('[LifeOS Sync] cloudSync called. _supaUser:', _supaUser ? _supaUser.email : 'NULL');
+  const supa = getSupabase();
+  console.log('[LifeOS Sync] supa client:', supa ? 'OK' : 'NULL');
+  if(!supa || !_supaUser){ 
+    console.log('[LifeOS Sync] Aborting - no supa or no user');
+    setSyncSt('local'); 
+    return; 
+  }
+  try {
+    console.log('[LifeOS Sync] Attempting upsert for user:', _supaUser.id);
+    const { data, error } = await supa.from('profiles').upsert({
+      user_id: _supaUser.id,
+      email: _supaUser.email,
+      data: D,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'user_id' }).select();
+    console.log('[LifeOS Sync] Result - error:', error, 'data:', data);
+    setSyncSt(error ? 'local' : 'cloud');
+    if(error) console.error('[LifeOS Sync] Upsert error details:', JSON.stringify(error));
+  } catch(e){ 
+    console.error('[LifeOS Sync] Exception:', e); 
+    setSyncSt('local'); 
+  }
+}
+
+async function cloudLoad(){
+  const supa = getSupabase();
+  if(!supa || !_supaUser) return false;
+  try {
+    const { data, error } = await supa.from('profiles')
+      .select('data')
+      .eq('user_id', _supaUser.id)
+      .single();
+    if(error || !data?.data) return false;
+    const saved = data.data;
+    for(const k of Object.keys(DEF)){ if(k in saved) D[k] = saved[k]; }
+    return true;
+  } catch(e){ return false; }
+}
+
+// Legacy - kept for settings page compatibility
+function getCC(){ return null; }
+
+function saveCloud(){ const u=(document.getElementById('wpUrl').value||'').trim(),k=(document.getElementById('wpKey').value||'').trim(); if(!u||!k){showToast('Enter URL and key');return;} localStorage.setItem(CU,u); localStorage.setItem(CK,k); closeSettings(); showToast('Cloud sync saved! ☁'); cloudSync(); }
+async function testCloud(){ const u=(document.getElementById('wpUrl').value||'').trim(),k=(document.getElementById('wpKey').value||'').trim(),el=document.getElementById('cloudMsg'); if(!u||!k){el.textContent='Enter URL and key';return;} el.textContent='Testing...'; try{ const r=await fetch(u.replace(/\/$/,'')+'/wp-json/dd/v1/sync?action=ping',{headers:{'X-DD-Key':k}}); const j=await r.json(); el.style.color=j?.success?'var(--gr)':'var(--pk)'; el.textContent=j?.success?'✅ Connected!':'❌ '+(j?.message||'Error'); }catch(e){ el.style.color='var(--pk)'; el.textContent='❌ '+e.message; } }
+
 // ── CLOCK ────────────────────────────────────────────────────
 function startClock(){
   function tick(){
@@ -7583,6 +7834,8 @@ const ALL_SECTIONS=[
   {id:'s-goals',label:'🎯 Goals'},{id:'s-skills',label:'🧠 Life Skills'},{id:'s-growing',label:'🌱 Growing Up'},
   {id:'s-craft',label:'🎵 Music & Practice'},{id:'s-contests',label:'🏆 Challenges'},{id:'s-rewards',label:'🎁 Rewards'},{id:'s-scripture',label:'✝️ Bible & Faith'},{id:'s-badges',label:'🏅 Badges'},{id:'s-driving',label:'🚗 Driving'},{id:'s-sports',label:'🏆 Sports'},
   {id:'s-journal',label:'✍️ Journal'},{id:'s-motivation',label:'🔥 Fuel Wall'},{id:'s-resume',label:'📄 Jobs/Resume'},{id:'s-bio',label:'🪪 Bio Page'},{id:'s-reading',label:'📖 Reading List'},{id:'s-mentors',label:'🤝 My People'},{id:'s-milestones',label:'🏆 Milestones'},{id:'s-mood',label:'😊 Mood Tracker'},{id:'s-chores',label:'✅ Chores'},{id:'s-parent',label:'👨‍👩‍👧 Parent Hub'},
+
+  {id:'s-cbt',label:'💻 Computer Based Training'},
 ];
 
 function buildToggles(){
@@ -7735,9 +7988,10 @@ const NAV_ITEMS = [
   ]},
   {id:'_group_school', icon:'🎓', label:'School & Career', isGroup:true, children:[
     {id:'s-school',    icon:'📚', label:'School',         key:'school'},
-    {id:'s-career',    icon:'💼', label:'Jobs/Resume',    key:'career'},
+    {id:'s-finance',   icon:'💼', label:'Jobs/Resume',    key:'career'},
     {id:'s-bio',       icon:'📋', label:'Bio Page',       key:'bio'},
     {id:'s-resources', icon:'📦', label:'Resources',      key:'resources'},
+    {id:'s-cbt',       icon:'💻', label:'CBT Training',    key:'cbt'},
   ]},
   {id:'_group_daily', icon:'📅', label:'Daily Life', isGroup:true, children:[
     {id:'s-chores',    icon:'✅', label:'Chores',         key:'chores'},
@@ -7751,7 +8005,7 @@ const NAV_ITEMS = [
     {id:'s-mood',      icon:'😊', label:'Mood Tracker',   key:'mood'},
   ]},
   {id:'_group_money', icon:'💰', label:'Money & Rewards', isGroup:true, children:[
-    {id:'s-money',     icon:'💰', label:'Money',          key:'money'},
+    {id:'s-finance',   icon:'💰', label:'Money',          key:'money'},
     {id:'s-rewards',   icon:'🎰', label:'Rewards',        key:'rewards'},
     {id:'s-contests',  icon:'🏆', label:'Challenges',     key:'contests'},
     {id:'s-badges',    icon:'🏅', label:'Badges',         key:'badges'},
@@ -7777,7 +8031,7 @@ function buildSideNav(){
       // Collapsible group
       const isOpen = openGroups[n.label] !== false; // default open
       const childHTML = (n.children||[]).map(c=>{
-        if(c.key && hidden[c.key]===0) return '';
+        if(c.key && hidden[c.key]===0 && typeof hidden[c.key]!=='undefined') return '';
         return `<button class="nav-item nav-child${c.id===_activeSection?' active':''}" id="ni-${c.id}" onclick="showSection('${c.id}')" style="padding-left:2.2rem;font-size:.78rem;">
           <span class="ni">${c.icon}</span>
           <span>${c.label}</span>
@@ -7798,7 +8052,7 @@ function buildSideNav(){
       </div>`;
     } else {
       // Regular item
-      if(n.key && hidden[n.key]===0) return;
+      if(n.key && hidden[n.key]===0 && typeof hidden[n.key]!=='undefined') return;
       navHTML += `<button class="nav-item${n.id===_activeSection?' active':''}" id="ni-${n.id}" onclick="showSection('${n.id}')">
         <span class="ni">${n.icon}</span>
         <span>${n.label}</span>
@@ -7860,6 +8114,8 @@ function showSection(id, fromMobile){
   if(id==='s-health') setTimeout(()=>{ renderWeightChart(); renderHealthHabits(); },80);
   if(id==='s-school') renderSchool&&renderSchool();
   if(id==='s-finance') setTimeout(renderFinanceDash,50);
+  if(id==='s-cbt') setTimeout(()=>{ typingReset(); renderCbtLesson('basics'); renderCbtLesson('windows'); renderCbtLesson('linux'); renderCbtLesson('coding'); renderCbtLesson('internet'); },80);
+  if(id==='s-rewards') setTimeout(()=>{ renderGameTickets(); renderPBStore&&renderPBStore(); renderRewardLog&&renderRewardLog(); },80);
   if(id==='s-resume') setTimeout(initResume,80);
   if(id==='s-badges') setTimeout(renderBadgesPage,50);
   if(id==='s-hero') setTimeout(()=>{ renderGettingStarted(); renderPathway(); renderMonthlyChallenge(); renderDailyPrompt(); renderBadges(); updateDashCards(); renderHeroScreenTime(); renderDevMap(); },50);
@@ -8013,6 +8269,20 @@ function renderMonthSnap(inc,exp,bills){
     <div style="padding:.6rem;background:rgba(255,255,255,.1);border-radius:9px;"><div style="font-size:.62rem;color:#c8d4e8;">BILLS PAID</div><div style="font-weight:800;color:var(--g);font-family:var(--fn);">${paid}/${total}</div></div>
     <div style="padding:.6rem;background:rgba(255,255,255,.1);border-radius:9px;"><div style="font-size:.62rem;color:#c8d4e8;">TOTAL BILLS</div><div style="font-weight:800;color:var(--pk);font-family:var(--fn);">$${bills.toFixed(2)}</div></div>
   </div>`;
+}
+
+function renderFinanceDash(){
+  // Show overview tab by default, render stats
+  document.querySelectorAll('[id^="mt-"]').forEach(t=>t.style.display='none');
+  const ov = document.getElementById('mt-overview');
+  if(ov) ov.style.display='block';
+  // Set overview tab as active
+  document.querySelectorAll('.moneyTabs .tab').forEach(b=>b.classList.remove('active'));
+  const firstTab = document.querySelector('.moneyTabs .tab');
+  if(firstTab) firstTab.classList.add('active');
+  // Update balance displays
+  updateFinSum&&updateFinSum();
+  renderBills&&renderBills();
 }
 
 function calcBudget(){
@@ -12462,20 +12732,20 @@ function printCert(key){
 
 
 <!-- ═══ REWARD SPINNER OVERLAY ═══ -->
-<div id="spinnerOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,rgba(15,10,40,.97),rgba(10,5,30,.99));z-index:9999;align-items:center;justify-content:center;flex-direction:column;">
-  <div style="text-align:center;width:100%;max-width:400px;padding:1rem;">
+<div id="spinnerOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,rgba(15,10,40,.97),rgba(10,5,30,.99));z-index:9999;align-items:center;justify-content:center;flex-direction:column;overflow-y:auto;">
+  <div style="text-align:center;width:100%;max-width:600px;padding:1rem 1rem 2rem;">
     <div style="font-family:var(--fh);font-size:1.8rem;font-weight:900;color:#fde68a;margin-bottom:.3rem;letter-spacing:2px;text-shadow:0 2px 10px rgba(253,230,138,.3);">🎰 SPIN TO WIN!</div>
-    <div style="font-size:.8rem;color:rgba(255,255,255,.5);margin-bottom:1rem;">Tap the button to spin the wheel</div>
-    <div style="position:relative;width:300px;height:300px;margin:0 auto;">
-      <canvas id="spinnerCanvas" width="300" height="300" style="border-radius:50%;"></canvas>
+    <div style="font-size:.8rem;color:rgba(255,255,255,.5);margin-bottom:.8rem;">Tap the button to spin the wheel</div>
+    <div id="spinnerWrap" style="position:relative;width:min(80vmin,520px);height:min(80vmin,520px);margin:0 auto;">
+      <canvas id="spinnerCanvas" width="520" height="520" style="border-radius:50%;width:100%;height:100%;"></canvas>
       <!-- Pointer needle -->
-      <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);z-index:3;filter:drop-shadow(0 3px 6px rgba(0,0,0,.6));">
-        <div style="width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:30px solid #fde68a;margin:0 auto;"></div>
-        <div style="width:10px;height:10px;background:#fde68a;border-radius:50%;margin:-3px auto 0;"></div>
+      <div style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);z-index:3;filter:drop-shadow(0 3px 10px rgba(0,0,0,.8));">
+        <div style="width:0;height:0;border-left:20px solid transparent;border-right:20px solid transparent;border-top:44px solid #fde68a;margin:0 auto;"></div>
+        <div style="width:14px;height:14px;background:#fde68a;border-radius:50%;margin:-4px auto 0;"></div>
       </div>
     </div>
-    <div id="spinnerResult" style="margin-top:1rem;font-size:1.1rem;font-weight:700;color:#fff;min-height:2.5rem;"></div>
-    <button id="spinnerBtn" class="btn" onclick="doSpin()" style="margin-top:.5rem;font-size:1rem;padding:.7rem 2rem;background:linear-gradient(135deg,#fde68a,#f59e0b);color:#1a1a2e;font-weight:800;border:none;border-radius:12px;cursor:pointer;letter-spacing:1px;">🎰 SPIN!</button>
+    <div id="spinnerResult" style="margin-top:1rem;font-size:1.4rem;font-weight:800;color:#fde68a;min-height:2.5rem;text-shadow:0 2px 10px rgba(253,230,138,.4);"></div>
+    <button id="spinnerBtn" class="btn" onclick="doSpin()" style="margin-top:.5rem;font-size:1.2rem;padding:.9rem 3rem;background:linear-gradient(135deg,#fde68a,#f59e0b);color:#1a1a2e;font-weight:900;border:none;border-radius:14px;cursor:pointer;letter-spacing:1px;box-shadow:0 4px 20px rgba(253,230,138,.4);">🎰 SPIN!</button>
     <div style="margin-top:.8rem;"><button class="btn" onclick="closeSpinner()" style="font-size:.75rem;color:rgba(255,255,255,.4);background:none;border:1px solid rgba(255,255,255,.1);padding:.4rem 1rem;border-radius:8px;cursor:pointer;">Close</button></div>
   </div>
 </div>
@@ -12560,25 +12830,31 @@ function renderMotivation(){ const el=document.getElementById('motivationWall');
 // ── INIT ──────────────────────────────────────────────────────
 async function init(){
   setSyncSt('loading');
-  const supa=getSupabase();
+
+  // Check for existing Supabase session
+  const supa = getSupabase();
   if(supa){
-    const{data:{session}}=await supa.auth.getSession();
+    const { data: { session } } = await supa.auth.getSession();
     if(session?.user){
-      _supaUser=session.user;
-      const loaded=await cloudLoad();
-      if(!loaded)loadData();
-      setSyncSt(loaded?'cloud':'local');
-      if(!D.chorePin&&!D.parentPIN){showFirstTimeGate();return;}
+      _supaUser = session.user;
+      const loaded = await cloudLoad();
+      if(!loaded) loadData(); // Fall back to localStorage
+      setSyncSt(loaded ? 'cloud' : 'local');
+      if(!D.chorePin && !D.parentPIN){ showFirstTimeGate(); return; }
       finishInit();
       return;
     }
-  }else{
-    loadData();setSyncSt('local');
-    if(!D.chorePin&&!D.parentPIN){showFirstTimeGate();return;}
+  } else {
+    // Supabase not available - use localStorage
+    loadData();
+    setSyncSt('local');
+    if(!D.chorePin && !D.parentPIN){ showFirstTimeGate(); return; }
     finishInit();
     return;
   }
-  document.getElementById('authScreen').style.display='flex';
+
+  // No session - show auth screen
+  document.getElementById('authScreen').style.display = 'flex';
 }
 
 function finishInit(){
@@ -12598,6 +12874,8 @@ function finishInit(){
   startVerseAutoRotation();
   // Start session timer
   if(typeof startSessionTimer === 'function') startSessionTimer();
+  // Initial cloud sync after login
+  setTimeout(function(){ if(_supaUser) cloudSync(); }, 1500);
   buildCheckins();
   updateStreak();
   updateQuickStats();
@@ -12663,13 +12941,8 @@ function finishInit(){
   renderDevMap();
   initResources();
 
-  // Welcome modal on first visit (replaces prompt())
-  if(!D.name){
-    setTimeout(()=>{
-      const m = document.getElementById('welcomeModal');
-      if(m){ m.style.display='flex'; setTimeout(()=>{ const i=document.getElementById('welcomeNameInput'); if(i) i.focus(); },100); }
-    }, 600);
-  }
+  // Name defaults to Champion - parent can set in Settings
+  // No popup on first visit
 
   // Macro goal inputs
   const g=D.macroGoals||{};
@@ -16910,10 +17183,9 @@ function saveProfiles(){
 // ── WELCOME MODAL ─────────────────────────────────────────────
 function welcomeSubmit(){
   const n = (document.getElementById('welcomeNameInput')||{}).value||'';
-  if(!n.trim()){ showToast('Please enter your name'); return; }
-  D.name = n.trim(); save(); applyName();
+  D.name = n.trim() || 'Champion';
+  save(); applyName();
   document.getElementById('welcomeModal').style.display='none';
-  // Auto-create parent profile
   if(_profiles.length===0){
     const id = generateParentId();
     _profiles.push({id, name:D.name, isParent:true, data:JSON.parse(JSON.stringify(D))});
@@ -16921,7 +17193,7 @@ function welcomeSubmit(){
     saveProfiles();
     renderProfileSwitcher();
   }
-  showToast('Welcome, '+D.name+'! 🙌');
+  showToast('Welcome! 🙌');
 }
 
 function generateParentId(){
@@ -19165,16 +19437,12 @@ function _pinCancel(){
 function _requirePin(title, sub, icon, onSuccess){
   const pin = D.chorePin || D.parentPIN;
   if(!pin){
-    // First time — use parent's initial as avatar icon
-    const initial = (D.name||'P').charAt(0).toUpperCase();
-    showPinModal('Create Your PIN', 'Choose a 6-digit parent PIN', initial, 'create', (newPin)=>{
-      D.chorePin = newPin; D.parentPIN = newPin; save();
-      showToast('Parent PIN created ✓');
-      onSuccess();
-    });
-  } else {
-    showPinModal(title, sub, icon||'🔒', 'enter', onSuccess);
+    // PIN not set yet - send to firstTimeGate instead of creating inline
+    showToast('Please set up your Parent PIN first.');
+    showFirstTimeGate();
+    return;
   }
+  showPinModal(title, sub, icon||'🔒', 'enter', onSuccess);
 }
 
 
@@ -19344,10 +19612,25 @@ function renderParentBucks(){
 
 function renderGameTickets(){
   if(!D.pb) return;
+  const spins = D.pb.spinTickets||0;
+  const scratches = D.pb.scratchTickets||0;
   const st = document.getElementById('spinnerTickets');
-  if(st) st.textContent = D.pb.spinTickets||0;
+  if(st) st.textContent = spins;
   const sc = document.getElementById('scratchTickets');
-  if(sc) sc.textContent = D.pb.scratchTickets||0;
+  if(sc) sc.textContent = scratches;
+  // Update ticket preview shown even when rewards is locked
+  const preview = document.getElementById('rewardsTicketPreview');
+  if(preview){
+    if(spins > 0 || scratches > 0){
+      preview.style.display = 'flex';
+      preview.innerHTML = 
+        (spins > 0 ? `<div style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2);border-radius:10px;padding:.5rem .9rem;font-size:.8rem;font-weight:700;color:#fbbf24;">🎰 ${spins} Spin${spins!==1?'s':''}</div>` : '') +
+        (scratches > 0 ? `<div style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:.5rem .9rem;font-size:.8rem;font-weight:700;color:#4ade80;">🎫 ${scratches} Scratch${scratches!==1?'es':''}</div>` : '');
+    } else {
+      preview.style.display = 'none';
+      preview.innerHTML = '';
+    }
+  }
 }
 
 // ── REWARD SPINNER ───────────────────────────────────────────
@@ -19366,7 +19649,8 @@ let _spinAngle = 0;
 let _spinning = false;
 
 function openSpinner(){
-  if(!D.pb || (D.pb.spinTickets||0) <= 0){ showToast('No spins available!'); return; }
+  if(!D.pb) initParentBucks();
+  if((D.pb.spinTickets||0) <= 0){ showToast('No spins available! Ask a parent to award spins from the Parent Hub.'); return; }
   document.getElementById('spinnerOverlay').style.display = 'flex';
   document.getElementById('spinnerResult').textContent = '';
   document.getElementById('spinnerBtn').disabled = false;
@@ -19379,13 +19663,15 @@ function closeSpinner(){ document.getElementById('spinnerOverlay').style.display
 function drawSpinner(angle){
   const c = document.getElementById('spinnerCanvas');
   if(!c) return;
+  // Use canvas internal resolution (520x520)
+  const size = c.width;
   const ctx = c.getContext('2d');
-  const cx = 150, cy = 150, r = 136;
+  const cx = size/2, cy = size/2, r = size/2 - 14;
   const slices = (D.pb&&D.pb.spinnerSlices&&D.pb.spinnerSlices.length) ? D.pb.spinnerSlices : DEFAULT_SPINNER;
   const n = slices.length;
   const arc = (Math.PI*2)/n;
 
-  ctx.clearRect(0,0,300,300);
+  ctx.clearRect(0,0,size,size);
 
   // Outer glow ring
   const ringGrad = ctx.createRadialGradient(cx,cy,r-4,cx,cy,r+14);
@@ -19470,7 +19756,7 @@ function drawSpinner(angle){
   ctx.lineWidth = 2;
   ctx.stroke();
   ctx.fillStyle = '#1a1a2e';
-  ctx.font = 'bold 12px Inter,sans-serif';
+  ctx.font = `bold ${Math.round(size/25)}px Inter,sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText('SPIN', cx, cy);
@@ -19783,6 +20069,24 @@ function renderParentBucksControls(){
     </div>
 
     <div style="border-top:1px solid rgba(255,255,255,.05);padding-top:.5rem;margin-top:.5rem;">
+      <div style="font-size:.6rem;font-weight:700;color:#fde68a;margin-bottom:.3rem;">🎰 SPIN WHEEL SLICES</div>
+      <div style="font-size:.55rem;color:var(--tx3);margin-bottom:.4rem;">Customize what kids can win. Leave empty to use the default 8-slice wheel.</div>
+      <div id="pbSpinnerSlices" style="max-height:100px;overflow-y:auto;margin-bottom:.4rem;"></div>
+      <div style="display:grid;grid-template-columns:1fr 60px 80px;gap:.3rem;margin-bottom:.3rem;">
+        <input type="text" id="newSliceLabel" placeholder="Label (e.g. +50 PB)" style="font-size:.65rem;">
+        <input type="number" id="newSliceValue" placeholder="Amt" min="0" style="font-size:.65rem;">
+        <select id="newSliceType" style="font-size:.6rem;background:var(--s2);color:var(--tx);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:.2rem;">
+          <option value="pb">PB</option>
+          <option value="screen">Screen Min</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:.3rem;">
+        <button class="btn bp bs" onclick="addSpinnerSlice()" style="flex:1;font-size:.6rem;">+ Add Slice</button>
+        <button class="btn bs" onclick="resetSpinnerToDefault()" style="font-size:.55rem;color:var(--tx3);">Reset Default</button>
+      </div>
+    </div>
+
+    <div style="border-top:1px solid rgba(255,255,255,.05);padding-top:.5rem;margin-top:.5rem;">
       <div style="font-size:.6rem;font-weight:700;color:var(--tx2);margin-bottom:.3rem;">GAME TRIGGERS (auto-award spins/scratches)</div>
       <div style="font-size:.58rem;color:var(--tx2);line-height:1.5;">
         ✅ Chore verified → +5 PB + chance of spin<br>
@@ -19806,6 +20110,41 @@ function renderParentBucksControls(){
       <button class="btn bda bs" onclick="removePBStoreItem(${i})" style="font-size:.4rem;padding:.1rem .2rem;">✕</button>
     </div>`).join('') || '<div style="font-size:.55rem;color:var(--tx3);">No items yet</div>';
   }
+
+  // Spinner slices section
+  const spinManage = document.getElementById('pbSpinnerSlices');
+  if(spinManage){
+    const slices = D.pb.spinnerSlices||[];
+    spinManage.innerHTML = slices.length ? slices.map((s,i)=>`<div style="display:flex;align-items:center;gap:.3rem;padding:.15rem 0;font-size:.6rem;border-bottom:1px solid rgba(255,255,255,.02);">
+      <div style="width:12px;height:12px;border-radius:3px;background:${s.color||'#fde68a'};flex-shrink:0;"></div>
+      <span style="flex:1;">${s.label} (${s.type==='pb'?s.value+' PB':s.value+' min screen'})</span>
+      <button onclick="removeSpinnerSlice(${i})" style="font-size:.5rem;color:#f87171;background:none;border:none;cursor:pointer;">✕</button>
+    </div>`).join('') : '<div style="font-size:.55rem;color:var(--tx3);">Using default 8-slice wheel</div>';
+  }
+}
+
+function addSpinnerSlice(){
+  if(!D.pb) initParentBucks();
+  if(!D.pb.spinnerSlices) D.pb.spinnerSlices=[];
+  const label=(document.getElementById('newSliceLabel')||{}).value?.trim();
+  const val=parseFloat((document.getElementById('newSliceValue')||{}).value)||0;
+  const type=(document.getElementById('newSliceType')||{}).value||'pb';
+  if(!label){showToast('Enter a label');return;}
+  const colors=['#fde68a','#bbf7d0','#bfdbfe','#fecaca','#e9d5ff','#fed7aa','#c7d2fe','#fef08a','#a7f3d0','#fbcfe8'];
+  D.pb.spinnerSlices.push({label,value:val,type,color:colors[D.pb.spinnerSlices.length%colors.length]});
+  save();renderParentBucksControls();showToast('Slice added to wheel!');
+}
+
+function removeSpinnerSlice(i){
+  if(!D.pb||!D.pb.spinnerSlices)return;
+  D.pb.spinnerSlices.splice(i,1);
+  save();renderParentBucksControls();showToast('Slice removed');
+}
+
+function resetSpinnerToDefault(){
+  if(!D.pb)initParentBucks();
+  D.pb.spinnerSlices=[];
+  save();renderParentBucksControls();showToast('Reset to default wheel');
 }
 
 function parentAddPB(){
@@ -20697,6 +21036,53 @@ function sendCompletionQuiz(){
   D.quizzes.push(quiz);
   save(); renderQuizNotification(); renderSentQuizzes();
   showToast('Quiz sent based on completed work! ✓');
+}
+
+function saveGpaTarget(val){
+  const v = parseFloat(val);
+  if(isNaN(v) || v < 0 || v > 4){ showToast('GPA target must be 0.0 – 4.0'); return; }
+  D.gpaTarget = v;
+  save();
+  showToast('GPA target saved');
+}
+
+function sendParentQuiz(){
+  const title = (document.getElementById('pqTitle')||{}).value || 'Parent Quiz';
+  const extraQs = (document.getElementById('pqQuestions')||{}).value || '';
+  const rewardCustom = (document.getElementById('pqRewardCustom')||{}).value || '';
+  const penaltyCustom = (document.getElementById('pqPenaltyCustom')||{}).value || '';
+  const reward = parseInt((document.getElementById('pqReward')||{}).value) || 25;
+  const penalty = parseInt((document.getElementById('pqPenalty')||{}).value) || 10;
+
+  // Build questions array from extra text if provided
+  let questions = [];
+  if(extraQs.trim()){
+    extraQs.split('\n').filter(q=>q.trim()).forEach(q=>{
+      questions.push({ q: q.trim(), opts:['True','False'], ans:0, explain:'' });
+    });
+  }
+  if(!questions.length){ showToast('Add at least one question'); return; }
+
+  if(!D.pendingQuizzes) D.pendingQuizzes = [];
+  D.pendingQuizzes.push({
+    id: Date.now(),
+    title: title,
+    questions: questions,
+    reward: rewardCustom || reward,
+    penalty: penaltyCustom || penalty,
+    passScore: 70,
+    status: 'pending',
+    sentAt: new Date().toISOString()
+  });
+  save();
+  const el = document.getElementById('pqPendingCount');
+  if(el) el.textContent = D.pendingQuizzes.filter(q=>q.status==='pending').length;
+  if(document.getElementById('pqTitle')) document.getElementById('pqTitle').value='';
+  if(document.getElementById('pqQuestions')) document.getElementById('pqQuestions').value='';
+  if(document.getElementById('pqRewardCustom')) document.getElementById('pqRewardCustom').value='';
+  if(document.getElementById('pqPenaltyCustom')) document.getElementById('pqPenaltyCustom').value='';
+  showToast('Quiz sent to child ✅');
+  if(typeof renderSentQuizzes==='function') renderSentQuizzes();
 }
 
 function sendCustomQuiz(){
@@ -21986,6 +22372,316 @@ document.addEventListener('DOMContentLoaded', ()=>{
   init();
 });
 
+
+
+
+// ═══════════════════════════════════════════════════════════
+// CBT — COMPUTER BASED TRAINING
+// ═══════════════════════════════════════════════════════════
+
+// ── CBT Tab switcher ────────────────────────────────────────
+function cbtTab(name, btn){
+  ['typing','basics','windows','linux','coding','internet'].forEach(t=>{
+    const el = document.getElementById('cbt-'+t);
+    if(el) el.style.display = t===name ? 'block' : 'none';
+  });
+  document.querySelectorAll('.cbtTabs .tab').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  if(name==='typing') typingReset();
+  if(name==='basics')   renderCbtLesson('basics');
+  if(name==='windows')  renderCbtLesson('windows');
+  if(name==='linux')    renderCbtLesson('linux');
+  if(name==='coding')   renderCbtLesson('coding');
+  if(name==='internet') renderCbtLesson('internet');
+}
+
+// ── TYPING ENGINE ───────────────────────────────────────────
+
+const TYPING_PASSAGES = {
+  easy:[
+    "The sun sets over the hills. Birds fly home as the sky turns orange and pink.",
+    "A dog runs fast through the green park. The children laugh and play all day long.",
+    "She opens the book and reads each page slowly. The story is fun and easy to follow.",
+    "Turn on the light. The room is now bright and ready for us to get to work.",
+    "He eats an apple every day to stay healthy and strong. Good food is important.",
+  ],
+  medium:[
+    "The keyboard is one of the most important tools for working with computers. Learning to type without looking at your fingers will save you hours every week.",
+    "Computers process millions of instructions every second using tiny chips called processors. The speed of a processor is measured in gigahertz, or GHz.",
+    "A strong password should be at least twelve characters long and include a mix of letters, numbers, and symbols. Never share your password with anyone.",
+    "The internet connects billions of devices around the world using a system of rules called protocols. The most common is HTTP, which powers every website.",
+    "When you save a file, the computer writes data to the hard drive or solid-state drive. SSDs are faster than HDDs because they have no moving parts.",
+  ],
+  hard:[
+    "Object-oriented programming organizes code into reusable structures called classes. Each class defines properties and methods that its objects inherit, enabling developers to write modular, maintainable software.",
+    "The Linux kernel was first released by Linus Torvalds in 1991. Today it powers Android phones, web servers, supercomputers, and embedded systems worldwide. Its open-source nature means anyone can study or modify the code.",
+    "Cybersecurity threats include phishing, ransomware, SQL injection, and man-in-the-middle attacks. Defending against these requires a layered strategy combining firewalls, encryption, regular patching, and user education.",
+    "A central processing unit executes the fetch-decode-execute cycle billions of times per second. Modern CPUs contain multiple cores and cache layers to reduce latency and maximize instruction throughput.",
+    "Version control systems like Git allow developers to track changes, branch code, merge contributions, and roll back to previous states. Repositories can be hosted on platforms like GitHub or GitLab for collaboration.",
+  ]
+};
+
+let _typingActive=false, _typingTimer=null, _typingSeconds=0;
+let _typingPassage='', _typingStart=null;
+
+function typingReset(){
+  clearInterval(_typingTimer);
+  _typingActive=false; _typingSeconds=0;
+  const diff = (document.getElementById('typingDifficulty')||{}).value||'medium';
+  const pool = TYPING_PASSAGES[diff];
+  _typingPassage = pool[Math.floor(Math.random()*pool.length)];
+
+  const inp = document.getElementById('typingInput');
+  if(inp){ inp.value=''; inp.disabled=true; inp.style.borderColor='rgba(255,255,255,.12)'; }
+
+  const btn = document.getElementById('typingStartBtn');
+  if(btn){ btn.textContent='▶ Start Test'; btn.disabled=false; }
+
+  document.getElementById('typingWpm').textContent='—';
+  document.getElementById('typingAcc').textContent='—';
+  document.getElementById('typingTime').textContent='0s';
+  document.getElementById('typingErrors').textContent='0';
+  document.getElementById('typingResult').style.display='none';
+
+  renderTypingPassage('');
+  renderTypingBests();
+}
+
+function renderTypingPassage(typed){
+  const el = document.getElementById('typingPassage');
+  if(!el) return;
+  let html='';
+  for(let i=0;i<_typingPassage.length;i++){
+    const ch = _typingPassage[i];
+    const disp = ch===' ' ? '&nbsp;' : ch;
+    if(i < typed.length){
+      if(typed[i]===ch) html+=`<span style="color:#86efac;">${disp}</span>`;
+      else html+=`<span style="background:#7f1d1d;color:#fca5a5;border-radius:2px;">${disp}</span>`;
+    } else if(i===typed.length){
+      html+=`<span style="border-left:2px solid #38bdf8;color:#fff;">${disp}</span>`;
+    } else {
+      html+=`<span style="color:rgba(255,255,255,.35);">${disp}</span>`;
+    }
+  }
+  el.innerHTML=html;
+}
+
+function typingStart(){
+  const btn = document.getElementById('typingStartBtn');
+  if(btn){ btn.textContent='Typing…'; btn.disabled=true; }
+  const inp = document.getElementById('typingInput');
+  if(inp){ inp.disabled=false; inp.focus(); inp.value=''; }
+  _typingActive=true;
+  _typingStart=null;
+  _typingSeconds=0;
+}
+
+function typingOnInput(){
+  if(!_typingActive) return;
+  const inp = document.getElementById('typingInput');
+  if(!inp) return;
+  const typed = inp.value;
+
+  if(!_typingStart){ _typingStart=Date.now(); startTypingTimer(); }
+
+  renderTypingPassage(typed);
+
+  // Count errors
+  let errors=0;
+  for(let i=0;i<typed.length;i++){ if(typed[i]!==_typingPassage[i]) errors++; }
+  document.getElementById('typingErrors').textContent=errors;
+
+  // Live WPM
+  const elapsed = (Date.now()-_typingStart)/60000;
+  const words = typed.trim().split(/\s+/).filter(Boolean).length;
+  if(elapsed>0) document.getElementById('typingWpm').textContent=Math.round(words/elapsed);
+
+  // Accuracy
+  const acc = typed.length>0 ? Math.round(((typed.length-errors)/typed.length)*100) : 100;
+  document.getElementById('typingAcc').textContent=acc+'%';
+
+  // Finished?
+  if(typed.length >= _typingPassage.length){
+    typingFinish(typed);
+  }
+}
+
+function startTypingTimer(){
+  clearInterval(_typingTimer);
+  _typingTimer=setInterval(()=>{
+    if(!_typingActive){clearInterval(_typingTimer);return;}
+    _typingSeconds++;
+    document.getElementById('typingTime').textContent=_typingSeconds+'s';
+  },1000);
+}
+
+function typingFinish(typed){
+  clearInterval(_typingTimer);
+  _typingActive=false;
+
+  const elapsed = (Date.now()-_typingStart)/60000;
+  let errors=0;
+  for(let i=0;i<_typingPassage.length;i++){ if((typed[i]||'')!==_typingPassage[i]) errors++; }
+  const acc = Math.round(((_typingPassage.length-errors)/_typingPassage.length)*100);
+  const words = _typingPassage.split(/\s+/).length;
+  const wpm = Math.round(words/elapsed);
+
+  document.getElementById('typingWpm').textContent=wpm;
+  document.getElementById('typingAcc').textContent=acc+'%';
+  document.getElementById('typingErrors').textContent=errors;
+
+  const diff = (document.getElementById('typingDifficulty')||{}).value||'medium';
+  const grade = acc>=98?'S':acc>=95?'A':acc>=88?'B':acc>=75?'C':'D';
+  const gradeColor = {S:'#fde68a',A:'#86efac',B:'#7dd3fc',C:'#fb923c',D:'#f87171'}[grade];
+
+  // Save personal best
+  if(!D.cbtTypingBests) D.cbtTypingBests={};
+  if(!D.cbtTypingBests[diff]||wpm>D.cbtTypingBests[diff].wpm){
+    D.cbtTypingBests[diff]={wpm,acc,errors,secs:_typingSeconds,date:new Date().toLocaleDateString()};
+    save();
+    showToast('🏆 New personal best on '+diff+'!');
+  }
+
+  const inp = document.getElementById('typingInput');
+  if(inp) inp.disabled=true;
+
+  const res = document.getElementById('typingResult');
+  if(res){
+    res.style.display='block';
+    res.innerHTML=`
+      <div style="font-size:2rem;margin-bottom:.3rem;">${grade==='S'?'🏆':grade==='A'?'🎉':grade==='B'?'👍':'💪'}</div>
+      <div style="font-size:1.4rem;font-weight:800;color:${gradeColor};">Grade ${grade}</div>
+      <div style="font-size:.85rem;color:var(--tx2);margin-top:.3rem;">${wpm} WPM · ${acc}% accuracy · ${errors} errors · ${_typingSeconds}s</div>
+      <div style="font-size:.72rem;color:var(--tx3);margin-top:.5rem;">${acc>=95?'Excellent work! Your accuracy is on point.':acc>=80?'Good effort. Focus on accuracy over speed.':'Slow down and prioritize hitting every key correctly.'}</div>
+      <button class="btn bp" onclick="typingReset()" style="margin-top:.8rem;font-size:.8rem;">Try Again</button>
+    `;
+  }
+  renderTypingBests();
+}
+
+function renderTypingBests(){
+  const el = document.getElementById('typingBests');
+  if(!el) return;
+  const bests = D.cbtTypingBests||{};
+  const diffs = ['easy','medium','hard'];
+  el.innerHTML = diffs.map(d=>{
+    const b = bests[d];
+    return `<div class="fst" style="text-align:center;border-top:3px solid ${d==='easy'?'#86efac':d==='medium'?'#7dd3fc':'#c084fc'};">
+      <div class="stat-lbl" style="text-transform:capitalize;">${d}</div>
+      ${b ? `<div class="stat-val" style="font-size:1rem;">${b.wpm}<span style="font-size:.55rem;"> WPM</span></div>
+      <div style="font-size:.6rem;color:var(--tx3);">${b.acc}% acc · ${b.date}</div>` :
+      `<div style="font-size:.75rem;color:var(--tx3);margin-top:.3rem;">Not yet</div>`}
+    </div>`;
+  }).join('');
+}
+
+// ── CBT LESSON RENDERER ─────────────────────────────────────
+
+const CBT_LESSONS = {
+  basics:[
+    {icon:'🖥️', title:'What is a Computer?', body:'A computer is an electronic device that takes in data (input), processes it, stores it, and produces output. The four core operations — input, processing, storage, output — apply to every device from a smartphone to a supercomputer.', quiz:[{q:'What are the four core computer operations?',a:'Input, Processing, Storage, Output'}]},
+    {icon:'🔩', title:'Hardware vs Software', body:'<b>Hardware</b> is any physical component you can touch — the monitor, keyboard, mouse, CPU, RAM, and hard drive. <b>Software</b> is the programs and data that run on the hardware. The operating system bridges the two, managing hardware resources for your apps.', quiz:[{q:'Give two examples of hardware.',a:'CPU and RAM / Monitor and keyboard (any two physical components)'}]},
+    {icon:'⚡', title:'The CPU — Brain of the Computer', body:'The Central Processing Unit executes instructions. Speed is measured in <b>GHz</b> (gigahertz) — the number of instruction cycles per second. Modern CPUs have multiple <b>cores</b> so they can work on several tasks at once. The more cores and higher the GHz, the faster the processor.', quiz:[{q:'What does GHz measure in a CPU?',a:'The number of instruction cycles per second (speed)'}]},
+    {icon:'💾', title:'Storage: HDD vs SSD', body:'A <b>Hard Disk Drive (HDD)</b> uses spinning magnetic platters to store data — slower but cheaper per GB. A <b>Solid State Drive (SSD)</b> stores data on flash chips with no moving parts — much faster, more durable, and increasingly affordable. Most modern laptops use SSDs.', quiz:[{q:'Why is an SSD faster than an HDD?',a:'An SSD has no moving parts — it reads/writes data electronically, not mechanically'}]},
+    {icon:'🧠', title:'RAM — Short Term Memory', body:'<b>RAM (Random Access Memory)</b> is your computer\'s workspace. When you open a program, it loads from storage into RAM so the CPU can access it instantly. More RAM = more programs open at once without slowing down. When you shut down, RAM is wiped — it is not permanent storage.', quiz:[{q:'What happens to data in RAM when you shut down?',a:'It is erased — RAM is volatile (temporary) memory'}]},
+    {icon:'🖱️', title:'Input & Output Devices', body:'<b>Input devices</b> send data INTO the computer: keyboard, mouse, microphone, webcam, scanner. <b>Output devices</b> send data OUT: monitor, speakers, printer, projector. Some devices do both — a touchscreen is both input and output. Understanding I/O helps you troubleshoot problems.', quiz:[{q:'Is a printer an input or output device?',a:'Output — it sends data out of the computer'}]},
+    {icon:'📁', title:'Files, Folders & File Systems', body:'A <b>file</b> is a named collection of data. A <b>folder</b> (directory) organizes files hierarchically. The <b>file system</b> (NTFS on Windows, ext4 on Linux, APFS on Mac) tracks where every file is stored on the drive. File extensions (.docx, .jpg, .mp3) tell the OS what program should open the file.', quiz:[{q:'What does a file extension tell the operating system?',a:'Which program should be used to open the file'}]},
+    {icon:'🔌', title:'Ports & Connectivity', body:'Computers connect to devices through <b>ports</b>. Common ones: <b>USB-A</b> (keyboards, flash drives), <b>USB-C</b> (fast data + charging), <b>HDMI</b> (video to monitors/TVs), <b>Ethernet</b> (wired internet), <b>3.5mm audio jack</b> (headphones). Wireless options include Wi-Fi and Bluetooth.', quiz:[{q:'Which port would you use to connect a laptop to a monitor?',a:'HDMI (or DisplayPort / USB-C with adapter)'}]},
+  ],
+  windows:[
+    {icon:'🪟', title:'The Desktop & Taskbar', body:'The <b>desktop</b> is your main workspace. The <b>taskbar</b> at the bottom shows open apps and the Start menu. The <b>system tray</b> (bottom right) shows notifications, Wi-Fi, volume, and the clock. You can right-click the desktop to change wallpaper or create new folders.', quiz:[{q:'What is the system tray?',a:'The bottom-right area of the taskbar showing notifications, Wi-Fi, clock, etc.'}]},
+    {icon:'🔍', title:'Windows Search & Start Menu', body:'Press the <b>Windows key</b> or click Start to open the menu. Type any app, file, or setting to search instantly. Press <b>Win + S</b> to open search directly. This is the fastest way to launch apps — faster than hunting through folders.', quiz:[{q:'What keyboard shortcut opens Windows Search?',a:'Win + S'}]},
+    {icon:'📂', title:'File Explorer', body:'<b>File Explorer</b> (Win + E) lets you navigate drives, folders, and files. Key locations: <b>Desktop</b>, <b>Documents</b>, <b>Downloads</b>, <b>This PC</b>. The address bar shows your current path. Right-click any file to Copy, Cut, Rename, Delete, or check Properties.', quiz:[{q:'What shortcut opens File Explorer?',a:'Win + E'}]},
+    {icon:'⚙️', title:'Settings & Control Panel', body:'<b>Settings</b> (Win + I) is where you manage Wi-Fi, display, sound, accounts, privacy, and updates. The older <b>Control Panel</b> still exists for advanced tasks. Always check <b>Windows Update</b> regularly — updates fix security vulnerabilities and bugs.', quiz:[{q:'What shortcut opens Windows Settings?',a:'Win + I'}]},
+    {icon:'🖥️', title:'Task Manager', body:'Press <b>Ctrl + Shift + Esc</b> to open Task Manager. You can see which apps are using the most CPU, RAM, and disk. If an app freezes, right-click it and choose <b>End Task</b>. The Startup tab shows programs that launch when Windows boots — disable ones you don\'t need.', quiz:[{q:'How do you force-close a frozen app in Task Manager?',a:'Right-click the app and choose End Task'}]},
+    {icon:'⌨️', title:'Essential Windows Shortcuts', body:'<b>Win+D</b> — show desktop · <b>Win+L</b> — lock screen · <b>Alt+Tab</b> — switch apps · <b>Win+Tab</b> — task view · <b>Ctrl+Z</b> — undo · <b>Ctrl+Y</b> — redo · <b>Ctrl+C/X/V</b> — copy/cut/paste · <b>Win+←/→</b> — snap window left/right · <b>F2</b> — rename file · <b>Delete / Shift+Delete</b> — delete / permanently delete.', quiz:[{q:'What shortcut locks your Windows screen?',a:'Win + L'}]},
+    {icon:'🔒', title:'User Accounts & Security', body:'Windows supports multiple user accounts with different permission levels. <b>Administrator</b> accounts can install software and change system settings. <b>Standard</b> accounts are safer for everyday use. Enable <b>Windows Hello</b> (face/fingerprint/PIN) for secure, fast login. Always set a strong password.', quiz:[{q:'Which account type should you use for everyday browsing?',a:'Standard account — it is safer than Administrator'}]},
+    {icon:'🌐', title:'Networking & Wi-Fi', body:'Click the Wi-Fi icon in the system tray to connect to networks. Your computer gets an <b>IP address</b> from the router via DHCP. Press <b>Win + R → cmd → ipconfig</b> to see your IP address. Use <b>ping google.com</b> in Command Prompt to test internet connectivity.', quiz:[{q:'What command in cmd shows your IP address?',a:'ipconfig'}]},
+  ],
+  linux:[
+    {icon:'🐧', title:'What is Linux?', body:'Linux is a free, open-source operating system kernel created by Linus Torvalds in 1991. It powers Android, 96% of the world\'s top web servers, the International Space Station, and most supercomputers. <b>Distributions</b> (distros) like Ubuntu, Fedora, and Debian package the kernel with tools and apps.', quiz:[{q:'What percentage of web servers run Linux?',a:'About 96%'}]},
+    {icon:'📟', title:'The Terminal', body:'The <b>terminal</b> (shell) lets you control Linux by typing commands. The default shell is usually <b>bash</b>. The prompt shows <code>username@hostname:directory$</code>. Everything in Linux can be controlled from the terminal — which is why sysadmins and developers love it.', quiz:[{q:'What is the name of the default Linux shell?',a:'bash (Bourne Again Shell)'}]},
+    {icon:'📁', title:'Linux File System', body:'Linux uses a single root <code>/</code> tree. Key directories: <code>/home</code> (user files), <code>/etc</code> (config files), <code>/bin</code> (essential commands), <code>/var</code> (logs, variable data), <code>/tmp</code> (temporary files), <code>/usr</code> (user programs). Everything is a file in Linux — even devices and processes.', quiz:[{q:'Where are user home directories stored in Linux?',a:'/home (e.g. /home/username)'}]},
+    {icon:'⌨️', title:'Essential Terminal Commands', body:'<code>pwd</code> — print working directory · <code>ls</code> — list files · <code>cd folder</code> — change directory · <code>mkdir name</code> — make directory · <code>rm file</code> — remove file · <code>cp src dst</code> — copy · <code>mv src dst</code> — move/rename · <code>cat file</code> — view file · <code>man cmd</code> — manual/help · <code>clear</code> — clear terminal.', quiz:[{q:'What command displays the current directory path?',a:'pwd (print working directory)'}]},
+    {icon:'🔐', title:'Permissions & sudo', body:'Every file has read (r), write (w), execute (x) permissions for <b>owner</b>, <b>group</b>, and <b>others</b>. Run <code>ls -l</code> to see them. Use <code>chmod 755 file</code> to change permissions. <b>sudo</b> (superuser do) lets you run commands as root (admin). Example: <code>sudo apt install firefox</code>.', quiz:[{q:'What does sudo mean?',a:'Superuser do — run a command with administrator (root) privileges'}]},
+    {icon:'📦', title:'Package Managers', body:'Linux uses <b>package managers</b> to install software safely from official repositories. Ubuntu/Debian uses <b>apt</b>: <code>sudo apt update</code> (refresh list) and <code>sudo apt install packagename</code> (install). Fedora uses <b>dnf</b>. Arch uses <b>pacman</b>. No hunting sketchy websites for installers.', quiz:[{q:'What apt command refreshes the package list?',a:'sudo apt update'}]},
+    {icon:'🔄', title:'Processes & System Info', body:'<code>top</code> or <code>htop</code> shows running processes and resource usage. <code>ps aux</code> lists all processes. <code>kill PID</code> stops a process. <code>df -h</code> shows disk usage. <code>free -h</code> shows RAM. <code>uname -a</code> shows kernel info. <code>uptime</code> shows how long the system has been running.', quiz:[{q:'What command shows disk space usage in human-readable format?',a:'df -h'}]},
+    {icon:'📝', title:'Text Editors: nano & vim', body:'<b>nano</b> is beginner-friendly: <code>nano filename</code> to open, <code>Ctrl+O</code> to save, <code>Ctrl+X</code> to exit. <b>vim</b> is powerful but has a steep learning curve: press <code>i</code> to insert text, <code>Esc</code> to stop, <code>:wq</code> to save and quit, <code>:q!</code> to quit without saving.', quiz:[{q:'In vim, what do you type to save and quit?',a:':wq (colon, w, q, then Enter)'}]},
+  ],
+  coding:[
+    {icon:'💡', title:'What is Programming?', body:'Programming is giving a computer a precise sequence of instructions to solve a problem. A <b>program</b> is written in a <b>programming language</b> — a formal grammar the computer can interpret. Computers cannot guess intent — every instruction must be exact and logical.', quiz:[{q:'Why must programming instructions be exact?',a:'Computers cannot guess intent — they follow instructions literally'}]},
+    {icon:'🔢', title:'Variables & Data Types', body:'A <b>variable</b> is a named container for data. <b>Data types</b> define what kind of data: <b>integer</b> (whole number), <b>float</b> (decimal), <b>string</b> (text in quotes), <b>boolean</b> (true/false). Example in Python: <code>name = "Alex"</code> · <code>age = 16</code> · <code>gpa = 3.8</code> · <code>isParent = False</code>', quiz:[{q:'What data type stores true/false values?',a:'Boolean'}]},
+    {icon:'🔀', title:'Conditionals: if / else', body:'Conditionals let programs make decisions. Syntax: <code>if condition: do this else: do that</code>. Example: <code>if age >= 18: print("Adult") else: print("Minor")</code>. You can chain with <code>elif</code> for multiple conditions. Every app you use runs thousands of conditionals every second.', quiz:[{q:'What keyword adds a second condition to an if statement?',a:'elif (else if)'}]},
+    {icon:'🔁', title:'Loops: for & while', body:'Loops repeat code. A <b>for loop</b> runs a set number of times: <code>for i in range(5): print(i)</code> prints 0–4. A <b>while loop</b> runs as long as a condition is true: <code>while score < 100: score += 10</code>. Be careful of <b>infinite loops</b> — always ensure the condition eventually becomes false.', quiz:[{q:'What kind of loop runs as long as a condition is true?',a:'while loop'}]},
+    {icon:'🧩', title:'Functions', body:'A <b>function</b> is a named, reusable block of code. Define with <code>def</code> in Python: <code>def greet(name): return "Hello " + name</code>. Call it: <code>greet("Alex")</code>. Functions take <b>parameters</b> as input and can <b>return</b> a value. Good functions do one thing well.', quiz:[{q:'What Python keyword defines a function?',a:'def'}]},
+    {icon:'📋', title:'Lists & Dictionaries', body:'A <b>list</b> stores ordered items: <code>grades = [95, 87, 92]</code>. Access by index: <code>grades[0]</code> = 95. A <b>dictionary</b> stores key-value pairs: <code>student = {"name":"Alex", "gpa":3.8}</code>. Access by key: <code>student["name"]</code>. These are the two most important data structures for beginners.', quiz:[{q:'How do you access the first item in a Python list called items?',a:'items[0] — lists are zero-indexed'}]},
+    {icon:'🐛', title:'Debugging & Errors', body:'Bugs are mistakes in code. Types: <b>Syntax errors</b> — bad grammar (missing colon, wrong indent). <b>Runtime errors</b> — crashes while running (dividing by zero). <b>Logic errors</b> — runs but gives wrong answer. Debugging steps: read the error message, isolate the problem, add print statements, Google the error, ask for help.', quiz:[{q:'What type of error produces a wrong answer but does not crash?',a:'Logic error'}]},
+    {icon:'🌐', title:'How the Web Works', body:'A website is files (HTML, CSS, JavaScript) served by a <b>web server</b>. When you visit a URL, DNS converts it to an IP address, your browser sends an <b>HTTP request</b>, the server responds with files, and your browser renders them. <b>HTML</b> = structure · <b>CSS</b> = style · <b>JavaScript</b> = interactivity.', quiz:[{q:'What do HTML, CSS, and JavaScript each handle in a website?',a:'HTML=structure, CSS=style, JavaScript=interactivity'}]},
+  ],
+  internet:[
+    {icon:'🌐', title:'How the Internet Works', body:'The internet is a global network of computers connected by physical cables, fiber optics, and wireless signals. Data travels in small packets that are routed across the network and reassembled at the destination. The <b>TCP/IP protocol suite</b> governs how data is formatted, addressed, and delivered.', quiz:[{q:'How is data broken up for travel across the internet?',a:'Into small packets that are routed and reassembled'}]},
+    {icon:'🔗', title:'DNS — The Internet\'s Phone Book', body:'Every website has an <b>IP address</b> like 142.250.80.46. <b>DNS (Domain Name System)</b> translates human-readable names like google.com into IP addresses. Your browser queries a DNS server every time you type a URL. If DNS fails, websites appear unreachable even if the internet connection is fine.', quiz:[{q:'What does DNS stand for and what does it do?',a:'Domain Name System — converts domain names to IP addresses'}]},
+    {icon:'🔒', title:'HTTPS & Encryption', body:'<b>HTTP</b> sends data in plain text — anyone on the network can read it. <b>HTTPS</b> encrypts the connection using <b>TLS</b>. Look for the padlock icon and "https://" in the address bar. Never enter passwords or payment info on HTTP sites. Encryption scrambles data so only the intended recipient can decode it.', quiz:[{q:'What is the difference between HTTP and HTTPS?',a:'HTTPS encrypts the connection using TLS; HTTP sends data in plain text'}]},
+    {icon:'🎣', title:'Phishing & Social Engineering', body:'<b>Phishing</b> is a scam where attackers disguise themselves as trusted sources (banks, Apple, IRS) to steal credentials. Warning signs: urgent language, misspelled domains, unexpected attachments, requests for passwords. Always verify sender email addresses. When in doubt, go directly to the official website instead of clicking links.', quiz:[{q:'Name two warning signs of a phishing email.',a:'Urgent language, misspelled domain, unexpected attachment, request for password (any two)'}]},
+    {icon:'🔑', title:'Strong Passwords & MFA', body:'A strong password is 12+ characters with mixed case, numbers, and symbols. Never reuse passwords across sites. Use a <b>password manager</b> (Bitwarden, 1Password) to generate and store unique passwords. Enable <b>MFA (Multi-Factor Authentication)</b> everywhere — it requires a second factor (app code, SMS) even if your password is stolen.', quiz:[{q:'What is MFA and why is it important?',a:'Multi-Factor Authentication — requires a second verification step so stolen passwords alone cannot grant access'}]},
+    {icon:'🛡️', title:'Firewalls & Antivirus', body:'A <b>firewall</b> monitors incoming and outgoing network traffic and blocks suspicious connections. Windows has a built-in firewall — keep it on. <b>Antivirus</b> software scans files for known malware. Keep your OS and antivirus updated — most attacks exploit known vulnerabilities that patches already fix.', quiz:[{q:'What does a firewall do?',a:'Monitors and filters network traffic, blocking suspicious connections'}]},
+    {icon:'🕵️', title:'Privacy & Digital Footprint', body:'Every website you visit, every search you make, and every app you use collects data. Your <b>digital footprint</b> includes browsing history, location data, purchase history, and social posts. Use a <b>VPN</b> on public Wi-Fi, review app permissions, use private browsing for sensitive searches, and regularly audit what accounts have access to your data.', quiz:[{q:'What is a digital footprint?',a:'The trail of data left by your online activity — browsing, searches, purchases, social posts'}]},
+    {icon:'💀', title:'Malware Types', body:'<b>Virus</b> — attaches to files and spreads when opened. <b>Ransomware</b> — encrypts your files and demands payment. <b>Spyware</b> — secretly monitors activity. <b>Trojan</b> — disguises itself as legitimate software. <b>Worm</b> — self-replicates across networks without user action. Prevention: keep software updated, avoid suspicious downloads, use antivirus.', quiz:[{q:'What does ransomware do?',a:'Encrypts your files and demands payment (ransom) for the decryption key'}]},
+  ]
+};
+
+function renderCbtLesson(module){
+  const targetId = 'cbt'+module.charAt(0).toUpperCase()+module.slice(1)+'Content';
+  const el = document.getElementById(targetId);
+  if(!el) return;
+  const lessons = CBT_LESSONS[module]||[];
+  if(!D.cbtProgress) D.cbtProgress={};
+  if(!D.cbtProgress[module]) D.cbtProgress[module]={};
+
+  el.innerHTML = lessons.map((lesson,i)=>{
+    const done = D.cbtProgress[module][i];
+    return `<div style="border:1px solid ${done?'rgba(134,239,172,.2)':'rgba(255,255,255,.07)'};border-radius:12px;padding:1rem;margin-bottom:.7rem;background:${done?'rgba(134,239,172,.04)':'rgba(255,255,255,.02)'};">
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
+        <span style="font-size:1.3rem;">${lesson.icon}</span>
+        <div style="flex:1;">
+          <div style="font-size:.8rem;font-weight:700;color:${done?'#86efac':'var(--tx)'};">${lesson.title}</div>
+          <div style="font-size:.6rem;color:var(--tx3);">Lesson ${i+1} of ${lessons.length}</div>
+        </div>
+        <div style="font-size:1rem;">${done?'✅':'⭕'}</div>
+      </div>
+      <div style="font-size:.75rem;color:var(--tx2);line-height:1.7;margin-bottom:.7rem;">${lesson.body}</div>
+      ${lesson.quiz.map((q,qi)=>`
+        <div style="background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.12);border-radius:8px;padding:.6rem .8rem;margin-bottom:.4rem;">
+          <div style="font-size:.7rem;font-weight:700;color:#7dd3fc;margin-bottom:.3rem;">📝 Quick Check: ${q.q}</div>
+          <details style="font-size:.7rem;color:var(--tx2);">
+            <summary style="cursor:pointer;color:var(--tx3);font-size:.65rem;">Reveal Answer</summary>
+            <div style="margin-top:.3rem;color:#86efac;font-weight:600;">${q.a}</div>
+          </details>
+        </div>`).join('')}
+      <button onclick="cbtMarkDone('${module}',${i},this)" class="btn ${done?'':'bp'}" style="font-size:.65rem;margin-top:.3rem;${done?'background:rgba(134,239,172,.1);color:#86efac;border-color:rgba(134,239,172,.2);':''}">
+        ${done?'✅ Completed':'Mark Complete'}
+      </button>
+    </div>`;
+  }).join('');
+  renderCbtProgress(module);
+}
+
+function cbtMarkDone(module, idx, btn){
+  if(!D.cbtProgress) D.cbtProgress={};
+  if(!D.cbtProgress[module]) D.cbtProgress[module]={};
+  D.cbtProgress[module][idx] = !D.cbtProgress[module][idx];
+  save();
+  renderCbtLesson(module);
+}
+
+function renderCbtProgress(module){
+  const lessons = CBT_LESSONS[module]||[];
+  const done = Object.values((D.cbtProgress||{})[module]||{}).filter(Boolean).length;
+  const pct = lessons.length ? Math.round((done/lessons.length)*100) : 0;
+  // Update section header if progress bar exists
+  const pb = document.getElementById('cbtProgress_'+module);
+  if(pb) pb.style.width=pct+'%';
+}
 
 </script>
 <script>
@@ -23756,5 +24452,3 @@ function applyChildAvatar(){
 
 </body>
 </html>
-
-
