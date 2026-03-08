@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>YourLife CC — The Life Operating System for the Next Generation</title>
-<meta name="description" content="140+ real-world lessons, career explorer, parent dashboard, and everything young people need — starting at $19.99/year. Church & school licenses available.">
+<meta name="description" content="140+ real-world lessons, career explorer, parent dashboard, and everything young people need — starting at $9.99/month. Church & school licenses available.">
 <meta property="og:title" content="YourLife CC — Everything School Doesn't Teach">
-<meta property="og:description" content="140+ life lessons, career tools, parent dashboard. Founding Family pricing: $19.99/year.">
+<meta property="og:description" content="140+ life lessons, career tools, parent dashboard. Start free today.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://yourlifecc.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,15 +26,13 @@ html{scroll-behavior:smooth;}
 body{font-family:var(--fn);background:var(--bg);color:var(--tx);line-height:1.7;overflow-x:hidden;}
 a{color:var(--blue);text-decoration:none;transition:color .2s;}
 img{max-width:100%;}
-
 .wrap{max-width:1120px;margin:0 auto;padding:0 24px;}
 .sec{padding:96px 0;}
 .tag{font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;display:inline-block;margin-bottom:1rem;}
 h2{font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;line-height:1.15;margin-bottom:1rem;letter-spacing:-.02em;}
 .sub{font-size:1.05rem;color:var(--tx2);max-width:580px;line-height:1.75;}
 
-/* Buttons */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:14px 30px;border-radius:12px;font-family:var(--fn);font-weight:700;font-size:.95rem;border:none;cursor:pointer;transition:all .25s;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:14px 30px;border-radius:12px;font-family:var(--fn);font-weight:700;font-size:.95rem;border:none;cursor:pointer;transition:all .25s;text-decoration:none;}
 .btn:hover{transform:translateY(-2px);}
 .bp{background:var(--grad);color:#fff;box-shadow:0 4px 24px rgba(79,143,255,.25);}
 .bp:hover{box-shadow:0 8px 32px rgba(79,143,255,.35);}
@@ -44,7 +42,7 @@ h2{font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;line-h
 .bg:hover{box-shadow:0 8px 28px rgba(34,197,94,.35);}
 .blg{padding:18px 40px;font-size:1.05rem;border-radius:14px;}
 
-/* ═══ NAV ═══ */
+/* NAV */
 .nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 0;backdrop-filter:blur(24px);background:rgba(6,9,15,.75);border-bottom:1px solid rgba(255,255,255,.03);}
 .nav .wrap{display:flex;align-items:center;justify-content:space-between;}
 .nav-logo{font-family:var(--fh);font-size:1.3rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
@@ -53,10 +51,9 @@ h2{font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;line-h
 .nav-links a:hover{color:var(--tx);}
 .nav-cta{background:var(--grad);color:#fff!important;padding:9px 22px;border-radius:10px;font-weight:700;font-size:.82rem;}
 .mobtn{display:none;background:none;border:none;color:var(--tx);font-size:1.4rem;cursor:pointer;}
-@media(max-width:600px){#register .wrap>div[style*='grid-template-columns:repeat(4']{grid-template-columns:repeat(2,1fr)!important;}}
 @media(max-width:768px){.nav-links{display:none;}.nav-links.on{display:flex;flex-direction:column;position:absolute;top:100%;left:0;right:0;background:var(--bg2);padding:1.2rem;border-bottom:1px solid rgba(255,255,255,.05);gap:.8rem;}.mobtn{display:block;}}
 
-/* ═══ HERO ═══ */
+/* HERO */
 .hero{padding:150px 0 90px;text-align:center;position:relative;}
 .hero::before{content:'';position:absolute;top:-300px;left:50%;transform:translateX(-50%);width:900px;height:900px;background:radial-gradient(ellipse,rgba(79,143,255,.07) 0%,rgba(6,214,160,.03) 40%,transparent 70%);pointer-events:none;}
 .hero-pill{display:inline-flex;align-items:center;gap:.45rem;background:rgba(79,143,255,.06);border:1px solid rgba(79,143,255,.18);border-radius:100px;padding:7px 18px;font-size:.78rem;font-weight:600;color:var(--blue);margin-bottom:1.6rem;}
@@ -70,12 +67,12 @@ h2{font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;line-h
 .hs-num{font-family:var(--fh);font-size:1.9rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 .hs-lbl{font-size:.72rem;color:var(--tx3);font-weight:500;letter-spacing:.5px;}
 
-/* ═══ TRUST BAR ═══ */
+/* TRUST */
 .trust{text-align:center;padding:40px 0;border-top:1px solid rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.03);background:var(--bg2);}
 .trust-items{display:flex;justify-content:center;gap:2.5rem;flex-wrap:wrap;align-items:center;}
 .trust-item{display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--tx2);font-weight:500;}
 
-/* ═══ PROBLEM ═══ */
+/* PROBLEM */
 .prob-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.2rem;margin-top:2.2rem;}
 .prob-card{background:var(--bg2);border:1px solid rgba(239,68,68,.08);border-radius:var(--r);padding:1.4rem;transition:all .3s;}
 .prob-card:hover{border-color:rgba(239,68,68,.18);transform:translateY(-2px);}
@@ -84,7 +81,7 @@ h2{font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;line-h
 .prob-card p{font-size:.84rem;color:var(--tx2);line-height:1.6;}
 @media(max-width:600px){.prob-grid{grid-template-columns:1fr;}}
 
-/* ═══ SOLUTION ═══ */
+/* SOLUTION */
 .sol-grid{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;align-items:start;margin-top:2.5rem;}
 @media(max-width:768px){.sol-grid{grid-template-columns:1fr;}}
 .sol-item{display:flex;gap:.9rem;padding:1rem 0;border-bottom:1px solid rgba(255,255,255,.04);}
@@ -95,7 +92,7 @@ h2{font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;line-h
 .sol-vis{background:var(--bg3);border:1px solid rgba(255,255,255,.05);border-radius:18px;padding:2rem;position:relative;overflow:hidden;}
 .sol-vis::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(6,214,160,.08),transparent);pointer-events:none;}
 
-/* ═══ FEATURES ═══ */
+/* FEATURES */
 .feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:.9rem;margin-top:2rem;}
 .fc{background:var(--bg2);border:1px solid rgba(255,255,255,.04);border-radius:var(--r);padding:1.1rem;transition:all .25s;cursor:default;}
 .fc:hover{border-color:rgba(79,143,255,.15);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.25);}
@@ -103,19 +100,7 @@ h2{font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;line-h
 .fc h3{font-family:var(--fh);font-size:.85rem;font-weight:700;margin-bottom:.2rem;}
 .fc p{font-size:.73rem;color:var(--tx2);line-height:1.5;}
 
-/* ═══ LIFE SKILLS DEEP DIVE ═══ */
-.ls-cats{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:1.5rem;}
-.ls-cat{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:.5rem .8rem;font-size:.72rem;font-weight:600;transition:all .2s;}
-.ls-cat:hover{background:rgba(79,143,255,.06);border-color:rgba(79,143,255,.15);}
-
-/* ═══ VIDEO ═══ */
-.vid-wrap{max-width:780px;margin:2rem auto 0;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.06);aspect-ratio:16/9;background:#000;position:relative;}
-.vid-wrap iframe{width:100%;height:100%;border:none;}
-.vid-ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--bg3),var(--bg2));cursor:pointer;}
-.vid-ph .play{width:72px;height:72px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin-bottom:.8rem;box-shadow:0 0 40px rgba(79,143,255,.25);transition:transform .2s;}
-.vid-ph:hover .play{transform:scale(1.08);}
-
-/* ═══ PRICING ═══ */
+/* PRICING */
 .price-tabs{display:flex;justify-content:center;gap:.5rem;margin-bottom:2rem;}
 .ptab{padding:10px 22px;border-radius:10px;font-size:.82rem;font-weight:600;cursor:pointer;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:var(--tx2);transition:all .2s;}
 .ptab.on{background:rgba(79,143,255,.1);border-color:rgba(79,143,255,.25);color:var(--blue);}
@@ -134,7 +119,7 @@ h2{font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;line-h
 .pc li{display:flex;gap:.45rem;font-size:.8rem;color:var(--tx2);}
 .pc li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0;}
 
-/* ═══ CHURCH/ORG ═══ */
+/* ORG */
 .org-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:2rem;}
 @media(max-width:768px){.org-grid{grid-template-columns:1fr;}}
 .org-card{background:var(--bg2);border:1px solid rgba(255,255,255,.05);border-radius:var(--r);padding:1.5rem;text-align:center;transition:all .25s;}
@@ -147,17 +132,7 @@ h2{font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;line-h
 .org-card li{font-size:.78rem;color:var(--tx2);display:flex;gap:.4rem;}
 .org-card li::before{content:'✓';color:var(--cyan);font-weight:700;}
 
-/* ═══ AFFILIATE ═══ */
-.aff-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:2rem;}
-@media(max-width:768px){.aff-grid{grid-template-columns:1fr;}}
-.aff-card{background:var(--bg2);border:1px solid rgba(255,255,255,.05);border-radius:var(--r);padding:1.5rem;text-align:center;}
-.aff-card .num{font-family:var(--fh);font-size:2.2rem;font-weight:800;margin:.5rem 0;}
-.aff-how{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:2rem;max-width:800px;margin-left:auto;margin-right:auto;}
-@media(max-width:600px){.aff-how{grid-template-columns:repeat(2,1fr);}}
-.aff-step{text-align:center;}
-.aff-step .circle{width:48px;height:48px;border-radius:50%;background:rgba(79,143,255,.08);border:1px solid rgba(79,143,255,.15);display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin:0 auto .5rem;}
-
-/* ═══ REVIEWS ═══ */
+/* REVIEWS */
 .rev-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1.2rem;margin-top:2rem;}
 .rc{background:var(--bg2);border:1px solid rgba(255,255,255,.04);border-radius:var(--r);padding:1.4rem;}
 .rc-stars{color:var(--gold);font-size:1rem;margin-bottom:.6rem;}
@@ -165,7 +140,7 @@ h2{font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;line-h
 .rc-who{display:flex;align-items:center;gap:.6rem;}
 .rc-av{width:38px;height:38px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.8rem;color:#fff;flex-shrink:0;}
 
-/* ═══ FAQ ═══ */
+/* FAQ */
 .faq-list{max-width:680px;margin:2rem auto 0;}
 .fq{background:var(--bg2);border:1px solid rgba(255,255,255,.04);border-radius:12px;margin-bottom:.5rem;overflow:hidden;}
 .fq-q{padding:1rem 1.2rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-weight:600;font-size:.9rem;transition:background .2s;}
@@ -176,17 +151,19 @@ h2{font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;line-h
 .fq-a.on{max-height:500px;padding:0 1.2rem 1rem;}
 .fq-a p{font-size:.85rem;color:var(--tx2);line-height:1.7;}
 
-/* ═══ REGISTER ═══ */
-.reg-box{max-width:540px;margin:2rem auto 0;background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:20px;padding:2.2rem;}
-.reg-box label{display:block;font-size:.75rem;font-weight:600;color:var(--tx2);margin-bottom:.25rem;margin-top:.9rem;}
-.reg-box label:first-child{margin-top:0;}
-.reg-box input,.reg-box select{width:100%;padding:11px 14px;background:var(--bg);border:1px solid rgba(255,255,255,.08);border-radius:10px;color:var(--tx);font-size:.9rem;font-family:var(--fn);transition:border .2s;}
-.reg-box input:focus,.reg-box select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(79,143,255,.08);}
-.reg-sum{background:rgba(79,143,255,.04);border:1px solid rgba(79,143,255,.12);border-radius:12px;padding:.9rem 1.1rem;margin-top:1.1rem;}
-.reg-row{display:flex;justify-content:space-between;font-size:.85rem;padding:.25rem 0;}
-.reg-row.tot{font-weight:800;font-size:1rem;border-top:1px solid rgba(255,255,255,.06);padding-top:.5rem;margin-top:.25rem;}
+/* LS CATS */
+.ls-cats{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:1.5rem;}
+.ls-cat{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:.5rem .8rem;font-size:.72rem;font-weight:600;transition:all .2s;}
+.ls-cat:hover{background:rgba(79,143,255,.06);border-color:rgba(79,143,255,.15);}
 
-/* ═══ FOOTER ═══ */
+/* VIDEO */
+.vid-wrap{max-width:780px;margin:2rem auto 0;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.06);aspect-ratio:16/9;background:#000;position:relative;}
+.vid-wrap iframe{width:100%;height:100%;border:none;}
+.vid-ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--bg3),var(--bg2));cursor:pointer;}
+.vid-ph .play{width:72px;height:72px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin-bottom:.8rem;box-shadow:0 0 40px rgba(79,143,255,.25);transition:transform .2s;}
+.vid-ph:hover .play{transform:scale(1.08);}
+
+/* FOOTER */
 footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:50px 0 30px;}
 .ft-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2rem;margin-bottom:2rem;}
 @media(max-width:768px){.ft-grid{grid-template-columns:1fr 1fr;}}
@@ -194,15 +171,11 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
 .ft-col a{display:block;font-size:.82rem;color:var(--tx3);margin-bottom:.4rem;}
 .ft-col a:hover{color:var(--tx);}
 .ft-bottom{text-align:center;border-top:1px solid rgba(255,255,255,.04);padding-top:1.5rem;font-size:.78rem;color:var(--tx3);}
-
-/* Animations */
-.rv{opacity:1;transform:none;}
-
 </style>
 </head>
 <body>
 
-<!-- ═══ NAV ═══ -->
+<!-- NAV -->
 <div class="nav">
   <div class="wrap">
     <a href="#" class="nav-logo">YourLife CC</a>
@@ -210,32 +183,24 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
       <a href="#features">Features</a>
       <a href="#video">Demo</a>
       <a href="#pricing">Pricing</a>
-      <a href="#sponsor">Sponsor</a>
       <a href="#church">Churches</a>
-      <a href="#affiliate">Earn</a>
       <a href="#faq">FAQ</a>
-      <a href="#register" class="nav-cta">Start Free Trial →</a>
+      <a href="login.html">Sign In</a>
+      <a href="register.html" class="nav-cta">Start Free →</a>
     </div>
     <button class="mobtn" onclick="document.getElementById('navLinks').classList.toggle('on')">☰</button>
   </div>
 </div>
 
-<!-- ═══ HERO ═══ -->
+<!-- HERO -->
 <section class="hero" id="home">
   <div class="wrap">
-    <div class="hero-pill"><span class="dot"></span> Founding Family Pricing — $29.99/yr (Regular $49.99) — First 100 Families</div>
-    <div style="display:flex;align-items:center;gap:.5rem;justify-content:center;margin-bottom:.8rem;">
-      <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.15);border-radius:8px;padding:.4rem .8rem;display:flex;align-items:center;gap:.4rem;">
-        <div style="width:8px;height:8px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite;"></div>
-        <span style="font-size:.8rem;color:#22c55e;font-weight:700;" id="userCounter">0</span>
-        <span style="font-size:.7rem;color:var(--tx2);">families signed up</span>
-      </div>
-    </div>
+    <div class="hero-pill"><span class="dot"></span> Now Live — Family Plans Starting at $9.99/mo</div>
     <h1>Everything School<br><em>Doesn't Teach.</em></h1>
-    <p>140+ life lessons, 36 growing up topics, 365 daily scriptures, 35 career profiles, 14 sports, driving education, music practice tools, reward games (spinner & scratch cards), Parent Bucks economy, and a parent dashboard with Life Score, screen time controls, and behavior tracking. The most comprehensive life platform ever built for young people. Starting at <strong>$29.99/year</strong>.</p>
+    <p>140+ life lessons, career explorer, 365 daily scriptures, parent dashboard with Life Score, chores & rewards, and everything young people need to grow up ready for real life.</p>
     <div style="height:1.5rem;"></div>
     <div class="hero-btns">
-      <a href="#register" class="btn bp blg">Start 3-Day Free Trial →</a>
+      <a href="register.html" class="btn bp blg">Start Free Today →</a>
       <a href="#video" class="btn bo blg">▶ Watch Demo</a>
     </div>
     <div class="hero-stats">
@@ -249,7 +214,7 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
   </div>
 </section>
 
-<!-- ═══ TRUST ═══ -->
+<!-- TRUST -->
 <div class="trust">
   <div class="wrap">
     <div class="trust-items">
@@ -262,77 +227,22 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
   </div>
 </div>
 
-<!-- ═══ THE PROBLEM ═══ -->
+<!-- PROBLEM -->
 <section class="sec" id="problem">
   <div class="wrap">
     <div class="tag" style="color:var(--red);">⚠️ THE REALITY</div>
     <h2>Our Kids Are Graduating<br>Unprepared for Real Life.</h2>
     <p class="sub">School teaches algebra and history — not taxes, credit, leases, budgeting, or emotional resilience. Parents are filling the gaps alone.</p>
     <div class="prob-grid">
-      <div class="prob-card rv"><div class="ic">💳</div><h3>72% of young adults can't explain how a credit score works</h3><p>They sign leases, take loans, and open credit cards with zero understanding of the system controlling their financial future.</p></div>
-      <div class="prob-card rv"><div class="ic">📝</div><h3>Only 17 states require personal finance education</h3><p>The majority of students graduate without ever learning budgeting, taxes, or the difference between good debt and bad debt.</p></div>
-      <div class="prob-card rv"><div class="ic">😰</div><h3>Gen Z reports the highest anxiety rates ever recorded</h3><p>Without tools for emotional regulation and resilience, young people struggle with a world that demands both.</p></div>
-      <div class="prob-card rv"><div class="ic">🏠</div><h3>60% of young adults move back home after college</h3><p>Not because they're lazy — because nobody taught them how to read a lease, cook, manage money, or navigate adulthood.</p></div>
+      <div class="prob-card"><div class="ic">💳</div><h3>72% of young adults can't explain how a credit score works</h3><p>They sign leases, take loans, and open credit cards with zero understanding of the system controlling their financial future.</p></div>
+      <div class="prob-card"><div class="ic">📝</div><h3>Only 17 states require personal finance education</h3><p>The majority of students graduate without ever learning budgeting, taxes, or the difference between good debt and bad debt.</p></div>
+      <div class="prob-card"><div class="ic">😰</div><h3>Gen Z reports the highest anxiety rates ever recorded</h3><p>Without tools for emotional regulation and resilience, young people struggle with a world that demands both.</p></div>
+      <div class="prob-card"><div class="ic">🏠</div><h3>60% of young adults move back home after college</h3><p>Not because they're lazy — because nobody taught them how to read a lease, cook, manage money, or navigate adulthood.</p></div>
     </div>
   </div>
 </section>
 
-<!-- ═══ WHAT THIS BUILDS ═══ -->
-<section class="sec" style="background:linear-gradient(180deg,rgba(139,92,246,.03),rgba(56,189,248,.02));border-top:1px solid rgba(139,92,246,.08);">
-  <div class="wrap" style="text-align:center;">
-    <div class="tag" style="color:var(--purple);">🏗️ WHAT THIS BUILDS</div>
-    <h2>This Is Not Just an App.<br>It's a Character Development System.</h2>
-    <p class="sub" style="max-width:700px;">YourLife CC doesn't just teach information — it builds the habits, discipline, and character that turn teenagers into capable, confident, responsible adults. Every feature is designed to develop something real.</p>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;margin-top:2rem;text-align:left;">
-      <div class="rv" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:1.2rem;">
-        <div style="font-size:1.5rem;margin-bottom:.4rem;">🧱</div>
-        <div style="font-size:.95rem;font-weight:800;margin-bottom:.3rem;">Structure</div>
-        <div style="font-size:.78rem;color:var(--tx2);line-height:1.6;">Daily habits, scheduled routines, goal tracking, and chore systems create the framework that young people need to thrive. Structure doesn't limit freedom — it creates the foundation for it.</div>
-      </div>
-      <div class="rv" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:1.2rem;">
-        <div style="font-size:1.5rem;margin-bottom:.4rem;">⚡</div>
-        <div style="font-size:.95rem;font-weight:800;margin-bottom:.3rem;">Discipline</div>
-        <div style="font-size:.78rem;color:var(--tx2);line-height:1.6;">Streaks, daily scripture reading, practice timers, and consistent check-ins build the muscle of showing up every day — even when motivation fades. Discipline is the skill behind every other skill.</div>
-      </div>
-      <div class="rv" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:1.2rem;">
-        <div style="font-size:1.5rem;margin-bottom:.4rem;">📊</div>
-        <div style="font-size:.95rem;font-weight:800;margin-bottom:.3rem;">Accountability</div>
-        <div style="font-size:.78rem;color:var(--tx2);line-height:1.6;">The Life Score, parent quizzes, behavior tracking, and activity audit mean actions have consequences. Kids learn that effort earns rewards and shortcuts cost them — before the real world teaches it the hard way.</div>
-      </div>
-      <div class="rv" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:1.2rem;">
-        <div style="font-size:1.5rem;margin-bottom:.4rem;">🧠</div>
-        <div style="font-size:.95rem;font-weight:800;margin-bottom:.3rem;">Core Life Skills</div>
-        <div style="font-size:.78rem;color:var(--tx2);line-height:1.6;">162 lessons across 22 categories teach the practical knowledge schools skip: taxes, credit, cooking, car care, first aid, home repairs, professional writing, negotiation, and digital literacy.</div>
-      </div>
-      <div class="rv" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:1.2rem;">
-        <div style="font-size:1.5rem;margin-bottom:.4rem;">❤️</div>
-        <div style="font-size:.95rem;font-weight:800;margin-bottom:.3rem;">Emotional Intelligence</div>
-        <div style="font-size:.78rem;color:var(--tx2);line-height:1.6;">36 Growing Up topics address the conversations most families avoid — anxiety, identity, peer pressure, conflict, grief, bullying, relationships, and self-worth. Written with honesty, not lectures.</div>
-      </div>
-      <div class="rv" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:1.2rem;">
-        <div style="font-size:1.5rem;margin-bottom:.4rem;">✝️</div>
-        <div style="font-size:.95rem;font-weight:800;margin-bottom:.3rem;">Faith Foundation</div>
-        <div style="font-size:.78rem;color:var(--tx2);line-height:1.6;">365 daily scriptures, 30 devotionals, Bible reading log with all 66 books, study notes with highlighters, and a faith-based perspective woven throughout every lesson and career profile.</div>
-      </div>
-      <div class="rv" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:1.2rem;">
-        <div style="font-size:1.5rem;margin-bottom:.4rem;">💰</div>
-        <div style="font-size:.95rem;font-weight:800;margin-bottom:.3rem;">Financial Literacy</div>
-        <div style="font-size:.78rem;color:var(--tx2);line-height:1.6;">Budgeting, banking, credit scores, savings goals, the Parent Bucks economy, and real-money earnings teach the value of money before they have access to credit cards and student loans.</div>
-      </div>
-      <div class="rv" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:1.2rem;">
-        <div style="font-size:1.5rem;margin-bottom:.4rem;">🎯</div>
-        <div style="font-size:.95rem;font-weight:800;margin-bottom:.3rem;">Purpose & Direction</div>
-        <div style="font-size:.78rem;color:var(--tx2);line-height:1.6;">35 career profiles, resume builder, goal setting, milestone tracking, and stage-based pathways from middle school through adulthood give young people something to aim at — not just survive.</div>
-      </div>
-    </div>
-    <div style="margin-top:2rem;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.12);border-radius:14px;padding:1.5rem 2rem;text-align:center;">
-      <div style="font-size:1.1rem;font-weight:800;color:var(--tx);margin-bottom:.5rem;">The Result?</div>
-      <div style="font-size:.92rem;color:var(--tx2);line-height:1.8;max-width:650px;margin:0 auto;">A young person who can manage money, cook a meal, communicate professionally, resolve conflict, maintain their health, set and achieve goals, understand their faith, navigate emotions, and walk into adulthood with confidence — not confusion. <b style="color:var(--tx);">That's what this platform builds. Every single day they use it.</b></div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══ THE SOLUTION ═══ -->
+<!-- SOLUTION -->
 <section class="sec" style="background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);">
   <div class="wrap">
     <div class="tag" style="color:var(--cyan);">✅ THE SOLUTION</div>
@@ -340,13 +250,13 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
     <p class="sub">YourLife CC is a private, personal platform that teaches everything school doesn't — and gives parents real visibility into how their child is growing.</p>
     <div class="sol-grid">
       <div>
-        <div class="sol-item rv"><div class="sol-ic" style="background:rgba(79,143,255,.08);">🧠</div><div><h4>140+ Life Skill Lessons in 18 Categories</h4><p>Taxes, credit, cooking, leases, car care, first aid, mental health, faith, relationships, legal rights, AI literacy, adulting basics, and more.</p></div></div>
-        <div class="sol-item rv"><div class="sol-ic" style="background:rgba(34,197,94,.08);">💼</div><div><h4>Career Explorer — 35 Real Paths</h4><p>Salary data, daily routines, and step-by-step roadmaps for careers from trades to tech to military to medicine.</p></div></div>
-        <div class="sol-item rv"><div class="sol-ic" style="background:rgba(244,114,182,.08);">👨‍👩‍👧</div><div><h4>PIN-Protected Parent Dashboard</h4><p>Overall Life Score (A+ through F), behavior logs, grade monitor, screen time controls, earnings tracker, chore verification, incentives, and weekly reports. Multi-child support, reward deductions for bad behavior, activity audit trail with timestamps, and complete control over the reward economy.</p></div></div>
-        <div class="sol-item rv"><div class="sol-ic" style="background:rgba(245,166,35,.08);">🎯</div><div><h4>Stage-Based Learning Pathways</h4><p>Content adapts from Middle School through Young Adult. Guided checklists, milestone tracking, and age-appropriate lessons at every stage.</p></div></div>
-        <div class="sol-item rv"><div class="sol-ic" style="background:rgba(167,139,250,.08);">📊</div><div><h4>Complete Life Tracking</h4><p>Goals, journal, mood, schedule, health, finances, milestones, reading list, resume builder, bio page — all in one private dashboard.</p></div></div>
+        <div class="sol-item"><div class="sol-ic" style="background:rgba(79,143,255,.08);">🧠</div><div><h4>140+ Life Skill Lessons in 18 Categories</h4><p>Taxes, credit, cooking, leases, car care, first aid, mental health, faith, relationships, legal rights, AI literacy, adulting basics, and more.</p></div></div>
+        <div class="sol-item"><div class="sol-ic" style="background:rgba(34,197,94,.08);">💼</div><div><h4>Career Explorer — 35 Real Paths</h4><p>Salary data, daily routines, and step-by-step roadmaps for careers from trades to tech to military to medicine.</p></div></div>
+        <div class="sol-item"><div class="sol-ic" style="background:rgba(244,114,182,.08);">👨‍👩‍👧</div><div><h4>PIN-Protected Parent Dashboard</h4><p>Overall Life Score, behavior logs, grade monitor, screen time controls, chore verification, incentives, and weekly reports.</p></div></div>
+        <div class="sol-item"><div class="sol-ic" style="background:rgba(245,166,35,.08);">🎯</div><div><h4>Stage-Based Learning Pathways</h4><p>Content adapts from Middle School through Young Adult. Guided checklists, milestone tracking, and age-appropriate lessons at every stage.</p></div></div>
+        <div class="sol-item"><div class="sol-ic" style="background:rgba(167,139,250,.08);">📊</div><div><h4>Complete Life Tracking</h4><p>Goals, journal, mood, schedule, health, finances, milestones, reading list, resume builder, bio page — all in one private dashboard.</p></div></div>
       </div>
-      <div class="sol-vis rv">
+      <div class="sol-vis">
         <div style="text-align:center;padding:1rem;">
           <div style="font-size:2.5rem;margin-bottom:.8rem;">📱</div>
           <div style="font-family:var(--fh);font-size:1.4rem;font-weight:800;margin-bottom:.4rem;">YourLife CC</div>
@@ -362,711 +272,245 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
             <div style="background:rgba(52,211,153,.06);border-radius:8px;padding:.55rem .3rem;"><div style="font-size:1.1rem;">✅</div><div style="font-size:.55rem;font-weight:600;margin-top:.15rem;">Chores</div></div>
             <div style="background:rgba(96,165,250,.06);border-radius:8px;padding:.55rem .3rem;"><div style="font-size:1.1rem;">😊</div><div style="font-size:.55rem;font-weight:600;margin-top:.15rem;">Mood</div></div>
           </div>
-          <div style="margin-top:1rem;font-size:.7rem;color:var(--tx3);">+ Resume, Bio Page, Reading List, Milestones, Calendar, Health, Gallery, and more</div>
+          <div style="margin-top:1.2rem;">
+            <a href="register.html" class="btn bp" style="width:100%;">Get Started Free →</a>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ═══ ALL 21 FEATURES ═══ -->
-<section id="features" style="padding:5rem 1.5rem;">
-  <div style="max-width:1100px;margin:0 auto;">
+<!-- FEATURES -->
+<section id="features" class="sec">
+  <div class="wrap">
     <div style="text-align:center;margin-bottom:3rem;">
-      <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:3px;color:var(--c);font-weight:700;margin-bottom:.5rem;">EVERYTHING THEY NEED</div>
-      <h2 style="font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;line-height:1.2;margin-bottom:1rem;">28 Sections. 500+ Lessons. One Platform.</h2>
-      <p class="sub" style="margin:0 auto;max-width:650px;">The most comprehensive life development platform ever built for young people. Every feature designed to teach, track, and transform.</p>
+      <div class="tag" style="color:var(--blue);">EVERYTHING THEY NEED</div>
+      <h2>28 Sections. 500+ Lessons. One Platform.</h2>
+      <p class="sub" style="margin:0 auto;">The most comprehensive life development platform ever built for young people.</p>
     </div>
-
-    <!-- FEATURE CHECKLIST -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;margin-bottom:3rem;" class="g3">
-      
-      <!-- Column 1: Life Skills & Education -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;" class="feat-cols">
       <div>
-        <div style="font-size:.85rem;font-weight:800;color:var(--c);margin-bottom:.8rem;border-bottom:2px solid var(--c);padding-bottom:.4rem;">🧠 EDUCATION & SKILLS</div>
+        <div style="font-size:.85rem;font-weight:800;color:var(--blue);margin-bottom:.8rem;border-bottom:2px solid var(--blue);padding-bottom:.4rem;">🧠 EDUCATION & SKILLS</div>
         <div style="display:flex;flex-direction:column;gap:.5rem;">
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>139 Life Skill Lessons</b> across 26 categories — taxes, credit, cooking, home repairs, career, communication, shopping, writing & more</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>43 Growing Up Topics</b> — puberty, emotions, bullying, drugs, pills, sleep, hygiene, phone use, graduation & more</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>22 Character Lessons</b> plus Friendship, Emotional Intelligence & Leadership modules — kindness, honesty, responsibility, empathy, leadership, resilience, anger management</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>35 Career Profiles</b> with salary ranges, day-in-the-life, how to start, timelines & resources</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>14 Sports Profiles</b> with scholarship info, health tips, and recruiting timelines</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Collapsible Sidebar Nav</b> — 8 smart groups organizing 27 sections</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Contests & Challenges</b> — 8 challenges, leaderboards, family rewards, weekly MVP</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>World Religions</b> — understanding 7 major faiths and freedom of religion</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Driving Education</b> — license prep, safety, car maintenance, insurance, costs</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Music & Practice Hub</b> — 14 instrument guides, practice timer, music theory, session logging</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Nutrition Education</b> — macros, protein, carbs, fats, sugar, water, disease prevention</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Certification System</b> with quizzes for all 26 categories (+15 PB per cert)</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>140+ Life Skill Lessons</b> across 18 categories — taxes, credit, cooking, home repairs, career, communication & more</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>43 Growing Up Topics</b> — puberty, emotions, bullying, drugs, sleep, hygiene & more</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>22 Character Lessons</b> — kindness, honesty, responsibility, empathy, leadership, resilience</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>35 Career Profiles</b> with salary ranges, day-in-the-life & roadmaps</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>14 Sports Profiles</b> with scholarship info & recruiting timelines</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Driving Education</b> — license prep, safety, car maintenance, insurance</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Music & Practice Hub</b> — 14 instrument guides, practice timer, session logging</span></div>
         </div>
       </div>
-
-      <!-- Column 2: Faith, Tracking & Tools -->
       <div>
-        <div style="font-size:.85rem;font-weight:800;color:#a78bfa;margin-bottom:.8rem;border-bottom:2px solid #a78bfa;padding-bottom:.4rem;">✝️ FAITH & DAILY TOOLS</div>
+        <div style="font-size:.85rem;font-weight:800;color:var(--purple);margin-bottom:.8rem;border-bottom:2px solid var(--purple);padding-bottom:.4rem;">✝️ FAITH & DAILY TOOLS</div>
         <div style="display:flex;flex-direction:column;gap:.5rem;">
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>365 Daily Scriptures</b> — one per day with point tracking, streaks & calendar</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>365 Daily Scriptures</b> with point tracking & streaks</span></div>
           <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>30 Daily Devotionals</b> with scripture, reflection & application</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Bible Reading Log</b> — all 66 books with chapters, notes & color highlights</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Faith Mode Toggle</b> — ON for Bible content, OFF for secular daily reflections</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>School Tracker</b> — classes, GPA, assignments, study timer, exam planner</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Bible Reading Log</b> — all 66 books with chapters & notes</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Faith Mode Toggle</b> — ON for Bible content, OFF for secular</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>School Tracker</b> — classes, GPA, assignments, study timer</span></div>
           <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Goal Setting & Tracking</b> with completion celebrations</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Journal & Mood Tracker</b> with daily prompts and mood logging</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Resume Builder & Bio Page</b> — professional resume, shareable bio with QR code</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Reading List, Calendar, Schedule</b> — complete personal management suite</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Journal & Mood Tracker</b> with daily prompts</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Resume Builder & Bio Page</b> with shareable QR code</span></div>
         </div>
       </div>
-
-      <!-- Column 3: Parent & Rewards -->
       <div>
-        <div style="font-size:.85rem;font-weight:800;color:#22c55e;margin-bottom:.8rem;border-bottom:2px solid #22c55e;padding-bottom:.4rem;">👨‍👩‍👧 PARENT & REWARDS</div>
+        <div style="font-size:.85rem;font-weight:800;color:var(--green);margin-bottom:.8rem;border-bottom:2px solid var(--green);padding-bottom:.4rem;">👨‍👩‍👧 PARENT & REWARDS</div>
         <div style="display:flex;flex-direction:column;gap:.5rem;">
           <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Life Score Dashboard</b> — weighted grade (A+ to F) across 6 dimensions</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Multi-Child Profiles</b> — separate data per child with PIN-protected switching</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Parent Bucks Economy</b> — virtual currency, redeemable store, add/deduct controls</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Multi-Child Profiles</b> — separate data per child with PIN protection</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Parent Bucks Economy</b> — virtual currency, redeemable store</span></div>
           <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Spinner & Scratch Cards</b> — reward games earned through achievements</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Screen Time Manager</b> — earn minutes for games, TV, phone, tablet with timers</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Parent Quiz System</b> — send quizzes based on completed content, pass/fail rewards</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Contests & Challenges</b> — 8 active challenges, leaderboard, family rewards</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Parent Education</b> — 16 lessons across 10 topics + 6 developmental stages + growth tracker + weekly self-reflection tracker</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Daily Activity Check</b> — 11 daily habits with PB rewards for completion</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Self-Initiated Chores</b> — kids log helpful acts, parents approve for points</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Parent Hub with Left Nav</b> — 9 organized panels: Overview, Chores, Contests, Quizzes, Controls, Behavior, Activity, Learning, Growth</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Google Translate</b> — one-click language translation for any family</span></div>
-          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Activity Audit Trail</b> — timestamped log of everything, anti-cheating controls</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Screen Time Manager</b> — earn minutes for games, TV, phone</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Parent Quiz System</b> — send quizzes based on completed content</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Activity Audit Trail</b> — timestamped log, anti-cheating controls</span></div>
+          <div style="display:flex;gap:.4rem;align-items:flex-start;"><span style="color:#22c55e;font-weight:800;">✓</span><span style="font-size:.82rem;"><b>Google Translate</b> — one-click language translation</span></div>
         </div>
       </div>
     </div>
-
-    <!-- BY THE NUMBERS -->
-    <div style="background:var(--s1);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:2.5rem 2rem;margin-bottom:2rem;">
-      <div style="text-align:center;margin-bottom:1.5rem;">
-        <div style="font-size:1.2rem;font-weight:900;">By the Numbers</div>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:1rem;text-align:center;" class="g6">
-        <div><div style="font-size:1.8rem;font-weight:900;color:var(--c);">600+</div><div style="font-size:.7rem;color:var(--tx2);">Total Lessons</div></div>
-        <div><div style="font-size:1.8rem;font-weight:900;color:#a78bfa;">365</div><div style="font-size:.7rem;color:var(--tx2);">Daily Scriptures</div></div>
-        <div><div style="font-size:1.8rem;font-weight:900;color:#22c55e;">35</div><div style="font-size:.7rem;color:var(--tx2);">Career Profiles</div></div>
-        <div><div style="font-size:1.8rem;font-weight:900;color:#fbbf24;">28</div><div style="font-size:.7rem;color:var(--tx2);">App Sections</div></div>
-        <div><div style="font-size:1.8rem;font-weight:900;color:#f472b6;">26</div><div style="font-size:.7rem;color:var(--tx2);">Skill Categories</div></div>
-        <div><div style="font-size:1.8rem;font-weight:900;color:#fb923c;">66</div><div style="font-size:.7rem;color:var(--tx2);">Bible Books</div></div>
-      </div>
-    </div>
-
-    <!-- WHAT MAKES IT DIFFERENT -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;" class="g3">
-      <div style="background:var(--s1);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:1.5rem;text-align:center;">
-        <div style="font-size:2rem;margin-bottom:.5rem;">🎮</div>
-        <div style="font-size:.9rem;font-weight:800;margin-bottom:.3rem;">Gamified Learning</div>
-        <div style="font-size:.78rem;color:var(--tx2);line-height:1.6;">Parent Bucks, spinner, scratch cards, challenges, leaderboards, Life Map game board, Daily Activity Check, and self-initiated chores. Kids WANT to use it.</div>
-      </div>
-      <div style="background:var(--s1);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:1.5rem;text-align:center;">
-        <div style="font-size:2rem;margin-bottom:.5rem;">🔒</div>
-        <div style="font-size:.9rem;font-weight:800;margin-bottom:.3rem;">Parent Controls</div>
-        <div style="font-size:.78rem;color:var(--tx2);line-height:1.6;">PIN-protected 9-panel Parent Hub. Chore manager, screen time, quizzes, contests, behavior tracking, per-child data, incentives, and full audit trail.</div>
-      </div>
-      <div style="background:var(--s1);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:1.5rem;text-align:center;">
-        <div style="font-size:2rem;margin-bottom:.5rem;">✝️</div>
-        <div style="font-size:.9rem;font-weight:800;margin-bottom:.3rem;">Faith Optional</div>
-        <div style="font-size:.78rem;color:var(--tx2);line-height:1.6;">Bible & Faith with 365 scriptures, 30 devotionals, 10 Jesus & Purpose lessons, and 10 Learn the Bible guides. Toggle OFF for secular reflections. World Religions coverage for all families.</div>
-      </div>
-    </div>
+    <style>@media(max-width:768px){.feat-cols{grid-template-columns:1fr!important;}}</style>
   </div>
 </section>
 
-<!-- ═══ LIFE SKILLS DEEP DIVE ═══ -->
-<section class="sec" style="background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);">
-  <div class="wrap">
-    <div class="tag" style="color:var(--purple);">📚 LIFE SKILLS ACADEMY</div>
-    <h2>18 Categories. 140+ Lessons.<br>Everything Real Life Demands.</h2>
-    <p class="sub">Each lesson is written like a mentor talking directly to your child — specific, actionable, no fluff. They read it, they know it, they can do it.</p>
-    <div class="ls-cats">
-      <span class="ls-cat">💸 Taxes & Filing (6)</span>
-      <span class="ls-cat">🚗 Car & Driving (7)</span>
-      <span class="ls-cat">🏥 Health & Body (9)</span>
-      <span class="ls-cat">🦷 Dental & Hygiene (6)</span>
-      <span class="ls-cat">🍳 Cooking & Food (8)</span>
-      <span class="ls-cat">🏠 Home & Renting (8)</span>
-      <span class="ls-cat">💼 Career & Work (9)</span>
-      <span class="ls-cat">💳 Credit & Banking (12)</span>
-      <span class="ls-cat">🤝 Relationships (8)</span>
-      <span class="ls-cat">⛪ Faith & Purpose (8)</span>
-      <span class="ls-cat">🧠 Mental Health (9)</span>
-      <span class="ls-cat">🏛️ Civic Life (10)</span>
-      <span class="ls-cat">🆘 Emergency Skills (6)</span>
-      <span class="ls-cat">📱 Digital Life (8)</span>
-      <span class="ls-cat">👨‍👩‍👧‍👦 Family & People (6)</span>
-      <span class="ls-cat">🎓 College & Future (12)</span>
-      <span class="ls-cat">⚖️ Legal Basics (4)</span>
-      <span class="ls-cat">🧹 Adulting 101 (4)</span>
-    </div>
-    <p style="margin-top:1.5rem;font-size:.88rem;color:var(--tx2);">New lessons added regularly — included free with your subscription.</p>
-  </div>
-</section>
-
-<!-- ═══ VIDEO ═══ -->
-<section class="sec" id="video" style="text-align:center;">
+<!-- VIDEO -->
+<section class="sec" id="video" style="text-align:center;background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);">
   <div class="wrap">
     <div class="tag" style="color:var(--gold);">🎬 SEE IT IN ACTION</div>
     <h2>Watch How It Works</h2>
-    <p class="sub" style="margin:0 auto;">Full walkthrough of YourLife CC — see every feature your child gets access to.</p>
+    <p class="sub" style="margin:0 auto;">Full walkthrough of YourLife CC — see every feature your family gets access to.</p>
     <div class="vid-wrap">
       <div class="vid-ph" id="vidPh" onclick="this.outerHTML='<iframe src=\'https://www.youtube.com/embed/YOUR_VIDEO_ID?autoplay=1&rel=0\' allow=\'autoplay;encrypted-media\' allowfullscreen></iframe>'">
         <div class="play">▶</div>
         <div style="font-weight:700;">Click to Play Demo</div>
-        <div style="font-size:.82rem;color:var(--tx2);margin-top:.25rem;">Full walkthrough • Under 5 min</div>
+        <div style="font-size:.82rem;color:var(--tx2);margin-top:.25rem;">Full walkthrough · Under 5 min</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ═══ PRICING — INDIVIDUAL ═══ -->
-<section class="sec" id="pricing" style="background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);text-align:center;">
+<!-- PRICING -->
+<section class="sec" id="pricing" style="text-align:center;">
   <div class="wrap">
     <div class="tag" style="color:var(--gold);">💰 SIMPLE PRICING</div>
     <h2>Choose Your Plan</h2>
-    <p class="sub" style="margin:0 auto 1.5rem;">3-day free trial on all plans. Cancel anytime. 30-day money-back guarantee.</p>
-
+    <p class="sub" style="margin:0 auto 1.5rem;">Start free. Cancel anytime. 30-day money-back guarantee.</p>
     <div class="price-tabs">
-      <div class="ptab on" onclick="showPricing('annual',this)">Annual (Save 30%+)</div>
+      <div class="ptab on" onclick="showPricing('monthly',this)">Monthly</div>
+      <div class="ptab" onclick="showPricing('yearly',this)">Yearly (Save 33%)</div>
       <div class="ptab" onclick="showPricing('lifetime',this)">Lifetime</div>
     </div>
-
-    <div id="price-annual" class="price-grid">
-      <div class="pc rv">
-        <div class="pc-name" style="color:var(--cyan);">1 Child</div>
-        <div class="pc-price" style="color:var(--tx);">$29.99</div>
-        <div class="pc-per">/year · Founding Family</div>
-        <div class="pc-orig">$49.99/yr regular price</div>
-        <div class="pc-save">FOUNDING FAMILY — SAVE 40%</div>
-        <ul><li>Full lifetime access to all features</li><li>All 140+ life lessons + 365 daily scriptures + 365 daily scriptures</li><li>Parent dashboard included</li><li>Private yourlifecc.com URL</li><li>3-day free trial</li></ul>
-        <a href="#register" class="btn bp" style="width:100%;" onclick="setP(1,'annual')">Start Free Trial →</a>
+    <div id="price-monthly" class="price-grid">
+      <div class="pc">
+        <div class="pc-name" style="color:var(--cyan);">Free</div>
+        <div class="pc-price">$0</div>
+        <div class="pc-per">forever</div>
+        <ul><li>Core dashboard & habits</li><li>School tracker</li><li>Basic money tools</li><li>Journal & goals</li><li>1 child profile</li></ul>
+        <a href="register.html" class="btn bo" style="width:100%;">Get Started Free →</a>
       </div>
-      <div class="pc pop rv">
-        <div class="pc-name" style="color:var(--blue);">Family (3 Kids)</div>
-        <div class="pc-price" style="color:var(--tx);">$59.99</div>
-        <div class="pc-per">/year — $20/child</div>
-        <div class="pc-orig">$149.97/yr if purchased separately</div>
-        <div class="pc-save">SAVE 60% — BEST VALUE</div>
-        <ul><li>3 separate private accounts</li><li>Each child gets own URL & login</li><li>All features × 3</li><li>3-day free trial</li><li>Priority support</li></ul>
-        <a href="#register" class="btn bp" style="width:100%;" onclick="setP(3,'annual')">Start Free Trial →</a>
+      <div class="pc pop">
+        <div class="pc-name" style="color:var(--blue);">Family Monthly</div>
+        <div class="pc-price">$9.99</div>
+        <div class="pc-per">/month · Full access</div>
+        <div class="pc-save">MOST POPULAR</div>
+        <ul><li>All 28 sections unlocked</li><li>Unlimited children</li><li>Life Skills Academy</li><li>Chores & Rewards</li><li>Parent Hub with Life Score</li><li>Cloud sync across all devices</li></ul>
+        <a href="register.html?plan=monthly" class="btn bp" style="width:100%;">Start Free →</a>
       </div>
-      <div class="pc rv">
-        <div class="pc-name" style="color:var(--green);">5 Kids</div>
-        <div class="pc-price" style="color:var(--tx);">$129.99</div>
-        <div class="pc-per">/year — $26/child</div>
-        <div class="pc-orig">$249.95/yr if purchased separately</div>
-        <div class="pc-save">SAVE 48%</div>
-        <ul><li>5 separate private accounts</li><li>Perfect for larger families</li><li>All features × 5</li><li>3-day free trial</li><li>Priority support</li></ul>
-        <a href="#register" class="btn bp" style="width:100%;" onclick="setP(5,'annual')">Start Free Trial →</a>
+      <div class="pc">
+        <div class="pc-name" style="color:var(--green);">Lifetime</div>
+        <div class="pc-price">$149</div>
+        <div class="pc-per">one-time · pay once</div>
+        <div class="pc-save">NEVER PAY AGAIN</div>
+        <ul><li>Everything in Monthly</li><li>All future updates included</li><li>Unlimited children forever</li><li>Priority support</li></ul>
+        <a href="register.html?plan=lifetime" class="btn bp" style="width:100%;">Get Lifetime Access →</a>
       </div>
     </div>
-
+    <div id="price-yearly" class="price-grid" style="display:none;">
+      <div class="pc">
+        <div class="pc-name" style="color:var(--cyan);">Free</div>
+        <div class="pc-price">$0</div>
+        <div class="pc-per">forever</div>
+        <ul><li>Core dashboard & habits</li><li>School tracker</li><li>Basic money tools</li><li>Journal & goals</li><li>1 child profile</li></ul>
+        <a href="register.html" class="btn bo" style="width:100%;">Get Started Free →</a>
+      </div>
+      <div class="pc pop">
+        <div class="pc-name" style="color:var(--blue);">Family Yearly</div>
+        <div class="pc-price">$79.99</div>
+        <div class="pc-per">/year · Save $40</div>
+        <div class="pc-save">BEST VALUE — SAVE 33%</div>
+        <ul><li>Everything in Monthly</li><li>Unlimited children</li><li>2 months free vs monthly</li><li>Cloud sync across all devices</li><li>Priority support</li></ul>
+        <a href="register.html?plan=yearly" class="btn bp" style="width:100%;">Start Free →</a>
+      </div>
+      <div class="pc">
+        <div class="pc-name" style="color:var(--green);">Lifetime</div>
+        <div class="pc-price">$149</div>
+        <div class="pc-per">one-time · pay once</div>
+        <div class="pc-save">NEVER PAY AGAIN</div>
+        <ul><li>Everything in Monthly</li><li>All future updates included</li><li>Unlimited children forever</li><li>Priority support</li></ul>
+        <a href="register.html?plan=lifetime" class="btn bp" style="width:100%;">Get Lifetime Access →</a>
+      </div>
+    </div>
     <div id="price-lifetime" class="price-grid" style="display:none;">
-      <div class="pc rv">
-        <div class="pc-name" style="color:var(--cyan);">1 Child</div>
-        <div class="pc-price" style="color:var(--tx);">$149.99</div>
-        <div class="pc-per">one-time — pay once, own forever</div>
-        <div class="pc-save">LIFETIME ACCESS</div>
-        <ul><li>Never pay again</li><li>All features forever</li><li>All future updates included</li><li>Private yourlifecc.com URL</li></ul>
-        <a href="#register" class="btn bp" style="width:100%;" onclick="setP(1,'lifetime')">Get Lifetime Access →</a>
+      <div class="pc">
+        <div class="pc-name" style="color:var(--cyan);">Free</div>
+        <div class="pc-price">$0</div>
+        <div class="pc-per">forever</div>
+        <ul><li>Core dashboard & habits</li><li>School tracker</li><li>Basic money tools</li><li>Journal & goals</li><li>1 child profile</li></ul>
+        <a href="register.html" class="btn bo" style="width:100%;">Get Started Free →</a>
       </div>
-      <div class="pc pop rv">
-        <div class="pc-name" style="color:var(--blue);">Family (3 Kids)</div>
-        <div class="pc-price" style="color:var(--tx);">$249.99</div>
-        <div class="pc-per">one-time — $83/child</div>
-        <div class="pc-save">LIFETIME — SAVE $199.98</div>
-        <ul><li>3 lifetime accounts</li><li>Never pay again</li><li>All future updates forever</li><li>Priority support</li></ul>
-        <a href="#register" class="btn bp" style="width:100%;" onclick="setP(3,'lifetime')">Get Lifetime Access →</a>
+      <div class="pc pop">
+        <div class="pc-name" style="color:var(--blue);">Family Monthly</div>
+        <div class="pc-price">$9.99</div>
+        <div class="pc-per">/month · cancel anytime</div>
+        <ul><li>All 28 sections unlocked</li><li>Unlimited children</li><li>Life Skills Academy</li><li>Parent Hub with Life Score</li></ul>
+        <a href="register.html?plan=monthly" class="btn bp" style="width:100%;">Start Free →</a>
       </div>
-      <div class="pc rv">
-        <div class="pc-name" style="color:var(--green);">5 Kids</div>
-        <div class="pc-price" style="color:var(--tx);">$349.99</div>
-        <div class="pc-per">one-time — $70/child</div>
-        <div class="pc-save">LIFETIME — SAVE $399.96</div>
-        <ul><li>5 lifetime accounts</li><li>Biggest per-child savings</li><li>All future updates forever</li><li>Priority support</li></ul>
-        <a href="#register" class="btn bp" style="width:100%;" onclick="setP(5,'lifetime')">Get Lifetime Access →</a>
+      <div class="pc">
+        <div class="pc-name" style="color:var(--green);">Lifetime</div>
+        <div class="pc-price">$149</div>
+        <div class="pc-per">one-time · pay once forever</div>
+        <div class="pc-save">NEVER PAY AGAIN</div>
+        <ul><li>Everything unlocked forever</li><li>All future updates free</li><li>Unlimited children</li><li>Priority support</li></ul>
+        <a href="register.html?plan=lifetime" class="btn bp" style="width:100%;">Get Lifetime Access →</a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ═══ CHURCH / ORG LICENSES ═══ -->
-<section class="sec" id="church">
-  <div class="wrap" style="text-align:center;">
+<!-- CHURCH -->
+<section class="sec" id="church" style="background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);text-align:center;">
+  <div class="wrap">
     <div class="tag" style="color:var(--cyan);">⛪ CHURCHES · SCHOOLS · YOUTH GROUPS</div>
     <h2>Equip Your Entire Community</h2>
-    <p class="sub" style="margin:0 auto;">Bulk licensing for organizations. Admin dashboard to issue codes, track onboarding, and see aggregate progress — without accessing individual student data.</p>
+    <p class="sub" style="margin:0 auto;">Bulk licensing for organizations. Issue codes, track onboarding, see aggregate progress.</p>
     <div class="org-grid">
-      <div class="org-card rv">
-        <div class="ic">⛪</div>
-        <h3>Starter</h3>
-        <div class="pr">$399</div>
-        <div class="per">/year — up to 20 youth</div>
-        <ul>
-          <li>20 unique access codes</li>
-          <li>Admin dashboard</li>
-          <li>Bulk code generation via QR</li>
-          <li>Aggregate engagement stats</li>
-          <li>Email support</li>
-        </ul>
-        <a href="#register" class="btn bo" style="width:100%;margin-top:.8rem;">Get Started →</a>
+      <div class="org-card">
+        <div class="ic">⛪</div><h3>Starter</h3>
+        <div class="pr">$399</div><div class="per">/year — up to 20 youth</div>
+        <ul><li>20 unique access codes</li><li>Admin dashboard</li><li>Bulk QR code generation</li><li>Aggregate engagement stats</li></ul>
+        <a href="register.html" class="btn bo" style="width:100%;margin-top:.8rem;">Get Started →</a>
       </div>
-      <div class="org-card rv" style="border-color:rgba(6,214,160,.15);">
-        <div class="ic">🏛️</div>
-        <h3>Growth</h3>
-        <div class="pr">$799</div>
-        <div class="per">/year — up to 50 youth</div>
-        <ul>
-          <li>50 unique access codes</li>
-          <li>Admin dashboard + reporting</li>
-          <li>Custom QR invite codes</li>
-          <li>Your church/org branding on login</li>
-          <li>Youth leader sub-accounts</li>
-          <li>Priority support</li>
-        </ul>
-        <a href="#register" class="btn bp" style="width:100%;margin-top:.8rem;">Get Started →</a>
+      <div class="org-card" style="border-color:rgba(6,214,160,.15);">
+        <div class="ic">🏛️</div><h3>Growth</h3>
+        <div class="pr">$799</div><div class="per">/year — up to 50 youth</div>
+        <ul><li>50 unique access codes</li><li>Admin dashboard + reporting</li><li>Custom QR invite codes</li><li>Your org branding on login</li><li>Youth leader sub-accounts</li></ul>
+        <a href="register.html" class="btn bp" style="width:100%;margin-top:.8rem;">Get Started →</a>
       </div>
-      <div class="org-card rv">
-        <div class="ic">🎓</div>
-        <h3>Unlimited</h3>
-        <div class="pr">$1,499</div>
-        <div class="per">/year — up to 200 youth</div>
-        <ul>
-          <li>Up to 200 access codes</li>
-          <li>Full admin dashboard + analytics</li>
-          <li>Custom branding everywhere</li>
-          <li>Multiple leader accounts</li>
-          <li>Onboarding support call</li>
-          <li>Dedicated account manager</li>
-        </ul>
-        <a href="#register" class="btn bo" style="width:100%;margin-top:.8rem;">Get Started →</a>
+      <div class="org-card">
+        <div class="ic">🎓</div><h3>Unlimited</h3>
+        <div class="pr">$1,499</div><div class="per">/year — up to 200 youth</div>
+        <ul><li>Up to 200 access codes</li><li>Full admin dashboard + analytics</li><li>Custom branding everywhere</li><li>Onboarding support call</li><li>Dedicated account manager</li></ul>
+        <a href="register.html" class="btn bo" style="width:100%;margin-top:.8rem;">Get Started →</a>
       </div>
-    </div>
-    <div style="margin-top:1.2rem;text-align:center;padding:1rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:10px;">
-      <div style="font-size:.82rem;color:var(--tx2);">Need 200+ youth? <strong style="color:var(--tx);">Enterprise pricing</strong> — <a href="/cdn-cgi/l/email-protection#dfb6b1b9b09fb4b6b1b8bbb0b2f2bcadbabeabb6a9baacf1bcb0b2" style="color:var(--cyan);">Contact us</a> for a custom quote.</div>
-    </div>
-    <div style="margin-top:2rem;padding:1.5rem;background:rgba(6,214,160,.04);border:1px solid rgba(6,214,160,.12);border-radius:var(--r);max-width:700px;margin-left:auto;margin-right:auto;">
-      <div style="font-family:var(--fh);font-weight:700;margin-bottom:.3rem;">🤝 How Church Licensing Works</div>
-      <p style="font-size:.85rem;color:var(--tx2);line-height:1.7;">Purchase a license, receive your admin login, and generate unique codes for each youth member. Students go to <strong>yourlifecc.com</strong>, enter their code, create their account, and they're in. You see aggregate engagement (% active, lessons completed, streaks) — never individual private data. QR code posters for your youth room make onboarding instant. Codes can be issued, revoked, or reassigned anytime from your dashboard.</p>
     </div>
   </div>
 </section>
 
-<!-- ═══ AFFILIATE / REFERRAL PROGRAM ═══ -->
-<section class="sec" style="background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);" id="affiliate">
-  <div class="wrap" style="text-align:center;">
-    <div class="tag" style="color:var(--gold);">💵 EARN WHILE YOU SHARE</div>
-    <h2>Refer Families. Earn Real Money.</h2>
-    <p class="sub" style="margin:0 auto;">Parents, students, pastors, teachers — anyone can earn by sharing YourLife CC. Get your unique referral link after sign-up.</p>
-    <div class="aff-grid">
-      <div class="aff-card rv">
-        <div style="font-size:1.5rem;">👨‍👩‍👧</div>
-        <div style="font-family:var(--fh);font-size:.8rem;font-weight:700;margin-top:.5rem;">PARENTS</div>
-        <div class="num" style="color:var(--green);">$10</div>
-        <div style="font-size:.82rem;color:var(--tx2);">per family you refer</div>
-        <div style="font-size:.72rem;color:var(--tx3);margin-top:.3rem;">Paid via PayPal or Venmo within 30 days</div>
-      </div>
-      <div class="aff-card rv">
-        <div style="font-size:1.5rem;">🎓</div>
-        <div style="font-family:var(--fh);font-size:.8rem;font-weight:700;margin-top:.5rem;">STUDENTS</div>
-        <div class="num" style="color:var(--blue);">$5</div>
-        <div style="font-size:.82rem;color:var(--tx2);">per friend who signs up</div>
-        <div style="font-size:.72rem;color:var(--tx3);margin-top:.3rem;">Credited to account or paid at 18+</div>
-      </div>
-      <div class="aff-card rv">
-        <div style="font-size:1.5rem;">⛪</div>
-        <div style="font-family:var(--fh);font-size:.8rem;font-weight:700;margin-top:.5rem;">CHURCH PARTNERS</div>
-        <div class="num" style="color:var(--gold);">20%</div>
-        <div style="font-size:.82rem;color:var(--tx2);">commission on every referral</div>
-        <div style="font-size:.72rem;color:var(--tx3);margin-top:.3rem;">Quarterly payouts · No cap</div>
-      </div>
-    </div>
-    <div class="aff-how" style="margin-top:2.5rem;">
-      <div class="aff-step rv"><div class="circle">1️⃣</div><div style="font-size:.78rem;font-weight:600;">Sign Up</div><div style="font-size:.7rem;color:var(--tx2);">Create your account</div></div>
-      <div class="aff-step rv"><div class="circle">2️⃣</div><div style="font-size:.78rem;font-weight:600;">Get Your Link</div><div style="font-size:.7rem;color:var(--tx2);">Unique referral URL</div></div>
-      <div class="aff-step rv"><div class="circle">3️⃣</div><div style="font-size:.78rem;font-weight:600;">Share</div><div style="font-size:.7rem;color:var(--tx2);">Text, social, email, word of mouth</div></div>
-      <div class="aff-step rv"><div class="circle">4️⃣</div><div style="font-size:.78rem;font-weight:600;">Get Paid</div><div style="font-size:.7rem;color:var(--tx2);">Real money, real fast</div></div>
-    </div>
-    <div style="margin-top:2rem;padding:1rem 1.5rem;background:rgba(245,166,35,.05);border:1px solid rgba(245,166,35,.12);border-radius:10px;display:inline-block;">
-      <span style="font-size:.85rem;">Refer 10 families = <strong style="color:var(--gold);">$100 earned</strong>. Refer 50 = <strong style="color:var(--gold);">$500</strong>. No limit. Ever.</span>
-    </div>
-  </div>
-</section>
-
-<!-- ═══ REVIEWS ═══ -->
+<!-- REVIEWS -->
 <section class="sec" id="reviews" style="text-align:center;">
   <div class="wrap">
     <div class="tag" style="color:var(--gold);">⭐ REVIEWS</div>
     <h2>What Families Are Saying</h2>
     <div style="margin-bottom:1rem;"><span style="font-size:1.3rem;color:var(--gold);">★★★★★</span> <span style="font-weight:700;">4.9/5</span> <span style="color:var(--tx2);font-size:.85rem;">from early access families</span></div>
     <div class="rev-grid">
-      <div class="rc rv"><div class="rc-stars">★★★★★</div><div class="rc-text">"My son learned more about credit and taxes in two weeks than I learned in my twenties. The parent dashboard shows me his progress without hovering. This is what I wished existed growing up."</div><div class="rc-who"><div class="rc-av">SM</div><div><div style="font-weight:700;font-size:.82rem;">Sarah M.</div><div style="font-size:.7rem;color:var(--tx3);">Mom of 2 · Texas</div></div></div></div>
-      <div class="rc rv"><div class="rc-stars">★★★★★</div><div class="rc-text">"The career explorer alone is worth it. My daughter found three paths she didn't know existed. The chore system with points has been a game-changer — she actually does them without being asked."</div><div class="rc-who"><div class="rc-av">DW</div><div><div style="font-weight:700;font-size:.82rem;">David W.</div><div style="font-size:.7rem;color:var(--tx3);">Dad of 3 · Ohio</div></div></div></div>
-      <div class="rc rv"><div class="rc-stars">★★★★★</div><div class="rc-text">"Our youth group uses the church license. 30 teens onboarded in one Sunday. The QR code made it instant. Kids are competing on streaks and bringing lessons up in small groups. Exactly what youth ministry needed."</div><div class="rc-who"><div class="rc-av">PR</div><div><div style="font-weight:700;font-size:.82rem;">Pastor Ryan D.</div><div style="font-size:.7rem;color:var(--tx3);">Youth Pastor · Georgia</div></div></div></div>
-      <div class="rc rv"><div class="rc-stars">★★★★★</div><div class="rc-text">"I homeschool three kids. This replaces five different apps I was paying for separately. The stage-based system means each kid sees content at their level. The Life Score gives me a real picture of each child."</div><div class="rc-who"><div class="rc-av">JH</div><div><div style="font-weight:700;font-size:.82rem;">Jessica H.</div><div style="font-size:.7rem;color:var(--tx3);">Homeschool Mom · Idaho</div></div></div></div>
-    </div>
-  </d
-<!-- ═══ SPONSOR A CHILD OR FAMILY ═══ -->
-<section style="padding:4rem 1.5rem;">
-  <div style="max-width:900px;margin:0 auto;">
-    <div style="text-align:center;margin-bottom:2.5rem;">
-      <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:3px;color:var(--c);font-weight:700;margin-bottom:.5rem;">THE COMPETITIVE LANDSCAPE</div>
-      <h2 style="font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:900;line-height:1.2;margin-bottom:.8rem;">What makes LifeOS completely unique</h2>
-      <p class="sub" style="margin:0 auto;max-width:600px;">Other apps do one thing. LifeOS does everything — the only platform that combines life skills, faith, character, career, parenting, and gamification in one place.</p>
-    </div>
-
-    <div style="background:var(--s1);border:1px solid rgba(255,255,255,.08);border-radius:16px;overflow:hidden;">
-      <!-- Header row -->
-      <div style="display:grid;grid-template-columns:1fr 80px 1fr;gap:0;padding:.8rem 1.2rem;background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.06);font-size:.7rem;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:1px;">
-        <div>Feature</div>
-        <div style="text-align:center;">LifeOS</div>
-        <div>Closest Competitor</div>
-      </div>
-
-      <!-- Rows -->
-      <div style="font-size:.82rem;" id="compTableRows">
-        <div style="display:grid;grid-template-columns:1fr 80px 1fr;gap:0;padding:.55rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.03);align-items:center;">
-          <div>600+ life skill lessons with quizzes & certs</div>
-          <div style="text-align:center;color:#22c55e;font-size:1.3rem;font-weight:900;">✓</div>
-          <div style="color:var(--tx3);font-size:.75rem;">Life Hub (different approach)</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 80px 1fr;gap:0;padding:.55rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.03);align-items:center;background:rgba(255,255,255,.015);">
-          <div>43 Growing Up topics (puberty, drugs, emotions, religion)</div>
-          <div style="text-align:center;color:#22c55e;font-size:1.3rem;font-weight:900;">✓</div>
-          <div style="color:#ef4444;font-size:.75rem;">✕ Nobody</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 80px 1fr;gap:0;padding:.55rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.03);align-items:center;">
-          <div>Faith toggle (Bible OR secular)</div>
-          <div style="text-align:center;color:#22c55e;font-size:1.3rem;font-weight:900;">✓</div>
-          <div style="color:#ef4444;font-size:.75rem;">✕ Nobody</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 80px 1fr;gap:0;padding:.55rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.03);align-items:center;background:rgba(255,255,255,.015);">
-          <div>365 scriptures + 30 devotionals + Jesus & Bible lessons</div>
-          <div style="text-align:center;color:#22c55e;font-size:1.3rem;font-weight:900;">✓</div>
-          <div style="color:var(--tx3);font-size:.75rem;">Parent Cue (devotionals only)</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 80px 1fr;gap:0;padding:.55rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.03);align-items:center;">
-          <div>Gamified chore system with Parent Bucks</div>
-          <div style="text-align:center;color:#22c55e;font-size:1.3rem;font-weight:900;">✓</div>
-          <div style="color:var(--tx3);font-size:.75rem;">BusyKid/Levelty (chores only)</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 80px 1fr;gap:0;padding:.55rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.03);align-items:center;background:rgba(255,255,255,.015);">
-          <div>Self-initiated chores with parent approval</div>
-          <div style="text-align:center;color:#22c55e;font-size:1.3rem;font-weight:900;">✓</div>
-          <div style="color:#ef4444;font-size:.75rem;">✕ Nobody</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 80px 1fr;gap:0;padding:.55rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.03);align-items:center;">
-          <div>Character & emotional intelligence lessons</div>
-          <div style="text-align:center;color:#22c55e;font-size:1.3rem;font-weight:900;">✓</div>
-          <div style="color:#ef4444;font-size:.75rem;">✕ Nobody</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 80px 1fr;gap:0;padding:.55rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.03);align-items:center;background:rgba(255,255,255,.015);">
-          <div>35 career profiles with salary data</div>
-          <div style="text-align:center;color:#22c55e;font-size:1.3rem;font-weight:900;">✓</div>
-          <div style="color:#ef4444;font-size:.75rem;">✕ Nobody</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 80px 1fr;gap:0;padding:.55rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.03);align-items:center;">
-          <div>Parent Education (16 lessons + growth tracker)</div>
-          <div style="text-align:center;color:#22c55e;font-size:1.3rem;font-weight:900;">✓</div>
-          <div style="color:var(--tx3);font-size:.75rem;">Parent Cue (tips only)</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 80px 1fr;gap:0;padding:.55rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.03);align-items:center;background:rgba(255,255,255,.015);">
-          <div>9-panel Parent Hub with full controls</div>
-          <div style="text-align:center;color:#22c55e;font-size:1.3rem;font-weight:900;">✓</div>
-          <div style="color:#ef4444;font-size:.75rem;">✕ Nobody</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 80px 1fr;gap:0;padding:.55rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.03);align-items:center;">
-          <div>Daily Activity Check (11 habit categories)</div>
-          <div style="text-align:center;color:#22c55e;font-size:1.3rem;font-weight:900;">✓</div>
-          <div style="color:var(--tx3);font-size:.75rem;">Habitica (generic habits)</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 80px 1fr;gap:0;padding:.55rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.03);align-items:center;background:rgba(255,255,255,.015);">
-          <div>School tracker with GPA</div>
-          <div style="text-align:center;color:#22c55e;font-size:1.3rem;font-weight:900;">✓</div>
-          <div style="color:#ef4444;font-size:.75rem;">✕ Nobody</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 80px 1fr;gap:0;padding:.55rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.03);align-items:center;">
-          <div>Visual Life Map game board</div>
-          <div style="text-align:center;color:#22c55e;font-size:1.3rem;font-weight:900;">✓</div>
-          <div style="color:#ef4444;font-size:.75rem;">✕ Nobody</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 80px 1fr;gap:0;padding:.55rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.03);align-items:center;background:rgba(255,255,255,.015);">
-          <div>Resume builder + Bio page for teens</div>
-          <div style="text-align:center;color:#22c55e;font-size:1.3rem;font-weight:900;">✓</div>
-          <div style="color:#ef4444;font-size:.75rem;">✕ Nobody</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 80px 1fr;gap:0;padding:.55rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.03);align-items:center;">
-          <div>World Religions education</div>
-          <div style="text-align:center;color:#22c55e;font-size:1.3rem;font-weight:900;">✓</div>
-          <div style="color:#ef4444;font-size:.75rem;">✕ Nobody</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 80px 1fr;gap:0;padding:.55rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.03);align-items:center;background:rgba(255,255,255,.015);">
-          <div>Google Translate for any language</div>
-          <div style="text-align:center;color:#22c55e;font-size:1.3rem;font-weight:900;">✓</div>
-          <div style="color:#ef4444;font-size:.75rem;">✕ Nobody</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 80px 1fr;gap:0;padding:.55rem 1.2rem;align-items:center;">
-          <div>Single HTML file, works offline</div>
-          <div style="text-align:center;color:#22c55e;font-size:1.3rem;font-weight:900;">✓</div>
-          <div style="color:#ef4444;font-size:.75rem;">✕ Nobody</div>
-        </div>
-      </div>
-    </div>
-
-    <div style="text-align:center;margin-top:1.5rem;font-size:.85rem;color:var(--tx2);line-height:1.7;">
-      Other apps are vertical — they do <b>one thing</b> (chores OR faith OR education OR parental controls).<br>
-      LifeOS is the only <span style="color:var(--c);font-weight:700;">horizontal platform</span> covering the full spectrum of raising a child.
+      <div class="rc"><div class="rc-stars">★★★★★</div><div class="rc-text">"My son learned more about credit and taxes in two weeks than I learned in my twenties. The parent dashboard shows me his progress without hovering."</div><div class="rc-who"><div class="rc-av">SM</div><div><div style="font-weight:700;font-size:.82rem;">Sarah M.</div><div style="font-size:.7rem;color:var(--tx3);">Mom of 2 · Texas</div></div></div></div>
+      <div class="rc"><div class="rc-stars">★★★★★</div><div class="rc-text">"The career explorer alone is worth it. The chore system with points has been a game-changer — she actually does them without being asked."</div><div class="rc-who"><div class="rc-av">DW</div><div><div style="font-weight:700;font-size:.82rem;">David W.</div><div style="font-size:.7rem;color:var(--tx3);">Dad of 3 · Ohio</div></div></div></div>
+      <div class="rc"><div class="rc-stars">★★★★★</div><div class="rc-text">"Our youth group uses the church license. 30 teens onboarded in one Sunday. Kids are competing on streaks and bringing lessons up in small groups."</div><div class="rc-who"><div class="rc-av">PR</div><div><div style="font-weight:700;font-size:.82rem;">Pastor Ryan D.</div><div style="font-size:.7rem;color:var(--tx3);">Youth Pastor · Georgia</div></div></div></div>
+      <div class="rc"><div class="rc-stars">★★★★★</div><div class="rc-text">"I homeschool three kids. This replaces five different apps I was paying for separately. The Life Score gives me a real picture of each child."</div><div class="rc-who"><div class="rc-av">JH</div><div><div style="font-weight:700;font-size:.82rem;">Jessica H.</div><div style="font-size:.7rem;color:var(--tx3);">Homeschool Mom · Idaho</div></div></div></div>
     </div>
   </div>
 </section>
 
-<section id="sponsor" style="padding:5rem 1.5rem;background:linear-gradient(180deg,rgba(167,139,250,.04) 0%,rgba(34,197,94,.03) 100%);">
-  <div style="max-width:900px;margin:0 auto;">
-    <div style="text-align:center;margin-bottom:2.5rem;">
-      <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:3px;color:#a78bfa;font-weight:700;margin-bottom:.5rem;">CHANGE A LIFE</div>
-      <h2 style="font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;line-height:1.2;margin-bottom:1rem;">Sponsor a Child or Family</h2>
-      <p style="font-size:1.05rem;color:var(--tx2);max-width:680px;margin:0 auto;line-height:1.8;">Not every family can afford the tools their child needs. <strong style="color:var(--tx);">For as little as $29.99, you can give a child an entire year</strong> of life skills, career guidance, Bible study, and a parent dashboard. Your sponsorship goes directly to a family in need. One gift. Generational impact.</p>
-    </div>
-
-    <!-- Impact Numbers -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2.5rem;text-align:center;">
-      <div style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.12);border-radius:12px;padding:1rem;">
-        <div style="font-size:2rem;font-weight:900;color:#22c55e;">600+</div>
-        <div style="font-size:.7rem;color:var(--tx2);">Life Lessons</div>
-      </div>
-      <div style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.12);border-radius:12px;padding:1rem;">
-        <div style="font-size:2rem;font-weight:900;color:#a78bfa;">365</div>
-        <div style="font-size:.7rem;color:var(--tx2);">Daily Scriptures</div>
-      </div>
-      <div style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.12);border-radius:12px;padding:1rem;">
-        <div style="font-size:2rem;font-weight:900;color:#fbbf24;">35</div>
-        <div style="font-size:.7rem;color:var(--tx2);">Career Profiles</div>
-      </div>
-      <div style="background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.12);border-radius:12px;padding:1rem;">
-        <div style="font-size:2rem;font-weight:900;color:#38bdf8;">36</div>
-        <div style="font-size:.7rem;color:var(--tx2);">Growing Up Topics</div>
-      </div>
-    </div>
-
-    <!-- Sponsorship Tiers -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem;" class="g3">
-      <div style="background:var(--s1);border:1px solid rgba(34,197,94,.15);border-radius:16px;padding:1.5rem;text-align:center;cursor:pointer;transition:all .2s;" onmouseenter="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(34,197,94,.4)'" onmouseleave="this.style.transform='';this.style.borderColor='rgba(34,197,94,.15)'" onclick="selectSponsor('child')">
-        <div style="font-size:2rem;margin-bottom:.4rem;">👦</div>
-        <div style="font-size:1rem;font-weight:800;">Sponsor 1 Child</div>
-        <div style="font-size:2rem;font-weight:900;color:#22c55e;margin:.3rem 0;">$29.99</div>
-        <div style="font-size:.7rem;color:var(--tx2);">1 year of full access</div>
-        <div style="font-size:.65rem;color:var(--tx3);margin-top:.3rem;">That's $2.50/month</div>
-      </div>
-      <div style="background:var(--s1);border:2px solid rgba(167,139,250,.3);border-radius:16px;padding:1.5rem;text-align:center;position:relative;cursor:pointer;transition:all .2s;" onmouseenter="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(167,139,250,.6)'" onmouseleave="this.style.transform='';this.style.borderColor='rgba(167,139,250,.3)'" onclick="selectSponsor('family')">
-        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#a78bfa;color:#fff;font-size:.55rem;font-weight:800;padding:.2rem .6rem;border-radius:10px;letter-spacing:1px;">MOST IMPACT</div>
-        <div style="font-size:2rem;margin-bottom:.4rem;">👨‍👩‍👧‍👦</div>
-        <div style="font-size:1rem;font-weight:800;">Sponsor a Family</div>
-        <div style="font-size:2rem;font-weight:900;color:#a78bfa;margin:.3rem 0;">$59.99</div>
-        <div style="font-size:.7rem;color:var(--tx2);">Up to 3 children, 1 year</div>
-        <div style="font-size:.65rem;color:var(--tx3);margin-top:.3rem;">$5/month for an entire family</div>
-      </div>
-      <div style="background:var(--s1);border:1px solid rgba(251,191,36,.15);border-radius:16px;padding:1.5rem;text-align:center;cursor:pointer;transition:all .2s;" onmouseenter="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(251,191,36,.4)'" onmouseleave="this.style.transform='';this.style.borderColor='rgba(251,191,36,.15)'" onclick="selectSponsor('multi')">
-        <div style="font-size:2rem;margin-bottom:.4rem;">🌍</div>
-        <div style="font-size:1rem;font-weight:800;">Sponsor Multiple</div>
-        <div style="font-size:1.5rem;font-weight:900;color:#fbbf24;margin:.3rem 0;">You Choose</div>
-        <div style="font-size:.7rem;color:var(--tx2);">Pick how many children</div>
-        <div style="font-size:.65rem;color:var(--tx3);margin-top:.3rem;">$29.99 per child per year</div>
-      </div>
-    </div>
-
-    <!-- Sponsor Form -->
-    <div id="sponsorForm" style="display:none;max-width:500px;margin:0 auto;">
-      <div style="background:var(--s1);border:1px solid rgba(167,139,250,.2);border-radius:20px;padding:2rem;box-shadow:0 8px 40px rgba(0,0,0,.3);">
-        <div style="text-align:center;margin-bottom:1.2rem;">
-          <div style="font-size:1.5rem;margin-bottom:.3rem;" id="spEmoji">👦</div>
-          <div style="font-size:1.1rem;font-weight:800;" id="spTitle">Sponsor a Child</div>
-        </div>
-
-        <label style="font-size:.75rem;font-weight:700;margin-bottom:.3rem;display:block;">Your Name *</label>
-        <input type="text" id="spName" placeholder="Your full name" style="width:100%;margin-bottom:.6rem;">
-
-        <label style="font-size:.75rem;font-weight:700;margin-bottom:.3rem;display:block;">Your Email *</label>
-        <input type="email" id="spEmail" placeholder="you@email.com" style="width:100%;margin-bottom:.6rem;">
-
-        <div id="spMultiField" style="display:none;margin-bottom:.6rem;">
-          <label style="font-size:.75rem;font-weight:700;margin-bottom:.3rem;display:block;">How many children to sponsor?</label>
-          <div style="display:flex;align-items:center;gap:.5rem;">
-            <button onclick="adjustSponsorCount(-1)" style="width:36px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:var(--tx);font-size:1.2rem;cursor:pointer;">−</button>
-            <div style="font-size:1.8rem;font-weight:900;color:var(--c);width:50px;text-align:center;" id="spCount">1</div>
-            <button onclick="adjustSponsorCount(1)" style="width:36px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:var(--tx);font-size:1.2rem;cursor:pointer;">+</button>
-          </div>
-        </div>
-
-        <label style="font-size:.75rem;font-weight:700;margin-bottom:.3rem;display:block;">Message to the family (optional)</label>
-        <textarea id="spMessage" rows="2" placeholder="A word of encouragement for the family..." style="width:100%;margin-bottom:.8rem;"></textarea>
-
-        <!-- Total -->
-        <div style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.15);border-radius:10px;padding:.8rem;margin-bottom:1rem;text-align:center;">
-          <div style="font-size:.65rem;color:var(--tx2);text-transform:uppercase;letter-spacing:1px;">Your Sponsorship Total</div>
-          <div style="font-size:2rem;font-weight:900;color:#a78bfa;" id="spTotal">$29.99</div>
-          <div style="font-size:.65rem;color:var(--tx2);" id="spDesc">1 child for 1 year</div>
-        </div>
-
-        <button onclick="processSponsor()" style="width:100%;padding:.85rem;border-radius:12px;border:none;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;font-size:1rem;font-weight:800;cursor:pointer;transition:all .2s;letter-spacing:.5px;" onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(139,92,246,.4)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
-          💜 Complete Sponsorship → Stripe
-        </button>
-        <div style="font-size:.6rem;color:var(--tx3);text-align:center;margin-top:.5rem;">Secure payment via Stripe. Tax-deductible receipt emailed to you.</div>
-      </div>
-    </div>
-
-    <!-- Thank You (hidden until complete) -->
-    <div id="sponsorThankYou" style="display:none;text-align:center;max-width:500px;margin:0 auto;">
-      <div style="background:var(--s1);border:2px solid rgba(34,197,94,.3);border-radius:20px;padding:2.5rem;box-shadow:0 8px 40px rgba(0,0,0,.3);">
-        <div style="font-size:3rem;margin-bottom:.5rem;">💜</div>
-        <div style="font-size:1.5rem;font-weight:900;color:#22c55e;margin-bottom:.5rem;">Thank You!</div>
-        <div style="font-size:.95rem;color:var(--tx2);line-height:1.8;margin-bottom:1rem;" id="spThankMsg">Your generosity just gave a child tools that will change their life. A confirmation email has been sent to your inbox.</div>
-        <div style="font-size:.8rem;color:var(--tx2);">Want to sponsor more? <a href="#sponsor" onclick="resetSponsorForm()" style="color:var(--c);">Sponsor another child →</a></div>
-      </div>
-    </div>
-
-    <!-- Social Proof -->
-    <div style="text-align:center;margin-top:2rem;">
-      <div style="font-size:.75rem;color:var(--tx2);font-style:italic;max-width:500px;margin:0 auto;line-height:1.7;">"I sponsored 3 children at my church. The pastor told me one of the kids started reading the Bible study section every day. That alone was worth it." <strong style="color:var(--tx);">— Sarah M., Church Volunteer</strong></div>
-    </div>
-  </div>
-</section>
-
-iv>
-</section>
-
-<!-- ═══ FAQ ═══ -->
+<!-- FAQ -->
 <section class="sec" style="background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);text-align:center;" id="faq">
   <div class="wrap">
     <div class="tag" style="color:var(--tx2);">❓ FAQ</div>
     <h2>Common Questions</h2>
     <div class="faq-list">
-      <div class="fq"><div class="fq-q" onclick="tFaq(this)">What age range is this for? <span class="arr">▼</span></div><div class="fq-a"><p>Ages 12-25+. Six life stages — Middle School through Young Adult. Content adapts automatically, showing age-appropriate lessons and features at each stage.</p></div></div>
-      <div class="fq"><div class="fq-q" onclick="tFaq(this)">Is there a free trial? <span class="arr">▼</span></div><div class="fq-a"><p>Yes — 3 days free on all plans. Full access to navigation, dashboard, tools, and 2 sample lessons per category. Complete lesson library, quizzes, certificates, and career profiles unlock with your paid subscription. No credit card required to start.</p></div></div>
-      <div class="fq"><div class="fq-q" onclick="tFaq(this)">What's the difference between annual and lifetime? <span class="arr">▼</span></div><div class="fq-a"><p>Annual is $29.99/year (Founding Family price, regular $49.99) and renews yearly. Lifetime is a one-time payment of $149.99 — pay once, access forever, including all future updates and new lessons.</p></div></div>
-      <div class="fq"><div class="fq-q" onclick="tFaq(this)">How does the parent dashboard work? <span class="arr">▼</span></div><div class="fq-a"><p>It's PIN-protected inside the app. Parents see a Life Score (weighted grade across academics, responsibility, growth, wellbeing, character, engagement), behavior logs, grade monitor, chore verification, incentives, and weekly reports — without accessing the child's private journal or mood entries.</p></div></div>
-      <div class="fq"><div class="fq-q" onclick="tFaq(this)">Is my child's data private? <span class="arr">▼</span></div><div class="fq-a"><p>Each license creates a private instance at a unique URL. Data is encrypted and stored in their secure account. No one else can access it. Church/org admins see only aggregate stats, never individual data.</p></div></div>
-      <div class="fq"><div class="fq-q" onclick="tFaq(this)">How do church/org licenses work? <span class="arr">▼</span></div><div class="fq-a"><p>Purchase a license, get an admin dashboard, and generate unique codes for each youth member. Students enter their code at yourlifecc.com to create their account. QR code posters make onboarding instant. Admin sees aggregate engagement — never individual private data. Codes can be issued, revoked, or reassigned anytime.</p></div></div>
-      <div class="fq"><div class="fq-q" onclick="tFaq(this)">Can students earn money by referring friends? <span class="arr">▼</span></div><div class="fq-a"><p>Yes! Students earn $5 for every friend who signs up through their referral link. Earnings are credited to their account and paid out at age 18+ or applied as account credit. Parents earn $10 per referral. Church partners earn 20% commission.</p></div></div>
-      <div class="fq"><div class="fq-q" onclick="tFaq(this)">What devices does it work on? <span class="arr">▼</span></div><div class="fq-a"><p>Any device with a browser — phones, tablets, laptops, desktops. No app store download. Just log in.</p></div></div>
-      <div class="fq"><div class="fq-q" onclick="tFaq(this)">Is this faith-based? <span class="arr">▼</span></div><div class="fq-a"><p>YourLife CC includes an optional Faith & Purpose category. The other 17 categories cover universal life skills. Faith content is clearly labeled and entirely optional.</p></div></div>
-      <div class="fq"><div class="fq-q" onclick="tFaq(this)">What if I'm not satisfied? <span class="arr">▼</span></div><div class="fq-a"><p>30-day money-back guarantee, no questions asked. Email <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="751c1b131a351e1c1b12111a185816071014011c0310065b161a18">[email&#160;protected]</a> and we'll refund you immediately.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">What age range is this for? <span class="arr">▼</span></div><div class="fq-a"><p>Ages 12–25+. Six life stages — Middle School through Young Adult. Content adapts automatically at each stage.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">Is there a free plan? <span class="arr">▼</span></div><div class="fq-a"><p>Yes — the free plan includes the core dashboard, school tracker, basic money tools, journal, goals, and 1 child profile. Paid plans unlock all 28 sections, unlimited children, and the full lesson library.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">What's the difference between monthly and lifetime? <span class="arr">▼</span></div><div class="fq-a"><p>Monthly is $9.99/month (or $79.99/year) and renews automatically. Lifetime is a one-time payment of $149 — pay once, access forever, including all future updates.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">How does the parent dashboard work? <span class="arr">▼</span></div><div class="fq-a"><p>It's PIN-protected inside the app. Parents see a Life Score, behavior logs, chore verification, grade monitor, screen time controls, and weekly reports — without accessing the child's private journal entries.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">Is my child's data private? <span class="arr">▼</span></div><div class="fq-a"><p>Yes. Each account is private and encrypted. Your unique URL is yours alone — no one else can access your family's data.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">What devices does it work on? <span class="arr">▼</span></div><div class="fq-a"><p>Any device with a browser — phones, tablets, laptops, desktops. No app download required. Just log in from yourlifecc.vercel.app.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">Is this faith-based? <span class="arr">▼</span></div><div class="fq-a"><p>YourLife CC includes an optional Faith & Purpose section with 365 scriptures, 30 devotionals, and Bible content. A Faith Mode toggle lets you turn it ON or OFF. The other 17 categories cover universal life skills for all families.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">What if I'm not satisfied? <span class="arr">▼</span></div><div class="fq-a"><p>30-day money-back guarantee, no questions asked. Email support@yourlifecc.com and we'll refund you immediately.</p></div></div>
     </div>
   </div>
 </section>
 
-<!-- ═══ REGISTRATION ═══ -->
-<section class="sec" id="register" style="text-align:center;">
-  <div class="wrap">
-    <div class="tag" style="color:var(--green);">🚀 GET STARTED</div>
-    <h2>Start Your 3-Day Free Trial</h2>
-    <p class="sub" style="margin:0 auto;">Parents register first, then create separate logins for each child. You manage everything from your parent account.</p>
-
-    <!-- HOW IT WORKS FLOW -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;max-width:720px;margin:2rem auto;text-align:center;">
-      <div class="rv"><div style="width:44px;height:44px;border-radius:50%;background:rgba(79,143,255,.08);border:1px solid rgba(79,143,255,.15);display:flex;align-items:center;justify-content:center;margin:0 auto .4rem;font-size:1.1rem;">1️⃣</div><div style="font-size:.75rem;font-weight:700;">Parent Signs Up</div><div style="font-size:.62rem;color:var(--tx2);">Your name, email, password</div></div>
-      <div class="rv"><div style="width:44px;height:44px;border-radius:50%;background:rgba(6,214,160,.08);border:1px solid rgba(6,214,160,.15);display:flex;align-items:center;justify-content:center;margin:0 auto .4rem;font-size:1.1rem;">2️⃣</div><div style="font-size:.75rem;font-weight:700;">Choose Plan</div><div style="font-size:.62rem;color:var(--tx2);">Pick how many kids</div></div>
-      <div class="rv"><div style="width:44px;height:44px;border-radius:50%;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.15);display:flex;align-items:center;justify-content:center;margin:0 auto .4rem;font-size:1.1rem;">3️⃣</div><div style="font-size:.75rem;font-weight:700;">Name Your Kids</div><div style="font-size:.62rem;color:var(--tx2);">Each gets a unique code</div></div>
-      <div class="rv"><div style="width:44px;height:44px;border-radius:50%;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.15);display:flex;align-items:center;justify-content:center;margin:0 auto .4rem;font-size:1.1rem;">4️⃣</div><div style="font-size:.75rem;font-weight:700;">Kids Create Logins</div><div style="font-size:.62rem;color:var(--tx2);">Their own private app</div></div>
-    </div>
-
-    <div class="reg-box" style="text-align:left;">
-
-      <div style="font-family:var(--fh);font-size:.7rem;font-weight:700;color:var(--blue);letter-spacing:1px;text-transform:uppercase;margin-bottom:.6rem;">STEP 1 — PARENT ACCOUNT</div>
-
-      <label>Your Full Name (Parent / Guardian)</label>
-      <input type="text" id="rName" placeholder="Your first and last name">
-      <label>Email Address</label>
-      <input type="email" id="rEmail" placeholder="you@email.com">
-      <label>Phone Number (for verification code)</label>
-      <input type="tel" id="rPhone" placeholder="(555) 123-4567">
-      <label>Create Password</label>
-      <input type="password" id="rPass" placeholder="At least 8 characters">
-
-      <div style="border-top:1px solid rgba(255,255,255,.06);margin:1.2rem 0;"></div>
-      <div style="font-family:var(--fh);font-size:.7rem;font-weight:700;color:var(--cyan);letter-spacing:1px;text-transform:uppercase;margin-bottom:.6rem;">STEP 2 — CHOOSE YOUR PLAN</div>
-
-      <label>Plan</label>
-      <select id="rPlan" onchange="calcReg()">
-        <option value="a1">1 Child — $29.99/year (Founding Family)</option>
-        <option value="a3" selected>Family 3 Kids — $59.99/year (Most Popular)</option>
-        <option value="a5">5 Kids — $129.99/year</option>
-        <option value="l1">1 Child — $149.99 Lifetime</option>
-        <option value="l3">Family 3 Kids — $249.99 Lifetime</option>
-        <option value="l5">5 Kids — $349.99 Lifetime</option>
-        <option value="c20">Church Starter (20 youth) — $399/year</option>
-        <option value="c50">Church Growth (50 youth) — $799/year</option>
-        <option value="cu">Church (up to 200) — $1,499/year</option>
-      </select>
-
-      <div style="border-top:1px solid rgba(255,255,255,.06);margin:1.2rem 0;"></div>
-      <div style="font-family:var(--fh);font-size:.7rem;font-weight:700;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:.3rem;">STEP 3 — NAME YOUR KIDS</div>
-      <div style="font-size:.72rem;color:var(--tx2);margin-bottom:.6rem;">Each child gets a unique access code and creates their own private login. You manage all accounts from your parent dashboard.</div>
-      <div id="rChildFields"></div>
-
-      <label>Referral Code (optional)</label>
-      <input type="text" id="rRef" placeholder="If someone referred you, enter their code">
-      
-      <label>Coupon Code (optional)</label>
-      <input type="text" id="rCoupon" placeholder="Enter coupon code for discount" oninput="applyCoupon()">
-      <div id="couponMsg" style="font-size:.6rem;min-height:1rem;margin-top:.2rem;"></div>
-
-      <!-- Order Summary -->
-      <div class="reg-sum">
-        <div class="reg-row"><span>Plan</span><span id="rsPlan">Family 3 Kids</span></div>
-        <div class="reg-row"><span>Billing</span><span id="rsBill">Annual</span></div>
-        <div class="reg-row" id="rsSaveRow" style="display:none;"><span style="color:var(--green);">Savings</span><span style="color:var(--green);" id="rsSave"></span></div>
-        <div class="reg-row"><span>Free trial</span><span style="color:var(--cyan);">3 days full access</span></div>
-        <div class="reg-row tot"><span>Due today</span><span id="rsTotal">$0.00</span></div>
-        <div style="font-size:.65rem;color:var(--tx3);margin-top:.3rem;">You won't be charged until the 3-day trial ends. Cancel anytime before.</div>
-      </div>
-
-      <!-- Trial vs Paid breakdown -->
-      <div style="margin-top:1rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:10px;padding:.8rem;">
-        <div style="font-size:.68rem;font-weight:700;color:var(--tx);margin-bottom:.35rem;">During your free trial:</div>
-        <div style="font-size:.63rem;color:var(--tx2);line-height:1.7;">
-          ✅ Full dashboard, goals, journal, mood, chores, schedule, calendar<br>
-          ✅ 2 sample lessons in every Life Skills category (preview all 18)<br>
-          ✅ Career Explorer preview (5 careers)<br>
-          ✅ Parent Dashboard with Life Score and behavior log<br>
-          🔒 Full lesson library (140+) unlocks on paid plan<br>
-          🔒 Quizzes, certificates, and badges unlock on paid plan<br>
-          🔒 Resume export and bio page sharing unlock on paid plan
-        </div>
-      </div>
-
-      <button class="btn bg blg" style="width:100%;margin-top:1.3rem;" onclick="doReg()">Create Parent Account & Start Trial →</button>
-
-      <div style="display:flex;justify-content:center;gap:.8rem;margin-top:.8rem;flex-wrap:wrap;font-size:.68rem;color:var(--tx3);">
-        <span>🔒 Secured by Stripe</span><span>💳 All major cards</span><span>✓ 30-day money-back guarantee</span>
-      </div>
-
-      <!-- What happens next -->
-      <div style="margin-top:1.2rem;padding:.8rem;background:rgba(79,143,255,.03);border:1px solid rgba(79,143,255,.08);border-radius:8px;">
-        <div style="font-size:.68rem;font-weight:700;color:var(--blue);margin-bottom:.3rem;">After you register:</div>
-        <div style="font-size:.63rem;color:var(--tx2);line-height:1.7;">
-          📧 Confirmation email sent with your parent login link<br>
-          📱 Verification code texted to your phone<br>
-          🔑 Unique code auto-generated for each child (e.g. <code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:3px;font-size:.65rem;">K4829103</code>)<br>
-          👧 Share each code with your child — they go to <strong>yourlifecc.com</strong>, enter their code, and create their own username + password<br>
-          👨‍👩‍👧 From your parent account you can: view all child accounts, reset passwords, access the Parent Dashboard, manage billing, and use your referral link to earn $10 per family
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══ FINAL CTA ═══ -->
+<!-- FINAL CTA -->
 <section class="sec" style="text-align:center;background:linear-gradient(180deg,var(--bg2),var(--bg));">
   <div class="wrap">
     <div style="font-size:2.5rem;margin-bottom:.8rem;">🚀</div>
     <h2>Give Your Child the<br>Unfair Advantage.</h2>
     <p style="color:var(--tx2);font-size:1.05rem;max-width:520px;margin:0 auto 2rem;line-height:1.7;">140+ life lessons. Career tools. Goal tracking. Parent visibility. Everything they need — and everything school forgot to teach.</p>
-    <a href="#register" class="btn bp blg">Start Your Free Trial →</a>
-    <div style="margin-top:1rem;color:var(--tx3);font-size:.82rem;">3-day free trial · No credit card required · 30-day guarantee</div>
+    <a href="register.html" class="btn bp blg">Create Your Account →</a>
+    <div style="margin-top:1rem;color:var(--tx3);font-size:.82rem;">Free plan available · No credit card required · 30-day guarantee</div>
   </div>
 </section>
 
-<!-- ═══ FOOTER ═══ -->
+<!-- FOOTER -->
 <footer>
   <div class="wrap">
     <div class="ft-grid">
@@ -1078,265 +522,36 @@ iv>
         <h4>Product</h4>
         <a href="#features">Features</a>
         <a href="#pricing">Pricing</a>
-      <a href="#sponsor">Sponsor</a>
         <a href="#church">Church Licenses</a>
         <a href="#video">Demo</a>
       </div>
       <div class="ft-col">
-        <h4>Company</h4>
-        <a href="#affiliate">Affiliate Program</a>
+        <h4>Account</h4>
+        <a href="register.html">Sign Up Free</a>
+        <a href="login.html">Sign In</a>
         <a href="#faq">FAQ</a>
-        <a href="/cdn-cgi/l/email-protection#71181f171e311a181f16151e1c5c1203141005180714025f121e1c">Contact</a>
+        <a href="mailto:support@yourlifecc.com">Contact</a>
       </div>
       <div class="ft-col">
-        <h4>Support</h4>
-        <a href="/cdn-cgi/l/email-protection#177e797178577c7e797073787a3a74657276637e6172643974787a"><span class="__cf_email__" data-cfemail="d8b1b6beb798b3b1b6bfbcb7b5f5bbaabdb9acb1aebdabf6bbb7b5">[email&#160;protected]</span></a>
-        <a href="#">Forgot Password</a>
-        <a href="#">Account Login</a>
+        <h4>Legal</h4>
         <a href="#">Privacy Policy</a>
         <a href="#">Terms of Service</a>
+        <a href="#">30-Day Guarantee</a>
       </div>
     </div>
-    <div class="ft-bottom">© 2026 Kingdom Creatives. All rights reserved. YourLife CC is a registered trademark.</div>
+    <div class="ft-bottom">© 2026 Kingdom Creatives. All rights reserved. YourLife CC is a trademark of Kingdom Creatives LLC.</div>
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-// ═══ PRICING TOGGLE ═══
+<script>
 function showPricing(type, btn){
-  document.getElementById('price-annual').style.display = type==='annual'?'grid':'none';
+  document.getElementById('price-monthly').style.display = type==='monthly'?'grid':'none';
+  document.getElementById('price-yearly').style.display = type==='yearly'?'grid':'none';
   document.getElementById('price-lifetime').style.display = type==='lifetime'?'grid':'none';
   document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('on'));
   btn.classList.add('on');
 }
 
-// ═══ REGISTRATION ═══
-const PLANS={
-  a1:{name:'1 Child',bill:'Annual',price:29.99,kids:1,retail:49.99},
-  a3:{name:'Family 3 Kids',bill:'Annual',price:59.99,kids:3,retail:149.97},
-  a5:{name:'5 Kids',bill:'Annual',price:129.99,kids:5,retail:249.95},
-  l1:{name:'1 Child Lifetime',bill:'Lifetime',price:149.99,kids:1,retail:0},
-  l3:{name:'Family 3 Kids Lifetime',bill:'Lifetime',price:249.99,kids:3,retail:449.97},
-  l5:{name:'5 Kids Lifetime',bill:'Lifetime',price:349.99,kids:5,retail:749.95},
-  c20:{name:'Church Starter (20)',bill:'Annual',price:399,kids:20,retail:0},
-  c50:{name:'Church Growth (50)',bill:'Annual',price:799,kids:50,retail:0},
-  cu:{name:'Church (up to 200)',bill:'Annual',price:1499,kids:0,retail:0},
-};
-
-function setP(qty, type){
-  const key = type==='annual'?'a'+qty:'l'+qty;
-  const sel = document.getElementById('rPlan');
-  if(sel) sel.value = key;
-  calcReg();
-}
-
-function genId(){
-  const L='ABCDEFGHJKLMNPQRSTUVWXYZ';
-  let d='';for(let i=0;i<7;i++) d+=Math.floor(Math.random()*10);
-  return L[Math.floor(Math.random()*L.length)]+d;
-}
-
-function calcReg(){
-  const plan = PLANS[document.getElementById('rPlan').value]||PLANS.a3;
-  document.getElementById('rsPlan').textContent = plan.name;
-  document.getElementById('rsBill').textContent = plan.bill;
-  const couponAmt = _couponApplied ? Math.round(plan.price * _couponDiscount) / 100 : 0;
-        document.getElementById('rsTotal').textContent = couponAmt > 0 ? '$0.00 (then $'+(plan.price - couponAmt).toFixed(2)+' after trial)' : '$0.00';
-
-  const saveRow = document.getElementById('rsSaveRow');
-  if(plan.retail > 0 && plan.retail > plan.price){
-    saveRow.style.display = 'flex';
-    document.getElementById('rsSave').textContent = '-$'+(plan.retail-plan.price).toFixed(2);
-  } else { saveRow.style.display = 'none'; }
-
-  const cf = document.getElementById('rChildFields');
-  if(plan.kids > 0 && plan.kids <= 10){
-    let h = '';
-    for(let i=0;i<plan.kids;i++){
-      h += `<label>${plan.kids>20?'Code '+(i+1):('Child '+(i+1)+' Name')}</label><input type="text" class="cn" placeholder="${plan.kids>20?'Auto-generated':'First and last name'}">`;
-    }
-    cf.innerHTML = h;
-  } else { cf.innerHTML = plan.kids>10?'<p style="margin-top:.8rem;font-size:.82rem;color:var(--tx2);">Access codes will be generated in your admin dashboard after purchase.</p>':''; }
-}
-
-function doReg(){
-  const name = document.getElementById('rName').value.trim();
-  const email = document.getElementById('rEmail').value.trim();
-  const phone = document.getElementById('rPhone').value.trim();
-  if(!name){alert('Please enter your name.');return;}
-  if(!email||!email.includes('@')){alert('Please enter a valid email.');return;}
-
-  const plan = PLANS[document.getElementById('rPlan').value]||PLANS.a3;
-  const kids = [];
-  document.querySelectorAll('.cn').forEach(el=>{
-    const v = el.value.trim();
-    if(v) kids.push({name:v, code:genId()});
-    else if(plan.kids<=10) kids.push({name:'Child '+(kids.length+1), code:genId()});
-  });
-
-  // In production: POST to backend → create Stripe Checkout Session → redirect
-  alert(
-    `✅ Trial Started!\n\n`+
-    `Name: ${name}\nEmail: ${email}\n`+
-    `Plan: ${plan.name} (${plan.bill})\n`+
-    `Price after trial: $${plan.price.toFixed(2)}\n\n`+
-    (kids.length?`Access Codes:\n${kids.map(k=>`  ${k.name} → ${k.code}`).join('\n')}\n\n`:'')+
-    `📧 Confirmation email sent to ${email}\n`+
-    `📱 Verification code sent to ${phone}\n\n`+
-    `Next: Create your login at yourlifecc.com`
-  );
-}
-
-// ═══ COUPON CODE ═══
-let _couponApplied = false;
-let _couponDiscount = 0;
-
-function applyCoupon(){
-  const code = (document.getElementById('rCoupon')||{}).value.trim().toUpperCase();
-  const msg = document.getElementById('couponMsg');
-  
-  const COUPONS = {
-    'KINGDOMCREATIVES': {pct:15, label:'Kingdom Creatives 15% Off'},
-    'LAUNCH': {pct:10, label:'Launch Day 10% Off'},
-    'CHURCH': {pct:20, label:'Church Partner 20% Off'},
-    'FAMILY': {pct:10, label:'Family Discount 10% Off'},
-  };
-  
-  if(COUPONS[code]){
-    _couponApplied = true;
-    _couponDiscount = COUPONS[code].pct;
-    if(msg) msg.innerHTML = '<span style="color:#22c55e;font-weight:700;">✅ '+COUPONS[code].label+' applied!</span>';
-    calcReg();
-  } else if(code.length > 0){
-    _couponApplied = false;
-    _couponDiscount = 0;
-    if(msg) msg.innerHTML = '<span style="color:#ef4444;">Invalid coupon code</span>';
-    calcReg();
-  } else {
-    _couponApplied = false;
-    _couponDiscount = 0;
-    if(msg) msg.innerHTML = '';
-    calcReg();
-  }
-}
-
-// ═══ USER COUNTER (animated) ═══
-function animateCounter(){
-  const el = document.getElementById('userCounter');
-  if(!el) return;
-  // Simulated count - replace with real API call in production
-  const target = 847;
-  let current = 0;
-  const duration = 2000;
-  const startTime = Date.now();
-  function step(){
-    const elapsed = Date.now() - startTime;
-    const progress = Math.min(1, elapsed/duration);
-    const ease = 1 - Math.pow(1-progress, 3);
-    current = Math.floor(target * ease);
-    el.textContent = current.toLocaleString();
-    if(progress < 1) requestAnimationFrame(step);
-    else el.textContent = target.toLocaleString();
-  }
-  step();
-}
-
-// Start counter when visible
-const counterObs = new IntersectionObserver((entries)=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting){ animateCounter(); counterObs.unobserve(e.target); }
-  });
-});
-const counterEl = document.getElementById('userCounter');
-if(counterEl) counterObs.observe(counterEl);
-
-// ═══ SPONSOR ═══
-let _sponsorType = 'child';
-let _sponsorCount = 1;
-
-function selectSponsor(type){
-  _sponsorType = type;
-  const form = document.getElementById('sponsorForm');
-  const multi = document.getElementById('spMultiField');
-  form.style.display = 'block';
-  document.getElementById('sponsorThankYou').style.display = 'none';
-  
-  if(type === 'child'){
-    _sponsorCount = 1;
-    document.getElementById('spEmoji').textContent = '👦';
-    document.getElementById('spTitle').textContent = 'Sponsor a Child';
-    multi.style.display = 'none';
-  } else if(type === 'family'){
-    _sponsorCount = 3;
-    document.getElementById('spEmoji').textContent = '👨‍👩‍👧‍👦';
-    document.getElementById('spTitle').textContent = 'Sponsor a Family';
-    multi.style.display = 'none';
-  } else {
-    _sponsorCount = 1;
-    document.getElementById('spEmoji').textContent = '🌍';
-    document.getElementById('spTitle').textContent = 'Sponsor Multiple Children';
-    multi.style.display = 'block';
-  }
-  updateSponsorTotal();
-  form.scrollIntoView({behavior:'smooth', block:'center'});
-}
-
-function adjustSponsorCount(delta){
-  _sponsorCount = Math.max(1, Math.min(50, _sponsorCount + delta));
-  document.getElementById('spCount').textContent = _sponsorCount;
-  updateSponsorTotal();
-}
-
-function updateSponsorTotal(){
-  let total, desc;
-  if(_sponsorType === 'child'){
-    total = 29.99; desc = '1 child for 1 year';
-  } else if(_sponsorType === 'family'){
-    total = 59.99; desc = '1 family (up to 3 children) for 1 year';
-  } else {
-    total = _sponsorCount * 29.99;
-    desc = _sponsorCount + ' child' + (_sponsorCount>1?'ren':'') + ' for 1 year';
-  }
-  document.getElementById('spTotal').textContent = '$' + total.toFixed(2);
-  document.getElementById('spDesc').textContent = desc;
-}
-
-function processSponsor(){
-  const name = (document.getElementById('spName')||{}).value.trim();
-  const email = (document.getElementById('spEmail')||{}).value.trim();
-  if(!name){ alert('Please enter your name.'); return; }
-  if(!email || !email.includes('@')){ alert('Please enter a valid email.'); return; }
-
-  // In production: create Stripe Checkout session via your backend
-  // For now: simulate the redirect
-  const total = _sponsorType === 'family' ? 59.99 : _sponsorCount * 29.99;
-  
-  // Stripe Payment Link (replace with your actual Stripe link in production)
-  const stripeUrl = 'https://checkout.stripe.com/pay/sponsor_placeholder';
-  
-  // Show thank you (in production this would happen after Stripe redirect back)
-  const thankMsg = document.getElementById('spThankMsg');
-  if(thankMsg){
-    const childText = _sponsorType === 'family' ? 'a family' : (_sponsorCount > 1 ? _sponsorCount + ' children' : 'a child');
-    thankMsg.innerHTML = `<b>${name}</b>, your generosity just sponsored <b>${childText}</b> for an entire year of YourLife CC. A confirmation and tax receipt has been sent to <b>${email}</b>.<br><br>The family you sponsored will receive their access within 24 hours along with your message of encouragement.`;
-  }
-  
-  document.getElementById('sponsorForm').style.display = 'none';
-  document.getElementById('sponsorThankYou').style.display = 'block';
-  
-  // Log for backend (in production: API call)
-  console.log('SPONSOR:', {name, email, type: _sponsorType, count: _sponsorCount, total, message: (document.getElementById('spMessage')||{}).value});
-  
-  // In production, redirect to Stripe:
-  // window.location.href = stripeUrl + '?client_reference_id=' + encodeURIComponent(JSON.stringify({name,email,type:_sponsorType,count:_sponsorCount}));
-}
-
-function resetSponsorForm(){
-  document.getElementById('sponsorForm').style.display = 'none';
-  document.getElementById('sponsorThankYou').style.display = 'none';
-}
-
-// ═══ FAQ ═══
 function tFaq(el){
   var a = el.nextElementSibling;
   var isOpen = el.classList.contains('on');
@@ -1349,8 +564,6 @@ function tFaq(el){
     a.style.padding = '0 1.2rem 1rem';
   }
 }
-
-// ═══ SCROLL REVEAL ═══
-
-
-// ═══ SMOOTH SCROLL 
+</script>
+</body>
+</html>
