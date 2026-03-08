@@ -81,46 +81,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   align-items:center;justify-content:space-between;padding:0 1rem;
 }
 .mBar-title{font-family:var(--fh);font-size:1.25rem;letter-spacing:3px;color:var(--c);}
-/* ── MOBILE QUICK ROW (below mBar) ─────────────── */
-#mobileQuickRow{
-  display:none;
-  position:fixed;top:54px;left:0;right:0;z-index:99985;
-  background:rgba(13,17,23,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border-bottom:1px solid rgba(255,255,255,.07);
-  padding:6px 10px;gap:6px;align-items:center;
-  overflow-x:auto;
-  scrollbar-width:none;
-}
-#mobileQuickRow::-webkit-scrollbar{display:none;}
-#mobileQuickRow .mqb{
-  flex-shrink:0;
-  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
-  color:var(--tx2);padding:5px 10px;border-radius:8px;
-  cursor:pointer;font-size:.68rem;font-weight:700;font-family:var(--fn);
-  display:flex;align-items:center;gap:.28rem;white-space:nowrap;
-}
-#mobileQuickRow .mqb-child{background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.18);color:#38bdf8;}
-#mobileQuickRow .mqb-parent{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.2);color:#a78bfa;}
-#mobileQuickRow .mqb-lang{background:rgba(255,255,255,.05);}
-#mobileQuickRow .mob-translate-wrap{position:relative;flex-shrink:0;}
-/* mob_translate_element is now position:fixed — see #mob_translate_element below */
-
-/* Mobile translate dropdown — fixed position so it floats ABOVE everything */
-#mob_translate_element{
-  position:fixed;
-  top:100px;left:8px;
-  z-index:999999;
-  background:#1e1e3a;border:1px solid rgba(56,189,248,.3);
-  border-radius:10px;padding:8px;display:none;
-  min-width:200px;
-  box-shadow:0 16px 48px rgba(0,0,0,.85);
-}
-#mob_translate_element select{
-  width:100%;font-size:.85rem;padding:.4rem .5rem;
-  background:#0d1b2a;color:#fff;border:1px solid rgba(56,189,248,.2);
-  border-radius:6px;cursor:pointer;
-}
-
 .hamb{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:8px;
   color:var(--tx);font-size:1rem;padding:.35rem .6rem;cursor:pointer;line-height:1;transition:background .15s;}
 .hamb:hover{background:rgba(255,255,255,.2);}
@@ -132,13 +92,13 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 #sideOverlay.open{display:block;}
 
 /* ─── MAIN CONTENT ────────────────────────────── */
-#mainWrap{margin-left:220px;min-height:100vh;position:relative;width:calc(100vw - 220px);}
+#mainWrap{margin-left:220px;min-height:100vh;position:relative;z-index:1;width:calc(100vw - 220px);}
 #app{padding:1.6rem 1.8rem 6rem;max-width:100%;}
 
 /* ─── SECTIONS (SPA — only active shows) ─────── */
 .sec{display:none;}
-.sec.active{display:block;}
-/* fadeUp animation removed — was creating stacking contexts trapping fixed dropdowns */
+.sec.active{display:block;animation:fadeUp .2s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
 /* ─── RESPONSIVE ──────────────────────────────── */
 
@@ -156,9 +116,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   #mainWrap{margin-left:0 !important;width:100% !important;}
   #app{padding:1rem .95rem 5rem;}
   #mBar{display:flex;}
-  #mainWrap{padding-top:100px;}
-  #topQuickBtns{display:none !important;}
-  #mobileQuickRow{display:flex !important;}
+  #mainWrap{padding-top:54px;}
   .g3,.g4{grid-template-columns:1fr 1fr;}
 }
 @media(max-width:520px){
@@ -327,13 +285,6 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 ::-webkit-scrollbar-thumb{background:var(--s4);border-radius:3px;}
 
 /* ── TOOLTIPS ───────────────────────────────────── */
-/* ── INLINE HELP BUTTONS ─────────────────────────────────── */
-.hlp{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);color:#38bdf8;font-size:.58rem;font-weight:900;cursor:pointer;flex-shrink:0;vertical-align:middle;margin-left:4px;transition:all .15s;user-select:none;line-height:1;}
-.hlp:hover{background:rgba(56,189,248,.32);transform:scale(1.2);}
-#hlpBox{position:fixed;z-index:99998;background:#0c1422;border:1px solid rgba(56,189,248,.35);border-radius:10px;padding:.7rem .9rem;max-width:270px;font-size:.76rem;color:#c8d4e8;line-height:1.6;box-shadow:0 6px 28px rgba(0,0,0,.7);pointer-events:none;transition:opacity .12s;opacity:0;}
-#hlpBox.show{opacity:1;}
-#hlpBox .hb-t{font-weight:800;color:#38bdf8;font-size:.78rem;margin-bottom:.28rem;}
-
 .tip-wrap{position:relative;display:inline-flex;align-items:center;gap:.3rem;}
 .tip-btn{width:17px;height:17px;border-radius:50%;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.35);color:var(--c);font-size:.65rem;font-weight:800;cursor:help;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s;font-family:var(--fm);line-height:1;}
 .tip-btn:hover{background:rgba(56,189,248,.4);}
@@ -354,7 +305,25 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .tip-title{font-family:var(--fh);font-size:.82rem;letter-spacing:1.5px;color:var(--c);margin-bottom:.38rem;}
 .tip-box b{color:#fff;}
 
-/* ── TUTORIAL CSS → see full definitions below ── */
+/* ── TUTORIAL ───────────────────────────────────── */
+#tutModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(12px);z-index:9999;align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto;}
+#tutModal.open{display:flex;}
+#tutInner{background:var(--s2);border:1px solid rgba(56,189,248,.2);border-radius:18px;width:100%;max-width:700px;margin:auto;overflow:hidden;box-shadow:0 30px 100px rgba(0,0,0,.8);}
+.tut-header{background:linear-gradient(135deg,rgba(56,189,248,.1),rgba(167,139,250,.07));padding:1.5rem 1.8rem .9rem;border-bottom:1px solid rgba(56,189,248,.1);}
+.tut-nav{display:flex;gap:.3rem;flex-wrap:wrap;padding:.7rem 1.2rem;background:var(--s1);border-bottom:1px solid rgba(255,255,255,.05);}
+.tut-nb{padding:.28rem .65rem;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;background:rgba(255,255,255,.06);color:var(--tx2);border:none;font-family:var(--fm);transition:all .13s;}
+.tut-nb.active,.tut-nb:hover{background:var(--c);color:#000;}
+.tut-body{padding:1.4rem 1.8rem 1.8rem;min-height:360px;}
+.tut-step{display:none;}
+.tut-step.active{display:block;animation:fadeIn .2s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.tut-step h3{font-family:var(--fh);font-size:1.05rem;letter-spacing:2px;color:var(--c);margin-bottom:.85rem;}
+.tut-step p{font-size:.86rem;color:#c8d4e8;line-height:1.72;margin-bottom:.65rem;}
+.tut-row{display:flex;align-items:flex-start;gap:.75rem;background:rgba(255,255,255,.04);border-radius:10px;padding:.72rem .9rem;margin-bottom:.45rem;border-left:3px solid rgba(56,189,248,.25);}
+.tut-icon{font-size:1.35rem;flex-shrink:0;}
+.tut-row-text{font-size:.83rem;color:#c8d4e8;line-height:1.65;}
+.tut-row-text b{color:#fff;display:block;margin-bottom:.1rem;}
+.tut-foot{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.8rem;border-top:1px solid rgba(255,255,255,.06);background:var(--s1);}
 .editable-name{color:var(--c);cursor:pointer;position:relative;}
 .editable-name::after{content:' ✎';font-size:.45em;opacity:0;transition:opacity .2s;vertical-align:middle;color:var(--mt);}
 .editable-name:hover::after{opacity:1;}
@@ -411,7 +380,9 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 :root.light .tut-header{background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(167,139,250,.05));}
 :root.light .tut-nav,:root.light .tut-foot{background:#f8fafc;}
 :root.light .tut-nb{background:rgba(0,0,0,.06);color:#475569;}
-
+:root.light .tut-row{background:rgba(0,0,0,.04);border-left-color:rgba(56,189,248,.35);}
+:root.light .tut-row-text{color:#475569;}
+:root.light .tut-row-text b{color:#0f172a;}
 :root.light .tut-step p{color:#475569;}
 :root.light .mo{background:rgba(0,0,0,.5);}
 :root.light .md{background:#fff;border-color:rgba(0,0,0,.1);}
@@ -1444,440 +1415,32 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .nav-child{opacity:.9;font-size:.76rem!important;}
 .nav-child:hover{opacity:1;}
 
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-.child-pin-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;border-radius:12px;padding:.9rem;font-size:1.1rem;font-weight:700;cursor:pointer;transition:all .1s;font-family:var(--fn);}
-.child-pin-btn:hover{background:rgba(255,255,255,.15);}
-.child-pin-btn:active{transform:scale(.94);}
-/* Google Translate */
+/* Google Translate compact styling */
+#google_translate_element select{background:#1a1a2e;border:1px solid rgba(255,255,255,.15);color:#e0e0e0;border-radius:8px;padding:6px 10px;font-size:.72rem;font-family:var(--fn);cursor:pointer;outline:none;min-width:140px;}
 #google_translate_element .goog-te-gadget{font-size:0!important;color:transparent!important;}
-#google_translate_element .goog-te-gadget select,
-#google_translate_element .goog-te-combo{
-  font-size:.8rem!important;
-  background:transparent!important;
-  color:#e0e0e0!important;
-  border:none!important;
-  width:100%!important;
-  cursor:pointer!important;
-  outline:none!important;
-  padding:2px 4px!important;
-}
-#google_translate_element .goog-te-gadget select option,
-#google_translate_element .goog-te-combo option{
-  background:#1e1e3a!important;
-  color:#e0e0e0!important;
-}
+#google_translate_element .goog-te-gadget span{display:none!important;}
+#google_translate_element .goog-te-gadget .goog-te-combo{margin:0!important;}
 .goog-te-banner-frame{display:none!important;}
-iframe.skiptranslate{display:none!important;}
 body{top:0!important;}
+.skiptranslate{display:none!important;}
 #goog-gt-tt{display:none!important;}
 
-
-/* ════ FLOATING START-HERE BUTTON ════════════════════════ */
-#startHereBtn{
-  position:fixed;
-  /* Hero section center — below top bars, visible in hero */
-  bottom:auto;
-  top:50%;
-  right:20px;
-  transform:translateY(-50%);
-  z-index:8800;
-  display:flex;flex-direction:column;align-items:center;gap:5px;
-  cursor:pointer;
-  transition:opacity .4s, transform .4s;
-}
-#startHereBtn.sh-hidden{
-  opacity:0;pointer-events:none;transform:translateY(-50%) scale(.7);
-}
-#startHereBtn .sh-bubble{
-  background:linear-gradient(135deg,#38bdf8,#818cf8);
-  color:#fff;font-size:.8rem;font-weight:900;
-  padding:6px 14px;border-radius:100px;white-space:nowrap;
-  box-shadow:0 6px 24px rgba(56,189,248,.6);
-  letter-spacing:.3px;
-  animation:shPulse 2s ease-in-out infinite;
-}
-@keyframes shPulse{
-  0%,100%{box-shadow:0 6px 24px rgba(56,189,248,.6);}
-  50%{box-shadow:0 6px 36px rgba(56,189,248,1), 0 0 60px rgba(56,189,248,.3);}
-}
-#startHereBtn .sh-emoji{
-  font-size:3rem;
-  animation:shBounce 1s cubic-bezier(.36,.07,.19,.97) infinite;
-  filter:drop-shadow(0 6px 12px rgba(56,189,248,.5));
-}
-@keyframes shBounce{
-  0%,100%{transform:translateY(0) rotate(0deg);}
-  30%{transform:translateY(-12px) rotate(-5deg);}
-  60%{transform:translateY(-5px) rotate(3deg);}
-  80%{transform:translateY(-9px) rotate(-2deg);}
-}
-#startHereBtn:hover .sh-emoji{animation-play-state:paused;transform:scale(1.2) rotate(0);}
-@media(max-width:860px){
-  #startHereBtn{ top:55%; right:12px; }
-}
-
-/* ════ ONBOARDING WIZARD (PARENT) ═══════════════════════ */
-#parentOnboard{
-  display:none;position:fixed;inset:0;z-index:99998;
-  background:rgba(0,0,0,.93);backdrop-filter:blur(18px);
-  align-items:center;justify-content:center;padding:1rem;
-}
-#parentOnboard.open{display:flex;animation:fadeInModal .35s ease;}
-
-/* ════ ONBOARDING WIZARD (KID) ══════════════════════════ */
-#kidOnboard{
-  display:none;position:fixed;inset:0;z-index:99998;
-  background:rgba(0,0,0,.93);backdrop-filter:blur(18px);
-  align-items:center;justify-content:center;padding:1rem;
-}
-#kidOnboard.open{display:flex;animation:fadeInModal .35s ease;}
-
-@keyframes fadeInModal{from{opacity:0;transform:scale(.96);}to{opacity:1;transform:none;}}
-
-/* ════ SHARED WIZARD STYLES ═════════════════════════════ */
-/* ═══════════════════════════════════════════════════════
-   ONBOARDING WIZARD — FULL REWRITE (bigger, animated)
-═══════════════════════════════════════════════════════ */
-
-/* Backdrop */
-#parentOnboard, #kidOnboard {
-  display:none; position:fixed; inset:0; z-index:99999;
-  background:rgba(0,0,0,.88);
-  backdrop-filter:blur(20px);
-  align-items:center; justify-content:center;
-  padding:1rem;
-  overflow:hidden;
-  box-sizing:border-box;
-}
-@media(max-width:860px){
-  #parentOnboard, #kidOnboard {
-    align-items:flex-start;
-    padding-top:112px;
-    padding-bottom:1rem;
-    overflow-y:auto;
-  }
-  .ob-box {
-    margin-top:0;
-    max-height:calc(100vh - 124px);
-  }
-}
-#parentOnboard.open, #kidOnboard.open {
-  display:flex;
-  animation:obBackdropIn .3s ease;
-}
-@keyframes obBackdropIn {
-  from{opacity:0;} to{opacity:1;}
-}
-
-/* Main box */
-.ob-box {
-  background:linear-gradient(145deg,#0d1b2a 0%,#1a2640 50%,#0d1b2a 100%);
-  border:1px solid rgba(56,189,248,.2);
-  border-radius:24px;
-  width:94vw;
-  max-width:580px;
-  max-height:92vh;
-  display:flex; flex-direction:column;
-  box-shadow:0 40px 120px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.04), inset 0 1px 0 rgba(255,255,255,.07);
-  overflow:hidden;
-  animation:obBoxIn .4s cubic-bezier(.34,1.56,.64,1);
-  position:relative;
-  box-sizing:border-box;
-}
-@keyframes obBoxIn {
-  from{opacity:0; transform:scale(.88) translateY(24px);}
-  to{opacity:1; transform:none;}
-}
-
-/* Animated top border glow */
-.ob-box::before {
-  content:''; position:absolute; top:0; left:0; right:0; height:2px;
-  background:linear-gradient(90deg,transparent,#38bdf8,#818cf8,#34d399,transparent);
-  background-size:200% 100%;
-  animation:obBorderFlow 3s linear infinite;
-}
-@keyframes obBorderFlow {
-  0%{background-position:200% 0;} 100%{background-position:-200% 0;}
-}
-
-/* Slide container */
-.ob-slides-wrap {
-  flex:1; overflow:hidden; min-height:0; position:relative;
-}
-.ob-slides {
-  display:flex;
-  transition:transform .45s cubic-bezier(.4,0,.2,1);
-  will-change:transform;
-  height:100%;
-}
-.ob-slide {
-  min-width:100%; flex-shrink:0; width:100%;
-  padding:1.2rem 1.5rem 1rem;
-  box-sizing:border-box;
-  overflow-y:auto;
-  max-height:calc(88vh - 80px);
-}
-@media(max-width:860px){
-  .ob-slide { padding-top:2rem; }
-  .ob-hero { padding-top:.5rem; }
-  .ob-hero-emoji { font-size:2.4rem; margin-bottom:.3rem; }
-  .ob-hero-title { font-size:1.15rem; }
-}
-.ob-slide::-webkit-scrollbar{width:4px;}
-.ob-slide::-webkit-scrollbar-thumb{background:rgba(56,189,248,.3);border-radius:2px;}
-
-/* Hero section per slide */
-.ob-hero { text-align:center; margin-bottom:1rem; padding-top:.2rem; }
-.ob-hero-emoji {
-  font-size:3.2rem; display:block; margin-bottom:.5rem;
-  animation:obFloat 2.8s ease-in-out infinite;
-  filter:drop-shadow(0 8px 24px rgba(56,189,248,.3));
-}
-@keyframes obFloat {
-  0%,100%{transform:translateY(0) rotate(-2deg);}
-  50%{transform:translateY(-14px) rotate(2deg);}
-}
-.ob-hero-title {
-  font-family:var(--fh); font-size:1.35rem; letter-spacing:2px;
-  color:var(--c); margin-bottom:.5rem;
-  text-shadow:0 0 40px rgba(56,189,248,.4);
-  word-break:break-word;
-}
-.ob-hero-sub {
-  font-size:.83rem; color:var(--tx2); line-height:1.65;
-  max-width:100%; margin:0 auto;
-}
-
-/* Feature cards grid */
-.ob-steps-grid {
-  display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:.6rem; margin-bottom:1rem;
-  width:100%; box-sizing:border-box;
-}
-.ob-step-card:nth-child(1){animation:obFadeUp .35s ease .05s both;}
-.ob-step-card:nth-child(2){animation:obFadeUp .35s ease .1s both;}
-.ob-step-card:nth-child(3){animation:obFadeUp .35s ease .15s both;}
-.ob-step-card:nth-child(4){animation:obFadeUp .35s ease .2s both;}
-.ob-step-card:nth-child(5){animation:obFadeUp .35s ease .25s both;}
-.ob-step-card:nth-child(6){animation:obFadeUp .35s ease .3s both;}
-@keyframes obFadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
-.ob-step-card {
-  background:rgba(255,255,255,.04);
-  border-radius:14px; padding:.85rem .8rem;
-  border:1px solid rgba(255,255,255,.07);
-  position:relative; overflow:hidden;
-  transition:transform .2s, border-color .2s, background .2s;
-  cursor:default;
-  box-sizing:border-box;
-  min-width:0;
-  word-break:break-word;
-}
-.ob-step-card:hover {
-  transform:translateY(-2px);
-  border-color:rgba(56,189,248,.25);
-  background:rgba(56,189,248,.05);
-}
-.ob-step-card::before {
-  content:''; position:absolute; top:0; left:0; right:0; height:2px;
-  background:linear-gradient(90deg,var(--accent,#38bdf8),transparent);
-}
-.ob-step-card .osc-icon { font-size:1.6rem; margin-bottom:.4rem; display:block; }
-.ob-step-card .osc-title { font-size:.85rem; font-weight:800; margin-bottom:.25rem; color:#fff; }
-.ob-step-card .osc-desc { font-size:.73rem; color:var(--tx2); line-height:1.6; }
-
-/* Numbered checklist */
-.ob-checklist { list-style:none; display:flex; flex-direction:column; gap:.5rem; margin-bottom:1.1rem; }
-.ob-checklist li {
-  display:flex; align-items:flex-start; gap:.7rem;
-  font-size:.81rem; color:var(--tx2); line-height:1.6;
-  background:rgba(255,255,255,.03); border-radius:10px; padding:.55rem .75rem;
-  border:1px solid rgba(255,255,255,.04);
-  animation:obSlideIn .3s ease both;
-  box-sizing:border-box; min-width:0; word-break:break-word;
-}
-.ob-checklist li:nth-child(1){animation-delay:.05s;}
-.ob-checklist li:nth-child(2){animation-delay:.1s;}
-.ob-checklist li:nth-child(3){animation-delay:.15s;}
-.ob-checklist li:nth-child(4){animation-delay:.2s;}
-.ob-checklist li:nth-child(5){animation-delay:.25s;}
-@keyframes obSlideIn {
-  from{opacity:0; transform:translateX(-12px);}
-  to{opacity:1; transform:none;}
-}
-.ob-checklist li .obc-n {
-  background:linear-gradient(135deg,#38bdf8,#818cf8); color:#06101e;
-  border-radius:50%; width:22px; height:22px; font-size:.68rem; font-weight:900;
-  display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px;
-  box-shadow:0 2px 8px rgba(56,189,248,.4);
-}
-.ob-checklist b { color:#fff; }
-
-/* Tip box */
-.ob-tip {
-  background:rgba(251,191,36,.06); border:1px solid rgba(251,191,36,.2);
-  border-radius:12px; padding:.7rem .85rem; font-size:.76rem; color:#fde68a;
-  margin-bottom:.8rem; line-height:1.6;
-  display:flex; align-items:flex-start; gap:.5rem;
-  width:100%; box-sizing:border-box; word-break:break-word;
-}
-.ob-tip strong { color:#fbbf24; }
-
-/* Footer nav */
-.ob-footer {
-  padding:1rem 1.5rem 1.2rem;
-  border-top:1px solid rgba(255,255,255,.07);
-  display:flex; align-items:center; justify-content:space-between; gap:.6rem;
-  background:rgba(0,0,0,.25); flex-shrink:0;
-}
-.ob-dots { display:flex; gap:.45rem; align-items:center; }
-.ob-dot {
-  width:7px; height:7px; border-radius:50%;
-  background:rgba(255,255,255,.15); transition:all .3s cubic-bezier(.34,1.56,.64,1);
-}
-.ob-dot.act { background:var(--c); width:22px; border-radius:4px; box-shadow:0 0 8px var(--c); }
-
-.ob-nav-btn {
-  background:linear-gradient(135deg,var(--c),var(--p));
-  color:#06101e; border:none; border-radius:12px;
-  padding:.65rem 1.6rem; font-size:.88rem; font-weight:900; cursor:pointer;
-  font-family:var(--fn); transition:all .2s;
-  box-shadow:0 4px 16px rgba(56,189,248,.35);
-  letter-spacing:.3px;
-}
-.ob-nav-btn:hover { transform:translateY(-1px); box-shadow:0 6px 22px rgba(56,189,248,.5); filter:brightness(1.1); }
-.ob-nav-btn:active { transform:translateY(0); }
-.ob-nav-btn.ghost {
-  background:rgba(255,255,255,.08); color:var(--tx2);
-  border:1px solid rgba(255,255,255,.12); box-shadow:none;
-}
-.ob-nav-btn.ghost:hover { background:rgba(255,255,255,.14); transform:none; }
-.ob-nav-btn:disabled { opacity:.3; cursor:not-allowed; transform:none !important; }
-.ob-skip {
-  font-size:.7rem; color:var(--tx3); cursor:pointer;
-  text-decoration:underline; transition:color .15s;
-}
-.ob-skip:hover { color:var(--tx2); }
-
-/* Kid wizard overrides */
-#kidOnboard .ob-box { border-color:rgba(245,158,11,.25); }
-#kidOnboard .ob-box::before { background:linear-gradient(90deg,transparent,#f59e0b,#ef4444,#f59e0b,transparent); }
-#kidOnboard .ob-hero-title { color:#f59e0b; text-shadow:0 0 40px rgba(245,158,11,.4); }
-#kidOnboard .ob-dot.act { background:#f59e0b; box-shadow:0 0 8px #f59e0b; }
-#kidOnboard .ob-nav-btn { background:linear-gradient(135deg,#f59e0b,#ef4444); box-shadow:0 4px 16px rgba(245,158,11,.35); }
-#kidOnboard .ob-step-card:hover { border-color:rgba(245,158,11,.3); background:rgba(245,158,11,.05); }
-#kidOnboard .obc-n { background:linear-gradient(135deg,#f59e0b,#ef4444); box-shadow:0 2px 8px rgba(245,158,11,.4); }
-#kidOnboard .ob-hero-emoji { filter:drop-shadow(0 8px 24px rgba(245,158,11,.3)); }
-
-
-/* ════ ENHANCED TUTORIAL MODAL ══════════════════════════ */
-#tutModal{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.94);backdrop-filter:blur(16px);
-  z-index:9999;align-items:flex-start;justify-content:center;
-  padding:1rem;overflow-y:auto;
-  /* Desktop: account for no top bar */
-  padding-top:1.5rem;
-}
-@media(max-width:860px){
-  #tutModal{ padding-top:108px; }
-}
-#tutModal.open{display:flex;}
-#tutInner{
-  background:linear-gradient(160deg,#0c1525,#111827);
-  border-radius:20px;max-width:640px;width:100%;margin:auto;
-  border:1px solid rgba(255,255,255,.08);
-  box-shadow:0 40px 100px rgba(0,0,0,.7);
-  overflow:hidden;
-}
-.tut-header{
-  padding:1.4rem 1.6rem 1rem;
-  background:linear-gradient(135deg,rgba(56,189,248,.06),rgba(129,140,248,.04));
-  border-bottom:1px solid rgba(255,255,255,.07);
-}
-.tut-nav{
-  display:flex;gap:.3rem;flex-wrap:wrap;padding:.7rem 1rem;
-  border-bottom:1px solid rgba(255,255,255,.06);
-  background:rgba(0,0,0,.2);
-}
-.tut-nb{
-  background:transparent;border:1px solid rgba(255,255,255,.08);color:var(--tx3);
-  border-radius:6px;padding:.2rem .55rem;font-size:.62rem;font-weight:700;
-  cursor:pointer;font-family:var(--fn);transition:all .15s;white-space:nowrap;
-}
-.tut-nb:hover{background:rgba(255,255,255,.06);color:var(--tx2);}
-.tut-nb.active{background:var(--c);color:#06101e;border-color:var(--c);}
-.tut-body{padding:1.2rem 1.6rem;}
-.tut-step{display:none;}
-.tut-step.active{display:block;animation:fadeUp .25s ease;}
-.tut-step h3{
-  font-family:var(--fh);font-size:1.05rem;letter-spacing:1px;color:var(--c);
-  margin-bottom:.3rem;display:flex;align-items:center;gap:.5rem;
-}
-.tut-step > p{font-size:.82rem;color:var(--tx2);line-height:1.65;margin-bottom:.9rem;}
-.tut-row{
-  display:flex;align-items:flex-start;gap:.75rem;
-  background:rgba(255,255,255,.03);border-radius:10px;
-  padding:.72rem .9rem;margin-bottom:.45rem;
-  border-left:3px solid rgba(56,189,248,.25);
-  transition:border-color .15s;
-}
-.tut-row:hover{border-left-color:rgba(56,189,248,.6);}
-.tut-icon{font-size:1.2rem;flex-shrink:0;margin-top:.05rem;}
-.tut-row-text{font-size:.82rem;color:#c8d4e8;line-height:1.65;}
-.tut-row-text b{color:#fff;display:block;margin-bottom:.1rem;}
-.tut-visual{
-  background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.1);
-  border-radius:10px;padding:.7rem 1rem;margin-bottom:.7rem;
-  font-size:.75rem;color:var(--tx2);line-height:1.7;
-}
-.tut-visual .tv-label{font-size:.62rem;color:var(--c);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:.3rem;}
-.tut-visual .tv-path{display:flex;align-items:center;gap:.3rem;flex-wrap:wrap;font-weight:600;color:var(--tx);}
-.tut-visual .tv-path span{background:rgba(255,255,255,.08);border-radius:5px;padding:2px 7px;font-size:.72rem;}
-.tut-visual .tv-path .arr{color:var(--tx3);}
-.tut-footer{
-  padding:.8rem 1.6rem 1.2rem;border-top:1px solid rgba(255,255,255,.07);
-  display:flex;align-items:center;justify-content:space-between;gap:.5rem;
-  background:rgba(0,0,0,.15);
-}
-:root.light .tut-row{background:rgba(0,0,0,.03);border-left-color:rgba(56,189,248,.3);}
-:root.light .tut-row-text{color:#475569;}
-:root.light .tut-row-text b{color:#0f172a;}
-:root.light #tutInner{background:linear-gradient(160deg,#f8fafc,#f1f5f9);}
-:root.light .tut-header{background:rgba(56,189,248,.04);}
 </style>
 </head>
 <body>
 <!-- FIRST TIME PARENT PIN SETUP -->
-<div id="firstTimeGate" style="display:none;position:fixed;inset:0;z-index:9999;background:linear-gradient(145deg,#050d1a,#0d1b2a);align-items:center;justify-content:center;">
-  <div style="text-align:center;max-width:420px;width:92vw;padding:2.5rem 2rem;background:rgba(255,255,255,.03);border:1px solid rgba(56,189,248,.15);border-radius:24px;box-shadow:0 40px 100px rgba(0,0,0,.6);">
-    <div style="font-size:3.5rem;margin-bottom:.6rem;animation:obFloat 3s ease-in-out infinite;display:inline-block;">🔒</div>
-    <div style="font-family:var(--fh);font-size:1.4rem;letter-spacing:2px;color:var(--c);margin-bottom:.4rem;">WELCOME TO LIFE OS</div>
-    <div style="font-size:.83rem;color:var(--tx2);margin-bottom:1.8rem;line-height:1.75;">You're almost in! Create a <strong style="color:#fff;">6-digit Parent PIN</strong> to protect the Parent Hub and all parental controls. Kids will never see this PIN.</div>
-
-    <div style="font-size:.72rem;font-weight:700;color:var(--c);letter-spacing:1px;text-transform:uppercase;margin-bottom:.5rem;">Create Your 6-Digit PIN</div>
-    <div style="display:flex;justify-content:center;gap:.45rem;margin-bottom:.7rem;" id="ftDots1">
-      <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd1_0"></div>
-      <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd1_1"></div>
-      <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd1_2"></div>
-      <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd1_3"></div>
-      <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd1_4"></div>
-      <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd1_5"></div>
-    </div>
-    <input type="password" id="ftPinInput" maxlength="6" placeholder="••••••" style="width:200px;text-align:center;font-size:1.6rem;letter-spacing:.8rem;margin-bottom:.8rem;padding:.65rem;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(56,189,248,.2);color:#fff;outline:none;" oninput="ftUpdateDots(1)" onkeyup="if(event.key==='Enter')document.getElementById('ftPinConfirm').focus()">
-
-    <div style="font-size:.72rem;font-weight:700;color:var(--c);letter-spacing:1px;text-transform:uppercase;margin-bottom:.5rem;margin-top:.4rem;">Confirm Your PIN</div>
-    <div style="display:flex;justify-content:center;gap:.45rem;margin-bottom:.7rem;" id="ftDots2">
-      <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd2_0"></div>
-      <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd2_1"></div>
-      <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd2_2"></div>
-      <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd2_3"></div>
-      <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd2_4"></div>
-      <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd2_5"></div>
-    </div>
-    <input type="password" id="ftPinConfirm" maxlength="6" placeholder="••••••" style="width:200px;text-align:center;font-size:1.6rem;letter-spacing:.8rem;margin-bottom:1.2rem;padding:.65rem;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(56,189,248,.2);color:#fff;outline:none;" oninput="ftUpdateDots(2)" onkeyup="if(event.key==='Enter')setupFirstPin()">
-
+<div id="firstTimeGate" style="display:none;position:fixed;inset:0;z-index:9999;background:var(--bg);align-items:center;justify-content:center;">
+  <div style="text-align:center;max-width:400px;padding:2rem;">
+    <div style="font-size:3rem;margin-bottom:.5rem;">🔒</div>
+    <div style="font-family:var(--fh);font-size:1.3rem;letter-spacing:2px;color:var(--c);margin-bottom:.3rem;">WELCOME TO LIFE OS</div>
+    <div style="font-size:.85rem;color:var(--tx2);margin-bottom:1.5rem;line-height:1.7;">Before getting started, a parent needs to create a 6-digit PIN. This PIN protects Parent Hub, Settings, and all parental controls.</div>
+    <div style="font-size:.75rem;font-weight:700;color:var(--tx);margin-bottom:.4rem;">Create Your Parent PIN</div>
+    <input type="password" id="ftPinInput" maxlength="6" placeholder="••••••" style="width:200px;text-align:center;font-size:1.5rem;letter-spacing:.6rem;margin-bottom:.5rem;padding:.6rem;" onkeyup="if(event.key==='Enter')document.getElementById('ftPinConfirm').focus()">
+    <div style="font-size:.75rem;font-weight:700;color:var(--tx);margin-bottom:.4rem;margin-top:.5rem;">Confirm PIN</div>
+    <input type="password" id="ftPinConfirm" maxlength="6" placeholder="••••••" style="width:200px;text-align:center;font-size:1.5rem;letter-spacing:.6rem;margin-bottom:1rem;padding:.6rem;" onkeyup="if(event.key==='Enter')setupFirstPin()">
     <br>
-    <button class="btn bp" onclick="setupFirstPin()" style="font-size:.95rem;padding:.75rem 2.5rem;border-radius:14px;font-weight:900;letter-spacing:.5px;box-shadow:0 4px 20px rgba(56,189,248,.35);">🔓 Set PIN &amp; Get Started</button>
-    <div id="ftPinError" style="font-size:.75rem;color:#f87171;margin-top:.7rem;min-height:1.2rem;font-weight:600;"></div>
+    <button class="btn bp" onclick="setupFirstPin()" style="font-size:.9rem;padding:.6rem 2rem;">🔓 Set PIN & Get Started</button>
+    <div id="ftPinError" style="font-size:.72rem;color:#ef4444;margin-top:.5rem;min-height:1rem;"></div>
   </div>
 </div>
 
@@ -1894,9 +1457,7 @@ body{top:0!important;}
 
   <!-- Tutorial launcher -->
 
-  <button class="btn bg_" style="width:100%;margin-bottom:.5rem;font-size:.75rem;white-space:normal;line-height:1.3;padding:.45rem .5rem;text-align:center;" onclick="closeSettings();D.parentWizardDone=false;setTimeout(showParentOnboard,100)">🚀 Quick Start Wizard</button>
-    <button style="width:100%;margin-bottom:.5rem;font-size:.75rem;white-space:normal;line-height:1.3;padding:.5rem .5rem;text-align:center;background:linear-gradient(135deg,#f59e0b,#f97316);color:#000;font-weight:900;border:none;border-radius:9px;cursor:pointer;font-family:var(--fn);box-shadow:0 3px 12px rgba(245,158,11,.4);" onclick="closeSettings();setTimeout(openTutorial,320)">📖 Full Detailed Tutorial</button>
-    <button class="btn bg_" style="width:100%;margin-bottom:.85rem;font-size:.75rem;white-space:normal;line-height:1.3;padding:.45rem .5rem;text-align:center;display:none;" onclick="closeSettings();setTimeout(openTutorial,320)">🎓 How to Use Life OS &mdash; Full Tutorial</button>
+  <button class="btn bg_" style="width:100%;margin-bottom:.85rem;font-size:.82rem;" onclick="closeSettings();openTutorial()">🎓 HOW TO USE LIFE OS — Full Tutorial</button>
   <div style="background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.15);border-radius:10px;padding:.9rem;margin-bottom:.85rem;">
     <label style="margin-top:0;">👤 Your Name</label>
     <input type="text" id="settingsName" placeholder="Enter your name">
@@ -2086,44 +1647,28 @@ body{top:0!important;}
   <div class="mBar-title">LIFE OS</div>
   <div style="display:flex;gap:.4rem;align-items:center;">
     <span id="svi2" style="font-size:.62rem;color:var(--gr);opacity:0;transition:opacity .3s;">✓</span>
+
+    <button class="btn bgh bs" onclick="openSettings()" style="padding:.28rem .6rem;font-size:.75rem;">⚙</button>
     <button class="hamb" onclick="toggleSidebar()">☰</button>
   </div>
 </div>
 
-<!-- MOBILE QUICK ROW (below mBar, mobile only) -->
-<div id="mobileQuickRow">
-  <div class="mob-translate-wrap">
-    <button class="mqb mqb-lang" onclick="toggleMobTranslate()">
-      <svg width="13" height="13" viewBox="0 0 24 24" style="flex-shrink:0;"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-      Language
-    </button>
-
-  </div>
-  <button class="mqb mqb-child" onclick="openChildLogin()">👤 Child Login</button>
-  <button class="mqb mqb-parent" onclick="quickParentHub()">👨‍👩‍👧 Parent</button>
-  <button class="mqb" onclick="quickSettings()">⚙ Settings</button>
-</div>
-
 
 <!-- ═══ TOP-RIGHT QUICK BUTTONS ═══ -->
-<div id="topQuickBtns" style="position:fixed;top:12px;right:16px;z-index:99990;display:flex;gap:.4rem;align-items:center;">
+<div id="topQuickBtns" style="position:fixed;top:12px;right:16px;z-index:95;display:flex;gap:.4rem;align-items:center;">
   <div style="position:relative;display:flex;align-items:center;" id="translateWrap">
-    <button onclick="toggleTranslateDropdown()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--tx2);padding:5px 10px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:var(--fn);display:flex;align-items:center;gap:.35rem;transition:all .15s;" onmouseenter="this.style.background='rgba(255,255,255,.12)'" onmouseleave="this.style.background='rgba(255,255,255,.06)'" title="Translate">
+    <button onclick="toggleTranslateDropdown()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--tx2);padding:5px 10px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:var(--fn);display:flex;align-items:center;gap:.35rem;" title="Translate">
       <svg width="14" height="14" viewBox="0 0 24 24" style="flex-shrink:0;"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       <span style="font-size:.68rem;">Language</span>
     </button>
-    <div id="google_translate_element" style="position:fixed;top:50px;right:16px;z-index:999999;background:#1e1e3a;border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:6px;display:none;min-width:200px;box-shadow:0 12px 48px rgba(0,0,0,.8);"></div>
+    <div id="google_translate_element" style="position:absolute;top:100%;right:0;margin-top:4px;z-index:999;display:none;"></div>
   </div>
-  <button onclick="openChildLogin()" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.15);color:#38bdf8;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:var(--fn);display:flex;align-items:center;gap:.3rem;transition:all .15s;" onmouseenter="this.style.background='rgba(56,189,248,.16)'" onmouseleave="this.style.background='rgba(56,189,248,.08)'">👤 Child Login <span class="hlp" onmouseenter="hlp('childlogin',this,event)" onmouseleave="hlpHide()">?</span></button>
   <button onclick="quickParentHub()" style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.2);color:#a78bfa;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:var(--fn);display:flex;align-items:center;gap:.3rem;transition:all .15s;" onmouseenter="this.style.background='rgba(139,92,246,.2)'" onmouseleave="this.style.background='rgba(139,92,246,.12)'">👨‍👩‍👧 Parent</button>
   <button onclick="quickSettings()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--tx2);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:var(--fn);display:flex;align-items:center;gap:.3rem;transition:all .15s;" onmouseenter="this.style.background='rgba(255,255,255,.12)'" onmouseleave="this.style.background='rgba(255,255,255,.06)'">⚙ Settings</button>
 </div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
-
-<!-- MOBILE TRANSLATE DROPDOWN — fixed, outside all overflow containers -->
-<div id="mob_translate_element"></div>
 
 <div id="mainWrap"><div id="app">
 
@@ -2216,7 +1761,7 @@ body{top:0!important;}
     <div class="dcard" onclick="showSection('s-parent')" style="background:linear-gradient(135deg,rgba(139,92,246,.06),rgba(56,189,248,.04));border-color:rgba(139,92,246,.15);">
       <div class="dcard-status" id="dcLifeScoreStatus"></div>
       <div class="dcard-icon">🏆</div>
-      <div class="dcard-label">LIFE SCORE <span class="hlp" onmouseenter="hlp('lifescore',this,event)" onmouseleave="hlpHide()">?</span></div>
+      <div class="dcard-label">LIFE SCORE</div>
       <div class="dcard-value" id="qsLifeScore" style="font-size:2rem;">—</div>
       <div class="dcard-sub" id="qsLifeScoreLabel">Unlock Parent Hub</div>
     </div>
@@ -2387,7 +1932,7 @@ body{top:0!important;}
   <!-- DAILY W's -->
   <div style="background:rgba(251,191,36,.03);border:1px solid rgba(251,191,36,.08);border-radius:12px;padding:.7rem .9rem;margin-bottom:.7rem;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.35rem;">
-      <span style="font-size:.75rem;font-weight:700;letter-spacing:1px;">⚡ DAILY W's</span><span class="hlp" onmouseenter="hlp('habits',this,event)" onmouseleave="hlpHide()" onclick="hlp('habits',this,event)">?</span>
+      <span style="font-size:.75rem;font-weight:700;letter-spacing:1px;">⚡ DAILY W's</span>
       <button class="btn bgh bs" onclick="addHabit()" style="font-size:.65rem;">+ Habit</button>
     </div>
     <div id="checkinGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:.3rem;"></div>
@@ -4853,8 +4398,7 @@ body{top:0!important;}
 <section id="s-scripture" class="sec">
   <div class="sh">
     <div class="si">✝️</div>
-    <div class="st">Bible &amp; Faith</div>
-    <span class="tip-wrap"><span class="tip-btn" onmouseenter="hlp('scripture',this,event)" onmouseleave="hlpHide()">?</span></span>
+    <div class="st">Bible & Faith</div>
     <div class="sl"></div>
   </div>
 
@@ -5234,7 +4778,6 @@ body{top:0!important;}
   <div class="sh">
     <div class="si">👨‍👩‍👧</div>
     <div class="st">Parent Hub</div>
-    <span class="tip-wrap"><span class="tip-btn" onmouseenter="hlp('parenthub',this,event)" onmouseleave="hlpHide()">?</span></span>
     <div class="sl"></div>
   </div>
 
@@ -5242,22 +4785,13 @@ body{top:0!important;}
   <div id="parentGate" style="text-align:center;padding:2rem 0;">
     <div style="font-size:2.5rem;margin-bottom:.5rem;">🔒</div>
     <div style="font-size:.9rem;font-weight:700;margin-bottom:.3rem;">Parent Access Required</div>
-    <div id="parentGateMsg" style="font-size:.75rem;color:var(--tx2);margin-bottom:1rem;">Enter your 6-digit PIN to access the Parent Hub</div>
-    <div id="parentPinFields">
-      <input type="password" id="parentPinInput" maxlength="6" placeholder="••••••" style="width:180px;text-align:center;font-size:1.3rem;letter-spacing:.5rem;margin-bottom:.5rem;" onkeyup="if(event.key==='Enter')unlockParentDash()">
-      <br>
-    </div>
-    <button class="btn bp" onclick="unlockParentDash()">🔓 Unlock</button>
+    <div style="font-size:.75rem;color:var(--tx2);margin-bottom:1rem;">Enter your 6-digit PIN to access the Parent Hub</div>
+    <input type="password" id="parentPinInput" maxlength="6" placeholder="••••••" style="width:180px;text-align:center;font-size:1.3rem;letter-spacing:.5rem;margin-bottom:.5rem;" onkeyup="if(event.key==='Enter')unlockParentDash()">
+    <br><button class="btn bp" onclick="unlockParentDash()">🔓 Unlock</button>
   </div>
 
   <!-- PARENT DASHBOARD (after PIN unlock) -->
   <div id="parentDashContent" style="display:none;">
-
-    <!-- BACK + LOCK ROW -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem;gap:.5rem;">
-      <button onclick="showSection('s-hero')" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--tx2);padding:.35rem .8rem;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:var(--fn);display:flex;align-items:center;gap:.35rem;">← Dashboard</button>
-      <button onclick="lockParentDash();showSection('s-hero');" style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);color:#f87171;padding:.35rem .8rem;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:var(--fn);display:flex;align-items:center;gap:.35rem;">🔒 Lock Hub</button>
-    </div>
 
     <!-- CHILD SELECTOR (always visible at top) -->
     <div style="background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.1);border-radius:10px;padding:.5rem .8rem;margin-bottom:.7rem;display:flex;align-items:center;gap:.5rem;">
@@ -5265,13 +4799,18 @@ body{top:0!important;}
       <select id="parentChildSelect" onchange="switchParentView(this.value)" style="flex:1;font-size:.8rem;font-weight:700;"></select>
     </div>
 
+    <!-- CHILD MANAGEMENT -->
+    <div style="display:flex;gap:.4rem;margin-bottom:.7rem;">
+      <button class="btn bp bs" onclick="addChildProfile()" style="flex:1;font-size:.72rem;">👶 + Add Child</button>
+      <button class="btn bgh bs" onclick="resetAllPins()" style="font-size:.72rem;">🔑 Reset PINs</button>
+    </div>
+
     <!-- LEFT NAV + RIGHT CONTENT LAYOUT -->
     <div style="display:flex;gap:.7rem;min-height:500px;" id="phLayout">
       
       <!-- LEFT PANEL -->
       <div style="width:180px;flex-shrink:0;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:.5rem;overflow-y:auto;" id="phLeftNav">
-        <div onclick="phNav('users')" class="ph-nav-item active" id="phn-users">👥 Manage Users <span class="hlp" onmouseenter="hlp('manageusers',this,event)" onmouseleave="hlpHide()">?</span></div>
-        <div onclick="phNav('overview')" class="ph-nav-item" id="phn-overview">📊 Overview</div>
+        <div onclick="phNav('overview')" class="ph-nav-item active" id="phn-overview">📊 Overview</div>
         <div onclick="phNav('chores')" class="ph-nav-item" id="phn-chores">✅ Chores & Deeds</div>
         <div onclick="phNav('contests')" class="ph-nav-item" id="phn-contests">🏆 Contests</div>
         <div onclick="phNav('quizzes')" class="ph-nav-item" id="phn-quizzes">📝 Quizzes</div>
@@ -5284,65 +4823,6 @@ body{top:0!important;}
 
       <!-- RIGHT CONTENT -->
       <div style="flex:1;min-width:0;">
-
-        <!-- MANAGE USERS -->
-        <div id="ph-users" style="display:none;">
-          <div style="font-size:.85rem;font-weight:800;color:#e0e0e0;margin-bottom:.8rem;display:flex;align-items:center;gap:.4rem;">👥 Manage Users</div>
-
-          <!-- CURRENT USERS LIST -->
-          <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:1rem 1.2rem;margin-bottom:.8rem;">
-            <div style="font-size:.75rem;font-weight:700;color:var(--tx2);margin-bottom:.6rem;text-transform:uppercase;letter-spacing:1px;">Current Users</div>
-            <div id="manageUsersList"></div>
-          </div>
-
-          <!-- ADD CHILD -->
-          <div style="background:rgba(56,189,248,.03);border:1px solid rgba(56,189,248,.1);border-radius:14px;padding:1rem 1.2rem;margin-bottom:.8rem;">
-            <div style="font-size:.75rem;font-weight:700;color:#38bdf8;margin-bottom:.5rem;text-transform:uppercase;letter-spacing:1px;">➕ Add New Child</div>
-            <div style="display:flex;gap:.4rem;align-items:flex-end;">
-              <div style="flex:1;">
-                <label style="font-size:.65rem;color:var(--tx2);display:block;margin-bottom:.2rem;">Child's Name</label>
-                <input type="text" id="newChildName" placeholder="e.g. Emma" style="width:100%;font-size:.8rem;">
-              </div>
-              <div>
-                <label style="font-size:.65rem;color:var(--tx2);display:block;margin-bottom:.2rem;">4-Digit PIN</label>
-                <input type="text" id="newChildPin" placeholder="auto" maxlength="4" style="width:80px;font-size:.8rem;text-align:center;letter-spacing:.2rem;">
-              </div>
-              <button class="btn bp bs" onclick="addChildFromHub()" style="font-size:.72rem;white-space:nowrap;">👶 Add Child</button>
-            </div>
-            <div style="font-size:.62rem;color:var(--tx3);margin-top:.35rem;">Leave PIN blank to auto-generate. Child uses this 4-digit PIN to log in.</div>
-          </div>
-
-          <!-- PARENT PIN -->
-          <div style="background:rgba(139,92,246,.03);border:1px solid rgba(139,92,246,.1);border-radius:14px;padding:1rem 1.2rem;">
-            <div style="font-size:.75rem;font-weight:700;color:#a78bfa;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:1px;">🔒 Parent PIN Settings</div>
-
-            <!-- PIN REQUIRED TOGGLE -->
-            <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:.6rem .8rem;margin-bottom:.7rem;">
-              <div>
-                <div style="font-size:.78rem;font-weight:700;">Require PIN to access Parent Hub</div>
-                <div style="font-size:.65rem;color:var(--tx2);margin-top:.1rem;">Turn off to enter without a PIN</div>
-              </div>
-              <div onclick="toggleParentPinRequired()" id="parentPinToggle" style="width:38px;height:22px;border-radius:11px;background:#22c55e;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;">
-                <div id="parentPinToggleKnob" style="position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:all .2s;"></div>
-              </div>
-            </div>
-
-            <div id="parentPinChangeSection">
-              <div style="font-size:.7rem;color:var(--tx2);margin-bottom:.5rem;">Change your 6-digit PIN:</div>
-              <div style="display:flex;gap:.4rem;align-items:flex-end;flex-wrap:wrap;">
-                <div>
-                  <label style="font-size:.62rem;color:var(--tx2);display:block;margin-bottom:.2rem;">New PIN</label>
-                  <input type="password" id="newParentPin" placeholder="••••••" maxlength="6" style="width:110px;font-size:.9rem;text-align:center;letter-spacing:.3rem;">
-                </div>
-                <div>
-                  <label style="font-size:.62rem;color:var(--tx2);display:block;margin-bottom:.2rem;">Confirm</label>
-                  <input type="password" id="confirmParentPin" placeholder="••••••" maxlength="6" style="width:110px;font-size:.9rem;text-align:center;letter-spacing:.3rem;">
-                </div>
-                <button class="btn bs" onclick="changeParentPin()" style="font-size:.72rem;background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.25);color:#a78bfa;">🔑 Update PIN</button>
-              </div>
-            </div>
-          </div>
-        </div>
 
         <!-- OVERVIEW -->
         <div id="ph-overview">
@@ -5626,252 +5106,189 @@ body{top:0!important;}
   <div class="tut-header">
     <div style="display:flex;align-items:center;justify-content:space-between;">
       <div>
-        <div style="font-family:var(--fh);font-size:1.4rem;letter-spacing:3px;color:var(--c);">📖 LIFE OS TUTORIAL</div>
-        <div style="font-size:.75rem;color:var(--tx2);margin-top:.15rem;">Tap any section below — or use Next › to go step by step</div>
+        <div style="font-family:var(--fh);font-size:1.5rem;letter-spacing:3px;color:var(--c);">LIFE OS TUTORIAL</div>
+        <div style="font-size:.8rem;color:var(--tx2);margin-top:.2rem;">Your complete guide to getting the most out of every feature</div>
       </div>
-      <div style="display:flex;gap:.4rem;flex-shrink:0;">
-        <button class="btn bgh bs" onclick="closeTutorial();showSection('s-hero')" style="font-size:.72rem;padding:.35rem .6rem;">🏠 Dashboard</button>
-        <button class="btn bgh bs" onclick="closeTutorial()" style="font-size:.72rem;padding:.35rem .6rem;">✕ Close</button>
-      </div>
+      <button class="btn bgh bs" onclick="closeTutorial()">✕ Close</button>
     </div>
-    <div style="margin-top:.8rem;background:rgba(0,0,0,.3);border-radius:8px;overflow:hidden;height:5px;">
-      <div id="tutProgress" style="height:100%;background:linear-gradient(90deg,var(--c),var(--p));transition:width .35s;width:5%;border-radius:8px;"></div>
+    <div style="margin-top:.8rem;background:rgba(0,0,0,.2);border-radius:8px;overflow:hidden;height:5px;">
+      <div id="tutProgress" style="height:100%;background:linear-gradient(90deg,var(--c),var(--p));transition:width .3s;width:9%;border-radius:8px;"></div>
     </div>
-    <div style="font-size:.65rem;color:var(--tx3);margin-top:.25rem;" id="tutProgressLbl">Step 1 of 19</div>
+    <div style="font-size:.68rem;color:var(--tx2);margin-top:.3rem;" id="tutProgressLbl">Step 1 of 11</div>
   </div>
 
   <div class="tut-nav" id="tutNav"></div>
 
   <div class="tut-body">
 
-    <!-- STEP 0: WELCOME -->
+    <!-- STEP 1: WELCOME -->
     <div class="tut-step active" data-step="0">
-      <h3>👋 Welcome to Life OS</h3>
-      <p>Life OS is a complete personal command center for young people — and a powerful management tool for parents. Everything saves automatically. No accounts needed. Let's explore every corner of it.</p>
-      <div class="tut-visual"><div class="tv-label">Where you are right now</div><div class="tv-path"><span>🌐 Language</span><span class="arr">·</span><span>👤 Child Login</span><span class="arr">·</span><span>👨‍👩‍👧 Parent</span><span class="arr">·</span><span>⚙ Settings</span><span class="arr">→</span><span>☰ Menu</span></div><div style="margin-top:.4rem;font-size:.72rem;">These 5 buttons at the top are your main controls. On mobile they appear in a row just below the LIFE OS title bar.</div></div>
-      <div class="tut-row"><div class="tut-icon">☰</div><div class="tut-row-text"><b>Menu — how you get anywhere</b> Tap the ☰ hamburger icon to open the navigation sidebar. All 20+ sections are listed with emoji icons. Tap any one to jump there instantly.</div></div>
-      <div class="tut-row"><div class="tut-icon">💾</div><div class="tut-row-text"><b>Everything saves automatically</b> You never need to tap Save. Every change you make is saved to your device instantly. Use Settings → Backup to export a copy as a safety net.</div></div>
-      <div class="tut-row"><div class="tut-icon">❓</div><div class="tut-row-text"><b>? buttons are everywhere</b> Throughout the app, you'll see small <span style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;background:rgba(56,189,248,.25);border-radius:50%;color:#38bdf8;font-size:.58rem;font-weight:900;">?</span> buttons. Tap one for an instant explanation of exactly what that section does.</div></div>
-      <div class="tut-row"><div class="tut-icon">👨‍👩‍👧</div><div class="tut-row-text"><b>Parents: set up first</b> If you're a parent, tap the Parent button at the top → Manage Users → add each child with a 4-digit PIN before your kids log in.</div></div>
-      <div class="tut-row"><div class="tut-icon">👤</div><div class="tut-row-text"><b>Kids: use Child Login</b> Tap the 👤 Child Login button at the top, find your name, and enter your 4-digit PIN to access your personal dashboard.</div></div>
+      <h3>👋 WELCOME TO LIFE OS</h3>
+      <p>LIFE OS is your personal command center — built to help you track your money, school, health, schedule, goals, and faith all in one place. Think of it as your digital life headquarters.</p>
+      <div class="tut-row"><div class="tut-icon">💡</div><div class="tut-row-text"><b>How it works</b>Everything saves automatically to your browser. You can also sync to the cloud via Settings so your data follows you across devices.</div></div>
+      <div class="tut-row"><div class="tut-icon">🧭</div><div class="tut-row-text"><b>Getting around</b>Use the emoji buttons in the top nav bar to jump to any section instantly. Or just scroll down.</div></div>
+      <div class="tut-row"><div class="tut-icon">⚙️</div><div class="tut-row-text"><b>Customize everything</b>Open Settings (top right) to set your name, show/hide sections, manage scriptures, and add custom schedule activities.</div></div>
+      <div class="tut-row"><div class="tut-icon">❓</div><div class="tut-row-text"><b>Quick help tooltips</b>Look for the <span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;background:rgba(56,189,248,.3);border-radius:50%;color:var(--c);font-size:.65rem;font-weight:800;">?</span> icons next to section headers throughout the app — hover over them for instant tips.</div></div>
     </div>
 
-    <!-- STEP 1: DASHBOARD -->
+    <!-- STEP 2: DASHBOARD -->
     <div class="tut-step" data-step="1">
-      <h3>🏠 Dashboard — Your Home Base</h3>
-      <p>The Dashboard is the first thing you see. It gives you a snapshot of everything important — updated live as you use the app.</p>
-      <div class="tut-visual"><div class="tv-label">How to get here</div><div class="tv-path"><span>☰ Menu</span><span class="arr">→</span><span>🏠 Dashboard</span></div></div>
-      <div class="tut-row"><div class="tut-icon">📊</div><div class="tut-row-text"><b>Quick Stats Bar</b> Shows your Bank balance, Savings, total Goals, GPA, and Streak — all pulled live from your data. Tap any stat to jump to that section.</div></div>
-      <div class="tut-row"><div class="tut-icon">🔥</div><div class="tut-row-text"><b>Streak Counter</b> Your streak goes up when you complete 4+ daily habits in a day. It resets to zero if you miss a full day — so check in every day!</div></div>
-      <div class="tut-row"><div class="tut-icon">✝️</div><div class="tut-row-text"><b>Scripture Banner</b> A Bible verse rotates automatically every 60 seconds. Tap › to skip ahead. You can turn this off in Settings if your family doesn't use faith features.</div></div>
-      <div class="tut-row"><div class="tut-icon">💬</div><div class="tut-row-text"><b>Daily Prompt</b> A new journaling question appears each day. Tap it to open your Journal with that prompt pre-loaded — just start typing.</div></div>
-      <div class="tut-row"><div class="tut-icon">🎨</div><div class="tut-row-text"><b>Make it yours</b> Open Settings → Appearance to choose from 10 background styles and 10 accent colors. Light mode and dark mode are both available.</div></div>
-      <div class="tut-row"><div class="tut-icon">✏️</div><div class="tut-row-text"><b>Edit your name</b> Click directly on your name at the top of the dashboard to edit it inline, or change it in Settings → Profile.</div></div>
-    </div>
-
-    <!-- STEP 2: DAILY HABITS -->
-    <div class="tut-step" data-step="2">
-      <h3>✅ Daily Habits — Your Daily W's</h3>
-      <p>The most important thing to do every single day. Check off your habits to build a streak and earn points toward your Life Score.</p>
-      <div class="tut-visual"><div class="tv-label">Where to find it</div><div class="tv-path"><span>🏠 Dashboard</span><span class="arr">→</span><span>Daily W's card</span></div></div>
-      <div class="tut-row"><div class="tut-icon">✅</div><div class="tut-row-text"><b>How to check in</b> Tap any habit tile to mark it complete for today. It turns green with a checkmark ✓ and locks until midnight automatically.</div></div>
-      <div class="tut-row"><div class="tut-icon">🔥</div><div class="tut-row-text"><b>Building your streak</b> Complete 4 or more habits in a single day to count as a "streak day." Your streak number is shown on your dashboard. Miss a full day and the streak resets to 0.</div></div>
-      <div class="tut-row"><div class="tut-icon">➕</div><div class="tut-row-text"><b>Add your own habit</b> Tap the "+ Habit" button at the bottom of the Daily W's card. Give it a name and pick an emoji — it'll appear in your grid every day from now on.</div></div>
-      <div class="tut-row"><div class="tut-icon">🙏</div><div class="tut-row-text"><b>Built-in habits</b> Includes: Prayer, Bible reading, workout, drink water, no doom-scrolling, journal, study, and gratitude. Faith habits can be toggled off in Settings.</div></div>
-      <div class="tut-row"><div class="tut-icon">📊</div><div class="tut-row-text"><b>Why it matters</b> Habit completion feeds directly into your Life Score (visible to parents in the Parent Hub). The more consistent you are, the better your score.</div></div>
+      <h3>🏠 DASHBOARD HUB</h3>
+      <p>The hero section at the top is your daily home base. It greets you by name, shows the time, and keeps your most important stats front and center.</p>
+      <div class="tut-row"><div class="tut-icon">✝️</div><div class="tut-row-text"><b>Scripture Banner</b>Shows a rotating Bible verse. Use › to go to the next one. Auto-rotates every 60 seconds by default. Add your own verses in Settings.</div></div>
+      <div class="tut-row"><div class="tut-icon">📊</div><div class="tut-row-text"><b>Quick Stats Row</b>Shows your Bank balance, Savings Account, Goal Savings total, GPA, and Streak — all pulled live from your data.</div></div>
+      <div class="tut-row"><div class="tut-icon">⚡</div><div class="tut-row-text"><b>Daily Wins</b>Check off habits each day. Complete 4+ to extend your streak. Your streak counter updates automatically. Click "+ Add Habit" to create custom ones.</div></div>
+      <div class="tut-row"><div class="tut-icon">✏️</div><div class="tut-row-text"><b>Edit your name</b>Click your name at the top to edit it inline — or go to Settings to change it and your level (Middle School / High School / College / Adult).</div></div>
     </div>
 
     <!-- STEP 3: MONEY -->
-    <div class="tut-step" data-step="3">
-      <h3>💰 Money Manager</h3>
-      <p>Learn how to handle money before you have a lot of it. Track balances, bills, expenses, and savings goals — just like a real adult budget.</p>
-      <div class="tut-visual"><div class="tv-label">Where to find it</div><div class="tv-path"><span>☰ Menu</span><span class="arr">→</span><span>💰 Money</span></div></div>
-      <div class="tut-row"><div class="tut-icon">🏦</div><div class="tut-row-text"><b>Overview tab</b> Enter your Checking and Savings balances here. They show on your dashboard instantly. A chart tracks your history every time you update your balance.</div></div>
-      <div class="tut-row"><div class="tut-icon">🧾</div><div class="tut-row-text"><b>Bills tab</b> Add recurring bills — name, amount, and due date. Tap a bill to mark it paid for the month. Total owed calculates automatically. Unpaid count shows on your dashboard.</div></div>
-      <div class="tut-row"><div class="tut-icon">💳</div><div class="tut-row-text"><b>Transactions tab</b> Log every income or expense with a category (food, gas, fun, etc.). Filter by type. Monthly totals auto-calculate. Watch your Net Left Over number.</div></div>
-      <div class="tut-row"><div class="tut-icon">🎯</div><div class="tut-row-text"><b>Savings Goals tab</b> Create goals with a name, emoji, target amount, and current savings. Progress bars show exactly how close you are. Tap to quick-add money toward a goal.</div></div>
-      <div class="tut-row"><div class="tut-icon">📋</div><div class="tut-row-text"><b>Budget Planner tab</b> Enter your monthly income and the 50/30/20 rule calculates automatically — 50% needs, 30% wants, 20% savings. Shows a warning if your bills exceed 50%.</div></div>
-      <div class="tut-row"><div class="tut-icon">📚</div><div class="tut-row-text"><b>Finance Education tab</b> Real financial education — taxes, retirement accounts (IRA/401k), self-employment taxes, and a quick tax estimator. Knowledge that schools don't teach.</div></div>
+    <div class="tut-step" data-step="2">
+      <h3>💰 MONEY MANAGER</h3>
+      <p>Track your real money — balances, bills, every transaction, and savings goals — all in one place. Six tabs cover everything.</p>
+      <div class="tut-row"><div class="tut-icon">📊</div><div class="tut-row-text"><b>Overview tab</b>Enter your Checking and Savings Account balances here. These show up on your dashboard instantly. Past entries are saved in history.</div></div>
+      <div class="tut-row"><div class="tut-icon">🧾</div><div class="tut-row-text"><b>Bills tab</b>Add every recurring bill with its name, amount, and due date. Tap a bill to mark it paid. Total auto-calculates. Unpaid count shows on the dashboard.</div></div>
+      <div class="tut-row"><div class="tut-icon">💳</div><div class="tut-row-text"><b>Transactions tab</b>Log every income or expense. Filter by type. Month totals calculate automatically and feed into your Net Left Over stat.</div></div>
+      <div class="tut-row"><div class="tut-icon">💚</div><div class="tut-row-text"><b>Goal Savings tab</b>See your overall savings progress and quick-add money to any goal. Three starter goals included — add your own from Sav. Goals tab.</div></div>
+      <div class="tut-row"><div class="tut-icon">🎯</div><div class="tut-row-text"><b>Sav. Goals tab</b>Create savings goals with emoji, target amount, and current balance. Each goal shows a progress bar. Edit or delete anytime.</div></div>
+      <div class="tut-row"><div class="tut-icon">📋</div><div class="tut-row-text"><b>Budget tab</b>Enter your monthly take-home and savings target. The 50/30/20 rule calculates automatically and flags if your bills exceed 50% of income.</div></div>
     </div>
 
     <!-- STEP 4: SCHOOL -->
-    <div class="tut-step" data-step="4">
-      <h3>📚 School Tracker</h3>
-      <p>Stay on top of every class, every assignment, and every grade — all in one organized place.</p>
-      <div class="tut-visual"><div class="tv-label">Where to find it</div><div class="tv-path"><span>☰ Menu</span><span class="arr">→</span><span>📚 School</span></div></div>
-      <div class="tut-row"><div class="tut-icon">📖</div><div class="tut-row-text"><b>My Classes tab</b> Tap "+ Add Class" to add each subject with teacher name, room number, and grade percentage. Grade letter and GPA update instantly as you type.</div></div>
-      <div class="tut-row"><div class="tut-icon">📝</div><div class="tut-row-text"><b>Assignments tab</b> Add every homework, test, and project with a due date and priority (High/Medium/Low). Color-coded by urgency — red means high priority. Overdue tasks show a red warning badge. Tap the checkbox when done.</div></div>
-      <div class="tut-row"><div class="tut-icon">🎓</div><div class="tut-row-text"><b>GPA tab</b> Live GPA calculated from all your class grades. Shows honor roll status and a visual breakdown by class. Updates the moment you change any grade.</div></div>
-      <div class="tut-row"><div class="tut-icon">⏱</div><div class="tut-row-text"><b>Study Timer tab</b> Set a Pomodoro timer — pick 25, 45, 60, or 90 minutes, name what you're studying, and start. Every session is automatically logged with subject, date, and duration.</div></div>
-      <div class="tut-row"><div class="tut-icon">📊</div><div class="tut-row-text"><b>Study Log tab</b> See all your past study sessions in a list with total time studied per subject. Shows patterns in your study habits over time.</div></div>
+    <div class="tut-step" data-step="3">
+      <h3>📚 SCHOOL</h3>
+      <p>Track every class, assignment, and study session — and watch your GPA calculate in real time.</p>
+      <div class="tut-row"><div class="tut-icon">📖</div><div class="tut-row-text"><b>My Classes</b>Click "+ Add Class" to add each subject with teacher, room, grade %, and a color. Your grade letter and GPA update instantly. Click ✎ to edit any class.</div></div>
+      <div class="tut-row"><div class="tut-icon">📝</div><div class="tut-row-text"><b>Assignments</b>Add tasks with a due date and priority (High/Medium/Low). Color-coded by priority — red = high. Check the box when done. Overdue assignments show a red warning.</div></div>
+      <div class="tut-row"><div class="tut-icon">🎓</div><div class="tut-row-text"><b>GPA tab</b>Automatically calculated from all your class grades. Shows honor roll status and a visual breakdown per class. Updates whenever you edit a grade.</div></div>
+      <div class="tut-row"><div class="tut-icon">⏱</div><div class="tut-row-text"><b>Study Timer</b>Set a Pomodoro timer (25, 45, 60, or 90 min), name what you're studying, and start. Completed sessions are logged with subject and duration.</div></div>
     </div>
 
     <!-- STEP 5: SCHEDULE -->
+    <div class="tut-step" data-step="4">
+      <h3>📅 MONTHLY SCHEDULE</h3>
+      <p>A visual 28-day grid showing every hour from 6 AM to 11 PM. Today's column is highlighted in blue. Everything saves automatically as you fill it in.</p>
+      <div class="tut-row"><div class="tut-icon">🖱️</div><div class="tut-row-text"><b>How to fill it</b>Click any time slot cell and pick an activity from the dropdown. The cell immediately color-codes to match the activity type.</div></div>
+      <div class="tut-row"><div class="tut-icon">🎨</div><div class="tut-row-text"><b>Color coding</b>Each activity type has its own color — cyan for Work, green for School/Gym, pink for Jiu Jitsu, purple for Church/Prayer, gold for Study, etc.</div></div>
+      <div class="tut-row"><div class="tut-icon">➕</div><div class="tut-row-text"><b>Add your own activities</b>Go to Settings → Schedule Activities to add custom activities with your own emoji and color. They appear in every dropdown instantly.</div></div>
+      <div class="tut-row"><div class="tut-icon">🗑️</div><div class="tut-row-text"><b>Clear schedule</b>The 🗑 Clear button clears only the current month — past months stay intact. Use Save to force-save immediately.</div></div>
+    </div>
+
+    <!-- STEP 6: CALENDAR -->
     <div class="tut-step" data-step="5">
-      <h3>📅 Schedule Planner</h3>
-      <p>A 28-day visual calendar grid that maps your whole week visually so you can see exactly where your time goes.</p>
-      <div class="tut-visual"><div class="tv-label">Where to find it</div><div class="tv-path"><span>☰ Menu</span><span class="arr">→</span><span>📅 Schedule</span></div></div>
-      <div class="tut-row"><div class="tut-icon">🗓</div><div class="tut-row-text"><b>The grid</b> A 28-day calendar from 6 AM to 11 PM. Each row is a time slot. Click any cell to assign an activity to that time. Cells color-code automatically by activity type.</div></div>
-      <div class="tut-row"><div class="tut-icon">🎨</div><div class="tut-row-text"><b>Activity colors</b> School = blue, Sleep = dark, Work = green, Exercise = orange, Faith = purple, Free time = teal. Each activity gets its own consistent color in the grid.</div></div>
-      <div class="tut-row"><div class="tut-icon">➕</div><div class="tut-row-text"><b>Custom activities</b> Go to Settings → Schedule Activities to add your own activity types with custom names and colors. They'll appear as options when you click any cell.</div></div>
-      <div class="tut-row"><div class="tut-icon">👁</div><div class="tut-row-text"><b>Why use it?</b> When you see your week laid out visually, you can spot where you're wasting time, when to study, and how to balance school, sleep, and fun.</div></div>
+      <h3>🗓️ CALENDAR</h3>
+      <p>A monthly event calendar for gigs, tournaments, school events, church, and anything else you want to track by date.</p>
+      <div class="tut-row"><div class="tut-icon">➕</div><div class="tut-row-text"><b>Add an event</b>Click "+ Event" or tap any date on the calendar. Fill in the title, date, time, category, and notes. Events show as color chips on the calendar grid.</div></div>
+      <div class="tut-row"><div class="tut-icon">🎨</div><div class="tut-row-text"><b>Categories</b>DJ/Gig (cyan), Sports/Martial Arts (pink), Work (purple), Church/Faith (gold), School (green), Other (gray). Each gets its own color on the calendar.</div></div>
+      <div class="tut-row"><div class="tut-icon">📌</div><div class="tut-row-text"><b>Upcoming events</b>The right panel shows your next 15 events in chronological order. Click ✕ to delete. Events on past dates disappear from this list automatically.</div></div>
+      <div class="tut-row"><div class="tut-icon">‹ ›</div><div class="tut-row-text"><b>Navigate months</b>Use the Prev / Next buttons to browse any month. Today is always highlighted with a cyan border.</div></div>
     </div>
 
-    <!-- STEP 6: HEALTH -->
+    <!-- STEP 7: HEALTH -->
     <div class="tut-step" data-step="6">
-      <h3>❤️ Health & Fitness</h3>
-      <p>Track your physical health, nutrition, mood, and habits over time. Your body is your most important long-term investment.</p>
-      <div class="tut-visual"><div class="tv-label">Where to find it</div><div class="tv-path"><span>☰ Menu</span><span class="arr">→</span><span>❤️ Health</span></div></div>
-      <div class="tut-row"><div class="tut-icon">⚖️</div><div class="tut-row-text"><b>Weight Tracker</b> Log your weight and see a chart of your progress over time. Completely private — only you can see it. Set a goal weight for motivation.</div></div>
-      <div class="tut-row"><div class="tut-icon">🥗</div><div class="tut-row-text"><b>Nutrition Log</b> Log meals with calories, protein, carbs, and fat. Daily totals calculate automatically. Color indicators show if you're over or under your targets.</div></div>
-      <div class="tut-row"><div class="tut-icon">😊</div><div class="tut-row-text"><b>Mood Check-In</b> Rate your mood from 1–5 and add a note about your day. Mood charts over time show patterns — great for noticing what affects how you feel.</div></div>
-      <div class="tut-row"><div class="tut-icon">💪</div><div class="tut-row-text"><b>Fitness Habits</b> Workout, stretch, water intake — track these alongside your daily habits. Consistent fitness entries boost your Life Score's Wellbeing category.</div></div>
+      <h3>💪 HEALTH & FITNESS</h3>
+      <p>Three tabs to track your weight progress, daily nutrition, and habit streaks — all tied back to your dashboard.</p>
+      <div class="tut-row"><div class="tut-icon">⚖️</div><div class="tut-row-text"><b>Weight tracker</b>Enter your current weight and goal weight, pick a date, and log it. A progress bar shows how far you've come. The chart shows your last 30 entries with weight and date on each dot.</div></div>
+      <div class="tut-row"><div class="tut-icon">🍽</div><div class="tut-row-text"><b>Nutrition</b>Log food with calories, protein, carbs, and fat. Daily macro totals update instantly with progress bars against your goals. Set custom daily goals at the bottom.</div></div>
+      <div class="tut-row"><div class="tut-icon">✅</div><div class="tut-row-text"><b>Daily Habits</b>Same habits as your dashboard check-ins — synced. Check off anything here and it counts toward your streak too.</div></div>
     </div>
 
-    <!-- STEP 7: GOALS -->
+    <!-- STEP 8: GOALS -->
     <div class="tut-step" data-step="7">
-      <h3>🎯 Goals & Vision</h3>
-      <p>Where big dreams get turned into real plans. Set goals, track progress, and explore potential careers.</p>
-      <div class="tut-visual"><div class="tv-label">Where to find it</div><div class="tv-path"><span>☰ Menu</span><span class="arr">→</span><span>🎯 Goals</span></div></div>
-      <div class="tut-row"><div class="tut-icon">📝</div><div class="tut-row-text"><b>Life Vision</b> Start by writing your personal vision statement — who do you want to be? This is private and just for you. Keep it updated as you grow.</div></div>
-      <div class="tut-row"><div class="tut-icon">📅</div><div class="tut-row-text"><b>Goal Timeline</b> Add goals for 1 year, 3 years, 5 years, and 10 years out. Pick a category (Education, Career, Health, etc.) and tap the circle to mark a goal achieved.</div></div>
-      <div class="tut-row"><div class="tut-icon">💼</div><div class="tut-row-text"><b>Career Explorer</b> Browse 35+ real careers with salary ranges, education requirements, and day-in-the-life descriptions. Tap the star to save careers you're interested in.</div></div>
-      <div class="tut-row"><div class="tut-icon">🏆</div><div class="tut-row-text"><b>Milestones</b> Record achievements that matter to you — awards, personal bests, proud moments. These build your life story and can go into your resume or bio page later.</div></div>
+      <h3>🎯 GOALS & VISION</h3>
+      <p>Write down your goals so they're real. Long-term and short-term, across every area of your life.</p>
+      <div class="tut-row"><div class="tut-icon">➕</div><div class="tut-row-text"><b>Add a goal</b>Click "+ Add Goal" and write your goal, pick Long-Term (1+ years) or Short-Term (weeks/months), and choose a life category like Faith, Fitness, Money, or DJ/Music.</div></div>
+      <div class="tut-row"><div class="tut-icon">✅</div><div class="tut-row-text"><b>Mark achieved</b>Click the circle on any goal to mark it done. It moves to the Achieved tab and records the date you completed it. Can be unchecked if needed.</div></div>
+      <div class="tut-row"><div class="tut-icon">💼</div><div class="tut-row-text"><b>Career Explorer</b>Tap career cards to mark ones you're interested in. Add custom career ideas. This is your vision board for your professional future.</div></div>
     </div>
 
-    <!-- STEP 8: LIFE SKILLS -->
+    <!-- STEP 9: LIFE SKILLS -->
     <div class="tut-step" data-step="8">
-      <h3>🧠 Life Skills Academy</h3>
-      <p>140+ lessons teaching everything schools don't — from cooking and budgeting to car care and mental health. Earn real certificates.</p>
-      <div class="tut-visual"><div class="tv-label">Where to find it</div><div class="tv-path"><span>☰ Menu</span><span class="arr">→</span><span>🧠 Life Skills</span></div></div>
-      <div class="tut-row"><div class="tut-icon">📂</div><div class="tut-row-text"><b>16 Categories</b> Cooking, Car Care, Money, Taxes, Home Maintenance, Communication, Mental Health, Relationships, Faith, Digital Safety, First Aid, and more. Each category has multiple lessons.</div></div>
-      <div class="tut-row"><div class="tut-icon">📖</div><div class="tut-row-text"><b>How to learn</b> Tap any lesson card to open the full guide. Read through it — guides are written in plain language, designed to be easy to understand even if you've never heard of the topic before.</div></div>
-      <div class="tut-row"><div class="tut-icon">📝</div><div class="tut-row-text"><b>Earn Certificates</b> After completing all lessons in a category, take a 5-question quiz. Score 80% or higher and you earn a shareable, printable certificate for that category.</div></div>
-      <div class="tut-row"><div class="tut-icon">🏅</div><div class="tut-row-text"><b>Achievement Badges</b> Earning 3 certificates unlocks a special badge in the Badges section. Completing all 16 categories is one of the hardest achievements in the whole app.</div></div>
+      <h3>🧠 LIFE SKILLS ACADEMY</h3>
+      <p>100+ practical lessons across 16 categories — the stuff school never taught you but you absolutely need to know.</p>
+      <div class="tut-row"><div class="tut-icon">📖</div><div class="tut-row-text"><b>How to use it</b>Tap any category card (Taxes, Car, Health, Credit, Faith, etc.) to open the full lesson guide. Each category has 6–9 detailed lessons with real tips.</div></div>
+      <div class="tut-row"><div class="tut-icon">💡</div><div class="tut-row-text"><b>Pro tips</b>Gold tip boxes inside each lesson give you the single most important action to take. Read one category a week — 16 weeks = seriously ahead of your peers.</div></div>
+      <div class="tut-row"><div class="tut-icon">🎓</div><div class="tut-row-text"><b>Categories include</b>Taxes & Filing, Car & Driving, Credit & Banking, Home & Renting, Career & Work, Faith & Purpose, Mental Health, Emergency Skills, Digital Life, and more.</div></div>
+      <div class="tut-row"><div class="tut-icon">🏆</div><div class="tut-row-text"><b>Quizzes & Certificates</b>Each category has a 5-question quiz. Score 80%+ to earn a certificate you can share. Track your progress on the stats bar at the top.</div></div>
     </div>
 
-    <!-- STEP 9: GROWING UP -->
+    <!-- STEP 10: GROWING UP -->
     <div class="tut-step" data-step="9">
-      <h3>🌱 Growing Up</h3>
-      <p>Real, honest guides for the stuff that's hard to talk about. Age-filtered and written with respect and care.</p>
-      <div class="tut-visual"><div class="tv-label">Where to find it</div><div class="tv-path"><span>☰ Menu</span><span class="arr">→</span><span>🌱 Growing Up</span></div></div>
-      <div class="tut-row"><div class="tut-icon">🧬</div><div class="tut-row-text"><b>Puberty & Body Changes</b> Honest, age-appropriate guides for both guys and girls. What to expect, what's normal, and how to handle the physical and emotional changes.</div></div>
-      <div class="tut-row"><div class="tut-icon">🧠</div><div class="tut-row-text"><b>Mental Health</b> Guides on anxiety, depression, stress, and self-worth — written to be understood by teens. Includes coping strategies and when to ask for help.</div></div>
-      <div class="tut-row"><div class="tut-icon">💬</div><div class="tut-row-text"><b>Relationships & Social Life</b> Friendship, boundaries, pressure, dating basics — all handled thoughtfully with guidance that respects different family values.</div></div>
-      <div class="tut-row"><div class="tut-icon">🆘</div><div class="tut-row-text"><b>Crisis Resources always visible</b> The 988 Suicide & Crisis Lifeline and Crisis Text Line (741741) are always displayed at the top of this section — no matter what age filter is set.</div></div>
-      <div class="tut-row"><div class="tut-icon">🔒</div><div class="tut-row-text"><b>Parents: age filtering</b> Content is filtered by the child's life stage setting. You can review all content in Settings and adjust what's visible for your child's age.</div></div>
+      <h3>🌱 GROWING UP</h3>
+      <p>12 real-talk guides on your body, your mind, relationships, and finding who you are — the stuff that matters most.</p>
+      <div class="tut-row"><div class="tut-icon">💪</div><div class="tut-row-text"><b>Body & brain</b>Age-appropriate guides on puberty, emotions, and what's happening in your brain during these years. Filtered by gender for relevance. No awkwardness — just facts.</div></div>
+      <div class="tut-row"><div class="tut-icon">🧠</div><div class="tut-row-text"><b>Mental health</b>Depression, anxiety, self-worth, social pressure, and suicidal thoughts — written so you actually understand what's going on and what to do about it.</div></div>
+      <div class="tut-row"><div class="tut-icon">🚫</div><div class="tut-row-text"><b>Real-world topics</b>Alcohol & drugs, consent & relationship boundaries, screen/gaming addiction, and identity & purpose. Honest, practical, no judgment.</div></div>
+      <div class="tut-row"><div class="tut-icon">🆘</div><div class="tut-row-text"><b>Crisis resources</b>24/7 helplines are visible throughout. 988 Suicide & Crisis Lifeline, Crisis Text Line (text HOME to 741741), SAMHSA (1-800-662-4357). You are never alone.</div></div>
     </div>
 
-    <!-- STEP 10: JOURNAL -->
+    <!-- STEP 11: CRAFT / GALLERY / JOURNAL -->
     <div class="tut-step" data-step="10">
-      <h3>✍️ Journal</h3>
-      <p>A private space to write, reflect, and process your thoughts. 100% private — nobody else can read your journal.</p>
-      <div class="tut-visual"><div class="tv-label">Where to find it</div><div class="tv-path"><span>☰ Menu</span><span class="arr">→</span><span>✍️ Journal</span></div></div>
-      <div class="tut-row"><div class="tut-icon">📝</div><div class="tut-row-text"><b>Writing an entry</b> Pick a category (Gratitude, Goals, Reflection, etc.), write your entry in the box, and tap Save. Each entry is stamped with the date and time automatically.</div></div>
-      <div class="tut-row"><div class="tut-icon">📂</div><div class="tut-row-text"><b>Saved entries</b> All past entries appear below the writing area. Tap any entry to read it again. You can filter entries by category to find what you're looking for.</div></div>
-      <div class="tut-row"><div class="tut-icon">💬</div><div class="tut-row-text"><b>Daily prompts</b> The Dashboard shows a new journaling prompt every day. Tap it and it opens your Journal with that prompt already filled in — just add your thoughts.</div></div>
-      <div class="tut-row"><div class="tut-icon">📊</div><div class="tut-row-text"><b>Life Score connection</b> The more journal entries you write, the higher your Engagement score in the Life Score report. Parents can see the count — but NOT the content.</div></div>
+      <h3>🎵 MUSIC & PRACTICE</h3>
+      <p>Your personal music hub for learning, practicing, and tracking progress on any instrument.</p>
+      <div class="tut-row"><div class="tut-icon">🎯</div><div class="tut-row-text"><b>Practice Hub</b> — Add your instruments, set weekly minute goals, and use the practice timer. Sessions log automatically.</div></div>
+      <div class="tut-row"><div class="tut-icon">🎸</div><div class="tut-row-text"><b>Instrument Guides</b> — 14 detailed profiles covering range, difficulty, start age, and practice tips.</div></div>
+      <div class="tut-row"><div class="tut-icon">🎼</div><div class="tut-row-text"><b>Music Theory</b> — Notes, rhythm, scales, and chords explained simply. The 4-chord trick for playing hundreds of songs.</div></div>
+      <div class="tut-row"><div class="tut-icon">🎧</div><div class="tut-row-text"><b>My Tracks</b> — Upload audio, play with the vinyl player, and discover free learning resources.</div></div>
     </div>
 
-    <!-- STEP 11: SCRIPTURE -->
     <div class="tut-step" data-step="11">
-      <h3>✝️ Bible & Faith</h3>
-      <p>A complete daily Bible reading and devotional system — optional for families who use faith features.</p>
-      <div class="tut-visual"><div class="tv-label">Where to find it</div><div class="tv-path"><span>☰ Menu</span><span class="arr">→</span><span>✝️ Scripture</span></div></div>
-      <div class="tut-row"><div class="tut-icon">📖</div><div class="tut-row-text"><b>Daily Verse</b> A new Bible verse every day, organized by monthly theme. Tap the calendar to see the full year's plan. Earn 5 points for reading each day — they add to your streak points.</div></div>
-      <div class="tut-row"><div class="tut-icon">📚</div><div class="tut-row-text"><b>Devotionals</b> Short guided reflections — read the passage, consider the questions, and write a response. Great for personal growth or family discussions.</div></div>
-      <div class="tut-row"><div class="tut-icon">🙏</div><div class="tut-row-text"><b>Faith Guides</b> Deeper guides on prayer, purpose, identity, and what the Bible says about real-life topics teens actually face.</div></div>
-      <div class="tut-row"><div class="tut-icon">⚙️</div><div class="tut-row-text"><b>Turn it off/on</b> Go to Settings → Content to toggle faith features on or off. When off, scripture sections are completely hidden. This setting is per-profile.</div></div>
+      <h3>🚗 DRIVING & 🏆 SPORTS</h3>
+      <p>Two sections preparing you for the road and the field.</p>
+      <div class="tut-row"><div class="tut-icon">🚗</div><div class="tut-row-text"><b>Driving</b> — License prep (permit test, practice hours, road test), safety (distracted/drunk driving, defensive techniques), car maintenance (oil, tires, fluids), insurance and costs, and accident procedures. Interactive checklist tracks your progress.</div></div>
+      <div class="tut-row"><div class="tut-icon">🏆</div><div class="tut-row-text"><b>Sports</b> — 14 sport profiles with preparation tips, health/safety info, participation stats, and scholarship details. Filter by boys/girls and level (middle school, high school, college).</div></div>
     </div>
 
-    <!-- STEP 12: DRIVING -->
     <div class="tut-step" data-step="12">
-      <h3>🚗 Driving</h3>
-      <p>Everything needed to go from "no license" to "road confident" — not just the permit test, but actual driving life.</p>
-      <div class="tut-visual"><div class="tv-label">Where to find it</div><div class="tv-path"><span>☰ Menu</span><span class="arr">→</span><span>🚗 Driving</span></div></div>
-      <div class="tut-row"><div class="tut-icon">📋</div><div class="tut-row-text"><b>License Prep</b> Full permit test study guide with interactive practice questions. Log practice driving hours (most states require 40-60 hours) — the tracker shows your progress toward the required total.</div></div>
-      <div class="tut-row"><div class="tut-icon">🔧</div><div class="tut-row-text"><b>Car Maintenance</b> Interactive checklist for everything your car needs — oil changes, tire pressure, air filters, and more. Learn what each thing is, why it matters, and how often to do it.</div></div>
-      <div class="tut-row"><div class="tut-icon">💰</div><div class="tut-row-text"><b>Costs & Insurance</b> Real numbers on what a car actually costs — insurance, gas, registration, maintenance. Eye-opening for teens who think they can afford a car on a part-time job.</div></div>
-      <div class="tut-row"><div class="tut-icon">🚨</div><div class="tut-row-text"><b>Accident Procedures</b> Step-by-step what to do if you're in an accident — who to call, what to say, what to photograph, and how insurance claims work.</div></div>
+      <h3>✝️ SCRIPTURE & 🏅 BADGES</h3>
+      <p>Daily spiritual growth and achievement tracking.</p>
+      <div class="tut-row"><div class="tut-icon">✝️</div><div class="tut-row-text"><b>365 Daily Scriptures</b> — One verse per day, organized by monthly themes. Earn 5 points for each day you read. Build streaks. Calendar view tracks your entire year. Can be toggled on/off in Settings.</div></div>
+      <div class="tut-row"><div class="tut-icon">🏅</div><div class="tut-row-text"><b>Badges</b> — 20 achievements to earn: streak milestones, certificates, books, goals, journal entries, and more. Full badge gallery shows earned vs locked with descriptions of how to unlock each one.</div></div>
     </div>
 
-    <!-- STEP 13: SPORTS -->
     <div class="tut-step" data-step="13">
-      <h3>🏆 Sports</h3>
-      <p>14 sport profiles covering athletic development, scholarships, health risks, and what it really takes to go to the next level.</p>
-      <div class="tut-visual"><div class="tv-label">Where to find it</div><div class="tv-path"><span>☰ Menu</span><span class="arr">→</span><span>🏆 Sports</span></div></div>
-      <div class="tut-row"><div class="tut-icon">⚽</div><div class="tut-row-text"><b>14 Sports covered</b> Football, basketball, baseball, soccer, volleyball, track, swimming, wrestling, softball, tennis, golf, lacrosse, gymnastics, and cross country. Filter by Boys, Girls, or Both.</div></div>
-      <div class="tut-row"><div class="tut-icon">🎓</div><div class="tut-row-text"><b>Scholarship Info</b> Each sport profile includes real scholarship statistics — how many athletes get recruited, average scholarship amounts, and what recruiters look for.</div></div>
-      <div class="tut-row"><div class="tut-icon">❤️</div><div class="tut-row-text"><b>Health & Safety</b> Common injuries, prevention tips, and the mental health challenges specific to each sport. Includes concussion protocols and overtraining warning signs.</div></div>
-      <div class="tut-row"><div class="tut-icon">📈</div><div class="tut-row-text"><b>Development Tips</b> Off-season training advice, what college coaches actually want to see, and the realistic odds at each competition level (JV → Varsity → College → Pro).</div></div>
+      <h3>📄 JOBS, RESUME & BIO</h3>
+      <p>Career tools for building your professional future.</p>
+      <div class="tut-row"><div class="tut-icon">💼</div><div class="tut-row-text"><b>Career Explorer</b> — 35 fully detailed profiles with salary ranges, day-in-the-life descriptions, how to start, skills required, timelines, resources, and a faith angle.</div></div>
+      <div class="tut-row"><div class="tut-icon">📄</div><div class="tut-row-text"><b>Resume Builder</b> — Create a professional resume with experience, skills, and education sections. Job tracker and interview prep with STAR method.</div></div>
+      <div class="tut-row"><div class="tut-icon">🪪</div><div class="tut-row-text"><b>Bio Page</b> — Build a shareable personal page with your stats, portfolio, and a QR code.</div></div>
     </div>
 
-    <!-- STEP 14: BADGES -->
     <div class="tut-step" data-step="14">
-      <h3>🏅 Badges & Achievements</h3>
-      <p>20 achievements to unlock by doing real things across the app. Badges make progress visible and keep things fun.</p>
-      <div class="tut-visual"><div class="tv-label">Where to find it</div><div class="tv-path"><span>☰ Menu</span><span class="arr">→</span><span>🏅 Badges</span></div></div>
-      <div class="tut-row"><div class="tut-icon">🔓</div><div class="tut-row-text"><b>How to unlock badges</b> Each badge has a specific requirement — like a 7-day streak, completing your first Life Skills certificate, writing 10 journal entries, or finishing all your goals for the year.</div></div>
-      <div class="tut-row"><div class="tut-icon">📊</div><div class="tut-row-text"><b>Badge gallery</b> Locked badges show as grey silhouettes so you can see what's possible. Earned badges display in full color with the date you unlocked them.</div></div>
-      <div class="tut-row"><div class="tut-icon">🏆</div><div class="tut-row-text"><b>Parent visibility</b> Parents can see your badge count in the Parent Hub Overview. Earning badges improves your Engagement score in the Life Score system.</div></div>
-      <div class="tut-row"><div class="tut-icon">🎯</div><div class="tut-row-text"><b>Challenge yourself</b> Try to earn all 20 badges. Some are easy (first login, first journal entry) and some take months of consistent effort. The rarest ones are real accomplishments.</div></div>
+      <h3>✅ CHORES, REWARDS & GAMES</h3>
+      <p>The complete reward ecosystem — chores, earnings, screen time, Parent Bucks, and games.</p>
+      <div class="tut-row"><div class="tut-icon">✅</div><div class="tut-row-text"><b>Chores</b> — Parents add chores with point values. Complete them, get verified, earn points and level up.</div></div>
+      <div class="tut-row"><div class="tut-icon">📱</div><div class="tut-row-text"><b>Screen Time</b> — Earn minutes for Video Games, TV, Phone, and Tablet. Use the countdown timer when playing. Parents control the time.</div></div>
+      <div class="tut-row"><div class="tut-icon">💰</div><div class="tut-row-text"><b>Earnings & Savings Jar</b> — Track cash earned from chores and behavior. Visual jar fills up as you save toward a goal.</div></div>
+      <div class="tut-row"><div class="tut-icon">🪙</div><div class="tut-row-text"><b>Parent Bucks</b> — Virtual currency earned from activities. Spend in the store for prizes parents set up. Exchange for real rewards!</div></div>
+      <div class="tut-row"><div class="tut-icon">🎰</div><div class="tut-row-text"><b>Spinner & Scratch Cards</b> — Earn game tickets from achievements. Spin the wheel for PB/screen time. Scratch 3 matching symbols to win!</div></div>
     </div>
 
-    <!-- STEP 15: JOBS & BIO -->
     <div class="tut-step" data-step="15">
-      <h3>💼 Jobs, Resume & Bio</h3>
-      <p>Build a real resume, track job applications, and create a shareable personal bio page — all before you're 18.</p>
-      <div class="tut-visual"><div class="tv-label">Where to find it</div><div class="tv-path"><span>☰ Menu</span><span class="arr">→</span><span>📄 Jobs / Resume</span><span class="arr">·</span><span>🪪 Bio Page</span></div></div>
-      <div class="tut-row"><div class="tut-icon">📄</div><div class="tut-row-text"><b>Resume Builder</b> Fill in your education, experience, skills, and activities. Choose from professional, modern, or creative templates. Download as a formatted resume ready to send to employers.</div></div>
-      <div class="tut-row"><div class="tut-icon">📋</div><div class="tut-row-text"><b>Job Tracker</b> Track every job you've applied for — company, position, date applied, status (applied, interview, offer, rejected). Never lose track of where you've applied.</div></div>
-      <div class="tut-row"><div class="tut-icon">🎤</div><div class="tut-row-text"><b>Interview Prep</b> Practice common interview questions with the STAR method (Situation, Task, Action, Result). Write out your answers and review them before any interview.</div></div>
-      <div class="tut-row"><div class="tut-icon">🪪</div><div class="tut-row-text"><b>Bio Page</b> Build a shareable personal page with your photo, skills, interests, and accomplishments. Gets a shareable link you can send to coaches, colleges, or employers.</div></div>
+      <h3>👨‍👩‍👧 PARENT HUB</h3>
+      <p>PIN-protected parent dashboard with complete visibility and control.</p>
+      <div class="tut-row"><div class="tut-icon">🏆</div><div class="tut-row-text"><b>Life Score</b> — Weighted grade (A+ through F, or N/A for new users) across academics, responsibility, growth, wellbeing, character, and engagement.</div></div>
+      <div class="tut-row"><div class="tut-icon">👧👦</div><div class="tut-row-text"><b>Multi-Child</b> — Add multiple children from the profile switcher. Each gets a unique ID. Parent Hub shows all children's stats at a glance.</div></div>
+      <div class="tut-row"><div class="tut-icon">📱</div><div class="tut-row-text"><b>Screen Time Controls</b> — Add earned minutes per category. Reset anytime.</div></div>
+      <div class="tut-row"><div class="tut-icon">🪙</div><div class="tut-row-text"><b>Parent Bucks</b> — Add PB, grant spin/scratch tickets, build the store with redeemable prizes.</div></div>
+      <div class="tut-row"><div class="tut-icon">💰</div><div class="tut-row-text"><b>Earnings</b> — Add cash rewards, set savings goals. Weekly report card and behavior log included.</div></div>
     </div>
 
-    <!-- STEP 16: CHORES & REWARDS -->
     <div class="tut-step" data-step="16">
-      <h3>✅ Chores & Rewards System</h3>
-      <p>The motivation engine of Life OS. Complete chores → earn Parent Bucks → redeem prizes. Here's how the whole system works from both sides.</p>
-      <div class="tut-visual"><div class="tv-label">Where to find it</div><div class="tv-path"><span>☰ Menu</span><span class="arr">→</span><span>✅ Chores</span><span class="arr">·</span><span>🪙 Parent Bucks</span><span class="arr">·</span><span>📱 Screen Time</span></div></div>
-      <div class="tut-row"><div class="tut-icon">✅</div><div class="tut-row-text"><b>For Kids — Chores tab</b> Your parent assigns chores here. Each chore shows the name, point value, and how often it repeats. Finish the real chore, then tap "Mark Done." Your parent verifies it and you get paid.</div></div>
-      <div class="tut-row"><div class="tut-icon">🪙</div><div class="tut-row-text"><b>Parent Bucks</b> Virtual currency you earn by completing chores and good behavior. Check your balance in the Parent Bucks section. Tap Prize Store to see what you can spend them on.</div></div>
-      <div class="tut-row"><div class="tut-icon">📱</div><div class="tut-row-text"><b>Screen Time</b> Earn screen time minutes through chores. Go to Screen Time → tap Use Time → start the countdown. When time runs out, the timer stops. Parents top up your balance.</div></div>
-      <div class="tut-row"><div class="tut-icon">🎰</div><div class="tut-row-text"><b>Bonus rewards — Wheel & Scratch Cards</b> The Chores section has a Spin the Wheel and Scratch Card feature. Spin once per day for a chance at bonus Parent Bucks. Scratch cards are awarded by parents for special achievements.</div></div>
-      <div class="tut-row"><div class="tut-icon">👨‍👩‍👧</div><div class="tut-row-text"><b>For Parents — setup in Parent Hub</b> Go to Parent Hub → Chores & Deeds to create chores and set point values. Prize Store is where you add items for kids to redeem. Screen Time tab is where you add/reset time balances.</div></div>
+      <h3>⚡ POWER TIPS</h3>
+      <p>Get the most out of YourLife CC.</p>
+      <div class="tut-row"><div class="tut-icon">📱</div><div class="tut-row-text"><b>Works on any device</b> — Phone, tablet, laptop, desktop. Just open in a browser. No app download needed.</div></div>
+      <div class="tut-row"><div class="tut-icon">🎨</div><div class="tut-row-text"><b>Customize</b> — Change accent colors and dark/light mode in Settings. Choose from 10 dashboard background presets.</div></div>
+      <div class="tut-row"><div class="tut-icon">🎯</div><div class="tut-row-text"><b>Monthly Challenges</b> — A new challenge every month with 3 tasks. Complete them for streaks and growth.</div></div>
+      <div class="tut-row"><div class="tut-icon">💭</div><div class="tut-row-text"><b>Daily Prompts</b> — 31 journal prompts rotate daily on your dashboard. Tap to open the journal.</div></div>
+      <div class="tut-row"><div class="tut-icon">📊</div><div class="tut-row-text"><b>Status Colors</b> — Dashboard cards show green (doing great), yellow (neutral), or red (needs attention) at a glance.</div></div>
+      <div class="tut-row"><div class="tut-icon">💾</div><div class="tut-row-text"><b>Backup</b> — Export your data in Settings. Import on any device to restore everything.</div></div>
     </div>
 
-    <!-- STEP 17: PARENT HUB -->
-    <div class="tut-step" data-step="17">
-      <h3>👨‍👩‍👧 Parent Hub</h3>
-      <p>Your private control center — PIN-protected. Everything you need to guide and monitor each child's progress.</p>
-      <div class="tut-visual"><div class="tv-label">How to access</div><div class="tv-path"><span>👨‍👩‍👧 Parent button</span><span class="arr">→</span><span>Enter 6-digit PIN</span><span class="arr">→</span><span>Parent Hub opens</span></div></div>
-      <div class="tut-row"><div class="tut-icon">👥</div><div class="tut-row-text"><b>Manage Users</b> First thing to set up. Add each child with a name and 4-digit PIN. From here you can also reset a child's PIN if they forget it, and toggle whether YOUR parent PIN is required every time you open the hub.</div></div>
-      <div class="tut-row"><div class="tut-icon">📊</div><div class="tut-row-text"><b>Overview — Life Score</b> Select a child from the dropdown at the top. See their Life Score (A+ to F) across 6 categories: Academics, Responsibility, Growth, Wellbeing, Character, Engagement. Updates in real time.</div></div>
-      <div class="tut-row"><div class="tut-icon">📋</div><div class="tut-row-text"><b>Behavior & Grades tab</b> Log positive notes ("Did homework without being asked") and areas to work on. Each entry affects their Life Score. Builds a record you can reference in real conversations.</div></div>
-      <div class="tut-row"><div class="tut-icon">🏆</div><div class="tut-row-text"><b>Contests tab</b> Create family competitions — first to reach a streak, most chores in a month, etc. Adds a fun competitive layer if you have multiple kids.</div></div>
-      <div class="tut-row"><div class="tut-icon">📈</div><div class="tut-row-text"><b>Activity Log</b> See a history of what your child has been doing in the app — lessons completed, journal entries written, badges earned. Great for weekly check-ins.</div></div>
-      <div class="tut-row"><div class="tut-icon">← </div><div class="tut-row-text"><b>Going back</b> Use the "← Dashboard" button at the top of the Parent Hub to return to the main app screen at any time.</div></div>
-    </div>
-
-    <!-- STEP 18: SETTINGS + LANGUAGE + POWER TIPS -->
-    <div class="tut-step" data-step="18">
-      <h3>⚙️ Settings, Language & Power Tips</h3>
-      <p>The final tools that make Life OS feel completely personal — and a few pro moves to get the most out of everything.</p>
-      <div class="tut-visual"><div class="tv-label">Where to find it</div><div class="tv-path"><span>⚙ Settings button</span><span class="arr">·</span><span>🌐 Language button</span><span class="arr">→</span><span>both in the top bar</span></div></div>
-      <div class="tut-row"><div class="tut-icon">🌐</div><div class="tut-row-text"><b>Language translation</b> Tap the 🌐 Language button. Select any language from the list — the ENTIRE app translates instantly. All text, buttons, labels, everything. Tap Language again and choose English to switch back.</div></div>
-      <div class="tut-row"><div class="tut-icon">⚙️</div><div class="tut-row-text"><b>Settings — Profile tab</b> Change your name, pick your grade/life stage (Elementary, Middle School, High School, etc.), and toggle faith features on or off. Life stage controls which sections are visible.</div></div>
-      <div class="tut-row"><div class="tut-icon">🎨</div><div class="tut-row-text"><b>Settings — Appearance tab</b> Pick from 10 background themes and 10 accent colors. Switch between Light and Dark mode. Changes apply instantly — experiment freely.</div></div>
-      <div class="tut-row"><div class="tut-icon">💾</div><div class="tut-row-text"><b>Settings — Data tab</b> Tap Export Backup to save your entire life's data as a .json file. Keep it in your photos or cloud drive. Import it anytime to restore everything exactly as it was.</div></div>
-      <div class="tut-row"><div class="tut-icon">📱</div><div class="tut-row-text"><b>Pro tip — Add to Home Screen</b> In your mobile browser, tap Share → "Add to Home Screen." Life OS works like a real app right from your home screen, no app store needed.</div></div>
-      <div class="tut-row"><div class="tut-icon">🔄</div><div class="tut-row-text"><b>Re-open this tutorial anytime</b> Go to ⚙ Settings → tap "How to Use Life OS — Full Tutorial." You can also re-open the Quick Start wizard from the Settings menu anytime.</div></div>
-    </div>
-
-  </div><!-- /tut-body -->
+    </div><!-- /tut-body -->
 
   <div class="tut-foot">
     <button class="btn bgh" id="tutPrevBtn" onclick="tutNav(-1)">‹ Back</button>
-    <button class="btn bgh" onclick="closeTutorial();showSection('s-hero')" style="font-size:.72rem;padding:.35rem .7rem;opacity:.8;">🏠 Dashboard</button>
-    <span style="font-size:.72rem;color:var(--tx2);" id="tutStepLbl">1 / 19</span>
+    <span style="font-size:.75rem;color:var(--tx2);" id="tutStepLbl">1 / 13</span>
     <button class="btn bp" id="tutNextBtn" onclick="tutNav(1)">Next ›</button>
   </div>
 </div>
@@ -5879,8 +5296,6 @@ body{top:0!important;}
 
 
 <!-- ══════════════════════ MODALS ═══════════════════════════ -->
-
-
 
 <div class="mo" id="goalModal">
   <div class="md">
@@ -6256,252 +5671,6 @@ body{top:0!important;}
     </div>
   </div>
 </div>
-
-<!-- ═══ ONBOARDING WELCOME MODAL ═══ -->
-<!-- ═══ FLOATING START HERE BUTTON ═══ -->
-<div id="startHereBtn" onclick="showParentOnboard()" title="Start Here!">
-  <div class="sh-bubble">✨ Start Here!</div>
-  <div class="sh-emoji">👆</div>
-</div>
-
-<!-- ═══ PARENT ONBOARDING WIZARD ═══ -->
-<div id="parentOnboard">
-<div class="ob-box">
-  <div class="ob-slides-wrap"><div class="ob-slides" id="pobSlides">
-
-    <!-- SLIDE 0: WELCOME -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji">👋</span>
-        <div class="ob-hero-title">WELCOME TO LIFE OS</div>
-        <div class="ob-hero-sub">Your family's complete command center. This quick guide will have your whole family up and running in just a few minutes.</div>
-      </div>
-      <div class="ob-steps-grid">
-        <div class="ob-step-card" style="--accent:#38bdf8"><span class="osc-icon">👨‍👩‍👧</span><div class="osc-title">Parent Hub</div><div class="osc-desc">Your private control center — PIN protected so only you can access it.</div></div>
-        <div class="ob-step-card" style="--accent:#818cf8"><span class="osc-icon">👤</span><div class="osc-title">Child Profiles</div><div class="osc-desc">Each kid gets their own 4-digit PIN and completely separate dashboard.</div></div>
-        <div class="ob-step-card" style="--accent:#34d399"><span class="osc-icon">🧠</span><div class="osc-title">140+ Lessons</div><div class="osc-desc">Life skills from cooking to budgeting. Kids earn real certificates.</div></div>
-        <div class="ob-step-card" style="--accent:#f59e0b"><span class="osc-icon">✅</span><div class="osc-title">Chores & Rewards</div><div class="osc-desc">Assign chores with point values. Kids earn Parent Bucks and screen time.</div></div>
-      </div>
-      <div class="ob-tip">💡 <strong>Tip:</strong> This whole guide takes about 2 minutes. You can reopen it anytime from Settings.</div>
-    </div>
-
-    <!-- SLIDE 1: FIRST STEPS -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji">🚀</span>
-        <div class="ob-hero-title">STEP 1 — SET UP YOUR FAMILY</div>
-        <div class="ob-hero-sub">Before your kids can log in, you need to add them. Here's how:</div>
-      </div>
-      <ul class="ob-checklist">
-        <li><div class="obc-n">1</div><div>Tap the <b>👨‍👩‍👧 Parent</b> button at the top of the screen to open the Parent Hub.</div></li>
-        <li><div class="obc-n">2</div><div>You'll be asked to create a <b>6-digit Parent PIN</b> — this keeps your parent controls private from the kids.</div></li>
-        <li><div class="obc-n">3</div><div>Once inside, go to <b>👥 Manage Users</b> on the left side menu.</div></li>
-        <li><div class="obc-n">4</div><div>Tap <b>"+ Add Child"</b> and type your child's name. A <b>4-digit PIN</b> will be created — write it down or share it with your child.</div></li>
-        <li><div class="obc-n">5</div><div>Repeat for each child in your family. You can add as many as you need!</div></li>
-      </ul>
-      <div class="ob-tip">💡 <strong>Each child has their own private space.</strong> When a child logs in, they only see their own data — not their siblings'.</div>
-    </div>
-
-    <!-- SLIDE 2: PARENT HUB TOUR -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji">🔐</span>
-        <div class="ob-hero-title">YOUR PARENT HUB</div>
-        <div class="ob-hero-sub">Everything you need to guide and monitor your kids — all in one place.</div>
-      </div>
-      <div class="ob-steps-grid">
-        <div class="ob-step-card" style="--accent:#38bdf8"><span class="osc-icon">📊</span><div class="osc-title">Overview</div><div class="osc-desc">See your child's Life Score — a real grade (A+ to F) across 6 life categories.</div></div>
-        <div class="ob-step-card" style="--accent:#34d399"><span class="osc-icon">✅</span><div class="osc-title">Chores & Deeds</div><div class="osc-desc">Create and assign chores. Kids complete them and earn Parent Bucks.</div></div>
-        <div class="ob-step-card" style="--accent:#f59e0b"><span class="osc-icon">📱</span><div class="osc-title">Screen Time</div><div class="osc-desc">Kids earn screen time by completing chores. You control the balance.</div></div>
-        <div class="ob-step-card" style="--accent:#818cf8"><span class="osc-icon">📋</span><div class="osc-title">Behavior Log</div><div class="osc-desc">Record positive moments and areas to work on. Feeds into their Life Score.</div></div>
-        <div class="ob-step-card" style="--accent:#ef4444"><span class="osc-icon">📈</span><div class="osc-title">Report Card</div><div class="osc-desc">Weekly snapshot of each child's progress across every section.</div></div>
-        <div class="ob-step-card" style="--accent:#06b6d4"><span class="osc-icon">🎮</span><div class="osc-title">Prize Store</div><div class="osc-desc">Build a custom reward store — kids spend their Parent Bucks here.</div></div>
-      </div>
-      <div class="ob-tip">💡 <strong>Back button:</strong> Use the <b>← Dashboard</b> button inside the Parent Hub to return to the main screen anytime.</div>
-    </div>
-
-    <!-- SLIDE 3: CHORES & REWARDS -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji">⭐</span>
-        <div class="ob-hero-title">CHORES & REWARDS</div>
-        <div class="ob-hero-sub">The most powerful motivation system you'll ever use at home.</div>
-      </div>
-      <ul class="ob-checklist">
-        <li><div class="obc-n">1</div><div>Go to <b>Parent Hub → Chores & Deeds</b>. Tap <b>"+ Add Chore"</b> and give it a name, point value, and how often it repeats (daily, weekly, one-time).</div></li>
-        <li><div class="obc-n">2</div><div>Your child will see the chore in their <b>✅ Chores</b> section. When they finish it, they tap <b>"Mark Done"</b>.</div></li>
-        <li><div class="obc-n">3</div><div>You verify it in the Parent Hub. Once approved, they earn <b>Parent Bucks 🪙</b> and <b>Screen Time ⏱</b> automatically.</div></li>
-        <li><div class="obc-n">4</div><div>Build a <b>Prize Store</b> — add prizes like "Movie Night", "Extra Screen Time", or real rewards. Kids spend their Parent Bucks to claim them.</div></li>
-      </ul>
-      <div class="ob-tip">💡 <strong>Fun extras:</strong> Your kids can also spin a reward wheel 🎰 or scratch a virtual card 🎫 to win bonus Parent Bucks!</div>
-    </div>
-
-    <!-- SLIDE 4: LANGUAGE & SETTINGS -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji">⚙️</span>
-        <div class="ob-hero-title">SETTINGS & LANGUAGE</div>
-        <div class="ob-hero-sub">Make Life OS feel like it was built for your family.</div>
-      </div>
-      <ul class="ob-checklist">
-        <li><div class="obc-n">🌐</div><div><b>Language:</b> Tap the <b>🌐 Language</b> button at the top. Pick any language from the list and the ENTIRE app translates instantly. Tap again and choose English to switch back.</div></li>
-        <li><div class="obc-n">⚙</div><div><b>Settings:</b> Tap <b>⚙ Settings</b> in the top bar. Change your name, pick a color theme, show or hide sections your family doesn't need, and back up your data.</div></li>
-        <li><div class="obc-n">🎨</div><div><b>Themes:</b> Inside Settings → Appearance, choose from 10 background styles and 10 accent colors to match your family's vibe.</div></li>
-        <li><div class="obc-n">💾</div><div><b>Backup:</b> Inside Settings → Data, tap <b>Export Backup</b> to save your family data as a file. Keep it safe — import it anytime to restore everything.</div></li>
-      </ul>
-      <div class="ob-tip">💡 <strong>Faith features:</strong> Bible verses, devotionals, and scripture sections can be toggled on or off in Settings for families of all backgrounds.</div>
-    </div>
-
-    <!-- SLIDE 5: YOU'RE READY -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji">🎉</span>
-        <div class="ob-hero-title">YOU'RE ALL SET!</div>
-        <div class="ob-hero-sub">Here's your quick-start checklist to get the whole family going today.</div>
-      </div>
-      <ul class="ob-checklist">
-        <li><div class="obc-n">✓</div><div>Open <b>Parent Hub</b> → <b>Manage Users</b> → Add each child with a 4-digit PIN</div></li>
-        <li><div class="obc-n">✓</div><div>Share each child's PIN with them and have them tap <b>👤 Child Login</b></div></li>
-        <li><div class="obc-n">✓</div><div>Add at least 3 chores in <b>Parent Hub → Chores & Deeds</b></div></li>
-        <li><div class="obc-n">✓</div><div>Build a Prize Store with at least 1 reward your kid will want</div></li>
-        <li><div class="obc-n">✓</div><div>Open the <b>Full Tutorial</b> below to explore every single section in detail</div></li>
-      </ul>
-      <div style="display:flex;flex-direction:column;gap:.5rem;margin-top:.5rem;">
-        <button onclick="closeParentOnboard();setTimeout(openTutorial,200);" style="background:linear-gradient(135deg,#38bdf8,#818cf8);color:#06101e;border:none;border-radius:10px;padding:.65rem 1rem;font-size:.83rem;font-weight:800;cursor:pointer;font-family:var(--fn);">📖 Open Full Detailed Tutorial</button>
-        <button onclick="closeParentOnboard();showSection('s-hero');" style="background:rgba(255,255,255,.07);color:var(--tx2);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fn);">✅ I Understand — Go to Dashboard</button>
-      </div>
-    </div>
-
-  </div><!-- /ob-slides -->
-  <div class="ob-footer">
-    <button class="ob-nav-btn ghost" id="pobPrev" onclick="pobNav(-1)" disabled>‹ Back</button>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:.3rem;">
-      <div class="ob-dots" id="pobDots"></div>
-      <span class="ob-skip" onclick="closeParentOnboard()">Skip for now</span>
-    </div>
-    <button class="ob-nav-btn" id="pobNext" onclick="pobNav(1)">Next ›</button>
-  </div>
-</div></div><!-- /ob-slides-wrap -->
-</div><!-- /ob-box -->
-</div><!-- /parentOnboard -->
-
-<!-- ═══ KID ONBOARDING WIZARD ═══ -->
-<div id="kidOnboard">
-<div class="ob-box">
-  <div class="ob-slides-wrap"><div class="ob-slides" id="kobSlides">
-
-    <!-- SLIDE 0: HI THERE! -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji" style="animation-duration:2s;">🌟</span>
-        <div class="ob-hero-title" style="color:#f59e0b;">HEY! WELCOME!</div>
-        <div class="ob-hero-sub">Life OS is YOUR personal command center. Let's take a super quick tour so you know exactly where everything is!</div>
-      </div>
-      <div class="ob-steps-grid">
-        <div class="ob-step-card" style="--accent:#f59e0b"><span class="osc-icon">📊</span><div class="osc-title">Your Dashboard</div><div class="osc-desc">Your home base — streaks, stats, and your daily wins all in one spot.</div></div>
-        <div class="ob-step-card" style="--accent:#34d399"><span class="osc-icon">✅</span><div class="osc-title">Daily Habits</div><div class="osc-desc">Check off habits every day to build your streak. Miss a day = streak reset!</div></div>
-        <div class="ob-step-card" style="--accent:#38bdf8"><span class="osc-icon">🧠</span><div class="osc-title">Life Skills</div><div class="osc-desc">140+ lessons with real certificates you can print. Learn stuff that actually matters.</div></div>
-        <div class="ob-step-card" style="--accent:#ef4444"><span class="osc-icon">🪙</span><div class="osc-title">Earn Rewards</div><div class="osc-desc">Finish chores → earn Parent Bucks → spend them on prizes in the store!</div></div>
-      </div>
-      <div class="ob-tip" style="background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.2);color:#fde68a;">💡 This is YOUR space. Your data is private — your parents can't see your journal entries!</div>
-    </div>
-
-    <!-- SLIDE 1: GETTING AROUND -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji">🧭</span>
-        <div class="ob-hero-title" style="color:#f59e0b;">HOW TO GET AROUND</div>
-        <div class="ob-hero-sub">Everything in Life OS is organized into sections. Here's how to navigate:</div>
-      </div>
-      <ul class="ob-checklist">
-        <li><div class="obc-n">☰</div><div>Tap the <b>☰ menu button</b> in the top-right corner to open the navigation. All your sections are listed there with emojis.</div></li>
-        <li><div class="obc-n">🏠</div><div>Tap <b>🏠 Dashboard</b> at the top of the menu to return home anytime from anywhere in the app.</div></li>
-        <li><div class="obc-n">❓</div><div>See a <b>? button</b> anywhere? Tap it! It gives you a quick explanation of exactly what that section does.</div></li>
-        <li><div class="obc-n">⚙</div><div>Tap <b>⚙ Settings</b> in the quick bar to change your name, pick your grade level, choose a color theme, and more.</div></li>
-      </ul>
-      <div class="ob-tip" style="background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.2);color:#fde68a;">💡 <strong>Lost?</strong> Just tap ☰ → Dashboard and you'll always get back home!</div>
-    </div>
-
-    <!-- SLIDE 2: DAILY HABITS & STREAKS -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji">🔥</span>
-        <div class="ob-hero-title" style="color:#f59e0b;">DAILY HABITS & STREAKS</div>
-        <div class="ob-hero-sub">This is the #1 thing to check every single day.</div>
-      </div>
-      <ul class="ob-checklist">
-        <li><div class="obc-n">1</div><div>On your <b>Dashboard</b>, find the <b>Daily W's</b> card. These are your habits — things like drinking water, praying, studying, working out.</div></li>
-        <li><div class="obc-n">2</div><div>Tap each habit to check it off with a ✅. The habit turns green and locks until midnight.</div></li>
-        <li><div class="obc-n">3</div><div>Complete <b>4 or more habits</b> in a day to count it as a streak day. Your streak number shows at the top.</div></li>
-        <li><div class="obc-n">4</div><div>Want to add your own habit? Tap the <b>+ Habit</b> button and create a custom one with your own emoji!</div></li>
-      </ul>
-      <div class="ob-tip" style="background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.2);color:#fde68a;">🔥 <strong>Challenge:</strong> Try to build a 7-day streak in your first week. You'll unlock your first badge!</div>
-    </div>
-
-    <!-- SLIDE 3: CHORES & EARNING -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji">💰</span>
-        <div class="ob-hero-title" style="color:#f59e0b;">CHORES & EARNING REWARDS</div>
-        <div class="ob-hero-sub">The more you do, the more you earn. Here's how it works:</div>
-      </div>
-      <ul class="ob-checklist">
-        <li><div class="obc-n">1</div><div>Tap <b>✅ Chores</b> in the menu. Your parent has added chores for you with point values.</div></li>
-        <li><div class="obc-n">2</div><div>Finish a chore in real life, then tap <b>"Mark Done"</b> in the app. Your parent will verify it.</div></li>
-        <li><div class="obc-n">3</div><div>Once approved, you earn <b>🪙 Parent Bucks</b> and <b>⏱ Screen Time</b> automatically!</div></li>
-        <li><div class="obc-n">4</div><div>Tap <b>🪙 Parent Bucks</b> to see your balance and visit the <b>Prize Store</b> — spend your bucks on prizes your parent added.</div></li>
-        <li><div class="obc-n">5</div><div>Check the <b>🎰 Wheel</b> and <b>🎫 Scratch Card</b> tabs for bonus ways to earn extra Parent Bucks!</div></li>
-      </ul>
-    </div>
-
-    <!-- SLIDE 4: SCHOOL & LIFE SKILLS -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji">📚</span>
-        <div class="ob-hero-title" style="color:#f59e0b;">SCHOOL & LIFE SKILLS</div>
-        <div class="ob-hero-sub">Two sections that help you actually get smarter — for real life, not just class.</div>
-      </div>
-      <ul class="ob-checklist">
-        <li><div class="obc-n">📖</div><div><b>School section:</b> Add your classes and grades — your GPA calculates automatically! Track assignments by due date so you never miss a deadline.</div></li>
-        <li><div class="obc-n">⏱</div><div><b>Study Timer:</b> In the School section, tap Study Timer. Set a Pomodoro timer (25 min focused work) and it logs every session automatically.</div></li>
-        <li><div class="obc-n">🧠</div><div><b>Life Skills Academy:</b> Find this in the menu. 140+ lessons on cooking, budgeting, car care, mental health, and more. Complete a category to earn a printable certificate!</div></li>
-        <li><div class="obc-n">🏅</div><div><b>Badges:</b> Check the Badges section to see what achievements you've unlocked and what challenges are still left to complete.</div></li>
-      </ul>
-      <div class="ob-tip" style="background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.2);color:#fde68a;">🎓 <strong>Pro tip:</strong> Earn 3 Life Skills certificates and unlock a special badge!</div>
-    </div>
-
-    <!-- SLIDE 5: YOU GOT THIS -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji" style="animation-duration:1.5s;">🚀</span>
-        <div class="ob-hero-title" style="color:#f59e0b;">YOU'VE GOT THIS!</div>
-        <div class="ob-hero-sub">You're ready to start. Here are your first 3 missions:</div>
-      </div>
-      <ul class="ob-checklist">
-        <li><div class="obc-n">🎯</div><div>Go to <b>⚙ Settings</b> and set your <b>name</b> and pick a <b>color theme</b> you like</div></li>
-        <li><div class="obc-n">🎯</div><div>Check off all your <b>Daily Habits</b> today to start your streak</div></li>
-        <li><div class="obc-n">🎯</div><div>Complete your first <b>chore</b> and earn your first Parent Bucks 🪙</div></li>
-      </ul>
-      <div class="ob-tip" style="background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.2);color:#fde68a;">💡 <strong>Remember:</strong> Tap the <b>☰ menu</b> to explore ALL sections — there are 20+ areas to discover!</div>
-      <div style="display:flex;flex-direction:column;gap:.5rem;margin-top:.7rem;">
-        <button onclick="closeKidOnboard();setTimeout(openTutorial,200);" style="background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;border:none;border-radius:10px;padding:.65rem 1rem;font-size:.83rem;font-weight:800;cursor:pointer;font-family:var(--fn);">📖 Show Me Everything (Full Tour)</button>
-        <button onclick="closeKidOnboard();" style="background:rgba(255,255,255,.07);color:var(--tx2);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fn);">Let's Go! I'm Ready 🚀</button>
-      </div>
-    </div>
-
-  </div><!-- /ob-slides -->
-  <div class="ob-footer">
-    <button class="ob-nav-btn ghost" id="kobPrev" onclick="kobNav(-1)" disabled style="background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.2);color:#f59e0b;">‹ Back</button>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:.3rem;">
-      <div class="ob-dots" id="kobDots"></div>
-      <span class="ob-skip" onclick="closeKidOnboard()">Skip for now</span>
-    </div>
-    <button class="ob-nav-btn" id="kobNext" onclick="kobNav(1)" style="background:linear-gradient(135deg,#f59e0b,#ef4444);">Next ›</button>
-  </div>
-</div></div><!-- /ob-slides-wrap -->
-</div><!-- /ob-box -->
-</div><!-- /kidOnboard -->
-
 <script>
 // ── FIRST TIME PARENT PIN SETUP ──────────────────────────────
 function showFirstTimeGate(){
@@ -6514,39 +5683,22 @@ function hideFirstTimeGate(){
   if(el) el.style.display = 'none';
 }
 
-function ftUpdateDots(which){
-  const inp = document.getElementById(which===1?'ftPinInput':'ftPinConfirm');
-  if(!inp) return;
-  const len = inp.value.length;
-  for(let i=0;i<6;i++){
-    const d = document.getElementById('ftd'+which+'_'+i);
-    if(!d) continue;
-    if(i < len){ d.style.background='#38bdf8'; d.style.borderColor='#38bdf8'; d.style.transform='scale(1.15)'; }
-    else { d.style.background=''; d.style.borderColor='rgba(56,189,248,.3)'; d.style.transform=''; }
-  }
-}
-
 function setupFirstPin(){
   const pin = (document.getElementById('ftPinInput')||{}).value||'';
   const conf = (document.getElementById('ftPinConfirm')||{}).value||'';
   const err = document.getElementById('ftPinError');
   
-  if(pin.length < 6){ if(err) err.textContent='PIN must be exactly 6 digits'; return; }
+  if(pin.length < 6){ if(err) err.textContent='PIN must be 6 digits'; return; }
   if(!/^\d{6}$/.test(pin)){ if(err) err.textContent='PIN must be numbers only'; return; }
-  if(pin !== conf){ if(err) err.textContent='PINs do not match — please try again'; return; }
+  if(pin !== conf){ if(err) err.textContent='PINs do not match'; return; }
   
   if(err) err.textContent='';
-  // Save PIN to BOTH chorePin and parentPIN so parent never needs to re-enter
   D.chorePin = pin;
-  D.parentPIN = pin;
   save();
   hideFirstTimeGate();
   
-  // Finish initializing the app
+  // Now finish initializing the app
   finishInit();
-  
-  // Wizard shows when parent taps the bouncing Start Here button
-  // (auto-show removed — let parent discover at their own pace)
 }
 
 
@@ -6861,7 +6013,6 @@ const STAGE_CONFIG = {
 };
 
 function applyName(){
-  updateStartHereBtn();
   const name=(D.name||'').trim();
   const el=document.getElementById('heroName');
   if(el) el.textContent=name?(name.toUpperCase()):'CHAMPION';
@@ -7498,16 +6649,6 @@ function showSection(id, fromMobile){
 
   // Scroll to top of main
   window.scrollTo(0,0);
-
-  // Auto-unlock Parent Hub gate if already unlocked this session or PIN disabled
-  if(id==='s-parent' && !_parentDashUnlocked && typeof D!=='undefined' && (D.parentPinDisabled || sessionStorage.getItem('parentUnlocked')==='1')){
-    _parentDashUnlocked = true;
-    const gate = document.getElementById('parentGate');
-    const content = document.getElementById('parentDashContent');
-    if(gate) gate.style.display='none';
-    if(content) content.style.display='block';
-    setTimeout(()=>{ typeof renderParentDash==='function'&&renderParentDash(); typeof updateIncConditions==='function'&&updateIncConditions(); },50);
-  }
 
   // Trigger renders that need visible DOM
   if(id==='s-schedule') setTimeout(buildSchedule,60);
@@ -11658,13 +10799,7 @@ function finishInit(){
   renderDevMap();
   initResources();
 
-  // Name prompt on first visit
-  if(!D.name){
-    setTimeout(()=>{
-      const n=prompt('👋 Welcome to LIFE OS!\n\nWhat\'s your name?');
-      if(n&&n.trim()){ D.name=n.trim(); save(); applyName(); showToast('Welcome, '+D.name+'! 🙌'); }
-    },600);
-  }
+  // Name is set during registration, no prompt needed
 
   // Macro goal inputs
   const g=D.macroGoals||{};
@@ -12473,165 +11608,10 @@ function applyTheme(){
   updateThemeBtn();
 }
 // ── TUTORIAL ─────────────────────────────────────────────────
-
-// ══════════════════════════════════════════════════════════
-// PARENT ONBOARDING WIZARD
-// ══════════════════════════════════════════════════════════
-let _pobStep = 0;
-const POB_TOTAL = 6;
-
-function initPobDots(){
-  const d = document.getElementById('pobDots'); if(!d) return;
-  d.innerHTML = Array.from({length:POB_TOTAL},(_,i)=>`<div class="ob-dot${i===0?' act':''}" id="pd${i}"></div>`).join('');
-}
-function pobNav(dir){
-  _pobStep = Math.max(0, Math.min(POB_TOTAL-1, _pobStep + dir));
-  const slides = document.getElementById('pobSlides'); if(!slides) return;
-  const w = slides.parentElement.offsetWidth || slides.offsetWidth;
-  slides.style.transform = `translateX(-${_pobStep * w}px)`;
-  document.querySelectorAll('#pobDots .ob-dot').forEach((d,i)=>d.classList.toggle('act',i===_pobStep));
-  const prev = document.getElementById('pobPrev');
-  const next = document.getElementById('pobNext');
-  if(prev){ prev.disabled = _pobStep===0; prev.style.opacity=_pobStep===0?'0.3':'1'; }
-  if(next){
-    next.textContent = _pobStep === POB_TOTAL-1 ? '✅ Complete' : 'Next ›';
-    if(_pobStep === POB_TOTAL-1){ next.onclick = ()=>{ closeParentOnboard(); showSection('s-hero'); }; } else { next.onclick = ()=>pobNav(1); }
-  }
-}
-function showParentOnboard(){
-  _pobStep = 0;
-  initPobDots();
-  const slides = document.getElementById('pobSlides');
-  if(slides) slides.style.transform='translateX(0px)';
-  const prev = document.getElementById('pobPrev');
-  if(prev){ prev.disabled=true; prev.style.opacity='0.35'; }
-  const next = document.getElementById('pobNext');
-  if(next){ next.textContent='Next ›'; next.onclick=()=>pobNav(1); }
-  const modal = document.getElementById('parentOnboard');
-  if(!modal){ alert('Wizard not found — please refresh the page'); return; }
-  // Force show with both inline style AND class (belt AND suspenders)
-  modal.style.cssText = 'display:flex !important; position:fixed; inset:0; z-index:99998; background:rgba(0,0,0,.93); align-items:center; justify-content:center; padding:1rem;';
-  modal.classList.add('open');
-  document.body.style.overflow='hidden';
-}
-function closeParentOnboard(){
-  const modal = document.getElementById('parentOnboard'); if(!modal) return;
-  modal.classList.remove('open');
-  modal.style.display='none';
-  document.body.style.overflow='';
-  D.parentWizardDone = true; save();
-  // Hide the bouncing button permanently
-  const btn = document.getElementById('startHereBtn');
-  if(btn) btn.classList.add('sh-hidden');
-}
-
-// ══════════════════════════════════════════════════════════
-// KID ONBOARDING WIZARD
-// ══════════════════════════════════════════════════════════
-let _kobStep = 0;
-const KOB_TOTAL = 6;
-
-function initKobDots(){
-  const d = document.getElementById('kobDots'); if(!d) return;
-  d.innerHTML = Array.from({length:KOB_TOTAL},(_,i)=>`<div class="ob-dot${i===0?' act':''}" id="kd${i}"></div>`).join('');
-}
-function kobNav(dir){
-  _kobStep = Math.max(0, Math.min(KOB_TOTAL-1, _kobStep + dir));
-  const slides = document.getElementById('kobSlides'); if(!slides) return;
-  const w = slides.parentElement.offsetWidth || slides.offsetWidth;
-  slides.style.transform = `translateX(-${_kobStep * w}px)`;
-  document.querySelectorAll('#kobDots .ob-dot').forEach((d,i)=>d.classList.toggle('act',i===_kobStep));
-  const prev = document.getElementById('kobPrev');
-  const next = document.getElementById('kobNext');
-  if(prev){ prev.disabled = _kobStep===0; prev.style.opacity=_kobStep===0?'0.3':'1'; }
-  if(next){
-    next.textContent = _kobStep === KOB_TOTAL-1 ? "🚀 Let's Go!" : 'Next ›';
-    if(_kobStep === KOB_TOTAL-1){ next.onclick = closeKidOnboard; } else { next.onclick = ()=>kobNav(1); }
-  }
-}
-function showKidOnboard(){
-  _kobStep = 0;
-  initKobDots();
-  const slides = document.getElementById('kobSlides'); if(slides) slides.style.transform='translateX(0px)';
-  const prev = document.getElementById('kobPrev'); if(prev){ prev.disabled=true; prev.style.opacity='0.35'; }
-  const next = document.getElementById('kobNext'); if(next){ next.textContent='Next ›'; next.onclick=()=>kobNav(1); }
-  const modal = document.getElementById('kidOnboard');
-  if(!modal){ console.warn('kidOnboard modal not found'); return; }
-  modal.style.display='flex';
-  modal.classList.add('open');
-  document.body.style.overflow='hidden';
-}
-function closeKidOnboard(){
-  const modal = document.getElementById('kidOnboard'); if(!modal) return;
-  modal.classList.remove('open');
-  modal.style.display='none';
-  document.body.style.overflow='';
-  D.kidOnboardDone = true; save();
-}
-
-// ══════════════════════════════════════════════════════════
-// START-HERE BUTTON VISIBILITY
-// ══════════════════════════════════════════════════════════
-function updateStartHereBtn(){
-  const btn = document.getElementById('startHereBtn'); if(!btn) return;
-  // Hide when child profile is active OR wizard already done
-  const profile = _profiles && _activeProfileId ? _profiles.find(p=>p.id===_activeProfileId) : null;
-  const isChild = profile && !profile.isParent;
-  if(isChild || D.parentWizardDone){ btn.classList.add('sh-hidden'); }
-  else { btn.classList.remove('sh-hidden'); }
-}
-
 const TUT_STEPS = [
-  'Welcome','Dashboard','Daily Habits','Money','School','Schedule','Health','Goals','Life Skills','Growing Up','Journal','Scripture','Driving','Sports','Badges','Jobs & Bio','Chores & Rewards','Parent Hub','Settings & Tips'
+  'Welcome','Dashboard','Money','School','Schedule','Calendar','Health','Goals','Life Skills','Growing Up','Music & Practice','Driving & Sports','Scripture & Badges','Jobs/Resume','Chores','Parent Hub','Power Tips'
 ];
 let _tutStep = 0;
-
-// ══ HELP TOOLTIP SYSTEM ════════════════════════════════════
-const HTIPS = {
-  dashboard:  ["🏠 Dashboard","Your daily home base. Streak counter, quick stats (bank, GPA, goals), Daily Wins habit tracker, scripture banner, and motivational quote. Everything updates live."],
-  habits:     ["⚡ Daily Wins","Tap each habit to check it off. Complete 4+ per day to keep your streak alive. Hit '+ Habit' to add your own. Streak resets at midnight if you miss a day."],
-  money:      ["💰 Money Manager","6 tabs: Overview (balances) · Bills (recurring bills, mark paid) · Transactions (log income/expenses) · Goal Savings (quick-add) · Sav. Goals (create goals) · Budget (50/30/20)."],
-  school:     ["📚 School","Add classes with grade %, and GPA calculates instantly. Track assignments by due date and priority. Use the Study Timer (Pomodoro) to log focused sessions automatically."],
-  schedule:   ["📅 Schedule","28-day visual grid, 6 AM to 11 PM. Click any cell to assign an activity. Color-codes automatically. Add custom activities in Settings > Schedule Activities."],
-  health:     ["❤️ Health & Fitness","Log weight, nutrition (calories/macros), and mood. Progress charts update with each entry. Daily habits here sync with your dashboard streak."],
-  goals:      ["🎯 Goals & Vision","Write your life vision, then add long-term and short-term goals by category. Click the circle to mark achieved. Career Explorer lets you save careers of interest."],
-  skills:     ["🧠 Life Skills Academy","140+ lessons across 16 categories. Tap a card to open the full guide. Pass the 5-question quiz (80%+) to earn a shareable certificate for that category."],
-  growing:    ["🌱 Growing Up","Real-talk guides on puberty, mental health, relationships, substance use, and identity — filtered by gender. Crisis helplines (988, 741741) are always visible."],
-  journal:    ["✍️ Journal","Pick a category, write your entry, and save. All entries are private and saved locally. Tap any saved entry to re-read it. Daily prompts appear on your dashboard."],
-  scripture:  ["✝️ Bible & Faith","365 daily verses by monthly theme. Earn 5 pts per day you read. Calendar shows your full year. Devotionals, Jesus & Purpose, and faith guides are in the tabs."],
-  driving:    ["🚗 Driving","License prep (permit test + practice hours) · Safety · Car maintenance · Costs & insurance · Accident procedures. Interactive checklists track your progress."],
-  sports:     ["🏆 Sports","14 sport profiles: prep tips, scholarship info, health & safety, participation stats. Filter by Boys / Girls / Both and by school level."],
-  chores:     ["✅ Chores","Parents assign chores with point values in Parent Hub. Complete them and hit Done to request verification. Earn Parent Bucks, screen time, and cash rewards."],
-  screentime: ["📱 Screen Time","Earn minutes by completing chores. Hit Use Time and start the countdown timer when playing. Parents add time and reset balances from Parent Hub."],
-  parentbucks:["🪙 Parent Bucks","Virtual currency parents award for good behavior and chores. Spend in the Prize Store. Earn bonus PB from Spin the Wheel and Scratch Cards."],
-  parenthub:  ["👨‍👩‍👧 Parent Hub","PIN-protected parent dashboard. View Life Scores, manage users, assign chores, control screen time, add Parent Bucks, log behavior, and review weekly report cards."],
-  manageusers:["👥 Manage Users","Add children here — give each a name and 4-digit PIN. Kids tap Child Login at the top to access their dashboard. Toggle parent PIN requirement on/off."],
-  lifescore:  ["📊 Life Score","Weighted grade (A+ to F) across 6 categories: Academics, Responsibility, Growth, Wellbeing, Character, Engagement. Updates live. Visible in Parent Hub Overview."],
-  childlogin: ["👤 Child Login","Children tap their name, then enter their 4-digit PIN to load their personal dashboard. PINs are set and reset in Parent Hub > Manage Users."],
-  badges:     ["🏅 Badges","20 achievements to unlock — streak milestones, certificates earned, books read, goals completed, journal entries, and more. Badge gallery shows earned vs locked."],
-  settings:   ["⚙️ Settings","Change your name and life stage, toggle sections on/off, manage themes and colors, set parent PIN, backup/restore data, and sync to cloud."],
-  language:   ["🌐 Language","Powered by Google Translate. Click to select any language — the entire app translates instantly. Select English to switch back."],
-};
-
-function hlp(key, el, evt){
-  if(evt) evt.stopPropagation();
-  const tip = HTIPS[key]; if(!tip) return;
-  const box = document.getElementById('hlpBox');
-  const t = document.getElementById('hlpT');
-  const b = document.getElementById('hlpB');
-  if(!box||!t||!b) return;
-  t.textContent = tip[0]; b.textContent = tip[1];
-  const r = el.getBoundingClientRect();
-  let top = r.bottom + 6;
-  let left = r.left;
-  if(top + 140 > window.innerHeight) top = r.top - 148;
-  if(left + 278 > window.innerWidth) left = window.innerWidth - 282;
-  if(left < 4) left = 4;
-  box.style.top = top + 'px'; box.style.left = left + 'px';
-  box.classList.add('show');
-}
-function hlpHide(){ document.getElementById('hlpBox')?.classList.remove('show'); }
-document.addEventListener('click', hlpHide);
 
 function openTutorial(){
   _tutStep = 0;
@@ -13174,7 +12154,9 @@ ${(b.showQR&&b.qrUrl&&qrSvgInline)?`<div class="section">
 
 <!-- ═══ SCRATCH CARD OVERLAY ═══ -->
 
-<div id="hlpBox"><div class="hb-t" id="hlpT"></div><div id="hlpB"></div></div>
+
+
+
 
 
 </body>
@@ -14127,20 +13109,10 @@ function renderChores(){
 }
 
 // ── PARENT DASHBOARD ─────────────────────────────────────────
-let _parentDashUnlocked = sessionStorage.getItem('parentUnlocked') === '1';
+let _parentDashUnlocked = false;
 
 function unlockParentDash(){
   initChoreData();
-  // Skip PIN if disabled
-  if(D.parentPinDisabled){
-    _parentDashUnlocked = true;
-    sessionStorage.setItem('parentUnlocked','1');
-    document.getElementById('parentGate').style.display='none';
-    document.getElementById('parentDashContent').style.display='block';
-    updateIncConditions();
-    renderParentDash();
-    return;
-  }
   const pin = (document.getElementById('parentPinInput')||{}).value||'';
   if(!D.chorePin){
     if(!pin || pin.length<6){ showToast('Set a 6-digit PIN'); return; }
@@ -14150,18 +13122,15 @@ function unlockParentDash(){
     showToast('Incorrect PIN'); return;
   }
   _parentDashUnlocked = true;
-  sessionStorage.setItem('parentUnlocked','1');
   document.getElementById('parentGate').style.display='none';
   document.getElementById('parentDashContent').style.display='block';
   document.getElementById('parentPinInput').value='';
   updateIncConditions();
   renderParentDash();
-  if(!D.parentWizardDone){ setTimeout(showParentOnboard, 700); }
 }
 
 function lockParentDash(){
   _parentDashUnlocked = false;
-  sessionStorage.removeItem('parentUnlocked');
   document.getElementById('parentGate').style.display='';
   document.getElementById('parentDashContent').style.display='none';
 }
@@ -14197,7 +13166,7 @@ function renderParentDash(){
   renderParentContests();
   renderParentFamilyRewards();
   renderParentActivityFeed();
-  phNav('users');
+  phNav('overview');
 }
 
 // ── PARENT SCORE — THE BIG NUMBER ────────────────────────────
@@ -15869,17 +14838,12 @@ let _activeProfileId = null;
 function initProfiles(){
   try {
     _profiles = JSON.parse(localStorage.getItem('ylcc_profiles')||'[]');
-    // Migration: first profile is always parent if no isParent flag set
-    if(_profiles.length > 0 && _profiles[0].isParent === undefined){
-      _profiles[0].isParent = true;
-      _profiles.slice(1).forEach(p => { if(p.isParent===undefined) p.isParent=false; });
-    }
     _activeProfileId = localStorage.getItem('ylcc_active_profile')||null;
   } catch(e){ _profiles=[]; }
   // Auto-create first profile from existing data if none exist
   if(_profiles.length === 0 && D.name){
     const id = generateProfileId();
-    _profiles.push({id, name:D.name, isParent:true, data:JSON.parse(JSON.stringify(D))});
+    _profiles.push({id, name:D.name, data:JSON.parse(JSON.stringify(D))});
     _activeProfileId = id;
     saveProfiles();
   }
@@ -15927,9 +14891,7 @@ function addChildProfile(){
       'Your child will need this code to switch to their profile.\n' +
       'Each child has their own private code that unlocks their data.');
     
-    // Stay on current (parent) profile — don't auto-switch
-    renderProfileSwitcher();
-    showToast(name.trim() + '\'s profile created ✓ — use Parent Hub to switch');
+    switchToProfile(id);
     
   } else {
     // Enter existing access code
@@ -15959,128 +14921,6 @@ function addChildProfile(){
     switchToProfile(cleanCode);
     showToast(name.trim() + '\'s profile created ✓');
   }
-}
-
-// ── CHILD LOGIN SYSTEM ──────────────────────────────────────
-let _childPinBuffer = '';
-
-function openChildLogin(){
-  const children = _profiles.filter(p => !p.isParent);
-  if(children.length === 0){ showToast('No child profiles yet — add in Parent Hub'); return; }
-  const colors = ['#4f8fff','#06d6a0','#f5a623','#f472b6','#a78bfa','#22d3ee','#ef4444'];
-  const list = document.getElementById('clChildList');
-  if(list){
-    list.innerHTML = children.map((p,i)=>{
-      const c = colors[i%colors.length];
-      return `<button onclick="clSelectChild('${p.id}')" style="display:flex;align-items:center;gap:.8rem;padding:.75rem 1rem;border-radius:12px;border:1.5px solid ${c}44;background:${c}11;cursor:pointer;width:100%;font-family:var(--fn);" onmouseenter="this.style.background='${c}22'" onmouseleave="this.style.background='${c}11'">
-        <div style="width:38px;height:38px;border-radius:50%;background:${c};display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:900;color:#fff;flex-shrink:0;">${p.name.charAt(0).toUpperCase()}</div>
-        <span style="font-size:.95rem;font-weight:700;color:#fff;">${p.name}</span>
-        <span style="margin-left:auto;color:${c};">→</span>
-      </button>`;
-    }).join('');
-  }
-  document.getElementById('clStep1').style.display='block';
-  document.getElementById('clStep2').style.display='none';
-  _childPinBuffer=''; _clSelectedId=null;
-  updateChildPinDots();
-  const s=document.getElementById('childLoginScreen');
-  s.style.visibility='visible'; s.style.opacity='1'; s.style.pointerEvents='all';
-}
-
-let _clSelectedId=null;
-
-function clSelectChild(id){
-  const p=_profiles.find(x=>x.id===id); if(!p) return;
-  _clSelectedId=id; _childPinBuffer='';
-  updateChildPinDots();
-  document.getElementById('childLoginMsg').textContent='';
-  const colors=['#4f8fff','#06d6a0','#f5a623','#f472b6','#a78bfa','#22d3ee','#ef4444'];
-  const idx=_profiles.filter(x=>!x.isParent).findIndex(x=>x.id===id);
-  const c=colors[idx%colors.length];
-  const nm=document.getElementById('clChildName');
-  const av=document.getElementById('clChildAvatar');
-  if(nm){nm.textContent=p.name; nm.style.color=c;}
-  if(av){av.textContent=p.name.charAt(0).toUpperCase(); av.style.cssText='width:52px;height:52px;border-radius:50%;background:'+c+';display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:900;color:#fff;margin:0 auto .5rem;';}
-  document.getElementById('clStep1').style.display='none';
-  document.getElementById('clStep2').style.display='block';
-}
-
-function clGoBack(){
-  document.getElementById('clStep1').style.display='block';
-  document.getElementById('clStep2').style.display='none';
-  _childPinBuffer=''; _clSelectedId=null; updateChildPinDots();
-}
-
-function closeChildLogin(){
-  const s=document.getElementById('childLoginScreen');
-  s.style.visibility='hidden'; s.style.opacity='0'; s.style.pointerEvents='none';
-  _childPinBuffer=''; _clSelectedId=null;
-}
-
-function childPinInput(digit){
-  if(_childPinBuffer.length>=4) return;
-  _childPinBuffer+=digit; updateChildPinDots();
-  if(_childPinBuffer.length===4) setTimeout(validateChildPin,200);
-}
-function childPinDelete(){ _childPinBuffer=_childPinBuffer.slice(0,-1); updateChildPinDots(); }
-function childPinClear(){ _childPinBuffer=''; updateChildPinDots(); }
-
-function updateChildPinDots(){
-  for(let i=0;i<4;i++){
-    const d=document.getElementById('cd'+i);
-    if(d){ d.style.background=i<_childPinBuffer.length?'#38bdf8':'transparent'; d.style.borderColor=i<_childPinBuffer.length?'#38bdf8':'rgba(255,255,255,.25)'; d.style.transform=i<_childPinBuffer.length?'scale(1.2)':'scale(1)'; }
-  }
-}
-
-function validateChildPin(){
-  if(!_clSelectedId) return;
-  const p=_profiles.find(x=>x.id===_clSelectedId); if(!p) return;
-  if(p.id===_childPinBuffer){
-    closeChildLogin();
-    switchToProfile(p.id);
-    showToast('Welcome, '+p.name+'! 👋');
-  } else {
-    document.getElementById('childLoginMsg').textContent='Wrong PIN — try again';
-    _childPinBuffer=''; updateChildPinDots();
-    const dots=document.getElementById('childPinDots');
-    if(dots){dots.style.animation='none';dots.offsetHeight;dots.style.animation='shake .35s ease';}
-  }
-}
-
-function removeChildProfile(){
-  // Get list of child profiles (all except the first/parent profile)
-  const children = _profiles.filter(p => !p.isParent);
-  if(children.length === 0){
-    showToast('No child profiles to remove');
-    return;
-  }
-
-  // Build selection list
-  const names = children.map((p,i) => (i+1) + '. ' + p.name + ' (Code: ' + p.id + ')').join('\n');
-  const input = prompt('SELECT CHILD TO REMOVE\n\nEnter the number of the child to deactivate:\n\n' + names + '\n\n⚠️ This will permanently delete all their data.');
-  if(!input) return;
-
-  const idx = parseInt(input.trim()) - 1;
-  if(isNaN(idx) || idx < 0 || idx >= children.length){
-    showToast('Invalid selection');
-    return;
-  }
-
-  const child = children[idx];
-  const confirm1 = confirm('⚠️ REMOVE CHILD PROFILE\n\nAre you sure you want to permanently remove:\n\n' + child.name + ' (Code: ' + child.id + ')\n\nAll their progress, data, and history will be deleted.\nThis cannot be undone.');
-  if(!confirm1) return;
-
-  // If currently viewing this child, switch back to parent first
-  if(_activeProfileId === child.id){
-    switchToProfile(_profiles[0].id);
-  }
-
-  // Remove from profiles array
-  _profiles = _profiles.filter(p => p.id !== child.id);
-  saveProfiles();
-  renderProfileSwitcher();
-  renderParentMultiChild();
-  showToast(child.name + '\'s profile removed ✓');
 }
 
 function unlockProfile(id){
@@ -16133,11 +14973,6 @@ function switchToProfile(id){
   }catch(e){}
 
   showToast('Switched to '+profile.name);
-  updateStartHereBtn();
-  // Show kid onboarding if this is a child profile who hasn't seen it yet
-  if(!profile.isParent && !D.kidOnboardDone){
-    setTimeout(showKidOnboard, 800);
-  }
 }
 
 function removeProfile(id){
@@ -16156,7 +14991,8 @@ function renderProfileSwitcher(){
   const tabs = document.getElementById('profileTabs');
   if(!el || !tabs) return;
 
-  el.style.display = 'none'; // Hidden from hero — use Child Login button instead
+  // Profile switcher is managed in Parent Hub only - hidden from hero
+  el.style.display = 'none';
   const colors = ['#4f8fff','#06d6a0','#f5a623','#f472b6','#a78bfa','#22d3ee','#ef4444'];
 
   tabs.innerHTML = _profiles.map((p,i)=>{
@@ -16180,7 +15016,7 @@ function renderParentMultiChild(){
   el.innerHTML = `
     <div style="font-family:var(--fh);font-size:.7rem;letter-spacing:1.5px;color:#fb923c;margin-bottom:.6rem;">👨‍👩‍👧‍👦 ALL CHILDREN OVERVIEW</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.6rem;margin-bottom:1.2rem;">
-      ${_profiles.filter(p => !p.isParent).map((p,i)=>{
+      ${_profiles.map((p,i)=>{
         const d = p.data||{};
         const c = colors[i%colors.length];
         // Calculate Life Score for this child
@@ -17819,94 +16655,6 @@ function resetChildPin(profileId){
   alert('PIN Reset!\n\nChild: '+profile.name+'\nNew PIN: '+newPin+'\n\n📝 Write this down!');
 }
 
-function toggleParentPinRequired(){
-  D.parentPinDisabled = !D.parentPinDisabled;
-  save();
-  updateParentPinToggleUI();
-  showToast(D.parentPinDisabled ? 'PIN disabled — Parent Hub opens freely' : 'PIN now required ✓');
-}
-
-function updateParentPinToggleUI(){
-  const tog=document.getElementById('parentPinToggle');
-  const knob=document.getElementById('parentPinToggleKnob');
-  const sec=document.getElementById('parentPinChangeSection');
-  const gateMsg=document.getElementById('parentGateMsg');
-  const pinFields=document.getElementById('parentPinFields');
-  const off=!!D.parentPinDisabled;
-  if(tog) tog.style.background=off?'#6b7280':'#22c55e';
-  if(knob) knob.style.right=off?'19px':'3px';
-  if(sec){sec.style.opacity=off?'.4':'1'; sec.style.pointerEvents=off?'none':'all';}
-  if(gateMsg) gateMsg.textContent=off?'Click Unlock to enter (PIN disabled)':'Enter your 6-digit PIN to access the Parent Hub';
-  if(pinFields) pinFields.style.display=off?'none':'block';
-}
-
-function changeParentPin(){
-  const np=document.getElementById('newParentPin');
-  const cp=document.getElementById('confirmParentPin');
-  if(!np||!cp) return;
-  const pin=np.value.trim(), conf=cp.value.trim();
-  if(pin.length!==6||isNaN(pin)){showToast('PIN must be exactly 6 digits'); return;}
-  if(pin!==conf){showToast('PINs do not match'); return;}
-  D.chorePin=pin; save();
-  np.value=''; cp.value='';
-  showToast('Parent PIN updated ✓');
-}
-
-function renderManageUsers(){
-  updateParentPinToggleUI();
-  const el=document.getElementById('manageUsersList'); if(!el) return;
-  const colors=['#a78bfa','#4f8fff','#06d6a0','#f5a623','#f472b6','#22d3ee','#ef4444'];
-  if(_profiles.length===0){el.innerHTML='<div style="font-size:.75rem;color:var(--tx3);">No profiles yet.</div>'; return;}
-  el.innerHTML=_profiles.map((p,i)=>{
-    const isP=!!p.isParent;
-    const c=colors[i%colors.length];
-    return `<div style="display:flex;align-items:center;gap:.6rem;padding:.6rem .4rem;border-bottom:1px solid rgba(255,255,255,.05);">
-      <div style="width:32px;height:32px;border-radius:50%;background:${c}22;border:2px solid ${c};display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;color:${c};">${p.name.charAt(0).toUpperCase()}</div>
-      <div style="flex:1;">
-        <div style="font-size:.8rem;font-weight:700;color:#e0e0e0;">${p.name}${isP?' <span style="font-size:.58rem;background:rgba(139,92,246,.2);color:#a78bfa;border-radius:4px;padding:1px 5px;margin-left:3px;">PARENT</span>':''}</div>
-        <div style="font-size:.65rem;color:var(--tx3);">${isP?'6-digit PIN (managed above)':'4-digit PIN: <span style="font-family:monospace;letter-spacing:.1rem;color:#38bdf8;">'+p.id+'</span>'}</div>
-      </div>
-      <div style="display:flex;gap:.3rem;">
-        ${!isP?`<button onclick="resetChildPin('${p.id}')" style="font-size:.62rem;padding:3px 7px;border-radius:6px;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.2);color:#fbbf24;cursor:pointer;">🔄 New PIN</button>`:''}
-        ${!isP?`<button onclick="removeChildById('${p.id}')" style="font-size:.62rem;padding:3px 7px;border-radius:6px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#f87171;cursor:pointer;">🗑 Remove</button>`:''}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function addChildFromHub(){
-  const nameEl=document.getElementById('newChildName');
-  const pinEl=document.getElementById('newChildPin');
-  const name=nameEl?nameEl.value.trim():'';
-  if(!name){showToast('Enter a name'); return;}
-  let pin=pinEl?pinEl.value.trim():'';
-  if(pin&&(pin.length!==4||isNaN(pin))){showToast('PIN must be 4 digits'); return;}
-  if(!pin){
-    let tries=0;
-    do{pin=String(Math.floor(1000+Math.random()*9000));tries++;}
-    while(_profiles.find(p=>p.id===pin)&&tries<100);
-  }
-  if(_profiles.find(p=>p.id===pin)){showToast('PIN already in use'); return;}
-  if(_activeProfileId){const cur=_profiles.find(p=>p.id===_activeProfileId);if(cur)cur.data=JSON.parse(JSON.stringify(D));}
-  _profiles.push({id:pin,name,isParent:false,data:{name,streak:0,mode:'mid_hs'}});
-  saveProfiles();
-  if(nameEl)nameEl.value='';
-  if(pinEl)pinEl.value='';
-  renderManageUsers();
-  renderProfileSwitcher();
-  showToast(name+' added!');
-  alert('✅ Child Profile Created!\n\nName: '+name+'\n4-Digit PIN: '+pin+'\n\n📝 Give this PIN to '+name+'.\nThey use Child Login to access their dashboard.');
-}
-
-function removeChildById(id){
-  const p=_profiles.find(x=>x.id===id); if(!p) return;
-  if(!confirm('Remove '+p.name+'?\n\nAll their data will be permanently deleted.')) return;
-  if(_activeProfileId===id) switchToProfile(_profiles.find(x=>x.isParent).id);
-  _profiles=_profiles.filter(x=>x.id!==id);
-  saveProfiles(); renderManageUsers(); renderProfileSwitcher();
-  showToast(p.name+' removed');
-}
-
 // ── ANTI-GAMING / INTEGRITY CONTROLS ─────────────────────────
 // Prevents kids from rushing through content without actually engaging
 
@@ -18045,11 +16793,6 @@ function quickSettings(){
 }
 
 function quickParentHub(){
-  // If PIN is disabled, go straight in
-  if(D.parentPinDisabled){
-    showSection('s-parent');
-    return;
-  }
   const pin = D.chorePin || D.parentPIN;
   if(!pin){
     const newPin = prompt('Create a 6-digit parent PIN to access Parent Hub:');
@@ -18759,7 +17502,7 @@ function renderParentDashboard(){ renderParentDash(); }
 
 // ── PARENT HUB NAVIGATION ──
 function phNav(tab){
-  const panels = ['users','overview','chores','contests','quizzes','controls','behavior','activity','learning','growth'];
+  const panels = ['overview','chores','contests','quizzes','controls','behavior','activity','learning','growth'];
   panels.forEach(p=>{
     const el = document.getElementById('ph-'+p);
     if(el) el.style.display = p===tab ? 'block' : 'none';
@@ -18767,7 +17510,6 @@ function phNav(tab){
     if(nav) nav.classList.toggle('active', p===tab);
   });
   // Trigger renders for the active panel
-  if(tab==='users'){ renderManageUsers(); }
   if(tab==='overview'){ renderParentGettingStarted(); renderParentMultiChild(); renderParentScore(); renderParentOverview(); renderWeeklyReportCard(); }
   if(tab==='chores'){ renderParentChoreList(); renderParentSelfChores(); renderParentDeeds(); }
   if(tab==='contests'){ renderParentLeaderboard(); renderParentContests(); renderParentFamilyRewards(); }
@@ -19729,6 +18471,19 @@ function renderHeroMotivation(){
     const ref = DAILY_REFLECTIONS[(day-1) % DAILY_REFLECTIONS.length];
     el.textContent = '"' + ref.text.substring(0, 100) + (ref.text.length > 100 ? '...' : '') + '"';
     if(auth) auth.textContent = '— ' + ref.author;
+  }
+}
+
+function toggleTranslateDropdown(){
+  const el = document.getElementById('google_translate_element');
+  if(!el) return;
+  if(el.style.display === 'none'){
+    el.style.display = 'block';
+    // Auto-click the select if it exists
+    const sel = el.querySelector('select');
+    if(sel) sel.focus();
+  } else {
+    el.style.display = 'none';
   }
 }
 
@@ -21922,105 +20677,42 @@ function resetAllData(){
 }
 
 
-
-// ── CUSTOM LANGUAGE PICKER ──────────────────────────────
-const LANGS = [
-  {code:'en',  label:'🇺🇸 English'},
-  {code:'es',  label:'🇪🇸 Español'},
-  {code:'fr',  label:'🇫🇷 Français'},
-  {code:'de',  label:'🇩🇪 Deutsch'},
-  {code:'pt',  label:'🇧🇷 Português'},
-  {code:'it',  label:'🇮🇹 Italiano'},
-  {code:'pl',  label:'🇵🇱 Polski'},
-  {code:'ru',  label:'🇷🇺 Русский'},
-  {code:'ar',  label:'🇸🇦 العربية'},
-  {code:'hi',  label:'🇮🇳 हिन्दी'},
-  {code:'zh-CN',label:'🇨🇳 中文(简体)'},
-  {code:'zh-TW',label:'🇹🇼 中文(繁體)'},
-  {code:'ko',  label:'🇰🇷 한국어'},
-  {code:'ja',  label:'🇯🇵 日本語'},
-  {code:'vi',  label:'🇻🇳 Tiếng Việt'},
-  {code:'tl',  label:'🇵🇭 Filipino'},
-  {code:'sw',  label:'🇰🇪 Kiswahili'},
-  {code:'ha',  label:'🇳🇬 Hausa'},
-];
+</script>
+</body>
+</html>
+<script>
 
 function googleTranslateElementInit(){
-  // Init hidden — we use our own picker UI
   new google.translate.TranslateElement({
     pageLanguage:'en',
     includedLanguages:'en,es,fr,de,pt,zh-CN,zh-TW,ar,hi,ko,ja,ru,it,pl,vi,tl,sw,ha',
+    layout:google.translate.TranslateElement.InlineLayout.SIMPLE,
     autoDisplay:false
   },'google_translate_element');
-}
-
-function doTranslate(langCode){
-  // Set the googtrans cookie and reload — most reliable method
-  if(langCode === 'en'){
-    // Remove translation
-    document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + location.hostname;
-  } else {
-    const val = '/en/' + langCode;
-    document.cookie = 'googtrans=' + val + '; path=/';
-    document.cookie = 'googtrans=' + val + '; path=/; domain=' + location.hostname;
-  }
-  // Trigger via the hidden select if available, else reload
-  const sel = document.querySelector('#google_translate_element select, .goog-te-combo');
-  if(sel){
-    sel.value = langCode;
-    sel.dispatchEvent(new Event('change'));
-  } else {
-    location.reload();
-  }
-  closeLangPicker();
-}
-
-function buildLangPicker(){
-  let el = document.getElementById('langPickerDropdown');
-  if(el) return;
-  el = document.createElement('div');
-  el.id = 'langPickerDropdown';
-  el.style.cssText = 'position:fixed;z-index:2147483647;isolation:isolate;background:#0d1b2a;border:1px solid rgba(56,189,248,.3);border-radius:12px;padding:6px;min-width:210px;box-shadow:0 16px 48px rgba(0,0,0,.85);display:none;max-height:320px;overflow-y:auto;';
-  el.innerHTML = LANGS.map(l =>
-    `<div onclick="doTranslate('${l.code}')" style="padding:8px 12px;border-radius:8px;cursor:pointer;font-size:.83rem;color:#e0e8f0;font-family:var(--fn);display:flex;align-items:center;gap:.5rem;transition:background .12s;" onmouseenter="this.style.background='rgba(56,189,248,.12)'" onmouseleave="this.style.background=''">${l.label}</div>`
-  ).join('');
-  document.body.appendChild(el);
-  document.addEventListener('click', function closeOnOutside(e){
-    if(!el.contains(e.target) && !e.target.closest('#translateWrap') && !e.target.closest('.mqb-lang')){
-      el.style.display = 'none';
-    }
-  });
-}
-
-function toggleLangPicker(anchorEl){
-  buildLangPicker();
-  const el = document.getElementById('langPickerDropdown');
-  if(el.style.display === 'block'){ el.style.display='none'; return; }
-  const r = anchorEl.getBoundingClientRect();
-  el.style.top = (r.bottom + 6) + 'px';
-  // Align right edge to anchor right edge, but keep on screen
-  const left = Math.max(8, Math.min(r.right - 210, window.innerWidth - 218));
-  el.style.left = left + 'px';
-  el.style.display = 'block';
-}
-
-function closeLangPicker(){
-  const el = document.getElementById('langPickerDropdown');
-  if(el) el.style.display = 'none';
-}
-
-function toggleMobTranslate(){
-  const btn = document.querySelector('#mobileQuickRow .mqb-lang');
-  toggleLangPicker(btn || document.body);
+  // Show the element briefly then hide so widget fully renders
+  setTimeout(function(){
+    var el = document.getElementById('google_translate_element');
+    if(el){ el.style.display='block'; setTimeout(function(){ el.style.display='none'; },100); }
+  },1500);
 }
 
 function toggleTranslateDropdown(){
-  const btn = document.getElementById('translateWrap');
-  toggleLangPicker(btn || document.body);
+  var el = document.getElementById('google_translate_element');
+  if(!el) return;
+  var sel = el.querySelector('select');
+  if(el.style.display === 'none' || el.style.display === ''){
+    el.style.display = 'block';
+    if(sel){ setTimeout(function(){ sel.focus(); sel.size=8; },50); }
+  } else {
+    el.style.display = 'none';
+    if(sel) sel.size=1;
+  }
 }
 
 </script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html
 <!-- GLOBAL LESSON MODAL -->
 <div id="charModal" class="mo" onclick="if(event.target===this)closeModal('charModal')">
   <div class="md" style="max-width:620px;padding:0;overflow:hidden;">
@@ -22034,52 +20726,5 @@ function toggleTranslateDropdown(){
     <div id="charQuiz" style="padding:0 1.5rem 1.2rem;"></div>
   </div>
 </div>
-<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
-<!-- ═══ CHILD LOGIN SCREEN ═══ -->
-<div id="childLoginScreen" style="visibility:hidden;opacity:0;pointer-events:none;position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#0a0a14,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity .25s;">
-  <div style="text-align:center;max-width:380px;width:92%;">
-
-    <!-- STEP 1: SELECT CHILD -->
-    <div id="clStep1">
-      <div style="font-size:2rem;margin-bottom:.4rem;">👨‍👩‍👧‍👦</div>
-      <div style="font-size:1.2rem;font-weight:900;color:#fff;margin-bottom:.3rem;">Who are you?</div>
-      <div style="font-size:.78rem;color:rgba(255,255,255,.45);margin-bottom:1.4rem;">Select your name to continue</div>
-      <div id="clChildList" style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.2rem;"></div>
-      <button onclick="closeChildLogin()" style="font-size:.72rem;color:rgba(255,255,255,.3);background:none;border:none;cursor:pointer;">Cancel</button>
-    </div>
-
-    <!-- STEP 2: ENTER PIN -->
-    <div id="clStep2" style="display:none;">
-      <div style="font-size:2rem;margin-bottom:.3rem;" id="clChildAvatar">👤</div>
-      <div style="font-size:1.2rem;font-weight:900;color:#fff;margin-bottom:.2rem;" id="clChildName">Child</div>
-      <div style="font-size:.78rem;color:rgba(255,255,255,.45);margin-bottom:1.4rem;">Enter your 4-digit PIN</div>
-      <div style="display:flex;justify-content:center;gap:.7rem;margin-bottom:1.4rem;" id="childPinDots">
-        <div style="width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.25);transition:all .15s;" id="cd0"></div>
-        <div style="width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.25);transition:all .15s;" id="cd1"></div>
-        <div style="width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.25);transition:all .15s;" id="cd2"></div>
-        <div style="width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.25);transition:all .15s;" id="cd3"></div>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem;max-width:220px;margin:0 auto .8rem;">
-        <button onclick="childPinInput('1')" class="child-pin-btn">1</button>
-        <button onclick="childPinInput('2')" class="child-pin-btn">2</button>
-        <button onclick="childPinInput('3')" class="child-pin-btn">3</button>
-        <button onclick="childPinInput('4')" class="child-pin-btn">4</button>
-        <button onclick="childPinInput('5')" class="child-pin-btn">5</button>
-        <button onclick="childPinInput('6')" class="child-pin-btn">6</button>
-        <button onclick="childPinInput('7')" class="child-pin-btn">7</button>
-        <button onclick="childPinInput('8')" class="child-pin-btn">8</button>
-        <button onclick="childPinInput('9')" class="child-pin-btn">9</button>
-        <button onclick="clGoBack()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--tx2);border-radius:10px;padding:.8rem;font-size:.7rem;cursor:pointer;">← Back</button>
-        <button onclick="childPinInput('0')" class="child-pin-btn">0</button>
-        <button onclick="childPinDelete()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--tx2);border-radius:10px;padding:.8rem;font-size:1rem;cursor:pointer;">⌫</button>
-      </div>
-      <div id="childLoginMsg" style="font-size:.73rem;color:#f87171;min-height:1rem;margin-bottom:.5rem;"></div>
-      <button onclick="closeChildLogin()" style="font-size:.7rem;color:rgba(255,255,255,.3);background:none;border:none;cursor:pointer;">Cancel</button>
-    </div>
-
-  </div>
-</div>
-
-</body>
-</html>
+>
