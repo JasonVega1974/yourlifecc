@@ -466,8 +466,32 @@ async function createAccount(){
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhyb2hnd2NiZmd5d2twbnZxeGhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MjcxNDYsImV4cCI6MjA4ODQwMzE0Nn0.PuWtBpiMw2DiCLp26ZP_Rd9BwzFvWT0sNZrDUNdULyo' },
         body: JSON.stringify({plan, email, name, familyId, couponCode: appliedCoupon ? appliedCoupon.id : null})
       });
-      const piData = await piResp.json();
+   const piData = await piResp.json();
       if(!piResp.ok || piData.error) throw new Error(piData.error || 'Payment setup failed. Please try again.');
+      
+      // If coupon covered 100% of cost, no card confirmation needed
+      if(piData.free){
+        stripeCustomerId = piData.customerId;
+        stripeSubId = piData.subscriptionId;
+        // Skip card confirmation, jump to account creation
+        btn.innerHTML='<span class="spinner"></span>Setting up your account...';
+        const {error:dbError} = await _sb.from('families').insert({
+          id: familyId, user_id: userId, parent_name: name, email: email,
+          plan: plan, plan_status: 'active',
+          stripe_customer_id: stripeCustomerId,
+          stripe_subscription_id: stripeSubId,
+          sponsor_code_id: sponsorData?.id || null,
+          created_at: new Date().toISOString(),
+        });
+        if(dbError) throw new Error('Account creation failed: '+dbError.message);
+        await _sb.from('family_data').insert({ family_id: familyId, data: JSON.stringify(getDefaultFamilyData(name, familyId)), updated_at: new Date().toISOString() });
+        createdFamilyId = familyId;
+        const appUrl = `${location.origin}/app?id=${familyId}`;
+        document.getElementById('familyUrl').textContent = appUrl;
+        document.getElementById('goAppBtn').href = appUrl;
+        goStep(4);
+        return;
+      }
 
       if(plan==='lifetime'){
         // One-time payment
