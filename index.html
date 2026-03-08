@@ -104,9 +104,7 @@ h2{font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;line-h
 .price-tabs{display:flex;justify-content:center;gap:.5rem;margin-bottom:2.5rem;}
 .ptab{padding:11px 26px;border-radius:10px;font-size:.85rem;font-weight:600;cursor:pointer;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:var(--tx2);transition:all .2s;}
 .ptab.on{background:rgba(79,143,255,.1);border-color:rgba(79,143,255,.25);color:var(--blue);}
-.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.8rem;max-width:1060px;margin:0 auto;}
-.price-grid[style*="display:grid"]{display:grid!important;}
-.price-grid[style*="display:none"]{display:none!important;}
+.price-grid{grid-template-columns:repeat(3,1fr);gap:1.8rem;max-width:1060px;margin:0 auto;}
 @media(max-width:768px){.price-grid{grid-template-columns:1fr;max-width:400px;}}
 .pc{background:var(--bg2);border:1px solid rgba(255,255,255,.05);border-radius:20px;padding:2.4rem 2rem;text-align:center;position:relative;transition:all .3s;}
 .pc:hover{transform:translateY(-5px);border-color:rgba(56,189,248,.35);box-shadow:0 0 40px rgba(56,189,248,.12),0 16px 40px rgba(0,0,0,.3);}
@@ -550,7 +548,12 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
 function showPricing(type, btn){
   ['monthly','yearly','lifetime'].forEach(function(t){
     var el = document.getElementById('price-'+t);
-    el.style.cssText = t===type ? 'display:grid!important' : 'display:none!important';
+    if(t === type){
+      el.removeAttribute('style');
+      el.style.display = 'grid';
+    } else {
+      el.style.display = 'none';
+    }
   });
   document.querySelectorAll('.ptab').forEach(function(t){t.classList.remove('on');});
   btn.classList.add('on');
