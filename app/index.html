@@ -4494,17 +4494,17 @@ body{top:0!important;}
   </div>
 
   <div class="tabs resTabs">
-    <button class="tab active" onclick="rTab('resMath',this)">🔢 Math</button>
-    <button class="tab" onclick="rTab('resPractice',this)">✏️ Practice</button>
-    <button class="tab" onclick="rTab('resScience',this)">🔬 Science</button>
-    <button class="tab" onclick="rTab('resCalc',this)">🧮 Calculators</button>
-    <button class="tab" onclick="rTab('resWriting',this)">📝 Writing</button>
-    <button class="tab" onclick="rTab('resComputer',this)">💻 Computer</button>
-    <button class="tab" onclick="rTab('resStudy',this)">📚 Study Tips</button>
+    <button class="tab active" onclick="rTab('math',this)">🔢 Math</button>
+    <button class="tab" onclick="rTab('practice',this)">✏️ Practice</button>
+    <button class="tab" onclick="rTab('science',this)">🔬 Science</button>
+    <button class="tab" onclick="rTab('calc',this)">🧮 Calculators</button>
+    <button class="tab" onclick="rTab('writing',this)">📝 Writing</button>
+    <button class="tab" onclick="rTab('computer',this)">💻 Computer</button>
+    <button class="tab" onclick="rTab('study',this)">📚 Study Tips</button>
   </div>
 
   <!-- MATH BASICS -->
-  <div id="st-resMath">
+  <div id="rs-math">
     <div class="g2">
       <div class="card">
         <div class="ct">➕ Arithmetic Basics</div>
@@ -4562,7 +4562,7 @@ body{top:0!important;}
   </div>
 
   <!-- MATH PRACTICE -->
-  <div id="st-resPractice" style="display:none;">
+  <div id="rs-practice" style="display:none;">
     <div class="g2">
       <div class="card" style="text-align:center;">
         <div class="ct" style="justify-content:center;">✏️ Quick Math Practice</div>
@@ -4599,7 +4599,7 @@ body{top:0!important;}
   </div>
 
   <!-- SCIENCE -->
-  <div id="st-resScience" style="display:none;">
+  <div id="rs-science" style="display:none;">
     <div class="g2">
       <div class="card">
         <div class="ct">📏 Measurements & Conversions</div>
@@ -4654,7 +4654,7 @@ body{top:0!important;}
   </div>
 
   <!-- CALCULATORS -->
-  <div id="st-resCalc" style="display:none;">
+  <div id="rs-calc" style="display:none;">
     <div class="g2">
       <div class="card">
         <div class="ct">📊 Percentage Calculator</div>
@@ -4715,7 +4715,7 @@ body{top:0!important;}
   </div>
 
   <!-- WRITING -->
-  <div id="st-resWriting" style="display:none;">
+  <div id="rs-writing" style="display:none;">
     <div class="g2">
       <div class="card">
         <div class="ct">📝 Essay Structure</div>
@@ -4759,7 +4759,7 @@ body{top:0!important;}
   </div>
 
   <!-- COMPUTER SKILLS -->
-  <div id="st-resComputer" style="display:none;">
+  <div id="rs-computer" style="display:none;">
     <div class="g2">
       <div class="card">
         <div class="ct">⌨️ Keyboard Shortcuts Everyone Should Know</div>
@@ -4823,7 +4823,7 @@ body{top:0!important;}
   </div>
 
   <!-- STUDY TIPS -->
-  <div id="st-resStudy" style="display:none;">
+  <div id="rs-study" style="display:none;">
     <div class="g2">
       <div class="card">
         <div class="ct">🧠 How to Actually Study</div>
@@ -7010,8 +7010,8 @@ function loadData(){
       const r=localStorage.getItem(k); if(!r) continue;
       const p=JSON.parse(r); if(!p||typeof p!=='object') continue;
       for(const key of Object.keys(DEF)){ if(key in p) D[key]=p[key]; }
-      // Never hide sections added after user first registered
-      const _newSecs=['cbt']; _newSecs.forEach(s=>{if(D.sections&&D.sections[s]===0)delete D.sections[s];});
+      // Never hide sections added after initial registration
+      if(D.sections){ ['cbt','resume'].forEach(s=>{ delete D.sections[s]; }); }
       if(k!==LS){ localStorage.setItem(LS,JSON.stringify(D)); }
       return;
     }catch(e){}
@@ -7221,9 +7221,8 @@ async function cloudLoad(){
     if(error || !data?.data) return false;
     const saved = data.data;
     for(const k of Object.keys(DEF)){ if(k in saved) D[k] = saved[k]; }
-    // Never hide sections that didn't exist when user first registered
-    const newSections = ['cbt'];
-    newSections.forEach(s=>{ if(D.sections && D.sections[s]===0) delete D.sections[s]; });
+    // Never hide sections added after initial registration
+    if(D.sections){ ['cbt','resume'].forEach(s=>{ delete D.sections[s]; }); }
     return true;
   } catch(e){ return false; }
 }
@@ -8022,7 +8021,8 @@ let _activeSection = 's-hero';
 function buildSideNav(){
   const el = document.getElementById('sideNav'); if(!el) return;
   // New sections added after launch - always visible, ignore saved hide state
-  if(D.sections) { delete D.sections.cbt; }
+  // Force-show new sections regardless of any saved hide state
+  if(D.sections){ delete D.sections.cbt; delete D.sections.resume; }
   const hidden = D.sections||{};
   const openGroups = D._navGroups || {};
   
@@ -8144,8 +8144,8 @@ function showSection(id, fromMobile){
   if(id==='s-school'){ renderSchool&&renderSchool(); setTimeout(()=>{ renderStudyPlan&&renderStudyPlan(); renderExams&&renderExams(); },100); }
   if(id==='s-resources') setTimeout(()=>{
     // Show Math tab by default
-    document.querySelectorAll('[id^="st-res"]').forEach(t=>t.style.display='none');
-    const mathTab = document.getElementById('st-resMath');
+    document.querySelectorAll('[id^="rs-"]').forEach(t=>t.style.display='none');
+    const mathTab = document.getElementById('rs-math');
     if(mathTab) mathTab.style.display='block';
     // Set active tab button
     document.querySelectorAll('.resTabs .tab').forEach(b=>b.classList.remove('active'));
@@ -8439,10 +8439,10 @@ function sTab(tab,btn){
   if(tab==='gpa') renderGPA();
 }
 function rTab(tab,btn){
-  // Resources tabs
-  document.querySelectorAll('[id^="st-res"]').forEach(t=>t.style.display='none');
+  // Resources tabs — uses rs- prefix to avoid sTab collision
+  document.querySelectorAll('[id^="rs-"]').forEach(t=>t.style.display='none');
   document.querySelectorAll('.resTabs .tab').forEach(b=>b.classList.remove('active'));
-  const te=document.getElementById('st-'+tab);
+  const te=document.getElementById('rs-'+tab);
   if(te) te.style.display='block';
   if(btn) btn.classList.add('active');
 }
