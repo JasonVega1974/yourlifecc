@@ -4489,13 +4489,13 @@ body{top:0!important;}
   </div>
 
   <div class="tabs resTabs">
-    <button class="tab active" onclick="sTab('resMath',this)">🔢 Math</button>
-    <button class="tab" onclick="sTab('resPractice',this)">✏️ Practice</button>
-    <button class="tab" onclick="sTab('resScience',this)">🔬 Science</button>
-    <button class="tab" onclick="sTab('resCalc',this)">🧮 Calculators</button>
-    <button class="tab" onclick="sTab('resWriting',this)">📝 Writing</button>
-    <button class="tab" onclick="sTab('resComputer',this)">💻 Computer</button>
-    <button class="tab" onclick="sTab('resStudy',this)">📚 Study Tips</button>
+    <button class="tab active" onclick="rTab('resMath',this)">🔢 Math</button>
+    <button class="tab" onclick="rTab('resPractice',this)">✏️ Practice</button>
+    <button class="tab" onclick="rTab('resScience',this)">🔬 Science</button>
+    <button class="tab" onclick="rTab('resCalc',this)">🧮 Calculators</button>
+    <button class="tab" onclick="rTab('resWriting',this)">📝 Writing</button>
+    <button class="tab" onclick="rTab('resComputer',this)">💻 Computer</button>
+    <button class="tab" onclick="rTab('resStudy',this)">📚 Study Tips</button>
   </div>
 
   <!-- MATH BASICS -->
@@ -7005,6 +7005,8 @@ function loadData(){
       const r=localStorage.getItem(k); if(!r) continue;
       const p=JSON.parse(r); if(!p||typeof p!=='object') continue;
       for(const key of Object.keys(DEF)){ if(key in p) D[key]=p[key]; }
+      // Never hide sections added after user first registered
+      const _newSecs=['cbt']; _newSecs.forEach(s=>{if(D.sections&&D.sections[s]===0)delete D.sections[s];});
       if(k!==LS){ localStorage.setItem(LS,JSON.stringify(D)); }
       return;
     }catch(e){}
@@ -7214,6 +7216,9 @@ async function cloudLoad(){
     if(error || !data?.data) return false;
     const saved = data.data;
     for(const k of Object.keys(DEF)){ if(k in saved) D[k] = saved[k]; }
+    // Never hide sections that didn't exist when user first registered
+    const newSections = ['cbt'];
+    newSections.forEach(s=>{ if(D.sections && D.sections[s]===0) delete D.sections[s]; });
     return true;
   } catch(e){ return false; }
 }
@@ -7978,7 +7983,7 @@ const NAV_ITEMS = [
   ]},
   {id:'_group_school', icon:'🎓', label:'School & Career', isGroup:true, children:[
     {id:'s-school',    icon:'📚', label:'School',         key:'school'},
-    {id:'s-finance',   icon:'💼', label:'Jobs/Resume',    key:'career'},
+    {id:'s-resume',    icon:'💼', label:'Jobs/Resume',    key:'resume'},
     {id:'s-bio',       icon:'📋', label:'Bio Page',       key:'bio'},
     {id:'s-resources', icon:'📦', label:'Resources',      key:'resources'},
     {id:'s-cbt',       icon:'💻', label:'CBT Training',    key:'cbt'},
@@ -7995,7 +8000,7 @@ const NAV_ITEMS = [
     {id:'s-mood',      icon:'😊', label:'Mood Tracker',   key:'mood'},
   ]},
   {id:'_group_money', icon:'💰', label:'Money & Rewards', isGroup:true, children:[
-    {id:'s-finance',   icon:'💰', label:'Money',          key:'money'},
+    {id:'s-finance',   icon:'💰', label:'Money Manager',  key:'money'},
     {id:'s-rewards',   icon:'🎰', label:'Rewards',        key:'rewards'},
     {id:'s-contests',  icon:'🏆', label:'Challenges',     key:'contests'},
     {id:'s-badges',    icon:'🏅', label:'Badges',         key:'badges'},
@@ -8129,7 +8134,18 @@ function showSection(id, fromMobile){
   // Trigger renders that need visible DOM
   if(id==='s-schedule') setTimeout(buildSchedule,60);
   if(id==='s-health') setTimeout(()=>{ renderWeightChart(); renderHealthHabits(); },80);
-  if(id==='s-school') renderSchool&&renderSchool();
+  if(id==='s-school'){ renderSchool&&renderSchool(); setTimeout(()=>{ renderStudyPlan&&renderStudyPlan(); renderExams&&renderExams(); },100); }
+  if(id==='s-resources') setTimeout(()=>{
+    // Show Math tab by default
+    document.querySelectorAll('[id^="st-res"]').forEach(t=>t.style.display='none');
+    const mathTab = document.getElementById('st-resMath');
+    if(mathTab) mathTab.style.display='block';
+    // Set active tab button
+    document.querySelectorAll('.resTabs .tab').forEach(b=>b.classList.remove('active'));
+    const mathBtn = document.querySelector('.resTabs .tab');
+    if(mathBtn) mathBtn.classList.add('active');
+  }, 60);
+  if(id==='s-resume') setTimeout(()=>{ typeof initResume==='function'&&initResume(); },80);
   if(id==='s-finance') setTimeout(renderFinanceDash,50);
   if(id==='s-cbt') setTimeout(()=>{ typingReset(); renderCbtLesson('basics'); renderCbtLesson('windows'); renderCbtLesson('linux'); renderCbtLesson('coding'); renderCbtLesson('internet'); },80);
   if(id==='s-rewards') setTimeout(()=>{ renderGameTickets(); renderPBStore&&renderPBStore(); renderRewardLog&&renderRewardLog(); },80);
@@ -8406,7 +8422,23 @@ function quickAdd(){
 }
 
 // ── SCHOOL ────────────────────────────────────────────────────
-function sTab(tab,btn){ document.querySelectorAll('[id^="st-"]').forEach(t=>t.style.display='none'); document.querySelectorAll('.schoolTabs .tab').forEach(b=>b.classList.remove('active')); const te=document.getElementById('st-'+tab); if(te) te.style.display='block'; if(btn) btn.classList.add('active'); if(tab==='gpa') renderGPA(); }
+function sTab(tab,btn){
+  // School tabs
+  document.querySelectorAll('[id^="st-"]').forEach(t=>t.style.display='none');
+  document.querySelectorAll('.schoolTabs .tab').forEach(b=>b.classList.remove('active'));
+  const te=document.getElementById('st-'+tab);
+  if(te) te.style.display='block';
+  if(btn) btn.classList.add('active');
+  if(tab==='gpa') renderGPA();
+}
+function rTab(tab,btn){
+  // Resources tabs
+  document.querySelectorAll('[id^="st-res"]').forEach(t=>t.style.display='none');
+  document.querySelectorAll('.resTabs .tab').forEach(b=>b.classList.remove('active'));
+  const te=document.getElementById('st-'+tab);
+  if(te) te.style.display='block';
+  if(btn) btn.classList.add('active');
+}
 
 function saveClass(){
   const id=document.getElementById('editClassId').value;
