@@ -4914,6 +4914,167 @@ body{top:0!important;}
       <div id="tt-bests"></div>
     </div>
   </div>
+<script>
+// Typing Test — inline script, co-located with HTML
+(function(){
+  var TT = {on:false,go:false,passage:'',t0:null,tid:null,err:0,tot:0};
+  var TT_P = {
+    easy:['The dog ran fast down the road and jumped over the fence into the yard.',
+      'She made a cup of tea and sat by the window to watch the rain fall slowly.',
+      'He opened the book and began to read the first page of the long story.',
+      'The sun rose over the hills and lit up the quiet little town below.',
+      'They walked to the park and played on the swings until it was dark outside.',
+      'My friend brought a big pizza and we ate every single slice together.',
+      'The cat jumped onto the bed and curled up next to the warm pillow.'],
+    medium:['Learning to type quickly and accurately is one of the most valuable skills you can develop.',
+      'Practice makes perfect but only when you focus on both speed and accuracy at the same time.',
+      'The ability to communicate clearly in writing is essential in every career and stage of life.',
+      'Time management means making deliberate choices about where you spend your energy each day.',
+      'Reading widely expands your vocabulary and helps you understand the world more deeply.',
+      'Success is not about talent alone but consistent effort applied with intention over time.',
+      'Every expert was once a beginner who refused to give up when things got difficult.'],
+    hard:['Effective communication requires clarity of expression and anticipating how your message will be received.',
+      'Critical thinking skills are fundamental to academic and professional success in a complex world.',
+      'Situational awareness is the ability to accurately perceive your environment and can be trained.',
+      'Financial literacy covers budgeting, saving, investing, and responsible credit use across every life stage.',
+      'The discipline to maintain consistent habits over years is more predictive of success than raw talent.',
+      'Resilience is not the absence of adversity but the capacity to recover and grow stronger from it.',
+      'Emotional intelligence means recognizing your own emotions and managing them and others constructively.']
+  };
+
+  function g(id){ return document.getElementById(id); }
+
+  function draw(typed){
+    var p=g('tt-passage'); if(!p||!TT.passage) return;
+    var s=TT.passage; var h='';
+    for(var i=0;i<s.length;i++){
+      var ch=s[i]; var d=ch===' '?'&nbsp;':ch;
+      if(i<typed.length){
+        h+='<span style="color:'+(typed[i]===ch?'#86efac':'#f87171')+'">'+d+'</span>';
+      }else if(i===typed.length){
+        h+='<span style="background:rgba(96,165,250,.5);border-radius:2px;color:#fff;">'+d+'</span>';
+      }else{
+        h+='<span style="color:rgba(255,255,255,.3)">'+d+'</span>';
+      }
+    }
+    p.innerHTML=h;
+  }
+
+  function tick(){
+    if(!TT.t0) return;
+    var secs=Math.max(1,(Date.now()-TT.t0)/1000);
+    var inp=g('tt-input'); var typed=inp?inp.value:'';
+    var words=typed.trim().split(' ').filter(function(w){return w.length>0;}).length;
+    var wpm=Math.round((words/secs)*60);
+    var acc=TT.tot>0?Math.max(0,Math.round(((TT.tot-TT.err)/TT.tot)*100)):100;
+    var w=g('tt-wpm'); if(w) w.textContent=wpm;
+    var a=g('tt-acc'); if(a) a.textContent=acc+'%';
+    var t=g('tt-time'); if(t) t.textContent=Math.round(secs)+'s';
+    var e=g('tt-err'); if(e) e.textContent=TT.err;
+  }
+
+  function bests(){
+    var el=g('tt-bests'); if(!el) return;
+    var b=(typeof D!=='undefined'&&D.ttBests)||{};
+    var html='<table style="width:100%;font-size:.78rem;border-collapse:collapse;">';
+    html+='<tr style="color:var(--tx3);font-size:.65rem;text-transform:uppercase;"><td style="padding:.3rem .4rem;">Level</td><td style="padding:.3rem .4rem;">WPM</td><td style="padding:.3rem .4rem;">Accuracy</td><td style="padding:.3rem .4rem;">Time</td><td style="padding:.3rem .4rem;">Date</td></tr>';
+    ['easy','medium','hard'].forEach(function(d){
+      var r=b[d]; var lbl=d[0].toUpperCase()+d.slice(1);
+      if(!r){html+='<tr><td style="padding:.3rem .4rem;color:var(--tx2);">'+lbl+'</td><td colspan="4" style="padding:.3rem .4rem;color:var(--tx3);">No record yet</td></tr>';return;}
+      html+='<tr style="border-top:1px solid rgba(255,255,255,.06);"><td style="padding:.3rem .4rem;">'+lbl+'</td><td style="padding:.3rem .4rem;color:var(--c);font-weight:700;">'+r.wpm+'</td><td style="padding:.3rem .4rem;color:#34d399;">'+r.acc+'%</td><td style="padding:.3rem .4rem;color:var(--tx2);">'+r.secs+'s</td><td style="padding:.3rem .4rem;color:var(--tx3);font-size:.7rem;">'+r.date+'</td></tr>';
+    });
+    html+='</table>';
+    el.innerHTML=html;
+  }
+
+  window.ttStart = function(){
+    if(TT.tid){clearInterval(TT.tid);TT.tid=null;}
+    var diff='medium'; var sel=g('tt-diff'); if(sel) diff=sel.value;
+    var list=TT_P[diff]||TT_P.medium;
+    TT={on:true,go:false,passage:list[Math.floor(Math.random()*list.length)],t0:null,tid:null,err:0,tot:0};
+    draw('');
+    var inp=g('tt-input');
+    if(inp){inp.value='';inp.disabled=false;inp.style.borderColor='rgba(96,165,250,.5)';inp.focus();}
+    var res=g('tt-result'); if(res) res.style.display='none';
+    var st=g('tt-status'); if(st) st.textContent='GO — type the passage above';
+    var w=g('tt-wpm'); if(w) w.textContent='—';
+    var a=g('tt-acc'); if(a) a.textContent='—';
+    var t=g('tt-time'); if(t) t.textContent='0s';
+    var e=g('tt-err'); if(e) e.textContent='0';
+    bests();
+  };
+
+  window.ttReset = function(){
+    if(TT.tid){clearInterval(TT.tid);TT.tid=null;}
+    TT={on:false,go:false,passage:'',t0:null,tid:null,err:0,tot:0};
+    var inp=g('tt-input'); if(inp){inp.value='';inp.disabled=true;inp.style.borderColor='rgba(255,255,255,.1)';}
+    var p=g('tt-passage'); if(p) p.innerHTML='<span style="color:rgba(255,255,255,.3);">Press New Test to load a passage...</span>';
+    var res=g('tt-result'); if(res) res.style.display='none';
+    var st=g('tt-status'); if(st) st.textContent='Press New Test to begin';
+    var w=g('tt-wpm'); if(w) w.textContent='—';
+    var a=g('tt-acc'); if(a) a.textContent='—';
+    var t=g('tt-time'); if(t) t.textContent='0s';
+    var e=g('tt-err'); if(e) e.textContent='0';
+    bests();
+  };
+
+  window.ttType = function(val){
+    if(!TT.on) return;
+    if(val.length>TT.passage.length){ val=val.substring(0,TT.passage.length); g('tt-input').value=val; }
+    if(!TT.go && val.length>0){
+      TT.go=true; TT.t0=Date.now();
+      TT.tid=setInterval(tick,300);
+    }
+    TT.tot=Math.max(TT.tot,val.length);
+    var e=0; for(var i=0;i<val.length;i++){if(val[i]!==TT.passage[i])e++;}
+    TT.err=e;
+    draw(val); tick();
+    if(val.length>=TT.passage.length) finish(val);
+  };
+
+  function finish(val){
+    if(TT.tid){clearInterval(TT.tid);TT.tid=null;}
+    TT.on=false;
+    var inp=g('tt-input'); if(inp){inp.disabled=true;inp.style.borderColor='rgba(52,211,153,.5)';}
+    var secs=Math.max(1,(Date.now()-TT.t0)/1000);
+    var errs=0; for(var i=0;i<TT.passage.length;i++){if((val[i]||'')!==TT.passage[i])errs++;}
+    var words=TT.passage.trim().split(' ').length;
+    var wpm=Math.round((words/secs)*60);
+    var acc=Math.max(0,Math.round(((TT.passage.length-errs)/TT.passage.length)*100));
+    var diff='medium'; var sel=g('tt-diff'); if(sel) diff=sel.value;
+    var grade=wpm>=80&&acc>=95?'S':wpm>=60&&acc>=90?'A':wpm>=45&&acc>=85?'B':wpm>=30?'C':'D';
+    var msgs={S:'Outstanding! Top-tier speed and accuracy.',A:'Excellent! Strong typing skills.',B:'Good work — keep pushing.',C:'Decent — accuracy first, speed follows.',D:'Keep at it — every test improves you!'};
+    if(typeof D!=='undefined'){
+      if(!D.ttBests) D.ttBests={};
+      if(!D.ttBests[diff]||wpm>D.ttBests[diff].wpm){
+        D.ttBests[diff]={wpm:wpm,acc:acc,secs:Math.round(secs),date:new Date().toLocaleDateString()};
+        if(typeof save==='function') save();
+      }
+    }
+    draw(val);
+    var w=g('tt-wpm'); if(w) w.textContent=wpm;
+    var a=g('tt-acc'); if(a) a.textContent=acc+'%';
+    var t=g('tt-time'); if(t) t.textContent=Math.round(secs)+'s';
+    var e=g('tt-err'); if(e) e.textContent=errs;
+    var gr=g('tt-grade'); if(gr) gr.textContent=grade;
+    var mg=g('tt-msg'); if(mg) mg.textContent=wpm+' WPM · '+acc+'% accuracy · '+Math.round(secs)+'s — '+msgs[grade];
+    var res=g('tt-result'); if(res) res.style.display='block';
+    var st=g('tt-status'); if(st) st.textContent='Complete! ✓';
+    bests();
+  }
+
+  // Wire rTab to auto-start when typing tab clicked
+  document.addEventListener('DOMContentLoaded', function(){
+    var _origRTab = window.rTab;
+    if(typeof _origRTab === 'function'){
+      window.rTab = function(tab, btn){
+        _origRTab(tab, btn);
+        if(tab==='typing') setTimeout(window.ttStart, 100);
+      };
+    }
+  });
+})();
+</script>
 
 </section>
 
@@ -8595,7 +8756,6 @@ function rTab(tab,btn){
   const te=document.getElementById('rs-'+tab);
   if(te) te.style.display='block';
   if(btn) btn.classList.add('active');
-  if(tab==='typing') setTimeout(function(){ ttStart(); }, 80);
 }
 
 function saveClass(){
@@ -24815,172 +24975,7 @@ function applyChildAvatar(){
     <div id="charQuiz" style="padding:0 1.5rem 1.2rem;"></div>
   </div>
 </div>
-<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
-
-
-
-
-
-
-// ── TYPING TEST (tt-) ────────────────────────────────────────────────
-var TT = {on:false,go:false,passage:'',t0:null,tid:null,err:0,tot:0};
-var TT_P = {
-  easy:['The dog ran fast down the road and jumped over the fence into the yard.',
-    'She made a cup of tea and sat by the window to watch the rain fall slowly.',
-    'He opened the book and began to read the first page of the long story.',
-    'The sun rose over the hills and lit up the quiet little town below.',
-    'They walked to the park and played on the swings until it was dark outside.',
-    'My friend brought a big pizza and we ate every single slice together.',
-    'The cat jumped onto the bed and curled up next to the warm pillow.'],
-  medium:['Learning to type quickly and accurately is one of the most valuable skills you can develop.',
-    'Practice makes perfect but only when you focus on both speed and accuracy at the same time.',
-    'The ability to communicate clearly in writing is essential in every career and stage of life.',
-    'Time management means making deliberate choices about where you spend your energy each day.',
-    'Reading widely expands your vocabulary and helps you understand the world more deeply.',
-    'Success is not about talent alone but consistent effort applied with intention over time.',
-    'Every expert was once a beginner who refused to give up when things got difficult.'],
-  hard:['Effective communication requires clarity of expression and anticipating how your message will be received.',
-    'Critical thinking skills are fundamental to academic and professional success in a complex world.',
-    'Situational awareness is the ability to accurately perceive your environment and can be trained.',
-    'Financial literacy covers budgeting, saving, investing, and responsible credit use across every life stage.',
-    'The discipline to maintain consistent habits over years is more predictive of success than raw talent.',
-    'Resilience is not the absence of adversity but the capacity to recover and grow stronger from it.',
-    'Emotional intelligence means recognizing your own emotions and managing them and others constructively.']
-};
-function ttG(id){return document.getElementById(id);}
-function ttStart(){
-  // clear any running timer
-  if(TT.tid){clearInterval(TT.tid);TT.tid=null;}
-  // pick passage
-  var diff='medium'; var sel=ttG('tt-diff'); if(sel) diff=sel.value;
-  var list=TT_P[diff]||TT_P.medium;
-  TT.passage=list[Math.floor(Math.random()*list.length)];
-  TT.on=true; TT.go=false; TT.t0=null; TT.err=0; TT.tot=0;
-  // draw passage
-  ttDraw('');
-  // enable input
-  var inp=ttG('tt-input');
-  if(inp){inp.value='';inp.disabled=false;inp.style.borderColor='rgba(96,165,250,.5)';inp.focus();}
-  // hide result
-  var res=ttG('tt-result'); if(res) res.style.display='none';
-  // status
-  var st=ttG('tt-status'); if(st) st.textContent='GO — type the passage above';
-  // reset stats
-  var w=ttG('tt-wpm'); if(w) w.textContent='—';
-  var a=ttG('tt-acc'); if(a) a.textContent='—';
-  var t=ttG('tt-time'); if(t) t.textContent='0s';
-  var e=ttG('tt-err'); if(e) e.textContent='0';
-  // render bests
-  ttBests();
-}
-function ttReset(){
-  if(TT.tid){clearInterval(TT.tid);TT.tid=null;}
-  TT={on:false,go:false,passage:'',t0:null,tid:null,err:0,tot:0};
-  var inp=ttG('tt-input'); if(inp){inp.value='';inp.disabled=true;inp.style.borderColor='rgba(255,255,255,.1)';}
-  var p=ttG('tt-passage'); if(p) p.innerHTML='<span style="color:rgba(255,255,255,.3);">Press New Test to load a passage...</span>';
-  var res=ttG('tt-result'); if(res) res.style.display='none';
-  var st=ttG('tt-status'); if(st) st.textContent='Press New Test to begin';
-  var w=ttG('tt-wpm'); if(w) w.textContent='—';
-  var a=ttG('tt-acc'); if(a) a.textContent='—';
-  var t=ttG('tt-time'); if(t) t.textContent='0s';
-  var e=ttG('tt-err'); if(e) e.textContent='0';
-  ttBests();
-}
-function ttDraw(typed){
-  var p=ttG('tt-passage'); if(!p||!TT.passage) return;
-  var s=TT.passage; var h='';
-  for(var i=0;i<s.length;i++){
-    var ch=s[i]; var d=ch===' '?'&nbsp;':ch;
-    if(i<typed.length){
-      h+='<span style="color:'+(typed[i]===ch?'#86efac':'#f87171')+'">'+d+'</span>';
-    }else if(i===typed.length){
-      h+='<span style="background:rgba(96,165,250,.5);border-radius:2px;">'+d+'</span>';
-    }else{
-      h+='<span style="color:rgba(255,255,255,.3)">'+d+'</span>';
-    }
-  }
-  p.innerHTML=h;
-}
-function ttType(val){
-  if(!TT.on) return;
-  if(!TT.go && val.length>0){
-    TT.go=true; TT.t0=Date.now();
-    TT.tid=setInterval(ttTick,300);
-  }
-  // cap input at passage length
-  if(val.length > TT.passage.length){
-    val = val.substring(0, TT.passage.length);
-    var inp=ttG('tt-input'); if(inp) inp.value=val;
-  }
-  TT.tot=Math.max(TT.tot,val.length);
-  var e=0; for(var i=0;i<val.length;i++){if(val[i]!==TT.passage[i])e++;}
-  TT.err=e;
-  ttDraw(val);
-  ttTick();
-  // finish when all characters typed
-  if(val.length >= TT.passage.length) ttFinish(val);
-}
-function ttTick(){
-  if(!TT.t0) return;
-  var secs=Math.max(1,(Date.now()-TT.t0)/1000);
-  var inp=ttG('tt-input'); var typed=inp?inp.value:'';
-  var words=typed.trim().split(' ').filter(function(w){return w.length>0;}).length;
-  var wpm=Math.round((words/secs)*60);
-  var acc=TT.tot>0?Math.max(0,Math.round(((TT.tot-TT.err)/TT.tot)*100)):100;
-  var w=ttG('tt-wpm'); if(w) w.textContent=wpm;
-  var a=ttG('tt-acc'); if(a) a.textContent=acc+'%';
-  var t=ttG('tt-time'); if(t) t.textContent=Math.round(secs)+'s';
-  var e=ttG('tt-err'); if(e) e.textContent=TT.err;
-}
-function ttFinish(val){
-  if(TT.tid){clearInterval(TT.tid);TT.tid=null;}
-  TT.on=false;
-  var inp=ttG('tt-input'); if(inp){inp.disabled=true;inp.style.borderColor='rgba(52,211,153,.5)';}
-  var secs=Math.max(1,(Date.now()-TT.t0)/1000);
-  // count errors against passage (not typed length)
-  var errs=0;
-  for(var i=0;i<TT.passage.length;i++){if((val[i]||'')!==TT.passage[i])errs++;}
-  var words=TT.passage.trim().split(' ').length;
-  var wpm=Math.round((words/secs)*60);
-  var acc=Math.max(0,Math.round(((TT.passage.length-errs)/TT.passage.length)*100));
-  var diff='medium'; var sel=ttG('tt-diff'); if(sel) diff=sel.value;
-  var grade=wpm>=80&&acc>=95?'S':wpm>=60&&acc>=90?'A':wpm>=45&&acc>=85?'B':wpm>=30?'C':'D';
-  var msgs={S:'Outstanding! Top-tier speed and accuracy.',A:'Excellent! Strong typing skills.',B:'Good work — keep pushing your speed.',C:'Decent — accuracy first, speed follows.',D:'Keep at it — every test makes you better!'};
-  if(!D.ttBests) D.ttBests={};
-  if(!D.ttBests[diff]||wpm>D.ttBests[diff].wpm){
-    D.ttBests[diff]={wpm:wpm,acc:acc,secs:Math.round(secs),date:new Date().toLocaleDateString()};
-    save();
-  }
-  // final draw showing all chars colored
-  ttDraw(val);
-  var w=ttG('tt-wpm'); if(w) w.textContent=wpm;
-  var a=ttG('tt-acc'); if(a) a.textContent=acc+'%';
-  var t=ttG('tt-time'); if(t) t.textContent=Math.round(secs)+'s';
-  var e=ttG('tt-err'); if(e) e.textContent=errs;
-  var gr=ttG('tt-grade'); if(gr) gr.textContent=grade;
-  var mg=ttG('tt-msg'); if(mg) mg.textContent=wpm+' WPM · '+acc+'% accuracy · '+Math.round(secs)+'s — '+msgs[grade];
-  var res=ttG('tt-result'); if(res) res.style.display='block';
-  var st=ttG('tt-status'); if(st) st.textContent='Complete! ✓';
-  ttBests();
-}
-function ttBests(){
-  var el=ttG('tt-bests'); if(!el) return;
-  var b=D.ttBests||{};
-  var html='<table style="width:100%;font-size:.78rem;border-collapse:collapse;">';
-  html+='<tr style="color:var(--tx3);font-size:.65rem;text-transform:uppercase;"><td style="padding:.3rem .4rem;">Level</td><td style="padding:.3rem .4rem;">WPM</td><td style="padding:.3rem .4rem;">Accuracy</td><td style="padding:.3rem .4rem;">Time</td><td style="padding:.3rem .4rem;">Date</td></tr>';
-  ['easy','medium','hard'].forEach(function(d){
-    var r=b[d]; var lbl=d[0].toUpperCase()+d.slice(1);
-    if(!r){html+='<tr><td style="padding:.3rem .4rem;color:var(--tx2);">'+lbl+'</td><td colspan="4" style="padding:.3rem .4rem;color:var(--tx3);">No record yet</td></tr>';return;}
-    html+='<tr style="border-top:1px solid rgba(255,255,255,.06);"><td style="padding:.3rem .4rem;">'+lbl+'</td><td style="padding:.3rem .4rem;color:var(--c);font-weight:700;">'+r.wpm+'</td><td style="padding:.3rem .4rem;color:#34d399;">'+r.acc+'%</td><td style="padding:.3rem .4rem;color:var(--tx2);">'+r.secs+'s</td><td style="padding:.3rem .4rem;color:var(--tx3);font-size:.7rem;">'+r.date+'</td></tr>';
-  });
-  html+='</table>';
-  el.innerHTML=html;
-}
-// rTab hook for typing tab auto-start
-var _ttOrigRTab=null;
-// ── END TYPING TEST ──────────────────────────────────────────────────
-
-</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 <!-- ═══ CHILD AVATAR PICKER MODAL ═══ -->
 <div id="childAvatarModal" onclick="if(event.target===this)closeChildAvatarPicker()">
