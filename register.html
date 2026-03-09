@@ -146,7 +146,27 @@ select option{background:#0c1220;}
           </div>
         </div>
 
-        <button class="btn btn-main" onclick="step1Next()">Continue →</button>
+        <!-- REFERRAL BANNER — shown automatically if ?ref= in URL -->
+        <div id="refBanner" style="display:none;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:12px;padding:1rem 1.1rem;margin-bottom:1rem;">
+          <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.3rem;">
+            <span style="font-size:1rem;">&#127881;</span>
+            <span style="font-size:.82rem;font-weight:700;color:#22c55e;">You were referred &#8212; you get $10 off!</span>
+          </div>
+          <div style="font-size:.78rem;color:var(--tx2);line-height:1.5;">Use code <strong style="color:#22c55e;letter-spacing:.05em;">REFER10</strong> at checkout to save $10 on any paid plan. Your friend will also earn $10 when you sign up.</div>
+          <div style="margin-top:.6rem;font-size:.72rem;color:var(--tx3);">Referred by: <span id="refByLabel" style="color:var(--tx2);font-weight:600;"></span></div>
+        </div>
+
+        <div class="sponsor-toggle" onclick="toggleReferral()" id="refToggle">&#129309; Have a referral code? Click here</div>
+        <div id="referralSection" style="display:none;">
+          <div class="field">
+            <label>REFERRAL CODE</label>
+            <input type="text" id="referralCode" placeholder="e.g. JASON42" style="text-transform:uppercase;letter-spacing:1px;" oninput="onRefCodeInput()">
+            <div class="field-hint">Got this from a friend? Enter it here &#8212; you will both get rewarded.</div>
+          </div>
+          <div id="refCodeMsg" style="font-size:.75rem;margin-top:.25rem;display:none;"></div>
+        </div>
+
+        <button class="btn btn-main" onclick="step1Next()">Continue &#8594;</button>
         <div style="text-align:center;margin-top:1rem;font-size:.75rem;color:var(--tx3);">By registering you agree to our <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a>.</div>
       </div>
 
@@ -292,6 +312,7 @@ let cardElement;
 let currentStep = 1;
 let selectedPlan = 'free';
 let sponsorData = null;
+let referredBy = null; // stores referral code from URL or manual entry
 let appliedCoupon = null; // {id, percent_off}
 let createdFamilyId = null;
 
@@ -316,6 +337,49 @@ function goStep(n){
   document.getElementById('s'+n).classList.add('active');
   window.scrollTo(0,0);
 }
+
+function toggleReferral(){
+  const s = document.getElementById('referralSection');
+  const t = document.getElementById('refToggle');
+  if(s.style.display==='none'||!s.style.display){
+    s.style.display='block'; t.style.color='var(--tx2)';
+  } else {
+    s.style.display='none';
+  }
+}
+
+function onRefCodeInput(){
+  const val = document.getElementById('referralCode').value.trim().toUpperCase();
+  const msg = document.getElementById('refCodeMsg');
+  if(val.length >= 3){
+    referredBy = val;
+    msg.style.display='block';
+    msg.style.color='#22c55e';
+    msg.textContent='✓ Referral code "' + val + '" will be saved. Use REFER10 at checkout for $10 off.';
+  } else {
+    referredBy = null;
+    msg.style.display='none';
+  }
+}
+
+// Read ?ref= from URL on page load and auto-populate
+function checkUrlRef(){
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get('ref');
+  if(ref){
+    const code = ref.toUpperCase();
+    referredBy = code;
+    // Show the banner
+    document.getElementById('refBanner').style.display='block';
+    document.getElementById('refByLabel').textContent = code;
+    // Pre-fill the referral code input and show section
+    document.getElementById('referralCode').value = code;
+    document.getElementById('referralSection').style.display='block';
+    document.getElementById('refToggle').style.display='none';
+  }
+}
+// Run on load
+document.addEventListener('DOMContentLoaded', checkUrlRef);
 
 function toggleSponsor(){
   const s = document.getElementById('sponsorSection');
@@ -481,6 +545,7 @@ async function createAccount(){
           stripe_customer_id: stripeCustomerId,
           stripe_subscription_id: stripeSubId,
           sponsor_code_id: sponsorData?.id || null,
+          referred_by: referredBy || null,
           created_at: new Date().toISOString(),
         });
         if(dbError) throw new Error('Account creation failed: '+dbError.message);
@@ -524,6 +589,7 @@ async function createAccount(){
       stripe_customer_id: stripeCustomerId,
       stripe_subscription_id: stripeSubId,
       sponsor_code_id: sponsorData?.id || null,
+      referred_by: referredBy || null,
       created_at: new Date().toISOString(),
     });
     if(dbError) throw new Error('Account creation failed: '+dbError.message);
