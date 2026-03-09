@@ -4501,7 +4501,6 @@ body{top:0!important;}
     <button class="tab" onclick="rTab('writing',this)">📝 Writing</button>
     <button class="tab" onclick="rTab('computer',this)">💻 Computer</button>
     <button class="tab" onclick="rTab('study',this)">📚 Study Tips</button>
-    <button class="tab" onclick="rTab('typing',this)">⌨️ Typing Test</button>
   </div>
 
   <!-- MATH BASICS -->
@@ -13466,6 +13465,8 @@ async function init(){
 }
 
 function finishInit(){
+  // Always ensure newly-added sections are visible regardless of saved state
+  if(D.sections){ ['cbt','resume','motivation','mentors'].forEach(function(k){ delete D.sections[k]; }); }
   // Apply saved theme
   applyTheme();
   applyPalette();
