@@ -205,6 +205,33 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
 /* ANIMATIONS */
 @keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
 .fade-up{animation:fadeUp .7s ease forwards;}
+
+.pricing-grid-6{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;max-width:1100px;margin:0 auto;}
+@media(max-width:900px){.pricing-grid-6{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:600px){.pricing-grid-6{grid-template-columns:1fr;}}
+.pc6{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:1.6rem;display:flex;flex-direction:column;gap:.6rem;position:relative;}
+.pc6.featured{border-color:#f5c842;background:rgba(245,200,66,.05);}
+.pc6.church{border-color:rgba(99,179,237,.3);background:rgba(99,179,237,.04);}
+.pc6-badge{font-size:.7rem;font-weight:700;letter-spacing:.08em;padding:.3rem .7rem;border-radius:20px;display:inline-block;width:fit-content;}
+.pc6-badge.gold{background:rgba(245,200,66,.2);color:#f5c842;}
+.church-badge{background:rgba(99,179,237,.15);color:#63b3ed;}
+.pc6-label{font-size:.7rem;letter-spacing:.12em;color:rgba(255,255,255,.4);font-weight:600;margin-top:.2rem;}
+.pc6-name{font-size:1.3rem;font-weight:800;color:#fff;}
+.pc6-price{display:flex;align-items:baseline;gap:2px;margin:.3rem 0;}
+.pc6-price .dl{font-size:1.2rem;color:rgba(255,255,255,.6);}
+.pc6-price .am{font-size:2.6rem;font-weight:900;line-height:1;color:#fff;}
+.pc6-price .ct{font-size:1.1rem;color:rgba(255,255,255,.7);}
+.pc6-per{font-size:.8rem;color:rgba(255,255,255,.5);}
+.pc6-savings{font-size:.82rem;background:rgba(255,255,255,.06);border-radius:8px;padding:.5rem .7rem;color:rgba(255,255,255,.7);}
+.pc6-list{list-style:none;padding:0;margin:.4rem 0;flex:1;display:flex;flex-direction:column;gap:.35rem;}
+.pc6-list li{font-size:.85rem;color:rgba(255,255,255,.75);}
+.pc6-btn{display:block;text-align:center;padding:.85rem;border-radius:10px;font-weight:700;font-size:.9rem;text-decoration:none;margin-top:.4rem;transition:opacity .2s;}
+.pc6-btn:hover{opacity:.85;}
+.pc6-btn.blue{background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;}
+.pc6-btn.gold{background:linear-gradient(135deg,#f5c842,#e6a817);color:#1a1200;}
+.pc6-btn.purple{background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;}
+.pc6-note{font-size:.75rem;color:rgba(255,255,255,.35);text-align:center;margin:0;}
+
 </style>
 </head>
 <body>
@@ -425,123 +452,111 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
       <h2>Start Free. Upgrade When You're Ready.</h2>
       <p>No credit card to start. Monthly cancel anytime. Lifetime is a one-time purchase — no subscription, no auto-charges ever.</p>
     </div>
-    <div class="btabs">
-      <button class="btab on" onclick="showPricing('monthly',this)">Monthly</button>
-      <button class="btab" onclick="showPricing('yearly',this)">Yearly <span class="save-pip">SAVE 33%</span></button>
-      <button class="btab" onclick="showPricing('lifetime',this)">Lifetime</button>
-    </div>
+    <div class="pricing-grid-6">
 
-    <!-- MONTHLY -->
-    <div id="pg-monthly" class="pg" style="display:grid;">
-      <div class="pc">
-        <div class="pc-name">Family Monthly</div>
-        <div class="pc-price"><span class="dl">$</span><span class="am">9</span><span class="ct">.99</span></div>
-        <div class="pc-per">per month · cancel anytime</div>
-        <div class="pc-who">Full access for your entire family. Every section, every lesson, every tool.</div>
-        <ul>
-          <li><span class="ck">✓</span><div><strong>Unlimited child profiles</strong> — every kid gets their own PIN-protected dashboard</div></li>
-          <li><span class="ck">✓</span><div><strong>All 28 sections unlocked</strong> — career, driving, health, resume & more</div></li>
-          <li><span class="ck">✓</span><div><strong>140+ life skill lessons</strong> — taxes, credit, cooking, first aid, relationships</div></li>
-          <li><span class="ck">✓</span><div><strong>Chores & Rewards system</strong> — Parent Bucks, spin wheel, scratch cards</div></li>
-          <li><span class="ck">✓</span><div><strong>Parent Hub with Life Score</strong> — report card, weekly reports, behavior log</div></li>
-          <li><span class="ck">✓</span><div><strong>AI-powered quiz feedback</strong>, skill certificates, screen time controls</div></li>
+      <!-- ROW 1: Family Plans -->
+      <div class="pc6">
+        <div class="pc6-label">FAMILY</div>
+        <div class="pc6-name">Monthly</div>
+        <div class="pc6-price"><span class="dl">$</span><span class="am">9</span><span class="ct">.99</span></div>
+        <div class="pc6-per">per month · cancel anytime</div>
+        <ul class="pc6-list">
+          <li>✓ Unlimited child profiles</li>
+          <li>✓ All 28 sections + 140+ lessons</li>
+          <li>✓ Chores, rewards, Parent Hub</li>
+          <li>✓ AI quiz feedback</li>
+          <li>✓ Cancel anytime</li>
         </ul>
-        <a href="https://buy.stripe.com/5kQaEQ52j4r783cftH7wA00" class="pc-btn blue" style="font-size:.96rem;padding:1.05rem;">Start 3-Day Trial →</a>
-        <p class="pc-note">Free for 3 days · then $9.99/mo · cancel anytime</p>
+        <a href="https://buy.stripe.com/5kQaEQ52j4r783cftH7wA00" class="pc6-btn blue">Start 3-Day Free Trial →</a>
+        <p class="pc6-note">Free for 3 days · then $9.99/mo</p>
       </div>
-      <div class="pc" style="border-color:rgba(99,179,237,.4);">
-        <div class="pc-badge" style="background:rgba(99,179,237,.2);color:#63b3ed;">🏛 CHURCH &amp; GROUP</div>
-        <div class="pc-name">Church / Group</div>
-        <div class="pc-price"><span class="dl">$</span><span class="am">249</span></div>
-        <div class="pc-per">one-time · up to 10 families · forever</div>
-        <div class="pc-who">Sponsor up to 10 families in your church or ministry. One payment, no monthly fees.</div>
-        <ul>
-          <li><span class="ck">✓</span><div><strong>10 family licenses</strong> — full access for each family</div></li>
-          <li><span class="ck">✓</span><div><strong>All 28 sections + 140+ lessons</strong> for every family</div></li>
-          <li><span class="ck">✓</span><div><strong>No monthly fees</strong> — one payment covers it all</div></li>
-          <li><span class="ck">✓</span><div><strong>Priority support</strong> &amp; onboarding call</div></li>
-          <li><span class="ck">✓</span><div><strong>30-day money-back guarantee</strong></div></li>
-        </ul>
-        <a href="https://buy.stripe.com/7sY3codyP9Lr1EOgxL7wA03" class="pc-btn blue">Get Started →</a>
-        <p class="pc-note">One-time payment · 10 families · no subscription</p>
-      </div>
-    </div>
 
-    <!-- YEARLY -->
-    <div id="pg-yearly" class="pg hide" style="display:none;">
-      <div class="pc featured">
-        <div class="pc-badge gold">⭐ BEST VALUE</div>
-        <div class="pc-name" style="color:#f5c842;">Family Yearly</div>
-        <div class="pc-price"><span class="dl">$</span><span class="am">79</span><span class="ct">.99</span></div>
-        <div class="pc-per">per year · just $6.67/month · save $40</div>
-        <div class="pc-who">All the power of monthly at 33% off — two months completely free, every year.</div>
-        <div class="pc-savings-box">
-          Monthly = <strong>$119.88/year</strong>. Yearly = <strong style="color:#f5c842;">$79.99</strong>. You save <strong style="color:#f5c842;">$40 every single year</strong>.
-        </div>
-        <ul>
-          <li><span class="ck gold">✓</span><div><strong>Save $40 every year</strong> vs monthly — 2 months free, automatically</div></li>
-          <li><span class="ck gold">✓</span><div><strong>Price locked forever</strong> — your $79.99 rate never increases</div></li>
-          <li><span class="ck gold">✓</span><div>Unlimited child profiles, all 28 sections, full Parent Hub</div></li>
-          <li><span class="ck gold">✓</span><div>140+ lessons, chores & rewards, AI quiz feedback</div></li>
-          <li><span class="ck gold">✓</span><div>Cancel before renewal for a full refund — no questions</div></li>
+      <div class="pc6 featured">
+        <div class="pc6-badge gold">⭐ BEST VALUE</div>
+        <div class="pc6-label">FAMILY</div>
+        <div class="pc6-name" style="color:#f5c842;">Yearly</div>
+        <div class="pc6-price"><span class="dl">$</span><span class="am">79</span><span class="ct">.99</span></div>
+        <div class="pc6-per">per year · save $40 vs monthly</div>
+        <div class="pc6-savings">Monthly = $119.88/yr. <strong style="color:#f5c842;">You save $40.</strong></div>
+        <ul class="pc6-list">
+          <li>✓ Everything in Monthly</li>
+          <li>✓ 2 months free every year</li>
+          <li>✓ Price locked forever</li>
+          <li>✓ Cancel before renewal — full refund</li>
         </ul>
-        <a href="https://buy.stripe.com/8x200ccuL7Dj4R0epD7wA01" class="pc-btn gold" style="font-size:.96rem;padding:1.05rem;">Start 3-Day Trial →</a>
-        <p class="pc-note">Free for 3 days · then $79.99/yr · cancel anytime</p>
+        <a href="https://buy.stripe.com/8x200ccuL7Dj4R0epD7wA01" class="pc6-btn gold">Start 3-Day Free Trial →</a>
+        <p class="pc6-note">Free for 3 days · then $79.99/yr</p>
       </div>
-      <div class="pc" style="border-color:rgba(99,179,237,.4);">
-        <div class="pc-badge" style="background:rgba(99,179,237,.2);color:#63b3ed;">🏛 CHURCH &amp; GROUP</div>
-        <div class="pc-name">Church / Group</div>
-        <div class="pc-price"><span class="dl">$</span><span class="am">599</span></div>
-        <div class="pc-per">one-time · up to 30 families · forever</div>
-        <div class="pc-who">Sponsor up to 30 families in your community. One payment, no annual renewals.</div>
-        <ul>
-          <li><span class="ck">✓</span><div><strong>30 family licenses</strong> — full access for each family</div></li>
-          <li><span class="ck">✓</span><div><strong>All 28 sections + 140+ lessons</strong> for every family</div></li>
-          <li><span class="ck">✓</span><div><strong>No annual renewals</strong> — one payment covers it all</div></li>
-          <li><span class="ck">✓</span><div><strong>Priority support</strong> &amp; onboarding call</div></li>
-          <li><span class="ck">✓</span><div><strong>30-day money-back guarantee</strong></div></li>
-        </ul>
-        <a href="https://buy.stripe.com/5kQ14gfGX6zfbfo1CR7wA04" class="pc-btn blue">Get Started →</a>
-        <p class="pc-note">One-time payment · 30 families · no subscription</p>
-      </div>
-    </div>
 
-    <!-- LIFETIME -->
-    <div id="pg-lifetime" class="pg hide" style="display:none;">
-      <div class="pc">
-        <div class="pc-name">Family Lifetime</div>
-        <div class="pc-price"><span class="dl">$</span><span class="am">149</span></div>
-        <div class="pc-per">one payment · no renewals · ever</div>
-        <div class="pc-who">Pay once. Own it forever. Every future update, your whole family included — for life.</div>
-        <div class="pc-savings-box">
-          Monthly for 5 yrs = <strong>$599.40</strong>. Yearly for 5 yrs = <strong>$399.95</strong>. Lifetime = <strong style="color:#f5c842;">$149 once</strong>. The math is obvious.
-        </div>
-        <ul>
-          <li><span class="ck">✓</span><div><strong>Never pay again</strong> — one payment, zero renewals</div></li>
-          <li><span class="ck">✓</span><div><strong>All future updates free, forever</strong></div></li>
-          <li><span class="ck">✓</span><div><strong>Unlimited family members, all ages</strong> — no caps</div></li>
-          <li><span class="ck">✓</span><div><strong>Priority support</strong> — real humans, fast responses</div></li>
-          <li><span class="ck">✓</span><div><strong>30-day money-back guarantee</strong></div></li>
+      <div class="pc6">
+        <div class="pc6-badge" style="background:rgba(139,92,246,.2);color:#a78bfa;">⚡ PAY ONCE FOREVER</div>
+        <div class="pc6-label">FAMILY</div>
+        <div class="pc6-name">Lifetime</div>
+        <div class="pc6-price"><span class="dl">$</span><span class="am">149</span></div>
+        <div class="pc6-per">one payment · no renewals · ever</div>
+        <div class="pc6-savings">5 yrs monthly = $599. <strong style="color:#a78bfa;">Lifetime = $149 once.</strong></div>
+        <ul class="pc6-list">
+          <li>✓ Everything in Yearly</li>
+          <li>✓ Never pay again</li>
+          <li>✓ All future updates free</li>
+          <li>✓ 30-day money-back guarantee</li>
         </ul>
-        <a href="https://buy.stripe.com/8x2dR27ar5vb4R03KZ7wA02" class="pc-btn gold" style="font-size:.96rem;padding:1.05rem;">Buy Now — $149 Once →</a>
-        <p class="pc-note">30-day guarantee · no subscription · yours forever</p>
+        <a href="https://buy.stripe.com/8x2dR27ar5vb4R03KZ7wA02" class="pc6-btn purple">Buy Now — $149 Once →</a>
+        <p class="pc6-note">30-day guarantee · yours forever</p>
       </div>
-      <div class="pc featured" style="border-color:rgba(99,179,237,.5);">
-        <div class="pc-badge" style="background:rgba(99,179,237,.2);color:#63b3ed;">🏛 CHURCH &amp; GROUP — 75 FAMILIES</div>
-        <div class="pc-name">Church / Donor</div>
-        <div class="pc-price"><span class="dl">$</span><span class="am">999</span></div>
-        <div class="pc-per">one payment · up to 75 families · forever</div>
-        <div class="pc-who">Give 75 families in your church or ministry lifetime access. No per-family fees, ever.</div>
-        <ul>
-          <li><span class="ck">✓</span><div><strong>75 family licenses</strong> — lifetime access for each</div></li>
-          <li><span class="ck">✓</span><div><strong>All future updates included</strong> forever</div></li>
-          <li><span class="ck">✓</span><div><strong>Admin dashboard</strong> — track family engagement</div></li>
-          <li><span class="ck">✓</span><div><strong>Bulk QR invite codes</strong> for easy onboarding</div></li>
-          <li><span class="ck">✓</span><div><strong>Priority support &amp; onboarding call</strong></div></li>
+
+      <!-- ROW 2: Church / Sponsor Plans -->
+      <div class="pc6 church">
+        <div class="pc6-badge church-badge">🏛 CHURCH &amp; MINISTRY</div>
+        <div class="pc6-label">SPONSOR</div>
+        <div class="pc6-name">Starter</div>
+        <div class="pc6-price"><span class="dl">$</span><span class="am">249</span></div>
+        <div class="pc6-per">one-time · 10 families · forever</div>
+        <ul class="pc6-list">
+          <li>✓ 10 family licenses</li>
+          <li>✓ Full access for each family</li>
+          <li>✓ All sections + lessons included</li>
+          <li>✓ Priority support</li>
+          <li>✓ 30-day money-back guarantee</li>
         </ul>
-        <a href="https://buy.stripe.com/00w14g2UbaPv83c6Xb7wA05" class="pc-btn blue">Get Started →</a>
-        <p class="pc-note">One-time payment · 75 families · lifetime access</p>
+        <a href="https://buy.stripe.com/7sY3codyP9Lr1EOgxL7wA03" class="pc6-btn blue">Get Started →</a>
+        <p class="pc6-note">One-time · 10 families · no subscription</p>
       </div>
+
+      <div class="pc6 church">
+        <div class="pc6-badge church-badge">🏛 CHURCH &amp; MINISTRY</div>
+        <div class="pc6-label">SPONSOR</div>
+        <div class="pc6-name">Community</div>
+        <div class="pc6-price"><span class="dl">$</span><span class="am">599</span></div>
+        <div class="pc6-per">one-time · 30 families · forever</div>
+        <ul class="pc6-list">
+          <li>✓ 30 family licenses</li>
+          <li>✓ Full access for each family</li>
+          <li>✓ All sections + lessons included</li>
+          <li>✓ Priority support &amp; onboarding call</li>
+          <li>✓ 30-day money-back guarantee</li>
+        </ul>
+        <a href="https://buy.stripe.com/5kQ14gfGX6zfbfo1CR7wA04" class="pc6-btn blue">Get Started →</a>
+        <p class="pc6-note">One-time · 30 families · no subscription</p>
+      </div>
+
+      <div class="pc6 church">
+        <div class="pc6-badge church-badge">🏛 CHURCH &amp; MINISTRY</div>
+        <div class="pc6-label">SPONSOR</div>
+        <div class="pc6-name">Church / Donor</div>
+        <div class="pc6-price"><span class="dl">$</span><span class="am">999</span></div>
+        <div class="pc6-per">one-time · 75 families · forever</div>
+        <ul class="pc6-list">
+          <li>✓ 75 family licenses</li>
+          <li>✓ Lifetime access for each family</li>
+          <li>✓ Admin dashboard + reporting</li>
+          <li>✓ Bulk QR invite codes</li>
+          <li>✓ Priority support &amp; onboarding call</li>
+        </ul>
+        <a href="https://buy.stripe.com/00w14g2UbaPv83c6Xb7wA05" class="pc6-btn blue">Get Started →</a>
+        <p class="pc6-note">One-time · 75 families · lifetime access</p>
+      </div>
+
     </div>
 
     <!-- COMING SOON -->
