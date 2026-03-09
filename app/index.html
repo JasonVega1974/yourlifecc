@@ -4488,7 +4488,7 @@ body{top:0!important;}
 <section id="s-resources" class="sec">
   <div class="sh">
     <div class="si">📐</div>
-    <div class="st">School &amp; Career Resources</div>
+    <div class="st">School Resources</div>
     <span class="tip-wrap"><span class="tip-btn">?</span><span class="tip-box tip-right"><span class="tip-title">HOW TO USE</span><br>Reference guides, practice tools, and calculators for school. Use the <b>Math</b> tab for formulas and practice, <b>Science</b> for measurements and methods, <b>Calculators</b> for quick math, <b>Writing</b> for essays, and <b>Computer</b> for tech skills.</span></span>
     <div class="sl"></div>
   </div>
@@ -4851,59 +4851,79 @@ body{top:0!important;}
 
   <!-- TYPING TEST TAB -->
   <div id="rs-typing" style="display:none;">
-    <div class="card" style="max-width:820px;margin:0 auto;">
+    <div class="card" style="max-width:860px;margin:0 auto;">
       <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem;flex-wrap:wrap;">
-        <div style="font-family:var(--fh);font-size:.85rem;letter-spacing:1.5px;color:var(--c);">⌨️ TYPING TEST</div>
-        <div style="margin-left:auto;display:flex;gap:.4rem;flex-wrap:wrap;">
-          <select id="rsTypeDiff" onchange="rsTypingReset()" style="font-size:.75rem;padding:.25rem .4rem;background:var(--bg2);border:1px solid rgba(255,255,255,.1);color:var(--tx);border-radius:6px;">
-            <option value="easy">🟢 Easy</option>
-            <option value="medium" selected>🟡 Medium</option>
-            <option value="hard">🔴 Hard</option>
+        <div style="font-family:var(--fh);font-size:.85rem;letter-spacing:1.5px;color:var(--c);">&#9000; TYPING TEST</div>
+        <div style="margin-left:auto;display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;">
+          <label style="font-size:.7rem;color:var(--tx3);">Difficulty:</label>
+          <select id="rsTypeDiff" style="font-size:.75rem;padding:.25rem .5rem;background:var(--bg2);border:1px solid rgba(255,255,255,.15);color:var(--tx);border-radius:6px;">
+            <option value="easy">Easy</option>
+            <option value="medium" selected>Medium</option>
+            <option value="hard">Hard</option>
           </select>
-          <button class="btn bp bs" onclick="rsTypingStart()">&#9654; Start</button>
-          <button class="btn bgh bs" onclick="rsTypingReset()">&#8634; Reset</button>
+          <button class="btn bp bs" onclick="rsStart()" style="font-size:.75rem;">&#9654; New Test</button>
+          <button class="btn bgh bs" onclick="rsReset()" style="font-size:.75rem;">&#8634; Reset</button>
         </div>
       </div>
-      <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:.8rem;">
-        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.4rem .8rem;text-align:center;min-width:70px;">
-          <div style="font-size:1.2rem;font-weight:700;color:var(--c);font-family:var(--fh);" id="rsWpm">0</div>
-          <div style="font-size:.58rem;color:var(--tx3);">WPM</div>
+
+      <!-- Stats -->
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:.4rem;margin-bottom:.9rem;">
+        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.5rem;text-align:center;">
+          <div style="font-size:1.3rem;font-weight:700;color:var(--c);font-family:var(--fh);" id="rsWpm">—</div>
+          <div style="font-size:.55rem;color:var(--tx3);text-transform:uppercase;margin-top:.1rem;">WPM</div>
         </div>
-        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.4rem .8rem;text-align:center;min-width:70px;">
-          <div style="font-size:1.2rem;font-weight:700;color:#34d399;font-family:var(--fh);" id="rsAcc">100%</div>
-          <div style="font-size:.58rem;color:var(--tx3);">Accuracy</div>
+        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.5rem;text-align:center;">
+          <div style="font-size:1.3rem;font-weight:700;color:#34d399;font-family:var(--fh);" id="rsAcc">—</div>
+          <div style="font-size:.55rem;color:var(--tx3);text-transform:uppercase;margin-top:.1rem;">Accuracy</div>
         </div>
-        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.4rem .8rem;text-align:center;min-width:70px;">
-          <div style="font-size:1.2rem;font-weight:700;color:var(--tx);font-family:var(--fh);" id="rsTimer">0s</div>
-          <div style="font-size:.58rem;color:var(--tx3);">Time</div>
+        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.5rem;text-align:center;">
+          <div style="font-size:1.3rem;font-weight:700;color:var(--tx);font-family:var(--fh);" id="rsTime">0s</div>
+          <div style="font-size:.55rem;color:var(--tx3);text-transform:uppercase;margin-top:.1rem;">Time</div>
         </div>
-        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.4rem .8rem;text-align:center;min-width:70px;">
-          <div style="font-size:1.2rem;font-weight:700;color:#f87171;font-family:var(--fh);" id="rsErrors">0</div>
-          <div style="font-size:.58rem;color:var(--tx3);">Errors</div>
+        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.5rem;text-align:center;">
+          <div style="font-size:1.3rem;font-weight:700;color:#f87171;font-family:var(--fh);" id="rsErr">0</div>
+          <div style="font-size:.55rem;color:var(--tx3);text-transform:uppercase;margin-top:.1rem;">Errors</div>
         </div>
-        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.4rem .8rem;text-align:center;min-width:70px;">
-          <div style="font-size:1.2rem;font-weight:700;color:#fbbf24;font-family:var(--fh);" id="rsBest">--</div>
-          <div style="font-size:.58rem;color:var(--tx3);">Best WPM</div>
+        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.5rem;text-align:center;">
+          <div style="font-size:1.3rem;font-weight:700;color:#fbbf24;font-family:var(--fh);" id="rsBestWpm">—</div>
+          <div style="font-size:.55rem;color:var(--tx3);text-transform:uppercase;margin-top:.1rem;">Best WPM</div>
         </div>
       </div>
-      <div id="rsPassageWrap" style="background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:1rem 1.2rem;margin-bottom:.8rem;font-size:.9rem;line-height:2;letter-spacing:.02em;min-height:70px;font-family:'Courier New',monospace;">
-        <span style="color:var(--tx3);font-size:.8rem;">Select difficulty and press Start, or just start typing below</span>
-      </div>
-      <textarea id="rsTypingInput" rows="3"
-        placeholder="Type here to begin..."
-        oninput="rsTypingOnInput(event)"
-        style="width:100%;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);border-radius:10px;padding:.7rem 1rem;font-size:.88rem;font-family:'Courier New',monospace;color:var(--tx);resize:none;box-sizing:border-box;"
-        onkeydown="if(event.key==='Tab'){event.preventDefault();}"
+
+      <!-- Status bar -->
+      <div id="rsStatus" style="font-size:.72rem;color:var(--c);margin-bottom:.5rem;min-height:1.2rem;font-family:var(--fh);letter-spacing:1px;">READY — START TYPING OR PRESS NEW TEST</div>
+
+      <!-- Passage display -->
+      <div id="rsPassage" style="background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:1rem 1.2rem;margin-bottom:.8rem;font-size:.95rem;line-height:2;font-family:'Courier New',monospace;min-height:72px;word-break:break-word;"></div>
+
+      <!-- Input -->
+      <textarea id="rsInput" rows="3"
+        placeholder="Click 'New Test' above, then type here..."
+        style="width:100%;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.12);border-radius:10px;padding:.7rem 1rem;font-size:.9rem;font-family:'Courier New',monospace;color:var(--tx);resize:none;box-sizing:border-box;outline:none;transition:border-color .2s;"
+        oninput="rsOnInput(this.value)"
+        onkeydown="if(event.key==='Tab')event.preventDefault();"
       ></textarea>
-      <div id="rsTypingResult" style="display:none;margin-top:.8rem;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.25);border-radius:10px;padding:1rem;text-align:center;">
-        <div style="font-family:var(--fh);font-size:1.6rem;color:var(--c);" id="rsGrade">S</div>
-        <div style="font-size:.82rem;color:var(--tx2);margin:.3rem 0;" id="rsResultMsg"></div>
-        <button class="btn bp" style="margin-top:.5rem;" onclick="rsTypingReset()">Try Again</button>
+
+      <!-- Result -->
+      <div id="rsResult" style="display:none;margin-top:.8rem;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.3);border-radius:10px;padding:1rem 1.2rem;text-align:center;">
+        <div style="font-family:var(--fh);font-size:2rem;color:var(--c);" id="rsGrade"></div>
+        <div style="font-size:.82rem;color:var(--tx2);margin:.4rem 0;" id="rsResultMsg"></div>
+        <button class="btn bp" onclick="rsStart()" style="margin-top:.4rem;">Next Test</button>
       </div>
     </div>
-    <div class="card" style="max-width:820px;margin:.8rem auto 0;">
-      <div class="ct">🏆 Personal Bests</div>
-      <div id="rsTypingBests" style="font-size:.78rem;color:var(--tx2);padding:.3rem 0;">No tests completed yet.</div>
+
+    <!-- Personal bests -->
+    <div class="card" style="max-width:860px;margin:.8rem auto 0;">
+      <div class="ct">&#127942; Personal Bests</div>
+      <table style="width:100%;font-size:.78rem;border-collapse:collapse;" id="rsBestsTable">
+        <tr style="color:var(--tx3);font-size:.65rem;text-transform:uppercase;">
+          <td style="padding:.3rem .4rem;">Difficulty</td>
+          <td style="padding:.3rem .4rem;">WPM</td>
+          <td style="padding:.3rem .4rem;">Accuracy</td>
+          <td style="padding:.3rem .4rem;">Time</td>
+          <td style="padding:.3rem .4rem;">Date</td>
+        </tr>
+      </table>
     </div>
   </div>
 </section>
@@ -8048,7 +8068,7 @@ const NAV_ITEMS = [
     {id:'s-school',    icon:'📚', label:'School',         key:'school'},
     {id:'s-resume',    icon:'💼', label:'Jobs/Resume',    key:'resume'},
     {id:'s-bio',       icon:'📋', label:'Bio Page',       key:'bio'},
-    {id:'s-resources', icon:'📦', label:'School & Career', key:'resources'},
+    {id:'s-resources', icon:'📦', label:'School Resources', key:'resources'},
     {id:'s-cbt',       icon:'💻', label:'CBT Training',    key:'cbt'},
   ]},
   {id:'_group_daily', icon:'📅', label:'Daily Life', isGroup:true, children:[
@@ -24724,153 +24744,168 @@ function applyChildAvatar(){
   </div>
 </div>
 <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
-// ── RESOURCES TYPING TEST ────────────────────────────────────────────
-const RS_PASSAGES = {
+
+
+
+// ── RESOURCES TYPING TEST ─────────────────────────────────────────
+const RSP = {
   easy:[
-    'The dog ran fast down the road and jumped over the fence into the yard.',
-    'She made a cup of tea and sat by the window to watch the rain fall.',
-    'He opened the book and began to read the first page of the long story.',
+    'The dog ran fast down the road and jumped over the fence.',
+    'She made a cup of tea and sat by the window to watch the rain.',
+    'He opened the book and began to read the first page of the story.',
     'The sun rose slowly over the hills and lit up the quiet little town.',
     'They walked to the park and played on the swings until it got dark.',
+    'My friend brought a big pizza and we ate every single slice.',
+    'The cat jumped onto the bed and curled up next to the pillow.',
   ],
   medium:[
-    'Learning to type quickly and accurately is one of the most valuable skills you can develop for school and work.',
-    'Practice makes perfect, but only if you practice correctly and focus on both speed and accuracy at the same time.',
-    'The ability to communicate clearly in writing is essential in every career and every stage of adult life.',
-    'Time management is about making conscious choices about where you spend your energy and attention each day.',
-    'Reading widely expands your vocabulary, improves your writing, and helps you understand the world more deeply.',
+    'Learning to type quickly and accurately is one of the most valuable skills for school and work.',
+    'Practice makes perfect, but only if you focus on both speed and accuracy at the same time.',
+    'The ability to communicate clearly in writing is essential in every career and stage of adult life.',
+    'Time management is about making conscious choices about where you spend your energy each day.',
+    'Reading widely expands your vocabulary, improves your writing, and helps you understand the world.',
+    'Success is not about talent alone but about consistent effort applied intelligently over time.',
+    'Every expert was once a beginner who refused to give up when things became difficult.',
   ],
   hard:[
-    'Effective communication requires not only clarity of expression but also the ability to anticipate how your message will be received by the intended audience.',
-    'The development of critical thinking skills is fundamental to academic success and professional achievement in an increasingly complex world.',
-    'Situational awareness, the ability to perceive and comprehend your environment, is a skill that can be trained and significantly improved with consistent practice.',
-    'Financial literacy encompasses understanding budgeting, saving, investing, and the responsible use of credit — knowledge that affects every major life decision.',
-    'The discipline required to maintain consistent habits over months and years is more predictive of long-term success than raw intelligence or natural talent.',
+    'Effective communication requires not only clarity of expression but also anticipating how your message will land.',
+    'The development of critical thinking skills is fundamental to academic success in an increasingly complex world.',
+    'Situational awareness, the ability to perceive and comprehend your environment, can be significantly improved with practice.',
+    'Financial literacy encompasses budgeting, saving, investing, and responsible credit use — affecting every major life decision.',
+    'The discipline required to maintain consistent habits over months and years is more predictive of success than raw talent.',
+    'Resilience is not the absence of difficulty but the capacity to recover, adapt, and grow stronger through adversity.',
+    'Emotional intelligence involves recognizing your own emotions and those of others, and managing them constructively.',
   ]
 };
 
-let _rsTyping = {
-  active: false, started: false,
-  passage: '', typed: '',
-  startTime: null, timerID: null,
-  errors: 0, totalTyped: 0
-};
+let RST = { on:false, started:false, passage:'', tid:null, t0:null, errs:0, total:0 };
 
-function rsTypingStart(){
-  rsTypingReset();
-  const diff = (document.getElementById('rsTypeDiff')||{value:'medium'}).value;
-  const passages = RS_PASSAGES[diff] || RS_PASSAGES.medium;
-  _rsTyping.passage = passages[Math.floor(Math.random()*passages.length)];
-  _rsTyping.active = true;
-  rsRenderPassage();
-  const inp = document.getElementById('rsTypingInput');
-  if(inp){ inp.disabled = false; inp.value = ''; inp.focus(); }
-  document.getElementById('rsTypingResult').style.display = 'none';
-  rsUpdateBest();
+function rsG(id){ return document.getElementById(id); }
+
+function rsStart(){
+  rsReset();
+  const diff = (rsG('rsTypeDiff')||{value:'medium'}).value;
+  const list = RSP[diff] || RSP.medium;
+  RST.passage = list[Math.floor(Math.random()*list.length)];
+  RST.on = true;
+  rsDrawPassage();
+  const inp = rsG('rsInput');
+  if(inp){ inp.value=''; inp.disabled=false; inp.style.borderColor='rgba(96,165,250,.5)'; inp.focus(); }
+  const res = rsG('rsResult'); if(res) res.style.display='none';
+  const st = rsG('rsStatus'); if(st) st.textContent='GO — TYPE THE PASSAGE ABOVE';
+  rsBests();
 }
 
-function rsTypingReset(){
-  if(_rsTyping.timerID) clearInterval(_rsTyping.timerID);
-  _rsTyping = { active:false, started:false, passage:'', typed:'', startTime:null, timerID:null, errors:0, totalTyped:0 };
-  const inp = document.getElementById('rsTypingInput');
-  if(inp){ inp.value = ''; inp.disabled = false; }
-  ['rsWpm','rsTimer','rsErrors'].forEach(id=>{ const e=document.getElementById(id); if(e) e.textContent = id==='rsAcc'?'100%':'0'; });
-  const acc = document.getElementById('rsAcc'); if(acc) acc.textContent='100%';
-  const wrap = document.getElementById('rsPassageWrap');
-  if(wrap) wrap.innerHTML = '<span style="color:var(--tx3);font-size:.8rem;">Select difficulty and press Start, or just start typing below</span>';
-  const res = document.getElementById('rsTypingResult'); if(res) res.style.display='none';
-  rsUpdateBest();
+function rsReset(){
+  if(RST.tid) clearInterval(RST.tid);
+  RST = { on:false, started:false, passage:'', tid:null, t0:null, errs:0, total:0 };
+  const inp = rsG('rsInput');
+  if(inp){ inp.value=''; inp.disabled=false; inp.style.borderColor='rgba(255,255,255,.12)'; }
+  ['rsWpm','rsAcc','rsErr'].forEach(id=>{ const e=rsG(id); if(e) e.textContent='—'; });
+  const t=rsG('rsTime'); if(t) t.textContent='0s';
+  const res=rsG('rsResult'); if(res) res.style.display='none';
+  const p=rsG('rsPassage'); if(p) p.innerHTML='<span style="color:var(--tx3);">Press <b>New Test</b> to load a passage</span>';
+  const st=rsG('rsStatus'); if(st) st.textContent='READY — PRESS NEW TEST TO BEGIN';
+  rsBests();
 }
 
-function rsRenderPassage(){
-  const wrap = document.getElementById('rsPassageWrap'); if(!wrap) return;
-  const typed = _rsTyping.typed;
-  const passage = _rsTyping.passage;
-  let html = '';
-  for(let i=0;i<passage.length;i++){
-    if(i < typed.length){
-      const correct = typed[i]===passage[i];
-      html += `<span style="color:${correct?'#86efac':'#f87171'};text-decoration:${correct?'none':'underline'};">${passage[i]==' '?'&nbsp;':passage[i]}</span>`;
-    } else if(i===typed.length){
-      html += `<span style="background:rgba(96,165,250,.4);border-radius:2px;">${passage[i]==' '?'&nbsp;':passage[i]}</span>`;
+function rsOnInput(val){
+  if(!RST.on){ rsStart(); return; }
+  if(!RST.started && val.length>0){
+    RST.started=true; RST.t0=Date.now();
+    RST.tid=setInterval(rsStats,250);
+  }
+  RST.total = Math.max(RST.total, val.length);
+  let e=0; for(let i=0;i<val.length;i++) if(val[i]!==RST.passage[i]) e++;
+  RST.errs=e;
+  rsDrawPassage(val);
+  rsStats(val);
+  if(val===RST.passage) rsFinish(val);
+}
+
+function rsDrawPassage(typed){
+  const p=rsG('rsPassage'); if(!p) return;
+  const t=typed||''; const s=RST.passage;
+  let h='';
+  for(let i=0;i<s.length;i++){
+    const ch=s[i]==='&nbsp;'?' ':s[i];
+    const disp=ch===' '?'&nbsp;':ch;
+    if(i<t.length){
+      h+=`<span style="color:${t[i]===s[i]?'#86efac':'#f87171'};">${disp}</span>`;
+    } else if(i===t.length){
+      h+=`<span style="background:rgba(96,165,250,.5);border-radius:2px;color:#fff;">${disp}</span>`;
     } else {
-      html += `<span style="color:rgba(255,255,255,.35);">${passage[i]==' '?'&nbsp;':passage[i]}</span>`;
+      h+=`<span style="color:rgba(255,255,255,.3);">${disp}</span>`;
     }
   }
-  wrap.innerHTML = html;
+  p.innerHTML=h;
 }
 
-function rsTypingOnInput(e){
-  if(!_rsTyping.active){ rsTypingStart(); }
-  const inp = document.getElementById('rsTypingInput'); if(!inp) return;
-  const typed = inp.value;
-  // Start timer on first char
-  if(!_rsTyping.started && typed.length > 0){
-    _rsTyping.started = true;
-    _rsTyping.startTime = Date.now();
-    _rsTyping.timerID = setInterval(rsUpdateStats, 300);
-  }
-  _rsTyping.typed = typed;
-  _rsTyping.totalTyped = Math.max(_rsTyping.totalTyped, typed.length);
-  // Count errors
-  let errs = 0;
-  for(let i=0;i<typed.length;i++){ if(typed[i]!==_rsTyping.passage[i]) errs++; }
-  _rsTyping.errors = errs;
-  rsRenderPassage();
-  rsUpdateStats();
-  // Check completion
-  if(typed === _rsTyping.passage){ rsTypingFinish(); }
+function rsStats(val){
+  const v=typeof val==='string'?val:(rsG('rsInput')||{value:''}).value;
+  const secs=RST.t0?Math.max(1,(Date.now()-RST.t0)/1000):0;
+  const words=v.trim().split(/\s+/).filter(Boolean).length;
+  const wpm=secs>0?Math.round((words/secs)*60):0;
+  const acc=RST.total>0?Math.max(0,Math.round(((RST.total-RST.errs)/RST.total)*100)):100;
+  const w=rsG('rsWpm'); if(w) w.textContent=secs>0?wpm:'—';
+  const a=rsG('rsAcc'); if(a) a.textContent=secs>0?acc+'%':'—';
+  const ti=rsG('rsTime'); if(ti) ti.textContent=Math.round(secs)+'s';
+  const er=rsG('rsErr'); if(er) er.textContent=RST.errs;
 }
 
-function rsUpdateStats(){
-  const secs = _rsTyping.startTime ? Math.max(1,(Date.now()-_rsTyping.startTime)/1000) : 0;
-  const words = _rsTyping.typed.trim().split(/\s+/).filter(Boolean).length;
-  const wpm = secs>0 ? Math.round((words/secs)*60) : 0;
-  const acc = _rsTyping.totalTyped>0 ? Math.max(0,Math.round((((_rsTyping.totalTyped-_rsTyping.errors)/_rsTyping.totalTyped)*100))) : 100;
-  const e = id => document.getElementById(id);
-  if(e('rsWpm')) e('rsWpm').textContent = wpm;
-  if(e('rsAcc')) e('rsAcc').textContent = acc+'%';
-  if(e('rsTimer')) e('rsTimer').textContent = Math.round(secs)+'s';
-  if(e('rsErrors')) e('rsErrors').textContent = _rsTyping.errors;
-}
-
-function rsTypingFinish(){
-  if(_rsTyping.timerID) clearInterval(_rsTyping.timerID);
-  _rsTyping.active = false;
-  const inp = document.getElementById('rsTypingInput'); if(inp) inp.disabled = true;
-  const secs = Math.max(1,(Date.now()-_rsTyping.startTime)/1000);
-  const words = _rsTyping.passage.trim().split(/\s+/).length;
-  const wpm = Math.round((words/secs)*60);
-  const acc = _rsTyping.totalTyped>0 ? Math.round(((_rsTyping.totalTyped-_rsTyping.errors)/_rsTyping.totalTyped)*100) : 100;
-  const grade = wpm>=80&&acc>=95?'S':wpm>=60&&acc>=90?'A':wpm>=45&&acc>=85?'B':wpm>=30?'C':'D';
-  const msgs = {S:'Outstanding! Top-tier speed and accuracy.',A:'Excellent! Strong typing skills.',B:'Good work! Keep practicing for more speed.',C:'Decent — focus on accuracy first, speed follows.',D:'Keep at it — consistency is the key!'};
-  const diff = (document.getElementById('rsTypeDiff')||{value:'medium'}).value;
-  // Save personal best
-  if(!D.rsTypingBests) D.rsTypingBests = {};
-  if(!D.rsTypingBests[diff] || wpm > D.rsTypingBests[diff].wpm){
-    D.rsTypingBests[diff] = {wpm, acc, errors:_rsTyping.errors, secs:Math.round(secs), date:new Date().toLocaleDateString()};
+function rsFinish(val){
+  if(RST.tid){ clearInterval(RST.tid); RST.tid=null; }
+  RST.on=false;
+  const inp=rsG('rsInput'); if(inp){ inp.disabled=true; inp.style.borderColor='rgba(52,211,153,.4)'; }
+  const secs=Math.max(1,(Date.now()-RST.t0)/1000);
+  const words=RST.passage.trim().split(/\s+/).length;
+  const wpm=Math.round((words/secs)*60);
+  const acc=RST.total>0?Math.round(((RST.total-RST.errs)/RST.total)*100):100;
+  const diff=(rsG('rsTypeDiff')||{value:'medium'}).value;
+  const grade=wpm>=80&&acc>=95?'S':wpm>=60&&acc>=90?'A':wpm>=45&&acc>=85?'B':wpm>=30?'C':'D';
+  const msg={S:'Outstanding! Elite speed and accuracy.',A:'Excellent work! Strong typing skills.',B:'Good job! Keep practicing for more speed.',C:'Decent — focus on accuracy first.',D:'Keep going — consistency is everything!'};
+  if(!D.rsTypingBests) D.rsTypingBests={};
+  if(!D.rsTypingBests[diff]||wpm>D.rsTypingBests[diff].wpm){
+    D.rsTypingBests[diff]={wpm,acc,secs:Math.round(secs),date:new Date().toLocaleDateString()};
     save();
   }
-  const res = document.getElementById('rsTypingResult'); if(res) res.style.display='block';
-  const gradeEl = document.getElementById('rsGrade'); if(gradeEl) gradeEl.textContent=grade;
-  const msgEl = document.getElementById('rsResultMsg');
-  if(msgEl) msgEl.textContent = wpm+' WPM · '+acc+'% accuracy · '+Math.round(secs)+'s · '+msgs[grade];
-  rsUpdateBest(); rsUpdateStats();
+  const w=rsG('rsWpm'); if(w) w.textContent=wpm;
+  const a=rsG('rsAcc'); if(a) a.textContent=acc+'%';
+  const ti=rsG('rsTime'); if(ti) ti.textContent=Math.round(secs)+'s';
+  const gr=rsG('rsGrade'); if(gr) gr.textContent=grade;
+  const rm=rsG('rsResultMsg'); if(rm) rm.textContent=wpm+' WPM · '+acc+'% accuracy · '+Math.round(secs)+'s — '+msg[grade];
+  const res=rsG('rsResult'); if(res) res.style.display='block';
+  const st=rsG('rsStatus'); if(st) st.textContent='COMPLETE!';
+  rsBests();
 }
 
-function rsUpdateBest(){
-  const el = document.getElementById('rsTypingBests'); if(!el) return;
-  const bests = D.rsTypingBests||{};
-  const diffs = ['easy','medium','hard'];
-  const labels = {easy:'🟢 Easy',medium:'🟡 Medium',hard:'🔴 Hard'};
-  const rows = diffs.map(d=>{
-    const b = bests[d];
-    if(!b) return `<div style="display:flex;justify-content:space-between;padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.05);"><span style="color:var(--tx3);">${labels[d]}</span><span style="color:var(--tx3);">No record</span></div>`;
-    return `<div style="display:flex;justify-content:space-between;padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.05);"><span>${labels[d]}</span><span style="color:var(--c);font-weight:600;">${b.wpm} WPM</span><span style="color:#34d399;">${b.acc}%</span><span style="color:var(--tx3);font-size:.7rem;">${b.date}</span></div>`;
+function rsBests(){
+  const el=rsG('rsBestsTable'); if(!el) return;
+  const b=D.rsTypingBests||{};
+  const rows=['easy','medium','hard'].map(d=>{
+    const r=b[d];
+    const lbl=d==='easy'?'Easy':d==='medium'?'Medium':'Hard';
+    if(!r) return `<tr><td style="padding:.3rem .4rem;color:var(--tx2);">${lbl}</td><td colspan="4" style="padding:.3rem .4rem;color:var(--tx3);font-size:.7rem;">No record yet</td></tr>`;
+    return `<tr style="border-top:1px solid rgba(255,255,255,.06);">
+      <td style="padding:.3rem .4rem;color:var(--tx);">${lbl}</td>
+      <td style="padding:.3rem .4rem;color:var(--c);font-weight:700;">${r.wpm}</td>
+      <td style="padding:.3rem .4rem;color:#34d399;">${r.acc}%</td>
+      <td style="padding:.3rem .4rem;color:var(--tx2);">${r.secs}s</td>
+      <td style="padding:.3rem .4rem;color:var(--tx3);font-size:.7rem;">${r.date}</td>
+    </tr>`;
   }).join('');
-  el.innerHTML = rows || '<div style="color:var(--tx3);">No tests completed yet.</div>';
+  // Keep header row
+  const hdr=el.rows[0]?el.rows[0].outerHTML:'';
+  el.innerHTML=hdr+rows;
 }
-// ── END RESOURCES TYPING TEST ────────────────────────────────────────
+
+// Auto-load typing test when tab is opened
+const _rsOrigRTab = rTab;
+rTab = function(tab, btn){
+  _rsOrigRTab(tab, btn);
+  if(tab==='typing') setTimeout(rsStart, 60);
+};
+// ── END RESOURCES TYPING TEST ─────────────────────────────────────
 
 </script>
 
