@@ -4849,83 +4849,72 @@ body{top:0!important;}
     </div>
   </div>
 
+
   <!-- TYPING TEST TAB -->
-  <div id="rs-typing" style="display:none;">
-    <div class="card" style="max-width:860px;margin:0 auto;">
-      <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem;flex-wrap:wrap;">
-        <div style="font-family:var(--fh);font-size:.85rem;letter-spacing:1.5px;color:var(--c);">&#9000; TYPING TEST</div>
-        <div style="margin-left:auto;display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;">
-          <label style="font-size:.7rem;color:var(--tx3);">Difficulty:</label>
-          <select id="rsTypeDiff" style="font-size:.75rem;padding:.25rem .5rem;background:var(--bg2);border:1px solid rgba(255,255,255,.15);color:var(--tx);border-radius:6px;">
-            <option value="easy">Easy</option>
-            <option value="medium" selected>Medium</option>
-            <option value="hard">Hard</option>
-          </select>
-          <button class="btn bp bs" onclick="rsStart()" style="font-size:.75rem;">&#9654; New Test</button>
-          <button class="btn bgh bs" onclick="rsReset()" style="font-size:.75rem;">&#8634; Reset</button>
-        </div>
+  <div id="rs-typing" style="display:none;padding:.5rem;">
+    <div class="card" style="max-width:800px;margin:0 auto;">
+
+      <!-- Controls -->
+      <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-bottom:.8rem;">
+        <span style="font-family:var(--fh);font-size:.8rem;letter-spacing:1px;color:var(--c);">⌨️ TYPING TEST</span>
+        <select id="tt-diff" style="padding:.3rem .5rem;background:var(--bg2);border:1px solid rgba(255,255,255,.15);color:var(--tx);border-radius:6px;font-size:.78rem;">
+          <option value="easy">Easy</option>
+          <option value="medium" selected>Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+        <button class="btn bp bs" id="tt-start-btn" onclick="ttStart()" style="font-size:.78rem;">▶ New Test</button>
+        <button class="btn bgh bs" onclick="ttReset()" style="font-size:.78rem;">↺ Reset</button>
+        <span id="tt-status" style="font-size:.72rem;color:var(--c);margin-left:.4rem;">Press New Test to begin</span>
       </div>
 
       <!-- Stats -->
-      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:.4rem;margin-bottom:.9rem;">
-        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.5rem;text-align:center;">
-          <div style="font-size:1.3rem;font-weight:700;color:var(--c);font-family:var(--fh);" id="rsWpm">—</div>
-          <div style="font-size:.55rem;color:var(--tx3);text-transform:uppercase;margin-top:.1rem;">WPM</div>
+      <div style="display:flex;gap:.5rem;margin-bottom:.8rem;">
+        <div style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.5rem;text-align:center;">
+          <div style="font-size:1.4rem;font-weight:700;color:var(--c);font-family:var(--fh);" id="tt-wpm">—</div>
+          <div style="font-size:.55rem;color:var(--tx3);">WPM</div>
         </div>
-        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.5rem;text-align:center;">
-          <div style="font-size:1.3rem;font-weight:700;color:#34d399;font-family:var(--fh);" id="rsAcc">—</div>
-          <div style="font-size:.55rem;color:var(--tx3);text-transform:uppercase;margin-top:.1rem;">Accuracy</div>
+        <div style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.5rem;text-align:center;">
+          <div style="font-size:1.4rem;font-weight:700;color:#34d399;font-family:var(--fh);" id="tt-acc">—</div>
+          <div style="font-size:.55rem;color:var(--tx3);">Accuracy</div>
         </div>
-        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.5rem;text-align:center;">
-          <div style="font-size:1.3rem;font-weight:700;color:var(--tx);font-family:var(--fh);" id="rsTime">0s</div>
-          <div style="font-size:.55rem;color:var(--tx3);text-transform:uppercase;margin-top:.1rem;">Time</div>
+        <div style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.5rem;text-align:center;">
+          <div style="font-size:1.4rem;font-weight:700;color:var(--tx);font-family:var(--fh);" id="tt-time">0s</div>
+          <div style="font-size:.55rem;color:var(--tx3);">Time</div>
         </div>
-        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.5rem;text-align:center;">
-          <div style="font-size:1.3rem;font-weight:700;color:#f87171;font-family:var(--fh);" id="rsErr">0</div>
-          <div style="font-size:.55rem;color:var(--tx3);text-transform:uppercase;margin-top:.1rem;">Errors</div>
-        </div>
-        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.5rem;text-align:center;">
-          <div style="font-size:1.3rem;font-weight:700;color:#fbbf24;font-family:var(--fh);" id="rsBestWpm">—</div>
-          <div style="font-size:.55rem;color:var(--tx3);text-transform:uppercase;margin-top:.1rem;">Best WPM</div>
+        <div style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.5rem;text-align:center;">
+          <div style="font-size:1.4rem;font-weight:700;color:#f87171;font-family:var(--fh);" id="tt-err">0</div>
+          <div style="font-size:.55rem;color:var(--tx3);">Errors</div>
         </div>
       </div>
 
-      <!-- Status bar -->
-      <div id="rsStatus" style="font-size:.72rem;color:var(--c);margin-bottom:.5rem;min-height:1.2rem;font-family:var(--fh);letter-spacing:1px;">READY — START TYPING OR PRESS NEW TEST</div>
-
-      <!-- Passage display -->
-      <div id="rsPassage" style="background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:1rem 1.2rem;margin-bottom:.8rem;font-size:.95rem;line-height:2;font-family:'Courier New',monospace;min-height:72px;word-break:break-word;"></div>
+      <!-- Passage -->
+      <div id="tt-passage" style="background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:1rem;margin-bottom:.7rem;font-size:.95rem;line-height:2;font-family:'Courier New',monospace;min-height:64px;word-break:break-word;">
+        <span style="color:rgba(255,255,255,.3);">Press New Test to load a passage...</span>
+      </div>
 
       <!-- Input -->
-      <textarea id="rsInput" rows="3"
-        placeholder="Click 'New Test' above, then type here..."
-        style="width:100%;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.12);border-radius:10px;padding:.7rem 1rem;font-size:.9rem;font-family:'Courier New',monospace;color:var(--tx);resize:none;box-sizing:border-box;outline:none;transition:border-color .2s;"
-        oninput="rsOnInput(this.value)"
+      <textarea id="tt-input" rows="3" disabled
+        placeholder="Press New Test above, then type here..."
+        oninput="ttType(this.value)"
         onkeydown="if(event.key==='Tab')event.preventDefault();"
+        style="width:100%;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);border-radius:10px;padding:.7rem 1rem;font-size:.9rem;font-family:'Courier New',monospace;color:var(--tx);resize:none;box-sizing:border-box;outline:none;transition:border-color .2s;"
       ></textarea>
 
       <!-- Result -->
-      <div id="rsResult" style="display:none;margin-top:.8rem;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.3);border-radius:10px;padding:1rem 1.2rem;text-align:center;">
-        <div style="font-family:var(--fh);font-size:2rem;color:var(--c);" id="rsGrade"></div>
-        <div style="font-size:.82rem;color:var(--tx2);margin:.4rem 0;" id="rsResultMsg"></div>
-        <button class="btn bp" onclick="rsStart()" style="margin-top:.4rem;">Next Test</button>
+      <div id="tt-result" style="display:none;margin-top:.7rem;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.3);border-radius:10px;padding:1rem;text-align:center;">
+        <div style="font-family:var(--fh);font-size:2.2rem;color:var(--c);" id="tt-grade"></div>
+        <div style="font-size:.82rem;color:var(--tx2);margin:.4rem 0 .7rem;" id="tt-msg"></div>
+        <button class="btn bp" onclick="ttStart()">Next Test</button>
       </div>
     </div>
 
-    <!-- Personal bests -->
-    <div class="card" style="max-width:860px;margin:.8rem auto 0;">
-      <div class="ct">&#127942; Personal Bests</div>
-      <table style="width:100%;font-size:.78rem;border-collapse:collapse;" id="rsBestsTable">
-        <tr style="color:var(--tx3);font-size:.65rem;text-transform:uppercase;">
-          <td style="padding:.3rem .4rem;">Difficulty</td>
-          <td style="padding:.3rem .4rem;">WPM</td>
-          <td style="padding:.3rem .4rem;">Accuracy</td>
-          <td style="padding:.3rem .4rem;">Time</td>
-          <td style="padding:.3rem .4rem;">Date</td>
-        </tr>
-      </table>
+    <!-- Bests -->
+    <div class="card" style="max-width:800px;margin:.7rem auto 0;">
+      <div class="ct">🏆 Personal Bests</div>
+      <div id="tt-bests"></div>
     </div>
   </div>
+
 </section>
 
 <!-- ════ CBT — COMPUTER BASED TRAINING ════ -->
@@ -8060,6 +8049,7 @@ const NAV_ITEMS = [
     {id:'s-growing',   icon:'🌱', label:'Growing Up',     key:'growing'},
     {id:'s-driving',   icon:'🚗', label:'Driving',        key:'driving'},
     {id:'s-sports',    icon:'⚽', label:'Sports',         key:'sports'},
+    {id:'s-mentors',   icon:'🤝', label:'My People',      key:'mentors'},
   ]},
   {id:'_group_faith', icon:'✝️', label:'Faith', isGroup:true, children:[
     {id:'s-scripture', icon:'✝️', label:'Bible & Faith',  key:'scripture'},
@@ -8081,6 +8071,7 @@ const NAV_ITEMS = [
     {id:'s-health',    icon:'💪', label:'Health',         key:'health'},
     {id:'s-journal',   icon:'✍️', icon:'✍️',label:'Journal',        key:'journal'},
     {id:'s-mood',      icon:'😊', label:'Mood Tracker',   key:'mood'},
+    {id:'s-motivation',icon:'🔥', label:'Fuel Wall',      key:'motivation'},
   ]},
   {id:'_group_money', icon:'💰', label:'Money & Rewards', isGroup:true, children:[
     {id:'s-finance',   icon:'💰', label:'Money Manager',  key:'money'},
@@ -8238,6 +8229,27 @@ function showSection(id, fromMobile){
   if(id==='s-resume') setTimeout(initResume,80);
   if(id==='s-badges') setTimeout(renderBadgesPage,50);
   if(id==='s-hero') setTimeout(()=>{ renderGettingStarted(); renderPathway(); renderMonthlyChallenge(); renderDailyPrompt(); renderBadges(); updateDashCards(); renderHeroScreenTime(); renderDevMap(); },50);
+
+  // ── Group 2: render fns exist, just needed wiring ──────────────────
+  if(id==='s-calendar')   setTimeout(()=>{ typeof renderCalendar==='function'&&renderCalendar(); },60);
+  if(id==='s-goals')      setTimeout(()=>{ typeof renderGoals==='function'&&renderGoals(); },60);
+  if(id==='s-journal')    setTimeout(()=>{ typeof renderJournal==='function'&&renderJournal(); },60);
+  if(id==='s-chores')     setTimeout(()=>{ typeof renderChores==='function'&&renderChores(); },60);
+  if(id==='s-milestones') setTimeout(()=>{ typeof renderMilestones==='function'&&renderMilestones(); },60);
+  if(id==='s-mood')       setTimeout(()=>{ typeof renderMoodTracker==='function'&&renderMoodTracker(); },60);
+  if(id==='s-sports')     setTimeout(()=>{ typeof renderSports==='function'&&renderSports(); },60);
+  if(id==='s-growing')    setTimeout(()=>{ typeof buildGrowingGrid==='function'&&buildGrowingGrid(); },60);
+  if(id==='s-skills')     setTimeout(()=>{ typeof initSkillsGrid==='function'&&initSkillsGrid(); },60);
+  if(id==='s-motivation') setTimeout(()=>{ typeof renderMotivation==='function'&&renderMotivation(); },60);
+  if(id==='s-mentors')    setTimeout(()=>{ typeof renderMentors==='function'&&renderMentors(); },60);
+
+  // ── Group 3: init functions were never called on section open ───────
+  if(id==='s-bio')        setTimeout(()=>{ typeof loadBioFields==='function'&&loadBioFields(); typeof updateBioPreview==='function'&&updateBioPreview(); },80);
+  if(id==='s-reading')    setTimeout(()=>{ typeof renderBooks==='function'&&renderBooks(); },60);
+  if(id==='s-contests')   setTimeout(()=>{ typeof initContests==='function'&&initContests(); typeof renderChallenges==='function'&&renderChallenges(); typeof renderHelpfulDeeds==='function'&&renderHelpfulDeeds(); },80);
+  if(id==='s-scripture')  setTimeout(()=>{ typeof initScripture==='function'&&initScripture(); typeof renderScripturePage==='function'&&renderScripturePage(); typeof renderDevotionals==='function'&&renderDevotionals(); typeof renderBibleReadings==='function'&&renderBibleReadings(); typeof renderLearnBibleGrid==='function'&&renderLearnBibleGrid(); },80);
+  if(id==='s-driving')    setTimeout(()=>{ typeof initDriving==='function'&&initDriving(); },60);
+  if(id==='s-craft')      setTimeout(()=>{ typeof buildCraftSection==='function'&&buildCraftSection(); },60);
 }
 
 function toggleSidebar(){
@@ -8524,7 +8536,7 @@ function rTab(tab,btn){
   const te=document.getElementById('rs-'+tab);
   if(te) te.style.display='block';
   if(btn) btn.classList.add('active');
-  if(tab==='typing') setTimeout(function(){ rsStart(); }, 80);
+  if(tab==='typing') setTimeout(function(){ ttStart(); }, 80);
 }
 
 function saveClass(){
@@ -24748,154 +24760,154 @@ function applyChildAvatar(){
 
 
 
-// ── RESOURCES TYPING TEST ─────────────────────────────────────────
-var _rstOn=false, _rstPassage='', _rstTid=null, _rstT0=null, _rstErrs=0, _rstTotal=0, _rstStarted=false;
-var _rstPassages={
+
+
+
+// ── TYPING TEST (tt-) ────────────────────────────────────────────────
+var TT = {on:false,go:false,passage:'',t0:null,tid:null,err:0,tot:0};
+var TT_P = {
   easy:['The dog ran fast down the road and jumped over the fence into the yard.',
-    'She made a cup of tea and sat by the window to watch the rain fall.',
+    'She made a cup of tea and sat by the window to watch the rain fall slowly.',
     'He opened the book and began to read the first page of the long story.',
-    'The sun rose slowly over the hills and lit up the quiet little town.',
-    'They walked to the park and played on the swings until it was dark.',
-    'My friend brought pizza and we ate every single slice together.',
+    'The sun rose over the hills and lit up the quiet little town below.',
+    'They walked to the park and played on the swings until it was dark outside.',
+    'My friend brought a big pizza and we ate every single slice together.',
     'The cat jumped onto the bed and curled up next to the warm pillow.'],
   medium:['Learning to type quickly and accurately is one of the most valuable skills you can develop.',
-    'Practice makes perfect but only if you focus on both speed and accuracy at the same time.',
-    'The ability to communicate clearly in writing is essential in every career and adult life.',
-    'Time management is about making conscious choices about where you spend your energy each day.',
+    'Practice makes perfect but only when you focus on both speed and accuracy at the same time.',
+    'The ability to communicate clearly in writing is essential in every career and stage of life.',
+    'Time management means making deliberate choices about where you spend your energy each day.',
     'Reading widely expands your vocabulary and helps you understand the world more deeply.',
-    'Success is not about talent alone but about consistent effort applied intelligently over time.',
-    'Every expert was once a beginner who refused to give up when things became difficult.'],
-  hard:['Effective communication requires clarity of expression and the ability to anticipate how your message will land.',
-    'The development of critical thinking skills is fundamental to academic success in a complex world.',
-    'Situational awareness, the ability to perceive your environment accurately, can be improved with consistent practice.',
-    'Financial literacy encompasses budgeting, saving, investing, and responsible credit use across every life stage.',
-    'The discipline required to maintain consistent habits over years is more predictive of success than raw talent.',
-    'Resilience is not the absence of difficulty but the capacity to recover and grow stronger through adversity.',
-    'Emotional intelligence involves recognizing your own emotions and managing them and others constructively.']
+    'Success is not about talent alone but consistent effort applied with intention over time.',
+    'Every expert was once a beginner who refused to give up when things got difficult.'],
+  hard:['Effective communication requires clarity of expression and anticipating how your message will be received.',
+    'Critical thinking skills are fundamental to academic and professional success in a complex world.',
+    'Situational awareness is the ability to accurately perceive your environment and can be trained.',
+    'Financial literacy covers budgeting, saving, investing, and responsible credit use across every life stage.',
+    'The discipline to maintain consistent habits over years is more predictive of success than raw talent.',
+    'Resilience is not the absence of adversity but the capacity to recover and grow stronger from it.',
+    'Emotional intelligence means recognizing your own emotions and managing them and others constructively.']
 };
-
-function rsStart(){
-  if(_rstTid) clearInterval(_rstTid);
-  _rstOn=false; _rstStarted=false; _rstErrs=0; _rstTotal=0; _rstT0=null; _rstTid=null;
-  var diff='medium';
-  var sel=document.getElementById('rsTypeDiff');
-  if(sel) diff=sel.value;
-  var list=_rstPassages[diff]||_rstPassages.medium;
-  _rstPassage=list[Math.floor(Math.random()*list.length)];
-  _rstOn=true;
-  var p=document.getElementById('rsPassage');
-  if(p){ p.innerHTML=_rstDrawPassage(''); }
-  var inp=document.getElementById('rsInput');
-  if(inp){ inp.value=''; inp.disabled=false; inp.style.borderColor='rgba(96,165,250,.5)'; inp.focus(); }
-  var res=document.getElementById('rsResult');
-  if(res) res.style.display='none';
-  var st=document.getElementById('rsStatus');
-  if(st) st.textContent='GO — TYPE THE PASSAGE ABOVE';
-  var w=document.getElementById('rsWpm'); if(w) w.textContent='—';
-  var a=document.getElementById('rsAcc'); if(a) a.textContent='—';
-  var t=document.getElementById('rsTime'); if(t) t.textContent='0s';
-  var e=document.getElementById('rsErr'); if(e) e.textContent='0';
-  _rstRenderBests();
+function ttG(id){return document.getElementById(id);}
+function ttStart(){
+  // clear any running timer
+  if(TT.tid){clearInterval(TT.tid);TT.tid=null;}
+  // pick passage
+  var diff='medium'; var sel=ttG('tt-diff'); if(sel) diff=sel.value;
+  var list=TT_P[diff]||TT_P.medium;
+  TT.passage=list[Math.floor(Math.random()*list.length)];
+  TT.on=true; TT.go=false; TT.t0=null; TT.err=0; TT.tot=0;
+  // draw passage
+  ttDraw('');
+  // enable input
+  var inp=ttG('tt-input');
+  if(inp){inp.value='';inp.disabled=false;inp.style.borderColor='rgba(96,165,250,.5)';inp.focus();}
+  // hide result
+  var res=ttG('tt-result'); if(res) res.style.display='none';
+  // status
+  var st=ttG('tt-status'); if(st) st.textContent='GO — type the passage above';
+  // reset stats
+  var w=ttG('tt-wpm'); if(w) w.textContent='—';
+  var a=ttG('tt-acc'); if(a) a.textContent='—';
+  var t=ttG('tt-time'); if(t) t.textContent='0s';
+  var e=ttG('tt-err'); if(e) e.textContent='0';
+  // render bests
+  ttBests();
 }
-
-function rsReset(){
-  if(_rstTid) clearInterval(_rstTid);
-  _rstOn=false; _rstStarted=false; _rstPassage=''; _rstErrs=0; _rstTotal=0; _rstT0=null; _rstTid=null;
-  var inp=document.getElementById('rsInput');
-  if(inp){ inp.value=''; inp.disabled=false; inp.style.borderColor='rgba(255,255,255,.12)'; }
-  var p=document.getElementById('rsPassage');
-  if(p) p.innerHTML='<span style="color:rgba(255,255,255,.3);">Press New Test to load a passage</span>';
-  var res=document.getElementById('rsResult'); if(res) res.style.display='none';
-  var st=document.getElementById('rsStatus'); if(st) st.textContent='READY — PRESS NEW TEST';
-  ['rsWpm','rsAcc','rsErr'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent='—'; });
-  var ti=document.getElementById('rsTime'); if(ti) ti.textContent='0s';
-  _rstRenderBests();
+function ttReset(){
+  if(TT.tid){clearInterval(TT.tid);TT.tid=null;}
+  TT={on:false,go:false,passage:'',t0:null,tid:null,err:0,tot:0};
+  var inp=ttG('tt-input'); if(inp){inp.value='';inp.disabled=true;inp.style.borderColor='rgba(255,255,255,.1)';}
+  var p=ttG('tt-passage'); if(p) p.innerHTML='<span style="color:rgba(255,255,255,.3);">Press New Test to load a passage...</span>';
+  var res=ttG('tt-result'); if(res) res.style.display='none';
+  var st=ttG('tt-status'); if(st) st.textContent='Press New Test to begin';
+  var w=ttG('tt-wpm'); if(w) w.textContent='—';
+  var a=ttG('tt-acc'); if(a) a.textContent='—';
+  var t=ttG('tt-time'); if(t) t.textContent='0s';
+  var e=ttG('tt-err'); if(e) e.textContent='0';
+  ttBests();
 }
-
-function _rstDrawPassage(typed){
-  var s=_rstPassage; var html='';
+function ttDraw(typed){
+  var p=ttG('tt-passage'); if(!p||!TT.passage) return;
+  var s=TT.passage; var h='';
   for(var i=0;i<s.length;i++){
-    var ch=s[i]; var disp=ch===' '?'&nbsp;':ch;
+    var ch=s[i]; var d=ch===' '?'&nbsp;':ch;
     if(i<typed.length){
-      html+='<span style="color:'+(typed[i]===ch?'#86efac':'#f87171')+';font-weight:'+(typed[i]===ch?'normal':'bold')+';">'+disp+'</span>';
-    } else if(i===typed.length){
-      html+='<span style="background:rgba(96,165,250,.5);border-radius:2px;color:#fff;padding:0 1px;">'+disp+'</span>';
-    } else {
-      html+='<span style="color:rgba(255,255,255,.3);">'+disp+'</span>';
+      h+='<span style="color:'+(typed[i]===ch?'#86efac':'#f87171')+'">'+d+'</span>';
+    }else if(i===typed.length){
+      h+='<span style="background:rgba(96,165,250,.5);border-radius:2px;">'+d+'</span>';
+    }else{
+      h+='<span style="color:rgba(255,255,255,.3)">'+d+'</span>';
     }
   }
-  return html;
+  p.innerHTML=h;
 }
-
-function rsOnInput(val){
-  if(!_rstOn){ return; }
-  if(!_rstStarted && val.length>0){
-    _rstStarted=true; _rstT0=Date.now();
-    _rstTid=setInterval(_rstTickStats,300);
+function ttType(val){
+  if(!TT.on) return;
+  if(!TT.go && val.length>0){
+    TT.go=true; TT.t0=Date.now();
+    TT.tid=setInterval(ttTick,300);
   }
-  _rstTotal=Math.max(_rstTotal,val.length);
-  var e=0;
-  for(var i=0;i<val.length;i++){ if(val[i]!==_rstPassage[i]) e++; }
-  _rstErrs=e;
-  var p=document.getElementById('rsPassage');
-  if(p) p.innerHTML=_rstDrawPassage(val);
-  _rstTickStats();
-  if(val===_rstPassage) _rstFinish(val);
+  TT.tot=Math.max(TT.tot,val.length);
+  var e=0; for(var i=0;i<val.length;i++){if(val[i]!==TT.passage[i])e++;}
+  TT.err=e;
+  ttDraw(val);
+  ttTick();
+  if(val===TT.passage) ttFinish(val);
 }
-
-function _rstTickStats(){
-  var secs=_rstT0?Math.max(1,(Date.now()-_rstT0)/1000):0;
-  var inp=document.getElementById('rsInput');
-  var typed=inp?inp.value:'';
-  var words=typed.trim().split(/\s+/).filter(function(w){return w.length>0;}).length;
-  var wpm=secs>0?Math.round((words/secs)*60):0;
-  var acc=_rstTotal>0?Math.max(0,Math.round(((_rstTotal-_rstErrs)/_rstTotal)*100)):100;
-  var w=document.getElementById('rsWpm'); if(w&&secs>0) w.textContent=wpm;
-  var a=document.getElementById('rsAcc'); if(a&&secs>0) a.textContent=acc+'%';
-  var ti=document.getElementById('rsTime'); if(ti) ti.textContent=Math.round(secs)+'s';
-  var er=document.getElementById('rsErr'); if(er) er.textContent=_rstErrs;
-}
-
-function _rstFinish(val){
-  if(_rstTid){ clearInterval(_rstTid); _rstTid=null; }
-  _rstOn=false;
-  var inp=document.getElementById('rsInput');
-  if(inp){ inp.disabled=true; inp.style.borderColor='rgba(52,211,153,.5)'; }
-  var secs=Math.max(1,(Date.now()-_rstT0)/1000);
-  var words=_rstPassage.trim().split(/\s+/).length;
+function ttTick(){
+  if(!TT.t0) return;
+  var secs=Math.max(1,(Date.now()-TT.t0)/1000);
+  var inp=ttG('tt-input'); var typed=inp?inp.value:'';
+  var words=typed.trim().split(' ').filter(function(w){return w.length>0;}).length;
   var wpm=Math.round((words/secs)*60);
-  var acc=_rstTotal>0?Math.round(((_rstTotal-_rstErrs)/_rstTotal)*100):100;
-  var diff='medium';
-  var sel=document.getElementById('rsTypeDiff'); if(sel) diff=sel.value;
+  var acc=TT.tot>0?Math.max(0,Math.round(((TT.tot-TT.err)/TT.tot)*100)):100;
+  var w=ttG('tt-wpm'); if(w) w.textContent=wpm;
+  var a=ttG('tt-acc'); if(a) a.textContent=acc+'%';
+  var t=ttG('tt-time'); if(t) t.textContent=Math.round(secs)+'s';
+  var e=ttG('tt-err'); if(e) e.textContent=TT.err;
+}
+function ttFinish(val){
+  if(TT.tid){clearInterval(TT.tid);TT.tid=null;}
+  TT.on=false;
+  var inp=ttG('tt-input'); if(inp){inp.disabled=true;inp.style.borderColor='rgba(52,211,153,.5)';}
+  var secs=Math.max(1,(Date.now()-TT.t0)/1000);
+  var words=TT.passage.trim().split(' ').length;
+  var wpm=Math.round((words/secs)*60);
+  var acc=TT.tot>0?Math.round(((TT.tot-TT.err)/TT.tot)*100):100;
+  var diff='medium'; var sel=ttG('tt-diff'); if(sel) diff=sel.value;
   var grade=wpm>=80&&acc>=95?'S':wpm>=60&&acc>=90?'A':wpm>=45&&acc>=85?'B':wpm>=30?'C':'D';
-  var msgs={S:'Outstanding! Elite speed and accuracy.',A:'Excellent! Strong typing skills.',B:'Good work — keep pushing your speed.',C:'Decent — focus on accuracy first.',D:'Keep at it — consistency is everything!'};
-  if(!D.rsTypingBests) D.rsTypingBests={};
-  if(!D.rsTypingBests[diff]||wpm>D.rsTypingBests[diff].wpm){
-    D.rsTypingBests[diff]={wpm:wpm,acc:acc,secs:Math.round(secs),date:new Date().toLocaleDateString()};
+  var msgs={S:'Outstanding! Top-tier speed and accuracy.',A:'Excellent! Strong typing skills.',B:'Good work — keep pushing your speed.',C:'Decent — accuracy first, speed follows.',D:'Keep at it — every test makes you better!'};
+  if(!D.ttBests) D.ttBests={};
+  if(!D.ttBests[diff]||wpm>D.ttBests[diff].wpm){
+    D.ttBests[diff]={wpm:wpm,acc:acc,secs:Math.round(secs),date:new Date().toLocaleDateString()};
     save();
   }
-  var w=document.getElementById('rsWpm'); if(w) w.textContent=wpm;
-  var a2=document.getElementById('rsAcc'); if(a2) a2.textContent=acc+'%';
-  var ti=document.getElementById('rsTime'); if(ti) ti.textContent=Math.round(secs)+'s';
-  var gr=document.getElementById('rsGrade'); if(gr) gr.textContent=grade;
-  var rm=document.getElementById('rsResultMsg'); if(rm) rm.textContent=wpm+' WPM · '+acc+'% accuracy · '+Math.round(secs)+'s — '+msgs[grade];
-  var res=document.getElementById('rsResult'); if(res) res.style.display='block';
-  var st=document.getElementById('rsStatus'); if(st) st.textContent='COMPLETE!';
-  _rstRenderBests();
+  var w=ttG('tt-wpm'); if(w) w.textContent=wpm;
+  var a=ttG('tt-acc'); if(a) a.textContent=acc+'%';
+  var t=ttG('tt-time'); if(t) t.textContent=Math.round(secs)+'s';
+  var gr=ttG('tt-grade'); if(gr) gr.textContent=grade;
+  var mg=ttG('tt-msg'); if(mg) mg.textContent=wpm+' WPM · '+acc+'% accuracy · '+Math.round(secs)+'s — '+msgs[grade];
+  var res=ttG('tt-result'); if(res) res.style.display='block';
+  var st=ttG('tt-status'); if(st) st.textContent='Complete!';
+  ttBests();
 }
-
-function _rstRenderBests(){
-  var el=document.getElementById('rsBestsTable'); if(!el) return;
-  var b=D.rsTypingBests||{};
-  var hdr='<tr style="color:var(--tx3);font-size:.65rem;text-transform:uppercase;"><td style="padding:.3rem .4rem;">Difficulty</td><td style="padding:.3rem .4rem;">WPM</td><td style="padding:.3rem .4rem;">Accuracy</td><td style="padding:.3rem .4rem;">Time</td><td style="padding:.3rem .4rem;">Date</td></tr>';
-  var rows=['easy','medium','hard'].map(function(d){
-    var r=b[d]; var lbl=d==='easy'?'Easy':d==='medium'?'Medium':'Hard';
-    if(!r) return '<tr><td style="padding:.3rem .4rem;color:var(--tx2);">'+lbl+'</td><td colspan="4" style="padding:.3rem .4rem;color:var(--tx3);font-size:.7rem;">No record yet</td></tr>';
-    return '<tr style="border-top:1px solid rgba(255,255,255,.06);"><td style="padding:.3rem .4rem;">'+lbl+'</td><td style="padding:.3rem .4rem;color:var(--c);font-weight:700;">'+r.wpm+'</td><td style="padding:.3rem .4rem;color:#34d399;">'+r.acc+'%</td><td style="padding:.3rem .4rem;color:var(--tx2);">'+r.secs+'s</td><td style="padding:.3rem .4rem;color:var(--tx3);font-size:.7rem;">'+r.date+'</td></tr>';
-  }).join('');
-  el.innerHTML=hdr+rows;
+function ttBests(){
+  var el=ttG('tt-bests'); if(!el) return;
+  var b=D.ttBests||{};
+  var html='<table style="width:100%;font-size:.78rem;border-collapse:collapse;">';
+  html+='<tr style="color:var(--tx3);font-size:.65rem;text-transform:uppercase;"><td style="padding:.3rem .4rem;">Level</td><td style="padding:.3rem .4rem;">WPM</td><td style="padding:.3rem .4rem;">Accuracy</td><td style="padding:.3rem .4rem;">Time</td><td style="padding:.3rem .4rem;">Date</td></tr>';
+  ['easy','medium','hard'].forEach(function(d){
+    var r=b[d]; var lbl=d[0].toUpperCase()+d.slice(1);
+    if(!r){html+='<tr><td style="padding:.3rem .4rem;color:var(--tx2);">'+lbl+'</td><td colspan="4" style="padding:.3rem .4rem;color:var(--tx3);">No record yet</td></tr>';return;}
+    html+='<tr style="border-top:1px solid rgba(255,255,255,.06);"><td style="padding:.3rem .4rem;">'+lbl+'</td><td style="padding:.3rem .4rem;color:var(--c);font-weight:700;">'+r.wpm+'</td><td style="padding:.3rem .4rem;color:#34d399;">'+r.acc+'%</td><td style="padding:.3rem .4rem;color:var(--tx2);">'+r.secs+'s</td><td style="padding:.3rem .4rem;color:var(--tx3);font-size:.7rem;">'+r.date+'</td></tr>';
+  });
+  html+='</table>';
+  el.innerHTML=html;
 }
-// ── END RESOURCES TYPING TEST ─────────────────────────────────────
+// rTab hook for typing tab auto-start
+var _ttOrigRTab=null;
+// ── END TYPING TEST ──────────────────────────────────────────────────
 
 </script>
 
