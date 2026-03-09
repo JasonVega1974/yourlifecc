@@ -7306,7 +7306,8 @@ function loadData(){
       const p=JSON.parse(r); if(!p||typeof p!=='object') continue;
       for(const key of Object.keys(DEF)){ if(key in p) D[key]=p[key]; }
       // Never hide sections added after initial registration
-      if(D.sections){ ['cbt','resume'].forEach(s=>{ delete D.sections[s]; }); }
+      if(D.sections){ ['cbt','resume','motivation','mentors','hero','parent'].forEach(s=>{ delete D.sections[s]; }); }
+      if(D.sections && D.sections.cbt===0) delete D.sections.cbt;
       if(k!==LS){ localStorage.setItem(LS,JSON.stringify(D)); }
       return;
     }catch(e){}
@@ -7449,6 +7450,9 @@ async function authForgotPassword(){
 async function authComplete(isReturningUser){
   // Try to load cloud data for returning users
   const loaded = isReturningUser ? await cloudLoad() : false;
+  // Force-strip hidden sections that should always be visible
+  if(!D.sections) D.sections={};
+  ['cbt','resume','motivation','mentors','hero','parent'].forEach(function(k){ delete D.sections[k]; });
   
   document.getElementById('authScreen').style.display = 'none';
   authSetLoading(false);
@@ -7540,6 +7544,8 @@ async function cloudLoad(){
     // Strip any sections that should never be hidden
     if(D.sections){
       ['cbt','resume','motivation','mentors','hero','parent'].forEach(function(k){ delete D.sections[k]; });
+        // Force CBT always visible after cloud load
+        if(D.sections && D.sections.cbt===0) delete D.sections.cbt;
     }
     localStorage.setItem('lifeos_last_sync', Date.now());
     // Re-save cleaned data back to Supabase immediately so bad values don't persist
@@ -8351,6 +8357,9 @@ function buildSideNav(){
   // New sections added after launch - always visible, ignore saved hide state
   // Force-show new sections regardless of any saved hide state
   if(D.sections){ delete D.sections.cbt; delete D.sections.resume; }
+  // Force CBT always on
+  if(!D.sections) D.sections={};
+  if(D.sections.cbt===0) delete D.sections.cbt;
   const hidden = D.sections||{};
   const openGroups = D._navGroups || {};
   
@@ -13506,6 +13515,8 @@ async function init(){
 function finishInit(){
   // Always ensure newly-added sections are visible regardless of saved state
   if(D.sections){ ['cbt','resume','motivation','mentors'].forEach(function(k){ delete D.sections[k]; }); }
+  // Belt+suspenders: force CBT on
+  if(D.sections && D.sections.cbt===0) delete D.sections.cbt;
   // Apply saved theme
   applyTheme();
   applyPalette();
