@@ -7507,9 +7507,20 @@ async function cloudLoad(){
     if(error || !data?.data) return false;
     const saved = data.data;
     for(const k of Object.keys(DEF)){ if(k in saved) D[k] = saved[k]; }
-    // Never hide sections added after initial registration
-    if(D.sections){ ['cbt','resume'].forEach(s=>{ delete D.sections[s]; }); }
+    // Strip any sections that should never be hidden
+    if(D.sections){
+      ['cbt','resume','motivation','mentors','hero','parent'].forEach(function(k){ delete D.sections[k]; });
+    }
     localStorage.setItem('lifeos_last_sync', Date.now());
+    // Re-save cleaned data back to Supabase immediately so bad values don't persist
+    try {
+      await supa.from('profiles').upsert({
+        user_id: _supaUser.id,
+        email: _supaUser.email,
+        data: D,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'user_id' });
+    } catch(e){}
     return true;
   } catch(e){ return false; }
 }
