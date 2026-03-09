@@ -110,7 +110,7 @@ a{color:var(--blue);text-decoration:none;}
 .btab.on{background:var(--bg3);color:var(--tx);box-shadow:0 2px 12px rgba(0,0,0,.5);}
 .save-pip{position:absolute;top:-10px;right:-6px;background:var(--green);color:#000;font-size:.5rem;font-weight:900;padding:2px 7px;border-radius:100px;letter-spacing:.04em;white-space:nowrap;}
 .pg{display:grid;grid-template-columns:1fr 1.06fr 1fr;gap:16px;max-width:1060px;margin:0 auto;align-items:start;}
-.pg.hide{display:none!important;}
+.pg.hide{display:none!important;visibility:hidden!important;}
 @media(max-width:860px){.pg{grid-template-columns:1fr;max-width:420px;}}
 .pc{background:var(--bg2);border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:2.2rem 1.9rem 2.4rem;position:relative;transition:transform .25s,box-shadow .25s;}
 .pc:hover{transform:translateY(-4px);}
@@ -693,14 +693,21 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
 </footer>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-function showPricing(type, btn) {
+window.showPricing = function(type, btn) {
   ['monthly','yearly','lifetime'].forEach(function(t){
-    document.getElementById('pg-'+t).classList.add('hide');
+    var el = document.getElementById('pg-'+t);
+    if(el){ el.style.display='none'; el.classList.add('hide'); }
   });
-  document.getElementById('pg-'+type).classList.remove('hide');
+  var target = document.getElementById('pg-'+type);
+  if(target){ target.style.display='grid'; target.classList.remove('hide'); }
   document.querySelectorAll('.btab').forEach(function(t){ t.classList.remove('on'); });
   btn.classList.add('on');
-}
-function tFaq(el) {
+};
+window.tFaq = function(el) {
   var a = el.nextElementSibling;
-  var open = el.classList.contains('
+  var open = el.classList.contains('on');
+  document.querySelectorAll('.fq-q').forEach(function(q){ q.classList.remove('on'); });
+  document.querySelectorAll('.fq-a').forEach(function(a){ a.classList.remove('on'); });
+  if(!open){ el.classList.add('on'); a.classList.add('on'); }
+};
+</script>E html>
