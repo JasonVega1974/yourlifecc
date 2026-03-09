@@ -306,8 +306,11 @@ const PLAN_INFO = {
 
 // ═══════════════════════════════════════════════
 const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const stripe = Stripe(STRIPE_PK);
-const elements = stripe.elements();
+let stripe = null;
+let elements = null;
+function initStripe(){
+  if(!stripe){ stripe = Stripe(STRIPE_PK); elements = stripe.elements(); }
+}
 let cardElement;
 let currentStep = 1;
 let selectedPlan = 'free';
@@ -468,6 +471,7 @@ function step2Next(){
 }
 
 function setupStep3(){
+  initStripe();
   const plan=sponsorData?'sponsored':selectedPlan;
 
   if(sponsorData){
@@ -491,7 +495,7 @@ function setupStep3(){
     document.getElementById('osPlan').textContent=PLAN_INFO[plan].name;
     document.getElementById('osPrice').textContent=PLAN_INFO[plan].price;
     document.getElementById('s3Sub').textContent='Secure payment via Stripe.';
-    if(!cardElement){
+    if(!cardElement && elements){
       cardElement = elements.create('card',{style:{base:{color:'#f0f6ff',fontFamily:'DM Sans, sans-serif',fontSize:'15px','::placeholder':{color:'#4a6080'}},invalid:{color:'#f87171'}}});
       cardElement.mount('#cardElement');
       cardElement.on('change',e=>{ document.getElementById('cardErrors').textContent=e.error?e.error.message:''; });
