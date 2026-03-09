@@ -7506,11 +7506,14 @@ async function cloudLoad(){
       .single();
     if(error || !data?.data) return false;
     const saved = data.data;
+    console.log('[CBT DEBUG] sections FROM SUPABASE:', JSON.stringify(saved.sections));
     for(const k of Object.keys(DEF)){ if(k in saved) D[k] = saved[k]; }
+    console.log('[CBT DEBUG] D.sections AFTER MERGE:', JSON.stringify(D.sections));
     // Strip any sections that should never be hidden
     if(D.sections){
       ['cbt','resume','motivation','mentors','hero','parent'].forEach(function(k){ delete D.sections[k]; });
     }
+    console.log('[CBT DEBUG] D.sections AFTER DELETE:', JSON.stringify(D.sections));
     localStorage.setItem('lifeos_last_sync', Date.now());
     // Re-save cleaned data back to Supabase immediately so bad values don't persist
     try {
@@ -8322,6 +8325,7 @@ function buildSideNav(){
   // Force-show new sections regardless of any saved hide state
   if(D.sections){ delete D.sections.cbt; delete D.sections.resume; }
   const hidden = D.sections||{};
+  console.log('[CBT DEBUG] buildSideNav hidden:', JSON.stringify(hidden), 'cbt value:', hidden.cbt);
   const openGroups = D._navGroups || {};
   
   let navHTML = '<div class="sid-sep">SECTIONS</div>';
