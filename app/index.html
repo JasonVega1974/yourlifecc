@@ -2011,28 +2011,18 @@ body{top:0!important;}
     <div style="font-family:var(--fh);font-size:1.4rem;letter-spacing:2px;color:var(--c);margin-bottom:.4rem;">WELCOME TO LIFE OS</div>
     <div style="font-size:.83rem;color:var(--tx2);margin-bottom:1.8rem;line-height:1.75;">You're almost in! Create a <strong style="color:#fff;">6-digit Parent PIN</strong> to protect the Parent Hub and all parental controls. Kids will never see this PIN.</div>
 
-    <div style="font-size:.72rem;font-weight:700;color:var(--c);letter-spacing:1px;text-transform:uppercase;margin-bottom:.5rem;">Create Your 6-Digit PIN</div>
-    <div style="display:flex;justify-content:center;gap:.45rem;margin-bottom:.7rem;" id="ftDots1">
-      <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd1_0"></div>
-      <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd1_1"></div>
-      <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd1_2"></div>
-      <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd1_3"></div>
-      <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd1_4"></div>
-      <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd1_5"></div>
+    <div style="font-size:.72rem;font-weight:700;color:var(--c);letter-spacing:1px;text-transform:uppercase;margin-bottom:.5rem;">Create Your 6-Digit Parent PIN</div>
+    <div style="font-size:.72rem;color:var(--tx3);margin-bottom:.8rem;">You will use this to access the Parent Hub. Enter it once and it's saved.</div>
+    <div style="display:flex;justify-content:center;gap:.45rem;margin-bottom:.8rem;" id="ftDots1">
+      <div style="width:16px;height:16px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd1_0"></div>
+      <div style="width:16px;height:16px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd1_1"></div>
+      <div style="width:16px;height:16px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd1_2"></div>
+      <div style="width:16px;height:16px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd1_3"></div>
+      <div style="width:16px;height:16px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd1_4"></div>
+      <div style="width:16px;height:16px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd1_5"></div>
     </div>
-    <input type="password" id="ftPinInput" maxlength="6" placeholder="••••••" style="width:200px;text-align:center;font-size:1.6rem;letter-spacing:.8rem;margin-bottom:.8rem;padding:.65rem;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(56,189,248,.2);color:#fff;outline:none;" oninput="ftUpdateDots(1)" onkeyup="if(event.key==='Enter')document.getElementById('ftPinConfirm').focus()">
-
-    <div style="font-size:.72rem;font-weight:700;color:var(--c);letter-spacing:1px;text-transform:uppercase;margin-bottom:.5rem;margin-top:.4rem;">Confirm Your PIN</div>
-    <div style="display:flex;justify-content:center;gap:.45rem;margin-bottom:.7rem;" id="ftDots2">
-      <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd2_0"></div>
-      <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd2_1"></div>
-      <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd2_2"></div>
-      <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd2_3"></div>
-      <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd2_4"></div>
-      <div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(56,189,248,.3);transition:all .15s;" id="ftd2_5"></div>
-    </div>
-    <input type="password" id="ftPinConfirm" maxlength="6" placeholder="••••••" style="width:200px;text-align:center;font-size:1.6rem;letter-spacing:.8rem;margin-bottom:1.2rem;padding:.65rem;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(56,189,248,.2);color:#fff;outline:none;" oninput="ftUpdateDots(2)" onkeyup="if(event.key==='Enter')setupFirstPin()">
-
+    <input type="password" id="ftPinInput" maxlength="6" placeholder="••••••" style="width:200px;text-align:center;font-size:1.6rem;letter-spacing:.8rem;margin-bottom:1.4rem;padding:.65rem;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(56,189,248,.2);color:#fff;outline:none;" oninput="ftUpdateDots(1)" onkeyup="if(event.key==='Enter')setupFirstPin()">
+    <input type="hidden" id="ftPinConfirm">
     <br>
     <button class="btn bp" onclick="setupFirstPin()" style="font-size:.95rem;padding:.75rem 2.5rem;border-radius:14px;font-weight:900;letter-spacing:.5px;box-shadow:0 4px 20px rgba(56,189,248,.35);">🔓 Set PIN &amp; Get Started</button>
     <div id="ftPinError" style="font-size:.75rem;color:#f87171;margin-top:.7rem;min-height:1.2rem;font-weight:600;"></div>
@@ -6929,23 +6919,19 @@ function ftUpdateDots(which){
 
 function setupFirstPin(){
   const pin = (document.getElementById('ftPinInput')||{}).value||'';
-  const conf = (document.getElementById('ftPinConfirm')||{}).value||'';
   const err = document.getElementById('ftPinError');
   
   if(pin.length < 6){ if(err) err.textContent='PIN must be exactly 6 digits'; return; }
   if(!/^\d{6}$/.test(pin)){ if(err) err.textContent='PIN must be numbers only'; return; }
-  if(pin !== conf){ if(err) err.textContent='PINs do not match — please try again'; return; }
   
   if(err) err.textContent='';
-  // Save PIN to BOTH chorePin and parentPIN so parent never needs to re-enter
   D.chorePin = pin;
   D.parentPIN = pin;
+  // Store PIN hash in localStorage so it survives page reload without re-asking
+  localStorage.setItem('lifeos_pin_set','1');
   save();
-  // Force immediate cloud sync so PIN is saved before user closes tab
   if(_supaUser) cloudSync();
   hideFirstTimeGate();
-  
-  // Finish initializing the app
   finishInit();
   
   // Wizard shows when parent taps the bouncing Start Here button
@@ -7182,6 +7168,10 @@ async function signOut(){
   _supaUser = null;
   D = JSON.parse(JSON.stringify(DEF));
   localStorage.removeItem(LS);
+  // Clear parent unlock flags on sign out
+  localStorage.removeItem('lifeos_parent_unlocked');
+  localStorage.removeItem('lifeos_pin_set');
+  sessionStorage.removeItem('parentUnlocked');
   document.getElementById('authScreen').style.display = 'flex';
   setSyncSt('local');
 }
@@ -8125,9 +8115,10 @@ function showSection(id, fromMobile){
   window.scrollTo(0,0);
 
   // Auto-unlock Parent Hub gate if already authenticated this session or PIN disabled
-  if(id==='s-parent' && typeof D!=='undefined' && (_parentDashUnlocked || D.parentPinDisabled || sessionStorage.getItem('parentUnlocked')==='1')){
+  if(id==='s-parent' && typeof D!=='undefined' && (_parentDashUnlocked || D.parentPinDisabled || sessionStorage.getItem('parentUnlocked')==='1' || localStorage.getItem('lifeos_parent_unlocked')==='1')){
     _parentDashUnlocked = true;
     sessionStorage.setItem('parentUnlocked','1');
+    localStorage.setItem('lifeos_parent_unlocked','1');
     const gate = document.getElementById('parentGate');
     const content = document.getElementById('parentDashContent');
     if(gate) gate.style.display='none';
@@ -15442,7 +15433,7 @@ function renderChores(){
 }
 
 // ── PARENT DASHBOARD ─────────────────────────────────────────
-let _parentDashUnlocked = sessionStorage.getItem('parentUnlocked') === '1';
+let _parentDashUnlocked = sessionStorage.getItem('parentUnlocked')==='1' || localStorage.getItem('lifeos_parent_unlocked')==='1';
 
 function unlockParentDash(){
   initChoreData();
@@ -17261,13 +17252,9 @@ function _pgSubmit(){
   }
   const correct=D.chorePin||D.parentPIN;
   if(!correct){
-    // No PIN set yet — this first entry BECOMES the PIN
-    if(_pgBuffer.length===6){
-      D.chorePin=_pgBuffer; D.parentPIN=_pgBuffer; save();
-      showToast('Parent PIN set ✓');
-      _pgBuffer=''; _pgUpdateDots();
-      _doUnlockParent();
-    }
+    // PIN not set — send back to setup
+    showToast('Please set up your PIN first.');
+    showFirstTimeGate();
     return;
   }
   if(_pgBuffer===correct){
@@ -17283,6 +17270,7 @@ function _pgSubmit(){
 function _doUnlockParent(){
   _parentDashUnlocked=true;
   sessionStorage.setItem('parentUnlocked','1');
+  localStorage.setItem('lifeos_parent_unlocked','1');
   const gate=document.getElementById('parentGate');
   const content=document.getElementById('parentDashContent');
   if(gate) gate.style.display='none';
