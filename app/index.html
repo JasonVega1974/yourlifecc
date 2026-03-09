@@ -1978,6 +1978,20 @@ body{top:0!important;}
       <input id="authConfirm" type="password" placeholder="Confirm password" style="width:100%;padding:.75rem 1rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#fff;font-size:.88rem;margin-bottom:.6rem;box-sizing:border-box;outline:none;">
     </div>
 
+    <!-- Terms of Service checkbox (signup only) -->
+    <div id="authTermsWrap" style="display:none;margin-bottom:.8rem;padding:.75rem;background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.15);border-radius:10px;">
+      <label style="display:flex;align-items:flex-start;gap:.7rem;cursor:pointer;">
+        <input type="checkbox" id="authTermsCheck" style="margin-top:3px;accent-color:#38bdf8;width:16px;height:16px;flex-shrink:0;">
+        <span style="font-size:.78rem;color:rgba(255,255,255,.65);line-height:1.6;">
+          I have read and agree to the 
+          <a href="https://yourlifecc.com/terms.html" target="_blank" style="color:#38bdf8;text-decoration:underline;font-weight:600;">Terms of Service</a> 
+          and 
+          <a href="https://yourlifecc.com/privacy.html" target="_blank" style="color:#38bdf8;text-decoration:underline;font-weight:600;">Privacy Policy</a> 
+          of Kingdom Creatives LLC. I understand this app provides tools and does not guarantee any specific results.
+        </span>
+      </label>
+    </div>
+
     <!-- Primary button -->
     <button id="authBtn" onclick="authSubmit()" style="width:100%;padding:.9rem;background:linear-gradient(135deg,#38bdf8,#4f8fff);border:none;border-radius:12px;color:#000;font-weight:800;font-size:.95rem;cursor:pointer;margin-bottom:.7rem;transition:all .2s;">Sign In</button>
 
@@ -7348,6 +7362,7 @@ function authSwitchTab(tab){
   const isSignup = tab === 'signup';
   document.getElementById('authConfirmWrap').style.display = isSignup ? 'block' : 'none';
   document.getElementById('authForgotWrap').style.display = isSignup ? 'none' : 'block';
+  document.getElementById('authTermsWrap').style.display = isSignup ? 'block' : 'none';
   document.getElementById('authBtn').textContent = isSignup ? 'Create Account' : 'Sign In';
   document.getElementById('authTabLogin').style.background = isSignup ? 'transparent' : 'var(--c)';
   document.getElementById('authTabLogin').style.color = isSignup ? 'var(--tx2)' : '#000';
@@ -7378,9 +7393,9 @@ async function authSubmit(){
   const isSignup = tab === 'signup';
 
   if(!email || !pass){ authSetMsg('Please enter email and password.'); return; }
-  if(isSignup){
-    const termsChecked = document.getElementById('authTermsCheck')?.checked;
-    if(!termsChecked){ authSetMsg('Please read and agree to the Terms of Service and Privacy Policy to create an account.'); return; }
+  if(isSignup && !document.getElementById('authTermsCheck')?.checked){
+    authSetMsg('Please agree to the Terms of Service and Privacy Policy to create an account.');
+    return;
   }
   if(pass.length < 6){ authSetMsg('Password must be at least 6 characters.'); return; }
   if(tab === 'signup' && pass !== confirm){ authSetMsg('Passwords do not match.'); return; }
