@@ -8524,6 +8524,7 @@ function rTab(tab,btn){
   const te=document.getElementById('rs-'+tab);
   if(te) te.style.display='block';
   if(btn) btn.classList.add('active');
+  if(tab==='typing') setTimeout(function(){ rsStart(); }, 80);
 }
 
 function saveClass(){
@@ -24748,163 +24749,152 @@ function applyChildAvatar(){
 
 
 // ── RESOURCES TYPING TEST ─────────────────────────────────────────
-const RSP = {
-  easy:[
-    'The dog ran fast down the road and jumped over the fence.',
-    'She made a cup of tea and sat by the window to watch the rain.',
-    'He opened the book and began to read the first page of the story.',
+var _rstOn=false, _rstPassage='', _rstTid=null, _rstT0=null, _rstErrs=0, _rstTotal=0, _rstStarted=false;
+var _rstPassages={
+  easy:['The dog ran fast down the road and jumped over the fence into the yard.',
+    'She made a cup of tea and sat by the window to watch the rain fall.',
+    'He opened the book and began to read the first page of the long story.',
     'The sun rose slowly over the hills and lit up the quiet little town.',
-    'They walked to the park and played on the swings until it got dark.',
-    'My friend brought a big pizza and we ate every single slice.',
-    'The cat jumped onto the bed and curled up next to the pillow.',
-  ],
-  medium:[
-    'Learning to type quickly and accurately is one of the most valuable skills for school and work.',
-    'Practice makes perfect, but only if you focus on both speed and accuracy at the same time.',
-    'The ability to communicate clearly in writing is essential in every career and stage of adult life.',
+    'They walked to the park and played on the swings until it was dark.',
+    'My friend brought pizza and we ate every single slice together.',
+    'The cat jumped onto the bed and curled up next to the warm pillow.'],
+  medium:['Learning to type quickly and accurately is one of the most valuable skills you can develop.',
+    'Practice makes perfect but only if you focus on both speed and accuracy at the same time.',
+    'The ability to communicate clearly in writing is essential in every career and adult life.',
     'Time management is about making conscious choices about where you spend your energy each day.',
-    'Reading widely expands your vocabulary, improves your writing, and helps you understand the world.',
+    'Reading widely expands your vocabulary and helps you understand the world more deeply.',
     'Success is not about talent alone but about consistent effort applied intelligently over time.',
-    'Every expert was once a beginner who refused to give up when things became difficult.',
-  ],
-  hard:[
-    'Effective communication requires not only clarity of expression but also anticipating how your message will land.',
-    'The development of critical thinking skills is fundamental to academic success in an increasingly complex world.',
-    'Situational awareness, the ability to perceive and comprehend your environment, can be significantly improved with practice.',
-    'Financial literacy encompasses budgeting, saving, investing, and responsible credit use — affecting every major life decision.',
-    'The discipline required to maintain consistent habits over months and years is more predictive of success than raw talent.',
-    'Resilience is not the absence of difficulty but the capacity to recover, adapt, and grow stronger through adversity.',
-    'Emotional intelligence involves recognizing your own emotions and those of others, and managing them constructively.',
-  ]
+    'Every expert was once a beginner who refused to give up when things became difficult.'],
+  hard:['Effective communication requires clarity of expression and the ability to anticipate how your message will land.',
+    'The development of critical thinking skills is fundamental to academic success in a complex world.',
+    'Situational awareness, the ability to perceive your environment accurately, can be improved with consistent practice.',
+    'Financial literacy encompasses budgeting, saving, investing, and responsible credit use across every life stage.',
+    'The discipline required to maintain consistent habits over years is more predictive of success than raw talent.',
+    'Resilience is not the absence of difficulty but the capacity to recover and grow stronger through adversity.',
+    'Emotional intelligence involves recognizing your own emotions and managing them and others constructively.']
 };
 
-let RST = { on:false, started:false, passage:'', tid:null, t0:null, errs:0, total:0 };
-
-function rsG(id){ return document.getElementById(id); }
-
 function rsStart(){
-  rsReset();
-  const diff = (rsG('rsTypeDiff')||{value:'medium'}).value;
-  const list = RSP[diff] || RSP.medium;
-  RST.passage = list[Math.floor(Math.random()*list.length)];
-  RST.on = true;
-  rsDrawPassage();
-  const inp = rsG('rsInput');
+  if(_rstTid) clearInterval(_rstTid);
+  _rstOn=false; _rstStarted=false; _rstErrs=0; _rstTotal=0; _rstT0=null; _rstTid=null;
+  var diff='medium';
+  var sel=document.getElementById('rsTypeDiff');
+  if(sel) diff=sel.value;
+  var list=_rstPassages[diff]||_rstPassages.medium;
+  _rstPassage=list[Math.floor(Math.random()*list.length)];
+  _rstOn=true;
+  var p=document.getElementById('rsPassage');
+  if(p){ p.innerHTML=_rstDrawPassage(''); }
+  var inp=document.getElementById('rsInput');
   if(inp){ inp.value=''; inp.disabled=false; inp.style.borderColor='rgba(96,165,250,.5)'; inp.focus(); }
-  const res = rsG('rsResult'); if(res) res.style.display='none';
-  const st = rsG('rsStatus'); if(st) st.textContent='GO — TYPE THE PASSAGE ABOVE';
-  rsBests();
+  var res=document.getElementById('rsResult');
+  if(res) res.style.display='none';
+  var st=document.getElementById('rsStatus');
+  if(st) st.textContent='GO — TYPE THE PASSAGE ABOVE';
+  var w=document.getElementById('rsWpm'); if(w) w.textContent='—';
+  var a=document.getElementById('rsAcc'); if(a) a.textContent='—';
+  var t=document.getElementById('rsTime'); if(t) t.textContent='0s';
+  var e=document.getElementById('rsErr'); if(e) e.textContent='0';
+  _rstRenderBests();
 }
 
 function rsReset(){
-  if(RST.tid) clearInterval(RST.tid);
-  RST = { on:false, started:false, passage:'', tid:null, t0:null, errs:0, total:0 };
-  const inp = rsG('rsInput');
+  if(_rstTid) clearInterval(_rstTid);
+  _rstOn=false; _rstStarted=false; _rstPassage=''; _rstErrs=0; _rstTotal=0; _rstT0=null; _rstTid=null;
+  var inp=document.getElementById('rsInput');
   if(inp){ inp.value=''; inp.disabled=false; inp.style.borderColor='rgba(255,255,255,.12)'; }
-  ['rsWpm','rsAcc','rsErr'].forEach(id=>{ const e=rsG(id); if(e) e.textContent='—'; });
-  const t=rsG('rsTime'); if(t) t.textContent='0s';
-  const res=rsG('rsResult'); if(res) res.style.display='none';
-  const p=rsG('rsPassage'); if(p) p.innerHTML='<span style="color:var(--tx3);">Press <b>New Test</b> to load a passage</span>';
-  const st=rsG('rsStatus'); if(st) st.textContent='READY — PRESS NEW TEST TO BEGIN';
-  rsBests();
+  var p=document.getElementById('rsPassage');
+  if(p) p.innerHTML='<span style="color:rgba(255,255,255,.3);">Press New Test to load a passage</span>';
+  var res=document.getElementById('rsResult'); if(res) res.style.display='none';
+  var st=document.getElementById('rsStatus'); if(st) st.textContent='READY — PRESS NEW TEST';
+  ['rsWpm','rsAcc','rsErr'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent='—'; });
+  var ti=document.getElementById('rsTime'); if(ti) ti.textContent='0s';
+  _rstRenderBests();
+}
+
+function _rstDrawPassage(typed){
+  var s=_rstPassage; var html='';
+  for(var i=0;i<s.length;i++){
+    var ch=s[i]; var disp=ch===' '?'&nbsp;':ch;
+    if(i<typed.length){
+      html+='<span style="color:'+(typed[i]===ch?'#86efac':'#f87171')+';font-weight:'+(typed[i]===ch?'normal':'bold')+';">'+disp+'</span>';
+    } else if(i===typed.length){
+      html+='<span style="background:rgba(96,165,250,.5);border-radius:2px;color:#fff;padding:0 1px;">'+disp+'</span>';
+    } else {
+      html+='<span style="color:rgba(255,255,255,.3);">'+disp+'</span>';
+    }
+  }
+  return html;
 }
 
 function rsOnInput(val){
-  if(!RST.on){ rsStart(); return; }
-  if(!RST.started && val.length>0){
-    RST.started=true; RST.t0=Date.now();
-    RST.tid=setInterval(rsStats,250);
+  if(!_rstOn){ return; }
+  if(!_rstStarted && val.length>0){
+    _rstStarted=true; _rstT0=Date.now();
+    _rstTid=setInterval(_rstTickStats,300);
   }
-  RST.total = Math.max(RST.total, val.length);
-  let e=0; for(let i=0;i<val.length;i++) if(val[i]!==RST.passage[i]) e++;
-  RST.errs=e;
-  rsDrawPassage(val);
-  rsStats(val);
-  if(val===RST.passage) rsFinish(val);
+  _rstTotal=Math.max(_rstTotal,val.length);
+  var e=0;
+  for(var i=0;i<val.length;i++){ if(val[i]!==_rstPassage[i]) e++; }
+  _rstErrs=e;
+  var p=document.getElementById('rsPassage');
+  if(p) p.innerHTML=_rstDrawPassage(val);
+  _rstTickStats();
+  if(val===_rstPassage) _rstFinish(val);
 }
 
-function rsDrawPassage(typed){
-  const p=rsG('rsPassage'); if(!p) return;
-  const t=typed||''; const s=RST.passage;
-  let h='';
-  for(let i=0;i<s.length;i++){
-    const ch=s[i]==='&nbsp;'?' ':s[i];
-    const disp=ch===' '?'&nbsp;':ch;
-    if(i<t.length){
-      h+=`<span style="color:${t[i]===s[i]?'#86efac':'#f87171'};">${disp}</span>`;
-    } else if(i===t.length){
-      h+=`<span style="background:rgba(96,165,250,.5);border-radius:2px;color:#fff;">${disp}</span>`;
-    } else {
-      h+=`<span style="color:rgba(255,255,255,.3);">${disp}</span>`;
-    }
-  }
-  p.innerHTML=h;
+function _rstTickStats(){
+  var secs=_rstT0?Math.max(1,(Date.now()-_rstT0)/1000):0;
+  var inp=document.getElementById('rsInput');
+  var typed=inp?inp.value:'';
+  var words=typed.trim().split(/\s+/).filter(function(w){return w.length>0;}).length;
+  var wpm=secs>0?Math.round((words/secs)*60):0;
+  var acc=_rstTotal>0?Math.max(0,Math.round(((_rstTotal-_rstErrs)/_rstTotal)*100)):100;
+  var w=document.getElementById('rsWpm'); if(w&&secs>0) w.textContent=wpm;
+  var a=document.getElementById('rsAcc'); if(a&&secs>0) a.textContent=acc+'%';
+  var ti=document.getElementById('rsTime'); if(ti) ti.textContent=Math.round(secs)+'s';
+  var er=document.getElementById('rsErr'); if(er) er.textContent=_rstErrs;
 }
 
-function rsStats(val){
-  const v=typeof val==='string'?val:(rsG('rsInput')||{value:''}).value;
-  const secs=RST.t0?Math.max(1,(Date.now()-RST.t0)/1000):0;
-  const words=v.trim().split(/\s+/).filter(Boolean).length;
-  const wpm=secs>0?Math.round((words/secs)*60):0;
-  const acc=RST.total>0?Math.max(0,Math.round(((RST.total-RST.errs)/RST.total)*100)):100;
-  const w=rsG('rsWpm'); if(w) w.textContent=secs>0?wpm:'—';
-  const a=rsG('rsAcc'); if(a) a.textContent=secs>0?acc+'%':'—';
-  const ti=rsG('rsTime'); if(ti) ti.textContent=Math.round(secs)+'s';
-  const er=rsG('rsErr'); if(er) er.textContent=RST.errs;
-}
-
-function rsFinish(val){
-  if(RST.tid){ clearInterval(RST.tid); RST.tid=null; }
-  RST.on=false;
-  const inp=rsG('rsInput'); if(inp){ inp.disabled=true; inp.style.borderColor='rgba(52,211,153,.4)'; }
-  const secs=Math.max(1,(Date.now()-RST.t0)/1000);
-  const words=RST.passage.trim().split(/\s+/).length;
-  const wpm=Math.round((words/secs)*60);
-  const acc=RST.total>0?Math.round(((RST.total-RST.errs)/RST.total)*100):100;
-  const diff=(rsG('rsTypeDiff')||{value:'medium'}).value;
-  const grade=wpm>=80&&acc>=95?'S':wpm>=60&&acc>=90?'A':wpm>=45&&acc>=85?'B':wpm>=30?'C':'D';
-  const msg={S:'Outstanding! Elite speed and accuracy.',A:'Excellent work! Strong typing skills.',B:'Good job! Keep practicing for more speed.',C:'Decent — focus on accuracy first.',D:'Keep going — consistency is everything!'};
+function _rstFinish(val){
+  if(_rstTid){ clearInterval(_rstTid); _rstTid=null; }
+  _rstOn=false;
+  var inp=document.getElementById('rsInput');
+  if(inp){ inp.disabled=true; inp.style.borderColor='rgba(52,211,153,.5)'; }
+  var secs=Math.max(1,(Date.now()-_rstT0)/1000);
+  var words=_rstPassage.trim().split(/\s+/).length;
+  var wpm=Math.round((words/secs)*60);
+  var acc=_rstTotal>0?Math.round(((_rstTotal-_rstErrs)/_rstTotal)*100):100;
+  var diff='medium';
+  var sel=document.getElementById('rsTypeDiff'); if(sel) diff=sel.value;
+  var grade=wpm>=80&&acc>=95?'S':wpm>=60&&acc>=90?'A':wpm>=45&&acc>=85?'B':wpm>=30?'C':'D';
+  var msgs={S:'Outstanding! Elite speed and accuracy.',A:'Excellent! Strong typing skills.',B:'Good work — keep pushing your speed.',C:'Decent — focus on accuracy first.',D:'Keep at it — consistency is everything!'};
   if(!D.rsTypingBests) D.rsTypingBests={};
   if(!D.rsTypingBests[diff]||wpm>D.rsTypingBests[diff].wpm){
-    D.rsTypingBests[diff]={wpm,acc,secs:Math.round(secs),date:new Date().toLocaleDateString()};
+    D.rsTypingBests[diff]={wpm:wpm,acc:acc,secs:Math.round(secs),date:new Date().toLocaleDateString()};
     save();
   }
-  const w=rsG('rsWpm'); if(w) w.textContent=wpm;
-  const a=rsG('rsAcc'); if(a) a.textContent=acc+'%';
-  const ti=rsG('rsTime'); if(ti) ti.textContent=Math.round(secs)+'s';
-  const gr=rsG('rsGrade'); if(gr) gr.textContent=grade;
-  const rm=rsG('rsResultMsg'); if(rm) rm.textContent=wpm+' WPM · '+acc+'% accuracy · '+Math.round(secs)+'s — '+msg[grade];
-  const res=rsG('rsResult'); if(res) res.style.display='block';
-  const st=rsG('rsStatus'); if(st) st.textContent='COMPLETE!';
-  rsBests();
+  var w=document.getElementById('rsWpm'); if(w) w.textContent=wpm;
+  var a2=document.getElementById('rsAcc'); if(a2) a2.textContent=acc+'%';
+  var ti=document.getElementById('rsTime'); if(ti) ti.textContent=Math.round(secs)+'s';
+  var gr=document.getElementById('rsGrade'); if(gr) gr.textContent=grade;
+  var rm=document.getElementById('rsResultMsg'); if(rm) rm.textContent=wpm+' WPM · '+acc+'% accuracy · '+Math.round(secs)+'s — '+msgs[grade];
+  var res=document.getElementById('rsResult'); if(res) res.style.display='block';
+  var st=document.getElementById('rsStatus'); if(st) st.textContent='COMPLETE!';
+  _rstRenderBests();
 }
 
-function rsBests(){
-  const el=rsG('rsBestsTable'); if(!el) return;
-  const b=D.rsTypingBests||{};
-  const rows=['easy','medium','hard'].map(d=>{
-    const r=b[d];
-    const lbl=d==='easy'?'Easy':d==='medium'?'Medium':'Hard';
-    if(!r) return `<tr><td style="padding:.3rem .4rem;color:var(--tx2);">${lbl}</td><td colspan="4" style="padding:.3rem .4rem;color:var(--tx3);font-size:.7rem;">No record yet</td></tr>`;
-    return `<tr style="border-top:1px solid rgba(255,255,255,.06);">
-      <td style="padding:.3rem .4rem;color:var(--tx);">${lbl}</td>
-      <td style="padding:.3rem .4rem;color:var(--c);font-weight:700;">${r.wpm}</td>
-      <td style="padding:.3rem .4rem;color:#34d399;">${r.acc}%</td>
-      <td style="padding:.3rem .4rem;color:var(--tx2);">${r.secs}s</td>
-      <td style="padding:.3rem .4rem;color:var(--tx3);font-size:.7rem;">${r.date}</td>
-    </tr>`;
+function _rstRenderBests(){
+  var el=document.getElementById('rsBestsTable'); if(!el) return;
+  var b=D.rsTypingBests||{};
+  var hdr='<tr style="color:var(--tx3);font-size:.65rem;text-transform:uppercase;"><td style="padding:.3rem .4rem;">Difficulty</td><td style="padding:.3rem .4rem;">WPM</td><td style="padding:.3rem .4rem;">Accuracy</td><td style="padding:.3rem .4rem;">Time</td><td style="padding:.3rem .4rem;">Date</td></tr>';
+  var rows=['easy','medium','hard'].map(function(d){
+    var r=b[d]; var lbl=d==='easy'?'Easy':d==='medium'?'Medium':'Hard';
+    if(!r) return '<tr><td style="padding:.3rem .4rem;color:var(--tx2);">'+lbl+'</td><td colspan="4" style="padding:.3rem .4rem;color:var(--tx3);font-size:.7rem;">No record yet</td></tr>';
+    return '<tr style="border-top:1px solid rgba(255,255,255,.06);"><td style="padding:.3rem .4rem;">'+lbl+'</td><td style="padding:.3rem .4rem;color:var(--c);font-weight:700;">'+r.wpm+'</td><td style="padding:.3rem .4rem;color:#34d399;">'+r.acc+'%</td><td style="padding:.3rem .4rem;color:var(--tx2);">'+r.secs+'s</td><td style="padding:.3rem .4rem;color:var(--tx3);font-size:.7rem;">'+r.date+'</td></tr>';
   }).join('');
-  // Keep header row
-  const hdr=el.rows[0]?el.rows[0].outerHTML:'';
   el.innerHTML=hdr+rows;
 }
-
-// Auto-load typing test when tab is opened
-const _rsOrigRTab = rTab;
-rTab = function(tab, btn){
-  _rsOrigRTab(tab, btn);
-  if(tab==='typing') setTimeout(rsStart, 60);
-};
 // ── END RESOURCES TYPING TEST ─────────────────────────────────────
 
 </script>
