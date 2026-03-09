@@ -9775,7 +9775,7 @@ const SK_CATS=[
   {icon:'🧹',name:'Cleaning & Home Care',key:'cleaning',color:'#22d3ee'},
   {icon:'⏰',name:'Time Management',key:'timemanage',color:'#f59e0b'},
   {icon:'📋',name:'Organization',key:'organize',color:'#10b981'},
-  {icon:'🛡️',name:'Personal Safety & Self-Defense',key:'safety',color:'#ef4444'},
+  {icon:'🛡️',name:'Situational Awareness & Safety',key:'safety',color:'#ef4444'},
   {icon:'📈',name:'Investing & Retirement',key:'investing',color:'#10b981'},
   {icon:'🏥',name:'Insurance Explained',key:'insurance',color:'#60a5fa'},
   {icon:'✈️', name:'Travel & World Readiness', key:'travel', color:'#f59e0b'},
@@ -11643,153 +11643,394 @@ adulting:[
 
 safety:[
   {
-    h:'Situational Awareness — The Foundation of Personal Safety',
-    b:`<p>Situational awareness is the single most powerful personal safety skill you can develop. It costs nothing, requires no physical strength, and works in every environment.</p>
-<p><strong>Jeff Cooper\'s Color Code:</strong></p>
+    h:'Situational Awareness — Your Most Powerful Safety Skill',
+    b:`<p><strong>Situational awareness</strong> means knowing what is happening around you, who is near you, and whether anything feels wrong — before it becomes a threat. It costs nothing, requires no strength, and works everywhere. It is the single most effective personal safety skill you can develop.</p>
+<p><strong>Jeff Cooper's Color Code System:</strong></p>
 <ul>
-  <li><strong>White (unaware):</strong> Head down, headphones in, phone out. Most dangerous state.</li>
-  <li><strong>Yellow (relaxed awareness):</strong> Calm but present. Notice who\'s around you, where exits are. This is the target state for everyday life.</li>
-  <li><strong>Orange (specific alert):</strong> Something caught your attention. You\'re watching it. Making a plan.</li>
-  <li><strong>Red (action):</strong> Threat is real and immediate. Escape, defend, or call for help.</li>
+  <li><strong style="color:#86efac;">White — Unaware:</strong> Head down, headphones in, phone out. Most dangerous state. Only appropriate in your own home.</li>
+  <li><strong style="color:#fde68a;">Yellow — Relaxed Alert:</strong> Calm, present, scanning. This is your <em>default mode in public</em>. You notice who is around you and where exits are.</li>
+  <li><strong style="color:#fb923c;">Orange — Specific Alert:</strong> Something has caught your attention. You are watching it and mentally planning your response.</li>
+  <li><strong style="color:#f87171;">Red — Action:</strong> The threat is real. You are moving — escaping, calling for help, or defending.</li>
 </ul>
-<p><strong>Daily habits:</strong> When you enter any space, locate the exits. Sit facing the door in restaurants. Keep your phone in your pocket when walking. Don\'t wear both earbuds in public.</p>`,
-    tip:'Most violent incidents have warning signs. Awareness lets you see them and leave before anything happens.',
+<p><strong>Most people live in White all the time.</strong> That is the vulnerability. Your goal is to live in Yellow whenever you leave home.</p>
+<p><strong>The 3-Second Entry Scan:</strong> Every time you enter a new space — a parking lot, restaurant, elevator, party — spend 3 seconds: <em>Who is here? Where are the exits? Does anything feel wrong?</em> This becomes automatic with practice and takes almost no time.</p>
+<p><strong>Environmental awareness habits:</strong></p>
+<ul>
+  <li>Always sit or stand with your back to a wall when possible — you see the room, no one is behind you</li>
+  <li>Identify two exits in every space you enter</li>
+  <li>Notice what is normal so you can spot what is not</li>
+  <li>Reduce phone use while moving — distraction is the #1 vulnerability predators look for</li>
+  <li>One earbud out in public — your hearing is your second threat-detection system</li>
+</ul>`,
     q:[
-      {q:'Which color in Cooper\'s code describes ideal everyday awareness?',a:['White','Yellow','Orange','Red'],c:1,e:'Yellow is relaxed but present — calm awareness without paranoia. White is dangerous; Orange and Red are reactive states.'},
-      {q:'What is the single most dangerous awareness state in everyday life?',a:['Orange','Red','White','Yellow'],c:2,e:'White means you\'re unaware of your surroundings — head down, distracted. This is when people get caught off guard.'},
-      {q:'What should you do first when entering any new space?',a:['Check your phone','Order food or sit down','Locate the exits','Look for familiar faces'],c:2,e:'Knowing your exits is automatic for situationally aware people. It costs nothing and could save your life.'},
-      {q:'Why is wearing both earbuds in public a safety risk?',a:['It\'s rude to others','It kills your battery','It eliminates one of your warning systems — hearing','It can damage your ears'],c:2,e:'Sound is a critical early-warning system. Footsteps behind you, voices, breaking glass — these all reach you through hearing first.'},
-      {q:'Situational awareness is best described as:',a:['Constant fear and suspicion of everyone','Calm observation of your environment without paranoia','Keeping your eyes closed and trusting instincts','Only necessary in dangerous neighborhoods'],c:1,e:'The goal is calm, relaxed observation — not anxiety. You\'re simply present and noticing, which is how humans lived for most of history.'}
+      {q:'What is the Yellow alert state?',opts:['Panicked and ready to fight','Completely relaxed with headphones in','Calm but present and aware of surroundings — your default in public','Already responding to a threat'],ans:2,explain:'Yellow is relaxed alertness — your goal state whenever you leave home. Calm, not paranoid, just present.'},
+      {q:'What is the 3-second entry scan?',opts:['Checking your phone for messages','Scanning who is present, where exits are, and whether anything feels wrong when entering a new space','Looking for security cameras','Checking that your belongings are secure'],ans:1,explain:'Three seconds when entering any new space: who is here, where are the exits, does anything feel wrong. It becomes automatic.'},
+      {q:'Why is phone distraction a personal safety vulnerability?',opts:['It drains your battery','It draws attention to expensive technology','Predators specifically look for distracted, unaware targets','It is rude to others around you'],ans:2,explain:'Target selection research shows predators look for distracted, unaware people. Phone use signals you are not paying attention to your environment.'}
     ]
   },
   {
-    h:'Trusting Your Gut — What Fear Is Really Telling You',
-    b:`<p>Your brain processes thousands of environmental signals below your conscious awareness. When something feels wrong — even if you can\'t explain why — that feeling is real data, not irrational anxiety.</p>
-<p><strong>The Gift of Fear (Gavin de Becker\'s research):</strong> Genuine fear is a survival signal. The problem is that most people override it because they don\'t want to seem rude, paranoid, or dramatic.</p>
-<p><strong>Red flags that should make you leave:</strong></p>
+    h:'Trust Your Gut — Fear Is Data, Not Weakness',
+    b:`<p>Gavin de Becker, the world's foremost expert on threat prediction, spent decades studying violent crime. His finding: <strong>victims almost always had a warning signal they talked themselves out of.</strong> They felt uneasy. They noticed something odd. And then they dismissed it to avoid seeming rude or paranoid.</p>
+<p><strong>Fear is not an emotion — it is information.</strong> It is your brain's pattern-recognition system processing thousands of subtle signals faster than conscious thought and flagging something that does not add up. When you feel it:</p>
 <ul>
-  <li>Someone is ignoring your "no" — a person who won\'t accept a polite refusal is revealing something important about how they view your boundaries</li>
-  <li>Unsolicited help with strings attached — "let me help you with that" followed by asking for something</li>
-  <li>Charm that feels performed or excessive — predators are often unusually charming</li>
-  <li>Trying to isolate you from others or from public spaces</li>
-  <li>Loan sharking — small favors designed to create a sense of obligation</li>
+  <li>Do NOT explain it away to seem polite or reasonable</li>
+  <li>Do NOT wait for certainty before acting — you will never have certainty in advance</li>
+  <li>Do NOT apologize for it to yourself or anyone else</li>
+  <li>Act first. Rationalize later. You can always apologize for leaving a situation that turned out to be fine.</li>
 </ul>
-<p><strong>The override problem:</strong> We override gut feelings to avoid awkwardness. It\'s okay to be rude. It\'s okay to leave. It\'s okay to say "I\'m not interested" and walk away.</p>`,
-    tip:'You don\'t owe anyone an explanation for feeling unsafe. "I have to go" is a complete sentence.',
+<p><strong>Real fear vs. worry:</strong> Real fear is always triggered by something present or genuinely imminent — it has a specific cause even if you cannot name it yet. Worry is manufactured anxiety about "what if." Learn to distinguish them. Act on the real kind immediately.</p>
+<p><strong>The manipulation tactics that override gut feelings:</strong></p>
+<ul>
+  <li><strong>Forced teaming:</strong> "We're in the same boat here" — creates false alliance with "we" language</li>
+  <li><strong>Too many details:</strong> Liars over-explain to seem credible. Truthful people are comfortable with ambiguity.</li>
+  <li><strong>Discounting your "no":</strong> "Oh come on, I'm just being friendly." A real no should be respected immediately. Persistence after a clear no is a major warning sign.</li>
+  <li><strong>Unsolicited help:</strong> Offering help you didn't ask for, then escalating when you decline</li>
+  <li><strong>Typecasting:</strong> "You seem like the kind of person who doesn't trust anyone." — pressuring you to prove you're not what they said</li>
+</ul>
+<p>Your safety is not worth anyone else's comfort. You owe no one an explanation for leaving a situation that makes you uneasy.</p>`,
     q:[
-      {q:'According to Gavin de Becker, what is genuine fear?',a:['A sign of weakness','Irrational anxiety','A survival signal based on real data','Something to be ignored'],c:2,e:'de Becker\'s research shows fear is the brain\'s rapid-processing system flagging real environmental cues. It deserves attention, not dismissal.'},
-      {q:'Someone keeps offering to help you despite your polite refusals. What does this signal?',a:['They\'re just being kind','They don\'t understand social cues','They are ignoring your "no" — a significant red flag','They need your approval'],c:2,e:'A person who won\'t accept a refusal is showing you they prioritize their agenda over your comfort. This is a key warning sign.'},
-      {q:'What is "loan sharking" in the context of predatory behavior?',a:['Lending money at high rates','Small unsolicited favors designed to create obligation','Asking for money directly','Offering to drive you somewhere'],c:1,e:'Small favors without your request create a psychological sense of debt. Predators use this to manufacture a reason for you to comply with larger asks.'},
-      {q:'Why do most people override genuine fear signals?',a:['They have no survival instincts','Fear is always irrational','They don\'t want to seem rude or paranoid','They\'re trained to ignore feelings'],c:2,e:'Social conditioning to be polite and not overreact causes people to suppress real warning signals. This is the override problem de Becker identifies.'},
-      {q:'Which statement is TRUE about leaving an uncomfortable situation?',a:['You must explain your reason clearly','You owe the other person an apology','You need a good excuse to leave','Leaving without explanation is completely acceptable'],c:3,e:'"I have to go" is a complete sentence. You never owe an explanation to someone who makes you feel unsafe. Your comfort and safety come first.'}
+      {q:'According to threat expert Gavin de Becker, what do victims of violence almost always have in common?',opts:['They were in a dangerous neighborhood','They had a warning signal they dismissed to avoid seeming rude','They were not physically capable of defending themselves','They were using their phones'],ans:1,explain:'De Becker studied thousands of cases. Almost without exception, victims had a signal — and overrode it. Fear is data.'},
+      {q:'What is "forced teaming"?',opts:['A sports training technique','A legal defense strategy','A manipulation tactic where an attacker uses "we" language to create false alliance','A type of group therapy'],ans:2,explain:'Predators use "we" language ("we are in the same situation") to lower your guard by creating false intimacy.'},
+      {q:'What should you do when you feel genuine fear in a situation?',opts:['Wait for certainty that the threat is real before acting','Act immediately — you can apologize later for leaving a situation that was fine','Explain to yourself why it is probably nothing','Ask the person who is making you uneasy if they mean harm'],ans:1,explain:'De Becker: you can always apologize for leaving a situation that turned out fine. You cannot undo not leaving one that was not.'}
     ]
   },
   {
-    h:'Online Safety & Predator Awareness',
-    b:`<p>The internet didn\'t create predatory behavior — it just gave predators access to more potential victims with less risk of being seen. Understanding how online grooming works is the best protection.</p>
-<p><strong>The 6-stage grooming pattern:</strong></p>
+    h:'How Attacks Actually Happen — The Predator Playbook',
+    b:`<p>Understanding HOW most attacks unfold removes the mystery and gives you a window to act. Predators are not random. <strong>They are opportunists who select targets and test them before attacking.</strong></p>
+<p><strong>Target selection:</strong> Attackers look for people who appear distracted, isolated, hesitant, or unaware. They avoid people who make eye contact, walk confidently, and demonstrate environmental awareness. Your body language alone changes your risk profile significantly.</p>
+<p><strong>The Interview:</strong> Before most attacks, the attacker "interviews" the target — a question or comment designed to assess compliance, awareness, and vulnerability.</p>
+<ul>
+  <li>"Hey, do you have the time?"</li>
+  <li>"Can I walk with you to your car?"</li>
+  <li>"You look like you need help with that."</li>
+</ul>
+<p>This is NOT casual conversation. It is a test. A confident, direct response ends most interviews immediately. A hesitant, apologetic, or mumbled response signals vulnerability and often invites escalation.</p>
+<p><strong>How to respond to an interview:</strong> Direct eye contact. Clear voice. "No thank you." Then move away. You are not rude — you are safe. You can be firm without being hostile.</p>
+<p><strong>The contact phase:</strong> The attacker attempts to close distance and gain physical control. This is when your response window is shrinking fast. Act during or before the contact phase — after it, your options narrow dramatically.</p>
+<p><strong>Highest-risk environments:</strong></p>
+<ul>
+  <li><strong>Parking lots:</strong> Isolation, low foot traffic, easy vehicle escape for attacker</li>
+  <li><strong>Elevators:</strong> Forced proximity, no escape route</li>
+  <li><strong>Stairwells:</strong> No surveillance, no witnesses</li>
+  <li><strong>Your car at night:</strong> Distracted with keys, confined space</li>
+</ul>
+<p>Apply heightened Yellow-to-Orange awareness in all four. Have keys in hand before reaching your car. Check the back seat. Lock doors immediately upon entering.</p>`,
+    q:[
+      {q:'What is "the interview" in predator behavior?',opts:['A job screening process','A pre-attack test using a question or comment to assess if you are a compliant, easy target','A police questioning technique','A social greeting that is being misinterpreted'],ans:1,explain:'Before most attacks, the attacker tests the target. A confident, direct response ends most interviews immediately.'},
+      {q:'Which environments require the highest awareness?',opts:['Restaurants, parks, and shopping malls','Schools, offices, and libraries','Parking lots, elevators, stairwells, and your car at night','Gyms, stores, and coffee shops'],ans:2,explain:'These four share isolation and limited escape routes — the conditions attackers look for.'},
+      {q:'What does target selection research show about who is chosen?',opts:['Attackers choose targets randomly','Physical size is the only factor','People who appear distracted, isolated, or hesitant are selected — confident, aware people are avoided','Attackers always know their target in advance'],ans:2,explain:'Predators are opportunists. Body language, awareness, and confidence all change your risk profile significantly.'}
+    ]
+  },
+  {
+    h:'Self-Defense That Actually Works',
+    b:`<p>Most self-defense training teaches techniques. Real self-defense starts long before physical contact — with <strong>avoidance, awareness, and assertiveness.</strong> Physical techniques are the last resort after everything else has failed.</p>
+<p><strong>The Defense Pyramid (in order):</strong></p>
 <ol>
-  <li><strong>Target selection:</strong> Predators target young people who appear lonely, lack parental attention, or post about problems</li>
-  <li><strong>Gaining trust:</strong> Excessive compliments, being "the only one who understands you," gift-giving</li>
-  <li><strong>Filling a need:</strong> Becoming an emotional support, financial help, or source of validation</li>
-  <li><strong>Isolation:</strong> "Don\'t tell your parents — they wouldn\'t understand us"</li>
-  <li><strong>Desensitization:</strong> Gradual introduction of inappropriate topics, testing boundaries</li>
-  <li><strong>Maintaining control:</strong> Secrets, guilt, shame, threats</li>
+  <li><strong>Avoid:</strong> Don't go to dangerous places alone. Trust your gut. Leave early.</li>
+  <li><strong>De-escalate:</strong> Calm voice, non-threatening posture, look for exit opportunities</li>
+  <li><strong>Escape:</strong> Create distance and run. Running is ALWAYS the best option if available.</li>
+  <li><strong>Fight:</strong> Only when escape is impossible and your physical safety demands it</li>
 </ol>
-<p><strong>Hard rules for online safety:</strong></p>
+<p><strong>If you must fight — fight to ESCAPE, not to win:</strong> Your goal is 3–5 seconds of distraction so you can run. You do not need to knock anyone out. You need a window.</p>
+<p><strong>High-percentage targets (work regardless of size difference):</strong></p>
 <ul>
-  <li>Never share your location, school name, or daily schedule with online contacts</li>
-  <li>Anyone asking you to keep your relationship secret from your family is a red flag — always</li>
-  <li>Screenshots protect you — if someone sends something inappropriate, document it</li>
-  <li>You can block anyone for any reason without explanation</li>
-</ul>`,
-    tip:'Anyone who asks you to keep your relationship secret from your parents is telling you something is wrong.',
+  <li><strong>Eyes:</strong> Thumb jab or finger flick — immediate pain, involuntary tearing, temporary impairment</li>
+  <li><strong>Throat:</strong> Open-palm strike — immediate pain, breathing disruption, shock</li>
+  <li><strong>Groin:</strong> Knee, kick, or grab — highly effective regardless of attacker size</li>
+  <li><strong>Nose:</strong> Palm-heel strike upward — pain, involuntary eye watering</li>
+  <li><strong>Instep:</strong> Hard heel stomp if grabbed from behind</li>
+  <li><strong>Knee:</strong> Side kick or stomp — compromises mobility instantly</li>
+</ul>
+<p><strong>Voice as a weapon:</strong> A loud, forceful <em>"STOP!"</em> or <em>"FIRE!"</em> (people respond faster to fire than help) draws attention, startles the attacker, and alerts bystanders. Most people are conditioned not to shout — practice it.</p>
+<p><strong>Best training systems for women:</strong></p>
+<ul>
+  <li><strong>Krav Maga:</strong> Israeli military system, entirely real-world focused, no sport rules</li>
+  <li><strong>RAD (Rape Aggression Defense):</strong> Designed specifically for women, available at many colleges and police departments</li>
+  <li><strong>Brazilian Jiu-Jitsu:</strong> Essential for ground defense — most attacks end up on the ground</li>
+</ul>
+<p>One 8-hour course changes your capability and your confidence permanently. Find a local RAD class — many are free.</p>`,
     q:[
-      {q:'What is the first stage of online grooming?',a:['Isolation from family','Target selection','Asking for photos','Building a secret relationship'],c:1,e:'Predators begin by identifying targets — often young people who appear lonely, post about problems, or seem to lack close adult connections.'},
-      {q:'An online contact says "your parents wouldn\'t understand our friendship." This is:',a:['Probably true — parents overreact','A normal boundary to have','A major red flag — isolation tactic','Fine if they\'re only a few years older'],c:2,e:'Asking you to hide the relationship from family is a textbook isolation tactic. Safe relationships don\'t require secrecy from your parents.'},
-      {q:'Someone online you\'ve never met is sending you gifts and saying you\'re special. You should:',a:['Feel grateful — they really like you','Recognize this as a grooming tactic','Send something back to be polite','Meet them to thank them in person'],c:1,e:'Excessive flattery, gifts, and "you\'re special" messaging toward people they\'ve never met is a trust-building grooming tactic, not genuine friendship.'},
-      {q:'What should you do if someone online sends you inappropriate content?',a:['Delete it immediately so no one sees','Reply asking them to stop','Screenshot it for documentation, then report and block','Ignore it and hope it stops'],c:2,e:'Documentation protects you. Screenshot before blocking. Report to the platform and tell a trusted adult. Evidence matters if authorities need to be involved.'},
-      {q:'Which piece of personal information is MOST dangerous to share online?',a:['Your favorite movie','Your first name','Your daily schedule and school name','Your opinion on current events'],c:2,e:'Your location, schedule, and school name allow someone to find you in person. First names and opinions carry far less risk than location-revealing information.'}
+      {q:'What is the primary goal when you are forced to fight?',opts:['Win the fight decisively','Knock the attacker out','Create 3-5 seconds to escape','Demonstrate your training'],ans:2,explain:'Fight to escape, not to win. You need enough distraction time to run. That is the only goal.'},
+      {q:'Why is shouting "FIRE!" sometimes more effective than "HELP!"?',opts:['It is louder','People respond faster to fire than calls for help — it draws more immediate bystander attention','It confuses the attacker','It is the internationally recognized distress signal'],ans:1,explain:'Research and real cases show bystanders respond more rapidly and reliably to "fire" than "help."'},
+      {q:'Which self-defense systems are considered most practical for women?',opts:['Tai Chi and yoga','Boxing and karate kata','Krav Maga, RAD, and Brazilian Jiu-Jitsu','Dance-based fitness programs'],ans:2,explain:'Krav Maga is real-world focused. RAD is designed specifically for women. BJJ teaches ground defense — critical because most attacks involve being taken to the ground.'}
     ]
   },
   {
-    h:'What To Do If You\'re Being Followed',
-    b:`<p>Most people don\'t have a plan for this scenario, which means they freeze when it happens. Having a mental plan means you can act immediately instead of standing there panicking.</p>
-<p><strong>If you\'re on foot:</strong></p>
-<ul>
-  <li><strong>The 4-direction test:</strong> Make 4 turns in the same direction (always turning right, for example). If they\'re still behind you after 4 turns, it\'s not coincidence.</li>
-  <li>Enter a busy public place — a store, restaurant, or any business with other people and staff</li>
-  <li>Call someone and describe where you are and what\'s happening out loud — this deters most followers and creates a witness</li>
-  <li>Go to any house and knock — most people will help you. Don\'t worry about being embarrassed.</li>
-  <li>Do NOT go home — you don\'t want someone to know where you live</li>
-</ul>
-<p><strong>If you\'re in a car:</strong></p>
-<ul>
-  <li>Make 4 right turns (driving in a circle). A follower will still be behind you.</li>
-  <li>Drive to a police station, fire station, or busy gas station — do NOT pull over in an isolated area</li>
-  <li>Call 911 while driving — describe your location and the vehicle following you</li>
-  <li>If you\'re cut off and approached, lock doors, keep engine running, and call 911 immediately</li>
-</ul>`,
-    tip:'Never go home if you think you\'re being followed. Lead them to a police station instead.',
+    h:'Escaping a Grab — When Hands Are On You',
+    b:`<p>Being grabbed is terrifying. Training removes the freeze response. <strong>These techniques work because of biomechanics — they do not require strength, speed, or size.</strong></p>
+<p><strong>Wrist grab escape:</strong> Rotate your wrist sharply toward the attacker's thumb. Every grip — regardless of how strong — is weakest at the thumb. A quick, decisive rotation breaks it. Practice with a partner until it is automatic.</p>
+<p><strong>Bear hug from behind (arms free):</strong></p>
+<ol>
+  <li>Drop your weight immediately — bend your knees hard, lean forward</li>
+  <li>Stomp your heel hard onto their instep (foot arch)</li>
+  <li>Throw your head backward into their face</li>
+  <li>Drive your elbow back into their ribs or solar plexus</li>
+  <li>Spin, create distance, run</li>
+</ol>
+<p><strong>Bear hug from behind (arms pinned):</strong></p>
+<ol>
+  <li>Drop your weight and widen your stance immediately</li>
+  <li>Thrust your hips back sharply to shift their center of gravity</li>
+  <li>Stomp on the instep repeatedly</li>
+  <li>When grip loosens even slightly — drop straight down. Dead weight is extremely hard to hold.</li>
+</ol>
+<p><strong>Choke from the front:</strong></p>
+<ol>
+  <li><strong>TUCK YOUR CHIN immediately</strong> — this protects the airway and buys time</li>
+  <li>Raise both arms straight overhead, then plunge them down sharply between their arms — this mechanically breaks the grip</li>
+  <li>Step back, palm-heel strike to the nose, and run</li>
+</ol>
+<p><strong>If being pulled into a vehicle:</strong> Fight with everything at the door. Scream, bite, scratch, grip the door frame, honk the horn, throw yourself onto the steering wheel. <strong>Never go to the second location.</strong> Statistics show outcomes at the second location are far worse. Fight at the point of abduction — your odds are dramatically better there.</p>
+<p><strong>If knocked to the ground:</strong> Protect your head immediately. Draw knees to chest, use feet to kick and create distance, roll to get up. Getting back upright is the priority.</p>`,
     q:[
-      {q:'The 4-direction test helps you determine if you\'re being followed by:',a:['Walking faster than them','Making 4 turns to see if they follow','Calling a friend','Making eye contact'],c:1,e:'Making 4 deliberate turns (like 4 rights, forming a circle) rules out coincidence. If someone is still behind you after that, they\'re following you intentionally.'},
-      {q:'If you\'re on foot and believe you\'re being followed, where should you go?',a:['Home quickly','A quiet side street','A busy public place with staff','An empty park to hide'],c:2,e:'You want witnesses and people who can help. A store, restaurant, or any business with employees and other customers provides both. Home reveals your address.'},
-      {q:'Why should you NOT go home if you think you\'re being followed?',a:['It\'s too far away','Your family will worry','You don\'t want to reveal where you live','You might be wrong about being followed'],c:2,e:'Leading someone to your home tells them exactly where to find you again. Always divert to a public place first. You can call home from there.'},
-      {q:'If followed in a car and someone cuts you off and approaches your vehicle, you should:',a:['Get out to confront them','Unlock your door to talk through the window','Roll down your window to ask what they want','Lock doors, keep engine running, call 911'],c:3,e:'Your car is a protective barrier. Keep it locked, keep the engine running (option to drive away), and call 911 immediately to create an official record.'},
-      {q:'What is the FIRST thing you should say when calling 911 while being followed?',a:['Your name','Your exact location','A description of the follower','How long you\'ve been followed'],c:1,e:'Location first, always. If the call drops, dispatchers need to know where to send help. Give your location before anything else.'}
+      {q:'What is the weakest point of any grip?',opts:['The palm','The fingers','The thumb side','Equal strength throughout'],ans:2,explain:'Every grip is mechanically weakest at the thumb. Rotating toward the thumb breaks almost any wrist grab.'},
+      {q:'If someone attempts to force you into a vehicle, what should you do?',opts:['Comply and look for an opportunity later','Get in quietly and call 911 discreetly','Fight with everything you have at the door — never go to the second location','Wait to understand their intention'],ans:2,explain:'The second location is statistically far more dangerous. Fight at the point of abduction. Your odds are best there.'},
+      {q:'Why does dropping your full body weight help escape a bear hug?',opts:['It makes you heavier permanently','Dead weight is extremely difficult to hold — it shifts the attacker\'s balance and opens escape options','It signals submission and may calm the attacker','It only works for larger people'],ans:1,explain:'Dead weight mechanics mean even a much larger person struggles to maintain a grip. Drop hard and fast.'}
     ]
   },
   {
-    h:'Self-Defense Basics — What Actually Works',
-    b:`<p>Self-defense isn\'t about winning a fight. It\'s about creating enough time and distance to escape. You don\'t need strength — you need to hit the right targets.</p>
-<p><strong>The goal is always escape, not victory.</strong></p>
-<p><strong>High-value targets that work regardless of size:</strong></p>
+    h:'Recognizing Abuse — The Patterns, Cycle, and Red Flags',
+    b:`<p>Abuse is rarely a single event. It is a <strong>pattern of behavior designed to gain and maintain power and control</strong> over another person. It can be physical, emotional, verbal, financial, sexual, or digital — and it almost never starts with a punch.</p>
+<p><strong>The Cycle of Abuse (Lenore Walker's research):</strong></p>
+<ol>
+  <li><strong>Tension Building:</strong> Anxiety rises, you walk on eggshells, minor incidents occur. You feel like you are managing them to prevent an explosion.</li>
+  <li><strong>Incident:</strong> The explosion — verbal, emotional, or physical abuse. The tension releases.</li>
+  <li><strong>Reconciliation (Honeymoon Phase):</strong> Apologies, gifts, tears, promises. "I'll never do it again. You know I love you." This phase creates false hope and is why leaving is hard.</li>
+  <li><strong>Calm:</strong> The incident is minimized or forgotten. Life feels normal. Then tension starts building again.</li>
+</ol>
+<p>The cycle always shortens over time. The honeymoon phase disappears. The incidents become more severe and more frequent.</p>
+<p><strong>Early Red Flags — these appear before physical violence:</strong></p>
 <ul>
-  <li><strong>Eyes:</strong> Temporary or permanent blindness. Even the threat of it causes flinching. Thumb jab, fingers spread, or any spray.</li>
-  <li><strong>Throat:</strong> Even a moderate strike disrupts breathing. An open palm strike or elbow strike to the throat creates immediate reaction.</li>
-  <li><strong>Groin (if applicable):</strong> Works immediately and creates opening to escape.</li>
-  <li><strong>Knees:</strong> The knee joint only bends one direction. A sharp kick sideways damages it regardless of attacker size.</li>
-  <li><strong>Instep/top of foot:</strong> Effective if grabbed from behind. Stomp hard.</li>
+  <li>Jealousy framed as love: "I just care so much about where you are"</li>
+  <li>Isolating you from friends and family ("They're not good for you")</li>
+  <li>Controlling finances, transportation, or how you dress</li>
+  <li>Checking your phone or tracking your location without consent</li>
+  <li>Moving very fast emotionally — intense attachment within weeks</li>
+  <li>Mood swings that keep you uncertain and walking on eggshells</li>
+  <li>Minimizing your feelings: "You're too sensitive," "You're crazy," "That never happened" (gaslighting)</li>
+  <li>Blaming you for their behavior: "You made me do this"</li>
+  <li>Threatening to hurt themselves if you leave</li>
+  <li>Public humiliation disguised as "just joking"</li>
 </ul>
-<p><strong>Wrist grab escape:</strong> Rotate your arm toward the attacker\'s thumb — the weakest point of any grip. This works regardless of strength difference.</p>
-<p><strong>Bear hug escape:</strong> Drop your weight, tuck your chin, rotate, then strike groin or stomp instep.</p>
-<p><strong>Most important rule:</strong> Make noise. Yell "FIRE" or "STOP" — not just screaming. Specific words activate bystanders.</p>`,
-    tip:'You only need 2-3 seconds of distraction to create escape distance. Strike, break grip, run.',
+<p><strong>Important:</strong> By the time physical violence appears, the psychological and emotional groundwork has already been laid for months or years. The earlier you recognize these patterns, the more options you have.</p>`,
     q:[
-      {q:'The primary goal of self-defense is to:',a:['Win the fight decisively','Hurt the attacker as much as possible','Create time and distance to escape','Prove you can handle yourself'],c:2,e:'You\'re not trying to win — you\'re trying to escape. A few seconds of disruption is all you need. Get away and call for help.'},
-      {q:'The wrist grab escape works by rotating your arm toward:',a:['The attacker\'s pinky side','The attacker\'s thumb — the weakest grip point','Straight up','Straight down'],c:1,e:'The thumb cannot hold a grip against rotational force. Rotating toward the thumb breaks any wrist grab regardless of how much stronger the attacker is.'},
-      {q:'Why is yelling "FIRE" more effective than just screaming?',a:['It\'s louder','It\'s a specific word that activates bystander response','It confuses the attacker','It signals police specifically'],c:1,e:'Vague screaming often triggers bystander paralysis. Specific words like "FIRE" or "STOP" activate people to respond. Bystanders need to know what\'s happening.'},
-      {q:'Which body target works regardless of the attacker\'s size or strength?',a:['The chest','The shoulders','The eyes or throat','The stomach'],c:2,e:'Eyes and throat are vulnerable regardless of physical size. They don\'t require strength to affect — even moderate pressure or contact causes a significant reaction.'},
-      {q:'If grabbed from behind in a bear hug, your first physical move should be to:',a:['Try to flip them over your shoulder','Drop your weight and tuck your chin','Scream for help only','Try to run immediately'],c:1,e:'Dropping your weight makes you harder to carry or move. Tucking your chin protects your neck. These create the setup for strikes to the instep or groin.'}
+      {q:'What makes the "honeymoon phase" of the abuse cycle so dangerous?',opts:['It involves physical violence','It creates false hope that the person has changed — making leaving feel unnecessary','It only happens once','It is when most legal action occurs'],ans:1,explain:'The honeymoon phase is designed (consciously or not) to restore the relationship before the cycle repeats. It is why "but they were so loving afterward" is a reason people stay.'},
+      {q:'Which of these is an early red flag for an abusive relationship?',opts:['Healthy disagreements resolved through conversation','Jealousy framed as deep love and intense concern for your whereabouts','Being introduced to friends and family','Taking time before becoming serious'],ans:1,explain:'Jealousy presented as love is one of the most consistent early red flags. It is not love — it is the beginning of control.'},
+      {q:'What is gaslighting?',opts:['A type of physical intimidation','Making someone question their own memory, perception, and sanity through denial and manipulation','A form of financial abuse','Threatening someone with a weapon'],ans:1,explain:'Gaslighting ("that never happened," "you are crazy," "you are too sensitive") makes the victim distrust their own experience — a core abuse tactic.'}
     ]
   },
   {
-    h:'Emergency Preparedness — Before Disaster Strikes',
-    b:`<p>Most people are not prepared for 72 hours without power, water, or emergency services. Most disasters last less than 72 hours — but in that window, unprepared people make desperate decisions.</p>
-<p><strong>The 72-hour kit (minimum):</strong></p>
+    h:'Leaving Safely — Escaping an Abusive Situation',
+    b:`<p><strong>Leaving an abusive relationship is the most dangerous time.</strong> Research consistently shows that the risk of serious violence — including homicide — increases significantly when an abuser senses they are losing control. Leaving without a plan puts you at greater risk. A safety plan is not optional.</p>
+<p><strong>Build your Safety Plan BEFORE you leave:</strong></p>
 <ul>
-  <li>Water: 1 gallon per person per day (3 gallons minimum per person)</li>
-  <li>Food: non-perishable, easy to prepare — granola bars, peanut butter, canned goods with a pull tab</li>
-  <li>First aid kit with any prescription medications (2-week supply is better)</li>
-  <li>Flashlight, extra batteries, or hand-crank flashlight</li>
-  <li>Phone charger and portable battery bank</li>
-  <li>Cash in small bills (ATMs go down when power fails)</li>
-  <li>Copies of important documents in a waterproof bag</li>
+  <li>Identify 2–3 safe people who know the full situation and can be called at any hour</li>
+  <li>Establish a code word with a trusted person that means "call 911 to my location"</li>
+  <li>Identify safe destinations: trusted friend/family, domestic violence shelter, police station</li>
+  <li>Build a hidden "go bag": government ID, birth certificate, Social Security card, cash, medications, phone charger, change of clothes, important documents, spare key</li>
+  <li>Open a bank account they do not know about — even $20/week builds an emergency fund</li>
+  <li>Memorize 2–3 key phone numbers in case your phone is taken or destroyed</li>
 </ul>
-<p><strong>Scenario protocols:</strong></p>
+<p><strong>Digital safety before leaving:</strong></p>
 <ul>
-  <li><strong>Tornado:</strong> Lowest floor, interior room, away from windows. A bathroom or closet is better than an open room.</li>
-  <li><strong>Earthquake:</strong> Drop, cover, hold on. Under a sturdy table or against an interior wall. Don\'t run outside during shaking.</li>
-  <li><strong>House fire:</strong> Stay low, feel doors before opening, meet at a designated outdoor location. Never re-enter.</li>
-  <li><strong>Power outage:</strong> Unplug electronics (surge when power returns). Generator use outdoors only — CO2 kills silently.</li>
-</ul>`,
-    tip:'Cash in small bills is one of the most overlooked emergency supplies. ATMs and card readers fail when power does.',
+  <li>Change ALL passwords (email, bank, social media) from a device they have never touched</li>
+  <li>Check your phone for tracking/stalkerware — factory reset if unsure</li>
+  <li>Turn off location sharing in every app, including Find My Friends and Google Maps sharing</li>
+  <li>Review all devices logged into your accounts — remove anything unfamiliar</li>
+  <li>Create a new email account for sensitive communications</li>
+</ul>
+<p><strong>Legal protections available to you:</strong></p>
+<ul>
+  <li><strong>Protective Order / Restraining Order:</strong> A court order prohibiting contact. Violating it is a criminal offense.</li>
+  <li><strong>Document everything:</strong> Dated photos of injuries, screenshots of threatening messages, medical records</li>
+  <li>DV advocates can help you navigate legal options for free</li>
+</ul>
+<p style="background:rgba(239,68,68,.1);border-left:3px solid #ef4444;padding:.6rem .8rem;border-radius:6px;margin-top:.8rem;">
+  <strong>📞 National Domestic Violence Hotline: 1-800-799-7233 (SAFE)</strong><br>
+  Text START to 88788 | Safe chat at thehotline.org
+</p>`,
     q:[
-      {q:'The minimum water supply recommended per person for a 72-hour emergency kit is:',a:['1 gallon total','1 cup per day','1 gallon per person per day','2 liters per week'],c:2,e:'FEMA recommends 1 gallon per person per day for drinking and sanitation. For 3 days, that\'s 3 gallons per person minimum.'},
-      {q:'During an earthquake, the correct response is:',a:['Run outside immediately','Stand in a doorframe','Drop, cover, and hold on under something sturdy','Run to an open field'],c:2,e:'Drop, Cover, Hold On is the scientifically supported protocol. Doorframes offer no special protection. Running outside risks falling debris.'},
-      {q:'Why is cash in small bills considered a critical emergency supply?',a:['Stores prefer cash payments','ATMs and card readers fail during power outages','It\'s easier to carry','Credit cards have fees'],c:1,e:'When power fails, electronic payment systems go down. Small bills let you buy food, fuel, or supplies when digital payments are unavailable.'},
-      {q:'During a house fire, if you must open a door, you should first:',a:['Open it quickly and run','Feel it for heat before opening','Break a window instead','Call 911 first'],c:1,e:'A hot door means fire is on the other side. Opening it would introduce oxygen and potentially engulf you in flames. Always feel doors before opening during a fire.'},
-      {q:'Why must generators always be used outdoors?',a:['They\'re too loud for indoors','They require fresh air intake','They produce carbon monoxide which is odorless and can kill silently','They might overheat'],c:2,e:'Carbon monoxide is invisible and odorless. A generator running indoors can reach lethal levels within minutes. CO poisoning is responsible for many storm-related deaths.'}
+      {q:'Why is leaving an abusive relationship potentially the most dangerous moment?',opts:['Because you have no legal rights at that point','Because the abuser feels they are losing control — risk of serious violence peaks','Because courts rarely believe victims','Because you lose financial support immediately'],ans:1,explain:'Research and homicide studies consistently show the period around leaving is when danger peaks. A safety plan is essential — not optional.'},
+      {q:'What should a safety "go bag" contain?',opts:['Sentimental items and photos','ID, cash, medications, documents, charger, and change of clothes','Just your phone and car keys','Legal documents only'],ans:1,explain:'The go bag covers what you cannot safely return for. You may not get a second chance to collect things.'},
+      {q:'What should you do before leaving regarding digital accounts?',opts:['Nothing — focus on physical safety only','Post about your situation on social media for support','Change all passwords from a device they have never used and check phone for tracking software','Delete all social media accounts immediately'],ans:2,explain:'Abusers frequently monitor email, social media, and location sharing. Digital security must happen alongside physical safety planning.'}
+    ]
+  },
+  {
+    h:'Sexual Assault — Prevention, Response, and Recovery',
+    b:`<p><strong>First and always:</strong> Sexual assault is never the victim's fault. Clothing, location, prior relationship to the attacker, intoxication, or any previous behavior do not create consent and do not shift responsibility. Ever.</p>
+<p><strong>What consent actually means:</strong></p>
+<ul>
+  <li>Consent is <strong>ongoing, enthusiastic, and freely given</strong> — not assumed, implied, or coerced</li>
+  <li>Silence or passivity is NOT consent</li>
+  <li>Past consent does not mean current consent — in any situation, any time</li>
+  <li>Intoxication removes the legal and ethical ability to give consent</li>
+  <li>"No" means no the first time — any pressure after a clear no is a violation of consent</li>
+</ul>
+<p><strong>Risk reduction in social situations:</strong></p>
+<ul>
+  <li>Never leave your drink unattended — not even for a minute</li>
+  <li>Know what drug-facilitated assault looks like: sudden extreme disorientation or sedation disproportionate to what you drank</li>
+  <li>Have a trusted friend system — you know where each other are and you leave together</li>
+  <li>Trust your discomfort — leave situations that feel wrong before they escalate</li>
+  <li>Know that the majority of assaults are committed by someone known to the victim — this does not make it less assault</li>
+</ul>
+<p><strong>If assault occurs — your immediate steps:</strong></p>
+<ol>
+  <li>Get to physical safety immediately</li>
+  <li><strong>Do not shower, change clothes, or clean up</strong> before a medical exam — this preserves forensic evidence</li>
+  <li>Go to an emergency room or SANE (Sexual Assault Nurse Examiner) clinic — they are trained specifically for this</li>
+  <li>You have the right to a forensic exam whether or not you report to police — reporting is entirely your choice</li>
+  <li>Bring a trusted person with you if possible</li>
+  <li>Evidence can often be collected up to 72–120 hours after an assault</li>
+</ol>
+<p style="background:rgba(239,68,68,.1);border-left:3px solid #ef4444;padding:.6rem .8rem;border-radius:6px;margin-top:.8rem;">
+  <strong>📞 RAINN National Sexual Assault Hotline: 1-800-656-4673 (HOPE)</strong><br>
+  24/7 confidential support | Online chat at rainn.org
+</p>`,
+    q:[
+      {q:'What does consent require?',opts:['The absence of a clear "no"','Ongoing, enthusiastic, and freely given agreement — not assumed, coerced, or implied','Agreement at the start of a relationship that applies going forward','No verbal objection during the encounter'],ans:1,explain:'Consent must be ongoing, enthusiastic, and freely given. It can be withdrawn at any moment. Silence, passivity, or past consent do not count.'},
+      {q:'Why should you not shower before a forensic medical exam after assault?',opts:['For psychological grounding','Because hospital showers are unavailable','To preserve forensic evidence that supports future legal options','Showering is fine — only clothing matters'],ans:2,explain:'Forensic evidence can be collected up to 72–120 hours after assault. Showering destroys critical evidence permanently.'},
+      {q:'Is reporting to police required to receive a forensic medical exam?',opts:['Yes — reporting is required first','No — you have the right to a forensic exam regardless of whether you report','Only in some states','Only if you have health insurance'],ans:1,explain:'You can receive a forensic exam and have evidence preserved without making a police report. Reporting is entirely your choice, and you can decide later.'}
+    ]
+  },
+  {
+    h:'Digital Safety — Cyberstalking, Tracking & Online Threats',
+    b:`<p>Technology has created powerful new tools for stalking, harassment, and abuse. <strong>Cyberstalking is a federal crime.</strong> These threats are just as real and just as dangerous as physical ones — and they often precede physical violence.</p>
+<p><strong>Warning signs you may be tracked or monitored:</strong></p>
+<ul>
+  <li>Someone knows things you only shared briefly online or in "private" messages</li>
+  <li>They appear at locations you never told them about</li>
+  <li>Your phone battery drains unusually fast (stalkerware runs in the background)</li>
+  <li>Your car or belongings have unfamiliar items attached (AirTag, GPS tracker)</li>
+  <li>Your accounts keep being accessed from unknown devices</li>
+  <li>A current or ex-partner seems to know your movements without being told</li>
+</ul>
+<p><strong>Lock down your digital life:</strong></p>
+<ul>
+  <li>Audit every app with location access — disable any that do not absolutely need it</li>
+  <li>Scan for AirTags: iPhone detects automatically; Android users use the "Tracker Detect" app</li>
+  <li>Review all devices logged into your Google/Apple/email accounts — remove unknowns immediately</li>
+  <li>Enable two-factor authentication on every account</li>
+  <li>If unsure whether your phone has spyware — factory reset it and restore only your own data</li>
+  <li>Check shared family plans and iCloud Family Sharing — these often allow location access</li>
+</ul>
+<p><strong>Social media hygiene:</strong></p>
+<ul>
+  <li>Post location <em>after</em> you leave — never in real time</li>
+  <li>Photos contain embedded GPS metadata — turn off location for your camera app</li>
+  <li>Review who can see your Stories, check-ins, and tagged posts</li>
+  <li>Block aggressively and without guilt — you owe no one access to your life</li>
+</ul>
+<p><strong>If being stalked digitally:</strong> Screenshot everything with timestamps. Report to police — cyberstalking charges require documentation. Contact the Cyber Civil Rights Initiative at cybercivilrights.org for expert guidance.</p>`,
+    q:[
+      {q:'What is a key sign your phone may have tracking software installed?',opts:['Apps open more slowly','Screen brightness fluctuates','Battery drains significantly faster than your normal usage','You receive more spam calls'],ans:2,explain:'Stalkerware and tracking apps run continuously in the background — a major battery drain is one of the most reliable signs.'},
+      {q:'When should you post your location on social media?',opts:['In real time so friends know where you are','Only on private accounts','After you have already left — never in real time','Never under any circumstances'],ans:2,explain:'Real-time location posting tells anyone monitoring your account exactly where to find you. Post after you leave.'},
+      {q:'What should you do if you suspect your phone has spyware installed?',opts:['Install an antivirus app','Delete suspicious-looking apps one by one','Factory reset the phone and restore only your own data from a trusted backup','Give it to police immediately'],ans:2,explain:'A factory reset is the only reliable way to remove spyware. Selective app deletion often misses deeply embedded tracking software.'}
+    ]
+  },
+  {
+    h:'Street Smarts — Practical Daily Safety Habits',
+    b:`<p>Most personal safety advice is abstract. These are <strong>specific, actionable habits</strong> you can use starting today. Each one meaningfully reduces your risk profile.</p>
+<p><strong>Walking alone:</strong></p>
+<ul>
+  <li>Phone in pocket while moving — not in your hand. If you must check it, stop with your back to a wall.</li>
+  <li>One earbud out, volume low — you need your hearing</li>
+  <li>Walk with your head up, at a purposeful pace. Confidence signals awareness — the single biggest deterrent.</li>
+  <li>Make brief eye contact with people nearby — signals you have registered them. Predators dislike being noticed.</li>
+  <li>Vary your routes and routines — predictability is exploitable</li>
+  <li>If you think you are being followed on foot: cross the street, enter a business, call someone and say their name and your exact location out loud</li>
+</ul>
+<p><strong>At your car:</strong></p>
+<ul>
+  <li>Have keys in hand before you reach the car — do not stand searching your bag at the door</li>
+  <li>Glance at the back seat before getting in</li>
+  <li>Lock doors <em>immediately</em> upon getting in — before phone, before music, before anything</li>
+  <li>Park near lights and near high-foot-traffic areas</li>
+  <li>If someone is parked very close on your driver's side in a van or large vehicle, enter from the passenger side</li>
+</ul>
+<p><strong>Tools worth having:</strong></p>
+<ul>
+  <li><strong>Personal alarm:</strong> 120dB+ keychain alarm. Pull to activate. Legal everywhere, startles attackers, draws immediate attention.</li>
+  <li><strong>Pepper spray:</strong> Effective at 8–12 feet. Legal in most states with minor restrictions. Practice your draw before you need it.</li>
+  <li><strong>Charged phone:</strong> Keep it above 20% when leaving home. Have 911 accessible from your lock screen.</li>
+</ul>
+<p><strong>If you think a car is following you while driving:</strong> Do NOT go home. Make four consecutive right turns — if the same car follows all four, you are being followed. Drive directly to a police station, fire station, or busy public place. Call 911 and stay on the line.</p>`,
+    q:[
+      {q:'Why is walking with your head up and at a purposeful pace important?',opts:['It is better for your posture','Confidence and awareness signal to predators that you are not an easy target','It helps you avoid tripping','It is more polite to other pedestrians'],ans:1,explain:'Target selection research shows confident, aware-looking people are consistently passed over. Your demeanor changes your risk profile before any interaction begins.'},
+      {q:'If you think a car is following you while driving, what should you do?',opts:['Drive home quickly and go inside','Speed up to lose them','Make four consecutive right turns — if they follow all four, drive to a police station and call 911','Flash your lights and pull over'],ans:2,explain:'Four right turns form a loop no one follows by accident. Do not go home — go to a police station where you have safety and witnesses.'},
+      {q:'When should you lock your car doors after getting in?',opts:['After you have adjusted your seat and mirrors','After you have started the engine','Immediately upon getting in — before anything else','Before you pull out of the parking space'],ans:1,explain:'Immediately. Before your phone, music, or seatbelt. The moment the door closes, lock it.'}
+    ]
+  },
+  {
+    h:'Safe Dating — Online, First Meetings, and Red Flags',
+    b:`<p>Online dating and social media have fundamentally changed how people meet — and introduced new risks alongside new opportunities. Most people are who they say they are. Some are not. <strong>Ten minutes of verification before meeting can prevent serious harm.</strong></p>
+<p><strong>Before meeting someone from online:</strong></p>
+<ul>
+  <li>Reverse image search their profile photos using Google Images or TinEye — check for catfishing or stolen photos</li>
+  <li>Search their name + city + employer — does anything verify?</li>
+  <li>Video call before meeting — appearance and voice should match across calls</li>
+  <li>Ask specific questions about things they have mentioned — liars lose track of details over time</li>
+</ul>
+<p><strong>First meeting rules — non-negotiable:</strong></p>
+<ul>
+  <li>Meet in a busy, public place — coffee shop, restaurant, populated park. Never their home, your home, or anywhere isolated.</li>
+  <li>Tell a trusted friend exactly who you are meeting, where, and set a check-in time</li>
+  <li>Drive yourself or take your own rideshare — do not accept a ride from them on a first meeting</li>
+  <li>Keep your drink in sight at all times</li>
+  <li>Have a code word to text a friend that means "call me with a fake emergency"</li>
+  <li>Trust discomfort — you can always leave. "I have to go" is a complete sentence.</li>
+</ul>
+<p><strong>Red flags in early communication:</strong></p>
+<ul>
+  <li>Pushes quickly to move off the dating app to private messaging</li>
+  <li>Repeatedly avoids or refuses video call</li>
+  <li>Excessive flattery very early — "love bombing" creates false intimacy fast</li>
+  <li>Asks for money, gift cards, or financial help — <strong>always a scam, always</strong></li>
+  <li>Sends sexual content early and expects reciprocation — potential sextortion setup</li>
+  <li>Gets angry, guilt-trips, or becomes aggressive when you set any boundary</li>
+</ul>
+<p><strong>Sextortion:</strong> If someone obtains intimate images — consensually or not — and threatens to share them, this is a federal crime. Contact the FBI's IC3.gov and the Cyber Civil Rights Initiative (cybercivilrights.org) immediately.</p>`,
+    q:[
+      {q:'What should you always do before meeting someone from online for the first time?',opts:['Trust your feelings — verification is insulting','Tell a trusted person who you are meeting, where, and set a check-in time','Meet at their home for privacy and comfort','Accept a ride from them to build trust'],ans:1,explain:'A trusted person knowing your plans creates a safety net. This is non-negotiable regardless of how well you think you know someone online.'},
+      {q:'If someone you met online asks for money or gift cards, this is:',opts:['Acceptable if you have talked for a long time','A test of your generosity and trust','Almost always a scam — one of the most reliable red flags regardless of the story','A genuine request if their situation sounds difficult'],ans:2,explain:'Financial requests from online contacts — money, gift cards, cryptocurrency — are among the most consistent scam indicators. The story is always compelling.'},
+      {q:'What is "love bombing"?',opts:['A healthy expression of strong feelings','Excessive flattery and intense early attachment designed to create false intimacy quickly','A form of online harassment','Repeatedly sending flowers or gifts'],ans:1,explain:'Love bombing — overwhelming praise, fast declarations of deep feelings — is a manipulation tactic that creates dependency and makes victims ignore red flags.'}
+    ]
+  },
+  {
+    h:'Your Personal Safety Network — Connection Is Protection',
+    b:`<p>Predators isolate their targets. <strong>Connection is your most powerful long-term protection.</strong> A strong personal safety network is not paranoia — it is one of the most practical safety tools available to you.</p>
+<p><strong>Your three-layer safety network:</strong></p>
+<ol>
+  <li><strong>Inner Circle (2–3 people):</strong> People who know your schedule, your relationships, and your situation fully. You can call them at 2am. They have your location when you want them to. They would call police if you went silent.</li>
+  <li><strong>Aware Circle (5–10 people):</strong> Friends and family who know your general life and would notice if you went quiet or disappeared from communication for longer than normal.</li>
+  <li><strong>Community Layer:</strong> Neighbors who know your face, coworkers who would notice your absence, local businesses you frequent.</li>
+</ol>
+<p><strong>Check-in systems to set up today:</strong></p>
+<ul>
+  <li>Share your live location with 1–2 trusted people during dates, late nights, or travel to unfamiliar places</li>
+  <li>Establish a code word: one word texted means "I need help — call the police to my location"</li>
+  <li>Set time-based check-ins: "If I don't text you by midnight, call me immediately"</li>
+  <li>Tell someone your plan before going somewhere new, especially alone</li>
+</ul>
+<p><strong>Know your emergency resources:</strong></p>
+<ul>
+  <li>Address of the nearest police station and hospital to your home</li>
+  <li>Local domestic violence shelter phone number</li>
+  <li>Enable Emergency SOS on your phone (hold side button on iPhone; most Androids too)</li>
+  <li>Set up Medical ID (visible from lock screen) with emergency contacts listed</li>
+  <li>Label key contacts as ICE (In Case of Emergency): "ICE — Mom," "ICE — Best Friend"</li>
+</ul>
+<p style="background:rgba(239,68,68,.1);border-left:3px solid #ef4444;padding:.6rem .8rem;border-radius:6px;margin-top:.8rem;">
+  <strong>Key Numbers:</strong><br>
+  🆘 Emergency: 911<br>
+  💜 National DV Hotline: 1-800-799-7233<br>
+  💙 RAINN Sexual Assault: 1-800-656-4673<br>
+  🧠 Crisis/Suicide Line: 988
+</p>`,
+    q:[
+      {q:'What does your "inner circle" safety network consist of?',opts:['Your entire social media following','Everyone at your workplace','2-3 trusted people who fully know your situation and would call for help if you went silent','Only law enforcement contacts'],ans:2,explain:'Your inner circle is small, fully informed, and reachable at any hour. Quality and trust matter far more than size.'},
+      {q:'What does labeling phone contacts as "ICE" do?',opts:['Keeps the contact hidden from others','Marks them as international contacts','Makes them visible to first responders on a locked phone as emergency contacts','Automatically calls them during an emergency'],ans:2,explain:'ICE (In Case of Emergency) contacts are recognized by first responders. Label your most important contacts this way — it could matter when you cannot speak.'},
+      {q:'What is a code word system between friends?',opts:['A secret language for private conversations','A pre-agreed word or phrase texted that signals "I need help — call police to my location"','An app that tracks your location automatically','A way to communicate without using names'],ans:1,explain:'A code word is one of the simplest and most effective safety tools. One text to a prepared friend initiates a call for help — even when you cannot say so directly.'}
     ]
   }
 ],
