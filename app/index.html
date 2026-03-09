@@ -3135,13 +3135,18 @@ body{top:0!important;}
         <select id="spDay" style="width:100px;"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select>
         <input type="time" id="spTime" value="15:30" style="width:100px;">
         <input type="number" id="spDuration" value="60" min="15" max="240" step="15" style="width:65px;" placeholder="min">
-        <select id="spSubject" style="flex:1;min-width:100px;"></select>
-        <input type="text" id="spTopic" placeholder="Specific topic (optional)" style="flex:1;min-width:120px;">
+        <input type="text" id="spSubject" list="spSubjectList" placeholder="Subject (e.g. Math, Science)" style="flex:1;min-width:120px;">
+        <datalist id="spSubjectList"></datalist>
+        <input type="text" id="spTopic" placeholder="Topic (optional)" style="flex:1;min-width:110px;">
+        <button class="btn bp bs" onclick="addStudyBlock()" style="white-space:nowrap;">+ Add</button>
       </div>
     </div>
 
     <!-- Weekly Grid -->
     <div id="studyPlanGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:.3rem;"></div>
+    <div id="spEmptyTip" style="text-align:center;padding:.8rem;font-size:.72rem;color:var(--tx3);margin-top:.3rem;">
+      ☝️ Enter a subject above and click <b>+ Add</b> to build your weekly study schedule
+    </div>
 
     <!-- Upcoming Deadlines -->
     <div style="margin-top:1rem;">
@@ -8016,6 +8021,8 @@ let _activeSection = 's-hero';
 
 function buildSideNav(){
   const el = document.getElementById('sideNav'); if(!el) return;
+  // New sections added after launch - always visible, ignore saved hide state
+  if(D.sections) { delete D.sections.cbt; }
   const hidden = D.sections||{};
   const openGroups = D._navGroups || {};
   
@@ -16036,8 +16043,12 @@ function renderParentActivityFeed(){
 // ── STUDY PLANNER ────────────────────────────────────────────
 function populateStudySelects(){
   const classes = D.classes||[];
-  const opts = '<option value="">— Subject —</option>' + classes.map(c=>`<option value="${c.name}">${c.name}</option>`).join('') + '<option value="Other">Other</option>';
-  ['spSubject','examClass'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML=opts; });
+  // Populate datalist for spSubject text input
+  const dl = document.getElementById('spSubjectList');
+  if(dl) dl.innerHTML = classes.map(c=>`<option value="${c.name}">`).join('') + '<option value="Math"><option value="Science"><option value="English"><option value="History"><option value="PE"><option value="Art"><option value="Other">';
+  // Populate examClass select (still a select)
+  const ec = document.getElementById('examClass');
+  if(ec) ec.innerHTML = '<option value="">— Select Class —</option>' + classes.map(c=>`<option value="${c.name}">${c.name}</option>`).join('');
 }
 
 function addStudyBlock(){
@@ -16046,7 +16057,7 @@ function addStudyBlock(){
   const duration = parseInt((document.getElementById('spDuration')||{}).value)||60;
   const subject = (document.getElementById('spSubject')||{}).value;
   const topic = (document.getElementById('spTopic')||{}).value.trim();
-  if(!subject){ showToast('Pick a subject'); return; }
+  if(!subject||!subject.trim()){ showToast('Enter a subject'); return; }
   if(!D.studyPlan) D.studyPlan=[];
   D.studyPlan.push({id:Date.now(), day, time, duration, subject, topic});
   document.getElementById('spTopic').value='';
@@ -16083,6 +16094,10 @@ function renderStudyPlan(){
       </div>`).join(''):`<div style="font-size:.45rem;color:var(--tx2);text-align:center;padding:.5rem 0;">Free</div>`}
     </div>`;
   }).join('');
+
+  // Show/hide empty tip
+  const spTip = document.getElementById('spEmptyTip');
+  if(spTip) spTip.style.display = (D.studyPlan&&D.studyPlan.length) ? 'none' : 'block';
 
   // Upcoming deadlines
   const deadEl = document.getElementById('upcomingDeadlines'); if(!deadEl) return;
