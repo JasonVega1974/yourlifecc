@@ -24907,12 +24907,18 @@ function ttType(val){
     TT.go=true; TT.t0=Date.now();
     TT.tid=setInterval(ttTick,300);
   }
+  // cap input at passage length
+  if(val.length > TT.passage.length){
+    val = val.substring(0, TT.passage.length);
+    var inp=ttG('tt-input'); if(inp) inp.value=val;
+  }
   TT.tot=Math.max(TT.tot,val.length);
   var e=0; for(var i=0;i<val.length;i++){if(val[i]!==TT.passage[i])e++;}
   TT.err=e;
   ttDraw(val);
   ttTick();
-  if(val===TT.passage) ttFinish(val);
+  // finish when all characters typed
+  if(val.length >= TT.passage.length) ttFinish(val);
 }
 function ttTick(){
   if(!TT.t0) return;
@@ -24931,9 +24937,12 @@ function ttFinish(val){
   TT.on=false;
   var inp=ttG('tt-input'); if(inp){inp.disabled=true;inp.style.borderColor='rgba(52,211,153,.5)';}
   var secs=Math.max(1,(Date.now()-TT.t0)/1000);
+  // count errors against passage (not typed length)
+  var errs=0;
+  for(var i=0;i<TT.passage.length;i++){if((val[i]||'')!==TT.passage[i])errs++;}
   var words=TT.passage.trim().split(' ').length;
   var wpm=Math.round((words/secs)*60);
-  var acc=TT.tot>0?Math.round(((TT.tot-TT.err)/TT.tot)*100):100;
+  var acc=Math.max(0,Math.round(((TT.passage.length-errs)/TT.passage.length)*100));
   var diff='medium'; var sel=ttG('tt-diff'); if(sel) diff=sel.value;
   var grade=wpm>=80&&acc>=95?'S':wpm>=60&&acc>=90?'A':wpm>=45&&acc>=85?'B':wpm>=30?'C':'D';
   var msgs={S:'Outstanding! Top-tier speed and accuracy.',A:'Excellent! Strong typing skills.',B:'Good work — keep pushing your speed.',C:'Decent — accuracy first, speed follows.',D:'Keep at it — every test makes you better!'};
@@ -24942,13 +24951,16 @@ function ttFinish(val){
     D.ttBests[diff]={wpm:wpm,acc:acc,secs:Math.round(secs),date:new Date().toLocaleDateString()};
     save();
   }
+  // final draw showing all chars colored
+  ttDraw(val);
   var w=ttG('tt-wpm'); if(w) w.textContent=wpm;
   var a=ttG('tt-acc'); if(a) a.textContent=acc+'%';
   var t=ttG('tt-time'); if(t) t.textContent=Math.round(secs)+'s';
+  var e=ttG('tt-err'); if(e) e.textContent=errs;
   var gr=ttG('tt-grade'); if(gr) gr.textContent=grade;
   var mg=ttG('tt-msg'); if(mg) mg.textContent=wpm+' WPM · '+acc+'% accuracy · '+Math.round(secs)+'s — '+msgs[grade];
   var res=ttG('tt-result'); if(res) res.style.display='block';
-  var st=ttG('tt-status'); if(st) st.textContent='Complete!';
+  var st=ttG('tt-status'); if(st) st.textContent='Complete! ✓';
   ttBests();
 }
 function ttBests(){
