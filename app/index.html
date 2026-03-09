@@ -7375,8 +7375,13 @@ async function authSubmit(){
   const pass = (document.getElementById('authPassword')||{}).value;
   const confirm = (document.getElementById('authConfirm')||{}).value;
   const tab = document.getElementById('authBtn').dataset.tab || 'login';
+  const isSignup = tab === 'signup';
 
   if(!email || !pass){ authSetMsg('Please enter email and password.'); return; }
+  if(isSignup){
+    const termsChecked = document.getElementById('authTermsCheck')?.checked;
+    if(!termsChecked){ authSetMsg('Please read and agree to the Terms of Service and Privacy Policy to create an account.'); return; }
+  }
   if(pass.length < 6){ authSetMsg('Password must be at least 6 characters.'); return; }
   if(tab === 'signup' && pass !== confirm){ authSetMsg('Passwords do not match.'); return; }
 
