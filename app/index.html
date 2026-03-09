@@ -7098,7 +7098,16 @@ function showSaved(){
 // ── CLOUD ────────────────────────────────────────────────────
 function setSyncSt(s){ 
   const labels={loading:['⟳','#888'],cloud:['☁ Cloud Saved','var(--gr)'],local:['💾 Local Only','var(--tx2)']};
-  const[t,col]=labels[s]||labels.local; 
+  var t,col; var base=labels[s]||labels.local;
+  t=base[0]; col=base[1];
+  if(s==='cloud'){
+    const last=localStorage.getItem('lifeos_last_sync');
+    if(last){
+      const mins=Math.round((Date.now()-parseInt(last))/60000);
+      const timeStr=mins<1?'just now':mins<60?mins+'m ago':Math.round(mins/60)+'h ago';
+      t='☁ Saved · '+timeStr;
+    }
+  }
   ['syncSt','syncSt2'].forEach(function(id){var el=document.getElementById(id);if(el){el.textContent=t;el.style.color=col;}});
   var emailEl=document.getElementById('authUserEmail');
   if(emailEl) emailEl.textContent=_supaUser?_supaUser.email:'';
@@ -7271,6 +7280,7 @@ async function cloudSync(){
     }, { onConflict: 'user_id' }).select();
     console.log('[LifeOS Sync] Result - error:', error, 'data:', data);
     setSyncSt(error ? 'local' : 'cloud');
+    if(!error) localStorage.setItem('lifeos_last_sync', Date.now());
     if(error) console.error('[LifeOS Sync] Upsert error details:', JSON.stringify(error));
   } catch(e){ 
     console.error('[LifeOS Sync] Exception:', e); 
@@ -7291,6 +7301,7 @@ async function cloudLoad(){
     for(const k of Object.keys(DEF)){ if(k in saved) D[k] = saved[k]; }
     // Never hide sections added after initial registration
     if(D.sections){ ['cbt','resume'].forEach(s=>{ delete D.sections[s]; }); }
+    localStorage.setItem('lifeos_last_sync', Date.now());
     return true;
   } catch(e){ return false; }
 }
