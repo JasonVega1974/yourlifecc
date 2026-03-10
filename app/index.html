@@ -24900,21 +24900,24 @@ function googleTranslateElementInit(){
 }
 
 function doTranslateLP(langCode){
-  const drop = document.getElementById('langPickerDropdownLP') || document.getElementById('langPickerDropdown');
+  // Close any open picker
+  const drop = document.getElementById('langPickerDropdown') || document.getElementById('langPickerDropdownLP');
   if(drop) drop.style.display='none';
-  if(langCode === 'en'){
-    document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + location.hostname;
-    document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.' + location.hostname;
-    location.reload();
-    return;
-  }
-  const tryGT = () => {
-    const sel = document.querySelector('.goog-te-combo');
-    if(sel){ sel.value = langCode; sel.dispatchEvent(new Event('change')); return true; }
-    return false;
+
+  // Clear existing googtrans cookies first
+  const clearCookie = (name, domain) => {
+    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;' + (domain ? ' domain='+domain+';' : '');
   };
-  if(!tryGT()){ let n=0; const t=setInterval(()=>{ n++; if(tryGT()||n>20) clearInterval(t); },150); }
+  clearCookie('googtrans', '');
+  clearCookie('googtrans', location.hostname);
+  clearCookie('googtrans', '.' + location.hostname);
+
+  if(langCode !== 'en'){
+    // Set new language cookie
+    document.cookie = 'googtrans=/en/' + langCode + '; path=/;';
+    document.cookie = 'googtrans=/en/' + langCode + '; path=/; domain=' + location.hostname + ';';
+  }
+  location.reload();
 }
   closeLangPicker();
 }
