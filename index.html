@@ -254,7 +254,46 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
 .compare-note{font-size:.7rem;color:var(--tx3);margin-top:1rem;text-align:center;font-style:italic;}
 .compare-cta{text-align:center;margin-top:3rem;font-size:1.05rem;color:var(--tx2);}
 
+
+
+  50%      { box-shadow:0 0 22px rgba(6,214,160,.55),0 0 55px rgba(6,214,160,.28),0 0 80px rgba(6,214,160,.12); }
+}
+
+.lang-badge {
+  display:inline-flex;
+  align-items:center;
+  gap:.5rem;
+  background:linear-gradient(135deg,rgba(251,191,36,.15),rgba(245,166,35,.08));
+  border:1.5px solid rgba(251,191,36,.6);
+  border-radius:100px;
+  padding:.6rem 1.8rem;
+  font-size:.88rem;
+  color:#fbbf24;
+  font-weight:800;
+  letter-spacing:.02em;
+  text-shadow:0 0 14px rgba(251,191,36,.7);
+  animation:langPulse 2s ease-in-out infinite;
+}
+@keyframes langPulse {
+  0%,100% {
+    box-shadow:0 0 8px rgba(251,191,36,.3),0 0 20px rgba(251,191,36,.12);
+    border-color:rgba(251,191,36,.5);
+  }
+  50% {
+    box-shadow:0 0 20px rgba(251,191,36,.7),0 0 50px rgba(251,191,36,.35),0 0 80px rgba(251,191,36,.15);
+    border-color:rgba(251,191,36,.95);
+  }
+}
+
+
+/* Google Translate — app-style lang picker */
+.goog-te-banner-frame{display:none!important;}
+iframe.skiptranslate{display:none!important;}
+body{top:0!important;}
+#goog-gt-tt{display:none!important;}
+#google_translate_element_lp{display:none;}
 </style>
+<script type="text/javascript">window.$crisp=[];window.CRISP_WEBSITE_ID="2d64672d-f810-4298-8a23-0712f5c66f45";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script>
 </head>
 <body>
 
@@ -269,6 +308,13 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
       <a href="#faq">FAQ</a>
       <a href="affiliate.html">Affiliates</a>
       <a href="referral.html">Refer & Earn</a>
+      <div style="position:relative;display:flex;align-items:center;" id="lpWrap">
+        <button onclick="toggleLangPickerLP()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#94a3b8;padding:5px 10px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:inherit;display:flex;align-items:center;gap:.35rem;transition:all .15s;" onmouseenter="this.style.background='rgba(255,255,255,.12)'" onmouseleave="this.style.background='rgba(255,255,255,.06)'" title="Translate">
+          <svg width="14" height="14" viewBox="0 0 24 24" style="flex-shrink:0;"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          <span style="font-size:.68rem;">Language</span>
+        </button>
+        <div id="google_translate_element_lp"></div>
+      </div>
       <a href="app/index.html">Sign In</a>
       <a href="#pricing" class="nav-cta">See Plans &amp; Pricing</a>
     </div>
@@ -287,9 +333,10 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
     <div class="hero-note">Free 3-day trial · Cancel anytime</div>
 
     <div style="display:flex;justify-content:center;margin-bottom:1.8rem;">
-      <div style="display:inline-flex;align-items:center;gap:.5rem;background:rgba(6,214,160,.08);border:1px solid rgba(6,214,160,.2);border-radius:100px;padding:.45rem 1.4rem;font-size:.8rem;color:var(--cyan);font-weight:600;">
+      <div class="lang-badge">
         🌐 Available in 18 Languages — English, Spanish, French, Mandarin, Hindi, Arabic &amp; more
       </div>
+
     </div>
 
     <div class="hero-stats">
@@ -986,18 +1033,104 @@ footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:
     <div class="ft-grid">
       <div class="ft-col"><div style="font-family:var(--fh);font-size:1.3rem;font-weight:800;margin-bottom:.5rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:inline-block;">YourLife CC</div><p style="font-size:.82rem;color:var(--tx3);max-width:280px;">The complete life operating system for the next generation. A product of Kingdom Creatives.</p></div>
       <div class="ft-col"><h4>Product</h4><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#video">Demo</a></div>
-      <div class="ft-col"><h4>Account</h4><a href="#pricing">See Plans &amp; Pricing</a><a href="app/index.html">Sign In</a><a href="#faq">FAQ</a><a href="mailto:info@kingdom-creatives.com" style="color:#f5c842;font-weight:600;">info@kingdom-creatives.com</a></div>
+      <div class="ft-col"><h4>Account</h4><a href="#pricing">See Plans &amp; Pricing</a><a href="app/index.html">Sign In</a><a href="#faq">FAQ</a><a href="<a href="mailto:info@kingdom-creatives.com" style="color:#f5c842;font-weight:600;">info@kingdom-creatives.com</a></div>
       <div class="ft-col"><h4>Legal</h4><a href="affiliate.html">Affiliate Program</a><a href="referral.html">Refer a Family</a><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a><a href="#pricing">30-Day Guarantee</a></div>
     </div>
 
-    <div style="border-top:1px solid rgba(255,255,255,.08);margin-top:2rem;padding-top:2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.5rem;">
-      <div>
-        <p style="font-size:.82rem;color:var(--tx3);margin:0 0 .3rem;">Need help? <a href="mailto:info@kingdom-creatives.com" style="color:#f5c842;font-weight:600;">info@kingdom-creatives.com</a></p>
-        <p style="font-size:.78rem;color:rgba(255,255,255,.25);margin:0;">© 2026 Kingdom Creatives. All rights reserved. YourLife CC is a product of Kingdom Creatives.</p>
-      </div>
-      <span style="font-family:'Orbitron',monospace;font-size:.85rem;font-weight:900;color:#f5c842;letter-spacing:.1em;line-height:1.3;">KINGDOM<br>CREATIVES</span>
+    <div style="border-top:1px solid rgba(255,255,255,.08);margin-top:2rem;padding-top:1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;">
+      <p style="font-size:.78rem;color:var(--tx3);margin:0;">© 2025 YourLife CC · Kingdom Creatives · All rights reserved.</p>
+      <p style="font-size:.78rem;color:var(--tx3);margin:0;">Need help? <a href="mailto:info@kingdom-creatives.com" style="color:#f5c842;font-weight:600;">info@kingdom-creatives.com</a></p>
     </div>
   </div>
 </footer>
+
+<script type="text/javascript">
+const LANGS_LP = [
+  {code:'en',    name:'🇺🇸  English'},
+  {code:'es',    name:'🇪🇸  Spanish'},
+  {code:'fr',    name:'🇫🇷  French'},
+  {code:'de',    name:'🇩🇪  German'},
+  {code:'pt',    name:'🇧🇷  Portuguese'},
+  {code:'it',    name:'🇮🇹  Italian'},
+  {code:'pl',    name:'🇵🇱  Polish'},
+  {code:'ru',    name:'🇷🇺  Russian'},
+  {code:'ar',    name:'🇸🇦  Arabic'},
+  {code:'hi',    name:'🇮🇳  Hindi'},
+  {code:'zh-CN', name:'🇨🇳  Chinese (Simplified)'},
+  {code:'zh-TW', name:'🇹🇼  Chinese (Traditional)'},
+  {code:'ko',    name:'🇰🇷  Korean'},
+  {code:'ja',    name:'🇯🇵  Japanese'},
+  {code:'vi',    name:'🇻🇳  Vietnamese'},
+  {code:'tl',    name:'🇵🇭  Filipino'},
+  {code:'sw',    name:'🇰🇪  Swahili'},
+  {code:'ha',    name:'🇳🇬  Hausa'},
+];
+
+function googleTranslateElementInit(){
+  new google.translate.TranslateElement({
+    pageLanguage:'en',
+    includedLanguages:'en,es,fr,de,pt,it,pl,ru,ar,hi,zh-CN,zh-TW,ko,ja,vi,tl,sw,ha',
+    autoDisplay:false
+  },'google_translate_element_lp');
+}
+
+function doTranslateLP(langCode){
+  if(langCode === 'en'){
+    document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + location.hostname;
+  } else {
+    const val = '/en/' + langCode;
+    document.cookie = 'googtrans=' + val + '; path=/;';
+    document.cookie = 'googtrans=' + val + '; path=/; domain=' + location.hostname;
+  }
+  location.reload();
+}
+
+function buildLangPickerLP(){
+  let el = document.getElementById('langPickerDropdownLP');
+  if(el) el.remove();
+  el = document.createElement('div');
+  el.id = 'langPickerDropdownLP';
+  el.style.cssText = `
+    position:fixed;z-index:2147483647;isolation:isolate;
+    background:#0d1421;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:12px;
+    padding:6px;
+    width:210px;
+    box-shadow:0 16px 48px rgba(0,0,0,.9);
+    display:none;
+    max-height:380px;
+    overflow-y:auto;
+  `;
+  el.innerHTML = LANGS_LP.map(l => `
+    <div onclick="doTranslateLP('${l.code}')"
+      style="padding:7px 12px;border-radius:8px;cursor:pointer;transition:all .12s;"
+      onmouseenter="this.style.background='rgba(255,255,255,.08)'"
+      onmouseleave="this.style.background=''">
+      <span style="font-size:.75rem;font-weight:700;font-family:inherit;color:#d4e8f8;letter-spacing:.3px;">${l.name}</span>
+    </div>`).join('');
+  document.body.appendChild(el);
+  document.addEventListener('click', function closeLP(e){
+    if(!el.contains(e.target) && !e.target.closest('#lpWrap')){
+      el.style.display = 'none';
+    }
+  });
+}
+
+function toggleLangPickerLP(){
+  buildLangPickerLP();
+  const el = document.getElementById('langPickerDropdownLP');
+  if(el.style.display === 'block'){ el.style.display='none'; return; }
+  const anchor = document.getElementById('lpWrap');
+  const r = anchor.getBoundingClientRect();
+  el.style.top = (r.bottom + 6) + 'px';
+  const left = Math.max(8, Math.min(r.right - 218, window.innerWidth - 226));
+  el.style.left = left + 'px';
+  el.style.display = 'block';
+}
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
 </body>
 </html>
