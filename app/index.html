@@ -6261,6 +6261,101 @@ body{top:0!important;}
 
 
 
+
+<!-- ══════════════════════ REFERRAL SECTION ═══════════════════ -->
+<section id="s-referral" class="sec">
+  <div class="sec-hdr">
+    <div class="sec-title">🤝 Refer &amp; Earn</div>
+    <div class="sec-sub">Share YourLife CC with another family — you get $10 cash, they get $10 off.</div>
+  </div>
+
+  <!-- Double reward cards -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.4rem;">
+    <div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.22);border-radius:14px;padding:1.2rem;text-align:center;">
+      <div style="font-size:.58rem;font-weight:800;letter-spacing:.14em;color:#22c55e;margin-bottom:.3rem;">YOU EARN</div>
+      <div style="font-size:2.4rem;font-weight:900;color:#22c55e;font-family:var(--fn);line-height:1;">$10</div>
+      <div style="font-size:.72rem;color:var(--tx2);margin-top:.25rem;">Venmo or PayPal</div>
+    </div>
+    <div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.22);border-radius:14px;padding:1.2rem;text-align:center;">
+      <div style="font-size:.58rem;font-weight:800;letter-spacing:.14em;color:#22c55e;margin-bottom:.3rem;">FRIEND SAVES</div>
+      <div style="font-size:2.4rem;font-weight:900;color:#22c55e;font-family:var(--fn);line-height:1;">$10</div>
+      <div style="font-size:.72rem;color:var(--tx2);margin-top:.25rem;">off first payment</div>
+    </div>
+  </div>
+
+  <!-- Referral link -->
+  <div style="background:var(--card);border:1px solid rgba(56,189,248,.2);border-radius:14px;padding:1.2rem;margin-bottom:1.2rem;">
+    <div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;color:var(--c);margin-bottom:.55rem;">YOUR REFERRAL LINK</div>
+    <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.7rem;">
+      <div id="refLinkDisplay" style="flex:1;font-family:monospace;font-size:.8rem;color:#38bdf8;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.5rem .7rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">yourlife.cc/register?ref=...</div>
+      <button onclick="copyRefLink()" id="refCopyBtn" style="flex-shrink:0;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.22);color:#38bdf8;font-size:.72rem;font-weight:700;padding:.45rem .85rem;border-radius:8px;cursor:pointer;font-family:var(--fn);">Copy</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.55rem;">
+      <button onclick="refShareSMS()" style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:#22c55e;padding:.6rem;border-radius:9px;font-size:.76rem;font-weight:700;cursor:pointer;font-family:var(--fn);">💬 Text a Friend</button>
+      <button onclick="refShareEmail()" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.15);color:#38bdf8;padding:.6rem;border-radius:9px;font-size:.76rem;font-weight:700;cursor:pointer;font-family:var(--fn);">✉️ Send Email</button>
+    </div>
+  </div>
+
+  <!-- Discount code reminder -->
+  <div style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:12px;padding:.95rem 1.1rem;margin-bottom:1.2rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+    <div style="flex:1;min-width:140px;">
+      <div style="font-size:.7rem;font-weight:700;color:#fbbf24;margin-bottom:.2rem;">💡 Tell your friend to use code:</div>
+      <div style="font-family:var(--fn);font-size:1.4rem;font-weight:900;color:#fbbf24;letter-spacing:.2em;">REFER10</div>
+      <div style="font-size:.7rem;color:var(--tx2);margin-top:.2rem;">Entered at checkout · $10 off any plan</div>
+    </div>
+    <button onclick="copyRefCode('REFER10',this)" style="flex-shrink:0;font-size:.7rem;font-weight:700;color:#fbbf24;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.22);border-radius:8px;padding:.4rem .9rem;cursor:pointer;font-family:var(--fn);">Copy Code</button>
+  </div>
+
+  <!-- Stats -->
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.2rem;margin-bottom:1.2rem;">
+    <div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;color:var(--tx2);margin-bottom:.7rem;">YOUR REFERRAL STATS</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin-bottom:.6rem;">
+      <div style="text-align:center;background:rgba(255,255,255,.03);border-radius:10px;padding:.7rem;">
+        <div id="refStatTotal" style="font-size:1.7rem;font-weight:900;color:var(--tx);font-family:var(--fn);">0</div>
+        <div style="font-size:.62rem;color:var(--tx2);margin-top:.15rem;">Referrals</div>
+      </div>
+      <div style="text-align:center;background:rgba(255,255,255,.03);border-radius:10px;padding:.7rem;">
+        <div id="refStatEarned" style="font-size:1.7rem;font-weight:900;color:#22c55e;font-family:var(--fn);">$0</div>
+        <div style="font-size:.62rem;color:var(--tx2);margin-top:.15rem;">Earned</div>
+      </div>
+      <div style="text-align:center;background:rgba(255,255,255,.03);border-radius:10px;padding:.7rem;">
+        <div id="refStatPending" style="font-size:1.7rem;font-weight:900;color:#fbbf24;font-family:var(--fn);">$0</div>
+        <div style="font-size:.62rem;color:var(--tx2);margin-top:.15rem;">Pending</div>
+      </div>
+    </div>
+    <div style="font-size:.7rem;color:var(--tx3);text-align:center;">Stats update as referrals are confirmed · Paid monthly on the 1st</div>
+  </div>
+
+  <!-- How it works -->
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.2rem;margin-bottom:1.2rem;">
+    <div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;color:var(--tx2);margin-bottom:.7rem;">HOW IT WORKS</div>
+    <div style="display:flex;flex-direction:column;gap:.6rem;">
+      <div style="display:flex;gap:.7rem;align-items:flex-start;">
+        <div style="width:22px;height:22px;min-width:22px;border-radius:50%;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.2);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:900;color:var(--c);">1</div>
+        <div style="font-size:.8rem;color:var(--tx2);">Share your referral link above by text, email, or social media.</div>
+      </div>
+      <div style="display:flex;gap:.7rem;align-items:flex-start;">
+        <div style="width:22px;height:22px;min-width:22px;border-radius:50%;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.2);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:900;color:var(--c);">2</div>
+        <div style="font-size:.8rem;color:var(--tx2);">Your friend signs up and uses code <strong style="color:#fbbf24;">REFER10</strong> at checkout for $10 off.</div>
+      </div>
+      <div style="display:flex;gap:.7rem;align-items:flex-start;">
+        <div style="width:22px;height:22px;min-width:22px;border-radius:50%;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.2);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:900;color:var(--c);">3</div>
+        <div style="font-size:.8rem;color:var(--tx2);">After 30 days we verify the referral and send you <strong style="color:#22c55e;">$10 cash</strong> via Venmo or PayPal on the 1st.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payout setup -->
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1rem 1.1rem;">
+    <div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;color:var(--tx2);margin-bottom:.5rem;">SET UP YOUR PAYOUT</div>
+    <div style="font-size:.78rem;color:var(--tx2);line-height:1.65;">
+      Email <a href="mailto:info@kingdom-creatives.com" style="color:var(--c);">info@kingdom-creatives.com</a> with your name, Venmo/PayPal handle, and subject <em>"Referral Payout Setup"</em> to register your payout method before your first referral is confirmed.
+    </div>
+  </div>
+
+</section>
+
+
 <!-- ══════════════════════ TUTORIAL MODAL ═══════════════════ -->
 <div id="tutModal">
 <div id="tutInner">
@@ -8348,6 +8443,7 @@ const NAV_ITEMS = [
     {id:'s-reading',   icon:'📖', label:'Reading List',   key:'reading'},
     {id:'s-milestones',icon:'🗺️', label:'Milestones',     key:'milestones'},
   ]},
+  {id:'s-referral',  icon:'🤝', label:'Refer & Earn',   key:'referral'},
 
 ];
 let _activeSection = 's-hero';
@@ -8446,6 +8542,7 @@ function toggleNavGroup(label){
 }
 
 function showSection(id, fromMobile){
+  if(id==='s-referral') setTimeout(initReferralTab,50);
   // Hide all, show target
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
   const target = document.getElementById(id);
@@ -25011,6 +25108,54 @@ function applyChildAvatar(){
   }
 }
 
+
+
+// ══════════════ REFERRAL TAB ══════════════
+function initReferralTab(){
+  const rawName = (D.parentName || D.familyId || 'family').replace(/[^a-zA-Z0-9]/g,'');
+  const refCode = rawName.toUpperCase().substring(0,10) || 'FRIEND';
+  const refLink = 'yourlife.cc/register?ref=' + refCode;
+  const el = document.getElementById('refLinkDisplay');
+  if(el) el.textContent = refLink;
+  const fid = D.familyId || 'local';
+  let stats = {total:0,earned:0,pending:0};
+  try{ const s = localStorage.getItem('ref_stats_'+fid); if(s) stats=JSON.parse(s); }catch(e){}
+  const t=document.getElementById('refStatTotal');
+  const e=document.getElementById('refStatEarned');
+  const p=document.getElementById('refStatPending');
+  if(t) t.textContent=stats.total;
+  if(e) e.textContent='$'+stats.earned;
+  if(p) p.textContent='$'+stats.pending;
+}
+function copyRefLink(){
+  const el=document.getElementById('refLinkDisplay');
+  if(!el) return;
+  const link='https://'+el.textContent.replace(/^https?:\/\//,'');
+  navigator.clipboard.writeText(link).then(()=>{
+    const btn=document.getElementById('refCopyBtn');
+    if(btn){btn.textContent='✓ Copied!';btn.style.color='#22c55e';}
+    setTimeout(()=>{if(btn){btn.textContent='Copy';btn.style.color='#38bdf8';}},2000);
+  });
+}
+function refShareSMS(){
+  const el=document.getElementById('refLinkDisplay');
+  const link='https://'+(el?el.textContent:'yourlife.cc/register');
+  const msg=encodeURIComponent("Hey! Check out YourLife CC — great for family chores, goals & school tracking. Get $10 off with code REFER10: "+link);
+  window.location.href='sms:?body='+msg;
+}
+function refShareEmail(){
+  const el=document.getElementById('refLinkDisplay');
+  const link='https://'+(el?el.textContent:'yourlife.cc/register');
+  const sub=encodeURIComponent("Check out YourLife CC — and get $10 off");
+  const body=encodeURIComponent("Hey!\n\nI've been using YourLife CC with my family — it's great for chores, goals, school tracking, and more.\n\nUse my link to sign up and get $10 off any plan with code REFER10:\n\n"+link+"\n\nHope your family loves it!");
+  window.location.href='mailto:?subject='+sub+'&body='+body;
+}
+function copyRefCode(code,btn){
+  navigator.clipboard.writeText(code).then(()=>{
+    if(btn){btn.textContent='✓ Copied!';}
+    setTimeout(()=>{if(btn)btn.textContent='Copy Code';},2000);
+  });
+}
 
 </script>
 <!-- GLOBAL LESSON MODAL -->
