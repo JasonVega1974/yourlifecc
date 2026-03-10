@@ -24969,13 +24969,11 @@ function closeLangPicker(){
 }
 
 function toggleMobTranslate(){
-  const btn = document.querySelector('#mobileQuickRow .mqb-lang');
-  toggleLangPicker(btn || document.body);
+  toggleLangPicker(document.querySelector('.mqb-lang'));
 }
 
 function toggleTranslateDropdown(){
-  const btn = document.getElementById('translateWrap');
-  toggleLangPicker(btn || document.body);
+  toggleLangPicker(document.querySelector('#translateWrap button'));
 }
 
 // ── CHILD AVATAR PICKER ──────────────────────────────────────
