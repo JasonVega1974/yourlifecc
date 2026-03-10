@@ -24899,25 +24899,23 @@ function googleTranslateElementInit(){
   },'google_translate_element');
 }
 
-function doTranslate(langCode){
-  // Set the googtrans cookie and reload — most reliable method
+function doTranslateLP(langCode){
+  const drop = document.getElementById('langPickerDropdownLP') || document.getElementById('langPickerDropdown');
+  if(drop) drop.style.display='none';
   if(langCode === 'en'){
-    // Remove translation
     document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + location.hostname;
-  } else {
-    const val = '/en/' + langCode;
-    document.cookie = 'googtrans=' + val + '; path=/';
-    document.cookie = 'googtrans=' + val + '; path=/; domain=' + location.hostname;
-  }
-  // Trigger via the hidden select if available, else reload
-  const sel = document.querySelector('#google_translate_element select, .goog-te-combo');
-  if(sel){
-    sel.value = langCode;
-    sel.dispatchEvent(new Event('change'));
-  } else {
+    document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.' + location.hostname;
     location.reload();
+    return;
   }
+  const tryGT = () => {
+    const sel = document.querySelector('.goog-te-combo');
+    if(sel){ sel.value = langCode; sel.dispatchEvent(new Event('change')); return true; }
+    return false;
+  };
+  if(!tryGT()){ let n=0; const t=setInterval(()=>{ n++; if(tryGT()||n>20) clearInterval(t); },150); }
+}
   closeLangPicker();
 }
 
