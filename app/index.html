@@ -24937,11 +24937,11 @@ function buildLangPicker(){
     overflow-y:auto;
   `;
   el.innerHTML = LANGS.map(l => `
-    <div onclick="doTranslate('${l.code}')"
+    <div onclick="doTranslateLP('${l.code}')"
       style="padding:7px 12px;border-radius:8px;cursor:pointer;transition:all .12s;"
       onmouseenter="this.style.background='rgba(255,255,255,.08)'"
       onmouseleave="this.style.background=''">
-      <span style="font-size:.68rem;font-weight:700;font-family:var(--fn);color:#d4e8f8;letter-spacing:.3px;">${l.name}</span>
+      <span style="font-size:.68rem;font-weight:700;font-family:var(--fn);color:#d4e8f8;letter-spacing:.3px;">${l.label} ${l.name}</span>
     </div>`).join('');
   document.body.appendChild(el);
   document.addEventListener('click', function closeOnOutside(e){
