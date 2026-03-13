@@ -7088,7 +7088,23 @@ body{top:0!important;}
 <div class="ob-box">
   <div class="ob-slides-wrap"><div class="ob-slides" id="pobSlides">
 
-    <!-- SLIDE 0: WELCOME -->
+    <!-- SLIDE 0: ADD CHILD (first action) -->
+    <div class="ob-slide">
+      <div class="ob-hero">
+        <span class="ob-hero-emoji">👶</span>
+        <div class="ob-hero-title">FIRST THING FIRST</div>
+        <div class="ob-hero-sub">Add your child now so they can log in on their own device. It only takes 10 seconds.</div>
+      </div>
+      <ul class="ob-checklist">
+        <li><div class="obc-n">1</div><div>You're already in the <b>Parent Hub</b>. Click <b>👥 Manage Users</b> in the left menu.</div></li>
+        <li><div class="obc-n">2</div><div>Type your child's name in the <b>Child's Name</b> field and tap <b>👶 Add Child</b>. A 4-digit PIN is auto-generated — write it down.</div></li>
+        <li><div class="obc-n">3</div><div>Repeat for each child. Then share their PIN so they can tap <b>👤 Child Login</b> at the top of the screen.</div></li>
+      </ul>
+      <button onclick="closeParentOnboard(); setTimeout(()=>{ showSection('s-parent'); if(!_parentDashUnlocked) _doUnlockParent(); setTimeout(()=>phNav('users'),300); }, 200);" style="width:100%;margin-top:.6rem;background:linear-gradient(135deg,#38bdf8,#818cf8);color:#06101e;border:none;border-radius:10px;padding:.7rem 1rem;font-size:.88rem;font-weight:900;cursor:pointer;font-family:var(--fn);box-shadow:0 4px 16px rgba(56,189,248,.35);">👥 Go Add a Child Now →</button>
+      <div class="ob-tip" style="margin-top:.6rem;">💡 <strong>Already added your kids?</strong> Tap Next to continue the setup guide.</div>
+    </div>
+
+    <!-- SLIDE 1: WELCOME -->
     <div class="ob-slide">
       <div class="ob-hero">
         <span class="ob-hero-emoji">👋</span>
@@ -14766,7 +14782,7 @@ function applyTheme(){
 // PARENT ONBOARDING WIZARD
 // ══════════════════════════════════════════════════════════
 let _pobStep = 0;
-const POB_TOTAL = 6;
+const POB_TOTAL = 7;
 
 function initPobDots(){
   const d = document.getElementById('pobDots'); if(!d) return;
@@ -14798,14 +14814,17 @@ function showParentOnboard(){
   const modal = document.getElementById('parentOnboard');
   if(!modal){ alert('Wizard not found — please refresh the page'); return; }
   // Force show with both inline style AND class (belt AND suspenders)
-  modal.style.cssText = 'display:flex !important; position:fixed; inset:0; z-index:99998; background:rgba(0,0,0,.93); align-items:center; justify-content:center; padding:1rem;';
+  modal.style.cssText = '';
   modal.classList.add('open');
   document.body.style.overflow='hidden';
+  // Mark as seen immediately so it never auto-shows again after this visit
+  D.parentWizardDone = true; save();
 }
 function closeParentOnboard(){
   const modal = document.getElementById('parentOnboard'); if(!modal) return;
   modal.classList.remove('open');
-  modal.style.display='none';
+  modal.style.cssText = '';
+  modal.style.display = 'none';
   document.body.style.overflow='';
   D.parentWizardDone = true; save();
   // Hide the bouncing button permanently
@@ -18328,7 +18347,7 @@ function clSelectChild(id){
   const p=_profiles.find(x=>x.id===id); if(!p) return;
   _clSelectedId=id; _childPinBuffer='';
   updateChildPinDots();
-  document.getElementById('childLoginMsg').textContent='';
+  const msgEl=document.getElementById('childLoginMsg'); if(msgEl) msgEl.textContent='';
   const colors=['#4f8fff','#06d6a0','#f5a623','#f472b6','#a78bfa','#22d3ee','#ef4444'];
   const idx=_profiles.filter(x=>!x.isParent).findIndex(x=>x.id===id);
   const c=colors[idx%colors.length];
@@ -18375,7 +18394,7 @@ function validateChildPin(){
     switchToProfile(p.id);
     showToast('Welcome, '+p.name+'! 👋');
   } else {
-    document.getElementById('childLoginMsg').textContent='Wrong PIN — try again';
+    const msgEl2=document.getElementById('childLoginMsg'); if(msgEl2) msgEl2.textContent='Wrong PIN — try again';
     _childPinBuffer=''; updateChildPinDots();
     const dots=document.getElementById('childPinDots');
     if(dots){dots.style.animation='none';dots.offsetHeight;dots.style.animation='shake .35s ease';}
@@ -25516,4 +25535,19 @@ function copyRefCode(code,btn){
         <button onclick="childPinInput('4')" class="child-pin-btn">4</button>
         <button onclick="childPinInput('5')" class="child-pin-btn">5</button>
         <button onclick="childPinInput('6')" class="child-pin-btn">6</button>
-        <button onclick="c
+        <button onclick="childPinInput('7')" class="child-pin-btn">7</button>
+        <button onclick="childPinInput('8')" class="child-pin-btn">8</button>
+        <button onclick="childPinInput('9')" class="child-pin-btn">9</button>
+        <button onclick="childPinDelete()" class="child-pin-btn" style="font-size:1.1rem;">⌫</button>
+        <button onclick="childPinInput('0')" class="child-pin-btn">0</button>
+        <button onclick="childPinClear()" class="child-pin-btn" style="font-size:.7rem;">CLR</button>
+      </div>
+      <div id="childLoginMsg" style="font-size:.78rem;color:#f87171;min-height:1.2rem;margin-bottom:.6rem;"></div>
+      <button onclick="clGoBack()" style="font-size:.72rem;color:rgba(255,255,255,.3);background:none;border:none;cursor:pointer;">← Back</button>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
