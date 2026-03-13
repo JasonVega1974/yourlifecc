@@ -1961,10 +1961,8 @@ body{top:0!important;}
     <div style="font-family:var(--fh);font-size:1.4rem;letter-spacing:2px;color:var(--c);margin-bottom:.3rem;">LIFE OS</div>
     <div style="font-size:.75rem;color:var(--tx2);margin-bottom:1.8rem;line-height:1.7;">The complete life skills platform for the next generation.</div>
 
-    <!-- Tab toggle -->
-    <div style="display:flex;background:rgba(255,255,255,.05);border-radius:10px;padding:3px;margin-bottom:1.4rem;gap:3px;">
-      <button id="authTabLogin" onclick="authSwitchTab('login')" style="flex:1;padding:.55rem;border:none;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s;background:var(--c);color:#000;">Sign In</button>
-      <button id="authTabSignup" onclick="authSwitchTab('signup')" style="flex:1;padding:.55rem;border:none;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s;background:transparent;color:var(--tx2);">Create Account</button>
+    <div style="text-align:center;margin-bottom:1.4rem;">
+      <div style="font-size:1rem;font-weight:800;color:var(--tx);">Sign In to Your Account</div>
     </div>
 
     <!-- Email -->
@@ -1994,6 +1992,7 @@ body{top:0!important;}
 
     <!-- Primary button -->
     <button id="authBtn" onclick="authSubmit()" style="width:100%;padding:.9rem;background:linear-gradient(135deg,#38bdf8,#4f8fff);border:none;border-radius:12px;color:#000;font-weight:800;font-size:.95rem;cursor:pointer;margin-bottom:.7rem;transition:all .2s;">Sign In</button>
+    <p style="text-align:center;font-size:.78rem;color:var(--tx2);margin-top:.5rem;margin-bottom:.7rem;">Don't have an account? <a href="../index.html#pricing" style="color:var(--c);font-weight:700;">See Plans &amp; Pricing →</a></p>
 
     <!-- Forgot password -->
     <div id="authForgotWrap" style="margin-bottom:.5rem;">
@@ -2007,14 +2006,26 @@ body{top:0!important;}
       <div style="flex:1;height:1px;background:#fff;"></div>
     </div>
 
-    <!-- Continue without account -->
-    <button onclick="authContinueLocal()" style="width:100%;padding:.75rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:var(--tx2);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;">Continue without account (local only)</button>
+
 
     <!-- Status message -->
     <div id="authMsg" style="font-size:.75rem;color:#f87171;margin-top:.8rem;min-height:1.1rem;font-weight:600;"></div>
 
     <!-- Loading spinner overlay -->
     <div id="authLoading" style="display:none;position:absolute;inset:0;background:rgba(5,13,26,.7);border-radius:24px;align-items:center;justify-content:center;font-size:1.5rem;">⟳</div>
+
+  </div>
+</div>
+
+<!-- ── SUBSCRIPTION BLOCKED SCREEN ─────────────────────────── -->
+<div id="subBlockedScreen" style="display:none;position:fixed;inset:0;z-index:9999999;background:linear-gradient(145deg,#050d1a,#0d1b2a);align-items:center;justify-content:center;flex-direction:column;">
+  <div style="max-width:440px;width:90%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:2.5rem 2rem;text-align:center;position:relative;">
+    <div style="font-size:3rem;margin-bottom:1rem;">🔒</div>
+    <div style="font-size:1.25rem;font-weight:800;color:#fff;margin-bottom:.5rem;">Subscription Required</div>
+    <div id="subBlockedMsg" style="font-size:.88rem;color:rgba(255,255,255,.6);margin-bottom:1.5rem;line-height:1.6;">Your subscription is no longer active. Reactivate to continue using Life OS.</div>
+    <a id="subBlockedCTA" href="https://yourlifecc.vercel.app/#pricing" style="display:block;width:100%;padding:.9rem;background:linear-gradient(135deg,#38bdf8,#4f8fff);border:none;border-radius:12px;color:#000;font-weight:800;font-size:.95rem;cursor:pointer;margin-bottom:.75rem;text-decoration:none;box-sizing:border-box;">Reactivate Subscription</a>
+    <button onclick="signOut()" style="width:100%;padding:.75rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:rgba(255,255,255,.6);font-size:.82rem;font-weight:600;cursor:pointer;">Sign Out</button>
+    <div style="font-size:.7rem;color:rgba(255,255,255,.3);margin-top:1.2rem;">Signed in as <span id="subBlockedEmail" style="color:rgba(255,255,255,.5);"></span></div>
   </div>
 </div>
 
@@ -2157,17 +2168,87 @@ body{top:0!important;}
     <button class="btn bgr bs" style="width:100%;margin-top:.4rem;" onclick="addCustomActivity()">Add Activity</button>
   </div>
 
+  <!-- ☁ CLOUD SYNC (Supabase) -->
   <div style="margin-top:1.1rem;padding-top:.9rem;border-top:1px solid rgba(255,255,255,.06);">
     <div style="font-family:var(--fh);font-size:.73rem;letter-spacing:1px;color:#c8d4e8;margin-bottom:.55rem;">☁ CLOUD SYNC</div>
-    <label>WordPress Site URL</label>
-    <input type="url" id="wpUrl" placeholder="https://yoursite.com">
-    <label>Secret Key</label>
-    <input type="text" id="wpKey" placeholder="Paste key here" style="font-size:.75rem;">
-    <div style="display:flex;gap:.4rem;margin-top:.5rem;">
-      <button class="btn bgh bs" onclick="testCloud()">Test</button>
-      <button class="btn bp bs" onclick="saveCloud()">Save &amp; Sync</button>
+    <div id="settingsSyncStatus" style="display:flex;align-items:center;gap:.6rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:.7rem .9rem;margin-bottom:.6rem;">
+      <span id="settingsSyncIcon" style="font-size:1.1rem;">💾</span>
+      <div>
+        <div id="settingsSyncLabel" style="font-size:.78rem;font-weight:700;color:var(--tx);">Local only</div>
+        <div id="settingsSyncSub" style="font-size:.65rem;color:var(--tx3);">Sign in to enable cloud sync</div>
+      </div>
     </div>
-    <div id="cloudMsg" style="font-size:.73rem;margin-top:.38rem;min-height:.9rem;"></div>
+    <div style="display:flex;gap:.4rem;">
+      <button class="btn bgh bs" style="flex:1;font-size:.75rem;" onclick="cloudSync();showToast('Syncing… ☁')">↑ Sync Now</button>
+      <button class="btn bgh bs" style="flex:1;font-size:.75rem;" onclick="cloudLoad().then(()=>showToast('Data refreshed ✓'))">↓ Refresh</button>
+    </div>
+  </div>
+
+  <!-- 💳 MANAGE SUBSCRIPTION -->
+  <div style="margin-top:1.1rem;padding-top:.9rem;border-top:1px solid rgba(255,255,255,.06);">
+    <div style="font-family:var(--fh);font-size:.73rem;letter-spacing:1px;color:#38bdf8;margin-bottom:.55rem;">💳 SUBSCRIPTION</div>
+
+    <!-- Plan status card -->
+    <div id="settingsPlanCard" style="background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.12);border-radius:10px;padding:.75rem .9rem;margin-bottom:.65rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.25rem;">
+        <div style="font-size:.78rem;font-weight:700;color:var(--tx);">Current Plan</div>
+        <div id="settingsPlanBadge" style="font-size:.65rem;font-weight:800;padding:.2rem .55rem;border-radius:20px;background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.25);">Loading…</div>
+      </div>
+      <div id="settingsPlanEmail" style="font-size:.68rem;color:var(--tx3);margin-bottom:.1rem;"></div>
+      <div id="settingsPlanNextBilling" style="font-size:.68rem;color:var(--tx3);"></div>
+    </div>
+
+    <!-- Portal button -->
+    <a href="https://billing.stripe.com/p/login/5kQaEQ52j4r783cftH7wA00" target="_blank"
+       style="display:block;width:100%;padding:.72rem;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);border-radius:10px;color:#38bdf8;font-size:.8rem;font-weight:700;text-align:center;text-decoration:none;margin-bottom:.4rem;box-sizing:border-box;cursor:pointer;">
+      ⚙️ Manage / Cancel Subscription
+    </a>
+    <a href="https://yourlifecc.vercel.app/#pricing" target="_blank"
+       style="display:block;width:100%;padding:.72rem;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.18);border-radius:10px;color:#a78bfa;font-size:.8rem;font-weight:700;text-align:center;text-decoration:none;box-sizing:border-box;cursor:pointer;">
+      ✨ View Plans / Upgrade
+    </a>
+    <div id="settingsPlanLocalNote" style="display:none;font-size:.65rem;color:var(--tx3);margin-top:.5rem;text-align:center;">Sign in to see your subscription details.</div>
+  </div>
+
+  <!-- 🆘 SUPPORT -->
+  <div style="margin-top:1.1rem;padding-top:.9rem;border-top:1px solid rgba(255,255,255,.06);">
+    <div style="font-family:var(--fh);font-size:.73rem;letter-spacing:1px;color:#f59e0b;margin-bottom:.55rem;">🆘 SUPPORT</div>
+
+    <a href="/cdn-cgi/l/email-protection#2940474f46694240474e4d4644044a5b4c485d405f4c5a074a4644" style="display:flex;align-items:center;gap:.6rem;width:100%;padding:.72rem .9rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;color:var(--tx);font-size:.8rem;font-weight:600;text-decoration:none;margin-bottom:.4rem;box-sizing:border-box;">
+      <span style="font-size:1rem;">📧</span>
+      <div>
+        <div style="font-weight:700;font-size:.78rem;">Email Support</div>
+        <div style="font-size:.65rem;color:var(--tx3);"><span class="__cf_email__" data-cfemail="c4adaaa2ab84afadaaa3a0aba9e9a7b6a1a5b0adb2a1b7eaa7aba9">[email&#160;protected]</span></div>
+      </div>
+    </a>
+
+    <a href="https://yourlifecc.vercel.app/faq" target="_blank"
+       style="display:flex;align-items:center;gap:.6rem;width:100%;padding:.72rem .9rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;color:var(--tx);font-size:.8rem;font-weight:600;text-decoration:none;margin-bottom:.4rem;box-sizing:border-box;">
+      <span style="font-size:1rem;">📖</span>
+      <div>
+        <div style="font-weight:700;font-size:.78rem;">Help & FAQ</div>
+        <div style="font-size:.65rem;color:var(--tx3);">Guides, tips, and common questions</div>
+      </div>
+    </a>
+
+    <!-- Bug report -->
+    <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:.75rem .9rem;">
+      <div style="font-size:.75rem;font-weight:700;color:var(--tx);margin-bottom:.5rem;">🐛 Submit a Bug Report</div>
+      <select id="supportBugArea" style="width:100%;margin-bottom:.4rem;padding:.5rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:var(--tx);font-size:.75rem;">
+        <option value="">Select area…</option>
+        <option value="login">Login / Account</option>
+        <option value="sync">Cloud Sync</option>
+        <option value="subscription">Subscription / Billing</option>
+        <option value="school">School Tracker</option>
+        <option value="chores">Chores & Rewards</option>
+        <option value="parent">Parent Hub</option>
+        <option value="content">Lessons / Content</option>
+        <option value="other">Other</option>
+      </select>
+      <textarea id="supportBugDetails" rows="3" placeholder="Describe what happened and what you expected…" style="width:100%;padding:.55rem .7rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:var(--tx);font-size:.75rem;resize:vertical;box-sizing:border-box;font-family:var(--fn);"></textarea>
+      <button class="btn bp" style="width:100%;margin-top:.4rem;font-size:.78rem;" onclick="submitSupportBug()">📤 Send Report</button>
+      <div id="supportBugMsg" style="font-size:.68rem;margin-top:.3rem;min-height:.9rem;text-align:center;"></div>
+    </div>
   </div>
 
   <!-- BETA TESTING FEEDBACK -->
@@ -4932,7 +5013,7 @@ body{top:0!important;}
       <div id="tt-bests"></div>
     </div>
   </div>
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // Typing Test — inline script, co-located with HTML
 (function(){
   var TT = {on:false,go:false,passage:'',t0:null,tid:null,err:0,tot:0};
@@ -6349,7 +6430,7 @@ body{top:0!important;}
   <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1rem 1.1rem;">
     <div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;color:var(--tx2);margin-bottom:.5rem;">SET UP YOUR PAYOUT</div>
     <div style="font-size:.78rem;color:var(--tx2);line-height:1.65;">
-      Email <a href="mailto:info@kingdom-creatives.com" style="color:var(--c);">info@kingdom-creatives.com</a> with your name, Venmo/PayPal handle, and subject <em>"Referral Payout Setup"</em> to register your payout method before your first referral is confirmed.
+      Email <a href="/cdn-cgi/l/email-protection#d4bdbab2bb94bfbdbab3b0bbb9f9b7a6b1b5a0bda2b1a7fab7bbb9" style="color:var(--c);"><span class="__cf_email__" data-cfemail="b0d9ded6dff0dbd9ded7d4dfdd9dd3c2d5d1c4d9c6d5c39ed3dfdd">[email&#160;protected]</span></a> with your name, Venmo/PayPal handle, and subject <em>"Referral Payout Setup"</em> to register your payout method before your first referral is confirmed.
     </div>
   </div>
 
@@ -7240,7 +7321,7 @@ body{top:0!important;}
 </div><!-- /ob-box -->
 </div><!-- /kidOnboard -->
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ── FIRST TIME PARENT PIN SETUP ──────────────────────────────
 function showFirstTimeGate(){
   const el = document.getElementById('firstTimeGate');
@@ -7459,11 +7540,7 @@ function authSwitchTab(tab){
   document.getElementById('authConfirmWrap').style.display = isSignup ? 'block' : 'none';
   document.getElementById('authForgotWrap').style.display = isSignup ? 'none' : 'block';
   document.getElementById('authTermsWrap').style.display = isSignup ? 'block' : 'none';
-  document.getElementById('authBtn').textContent = isSignup ? 'Create Account' : 'Sign In';
-  document.getElementById('authTabLogin').style.background = isSignup ? 'transparent' : 'var(--c)';
-  document.getElementById('authTabLogin').style.color = isSignup ? 'var(--tx2)' : '#000';
-  document.getElementById('authTabSignup').style.background = isSignup ? 'var(--c)' : 'transparent';
-  document.getElementById('authTabSignup').style.color = isSignup ? '#000' : 'var(--tx2)';
+  document.getElementById('authBtn').textContent = 'Sign In';
   document.getElementById('authBtn').dataset.tab = tab;
   document.getElementById('authMsg').textContent = '';
 }
@@ -7480,7 +7557,7 @@ function authSetLoading(on){
 
 async function authSubmit(){
   const supa = getSupabase();
-  if(!supa){ authContinueLocal(); return; }
+  if(!supa){ authSetMsg('Unable to connect. Please try again.'); return; }
 
   const email = (document.getElementById('authEmail')||{}).value?.trim();
   const pass = (document.getElementById('authPassword')||{}).value;
@@ -7511,6 +7588,20 @@ async function authSubmit(){
         return;
       }
       authSetMsg('Account created! Check your email to confirm, or continue now.', 'var(--gr)');
+      // Save referral code if present
+      const refCode = getRefCookie();
+      if(refCode && result.data?.user){
+        try {
+          const supaInst = getSupabase();
+          await supaInst.from('profiles').upsert({
+            user_id: result.data.user.id,
+            email: result.data.user.email,
+            referred_by: refCode,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id' });
+          clearRefCookie();
+        } catch(e){ console.log('Ref save failed:', e); }
+      }
       // Auto continue after signup
       _supaUser = result.data.user;
       setTimeout(() => authComplete(false), 1200);
@@ -7530,6 +7621,16 @@ async function authSubmit(){
   }
 }
 
+
+// ── REFERRAL TRACKING ────────────────────────────────────────
+function getRefCookie(){
+  const match = document.cookie.match(/(?:^|;\s*)ylref=([^;]*)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+function clearRefCookie(){
+  document.cookie = 'ylref=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+}
+
 async function authForgotPassword(){
   const supa = getSupabase();
   if(!supa){ authSetMsg('Not connected.'); return; }
@@ -7542,7 +7643,55 @@ async function authForgotPassword(){
   else authSetMsg('Password reset email sent!', 'var(--gr)');
 }
 
+// ── SUBSCRIPTION GATE ─────────────────────────────────────────
+async function checkPlanStatus(){
+  const supa = getSupabase();
+  if(!supa || !_supaUser) return false; // local-only users pass through
+
+  try {
+    const { data, error } = await supa
+      .from('profiles')
+      .select('plan_status')
+      .eq('user_id', _supaUser.id)
+      .single();
+
+    if(error || !data) return false; // no record yet = new user, let through
+
+    const status = data.plan_status;
+    // Block cancelled and past_due; allow active, trialing, null/undefined (legacy/free)
+    if(status === 'cancelled' || status === 'past_due'){
+      document.getElementById('authScreen').style.display = 'none';
+      authSetLoading(false);
+
+      const msgEl = document.getElementById('subBlockedMsg');
+      const emailEl = document.getElementById('subBlockedEmail');
+      if(emailEl) emailEl.textContent = _supaUser.email || '';
+      if(msgEl){
+        if(status === 'past_due'){
+          msgEl.textContent = 'Your last payment failed and your subscription is past due. Please update your payment method to continue.';
+          const cta = document.getElementById('subBlockedCTA');
+          if(cta){ cta.textContent = 'Update Payment Method'; cta.href = 'https://billing.stripe.com/p/login/5kQaEQ52j4r783cftH7wA00'; }
+        } else {
+          msgEl.textContent = 'Your subscription has been cancelled. Reactivate anytime to pick up right where you left off — your data is saved.';
+        }
+      }
+      document.getElementById('subBlockedScreen').style.display = 'flex';
+      return true; // blocked
+    }
+    return false; // active / trialing / unknown = allow
+  } catch(e){
+    console.warn('[LifeOS] Plan status check failed, allowing through:', e);
+    return false; // fail open — don't lock out on network errors
+  }
+}
+
 async function authComplete(isReturningUser){
+  // ── CHECK SUBSCRIPTION STATUS ──────────────────────────────
+  if(_supaUser){
+    const blocked = await checkPlanStatus();
+    if(blocked) return; // blocked screen is shown, stop here
+  }
+
   // Try to load cloud data for returning users
   const loaded = isReturningUser ? await cloudLoad() : false;
   // Force-strip hidden sections that should always be visible
@@ -7593,6 +7742,7 @@ async function signOut(){
   localStorage.removeItem('lifeos_parent_unlocked');
   localStorage.removeItem('lifeos_pin_set');
   sessionStorage.removeItem('parentUnlocked');
+  document.getElementById('subBlockedScreen').style.display = 'none';
   document.getElementById('authScreen').style.display = 'flex';
   setSyncSt('local');
 }
@@ -7659,8 +7809,8 @@ async function cloudLoad(){
 // Legacy - kept for settings page compatibility
 function getCC(){ return null; }
 
-function saveCloud(){ const u=(document.getElementById('wpUrl').value||'').trim(),k=(document.getElementById('wpKey').value||'').trim(); if(!u||!k){showToast('Enter URL and key');return;} localStorage.setItem(CU,u); localStorage.setItem(CK,k); closeSettings(); showToast('Cloud sync saved! ☁'); cloudSync(); }
-async function testCloud(){ const u=(document.getElementById('wpUrl').value||'').trim(),k=(document.getElementById('wpKey').value||'').trim(),el=document.getElementById('cloudMsg'); if(!u||!k){el.textContent='Enter URL and key';return;} el.textContent='Testing...'; try{ const r=await fetch(u.replace(/\/$/,'')+'/wp-json/dd/v1/sync?action=ping',{headers:{'X-DD-Key':k}}); const j=await r.json(); el.style.color=j?.success?'var(--gr)':'var(--pk)'; el.textContent=j?.success?'✅ Connected!':'❌ '+(j?.message||'Error'); }catch(e){ el.style.color='var(--pk)'; el.textContent='❌ '+e.message; } }
+function saveCloud(){ showToast("Cloud sync is now handled automatically via Supabase ☁"); }
+function testCloud(){ showToast("Cloud sync is now handled automatically via Supabase ☁"); }
 
 // ── CLOCK ────────────────────────────────────────────────────
 function startClock(){
@@ -8382,8 +8532,6 @@ function applySettings(){
 function openSettings(){
   document.getElementById('settingsName').value=D.name||'';
   document.getElementById('modeSelect').value=D.mode||'high';
-  document.getElementById('wpUrl').value=localStorage.getItem(CU)||'';
-  document.getElementById('wpKey').value=localStorage.getItem(CK)||'';
   // Verse speed
   const vs=document.getElementById('verseSpeed');
   if(vs) vs.value=D.verseSpeed||60000;
@@ -8395,10 +8543,107 @@ function openSettings(){
   if(stb) stb.classList.toggle('on',!D.hideScripture);
   renderVerseSettingsList();
   renderActivityList();
+  // Populate sync + subscription status
+  refreshSettingsSyncStatus();
+  refreshSettingsPlanStatus();
   document.getElementById('sp').classList.add('open');
   document.getElementById('so').classList.add('open');
 }
 function closeSettings(){ document.getElementById('sp').classList.remove('open'); document.getElementById('so').classList.remove('open'); }
+
+// ── SETTINGS: SYNC STATUS ─────────────────────────────────────
+function refreshSettingsSyncStatus(){
+  const icon=document.getElementById('settingsSyncIcon');
+  const label=document.getElementById('settingsSyncLabel');
+  const sub=document.getElementById('settingsSyncSub');
+  if(!icon||!label||!sub) return;
+  const lastSync=localStorage.getItem('lifeos_last_sync');
+  if(_supaUser){
+    icon.textContent='☁️';
+    label.textContent='Synced to cloud';
+    if(lastSync){
+      const mins=Math.round((Date.now()-parseInt(lastSync))/60000);
+      sub.textContent=mins<1?'Just synced':mins<60?`${mins}m ago`:`${Math.round(mins/60)}h ago`;
+    } else {
+      sub.textContent=_supaUser.email||'Signed in';
+    }
+  } else {
+    icon.textContent='💾';
+    label.textContent='Local only';
+    sub.textContent='Sign in to enable cloud sync';
+  }
+}
+
+// ── SETTINGS: SUBSCRIPTION STATUS ────────────────────────────
+async function refreshSettingsPlanStatus(){
+  const badge=document.getElementById('settingsPlanBadge');
+  const emailEl=document.getElementById('settingsPlanEmail');
+  const nextBill=document.getElementById('settingsPlanNextBilling');
+  const localNote=document.getElementById('settingsPlanLocalNote');
+  if(!badge) return;
+
+  if(!_supaUser){
+    badge.textContent='—';
+    badge.style.background='rgba(255,255,255,.08)';
+    badge.style.color='var(--tx3)';
+    badge.style.borderColor='rgba(255,255,255,.1)';
+    if(emailEl) emailEl.textContent='';
+    if(nextBill) nextBill.textContent='';
+    if(localNote) localNote.style.display='block';
+    return;
+  }
+  if(localNote) localNote.style.display='none';
+  if(emailEl) emailEl.textContent=_supaUser.email||'';
+  badge.textContent='Checking…';
+
+  try {
+    const supa=getSupabase();
+    if(!supa) throw new Error('no client');
+    const {data,error}=await supa.from('profiles').select('plan_status,current_period_end').eq('user_id',_supaUser.id).single();
+    if(error||!data){badge.textContent='Active';return;}
+
+    const status=data.plan_status||'active';
+    const statusMap={
+      'active':   {label:'Active',   bg:'rgba(34,197,94,.15)', color:'#22c55e', border:'rgba(34,197,94,.25)'},
+      'trialing': {label:'Trial',    bg:'rgba(56,189,248,.15)',color:'#38bdf8', border:'rgba(56,189,248,.25)'},
+      'past_due': {label:'Past Due', bg:'rgba(245,158,11,.15)',color:'#f59e0b', border:'rgba(245,158,11,.25)'},
+      'cancelled':{label:'Cancelled',bg:'rgba(239,68,68,.15)', color:'#f87171', border:'rgba(239,68,68,.25)'},
+    };
+    const s=statusMap[status]||statusMap['active'];
+    badge.textContent=s.label;
+    badge.style.background=s.bg;
+    badge.style.color=s.color;
+    badge.style.borderColor=s.border;
+
+    if(nextBill && data.current_period_end){
+      const d=new Date(data.current_period_end*1000);
+      const label=status==='cancelled'?'Cancelled':'Next billing';
+      nextBill.textContent=`${label}: ${d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`;
+    }
+  } catch(e){
+    badge.textContent='Active';
+    badge.style.background='rgba(34,197,94,.15)';
+    badge.style.color='#22c55e';
+  }
+}
+
+// ── SUPPORT BUG REPORT ────────────────────────────────────────
+async function submitSupportBug(){
+  const area=(document.getElementById('supportBugArea')||{}).value||'';
+  const details=(document.getElementById('supportBugDetails')||{}).value?.trim()||'';
+  const msgEl=document.getElementById('supportBugMsg');
+  if(!details){msgEl.style.color='#f87171';msgEl.textContent='Please describe the issue first.';return;}
+
+  msgEl.style.color='var(--tx2)';
+  msgEl.textContent='Sending…';
+
+  const body=`Bug Report from Life OS\n\nUser: ${_supaUser?_supaUser.email:'(local)'}\nArea: ${area||'Not specified'}\n\n${details}`;
+  const mailto=`mailto:info@kingdom-creatives.com?subject=${encodeURIComponent('Life OS Bug Report'+(area?' — '+area:''))}&body=${encodeURIComponent(body)}`;
+  window.open(mailto,'_blank');
+  msgEl.style.color='#22c55e';
+  msgEl.textContent='✅ Email draft opened — hit Send!';
+  setTimeout(()=>msgEl.textContent='',4000);
+}
 
 // ── SIDEBAR NAV ──────────────────────────────────────────────
 const NAV_ITEMS = [
@@ -8457,6 +8702,9 @@ function buildSideNav(){
   if(!D.sections) D.sections={};
   if(D.sections.cbt===0) delete D.sections.cbt;
   const hidden = D.sections||{};
+  // Force School & Career group open so CBT is never hidden by a collapsed group
+  if(!D._navGroups) D._navGroups={};
+  D._navGroups["School & Career"] = true;
   const openGroups = D._navGroups || {};
   
   let navHTML = '<div class="sid-sep">SECTIONS</div>';
@@ -13589,6 +13837,11 @@ async function init(){
     const { data: { session } } = await supa.auth.getSession();
     if(session?.user){
       _supaUser = session.user;
+
+      // ── CHECK SUBSCRIPTION STATUS ON EXISTING SESSION ──────
+      const blocked = await checkPlanStatus();
+      if(blocked) return; // show blocked screen, stop here
+
       const loaded = await cloudLoad();
       if(!loaded) loadData(); // Fall back to localStorage
       setSyncSt(loaded ? 'cloud' : 'local');
@@ -13698,7 +13951,8 @@ function finishInit(){
   initResources();
 
   // Name defaults to Champion - parent can set in Settings
-  // No popup on first visit
+  // Auto-show tutorial on first visit
+  if(!D.tutSeen){ D.tutSeen=1; save(); setTimeout(openTutorial, 600); }
 
   // Macro goal inputs
   const g=D.macroGoals||{};
@@ -25111,21 +25365,38 @@ function applyChildAvatar(){
 
 
 // ══════════════ REFERRAL TAB ══════════════
-function initReferralTab(){
-  const rawName = (D.parentName || D.familyId || 'family').replace(/[^a-zA-Z0-9]/g,'');
-  const refCode = rawName.toUpperCase().substring(0,10) || 'FRIEND';
-  const refLink = 'yourlife.cc/register?ref=' + refCode;
+async function initReferralTab(){
   const el = document.getElementById('refLinkDisplay');
-  if(el) el.textContent = refLink;
-  const fid = D.familyId || 'local';
-  let stats = {total:0,earned:0,pending:0};
-  try{ const s = localStorage.getItem('ref_stats_'+fid); if(s) stats=JSON.parse(s); }catch(e){}
+  if(!el) return;
+
+  // Try Supabase user first (most reliable unique ID)
+  let refCode = null;
+  if(supa){
+    try{
+      const { data: { user } } = await supa.auth.getUser();
+      if(user) refCode = user.id.split('-')[0].toUpperCase();
+    }catch(e){}
+  }
+  // Fallback to local profile name
+  if(!refCode){
+    const rawName = (D.parentName || D.familyId || '').replace(/[^a-zA-Z0-9]/g,'');
+    refCode = rawName.toUpperCase().substring(0,10) || null;
+  }
+
+  if(refCode){
+    el.textContent = 'https://www.yourlifecc.com/?ref=' + refCode;
+  } else {
+    el.textContent = 'Sign in to generate your link';
+    el.style.color = 'var(--tx3)';
+  }
+
+  // Stats (manual tracking for now)
   const t=document.getElementById('refStatTotal');
   const e=document.getElementById('refStatEarned');
   const p=document.getElementById('refStatPending');
-  if(t) t.textContent=stats.total;
-  if(e) e.textContent='$'+stats.earned;
-  if(p) p.textContent='$'+stats.pending;
+  if(t) t.textContent='—';
+  if(e) e.textContent='—';
+  if(p) p.textContent='—';
 }
 function copyRefLink(){
   const el=document.getElementById('refLinkDisplay');
@@ -25245,19 +25516,4 @@ function copyRefCode(code,btn){
         <button onclick="childPinInput('4')" class="child-pin-btn">4</button>
         <button onclick="childPinInput('5')" class="child-pin-btn">5</button>
         <button onclick="childPinInput('6')" class="child-pin-btn">6</button>
-        <button onclick="childPinInput('7')" class="child-pin-btn">7</button>
-        <button onclick="childPinInput('8')" class="child-pin-btn">8</button>
-        <button onclick="childPinInput('9')" class="child-pin-btn">9</button>
-        <button onclick="clGoBack()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--tx2);border-radius:10px;padding:.8rem;font-size:.7rem;cursor:pointer;">← Back</button>
-        <button onclick="childPinInput('0')" class="child-pin-btn">0</button>
-        <button onclick="childPinDelete()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--tx2);border-radius:10px;padding:.8rem;font-size:1rem;cursor:pointer;">⌫</button>
-      </div>
-      <div id="childLoginMsg" style="font-size:.73rem;color:#f87171;min-height:1rem;margin-bottom:.5rem;"></div>
-      <button onclick="closeChildLogin()" style="font-size:.7rem;color:rgba(255,255,255,.3);background:none;border:none;cursor:pointer;">Cancel</button>
-    </div>
-
-  </div>
-</div>
-
-</body>
-</html>
+        <button onclick="c
