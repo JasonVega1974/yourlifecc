@@ -7809,6 +7809,13 @@ async function cloudLoad(){
         if(D.sections && D.sections.cbt===0) delete D.sections.cbt;
     }
     localStorage.setItem('lifeos_last_sync', Date.now());
+    // Restore profiles from cloud data into localStorage for this device
+    if(saved._profiles && saved._profiles.length > 0){
+      _profiles = JSON.parse(JSON.stringify(saved._profiles));
+      _activeProfileId = saved._activeProfileId || null;
+      localStorage.setItem('ylcc_profiles', JSON.stringify(_profiles));
+      localStorage.setItem('ylcc_active_profile', _activeProfileId||'');
+    }
     // Re-save cleaned data back to Supabase immediately so bad values don't persist
     try {
       await supa.from('profiles').upsert({
@@ -18190,12 +18197,17 @@ let _activeProfileId = null;
 function initProfiles(){
   try {
     _profiles = JSON.parse(localStorage.getItem('ylcc_profiles')||'[]');
+    // If localStorage empty, try loading from D (synced from cloud on another device)
+    if(_profiles.length === 0 && D._profiles && D._profiles.length > 0){
+      _profiles = JSON.parse(JSON.stringify(D._profiles));
+      localStorage.setItem('ylcc_profiles', JSON.stringify(_profiles));
+    }
     // Migration: first profile is always parent if no isParent flag set
     if(_profiles.length > 0 && _profiles[0].isParent === undefined){
       _profiles[0].isParent = true;
       _profiles.slice(1).forEach(p => { if(p.isParent===undefined) p.isParent=false; });
     }
-    _activeProfileId = localStorage.getItem('ylcc_active_profile')||null;
+    _activeProfileId = localStorage.getItem('ylcc_active_profile') || (D._activeProfileId||null);
   } catch(e){ _profiles=[]; }
   // Auto-create parent profile from existing data if none exist
   if(_profiles.length === 0 && D.name){
@@ -18215,6 +18227,11 @@ function initProfiles(){
 function saveProfiles(){
   localStorage.setItem('ylcc_profiles', JSON.stringify(_profiles));
   localStorage.setItem('ylcc_active_profile', _activeProfileId||'');
+  // Persist into D so cloudSync carries profiles to all devices
+  D._profiles = JSON.parse(JSON.stringify(_profiles));
+  D._activeProfileId = _activeProfileId||'';
+  save();
+  if(typeof _supaUser !== 'undefined' && _supaUser) setTimeout(cloudSync, 500);
 }
 
 // ── WELCOME MODAL ─────────────────────────────────────────────
