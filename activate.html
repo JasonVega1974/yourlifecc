@@ -39,7 +39,9 @@
     await new Promise(r => setTimeout(r, 600));
     const { data: { session } } = await supa.auth.getSession();
     if (session) {
-      window.location.href = '/set-password.html?activated=1';
+      setTimeout(() => {
+        window.location.href = '/set-password.html?activated=1';
+      }, 1000);
       return;
     }
 
