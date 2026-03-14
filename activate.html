@@ -28,11 +28,12 @@
 
     // Wait for Supabase to consume the hash token and fire auth event
     supa.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        // Session is live — go straight to set-password
-        window.location.href = '/set-password.html?activated=1';
-      }
-    });
+  if (event === 'SIGNED_IN' && session) {
+    setTimeout(() => {
+      window.location.href = '/set-password.html?activated=1';
+    }, 1000);
+  }
+});
 
     // Also check if session is already there (fast path)
     await new Promise(r => setTimeout(r, 600));
