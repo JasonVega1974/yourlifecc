@@ -71,7 +71,7 @@
 <body>
 <div class="page-wrap">
   <div class="container">
-    <div class="logo">YOURLIFE.CC <a href="/app">← Back to App</a></div>
+    <div class="logo">YOURLIFE.CC <a href="/app/index.html">← Back to App</a></div>
 
     <!-- Loading -->
     <div id="loading-view">
@@ -83,7 +83,7 @@
     <div id="unauth-view">
       <div class="card">
         <p style="color:var(--tx2);margin-bottom:1.25rem;">You need to be signed in to view your account.</p>
-        <a href="/app"><button class="btn btn-primary">SIGN IN</button></a>
+        <a href="/app/index.html"><button class="btn btn-primary">SIGN IN</button></a>
       </div>
     </div>
 
@@ -267,14 +267,14 @@ async function deleteAccount(){
         <div style="font-size:3rem;margin-bottom:1rem;">👋</div>
         <h2 style="font-family:Orbitron,monospace;color:#f0f0f8;margin-bottom:.75rem;">Account Deleted</h2>
         <p style="color:#a0a0b8;line-height:1.6;margin-bottom:1.5rem;">Your data has been removed. Thanks for using YourLife.cc.</p>
-        <a href="/app" style="background:#3b82f6;color:#fff;padding:.75rem 1.5rem;border-radius:8px;font-family:Orbitron,monospace;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-decoration:none;">GO HOME</a>
+        <a href="/app/index.html" style="background:#3b82f6;color:#fff;padding:.75rem 1.5rem;border-radius:8px;font-family:Orbitron,monospace;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-decoration:none;">GO HOME</a>
       </div>
     </div>`;
 }
 
 async function signOut(){
   await supa.auth.signOut();
-  window.location.href = '/app';
+  window.location.href = '/app/index.html';
 }
 
 init();
