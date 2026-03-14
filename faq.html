@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>YourLife CC — Help & FAQ</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:#0d1117;color:#f1f5f9;line-height:1.6;font-size:15px;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 60% 40% at 30% 10%,rgba(56,189,248,.05) 0%,transparent 60%),
+  radial-gradient(ellipse 40% 50% at 80% 85%,rgba(167,139,250,.04) 0%,transparent 60%);}
+
+/* ── HEADER ── */
+.header{position:sticky;top:0;z-index:100;background:rgba(13,17,23,.97);backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,.07);padding:1rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;}
+.header-logo{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:4px;color:#38bdf8;text-decoration:none;}
+.header-logo span{font-size:.55rem;display:block;letter-spacing:2px;color:#64748b;font-family:'Inter',sans-serif;font-weight:700;margin-top:-.2rem;}
+.header-back{display:flex;align-items:center;gap:.4rem;color:#94a3b8;font-size:.8rem;font-weight:600;
+  text-decoration:none;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;padding:.4rem .8rem;transition:all .15s;}
+.header-back:hover{color:#f1f5f9;background:rgba(255,255,255,.1);}
+
+/* ── HERO ── */
+.hero{text-align:center;padding:4rem 2rem 3rem;position:relative;z-index:1;}
+.hero-badge{display:inline-block;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);
+  color:#38bdf8;font-size:.7rem;font-weight:800;letter-spacing:2px;padding:.3rem .8rem;
+  border-radius:20px;margin-bottom:1rem;font-family:'Orbitron',sans-serif;}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:3.5rem;letter-spacing:3px;
+  background:linear-gradient(135deg,#f1f5f9,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;line-height:1.1;margin-bottom:.8rem;}
+.hero p{font-size:1rem;color:#94a3b8;max-width:520px;margin:0 auto 2rem;}
+.hero-search{max-width:480px;margin:0 auto;position:relative;}
+.hero-search input{width:100%;padding:.85rem 1.2rem .85rem 3rem;background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);border-radius:12px;color:#f1f5f9;font-size:.9rem;
+  font-family:'Inter',sans-serif;outline:none;transition:border .2s;}
+.hero-search input:focus{border-color:rgba(56,189,248,.4);}
+.hero-search input::placeholder{color:#475569;}
+.hero-search .si{position:absolute;left:1rem;top:50%;transform:translateY(-50%);font-size:1rem;color:#475569;}
+
+/* ── LAYOUT ── */
+.container{max-width:900px;margin:0 auto;padding:0 1.5rem 6rem;position:relative;z-index:1;}
+
+/* ── CATEGORY NAV ── */
+.cat-nav{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:2.5rem;justify-content:center;}
+.cat-btn{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);color:#94a3b8;
+  padding:.4rem .9rem;border-radius:20px;font-size:.75rem;font-weight:700;cursor:pointer;
+  transition:all .15s;font-family:'Inter',sans-serif;}
+.cat-btn:hover,.cat-btn.active{background:rgba(56,189,248,.1);border-color:rgba(56,189,248,.25);color:#38bdf8;}
+
+/* ── SECTION ── */
+.faq-section{margin-bottom:3rem;}
+.faq-section-title{display:flex;align-items:center;gap:.6rem;font-family:'Orbitron',sans-serif;
+  font-size:.75rem;font-weight:700;letter-spacing:2px;color:#38bdf8;text-transform:uppercase;
+  margin-bottom:1rem;padding-bottom:.6rem;border-bottom:1px solid rgba(56,189,248,.15);}
+.faq-section-title .si{font-size:1rem;}
+
+/* ── FAQ ITEM ── */
+.faq-item{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);
+  border-radius:12px;margin-bottom:.5rem;overflow:hidden;transition:border .2s;}
+.faq-item:hover{border-color:rgba(255,255,255,.12);}
+.faq-item.open{border-color:rgba(56,189,248,.2);background:rgba(56,189,248,.02);}
+.faq-q{display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  padding:1rem 1.2rem;cursor:pointer;font-weight:700;font-size:.88rem;color:#f1f5f9;
+  user-select:none;}
+.faq-q:hover{color:#38bdf8;}
+.faq-item.open .faq-q{color:#38bdf8;}
+.faq-arrow{font-size:.75rem;color:#475569;transition:transform .2s;flex-shrink:0;}
+.faq-item.open .faq-arrow{transform:rotate(180deg);color:#38bdf8;}
+.faq-a{display:none;padding:0 1.2rem 1rem;font-size:.85rem;color:#94a3b8;line-height:1.8;}
+.faq-item.open .faq-a{display:block;}
+.faq-a p{margin-bottom:.6rem;}
+.faq-a p:last-child{margin-bottom:0;}
+.faq-a strong{color:#f1f5f9;}
+.faq-a a{color:#38bdf8;text-decoration:none;}
+.faq-a a:hover{text-decoration:underline;}
+.faq-a ul{padding-left:1.2rem;margin:.4rem 0;}
+.faq-a ul li{margin-bottom:.3rem;}
+.faq-a .tip{background:rgba(56,189,248,.06);border-left:3px solid #38bdf8;border-radius:0 8px 8px 0;
+  padding:.6rem .9rem;margin:.6rem 0;font-size:.82rem;}
+.faq-a .warn{background:rgba(251,191,36,.06);border-left:3px solid #fbbf24;border-radius:0 8px 8px 0;
+  padding:.6rem .9rem;margin:.6rem 0;font-size:.82rem;color:#fbbf24;}
+
+/* ── CONTACT CARD ── */
+.contact-card{background:linear-gradient(135deg,rgba(56,189,248,.07),rgba(167,139,250,.05));
+  border:1px solid rgba(56,189,248,.15);border-radius:16px;padding:2rem;text-align:center;margin-top:2rem;}
+.contact-card h3{font-family:'Orbitron',sans-serif;font-size:.9rem;letter-spacing:1px;color:#38bdf8;margin-bottom:.5rem;}
+.contact-card p{font-size:.85rem;color:#94a3b8;margin-bottom:1.2rem;}
+.contact-btn{display:inline-flex;align-items:center;gap:.4rem;background:linear-gradient(135deg,#38bdf8,#818cf8);
+  color:#06101e;font-weight:800;font-size:.85rem;padding:.65rem 1.4rem;border-radius:10px;
+  text-decoration:none;font-family:'Orbitron',sans-serif;transition:opacity .15s;}
+.contact-btn:hover{opacity:.85;}
+
+/* ── NO RESULTS ── */
+.no-results{text-align:center;padding:3rem;color:#475569;display:none;}
+.no-results .ni{font-size:2rem;margin-bottom:.5rem;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .hero h1{font-size:2.5rem;}
+  .header{padding:.8rem 1rem;}
+  .container{padding:0 1rem 4rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <a href="/" class="header-logo">LIFE OS<span>YOUR COMMAND CENTER</span></a>
+  <a href="/app/index.html" class="header-back">← Back to App</a>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">HELP & FAQ</div>
+  <h1>How Can We Help?</h1>
+  <p>Find answers to common questions about YourLife CC — setup, features, billing, and more.</p>
+  <div class="hero-search">
+    <span class="si">🔍</span>
+    <input type="text" id="searchInput" placeholder="Search questions..." oninput="filterFAQ(this.value)">
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="container">
+
+  <!-- CATEGORY NAV -->
+  <div class="cat-nav">
+    <button class="cat-btn active" onclick="filterCat('all',this)">All</button>
+    <button class="cat-btn" onclick="filterCat('getting-started',this)">🚀 Getting Started</button>
+    <button class="cat-btn" onclick="filterCat('account',this)">👤 Account</button>
+    <button class="cat-btn" onclick="filterCat('billing',this)">💳 Billing</button>
+    <button class="cat-btn" onclick="filterCat('features',this)">⚡ Features</button>
+    <button class="cat-btn" onclick="filterCat('parent',this)">👨‍👩‍👧 Parent Hub</button>
+    <button class="cat-btn" onclick="filterCat('faith',this)">✝️ Faith</button>
+    <button class="cat-btn" onclick="filterCat('technical',this)">🔧 Technical</button>
+  </div>
+
+  <div id="noResults" class="no-results">
+    <div class="ni">🤔</div>
+    <div>No results found. Try different keywords or <a href="mailto:info@kingdom-creatives.com" style="color:#38bdf8;">email us</a>.</div>
+  </div>
+
+  <!-- ── GETTING STARTED ── -->
+  <div class="faq-section" data-cat="getting-started">
+    <div class="faq-section-title"><span class="si">🚀</span> Getting Started</div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">What is YourLife CC — Life OS? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>YourLife CC is a family life skills app built for teens and young adults (middle school through young adult). It's a complete command center that covers school tracking, chores, goals, health, money, faith, career prep, and more — all in one place.</p>
+        <p>Parents get a dedicated Parent Hub to monitor progress, assign chores, send notes, run quizzes, and manage rewards — while kids get a personalized dashboard that grows with them through every life stage.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">How do I get started after signing up? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>After completing your purchase you'll receive an email with an activation link. Click it, set your password, and you're in.</p>
+        <p><strong>First steps:</strong></p>
+        <ul>
+          <li>Go to <strong>Settings → Set your name and life stage</strong> (Middle School, High School, College, etc.)</li>
+          <li>Add your child profiles in the <strong>Parent Hub</strong></li>
+          <li>Set up a Parent PIN to keep your hub secure</li>
+          <li>Explore the Full Tutorial anytime via <strong>Settings → Full Detailed Tutorial</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">What life stages does the app support? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Life OS adapts its content and visible sections based on your child's life stage:</p>
+        <ul>
+          <li>🎒 <strong>Middle School</strong> — Core skills, chores, habits, growing up basics</li>
+          <li>📚 <strong>Freshman (9th Grade)</strong> — School tracking, goals, health, faith</li>
+          <li>📖 <strong>High School (10th–11th)</strong> — Career exploration, resume, driving, finances</li>
+          <li>🎓 <strong>Senior Year</strong> — College prep, life skills, milestones</li>
+          <li>🏛️ <strong>College</strong> — Full financial tools, budget, investing basics</li>
+          <li>💼 <strong>Young Adult</strong> — Complete life management, all sections unlocked</li>
+        </ul>
+        <p>Change the life stage anytime in <strong>Settings</strong>.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">Is there a tutorial or walkthrough? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Yes! Go to <strong>Settings → Full Detailed Tutorial</strong> — it walks through every section of the app with tips and examples. You can also reopen the Quick Start wizard from the Settings menu anytime.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">Can multiple children use the same account? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Yes — one subscription covers your whole family. You can add multiple child profiles from the <strong>Parent Hub</strong>. Each child gets their own profile, PIN, avatar, data, and personalized dashboard. Parents can switch between profiles from the home screen.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ACCOUNT ── -->
+  <div class="faq-section" data-cat="account">
+    <div class="faq-section-title"><span class="si">👤</span> Account & Login</div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">I didn't receive my activation email. What do I do? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Check your <strong>spam/junk folder</strong> first — activation emails sometimes land there.</p>
+        <p>If it's not there, email us at <a href="mailto:info@kingdom-creatives.com">info@kingdom-creatives.com</a> with your purchase email address and we'll resend it manually within a few hours.</p>
+        <div class="tip">💡 Add info@kingdom-creatives.com to your contacts to prevent future emails from going to spam.</div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">How do I reset my password? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>On the login screen, click <strong>"Forgot password"</strong> and enter your email. You'll receive a reset link within a few minutes. Check your spam folder if you don't see it.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">How do I change my email address? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Email us at <a href="mailto:info@kingdom-creatives.com">info@kingdom-creatives.com</a> with your current email and new email address. We'll update it for you.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">Will my data be saved if I close the app? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Yes. When logged in with a cloud account, your data is automatically synced to the cloud and restored on any device you log into. If you're using local-only mode, data is saved in your browser's local storage — it will persist as long as you use the same browser on the same device.</p>
+        <div class="warn">⚠️ Clearing your browser cache or using Incognito mode will not save local data. Always use a cloud account to protect your data.</div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">Can I use the app on multiple devices? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Yes — log into your account on any device (phone, tablet, computer) and your data will sync automatically. The app works in any modern browser.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">How do I delete my account? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Email <a href="mailto:info@kingdom-creatives.com">info@kingdom-creatives.com</a> with your account email and request for deletion. We'll remove all your data within 5 business days.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BILLING ── -->
+  <div class="faq-section" data-cat="billing">
+    <div class="faq-section-title"><span class="si">💳</span> Billing & Subscription</div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">What plans are available? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>YourLife CC offers three plans:</p>
+        <ul>
+          <li>💙 <strong>Monthly</strong> — Pay month to month, cancel anytime</li>
+          <li>💛 <strong>Yearly</strong> — Best value, billed once per year</li>
+          <li>💜 <strong>Lifetime</strong> — One-time payment, access forever</li>
+        </ul>
+        <p>All plans include the full app for the entire family — no per-child charges.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">How do I cancel my subscription? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Email us at <a href="mailto:info@kingdom-creatives.com">info@kingdom-creatives.com</a> with your account email and we'll cancel your subscription immediately. You'll retain access through the end of your current billing period.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">Do you offer refunds? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>We offer a <strong>7-day satisfaction guarantee</strong> on monthly and yearly plans. If you're not happy within the first 7 days, email us at <a href="mailto:info@kingdom-creatives.com">info@kingdom-creatives.com</a> and we'll issue a full refund — no questions asked.</p>
+        <p>Lifetime plans are non-refundable after 7 days.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">My payment failed — what happens to my account? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>If a payment fails, your account will show a <strong>"Past Due"</strong> status. You'll still have a grace period to update your payment method. Update it via your Stripe billing portal or email us and we'll send you a direct link.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">Do you have a referral program? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Yes! Find your referral link in the app under <strong>Refer & Earn</strong> in the sidebar. When someone signs up using your link, you earn a reward. Referral payouts are processed monthly on the 1st.</p>
+        <p>To set up your payout method, email <a href="mailto:info@kingdom-creatives.com">info@kingdom-creatives.com</a> with your name, Venmo/PayPal handle, and the subject "Referral Payout Setup."</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FEATURES ── -->
+  <div class="faq-section" data-cat="features">
+    <div class="faq-section-title"><span class="si">⚡</span> Features & Sections</div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">What sections are in the app? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Life OS has 25+ sections organized into groups:</p>
+        <ul>
+          <li>🏠 <strong>Home Dashboard</strong> — Streak, stats, daily habits, scripture banner</li>
+          <li>🧠 <strong>Life Skills</strong> — 140+ lessons across 18 categories</li>
+          <li>🌱 <strong>Growing Up</strong> — Age-appropriate guidance for teens</li>
+          <li>📚 <strong>School</strong> — GPA tracker, classes, assignments, study log</li>
+          <li>💰 <strong>Money Manager</strong> — Bank tracker, budget planner, bills, transactions</li>
+          <li>🎯 <strong>Goals</strong> — Short and long-term goal tracking</li>
+          <li>✅ <strong>Chores</strong> — Chore assignments, verification, Parent Bucks rewards</li>
+          <li>💪 <strong>Health</strong> — Weight, workout log, health habits</li>
+          <li>😊 <strong>Mood Tracker</strong> — Daily mood logging and trends</li>
+          <li>✝️ <strong>Bible & Faith</strong> — Devotionals, scripture, prayer journal</li>
+          <li>📅 <strong>Schedule & Calendar</strong> — Daily schedule and event calendar</li>
+          <li>🎵 <strong>Music & Practice</strong> — Practice log for instruments or performance</li>
+          <li>🚗 <strong>Driving</strong> — Practice log and safety guides</li>
+          <li>⚽ <strong>Sports</strong> — Stats, practice log, game tracker</li>
+          <li>💼 <strong>Jobs/Resume</strong> — Resume builder and career explorer</li>
+          <li>🏆 <strong>Challenges & Badges</strong> — Monthly challenges and achievement badges</li>
+          <li>🔥 <strong>Fuel Wall</strong> — Motivational quotes and personal mantras</li>
+          <li>✍️ <strong>Journal</strong> — Private journaling with prompts</li>
+          <li>📖 <strong>Reading List</strong> — Track books you're reading or want to read</li>
+          <li>🤝 <strong>My People</strong> — Mentors, coaches, key relationships</li>
+          <li>🗺️ <strong>Milestones</strong> — Life achievement tracker</li>
+          <li>🎁 <strong>Rewards</strong> — Parent Bucks store and reward redemption</li>
+          <li>💻 <strong>CBT Training</strong> — Computer basics and tech skills</li>
+          <li>🤝 <strong>Refer & Earn</strong> — Referral program</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">What is the Life Score? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>The Life Score is a point system that tracks overall progress across the app. Points are earned by completing daily habits, reading scripture, finishing chores, logging workouts, writing journal entries, completing lessons, and more. It's designed to motivate consistent engagement across all areas of life — not just school or chores.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">What are Parent Bucks? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Parent Bucks are a virtual reward currency that parents award to kids for completing chores, good behavior, achieving goals, and passing quizzes. Kids can redeem Parent Bucks in the <strong>Rewards Store</strong> for prizes that parents set up — screen time, outings, Amazon gift cards, whatever works for your family.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">How does the scripture banner rotation work? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>The scripture banner on the home dashboard displays rotating Bible verses. There are 30 built-in verses that rotate automatically. You can:</p>
+        <ul>
+          <li>Tap <strong>› Next Verse</strong> to skip to the next one manually</li>
+          <li>Turn on <strong>Auto-Rotate</strong> to cycle automatically on a timer</li>
+          <li>Add your own custom scriptures or quotes</li>
+          <li>Switch to <strong>Motivational</strong> mode for non-faith quotes</li>
+          <li>Turn the banner off completely</li>
+        </ul>
+        <p>All of these settings are in <strong>Parent Settings → Scripture Rotation</strong>.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">Can I hide sections my family doesn't use? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Yes — go to <strong>Settings → Sections</strong> and toggle any section on or off. Hidden sections disappear from the sidebar completely. This is useful for keeping the app focused and uncluttered for younger kids.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">How do Daily W's (habits) work? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Daily W's are your daily habit checklist on the home dashboard. Built-in habits include prayer, Bible reading, workout, water intake, journaling, study, gratitude, and sleep. You can add custom habits too. Check them off each day to build streaks and earn Life Score points. They reset daily at midnight.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">What is the Life Map? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>The Life Map is a visual game board on the home dashboard showing your progress across 16 key life areas. As you complete activities in different sections of the app, your game piece advances. It's a visual way to see how balanced and active you are across all areas of life.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PARENT HUB ── -->
+  <div class="faq-section" data-cat="parent">
+    <div class="faq-section-title"><span class="si">👨‍👩‍👧</span> Parent Hub</div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">How do I access the Parent Hub? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Click <strong>Parent</strong> in the top navigation bar or find it in the sidebar. You'll be prompted to enter your Parent PIN. If you haven't set one yet, go to <strong>Settings → Set Parent PIN</strong>.</p>
+        <div class="tip">💡 Set your PIN before adding children — it keeps your hub private and secure from kids browsing the app.</div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">What can I do from the Parent Hub? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>The Parent Hub gives you full oversight and control:</p>
+        <ul>
+          <li>📊 <strong>Weekly Report Card</strong> — See each child's progress across all sections</li>
+          <li>✅ <strong>Chore Management</strong> — Assign, verify, and approve chores</li>
+          <li>🪙 <strong>Parent Bucks</strong> — Award or deduct points, manage the rewards store</li>
+          <li>📝 <strong>Parent Notes</strong> — Post notes visible on your child's dashboard</li>
+          <li>🧠 <strong>Send a Quiz</strong> — Quiz your kids on life skills topics</li>
+          <li>📅 <strong>Incentive Conditions</strong> — Set up screen time or reward rules tied to app completion</li>
+          <li>👤 <strong>Child Profiles</strong> — Manage all child accounts from one place</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">How do I add a child profile? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Go to <strong>Parent Hub → Child Profiles → Add Child</strong>. Enter their name, age, and life stage. They'll get their own profile with a PIN you set for them. You can add photos or choose an avatar for each child.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">Can my child see my Parent Hub? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>No — the Parent Hub is protected by your PIN. Kids cannot access it without the PIN. Journal entries are also completely private — parents can see that a child has written entries but cannot read the content.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">How do chore verification and Parent Bucks work together? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Here's the flow:</p>
+        <ul>
+          <li>Parent assigns chores with a Parent Bucks value from the Parent Hub</li>
+          <li>Child marks the chore complete from their Chores section</li>
+          <li>Parent receives a notification and verifies from the Parent Hub</li>
+          <li>Parent Bucks are awarded automatically upon verification</li>
+          <li>Child redeems Parent Bucks in the Rewards Store for prizes you've set up</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">I forgot my Parent PIN. How do I reset it? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Go to <strong>Settings → Reset Parent PIN</strong>. You'll need to verify your identity via your account email. If you're locked out completely, email us at <a href="mailto:info@kingdom-creatives.com">info@kingdom-creatives.com</a> and we'll help you reset it.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FAITH ── -->
+  <div class="faq-section" data-cat="faith">
+    <div class="faq-section-title"><span class="si">✝️</span> Faith Features</div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">Can I turn off the faith/scripture features? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Yes — go to <strong>Settings → Content → Faith Mode</strong> and toggle it off. When off, all scripture sections, Bible references, and faith-specific content are hidden. Daily devotionals become non-religious "Daily Reflections" instead. This setting is per-profile so each family member can have their own preference.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">What's in the Bible & Faith section? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>The Bible & Faith section includes:</p>
+        <ul>
+          <li>📖 <strong>Daily Devotionals</strong> — 365 devotionals with scripture, reflection, and prayer</li>
+          <li>✝️ <strong>Jesus & Purpose</strong> — Character and faith lessons</li>
+          <li>📚 <strong>Learn the Bible</strong> — Bible overview and study guides</li>
+          <li>📖 <strong>Bible Study</strong> — Reading plans and notes</li>
+          <li>🌟 <strong>My Journey</strong> — Personal faith milestones and prayer journal</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">Can I add my own scriptures to the banner rotation? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Yes — go to <strong>Settings → Scripture Rotation → Add Custom Scripture</strong>. Enter the verse text and reference and it will be added to the rotation alongside the 30 built-in verses. You can delete custom verses at any time from the same settings panel.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TECHNICAL ── -->
+  <div class="faq-section" data-cat="technical">
+    <div class="faq-section-title"><span class="si">🔧</span> Technical & Troubleshooting</div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">The app is showing old data or not loading correctly. <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Try a hard refresh — go to <strong>Settings → Refresh App → Hard Refresh / Clear Cache</strong>. This forces the app to reload from scratch, bypassing cached files.</p>
+        <p>On mobile you can also close and reopen the browser tab, or clear your browser cache manually.</p>
+        <div class="tip">💡 If you see a "Seeing wrong data?" banner on the home screen, click the Refresh App button right there.</div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">The app works on desktop but not on my phone. <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Make sure you're using a modern browser (Chrome, Safari, or Edge). The app is fully mobile-responsive. Try these steps:</p>
+        <ul>
+          <li>Clear your mobile browser cache</li>
+          <li>Make sure you're visiting <strong>yourlifecc.com/app</strong> — not a cached bookmark</li>
+          <li>Try opening in an Incognito/Private window to rule out cache issues</li>
+          <li>If using iOS Safari, make sure it's updated to the latest version</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">My data disappeared after logging out. <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>If you were using <strong>local mode</strong> (not logged into a cloud account), data is stored in your browser and won't transfer between devices or after clearing cache. Always make sure you're logged in with your account email to enable cloud sync.</p>
+        <p>If you were logged in and data is missing, email us at <a href="mailto:info@kingdom-creatives.com">info@kingdom-creatives.com</a> — we may be able to recover it.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">Can I add the app to my phone's home screen? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Yes — this gives you a native app-like experience:</p>
+        <ul>
+          <li><strong>iPhone/iPad:</strong> Open Safari → tap the Share button → "Add to Home Screen"</li>
+          <li><strong>Android:</strong> Open Chrome → tap the three-dot menu → "Add to Home Screen"</li>
+        </ul>
+        <p>The app will open full-screen without the browser bar, just like a native app.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">The translation / language picker isn't working. <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>The language translation feature uses Google Translate. Make sure you're connected to the internet and that your browser isn't blocking third-party scripts. Try refreshing the page. If the issue persists, email us at <a href="mailto:info@kingdom-creatives.com">info@kingdom-creatives.com</a>.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">Is my data private and secure? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Yes. Your data is stored securely in our cloud database (Supabase) with encryption at rest and in transit. We never sell your data to third parties. Journal entries are private — even in the Parent Hub, parents can only see that entries exist, not the content.</p>
+        <p>For full details, see our <a href="/privacy.html" target="_blank">Privacy Policy</a>.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">I found a bug. How do I report it? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">
+        <p>Go to <strong>Settings → Support → Submit a Bug Report</strong>. Select the area, describe what happened, and hit Send. It goes directly to our team. You can also email <a href="mailto:info@kingdom-creatives.com">info@kingdom-creatives.com</a> directly.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTACT CARD -->
+  <div class="contact-card">
+    <h3>STILL NEED HELP?</h3>
+    <p>Can't find what you're looking for? Our team is here to help.</p>
+    <a href="mailto:info@kingdom-creatives.com" class="contact-btn" target="_blank">📧 Email Support</a>
+  </div>
+
+</div>
+
+<script>
+function toggle(el){
+  const item = el.closest('.faq-item');
+  const isOpen = item.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+  // Open this one if it was closed
+  if(!isOpen) item.classList.add('open');
+}
+
+function filterCat(cat, btn){
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.faq-section').forEach(s => {
+    if(cat === 'all' || s.dataset.cat === cat){
+      s.style.display = '';
+    } else {
+      s.style.display = 'none';
+    }
+  });
+  document.getElementById('noResults').style.display = 'none';
+  // Clear search
+  document.getElementById('searchInput').value = '';
+}
+
+function filterFAQ(query){
+  query = query.toLowerCase().trim();
+  if(!query){
+    document.querySelectorAll('.faq-section').forEach(s => s.style.display = '');
+    document.querySelectorAll('.faq-item').forEach(i => i.style.display = '');
+    document.getElementById('noResults').style.display = 'none';
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.cat-btn').classList.add('active');
+    return;
+  }
+  let found = 0;
+  document.querySelectorAll('.faq-section').forEach(s => {
+    let sectionHasMatch = false;
+    s.querySelectorAll('.faq-item').forEach(item => {
+      const text = item.textContent.toLowerCase();
+      if(text.includes(query)){
+        item.style.display = '';
+        sectionHasMatch = true;
+        found++;
+        // Auto-open if only one result
+        item.classList.add('open');
+      } else {
+        item.style.display = 'none';
+        item.classList.remove('open');
+      }
+    });
+    s.style.display = sectionHasMatch ? '' : 'none';
+  });
+  document.getElementById('noResults').style.display = found === 0 ? 'block' : 'none';
+}
+</script>
+</body>
+</html>
