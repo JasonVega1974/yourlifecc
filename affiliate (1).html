@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Affiliate Program · YourLife.cc</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0a0a0f;--bg2:#111118;--bg3:#1a1a24;--bg4:#0f0f1a;
+      --gold:#f5c842;--gold2:rgba(245,200,66,.15);--gold3:rgba(245,200,66,.06);
+      --blue:#3b82f6;--blue2:#60a5fa;
+      --green:#34d399;
+      --tx:#f0f0f8;--tx2:#a0a0b8;--tx3:#505068;
+      --border:rgba(255,255,255,.08);--fn:'Orbitron',monospace;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--tx);font-family:'Inter',sans-serif;line-height:1.7;overflow-x:hidden;}
+
+    /* ── HEADER ── */
+    header{
+      background:rgba(10,10,15,.85);border-bottom:1px solid var(--border);
+      padding:1.25rem 2rem;display:flex;align-items:center;justify-content:space-between;
+      position:sticky;top:0;z-index:100;backdrop-filter:blur(16px);
+    }
+    .logo{font-family:var(--fn);font-size:.95rem;font-weight:900;color:var(--gold);letter-spacing:.15em;text-decoration:none;}
+    .hdr-links{display:flex;gap:1.5rem;align-items:center;}
+    .hdr-links a{color:var(--tx2);font-size:.85rem;text-decoration:none;transition:color .2s;}
+    .hdr-links a:hover{color:var(--tx);}
+    .hdr-apply{background:var(--gold);color:#0a0a0f;font-size:.82rem;font-weight:700;padding:.45rem 1.1rem;border-radius:20px;text-decoration:none;transition:opacity .2s;}
+    .hdr-apply:hover{opacity:.88;}
+
+    /* ── HERO ── */
+    .hero{
+      position:relative;text-align:center;padding:6rem 2rem 5rem;overflow:hidden;
+      background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(245,200,66,.08) 0%, transparent 70%);
+    }
+    .hero::before{
+      content:'';position:absolute;inset:0;
+      background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.02) 39px,rgba(255,255,255,.02) 40px),
+                 repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.02) 39px,rgba(255,255,255,.02) 40px);
+      pointer-events:none;
+    }
+    .hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:var(--gold2);border:1px solid rgba(245,200,66,.3);border-radius:20px;padding:.35rem 1rem;font-size:.78rem;font-weight:600;color:var(--gold);letter-spacing:.06em;margin-bottom:1.5rem;}
+    .hero h1{font-family:var(--fn);font-size:clamp(1.8rem,5vw,3.2rem);font-weight:900;color:var(--tx);line-height:1.15;margin-bottom:1.25rem;}
+    .hero h1 span{color:var(--gold);}
+    .hero p{color:var(--tx2);font-size:1.05rem;max-width:600px;margin:0 auto 2.5rem;}
+    .hero-cta{display:inline-flex;gap:1rem;flex-wrap:wrap;justify-content:center;}
+    .btn-gold{background:var(--gold);color:#0a0a0f;font-weight:700;font-size:.95rem;padding:.85rem 2rem;border-radius:10px;text-decoration:none;transition:transform .2s,opacity .2s;display:inline-block;}
+    .btn-gold:hover{transform:translateY(-2px);opacity:.92;}
+    .btn-outline{border:1px solid rgba(245,200,66,.4);color:var(--gold);font-weight:600;font-size:.95rem;padding:.85rem 2rem;border-radius:10px;text-decoration:none;transition:background .2s;display:inline-block;}
+    .btn-outline:hover{background:var(--gold2);}
+
+    /* ── PAYOUT CARDS ── */
+    .section{max-width:1100px;margin:0 auto;padding:4rem 2rem;}
+    .sec-label{font-family:var(--fn);font-size:.7rem;letter-spacing:.14em;color:var(--gold);font-weight:700;margin-bottom:.6rem;}
+    .sec-title{font-size:clamp(1.5rem,3.5vw,2.2rem);font-weight:800;color:var(--tx);margin-bottom:.75rem;}
+    .sec-sub{color:var(--tx2);font-size:.95rem;max-width:560px;margin-bottom:3rem;}
+    .payout-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
+    @media(max-width:768px){.payout-grid{grid-template-columns:1fr;}}
+    .payout-card{
+      background:var(--bg2);border:1px solid var(--border);border-radius:16px;
+      padding:2rem 1.75rem;position:relative;overflow:hidden;transition:transform .3s,border-color .3s;
+    }
+    .payout-card:hover{transform:translateY(-4px);border-color:rgba(245,200,66,.3);}
+    .payout-card.featured{border-color:var(--gold);background:linear-gradient(135deg,rgba(245,200,66,.07),var(--bg2));}
+    .payout-card::after{
+      content:'';position:absolute;top:0;left:0;right:0;height:2px;
+      background:linear-gradient(90deg,transparent,rgba(245,200,66,.4),transparent);
+      opacity:0;transition:opacity .3s;
+    }
+    .payout-card:hover::after,.payout-card.featured::after{opacity:1;}
+    .plan-badge{font-size:.68rem;font-weight:700;letter-spacing:.1em;padding:.28rem .7rem;border-radius:20px;display:inline-block;margin-bottom:1rem;}
+    .badge-monthly{background:rgba(59,130,246,.15);color:#60a5fa;}
+    .badge-annual{background:rgba(52,211,153,.12);color:#34d399;}
+    .badge-lifetime{background:var(--gold2);color:var(--gold);}
+    .plan-name{font-family:var(--fn);font-size:.88rem;font-weight:700;color:var(--tx2);letter-spacing:.08em;margin-bottom:.5rem;}
+    .payout-amount{font-size:3rem;font-weight:900;color:var(--gold);line-height:1;margin-bottom:.3rem;}
+    .payout-amount span{font-size:1.2rem;font-weight:600;vertical-align:top;margin-top:.5rem;display:inline-block;}
+    .payout-when{font-size:.82rem;color:var(--tx3);margin-bottom:1.25rem;}
+    .plan-price-note{font-size:.85rem;color:var(--tx2);padding-top:1rem;border-top:1px solid var(--border);}
+    .plan-price-note strong{color:var(--tx);}
+
+    /* ── HOW IT WORKS ── */
+    .how-bg{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+    .steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;margin-top:2rem;}
+    @media(max-width:900px){.steps-grid{grid-template-columns:repeat(2,1fr);}}
+    @media(max-width:500px){.steps-grid{grid-template-columns:1fr;}}
+    .step{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:1.5rem;}
+    .step-num{width:36px;height:36px;background:var(--gold2);border:1px solid rgba(245,200,66,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fn);font-size:.75rem;font-weight:900;color:var(--gold);margin-bottom:1rem;}
+    .step h3{font-size:.95rem;font-weight:700;color:var(--tx);margin-bottom:.4rem;}
+    .step p{font-size:.83rem;color:var(--tx2);line-height:1.5;}
+
+    /* ── REFERRAL CODE SECTION ── */
+    .code-section{background:linear-gradient(135deg,rgba(245,200,66,.06),rgba(59,130,246,.04));border:1px solid rgba(245,200,66,.2);border-radius:20px;padding:2.5rem;margin:3rem 0;display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:center;}
+    @media(max-width:768px){.code-section{grid-template-columns:1fr;}}
+    .code-section h3{font-family:var(--fn);font-size:1rem;font-weight:900;color:var(--tx);margin-bottom:.75rem;}
+    .code-section p{font-size:.88rem;color:var(--tx2);margin-bottom:1rem;line-height:1.6;}
+    .code-demo{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:1.5rem;font-family:'Courier New',monospace;}
+    .code-label{font-size:.7rem;color:var(--tx3);letter-spacing:.1em;margin-bottom:.5rem;}
+    .code-example{font-size:1.3rem;font-weight:700;color:var(--gold);letter-spacing:.15em;margin-bottom:.75rem;}
+    .code-url{font-size:.78rem;color:var(--blue2);word-break:break-all;}
+    .code-note{font-size:.75rem;color:var(--tx3);margin-top:.5rem;}
+
+    /* ── EARNINGS TABLE ── */
+    .earnings-wrap{overflow-x:auto;margin-top:2rem;}
+    table{width:100%;border-collapse:collapse;font-size:.88rem;}
+    thead th{background:var(--bg3);color:var(--tx2);font-weight:600;font-size:.75rem;letter-spacing:.08em;padding:.85rem 1.1rem;text-align:left;border-bottom:1px solid var(--border);}
+    tbody td{padding:.85rem 1.1rem;border-bottom:1px solid rgba(255,255,255,.04);color:var(--tx2);}
+    tbody tr:hover td{background:rgba(255,255,255,.02);}
+    td.highlight-val{color:var(--gold);font-weight:700;}
+    td.plan-col{color:var(--tx);font-weight:600;}
+
+    /* ── WHO IT'S FOR ── */
+    .audience-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-top:2rem;}
+    @media(max-width:768px){.audience-grid{grid-template-columns:1fr 1fr;}}
+    @media(max-width:480px){.audience-grid{grid-template-columns:1fr;}}
+    .audience-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.25rem;}
+    .audience-icon{font-size:1.75rem;margin-bottom:.6rem;}
+    .audience-card h4{font-size:.9rem;font-weight:700;color:var(--tx);margin-bottom:.3rem;}
+    .audience-card p{font-size:.8rem;color:var(--tx2);line-height:1.5;}
+
+    /* ── APPLY FORM ── */
+    .apply-bg{background:var(--bg2);border-top:1px solid var(--border);}
+    .apply-wrap{max-width:640px;margin:0 auto;padding:4rem 2rem;text-align:center;}
+    .apply-wrap h2{font-family:var(--fn);font-size:1.4rem;font-weight:900;color:var(--tx);margin-bottom:.75rem;}
+    .apply-wrap p{color:var(--tx2);font-size:.9rem;margin-bottom:2rem;}
+    .apply-form{background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:2rem;text-align:left;}
+    .field{margin-bottom:1.25rem;}
+    .field label{display:block;font-size:.8rem;font-weight:600;color:var(--tx2);margin-bottom:.4rem;letter-spacing:.04em;}
+    .field input,.field select,.field textarea{
+      width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;
+      padding:.75rem 1rem;color:var(--tx);font-size:.9rem;font-family:'Inter',sans-serif;
+      transition:border-color .2s;outline:none;
+    }
+    .field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(245,200,66,.4);}
+    .field textarea{resize:vertical;min-height:90px;}
+    .field select option{background:var(--bg3);}
+    .field-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+    @media(max-width:500px){.field-row{grid-template-columns:1fr;}}
+    .submit-btn{width:100%;background:var(--gold);color:#0a0a0f;font-weight:700;font-size:1rem;padding:1rem;border-radius:10px;border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:opacity .2s;}
+    .submit-btn:hover{opacity:.88;}
+    .form-note{font-size:.78rem;color:var(--tx3);text-align:center;margin-top:.75rem;}
+
+    /* ── RULES / TERMS ── */
+    .rules-section{max-width:760px;margin:0 auto;padding:4rem 2rem;}
+    .rules-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:2rem 2.5rem;}
+    .rules-box h2{font-family:var(--fn);font-size:.9rem;font-weight:700;color:var(--gold);letter-spacing:.1em;margin-bottom:1.5rem;padding-bottom:.75rem;border-bottom:1px solid var(--border);}
+    .rule-item{display:flex;gap:1rem;margin-bottom:1.25rem;align-items:flex-start;}
+    .rule-num{flex-shrink:0;width:26px;height:26px;background:var(--gold2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;color:var(--gold);margin-top:.15rem;}
+    .rule-item p{font-size:.87rem;color:var(--tx2);line-height:1.6;}
+    .rule-item p strong{color:var(--tx);}
+    .rules-updated{font-size:.78rem;color:var(--tx3);margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);}
+
+    /* ── FOOTER ── */
+    footer{text-align:center;padding:2rem;color:var(--tx3);font-size:.8rem;border-top:1px solid var(--border);}
+    footer a{color:var(--tx3);text-decoration:none;}
+    footer a:hover{color:var(--tx2);}
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+    .hero>*{animation:fadeUp .6s ease both;}
+    .hero .hero-badge{animation-delay:.1s;}
+    .hero h1{animation-delay:.2s;}
+    .hero p{animation-delay:.3s;}
+    .hero-cta{animation-delay:.4s;}
+
+    /* ── SUCCESS STATE ── */
+    .success-msg{display:none;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);border-radius:10px;padding:1.25rem;text-align:center;color:#34d399;font-size:.9rem;margin-top:1rem;}
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="/" class="logo">YOURLIFE.CC</a>
+  <div class="hdr-links">
+    <a href="/#pricing">Pricing</a>
+    <a href="/app">Sign In</a>
+    <a href="#apply" class="hdr-apply">Apply Now →</a>
+  </div>
+</header>
+
+<!-- ══════════ HERO ══════════ -->
+<div class="hero">
+  <div class="hero-badge">💰 Commission-Only · No Cap · Pay on Conversion</div>
+  <h1>Get Paid to Share<br><span>YourLife CC</span></h1>
+  <p>Refer families, churches, and organizations. Earn real cash for every plan they purchase — monthly, annually, or for life.</p>
+  <div class="hero-cta">
+    <a href="#apply" class="btn-gold">Apply to Become an Affiliate →</a>
+    <a href="#how-it-works" class="btn-outline">See How It Works</a>
+  </div>
+</div>
+
+<!-- ══════════ PAYOUT CARDS ══════════ -->
+<div class="section">
+  <div class="sec-label">YOUR COMMISSION</div>
+  <div class="sec-title">Simple, Flat Payouts</div>
+  <p class="sec-sub">Flat commissions on every individual signup plus bonus tiers for landing churches, schools, and organizations that sponsor multiple families at once.</p>
+
+  <div style="font-size:.72rem;font-weight:800;letter-spacing:.1em;color:var(--tx3);margin-bottom:.75rem;">INDIVIDUAL SIGNUPS</div>
+  <div class="payout-grid">
+    <div class="payout-card">
+      <div class="plan-badge badge-monthly">MONTHLY</div>
+      <div class="plan-name">FAMILY MONTHLY</div>
+      <div class="payout-amount"><span>$</span>5</div>
+      <div class="payout-when">per signup · paid after 30 days</div>
+      <div class="plan-price-note">Plan price: <strong>$9.99/mo</strong><br>Your cut: <strong>~50%</strong> of first month</div>
+    </div>
+    <div class="payout-card featured">
+      <div class="plan-badge badge-annual">ANNUAL ⭐ BEST</div>
+      <div class="plan-name">FAMILY ANNUAL</div>
+      <div class="payout-amount"><span>$</span>10</div>
+      <div class="payout-when">per signup · paid after 30 days</div>
+      <div class="plan-price-note">Plan price: <strong>$79.99/yr</strong><br>Your cut: <strong>~12.5%</strong> of sale</div>
+    </div>
+    <div class="payout-card">
+      <div class="plan-badge badge-lifetime">LIFETIME</div>
+      <div class="plan-name">FAMILY LIFETIME</div>
+      <div class="payout-amount"><span>$</span>20</div>
+      <div class="payout-when">per signup · paid after 30 days</div>
+      <div class="plan-price-note">Plan price: <strong>$149 once</strong><br>Your cut: <strong>~13%</strong> of sale</div>
+    </div>
+  </div>
+
+  <div style="font-size:.72rem;font-weight:800;letter-spacing:.1em;color:var(--tx3);margin:2.5rem 0 .75rem;">SPONSOR &amp; DONOR BONUSES — CHURCHES, SCHOOLS &amp; ORGANIZATIONS</div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;">
+    <div class="payout-card" style="border-color:rgba(34,197,94,.25);">
+      <div class="plan-badge" style="background:rgba(34,197,94,.12);color:#34d399;">SMALL SPONSOR</div>
+      <div class="plan-name">5–14 FAMILIES</div>
+      <div class="payout-amount" style="color:#22c55e;font-size:2.4rem;"><span>$</span>50</div>
+      <div class="payout-when">flat bonus · one-time</div>
+      <div class="plan-price-note">Org sponsors 5 to 14 family subscriptions</div>
+    </div>
+    <div class="payout-card" style="border-color:rgba(34,197,94,.25);">
+      <div class="plan-badge" style="background:rgba(34,197,94,.12);color:#34d399;">MID SPONSOR</div>
+      <div class="plan-name">15–29 FAMILIES</div>
+      <div class="payout-amount" style="color:#22c55e;font-size:2.4rem;"><span>$</span>100</div>
+      <div class="payout-when">flat bonus · one-time</div>
+      <div class="plan-price-note">Org sponsors 15 to 29 family subscriptions</div>
+    </div>
+    <div class="payout-card" style="border-color:rgba(34,197,94,.3);background:linear-gradient(135deg,rgba(34,197,94,.06),var(--bg2));">
+      <div class="plan-badge" style="background:rgba(34,197,94,.15);color:#34d399;">LARGE SPONSOR</div>
+      <div class="plan-name">30–49 FAMILIES</div>
+      <div class="payout-amount" style="color:#22c55e;font-size:2.4rem;"><span>$</span>150</div>
+      <div class="payout-when">flat bonus · one-time</div>
+      <div class="plan-price-note">Org sponsors 30 to 49 family subscriptions</div>
+    </div>
+    <div class="payout-card" style="border-color:rgba(34,197,94,.4);background:linear-gradient(135deg,rgba(34,197,94,.09),var(--bg2));">
+      <div class="plan-badge" style="background:rgba(34,197,94,.2);color:#34d399;">MAJOR SPONSOR ⭐</div>
+      <div class="plan-name">50+ FAMILIES</div>
+      <div class="payout-amount" style="color:#22c55e;font-size:1.6rem;line-height:1.3;">$150<br><span style="font-size:1rem;">+ 10%</span></div>
+      <div class="payout-when">bonus + 10% of sponsor payment</div>
+      <div class="plan-price-note">Org sponsors 50+ families<br><strong style="color:#34d399;">Biggest earning potential</strong></div>
+    </div>
+  </div>
+  <p style="font-size:.78rem;color:var(--tx3);margin-top:.75rem;">Sponsor bonuses paid after 30-day retention confirmation. 10% calculated on total sponsor payment amount.</p>
+
+  <!-- Earnings Potential Table -->
+  <div class="earnings-wrap" style="margin-top:3rem;">
+    <div class="sec-label">EARNINGS POTENTIAL</div>
+    <div class="sec-title" style="font-size:1.3rem;">What Could You Earn?</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Referrals / Month</th>
+          <th>Plan Mix (Example)</th>
+          <th>Monthly Earnings</th>
+          <th>Annual Earnings</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="plan-col">5 referrals</td>
+          <td>All monthly signups</td>
+          <td class="highlight-val">$25</td>
+          <td class="highlight-val">$300</td>
+        </tr>
+        <tr>
+          <td class="plan-col">10 referrals</td>
+          <td>Mix of monthly + annual</td>
+          <td class="highlight-val">$75</td>
+          <td class="highlight-val">$900</td>
+        </tr>
+        <tr>
+          <td class="plan-col">20 referrals</td>
+          <td>Mostly annual + lifetime</td>
+          <td class="highlight-val">$250</td>
+          <td class="highlight-val">$3,000</td>
+        </tr>
+        <tr>
+          <td class="plan-col">1 sponsor deal</td>
+          <td>Church sponsors 20 families</td>
+          <td class="highlight-val" style="color:#22c55e;">$100 bonus</td>
+          <td class="highlight-val" style="color:#22c55e;">per deal</td>
+        </tr>
+        <tr>
+          <td class="plan-col">1 major sponsor</td>
+          <td>School — 60 families @ $25/mo</td>
+          <td class="highlight-val" style="color:#22c55e;">$300 bonus</td>
+          <td class="highlight-val" style="color:#22c55e;">per deal</td>
+        </tr>
+        <tr>
+          <td class="plan-col">15 refs + 1 sponsor</td>
+          <td>Mixed strong month</td>
+          <td class="highlight-val">$250–$400</td>
+          <td class="highlight-val">$3,000–$5,000</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:.78rem;color:var(--tx3);margin-top:.75rem;">* Estimates based on referral mix. No earnings are guaranteed. Results depend on effort and audience.</p>
+  </div>
+</div>
+
+<!-- ══════════ HOW IT WORKS ══════════ -->
+<div class="how-bg" id="how-it-works">
+  <div class="section">
+    <div class="sec-label">PROCESS</div>
+    <div class="sec-title">How It Works</div>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>Apply Below</h3>
+        <p>Fill out the affiliate application. We review and approve — usually within 48 hours. Commission-only, no cost to you.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>Get Your Code</h3>
+        <p>We issue you a unique referral code (e.g. <strong style="color:var(--gold);">REF-JASON42</strong>). Share it via social media, email, word of mouth, or your website.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>Customers Enter Code</h3>
+        <p>When someone signs up, they enter your referral code at checkout. The sale is automatically credited to your account.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <h3>You Get Paid</h3>
+        <p>Commissions are tracked and paid monthly via PayPal or Venmo. Minimum payout threshold: $20.</p>
+      </div>
+    </div>
+
+    <!-- Referral Code Explainer -->
+    <div class="code-section">
+      <div>
+        <h3>Your Unique Referral Code</h3>
+        <p>Every affiliate gets a personalized code we create for you — tied to your name or brand. When a customer uses it at checkout, the sale is permanently linked to you. No cookies, no expiration, no guesswork.</p>
+        <p>You can also share a direct referral link that pre-fills your code automatically.</p>
+      </div>
+      <div class="code-demo">
+        <div class="code-label">YOUR CODE</div>
+        <div class="code-example">REF-YOURNAME</div>
+        <div class="code-label" style="margin-top:.75rem;">YOUR REFERRAL LINK</div>
+        <div class="code-url">yourlife.cc/register?ref=YOURNAME</div>
+        <div class="code-note">Share either — both track to you</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ WHO IT'S FOR ══════════ -->
+<div class="section">
+  <div class="sec-label">IDEAL AFFILIATES</div>
+  <div class="sec-title">Who Should Apply?</div>
+  <p class="sec-sub">You don't need a huge following — just a real connection to families, churches, or communities who need tools like this.</p>
+  <div class="audience-grid">
+    <div class="audience-card">
+      <div class="audience-icon">⛪</div>
+      <h4>Pastors & Church Leaders</h4>
+      <p>Recommend to your congregation families and earn on every signup.</p>
+    </div>
+    <div class="audience-card">
+      <div class="audience-icon">📱</div>
+      <h4>Content Creators</h4>
+      <p>Family, faith, parenting, or education creators with an engaged audience.</p>
+    </div>
+    <div class="audience-card">
+      <div class="audience-icon">📚</div>
+      <h4>Homeschool Educators</h4>
+      <p>Co-op leaders, tutors, and educators who work directly with families.</p>
+    </div>
+    <div class="audience-card">
+      <div class="audience-icon">💼</div>
+      <h4>Sales & Marketing Pros</h4>
+      <p>Commission-driven hustlers looking for a product that practically sells itself.</p>
+    </div>
+    <div class="audience-card">
+      <div class="audience-icon">🏫</div>
+      <h4>School & Youth Workers</h4>
+      <p>Coaches, counselors, youth workers who touch families every day.</p>
+    </div>
+    <div class="audience-card">
+      <div class="audience-icon">🤝</div>
+      <h4>Community Organizers</h4>
+      <p>Anyone embedded in a community who believes in helping families thrive.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ APPLY FORM ══════════ -->
+<div class="apply-bg" id="apply">
+  <div class="apply-wrap">
+    <div class="sec-label" style="text-align:center;">JOIN THE PROGRAM</div>
+    <h2>Apply to Become an Affiliate</h2>
+    <p>Commission-only. No cost. No quota. Just share YourLife CC and earn when families sign up.</p>
+
+    <div class="apply-form">
+      <div class="field-row">
+        <div class="field">
+          <label>FIRST NAME</label>
+          <input type="text" placeholder="Jason" id="f-first">
+        </div>
+        <div class="field">
+          <label>LAST NAME</label>
+          <input type="text" placeholder="Smith" id="f-last">
+        </div>
+      </div>
+      <div class="field">
+        <label>EMAIL ADDRESS</label>
+        <input type="email" placeholder="you@email.com" id="f-email">
+      </div>
+      <div class="field">
+        <label>PHONE (OPTIONAL)</label>
+        <input type="tel" placeholder="(208) 555-0100" id="f-phone">
+      </div>
+      <div class="field">
+        <label>HOW WILL YOU PROMOTE YOURLIFE CC?</label>
+        <select id="f-method">
+          <option value="">Select one...</option>
+          <option>Social media (Facebook, Instagram, TikTok, etc.)</option>
+          <option>Church / ministry network</option>
+          <option>Homeschool co-op or community</option>
+          <option>Email list / newsletter</option>
+          <option>Blog or website</option>
+          <option>Word of mouth / personal network</option>
+          <option>YouTube or podcast</option>
+          <option>Direct sales / outreach</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>ESTIMATED MONTHLY REACH (how many people you can reach)</label>
+        <select id="f-reach">
+          <option value="">Select range...</option>
+          <option>Under 100</option>
+          <option>100–500</option>
+          <option>500–2,000</option>
+          <option>2,000–10,000</option>
+          <option>10,000+</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>TELL US A BIT ABOUT YOURSELF (optional)</label>
+        <textarea id="f-bio" placeholder="Your background, why you believe in this product, your audience..."></textarea>
+      </div>
+      <div class="field">
+        <label>PREFERRED PAYOUT METHOD</label>
+        <select id="f-payout">
+          <option value="">Select...</option>
+          <option>PayPal</option>
+          <option>Venmo</option>
+          <option>Other (we'll discuss)</option>
+        </select>
+      </div>
+
+      <button class="submit-btn" onclick="submitApp()">Submit Application →</button>
+      <p class="form-note">We review all applications within 48 hours. You'll receive your referral code by email upon approval.</p>
+      <div class="success-msg" id="success-msg">
+        ✅ Application submitted! We'll review your application and email your referral code within 48 hours.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ PROGRAM RULES ══════════ -->
+<div class="rules-section" id="rules">
+  <div class="rules-box">
+    <h2>📋 AFFILIATE PROGRAM RULES & TERMS</h2>
+
+    <div class="rule-item">
+      <div class="rule-num">1</div>
+      <p><strong>Eligibility:</strong> You must be 18 or older to participate. Employees and immediate family members of YourLife CC / Kingdom Creatives are not eligible.</p>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">2</div>
+      <p><strong>Referral Codes:</strong> Each affiliate receives one unique referral code issued by YourLife CC. Codes are non-transferable and may not be shared with another affiliate for credit-splitting purposes.</p>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">3</div>
+      <p><strong>How Sales Are Tracked:</strong> A sale is credited to you when a new customer enters your referral code at checkout. The code must be entered at the time of purchase — we cannot apply codes retroactively.</p>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">4</div>
+      <p><strong>Commission Amounts:</strong> Monthly plan = <strong>$5</strong>. Annual plan = <strong>$10</strong>. Lifetime plan = <strong>$20</strong>. Commissions are one-time per unique customer. You do not earn recurring commissions on monthly renewals.</p><p style="margin-top:.5rem;"><strong>Sponsor &amp; Donor Bonuses:</strong> When you land a church, school, or organization that sponsors multiple family subscriptions, you earn a flat bonus in addition to individual commissions: 5–14 families = <strong>$50</strong>, 15–29 families = <strong>$100</strong>, 30–49 families = <strong>$150</strong>, 50+ families = <strong>$150 + 10% of total sponsor payment</strong>. Sponsor bonuses are paid after 30-day retention confirmation.</p>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">5</div>
+      <p><strong>Payment Schedule:</strong> Commissions are paid on the 15th of each month for sales confirmed in the prior month. Minimum payout threshold is <strong>$20</strong>. Unpaid balances roll to the next month.</p>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">6</div>
+      <p><strong>Refund Policy:</strong> If a referred customer receives a refund within 30 days, the associated commission will be reversed. Commissions are not paid until the refund window has closed.</p>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">7</div>
+      <p><strong>Self-Referrals Prohibited:</strong> You may not use your own referral code to purchase a plan for yourself, a family member, or any account you control. Violations will result in immediate termination.</p>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">8</div>
+      <p><strong>Honest Promotion:</strong> You may not make false, misleading, or exaggerated claims about YourLife CC. All promotional content must be truthful and comply with FTC disclosure requirements (you must disclose your affiliate relationship).</p>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">9</div>
+      <p><strong>Approved Channels:</strong> Promotion via social media, email, church networks, blogs, and word of mouth is encouraged. Paid advertising using YourLife CC trademarks requires written pre-approval. Spam or unsolicited bulk messaging is strictly prohibited.</p>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">10</div>
+      <p><strong>Program Modification & Termination:</strong> YourLife CC reserves the right to change commission rates, rules, or terminate the program at any time with 30 days notice. We may terminate an individual affiliate's account at any time for violation of these terms.</p>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">11</div>
+      <p><strong>No Guarantee of Earnings:</strong> This is a commission-only program. No earnings are guaranteed. Results depend entirely on your promotional effort and audience.</p>
+    </div>
+
+    <p class="rules-updated">Last updated: March 2026 · Questions? <a href="mailto:info@kingdom-creatives.com" style="color:var(--gold);">info@kingdom-creatives.com</a></p>
+  </div>
+</div>
+
+<footer>
+  © 2026 YourLife.cc · 
+  <a href="/privacy.html">Privacy Policy</a> · 
+  <a href="/terms.html">Terms of Service</a> · 
+  <a href="#rules">Affiliate Rules</a>
+</footer>
+
+<script>
+function submitApp() {
+  const first = document.getElementById('f-first').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const method = document.getElementById('f-method').value;
+
+  if (!first || !email || !method) {
+    alert('Please fill in your name, email, and promotion method to continue.');
+    return;
+  }
+
+  // Build mailto with form data
+  const last = document.getElementById('f-last').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+  const reach = document.getElementById('f-reach').value;
+  const bio = document.getElementById('f-bio').value.trim();
+  const payout = document.getElementById('f-payout').value;
+
+  const subject = encodeURIComponent(`YourLife CC Affiliate Application — ${first} ${last}`);
+  const body = encodeURIComponent(
+`NEW AFFILIATE APPLICATION
+=========================
+Name: ${first} ${last}
+Email: ${email}
+Phone: ${phone || 'Not provided'}
+
+Promotion Method: ${method}
+Monthly Reach: ${reach || 'Not provided'}
+Payout Preference: ${payout || 'Not specified'}
+
+About / Notes:
+${bio || 'Not provided'}
+`
+  );
+
+  window.location.href = `mailto:info@kingdom-creatives.com?subject=${subject}&body=${body}`;
+
+  document.getElementById('success-msg').style.display = 'block';
+}
+</script>
+</body>
+</html>
