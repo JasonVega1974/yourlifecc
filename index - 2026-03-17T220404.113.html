@@ -1,0 +1,1724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>YourLife CC — The Life Operating System for Families</title>
+<meta name="description" content="The complete family command center. Monitor behavior, reward progress, track school work, chores and daily tasks. Transform your child — transform your family.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#06090f;--bg2:#0c1220;--bg3:#131c30;
+  --tx:#eef2f7;--tx2:#8b9ab8;--tx3:#5a6a85;
+  --blue:#4f8fff;--cyan:#06d6a0;--green:#22c55e;
+  --gold:#f5a623;--purple:#a78bfa;--red:#ef4444;
+  --grad:linear-gradient(135deg,#4f8fff,#06d6a0);
+  --grad2:linear-gradient(135deg,#f5a623,#06d6a0);
+  --fn:'DM Sans',sans-serif;--fh:'Sora',sans-serif;
+}
+html{scroll-behavior:smooth;}
+body{font-family:var(--fn);background:var(--bg);color:var(--tx);line-height:1.7;overflow-x:hidden;}
+a{color:var(--blue);text-decoration:none;}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px;}
+.sec{padding:88px 0;}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;backdrop-filter:blur(20px);background:rgba(6,9,15,.85);display:flex;flex-direction:column;}.nav>.wrap{padding:14px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-family:var(--fh);font-size:1.3rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.nav-links{display:flex;gap:1.8rem;align-items:center;}
+.nav-links a{color:var(--tx2);font-size:.85rem;font-weight:500;}
+.nav-links a:hover{color:var(--tx);}
+.nav-cta{background:var(--grad);color:#fff!important;padding:9px 20px;border-radius:10px;font-weight:700!important;}
+
+/* HAMBURGER */
+.nav-ham{display:none;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:9px;padding:.45rem .6rem;cursor:pointer;flex-direction:column;gap:4px;flex-shrink:0;}
+.nav-ham span{display:block;width:20px;height:2px;background:var(--tx);border-radius:2px;transition:all .25s;}
+.nav-ham.open span:nth-child(1){transform:translateY(6px) rotate(45deg);}
+.nav-ham.open span:nth-child(2){opacity:0;}
+.nav-ham.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
+
+/* MOBILE NAV DRAWER */
+.nav-drawer{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:99;background:rgba(6,9,15,.98);backdrop-filter:blur(20px);padding:80px 24px 40px;flex-direction:column;gap:0;overflow-y:auto;}
+.nav-drawer.open{display:flex;}
+.nav-drawer a{color:var(--tx2);font-size:1.1rem;font-weight:600;padding:1rem 0;border-bottom:1px solid rgba(255,255,255,.05);display:block;}
+.nav-drawer a:last-child{border-bottom:none;}
+.nav-drawer a:hover{color:var(--tx);}
+.nav-drawer .nav-cta-mob{margin-top:1.2rem;background:var(--grad);color:#fff!important;padding:1rem;border-radius:13px;text-align:center;font-weight:700;font-size:1rem;border:none;}
+.nav-drawer .nav-signin-mob{margin-top:.6rem;background:rgba(255,255,255,.07);color:var(--tx)!important;padding:.9rem;border-radius:13px;text-align:center;font-weight:600;font-size:.95rem;border:1px solid rgba(255,255,255,.1);}
+
+@media(max-width:860px){
+  .nav-links{display:none;}
+  .nav-ham{display:flex;}
+  .nav .wrap{padding:0 4px;}
+}
+
+/* HERO */
+.hero{padding:175px 0 80px;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:900px;height:900px;background:radial-gradient(ellipse,rgba(79,143,255,.08) 0%,transparent 70%);pointer-events:none;}
+.hero h1{font-family:var(--fh);font-size:clamp(2.4rem,5.5vw,4.4rem);font-weight:900;line-height:1.15;margin-bottom:1.2rem;letter-spacing:-.03em;}
+.hero h1 em{font-style:normal;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:inline-block;padding-bottom:.05em;}
+.hero p{font-size:1.1rem;color:var(--tx2);max-width:580px;margin:0 auto 2rem;line-height:1.75;}
+.hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:.8rem;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:15px 32px;border-radius:13px;font-family:var(--fn);font-weight:700;font-size:.95rem;border:none;cursor:pointer;transition:all .25s;text-decoration:none;}
+.btn:hover{transform:translateY(-2px);}
+.bp{background:var(--grad);color:#fff;box-shadow:0 6px 24px rgba(79,143,255,.3);}
+.bp:hover{box-shadow:0 10px 36px rgba(79,143,255,.45);}
+.bo{background:transparent;color:var(--tx);border:1.5px solid rgba(255,255,255,.15);}
+.bo:hover{border-color:var(--blue);color:var(--blue);}
+.hero-note{font-size:.8rem;color:var(--tx3);margin-bottom:3rem;}
+.hero-stats{display:flex;justify-content:center;gap:clamp(1.5rem,4vw,3.5rem);flex-wrap:wrap;}
+.hs-num{font-family:var(--fh);font-size:2rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hs-lbl{font-size:.7rem;color:var(--tx3);font-weight:500;letter-spacing:.5px;}
+
+@media(max-width:640px){
+  .hero{padding:130px 0 60px;}
+  .hero p{font-size:.95rem;}
+  .hero-btns .btn{width:100%;justify-content:center;}
+  .hero-btns{flex-direction:column;padding:0 16px;}
+  .hero-note{margin-bottom:1.8rem;}
+  .hero-stats{gap:1.2rem;}
+  .hs-num{font-size:1.6rem;}
+  .lang-badge{font-size:.78rem;padding:.55rem 1.2rem;text-align:center;line-height:1.6;}
+}
+
+/* TRUST BAR */
+.trust{padding:36px 0;background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.03);}
+.trust-items{display:flex;justify-content:center;gap:2.5rem;flex-wrap:wrap;}
+.trust-item{display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--tx2);font-weight:500;}
+@media(max-width:640px){
+  .trust-items{gap:1rem 1.8rem;}
+  .trust-item{font-size:.75rem;}
+  .sec{padding:60px 0;}
+}
+
+/* ═══ EMOTIONAL IMPACT SECTION ═══ */
+.impact{padding:100px 0;background:linear-gradient(180deg,var(--bg) 0%,rgba(10,16,30,1) 100%);position:relative;overflow:hidden;}
+.impact::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(79,143,255,.06) 0%,transparent 65%);pointer-events:none;}
+.impact-eyebrow{font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--gold);text-align:center;margin-bottom:1rem;}
+.impact-h2{font-family:var(--fh);font-size:clamp(2.2rem,5vw,3.8rem);font-weight:900;text-align:center;line-height:1.1;letter-spacing:-.03em;margin-bottom:1.5rem;}
+.impact-h2 em{font-style:normal;background:linear-gradient(135deg,#f5a623,#06d6a0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.impact-sub{text-align:center;font-size:1.1rem;color:var(--tx2);max-width:640px;margin:0 auto 3.5rem;line-height:1.8;}
+.impact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:4rem;}
+@media(max-width:800px){.impact-grid{grid-template-columns:1fr;}}
+.impact-card{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);border-radius:20px;padding:2rem 1.8rem;position:relative;overflow:hidden;transition:transform .3s,border-color .3s;}
+.impact-card:hover{transform:translateY(-4px);border-color:rgba(79,143,255,.2);}
+.impact-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--card-accent,var(--grad));}
+.impact-card .ic-icon{font-size:2.4rem;margin-bottom:1rem;}
+.impact-card h3{font-family:var(--fh);font-size:1.1rem;font-weight:800;margin-bottom:.6rem;}
+.impact-card p{font-size:.88rem;color:var(--tx2);line-height:1.75;}
+.impact-card .ic-result{display:inline-block;margin-top:.9rem;font-size:.78rem;font-weight:700;padding:.3rem .9rem;border-radius:100px;background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.2);}
+
+/* THE BEFORE / AFTER */
+.ba-section{padding:80px 0;background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);}
+.ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;max-width:900px;margin:2.5rem auto 0;}
+@media(max-width:700px){.ba-grid{grid-template-columns:1fr;}}
+@media(max-width:640px){.refer-grid{grid-template-columns:1fr!important;}}
+.ba-card{border-radius:18px;padding:2rem;}
+.ba-before{background:rgba(239,68,68,.04);border:1px solid rgba(239,68,68,.12);}
+.ba-after{background:rgba(34,197,94,.04);border:1px solid rgba(34,197,94,.12);}
+.ba-label{font-family:var(--fh);font-size:.65rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;margin-bottom:1.2rem;}
+.ba-before .ba-label{color:var(--red);}
+.ba-after .ba-label{color:var(--green);}
+.ba-list{list-style:none;display:flex;flex-direction:column;gap:.7rem;}
+.ba-list li{font-size:.88rem;color:var(--tx2);display:flex;gap:.7rem;line-height:1.6;}
+.ba-before .ba-list li::before{content:'✗';color:var(--red);font-weight:800;flex-shrink:0;}
+.ba-after .ba-list li::before{content:'✓';color:var(--green);font-weight:800;flex-shrink:0;}
+
+/* VIDEO */
+.vid-section{padding:88px 0;text-align:center;}
+.vid-wrap{max-width:820px;margin:2rem auto 0;border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.07);aspect-ratio:16/9;background:#0a0f1a;box-shadow:0 40px 100px rgba(0,0,0,.5);}
+.vid-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d1628,#0c1220);cursor:pointer;transition:all .3s;}
+.vid-placeholder:hover .play-btn{transform:scale(1.08);box-shadow:0 12px 48px rgba(79,143,255,.5);}
+.play-btn{width:80px;height:80px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:2rem;margin-bottom:1rem;transition:all .3s;box-shadow:0 8px 32px rgba(79,143,255,.35);}
+.vid-placeholder h3{font-family:var(--fh);font-size:1.1rem;font-weight:700;margin-bottom:.4rem;}
+.vid-placeholder p{font-size:.85rem;color:var(--tx2);}
+
+/* FEATURES */
+.feat-section{padding:88px 0;background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);}
+
+/* PRICING */
+.price-head{text-align:center;margin-bottom:2.2rem;}
+.price-head .tag{font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--gold);display:block;margin-bottom:.8rem;}
+.price-head h2{font-family:var(--fh);font-size:clamp(2rem,4vw,3rem);font-weight:800;margin-bottom:.8rem;letter-spacing:-.02em;}
+.price-head p{color:var(--tx2);font-size:1rem;max-width:560px;margin:0 auto;}
+.btabs{display:flex;justify-content:center;gap:3px;margin-bottom:44px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:13px;padding:4px;width:fit-content;margin-left:auto;margin-right:auto;}
+.btab{position:relative;padding:10px 28px;border-radius:10px;border:none;font-family:var(--fn);font-size:.85rem;font-weight:700;cursor:pointer;color:var(--tx3);background:transparent;transition:all .2s;}
+.btab.on{background:var(--bg3);color:var(--tx);box-shadow:0 2px 12px rgba(0,0,0,.5);}
+.save-pip{position:absolute;top:-10px;right:-6px;background:var(--green);color:#000;font-size:.5rem;font-weight:900;padding:2px 7px;border-radius:100px;letter-spacing:.04em;white-space:nowrap;}
+.pg{display:grid;grid-template-columns:1fr 1.06fr 1fr;gap:16px;max-width:1060px;margin:0 auto;align-items:start;}
+.pg.hide{display:none!important;visibility:hidden!important;}
+@media(max-width:860px){.pg{grid-template-columns:1fr;max-width:420px;}}
+.pc{background:var(--bg2);border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:2.2rem 1.9rem 2.4rem;position:relative;transition:transform .25s,box-shadow .25s;}
+.pc:hover{transform:translateY(-4px);}
+.pc.pop{border-color:rgba(79,143,255,.3);background:linear-gradient(160deg,rgba(79,143,255,.07),var(--bg2) 60%);box-shadow:0 0 0 1px rgba(79,143,255,.3),0 24px 60px rgba(79,143,255,.1);margin-top:-14px;padding-top:2.6rem;padding-bottom:2.8rem;}
+.pc.pop:hover{box-shadow:0 0 0 1px rgba(79,143,255,.45),0 32px 80px rgba(79,143,255,.2);}
+.pc.ltm{border-color:rgba(245,166,35,.25);background:linear-gradient(160deg,rgba(245,166,35,.06),var(--bg2) 60%);box-shadow:0 0 0 1px rgba(245,166,35,.25),0 20px 50px rgba(245,166,35,.07);}
+.pc.ltm:hover{box-shadow:0 0 0 1px rgba(245,166,35,.4),0 28px 70px rgba(245,166,35,.14);}
+.pc-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-family:var(--fh);font-size:.6rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:.38rem 1.2rem;border-radius:100px;white-space:nowrap;}
+.pc-badge.bb{background:var(--grad);color:#fff;box-shadow:0 4px 16px rgba(79,143,255,.45);}
+.pc-badge.bg{background:linear-gradient(90deg,#f5a623,#e09010);color:#000;box-shadow:0 4px 14px rgba(245,166,35,.4);}
+.pc-name{font-family:var(--fh);font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:.9rem;color:var(--tx3);}
+.pc.pop .pc-name{color:var(--blue);}
+.pc.ltm .pc-name{color:var(--gold);}
+.pc-price{font-family:var(--fh);font-weight:800;line-height:1;margin-bottom:.3rem;}
+.pc-price .dl{font-size:1.5rem;vertical-align:top;margin-top:.55rem;font-weight:700;}
+.pc-price .am{font-size:3.6rem;letter-spacing:-.03em;}
+.pc-price .ct{font-size:1.7rem;font-weight:600;}
+.pc.ltm .pc-price{color:var(--gold);}
+.pc-per{font-size:.8rem;color:var(--tx3);margin-bottom:1.2rem;min-height:2.2rem;line-height:1.5;}
+.pc-who{font-size:.82rem;color:var(--tx2);line-height:1.55;padding:.85rem 0 1rem;border-top:1px solid rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.05);margin-bottom:1.3rem;}
+.pc.pop .pc-who{border-color:rgba(79,143,255,.12);}
+.pc.ltm .pc-who{border-color:rgba(245,166,35,.12);}
+.math-box{background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.18);border-radius:10px;padding:.7rem 1rem;margin-bottom:1.1rem;font-size:.76rem;color:rgba(255,235,160,.6);line-height:1.6;}
+.math-box strong{color:var(--gold);}
+.pc ul{list-style:none;display:flex;flex-direction:column;gap:.72rem;margin-bottom:1.9rem;}
+.pc li{display:flex;align-items:flex-start;gap:.6rem;font-size:.83rem;color:var(--tx2);line-height:1.5;}
+.ck{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.62rem;flex-shrink:0;margin-top:1px;background:rgba(255,255,255,.06);color:var(--tx3);}
+.pc.pop .ck{background:rgba(79,143,255,.15);color:var(--blue);}
+.pc.ltm .ck{background:rgba(245,166,35,.12);color:var(--gold);}
+.pc li strong{color:var(--tx);font-weight:600;}
+.pc-btn{width:100%;padding:.95rem;border-radius:13px;border:none;font-family:var(--fn);font-size:.92rem;font-weight:700;cursor:pointer;transition:all .22s;display:flex;align-items:center;justify-content:center;gap:.5rem;text-decoration:none;}
+.b-free{background:rgba(255,255,255,.08);color:var(--tx);border:1px solid rgba(255,255,255,.12);}
+.b-free:hover{background:rgba(255,255,255,.14);transform:translateY(-1px);}
+.blue{background:var(--grad);color:#fff;box-shadow:0 8px 24px rgba(79,143,255,.3);}
+.blue:hover{box-shadow:0 14px 36px rgba(79,143,255,.45);transform:translateY(-2px);}
+.gold{background:linear-gradient(135deg,#f5a623,#e08c0a);color:#000;box-shadow:0 8px 24px rgba(245,166,35,.3);}
+.gold:hover{box-shadow:0 14px 36px rgba(245,166,35,.45);transform:translateY(-2px);}
+.pc-note{text-align:center;font-size:.67rem;color:var(--tx3);margin-top:.5rem;}
+.helper{max-width:860px;margin:36px auto 0;background:var(--bg2);border:1px solid rgba(255,255,255,.05);border-radius:15px;padding:1.4rem 2rem;display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;text-align:center;}
+@media(max-width:700px){.helper{grid-template-columns:1fr;}}
+.helper strong{display:block;font-family:var(--fh);font-size:.88rem;font-weight:700;margin-bottom:.25rem;}
+.helper p{font-size:.78rem;color:var(--tx3);line-height:1.5;}
+
+/* COMING SOON */
+.cs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-bottom:2.5rem;}
+@media(max-width:768px){.cs-grid{grid-template-columns:1fr;}}
+.cs-card{background:var(--bg3);border:1px solid rgba(167,139,250,.12);border-radius:16px;padding:1.5rem;text-align:left;}
+.cs-card h4{font-family:var(--fh);font-size:.95rem;font-weight:800;margin-bottom:.4rem;}
+.cs-card p{font-size:.8rem;color:var(--tx2);line-height:1.6;}
+.cs-tag{font-size:.58rem;letter-spacing:2px;color:var(--purple);font-weight:700;margin-bottom:.4rem;text-transform:uppercase;}
+
+/* CHURCH */
+.org-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:2rem;}
+@media(max-width:768px){.org-grid{grid-template-columns:1fr;}}
+.org-card{background:var(--bg2);border:1px solid rgba(255,255,255,.05);border-radius:14px;padding:1.5rem;text-align:center;transition:all .25s;}
+.org-card:hover{border-color:rgba(6,214,160,.15);transform:translateY(-2px);}
+.org-card h3{font-family:var(--fh);font-size:1rem;font-weight:700;margin-bottom:.2rem;}
+.org-pr{font-family:var(--fh);font-size:1.8rem;font-weight:800;color:var(--cyan);margin:.5rem 0;}
+.org-per{font-size:.78rem;color:var(--tx2);}
+.org-card ul{text-align:left;margin:1rem 0;list-style:none;display:flex;flex-direction:column;gap:.35rem;}
+.org-card li{font-size:.78rem;color:var(--tx2);display:flex;gap:.4rem;}
+.org-card li::before{content:'✓';color:var(--cyan);font-weight:700;}
+
+/* REVIEWS */
+.rev-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1.2rem;margin-top:2rem;}
+.rc{background:var(--bg2);border:1px solid rgba(255,255,255,.04);border-radius:14px;padding:1.4rem;}
+.rc-stars{color:var(--gold);margin-bottom:.6rem;}
+.rc-text{font-size:.88rem;color:var(--tx2);line-height:1.7;margin-bottom:1rem;font-style:italic;}
+.rc-who{display:flex;align-items:center;gap:.6rem;}
+.rc-av{width:38px;height:38px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.8rem;color:#fff;flex-shrink:0;}
+
+/* FAQ */
+.faq-list{max-width:700px;margin:2rem auto 0;}
+.fq{background:var(--bg2);border:1px solid rgba(255,255,255,.04);border-radius:12px;margin-bottom:.5rem;overflow:hidden;}
+.fq-q{padding:1rem 1.3rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-weight:600;font-size:.9rem;transition:background .2s;}
+.fq-q:hover{background:rgba(255,255,255,.015);}
+.fq-q .arr{transition:transform .3s;font-size:.75rem;color:var(--tx3);}
+.fq-q.on .arr{transform:rotate(180deg);}
+.fq-a{max-height:0;overflow:hidden;transition:max-height .35s ease;padding:0 1.3rem;}
+.fq-a.on{max-height:400px;padding:0 1.3rem 1rem;}
+.fq-a p{font-size:.85rem;color:var(--tx2);line-height:1.7;}
+
+/* FOOTER */
+footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);padding:50px 0 28px;}
+.ft-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2rem;margin-bottom:2rem;}
+@media(max-width:768px){.ft-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:480px){.ft-grid{grid-template-columns:1fr;}}
+.ft-col h4{font-family:var(--fh);font-size:.8rem;font-weight:700;margin-bottom:.8rem;}
+.ft-col a{display:block;font-size:.82rem;color:var(--tx3);margin-bottom:.4rem;}
+.ft-col a:hover{color:var(--tx);}
+.ft-bottom{text-align:center;border-top:1px solid rgba(255,255,255,.04);padding-top:1.5rem;font-size:.78rem;color:var(--tx3);}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+.fade-up{animation:fadeUp .7s ease forwards;}
+
+.pricing-grid-6{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;max-width:1100px;margin:0 auto;}
+@media(max-width:900px){.pricing-grid-6{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:600px){.pricing-grid-6{grid-template-columns:1fr;}}
+.pc6{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:1.6rem;display:flex;flex-direction:column;gap:.6rem;position:relative;}
+.pc6.featured{border-color:#f5c842;background:rgba(245,200,66,.05);}
+.pc6.church{border-color:rgba(99,179,237,.3);background:rgba(99,179,237,.04);}
+.pc6-badge{font-size:.7rem;font-weight:700;letter-spacing:.08em;padding:.3rem .7rem;border-radius:20px;display:inline-block;width:fit-content;}
+.pc6-badge.gold{background:rgba(245,200,66,.2);color:#f5c842;}
+.church-badge{background:rgba(99,179,237,.15);color:#63b3ed;}
+.pc6-label{font-size:.7rem;letter-spacing:.12em;color:rgba(255,255,255,.4);font-weight:600;margin-top:.2rem;}
+.pc6-name{font-size:1.3rem;font-weight:800;color:#fff;}
+.pc6-price{display:flex;align-items:baseline;gap:2px;margin:.3rem 0;}
+.pc6-price .dl{font-size:1.2rem;color:rgba(255,255,255,.6);}
+.pc6-price .am{font-size:2.6rem;font-weight:900;line-height:1;color:#fff;}
+.pc6-price .ct{font-size:1.1rem;color:rgba(255,255,255,.7);}
+.pc6-per{font-size:.8rem;color:rgba(255,255,255,.5);}
+.pc6-savings{font-size:.82rem;background:rgba(255,255,255,.06);border-radius:8px;padding:.5rem .7rem;color:rgba(255,255,255,.7);}
+.pc6-list{list-style:none;padding:0;margin:.4rem 0;flex:1;display:flex;flex-direction:column;gap:.35rem;}
+.pc6-list li{font-size:.85rem;color:rgba(255,255,255,.75);}
+.pc6-btn{display:block;text-align:center;padding:.85rem;border-radius:10px;font-weight:700;font-size:.9rem;text-decoration:none;margin-top:.4rem;transition:opacity .2s;}
+.pc6-btn:hover{opacity:.85;}
+.pc6-btn.blue{background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;}
+.pc6-btn.gold{background:linear-gradient(135deg,#f5c842,#e6a817);color:#1a1200;}
+.pc6-btn.purple{background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;}
+.pc6-note{font-size:.75rem;color:rgba(255,255,255,.35);text-align:center;margin:0;}
+
+
+/* ═══ COMPARISON TABLE ═══ */
+.compare-sec{background:var(--bg);border-top:1px solid rgba(255,255,255,.03);}
+.compare-wrap{max-width:1080px;margin:0 auto;}
+.compare-scroll{overflow-x:auto;border-radius:18px;border:1px solid rgba(255,255,255,.07);background:var(--bg2);}
+.compare-table{width:100%;border-collapse:collapse;min-width:700px;}
+.compare-table thead tr{background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.08);}
+.compare-table th{padding:1rem .9rem;font-family:var(--fh);font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);text-align:center;}
+.compare-table th.feat-col{text-align:left;width:220px;}
+.compare-table th.us-col{background:rgba(79,143,255,.08);color:var(--blue);}
+.us-badge{display:inline-block;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900;font-size:.85rem;}
+.compare-table td{padding:.75rem .9rem;font-size:.83rem;color:var(--tx2);text-align:center;border-bottom:1px solid rgba(255,255,255,.03);}
+.compare-table td.feat-col,.compare-table th.feat-col{text-align:left;}
+.compare-table td.us-col{background:rgba(79,143,255,.05);font-weight:600;}
+.compare-table tbody tr:hover{background:rgba(255,255,255,.015);}
+.compare-table .cat-row td{background:rgba(255,255,255,.02);color:var(--tx3);font-family:var(--fh);font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.5rem .9rem;border-top:1px solid rgba(255,255,255,.05);}
+.compare-table .y{color:var(--green);font-weight:700;font-size:.95rem;}
+.compare-table .n{color:rgba(255,255,255,.2);font-size:.9rem;}
+.compare-table .p{color:var(--gold);font-size:.75rem;font-weight:600;}
+.compare-note{font-size:.7rem;color:var(--tx3);margin-top:1rem;text-align:center;font-style:italic;}
+.compare-cta{text-align:center;margin-top:3rem;font-size:1.05rem;color:var(--tx2);}
+
+
+.lang-badge {
+  display:inline-flex;
+  align-items:center;
+  gap:.5rem;
+  background:rgba(251,191,36,.08);
+  border:1px solid rgba(251,191,36,.25);
+  border-radius:100px;
+  padding:.6rem 1.8rem;
+  font-size:.88rem;
+  color:#fbbf24;
+  font-weight:800;
+  letter-spacing:.02em;
+}
+@keyframes langPulse {
+  0%,100% {
+    box-shadow:0 0 8px rgba(251,191,36,.3),0 0 20px rgba(251,191,36,.12);
+    border-color:rgba(251,191,36,.5);
+  }
+  50% {
+    box-shadow:0 0 20px rgba(251,191,36,.7),0 0 50px rgba(251,191,36,.35),0 0 80px rgba(251,191,36,.15);
+    border-color:rgba(251,191,36,.95);
+  }
+}
+
+
+/* Google Translate — app-style lang picker */
+.goog-te-banner-frame{display:none!important;}
+iframe.skiptranslate{display:none!important;}
+body{top:0!important;}
+#goog-gt-tt{display:none!important;}
+#google_translate_element_lp{display:none;}
+.ctb-inner{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:nowrap;max-width:1200px;margin:0 auto;}
+.ctb-left{flex-shrink:0;}
+.ctb-label{font-family:var(--fh);font-size:.7rem;font-weight:700;color:rgba(245,200,66,.65);letter-spacing:.18em;text-transform:uppercase;margin-bottom:.2rem;}
+.ctb-prize{font-family:var(--fh);font-size:1.2rem;font-weight:900;color:var(--gold);letter-spacing:.04em;text-shadow:0 0 20px rgba(245,200,66,.4);line-height:1;}
+.ctb-cd{display:flex;align-items:center;gap:.5rem;flex-shrink:0;}
+.ctb-cd-label{font-size:.75rem;font-weight:700;color:rgba(245,200,66,.6);letter-spacing:.1em;margin-right:.25rem;}
+.ctb-cd-blocks{display:flex;align-items:center;gap:.35rem;}
+.ctb-cd-block{background:#111;border:1px solid rgba(245,200,66,.4);border-radius:6px;padding:.3rem .6rem;text-align:center;min-width:40px;}
+.ctb-cd-num{font-family:var(--fh);font-size:.95rem;font-weight:900;color:var(--gold);line-height:1;}
+.ctb-cd-unit{font-size:.5rem;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;margin-top:1px;}
+.ctb-cd-sep{color:var(--gold);font-weight:900;font-size:.85rem;}
+.ctb-right{display:flex;align-items:center;gap:.75rem;flex-shrink:0;}
+.ctb-tagline{font-family:var(--fh);font-size:.72rem;color:rgba(245,200,66,.7);letter-spacing:.1em;white-space:nowrap;}
+.ctb-btn{background:var(--gold);color:#06090f;font-family:var(--fh);font-weight:900;font-size:.8rem;letter-spacing:.08em;padding:.55rem 1.3rem;border-radius:8px;text-decoration:none;white-space:nowrap;transition:all .2s;box-shadow:0 0 16px rgba(245,200,66,.4);}
+.ctb-btn:hover{opacity:.85;box-shadow:0 0 30px rgba(245,200,66,.7);}
+.ctb-dismiss{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:1.1rem;padding:0 0 0 .25rem;line-height:1;flex-shrink:0;}
+.ctb-dismiss:hover{color:var(--tx);}
+
+/* Mobile — stack vertically */
+@media(max-width:700px){
+  .ctb-inner{flex-wrap:wrap;justify-content:center;text-align:center;gap:.5rem;}
+  .ctb-left{width:100%;text-align:center;}
+  .ctb-prize{font-size:1rem;}
+  .ctb-cd{justify-content:center;width:100%;}
+  .ctb-cd-label{display:none;}
+  .ctb-cd-block{min-width:36px;padding:.25rem .5rem;}
+  .ctb-cd-num{font-size:.85rem;}
+  .ctb-right{width:100%;justify-content:center;}
+  .ctb-tagline{display:none;}
+}
+
+@keyframes contestBarPulse {
+  0%,100% { box-shadow:0 0 15px rgba(245,200,66,.2), 0 0 40px rgba(245,200,66,.08), inset 0 0 20px rgba(245,200,66,.03); border-color:rgba(245,200,66,.7); }
+  50%      { box-shadow:0 0 35px rgba(245,200,66,.6), 0 0 80px rgba(245,200,66,.25), inset 0 0 30px rgba(245,200,66,.06); border-color:rgba(245,200,66,1); }
+}
+</style>
+<script type="text/javascript">window.$crisp=[];window.CRISP_WEBSITE_ID="2d64672d-f810-4298-8a23-0712f5c66f45";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script>
+</head>
+<body>
+
+<section class="hero">
+  <div class="wrap">
+
+<div class="nav">
+  <div class="wrap">
+    <span class="nav-logo" style="line-height:1.1;display:flex;flex-direction:column;">YourLife CC<span style="font-size:.5rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);-webkit-text-fill-color:var(--tx3);background:none;margin-top:1px;">Your Life Command Center</span></span>
+    <div class="nav-links">
+      <a href="#why">Why It Works</a>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a href="affiliate.html">Affiliates</a>
+      <a href="referral.html">Refer & Earn</a>
+      <div style="position:relative;display:flex;align-items:center;" id="lpWrap">
+        <button onclick="toggleLangPickerLP(this)" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#94a3b8;padding:5px 10px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:inherit;display:flex;align-items:center;gap:.35rem;transition:all .15s;" onmouseenter="this.style.background='rgba(255,255,255,.12)'" onmouseleave="this.style.background='rgba(255,255,255,.06)'" title="Translate">
+          <svg width="14" height="14" viewBox="0 0 24 24" style="flex-shrink:0;"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          <span style="font-size:.68rem;">Language</span>
+        </button>
+        <div id="google_translate_element_lp"></div>
+      </div>
+      <a href="/app/index.html">Sign In</a>
+      <a href="#pricing" class="nav-cta">See Plans &amp; Pricing</a>
+    </div>
+    <!-- HAMBURGER -->
+    <button class="nav-ham" id="navHam" onclick="toggleMobNav()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <!-- CONTEST BANNER -->
+  <!-- CONTEST BANNER -->
+      <div id="contest-top-bar" style="background:#000;border:2px solid var(--gold);padding:1rem 1.5rem;position:relative;overflow:hidden;animation:contestBarPulse 2s ease-in-out infinite;box-sizing:border-box;width:100%;">
+        <div class="ctb-inner">
+          <!-- Left: title -->
+          <div class="ctb-left">
+            <div class="ctb-label">🏆 LAUNCH CONTEST · LIMITED TIME</div>
+            <div class="ctb-prize">$5,000 CASH DRAWING</div>
+          </div>
+          <!-- Center: countdown -->
+          <div class="ctb-cd">
+            <span class="ctb-cd-label">DRAWING IN</span>
+            <div class="ctb-cd-blocks">
+              <div class="ctb-cd-block"><div class="ctb-cd-num" id="tb-days">90</div><div class="ctb-cd-unit">days</div></div>
+              <span class="ctb-cd-sep">:</span>
+              <div class="ctb-cd-block"><div class="ctb-cd-num" id="tb-hrs">00</div><div class="ctb-cd-unit">hrs</div></div>
+              <span class="ctb-cd-sep">:</span>
+              <div class="ctb-cd-block"><div class="ctb-cd-num" id="tb-min">00</div><div class="ctb-cd-unit">min</div></div>
+              <span class="ctb-cd-sep">:</span>
+              <div class="ctb-cd-block"><div class="ctb-cd-num" id="tb-sec">00</div><div class="ctb-cd-unit">sec</div></div>
+            </div>
+          </div>
+          <!-- Right: CTA -->
+          <div class="ctb-right">
+            <span class="ctb-tagline">REFER · SPONSOR · WIN</span>
+            <a href="/contest.html" class="ctb-btn">ENTER NOW →</a>
+            <button onclick="dismissBanner()" class="ctb-dismiss" title="Dismiss">✕</button>
+          </div>
+        </div>
+      </div>
+</div>
+
+<!-- MOBILE NAV DRAWER -->
+<div class="nav-drawer" id="navDrawer">
+  <a href="#why" onclick="closeMobNav()">🏆 Why It Works</a>
+  <a href="#features" onclick="closeMobNav()">⚡ Features</a>
+  <a href="#pricing" onclick="closeMobNav()">💳 Pricing</a>
+  <a href="#faq" onclick="closeMobNav()">❓ FAQ</a>
+  <a href="affiliate.html" onclick="closeMobNav()">🤝 Affiliates</a>
+  <a href="referral.html" onclick="closeMobNav()">💸 Refer & Earn</a>
+  <div style="padding:1rem 0;border-bottom:1px solid rgba(255,255,255,.05);">
+    <button onclick="toggleLangPickerLP(this)" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:var(--tx2);padding:.6rem 1rem;border-radius:10px;cursor:pointer;font-size:.9rem;font-weight:600;font-family:inherit;display:flex;align-items:center;gap:.5rem;width:100%;">🌐 Language</button>
+  </div>
+  <a href="/app/index.html" class="nav-signin-mob">Sign In</a>
+  <a href="#pricing" onclick="closeMobNav()" class="nav-cta-mob">See Plans &amp; Pricing →</a>
+</div>
+
+<!-- HERO -->
+
+
+    <div style="font-family:var(--fh);font-size:.72rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--gold);margin-bottom:1rem;">⚠️ What School Doesn't Teach — But Life Demands</div>
+    <h1>The Life Skills<br>App Your Kids<br><em>Can't Afford to Miss.</em></h1>
+    <p>By the time your child leaves your house, will they know how to manage money, build habits, take responsibility, and handle real life? Most won't. YourLife CC fixes that — giving parents <strong style="color:var(--tx);">real-time visibility</strong> and kids the structure, skills, and motivation that no classroom ever will. <strong style="color:var(--tx);">Every day you wait is a day they fall further behind.</strong></p>
+    <div class="hero-btns">
+      <a href="#pricing" class="btn bp">Start Free Today →</a>
+      <a href="#video" class="btn bo">▶ Watch Demo</a>
+    </div>
+    <div class="hero-note">⚡ Setup in under 5 minutes · Free 3-day trial · Cancel anytime</div>
+
+    <div style="display:flex;justify-content:center;margin-bottom:1.8rem;">
+      <div class="lang-badge">
+        🌐 Available in 18 Languages — English, Spanish, French, Mandarin, Hindi, Arabic &amp; more
+      </div>
+
+    </div>
+
+    <div class="hero-stats">
+      <div style="text-align:center;"><div class="hs-num">18</div><div class="hs-lbl">Languages</div></div>
+      <div style="text-align:center;"><div class="hs-num">99+</div><div class="hs-lbl">Life Skill Lessons</div></div>
+      <div style="text-align:center;"><div class="hs-num">28</div><div class="hs-lbl">App Sections</div></div>
+      <div style="text-align:center;"><div class="hs-num">30</div><div class="hs-lbl">Skill Categories</div></div>
+      <div style="text-align:center;"><div class="hs-num">35</div><div class="hs-lbl">Career Profiles</div></div>
+      <div style="text-align:center;"><div class="hs-num">259+</div><div class="hs-lbl">Quiz Questions</div></div>
+    </div>
+
+    <!-- SPONSOR COUNTER BANNER -->
+    <div style="margin-top:2.5rem;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:16px;padding:1.25rem 2rem;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:1.5rem 2.5rem;">
+      <div style="text-align:center;">
+        <div style="font-family:var(--fh);font-size:2rem;font-weight:900;color:#22c55e;line-height:1;" id="stat-families">—</div>
+        <div style="font-size:.7rem;font-weight:700;letter-spacing:.08em;color:rgba(34,197,94,.7);text-transform:uppercase;margin-top:.25rem;">Families Registered</div>
+      </div>
+      <div style="width:1px;height:36px;background:rgba(34,197,94,.2);flex-shrink:0;"></div>
+      <div style="text-align:center;">
+        <div style="font-family:var(--fh);font-size:2rem;font-weight:900;color:var(--gold);line-height:1;" id="stat-sponsored">—</div>
+        <div style="font-size:.7rem;font-weight:700;letter-spacing:.08em;color:rgba(245,200,66,.7);text-transform:uppercase;margin-top:.25rem;">Families Sponsored</div>
+      </div>
+      <div style="width:1px;height:36px;background:rgba(34,197,94,.2);flex-shrink:0;"></div>
+      <div style="text-align:center;">
+        <div style="font-family:var(--fh);font-size:2rem;font-weight:900;color:#f87171;line-height:1;" id="stat-waitlist">—</div>
+        <div style="font-size:.7rem;font-weight:700;letter-spacing:.08em;color:rgba(248,113,113,.7);text-transform:uppercase;margin-top:.25rem;">Families Waiting</div>
+      </div>
+      <a href="#sponsor-a-family" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700;font-size:.85rem;padding:.7rem 1.5rem;border-radius:10px;text-decoration:none;white-space:nowrap;flex-shrink:0;">❤️ Sponsor a Family</a>
+    </div>
+
+  </div>
+  </section>
+
+<div class="trust">
+  <div class="wrap">
+    <div class="trust-items">
+      <div class="trust-item">🌐 18 Languages</div>
+      <div class="trust-item">🔒 Bank-Level Security</div>
+      <div class="trust-item">📱 Any Device</div>
+      <div class="trust-item">⛪ Church Licenses</div>
+      <div class="trust-item">💯 30-Day Guarantee</div>
+      <div class="trust-item">⭐ 4.9/5 Rating</div>
+      <div class="trust-item">🛡️ COPPA Compliant</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ EMOTIONAL IMPACT ═══ -->
+<section class="impact" id="why">
+  <div class="wrap">
+    <div class="impact-eyebrow">🏆 WHY FAMILIES CHOOSE YOURLIFE CC</div>
+    <h2 class="impact-h2">Stop Wondering.<br><em>Start Knowing.</em></h2>
+    <p class="impact-sub">Most parents have no idea how their child is really doing until a report card arrives or a problem explodes. YourLife CC gives you a real-time window into your child's world — and the tools to actually shape it.</p>
+
+    <div class="impact-grid">
+      <div class="impact-card" style="--card-accent:linear-gradient(90deg,#4f8fff,#06d6a0);">
+        <div class="ic-icon">📋</div>
+        <h3>Total Organization</h3>
+        <p>Chores, school assignments, daily tasks, goals and habits — all tracked in one place. No more nagging. No more "I forgot." Your child knows exactly what they need to do and when.</p>
+        <span class="ic-result">✓ Fewer arguments. More accountability.</span>
+      </div>
+      <div class="impact-card" style="--card-accent:linear-gradient(90deg,#f5a623,#22c55e);">
+        <div class="ic-icon">👁️</div>
+        <h3>Real-Time Visibility</h3>
+        <p>The Parent Hub shows you a Life Score for each child — a weighted grade covering school, chores, habits, goals and more. Know where they're excelling and where they need your support.</p>
+        <span class="ic-result">✓ No surprises. Just clear, honest data.</span>
+      </div>
+      <div class="impact-card" style="--card-accent:linear-gradient(90deg,#a78bfa,#4f8fff);">
+        <div class="ic-icon">🏅</div>
+        <h3>Behavior That Changes</h3>
+        <p>A reward economy that works. Earn Parent Bucks for completing chores and tasks, redeem them in the family store, unlock screen time, spin the reward wheel. Motivation that sticks.</p>
+        <span class="ic-result">✓ Children do chores. Without being asked.</span>
+      </div>
+      <div class="impact-card" style="--card-accent:linear-gradient(90deg,#22c55e,#06d6a0);">
+        <div class="ic-icon">🎓</div>
+        <h3>School Performance</h3>
+        <p>GPA tracker, assignment log, study timer, SAT/ACT prep — everything a student needs to stay ahead. Parents can monitor grades and homework without hovering over every shoulder.</p>
+        <span class="ic-result">✓ Grades improve. Stress drops.</span>
+      </div>
+      <div class="impact-card" style="--card-accent:linear-gradient(90deg,#f5a623,#ef4444);">
+        <div class="ic-icon">❤️</div>
+        <h3>A Stronger Family</h3>
+        <p>When everyone knows the expectations, speaks the same language, and celebrates the same wins — conflict drops. Connection rises. YourLife CC isn't just an app, it's a family operating system.</p>
+        <span class="ic-result">✓ More peace. Deeper relationships.</span>
+      </div>
+      <div class="impact-card" style="--card-accent:linear-gradient(90deg,#06d6a0,#a78bfa);">
+        <div class="ic-icon">🚀</div>
+        <h3>Built for Real Life</h3>
+        <p>99+ life skill lessons covering finance, careers, relationships, health, faith and more. What school doesn't teach, YourLife CC does. Your child graduates knowing how to actually live.</p>
+        <span class="ic-result">✓ Confident, capable, ready for adulthood.</span>
+      </div>
+    </div>
+
+    <!-- APP FEATURES GRID -->
+    <div style="text-align:center;margin:4rem 0 2rem;">
+      <div style="font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--cyan);">EVERYTHING INSIDE THE APP</div>
+      <h3 style="font-family:var(--fh);font-size:1.8rem;font-weight:800;margin-top:.5rem;">16 Powerful Features.<br><em>One Family App.</em></h3>
+      <p style="color:var(--tx2);max-width:520px;margin:.75rem auto 0;font-size:.95rem;">Every tool your family needs to build skills, stay organized, and grow together — all in one place. <strong style="color:var(--tx);">And more features on the way.</strong></p>
+    </div>
+
+    <!-- Feature Detail Modal -->
+    <div id="featModal" onclick="closeFeatModal()" style="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:1rem;display:none;">
+      <div onclick="event.stopPropagation()" style="background:#0d1421;border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:2rem;max-width:380px;width:100%;position:relative;box-shadow:0 24px 80px rgba(0,0,0,.8);">
+        <button onclick="closeFeatModal()" style="position:absolute;top:1rem;right:1rem;background:rgba(255,255,255,.08);border:none;color:var(--tx2);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">✕</button>
+        <div id="featModalIcon" style="font-size:2.5rem;margin-bottom:.75rem;"></div>
+        <div id="featModalTitle" style="font-family:var(--fh);font-size:1.2rem;font-weight:800;color:var(--tx);margin-bottom:.5rem;"></div>
+        <div id="featModalDesc" style="font-size:.88rem;color:var(--tx2);line-height:1.6;"></div>
+        <a href="#pricing" onclick="closeFeatModal()" style="display:block;margin-top:1.5rem;background:var(--grad);color:#fff;text-align:center;padding:.75rem;border-radius:12px;font-weight:700;font-size:.85rem;text-decoration:none;">Get Started Free →</a>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;max-width:960px;margin:0 auto 4rem;" class="feat16-grid">
+
+      <div onclick="openFeatModal('🧠','Life Skills','Over 140 lessons across 18 real-life categories — money, health, relationships, communication, cooking, and more. Kids learn at their own pace while parents track every milestone. What school never taught, YourLife CC does.')" style="background:var(--bg3);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.4rem 1rem;text-align:center;transition:transform .2s,border-color .2s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(79,143,255,.3)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.07)'">
+        <div style="font-size:1.8rem;margin-bottom:.6rem;">🧠</div>
+        <div style="font-size:.8rem;font-weight:800;color:var(--tx);margin-bottom:.3rem;">Life Skills</div>
+        <div style="font-size:.68rem;color:var(--tx3);line-height:1.4;">140+ lessons across 18 real-life categories</div>
+        <div style="font-size:.6rem;color:var(--cyan);margin-top:.5rem;font-weight:700;">Tap to learn more</div>
+      </div>
+
+      <div onclick="openFeatModal('💰','Money Manager','Budgeting, expense tracking, savings goals, and financial literacy — all in one place. Kids learn to manage real money before they have to manage it alone. Parents can monitor spending habits and set limits.')" style="background:var(--bg3);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.4rem 1rem;text-align:center;transition:transform .2s,border-color .2s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(79,143,255,.3)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.07)'">
+        <div style="font-size:1.8rem;margin-bottom:.6rem;">💰</div>
+        <div style="font-size:.8rem;font-weight:800;color:var(--tx);margin-bottom:.3rem;">Money Manager</div>
+        <div style="font-size:.68rem;color:var(--tx3);line-height:1.4;">Budget, track spending, set savings goals</div>
+        <div style="font-size:.6rem;color:var(--cyan);margin-top:.5rem;font-weight:700;">Tap to learn more</div>
+      </div>
+
+      <div onclick="openFeatModal('✅','Chore System','Assign chores to each child, set due dates, and watch them get done — no more nagging. Kids earn points for completed chores and redeem them in the Reward Store. Parents approve completions with one tap.')" style="background:var(--bg3);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.4rem 1rem;text-align:center;transition:transform .2s,border-color .2s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(79,143,255,.3)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.07)'">
+        <div style="font-size:1.8rem;margin-bottom:.6rem;">✅</div>
+        <div style="font-size:.8rem;font-weight:800;color:var(--tx);margin-bottom:.3rem;">Chore System</div>
+        <div style="font-size:.68rem;color:var(--tx3);line-height:1.4;">Assign, track & reward chores automatically</div>
+        <div style="font-size:.6rem;color:var(--cyan);margin-top:.5rem;font-weight:700;">Tap to learn more</div>
+      </div>
+
+      <div onclick="openFeatModal('🎯','Goal Tracker','Short-term and long-term goals with visual progress tracking. Kids set their own goals, break them into steps, and celebrate wins. Parents see every goal and can add encouragement along the way.')" style="background:var(--bg3);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.4rem 1rem;text-align:center;transition:transform .2s,border-color .2s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(79,143,255,.3)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.07)'">
+        <div style="font-size:1.8rem;margin-bottom:.6rem;">🎯</div>
+        <div style="font-size:.8rem;font-weight:800;color:var(--tx);margin-bottom:.3rem;">Goal Tracker</div>
+        <div style="font-size:.68rem;color:var(--tx3);line-height:1.4;">Set short & long-term goals with progress tracking</div>
+        <div style="font-size:.6rem;color:var(--cyan);margin-top:.5rem;font-weight:700;">Tap to learn more</div>
+      </div>
+
+      <div onclick="openFeatModal('👨‍👩‍👧','Parent Hub','Your command center. See every child\'s activity, scores, chores, goals, and mood — all in one dashboard. Set rules, approve requests, manage rewards, and stay connected without hovering.')" style="background:var(--bg3);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.4rem 1rem;text-align:center;transition:transform .2s,border-color .2s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(245,166,35,.3)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.07)'">
+        <div style="font-size:1.8rem;margin-bottom:.6rem;">👨‍👩‍👧</div>
+        <div style="font-size:.8rem;font-weight:800;color:var(--tx);margin-bottom:.3rem;">Parent Hub</div>
+        <div style="font-size:.68rem;color:var(--tx3);line-height:1.4;">Real-time visibility into every child's activity</div>
+        <div style="font-size:.6rem;color:var(--gold);margin-top:.5rem;font-weight:700;">Tap to learn more</div>
+      </div>
+
+      <div onclick="openFeatModal('📚','School Tracker','GPA tracking, assignment log, grade book, and built-in study timer. Parents get a full picture of academic performance without waiting for report cards. Set grade alerts and celebrate improvements.')" style="background:var(--bg3);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.4rem 1rem;text-align:center;transition:transform .2s,border-color .2s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(245,166,35,.3)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.07)'">
+        <div style="font-size:1.8rem;margin-bottom:.6rem;">📚</div>
+        <div style="font-size:.8rem;font-weight:800;color:var(--tx);margin-bottom:.3rem;">School Tracker</div>
+        <div style="font-size:.68rem;color:var(--tx3);line-height:1.4;">Grades, assignments, GPA & study timer</div>
+        <div style="font-size:.6rem;color:var(--gold);margin-top:.5rem;font-weight:700;">Tap to learn more</div>
+      </div>
+
+      <div onclick="openFeatModal('💼','Career Builder','Resume builder, job skills checklist, interview prep, and career path exploration — all designed for teens. Kids discover what excites them and build the skills employers actually want before they ever apply.')" style="background:var(--bg3);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.4rem 1rem;text-align:center;transition:transform .2s,border-color .2s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(245,166,35,.3)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.07)'">
+        <div style="font-size:1.8rem;margin-bottom:.6rem;">💼</div>
+        <div style="font-size:.8rem;font-weight:800;color:var(--tx);margin-bottom:.3rem;">Career Builder</div>
+        <div style="font-size:.68rem;color:var(--tx3);line-height:1.4;">Resume, job skills, interview prep & career paths</div>
+        <div style="font-size:.6rem;color:var(--gold);margin-top:.5rem;font-weight:700;">Tap to learn more</div>
+      </div>
+
+      <div onclick="openFeatModal('😊','Mood Journal','Daily emotional check-ins with mood tracking, journaling prompts, and trend graphs over time. Parents can see patterns without reading private entries. Helps kids build emotional intelligence and self-awareness.')" style="background:var(--bg3);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.4rem 1rem;text-align:center;transition:transform .2s,border-color .2s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(245,166,35,.3)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.07)'">
+        <div style="font-size:1.8rem;margin-bottom:.6rem;">😊</div>
+        <div style="font-size:.8rem;font-weight:800;color:var(--tx);margin-bottom:.3rem;">Mood Journal</div>
+        <div style="font-size:.68rem;color:var(--tx3);line-height:1.4;">Daily check-ins, emotional health & reflection</div>
+        <div style="font-size:.6rem;color:var(--gold);margin-top:.5rem;font-weight:700;">Tap to learn more</div>
+      </div>
+
+      <div onclick="openFeatModal('🏆','Reward Store','Kids earn Life Points for completing chores, lessons, and goals — then spend them in the Reward Store on prizes you set. Screen time, outings, cash, privileges — you decide the rewards. Motivation that actually works.')" style="background:var(--bg3);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.4rem 1rem;text-align:center;transition:transform .2s,border-color .2s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(6,214,160,.3)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.07)'">
+        <div style="font-size:1.8rem;margin-bottom:.6rem;">🏆</div>
+        <div style="font-size:.8rem;font-weight:800;color:var(--tx);margin-bottom:.3rem;">Reward Store</div>
+        <div style="font-size:.68rem;color:var(--tx3);line-height:1.4;">Kids earn points and redeem real rewards</div>
+        <div style="font-size:.6rem;color:#06d6a0;margin-top:.5rem;font-weight:700;">Tap to learn more</div>
+      </div>
+
+      <div onclick="openFeatModal('🍎','Health & Fitness','Nutrition logging, workout tracking, sleep monitoring, and wellness goals. Kids learn healthy habits early — one of the most important life skills there is. Includes macro tracking and custom fitness plans.')" style="background:var(--bg3);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.4rem 1rem;text-align:center;transition:transform .2s,border-color .2s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(6,214,160,.3)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.07)'">
+        <div style="font-size:1.8rem;margin-bottom:.6rem;">🍎</div>
+        <div style="font-size:.8rem;font-weight:800;color:var(--tx);margin-bottom:.3rem;">Health & Fitness</div>
+        <div style="font-size:.68rem;color:var(--tx3);line-height:1.4;">Nutrition, workouts, sleep & wellness tracking</div>
+        <div style="font-size:.6rem;color:#06d6a0;margin-top:.5rem;font-weight:700;">Tap to learn more</div>
+      </div>
+
+      <div onclick="openFeatModal('📅','Family Calendar','One shared calendar for the whole family — events, reminders, school deadlines, and appointments. No more missed pickups or forgotten commitments. Everyone stays on the same page automatically.')" style="background:var(--bg3);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.4rem 1rem;text-align:center;transition:transform .2s,border-color .2s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(6,214,160,.3)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.07)'">
+        <div style="font-size:1.8rem;margin-bottom:.6rem;">📅</div>
+        <div style="font-size:.8rem;font-weight:800;color:var(--tx);margin-bottom:.3rem;">Family Calendar</div>
+        <div style="font-size:.68rem;color:var(--tx3);line-height:1.4;">Shared events, reminders & schedule sync</div>
+        <div style="font-size:.6rem;color:#06d6a0;margin-top:.5rem;font-weight:700;">Tap to learn more</div>
+      </div>
+
+      <div onclick="openFeatModal('✝️','Faith Mode','Daily scripture, devotionals, prayer tracking, and faith-based life lessons. Completely optional — enable it for your family or keep it off. Designed for families who want their values woven into daily life.')" style="background:var(--bg3);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.4rem 1rem;text-align:center;transition:transform .2s,border-color .2s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(6,214,160,.3)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.07)'">
+        <div style="font-size:1.8rem;margin-bottom:.6rem;">✝️</div>
+        <div style="font-size:.8rem;font-weight:800;color:var(--tx);margin-bottom:.3rem;">Faith Mode</div>
+        <div style="font-size:.68rem;color:var(--tx3);line-height:1.4;">Daily scripture, devotionals & faith tracking</div>
+        <div style="font-size:.6rem;color:#06d6a0;margin-top:.5rem;font-weight:700;">Tap to learn more</div>
+      </div>
+
+      <div onclick="openFeatModal('🗺️','Life Map','A visual board showing skill progress across every life category at a glance. Kids and parents can instantly see where they\'re thriving and where to focus next. Like a report card for real life.')" style="background:var(--bg3);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.4rem 1rem;text-align:center;transition:transform .2s,border-color .2s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(129,140,248,.3)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.07)'">
+        <div style="font-size:1.8rem;margin-bottom:.6rem;">🗺️</div>
+        <div style="font-size:.8rem;font-weight:800;color:var(--tx);margin-bottom:.3rem;">Life Map</div>
+        <div style="font-size:.68rem;color:var(--tx3);line-height:1.4;">Visual skill progress board across all areas</div>
+        <div style="font-size:.6rem;color:#818cf8;margin-top:.5rem;font-weight:700;">Tap to learn more</div>
+      </div>
+
+      <div onclick="openFeatModal('📊','Life Score','A dynamic score that reflects your child\'s overall growth across all areas of life — not just academics. Updated in real time as they complete lessons, chores, goals, and more. A number that actually means something.')" style="background:var(--bg3);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.4rem 1rem;text-align:center;transition:transform .2s,border-color .2s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(129,140,248,.3)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.07)'">
+        <div style="font-size:1.8rem;margin-bottom:.6rem;">📊</div>
+        <div style="font-size:.8rem;font-weight:800;color:var(--tx);margin-bottom:.3rem;">Life Score</div>
+        <div style="font-size:.68rem;color:var(--tx3);line-height:1.4;">Dynamic score showing overall growth & balance</div>
+        <div style="font-size:.6rem;color:#818cf8;margin-top:.5rem;font-weight:700;">Tap to learn more</div>
+      </div>
+
+      <div onclick="openFeatModal('🌐','18 Languages','The full app is available in 18 languages including Spanish, French, Mandarin, Hindi, Arabic, and more. One tap switches the entire interface — perfect for multilingual families or international users.')" style="background:var(--bg3);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.4rem 1rem;text-align:center;transition:transform .2s,border-color .2s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(129,140,248,.3)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.07)'">
+        <div style="font-size:1.8rem;margin-bottom:.6rem;">🌐</div>
+        <div style="font-size:.8rem;font-weight:800;color:var(--tx);margin-bottom:.3rem;">18 Languages</div>
+        <div style="font-size:.68rem;color:var(--tx3);line-height:1.4;">Full app available in 18 languages worldwide</div>
+        <div style="font-size:.6rem;color:#818cf8;margin-top:.5rem;font-weight:700;">Tap to learn more</div>
+      </div>
+
+      <div onclick="openFeatModal('📱','Any Device','No app store. No download. Works instantly on any phone, tablet, or computer — just open the browser and go. Your whole family can be set up in under 5 minutes from any device they already own.')" style="background:var(--bg3);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.4rem 1rem;text-align:center;transition:transform .2s,border-color .2s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(129,140,248,.3)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.07)'">
+        <div style="font-size:1.8rem;margin-bottom:.6rem;">📱</div>
+        <div style="font-size:.8rem;font-weight:800;color:var(--tx);margin-bottom:.3rem;">Any Device</div>
+        <div style="font-size:.68rem;color:var(--tx3);line-height:1.4;">Works on phone, tablet & desktop — no download</div>
+        <div style="font-size:.6rem;color:#818cf8;margin-top:.5rem;font-weight:700;">Tap to learn more</div>
+      </div>
+
+    </div>
+    <style>
+      @media(max-width:640px){.feat16-grid{grid-template-columns:repeat(2,1fr)!important;}}
+    </style>
+    <script>
+      function openFeatModal(icon,title,desc){
+        document.getElementById('featModalIcon').textContent=icon;
+        document.getElementById('featModalTitle').textContent=title;
+        document.getElementById('featModalDesc').textContent=desc;
+        var m=document.getElementById('featModal');
+        m.style.display='flex';
+        document.body.style.overflow='hidden';
+      }
+      function closeFeatModal(){
+        document.getElementById('featModal').style.display='none';
+        document.body.style.overflow='';
+      }
+      document.addEventListener('keydown',function(e){if(e.key==='Escape')closeFeatModal();});
+    </script>
+
+    <!-- BEFORE / AFTER -->
+    <div style="text-align:center;margin-bottom:1.5rem;">
+      <div style="font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--tx3);">THE TRANSFORMATION</div>
+      <h3 style="font-family:var(--fh);font-size:1.8rem;font-weight:800;margin-top:.5rem;">Before vs. After YourLife CC</h3>
+    </div>
+    <div class="ba-grid">
+      <div class="ba-card ba-before">
+        <div class="ba-label">❌ Before</div>
+        <ul class="ba-list">
+          <li>Constant nagging to do chores and homework</li>
+          <li>No idea how your child is really doing in school</li>
+          <li>Behavior issues with no clear system to correct them</li>
+          <li>Screen time battles every single day</li>
+          <li>Kids with no financial literacy or life skills</li>
+          <li>Disconnected family, everyone in their own world</li>
+          <li>Report cards are the only feedback you get</li>
+        </ul>
+      </div>
+      <div class="ba-card ba-after">
+        <div class="ba-label">✅ After</div>
+        <ul class="ba-list">
+          <li>Kids check their task list and do it on their own</li>
+          <li>Real-time Life Score shows exactly where each child stands</li>
+          <li>Clear reward and consequence system everyone understands</li>
+          <li>Screen time earned through completed tasks and chores</li>
+          <li>99+ lessons on money, careers, adulting and more</li>
+          <li>Shared goals, shared wins — a family that works together</li>
+          <li>Daily visibility into habits, moods, progress and growth</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:3rem;">
+      <a href="#pricing" class="btn bp" style="padding:18px 44px;font-size:1.05rem;border-radius:14px;">Start Transforming Your Family Today →</a>
+      <div style="margin-top:.8rem;font-size:.8rem;color:var(--tx3);">Free 3-day trial · Cancel anytime</div>
+    </div>
+  </div>
+</section>
+
+<!-- VIDEO DEMO -->
+<section class="vid-section" id="video">
+  <div class="wrap">
+    <div style="font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--gold);margin-bottom:.8rem;text-align:center;">🎬 SEE IT IN ACTION</div>
+    <h2 style="font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;margin-bottom:.5rem;text-align:center;">Watch the Full Walkthrough</h2>
+    <p style="text-align:center;color:var(--tx2);max-width:520px;margin:0 auto;">See exactly how YourLife CC works — from login to Parent Hub to chores and rewards. Under 5 minutes.</p>
+    <div class="vid-wrap">
+      <!-- ══════════════════════════════════════════════════
+           PASTE YOUR YOUTUBE VIDEO ID BELOW
+           Replace YOUR_VIDEO_ID with the actual ID
+           Example: https://youtube.com/watch?v=abc123
+           → replace YOUR_VIDEO_ID with abc123
+      ══════════════════════════════════════════════════ -->
+      <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d1628,#0c1220);gap:1rem;padding:2rem;">
+        <div style="width:80px;height:80px;border-radius:50%;background:rgba(245,200,66,.12);border:2px solid rgba(245,200,66,.25);display:flex;align-items:center;justify-content:center;font-size:2rem;">🎬</div>
+        <div style="font-family:var(--fh);font-size:.65rem;font-weight:800;letter-spacing:.2em;color:var(--gold);background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.25);padding:.35rem 1rem;border-radius:20px;">COMING SOON</div>
+        <h3 style="font-family:var(--fh);font-size:1.15rem;font-weight:800;color:var(--tx);margin:0;">Demo Video In Production</h3>
+        <p style="font-size:.88rem;color:var(--tx2);max-width:400px;text-align:center;margin:0;">We're putting the finishing touches on a full walkthrough. Check back soon — or sign up now and explore it yourself for free.</p>
+        <a href="#pricing" style="margin-top:.5rem;background:var(--gold);color:#0a0a0f;font-weight:700;font-size:.88rem;padding:.65rem 1.5rem;border-radius:8px;text-decoration:none;">See Plans &amp; Get Started →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" class="feat-section">
+  <div class="wrap">
+    <div style="text-align:center;margin-bottom:3rem;">
+      <div style="font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--blue);margin-bottom:.8rem;">EVERYTHING THEY NEED</div>
+      <h2 style="font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;line-height:1.15;letter-spacing:-.02em;margin-bottom:.8rem;">28 Sections. 99+ Lessons. One Platform.</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;" class="fc">
+      <div>
+        <div style="font-size:.85rem;font-weight:800;color:var(--blue);margin-bottom:.8rem;border-bottom:2px solid var(--blue);padding-bottom:.4rem;">🧠 EDUCATION &amp; SKILLS</div>
+        <div style="display:flex;flex-direction:column;gap:.45rem;">
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>99+ Life Skill Lessons</b> across 30 categories</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>43 Growing Up Topics</b> — puberty, emotions, drugs, hygiene</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>22 Character Lessons</b> — kindness, resilience, leadership</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>35 Career Profiles</b> with salary ranges and roadmaps</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>14 Sports Profiles</b> with scholarship timelines</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Driving Education</b> — license prep, car maintenance</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Music Hub</b> — 14 instrument guides, practice timer</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>CBT Training</b> — emotional intelligence and cognitive skills</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:.85rem;font-weight:800;color:var(--purple);margin-bottom:.8rem;border-bottom:2px solid var(--purple);padding-bottom:.4rem;">✝️ FAITH &amp; DAILY TOOLS</div>
+        <div style="display:flex;flex-direction:column;gap:.45rem;">
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>30 Daily Devotionals</b> with scripture and prayer</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>30 Daily Devotionals</b> with reflection and application</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Bible Reading Log</b> — all 66 books</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Faith Mode Toggle</b> — ON or OFF per family</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>School Tracker</b> — GPA, assignments, study timer</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Journal and Mood Tracker</b> with daily prompts</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Resume Builder and Bio Page</b> with QR code</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Goal System</b> — short, mid and long-term planning</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:.85rem;font-weight:800;color:var(--green);margin-bottom:.8rem;border-bottom:2px solid var(--green);padding-bottom:.4rem;">👨‍👩‍👧 PARENT &amp; REWARDS</div>
+        <div style="display:flex;flex-direction:column;gap:.45rem;">
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Life Score Dashboard</b> — weighted A+ to F grade per child</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Multi-Child Profiles</b> — separate PIN-protected dashboards</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Parent Bucks Economy</b> — virtual currency, redeemable store</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Spin Wheel and Scratch Cards</b> — reward games</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Screen Time Manager</b> — earn minutes for games and TV</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Parent Quiz System</b> — send quizzes to kids remotely</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Activity Audit Trail</b> — timestamped, anti-cheating</span></div>
+          <div style="font-size:.82rem;display:flex;gap:.4rem;"><span style="color:var(--green);font-weight:800;">✓</span><span><b>Behavior Log</b> — correct or reward any action instantly</span></div>
+        </div>
+      </div>
+    </div>
+    <style>@media(max-width:768px){.fc{grid-template-columns:1fr!important;}}</style>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="sec" id="pricing" style="background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);">
+  <div class="wrap">
+    <div class="price-head">
+      <span class="tag">💰 PRICING</span>
+      <h2>Start Free. Upgrade When You're Ready.</h2>
+      <p>Start with a 3-day free trial. Monthly cancel anytime. Lifetime is a one-time purchase — no subscription, no auto-charges ever.</p>
+    </div>
+    <div class="pricing-grid-6">
+
+      <!-- ROW 1: Family Plans -->
+      <div class="pc6">
+        <div class="pc6-label">FAMILY</div>
+        <div class="pc6-name">Monthly</div>
+        <div class="pc6-price"><span class="dl">$</span><span class="am">9</span><span class="ct">.99</span></div>
+        <div class="pc6-per">per month · cancel anytime</div>
+        <ul class="pc6-list">
+          <li>✓ Unlimited child profiles</li>
+          <li>✓ All 28 sections + 99+ lessons</li>
+          <li>✓ Chores, rewards, Parent Hub</li>
+          <li>✓ AI quiz feedback</li>
+          <li>✓ Cancel anytime</li>
+        </ul>
+        <a href="https://buy.stripe.com/5kQaEQ52j4r783cftH7wA00" class="pc6-btn blue">Start 3-Day Free Trial →</a>
+        <p class="pc6-note">Free for 3 days · then $9.99/mo</p>
+      </div>
+
+      <div class="pc6 featured">
+        <div class="pc6-badge gold">⭐ BEST VALUE</div>
+        <div class="pc6-label">FAMILY</div>
+        <div class="pc6-name" style="color:#f5c842;">Yearly</div>
+        <div class="pc6-price"><span class="dl">$</span><span class="am">79</span><span class="ct">.99</span></div>
+        <div class="pc6-per">per year · save $40 vs monthly</div>
+        <div class="pc6-savings">Monthly = $119.88/yr. <strong style="color:#f5c842;">You save $40.</strong></div>
+        <ul class="pc6-list">
+          <li>✓ Everything in Monthly</li>
+          <li>✓ 2 months free every year</li>
+          <li>✓ Price locked forever</li>
+          <li>✓ Cancel before renewal — full refund</li>
+        </ul>
+        <a href="https://buy.stripe.com/8x200ccuL7Dj4R0epD7wA01" class="pc6-btn gold">Start 3-Day Free Trial →</a>
+        <p class="pc6-note">Free for 3 days · then $79.99/yr</p>
+      </div>
+
+      <div class="pc6">
+        <div class="pc6-badge" style="background:rgba(139,92,246,.2);color:#a78bfa;">⚡ PAY ONCE FOREVER</div>
+        <div class="pc6-label">FAMILY</div>
+        <div class="pc6-name">Lifetime</div>
+        <div class="pc6-price"><span class="dl">$</span><span class="am">149</span></div>
+        <div class="pc6-per">one payment · no renewals · ever</div>
+        <div class="pc6-savings">5 yrs monthly = $599. <strong style="color:#a78bfa;">Lifetime = $149 once.</strong></div>
+        <ul class="pc6-list">
+          <li>✓ Everything in Yearly</li>
+          <li>✓ Never pay again</li>
+          <li>✓ All future updates free</li>
+          <li>✓ 30-day money-back guarantee</li>
+        </ul>
+        <a href="https://buy.stripe.com/8x2dR27ar5vb4R03KZ7wA02" class="pc6-btn purple">Buy Now — $149 Once →</a>
+        <p class="pc6-note">30-day guarantee · yours forever</p>
+      </div>
+
+      <!-- ROW 2: Church / Sponsor Plans -->
+      <div class="pc6 church">
+        <div class="pc6-badge gold">🏛 DONOR &amp; SPONSOR — 10 FAMILIES</div>
+        <div class="pc6-name">Starter</div>
+        <div class="pc6-price"><span class="dl">$</span><span class="am">249</span></div>
+        <div class="pc6-per">one-time · 10 families · forever</div>
+        <ul class="pc6-list">
+          <li>✓ 10 family licenses</li>
+          <li>✓ Full access for each family</li>
+          <li>✓ All sections + lessons included</li>
+          <li>✓ Priority support</li>
+          <li>✓ 30-day money-back guarantee</li>
+        </ul>
+        <a href="https://buy.stripe.com/7sY3codyP9Lr1EOgxL7wA03" class="pc6-btn blue">Get Started →</a>
+        <p class="pc6-note">One-time · 10 families · no subscription</p>
+      </div>
+
+      <div class="pc6 church">
+        <div class="pc6-badge gold">🏛 DONOR &amp; SPONSOR — 30 FAMILIES</div>
+        <div class="pc6-name">Community</div>
+        <div class="pc6-price"><span class="dl">$</span><span class="am">599</span></div>
+        <div class="pc6-per">one-time · 30 families · forever</div>
+        <ul class="pc6-list">
+          <li>✓ 30 family licenses</li>
+          <li>✓ Full access for each family</li>
+          <li>✓ All sections + lessons included</li>
+          <li>✓ Priority support &amp; onboarding call</li>
+          <li>✓ 30-day money-back guarantee</li>
+        </ul>
+        <a href="https://buy.stripe.com/5kQ14gfGX6zfbfo1CR7wA04" class="pc6-btn blue">Get Started →</a>
+        <p class="pc6-note">One-time · 30 families · no subscription</p>
+      </div>
+
+      <div class="pc6 church">
+        <div class="pc6-badge gold">🏛 DONOR &amp; SPONSOR — 75 FAMILIES</div>
+        <div class="pc6-name">Church / Donor</div>
+        <div class="pc6-price"><span class="dl">$</span><span class="am">999</span></div>
+        <div class="pc6-per">one-time · 75 families · forever</div>
+        <ul class="pc6-list">
+          <li>✓ 75 family licenses</li>
+          <li>✓ Lifetime access for each family</li>
+          <li>✓ Admin dashboard + reporting</li>
+          <li>✓ Bulk QR invite codes</li>
+          <li>✓ Priority support &amp; onboarding call</li>
+        </ul>
+        <a href="https://buy.stripe.com/00w14g2UbaPv83c6Xb7wA05" class="pc6-btn blue">Get Started →</a>
+        <p class="pc6-note">One-time · 75 families · lifetime access</p>
+      </div>
+
+    </div>
+
+    <div style="text-align:center;margin-top:1.5rem;margin-bottom:3rem;padding:1rem 1.5rem;background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.25);border-radius:12px;max-width:700px;margin-left:auto;margin-right:auto;">
+      <p style="color:#f5c842;font-size:.92rem;margin:0;">
+        🏛 <strong>Want to sponsor more families or need a custom plan?</strong><br>
+        <span style="color:rgba(255,255,255,.7);font-size:.87rem;">Reach out and we'll build something that fits your ministry or organization.</span><br>
+        <a href="/cdn-cgi/l/email-protection#ec85828a83ac8785828b888381c18f9e898d98859a899fc28f8381" style="color:#f5c842;font-weight:600;"><span class="__cf_email__" data-cfemail="6c05020a032c0705020b080301410f1e090d18051a091f420f0301">[email&#160;protected]</span></a>
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ SPONSOR A FAMILY ═══ -->
+<section id="sponsor-a-family" style="padding:88px 0;background:var(--bg);border-top:1px solid rgba(255,255,255,.05);">
+  <div class="wrap">
+
+    <!-- Header -->
+    <div style="text-align:center;margin-bottom:3rem;">
+      <div style="font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:#22c55e;margin-bottom:.8rem;">❤️ PAY IT FORWARD</div>
+      <h2 style="font-family:var(--fh);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;color:var(--tx);margin-bottom:.75rem;line-height:1.15;">Give a Family the Tools<br><em style="font-style:normal;background:linear-gradient(135deg,#22c55e,#16a34a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">to Thrive.</em></h2>
+      <p style="color:var(--tx2);font-size:1rem;max-width:560px;margin:0 auto 1.5rem;">Some families want these tools desperately but can't afford them. One small gift can change everything for a child who deserves the same start as everyone else.</p>
+      <div style="display:inline-flex;align-items:center;gap:.6rem;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:100px;padding:.45rem 1.1rem;">
+        <div style="width:7px;height:7px;border-radius:50%;background:#f87171;animation:pulse 2s infinite;flex-shrink:0;"></div>
+        <span style="font-size:.82rem;color:#fca5a5;font-weight:600;"><span id="hero-waitlist-count">—</span> families currently waiting for a sponsor</span>
+      </div>
+    </div>
+
+    <!-- Three sponsor tiers -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;max-width:860px;margin:0 auto 2rem;" class="refer-grid">
+
+      <!-- 1 Month -->
+      <div style="background:var(--bg3);border:1px solid rgba(34,197,94,.2);border-radius:18px;padding:1.75rem 1.5rem;text-align:center;position:relative;overflow:hidden;transition:transform .25s,box-shadow .25s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 16px 50px rgba(34,197,94,.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#22c55e,transparent);"></div>
+        <div style="font-size:2rem;margin-bottom:.5rem;">🌱</div>
+        <div style="font-family:var(--fh);font-size:.7rem;font-weight:700;letter-spacing:.1em;color:#22c55e;margin-bottom:.5rem;">ONE MONTH</div>
+        <div style="font-family:var(--fh);font-size:2.4rem;font-weight:900;color:var(--tx);line-height:1;margin-bottom:.3rem;">$9.99</div>
+        <div style="font-size:.82rem;color:var(--tx2);margin-bottom:1.25rem;">Gives one family 30 days of full access — a fresh start.</div>
+        <a href="https://buy.stripe.com/5kQeV69izaPvfvE0yN7wA06" style="display:block;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#22c55e;font-weight:700;font-size:.85rem;padding:.7rem;border-radius:10px;text-decoration:none;transition:background .2s;" onmouseover="this.style.background='rgba(34,197,94,.2)'" onmouseout="this.style.background='rgba(34,197,94,.12)'">Sponsor 1 Month →</a>
+      </div>
+
+      <!-- 3 Months — Featured -->
+      <div style="background:var(--bg3);border:2px solid #22c55e;border-radius:18px;padding:1.75rem 1.5rem;text-align:center;position:relative;overflow:hidden;transform:scale(1.03);transition:transform .25s,box-shadow .25s;" onmouseover="this.style.transform='scale(1.03) translateY(-4px)';this.style.boxShadow='0 20px 60px rgba(34,197,94,.15)'" onmouseout="this.style.transform='scale(1.03)';this.style.boxShadow=''">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#22c55e,transparent);"></div>
+        <div style="position:absolute;top:12px;right:12px;background:#22c55e;color:#06090f;font-size:.65rem;font-weight:800;padding:2px 9px;border-radius:20px;letter-spacing:.06em;">MOST IMPACT</div>
+        <div style="font-size:2rem;margin-bottom:.5rem;">🌿</div>
+        <div style="font-family:var(--fh);font-size:.7rem;font-weight:700;letter-spacing:.1em;color:#22c55e;margin-bottom:.5rem;">THREE MONTHS</div>
+        <div style="font-family:var(--fh);font-size:2.4rem;font-weight:900;color:var(--tx);line-height:1;margin-bottom:.3rem;">$25</div>
+        <div style="font-size:.82rem;color:var(--tx2);margin-bottom:1.25rem;">Gives a family enough time to build real habits and see lasting change.</div>
+        <a href="https://buy.stripe.com/cNi8wI2Ub8HndnwepD7wA07" style="display:block;background:#22c55e;color:#06090f;font-weight:700;font-size:.85rem;padding:.7rem;border-radius:10px;text-decoration:none;transition:opacity .2s;" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">Sponsor 3 Months →</a>
+      </div>
+
+      <!-- Full Year -->
+      <div style="background:var(--bg3);border:1px solid rgba(34,197,94,.2);border-radius:18px;padding:1.75rem 1.5rem;text-align:center;position:relative;overflow:hidden;transition:transform .25s,box-shadow .25s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 16px 50px rgba(34,197,94,.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#22c55e,transparent);"></div>
+        <div style="font-size:2rem;margin-bottom:.5rem;">🌳</div>
+        <div style="font-family:var(--fh);font-size:.7rem;font-weight:700;letter-spacing:.1em;color:#22c55e;margin-bottom:.5rem;">FULL YEAR</div>
+        <div style="font-family:var(--fh);font-size:2.4rem;font-weight:900;color:var(--tx);line-height:1;margin-bottom:.3rem;">$79.99</div>
+        <div style="font-size:.82rem;color:var(--tx2);margin-bottom:1.25rem;">A full year of access — the greatest gift you can give a family's future.</div>
+        <a href="https://buy.stripe.com/00wcMY1Q74r7bfobdr7wA08" style="display:block;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#22c55e;font-weight:700;font-size:.85rem;padding:.7rem;border-radius:10px;text-decoration:none;transition:background .2s;" onmouseover="this.style.background='rgba(34,197,94,.2)'" onmouseout="this.style.background='rgba(34,197,94,.12)'">Sponsor 1 Year →</a>
+      </div>
+
+    </div>
+
+    <!-- How it works + direct sponsor note -->
+    <div style="max-width:860px;margin:0 auto;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;" class="refer-grid">
+
+        <!-- How it works -->
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:1.5rem;">
+          <div style="font-family:var(--fh);font-size:.7rem;font-weight:700;letter-spacing:.1em;color:var(--tx2);margin-bottom:1rem;">HOW IT WORKS</div>
+          <div style="display:flex;flex-direction:column;gap:.85rem;">
+            <div style="display:flex;gap:.85rem;align-items:flex-start;">
+              <div style="width:24px;height:24px;border-radius:50%;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#22c55e;font-size:.75rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
+              <div style="font-size:.85rem;color:var(--tx2);line-height:1.5;">You choose an amount and complete payment through our secure checkout</div>
+            </div>
+            <div style="display:flex;gap:.85rem;align-items:flex-start;">
+              <div style="width:24px;height:24px;border-radius:50%;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#22c55e;font-size:.75rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
+              <div style="font-size:.85rem;color:var(--tx2);line-height:1.5;">Your gift funds a spot for a family on the waitlist — either a specific family you know or the next family in line</div>
+            </div>
+            <div style="display:flex;gap:.85rem;align-items:flex-start;">
+              <div style="width:24px;height:24px;border-radius:50%;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#22c55e;font-size:.75rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
+              <div style="font-size:.85rem;color:var(--tx2);line-height:1.5;">The sponsored family receives access and you get a confirmation that your gift was used</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sponsor someone you know -->
+        <div style="background:rgba(245,200,66,.04);border:1px solid rgba(245,200,66,.2);border-radius:14px;padding:1.5rem;">
+          <div style="font-family:var(--fh);font-size:.7rem;font-weight:700;letter-spacing:.1em;color:var(--gold);margin-bottom:.6rem;">WANT TO SPONSOR SOMEONE YOU KNOW?</div>
+          <p style="font-size:.85rem;color:var(--tx2);line-height:1.6;margin-bottom:1rem;">After you pay, simply tell your friend or family member to register on our waitlist. When they sign up, they enter your name in the "Referred & Sponsored By" field — and we'll match your payment to them directly.</p>
+          <div style="background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.15);border-radius:10px;padding:.75rem 1rem;font-size:.8rem;color:var(--tx2);line-height:1.5;">
+            💡 <strong style="color:var(--tx);">Tip:</strong> Share the waitlist link with them before you pay so they're ready to register right away → <a href="/sponsor-waitlist.html" style="color:var(--gold);font-weight:600;">yourlifecc.com/sponsor-waitlist</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Large donor card -->
+    <div style="max-width:860px;margin:1.25rem auto 0;">
+      <div style="background:rgba(245,200,66,.04);border:1px solid rgba(245,200,66,.2);border-radius:18px;padding:1.75rem 2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.25rem;">
+        <div>
+          <div style="font-family:var(--fh);font-size:.7rem;font-weight:700;letter-spacing:.1em;color:var(--gold);margin-bottom:.4rem;">🏛️ CHURCHES, SCHOOLS &amp; LARGE DONORS</div>
+          <div style="font-size:1rem;font-weight:700;color:var(--tx);margin-bottom:.3rem;">Want to sponsor 10, 50, or 100+ families?</div>
+          <div style="font-size:.85rem;color:var(--tx2);">Contact us directly — we'll set up a custom sponsorship arrangement for your organization, congregation, or giving campaign.</div>
+        </div>
+        <a href="/cdn-cgi/l/email-protection#a7cec9c1c8e7cccec9c0c3c8ca8ac4d5c2c6d3ced1c2d489c4c8ca98d4d2c5cdc2c4d39aebc6d5c0c287e1c6cacecbde87f4d7c8c9d4c8d5d4cfced787eec9d6d2ced5de" style="background:var(--gold);color:#06090f;font-weight:700;font-size:.88rem;padding:.75rem 1.5rem;border-radius:10px;text-decoration:none;white-space:nowrap;flex-shrink:0;transition:opacity .2s;" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">Contact Us →</a>
+      </div>
+    </div>
+
+    <p style="text-align:center;font-size:.82rem;color:var(--tx3);margin-top:1.75rem;">Are you a family in need of sponsorship? <a href="/sponsor-waitlist.html" style="color:#22c55e;font-weight:600;">Apply for our waitlist →</a></p>
+
+  </div>
+</section>
+
+<!-- ═══ SHARE & EARN ═══ -->
+<section style="padding:88px 0;background:var(--bg2);border-top:1px solid rgba(255,255,255,.05);">
+  <div class="wrap">
+
+    <!-- Header -->
+    <div style="text-align:center;margin-bottom:3rem;">
+      <div style="font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--gold);margin-bottom:.8rem;">💸 GET REWARDED</div>
+      <h2 style="font-family:var(--fh);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;color:var(--tx);margin-bottom:.75rem;line-height:1.15;">Share YourLife CC.<br>Get Rewarded.</h2>
+      <p style="color:var(--tx2);font-size:1rem;max-width:500px;margin:0 auto;">Two ways to earn — whether you're sharing with a friend or building a real income stream.</p>
+    </div>
+
+    <!-- Two Cards -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:900px;margin:0 auto 2.5rem;" class="refer-grid">
+
+      <!-- Referral Card -->
+      <div style="background:var(--bg3);border:1px solid rgba(34,197,94,.25);border-radius:20px;padding:2.25rem;position:relative;overflow:hidden;transition:transform .3s,box-shadow .3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 20px 60px rgba(34,197,94,.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <!-- top accent line -->
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#22c55e,transparent);"></div>
+        <div style="display:inline-flex;align-items:center;gap:.5rem;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);border-radius:100px;padding:.3rem .85rem;font-size:.68rem;font-weight:800;letter-spacing:.1em;color:#22c55e;margin-bottom:1.25rem;">🤝 REFER A FAMILY</div>
+        <h3 style="font-family:var(--fh);font-size:1.2rem;font-weight:800;color:var(--tx);margin-bottom:.6rem;line-height:1.2;">Tell a Friend.<br>Both of You Win.</h3>
+        <p style="font-size:.88rem;color:var(--tx2);margin-bottom:1.5rem;line-height:1.6;">Share your personal link with another family. You pocket $10 cash — and they get $10 off their first payment. No forms, no approval needed.</p>
+
+        <!-- Reward split -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.5rem;">
+          <div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.15);border-radius:12px;padding:1rem;text-align:center;">
+            <div style="font-size:.62rem;font-weight:800;letter-spacing:.1em;color:#22c55e;margin-bottom:.3rem;">YOU EARN</div>
+            <div style="font-family:var(--fh);font-size:1.8rem;font-weight:900;color:#22c55e;line-height:1;">$10</div>
+            <div style="font-size:.72rem;color:var(--tx2);margin-top:.25rem;">cash · Venmo/PayPal</div>
+          </div>
+          <div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.15);border-radius:12px;padding:1rem;text-align:center;">
+            <div style="font-size:.62rem;font-weight:800;letter-spacing:.1em;color:#22c55e;margin-bottom:.3rem;">THEY SAVE</div>
+            <div style="font-family:var(--fh);font-size:1.8rem;font-weight:900;color:#22c55e;line-height:1;">$10</div>
+            <div style="font-size:.72rem;color:var(--tx2);margin-top:.25rem;">off first payment</div>
+          </div>
+        </div>
+
+        <div style="font-size:.78rem;color:var(--tx2);margin-bottom:1.5rem;padding:.75rem 1rem;background:rgba(255,255,255,.03);border-radius:10px;">
+          ✓ Works on any paid plan &nbsp;·&nbsp; ✓ No limit on referrals &nbsp;·&nbsp; ✓ For existing customers
+        </div>
+
+        <a href="referral.html" style="display:block;text-align:center;background:#22c55e;color:#06090f;font-weight:700;font-size:.9rem;padding:.85rem;border-radius:10px;text-decoration:none;transition:opacity .2s;" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">Get My Referral Link →</a>
+      </div>
+
+      <!-- Affiliate Card -->
+      <div style="background:var(--bg3);border:1px solid rgba(245,166,35,.25);border-radius:20px;padding:2.25rem;position:relative;overflow:hidden;transition:transform .3s,box-shadow .3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 20px 60px rgba(245,166,35,.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <!-- top accent line -->
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);"></div>
+        <div style="display:inline-flex;align-items:center;gap:.5rem;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.2);border-radius:100px;padding:.3rem .85rem;font-size:.68rem;font-weight:800;letter-spacing:.1em;color:var(--gold);margin-bottom:1.25rem;">💰 BECOME AN AFFILIATE</div>
+        <h3 style="font-family:var(--fh);font-size:1.2rem;font-weight:800;color:var(--tx);margin-bottom:.6rem;line-height:1.2;">Turn Sharing Into<br>Real Income.</h3>
+        <p style="font-size:.88rem;color:var(--tx2);margin-bottom:1.5rem;line-height:1.6;">Promote YourLife CC to families, churches, schools, and organizations — earn flat commissions on every signup plus sponsor bonuses for bulk deals. No cap.</p>
+
+        <!-- Commission tiers -->
+        <div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;color:var(--tx3);margin-bottom:.4rem;">INDIVIDUAL SIGNUPS</div>
+        <div style="display:flex;flex-direction:column;gap:.4rem;margin-bottom:.75rem;">
+          <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.12);border-radius:10px;padding:.6rem 1rem;">
+            <span style="font-size:.82rem;color:var(--tx2);">Monthly plan signup</span>
+            <span style="font-family:var(--fh);font-size:.95rem;font-weight:900;color:var(--gold);">$5</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.12);border-radius:10px;padding:.6rem 1rem;">
+            <span style="font-size:.82rem;color:var(--tx2);">Annual plan signup</span>
+            <span style="font-family:var(--fh);font-size:.95rem;font-weight:900;color:var(--gold);">$10</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.2);border-radius:10px;padding:.6rem 1rem;">
+            <span style="font-size:.82rem;color:var(--tx);">Lifetime plan signup</span>
+            <span style="font-family:var(--fh);font-size:.95rem;font-weight:900;color:var(--gold);">$20</span>
+          </div>
+        </div>
+        <div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;color:var(--tx3);margin-bottom:.4rem;">SPONSOR &amp; DONOR BONUSES</div>
+        <div style="display:flex;flex-direction:column;gap:.4rem;margin-bottom:1.1rem;">
+          <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15);border-radius:10px;padding:.55rem 1rem;">
+            <span style="font-size:.78rem;color:var(--tx2);">Sponsor 5–14 families</span>
+            <span style="font-family:var(--fh);font-size:.88rem;font-weight:900;color:#22c55e;">+$50</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15);border-radius:10px;padding:.55rem 1rem;">
+            <span style="font-size:.78rem;color:var(--tx2);">Sponsor 15–29 families</span>
+            <span style="font-family:var(--fh);font-size:.88rem;font-weight:900;color:#22c55e;">+$100</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:.55rem 1rem;">
+            <span style="font-size:.78rem;color:var(--tx2);">Sponsor 30–49 families</span>
+            <span style="font-family:var(--fh);font-size:.88rem;font-weight:900;color:#22c55e;">+$150</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);border-radius:10px;padding:.55rem 1rem;">
+            <span style="font-size:.78rem;color:var(--tx);">Sponsor 50+ families</span>
+            <span style="font-family:var(--fh);font-size:.82rem;font-weight:900;color:#22c55e;">$150 + 10%</span>
+          </div>
+        </div>
+
+        <div style="font-size:.78rem;color:var(--tx2);margin-bottom:1.5rem;padding:.75rem 1rem;background:rgba(255,255,255,.03);border-radius:10px;">
+          ✓ Must be 18+ to apply &nbsp;·&nbsp; ✓ No cap on earnings &nbsp;·&nbsp; ✓ 1099 contractor
+        </div>
+
+        <a href="affiliate.html" style="display:block;text-align:center;background:var(--gold);color:#06090f;font-weight:700;font-size:.9rem;padding:.85rem;border-radius:10px;text-decoration:none;transition:opacity .2s;" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">Apply to Be an Affiliate →</a>
+      </div>
+
+    </div>
+
+    <!-- Bottom note -->
+    <p style="text-align:center;font-size:.82rem;color:var(--tx3);">Already a customer? Your referral link is inside your account. &nbsp;·&nbsp; Want to go bigger? <a href="affiliate.html" style="color:var(--gold);">Apply to the affiliate program →</a></p>
+
+  </div>
+</section>
+
+<!-- ═══ COMPARISON TABLE ═══ -->
+<section class="sec compare-sec" id="compare">
+  <div class="wrap">
+    <div class="price-head">
+      <span class="tag">Why YourLife CC</span>
+      <h2>See How We Stack Up</h2>
+      <p>Other apps do one thing. YourLife CC does everything — for less than a cup of coffee a week.</p>
+    </div>
+
+    <div class="compare-wrap">
+      <div class="compare-scroll">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th class="feat-col">Feature</th>
+              <th class="us-col"><span class="us-badge">YourLife CC</span></th>
+              <th>Greenlight</th>
+              <th>Bark</th>
+              <th>iRewardChart</th>
+              <th>OurPact</th>
+              <th>Family 1st</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="cat-row"><td colspan="7">💰 Money & Chores</td></tr>
+            <tr>
+              <td>Chore Tracking</td>
+              <td class="us-col"><span class="y">✓</span></td>
+              <td><span class="y">✓</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="y">✓</span></td>
+              <td><span class="y">✓</span></td>
+              <td><span class="y">✓</span></td>
+            </tr>
+            <tr>
+              <td>Rewards & Points System</td>
+              <td class="us-col"><span class="y">✓</span></td>
+              <td><span class="p">Partial</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="y">✓</span></td>
+              <td><span class="y">✓</span></td>
+              <td><span class="p">Partial</span></td>
+            </tr>
+            <tr>
+              <td>Debit / Spending Card</td>
+              <td class="us-col"><span class="n">✗</span></td>
+              <td><span class="y">✓</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+            </tr>
+            <tr>
+              <td>Money Manager / Budgeting</td>
+              <td class="us-col"><span class="y">✓</span></td>
+              <td><span class="y">✓</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+            </tr>
+
+            <tr class="cat-row"><td colspan="7">📚 Education & Skills</td></tr>
+            <tr>
+              <td>School / Homework Tracker</td>
+              <td class="us-col"><span class="y">✓</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+            </tr>
+            <tr>
+              <td>Life Skills Lessons (99+)</td>
+              <td class="us-col"><span class="y">✓</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+            </tr>
+            <tr>
+              <td>Resume / Career Builder</td>
+              <td class="us-col"><span class="y">✓</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+            </tr>
+            <tr>
+              <td>GPA / Grade Tracking</td>
+              <td class="us-col"><span class="y">✓</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+            </tr>
+
+            <tr class="cat-row"><td colspan="7">🧠 Wellness & Growth</td></tr>
+            <tr>
+              <td>Mood Tracker</td>
+              <td class="us-col"><span class="y">✓</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+            </tr>
+            <tr>
+              <td>Journal</td>
+              <td class="us-col"><span class="y">✓</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+            </tr>
+            <tr>
+              <td>Health & Fitness Tracker</td>
+              <td class="us-col"><span class="y">✓</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+            </tr>
+            <tr>
+              <td>Faith / Bible Integration</td>
+              <td class="us-col"><span class="y">✓</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+            </tr>
+
+            <tr class="cat-row"><td colspan="7">👨‍👩‍👧 Family & Control</td></tr>
+            <tr>
+              <td>Parent Dashboard / Hub</td>
+              <td class="us-col"><span class="y">✓</span></td>
+              <td><span class="y">✓</span></td>
+              <td><span class="y">✓</span></td>
+              <td><span class="y">✓</span></td>
+              <td><span class="y">✓</span></td>
+              <td><span class="y">✓</span></td>
+            </tr>
+            <tr>
+              <td>Screen Time / App Controls</td>
+              <td class="us-col"><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="y">✓</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="y">✓</span></td>
+              <td><span class="n">✗</span></td>
+            </tr>
+            <tr>
+              <td>Goal Setting & Milestones</td>
+              <td class="us-col"><span class="y">✓</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="p">Partial</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="y">✓</span></td>
+            </tr>
+            <tr>
+              <td>Schedule & Calendar</td>
+              <td class="us-col"><span class="y">✓</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="y">✓</span></td>
+            </tr>
+
+            <tr class="cat-row"><td colspan="7">💲 Pricing</td></tr>
+            <tr>
+              <td>Monthly Price</td>
+              <td class="us-col"><strong style="color:var(--green);">$9.99/mo</strong></td>
+              <td>$14.99/mo</td>
+              <td>$14/mo</td>
+              <td>$3.99/mo</td>
+              <td>$6.99/mo</td>
+              <td>$4.99/mo</td>
+            </tr>
+            <tr>
+              <td>Free Trial</td>
+              <td class="us-col"><span class="y">3 Days</span></td>
+              <td><span class="y">1 Month</span></td>
+              <td><span class="y">7 Days</span></td>
+              <td><span class="y">✓</span></td>
+              <td><span class="y">7 Days</span></td>
+              <td><span class="n">✗</span></td>
+            </tr>
+            <tr>
+              <td>Lifetime Option</td>
+              <td class="us-col"><span class="y">✓ $149</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+              <td><span class="n">✗</span></td>
+            </tr>
+            <tr class="cat-row"><td colspan="7">🌐 Language & Accessibility</td></tr>
+            <tr>
+              <td>Available Languages</td>
+              <td class="us-col"><strong style="color:var(--cyan);">18 Languages</strong></td>
+              <td>English only</td>
+              <td>English only</td>
+              <td>English only</td>
+              <td>English only</td>
+              <td>English only</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="compare-note">* Feature comparison based on publicly available information. Some apps may offer features in premium tiers not reflected above.</p>
+    </div>
+
+    <div class="compare-cta">
+      <p>YourLife CC covers <strong style="color:var(--cyan);">more ground than any competitor</strong> — at a lower price.</p>
+      <a href="#pricing" class="btn bp" style="margin-top:1.2rem;">Start Free Today →</a>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="sec" id="reviews" style="text-align:center;">
+  <div class="wrap">
+    <div style="font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--gold);margin-bottom:.8rem;">⭐ EARLY FEEDBACK</div>
+    <h2 style="font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;margin-bottom:.5rem;">What Families Are Saying</h2>
+    <p style="color:rgba(255,255,255,.45);font-size:.85rem;margin-bottom:.4rem;font-style:italic;">We're just launching — these reflect the kinds of results this app is built to deliver. Real reviews coming soon.</p>
+    <div style="display:flex;align-items:center;justify-content:center;gap:.4rem;margin-bottom:1.8rem;">
+      <span style="color:var(--gold);font-size:1.1rem;">★★★★★</span>
+      <span style="font-size:.82rem;color:rgba(255,255,255,.5);">5.0 · Early Access</span>
+    </div>
+    <div class="rev-grid">
+      <div class="rc">
+        <div class="rc-stars">★★★★★</div>
+        <div class="rc-text">"My son learned more about credit and taxes in two weeks than I learned in my twenties. The parent dashboard shows me his progress without me hovering over him."</div>
+        <div class="rc-who"><div class="rc-av">SM</div><div><div style="font-weight:700;font-size:.82rem;">Sarah M.</div><div style="font-size:.7rem;color:var(--tx3);">Mom of 2</div></div></div>
+      </div>
+      <div class="rc">
+        <div class="rc-stars">★★★★★</div>
+        <div class="rc-text">"The chore system with points has been a total game-changer — she actually does them without being asked now. The career explorer alone is worth the subscription."</div>
+        <div class="rc-who"><div class="rc-av">DW</div><div><div style="font-weight:700;font-size:.82rem;">David W.</div><div style="font-size:.7rem;color:var(--tx3);">Dad of 3</div></div></div>
+      </div>
+      <div class="rc">
+        <div class="rc-stars">★★★★★</div>
+        <div class="rc-text">"Our youth group onboarded 30 teens in one Sunday. Kids are competing on streaks and bringing lessons up in small groups on their own."</div>
+        <div class="rc-who"><div class="rc-av">PR</div><div><div style="font-weight:700;font-size:.82rem;">Pastor Ryan D.</div><div style="font-size:.7rem;color:var(--tx3);">Youth Pastor</div></div></div>
+      </div>
+      <div class="rc">
+        <div class="rc-stars">★★★★★</div>
+        <div class="rc-text">"I homeschool three kids and this replaced five apps I was paying for separately. The Life Score gives me a real picture of each child every single day."</div>
+        <div class="rc-who"><div class="rc-av">JH</div><div><div style="font-weight:700;font-size:.82rem;">Jessica H.</div><div style="font-size:.7rem;color:var(--tx3);">Homeschool Mom</div></div></div>
+      </div>
+    </div>
+    <p style="margin-top:1.8rem;font-size:.82rem;color:rgba(255,255,255,.3);">⭐ Be one of our first reviewers — <a href="/app/index.html" style="color:rgba(255,255,255,.5);">try it free for 3 days</a> and share your experience.</p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="sec" id="faq" style="background:var(--bg2);border-top:1px solid rgba(255,255,255,.03);text-align:center;">
+  <div class="wrap">
+    <div style="font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--tx2);margin-bottom:.8rem;">❓ FAQ</div>
+    <h2 style="font-family:var(--fh);font-size:clamp(1.9rem,4vw,3rem);font-weight:800;margin-bottom:1rem;">Common Questions</h2>
+    <div class="faq-list">
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">Is "Free" actually free — is there a catch? <span class="arr">▼</span></div><div class="fq-a"><p>Actually free. The free tier gives one child access to the personal dashboard, school tracker, habit tracker, journal, money basics, and goals — permanently. We make money when families upgrade, not by trapping them.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">Will I be charged automatically? <span class="arr">▼</span></div><div class="fq-a"><p>No. The free plan requires no card at all. If you choose Monthly or Yearly, you only get charged when you enter payment details and confirm. Lifetime is a one-time checkout — no subscription, no renewal, no auto-charge. You will never be surprised by a charge on YourLife CC.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">What's the difference between Monthly and Lifetime? <span class="arr">▼</span></div><div class="fq-a"><p>Monthly is $9.99/month — full access for as long as you pay, cancel anytime. Lifetime is $149 once — same full access forever, including every future update. Break-even is 15 months. A family with kids under 15 today will almost certainly save money going Lifetime.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">What age range is this for? <span class="arr">▼</span></div><div class="fq-a"><p>Ages 11–22+. YourLife CC has four life stages — Middle School, High School, College, and Young Adult — and content adapts automatically. The same app grows with your child for years.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">How does the Parent Hub work? <span class="arr">▼</span></div><div class="fq-a"><p>PIN-protected inside the app. Parents see a Life Score (weighted grade per child), behavior logs, chore verification, grade monitor, screen time controls, and weekly reports — without accessing the child's private journal.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">How do multiple kids work? <span class="arr">▼</span></div><div class="fq-a"><p>Every child gets their own PIN and completely separate dashboard. Free plan: 1 child. Family Monthly, Yearly, and Lifetime: unlimited children, no extra charge.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">What if I cancel my subscription? <span class="arr">▼</span></div><div class="fq-a"><p>You drop to the free tier automatically. Your family's data is never deleted — re-subscribe anytime and pick up where you left off.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">Is this faith-based? <span class="arr">▼</span></div><div class="fq-a"><p>YourLife CC includes an optional Faith and Purpose section with 30 devotionals, Bible study content, and a prayer journal. A Faith Mode toggle lets you turn it ON or OFF. The other 29 skill categories are universal — for all families.</p></div></div>
+      <div class="fq"><div class="fq-q" onclick="tFaq(this)">What if I'm not satisfied? <span class="arr">▼</span></div><div class="fq-a"><p>30-day money-back guarantee on all paid plans, no questions asked. Email <a href="/cdn-cgi/l/email-protection#deb7b0b8b19eb5b7b0b9bab1b3f3bdacbbbfaab7a8bbadf0bdb1b3" style="color:#f5c842;font-weight:600;"><span class="__cf_email__" data-cfemail="523b3c343d12393b3c35363d3f7f31203733263b2437217c313d3f">[email&#160;protected]</span></a> and we'll refund you immediately — even on the Lifetime plan.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="sec" style="text-align:center;background:linear-gradient(180deg,var(--bg2),var(--bg));position:relative;overflow:hidden;">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(79,143,255,.07) 0%,transparent 70%);pointer-events:none;"></div>
+  <div class="wrap" style="position:relative;">
+    <div style="font-size:2.8rem;margin-bottom:.8rem;">🏆</div>
+    <h2 style="font-family:var(--fh);font-size:clamp(2rem,4.5vw,3.4rem);font-weight:900;margin-bottom:1rem;letter-spacing:-.03em;">Your Family Deserves This.</h2>
+    <p style="color:var(--tx2);font-size:1.1rem;max-width:580px;margin:0 auto 1.5rem;line-height:1.8;">The version of your family where kids do their chores, stay on top of school, learn real life skills, and grow into people you're proud of — that family is one decision away.</p>
+    <p style="color:var(--tx2);font-size:.95rem;max-width:520px;margin:0 auto 2.5rem;line-height:1.8;">YourLife CC is the system that makes it happen. Start free, upgrade when you're ready, and change everything.</p>
+    <a href="#pricing" class="btn bp" style="padding:20px 52px;font-size:1.1rem;border-radius:16px;box-shadow:0 12px 40px rgba(79,143,255,.4);">See Plans &amp; Pricing →</a>
+    <div style="margin-top:1rem;color:var(--tx3);font-size:.82rem;">Free plan always available · 30-day guarantee on paid plans · Cancel anytime</div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="ft-grid">
+      <div class="ft-col">
+        <div style="font-family:var(--fh);font-size:1.3rem;font-weight:800;margin-bottom:.5rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:inline-block;">YourLife CC</div>
+        <p style="font-size:.82rem;color:var(--tx3);max-width:280px;margin-bottom:1rem;">The complete life operating system for the next generation. A product of Kingdom Creatives.</p>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.25rem;">
+          <!-- Facebook -->
+          <a href="https://www.facebook.com/yourlifecc" target="_blank" title="Facebook" style="width:32px;height:32px;border-radius:8px;background:#1877f2;display:flex;align-items:center;justify-content:center;text-decoration:none;transition:opacity .15s;flex-shrink:0;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+          </a>
+          <!-- Instagram -->
+          <a href="https://www.instagram.com/yourlifecc" target="_blank" title="Instagram" style="width:32px;height:32px;border-radius:8px;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);display:flex;align-items:center;justify-content:center;text-decoration:none;transition:opacity .15s;flex-shrink:0;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </a>
+          <!-- TikTok -->
+          <a href="https://www.tiktok.com/@yourlifecc" target="_blank" title="TikTok" style="width:32px;height:32px;border-radius:8px;background:#000;border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;text-decoration:none;transition:opacity .15s;flex-shrink:0;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>
+          </a>
+          <!-- X / Twitter -->
+          <a href="https://twitter.com/yourlifecc" target="_blank" title="X (Twitter)" style="width:32px;height:32px;border-radius:8px;background:#000;border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;text-decoration:none;transition:opacity .15s;flex-shrink:0;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <!-- YouTube -->
+          <a href="https://www.youtube.com/@yourlifecc" target="_blank" title="YouTube" style="width:32px;height:32px;border-radius:8px;background:#ff0000;display:flex;align-items:center;justify-content:center;text-decoration:none;transition:opacity .15s;flex-shrink:0;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="black"/></svg>
+          </a>
+          <!-- LinkedIn -->
+          <a href="https://www.linkedin.com/company/yourlifecc" target="_blank" title="LinkedIn" style="width:32px;height:32px;border-radius:8px;background:#0a66c2;display:flex;align-items:center;justify-content:center;text-decoration:none;transition:opacity .15s;flex-shrink:0;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="ft-col"><h4>Product</h4><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#video">Demo</a><a href="/contest.html" style="color:var(--gold);font-weight:700;">&#127942; $5K Contest</a></div>
+      <div class="ft-col"><h4>Account</h4><a href="#pricing">See Plans &amp; Pricing</a><a href="/app/index.html">Sign In</a><a href="#faq">FAQ</a><a href="/cdn-cgi/l/email-protection#3851565e57785351565f5c5755155b4a5d594c514e5d4b165b5755" style="color:#f5c842;font-weight:600;"><span class="__cf_email__" data-cfemail="10797e767f507b797e77747f7d3d7362757164796675633e737f7d">[email&#160;protected]</span></a></div>
+      <div class="ft-col"><h4>Legal</h4><a href="affiliate.html">Affiliate Program</a><a href="referral.html">Refer a Family</a><a href="sponsor-waitlist.html">Sponsor a Family</a><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a><a href="#pricing">30-Day Guarantee</a></div>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,.08);margin-top:2rem;padding-top:1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;">
+      <p style="font-size:.78rem;color:var(--tx3);margin:0;">&#169; 2026 Kingdom Creatives LLC &middot; YourLife.cc &middot; All rights reserved.</p>
+      <p style="font-size:.78rem;color:var(--tx3);margin:0;">Need help? <a href="/cdn-cgi/l/email-protection#4920272f26092220272e2d2624642a3b2c283d203f2c3a672a2624" style="color:#f5c842;font-weight:600;"><span class="__cf_email__" data-cfemail="99f0f7fff6d9f2f0f7fefdf6f4b4faebfcf8edf0effceab7faf6f4">[email&#160;protected]</span></a></p>
+    </div>
+  </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">
+const LANGS_LP = [
+  {code:'en',    label:'🇺🇸', name:'English'},
+  {code:'es',    label:'🇪🇸', name:'Spanish'},
+  {code:'fr',    label:'🇫🇷', name:'French'},
+  {code:'de',    label:'🇩🇪', name:'German'},
+  {code:'pt',    label:'🇧🇷', name:'Portuguese'},
+  {code:'it',    label:'🇮🇹', name:'Italian'},
+  {code:'pl',    label:'🇵🇱', name:'Polish'},
+  {code:'ru',    label:'🇷🇺', name:'Russian'},
+  {code:'ar',    label:'🇸🇦', name:'Arabic'},
+  {code:'hi',    label:'🇮🇳', name:'Hindi'},
+  {code:'zh-CN', label:'🇨🇳', name:'Chinese (Simplified)'},
+  {code:'zh-TW', label:'🇹🇼', name:'Chinese (Traditional)'},
+  {code:'ko',    label:'🇰🇷', name:'Korean'},
+  {code:'ja',    label:'🇯🇵', name:'Japanese'},
+  {code:'vi',    label:'🇻🇳', name:'Vietnamese'},
+  {code:'tl',    label:'🇵🇭', name:'Filipino'},
+  {code:'sw',    label:'🇰🇪', name:'Swahili'},
+  {code:'ha',    label:'🇳🇬', name:'Hausa'},
+];
+
+// Google Translate init
+function googleTranslateElementInit(){
+  new google.translate.TranslateElement({
+    pageLanguage:'en',
+    includedLanguages:'en,es,fr,de,pt,it,pl,ru,ar,hi,zh-CN,zh-TW,ko,ja,vi,tl,sw,ha',
+    autoDisplay:false
+  },'google_translate_element_lp');
+}
+
+// Queue a pending translation if user clicks before widget is ready
+var _pendingLang = null;
+
+// Poll for Google Translate combo to appear — start immediately on load
+function waitForGTCombo(cb, maxWait){
+  var waited = 0;
+  var interval = setInterval(function(){
+    var sel = document.querySelector('.goog-te-combo');
+    if(sel){
+      clearInterval(interval);
+      cb(sel);
+      return;
+    }
+    waited += 100;
+    if(waited >= maxWait){
+      clearInterval(interval);
+      cb(null); // timed out
+    }
+  }, 100);
+}
+
+// Pre-warm: start waiting for combo as soon as page loads
+// so it's ready by the time user clicks
+var _gtComboReady = false;
+var _gtCombo = null;
+document.addEventListener('DOMContentLoaded', function(){
+  waitForGTCombo(function(sel){
+    if(sel){
+      _gtComboReady = true;
+      _gtCombo = sel;
+      // If user already clicked a language before widget was ready, apply it now
+      if(_pendingLang){
+        sel.value = _pendingLang;
+        sel.dispatchEvent(new Event('change'));
+        _pendingLang = null;
+      }
+    }
+  }, 8000); // wait up to 8 seconds
+});
+
+function doTranslateLP(langCode){
+  // Close dropdown
+  var dd = document.getElementById('langPickerDropdownLP');
+  if(dd) dd.style.display = 'none';
+
+  // If combo already found and ready — use it immediately
+  if(_gtComboReady && _gtCombo){
+    _gtCombo.value = langCode;
+    _gtCombo.dispatchEvent(new Event('change'));
+    return;
+  }
+
+  // Widget not ready yet — queue the language and wait
+  _pendingLang = langCode;
+
+  // Also try cookie fallback after 3 seconds if still not ready
+  setTimeout(function(){
+    if(_pendingLang === langCode){
+      // Still pending — use cookie + reload
+      _pendingLang = null;
+      if(langCode === 'en'){
+        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + location.hostname;
+      } else {
+        var v = '/en/' + langCode;
+        document.cookie = 'googtrans=' + v + '; path=/;';
+        document.cookie = 'googtrans=' + v + '; path=/; domain=' + location.hostname;
+      }
+      location.reload();
+    }
+  }, 3000);
+}
+
+function buildLangPickerLP(){
+  var old = document.getElementById('langPickerDropdownLP');
+  if(old) old.remove();
+  var el = document.createElement('div');
+  el.id = 'langPickerDropdownLP';
+  el.style.cssText = 'position:fixed;z-index:2147483647;background:#0d1421;border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:6px;width:220px;box-shadow:0 16px 48px rgba(0,0,0,.9);display:none;max-height:360px;overflow-y:auto;';
+  LANGS_LP.forEach(function(l){
+    var row = document.createElement('div');
+    row.style.cssText = 'padding:12px 14px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:10px;min-height:44px;-webkit-tap-highlight-color:transparent;user-select:none;';
+    row.onmouseenter = function(){ this.style.background='rgba(255,255,255,.08)'; };
+    row.onmouseleave = function(){ this.style.background=''; };
+    row.onclick = function(e){ e.stopPropagation(); doTranslateLP(l.code); };
+    row.addEventListener('touchend', function(e){ e.preventDefault(); e.stopPropagation(); doTranslateLP(l.code); }, {passive:false});
+    var flag = document.createElement('span');
+    flag.style.cssText = 'font-size:1.2rem;line-height:1;flex-shrink:0;width:24px;text-align:center;';
+    flag.textContent = l.label;
+    var nm = document.createElement('span');
+    nm.style.cssText = 'font-size:.8rem;font-weight:600;color:#e2e8f0;';
+    nm.textContent = l.name;
+    row.appendChild(flag);
+    row.appendChild(nm);
+    el.appendChild(row);
+  });
+  document.body.appendChild(el);
+  document.addEventListener('click', function(e){
+    var dd = document.getElementById('langPickerDropdownLP');
+    if(dd && !dd.contains(e.target) && !e.target.closest('#lpWrap')){
+      dd.style.display = 'none';
+    }
+  }, true);
+}
+
+function toggleLangPickerLP(anchorEl){
+  // Build once, reuse after
+  if(!document.getElementById('langPickerDropdownLP')) buildLangPickerLP();
+  var el = document.getElementById('langPickerDropdownLP');
+  if(!el) return;
+  if(el.style.display === 'block'){ el.style.display = 'none'; return; }
+  var r = anchorEl.getBoundingClientRect();
+  el.style.top  = (r.bottom + 8) + 'px';
+  var left = Math.max(8, Math.min(r.right - 220, window.innerWidth - 228));
+  el.style.left = left + 'px';
+  el.style.display = 'block';
+}
+
+function toggleMobNav(){
+  const drawer = document.getElementById('navDrawer');
+  const ham = document.getElementById('navHam');
+  if(!drawer) return;
+  const isOpen = drawer.classList.contains('open');
+  if(isOpen){
+    drawer.classList.remove('open');
+    ham.classList.remove('open');
+    document.body.style.overflow = '';
+  } else {
+    drawer.classList.add('open');
+    ham.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeMobNav(){
+  const drawer = document.getElementById('navDrawer');
+  const ham = document.getElementById('navHam');
+  if(drawer) drawer.classList.remove('open');
+  if(ham) ham.classList.remove('open');
+  document.body.style.overflow = '';
+}
+</script>
+
+<script>
+(function(){
+  var families = 0;
+  var sponsored = 0;
+  var waitlist = 0;
+
+  function animCount(el, target){
+    if(!el) return;
+    if(target === 0){ el.textContent = '0'; return; }
+    var start = 0;
+    var step = Math.max(1, Math.ceil(target / 75));
+    var timer = setInterval(function(){
+      start = Math.min(start + step, target);
+      el.textContent = start.toLocaleString();
+      if(start >= target) clearInterval(timer);
+    }, 16);
+  }
+
+  function loadCounts(){
+    animCount(document.getElementById('stat-families'), families);
+    animCount(document.getElementById('stat-sponsored'), sponsored);
+    animCount(document.getElementById('stat-waitlist'), waitlist);
+    var wl = document.getElementById('hero-waitlist-count');
+    if(wl) wl.textContent = waitlist > 0 ? waitlist : '0';
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', loadCounts);
+  } else {
+    setTimeout(loadCounts, 100);
+  }
+})();
+</script>
+<script>
+(function(){
+  // Set hero padding to account for fixed nav (which now includes the banner)
+  function positionBanner(){
+    var nav = document.querySelector('.nav');
+    var hero = document.querySelector('.hero');
+    if(!nav || !hero) return;
+    var navH = Math.round(nav.getBoundingClientRect().height);
+    hero.style.paddingTop = (navH + 20) + 'px';
+  }
+  window.dismissBanner = function(){
+    var bar = document.getElementById('contest-top-bar');
+    if(bar){ bar.style.display = 'none'; }
+    positionBanner();
+  };
+  document.addEventListener('DOMContentLoaded', positionBanner);
+  window.addEventListener('resize', positionBanner);
+  window.addEventListener('load', function(){ setTimeout(positionBanner, 300); });
+  setTimeout(positionBanner, 150);
+  setTimeout(positionBanner, 600);
+})();
+
+(function(){
+  // Top bar countdown
+  var DRAW = new Date();
+  DRAW.setDate(DRAW.getDate() + 90);
+  function tick(){
+    var diff = DRAW - new Date();
+    if(di
