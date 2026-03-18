@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Activating...</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { background:#0a0e1a; color:#e2e8f0; font-family:sans-serif; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; }
+    .msg { text-align:center; }
+    .msg p { color:#64748b; font-size:.9rem; margin-top:.5rem; }
+  </style>
+</head>
+<body>
+<div class="msg">
+  <div style="font-size:2rem;margin-bottom:.5rem;">⟳</div>
+  <div style="font-size:1rem;font-weight:600;">Activating your account...</div>
+  <p>Please wait, do not close this tab.</p>
+</div>
+<script>
+  // This page receives the Supabase magic link / verification link click.
+  // Supabase JS will auto-consume the token and establish a session.
+  // We then redirect to set-password.html with the session already active.
+  //
+  // RULES (do not change):
+  // - NO error/expired redirect logic
+  // - NO disabled form inputs
+  // - detectSessionInUrl: true always
+  // - redirectTo must stay as https://yourlifecc.com/activate.html
+
+  const SUPABASE_URL = 'https://hrohgwcbfgywkpnvqxhk.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhyb2hnd2NiZmd5d2twbnZxeGhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MjcxNDYsImV4cCI6MjA4ODQwMzE0Nn0.PuWtBpiMw2DiCLp26ZP_Rd9BwzFvWT0sNZrDUNdULyo';
+
+  const supa = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { detectSessionInUrl: true, persistSession: true }
+  });
+
+  async function activate() {
+    // Listen for auth state change — fires when Supabase consumes the token
+    supa.auth.onAuthStateChange((event, session) => {
+      if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && session) {
+        window.location.href = '/set-password.html?activated=1';
+      }
+    });
+
+    // Also poll for session as a fallback (handles fast token consumption)
+    let attempts = 0;
+    const poll = setInterval(async () => {
+      attempts++;
+      const { data: { session } } = await supa.auth.getSession();
+      if (session) {
+        clearInterval(poll);
+        window.location.href = '/set-password.html?activated=1';
+        return;
+      }
+      // After 8 seconds with no session, stop polling — user sees the waiting message
+      if (attempts >= 8) clearInterval(poll);
+    }, 1000);
+  }
+
+  activate();
+</script>
+</body>
+</html>
