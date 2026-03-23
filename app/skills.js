@@ -1,0 +1,5078 @@
+/* =============================================================
+   skills.js — Life skills lessons, certs, CBT training, craft/gallery,
+               journal, motivation, resume builder, career hub,
+               job tracker, interview prep, bio builder
+============================================================= */
+
+// ── LIFE SKILLS ───────────────────────────────────────────────
+const SK_CATS=[
+  {icon:'💸',name:'Taxes & Filing',key:'taxes',color:'#fbbf24'},
+  {icon:'🚗',name:'Car & Driving',key:'car',color:'#60a5fa'},
+  {icon:'🏥',name:'Health & Body',key:'health',color:'#34d399'},
+  {icon:'🦷',name:'Dental & Hygiene',key:'dental',color:'#a78bfa'},
+  {icon:'🍳',name:'Cooking & Food',key:'cooking',color:'#fb923c'},
+  {icon:'🏠',name:'Home & Renting',key:'home',color:'#38bdf8'},
+  {icon:'💼',name:'Career & Work',key:'career',color:'#818cf8'},
+  {icon:'💳',name:'Credit & Banking',key:'credit',color:'#4ade80'},
+  {icon:'🤝',name:'Relationships',key:'relationships',color:'#f472b6'},
+  {icon:'⛪',name:'Faith & Purpose',key:'faith',color:'#c084fc'},
+  {icon:'🧠',name:'Mental Health',key:'mental',color:'#22d3ee'},
+  {icon:'🏛️',name:'Civic Life',key:'civic',color:'#94a3b8'},
+  {icon:'🆘',name:'Emergency Skills',key:'emergency',color:'#f87171'},
+  {icon:'📱',name:'Digital Life',key:'digital',color:'#2dd4bf'},
+  {icon:'👨‍👩‍👧‍👦',name:'Family & People',key:'family',color:'#fb7185'},
+  {icon:'🎓',name:'College & Future',key:'college',color:'#fde68a'},
+  {icon:'⚖️',name:'Legal Basics',key:'legal',color:'#e2e8f0'},
+  {icon:'🧹',name:'Adulting 101',key:'adulting',color:'#d946ef'},
+  {icon:'🗣️',name:'Communication',key:'communication',color:'#06b6d4'},
+  {icon:'🧰',name:'Home Repairs & DIY',key:'diy',color:'#78716c'},
+  {icon:'📦',name:'Shopping Smart',key:'shopping',color:'#f97316'},
+  {icon:'📝',name:'Professional Writing',key:'writing',color:'#6366f1'},
+  {icon:'👕',name:'Laundry & Clothes',key:'laundry',color:'#38bdf8'},
+  {icon:'🧹',name:'Cleaning & Home Care',key:'cleaning',color:'#22d3ee'},
+  {icon:'⏰',name:'Time Management',key:'timemanage',color:'#f59e0b'},
+  {icon:'📋',name:'Organization',key:'organize',color:'#10b981'},
+  {icon:'🛡️',name:'Situational Awareness & Safety',key:'safety',color:'#ef4444'},
+  {icon:'📈',name:'Investing & Retirement',key:'investing',color:'#10b981'},
+  {icon:'🏥',name:'Insurance Explained',key:'insurance',color:'#60a5fa'},
+  {icon:'✈️', name:'Travel & World Readiness', key:'travel', color:'#f59e0b'},
+];
+
+// (Skills data preserved — 100+ lessons)
+const SK_DATA={taxes:[
+  {
+    h:'What Is Income Tax — And Why Everyone Must Understand It',
+    b:`<p>Income tax is the percentage of your earnings that the federal and state governments collect to fund everything from roads and schools to the military and Social Security. It's not optional, it's not negotiable, and it's one of the most consequential systems you'll interact with your entire working life. Yet most people navigate it blindly, either overpaying every year or getting blindsided by a surprise bill.</p>
+
+<p><strong>The U.S. uses a progressive tax system</strong>, which means the more you earn, the higher the percentage you pay — but only on the income above each threshold. This is the most misunderstood concept in personal finance. You do not pay your highest tax rate on all your income. You pay each rate only on the slice of income that falls within that bracket.</p>
+
+<p><strong>Here's how it actually works with real numbers (2024, single filer):</strong></p>
+<ul>
+  <li>First $11,600 → taxed at <strong>10%</strong> = $1,160</li>
+  <li>$11,601–$47,150 → taxed at <strong>12%</strong> = $4,266</li>
+  <li>$47,151–$100,525 → taxed at <strong>22%</strong></li>
+  <li>$100,526–$191,950 → taxed at <strong>24%</strong></li>
+  <li>Above that → 32%, 35%, 37%</li>
+</ul>
+
+<p>If you earn $60,000, you don't pay 22% on all $60,000. You pay 10% on the first slice, 12% on the middle, and 22% only on the dollars above $47,150. Your actual total federal tax bill at $60,000 is roughly $8,000 — an effective rate of about 13.3%, not 22%.</p>
+
+<p><strong>Marginal rate vs. effective rate:</strong> Your marginal rate is the highest bracket you're in. Your effective rate is your actual average rate across all income. The effective rate is always meaningfully lower. Understanding this eliminates the common mistake of turning down a raise because "it'll push me into a higher bracket." More income always means more money in your pocket — always.</p>
+
+<p><strong>Why this matters for your life:</strong> The tax code is extraordinarily complex, but it rewards people who understand it. Every deduction, credit, and tax-advantaged account is a legal mechanism to pay less. People who understand these tools keep tens of thousands of dollars more over their lifetimes than those who don't.</p>`,
+    tip:'Every dollar you contribute to a Traditional 401k or IRA directly reduces your taxable income — at your marginal rate. If you\'re in the 22% bracket and contribute $5,000, you immediately save $1,100 in taxes. The government is effectively subsidizing your retirement savings.'
+  },
+  {
+    h:'W-2 vs. 1099 — The Critical Difference Between Employee and Self-Employed',
+    b:`<p>This distinction determines how much you owe, when you owe it, and how much of your paycheck you should never touch. Getting it wrong doesn't just mean a surprise tax bill — it means potential penalties, interest, and a financial crisis at the worst time.</p>
+
+<p><strong>W-2 — You're an employee:</strong></p>
+<p>Your employer withholds federal income tax, state income tax, Social Security (6.2%), and Medicare (1.45%) from every paycheck before the money hits your bank account. At the end of the year, your employer sends you a W-2 form showing your total wages and every dollar withheld. When you file, you report that income and compare what was withheld to what you actually owed. The difference is either a refund or a small payment.</p>
+
+<p><strong>1099 — You're self-employed or a contractor:</strong></p>
+<p>Clients, platforms, and companies that pay you as a contractor send you a 1099 form if they paid you $600 or more. Unlike a W-2, no taxes are withheld. You receive 100% of your payment and owe 100% of the taxes yourself. This includes:</p>
+<ul>
+  <li><strong>Self-employment tax: 15.3%</strong> — This is both halves of Social Security and Medicare. As an employee, your employer pays 7.65% and you pay 7.65%. As self-employed, you pay the full 15.3%. It's applied to 92.35% of your net self-employment income.</li>
+  <li><strong>Federal income tax</strong> — At your applicable bracket rate, on top of SE tax</li>
+  <li><strong>State income tax</strong> — At your state's rate</li>
+</ul>
+
+<p><strong>The math that surprises people:</strong> If you earn $10,000 from freelance work, here's what you actually owe before income tax even applies: $10,000 × 92.35% × 15.3% = $1,413 in self-employment tax alone. Add federal income tax on top, and at a modest income level you're looking at owing $2,500–$3,500 on that $10,000.</p>
+
+<p><strong>Quarterly estimated taxes:</strong> Self-employed people are required to pay their taxes quarterly, not annually. The IRS expects payment by April 15, June 15, September 15, and January 15. Failing to pay quarterly results in an underpayment penalty at tax time — even if you pay everything you owe when you file.</p>`,
+    tip:'The moment you start any self-employed income — DJ gigs, freelance work, Etsy sales, contract work — open a dedicated savings account and immediately transfer 28–30% of every payment into it. Treat that money as already spent. It belongs to the IRS, not you.'
+  },
+  {
+    h:'Filing Your Taxes — The Complete Annual Process',
+    b:`<p>Filing taxes is how you officially report your income to the government and settle up on what you owe. The deadline is April 15 each year (or the next business day if it falls on a weekend or holiday). Here's the complete process:</p>
+
+<p><strong>Step 1: Gather your documents (January–February)</strong></p>
+<ul>
+  <li><strong>W-2s:</strong> Employers must mail by January 31. Check your email and mail — many companies provide them electronically.</li>
+  <li><strong>1099s:</strong> Also due by January 31. Includes 1099-NEC (contractor income), 1099-INT (bank interest), 1099-DIV (dividend income), 1099-B (investment sales), 1099-G (unemployment benefits).</li>
+  <li><strong>1098s:</strong> 1098-E (student loan interest paid — deductible up to $2,500), 1098 (mortgage interest paid).</li>
+  <li><strong>Social Security numbers</strong> for yourself, spouse if applicable, and all dependents.</li>
+  <li><strong>Previous year's tax return</strong> — you'll need last year's AGI to e-file.</li>
+  <li><strong>Receipts for deductions:</strong> Business expenses, charitable donations, medical bills.</li>
+</ul>
+
+<p><strong>Step 2: Choose your filing method</strong></p>
+<ul>
+  <li><strong>IRS Free File</strong> (irs.gov/freefile): Free federal filing if your income is under $79,000. Partners include TurboTax and H&R Block free versions.</li>
+  <li><strong>FreeTaxUSA</strong> (freetaxusa.com): Always free federal, $15 state. Excellent for straightforward to moderately complex returns.</li>
+  <li><strong>TurboTax / H&R Block:</strong> Most user-friendly, best support — but cost money for anything beyond simple returns.</li>
+  <li><strong>CPA or tax professional:</strong> Worth it if you're self-employed, have significant investment income, own rental property, or have a life change (marriage, divorce, inherited assets).</li>
+</ul>
+
+<p><strong>Step 3: File electronically and set up direct deposit</strong></p>
+<p>E-filing is faster, more accurate, and your refund arrives in 7–14 days vs. 6–8 weeks for paper. Direct deposit is faster and more secure than a paper check.</p>
+
+<p><strong>Step 4: If you owe money</strong></p>
+<p>Pay by April 15 to avoid penalties. If you can't pay in full, pay what you can — it reduces the penalty and interest. Set up a payment plan at IRS.gov/OPA. The failure-to-file penalty (5% per month of what you owe) is far worse than the failure-to-pay penalty (0.5% per month). Always file on time, even if you can't pay.</p>
+
+<p><strong>Step 5: Consider filing an extension if needed</strong></p>
+<p>Form 4868 gives you until October 15. An extension to file is NOT an extension to pay — you still must pay your estimated taxes by April 15 or owe interest and penalties.</p>`,
+    tip:'After filing, save a PDF copy of your complete return and all supporting documents for at least 7 years. The IRS can audit returns up to 3 years back (6 years for substantial underreporting). Digital copies in cloud storage are perfect.'
+  },
+  {
+    h:'Tax Deductions — Every Legal Way to Reduce What You Owe',
+    b:`<p>A tax deduction reduces your <strong>taxable income</strong> before your tax rate is applied. If you're in the 22% bracket, a $1,000 deduction saves you $220 in taxes — not a dollar-for-dollar reduction, but real money that compounds significantly when you understand all available deductions.</p>
+
+<p><strong>The Standard Deduction vs. Itemizing</strong></p>
+<p>The IRS lets you take one of two approaches:</p>
+<ul>
+  <li><strong>Standard deduction (2024):</strong> $14,600 single | $29,200 married filing jointly | $21,900 head of household. Take this if your itemized deductions don't exceed these amounts — about 90% of Americans do.</li>
+  <li><strong>Itemizing:</strong> Add up specific deductible expenses and deduct the total if it exceeds the standard deduction. Worth calculating if you have a mortgage, significant medical expenses, or large charitable gifts.</li>
+</ul>
+
+<p><strong>Common itemized deductions:</strong></p>
+<ul>
+  <li>Mortgage interest (on up to $750,000 of loan principal)</li>
+  <li>State and local taxes (SALT) — capped at $10,000 total</li>
+  <li>Charitable donations (cash and non-cash with documentation)</li>
+  <li>Medical expenses exceeding 7.5% of your AGI</li>
+</ul>
+
+<p><strong>Above-the-line deductions</strong> (these reduce your income even if you take the standard deduction — extremely valuable):</p>
+<ul>
+  <li><strong>Traditional IRA contributions:</strong> Up to $7,000 (2024), $8,000 if 50+</li>
+  <li><strong>Student loan interest:</strong> Up to $2,500 (phases out at higher incomes)</li>
+  <li><strong>HSA contributions:</strong> Up to $4,150 individual, $8,300 family</li>
+  <li><strong>Half of self-employment tax</strong></li>
+  <li><strong>Self-employed health insurance premiums</strong></li>
+  <li><strong>Alimony paid</strong> (for agreements before 2019)</li>
+  <li><strong>Educator expenses:</strong> Up to $300 for K-12 teachers</li>
+</ul>
+
+<p><strong>Self-employed deductions</strong> (available on Schedule C, extremely powerful):</p>
+<ul>
+  <li>Business portion of your phone and internet</li>
+  <li>Equipment, tools, and supplies</li>
+  <li>Software and subscriptions</li>
+  <li>Mileage (67 cents/mile in 2024 for business driving)</li>
+  <li>Home office (dedicated space used exclusively for business)</li>
+  <li>Professional development, books, courses, conferences</li>
+  <li>Marketing and advertising</li>
+  <li>Travel for business purposes</li>
+  <li>Meals with clients (50% deductible)</li>
+</ul>`,
+    tip:'Keep digital receipts for every business expense — photograph them with your phone immediately and save to a folder. Apps like Expensify or even just a Google Drive folder work perfectly. At year-end, these receipts translate directly into deductions that reduce your tax bill.'
+  },
+  {
+    h:'Tax Credits — Dollar-for-Dollar Reductions in What You Owe',
+    b:`<p>Credits are significantly more valuable than deductions. A deduction reduces your taxable income; a credit reduces your actual tax bill dollar-for-dollar. A $1,000 credit saves $1,000 regardless of your bracket — compared to a $1,000 deduction that saves $220 in the 22% bracket.</p>
+
+<p><strong>Refundable vs. Non-refundable credits:</strong></p>
+<ul>
+  <li><strong>Non-refundable:</strong> Can reduce your tax to $0 but not below. You can't get back more than you paid in.</li>
+  <li><strong>Refundable:</strong> Can reduce your tax below $0, meaning the IRS sends you the difference as a refund even if you owed nothing. Highly valuable for lower-income filers.</li>
+  <li><strong>Partially refundable:</strong> A portion is refundable, up to a limit.</li>
+</ul>
+
+<p><strong>The most valuable credits to know:</strong></p>
+
+<p><strong>Earned Income Tax Credit (EITC)</strong> — Refundable<br>
+Designed for low-to-moderate income workers. Maximum credit (2024): $7,830 (with 3+ children), $632 (no children). One of the largest anti-poverty programs in the country — and frequently unclaimed because people don't know they qualify. Use the IRS EITC assistant at irs.gov to check eligibility.</p>
+
+<p><strong>Child Tax Credit</strong> — Partially refundable<br>
+$2,000 per qualifying child under 17. Up to $1,700 refundable (Additional Child Tax Credit). Phases out at higher income levels.</p>
+
+<p><strong>American Opportunity Credit (AOC)</strong> — Partially refundable<br>
+Up to $2,500/year for the first four years of higher education. 40% refundable (up to $1,000 back even if you owe nothing). Requires enrollment at least half-time. Claimed on Form 8863.</p>
+
+<p><strong>Lifetime Learning Credit</strong> — Non-refundable<br>
+Up to $2,000 per return for any year of postsecondary education or professional development. Doesn't have to be a degree program. No limit on years claimed.</p>
+
+<p><strong>Saver's Credit</strong> — Non-refundable<br>
+Up to $1,000 ($2,000 married) for contributions to a 401k, IRA, or other retirement account. Available to lower-income filers. Overlooked and underused.</p>
+
+<p><strong>Child and Dependent Care Credit</strong> — Non-refundable<br>
+Up to $3,000 for one dependent, $6,000 for two+. For childcare expenses incurred so you can work or look for work.</p>
+
+<p><strong>Electric Vehicle Credit</strong> — Partially refundable (as of 2024)<br>
+Up to $7,500 for eligible new electric vehicles. Vehicle and income requirements apply. Point-of-sale credit now available.</p>`,
+    tip:'Run your numbers through quality tax software or a CPA even if you think your situation is simple. Studies consistently find that many eligible filers miss credits — especially EITC — because they didn\'t know they qualified. The software prompts you for every credit automatically.'
+  },
+  {
+    h:'Smart Tax Habits That Compound Over a Lifetime',
+    b:`<p>The difference between someone who understands the tax system and someone who doesn't isn't just one year's savings — it compounds dramatically across a working lifetime. Here are the habits and strategies that separate financially sophisticated people from everyone else.</p>
+
+<p><strong>1. Adjust your W-4 withholding to near-zero refund</strong></p>
+<p>A large tax refund feels like a windfall, but it's actually the government returning money you overpaid — interest-free — throughout the year. A $3,000 refund means you loaned the IRS $250/month at 0% interest. Instead, adjust your W-4 so your withholding matches your actual tax liability. Use the IRS Withholding Estimator at irs.gov/W4App. Revisit after any major life change: marriage, children, job change, side income.</p>
+
+<p><strong>2. Maximize tax-advantaged accounts before anything else</strong></p>
+<ul>
+  <li><strong>401(k):</strong> $23,000/year limit (2024). Contributions reduce taxable income dollar-for-dollar at your marginal rate.</li>
+  <li><strong>Traditional IRA:</strong> $7,000/year. Also pre-tax (with income limits for deductibility).</li>
+  <li><strong>HSA:</strong> Triple tax advantage — contributions pre-tax, growth tax-free, withdrawals for medical expenses tax-free. The most tax-efficient savings vehicle that exists.</li>
+  <li><strong>Roth IRA:</strong> After-tax contributions grow tax-free. No required minimum distributions. Best when you expect to be in a higher bracket in retirement.</li>
+</ul>
+
+<p><strong>3. Track deductible expenses throughout the year</strong></p>
+<p>Don't scramble in April trying to remember what you spent 14 months ago. Use a folder (physical or digital) to capture: business receipts, charitable donation acknowledgments, medical bills, mileage logs. The habit takes 5 minutes per week and is worth hundreds to thousands in deductions.</p>
+
+<p><strong>4. Keep records 7 years</strong></p>
+<p>The IRS can audit returns up to 3 years back (6 years for substantial underreporting of income). Keep all tax documents, receipts, and supporting records for 7 years. Digital storage in cloud backup is perfectly adequate and far more reliable than a shoebox.</p>
+
+<p><strong>5. Never ignore IRS correspondence</strong></p>
+<p>The IRS communicates exclusively by mail. Most letters are automated notices — not audits — and are entirely resolvable if you respond within 30 days. Ignoring them causes penalties and interest to accumulate. Open every piece of IRS mail the day it arrives.</p>
+
+<p><strong>6. Consider a CPA if you have complex income</strong></p>
+<p>Self-employed income, rental properties, investment accounts, inherited assets, business ownership — these significantly increase complexity and potential error. A good CPA typically saves their fee many times over in found deductions and avoided mistakes.</p>`,
+    tip:'The highest-ROI financial education you can get is a thorough understanding of how taxes work. Most people leave thousands on the table every year — not through illegal evasion, but through simple ignorance of legal deductions, credits, and strategies available to them.'
+  },
+],
+car:[
+  {
+    h:'How to Change a Flat Tire — Every Step, Every Detail',
+    b:`<p>Changing a flat tire is a non-negotiable life skill. Every driver will face a flat eventually — on a highway, at night, in the rain, far from a cell signal. Calling roadside assistance is perfectly fine, but being capable of handling it yourself means you're never helpless.</p>
+
+<p><strong>Before you ever need it — do this now:</strong></p>
+<ul>
+  <li>Locate your spare tire (trunk floor, under the rear of SUVs/trucks, or mounted on the back)</li>
+  <li>Check its pressure with a gauge — spare tires lose air sitting for years. A flat spare is useless when you need it most.</li>
+  <li>Verify you have a jack and lug wrench in the vehicle</li>
+  <li>Consider keeping a can of fix-a-flat for slow leaks (buys you time but not a permanent fix)</li>
+</ul>
+
+<p><strong>The complete process:</strong></p>
+<ol>
+  <li><strong>Get safe first.</strong> Signal, slow down gradually, pull completely off the road onto a stable flat surface. Never change a tire on soft ground — the jack can sink. Turn on hazard lights. Apply parking brake. If you have them, place wheel wedges or large rocks behind the tires to prevent rolling.</li>
+  <li><strong>Gather your tools.</strong> Spare tire, jack, lug wrench, and your owner's manual (which shows the exact jack point for your vehicle — using the wrong location damages the frame).</li>
+  <li><strong>Loosen the lug nuts BEFORE jacking.</strong> This is critical. With the tire still on the ground, break each lug nut loose one half-turn counterclockwise using a star (cross) pattern — not circular. If you loosen them after jacking, the wheel spins freely and you can't get traction.</li>
+  <li><strong>Position the jack.</strong> Place it under the manufacturer's specified jack point (a reinforced section of the frame near the flat tire). Check your owner's manual for the exact location — it's vehicle-specific.</li>
+  <li><strong>Raise the vehicle</strong> until the flat tire is 6 inches off the ground.</li>
+  <li><strong>Remove the lug nuts completely</strong> and put them somewhere safe — your pocket, or a cup if you have one. Don't lose them.</li>
+  <li><strong>Remove the flat.</strong> Pull it straight toward you and set it aside.</li>
+  <li><strong>Mount the spare.</strong> Align the holes and push onto the bolts. Hand-tighten all lug nuts in star pattern.</li>
+  <li><strong>Lower the car partially,</strong> then tighten lug nuts fully in star pattern while the tire still can't spin completely. Lower fully. Final tighten.</li>
+  <li><strong>Stow the flat</strong> where the spare was. Bring it to a tire shop — it may be repairable.</li>
+</ol>
+
+<p><strong>Spare tire limits:</strong> A "donut" spare is rated for 50 mph maximum and 50–70 miles maximum. It's not a real tire — get your flat repaired or replaced immediately.</p>`,
+    tip:'Practice changing a tire once in your driveway before you ever need to do it in the dark on a highway shoulder. The 20-minute practice session eliminates 90% of the stress when the real moment comes.'
+  },
+  {
+    h:'Engine Oil — Why It Matters More Than Almost Any Other Maintenance',
+    b:`<p>Engine oil is the single most important fluid in your vehicle. It does five critical things simultaneously: lubricates hundreds of metal parts moving at thousands of RPMs, cools components that aren't reached by the cooling system, cleans microscopic contaminants from internal surfaces, prevents corrosion, and seals small gaps in the piston rings. When oil degrades, it can't do any of these effectively — and your engine begins destroying itself quietly, invisibly, and expensively.</p>
+
+<p><strong>What happens without proper oil changes:</strong></p>
+<p>Oil breaks down from heat and oxidation over time. It becomes thick, dark, acidic, and full of contaminants. Moving metal parts that should be separated by a thin film of oil begin making metal-to-metal contact. Wear accelerates exponentially. Eventually, bearing surfaces score, pistons seize, and an engine that could have lasted 200,000+ miles fails catastrophically — often without warning — at 80,000 miles. A $40–$80 oil change prevents a $4,000–$12,000 engine repair.</p>
+
+<p><strong>How often to change (follow your owner's manual above all):</strong></p>
+<ul>
+  <li><strong>Conventional oil:</strong> Every 3,000–5,000 miles</li>
+  <li><strong>Synthetic blend:</strong> Every 5,000–7,500 miles</li>
+  <li><strong>Full synthetic:</strong> Every 7,500–10,000 miles (some vehicles up to 15,000)</li>
+  <li><strong>Severe service</strong> (frequent short trips under 5 miles, towing, extreme temperatures): Shorten intervals by 20–30%</li>
+</ul>
+
+<p><strong>Checking your oil — do this monthly:</strong></p>
+<ol>
+  <li>Park on level ground, engine off for at least 10 minutes</li>
+  <li>Open hood, find dipstick (usually bright yellow or orange handle)</li>
+  <li>Pull it out, wipe completely clean with a rag</li>
+  <li>Reinsert fully, then pull again — this gives an accurate reading</li>
+  <li>Read the level: oil should be between the MIN and MAX marks</li>
+  <li>Read the color: <strong>Amber to light brown = good</strong> | <strong>Dark brown = due soon</strong> | <strong>Black and gritty = overdue</strong> | <strong>Milky/foamy = serious problem</strong> (water in oil, possible head gasket failure — don't drive)</li>
+</ol>
+
+<p><strong>Choosing the right oil:</strong></p>
+<p>Your owner's manual specifies the exact viscosity required (e.g., 5W-30, 0W-20). The first number is cold-weather performance; the second is operating temperature viscosity. Using the wrong viscosity can cause inadequate lubrication or excessive wear. Brand matters less than using the correct viscosity and changing on schedule.</p>
+
+<p><strong>DIY vs. shop:</strong> A quick-lube shop oil change runs $50–$100. DIY costs $25–$45 in materials and 30 minutes of your time. Either is fine — the critical thing is doing it consistently on schedule.</p>`,
+    tip:'Set a recurring phone reminder based on mileage. When you get an oil change, note your current odometer and add 5,000 (or whatever your interval is). When you hit that mileage, the reminder fires. Never rely on memory alone.'
+  },
+  {
+    h:'Car Insurance — What You\'re Actually Buying and What to Skip',
+    b:`<p>Car insurance is legally required everywhere and financially critical everywhere, yet most people choose coverage based on price alone without understanding what they're buying. Here's every coverage type explained, who needs it, and how to stop overpaying.</p>
+
+<p><strong>Liability coverage (required by law in almost every state):</strong></p>
+<p>Covers damage and injuries you cause to other people in an accident. Does NOT cover your vehicle or your injuries. Listed as three numbers: <strong>25/50/25</strong> means $25,000 per injured person, $50,000 maximum per accident for bodily injury, $25,000 for property damage.</p>
+<p>State minimums are dangerously low — a serious accident can easily exceed $100,000 in medical bills. If a judgment against you exceeds your coverage, your personal assets (savings, future wages) are at risk. Consider 100/300/100 or higher if you have assets to protect.</p>
+
+<p><strong>Collision coverage:</strong></p>
+<p>Pays for damage to your car when you collide with another vehicle or object — regardless of fault. Comes with a deductible ($500–$2,000). Required by lenders if you have a car loan or lease. If your car is worth less than 10× your annual premium for this coverage, consider dropping it — you're paying more annually than the coverage is worth.</p>
+
+<p><strong>Comprehensive coverage:</strong></p>
+<p>Everything that isn't a collision — theft, vandalism, hail, flooding, fire, falling trees, hitting an animal. Also comes with a deductible. Same math applies: if your car is worth less than 10× the annual premium, it may not be worth carrying.</p>
+
+<p><strong>Uninsured/Underinsured Motorist (UM/UIM):</strong></p>
+<p>One in eight U.S. drivers is uninsured. This coverage protects you when someone hits you and can't pay. Highly recommended — it's relatively cheap and covers a very real risk.</p>
+
+<p><strong>Medical Payments / PIP (Personal Injury Protection):</strong></p>
+<p>Pays medical bills for you and your passengers regardless of fault. PIP is required in "no-fault" states. If you have good health insurance, you may not need much here.</p>
+
+<p><strong>Factors that affect your premium:</strong></p>
+<ul>
+  <li>Age (under 25 pays significantly more — rates drop substantially at 25 and again at 30)</li>
+  <li>Driving record (accidents and tickets stay on record 3–7 years)</li>
+  <li>Credit score (in most states — improve credit, lower insurance rate)</li>
+  <li>Vehicle make/model/year (sports cars, luxury vehicles cost more to insure)</li>
+  <li>Annual mileage</li>
+  <li>Location (urban areas pay more than rural)</li>
+  <li>Deductible amount (higher deductible = lower premium)</li>
+</ul>
+
+<p><strong>How to reduce your premium:</strong></p>
+<ul>
+  <li>Shop competing quotes every 2 years (rates vary enormously between companies)</li>
+  <li>Bundle auto + renters insurance with the same company (10–15% discount)</li>
+  <li>Ask about every discount: good student, defensive driving course, low mileage, paperless, paid in full</li>
+  <li>Raise your deductible if you have an emergency fund to cover it</li>
+  <li>Drop comprehensive/collision on older vehicles with low value</li>
+</ul>`,
+    tip:'Use a comparison site (The Zebra, NerdWallet, or Policygenius) to get quotes from 10+ insurers at once. For identical coverage, the price difference between the cheapest and most expensive insurer for the same driver can be $600–$1,500/year. Never auto-renew without checking competitors.'
+  },
+  {
+    h:'Jump-Starting a Dead Battery — The Exact Correct Procedure',
+    b:`<p>Getting jumper cable polarity wrong doesn't just fail to start the car — it can permanently damage expensive electronic components, destroy the battery, or cause a dangerous hydrogen gas explosion near the battery. Do this correctly every single time.</p>
+
+<p><strong>Why the order matters:</strong></p>
+<p>Car batteries produce hydrogen gas, especially when being charged. A spark near the battery can ignite it. The procedure is designed to make the final, most spark-prone connection (grounding the circuit) happen away from the battery — on unpainted metal instead.</p>
+
+<p><strong>What you need:</strong></p>
+<ul>
+  <li>Jumper cables (keep a quality set — minimum 12 feet, 6-gauge wire — in your car always)</li>
+  <li>OR a portable jump starter (highly recommended — $40–$70, no second car needed, fits in a glove box)</li>
+</ul>
+
+<p><strong>The exact cable sequence — never deviate from this:</strong></p>
+<ol>
+  <li>🔴 <strong>Red clamp → Dead battery POSITIVE (+) terminal</strong> (marked with +, usually red)</li>
+  <li>🔴 <strong>Red clamp → Good battery POSITIVE (+) terminal</strong></li>
+  <li>⚫ <strong>Black clamp → Good battery NEGATIVE (−) terminal</strong></li>
+  <li>⚫ <strong>Black clamp → Unpainted metal on the dead car</strong> — engine block, bolt, bracket. NOT the negative terminal of the dead battery. This final connection is where the spark happens — doing it away from the battery prevents ignition of any hydrogen gas.</li>
+</ol>
+
+<p><strong>Starting the vehicles:</strong></p>
+<ol>
+  <li>Start the working car. Let it run for 2–3 minutes to charge the dead battery.</li>
+  <li>Try starting the dead car. If it doesn't start, wait another 2 minutes and try again.</li>
+  <li>Don't hold the starter more than 5 seconds at a time — you'll overheat the starter motor.</li>
+  <li>If it won't start after 3–4 attempts, the battery may be too far gone or there's another issue.</li>
+</ol>
+
+<p><strong>Removal sequence (always reverse of installation):</strong></p>
+<ol>
+  <li>⚫ Black clamp from engine block (dead car)</li>
+  <li>⚫ Black clamp from negative terminal (good car)</li>
+  <li>🔴 Red clamp from good battery positive</li>
+  <li>🔴 Red clamp from started car positive</li>
+</ol>
+
+<p><strong>After starting:</strong> Drive for at least 20–30 minutes at highway speed to give the alternator time to recharge the battery. Short trips won't fully recharge it. If the battery dies again within a few days, it needs replacement — typically $100–$200 at an auto parts store with free installation.</p>
+
+<p><strong>Signs a battery needs replacement:</strong> Slow cranking when starting, battery warning light, battery over 4–5 years old, swollen battery case, corroded terminals.</p>`,
+    tip:'A portable jump starter (NOCO Boost or Tacklife brand are excellent) is one of the best investments for any car owner. It\'s about the size of a thick paperback book, costs $50–$80, holds a charge for months, and means you can jump your own car without flagging down a stranger in a parking lot at midnight.'
+  },
+  {
+    h:'Tire Care — Safety, Savings, and When to Replace',
+    b:`<p>Tires are your vehicle's only contact with the road. Everything your car does — accelerating, braking, turning — flows through four roughly hand-sized tire contact patches. Worn, improperly inflated, or mismatched tires dramatically increase stopping distance, reduce handling response, and cause blowouts that can be fatal at highway speeds.</p>
+
+<p><strong>Tire pressure — check monthly:</strong></p>
+<p>Find your correct target PSI on the sticker inside your driver's door jamb (or in your owner's manual). This is your car's recommended pressure — not the maximum pressure molded on the tire sidewall, which is the tire's maximum, not your target.</p>
+<ul>
+  <li>Tires naturally lose 1–2 PSI per month and approximately 1 PSI per 10°F drop in temperature</li>
+  <li>Underinflation: causes premature wear on the outer edges, reduces fuel economy 0.5% per PSI low, makes handling sluggish, and dramatically increases blowout risk</li>
+  <li>Overinflation: causes premature center wear, harsher ride, reduced traction, and higher risk of damage from road hazards</li>
+  <li>Check pressure when tires are cold (driven less than 1 mile) — heat from driving expands air and gives artificially high readings</li>
+</ul>
+
+<p><strong>Tire rotation — every 5,000–7,500 miles:</strong></p>
+<p>Front tires wear faster than rear tires on most vehicles because they handle steering and, on front-wheel drive vehicles, also power the car. Rotating tires evenly distributes wear across all four, extending total tire life by 20–40% — often adding 15,000–25,000 miles to a set of tires. Many shops do rotations free with an oil change.</p>
+
+<p><strong>Checking tread depth:</strong></p>
+<ul>
+  <li><strong>The Penny Test:</strong> Insert a penny with Lincoln's head pointing into the tread groove. If you can see the top of Lincoln's head, your tread is below 2/32" — the legal minimum in most states and genuinely dangerous, especially in rain. Replace immediately.</li>
+  <li><strong>The Quarter Test:</strong> Insert a quarter with Washington's head in. If you see the top of his head, you're at 4/32" — legal but degraded wet-weather performance. Start budgeting for replacement.</li>
+  <li><strong>Tread wear indicators:</strong> Molded into tire grooves at 2/32" — when they're flush with the surrounding tread, you're at the legal minimum.</li>
+</ul>
+
+<p><strong>When to replace regardless of tread:</strong></p>
+<ul>
+  <li>Any sidewall bulge, crack, or cut — these indicate structural failure and blowout risk</li>
+  <li>Any tire over 6 years old — rubber degrades even if tread looks fine. Check the 4-digit DOT date code on the sidewall (format WWYY — week and year of manufacture)</li>
+  <li>After any severe impact (large pothole, curb strike) that causes vibration or pulling</li>
+</ul>
+
+<p><strong>Where to buy:</strong> Discount Tire, Tire Rack, and Costco (members) consistently offer better prices than dealerships. Tire Rack ships to a local installer and the combined cost is often still lower than a shop price.</p>`,
+    tip:'Buy tires in sets of two (both fronts or both rears) at minimum, always in pairs. Mismatched tread depths between tires on the same axle cause uneven braking and handling. All four at once is ideal. Never put new tires only on the front — put them on the rear, regardless of drive wheel, for better control in emergency braking.'
+  },
+  {
+    h:'Understanding Warning Lights and Monthly Car Checks',
+    b:`<p>Your dashboard warning lights are your car communicating with you. Most people either panic at every light or ignore them all — both approaches are wrong and costly. Here's exactly what each major light means and what to do.</p>
+
+<p><strong>🔴 Red lights — stop driving soon or immediately:</strong></p>
+<ul>
+  <li><strong>Oil pressure (oil can icon):</strong> Pull over NOW and turn off the engine. This is the most urgent light. Driving with low oil pressure destroys your engine in minutes — internal parts are grinding without lubrication. Check your oil level first (it may just be low). If oil level is fine, the oil pump may be failing — tow it.</li>
+  <li><strong>Engine temperature (thermometer in liquid):</strong> Overheating. Pull over immediately. Turn off the AC, turn on the heat full blast (draws heat away from the engine). Let it cool completely before checking the coolant. Never open a hot radiator cap — steam causes severe burns.</li>
+  <li><strong>Battery warning:</strong> Your alternator isn't charging the battery properly. Your car is running on battery power alone — you have limited time before it dies. Get to a mechanic or auto parts store to test the alternator and battery.</li>
+  <li><strong>Brake system warning (with parking brake released):</strong> Low brake fluid or a brake system problem. Don't drive — have it towed or inspected immediately.</li>
+</ul>
+
+<p><strong>🟡 Yellow/amber lights — address within days to weeks:</strong></p>
+<ul>
+  <li><strong>Check engine light:</strong> Can be anything from a loose gas cap to a serious issue. Get it scanned — AutoZone, O'Reilly, and Advance Auto Parts all do this free. The scan gives a specific diagnostic code. A steady check engine light is different from a flashing one — a flashing check engine light indicates an active misfire and requires immediate attention (continuing to drive can damage the catalytic converter, a $1,000+ repair).</li>
+  <li><strong>TPMS (tire with exclamation point):</strong> One or more tires is 25%+ below recommended pressure. Check and inflate all four — don't assume it's just one tire.</li>
+  <li><strong>Low fuel:</strong> Approximately 30–50 miles of range remaining. Running out of fuel strains your fuel pump (which uses fuel for cooling) and may leave debris from the tank bottom in your fuel system.</li>
+  <li><strong>Traction control / stability control off:</strong> These safety systems are disabled — usually because they were manually turned off or the system detected an issue.</li>
+</ul>
+
+<p><strong>Monthly checks to do yourself (5 minutes):</strong></p>
+<ul>
+  <li>Check oil level and color with dipstick</li>
+  <li>Check tire pressure on all four tires</li>
+  <li>Check coolant level in the translucent reservoir (cold engine only)</li>
+  <li>Check windshield washer fluid</li>
+  <li>Walk around the car and check all lights (headlights, brake lights, turn signals)</li>
+</ul>`,
+    tip:'Get an OBD-II reader ($20–$40 on Amazon) for your glove box. When your check engine light comes on, plug it in and read the diagnostic code yourself before going to a mechanic. Knowing the code tells you whether you\'re looking at a $10 gas cap fix or a $400 oxygen sensor — and prevents mechanics from selling you repairs you don\'t need.'
+  },
+  {
+    h:'The True Cost of Car Ownership — Running the Real Numbers',
+    b:`<p>The single most common financial mistake young adults make when buying a vehicle is looking only at the monthly payment. The payment is one of six costs — and sometimes not even the largest one. Here's how to calculate the true total cost before you commit.</p>
+
+<p><strong>The six components of total car ownership cost:</strong></p>
+
+<p><strong>1. Loan payment: $200–$700+/month</strong><br>
+Depends on purchase price, down payment, interest rate, and loan term. Interest rates in 2024 range from 5% (excellent credit, short term) to 14%+ (poor credit). A $25,000 car at 8% over 60 months costs $507/month — but you pay $5,400 in interest over the life of the loan. Longer terms lower your payment but dramatically increase total cost.</p>
+
+<p><strong>2. Insurance: $100–$400+/month</strong><br>
+Young drivers (under 25) often pay $200–$400/month. Rates vary significantly by coverage level, vehicle type, and driving record. Sports cars, luxury vehicles, and vehicles with expensive parts (BMWs, certain SUVs) cost significantly more to insure.</p>
+
+<p><strong>3. Fuel: $80–$200/month</strong><br>
+Depends on your driving distance, the vehicle's fuel economy (MPG), and current gas prices. Calculate: monthly miles ÷ vehicle MPG × gas price per gallon. A 30-mile commute each way in a 20 MPG vehicle at $3.50/gallon costs roughly $220/month in fuel alone.</p>
+
+<p><strong>4. Maintenance and repairs: Budget $100–$150/month averaged</strong><br>
+New vehicles under warranty: lower near-term costs. Older vehicles: more frequent repairs. Budget for: oil changes ($50–$100 × 4–5 per year), tires ($600–$1,200 every 3–5 years), brakes ($300–$600 per axle every 3–5 years), unexpected repairs.</p>
+
+<p><strong>5. Registration and taxes: $100–$700/year</strong><br>
+Annual DMV registration fees vary dramatically by state and vehicle value. Some states charge ad valorem tax based on the vehicle's assessed value.</p>
+
+<p><strong>6. Depreciation (the hidden giant):</strong><br>
+New cars lose approximately 20–25% of their value in the first year. A $35,000 new car is worth roughly $26,000 after 12 months. Over five years, a new vehicle loses 50–60% of its original value. This cost is real even if you don't feel it monthly — it's what you've lost when you sell.</p>
+
+<p><strong>Total realistic ownership cost: $700–$1,500+/month</strong></p>
+<p>Financial experts recommend keeping total vehicle costs under 15–20% of your take-home pay. At $3,500/month take-home, that's $525–$700 maximum for all car expenses combined.</p>
+
+<p><strong>The smartest car purchase by the numbers:</strong> A 2–4 year old certified pre-owned vehicle from a reliable brand (Toyota, Honda, Subaru, Mazda), paid for in cash or with a short 36-month loan. You avoid the catastrophic first-year depreciation while still getting a nearly-new, reliable vehicle.</p>`,
+    tip:'Before buying any vehicle, calculate the total monthly cost across all six categories. If that number exceeds 15–20% of your monthly take-home pay, the vehicle is outside your sustainable budget regardless of what the monthly payment alone looks like.'
+  },
+],health:[
+  {
+    h:'Your Annual Physical — What Happens and Why You Can\'t Skip It',
+    b:`<p>The conditions that kill most people — high blood pressure, high cholesterol, type 2 diabetes, early cancers — have no symptoms for years. By the time you feel something wrong, the damage has been building for a decade. An annual physical catches these things early, when they're manageable. It's the highest-value medical appointment you can keep.</p>
+<p><strong>What happens at a physical:</strong></p>
+<ul>
+  <li><strong>Vital signs:</strong> Blood pressure (silent killer — normal is under 120/80), heart rate, weight, height, BMI, oxygen saturation</li>
+  <li><strong>Blood work:</strong> Glucose and A1C (diabetes), LDL/HDL cholesterol (heart disease), kidney and liver function, thyroid (TSH), complete blood count</li>
+  <li><strong>Physical exam:</strong> Heart and lungs with stethoscope, abdomen, lymph nodes, reflexes, skin for unusual lesions</li>
+  <li><strong>Family history review:</strong> Your hereditary risks determine what to screen for and when — heart disease, cancer, diabetes</li>
+  <li><strong>Age-specific screenings:</strong> Pap smear and HPV for women starting at 21; colorectal cancer screening at 45; skin cancer checks if high sun exposure</li>
+  <li><strong>Mental health screening:</strong> Depression and anxiety screens are now routinely included</li>
+  <li><strong>Vaccination review:</strong> What's current, what's overdue</li>
+</ul>
+<p><strong>How to prepare:</strong> Fast 8–12 hours if blood work is included. Write down all medications and supplements. Write your questions beforehand — you'll forget them in the room. Be honest about diet, alcohol, exercise, and sleep — your doctor can't help you accurately with incomplete information.</p>
+<p><strong>Cost:</strong> Under the ACA, most insurance covers annual preventive physicals at 100% with no copay. Call your insurer to confirm, but this is one of the most concrete benefits your monthly premium pays for.</p>`,
+    tip:'Schedule your physical in your birthday month every year — it\'s easy to remember and prevents three years from quietly slipping by. If you don\'t have a primary care doctor, your insurance website has a provider search. Establish care before you need it urgently.'
+  },
+  {
+    h:'Sleep — The Free Health Intervention Most People Ignore',
+    b:`<p>Sleep is not passive rest. It's a biologically active process during which your brain clears metabolic waste, consolidates memories, regulates hormones, and repairs tissue. Every system in your body degrades without adequate sleep — and most of the damage is invisible until it becomes catastrophic.</p>
+<p><strong>What happens while you sleep:</strong></p>
+<ul>
+  <li><strong>Deep sleep (Stage 3):</strong> Growth hormone releases, driving tissue repair, muscle recovery, immune cell production, and bone maintenance. This is when your body physically heals.</li>
+  <li><strong>REM sleep:</strong> Brain processes emotion, consolidates memory, integrates learning. REM deprivation causes rapid emotional dysregulation even after one night.</li>
+  <li><strong>Glymphatic system:</strong> The brain's waste-clearance system activates during sleep, flushing out beta-amyloid — the protein linked to Alzheimer's. This is one reason chronic sleep deprivation correlates with dementia risk.</li>
+</ul>
+<p><strong>What chronic sleep deprivation actually causes:</strong></p>
+<ul>
+  <li>Impaired glucose metabolism and insulin sensitivity (diabetes risk)</li>
+  <li>Elevated cortisol — causes weight gain, blood pressure increase, immune suppression</li>
+  <li>Disrupted hunger hormones — increases appetite by 24% and specifically increases cravings for high-calorie foods</li>
+  <li>Degraded judgment equivalent to 0.05% blood alcohol at 17 hours without sleep</li>
+  <li>Quadrupled risk of catching a cold when exposed to a virus</li>
+</ul>
+<p><strong>Evidence-based improvements:</strong></p>
+<ul>
+  <li><strong>Fixed wake time (most powerful):</strong> Your circadian rhythm anchors to when you wake. Keep it consistent every day including weekends — varying by more than 60 minutes causes "social jet lag"</li>
+  <li><strong>Cool room:</strong> 65–68°F. Body temperature drop triggers sleep onset.</li>
+  <li><strong>Complete darkness:</strong> Even dim light suppresses melatonin. Blackout curtains or a sleep mask make a real difference.</li>
+  <li><strong>No screens 60 min before bed:</strong> Blue light delays melatonin onset by 90+ minutes.</li>
+  <li><strong>No caffeine after 2pm:</strong> Caffeine has a 5–7 hour half-life — a 3pm coffee still has half its effect at 10pm.</li>
+  <li><strong>No alcohol as a sleep aid:</strong> Alcohol helps you fall asleep but fragments sleep architecture and suppresses REM throughout the night.</li>
+</ul>`,
+    tip:'The single most impactful sleep habit is a consistent wake time — even on weekends. Your circadian rhythm is a clock, and your wake time sets it. Everything else improves when that anchor is in place.'
+  },
+  {
+    h:'Exercise — What Works, How Much, and Why It\'s Non-Negotiable',
+    b:`<p>Exercise is the most evidence-backed health intervention available. It prevents disease, improves brain function, treats depression, extends healthy lifespan, and improves nearly every measurable health marker. Physical inactivity is one of the leading causes of preventable death worldwide. The minimum effective dose is achievable by almost anyone.</p>
+<p><strong>CDC minimum recommendation:</strong></p>
+<ul>
+  <li><strong>Moderate aerobic activity:</strong> 150 min/week (22 min/day). Brisk walking, cycling, swimming, dancing — anything where you can hold a conversation but not sing.</li>
+  <li><strong>Vigorous aerobic activity:</strong> 75 min/week. Running, swimming laps, basketball. Vigorous counts double — 75 vigorous minutes equals 150 moderate.</li>
+  <li><strong>Strength training:</strong> 2+ days/week, all major muscle groups. Not optional — muscle mass is one of the strongest predictors of healthy aging, metabolic health, and longevity.</li>
+</ul>
+<p><strong>What exercise actually does in your body:</strong></p>
+<ul>
+  <li>Releases BDNF — stimulates new neuron growth in the hippocampus, improving memory and learning</li>
+  <li>Improves insulin sensitivity — muscle is the primary glucose disposal organ; more muscle means better blood sugar control</li>
+  <li>Reduces chronic inflammation — a driver of cancer, heart disease, dementia, and arthritis</li>
+  <li>Lowers resting heart rate and blood pressure</li>
+  <li>Builds bone density (mechanical load is the only thing that actually does this)</li>
+  <li>As effective as antidepressants for mild-to-moderate depression in multiple controlled trials — with no side effects</li>
+  <li>Dramatically improves sleep quality, particularly deep sleep</li>
+</ul>
+<p><strong>Strength training matters as you age:</strong> Without it, adults lose 3–8% of muscle mass per decade after 30. Muscle loss drives metabolic slowdown, insulin resistance, frailty, and loss of independence. Bodyweight exercises — push-ups, squats, lunges, planks — are completely adequate if you can't access a gym.</p>`,
+    tip:'The best exercise is the one you\'ll actually do consistently. If you hate running, don\'t run — find something you genuinely enjoy. Consistency over months and years matters infinitely more than the "optimal" workout you never do.'
+  },
+  {
+    h:'Nutrition Fundamentals — What the Evidence Actually Says',
+    b:`<p>Nutrition is one of the most confused fields in medicine — driven by poor studies, industry funding, fad diet marketing, and media coverage that treats nutrition like sports scores. Here's what is actually settled and agreed upon across major health organizations.</p>
+<p><strong>Protein (4 cal/gram):</strong> Builds muscle, enzymes, hormones, and immune cells. The most satiating macronutrient — high protein intake consistently reduces overall calorie consumption. Target 0.7–1.0g per pound of body weight for active people. Best sources: chicken, eggs, Greek yogurt, fish, lean beef, legumes, cottage cheese.</p>
+<p><strong>Carbohydrates (4 cal/gram):</strong> Primary fuel for brain and muscles. Quality matters far more than quantity. Whole food carbs (oats, sweet potato, brown rice, fruits, vegetables, legumes) provide fiber, micronutrients, and sustained energy. Refined carbs (white bread, sugar, ultra-processed foods) spike blood sugar and provide minimal nutrition.</p>
+<p><strong>Fats (9 cal/gram):</strong> Essential for brain structure (60% of your brain is fat), hormone production, and absorbing vitamins A, D, E, and K. Healthy sources: avocados, olive oil, nuts, fatty fish (omega-3s reduce inflammation and support brain function). Limit saturated fat; avoid trans fats entirely.</p>
+<p><strong>Fiber:</strong> Most Americans get roughly half the recommended 25–38g/day. Fiber feeds gut bacteria, slows blood sugar absorption, reduces LDL cholesterol, and significantly reduces colon cancer risk. Beans, lentils, oats, vegetables, and fruits are rich sources.</p>
+<p><strong>Hydration:</strong> Target half your body weight in ounces per day (160 lb person = 80 oz). Even mild dehydration impairs cognition and mood before you feel thirsty.</p>
+<p><strong>What the strongest evidence supports:</strong> Eat mostly whole, minimally processed foods. Get adequate protein. Eat plenty of vegetables. Limit ultra-processed foods. Stay within appropriate calories. The specific diet name matters far less than these consistent principles.</p>`,
+    tip:'Michael Pollan\'s summary of nutrition science holds up: "Eat food. Not too much. Mostly plants." — "Food" meaning whole, recognizable ingredients — not the 60,000 processed products that fill most of a grocery store.'
+  },
+  {
+    h:'Health Insurance — Every Term Decoded',
+    b:`<p>Health insurance has its own language, and not understanding it costs people thousands of dollars annually. Here's every key term and how they interact:</p>
+<p><strong>Premium:</strong> What you pay monthly for coverage, whether you use it or not. Your subscription fee to have coverage.</p>
+<p><strong>Deductible:</strong> The amount you pay out-of-pocket before insurance starts paying its share. A $1,500 deductible means you cover the first $1,500 in medical costs each year.</p>
+<p><strong>Copay:</strong> A fixed fee for specific services — $25 for a primary care visit, $50 for a specialist, $15 for a generic prescription. Some plans have copays even before the deductible is met.</p>
+<p><strong>Coinsurance:</strong> After meeting your deductible, you still pay a percentage — often 20% while insurance pays 80%. This continues until you hit your out-of-pocket maximum.</p>
+<p><strong>Out-of-pocket maximum:</strong> The absolute annual ceiling on what you pay for covered services. After hitting it, insurance pays 100%. 2024 limits: $9,450 individual, $18,900 family.</p>
+<p><strong>In-network vs. out-of-network:</strong> In-network providers have negotiated discounted rates with your insurer — dramatically cheaper. Out-of-network can mean you pay full, undiscounted rates. Always verify in-network status before any non-emergency appointment.</p>
+<p><strong>HSA (Health Savings Account):</strong> Triple tax advantage — contributions pre-tax, growth tax-free, withdrawals for medical expenses tax-free. Available with high-deductible health plans. The most tax-efficient savings vehicle that exists. 2024: $4,150 individual, $8,300 family.</p>
+<p><strong>FSA:</strong> Pre-tax medical spending account — but most funds expire December 31. Use it or lose it.</p>
+<p><strong>Key rules:</strong> Stay on a parent's plan until age 26 — almost always much cheaper than independent coverage. Always use in-network providers. Review your Explanation of Benefits (EOB) after every claim — billing errors are extremely common. Request an itemized bill for any hospital visit and audit every charge.</p>`,
+    tip:'If you get a medical bill you can\'t afford, call the billing department before paying or ignoring it. Hospitals must offer financial assistance for qualifying patients, and most will negotiate payment plans. Ignoring a medical bill sends it to collections — always engage.'
+  },
+  {
+    h:'ER vs. Urgent Care vs. Primary Care — Choosing Right Saves Money',
+    b:`<p>Using the wrong level of care is costly and common. An ER visit for a non-emergency runs $1,500–$3,000. The same issue at urgent care costs $150–$250. Know exactly when to use each.</p>
+<p><strong>Emergency Room — life-threatening situations only:</strong></p>
+<ul>
+  <li>Chest pain or pressure (possible heart attack — don't drive yourself, call 911)</li>
+  <li>Stroke symptoms: Face drooping, Arm weakness, Speech difficulty → call 911 immediately (FAST)</li>
+  <li>Difficulty breathing at rest, severe allergic reaction with throat swelling</li>
+  <li>Loss of consciousness, uncontrolled bleeding, major trauma</li>
+  <li>Overdose or poisoning, first seizure, sudden severe "worst headache of your life"</li>
+</ul>
+<p><strong>Urgent Care — non-life-threatening, needs prompt attention:</strong></p>
+<ul>
+  <li>Infections: ear, sinus, UTI, strep throat, skin infections</li>
+  <li>Minor lacerations needing stitches, sprains, suspected minor fractures</li>
+  <li>Fever in adults, moderate respiratory illness, rashes, minor burns</li>
+  <li>COVID-19 testing, eye infections, mild asthma if rescue inhaler isn't working</li>
+</ul>
+<p><strong>Primary Care Doctor — non-urgent, ongoing:</strong></p>
+<ul>
+  <li>Annual physicals, chronic condition management, prescription refills, referrals to specialists</li>
+  <li>Follow-up after ER or urgent care</li>
+</ul>
+<p><strong>Telehealth:</strong> Many insurers now offer 24/7 telehealth at low or no cost — appropriate for UTI evaluation, mild respiratory symptoms, rash evaluation, and mental health support. Can save hours and significant cost for the right conditions.</p>`,
+    tip:'Save your nearest ER address, 2–3 urgent care locations, and your insurance\'s nurse advice line in your phone contacts right now — not when you\'re sick and panicking at 2am. The nurse line (often on your insurance card) can help you decide the right level of care over the phone.'
+  },
+],
+dental:[
+  {
+    h:'Brushing — The Right Way Makes All the Difference',
+    b:`<p>Most people have been brushing incorrectly their entire lives — and their gums are paying for it. The technique matters as much as the frequency. Here's exactly how to do it right.</p>
+<p><strong>The correct technique:</strong></p>
+<ul>
+  <li><strong>Angle:</strong> Hold the brush at 45° to the gumline — not perpendicular. This angle lets the bristles clean under the edge of the gum where plaque builds up and causes disease.</li>
+  <li><strong>Motion:</strong> Short, gentle circular strokes or back-and-forth strokes no wider than a single tooth. Not vigorous scrubbing — aggressive brushing erodes enamel and recedes gums permanently.</li>
+  <li><strong>Time:</strong> 2 full minutes, twice daily. Set a timer — almost everyone who thinks they brush 2 minutes actually brushes 45 seconds.</li>
+  <li><strong>Coverage:</strong> All surfaces — outer faces, inner faces, and chewing surfaces of every tooth. Most people neglect the inner surfaces of lower front teeth.</li>
+  <li><strong>Brush type:</strong> Soft bristles only. Medium and hard bristles damage enamel and gums. Replace every 3 months or when bristles visibly splay — frayed bristles clean poorly.</li>
+  <li><strong>Toothpaste:</strong> Fluoride toothpaste is non-negotiable — fluoride remineralizes enamel and prevents cavities. Amount: pea-sized. Don't rinse vigorously after brushing — let the fluoride stay on your teeth.</li>
+</ul>
+<p><strong>Electric vs. manual:</strong> Multiple studies show electric toothbrushes (Oral-B or Sonicare) remove 21% more plaque and reduce gingivitis significantly compared to manual brushing. The oscillating or sonic action does the work even if your technique isn't perfect. If you can invest $40–$80 in an electric toothbrush, it's one of the best dental investments you can make.</p>
+<p><strong>When to brush:</strong> Morning and before bed. Wait 30 minutes after acidic foods or drinks (coffee, soda, citrus) before brushing — acid temporarily softens enamel and brushing immediately causes more erosion than not brushing at all.</p>`,
+    tip:'Brush before breakfast, not after — morning brushing removes the bacterial buildup from overnight, and the fluoride protects your teeth during the meal. If you brush after breakfast, wait at least 30 minutes.'
+  },
+  {
+    h:'Flossing — The Half of Your Mouth Most People Completely Ignore',
+    b:`<p>No matter how perfectly you brush, your toothbrush cannot reach 40% of your tooth surfaces — the areas between teeth where food debris and bacteria accumulate. Flossing is the only way to clean these spaces. Skipping it is like washing 60% of your body and calling it a shower.</p>
+<p><strong>Why it matters — the biology:</strong> Bacteria between teeth produce acids that cause cavities in those contact areas (interproximal cavities — often invisible until they're large). The same bacteria trigger gum inflammation (gingivitis) that, if untreated, progresses to periodontitis — irreversible bone loss that ultimately causes tooth loss. Gum disease also has documented links to heart disease, diabetes, and premature birth.</p>
+<p><strong>How to floss correctly:</strong></p>
+<ol>
+  <li>Use 18 inches of floss, wound around your middle fingers, leaving 1–2 inches to work with</li>
+  <li>Hold the floss taut between thumbs and forefingers</li>
+  <li>Slide gently between teeth — never snap or force it, which cuts gums</li>
+  <li><strong>Curve into a C-shape around each tooth</strong> and slide up and down against the tooth surface, going slightly under the gumline — this is the critical step most people skip</li>
+  <li>Use a fresh section of floss for each tooth contact</li>
+  <li>Do all teeth, including behind the last molars</li>
+</ol>
+<p><strong>Alternatives that work equally well:</strong></p>
+<ul>
+  <li><strong>Waterpik (water flosser):</strong> Studies show equal or better plaque removal compared to string floss for many people. Takes 60 seconds, easier for people with braces, bridges, or dexterity issues. Highly recommended if you hate string floss — it eliminates the excuse.</li>
+  <li><strong>Floss picks:</strong> Less effective than string floss (can't curve properly around teeth) but far better than nothing.</li>
+  <li><strong>Interdental brushes:</strong> Small brushes that fit between teeth. Excellent for larger gaps and around braces.</li>
+</ul>
+<p><strong>What to expect when you start:</strong> If you've never flossed regularly, your gums will bleed the first week or two. This is because they're inflamed from existing bacteria. Keep going — the bleeding stops as the inflammation resolves, usually within 7–14 days of consistent flossing.</p>`,
+    tip:'The best time to floss is right before bed brushing — removing debris before overnight gives bacteria less to work with during the 6–8 hours you\'re not eating or drinking water. If you can only floss once, make it nighttime.'
+  },
+  {
+    h:'Dental Checkups — What Actually Happens and Why Twice a Year',
+    b:`<p>Regular dental checkups are one of the highest-value preventive health investments available. Most dental insurance covers two cleanings per year at 100% precisely because the math is clear: a cleaning costs $80–$200; a crown costs $1,000–$1,800; a root canal plus crown costs $2,000–$4,000; an extraction and implant costs $3,000–$5,000. Prevention is dramatically cheaper than repair.</p>
+<p><strong>What happens at a cleaning appointment:</strong></p>
+<ul>
+  <li><strong>Dental hygienist scaling:</strong> Removes calculus (tartar) — hardened mineralized plaque that no amount of brushing can remove once formed. It accumulates in specific spots (behind lower front teeth, along the gumline) and causes gum disease if not regularly removed.</li>
+  <li><strong>Polishing:</strong> Removes surface stains and leaves teeth smooth (smooth surfaces accumulate less plaque)</li>
+  <li><strong>Gum measurements:</strong> Hygienist probes around each tooth measuring pocket depth — the space between tooth and gum. Healthy: 1–3mm. Beginning disease: 4mm. Established periodontitis: 5mm+. This is your gum health report card.</li>
+  <li><strong>X-rays:</strong> Typically every 1–2 years. Reveal cavities between teeth, bone levels, developing wisdom teeth, infections, and issues invisible to the naked eye.</li>
+</ul>
+<p><strong>What the dentist checks:</strong></p>
+<ul>
+  <li>Existing restorations (fillings, crowns) for failure or wear</li>
+  <li>New cavities — caught early (small), a filling costs $150–$300. Caught late (large), a crown costs $1,000+</li>
+  <li>Gum disease status</li>
+  <li>Bite and jaw function</li>
+  <li><strong>Oral cancer screening</strong> — visual and tactile exam of lips, tongue, cheeks, throat. Oral cancer caught early has a 90%+ survival rate. Caught late, below 50%.</li>
+</ul>
+<p><strong>If you don't have dental insurance:</strong> Dental schools provide care at 40–70% reduced cost under faculty supervision. Many areas have community health centers with sliding-scale dental fees. Dental savings plans (not insurance) charge a flat annual fee for discounts. CareCredit offers 0% financing for dental work.</p>`,
+    tip:'Use your dental benefits before year-end — most dental insurance resets on January 1 and unused benefits don\'t carry over. If you have remaining annual maximum, schedule that filling or crown before December 31.'
+  },
+  {
+    h:'Understanding Cavities — What Actually Causes Them',
+    b:`<p>A cavity is a permanently damaged area in tooth enamel — a hole created by bacterial acid erosion. Once enamel is gone, it cannot regenerate. Understanding the cause lets you interrupt the process before it starts.</p>
+<p><strong>The exact mechanism:</strong></p>
+<ol>
+  <li>Bacteria in your mouth (primarily Streptococcus mutans) consume sugar and carbohydrates from your food</li>
+  <li>They produce lactic acid as a byproduct — directly on your tooth surfaces</li>
+  <li>This acid demineralizes enamel, the hardest substance in your body</li>
+  <li>Repeated acid attacks erode enamel progressively until a cavity forms</li>
+  <li>Once through enamel, decay reaches dentin (softer, faster decay) and eventually the pulp (nerve — root canal territory)</li>
+</ol>
+<p><strong>What accelerates cavities:</strong></p>
+<ul>
+  <li><strong>Frequency of sugar/carb exposure matters more than amount:</strong> Sipping a soda over 3 hours is far worse than drinking it in 15 minutes. Each exposure triggers an acid attack that lasts 20–30 minutes. More exposures = more cumulative acid time.</li>
+  <li><strong>Sticky foods:</strong> Gummies, dried fruit, crackers, and chips stick to teeth and provide prolonged bacterial fuel</li>
+  <li><strong>Acidic drinks (independent of sugar):</strong> Coffee, energy drinks, kombucha, citrus juice, and sparkling water directly erode enamel through their own acidity, independent of sugar content</li>
+  <li><strong>Dry mouth:</strong> Saliva neutralizes acid and remineralizes enamel. Medications that cause dry mouth (antihistamines, antidepressants, blood pressure meds) dramatically increase cavity risk</li>
+  <li><strong>Snacking frequently:</strong> Your mouth never returns to neutral pH if you're eating constantly</li>
+</ul>
+<p><strong>What protects teeth:</strong> Fluoride (remineralizes enamel), saliva (neutralizes acid), drinking water after meals, limiting sugar frequency, and consistent removal of bacterial plaque.</p>`,
+    tip:'The single most impactful dietary change for dental health: stop sipping sugary or acidic drinks throughout the day. Drink them with meals, then drink water. Your teeth need stretches of time at neutral pH to remineralize. Constant acid exposure prevents this entirely.'
+  },
+  {
+    h:'Gum Disease — The Silent Condition That Destroys Teeth',
+    b:`<p>Periodontal (gum) disease is the leading cause of tooth loss in adults — more than cavities. It affects nearly half of adults over 30 in the U.S. Most people don't know they have it because it's painless until advanced stages. By the time it hurts, significant damage has already occurred.</p>
+<p><strong>The progression:</strong></p>
+<ul>
+  <li><strong>Gingivitis:</strong> Inflammation of the gums caused by plaque and tartar buildup. Signs: gums bleed when brushing/flossing, slight swelling, redness. Fully reversible with professional cleaning and improved home care.</li>
+  <li><strong>Early periodontitis:</strong> Infection spreads below the gumline, pockets deepen (4–5mm), early bone loss begins. Requires deep cleaning (scaling and root planing). Reversible damage limited.</li>
+  <li><strong>Moderate periodontitis:</strong> Significant bone loss, teeth may become sensitive or shift. More extensive treatment, possible surgery.</li>
+  <li><strong>Advanced periodontitis:</strong> Severe bone loss, teeth loosen, tooth loss occurs. Treatment can slow but not reverse the damage. Implants cost $3,000–$5,000 per tooth.</li>
+</ul>
+<p><strong>Risk factors:</strong> Smoking (triples gum disease risk), diabetes (bidirectional relationship — gum disease worsens blood sugar control), genetics, medications that cause dry mouth, stress (increases inflammatory response), and pregnancy (hormonal changes amplify gum sensitivity).</p>
+<p><strong>Systemic connections:</strong> Periodontal bacteria enter the bloodstream through inflamed gum tissue. Research has linked gum disease to increased risk of heart disease, stroke, diabetes complications, premature birth, and cognitive decline. Your mouth is not isolated from your body.</p>
+<p><strong>Prevention:</strong> Brush and floss daily (removes the plaque that causes gum disease), see a dentist every 6 months, don't smoke. That's genuinely most of it.</p>`,
+    tip:'If your gums bleed consistently when you brush or floss after 2 weeks of consistent care, see a dentist — it\'s not normal and it won\'t fix itself. Bleeding gums are your mouth\'s distress signal.'
+  },
+  {
+    h:'Dental Emergencies — What to Do When Things Go Wrong',
+    b:`<p>Dental emergencies happen at inconvenient times. Knowing what to do in the first minutes dramatically affects the outcome — especially with knocked-out teeth, where time is critical.</p>
+<p><strong>Knocked-out permanent tooth (dental avulsion):</strong></p>
+<ol>
+  <li>Pick up by the crown (white part) — never touch the root</li>
+  <li>If dirty, rinse briefly with water — do NOT scrub or use soap</li>
+  <li>Reinsert into the socket immediately if possible (have the patient bite down on gauze to hold it) — this is the best option</li>
+  <li>If reinsertion isn't possible: store in milk, saline, or the patient's own saliva (tucked in cheek) — do NOT store in water</li>
+  <li>Get to a dentist within 30 minutes — survival rate drops dramatically after 60 minutes</li>
+</ol>
+<p><strong>Chipped or cracked tooth:</strong> Rinse with warm water, apply a cold compress to reduce swelling, take OTC pain reliever if needed. See a dentist within 24–48 hours. Avoid chewing on that side. If the crack is severe or you can see the nerve (pink center), this is urgent — call that day.</p>
+<p><strong>Severe toothache:</strong> Rinse with warm salt water. Take ibuprofen (anti-inflammatory) rather than acetaminophen for dental pain. Do NOT put aspirin directly on the tooth or gum — it causes chemical burns. See a dentist ASAP — severe toothache often indicates infection that can spread.</p>
+<p><strong>Lost filling or crown:</strong> Temporary fix: dental cement (found at any pharmacy — Dentemp or Recapit) can temporarily re-cement a crown or cover an exposed cavity. This buys days until you can see a dentist — it's not a permanent fix.</p>
+<p><strong>Dental abscess:</strong> A pimple-like swelling on the gum, severe persistent pain, swelling of the face or jaw, fever, or difficulty swallowing — these are signs of infection spreading beyond the tooth. This can become life-threatening if bacteria spread. Go to urgent care or ER if you can't reach a dentist same day.</p>`,
+    tip:'Save your dentist\'s after-hours number in your phone contacts. Most dental offices have an emergency line or a recorded message directing you to emergency care. Finding this number at 10pm when you\'re in pain is far harder than saving it when you\'re calm.'
+  },
+],
+cooking:[
+  {
+    h:'Kitchen Safety — The Rules That Prevent Real Harm',
+    b:`<p>The kitchen is where most household accidents happen. Burns, cuts, falls, and foodborne illness send millions of people to urgent care every year — and the vast majority are preventable. Before you learn to cook, learn to cook safely.</p>
+<p><strong>Knife safety (the most common kitchen injury):</strong></p>
+<ul>
+  <li><strong>A sharp knife is safer than a dull one.</strong> Dull knives require more force, slip more easily, and cause worse injuries. Sharpen your knives regularly (a honing steel before each use; a whetstone or sharpener every few months).</li>
+  <li>Always cut on a stable cutting board — place a damp towel underneath to prevent sliding</li>
+  <li>Curl your fingers into a "claw" grip when holding food — fingertips tucked under, knuckles guiding the blade</li>
+  <li>Never put knives in a dish-filled sink (invisible blade hazard) — wash immediately and separately</li>
+  <li>A falling knife: step back, let it fall. Do not catch it.</li>
+</ul>
+<p><strong>Heat and fire safety:</strong></p>
+<ul>
+  <li>Never leave a pan of hot oil unattended — grease fires escalate in seconds</li>
+  <li>Grease fire response: <strong>smother with a lid or baking soda, never water.</strong> Water causes a grease fire to explode violently.</li>
+  <li>Turn pot handles inward — they can't be bumped or grabbed by children</li>
+  <li>Use oven mitts, not dish towels — towels slip and can catch fire</li>
+  <li>Keep a working fire extinguisher in the kitchen</li>
+</ul>
+<p><strong>Food safety — the danger zone:</strong></p>
+<ul>
+  <li>Bacteria multiply rapidly between 40°F and 140°F (the "danger zone")</li>
+  <li>Refrigerator should be at or below 40°F; freezer at 0°F</li>
+  <li>Never thaw meat on the counter — use the refrigerator (overnight), cold water (sealed bag, change water every 30 min), or microwave (cook immediately after)</li>
+  <li>Don't leave cooked food at room temperature for more than 2 hours (1 hour above 90°F)</li>
+  <li>Cross-contamination: use separate cutting boards for raw meat and produce. Wash hands, surfaces, and utensils after contact with raw meat.</li>
+</ul>`,
+    tip:'Invest in an instant-read thermometer ($10–$15). It\'s the only reliable way to know meat is safe. Chicken: 165°F. Ground beef/pork: 160°F. Whole beef/pork/lamb: 145°F. Guessing by color or texture causes foodborne illness — thermometers prevent it.'
+  },
+  {
+    h:'5 Foundational Meals Every Adult Should Master',
+    b:`<p>You don't need to be a chef. You need to reliably feed yourself well. Master these five meals and you have a functional cooking foundation that covers most of your daily needs, costs a fraction of eating out, and takes less time than waiting for delivery.</p>
+<p><strong>1. Scrambled eggs (10 minutes):</strong> The technique matters. Low heat, butter in the pan, crack eggs directly in. Stir slowly and constantly with a spatula, pulling the eggs from the edges. Remove from heat while still slightly wet — carryover heat finishes them. Season at the end. Result: creamy, soft eggs instead of dry rubber. Variations: add cheese at the end, herbs, leftover vegetables.</p>
+<p><strong>2. Rice and protein bowl (25 minutes):</strong> Rinse rice, cook in 1.5x water (bring to boil, reduce to simmer, cover, 18 minutes, don't lift the lid). Season and sear protein (chicken thighs, ground beef, salmon) in a hot pan with oil. Add a sauce (soy+garlic+sesame, or sriracha+mayo, or teriyaki). Build the bowl: rice, protein, sauce, any vegetable. This format is infinitely variable.</p>
+<p><strong>3. Pasta with real sauce (20 minutes):</strong> Salt the pasta water generously (it should taste like the sea — this seasons the pasta from the inside). Cook pasta 1 minute less than the box says. In a separate pan, sauté garlic in olive oil, add canned crushed tomatoes, season, simmer 10 minutes. Drain pasta, reserving a cup of pasta water. Finish pasta in the sauce with a splash of pasta water — the starch binds the sauce to the noodles. This is why restaurant pasta tastes better.</p>
+<p><strong>4. Sheet pan dinner (10 min prep, 25–30 min cook):</strong> Preheat oven to 425°F. Toss protein (chicken thighs, salmon, pork tenderloin) and vegetables (broccoli, potatoes, bell peppers, zucchini) in olive oil, salt, pepper, garlic powder. Spread in a single layer on a sheet pan (crowding = steaming, not roasting). Roast until done. One pan, almost no cleanup, endlessly variable.</p>
+<p><strong>5. Stir fry (10 minutes):</strong> Everything cut and ready before you start — stir fry moves fast. Screaming hot wok or large skillet. Oil first, then aromatics (garlic, ginger, onion) 30 seconds. Protein next, cook through. Vegetables added by density (denser = longer cook). Sauce last (soy sauce, oyster sauce, sesame oil, a little cornstarch slurry to thicken). Over rice. The key is high heat and not overcrowding.</p>`,
+    tip:'Learn these five meals well before you try anything more complex. Cooking skill is built through repetition — make the same dish 5 times and it becomes automatic. Then it\'s yours forever and you can riff on it endlessly.'
+  },
+  {
+    h:'Meal Prep — Feed Yourself Well All Week for Under $60',
+    b:`<p>Meal prep is not about eating sad identical containers of food every day. It's about doing the slow, boring parts of cooking once so that assembling a meal on a Tuesday night takes 5 minutes instead of 45. Here's a complete system.</p>
+<p><strong>The framework (Sunday, ~90 minutes):</strong></p>
+<ul>
+  <li><strong>1 grain or starch:</strong> Cook a large batch of rice, quinoa, farro, or roast potatoes. Stores 5 days refrigerated.</li>
+  <li><strong>1–2 proteins:</strong> Bake a full tray of chicken thighs (season, 425°F, 25 min), cook ground beef or turkey, hard boil eggs, or cook a pork tenderloin. Stores 4 days refrigerated.</li>
+  <li><strong>2–3 vegetables:</strong> Roast two sheet pans (broccoli, sweet potato, zucchini, carrots), prep raw salad greens, slice raw vegetables for snacking.</li>
+  <li><strong>1–2 sauces:</strong> A versatile sauce transforms the same ingredients into different meals. Teriyaki, tahini-lemon, peanut-ginger, chimichurri, salsa — make a jar of something on Sunday.</li>
+</ul>
+<p><strong>What a week looks like:</strong> Monday: rice bowl with chicken and teriyaki. Tuesday: chicken over salad with different dressing. Wednesday: grain with roasted vegetables and egg. Thursday: pasta (cook fresh, 20 min). Friday: stir fry with leftover rice and protein. You're never eating the same exact meal — just the same prepped components assembled differently.</p>
+<p><strong>The grocery math:</strong></p>
+<ul>
+  <li>Chicken thighs (3 lbs): $8–$12</li>
+  <li>Ground beef (2 lbs): $10–$14</li>
+  <li>Rice (5 lb bag): $6 (lasts weeks)</li>
+  <li>Frozen vegetables (multiple bags): $8–$12</li>
+  <li>Eggs (dozen): $4–$6</li>
+  <li>Canned goods, pasta, seasonings: $10–$15</li>
+  <li><strong>Total: ~$50–$60 for the week</strong> vs. $50–$100 eating out just at lunch</li>
+</ul>`,
+    tip:'The biggest barrier to meal prep is starting. Commit to one Sunday of 90 minutes. The next week when you have ready food available every night, the habit sells itself. Start simpler than you think you need to — one protein and one grain is enough.'
+  },
+  {
+    h:'Grocery Shopping — Buy Smart, Waste Less, Spend Less',
+    b:`<p>The average American wastes about 30–40% of the food they buy. Combined with poor purchasing decisions, most people dramatically overspend on groceries relative to what they actually eat. A few principles change everything.</p>
+<p><strong>Before you shop:</strong></p>
+<ul>
+  <li>Plan 4–5 meals for the week before you make a list. Build the list from the plan, not from wandering the store.</li>
+  <li>Check what you already have. Most people buy duplicates of things they have buried in the pantry.</li>
+  <li>Never shop hungry — studies consistently show hungry shoppers spend 20%+ more and choose more high-calorie impulse items.</li>
+</ul>
+<p><strong>Smart buying decisions:</strong></p>
+<ul>
+  <li><strong>Store brands:</strong> 20–40% cheaper than name brands for almost identical products. Canned goods, grains, dairy, eggs, frozen vegetables — store brand is nearly always the right call.</li>
+  <li><strong>Unit price (not package price):</strong> The shelf tag shows cost per ounce or per unit. A larger package is almost always cheaper per unit — but only if you'll actually use it before it expires.</li>
+  <li><strong>Frozen vegetables = fresh nutrition at lower cost:</strong> Frozen vegetables are processed at peak ripeness, retaining essentially the same nutrients as fresh. Often 40–60% cheaper. Ideal for stir fries, soups, rice bowls, and anything cooked.</li>
+  <li><strong>Buy protein in bulk and freeze:</strong> Chicken thighs, ground beef, and salmon in family packs cost significantly less per pound. Portion and freeze immediately.</li>
+  <li><strong>Eggs:</strong> The most nutritionally complete, most affordable protein source available. Never a bad buy.</li>
+  <li><strong>Dried beans and lentils:</strong> Cost pennies per serving, take 30–45 minutes to cook from dried, freeze well after cooking. Nutritional powerhouses.</li>
+</ul>
+<p><strong>Reduce food waste:</strong> First in, first out — move older items to the front of the fridge and pantry when you bring new ones home. Use a clear produce drawer so you actually see what needs to be used. Plan at least one "use what we have" meal per week.</p>`,
+    tip:'The produce section and the center aisles of grocery stores operate on different economics. The perimeter (produce, meat, dairy, eggs) is where you build meals. The center aisles (packaged, processed foods) are where you spend the most money on the least nutrition. Shop the perimeter first and fill your cart before entering the middle.'
+  },
+  {
+    h:'Reading Nutrition Labels — Don\'t Get Fooled',
+    b:`<p>Food packaging is one of the most effective marketing environments ever created. Health claims on the front of a package are almost entirely unregulated — "natural," "wholesome," "made with real fruit," "multigrain" mean almost nothing. The nutrition label on the back, however, is regulated and tells the real story.</p>
+<p><strong>How to read a label — in order:</strong></p>
+<ol>
+  <li><strong>Serving size first:</strong> Every number on the label refers to this amount. A bag of chips that looks like one serving often contains 2.5 servings — meaning you must multiply every number by 2.5 to know what you'd actually consume eating the bag. This is the most common way people underestimate calories.</li>
+  <li><strong>Calories:</strong> Your energy intake. Context: a moderately active adult needs roughly 2,000–2,500 calories/day. A 500-calorie snack is 20–25% of a day's energy budget.</li>
+  <li><strong>Protein:</strong> How many grams per serving. Most people need 0.7–1.0g per pound of body weight daily. Check this on every food — it helps you understand whether a food contributes meaningfully to your protein target.</li>
+  <li><strong>Total fat:</strong> Less important than type. Scan for saturated fat (limit) and trans fat (avoid entirely — any amount is harmful).</li>
+  <li><strong>Sodium:</strong> Daily limit is 2,300mg. A single can of soup can contain 800–1,200mg. Processed foods, restaurant meals, and canned goods are the primary sodium sources for most Americans. High sodium = high blood pressure risk over time.</li>
+  <li><strong>Added sugars:</strong> Listed separately from total sugars (as of 2020 label rules). Added sugars should be under 25g/day (women) or 36g/day (men). A single flavored yogurt can contain 20–25g of added sugar.</li>
+  <li><strong>Ingredient list:</strong> Ingredients are listed in descending order by weight. If sugar, high-fructose corn syrup, or any refined grain is in the first three ingredients, the product is primarily that thing. The shorter and more recognizable the ingredient list, the better.</li>
+</ol>`,
+    tip:'The simplest nutrition heuristic: if a food needs an extensive nutrition label to justify itself, it\'s probably not the best choice. Whole foods — chicken, broccoli, eggs, apples, rice — don\'t need marketing. The more a food advertises its healthfulness, often the less healthy it actually is.'
+  },
+  {
+    h:'Essential Spices and Flavor — Making Food You Actually Want to Eat',
+    b:`<p>Boiled chicken and plain rice isn't a nutrition plan — it's a punishment that makes people quit cooking and go back to fast food. Learning to season food properly is what makes home cooking sustainable. You don't need 50 spices. You need the right 10.</p>
+<p><strong>The 10 spices that cover almost everything:</strong></p>
+<ul>
+  <li><strong>Kosher salt:</strong> The foundation of flavor. Properly salted food doesn't taste "salty" — it tastes like itself, more intensely. Most home cooks drastically undersalt.</li>
+  <li><strong>Black pepper (freshly ground):</strong> Pre-ground pepper loses most of its flavor within a few months. A $10 pepper grinder and whole peppercorns is a meaningful upgrade.</li>
+  <li><strong>Garlic powder:</strong> Savory depth in everything — chicken, vegetables, eggs, sauces, pasta.</li>
+  <li><strong>Onion powder:</strong> Similar to garlic — adds savory sweetness and depth.</li>
+  <li><strong>Smoked paprika:</strong> Smoky, slightly sweet, transforms chicken and roasted vegetables. The most-used spice in many professional kitchens.</li>
+  <li><strong>Cumin:</strong> Earthy, warm — essential for Mexican, Indian, and Middle Eastern-inspired cooking. Works in chili, taco meat, roasted vegetables.</li>
+  <li><strong>Italian seasoning:</strong> Oregano, basil, thyme, rosemary blend. Any pasta sauce, pizza, roasted tomato dish.</li>
+  <li><strong>Chili powder:</strong> Chili, taco seasoning, anything that needs warmth and depth without intense heat.</li>
+  <li><strong>Cayenne:</strong> Heat. Use sparingly to add a background warmth to almost anything without making it identifiably "spicy."</li>
+  <li><strong>Cinnamon:</strong> Not just baking — a pinch in chili, Moroccan dishes, and oatmeal creates warmth and complexity.</li>
+</ul>
+<p><strong>Universal seasoning formula:</strong> For almost any protein or vegetable, combine: salt + pepper + garlic powder + smoked paprika (+ cumin or Italian seasoning depending on direction). This base works for chicken, beef, pork, fish, and roasted vegetables every time.</p>
+<p><strong>Umami boosters (flavor depth without a recipe):</strong> Soy sauce, Worcestershire sauce, fish sauce (even a few drops), parmesan cheese, tomato paste, miso. These amplify savory flavor in dishes that taste "flat."</p>`,
+    tip:'Season in layers — a little salt at each stage of cooking (on the raw protein, while it cooks, and adjusted at the end) produces more complex, better-seasoned food than dumping everything on at the end. Taste as you cook. Every time you do, you\'re training your palate.'
+  },
+],
+home:[
+  {
+    h:'Reading a Lease — Every Clause That Could Cost You',
+    b:`<p>A lease is a legal contract. Unlike most things in life, "I didn't read it" is not a defense if something goes wrong. Landlords write leases to protect themselves — and many contain clauses that will shock you when they're enforced. Read every word before signing anything.</p>
+<p><strong>What to check on every lease:</strong></p>
+<ul>
+  <li><strong>Rent amount and due date:</strong> Obvious, but confirm the exact number. Also check: is there a grace period before late fees? How much are late fees? Some leases charge $50–$100/day after the 5th of the month.</li>
+  <li><strong>Lease term:</strong> Start and end date. What happens at the end — does it auto-renew month-to-month? Is there a rent increase clause at renewal?</li>
+  <li><strong>Security deposit:</strong> Amount, what it can be used for (damage beyond normal wear and tear), and the timeline for return after move-out. Most states require return within 14–30 days with an itemized deduction list. Know your state's law.</li>
+  <li><strong>Early termination:</strong> What does it cost to break the lease? Many leases require 1–2 months rent penalty plus forfeiture of deposit. Some require payment through the end of the term. Military and domestic violence victims often have legal protections to break leases without penalty.</li>
+  <li><strong>Pet policy:</strong> Whether pets are allowed, pet deposit (often non-refundable), monthly pet rent, breed/weight restrictions. Undisclosed pets are a common lease violation used to justify eviction.</li>
+  <li><strong>Utilities:</strong> Which utilities are included in rent? Who sets up and pays for electricity, gas, water, internet, trash? What's the average monthly utility cost — ask before signing.</li>
+  <li><strong>Maintenance responsibilities:</strong> Who handles minor repairs? Who is responsible for lawn care, snow removal, pest control? What's the process for maintenance requests?</li>
+  <li><strong>Guest policy:</strong> Many leases limit how long guests can stay (often 7–14 consecutive days). Violating this can be grounds for eviction.</li>
+  <li><strong>Subletting:</strong> Can you sublet if you need to leave? Many leases prohibit this entirely.</li>
+  <li><strong>Renewal and rent increase notice:</strong> How much notice is required to not renew? How much can rent increase and with how much notice?</li>
+</ul>
+<p><strong>Red flags in a lease:</strong> Clauses waiving your right to a habitable unit, signing away your right to sue, excessive late fees, or vague language around deposit deductions that gives the landlord unlimited discretion.</p>`,
+    tip:'Before signing, walk through the unit with the landlord and photograph or video every existing imperfection — scuffs, stains, damaged fixtures, worn carpet, anything. Email these photos to the landlord the day you move in. Your timestamped documentation is your only protection against being charged for pre-existing damage when you move out.'
+  },
+  {
+    h:'Renter\'s Insurance — $15/Month for Thousands of Dollars of Protection',
+    b:`<p>Renter's insurance is one of the most straightforward financial decisions that most young adults still don't make. Here's the core misunderstanding: your landlord's insurance covers the building — walls, roof, structure. It covers nothing that belongs to you. If there's a fire, a burst pipe, or a break-in, you have no coverage unless you have your own policy.</p>
+<p><strong>What renter's insurance actually covers:</strong></p>
+<ul>
+  <li><strong>Personal property:</strong> Your laptop, TV, furniture, clothing, gaming equipment, instruments, jewelry — up to your coverage limit, for covered perils (fire, theft, vandalism, water damage from a burst pipe, smoke damage). The average person has $20,000–$30,000 in personal belongings without realizing it.</li>
+  <li><strong>Liability:</strong> If a guest is injured in your apartment, or you accidentally damage a neighbor's property (your bathtub overflows into the unit below), liability coverage pays their medical bills and legal fees up to your limit (typically $100,000). Without this, you pay out of pocket.</li>
+  <li><strong>Loss of use / additional living expenses:</strong> If your unit becomes uninhabitable due to a covered peril (fire, severe water damage), your policy pays for a hotel and meals while your home is being repaired.</li>
+</ul>
+<p><strong>What renter's insurance doesn't cover:</strong> Floods (require separate flood policy), earthquakes (separate policy in most states), your roommate's belongings (they need their own policy), high-value items above scheduled limits (add riders for expensive jewelry, instruments, cameras).</p>
+<p><strong>Cost:</strong> $10–$20/month is typical for $20,000–$30,000 in personal property coverage and $100,000 in liability. Some policies are as low as $5–$8/month.</p>
+<p><strong>Where to get it:</strong> Lemonade (app-based, instant coverage, often lowest price), State Farm, Allstate, or bundle with your auto insurance for a multi-policy discount. Coverage can start within minutes of signing up.</p>`,
+    tip:'Many landlords now require renter\'s insurance as a lease condition. Even if yours doesn\'t, get it anyway. At $15/month, you\'re paying $180/year to protect $20,000+ in belongings and $100,000 in liability. The math is absurdly favorable.'
+  },
+  {
+    h:'Move-In and Move-Out — Protecting Your Security Deposit',
+    b:`<p>Security deposit disputes are among the most common landlord-tenant conflicts. The landlord holds your money and has strong incentive to keep as much as possible. Your only protection is documentation. Do this correctly and you'll get your deposit back — or have strong grounds to fight if you don't.</p>
+<p><strong>Move-in documentation (do this before you unpack):</strong></p>
+<ol>
+  <li>Walk through every room with your phone recording video</li>
+  <li>Film every wall, floor, ceiling, window, fixture, and appliance</li>
+  <li>Narrate what you see: "There's a scuff on the wall here, existing carpet stain in the corner, crack in this window sill"</li>
+  <li>Open every cabinet, closet, and drawer</li>
+  <li>Test every outlet, light switch, door lock, window, appliance</li>
+  <li>Email the video and a written list of every issue to your landlord the same day</li>
+  <li>Keep the sent email with timestamp — this is your evidence</li>
+</ol>
+<p><strong>During tenancy:</strong> Report all maintenance issues in writing (text or email) — oral reports are deniable. Keep screenshots of your texts. Most states require landlords to address habitability issues (heat, hot water, pest infestation) within 14–30 days.</p>
+<p><strong>Move-out:</strong></p>
+<ul>
+  <li>Repair damage you caused — a $5 spackle repair prevents a $150 charge from the landlord</li>
+  <li>Clean thoroughly — professional cleaning fees ($150–$400) are a common deduction. Leave it as clean as when you arrived.</li>
+  <li>Request a walk-through with the landlord present before returning keys</li>
+  <li>Return keys on the exact last day of your lease — staying even one day past can trigger daily rent charges</li>
+  <li>Provide your forwarding address in writing for deposit return</li>
+</ul>
+<p><strong>If your deposit isn't returned:</strong> Most states require landlords to return deposits with itemized deductions within 14–30 days. Failure is often subject to penalties of 2–3x the deposit amount. Small claims court handles these disputes with no attorney required — filing fees are $30–$75.</p>`,
+    tip:'Know your state\'s security deposit laws before you sign a lease — Google "[your state] security deposit law." The specifics (timeline, penalty for withholding, what qualifies as normal wear and tear) vary significantly and this knowledge is the difference between getting your money back or not.'
+  },
+  {
+    h:'Basic Home Maintenance — What You\'re Responsible For',
+    b:`<p>Even renters have maintenance responsibilities — and ignoring them causes damage that gets deducted from your deposit. Homeowners have far more. Either way, a few simple habits prevent the expensive problems.</p>
+<p><strong>Monthly:</strong></p>
+<ul>
+  <li><strong>HVAC filter:</strong> A clogged filter makes the system work harder, increases energy bills, reduces air quality, and can cause the system to fail. Filters cost $5–$15. Check monthly, replace every 1–3 months depending on type and pet/dust levels.</li>
+  <li><strong>Dryer lint trap:</strong> Clean before every load. A clogged lint trap is a leading cause of house fires — the lint is extremely flammable and sits right next to a heating element. Also: clean the dryer vent hose annually (disconnect it from the wall and vacuum it out).</li>
+  <li><strong>Check under sinks:</strong> Look for any signs of moisture or drips from pipes or the disposal. Slow leaks cause mold and structural damage over months before becoming obvious.</li>
+</ul>
+<p><strong>Every 6 months:</strong></p>
+<ul>
+  <li><strong>Smoke detector test:</strong> Press the test button. Replace batteries (even if they seem fine) every October when clocks change. Replace the entire detector every 10 years — sensors degrade.</li>
+  <li><strong>Carbon monoxide detector:</strong> Same schedule. CO is odorless and lethal — the detector is the only warning you'll get.</li>
+  <li><strong>Refrigerator coils:</strong> Dust on coils behind or below the fridge makes it work harder and shortens its life. Vacuum them off with a brush attachment.</li>
+</ul>
+<p><strong>Know where your shutoffs are:</strong></p>
+<ul>
+  <li><strong>Water main shutoff:</strong> Usually near the water meter, in the basement, or outside. Know this before a pipe bursts — every second of flooding is water damage compounding.</li>
+  <li><strong>Individual fixture shutoffs:</strong> Under every sink and behind every toilet is a valve to shut off water to that fixture only — for leaks without shutting off the whole house</li>
+  <li><strong>Electrical panel:</strong> Know where your breaker box is and which breakers control which areas of the home</li>
+  <li><strong>Gas shutoff:</strong> If you smell gas, don't touch light switches (sparks can ignite gas), leave the house, and call the gas company from outside</li>
+</ul>`,
+    tip:'When you move into any new place — owned or rented — spend 20 minutes locating every shutoff: water main, individual sink/toilet valves, circuit breakers, gas. Walk through this with a family member. When a pipe bursts at 2am, this knowledge saves thousands of dollars in water damage.'
+  },
+  {
+    h:'Understanding Your Utility Bills — and Cutting Them',
+    b:`<p>Utilities are often the largest variable expense young adults don't think to manage. A few simple habits can meaningfully reduce monthly costs without any significant lifestyle change.</p>
+<p><strong>What to budget (national averages):</strong></p>
+<ul>
+  <li><strong>Electricity:</strong> $60–$150/month. Higher in extreme climates, larger homes, older buildings with poor insulation.</li>
+  <li><strong>Natural gas:</strong> $20–$80/month. Spikes heavily in cold months if you have gas heat.</li>
+  <li><strong>Water:</strong> $30–$70/month. Often bundled with sewer and trash.</li>
+  <li><strong>Internet:</strong> $40–$80/month. Shop this every year — providers offer new-customer rates that existing customers don't get. Call and threaten to cancel to get retention offers.</li>
+  <li><strong>Trash:</strong> $20–$40/month (often paid with rent or water bill).</li>
+</ul>
+<p><strong>Electricity reduction (biggest impact):</strong></p>
+<ul>
+  <li>Heating and cooling are 50–70% of a typical electric bill. Setting the thermostat 2 degrees higher in summer and lower in winter saves 3–5% per degree.</li>
+  <li>Use a programmable or smart thermostat — don't heat/cool an empty home. Energy Star estimates $50–$150/year in savings.</li>
+  <li>Water heater temperature: default is often 140°F. Setting to 120°F is safe and saves 6–10% on water heating costs.</li>
+  <li>LED bulbs: use 75% less energy than incandescents and last 15–25 years. A one-time swap.</li>
+  <li>Phantom load: electronics draw power even when "off." Plug entertainment systems into a power strip and switch it off when not in use.</li>
+  <li>Full loads only for washer and dishwasher. Cold water for laundry — water heating is 90% of the washing machine's energy use.</li>
+</ul>
+<p><strong>Understanding your bill:</strong> Request a 12-month usage history from your utility. Look for months where usage spiked abnormally — this reveals inefficiencies (a leaky hot water pipe, a drafty window, equipment working harder than it should).</p>`,
+    tip:'Call your utility company and ask about budget billing (equal monthly payments based on annual average) and any efficiency programs — many utilities offer free energy audits, rebates for smart thermostats, and low-income assistance programs that most eligible customers never claim.'
+  },
+  {
+    h:'Your Rights as a Tenant — What Landlords Can and Cannot Do',
+    b:`<p>Landlord-tenant law is heavily state-specific, but several core protections exist almost everywhere. Most tenants don't know their rights — and landlords who do inappropriate things count on that ignorance.</p>
+<p><strong>The implied warranty of habitability:</strong> In virtually every U.S. state, your landlord is legally required to provide a habitable unit — functioning heat, plumbing, hot water, a weatherproof structure, and freedom from pest infestation. These are not optional amenities — they're legal minimums. Failure to maintain habitability can give you the right to withhold rent (in some states), repair and deduct the cost from rent, or terminate your lease without penalty.</p>
+<p><strong>Entry rights:</strong> In most states, landlords must give 24–48 hours written notice before entering your unit for non-emergency reasons (inspections, repairs, showings). Emergency access (fire, flooding, gas leak) is always permitted immediately. Repeated unannounced entries can constitute harassment and be grounds for lease termination.</p>
+<p><strong>Retaliation is illegal:</strong> If you report a housing code violation, withhold rent legally, or organize with other tenants, your landlord cannot legally retaliate by raising your rent, refusing to renew, or initiating eviction. Proving retaliation (documented timeline of complaint followed by adverse action) can result in significant penalties against the landlord.</p>
+<p><strong>Discrimination:</strong> The Fair Housing Act prohibits discrimination based on race, color, national origin, religion, sex, familial status, and disability. Many states add sexual orientation, gender identity, and source of income. Illegal discrimination includes refusing to rent, setting different terms, or providing different services based on these characteristics.</p>
+<p><strong>Eviction process:</strong> Eviction requires a court order — a landlord cannot legally change your locks, remove your belongings, or shut off utilities to force you to leave. "Self-help eviction" is illegal in all 50 states. If a landlord does this, you have significant legal remedies including immediate reinstatement and financial damages.</p>`,
+    tip:'Document everything in writing. If your landlord says something verbally, follow up with a text or email: "Just confirming our conversation — you agreed to repair the heating unit by [date]." This converts verbal agreements into written records. Courts decide disputes based on evidence, not memory.'
+  },
+],
+career:[
+  {
+    h:'Building a Resume That Actually Gets Read',
+    b:`<p>Hiring managers spend an average of 7 seconds on an initial resume scan. Your resume has to immediately communicate competence and relevance or it's discarded. Most resumes fail not because of lack of experience but because of poor presentation of the experience that exists.</p>
+<p><strong>The fundamentals:</strong></p>
+<ul>
+  <li><strong>One page:</strong> Under 10 years of experience, one page. Always. Two-page resumes signal poor editing judgment. Ruthlessly prioritize your most relevant and impressive content.</li>
+  <li><strong>Clean, simple formatting:</strong> No graphics, photos, charts, or elaborate design elements — these confuse ATS (Applicant Tracking Systems) that parse resumes before a human sees them. Standard fonts (Calibri, Garamond, Georgia), consistent formatting, clear sections.</li>
+  <li><strong>Contact information:</strong> Name (large, at top), professional email, phone, LinkedIn URL, city/state (no full address needed). Professional email = firstname.lastname@gmail.com — not nicknames or numbers.</li>
+</ul>
+<p><strong>The bullet point formula that works:</strong> Every experience bullet should follow: <strong>Action verb + what you did + result/scale.</strong></p>
+<ul>
+  <li>Bad: "Responsible for managing social media"</li>
+  <li>Good: "Grew Instagram following from 800 to 4,200 in 6 months through daily content strategy"</li>
+  <li>Bad: "Helped customers"</li>
+  <li>Good: "Resolved 40+ customer inquiries daily with 97% satisfaction rating"</li>
+</ul>
+<p><strong>ATS keyword matching:</strong> Many companies use software that scores resumes against the job description before a human reviews them. Mirror the exact language from the job posting in your resume. If the job says "project management" and you write "managed projects," the ATS may score you lower even though they mean the same thing.</p>
+<p><strong>What to include:</strong> Work experience (newest first), education, skills (hard skills: software, languages, tools — not soft skills like "team player"), relevant projects or achievements. Tailor for every application — swap out bullets to match what each specific role is looking for.</p>
+<p><strong>What to leave out:</strong> Objective statements (outdated), references available upon request (assumed), high school after you have college experience, irrelevant jobs more than 10 years old, every job you've ever had.</p>`,
+    tip:'Use jobscan.co to paste your resume and the job description side-by-side — it scores your keyword match percentage and shows exactly what you\'re missing. Optimizing this alone can move your resume from auto-rejected to an interview call.'
+  },
+  {
+    h:'Acing the Interview — Preparation That Actually Works',
+    b:`<p>Most interview failures are preparation failures, not performance failures. Interviews reward people who've thought deeply about the questions in advance, not people who think fastest on their feet. Here's the complete preparation system.</p>
+<p><strong>Before the interview:</strong></p>
+<ul>
+  <li><strong>Research the company:</strong> Read their About page, mission statement, recent news (Google "[company name] news [year]"), Glassdoor reviews, and LinkedIn pages of your interviewers. Know their products, competitors, recent wins or challenges. Interviewers notice immediately when candidates haven't done this.</li>
+  <li><strong>Understand the role:</strong> Reread the job description. For every requirement listed, prepare a specific example from your experience that demonstrates that skill.</li>
+  <li><strong>Prepare your "Tell me about yourself":</strong> This opens 90% of interviews. It's not your life story — it's a 90-second professional narrative: who you are, what you've done that's relevant, why you're here talking to them. Write it out and practice it aloud until it sounds natural, not memorized.</li>
+</ul>
+<p><strong>The STAR method for behavioral questions:</strong><br>
+"Tell me about a time you..." questions require a structured answer:</p>
+<ul>
+  <li><strong>S</strong>ituation: brief context</li>
+  <li><strong>T</strong>ask: what you needed to accomplish</li>
+  <li><strong>A</strong>ction: what you specifically did (this is the most important part)</li>
+  <li><strong>R</strong>esult: quantified outcome where possible</li>
+</ul>
+<p>Prepare 5–7 STAR stories from your experience that can flex to answer multiple question types. The same story about a project can answer "tell me about a time you led a team," "dealt with a difficult deadline," or "solved a complex problem."</p>
+<p><strong>Questions to ask them:</strong> Asking thoughtful questions signals intelligence and genuine interest. Good questions: "What does success look like in this role after 90 days?" "What's the biggest challenge the team is facing?" "What do you enjoy most about working here?" Bad question: "How much vacation do I get?" (save this for the offer stage).</p>
+<p><strong>After:</strong> Email a thank-you note within 24 hours to every person who interviewed you. Brief — 3–4 sentences: appreciation for their time, one specific thing from the conversation that resonated, brief restatement of your interest. 80% of candidates don't do this. It stands out.</p>`,
+    tip:'Record yourself doing a mock interview on your phone. Watch it back. Most people have no idea what they actually look and sound like — filler words ("um," "like"), poor eye contact, rushed answers, trailing off. 30 minutes of self-review is more valuable than hours of mental rehearsal.'
+  },
+  {
+    h:'Understanding Your Paycheck — Every Line Explained',
+    b:`<p>Your first paycheck is often confusing and disappointing — what hits your bank account is significantly less than what you were told you'd earn. Here's exactly where every dollar goes.</p>
+<p><strong>Gross pay:</strong> Your total earnings before any deductions. This is what's quoted in job offers and salary negotiations. Every line below reduces it.</p>
+<p><strong>Pre-tax deductions (reduce your taxable income):</strong></p>
+<ul>
+  <li><strong>401(k) contributions:</strong> Money going into your retirement account. This reduces your taxable income dollar-for-dollar — a $200 contribution doesn't reduce your take-home by $200, it reduces it by roughly $156 if you're in the 22% bracket (the tax savings offset part of the contribution).</li>
+  <li><strong>Health insurance premium:</strong> Your share of employer-sponsored health insurance, deducted pre-tax.</li>
+  <li><strong>HSA/FSA contributions:</strong> Pre-tax medical savings.</li>
+  <li><strong>Dental and vision insurance:</strong> Your portion, pre-tax.</li>
+</ul>
+<p><strong>Taxes withheld:</strong></p>
+<ul>
+  <li><strong>Federal income tax:</strong> Based on your W-4 elections and income. Withheld throughout the year and reconciled when you file.</li>
+  <li><strong>State income tax:</strong> Varies by state. 9 states have no income tax.</li>
+  <li><strong>Social Security:</strong> 6.2% of gross wages, up to the annual wage cap ($160,200 in 2024).</li>
+  <li><strong>Medicare:</strong> 1.45% of all wages with no cap. Additional 0.9% on income above $200,000.</li>
+</ul>
+<p><strong>Post-tax deductions:</strong> Roth 401(k) contributions, Roth IRA (if auto-contributed), some life insurance, garnishments.</p>
+<p><strong>Net pay:</strong> What hits your bank. This is the number your budget should be built around — not gross.</p>
+<p><strong>Year-to-date (YTD) columns:</strong> Shows your running totals for the year. Useful for tracking against annual limits (401k: $23,000/year) and for understanding your annual income when budgeting.</p>`,
+    tip:'Review every paycheck, at least for the first few months. Payroll errors happen — incorrect deductions, missing raises, wrong tax withholding. It\'s your responsibility to catch them. Keep your last few pay stubs — you\'ll need them for apartment applications, loans, and tax filing.'
+  },
+  {
+    h:'The 401(k) — Why Starting Now Is Worth Hundreds of Thousands',
+    b:`<p>The 401(k) is the most powerful wealth-building tool available to working Americans, and most young workers either don't use it or don't use it correctly. Understanding compound growth makes the decision obvious.</p>
+<p><strong>What a 401(k) actually is:</strong> A tax-advantaged retirement savings account through your employer. You contribute a percentage of your paycheck — pre-tax — and choose how to invest it (typically index funds). The money grows tax-deferred until retirement, when you pay income tax on withdrawals.</p>
+<p><strong>Employer match = free money, always take it:</strong> Most employers match contributions up to 3–6% of your salary. A typical structure: "We match 100% of your first 3% and 50% of the next 2%." This is immediate 50–100% returns on the matched amount. Not contributing enough to capture the full match is turning down part of your compensation.</p>
+<p><strong>The compound growth math — why starting at 22 vs. 32 matters:</strong></p>
+<ul>
+  <li>Invest $300/month starting at 22, assume 8% average annual return → at 65: <strong>~$1.15 million</strong></li>
+  <li>Invest $300/month starting at 32, same assumptions → at 65: <strong>~$520,000</strong></li>
+  <li><strong>Starting 10 years earlier = $630,000 more</strong> from the same monthly contribution</li>
+</ul>
+<p><strong>Investment choices inside the 401(k):</strong> Most plans offer target-date funds (e.g., "Target Date 2060 Fund" — automatically adjusts allocation as you approach retirement) or index funds. For most people, a low-cost S&P 500 index fund or target-date fund is the right choice. Avoid actively managed funds with high expense ratios (over 0.5%) — fees compound just like returns, only they compound against you.</p>
+<p><strong>2024 limits:</strong> $23,000 employee contribution maximum. Contribute at minimum up to the employer match. Increase 1% per year until you're at 10–15% of income.</p>`,
+    tip:'When you start a new job, set up your 401(k) in the first week — many plans have a waiting period and you don\'t want to delay the clock. Set contributions to at least capture the full employer match on day one. Increase your contribution rate by 1% every January until you reach 15% — you won\'t notice the gradual increase.'
+  },
+  {
+    h:'Networking — The Real Way Most Jobs Are Filled',
+    b:`<p>Studies consistently find that 70–80% of jobs are filled through networking before or instead of being publicly posted. The "hidden job market" is real — and most people access it poorly or not at all. Here's how networking actually works for people who aren't naturally social.</p>
+<p><strong>What networking is not:</strong> It's not a room full of people exchanging business cards while pretending to be interested in each other. That's a networking event, and it's mostly a waste of time. Real networking is building genuine relationships over time with people in your industry or adjacent to your goals.</p>
+<p><strong>Start with your warm network:</strong> Before reaching out to strangers, map the people you already know: professors, former employers, coaches, family friends, church members, classmates. Someone in your existing network almost certainly has a connection to where you want to go. Ask for an introduction.</p>
+<p><strong>The informational interview:</strong> The most underused tool for career advancement. Reach out to someone working in a role or company you're interested in and ask for 20 minutes to learn about their work. People are remarkably willing to share their experience — it's flattering to be asked. You're not asking for a job; you're asking to learn. This conversation often leads to referrals, insight about unadvertised positions, and a genuine relationship. Script: "I'm [name], trying to understand what it's like to work in [field/company]. Would you be open to a 20-minute call? I'd love to hear about your career path."</p>
+<p><strong>LinkedIn as a professional tool:</strong> A complete LinkedIn profile with a professional photo, current role, skills, and accomplishments is searchable by recruiters. Connect with everyone you meet professionally. Post occasionally about what you're learning or doing — it keeps you visible. Message connections when you see they've changed roles, had accomplishments, or when you have a genuine question.</p>
+<p><strong>Give before you ask:</strong> Share articles, make introductions, congratulate people on wins, offer help before you need something. Relationships are reciprocal. The people who only show up when they need something get less in return.</p>`,
+    tip:'Set a goal: one informational interview per month. In a year, you\'ll have built genuine relationships with 12 people in fields you care about. The career opportunities, referrals, and insider knowledge that come from those 12 conversations are worth more than any resume optimization.'
+  },
+  {
+    h:'Professionalism and Work Ethic — What Actually Gets You Promoted',
+    b:`<p>Technical skill gets you the job. Work ethic and professional behavior determine whether you advance. The people who rise fastest aren't always the most talented — they're the most reliable, the most communicative, and the most trusted. These qualities are completely teachable and entirely within your control.</p>
+<p><strong>Reliability — the single most valuable professional trait:</strong> Do what you say you will, when you said you would do it. This sounds obvious and it's remarkably rare. If you commit to a deadline and realize you can't hit it, communicate 24–48 hours before, not after. Managers build their entire workload management around what they can count on from their team. Being someone they can fully count on is career-defining.</p>
+<p><strong>Responsiveness:</strong> Respond to emails and messages within one business day, ideally the same day. Even if you can't fully address something yet, acknowledge receipt and give an ETA: "Got it — I'll have this to you by Thursday." This eliminates the manager's need to follow up, which is one of the most common sources of frustration with employees.</p>
+<p><strong>Take initiative:</strong> The difference between good employees and exceptional ones is initiative. Don't wait to be told to do the next thing — look for what needs to be done and do it. After finishing a task, ask: "What else would be helpful?" This one question, asked genuinely and repeatedly, is worth thousands of dollars in raises.</p>
+<p><strong>Manage up:</strong> Your manager has their own pressures, deadlines, and priorities you may not see. Understand what their biggest concerns are and orient your work to address them. Update them before they ask for updates. Make their life easier — this is how you become indispensable.</p>
+<p><strong>Handle mistakes correctly:</strong> Everyone makes mistakes. What differentiates people is how they handle them. Own it clearly and quickly (don't deflect or minimize). Explain briefly what happened. Most importantly, immediately shift to: "Here's how I'm going to fix this, and here's what I'm changing so it doesn't happen again." This response builds more trust than never making the mistake in the first place.</p>
+<p><strong>Your reputation is built over thousands of small moments:</strong> How you handle the boring tasks, how you treat the receptionist, whether you meet your smaller commitments — these accumulate into a reputation that determines what opportunities come to you.</p>`,
+    tip:'Every new job, every new environment — the first 90 days set your reputation for years. Show up a few minutes early. Learn people\'s names. Take notes. Ask questions. Say yes to things. Volunteer for the unglamorous tasks. This sprint of first impressions compounds for the entire time you\'re there.'
+  },
+  {
+    h:'Side Hustles and Multiple Income Streams',
+    b:`<p>A single income source is a single point of failure. Building even one additional income stream — however modest — provides financial flexibility, reduces anxiety, builds skills, and often grows into something significant. The time to start is before you desperately need it.</p>
+<p><strong>The best side hustles for young adults:</strong></p>
+<ul>
+  <li><strong>Freelance services (highest hourly rate potential):</strong> Graphic design, web development, video editing, writing, photography, social media management. Package skills you already have. Fiverr and Upwork for finding first clients; then direct outreach. Hourly equivalent often $25–$75+.</li>
+  <li><strong>Tutoring:</strong> Academic subjects, musical instruments, sports skills, test prep (SAT, ACT). Wyzant.com connects tutors with students. $25–$80/hour for someone with genuine expertise or a college degree in the subject.</li>
+  <li><strong>Gig services (flexible, immediate income):</strong> DoorDash, Uber Eats, Instacart, TaskRabbit for odd jobs and handyman work. Lower hourly rate but immediate start, complete flexibility. Best as a bridge, not a long-term plan.</li>
+  <li><strong>Reselling:</strong> Buy discounted items (estate sales, thrift stores, clearance) and sell on eBay, Facebook Marketplace, or Poshmark. Requires learning what sells and what doesn't, but profit margins on the right items can be significant.</li>
+  <li><strong>Content creation:</strong> Longer time horizon but potentially high value. YouTube, newsletter, podcast. Pick a niche you know well. Monetization typically requires 6–18 months of consistent effort, but the audience compounds.</li>
+</ul>
+<p><strong>Critical tax note:</strong> All side hustle income is self-employment income. Set aside 28–30% of every payment for taxes from the first dollar. Track all income (even cash) and all business expenses. If you earn over $400/year from self-employment, you must file a Schedule SE and potentially make quarterly estimated tax payments.</p>`,
+    tip:'Start the side hustle you can start this week — not the one that requires months of planning. The learning that comes from doing it poorly and refining it is worth far more than planning the perfect version that never launches.'
+  },
+],
+credit:[
+  {
+    h:'What Is a Credit Score — and Why It Controls More Than You Think',
+    b:`<p>Your credit score is a three-digit number (300–850) that functions as a financial reputation score. Lenders use it to decide whether to approve you for loans and at what interest rate. But its reach extends far beyond borrowing — it affects housing, employment, and even insurance.</p>
+<p><strong>What your credit score affects:</strong></p>
+<ul>
+  <li><strong>Mortgage rate:</strong> A 760 score might get 6.5% on a $300k mortgage; a 620 score might get 8.5%. That 2% difference costs $180,000 extra in interest over 30 years.</li>
+  <li><strong>Auto loan rate:</strong> Poor credit can add $100–$200/month to a car payment on the exact same vehicle.</li>
+  <li><strong>Apartment approval:</strong> Most landlords run credit checks. Bad credit means rejections or large security deposits.</li>
+  <li><strong>Utilities:</strong> Some utility companies require deposits for customers with poor credit history.</li>
+  <li><strong>Employment:</strong> Finance, government, and security jobs often include credit checks as part of hiring.</li>
+  <li><strong>Insurance premiums:</strong> In most states, your credit score directly affects your car and home insurance rates.</li>
+</ul>
+<p><strong>Score ranges (FICO):</strong></p>
+<ul>
+  <li>800–850: Exceptional — best rates available on anything</li>
+  <li>740–799: Very Good — near-best rates, excellent approval odds</li>
+  <li>670–739: Good — most loans approved, competitive rates</li>
+  <li>580–669: Fair — higher rates, some rejections, larger deposits</li>
+  <li>Below 580: Poor — very limited options, very high rates, frequent rejections</li>
+</ul>
+<p>FICO scores are used in 90% of lending decisions. You have multiple FICO scores — different versions for mortgages, auto loans, and credit cards — but they all derive from the same underlying credit report.</p>`,
+    tip:'Check your score for free at CreditKarma.com (VantageScore) or through your bank or credit card — many now provide free FICO scores. Checking your own score is a "soft inquiry" and does NOT affect your score. Only lender "hard inquiries" cause a temporary dip.'
+  },
+  {
+    h:'The Five Factors That Build or Destroy Your Score',
+    b:`<p>Your credit score isn't mysterious — it's calculated from five specific, weighted factors. Understanding each one lets you actively build your score rather than wondering why it went up or down.</p>
+<p><strong>1. Payment History — 35% (the most important factor)</strong><br>
+Every payment on every account, on time or late, for up to 7 years. A single 30-day late payment can drop a good score by 50–100 points and stays on your report for seven years. Even one missed payment is very hard to recover from quickly. This is why setting up autopay for at least the minimum payment is non-negotiable — even if you intend to pay in full, the autopay is a backstop.</p>
+<p><strong>2. Credit Utilization — 30%</strong><br>
+The percentage of your total available credit currently in use. If your total credit limit across all cards is $5,000 and you carry a $1,500 balance, your utilization is 30%. Under 30% is recommended; under 10% is excellent. This factor updates every billing cycle — pay down a balance and your score can improve within 30 days.</p>
+<p><strong>3. Length of Credit History — 15%</strong><br>
+The age of your oldest account, newest account, and the average age of all accounts. The longer your history of responsible credit use, the better. This is why closing old credit cards often hurts your score — it shortens your history and reduces available credit (which increases utilization).</p>
+<p><strong>4. Credit Mix — 10%</strong><br>
+Having a variety of credit types — credit cards, auto loan, student loan, mortgage — shows you can manage different forms of debt. Less important than the others, but having only one type of credit slightly limits your score ceiling.</p>
+<p><strong>5. New Credit / Inquiries — 10%</strong><br>
+Each time you apply for credit, a "hard inquiry" appears on your report and temporarily lowers your score by 5–10 points. Multiple applications in a short window signal financial stress to lenders. Exception: rate-shopping for a mortgage or auto loan within a 14–45 day window typically counts as a single inquiry.</p>`,
+    tip:'The fastest legitimate score improvement: lower your credit utilization (pay down balances or request a credit limit increase without spending more) and ensure nothing is late. A 600 score can reach 720+ within 12 months of consistent on-time payments and kept utilization below 10%.'
+  },
+  {
+    h:'Building Credit From Zero — A Step-by-Step Plan',
+    b:`<p>No credit history is nearly as problematic as bad credit — lenders have nothing to evaluate. Here's the systematic approach to building from scratch, in order of speed and effectiveness.</p>
+<p><strong>Step 1 — Become an authorized user</strong><br>
+Ask a parent or family member with good credit to add you as an authorized user on their credit card. You don't even need to use the card — you inherit their positive payment history and account age. This is the fastest way to get a score from zero, often producing a scoreable file within 1–2 billing cycles.</p>
+<p><strong>Step 2 — Get a secured credit card</strong><br>
+You deposit $200–$500 as collateral, which becomes your credit limit. Use it for one small recurring purchase (Netflix, gas, groceries). Pay the FULL balance every single month — never carry a balance. After 6–12 months of on-time payments, most issuers upgrade you to a regular unsecured card and return your deposit. Discover It Secured and Capital One Secured are the top recommendations — no annual fee.</p>
+<p><strong>Step 3 — Credit-builder loan (optional, powerful)</strong><br>
+Offered by some credit unions. You "borrow" money that goes into a locked savings account, make monthly payments reported to bureaus, and receive the savings when the loan is paid off. You build credit AND savings simultaneously. Self Financial offers this online.</p>
+<p><strong>Step 4 — Student credit card (if in college)</strong><br>
+Designed for credit beginners with lower approval requirements. Discover Student Cash Back and Capital One SavorOne Student are strong options with no annual fee and real rewards.</p>
+<p><strong>Timeline:</strong> With a secured card and consistent on-time payments, you should have a scoreable FICO file within 3–6 months and reach 670+ (Good) within 12–18 months.</p>
+<p><strong>The cardinal rule:</strong> Only charge what you already have the cash to pay off immediately. Use the card like a debit card that also builds credit. Never spend money you don't have because of rewards or "I'll pay it later."</p>`,
+    tip:'The single habit that protects your credit score forever: set up autopay for the full statement balance on every credit card. Not the minimum — the full balance. This eliminates interest, keeps utilization low, and ensures you never miss a payment regardless of how busy life gets.'
+  },
+  {
+    h:'Credit Cards — Interest, Minimums, and How to Use Them Correctly',
+    b:`<p>Credit cards are financial tools. Used correctly, they're free money, fraud protection, purchase protection, and rewards. Used incorrectly, they're 20–30% interest-rate debt traps that take years to escape. The difference is entirely in how you use them.</p>
+<p><strong>How credit card interest actually works:</strong><br>
+You have a $3,000 balance at 22% APR. You pay only the minimum each month (roughly 2% of balance or $25, whichever is more). Here's what happens:</p>
+<ul>
+  <li>Time to pay off: approximately 19 years</li>
+  <li>Total interest paid: roughly $5,500</li>
+  <li>You paid $8,500 for $3,000 worth of purchases</li>
+</ul>
+<p>This is not an edge case — it's exactly how the credit card business model works for millions of cardholders.</p>
+<p><strong>The only correct way to use a credit card:</strong> Pay the full statement balance every month, every time. When you pay in full, you pay zero interest — you're using the card as an interest-free 30-day loan and earning rewards on every purchase. The moment you carry a balance, all rewards become worthless (the interest far exceeds any cash back).</p>
+<p><strong>If you currently carry a balance:</strong> Stop using the card for new purchases immediately. Attack the balance using either the avalanche method (highest interest rate first — mathematically optimal) or the snowball method (smallest balance first — psychologically motivating). The method matters less than the consistency of paying extra every month.</p>
+<p><strong>What cards to get:</strong></p>
+<ul>
+  <li><strong>Starting out:</strong> No-annual-fee cash back card — Discover It Cash Back, Chase Freedom Unlimited, Capital One Quicksilver. Simple, no complexity.</li>
+  <li><strong>Frequent flyers:</strong> Travel cards with sign-up bonuses can be worth $500–$1,500 in first-year value — but only if you're paying in full monthly.</li>
+  <li><strong>Annual fee cards:</strong> Only worthwhile when rewards + benefits reliably exceed the fee. Run the math before every renewal.</li>
+</ul>`,
+    tip:'The credit card rewards that airlines and banks advertise so heavily are funded by interchange fees and — most profitably — by the interest paid by the 55% of cardholders who carry a balance. Be in the 45% who pay in full. Those people get subsidized rewards paid for by those who don\'t.'
+  },
+  {
+    h:'Your Credit Report — Reading It and Disputing Errors',
+    b:`<p>Your credit score is calculated from your credit report. Studies find that 1 in 4 Americans has at least one error significant enough to hurt their score — and most people have never looked. You're legally entitled to check for free.</p>
+<p><strong>Get your free reports:</strong> AnnualCreditReport.com is the only official site mandated by federal law — free reports from all three bureaus (Equifax, Experian, TransUnion). You're entitled to one from each per year. Strategy: stagger them, checking one bureau every four months to monitor year-round for free.</p>
+<p><strong>What to look for:</strong></p>
+<ul>
+  <li>Accounts you never opened (identity theft red flag)</li>
+  <li>Late payments you made on time</li>
+  <li>Wrong balances or credit limits</li>
+  <li>Closed accounts showing as open (or vice versa)</li>
+  <li>Incorrect personal information (wrong SSN, address, name spelling)</li>
+  <li>Duplicate accounts for the same debt</li>
+  <li>Negative items past the 7-year reporting limit (most negative items must drop off after 7 years; bankruptcies after 10)</li>
+</ul>
+<p><strong>How to dispute errors:</strong> Submit online at the specific bureau's website (Equifax.com, Experian.com, or TransUnion.com) with any supporting documentation. They must investigate within 30 days and remove or correct unverifiable items. Also dispute with the lender who reported the error — they report to all bureaus.</p>
+<p><strong>Identity theft response:</strong> If you find accounts you never opened, immediately place a fraud alert (free, 1 year) or credit freeze (free, indefinite) at all three bureaus. A freeze is the strongest protection — it prevents anyone from opening new credit in your name. Freeze and unfreeze online in minutes at each bureau's website.</p>`,
+    tip:'Consider placing a credit freeze if you\'re not actively applying for new credit. It\'s free, doesn\'t affect your score, and completely prevents anyone — including you temporarily — from opening new credit in your name. Unfreeze only when applying, then refreeze. It\'s the most effective identity theft prevention available.'
+  },
+],
+relationships:[
+  {
+    h:'Healthy vs. Unhealthy Relationships — The Markers That Matter',
+    b:`<p>Most people can describe a healthy relationship in the abstract. Far fewer can accurately evaluate the relationship they're currently in. Unhealthy patterns normalize gradually — each step seems small — until you look back and realize how far things have drifted.</p>
+<p><strong>Markers of a healthy relationship:</strong></p>
+<ul>
+  <li><strong>Mutual respect:</strong> Each person's thoughts, feelings, boundaries, and time are treated as genuinely important — not just acknowledged when convenient</li>
+  <li><strong>Trust:</strong> You don't feel the need to check their phone, verify their stories, or manage their behavior. Trust is built through consistent honesty over time, not demanded.</li>
+  <li><strong>Individual identity:</strong> Both people maintain their own friendships, interests, and goals. Neither person exists only in the context of the relationship.</li>
+  <li><strong>Conflict without contempt:</strong> Disagreements happen, but arguments don't involve name-calling, mockery, stonewalling, or threats. Repair happens after conflict.</li>
+  <li><strong>Safety to be honest:</strong> You can disagree, express needs, or say "I'm not comfortable with that" without fear of major consequences.</li>
+  <li><strong>Mutual investment:</strong> Both people are actively contributing to the relationship's health — not one person endlessly accommodating the other.</li>
+</ul>
+<p><strong>Markers of an unhealthy relationship (recognize these early):</strong></p>
+<ul>
+  <li><strong>Isolation:</strong> Gradually cutting you off from family, friends, and your support system. This is usually framed as "I just want to spend time with you" until you realize you've lost your entire outside network.</li>
+  <li><strong>Control:</strong> Monitoring your whereabouts, checking your phone, controlling finances, dictating clothing, requiring constant check-ins, and getting angry when you make independent decisions.</li>
+  <li><strong>Contempt:</strong> John Gottman's research identified contempt (mockery, eye-rolling, dismissiveness, superiority) as the single strongest predictor of relationship failure. It signals fundamental disrespect.</li>
+  <li><strong>Walking on eggshells:</strong> Modifying your behavior, words, and even thoughts to manage someone else's emotional state. This is exhausting and signals something is seriously wrong.</li>
+  <li><strong>Volatility:</strong> Dramatic swings between intense affection ("love bombing") and anger, coldness, or punishment. The intensity of the good moments doesn't offset the damage of the bad ones.</li>
+  <li><strong>Minimizing and gaslighting:</strong> Being told your concerns aren't real, that you're "too sensitive," or that events didn't happen the way you clearly remember them.</li>
+</ul>`,
+    tip:'The clearest early warning sign: how does this person handle not getting what they want? Healthy people negotiate and accept compromise. Unhealthy patterns show in the moments of disappointment — anger, sulking, manipulation, or punishment. You see the real person in those moments, not the charming ones.'
+  },
+  {
+    h:'Communication — The Skill That Determines Relationship Quality',
+    b:`<p>Dr. John Gottman's 40 years of research on couples identified the exact communication patterns that predict relationship success or failure with remarkable accuracy. These patterns apply to friendships, family, and romantic relationships.</p>
+<p><strong>The Four Horsemen (patterns that destroy relationships):</strong></p>
+<ul>
+  <li><strong>Criticism:</strong> Attacking someone's character rather than addressing a specific behavior. "You never think about anyone but yourself" vs. "I felt hurt when you forgot our plans." The first attacks the person; the second addresses the behavior.</li>
+  <li><strong>Contempt:</strong> Mockery, sarcasm, eye-rolling, superiority. Communicates fundamental disrespect. The most corrosive of the four — impossible to maintain a healthy relationship in the presence of chronic contempt.</li>
+  <li><strong>Defensiveness:</strong> Responding to a complaint with a counter-complaint or excuse rather than taking any accountability. Feels like self-protection but escalates conflict rather than resolving it.</li>
+  <li><strong>Stonewalling:</strong> Emotional withdrawal — shutting down, going quiet, leaving the conversation. Usually triggered by emotional flooding (being too overwhelmed to continue productively).</li>
+</ul>
+<p><strong>What actually works:</strong></p>
+<ul>
+  <li><strong>"I" statements:</strong> "I feel [emotion] when [specific situation]" instead of "You always/never [behavior]." Describes your experience without attacking. Harder to defensively reject.</li>
+  <li><strong>Repair attempts:</strong> Anything that interrupts escalating conflict — humor, a touch, acknowledging the other person's point, taking a break. Successful couples make and accept repair attempts; it doesn't matter how clumsy they are.</li>
+  <li><strong>The 5:1 ratio:</strong> Gottman found that stable relationships maintain 5 positive interactions for every 1 negative one. This isn't about suppressing conflict — it's about building a foundation of goodwill strong enough to survive conflict.</li>
+  <li><strong>Active listening:</strong> Reflecting back what you heard before responding: "What I'm hearing is that you felt overlooked when I didn't tell you about the change in plans — is that right?" This alone prevents 90% of escalation.</li>
+</ul>`,
+    tip:'When a conversation is getting heated and you feel the urge to say something cutting, buy yourself 20 seconds by asking a question instead: "Help me understand what you mean by that." It\'s genuinely hard to escalate when you\'re in curiosity mode rather than attack mode.'
+  },
+  {
+    h:'Boundaries — What They Actually Are and How to Hold Them',
+    b:`<p>Boundaries are not walls. They're not punishments. They're not ultimatums. A boundary is a clear statement of what you will and won't accept in how you're treated, and what you'll do if that limit is crossed. The most common misunderstanding: boundaries control what the other person does. They don't — they define your response.</p>
+<p><strong>What a boundary actually is:</strong><br>
+"I won't continue a conversation when you're yelling. If you raise your voice, I'm going to take a 20-minute break and come back to talk when we can both be calm." That's a boundary — it clearly states the behavior you won't engage with and your response. You're not controlling them; you're controlling yourself.</p>
+<p><strong>What a boundary is not:</strong><br>
+"You need to stop yelling at me" is a demand, not a boundary. You can make the request — but whether they comply is outside your control. A boundary is about your action, not their compliance.</p>
+<p><strong>Types of boundaries:</strong></p>
+<ul>
+  <li><strong>Physical:</strong> Personal space, touch, privacy</li>
+  <li><strong>Emotional:</strong> What topics you'll discuss, how you'll be spoken to, what you'll take responsibility for</li>
+  <li><strong>Time:</strong> Availability, response time expectations, how your time is spent</li>
+  <li><strong>Financial:</strong> What you'll lend, how money decisions are made</li>
+  <li><strong>Digital:</strong> Access to your phone/accounts, response time, what you share</li>
+</ul>
+<p><strong>Why people don't hold boundaries:</strong> Fear of the other person's reaction, guilt, not believing they deserve them, conflict avoidance, or not knowing what they actually need. Setting a boundary and then abandoning it when the other person pushes back teaches them that pushing back works — it actually makes boundary violations more likely.</p>
+<p><strong>Delivering a boundary:</strong> Clear, calm, direct. No long explanation needed. "I'm not going to discuss this anymore tonight" is a complete sentence. The calmer and more matter-of-fact you are, the less it reads as an attack and the more it lands as information.</p>`,
+    tip:'"No" is a complete sentence. You don\'t owe anyone a lengthy justification for a boundary. The more you over-explain and defend, the more it signals uncertainty and invites negotiation. Say what you mean, mean what you say, and follow through consistently.'
+  },
+  {
+    h:'Conflict Resolution — Fighting in a Way That Actually Fixes Things',
+    b:`<p>Conflict in relationships is inevitable — the goal isn't to avoid it but to handle it in a way that actually resolves the underlying issue rather than just pausing the fight. Most people were never taught how to do this.</p>
+<p><strong>Before the conversation:</strong></p>
+<ul>
+  <li><strong>Timing matters:</strong> Don't have the conversation when either person is tired, hungry, or emotionally flooded. "Can we talk about this after dinner?" is not avoidance — it's setup for success.</li>
+  <li><strong>Know what you're actually upset about:</strong> The presenting complaint is often not the real issue. "You were late" might really be "I feel like I'm not a priority." Getting to the real issue makes resolution possible.</li>
+  <li><strong>Private and calm:</strong> Never in public, never through text for anything serious.</li>
+</ul>
+<p><strong>During the conversation:</strong></p>
+<ol>
+  <li>State the specific behavior — not character: "When you made plans without checking with me first" not "You're so selfish"</li>
+  <li>State the impact: "I felt like my schedule doesn't matter to you"</li>
+  <li>Make a specific request: "In the future, can you check with me before committing us to something?"</li>
+  <li>Listen fully before responding — don't formulate your counterargument while they're still talking</li>
+  <li>Look for the grain of truth in their perspective — there almost always is one</li>
+</ol>
+<p><strong>If it escalates:</strong> Take a break — a real one, at least 20 minutes (the time it takes cortisol to drop meaningfully). Agree on a time to come back. Don't use the break to rehearse your argument; use it to genuinely calm down. "I need 30 minutes to cool off and then I want to finish this conversation" is not stonewalling — stonewalling is refusing to engage at all.</p>
+<p><strong>Resolution means:</strong> Both people feel heard, a specific plan or understanding is reached, and the relationship doesn't carry forward the resentment from the fight. Saying "I'm sorry" followed by the same behavior repeatedly is not resolution.</p>`,
+    tip:'After a conflict is resolved, do one small positive thing together — make food, take a walk, watch something. It resets the emotional tone and prevents the relationship from getting stuck in the lingering atmosphere of a recent fight.'
+  },
+  {
+    h:'Friendship — Investing in Relationships That Last',
+    b:`<p>Adult friendship is harder than it looks. The accidental proximity of childhood and college that creates friendships doesn't exist in the same way after your mid-twenties. Adult friendships require intentional investment — and most people don't realize this until they look up and find their social world has quietly hollowed out.</p>
+<p><strong>What makes friendships last:</strong></p>
+<ul>
+  <li><strong>Consistency over intensity:</strong> Regular low-key contact (a text, a quick call, showing up for the small things) maintains friendship better than occasional grand gestures. "Let's get together sometime" kills friendships; "Are you free Thursday?" sustains them.</li>
+  <li><strong>Showing up when it's hard:</strong> The friend who appears when life is good is a fair-weather friend. The one who shows up at the funeral, at the hospital, at the divorce — that's the friendship that defines your life.</li>
+  <li><strong>Keeping confidences:</strong> What's shared in trust stays there. People who share other people's private information to seem interesting are telling you what they'll do with yours.</li>
+  <li><strong>Mutual honesty:</strong> Real friends tell you when you have spinach in your teeth — and when your plan is a bad idea. Constant validation is pleasant but useless. Honest feedback, delivered with care, is what you actually need.</li>
+  <li><strong>Celebrating wins genuinely:</strong> The inability to be happy for a friend's success is a form of resentment that silently poisons the relationship. Genuine celebration of other people's wins costs nothing and builds significant relational capital.</li>
+</ul>
+<p><strong>The 5-person audit:</strong> Research consistently finds you become like the five people you spend the most time with. Your habits, thinking patterns, financial behaviors, ambitions, and values are substantially influenced by your closest relationships. This isn't about cutting off imperfect people — it's about being intentional about who gets the most access to your time and energy.</p>`,
+    tip:'Schedule the friendship. It feels unromantic, but the friendships that survive adult life are the ones where both people proactively put time on the calendar. "We need to catch up" is a social convention, not a plan. "I\'m going to be at X on Saturday, come join me" is a plan.'
+  },
+],
+faith:[
+  {
+    h:'Faith as Foundation — Not One Compartment Among Many',
+    b:`<p>For many people, faith is one compartment of life — practiced on Sundays, separate from finances, work, relationships, and daily decisions. But biblical faith presents itself very differently: not as an addition to life but as the framework beneath all of it.</p>
+<p>Proverbs 3:5–6: <em>"Trust in the LORD with all your heart and lean not on your own understanding; in all your ways submit to him, and he will make your paths straight."</em></p>
+<p>The word "all" appears three times: all your heart, all your understanding, all your ways. This is not a Sunday recommendation — it's a claim about how life works best in every dimension. Financial decisions made through the lens of stewardship. Relationships built on the standard of 1 Corinthians 13. Career and purpose oriented toward calling, not just accumulation. Difficulty processed through Romans 8:28.</p>
+<p><strong>What leaning on your own understanding actually produces:</strong> Our understanding is limited, biased, and self-interested in ways we can't fully see. We rationalize what we want. We weight short-term comfort against long-term flourishing. We trust our feelings in moments when our feelings are the least reliable guide. Faith in something larger, wiser, and genuinely good is partly a wisdom claim: the designer of a system has better instructions for running it than the users.</p>
+<p><strong>This foundation doesn't eliminate hard things</strong> — Jesus explicitly promises the opposite: "In this world you will have trouble." What it provides is an unshakeable framework for navigating them. A confidence not rooted in circumstances but in the character of God. That's why James 1:2 says to "consider it pure joy" when trials come — not because the trial is good, but because of what it produces in those whose foundation holds.</p>`,
+    tip:'The most important thing about faith is not having perfect theology — it\'s having a real, honest relationship with God. Bring your actual doubts, your genuine frustrations, your hardest questions. Faith that can\'t survive honest questions is not a very solid foundation.'
+  },
+  {
+    h:'How to Read the Bible and Actually Get Something from It',
+    b:`<p>The Bible is the most translated, most read, most influential book in human history. It's also widely misunderstood, badly quoted out of context, and underused by people who theoretically believe it's the Word of God. Here's how to actually engage with it in a way that changes you.</p>
+<p><strong>Where to start:</strong></p>
+<ul>
+  <li><strong>Gospel of John:</strong> Best introduction to who Jesus claimed to be. Opens with "In the beginning was the Word" — a direct echo of Genesis 1, signaling this is the Creator entering creation. Moves through miracles, teaching, confrontation, crucifixion, and resurrection.</li>
+  <li><strong>Gospel of Mark:</strong> The shortest, fastest-moving gospel. Almost no extended teaching — just action. Ideal for a quick read-through to grasp what Jesus did.</li>
+  <li><strong>Proverbs:</strong> 31 chapters of practical wisdom — one per day of the month, indefinitely. Addresses money, relationships, speech, work, character, parenting. Stands up whether you're a believer or not.</li>
+  <li><strong>Psalms:</strong> 150 poems and songs covering the complete range of human emotion — joy, grief, doubt, anger at God, desperate longing, overflowing gratitude. You'll find your own interior life reflected honestly here.</li>
+  <li><strong>Romans:</strong> Paul's most systematic presentation of the gospel and its implications. Dense but foundational — understanding Romans changes how you read everything else.</li>
+</ul>
+<p><strong>How to read it with depth:</strong></p>
+<ul>
+  <li>Read for understanding — ask three questions: What does this say? What did it mean to its original audience? What does it mean for me today?</li>
+  <li>Read context — the verse before and after, the chapter, the book. Single verses stripped from context are among the most misused things in human history. "I can do all things through Christ who strengthens me" (Phil 4:13) is about contentment in all circumstances — not unlimited worldly success.</li>
+  <li>Read in a translation you can understand: NIV (readable, widely used), ESV (more literal, excellent for study), NLT (very accessible, great for beginners)</li>
+  <li>Use a study Bible: ESV Study Bible or NIV Study Bible provide background, maps, cross-references, and explanation directly on the page</li>
+</ul>`,
+    tip:'The YouVersion Bible App (bible.com) is free with 2,000+ translations and thousands of reading plans on every topic and life stage — from 3 days to a year. "The Bible in One Year" with Nicky Gumbel provides daily Old Testament, New Testament, and Psalm readings with audio commentary. Ten minutes daily compounds powerfully over months and years.'
+  },
+  {
+    h:'Prayer — What It Is and How to Actually Do It',
+    b:`<p>Prayer is direct communication with God — not a religious performance, not a recitation of the right words, and not something reserved for spiritual giants. Jesus criticized those who prayed to be seen by others and commended those who prayed simply and honestly (Matthew 6:5–8). The model He gave (the Lord's Prayer) covers the essential elements in about 60 words.</p>
+<p><strong>The ACTS prayer framework:</strong></p>
+<ul>
+  <li><strong>Adoration:</strong> Begin with who God is — not what you need. Praise for His character: goodness, faithfulness, power, love. This orients you before you bring requests. Psalm 100 is a model of pure adoration.</li>
+  <li><strong>Confession:</strong> Honest acknowledgment of specific failures — not vague "I'm not perfect" but actual things. 1 John 1:9: "If we confess our sins, he is faithful and just and will forgive us our sins and purify us from all unrighteousness." Confession clears the relational space.</li>
+  <li><strong>Thanksgiving:</strong> Specific gratitude for specific things. Not "thanks for everything" — "thank you for the conversation with my dad yesterday, for the job that covers my bills, for the moment this morning when I felt peace." Specificity builds faith and trains your attention toward what is good.</li>
+  <li><strong>Supplication:</strong> Your requests — for yourself and for others. Be specific. Vague prayers get vague answers (or we don't notice when they're answered). Bring the actual situation, the actual person, the actual outcome you're asking for.</li>
+</ul>
+<p><strong>The posture of prayer:</strong> Honest, not performative. Persistent, not transactional. Expectant, not demanding. Jesus models this in Gethsemane — bringing a specific, deeply felt request ("take this cup from me") while ultimately yielding to the Father's will ("yet not my will, but yours be done"). That's the full arc of mature prayer.</p>
+<p><strong>When prayer feels impossible:</strong> Romans 8:26 says the Spirit intercedes for us "with groanings too deep for words." In grief, confusion, or spiritual numbness — showing up to be with God even without words is itself prayer.</p>`,
+    tip:'Write your prayers in a journal. Two things happen: the act of writing forces specificity and slows down your thinking, and over months you accumulate a record of what you\'ve asked for and how God has responded. The pattern you\'ll see over time builds a kind of faith that abstract belief alone doesn\'t produce.'
+  },
+  {
+    h:'Finding and Evaluating a Good Church',
+    b:`<p>A good church is one of the most significant investments you can make in your spiritual formation, your relationships, and your resilience in difficult seasons. A bad church can do real damage. Knowing the difference matters.</p>
+<p><strong>What to look for:</strong></p>
+<ul>
+  <li><strong>Biblical preaching:</strong> The sermon should be rooted in a specific biblical text, interpreted in its context, and applied to real life — not built around cultural talking points with Bible verses added for support. Over time, ask: am I learning to understand the Bible? Am I being challenged to change?</li>
+  <li><strong>Authentic community:</strong> Church is not just a Sunday service — it's the people who show up when you're in the hospital, who know your name, who you can call in a crisis. Small groups, life groups, community groups are how this happens. Evaluate these, not just the main service.</li>
+  <li><strong>Accountability and elder oversight:</strong> Healthy churches have multiple leaders who hold each other accountable. A church where one person runs everything without checks is a structure that enables abuse.</li>
+  <li><strong>Culture of service:</strong> Healthy churches look outward — serving their city, supporting the vulnerable, engaging their neighborhood. Churches that are entirely inward-focused often become insular and stagnant.</li>
+  <li><strong>Discipleship:</strong> Is there a pathway for growing in faith? Are people being equipped to live out their faith, not just attend?</li>
+</ul>
+<p><strong>Red flags:</strong></p>
+<ul>
+  <li>Prosperity gospel — the teaching that faith or giving guarantees wealth and health</li>
+  <li>Pastor accountable to no one, or who discourages questions</li>
+  <li>Culture of fear, shame, or pressure around giving</li>
+  <li>Dismissal of mental health ("just pray more")</li>
+  <li>Isolation from outside relationships or other churches</li>
+</ul>`,
+    tip:'Find a church before you need it — before you\'re lonely, before a crisis hits, before you\'re struggling. Walking into an unknown church for the first time when you\'re already in pain is hard. Establish the community when life is relatively stable, so it\'s there when it\'s not.'
+  },
+  {
+    h:'Integrity — Who You Are When No One Is Watching',
+    b:`<p>Integrity is not a religious concept — it's an engineering term. In materials science, integrity means the structure does what it's supposed to do under load, consistently, regardless of who's observing. A bridge with structural integrity doesn't perform differently when inspectors are watching versus when they're not. That's exactly what character integrity means for a person.</p>
+<p><strong>Why integrity matters practically, not just morally:</strong></p>
+<ul>
+  <li>Trust is built entirely on consistent behavior over time — and once broken, it takes far longer to rebuild than it took to build. Relationships, careers, and organizations run on trust.</li>
+  <li>Character determines your ceiling. You might get somewhere through talent or luck — but staying there, being trusted with more, leading others, requires character that holds under pressure.</li>
+  <li>The private becomes public, eventually. In an age of screenshots, recordings, and social media, the assumption that private behavior stays private is increasingly unreliable.</li>
+</ul>
+<p><strong>Biblical patterns of integrity:</strong></p>
+<ul>
+  <li><strong>Joseph (Genesis 37–50):</strong> Faithful in Potiphar's house, faithful in prison, faithful in obscurity — for years, with no visible reward and plenty of evidence that faithfulness wasn't working. His private character prepared him for the public responsibility he eventually received.</li>
+  <li><strong>Daniel (Daniel 1–6):</strong> Maintained his convictions under genuine threat to his life. Integrity isn't just about avoiding small temptations — it's about what you do when the cost is real.</li>
+  <li><strong>David (Psalm 51):</strong> The man after God's own heart also failed catastrophically. Integrity includes honest, undefended acknowledgment of failure and genuine commitment to change.</li>
+</ul>
+<p><strong>Building integrity as a practice:</strong> Do what you said you would do. Be honest about mistakes before being caught. Keep confidences. Treat people the same whether they can help you or not. Show up consistently — integrity is a pattern, not a single decision.</p>`,
+    tip:'Ask yourself regularly: "Would I be comfortable if the people I most respect could see exactly what I\'m doing right now and why I\'m doing it?" If yes, continue. If no, stop — regardless of whether they can actually see. Your character is what you do with that question when no one\'s looking.'
+  },
+  {
+    h:'Tithing and Financial Generosity',
+    b:`<p>Tithing — giving the first 10% of your income — is one of the most counter-intuitive and transformative practices in Scripture. Malachi 3:10 contains one of the few places God explicitly invites a test: "Bring the whole tithe into the storehouse... Test me in this and see if I will not throw open the floodgates of heaven and pour out so much blessing that there will not be room enough to store it."</p>
+<p><strong>Why generosity changes you, not just the recipient:</strong></p>
+<ul>
+  <li>Money is one of the most powerful competing loyalties in human life. Jesus said more about money than almost any other topic — because he understood that where your treasure goes, your heart follows (Matthew 6:21). Giving is a deliberate act of loosening money's grip on you.</li>
+  <li>Generosity consistently produces more peace about finances, not less. Counterintuitively, people who give report feeling more financially secure, not more anxious — because their security isn't rooted in the account balance.</li>
+  <li>It's a practice of trust. Giving first — before you know if the bills are covered — is an act of faith that God's provision is real. It's easy to give from abundance. The tithe is about giving first, from what comes in, before you calculate whether you can afford it.</li>
+</ul>
+<p><strong>Starting where you are:</strong> If 10% feels impossible, start with 3% and increase 1% every 6 months. The practice and the posture matter more initially than the percentage. Most people who begin giving report that the budget adjusts in ways they didn't expect — spending changes when you've already given first.</p>
+<p><strong>Where to give:</strong> Your local church should be the primary destination — this is where biblical generosity is directed and where community is sustained. Beyond that: causes aligned with your gifts, passions, and calling. Give to organizations whose financial accountability you can verify (Charity Navigator, GuideStar).</p>`,
+    tip:'Track what you give annually. It\'s easy to intend to be generous and find at the end of the year that the giving was scattered and minimal. Many people find that making giving automatic — a transfer scheduled on payday before discretionary spending is possible — is the only approach that actually works consistently.'
+  },
+],
+mental:[
+  {
+    h:'What Anxiety Actually Is — and What Actually Works',
+    b:`<p>Anxiety is your brain's threat-detection system firing when there's no real physical danger. The amygdala — your brain's alarm center — can't distinguish between a charging lion and a job interview. It activates the same fight-or-flight cascade regardless. Understanding the biology makes it less terrifying and helps you intervene effectively.</p>
+<p><strong>What happens physically during anxiety:</strong></p>
+<ul>
+  <li>Amygdala signals the hypothalamus, which triggers the adrenal glands</li>
+  <li>Adrenaline and cortisol flood your system</li>
+  <li>Heart rate surges, breathing quickens, muscles tense, digestion halts</li>
+  <li>Blood diverts to large muscle groups</li>
+  <li>Prefrontal cortex (rational thinking) activity decreases — literally harder to think clearly when anxious</li>
+</ul>
+<p><strong>Common anxiety symptoms beyond just "worrying":</strong> Racing heart, chest tightness, shortness of breath, stomach knots and GI distress, muscle tension, sweating, difficulty concentrating, derealization (feeling unreal or detached), irritability, sleep disruption, and persistent avoidance of feared situations.</p>
+<p><strong>What evidence shows actually works:</strong></p>
+<ul>
+  <li><strong>Diaphragmatic breathing / 4-7-8 method:</strong> Inhale 4 counts, hold 7, exhale 8. The extended exhale activates the parasympathetic nervous system — your body's physiological brake. This works within minutes and is not a placebo.</li>
+  <li><strong>Cognitive Behavioral Therapy (CBT):</strong> The strongest evidence-base of any anxiety treatment. Teaches you to identify distorted thought patterns ("this presentation will be a disaster and everyone will judge me") and challenge them with evidence.</li>
+  <li><strong>Consistent exercise:</strong> 30+ minutes of aerobic exercise reduces anxiety for 4–8 hours and has lasting structural effects on the brain with consistent practice.</li>
+  <li><strong>Reducing caffeine:</strong> Caffeine physically mimics anxiety symptoms — it increases heart rate, causes jitteriness, and amplifies the physical sensations of anxiety.</li>
+  <li><strong>Exposure (not avoidance):</strong> Anxiety tells you to avoid what scares you. Avoidance provides short-term relief but strengthens anxiety long-term. Gradual, systematic exposure to feared situations is what reduces anxiety over time.</li>
+  <li><strong>Medication:</strong> SSRIs and SNRIs are effective for generalized anxiety disorder. Not necessary for everyone, but transformative for many when the right medication and dose is found.</li>
+</ul>`,
+    tip:'Anxiety lies. It tells you that you can\'t handle something — and it is almost always wrong. Every time you face something anxiety says you can\'t handle and get through it, you build evidence against the lie. That\'s the core mechanism of why exposure therapy works.'
+  },
+  {
+    h:'Recognizing Depression — What It Actually Is',
+    b:`<p>Depression is not sadness. Sadness is a normal human emotion with a clear cause that fades over time. Major depression is a clinical condition involving measurable changes in brain chemistry, neuroplasticity, sleep architecture, and hormonal regulation that persist regardless of circumstances. It is medical — not a choice, not weakness, not something you should be able to think your way out of.</p>
+<p><strong>The clinical criteria (5+ of these for 2+ weeks):</strong></p>
+<ul>
+  <li>Depressed mood most of the day, nearly every day</li>
+  <li>Anhedonia — markedly diminished interest or pleasure in activities you previously enjoyed (often the most recognizable early sign)</li>
+  <li>Significant weight change or appetite disturbance</li>
+  <li>Insomnia or sleeping much more than usual</li>
+  <li>Psychomotor changes — either agitation or slowing that others can observe</li>
+  <li>Persistent fatigue or loss of energy</li>
+  <li>Feelings of worthlessness or excessive, irrational guilt</li>
+  <li>Difficulty thinking, concentrating, or making even small decisions</li>
+  <li>Recurrent thoughts of death or suicidal ideation</li>
+</ul>
+<p><strong>What depression does in the brain:</strong> Reduces neuroplasticity and neurogenesis (particularly in the hippocampus), dysregulates the HPA axis (the body's stress response system), disrupts circadian rhythms, and alters the sleep cycle in ways that worsen mood further — creating a self-reinforcing loop.</p>
+<p><strong>What actually works:</strong></p>
+<ul>
+  <li><strong>Psychotherapy:</strong> CBT, behavioral activation, and interpersonal therapy all have strong evidence. As effective as medication for mild-to-moderate depression. Often more durable — therapy teaches skills that remain after treatment ends.</li>
+  <li><strong>Antidepressants:</strong> SSRIs and SNRIs are effective for moderate-to-severe depression. Finding the right one often requires 2–3 tries. This is normal — not failure. Give each trial 6–8 weeks to fully evaluate.</li>
+  <li><strong>Exercise:</strong> Multiple randomized trials show aerobic exercise 3–5x/week is as effective as antidepressants for mild-to-moderate depression. The mechanism is real — BDNF, serotonin, dopamine, reduced cortisol.</li>
+  <li><strong>Medication + therapy together:</strong> Significantly more effective than either alone for most people with moderate-to-severe depression.</li>
+</ul>`,
+    tip:'The cruelest aspect of depression is that it destroys motivation to do the exact things that help — exercise, socializing, seeking treatment. The first step doesn\'t have to feel possible to be worth taking. Making one appointment, sending one text for help — that\'s the whole goal for day one.'
+  },
+  {
+    h:'Managing Stress Before It Manages You',
+    b:`<p>Stress itself is not the problem — short-term stress (the kind that sharpens focus before a presentation) is actually adaptive and performance-enhancing. The problem is chronic, unmanaged stress: cortisol and adrenaline running at elevated levels day after day, eroding your health, judgment, relationships, and sleep.</p>
+<p><strong>What chronic stress does to your body:</strong></p>
+<ul>
+  <li>Elevates blood pressure over time, increasing cardiovascular disease risk</li>
+  <li>Suppresses immune function — you get sick more often and recover more slowly</li>
+  <li>Disrupts sleep architecture, reducing deep sleep and REM</li>
+  <li>Promotes abdominal fat accumulation (cortisol-driven)</li>
+  <li>Impairs memory consolidation and prefrontal cortex function</li>
+  <li>Accelerates cellular aging (telomere shortening)</li>
+</ul>
+<p><strong>What actually reduces stress (evidence-based):</strong></p>
+<ul>
+  <li><strong>Exercise — most powerful intervention:</strong> Physiologically burns off stress hormones, releases endorphins, and resets the HPA axis. Even a 20-minute walk measurably reduces cortisol.</li>
+  <li><strong>Sleep:</strong> Sleep and stress are bidirectional — chronic stress disrupts sleep, and sleep deprivation dramatically increases stress reactivity. Fixing sleep is often the highest-leverage intervention.</li>
+  <li><strong>Social connection:</strong> Talking to someone you trust activates the same brain systems that oxytocin (the bonding hormone) affects — directly counteracting the stress response.</li>
+  <li><strong>Controlled breathing:</strong> Extended exhales (longer out than in) activate the parasympathetic nervous system and measurably lower heart rate within 60–90 seconds.</li>
+  <li><strong>Saying no:</strong> Overcommitment is one of the most common sources of chronic stress. Protecting your time is a health decision.</li>
+  <li><strong>Prayer and scripture:</strong> Philippians 4:6–7: "Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God. And the peace of God, which transcends all understanding, will guard your hearts and your minds."</li>
+</ul>
+<p><strong>What doesn't work:</strong> Alcohol (worsens anxiety and sleep), social media (comparison and doomscrolling amplify stress), excessive caffeine, and avoidance (makes stressors larger, not smaller).</p>`,
+    tip:'Journaling for 15–20 minutes about a stressor — specifically writing about your thoughts and feelings, not just recapping events — measurably reduces its psychological weight. Writing forces cognitive processing that rumination alone doesn\'t achieve.'
+  },
+  {
+    h:'When to See a Therapist — and How to Find One',
+    b:`<p>Therapy isn't only for crisis. It's for anyone who wants to understand themselves better, break patterns that aren't serving them, process past experiences, or develop more effective ways of thinking and behaving. The question isn't "am I broken enough to need therapy" — it's "would I benefit from professional support?" The answer is almost always yes.</p>
+<p><strong>Clear reasons to seek therapy:</strong></p>
+<ul>
+  <li>Persistent depression or anxiety lasting more than 2 weeks</li>
+  <li>Any thoughts of self-harm or suicide</li>
+  <li>Trauma that continues to affect your daily life, relationships, or behavior</li>
+  <li>Patterns that keep repeating despite your best intentions — in relationships, work, habits, or emotional responses</li>
+  <li>Using alcohol, substances, food, screens, or work to numb or escape</li>
+  <li>Grief that feels unmanageable</li>
+  <li>Relationship difficulties that you can't resolve with communication alone</li>
+  <li>Major life transitions: divorce, loss, career change, new parenthood</li>
+</ul>
+<p><strong>Types of therapy:</strong></p>
+<ul>
+  <li><strong>CBT (Cognitive Behavioral Therapy):</strong> Strongest evidence base. Structured, skills-focused, typically 12–20 sessions. Identifies and modifies distorted thought patterns and maladaptive behaviors.</li>
+  <li><strong>DBT (Dialectical Behavior Therapy):</strong> Especially effective for emotional dysregulation, borderline patterns, and self-harm.</li>
+  <li><strong>EMDR:</strong> Highly effective for trauma and PTSD. Processes traumatic memories through bilateral stimulation.</li>
+  <li><strong>Talk therapy / psychodynamic:</strong> Explores patterns from past relationships and experiences. More open-ended.</li>
+</ul>
+<p><strong>How to find a therapist:</strong></p>
+<ul>
+  <li>Psychology Today's therapist finder (psychologytoday.com/us/therapists) — filter by insurance, issue, approach, and location</li>
+  <li>Your insurance's provider directory (covers in-network therapists)</li>
+  <li>Open Path Collective (openpath.org) — sliding scale $30–$80 sessions</li>
+  <li>BetterHelp or Talkspace — online therapy, faster to start, often lower cost</li>
+  <li>Your school's counseling center if in college — often free</li>
+</ul>`,
+    tip:'When looking for a therapist, the relationship matters as much as their credentials. It\'s normal and appropriate to try 2–3 therapists before finding one you connect with. Feeling heard, respected, and challenged (not just validated) are signs of a productive therapeutic relationship.'
+  },
+  {
+    h:'Social Media, Screens, and Mental Health',
+    b:`<p>The relationship between social media use and mental health has been studied extensively. The findings are consistent: heavy use — particularly passive scrolling — is associated with increased depression, anxiety, loneliness, and body image concerns. Understanding why helps you use these tools intentionally rather than reactively.</p>
+<p><strong>Why social media affects mental health:</strong></p>
+<ul>
+  <li><strong>Social comparison:</strong> You compare your behind-the-scenes life to everyone else's highlight reel. This comparison is inevitable, constant, and consistently produces negative self-evaluation.</li>
+  <li><strong>Variable reward loops:</strong> Likes, comments, and notifications operate on the same intermittent reinforcement schedule that makes slot machines addictive. The unpredictability of reward drives compulsive checking.</li>
+  <li><strong>Displacement of real connection:</strong> Time on social media replaces time in face-to-face interactions — which are substantially more emotionally nourishing and resilience-building.</li>
+  <li><strong>Doomscrolling:</strong> Algorithms optimize for engagement, and negative, outrage-inducing content drives more engagement. Extended news and social media consumption consistently elevates anxiety and helplessness.</li>
+  <li><strong>Sleep disruption:</strong> Phone use before bed delays sleep onset. Notifications interrupt sleep. Many people check their phone within minutes of waking — immediately entering a reactive mental state.</li>
+</ul>
+<p><strong>Research-backed findings:</strong></p>
+<ul>
+  <li>3+ hours of daily social media use significantly increases depression and anxiety risk, particularly in adolescents</li>
+  <li>Experimental studies where participants reduce social media use by 30 minutes/day show measurable improvements in wellbeing within weeks</li>
+  <li>Passive scrolling is more harmful than active use (posting, messaging, creating)</li>
+</ul>
+<p><strong>Practical interventions:</strong> Designated phone-free times and spaces (meals, bedroom, first hour of morning). Notification reduction. Screen time limits with app timers. Intentional curation of who and what you follow. Replacing scrolling with a physical activity or direct conversation.</p>`,
+    tip:'Try a 7-day experiment: reduce social media use by half and document how you feel each day. Most people report feeling measurably less anxious, more present, and more in control within the first week. The data from your own life is more convincing than any study.'
+  },
+  {
+    h:'Building Resilience — The Science of Bouncing Back',
+    b:`<p>Resilience is not the absence of pain or hardship. It's the capacity to experience difficulty fully, process it, and return to functioning — and sometimes to grow through it. Critically, resilience is not a fixed trait. It's developed through specific, learnable practices and conditions.</p>
+<p><strong>What research identifies as the strongest predictors of resilience:</strong></p>
+<p><strong>1. Strong social connections</strong><br>
+The most consistently powerful protective factor across virtually every study. Having people who know you, love you, and will show up for you in crisis is more protective than any individual personality trait. Investing in relationships before you need them is investing in your resilience.</p>
+<p><strong>2. Meaning-making</strong><br>
+People who can find meaning or purpose in difficulty — even severe difficulty — recover more effectively. Viktor Frankl, writing from experience in Nazi concentration camps, described this as the fundamental human capacity: "Between stimulus and response, there is a space. In that space is our power to choose our response." Faith is one of the most powerful frameworks for making meaning of suffering.</p>
+<p><strong>3. Physical health as the foundation</strong><br>
+A sleep-deprived, sedentary, poorly nourished body handles adversity far worse than a rested, active one. Physical health isn't separate from mental resilience — it's the substrate it runs on.</p>
+<p><strong>4. Self-efficacy — built through experience</strong><br>
+Belief in your ability to handle challenges is built by actually handling challenges and surviving them. Each difficult thing you get through becomes evidence that you're capable. This is why protecting people from all difficulty doesn't build resilience — it prevents it from developing.</p>
+<p><strong>5. Cognitive flexibility</strong><br>
+The ability to hold multiple perspectives, reframe situations, and resist catastrophic thinking. CBT specifically trains this capacity. Asking "Is there another way to look at this?" is a practice that rewires habitual thought patterns over time.</p>
+<p><strong>6. Faith and spiritual foundation</strong><br>
+Romans 5:3–4: "We also glory in our sufferings, because we know that suffering produces perseverance; perseverance, character; and character, hope." This is not toxic positivity — it's a framework for finding meaning within pain that doesn't require the pain to stop first.</p>`,
+    tip:'Write down three difficult things you\'ve already survived. Not to minimize current struggles — but to remind yourself that you have a track record of getting through hard things. Your personal history is evidence of your resilience, even when anxiety or depression makes it invisible.'
+  },
+],
+civic:[
+  {
+    h:'How American Democracy Actually Works',
+    b:`<p>The American system of government was designed with one central obsession: preventing the concentration of power. Understanding how it's structured is the foundation for understanding why political change is slow, why local elections matter more than most people realize, and where citizens actually have leverage.</p>
+<p><strong>The three branches — why they exist:</strong></p>
+<ul>
+  <li><strong>Legislative (Congress):</strong> Writes and passes laws. Senate (100 senators, 2 per state, 6-year terms) and House of Representatives (435 members, proportional to population, 2-year terms). Both chambers must pass identical legislation before it becomes law. This structure intentionally makes passing legislation difficult.</li>
+  <li><strong>Executive (President + Cabinet):</strong> Enforces laws, commands the military, directs foreign policy, nominates federal judges, and vetoes legislation. Limited to two 4-year terms since the 22nd Amendment.</li>
+  <li><strong>Judicial (Supreme Court + Federal Courts):</strong> Interprets whether laws are constitutional. Supreme Court justices are appointed for life — which is why Court appointments are so consequential. The Court's rulings on constitutional questions are final law of the land.</li>
+</ul>
+<p><strong>Federalism — the layer most people ignore:</strong> The federal government and state governments have separate spheres of authority. Education, most criminal law, marriage, licensing, and many aspects of daily life are primarily state-controlled. This is why state and local elections often affect your daily life more directly than federal ones — yet local voter turnout is often under 20%.</p>
+<p><strong>Where leverage actually exists:</strong></p>
+<ul>
+  <li>Local government: school boards, city councils, county commissions, mayors, sheriffs. These offices are decided by hundreds or thousands of votes, not millions. One engaged person can meaningfully influence outcomes.</li>
+  <li>State legislature: controls most policy that directly affects residents — taxes, education, housing, criminal justice, healthcare regulations. Small-district races are decided by tight margins.</li>
+  <li>Federal Congress: more distant but controls national policy, budget, and judicial appointments.</li>
+</ul>`,
+    tip:'If you want your civic engagement to have maximum impact, focus below the presidential level. Your single vote in a city council race or school board election has thousands of times more relative weight than in a presidential election — and those offices make decisions that directly affect your neighborhood, schools, and daily life.'
+  },
+  {
+    h:'Your Constitutional Rights — What They Actually Mean',
+    b:`<p>The Bill of Rights exists because the founders understood that governments — even well-intentioned ones — tend to accumulate power at citizens' expense. Knowing your rights isn't paranoia; it's civic literacy that every adult should have.</p>
+<p><strong>First Amendment — Freedom of speech, religion, press, assembly, and petition:</strong></p>
+<ul>
+  <li>Protects you from government censorship of speech — not from private consequences. Your employer, university, or social media platform can restrict speech. The government generally cannot.</li>
+  <li>Protects all speech, including speech you find offensive — the ACLU regularly defends the speech rights of people whose views they oppose because the principle requires consistency.</li>
+  <li>Exceptions: true threats, incitement to imminent lawless action, fraud. These are narrow and legally defined.</li>
+  <li>Freedom of religion: government cannot establish an official religion or prohibit religious practice. This cuts both directions — no official state church, but also no prohibition on religious expression in public life.</li>
+</ul>
+<p><strong>Fourth Amendment — Protection from unreasonable search and seizure:</strong></p>
+<ul>
+  <li>Police generally need a warrant (based on probable cause) to search your home, your car (with exceptions), or your person</li>
+  <li>You can refuse consent to a search. Saying "I do not consent to a search" is not an admission of guilt and limits what can be done without a warrant.</li>
+  <li>If you consent to a search and something is found, you've waived your Fourth Amendment protections</li>
+</ul>
+<p><strong>Fifth Amendment — Right to remain silent:</strong></p>
+<ul>
+  <li>You cannot be compelled to testify against yourself. "I invoke my Fifth Amendment right to remain silent" is legally meaningful.</li>
+  <li>This applies to police interrogation, not just courtrooms. You are not required to answer questions beyond identifying yourself in states with stop-and-identify laws.</li>
+</ul>
+<p><strong>Sixth Amendment — Right to an attorney:</strong></p>
+<ul>
+  <li>If you're arrested, you have the right to an attorney before and during questioning. "I want an attorney" should stop all questioning until one is present.</li>
+  <li>If you can't afford an attorney, one will be appointed. Public defenders are overworked but are licensed lawyers who know criminal law well.</li>
+</ul>`,
+    tip:'If you\'re ever stopped by police: be calm and respectful in tone. Comply with lawful orders. But know you can clearly and calmly state: "I\'m exercising my right to remain silent" and "I\'d like to speak with an attorney." These phrases, calmly stated, are your most important legal tools in an encounter with law enforcement.'
+  },
+  {
+    h:'Voting and Civic Participation — Your Generation Decides',
+    b:`<p>Young adults (18–35) are consistently the largest eligible voting bloc and consistently among the lowest-turnout groups. The result: policies are systematically tilted toward older voters whose preferences actually show up. This isn't a complaint — it's math. Participation determines representation.</p>
+<p><strong>How to register:</strong></p>
+<ul>
+  <li>Vote.org — the fastest way to register, check registration status, and find your polling place</li>
+  <li>You need: driver's license or last 4 of SSN, current address</li>
+  <li>Registration deadlines vary by state: typically 15–30 days before the election. Some states offer same-day registration at the polls.</li>
+  <li>Check your registration status before every election — moving, database errors, or inactivity purges can remove you without notice</li>
+</ul>
+<p><strong>What's actually on the ballot:</strong> Most ballots include far more than President or Senator. Local races, ballot measures, bond issues, and judicial retention elections are decided at very low turnout and have direct, immediate impacts. Read your full sample ballot before election day — most county election offices post them online 2–4 weeks before the election.</p>
+<p><strong>Beyond voting:</strong></p>
+<ul>
+  <li>Attend city council meetings (they're public, and public comment periods are real)</li>
+  <li>Contact your representatives (congressional offices track constituent contacts and respond to volume)</li>
+  <li>Volunteer for campaigns of people whose values you share — labor, not just money, is what campaigns need</li>
+  <li>Run for local office — school boards, city councils, and water districts are decided by hundreds or thousands of votes and are genuine entry points to democratic participation</li>
+</ul>
+<p><strong>Being an informed voter:</strong> AllSides.com rates news outlets across the political spectrum and offers balanced coverage on major issues. FactCheck.org and PolitiFact check specific claims. Ballotpedia covers races and ballot measures with nonpartisan descriptions. Consuming news from sources that challenge your existing views is how you stay calibrated.</p>`,
+    tip:'Make a habit: vote in every election, not just presidential years. Local elections, primaries, school board races — these happen in odd-numbered years when almost no one votes. Turnout of 8–15% is common in local races. A motivated group of 50–200 engaged people can genuinely swing these outcomes.'
+  },
+],
+emergency:[
+  {
+    h:'CPR — The Skill That Gives You a Chance to Save a Life',
+    b:`<p>Cardiac arrest kills 350,000 Americans per year outside of hospitals. The survival rate without immediate CPR is under 10%. With immediate bystander CPR, survival rates can double or triple. The window is 4–6 minutes before irreversible brain damage begins. The paramedics are typically 8–12 minutes away. You are the first responder.</p>
+<p><strong>Recognizing cardiac arrest:</strong></p>
+<ul>
+  <li>Person is unresponsive (tap shoulders, call their name loudly)</li>
+  <li>Not breathing normally (no breath or only gasping — agonal breathing)</li>
+  <li>No pulse (checking is difficult for untrained people — if unresponsive and not breathing normally, assume cardiac arrest)</li>
+</ul>
+<p><strong>The sequence — hands-only CPR (most effective for untrained bystanders):</strong></p>
+<ol>
+  <li><strong>Call 911 first</strong> (or shout for someone else to call while you start CPR)</li>
+  <li><strong>Position:</strong> Lay the person on their back on a firm surface. Kneel beside their chest.</li>
+  <li><strong>Hand placement:</strong> Heel of one hand on the center of the chest (lower half of the sternum), other hand on top, fingers interlaced and lifted off the chest</li>
+  <li><strong>Compressions:</strong> Straight arms, compress down 2–2.4 inches (full adult body weight behind it), <strong>100–120 compressions per minute</strong> — the beat of "Stayin' Alive" by the Bee Gees is exactly this tempo. Hum it while you compress.</li>
+  <li><strong>Full recoil:</strong> Let the chest fully rise between compressions — this allows the heart to refill. Don't lean on the chest.</li>
+  <li>Continue until paramedics arrive, an AED is ready, or the person shows clear signs of life</li>
+</ol>
+<p><strong>If trained: 30 compressions, 2 rescue breaths (30:2 ratio)</strong><br>
+Tilt head back, lift chin, pinch nose, seal your mouth over theirs, give two breaths (1 second each, just enough to see chest rise). Then resume compressions immediately.</p>
+<p><strong>AED (Automated External Defibrillator):</strong> AEDs are in airports, schools, gyms, malls, and many public buildings. They give clear voice instructions and are designed for untrained users. Turn it on, attach the pads as shown, follow the voice prompts. It will tell you whether to shock. AED + CPR significantly increases survival odds.</p>`,
+    tip:'Take a hands-on CPR/AED course — the American Heart Association and Red Cross offer them everywhere, many free through employers or community centers. Watching a video is helpful; performing compressions on a mannequin until the technique is muscle memory is the only real preparation. Once certified, recertify every 2 years.'
+  },
+  {
+    h:'Stop the Bleed — Controlling Severe Hemorrhage',
+    b:`<p>Uncontrolled bleeding is the leading cause of preventable death from traumatic injury. In the minutes before EMS arrives, the right response to severe bleeding can be the difference between life and death. The Stop the Bleed program was developed after mass casualty events highlighted how often bystanders watched helplessly while people bled to death from survivable injuries.</p>
+<p><strong>Step 1 — Call 911 first</strong> (or have someone else call while you act).</p>
+<p><strong>Step 2 — Expose and identify the wound:</strong> Remove clothing from around the injury site so you can see what you're dealing with. Don't remove embedded objects — stabilize them in place.</p>
+<p><strong>Step 3 — Wound packing for deep wounds:</strong> Pack the wound tightly with gauze (or any clean cloth — a t-shirt, bandana). Push it deep into the wound with your fingers. The goal is to fill the entire wound space to create pressure from within. Then apply firm, direct pressure on top of the packing.</p>
+<p><strong>Step 4 — Direct pressure:</strong> For surface wounds, apply firm, direct pressure with the heel of your hand or both hands on top of folded cloth. Press hard and maintain it — don't lift to check, don't ease pressure. This is harder than people expect: it needs to be strong, sustained pressure for 5–10+ minutes. Lifting to check interrupts clot formation.</p>
+<p><strong>Step 5 — Tourniquet for limb bleeding that can't be controlled:</strong></p>
+<ul>
+  <li>Commercial tourniquet (CAT or SOFTT-W): Apply 2–3 inches above the wound (not on the joint), tighten until bleeding stops, note the time applied</li>
+  <li>Improvised: a belt or fabric strip at least 2 inches wide, tied in a half knot, a stick or pen inserted under it, twisted until bleeding stops, secured</li>
+  <li>A correctly applied tourniquet will be painful — this is expected and confirms it's working</li>
+  <li>Do not remove once applied — leave for EMS</li>
+</ul>`,
+    tip:'Keep a Stop the Bleed kit (tourniquet + wound packing gauze + gloves, ~$30) in your car. Know how to use it before you need it — the American College of Surgeons offers free Stop the Bleed training at stopthebleed.org. This one skill has saved lives at car accidents, workplace incidents, and mass casualty events.'
+  },
+  {
+    h:'Building an Emergency Kit — 72-Hour Preparedness',
+    b:`<p>FEMA recommends every household have supplies for at least 72 hours without outside assistance — the typical time for initial emergency response to reach affected areas after a disaster. This isn't survivalist prepping; it's basic adult preparedness that most households lack entirely.</p>
+<p><strong>The core 72-hour kit:</strong></p>
+<ul>
+  <li><strong>Water:</strong> 1 gallon per person per day (drinking and sanitation). For 2 people × 3 days = 6 gallons minimum. Commercially sealed water (or regularly rotated containers) stored in a cool, dark place. Water is the most critical and most often missing item.</li>
+  <li><strong>Food:</strong> 3-day supply of non-perishable foods that require no refrigeration and minimal cooking. Options: canned goods (with a manual can opener), peanut butter, crackers, dried fruit, nuts, granola bars. Choose foods your household actually eats.</li>
+  <li><strong>Flashlight + extra batteries</strong> (or hand-crank/solar flashlight)</li>
+  <li><strong>Battery-powered or hand-crank NOAA weather radio</strong> — receives emergency alerts when cell networks are down</li>
+  <li><strong>First aid kit:</strong> Bandages, antiseptic, gauze, medical tape, pain reliever, antihistamine, any prescription medications (keep a 7-day buffer supply)</li>
+  <li><strong>Phone charger + power bank</strong> (keep fully charged)</li>
+  <li><strong>Cash:</strong> ATMs and card readers go down in power outages. Small bills are most useful.</li>
+  <li><strong>Copies of important documents</strong> in a waterproof bag: ID, insurance cards, bank account info, emergency contact list. Also store digital copies in cloud storage.</li>
+  <li><strong>Warm clothing and blankets</strong> if you live in a cold climate</li>
+  <li><strong>Sanitation supplies:</strong> Toilet paper, hand sanitizer, sanitation bags if plumbing is unavailable</li>
+</ul>
+<p><strong>Emergency plan:</strong> Know where to go if you can't stay home, how to get there, and how to reconnect with family if separated. Designate an out-of-area contact everyone can check in with (long-distance calls sometimes get through when local lines are overloaded).</p>`,
+    tip:'Store your emergency kit somewhere accessible — not deep in a basement you can\'t reach if the structure is compromised. A garage, hallway closet, or under a bed are good options. Review and rotate food and batteries annually — check expiration dates every October when you change smoke detector batteries.'
+  },
+  {
+    h:'Fire Safety — What to Do When Seconds Count',
+    b:`<p>House fires kill over 2,500 Americans annually and injure tens of thousands more. Most deaths are from smoke inhalation, not burns. Most happen at night. The margin between escape and tragedy is often measured in seconds — decisions made in advance eliminate the need to think under panic.</p>
+<p><strong>Smoke alarm placement and maintenance:</strong></p>
+<ul>
+  <li>Install on every level of the home, inside every bedroom, and outside sleeping areas</li>
+  <li>Interconnected alarms (when one sounds, all sound) dramatically improve response time — required in new construction in most states</li>
+  <li>Test monthly (press the test button), replace batteries annually (October when clocks change is the standard reminder), replace the entire alarm every 10 years</li>
+  <li>Never remove batteries because of nuisance alarms — relocate the alarm or use a battery-powered fan to clear steam/cooking smoke. The battery-removed alarm that doesn't wake you is a death trap.</li>
+</ul>
+<p><strong>If there's a fire:</strong></p>
+<ol>
+  <li><strong>Get out — immediately.</strong> Don't stop to grab belongings.</li>
+  <li><strong>Feel doors before opening.</strong> If hot, don't open — fire or superheated gases are on the other side. Use your alternate exit route.</li>
+  <li><strong>Low crawl under smoke.</strong> Smoke and toxic gases rise. Cleaner air is near the floor — stay low all the way to the exit.</li>
+  <li><strong>Close doors behind you.</strong> A closed door slows fire spread and gives people more time to escape. It can double the time before a room is untenable.</li>
+  <li><strong>Meet at your designated outside meeting spot.</strong> Never go back inside for any reason. Call 911 from outside.</li>
+</ol>
+<p><strong>If you're trapped:</strong> Close the door and seal gaps with clothing. Signal from a window. Call 911 and tell them your exact location. Don't jump from upper floors unless fire is immediately entering the room — firefighters will reach you.</p>
+<p><strong>Stop, drop, and roll</strong> if your clothing catches fire: stop moving (running fans the flames), drop to the ground, roll to smother flames.</p>`,
+    tip:'Make a physical escape plan for your home: map two ways out of every room (usually a door and a window), designate a meeting spot outside, and walk through it with everyone who lives there. Do this once. A 15-minute exercise that most households never do could be the reason everyone gets out.'
+  },
+],
+digital:[
+  {
+    h:'Password Security — The Foundation of Digital Safety',
+    b:`<p>Your email password is the master key to your digital life. With access to your email, an attacker can reset your bank password, your social media passwords, your healthcare portal, and virtually everything else within minutes. Password security isn't optional — it's the most basic digital hygiene.</p>
+<p><strong>Why most people's approach is wrong:</strong></p>
+<ul>
+  <li>Using the same password on multiple sites: when any site is breached (and thousands are breached every year), your password is exposed everywhere you used it. HaveIBeenPwned.com shows you which of your email addresses appear in known data breaches.</li>
+  <li>Simple passwords: automated tools crack common passwords (keyboard patterns, names + numbers, dictionary words) in seconds to minutes</li>
+  <li>Security questions: the answers (mother's maiden name, high school, first pet) are often on your social media — effectively making these a back door around your password</li>
+</ul>
+<p><strong>The correct approach — password manager:</strong></p>
+<ul>
+  <li><strong>Bitwarden</strong> (free) or 1Password ($3/month) generates and stores a unique, random, strong password for every site</li>
+  <li>You remember one master password; it remembers the rest</li>
+  <li>Passwords are unique per site, so a breach at one site doesn't compromise others</li>
+  <li>Works across all your devices and browsers</li>
+  <li>The master password should be a long passphrase (4+ random words) that's memorable but not guessable</li>
+</ul>
+<p><strong>Two-factor authentication (2FA) — add this everywhere:</strong></p>
+<ul>
+  <li>Even if your password is stolen, 2FA requires a second verification — typically a code from an app or a text message</li>
+  <li>Use an authenticator app (Google Authenticator, Authy) rather than SMS text — SMS 2FA can be bypassed through SIM-swapping attacks</li>
+  <li>Priority accounts for 2FA: email (most critical), bank accounts, investment accounts, social media, Amazon, Apple/Google account</li>
+</ul>
+<p><strong>Protect your email specifically:</strong> Your email is the recovery mechanism for everything else. Use a unique, strong password. Enable 2FA. Review which apps have access to your email account (Google: Security → Third-party access) and revoke anything unfamiliar or unused.</p>`,
+    tip:'The single most impactful action you can take in the next 30 minutes: download Bitwarden (free), import or start creating unique passwords for your top 10 accounts (email, bank, social media), and enable 2FA on your email account. This eliminates your biggest digital vulnerability.'
+  },
+  {
+    h:'Your Digital Footprint — What Exists and How to Manage It',
+    b:`<p>Everything you do online leaves a record. What you search, what you buy, what you post, what you click, where you are — all of it is collected, stored, analyzed, and often sold. This isn't to create paranoia; it's to create intentionality about what you share and with whom.</p>
+<p><strong>What exists about you right now:</strong></p>
+<ul>
+  <li><strong>Search history:</strong> Google stores your complete search history (signed in or not, by IP address). This can be deleted in your Google account settings, and search history paused.</li>
+  <li><strong>Location history:</strong> Your phone tracks and stores your location continuously if location services are enabled. Google Maps Timeline shows you where you've been for years.</li>
+  <li><strong>Social media profiles:</strong> Past public posts, photos, check-ins, tagged photos, comments — often going back a decade or more. Future employers, landlords, and dates commonly search for this.</li>
+  <li><strong>Data brokers:</strong> Companies like Spokeo, Whitepages, Intelius, and BeenVerified compile public records into searchable profiles including home address, relatives, estimated income, past addresses, and more. Opt-out requests can remove your data.</li>
+  <li><strong>Third-party app data:</strong> Every app you've authorized to access your social media (games, quizzes, tools) has collected and retained data about you</li>
+</ul>
+<p><strong>Practical management:</strong></p>
+<ul>
+  <li>Google yourself periodically — search your name + city to see what appears publicly</li>
+  <li>Review and adjust privacy settings on all social platforms — most default to maximum visibility</li>
+  <li>Delete unused accounts (check accounts you've forgotten about at justdeleteme.com)</li>
+  <li>Review app permissions on your phone — location, microphone, camera access for apps that don't need it</li>
+  <li>Use a VPN on public WiFi to prevent the hotspot operator from seeing your traffic</li>
+</ul>
+<p><strong>Before posting anything:</strong> Ask — would you be completely comfortable if your future employer, your parents, your pastor, or a judge saw this? Not because you need to perform for all of them, but because this question clarifies whether you'd regret it. The internet remembers far longer than you will.</p>`,
+    tip:'Set up a Google Alert for your own name (google.com/alerts). You\'ll get notified whenever new content about you appears online — useful for catching identity theft, unexpected mentions, and keeping track of your public presence.'
+  },
+  {
+    h:'Recognizing Scams — The Patterns That Cost People Billions',
+    b:`<p>Online and phone scams steal over $10 billion from Americans annually. The targets aren't just elderly people — young adults are increasingly victimized, especially through social media, romance scams, and job offer fraud. Knowing the patterns is the protection.</p>
+<p><strong>The universal scam playbook — these elements appear in nearly every scam:</strong></p>
+<ul>
+  <li><strong>Artificial urgency:</strong> "Act now," "this offer expires in 2 hours," "your account will be suspended immediately." Urgency prevents you from thinking clearly or verifying the claim.</li>
+  <li><strong>Fear or excitement as leverage:</strong> Scammers trigger strong emotions — fear of arrest/fines, excitement about a prize or job offer — because strong emotions impair rational evaluation.</li>
+  <li><strong>Requests for unusual payment methods:</strong> Gift cards, wire transfers, cryptocurrency, Zelle, or Venmo are preferred by scammers because these payments are irreversible. No legitimate business, government agency, or person you're actually helping requires these payment methods.</li>
+  <li><strong>Too-good-to-be-true:</strong> You won a prize you didn't enter. A stranger wants to pay you more than market rate for simple work. An investment offers guaranteed high returns.</li>
+</ul>
+<p><strong>Common scams targeting young adults specifically:</strong></p>
+<ul>
+  <li><strong>Job offer scams:</strong> Fake remote job that pays well but requires buying equipment first with a check they send you (which bounces after you've spent the money)</li>
+  <li><strong>Romance scams:</strong> Someone who builds a relationship online (often months) before suddenly needing financial help</li>
+  <li><strong>Social media marketplace:</strong> Fake buyers who send fake payment confirmations, or sellers who take payment and disappear</li>
+  <li><strong>Student loan forgiveness:</strong> Anyone charging a fee to access loan forgiveness programs — all legitimate programs are free through your loan servicer</li>
+  <li><strong>Phishing:</strong> Fake emails/texts designed to look like banks, Amazon, or the IRS containing links to credential-stealing websites</li>
+</ul>
+<p><strong>When in doubt:</strong> Hang up and call back using the official number from the organization's website (not a number they gave you). Google the exact text or script they used — scam scripts are typically documented online.</p>`,
+    tip:'The IRS communicates exclusively by postal mail. The IRS never calls demanding immediate payment, threatens arrest, or requires gift cards. Every call claiming to be the IRS demanding immediate action is a scam — 100% of the time. Same for Social Security Administration. These agencies mail you first, always.'
+  },
+  {
+    h:'Screen Time and Digital Wellness — Managing Your Attention',
+    b:`<p>Your phone is designed by some of the most sophisticated behavioral engineers in the world, with the explicit goal of maximizing the time you spend looking at it. Understanding the design is the beginning of having genuine control over your relationship with technology rather than the reverse.</p>
+<p><strong>How the design works against you:</strong></p>
+<ul>
+  <li><strong>Variable reward loops:</strong> The same mechanism that makes slot machines addictive — unpredictable, intermittent rewards (an interesting post, a like, a message) — drives compulsive checking. Each pull of the slot (scroll or tap) might pay off, which keeps you pulling.</li>
+  <li><strong>Social validation mechanisms:</strong> Likes, comments, follower counts trigger the same dopamine response as social approval from people physically present. The platform captures real human emotional needs and monetizes them.</li>
+  <li><strong>Infinite scroll:</strong> Deliberately removing the endpoint that would otherwise tell your brain "you're done." Bottomless content removes the natural stopping point.</li>
+  <li><strong>Notifications:</strong> Each one is a small urgency designed to interrupt whatever you're doing and return your attention to the app</li>
+</ul>
+<p><strong>Practical reclaiming of attention:</strong></p>
+<ul>
+  <li>Turn off all non-essential notifications. Notifications from people you care about: keep. Notifications from apps: turn off. Check apps on your schedule, not theirs.</li>
+  <li>Phone out of the bedroom. The first and last things you see shouldn't be a feed. Buy an alarm clock ($10) and charge your phone in another room. Most people who do this report immediate sleep improvement.</li>
+  <li>Use your phone's built-in screen time limits (Screen Time on iOS, Digital Wellbeing on Android) with a password set by someone else if you can't hold the limit yourself.</li>
+  <li>Phone-free meals — with yourself and with others. The presence of a phone on the table reduces the quality of conversations even if it's never picked up.</li>
+  <li>Batch social media: check at specific times (twice a day, 15 minutes each) rather than habitually throughout the day</li>
+</ul>`,
+    tip:'Try a 24-hour screen-free period — one full day with no social media, no streaming, no gaming. Notice what fills the space, what you reach for the phone out of habit, and how you feel by the end of the day. Most people report feeling simultaneously restless at first and significantly calmer overall. The data from your own experience is more convincing than any study.'
+  },
+],
+family:[
+  {
+    h:'Honoring Your Parents — What It Means in Practice',
+    b:`<p>"Honor your father and your mother" (Exodus 20:12) is the fifth commandment — and Paul notes in Ephesians that it's the first commandment with a promise attached: "that it may go well with you and that you may enjoy long life on the earth." This isn't incidental. The pattern of honoring those who came before you has practical as well as spiritual dimensions.</p>
+<p><strong>Honor doesn't mean agreement or obedience (as an adult):</strong> Honor is about respect and dignity. You can disagree with your parents' decisions, values, or advice while still treating them with genuine respect. Honor doesn't require pretending everything is fine or complying with requests that would require you to act against your own conscience or wellbeing.</p>
+<p><strong>What honor looks like practically:</strong></p>
+<ul>
+  <li>Showing up — for their events, their birthdays, their health appointments when they age. Physical presence communicates that they matter.</li>
+  <li>Calling and checking in. Not waiting for them to always initiate. As parents age, the responsibility of maintaining the relationship appropriately shifts.</li>
+  <li>Speaking about them with respect to others — not venting about them publicly to friends or posting complaints on social media</li>
+  <li>Listening to their experience and wisdom even when you disagree — they've navigated things you haven't yet</li>
+  <li>Saying thank you, specifically, for what they've done and sacrificed for you</li>
+  <li>Including them in significant life decisions — not necessarily giving them decision-making authority, but giving them knowledge and consideration</li>
+</ul>
+<p><strong>When family is complicated:</strong> Not every parent is safe, healthy, or worthy of the trust the word "honor" might imply. Families with addiction, abuse, mental illness, or abandonment create real complexity. Honor doesn't require tolerating harm or maintaining unlimited access to someone who is destructive. You can love someone and limit contact for your own and their wellbeing simultaneously. This is not dishonor — it's wisdom.</p>`,
+    tip:'Most people don\'t realize how much they\'ll regret not asking their parents and grandparents more questions while they had the chance. The stories, the history, the lessons from their life — these disappear when they do. Start asking the questions now: "What was the hardest thing you\'ve been through? What do you wish you\'d known at my age? What was your life like when you were my age?"'
+  },
+  {
+    h:'Navigating Family Conflict — Without Destroying Relationships',
+    b:`<p>Family conflict is inevitable because family relationships involve people who are deeply connected, have a long history together, hold different values and perspectives, and have no formal structure for dispute resolution. The goal isn't to eliminate conflict — it's to handle it in a way that preserves the relationship and addresses the real issue.</p>
+<p><strong>What makes family conflict uniquely difficult:</strong></p>
+<ul>
+  <li>Long history means old wounds are close to the surface — a current argument can quickly become about events from 15 years ago</li>
+  <li>Family roles (the responsible one, the black sheep, the peacemaker) can calcify in ways that prevent people from being seen for who they currently are</li>
+  <li>High stakes — the relationship matters more than it would with a stranger or even a friend, which paradoxically makes it harder to navigate</li>
+  <li>Obligation — you can't easily exit a family relationship the way you can a friendship, which creates pressure that sometimes makes people dig in more defensively</li>
+</ul>
+<p><strong>Principles for navigating family conflict:</strong></p>
+<ul>
+  <li><strong>Address the actual issue, not the catalog:</strong> Stay focused on the specific current situation. Reaching into the past for evidence ("and you did this in 2015 too") escalates without resolving.</li>
+  <li><strong>Speak for yourself:</strong> "I felt excluded when I wasn't told about the decision" lands differently than "The whole family always does this."</li>
+  <li><strong>Choose the relationship over being right:</strong> You can be completely correct and still prioritize preserving the relationship over winning the argument. Sometimes the most powerful thing you can say is "I don't want to fight about this. You matter more to me than this disagreement."</li>
+  <li><strong>Family counseling:</strong> For serious ongoing conflict — estrangement, addiction, major betrayals — a family therapist creates a neutral structure for conversations that can't happen safely without one. This isn't weakness; it's wisdom.</li>
+</ul>`,
+    tip:'In family conflict, being the person who extends repair first costs something and it\'s almost always worth it. The person who says "I don\'t want this to damage our relationship — can we start over?" loses nothing of substance and potentially saves something irreplaceable.'
+  },
+  {
+    h:'Siblings — Investing in Your Longest Relationships',
+    b:`<p>Your siblings will likely be in your life longer than any other human beings — longer than parents (you're younger), longer than friends (friendships often drift), longer than most marriages (statistically). This relationship, which often feels like a given in childhood, requires deliberate investment in adulthood to remain meaningful.</p>
+<p><strong>What happens to sibling relationships without investment:</strong> Geographic distance, different life stages, different values, or simply busy lives cause sibling relationships to drift from closeness to yearly check-ins to occasional texts. This drift is normal and doesn't mean the relationship is broken — but reversing it requires someone to actively invest.</p>
+<p><strong>How to invest in adult sibling relationships:</strong></p>
+<ul>
+  <li><strong>Create recurring contact:</strong> A regular call (even 10 minutes), a group chat, or an annual trip together. Consistency matters more than intensity.</li>
+  <li><strong>Show genuine interest in their life:</strong> Their work, their relationships, their kids, their interests. Not just asking to ask — actually remembering and following up.</li>
+  <li><strong>Show up for their significant moments:</strong> The graduation, the move, the health scare, the loss. These are the moments that define a relationship.</li>
+  <li><strong>Process shared experiences:</strong> Siblings have a unique vantage point on family dynamics, shared childhood, and parents. There's understanding available in sibling conversations that no one else can offer.</li>
+  <li><strong>Defend them:</strong> Among the most meaningful things a sibling can do is speak up for you when you're not in the room — with parents, with other family, with anyone.</li>
+</ul>
+<p><strong>When sibling relationships are strained:</strong> Adult sibling conflict often stems from unresolved childhood dynamics, perceived unequal treatment by parents, or life choices that feel like implicit criticism of each other's path. Naming this directly — "I wonder if some of this is still about how things were between us growing up" — can open conversations that feel stuck.</p>`,
+    tip:'Do something with a sibling that\'s just for fun — no agenda, no family obligations, just you two or a small group doing something you both enjoy. Adult siblings often only see each other at structured family events. The casual, spontaneous hang is what actually rebuilds closeness.'
+  },
+  {
+    h:'Building a Healthy Family Culture — Starting Now',
+    b:`<p>The family you came from shaped your defaults — your communication style, how you handle conflict, your relationship with money, your view of faith and authority, your assumptions about what family life looks like. The family you build (or the household you create now) will be shaped by your deliberate choices about which of those defaults to keep and which to change.</p>
+<p><strong>This starts now, before you have a family:</strong> The patterns you're building right now — how you handle stress, how you communicate, how you manage money, how you treat people in service roles, how you spend your time — will become your children's normal. Children absorb the patterns of their households far more than the explicit lessons.</p>
+<p><strong>Patterns worth deliberately building:</strong></p>
+<ul>
+  <li><strong>Honest communication:</strong> Households where people say what they mean, address problems directly instead of through passive aggression, and apologize genuinely produce people who can do the same</li>
+  <li><strong>Financial integrity:</strong> A household that lives within its means, talks openly about money without shame or secrecy, and prioritizes giving produces children with healthy financial foundations</li>
+  <li><strong>Faith as actual practice:</strong> Praying before meals is nice; households where faith is discussed, practiced, and visibly important produce different outcomes than households where it's only performed at church</li>
+  <li><strong>Physical presence and attention:</strong> Being physically in the same house while everyone stares at separate screens is not connection. Deliberate, phone-free family time is increasingly countercultural and increasingly valuable.</li>
+  <li><strong>Repair culture:</strong> Households where adults model genuine apology — "I was wrong, I'm sorry, I'm changing this" — give children permission to be imperfect and teachable</li>
+</ul>
+<p>Deuteronomy 6:6–7: "These commandments that I give you today are to be on your hearts. Impress them on your children. Talk about them when you sit at home and when you walk along the road, when you lie down and when you get up." Faith transmitted by life, not just by explicit teaching.</p>`,
+    tip:'Before you build a family, think carefully about what you want to pass on and what you want to be different from your own upbringing. Write it down. Talk about it with your partner if you have one. The family culture you create will be largely determined by choices you make now — and increasingly harder to change after children are in the picture.'
+  },
+],
+college:[{h:'Is College Right for You?',b:'4-year: Required for medicine, law, engineering, teaching. Community college: 60–70% cheaper, then transfer. Trade school: Electricians/plumbers earn $60–100k+. Military: Training + GI Bill.',tip:''},{h:'Choosing a Major Wisely',b:'Ask BEFORE committing: What jobs does this lead to? What\'s the starting salary? Will it cover loan payments? Talk to 3 people who WORK in that field.',tip:'Don\'t choose a major just because it sounds interesting. Know where it leads.'},{h:'FAFSA',b:'File every single year. Opens October 1. Based on family income. Determines grants (FREE money), work-study, and loans. File as early as possible — some aid runs out.',tip:''},{h:'Student Loan Math',b:'Average debt: $37,000. Monthly payment at 6.5% over 10 years: $420/month. Rule: Don\'t borrow more total than your expected FIRST-YEAR salary.',tip:'Always choose federal over private loans. Better rates, income-driven repayment, forgiveness programs.'},{h:'Scholarships',b:'Apply to every scholarship you\'re eligible for. Local community foundation scholarships have way less competition. Fastweb.com and scholarships.com for searches. Apply even to $500 ones.',tip:''},{h:'Surviving First Year',b:'Go to every class. Visit professors in office hours. Find your community in the first 2 weeks. Find a church before you need it. Call home regularly.',tip:''},{h:'GPA Still Matters',b:'3.5+ opens graduate school, top internships, competitive employers. Most ask for GPA on first-job applications. After 3–5 years work experience, it matters much less.',tip:''},{h:'Building Resume in College',b:'Internships > grades on resume after graduation. Start pursuing internships sophomore year. Join 1–2 career-related clubs. Seek leadership roles. Build LinkedIn and update every semester.',tip:''}],
+college:[{h:'Is College Right for You?',b:'4-year: Required for medicine, law, engineering, teaching. Community college: 60–70% cheaper, then transfer. Trade school: Electricians/plumbers earn $60–100k+. Military: Training + GI Bill.',tip:''},{h:'Choosing a Major Wisely',b:'Ask BEFORE committing: What jobs does this lead to? What\'s the starting salary? Will it cover loan payments? Talk to 3 people who WORK in that field.',tip:'Don\'t choose a major just because it sounds interesting. Know where it leads.'},{h:'FAFSA',b:'File every single year. Opens October 1. Based on family income. Determines grants (FREE money), work-study, and loans. File as early as possible — some aid runs out.',tip:''},{h:'Student Loan Math',b:'Average debt: $37,000. Monthly payment at 6.5% over 10 years: $420/month. Rule: Don\'t borrow more total than your expected FIRST-YEAR salary.',tip:'Always choose federal over private loans. Better rates, income-driven repayment, forgiveness programs.'},{h:'Scholarships',b:'Apply to every scholarship you\'re eligible for. Local community foundation scholarships have way less competition. Fastweb.com and scholarships.com for searches. Apply even to $500 ones.',tip:''},{h:'Surviving First Year',b:'Go to every class. Visit professors in office hours. Find your community in the first 2 weeks. Find a church before you need it. Call home regularly.',tip:''},{h:'GPA Still Matters',b:'3.5+ opens graduate school, top internships, competitive employers. Most ask for GPA on first-job applications. After 3–5 years work experience, it matters much less.',tip:''},{h:'Building Resume in College',b:'Internships > grades on resume after graduation. Start pursuing internships sophomore year. Join 1–2 career-related clubs. Seek leadership roles. Build LinkedIn and update every semester.',tip:''}],
+communication:[
+  {h:'How to Talk to Anyone — The Fundamentals of Clear Communication',
+   b:`<p><strong>Communication is the single most important skill in every career, relationship, and social interaction.</strong> It's not about being charismatic or extroverted — it's about being clear, intentional, and present.</p><p><b>The basics that most people get wrong:</b> Make eye contact (not staring — natural 3-5 second intervals). Use the person's name. Ask questions and actually listen to the answers. Don't interrupt. Speak at a pace others can follow. Match your tone to the situation.</p><p><b>The 70/30 rule:</b> In most conversations, listen 70% and talk 30%. People who listen well are perceived as better communicators than people who talk well. Ask follow-up questions: "What happened next?" "How did that make you feel?" "What are you going to do about it?"</p><p><b>Body language:</b> 55% of communication is non-verbal. Uncross your arms. Face the person. Nod to show you're tracking. Don't look at your phone. Lean slightly forward. Mirror their energy level.</p>`},
+  {h:'Public Speaking — How to Present Without Freezing',
+   b:`<p><strong>Fear of public speaking ranks higher than fear of death in most surveys.</strong> The good news: it's a skill, not a talent. Every great speaker was once terrified.</p><p><b>Preparation kills anxiety:</b> Know your material cold. Don't memorize word-for-word — memorize your key points and practice the flow. Practice out loud at least 3 times. Record yourself and watch it back.</p><p><b>Structure:</b> Tell them what you'll tell them (intro), tell them (body — 3 main points max), tell them what you told them (conclusion). Simple structure = easy to follow.</p><p><b>Delivery:</b> Speak slower than feels natural. Pause after important points — silence is powerful. Make eye contact with different people. Use your hands naturally. Start with a hook — a question, a surprising stat, or a short story.</p><p><b>If you freeze:</b> Take a breath. Look at your notes. Say "Let me come back to that" and move to the next point. Nobody notices a brief pause as much as you think.</p>`},
+  {h:'Phone Calls — Why Gen Z Avoids Them and Why You Cannot',
+   b:`<p><strong>Making a phone call to schedule an appointment or handle a problem is a basic adult skill</strong> — and one that many young people genuinely avoid because texting feels safer. The truth: many situations require a phone call.</p><p><b>Before you call:</b> Write down why you're calling and what you need. Have any account numbers, dates, or reference info ready.</p><p><b>The script:</b> "Hi, my name is [name]. I'm calling about [reason]. I need [specific request]." Be polite, be direct, be brief.</p><p><b>Voicemails:</b> State your name, number (slowly), reason for calling, and best time to reach you. Keep it under 30 seconds. Repeat your number at the end.</p>`},
+  {h:'How to Disagree Without Destroying the Relationship',
+   b:`<p><strong>Disagreement is not conflict. It's two people seeing the same thing differently.</strong></p><p><b>What works:</b> "I see it differently because..." "Help me understand your perspective on..." "We might have to agree to disagree on this one." These phrases show respect while maintaining your position.</p><p><b>What destroys:</b> "You're wrong." "That's stupid." Eye-rolling. Dismissing without listening. Making it personal instead of about the issue.</p><p><b>The steel man technique:</b> Before arguing against someone's position, state their argument better than they did. "So what you're saying is..." This proves you listened and often reveals you agree on more than you thought.</p>`},
+  {h:'Difficult Conversations — Asking for a Raise, Setting Boundaries, Saying No',
+   b:`<p><strong>The conversations you avoid are usually the ones that matter most.</strong></p><p><b>Asking for a raise:</b> Document your contributions first. Say: "Based on [examples], I'd like to discuss adjusting my compensation to [specific number]." Don't apologize for asking. Make it about your value, not your needs.</p><p><b>Setting boundaries:</b> "I care about you, and I need [specific boundary]." You don't need to explain or justify. A boundary without a consequence is just a suggestion.</p><p><b>Saying no:</b> "I appreciate you thinking of me, but I can't commit to that right now." "No" is a complete sentence, but a brief reason makes it easier.</p>`},
+  {h:'Active Listening — The Skill That Makes People Trust You',
+   b:`<p><strong>Most people don't listen to understand — they listen to respond.</strong> Active listening is the opposite: you focus entirely on what the other person is saying, feeling, and meaning.</p><p><b>How to do it:</b> Put your phone away. Make eye contact. Don't interrupt. Reflect back: "It sounds like you're saying..." Ask clarifying questions. Validate feelings before offering solutions: "That sounds really frustrating."</p><p><b>Why it matters:</b> People who feel heard become loyal friends and productive coworkers. Active listening builds trust faster than any other skill. Therapists, negotiators, and the best leaders all rely on it as their primary tool.</p><p><b>The hardest part:</b> Not giving advice when someone just needs to vent. Sometimes the best response is: "That's tough. I'm here for you."</p>`}
+],
+diy:[
+  {h:'Your Basic Tool Kit — What Every Person Should Own',
+   b:`<p><strong>You don't need a garage full of tools. You need 12 items that handle 90% of home tasks.</strong></p><p><b>The essential kit ($50-80):</b> Hammer, Phillips and flathead screwdrivers (or multi-bit set), adjustable wrench, pliers, tape measure, level, utility knife, duct tape, electrical tape, WD-40, Allen wrenches, and a cordless drill ($40-60, your most versatile tool).</p><p><b>Where to buy cheap:</b> Harbor Freight for basics, estate sales, Facebook Marketplace. You don't need professional-grade tools for home repairs.</p>`},
+  {h:'Unclog a Drain — Without Calling a Plumber',
+   b:`<p><strong>A plumber charges $150-300 for something you can fix in 10 minutes.</strong></p><p><b>Bathroom (hair clog):</b> Remove the drain cover. Pull out the hair ball. Use a $3 plastic drain snake (Zip-It tool) for deeper clogs. Run hot water 2 minutes.</p><p><b>Kitchen (grease/food):</b> Pour half a cup of baking soda, then half a cup of white vinegar. Wait 15 minutes. Flush with boiling water. For stubborn clogs, use a flat-bottom sink plunger.</p><p><b>When to call a plumber:</b> Multiple drains clogged simultaneously, water backing up into other drains, sewage smell, or you've tried everything twice.</p>`},
+  {h:'Fix a Running Toilet — The Most Common Home Repair',
+   b:`<p><strong>A running toilet wastes 200 gallons/day and adds $100+ to your water bill monthly.</strong> The fix takes 10 minutes and costs $5-15.</p><p><b>Most common fix — replace the flapper ($5):</b> Turn off the water valve behind the toilet. Flush to empty. Unhook the old flapper. Hook on the new one. Turn water back on. Done.</p><p><b>If the flapper isn't the problem:</b> The fill valve may need adjusting or replacing ($8-15). YouTube your specific toilet model.</p>`},
+  {h:'Patch a Wall Hole — From Nail Holes to Fist-Sized Damage',
+   b:`<p><strong>Knowing how to patch drywall saves your security deposit.</strong></p><p><b>Small holes (nail/screw):</b> Fill with lightweight spackle. Let dry 30 min. Sand smooth. Touch up paint. $5, 5 minutes.</p><p><b>Medium holes (1-3 inches):</b> Buy a drywall patch kit ($5-8). Apply spackle over mesh in thin layers, sanding between. Paint.</p><p><b>Large holes (3+ inches):</b> Cut a clean square around the damage. Cut matching drywall. Screw a backer board behind the hole. Screw patch to backer. Tape seams. Apply joint compound in 2-3 thin coats, sanding between.</p>`},
+  {h:'Reset a Circuit Breaker and Basic Electrical Safety',
+   b:`<p><strong>When power goes out in one room, it's almost always a tripped breaker — not a power outage.</strong></p><p><b>How to reset:</b> Find your electrical panel. Look for the breaker in the middle position. Flip it fully OFF first, then back ON.</p><p><b>Why it tripped:</b> Too many devices on one circuit, a short circuit, or a ground fault. If it trips repeatedly, call an electrician.</p><p><b>Safety rules:</b> Never touch wires you're not sure are dead. Water and electricity kill. Don't overload power strips (daisy-chaining is a fire hazard). Replace frayed cords. If an outlet is warm, stop using it and call an electrician.</p>`},
+  {h:'Stop a Leak and Know Your Shut-Off Valves',
+   b:`<p><strong>Water damage is the #1 insurance claim in America.</strong></p><p><b>Find your main water shut-off valve NOW — before you need it.</b> Usually near the water meter (basement, crawl space, or outside). Turn clockwise to shut off all water. Teach everyone in the house where it is.</p><p><b>Leaking faucet:</b> Usually a worn washer. Turn off water under the sink. Disassemble handle, replace washer ($1), reassemble.</p><p><b>Leaking pipe joint:</b> Tighten the fitting. If still leaking, wrap with plumber's tape ($2) and retighten. For cracked pipes: wrap with self-fusing silicone tape until a plumber arrives.</p>`}
+],
+shopping:[
+  {h:'How Stores Manipulate You — And How to Fight Back',
+   b:`<p><strong>Every store and website is designed to make you spend more than you planned.</strong></p><p><b>Anchoring:</b> The crossed-out "original price" is often inflated to make the sale price look good. Evaluate every price on its own merit.</p><p><b>Urgency:</b> "Only 3 left!" "Sale ends tonight!" Most are manufactured. The sale will come back.</p><p><b>Store layout:</b> Essentials are at the BACK so you walk past everything. End caps are advertising, not deals. Checkout lines are lined with impulse purchases.</p><p><b>The 24-hour rule:</b> For any non-essential purchase over $30, wait 24 hours. This one rule eliminates most impulse spending.</p>`},
+  {h:'How to Compare Prices — Unit Pricing and Real Deals',
+   b:`<p><strong>The cheapest option isn't always the biggest package.</strong></p><p><b>Unit pricing:</b> The small number on the shelf tag showing price per ounce/unit is the only honest comparison. "Family size" is sometimes MORE expensive per unit.</p><p><b>Generic vs brand:</b> For medications, generics are chemically identical by law. For food staples, store-brand is often made in the same factories. Try generic once — save 20-40% forever.</p><p><b>Track prices:</b> Apps like Honey, CamelCamelCamel (Amazon), and Flipp (weekly ads) show real price history so you know if a "deal" is actually a deal.</p>`},
+  {h:'Subscription Traps — The Silent Budget Killer',
+   b:`<p><strong>The average American spends $219/month on subscriptions</strong> — and underestimates by 2-3x.</p><p><b>The trap:</b> Free trial → auto-converts → you forget → charges for months. This is the business model.</p><p><b>Audit yourself:</b> Check your bank statement. List every recurring charge. Cancel anything unused in 30 days.</p><p><b>Before subscribing:</b> Set a calendar reminder 2 days before trial ends. Use a virtual card number. Ask: "Would I pay this every month for a year?" If not, don't sign up.</p><p><b>The real cost:</b> Five subscriptions at $15/month = $900/year. That's a vacation or an emergency fund.</p>`},
+  {h:'Avoiding Scams — Online, Phone, and In-Person',
+   b:`<p><strong>Scammers stole $10 billion from Americans last year.</strong></p><p><b>Red flags:</b> Paying with gift cards (no legit company does this). Unsolicited calls saying you owe money. "You've won!" when you didn't enter. Anyone rushing you. Anyone asking for your SSN by phone/email. Jobs requiring you to pay upfront.</p><p><b>Online:</b> Check URLs for misspellings. If a deal is too good to be true, it is. Don't click links from unknown numbers. Use two-factor authentication on everything.</p><p><b>Marketplace:</b> Meet in public (police stations have safe exchange zones). Don't accept checks. Use PayPal/Venmo with purchase protection for strangers, not Zelle.</p>`},
+  {h:'Negotiation — You Can and Should Ask for a Better Price',
+   b:`<p><strong>Almost everything is negotiable.</strong> Rent, cars, salary, medical bills, phone plans — most people never try.</p><p><b>Car buying:</b> Negotiate total price, not monthly payment. Research market value first. Get 3+ quotes. Be willing to walk away.</p><p><b>Rent:</b> Research comparable units. Offer a longer lease for lower rent. Ask: "Is there any flexibility on the rent?"</p><p><b>Medical bills:</b> Always request an itemized bill. Ask about cash-pay discounts (20-50% off). Ask about zero-interest payment plans. Hospitals expect negotiation.</p><p><b>The magic phrase:</b> "Is that the best you can do?" Then be silent. Silence is the most powerful negotiation tool.</p>`}
+],
+writing:[
+  {h:'How to Write a Professional Email That Gets Results',
+   b:`<p><strong>Your email is often the first impression you make.</strong></p><p><b>Subject line:</b> Specific and actionable. Not "Hi." Yes: "Application for Marketing Intern — [Your Name]"</p><p><b>Greeting:</b> "Hi [Name]," or "Dear [Mr./Ms. Last Name]," Never "Hey" or "Yo" professionally.</p><p><b>Body:</b> State your purpose in sentence one. Short paragraphs (2-3 sentences). One topic per email. End with a clear next step.</p><p><b>Sign-off:</b> "Best," or "Thank you," with your full name and phone number. Proofread before sending — every time.</p>`},
+  {h:'Cover Letters — The One Page That Can Change Your Career',
+   b:`<p><strong>A cover letter is a persuasive argument for why YOU are right for THIS job.</strong></p><p><b>Paragraph 1:</b> What job, how you found it, one compelling reason you fit.</p><p><b>Paragraph 2:</b> Most relevant experience with a specific example and numbers. Not "I'm a hard worker" — "I increased engagement by 35% in 3 months."</p><p><b>Paragraph 3:</b> Why this company specifically. Show you researched them.</p><p><b>Closing:</b> Thank them. State availability. One page maximum. Customize for every application.</p>`},
+  {h:'Writing a Complaint That Actually Gets Resolved',
+   b:`<p><strong>The difference between a complaint that gets ignored and one that gets resolved is how you write it.</strong></p><p><b>Structure:</b> 1) State the problem with dates. 2) Explain the impact. 3) State what you want. 4) Give a deadline. 5) State what you'll do if unresolved.</p><p><b>Where to escalate:</b> Customer service → manager → social media (public) → BBB → CFPB (financial) → FTC (products). Keep records of everything.</p>`},
+  {h:'Thank-You Notes — The Lost Art That Opens Every Door',
+   b:`<p><strong>A thank-you note after a job interview increases your chances by 20-30%.</strong> Almost nobody does it.</p><p><b>After interviews:</b> Send within 24 hours. Reference something specific from the conversation. Reiterate interest. Under 150 words.</p><p><b>After gifts or help:</b> Acknowledge the specific thing. Say why it mattered. Handwritten carries 10x the impact of a text.</p><p><b>The format:</b> "Thank you for [specific thing]. [Why it mattered]. [Forward-looking statement]." Three sentences is enough. The bar is so low that doing it puts you in the top 5%.</p>`},
+  {h:'Texting Professionally — When Casual Does Not Cut It',
+   b:`<p><strong>There's a difference between how you text friends and how you text your boss.</strong></p><p><b>Professional texting:</b> Complete sentences. Correct spelling. No slang or excessive emojis. State your name if they might not have your number.</p><p><b>Response time:</b> Professional texts: within a few hours. Boss/professor emails: within 24 hours. If you need more time: "Thanks — I'll have a full response by [time]."</p><p><b>What should NOT be a text:</b> Quitting a job, delivering bad news, negotiating salary, or anything you'd be embarrassed to see screenshotted.</p>`}
+],
+laundry:[
+  {h:'Laundry 101 — How to Not Destroy Your Clothes',
+   b:`<p><strong>Laundry is not hard. It is just something nobody teaches you until you ruin your favorite shirt.</strong></p><p><b>Sort by color:</b> Whites, darks, colors — separate. Check every pocket. Turn jeans and printed shirts inside out. Close zippers.</p><p><b>Temperature:</b> Cold water works for 90% of loads and saves energy. Hot only for white towels, sheets, and heavily soiled work clothes. Never hot for colors.</p><p><b>Detergent:</b> Less is more. Most people use 2-3x too much, leaving residue that makes clothes stiff and smelly. Follow the cap line. Liquid for cold, powder for hot.</p><p><b>Cycle:</b> Normal for everyday. Delicate for thin/stretchy items. Heavy duty for towels and jeans.</p>`},
+  {h:'Drying, Folding, and Stain Removal',
+   b:`<p><b>Drying:</b> Not everything goes in the dryer. Check labels. Athletic wear, bras, and anything with elastic should air dry. Clean the lint trap EVERY load — fire hazard.</p><p><b>Stains:</b> Act fast — fresh stains are 10x easier. Blot, don't rub. Cold water for blood/protein. Dish soap for grease. Hydrogen peroxide for organic stains. Never put a stained item in the dryer — heat sets stains permanently.</p><p><b>Folding:</b> Fold or hang immediately when dry. Hang dress shirts, fold t-shirts and jeans.</p><p><b>Frequency:</b> Underwear/socks: every wear. Shirts: 1-2 wears. Jeans: 3-5 wears. Sheets: every 1-2 weeks. Towels: every 3-4 uses.</p>`},
+  {h:'Ironing, Special Fabrics, and Wardrobe Care',
+   b:`<p><b>Ironing:</b> Iron slightly damp for best results. Low heat for delicates, high for cotton. Or skip ironing — a steamer ($25-40) is faster and harder to mess up.</p><p><b>Special fabrics:</b> Wool: hand wash cold, lay flat to dry. Silk: hand wash, gentle detergent. Denim: inside out, cold, infrequently. Athletic wear: cold, no fabric softener, air dry.</p><p><b>Wardrobe care:</b> Invest in good hangers. Cedar blocks prevent moths. A lint roller and basic sewing kit saves trips to the tailor. Sewing a button takes 5 minutes and saves $15-20.</p>`}
+],
+cleaning:[
+  {h:'The Daily Reset — 10 Minutes to a Clean Space',
+   b:`<p><strong>A clean space reduces stress, improves focus, and makes you feel in control.</strong> You don't need to deep clean daily — you need a 10-minute reset.</p><p><b>Minutes 1-2:</b> Trash sweep — walk through with a bag. <b>Minutes 3-5:</b> Put things back where they belong. <b>Minutes 5-7:</b> Wipe down surfaces. <b>Minutes 8-9:</b> Quick sweep or vacuum. <b>Minute 10:</b> Set up tomorrow (lay out clothes, prep bag, check schedule). Do this every evening and your space never gets out of control.</p>`},
+  {h:'Kitchen Cleaning — The Room That Gets Dirty Fastest',
+   b:`<p><b>The rule:</b> Clean as you cook. While food simmers, wash the prep dishes. This one habit changes everything.</p><p><b>Daily:</b> Wash dishes after every meal. Wipe counters and stovetop. Take out trash when full.</p><p><b>Weekly:</b> Clean microwave (microwave a wet sponge 2 min, then wipe). Wipe fridge shelves. Mop floor. Clean sink with baking soda.</p><p><b>Monthly:</b> Deep clean oven. Clean behind appliances. Check fridge for expired food.</p><p><b>The sink rule:</b> Never go to bed with dishes in the sink. An empty sink in the morning changes how your entire day starts.</p>`},
+  {h:'Bathroom Cleaning — Quick, Simple, Done',
+   b:`<p><b>The 8-minute clean:</b> Spray everything with all-purpose cleaner. Let it sit 2 minutes while you gather trash. Wipe mirror. Scrub sink. Scrub toilet (bowl, seat, base). Wipe counter. Quick tub wipe. Mop floor last.</p><p><b>Prevention:</b> Squeegee the shower after each use (prevents 90% of soap scum). Keep a toilet brush nearby. Ventilation fan ON during and 15 min after showers (prevents mold).</p><p><b>Products you need:</b> All-purpose cleaner, toilet bowl cleaner, glass cleaner. That's it. Baking soda + vinegar handles most tough jobs for pennies.</p>`}
+],
+timemanage:[
+  {h:'Why Time Management Matters — Your Most Limited Resource',
+   b:`<p><strong>Every person gets exactly 24 hours per day.</strong> The difference between people who accomplish goals and people who don't is how they use their time.</p><p><b>The math:</b> 24 hours = 8 sleep + 7 school/work + 2 meals/hygiene = 7 hours of discretionary time. That's where your life is won or lost.</p><p><b>Parkinson's Law:</b> Work expands to fill time available. Give yourself all day for a paper, it takes all day. Give yourself 2 hours, it takes 2 hours. Set deadlines for everything.</p>`},
+  {h:'Systems That Work — Planners, Time Blocks, and the 2-Minute Rule',
+   b:`<p><b>The 2-Minute Rule:</b> If a task takes less than 2 minutes, do it NOW. This eliminates 40% of your to-do list.</p><p><b>Time blocking:</b> Block your calendar: 4:00-5:00 homework, 5:00-5:30 practice. When the block ends, move on.</p><p><b>The Eisenhower Matrix:</b> Every task is Urgent/Not Urgent and Important/Not Important. Do urgent+important now. Schedule important-not-urgent. Eliminate neither.</p><p><b>Sunday planning:</b> Spend 15 minutes every Sunday planning your week. People who plan are 3x more likely to complete goals.</p>`},
+  {h:'Beating Procrastination — The Real Enemy',
+   b:`<p><b>Why you procrastinate:</b> Not laziness — it's an emotional regulation problem. You avoid tasks that make you anxious or overwhelmed.</p><p><b>The 5-minute start:</b> Commit to just 5 minutes. Momentum carries you forward.</p><p><b>Break it down:</b> "Write a paper" is overwhelming. "Find 3 sources" is doable. Break every big task into non-scary steps.</p><p><b>Remove friction:</b> Put your phone in another room before studying. Sleep in workout clothes. Make the right choice the easy choice.</p><p><b>Reward yourself:</b> Study 45 min, then 15 min of whatever. This trains your brain to associate hard work with reward.</p>`}
+],
+organize:[
+  {h:'The Art of Organization — A Place for Everything',
+   b:`<p><strong>Organization is not about being neat — it is about finding what you need when you need it.</strong> The average person spends 2.5 hours/day looking for things.</p><p><b>The one rule:</b> Every item has a designated spot. Keys on the hook. Charger on the nightstand. Backpack by the door.</p><p><b>The container principle:</b> If a category doesn't have a container, it will spread. School supplies need a drawer. Papers need a folder.</p>`},
+  {h:'Digital Organization — Files, Passwords, and Your Online Life',
+   b:`<p><b>File naming:</b> Not "doc1" — "2026-03-Biology-Lab-Report." Use YYYY-MM format. Create folders: School, Personal, Work, Financial.</p><p><b>Passwords:</b> Use a password manager (Bitwarden is free). Never reuse passwords. Enable two-factor on everything important.</p><p><b>Email:</b> Unsubscribe from everything you don't read. Goal: inbox zero.</p><p><b>Phone:</b> Delete unused apps. Turn off unnecessary notifications.</p>`},
+  {h:'Planning Ahead — Weekly Reviews and Systems That Stick',
+   b:`<p><b>The weekly review (15 min every Sunday):</b> Check calendar. Write down 3 most important things. Check what carried over.</p><p><b>The nightly reset (5 min):</b> Check tomorrow. Prepare what's needed. Lay out clothes. Clean workspace.</p><p><b>Systems beat motivation:</b> "I check my planner every morning at 7:00" is a system. "I'll try to be organized" is a wish.</p>`}
+]
+,
+legal:[
+  {h:'Know Your Rights — Interactions with Law Enforcement',
+   b:`<p><strong>Understanding your rights protects you.</strong> You have the right to remain silent. You have the right to refuse a search of your car or home without a warrant. You should always be respectful and calm. Give your name and ID if asked. Do not resist physically. If you believe your rights were violated, document everything and contact a lawyer afterward — not during the encounter.</p>`},
+  {h:'Contracts, Leases, and What You Are Actually Signing',
+   b:`<p><strong>A contract is a legally binding promise.</strong> Before you sign anything — a lease, a loan, a job offer, a phone plan — read every word. If you do not understand something, ask. Key things to look for: the total cost, the length of commitment, cancellation terms, penalties, and what happens if you break the agreement. Never sign under pressure. "I need to take this home and review it" is always acceptable.</p>`},
+  {h:'Small Claims Court and How to Handle Disputes',
+   b:`<p><strong>Small claims court handles disputes up to $5,000-$10,000 depending on your state.</strong> You do not need a lawyer. You file a claim, pay a small fee ($30-75), and present your case to a judge. Bring all documentation: receipts, texts, photos, contracts. The judge makes a decision, usually the same day. This is how you handle a landlord who won't return your deposit, a contractor who didn't finish a job, or a buyer who didn't pay.</p>`},
+  {h:'Power of Attorney, Wills, and Documents Every Adult Needs',
+   b:`<p><b>Documents you need by age 18-25:</b> A will (yes, even young — it says who gets your stuff and who makes decisions if you can't). A power of attorney (who can act on your behalf if you're incapacitated). A healthcare directive (your medical wishes if you can't communicate). These sound morbid but they protect you and your family. Many can be created free online or for under $50.</p>`}
+],
+adulting:[
+  {h:'Moving Out — The Complete First Apartment Checklist',
+   b:`<p><strong>Kitchen essentials:</strong> One good pan, one pot, cooking utensils, plates, bowls, cups, silverware (4 of each), cutting board, chef knife, can opener. <b>Bathroom:</b> Towels (2 bath, 2 hand), shower curtain, toilet brush, plunger (buy BEFORE you need it). <b>Bedroom:</b> Mattress, 2 sets of sheets, pillows, curtains. <b>First things to set up:</b> Utilities (electric, water, gas), internet, renter's insurance. <b>Things everyone forgets:</b> Toilet paper, a plunger, lightbulbs, a flashlight, cleaning supplies, a first aid kit, a fire extinguisher.</p>`},
+  {h:'Utilities, Bills, and Adulting Paperwork',
+   b:`<p><b>Setting up utilities:</b> Call the electric, gas, and water companies BEFORE move-in day. You'll need your lease and ID. Internet: compare providers, don't accept the first price. <b>Bills to budget for monthly:</b> Rent, electric, gas, water/sewer, internet, phone, renter's insurance, groceries, transportation. <b>Autopay everything you can</b> — late payments hurt your credit score. Keep a folder (physical or digital) for all important documents: lease, insurance, tax returns, pay stubs.</p>`},
+  {h:'How to Adult — The Skills Nobody Taught You',
+   b:`<p><b>Schedule your own appointments:</b> Doctor, dentist, eye doctor — you're in charge now. <b>Register to vote</b> when you turn 18. <b>Know your blood type.</b> <b>Learn to cook 5 meals</b> you can rotate. <b>Keep a basic toolkit.</b> <b>Build an emergency fund</b> ($1,000 minimum, then 3 months of expenses). <b>Check your bank account weekly.</b> <b>File your taxes</b> — don't fear them, they're simpler than you think for a single filer. <b>Update your address</b> when you move: bank, employer, DMV, subscriptions, insurance.</p>`},
+  {h:'Building Credit From Zero — Your Financial Reputation',
+   b:`<p><b>Start at 18:</b> Get a secured credit card ($200-500 deposit). Use it for ONE recurring bill (like gas or a subscription). Pay the FULL balance every month — never carry a balance. <b>After 6-12 months:</b> Your score builds. Apply for a regular card with a small limit. <b>The rules:</b> Never use more than 30% of your limit. Never miss a payment. Never close your oldest card. <b>Why it matters:</b> Your credit score determines your interest rates on everything — car loans, apartments, mortgages, even insurance. Good credit saves you tens of thousands of dollars over your lifetime.</p>`}
+],
+
+safety:[
+  {
+    h:'Situational Awareness — Your Most Powerful Safety Skill',
+    b:`<p><strong>Situational awareness</strong> means knowing what is happening around you, who is near you, and whether anything feels wrong — before it becomes a threat. It costs nothing, requires no strength, and works everywhere. It is the single most effective personal safety skill you can develop.</p>
+<p><strong>Jeff Cooper's Color Code System:</strong></p>
+<ul>
+  <li><strong style="color:#86efac;">White — Unaware:</strong> Head down, headphones in, phone out. Most dangerous state. Only appropriate in your own home.</li>
+  <li><strong style="color:#fde68a;">Yellow — Relaxed Alert:</strong> Calm, present, scanning. This is your <em>default mode in public</em>. You notice who is around you and where exits are.</li>
+  <li><strong style="color:#fb923c;">Orange — Specific Alert:</strong> Something has caught your attention. You are watching it and mentally planning your response.</li>
+  <li><strong style="color:#f87171;">Red — Action:</strong> The threat is real. You are moving — escaping, calling for help, or defending.</li>
+</ul>
+<p><strong>Most people live in White all the time.</strong> That is the vulnerability. Your goal is to live in Yellow whenever you leave home.</p>
+<p><strong>The 3-Second Entry Scan:</strong> Every time you enter a new space — a parking lot, restaurant, elevator, party — spend 3 seconds: <em>Who is here? Where are the exits? Does anything feel wrong?</em> This becomes automatic with practice and takes almost no time.</p>
+<p><strong>Environmental awareness habits:</strong></p>
+<ul>
+  <li>Always sit or stand with your back to a wall when possible — you see the room, no one is behind you</li>
+  <li>Identify two exits in every space you enter</li>
+  <li>Notice what is normal so you can spot what is not</li>
+  <li>Reduce phone use while moving — distraction is the #1 vulnerability predators look for</li>
+  <li>One earbud out in public — your hearing is your second threat-detection system</li>
+</ul>`,
+    q:[
+      {q:'What is the Yellow alert state?',opts:['Panicked and ready to fight','Completely relaxed with headphones in','Calm but present and aware of surroundings — your default in public','Already responding to a threat'],ans:2,explain:'Yellow is relaxed alertness — your goal state whenever you leave home. Calm, not paranoid, just present.'},
+      {q:'What is the 3-second entry scan?',opts:['Checking your phone for messages','Scanning who is present, where exits are, and whether anything feels wrong when entering a new space','Looking for security cameras','Checking that your belongings are secure'],ans:1,explain:'Three seconds when entering any new space: who is here, where are the exits, does anything feel wrong. It becomes automatic.'},
+      {q:'Why is phone distraction a personal safety vulnerability?',opts:['It drains your battery','It draws attention to expensive technology','Predators specifically look for distracted, unaware targets','It is rude to others around you'],ans:2,explain:'Target selection research shows predators look for distracted, unaware people. Phone use signals you are not paying attention to your environment.'}
+    ]
+  },
+  {
+    h:'Trust Your Gut — Fear Is Data, Not Weakness',
+    b:`<p>Gavin de Becker, the world's foremost expert on threat prediction, spent decades studying violent crime. His finding: <strong>victims almost always had a warning signal they talked themselves out of.</strong> They felt uneasy. They noticed something odd. And then they dismissed it to avoid seeming rude or paranoid.</p>
+<p><strong>Fear is not an emotion — it is information.</strong> It is your brain's pattern-recognition system processing thousands of subtle signals faster than conscious thought and flagging something that does not add up. When you feel it:</p>
+<ul>
+  <li>Do NOT explain it away to seem polite or reasonable</li>
+  <li>Do NOT wait for certainty before acting — you will never have certainty in advance</li>
+  <li>Do NOT apologize for it to yourself or anyone else</li>
+  <li>Act first. Rationalize later. You can always apologize for leaving a situation that turned out to be fine.</li>
+</ul>
+<p><strong>Real fear vs. worry:</strong> Real fear is always triggered by something present or genuinely imminent — it has a specific cause even if you cannot name it yet. Worry is manufactured anxiety about "what if." Learn to distinguish them. Act on the real kind immediately.</p>
+<p><strong>The manipulation tactics that override gut feelings:</strong></p>
+<ul>
+  <li><strong>Forced teaming:</strong> "We're in the same boat here" — creates false alliance with "we" language</li>
+  <li><strong>Too many details:</strong> Liars over-explain to seem credible. Truthful people are comfortable with ambiguity.</li>
+  <li><strong>Discounting your "no":</strong> "Oh come on, I'm just being friendly." A real no should be respected immediately. Persistence after a clear no is a major warning sign.</li>
+  <li><strong>Unsolicited help:</strong> Offering help you didn't ask for, then escalating when you decline</li>
+  <li><strong>Typecasting:</strong> "You seem like the kind of person who doesn't trust anyone." — pressuring you to prove you're not what they said</li>
+</ul>
+<p>Your safety is not worth anyone else's comfort. You owe no one an explanation for leaving a situation that makes you uneasy.</p>`,
+    q:[
+      {q:'According to threat expert Gavin de Becker, what do victims of violence almost always have in common?',opts:['They were in a dangerous neighborhood','They had a warning signal they dismissed to avoid seeming rude','They were not physically capable of defending themselves','They were using their phones'],ans:1,explain:'De Becker studied thousands of cases. Almost without exception, victims had a signal — and overrode it. Fear is data.'},
+      {q:'What is "forced teaming"?',opts:['A sports training technique','A legal defense strategy','A manipulation tactic where an attacker uses "we" language to create false alliance','A type of group therapy'],ans:2,explain:'Predators use "we" language ("we are in the same situation") to lower your guard by creating false intimacy.'},
+      {q:'What should you do when you feel genuine fear in a situation?',opts:['Wait for certainty that the threat is real before acting','Act immediately — you can apologize later for leaving a situation that was fine','Explain to yourself why it is probably nothing','Ask the person who is making you uneasy if they mean harm'],ans:1,explain:'De Becker: you can always apologize for leaving a situation that turned out fine. You cannot undo not leaving one that was not.'}
+    ]
+  },
+  {
+    h:'How Attacks Actually Happen — The Predator Playbook',
+    b:`<p>Understanding HOW most attacks unfold removes the mystery and gives you a window to act. Predators are not random. <strong>They are opportunists who select targets and test them before attacking.</strong></p>
+<p><strong>Target selection:</strong> Attackers look for people who appear distracted, isolated, hesitant, or unaware. They avoid people who make eye contact, walk confidently, and demonstrate environmental awareness. Your body language alone changes your risk profile significantly.</p>
+<p><strong>The Interview:</strong> Before most attacks, the attacker "interviews" the target — a question or comment designed to assess compliance, awareness, and vulnerability.</p>
+<ul>
+  <li>"Hey, do you have the time?"</li>
+  <li>"Can I walk with you to your car?"</li>
+  <li>"You look like you need help with that."</li>
+</ul>
+<p>This is NOT casual conversation. It is a test. A confident, direct response ends most interviews immediately. A hesitant, apologetic, or mumbled response signals vulnerability and often invites escalation.</p>
+<p><strong>How to respond to an interview:</strong> Direct eye contact. Clear voice. "No thank you." Then move away. You are not rude — you are safe. You can be firm without being hostile.</p>
+<p><strong>The contact phase:</strong> The attacker attempts to close distance and gain physical control. This is when your response window is shrinking fast. Act during or before the contact phase — after it, your options narrow dramatically.</p>
+<p><strong>Highest-risk environments:</strong></p>
+<ul>
+  <li><strong>Parking lots:</strong> Isolation, low foot traffic, easy vehicle escape for attacker</li>
+  <li><strong>Elevators:</strong> Forced proximity, no escape route</li>
+  <li><strong>Stairwells:</strong> No surveillance, no witnesses</li>
+  <li><strong>Your car at night:</strong> Distracted with keys, confined space</li>
+</ul>
+<p>Apply heightened Yellow-to-Orange awareness in all four. Have keys in hand before reaching your car. Check the back seat. Lock doors immediately upon entering.</p>`,
+    q:[
+      {q:'What is "the interview" in predator behavior?',opts:['A job screening process','A pre-attack test using a question or comment to assess if you are a compliant, easy target','A police questioning technique','A social greeting that is being misinterpreted'],ans:1,explain:'Before most attacks, the attacker tests the target. A confident, direct response ends most interviews immediately.'},
+      {q:'Which environments require the highest awareness?',opts:['Restaurants, parks, and shopping malls','Schools, offices, and libraries','Parking lots, elevators, stairwells, and your car at night','Gyms, stores, and coffee shops'],ans:2,explain:'These four share isolation and limited escape routes — the conditions attackers look for.'},
+      {q:'What does target selection research show about who is chosen?',opts:['Attackers choose targets randomly','Physical size is the only factor','People who appear distracted, isolated, or hesitant are selected — confident, aware people are avoided','Attackers always know their target in advance'],ans:2,explain:'Predators are opportunists. Body language, awareness, and confidence all change your risk profile significantly.'}
+    ]
+  },
+  {
+    h:'Self-Defense That Actually Works',
+    b:`<p>Most self-defense training teaches techniques. Real self-defense starts long before physical contact — with <strong>avoidance, awareness, and assertiveness.</strong> Physical techniques are the last resort after everything else has failed.</p>
+<p><strong>The Defense Pyramid (in order):</strong></p>
+<ol>
+  <li><strong>Avoid:</strong> Don't go to dangerous places alone. Trust your gut. Leave early.</li>
+  <li><strong>De-escalate:</strong> Calm voice, non-threatening posture, look for exit opportunities</li>
+  <li><strong>Escape:</strong> Create distance and run. Running is ALWAYS the best option if available.</li>
+  <li><strong>Fight:</strong> Only when escape is impossible and your physical safety demands it</li>
+</ol>
+<p><strong>If you must fight — fight to ESCAPE, not to win:</strong> Your goal is 3–5 seconds of distraction so you can run. You do not need to knock anyone out. You need a window.</p>
+<p><strong>High-percentage targets (work regardless of size difference):</strong></p>
+<ul>
+  <li><strong>Eyes:</strong> Thumb jab or finger flick — immediate pain, involuntary tearing, temporary impairment</li>
+  <li><strong>Throat:</strong> Open-palm strike — immediate pain, breathing disruption, shock</li>
+  <li><strong>Groin:</strong> Knee, kick, or grab — highly effective regardless of attacker size</li>
+  <li><strong>Nose:</strong> Palm-heel strike upward — pain, involuntary eye watering</li>
+  <li><strong>Instep:</strong> Hard heel stomp if grabbed from behind</li>
+  <li><strong>Knee:</strong> Side kick or stomp — compromises mobility instantly</li>
+</ul>
+<p><strong>Voice as a weapon:</strong> A loud, forceful <em>"STOP!"</em> or <em>"FIRE!"</em> (people respond faster to fire than help) draws attention, startles the attacker, and alerts bystanders. Most people are conditioned not to shout — practice it.</p>
+<p><strong>Best training systems for women:</strong></p>
+<ul>
+  <li><strong>Krav Maga:</strong> Israeli military system, entirely real-world focused, no sport rules</li>
+  <li><strong>RAD (Rape Aggression Defense):</strong> Designed specifically for women, available at many colleges and police departments</li>
+  <li><strong>Brazilian Jiu-Jitsu:</strong> Essential for ground defense — most attacks end up on the ground</li>
+</ul>
+<p>One 8-hour course changes your capability and your confidence permanently. Find a local RAD class — many are free.</p>`,
+    q:[
+      {q:'What is the primary goal when you are forced to fight?',opts:['Win the fight decisively','Knock the attacker out','Create 3-5 seconds to escape','Demonstrate your training'],ans:2,explain:'Fight to escape, not to win. You need enough distraction time to run. That is the only goal.'},
+      {q:'Why is shouting "FIRE!" sometimes more effective than "HELP!"?',opts:['It is louder','People respond faster to fire than calls for help — it draws more immediate bystander attention','It confuses the attacker','It is the internationally recognized distress signal'],ans:1,explain:'Research and real cases show bystanders respond more rapidly and reliably to "fire" than "help."'},
+      {q:'Which self-defense systems are considered most practical for women?',opts:['Tai Chi and yoga','Boxing and karate kata','Krav Maga, RAD, and Brazilian Jiu-Jitsu','Dance-based fitness programs'],ans:2,explain:'Krav Maga is real-world focused. RAD is designed specifically for women. BJJ teaches ground defense — critical because most attacks involve being taken to the ground.'}
+    ]
+  },
+  {
+    h:'Escaping a Grab — When Hands Are On You',
+    b:`<p>Being grabbed is terrifying. Training removes the freeze response. <strong>These techniques work because of biomechanics — they do not require strength, speed, or size.</strong></p>
+<p><strong>Wrist grab escape:</strong> Rotate your wrist sharply toward the attacker's thumb. Every grip — regardless of how strong — is weakest at the thumb. A quick, decisive rotation breaks it. Practice with a partner until it is automatic.</p>
+<p><strong>Bear hug from behind (arms free):</strong></p>
+<ol>
+  <li>Drop your weight immediately — bend your knees hard, lean forward</li>
+  <li>Stomp your heel hard onto their instep (foot arch)</li>
+  <li>Throw your head backward into their face</li>
+  <li>Drive your elbow back into their ribs or solar plexus</li>
+  <li>Spin, create distance, run</li>
+</ol>
+<p><strong>Bear hug from behind (arms pinned):</strong></p>
+<ol>
+  <li>Drop your weight and widen your stance immediately</li>
+  <li>Thrust your hips back sharply to shift their center of gravity</li>
+  <li>Stomp on the instep repeatedly</li>
+  <li>When grip loosens even slightly — drop straight down. Dead weight is extremely hard to hold.</li>
+</ol>
+<p><strong>Choke from the front:</strong></p>
+<ol>
+  <li><strong>TUCK YOUR CHIN immediately</strong> — this protects the airway and buys time</li>
+  <li>Raise both arms straight overhead, then plunge them down sharply between their arms — this mechanically breaks the grip</li>
+  <li>Step back, palm-heel strike to the nose, and run</li>
+</ol>
+<p><strong>If being pulled into a vehicle:</strong> Fight with everything at the door. Scream, bite, scratch, grip the door frame, honk the horn, throw yourself onto the steering wheel. <strong>Never go to the second location.</strong> Statistics show outcomes at the second location are far worse. Fight at the point of abduction — your odds are dramatically better there.</p>
+<p><strong>If knocked to the ground:</strong> Protect your head immediately. Draw knees to chest, use feet to kick and create distance, roll to get up. Getting back upright is the priority.</p>`,
+    q:[
+      {q:'What is the weakest point of any grip?',opts:['The palm','The fingers','The thumb side','Equal strength throughout'],ans:2,explain:'Every grip is mechanically weakest at the thumb. Rotating toward the thumb breaks almost any wrist grab.'},
+      {q:'If someone attempts to force you into a vehicle, what should you do?',opts:['Comply and look for an opportunity later','Get in quietly and call 911 discreetly','Fight with everything you have at the door — never go to the second location','Wait to understand their intention'],ans:2,explain:'The second location is statistically far more dangerous. Fight at the point of abduction. Your odds are best there.'},
+      {q:'Why does dropping your full body weight help escape a bear hug?',opts:['It makes you heavier permanently','Dead weight is extremely difficult to hold — it shifts the attacker\'s balance and opens escape options','It signals submission and may calm the attacker','It only works for larger people'],ans:1,explain:'Dead weight mechanics mean even a much larger person struggles to maintain a grip. Drop hard and fast.'}
+    ]
+  },
+  {
+    h:'Recognizing Abuse — The Patterns, Cycle, and Red Flags',
+    b:`<p>Abuse is rarely a single event. It is a <strong>pattern of behavior designed to gain and maintain power and control</strong> over another person. It can be physical, emotional, verbal, financial, sexual, or digital — and it almost never starts with a punch.</p>
+<p><strong>The Cycle of Abuse (Lenore Walker's research):</strong></p>
+<ol>
+  <li><strong>Tension Building:</strong> Anxiety rises, you walk on eggshells, minor incidents occur. You feel like you are managing them to prevent an explosion.</li>
+  <li><strong>Incident:</strong> The explosion — verbal, emotional, or physical abuse. The tension releases.</li>
+  <li><strong>Reconciliation (Honeymoon Phase):</strong> Apologies, gifts, tears, promises. "I'll never do it again. You know I love you." This phase creates false hope and is why leaving is hard.</li>
+  <li><strong>Calm:</strong> The incident is minimized or forgotten. Life feels normal. Then tension starts building again.</li>
+</ol>
+<p>The cycle always shortens over time. The honeymoon phase disappears. The incidents become more severe and more frequent.</p>
+<p><strong>Early Red Flags — these appear before physical violence:</strong></p>
+<ul>
+  <li>Jealousy framed as love: "I just care so much about where you are"</li>
+  <li>Isolating you from friends and family ("They're not good for you")</li>
+  <li>Controlling finances, transportation, or how you dress</li>
+  <li>Checking your phone or tracking your location without consent</li>
+  <li>Moving very fast emotionally — intense attachment within weeks</li>
+  <li>Mood swings that keep you uncertain and walking on eggshells</li>
+  <li>Minimizing your feelings: "You're too sensitive," "You're crazy," "That never happened" (gaslighting)</li>
+  <li>Blaming you for their behavior: "You made me do this"</li>
+  <li>Threatening to hurt themselves if you leave</li>
+  <li>Public humiliation disguised as "just joking"</li>
+</ul>
+<p><strong>Important:</strong> By the time physical violence appears, the psychological and emotional groundwork has already been laid for months or years. The earlier you recognize these patterns, the more options you have.</p>`,
+    q:[
+      {q:'What makes the "honeymoon phase" of the abuse cycle so dangerous?',opts:['It involves physical violence','It creates false hope that the person has changed — making leaving feel unnecessary','It only happens once','It is when most legal action occurs'],ans:1,explain:'The honeymoon phase is designed (consciously or not) to restore the relationship before the cycle repeats. It is why "but they were so loving afterward" is a reason people stay.'},
+      {q:'Which of these is an early red flag for an abusive relationship?',opts:['Healthy disagreements resolved through conversation','Jealousy framed as deep love and intense concern for your whereabouts','Being introduced to friends and family','Taking time before becoming serious'],ans:1,explain:'Jealousy presented as love is one of the most consistent early red flags. It is not love — it is the beginning of control.'},
+      {q:'What is gaslighting?',opts:['A type of physical intimidation','Making someone question their own memory, perception, and sanity through denial and manipulation','A form of financial abuse','Threatening someone with a weapon'],ans:1,explain:'Gaslighting ("that never happened," "you are crazy," "you are too sensitive") makes the victim distrust their own experience — a core abuse tactic.'}
+    ]
+  },
+  {
+    h:'Leaving Safely — Escaping an Abusive Situation',
+    b:`<p><strong>Leaving an abusive relationship is the most dangerous time.</strong> Research consistently shows that the risk of serious violence — including homicide — increases significantly when an abuser senses they are losing control. Leaving without a plan puts you at greater risk. A safety plan is not optional.</p>
+<p><strong>Build your Safety Plan BEFORE you leave:</strong></p>
+<ul>
+  <li>Identify 2–3 safe people who know the full situation and can be called at any hour</li>
+  <li>Establish a code word with a trusted person that means "call 911 to my location"</li>
+  <li>Identify safe destinations: trusted friend/family, domestic violence shelter, police station</li>
+  <li>Build a hidden "go bag": government ID, birth certificate, Social Security card, cash, medications, phone charger, change of clothes, important documents, spare key</li>
+  <li>Open a bank account they do not know about — even $20/week builds an emergency fund</li>
+  <li>Memorize 2–3 key phone numbers in case your phone is taken or destroyed</li>
+</ul>
+<p><strong>Digital safety before leaving:</strong></p>
+<ul>
+  <li>Change ALL passwords (email, bank, social media) from a device they have never touched</li>
+  <li>Check your phone for tracking/stalkerware — factory reset if unsure</li>
+  <li>Turn off location sharing in every app, including Find My Friends and Google Maps sharing</li>
+  <li>Review all devices logged into your accounts — remove anything unfamiliar</li>
+  <li>Create a new email account for sensitive communications</li>
+</ul>
+<p><strong>Legal protections available to you:</strong></p>
+<ul>
+  <li><strong>Protective Order / Restraining Order:</strong> A court order prohibiting contact. Violating it is a criminal offense.</li>
+  <li><strong>Document everything:</strong> Dated photos of injuries, screenshots of threatening messages, medical records</li>
+  <li>DV advocates can help you navigate legal options for free</li>
+</ul>
+<p style="background:rgba(239,68,68,.1);border-left:3px solid #ef4444;padding:.6rem .8rem;border-radius:6px;margin-top:.8rem;">
+  <strong>📞 National Domestic Violence Hotline: 1-800-799-7233 (SAFE)</strong><br>
+  Text START to 88788 | Safe chat at thehotline.org
+</p>`,
+    q:[
+      {q:'Why is leaving an abusive relationship potentially the most dangerous moment?',opts:['Because you have no legal rights at that point','Because the abuser feels they are losing control — risk of serious violence peaks','Because courts rarely believe victims','Because you lose financial support immediately'],ans:1,explain:'Research and homicide studies consistently show the period around leaving is when danger peaks. A safety plan is essential — not optional.'},
+      {q:'What should a safety "go bag" contain?',opts:['Sentimental items and photos','ID, cash, medications, documents, charger, and change of clothes','Just your phone and car keys','Legal documents only'],ans:1,explain:'The go bag covers what you cannot safely return for. You may not get a second chance to collect things.'},
+      {q:'What should you do before leaving regarding digital accounts?',opts:['Nothing — focus on physical safety only','Post about your situation on social media for support','Change all passwords from a device they have never used and check phone for tracking software','Delete all social media accounts immediately'],ans:2,explain:'Abusers frequently monitor email, social media, and location sharing. Digital security must happen alongside physical safety planning.'}
+    ]
+  },
+  {
+    h:'Sexual Assault — Prevention, Response, and Recovery',
+    b:`<p><strong>First and always:</strong> Sexual assault is never the victim's fault. Clothing, location, prior relationship to the attacker, intoxication, or any previous behavior do not create consent and do not shift responsibility. Ever.</p>
+<p><strong>What consent actually means:</strong></p>
+<ul>
+  <li>Consent is <strong>ongoing, enthusiastic, and freely given</strong> — not assumed, implied, or coerced</li>
+  <li>Silence or passivity is NOT consent</li>
+  <li>Past consent does not mean current consent — in any situation, any time</li>
+  <li>Intoxication removes the legal and ethical ability to give consent</li>
+  <li>"No" means no the first time — any pressure after a clear no is a violation of consent</li>
+</ul>
+<p><strong>Risk reduction in social situations:</strong></p>
+<ul>
+  <li>Never leave your drink unattended — not even for a minute</li>
+  <li>Know what drug-facilitated assault looks like: sudden extreme disorientation or sedation disproportionate to what you drank</li>
+  <li>Have a trusted friend system — you know where each other are and you leave together</li>
+  <li>Trust your discomfort — leave situations that feel wrong before they escalate</li>
+  <li>Know that the majority of assaults are committed by someone known to the victim — this does not make it less assault</li>
+</ul>
+<p><strong>If assault occurs — your immediate steps:</strong></p>
+<ol>
+  <li>Get to physical safety immediately</li>
+  <li><strong>Do not shower, change clothes, or clean up</strong> before a medical exam — this preserves forensic evidence</li>
+  <li>Go to an emergency room or SANE (Sexual Assault Nurse Examiner) clinic — they are trained specifically for this</li>
+  <li>You have the right to a forensic exam whether or not you report to police — reporting is entirely your choice</li>
+  <li>Bring a trusted person with you if possible</li>
+  <li>Evidence can often be collected up to 72–120 hours after an assault</li>
+</ol>
+<p style="background:rgba(239,68,68,.1);border-left:3px solid #ef4444;padding:.6rem .8rem;border-radius:6px;margin-top:.8rem;">
+  <strong>📞 RAINN National Sexual Assault Hotline: 1-800-656-4673 (HOPE)</strong><br>
+  24/7 confidential support | Online chat at rainn.org
+</p>`,
+    q:[
+      {q:'What does consent require?',opts:['The absence of a clear "no"','Ongoing, enthusiastic, and freely given agreement — not assumed, coerced, or implied','Agreement at the start of a relationship that applies going forward','No verbal objection during the encounter'],ans:1,explain:'Consent must be ongoing, enthusiastic, and freely given. It can be withdrawn at any moment. Silence, passivity, or past consent do not count.'},
+      {q:'Why should you not shower before a forensic medical exam after assault?',opts:['For psychological grounding','Because hospital showers are unavailable','To preserve forensic evidence that supports future legal options','Showering is fine — only clothing matters'],ans:2,explain:'Forensic evidence can be collected up to 72–120 hours after assault. Showering destroys critical evidence permanently.'},
+      {q:'Is reporting to police required to receive a forensic medical exam?',opts:['Yes — reporting is required first','No — you have the right to a forensic exam regardless of whether you report','Only in some states','Only if you have health insurance'],ans:1,explain:'You can receive a forensic exam and have evidence preserved without making a police report. Reporting is entirely your choice, and you can decide later.'}
+    ]
+  },
+  {
+    h:'Digital Safety — Cyberstalking, Tracking & Online Threats',
+    b:`<p>Technology has created powerful new tools for stalking, harassment, and abuse. <strong>Cyberstalking is a federal crime.</strong> These threats are just as real and just as dangerous as physical ones — and they often precede physical violence.</p>
+<p><strong>Warning signs you may be tracked or monitored:</strong></p>
+<ul>
+  <li>Someone knows things you only shared briefly online or in "private" messages</li>
+  <li>They appear at locations you never told them about</li>
+  <li>Your phone battery drains unusually fast (stalkerware runs in the background)</li>
+  <li>Your car or belongings have unfamiliar items attached (AirTag, GPS tracker)</li>
+  <li>Your accounts keep being accessed from unknown devices</li>
+  <li>A current or ex-partner seems to know your movements without being told</li>
+</ul>
+<p><strong>Lock down your digital life:</strong></p>
+<ul>
+  <li>Audit every app with location access — disable any that do not absolutely need it</li>
+  <li>Scan for AirTags: iPhone detects automatically; Android users use the "Tracker Detect" app</li>
+  <li>Review all devices logged into your Google/Apple/email accounts — remove unknowns immediately</li>
+  <li>Enable two-factor authentication on every account</li>
+  <li>If unsure whether your phone has spyware — factory reset it and restore only your own data</li>
+  <li>Check shared family plans and iCloud Family Sharing — these often allow location access</li>
+</ul>
+<p><strong>Social media hygiene:</strong></p>
+<ul>
+  <li>Post location <em>after</em> you leave — never in real time</li>
+  <li>Photos contain embedded GPS metadata — turn off location for your camera app</li>
+  <li>Review who can see your Stories, check-ins, and tagged posts</li>
+  <li>Block aggressively and without guilt — you owe no one access to your life</li>
+</ul>
+<p><strong>If being stalked digitally:</strong> Screenshot everything with timestamps. Report to police — cyberstalking charges require documentation. Contact the Cyber Civil Rights Initiative at cybercivilrights.org for expert guidance.</p>`,
+    q:[
+      {q:'What is a key sign your phone may have tracking software installed?',opts:['Apps open more slowly','Screen brightness fluctuates','Battery drains significantly faster than your normal usage','You receive more spam calls'],ans:2,explain:'Stalkerware and tracking apps run continuously in the background — a major battery drain is one of the most reliable signs.'},
+      {q:'When should you post your location on social media?',opts:['In real time so friends know where you are','Only on private accounts','After you have already left — never in real time','Never under any circumstances'],ans:2,explain:'Real-time location posting tells anyone monitoring your account exactly where to find you. Post after you leave.'},
+      {q:'What should you do if you suspect your phone has spyware installed?',opts:['Install an antivirus app','Delete suspicious-looking apps one by one','Factory reset the phone and restore only your own data from a trusted backup','Give it to police immediately'],ans:2,explain:'A factory reset is the only reliable way to remove spyware. Selective app deletion often misses deeply embedded tracking software.'}
+    ]
+  },
+  {
+    h:'Street Smarts — Practical Daily Safety Habits',
+    b:`<p>Most personal safety advice is abstract. These are <strong>specific, actionable habits</strong> you can use starting today. Each one meaningfully reduces your risk profile.</p>
+<p><strong>Walking alone:</strong></p>
+<ul>
+  <li>Phone in pocket while moving — not in your hand. If you must check it, stop with your back to a wall.</li>
+  <li>One earbud out, volume low — you need your hearing</li>
+  <li>Walk with your head up, at a purposeful pace. Confidence signals awareness — the single biggest deterrent.</li>
+  <li>Make brief eye contact with people nearby — signals you have registered them. Predators dislike being noticed.</li>
+  <li>Vary your routes and routines — predictability is exploitable</li>
+  <li>If you think you are being followed on foot: cross the street, enter a business, call someone and say their name and your exact location out loud</li>
+</ul>
+<p><strong>At your car:</strong></p>
+<ul>
+  <li>Have keys in hand before you reach the car — do not stand searching your bag at the door</li>
+  <li>Glance at the back seat before getting in</li>
+  <li>Lock doors <em>immediately</em> upon getting in — before phone, before music, before anything</li>
+  <li>Park near lights and near high-foot-traffic areas</li>
+  <li>If someone is parked very close on your driver's side in a van or large vehicle, enter from the passenger side</li>
+</ul>
+<p><strong>Tools worth having:</strong></p>
+<ul>
+  <li><strong>Personal alarm:</strong> 120dB+ keychain alarm. Pull to activate. Legal everywhere, startles attackers, draws immediate attention.</li>
+  <li><strong>Pepper spray:</strong> Effective at 8–12 feet. Legal in most states with minor restrictions. Practice your draw before you need it.</li>
+  <li><strong>Charged phone:</strong> Keep it above 20% when leaving home. Have 911 accessible from your lock screen.</li>
+</ul>
+<p><strong>If you think a car is following you while driving:</strong> Do NOT go home. Make four consecutive right turns — if the same car follows all four, you are being followed. Drive directly to a police station, fire station, or busy public place. Call 911 and stay on the line.</p>`,
+    q:[
+      {q:'Why is walking with your head up and at a purposeful pace important?',opts:['It is better for your posture','Confidence and awareness signal to predators that you are not an easy target','It helps you avoid tripping','It is more polite to other pedestrians'],ans:1,explain:'Target selection research shows confident, aware-looking people are consistently passed over. Your demeanor changes your risk profile before any interaction begins.'},
+      {q:'If you think a car is following you while driving, what should you do?',opts:['Drive home quickly and go inside','Speed up to lose them','Make four consecutive right turns — if they follow all four, drive to a police station and call 911','Flash your lights and pull over'],ans:2,explain:'Four right turns form a loop no one follows by accident. Do not go home — go to a police station where you have safety and witnesses.'},
+      {q:'When should you lock your car doors after getting in?',opts:['After you have adjusted your seat and mirrors','After you have started the engine','Immediately upon getting in — before anything else','Before you pull out of the parking space'],ans:1,explain:'Immediately. Before your phone, music, or seatbelt. The moment the door closes, lock it.'}
+    ]
+  },
+  {
+    h:'Safe Dating — Online, First Meetings, and Red Flags',
+    b:`<p>Online dating and social media have fundamentally changed how people meet — and introduced new risks alongside new opportunities. Most people are who they say they are. Some are not. <strong>Ten minutes of verification before meeting can prevent serious harm.</strong></p>
+<p><strong>Before meeting someone from online:</strong></p>
+<ul>
+  <li>Reverse image search their profile photos using Google Images or TinEye — check for catfishing or stolen photos</li>
+  <li>Search their name + city + employer — does anything verify?</li>
+  <li>Video call before meeting — appearance and voice should match across calls</li>
+  <li>Ask specific questions about things they have mentioned — liars lose track of details over time</li>
+</ul>
+<p><strong>First meeting rules — non-negotiable:</strong></p>
+<ul>
+  <li>Meet in a busy, public place — coffee shop, restaurant, populated park. Never their home, your home, or anywhere isolated.</li>
+  <li>Tell a trusted friend exactly who you are meeting, where, and set a check-in time</li>
+  <li>Drive yourself or take your own rideshare — do not accept a ride from them on a first meeting</li>
+  <li>Keep your drink in sight at all times</li>
+  <li>Have a code word to text a friend that means "call me with a fake emergency"</li>
+  <li>Trust discomfort — you can always leave. "I have to go" is a complete sentence.</li>
+</ul>
+<p><strong>Red flags in early communication:</strong></p>
+<ul>
+  <li>Pushes quickly to move off the dating app to private messaging</li>
+  <li>Repeatedly avoids or refuses video call</li>
+  <li>Excessive flattery very early — "love bombing" creates false intimacy fast</li>
+  <li>Asks for money, gift cards, or financial help — <strong>always a scam, always</strong></li>
+  <li>Sends sexual content early and expects reciprocation — potential sextortion setup</li>
+  <li>Gets angry, guilt-trips, or becomes aggressive when you set any boundary</li>
+</ul>
+<p><strong>Sextortion:</strong> If someone obtains intimate images — consensually or not — and threatens to share them, this is a federal crime. Contact the FBI's IC3.gov and the Cyber Civil Rights Initiative (cybercivilrights.org) immediately.</p>`,
+    q:[
+      {q:'What should you always do before meeting someone from online for the first time?',opts:['Trust your feelings — verification is insulting','Tell a trusted person who you are meeting, where, and set a check-in time','Meet at their home for privacy and comfort','Accept a ride from them to build trust'],ans:1,explain:'A trusted person knowing your plans creates a safety net. This is non-negotiable regardless of how well you think you know someone online.'},
+      {q:'If someone you met online asks for money or gift cards, this is:',opts:['Acceptable if you have talked for a long time','A test of your generosity and trust','Almost always a scam — one of the most reliable red flags regardless of the story','A genuine request if their situation sounds difficult'],ans:2,explain:'Financial requests from online contacts — money, gift cards, cryptocurrency — are among the most consistent scam indicators. The story is always compelling.'},
+      {q:'What is "love bombing"?',opts:['A healthy expression of strong feelings','Excessive flattery and intense early attachment designed to create false intimacy quickly','A form of online harassment','Repeatedly sending flowers or gifts'],ans:1,explain:'Love bombing — overwhelming praise, fast declarations of deep feelings — is a manipulation tactic that creates dependency and makes victims ignore red flags.'}
+    ]
+  },
+  {
+    h:'Your Personal Safety Network — Connection Is Protection',
+    b:`<p>Predators isolate their targets. <strong>Connection is your most powerful long-term protection.</strong> A strong personal safety network is not paranoia — it is one of the most practical safety tools available to you.</p>
+<p><strong>Your three-layer safety network:</strong></p>
+<ol>
+  <li><strong>Inner Circle (2–3 people):</strong> People who know your schedule, your relationships, and your situation fully. You can call them at 2am. They have your location when you want them to. They would call police if you went silent.</li>
+  <li><strong>Aware Circle (5–10 people):</strong> Friends and family who know your general life and would notice if you went quiet or disappeared from communication for longer than normal.</li>
+  <li><strong>Community Layer:</strong> Neighbors who know your face, coworkers who would notice your absence, local businesses you frequent.</li>
+</ol>
+<p><strong>Check-in systems to set up today:</strong></p>
+<ul>
+  <li>Share your live location with 1–2 trusted people during dates, late nights, or travel to unfamiliar places</li>
+  <li>Establish a code word: one word texted means "I need help — call the police to my location"</li>
+  <li>Set time-based check-ins: "If I don't text you by midnight, call me immediately"</li>
+  <li>Tell someone your plan before going somewhere new, especially alone</li>
+</ul>
+<p><strong>Know your emergency resources:</strong></p>
+<ul>
+  <li>Address of the nearest police station and hospital to your home</li>
+  <li>Local domestic violence shelter phone number</li>
+  <li>Enable Emergency SOS on your phone (hold side button on iPhone; most Androids too)</li>
+  <li>Set up Medical ID (visible from lock screen) with emergency contacts listed</li>
+  <li>Label key contacts as ICE (In Case of Emergency): "ICE — Mom," "ICE — Best Friend"</li>
+</ul>
+<p style="background:rgba(239,68,68,.1);border-left:3px solid #ef4444;padding:.6rem .8rem;border-radius:6px;margin-top:.8rem;">
+  <strong>Key Numbers:</strong><br>
+  🆘 Emergency: 911<br>
+  💜 National DV Hotline: 1-800-799-7233<br>
+  💙 RAINN Sexual Assault: 1-800-656-4673<br>
+  🧠 Crisis/Suicide Line: 988
+</p>`,
+    q:[
+      {q:'What does your "inner circle" safety network consist of?',opts:['Your entire social media following','Everyone at your workplace','2-3 trusted people who fully know your situation and would call for help if you went silent','Only law enforcement contacts'],ans:2,explain:'Your inner circle is small, fully informed, and reachable at any hour. Quality and trust matter far more than size.'},
+      {q:'What does labeling phone contacts as "ICE" do?',opts:['Keeps the contact hidden from others','Marks them as international contacts','Makes them visible to first responders on a locked phone as emergency contacts','Automatically calls them during an emergency'],ans:2,explain:'ICE (In Case of Emergency) contacts are recognized by first responders. Label your most important contacts this way — it could matter when you cannot speak.'},
+      {q:'What is a code word system between friends?',opts:['A secret language for private conversations','A pre-agreed word or phrase texted that signals "I need help — call police to my location"','An app that tracks your location automatically','A way to communicate without using names'],ans:1,explain:'A code word is one of the simplest and most effective safety tools. One text to a prepared friend initiates a call for help — even when you cannot say so directly.'}
+    ]
+  }
+],
+
+investing:[
+  {
+    h:'Why Investing Is the Most Important Financial Skill You\'ll Ever Learn',
+    b:`<p>Most people think investing is for wealthy people or finance professionals. It isn\'t. It\'s for anyone who wants to have more money in the future than they have today.</p>
+<p><strong>The core idea:</strong> Put money to work so it earns more money — without you doing anything additional. This is called compound growth, and it is the closest thing to a financial superpower that exists.</p>
+<p><strong>The Rule of 72:</strong> Divide 72 by your annual return to find how many years it takes to double your money. At 8% return (roughly the S&P 500 average), your money doubles every 9 years.</p>
+<p><strong>Why starting young is everything:</strong></p>
+<ul>
+  <li>$150/month starting at age 16 → approximately $1.7 million by age 65 (at 8% avg return)</li>
+  <li>$150/month starting at age 30 → approximately $440,000 by age 65</li>
+  <li>Same contribution. 14-year head start. $1.26 million difference.</li>
+</ul>
+<p><strong>Why NOT investing is a guaranteed loss:</strong> Inflation runs about 3% per year. Cash in a checking account loses purchasing power every year. Not investing is not "playing it safe" — it\'s a guaranteed slow loss.</p>`,
+    tip:'Time in the market beats timing the market. The best time to start was yesterday. The second best time is today.',
+    q:[
+      {q:'At an 8% annual return, how long does it take to double your money (Rule of 72)?',a:['4 years','6 years','9 years','12 years'],c:2,e:'Rule of 72: divide 72 by the return rate. 72 ÷ 8 = 9 years. This rule works for any interest or return rate estimate.'},
+      {q:'Why is NOT investing often described as a guaranteed slow loss?',a:['The stock market always crashes','Banks charge fees on savings','Inflation erodes purchasing power of cash every year','Taxes take too much of savings'],c:2,e:'Inflation averages ~3%/year. Money sitting in a checking account loses 3% of its purchasing power annually. Not investing means falling behind.'},
+      {q:'Someone starts investing $150/month at 16 vs someone who starts at 30. The main advantage of starting at 16 is:',a:['Lower tax rates','More time for compound growth to work','Better investment options','Lower fund fees'],c:1,e:'Compound growth is exponential, not linear. The extra 14 years don\'t add 14 years of contributions — they create decades of additional growth ON the earlier growth.'},
+      {q:'What does "putting money to work" mean in investing?',a:['Getting a higher-paying job','Spending money on tools that earn income','Deploying capital into assets that grow in value or generate returns','Working more hours'],c:2,e:'Your money "works" when it\'s invested — growing through price appreciation, dividends, or interest. Unlike wages, this doesn\'t require your active time.'},
+      {q:'The best description of compound growth is:',a:['Earning interest only on your original investment','Earning returns on your returns over time, creating exponential growth','Getting a guaranteed return from the government','A type of savings account'],c:1,e:'Compound growth means your earnings generate their own earnings. Year 1 earnings are invested and generate Year 2 earnings, which generate Year 3 earnings — exponentially.'}
+    ]
+  },
+  {
+    h:'Understanding Stocks — Owning a Piece of Real Companies',
+    b:`<p>When you buy stock, you\'re buying a small ownership stake in a real company. If that company grows and becomes more valuable, your stake grows too.</p>
+<p><strong>How stocks make you money:</strong></p>
+<ul>
+  <li><strong>Price appreciation:</strong> The stock price rises as the company becomes more valuable</li>
+  <li><strong>Dividends:</strong> Some companies pay shareholders a portion of profits regularly (like Apple, Coca-Cola, Johnson & Johnson)</li>
+</ul>
+<p><strong>Index funds vs. individual stocks:</strong></p>
+<ul>
+  <li><strong>Individual stocks:</strong> Higher risk, higher potential reward. Requires research. Even professionals mostly fail to beat the market long-term.</li>
+  <li><strong>Index funds:</strong> Buy a tiny piece of 500+ companies at once. When the whole market grows, you grow. Lower fees, lower risk, better average performance than most active traders.</li>
+</ul>
+<p><strong>S&P 500 history:</strong> The index of America\'s 500 largest companies has averaged ~10% annual return over 100 years. There have been crashes — but the long-term trend is always up. Anyone who stayed invested through 2008 and 2020 came out ahead.</p>
+<p><strong>Fractional shares:</strong> You don\'t need $200+ to buy one share of Amazon. Most brokerages now let you buy $5 or $10 worth of any stock.</p>`,
+    tip:'Most professional fund managers fail to beat the S&P 500 index over 10+ years. Simple index investing outperforms complexity.',
+    q:[
+      {q:'When you buy a stock, you are:',a:['Lending money to a company','Buying a small ownership stake in that company','Paying for a guaranteed return','Purchasing a government bond'],c:1,e:'Shareholders are part-owners of the company. If the company grows and becomes more valuable, so does your ownership stake.'},
+      {q:'What is a dividend?',a:['A fee charged by the brokerage','A guaranteed return on investment','A portion of company profits paid to shareholders','A type of bond payment'],c:2,e:'Some profitable companies share earnings with shareholders through regular dividend payments. This creates income even if the stock price doesn\'t move.'},
+      {q:'Why do index funds typically outperform most actively managed funds?',a:['Index funds have famous managers','They own only the best stocks','Lower fees and broad diversification — most active managers can\'t consistently beat the market','The government guarantees their returns'],c:2,e:'Over 10+ years, ~80-90% of active fund managers underperform a simple S&P 500 index fund. Low fees and broad diversification compound into a significant advantage.'},
+      {q:'The S&P 500 represents:',a:['The 500 oldest American companies','America\'s 500 largest publicly traded companies','The top 500 tech companies','Government bonds from 500 states'],c:1,e:'The S&P 500 tracks America\'s 500 largest companies by market cap, spanning every major industry. It\'s the standard benchmark for measuring investment performance.'},
+      {q:'What are fractional shares?',a:['Stocks that have split into smaller pieces','The ability to buy a dollar amount of stock instead of full shares','Shares that have lower dividends','Stocks that can only be sold in portions'],c:1,e:'Fractional shares let you invest any dollar amount — like $10 in Amazon — without needing to afford a full share. This makes investing accessible from day one.'}
+    ]
+  },
+  {
+    h:'Retirement Accounts — Your Greatest Financial Tool',
+    b:`<p>A retirement account isn\'t just a place to save money — it\'s a legal tax shelter that can add hundreds of thousands of dollars to your wealth over a lifetime. Not using one is leaving real money on the table.</p>
+<p><strong>401(k) — Through your employer:</strong></p>
+<ul>
+  <li>Contributions come out of your paycheck before taxes — lowers your taxable income now</li>
+  <li><strong>Employer match is a guaranteed 100% return:</strong> If your employer matches 50% of contributions up to 6% of salary, contributing 6% of your $60K salary means they add $1,800 free. Never leave this uncollected.</li>
+  <li>2024 contribution limit: $23,000 per year</li>
+</ul>
+<p><strong>Roth IRA — Best account for young people:</strong></p>
+<ul>
+  <li>Contribute after-tax money now. All growth is completely tax-free forever.</li>
+  <li>$7,000/year contribution limit (2024)</li>
+  <li>$7,000 at age 18, growing at 8% for 47 years = approximately $243,000 — all tax-free</li>
+  <li>Because you\'re young, your tax rate is likely the lowest it\'ll ever be. Paying taxes now and never again is a great deal.</li>
+</ul>
+<p><strong>The contribution order:</strong></p>
+<ol>
+  <li>401(k) up to the employer match (free money — always first)</li>
+  <li>Max Roth IRA ($7,000/year)</li>
+  <li>Back to 401(k) if you have more to contribute</li>
+</ol>`,
+    tip:'An employer match on a 401(k) is a guaranteed 50-100% instant return on your contribution. It\'s the best investment you\'ll ever make.',
+    q:[
+      {q:'Why is collecting your full 401(k) employer match described as the best investment available?',a:['It grows tax-free forever','It\'s a guaranteed 50-100% instant return on your contribution','It has no contribution limit','It can be withdrawn anytime'],c:1,e:'If your employer matches 50 cents per dollar up to 6% of salary, you\'re getting a guaranteed 50% return on that portion before any market growth. No investment reliably beats that.'},
+      {q:'What makes a Roth IRA especially valuable for young people?',a:['Higher contribution limits than 401(k)','Employer matching contributions','Growth and withdrawals in retirement are completely tax-free, and your tax rate is low now','Government-guaranteed returns'],c:2,e:'Roth accounts are funded with after-tax money. Since young people are usually in lower tax brackets, paying taxes now and never paying again on decades of growth is an excellent deal.'},
+      {q:'What is the correct contribution priority order for retirement accounts?',a:['Roth IRA first, then 401(k)','401(k) to employer match → Roth IRA → more 401(k)','Max both simultaneously','Savings account first, then retirement accounts'],c:1,e:'Always capture free employer match money first (guaranteed return), then max the Roth IRA (tax-free growth), then return to 401(k). This order maximizes every dollar.'},
+      {q:'Traditional 401(k) contributions reduce your taxes because:',a:['The government subsidizes them','They come out pre-tax, lowering your taxable income in the current year','You can deduct them at any age','Employers pay the taxes for you'],c:1,e:'Pre-tax 401(k) contributions reduce your taxable income in the year you contribute. If you\'re in the 22% bracket and contribute $5,000, you save $1,100 in taxes that year.'},
+      {q:'The 2024 annual contribution limit for a Roth IRA is approximately:',a:['$3,000','$7,000','$15,000','$23,000'],c:1,e:'The 2024 Roth IRA limit is $7,000 per year ($8,000 if you\'re 50+). The 401(k) limit is $23,000. Both have income eligibility requirements for the Roth.'}
+    ]
+  },
+  {
+    h:'Mutual Funds, ETFs & The Power of Not Trying to Be Smart',
+    b:`<p>The investment industry spends billions of dollars convincing you that you need their experts to beat the market. The data disagrees. Simple, boring, low-cost index investing outperforms nearly every other strategy over 20+ years.</p>
+<p><strong>Mutual Funds:</strong> A pooled investment vehicle where many investors\' money is combined and managed by a professional who picks stocks. Usually has higher fees (1-2% expense ratio).</p>
+<p><strong>ETFs (Exchange-Traded Funds):</strong> Similar to mutual funds, but traded on the stock exchange like a stock. Usually track an index automatically. Lower fees (0.03-0.20% for index ETFs).</p>
+<p><strong>The fee impact is enormous:</strong></p>
+<ul>
+  <li>$10,000 invested for 30 years at 8% return with 0.05% fee → approximately $99,500</li>
+  <li>$10,000 invested for 30 years at 8% return with 1% fee → approximately $76,100</li>
+  <li>That 0.95% fee difference costs you $23,400 on a single $10,000 investment</li>
+</ul>
+<p><strong>Dollar-Cost Averaging (DCA):</strong> Invest the same amount every month regardless of market conditions. When prices are high, you buy fewer shares. When prices drop, you buy more. Over time, you automatically avoid the mistake of trying to time the market.</p>`,
+    tip:'Lower fees are the only guaranteed return in investing. Every 1% in fees you avoid keeps that 1% compounding for you instead.',
+    q:[
+      {q:'What is the primary advantage of ETFs over traditional mutual funds?',a:['They\'re government guaranteed','They have professional managers who pick stocks','They typically have much lower fees and trade on exchanges like stocks','They pay higher dividends'],c:2,e:'Index ETFs charge as little as 0.03% annually vs 1-2% for actively managed mutual funds. Over decades, this fee difference compounds into a massive wealth gap.'},
+      {q:'Dollar-cost averaging means:',a:['Buying stocks only when prices are low','Investing the same amount on a regular schedule regardless of market conditions','Averaging your gains and losses annually','Using a financial advisor to time markets'],c:1,e:'DCA removes emotion and timing guesswork. You invest consistently regardless of whether markets are up or down. Over time, you naturally buy more when prices are low.'},
+      {q:'On a $10,000 investment over 30 years, a 1% annual fee vs a 0.05% fee costs approximately:',a:['$500','$5,000','$23,000','$50,000'],c:2,e:'Fees compound against you just like returns compound for you. A seemingly small 1% annual fee extracts tens of thousands of dollars from your portfolio over decades.'},
+      {q:'Why do most actively managed mutual funds underperform index funds over 20+ years?',a:['Fund managers invest poorly on purpose','Higher fees and the near-impossibility of consistently predicting markets create a drag on returns','Active funds only hold bonds','They have too many investors'],c:1,e:'After fees (1-2%/year), active managers need to outperform the market by that margin just to match index funds. Over 20 years, roughly 80-90% of active funds fail to do this.'},
+      {q:'An index ETF like VOO or SPY is designed to:',a:['Beat the market every year','Track the performance of an index like the S&P 500','Invest only in tech companies','Guarantee no losses'],c:1,e:'Index ETFs simply mirror an index — they hold the same stocks in the same proportions. No active management, minimal fees, and historically strong long-term returns.'}
+    ]
+  },
+  {
+    h:'Planning for Retirement — The Numbers That Actually Matter',
+    b:`<p>Retirement planning doesn\'t require a financial advisor to understand. It requires knowing a few key numbers and starting early enough for them to work.</p>
+<p><strong>The 4% Rule:</strong> You can withdraw 4% of your portfolio annually in retirement without running out of money over 30 years. This means:</p>
+<ul>
+  <li>If you spend $40,000/year in retirement → you need $1,000,000 saved ($40K ÷ 0.04)</li>
+  <li>If you spend $60,000/year in retirement → you need $1,500,000 saved</li>
+  <li>Your target number = annual expenses × 25</li>
+</ul>
+<p><strong>Monthly contributions needed by starting age (to reach $1M at 65, assuming 8% return):</strong></p>
+<ul>
+  <li>Start at 20: ~$200/month</li>
+  <li>Start at 25: ~$300/month</li>
+  <li>Start at 30: ~$435/month</li>
+  <li>Start at 35: ~$670/month</li>
+  <li>Start at 40: ~$1,050/month</li>
+</ul>
+<p><strong>Social Security is not a retirement plan:</strong> The average Social Security benefit is approximately $1,900/month. Most Americans need significantly more. Treat it as a bonus, not a strategy.</p>
+<p><strong>The 15-20% rule:</strong> Save 15-20% of gross income for retirement throughout your working life. Automate it so it happens before you can spend it.</p>`,
+    tip:'Your target retirement number is your annual expenses multiplied by 25. That\'s it. That\'s the math.',
+    q:[
+      {q:'Using the 4% rule, how much do you need saved if you plan to spend $50,000 per year in retirement?',a:['$500,000','$750,000','$1,250,000','$2,000,000'],c:2,e:'4% rule: target = annual expenses ÷ 0.04 = annual expenses × 25. $50,000 × 25 = $1,250,000. This amount, withdrawn at 4% annually, historically lasts 30+ years.'},
+      {q:'How much MORE does waiting from age 20 to age 30 cost you per month to still reach $1M by 65?',a:['About $50 more','About $100 more','About $235 more','About $850 more'],c:2,e:'Starting at 20 requires ~$200/month. Starting at 30 requires ~$435/month — about $235 more monthly to reach the same goal. That\'s the real cost of a 10-year delay.'},
+      {q:'The standard recommendation for retirement savings as a percentage of gross income is:',a:['5%','10%','15-20%','25-30%'],c:2,e:'Most financial planners recommend 15-20% of gross income for retirement savings throughout your working years. Automating this ensures it happens before lifestyle inflation sets in.'},
+      {q:'Social Security should be treated as:',a:['Your primary retirement income source','A guaranteed supplement to personal retirement savings','The only retirement planning you need','Something only poor people rely on'],c:1,e:'Average Social Security benefit is ~$1,900/month — not enough for most people. It\'s a supplement to personal savings, not a complete retirement plan. Never rely on it alone.'},
+      {q:'The formula for calculating your personal retirement target number is:',a:['Current savings × 10','Annual income × 15','Annual expenses × 25','Monthly expenses × 300'],c:2,e:'Annual expenses × 25 gives you the portfolio size from which you can safely withdraw 4% annually. This is the standard application of the 4% rule.'}
+    ]
+  }
+],
+
+insurance:[
+  {
+    h:'Health Insurance — The System You Must Understand to Survive Adulthood',
+    b:`<p>Health insurance is one of the most complex and expensive systems you\'ll navigate as an adult. Most people don\'t understand it until they get a $4,000 bill they weren\'t expecting.</p>
+<p><strong>The key terms:</strong></p>
+<ul>
+  <li><strong>Premium:</strong> What you pay monthly just to have the insurance (whether or not you use it)</li>
+  <li><strong>Deductible:</strong> What you pay out-of-pocket before insurance starts paying. A $2,000 deductible means you pay the first $2,000 of costs yourself.</li>
+  <li><strong>Copay:</strong> A fixed amount you pay per visit (e.g., $30 per doctor visit)</li>
+  <li><strong>Coinsurance:</strong> After your deductible, you and insurance split costs — e.g., you pay 20%, insurance pays 80%</li>
+  <li><strong>Out-of-pocket maximum:</strong> The most you\'ll pay in a year. After this, insurance covers 100%.</li>
+</ul>
+<p><strong>HMO vs PPO vs HDHP:</strong></p>
+<ul>
+  <li><strong>HMO:</strong> Must use network providers and get referrals. Lower premiums.</li>
+  <li><strong>PPO:</strong> More flexibility to see any doctor. Higher premiums.</li>
+  <li><strong>HDHP (High Deductible):</strong> Lower premiums, high deductible. Best paired with an HSA.</li>
+</ul>
+<p><strong>HSA (Health Savings Account):</strong> Available with HDHPs. Triple tax advantage — contributions tax-free, growth tax-free, withdrawals for medical expenses tax-free. Unspent money rolls over forever.</p>
+<p><strong>Stay on your parent\'s plan until 26.</strong> Under the ACA, you can remain on a parent\'s health insurance until your 26th birthday. Almost always cheaper than your own plan.</p>`,
+    tip:'Always understand your out-of-pocket maximum before choosing a plan. That\'s the worst-case number you need to be prepared for.',
+    q:[
+      {q:'What is a health insurance deductible?',a:['The monthly premium you pay','The total cost of all your medical care','The amount you pay out-of-pocket before insurance begins covering costs','The maximum you\'ll ever pay in a year'],c:2,e:'The deductible is the threshold you must pay before insurance kicks in. A $3,000 deductible means the first $3,000 of medical costs each year are entirely your responsibility.'},
+      {q:'Until what age can you stay on a parent\'s health insurance plan under the ACA?',a:['21','23','25','26'],c:3,e:'The Affordable Care Act requires insurers to allow adult children to remain on a parent\'s plan until age 26. This is almost always the cheapest option for young adults.'},
+      {q:'An HSA (Health Savings Account) has which major tax advantage?',a:['You pay no taxes ever on any investments','Contributions, growth, and qualified medical withdrawals are all tax-free','Only contributions are tax-free','The government matches your contributions'],c:1,e:'The HSA is the only account with triple tax benefits: pre-tax contributions, tax-free growth, and tax-free withdrawals for medical costs. Unused funds roll over and can invest.'},
+      {q:'What does your out-of-pocket maximum represent?',a:['Your monthly premium','The most you will pay in medical costs in a year — after this insurance covers 100%','Your annual deductible','The maximum insurance will pay'],c:1,e:'The OOP maximum caps your annual exposure. After reaching it, your insurance covers 100% of covered services. This is the worst-case number for any given year.'},
+      {q:'Which insurance plan type typically offers the lowest monthly premium?',a:['PPO','HMO','HDHP (High Deductible)','Any plan with an HSA'],c:2,e:'HDHPs have the lowest premiums because you accept higher out-of-pocket costs before coverage kicks in. This trade-off works well for healthy young people with emergency savings.'}
+    ]
+  },
+  {
+    h:'Car Insurance — What You\'re Actually Required to Have',
+    b:`<p>Car insurance is legally required in almost every state. But "legally required" and "adequately protected" are very different things. Understanding what each coverage type does could save you tens of thousands of dollars.</p>
+<p><strong>The 6 coverage types:</strong></p>
+<ul>
+  <li><strong>Liability:</strong> Pays for damage you cause to OTHER people and their property. This is what\'s legally required. Low minimums are dangerously insufficient.</li>
+  <li><strong>Collision:</strong> Pays for damage to YOUR car from a collision, regardless of who\'s at fault</li>
+  <li><strong>Comprehensive:</strong> Pays for non-collision damage to your car — theft, weather, animals, falling objects</li>
+  <li><strong>Uninsured/Underinsured Motorist:</strong> Protects you when the at-fault driver has no insurance or insufficient coverage</li>
+  <li><strong>Medical Payments/PIP:</strong> Covers medical bills for you and passengers regardless of fault</li>
+  <li><strong>Gap Insurance:</strong> Covers the difference between what you owe on a car loan and the car\'s actual value after an accident</li>
+</ul>
+<p><strong>Teen premium reality:</strong> A 16-year-old added to a parent\'s policy typically adds $1,500-$2,500 per year. Your own policy could be $3,000-$6,000 annually.</p>
+<p><strong>Good student discount:</strong> Most insurers offer 5-25% discounts for maintaining a B average or above. This is thousands of dollars — keep your grades up.</p>`,
+    tip:'State minimum liability is almost always dangerously low. If you cause an accident and exceed those limits, you\'re personally liable for the rest.',
+    q:[
+      {q:'Which type of car insurance coverage is legally required in almost every state?',a:['Collision','Comprehensive','Liability','Gap insurance'],c:2,e:'Liability insurance is mandatory because it protects OTHER people from damage you cause. Collision and comprehensive protect your own car and are optional (unless required by a lender).'},
+      {q:'Gap insurance covers:',a:['Damage to other vehicles','Medical bills for your passengers','The difference between your loan balance and the car\'s market value after a total loss','Accidents that aren\'t your fault'],c:2,e:'If you owe $25,000 on a car loan but your totaled car is only worth $18,000, gap insurance covers that $7,000 difference. Without it, you\'d pay it out of pocket while having no car.'},
+      {q:'Why is state minimum liability coverage considered dangerous?',a:['It costs too much','It only covers the other driver, not you','Minimums are often far below the cost of a serious accident — you\'re personally liable for the excess','It doesn\'t cover property damage'],c:2,e:'Many state minimums are $25,000-$50,000 for bodily injury. A serious accident can cost $200,000+. You\'re personally responsible for anything above your coverage limit.'},
+      {q:'What does uninsured motorist coverage protect you from?',a:['Your own medical bills from any cause','Accidents where the at-fault driver has no or insufficient insurance','Theft of your vehicle','Weather-related damage'],c:1,e:'About 1 in 8 drivers is uninsured. If an uninsured driver hits you, your UM coverage pays for your damages and medical bills — otherwise you could be left with no compensation.'},
+      {q:'A good student discount on car insurance is available because:',a:['Students drive less','Insurers are legally required to offer it','Statistics show students with good grades are lower-risk drivers','Schools negotiate rates on behalf of students'],c:2,e:'Actuarial data shows students with strong grades tend to be more responsible drivers. Most major insurers offer 5-25% discounts for a B average or above — worth thousands annually.'}
+    ]
+  },
+  {
+    h:'Life Insurance — Who Needs It and What to Actually Buy',
+    b:`<p>Life insurance is one of the most misunderstood financial products, and the insurance industry profits from that confusion. Here\'s the clear version.</p>
+<p><strong>What life insurance actually does:</strong> It pays a lump sum to your beneficiaries when you die. The question is: who depends on your income?</p>
+<p><strong>Who needs life insurance:</strong></p>
+<ul>
+  <li>Anyone whose death would leave dependents without income (spouse, children, parents who depend on you)</li>
+  <li>Anyone with significant debt that would pass to a cosigner</li>
+</ul>
+<p><strong>Who probably doesn\'t need it yet:</strong> Single young adults with no dependents and no cosigned debt.</p>
+<p><strong>Term vs. Whole Life:</strong></p>
+<ul>
+  <li><strong>Term life:</strong> Coverage for a specific period (10, 20, 30 years). Pure death benefit. Cheap. $500,000 of coverage for a healthy 30-year-old: ~$25-35/month.</li>
+  <li><strong>Whole life:</strong> Permanent coverage with a cash value component. Much more expensive (5-10x). The investment component underperforms simple investing.</li>
+</ul>
+<p><strong>The expert consensus:</strong> Buy term and invest the difference. A $500,000 term policy at $30/month vs. whole life at $250/month — the $220 monthly difference invested in an index fund will almost always outperform the whole life cash value.</p>
+<p><strong>How much coverage:</strong> A common guideline is 10-12 times your annual income.</p>`,
+    tip:'If an insurance agent pushes hard on whole life, ask them to show you the internal rate of return. It\'s almost never competitive with simple index fund investing.',
+    q:[
+      {q:'Who most clearly NEEDS life insurance?',a:['All young adults as soon as they turn 18','A single 22-year-old with no dependents and no debt','A parent with a spouse and two children who depend on their income','Someone who already has significant savings'],c:2,e:'Life insurance exists to replace income that dependents rely on. A parent with a family depending on their paycheck has the clearest need. Single adults with no dependents rarely do.'},
+      {q:'The "buy term and invest the difference" strategy means:',a:['Invest in term life funds','Buy cheap term coverage and invest the premium savings from not buying expensive whole life','Buy both term and whole life','Invest only in insurance companies'],c:1,e:'Term insurance is 5-10x cheaper than whole life. The monthly savings, invested in index funds, typically generate more wealth than whole life\'s cash value component over the same period.'},
+      {q:'A standard guideline for how much life insurance coverage to purchase is:',a:['$1 million regardless of income','5 times your annual income','10-12 times your annual income','Enough to cover your mortgage only'],c:2,e:'10-12x annual income gives dependents enough to replace your earnings for a decade or more while invested assets grow. This gives surviving family time to adjust financially.'},
+      {q:'What is the main criticism of whole life insurance as an investment?',a:['It has no death benefit','The coverage expires after 20 years','The investment component\'s returns are consistently outperformed by simple index fund investing','It\'s only available to wealthy people'],c:2,e:'Whole life cash value grows slowly, fees are high, and the internal rate of return typically ranges from 1-4%. An S&P 500 index fund has averaged ~10% annually over decades.'},
+      {q:'A $500,000 term life policy for a healthy 30-year-old typically costs approximately:',a:['$5-10 per month','$25-35 per month','$100-150 per month','$250-400 per month'],c:1,e:'Term life is genuinely affordable for young healthy people. $25-35/month for $500K in coverage is common. This is why term is the recommended choice for pure protection needs.'}
+    ]
+  },
+  {
+    h:'Dental & Vision Insurance — Use Your Benefits Before You Lose Them',
+    b:`<p>Dental and vision insurance work differently from health insurance — and most people don\'t use them correctly, leaving hundreds or thousands of dollars of benefits unused every year.</p>
+<p><strong>How dental insurance actually works:</strong></p>
+<ul>
+  <li>Most plans cover preventive care (cleanings, X-rays) at 100%</li>
+  <li>Basic restorative (fillings) typically at 80%</li>
+  <li>Major work (crowns, root canals) typically at 50%</li>
+  <li><strong>Annual maximum:</strong> Most plans cap total coverage at $1,000-$2,000/year. Unlike health insurance, you lose unused benefits — they don\'t roll over.</li>
+</ul>
+<p><strong>The math on dental insurance:</strong></p>
+<ul>
+  <li>Annual premium: ~$250-400</li>
+  <li>Two cleanings per year: ~$200-300 each without insurance → $400-600 value</li>
+  <li>Two cleanings alone often covers the premium. Early cavity detection prevents $800-3,000 root canals.</li>
+</ul>
+<p><strong>How vision insurance works:</strong></p>
+<ul>
+  <li>Typically covers one eye exam per year (worth $100-200)</li>
+  <li>Allowance toward frames/contacts (usually $150-200 credit)</li>
+  <li>Premium is usually $15-25/month — use your exam and allowance and it almost always pays for itself</li>
+</ul>
+<p><strong>Critical rule:</strong> Use your dental and vision benefits every single year. They reset annually, and any unused value is simply gone.</p>`,
+    tip:'Your annual dental cleanings cost the insurer money — it\'s the insurer\'s financial incentive to keep you from needing expensive work. Use them every year.',
+    q:[
+      {q:'What happens to unused dental insurance benefits at the end of the year?',a:['They roll over to next year','They accumulate into a larger benefit','They are permanently lost — dental benefits reset annually','They can be converted to cash'],c:2,e:'Unlike FSA funds or HSA balances, standard dental insurance benefits don\'t roll over. Your annual maximum resets, and any unused portion simply disappears.'},
+      {q:'Most dental plans cover preventive care (cleanings and X-rays) at what percentage?',a:['50%','70%','80%','100%'],c:3,e:'Preventive care is typically covered at 100% because insurers benefit from catching problems early. A $300 cleaning prevents $3,000 root canals — it\'s in their financial interest too.'},
+      {q:'The annual maximum on most dental plans ($1,000-$2,000) means:',a:['You must pay the first $1,000-$2,000','The plan covers a maximum of $1,000-$2,000 in benefits per year','You can only visit the dentist $1,000-$2,000 worth of times','Your premium cannot exceed this amount'],c:1,e:'The annual maximum is the ceiling on what your insurance will pay out in a year. After that limit, you pay 100% of additional costs. Health insurance works the opposite way (OOP maximum).'},
+      {q:'Vision insurance typically covers:',a:['Laser eye surgery at no cost','One eye exam per year plus a frame/contact lens allowance','Unlimited eye exams','All prescription eyewear at 100%'],c:1,e:'Standard vision plans cover one annual exam and provide an allowance ($150-200) toward glasses or contacts. Premiums are low enough that using both benefits almost always covers the cost.'},
+      {q:'Why do two dental cleanings per year matter even beyond insurance?',a:['They whiten your teeth','They prevent bad breath only','They catch problems early, preventing expensive procedures that far exceed your annual premiums','Dentists are legally required to see you twice yearly'],c:2,e:'Early cavity detection means a $150 filling instead of an $1,800 root canal. Gum disease caught early prevents $3,000-$8,000 periodontal treatment. Prevention returns 10x or more in savings.'}
+    ]
+  }
+],
+
+travel:[
+  {
+    h:'Passports, Visas & ID — The Documents That Let You Travel',
+    b:`<p>Running out of passport pages, applying too late, or not knowing you need a visa are among the most common — and most preventable — travel disasters. Document preparation is the foundation of every international trip.</p>
+<p><strong>US Passport basics:</strong></p>
+<ul>
+  <li>Valid for 10 years (adults) or 5 years (under 16)</li>
+  <li>Apply 6+ months before travel — processing currently takes 6-12 weeks routine, 2-3 weeks expedited ($60 extra)</li>
+  <li>Many countries require 6 months of validity beyond your travel dates — a "valid" passport expiring in 3 months may still be refused</li>
+  <li>Cost: ~$165 for new passport (application + execution fee)</li>
+</ul>
+<p><strong>Visas:</strong></p>
+<ul>
+  <li>A visa is permission from another country to enter. Without it, you can be turned back at the border or denied boarding.</li>
+  <li>US citizens get visa-free or visa-on-arrival access to 180+ countries, but some popular destinations (China, Russia, India, Brazil, Saudi Arabia) require advance visas</li>
+  <li>Always check requirements at travel.state.gov — requirements change</li>
+  <li>Some visas take weeks or months to process. Apply early.</li>
+</ul>
+<p><strong>Real ID & Domestic travel:</strong></p>
+<ul>
+  <li>Starting May 2025, a Real ID-compliant driver\'s license (or passport) is required for domestic flights</li>
+  <li>Check for the star in the upper corner of your license</li>
+</ul>`,
+    tip:'Check your passport expiration date and the 6-month rule for your destination before booking any international trip. Rebooking fees cost far more than a passport renewal.',
+    q:[
+      {q:'How many months of passport validity do most countries require beyond your travel dates?',a:['1 month','3 months','6 months','12 months'],c:2,e:'Many countries require 6 months of passport validity beyond your intended stay. A passport expiring 3 months after your trip may result in being denied boarding or entry.'},
+      {q:'What is a visa?',a:['A type of credit card for travelers','Permission granted by a country for you to enter','Your passport photo page','Travel insurance documentation'],c:1,e:'A visa is official permission from a foreign government to enter their country. Without the required visa, you can be denied boarding before you even board the plane.'},
+      {q:'Where should you verify current visa requirements for international travel?',a:['The destination country\'s tourism website','Your airline\'s website','travel.state.gov — the official US State Department resource','A travel blog or social media post'],c:2,e:'travel.state.gov is the official, accurate, and current source for US passport holders. Travel blogs and tourism sites may be outdated. Requirements change with diplomatic relationships.'},
+      {q:'The Real ID requirement (starting May 2025) affects:',a:['International travel only','Passports renewals','Domestic US flights — non-compliant IDs won\'t be accepted at airport security','All government building access'],c:2,e:'Real ID-compliant licenses have a star in the upper corner. Without one (or a passport), you\'ll be denied through TSA security for domestic flights starting May 2025.'},
+      {q:'Standard US passport processing currently takes approximately:',a:['1-2 weeks','2-4 weeks','6-12 weeks (routine)','6 months minimum'],c:2,e:'Routine processing currently takes 6-12 weeks. Expedited service costs $60 extra and takes 2-3 weeks. Apply 6+ months before your trip to avoid paying rush fees or missing travel.'}
+    ]
+  },
+  {
+    h:'Travel Safety & Situational Awareness Abroad',
+    b:`<p>Most travel is safe. But being in an unfamiliar place where you don\'t speak the language and can\'t read signs creates vulnerability that smart preparation eliminates.</p>
+<p><strong>Before you leave:</strong></p>
+<ul>
+  <li>Register your trip at step.state.gov (Smart Traveler Enrollment Program) — free, takes 5 minutes, allows the embassy to contact you in emergencies</li>
+  <li>Know the local emergency number (not always 911 — it\'s 112 in Europe, 999 in UK, 110 in Japan for police)</li>
+  <li>Save your country\'s embassy address and phone number in your phone</li>
+  <li>Share your itinerary with someone at home including accommodation addresses</li>
+</ul>
+<p><strong>On the ground:</strong></p>
+<ul>
+  <li>Use hotel safes for passports — carry a color photocopy instead day-to-day</li>
+  <li>Keep one credit card and some cash in a separate location from your wallet</li>
+  <li>Look up your destination on travel.state.gov for current advisories before you go</li>
+  <li>Download offline maps (Google Maps works offline when downloaded in advance)</li>
+  <li>Avoid walking with your phone out in unfamiliar areas — phone theft is among the most common crimes against tourists</li>
+</ul>
+<p><strong>Common tourist scams:</strong></p>
+<ul>
+  <li>The "friendship bracelet" — someone puts it on your wrist then demands payment</li>
+  <li>Fake police officers asking to inspect your wallet</li>
+  <li>Taxi drivers "meters are broken" and quote outrageous fares</li>
+  <li>Distractions designed to draw your attention while an accomplice reaches for your bag</li>
+</ul>`,
+    tip:'A color photocopy of your passport stored separately from the original is invaluable if your passport is lost or stolen. It speeds up emergency replacement significantly.',
+    q:[
+      {q:'What is the STEP program (step.state.gov) and why should you register?',a:['A travel rewards program','A flight tracking service','Smart Traveler Enrollment — allows the US embassy to contact you in emergencies abroad','A visa application system'],c:2,e:'STEP is free and takes 5 minutes. In a natural disaster, civil unrest, or family emergency abroad, the embassy can reach you directly. It\'s one of the highest-value pre-trip steps you can take.'},
+      {q:'What is the emergency number in most of Europe?',a:['911','999','112','110'],c:2,e:'112 is the standard emergency number across the EU. 999 is the UK. 911 only works in North America. Knowing the local emergency number before you need it could save your life.'},
+      {q:'Why should you carry a photocopy of your passport instead of the original when sightseeing?',a:['The photocopy is legally accepted everywhere','Originals get damaged in humidity','If stolen or lost, a photocopy speeds up emergency replacement significantly','Originals are too heavy to carry'],c:2,e:'Your original passport is irreplaceable abroad. A photocopy keeps the original safe in the hotel safe while giving you ID documentation. Emergency passport replacement is much faster with a photocopy.'},
+      {q:'Someone in a popular tourist area approaches you and ties a bracelet on your wrist. You should:',a:['Accept it as a cultural gesture','Buy something from them out of politeness','Recognize it as a common scam and firmly decline before it\'s on your wrist','Report them to police immediately'],c:2,e:'The friendship bracelet scam works by creating a sense of obligation once the bracelet is on. The solution is to physically prevent it from being placed. "No thank you" while stepping back is effective.'},
+      {q:'Before traveling internationally, you should download offline maps because:',a:['Roaming charges make online maps expensive','Foreign maps aren\'t available online','In areas without reliable data or Wi-Fi, offline maps work without any connection','GPS doesn\'t work internationally'],c:0,e:'International roaming data can be expensive, and you\'ll often be in areas with poor connectivity. Google Maps allows you to download entire regions in advance for offline use.'}
+    ]
+  },
+  {
+    h:'Money Abroad — Currency, Cards & Not Getting Ripped Off',
+    b:`<p>Currency confusion and bad exchange rates are among the most expensive travel mistakes. Understanding how money moves internationally saves you real money on every trip.</p>
+<p><strong>Currency exchange — ranked worst to best:</strong></p>
+<ol>
+  <li><strong>Airport exchange kiosks:</strong> Worst rates. Markups of 10-15%. Use only in emergencies for a small amount.</li>
+  <li><strong>Hotel exchange desks:</strong> Slightly better but still poor rates.</li>
+  <li><strong>Local ATMs:</strong> Generally best rates — they use the real interbank exchange rate. Use your bank\'s network or one that reimburses ATM fees.</li>
+  <li><strong>Credit cards with no foreign transaction fees:</strong> Best for purchases. Cards like Chase Sapphire, Capital One, and Schwab debit give real exchange rates with zero markup.</li>
+</ol>
+<p><strong>Foreign transaction fees:</strong> Many US credit/debit cards charge 1-3% on every international purchase. On a $3,000 trip, that\'s $30-90 in invisible fees. Get a no-foreign-transaction-fee card before traveling.</p>
+<p><strong>Dynamic Currency Conversion (DCA) scam:</strong> When a merchant abroad asks "Would you like to pay in US Dollars or local currency?" — always choose LOCAL currency. Paying in USD at the point of sale lets the merchant apply their own (terrible) exchange rate.</p>
+<p><strong>Always carry some local cash:</strong> Small businesses, markets, street food, and taxis often don\'t accept cards. Have $50-100 equivalent in local currency at all times.</p>`,
+    tip:'When asked "pay in dollars or local currency?" abroad, always choose local currency. Choosing dollars gives the merchant control over the exchange rate — and they\'ll use a bad one.',
+    q:[
+      {q:'What is generally the BEST way to get local currency when traveling internationally?',a:['Airport exchange kiosks','Traveler\'s checks','Local ATMs using your bank card','Hotel exchange desks'],c:2,e:'Local ATMs use real interbank exchange rates — the best available rate. Airport kiosks apply 10-15% markups. Always use a bank card that reimburses or waives international ATM fees.'},
+      {q:'Dynamic Currency Conversion means:',a:['Your bank converts currency automatically','The merchant offers to charge you in your home currency, applying their own exchange rate','A fee for using foreign ATMs','Currency that changes value daily'],c:1,e:'DCA lets merchants apply their own exchange rate when you pay in your home currency. Their rate is always worse than your card\'s rate. Always choose to pay in local currency.'},
+      {q:'A foreign transaction fee of 3% on a $3,000 international trip costs you:',a:['$3','$30','$90','$300'],c:2,e:'3% × $3,000 = $90. This fee is invisible — it appears as a slightly different exchange rate, not a labeled charge. Using a no-foreign-transaction-fee card eliminates this entirely.'},
+      {q:'Why should you always carry some local cash when traveling internationally?',a:['Credit cards don\'t work internationally','Cash gets better exchange rates than cards','Many small businesses, markets, and taxis don\'t accept cards','ATMs aren\'t available outside major cities'],c:2,e:'Street food, local markets, small restaurants, and many taxis are cash-only worldwide. Running out of local cash in a remote area can leave you unable to pay for food or transportation.'},
+      {q:'Airport currency exchange kiosks should be used:',a:['For all currency needs — they\'re most convenient','Never under any circumstances','Only in emergencies for a small amount to cover immediate needs','They offer the best exchange rates'],c:2,e:'Airport kiosks offer the worst rates (10-15% markup) but are sometimes the only option on arrival. Use them for a minimal amount to get to your hotel or ATM, then get cash from a local ATM.'}
+    ]
+  },
+  {
+    h:'Packing Smart & Travel Health',
+    b:`<p>How you pack determines how miserable or comfortable your trip is. And being sick abroad — without knowing the healthcare system, the language, or your coverage — is one of the most stressful travel experiences possible.</p>
+<p><strong>The carry-on rule:</strong> Never check anything you can\'t afford to lose or wait 3 days to get. Airlines lose and delay bags routinely. Pack essentials (medications, valuables, one outfit) in your carry-on no matter what.</p>
+<p><strong>Packing principles:</strong></p>
+<ul>
+  <li><strong>Pack half, bring double the money:</strong> You\'ll buy things. You\'ll need less clothing than you think.</li>
+  <li><strong>Wear your heaviest items on the plane</strong> — shoes, jackets, jeans</li>
+  <li><strong>Roll, don\'t fold</strong> — more fits, less wrinkling</li>
+  <li><strong>A packing cube system</strong> separates categories and compresses clothing</li>
+  <li><strong>Power adapters:</strong> Different regions use different outlet types. Europe is Type C/E, UK is Type G, Australia is Type I.</li>
+</ul>
+<p><strong>Travel health essentials:</strong></p>
+<ul>
+  <li>Check CDC.gov for destination-specific vaccine recommendations — some are required, some strongly advised</li>
+  <li>Prescription medications: bring more than you need, keep in original packaging, carry in hand luggage</li>
+  <li><strong>Travel insurance:</strong> Costs $50-200 and covers trip cancellation, medical evacuation ($25,000-$100,000+ events), and lost luggage. Medical evacuation alone can cost $50,000-$200,000 without coverage.</li>
+  <li>Notify your bank before traveling internationally — otherwise they may freeze your card for suspected fraud</li>
+</ul>`,
+    tip:'Medical evacuation from a remote international destination can cost $50,000-$200,000. Travel insurance that covers this costs $50-200. It\'s one of the clearest value propositions in insurance.',
+    q:[
+      {q:'What is the most important reason to pack essential items in your carry-on?',a:['Carry-ons are free; checked bags cost money','Airlines lose and delay checked bags — you cannot afford to be without medications or valuables','Security checks carry-ons less thoroughly','Carry-ons arrive faster at the destination'],c:1,e:'Checked bag delays and losses are common. Medications, valuables, travel documents, and one set of clothes in your carry-on ensure you can function even if your checked bag is lost for days.'},
+      {q:'Before traveling internationally, you should notify your bank because:',a:['They need to update your address','International purchases may trigger fraud alerts and freeze your card','They charge less for international transactions when notified','It\'s legally required'],c:1,e:'Banks\' fraud detection flags unusual international transactions. A frozen card abroad is a serious problem. A 5-minute call or app notification before departure prevents this.'},
+      {q:'Travel insurance is especially valuable for covering:',a:['Normal medical care at your destination','Lost phone replacement','Medical evacuation — which can cost $50,000-$200,000 without coverage','Lost souvenirs'],c:2,e:'Repatriation and medical evacuation costs are catastrophic without insurance. A helicopter evacuation from a remote area or a medical flight home can cost six figures. Travel insurance covering this costs $50-200.'},
+      {q:'For international destination-specific vaccine requirements and recommendations, you should check:',a:['The airline\'s website','Your travel agent','cdc.gov — the CDC\'s official travel health resource','The destination country\'s embassy'],c:2,e:'CDC.gov maintains current vaccine requirements and recommendations by destination. Some are legally required for entry (yellow fever in certain countries); others are strongly advised for your safety.'},
+      {q:'Which outlet type is used in most of continental Europe?',a:['Type A (US standard)','Type G (UK)','Type C/E (continental Europe)','Type I (Australia)'],c:2,e:'Continental Europe uses Type C/E outlets. UK uses Type G (the 3-rectangular-pin plug). Australia and New Zealand use Type I. A universal adapter covers all types and is worth buying before departure.'}
+    ]
+  },
+  {
+    h:'Travel Budgeting & Booking Smart',
+    b:`<p>Travel doesn\'t have to be expensive. How you book, when you book, and how you structure your budget determines whether travel enriches your life regularly or feels like a once-a-decade luxury.</p>
+<p><strong>The booking timeline:</strong></p>
+<ul>
+  <li><strong>International flights:</strong> 2-6 months in advance is generally optimal. The "cheapest day" myth is largely false — use Google Flights\'s price tracking feature instead.</li>
+  <li><strong>Domestic flights:</strong> 1-3 months out. Tuesday/Wednesday departures are often cheaper.</li>
+  <li><strong>Hotels:</strong> Book refundable rates unless you\'re certain of your plans. Hotels can be booked closer to arrival than flights.</li>
+</ul>
+<p><strong>Travel budget categories to plan for:</strong></p>
+<ul>
+  <li>Flights (often 30-40% of budget)</li>
+  <li>Accommodation</li>
+  <li>Food (budget $30-60/day in most countries; less in Southeast Asia, more in Scandinavia)</li>
+  <li>Transportation (local transit, rideshare, rental cars)</li>
+  <li>Activities and entrance fees</li>
+  <li>Buffer (10-15% for unexpected costs — always include this)</li>
+</ul>
+<p><strong>Credit card travel rewards:</strong> Travel credit cards (Chase Sapphire, Capital One Venture, Amex Gold) earn points on everyday spending that can pay for flights and hotels. Used responsibly (paid in full monthly), they\'re a significant travel subsidy.</p>
+<p><strong>Travel hacking basics:</strong> Book award flights with points during off-peak periods. Fly into secondary airports (cheaper than main hubs). Stay slightly outside city centers (30% cheaper, often 10-minute transit ride).</p>`,
+    tip:'Always include a 10-15% buffer in your travel budget. Unexpected costs — a cab, a replacement item, a meal when nothing else is open — are guaranteed on any trip.',
+    q:[
+      {q:'When is the generally optimal time to book international flights?',a:['12+ months in advance for lowest prices','The day before for last-minute deals','2-6 months in advance','1 week before departure'],c:2,e:'Research shows 2-6 months is generally the sweet spot for international airfare. Booking too early or too late often results in higher prices. Google Flights price tracking helps you monitor trends.'},
+      {q:'A 10-15% budget buffer is recommended for travel because:',a:['Airlines charge surprise fees','Prices change after booking','Unexpected costs are guaranteed on any trip — small emergencies, replacements, unplanned needs','Currency exchange always costs 10-15%'],c:2,e:'No trip goes exactly as planned. A taxi when transit is closed, a replacement adapter, a meal when the original plan falls through — the buffer absorbs these without derailing your budget.'},
+      {q:'Travel credit card rewards are most beneficial when:',a:['You carry a balance to maximize points earned','You use the card only for travel purchases','You pay the balance in full monthly — earning rewards without paying interest','You apply for multiple cards simultaneously'],c:2,e:'Credit card rewards only make financial sense when paid in full. Interest charges at 20%+ APR erase all reward value instantly. Full monthly payment turns rewards into pure upside.'},
+      {q:'When booking hotels, booking a refundable rate is generally wise because:',a:['Refundable rates are always cheaper','Hotels don\'t honor non-refundable bookings','Plans change — a refundable rate preserves flexibility without financial penalty','Non-refundable hotels have worse service'],c:2,e:'Unless you\'re certain your plans are fixed, refundable rates give you flexibility. The price difference is usually small. Non-refundable rates can cost you the full amount if plans change.'},
+      {q:'Staying slightly outside the city center (10-15 minute transit ride) often saves:',a:['5%','10%','20-30% on accommodation costs','50% or more'],c:2,e:'Accommodation prices drop significantly just outside the tourist core — often 20-30% for the same quality. With a 10-minute metro ride, you get the full city experience at a much lower price.'}
+    ]
+  }
+],};
+
+let _quizAnswered = false;
+let _quizShuffled = [];
+
+SK_QUIZ = {
+taxes:[
+  {q:'What is the federal tax filing deadline each year?',opts:['March 15','April 15','May 1','June 1'],ans:1,explain:'April 15 is the annual federal deadline. If it falls on a weekend, it shifts to the next business day.'},
+  {q:'What does a W-2 form represent?',opts:['Freelance income you earned','Income taxes you owe','Wages paid and taxes withheld by an employer','Your total net worth'],ans:2,explain:'A W-2 is issued by employers and shows your gross wages and all taxes withheld during the year.'},
+  {q:'If you are self-employed, what is the self-employment tax rate on net earnings?',opts:['7.65%','12.4%','15.3%','22%'],ans:2,explain:'Self-employed individuals pay 15.3% — both the employee (7.65%) and employer (7.65%) halves of Social Security and Medicare.'},
+  {q:'What is a tax deduction?',opts:['Money the government gives back to you','An amount that reduces your taxable income','A penalty for filing late','A credit applied directly to your tax bill'],ans:1,explain:'Deductions reduce your taxable income, which indirectly lowers your tax bill. Credits reduce the actual tax owed dollar-for-dollar.'},
+  {q:'Which of these is NOT a zero income-tax state?',opts:['Texas','Florida','Nevada','Georgia'],ans:3,explain:'Georgia charges state income tax. Texas, Florida, and Nevada have no state income tax.'},
+  {q:'What happens if you do not file your taxes on time?',opts:['Nothing — IRS automatically files for you','You get a penalty for failing to file, even if you cannot pay','The IRS forgets about it after 2 years','Your employer pays on your behalf'],ans:1,explain:'Failure-to-file penalties are larger than failure-to-pay penalties. Always file even if you cannot pay the full amount.'},
+  {q:'What does FICA stand for and what does it fund?',opts:['Federal Income Credit Act — housing','Federal Insurance Contributions Act — Social Security & Medicare','Financial Interest Collection Agency — debt recovery','Federal Integrated Claims Account — unemployment'],ans:1,explain:'FICA funds Social Security and Medicare. Employees pay 7.65%, employers match it. Self-employed pay 15.3% total.'},
+],
+car:[
+  {q:'When jump-starting a car, which cable connects first?',opts:['Black to dead battery negative','Red to dead battery positive','Black to working car negative','It does not matter'],ans:1,explain:'Connect red (positive) to the dead battery first, then red to good battery, then black to good battery, then black to unpainted metal on the dead car.'},
+  {q:'How often should you typically change conventional motor oil?',opts:['Every 1,000 miles','Every 3,000–5,000 miles','Every 10,000–15,000 miles','Once a year regardless of mileage'],ans:1,explain:'Conventional oil should be changed every 3,000–5,000 miles. Synthetic oil can go 7,500–10,000 miles between changes.'},
+  {q:'What does a car\'s deductible mean on an insurance policy?',opts:['The monthly premium you pay','The amount you pay out-of-pocket before insurance covers a claim','The maximum the insurer will ever pay','A discount for good driving'],ans:1,explain:'The deductible is what you pay first on a claim. A higher deductible lowers your monthly premium but means more out-of-pocket after an accident.'},
+  {q:'When using the penny test on tires, what does seeing Lincoln\'s entire head mean?',opts:['Tires are like new','Tires are okay for another 6 months','Tires need to be replaced immediately','Tires need rotation but not replacement'],ans:2,explain:'If you insert a penny with Lincoln\'s head down and can see his full head, your tread depth is under 2/32" — legally and safely worn out. Replace them.'},
+  {q:'What is the maximum recommended speed on a spare "donut" tire?',opts:['35 mph','50 mph','65 mph','Same as normal tires'],ans:1,explain:'Spare donut tires are rated for a maximum of 50 mph and should not be driven more than 50–70 miles. They are temporary emergency solutions only.'},
+],
+health:[
+  {q:'According to the CDC, how many minutes of moderate exercise per week do adults need?',opts:['60 minutes','90 minutes','150 minutes','300 minutes'],ans:2,explain:'The CDC recommends 150 minutes of moderate-intensity aerobic activity per week, plus muscle-strengthening activities 2+ days per week.'},
+  {q:'When should you go to the ER vs. Urgent Care?',opts:['ER for a minor cut; Urgent Care for chest pain','ER for chest pain/stroke; Urgent Care for infections and minor injuries','They are interchangeable — go to whichever is closer','Urgent Care for everything to save money'],ans:1,explain:'ERs handle life-threatening emergencies: chest pain, difficulty breathing, stroke symptoms, severe injuries. Urgent Care handles non-life-threatening issues when your doctor is unavailable.'},
+  {q:'What is considered a normal blood pressure reading?',opts:['140/90','130/80','Under 120/80','Over 100/60'],ans:2,explain:'Normal blood pressure is under 120/80 mmHg. 130/80 and above is considered hypertension Stage 1 and should be monitored.'},
+  {q:'How much water should an average adult drink per day?',opts:['32 oz (4 cups)','Half your body weight in ounces','At least 1 gallon regardless of weight','8 oz total'],ans:1,explain:'A common guideline is to drink half your body weight in ounces daily. A 160 lb person would target 80 oz (about 10 cups).'},
+  {q:'How often should adults get an annual physical exam?',opts:['Only when sick','Every 5 years','Once a year','Every other year for people under 40'],ans:2,explain:'Annual physicals catch silent issues early — high blood pressure, cholesterol, blood sugar — before they cause serious problems. Most insurance covers them 100%.'},
+],
+credit:[
+  {q:'What is the most important factor in your credit score?',opts:['Credit utilization','Length of credit history','Payment history','Types of credit'],ans:2,explain:'Payment history makes up 35% of your FICO score. One late payment can drop your score 50–100 points. Set up autopay for at least the minimum payment.'},
+  {q:'What credit utilization ratio should you stay under for a good credit score?',opts:['10%','30%','50%','75%'],ans:1,explain:'Keeping your credit utilization under 30% of your total limit is recommended. Under 10% is even better for maximum score benefit.'},
+  {q:'What credit score range is considered "good" by most lenders?',opts:['300–500','500–600','670–739','800–850'],ans:2,explain:'670–739 is considered "Good" by FICO. 740–799 is "Very Good" and 800+ is "Exceptional." Good credit unlocks lower interest rates saving you thousands.'},
+  {q:'What is the best way for someone with no credit history to start building credit?',opts:['Take out a large personal loan','Apply for multiple credit cards at once','Become an authorized user on a parent\'s card or get a secured card','Wait until age 25 when credit builds automatically'],ans:2,explain:'Becoming an authorized user on a responsible person\'s card or getting a secured credit card (deposit-backed) are the safest ways to start building credit with no history.'},
+  {q:'What should you ALWAYS do with a credit card to avoid interest charges?',opts:['Pay the minimum balance each month','Pay the full statement balance each month','Pay any amount before the due date','Keep the balance under your credit limit'],ans:1,explain:'Paying the full statement balance every month means you pay zero interest. Paying only the minimum on a $1,000 balance at 24% APR can take 5+ years and cost $1,000+ in interest.'},
+],
+cooking:[
+  {q:'What internal temperature must chicken reach to be safe to eat?',opts:['145°F','155°F','165°F','180°F'],ans:2,explain:'Chicken must reach an internal temperature of 165°F (74°C) to kill harmful bacteria like Salmonella. Always use an instant-read thermometer.'},
+  {q:'How long can cooked food safely stay at room temperature?',opts:['30 minutes','1 hour','2 hours','4 hours'],ans:2,explain:'The USDA "Danger Zone" rule: bacteria multiply rapidly between 40°F–140°F. Cooked food left at room temperature for more than 2 hours should be discarded.'},
+  {q:'Which is the best method to thaw frozen meat safely?',opts:['On the kitchen counter','Under hot running water','In the refrigerator overnight','In the microwave then re-freeze'],ans:2,explain:'Thawing in the refrigerator is the safest method. Counter thawing allows the outer layer to reach unsafe temperatures while the inside is still frozen.'},
+  {q:'What does "Best By" on a food package mean?',opts:['The food is dangerous after this date','The food is at peak quality before this date — often still safe after','The store must remove it from shelves by this date','It is a legal safety requirement'],ans:1,explain:'"Best By" indicates peak quality, not a safety cutoff. Use your senses to judge. "Use By" dates are the ones to strictly follow for safety.'},
+  {q:'Why is a dull kitchen knife considered more dangerous than a sharp one?',opts:['Dull knives cut at unexpected angles','You apply more force with a dull knife and it can slip off food','Dull knives heat up and can cause burns','Sharp knives are actually more dangerous'],ans:1,explain:'With a dull knife, you press harder to cut, and that pressure causes the blade to slip unpredictably. A sharp knife cuts with control and less force.'},
+],
+home:[
+  {q:'What should you do immediately upon moving into a rental?',opts:['Paint the walls your preferred color','Photograph every room and document every existing damage','Introduce yourself to all neighbors','Replace the smoke detector batteries'],ans:1,explain:'Timestamped photos of every existing scuff, damage, and appliance protect your security deposit. Send them to your landlord immediately to create a documented record.'},
+  {q:'What does a renter\'s insurance policy cover?',opts:['Structural damage to the building','Only theft — not fire or water damage','Your personal belongings from theft, fire, and water damage','Liability only — not your possessions'],ans:2,explain:'Renter\'s insurance covers YOUR belongings. The landlord\'s insurance covers the building. At $10–20/month, it\'s one of the best insurance values available.'},
+  {q:'How often should you clean your dryer lint trap?',opts:['Monthly','Weekly','Every load','Only when visibly full'],ans:2,explain:'The lint trap should be cleaned before or after EVERY load. Lint buildup is a leading cause of house fires. It also makes your dryer less efficient.'},
+  {q:'How many days\' notice must you typically give before leaving a rental?',opts:['7 days','14 days','30–60 days','90 days'],ans:2,explain:'Most leases require 30–60 days written notice before vacating. Check your specific lease — violating this can cost you your security deposit or additional rent.'},
+  {q:'What is the best way to document a maintenance issue with your landlord?',opts:['Call them verbally','Text or email — anything with a written record','Leave a note under their door','Tell the building manager in person'],ans:1,explain:'Text messages and emails create timestamped written records. If a dispute arises, you need documented proof that you reported the issue and when.'},
+],
+career:[
+  {q:'When building a resume, how long should it typically be for someone with under 10 years of experience?',opts:['As long as needed — more is better','Exactly 2 pages','1 page','Half a page to seem concise'],ans:2,explain:'One page is the standard for candidates with under 10 years of experience. Recruiters spend an average of 7 seconds scanning a resume — make every line count.'},
+  {q:'What does the STAR method stand for in job interviews?',opts:['Skills, Tasks, Abilities, Results','Situation, Task, Action, Result','Strategy, Team, Approach, Review','Success, Talent, Achievement, Recognition'],ans:1,explain:'STAR = Situation, Task, Action, Result. This framework structures behavioral interview answers into clear, compelling stories with measurable outcomes.'},
+  {q:'What percentage of jobs are filled through networking rather than job postings?',opts:['25%','40%','70–85%','Over 95%'],ans:2,explain:'Studies consistently show 70–85% of jobs are filled through networking. Job boards are competitive. Relationships open doors that applications cannot.'},
+  {q:'What should you do within 24 hours of a job interview?',opts:['Call to check the status of the job','Send a thank-you email referencing something specific from the conversation','Wait for them to contact you','Follow up weekly until you hear back'],ans:1,explain:'A thank-you email within 24 hours is sent by fewer than 30% of candidates. It shows professionalism, reinforces your interest, and keeps you top of mind.'},
+  {q:'What does 401k employer matching mean?',opts:['The employer manages your retirement investments for you','The employer contributes money to your 401k based on how much you contribute','Your 401k doubles every 4 years guaranteed','You pay no taxes on 401k withdrawals'],ans:1,explain:'Employer matching is free money — if your employer matches 3% and you contribute 3%, they add an additional 3%. Not contributing enough to get the full match is leaving compensation on the table.'},
+],
+cooking:[
+  {q:'What internal temperature must chicken reach to be safe to eat?',opts:['145°F','155°F','165°F','180°F'],ans:2,explain:'Chicken must reach 165°F internally. Always verify with a meat thermometer — visual cues alone are unreliable.'},
+  {q:'How long can cooked food safely sit at room temperature?',opts:['30 min','1 hour','2 hours','4 hours'],ans:2,explain:'Bacteria multiply rapidly between 40–140°F. After 2 hours in this danger zone, food should be discarded.'},
+  {q:'What is the safest method to thaw frozen meat?',opts:['Counter overnight','Under hot water','In the refrigerator','Microwave then refreeze'],ans:2,explain:'Refrigerator thawing keeps food safe throughout. Counter thawing lets the exterior reach unsafe temps while the interior stays frozen.'},
+  {q:'"Best By" on a food label means:',opts:['Dangerous after this date','Peak quality date — often safe after','Store must remove it by this date','Legal safety requirement'],ans:1,explain:'"Best By" is a quality indicator, not a safety cutoff. Trust your senses. "Use By" is the date to strictly follow.'},
+  {q:'Why is a dull knife more dangerous than a sharp one?',opts:['Cuts at odd angles','You press harder and it slips','Heats up during use','Sharp knives are actually more dangerous'],ans:1,explain:'A dull knife requires more force, increasing the chance it will slip off food unpredictably. Sharp knives cut with control.'},
+],
+mental:[
+  {q:'What is the 4-7-8 breathing technique used for?',opts:['Increasing energy before exercise','Activating the parasympathetic nervous system to reduce anxiety','Improving lung capacity over time','Falling asleep faster only'],ans:1,explain:'4-7-8 breathing (inhale 4 sec, hold 7, exhale 8) activates the parasympathetic (rest-and-digest) nervous system, countering the fight-or-flight stress response within minutes.'},
+  {q:'Depression is best described as:',opts:['Just feeling sad for a few days','Persistent low mood for 2+ weeks that interferes with daily life, a treatable medical condition','A character flaw or weakness','Only affecting people who have had trauma'],ans:1,explain:'Depression is a medical condition — not weakness. It involves persistent symptoms for 2+ weeks. It is highly treatable with therapy, medication, or both.'},
+  {q:'Which of these is a healthy coping mechanism for stress?',opts:['Isolating yourself from others','Binge-watching to numb out','Regular exercise and physical movement','Overworking to stay distracted'],ans:2,explain:'Exercise is one of the most powerful stress reducers — it changes brain chemistry by releasing endorphins and reducing cortisol. Effects last for hours.'},
+  {q:'How many hours of daily social media use is associated with increased depression and anxiety in teens?',opts:['1 hour','2 hours','3+ hours','5+ hours'],ans:2,explain:'Research consistently shows 3+ hours of daily social media use correlates with significantly higher rates of depression and anxiety, particularly due to social comparison.'},
+  {q:'When should you consider seeing a therapist?',opts:['Only in a mental health crisis','Only if diagnosed with a disorder','For growth, repeated patterns, persistent anxiety/depression, or trauma — not just crisis','Only if your doctor refers you'],ans:2,explain:'Therapy is not just for crisis — it\'s a tool for growth, understanding patterns, processing experiences, and building resilience. Most insurance covers it.'},
+],
+faith:[
+  {q:'According to Proverbs 3:5-6, what should you trust with ALL your heart?',opts:['Your own wisdom and understanding','Your family and close friends','The LORD — not leaning on your own understanding','Your intuition and gut feelings'],ans:2,explain:'Proverbs 3:5-6 — "Trust in the LORD with all your heart and lean not on your own understanding; in all your ways submit to him, and he will make your paths straight."'},
+  {q:'What does the ACTS method of prayer stand for?',opts:['Ask, Claim, Trust, Surrender','Adoration, Confession, Thanksgiving, Supplication','Accept, Confess, Thank, Seek','Action, Commitment, Truth, Surrender'],ans:1,explain:'ACTS: Adoration (praising God for who He is), Confession (honesty about shortfalls), Thanksgiving (specific gratitude), Supplication (specific requests for yourself and others).'},
+  {q:'Where is a good place to start reading the Bible as a new reader?',opts:['Genesis — start from the beginning','Revelation — see the end first','The Gospel of John — to understand who Jesus is','Psalms — for emotional connection first'],ans:2,explain:'The Gospel of John is widely recommended as the best starting point because it clearly presents who Jesus is, why He came, and what He offers. Then read Mark for what Jesus did.'},
+  {q:'What does integrity mean in the context of Christian character?',opts:['Being perfect and never making mistakes','Being truthful only with authority figures','Who you are when no one is watching — consistent character','Attending church every week without fail'],ans:2,explain:'Integrity is consistency between your public and private self. Daniel, Joseph, and David were all tested in obscurity before being entrusted with influence. Character is built in private.'},
+  {q:'Malachi 3:10 is associated with which financial principle?',opts:['Saving 10% of your income','Avoiding all debt','Tithing — giving the first 10% to God','Investing in real estate'],ans:2,explain:'Malachi 3:10 says "Bring the whole tithe into the storehouse... Test me in this, says the LORD Almighty, and see if I will not throw open the floodgates of heaven." The tithe (10%) is a test of trust.'},
+],
+emergency:[
+  {q:'When calling 911, what information should you give FIRST?',opts:['Your name','Your phone number','Your location and the nature of the emergency','How many people are involved'],ans:2,explain:'Always state your location first — dispatchers can send help immediately even if the call drops. Then describe the emergency clearly and stay on the line.'},
+  {q:'During hands-only CPR, how fast should you compress the chest?',opts:['60 compressions per minute','100–120 compressions per minute','140 compressions per minute','As fast as you can'],ans:1,explain:'100–120 compressions per minute is the recommended rate — roughly the beat of "Stayin\' Alive" by the Bee Gees. Compress at least 2 inches deep on the center of the chest.'},
+  {q:'What should you do if a door handle is hot during a fire?',opts:['Open it slowly to let air in','Do not open it — find another exit','Pour water on it first then open','Knock it down with your shoulder'],ans:1,explain:'A hot door handle means fire or extreme heat is on the other side. Opening it could cause a backdraft. Find another exit, or signal from a window.'},
+  {q:'What is the first step in treating severe bleeding?',opts:['Apply a tourniquet immediately','Elevate the limb above the heart','Apply firm direct pressure with the cleanest material available','Call 911 before doing anything'],ans:2,explain:'Direct pressure is always the first step. Maintain it without lifting to check — that breaks the clot forming. Elevate if possible. Tourniquet for uncontrolled limb bleeding.'},
+  {q:'How much water should an emergency kit contain per person per day?',opts:['Half a gallon','1 gallon','2 gallons','As much as possible'],ans:1,explain:'FEMA recommends 1 gallon of water per person per day. Prepare at least a 72-hour (3-day) supply. More in hot climates or for people with medical needs.'},
+],
+relationships:[
+  {q:'What is the biggest red flag in a relationship?',opts:['Disagreeing about money','Different music tastes','Isolating you from family and friends','Being introverted'],ans:2,explain:'Isolation from your support network is the #1 warning sign of a controlling or abusive relationship. Healthy relationships support your other connections, not undermine them.'},
+  {q:'Which communication style leads to healthier conflict resolution?',opts:['"You always do this..."','"I feel hurt when..."','"This is your fault."','"Fine, whatever."'],ans:1,explain:'"I feel..." statements express your experience without attacking. "You always/never..." statements trigger defensiveness. Healthy conflict addresses feelings and behaviors, not character.'},
+  {q:'What does setting a boundary mean?',opts:['Ending a relationship','Building emotional walls to protect yourself','Clearly communicating how you need to be treated and following through','Telling others what they should do'],ans:2,explain:'Boundaries are clear guidelines for how you need to be treated — not walls, ultimatums, or attempts to control others. Set them clearly, follow through, and respect others\' boundaries too.'},
+  {q:'Who do you become like over time, according to research and wisdom?',opts:['Whoever you follow online','The 5 people you spend the most time with','Your childhood role models','Your parents, regardless of other influences'],ans:1,explain:'Jim Rohn\'s famous observation — "You are the average of the five people you spend the most time with" — is backed by research on social influence and behavioral contagion.'},
+  {q:'What is the correct order of the conflict resolution steps?',opts:['Respond immediately while emotions are fresh','Cool down → right time/place → address behavior → listen → agree on solution → follow through','Address it publicly so others can mediate','Send a long text explaining your full perspective'],ans:1,explain:'Addressing conflict immediately while emotionally charged usually escalates it. Cool down first, then choose the right time and private place. Address behavior (not the person), listen fully, agree on a specific solution.'},
+],
+digital:[
+  {q:'What is the most secure approach to managing passwords?',opts:['Use one strong password for everything','Use a password manager with unique passwords for every account','Write them in a notebook','Use your birthdate with different symbols'],ans:1,explain:'Password managers like Bitwarden (free) generate and store unique, complex passwords for every account. One password is one breach away from losing everything.'},
+  {q:'What is a key warning sign of a phishing email?',opts:['It comes from a company you use','It uses your full name','It creates urgency and asks you to click a link or provide credentials','It has a professional-looking logo'],ans:2,explain:'Phishing emails create false urgency ("Your account will be closed!") and direct you to fake login pages. Legitimate companies never ask for passwords via email.'},
+  {q:'What does "your digital footprint" refer to?',opts:['Your internet browsing speed','The trail of data and content you leave online','How much storage your files use','Your social media follower count'],ans:1,explain:'Your digital footprint is every post, comment, like, purchase, and search — anything that can be found about you online. Future employers, colleges, and partners regularly search this.'},
+  {q:'How do free apps typically generate revenue?',opts:['Government grants for technology','Selling data about you — your behavior, location, and connections','Donations from satisfied users','Advertising from partner companies only'],ans:3,explain:'Most free apps make money from advertising AND selling or sharing data about you. Your behavior, location, interests, and social connections are incredibly valuable. "If the product is free, you are the product."'},
+  {q:'What is two-factor authentication (2FA)?',opts:['Using two different passwords','A second verification step (like a code texted to your phone) in addition to your password','Logging in from two devices simultaneously','A backup email for password recovery'],ans:1,explain:'2FA adds a second layer of security — even if someone steals your password, they cannot access your account without also having your phone or authenticator app. Enable it everywhere possible.'},
+],
+civic:[
+  {q:'At what age can U.S. citizens register to vote?',opts:['16','17','18','21'],ans:2,explain:'U.S. citizens can register to vote at 18. Many states allow pre-registration at 16-17. Visit vote.org to register. Register at least 30 days before an election.'},
+  {q:'What does the First Amendment protect?',opts:['The right to bear arms','The right to a fair trial','Freedom of speech, religion, press, and assembly','Protection from unreasonable search and seizure'],ans:2,explain:'The First Amendment protects freedom of speech, religion, the press, peaceful assembly, and the right to petition the government. The Second Amendment covers arms; the Fourth covers search and seizure.'},
+  {q:'If stopped by police, what right does the Fifth Amendment give you?',opts:['The right to refuse a breathalyzer','The right to remain silent — not to incriminate yourself','The right to record the interaction','The right to have a lawyer present immediately'],ans:1,explain:'The Fifth Amendment protects you from self-incrimination. You have the right to remain silent. Clearly and calmly state: "I am invoking my Fifth Amendment right to remain silent."'},
+  {q:'What is the sequence for how a bill becomes federal law?',opts:['President proposes → Congress votes → Supreme Court approves','Bill introduced → passes House → passes Senate → President signs','Senate writes it → House approves → States ratify','Any citizen can propose → Congress votes → President signs'],ans:1,explain:'A bill is introduced in either chamber, must pass both the House and Senate (often in identical form), then goes to the President to sign into law or veto.'},
+  {q:'How can you check if a news source is biased?',opts:['See how many followers they have','Check if the stories make you feel good','Use tools like AllSides.com to compare how different outlets cover the same story','Only trust sources over 50 years old'],ans:2,explain:'AllSides.com rates media bias and shows how different outlets cover the same story. FactCheck.org and PolitiFact check specific claims. Primary sources (original documents, official statements) are always most reliable.'},
+],
+family:[
+  {q:'What is the only commandment in the Bible that includes a specific promise?',opts:['Do not steal','Do not murder','Honor your father and mother','Remember the Sabbath day'],ans:2,explain:'Exodus 20:12 — "Honor your father and your mother, that your days may be long upon the land." It is the only commandment with a specific attached promise: long life and things going well.'},
+  {q:'What are the "3 C\'s" regarding a family member\'s addiction?',opts:['Confront, Counsel, Commit','You did not Cause it, you cannot Control it, you cannot Cure it','Care, Confront, Change','Connect, Communicate, Commit'],ans:1,explain:'The 3 C\'s are foundational for families dealing with addiction: you did not Cause it, you cannot Control it, and you cannot Cure it. This releases guilt and defines what is actually in your power.'},
+  {q:'What does honoring your parents mean practically?',opts:['Agreeing with everything they say','Obeying every request regardless of age','Showing respect and appreciation even in disagreement','Moving back home after college'],ans:2,explain:'Honor is about respect and appreciation — not blind obedience. You can disagree, set boundaries when necessary, and still honor. It is an attitude of the heart, not just actions.'},
+  {q:'According to relationship research, who will likely be in your life longer than almost anyone else?',opts:['Your closest friends','Your spouse or partner','Your siblings','Your parents'],ans:2,explain:'Siblings typically span your entire life. Friendships come and go, parents pass before you, and marriages involve significant adult years. Invest in sibling relationships — they pay dividends for a lifetime.'},
+  {q:'What is the healthiest way to process grief?',opts:['Stay busy to avoid thinking about it','Push through it as quickly as possible','Allow yourself to feel it, talk about the person, and seek support — with no fixed timeline','Only talk to a professional, not friends or family'],ans:2,explain:'Grief is not linear and has no correct timeline. Suppressing it causes it to resurface later. Talking about the person you lost, allowing emotions, and seeking community support are the healthiest approaches.'},
+],
+college:[
+  {q:'What is the FAFSA and when should it be filed?',opts:['A scholarship database — apply anytime','The Free Application for Federal Student Aid — file as early as possible after October 1','A private loan application — file before January 1','A college application supplement — file with your admission application'],ans:1,explain:'FAFSA opens October 1 each year and determines your eligibility for grants (free money), work-study, and federal loans. File as early as possible — some aid is first-come, first-served.'},
+  {q:'What is the general rule for how much student loan debt to take on?',opts:['Never borrow more than $10,000','Do not borrow more than your expected first-year salary after graduation','Borrow as much as needed — loans are always affordable','The standard 10-year payment is always manageable'],ans:1,explain:'The guideline: total student debt should not exceed your expected starting salary. If your field typically pays $45,000/year, borrowing $80,000 creates an unsustainable debt burden.'},
+  {q:'What is the most valuable thing you can do in college for your career?',opts:['Maintain a perfect GPA','Get as many extracurricular activities as possible','Complete internships — they matter more than grades on a resume','Graduate as quickly as possible'],ans:2,explain:'Internships provide real work experience, professional references, and often lead directly to job offers. After graduation, employers care far more about relevant experience than GPA.'},
+  {q:'What should you do during your first 2 weeks of college?',opts:['Focus exclusively on academics — socializing can wait','Find your community and establish connections — it becomes much harder after month 1','Set up your study space and establish a rigid routine','Avoid clubs — they take time away from studying'],ans:1,explain:'The first 2 weeks determine your social circle for the year. Connections formed later require much more effort. Join organizations, attend events, introduce yourself aggressively — even if it feels uncomfortable.'},
+  {q:'What is the advantage of attending community college first?',opts:['Community college credits do not transfer to 4-year schools','It is only for students who could not get into a 4-year school','It is 60–70% cheaper for the same first 2 years of education','Community college degrees are worth the same as 4-year degrees'],ans:2,explain:'Two years of community college then transferring to a 4-year school can save $30,000–$80,000 in tuition. Your degree says the 4-year school you transferred to — not the community college.'},
+],
+dental:[
+  {q:'How long should you brush your teeth each session?',opts:['30 seconds','1 minute','2 full minutes','5 minutes'],ans:2,explain:'2 minutes twice daily is the ADA recommendation. Use a timer — most people dramatically underestimate 2 minutes. Electric toothbrushes often have built-in 2-minute timers.'},
+  {q:'Why is flossing so important if you brush thoroughly?',opts:['It is not important if you brush correctly','It removes food that gets stuck between teeth only','It cleans 40% of tooth surface that brushes cannot reach — between teeth and under the gumline','It primarily prevents bad breath'],ans:2,explain:'Approximately 40% of each tooth\'s surface is between teeth where toothbrushes physically cannot reach. Flossing prevents cavities and gum disease in those spaces.'},
+  {q:'Why should you wait 30 minutes after drinking soda before brushing?',opts:['The sugar needs to neutralize first','The acid softens enamel temporarily — brushing immediately causes more erosion','Your toothbrush works less effectively on fresh soda residue','The fluoride in soda needs time to absorb'],ans:1,explain:'Acidic drinks temporarily soften tooth enamel. Brushing immediately scrubs away softened enamel. Wait 30 minutes for saliva to re-harden the enamel before brushing.'},
+  {q:'How often should you get a professional dental cleaning?',opts:['Once a year','Twice a year','Every 3 months','Only when you have a cavity'],ans:1,explain:'Two cleanings per year remove tartar (hardened plaque) that brushing cannot remove. They also screen for early cavities (when treatment is cheap) and oral cancer.'},
+  {q:'What is the penny test for tires... wait, what causes cavities?',opts:['Acidic foods alone eroding enamel','Sugar + bacteria producing acid that slowly erodes enamel over time','Drinking too little water','Grinding teeth while sleeping'],ans:1,explain:'Cavities form when sugar feeds oral bacteria, which produce acid as a byproduct. That acid slowly dissolves tooth enamel. Reducing sugar and brushing after meals breaks this cycle.'},
+],
+legal:[
+  {q:'What is a lease agreement?',opts:['A car payment','A legal rental contract','An insurance policy','A loan'],ans:1,explain:'A lease is a binding contract between landlord and tenant.'},
+  {q:'Before signing any contract you should:',opts:['Sign immediately','Read every word','Ask a friend','Take a photo'],ans:1,explain:'Always read the entire contract before signing.'},
+  {q:'What does liability mean?',opts:['A type of insurance','Legal responsibility','A court fee','A tax form'],ans:1,explain:'Liability means you are legally responsible.'}
+],
+adulting:[
+  {q:'How often check your bank account?',opts:['Once a year','Weekly or more','Only when wrong','Monthly'],ans:1,explain:'Check weekly to catch errors and fraud.'},
+  {q:'What is renters insurance?',opts:['Landlord pays','Coverage for your belongings','Car insurance','Health insurance'],ans:1,explain:'Protects YOUR belongings. Typically $15-30/month.'},
+  {q:'How much of income should rent cost?',opts:['50%','No more than 30%','As much as needed','10%'],ans:1,explain:'Rent should not exceed 30% of gross income.'}
+],
+communication:[
+  {q:'The 70/30 rule means:',opts:['Talk 70% listen 30%','Listen 70% talk 30%','70% text 30% calls','70% email'],ans:1,explain:'Listen 70%, talk 30%.'},
+  {q:'Non-verbal communication is about:',opts:['10%','25%','55%','90%'],ans:2,explain:'About 55% is body language.'},
+  {q:'Steel man technique means:',opts:['Being tough','State their argument better than they did','Never back down','Facts only'],ans:1,explain:'Present strongest version of their argument before disagreeing.'}
+],
+diy:[
+  {q:'Most versatile home repair tool?',opts:['Hammer','Duct tape','Cordless drill','Wrench'],ans:2,explain:'A drill handles the widest range of tasks.'},
+  {q:'Running toilet usually needs:',opts:['New toilet','New flapper ($5)','A plumber','New pipes'],ans:1,explain:'$5 flapper fixes 90% of running toilets.'},
+  {q:'When a breaker trips:',opts:['Call electrician','Flip fully OFF then ON','Ignore it','Replace panel'],ans:1,explain:'Flip fully OFF first, then back ON.'}
+],
+shopping:[
+  {q:'The 24-hour rule means:',opts:['Stores open 24hrs','Wait 24hrs before buying over $30','Return within 24hrs','Shop midnight'],ans:1,explain:'Waiting eliminates most impulse buying.'},
+  {q:'Unit pricing shows:',opts:['Total price','Price per ounce/unit','Discount','Tax included'],ans:1,explain:'Only honest comparison between sizes.'},
+  {q:'Generic medications vs brand:',opts:['Lower quality','Chemically identical by law','Dangerous','Untested'],ans:1,explain:'FDA requires generics to be chemically identical.'}
+],
+writing:[
+  {q:'Professional email subject should be:',opts:['Just Hi','Specific and actionable','Left blank','All caps'],ans:1,explain:'Specific subjects get opened and acted on.'},
+  {q:'A cover letter should be:',opts:['3 pages','Resume summary','Persuasive argument for THIS job','Optional'],ans:2,explain:'Argue why YOU are right for THIS specific job.'},
+  {q:'Thank-you note after interview within:',opts:['1 week','24 hours','Only if hired','Never'],ans:1,explain:'Send within 24 hours.'}
+],
+laundry:[
+  {q:'Best temperature for most laundry?',opts:['Hot','Warm','Cold','Boiling'],ans:2,explain:'Cold works for 90% of loads.'},
+  {q:'Never put stained items in dryer because:',opts:['Wastes energy','Heat sets stains permanently','Breaks dryer','Colors bleed'],ans:1,explain:'Heat sets stains permanently.'},
+  {q:'How often wash sheets?',opts:['Monthly','Every 1-2 weeks','Seasonally','Daily'],ans:1,explain:'Every 1-2 weeks for hygiene.'}
+],
+cleaning:[
+  {q:'Daily reset starts with:',opts:['Vacuuming','Trash sweep','Organizing','Mopping'],ans:1,explain:'Walk through with a bag first.'},
+  {q:'Most important kitchen rule:',opts:['Deep clean weekly','Clean as you cook','Only weekends','Bleach everything'],ans:1,explain:'Cleaning while cooking prevents pile-ups.'},
+  {q:'To prevent bathroom mold:',opts:['Keep windows closed','Run vent fan 15min after showers','Hot water only','Never clean'],ans:1,explain:'Ventilation removes moisture.'}
+],
+timemanage:[
+  {q:'The 2-Minute Rule:',opts:['Study 2 min','Do tasks under 2 min now','Break every 2 min','Plan 2 min'],ans:1,explain:'Do it now if under 2 minutes.'},
+  {q:'Best time to plan your week:',opts:['Monday morning','Friday afternoon','Sunday evening','Never'],ans:2,explain:'Sunday planning makes you 3x more likely to complete goals.'},
+  {q:'The 5-minute start helps with:',opts:['Sleep','Procrastination','Cooking','Exercise'],ans:1,explain:'Commit to 5 min. Momentum carries you.'}
+],
+safety:[
+  {q:'What color in Cooper\'s Code describes ideal everyday awareness?',opts:['White','Yellow','Orange','Red'],ans:1,explain:'Yellow is relaxed but alert — calm, present, and aware.'},
+  {q:'Primary goal of self-defense is to:',opts:['Win the fight','Hurt attacker','Create time and distance to escape','Confront attacker'],ans:2,explain:'Strike to create distance then escape — not to win.'},
+  {q:'If followed on foot you should:',opts:['Go home fast','Make 4 turns then go to a busy public place','Confront them','Hide'],ans:1,explain:'4 turns confirm following. Busy public place provides safety. Never go home.'},
+  {q:'Yelling FIRE instead of just screaming works because:',opts:['Louder','Activates bystanders with specific call to action','Police respond faster','Confuses attacker'],ans:1,explain:'Specific words prompt bystanders to act. Vague screaming causes paralysis.'},
+  {q:'An online contact asking you to hide the friendship from parents is showing:',opts:['Privacy preference','A red flag isolation tactic','Shyness','Loyalty testing'],ans:1,explain:'Safe relationships never require hiding from family. Classic grooming tactic.'}
+],
+investing:[
+  {q:'Rule of 72 at 8 percent return means your money doubles every:',opts:['4 years','6 years','9 years','12 years'],ans:2,explain:'72 divided by 8 equals 9 years to double.'},
+  {q:'The 401k employer match is top priority because it is a:',opts:['Tax shelter first','Guaranteed 50-100 percent instant return','Premium reduction','Legal requirement'],ans:1,explain:'Employer match is a guaranteed return before any market movement.'},
+  {q:'Index funds beat most active funds because of:',opts:['Famous managers','Lower fees and diversification compounding over time','Government guarantees','Only safe stocks'],ans:1,explain:'0.05 vs 1-2 percent fees compounded over 20 plus years outperforms 80-90 percent of active managers.'},
+  {q:'Dollar cost averaging means:',opts:['Buy only at low prices','Invest fixed amount regularly regardless of market','Average annual gains','Time the market with an advisor'],ans:1,explain:'Regular fixed investing automatically buys more shares when prices drop.'},
+  {q:'Your retirement target using the 4 percent rule equals:',opts:['Annual income x 10','Annual expenses x 25','Monthly savings x 100','Current savings x 5'],ans:1,explain:'Annual expenses times 25 lets you safely withdraw 4 percent annually indefinitely.'}
+],
+insurance:[
+  {q:'A health insurance deductible is:',opts:['Monthly premium','What insurance pays first','Amount you pay before coverage starts','Annual spending maximum'],ans:2,explain:'Pay the deductible first — then insurance begins sharing costs with you.'},
+  {q:'Under the ACA you can stay on parent health insurance until age:',opts:['21','23','25','26'],ans:3,explain:'ACA extends parent coverage to age 26. Almost always cheapest option for young adults.'},
+  {q:'Legally required car insurance in most states is:',opts:['Collision','Comprehensive','Liability','Gap insurance'],ans:2,explain:'Liability is mandatory — protects others from damage you cause.'},
+  {q:'Buy term invest the difference means:',opts:['Buy whole life early','Buy cheap term and invest the monthly savings','Buy both types','Skip life insurance'],ans:1,explain:'Term is 5-10x cheaper. Investing savings typically outperforms whole life cash value.'},
+  {q:'Unused dental benefits at year end are:',opts:['Rolled over','Accumulated into a larger amount','Permanently lost','Converted to premium credits'],ans:2,explain:'Dental benefits reset every year. Any unused portion is simply gone.'}
+],
+travel:[
+  {q:'Most countries require passport validity beyond travel dates of:',opts:['1 month','3 months','6 months','12 months'],ans:2,explain:'6 month rule — too-soon expiration can get you denied boarding even with valid passport.'},
+  {q:'When asked dollars or local currency abroad always choose:',opts:['Dollars always safer','Local currency for better exchange rate','Whatever merchant recommends','It does not matter'],ans:1,explain:'Choosing dollars lets merchant apply bad exchange rate. Local currency uses your card real rate.'},
+  {q:'STEP program at step.state.gov lets the US embassy:',opts:['Give travel rewards','Contact you in emergencies abroad','Help skip customs','Issue cheaper visas'],ans:1,explain:'Free 5-minute enrollment ensures embassy can reach you during disasters abroad.'},
+  {q:'Best source for local currency internationally is:',opts:['Airport exchange kiosks','Hotel exchange desks','Local ATMs with your bank card','Traveler checks'],ans:2,explain:'Local ATMs use real interbank rates. Airport kiosks charge 10-15 percent markup.'},
+  {q:'Travel insurance is most critical for covering:',opts:['Normal doctor visits','Lost souvenirs','Medical evacuation which can cost up to 200000 dollars','Cancelled dinner reservations'],ans:2,explain:'Medical evacuation can cost six figures. Insurance covering it costs only 50-200 dollars.'}
+]
+
+};
+
+
+function renderQuiz(key){
+  _quizKey = key;
+  _quizIdx = 0;
+  _quizCorrect = 0;
+  _quizAnswers = {};   // idx -> chosen text
+  _quizAnswered = false;
+
+  const rawQs = SK_QUIZ[key] || [];
+  const el = document.getElementById('skQuizArea'); if(!el) return;
+  const prevScore = (D.skillQuizScores || {})[key];
+
+  if(!rawQs.length){
+    el.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--tx2);">No quiz available for this subject yet.</div>';
+    return;
+  }
+
+  // Build shuffled questions: store correct answer as TEXT, shuffle opts
+  _quizShuffled = rawQs.map(q => {
+    const correctText = q.opts[q.ans];
+    const shuffledOpts = [...q.opts].sort(() => Math.random() - .5);
+    return { q: q.q, opts: shuffledOpts, correct: correctText, explain: q.explain || '' };
+  });
+
+  const cat = SK_CATS.find(c=>c.key===key);
+  const col = cat?.color||'var(--c)';
+  el.innerHTML = `
+    <div style="text-align:center;padding:1.5rem 1rem;">
+      <div style="font-size:3rem;margin-bottom:.75rem;">${cat?.icon||'❓'}</div>
+      <div style="font-family:var(--fh);font-size:1.1rem;letter-spacing:2px;color:${col};margin-bottom:.4rem;">${cat?.name||key} QUIZ</div>
+      <div style="font-size:.84rem;color:var(--tx2);margin-bottom:.3rem;">${_quizShuffled.length} questions · Need <b style="color:var(--g);">80%</b> to earn your certificate</div>
+      ${prevScore!=null?`<div style="font-size:.78rem;margin-bottom:.5rem;color:${prevScore>=80?'var(--gr)':'#f87171'};">Previous score: <b>${prevScore}%</b> ${prevScore>=80?'✅':'— try again!'}</div>`:''}
+      <button class="btn" style="background:${col};color:#000;font-weight:800;font-size:.9rem;margin-top:.75rem;" onclick="showQuestion(0)">Start Quiz →</button>
+    </div>`;
+}
+
+function showQuestion(idx){
+  const qs = _quizShuffled||[];
+  if(idx >= qs.length){ finishSkillQuiz(); return; }
+  _quizIdx = idx;
+  _quizAnswered = false;
+  const q = qs[idx];
+  const cat = SK_CATS.find(c=>c.key===_quizKey);
+  const col = cat?.color||'var(--c)';
+  const el = document.getElementById('skQuizArea'); if(!el) return;
+  const pct = Math.round((idx/qs.length)*100);
+
+  el.innerHTML = `
+    <div style="margin-bottom:1rem;">
+      <div style="display:flex;justify-content:space-between;font-size:.7rem;color:var(--tx2);margin-bottom:.35rem;">
+        <span>Question ${idx+1} of ${qs.length}</span>
+        <span style="color:var(--gr);">✅ ${_quizCorrect} correct so far</span>
+      </div>
+      <div style="height:6px;background:rgba(255,255,255,.1);border-radius:100px;overflow:hidden;">
+        <div style="height:100%;width:${pct}%;background:${col};border-radius:100px;transition:width .3s;"></div>
+      </div>
+    </div>
+    <div class="sk-q-card" id="sqCard">
+      <div class="sk-q-header" style="border-left-color:${col};">
+        <div class="sk-q-tag" style="background:${col}22;color:${col};">Q${idx+1}</div>
+        <div class="sk-q-text">${q.q}</div>
+      </div>
+      <div class="sk-q-opts" id="sqOpts">
+        ${q.opts.map((opt,oi)=>`
+          <button class="sk-q-opt-btn" id="sqo-${oi}" onclick="answerQuestion(${oi})">
+            <span class="sk-q-opt-letter">${String.fromCharCode(65+oi)}</span>
+            <span>${opt}</span>
+          </button>`).join('')}
+      </div>
+      <div class="sk-q-feedback" id="sqFeedback" style="display:none;"></div>
+    </div>
+    <div style="text-align:center;margin-top:.85rem;">
+      <button class="btn" id="sqNextBtn" style="display:none;background:${col};color:#000;font-weight:800;" onclick="showQuestion(${idx+1})">${idx+1<qs.length?'Next Question →':'See Results →'}</button>
+    </div>`;
+}
+
+function answerQuestion(chosen){
+  if(_quizAnswered) return;
+  _quizAnswered = true;
+  const qs = _quizShuffled||[];
+  const q = qs[_quizIdx];
+  const chosenText = q.opts[chosen];
+  const isCorrect = chosenText === q.correct;
+  if(isCorrect) _quizCorrect++;
+  _quizAnswers[_quizIdx] = chosenText;  // store text
+
+  const cat = SK_CATS.find(c=>c.key===_quizKey);
+  const col = cat?.color||'var(--c)';
+  const correctIdx = q.opts.indexOf(q.correct);
+
+  q.opts.forEach((_,oi)=>{
+    const btn = document.getElementById('sqo-'+oi);
+    if(!btn) return;
+    btn.disabled = true;
+    if(oi === correctIdx){
+      btn.classList.add('sq-correct');
+    } else if(oi === chosen && !isCorrect){
+      btn.classList.add('sq-wrong');
+    } else {
+      btn.style.opacity = '.4';
+    }
+  });
+
+  const fb = document.getElementById('sqFeedback');
+  if(fb){
+    fb.style.display = 'block';
+    fb.className = 'sk-q-feedback '+(isCorrect?'sk-fb-correct':'sk-fb-wrong');
+    fb.innerHTML = isCorrect
+      ? `<div class="sk-fb-emoji">🎉</div><div><b style="color:var(--gr);">Great job! That's correct.</b><br><span style="font-size:.79rem;color:var(--tx2);">${q.explain}</span></div>`
+      : `<div class="sk-fb-emoji">❌</div><div><b style="color:#f87171;">Not quite — correct answer: <span style="color:var(--gr);">${q.correct}</span>.</b><br><span style="font-size:.79rem;color:var(--tx2);">${q.explain}</span></div>`;
+  }
+  // 🎉 Confetti on correct answer
+  if(isCorrect && typeof launchSideConfetti === 'function') launchSideConfetti();
+
+  const nb = document.getElementById('sqNextBtn');
+  if(nb) nb.style.display = 'inline-flex';
+}
+
+function finishSkillQuiz(){
+  const qs = _quizShuffled||[];
+  const pct = Math.round(_quizCorrect/qs.length*100);
+  const passed = pct >= 80;
+  const cat = SK_CATS.find(c=>c.key===_quizKey);
+  const col = cat?.color||'var(--c)';
+
+  if(!D.skillQuizScores) D.skillQuizScores = {};
+  D.skillQuizScores[_quizKey] = pct;
+
+  if(passed){
+    if(!D.skillCerts) D.skillCerts = {};
+    D.skillCerts[_quizKey] = new Date().toLocaleDateString();
+    const certBtn = document.getElementById('skViewCertBtn');
+    if(certBtn) certBtn.style.display = 'inline-flex';
+    // Award PB for passing — 10 PB per quiz pass
+    earnPB(10, 'Life Skills quiz passed: '+(cat?.label||_quizKey));
+    // Award a scratch card ticket every quiz pass
+    if(!D.pb) initParentBucks();
+    D.pb.scratchTickets = (D.pb.scratchTickets||0) + 1;
+    save(); renderGameTickets();
+    // 🏆 Big confetti burst on quiz pass
+    setTimeout(()=>{ if(typeof launchBigConfetti==='function') launchBigConfetti(); }, 300);
+  }
+  save(); renderParentBucks();
+
+  const el = document.getElementById('skQuizArea'); if(!el) return;
+
+  el.innerHTML = `
+    <div style="margin-bottom:1rem;">
+      <div style="height:6px;background:rgba(255,255,255,.1);border-radius:100px;overflow:hidden;">
+        <div style="height:100%;width:100%;background:${passed?'var(--gr)':'#f87171'};border-radius:100px;"></div>
+      </div>
+    </div>
+    <div class="sk-result-card ${passed?'sk-result-pass':'sk-result-fail'}">
+      <div class="sk-result-emoji">${passed?'🏆':'💪'}</div>
+      <div class="sk-result-pct" style="color:${passed?'var(--gr)':'#f87171'};">${pct}%</div>
+      <div class="sk-result-msg">${passed?'<b style="color:var(--gr);">You passed!</b> Certificate unlocked.':'<b style="color:#f87171;">Keep going!</b> You need 80% to pass.'}</div>
+      <div class="sk-result-detail">${_quizCorrect} of ${qs.length} correct</div>
+      <div class="sk-result-breakdown">
+        ${qs.map((_,i)=>`<div class="sk-result-dot ${_quizAnswers[i]===qs[i].correct?'sk-dot-pass':'sk-dot-fail'}" title="Q${i+1}: ${_quizAnswers[i]===qs[i].correct?'Correct':'Wrong'}"></div>`).join('')}
+      </div>
+      <div style="display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;margin-top:.9rem;">
+        ${passed
+          ? `<button class="btn" style="background:${col};color:#000;font-weight:800;" onclick="switchSkTab('cert')">View Certificate 🏆</button>`
+          : `<button class="btn" style="background:${col};color:#000;font-weight:800;" onclick="renderQuiz('${_quizKey}')">Try Again →</button>`}
+        <button class="btn bgh bs" onclick="switchSkTab('lessons')">Review Lessons</button>
+        <button class="btn bs" id="skAnalysisBtn" style="background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.35);color:#a78bfa;font-weight:700;" onclick="getQuizAnalysis()">🤖 Get Analysis</button>
+      </div>
+      <div id="skAnalysisPanel" style="display:none;margin-top:1rem;text-align:left;background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.2);border-radius:12px;padding:1rem;">
+        <div style="font-size:.65rem;font-weight:700;font-family:var(--fn);letter-spacing:2px;color:#a78bfa;margin-bottom:.5rem;">🤖 AI ANALYSIS</div>
+        <div id="skAnalysisText" style="font-size:.82rem;color:var(--tx);line-height:1.7;"></div>
+      </div>
+    </div>`;
+
+  buildSkillsGrid();
+}
+
+
+
+
+async function getQuizAnalysis(){
+  const btn = document.getElementById('skAnalysisBtn');
+  const panel = document.getElementById('skAnalysisPanel');
+  const textEl = document.getElementById('skAnalysisText');
+  if(!btn || !panel || !textEl) return;
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Analyzing...';
+  panel.style.display = 'block';
+  textEl.innerHTML = '<span style="color:var(--tx2);font-size:.8rem;">Thinking about your results…</span>';
+
+  const qs = _quizShuffled || [];
+  const cat = SK_CATS.find(c => c.key === _quizKey);
+  const pct = Math.round(_quizCorrect / qs.length * 100);
+
+  const breakdown = qs.map((q, i) => {
+    const chosen = _quizAnswers[i];
+    const correct = chosen === q.correct;
+    return `Q${i+1}: "${q.q}" — ${correct ? 'Correct ✅' : `Wrong ❌ (chose "${chosen ?? 'no answer'}", correct was "${q.correct}")`}`;
+  }).join('\n');
+
+  const prompt = `You are a friendly, encouraging life skills coach for young people. A student just completed the "${cat?.name || _quizKey}" quiz and scored ${pct}% (${_quizCorrect} of ${qs.length} correct).
+
+Here is their question-by-question breakdown:
+${breakdown}
+
+Please give a SHORT, warm, personalized analysis (3-4 sentences max). Mention 1-2 specific topics they struggled with (if any) and what they should focus on to improve. Be encouraging and age-appropriate. Do not use bullet points — write it as a natural paragraph.`;
+
+  try {
+    const res = await fetch('/api/ai-summary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+    const data = await res.json();
+    const text = data?.text || 'Could not load analysis.';
+    textEl.innerHTML = text.replace(/\n/g, '<br>');
+    btn.textContent = '✓ Analysis Done';
+  } catch(e) {
+    textEl.innerHTML = '<span style="color:#f87171;">Could not connect to AI. Check your connection and try again.</span>';
+    btn.disabled = false;
+    btn.textContent = '🤖 Get Analysis';
+  }
+}
+
+
+function initSkillsGrid(){
+  buildSkillsGrid();
+  updateSkillsStats();
+}
+
+function buildSkillsGrid(filter){
+  const el = document.getElementById('skillsGrid'); if(!el) return;
+  const search = (filter||'').toLowerCase();
+  el.innerHTML = SK_CATS.map(cat=>{
+    if(search && !cat.name.toLowerCase().includes(search) && !cat.key.includes(search)) return '';
+    const lessons = SK_DATA[cat.key]||[];
+    const hasCert = D.skillCerts && D.skillCerts[cat.key];
+    const quizScore = D.skillQuizScores && D.skillQuizScores[cat.key];
+    return `<div onclick="openSkillCategory('${cat.key}')" style="background:rgba(255,255,255,.04);border:1px solid ${cat.color}22;border-left:3px solid ${cat.color};border-radius:12px;padding:.75rem .7rem;cursor:pointer;transition:all .15s;position:relative;${hasCert?'border-color:'+cat.color+'55;':''}" onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 12px rgba(0,0,0,.2)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
+      ${hasCert?'<div style="position:absolute;top:.4rem;right:.4rem;font-size:.55rem;background:rgba(34,197,94,.15);color:#22c55e;padding:.08rem .3rem;border-radius:4px;font-weight:700;">✓ Cert</div>':''}
+      <div style="font-size:1.4rem;margin-bottom:.3rem;">${cat.icon}</div>
+      <div style="font-size:.78rem;font-weight:800;color:var(--tx);margin-bottom:.15rem;">${cat.name}</div>
+      <div style="font-size:.6rem;color:var(--tx2);">${lessons.length} lessons${quizScore?' · '+quizScore+'%':''}</div>
+    </div>`;
+  }).join('');
+}
+
+function filterSkillsGrid(val){ buildSkillsGrid(val); }
+
+function updateSkillsStats(){
+  const totalLessons = Object.values(SK_DATA).reduce((s,arr)=>s+(arr?arr.length:0),0);
+  const certs = Object.values(D.skillCerts||{}).filter(Boolean).length;
+  const quizzes = Object.values(D.skillQuizScores||{}).filter(v=>v>=80).length;
+  const e1 = document.getElementById('skTotalLessons'); if(e1) e1.textContent = totalLessons;
+  const e2 = document.getElementById('skCertCount'); if(e2) e2.textContent = certs;
+  const e3 = document.getElementById('skQuizPassed'); if(e3) e3.textContent = quizzes;
+}
+
+function openSkillCategory(key){
+  const cat = SK_CATS.find(c=>c.key===key); if(!cat) return;
+  const lessons = SK_DATA[key]||[];
+  const hasCert = D.skillCerts && D.skillCerts[key];
+
+  // Set header
+  const icon = document.getElementById('skModalIcon'); if(icon) icon.textContent = cat.icon;
+  const title = document.getElementById('skModalTitle'); if(title) title.textContent = cat.name;
+  const meta = document.getElementById('skModalMeta'); if(meta) meta.textContent = lessons.length+' lessons'+(hasCert?' · ✅ Certified':'');
+
+  // Populate lessons tab
+  const body = document.getElementById('skillModalBody');
+  if(body){
+    body.innerHTML = lessons.length===0 ? '<div style="text-align:center;padding:2rem;color:var(--tx3);">Lessons coming soon!</div>' :
+      lessons.map((l,i)=>`
+        <div style="border-bottom:1px solid rgba(255,255,255,.04);padding:.8rem 0;">
+          <div style="display:flex;align-items:center;gap:.4rem;cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+            <span style="font-size:.7rem;font-weight:800;color:${cat.color};width:22px;">L${i+1}</span>
+            <span style="font-size:.85rem;font-weight:700;">${l.h}</span>
+            <span style="margin-left:auto;font-size:.6rem;color:var(--tx3);">▼</span>
+          </div>
+          <div style="display:none;margin-top:.5rem;font-size:.82rem;color:var(--tx2);line-height:1.7;padding-left:26px;">${l.b}</div>
+        </div>
+      `).join('');
+  }
+
+  // Show quiz button in footer
+  const quizBtn = document.getElementById('skStartQuizBtn');
+  if(quizBtn){ quizBtn.style.display = (SK_QUIZ[key]&&SK_QUIZ[key].length) ? '' : 'none'; }
+
+  // Load quiz
+  renderQuiz(key);
+
+  // Load cert
+  if(typeof renderCertPanel==='function') renderCertPanel(key);
+
+  // Switch to lessons tab
+  switchSkTab('lessons');
+
+  // Open modal
+  openModal('skillsModal');
+  logActivity('lesson', 'Opened: '+cat.name);
+}
+
+function switchSkTab(tab){
+  ['lessons','quiz','cert'].forEach(t=>{
+    const panel = document.getElementById('skPanel-'+t);
+    const tabBtn = document.getElementById('skTab-'+t);
+    if(panel) panel.style.display = t===tab ? 'block' : 'none';
+    if(tabBtn) tabBtn.classList.toggle('active', t===tab);
+  });
+  // Always re-render cert panel so it reflects latest quiz results
+  if(tab === 'cert' && _quizKey && typeof renderCertPanel === 'function'){
+    renderCertPanel(_quizKey);
+  }
+}
+
+
+function renderCertPanel(key){
+  const cat = SK_CATS.find(c=>c.key===key);
+  const score = (D.skillQuizScores||{})[key];
+  const certDate = (D.skillCerts||{})[key];
+  const el = document.getElementById('skCertArea'); if(!el) return;
+  const userName = (D.name||'Champion').toUpperCase();
+  const col = cat?.color||'#38bdf8';
+
+  if(!certDate||score<80){
+    el.innerHTML=`<div style="text-align:center;padding:2.5rem 1rem;">
+      <div style="font-size:4rem;margin-bottom:.75rem;filter:grayscale(1);opacity:.4;">🏆</div>
+      <div style="font-size:1rem;font-weight:700;color:var(--tx);margin-bottom:.5rem;">Certificate Locked</div>
+      <div style="font-size:.85rem;color:var(--tx2);margin-bottom:1rem;">Pass the quiz with 80% or higher to unlock your official certificate for <b>${cat?.name||key}</b>.</div>
+      <button class="btn" style="background:${col};color:#000;font-weight:800;" onclick="switchSkTab('quiz')">Take the Quiz →</button>
+    </div>`;
+    return;
+  }
+
+  el.innerHTML=`
+    <div style="text-align:center;margin-bottom:.85rem;display:flex;gap:.5rem;justify-content:center;">
+      <button class="btn bgh bs" onclick="printCert('${key}')">🖨 Print / Save PDF</button>
+      <button class="btn bgh bs" onclick="shareCert('${key}')">📤 Share</button>
+    </div>
+    <div id="cert-${key}" class="sk-cert">
+      <div class="sk-cert-outer">
+        <div class="sk-cert-inner">
+          <!-- Decorative corners -->
+          <div class="sk-cert-corner tl" style="border-color:${col};"></div>
+          <div class="sk-cert-corner tr" style="border-color:${col};"></div>
+          <div class="sk-cert-corner bl" style="border-color:${col};"></div>
+          <div class="sk-cert-corner br" style="border-color:${col};"></div>
+
+          <div class="sk-cert-top" style="color:${col};">✦ LIFE OS ACADEMY ✦</div>
+          <div style="font-size:.62rem;letter-spacing:3px;color:rgba(255,255,255,.4);margin-bottom:1rem;text-transform:uppercase;">Certificate of Achievement</div>
+          <div class="sk-cert-icon-big">${cat?.icon||'🎓'}</div>
+          <div style="font-size:.75rem;color:rgba(255,255,255,.5);margin:.6rem 0 .2rem;font-style:italic;">This certifies that</div>
+          <div class="sk-cert-name">${userName}</div>
+          <div style="font-size:.75rem;color:rgba(255,255,255,.5);margin:.4rem 0 .2rem;font-style:italic;">has successfully completed</div>
+          <div class="sk-cert-subject" style="color:${col};">${(cat?.name||key).toUpperCase()}</div>
+          <div class="sk-cert-stars" style="color:${col};">★ ★ ★ ★ ★</div>
+          <div class="sk-cert-score-wrap">
+            <div class="sk-cert-score-box" style="border-color:${col}22;background:${col}11;">
+              <div style="font-size:.6rem;letter-spacing:2px;color:rgba(255,255,255,.5);margin-bottom:.2rem;">SCORE ACHIEVED</div>
+              <div style="font-size:2.2rem;font-weight:900;color:${col};line-height:1;">${score}%</div>
+              <div style="font-size:.6rem;color:rgba(255,255,255,.4);">Passing: 80%</div>
+            </div>
+          </div>
+          <div class="sk-cert-footer">
+            <div style="text-align:center;">
+              <div style="font-size:.55rem;color:rgba(255,255,255,.3);letter-spacing:1px;text-transform:uppercase;">Issued</div>
+              <div style="font-size:.72rem;color:rgba(255,255,255,.6);">${certDate}</div>
+            </div>
+            <div class="sk-cert-seal" style="border-color:${col};color:${col};">
+              <div style="font-size:.55rem;font-weight:900;letter-spacing:1.5px;">VERIFIED</div>
+              <div style="font-size:.5rem;color:rgba(255,255,255,.5);">Life OS Academy</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:.55rem;color:rgba(255,255,255,.3);letter-spacing:1px;text-transform:uppercase;">Credential ID</div>
+              <div style="font-size:.62rem;color:rgba(255,255,255,.4);">${key.toUpperCase()}-${score}-${new Date().getFullYear()}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function shareCert(key){
+  const cat = SK_CATS.find(c=>c.key===key);
+  const score = (D.skillQuizScores||{})[key];
+  const text = `I just earned my ${cat?.name} certificate on Life OS Academy with a score of ${score}%! 🏆 #LifeSkills`;
+  if(navigator.share) navigator.share({title:'My Certificate',text});
+  else { navigator.clipboard?.writeText(text); showToast('Certificate text copied to clipboard! 📋'); }
+}
+
+
+function printCert(key){
+  const el = document.getElementById('cert-'+key); if(!el) return;
+  const win = window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><title>Certificate</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:#0d1117;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem;}
+    @page{size:landscape;margin:.4in;}
+    ${document.querySelector('style').textContent.split('.sk-cert').filter((_,i)=>i>0).map(s=>'.sk-cert'+s.split('}')[0]+'}').join('')}
+  </style></head><body>${el.outerHTML}
+</body></html>`);
+  win.document.close();
+  setTimeout(()=>win.print(),500);
+}
+
+
+
+// ── CRAFT ─────────────────────────────────────────────────────
+function buildCraftSection(){ const t=document.getElementById('craftTitle'); if(t&&D.craftName) t.textContent=D.craftName; const gd=document.getElementById('gigDate'); if(gd&&!gd.value) gd.value=new Date().toISOString().split('T')[0]; renderPlaylist(); renderGigLog(); }
+function renameCraft(el){ const old=el.textContent; const inp=document.createElement('input'); inp.value=D.craftName||old; inp.style.cssText='background:transparent;border:none;border-bottom:2px solid var(--c);color:#fff;font-family:var(--fh);font-size:1.7rem;letter-spacing:2px;width:200px;outline:none;'; el.replaceWith(inp); inp.focus(); inp.select(); inp.onblur=()=>{ const v=inp.value.trim()||old; D.craftName=v; save(); inp.replaceWith(el); el.textContent=v; }; inp.onkeydown=e=>{ if(e.key==='Enter') inp.blur(); }; }
+function loadAudio(input){ const files=Array.from(input.files); files.forEach(f=>{ const url=URL.createObjectURL(f); _tracks.push({url,name:f.name.replace(/\.[^/.]+$/,''),artist:'My Music'}); }); if(_tracks.length===1) loadTrack(0); else renderPlaylist(); showToast(_tracks.length+' track(s) loaded 🎵'); }
+function loadTrack(idx){ if(idx<0||idx>=_tracks.length) return; _trackIdx=idx; const t=_tracks[idx]; _audio.src=t.url; const tn=document.getElementById('trackName'),ta=document.getElementById('trackArtist'); if(tn) tn.textContent=t.name; if(ta) ta.textContent=t.artist; renderPlaylist(); if(_playing){_audio.play();spinVinyl(true);} }
+function togglePlay(){ if(!_tracks.length){showToast('Upload a track first!');return;} if(_playing){_audio.pause();_playing=false;spinVinyl(false);document.getElementById('playBtn').textContent='▶';}else{_audio.play();_playing=true;spinVinyl(true);document.getElementById('playBtn').textContent='⏸';} }
+function prevTrack(){ loadTrack((_trackIdx-1+_tracks.length)%_tracks.length); }
+function nextTrack(){ loadTrack((_trackIdx+1)%_tracks.length); }
+function setVol(v){ _audio.volume=parseFloat(v); }
+function spinVinyl(on){ const v=document.getElementById('vinyl'); if(!v) return; v.style.animation=on?'spin 2s linear infinite':'none'; }
+function renderPlaylist(){ const el=document.getElementById('playlist'); if(!el) return; if(!_tracks.length){el.innerHTML='<div style="font-size:.77rem;color:#c8d4e8;text-align:center;padding:.5rem;">No tracks loaded</div>';return;} el.innerHTML=_tracks.map((t,i)=>`<div style="display:flex;align-items:center;gap:.5rem;padding:.38rem .6rem;background:${i===_trackIdx?'rgba(56,189,248,.1)':'var(--s3)'};border-radius:7px;margin-bottom:.25rem;cursor:pointer;border-left:3px solid ${i===_trackIdx?'var(--c)':'transparent'};" onclick="loadTrack(${i})"><span style="font-size:.66rem;color:#c8d4e8;">${i+1}</span><span style="flex:1;font-size:.82rem;font-weight:${i===_trackIdx?'700':'400'};">${t.name}</span>${i===_trackIdx&&_playing?'<span style="font-size:.63rem;color:var(--c);">▶</span>':''}</div>`).join(''); }
+_audio.onended=()=>{ nextTrack(); };
+function logGig(){ const title=(document.getElementById('gigTitle').value||'').trim(),date=document.getElementById('gigDate').value||new Date().toLocaleDateString(),notes=(document.getElementById('gigNotes').value||'').trim(); if(!title){showToast('Enter a session title');return;} if(!D.gigLog) D.gigLog=[]; D.gigLog.unshift({id:Date.now(),title,date,notes}); document.getElementById('gigTitle').value=''; document.getElementById('gigNotes').value=''; save(); renderGigLog(); showToast('Session logged! 🎧'); }
+function renderGigLog(){ const el=document.getElementById('gigLog'); if(!el) return; if(!(D.gigLog||[]).length){el.innerHTML='<div style="font-size:.8rem;color:#c8d4e8;text-align:center;padding:1rem;">No sessions logged yet</div>';return;} el.innerHTML=D.gigLog.map(g=>`<div style="padding:.65rem .8rem;background:rgba(255,255,255,.1);border-radius:9px;margin-bottom:.35rem;border-left:3px solid var(--c);"><div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-weight:700;font-size:.88rem;">${g.title}</div><div style="display:flex;gap:.3rem;align-items:center;"><span style="font-size:.68rem;color:#c8d4e8;">${g.date}</span><button class="db" onclick="D.gigLog=D.gigLog.filter(x=>x.id!=${g.id});save();renderGigLog();">✕</button></div></div>${g.notes?`<div style="font-size:.76rem;color:#8090b0;margin-top:.28rem;line-height:1.55;">${g.notes}</div>`:''}</div>`).join(''); }
+
+// ── GALLERY ───────────────────────────────────────────────────
+function addPhotos(input){ const files=Array.from(input.files).slice(0,20); if(!D.photos) D.photos=[]; let loaded=0; files.forEach(f=>{ const reader=new FileReader(); reader.onload=e=>{ D.photos.unshift({id:Date.now()+Math.random(),src:e.target.result,cat:'other',name:f.name,date:new Date().toLocaleDateString()}); loaded++; if(loaded===files.length){save();renderGallery();showToast(files.length+' photo(s) added! 📸');} }; reader.readAsDataURL(f); }); }
+function filterGallery(cat,btn){ _galFilter=cat; document.querySelectorAll('.galf').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); renderGallery(); }
+function renderGallery(){ const el=document.getElementById('galleryGrid'); if(!el) return; const photos=(D.photos||[]).filter(p=>_galFilter==='all'||p.cat===_galFilter); if(!photos.length){el.innerHTML=`<div style="color:#c8d4e8;text-align:center;padding:2rem;grid-column:1/-1;font-size:.87rem;">${_galFilter==='all'?'No photos yet — click Upload above!':'No '+_galFilter+' photos'}</div>`;return;} el.innerHTML=photos.map(p=>`<div style="position:relative;border-radius:10px;overflow:hidden;aspect-ratio:1;cursor:pointer;background:rgba(255,255,255,.08);" onclick="viewPhoto(${p.id})"><img src="${p.src}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;display:block;"><div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.65));padding:.5rem .45rem .35rem;font-size:.63rem;color:#fff;">${p.date}<button class="db" style="position:absolute;top:4px;right:4px;color:#fff;" onclick="event.stopPropagation();deletePhoto(${p.id})">✕</button></div></div>`).join(''); }
+function viewPhoto(id){ const p=(D.photos||[]).find(p=>p.id===id); if(!p) return; const img=document.getElementById('photoViewImg'),del=document.getElementById('photoViewDel'); if(img) img.src=p.src; if(del) del.onclick=()=>{deletePhoto(id);closeModal('photoViewModal');}; openModal('photoViewModal'); }
+function deletePhoto(id){ D.photos=(D.photos||[]).filter(p=>p.id!==id); save(); renderGallery(); }
+
+// ── JOURNAL ───────────────────────────────────────────────────
+const JCOLS={reflection:'var(--p)',gratitude:'var(--gr)',prayer:'var(--c)',idea:'var(--g)',win:'var(--or)',lesson:'var(--pk)'};
+const JICONS={reflection:'🪞',gratitude:'🙌',prayer:'🙏',idea:'💡',win:'🏆',lesson:'📖'};
+function saveJournal(){ const title=(document.getElementById('jTitle').value||'').trim(),body=(document.getElementById('jBody').value||'').trim(),cat=document.getElementById('jCat').value; if(!title||!body){showToast('Add title and entry');return;} if(!D.journal) D.journal=[]; D.journal.unshift({id:Date.now(),title,body,cat,date:new Date().toLocaleDateString(),time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}); document.getElementById('jTitle').value=''; document.getElementById('jBody').value=''; save(); renderJournal(); earnPB(2,'Journal entry'); logActivity('habit','Journal entry'); showToast('Entry saved! ✍️ +2 PB'); }
+function renderJournal(){ const el=document.getElementById('journalList'); if(!el) return; if(!(Array.isArray(D.journal)?D.journal:[]).length){el.innerHTML='<div style="font-size:.82rem;color:#c8d4e8;text-align:center;padding:1.5rem;">No entries yet — start writing!</div>';return;} el.innerHTML=D.journal.map(j=>`<div style="padding:.72rem .9rem;background:rgba(255,255,255,.1);border-radius:10px;margin-bottom:.38rem;border-left:3px solid ${JCOLS[j.cat]||'var(--mt)'};cursor:pointer;" onclick="viewJournal(${j.id})"><div style="display:flex;align-items:center;gap:.45rem;margin-bottom:.2rem;"><span style="font-size:.88rem;">${JICONS[j.cat]||'✍️'}</span><span style="font-weight:700;font-size:.89rem;flex:1;">${j.title}</span><button class="db" onclick="event.stopPropagation();deleteJournal(${j.id})">✕</button></div><div style="font-size:.68rem;color:#c8d4e8;">${j.date} · ${j.time}</div><div style="font-size:.78rem;color:#8090b0;margin-top:.28rem;line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${j.body}</div></div>`).join(''); }
+function viewJournal(id){ const j=(Array.isArray(D.journal)?D.journal:[]).find(j=>j.id===id); if(!j) return; const te=document.getElementById('jViewTitle'),me=document.getElementById('jViewMeta'),be=document.getElementById('jViewBody'),de=document.getElementById('jViewDel'); if(te){te.textContent=(JICONS[j.cat]||'✍️')+' '+j.title;te.style.color=JCOLS[j.cat]||'var(--c)';} if(me) me.textContent=j.date+' at '+j.time; if(be) be.textContent=j.body; if(de) de.onclick=()=>{deleteJournal(id);closeModal('jViewModal');}; openModal('jViewModal'); }
+function deleteJournal(id){ D.journal=(Array.isArray(D.journal)?D.journal:[]).filter(j=>j.id!==id); save(); renderJournal(); }
+
+// ── MOTIVATION ────────────────────────────────────────────────
+const DEFAULT_QUOTES=[
+  {id:0,text:"Hard work beats talent when talent doesn't work hard.",source:"Tim Notke"},{id:1,text:"I can do all things through Christ who strengthens me.",source:"Philippians 4:13"},
+  {id:2,text:"Success is not final, failure is not fatal: it is the courage to continue that counts.",source:"Winston Churchill"},{id:3,text:"Don't count the days, make the days count.",source:"Muhammad Ali"},
+  {id:4,text:"Commit to the LORD whatever you do, and he will establish your plans.",source:"Proverbs 16:3"},{id:5,text:"No discipline seems pleasant at the time, but painful. Later on it produces a harvest of righteousness.",source:"Hebrews 12:11"},
+];
+function saveQuote(){ const text=(document.getElementById('quoteText').value||'').trim(),source=(document.getElementById('quoteSource').value||'').trim(); if(!text){showToast('Enter a quote');return;} if(!D.quotes) D.quotes=[]; D.quotes.unshift({id:Date.now(),text,source}); document.getElementById('quoteText').value=''; document.getElementById('quoteSource').value=''; save(); renderMotivation(); closeModal('quoteModal'); showToast('Added to Fuel Wall! 🔥'); }
+function deleteQuote(id){ D.quotes=(D.quotes||[]).filter(q=>q.id!==id); save(); renderMotivation(); }
+function renderMotivation(){ const el=document.getElementById('motivationWall'); if(!el) return; const all=[...DEFAULT_QUOTES,...(D.quotes||[])]; const colors=['var(--g)','var(--c)','var(--gr)','var(--p)','var(--pk)','var(--or)']; el.innerHTML=all.map((q,i)=>`<div style="padding:1.1rem 1.25rem;background:rgba(255,255,255,.08);border-radius:12px;border-left:4px solid ${colors[i%colors.length]};"><div style="font-size:.92rem;font-style:italic;line-height:1.65;color:var(--tx);margin-bottom:.55rem;">"${q.text}"</div>${q.source?`<div style="font-size:.72rem;font-weight:700;color:${colors[i%colors.length]};">— ${q.source}</div>`:''}<div style="margin-top:.5rem;">${q.id>5?`<button class="db" onclick="deleteQuote(${q.id})">✕ Remove</button>`:''}</div></div>`).join(''); }
+
+// ── INIT ──────────────────────────────────────────────────────
+async function init(){
+  setSyncSt('loading');
+
+  // Check for existing Supabase session
+  const supa = getSupabase();
+  if(supa){
+    // Keep _supaUser current whenever Supabase refreshes the token
+    supa.auth.onAuthStateChange(function(event, session){
+      if(session && session.user){
+        _supaUser = session.user;
+        if(event === 'TOKEN_REFRESHED') cloudSync();
+      } else if(event === 'SIGNED_OUT'){
+        _supaUser = null;
+        setSyncSt('local');
+      }
+    });
+
+    const { data: { session } } = await supa.auth.getSession();
+    if(session?.user){
+      _supaUser = session.user;
+
+      // ── CHECK SUBSCRIPTION STATUS ON EXISTING SESSION ──────
+      const blocked = await checkPlanStatus();
+      if(blocked) return; // show blocked screen, stop here
+
+      const loaded = await cloudLoad();
+      if(!loaded){ loadData(); setTimeout(cloudSync, 1500); } // load local + write row to Supabase
+      setSyncSt(loaded ? 'cloud' : 'cloud'); // user is signed in either way
+      if(!D.chorePin && !D.parentPIN){ showFirstTimeGate(); return; }
+      finishInit();
+      setTimeout(setupContestFreeUser, 500); // Show contest banner if applicable
+      return;
+    }
+  } else {
+    // Supabase not available - use localStorage
+    loadData();
+    setSyncSt('local');
+    if(!D.chorePin && !D.parentPIN){ showFirstTimeGate(); return; }
+    finishInit();
+    return;
+  }
+
+  // No session - show auth screen
+  document.getElementById('authScreen').style.display = 'flex';
+}
+
+function finishInit(){
+  // Always ensure newly-added sections are visible regardless of saved state
+  if(D.sections){ ['cbt','resume','motivation','mentors'].forEach(function(k){ delete D.sections[k]; }); }
+  // Belt+suspenders: force CBT on
+  if(D.sections && D.sections.cbt===0) delete D.sections.cbt;
+  // Apply saved theme
+  applyTheme();
+  applyPalette();
+  applyHeroBg();
+  // Build sidebar nav
+  buildSideNav();
+  // Show hero section by default
+  showSection('s-hero');
+  // Show daily devotional popup once per day — skip if wizard is open
+  setTimeout(function(){
+    const today = new Date().toISOString().slice(0,10);
+    const faithOn = !(D.settings && D.settings.faithMode===false);
+    const wizardOpen = (document.getElementById('parentOnboard')||{}).classList&&document.getElementById('parentOnboard').classList.contains('open');
+    const kidWizOpen = (document.getElementById('kidOnboard')||{}).classList&&document.getElementById('kidOnboard').classList.contains('open');
+    if(faithOn && (!D.devPopupSeen || D.devPopupSeen !== today) && !wizardOpen && !kidWizOpen){
+      showDailyDevModal();
+    }
+  }, 1200);
+
+  startClock();
+  applySettings();
+  applyChildAvatar();
+  renderVerse();
+  startVerseAutoRotation();
+  // Start session timer
+  if(typeof startSessionTimer === 'function') startSessionTimer();
+  // Initial cloud sync after login
+  setTimeout(function(){ if(_supaUser) cloudSync(); }, 1500);
+  buildCheckins();
+  updateStreak();
+  updateQuickStats();
+
+  // Finance
+  const savedBankBal=D.bank||0, savedSavBal=D.bankSavAcct||0;
+  const bbl=document.getElementById('bankBal'), sabl=document.getElementById('savAcctBal');
+  const bll=document.getElementById('bankLbl'), sall=document.getElementById('savAcctLbl');
+  if(bbl) bbl.value=savedBankBal||''; if(sabl) sabl.value=savedSavBal||'';
+  if(bll) bll.value=D.bankLabel||''; if(sall) sall.value=D.bankSavAcctLabel||'';
+  renderBankHist(); renderBills(); renderTx(); updateFinSum();
+
+  // School
+  renderClasses(); renderGPA(); refreshAsgClassSelect(); renderAsg(); renderStudyLog();
+
+  // Schedule
+  buildSchedule();
+
+  // Calendar
+  renderCalendar(); renderUpcoming();
+
+  // Health
+  updateWeightStats(); renderWeightList(); renderFoodLog(); updateMacros();
+
+  // Goals
+  renderGoals(); renderVision(); renderTimeline(); buildCareers();
+
+  // Profile
+  updateProfileButton(); applyProfileContext();
+
+  // Growing Up
+  buildGrowingGrid();
+
+  // Life Skills
+  buildSkillsGrid();
+
+  // Craft / Gallery / Journal / Motivation
+  buildCraftSection(); renderGallery(); renderJournal(); renderMotivation();
+  loadBioFields();
+  renderBooks(); renderMentors(); renderMilestones(); renderMoodTracker();
+  renderChores();
+  renderStudyPlan(); renderExams(); renderKidParentNotes();
+  applyStageFilter();
+  renderGettingStarted();
+  renderMonthlyChallenge(); renderDailyPrompt(); renderBadges();
+  initMusicAndSports();
+  initDriving();
+  initProfiles();
+  initScreenTime(); renderEarnings();
+  initBadgesPage();
+  initScripture();
+  initParentBucks();
+  renderParentBucks();
+  renderGameTickets();
+  hookRewardTriggers();
+  initQuizSystem();
+  initCharacter();
+  initSkillsGrid();
+  updateHeroClock();
+  renderHeroMotivation();
+  renderDailyActivityCheck();
+  renderLifeMapBoard();
+  initContests();
+  applyFaithMode();
+  renderDevMap();
+  initResources();
+
+  // Auto-show Quick Start Wizard on first visit
+  // isNewUser catches accounts where parentWizardDone:true was saved from a prior test
+  const isNewUser = !D.name || D.name === '';
+  if(!D.parentWizardDone || isNewUser){ setTimeout(showParentOnboard, 700); }
+
+  // Macro goal inputs
+  const g=D.macroGoals||{};
+  ['goalCal','goalPro','goalCarb','goalFat'].forEach((id,i)=>{ const e=document.getElementById(id); const keys=['cal','pro','carb','fat']; if(e&&g[keys[i]]) e.value=g[keys[i]]; });
+
+  // Today's date defaults
+  const today=new Date().toISOString().split('T')[0];
+  ['txDate','asgDue','evDate','wDate'].forEach(id=>{ const e=document.getElementById(id); if(e&&!e.value) e.value=today; });
+
+  // Pre-fill budget if saved
+  if(D.budgetIncome){ const bi=document.getElementById('budgInc'); if(bi) bi.value=D.budgetIncome; }
+  if(D.budgetSavings){ const bs=document.getElementById('budgSav'); if(bs) bs.value=D.budgetSavings; }
+}
+
+
+
+
+// ── RESUME BUILDER ───────────────────────────────────────────────────
+
+// ── Data helpers ────────────────────────────────────────────────────
+function rGet(id){ const el=document.getElementById(id); return el?el.value.trim():''; }
+function rSet(id,val){ const el=document.getElementById(id); if(el) el.value=val||''; }
+
+function getResumeData(){
+  return {
+    name:rGet('rName'), title:rGet('rTitle'), email:rGet('rEmail'),
+    phone:rGet('rPhone'), location:rGet('rLocation'),
+    linkedin:rGet('rLinkedin'), website:rGet('rWebsite'),
+    summary:rGet('rSummary'),
+    skills:rGet('rSkills'), certs:rGet('rCerts'), langs:rGet('rLangs'),
+    experience: collectEntries('exp'),
+    education:  collectEntries('edu'),
+    template: D.resume.activeTemplate || 'modern'
+  };
+}
+
+function collectEntries(type){
+  const list = document.getElementById(type+'List'); if(!list) return [];
+  return Array.from(list.querySelectorAll('.res-entry')).map(el=>{
+    const get = cls => (el.querySelector('.re-'+cls)||{}).value||'';
+    if(type==='exp') return {
+      role:get('role'), company:get('company'), dates:get('dates'),
+      location:get('location'), bullets:get('bullets')
+    };
+    return {
+      degree:get('degree'), school:get('school'), dates:get('dates'),
+      gpa:get('gpa'), notes:get('notes')
+    };
+  }).filter(e=> type==='exp' ? (e.role||e.company) : (e.degree||e.school));
+}
+
+// ── Entries (Experience / Education) ────────────────────────────────
+function addExpEntry(data={}){
+  const list=document.getElementById('expList'); if(!list) return;
+  const id='exp-'+Date.now();
+  const div=document.createElement('div');
+  div.className='res-entry'; div.id=id;
+  div.innerHTML=`
+    <div class="res-entry-header" onclick="toggleEntry('${id}')">
+      <span class="res-entry-title">${data.role||'New Position'} ${data.company?'at '+data.company:''}</span>
+      <button class="db" onclick="event.stopPropagation();document.getElementById('${id}').remove();livePreview();" style="color:#f87171;font-size:.8rem;">✕</button>
+    </div>
+    <div class="res-entry-body open">
+      <div class="g2" style="gap:.45rem;">
+        <div><label>Job Title / Role *</label><input class="re-role" placeholder="VP of Digital Strategy" value="${data.role||''}" oninput="updateEntryTitle('${id}');livePreview()"></div>
+        <div><label>Company / Organization *</label><input class="re-company" placeholder="Roady's Truck Stops" value="${data.company||''}" oninput="updateEntryTitle('${id}');livePreview()"></div>
+        <div><label>Dates (e.g. Jan 2020 – Present)</label><input class="re-dates" placeholder="Jan 2020 – Present" value="${data.dates||''}" oninput="livePreview()"></div>
+        <div><label>City, State</label><input class="re-location" placeholder="Nampa, ID" value="${data.location||''}" oninput="livePreview()"></div>
+      </div>
+      <label style="margin-top:.5rem;">Key Accomplishments (one per line, start each with an action verb)</label>
+      <textarea class="re-bullets" rows="3" placeholder="Increased fuel network revenue by 22% through strategic partnerships
+Led digital transformation for 120+ independent truck stops
+Built enterprise platform used by 5,000+ merchants daily" oninput="livePreview()" style="min-height:70px;">${data.bullets||''}</textarea>
+    </div>`;
+  list.appendChild(div);
+  livePreview();
+}
+
+function addEduEntry(data={}){
+  const list=document.getElementById('eduList'); if(!list) return;
+  const id='edu-'+Date.now();
+  const div=document.createElement('div');
+  div.className='res-entry'; div.id=id;
+  div.innerHTML=`
+    <div class="res-entry-header" onclick="toggleEntry('${id}')">
+      <span class="res-entry-title">${data.degree||'New Degree'} ${data.school?'— '+data.school:''}</span>
+      <button class="db" onclick="event.stopPropagation();document.getElementById('${id}').remove();livePreview();" style="color:#f87171;font-size:.8rem;">✕</button>
+    </div>
+    <div class="res-entry-body open">
+      <div class="g2" style="gap:.45rem;">
+        <div><label>Degree / Certificate *</label><input class="re-degree" placeholder="B.S. Business Administration" value="${data.degree||''}" oninput="updateEntryTitle('${id}');livePreview()"></div>
+        <div><label>School / Institution *</label><input class="re-school" placeholder="University of Idaho" value="${data.school||''}" oninput="updateEntryTitle('${id}');livePreview()"></div>
+        <div><label>Dates</label><input class="re-dates" placeholder="Aug 2003 – May 2007" value="${data.dates||''}" oninput="livePreview()"></div>
+        <div><label>GPA (optional)</label><input class="re-gpa" placeholder="3.8" value="${data.gpa||''}" oninput="livePreview()"></div>
+      </div>
+      <label style="margin-top:.5rem;">Honors / Relevant Coursework (optional)</label>
+      <textarea class="re-notes" rows="2" placeholder="Dean's List, Relevant: Business Strategy, Data Analytics" oninput="livePreview()" style="min-height:44px;">${data.notes||''}</textarea>
+    </div>`;
+  list.appendChild(div);
+  livePreview();
+}
+
+function toggleEntry(id){
+  const body=document.querySelector('#'+id+' .res-entry-body');
+  if(body) body.classList.toggle('open');
+}
+
+function updateEntryTitle(id){
+  const el=document.getElementById(id); if(!el) return;
+  const role=el.querySelector('.re-role'), company=el.querySelector('.re-company');
+  const degree=el.querySelector('.re-degree'), school=el.querySelector('.re-school');
+  const tEl=el.querySelector('.res-entry-title'); if(!tEl) return;
+  if(role) tEl.textContent=(role.value||'New Position')+(company&&company.value?' at '+company.value:'');
+  if(degree) tEl.textContent=(degree.value||'New Degree')+(school&&school.value?' — '+school.value:'');
+}
+
+// ── Template ─────────────────────────────────────────────────────────
+function setTemplate(name, btn){
+  D.resume.activeTemplate=name; save();
+  document.querySelectorAll('.res-tmpl-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  livePreview();
+}
+
+// ── Live Preview ─────────────────────────────────────────────────────
+function livePreview(){
+  const el=document.getElementById('resumePreview'); if(!el) return;
+  const d=getResumeData();
+  el.innerHTML = buildResumeHTML(d);
+}
+
+function buildResumeHTML(d){
+  const t=d.template||'modern';
+  const skills=(d.skills||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const certs=(d.certs||'').split('\n').map(s=>s.trim()).filter(Boolean);
+  const langs=(d.langs||'').split('\n').map(s=>s.trim()).filter(Boolean);
+
+  if(t==='modern')  return tmplModern(d,skills,certs,langs);
+  if(t==='classic') return tmplClassic(d,skills,certs,langs);
+  if(t==='minimal') return tmplMinimal(d,skills,certs,langs);
+  if(t==='bold')    return tmplBold(d,skills,certs,langs);
+  return tmplModern(d,skills,certs,langs);
+}
+
+// ── TEMPLATE: Modern (sidebar) ───────────────────────────────────────
+function tmplModern(d,skills,certs,langs){
+  const expHTML=d.experience.map(e=>`
+    <div style="margin-bottom:14px;">
+      <div style="font-size:12px;font-weight:800;color:#1e293b;">${e.role||''}</div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+        <span style="font-size:10.5px;font-weight:700;color:#2563eb;">${e.company||''}</span>
+        <span style="font-size:9.5px;color:#64748b;">${e.dates||''}</span>
+      </div>
+      ${e.location?`<div style="font-size:9px;color:#94a3b8;margin-bottom:3px;">${e.location}</div>`:''}
+      ${e.bullets?`<ul style="margin:4px 0 0 14px;padding:0;">${e.bullets.split('\n').filter(Boolean).map(b=>`<li style="font-size:10px;color:#334155;margin-bottom:2px;line-height:1.45;">${b}</li>`).join('')}</ul>`:''}
+    </div>`).join('');
+
+  const eduHTML=d.education.map(e=>`
+    <div style="margin-bottom:11px;">
+      <div style="font-size:11px;font-weight:800;color:#1e293b;">${e.degree||''}</div>
+      <div style="font-size:10px;font-weight:700;color:#2563eb;">${e.school||''}</div>
+      <div style="font-size:9.5px;color:#64748b;">${[e.dates,e.gpa?'GPA: '+e.gpa:''].filter(Boolean).join(' · ')}</div>
+      ${e.notes?`<div style="font-size:9px;color:#64748b;margin-top:2px;">${e.notes}</div>`:''}
+    </div>`).join('');
+
+  return `<div style="display:grid;grid-template-columns:200px 1fr;min-height:600px;font-family:'Inter',sans-serif;">
+    <!-- Sidebar -->
+    <div style="background:#1e3a5f;color:#fff;padding:22px 16px;display:flex;flex-direction:column;gap:18px;">
+      <div>
+        <div style="font-size:18px;font-weight:900;line-height:1.1;color:#fff;">${d.name||'Your Name'}</div>
+        <div style="font-size:9.5px;font-weight:700;color:#93c5fd;letter-spacing:1.5px;margin-top:4px;text-transform:uppercase;">${d.title||'Your Title'}</div>
+      </div>
+      <div style="border-top:1px solid rgba(255,255,255,.15);padding-top:14px;">
+        <div style="font-size:8px;font-weight:800;letter-spacing:2px;color:#93c5fd;margin-bottom:8px;">CONTACT</div>
+        ${d.email?`<div style="font-size:9px;color:#e2e8f0;margin-bottom:4px;">✉ ${d.email}</div>`:''}
+        ${d.phone?`<div style="font-size:9px;color:#e2e8f0;margin-bottom:4px;">📞 ${d.phone}</div>`:''}
+        ${d.location?`<div style="font-size:9px;color:#e2e8f0;margin-bottom:4px;">📍 ${d.location}</div>`:''}
+        ${d.linkedin?`<div style="font-size:9px;color:#93c5fd;margin-bottom:4px;">🔗 ${d.linkedin}</div>`:''}
+        ${d.website?`<div style="font-size:9px;color:#93c5fd;margin-bottom:4px;">🌐 ${d.website}</div>`:''}
+      </div>
+      ${skills.length?`<div style="border-top:1px solid rgba(255,255,255,.15);padding-top:14px;">
+        <div style="font-size:8px;font-weight:800;letter-spacing:2px;color:#93c5fd;margin-bottom:8px;">SKILLS</div>
+        ${skills.map(s=>`<div style="background:rgba(255,255,255,.12);border-radius:4px;padding:3px 8px;font-size:9px;color:#e2e8f0;margin-bottom:4px;display:inline-block;margin-right:3px;">${s}</div>`).join('')}
+      </div>`:''}
+      ${certs.length?`<div style="border-top:1px solid rgba(255,255,255,.15);padding-top:14px;">
+        <div style="font-size:8px;font-weight:800;letter-spacing:2px;color:#93c5fd;margin-bottom:8px;">CERTIFICATIONS</div>
+        ${certs.map(c=>`<div style="font-size:9px;color:#e2e8f0;margin-bottom:4px;">✓ ${c}</div>`).join('')}
+      </div>`:''}
+      ${langs.length?`<div style="border-top:1px solid rgba(255,255,255,.15);padding-top:14px;">
+        <div style="font-size:8px;font-weight:800;letter-spacing:2px;color:#93c5fd;margin-bottom:8px;">LANGUAGES</div>
+        ${langs.map(l=>`<div style="font-size:9px;color:#e2e8f0;margin-bottom:3px;">${l}</div>`).join('')}
+      </div>`:''}
+    </div>
+    <!-- Main -->
+    <div style="padding:22px 20px;background:#fff;">
+      ${d.summary?`<div style="margin-bottom:18px;">
+        <div style="font-size:8px;font-weight:900;letter-spacing:2px;color:#1e3a5f;border-bottom:2px solid #2563eb;padding-bottom:3px;margin-bottom:8px;text-transform:uppercase;">Profile</div>
+        <p style="font-size:10px;color:#334155;line-height:1.65;margin:0;">${d.summary}</p>
+      </div>`:''}
+      ${expHTML?`<div style="margin-bottom:18px;">
+        <div style="font-size:8px;font-weight:900;letter-spacing:2px;color:#1e3a5f;border-bottom:2px solid #2563eb;padding-bottom:3px;margin-bottom:10px;text-transform:uppercase;">Experience</div>
+        ${expHTML}
+      </div>`:''}
+      ${eduHTML?`<div>
+        <div style="font-size:8px;font-weight:900;letter-spacing:2px;color:#1e3a5f;border-bottom:2px solid #2563eb;padding-bottom:3px;margin-bottom:10px;text-transform:uppercase;">Education</div>
+        ${eduHTML}
+      </div>`:''}
+    </div>
+  </div>`;
+}
+
+// ── TEMPLATE: Classic (traditional single column) ────────────────────
+function tmplClassic(d,skills,certs,langs){
+  const expHTML=d.experience.map(e=>`
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;">
+        <span style="font-size:11.5px;font-weight:800;color:#111;">${e.role||''}</span>
+        <span style="font-size:9.5px;color:#555;">${e.dates||''}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <span style="font-size:10px;font-style:italic;color:#444;">${e.company||''}</span>
+        <span style="font-size:9.5px;color:#777;">${e.location||''}</span>
+      </div>
+      ${e.bullets?`<ul style="margin:5px 0 0 16px;padding:0;">${e.bullets.split('\n').filter(Boolean).map(b=>`<li style="font-size:10px;color:#333;margin-bottom:2px;line-height:1.45;">${b}</li>`).join('')}</ul>`:''}
+    </div>`).join('');
+
+  const eduHTML=d.education.map(e=>`
+    <div style="margin-bottom:11px;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;">
+        <span style="font-size:11.5px;font-weight:800;color:#111;">${e.degree||''}</span>
+        <span style="font-size:9.5px;color:#555;">${e.dates||''}</span>
+      </div>
+      <div style="font-size:10px;font-style:italic;color:#444;">${e.school||''}${e.gpa?' — GPA: '+e.gpa:''}</div>
+      ${e.notes?`<div style="font-size:9.5px;color:#666;margin-top:2px;">${e.notes}</div>`:''}
+    </div>`).join('');
+
+  const allSkills=[...skills,...certs].join(' · ');
+
+  return `<div style="padding:28px 30px;font-family:'Times New Roman',serif;background:#fff;min-height:600px;">
+    <div style="text-align:center;border-bottom:2px solid #111;padding-bottom:12px;margin-bottom:14px;">
+      <div style="font-size:22px;font-weight:900;letter-spacing:1px;color:#111;">${d.name||'Your Name'}</div>
+      ${d.title?`<div style="font-size:11px;color:#444;margin-top:3px;letter-spacing:.5px;">${d.title}</div>`:''}
+      <div style="font-size:9.5px;color:#555;margin-top:6px;">${[d.email,d.phone,d.location,d.linkedin].filter(Boolean).join(' | ')}</div>
+    </div>
+    ${d.summary?`<div style="margin-bottom:14px;">
+      <div style="font-size:10.5px;font-weight:900;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #aaa;margin-bottom:6px;padding-bottom:2px;">Summary</div>
+      <p style="font-size:10px;color:#333;line-height:1.6;margin:0;">${d.summary}</p>
+    </div>`:''}
+    ${expHTML?`<div style="margin-bottom:14px;">
+      <div style="font-size:10.5px;font-weight:900;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #aaa;margin-bottom:8px;padding-bottom:2px;">Experience</div>
+      ${expHTML}</div>`:''}
+    ${eduHTML?`<div style="margin-bottom:14px;">
+      <div style="font-size:10.5px;font-weight:900;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #aaa;margin-bottom:8px;padding-bottom:2px;">Education</div>
+      ${eduHTML}</div>`:''}
+    ${allSkills?`<div>
+      <div style="font-size:10.5px;font-weight:900;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #aaa;margin-bottom:6px;padding-bottom:2px;">Skills & Certifications</div>
+      <p style="font-size:10px;color:#333;line-height:1.5;margin:0;">${allSkills}</p>
+    </div>`:''}
+  </div>`;
+}
+
+// ── TEMPLATE: Minimal (clean modern) ─────────────────────────────────
+function tmplMinimal(d,skills,certs,langs){
+  const expHTML=d.experience.map(e=>`
+    <div style="display:grid;grid-template-columns:90px 1fr;gap:8px;margin-bottom:14px;">
+      <div style="font-size:9px;color:#999;text-align:right;padding-top:2px;line-height:1.4;">${e.dates||''}<br><span style="color:#bbb;">${e.location||''}</span></div>
+      <div>
+        <div style="font-size:11.5px;font-weight:800;color:#111;">${e.role||''}</div>
+        <div style="font-size:10px;color:#666;margin-bottom:4px;">${e.company||''}</div>
+        ${e.bullets?`<ul style="margin:4px 0 0 12px;padding:0;">${e.bullets.split('\n').filter(Boolean).map(b=>`<li style="font-size:9.5px;color:#444;margin-bottom:2px;line-height:1.4;">${b}</li>`).join('')}</ul>`:''}
+      </div>
+    </div>`).join('');
+
+  const eduHTML=d.education.map(e=>`
+    <div style="display:grid;grid-template-columns:90px 1fr;gap:8px;margin-bottom:12px;">
+      <div style="font-size:9px;color:#999;text-align:right;">${e.dates||''}</div>
+      <div>
+        <div style="font-size:11px;font-weight:800;color:#111;">${e.degree||''}</div>
+        <div style="font-size:10px;color:#666;">${e.school||''}${e.gpa?' · '+e.gpa:''}</div>
+      </div>
+    </div>`).join('');
+
+  return `<div style="padding:30px 32px;font-family:'Helvetica Neue',Helvetica,sans-serif;background:#fff;min-height:600px;">
+    <div style="margin-bottom:20px;">
+      <div style="font-size:24px;font-weight:900;color:#111;letter-spacing:-1px;">${d.name||'Your Name'}</div>
+      ${d.title?`<div style="font-size:11px;color:#888;margin-top:2px;">${d.title}</div>`:''}
+      <div style="font-size:9px;color:#aaa;margin-top:8px;display:flex;gap:12px;flex-wrap:wrap;">
+        ${[d.email,d.phone,d.location,d.linkedin,d.website].filter(Boolean).map(v=>`<span>${v}</span>`).join('')}
+      </div>
+    </div>
+    <div style="height:1px;background:#e5e7eb;margin-bottom:18px;"></div>
+    ${d.summary?`<p style="font-size:10px;color:#555;line-height:1.65;margin:0 0 18px;">${d.summary}</p>`:''}
+    ${expHTML?`<div style="margin-bottom:18px;"><div style="font-size:8.5px;font-weight:800;letter-spacing:2px;color:#aaa;margin-bottom:12px;text-transform:uppercase;">Experience</div>${expHTML}</div>`:''}
+    ${eduHTML?`<div style="margin-bottom:18px;"><div style="font-size:8.5px;font-weight:800;letter-spacing:2px;color:#aaa;margin-bottom:12px;text-transform:uppercase;">Education</div>${eduHTML}</div>`:''}
+    ${skills.length?`<div><div style="font-size:8.5px;font-weight:800;letter-spacing:2px;color:#aaa;margin-bottom:8px;text-transform:uppercase;">Skills</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;">${skills.map(s=>`<span style="border:1px solid #e5e7eb;border-radius:100px;padding:2px 10px;font-size:9px;color:#555;">${s}</span>`).join('')}</div>
+    </div>`:''}
+  </div>`;
+}
+
+// ── TEMPLATE: Bold (high impact) ─────────────────────────────────────
+function tmplBold(d,skills,certs,langs){
+  const expHTML=d.experience.map(e=>`
+    <div style="margin-bottom:14px;padding-left:10px;border-left:3px solid #f59e0b;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;">
+        <span style="font-size:12px;font-weight:900;color:#fff;">${e.role||''}</span>
+        <span style="font-size:9px;color:#fcd34d;background:rgba(251,191,36,.15);padding:2px 8px;border-radius:100px;">${e.dates||''}</span>
+      </div>
+      <div style="font-size:10px;color:#94a3b8;margin-bottom:4px;">${[e.company,e.location].filter(Boolean).join(' · ')}</div>
+      ${e.bullets?`<ul style="margin:5px 0 0 12px;padding:0;">${e.bullets.split('\n').filter(Boolean).map(b=>`<li style="font-size:9.5px;color:#cbd5e1;margin-bottom:3px;line-height:1.45;">${b}</li>`).join('')}</ul>`:''}
+    </div>`).join('');
+
+  const eduHTML=d.education.map(e=>`
+    <div style="margin-bottom:10px;">
+      <div style="font-size:11px;font-weight:800;color:#fff;">${e.degree||''}</div>
+      <div style="font-size:9.5px;color:#94a3b8;">${e.school||''}${e.dates?' · '+e.dates:''}${e.gpa?' · GPA '+e.gpa:''}</div>
+    </div>`).join('');
+
+  return `<div style="background:#0f172a;color:#f1f5f9;font-family:'Inter',sans-serif;min-height:600px;">
+    <div style="background:linear-gradient(135deg,#1e3a5f,#1e1b4b);padding:24px 26px;">
+      <div style="font-size:24px;font-weight:900;letter-spacing:-1px;color:#fff;">${d.name||'Your Name'}</div>
+      <div style="font-size:11px;font-weight:700;color:#f59e0b;letter-spacing:2px;margin-top:4px;text-transform:uppercase;">${d.title||'Your Title'}</div>
+      <div style="font-size:9px;color:#94a3b8;margin-top:8px;display:flex;flex-wrap:wrap;gap:10px;">
+        ${[d.email,d.phone,d.location].filter(Boolean).map(v=>`<span>${v}</span>`).join('')}
+      </div>
+    </div>
+    <div style="padding:20px 26px;display:grid;grid-template-columns:1fr 150px;gap:20px;">
+      <div>
+        ${d.summary?`<div style="margin-bottom:18px;"><div style="font-size:8px;font-weight:800;letter-spacing:2px;color:#f59e0b;margin-bottom:6px;text-transform:uppercase;">About</div><p style="font-size:10px;color:#94a3b8;line-height:1.65;margin:0;">${d.summary}</p></div>`:''}
+        ${expHTML?`<div style="margin-bottom:18px;"><div style="font-size:8px;font-weight:800;letter-spacing:2px;color:#f59e0b;margin-bottom:10px;text-transform:uppercase;">Experience</div>${expHTML}</div>`:''}
+        ${eduHTML?`<div><div style="font-size:8px;font-weight:800;letter-spacing:2px;color:#f59e0b;margin-bottom:10px;text-transform:uppercase;">Education</div>${eduHTML}</div>`:''}
+      </div>
+      <div>
+        ${skills.length?`<div style="margin-bottom:16px;"><div style="font-size:8px;font-weight:800;letter-spacing:2px;color:#f59e0b;margin-bottom:8px;text-transform:uppercase;">Skills</div>${skills.map(s=>`<div style="font-size:9px;color:#cbd5e1;background:rgba(255,255,255,.07);border-radius:5px;padding:3px 8px;margin-bottom:4px;">${s}</div>`).join('')}</div>`:''}
+        ${certs.length?`<div style="margin-bottom:16px;"><div style="font-size:8px;font-weight:800;letter-spacing:2px;color:#f59e0b;margin-bottom:8px;text-transform:uppercase;">Certs</div>${certs.map(c=>`<div style="font-size:9px;color:#cbd5e1;margin-bottom:4px;">✓ ${c}</div>`).join('')}</div>`:''}
+        ${langs.length?`<div><div style="font-size:8px;font-weight:800;letter-spacing:2px;color:#f59e0b;margin-bottom:8px;text-transform:uppercase;">Languages</div>${langs.map(l=>`<div style="font-size:9px;color:#cbd5e1;margin-bottom:4px;">${l}</div>`).join('')}</div>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Save / Load named resumes ────────────────────────────────────────
+function saveNamedResume(){
+  const name=(document.getElementById('resumeNameInput')||{}).value?.trim();
+  if(!name){showToast('Enter a resume name first');return;}
+  if(!D.resume.resumes) D.resume.resumes={};
+  const data=getResumeData();
+  data.expEntries=collectEntries('exp');
+  data.eduEntries=collectEntries('edu');
+  D.resume.resumes[name]=data;
+  save(); populateResumeSelect(); showToast('Saved: '+name+' ✅');
+}
+
+function loadSavedResume(name){
+  if(!name) return;
+  const r=(D.resume.resumes||{})[name]; if(!r) return;
+  // Fill fields
+  rSet('rName',r.name); rSet('rTitle',r.title); rSet('rEmail',r.email);
+  rSet('rPhone',r.phone); rSet('rLocation',r.location);
+  rSet('rLinkedin',r.linkedin); rSet('rWebsite',r.website);
+  rSet('rSummary',r.summary); rSet('rSkills',r.skills);
+  rSet('rCerts',r.certs); rSet('rLangs',r.langs);
+  // Rebuild entries
+  const expList=document.getElementById('expList');
+  const eduList=document.getElementById('eduList');
+  if(expList) expList.innerHTML='';
+  if(eduList) eduList.innerHTML='';
+  (r.expEntries||r.experience||[]).forEach(e=>addExpEntry(e));
+  (r.eduEntries||r.education||[]).forEach(e=>addEduEntry(e));
+  // Template
+  if(r.template){
+    D.resume.activeTemplate=r.template;
+    document.querySelectorAll('.res-tmpl-btn').forEach(b=>b.classList.remove('active'));
+    const btn=document.getElementById('tmpl-'+r.template);
+    if(btn) btn.classList.add('active');
+  }
+  const nameInput=document.getElementById('resumeNameInput');
+  if(nameInput) nameInput.value=name;
+  livePreview();
+  showToast('Loaded: '+name);
+}
+
+function deleteResume(){
+  const sel=document.getElementById('resumeSelect');
+  const name=sel&&sel.value;
+  if(!name){showToast('Select a saved resume to delete');return;}
+  if(!confirm('Delete "'+name+'"?')) return;
+  delete (D.resume.resumes||{})[name];
+  save(); populateResumeSelect();
+  sel.value='';
+  showToast('Deleted!');
+}
+
+function populateResumeSelect(){
+  const sel=document.getElementById('resumeSelect'); if(!sel) return;
+  const names=Object.keys(D.resume.resumes||{});
+  sel.innerHTML='<option value="">— New / Unsaved —</option>'+names.map(n=>`<option value="${n}">${n}</option>`).join('');
+}
+
+function printResume(){
+  const d=getResumeData();
+  const html=buildResumeHTML(d);
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><title>Resume - ${d.name||'Resume'}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>*{margin:0;padding:0;box-sizing:border-box;}body{margin:0;padding:0;}@page{margin:.4in;size:letter;}ul{margin-left:1.2em;}li{margin-bottom:2px;}</style>
+    </head><body>${html}
+
+
+
+
+<!-- ═══ REWARD SPINNER OVERLAY ═══ -->
+
+<!-- ═══ SCRATCH CARD OVERLAY ═══ -->
+
+
+
+
+
+
+</body></html>`);
+  win.document.close();
+  setTimeout(()=>win.print(),600);
+}
+
+function initResume(){
+  // Set today's date as default for job applications
+  const dateEl=document.getElementById('jaDate');
+  if(dateEl && !dateEl.value) dateEl.value=new Date().toISOString().slice(0,10);
+  // Load saved state back into fields
+  const r=D.resume||{};
+  rSet('rName',r.name); rSet('rTitle',r.title); rSet('rEmail',r.email);
+  rSet('rPhone',r.phone); rSet('rLocation',r.location);
+  rSet('rLinkedin',r.linkedin); rSet('rWebsite',r.website);
+  rSet('rSummary',r.summary); rSet('rSkills',r.skills);
+  rSet('rCerts',r.certs); rSet('rLangs',r.langs);
+  (r.experience||[]).forEach(e=>addExpEntry(e));
+  (r.education||[]).forEach(e=>addEduEntry(e));
+  // Set template button
+  const tpl=r.activeTemplate||'modern';
+  document.querySelectorAll('.res-tmpl-btn').forEach(b=>b.classList.remove('active'));
+  const btn=document.getElementById('tmpl-'+tpl); if(btn) btn.classList.add('active');
+  populateResumeSelect();
+  livePreview();
+}
+
+
+// ── CAREER HUB TAB SWITCHER ──────────────────────────────────────────
+function resumeTab(panel, btn){
+  document.querySelectorAll('.r-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('#s-resume .tab').forEach(b=>b.classList.remove('on','active'));
+  const el=document.getElementById('rPanel-'+panel);
+  if(el) el.classList.add('active');
+  if(btn){ btn.classList.add('active'); }
+  if(panel==='tracker') renderJobApps();
+  if(panel==='prep') renderBQList();
+}
+
+// ── JOB TRACKER ──────────────────────────────────────────────────────
+const JA_STATUS_MAP={
+  'Applied':           'st-applied',
+  'Phone Screen':      'st-phone',
+  'Interview Scheduled':'st-interview',
+  '1st Interview':     'st-interview',
+  '2nd Interview':     'st-interview2',
+  'Final Round':       'st-final',
+  'Offer Received':    'st-offer',
+  'Offer Accepted':    'st-accepted',
+  'Waiting':           'st-waiting',
+  'Not Selected':      'st-no',
+  'Withdrew':          'st-withdrew',
+};
+
+function addJobApp(){
+  const company=(document.getElementById('jaCompany')||{}).value?.trim();
+  const role=(document.getElementById('jaRole')||{}).value?.trim();
+  if(!company||!role){showToast('Enter company and job title');return;}
+  if(!D.jobApps) D.jobApps=[];
+  D.jobApps.unshift({
+    id:Date.now(),
+    company, role,
+    board:(document.getElementById('jaBoard')||{}).value||'',
+    date:(document.getElementById('jaDate')||{}).value||new Date().toISOString().slice(0,10),
+    salary:(document.getElementById('jaSalary')||{}).value?.trim()||'',
+    url:(document.getElementById('jaUrl')||{}).value?.trim()||'',
+    notes:(document.getElementById('jaNotes')||{}).value?.trim()||'',
+    status:'Applied'
+  });
+  ['jaCompany','jaRole','jaSalary','jaUrl','jaNotes'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  save(); renderJobApps(); showToast('Application logged! 🎯');
+}
+
+function updateJobStatus(id, val){
+  const app=(D.jobApps||[]).find(a=>a.id===id);
+  if(app){ app.status=val; save(); renderJobApps(); }
+}
+
+function deleteJobApp(id){
+  D.jobApps=(D.jobApps||[]).filter(a=>a.id!==id);
+  save(); renderJobApps();
+}
+
+function renderJobApps(){
+  const list=document.getElementById('jaList');
+  const stats=document.getElementById('jaStats');
+  const countEl=document.getElementById('jaCount');
+  if(!list) return;
+
+  const filter=(document.getElementById('jaFilter')||{}).value||'all';
+  const apps=D.jobApps||[];
+  const filtered=filter==='all'?apps:apps.filter(a=>a.status===filter);
+
+  // Stats pills
+  const statusCounts={};
+  apps.forEach(a=>{ statusCounts[a.status]=(statusCounts[a.status]||0)+1; });
+  if(stats){
+    const active=apps.filter(a=>!['Not Selected','Withdrew','Offer Accepted'].includes(a.status)).length;
+    const offers=apps.filter(a=>a.status==='Offer Received'||a.status==='Offer Accepted').length;
+    stats.innerHTML=`
+      <div class="ja-stat-pill">📋 ${apps.length} Total</div>
+      <div class="ja-stat-pill" style="border-color:rgba(56,189,248,.3);color:var(--c);">⚡ ${active} Active</div>
+      ${offers?`<div class="ja-stat-pill" style="border-color:rgba(52,211,153,.4);color:var(--gr);">🎉 ${offers} Offer${offers>1?'s':''}</div>`:''}
+      <div class="ja-stat-pill" style="border-color:rgba(248,113,113,.3);color:#fca5a5;">✕ ${statusCounts['Not Selected']||0} Rejected</div>
+    `;
+  }
+  if(countEl) countEl.textContent=filtered.length+' shown';
+
+  if(!filtered.length){
+    list.innerHTML=`<div style="text-align:center;padding:2rem;color:var(--mt);font-size:.85rem;">${apps.length?'No applications match this filter.':'No applications yet — add your first one above!'}</div>`;
+    return;
+  }
+
+  list.innerHTML=filtered.map(a=>{
+    const cls=JA_STATUS_MAP[a.status]||'st-applied';
+    const statusOpts=['Applied','Phone Screen','Interview Scheduled','1st Interview','2nd Interview','Final Round','Offer Received','Offer Accepted','Waiting','Not Selected','Withdrew'];
+    return `<div class="ja-card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem;flex-wrap:wrap;margin-bottom:.45rem;">
+        <div>
+          <div style="font-size:.95rem;font-weight:800;color:var(--tx);">${a.company}</div>
+          <div style="font-size:.82rem;color:var(--tx2);">${a.role}${a.board?' · <span style="color:var(--mt);">via '+a.board+'</span>':''}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:.4rem;">
+          <span class="ja-status ${cls}">${a.status}</span>
+          <button class="db" onclick="deleteJobApp(${a.id})" style="color:#f87171;font-size:.75rem;opacity:.6;">✕</button>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+        <select onchange="updateJobStatus(${a.id},this.value)" style="font-size:.72rem;padding:.25rem .5rem;width:auto;flex:1;max-width:200px;">
+          ${statusOpts.map(s=>`<option value="${s}"${s===a.status?' selected':''}>${s}</option>`).join('')}
+        </select>
+        ${a.date?`<span style="font-size:.72rem;color:var(--mt);">📅 ${a.date}</span>`:''}
+        ${a.salary?`<span style="font-size:.72rem;color:var(--gr);">💰 ${a.salary}</span>`:''}
+        ${a.url?`<a href="${a.url}" target="_blank" style="font-size:.72rem;color:var(--c);">🔗 Post</a>`:''}
+      </div>
+      ${a.notes?`<div style="font-size:.76rem;color:var(--mt);margin-top:.35rem;padding-top:.35rem;border-top:1px solid rgba(255,255,255,.06);">${a.notes}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ── BEHAVIORAL QUESTIONS BANK ─────────────────────────────────────────
+const BQ_LIST=[
+  'Tell me about yourself.',
+  'Why do you want to work here?',
+  'What is your greatest strength?',
+  'What is your greatest weakness?',
+  'Tell me about a time you overcame a major challenge.',
+  'Describe a conflict with a coworker and how you resolved it.',
+  'Tell me about a time you failed. What did you learn?',
+  'Describe a time you had to lead without authority.',
+  'Tell me about a time you managed multiple competing priorities.',
+  'Give an example of a time you went above and beyond.',
+  'Describe a time you had to adapt quickly to change.',
+  'Tell me about a time you had to persuade someone to see your point of view.',
+  'Where do you see yourself in 5 years?',
+  'Why are you leaving your current role?',
+  'Tell me about a time you took initiative without being asked.',
+  'Describe your greatest professional accomplishment.',
+  'How do you handle stress and pressure?',
+  'Tell me about a time you worked with a difficult person.',
+  'Describe a situation where you had to make a decision with limited information.',
+  'What motivates you most at work?',
+];
+
+function renderBQList(){
+  const el=document.getElementById('bqList'); if(!el) return;
+  el.innerHTML=BQ_LIST.map((q,i)=>`
+    <div class="bq-item" onclick="this.style.background='rgba(56,189,248,.1)';this.style.color='var(--tx)';this.style.borderLeftColor='var(--c)';">
+      <span style="font-size:.68rem;font-weight:800;color:var(--mt);margin-right:.4rem;">${i+1}.</span>${q}
+    </div>`).join('');
+}
+
+
+// ── HERO PHOTO BACKGROUND ────────────────────────────────────────────
+function setHeroBg(input){
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    D.heroBg = e.target.result; // store base64
+    applyHeroBg();
+    save();
+    showToast('Background photo set! 📷');
+  };
+  reader.readAsDataURL(file);
+}
+
+function applyHeroBg(){
+  const layer = document.getElementById('heroBgLayer');
+  const card  = document.getElementById('heroCard');
+  const rmBtn = document.getElementById('heroRemoveBtn');
+  if(!layer) return;
+  // Apply preset to full background on load
+  if(D.heroBgPreset){
+    // Banner only
+  }
+  if(D.appBgPreset){
+    document.body.style.backgroundImage = D.appBgPreset;
+    document.body.style.backgroundAttachment = 'fixed';
+  }
+  if(D.heroBg){
+    layer.style.backgroundImage = `url(${D.heroBg})`;
+    layer.style.backgroundSize  = 'cover';
+    layer.style.backgroundPosition = 'center';
+    if(card)  card.classList.remove('no-photo');
+    if(rmBtn) rmBtn.style.display = 'flex';
+  } else {
+    layer.style.backgroundImage = '';
+    if(card)  card.classList.add('no-photo');
+    if(rmBtn) rmBtn.style.display = 'none';
+  }
+}
+
+function removeHeroBg(){
+  D.heroBg = ''; save(); applyHeroBg(); showToast('Background removed');
+}
+
+// ── COLOR PALETTE SYSTEM ─────────────────────────────────────────────
+const PALETTES = {
+  cyan:    null, // default — uses :root values
+  violet:  {c:'#8b5cf6', p:'#06b6d4', gr:'#34d399', g:'#fbbf24'},
+  rose:    {c:'#f43f5e', p:'#a78bfa', gr:'#34d399', g:'#fbbf24'},
+  emerald: {c:'#10b981', p:'#6366f1', gr:'#34d399', g:'#fbbf24'},
+  amber:   {c:'#f59e0b', p:'#8b5cf6', gr:'#34d399', g:'#fb923c'},
+  coral:   {c:'#ff6b6b', p:'#4ecdc4', gr:'#45b7d1', g:'#ffd93d'},
+  neon:    {c:'#39ff14', p:'#ff00ff', gr:'#00ffff', g:'#ffff00', bg:'#050505', s1:'#0a0a0a', s2:'#111', s3:'#161616', s4:'#1a1a1a'},
+laundry:[
+  {q:'What water temperature works for 90% of laundry loads?',opts:['Hot','Warm','Cold','Boiling'],ans:2,explain:'Cold water works for almost everything, saves energy, and prevents color bleeding.'},
+  {q:'What should you NEVER put in the dryer?',opts:['Jeans','Towels','Bras and elastic items','Socks'],ans:2,explain:'Athletic wear, bras, and anything with elastic should air dry to prevent damage.'},
+  {q:'The best way to treat a fresh stain is:',opts:['Rub vigorously with hot water','Blot gently with cold water','Ignore it','Put it directly in the dryer'],ans:1,explain:'Blot (don\'t rub) with cold water immediately. Rubbing pushes stains deeper.'},
+  {q:'How often should you wash bed sheets?',opts:['Monthly','Every 1-2 weeks','Once a season','Daily'],ans:1,explain:'Wash sheets every 1-2 weeks. Dirty sheets cause acne, allergies, and poor sleep.'},
+  {q:'What happens if you use too much detergent?',opts:['Clothes get extra clean','Leaves residue making clothes stiff and smelly','Nothing','Colors get brighter'],ans:1,explain:'Excess detergent leaves residue that traps odors and makes fabric stiff.'}
+],
+cleaning:[
+  {q:'The 10-minute daily reset starts with:',opts:['Vacuuming','A trash sweep','Organizing books','Calling someone'],ans:1,explain:'Start with a trash sweep — walk through with a bag and grab everything that\'s garbage.'},
+  {q:'The most important kitchen cleaning rule is:',opts:['Deep clean weekly','Clean as you cook','Only clean on weekends','Use bleach everywhere'],ans:1,explain:'Cleaning while cooking prevents the overwhelming pile-up after meals.'},
+  {q:'To prevent bathroom mold, you should:',opts:['Keep windows closed','Run the vent fan during and 15 min after showers','Use hot water only','Never clean'],ans:1,explain:'Ventilation removes moisture that causes mold growth. Run the fan during and 15 minutes after.'},
+  {q:'What three cleaning products handle most jobs?',opts:['Bleach, ammonia, acid','All-purpose cleaner, toilet cleaner, glass cleaner','Soap, water, vinegar','Only bleach'],ans:1,explain:'All-purpose cleaner, toilet bowl cleaner, and glass cleaner cover 95% of household cleaning.'},
+  {q:'You should never go to bed with:',opts:['The TV on','Dishes in the sink','Music playing','The window open'],ans:1,explain:'An empty sink in the morning changes how your entire day starts. Never go to bed with dirty dishes.'}
+],
+timemanage:[
+  {q:'The 2-Minute Rule states:',opts:['Study for only 2 minutes','If a task takes under 2 minutes, do it now','Take a 2-minute break every hour','Spend 2 minutes planning'],ans:1,explain:'Tasks under 2 minutes should be done immediately — this eliminates 40% of your to-do list.'},
+  {q:'Parkinson\'s Law means:',opts:['Work expands to fill the time available','Working harder is always better','Planning wastes time','Deadlines don\'t matter'],ans:0,explain:'Give yourself all day for a task and it takes all day. Set tight deadlines to work efficiently.'},
+  {q:'The 5-minute start technique helps with:',opts:['Sleeping','Procrastination','Cooking','Exercising'],ans:1,explain:'Commit to just 5 minutes of work. Once you start, momentum usually carries you forward.'},
+  {q:'How much discretionary time does the average person have daily?',opts:['2 hours','5 hours','About 7 hours','12 hours'],ans:2,explain:'After sleep, school/work, and meals, most people have roughly 7 hours of free time.'},
+  {q:'The best time to plan your week is:',opts:['Monday morning','Friday afternoon','Sunday evening','Never'],ans:2,explain:'A 15-minute Sunday planning session makes you 3x more likely to complete your goals.'}
+],
+organize:[
+  {q:'The average person spends how much time per day looking for things?',opts:['10 minutes','30 minutes','2.5 hours','5 hours'],ans:2,explain:'2.5 hours daily = 38 days per year wasted because items don\'t have a designated home.'},
+  {q:'The most important organization rule is:',opts:['Buy more storage','Every item has a designated spot','Label everything','Color code'],ans:1,explain:'When every item has a home and goes back after use, clutter becomes impossible.'},
+  {q:'Files should be named:',opts:['doc1, doc2, doc3','With dates and descriptions (2026-03-Biology-Lab)','Whatever you feel like','By the first word'],ans:1,explain:'Descriptive names with dates mean you can find any file in seconds, even months later.'},
+  {q:'How often should you do a weekly review?',opts:['Monthly','Every Sunday for 15 minutes','Daily for 2 hours','Never'],ans:1,explain:'A 15-minute Sunday review of your upcoming week dramatically increases follow-through.'},
+  {q:'The nightly reset should take:',opts:['1 hour','5 minutes','30 minutes','No time — skip it'],ans:1,explain:'5 minutes each night (check tomorrow, prep bag, lay out clothes) means mornings are smooth.'}
+]
+};
+
+function setPalette(name, el){
+  D.palette = name; save();
+  applyPalette();
+  // Update active swatch
+  document.querySelectorAll('.palette-swatch').forEach(s => s.classList.remove('active'));
+  if(el) el.classList.add('active');
+  else {
+    const sw = document.getElementById('ps-'+name);
+    if(sw) sw.classList.add('active');
+  }
+}
+
+function applyPalette(){
+  const name = D.palette || 'cyan';
+  const root = document.documentElement;
+  // Set data-palette attribute (drives CSS var overrides)
+  root.setAttribute('data-palette', name);
+
+  // Also apply via JS for reliability
+  const pal = PALETTES[name];
+  if(pal){
+    if(pal.c)  root.style.setProperty('--c',  pal.c);
+    if(pal.p)  root.style.setProperty('--p',  pal.p);
+    if(pal.gr) root.style.setProperty('--gr', pal.gr);
+    if(pal.g)  root.style.setProperty('--g',  pal.g);
+    if(pal.bg) root.style.setProperty('--bg', pal.bg);
+    if(pal.s1) root.style.setProperty('--s1', pal.s1);
+    if(pal.s2) root.style.setProperty('--s2', pal.s2);
+    if(pal.s3) root.style.setProperty('--s3', pal.s3);
+    if(pal.s4) root.style.setProperty('--s4', pal.s4);
+  } else {
+    // Reset to cyan defaults
+    root.style.setProperty('--c',  '#38bdf8');
+    root.style.setProperty('--p',  '#a78bfa');
+    root.style.setProperty('--gr', '#34d399');
+    root.style.setProperty('--g',  '#fbbf24');
+    root.style.removeProperty('--bg');
+    root.style.removeProperty('--s1');
+    root.style.removeProperty('--s2');
+    root.style.removeProperty('--s3');
+    root.style.removeProperty('--s4');
+  }
+
+  // Highlight correct swatch
+  document.querySelectorAll('.palette-swatch').forEach(s => {
+    s.classList.toggle('active', s.dataset.palette === name);
+  });
+}
+
+// ── TAX ESTIMATOR ────────────────────────────────────────────────────
+function calcTax(){
+  const income = parseFloat(document.getElementById('taxIncome').value) || 0;
+  const status = document.getElementById('taxStatus').value;
+  const type   = document.getElementById('taxType').value;
+  const res    = document.getElementById('taxResult');
+  if(!income || income <= 0){ if(res) res.style.display='none'; return; }
+  if(res) res.style.display='block';
+
+  // 2024 Federal brackets
+  const brackets = {
+    single: [[11600,.10],[47150,.12],[100525,.22],[191950,.24],[243725,.32],[609350,.35],[Infinity,.37]],
+    mfj:    [[23200,.10],[94300,.12],[201050,.22],[383900,.24],[487450,.32],[731200,.35],[Infinity,.37]],
+    hoh:    [[16550,.10],[63100,.12],[100500,.22],[191950,.24],[243700,.32],[609350,.35],[Infinity,.37]],
+  };
+  const stdDed = {single:14600, mfj:29200, hoh:21900};
+
+  // Self-employed: deduct half of SE tax first
+  let seAmt = 0;
+  if(type === 'self'){
+    seAmt = income * 0.9235 * 0.153;
+  }
+
+  const taxableIncome = Math.max(0, income - (seAmt / 2) - stdDed[status]);
+  const bracks = brackets[status];
+
+  let fedTax = 0;
+  let prev = 0;
+  let bracketDesc = '';
+  let topRate = 0;
+  for(const [ceiling, rate] of bracks){
+    if(taxableIncome <= prev) break;
+    const chunk = Math.min(taxableIncome, ceiling) - prev;
+    fedTax += chunk * rate;
+    if(chunk > 0){ topRate = rate; bracketDesc = `Marginal bracket: ${(rate*100).toFixed(0)}%`; }
+    prev = ceiling;
+  }
+
+  const total = fedTax + seAmt;
+  const effectiveRate = income > 0 ? (total / income * 100) : 0;
+
+  const fmt = n => '$' + Math.round(n).toLocaleString();
+
+  document.getElementById('trFed').textContent   = fmt(fedTax);
+  document.getElementById('trSE').textContent    = type === 'self' ? fmt(seAmt) : '—';
+  document.getElementById('trRate').textContent  = effectiveRate.toFixed(1) + '%';
+  document.getElementById('trTotal').textContent = fmt(total);
+  document.getElementById('trBracket').textContent = bracketDesc + ' · Standard deduction applied';
+
+  const tip = document.getElementById('trTip');
+  if(type === 'self'){
+    const setAside = income * 0.28;
+    tip.innerHTML = `<b>Self-employed tip:</b> Set aside ${fmt(setAside)}/year (${fmt(setAside/12)}/month) to cover taxes. Pay quarterly to avoid penalties.`;
+  } else {
+    const monthly = total / 12;
+    tip.innerHTML = `<b>W-2 tip:</b> ${fmt(monthly)}/month should be withheld. Check your last pay stub to confirm withholding is on track.`;
+  }
+}
+
+// ── THEME TOGGLE ────────────────────────────────────────────────────
+function toggleTheme(){
+  const isLight = document.documentElement.classList.toggle('light');
+  D.theme = isLight ? 'light' : 'dark';
+  save();
+  updateThemeBtn();
+}
+
+function updateThemeBtn(){
+  const isLight = document.documentElement.classList.contains('light');
+  const label = isLight ? '☀️ Light' : '🌙 Dark';
+  const icon  = isLight ? '☀️' : '🌙';
+  const btn  = document.getElementById('themeBtn');
+  const btnM = document.getElementById('themeBtnMob');
+  if(btn)  btn.textContent  = label;
+  if(btnM) btnM.textContent = icon;
+}
+
+function applyTheme(){
+  const isLight = D.theme === 'light';
+  document.documentElement.classList.toggle('light', isLight);
+  updateThemeBtn();
+}
+// ── TUTORIAL ─────────────────────────────────────────────────
+
+// ══════════════════════════════════════════════════════════
+// PARENT ONBOARDING WIZARD
+// ══════════════════════════════════════════════════════════
+let _pobStep = 0;
+const POB_TOTAL = 7;
+
+function initPobDots(){
+  const d = document.getElementById('pobDots'); if(!d) return;
+  d.innerHTML = Array.from({length:POB_TOTAL},(_,i)=>`<div class="ob-dot${i===0?' act':''}" id="pd${i}"></div>`).join('');
+}
+function pobNav(dir){
+  _pobStep = Math.max(0, Math.min(POB_TOTAL-1, _pobStep + dir));
+  const slides = document.getElementById('pobSlides'); if(!slides) return;
+  const w = slides.parentElement.offsetWidth || slides.offsetWidth;
+  slides.style.transform = `translateX(-${_pobStep * w}px)`;
+  document.querySelectorAll('#pobDots .ob-dot').forEach((d,i)=>d.classList.toggle('act',i===_pobStep));
+  const prev = document.getElementById('pobPrev');
+  const next = document.getElementById('pobNext');
+  if(prev){ prev.disabled = _pobStep===0; prev.style.opacity=_pobStep===0?'0.3':'1'; }
+  if(next){
+    next.textContent = _pobStep === POB_TOTAL-1 ? '✅ Complete' : 'Next ›';
+    if(_pobStep === POB_TOTAL-1){ next.onclick = ()=>{ closeParentOnboard(); showSection('s-hero'); }; } else { next.onclick = ()=>pobNav(1); }
+  }
+}
+function showParentOnboard(){
+  _pobStep = 0;
+  initPobDots();
+  const slides = document.getElementById('pobSlides');
+  if(slides) slides.style.transform='translateX(0px)';
+  const prev = document.getElementById('pobPrev');
+  if(prev){ prev.disabled=true; prev.style.opacity='0.35'; }
+  const next = document.getElementById('pobNext');
+  if(next){ next.textContent='Next ›'; next.onclick=()=>pobNav(1); }
+  const modal = document.getElementById('parentOnboard');
+  if(!modal){ alert('Wizard not found — please refresh the page'); return; }
+  // Force show with both inline style AND class (belt AND suspenders)
+  modal.style.cssText = '';
+  modal.classList.add('open');
+  document.body.style.overflow='hidden';
+  // Mark as seen immediately so it never auto-shows again after this visit
+  D.parentWizardDone = true; save();
+}
+function closeParentOnboard(){
+  const modal = document.getElementById('parentOnboard'); if(!modal) return;
+  modal.classList.remove('open');
+  modal.style.cssText = '';
+  modal.style.display = 'none';
+  document.body.style.overflow='';
+  D.parentWizardDone = true; save();
+  const btn = document.getElementById('startHereBtn');
+  if(btn) btn.classList.add('sh-hidden');
+  // Hide wizard return btn if wizard closed normally (not via wizGoTo)
+  if(_wizReturnType!=='parent'){ var wb=document.getElementById('wizReturnBtn'); if(wb) wb.classList.remove('visible'); }
+}
+
+// ══════════════════════════════════════════════════════════
+// KID ONBOARDING WIZARD
+// ══════════════════════════════════════════════════════════
+let _kobStep = 0;
+const KOB_TOTAL = 6;
+
+function initKobDots(){
+  const d = document.getElementById('kobDots'); if(!d) return;
+  d.innerHTML = Array.from({length:KOB_TOTAL},(_,i)=>`<div class="ob-dot${i===0?' act':''}" id="kd${i}"></div>`).join('');
+}
+function kobNav(dir){
+  _kobStep = Math.max(0, Math.min(KOB_TOTAL-1, _kobStep + dir));
+  const slides = document.getElementById('kobSlides'); if(!slides) return;
+  const w = slides.parentElement.offsetWidth || slides.offsetWidth;
+  slides.style.transform = `translateX(-${_kobStep * w}px)`;
+  document.querySelectorAll('#kobDots .ob-dot').forEach((d,i)=>d.classList.toggle('act',i===_kobStep));
+  const prev = document.getElementById('kobPrev');
+  const next = document.getElementById('kobNext');
+  if(prev){ prev.disabled = _kobStep===0; prev.style.opacity=_kobStep===0?'0.3':'1'; }
+  if(next){
+    next.textContent = _kobStep === KOB_TOTAL-1 ? "🚀 Let's Go!" : 'Next ›';
+    if(_kobStep === KOB_TOTAL-1){ next.onclick = closeKidOnboard; } else { next.onclick = ()=>kobNav(1); }
+  }
+}
+function showKidOnboard(){
+  _kobStep = 0;
+  initKobDots();
+  const slides = document.getElementById('kobSlides'); if(slides) slides.style.transform='translateX(0px)';
+  const prev = document.getElementById('kobPrev'); if(prev){ prev.disabled=true; prev.style.opacity='0.35'; }
+  const next = document.getElementById('kobNext'); if(next){ next.textContent='Next ›'; next.onclick=()=>kobNav(1); }
+  const modal = document.getElementById('kidOnboard');
+  if(!modal){ console.warn('kidOnboard modal not found'); return; }
+  modal.style.display='flex';
+  modal.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeKidOnboard(){
+  const modal = document.getElementById('kidOnboard'); if(!modal) return;
+  modal.classList.remove('open');
+  modal.style.display='none';
+  document.body.style.overflow='';
+  D.kidOnboardDone = true; save();
+  if(_wizReturnType!=='kid'){ var wb=document.getElementById('wizReturnBtn'); if(wb) wb.classList.remove('visible'); }
+}
+
+// ══════════════════════════════════════════════════════════
+// START-HERE BUTTON VISIBILITY
+// ══════════════════════════════════════════════════════════
+function updateStartHereBtn(){
+  const btn = document.getElementById('startHereBtn'); if(!btn) return;
+  // Hide when child profile is active OR wizard already done
+  const profile = _profiles && _activeProfileId ? _profiles.find(p=>p.id===_activeProfileId) : null;
+  const isChild = profile && !profile.isParent;
+  if(isChild || D.parentWizardDone){ btn.classList.add('sh-hidden'); }
+  else { btn.classList.remove('sh-hidden'); }
+}
+
+const TUT_STEPS = [
+  'Welcome','Dashboard','Daily Habits','Money','School','Schedule','Health','Goals','Life Skills','Growing Up','Journal','Scripture','Driving','Sports','Badges','Jobs & Bio','Chores & Rewards','Parent Hub','Settings & Tips'
+];
+let _tutStep = 0;
+
+// ══ HELP TOOLTIP SYSTEM ════════════════════════════════════
+const HTIPS = {
+  dashboard:  ["🏠 Dashboard","Your daily home base. Streak counter, quick stats (bank, GPA, goals), Daily Wins habit tracker, scripture banner, and motivational quote. Everything updates live."],
+  habits:     ["⚡ Daily Wins","Tap each habit to check it off. Complete 4+ per day to keep your streak alive. Hit '+ Habit' to add your own. Streak resets at midnight if you miss a day."],
+  money:      ["💰 Money Manager","6 tabs: Overview (balances) · Bills (recurring bills, mark paid) · Transactions (log income/expenses) · Goal Savings (quick-add) · Sav. Goals (create goals) · Budget (50/30/20)."],
+  school:     ["📚 School","Add classes with grade %, and GPA calculates instantly. Track assignments by due date and priority. Use the Study Timer (Pomodoro) to log focused sessions automatically."],
+  schedule:   ["📅 Schedule","28-day visual grid, 6 AM to 11 PM. Click any cell to assign an activity. Color-codes automatically. Add custom activities in Settings > Schedule Activities."],
+  health:     ["❤️ Health & Fitness","Log weight, nutrition (calories/macros), and mood. Progress charts update with each entry. Daily habits here sync with your dashboard streak."],
+  goals:      ["🎯 Goals & Vision","Write your life vision, then add long-term and short-term goals by category. Click the circle to mark achieved. Career Explorer lets you save careers of interest."],
+  skills:     ["🧠 Life Skills Academy","140+ lessons across 16 categories. Tap a card to open the full guide. Pass the 5-question quiz (80%+) to earn a shareable certificate for that category."],
+  growing:    ["🌱 Growing Up","Real-talk guides on puberty, mental health, relationships, substance use, and identity — filtered by gender. Crisis helplines (988, 741741) are always visible."],
+  journal:    ["✍️ Journal","Pick a category, write your entry, and save. All entries are private and saved locally. Tap any saved entry to re-read it. Daily prompts appear on your dashboard."],
+  scripture:  ["✝️ Bible & Faith","365 daily verses by monthly theme. Earn 5 pts per day you read. Calendar shows your full year. Devotionals, Jesus & Purpose, and faith guides are in the tabs."],
+  driving:    ["🚗 Driving","License prep (permit test + practice hours) · Safety · Car maintenance · Costs & insurance · Accident procedures. Interactive checklists track your progress."],
+  sports:     ["🏆 Sports","14 sport profiles: prep tips, scholarship info, health & safety, participation stats. Filter by Boys / Girls / Both and by school level."],
+  chores:     ["✅ Chores","Parents assign chores with point values in Parent Hub. Complete them and hit Done to request verification. Earn Parent Bucks, screen time, and cash rewards."],
+  screentime: ["📱 Screen Time","Earn minutes by completing chores. Hit Use Time and start the countdown timer when playing. Parents add time and reset balances from Parent Hub."],
+  parentbucks:["🪙 Parent Bucks","Virtual currency parents award for good behavior and chores. Spend in the Prize Store. Earn bonus PB from Spin the Wheel and Scratch Cards."],
+  parenthub:  ["👨‍👩‍👧 Parent Hub","PIN-protected parent dashboard. View Life Scores, manage users, assign chores, control screen time, add Parent Bucks, log behavior, and review weekly report cards."],
+  manageusers:["👥 Manage Users","Add children here — give each a name and 4-digit PIN. Kids tap Child Login at the top to access their dashboard. Toggle parent PIN requirement on/off."],
+  lifescore:  ["📊 Life Score","Weighted grade (A+ to F) across 6 categories: Academics, Responsibility, Growth, Wellbeing, Character, Engagement. Updates live. Visible in Parent Hub Overview."],
+  childlogin: ["👤 Child Login","Children tap their name, then enter their 4-digit PIN to load their personal dashboard. PINs are set and reset in Parent Hub > Manage Users."],
+  badges:     ["🏅 Badges","20 achievements to unlock — streak milestones, certificates earned, books read, goals completed, journal entries, and more. Badge gallery shows earned vs locked."],
+  settings:   ["⚙️ Settings","Change your name and life stage, toggle sections on/off, manage themes and colors, set parent PIN, backup/restore data, and sync to cloud."],
+  language:   ["🌐 Language","Powered by Google Translate. Click to select any language — the entire app translates instantly. Select English to switch back."],
+  gpa:        ["📚 GPA","Your grade point average calculated from all active classes. Add classes in the School section with your current grade % and GPA updates instantly."],
+  streak:     ["🔥 Daily Streak","Days in a row you've completed 4+ Daily Wins habits. Miss a day and the streak resets at midnight. Your longest streak is saved automatically."],
+  chorepoints:["✅ Chore Points","Points earned by completing assigned chores. Parents set point values per chore in Parent Hub. Points convert to Parent Bucks and cash rewards."],
+  earnings:   ["💰 Earnings","Total cash earned from completed chores. Parents set dollar amounts per chore in Parent Hub. Track your savings goal progress here."],
+  certs:      ["🧠 Certificates","Life Skills Academy certificates earned by passing quizzes (80%+) in any of the 16 subject categories. Each certificate is shareable and printable."],
+  goals:      ["🎯 Goals","Active short-term and long-term goals across all categories. Tap any goal to mark it achieved. Add goals in the Goals & Vision section."],
+  mood:       ["😊 Mood","Your mood logged today. Daily mood tracking reveals patterns over time — what helps, what hurts, and how your mental health connects to your habits."],
+  books:      ["📖 Books","Books you've marked as finished in the Reading Tracker. Leaders are readers — log every book you complete here."],
+  checking:   ["🏦 Checking","Your current checking account balance from the Money Manager. Add transactions in the Finance section to keep this accurate."],
+  upcoming:   ["📅 Upcoming","Your next calendar event. Add events in the Calendar section. Color-coded by category — school, personal, health, faith, and more."],
+  lifeskills: ["🎓 Life Skills","Percentage of Life Skills Academy completed across all 16 categories. Each subject has lessons, a quiz, and a certificate. Tap to open the full academy."],
+  milestones: ["🏆 Milestones","Big life moments and accomplishments you've logged. Looking back at how far you've come fuels where you're going. Add milestones in the Milestones section."],
+};
+
+function hlp(key, el, evt){
+  if(evt) evt.stopPropagation();
+  const tip = HTIPS[key]; if(!tip) return;
+  const box = document.getElementById('hlpBox');
+  const t = document.getElementById('hlpT');
+  const b = document.getElementById('hlpB');
+  if(!box||!t||!b) return;
+  t.textContent = tip[0]; b.textContent = tip[1];
+  const r = el.getBoundingClientRect();
+  let top = r.bottom + 6;
+  let left = r.left;
+  if(top + 140 > window.innerHeight) top = r.top - 148;
+  if(left + 278 > window.innerWidth) left = window.innerWidth - 282;
+  if(left < 4) left = 4;
+  box.style.top = top + 'px'; box.style.left = left + 'px';
+  box.classList.add('show');
+}
+function hlpHide(){ document.getElementById('hlpBox')?.classList.remove('show'); }
+document.addEventListener('click', hlpHide);
+
+// ── BOUNCING ARROW HINT — dismiss permanently on first interaction ──
+function hlpHintDone(){
+  if(localStorage.getItem('ylcc_hlp_hint_seen')) return;
+  localStorage.setItem('ylcc_hlp_hint_seen','1');
+  document.querySelectorAll('.hlp-arrow').forEach(a=>a.style.display='none');
+}
+function hlpHintInit(){
+  if(localStorage.getItem('ylcc_hlp_hint_seen')){
+    document.querySelectorAll('.hlp-arrow').forEach(a=>a.style.display='none');
+  }
+}
+window.addEventListener('load', hlpHintInit);
+
+let _tutReturnStep=0;
+let _wizReturnType=null; // "parent" or "kid"
+let _wizReturnStep=0;
+
+function wizGoTo(sectionId, wizType, wizStep){
+  _wizReturnType = wizType;
+  _wizReturnStep = wizStep||0;
+  if(wizType==='parent') closeParentOnboard();
+  else if(wizType==='kid') closeKidOnboard();
+  showSection(sectionId);
+  var b=document.getElementById('wizReturnBtn');
+  if(b) b.classList.add('visible');
+}
+
+function wizReturn(){
+  var b=document.getElementById('wizReturnBtn');
+  if(b) b.classList.remove('visible');
+  if(_wizReturnType==='parent'){
+    showParentOnboard();
+    // Navigate to saved step
+    if(_wizReturnStep>0){
+      setTimeout(function(){
+        _pobStep=_wizReturnStep;
+        var slides=document.getElementById('pobSlides');
+        if(slides){ var w=slides.parentElement.offsetWidth||slides.offsetWidth; slides.style.transform='translateX(-'+(_pobStep*w)+'px)'; }
+        document.querySelectorAll('#pobDots .ob-dot').forEach(function(d,i){d.classList.toggle('act',i===_pobStep);});
+        var prev=document.getElementById('pobPrev'),next=document.getElementById('pobNext');
+        if(prev){prev.disabled=_pobStep===0;prev.style.opacity=_pobStep===0?'0.3':'1';}
+        if(next){next.textContent=_pobStep===POB_TOTAL-1?'✅ Complete':'Next ›';}
+      },200);
+    }
+  } else if(_wizReturnType==='kid'){
+    showKidOnboard();
+    if(_wizReturnStep>0){
+      setTimeout(function(){
+        _kobStep=_wizReturnStep;
+        var slides=document.getElementById('kobSlides');
+        if(slides){ var w=slides.parentElement.offsetWidth||slides.offsetWidth; slides.style.transform='translateX(-'+(_kobStep*w)+'px)'; }
+        document.querySelectorAll('#kobDots .ob-dot').forEach(function(d,i){d.classList.toggle('act',i===_kobStep);});
+        var prev=document.getElementById('kobPrev'),next=document.getElementById('kobNext');
+        if(prev){prev.disabled=_kobStep===0;prev.style.opacity=_kobStep===0?'0.3':'1';}
+      },200);
+    }
+  }
+}
+
+function tutGoTo(sid){_tutReturnStep=_tutStep;closeTutorial();showSection(sid);var b=document.getElementById('tutReturnBtn');if(b)b.classList.add('visible');}
+function tutReturn(){var b=document.getElementById('tutReturnBtn');if(b)b.classList.remove('visible');openTutorial();showTutStep(_tutReturnStep);}
+function openTutorial(){
+  _tutStep = 0;
+  buildTutNav();
+  showTutStep(0);
+  document.getElementById('tutModal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function hardRefreshApp(){
+  // Unregister service workers, clear caches, force reload
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.getRegistrations().then(function(regs){
+      regs.forEach(function(r){r.unregister();});
+    });
+  }
+  if(window.caches){
+    caches.keys().then(function(keys){
+      keys.forEach(function(k){caches.delete(k);});
+    });
+  }
+  // Force reload bypassing browser cache
+  setTimeout(function(){ window.location.reload(true); }, 300);
+}
+
+function closeTutorial(){
+  document.getElementById('tutModal').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function buildTutNav(){
+  const nav = document.getElementById('tutNav'); if(!nav) return;
+  nav.innerHTML = TUT_STEPS.map((s,i)=>
+    `<button class="tut-nb${i===0?' active':''}" id="tnb${i}" onclick="showTutStep(${i})">${s}</button>`
+  ).join('');
+}
+
+function showTutStep(n){
+  const steps = document.querySelectorAll('.tut-step');
+  const btns = document.querySelectorAll('.tut-nb');
+  steps.forEach((s,i)=>s.classList.toggle('active',i===n));
+  btns.forEach((b,i)=>b.classList.toggle('active',i===n));
+  _tutStep = n;
+
+  // Progress bar
+  const pct = Math.round(((n+1)/TUT_STEPS.length)*100);
+  const pb = document.getElementById('tutProgress');
+  const pl = document.getElementById('tutProgressLbl');
+  if(pb) pb.style.width = pct+'%';
+  if(pl) pl.textContent = 'Step '+(n+1)+' of '+TUT_STEPS.length;
+
+  // Footer label + button states
+  const lbl = document.getElementById('tutStepLbl');
+  const prev = document.getElementById('tutPrevBtn');
+  const next = document.getElementById('tutNextBtn');
+  if(lbl) lbl.textContent = (n+1)+' / '+TUT_STEPS.length;
+  if(prev){ prev.disabled = n===0; prev.style.opacity = n===0?'0.4':'1'; }
+  if(next){ next.textContent = n===TUT_STEPS.length-1 ? '✓ Done' : 'Next ›'; }
+}
+
+function tutNav(dir){
+  const next = _tutStep + dir;
+  if(next < 0) return;
+  if(next >= TUT_STEPS.length){ closeTutorial(); return; }
+  showTutStep(next);
+}
+
+// ── BIO PAGE BUILDER ─────────────────────────────────────────
+let _bioTemplate = 'professional';
+let _bioPhoto = '';
+let _bioPortfolio = [];
+
+function setBioTemplate(tpl, btn){
+  _bioTemplate = tpl;
+  document.querySelectorAll('.bio-tpl-btn').forEach(b=>{ b.classList.remove('active','bp'); b.classList.add('bgh'); });
+  btn.classList.add('active','bp'); btn.classList.remove('bgh');
+  updateBioPreview();
+}
+
+function setBioPhoto(input){
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    _bioPhoto = e.target.result;
+    const prev = document.getElementById('bioPhotoPreview');
+    if(prev) prev.innerHTML = `<img src="${_bioPhoto}" style="width:100%;height:100%;object-fit:cover;">`;
+    updateBioPreview();
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeBioPhoto(){
+  _bioPhoto = '';
+  const prev = document.getElementById('bioPhotoPreview');
+  if(prev) prev.innerHTML = '👤';
+  updateBioPreview();
+}
+
+function getBioData(){
+  return {
+    name: (document.getElementById('bioName')||{}).value||'',
+    tagline: (document.getElementById('bioTagline')||{}).value||'',
+    about: (document.getElementById('bioAbout')||{}).value||'',
+    email: (document.getElementById('bioEmail')||{}).value||'',
+    phone: (document.getElementById('bioPhone')||{}).value||'',
+    location: (document.getElementById('bioLocation')||{}).value||'',
+    website: (document.getElementById('bioWebsite')||{}).value||'',
+    highlights: [1,2,3,4,5,6].map(i=>{
+      const text = (document.getElementById('bioH'+i)||{}).value||'';
+      const icon = (document.getElementById('bioH'+i+'Icon')||{}).value||'🏆';
+      return text ? {text, icon} : null;
+    }).filter(Boolean),
+    portfolio: _bioPortfolio,
+    photo: _bioPhoto,
+    ig: (document.getElementById('bioIG')||{}).value||'',
+    linkedin: (document.getElementById('bioLinkedIn')||{}).value||'',
+    yt: (document.getElementById('bioYT')||{}).value||'',
+    other: (document.getElementById('bioOther')||{}).value||'',
+    template: _bioTemplate,
+    logo: _bioLogo,
+    qrUrl: (document.getElementById('bioQRUrl')||{}).value||'',
+    showQR: _bioShowQR,
+    videos: _bioVideos,
+    stats: [1,2,3,4,5,6].map(i=>{
+      const num = (document.getElementById('bioStat'+i+'Num')||{}).value||'';
+      const label = (document.getElementById('bioStat'+i+'Label')||{}).value||'';
+      return num&&label ? {num,label} : null;
+    }).filter(Boolean)
+  };
+}
+
+function addBioPortfolioItem(){
+  const title = document.getElementById('bioPortTitle').value.trim();
+  if(!title){ showToast('Add a title first'); return; }
+  const cat = document.getElementById('bioPortCat').value;
+  const desc = document.getElementById('bioPortDesc').value.trim();
+  const fileInput = document.getElementById('bioPortPhoto');
+  const catEmojis = {event:'🎪',award:'🏆',project:'💻',performance:'🎵',art:'🎨',volunteer:'🤝',other:'📌'};
+
+  const finish = (photo) => {
+    _bioPortfolio.push({id:Date.now(), title, cat, desc, photo, emoji:catEmojis[cat]||'📌'});
+    document.getElementById('bioPortTitle').value='';
+    document.getElementById('bioPortDesc').value='';
+    fileInput.value='';
+    renderBioPortfolioList();
+    updateBioPreview();
+    showToast('Added to portfolio ✓');
+  };
+
+  if(fileInput.files.length){
+    const reader = new FileReader();
+    reader.onload = e => finish(e.target.result);
+    reader.readAsDataURL(fileInput.files[0]);
+  } else {
+    finish('');
+  }
+}
+
+function removeBioPortItem(id){
+  _bioPortfolio = _bioPortfolio.filter(p=>p.id!==id);
+  renderBioPortfolioList();
+  updateBioPreview();
+}
+
+function renderBioPortfolioList(){
+  const el = document.getElementById('bioPortfolioList'); if(!el) return;
+  if(!_bioPortfolio.length){ el.innerHTML=''; return; }
+  el.innerHTML = _bioPortfolio.map(p=>`
+    <div style="display:flex;align-items:center;gap:.5rem;padding:.4rem .5rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:8px;margin-bottom:.3rem;">
+      ${p.photo?`<img src="${p.photo}" style="width:36px;height:36px;border-radius:6px;object-fit:cover;flex-shrink:0;">`:`<div style="width:36px;height:36px;border-radius:6px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;">${p.emoji}</div>`}
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:.72rem;font-weight:600;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.emoji} ${p.title}</div>
+        ${p.desc?`<div style="font-size:.6rem;color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.desc}</div>`:''}
+      </div>
+      <button class="btn bda bs" onclick="removeBioPortItem(${p.id})" style="font-size:.55rem;padding:.15rem .35rem;">✕</button>
+    </div>
+  `).join('');
+}
+
+function loadBioFields(){
+  const b = D.bio || {};
+  const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.value=v||''; };
+  set('bioName', b.name || D.name || '');
+  set('bioTagline', b.tagline);
+  set('bioAbout', b.about);
+  set('bioEmail', b.email);
+  set('bioPhone', b.phone);
+  set('bioLocation', b.location);
+  set('bioWebsite', b.website);
+  [1,2,3,4,5,6].forEach(i=>{
+    const h = (b.highlights||[])[i-1];
+    if(h && typeof h === 'object'){ set('bioH'+i, h.text); set('bioH'+i+'Icon', h.icon); }
+    else if(typeof h === 'string'){ set('bioH'+i, h); }
+    else { set('bioH'+i, ''); }
+  });
+  set('bioIG', b.ig);
+  set('bioLinkedIn', b.linkedin);
+  set('bioYT', b.yt);
+  set('bioOther', b.other);
+  _bioPhoto = b.photo || '';
+  _bioPortfolio = b.portfolio || [];
+  _bioLogo = b.logo || '';
+  _bioShowQR = b.showQR || false;
+  if(_bioPhoto){
+    const prev = document.getElementById('bioPhotoPreview');
+    if(prev) prev.innerHTML = `<img src="${_bioPhoto}" style="width:100%;height:100%;object-fit:cover;">`;
+  }
+  if(_bioLogo){
+    const lp = document.getElementById('bioLogoPreview');
+    if(lp) lp.innerHTML = `<img src="${_bioLogo}" style="width:100%;height:100%;object-fit:cover;">`;
+  }
+  const qrInput = document.getElementById('bioQRUrl');
+  if(qrInput && b.qrUrl){ qrInput.value = b.qrUrl; generateBioQR(); }
+  const qrBtn = document.getElementById('bioQRToggleBtn');
+  if(qrBtn) qrBtn.textContent = _bioShowQR ? '➖ Remove from Bio' : '➕ Add to Bio';
+  _bioVideos = b.videos || [];
+  renderBioVideoList();
+  [1,2,3,4,5,6].forEach(i=>{
+    const s = (b.stats||[])[i-1];
+    set('bioStat'+i+'Num', s?s.num:'');
+    set('bioStat'+i+'Label', s?s.label:'');
+  });
+  renderBioPortfolioList();
+  if(b.template){ _bioTemplate = b.template; document.querySelectorAll('.bio-tpl-btn').forEach(btn=>{ const t=btn.getAttribute('data-tpl'); btn.classList.toggle('active',t===_bioTemplate); btn.classList.toggle('bp',t===_bioTemplate); btn.classList.toggle('bgh',t!==_bioTemplate); }); }
+  updateBioPreview();
+}
+
+function saveBio(){
+  D.bio = getBioData(); save();
+  showToast('Bio saved ✓');
+}
+
+function renderBioHTML(b, forPrint){
+  const tpl = b.template || 'professional';
+  const p = forPrint;
+  const sz = (sm, lg) => p ? lg : sm;
+
+  const contactItems = [
+    b.email ? '✉ '+b.email : '',
+    b.phone ? '☎ '+b.phone : '',
+    b.location ? '📍 '+b.location : '',
+    b.website ? '🔗 '+b.website : ''
+  ].filter(Boolean);
+
+  const socialItems = [
+    b.ig ? 'IG: '+b.ig : '',
+    b.linkedin ? 'LinkedIn: '+b.linkedin : '',
+    b.yt ? 'YouTube: '+b.yt : '',
+    b.other ? b.other : ''
+  ].filter(Boolean);
+
+  const colors = {
+    professional: {bg:'#ffffff',accent:'#1e3a5f',accent2:'#2563eb',text:'#1a1a2e',muted:'#64748b',stripe:'linear-gradient(135deg,#1e3a5f,#2563eb)'},
+    creative: {bg:'#fffbeb',accent:'#7c3aed',accent2:'#ec4899',text:'#1e1b4b',muted:'#6b7280',stripe:'linear-gradient(135deg,#7c3aed,#ec4899)'},
+    student: {bg:'#f0fdf4',accent:'#059669',accent2:'#0ea5e9',text:'#1a1a2e',muted:'#6b7280',stripe:'linear-gradient(135deg,#059669,#0ea5e9)'},
+    minimal: {bg:'#ffffff',accent:'#18181b',accent2:'#52525b',text:'#18181b',muted:'#a1a1aa',stripe:'linear-gradient(135deg,#18181b,#3f3f46)'}
+  };
+  const c = colors[tpl] || colors.professional;
+
+  // Photo HTML
+  const photoHTML = b.photo ? `<img src="${b.photo}" style="width:${sz('48px','72px')};height:${sz('48px','72px')};border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.4);flex-shrink:0;">` : '';
+
+  // Logo HTML (right side of header)
+  const logoHTML = (b.logo||_bioLogo) ? `<img src="${b.logo||_bioLogo}" style="width:${sz('36px','52px')};height:${sz('36px','52px')};border-radius:${sz('8px','10px')};object-fit:cover;flex-shrink:0;margin-left:auto;">` : '';
+
+  // QR code for bio page
+  const qrUrl = b.qrUrl || (document.getElementById('bioQRUrl')||{}).value || '';
+  let qrHTML = '';
+  if((b.showQR||_bioShowQR) && qrUrl){
+    const qrSvg = generateQRSVG(qrUrl, p?100:60);
+    qrHTML = `<div style="margin-top:${sz('.6rem','.9rem')};padding-top:${sz('.5rem','.7rem')};border-top:1px solid ${c.accent}15;display:flex;align-items:center;gap:${sz('.5rem','.8rem')};">
+      <div style="flex-shrink:0;background:#fff;padding:${sz('3px','5px')};border-radius:${sz('4px','6px')};border:1px solid ${c.accent}15;">${qrSvg}</div>
+      <div>
+        <div style="font-size:${sz('.5rem','.7rem')};font-weight:700;color:${c.accent};">Scan to Connect</div>
+        <div style="font-size:${sz('.42rem','.6rem')};color:${c.muted};word-break:break-all;">${qrUrl}</div>
+      </div>
+    </div>`;
+  }
+
+  // Stats HTML
+  let statsHTML = '';
+  if(b.stats && b.stats.length){
+    statsHTML = `<div style="margin-bottom:${sz('.6rem','1rem')};display:flex;flex-wrap:wrap;gap:${sz('.3rem','.5rem')};">
+      ${b.stats.map(s=>`<div style="flex:1;min-width:${sz('60px','80px')};text-align:center;padding:${sz('.35rem .3rem','.55rem .5rem')};background:${c.accent}08;border-radius:${sz('6px','8px')};border:1px solid ${c.accent}12;">
+        <div style="font-family:'Segoe UI',system-ui;font-size:${sz('.85rem','1.2rem')};font-weight:900;color:${c.accent2};">${s.num}</div>
+        <div style="font-size:${sz('.42rem','.6rem')};color:${c.muted};margin-top:.05rem;text-transform:uppercase;letter-spacing:.5px;">${s.label}</div>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  // Videos HTML
+  let videosHTML = '';
+  if(b.videos && b.videos.length){
+    videosHTML = `<div style="margin-bottom:${sz('.6rem','1rem')};">
+      <div style="font-size:${sz('.55rem','.75rem')};font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:${c.accent};margin-bottom:${sz('.3rem','.45rem')};">Video Showcase</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(${sz('130px','180px')},1fr));gap:${sz('.3rem','.5rem')};">
+        ${b.videos.map(v=>{
+          const thumb = v.ytId ? `<div style="position:relative;padding-top:56.25%;background:#000;overflow:hidden;border-radius:${sz('4px','6px')} ${sz('4px','6px')} 0 0;">
+            <img src="https://img.youtube.com/vi/${v.ytId}/mqdefault.jpg" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;height:100%;font-size:1.5rem;position:absolute;inset:0;\\'>📹</div>'">
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+              <div style="width:${sz('24px','36px')};height:${sz('24px','36px')};background:rgba(255,0,0,.85);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                <div style="width:0;height:0;border-style:solid;border-width:${sz('5px 0 5px 9px','7px 0 7px 12px')};border-color:transparent transparent transparent #fff;margin-left:${sz('2px','3px')};"></div>
+              </div>
+            </div>
+          </div>` : `<div style="padding-top:56.25%;background:${c.accent}0a;position:relative;border-radius:${sz('4px','6px')} ${sz('4px','6px')} 0 0;"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">📹</div></div>`;
+          return `<a href="${v.url}" target="_blank" style="text-decoration:none;color:inherit;border:1px solid ${c.accent}12;border-radius:${sz('4px','6px')};overflow:hidden;display:block;">
+            ${thumb}
+            <div style="padding:${sz('.2rem .3rem','.35rem .5rem')};">
+              <div style="font-size:${sz('.5rem','.7rem')};font-weight:600;color:${c.text};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${v.emoji} ${v.title}</div>
+            </div>
+          </a>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
+
+  // Portfolio HTML
+  let portHTML = '';
+  if(b.portfolio && b.portfolio.length){
+    portHTML = `<div style="margin-top:${sz('.6rem','.9rem')};">
+      <div style="font-size:${sz('.55rem','.75rem')};font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:${c.accent};margin-bottom:${sz('.3rem','.5rem')};">Portfolio & Events</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(${sz('120px','160px')},1fr));gap:${sz('.3rem','.5rem')};">
+        ${b.portfolio.map(item=>`<div style="border:1px solid ${c.accent}15;border-radius:${sz('6px','8px')};overflow:hidden;">
+          ${item.photo?`<div style="height:${sz('50px','80px')};overflow:hidden;"><img src="${item.photo}" style="width:100%;height:100%;object-fit:cover;"></div>`:''}
+          <div style="padding:${sz('.25rem .35rem','.4rem .5rem')};">
+            <div style="font-size:${sz('.52rem','.72rem')};font-weight:600;color:${c.text};">${item.emoji} ${item.title}</div>
+            ${item.desc?`<div style="font-size:${sz('.45rem','.62rem')};color:${c.muted};margin-top:.1rem;">${item.desc}</div>`:''}
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  return `<div style="font-family:'Segoe UI',system-ui,sans-serif;background:${c.bg};color:${c.text};padding:0;">
+    <!-- Header -->
+    <div style="background:${c.stripe};padding:${sz('1rem 1.2rem .8rem','1.6rem 2rem 1.3rem')};color:#fff;display:flex;align-items:center;gap:${sz('.7rem','1rem')};">
+      ${photoHTML}
+      <div style="flex:1;">
+        <div style="font-size:${sz('1.1rem','1.7rem')};font-weight:800;letter-spacing:.5px;">${b.name||'Your Name'}</div>
+        ${b.tagline?`<div style="font-size:${sz('.62rem','.9rem')};opacity:.9;margin-top:.15rem;">${b.tagline}</div>`:''}
+      </div>
+      ${logoHTML}
+    </div>
+    <div style="padding:${sz('.8rem 1.2rem','1.3rem 2rem')};">
+      ${contactItems.length?`<div style="display:flex;flex-wrap:wrap;gap:${sz('.4rem','.7rem')};font-size:${sz('.5rem','.76rem')};color:${c.muted};margin-bottom:${sz('.6rem','1rem')};padding-bottom:${sz('.45rem','.7rem')};border-bottom:1px solid ${c.muted}22;">${contactItems.map(i=>`<span>${i}</span>`).join('')}</div>`:''}
+      ${b.about?`<div style="margin-bottom:${sz('.6rem','1rem')};"><div style="font-size:${sz('.55rem','.75rem')};font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:${c.accent};margin-bottom:${sz('.25rem','.4rem')};">About</div><div style="font-size:${sz('.56rem','.82rem')};line-height:1.6;color:${c.text}cc;">${b.about}</div></div>`:''}
+      ${b.highlights&&b.highlights.length?`<div style="margin-bottom:${sz('.6rem','1rem')};"><div style="font-size:${sz('.55rem','.75rem')};font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:${c.accent};margin-bottom:${sz('.3rem','.45rem')};">Key Achievements</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:${sz('.2rem','.35rem')};">${b.highlights.map(h=>`<div style="font-size:${sz('.54rem','.78rem')};padding:${sz('.25rem .4rem','.4rem .6rem')};background:${c.accent}08;border-left:3px solid ${c.accent2};border-radius:0 6px 6px 0;">${typeof h==='object'?h.icon:''} ${typeof h==='object'?h.text:h}</div>`).join('')}</div></div>`:''}
+      ${statsHTML}
+      ${videosHTML}
+      ${portHTML}
+      ${socialItems.length?`<div style="margin-top:${sz('.5rem','.8rem')};"><div style="font-size:${sz('.55rem','.75rem')};font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:${c.accent};margin-bottom:${sz('.25rem','.4rem')};">Connect</div><div style="display:flex;flex-wrap:wrap;gap:${sz('.3rem','.4rem')};font-size:${sz('.5rem','.74rem')};color:${c.muted};">${socialItems.map(s=>`<span style="background:${c.accent}08;padding:${sz('.15rem .35rem','.25rem .5rem')};border-radius:4px;">${s}</span>`).join('')}</div></div>`:''}
+      ${qrHTML}
+    </div>
+  </div>`;
+}
+
+function updateBioPreview(){
+  const el = document.getElementById('bioPreviewInner'); if(!el) return;
+  el.innerHTML = renderBioHTML(getBioData(), false);
+}
+
+function buildBioStandalonePage(b){
+  const tpl = b.template || 'professional';
+  const colors = {
+    professional: {bg:'#f8fafc',card:'#ffffff',accent:'#1e3a5f',accent2:'#2563eb',text:'#1a1a2e',muted:'#64748b',stripe:'linear-gradient(135deg,#1e3a5f,#2563eb)',statBg:'#eff6ff'},
+    creative: {bg:'#fefce8',card:'#ffffff',accent:'#7c3aed',accent2:'#ec4899',text:'#1e1b4b',muted:'#6b7280',stripe:'linear-gradient(135deg,#7c3aed,#ec4899)',statBg:'#faf5ff'},
+    student: {bg:'#f0fdf4',card:'#ffffff',accent:'#059669',accent2:'#0ea5e9',text:'#1a1a2e',muted:'#6b7280',stripe:'linear-gradient(135deg,#059669,#0ea5e9)',statBg:'#ecfdf5'},
+    minimal: {bg:'#fafafa',card:'#ffffff',accent:'#18181b',accent2:'#52525b',text:'#18181b',muted:'#a1a1aa',stripe:'linear-gradient(135deg,#18181b,#3f3f46)',statBg:'#f4f4f5'}
+  };
+  const c = colors[tpl] || colors.professional;
+
+  const contactItems = [
+    b.email ? `<a href="mailto:${b.email}" style="color:${c.accent2};text-decoration:none;">✉ ${b.email}</a>` : '',
+    b.phone ? `<a href="tel:${b.phone}" style="color:${c.accent2};text-decoration:none;">☎ ${b.phone}</a>` : '',
+    b.location ? `<span>📍 ${b.location}</span>` : '',
+    b.website ? `<a href="${b.website}" target="_blank" style="color:${c.accent2};text-decoration:none;">🔗 ${b.website}</a>` : ''
+  ].filter(Boolean);
+
+  const socialItems = [
+    b.ig ? {label:'Instagram', value:b.ig, icon:'📷'} : null,
+    b.linkedin ? {label:'LinkedIn', value:b.linkedin, icon:'💼'} : null,
+    b.yt ? {label:'YouTube', value:b.yt, icon:'📺'} : null,
+    b.other ? {label:'Other', value:b.other, icon:'🔗'} : null
+  ].filter(Boolean);
+
+  // QR SVG (generate inline)
+  let qrSvgInline = '';
+  if(b.showQR && b.qrUrl){
+    const mods = encodeQR(b.qrUrl);
+    if(mods){
+      const n=mods.length;
+      let paths='';
+      for(let r=0;r<n;r++) for(let cc=0;cc<n;cc++) if(mods[r][cc]) paths+=`<rect x="${cc}" y="${r}" width="1" height="1"/>`;
+      qrSvgInline=`<svg xmlns="http://www.w3.org/2000/svg" width="140" height="140" viewBox="0 0 ${n} ${n}" style="background:#fff;border-radius:8px;border:1px solid #e2e8f0;">${paths}</svg>`;
+    }
+  }
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${b.name||'Bio'}</title>
+<meta name="description" content="${b.tagline||b.name||'Personal Bio Page'}">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:${c.bg};font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:${c.text};line-height:1.6;-webkit-font-smoothing:antialiased;}
+a{color:${c.accent2};text-decoration:none;}
+a:hover{text-decoration:underline;}
+.wrap{max-width:720px;margin:0 auto;padding:0 1rem 3rem;}
+.hero{background:${c.stripe};color:#fff;padding:3rem 0 2.5rem;margin-bottom:0;}
+.hero-inner{max-width:720px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;}
+.hero-photo{width:100px;height:100px;border-radius:50%;object-fit:cover;border:4px solid rgba(255,255,255,.3);flex-shrink:0;}
+.hero-logo{width:60px;height:60px;border-radius:12px;object-fit:cover;margin-left:auto;flex-shrink:0;}
+.hero h1{font-size:2.2rem;font-weight:900;letter-spacing:.5px;}
+.hero .tagline{font-size:1.05rem;opacity:.9;margin-top:.25rem;}
+.section{background:${c.card};border-radius:16px;padding:2rem;margin-top:1.2rem;box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);}
+.section-title{font-size:.7rem;text-transform:uppercase;letter-spacing:2px;color:${c.accent};font-weight:700;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid ${c.accent}15;}
+.contact-row{display:flex;flex-wrap:wrap;gap:1rem;font-size:.9rem;color:${c.muted};padding:1rem 0;background:${c.card};border-radius:16px;margin-top:1.2rem;padding:1.2rem 2rem;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+.stat-grid{display:flex;flex-wrap:wrap;gap:.7rem;justify-content:center;}
+.stat-card{flex:1;min-width:90px;text-align:center;padding:.9rem .6rem;background:${c.statBg};border-radius:12px;border:1px solid ${c.accent}10;}
+.stat-num{font-size:1.6rem;font-weight:900;color:${c.accent2};}
+.stat-label{font-size:.65rem;color:${c.muted};text-transform:uppercase;letter-spacing:1px;margin-top:.15rem;}
+.ach-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
+.ach-item{padding:.65rem .9rem;background:${c.accent}06;border-left:4px solid ${c.accent2};border-radius:0 10px 10px 0;font-size:.88rem;}
+.video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.8rem;}
+.video-card{border:1px solid ${c.accent}12;border-radius:12px;overflow:hidden;transition:transform .15s,box-shadow .15s;}
+.video-card:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(0,0,0,.1);}
+.video-thumb{position:relative;padding-top:56.25%;background:#000;overflow:hidden;}
+.video-thumb img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;}
+.play-btn{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+.play-btn div{width:48px;height:48px;background:rgba(255,0,0,.85);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.play-arrow{width:0;height:0;border-style:solid;border-width:9px 0 9px 16px;border-color:transparent transparent transparent #fff;margin-left:4px;}
+.port-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.8rem;}
+.port-card{border:1px solid ${c.accent}12;border-radius:12px;overflow:hidden;}
+.port-card img{width:100%;height:120px;object-fit:cover;}
+.port-info{padding:.6rem .8rem;}
+.social-grid{display:flex;flex-wrap:wrap;gap:.6rem;}
+.social-chip{padding:.5rem 1rem;background:${c.accent}08;border-radius:8px;font-size:.85rem;color:${c.muted};}
+.qr-section{display:flex;align-items:center;gap:1.2rem;margin-top:1.5rem;padding-top:1.2rem;border-top:2px solid ${c.accent}10;}
+.footer{text-align:center;padding:2rem 1rem;font-size:.75rem;color:${c.muted};}
+@media(max-width:600px){
+  .hero h1{font-size:1.6rem;} .hero-inner{gap:1rem;} .hero-photo{width:72px;height:72px;}
+  .section{padding:1.3rem;} .ach-grid{grid-template-columns:1fr;} .stat-num{font-size:1.3rem;}
+}
+@media print{
+  body{background:#fff;} .section{box-shadow:none;border:1px solid #eee;break-inside:avoid;}
+  .video-card:hover{transform:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    ${b.photo?`<img class="hero-photo" src="${b.photo}" alt="${b.name}">`:''}
+    <div style="flex:1;">
+      <h1>${b.name||'Your Name'}</h1>
+      ${b.tagline?`<div class="tagline">${b.tagline}</div>`:''}
+    </div>
+    ${(b.logo)?`<img class="hero-logo" src="${b.logo}" alt="Logo">`:''}
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- CONTACT -->
+${contactItems.length?`<div class="contact-row">${contactItems.join('<span style="opacity:.3;">|</span>')}</div>`:''}
+
+<!-- ABOUT -->
+${b.about?`<div class="section">
+  <div class="section-title">About</div>
+  <p style="font-size:.95rem;line-height:1.8;color:${c.text}dd;">${b.about}</p>
+</div>`:''}
+
+<!-- STATS -->
+${b.stats&&b.stats.length?`<div class="section">
+  <div class="section-title">By the Numbers</div>
+  <div class="stat-grid">
+    ${b.stats.map(s=>`<div class="stat-card"><div class="stat-num">${s.num}</div><div class="stat-label">${s.label}</div></div>`).join('')}
+  </div>
+</div>`:''}
+
+<!-- ACHIEVEMENTS -->
+${b.highlights&&b.highlights.length?`<div class="section">
+  <div class="section-title">Key Achievements</div>
+  <div class="ach-grid">
+    ${b.highlights.map(h=>`<div class="ach-item">${typeof h==='object'?h.icon+' '+h.text:'✦ '+h}</div>`).join('')}
+  </div>
+</div>`:''}
+
+<!-- VIDEOS -->
+${b.videos&&b.videos.length?`<div class="section">
+  <div class="section-title">Video Showcase</div>
+  <div class="video-grid">
+    ${b.videos.map(v=>{
+      if(v.ytId) return `<a href="${v.url}" target="_blank" class="video-card" style="text-decoration:none;color:inherit;">
+        <div class="video-thumb">
+          <img src="https://img.youtube.com/vi/${v.ytId}/hqdefault.jpg" alt="${v.title}">
+          <div class="play-btn"><div><div class="play-arrow"></div></div></div>
+        </div>
+        <div style="padding:.6rem .8rem;">
+          <div style="font-size:.85rem;font-weight:600;">${v.emoji} ${v.title}</div>
+        </div>
+      </a>`;
+      return `<a href="${v.url}" target="_blank" class="video-card" style="text-decoration:none;color:inherit;">
+        <div class="video-thumb"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2rem;">📹</div></div>
+        <div style="padding:.6rem .8rem;"><div style="font-size:.85rem;font-weight:600;">${v.emoji} ${v.title}</div></div>
+      </a>`;
+    }).join('')}
+  </div>
+</div>`:''}
+
+<!-- PORTFOLIO -->
+${b.portfolio&&b.portfolio.length?`<div class="section">
+  <div class="section-title">Portfolio & Events</div>
+  <div class="port-grid">
+    ${b.portfolio.map(p=>`<div class="port-card">
+      ${p.photo?`<img src="${p.photo}" alt="${p.title}">`:`<div style="height:80px;background:${c.accent}08;display:flex;align-items:center;justify-content:center;font-size:2rem;">${p.emoji}</div>`}
+      <div class="port-info">
+        <div style="font-size:.85rem;font-weight:600;">${p.emoji} ${p.title}</div>
+        ${p.desc?`<div style="font-size:.78rem;color:${c.muted};margin-top:.2rem;">${p.desc}</div>`:''}
+      </div>
+    </div>`).join('')}
+  </div>
+</div>`:''}
+
+<!-- SOCIAL -->
+${socialItems.length?`<div class="section">
+  <div class="section-title">Connect</div>
+  <div class="social-grid">
+    ${socialItems.map(s=>`<span class="social-chip">${s.icon} ${s.label}: ${s.value}</span>`).join('')}
+  </div>
+</div>`:''}
+
+<!-- QR -->
+${(b.showQR&&b.qrUrl&&qrSvgInline)?`<div class="section">
+  <div style="display:flex;align-items:center;gap:1.2rem;">
+    <div style="flex-shrink:0;">${qrSvgInline}</div>
+    <div>
+      <div style="font-size:1rem;font-weight:700;color:${c.accent};">Scan to Connect</div>
+      <div style="font-size:.82rem;color:${c.muted};margin-top:.2rem;word-break:break-all;">${b.qrUrl}</div>
+    </div>
+  </div>
+</div>`:''}
+
+<div class="footer">Built with LifeOS</div>
+
+</div>
+`;
+}
