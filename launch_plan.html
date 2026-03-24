@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jason Vega — 3-Week Launch Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cabinet+Grotesk:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f3ef;--bg2:#fff;--bg3:#f0ede8;
+  --ink:#0f0e0c;--ink2:#4a4640;--ink3:#9a9490;
+  --ylcc:#1a3a6b;--ylcc-light:#e8eef7;--ylcc-acc:#f5c842;
+  --kc:#1a5c3a;--kc-light:#e8f5ee;--kc-acc:#22c55e;
+  --red:#dc2626;--red-light:#fef2f2;
+  --orange:#d97706;--orange-light:#fffbeb;
+  --border:#e5e1da;
+  --fn:'Cabinet Grotesk',sans-serif;
+  --fh:'Bebas Neue',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--ink);font-family:var(--fn);line-height:1.6;padding:0 0 80px;}
+
+/* TOP BAR */
+.topbar{background:var(--ink);color:#fff;padding:12px 40px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.topbar-title{font-family:var(--fh);font-size:1.4rem;letter-spacing:.1em;color:#fff;}
+.topbar-sub{font-size:.72rem;color:rgba(255,255,255,.45);letter-spacing:.08em;text-transform:uppercase;}
+.topbar-date{font-size:.72rem;color:var(--ylcc-acc);font-weight:700;letter-spacing:.05em;}
+.progress-bar-wrap{position:sticky;top:52px;z-index:99;background:#fff;border-bottom:1px solid var(--border);padding:10px 40px;display:flex;align-items:center;gap:16px;}
+.prog-label{font-size:.68rem;font-weight:800;color:var(--ink3);text-transform:uppercase;letter-spacing:.1em;white-space:nowrap;}
+.prog-track{flex:1;height:8px;background:var(--border);border-radius:10px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--ylcc),var(--kc-acc));border-radius:10px;transition:width .4s;}
+.prog-pct{font-family:var(--fh);font-size:1.1rem;color:var(--ylcc);min-width:40px;}
+.prog-tasks{font-size:.7rem;color:var(--ink3);white-space:nowrap;}
+
+/* HERO */
+.hero{background:var(--ink);padding:60px 40px 50px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-100px;right:-100px;width:500px;height:500px;background:radial-gradient(circle,rgba(245,200,66,.08),transparent 65%);}
+.hero::after{content:'';position:absolute;bottom:-80px;left:100px;width:400px;height:400px;background:radial-gradient(circle,rgba(34,197,94,.06),transparent 65%);}
+.hero-eyebrow{font-size:.65rem;font-weight:800;letter-spacing:.25em;text-transform:uppercase;color:var(--ylcc-acc);margin-bottom:.75rem;}
+.hero h1{font-family:var(--fh);font-size:clamp(3rem,6vw,5.5rem);color:#fff;line-height:.95;letter-spacing:.02em;margin-bottom:1.2rem;}
+.hero h1 em{font-style:normal;-webkit-text-stroke:1px var(--ylcc-acc);color:transparent;}
+.hero-sub{font-size:1rem;color:rgba(255,255,255,.55);max-width:580px;line-height:1.7;margin-bottom:2rem;}
+.hero-pills{display:flex;flex-wrap:wrap;gap:.5rem;}
+.hero-pill{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.65);padding:.3rem .8rem;border-radius:4px;font-size:.72rem;font-weight:700;letter-spacing:.04em;}
+.hero-pill.ylcc{background:rgba(26,58,107,.4);border-color:rgba(245,200,66,.3);color:var(--ylcc-acc);}
+.hero-pill.kc{background:rgba(26,92,58,.4);border-color:rgba(34,197,94,.3);color:#4ade80;}
+
+/* WRAP */
+.wrap{max-width:1100px;margin:0 auto;padding:0 40px;}
+
+/* WEEK HEADER */
+.week-block{margin:40px 0 0;}
+.week-header{display:flex;align-items:center;gap:16px;padding:20px 0 16px;border-bottom:3px solid var(--ink);margin-bottom:24px;}
+.week-num{font-family:var(--fh);font-size:4rem;color:var(--border);line-height:1;}
+.week-info{flex:1;}
+.week-title{font-family:var(--fh);font-size:1.8rem;letter-spacing:.05em;color:var(--ink);line-height:1;}
+.week-dates{font-size:.72rem;color:var(--ink3);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:.2rem;}
+.week-focus{background:var(--ink);color:#fff;padding:.3rem .9rem;border-radius:4px;font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;}
+
+/* DAY GRID */
+.day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:32px;}
+.day-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;}
+.day-card.today{border-color:var(--ylcc);box-shadow:0 0 0 2px rgba(26,58,107,.15);}
+.day-card.launch-day{border-color:var(--ylcc-acc);box-shadow:0 0 0 3px rgba(245,200,66,.2);}
+.day-card.travel{border-color:var(--kc-acc);box-shadow:0 0 0 2px rgba(34,197,94,.15);}
+.day-head{padding:8px 10px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.day-name{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);}
+.day-date{font-family:var(--fh);font-size:1.3rem;color:var(--ink);line-height:1;}
+.day-card.today .day-date{color:var(--ylcc);}
+.day-card.launch-day .day-date{color:var(--orange);}
+.day-label{position:absolute;top:0;right:0;background:var(--ylcc-acc);color:var(--ink);font-size:.5rem;font-weight:900;padding:2px 6px;letter-spacing:.08em;text-transform:uppercase;}
+.day-label.kc{background:var(--kc-acc);color:#fff;}
+.day-label.launch{background:var(--orange);color:#fff;}
+.day-label.travel{background:#8b5cf6;color:#fff;}
+.day-body{padding:8px 10px;}
+.task-item{display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;cursor:pointer;}
+.task-check{width:14px;height:14px;border:1.5px solid var(--border);border-radius:3px;flex-shrink:0;margin-top:2px;transition:all .15s;display:flex;align-items:center;justify-content:center;}
+.task-check.done{background:var(--kc);border-color:var(--kc);}
+.task-check.done::after{content:'✓';font-size:9px;color:#fff;font-weight:900;}
+.task-text{font-size:.68rem;color:var(--ink2);line-height:1.45;font-weight:500;}
+.task-text.done{text-decoration:line-through;color:var(--ink3);}
+.task-tag{display:inline-block;padding:.05rem .3rem;border-radius:3px;font-size:.55rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-right:2px;}
+.tag-ylcc{background:var(--ylcc-light);color:var(--ylcc);}
+.tag-kc{background:var(--kc-light);color:var(--kc);}
+.tag-tt{background:#fce7f3;color:#be185d;}
+.tag-fb{background:#eff6ff;color:#1d4ed8;}
+.tag-tech{background:#f5f3ff;color:#6d28d9;}
+.tag-content{background:#fff7ed;color:#c2410c;}
+
+/* SECTION CARDS */
+.section-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px;}
+.section-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px 22px;}
+.section-card.full{grid-column:1/-1;}
+.sc-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.sc-icon{font-size:1.4rem;}
+.sc-title{font-family:var(--fh);font-size:1.1rem;letter-spacing:.05em;color:var(--ink);}
+.sc-badge{margin-left:auto;padding:.2rem .6rem;border-radius:4px;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;}
+.badge-ylcc{background:var(--ylcc-light);color:var(--ylcc);}
+.badge-kc{background:var(--kc-light);color:var(--kc);}
+.badge-both{background:var(--orange-light);color:var(--orange);}
+.script-block{background:var(--bg3);border-left:3px solid var(--ylcc-acc);border-radius:0 8px 8px 0;padding:12px 14px;margin-bottom:10px;font-size:.75rem;color:var(--ink2);line-height:1.7;font-style:italic;}
+.script-label{font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:var(--ylcc-acc);margin-bottom:.4rem;font-style:normal;}
+.hashtag-cloud{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.5rem;}
+.hashtag{background:var(--bg3);border:1px solid var(--border);padding:.2rem .55rem;border-radius:20px;font-size:.65rem;font-weight:700;color:var(--ink2);}
+.hashtag.hot{background:var(--red-light);border-color:#fca5a5;color:var(--red);}
+.tool-row{display:flex;align-items:center;gap:10px;padding:.55rem 0;border-bottom:1px solid var(--border);}
+.tool-row:last-child{border-bottom:none;}
+.tool-emoji{font-size:1.1rem;flex-shrink:0;}
+.tool-name{font-weight:800;font-size:.8rem;color:var(--ink);min-width:110px;}
+.tool-desc{font-size:.73rem;color:var(--ink2);}
+.tool-cost{margin-left:auto;font-size:.68rem;font-weight:800;color:var(--kc);white-space:nowrap;}
+.metric-row{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--border);}
+.metric-row:last-child{border-bottom:none;}
+.metric-label{font-size:.75rem;color:var(--ink2);font-weight:500;}
+.metric-target{font-family:var(--fh);font-size:1.2rem;color:var(--ylcc);}
+.fb-group{display:flex;align-items:center;gap:8px;padding:.45rem 0;border-bottom:1px solid var(--border);font-size:.73rem;}
+.fb-group:last-child{border-bottom:none;}
+.fb-members{margin-left:auto;font-weight:800;color:var(--ylcc);font-size:.7rem;}
+.checklist-item{display:flex;align-items:flex-start;gap:8px;padding:.5rem 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.checklist-item:last-child{border-bottom:none;}
+.cl-check{width:16px;height:16px;border:2px solid var(--border);border-radius:4px;flex-shrink:0;margin-top:1px;transition:all .15s;display:flex;align-items:center;justify-content:center;}
+.cl-check.done{background:var(--kc);border-color:var(--kc);}
+.cl-check.done::after{content:'✓';font-size:10px;color:#fff;font-weight:900;}
+.cl-text{font-size:.78rem;color:var(--ink2);line-height:1.5;}
+.cl-text.done{text-decoration:line-through;color:var(--ink3);}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:32px;}
+.kpi-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px 18px;text-align:center;}
+.kpi-val{font-family:var(--fh);font-size:2.2rem;line-height:1;margin-bottom:.2rem;}
+.kpi-lbl{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);}
+.kpi-card.ylcc .kpi-val{color:var(--ylcc);}
+.kpi-card.kc .kpi-val{color:var(--kc);}
+.kpi-card.tt .kpi-val{color:#be185d;}
+.kpi-card.money .kpi-val{color:var(--orange);}
+.divider{height:1px;background:var(--border);margin:32px 0;}
+.alert-box{background:var(--orange-light);border:1.5px solid #fcd34d;border-radius:10px;padding:14px 18px;margin-bottom:20px;display:flex;gap:10px;align-items:flex-start;}
+.alert-icon{font-size:1.2rem;flex-shrink:0;}
+.alert-text{font-size:.78rem;color:#92400e;line-height:1.6;}
+.alert-text strong{color:#78350f;}
+
+@media(max-width:768px){
+  .topbar,.progress-bar-wrap{padding:10px 16px;}
+  .wrap{padding:0 16px;}
+  .hero{padding:40px 16px;}
+  .day-grid{grid-template-columns:1fr 1fr;}
+  .section-grid{grid-template-columns:1fr;}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .section-card.full{grid-column:1;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div>
+    <div class="topbar-title">3-WEEK LAUNCH PLAN</div>
+    <div class="topbar-sub">Jason Vega · Kingdom Creatives LLC</div>
+  </div>
+  <div class="topbar-date">Launch: April 13, 2026 🚀</div>
+</div>
+
+<!-- PROGRESS BAR -->
+<div class="progress-bar-wrap">
+  <div class="prog-label">Overall Progress</div>
+  <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  <div class="prog-pct" id="progPct">0%</div>
+  <div class="prog-tasks" id="progTasks">0 of 0 tasks complete</div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-eyebrow">March 24 → April 13, 2026</div>
+    <h1>BUILD.<br>LAUNCH.<br><em>GROW.</em></h1>
+    <div class="hero-sub">Three weeks. Two products. One focused execution plan. YourLife CC launches April 13th. Kingdom Creatives runs a soft launch in parallel. No hired help — just you, AI tools, and a system built to grow itself.</div>
+    <div class="hero-pills">
+      <span class="hero-pill ylcc">🎯 YourLife CC Launch Apr 13</span>
+      <span class="hero-pill kc">⛪ KC Soft Launch — Church Waitlist</span>
+      <span class="hero-pill">🎬 AI TikTok Content</span>
+      <span class="hero-pill">📘 Facebook Groups</span>
+      <span class="hero-pill">🏆 $5K Contest Goes Live</span>
+      <span class="hero-pill">✈️ Cozumel Early April</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- KPI TARGETS -->
+<div style="margin-top:32px;margin-bottom:8px;">
+  <div style="font-family:var(--fh);font-size:1.6rem;letter-spacing:.05em;margin-bottom:16px;">3-WEEK TARGETS</div>
+</div>
+<div class="kpi-grid">
+  <div class="kpi-card ylcc"><div class="kpi-val" id="kpi-signups">0</div><div class="kpi-lbl">YourLife CC Signups</div></div>
+  <div class="kpi-card kc"><div class="kpi-val" id="kpi-churches">0</div><div class="kpi-lbl">KC Church Waitlist</div></div>
+  <div class="kpi-card tt"><div class="kpi-val" id="kpi-tiktoks">0</div><div class="kpi-lbl">TikToks Posted</div></div>
+  <div class="kpi-card money"><div class="kpi-val" id="kpi-sponsors">0</div><div class="kpi-lbl">Sponsor Inquiries</div></div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:32px;font-size:.7rem;text-align:center;color:var(--ink3);">
+  <div>Target: <strong style="color:var(--ylcc)">250+</strong></div>
+  <div>Target: <strong style="color:var(--kc)">50+</strong></div>
+  <div>Target: <strong style="color:#be185d">15+</strong></div>
+  <div>Target: <strong style="color:var(--orange)">10+</strong></div>
+</div>
+
+<!-- ALERT -->
+<div class="alert-box">
+  <div class="alert-icon">✈️</div>
+  <div class="alert-text"><strong>Cozumel Trip — Early April.</strong> Schedule all content and Facebook group posts BEFORE you leave. Use CapCut's schedule feature and Buffer (free) to auto-post while you're on the beach. Come back to data, not silence. Launch day April 13th should be fully automated if needed.</div>
+</div>
+
+<!-- ═══════════════════════════════════════ WEEK 1 -->
+<div class="week-block">
+  <div class="week-header">
+    <div class="week-num">01</div>
+    <div class="week-info">
+      <div class="week-title">PREPARE & PRODUCE</div>
+      <div class="week-dates">March 24 – March 30</div>
+    </div>
+    <div class="week-focus">Set Up Everything Before Cozumel</div>
+  </div>
+
+  <div class="day-grid">
+    <!-- MON Mar 24 -->
+    <div class="day-card today">
+      <div class="day-label">TODAY</div>
+      <div class="day-head"><span class="day-name">Mon</span><span class="day-date">24</span></div>
+      <div class="day-body">
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-tech">Tech</span>Upgrade Supabase to Pro plan</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-tech">Tech</span>Upgrade Brevo to Business plan</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-ylcc">YLCC</span>Test demo mode yourlifecc.com/app?demo=true</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-tech">Tech</span>Create TikTok Business Account</div></div>
+      </div>
+    </div>
+    <!-- TUE Mar 25 -->
+    <div class="day-card">
+      <div class="day-head"><span class="day-name">Tue</span><span class="day-date">25</span></div>
+      <div class="day-body">
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-content">Content</span>Download CapCut — watch 1 tutorial</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-ylcc">YLCC</span>Screen record app demo walkthrough (3 min)</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-kc">KC</span>Add church waitlist form to kingdom-creatives.com</div></div>
+      </div>
+    </div>
+    <!-- WED Mar 26 -->
+    <div class="day-card">
+      <div class="day-head"><span class="day-name">Wed</span><span class="day-date">26</span></div>
+      <div class="day-body">
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-content">Content</span>Produce TikTok #1 — Contest Hook ("Win $5K")</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-content">Content</span>Produce TikTok #2 — Problem/Solution</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-tech">Tech</span>Set up Buffer free account for scheduling</div></div>
+      </div>
+    </div>
+    <!-- THU Mar 27 -->
+    <div class="day-card">
+      <div class="day-head"><span class="day-name">Thu</span><span class="day-date">27</span></div>
+      <div class="day-body">
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-content">Content</span>Produce TikTok #3 — Parent Hub Feature</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-content">Content</span>Produce TikTok #4 — Faith Angle</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-kc">KC</span>Produce TikTok #5 — KC Church Website angle</div></div>
+      </div>
+    </div>
+    <!-- FRI Mar 28 -->
+    <div class="day-card">
+      <div class="day-head"><span class="day-name">Fri</span><span class="day-date">28</span></div>
+      <div class="day-body">
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-fb">FB</span>Join 20 Facebook parenting/Christian groups</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-fb">FB</span>Draft Facebook post for groups (YLCC)</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-kc">KC</span>Join 10 pastor/church admin Facebook groups</div></div>
+      </div>
+    </div>
+    <!-- SAT Mar 29 -->
+    <div class="day-card">
+      <div class="day-head"><span class="day-name">Sat</span><span class="day-date">29</span></div>
+      <div class="day-body">
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-content">Content</span>Schedule all 5 TikToks via Buffer (1/day Apr 7-11)</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-ylcc">YLCC</span>Run full beta test checklist — fix any bugs</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-tech">Tech</span>Test full payment flow with Stripe test card</div></div>
+      </div>
+    </div>
+    <!-- SUN Mar 30 -->
+    <div class="day-card">
+      <div class="day-head"><span class="day-name">Sun</span><span class="day-date">30</span></div>
+      <div class="day-body">
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-ylcc">YLCC</span>Test activation email end-to-end</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-ylcc">YLCC</span>Test referral link + contest entry tracking</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-content">Content</span>Schedule Facebook group posts for Apr 13</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Week 1 Resources -->
+  <div class="section-grid">
+    <div class="section-card">
+      <div class="sc-head"><div class="sc-icon">🎬</div><div class="sc-title">AI VIDEO TOOLS</div><div class="sc-badge badge-both">Use These</div></div>
+      <div class="tool-row"><div class="tool-emoji">✂️</div><div class="tool-name">CapCut</div><div class="tool-desc">Script → video, trending sounds, auto-captions. TikTok native.</div><div class="tool-cost">FREE</div></div>
+      <div class="tool-row"><div class="tool-emoji">🤖</div><div class="tool-name">HeyGen</div><div class="tool-desc">AI avatar talks for you. Paste script, get video. No camera needed.</div><div class="tool-cost">~$29/mo</div></div>
+      <div class="tool-row"><div class="tool-emoji">🎙️</div><div class="tool-name">ElevenLabs</div><div class="tool-desc">AI voiceover. Natural sounding narration for any script.</div><div class="tool-cost">FREE tier</div></div>
+      <div class="tool-row"><div class="tool-emoji">📅</div><div class="tool-name">Buffer</div><div class="tool-desc">Schedule TikTok + Facebook posts in advance. Auto-posts while you travel.</div><div class="tool-cost">FREE</div></div>
+      <div class="tool-row"><div class="tool-emoji">🎨</div><div class="tool-name">Canva</div><div class="tool-desc">Graphics, flyers, thumbnails. Has church flyer and parenting templates.</div><div class="tool-cost">FREE tier</div></div>
+    </div>
+    <div class="section-card">
+      <div class="sc-head"><div class="sc-icon">📘</div><div class="sc-title">FACEBOOK GROUPS TO JOIN</div><div class="sc-badge badge-ylcc">YLCC</div></div>
+      <div class="fb-group">💒 Christian Moms Network<span class="fb-members">180K members</span></div>
+      <div class="fb-group">👨‍👩‍👧 Parenting Teens Today<span class="fb-members">95K members</span></div>
+      <div class="fb-group">📖 Homeschool Christian Families<span class="fb-members">220K members</span></div>
+      <div class="fb-group">💰 Dave Ramsey Followers Group<span class="fb-members">340K members</span></div>
+      <div class="fb-group">🙏 Faith & Family Living<span class="fb-members">75K members</span></div>
+      <div class="fb-group">⛪ Small Church Pastors Network<span class="fb-members">45K members</span></div>
+      <div class="fb-group">👩‍👧 Christian Parenting Community<span class="fb-members">130K members</span></div>
+      <div class="fb-group">🏫 PTA Parents Connect<span class="fb-members">88K members</span></div>
+      <div style="font-size:.65rem;color:var(--ink3);margin-top:8px;">+ Search your local Boise/Nampa area parent groups for immediate local traction</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ WEEK 2 -->
+<div class="week-block">
+  <div class="week-header">
+    <div class="week-num">02</div>
+    <div class="week-info">
+      <div class="week-title">COZUMEL + AUTO-LAUNCH</div>
+      <div class="week-dates">March 31 – April 6</div>
+    </div>
+    <div class="week-focus">Everything Runs Automatically ✈️</div>
+  </div>
+
+  <div class="alert-box">
+    <div class="alert-icon">🏖️</div>
+    <div class="alert-text"><strong>You're heading to Cozumel this week.</strong> If everything in Week 1 is done, this week runs on autopilot. Scheduled TikToks post daily. Facebook posts go live. Just check your phone once a day to respond to any comments or DMs. Enjoy El Cozumeleño Beach Resort — you've earned it.</div>
+  </div>
+
+  <div class="day-grid">
+    <div class="day-card travel">
+      <div class="day-label travel">PRE-TRIP</div>
+      <div class="day-head"><span class="day-name">Mon</span><span class="day-date">31</span></div>
+      <div class="day-body">
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-tech">Tech</span>Verify all Buffer posts scheduled correctly</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-ylcc">YLCC</span>Final beta test on mobile — iOS + Android</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-kc">KC</span>Post KC church waitlist to 5 pastor groups</div></div>
+      </div>
+    </div>
+    <div class="day-card travel">
+      <div class="day-label travel">TRAVEL</div>
+      <div class="day-head"><span class="day-name">Tue</span><span class="day-date">1</span></div>
+      <div class="day-body">
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text">✈️ Travel to Cozumel</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-content">Auto</span>TikTok #1 posts automatically</div></div>
+      </div>
+    </div>
+    <div class="day-card travel">
+      <div class="day-label travel">COZUMEL</div>
+      <div class="day-head"><span class="day-name">Wed</span><span class="day-date">2</span></div>
+      <div class="day-body">
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-content">Auto</span>TikTok #2 posts automatically</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text">Check TikTok comments — reply to any</div></div>
+      </div>
+    </div>
+    <div class="day-card travel">
+      <div class="day-label travel">COZUMEL</div>
+      <div class="day-head"><span class="day-name">Thu</span><span class="day-date">3</span></div>
+      <div class="day-body">
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-content">Auto</span>TikTok #3 posts automatically</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text">Check signups in Supabase dashboard</div></div>
+      </div>
+    </div>
+    <div class="day-card travel">
+      <div class="day-label travel">COZUMEL</div>
+      <div class="day-head"><span class="day-name">Fri</span><span class="day-date">4</span></div>
+      <div class="day-body">
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-content">Auto</span>TikTok #4 posts automatically</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text">Reply to any Facebook group comments</div></div>
+      </div>
+    </div>
+    <div class="day-card travel">
+      <div class="day-label travel">COZUMEL</div>
+      <div class="day-head"><span class="day-name">Sat</span><span class="day-date">5</span></div>
+      <div class="day-body">
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-content">Auto</span>TikTok #5 posts automatically</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text">Note which TikTok angle performed best</div></div>
+      </div>
+    </div>
+    <div class="day-card">
+      <div class="day-head"><span class="day-name">Sun</span><span class="day-date">6</span></div>
+      <div class="day-body">
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text">Return home / travel day</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text">Review all TikTok analytics</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text">Check Supabase — how many signups so far?</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TikTok Scripts -->
+  <div class="section-grid">
+    <div class="section-card full">
+      <div class="sc-head"><div class="sc-icon">🎬</div><div class="sc-title">THE 5 TIKTOK SCRIPTS — READY TO PASTE INTO CAPCUT</div><div class="sc-badge badge-both">AI Video Ready</div></div>
+      <div class="script-block">
+        <div class="script-label">Script 1 — Contest Hook (Post Apr 7) 🏆</div>
+        "We're giving away $5,000 cash to one family this September. Here's how to enter for FREE. YourLife CC is an app that helps parents raise kids who are actually ready for real life — money, goals, chores, faith, mental health — all in one place. Go to YourLife CC dot com, create a free account, and you're automatically entered. Share your link and get 5 bonus entries per signup. Drawing September 1st. Link in bio. Don't sleep on this."
+      </div>
+      <div class="script-block">
+        <div class="script-label">Script 2 — Problem/Solution (Post Apr 8) 🎯</div>
+        "By the time your kid leaves your house — will they know how to manage a bank account? Pay a bill? Set a goal and actually hit it? Handle stress without falling apart? Most won't. And that's not their fault — no one taught them. YourLife CC fixes that. 140 life skill lessons, a chore and rewards system, GPA tracker, faith devotionals, and a $5,000 cash drawing just for signing up free. Link in bio."
+      </div>
+      <div class="script-block">
+        <div class="script-label">Script 3 — Parent Hub Feature (Post Apr 9) 👨‍👩‍👧</div>
+        "What if you could see your kid's mood, grades, goals, chores, and behavior — all in one place — without hovering over them? That's the Parent Hub in YourLife CC. Your kids log their own stuff. You see it all in real time. And right now there's a $5,000 cash drawing just for creating a free account. No credit card. No catch. Link in bio."
+      </div>
+      <div class="script-block">
+        <div class="script-label">Script 4 — Faith Angle (Post Apr 10) ✝️</div>
+        "If you're a Christian parent trying to raise kids with real values, real faith, and real discipline — this app was literally built for you. YourLife CC has daily Bible devotionals, scripture tracking, faith points, prayer logs, and a full family management system. And right now we're giving away $5,000 cash — free to enter, just create an account. Link in bio."
+      </div>
+      <div class="script-block">
+        <div class="script-label">Script 5 — Kingdom Creatives / Church (Post Apr 11) ⛪</div>
+        "140,000 small churches in America have no website. No online presence. No way for new families to find them. We're changing that. Kingdom Creatives builds free professional websites for small churches — sermon builder included — funded by local sponsors. If your church needs a website, or you want to sponsor one in your community, the link is in my bio. Applications open now."
+      </div>
+      <div class="hashtag-cloud">
+        <span class="hashtag hot">#ChristianParenting</span>
+        <span class="hashtag hot">#MomTok</span>
+        <span class="hashtag hot">#FaithAndFamily</span>
+        <span class="hashtag hot">#RaisingTeens</span>
+        <span class="hashtag">#ParentingTips</span>
+        <span class="hashtag">#HomeschoolMom</span>
+        <span class="hashtag">#ChristianMom</span>
+        <span class="hashtag">#KidsAndMoney</span>
+        <span class="hashtag">#SmallChurch</span>
+        <span class="hashtag">#PastorLife</span>
+        <span class="hashtag">#ChurchGrowth</span>
+        <span class="hashtag">#MinistryLife</span>
+        <span class="hashtag">#TeenMom</span>
+        <span class="hashtag">#FamilyApp</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ WEEK 3 -->
+<div class="week-block">
+  <div class="week-header">
+    <div class="week-num">03</div>
+    <div class="week-info">
+      <div class="week-title">LAUNCH & ACCELERATE</div>
+      <div class="week-dates">April 7 – April 13</div>
+    </div>
+    <div class="week-focus">🚀 Launch Day April 13th</div>
+  </div>
+
+  <div class="day-grid">
+    <div class="day-card">
+      <div class="day-head"><span class="day-name">Mon</span><span class="day-date">7</span></div>
+      <div class="day-body">
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-content">Auto</span>TikTok #1 Contest Hook posts</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-ylcc">YLCC</span>Final Vercel deployment check</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-tech">Tech</span>Confirm Stripe webhook firing correctly</div></div>
+      </div>
+    </div>
+    <div class="day-card">
+      <div class="day-head"><span class="day-name">Tue</span><span class="day-date">8</span></div>
+      <div class="day-body">
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-content">Auto</span>TikTok #2 Problem/Solution posts</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-fb">FB</span>Post in 10 Facebook parenting groups</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-ylcc">YLCC</span>Test demo link on mobile</div></div>
+      </div>
+    </div>
+    <div class="day-card">
+      <div class="day-head"><span class="day-name">Wed</span><span class="day-date">9</span></div>
+      <div class="day-body">
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-content">Auto</span>TikTok #3 Parent Hub posts</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-fb">FB</span>Post in 10 more Facebook groups</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-kc">KC</span>Email 5 local churches directly</div></div>
+      </div>
+    </div>
+    <div class="day-card">
+      <div class="day-head"><span class="day-name">Thu</span><span class="day-date">10</span></div>
+      <div class="day-body">
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-content">Auto</span>TikTok #4 Faith Angle posts</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-ylcc">YLCC</span>Produce 3 more TikToks doubling down on best performing angle</div></div>
+      </div>
+    </div>
+    <div class="day-card">
+      <div class="day-head"><span class="day-name">Fri</span><span class="day-date">11</span></div>
+      <div class="day-body">
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-content">Auto</span>TikTok #5 KC Church posts</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-fb">FB</span>Personal post to your own Facebook network</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-kc">KC</span>Reach out to 3 potential local sponsors</div></div>
+      </div>
+    </div>
+    <div class="day-card">
+      <div class="day-head"><span class="day-name">Sat</span><span class="day-date">12</span></div>
+      <div class="day-body">
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-ylcc">YLCC</span>Final full end-to-end test — signup to activation</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-tech">Tech</span>Switch Supabase + Brevo to production settings</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text">Prepare launch day social posts (ready to fire)</div></div>
+      </div>
+    </div>
+    <div class="day-card launch-day">
+      <div class="day-label launch">🚀 LAUNCH</div>
+      <div class="day-head"><span class="day-name">Sun</span><span class="day-date">13</span></div>
+      <div class="day-body">
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-ylcc">YLCC</span>Go live — remove beta flags</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-content">🚀</span>Post launch TikTok immediately</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text"><span class="task-tag tag-fb">FB</span>Blast all Facebook groups simultaneously</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text">Monitor Supabase signups in real time</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><div class="task-text">🎉 Celebrate — you launched!</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Launch Day Checklist -->
+  <div class="section-grid">
+    <div class="section-card">
+      <div class="sc-head"><div class="sc-icon">🚀</div><div class="sc-title">LAUNCH DAY CHECKLIST</div><div class="sc-badge badge-ylcc">April 13</div></div>
+      <div class="checklist-item" onclick="toggleCL(this)"><div class="cl-check"></div><div class="cl-text">yourlifecc.com loads correctly on mobile and desktop</div></div>
+      <div class="checklist-item" onclick="toggleCL(this)"><div class="cl-check"></div><div class="cl-text">Demo link works: yourlifecc.com/app?demo=true</div></div>
+      <div class="checklist-item" onclick="toggleCL(this)"><div class="cl-check"></div><div class="cl-text">New signup → activation email arrives within 2 min</div></div>
+      <div class="checklist-item" onclick="toggleCL(this)"><div class="cl-check"></div><div class="cl-text">Magic link in email works correctly</div></div>
+      <div class="checklist-item" onclick="toggleCL(this)"><div class="cl-check"></div><div class="cl-text">Stripe payment completes for all 3 plan types</div></div>
+      <div class="checklist-item" onclick="toggleCL(this)"><div class="cl-check"></div><div class="cl-text">Contest entry created in Supabase on signup</div></div>
+      <div class="checklist-item" onclick="toggleCL(this)"><div class="cl-check"></div><div class="cl-text">Referral link generates correctly per user</div></div>
+      <div class="checklist-item" onclick="toggleCL(this)"><div class="cl-check"></div><div class="cl-text">Parent Hub PIN works correctly</div></div>
+      <div class="checklist-item" onclick="toggleCL(this)"><div class="cl-check"></div><div class="cl-text">Cloud sync saves data to Supabase</div></div>
+      <div class="checklist-item" onclick="toggleCL(this)"><div class="cl-check"></div><div class="cl-text">$5K contest banner + countdown visible on landing</div></div>
+      <div class="checklist-item" onclick="toggleCL(this)"><div class="cl-check"></div><div class="cl-text">All email addresses show info@kingdom-creatives.com</div></div>
+      <div class="checklist-item" onclick="toggleCL(this)"><div class="cl-check"></div><div class="cl-text">No console errors on landing page or app</div></div>
+    </div>
+    <div class="section-card">
+      <div class="sc-head"><div class="sc-icon">📊</div><div class="sc-title">SUCCESS METRICS — END OF WEEK 3</div><div class="sc-badge badge-both">Targets</div></div>
+      <div class="metric-row"><span class="metric-label">YourLife CC signups</span><span class="metric-target">250+</span></div>
+      <div class="metric-row"><span class="metric-label">Free contest entries</span><span class="metric-target">200+</span></div>
+      <div class="metric-row"><span class="metric-label">Paid subscribers</span><span class="metric-target">20+</span></div>
+      <div class="metric-row"><span class="metric-label">TikTok videos posted</span><span class="metric-target">5+</span></div>
+      <div class="metric-row"><span class="metric-label">TikTok views total</span><span class="metric-target">10K+</span></div>
+      <div class="metric-row"><span class="metric-label">Facebook groups joined</span><span class="metric-target">30+</span></div>
+      <div class="metric-row"><span class="metric-label">KC church waitlist</span><span class="metric-target">50+</span></div>
+      <div class="metric-row"><span class="metric-label">KC sponsor inquiries</span><span class="metric-target">10+</span></div>
+      <div class="metric-row"><span class="metric-label">Referral links shared</span><span class="metric-target">50+</span></div>
+      <div class="metric-row"><span class="metric-label">Year 1 revenue pace</span><span class="metric-target">$900K</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER NOTE -->
+<div class="divider"></div>
+<div style="background:var(--ink);border-radius:12px;padding:28px 32px;text-align:center;">
+  <div style="font-family:var(--fh);font-size:2rem;color:#fff;letter-spacing:.05em;margin-bottom:.5rem;">YOU BUILT THIS. NOW LAUNCH IT.</div>
+  <div style="font-size:.85rem;color:rgba(255,255,255,.45);max-width:500px;margin:0 auto 1rem;">At 1,000 users, hire your superstar rep. At 10,000, you're netting $641K. The system is built — now execute the plan.</div>
+  <div style="font-size:.72rem;color:rgba(255,255,255,.25);">YourLife CC · Kingdom Creatives LLC · Jason Vega · info@kingdom-creatives.com</div>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+// ── TASK TOGGLE ───────────────────────────────────────
+function toggleTask(el){
+  const check = el.querySelector('.task-check');
+  const text = el.querySelector('.task-text');
+  check.classList.toggle('done');
+  text.classList.toggle('done');
+  saveState();
+  updateProgress();
+}
+function toggleCL(el){
+  const check = el.querySelector('.cl-check');
+  const text = el.querySelector('.cl-text');
+  check.classList.toggle('done');
+  text.classList.toggle('done');
+  saveState();
+  updateProgress();
+}
+
+// ── KPI INPUTS ────────────────────────────────────────
+['kpi-signups','kpi-churches','kpi-tiktoks','kpi-sponsors'].forEach(id => {
+  const el = document.getElementById(id);
+  if(el){
+    el.contentEditable = 'true';
+    el.style.cursor = 'text';
+    el.style.outline = 'none';
+    el.addEventListener('input', saveState);
+  }
+});
+
+// ── PROGRESS ─────────────────────────────────────────
+function updateProgress(){
+  const all = document.querySelectorAll('.task-check, .cl-check');
+  const done = document.querySelectorAll('.task-check.done, .cl-check.done');
+  const pct = all.length ? Math.round(done.length/all.length*100) : 0;
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('progTasks').textContent = done.length + ' of ' + all.length + ' tasks complete';
+}
+
+// ── SAVE / LOAD ───────────────────────────────────────
+function saveState(){
+  const checks = [];
+  document.querySelectorAll('.task-check, .cl-check').forEach((el,i) => {
+    checks.push(el.classList.contains('done'));
+  });
+  const kpis = {};
+  ['kpi-signups','kpi-churches','kpi-tiktoks','kpi-sponsors'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) kpis[id] = el.textContent;
+  });
+  localStorage.setItem('launch_plan_v1', JSON.stringify({checks, kpis}));
+}
+
+function loadState(){
+  const raw = localStorage.getItem('launch_plan_v1');
+  if(!raw) return;
+  try {
+    const {checks, kpis} = JSON.parse(raw);
+    const els = document.querySelectorAll('.task-check, .cl-check');
+    checks.forEach((done, i) => {
+      if(done && els[i]){
+        els[i].classList.add('done');
+        const parent = els[i].closest('.task-item, .checklist-item');
+        if(parent){
+          const text = parent.querySelector('.task-text, .cl-text');
+          if(text) text.classList.add('done');
+        }
+      }
+    });
+    if(kpis){
+      Object.entries(kpis).forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        if(el) el.textContent = val;
+      });
+    }
+  } catch(e){}
+}
+
+loadState();
+updateProgress();
+</script>
+</body>
+</html>
