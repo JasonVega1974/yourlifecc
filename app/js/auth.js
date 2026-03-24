@@ -456,3 +456,14 @@ async function signOut(){
   setSyncSt('local');
 }
 
+
+// ── FIRST TIME GATE ───────────────────────────────────────────
+function showFirstTimeGate(){
+  // PIN setup removed — go straight to app
+  finishInit();
+}
+
+function hideFirstTimeGate(){
+  const el = document.getElementById('firstTimeGate');
+  if(el) el.style.display = 'none';
+}
