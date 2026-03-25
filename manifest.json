@@ -1,0 +1,29 @@
+{
+  "name": "YourLifeCC",
+  "short_name": "YourLifeCC",
+  "description": "Family life management — profiles, chores, goals, rewards & more.",
+  "start_url": "/app/",
+  "scope": "/app/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#1a1a2e",
+  "theme_color": "#4A90D9",
+  "lang": "en-US",
+  "categories": ["lifestyle", "education", "kids"],
+  "icons": [
+    {
+      "src": "/app/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/app/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false
+}
