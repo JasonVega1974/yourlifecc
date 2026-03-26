@@ -1813,10 +1813,16 @@ function doTranslateLP(langCode){
   if(dd) dd.style.display = 'none';
 
   // If combo already found and ready — use it immediately
-  if(_gtComboReady && _gtCombo){
+if(_gtComboReady && _gtCombo){
     _gtCombo.value = langCode;
     _gtCombo.dispatchEvent(new Event('change'));
-    try{ localStorage.setItem('ylcc_lang', langCode); } catch(e){}
+    try{
+      if(langCode === 'en'){
+        localStorage.removeItem('ylcc_lang');
+      } else {
+        localStorage.setItem('ylcc_lang', langCode);
+      }
+    } catch(e){}
     return;
   }
 
