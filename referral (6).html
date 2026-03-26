@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Refer a Family · YourLife CC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #08080f;
+      --bg2: #0f0f1a;
+      --bg3: #161625;
+      --gold: #f5c842;
+      --gold2: rgba(245,200,66,.12);
+      --gold3: rgba(245,200,66,.05);
+      --green: #22c55e;
+      --green2: rgba(34,197,94,.12);
+      --blue: #60a5fa;
+      --tx: #f0f0f8;
+      --tx2: #9090b0;
+      --tx3: #404058;
+      --border: rgba(255,255,255,.07);
+      --fn: 'Orbitron', monospace;
+      --fs: 'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--tx); font-family: var(--fs); line-height: 1.65; overflow-x: hidden; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(8,8,15,.9); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 1.1rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo { font-family: var(--fn); font-size: .9rem; font-weight: 900; color: var(--gold); letter-spacing: .15em; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--tx2); font-size: .85rem; text-decoration: none; transition: color .2s; }
+    .nav-links a:hover { color: var(--tx); }
+    .nav-cta { background: var(--gold) !important; color: #080810 !important; font-weight: 700 !important; padding: .45rem 1.1rem; border-radius: 8px; font-size: .82rem !important; }
+
+    /* HERO */
+    .hero {
+      position: relative; text-align: center; padding: 5rem 2rem 4rem; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 70% 50% at 50% -10%, rgba(245,200,66,.1) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 20% 80%, rgba(34,197,94,.06) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 80% 80%, rgba(96,165,250,.05) 0%, transparent 60%);
+    }
+    /* grid lines */
+    .hero::after {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background-image: linear-gradient(rgba(255,255,255,.015) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255,255,255,.015) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+    .hero-inner { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: var(--green2); border: 1px solid rgba(34,197,94,.25);
+      border-radius: 100px; padding: .35rem 1rem;
+      font-size: .75rem; font-weight: 700; color: var(--green); letter-spacing: .08em;
+      margin-bottom: 1.5rem;
+      animation: fadeDown .5s ease both;
+    }
+    .hero h1 {
+      font-family: var(--fn); font-size: clamp(2rem, 5.5vw, 3.5rem);
+      font-weight: 900; line-height: 1.1; margin-bottom: 1.25rem;
+      animation: fadeDown .55s .1s ease both;
+    }
+    .hero h1 em { font-style: normal; color: var(--gold); }
+    .hero p { color: var(--tx2); font-size: 1.05rem; margin-bottom: 2.5rem; animation: fadeDown .6s .2s ease both; }
+
+    /* DOUBLE REWARD CARDS */
+    .reward-split {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;
+      max-width: 580px; margin: 0 auto 2.5rem;
+      animation: fadeDown .65s .3s ease both;
+    }
+    @media(max-width: 520px) { .reward-split { grid-template-columns: 1fr; } }
+    .reward-card {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 16px;
+      padding: 1.4rem 1.2rem; text-align: center; position: relative; overflow: hidden;
+      transition: transform .3s, border-color .3s;
+    }
+    .reward-card:hover { transform: translateY(-3px); }
+    .reward-card.you { border-color: rgba(245,200,66,.3); }
+    .reward-card.them { border-color: rgba(34,197,94,.3); }
+    .reward-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    }
+    .reward-card.you::before { background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+    .reward-card.them::before { background: linear-gradient(90deg, transparent, var(--green), transparent); }
+    .reward-who { font-size: .65rem; font-weight: 800; letter-spacing: .12em; margin-bottom: .6rem; }
+    .reward-card.you .reward-who { color: var(--gold); }
+    .reward-card.them .reward-who { color: var(--green); }
+    .reward-amount { font-family: var(--fn); font-size: 2.4rem; font-weight: 900; line-height: 1; margin-bottom: .3rem; }
+    .reward-card.you .reward-amount { color: var(--gold); }
+    .reward-card.them .reward-amount { color: var(--green); }
+    .reward-desc { font-size: .8rem; color: var(--tx2); line-height: 1.4; }
+
+    .hero-cta-row { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; animation: fadeDown .7s .4s ease both; }
+    .btn-primary { background: var(--gold); color: #080810; font-weight: 700; font-size: .95rem; padding: .85rem 2rem; border-radius: 10px; text-decoration: none; transition: transform .2s, opacity .2s; display: inline-block; }
+    .btn-primary:hover { transform: translateY(-2px); opacity: .9; }
+    .btn-ghost { border: 1px solid rgba(245,200,66,.3); color: var(--gold); font-size: .95rem; font-weight: 600; padding: .85rem 2rem; border-radius: 10px; text-decoration: none; transition: background .2s; display: inline-block; }
+    .btn-ghost:hover { background: var(--gold2); }
+
+    /* HOW IT WORKS */
+    .section { max-width: 1060px; margin: 0 auto; padding: 4.5rem 2rem; }
+    .sec-eyebrow { font-family: var(--fn); font-size: .65rem; letter-spacing: .18em; color: var(--gold); font-weight: 700; margin-bottom: .6rem; }
+    .sec-title { font-size: clamp(1.5rem, 3.5vw, 2.2rem); font-weight: 700; color: var(--tx); margin-bottom: .75rem; }
+    .sec-sub { color: var(--tx2); font-size: .95rem; max-width: 520px; margin-bottom: 3rem; }
+
+    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
+    @media(max-width: 860px) { .steps { grid-template-columns: repeat(2, 1fr); } }
+    @media(max-width: 480px) { .steps { grid-template-columns: 1fr; } }
+    .step-card {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 14px;
+      padding: 1.5rem; position: relative;
+      transition: border-color .3s, transform .3s;
+    }
+    .step-card:hover { border-color: rgba(245,200,66,.2); transform: translateY(-3px); }
+    .step-n {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--gold2); border: 1px solid rgba(245,200,66,.25);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--fn); font-size: .7rem; font-weight: 900; color: var(--gold);
+      margin-bottom: 1rem;
+    }
+    .step-card h3 { font-size: .95rem; font-weight: 700; color: var(--tx); margin-bottom: .4rem; }
+    .step-card p { font-size: .82rem; color: var(--tx2); line-height: 1.55; }
+
+    /* SHARE WIDGET */
+    .share-section { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .share-wrap { max-width: 640px; margin: 0 auto; padding: 4rem 2rem; text-align: center; }
+    .share-wrap h2 { font-family: var(--fn); font-size: 1.2rem; font-weight: 900; color: var(--tx); margin-bottom: .5rem; }
+    .share-wrap > p { color: var(--tx2); font-size: .9rem; margin-bottom: 2rem; }
+
+    .link-box {
+      background: var(--bg3); border: 1px solid rgba(245,200,66,.2); border-radius: 12px;
+      padding: 1rem 1.25rem; display: flex; align-items: center; gap: .75rem; margin-bottom: 1.5rem;
+    }
+    .link-url {
+      flex: 1; font-family: 'Courier New', monospace; font-size: .85rem; color: var(--blue);
+      word-break: break-all; text-align: left;
+    }
+    .copy-btn {
+      flex-shrink: 0; background: var(--gold2); border: 1px solid rgba(245,200,66,.3);
+      color: var(--gold); font-size: .78rem; font-weight: 700; padding: .5rem 1rem;
+      border-radius: 8px; cursor: pointer; transition: background .2s; white-space: nowrap;
+      font-family: var(--fs);
+    }
+    .copy-btn:hover { background: rgba(245,200,66,.2); }
+    .copy-btn.copied { background: var(--green2); border-color: rgba(34,197,94,.3); color: var(--green); }
+
+    .share-note { font-size: .78rem; color: var(--tx3); margin-bottom: 2rem; }
+
+    .share-methods { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; margin-bottom: 1.5rem; }
+    @media(max-width: 480px) { .share-methods { grid-template-columns: 1fr; } }
+    .share-btn {
+      padding: .75rem 1rem; border-radius: 10px; font-size: .82rem; font-weight: 700;
+      text-decoration: none; display: flex; align-items: center; justify-content: center;
+      gap: .5rem; transition: opacity .2s, transform .2s; cursor: pointer; border: none;
+    }
+    .share-btn:hover { opacity: .85; transform: translateY(-1px); }
+    .share-sms { background: #22c55e; color: #fff; }
+    .share-email { background: #3b82f6; color: #fff; }
+    .share-copy { background: var(--bg3); border: 1px solid var(--border); color: var(--tx2); }
+
+    /* IN-APP PREVIEW */
+    .preview-section { background: var(--bg); }
+    .preview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
+    @media(max-width: 768px) { .preview-grid { grid-template-columns: 1fr; } }
+    .preview-text h2 { font-family: var(--fn); font-size: 1.3rem; font-weight: 900; color: var(--tx); margin-bottom: .75rem; }
+    .preview-text p { color: var(--tx2); font-size: .9rem; margin-bottom: 1rem; }
+    .preview-text ul { list-style: none; display: flex; flex-direction: column; gap: .6rem; }
+    .preview-text ul li { display: flex; align-items: flex-start; gap: .75rem; font-size: .88rem; color: var(--tx2); }
+    .preview-text ul li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; margin-top: .05rem; }
+
+    /* Mock in-app widget */
+    .app-widget {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 20px;
+      padding: 1.5rem; max-width: 340px; margin: 0 auto;
+    }
+    .widget-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+    .widget-title { font-family: var(--fn); font-size: .7rem; font-weight: 700; color: var(--tx2); letter-spacing: .1em; }
+    .widget-badge { background: var(--green2); color: var(--green); font-size: .65rem; font-weight: 700; padding: .2rem .6rem; border-radius: 20px; }
+    .widget-stat { text-align: center; padding: 1rem; background: var(--bg3); border-radius: 12px; margin-bottom: 1rem; }
+    .widget-stat-num { font-family: var(--fn); font-size: 2rem; font-weight: 900; color: var(--gold); }
+    .widget-stat-label { font-size: .75rem; color: var(--tx2); margin-top: .2rem; }
+    .widget-earnings { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin-bottom: 1.25rem; }
+    .widget-earn-box { background: var(--bg3); border-radius: 10px; padding: .75rem; text-align: center; }
+    .widget-earn-num { font-size: 1.1rem; font-weight: 700; color: var(--green); }
+    .widget-earn-label { font-size: .68rem; color: var(--tx3); margin-top: .15rem; }
+    .widget-link-row { background: var(--bg3); border-radius: 10px; padding: .75rem 1rem; display: flex; align-items: center; gap: .6rem; margin-bottom: 1rem; }
+    .widget-link-text { flex: 1; font-size: .72rem; color: var(--blue); font-family: monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .widget-copy-mini { font-size: .65rem; font-weight: 700; color: var(--gold); background: var(--gold2); border: none; border-radius: 6px; padding: .3rem .6rem; cursor: pointer; white-space: nowrap; font-family: var(--fs); }
+    .widget-share-row { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+    .widget-share-mini { padding: .6rem; border-radius: 8px; font-size: .72rem; font-weight: 700; text-align: center; cursor: pointer; border: none; font-family: var(--fs); }
+    .wsm-sms { background: rgba(34,197,94,.15); color: var(--green); }
+    .wsm-email { background: rgba(96,165,250,.12); color: var(--blue); }
+
+    /* FAQ */
+    .faq-section { background: var(--bg2); border-top: 1px solid var(--border); }
+    .faq-list { max-width: 680px; display: flex; flex-direction: column; gap: .75rem; }
+    .faq-item { background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .faq-q {
+      padding: 1.1rem 1.25rem; cursor: pointer; display: flex; justify-content: space-between;
+      align-items: center; font-weight: 600; font-size: .9rem; color: var(--tx);
+      transition: color .2s; user-select: none;
+    }
+    .faq-q:hover { color: var(--gold); }
+    .faq-arr { font-size: .7rem; color: var(--tx3); transition: transform .3s; }
+    .faq-item.open .faq-arr { transform: rotate(180deg); }
+    .faq-a { display: none; padding: 0 1.25rem 1.1rem; font-size: .87rem; color: var(--tx2); line-height: 1.65; }
+    .faq-item.open .faq-a { display: block; }
+
+    /* TERMS */
+    .terms-section { max-width: 720px; margin: 0 auto; padding: 3rem 2rem 5rem; }
+    .terms-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 2rem 2.5rem; }
+    .terms-box h2 { font-family: var(--fn); font-size: .82rem; font-weight: 700; color: var(--gold); letter-spacing: .1em; margin-bottom: 1.5rem; padding-bottom: .75rem; border-bottom: 1px solid var(--border); }
+    .term { display: flex; gap: 1rem; margin-bottom: 1.1rem; align-items: flex-start; }
+    .term-n { flex-shrink: 0; width: 24px; height: 24px; background: var(--gold2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .68rem; font-weight: 800; color: var(--gold); margin-top: .2rem; }
+    .term p { font-size: .85rem; color: var(--tx2); line-height: 1.6; }
+    .term p strong { color: var(--tx); }
+    .terms-updated { font-size: .75rem; color: var(--tx3); margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+
+    /* FOOTER */
+    footer { text-align: center; padding: 2rem; color: var(--tx3); font-size: .8rem; border-top: 1px solid var(--border); }
+    footer a { color: var(--tx3); text-decoration: none; }
+    footer a:hover { color: var(--tx2); }
+
+    /* ANIMATIONS */
+    @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="/" class="nav-logo">YOURLIFE.CC</a>
+  <div class="nav-links">
+    <a href="/#pricing">Pricing</a>
+    <a href="affiliate.html">Affiliates</a>
+    <a href="/login.html">Sign In</a>
+    <a href="/#pricing" class="nav-cta">Get Started →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">🤝 Both of you win</div>
+    <h1>Refer a Family.<br><em>Both Get Rewarded.</em></h1>
+    <p>Share YourLife CC with another family. You get <strong style="color:var(--gold);">$10 cash</strong> — and they get <strong style="color:var(--green);">$10 off</strong> their first payment. Everyone wins.</p>
+
+    <div class="reward-split">
+      <div class="reward-card you">
+        <div class="reward-who">YOU GET</div>
+        <div class="reward-amount">$10</div>
+        <div class="reward-desc">Cash via Venmo or PayPal when your friend signs up on any paid plan</div>
+      </div>
+      <div class="reward-card them">
+        <div class="reward-who">YOUR FRIEND GETS</div>
+        <div class="reward-amount">$10</div>
+        <div class="reward-desc">Off their first payment — automatically applied when they use your link</div>
+      </div>
+    </div>
+
+    <div class="hero-cta-row">
+      <a href="#share" class="btn-primary">Get My Referral Link →</a>
+      <a href="#how" class="btn-ghost">How It Works</a>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<div id="how">
+  <div class="section">
+    <div class="sec-eyebrow">THE PROCESS</div>
+    <div class="sec-title">Simple as 1-2-3</div>
+    <p class="sec-sub">No apps to install. No complicated steps. Just share your link and let us handle the rest.</p>
+    <div class="steps">
+      <div class="step-card">
+        <div class="step-n">01</div>
+        <h3>Get Your Link</h3>
+        <p>Sign in to your YourLife CC account and grab your personal referral link from the Referral tab. It's already tied to your account.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-n">02</div>
+        <h3>Share It</h3>
+        <p>Send it via text, email, Facebook, church group, whatever feels natural. Your friend clicks it and gets taken straight to signup with your code pre-filled.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-n">03</div>
+        <h3>They Sign Up</h3>
+        <p>Your friend pays for any plan (monthly, annual, or lifetime) and the $10 discount is automatically applied at checkout. No code needed.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-n">04</div>
+        <h3>You Get Paid</h3>
+        <p>Once their purchase clears the 30-day refund window, we send you $10 via Venmo or PayPal — your choice. No minimum balance needed.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SHARE WIDGET -->
+<div class="share-section" id="share">
+  <div class="share-wrap">
+    <div class="sec-eyebrow" style="text-align:center;">YOUR REFERRAL LINK</div>
+    <h2>Share & Start Earning</h2>
+    <p>Your personal referral link lives inside your YourLife CC account. Sign in (or create a free account) to grab it — then share it anywhere.</p>
+
+    <!-- Sign-in gate — makes clear YOUR-CODE is a placeholder, not a real link -->
+    <div style="background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.25);border-radius:14px;padding:1.75rem 1.5rem;margin-bottom:1.5rem;text-align:left;">
+      <div style="font-family:'Orbitron',monospace;font-size:.6rem;font-weight:700;letter-spacing:.14em;color:var(--gold);margin-bottom:.6rem;">⚠️ SIGN IN REQUIRED TO GET YOUR LINK</div>
+      <p style="font-size:.92rem;font-weight:600;color:var(--tx);margin-bottom:.5rem;">You need a YourLife CC account to get your personal referral link.</p>
+      <p style="font-size:.83rem;color:var(--tx2);line-height:1.65;margin-bottom:1.25rem;">The link shown below (<code style="background:rgba(255,255,255,.07);padding:2px 7px;border-radius:4px;font-size:.8rem;color:var(--blue);">yourlifecc.com/register.html?ref=YOUR-CODE</code>) is just a <strong style="color:var(--tx);">placeholder example</strong> — <em>not</em> your actual referral link. Once you sign in, your account dashboard will show your real unique link with your personal code already filled in.</p>
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+        <a href="/login.html?next=referral" style="background:var(--gold);color:#080810;font-weight:700;font-size:.88rem;padding:.65rem 1.4rem;border-radius:9px;text-decoration:none;display:inline-block;">Sign In to Get My Link →</a>
+        <a href="/#pricing" style="border:1px solid rgba(245,200,66,.3);color:var(--gold);font-size:.88rem;font-weight:600;padding:.65rem 1.4rem;border-radius:9px;text-decoration:none;display:inline-block;">Create an Account First</a>
+      </div>
+    </div>
+
+    <div class="link-box">
+      <div class="link-url" id="ref-link">yourlifecc.com/register.html?ref=YOUR-CODE</div>
+      <button class="copy-btn" id="copy-btn" onclick="copyLink()">Copy Link</button>
+    </div>
+    <p class="share-note">📌 Your unique referral code is tied to your account — every signup through your personal link credits you automatically.</p>
+
+    <div class="share-methods">
+      <a class="share-btn share-sms" onclick="shareSMS()">💬 Text a Friend</a>
+      <a class="share-btn share-email" onclick="shareEmail()">✉️ Send an Email</a>
+      <a class="share-btn share-copy" onclick="copyLink()">🔗 Copy Link</a>
+    </div>
+  </div>
+</div>
+
+<!-- IN-APP PREVIEW -->
+<div class="preview-section">
+  <div class="section">
+    <div class="preview-grid">
+      <div class="preview-text">
+        <div class="sec-eyebrow">INSIDE YOUR ACCOUNT</div>
+        <h2>Track Everything From Your Dashboard</h2>
+        <p>Your referral stats live right inside your YourLife CC account. See how many families you've referred, how much you've earned, and share your link without ever leaving the app.</p>
+        <ul>
+          <li>See total referrals and pending payouts at a glance</li>
+          <li>Share via SMS or email directly from the app</li>
+          <li>Copy your personal referral link with one tap</li>
+          <li>Payouts tracked and paid monthly to Venmo or PayPal</li>
+          <li>No minimum balance — $10 per referral, paid individually</li>
+        </ul>
+      </div>
+
+      <!-- Mock widget -->
+      <div class="app-widget">
+        <div class="widget-header">
+          <div class="widget-title">MY REFERRALS</div>
+          <div class="widget-badge">● ACTIVE</div>
+        </div>
+        <div class="widget-stat">
+          <div class="widget-stat-num">3</div>
+          <div class="widget-stat-label">Families Referred</div>
+        </div>
+        <div class="widget-earnings">
+          <div class="widget-earn-box">
+            <div class="widget-earn-num">$30</div>
+            <div class="widget-earn-label">Total Earned</div>
+          </div>
+          <div class="widget-earn-box">
+            <div class="widget-earn-num">$10</div>
+            <div class="widget-earn-label">Pending Payout</div>
+          </div>
+        </div>
+        <div class="widget-link-row">
+          <div class="widget-link-text">yourlifecc.com/register.html?ref=JASON42</div>
+          <button class="widget-copy-mini" onclick="this.textContent='✓ Copied'">Copy</button>
+        </div>
+        <div class="widget-share-row">
+          <button class="widget-share-mini wsm-sms">💬 Text</button>
+          <button class="widget-share-mini wsm-email">✉️ Email</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="faq-section">
+  <div class="section">
+    <div class="sec-eyebrow">QUESTIONS</div>
+    <div class="sec-title">Common Questions</div>
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">How does my friend get the $10 discount? <span class="faq-arr">▼</span></div>
+        <div class="faq-a">When they click your referral link, the discount is automatically applied to their checkout — they don't need to enter any code. It works on all plans: monthly, annual, and lifetime.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">When do I get paid? <span class="faq-arr">▼</span></div>
+        <div class="faq-a">After your friend's purchase clears our 30-day refund window, we send you $10 via Venmo or PayPal (your choice). Payouts are processed on the 1st of each month for the prior month's confirmed referrals.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Is there a limit to how many families I can refer? <span class="faq-arr">▼</span></div>
+        <div class="faq-a">No limit at all. Refer 2 families or 20 — you earn $10 for every single one. The more you share, the more you earn.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What plans count for the reward? <span class="faq-arr">▼</span></div>
+        <div class="faq-a">Any paid plan — monthly ($9.99/mo), annual ($79.99/yr), or lifetime ($149 once). Free plan signups do not count. Your friend must complete a paid purchase for both rewards to apply.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Can I refer family members who live in the same household? <span class="faq-arr">▼</span></div>
+        <div class="faq-a">No — referrals must be to separate households with separate accounts. Referring yourself, a spouse, or someone who shares your household is not allowed and will not be credited.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What's the difference between this and the Affiliate Program? <span class="faq-arr">▼</span></div>
+        <div class="faq-a">The Referral Program is for existing YourLife CC customers sharing with friends — casual, word-of-mouth sharing. The <a href="affiliate.html" style="color:var(--gold);">Affiliate Program</a> is for people who want to actively promote YourLife CC to a wider audience (social media, churches, communities) as a commission-only side income. Affiliates earn the same $10 per signup but have no limit on scale and can promote to any audience.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">I don't see my referral link — where do I find it? <span class="faq-arr">▼</span></div>
+        <div class="faq-a">Sign in to your account at <a href="/login.html?next=referral" style="color:var(--gold);">yourlifecc.com/login</a> and look for the "Referrals" tab in your account menu. If you don't see it yet, the feature may still be rolling out — email us at <a href="mailto:info@kingdom-creatives.com" style="color:var(--gold);">info@kingdom-creatives.com</a> and we'll get you your link manually.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- TERMS -->
+<div class="terms-section" id="terms">
+  <div class="terms-box">
+    <h2>📋 REFERRAL PROGRAM RULES & TERMS</h2>
+
+    <div class="term"><div class="term-n">1</div><p><strong>Who can participate:</strong> Any active YourLife CC customer with a paid account (monthly, annual, or lifetime) may participate in the referral program.</p></div>
+    <div class="term"><div class="term-n">2</div><p><strong>How your reward works:</strong> You earn <strong>$10 cash</strong> for each new unique customer who signs up for a paid plan using your personal referral link. Paid via Venmo or PayPal on the 1st of each month for referrals confirmed in the prior month.</p></div>
+    <div class="term"><div class="term-n">3</div><p><strong>How their discount works:</strong> The referred family receives <strong>$10 off their first payment</strong> automatically when they sign up through your link. This discount cannot be combined with other promotions.</p></div>
+    <div class="term"><div class="term-n">4</div><p><strong>30-day hold:</strong> Referral rewards are held for 30 days to cover the refund window. If your referred customer requests a refund, the reward is cancelled.</p></div>
+    <div class="term"><div class="term-n">5</div><p><strong>No self-referrals:</strong> You may not refer yourself, a family member in the same household, or any account you control. Violations result in reward forfeiture.</p></div>
+    <div class="term"><div class="term-n">6</div><p><strong>Unique customers only:</strong> Each referred person must be a brand-new YourLife CC customer. Existing users or previously cancelled accounts do not qualify.</p></div>
+    <div class="term"><div class="term-n">7</div><p><strong>No paid advertising:</strong> This referral program is for personal, organic sharing — word of mouth, text, email, social posts. Running paid ads with your referral link is not permitted under this program (see the Affiliate Program instead).</p></div>
+    <div class="term"><div class="term-n">8</div><p><strong>No limit on referrals:</strong> There is no cap on how many families you can refer or how much you can earn.</p></div>
+    <div class="term"><div class="term-n">9</div><p><strong>Program changes:</strong> YourLife CC reserves the right to modify or end the referral program at any time with 30 days notice to participants.</p></div>
+
+    <p class="terms-updated">Last updated: March 2026 · Questions? <a href="mailto:info@kingdom-creatives.com" style="color:var(--gold);">info@kingdom-creatives.com</a></p>
+  </div>
+</div>
+
+<footer>
+  © 2026 YourLife.cc ·
+  <a href="/privacy.html">Privacy</a> ·
+  <a href="/terms.html">Terms</a> ·
+  <a href="affiliate.html">Affiliate Program</a> ·
+  <a href="#terms">Referral Rules</a>
+</footer>
+
+<script>
+  // Copy link
+  function copyLink() {
+    const link = document.getElementById('ref-link').textContent;
+    navigator.clipboard.writeText(link).then(() => {
+      const btn = document.getElementById('copy-btn');
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy Link'; btn.classList.remove('copied'); }, 2500);
+    });
+  }
+
+  // SMS share
+  function shareSMS() {
+    const link = document.getElementById('ref-link').textContent;
+    const msg = encodeURIComponent(`Hey! I've been using YourLife CC to help manage our family and it's been awesome. You can get $10 off when you sign up with my link: ${link}`);
+    window.location.href = `sms:?body=${msg}`;
+  }
+
+  // Email share
+  function shareEmail() {
+    const link = document.getElementById('ref-link').textContent;
+    const subject = encodeURIComponent('I think your family would love YourLife CC — and you get $10 off');
+    const body = encodeURIComponent(`Hey!
+
+I've been using YourLife CC with my family and it's been a game changer — chores, school tracking, rewards, daily routines, all in one place.
+
+I wanted to share it with you because you can get $10 off your first payment when you sign up through my link:
+
+${link}
+
+It works for the monthly, annual, or 
