@@ -2050,15 +2050,12 @@ function submitContact(e){
   var families= document.getElementById('cf-families').value;
   var msg     = document.getElementById('cf-msg').value;
   // Send via Brevo API
-  fetch('https://api.brevo.com/v3/smtp/email',{
+  fetch('/api/send-email',{
     method:'POST',
-    headers:{'Content-Type':'application/json','api-key':'xkeysib-REPLACE_WITH_BREVO_KEY'},
+    headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
-      sender:{name:'YourLife CC Contact',email:'info@kingdom-creatives.com'},
-      to:[{email:'info@kingdom-creatives.com',name:'Jason Vega'}],
-      replyTo:{email:email,name:name},
       subject:'Bulk Sponsorship Inquiry — ' + org,
-      htmlContent:'<b>Name:</b> '+name+'<br><b>Org:</b> '+org+'<br><b>Email:</b> '+email+'<br><b>Families:</b> '+(families||'Not provided')+'<br><b>Message:</b><br>'+msg.replace(/\n/g,'<br>')
+      textContent:'Name: '+name+'\nOrg: '+org+'\nEmail: '+email+'\nFamilies: '+(families||'Not provided')+'\nMessage:\n'+msg
     })
   })
   .then(function(res){
