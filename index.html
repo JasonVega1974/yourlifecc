@@ -2054,4 +2054,24 @@ function submitContact(e){
     method:'POST',
     headers:{'Content-Type':'application/json','api-key':'xkeysib-REPLACE_WITH_BREVO_KEY'},
     body:JSON.stringify({
-      sender:{name:'YourLife CC Conta
+      sender:{name:'YourLife CC Contact',email:'info@kingdom-creatives.com'},
+      to:[{email:'info@kingdom-creatives.com',name:'Jason Vega'}],
+      replyTo:{email:email,name:name},
+      subject:'Bulk Sponsorship Inquiry — ' + org,
+      htmlContent:'<b>Name:</b> '+name+'<br><b>Org:</b> '+org+'<br><b>Email:</b> '+email+'<br><b>Families:</b> '+(families||'Not provided')+'<br><b>Message:</b><br>'+msg.replace(/\n/g,'<br>')
+    })
+  })
+  .then(function(res){
+    if(!res.ok){throw new Error('fail');}
+    document.getElementById('contactForm').style.display='none';
+    document.getElementById('cf-success').style.display='block';
+  })
+  .catch(function(){
+    btn.textContent='Send Message →';
+    btn.disabled=false;
+    alert('Something went wrong. Please email us directly at info@kingdom-creatives.com');
+  });
+}
+</script>
+</body>
+</html>
