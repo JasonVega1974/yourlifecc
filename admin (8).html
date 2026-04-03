@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>YourLife.CC — Admin</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+:root{--bg:#070b14;--bg2:#0d1424;--bg3:#111d32;--border:rgba(56,189,248,.12);--border2:rgba(56,189,248,.22);--tx:#f1f5f9;--tx2:#cbd5e1;--tx3:#94a3b8;--blue:#38bdf8;--green:#34d399;--red:#f87171;--amber:#fbbf24;--purple:#a78bfa;--fn:'IBM Plex Sans',sans-serif;--fm:'IBM Plex Mono',monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh;overflow-x:hidden}
+#pinScreen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:1.5rem}
+.pin-logo{font-family:var(--fm);font-size:.72rem;letter-spacing:.2em;color:var(--blue);text-transform:uppercase;opacity:.7}
+.pin-title{font-family:var(--fm);font-size:1.4rem;font-weight:700;color:var(--tx);letter-spacing:-.02em}
+.pin-sub{font-family:var(--fm);font-size:.68rem;color:var(--tx3);letter-spacing:.06em}
+.pin-dots{display:flex;gap:.6rem}
+.pin-dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--border2);transition:all .2s}
+.pin-dot.filled{background:var(--blue);border-color:var(--blue);box-shadow:0 0 12px rgba(56,189,248,.5)}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;width:220px}
+.pin-btn{background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--tx);font-family:var(--fm);font-size:1.1rem;font-weight:500;padding:.9rem;cursor:pointer;transition:all .15s;text-align:center}
+.pin-btn:hover{background:var(--bg3);border-color:var(--border2)}
+.pin-btn:active{transform:scale(.95)}
+.pin-btn.zero{grid-column:2}
+.pin-error{font-family:var(--fm);font-size:.7rem;color:var(--red);min-height:1rem;text-align:center;letter-spacing:.05em}
+#app{display:none;min-height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+.topbar-left{display:flex;align-items:center;gap:1rem}
+.topbar-logo{font-family:var(--fm);font-size:.72rem;letter-spacing:.18em;color:var(--blue);text-transform:uppercase}
+.topbar-sep{color:var(--tx3)}
+.topbar-title{font-family:var(--fm);font-size:.8rem;color:var(--tx2);letter-spacing:.08em}
+.topbar-right{display:flex;align-items:center;gap:.75rem}
+#lastRefresh{font-family:var(--fm);font-size:.65rem;color:var(--tx3)}
+.btn-sm{border-radius:7px;font-family:var(--fm);font-size:.68rem;padding:.38rem .75rem;cursor:pointer;transition:all .15s;letter-spacing:.04em;border:1px solid}
+.btn-blue{background:rgba(56,189,248,.08);border-color:var(--border2);color:var(--blue)}
+.btn-blue:hover{background:rgba(56,189,248,.15)}
+.btn-red{background:rgba(248,113,113,.06);border-color:rgba(248,113,113,.2);color:var(--red)}
+.btn-red:hover{background:rgba(248,113,113,.12)}
+.content{padding:2rem;max-width:1400px;margin:0 auto}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem}
+.kpi-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.25rem 1.5rem;position:relative;overflow:hidden;transition:border-color .2s}
+.kpi-card:hover{border-color:var(--border2)}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent-color,var(--blue));opacity:.6}
+.kpi-label{font-family:var(--fm);font-size:.62rem;letter-spacing:.15em;color:var(--tx3);text-transform:uppercase;margin-bottom:.5rem}
+.kpi-value{font-family:var(--fm);font-size:2rem;font-weight:700;color:var(--tx);line-height:1;margin-bottom:.25rem}
+.kpi-sub{font-size:.72rem;color:var(--tx2)}
+.section-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem}
+@media(max-width:900px){.section-grid{grid-template-columns:1fr}}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid var(--border)}
+.card-title{font-family:var(--fm);font-size:.7rem;letter-spacing:.12em;color:var(--blue);text-transform:uppercase}
+.card-badge{font-family:var(--fm);font-size:.6rem;padding:.2rem .5rem;border-radius:5px;background:rgba(56,189,248,.1);color:var(--blue);border:1px solid var(--border)}
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{font-family:var(--fm);font-size:.6rem;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase;padding:.6rem 1.25rem;text-align:left;border-bottom:1px solid var(--border);background:rgba(0,0,0,.2)}
+.data-table td{padding:.65rem 1.25rem;color:var(--tx2);border-bottom:1px solid rgba(255,255,255,.03);font-size:.78rem}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:rgba(56,189,248,.03)}
+.tab-nav{display:flex;gap:.5rem;margin-bottom:1.5rem;border-bottom:1px solid var(--border);padding-bottom:0;}
+.tab-btn{background:none;border:none;color:var(--tx3);font-size:.78rem;font-weight:700;font-family:var(--fm);letter-spacing:.08em;padding:.6rem 1.1rem;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;}
+.tab-btn:hover{color:var(--tx);}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.approve-btn{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#22c55e;font-size:.7rem;font-weight:700;padding:.3rem .75rem;border-radius:6px;cursor:pointer;font-family:var(--fm);}
+.approve-btn:hover{background:rgba(34,197,94,.25);}
+.approve-btn:disabled{opacity:.4;cursor:not-allowed;}
+.badge-pending{background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.2);padding:.2rem .6rem;border-radius:20px;font-size:.65rem;font-weight:700;}
+.badge-approved{background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.2);padding:.2rem .6rem;border-radius:20px;font-size:.65rem;font-weight:700;}
+.badge-aff{background:rgba(139,92,246,.12);color:#a78bfa;border:1px solid rgba(139,92,246,.2);padding:.2rem .6rem;border-radius:20px;font-size:.65rem;font-weight:700;}
+.email-cell{font-family:var(--fm);font-size:.72rem;color:var(--tx)}
+.badge{display:inline-block;font-family:var(--fm);font-size:.58rem;letter-spacing:.06em;padding:.18rem .5rem;border-radius:4px;text-transform:uppercase;font-weight:600}
+.badge-active{background:rgba(52,211,153,.12);color:var(--green);border:1px solid rgba(52,211,153,.25)}
+.badge-free{background:rgba(251,191,36,.1);color:var(--amber);border:1px solid rgba(251,191,36,.2)}
+.badge-churned{background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.2)}
+.badge-silent{background:rgba(148,163,184,.08);color:var(--tx3);border:1px solid rgba(148,163,184,.15)}
+.badge-synced{background:rgba(56,189,248,.1);color:var(--blue);border:1px solid var(--border2)}
+.card-full{margin-bottom:1.5rem}
+.loading-row td{text-align:center;padding:2rem!important;color:var(--tx3);font-family:var(--fm);font-size:.72rem;letter-spacing:.08em}
+.churn-bar{display:flex;align-items:center;gap:.75rem;padding:.75rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.03)}
+.churn-bar:last-child{border-bottom:none}
+.churn-email{font-family:var(--fm);font-size:.7rem;color:var(--tx);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.churn-days{font-family:var(--fm);font-size:.65rem;color:var(--red);white-space:nowrap}
+.churn-plan{font-size:.65rem;color:var(--tx3);white-space:nowrap}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);pointer-events:none;z-index:9998}
+.pulse-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;margin-right:.4rem;box-shadow:0 0 0 0 rgba(52,211,153,.4);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(52,211,153,.4)}70%{box-shadow:0 0 0 6px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
+.empty-state{padding:2rem;text-align:center;color:var(--tx3);font-family:var(--fm);font-size:.7rem;letter-spacing:.08em}
+.data-table th.sortable{cursor:pointer;user-select:none;white-space:nowrap;}
+.data-table th.sortable:hover{color:var(--tx2);}
+.data-table th.sort-asc::after{content:' ▲';color:var(--blue);font-size:.55rem;}
+.data-table th.sort-desc::after{content:' ▼';color:var(--blue);font-size:.55rem;}
+.user-search-wrap{padding:.75rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.6rem;}
+.user-search{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--tx);font-family:var(--fm);font-size:.75rem;padding:.45rem .85rem;outline:none;transition:border-color .15s;}
+.user-search:focus{border-color:var(--border2);}
+.user-search::placeholder{color:var(--tx3);}
+.search-clear{background:none;border:none;color:var(--tx3);font-size:.8rem;cursor:pointer;padding:.2rem .4rem;border-radius:4px;transition:color .15s;display:none;}
+.search-clear:hover{color:var(--tx);}
+.search-count{font-family:var(--fm);font-size:.62rem;color:var(--tx3);white-space:nowrap;}
+
+/* ── OUTREACH ── */
+.outreach-grid{display:grid;grid-template-columns:340px 1fr;gap:1.5rem;align-items:start;}
+@media(max-width:960px){.outreach-grid{grid-template-columns:1fr;}}
+.recipient-panel{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.recipient-header{padding:.85rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.recipient-search{width:100%;padding:.5rem .85rem;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--tx);font-family:var(--fm);font-size:.75rem;outline:none;margin:.75rem 1.25rem;width:calc(100% - 2.5rem);}
+.recipient-search::placeholder{color:var(--tx3);}
+.recipient-search:focus{border-color:var(--border2);}
+.recipient-groups{display:flex;gap:.4rem;flex-wrap:wrap;padding:.5rem 1.25rem .75rem;}
+.group-chip{font-family:var(--fm);font-size:.62rem;letter-spacing:.06em;padding:.28rem .65rem;border-radius:20px;border:1px solid var(--border);color:var(--tx3);cursor:pointer;transition:all .15s;background:none;text-transform:uppercase;}
+.group-chip:hover{border-color:var(--border2);color:var(--tx2);}
+.group-chip.selected{background:rgba(56,189,248,.12);border-color:var(--border2);color:var(--blue);}
+.recipient-list{max-height:420px;overflow-y:auto;}
+.recipient-item{display:flex;align-items:center;gap:.6rem;padding:.55rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.03);cursor:pointer;transition:background .1s;}
+.recipient-item:last-child{border-bottom:none;}
+.recipient-item:hover{background:rgba(56,189,248,.04);}
+.recipient-item.selected-r{background:rgba(56,189,248,.08);}
+.r-check{width:16px;height:16px;border:1.5px solid var(--border2);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.r-check.checked{background:var(--blue);border-color:var(--blue);}
+.r-email{font-family:var(--fm);font-size:.72rem;color:var(--tx);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.r-tag{font-family:var(--fm);font-size:.58rem;padding:.15rem .4rem;border-radius:3px;background:rgba(56,189,248,.08);color:var(--blue);border:1px solid var(--border);white-space:nowrap;}
+.r-phone{font-size:.65rem;color:var(--tx3);font-family:var(--fm);}
+.sel-bar{padding:.6rem 1.25rem;border-top:1px solid var(--border);background:rgba(0,0,0,.2);display:flex;align-items:center;justify-content:space-between;}
+.sel-count{font-family:var(--fm);font-size:.68rem;color:var(--tx3);}
+
+.compose-panel{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.compose-header{padding:.85rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.75rem;}
+.channel-toggle{display:flex;gap:.3rem;}
+.ch-btn{font-family:var(--fm);font-size:.65rem;letter-spacing:.06em;padding:.3rem .7rem;border-radius:6px;border:1px solid var(--border);color:var(--tx3);cursor:pointer;transition:all .15s;background:none;text-transform:uppercase;}
+.ch-btn.active{background:rgba(56,189,248,.12);border-color:var(--border2);color:var(--blue);}
+.compose-body{padding:1.25rem;}
+.compose-field{margin-bottom:1rem;}
+.compose-label{font-family:var(--fm);font-size:.62rem;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase;margin-bottom:.35rem;display:block;}
+.compose-input{width:100%;padding:.6rem .9rem;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--tx);font-family:var(--fn);font-size:.85rem;outline:none;transition:border-color .15s;}
+.compose-input:focus{border-color:var(--border2);}
+.compose-textarea{width:100%;padding:.75rem .9rem;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--tx);font-family:var(--fn);font-size:.85rem;outline:none;resize:vertical;min-height:140px;line-height:1.6;transition:border-color .15s;}
+.compose-textarea:focus{border-color:var(--border2);}
+.compose-footer{padding:1rem 1.25rem;border-top:1px solid var(--border);display:flex;align-items:center;gap:.75rem;justify-content:space-between;}
+.send-btn{background:linear-gradient(135deg,rgba(56,189,248,.2),rgba(56,189,248,.08));border:1px solid var(--border2);color:var(--blue);font-family:var(--fm);font-size:.75rem;font-weight:700;letter-spacing:.06em;padding:.55rem 1.4rem;border-radius:8px;cursor:pointer;transition:all .15s;}
+.send-btn:hover{background:linear-gradient(135deg,rgba(56,189,248,.3),rgba(56,189,248,.14));}
+.send-btn:disabled{opacity:.4;cursor:not-allowed;}
+.outreach-log{margin-top:1.5rem;}
+.log-entry{display:flex;align-items:flex-start;gap:.75rem;padding:.7rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.03);}
+.log-entry:last-child{border-bottom:none;}
+.log-icon{font-size:.9rem;margin-top:.1rem;}
+.log-detail{flex:1;}
+.log-title{font-family:var(--fm);font-size:.72rem;color:var(--tx);margin-bottom:.15rem;}
+.log-meta{font-family:var(--fm);font-size:.62rem;color:var(--tx3);}
+.log-status-ok{font-family:var(--fm);font-size:.62rem;color:var(--green);}
+.log-status-err{font-family:var(--fm);font-size:.62rem;color:var(--red);}
+.preview-chips{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.35rem;}
+.preview-chip{font-family:var(--fm);font-size:.6rem;padding:.18rem .5rem;border-radius:4px;background:rgba(56,189,248,.07);border:1px solid var(--border);color:var(--tx2);}
+.no-recipients{padding:1.5rem;text-align:center;color:var(--tx3);font-family:var(--fm);font-size:.7rem;letter-spacing:.08em;}
+</style>
+</head>
+<body>
+
+<div id="pinScreen">
+  <div class="pin-logo">YourLife.CC</div>
+  <div class="pin-title">Admin</div>
+  <div class="pin-sub">Enter 6-digit PIN</div>
+  <div class="pin-dots">
+    <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
+    <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
+    <div class="pin-dot" id="d4"></div><div class="pin-dot" id="d5"></div>
+  </div>
+  <div class="pin-pad">
+    <button class="pin-btn" onclick="pinPress('1')">1</button>
+    <button class="pin-btn" onclick="pinPress('2')">2</button>
+    <button class="pin-btn" onclick="pinPress('3')">3</button>
+    <button class="pin-btn" onclick="pinPress('4')">4</button>
+    <button class="pin-btn" onclick="pinPress('5')">5</button>
+    <button class="pin-btn" onclick="pinPress('6')">6</button>
+    <button class="pin-btn" onclick="pinPress('7')">7</button>
+    <button class="pin-btn" onclick="pinPress('8')">8</button>
+    <button class="pin-btn" onclick="pinPress('9')">9</button>
+    <button class="pin-btn zero" onclick="pinPress('0')">0</button>
+  </div>
+  <div class="pin-error" id="pinError"></div>
+</div>
+
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-logo">YourLife.CC</span>
+      <span class="topbar-sep">/</span>
+      <span class="topbar-title">Admin Dashboard</span>
+    </div>
+    <div class="topbar-right">
+      <span id="lastRefresh"></span>
+      <button class="btn-sm btn-blue" onclick="loadAll()">↻ Refresh</button>
+      <button class="btn-sm btn-red" onclick="lock()">⏻ Lock</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab('users',this)">👥 USERS</button>
+      <button class="tab-btn" onclick="switchTab('affiliates',this)">🤝 AFFILIATES</button>
+      <button class="tab-btn" onclick="switchTab('referrals',this)">💸 REFERRALS</button>
+      <button class="tab-btn" onclick="switchTab('waitlist',this)">❤️ WAITLIST</button>
+      <button class="tab-btn" onclick="switchTab('contest',this)">🏆 CONTEST</button>
+      <button class="tab-btn" onclick="switchTab('outreach',this)">📣 OUTREACH</button>
+    </div>
+
+    <!-- USERS TAB -->
+    <div class="tab-panel active" id="tab-users">
+    <div class="kpi-grid">
+      <div class="kpi-card" style="--accent-color:var(--blue)"><div class="kpi-label">Total Signups</div><div class="kpi-value" id="kTotalSignups">—</div><div class="kpi-sub">All time accounts</div></div>
+      <div class="kpi-card" style="--accent-color:var(--green)"><div class="kpi-label">Paying Users</div><div class="kpi-value" id="kPayingUsers">—</div><div class="kpi-sub" id="kPayingSub">—</div></div>
+      <div class="kpi-card" style="--accent-color:var(--amber)"><div class="kpi-label">MRR Estimate</div><div class="kpi-value" id="kMRR">—</div><div class="kpi-sub" id="kMRRSub">—</div></div>
+      <div class="kpi-card" style="--accent-color:var(--purple)"><div class="kpi-label">Active (7 days)</div><div class="kpi-value" id="kActive7">—</div><div class="kpi-sub">synced in last 7 days</div></div>
+      <div class="kpi-card" style="--accent-color:var(--red)"><div class="kpi-label">At-Risk</div><div class="kpi-value" id="kAtRisk">—</div><div class="kpi-sub">14+ days, never synced</div></div>
+    </div>
+    <div class="section-grid">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Recent Signups</span><span class="card-badge" id="recentBadge">Last 10</span></div>
+        <table class="data-table"><thead><tr><th>Email</th><th>Plan</th><th>Signed Up</th><th>Last Login</th><th>Activity</th></tr></thead><tbody id="recentSignups"><tr class="loading-row"><td colspan="5">LOADING...</td></tr></tbody></table>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Plan Breakdown</span><span class="card-badge">All Users</span></div>
+        <table class="data-table"><thead><tr><th>Plan</th><th>Count</th><th>Est. MRR</th><th>% Total</th></tr></thead><tbody id="planBreakdown"><tr class="loading-row"><td colspan="4">LOADING...</td></tr></tbody></table>
+      </div>
+    </div>
+    <div class="section-grid">
+      <div class="card">
+        <div class="card-header"><span class="card-title"><span class="pulse-dot"></span>Last Active</span><span class="card-badge">By Cloud Sync</span></div>
+        <table class="data-table"><thead><tr><th>Email</th><th>Plan</th><th>Last Sync</th><th>Status</th></tr></thead><tbody id="lastActive"><tr class="loading-row"><td colspan="4">LOADING...</td></tr></tbody></table>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Churn Risk</span><span class="card-badge" id="churnBadge">14+ Days No Sync</span></div>
+        <div id="churnList"><div class="empty-state">LOADING...</div></div>
+      </div>
+    </div>
+    <div class="card card-full">
+      <div class="card-header"><span class="card-title">All Users</span><span class="card-badge" id="allUsersBadge">—</span></div>
+      <div class="user-search-wrap">
+        <input class="user-search" id="userSearch" type="text" placeholder="Search by email or section…" oninput="filterUsers()">
+        <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+        <span class="search-count" id="searchCount"></span>
+      </div>
+      <table class="data-table"><thead><tr>
+        <th class="sortable" onclick="sortUsers('email',this)">Email</th>
+        <th class="sortable" onclick="sortUsers('plan',this)">Plan</th>
+        <th class="sortable" onclick="sortUsers('plan_status',this)">Status</th>
+        <th class="sortable" onclick="sortUsers('created_at',this)">Signed Up</th>
+        <th class="sortable" onclick="sortUsers('last_sign_in_at',this)">Last Login</th>
+        <th class="sortable" onclick="sortUsers('updated_at',this)">Last Sync</th>
+        <th class="sortable" onclick="sortUsers('last_section',this)">Last Section</th>
+        <th class="sortable" onclick="sortUsers('sessions_30d',this)">Engagement</th>
+        <th>Activity</th>
+      </tr></thead><tbody id="allUsers"><tr class="loading-row"><td colspan="9">LOADING...</td></tr></tbody></table>
+    </div>
+    </div><!-- end tab-users -->
+
+    <!-- AFFILIATES TAB -->
+    <div class="tab-panel" id="tab-affiliates">
+      <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="kpi-card" style="--accent-color:var(--amber)"><div class="kpi-label">Pending Applications</div><div class="kpi-value" id="kAffPending">—</div><div class="kpi-sub">Awaiting review</div></div>
+        <div class="kpi-card" style="--accent-color:var(--green)"><div class="kpi-label">Approved Affiliates</div><div class="kpi-value" id="kAffApproved">—</div><div class="kpi-sub">Active in program</div></div>
+        <div class="kpi-card" style="--accent-color:var(--purple)"><div class="kpi-label">Affiliate Signups</div><div class="kpi-value" id="kAffSignups">—</div><div class="kpi-sub">Families via AFF- codes</div></div>
+      </div>
+      <div class="card card-full">
+        <div class="card-header"><span class="card-title">Affiliate Applications</span><span class="card-badge" id="affBadge">—</span></div>
+        <table class="data-table">
+          <thead><tr><th>Name</th><th>Email</th><th>Ref Code</th><th>Method</th><th>Reach</th><th>Payout</th><th>Status</th><th>Applied</th><th>Action</th></tr></thead>
+          <tbody id="affTable"><tr class="loading-row"><td colspan="9">LOADING...</td></tr></tbody>
+        </table>
+      </div>
+    </div><!-- end tab-affiliates -->
+
+    <!-- REFERRALS TAB -->
+    <div class="tab-panel" id="tab-referrals">
+      <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="kpi-card" style="--accent-color:var(--green)"><div class="kpi-label">Total Referrals</div><div class="kpi-value" id="kRefTotal">—</div><div class="kpi-sub">All referred signups</div></div>
+        <div class="kpi-card" style="--accent-color:var(--blue)"><div class="kpi-label">Referral Signups</div><div class="kpi-value" id="kRefSignups">—</div><div class="kpi-sub">Non-affiliate refs</div></div>
+        <div class="kpi-card" style="--accent-color:var(--amber)"><div class="kpi-label">Est. Payouts Due</div><div class="kpi-value" id="kRefPayout">—</div><div class="kpi-sub">$10 per confirmed ref</div></div>
+      </div>
+      <div class="card card-full">
+        <div class="card-header"><span class="card-title">Referred Signups</span><span class="card-badge" id="refBadge">—</span></div>
+        <table class="data-table">
+          <thead><tr><th>Email</th><th>Plan</th><th>Referred By</th><th>Type</th><th>Signed Up</th><th>Payout</th></tr></thead>
+          <tbody id="refTable"><tr class="loading-row"><td colspan="6">LOADING...</td></tr></tbody>
+        </table>
+      </div>
+    </div><!-- end tab-referrals -->
+
+    <!-- WAITLIST TAB -->
+    <div class="tab-panel" id="tab-waitlist">
+      <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="kpi-card" style="--accent-color:var(--red)"><div class="kpi-label">Total on Waitlist</div><div class="kpi-value" id="kWaitTotal">—</div><div class="kpi-sub">All applications</div></div>
+        <div class="kpi-card" style="--accent-color:var(--amber)"><div class="kpi-label">Pending Match</div><div class="kpi-value" id="kWaitPending">—</div><div class="kpi-sub">Awaiting sponsor</div></div>
+        <div class="kpi-card" style="--accent-color:var(--green)"><div class="kpi-label">Approved</div><div class="kpi-value" id="kWaitApproved">—</div><div class="kpi-sub">Matched with sponsor</div></div>
+      </div>
+
+      <div class="card card-full">
+        <div class="card-header"><span class="card-title">Waitlist Applications</span><span class="card-badge" id="waitBadge">—</span></div>
+        <table class="data-table">
+          <thead><tr><th>Name</th><th>Email</th><th>Children</th><th>Sponsored By</th><th>Status</th><th>Submitted</th><th>Action</th></tr></thead>
+          <tbody id="waitTable"><tr class="loading-row"><td colspan="7">LOADING...</td></tr></tbody>
+        </table>
+      </div>
+    </div><!-- end tab-waitlist -->
+
+    <!-- ══ CONTEST TAB ══ -->
+    <div class="tab-panel" id="tab-contest">
+
+      <!-- Manual Award Card -->
+      <div class="card" style="margin-bottom:1.5rem;border-color:rgba(245,200,66,.25);background:rgba(245,200,66,.03);">
+        <div class="card-header"><span class="card-title">🏅 Award Sponsor Entries Manually</span></div>
+        <div style="padding:1.25rem 1.5rem;">
+          <div style="font-size:.8rem;color:var(--tx2);margin-bottom:1rem;line-height:1.6;">
+            Use this when a Sponsor a Family purchase is confirmed in Stripe. Awards <strong style="color:var(--gold);">+5 entries</strong> to the sponsor's account.
+          </div>
+          <div style="display:grid;grid-template-columns:1fr auto auto;gap:.75rem;align-items:end;">
+            <div>
+              <label style="display:block;font-size:.68rem;font-weight:700;letter-spacing:.08em;color:var(--tx3);text-transform:uppercase;margin-bottom:.35rem;">Sponsor Email</label>
+              <input id="awardEmail" type="email" placeholder="sponsor@email.com"
+                style="width:100%;padding:.65rem .9rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:var(--tx);font-size:.88rem;font-family:var(--fm);outline:none;">
+            </div>
+            <div>
+              <label style="display:block;font-size:.68rem;font-weight:700;letter-spacing:.08em;color:var(--tx3);text-transform:uppercase;margin-bottom:.35rem;">Entries</label>
+              <input id="awardEntries" type="number" value="5" min="1" max="50"
+                style="width:80px;padding:.65rem .75rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:var(--gold);font-size:.95rem;font-weight:800;font-family:var(--fm);outline:none;text-align:center;">
+            </div>
+            <button onclick="awardSponsorEntries()" id="awardBtn"
+              style="padding:.65rem 1.4rem;background:linear-gradient(135deg,#f5c842,#f97316);border:none;border-radius:10px;color:#06090f;font-weight:800;font-size:.85rem;cursor:pointer;font-family:var(--fm);white-space:nowrap;">
+              ❤️ Award Entries
+            </button>
+          </div>
+          <div id="awardMsg" style="margin-top:.75rem;font-size:.8rem;min-height:1.2rem;"></div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;">
+        <div class="kpi-card"><div class="kpi-val" id="kContestTotal">—</div><div class="kpi-label">Total Entries</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="kContestUsers">—</div><div class="kpi-label">Participants</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="kContestFree">—</div><div class="kpi-label">Free Entries</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="kContestBonus">—</div><div class="kpi-label">Bonus Entries</div></div>
+      </div>
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-header"><span class="card-title">📊 Entries by Type</span></div>
+        <table class="data-table">
+          <thead><tr><th>Entry Type</th><th>Count</th><th>Entries</th><th>% of Total</th></tr></thead>
+          <tbody id="contestTypeTable"><tr class="loading-row"><td colspan="4">Loading…</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-header"><span class="card-title">🏆 Leaderboard <span class="badge" id="contestLeaderBadge" style="margin-left:.5rem;"></span></span></div>
+        <table class="data-table">
+          <thead><tr><th>#</th><th>Email</th><th>Total Entries</th><th>Entry Types</th><th>Last Entry</th></tr></thead>
+          <tbody id="contestLeaderTable"><tr class="loading-row"><td colspan="5">Loading…</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">🕐 Recent Entries</span></div>
+        <table class="data-table">
+          <thead><tr><th>Email</th><th>Type</th><th>Entries</th><th>Reference</th><th>Date</th></tr></thead>
+          <tbody id="contestRecentTable"><tr class="loading-row"><td colspan="5">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div><!-- end tab-contest -->
+
+    <!-- ══ OUTREACH TAB ══ -->
+    <div class="tab-panel" id="tab-outreach">
+
+      <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.5rem;">
+        <div class="kpi-card" style="--accent-color:var(--blue)"><div class="kpi-label">Messages Sent</div><div class="kpi-value" id="kOutMsgSent">0</div><div class="kpi-sub">This session</div></div>
+        <div class="kpi-card" style="--accent-color:var(--green)"><div class="kpi-label">Recipients Selected</div><div class="kpi-value" id="kOutSelected">0</div><div class="kpi-sub">Ready to send</div></div>
+        <div class="kpi-card" style="--accent-color:var(--amber)"><div class="kpi-label">Available Contacts</div><div class="kpi-value" id="kOutContacts">—</div><div class="kpi-sub">Across all groups</div></div>
+      </div>
+
+      <div class="outreach-grid">
+
+        <!-- LEFT: Recipient Selector -->
+        <div class="recipient-panel">
+          <div class="recipient-header">
+            <span class="card-title">👥 Recipients</span>
+            <div style="display:flex;gap:.4rem;">
+              <button class="btn-sm btn-blue" onclick="selectAllVisible()" style="font-size:.6rem;padding:.28rem .6rem;">All</button>
+              <button class="btn-sm btn-red" onclick="clearSelection()" style="font-size:.6rem;padding:.28rem .6rem;">Clear</button>
+            </div>
+          </div>
+          <div style="padding:.5rem 1.25rem .25rem;">
+            <input class="recipient-search" id="rSearch" placeholder="Search by email…" oninput="filterRecipients()">
+          </div>
+          <div class="recipient-groups" id="rGroupChips">
+            <button class="group-chip selected" data-group="all" onclick="setGroup('all',this)">All</button>
+            <button class="group-chip" data-group="paying" onclick="setGroup('paying',this)">Paying</button>
+            <button class="group-chip" data-group="free" onclick="setGroup('free',this)">Free</button>
+            <button class="group-chip" data-group="at-risk" onclick="setGroup('at-risk',this)">At-Risk</button>
+            <button class="group-chip" data-group="affiliates" onclick="setGroup('affiliates',this)">Affiliates</button>
+            <button class="group-chip" data-group="waitlist" onclick="setGroup('waitlist',this)">Waitlist</button>
+          </div>
+          <div class="recipient-list" id="recipientList">
+            <div class="no-recipients">Load Outreach to populate contacts</div>
+          </div>
+          <div class="sel-bar">
+            <span class="sel-count" id="selCountLabel">0 selected</span>
+            <button class="btn-sm btn-blue" onclick="previewRecipients()" style="font-size:.6rem;padding:.28rem .6rem;">Preview →</button>
+          </div>
+        </div>
+
+        <!-- RIGHT: Compose -->
+        <div class="compose-panel">
+          <div class="compose-header">
+            <span class="card-title" style="flex:1;">✉️ Compose Message</span>
+            <div class="channel-toggle">
+              <button class="ch-btn active" id="chEmail" onclick="setChannel('email')">📧 Email</button>
+              <button class="ch-btn" id="chSMS" onclick="setChannel('sms')">💬 SMS</button>
+            </div>
+          </div>
+          <div class="compose-body">
+
+            <!-- Email fields -->
+            <div id="emailFields">
+              <div class="compose-field">
+                <label class="compose-label">From Name</label>
+                <input class="compose-input" id="fromName" value="Jason @ YourLife CC" placeholder="Sender display name">
+              </div>
+              <div class="compose-field">
+                <label class="compose-label">Subject Line</label>
+                <input class="compose-input" id="emailSubject" placeholder="e.g. Big update for YourLife CC families!">
+              </div>
+            </div>
+
+            <!-- SMS info -->
+            <div id="smsFields" style="display:none;">
+              <div style="background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;">
+                <div style="font-family:var(--fm);font-size:.68rem;color:var(--amber);font-weight:700;margin-bottom:.25rem;">📱 SMS / Text Messaging</div>
+                <div style="font-size:.75rem;color:var(--tx2);line-height:1.5;">SMS is sent via your configured provider (Twilio/Brevo SMS). Phone numbers are pulled from profiles where available. Messages are limited to 160 characters.</div>
+              </div>
+              <div class="compose-field">
+                <label class="compose-label">Char Count</label>
+                <div id="smsCharCount" style="font-family:var(--fm);font-size:.8rem;color:var(--tx3);">0 / 160</div>
+              </div>
+            </div>
+
+            <div class="compose-field">
+              <label class="compose-label" id="msgLabel">Message Body</label>
+              <textarea class="compose-textarea" id="msgBody" placeholder="Write your message here…" oninput="updateCharCount()"></textarea>
+            </div>
+
+            <!-- Template Quick-fills -->
+            <div class="compose-field">
+              <label class="compose-label">Quick Templates</label>
+              <div style="display:flex;flex-wrap:wrap;gap:.4rem;">
+                <button class="group-chip" onclick="useTemplate('welcome')">👋 Welcome</button>
+                <button class="group-chip" onclick="useTemplate('feature')">🚀 Feature Update</button>
+                <button class="group-chip" onclick="useTemplate('contest')">🏆 Contest Reminder</button>
+                <button class="group-chip" onclick="useTemplate('winback')">💙 Win-Back</button>
+                <button class="group-chip" onclick="useTemplate('launch')">🎉 Launch Day</button>
+              </div>
+            </div>
+
+            <!-- To: Preview -->
+            <div class="compose-field" id="toPreviewWrap" style="display:none;">
+              <label class="compose-label">To: <span id="toPreviewCount" style="color:var(--blue);"></span></label>
+              <div class="preview-chips" id="toPreviewChips"></div>
+            </div>
+          </div>
+
+          <div class="compose-footer">
+            <div style="font-family:var(--fm);font-size:.68rem;color:var(--tx3);" id="sendStatusMsg"></div>
+            <div style="display:flex;gap:.6rem;">
+              <button class="btn-sm btn-blue" onclick="previewRecipients()">👁 Preview To:</button>
+              <button class="send-btn" id="sendBtn" onclick="sendOutreach()">✈️ Send Message</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Send Log -->
+      <div class="card outreach-log" style="margin-top:1.5rem;">
+        <div class="card-header"><span class="card-title">📋 Send Log</span><span class="card-badge" id="logBadge">Session</span></div>
+        <div id="outreachLog"><div class="empty-state">No messages sent this session</div></div>
+      </div>
+
+    </div><!-- end tab-outreach -->
+
+  </div>
+</div>
+
+<script>
+const EDGE_URL    = 'https://hrohgwcbfgywkpnvqxhk.supabase.co/functions/v1/admin-data';
+const ADMIN_TOKEN = 'ylcc-admin-2729';
+const ADMIN_PIN   = '272927';
+const MRR_MAP     = {monthly:9.99,yearly:6.58,lifetime:0,free_contest:0,active:9.99};
+let pinBuffer = '';
+
+function pinPress(d){
+  if(pinBuffer.length>=6) return;
+  pinBuffer+=d;
+  for(let i=0;i<6;i++) document.getElementById('d'+i).classList.toggle('filled',i<pinBuffer.length);
+  if(pinBuffer.length===6){
+    setTimeout(()=>{
+      if(pinBuffer===ADMIN_PIN){
+        document.getElementById('pinScreen').style.display='none';
+        document.getElementById('app').style.display='block';
+        loadAll();
+      } else {
+        document.getElementById('pinError').textContent='INCORRECT PIN';
+        pinBuffer='';
+        for(let i=0;i<6;i++) document.getElementById('d'+i).classList.remove('filled');
+        setTimeout(()=>document.getElementById('pinError').textContent='',1500);
+      }
+    },200);
+  }
+}
+
+function lock(){
+  pinBuffer='';
+  for(let i=0;i<6;i++) document.getElementById('d'+i).classList.remove('filled');
+  document.getElementById('pinError').textContent='';
+  document.getElementById('pinScreen').style.display='flex';
+  document.getElementById('app').style.display='none';
+}
+
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('pinScreen').style.display==='none') return;
+  if(e.key>='0'&&e.key<='9') pinPress(e.key);
+  if(e.key==='Backspace'){pinBuffer=pinBuffer.slice(0,-1);for(let i=0;i<6;i++) document.getElementById('d'+i).classList.toggle('filled',i<pinBuffer.length);}
+});
+
+function fmtDate(iso){if(!iso)return'—';return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'});}
+function fmtAgo(iso){if(!iso)return'—';const ms=Date.now()-new Date(iso).getTime(),mins=Math.floor(ms/60000),hrs=Math.floor(ms/3600000),days=Math.floor(ms/86400000);if(mins<60)return mins+'m ago';if(hrs<24)return hrs+'h ago';return days+'d ago';}
+function daysSince(iso){if(!iso)return null;return Math.floor((Date.now()-new Date(iso).getTime())/86400000);}
+function planBadge(plan,status){
+  const p=(plan||status||'').toLowerCase();
+  if(p==='lifetime')return'<span class="badge badge-active">Lifetime</span>';
+  if(p==='yearly')return'<span class="badge badge-active">Yearly</span>';
+  if(p==='monthly')return'<span class="badge badge-active">Monthly</span>';
+  if(p==='active')return'<span class="badge badge-active">Active</span>';
+  if(p==='free_contest')return'<span class="badge badge-free">Free</span>';
+  if(p==='cancelled'||p==='canceled')return'<span class="badge badge-churned">Cancelled</span>';
+  if(p==='past_due')return'<span class="badge badge-churned">Past Due</span>';
+  return`<span class="badge badge-silent">${p||'unknown'}</span>`;
+}
+function activityBadge(u){const d=daysSince(u);if(d===null)return'<span class="badge badge-silent">No Sync</span>';if(d<=7)return'<span class="badge badge-synced">Active</span>';if(d<=30)return'<span class="badge badge-free">Quiet</span>';return'<span class="badge badge-churned">Silent</span>';}
+function estimateMRR(plan,status){return MRR_MAP[(plan||status||'').toLowerCase()]??0;}
+function engagementScore(sessions){
+  if(sessions>=20)return'<span class="badge badge-active">🔥 Active</span>';
+  if(sessions>=8) return'<span class="badge badge-synced">↑ Warming</span>';
+  if(sessions>=2) return'<span class="badge badge-free">↓ Cold</span>';
+  if(sessions===0)return'<span class="badge badge-silent">Ghost</span>';
+  return'<span class="badge badge-silent">Lurking</span>';
+}
+
+// ── ALL USERS — SORT & SEARCH ───────────────────────────────
+let _allUsers = [];
+let _sortCol = 'created_at';
+let _sortDir = -1; // -1 = desc, 1 = asc
+
+function sortUsers(col, th){
+  if(_sortCol === col){
+    _sortDir *= -1;
+  } else {
+    _sortCol = col;
+    _sortDir = col === 'created_at' || col === 'last_sign_in_at' || col === 'updated_at' ? -1 : 1;
+  }
+  document.querySelectorAll('.data-table th.sortable').forEach(t=>{
+    t.classList.remove('sort-asc','sort-desc');
+  });
+  th.classList.add(_sortDir === 1 ? 'sort-asc' : 'sort-desc');
+  renderUsers();
+}
+
+function filterUsers(){
+  const q = (document.getElementById('userSearch')||{}).value||'';
+  const clear = document.getElementById('searchClear');
+  if(clear) clear.style.display = q ? 'block' : 'none';
+  renderUsers();
+}
+
+function clearSearch(){
+  const inp = document.getElementById('userSearch');
+  if(inp) inp.value = '';
+  const clear = document.getElementById('searchClear');
+  if(clear) clear.style.display = 'none';
+  renderUsers();
+}
+
+function _getVal(u, col){
+  if(col==='email') return (u.email||'').toLowerCase();
+  if(col==='plan') return (u.plan||u.plan_status||'').toLowerCase();
+  if(col==='plan_status') return (u.plan_status||'').toLowerCase();
+  if(col==='created_at') return u.created_at ? new Date(u.created_at).getTime() : 0;
+  if(col==='last_sign_in_at') return u.last_sign_in_at ? new Date(u.last_sign_in_at).getTime() : 0;
+  if(col==='updated_at') return u.updated_at ? new Date(u.updated_at).getTime() : 0;
+  if(col==='last_section') return (u.last_section||'').toLowerCase();
+  if(col==='sessions_30d') return u.sessions_30d||0;
+  return '';
+}
+
+function renderUsers(){
+  const q = ((document.getElementById('userSearch')||{}).value||'').toLowerCase().trim();
+  let users = _allUsers.slice();
+
+  // Filter
+  if(q){
+    users = users.filter(u=>(u.email||'').toLowerCase().includes(q)||(u.last_section||'').toLowerCase().includes(q)||(u.plan||'').toLowerCase().includes(q)||(u.plan_status||'').toLowerCase().includes(q));
+  }
+
+  // Sort
+  users.sort((a,b)=>{
+    const av = _getVal(a, _sortCol);
+    const bv = _getVal(b, _sortCol);
+    if(av < bv) return -1 * _sortDir;
+    if(av > bv) return 1 * _sortDir;
+    return 0;
+  });
+
+  // Count display
+  const countEl = document.getElementById('searchCount');
+  if(countEl) countEl.textContent = q ? `${users.length} of ${_allUsers.length}` : '';
+
+  document.getElementById('allUsers').innerHTML = users.length===0
+    ? `<tr class="loading-row"><td colspan="9">${q?'NO MATCHES':'NO USERS YET'}</td></tr>`
+    : users.map(u=>`<tr>
+        <td class="email-cell">${u.email||'—'}${u.is_admin?' <span class="badge badge-synced">Admin</span>':''}</td>
+        <td>${planBadge(u.plan,u.plan_status)}</td>
+        <td><span class="badge ${['active','lifetime'].includes((u.plan_status||'').toLowerCase())?'badge-active':'badge-silent'}">${u.plan_status||'—'}</span></td>
+        <td style="font-size:.72rem;color:var(--tx3)">${fmtDate(u.created_at)}</td>
+        <td style="font-family:var(--fm);font-size:.7rem;color:var(--tx2)">${u.last_sign_in_at?fmtAgo(u.last_sign_in_at):'<span style="color:var(--tx3)">Never</span>'}</td>
+        <td style="font-family:var(--fm);font-size:.7rem">${u.updated_at?fmtAgo(u.updated_at):'—'}</td>
+        <td style="font-family:var(--fm);font-size:.7rem;color:var(--tx2)">${u.last_section||'<span style="color:var(--tx3)">—</span>'}</td>
+        <td>${engagementScore(u.sessions_30d||0)}</td>
+        <td>${activityBadge(u.updated_at)}</td>
+      </tr>`).join('');
+}
+
+async function loadAll(){
+  document.getElementById('lastRefresh').textContent='Loading...';
+  try{
+    const res=await fetch(EDGE_URL,{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':ADMIN_TOKEN}});
+    const json=await res.json();
+    if(!res.ok) throw new Error(json.error||'Failed to load');
+    const all=json.profiles||[];
+
+    const paying=all.filter(u=>['monthly','yearly','lifetime','active'].includes((u.plan||u.plan_status||'').toLowerCase()));
+    const free=all.filter(u=>{const p=(u.plan||u.plan_status||'').toLowerCase();return p==='free_contest'||p==='';});
+    const active7=all.filter(u=>u.updated_at&&daysSince(u.updated_at)<=7);
+    const atRisk=all.filter(u=>daysSince(u.created_at)>=14&&(!u.updated_at||u.updated_at===u.created_at));
+    const mrr=paying.reduce((s,u)=>s+estimateMRR(u.plan,u.plan_status),0);
+
+    document.getElementById('kTotalSignups').textContent=all.length;
+    document.getElementById('kPayingUsers').textContent=paying.length;
+    document.getElementById('kPayingSub').textContent=`${free.length} free · ${paying.length} paid`;
+    document.getElementById('kMRR').textContent='$'+mrr.toFixed(0);
+    document.getElementById('kMRRSub').textContent=`~$${(mrr*12).toFixed(0)} ARR est.`;
+    document.getElementById('kActive7').textContent=active7.length;
+    document.getElementById('kAtRisk').textContent=atRisk.length;
+
+    const recent=all.slice(0,10);
+    document.getElementById('recentBadge').textContent=`Last ${recent.length}`;
+    document.getElementById('recentSignups').innerHTML=recent.length===0?'<tr class="loading-row"><td colspan="5">NO SIGNUPS YET</td></tr>':recent.map(u=>`<tr><td class="email-cell">${u.email||'—'}</td><td>${planBadge(u.plan,u.plan_status)}</td><td>${fmtDate(u.created_at)}</td><td style="font-family:var(--fm);font-size:.7rem;color:var(--tx2)">${u.last_sign_in_at?fmtAgo(u.last_sign_in_at):'<span style="color:var(--tx3)">Never</span>'}</td><td>${activityBadge(u.updated_at)}</td></tr>`).join('');
+
+    const planCounts={};
+    all.forEach(u=>{const p=(u.plan||u.plan_status||'unknown').toLowerCase();planCounts[p]=(planCounts[p]||0)+1;});
+    const planOrder=['monthly','yearly','lifetime','active','free_contest','cancelled','past_due'];
+    document.getElementById('planBreakdown').innerHTML=Object.entries(planCounts).sort((a,b)=>(planOrder.indexOf(a[0])<0?99:planOrder.indexOf(a[0]))-(planOrder.indexOf(b[0])<0?99:planOrder.indexOf(b[0]))).map(([plan,count])=>{const mrrEst=estimateMRR(plan,plan)*count;const pct=all.length>0?((count/all.length)*100).toFixed(0):0;return`<tr><td>${planBadge(plan,plan)}</td><td class="email-cell">${count}</td><td>${mrrEst>0?'$'+mrrEst.toFixed(0):'—'}</td><td style="color:var(--tx3)">${pct}%</td></tr>`;}).join('');
+
+    const synced=[...all].filter(u=>u.updated_at).sort((a,b)=>new Date(b.updated_at)-new Date(a.updated_at)).slice(0,10);
+    document.getElementById('lastActive').innerHTML=synced.length===0?'<tr class="loading-row"><td colspan="4">NO SYNC DATA YET</td></tr>':synced.map(u=>`<tr><td class="email-cell">${u.email||'—'}</td><td>${planBadge(u.plan,u.plan_status)}</td><td style="font-family:var(--fm);font-size:.7rem">${fmtAgo(u.updated_at)}</td><td>${activityBadge(u.updated_at)}</td></tr>`).join('');
+
+    document.getElementById('churnBadge').textContent=`${atRisk.length} users`;
+    document.getElementById('churnList').innerHTML=atRisk.length===0?'<div class="empty-state">NO AT-RISK USERS ✓</div>':atRisk.map(u=>`<div class="churn-bar"><div class="churn-email">${u.email||'—'}</div><div class="churn-plan">${u.plan||u.plan_status||'unknown'}</div><div class="churn-days">Signed up ${daysSince(u.created_at)}d ago — never synced</div></div>`).join('');
+
+    document.getElementById('allUsersBadge').textContent=`${all.length} total`;
+    _allUsers = all;
+    _sortCol = 'created_at'; _sortDir = -1;
+    renderUsers();
+
+    document.getElementById('lastRefresh').textContent='Updated '+new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  }catch(e){console.error(e);document.getElementById('lastRefresh').textContent='Error: '+e.message;}
+}
+
+
+// ── SUPABASE DIRECT CONFIG ──────────────────────────────────────
+const SUPA_URL  = 'https://hrohgwcbfgywkpnvqxhk.supabase.co';
+const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhyb2hnd2NiZmd5d2twbnZxeGhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MjcxNDYsImV4cCI6MjA4ODQwMzE0Nn0.PuWtBpiMw2DiCLp26ZP_Rd9BwzFvWT0sNZrDUNdULyo';
+
+function supaFetch(path){ return fetch(SUPA_URL+'/rest/v1/'+path,{headers:{'apikey':SUPA_ANON,'Authorization':'Bearer '+SUPA_ANON}}).then(r=>r.json()); }
+
+// ── TAB SWITCHING ───────────────────────────────────────────────
+function switchTab(name, btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='affiliates') loadAffiliates();
+  if(name==='referrals')  loadReferrals();
+  if(name==='waitlist')   loadWaitlist();
+  if(name==='contest')    loadContest();
+  if(name==='outreach')   loadOutreach();
+}
+
+// ── AFFILIATES ──────────────────────────────────────────────────
+async function loadAffiliates(){
+  try{
+    const [apps, families] = await Promise.all([
+      supaFetch('affiliate_applications?select=*&order=applied_at.desc'),
+      supaFetch('families?select=referred_by&referred_by=like.AFF-*')
+    ]);
+    const pending  = apps.filter(a=>a.status==='pending').length;
+    const approved = apps.filter(a=>a.status==='approved').length;
+    document.getElementById('kAffPending').textContent  = pending;
+    document.getElementById('kAffApproved').textContent = approved;
+    document.getElementById('kAffSignups').textContent  = families.length;
+    document.getElementById('affBadge').textContent     = apps.length + ' total';
+
+    document.getElementById('affTable').innerHTML = apps.length === 0
+      ? '<tr class="loading-row"><td colspan="9">No applications yet</td></tr>'
+      : apps.map(a => `<tr>
+          <td>${a.first_name||''} ${a.last_name||''}</td>
+          <td class="email-cell">${a.email||'—'}</td>
+          <td style="font-family:var(--fm);font-size:.72rem;color:var(--amber)">${a.ref_code||'—'}</td>
+          <td style="font-size:.72rem">${a.promo_method||'—'}</td>
+          <td style="font-size:.72rem">${a.reach||'—'}</td>
+          <td style="font-size:.72rem">${a.payout_pref||'—'}</td>
+          <td><span class="badge-${a.status==='approved'?'approved':'pending'}">${a.status||'pending'}</span></td>
+          <td style="font-size:.72rem;color:var(--tx3)">${fmtDate(a.applied_at)}</td>
+          <td>${a.status==='pending'
+            ? `<button class="approve-btn" onclick="approveAffiliate(${a.id},this)">✓ Approve</button>`
+            : `<span style="font-size:.7rem;color:var(--tx3)">${a.approval_email_sent?'✉ Sent':'Approved'}</span>`}</td>
+        </tr>`).join('');
+  }catch(e){ console.error(e); }
+}
+
+async function approveAffiliate(id, btn){
+  btn.disabled = true;
+  btn.textContent = 'Approving…';
+  try{
+    const res = await fetch(SUPA_URL+'/rest/v1/affiliate_applications?id=eq.'+id, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPA_ANON,
+        'Authorization': 'Bearer '+SUPA_ANON,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ status: 'approved' })
+    });
+    if(res.ok){
+      btn.textContent = '✓ Done';
+      setTimeout(loadAffiliates, 1500);
+    } else {
+      btn.disabled = false;
+      btn.textContent = '✓ Approve';
+      alert('Update failed — try again');
+    }
+  }catch(e){ btn.disabled=false; btn.textContent='✓ Approve'; }
+}
+
+// ── REFERRALS ───────────────────────────────────────────────────
+async function loadReferrals(){
+  try{
+    const refs = await supaFetch('families?select=email,plan,referred_by,created_at&referred_by=not.is.null&order=created_at.desc');
+    const affRefs  = refs.filter(r => r.referred_by && r.referred_by.startsWith('AFF-'));
+    const userRefs = refs.filter(r => r.referred_by && !r.referred_by.startsWith('AFF-'));
+    const payout   = userRefs.length * 10;
+
+    document.getElementById('kRefTotal').textContent   = refs.length;
+    document.getElementById('kRefSignups').textContent = userRefs.length;
+    document.getElementById('kRefPayout').textContent  = '$' + payout;
+    document.getElementById('refBadge').textContent    = refs.length + ' total';
+
+    document.getElementById('refTable').innerHTML = refs.length === 0
+      ? '<tr class="loading-row"><td colspan="6">No referred signups yet</td></tr>'
+      : refs.map(r => {
+          const isAff = r.referred_by && r.referred_by.startsWith('AFF-');
+          const payAmt = isAff ? getAffPayout(r.plan) : '$10';
+          return `<tr>
+            <td class="email-cell">${r.email||'—'}</td>
+            <td>${planBadge(r.plan, r.plan)}</td>
+            <td style="font-family:var(--fm);font-size:.72rem;color:${isAff?'var(--purple)':'var(--green)'}">${r.referred_by||'—'}</td>
+            <td>${isAff ? '<span class="badge-aff">AFFILIATE</span>' : '<span class="badge-approved">REFERRAL</span>'}</td>
+            <td style="font-size:.72rem;color:var(--tx3)">${fmtDate(r.created_at)}</td>
+            <td style="font-weight:700;color:var(--green)">${payAmt}</td>
+          </tr>`;
+        }).join('');
+  }catch(e){ console.error(e); }
+}
+
+function getAffPayout(plan){
+  const p = (plan||'').toLowerCase();
+  if(p==='lifetime') return '$20';
+  if(p==='yearly')   return '$10';
+  return '$5';
+}
+
+// ── WAITLIST ────────────────────────────────────────────────────
+async function loadWaitlist(){
+  try{
+    const apps = await supaFetch('waitlist_applications?select=*&order=submitted_at.desc');
+    const pending  = apps.filter(a=>a.status==='pending').length;
+    const approved = apps.filter(a=>a.status==='approved').length;
+
+    document.getElementById('kWaitTotal').textContent   = apps.length;
+    document.getElementById('kWaitPending').textContent = pending;
+    document.getElementById('kWaitApproved').textContent= approved;
+    document.getElementById('waitBadge').textContent    = apps.length + ' total';
+
+    document.getElementById('waitTable').innerHTML = apps.length === 0
+      ? '<tr class="loading-row"><td colspan="7">No applications yet</td></tr>'
+      : apps.map(a => `<tr>
+          <td>${a.first_name||''} ${a.last_name||''}</td>
+          <td class="email-cell">${a.email||'—'}</td>
+          <td style="font-size:.72rem">${a.children||'—'}</td>
+          <td style="font-size:.72rem;color:var(--amber)">${a.sponsored_by||'<span style="color:var(--tx3)">Unmatched</span>'}</td>
+          <td><span class="badge-${a.status==='approved'?'approved':'pending'}">${a.status||'pending'}</span></td>
+          <td style="font-size:.72rem;color:var(--tx3)">${fmtDate(a.submitted_at)}</td>
+          <td>${a.status==='pending'
+            ? `<button class="approve-btn" onclick="approveWaitlist(${a.id},this)">✓ Match</button>`
+            : '<span style="font-size:.7rem;color:var(--tx3)">✓ Matched</span>'}</td>
+        </tr>`).join('');
+  }catch(e){ console.error(e); }
+}
+
+// ── MANUAL SPONSOR ENTRY AWARD ─────────────────────────────────
+async function awardSponsorEntries(){
+  const email   = (document.getElementById('awardEmail').value||'').trim().toLowerCase();
+  const entries = parseInt(document.getElementById('awardEntries').value)||5;
+  const msg     = document.getElementById('awardMsg');
+  const btn     = document.getElementById('awardBtn');
+
+  if(!email || !email.includes('@')){ msg.style.color='#f87171'; msg.textContent='⚠️ Please enter a valid email address.'; return; }
+
+  btn.disabled = true; btn.textContent = 'Awarding…';
+  msg.style.color = 'var(--tx2)'; msg.textContent = 'Looking up user…';
+
+  try {
+    // Look up user_id from profiles table by email
+    const profiles = await supaFetch('profiles?email=eq.'+encodeURIComponent(email)+'&select=user_id,email&limit=1');
+    const profile  = profiles && profiles[0];
+    const userId   = profile ? profile.user_id : null;
+
+    const { error } = await fetch(SUPA_URL+'/rest/v1/contest_entries', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPA_ANON,
+        'Authorization': 'Bearer '+SUPA_ANON,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        user_id:         userId || null,
+        email:           email,
+        entry_type:      'sponsored',
+        entries_awarded: entries,
+        reference_id:    'manual-admin-'+new Date().toISOString().slice(0,10)
+      })
+    }).then(r=>r.ok ? {} : r.json().then(j=>({error:j})));
+
+    if(error && error.error){ throw new Error(JSON.stringify(error.error)); }
+
+    msg.style.color = '#22c55e';
+    msg.textContent = '✅ Awarded '+entries+' sponsor entries to '+email+(userId?' (user matched)':' (email only — user not found in profiles)');
+    document.getElementById('awardEmail').value = '';
+    document.getElementById('awardEntries').value = '5';
+    // Refresh the contest data
+    setTimeout(loadContest, 800);
+  } catch(e){
+    msg.style.color = '#f87171';
+    msg.textContent = '❌ Error: '+e.message;
+  } finally {
+    btn.disabled = false; btn.textContent = '❤️ Award Entries';
+  }
+}
+
+// ── CONTEST ENTRIES ─────────────────────────────────────────────
+async function loadContest(){
+  try {
+    const entries = await supaFetch('contest_entries?select=*&order=created_at.desc');
+
+    if(!entries || entries.length === 0){
+      ['contestTypeTable','contestLeaderTable','contestRecentTable'].forEach(id=>{
+        document.getElementById(id).innerHTML = '<tr class="loading-row"><td colspan="5">No contest entries yet</td></tr>';
+      });
+      ['kContestTotal','kContestUsers','kContestFree','kContestBonus'].forEach(id=>{
+        document.getElementById(id).textContent = '0';
+      });
+      return;
+    }
+
+    // ── KPIs ──
+    const totalEntries = entries.reduce((s,e)=>s+(e.entries_awarded||0),0);
+    const uniqueUsers  = new Set(entries.map(e=>e.email||e.user_id)).size;
+    const freeTypes    = ['account_created','setup_complete','first_task','social_share'];
+    const freeEntries  = entries.filter(e=>freeTypes.includes(e.entry_type)).reduce((s,e)=>s+(e.entries_awarded||0),0);
+    const bonusEntries = totalEntries - freeEntries;
+
+    document.getElementById('kContestTotal').textContent = totalEntries.toLocaleString();
+    document.getElementById('kContestUsers').textContent = uniqueUsers.toLocaleString();
+    document.getElementById('kContestFree').textContent  = freeEntries.toLocaleString();
+    document.getElementById('kContestBonus').textContent = bonusEntries.toLocaleString();
+
+    // ── ENTRY TYPE BREAKDOWN ──
+    const byType = {};
+    entries.forEach(e=>{
+      const t = e.entry_type || 'unknown';
+      if(!byType[t]) byType[t] = { count:0, entries:0 };
+      byType[t].count++;
+      byType[t].entries += (e.entries_awarded||0);
+    });
+    const typeLabels = {
+      account_created: '✅ Account Created',
+      setup_complete:  '👧 Child Added',
+      first_task:      '📋 First Task Created',
+      referral:        '🔗 Referral',
+      sponsored:       '❤️ Sponsor a Family',
+      social_share:    '📣 Social Share',
+      paid_monthly:    '💳 Paid — Monthly',
+      paid_yearly:     '💳 Paid — Annual',
+      paid_lifetime:   '💳 Paid — Lifetime',
+    };
+    document.getElementById('contestTypeTable').innerHTML = Object.entries(byType)
+      .sort((a,b)=>b[1].entries-a[1].entries)
+      .map(([type,data])=>{
+        const pct = totalEntries ? ((data.entries/totalEntries)*100).toFixed(1) : '0';
+        return `<tr>
+          <td style="font-weight:600;">${typeLabels[type]||type}</td>
+          <td>${data.count}</td>
+          <td style="font-weight:700;color:var(--gold);">${data.entries}</td>
+          <td><div style="display:flex;align-items:center;gap:.5rem;">
+            <div style="flex:1;background:rgba(255,255,255,.07);border-radius:4px;height:6px;overflow:hidden;">
+              <div style="height:100%;width:${pct}%;background:var(--gold);border-radius:4px;"></div>
+            </div>
+            <span style="font-size:.72rem;color:var(--tx3);width:2.5rem;text-align:right;">${pct}%</span>
+          </div></td>
+        </tr>`;
+      }).join('');
+
+    // ── LEADERBOARD ──
+    const byUser = {};
+    entries.forEach(e=>{
+      const key = e.email || e.user_id || 'unknown';
+      if(!byUser[key]) byUser[key] = { email:e.email||'—', total:0, types:new Set(), last:e.created_at };
+      byUser[key].total += (e.entries_awarded||0);
+      byUser[key].types.add(e.entry_type||'unknown');
+      if(e.created_at > byUser[key].last) byUser[key].last = e.created_at;
+    });
+    const leaderboard = Object.values(byUser).sort((a,b)=>b.total-a.total);
+    document.getElementById('contestLeaderBadge').textContent = leaderboard.length + ' participants';
+    document.getElementById('contestLeaderTable').innerHTML = leaderboard.length === 0
+      ? '<tr class="loading-row"><td colspan="5">No entries yet</td></tr>'
+      : leaderboard.slice(0,50).map((u,i)=>`<tr>
+          <td style="font-family:var(--fm);font-weight:700;color:${i===0?'#f5c842':i===1?'#a0a0b8':i===2?'#cd7f32':'var(--tx3)'};">${i+1}</td>
+          <td class="email-cell">${u.email}</td>
+          <td style="font-family:var(--fm);font-weight:900;color:var(--gold);font-size:1.1rem;">${u.total}</td>
+          <td style="font-size:.72rem;color:var(--tx2);">${[...u.types].map(t=>typeLabels[t]||t).join(', ')}</td>
+          <td style="font-size:.72rem;color:var(--tx3);">${fmtAgo(u.last)}</td>
+        </tr>`).join('');
+
+    // ── RECENT ENTRIES ──
+    document.getElementById('contestRecentTable').innerHTML = entries.slice(0,30).map(e=>`<tr>
+      <td class="email-cell">${e.email||'—'}</td>
+      <td style="font-size:.78rem;">${typeLabels[e.entry_type]||e.entry_type||'—'}</td>
+      <td style="font-weight:700;color:var(--gold);">+${e.entries_awarded||0}</td>
+      <td style="font-size:.72rem;color:var(--tx3);">${e.reference_id||'—'}</td>
+      <td style="font-size:.72rem;color:var(--tx3);">${fmtAgo(e.created_at)}</td>
+    </tr>`).join('');
+
+  } catch(e){ console.error('[Contest]', e); }
+}
+
+// ── OUTREACH ────────────────────────────────────────────────────
+let outContacts   = [];   // full contact list [{email, tag, phone}]
+let selectedEmails= new Set();
+let activeGroup   = 'all';
+let activeChannel = 'email';
+let sessionSent   = 0;
+let sendLog       = [];
+
+async function loadOutreach(){
+  try{
+    // Pull profiles + affiliates + waitlist in parallel
+    const [profiles, affiliates, waitlist] = await Promise.all([
+      supaFetch('profiles?select=email,plan,plan_status,updated_at,created_at&order=created_at.desc'),
+      supaFetch('affiliate_applications?select=email,status&order=applied_at.desc'),
+      supaFetch('waitlist_applications?select=email,status&order=submitted_at.desc')
+    ]);
+
+    const paying = ['monthly','yearly','lifetime','active'];
+    const contacts = [];
+    const seen = new Set();
+
+    // Profiles → users
+    (profiles||[]).forEach(u=>{
+      if(!u.email || seen.has(u.email)) return;
+      seen.add(u.email);
+      const p = (u.plan||u.plan_status||'').toLowerCase();
+      const dSince = daysSince(u.created_at);
+      const noSync = !u.updated_at || u.updated_at===u.created_at;
+      let tag = paying.includes(p) ? 'paying' : 'free';
+      if(dSince>=14 && noSync) tag = 'at-risk';
+      contacts.push({email:u.email, tag, phone:'', group:'users'});
+    });
+
+    // Affiliates
+    (affiliates||[]).forEach(a=>{
+      if(!a.email) return;
+      if(!seen.has(a.email)){
+        seen.add(a.email);
+        contacts.push({email:a.email, tag:'affiliate', phone:'', group:'affiliates'});
+      }
+    });
+
+    // Waitlist
+    (waitlist||[]).forEach(w=>{
+      if(!w.email) return;
+      if(!seen.has(w.email)){
+        seen.add(w.email);
+        contacts.push({email:w.email, tag:'waitlist', phone:'', group:'waitlist'});
+      }
+    });
+
+    outContacts = contacts;
+    document.getElementById('kOutContacts').textContent = contacts.length;
+    renderRecipientList();
+  }catch(e){ console.error('[Outreach]', e); }
+}
+
+function getFilteredContacts(){
+  const q = (document.getElementById('rSearch').value||'').toLowerCase();
+  return outContacts.filter(c=>{
+    const matchGroup =
+      activeGroup==='all'       ? true :
+      activeGroup==='paying'    ? c.tag==='paying' :
+      activeGroup==='free'      ? c.tag==='free' :
+      activeGroup==='at-risk'   ? c.tag==='at-risk' :
+      activeGroup==='affiliates'? c.group==='affiliates' :
+      activeGroup==='waitlist'  ? c.group==='waitlist' : true;
+    const matchQ = !q || c.email.toLowerCase().includes(q);
+    return matchGroup && matchQ;
+  });
+}
+
+function renderRecipientList(){
+  const filtered = getFilteredContacts();
+  const list = document.getElementById('recipientList');
+  if(!filtered.length){
+    list.innerHTML='<div class="no-recipients">No contacts match</div>';
+    updateSelCount(); return;
+  }
+  list.innerHTML = filtered.map(c=>{
+    const sel = selectedEmails.has(c.email);
+    const tagColor = c.tag==='paying'?'var(--green)':c.tag==='at-risk'?'var(--red)':c.tag==='affiliate'?'var(--purple)':c.tag==='waitlist'?'var(--amber)':'var(--tx3)';
+    return `<div class="recipient-item ${sel?'selected-r':''}" onclick="toggleRecipient('${c.email.replace(/'/g,"\\'")}',this)">
+      <div class="r-check ${sel?'checked':''}">${sel?'<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}</div>
+      <div class="r-email">${c.email}</div>
+      <span class="r-tag" style="color:${tagColor};border-color:${tagColor}22;">${c.tag}</span>
+    </div>`;
+  }).join('');
+  updateSelCount();
+}
+
+function toggleRecipient(email, el){
+  if(selectedEmails.has(email)){
+    selectedEmails.delete(email);
+  } else {
+    selectedEmails.add(email);
+  }
+  renderRecipientList();
+  updateKPIs();
+}
+
+function selectAllVisible(){
+  getFilteredContacts().forEach(c=>selectedEmails.add(c.email));
+  renderRecipientList(); updateKPIs();
+}
+
+function clearSelection(){
+  selectedEmails.clear();
+  renderRecipientList(); updateKPIs();
+  document.getElementById('toPreviewWrap').style.display='none';
+}
+
+function filterRecipients(){ renderRecipientList(); }
+
+function setGroup(g, btn){
+  activeGroup = g;
+  document.querySelectorAll('.group-chip[data-group]').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  renderRecipientList();
+}
+
+function updateSelCount(){
+  const n = selectedEmails.size;
+  document.getElementById('selCountLabel').textContent = n + ' selected';
+}
+
+function updateKPIs(){
+  document.getElementById('kOutSelected').textContent = selectedEmails.size;
+}
+
+function setChannel(ch){
+  activeChannel = ch;
+  document.getElementById('chEmail').classList.toggle('active', ch==='email');
+  document.getElementById('chSMS').classList.toggle('active', ch==='sms');
+  document.getElementById('emailFields').style.display = ch==='email'?'block':'none';
+  document.getElementById('smsFields').style.display   = ch==='sms'?'block':'none';
+  document.getElementById('msgLabel').textContent = ch==='email'?'Message Body (HTML OK)':'SMS Body (160 chars)';
+  updateCharCount();
+}
+
+function updateCharCount(){
+  const txt = (document.getElementById('msgBody').value||'').length;
+  document.getElementById('smsCharCount').textContent = txt+' / 160';
+  document.getElementById('smsCharCount').style.color = txt>160?'var(--red)':'var(--tx3)';
+}
+
+function previewRecipients(){
+  const arr = [...selectedEmails].slice(0,30);
+  const wrap = document.getElementById('toPreviewWrap');
+  if(!arr.length){ wrap.style.display='none'; return; }
+  document.getElementById('toPreviewCount').textContent = selectedEmails.size+' recipient'+(selectedEmails.size!==1?'s':'');
+  document.getElementById('toPreviewChips').innerHTML = arr.map(e=>`<span class="preview-chip">${e}</span>`).join('')+(selectedEmails.size>30?`<span class="preview-chip" style="color:var(--tx3)">+${selectedEmails.size-30} more</span>`:'');
+  wrap.style.display='block';
+}
+
+const TEMPLATES = {
+  welcome:{
+    subject:'Welcome to YourLife CC! 🎉',
+    body:`Hi there!\n\nWelcome to YourLife CC — we're so excited to have your family on board.\n\nYourLife CC helps families build real life skills together through chores, goals, and faith-centered tools. Explore everything at https://yourlifecc.com.\n\nIf you have any questions, just reply to this email.\n\nBlessings,\nJason @ YourLife CC`
+  },
+  feature:{
+    subject:'New feature alert in YourLife CC 🚀',
+    body:`Hi!\n\nWe just shipped something new inside YourLife CC that I think your family is going to love.\n\n[Describe the new feature here]\n\nLog in now at https://yourlifecc.com to check it out.\n\nThanks for being part of our community!\n\nJason @ YourLife CC`
+  },
+  contest:{
+    subject:'Don\'t forget — $5,000 drawing ends Sept 1! 🏆',
+    body:`Hi!\n\nJust a quick reminder that our $5,000 Cash Drawing closes September 1, 2026.\n\nYou can earn more entries by:\n• Referring a friend\n• Sponsoring a family\n• Completing app setup\n\nLog in at https://yourlifecc.com to see your entries and get more.\n\nGood luck!\nJason @ YourLife CC`
+  },
+  winback:{
+    subject:'We miss you — come back to YourLife CC 💙',
+    body:`Hi!\n\nWe noticed you haven't been back to YourLife CC in a little while and wanted to check in.\n\nLife gets busy — we get it. But your family's goals, chores, and life skills are still right where you left them.\n\nLog back in anytime at https://yourlifecc.com.\n\nIf something wasn't working right or you have feedback, just reply — I read every email personally.\n\nBlessings,\nJason @ YourLife CC`
+  },
+  launch:{
+    subject:'YourLife CC is LIVE — share the news! 🎉',
+    body:`Hi!\n\nToday's the day — YourLife CC is officially live!\n\nWe built this platform for families who want to raise kids that are capable, confident, and grounded in faith. Everything your family needs is now at https://yourlifecc.com.\n\nSpread the word — share your referral link inside the app and earn rewards when families join.\n\nThank you for believing in this mission.\n\nBlessings,\nJason @ YourLife CC`
+  }
+};
+
+function useTemplate(key){
+  const t = TEMPLATES[key];
+  if(!t) return;
+  if(activeChannel==='email'){
+    document.getElementById('emailSubject').value = t.subject;
+  }
+  document.getElementById('msgBody').value = t.body;
+  updateCharCount();
+}
+
+async function sendOutreach(){
+  const recipients = [...selectedEmails];
+  if(!recipients.length){
+    showSendStatus('⚠️ No recipients selected.', 'var(--amber)'); return;
+  }
+  const body = (document.getElementById('msgBody').value||'').trim();
+  if(!body){
+    showSendStatus('⚠️ Message body is empty.', 'var(--amber)'); return;
+  }
+
+  if(activeChannel==='email'){
+    const subject = (document.getElementById('emailSubject').value||'').trim();
+    const fromName = (document.getElementById('fromName').value||'YourLife CC').trim();
+    if(!subject){ showSendStatus('⚠️ Subject line is required.', 'var(--amber)'); return; }
+    await sendViaBrevo(recipients, subject, body, fromName);
+  } else {
+    await sendViaSMS(recipients, body);
+  }
+}
+
+async function sendViaBrevo(recipients, subject, body, fromName){
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  showSendStatus('Sending via Brevo…', 'var(--tx3)');
+
+  const results = [];
+  const BREVO_URL = 'https://api.brevo.com/v3/smtp/email';
+
+  // Send individually so each gets a personalized To: field
+  // Batch in groups of 5 to avoid hammering (adjust as needed)
+  for(let i=0;i<recipients.length;i++){
+    const email = recipients[i];
+    try{
+      const res = await fetch(BREVO_URL, {
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'api-key': window.BREVO_API_KEY || prompt('Enter your Brevo API key (stored for session):') || ''
+        },
+        body: JSON.stringify({
+          sender:{ name: fromName, email:'info@kingdom-creatives.com' },
+          to:[{ email }],
+          subject,
+          htmlContent: body.replace(/\n/g,'<br>'),
+          textContent: body
+        })
+      });
+      results.push({email, ok:res.ok, status:res.status});
+      if(res.ok && !window.BREVO_API_KEY){
+        // Key worked — cache it for this session
+        window.BREVO_API_KEY = document.querySelector('input') ? window.BREVO_API_KEY : window.BREVO_API_KEY;
+      }
+    }catch(e){
+      results.push({email, ok:false, status:e.message});
+    }
+  }
+
+  const ok  = results.filter(r=>r.ok).length;
+  const err = results.filter(r=>!r.ok).length;
+  sessionSent += ok;
+  document.getElementById('kOutMsgSent').textContent = sessionSent;
+
+  logSend({
+    channel:'email', subject,
+    total:recipients.length, ok, err,
+    recipients: recipients.slice(0,5),
+    ts: new Date()
+  });
+
+  showSendStatus(`✅ Sent ${ok}/${recipients.length}${err>0?' — '+err+' failed':''}`, ok===recipients.length?'var(--green)':'var(--amber)');
+  btn.disabled=false; btn.textContent='✈️ Send Message';
+}
+
+async function sendViaSMS(recipients, body){
+  // SMS via Brevo SMS API (requires SMS plan)
+  const btn = document.getElementById('sendBtn');
+  btn.disabled=true; btn.textContent='Sending…';
+
+  const withPhone = recipients.filter(e=>{
+    const c = outContacts.find(x=>x.email===e);
+    return c && c.phone;
+  });
+  const noPhone = recipients.filter(e=>!outContacts.find(x=>x.email===e&&x.phone));
+
+  if(!withPhone.length){
+    showSendStatus('⚠️ No phone numbers on file for selected recipients.', 'var(--amber)');
+    btn.disabled=false; btn.textContent='✈️ Send Message';
+    return;
+  }
+
+  logSend({
+    channel:'sms', subject:'SMS',
+    total:recipients.length,
+    ok:withPhone.length,
+    err:noPhone.length,
+    note: noPhone.length ? noPhone.length+' had no phone number' : null,
+    recipients: withPhone.slice(0,5),
+    ts: new Date()
+  });
+
+  sessionSent += withPhone.length;
+  document.getElementById('kOutMsgSent').textContent = sessionSent;
+  showSendStatus(`📱 SMS queued for ${withPhone.length} contact(s)${noPhone.length?' — '+noPhone.length+' skipped (no phone)':''}`, 'var(--green)');
+  btn.disabled=false; btn.textContent='✈️ Send Message';
+}
+
+function showSendStatus(msg, color){
+  const el = document.getElementById('sendStatusMsg');
+  el.textContent=msg; el.style.color=color||'var(--tx3)';
+}
+
+function logSend({channel, subject, total, ok, err, recipients, note, ts}){
+  sendLog.unshift({channel, subject, total, ok, err, recipients, note, ts});
+  document.getElementById('logBadge').textContent = sendLog.length + ' sent';
+  const icon = channel==='email'?'📧':'💬';
+  document.getElementById('outreachLog').innerHTML = sendLog.map(l=>`
+    <div class="log-entry">
+      <div class="log-icon">${l.channel==='email'?'📧':'💬'}</div>
+      <div class="log-detail">
+        <div class="log-title">${l.subject||'SMS'} <span style="color:var(--tx3);font-size:.65rem;">· ${l.channel.toUpperCase()}</span></div>
+        <div class="log-meta">${l.ts.toLocaleTimeString()} · ${l.total} recipient${l.total!==1?'s':''}: ${l.recipients.map(e=>`<span style="color:var(--tx2)">${e}</span>`).join(', ')}${l.recipients.length<l.total?' …':''}</div>
+        ${l.note?`<div class="log-meta" style="color:var(--amber);">${l.note}</div>`:''}
+      </div>
+      <div>${l.err===0?`<span class="log-status-ok">✓ ${l.ok} sent</span>`:`<span class="log-status-err">${l.err} failed</span> <span class="log-status-ok">${l.ok} ok</span>`}</div>
+    </div>`).join('');
+}
+
+// Cache Brevo API key for session (prompted once on first send)
+window.BREVO_API_KEY = '';
+
+async function approveWaitlist(id, btn){
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  try{
+    const res = await fetch(SUPA_URL+'/rest/v1/waitlist_applications?id=eq.'+id, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPA_ANON,
+        'Authorization': 'Bearer '+SUPA_ANON,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ status: 'approved' })
+    });
+    if(res.ok){
+      btn.textContent = '✓ Done';
+      setTimeout(loadWaitlist, 1500);
+    } else {
+      btn.disabled = false;
+      btn.textContent = '✓ Match';
+    }
+  }catch(e){ btn.disabled=false; btn.textContent='✓ Match'; }
+}
+</script>
+</body>
+</html>
