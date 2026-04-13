@@ -2139,3 +2139,44 @@ body.child-view  #parentWelcomeCard{ display: none !important; }
   border-color: rgba(0,0,0,.4) !important;
   box-shadow: 0 0 0 3px rgba(0,0,0,.15), 0 2px 6px rgba(0,0,0,.2) !important;
 }
+
+/* ── CHILD DASHBOARD CONTENT — hidden in parent view ────────── */
+body.parent-view #childDashContent { display: none !important; }
+body.child-view  #childDashContent { display: block !important; }
+
+/* ── SWATCH ROWS — force visibility in light mode ────────────
+   The gradient swatches ARE there, but the settings panel (#sp)
+   background in light mode is white, making light-colored swatches
+   hard to see. Add a strong outline to every swatch button.
+   Using :not() to avoid hitting other buttons.
+─────────────────────────────────────────────────────────────── */
+:root.light .swatch-row > button {
+  outline: 2px solid rgba(0,0,0,.25) !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,.2) !important;
+}
+:root.light .swatch-row > button:first-child {
+  background: #e2e8f0 !important;
+  color: #475569 !important;
+  outline-color: rgba(0,0,0,.2) !important;
+}
+
+/* ── TOP QUICK BUTTONS BAR — light mode fix ─────────────────
+   #topQuickBtns has hardcoded dark background rgba(10,10,15,.95)
+─────────────────────────────────────────────────────────────── */
+:root.light #topQuickBtns {
+  background: rgba(255,255,255,.97) !important;
+  border-bottom-color: rgba(0,0,0,.1) !important;
+  backdrop-filter: blur(12px);
+}
+:root.light #topQuickBtns button {
+  background: rgba(0,0,0,.05) !important;
+  border-color: rgba(0,0,0,.12) !important;
+  color: #334155 !important;
+}
+:root.light #topQuickBtns button:hover {
+  background: rgba(0,0,0,.1) !important;
+}
+/* Keep colored buttons (Parent, Refer & Earn) readable */
+:root.light #topQuickBtns button[style*="color:#fff"] {
+  color: #fff !important;
+}
