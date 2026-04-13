@@ -6172,7 +6172,7 @@
     var now = new Date();
     var diff = drawing - now;
     if(diff <= 0){ 
-      ['cd','cd2'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent='Drawing today!'; }); 
+      ['cdTimer','cdTimer2'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent='Drawing today!'; }); 
       return; 
     }
     var d = Math.floor(diff/864e5);
@@ -6180,7 +6180,7 @@
     var m = Math.floor((diff%36e5)/6e4);
     var s = Math.floor((diff%6e4)/1e3);
     var str = d+'d '+h+'h '+m+'m '+s+'s';
-    ['cd','cd2'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent=str; });
+    ['cdTimer','cdTimer2'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent=str; });
   }
   tick();
   setInterval(tick, 1000);
