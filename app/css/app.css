@@ -1,10 +1,10 @@
 /* =============================================================
-   YourLife CC — App Stylesheet
+   YourLife CC â€” App Stylesheet
    Extracted from app/index.html
-   DO NOT edit index.html styles — edit this file instead
+   DO NOT edit index.html styles â€” edit this file instead
 ============================================================= */
 
-/* ── DARK MODE (default) ────────────────────────── */
+/* â”€â”€ DARK MODE (default) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 :root{
   --bg:#0d1117;--s1:#161b27;--s2:#1c2333;--s3:#232d42;--s4:#2a3652;
   --c:#38bdf8;--g:#fbbf24;--gr:#34d399;--p:#a78bfa;--pk:#f472b6;--or:#fb923c;
@@ -17,7 +17,7 @@
   --sel-bg:#1c2236;
 }
 
-/* ── LIGHT MODE ─────────────────────────────────── */
+/* â”€â”€ LIGHT MODE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 :root.light{
   --bg:#f0f4f8;--s1:#ffffff;--s2:#f8fafc;--s3:#e9eef5;--s4:#dde4ee;
   --tx:#0f172a;--tx2:#475569;--mt:#94a3b8;--br:rgba(56,189,248,0.25);
@@ -34,7 +34,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   radial-gradient(ellipse 40% 50% at 80% 85%,rgba(167,139,250,.04) 0%,transparent 60%);}
 :root.light body::before{background:radial-gradient(ellipse 60% 40% at 30% 10%,rgba(56,189,248,.07) 0%,transparent 60%),radial-gradient(ellipse 40% 50% at 80% 85%,rgba(167,139,250,.05) 0%,transparent 60%);}
 
-/* ─── SIDEBAR (fixed left) ─────────────────────── */
+/* â”€â”€â”€ SIDEBAR (fixed left) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 #sidebar{
   width:var(--sidebar);
   background:var(--s1);
@@ -69,7 +69,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .sid-bottom{padding:.8rem .9rem;border-top:1px solid rgba(255,255,255,.07);flex-shrink:0;}
 .sid-status{display:flex;justify-content:space-between;font-size:.62rem;margin-bottom:.5rem;color:var(--mt);}
 
-/* ─── MOBILE TOP BAR ──────────────────────────── */
+/* â”€â”€â”€ MOBILE TOP BAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 #mBar{
   display:none;position:fixed;top:0;left:0;right:0;height:54px;z-index:910;
   -webkit-transform:translateZ(0);transform:translateZ(0);
@@ -78,7 +78,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   align-items:center;justify-content:space-between;padding:0 1rem;
 }
 .mBar-title{font-family:var(--fh);font-size:1.25rem;letter-spacing:3px;color:var(--c);}
-/* ── MOBILE QUICK ROW (below mBar) ─────────────── */
+/* â”€â”€ MOBILE QUICK ROW (below mBar) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 #mobileQuickRow{
   display:none;
   position:relative;z-index:1;
@@ -100,9 +100,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 #mobileQuickRow .mqb-parent{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.2);color:#a78bfa;}
 #mobileQuickRow .mqb-lang{background:rgba(255,255,255,.05);}
 #mobileQuickRow .mob-translate-wrap{position:relative;flex-shrink:0;}
-/* mob_translate_element is now position:fixed — see #mob_translate_element below */
+/* mob_translate_element is now position:fixed â€” see #mob_translate_element below */
 
-/* Mobile translate dropdown — fixed position so it floats ABOVE everything */
+/* Mobile translate dropdown â€” fixed position so it floats ABOVE everything */
 #mob_translate_element{
   position:fixed;
   top:100px;left:8px;
@@ -128,16 +128,16 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 }
 #sideOverlay.open{display:block;}
 
-/* ─── MAIN CONTENT ────────────────────────────── */
+/* â”€â”€â”€ MAIN CONTENT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 #mainWrap{margin-left:220px;min-height:100vh;position:relative;width:calc(100vw - 220px);padding-top:44px;overflow-x:hidden;}
 #app{padding:1.6rem 1.8rem 6rem;max-width:100%;}
 
-/* ─── SECTIONS (SPA — only active shows) ─────── */
+/* â”€â”€â”€ SECTIONS (SPA â€” only active shows) â”€â”€â”€â”€â”€â”€â”€ */
 .sec{display:none;}
 .sec.active{display:block;}
-/* fadeUp animation removed — was creating stacking contexts trapping fixed dropdowns */
+/* fadeUp animation removed â€” was creating stacking contexts trapping fixed dropdowns */
 
-/* ─── RESPONSIVE ──────────────────────────────── */
+/* â”€â”€â”€ RESPONSIVE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 /* Desktop: sidebar locked on left */
 @media(min-width:861px){
@@ -171,12 +171,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 @media(max-width:768px){.g2,.g3,.g4{grid-template-columns:1fr;}}
 @media(max-width:500px){.g2{grid-template-columns:1fr;}}
 
-/* ── CARDS ─────────────────────────────────────── */
+/* â”€â”€ CARDS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--r);padding:1.3rem;position:relative;box-shadow:var(--card-shadow);}
 .card-dark{background:var(--s1);}
 .ct{font-family:var(--fh);letter-spacing:1.5px;font-size:.82rem;color:var(--c);margin-bottom:.9rem;display:flex;align-items:center;justify-content:space-between;gap:.4rem;text-transform:uppercase;}
 
-/* ── FORMS ─────────────────────────────────────── */
+/* â”€â”€ FORMS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 label{display:block;font-size:.78rem;color:#c8d4e8;font-weight:700;margin:.7rem 0 .25rem;letter-spacing:.3px;}
 input,textarea,select{width:100%;background:var(--input-bg);border:1px solid var(--input-border);border-radius:8px;padding:.58rem .85rem;color:var(--tx);font-family:var(--fm);font-size:.92rem;outline:none;transition:border-color .18s;font-weight:500;}
 input:focus,textarea:focus,select:focus{border-color:rgba(56,189,248,.6);background:var(--input-bg);}
@@ -185,7 +185,7 @@ textarea{resize:vertical;min-height:76px;}
 input[type=range]{padding:0;height:6px;accent-color:var(--c);}
 input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 
-/* ── BUTTONS ───────────────────────────────────── */
+/* â”€â”€ BUTTONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:.3rem;padding:.5rem 1.15rem;border-radius:8px;font-family:var(--fm);font-weight:600;font-size:.83rem;cursor:pointer;border:none;transition:all .15s;white-space:nowrap;min-height:36px;}
 .bp{background:var(--c);color:#000;}.bp:hover{filter:brightness(1.1);box-shadow:0 0 14px rgba(56,189,248,.3);}
 .bg_{background:var(--g);color:#000;}.bg_:hover{filter:brightness(1.1);}
@@ -200,12 +200,12 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .db{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.35);font-size:.8rem;padding:2px 5px;font-family:var(--fm);}
 .db:hover{color:var(--pk);}
 
-/* ── TABS ──────────────────────────────────────── */
+/* â”€â”€ TABS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .tabs{display:flex;gap:.28rem;flex-wrap:wrap;margin-bottom:1rem;}
 .tab{padding:.42rem 1rem;border-radius:7px;font-size:.8rem;font-weight:600;cursor:pointer;background:rgba(255,255,255,.1);color:#d4e0f0;border:none;transition:all .13s;font-family:var(--fm);}
 .tab.active,.tab:hover{background:var(--c);color:#000;font-weight:700;}
 
-/* ── SECTIONS ──────────────────────────────────── */
+/* â”€â”€ SECTIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .sec{padding:2.2rem 0 .5rem;}
 .sh{display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;}
 .si{font-size:1.5rem;}
@@ -213,11 +213,11 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .sl{flex:1;height:1px;background:linear-gradient(90deg,rgba(56,189,248,.3),transparent);}
 .sdiv{height:1px;background:linear-gradient(90deg,transparent,rgba(56,189,248,.08),transparent);margin:.6rem 0;}
 
-/* ── PROGRESS ──────────────────────────────────── */
+/* â”€â”€ PROGRESS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .pt{background:rgba(255,255,255,.07);border-radius:100px;overflow:hidden;}
 .pf{height:100%;border-radius:100px;transition:width .6s cubic-bezier(.4,0,.2,1);}
 
-/* ── BADGES ────────────────────────────────────── */
+/* â”€â”€ BADGES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .bdg{display:inline-flex;align-items:center;padding:.14rem .52rem;border-radius:100px;font-size:.67rem;font-weight:700;}
 .bc{background:rgba(56,189,248,.15);color:var(--c);}
 .bg2{background:rgba(251,191,36,.15);color:var(--g);}
@@ -225,9 +225,9 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .bp2{background:rgba(167,139,250,.15);color:var(--p);}
 .bpk{background:rgba(244,114,182,.15);color:var(--pk);}
 
-/* nav CSS now replaced by sidebar — see above */
+/* nav CSS now replaced by sidebar â€” see above */
 
-/* ── SETTINGS PANEL ────────────────────────────── */
+/* â”€â”€ SETTINGS PANEL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 #sp{position:fixed;top:0;right:-315px;width:300px;height:100vh;background:var(--s1);border-left:1px solid rgba(56,189,248,.2);z-index:99995;transition:right .28s;overflow-y:auto;padding:1.3rem 1rem 3rem;}
 #sp.open{right:0;}
 #so{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:8800;display:none;}
@@ -238,7 +238,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .tg::after{content:'';position:absolute;top:3px;left:3px;width:17px;height:17px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3);}
 .tg.on::after{transform:translateX(19px);}
 
-/* ── MODALS ────────────────────────────────────── */
+/* â”€â”€ MODALS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .mo{display:none;position:fixed;inset:0;background:rgba(10,15,30,.88);backdrop-filter:blur(10px);z-index:9999;align-items:center;justify-content:center;padding:1rem;}
 .mo.open{display:flex;}
 .md{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:1.8rem;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.5);}
@@ -246,7 +246,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .mdt{font-family:var(--fh);font-size:1.2rem;letter-spacing:2px;color:var(--c);margin-bottom:1.1rem;}
 .ma{display:flex;gap:.5rem;justify-content:flex-end;margin-top:1.1rem;flex-wrap:wrap;}
 
-/* ── TOAST ─────────────────────────────────────── */
+/* â”€â”€ TOAST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .toast{position:fixed;bottom:1.8rem;left:50%;transform:translateX(-50%) translateY(100px);background:rgba(255,255,255,.1);border:1px solid rgba(56,189,248,.25);border-radius:10px;padding:.65rem 1.4rem;font-size:.88rem;font-weight:600;z-index:99999;transition:transform .28s;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.5);}
 .toast.show{transform:translateX(-50%) translateY(0);}
 
@@ -288,7 +288,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .child-avatar-edit-btn:hover{background:rgba(56,189,248,.25);border-color:rgba(56,189,248,.9);}
 @media(max-width:860px){.child-avatar-hero{display:none !important;}}
 
-/* ── CHILD AVATAR PICKER MODAL ─────────────────────────── */
+/* â”€â”€ CHILD AVATAR PICKER MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 #childAvatarModal{display:none;position:fixed;inset:0;background:rgba(4,6,16,.94);backdrop-filter:blur(18px);z-index:9999;align-items:center;justify-content:center;padding:1rem;}
 #childAvatarModal.open{display:flex;animation:camFadeIn .2s ease;}
 @keyframes camFadeIn{from{opacity:0;transform:scale(.95);}to{opacity:1;transform:scale(1);}}
@@ -304,7 +304,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
   font-family:var(--fn);font-size:.7rem;font-weight:700;letter-spacing:3px;
   color:var(--c);margin-bottom:1.4rem;text-align:center;text-transform:uppercase;
 }
-/* Preview — large, centered */
+/* Preview â€” large, centered */
 .cam-preview-wrap{display:flex;flex-direction:column;align-items:center;gap:.5rem;margin-bottom:1rem;}
 .cam-preview{
   width:110px;height:110px;border-radius:50%;
@@ -329,7 +329,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .cam-upload-sub{font-size:.62rem;color:var(--tx2);margin-top:.1rem;display:block;}
 /* Section labels */
 .cam-section-label{font-size:.56rem;font-weight:700;font-family:var(--fn);letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.35);margin:.9rem 0 .45rem;}
-/* Avatar grid — NO background on tiles, pure emoji */
+/* Avatar grid â€” NO background on tiles, pure emoji */
 .cam-avatars{display:grid;grid-template-columns:repeat(8,1fr);gap:.15rem;}
 .cam-av{
   width:100%;height:46px;border-radius:8px;border:2px solid transparent;
@@ -343,7 +343,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 
 
 
-/* ── HERO ──────────────────────────────────────── */
+/* â”€â”€ HERO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .hn{font-family:var(--fh);font-size:2.8rem;letter-spacing:2px;line-height:1;}
 .ct2{font-family:var(--fn);font-size:1.8rem;font-weight:700;color:var(--c);}
 .sb{background:rgba(192,132,252,.15);border:1px solid rgba(192,132,252,.3);border-radius:12px;padding:.9rem 1.1rem;margin-bottom:1rem;display:flex;align-items:center;gap:.85rem;}
@@ -354,11 +354,11 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .qsv{font-family:var(--fn);font-size:1.1rem;font-weight:700;margin-bottom:.18rem;}
 .qsl{font-size:.63rem;color:#c8d4e8;text-transform:uppercase;letter-spacing:.8px;font-weight:600;}
 
-/* ── FINANCE ───────────────────────────────────── */
+/* â”€â”€ FINANCE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .fst{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:.9rem 1rem;}
 .fa{font-family:var(--fn);font-size:1.1rem;font-weight:700;margin-top:.2rem;}
 
-/* ── SCHOOL ────────────────────────────────────── */
+/* â”€â”€ SCHOOL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .cc{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:var(--r);padding:1.1rem;}
 .gb{font-family:var(--fn);font-size:1.1rem;font-weight:900;width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .gA{background:rgba(52,211,153,.15);color:var(--gr);}
@@ -370,7 +370,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .ck{width:18px;height:18px;border-radius:5px;border:2px solid rgba(255,255,255,.35);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.62rem;transition:all .13s;}
 .ck.on{background:var(--gr);border-color:var(--gr);color:#000;}
 
-/* ── SCHEDULE ──────────────────────────────────── */
+/* â”€â”€ SCHEDULE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .sched-wrap{overflow-x:auto;border-radius:10px;}
 .sched-table{border-collapse:collapse;min-width:900px;width:100%;}
 .sched-table th{background:rgba(255,255,255,.12);padding:.5rem .3rem;font-size:.66rem;font-weight:700;text-align:center;color:#fff;border:1px solid rgba(255,255,255,.1);white-space:nowrap;}
@@ -382,7 +382,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .act-cell select{width:100%;height:28px;background:#1c2236;border:none;color:#e8edf8;font-size:.6rem;cursor:pointer;outline:none;padding:0 2px;font-family:var(--fm);}
 .act-cell select option{background:var(--sel-bg);color:var(--tx);}
 
-/* ── CALENDAR ──────────────────────────────────── */
+/* â”€â”€ CALENDAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 #cg{display:grid!important;grid-template-columns:repeat(7,1fr)!important;gap:2px!important;}
 .cd{min-height:72px;background:rgba(255,255,255,.08);border-radius:7px;padding:4px;cursor:pointer;border:1px solid transparent;}
 .cd:hover{border-color:rgba(56,189,248,.2);}
@@ -397,18 +397,18 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .esc{background:rgba(52,211,153,.18);color:var(--gr);}
 .eot{background:rgba(255,255,255,.1);color:#ccc;}
 
-/* ── CHECK-INS ─────────────────────────────────── */
+/* â”€â”€ CHECK-INS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .chi{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.6rem .75rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:.55rem;font-size:.82rem;font-weight:600;color:var(--tx2);user-select:none;}
 .chi.done{background:rgba(52,211,153,.18);border-color:rgba(52,211,153,.45);color:#6ee7b7;}
 
-/* ── TIMER ─────────────────────────────────────── */
+/* â”€â”€ TIMER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .tdisp{font-family:var(--fn);font-size:3rem;font-weight:900;color:var(--c);text-align:center;padding:.7rem 0;letter-spacing:2px;}
 .gpab{font-family:var(--fn);font-size:3.5rem;font-weight:900;text-align:center;line-height:1;}
 
-/* ── CRAFT ─────────────────────────────────────── */
+/* â”€â”€ CRAFT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 
-/* ── STAT TILES ────────────────────────────────── */
+/* â”€â”€ STAT TILES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .stat-tile{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:11px;padding:.9rem 1rem;}
 .stat-val{font-family:var(--fn);font-size:1.2rem;font-weight:700;margin:.18rem 0 .08rem;}
 .stat-lbl{font-size:.64rem;color:#c8d4e8;text-transform:uppercase;letter-spacing:.8px;font-weight:600;}
@@ -417,14 +417,14 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 ::-webkit-scrollbar-track{background:var(--s1);}
 ::-webkit-scrollbar-thumb{background:var(--s4);border-radius:3px;}
 
-/* ── TOOLTIPS ───────────────────────────────────── */
-/* ── INLINE HELP BUTTONS ─────────────────────────────────── */
+/* â”€â”€ TOOLTIPS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â”€â”€ INLINE HELP BUTTONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .hlp{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);color:#38bdf8;font-size:.58rem;font-weight:900;cursor:pointer;flex-shrink:0;vertical-align:middle;margin-left:4px;transition:all .15s;user-select:none;line-height:1;position:relative;}
 .hlp:hover{background:rgba(56,189,248,.32);transform:scale(1.2);}
 #hlpBox{position:fixed;z-index:99998;background:#0c1422;border:1px solid rgba(56,189,248,.35);border-radius:10px;padding:.7rem .9rem;max-width:270px;font-size:.76rem;color:#c8d4e8;line-height:1.6;box-shadow:0 6px 28px rgba(0,0,0,.7);pointer-events:none;transition:opacity .12s;opacity:0;}
 #hlpBox.show{opacity:1;}
 #hlpBox .hb-t{font-weight:800;color:#38bdf8;font-size:.78rem;margin-bottom:.28rem;}
-/* ── BOUNCING ARROW HINT on ? buttons ─────────────────────── */
+/* â”€â”€ BOUNCING ARROW HINT on ? buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @keyframes hlpArrowBounce{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(-4px);}}
 .hlp-arrow{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:.65rem;color:#38bdf8;animation:hlpArrowBounce 1s ease-in-out infinite;pointer-events:none;line-height:1;text-shadow:0 0 6px rgba(56,189,248,.6);z-index:2;}
 .hlp-hint-done .hlp-arrow{display:none !important;}
@@ -449,7 +449,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .tip-title{font-family:var(--fh);font-size:.82rem;letter-spacing:1.5px;color:var(--c);margin-bottom:.38rem;}
 .tip-box b{color:#fff;}
 
-/* ── TUTORIAL CSS → see full definitions below ── */
+/* â”€â”€ TUTORIAL CSS â†’ see full definitions below â”€â”€ */
 #tutReturnBtn{position:fixed;bottom:1.4rem;right:1.1rem;z-index:99990;background:linear-gradient(135deg,#38bdf8,#818cf8);color:#000;border:none;border-radius:30px;padding:.65rem 1.3rem;font-size:.82rem;font-weight:900;cursor:pointer;font-family:var(--fn);letter-spacing:.5px;box-shadow:0 6px 24px rgba(56,189,248,.6);display:none;align-items:center;gap:.5rem;animation:pulseBtn 1.8s ease-in-out infinite;}
 @keyframes pulseBtn{0%,100%{box-shadow:0 6px 24px rgba(56,189,248,.6);}50%{box-shadow:0 6px 32px rgba(56,189,248,.9);transform:translateY(-2px);}}
 #tutReturnBtn.visible{display:flex;}
@@ -507,10 +507,10 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 
 
 .editable-name{color:var(--c);cursor:pointer;position:relative;}
-.editable-name::after{content:' ✎';font-size:.45em;opacity:0;transition:opacity .2s;vertical-align:middle;color:var(--mt);}
+.editable-name::after{content:' âœŽ';font-size:.45em;opacity:0;transition:opacity .2s;vertical-align:middle;color:var(--mt);}
 .editable-name:hover::after{opacity:1;}
 
-/* ── LIGHT MODE OVERRIDES ───────────────────────── */
+/* â”€â”€ LIGHT MODE OVERRIDES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 :root.light body{background:var(--bg);}
 :root.light #sidebar{background:#fff;border-right-color:rgba(0,0,0,.08);}
 :root.light .sid-logo{border-bottom-color:rgba(0,0,0,.08);}
@@ -569,7 +569,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 :root.light #themeBtn{background:rgba(0,0,0,.06);border-color:rgba(0,0,0,.15);color:#475569;}
 :root.light #themeBtnMob{background:rgba(0,0,0,.08);border-color:rgba(0,0,0,.18);color:#475569;}
 
-/* ── RESUME BUILDER ─────────────────────────────── */
+/* â”€â”€ RESUME BUILDER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .res-tmpl-btn{padding:.32rem .75rem;border-radius:7px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:var(--tx2);font-size:.75rem;font-weight:700;cursor:pointer;font-family:var(--fm);transition:all .15s;}
 .res-tmpl-btn:hover{border-color:rgba(56,189,248,.4);color:var(--tx);}
 .res-tmpl-btn.active{background:var(--c);border-color:var(--c);color:#000;}
@@ -582,7 +582,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 :root.light .res-tmpl-btn{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.15);color:#475569;}
 :root.light .res-tmpl-btn.active{background:var(--c);color:#000;}
 
-/* ── RESUME PREVIEW TEMPLATES ───────────────────── */
+/* â”€â”€ RESUME PREVIEW TEMPLATES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 #resumePreview{font-size:11px;line-height:1.5;}
 
 /* PRINT STYLES */
@@ -597,11 +597,11 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
   @page{margin:.5in;size:letter;}
 }
 
-/* ── CAREER HUB TABS ────────────────────────────── */
+/* â”€â”€ CAREER HUB TABS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .r-panel{display:none;}
 .r-panel.active{display:block;animation:fadeUp .2s ease;}
 
-/* ── JOB TRACKER ────────────────────────────────── */
+/* â”€â”€ JOB TRACKER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .jb-link{display:inline-flex;align-items:center;gap:.4rem;padding:.38rem .85rem;border-radius:8px;font-size:.78rem;font-weight:700;color:#fff;text-decoration:none;transition:filter .15s;}
 .jb-link:hover{filter:brightness(1.15);}
 .ja-card{background:var(--s2);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:.85rem 1rem;position:relative;transition:border-color .15s;}
@@ -621,7 +621,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .st-no{background:rgba(248,113,113,.15);color:#fca5a5;}
 .st-withdrew{background:rgba(148,163,184,.1);color:#64748b;}
 
-/* ── INTERVIEW PREP ──────────────────────────────── */
+/* â”€â”€ INTERVIEW PREP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .prep-tip-row{display:flex;align-items:flex-start;gap:.7rem;padding:.6rem .7rem;border-radius:9px;margin-bottom:.35rem;background:rgba(255,255,255,.04);font-size:.82rem;color:var(--tx2);line-height:1.55;}
 .prep-tip-row b{color:var(--tx);}
 .prep-gold{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);}
@@ -646,7 +646,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 :root.light .bq-item{background:rgba(0,0,0,.03);color:#475569;}
 :root.light .jb-link{opacity:.95;}
 
-/* ── HERO CARD (full bleed photo) ───────────────── */
+/* â”€â”€ HERO CARD (full bleed photo) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .logo-color-opt{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .12s;}
 .logo-color-opt.active{border-color:#fff;box-shadow:0 0 0 2px var(--c);}
 .logo-icon-opt.active{background:var(--c) !important;border-radius:5px;padding:.15rem .35rem;}
@@ -739,8 +739,8 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
   margin-top:.3rem;letter-spacing:.5px;
 }
 
-/* ── ACCENT PALETTE SYSTEM ──────────────────────── */
-/* Default (Cyan) — already set in :root */
+/* â”€â”€ ACCENT PALETTE SYSTEM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* Default (Cyan) â€” already set in :root */
 
 :root[data-palette="violet"]{
   --c:#8b5cf6;--p:#06b6d4;--gr:#34d399;--g:#fbbf24;
@@ -798,7 +798,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 :root.light .hero-greet{color:rgba(30,41,59,.7);}
 :root.light .hero-date{color:rgba(30,41,59,.6);}
 
-/* ── TAX EDUCATION ──────────────────────────────── */
+/* â”€â”€ TAX EDUCATION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .tax-lesson{border-left:3px solid rgba(251,191,36,.3);padding:.6rem .8rem;margin-bottom:.55rem;background:rgba(255,255,255,.03);border-radius:0 8px 8px 0;}
 .tax-lesson-title{font-size:.8rem;font-weight:800;color:var(--tx);margin-bottom:.3rem;letter-spacing:.3px;}
 .tax-callout{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:.55rem .75rem;font-size:.78rem;color:var(--tx2);line-height:1.55;}
@@ -827,7 +827,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 :root.light .tax-link{background:#f8fafc;border-color:rgba(0,0,0,.08);color:var(--c);}
 :root.light .tax-pro-tip{background:rgba(251,191,36,.05);}
 
-/* ══ LIFE SKILLS ACADEMY ════════════════════════════════════ */
+/* â•â• LIFE SKILLS ACADEMY â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 /* Grid cards */
 .sk-card{
@@ -844,7 +844,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .sk-pending{background:rgba(56,189,248,.1);color:var(--c);border:1px solid rgba(56,189,248,.2);}
 .sk-card-score{font-size:.62rem;color:var(--g);margin-top:.15rem;}
 .sk-certified{border-color:rgba(251,191,36,.4)!important;background:rgba(251,191,36,.06)!important;}
-.sk-certified::after{content:'🏆';position:absolute;top:.4rem;right:.5rem;font-size:.8rem;}
+.sk-certified::after{content:'ðŸ†';position:absolute;top:.4rem;right:.5rem;font-size:.8rem;}
 
 /* Stats pills */
 .sk-stat-pill{display:inline-flex;align-items:center;gap:.3rem;padding:.28rem .65rem;border-radius:100px;font-size:.72rem;font-weight:700;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:var(--tx2);}
@@ -906,14 +906,14 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 :root.light .sk-cert{background:linear-gradient(135deg,#f8fafc 0%,#fff 50%,#f8fafc 100%);}
 :root.light .sk-cert-name{color:#0f172a;}
 
-/* ── UPGRADED ACADEMY CARDS ─────────────────────────── */
+/* â”€â”€ UPGRADED ACADEMY CARDS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .sk-card{position:relative;overflow:hidden;transition:all .2s cubic-bezier(.4,0,.2,1);}
 .sk-card:hover{transform:translateY(-4px) scale(1.01);box-shadow:0 8px 32px rgba(0,0,0,.3);}
 .sk-card-glow{position:absolute;inset:0;pointer-events:none;transition:opacity .2s;}
 .sk-card:hover .sk-card-glow{opacity:1.5;}
 .sk-card-badge{font-size:.62rem;font-weight:800;margin-top:.4rem;padding:.2rem .55rem;border-radius:100px;border:1px solid;display:inline-block;}
 
-/* ── REFERENCE LINKS ─────────────────────────────────── */
+/* â”€â”€ REFERENCE LINKS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .sk-refs-block{margin-top:1.2rem;padding-top:.9rem;border-top:1px solid rgba(255,255,255,.08);}
 .sk-refs-title{font-size:.7rem;font-weight:800;letter-spacing:1.5px;color:var(--tx2);text-transform:uppercase;margin-bottom:.55rem;}
 .sk-ref-link{display:flex;align-items:flex-start;gap:.65rem;padding:.55rem .7rem;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);text-decoration:none;margin-bottom:.35rem;transition:all .14s;color:var(--tx);}
@@ -922,7 +922,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .sk-ref-label{font-size:.8rem;font-weight:700;color:var(--c);}
 .sk-ref-desc{font-size:.72rem;color:var(--tx2);margin-top:.1rem;}
 
-/* ── GORGEOUS CERTIFICATE ────────────────────────────── */
+/* â”€â”€ GORGEOUS CERTIFICATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .sk-cert-outer{background:linear-gradient(145deg,#0d1117 0%,#111827 40%,#0d1117 100%);border-radius:18px;padding:4px;background-clip:padding-box;}
 .sk-cert-inner{position:relative;border-radius:15px;padding:2.2rem 1.8rem 1.8rem;background:radial-gradient(ellipse at 50% 0%,rgba(255,255,255,.04) 0%,transparent 70%),linear-gradient(145deg,#0f172a,#1e293b);}
 .sk-cert-corner{position:absolute;width:22px;height:22px;border-width:3px;border-style:solid;}
@@ -946,7 +946,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 :root.light .sk-cert-inner{background:linear-gradient(145deg,#f0f4f8,#fff);}
 :root.light .sk-cert-name{color:#0f172a;}
 
-/* ── QUIZ — one-at-a-time redesign ─────────────────── */
+/* â”€â”€ QUIZ â€” one-at-a-time redesign â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .sk-q-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:1.1rem;overflow:hidden;}
 .sk-q-header{display:flex;gap:.75rem;align-items:flex-start;border-left:3px solid;padding-left:.75rem;margin-bottom:.85rem;}
 .sk-q-tag{font-size:.65rem;font-weight:900;letter-spacing:1px;padding:.2rem .55rem;border-radius:6px;flex-shrink:0;margin-top:.1rem;}
@@ -1001,9 +1001,9 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 :root.light .sk-q-opt-letter{background:rgba(0,0,0,.08);}
 :root.light .sk-result-card{background:#f8fafc;}
 
-/* ════════════════════════════════════════════════════
-   IMMERSIVE LESSON MODAL — accordion + progress design
-   ════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   IMMERSIVE LESSON MODAL â€” accordion + progress design
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 /* Hero banner inside modal */
 .sk-hero{
@@ -1129,9 +1129,9 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 :root.light .sk-ref-link{background:#f8fafc;border-color:#e2e8f0;}
 
 
-/* ═══════════════════════════════════════
-   GOALS & VISION — expanded section CSS
-   ═══════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   GOALS & VISION â€” expanded section CSS
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 /* Vision statement banner */
 .gv-vision-card{
@@ -1166,7 +1166,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 }
 .gv-vision-edit:hover{background:rgba(139,92,246,.12);color:var(--tx);}
 
-/* Timeline row — 1/3/5/10 year */
+/* Timeline row â€” 1/3/5/10 year */
 .gv-timeline{
   display:grid;grid-template-columns:repeat(4,1fr);
   gap:.5rem;margin-bottom:1rem;
@@ -1290,9 +1290,9 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 :root.light .gv-stat{background:#fff;border-color:#e2e8f0;}
 
 
-/* ═══════════════════════════════════════
-   CAREER EXPLORER — cards + modal CSS
-   ═══════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   CAREER EXPLORER â€” cards + modal CSS
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 /* Career grid cards */
 .cv-card{
@@ -1407,9 +1407,9 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 :root.light .cm-header{border-bottom-color:#e2e8f0;}
 
 
-/* ═══════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    USER PROFILE SYSTEM
-   ═══════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 /* Profile button in sidebar / hero */
 .profile-btn{
@@ -1628,10 +1628,10 @@ body{top:0!important;}
 #goog-gt-tt{display:none!important;}
 
 
-/* ════ FLOATING START-HERE BUTTON ════════════════════════ */
+/* â•â•â•â• FLOATING START-HERE BUTTON â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 #startHereBtn{
   position:fixed;
-  /* Hero section center — below top bars, visible in hero */
+  /* Hero section center â€” below top bars, visible in hero */
   bottom:auto;
   top:50%;
   right:50%;
@@ -1672,7 +1672,7 @@ body{top:0!important;}
   #startHereBtn{ top:55%; right:12px; }
 }
 
-/* ════ ONBOARDING WIZARD (PARENT) ═══════════════════════ */
+/* â•â•â•â• ONBOARDING WIZARD (PARENT) â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 #parentOnboard{
   display:none;position:fixed;inset:0;z-index:99998;
   background:rgba(0,0,0,.93);backdrop-filter:blur(18px);
@@ -1680,7 +1680,7 @@ body{top:0!important;}
 }
 #parentOnboard.open{display:flex;animation:fadeInModal .35s ease;}
 
-/* ════ ONBOARDING WIZARD (KID) ══════════════════════════ */
+/* â•â•â•â• ONBOARDING WIZARD (KID) â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 #kidOnboard{
   display:none;position:fixed;inset:0;z-index:99998;
   background:rgba(0,0,0,.93);backdrop-filter:blur(18px);
@@ -1690,10 +1690,10 @@ body{top:0!important;}
 
 @keyframes fadeInModal{from{opacity:0;transform:scale(.96);}to{opacity:1;transform:none;}}
 
-/* ════ SHARED WIZARD STYLES ═════════════════════════════ */
-/* ═══════════════════════════════════════════════════════
-   ONBOARDING WIZARD — FULL REWRITE (bigger, animated)
-═══════════════════════════════════════════════════════ */
+/* â•â•â•â• SHARED WIZARD STYLES â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   ONBOARDING WIZARD â€” FULL REWRITE (bigger, animated)
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 /* Backdrop */
 #parentOnboard, #kidOnboard {
@@ -1924,7 +1924,7 @@ body{top:0!important;}
 #kidOnboard .ob-hero-emoji { filter:drop-shadow(0 8px 24px rgba(245,158,11,.3)); }
 
 
-/* ════ ENHANCED TUTORIAL MODAL ══════════════════════════ */
+/* â•â•â•â• ENHANCED TUTORIAL MODAL â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 #tutModal{
   display:none;position:fixed;inset:0;
   background:rgba(0,0,0,.94);backdrop-filter:blur(16px);
@@ -2000,7 +2000,7 @@ body{top:0!important;}
 :root.light #tutInner{background:linear-gradient(160deg,#f8fafc,#f1f5f9);}
 :root.light .tut-header{background:rgba(56,189,248,.04);}
 
-/* ── AUTH SCREEN ─────────────────────────────────────────────── */
+/* â”€â”€ AUTH SCREEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 #authScreen input:focus {
   border-color: rgba(56,189,248,.5) !important;
   background: rgba(255,255,255,.09) !important;
@@ -2009,30 +2009,30 @@ body{top:0!important;}
 #authLoading { animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── LIGHT MODE CONTRAST FIXES ───────────────────────────────
+/* â”€â”€ LIGHT MODE CONTRAST FIXES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    Overrides hardcoded white/yellow text that's invisible on
    light backgrounds. Grouped by section.
-─────────────────────────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
-/* Hero — scripture/motivation text (hardcoded #fde68a yellow) */
+/* Hero â€” scripture/motivation text (hardcoded #fde68a yellow) */
 :root.light #heroMotivation { color: #92400e !important; }
 :root.light #heroMotivationAuthor { color: rgba(120,53,15,.6) !important; }
 
-/* Hero — clock (hardcoded rgba(255,255,255,.85)) */
+/* Hero â€” clock (hardcoded rgba(255,255,255,.85)) */
 :root.light #heroClock { color: #1e3a5f !important; }
 
-/* Hero card — ensure text readable when no photo set */
+/* Hero card â€” ensure text readable when no photo set */
 :root.light .hero-card.no-photo .hero-greet { color: #334155; }
 :root.light .hero-card.no-photo .hero-name  { color: #0f172a; }
 :root.light .hero-card.no-photo .hero-date  { color: #475569; }
 
-/* Dashboard cards — white text on card backgrounds */
+/* Dashboard cards â€” white text on card backgrounds */
 :root.light .dcard { background: #fff; border-color: rgba(0,0,0,.1); }
 :root.light .dcard-label { color: #64748b; }
 :root.light .dcard-value { color: #0f172a; }
 :root.light .dcard-sub   { color: #94a3b8; }
 
-/* Parent Bucks — hardcoded #fbbf24 yellow on white bg */
+/* Parent Bucks â€” hardcoded #fbbf24 yellow on white bg */
 :root.light #heroPBBalance,
 :root.light #qsPB,
 :root.light #schoolPBBalance,
@@ -2042,7 +2042,7 @@ body{top:0!important;}
 /* Parent Bucks label */
 :root.light [style*="color:#fbbf24"] { color: #b45309 !important; }
 
-/* Scripture / Devotional section — hardcoded white text on dark cards */
+/* Scripture / Devotional section â€” hardcoded white text on dark cards */
 :root.light #devTitle,
 :root.light #devScripture,
 :root.light #ddmTitle { color: #0f172a !important; }
@@ -2052,7 +2052,7 @@ body{top:0!important;}
 :root.light [style*="color:rgba(255,255,255,.7)"],
 :root.light [style*="color:rgba(255,255,255,.8)"] { color: #475569 !important; }
 
-/* Modals & overlays — PIN modal, char modal, child login */
+/* Modals & overlays â€” PIN modal, char modal, child login */
 :root.light #pinModalTitle,
 :root.light #charTitle,
 :root.light #ddmTitle { color: #0f172a !important; }
@@ -2063,7 +2063,7 @@ body{top:0!important;}
 :root.light #clChildName { color: #0f172a !important; }
 :root.light [style*="color:rgba(255,255,255,.45)"] { color: #64748b !important; }
 
-/* Toolbar buttons (resume editor) — white on white issue */
+/* Toolbar buttons (resume editor) â€” white on white issue */
 :root.light .rtb {
   background: rgba(0,0,0,.05);
   border-color: rgba(0,0,0,.15);
@@ -2080,17 +2080,17 @@ body{top:0!important;}
   border-color: rgba(0,0,0,.1) !important;
 }
 
-/* Reading speed / comprehension test — white placeholder */
+/* Reading speed / comprehension test â€” white placeholder */
 :root.light [style*="color:rgba(255,255,255,.3)"] { color: #94a3b8 !important; }
 
 /* Fuel wall / quote cards */
 :root.light .fst { background: #fff; border-color: rgba(0,0,0,.1); }
 
-/* Nav banner (top strip) — white links */
+/* Nav banner (top strip) â€” white links */
 :root.light #topBanner a,
 :root.light #topBanner span { color: #0f172a !important; }
 
-/* Settings panel — rgba white borders and backgrounds */
+/* Settings panel â€” rgba white borders and backgrounds */
 :root.light #sp button[style*="rgba(255,255,255"] {
   background: rgba(0,0,0,.05) !important;
   border-color: rgba(0,0,0,.12) !important;
@@ -2110,3 +2110,12 @@ body{top:0!important;}
 
 /* Spin wheel / scratch card text */
 :root.light [style*="color:rgba(255,255,255,.5)"] { color: #64748b !important; }
+
+/* â”€â”€ PARENT vs CHILD HERO CARD VISIBILITY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   body.parent-view = parent is the active viewer (no child PIN login)
+   body.child-view  = a child profile is active
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+body.parent-view #heroCard         { display: none !important; }
+body.parent-view #parentWelcomeCard{ display: block !important; }
+body.child-view  #heroCard         { display: block !important; }
+body.child-view  #parentWelcomeCard{ display: none !important; }
