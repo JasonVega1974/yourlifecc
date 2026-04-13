@@ -159,6 +159,7 @@ function initResume() {
   _populateResumeSelect();
 
   _resumeRestoring = false;
+  rClearDirty();
 
   // Single preview render after full restore — not per-entry
   livePreview();
@@ -367,11 +368,8 @@ function printResume() {
 function livePreview() {
   const el = document.getElementById('resumePreview');
   if (!el) return;
-  // If user has manually edited the preview, ask before overwriting
-  if (_resumeDirty && !_resumeRestoring) {
-    if (!confirm('You have unsaved edits in the preview.\n\nOverwrite with form fields?')) return;
-    _resumeDirty = false;
-  }
+  // If user manually edited the preview, don't overwrite — let them use ↺ Reset
+  if (_resumeDirty && !_resumeRestoring) return;
 
   const v = id => { const e = document.getElementById(id); return e ? (e.value || '').trim() : ''; };
 
@@ -666,7 +664,20 @@ function renderJobApps() {
 let _resumeDirty = false; // true when user has manually edited the preview
 
 function rMarkDirty() {
+  if (_resumeDirty) return; // already dirty, no need to update badge again
   _resumeDirty = true;
+  // Show "Edited" badge so user knows preview is decoupled from fields
+  const lbl = document.querySelector('#resumeToolbar span');
+  if (lbl) {
+    lbl.innerHTML = 'LIVE PREVIEW <span style="background:#f59e0b;color:#000;font-size:.55rem;padding:.08rem .3rem;border-radius:4px;margin-left:.3rem;font-weight:900;">✏️ EDITED</span>';
+  }
+}
+
+function rClearDirty() {
+  _resumeDirty = false;
+  // Restore label
+  const lbl = document.querySelector('#resumeToolbar span');
+  if (lbl) lbl.innerHTML = 'LIVE PREVIEW';
 }
 
 // execCommand wrapper — focuses preview first so commands apply
@@ -698,10 +709,7 @@ function rResetFromFields() {
   if (_resumeDirty) {
     if (!confirm('This will discard all manual edits in the preview and rebuild from your form fields.\n\nContinue?')) return;
   }
-  _resumeDirty = false;
-  // Temporarily bypass dirty check
-  const wasDirty = _resumeDirty;
-  _resumeDirty = false;
+  rClearDirty();
 
   const v = id => { const e = document.getElementById(id); return e ? (e.value||'').trim() : ''; };
   const tmpl = _resumeTemplate || 'modern';
