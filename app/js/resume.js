@@ -228,15 +228,12 @@ function _resumePageHtml(forPrint) {
     '<div style="font-size:.6rem;font-weight:900;letter-spacing:2px;text-transform:uppercase;' +
     'color:#1e3a5f;border-bottom:2px solid #1e3a5f;padding-bottom:.18rem;margin:.8rem 0 .45rem;">' + label + '</div>';
 
-  const ciP = (label, val) => val
-    ? '<div style="margin-bottom:.32rem;"><span style="font-size:.56rem;font-weight:700;color:#7dd3fc;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:.05rem;">' + label + '</span><span>' + escHtml(val) + '</span></div>'
-    : '';
   const contactItems = [
-    ciP('Email',    d.email),
-    ciP('Phone',    d.phone),
-    ciP('Location', d.location),
-    ciP('LinkedIn', d.linkedin),
-    ciP('Website',  d.website),
+    d.email    ? '<div style="margin-bottom:.25rem;">&#9993; ' + escHtml(d.email) + '</div>' : '',
+    d.phone    ? '<div style="margin-bottom:.25rem;">&#128222; ' + escHtml(d.phone) + '</div>' : '',
+    d.location ? '<div style="margin-bottom:.25rem;">&#128205; ' + escHtml(d.location) + '</div>' : '',
+    d.linkedin ? '<div style="margin-bottom:.25rem;">&#128279; LinkedIn: ' + escHtml(d.linkedin) + '</div>' : '',
+    d.website  ? '<div style="margin-bottom:.25rem;">&#127760; ' + escHtml(d.website) + '</div>' : '',
   ].join('');
 
   const skillsList = d.skills ? d.skills.split(',').map(s => s.trim()).filter(Boolean)
@@ -281,6 +278,9 @@ function _resumePageHtml(forPrint) {
     'body{background:#e5e7eb;display:flex;justify-content:center;padding:.4in 0;min-height:100vh;}' +
     '#page{box-shadow:0 8px 40px rgba(0,0,0,.3);}';
 
+  const printTip = forPrint ? '' :
+    '<div style="position:fixed;bottom:0;left:0;right:0;background:#1e3a5f;color:#7dd3fc;font-size:.7rem;text-align:center;padding:.4rem;font-family:Inter,sans-serif;">' +
+    '&#128161; To print: click Print/PDF above. In the print dialog, check <b style="color:#fff;">Background graphics</b> to show the blue sidebar.</div>';
   const autoprint = forPrint
     ? '<scr'+'ipt>window.onload=function(){window.print();}<'+'/scr'+'ipt>'
     : '';
@@ -293,7 +293,7 @@ function _resumePageHtml(forPrint) {
       'html,body{font-family:Inter,Arial,sans-serif;background:#fff;}' +
       '@page{size:8.5in 11in portrait;margin:0;}' +
       '#page{width:8.5in;min-height:11in;display:grid;grid-template-columns:2.8in 5.7in;}' +
-      '#sidebar{background:#1e3a5f;color:#e0f0ff;padding:.55in .3in .4in .35in;min-height:11in;-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
+      '#sidebar{background:#1e3a5f!important;color:#e0f0ff!important;padding:.55in .3in .4in .35in;min-height:11in;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important;}' +
       '#main{background:#fff;padding:.5in .4in .4in .4in;min-height:11in;}' +
       '@media print{' +
         'html,body{width:8.5in;}' +
@@ -304,9 +304,10 @@ function _resumePageHtml(forPrint) {
       previewCss +
     '</style></head><body>' +
     '<div id="page">' +
-      '<div id="sidebar">' + sidebar + '</div>' +
-      '<div id="main">' + main + '</div>' +
+      '<div id="sidebar" style="background:#1e3a5f!important;color:#e0f0ff!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;">' + sidebar + '</div>' +
+      '<div id="main" style="background:#ffffff!important;">' + main + '</div>' +
     '</div>' +
+    printTip +
     autoprint +
     '</body></html>';
 }
@@ -401,15 +402,12 @@ function _tmplModern(d) {
   const sideHead = label => `<div style="font-size:.58rem;font-weight:900;letter-spacing:2.5px;text-transform:uppercase;color:#7dd3fc;border-bottom:1px solid rgba(255,255,255,.15);padding-bottom:.2rem;margin:1rem 0 .45rem;">${label}</div>`;
   const mainHead = label => `<div style="font-size:.6rem;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:#1e3a5f;border-bottom:2px solid #1e3a5f;padding-bottom:.18rem;margin:1rem 0 .5rem;">${label}</div>`;
 
-  const ci = (label, val) => val
-    ? `<div style="margin-bottom:.3rem;"><span style="font-size:.58rem;font-weight:700;color:#7dd3fc;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:.06rem;">${label}</span><span>${escHtml(val)}</span></div>`
-    : '';
   const contactItems = [
-    ci('Email',    d.email),
-    ci('Phone',    d.phone),
-    ci('Location', d.location),
-    ci('LinkedIn', d.linkedin),
-    ci('Website',  d.website),
+    d.email    ? `<div style="margin-bottom:.25rem;">✉ ${escHtml(d.email)}</div>` : '',
+    d.phone    ? `<div style="margin-bottom:.25rem;">📞 ${escHtml(d.phone)}</div>` : '',
+    d.location ? `<div style="margin-bottom:.25rem;">📍 ${escHtml(d.location)}</div>` : '',
+    d.linkedin ? `<div style="margin-bottom:.25rem;">🔗 LinkedIn: ${escHtml(d.linkedin)}</div>` : '',
+    d.website  ? `<div style="margin-bottom:.25rem;">🌐 ${escHtml(d.website)}</div>` : '',
   ].join('');
 
   const skillsList = d.skills ? d.skills.split(',').map(s => s.trim()).filter(Boolean)
