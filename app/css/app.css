@@ -2090,11 +2090,21 @@ body{top:0!important;}
 :root.light #topBanner a,
 :root.light #topBanner span { color: #0f172a !important; }
 
-/* Settings panel — rgba white borders and backgrounds */
-:root.light #sp button[style*="rgba(255,255,255"] {
+/* Settings panel — rgba white borders/backgrounds — exclude swatches */
+:root.light #sp button[style*="rgba(255,255,255"]:not(.swatch-btn) {
   background: rgba(0,0,0,.05) !important;
   border-color: rgba(0,0,0,.12) !important;
   color: #334155 !important;
+}
+/* Swatch buttons: preserve their gradient background, just fix border */
+:root.light .swatch-row > button {
+  border-color: rgba(0,0,0,.25) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,.2) !important;
+  outline: none !important;
+}
+:root.light .swatch-row > button:first-child {
+  background: #e2e8f0 !important;
+  color: #475569 !important;
 }
 
 /* Bible section dark card backgrounds */
@@ -2124,41 +2134,21 @@ body.child-view  #parentWelcomeCard{ display: none !important; }
    All swatch types get visible borders/shadows against white bg.
 ─────────────────────────────────────────────────────────────── */
 
-/* Banner + Background gradient swatches */
-:root.light .swatch-row button {
-  border-color: rgba(0,0,0,.22) !important;
-  box-shadow: 0 1px 6px rgba(0,0,0,.18) !important;
-}
-
-/* Accent color round swatches (palette-swatch class) */
+/* ── ACCENT swatch borders in light mode */
 :root.light .palette-swatch {
-  border: 2px solid rgba(0,0,0,.15) !important;
-  box-shadow: 0 2px 6px rgba(0,0,0,.18) !important;
+  border: 2px solid rgba(0,0,0,.2) !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,.15) !important;
 }
 :root.light .palette-swatch.active {
-  border-color: rgba(0,0,0,.4) !important;
-  box-shadow: 0 0 0 3px rgba(0,0,0,.15), 0 2px 6px rgba(0,0,0,.2) !important;
+  border-color: rgba(0,0,0,.45) !important;
+  box-shadow: 0 0 0 3px rgba(0,0,0,.15) !important;
 }
 
 /* ── CHILD DASHBOARD CONTENT — hidden in parent view ────────── */
 body.parent-view #childDashContent { display: none !important; }
 body.child-view  #childDashContent { display: block !important; }
 
-/* ── SWATCH ROWS — force visibility in light mode ────────────
-   The gradient swatches ARE there, but the settings panel (#sp)
-   background in light mode is white, making light-colored swatches
-   hard to see. Add a strong outline to every swatch button.
-   Using :not() to avoid hitting other buttons.
-─────────────────────────────────────────────────────────────── */
-:root.light .swatch-row > button {
-  outline: 2px solid rgba(0,0,0,.25) !important;
-  box-shadow: 0 2px 6px rgba(0,0,0,.2) !important;
-}
-:root.light .swatch-row > button:first-child {
-  background: #e2e8f0 !important;
-  color: #475569 !important;
-  outline-color: rgba(0,0,0,.2) !important;
-}
+
 
 /* ── TOP QUICK BUTTONS BAR — light mode fix ─────────────────
    #topQuickBtns has hardcoded dark background rgba(10,10,15,.95)
