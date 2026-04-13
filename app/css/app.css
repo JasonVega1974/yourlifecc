@@ -2120,18 +2120,22 @@ body.parent-view #parentWelcomeCard{ display: block !important; }
 body.child-view  #heroCard         { display: block !important; }
 body.child-view  #parentWelcomeCard{ display: none !important; }
 
-/* ── SETTINGS PANEL — color swatch borders in light mode ─────
-   Swatches use rgba(255,255,255,.1) borders — invisible on light bg.
-   Give them a visible border so all swatches are distinguishable.
+/* ── SETTINGS PANEL — color swatch visibility in light mode ──
+   All swatch types get visible borders/shadows against white bg.
 ─────────────────────────────────────────────────────────────── */
-:root.light #sp button[style*="border:1px solid rgba(255,255,255"],
-:root.light #sp button[style*="border:1.5px solid rgba(255,255,255"] {
-  border-color: rgba(0,0,0,.18) !important;
-  box-shadow: 0 1px 4px rgba(0,0,0,.1);
+
+/* Banner + Background gradient swatches */
+:root.light .swatch-row button {
+  border-color: rgba(0,0,0,.22) !important;
+  box-shadow: 0 1px 6px rgba(0,0,0,.18) !important;
 }
 
-/* The ✕ clear button specifically */
-:root.light #sp button[style*="background:var(--bg)"] {
-  border-color: rgba(0,0,0,.2) !important;
-  color: #475569 !important;
+/* Accent color round swatches (palette-swatch class) */
+:root.light .palette-swatch {
+  border: 2px solid rgba(0,0,0,.15) !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,.18) !important;
+}
+:root.light .palette-swatch.active {
+  border-color: rgba(0,0,0,.4) !important;
+  box-shadow: 0 0 0 3px rgba(0,0,0,.15), 0 2px 6px rgba(0,0,0,.2) !important;
 }
