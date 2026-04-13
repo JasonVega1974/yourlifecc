@@ -212,88 +212,41 @@ function _resumePageHtml(forPrint) {
   const preview = document.getElementById('resumePreview');
   if (!preview) return null;
   const name = (document.getElementById('rName') || {}).value || 'Resume';
-  return `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>${escHtml(name)} — Resume</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; background: #fff; }
-    body { font-family: 'Inter', Arial, sans-serif; }
 
-    /* The resume card fills the page exactly */
-    #resume-root {
-      width: 8.5in;
-      min-height: 11in;
-      margin: 0 auto;
-      background: #fff;
-      display: grid;
-      grid-template-columns: 38% 62%;
-    }
+  // Pull sidebar and main HTML directly from the rendered grid children
+  const root = preview.querySelector('div');
+  const sideEl = root ? root.children[0] : null;
+  const mainEl = root ? root.children[1] : null;
+  const sideHtml = sideEl ? sideEl.innerHTML : '';
+  const mainHtml = mainEl ? mainEl.innerHTML : '';
 
-    /* Sidebar fills full height of the page */
-    #resume-sidebar {
-      background: #1e3a5f;
-      min-height: 11in;
-      padding: 0.75in 0.35in 0.5in 0.4in;
-      color: #e0f0ff;
-    }
+  const previewCss = forPrint ? '' :
+    'body{background:#e5e7eb;display:flex;justify-content:center;align-items:flex-start;padding:.4in 0;min-height:100vh;}' +
+    '#resume-root{box-shadow:0 8px 40px rgba(0,0,0,.25);}';
 
-    #resume-main {
-      background: #fff;
-      min-height: 11in;
-      padding: 0.6in 0.45in 0.5in 0.45in;
-      color: #111;
-    }
+  const autoprint = forPrint ? '<scr'+'ipt>window.onload=function(){window.print();}<'+'/scr'+'ipt>' : '';
 
-    @page {
-      size: letter portrait;
-      margin: 0;
-    }
-
-    @media print {
-      html, body { width: 8.5in; height: 11in; }
-      #resume-root { width: 8.5in; min-height: 11in; page-break-inside: avoid; }
-      #resume-sidebar { min-height: 11in; }
-      #resume-main { min-height: 11in; }
-      /* Hide browser date/time/URL/page number headers and footers */
-      head, header, footer { display: none !important; }
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-      color-adjust: exact !important;
-    }
-
-    ${forPrint ? '' : `
-    /* Preview mode: show page shadow */
-    body { background: #e5e7eb; display: flex; justify-content: center; padding: 0.4in 0; }
-    #resume-root { box-shadow: 0 8px 40px rgba(0,0,0,0.25); }
-    `}
-  </style>
-</head>
-<body>
-  ${preview.innerHTML.replace(
-    /style="display:grid;grid-template-columns:38% 62%;[^"]*"/,
-    'id="resume-root" style=""'
-  ).replace(
-    /style="background:#1e3a5f;color:#e0f0ff;padding:[^"]*"/,
-    'id="resume-sidebar" style=""'
-  ).replace(
-    /style="background:#fff;color:#111;padding:[^"]*"/,
-    'id="resume-main" style=""'
-  )}
-  ${forPrint ? '<script>window.onload=function(){window.print();}<\/script>' : ''}
-</body>
-</html>`;
-}
-
-function printResume() {
-  const html = _resumePageHtml(true);
-  if (!html) return;
-  const win = window.open('', '_blank');
-  win.document.write(html);
-  win.document.close();
+  return '<!DOCTYPE html><html><head><meta charset="utf-8">' +
+    '<title>' + escHtml(name) + ' Resume</title>' +
+    '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">' +
+    '<style>' +
+      '*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}' +
+      'html,body{background:#fff;font-family:Inter,Arial,sans-serif;}' +
+      '@page{size:8.5in 11in portrait;margin:0;}' +
+      '#resume-root{width:8.5in;height:11in;display:grid;grid-template-columns:38% 62%;overflow:hidden;}' +
+      '#resume-sidebar{background:#1e3a5f;color:#e0f0ff;padding:.55in .32in .4in .38in;height:11in;overflow:hidden;font-size:.78rem;line-height:1.45;}' +
+      '#resume-main{background:#fff;color:#111;padding:.5in .42in .4in .42in;height:11in;overflow:hidden;font-size:.82rem;line-height:1.5;}' +
+      '@media print{html,body{width:8.5in;height:11in;margin:0;padding:0;}' +
+      '#resume-root{width:8.5in;height:11in;}' +
+      '-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important;}' +
+      previewCss +
+    '</style></head><body>' +
+    '<div id="resume-root">' +
+      '<div id="resume-sidebar">' + sideHtml + '</div>' +
+      '<div id="resume-main">' + mainHtml + '</div>' +
+    '</div>' +
+    autoprint +
+    '</body></html>';
 }
 
 function previewResume() {
