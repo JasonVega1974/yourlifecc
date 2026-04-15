@@ -19,6 +19,13 @@ function save(){
   }
   localStorage.setItem(LS, JSON.stringify(D));
   showSaved();
+  // Keep the active profile snapshot current so switchToProfile()
+  // never loads stale data (fixes tutorial / devotional re-showing)
+  if(typeof _profiles !== 'undefined' && typeof _activeProfileId !== 'undefined' && _activeProfileId){
+    const _ap = _profiles.find(function(p){ return p.id === _activeProfileId; });
+    if(_ap){ _ap.data = JSON.parse(JSON.stringify(D)); }
+    if(typeof saveProfiles === 'function') saveProfiles();
+  }
   // Sync to Supabase if logged in (debounced 2s)
   clearTimeout(_wpTimer);
   _wpTimer = setTimeout(cloudSync, 2000);
