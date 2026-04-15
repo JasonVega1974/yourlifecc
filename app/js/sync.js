@@ -19,18 +19,6 @@ function save(){
   }
   localStorage.setItem(LS, JSON.stringify(D));
   showSaved();
-  // Keep the active profile snapshot current so switchToProfile()
-  // never loads stale data (fixes tutorial / devotional re-showing).
-  // IMPORTANT: do NOT call saveProfiles() here — saveProfiles() calls
-  // save(), which would create an infinite loop. Just patch in-memory
-  // and write the ylcc_profiles key directly.
-  if(typeof _profiles !== 'undefined' && typeof _activeProfileId !== 'undefined' && _activeProfileId){
-    const _ap = _profiles.find(function(p){ return p.id === _activeProfileId; });
-    if(_ap){
-      _ap.data = JSON.parse(JSON.stringify(D));
-      try{ localStorage.setItem('ylcc_profiles', JSON.stringify(_profiles)); }catch(e){}
-    }
-  }
   // Sync to Supabase if logged in (debounced 2s)
   clearTimeout(_wpTimer);
   _wpTimer = setTimeout(cloudSync, 2000);
@@ -164,4 +152,3 @@ function getCC(){ return null; }
 
 function saveCloud(){ showToast("Cloud sync is now handled automatically via Supabase ☁"); }
 function testCloud(){ showToast("Cloud sync is now handled automatically via Supabase ☁"); }
-
