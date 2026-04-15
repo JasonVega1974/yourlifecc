@@ -1491,6 +1491,10 @@ function switchToProfile(id){
   for(const key in D){ if(D.hasOwnProperty(key)) delete D[key]; }
   Object.assign(D, saved);
   D.name = profile.name;
+  // Ensure these fields exist but never overwrite a real saved value with a blank default
+  if(!D.scrReadDays || Array.isArray(D.scrReadDays)) D.scrReadDays = {};
+  if(D.devPopupSeen === undefined) D.devPopupSeen = '';
+  if(D.kidOnboardDone === undefined) D.kidOnboardDone = false;
   save();
 
   // Re-render everything
