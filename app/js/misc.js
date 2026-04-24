@@ -3288,27 +3288,38 @@ async function confirmDeleteAccount(){
       return;
     }
 
-    // Delete all data rows directly (RLS ensures users can only delete their own)
-    const uid = _supaUser.id;
-    const errors = [];
-
-    const tables = ['profiles', 'families', 'billing_history', 'age_verifications', 'contest_entries'];
-    for(const table of tables){
-      try {
-        const { error } = await supa.from(table).delete().eq('user_id', uid);
-        if(error) errors.push(table + ': ' + error.message);
-      } catch(e){ errors.push(table + ' exception'); }
+    // Get current JWT to authorize the Edge Function call.
+    const { data: { session } } = await supa.auth.getSession();
+    if(!session || !session.access_token){
+      msg.textContent = 'Session expired. Please sign in again and retry.';
+      btn.disabled = false; btn.textContent = 'Delete Forever';
+      return;
     }
 
-    if(errors.length > 0){
-      console.warn('[Delete Account] Some rows could not be deleted:', errors);
-      // Non-fatal — main profiles row is what matters
+    // Call the delete-account Edge Function. It uses the service_role key
+    // to bypass RLS, delete every user-owned row, AND remove the auth user
+    // itself — the only way to guarantee the account is fully gone.
+    const resp = await fetch('https://hrohgwcbfgywkpnvqxhk.supabase.co/functions/v1/delete-account', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + session.access_token
+      }
+    });
+
+    let result = {};
+    try { result = await resp.json(); } catch(_){ /* leave empty */ }
+
+    if(!resp.ok || !result.success){
+      msg.textContent = (result && result.error) ? result.error : 'Delete failed. Please contact info@kingdom-creatives.com';
+      btn.disabled = false; btn.textContent = 'Delete Forever';
+      return;
     }
 
-    // Sign out the user
-    await supa.auth.signOut();
-
-    // Clear all local storage
+    // Auth user is now deleted server-side. Sign out the dead session and
+    // wipe all local storage so legacy keys (e.g. dominic_v1) cannot pollute
+    // a future registration.
+    try { await supa.auth.signOut(); } catch(_){}
     localStorage.clear();
 
     closeDeleteAccountModal();
