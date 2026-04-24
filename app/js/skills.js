@@ -4913,8 +4913,11 @@ function showParentOnboard(){
   modal.style.cssText = '';
   modal.classList.add('open');
   document.body.style.overflow='hidden';
-  // Mark as seen immediately so it never auto-shows again after this visit
-  D.parentWizardDone = true; save();
+  // Mark as seen immediately so it never auto-shows again after this visit.
+  // Per-user localStorage flag survives cloudLoad() overwrites on refresh.
+  D.parentWizardDone = true;
+  try{ localStorage.setItem(_ylccUserKey('ylcc_parentWizardDone'), '1'); }catch(e){}
+  save();
 }
 function closeParentOnboard(){
   const modal = document.getElementById('parentOnboard'); if(!modal) return;
@@ -4922,7 +4925,9 @@ function closeParentOnboard(){
   modal.style.cssText = '';
   modal.style.display = 'none';
   document.body.style.overflow='';
-  D.parentWizardDone = true; save();
+  D.parentWizardDone = true;
+  try{ localStorage.setItem(_ylccUserKey('ylcc_parentWizardDone'), '1'); }catch(e){}
+  save();
   const btn = document.getElementById('startHereBtn');
   if(btn) btn.classList.add('sh-hidden');
   // Hide wizard return btn if wizard closed normally (not via wizGoTo)
