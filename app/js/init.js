@@ -6,6 +6,13 @@
 // ── DEMO MODE ─────────────────────────────────────────────────
 const IS_DEMO = new URLSearchParams(window.location.search).get('demo') === 'true';
 
+// Per-user localStorage key for UI state flags (wizard-done, devotional-seen, etc.)
+// that must survive cloudLoad() overwrites. Falls back to '_local' when no Supabase user.
+function _ylccUserKey(base){
+  var uid = (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.id) ? _supaUser.id : 'local';
+  return base + '_' + uid;
+}
+
 function loadDemoData(){
   D.name = 'Emma';
   D.chorePin = null;
@@ -229,15 +236,14 @@ function finishInit(cloudReady){
     const wizardOpen = (document.getElementById('parentOnboard')||{}).classList&&document.getElementById('parentOnboard').classList.contains('open');
     const kidWizOpen = (document.getElementById('kidOnboard')||{}).classList&&document.getElementById('kidOnboard').classList.contains('open');
     const alreadyRead = D.scrReadDays && D.scrReadDays[today];
-    // Check localStorage FIRST (persists across sign-ins, not blocked by cloud sync timing).
+    // Check localStorage FIRST (per-user key, survives cloudLoad overwrites).
     // Fall back to D.devPopupSeen for data migrated from older sessions.
-    const alreadySeen = localStorage.getItem('ylcc_devPopupSeen') === today || (D.devPopupSeen && D.devPopupSeen === today);
+    const alreadySeen = localStorage.getItem(_ylccUserKey('ylcc_devPopupSeen')) === today || (D.devPopupSeen && D.devPopupSeen === today);
     if(!IS_DEMO && faithOn && !alreadyRead && !alreadySeen && !wizardOpen && !kidWizOpen){
       showDailyDevModal();
-      // Mark as seen today in BOTH localStorage (device-level, survives sign-out)
-      // and D (cloud-synced). If showDailyDevModal already sets D.devPopupSeen,
-      // this line is still safe — just belt-and-suspenders.
-      localStorage.setItem('ylcc_devPopupSeen', today);
+      // Mark as seen today in BOTH localStorage (per-user, survives cloudLoad)
+      // and D (cloud-synced).
+      try{ localStorage.setItem(_ylccUserKey('ylcc_devPopupSeen'), today); }catch(e){}
       D.devPopupSeen = today;
     }
   }, popupDelay);
@@ -335,7 +341,7 @@ function finishInit(cloudReady){
   // being empty as a "new user" signal, because D.name is temporarily empty
   // on every sign-in before cloud data loads — that caused the wizard to
   // re-open on every refresh/login.
-  if(!IS_DEMO && !D.parentWizardDone){ setTimeout(showParentOnboard, 700); }
+  if(!IS_DEMO && !D.parentWizardDone && localStorage.getItem(_ylccUserKey('ylcc_parentWizardDone')) !== '1'){ setTimeout(showParentOnboard, 700); }
 
   // Macro goal inputs
   const g=D.macroGoals||{};
