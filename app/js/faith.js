@@ -1394,6 +1394,7 @@ function markDevotionalRead(){
   if(D.scrReadDays[today]){ showToast('Already marked today'); return; }
   D.scrReadDays[today] = true;
   D.devPopupSeen = today;
+  try{ if(typeof _ylccUserKey === 'function') localStorage.setItem(_ylccUserKey('ylcc_devPopupSeen'), today); }catch(e){}
   D.scrPoints = (D.scrPoints||0) + 5;
   save();
   showToast('Devotional read! +5 pts 🙏');
@@ -1405,8 +1406,10 @@ function markDevotionalRead(){
 }
 
 function showDailyDevModal(){
-  // Don't show if already read today OR already dismissed today
+  // Don't show if already read today OR already dismissed today.
+  // Per-user localStorage flag is authoritative — it survives cloudLoad() overwrites.
   const today = new Date().toISOString().slice(0,10);
+  if(typeof _ylccUserKey === 'function' && localStorage.getItem(_ylccUserKey('ylcc_devPopupSeen')) === today) return;
   if(D.devPopupSeen === today) return;
   if(D.scrReadDays && D.scrReadDays[today]) return;
   const idx = getDailyDevotionalIdx();
@@ -1435,9 +1438,11 @@ function closeDailyDevModal(){
   const el = document.getElementById('dailyDevModal'); if(!el) return;
   el.style.display = 'none';
   document.body.style.overflow = '';
-  // Mark as seen today so it won't show again until tomorrow
+  // Mark as seen today so it won't show again until tomorrow.
+  // Per-user localStorage flag survives cloudLoad() overwrites on refresh.
   const today = new Date().toISOString().slice(0,10);
   D.devPopupSeen = today;
+  try{ if(typeof _ylccUserKey === 'function') localStorage.setItem(_ylccUserKey('ylcc_devPopupSeen'), today); }catch(e){}
   save();
 }
 
@@ -1447,6 +1452,7 @@ function markDevFromPopup(){
   if(D.scrReadDays[today]){ showToast('Already marked today'); return; }
   D.scrReadDays[today] = true;
   D.devPopupSeen = today;
+  try{ if(typeof _ylccUserKey === 'function') localStorage.setItem(_ylccUserKey('ylcc_devPopupSeen'), today); }catch(e){}
   D.scrPoints = (D.scrPoints||0) + 5;
   save();
   // Close and update UI first — guards ensure missing modules don't block this
