@@ -3299,10 +3299,13 @@ async function confirmDeleteAccount(){
     // Call the delete-account Edge Function. It uses the service_role key
     // to bypass RLS, delete every user-owned row, AND remove the auth user
     // itself — the only way to guarantee the account is fully gone.
+    // Both headers are required: apikey identifies the project to the gateway,
+    // Authorization carries the user JWT the function uses to verify identity.
     const resp = await fetch('https://hrohgwcbfgywkpnvqxhk.supabase.co/functions/v1/delete-account', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'apikey': SUPA_KEY,
         'Authorization': 'Bearer ' + session.access_token
       }
     });
