@@ -1237,7 +1237,7 @@ function initProfiles(){
     if(!hasExplicitParent && _profiles.length > 0){
       _profiles[0].isParent = true;
     }
-    _activeProfileId = localStorage.getItem('ylcc_active_profile') || (D._activeProfileId||null);
+    _activeProfileId = localStorage.getItem(_ylccUserKey('ylcc_active_profile')) || (D._activeProfileId||null);
   } catch(e){ _profiles=[]; }
   // Auto-create parent profile from existing data if none exist
   if(_profiles.length === 0 && D.name){
@@ -1256,7 +1256,7 @@ function initProfiles(){
 
 function saveProfiles(){
   localStorage.setItem('ylcc_profiles', JSON.stringify(_profiles));
-  localStorage.setItem('ylcc_active_profile', _activeProfileId||'');
+  localStorage.setItem(_ylccUserKey('ylcc_active_profile'), _activeProfileId||'');
   // Persist into D so cloudSync carries profiles to all devices
   D._profiles = JSON.parse(JSON.stringify(_profiles));
   D._activeProfileId = _activeProfileId||'';
