@@ -17,6 +17,11 @@ function save(){
     D.resume.experience=collectEntries('exp');
     D.resume.education=collectEntries('edu');
   }
+  // Sync current profile data if in multi-profile mode (parent.js)
+  if(typeof _activeProfileId !== 'undefined' && _activeProfileId && typeof _profiles !== 'undefined'){
+    const curProfile = _profiles.find(p=>p.id===_activeProfileId);
+    if(curProfile) curProfile.data = JSON.parse(JSON.stringify(D));
+  }
   localStorage.setItem(LS, JSON.stringify(D));
   showSaved();
   // Sync to Supabase if logged in (debounced 2s)
