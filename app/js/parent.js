@@ -1347,7 +1347,7 @@ function _doUnlockParent(){
   if(gate) gate.style.display='none';
   if(content) content.style.display='block';
   updateIncConditions(); renderParentDash();
-  if(!D.parentWizardDone){ setTimeout(showParentOnboard,700); }
+  if(!D.parentWizardDone && localStorage.getItem(_ylccUserKey('ylcc_parentWizardDone')) !== '1'){ setTimeout(showParentOnboard,700); }
 }
 
 
