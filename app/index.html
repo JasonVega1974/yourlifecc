@@ -593,12 +593,12 @@
   <div style="background:#0f1523;border:1px solid rgba(56,189,248,.2);border-radius:20px;padding:2rem 1.8rem;width:92%;max-width:340px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.85);">
     <div style="font-size:2.5rem;margin-bottom:.6rem;">🚀</div>
     <div style="font-family:var(--fn);font-size:.8rem;font-weight:700;letter-spacing:2px;color:var(--c);margin-bottom:.3rem;">WELCOME TO LIFE OS</div>
-    <div style="font-size:.8rem;color:var(--tx2);margin-bottom:1.2rem;">Enter a name for the child using this account, or leave blank to use "Champion".</div>
-    <input id="welcomeNameInput" type="text" placeholder="Child's name (optional)" autocomplete="off"
+    <div style="font-size:.8rem;color:var(--tx2);margin-bottom:1.2rem;">What should we call you? You can add child profiles later from the Parent Hub.</div>
+    <input id="welcomeNameInput" type="text" placeholder="Your first name" autocomplete="given-name"
       style="width:100%;padding:.65rem .8rem;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff;font-size:.95rem;font-family:var(--fn);text-align:center;margin-bottom:1rem;box-sizing:border-box;"
       onkeydown="if(event.key==='Enter')welcomeSubmit()">
     <button onclick="welcomeSubmit()" class="btn bp" style="width:100%;font-size:.8rem;">Let's Go →</button>
-    <button onclick="document.getElementById('welcomeModal').style.display='none'" style="background:none;border:none;color:var(--tx3);font-size:.72rem;cursor:pointer;margin-top:.5rem;">Skip — use Champion</button>
+    <button onclick="document.getElementById('welcomeModal').style.display='none'" style="background:none;border:none;color:var(--tx3);font-size:.72rem;cursor:pointer;margin-top:.5rem;">Skip for now</button>
   </div>
 </div>
 
