@@ -14,8 +14,20 @@ let _parentDashUnlocked = sessionStorage.getItem('parentUnlocked')==='1';
 
 function unlockParentDash(){
   initChoreData();
+  // Hard rule: child profiles can never auto-unlock the Parent Hub.
+  // If a parent PIN isn't set yet, the parent (not a child) must set one first.
+  var _activeIsChild = false;
+  if(typeof _profiles !== 'undefined' && _profiles && typeof _activeProfileId !== 'undefined' && _activeProfileId){
+    var _ap = _profiles.find(function(p){ return p.id === _activeProfileId; });
+    if(_ap && _ap.isParent === false) _activeIsChild = true;
+  }
+  if(_activeIsChild){
+    var _err = document.getElementById('parentGateError');
+    if(_err) _err.textContent = 'Switch to your parent profile to access Parent Hub.';
+    return;
+  }
   if(D.parentPinDisabled){ _doUnlockParent(); return; }
-  // If no PIN set yet, let them straight in
+  // No PIN set — only the parent profile gets the friendly "let them in" path
   if(!D.chorePin && !D.parentPIN){ _doUnlockParent(); return; }
   // Submission handled by pgPinKey / _pgSubmit
 }
@@ -1342,6 +1354,18 @@ function _pgUpdateDots(){
   }
 }
 function _pgSubmit(){
+  // Same hard rule: child profiles can never satisfy the parent gate.
+  var _activeIsChild = false;
+  if(typeof _profiles !== 'undefined' && _profiles && typeof _activeProfileId !== 'undefined' && _activeProfileId){
+    var _ap2 = _profiles.find(function(p){ return p.id === _activeProfileId; });
+    if(_ap2 && _ap2.isParent === false) _activeIsChild = true;
+  }
+  if(_activeIsChild){
+    _pgBuffer=''; _pgUpdateDots();
+    var _err2 = document.getElementById('parentGateError');
+    if(_err2) _err2.textContent = 'Switch to your parent profile first.';
+    return;
+  }
   const off=!!D.parentPinDisabled;
   if(off){
     _pgBuffer=''; _pgUpdateDots();
@@ -1350,7 +1374,7 @@ function _pgSubmit(){
   }
   const correct=String(D.chorePin||D.parentPIN||'');
   if(!correct){
-    // No PIN set — just let them in
+    // No PIN set — just let them in (parent profile only, child blocked above)
     _pgBuffer=''; _pgUpdateDots();
     _doUnlockParent();
     return;
@@ -3856,9 +3880,19 @@ function _openChildSettings(cid){
 
 function quickParentHub(){
   if(typeof IS_DEMO !== 'undefined' && IS_DEMO){ showSection('s-parent'); _doUnlockParent(); return; }
+  // Hard rule: child profiles can never quick-jump into Parent Hub.
+  var _activeIsChild = false;
+  if(typeof _profiles !== 'undefined' && _profiles && _activeProfileId){
+    var _ap = _profiles.find(function(p){ return p.id === _activeProfileId; });
+    if(_ap && _ap.isParent === false) _activeIsChild = true;
+  }
+  if(_activeIsChild){
+    showToast('Switch to your parent profile to access Parent Hub.');
+    return;
+  }
   if(D.parentPinDisabled){ showSection('s-parent'); _doUnlockParent(); return; }
   if(_parentDashUnlocked){ showSection('s-parent'); return; }
-  // If no PIN set yet, let them straight in
+  // No PIN set — only the parent gets the friendly auto-open path
   if(!D.chorePin && !D.parentPIN){ showSection('s-parent'); _doUnlockParent(); return; }
   const init=(D.name||'P').charAt(0).toUpperCase();
   _requirePin('Parent Hub', 'Enter your 6-digit parent PIN', init, ()=>{
