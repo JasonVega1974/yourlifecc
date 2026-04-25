@@ -1225,11 +1225,18 @@ let _activeProfileId = null;
 
 function initProfiles(){
   try {
-    _profiles = JSON.parse(localStorage.getItem('ylcc_profiles')||'[]');
-    // If localStorage empty, try loading from D (synced from cloud on another device)
-    if(_profiles.length === 0 && D._profiles && D._profiles.length > 0){
+    // CLOUD WINS: when we have cloud-loaded data (D._profiles non-empty),
+    // trust it over localStorage. Previously localStorage took precedence,
+    // which caused stale-tab corruption: a tab that had old _profiles in
+    // localStorage would override fresh cloud data on every page load and
+    // then re-upload the stale data via cloudSync, permanently losing the
+    // server-side correction.
+    var _hasCloudProfiles = D && D._profiles && Array.isArray(D._profiles) && D._profiles.length > 0;
+    if(_hasCloudProfiles){
       _profiles = JSON.parse(JSON.stringify(D._profiles));
       localStorage.setItem('ylcc_profiles', JSON.stringify(_profiles));
+    } else {
+      _profiles = JSON.parse(localStorage.getItem('ylcc_profiles')||'[]');
     }
     // Migration: first profile is always parent if no isParent flag set
     if(_profiles.length > 0 && _profiles[0].isParent === undefined){
@@ -1241,8 +1248,13 @@ function initProfiles(){
     if(!hasExplicitParent && _profiles.length > 0){
       _profiles[0].isParent = true;
     }
-    // Try user-specific key first (per-user persistence), then fall back to D, then global key
-    _activeProfileId = localStorage.getItem(_ylccUserKey('ylcc_active_profile')) || (D._activeProfileId||null) || localStorage.getItem('ylcc_active_profile');
+    // Active profile: cloud wins when we have cloud data, otherwise fall back
+    // to localStorage chain (user-specific key, then global key).
+    if(_hasCloudProfiles && D._activeProfileId){
+      _activeProfileId = D._activeProfileId;
+    } else {
+      _activeProfileId = localStorage.getItem(_ylccUserKey('ylcc_active_profile')) || (D._activeProfileId||null) || localStorage.getItem('ylcc_active_profile');
+    }
   } catch(e){ _profiles=[]; }
   // Auto-create parent profile from existing data if none exist
   if(_profiles.length === 0 && D.name){
