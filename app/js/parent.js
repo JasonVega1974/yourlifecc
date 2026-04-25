@@ -6,7 +6,11 @@
 ============================================================= */
 
 // ── PARENT DASHBOARD ─────────────────────────────────────────
-let _parentDashUnlocked = sessionStorage.getItem('parentUnlocked')==='1' || localStorage.getItem('lifeos_parent_unlocked')==='1';
+// Unlock state is per-tab only. localStorage was previously honored here, but
+// it let any kid bypass the PIN by setting one key in DevTools. Session-scoped
+// unlock is forgotten when the tab closes — re-enter PIN per session.
+try { localStorage.removeItem('lifeos_parent_unlocked'); } catch(e){}
+let _parentDashUnlocked = sessionStorage.getItem('parentUnlocked')==='1';
 
 function unlockParentDash(){
   initChoreData();
@@ -1344,7 +1348,6 @@ function _pgSubmit(){
 function _doUnlockParent(){
   _parentDashUnlocked=true;
   sessionStorage.setItem('parentUnlocked','1');
-  localStorage.setItem('lifeos_parent_unlocked','1');
   const gate=document.getElementById('parentGate');
   const content=document.getElementById('parentDashContent');
   if(gate) gate.style.display='none';
