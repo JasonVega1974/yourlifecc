@@ -1295,11 +1295,18 @@ function switchParentView(profileId){
   if(!_profiles || !_profiles.length) return;
   const profile = _profiles.find(p=>p.id === profileId);
   if(!profile) return;
-  
+
   // Switch active profile to view their data
   _activeProfileId = profile.id;
   D = profile.data || {};
-  
+
+  // If we're switching the active profile to a child, re-lock the Parent Hub
+  // so any subsequent navigation to s-parent forces a fresh PIN entry.
+  if(profile.isParent === false){
+    _parentDashUnlocked = false;
+    try { sessionStorage.removeItem('parentUnlocked'); } catch(e){}
+  }
+
   // Re-render all parent dashboard components
   renderParentDashboard();
   showToast('Viewing: ' + profile.name);
