@@ -167,35 +167,7 @@ async function init(){
 
   // Check for existing Supabase session
   const supa = getSupabase();
-  if(supa){
-    // Keep _supaUser current whenever Supabase refreshes the token
-    supa.auth.onAuthStateChange(function(event, session){
-      if(session && session.user){
-        _supaUser = session.user;
-        if(event === 'TOKEN_REFRESHED') cloudSync();
-      } else if(event === 'SIGNED_OUT'){
-        _supaUser = null;
-        setSyncSt('local');
-      }
-    });
-
-    const { data: { session } } = await supa.auth.getSession();
-    if(session?.user){
-      _supaUser = session.user;
-
-      // ── CHECK SUBSCRIPTION STATUS ON EXISTING SESSION ──────
-      const blocked = await checkPlanStatus();
-      if(blocked) return; // show blocked screen, stop here
-
-      const loaded = await cloudLoad();
-      if(!loaded){ loadData(); setTimeout(cloudSync, 1500); } // load local + write row to Supabase
-      setSyncSt(loaded ? 'cloud' : 'cloud'); // user is signed in either way
-      if(!D.chorePin && !D.parentPIN){ showFirstTimeGate(); return; }
-      finishInit(true); // pass flag so popup shows after cloud data is confirmed loaded
-      setTimeout(setupContestFreeUser, 500); // Show contest banner if applicable
-      return;
-    }
-  } else {
+  if(!supa){
     // Supabase not available - use localStorage
     loadData();
     setSyncSt('local');
@@ -204,8 +176,65 @@ async function init(){
     return;
   }
 
+  // Register the auth listener FIRST so we never miss a SIGNED_IN/SIGNED_OUT
+  // event that fires while getSession() is in flight.
+  let _bootstrapped = false;
+  supa.auth.onAuthStateChange(function(event, session){
+    if(session && session.user){
+      _supaUser = session.user;
+      if(event === 'TOKEN_REFRESHED') cloudSync();
+    } else if(event === 'SIGNED_OUT'){
+      _supaUser = null;
+      setSyncSt('local');
+      // If we're already past bootstrap, kick the user back to the auth screen.
+      if(_bootstrapped){
+        const as = document.getElementById('authScreen');
+        if(as) as.style.display = 'flex';
+      }
+    }
+  });
+
+  let session = null;
+  try {
+    const result = await supa.auth.getSession();
+    session = result && result.data ? result.data.session : null;
+  } catch(e){
+    console.warn('[Init] getSession failed, falling back to local mode:', e);
+    loadData();
+    setSyncSt('local');
+    document.getElementById('authScreen').style.display = 'flex';
+    _bootstrapped = true;
+    return;
+  }
+
+  if(session && session.user){
+    _supaUser = session.user;
+
+    try {
+      // ── CHECK SUBSCRIPTION STATUS ON EXISTING SESSION ──────
+      const blocked = await checkPlanStatus();
+      if(blocked){ _bootstrapped = true; return; } // show blocked screen, stop here
+
+      const loaded = await cloudLoad();
+      if(!loaded){ loadData(); setTimeout(cloudSync, 1500); } // load local + write row to Supabase
+      setSyncSt('cloud');
+      if(!D.chorePin && !D.parentPIN){ showFirstTimeGate(); _bootstrapped = true; return; }
+      finishInit(true);
+      setTimeout(setupContestFreeUser, 500);
+    } catch(e){
+      console.error('[Init] Post-auth bootstrap failed:', e);
+      loadData();
+      setSyncSt('local');
+      finishInit();
+    }
+    _bootstrapped = true;
+    return;
+  }
+
   // No session - show auth screen
-  document.getElementById('authScreen').style.display = 'flex';
+  const authScreen = document.getElementById('authScreen');
+  if(authScreen) authScreen.style.display = 'flex';
+  _bootstrapped = true;
 }
 
 function finishInit(cloudReady){

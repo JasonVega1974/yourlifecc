@@ -1,7 +1,8 @@
-// YourLifeCC Service Worker
-// Version bump this string whenever you deploy a major update
-// to force old caches to clear.
-const CACHE_NAME = 'yourlifecc-v5';
+// IMPORTANT: bump CACHE_VERSION on every deploy that ships JS/CSS/HTML changes.
+// (Browsers byte-compare the SW file, so any change here triggers a new install.)
+// Continues from previous manual numbering yourlifecc-v1 .. yourlifecc-v5.
+const CACHE_VERSION = 'v6-2026-04-25';
+const CACHE_NAME = 'yourlifecc-' + CACHE_VERSION;
 
 // Core assets to pre-cache on install — the app shell
 const PRECACHE_ASSETS = [
@@ -68,26 +69,43 @@ self.addEventListener('fetch', event => {
     event.respondWith(
       fetch(event.request)
         .then(response => {
-          // Clone and cache a fresh copy
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
           return response;
         })
         .catch(() => {
-          // Offline fallback — serve cached app shell
           return caches.match('/app/index.html') || caches.match('/app/');
         })
     );
     return;
   }
 
-  // For everything else — cache first, network fallback
+  // App JS/CSS and HTML — network-first so deploys take effect immediately,
+  // with cache as offline fallback only.
+  const isAppCode =
+    url.origin === self.location.origin &&
+    (/\.(?:js|css|html)$/.test(url.pathname) ||
+     url.pathname.startsWith('/app/js/') ||
+     url.pathname.startsWith('/app/css/'));
+
+  if (isAppCode) {
+    event.respondWith(
+      fetch(event.request).then(response => {
+        if (response && response.status === 200 && response.type !== 'opaque') {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        }
+        return response;
+      }).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Everything else (images, fonts, etc.) — cache-first
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
-
       return fetch(event.request).then(response => {
-        // Only cache successful same-origin responses
         if (
           !response ||
           response.status !== 200 ||
@@ -100,11 +118,17 @@ self.addEventListener('fetch', event => {
         caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
         return response;
       }).catch(() => {
-        // For image/font failures offline — just return nothing gracefully
         return new Response('', { status: 408, statusText: 'Offline' });
       });
     })
   );
+});
+
+// Allow page to trigger immediate activation of a waiting SW
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 // ─── Background Sync (optional future use) ─────────────────────────────────

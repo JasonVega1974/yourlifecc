@@ -999,10 +999,9 @@ function showSection(id, fromMobile){
   window.scrollTo(0,0);
 
   // Auto-unlock Parent Hub gate if already authenticated this session or PIN disabled
-  if(id==='s-parent' && typeof D!=='undefined' && (_parentDashUnlocked || D.parentPinDisabled || sessionStorage.getItem('parentUnlocked')==='1' || localStorage.getItem('lifeos_parent_unlocked')==='1')){
+  if(id==='s-parent' && typeof D!=='undefined' && (_parentDashUnlocked || D.parentPinDisabled || sessionStorage.getItem('parentUnlocked')==='1')){
     _parentDashUnlocked = true;
     sessionStorage.setItem('parentUnlocked','1');
-    localStorage.setItem('lifeos_parent_unlocked','1');
     const gate = document.getElementById('parentGate');
     const content = document.getElementById('parentDashContent');
     if(gate) gate.style.display='none';

@@ -6683,5 +6683,44 @@ if (_origRefresh) {
   };
 }
 </script>
+
+<!-- Service Worker registration with auto-update on new deploy -->
+<link rel="manifest" href="/manifest.json">
+<script>
+(function(){
+  if (!('serviceWorker' in navigator)) return;
+  if (location.protocol !== 'https:' && location.hostname !== 'localhost') return;
+
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('/service-worker.js').then(function(reg){
+      // When a new SW is found, tell it to take over right away.
+      reg.addEventListener('updatefound', function(){
+        var nw = reg.installing;
+        if (!nw) return;
+        nw.addEventListener('statechange', function(){
+          if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+            // New version waiting — activate it immediately.
+            nw.postMessage({ type: 'SKIP_WAITING' });
+          }
+        });
+      });
+      // Check for updates whenever the page becomes visible again.
+      document.addEventListener('visibilitychange', function(){
+        if (document.visibilityState === 'visible') reg.update().catch(function(){});
+      });
+    }).catch(function(err){
+      console.warn('[SW] registration failed:', err);
+    });
+
+    // When the controlling SW changes, reload once to pick up new assets.
+    var refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', function(){
+      if (refreshing) return;
+      refreshing = true;
+      location.reload();
+    });
+  });
+})();
+</script>
 </body>
 </html>

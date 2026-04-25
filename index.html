@@ -1887,13 +1887,17 @@ function closeMobNav(){
       fetch(SUPA_URL + '/rest/v1/families?select=id', { headers: hdrs }).then(function(r){ return r.json(); }),
       // Families Sponsored — rows where plan = 'sponsored'
       fetch(SUPA_URL + '/rest/v1/families?select=id&plan=eq.sponsored', { headers: hdrs }).then(function(r){ return r.json(); }),
-      // Families Waiting — waitlist applications
-      fetch(SUPA_URL + '/rest/v1/waitlist_applications?select=id', { headers: hdrs }).then(function(r){ return r.json(); })
+      // Families Waiting — waitlist count via RPC (no row data exposed)
+      fetch(SUPA_URL + '/rest/v1/rpc/waitlist_count', {
+        method: 'POST',
+        headers: Object.assign({}, hdrs, { 'Content-Type': 'application/json' }),
+        body: '{}'
+      }).then(function(r){ return r.json(); })
     ])
     .then(function(results){
       var families  = Array.isArray(results[0]) ? results[0].length : 0;
       var sponsored = Array.isArray(results[1]) ? results[1].length : 0;
-      var waitlist  = Array.isArray(results[2]) ? results[2].length : 0;
+      var waitlist  = (typeof results[2] === 'number') ? results[2] : 0;
       animCount(document.getElementById('stat-families'),  families);
       animCount(document.getElementById('stat-sponsored'), sponsored);
       animCount(document.getElementById('stat-waitlist'),  waitlist);
