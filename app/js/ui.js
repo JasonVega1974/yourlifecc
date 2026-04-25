@@ -998,8 +998,15 @@ function showSection(id, fromMobile){
   // Scroll to top of main
   window.scrollTo(0,0);
 
-  // Auto-unlock Parent Hub gate if already authenticated this session or PIN disabled
-  if(id==='s-parent' && typeof D!=='undefined' && (_parentDashUnlocked || D.parentPinDisabled || sessionStorage.getItem('parentUnlocked')==='1')){
+  // Auto-unlock Parent Hub gate if already authenticated this session or PIN disabled.
+  // Hard rule: if the active profile is a child, NEVER auto-unlock — they must enter
+  // the parent PIN even if a previous parent session left the unlock flag set.
+  var _activeProfIsChild = false;
+  if(typeof _profiles !== 'undefined' && _profiles && typeof _activeProfileId !== 'undefined' && _activeProfileId){
+    var _ap = _profiles.find(function(p){ return p.id === _activeProfileId; });
+    if(_ap && _ap.isParent === false) _activeProfIsChild = true;
+  }
+  if(id==='s-parent' && typeof D!=='undefined' && !_activeProfIsChild && (_parentDashUnlocked || D.parentPinDisabled || sessionStorage.getItem('parentUnlocked')==='1')){
     _parentDashUnlocked = true;
     sessionStorage.setItem('parentUnlocked','1');
     const gate = document.getElementById('parentGate');
