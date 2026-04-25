@@ -465,6 +465,13 @@ async function signOut(){
   localStorage.removeItem('lifeos_parent_unlocked');
   localStorage.removeItem('lifeos_pin_set');
   sessionStorage.removeItem('parentUnlocked');
+  // Clear all profile-related keys so a stale local profile snapshot can't
+  // override fresh cloud data on next sign-in.
+  try {
+    Object.keys(localStorage).forEach(function(k){
+      if(k.indexOf('ylcc_') === 0) localStorage.removeItem(k);
+    });
+  } catch(e){}
   document.getElementById('subBlockedScreen').style.display = 'none';
   document.getElementById('authScreen').style.display = 'flex';
   setSyncSt('local');
