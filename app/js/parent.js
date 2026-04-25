@@ -1256,6 +1256,14 @@ function initProfiles(){
     _activeProfileId = _profiles.length ? _profiles[0].id : null;
     saveProfiles();
   }
+  // If we boot up with a child profile active, the Parent Hub must start locked
+  // regardless of any leftover sessionStorage flag. Otherwise a child can refresh
+  // the page and walk straight into the parent dashboard.
+  var _activeProf = _activeProfileId ? _profiles.find(function(p){ return p.id === _activeProfileId; }) : null;
+  if(_activeProf && _activeProf.isParent === false){
+    _parentDashUnlocked = false;
+    try { sessionStorage.removeItem('parentUnlocked'); } catch(e){}
+  }
   renderProfileSwitcher();
 }
 
@@ -1491,6 +1499,22 @@ function switchToProfile(id){
   // Load new profile
   const profile = _profiles.find(p=>p.id===id);
   if(!profile) return;
+
+  // Switching to a child profile must re-lock the Parent Hub. Otherwise the
+  // child inherits the parent's unlocked session and can navigate to s-parent
+  // without entering the PIN.
+  if(profile.isParent === false){
+    _parentDashUnlocked = false;
+    try { sessionStorage.removeItem('parentUnlocked'); } catch(e){}
+    var _gate = document.getElementById('parentGate');
+    var _content = document.getElementById('parentDashContent');
+    if(_gate) _gate.style.display = '';
+    if(_content) _content.style.display = 'none';
+    // If the child happens to be sitting on the Parent Hub section, bounce them out.
+    if(typeof _activeSection !== 'undefined' && _activeSection === 's-parent'){
+      if(typeof showSection === 'function') showSection('s-hero');
+    }
+  }
 
   _activeProfileId = id;
   saveProfiles();
