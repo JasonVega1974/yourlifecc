@@ -6639,13 +6639,20 @@ function applyHeroViewMode() {
     var nameEl = document.getElementById('parentWelcomeName');
     var dateEl = document.getElementById('parentWelcomeDate');
     if (nameEl) {
-      // Use parent profile name if set, otherwise fall back to email prefix, never child name
-      var parentProf = (_profiles || []).find(function(p){ return p.isParent !== false; });
-      var pname = (parentProf && parentProf.name)
-        ? parentProf.name
-        : (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.email)
-          ? _supaUser.email.split('@')[0]
-          : 'Parent';
+      // Pick the best real name, never the email prefix.
+      var parentProf = (typeof _profiles !== 'undefined' && _profiles)
+        ? _profiles.find(function(p){ return p.isParent !== false; })
+        : null;
+      var meta = (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.user_metadata)
+        ? _supaUser.user_metadata
+        : {};
+      var pname =
+        (parentProf && parentProf.name && parentProf.name.trim()) ||
+        (typeof D !== 'undefined' && D && D.name && D.name.trim()) ||
+        (meta.first_name && String(meta.first_name).trim()) ||
+        (meta.name && String(meta.name).trim().split(/\s+/)[0]) ||
+        (meta.full_name && String(meta.full_name).trim().split(/\s+/)[0]) ||
+        'Friend';
       var hr = new Date().getHours();
       var greet = hr < 12 ? 'morning' : hr < 17 ? 'afternoon' : 'evening';
       nameEl.textContent = 'Good ' + greet + ', ' + pname;
