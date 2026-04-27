@@ -1647,19 +1647,23 @@ function renderSwitchToParentBtn(){
 }
 
 function switchToParentRequest(){
+  console.log('[YLCC switch] entry, active=', _activeProfileId, 'profiles=', (_profiles||[]).map(function(p){return {id:p.id,name:p.name,isParent:p.isParent};}));
   var parent = _profiles.find(function(p){ return p.isParent === true; });
-  if(!parent){ showToast('No parent profile found'); return; }
-  console.log('[YLCC profile] switchToParentRequest → target=', parent.id, parent.name);
+  if(!parent){ console.warn('[YLCC switch] no parent with isParent===true'); showToast('No parent profile found'); return; }
+  console.log('[YLCC switch] target=', parent.id, parent.name);
   var pin = D.chorePin || D.parentPIN;
   var pinOff = !!D.parentPinDisabled;
+  console.log('[YLCC switch] pinSet?', !!pin, 'pinDisabled?', pinOff);
   // No PIN set, or PIN toggle disabled → switch immediately, no prompt.
   if(!pin || pinOff){
-    switchToProfile(parent.id);
+    try { switchToProfile(parent.id); }
+    catch(e){ console.error('[YLCC switch] switchToProfile threw:', e); showToast('Switch failed: '+(e&&e.message||e)); }
     return;
   }
   // PIN required — use the existing PIN modal helper.
   _requirePin('Switch to Parent', 'Enter your 6-digit parent PIN', (parent.name||'P').charAt(0).toUpperCase(), function(){
-    switchToProfile(parent.id);
+    try { switchToProfile(parent.id); }
+    catch(e){ console.error('[YLCC switch] switchToProfile threw (post-PIN):', e); showToast('Switch failed: '+(e&&e.message||e)); }
   });
 }
 
@@ -3966,25 +3970,38 @@ function closeSettingsPicker(){
   var modal=document.getElementById('settingsPickerModal'); if(modal) modal.classList.remove('open');
 }
 function _openParentSettings(){
-  if(typeof IS_DEMO !== 'undefined' && IS_DEMO){ openSettings(); return; }
+  console.log('[YLCC parentSettings] entry, active=', _activeProfileId, 'IS_DEMO=', (typeof IS_DEMO !== 'undefined' && IS_DEMO));
+  if(typeof IS_DEMO !== 'undefined' && IS_DEMO){
+    try { openSettings(); }
+    catch(e){ console.error('[YLCC parentSettings] openSettings threw (demo):', e); showToast('Settings failed: '+(e&&e.message||e)); }
+    return;
+  }
 
   // Shared "do the thing" fn — used after PIN entry OR when no PIN is required.
-  // Use strict isParent === true (matches the rest of the codebase). Switch
-  // profile only if needed, then open settings on the next two animation frames
-  // so the showSection('s-hero') render chain inside switchToProfile finishes
-  // before the settings panel tries to open. The previous setTimeout(300) was
-  // a race that lost on slower devices and left the panel closed.
   function _doOpen(){
+    console.log('[YLCC parentSettings] _doOpen, active=', _activeProfileId);
     var parentProf = (_profiles||[]).find(function(p){ return p.isParent === true; });
+    console.log('[YLCC parentSettings] parentProf=', parentProf && parentProf.id, parentProf && parentProf.name);
     if(parentProf && _activeProfileId !== parentProf.id){
-      switchToProfile(parentProf.id);
-      requestAnimationFrame(function(){ requestAnimationFrame(openSettings); });
+      console.log('[YLCC parentSettings] switching profile then opening');
+      try { switchToProfile(parentProf.id); }
+      catch(e){ console.error('[YLCC parentSettings] switchToProfile threw:', e); showToast('Switch failed: '+(e&&e.message||e)); return; }
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){
+          console.log('[YLCC parentSettings] calling openSettings (post-switch)');
+          try { openSettings(); }
+          catch(e){ console.error('[YLCC parentSettings] openSettings threw (post-switch):', e); showToast('Settings failed: '+(e&&e.message||e)); }
+        });
+      });
     } else {
-      openSettings();
+      console.log('[YLCC parentSettings] calling openSettings directly');
+      try { openSettings(); }
+      catch(e){ console.error('[YLCC parentSettings] openSettings threw (direct):', e); showToast('Settings failed: '+(e&&e.message||e)); }
     }
   }
 
   var pin = D.chorePin || D.parentPIN;
+  console.log('[YLCC parentSettings] pinSet?', !!pin, 'pinDisabled?', !!D.parentPinDisabled);
   if(pin && !D.parentPinDisabled){
     showPinModal('Parent Settings','Enter your 6-digit parent PIN',(D.name||'P').charAt(0).toUpperCase(),'enter', _doOpen);
     return;
