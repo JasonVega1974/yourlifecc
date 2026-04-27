@@ -138,6 +138,7 @@ async function cloudLoad(){
       _activeProfileId = saved._activeProfileId || null;
       localStorage.setItem('ylcc_profiles', JSON.stringify(_profiles));
       localStorage.setItem('ylcc_active_profile', _activeProfileId||'');
+      console.log('[YLCC profile] cloudLoad restored profiles:', _profiles.map(p=>({id:p.id,name:p.name,isParent:p.isParent})), 'active=', _activeProfileId);
     }
     // Re-save cleaned data back to Supabase immediately so bad values don't persist
     try {
