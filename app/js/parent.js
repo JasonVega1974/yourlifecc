@@ -1271,11 +1271,19 @@ function initProfiles(){
   if(_ylccProfileCorruptionDetected && typeof showProfileMigrationModal === 'function'){
     setTimeout(showProfileMigrationModal, 600);
   }
-  // NOTE: brand-new-user name capture is handled by the existing parent onboarding
-  // wizard's slide 0 (chooseSoloMode / chooseFamilyMode in app/index.html) — we do
-  // NOT auto-fire openParentNameCapture here. It would duplicate the wizard.
-  // The modal stays available as a guard inside addChildFromHub for the rare case
-  // where a child is created before any parent profile exists.
+  // CORRUPTED-STATE RECOVERY: returning user with parentWizardDone=true but no
+  // parent profile in _profiles (e.g. signed up before our profile model existed,
+  // or had data wiped). Without this, the welcome card falls back to the email
+  // local-part and the addChildFromHub guard fires a second prompt later. Reset
+  // the wizard flag so init.js's setTimeout(showParentOnboard, 700) catches it
+  // on the same load and the user gets the canonical wizard slide 0 once.
+  var _hasParentProfile = _profiles.some(function(p){ return p.isParent === true; });
+  if(!_hasParentProfile && D.parentWizardDone){
+    console.log('[YLCC profile] No parent profile but wizardDone=true — resetting wizard flag so slide 0 re-fires');
+    D.parentWizardDone = false;
+    try{ localStorage.removeItem(_ylccUserKey('ylcc_parentWizardDone')); }catch(e){}
+    save();
+  }
 }
 
 // Set true when initProfiles detects an orphan-child / no-parent state. The
