@@ -292,8 +292,29 @@ function addChildFromHub(){
     while(_profiles.find(p=>p.id===pin)&&tries<100);
   }
   if(_profiles.find(p=>p.id===pin)){showToast('PIN already in use — try a different one'); return;}
+
+  // GUARD: a child profile must never be the only profile. If no parent exists,
+  // open the parent-name modal first so the parent record is created BEFORE the
+  // child is appended. This prevents the orphaned-child → relabel-as-parent
+  // corruption that overwrites the parent record on next login.
+  var hasParent = _profiles.some(function(p){ return p.isParent === true; });
+  if(!hasParent){
+    console.log('[YLCC profile] addChildFromHub blocked: no parent profile exists yet — prompting for parent name');
+    if(typeof openParentNameCapture === 'function'){
+      openParentNameCapture(function(){
+        // After parent is captured, retry the add-child flow
+        addChildFromHub();
+      });
+      return;
+    }
+    // Fallback: hard-stop with a toast if the modal helper isn't loaded
+    showToast('Set your parent name first (Settings → Profile)');
+    return;
+  }
+
   if(_activeProfileId){const cur=_profiles.find(p=>p.id===_activeProfileId);if(cur)cur.data=JSON.parse(JSON.stringify(D));}
   _profiles.push({id:pin,name,isParent:false,data:{name,streak:0,mode:'mid_hs'}});
+  console.log('[YLCC profile] addChildFromHub created child:', {id:pin,name}, 'parent active=', _activeProfileId);
   saveProfiles();
   if(nameEl)nameEl.value='';
   if(pinEl)pinEl.value='';
@@ -1295,18 +1316,11 @@ function switchParentView(profileId){
   if(!_profiles || !_profiles.length) return;
   const profile = _profiles.find(p=>p.id === profileId);
   if(!profile) return;
-
+  
   // Switch active profile to view their data
   _activeProfileId = profile.id;
   D = profile.data || {};
-
-  // If we're switching the active profile to a child, re-lock the Parent Hub
-  // so any subsequent navigation to s-parent forces a fresh PIN entry.
-  if(profile.isParent === false){
-    _parentDashUnlocked = false;
-    try { sessionStorage.removeItem('parentUnlocked'); } catch(e){}
-  }
-
+  
   // Re-render all parent dashboard components
   renderParentDashboard();
   showToast('Viewing: ' + profile.name);
