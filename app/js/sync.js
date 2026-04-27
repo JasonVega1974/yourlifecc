@@ -132,12 +132,15 @@ async function cloudLoad(){
         if(D.sections && D.sections.cbt===0) delete D.sections.cbt;
     }
     localStorage.setItem('lifeos_last_sync', Date.now());
-    // Restore profiles from cloud data into localStorage for this device
+    // Restore profiles from cloud data into localStorage for this device.
+    // Route through saveProfiles so per-profile data lands in its own LS key
+    // and the index stays slim — writing the cloud's bloated array directly
+    // into ylcc_profiles is what blew the quota in the first place.
     if(saved._profiles && saved._profiles.length > 0){
       _profiles = JSON.parse(JSON.stringify(saved._profiles));
       _activeProfileId = saved._activeProfileId || null;
-      localStorage.setItem('ylcc_profiles', JSON.stringify(_profiles));
-      localStorage.setItem('ylcc_active_profile', _activeProfileId||'');
+      try { saveProfiles(); }
+      catch(e){ console.warn('[YLCC profile] cloudLoad saveProfiles failed:', e.message); }
       console.log('[YLCC profile] cloudLoad restored profiles:', _profiles.map(p=>({id:p.id,name:p.name,isParent:p.isParent})), 'active=', _activeProfileId);
     }
     // Re-save cleaned data back to Supabase immediately so bad values don't persist
