@@ -1271,11 +1271,11 @@ function initProfiles(){
   if(_ylccProfileCorruptionDetected && typeof showProfileMigrationModal === 'function'){
     setTimeout(showProfileMigrationModal, 600);
   }
-  // If there are zero profiles AND no D.name (brand-new account that didn't go through
-  // the new onboard.html parent-name step, or whose data was wiped), prompt for parent name.
-  if(_profiles.length === 0 && !D.name && typeof openParentNameCapture === 'function'){
-    setTimeout(function(){ openParentNameCapture(); }, 400);
-  }
+  // NOTE: brand-new-user name capture is handled by the existing parent onboarding
+  // wizard's slide 0 (chooseSoloMode / chooseFamilyMode in app/index.html) — we do
+  // NOT auto-fire openParentNameCapture here. It would duplicate the wizard.
+  // The modal stays available as a guard inside addChildFromHub for the rare case
+  // where a child is created before any parent profile exists.
 }
 
 // Set true when initProfiles detects an orphan-child / no-parent state. The
