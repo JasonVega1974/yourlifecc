@@ -293,23 +293,31 @@ function addChildFromHub(){
   }
   if(_profiles.find(p=>p.id===pin)){showToast('PIN already in use — try a different one'); return;}
 
-  // GUARD: a child profile must never be the only profile. If no parent exists,
-  // open the parent-name modal first so the parent record is created BEFORE the
-  // child is appended. This prevents the orphaned-child → relabel-as-parent
-  // corruption that overwrites the parent record on next login.
+  // GUARD: a child profile must never be the only profile in the array. If no
+  // parent exists, create one before appending the child. This prevents the
+  // orphaned-child → relabel-as-parent corruption that previously overwrote
+  // the parent record on next login.
   var hasParent = _profiles.some(function(p){ return p.isParent === true; });
   if(!hasParent){
-    console.log('[YLCC profile] addChildFromHub blocked: no parent profile exists yet — prompting for parent name');
-    if(typeof openParentNameCapture === 'function'){
-      openParentNameCapture(function(){
-        // After parent is captured, retry the add-child flow
-        addChildFromHub();
-      });
+    if(D.name && String(D.name).trim() && typeof generateParentId === 'function'){
+      // We have D.name (the user has been through the wizard or set a name in
+      // Settings) — silently create the parent profile from it. No modal.
+      var pid = generateParentId();
+      _profiles.unshift({ id:pid, name:D.name, isParent:true, data:JSON.parse(JSON.stringify(D)) });
+      _activeProfileId = pid;
+      console.log('[YLCC profile] addChildFromHub auto-created parent from D.name=', D.name);
+    } else {
+      // No name on file at all. Send them to the wizard rather than firing the
+      // modal — the wizard slide 0 is the canonical name+role capture surface.
+      console.log('[YLCC profile] addChildFromHub blocked: no parent profile and no D.name — opening wizard');
+      showToast('Set up your parent profile first');
+      if(typeof showParentOnboard === 'function'){
+        D.parentWizardDone = false;
+        try{ localStorage.removeItem(_ylccUserKey('ylcc_parentWizardDone')); }catch(e){}
+        showParentOnboard();
+      }
       return;
     }
-    // Fallback: hard-stop with a toast if the modal helper isn't loaded
-    showToast('Set your parent name first (Settings → Profile)');
-    return;
   }
 
   if(_activeProfileId){const cur=_profiles.find(p=>p.id===_activeProfileId);if(cur)cur.data=JSON.parse(JSON.stringify(D));}
