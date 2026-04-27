@@ -1688,15 +1688,28 @@ function renderSwitchToParentBtn(){
     + '</button>';
 }
 
-function switchToParentRequest(){
+// Read PIN settings from the parent profile, not from the currently-active
+// profile's D. When a child is active, D has no chorePin/parentPIN/disabled
+// fields, so reading from D would silently bypass the gate.
+function _getParentPinInfo(){
   var parent = _profiles.find(function(p){ return p.isParent === true; });
-  if(!parent){ showToast('No parent profile found'); return; }
-  var pin = D.chorePin || D.parentPIN;
-  var pinOff = !!D.parentPinDisabled;
-  if(!pin || pinOff){ switchToProfile(parent.id); return; }
-  _requirePin('Switch to Parent', 'Enter your 6-digit parent PIN', (parent.name||'P').charAt(0).toUpperCase(), function(){
-    switchToProfile(parent.id);
-  });
+  var src = (parent && _activeProfileId === parent.id) ? D
+          : (parent && parent.data) ? parent.data
+          : D;
+  return {
+    parent: parent,
+    pin: src.chorePin || src.parentPIN,
+    disabled: !!src.parentPinDisabled
+  };
+}
+
+function switchToParentRequest(){
+  var info = _getParentPinInfo();
+  if(!info.parent){ showToast('No parent profile found'); return; }
+  if(!info.pin || info.disabled){ switchToProfile(info.parent.id); return; }
+  showPinModal('Switch to Parent','Enter your 6-digit parent PIN',(info.parent.name||'P').charAt(0).toUpperCase(),'enter', function(){
+    switchToProfile(info.parent.id);
+  }, null, info.pin);
 }
 
 // ── PARENT-NAME CAPTURE MODAL ─────────────────────────────────
@@ -3876,10 +3889,15 @@ let _pinMode = '';
 let _pinTemp = '';
 let _pinCallback = null;
 let _pinCancelCb = null;
+// Optional expected PIN. When set, _pinSubmit validates against this instead
+// of D.chorePin/D.parentPIN — needed for "verify parent's PIN while a child
+// is active", since D is the child's data and has no PIN field.
+let _pinExpected = null;
 
-function showPinModal(title, sub, icon, mode, callback, cancelCb){
+function showPinModal(title, sub, icon, mode, callback, cancelCb, expectedPin){
   _pinEntry = ''; _pinMode = mode; _pinTemp = '';
   _pinCallback = callback; _pinCancelCb = cancelCb || null;
+  _pinExpected = expectedPin || null;
   document.getElementById('pinModalTitle').textContent = title;
   document.getElementById('pinModalSub').textContent = sub;
   // Icon: render as colored avatar circle (initial letter or emoji)
@@ -3921,9 +3939,10 @@ function _pinError(msg){
 
 function _pinSubmit(){
   if(_pinMode === 'enter'){
-    const correct = D.chorePin || D.parentPIN;
+    const correct = _pinExpected || D.chorePin || D.parentPIN;
     if(_pinEntry === correct){
       document.getElementById('pinModal').style.display = 'none';
+      _pinExpected = null;
       _pinCallback && _pinCallback(_pinEntry);
     } else {
       _pinError('Incorrect PIN — try again');
@@ -3951,6 +3970,7 @@ function _pinSubmit(){
 
 function _pinCancel(){
   document.getElementById('pinModal').style.display = 'none';
+  _pinExpected = null;
   _pinCancelCb && _pinCancelCb();
 }
 
@@ -4003,18 +4023,18 @@ function closeSettingsPicker(){
 }
 function _openParentSettings(){
   if(typeof IS_DEMO !== 'undefined' && IS_DEMO){ openSettings(); return; }
+  var info = _getParentPinInfo();
   function _doOpen(){
-    var parentProf = (_profiles||[]).find(function(p){ return p.isParent === true; });
-    if(parentProf && _activeProfileId !== parentProf.id){
-      switchToProfile(parentProf.id);
+    if(info.parent && _activeProfileId !== info.parent.id){
+      switchToProfile(info.parent.id);
       requestAnimationFrame(function(){ requestAnimationFrame(openSettings); });
     } else {
       openSettings();
     }
   }
-  var pin = D.chorePin || D.parentPIN;
-  if(pin && !D.parentPinDisabled){
-    showPinModal('Parent Settings','Enter your 6-digit parent PIN',(D.name||'P').charAt(0).toUpperCase(),'enter', _doOpen);
+  if(info.pin && !info.disabled){
+    var iconLetter = ((info.parent && info.parent.name) || D.name || 'P').charAt(0).toUpperCase();
+    showPinModal('Parent Settings','Enter your 6-digit parent PIN', iconLetter,'enter', _doOpen, null, info.pin);
     return;
   }
   _doOpen();
