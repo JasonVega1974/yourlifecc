@@ -146,17 +146,19 @@
     const modal = document.createElement('div');
     modal.id = 'upgradeModal';
     modal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:1rem;';
+    // Upgrade flow temporarily routed to mailto while Brevo/Supabase email-link
+     // issue is being fixed. Original buttons linked to ../register.html?plan=... — see REVERT_CHECKLIST.
     modal.innerHTML = `
       <div style="background:#0c1220;border:1px solid rgba(56,189,248,.2);border-radius:18px;max-width:420px;width:100%;padding:2rem;text-align:center;">
         <div style="font-size:2.5rem;margin-bottom:.6rem;">🚀</div>
         <div style="font-family:var(--fh,sans-serif);font-size:1.3rem;font-weight:900;margin-bottom:.4rem;">Unlock Everything</div>
-        <div style="font-size:.82rem;color:#8fa3bf;margin-bottom:1.5rem;line-height:1.6;">Upgrade to access all 20+ sections, unlimited children, Life Skills Academy, Chores & Rewards, Parent Hub, and cloud sync.</div>
+        <div style="font-size:.82rem;color:#8fa3bf;margin-bottom:1.5rem;line-height:1.6;">We're in private beta. Email us with the plan you want and your account email — we'll set you up directly.</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1.2rem;">
-          <a href="../register.html?plan=monthly&upgrade=${_familyId}" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);border-radius:10px;padding:.9rem;text-decoration:none;display:block;">
+          <a href="mailto:info@kingdom-creatives.com?subject=YourLife%20CC%20Upgrade%20%E2%80%94%20Monthly%20(Family%20${_familyId})" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);border-radius:10px;padding:.9rem;text-decoration:none;display:block;">
             <div style="font-weight:700;font-size:.82rem;color:#f0f6ff;">Monthly</div>
             <div style="color:#38bdf8;font-size:1.1rem;font-weight:900;">$9.99<span style="font-size:.7rem;color:#8fa3bf;">/mo</span></div>
           </a>
-          <a href="../register.html?plan=lifetime&upgrade=${_familyId}" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);border-radius:10px;padding:.9rem;text-decoration:none;display:block;">
+          <a href="mailto:info@kingdom-creatives.com?subject=YourLife%20CC%20Upgrade%20%E2%80%94%20Lifetime%20(Family%20${_familyId})" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);border-radius:10px;padding:.9rem;text-decoration:none;display:block;">
             <div style="font-weight:700;font-size:.82rem;color:#f0f6ff;">Lifetime</div>
             <div style="color:#38bdf8;font-size:1.1rem;font-weight:900;">$149<span style="font-size:.7rem;color:#8fa3bf;"> once</span></div>
           </a>
