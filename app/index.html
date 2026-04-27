@@ -31,7 +31,7 @@
 <div id="authScreen" style="display:none;position:fixed;inset:0;z-index:10000;background:linear-gradient(145deg,#050d1a,#0d1b2a);align-items:center;justify-content:center;">
   <div style="text-align:center;max-width:420px;width:92vw;max-height:95vh;overflow-y:auto;overflow-x:hidden;padding:2.5rem 2rem;background:rgba(255,255,255,.03);border:1px solid rgba(56,189,248,.15);border-radius:24px;box-shadow:0 40px 100px rgba(0,0,0,.6);">
     <div style="font-size:3rem;margin-bottom:.6rem;animation:obFloat 3s ease-in-out infinite;display:inline-block;">🧠</div>
-    <div style="font-family:var(--fh);font-size:1.4rem;letter-spacing:2px;color:var(--c);margin-bottom:.3rem;">LIFE OS</div>
+    <div style="font-family:var(--fh);font-size:1.4rem;letter-spacing:2px;color:var(--c);margin-bottom:.3rem;">YOURLIFE CC</div>
     <div style="font-size:.75rem;color:var(--tx2);margin-bottom:1.8rem;line-height:1.7;">The complete life skills platform for the next generation.</div>
 
     <div style="text-align:center;margin-bottom:1.4rem;">
@@ -85,7 +85,11 @@
     </div>
     <!-- Primary button -->
     <button id="authBtn" onclick="authSubmit()" style="width:100%;padding:.9rem;background:linear-gradient(135deg,#38bdf8,#4f8fff);border:none;border-radius:12px;color:#000;font-weight:800;font-size:.95rem;cursor:pointer;margin-bottom:.7rem;transition:all .2s;">Sign In</button>
-    <p id="authPaidLink" style="text-align:center;font-size:.78rem;color:var(--tx2);margin-top:.5rem;margin-bottom:.7rem;">Don't have an account? <a href="javascript:void(0)" onclick="authSwitchTab('signup')" style="color:var(--c);font-weight:700;">Create Account →</a> &nbsp;|&nbsp; <a href="../index.html#pricing" style="color:var(--tx2);font-weight:600;font-size:.72rem;">See Plans</a></p>
+    <!-- Public signup is temporarily disabled while Brevo/Supabase email-link issue is being fixed.
+         To re-enable, restore the previous version which had:
+           Don't have an account? <a onclick="authSwitchTab('signup')">Create Account →</a> | <a href="../index.html#pricing">See Plans</a>
+         (See REVERT_CHECKLIST in repo root for the full list of files to revert.) -->
+    <p id="authPaidLink" style="text-align:center;font-size:.78rem;color:var(--tx2);margin-top:.5rem;margin-bottom:.7rem;line-height:1.55;">Don't have an account? We're in private beta. Email <a href="mailto:info@kingdom-creatives.com?subject=YourLife%20CC%20Access%20Request" style="color:var(--c);font-weight:700;">info@kingdom-creatives.com</a> to request access.</p>
 
     <!-- Forgot password -->
     <div id="authForgotWrap" style="margin-bottom:.5rem;">
