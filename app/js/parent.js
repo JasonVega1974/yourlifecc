@@ -3967,28 +3967,29 @@ function closeSettingsPicker(){
 }
 function _openParentSettings(){
   if(typeof IS_DEMO !== 'undefined' && IS_DEMO){ openSettings(); return; }
+
+  // Shared "do the thing" fn — used after PIN entry OR when no PIN is required.
+  // Use strict isParent === true (matches the rest of the codebase). Switch
+  // profile only if needed, then open settings on the next two animation frames
+  // so the showSection('s-hero') render chain inside switchToProfile finishes
+  // before the settings panel tries to open. The previous setTimeout(300) was
+  // a race that lost on slower devices and left the panel closed.
+  function _doOpen(){
+    var parentProf = (_profiles||[]).find(function(p){ return p.isParent === true; });
+    if(parentProf && _activeProfileId !== parentProf.id){
+      switchToProfile(parentProf.id);
+      requestAnimationFrame(function(){ requestAnimationFrame(openSettings); });
+    } else {
+      openSettings();
+    }
+  }
+
   var pin = D.chorePin || D.parentPIN;
-  // Always require PIN if one is set, regardless of session state
   if(pin && !D.parentPinDisabled){
-    showPinModal('Parent Settings','Enter your 6-digit parent PIN',(D.name||'P').charAt(0).toUpperCase(),'enter',function(){
-      var parentProf=(_profiles||[]).find(function(p){return p.isParent!==false;});
-      if(parentProf&&_activeProfileId!==parentProf.id){
-        switchToProfile(parentProf.id);
-        setTimeout(openSettings,300);
-      } else {
-        openSettings();
-      }
-    });
+    showPinModal('Parent Settings','Enter your 6-digit parent PIN',(D.name||'P').charAt(0).toUpperCase(),'enter', _doOpen);
     return;
   }
-  // No PIN set — open directly
-  var parentProf=(_profiles||[]).find(function(p){return p.isParent!==false;});
-  if(parentProf&&_activeProfileId!==parentProf.id){
-    switchToProfile(parentProf.id);
-    setTimeout(openSettings,300);
-  } else {
-    openSettings();
-  }
+  _doOpen();
 }
 function _openChildSettings(cid){
   // Switch to child profile temporarily for settings, then open
