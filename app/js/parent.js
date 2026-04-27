@@ -6,28 +6,12 @@
 ============================================================= */
 
 // ── PARENT DASHBOARD ─────────────────────────────────────────
-// Unlock state is per-tab only. localStorage was previously honored here, but
-// it let any kid bypass the PIN by setting one key in DevTools. Session-scoped
-// unlock is forgotten when the tab closes — re-enter PIN per session.
-try { localStorage.removeItem('lifeos_parent_unlocked'); } catch(e){}
-let _parentDashUnlocked = sessionStorage.getItem('parentUnlocked')==='1';
+let _parentDashUnlocked = sessionStorage.getItem('parentUnlocked')==='1' || localStorage.getItem('lifeos_parent_unlocked')==='1';
 
 function unlockParentDash(){
   initChoreData();
-  // Hard rule: child profiles can never auto-unlock the Parent Hub.
-  // If a parent PIN isn't set yet, the parent (not a child) must set one first.
-  var _activeIsChild = false;
-  if(typeof _profiles !== 'undefined' && _profiles && typeof _activeProfileId !== 'undefined' && _activeProfileId){
-    var _ap = _profiles.find(function(p){ return p.id === _activeProfileId; });
-    if(_ap && _ap.isParent === false) _activeIsChild = true;
-  }
-  if(_activeIsChild){
-    var _err = document.getElementById('parentGateError');
-    if(_err) _err.textContent = 'Switch to your parent profile to access Parent Hub.';
-    return;
-  }
   if(D.parentPinDisabled){ _doUnlockParent(); return; }
-  // No PIN set — only the parent profile gets the friendly "let them in" path
+  // If no PIN set yet, let them straight in
   if(!D.chorePin && !D.parentPIN){ _doUnlockParent(); return; }
   // Submission handled by pgPinKey / _pgSubmit
 }
@@ -1237,42 +1221,43 @@ let _activeProfileId = null;
 
 function initProfiles(){
   try {
-    // CLOUD WINS: when we have cloud-loaded data (D._profiles non-empty),
-    // trust it over localStorage. Previously localStorage took precedence,
-    // which caused stale-tab corruption: a tab that had old _profiles in
-    // localStorage would override fresh cloud data on every page load and
-    // then re-upload the stale data via cloudSync, permanently losing the
-    // server-side correction.
-    var _hasCloudProfiles = D && D._profiles && Array.isArray(D._profiles) && D._profiles.length > 0;
-    if(_hasCloudProfiles){
+    _profiles = JSON.parse(localStorage.getItem('ylcc_profiles')||'[]');
+    // If localStorage empty, try loading from D (synced from cloud on another device)
+    if(_profiles.length === 0 && D._profiles && D._profiles.length > 0){
       _profiles = JSON.parse(JSON.stringify(D._profiles));
       localStorage.setItem('ylcc_profiles', JSON.stringify(_profiles));
-    } else {
-      _profiles = JSON.parse(localStorage.getItem('ylcc_profiles')||'[]');
     }
-    // Migration: first profile is always parent if no isParent flag set
+    console.log('[YLCC profile] initProfiles loaded _profiles=', _profiles.map(p=>({id:p.id,name:p.name,isParent:p.isParent})));
+    // Migration: profiles created before isParent existed default the FIRST one to parent.
+    // This is only safe when isParent is *undefined* — never overwrite an explicit false.
     if(_profiles.length > 0 && _profiles[0].isParent === undefined){
       _profiles[0].isParent = true;
       _profiles.slice(1).forEach(p => { if(p.isParent===undefined) p.isParent=false; });
     }
-    // Belt-and-suspenders: ensure exactly one parent exists (the first profile)
+    // CORRUPTION DETECT: there are profiles, none of them is a parent, and at least
+    // one is explicitly a child. Do NOT silently flip the child to parent — that's
+    // the bug that overwrote JASON with DOMINIC. Instead, defer to the migration
+    // modal which asks the user to confirm the parent name.
     var hasExplicitParent = _profiles.some(function(p){ return p.isParent===true; });
+    var hasExplicitChild  = _profiles.some(function(p){ return p.isParent===false; });
     if(!hasExplicitParent && _profiles.length > 0){
-      _profiles[0].isParent = true;
+      if(hasExplicitChild){
+        console.warn('[YLCC profile] CORRUPTION DETECTED: child profile(s) with no parent. Deferring to migration modal.');
+        _ylccProfileCorruptionDetected = true;
+      } else {
+        // No isParent flags anywhere — safe legacy migration
+        _profiles[0].isParent = true;
+      }
     }
-    // Active profile: cloud wins when we have cloud data, otherwise fall back
-    // to localStorage chain (user-specific key, then global key).
-    if(_hasCloudProfiles && D._activeProfileId){
-      _activeProfileId = D._activeProfileId;
-    } else {
-      _activeProfileId = localStorage.getItem(_ylccUserKey('ylcc_active_profile')) || (D._activeProfileId||null) || localStorage.getItem('ylcc_active_profile');
-    }
+    // Try user-specific key first (per-user persistence), then fall back to D, then global key
+    _activeProfileId = localStorage.getItem(_ylccUserKey('ylcc_active_profile')) || (D._activeProfileId||null) || localStorage.getItem('ylcc_active_profile');
   } catch(e){ _profiles=[]; }
   // Auto-create parent profile from existing data if none exist
   if(_profiles.length === 0 && D.name){
     const id = generateParentId();
     _profiles.push({id, name:D.name, isParent:true, data:JSON.parse(JSON.stringify(D))});
     _activeProfileId = id;
+    console.log('[YLCC profile] initProfiles auto-created parent from D.name=', D.name, 'id=', id);
     saveProfiles();
   }
   // Ensure active profile ID is valid
@@ -1280,16 +1265,22 @@ function initProfiles(){
     _activeProfileId = _profiles.length ? _profiles[0].id : null;
     saveProfiles();
   }
-  // If we boot up with a child profile active, the Parent Hub must start locked
-  // regardless of any leftover sessionStorage flag. Otherwise a child can refresh
-  // the page and walk straight into the parent dashboard.
-  var _activeProf = _activeProfileId ? _profiles.find(function(p){ return p.id === _activeProfileId; }) : null;
-  if(_activeProf && _activeProf.isParent === false){
-    _parentDashUnlocked = false;
-    try { sessionStorage.removeItem('parentUnlocked'); } catch(e){}
-  }
   renderProfileSwitcher();
+  // If we detected corruption above, run the one-time confirmation modal AFTER
+  // the rest of the bootstrap finishes so the modal renders cleanly.
+  if(_ylccProfileCorruptionDetected && typeof showProfileMigrationModal === 'function'){
+    setTimeout(showProfileMigrationModal, 600);
+  }
+  // If there are zero profiles AND no D.name (brand-new account that didn't go through
+  // the new onboard.html parent-name step, or whose data was wiped), prompt for parent name.
+  if(_profiles.length === 0 && !D.name && typeof openParentNameCapture === 'function'){
+    setTimeout(function(){ openParentNameCapture(); }, 400);
+  }
 }
+
+// Set true when initProfiles detects an orphan-child / no-parent state. The
+// migration modal uses this to render its one-time confirmation prompt.
+var _ylccProfileCorruptionDetected = false;
 
 function saveProfiles(){
   localStorage.setItem('ylcc_profiles', JSON.stringify(_profiles));
@@ -1299,10 +1290,12 @@ function saveProfiles(){
   // Persist into D so cloudSync carries profiles to all devices
   D._profiles = JSON.parse(JSON.stringify(_profiles));
   D._activeProfileId = _activeProfileId||'';
-  // Ensure D.name always reflects the PARENT name before saving to cloud,
-  // so the parent welcome card never shows the last-active child's name.
-  var _parentProf = _profiles.find(function(p){ return p.isParent !== false; });
-  if(_parentProf && _parentProf.name) D.name = _parentProf.name;
+  // Keep D.name in sync with the *active* profile's name, so the welcome card
+  // matches whoever is actually using the app right now. Previously this always
+  // wrote the parent's name into D — which silently overwrote a child's D.name
+  // every save and was the trigger for the parent-record-corruption bug.
+  var _activeProf = _profiles.find(function(p){ return p.id === _activeProfileId; });
+  if(_activeProf && _activeProf.name) D.name = _activeProf.name;
   save();
   if(typeof _supaUser !== 'undefined' && _supaUser) setTimeout(cloudSync, 500);
 }
@@ -1354,18 +1347,6 @@ function _pgUpdateDots(){
   }
 }
 function _pgSubmit(){
-  // Same hard rule: child profiles can never satisfy the parent gate.
-  var _activeIsChild = false;
-  if(typeof _profiles !== 'undefined' && _profiles && typeof _activeProfileId !== 'undefined' && _activeProfileId){
-    var _ap2 = _profiles.find(function(p){ return p.id === _activeProfileId; });
-    if(_ap2 && _ap2.isParent === false) _activeIsChild = true;
-  }
-  if(_activeIsChild){
-    _pgBuffer=''; _pgUpdateDots();
-    var _err2 = document.getElementById('parentGateError');
-    if(_err2) _err2.textContent = 'Switch to your parent profile first.';
-    return;
-  }
   const off=!!D.parentPinDisabled;
   if(off){
     _pgBuffer=''; _pgUpdateDots();
@@ -1374,7 +1355,7 @@ function _pgSubmit(){
   }
   const correct=String(D.chorePin||D.parentPIN||'');
   if(!correct){
-    // No PIN set — just let them in (parent profile only, child blocked above)
+    // No PIN set — just let them in
     _pgBuffer=''; _pgUpdateDots();
     _doUnlockParent();
     return;
@@ -1392,6 +1373,7 @@ function _pgSubmit(){
 function _doUnlockParent(){
   _parentDashUnlocked=true;
   sessionStorage.setItem('parentUnlocked','1');
+  localStorage.setItem('lifeos_parent_unlocked','1');
   const gate=document.getElementById('parentGate');
   const content=document.getElementById('parentDashContent');
   if(gate) gate.style.display='none';
@@ -1536,22 +1518,6 @@ function switchToProfile(id){
   const profile = _profiles.find(p=>p.id===id);
   if(!profile) return;
 
-  // Switching to a child profile must re-lock the Parent Hub. Otherwise the
-  // child inherits the parent's unlocked session and can navigate to s-parent
-  // without entering the PIN.
-  if(profile.isParent === false){
-    _parentDashUnlocked = false;
-    try { sessionStorage.removeItem('parentUnlocked'); } catch(e){}
-    var _gate = document.getElementById('parentGate');
-    var _content = document.getElementById('parentDashContent');
-    if(_gate) _gate.style.display = '';
-    if(_content) _content.style.display = 'none';
-    // If the child happens to be sitting on the Parent Hub section, bounce them out.
-    if(typeof _activeSection !== 'undefined' && _activeSection === 's-parent'){
-      if(typeof showSection === 'function') showSection('s-hero');
-    }
-  }
-
   _activeProfileId = id;
   saveProfiles();
 
@@ -1632,6 +1598,8 @@ function removeProfile(id){
 function renderProfileSwitcher(){
   const el = document.getElementById('profileSwitcher');
   const tabs = document.getElementById('profileTabs');
+  // Render the prominent "Switch to Parent" button visible from a child's home.
+  renderSwitchToParentBtn();
   if(!el || !tabs) return;
 
   el.style.display = 'none'; // Hidden from hero — use Child Login button instead
@@ -1646,6 +1614,149 @@ function renderProfileSwitcher(){
       ${active?'<span style="font-size:.45rem;color:'+c+';">●</span>':'<span style="font-size:.45rem;color:var(--tx3);">🔒</span>'}
     </button>`;
   }).join('') + `<button onclick="addChildProfile()" style="padding:.35rem .7rem;border-radius:8px;border:1.5px dashed rgba(255,255,255,.12);background:none;cursor:pointer;font-size:.65rem;color:var(--tx3);font-family:var(--fn);display:flex;align-items:center;gap:.3rem;"><span style="font-size:.85rem;">+</span> Add Child</button>`;
+}
+
+// ── SWITCH-TO-PARENT BUTTON (visible only when a child is active) ──
+// PIN-gated only when the parent has a PIN set (and toggle is on). If no PIN
+// or toggle disabled, switches immediately. Mounted into a dedicated host
+// container in app/index.html (#switchToParentHost) so it survives section
+// re-renders and the layout doesn't reflow.
+function renderSwitchToParentBtn(){
+  var host = document.getElementById('switchToParentHost');
+  if(!host) return;
+  var active = _profiles.find(function(p){ return p.id === _activeProfileId; });
+  var isChild = !!(active && active.isParent === false);
+  if(!isChild){ host.innerHTML=''; host.style.display='none'; return; }
+  var parent = _profiles.find(function(p){ return p.isParent === true; });
+  if(!parent){ host.innerHTML=''; host.style.display='none'; return; }
+  host.style.display='flex';
+  host.innerHTML = '<button onclick="switchToParentRequest()" '
+    + 'style="display:flex;align-items:center;gap:.45rem;padding:.5rem .9rem;border-radius:10px;'
+    + 'border:1px solid rgba(167,139,250,.35);background:rgba(167,139,250,.12);'
+    + 'color:#c4b5fd;font-family:var(--fn);font-weight:700;font-size:.75rem;cursor:pointer;">'
+    + '<span style="font-size:.95rem;">👨‍👩‍👧</span> Switch to ' + (parent.name||'Parent')
+    + '</button>';
+}
+
+function switchToParentRequest(){
+  var parent = _profiles.find(function(p){ return p.isParent === true; });
+  if(!parent){ showToast('No parent profile found'); return; }
+  console.log('[YLCC profile] switchToParentRequest → target=', parent.id, parent.name);
+  var pin = D.chorePin || D.parentPIN;
+  var pinOff = !!D.parentPinDisabled;
+  // No PIN set, or PIN toggle disabled → switch immediately, no prompt.
+  if(!pin || pinOff){
+    switchToProfile(parent.id);
+    return;
+  }
+  // PIN required — use the existing PIN modal helper.
+  _requirePin('Switch to Parent', 'Enter your 6-digit parent PIN', (parent.name||'P').charAt(0).toUpperCase(), function(){
+    switchToProfile(parent.id);
+  });
+}
+
+// ── PARENT-NAME CAPTURE MODAL ─────────────────────────────────
+// Shown when a brand-new account reaches the app without a parent profile,
+// or when addChildFromHub is called with no parent on file. Creates the
+// parent profile with the user's typed name (no email-fallback per rules).
+function openParentNameCapture(onSavedCb){
+  var modal = document.getElementById('parentNameCaptureModal');
+  if(!modal){ showToast('Profile setup unavailable — please refresh'); return; }
+  modal.classList.add('open');
+  modal.style.display = 'flex';
+  var inp = document.getElementById('pncName');
+  if(inp){ inp.value = ''; setTimeout(function(){ inp.focus(); }, 100); }
+  // Reset role to default 'parent'
+  document.querySelectorAll('#parentNameCaptureModal .pnc-role').forEach(function(b){ b.classList.remove('selected'); });
+  var defBtn = document.querySelector('#parentNameCaptureModal .pnc-role[data-role="parent"]');
+  if(defBtn) defBtn.classList.add('selected');
+  window._pncRole = 'parent';
+  window._pncOnSaved = onSavedCb || null;
+}
+
+function pncSelectRole(btn, role){
+  document.querySelectorAll('#parentNameCaptureModal .pnc-role').forEach(function(b){ b.classList.remove('selected'); });
+  btn.classList.add('selected');
+  window._pncRole = role;
+}
+
+function pncSubmit(){
+  var inp = document.getElementById('pncName');
+  var err = document.getElementById('pncErr');
+  var name = (inp && inp.value || '').trim();
+  if(err) err.textContent = '';
+  if(!name){ if(err) err.textContent = 'Please enter your name.'; return; }
+  var role = window._pncRole || 'parent';
+  // Always create a parent profile — solo mode just means we won't show child management UI later.
+  var id = generateParentId();
+  // If profiles already exist (edge case), don't append a duplicate parent.
+  var existingParent = _profiles.find(function(p){ return p.isParent === true; });
+  if(existingParent){
+    existingParent.name = name;
+  } else {
+    _profiles.unshift({id:id, name:name, isParent:true, data:JSON.parse(JSON.stringify(D))});
+    _activeProfileId = id;
+  }
+  D.name = name;
+  D.soloMode = (role === 'solo');
+  console.log('[YLCC profile] pncSubmit created/updated parent name=', name, 'role=', role, 'profiles=', _profiles.length);
+  saveProfiles();
+  applyName && applyName();
+  renderProfileSwitcher();
+  var modal = document.getElementById('parentNameCaptureModal');
+  if(modal){ modal.classList.remove('open'); modal.style.display='none'; }
+  showToast('Welcome, ' + name + '! 👋');
+  if(typeof window._pncOnSaved === 'function'){
+    var cb = window._pncOnSaved; window._pncOnSaved = null;
+    setTimeout(cb, 200);
+  }
+}
+
+// ── PROFILE MIGRATION MODAL ─────────────────────────────────
+// Triggered when initProfiles detects orphan child(ren) with no parent — the
+// exact corruption from the addChildFromHub-without-parent bug. The user
+// confirms their name as the parent; we create the parent record and keep
+// existing children as children. No silent guessing.
+function showProfileMigrationModal(){
+  var modal = document.getElementById('profileMigrationModal');
+  if(!modal){
+    console.warn('[YLCC profile] migration modal element missing — cannot prompt');
+    return;
+  }
+  // Populate the list of orphan-child names so the user understands what's being migrated.
+  var listEl = document.getElementById('pmmChildList');
+  if(listEl){
+    listEl.innerHTML = _profiles.map(function(p){
+      return '<li style="margin:.2rem 0;color:var(--tx2);">'+ (p.name||'(unnamed)') + ' <span style="color:var(--tx3);font-size:.7rem;">(child)</span></li>';
+    }).join('');
+  }
+  modal.classList.add('open');
+  modal.style.display = 'flex';
+  var inp = document.getElementById('pmmName');
+  if(inp){ inp.value = ''; setTimeout(function(){ inp.focus(); }, 100); }
+}
+
+function pmmSubmit(){
+  var inp = document.getElementById('pmmName');
+  var err = document.getElementById('pmmErr');
+  var name = (inp && inp.value || '').trim();
+  if(err) err.textContent = '';
+  if(!name){ if(err) err.textContent = 'Please enter your name.'; return; }
+  // Existing children stay — we just prepend a new parent record.
+  var id = generateParentId();
+  // Keep current children as-is, but ensure none of them have isParent===true mistakenly.
+  _profiles.forEach(function(p){ if(p.isParent !== true) p.isParent = false; });
+  _profiles.unshift({id:id, name:name, isParent:true, data:JSON.parse(JSON.stringify(D))});
+  _activeProfileId = id;
+  D.name = name;
+  _ylccProfileCorruptionDetected = false;
+  console.log('[YLCC profile] migration completed: parent=', name, 'id=', id, 'children kept=', _profiles.length-1);
+  saveProfiles();
+  applyName && applyName();
+  renderProfileSwitcher();
+  var modal = document.getElementById('profileMigrationModal');
+  if(modal){ modal.classList.remove('open'); modal.style.display='none'; }
+  showToast('Profile fixed — welcome back, ' + name + '!');
 }
 
 // ── PARENT HUB MULTI-CHILD VIEW ──────────────────────────────
@@ -3880,19 +3991,9 @@ function _openChildSettings(cid){
 
 function quickParentHub(){
   if(typeof IS_DEMO !== 'undefined' && IS_DEMO){ showSection('s-parent'); _doUnlockParent(); return; }
-  // Hard rule: child profiles can never quick-jump into Parent Hub.
-  var _activeIsChild = false;
-  if(typeof _profiles !== 'undefined' && _profiles && _activeProfileId){
-    var _ap = _profiles.find(function(p){ return p.id === _activeProfileId; });
-    if(_ap && _ap.isParent === false) _activeIsChild = true;
-  }
-  if(_activeIsChild){
-    showToast('Switch to your parent profile to access Parent Hub.');
-    return;
-  }
   if(D.parentPinDisabled){ showSection('s-parent'); _doUnlockParent(); return; }
   if(_parentDashUnlocked){ showSection('s-parent'); return; }
-  // No PIN set — only the parent gets the friendly auto-open path
+  // If no PIN set yet, let them straight in
   if(!D.chorePin && !D.parentPIN){ showSection('s-parent'); _doUnlockParent(); return; }
   const init=(D.name||'P').charAt(0).toUpperCase();
   _requirePin('Parent Hub', 'Enter your 6-digit parent PIN', init, ()=>{
