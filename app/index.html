@@ -593,14 +593,62 @@
   <div style="background:#0f1523;border:1px solid rgba(56,189,248,.2);border-radius:20px;padding:2rem 1.8rem;width:92%;max-width:340px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.85);">
     <div style="font-size:2.5rem;margin-bottom:.6rem;">🚀</div>
     <div style="font-family:var(--fn);font-size:.8rem;font-weight:700;letter-spacing:2px;color:var(--c);margin-bottom:.3rem;">WELCOME TO LIFE OS</div>
-    <div style="font-size:.8rem;color:var(--tx2);margin-bottom:1.2rem;">What should we call you? You can add child profiles later from the Parent Hub.</div>
-    <input id="welcomeNameInput" type="text" placeholder="Your first name" autocomplete="given-name"
+    <div style="font-size:.8rem;color:var(--tx2);margin-bottom:1.2rem;">Enter a name for the child using this account, or leave blank to use "Champion".</div>
+    <input id="welcomeNameInput" type="text" placeholder="Child's name (optional)" autocomplete="off"
       style="width:100%;padding:.65rem .8rem;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff;font-size:.95rem;font-family:var(--fn);text-align:center;margin-bottom:1rem;box-sizing:border-box;"
       onkeydown="if(event.key==='Enter')welcomeSubmit()">
     <button onclick="welcomeSubmit()" class="btn bp" style="width:100%;font-size:.8rem;">Let's Go →</button>
-    <button onclick="document.getElementById('welcomeModal').style.display='none'" style="background:none;border:none;color:var(--tx3);font-size:.72rem;cursor:pointer;margin-top:.5rem;">Skip for now</button>
+    <button onclick="document.getElementById('welcomeModal').style.display='none'" style="background:none;border:none;color:var(--tx3);font-size:.72rem;cursor:pointer;margin-top:.5rem;">Skip — use Champion</button>
   </div>
 </div>
+
+<!-- ── PARENT-NAME CAPTURE MODAL ──────────────────────────────────
+     Shown by parent.js openParentNameCapture() when a brand-new account
+     reaches the app with no parent profile (or addChildFromHub guards
+     against creating an orphan child). Per product rules: never auto-fill
+     from email local-part, always require explicit name input. -->
+<div id="parentNameCaptureModal" style="display:none;position:fixed;inset:0;background:rgba(4,6,16,.95);backdrop-filter:blur(12px);z-index:99997;align-items:center;justify-content:center;">
+  <div style="background:#0f1523;border:1px solid rgba(56,189,248,.2);border-radius:20px;padding:2rem 1.8rem;width:92%;max-width:380px;box-shadow:0 24px 64px rgba(0,0,0,.85);">
+    <div style="text-align:center;font-size:2rem;margin-bottom:.5rem;">👋</div>
+    <div style="text-align:center;font-family:var(--fn);font-size:.72rem;font-weight:700;letter-spacing:2px;color:#38bdf8;margin-bottom:.5rem;">WELCOME</div>
+    <div style="text-align:center;font-size:1.05rem;font-weight:800;margin-bottom:.4rem;color:var(--tx);">What's your name?</div>
+    <div style="text-align:center;font-size:.78rem;color:var(--tx2);margin-bottom:1.1rem;line-height:1.55;">This is the parent profile name that shows on your dashboard.</div>
+    <input type="text" id="pncName" placeholder="Your first name" maxlength="40" autocomplete="given-name" style="width:100%;box-sizing:border-box;padding:.75rem 1rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;color:var(--tx);font-family:var(--fn);font-size:.95rem;outline:none;margin-bottom:1rem;">
+    <div style="font-family:var(--fn);font-size:.66rem;font-weight:700;letter-spacing:1.5px;color:var(--tx3);text-transform:uppercase;margin-bottom:.5rem;">I'm using YourLife CC as…</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1rem;">
+      <button class="pnc-role selected" data-role="parent" onclick="pncSelectRole(this,'parent')" style="padding:.7rem .6rem;border-radius:12px;border:1.5px solid rgba(56,189,248,.4);background:rgba(56,189,248,.1);color:#fff;font-family:var(--fn);font-size:.78rem;font-weight:700;cursor:pointer;text-align:left;line-height:1.3;">👨‍👩‍👧<br>A parent for my family</button>
+      <button class="pnc-role" data-role="solo" onclick="pncSelectRole(this,'solo')" style="padding:.7rem .6rem;border-radius:12px;border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:var(--tx2);font-family:var(--fn);font-size:.78rem;font-weight:700;cursor:pointer;text-align:left;line-height:1.3;">🙋<br>Just for myself</button>
+    </div>
+    <div id="pncErr" style="font-size:.72rem;color:#f87171;min-height:1rem;margin-bottom:.4rem;"></div>
+    <button onclick="pncSubmit()" class="btn bp" style="width:100%;font-size:.85rem;">Continue →</button>
+  </div>
+</div>
+<style>
+  #parentNameCaptureModal.open{ display:flex !important; }
+  #parentNameCaptureModal .pnc-role.selected{ border-color:rgba(56,189,248,.55) !important; background:rgba(56,189,248,.14) !important; color:#fff !important; }
+</style>
+
+<!-- ── PROFILE MIGRATION MODAL ─────────────────────────────────
+     Triggered by parent.js initProfiles() when it detects orphan-child
+     profiles with no parent record (the fingerprint of the corruption
+     bug). User confirms their name; we add a parent record without
+     touching existing children. No silent guessing. -->
+<div id="profileMigrationModal" style="display:none;position:fixed;inset:0;background:rgba(4,6,16,.95);backdrop-filter:blur(12px);z-index:99997;align-items:center;justify-content:center;">
+  <div style="background:#0f1523;border:1px solid rgba(245,158,11,.25);border-radius:20px;padding:2rem 1.8rem;width:92%;max-width:380px;box-shadow:0 24px 64px rgba(0,0,0,.85);">
+    <div style="text-align:center;font-size:2rem;margin-bottom:.5rem;">🛠️</div>
+    <div style="text-align:center;font-family:var(--fn);font-size:.72rem;font-weight:700;letter-spacing:2px;color:#fbbf24;margin-bottom:.5rem;">FAMILY PROFILE FIX</div>
+    <div style="text-align:center;font-size:1.02rem;font-weight:800;margin-bottom:.4rem;color:var(--tx);line-height:1.3;">Confirm your name as the parent</div>
+    <div style="text-align:center;font-size:.78rem;color:var(--tx2);margin-bottom:.9rem;line-height:1.55;">We've improved how family profiles are stored. We found these existing profiles on your account:</div>
+    <ul id="pmmChildList" style="list-style:none;padding:.5rem .8rem;margin:0 0 1rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;font-size:.8rem;"></ul>
+    <div style="font-size:.78rem;color:var(--tx2);margin-bottom:.6rem;line-height:1.55;">Enter your name so we can rebuild your parent profile (your children's data stays exactly as it was):</div>
+    <input type="text" id="pmmName" placeholder="Your first name" maxlength="40" autocomplete="given-name" style="width:100%;box-sizing:border-box;padding:.75rem 1rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;color:var(--tx);font-family:var(--fn);font-size:.95rem;outline:none;margin-bottom:.7rem;">
+    <div id="pmmErr" style="font-size:.72rem;color:#f87171;min-height:1rem;margin-bottom:.4rem;"></div>
+    <button onclick="pmmSubmit()" class="btn bp" style="width:100%;font-size:.85rem;">Save and continue →</button>
+  </div>
+</div>
+<style>
+  #profileMigrationModal.open{ display:flex !important; }
+</style>
 
 <!-- CHILD PIN REVEAL MODAL -->
 <div id="childPinReveal" style="display:none;position:fixed;inset:0;background:rgba(4,6,16,.95);backdrop-filter:blur(12px);z-index:99998;align-items:center;justify-content:center;">
@@ -694,6 +742,11 @@
       </div>
     </div>
   </div>
+
+  <!-- SWITCH-TO-PARENT BUTTON HOST — populated by renderSwitchToParentBtn() in parent.js
+       only when the active profile is a child. PIN-gated only if a parent PIN is set
+       and the parent-PIN toggle is on (see switchToParentRequest). -->
+  <div id="switchToParentHost" style="display:none;justify-content:flex-end;margin-bottom:.55rem;"></div>
 
   <!-- HERO HEADER — child only, hidden in parent view -->
   <div id="heroCard" class="hero-card no-photo" style="margin-bottom:.7rem;">
@@ -6639,20 +6692,13 @@ function applyHeroViewMode() {
     var nameEl = document.getElementById('parentWelcomeName');
     var dateEl = document.getElementById('parentWelcomeDate');
     if (nameEl) {
-      // Pick the best real name, never the email prefix.
-      var parentProf = (typeof _profiles !== 'undefined' && _profiles)
-        ? _profiles.find(function(p){ return p.isParent !== false; })
-        : null;
-      var meta = (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.user_metadata)
-        ? _supaUser.user_metadata
-        : {};
-      var pname =
-        (parentProf && parentProf.name && parentProf.name.trim()) ||
-        (typeof D !== 'undefined' && D && D.name && D.name.trim()) ||
-        (meta.first_name && String(meta.first_name).trim()) ||
-        (meta.name && String(meta.name).trim().split(/\s+/)[0]) ||
-        (meta.full_name && String(meta.full_name).trim().split(/\s+/)[0]) ||
-        'Friend';
+      // Use parent profile name if set, otherwise fall back to email prefix, never child name
+      var parentProf = (_profiles || []).find(function(p){ return p.isParent !== false; });
+      var pname = (parentProf && parentProf.name)
+        ? parentProf.name
+        : (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.email)
+          ? _supaUser.email.split('@')[0]
+          : 'Parent';
       var hr = new Date().getHours();
       var greet = hr < 12 ? 'morning' : hr < 17 ? 'afternoon' : 'evening';
       nameEl.textContent = 'Good ' + greet + ', ' + pname;
@@ -6689,45 +6735,6 @@ if (_origRefresh) {
     applyHeroViewMode();
   };
 }
-</script>
-
-<!-- Service Worker registration with auto-update on new deploy -->
-<link rel="manifest" href="/manifest.json">
-<script>
-(function(){
-  if (!('serviceWorker' in navigator)) return;
-  if (location.protocol !== 'https:' && location.hostname !== 'localhost') return;
-
-  window.addEventListener('load', function(){
-    navigator.serviceWorker.register('/service-worker.js').then(function(reg){
-      // When a new SW is found, tell it to take over right away.
-      reg.addEventListener('updatefound', function(){
-        var nw = reg.installing;
-        if (!nw) return;
-        nw.addEventListener('statechange', function(){
-          if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-            // New version waiting — activate it immediately.
-            nw.postMessage({ type: 'SKIP_WAITING' });
-          }
-        });
-      });
-      // Check for updates whenever the page becomes visible again.
-      document.addEventListener('visibilitychange', function(){
-        if (document.visibilityState === 'visible') reg.update().catch(function(){});
-      });
-    }).catch(function(err){
-      console.warn('[SW] registration failed:', err);
-    });
-
-    // When the controlling SW changes, reload once to pick up new assets.
-    var refreshing = false;
-    navigator.serviceWorker.addEventListener('controllerchange', function(){
-      if (refreshing) return;
-      refreshing = true;
-      location.reload();
-    });
-  });
-})();
 </script>
 </body>
 </html>
