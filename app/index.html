@@ -6636,9 +6636,19 @@ function _onboardSaveName(){
   }
   // Save name to D and to the parent profile in _profiles
   D.name = name;
-  if(typeof _profiles !== 'undefined' && typeof _activeProfileId !== 'undefined'){
-    var parentProf = _profiles.find(function(p){ return p.isParent !== false; });
-    if(parentProf) parentProf.name = name;
+  if(typeof _profiles !== 'undefined'){
+    var parentProf = _profiles.find(function(p){ return p.isParent === true; });
+    if(parentProf){
+      parentProf.name = name;
+    } else if(typeof generateParentId === 'function'){
+      // No parent profile yet (existing user with corrupted state, or first
+      // login from an account that never had a parent profile created).
+      // Create one now so addChildFromHub and welcome card both have something
+      // to anchor on. Without this, downstream flows fire prompts again.
+      var newId = generateParentId();
+      _profiles.unshift({ id:newId, name:name, isParent:true, data:JSON.parse(JSON.stringify(D)) });
+      _activeProfileId = newId;
+    }
     if(typeof saveProfiles === 'function') saveProfiles();
   }
   if(typeof applyName === 'function') applyName();
@@ -6696,12 +6706,14 @@ function applyHeroViewMode() {
     var nameEl = document.getElementById('parentWelcomeName');
     var dateEl = document.getElementById('parentWelcomeDate');
     if (nameEl) {
-      // Use parent profile name if set, otherwise fall back to email prefix, never child name
-      var parentProf = (_profiles || []).find(function(p){ return p.isParent !== false; });
+      // Use parent profile name first, then D.name if set, then a neutral default.
+      // Never the email local-part (per product rules — that\'s where "jason.vega07"
+      // was leaking through).
+      var parentProf = (_profiles || []).find(function(p){ return p.isParent === true; });
       var pname = (parentProf && parentProf.name)
         ? parentProf.name
-        : (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.email)
-          ? _supaUser.email.split('@')[0]
+        : (typeof D !== 'undefined' && D && D.name && String(D.name).trim())
+          ? D.name
           : 'Parent';
       var hr = new Date().getHours();
       var greet = hr < 12 ? 'morning' : hr < 17 ? 'afternoon' : 'evening';
