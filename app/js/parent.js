@@ -1688,19 +1688,31 @@ function renderSwitchToParentBtn(){
     + '</button>';
 }
 
-// Read PIN settings from the parent profile, not from the currently-active
-// profile's D. When a child is active, D has no chorePin/parentPIN/disabled
-// fields, so reading from D would silently bypass the gate.
+// The parent PIN is conceptually a family-level setting but historically
+// got saved into whichever profile was active when the user typed it. So
+// look in current D first (most recently touched settings), fall back to
+// the parent profile's stored data, then scan any profile as a last resort.
+// Take the toggle (parentPinDisabled) from whichever source actually has
+// the PIN so they stay paired.
 function _getParentPinInfo(){
   var parent = _profiles.find(function(p){ return p.isParent === true; });
-  var src = (parent && _activeProfileId === parent.id) ? D
-          : (parent && parent.data) ? parent.data
-          : D;
-  return {
-    parent: parent,
-    pin: src.chorePin || src.parentPIN,
-    disabled: !!src.parentPinDisabled
-  };
+  var pin = D.chorePin || D.parentPIN;
+  var disabled = !!D.parentPinDisabled;
+  if(!pin && parent && parent.data){
+    pin = parent.data.chorePin || parent.data.parentPIN;
+    if(pin) disabled = !!parent.data.parentPinDisabled;
+  }
+  if(!pin){
+    for(var i=0;i<(_profiles||[]).length;i++){
+      var pd = _profiles[i].data;
+      if(pd && (pd.chorePin || pd.parentPIN)){
+        pin = pd.chorePin || pd.parentPIN;
+        disabled = !!pd.parentPinDisabled;
+        break;
+      }
+    }
+  }
+  return { parent: parent, pin: pin, disabled: disabled };
 }
 
 function switchToParentRequest(){
