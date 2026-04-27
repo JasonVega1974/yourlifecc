@@ -1225,8 +1225,19 @@ function initProfiles(){
     // If localStorage empty, try loading from D (synced from cloud on another device)
     if(_profiles.length === 0 && D._profiles && D._profiles.length > 0){
       _profiles = JSON.parse(JSON.stringify(D._profiles));
-      localStorage.setItem('ylcc_profiles', JSON.stringify(_profiles));
     }
+    // Hydrate each profile's .data: prefer inline (legacy bloated index) so
+    // the next saveProfiles pushes it into per-profile keys; otherwise read
+    // from per-profile key (new layout). Active profile's .data is also
+    // re-synced from D below since lifeos_v2 is the freshest source.
+    _profiles.forEach(function(p){
+      if(p && p.id && !p.data){
+        try {
+          var raw = localStorage.getItem(_ylccProfileDataKey(p.id));
+          if(raw) p.data = JSON.parse(raw);
+        } catch(e){ /* ignore — profile will hydrate next save */ }
+      }
+    });
     console.log('[YLCC profile] initProfiles loaded _profiles=', _profiles.map(p=>({id:p.id,name:p.name,isParent:p.isParent})));
     // Migration: profiles created before isParent existed default the FIRST one to parent.
     // This is only safe when isParent is *undefined* — never overwrite an explicit false.
@@ -1265,6 +1276,16 @@ function initProfiles(){
     _activeProfileId = _profiles.length ? _profiles[0].id : null;
     saveProfiles();
   }
+  // Active profile's .data is authoritative in D (lifeos_v2) — sync that into
+  // _profiles[active].data so a subsequent switchToProfile saves the freshest
+  // values, not the stale per-profile-key snapshot.
+  if(_activeProfileId){
+    var _act = _profiles.find(function(p){ return p.id === _activeProfileId; });
+    if(_act) _act.data = JSON.parse(JSON.stringify(D));
+  }
+  // Eagerly migrate legacy bloated ylcc_profiles → slim index + per-profile keys
+  // so users hitting the quota crash get freed space on first reload after this fix.
+  saveProfiles();
   renderProfileSwitcher();
   // If we detected corruption above, run the one-time confirmation modal AFTER
   // the rest of the bootstrap finishes so the modal renders cleanly.
@@ -1290,21 +1311,42 @@ function initProfiles(){
 // migration modal uses this to render its one-time confirmation prompt.
 var _ylccProfileCorruptionDetected = false;
 
+// Per-profile data lives in its own LS key so the index stays small.
+// Storing every profile's full data inside ylcc_profiles bloated the value
+// past the localStorage quota once a family had photos + history.
+function _ylccProfileDataKey(id){ return 'lifeos_profile_'+id; }
+
 function saveProfiles(){
-  localStorage.setItem('ylcc_profiles', JSON.stringify(_profiles));
-  // Save to both user-specific key (survives cloudLoad) and global key (fallback)
-  localStorage.setItem(_ylccUserKey('ylcc_active_profile'), _activeProfileId||'');
-  localStorage.setItem('ylcc_active_profile', _activeProfileId||'');
-  // Persist into D so cloudSync carries profiles to all devices
-  D._profiles = JSON.parse(JSON.stringify(_profiles));
+  // Order matters: SHRINK the bloated keys first (frees quota space) before
+  // writing per-profile keys. Users hitting quota on the legacy bloated layout
+  // would fail on the first per-profile setItem if we wrote those first.
+  var slim = (_profiles||[]).map(function(p){
+    return { id:p.id, name:p.name, isParent:p.isParent };
+  });
+  D._profiles = JSON.parse(JSON.stringify(slim));
   D._activeProfileId = _activeProfileId||'';
-  // Keep D.name in sync with the *active* profile's name, so the welcome card
-  // matches whoever is actually using the app right now. Previously this always
-  // wrote the parent's name into D — which silently overwrote a child's D.name
-  // every save and was the trigger for the parent-record-corruption bug.
+  // Keep D.name in sync with the active profile's name (was the trigger for
+  // the parent-record-corruption bug when this always wrote the parent's name).
   var _activeProf = _profiles.find(function(p){ return p.id === _activeProfileId; });
   if(_activeProf && _activeProf.name) D.name = _activeProf.name;
+  // 1) Shrink the index — replaces the legacy bloated value, frees space.
+  try { localStorage.setItem('ylcc_profiles', JSON.stringify(slim)); }
+  catch(e){ console.error('[YLCC profile] could not save profile index:', e.message); }
+  // 2) Active-profile pointers (tiny).
+  try {
+    localStorage.setItem(_ylccUserKey('ylcc_active_profile'), _activeProfileId||'');
+    localStorage.setItem('ylcc_active_profile', _activeProfileId||'');
+  } catch(e){}
+  // 3) lifeos_v2 with the now-slim D._profiles (frees more space than it adds).
   save();
+  // 4) Per-profile data keys — quota now has room. Per-profile failure is
+  // logged but doesn't abort the rest.
+  (_profiles||[]).forEach(function(p){
+    if(p && p.id && p.data){
+      try { localStorage.setItem(_ylccProfileDataKey(p.id), JSON.stringify(p.data)); }
+      catch(e){ console.warn('[YLCC profile] could not save data for', p.id, '-', e.message); }
+    }
+  });
   if(typeof _supaUser !== 'undefined' && _supaUser) setTimeout(cloudSync, 500);
 }
 
@@ -1647,23 +1689,13 @@ function renderSwitchToParentBtn(){
 }
 
 function switchToParentRequest(){
-  console.log('[YLCC switch] entry, active=', _activeProfileId, 'profiles=', (_profiles||[]).map(function(p){return {id:p.id,name:p.name,isParent:p.isParent};}));
   var parent = _profiles.find(function(p){ return p.isParent === true; });
-  if(!parent){ console.warn('[YLCC switch] no parent with isParent===true'); showToast('No parent profile found'); return; }
-  console.log('[YLCC switch] target=', parent.id, parent.name);
+  if(!parent){ showToast('No parent profile found'); return; }
   var pin = D.chorePin || D.parentPIN;
   var pinOff = !!D.parentPinDisabled;
-  console.log('[YLCC switch] pinSet?', !!pin, 'pinDisabled?', pinOff);
-  // No PIN set, or PIN toggle disabled → switch immediately, no prompt.
-  if(!pin || pinOff){
-    try { switchToProfile(parent.id); }
-    catch(e){ console.error('[YLCC switch] switchToProfile threw:', e); showToast('Switch failed: '+(e&&e.message||e)); }
-    return;
-  }
-  // PIN required — use the existing PIN modal helper.
+  if(!pin || pinOff){ switchToProfile(parent.id); return; }
   _requirePin('Switch to Parent', 'Enter your 6-digit parent PIN', (parent.name||'P').charAt(0).toUpperCase(), function(){
-    try { switchToProfile(parent.id); }
-    catch(e){ console.error('[YLCC switch] switchToProfile threw (post-PIN):', e); showToast('Switch failed: '+(e&&e.message||e)); }
+    switchToProfile(parent.id);
   });
 }
 
@@ -3970,38 +4002,17 @@ function closeSettingsPicker(){
   var modal=document.getElementById('settingsPickerModal'); if(modal) modal.classList.remove('open');
 }
 function _openParentSettings(){
-  console.log('[YLCC parentSettings] entry, active=', _activeProfileId, 'IS_DEMO=', (typeof IS_DEMO !== 'undefined' && IS_DEMO));
-  if(typeof IS_DEMO !== 'undefined' && IS_DEMO){
-    try { openSettings(); }
-    catch(e){ console.error('[YLCC parentSettings] openSettings threw (demo):', e); showToast('Settings failed: '+(e&&e.message||e)); }
-    return;
-  }
-
-  // Shared "do the thing" fn — used after PIN entry OR when no PIN is required.
+  if(typeof IS_DEMO !== 'undefined' && IS_DEMO){ openSettings(); return; }
   function _doOpen(){
-    console.log('[YLCC parentSettings] _doOpen, active=', _activeProfileId);
     var parentProf = (_profiles||[]).find(function(p){ return p.isParent === true; });
-    console.log('[YLCC parentSettings] parentProf=', parentProf && parentProf.id, parentProf && parentProf.name);
     if(parentProf && _activeProfileId !== parentProf.id){
-      console.log('[YLCC parentSettings] switching profile then opening');
-      try { switchToProfile(parentProf.id); }
-      catch(e){ console.error('[YLCC parentSettings] switchToProfile threw:', e); showToast('Switch failed: '+(e&&e.message||e)); return; }
-      requestAnimationFrame(function(){
-        requestAnimationFrame(function(){
-          console.log('[YLCC parentSettings] calling openSettings (post-switch)');
-          try { openSettings(); }
-          catch(e){ console.error('[YLCC parentSettings] openSettings threw (post-switch):', e); showToast('Settings failed: '+(e&&e.message||e)); }
-        });
-      });
+      switchToProfile(parentProf.id);
+      requestAnimationFrame(function(){ requestAnimationFrame(openSettings); });
     } else {
-      console.log('[YLCC parentSettings] calling openSettings directly');
-      try { openSettings(); }
-      catch(e){ console.error('[YLCC parentSettings] openSettings threw (direct):', e); showToast('Settings failed: '+(e&&e.message||e)); }
+      openSettings();
     }
   }
-
   var pin = D.chorePin || D.parentPIN;
-  console.log('[YLCC parentSettings] pinSet?', !!pin, 'pinDisabled?', !!D.parentPinDisabled);
   if(pin && !D.parentPinDisabled){
     showPinModal('Parent Settings','Enter your 6-digit parent PIN',(D.name||'P').charAt(0).toUpperCase(),'enter', _doOpen);
     return;
