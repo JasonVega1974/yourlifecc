@@ -326,34 +326,13 @@
 
   <!-- PROGRESS -->
   <div id="progressWrap">
-    <div id="progressLabel">Getting started <span id="stepLabel">Step 1 of 5</span></div>
-    <div id="progressBar"><div id="progressFill" style="width:20%"></div></div>
+    <div id="progressLabel">Getting started <span id="stepLabel">Step 1 of 4</span></div>
+    <div id="progressBar"><div id="progressFill" style="width:25%"></div></div>
   </div>
 
   <!-- ══ STEP 1: ACCOUNT (skipped when arriving from authScreen signup) ══ -->
   <div class="card" id="step1" style="display:none;">
     <!-- Step 1 is handled by the main authScreen — users arrive here already signed up -->
-  </div>
-
-  <!-- ══ STEP 1B: YOUR NAME + ROLE ══ -->
-  <div class="card" id="step1b" style="display:none;">
-    <span class="step-icon">👋</span>
-    <div class="step-title">What's your name?</div>
-    <div class="step-sub">This is the name on your parent profile — kids can see it.</div>
-
-    <div class="field">
-      <label>Your name</label>
-      <input type="text" id="s1bName" placeholder="e.g. Jason" autocomplete="given-name" maxlength="40">
-    </div>
-    <div class="field">
-      <label>I'm using YourLife CC as…</label>
-      <div id="s1bRoles" style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">
-        <button type="button" class="role-btn selected" data-role="parent" onclick="selectRole(this,'parent')" style="padding:.85rem .6rem;border-radius:12px;border:1.5px solid rgba(56,189,248,.4);background:rgba(56,189,248,.1);color:#fff;font-family:var(--fn);font-size:.8rem;font-weight:700;cursor:pointer;text-align:left;line-height:1.3;">👨‍👩‍👧<br>A parent for my family</button>
-        <button type="button" class="role-btn" data-role="solo" onclick="selectRole(this,'solo')" style="padding:.85rem .6rem;border-radius:12px;border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:var(--tx2);font-family:var(--fn);font-size:.8rem;font-weight:700;cursor:pointer;text-align:left;line-height:1.3;">🙋<br>Just for myself</button>
-      </div>
-    </div>
-    <div class="err" id="s1bErr"></div>
-    <button class="btn-primary" onclick="doParentInfo()">Continue →</button>
   </div>
 
   <!-- ══ STEP 2: CHILD ══ -->
@@ -447,8 +426,6 @@
 const STATE = {
   email: '',
   password: '',
-  parentName: '',
-  role: 'parent',           // 'parent' | 'solo'
   childName: '',
   childAge: '',
   taskName: '',
@@ -459,47 +436,12 @@ let _currentStep = 1;
 let _selectedChip = null;
 
 // ── PROGRESS ───────────────────────────────────────────────
-// Step IDs are: '1b' (name+role), 2 (child), 3 (task), 4 (demo)
-const STEP_LABELS = { '1b':'Step 1 of 4', 2:'Step 2 of 4', 3:'Step 3 of 4', 4:'Step 4 of 4', '4solo':'Step 2 of 2' };
-const STEP_PCT    = { '1b':25,           2:50,             3:75,             4:100,             '4solo':100 };
+const STEP_LABELS = { 1:'Step 1 of 4', 2:'Step 2 of 4', 3:'Step 3 of 4', 4:'Step 4 of 4' };
+const STEP_PCT    = { 1:25, 2:50, 3:75, 4:100 };
 
 function setProgress(step){
-  var key = String(step);
-  document.getElementById('stepLabel').textContent = STEP_LABELS[key] || '';
-  document.getElementById('progressFill').style.width = (STEP_PCT[key] || 25) + '%';
-}
-
-// ── ROLE SELECT (Step 1b) ─────────────────────────────────
-function selectRole(btn, role){
-  STATE.role = role;
-  document.querySelectorAll('#s1bRoles .role-btn').forEach(function(b){
-    b.classList.remove('selected');
-    b.style.borderColor='rgba(255,255,255,.1)';
-    b.style.background='rgba(255,255,255,.03)';
-    b.style.color='var(--tx2)';
-  });
-  btn.classList.add('selected');
-  btn.style.borderColor='rgba(56,189,248,.4)';
-  btn.style.background='rgba(56,189,248,.1)';
-  btn.style.color='#fff';
-}
-
-function doParentInfo(){
-  var name = document.getElementById('s1bName').value.trim();
-  var err  = document.getElementById('s1bErr');
-  err.textContent='';
-  if(!name){ err.textContent='Please enter your name.'; return; }
-  STATE.parentName = name;
-  if(STATE.role === 'solo'){
-    // Solo: save parent-only profile and route straight to the dashboard. No child step,
-    // no chore demo — they're a single user, not a parent setting up for a kid.
-    saveOnboardData();
-    // Solo users land on the home dashboard (NOT Parent Hub).
-    localStorage.removeItem('ylcc_goto_parent');
-    window.location.href = '/app';
-  } else {
-    goTo(2);
-  }
+  document.getElementById('stepLabel').textContent = STEP_LABELS[step] || '';
+  document.getElementById('progressFill').style.width = (STEP_PCT[step] || 25) + '%';
 }
 
 // ── NAVIGATION ─────────────────────────────────────────────
@@ -720,13 +662,15 @@ function saveOnboardData(){
     // onboarding profile was silently discarded on enter.
     var APP_LS_KEY = 'lifeos_v2';
 
-    // Build the multi-profile array. Parent always exists (the user's name + role).
+    // Parent name is captured later by the in-app wizard's slide 0 (chooseSoloMode /
+    // chooseFamilyMode in app/index.html). We leave the parent profile name blank here;
+    // saveProfiles will pick up D.name once the wizard sets it.
     var parentId = genParentId();
     var profiles = [
-      { id: parentId, name: STATE.parentName || 'You', isParent: true, avatar: '👨‍👩‍👧' }
+      { id: parentId, name: '', isParent: true, avatar: '👨‍👩‍👧' }
     ];
     var childId = null;
-    if(STATE.role !== 'solo' && STATE.childName){
+    if(STATE.childName){
       childId = genChildId();
       profiles.push({
         id: childId, name: STATE.childName, isParent: false, avatar: '👧',
@@ -747,16 +691,13 @@ function saveOnboardData(){
     try { var raw = localStorage.getItem(APP_LS_KEY); if(raw) existing = JSON.parse(raw) || {}; } catch(e){}
 
     var merged = Object.assign({}, existing, {
-      name: STATE.parentName || existing.name || '',
       parentWizardDone: false,
       kidOnboardDone: true,
-      soloMode: STATE.role === 'solo',
       _profiles: profiles,
       _activeProfileId: parentId
     });
 
     localStorage.setItem(APP_LS_KEY, JSON.stringify(merged));
-    // Mirror profiles into the multi-profile localStorage key the app reads on init.
     localStorage.setItem('ylcc_profiles', JSON.stringify(profiles));
     localStorage.setItem('ylcc_active_profile', parentId);
 
@@ -765,10 +706,8 @@ function saveOnboardData(){
       localStorage.setItem('ylcc_onboard_child_name', STATE.childName);
     }
 
-    // ── AWARD CONTEST ENTRIES ──────────────────────────────────
     awardOnboardEntry('setup_complete', 1);
     if(childId) awardOnboardEntry('first_task', 1);
-    // ────────────────────────────────────────────────────────────
 
   } catch(e){
     console.warn('saveOnboardData:', e);
@@ -794,18 +733,16 @@ function enterApp(){
 // ── ENTER KEY SUPPORT ──────────────────────────────────────
 document.addEventListener('keydown', e=>{
   if(e.key !== 'Enter') return;
-  if(_currentStep === '1b') doParentInfo();
-  else if(_currentStep === 2) doChild();
+  if(_currentStep === 2) doChild();
   else if(_currentStep === 3 && !document.getElementById('s3Btn').disabled) doTask();
 });
 
-// ── AUTO-START: skip step 1, always begin at step 1b (name + role) ────────
+// ── AUTO-START: skip step 1, always begin at step 2 ────────
 // Users arrive here after completing authScreen signup — already authenticated.
 (function(){
-  // Clean up the new-signup flag
   localStorage.removeItem('ylcc_new_signup');
-  _currentStep = 1; // goTo increments from this; we go to '1b' explicitly
-  goTo('1b');
+  _currentStep = 1; // goTo increments from this
+  goTo(2);
 })();
 </script>
 </body>
