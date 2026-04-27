@@ -4878,46 +4878,31 @@ function applyTheme(){
 // PARENT ONBOARDING WIZARD
 // ══════════════════════════════════════════════════════════
 let _pobStep = 0;
-// _pobMinStep raises the floor when an earlier flow (e.g. onboard.html step 1b)
-// already captured what slide 0 used to ask. Slide 0 is then unreachable so the
-// user doesn't get prompted for the same name + role twice.
-let _pobMinStep = 0;
 const POB_TOTAL = 7;
 
 function initPobDots(){
   const d = document.getElementById('pobDots'); if(!d) return;
-  d.innerHTML = Array.from({length:POB_TOTAL},(_,i)=>`<div class="ob-dot${i===_pobMinStep?' act':''}" id="pd${i}"></div>`).join('');
+  d.innerHTML = Array.from({length:POB_TOTAL},(_,i)=>`<div class="ob-dot${i===0?' act':''}" id="pd${i}"></div>`).join('');
 }
 function pobNav(dir){
-  _pobStep = Math.max(_pobMinStep, Math.min(POB_TOTAL-1, _pobStep + dir));
+  _pobStep = Math.max(0, Math.min(POB_TOTAL-1, _pobStep + dir));
   const slides = document.getElementById('pobSlides'); if(!slides) return;
   const w = slides.parentElement.offsetWidth || slides.offsetWidth;
   slides.style.transform = `translateX(-${_pobStep * w}px)`;
   document.querySelectorAll('#pobDots .ob-dot').forEach((d,i)=>d.classList.toggle('act',i===_pobStep));
   const prev = document.getElementById('pobPrev');
   const next = document.getElementById('pobNext');
-  if(prev){ prev.disabled = _pobStep===_pobMinStep; prev.style.opacity=_pobStep===_pobMinStep?'0.3':'1'; }
+  if(prev){ prev.disabled = _pobStep===0; prev.style.opacity=_pobStep===0?'0.3':'1'; }
   if(next){
     next.textContent = _pobStep === POB_TOTAL-1 ? '✅ Complete' : 'Next ›';
     if(_pobStep === POB_TOTAL-1){ next.onclick = ()=>{ closeParentOnboard(); showSection('s-hero'); }; } else { next.onclick = ()=>pobNav(1); }
   }
 }
 function showParentOnboard(){
-  // If onboard.html step 1b already collected name + role, slide 0 is redundant.
-  // Solo users skip the wizard entirely (the rest is a family-setup tutorial).
-  // Family users open at slide 1 (Welcome) and the back button is gated to slide 1.
-  var hasNameAndRole = !!(D && D.name && String(D.name).trim() && typeof D.soloMode === 'boolean');
-  if(hasNameAndRole && D.soloMode === true){
-    D.parentWizardDone = true;
-    try{ localStorage.setItem(_ylccUserKey('ylcc_parentWizardDone'), '1'); }catch(e){}
-    save();
-    return;
-  }
-  _pobMinStep = hasNameAndRole ? 1 : 0;
-  _pobStep = _pobMinStep;
+  _pobStep = 0;
   initPobDots();
   const slides = document.getElementById('pobSlides');
-  if(slides) slides.style.transform = `translateX(-${_pobStep * (slides.parentElement?.offsetWidth || slides.offsetWidth || 0)}px)`;
+  if(slides) slides.style.transform='translateX(0px)';
   const prev = document.getElementById('pobPrev');
   if(prev){ prev.disabled=true; prev.style.opacity='0.35'; }
   const next = document.getElementById('pobNext');
@@ -4928,15 +4913,6 @@ function showParentOnboard(){
   modal.style.cssText = '';
   modal.classList.add('open');
   document.body.style.overflow='hidden';
-  // Re-snap to the correct slide AFTER the modal becomes visible — offsetWidth
-  // is 0 while display:none, so the initial transform above can be wrong when
-  // _pobStep > 0. This 50ms delay matches the modal's open animation.
-  if(_pobStep > 0 && slides){
-    setTimeout(function(){
-      var w = slides.parentElement ? slides.parentElement.offsetWidth : 0;
-      if(w) slides.style.transform = 'translateX(-' + (_pobStep * w) + 'px)';
-    }, 50);
-  }
   // Mark as seen immediately so it never auto-shows again after this visit.
   // Per-user localStorage flag survives cloudLoad() overwrites on refresh.
   D.parentWizardDone = true;
