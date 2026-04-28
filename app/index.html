@@ -291,6 +291,16 @@
   </div>
 
   <div class="sp-pb">
+  <!-- Life stage / age tier — entry for existing users to retune sections after first launch. -->
+  <div style="margin-bottom:.85rem;">
+    <div style="font-family:var(--fh);font-size:.73rem;letter-spacing:1px;color:#c8d4e8;margin-bottom:.45rem;">🎯 LIFE STAGE</div>
+    <div style="font-size:.68rem;color:var(--tx2);margin-bottom:.45rem;">Tap a stage to retune which sections show in your sidebar.</div>
+    <div style="display:flex;gap:.3rem;flex-wrap:wrap;">
+      <button class="btn bs" onclick="setMode('middle');showToast('Stage: 12–14 ✓');" style="flex:1;min-width:90px;font-size:.65rem;padding:.4rem;">🎒 12–14</button>
+      <button class="btn bs" onclick="setMode('mid_hs');showToast('Stage: 15–17 ✓');" style="flex:1;min-width:90px;font-size:.65rem;padding:.4rem;">📖 15–17</button>
+      <button class="btn bs" onclick="setMode('adult');showToast('Stage: 18–22 ✓');" style="flex:1;min-width:90px;font-size:.65rem;padding:.4rem;">💼 18–22</button>
+    </div>
+  </div>
   <div style="font-family:var(--fh);font-size:.73rem;letter-spacing:1px;color:#c8d4e8;margin-bottom:.45rem;">SHOW / HIDE SECTIONS</div>
   <div id="sectionToggles"></div>
 
@@ -6036,6 +6046,41 @@
       </div>
     </div>
 
+    <!-- SLIDE 1: AGE TIER PICKER (Solo path only — Family path skips this slide via pobNav(2)) -->
+    <div class="ob-slide">
+      <div class="ob-hero">
+        <span class="ob-hero-emoji">🎯</span>
+        <div class="ob-hero-title">HOW OLD ARE YOU?</div>
+        <div class="ob-hero-sub">We'll tailor what you see to your stage. You can change this anytime in Settings.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:.65rem;margin-top:.8rem;">
+        <button onclick="chooseAgeTier('middle')" style="display:flex;align-items:center;gap:.9rem;width:100%;padding:.95rem 1.1rem;background:linear-gradient(135deg,rgba(34,211,153,.08),rgba(34,197,94,.06));border:2px solid rgba(34,211,153,.3);border-radius:14px;cursor:pointer;text-align:left;font-family:var(--fn);transition:all .2s;" onmouseover="this.style.borderColor='#34d399'" onmouseout="this.style.borderColor='rgba(34,211,153,.3)'">
+          <span style="font-size:1.9rem;flex-shrink:0;">🎒</span>
+          <div>
+            <div style="font-size:.88rem;font-weight:900;color:#fff;margin-bottom:.15rem;">12–14 · Middle School</div>
+            <div style="font-size:.72rem;color:rgba(255,255,255,.45);line-height:1.5;">Core surface — chores, goals, mood, habits, reading, scripture, rewards.</div>
+          </div>
+          <span style="margin-left:auto;color:#34d399;font-size:1.2rem;flex-shrink:0;">→</span>
+        </button>
+        <button onclick="chooseAgeTier('mid_hs')" style="display:flex;align-items:center;gap:.9rem;width:100%;padding:.95rem 1.1rem;background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(79,143,255,.06));border:2px solid rgba(56,189,248,.3);border-radius:14px;cursor:pointer;text-align:left;font-family:var(--fn);transition:all .2s;" onmouseover="this.style.borderColor='#38bdf8'" onmouseout="this.style.borderColor='rgba(56,189,248,.3)'">
+          <span style="font-size:1.9rem;flex-shrink:0;">📖</span>
+          <div>
+            <div style="font-size:.88rem;font-weight:900;color:#fff;margin-bottom:.15rem;">15–17 · High School</div>
+            <div style="font-size:.72rem;color:rgba(255,255,255,.45);line-height:1.5;">Adds school tracking, health, finance basics, driving, and life skills.</div>
+          </div>
+          <span style="margin-left:auto;color:#38bdf8;font-size:1.2rem;flex-shrink:0;">→</span>
+        </button>
+        <button onclick="chooseAgeTier('adult')" style="display:flex;align-items:center;gap:.9rem;width:100%;padding:.95rem 1.1rem;background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(139,92,246,.06));border:2px solid rgba(167,139,250,.25);border-radius:14px;cursor:pointer;text-align:left;font-family:var(--fn);transition:all .2s;" onmouseover="this.style.borderColor='#a78bfa'" onmouseout="this.style.borderColor='rgba(167,139,250,.25)'">
+          <span style="font-size:1.9rem;flex-shrink:0;">💼</span>
+          <div>
+            <div style="font-size:.88rem;font-weight:900;color:#fff;margin-bottom:.15rem;">18–22 · Young Adult</div>
+            <div style="font-size:.72rem;color:rgba(255,255,255,.45);line-height:1.5;">Full surface — resume, jobs, bio page, mentors, milestones, all life skills.</div>
+          </div>
+          <span style="margin-left:auto;color:#a78bfa;font-size:1.2rem;flex-shrink:0;">→</span>
+        </button>
+      </div>
+    </div>
+
     <!-- SLIDE 1: WELCOME -->
     <div class="ob-slide">
       <div class="ob-hero">
@@ -6731,20 +6776,39 @@ function _onboardSaveName(){
 function chooseSoloMode(){
   if(!_onboardSaveName()) return;
   D.soloMode = true;
-  D.parentWizardDone = true;
   save();
-  var ob = document.getElementById('parentOnboard');
-  if(ob) ob.classList.remove('open');
-  applySoloMode();
-  showSection('s-hero');
-  showToast('Welcome, ' + D.name + '! Your dashboard is ready. 🚀');
+  // Advance to age-tier picker (slide 1). chooseAgeTier finishes the wizard.
+  if(typeof pobNav === 'function') pobNav(1);
 }
 
 function chooseFamilyMode(){
   if(!_onboardSaveName()) return;
   D.soloMode = false;
+  // Parent presumed 18+. Default mode to 'adult' so they get the full surface.
+  if(!D.mode || D.mode === 'high') D.mode = 'adult';
   save();
-  if(typeof pobNav === 'function') pobNav(1);
+  // Skip the Solo-only age-picker slide (index 1) and jump to Welcome (index 2).
+  if(typeof pobNav === 'function') pobNav(2);
+}
+
+function chooseAgeTier(tier){
+  // tier: 'middle' (12-14) | 'mid_hs' (15-17) | 'adult' (18-22).
+  // Maps directly to existing STAGE_CONFIG entries (see ui.js).
+  if(typeof setMode === 'function'){
+    setMode(tier);
+  } else {
+    D.mode = tier; save();
+  }
+  if(typeof buildSideNav === 'function') buildSideNav();
+  D.parentWizardDone = true;
+  try{ localStorage.setItem(_ylccUserKey('ylcc_parentWizardDone'), '1'); }catch(e){}
+  save();
+  var ob = document.getElementById('parentOnboard');
+  if(ob){ ob.classList.remove('open'); ob.style.display='none'; }
+  document.body.style.overflow = '';
+  if(typeof applySoloMode === 'function') applySoloMode();
+  if(typeof showSection === 'function') showSection('s-hero');
+  if(typeof showToast === 'function') showToast('Welcome, ' + (D.name||'champion') + '! 🚀');
 }
 
 function applySoloMode(){
