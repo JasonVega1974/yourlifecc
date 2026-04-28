@@ -1737,28 +1737,23 @@ function toggleChildHeaderDropdown(){
   if(btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
 }
 
-function signOutChild(){
+async function signOutChild(){
+  // Full sign-out: end the Supabase session, wipe local state, redirect.
+  // The "Switch profile" menu item handles the picker UX separately.
   const m = document.getElementById('heroProfileMenu');
   if(m) m.style.display = 'none';
-  // Clear active child + every parent-unlock surface so re-selecting the
-  // parent profile must re-enter the PIN.
-  _activeProfileId = null;
-  if(typeof saveProfiles === 'function') saveProfiles();
-  _parentDashUnlocked = false;
-  sessionStorage.removeItem('parentUnlocked');
-  localStorage.removeItem('lifeos_parent_unlocked');
-  // No supa.auth.signOut here — parent's account session stays alive.
-  if(typeof _supaUser === 'undefined' || !_supaUser){
-    window.location.href = '/login.html';
-    return;
+  try {
+    const supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+    if(supa) await supa.auth.signOut();
+  } catch(e){ console.warn('[signOutChild] supa.signOut threw', e); }
+  var rememberEmail = null;
+  try { rememberEmail = localStorage.getItem('lifeos_remember_email'); } catch(_){}
+  try { localStorage.clear(); } catch(_){}
+  try { sessionStorage.clear(); } catch(_){}
+  if(rememberEmail){
+    try { localStorage.setItem('lifeos_remember_email', rememberEmail); } catch(_){}
   }
-  // Open the profile picker (same UI children use to pick).
-  if(typeof openChildLogin === 'function'){
-    openChildLogin();
-  } else {
-    // Fallback: refresh the page so init re-routes through the picker.
-    location.reload();
-  }
+  window.location.href = '/';
 }
 
 
