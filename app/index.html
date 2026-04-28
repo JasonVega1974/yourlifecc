@@ -515,14 +515,14 @@
 <div id="deleteAccountModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;align-items:center;justify-content:center;padding:1rem;">
   <div style="background:var(--bg2,#1a1a2e);border:1px solid rgba(248,113,113,.3);border-radius:16px;padding:1.5rem;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5);">
     <div style="font-size:1.4rem;text-align:center;margin-bottom:.5rem;">⚠️</div>
-    <div style="font-size:1rem;font-weight:700;color:#f87171;text-align:center;margin-bottom:.5rem;">Delete Account & All Data</div>
-    <div style="font-size:.75rem;color:var(--tx2);text-align:center;margin-bottom:1rem;line-height:1.6;">This will permanently delete your account and every piece of data associated with it. <strong style="color:var(--tx);">This cannot be undone.</strong></div>
+    <div style="font-size:1rem;font-weight:700;color:#f87171;text-align:center;margin-bottom:.5rem;">Delete your account?</div>
+    <div style="font-size:.75rem;color:var(--tx2);text-align:center;margin-bottom:1rem;line-height:1.6;">This permanently deletes your account, all family data, and cancels any active subscription. <strong style="color:var(--tx);">This cannot be undone.</strong></div>
     <div style="font-size:.73rem;color:var(--tx2);margin-bottom:.4rem;">Type <strong style="color:#f87171;">DELETE</strong> to confirm:</div>
     <input id="deleteAccountConfirm" type="text" placeholder="Type DELETE here" style="width:100%;padding:.6rem .8rem;background:rgba(255,255,255,.06);border:1px solid rgba(248,113,113,.3);border-radius:8px;color:var(--tx);font-size:.85rem;box-sizing:border-box;margin-bottom:.75rem;font-family:var(--fn);" oninput="checkDeleteConfirm()">
     <div id="deleteAccountMsg" style="font-size:.68rem;color:#f87171;min-height:1rem;margin-bottom:.5rem;text-align:center;"></div>
     <div style="display:flex;gap:.5rem;">
       <button class="btn bgh bs" style="flex:1;" onclick="closeDeleteAccountModal()">Cancel</button>
-      <button id="deleteAccountBtn" class="btn bs" style="flex:1;background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.3);opacity:.4;cursor:not-allowed;" disabled onclick="confirmDeleteAccount()">Delete Forever</button>
+      <button id="deleteAccountBtn" class="btn bs" style="flex:1;background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.3);opacity:.4;cursor:not-allowed;" disabled onclick="confirmDeleteAccount()">Delete forever</button>
     </div>
   </div>
 </div>
