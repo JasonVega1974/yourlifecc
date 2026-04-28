@@ -3317,8 +3317,23 @@ async function confirmDeleteAccount(){
       return;
     }
 
-    // Server confirmed auth user + rows deleted. Wipe local state, preserving
-    // the remember-email pref if present so a future signup form prefills.
+    // Server confirmed auth user + rows deleted. Wipe ALL local state — both
+    // in-memory AND persisted — so the next signup on this device cannot
+    // inherit the previous family's child profile names.
+    //
+    // Order matters: blank in-memory FIRST. Otherwise an async listener that
+    // fires after supa.auth.signOut() (e.g. cloudSync, saveProfiles via auth
+    // state change) reads stale _profiles from RAM and re-writes them to
+    // localStorage AFTER our clear() — which is exactly the "Lilly" leak.
+    try {
+      if(typeof _profiles !== 'undefined' && Array.isArray(_profiles)) _profiles.length = 0;
+      if(typeof _activeProfileId !== 'undefined') _activeProfileId = null;
+      if(typeof D === 'object' && D && typeof DEF === 'object' && DEF){
+        for(var _k in D){ if(Object.prototype.hasOwnProperty.call(D, _k)) delete D[_k]; }
+        Object.assign(D, JSON.parse(JSON.stringify(DEF)));
+      }
+    } catch(_){}
+
     try { await supa.auth.signOut(); } catch(_){}
     var rememberEmail = null;
     try { rememberEmail = localStorage.getItem('lifeos_remember_email'); } catch(_){}
@@ -3330,7 +3345,10 @@ async function confirmDeleteAccount(){
 
     closeDeleteAccountModal();
     showToast('Account deleted. Goodbye 👋');
-    setTimeout(function(){ window.location.href = '/'; }, 1500);
+    // Short delay so the toast is readable. Belt-and-suspenders: if anything
+    // writes ylcc_profiles back during the wait, the in-memory wipe above
+    // means it's writing [], not Lilly.
+    setTimeout(function(){ window.location.href = '/'; }, 800);
   } catch(e){
     console.error('[delete-account] threw:', e);
     msg.textContent = 'Network error: ' + (e && e.message ? e.message : 'unknown');
