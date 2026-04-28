@@ -135,6 +135,8 @@ function resetAllPins(){
   if(!confirm('Reset ALL PINs? This clears the parent PIN and all child PINs.')){ return; }
   D.chorePin = null;
   D.parentPIN = null;
+  D.parentPinHash = '';
+  D.pinMigration = { status:'pending', startedAt:null, completedAt:null, childrenMigrated:[] };
   _profiles = [];
   _activeProfileId = null;
   localStorage.removeItem('ylcc_profiles');
@@ -144,20 +146,37 @@ function resetAllPins(){
   showToast('All PINs reset. Set a new one on next unlock.');
 }
 
-function resetChildPin(profileId){
+async function resetChildPin(profileId){
   const profile = _profiles.find(p=>p.id===profileId);
   if(!profile){ showToast('Profile not found'); return; }
-  let newPin='';
-  let tries=0;
-  do{ newPin=String(Math.floor(1000+Math.random()*9000)); tries++; }
-  while(_profiles.find(p=>p.id===newPin) && tries<100);
-  const oldId = profile.id;
-  profile.id = newPin;
-  if(_activeProfileId === oldId) _activeProfileId = newPin;
+  // Generate a random 4-digit PIN. Uniqueness across other children matters
+  // only so the parent doesn't end up with two identical PINs by chance.
+  const usedHashes = new Set();
+  const usedLegacyIds = new Set();
+  (_profiles||[]).forEach(function(p){
+    if(!p || p.isParent) return;
+    if(p.pinHash) usedHashes.add(p.pinHash);
+    else if(p.id) usedLegacyIds.add(String(p.id));
+  });
+  let newPin = '';
+  for(let tries=0; tries<200; tries++){
+    const candidate = String(Math.floor(1000+Math.random()*9000));
+    if(usedLegacyIds.has(candidate)) continue;
+    const h = await hashPin(candidate);
+    if(usedHashes.has(h)) continue;
+    newPin = candidate; break;
+  }
+  if(!newPin){ showToast('Could not generate a unique PIN — try again.'); return; }
+  await setChildPinHash(profile, newPin);
+  // Strip any plaintext that may have lived on the profile.
+  if(profile.data){
+    if(profile.data.chorePin) profile.data.chorePin = '';
+    if(profile.data.parentPIN) profile.data.parentPIN = '';
+  }
   saveProfiles();
   renderProfileSwitcher();
   renderManageUsers();
-  // Show reveal modal
+  // Show reveal modal so parent can read the PIN to the child.
   const nm=document.getElementById('cprName');
   const pn=document.getElementById('cprPin');
   if(nm) nm.textContent=profile.name+"'s New PIN";
@@ -210,14 +229,18 @@ function updateParentPinToggleUI(){
   }
 }
 
-function changeParentPin(){
+async function changeParentPin(){
   const np=document.getElementById('newParentPin');
   const cp=document.getElementById('confirmParentPin');
   if(!np||!cp) return;
   const pin=np.value.trim(), conf=cp.value.trim();
   if(pin.length!==6||isNaN(pin)){showToast('PIN must be exactly 6 digits'); return;}
   if(pin!==conf){showToast('PINs do not match'); return;}
-  D.chorePin=pin; save();
+  await setParentPin(pin);
+  // Mark parent step of migration as done so the banner doesn't re-prompt
+  // for the parent PIN if a partial migration was in flight.
+  try { setPinMigrationStatus('parent_done'); } catch(e){}
+  save();
   np.value=''; cp.value='';
   showToast('Parent PIN updated ✓');
 }
@@ -279,19 +302,42 @@ function phSetChildBanner(childId, gradient){
   showToast('Banner color updated!');
 }
 
-function addChildFromHub(){
+async function addChildFromHub(){
   const nameEl=document.getElementById('newChildName');
   const pinEl=document.getElementById('newChildPin');
   const name=nameEl?nameEl.value.trim():'';
   if(!name){showToast('Enter a name'); return;}
   let pin=pinEl?pinEl.value.trim():'';
   if(pin&&(pin.length!==4||isNaN(pin))){showToast('PIN must be exactly 4 digits'); return;}
+  // Decide whether this family is using hashed PINs. If so, new children get
+  // a stable random id and a separate pinHash; otherwise legacy id-as-PIN.
+  const useHash = !!D.parentPinHash;
+  // Collect existing PIN signatures to avoid collisions (across both forms).
+  const existingHashes = new Set();
+  const existingLegacyIds = new Set();
+  (_profiles||[]).forEach(function(p){
+    if(!p || p.isParent) return;
+    if(p.pinHash) existingHashes.add(p.pinHash);
+    else if(p.id) existingLegacyIds.add(String(p.id));
+  });
   if(!pin){
-    let tries=0;
-    do{pin=String(Math.floor(1000+Math.random()*9000));tries++;}
-    while(_profiles.find(p=>p.id===pin)&&tries<100);
+    for(let tries=0; tries<200; tries++){
+      const cand = String(Math.floor(1000+Math.random()*9000));
+      if(existingLegacyIds.has(cand)) continue;
+      if(useHash){
+        const h = await hashPin(cand);
+        if(existingHashes.has(h)) continue;
+      }
+      pin = cand; break;
+    }
+  } else {
+    if(existingLegacyIds.has(pin)){ showToast('PIN already in use — try a different one'); return; }
+    if(useHash){
+      const h = await hashPin(pin);
+      if(existingHashes.has(h)){ showToast('PIN already in use — try a different one'); return; }
+    }
   }
-  if(_profiles.find(p=>p.id===pin)){showToast('PIN already in use — try a different one'); return;}
+  if(!pin){ showToast('Could not generate a unique PIN — try again.'); return; }
 
   // GUARD: a child profile must never be the only profile in the array. If no
   // parent exists, create one before appending the child. This prevents the
@@ -321,8 +367,22 @@ function addChildFromHub(){
   }
 
   if(_activeProfileId){const cur=_profiles.find(p=>p.id===_activeProfileId);if(cur)cur.data=JSON.parse(JSON.stringify(D));}
-  _profiles.push({id:pin,name,isParent:false,data:{name,streak:0,mode:'mid_hs'}});
-  console.log('[YLCC profile] addChildFromHub created child:', {id:pin,name}, 'parent active=', _activeProfileId);
+  // For hashed families: id is a stable random key, pinHash holds the secret.
+  // For legacy families: id IS the PIN (pre-migration behavior preserved).
+  let newProfile;
+  if(useHash){
+    const stableId = 'c_' + Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4);
+    newProfile = { id: stableId, name, isParent:false, pinHash: await hashPin(pin), data:{name,streak:0,mode:'mid_hs'} };
+    // Track as already-migrated so banner doesn't ask for this child's PIN.
+    try {
+      const m = (typeof getPinMigration === 'function') ? getPinMigration() : null;
+      if(m && m.childrenMigrated.indexOf(stableId) === -1) m.childrenMigrated.push(stableId);
+    } catch(e){}
+  } else {
+    newProfile = { id: pin, name, isParent:false, data:{name,streak:0,mode:'mid_hs'} };
+  }
+  _profiles.push(newProfile);
+  console.log('[YLCC profile] addChildFromHub created child:', {id:newProfile.id,name,hashed:useHash}, 'parent active=', _activeProfileId);
   saveProfiles();
   if(nameEl)nameEl.value='';
   if(pinEl)pinEl.value='';
