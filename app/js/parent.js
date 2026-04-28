@@ -6,7 +6,57 @@
 ============================================================= */
 
 // ── PARENT DASHBOARD ─────────────────────────────────────────
-let _parentDashUnlocked = sessionStorage.getItem('parentUnlocked')==='1' || localStorage.getItem('lifeos_parent_unlocked')==='1';
+// Timed in-memory unlock. Replaces the old sessionStorage/localStorage cache
+// (which persisted across browser restarts — major security hole).
+//   - Sliding idle: any user activity in the parent area refreshes the idle
+//     window. After PARENT_IDLE_MS of no activity, the dash auto-locks.
+//   - Hard cap: regardless of activity, after PARENT_HARD_CAP_MS the dash
+//     auto-locks and re-PIN is required. Protects against walk-away laptops.
+const PARENT_IDLE_MS     =  5 * 60 * 1000;   // 5 min sliding idle
+const PARENT_HARD_CAP_MS = 30 * 60 * 1000;   // 30 min hard cap
+let _parentUnlockExpiresAt = 0;   // sliding idle expiry (ms epoch)
+let _parentUnlockHardCap   = 0;   // hard cap expiry (ms epoch)
+let _parentIdleListenersAttached = false;
+
+function isParentUnlocked(){
+  const now = Date.now();
+  return now < _parentUnlockExpiresAt && now < _parentUnlockHardCap;
+}
+
+function _bumpParentIdleTimer(){
+  if(typeof D!=='undefined' && D && D.parentPinDisabled) return;
+  if(!isParentUnlocked()) return;
+  _parentUnlockExpiresAt = Math.min(Date.now() + PARENT_IDLE_MS, _parentUnlockHardCap);
+}
+
+function _attachParentIdleListeners(){
+  if(_parentIdleListenersAttached) return;
+  _parentIdleListenersAttached = true;
+  ['mousedown','keydown','touchstart','wheel'].forEach(function(evt){
+    document.addEventListener(evt, _bumpParentIdleTimer, {passive:true});
+  });
+  setInterval(function(){
+    if(_parentUnlockHardCap && !isParentUnlocked()){
+      _autoLockParentDash();
+    }
+  }, 30000);
+}
+
+function _autoLockParentDash(){
+  _parentUnlockExpiresAt = 0;
+  _parentUnlockHardCap = 0;
+  if(typeof _activeSection!=='undefined' && _activeSection==='s-parent'){
+    if(typeof lockParentDash==='function') lockParentDash();
+    if(typeof showToast==='function') showToast('Parent session timed out — please re-enter PIN');
+  }
+}
+
+// HTML-escape user-supplied strings before innerHTML interpolation.
+function escapeHtml(s){
+  return String(s==null?'':s).replace(/[&<>"']/g, function(c){
+    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+  });
+}
 
 function unlockParentDash(){
   initChoreData();
@@ -17,9 +67,13 @@ function unlockParentDash(){
 }
 
 function lockParentDash(){
-  _parentDashUnlocked = false;
+  _parentUnlockExpiresAt = 0;
+  _parentUnlockHardCap = 0;
   _pgBuffer = ''; _pgUpdateDots();
-  sessionStorage.removeItem('parentUnlocked');
+  // Cleanup of any stale flags from the previous deploy (storage-cache model).
+  // Safe to remove this block in a future deploy once known users have rotated.
+  try { sessionStorage.removeItem('parentUnlocked'); } catch(e){}
+  try { localStorage.removeItem('lifeos_parent_unlocked'); } catch(e){}
   const gate=document.getElementById('parentGate');
   const content=document.getElementById('parentDashContent');
   const err=document.getElementById('parentGateError');
@@ -85,7 +139,7 @@ function toggleChildSection(cid,sid,btn){
 }
 
 function renderParentDash(){
-  if(!_parentDashUnlocked) return;
+  if(!isParentUnlocked()) return;
   populateParentChildSelect();
   populateChildSectionSel();
   renderParentGettingStarted();
@@ -265,10 +319,10 @@ function renderParentNotes(){
     <div style="display:flex;gap:.5rem;padding:.5rem .6rem;background:rgba(251,146,60,.04);border:1px solid rgba(251,146,60,.08);border-radius:8px;margin-bottom:.3rem;">
       <span style="font-size:1rem;">💌</span>
       <div style="flex:1;">
-        <div style="font-size:.75rem;color:var(--tx);line-height:1.5;">${n.text}</div>
-        <div style="font-size:.55rem;color:var(--tx2);margin-top:.15rem;">From Mom/Dad · ${n.date} ${n.time}</div>
+        <div style="font-size:.75rem;color:var(--tx);line-height:1.5;">${escapeHtml(n.text)}</div>
+        <div style="font-size:.55rem;color:var(--tx2);margin-top:.15rem;">From Mom/Dad · ${escapeHtml(n.date)} ${escapeHtml(n.time)}</div>
       </div>
-      ${_parentDashUnlocked?`<button class="btn bda bs" onclick="removeParentNote(${n.id})" style="font-size:.45rem;">✕</button>`:''}
+      ${isParentUnlocked()?`<button class="btn bda bs" onclick="removeParentNote(${n.id})" style="font-size:.45rem;">✕</button>`:''}
     </div>
   `).join('');
 }
@@ -280,8 +334,8 @@ function renderKidParentNotes(){
   const el = document.getElementById('heroParentNotes'); if(!el) return;
   el.innerHTML = notes.map(n=>`
     <div style="padding:.35rem .5rem;background:rgba(251,146,60,.04);border:1px solid rgba(251,146,60,.1);border-radius:8px;margin-bottom:.2rem;">
-      <div style="font-size:.65rem;color:var(--tx);">💌 ${n.text}</div>
-      <div style="font-size:.48rem;color:var(--tx2);">${n.date}</div>
+      <div style="font-size:.65rem;color:var(--tx);">💌 ${escapeHtml(n.text)}</div>
+      <div style="font-size:.48rem;color:var(--tx2);">${escapeHtml(n.date)}</div>
     </div>
   `).join('');
 }
@@ -1434,9 +1488,16 @@ async function _pgSubmit(){
   }
 }
 function _doUnlockParent(){
-  _parentDashUnlocked=true;
-  sessionStorage.setItem('parentUnlocked','1');
-  localStorage.setItem('lifeos_parent_unlocked','1');
+  const now = Date.now();
+  if(typeof D!=='undefined' && D && D.parentPinDisabled){
+    // PIN gate disabled by user — no idle/cap enforcement.
+    _parentUnlockHardCap = Number.MAX_SAFE_INTEGER;
+    _parentUnlockExpiresAt = Number.MAX_SAFE_INTEGER;
+  } else {
+    _parentUnlockHardCap = now + PARENT_HARD_CAP_MS;
+    _parentUnlockExpiresAt = now + PARENT_IDLE_MS;
+    _attachParentIdleListeners();
+  }
   const gate=document.getElementById('parentGate');
   const content=document.getElementById('parentDashContent');
   if(gate) gate.style.display='none';
@@ -1752,7 +1813,7 @@ async function signOutChild(){
 function addChildProfile(){
   // Route to the Hub's add-child UI — it's the cleanest path
   showSection('s-parent');
-  if(!_parentDashUnlocked){
+  if(!isParentUnlocked()){
     // Need parent auth first
     _requirePin('ADD CHILD','Enter parent PIN to add a child profile','👶',()=>{
       _doUnlockParent();
@@ -4398,7 +4459,7 @@ function _openChildSettings(cid){
 function quickParentHub(){
   if(typeof IS_DEMO !== 'undefined' && IS_DEMO){ showSection('s-parent'); _doUnlockParent(); return; }
   if(D.parentPinDisabled){ showSection('s-parent'); _doUnlockParent(); return; }
-  if(_parentDashUnlocked){ showSection('s-parent'); return; }
+  if(isParentUnlocked()){ showSection('s-parent'); return; }
   // If no PIN set yet (hashed or plaintext), let them straight in
   if(!D.parentPinHash && !D.chorePin && !D.parentPIN){ showSection('s-parent'); _doUnlockParent(); return; }
   const init=(D.name||'P').charAt(0).toUpperCase();
