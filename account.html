@@ -163,8 +163,8 @@
 <!-- Delete Confirm Modal -->
 <div class="overlay" id="delete-overlay">
   <div class="modal">
-    <h3>⚠ Delete Account</h3>
-    <p>This will permanently delete your account and all data. This cannot be undone.<br><br>
+    <h3>⚠ Delete your account?</h3>
+    <p>This permanently deletes your account, all family data, and cancels any active subscription. <strong style="color:var(--tx);">This cannot be undone.</strong><br><br>
     Type <strong style="color:var(--rd);">DELETE</strong> to confirm.</p>
     <div class="confirm-field">
       <label>Confirmation</label>
@@ -173,7 +173,7 @@
     <div id="msg-delete" class="msg"></div>
     <div class="modal-btns">
       <button class="btn btn-ghost" onclick="closeDeleteModal()">CANCEL</button>
-      <button class="btn btn-danger" onclick="deleteAccount()">DELETE ACCOUNT</button>
+      <button class="btn btn-danger" onclick="deleteAccount()">DELETE FOREVER</button>
     </div>
   </div>
 </div>
@@ -252,24 +252,63 @@ async function deleteAccount(){
   const val = document.getElementById('delete-confirm-input').value.trim();
   if(val !== 'DELETE'){ showMsg('msg-delete','You must type DELETE exactly.','err'); return; }
 
-  // Delete profile data from profiles table first
-  await supa.from('profiles').delete().eq('user_id', _user.id);
+  const btn = document.querySelector('#delete-overlay .btn-danger');
+  const origLabel = btn ? btn.textContent : 'DELETE FOREVER';
+  if(btn){ btn.disabled = true; btn.textContent = 'DELETING…'; }
 
-  // Call Supabase edge function or admin API to delete auth user
-  // Since we can't call admin.deleteUser from client, we use a workaround:
-  // Sign out and flag the account — or use a Supabase edge function
-  // For now: delete profile data and sign out with a message
-  await supa.auth.signOut();
-  closeDeleteModal();
-  document.body.innerHTML = `
-    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0a0f;font-family:Inter,sans-serif;padding:2rem;">
-      <div style="text-align:center;max-width:400px;">
-        <div style="font-size:3rem;margin-bottom:1rem;">👋</div>
-        <h2 style="font-family:Orbitron,monospace;color:#f0f0f8;margin-bottom:.75rem;">Account Deleted</h2>
-        <p style="color:#a0a0b8;line-height:1.6;margin-bottom:1.5rem;">Your data has been removed. Thanks for using YourLife.cc.</p>
-        <a href="/app/index.html" style="background:#3b82f6;color:#fff;padding:.75rem 1.5rem;border-radius:8px;font-family:Orbitron,monospace;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-decoration:none;">GO HOME</a>
-      </div>
-    </div>`;
+  try {
+    const { data: { session } } = await supa.auth.getSession();
+    if(!session || !session.access_token){
+      showMsg('msg-delete', 'Session expired. Please sign in again and retry.', 'err');
+      if(btn){ btn.disabled = false; btn.textContent = origLabel; }
+      return;
+    }
+
+    const resp = await fetch(SUPA_URL + '/functions/v1/delete-account', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPA_KEY,
+        'Authorization': 'Bearer ' + session.access_token
+      }
+    });
+
+    let result = {};
+    try { result = await resp.json(); } catch(_){ /* leave empty */ }
+
+    if(!resp.ok || !result.success){
+      const real = (result && result.error) ? result.error
+                 : ('HTTP ' + resp.status + (resp.statusText ? ' ' + resp.statusText : ''));
+      showMsg('msg-delete', real, 'err');
+      console.error('[delete-account] failed:', resp.status, result);
+      if(btn){ btn.disabled = false; btn.textContent = origLabel; }
+      return;
+    }
+
+    try { await supa.auth.signOut(); } catch(_){}
+    let rememberEmail = null;
+    try { rememberEmail = localStorage.getItem('lifeos_remember_email'); } catch(_){}
+    try { localStorage.clear(); } catch(_){}
+    try { sessionStorage.clear(); } catch(_){}
+    if(rememberEmail){
+      try { localStorage.setItem('lifeos_remember_email', rememberEmail); } catch(_){}
+    }
+
+    closeDeleteModal();
+    document.body.innerHTML = `
+      <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0a0f;font-family:Inter,sans-serif;padding:2rem;">
+        <div style="text-align:center;max-width:400px;">
+          <div style="font-size:3rem;margin-bottom:1rem;">👋</div>
+          <h2 style="font-family:Orbitron,monospace;color:#f0f0f8;margin-bottom:.75rem;">Account Deleted</h2>
+          <p style="color:#a0a0b8;line-height:1.6;margin-bottom:1.5rem;">Your account, family data, and any active subscription have been removed.</p>
+          <a href="/" style="background:#3b82f6;color:#fff;padding:.75rem 1.5rem;border-radius:8px;font-family:Orbitron,monospace;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-decoration:none;">GO HOME</a>
+        </div>
+      </div>`;
+  } catch(e){
+    console.error('[delete-account] threw:', e);
+    showMsg('msg-delete', 'Network error: ' + (e && e.message ? e.message : 'unknown'), 'err');
+    if(btn){ btn.disabled = false; btn.textContent = origLabel; }
+  }
 }
 
 async function signOut(){
