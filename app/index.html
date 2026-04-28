@@ -942,7 +942,7 @@
     </div>
 
     <!-- Earnings -->
-    <div class="dcard" onclick="showSection('s-chores')">
+    <div class="dcard dcard-extra" onclick="showSection('s-chores')">
       <div class="dcard-status" id="dcEarnStatus"></div>
       <div class="dcard-icon">💰</div>
       <div class="dcard-label">EARNINGS <span class="hlp" onmouseenter="hlp('earnings',this,event);hlpHintDone()" onmouseleave="hlpHide()">?<span class="hlp-arrow">▲</span></span></div>
@@ -951,7 +951,7 @@
     </div>
 
     <!-- Certificates -->
-    <div class="dcard" onclick="showSection('s-skills')">
+    <div class="dcard dcard-extra" onclick="showSection('s-skills')">
       <div class="dcard-status" id="dcCertStatus"></div>
       <div class="dcard-icon">🧠</div>
       <div class="dcard-label">CERTS <span class="hlp" onmouseenter="hlp('certs',this,event);hlpHintDone()" onmouseleave="hlpHide()">?<span class="hlp-arrow">▲</span></span></div>
@@ -978,7 +978,7 @@
     </div>
 
     <!-- Books -->
-    <div class="dcard" onclick="showSection('s-reading')">
+    <div class="dcard dcard-extra" onclick="showSection('s-reading')">
       <div class="dcard-status" id="dcBookStatus"></div>
       <div class="dcard-icon">📖</div>
       <div class="dcard-label">BOOKS <span class="hlp" onmouseenter="hlp('books',this,event);hlpHintDone()" onmouseleave="hlpHide()">?<span class="hlp-arrow">▲</span></span></div>
@@ -989,7 +989,7 @@
     <!-- Health -->
     
     <!-- Screen Time -->
-    <div class="dcard" onclick="showSection('s-chores')">
+    <div class="dcard dcard-extra" onclick="showSection('s-chores')">
       <div class="dcard-status" id="dcScreenStatus"></div>
       <div class="dcard-icon">📱</div>
       <div class="dcard-label">SCREEN TIME <span class="hlp" onmouseenter="hlp('screentime',this,event);hlpHintDone()" onmouseleave="hlpHide()">?<span class="hlp-arrow">▲</span></span></div>
@@ -998,7 +998,7 @@
     </div>
 
     <!-- Checking -->
-    <div class="dcard" onclick="showSection('s-finance')">
+    <div class="dcard dcard-extra" onclick="showSection('s-finance')">
       <div class="dcard-status" id="dcFinStatus"></div>
       <div class="dcard-icon">🏦</div>
       <div class="dcard-label">CHECKING <span class="hlp" onmouseenter="hlp('checking',this,event);hlpHintDone()" onmouseleave="hlpHide()">?<span class="hlp-arrow">▲</span></span></div>
@@ -1007,7 +1007,7 @@
     </div>
 
     <!-- Upcoming -->
-    <div class="dcard" onclick="showSection('s-calendar')">
+    <div class="dcard dcard-extra" onclick="showSection('s-calendar')">
       <div class="dcard-status" id="dcCalStatus"></div>
       <div class="dcard-icon">📅</div>
       <div class="dcard-label">UPCOMING <span class="hlp" onmouseenter="hlp('upcoming',this,event);hlpHintDone()" onmouseleave="hlpHide()">?<span class="hlp-arrow">▲</span></span></div>
@@ -1028,7 +1028,7 @@
     <!-- Journal -->
     
     <!-- Milestones -->
-    <div class="dcard" onclick="showSection('s-milestones')">
+    <div class="dcard dcard-extra" onclick="showSection('s-milestones')">
       <div class="dcard-status" id="dcMileStatus"></div>
       <div class="dcard-icon">🏆</div>
       <div class="dcard-label">MILESTONES <span class="hlp" onmouseenter="hlp('milestones',this,event);hlpHintDone()" onmouseleave="hlpHide()">?<span class="hlp-arrow">▲</span></span></div>
@@ -1037,7 +1037,7 @@
     </div>
 
     <!-- Daily Scripture -->
-    <div class="dcard" onclick="showSection('s-scripture')">
+    <div class="dcard dcard-extra" onclick="showSection('s-scripture')">
       <div class="dcard-status" id="dcScrStatus"></div>
       <div class="dcard-icon">✝️</div>
       <div class="dcard-label">SCRIPTURE <span class="hlp" onmouseenter="hlp('scripture',this,event);hlpHintDone()" onmouseleave="hlpHide()">?<span class="hlp-arrow">▲</span></span></div>
@@ -1046,13 +1046,19 @@
     </div>
 
     <!-- Parent Bucks (2nd instance) -->
-    <div class="dcard" onclick="showSection('s-chores')">
+    <div class="dcard dcard-extra" onclick="showSection('s-chores')">
       <div class="dcard-status" id="dcPBStatus2"></div>
       <div class="dcard-icon">🪙</div>
       <div class="dcard-label">PARENT BUCKS <span class="hlp" onmouseenter="hlp('parentbucks',this,event);hlpHintDone()" onmouseleave="hlpHide()">?<span class="hlp-arrow">▲</span></span></div>
       <div class="dcard-value" id="qsPB" style="color:#fbbf24;">0</div>
       <div class="dcard-sub" id="qsPBGames"></div>
     </div>
+  </div>
+
+  <!-- Hero compact mode toggle (Phase 2.2) — collapses non-priority cards. -->
+  <style>.dashGrid.compact .dcard-extra{display:none;}</style>
+  <div style="text-align:center;margin:-.3rem 0 .7rem;">
+    <button id="heroCompactToggle" onclick="toggleHeroCompact()" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--tx2);padding:.3rem .8rem;border-radius:8px;font-size:.65rem;font-weight:700;cursor:pointer;font-family:var(--fn);letter-spacing:.5px;">📊 Show all stats</button>
   </div>
 
     <!-- ═══ DAILY ACTIVITY CHECK ═══ -->
@@ -6821,6 +6827,40 @@ function applySoloMode(){
   // Update body class for CSS hooks
   document.body.classList.toggle('solo-mode', isSolo);
 }
+
+// ── HERO COMPACT MODE (Phase 2.2) ────────────────────────────
+// Default-compact dashboard: 8 priority cards visible, 9 extras hidden behind
+// "Show all stats" toggle. Preference persists per-user via the standard
+// _ylccUserKey pattern so it survives cloudLoad() overwrites.
+function toggleHeroCompact(){
+  var grid = document.querySelector('.dashGrid');
+  if(!grid) return;
+  var nowCompact = !grid.classList.contains('compact');
+  grid.classList.toggle('compact', nowCompact);
+  var btn = document.getElementById('heroCompactToggle');
+  if(btn) btn.textContent = nowCompact ? '📊 Show all stats' : '📉 Hide extra stats';
+  try {
+    var key = (typeof _ylccUserKey === 'function') ? _ylccUserKey('ylcc_heroCompact') : 'ylcc_heroCompact_local';
+    localStorage.setItem(key, nowCompact ? '1' : '0');
+  } catch(e){}
+}
+
+function _applyHeroCompact(){
+  var grid = document.querySelector('.dashGrid');
+  if(!grid) return;
+  var key = (typeof _ylccUserKey === 'function') ? _ylccUserKey('ylcc_heroCompact') : 'ylcc_heroCompact_local';
+  var stored = null;
+  try { stored = localStorage.getItem(key); } catch(e){}
+  // Default = compact (Phase 2.2). User toggles off → '0' is stored.
+  var compact = stored !== '0';
+  grid.classList.toggle('compact', compact);
+  var btn = document.getElementById('heroCompactToggle');
+  if(btn) btn.textContent = compact ? '📊 Show all stats' : '📉 Hide extra stats';
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  setTimeout(_applyHeroCompact, 350);
+});
 </script>
 
 <script>
