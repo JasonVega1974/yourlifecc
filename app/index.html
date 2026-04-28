@@ -703,6 +703,63 @@
   </div>
 </div>
 
+<!-- MIGRATION CHILD-PIN MODAL (Phase 1.1 add-on) — 4-digit PIN entry while
+     walking each child during PIN migration. -->
+<div id="migChildPinModal" style="display:none;position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#0a0a14,#1a1a2e,#16213e);align-items:center;justify-content:center;flex-direction:column;">
+  <div style="text-align:center;max-width:340px;width:92%;">
+    <div style="width:60px;height:60px;border-radius:50%;background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto .7rem;">🔐</div>
+    <div style="font-size:1.2rem;font-weight:900;color:#fff;margin-bottom:.2rem;">Set new 4-digit PIN</div>
+    <div style="font-size:.78rem;color:rgba(255,255,255,.55);margin-bottom:1.2rem;">For <span id="migChildPinName" style="color:var(--c);font-weight:700;"></span></div>
+    <div style="display:flex;gap:.7rem;justify-content:center;margin-bottom:1.2rem;">
+      <div class="pin-dot" id="mcd0"></div>
+      <div class="pin-dot" id="mcd1"></div>
+      <div class="pin-dot" id="mcd2"></div>
+      <div class="pin-dot" id="mcd3"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem;max-width:240px;margin:0 auto .7rem;">
+      <button onclick="migChildPinKey('1')" class="pin-btn">1</button>
+      <button onclick="migChildPinKey('2')" class="pin-btn">2</button>
+      <button onclick="migChildPinKey('3')" class="pin-btn">3</button>
+      <button onclick="migChildPinKey('4')" class="pin-btn">4</button>
+      <button onclick="migChildPinKey('5')" class="pin-btn">5</button>
+      <button onclick="migChildPinKey('6')" class="pin-btn">6</button>
+      <button onclick="migChildPinKey('7')" class="pin-btn">7</button>
+      <button onclick="migChildPinKey('8')" class="pin-btn">8</button>
+      <button onclick="migChildPinKey('9')" class="pin-btn">9</button>
+      <button onclick="migChildPinSkip()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.4);border-radius:12px;padding:.9rem;font-size:.62rem;font-weight:700;cursor:pointer;font-family:var(--fn);">Skip</button>
+      <button onclick="migChildPinKey('0')" class="pin-btn">0</button>
+      <button onclick="migChildPinKey('⌫')" class="pin-btn" style="font-size:1.2rem;">⌫</button>
+    </div>
+    <div id="migChildPinError" style="font-size:.72rem;color:#f87171;min-height:1rem;"></div>
+  </div>
+</div>
+
+<!-- FORGOT PARENT PIN MODAL (Phase 1.1 add-on) — re-confirm Supabase password
+     to set a new parent PIN. No tokens, no email, no Edge Function. -->
+<div id="forgotPinModal" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.78);align-items:center;justify-content:center;">
+  <div style="background:#0a0e1a;border:1.5px solid rgba(56,189,248,.35);border-radius:18px;padding:1.6rem 1.4rem;max-width:380px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,.7);">
+    <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.7rem;">
+      <div style="width:42px;height:42px;border-radius:50%;background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);display:flex;align-items:center;justify-content:center;font-size:1.3rem;">🔑</div>
+      <div>
+        <div style="font-size:1rem;font-weight:900;color:#fff;">Reset parent PIN</div>
+        <div style="font-size:.7rem;color:var(--tx2);">Confirm your account password</div>
+      </div>
+    </div>
+    <div style="font-size:.72rem;color:var(--tx2);margin-bottom:.85rem;line-height:1.45;">
+      We'll verify your account password (<span id="forgotPinEmail" style="color:var(--c);font-weight:600;"></span>), then let you set a fresh 6-digit PIN.
+    </div>
+    <label style="display:block;font-size:.7rem;font-weight:700;color:var(--tx2);margin-bottom:.25rem;">Account password</label>
+    <input id="forgotPinPassword" type="password" autocomplete="current-password" style="width:100%;padding:.55rem .7rem;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--tx);font-size:.85rem;margin-bottom:.7rem;font-family:var(--fn);">
+    <label style="display:block;font-size:.7rem;font-weight:700;color:var(--tx2);margin-bottom:.25rem;">New 6-digit PIN</label>
+    <input id="forgotPinNew" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" style="width:100%;padding:.55rem .7rem;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--tx);font-size:.85rem;margin-bottom:.6rem;font-family:var(--fn);letter-spacing:.2rem;">
+    <div id="forgotPinError" style="font-size:.7rem;color:#f87171;min-height:1rem;margin-bottom:.5rem;"></div>
+    <div style="display:flex;gap:.5rem;justify-content:flex-end;">
+      <button onclick="closeForgotParentPinModal()" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--tx2);padding:.5rem .9rem;border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fn);">Cancel</button>
+      <button onclick="submitForgotParentPin()" class="btn bp" style="font-size:.78rem;padding:.5rem .9rem;">Reset PIN</button>
+    </div>
+  </div>
+</div>
+
 <!-- MOBILE TRANSLATE DROPDOWN — fixed, outside all overflow containers -->
 <div id="mob_translate_element"></div>
 
@@ -773,8 +830,17 @@
         </div>
         <div>
           <div class="hero-greet" style="font-size:1rem;">Good <span id="greet">morning</span></div>
-          <div class="hero-name-wrap"><span id="heroName" class="editable-name hero-name" title="Click to edit" onclick="editNameInline(this)">CHAMPION</span>
-          <span id="heroModeBadge" style="display:none;"></span></div>
+          <div class="hero-name-wrap" style="display:flex;align-items:center;gap:.35rem;flex-wrap:wrap;position:relative;">
+            <span id="heroName" class="editable-name hero-name" title="Click to edit" onclick="editNameInline(this)">CHAMPION</span>
+            <span id="heroModeBadge" style="display:none;"></span>
+            <!-- Child header dropdown trigger (Phase 1.1 add-on) — visible
+                 only when active profile is a child. -->
+            <button id="heroProfileMenuBtn" type="button" aria-haspopup="menu" aria-expanded="false" onclick="toggleChildHeaderDropdown()" title="Profile menu" style="display:none;align-items:center;justify-content:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:var(--tx);width:44px;height:44px;border-radius:50%;font-size:1rem;cursor:pointer;font-family:var(--fn);font-weight:700;">▾</button>
+            <div id="heroProfileMenu" role="menu" style="display:none;position:absolute;top:calc(100% + 6px);right:0;min-width:180px;background:#0a0e1a;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.35rem;z-index:9500;box-shadow:0 8px 24px rgba(0,0,0,.5);">
+              <button type="button" role="menuitem" onclick="document.getElementById('heroProfileMenu').style.display='none';openChildLogin();" style="display:block;width:100%;text-align:left;background:none;border:none;color:var(--tx);font-family:var(--fn);font-size:.78rem;font-weight:600;padding:.55rem .7rem;border-radius:7px;cursor:pointer;">Switch profile</button>
+              <button type="button" role="menuitem" onclick="signOutChild()" style="display:block;width:100%;text-align:left;background:none;border:none;color:#f87171;font-family:var(--fn);font-size:.78rem;font-weight:700;padding:.55rem .7rem;border-radius:7px;cursor:pointer;">Sign out</button>
+            </div>
+          </div>
           <div class="hero-date" id="heroDate" style="font-size:.85rem;"></div>
           <div id="heroClock" style="font-family:var(--fn);font-size:1.8rem;font-weight:900;color:rgba(255,255,255,.85);margin-top:.3rem;letter-spacing:-1px;"></div>
         </div>
@@ -4544,6 +4610,10 @@
         <button onclick="pgPinKey('⌫')" class="pin-btn" style="font-size:1.2rem;">⌫</button>
       </div>
       <div id="parentGateError" style="font-size:.72rem;color:#f87171;min-height:1rem;margin-bottom:.4rem;"></div>
+      <div style="font-size:.7rem;color:var(--tx2);margin-top:.3rem;">
+        <a href="javascript:void(0)" onclick="openForgotParentPinModal()" style="color:var(--c);text-decoration:underline;font-weight:600;">Forgot PIN?</a>
+        <span style="color:var(--tx3);"> Reset with your account password.</span>
+      </div>
     </div>
     <!-- keep hidden input for compatibility -->
     <input type="hidden" id="parentPinInput" value="">
@@ -4551,6 +4621,9 @@
 
   <!-- PARENT DASHBOARD (after PIN unlock) -->
   <div id="parentDashContent" style="display:none;">
+
+    <!-- PIN MIGRATION BANNER (Phase 1.1 add-on) — populated by maybeShowPinMigrationBanner() -->
+    <div id="pinMigrationBanner" style="display:none;background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.25);border-radius:10px;padding:.7rem .85rem;margin-bottom:.7rem;"></div>
 
     <!-- BACK + LOCK ROW -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem;gap:.5rem;">
