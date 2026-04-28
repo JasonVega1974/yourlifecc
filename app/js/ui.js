@@ -998,27 +998,9 @@ function showSection(id, fromMobile){
   // Scroll to top of main
   window.scrollTo(0,0);
 
-  // Parent Hub gate handling. Hard rule: a child profile must ALWAYS see the
-  // PIN gate when navigating to s-parent, regardless of any leftover unlock
-  // state from a previous parent session. We actively re-lock here in case
-  // an earlier parent session left the gate hidden.
-  var _activeProfIsChild = false;
-  if(typeof _profiles !== 'undefined' && _profiles && typeof _activeProfileId !== 'undefined' && _activeProfileId){
-    var _ap = _profiles.find(function(p){ return p.id === _activeProfileId; });
-    if(_ap && _ap.isParent === false) _activeProfIsChild = true;
-  }
-  if(id==='s-parent' && _activeProfIsChild){
-    // Force-lock: clear any unlock flag, show gate, hide content.
-    _parentDashUnlocked = false;
-    try { sessionStorage.removeItem('parentUnlocked'); } catch(e){}
-    var _g = document.getElementById('parentGate');
-    var _c = document.getElementById('parentDashContent');
-    if(_g) _g.style.display = '';
-    if(_c) _c.style.display = 'none';
-  } else if(id==='s-parent' && typeof D!=='undefined' && (_parentDashUnlocked || D.parentPinDisabled || sessionStorage.getItem('parentUnlocked')==='1')){
-    // Parent profile, already authenticated this session — auto-unlock.
-    _parentDashUnlocked = true;
-    sessionStorage.setItem('parentUnlocked','1');
+  // Auto-bypass Parent Hub gate if currently within the unlock window or PIN
+  // gate is disabled. Does NOT extend the unlock — must be active already.
+  if(id==='s-parent' && typeof D!=='undefined' && ((typeof isParentUnlocked==='function' && isParentUnlocked()) || D.parentPinDisabled)){
     const gate = document.getElementById('parentGate');
     const content = document.getElementById('parentDashContent');
     if(gate) gate.style.display='none';
