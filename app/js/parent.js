@@ -11,8 +11,8 @@ let _parentDashUnlocked = sessionStorage.getItem('parentUnlocked')==='1' || loca
 function unlockParentDash(){
   initChoreData();
   if(D.parentPinDisabled){ _doUnlockParent(); return; }
-  // If no PIN set yet, let them straight in
-  if(!D.chorePin && !D.parentPIN){ _doUnlockParent(); return; }
+  // If no PIN set yet (hashed or plaintext), let them straight in
+  if(!D.parentPinHash && !D.chorePin && !D.parentPIN){ _doUnlockParent(); return; }
   // Submission handled by pgPinKey / _pgSubmit
 }
 
@@ -31,7 +31,19 @@ function lockParentDash(){
 
 function resetParentPin(){
   if(!confirm('Clear parent PIN? You will need to set a new one on next unlock.')){ return; }
-  D.chorePin = ''; D.parentPIN = ''; save();
+  D.chorePin = ''; D.parentPIN = ''; D.parentPinHash = '';
+  // Mirror the clear onto the parent profile's data so the verifier doesn't
+  // pick up a stale hash from there.
+  if(typeof _profiles !== 'undefined' && _profiles){
+    _profiles.forEach(function(p){
+      if(p && p.data){
+        if(p.data.parentPinHash) p.data.parentPinHash = '';
+        if(p.data.chorePin) p.data.chorePin = '';
+        if(p.data.parentPIN) p.data.parentPIN = '';
+      }
+    });
+  }
+  save();
   showToast('PIN cleared. Set a new one on next unlock.');
 }
 
@@ -1396,21 +1408,22 @@ function _pgUpdateDots(){
     if(d) d.className='pin-dot'+(_pgBuffer.length>i?' filled':'');
   }
 }
-function _pgSubmit(){
+async function _pgSubmit(){
   const off=!!D.parentPinDisabled;
   if(off){
     _pgBuffer=''; _pgUpdateDots();
     _doUnlockParent();
     return;
   }
-  const correct=String(D.chorePin||D.parentPIN||'');
-  if(!correct){
+  const hasAnyPin = !!(D.parentPinHash || D.chorePin || D.parentPIN);
+  if(!hasAnyPin){
     // No PIN set — just let them in
     _pgBuffer=''; _pgUpdateDots();
     _doUnlockParent();
     return;
   }
-  if(_pgBuffer===correct){
+  const ok = await verifyParentPin(_pgBuffer);
+  if(ok){
     _pgBuffer=''; _pgUpdateDots();
     _doUnlockParent();
   } else {
@@ -1430,6 +1443,322 @@ function _doUnlockParent(){
   if(content) content.style.display='block';
   updateIncConditions(); renderParentDash();
   if(!D.parentWizardDone && localStorage.getItem(_ylccUserKey('ylcc_parentWizardDone')) !== '1'){ setTimeout(showParentOnboard,700); }
+  // PIN migration banner — only shown when there's plaintext to migrate or a
+  // partially-completed migration to resume.
+  try { if(typeof maybeShowPinMigrationBanner === 'function') maybeShowPinMigrationBanner(); } catch(e){}
+}
+
+// ── PIN MIGRATION (Phase 1.1 add-on) ─────────────────────────
+// Banner + per-step modals to walk the parent through hashing the existing
+// plaintext PIN(s). Idempotent: safe to call repeatedly. Status lives on
+// D.pinMigration.status — 'pending' → 'parent_done' → 'in_progress' → 'complete'.
+
+function maybeShowPinMigrationBanner(){
+  const banner = document.getElementById('pinMigrationBanner');
+  if(!banner) return;
+  const m = (typeof getPinMigration === 'function') ? getPinMigration() : null;
+  if(!m){ banner.style.display='none'; return; }
+  if(m.status === 'complete'){ banner.style.display='none'; return; }
+  // Show only if there's something to migrate or a resume in progress.
+  const hasPlain = (typeof hasPlaintextPin === 'function') ? hasPlaintextPin() : false;
+  const isResuming = m.status === 'parent_done' || m.status === 'in_progress';
+  if(!hasPlain && !isResuming){ banner.style.display='none'; return; }
+  // Render banner content based on resume state.
+  let title, sub, cta;
+  if(m.status === 'parent_done' || m.status === 'in_progress'){
+    title = 'Finish setting child PINs';
+    sub = 'Pick up where you left off — set a fresh 4-digit PIN for each child.';
+    cta = 'Continue';
+  } else {
+    title = 'Set new PINs for your family';
+    sub = 'Your PINs are now stored securely. Set a 6-digit parent PIN, then a 4-digit PIN for each child.';
+    cta = 'Set up now';
+  }
+  banner.innerHTML =
+    '<div style="display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;">'
+    + '<div style="font-size:1.1rem;flex-shrink:0;">🔐</div>'
+    + '<div style="flex:1;min-width:180px;">'
+    + '<div style="font-size:.85rem;font-weight:800;color:var(--tx);">' + title + '</div>'
+    + '<div style="font-size:.7rem;color:var(--tx2);margin-top:.15rem;line-height:1.4;">' + sub + '</div>'
+    + '</div>'
+    + '<div style="display:flex;gap:.4rem;flex-wrap:wrap;">'
+    + '<button onclick="startPinMigration()" class="btn bp" style="font-size:.72rem;padding:.4rem .85rem;">' + cta + '</button>'
+    + '<button onclick="dismissPinMigrationBanner()" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--tx2);font-size:.7rem;padding:.4rem .75rem;border-radius:8px;cursor:pointer;font-family:var(--fn);font-weight:700;">Set up later</button>'
+    + '</div>'
+    + '</div>';
+  banner.style.display='block';
+}
+
+function dismissPinMigrationBanner(){
+  const banner = document.getElementById('pinMigrationBanner');
+  if(banner) banner.style.display='none';
+  // Re-appears on next Hub visit — defer is allowed but not permanent.
+}
+
+function startPinMigration(){
+  const m = (typeof getPinMigration === 'function') ? getPinMigration() : null;
+  if(!m) return;
+  if(m.status === 'complete'){ dismissPinMigrationBanner(); return; }
+  // If parent step already done, skip directly to children.
+  if(m.status === 'parent_done' || m.status === 'in_progress'){
+    _migrationStepNextChild();
+    return;
+  }
+  _migrationStepParent();
+}
+
+function _migrationStepParent(){
+  // Use showPinModal in 'create' mode so the parent enters their new PIN
+  // twice. Then hash and persist.
+  showPinModal('Set new parent PIN','Enter a 6-digit PIN you can remember','🔐','create', function(newPin){
+    (async function(){
+      try {
+        await setParentPin(newPin);
+        setPinMigrationStatus('parent_done');
+        save();
+        showToast('Parent PIN saved ✓');
+        setTimeout(_migrationStepNextChild, 350);
+      } catch(e){
+        showToast('Could not save PIN — try again.');
+      }
+    })();
+  });
+}
+
+function _nextUnmigratedChild(){
+  const m = getPinMigration();
+  const done = (m && m.childrenMigrated) || [];
+  const children = (_profiles||[]).filter(function(p){ return p && p.isParent === false; });
+  for(let i=0;i<children.length;i++){
+    if(done.indexOf(children[i].id) === -1) return children[i];
+  }
+  return null;
+}
+
+function _migrationStepNextChild(){
+  setPinMigrationStatus('in_progress');
+  const next = _nextUnmigratedChild();
+  if(!next){
+    setPinMigrationStatus('complete');
+    save();
+    const banner = document.getElementById('pinMigrationBanner');
+    if(banner) banner.style.display='none';
+    showToast('All PINs updated ✓');
+    return;
+  }
+  // Open a 4-digit PIN entry for this child. Reuse the child PIN modal if
+  // available (it's the dedicated 4-dot UI); otherwise fall back to a prompt.
+  if(typeof openMigrationChildPinModal === 'function'){
+    openMigrationChildPinModal(next);
+  } else {
+    // Fallback path: prompt() — graceless but never blocks the user.
+    const v = prompt('Set a new 4-digit PIN for ' + next.name + ':');
+    if(v && /^\d{4}$/.test(v)){
+      (async function(){
+        await setChildPinHash(next, v);
+        const m = getPinMigration();
+        if(m.childrenMigrated.indexOf(next.id) === -1) m.childrenMigrated.push(next.id);
+        save();
+        renderProfileSwitcher();
+        if(typeof renderManageUsers === 'function') renderManageUsers();
+        setTimeout(_migrationStepNextChild, 200);
+      })();
+    } else {
+      showToast('Skipped — banner will reappear next time.');
+      dismissPinMigrationBanner();
+    }
+  }
+}
+
+// ── MIGRATION CHILD-PIN MODAL ────────────────────────────────
+// Dedicated 4-digit modal so parents see exactly which child they're setting
+// a PIN for. Backed by DOM in app/index.html (id 'migChildPinModal').
+let _migChildBuffer = '';
+let _migChildTarget = null;
+
+function openMigrationChildPinModal(profile){
+  _migChildBuffer = '';
+  _migChildTarget = profile;
+  const modal = document.getElementById('migChildPinModal');
+  if(!modal){
+    // Modal markup not present — fall through to prompt fallback.
+    const v = prompt('Set a new 4-digit PIN for ' + (profile && profile.name) + ':');
+    if(v && /^\d{4}$/.test(v)){
+      (async function(){
+        await setChildPinHash(profile, v);
+        const m = getPinMigration();
+        if(m.childrenMigrated.indexOf(profile.id) === -1) m.childrenMigrated.push(profile.id);
+        save();
+        renderProfileSwitcher();
+        if(typeof renderManageUsers === 'function') renderManageUsers();
+        setTimeout(_migrationStepNextChild, 200);
+      })();
+    } else {
+      dismissPinMigrationBanner();
+    }
+    return;
+  }
+  const nm = document.getElementById('migChildPinName');
+  if(nm) nm.textContent = (profile && profile.name) || 'this child';
+  _migChildUpdateDots();
+  const err = document.getElementById('migChildPinError');
+  if(err) err.textContent = '';
+  modal.style.display = 'flex';
+}
+
+function _migChildUpdateDots(){
+  for(let i=0;i<4;i++){
+    const d = document.getElementById('mcd'+i);
+    if(d) d.className = 'pin-dot' + (_migChildBuffer.length > i ? ' filled' : '');
+  }
+}
+
+function migChildPinKey(k){
+  if(String(k) === '⌫'){ _migChildBuffer = _migChildBuffer.slice(0,-1); _migChildUpdateDots(); return; }
+  if(_migChildBuffer.length >= 4) return;
+  _migChildBuffer += String(k); _migChildUpdateDots();
+  if(_migChildBuffer.length === 4) setTimeout(_migChildPinSubmit, 180);
+}
+
+async function _migChildPinSubmit(){
+  const target = _migChildTarget;
+  if(!target){ closeMigrationChildPinModal(); return; }
+  await setChildPinHash(target, _migChildBuffer);
+  const m = getPinMigration();
+  if(m.childrenMigrated.indexOf(target.id) === -1) m.childrenMigrated.push(target.id);
+  save();
+  renderProfileSwitcher();
+  if(typeof renderManageUsers === 'function') renderManageUsers();
+  closeMigrationChildPinModal();
+  setTimeout(_migrationStepNextChild, 200);
+}
+
+function migChildPinSkip(){
+  // Skipping a single child during migration just leaves them unmigrated;
+  // they keep id-as-PIN fallback until next time.
+  closeMigrationChildPinModal();
+  dismissPinMigrationBanner();
+  showToast('Skipped — banner will reappear next time.');
+}
+
+function closeMigrationChildPinModal(){
+  const modal = document.getElementById('migChildPinModal');
+  if(modal) modal.style.display = 'none';
+  _migChildBuffer = '';
+  _migChildTarget = null;
+}
+
+// ── FORGOT PARENT PIN — Supabase password re-confirm ─────────
+function openForgotParentPinModal(){
+  if(typeof _supaUser === 'undefined' || !_supaUser){
+    showToast('PIN reset requires an account. Sign in first.');
+    return;
+  }
+  const modal = document.getElementById('forgotPinModal');
+  if(!modal) return;
+  const emailEl = document.getElementById('forgotPinEmail');
+  if(emailEl) emailEl.textContent = _supaUser.email || '';
+  const pwEl = document.getElementById('forgotPinPassword');
+  if(pwEl) pwEl.value = '';
+  const newEl = document.getElementById('forgotPinNew');
+  if(newEl) newEl.value = '';
+  const errEl = document.getElementById('forgotPinError');
+  if(errEl) errEl.textContent = '';
+  modal.style.display = 'flex';
+  setTimeout(function(){ if(pwEl) pwEl.focus(); }, 50);
+}
+
+function closeForgotParentPinModal(){
+  const modal = document.getElementById('forgotPinModal');
+  if(modal) modal.style.display = 'none';
+}
+
+async function submitForgotParentPin(){
+  const pwEl = document.getElementById('forgotPinPassword');
+  const newEl = document.getElementById('forgotPinNew');
+  const errEl = document.getElementById('forgotPinError');
+  const pw = pwEl ? pwEl.value : '';
+  const np = newEl ? newEl.value.trim() : '';
+  if(errEl) errEl.textContent = '';
+  if(!pw){ if(errEl) errEl.textContent = 'Enter your account password.'; return; }
+  if(!/^\d{6}$/.test(np)){ if(errEl) errEl.textContent = 'New PIN must be exactly 6 digits.'; return; }
+  const r = await parentPinResetWithPassword(pw, np);
+  if(!r.ok){ if(errEl) errEl.textContent = r.error || 'Could not reset PIN.'; return; }
+  // After reset, also clear the 'parent_done' fast-forward so banner walks
+  // through children again on next Hub visit (PIN context changed).
+  closeForgotParentPinModal();
+  showToast('Parent PIN updated ✓');
+  // Reset the gate state so the unlock flow re-evaluates.
+  _pgBuffer = ''; _pgUpdateDots && _pgUpdateDots();
+  const gateErr = document.getElementById('parentGateError');
+  if(gateErr) gateErr.textContent = '';
+}
+
+// ── CHILD HEADER DROPDOWN (Phase 1.1 add-on) ─────────────────
+// Sign-out / switch-profile menu attached to #heroName via a caret button.
+// Visible only when the active profile is a child.
+function refreshChildHeaderDropdown(){
+  const trigger = document.getElementById('heroProfileMenuBtn');
+  if(!trigger) return;
+  const active = (_profiles || []).find(function(p){ return p.id === _activeProfileId; });
+  const isChild = !!(active && active.isParent === false);
+  trigger.style.display = isChild ? 'inline-flex' : 'none';
+  // Close menu on outside-click / Escape — hooked once.
+  if(!window._heroMenuHooked){
+    document.addEventListener('click', function(e){
+      const m = document.getElementById('heroProfileMenu');
+      const t = document.getElementById('heroProfileMenuBtn');
+      if(!m || m.style.display !== 'block') return;
+      if(t && (t === e.target || t.contains(e.target))) return;
+      if(m.contains(e.target)) return;
+      m.style.display = 'none';
+      if(t) t.setAttribute('aria-expanded','false');
+    });
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape'){
+        const m = document.getElementById('heroProfileMenu');
+        const t = document.getElementById('heroProfileMenuBtn');
+        if(m && m.style.display === 'block'){
+          m.style.display = 'none';
+          if(t) t.setAttribute('aria-expanded','false');
+        }
+      }
+    });
+    window._heroMenuHooked = true;
+  }
+}
+
+function toggleChildHeaderDropdown(){
+  const m = document.getElementById('heroProfileMenu');
+  const btn = document.getElementById('heroProfileMenuBtn');
+  if(!m) return;
+  const open = m.style.display !== 'block';
+  m.style.display = open ? 'block' : 'none';
+  if(btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+
+function signOutChild(){
+  const m = document.getElementById('heroProfileMenu');
+  if(m) m.style.display = 'none';
+  // Clear active child + every parent-unlock surface so re-selecting the
+  // parent profile must re-enter the PIN.
+  _activeProfileId = null;
+  if(typeof saveProfiles === 'function') saveProfiles();
+  _parentDashUnlocked = false;
+  sessionStorage.removeItem('parentUnlocked');
+  localStorage.removeItem('lifeos_parent_unlocked');
+  // No supa.auth.signOut here — parent's account session stays alive.
+  if(typeof _supaUser === 'undefined' || !_supaUser){
+    window.location.href = '/login.html';
+    return;
+  }
+  // Open the profile picker (same UI children use to pick).
+  if(typeof openChildLogin === 'function'){
+    openChildLogin();
+  } else {
+    // Fallback: refresh the page so init re-routes through the picker.
+    location.reload();
+  }
 }
 
 
@@ -1520,10 +1849,11 @@ function updateChildPinDots(){
   }
 }
 
-function validateChildPin(){
+async function validateChildPin(){
   if(!_clSelectedId) return;
   const p=_profiles.find(x=>x.id===_clSelectedId); if(!p) return;
-  if(p.id===_childPinBuffer){
+  const ok = await verifyChildPin(p, _childPinBuffer);
+  if(ok){
     closeChildLogin();
     switchToProfile(p.id); // switchToProfile handles toast + showSection('s-hero')
   } else {
@@ -1658,12 +1988,17 @@ function renderProfileSwitcher(){
   tabs.innerHTML = _profiles.map((p,i)=>{
     const active = p.id === _activeProfileId;
     const c = colors[i % colors.length];
-    return `<button onclick="${active?`alert('${p.name}\\nAccess Code: ${p.id}\\n\\nThis code is needed to switch to this profile.')`:`unlockProfile('${p.id}')`}" style="display:flex;align-items:center;gap:.3rem;padding:.35rem .7rem;border-radius:8px;border:1.5px solid ${active?c:'rgba(255,255,255,.08)'};background:${active?c+'15':'rgba(255,255,255,.02)'};cursor:pointer;transition:all .15s;font-family:var(--fn);" title="${active?'Tap to view code':'Enter code to switch'}">
+    // Don't reveal the PIN on the switcher — once migrated, profile.id is no
+    // longer the PIN; for unmigrated children it would leak the PIN. Show a
+    // protected-state hint instead.
+    const hint = p.isParent ? 'Parent' : (p.pinHash ? 'PIN protected' : 'Tap to switch');
+    return `<button onclick="${active?`alert('${p.name}\\n\\nUse Parent Hub → Manage Users to reset this PIN.')`:`unlockProfile('${p.id}')`}" style="display:flex;align-items:center;gap:.3rem;padding:.35rem .7rem;border-radius:8px;border:1.5px solid ${active?c:'rgba(255,255,255,.08)'};background:${active?c+'15':'rgba(255,255,255,.02)'};cursor:pointer;transition:all .15s;font-family:var(--fn);" title="${active?'Active profile':'Enter PIN to switch'}">
       <div style="width:24px;height:24px;border-radius:50%;background:${c};display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:800;color:#fff;">${p.name.charAt(0).toUpperCase()}</div>
-      <div style="text-align:left;"><div style="font-size:.65rem;font-weight:${active?'700':'500'};color:${active?c:'var(--tx2)'};">${p.name}</div><div style="font-size:.42rem;color:var(--tx3);font-family:monospace;">${p.id}</div></div>
+      <div style="text-align:left;"><div style="font-size:.65rem;font-weight:${active?'700':'500'};color:${active?c:'var(--tx2)'};">${p.name}</div><div style="font-size:.42rem;color:var(--tx3);">${hint}</div></div>
       ${active?'<span style="font-size:.45rem;color:'+c+';">●</span>':'<span style="font-size:.45rem;color:var(--tx3);">🔒</span>'}
     </button>`;
   }).join('') + `<button onclick="addChildProfile()" style="padding:.35rem .7rem;border-radius:8px;border:1.5px dashed rgba(255,255,255,.12);background:none;cursor:pointer;font-size:.65rem;color:var(--tx3);font-family:var(--fn);display:flex;align-items:center;gap:.3rem;"><span style="font-size:.85rem;">+</span> Add Child</button>`;
+  if(typeof refreshChildHeaderDropdown === 'function') refreshChildHeaderDropdown();
 }
 
 // ── SWITCH-TO-PARENT BUTTON (visible only when a child is active) ──
@@ -1698,6 +2033,14 @@ function _getParentPinInfo(){
   var parent = _profiles.find(function(p){ return p.isParent === true; });
   var pin = D.chorePin || D.parentPIN;
   var disabled = !!D.parentPinDisabled;
+  // Hashed PIN (post-migration): live on D and/or the parent profile's data.
+  var hash = D.parentPinHash || (parent && parent.data && parent.data.parentPinHash) || '';
+  if(!hash){
+    for(var j=0;j<(_profiles||[]).length;j++){
+      var pdj = _profiles[j].data;
+      if(pdj && pdj.parentPinHash){ hash = pdj.parentPinHash; break; }
+    }
+  }
   if(!pin && parent && parent.data){
     pin = parent.data.chorePin || parent.data.parentPIN;
     if(pin) disabled = !!parent.data.parentPinDisabled;
@@ -1712,16 +2055,19 @@ function _getParentPinInfo(){
       }
     }
   }
-  return { parent: parent, pin: pin, disabled: disabled };
+  // hasAny: any PIN (hashed or plaintext) exists for the family.
+  return { parent: parent, pin: pin, hash: hash, hasAny: !!(pin || hash), disabled: disabled };
 }
 
 function switchToParentRequest(){
   var info = _getParentPinInfo();
   if(!info.parent){ showToast('No parent profile found'); return; }
-  if(!info.pin || info.disabled){ switchToProfile(info.parent.id); return; }
+  if(!info.hasAny || info.disabled){ switchToProfile(info.parent.id); return; }
+  // No expectedPin — verifyParentPin checks the hash and falls back to
+  // plaintext for un-migrated families.
   showPinModal('Switch to Parent','Enter your 6-digit parent PIN',(info.parent.name||'P').charAt(0).toUpperCase(),'enter', function(){
     switchToProfile(info.parent.id);
-  }, null, info.pin);
+  });
 }
 
 // ── PARENT-NAME CAPTURE MODAL ─────────────────────────────────
@@ -3949,10 +4295,18 @@ function _pinError(msg){
   setTimeout(()=>{ _pinEntry=''; _pinUpdateDots(); if(errEl) errEl.textContent=''; }, 800);
 }
 
-function _pinSubmit(){
+async function _pinSubmit(){
   if(_pinMode === 'enter'){
-    const correct = _pinExpected || D.chorePin || D.parentPIN;
-    if(_pinEntry === correct){
+    // _pinExpected (legacy plaintext) is honored only when explicitly passed.
+    // Otherwise fall through to the hash-aware verifier so partially-migrated
+    // and fully-migrated users both work.
+    let ok;
+    if(_pinExpected){
+      ok = String(_pinEntry) === String(_pinExpected);
+    } else {
+      ok = await verifyParentPin(_pinEntry);
+    }
+    if(ok){
       document.getElementById('pinModal').style.display = 'none';
       _pinExpected = null;
       _pinCallback && _pinCallback(_pinEntry);
@@ -3988,9 +4342,9 @@ function _pinCancel(){
 
 function _requirePin(title, sub, icon, onSuccess){
   if(typeof IS_DEMO !== 'undefined' && IS_DEMO){ onSuccess && onSuccess(); return; }
-  const pin = D.chorePin || D.parentPIN;
-  if(!pin){
-    // No PIN set — just proceed directly
+  const info = _getParentPinInfo();
+  if(!info.hasAny || info.disabled){
+    // No PIN set or PIN gating disabled — just proceed
     onSuccess && onSuccess();
     return;
   }
@@ -4044,9 +4398,9 @@ function _openParentSettings(){
       openSettings();
     }
   }
-  if(info.pin && !info.disabled){
+  if(info.hasAny && !info.disabled){
     var iconLetter = ((info.parent && info.parent.name) || D.name || 'P').charAt(0).toUpperCase();
-    showPinModal('Parent Settings','Enter your 6-digit parent PIN', iconLetter,'enter', _doOpen, null, info.pin);
+    showPinModal('Parent Settings','Enter your 6-digit parent PIN', iconLetter,'enter', _doOpen);
     return;
   }
   _doOpen();
@@ -4062,8 +4416,8 @@ function quickParentHub(){
   if(typeof IS_DEMO !== 'undefined' && IS_DEMO){ showSection('s-parent'); _doUnlockParent(); return; }
   if(D.parentPinDisabled){ showSection('s-parent'); _doUnlockParent(); return; }
   if(_parentDashUnlocked){ showSection('s-parent'); return; }
-  // If no PIN set yet, let them straight in
-  if(!D.chorePin && !D.parentPIN){ showSection('s-parent'); _doUnlockParent(); return; }
+  // If no PIN set yet (hashed or plaintext), let them straight in
+  if(!D.parentPinHash && !D.chorePin && !D.parentPIN){ showSection('s-parent'); _doUnlockParent(); return; }
   const init=(D.name||'P').charAt(0).toUpperCase();
   _requirePin('Parent Hub', 'Enter your 6-digit parent PIN', init, ()=>{
     showSection('s-parent');
