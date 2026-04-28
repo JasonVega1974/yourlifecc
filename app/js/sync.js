@@ -5,6 +5,55 @@
 // ── STORAGE ─────────────────────────────────────────────────
 const LS='lifeos_v2', CU='lifeos_cu', CK='lifeos_ck';
 
+// ── DEVICE-OWNER GUARD ─────────────────────────────────────
+// Every signed-in user "claims" this device by stamping their user_id into
+// localStorage. On the next sign-in, if the stamp doesn't match the current
+// auth user, the local cache belongs to someone else (e.g. previous family
+// who deleted their account, or a shared/used device). We wipe before any
+// save/cloudSync can promote the stale data to the new user's cloud row.
+//
+// This is what prevents "Good afternoon, Lilly" appearing on a brand-new
+// account signed up on a device that previously hosted a different family.
+function _ylccEnforceOwner(userId){
+  if(!userId) return;
+  try {
+    var prev = localStorage.getItem('lifeos_owner_user_id');
+    if(prev && prev !== userId){
+      console.log('[LifeOS] Owner mismatch — wiping local state. prev=', prev, 'new=', userId);
+      var rememberEmail = null;
+      try { rememberEmail = localStorage.getItem('lifeos_remember_email'); } catch(_){}
+      // Sweep YLCC + LifeOS keys (and any legacy keys we know about)
+      for(var i = localStorage.length - 1; i >= 0; i--){
+        var k = localStorage.key(i);
+        if(!k) continue;
+        if(k === 'lifeos_remember_email') continue;
+        if(k.indexOf('ylcc_')   === 0 ||
+           k.indexOf('lifeos_') === 0 ||
+           k.indexOf('dominic_')=== 0 ||
+           k.indexOf('levelup_')=== 0){
+          try { localStorage.removeItem(k); } catch(_){}
+        }
+      }
+      try { sessionStorage.clear(); } catch(_){}
+      if(rememberEmail){
+        try { localStorage.setItem('lifeos_remember_email', rememberEmail); } catch(_){}
+      }
+      // Reset in-memory state — `D = {...}` only rebinds in the calling scope,
+      // so we mutate D in place and zero the parent.js arrays via .length=0
+      // so all modules holding the reference see the wipe.
+      try {
+        if(typeof _profiles !== 'undefined' && Array.isArray(_profiles)) _profiles.length = 0;
+        if(typeof _activeProfileId !== 'undefined') _activeProfileId = null;
+        if(typeof D === 'object' && D && typeof DEF === 'object' && DEF){
+          for(var dk in D){ if(Object.prototype.hasOwnProperty.call(D, dk)) delete D[dk]; }
+          Object.assign(D, JSON.parse(JSON.stringify(DEF)));
+        }
+      } catch(_){}
+    }
+    localStorage.setItem('lifeos_owner_user_id', userId);
+  } catch(e){ console.warn('[LifeOS] _ylccEnforceOwner error:', e); }
+}
+
 function save(){
   // Sync resume fields to D before saving
   const rFields=['rName','rTitle','rEmail','rPhone','rLocation','rLinkedin','rWebsite','rSummary','rSkills','rCerts','rLangs'];
@@ -111,6 +160,9 @@ async function cloudSync(){
 async function cloudLoad(){
   const supa = getSupabase();
   if(!supa || !_supaUser) return false;
+  // Wipe stale data from a different account before loading. No-op when the
+  // stamp matches the current user (the common case).
+  _ylccEnforceOwner(_supaUser.id);
   try {
     const { data, error } = await supa.from('profiles')
       .select('data')
