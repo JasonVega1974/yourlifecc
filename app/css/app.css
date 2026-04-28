@@ -2170,3 +2170,23 @@ body.child-view  #childDashContent { display: block !important; }
 :root.light #topQuickBtns button[style*="color:#fff"] {
   color: #fff !important;
 }
+
+/* ── Phase 1.1 add-on: child header dropdown ────────────────── */
+#heroProfileMenuBtn:hover {
+  background: rgba(255,255,255,.16) !important;
+}
+#heroProfileMenuBtn[aria-expanded="true"] {
+  background: rgba(255,255,255,.18) !important;
+}
+#heroProfileMenu button[role="menuitem"]:hover,
+#heroProfileMenu button[role="menuitem"]:focus {
+  background: rgba(255,255,255,.06);
+  outline: none;
+}
+:root.light #heroProfileMenu {
+  background: var(--s2, #fff) !important;
+  border-color: rgba(0,0,0,.12) !important;
+}
+:root.light #heroProfileMenu button[role="menuitem"]:hover {
+  background: rgba(0,0,0,.06);
+}
