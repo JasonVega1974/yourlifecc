@@ -4878,7 +4878,7 @@ function applyTheme(){
 // PARENT ONBOARDING WIZARD
 // ══════════════════════════════════════════════════════════
 let _pobStep = 0;
-const POB_TOTAL = 7;
+const POB_TOTAL = 8;
 
 function initPobDots(){
   const d = document.getElementById('pobDots'); if(!d) return;
