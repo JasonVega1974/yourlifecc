@@ -3284,24 +3284,18 @@ async function confirmDeleteAccount(){
     const supa = getSupabase();
     if(!supa || !_supaUser){
       msg.textContent = 'You must be signed in to delete your account.';
-      btn.disabled = false; btn.textContent = 'Delete Forever';
+      btn.disabled = false; btn.textContent = 'Delete forever';
       return;
     }
 
-    // Get current JWT to authorize the Edge Function call.
     const { data: { session } } = await supa.auth.getSession();
     if(!session || !session.access_token){
       msg.textContent = 'Session expired. Please sign in again and retry.';
-      btn.disabled = false; btn.textContent = 'Delete Forever';
+      btn.disabled = false; btn.textContent = 'Delete forever';
       return;
     }
 
-    // Call the delete-account Edge Function. It uses the service_role key
-    // to bypass RLS, delete every user-owned row, AND remove the auth user
-    // itself — the only way to guarantee the account is fully gone.
-    // Both headers are required: apikey identifies the project to the gateway,
-    // Authorization carries the user JWT the function uses to verify identity.
-    const resp = await fetch('https://hrohgwcbfgywkpnvqxhk.supabase.co/functions/v1/delete-account', {
+    const resp = await fetch(SUPA_URL + '/functions/v1/delete-account', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -3314,24 +3308,33 @@ async function confirmDeleteAccount(){
     try { result = await resp.json(); } catch(_){ /* leave empty */ }
 
     if(!resp.ok || !result.success){
-      msg.textContent = (result && result.error) ? result.error : 'Delete failed. Please contact info@kingdom-creatives.com';
-      btn.disabled = false; btn.textContent = 'Delete Forever';
+      // Surface the real failure so it's diagnosable instead of generic.
+      const real = (result && result.error) ? result.error
+                 : ('HTTP ' + resp.status + (resp.statusText ? ' ' + resp.statusText : ''));
+      msg.textContent = real;
+      console.error('[delete-account] failed:', resp.status, result);
+      btn.disabled = false; btn.textContent = 'Delete forever';
       return;
     }
 
-    // Auth user is now deleted server-side. Sign out the dead session and
-    // wipe all local storage so legacy keys (e.g. dominic_v1) cannot pollute
-    // a future registration.
+    // Server confirmed auth user + rows deleted. Wipe local state, preserving
+    // the remember-email pref if present so a future signup form prefills.
     try { await supa.auth.signOut(); } catch(_){}
-    localStorage.clear();
+    var rememberEmail = null;
+    try { rememberEmail = localStorage.getItem('lifeos_remember_email'); } catch(_){}
+    try { localStorage.clear(); } catch(_){}
+    try { sessionStorage.clear(); } catch(_){}
+    if(rememberEmail){
+      try { localStorage.setItem('lifeos_remember_email', rememberEmail); } catch(_){}
+    }
 
     closeDeleteAccountModal();
     showToast('Account deleted. Goodbye 👋');
-    setTimeout(function(){ window.location.href = '/'; }, 2000);
+    setTimeout(function(){ window.location.href = '/'; }, 1500);
   } catch(e){
-    console.error('Delete account error:', e);
-    msg.textContent = 'Network error. Please try again or contact info@kingdom-creatives.com';
-    btn.disabled = false; btn.textContent = 'Delete Forever';
+    console.error('[delete-account] threw:', e);
+    msg.textContent = 'Network error: ' + (e && e.message ? e.message : 'unknown');
+    btn.disabled = false; btn.textContent = 'Delete forever';
   }
 }
 
