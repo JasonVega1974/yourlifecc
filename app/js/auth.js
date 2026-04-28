@@ -465,13 +465,6 @@ async function signOut(){
   localStorage.removeItem('lifeos_parent_unlocked');
   localStorage.removeItem('lifeos_pin_set');
   sessionStorage.removeItem('parentUnlocked');
-  // Clear all profile-related keys so a stale local profile snapshot can't
-  // override fresh cloud data on next sign-in.
-  try {
-    Object.keys(localStorage).forEach(function(k){
-      if(k.indexOf('ylcc_') === 0) localStorage.removeItem(k);
-    });
-  } catch(e){}
   document.getElementById('subBlockedScreen').style.display = 'none';
   document.getElementById('authScreen').style.display = 'flex';
   setSyncSt('local');
@@ -488,4 +481,140 @@ function showFirstTimeGate(){
 function hideFirstTimeGate(){
   const el = document.getElementById('firstTimeGate');
   if(el) el.style.display = 'none';
+}
+
+
+// ── PIN HASHING & MIGRATION (Phase 1.1 add-on) ────────────────
+// Salt is the Supabase user id when present (different per family) and a
+// constant 'local' for local-only users. The salt is not a secret — it just
+// keeps hashes from being directly comparable across users. PINs are 4–6
+// digits so the hash alone is brute-forceable; the salt prevents trivial
+// rainbow-table reuse and reading the hash gives no immediate plaintext.
+function _pinSalt(){
+  return (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.id) ? _supaUser.id : 'local';
+}
+
+async function hashPin(pin){
+  const text = String(pin) + ':' + _pinSalt();
+  const enc = new TextEncoder().encode(text);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// Verify parent PIN. Hash-aware with plaintext fallback so partially migrated
+// users keep working. The hash and the legacy plaintext can both live on D
+// or on any profile.data depending on which profile was active when set —
+// scan both. Returns boolean.
+async function verifyParentPin(input){
+  const v = String(input || '');
+  // Collect candidate hashes from D and from every profile.data.
+  const hashes = [];
+  if(typeof D !== 'undefined' && D && D.parentPinHash) hashes.push(D.parentPinHash);
+  if(typeof _profiles !== 'undefined' && _profiles){
+    for(let i=0;i<_profiles.length;i++){
+      const pd = _profiles[i] && _profiles[i].data;
+      if(pd && pd.parentPinHash) hashes.push(pd.parentPinHash);
+    }
+  }
+  if(hashes.length){
+    const h = await hashPin(v);
+    return hashes.indexOf(h) !== -1;
+  }
+  // Legacy plaintext fallback.
+  let plain = (typeof D !== 'undefined' && D) ? (D.chorePin || D.parentPIN) : '';
+  if(!plain && typeof _profiles !== 'undefined' && _profiles){
+    for(let i=0;i<_profiles.length;i++){
+      const pd = _profiles[i] && _profiles[i].data;
+      if(pd && (pd.chorePin || pd.parentPIN)){ plain = pd.chorePin || pd.parentPIN; break; }
+    }
+  }
+  return !!plain && v === String(plain);
+}
+
+// Verify a child profile's PIN. Hash-aware with id-as-PIN fallback for
+// children that haven't been migrated yet.
+async function verifyChildPin(profile, input){
+  if(!profile) return false;
+  const v = String(input || '');
+  if(profile.pinHash) return (await hashPin(v)) === profile.pinHash;
+  return v === String(profile.id || '');
+}
+
+// Set parent PIN (hash). Writes to D AND to the parent profile's data so
+// verification works while a child is the active profile (D is the child's
+// data in that case). Clears every legacy plaintext field. Caller saves.
+async function setParentPin(newPin){
+  if(typeof D === 'undefined' || !D) return false;
+  const h = await hashPin(newPin);
+  D.parentPinHash = h;
+  D.chorePin = ''; D.parentPIN = '';
+  if(typeof _profiles !== 'undefined' && _profiles){
+    _profiles.forEach(function(p){
+      if(p && p.data){
+        if(p.isParent) p.data.parentPinHash = h;
+        if(p.data.chorePin) p.data.chorePin = '';
+        if(p.data.parentPIN) p.data.parentPIN = '';
+        // Stale hashes on non-parent profiles get cleared.
+        if(!p.isParent && p.data.parentPinHash) p.data.parentPinHash = '';
+      }
+    });
+  }
+  return true;
+}
+
+async function setChildPinHash(profile, newPin){
+  if(!profile) return false;
+  profile.pinHash = await hashPin(newPin);
+  return true;
+}
+
+// Has the family got any plaintext PIN to migrate?
+function hasPlaintextPin(){
+  if(typeof D !== 'undefined' && D && (D.chorePin || D.parentPIN)) return true;
+  if(typeof _profiles !== 'undefined' && _profiles){
+    for(let i=0;i<_profiles.length;i++){
+      const pd = _profiles[i] && _profiles[i].data;
+      if(pd && (pd.chorePin || pd.parentPIN)) return true;
+    }
+  }
+  return false;
+}
+
+function getPinMigration(){
+  if(typeof D === 'undefined' || !D) return null;
+  if(!D.pinMigration){
+    D.pinMigration = { status:'pending', startedAt:null, completedAt:null, childrenMigrated:[] };
+  }
+  if(!Array.isArray(D.pinMigration.childrenMigrated)) D.pinMigration.childrenMigrated = [];
+  return D.pinMigration;
+}
+
+function setPinMigrationStatus(status){
+  const m = getPinMigration();
+  if(!m) return;
+  if(!m.startedAt && status !== 'pending') m.startedAt = new Date().toISOString();
+  m.status = status;
+  if(status === 'complete') m.completedAt = new Date().toISOString();
+}
+
+// Recovery: re-confirm Supabase password, then set a fresh parent PIN.
+// Returns { ok:true } or { ok:false, error:'message' }.
+async function parentPinResetWithPassword(password, newPin){
+  if(typeof _supaUser === 'undefined' || !_supaUser || !_supaUser.email){
+    return { ok:false, error:'Sign in to your account before resetting your PIN.' };
+  }
+  if(!newPin || String(newPin).length < 4){
+    return { ok:false, error:'New PIN is required.' };
+  }
+  const supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+  if(!supa) return { ok:false, error:'Cannot reach the server. Check your connection.' };
+  try {
+    const r = await supa.auth.signInWithPassword({ email:_supaUser.email, password:String(password||'') });
+    if(r.error) return { ok:false, error:'Wrong password — try again.' };
+  } catch(e){
+    return { ok:false, error:'Could not verify password. Please try again.' };
+  }
+  await setParentPin(newPin);
+  if(typeof save === 'function') save();
+  return { ok:true };
 }
