@@ -292,14 +292,32 @@ async function authComplete(isReturningUser){
 
   // For new users, wipe any stale localStorage so previous account data doesn't bleed in
   if(!isReturningUser){
-    const keysToKeep = ['lifeos_last_sync']; // preserve nothing meaningful
+    const keysToKeep = ['lifeos_last_sync', 'lifeos_remember_email'];
     Object.keys(localStorage).forEach(function(k){
       if(!keysToKeep.includes(k)) localStorage.removeItem(k);
     });
-    D = JSON.parse(JSON.stringify(DEF)); // reset in-memory data to defaults
+    // Mutate D in place — `D = JSON.parse(...)` only rebinds in this scope,
+    // leaving other modules looking at the old object. parent.js's _profiles
+    // array survives module load and must be zeroed via .length=0 so all
+    // holders of the reference see the empty array. Otherwise the next
+    // saveProfiles promotes the previous family's children into D._profiles
+    // and cloudSync writes them to the new user's cloud row (the leak).
+    try {
+      if(typeof D === 'object' && D && typeof DEF === 'object' && DEF){
+        for(var _dk in D){ if(Object.prototype.hasOwnProperty.call(D, _dk)) delete D[_dk]; }
+        Object.assign(D, JSON.parse(JSON.stringify(DEF)));
+      }
+      if(typeof _profiles !== 'undefined' && Array.isArray(_profiles)) _profiles.length = 0;
+      if(typeof _activeProfileId !== 'undefined') _activeProfileId = null;
+    } catch(_){}
+    // Stamp this device with the new owner so any future signin on this
+    // browser triggers the owner-mismatch wipe in cloudLoad.
+    if(_supaUser){
+      try { localStorage.setItem('lifeos_owner_user_id', _supaUser.id); } catch(_){}
+    }
   }
 
-  // Try to load cloud data for returning users
+  // Try to load cloud data for returning users (cloudLoad runs the owner check)
   const loaded = isReturningUser ? await cloudLoad() : false;
   // Force-strip hidden sections that should always be visible
   if(!D.sections) D.sections={};
