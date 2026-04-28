@@ -1738,22 +1738,13 @@ function toggleChildHeaderDropdown(){
 }
 
 async function signOutChild(){
-  // Full sign-out: end the Supabase session, wipe local state, redirect.
-  // The "Switch profile" menu item handles the picker UX separately.
+  // Match the bottom-left panel Sign Out exactly: delegate to the canonical
+  // signOut() in auth.js so behavior stays in lockstep across both entry points.
   const m = document.getElementById('heroProfileMenu');
   if(m) m.style.display = 'none';
-  try {
-    const supa = (typeof getSupabase === 'function') ? getSupabase() : null;
-    if(supa) await supa.auth.signOut();
-  } catch(e){ console.warn('[signOutChild] supa.signOut threw', e); }
-  var rememberEmail = null;
-  try { rememberEmail = localStorage.getItem('lifeos_remember_email'); } catch(_){}
-  try { localStorage.clear(); } catch(_){}
-  try { sessionStorage.clear(); } catch(_){}
-  if(rememberEmail){
-    try { localStorage.setItem('lifeos_remember_email', rememberEmail); } catch(_){}
+  if(typeof signOut === 'function'){
+    await signOut();
   }
-  window.location.href = '/';
 }
 
 
@@ -2057,12 +2048,9 @@ function _getParentPinInfo(){
 function switchToParentRequest(){
   var info = _getParentPinInfo();
   if(!info.parent){ showToast('No parent profile found'); return; }
-  if(!info.hasAny || info.disabled){ switchToProfile(info.parent.id); return; }
-  // No expectedPin — verifyParentPin checks the hash and falls back to
-  // plaintext for un-migrated families.
-  showPinModal('Switch to Parent','Enter your 6-digit parent PIN',(info.parent.name||'P').charAt(0).toUpperCase(),'enter', function(){
-    switchToProfile(info.parent.id);
-  });
+  // No PIN at the switch step — Parent Hub and Parent Settings each gate
+  // themselves with the PIN. Asking again here is redundant friction.
+  switchToProfile(info.parent.id);
 }
 
 // ── PARENT-NAME CAPTURE MODAL ─────────────────────────────────
