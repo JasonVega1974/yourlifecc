@@ -894,15 +894,19 @@ function buildSideNav(){
   const hidden = D.sections||{};
   // Force School & Career group open so CBT is never hidden by a collapsed group
   if(!D._navGroups) D._navGroups={};
+  // Force-open groups that must always be visible:
+  //   School & Career — CBT injection logic depends on it being open
+  //   Daily Life      — highest-frequency group, Phase 2.2 keeps this expanded by default
   D._navGroups["School & Career"] = true;
+  D._navGroups["Daily Life"]      = true;
   const openGroups = D._navGroups || {};
-  
+
   let navHTML = '<div class="sid-sep">SECTIONS</div>';
-  
+
   NAV_ITEMS.forEach(n=>{
     if(n.isGroup){
-      // Collapsible group
-      const isOpen = openGroups[n.label] !== false; // default open
+      // Collapsible group — Phase 2.2: default closed unless user explicitly opened.
+      const isOpen = openGroups[n.label] === true;
       const childHTML = (n.children||[]).map(c=>{
         if(c.key && hidden[c.key]===0 && typeof hidden[c.key]!=='undefined') return '';
         return `<button class="nav-item nav-child${c.id===_activeSection?' active':''}" id="ni-${c.id}" onclick="showSection('${c.id}')" style="padding-left:2.2rem;font-size:.78rem;">
