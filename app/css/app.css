@@ -2171,22 +2171,13 @@ body.child-view  #childDashContent { display: block !important; }
   color: #fff !important;
 }
 
-/* ── Phase 1.1 add-on: child header dropdown ────────────────── */
-#heroProfileMenuBtn:hover {
-  background: rgba(255,255,255,.16) !important;
+/* ── MOBILE QUICK ROW — light mode ──────────────────────────── */
+:root.light #mobileQuickRow {
+  background: rgba(255,255,255,.97) !important;
+  border-bottom-color: rgba(0,0,0,.08) !important;
 }
-#heroProfileMenuBtn[aria-expanded="true"] {
-  background: rgba(255,255,255,.18) !important;
-}
-#heroProfileMenu button[role="menuitem"]:hover,
-#heroProfileMenu button[role="menuitem"]:focus {
-  background: rgba(255,255,255,.06);
-  outline: none;
-}
-:root.light #heroProfileMenu {
-  background: var(--s2, #fff) !important;
+:root.light #mobileQuickRow .mqb {
+  background: rgba(0,0,0,.05) !important;
   border-color: rgba(0,0,0,.12) !important;
-}
-:root.light #heroProfileMenu button[role="menuitem"]:hover {
-  background: rgba(0,0,0,.06);
+  color: #334155 !important;
 }
