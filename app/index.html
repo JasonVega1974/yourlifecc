@@ -31,7 +31,7 @@
 <div id="authScreen" style="display:none;position:fixed;inset:0;z-index:10000;background:linear-gradient(145deg,#050d1a,#0d1b2a);align-items:center;justify-content:center;">
   <div style="text-align:center;max-width:420px;width:92vw;max-height:95vh;overflow-y:auto;overflow-x:hidden;padding:2.5rem 2rem;background:rgba(255,255,255,.03);border:1px solid rgba(56,189,248,.15);border-radius:24px;box-shadow:0 40px 100px rgba(0,0,0,.6);">
     <div style="font-size:3rem;margin-bottom:.6rem;animation:obFloat 3s ease-in-out infinite;display:inline-block;">🧠</div>
-    <div style="font-family:var(--fh);font-size:1.4rem;letter-spacing:2px;color:var(--c);margin-bottom:.3rem;">YOURLIFE CC</div>
+    <div style="font-family:var(--fh);font-size:1.4rem;letter-spacing:2px;color:var(--c);margin-bottom:.3rem;">LIFE OS</div>
     <div style="font-size:.75rem;color:var(--tx2);margin-bottom:1.8rem;line-height:1.7;">The complete life skills platform for the next generation.</div>
 
     <div style="text-align:center;margin-bottom:1.4rem;">
@@ -85,11 +85,7 @@
     </div>
     <!-- Primary button -->
     <button id="authBtn" onclick="authSubmit()" style="width:100%;padding:.9rem;background:linear-gradient(135deg,#38bdf8,#4f8fff);border:none;border-radius:12px;color:#000;font-weight:800;font-size:.95rem;cursor:pointer;margin-bottom:.7rem;transition:all .2s;">Sign In</button>
-    <!-- Public signup is temporarily disabled while Brevo/Supabase email-link issue is being fixed.
-         To re-enable, restore the previous version which had:
-           Don't have an account? <a onclick="authSwitchTab('signup')">Create Account →</a> | <a href="../index.html#pricing">See Plans</a>
-         (See REVERT_CHECKLIST in repo root for the full list of files to revert.) -->
-    <p id="authPaidLink" style="text-align:center;font-size:.78rem;color:var(--tx2);margin-top:.5rem;margin-bottom:.7rem;line-height:1.55;">Don't have an account? We're in private beta. Email <a href="mailto:info@kingdom-creatives.com?subject=YourLife%20CC%20Access%20Request" style="color:var(--c);font-weight:700;">info@kingdom-creatives.com</a> to request access.</p>
+    <p id="authPaidLink" style="text-align:center;font-size:.78rem;color:var(--tx2);margin-top:.5rem;margin-bottom:.7rem;">Don't have an account? <a href="javascript:void(0)" onclick="authSwitchTab('signup')" style="color:var(--c);font-weight:700;">Create Account →</a> &nbsp;|&nbsp; <a href="../index.html#pricing" style="color:var(--tx2);font-weight:600;font-size:.72rem;">See Plans</a></p>
 
     <!-- Forgot password -->
     <div id="authForgotWrap" style="margin-bottom:.5rem;">
@@ -291,16 +287,6 @@
   </div>
 
   <div class="sp-pb">
-  <!-- Life stage / age tier — entry for existing users to retune sections after first launch. -->
-  <div style="margin-bottom:.85rem;">
-    <div style="font-family:var(--fh);font-size:.73rem;letter-spacing:1px;color:#c8d4e8;margin-bottom:.45rem;">🎯 LIFE STAGE</div>
-    <div style="font-size:.68rem;color:var(--tx2);margin-bottom:.45rem;">Tap a stage to retune which sections show in your sidebar.</div>
-    <div style="display:flex;gap:.3rem;flex-wrap:wrap;">
-      <button class="btn bs" onclick="setMode('middle');showToast('Stage: 12–14 ✓');" style="flex:1;min-width:90px;font-size:.65rem;padding:.4rem;">🎒 12–14</button>
-      <button class="btn bs" onclick="setMode('mid_hs');showToast('Stage: 15–17 ✓');" style="flex:1;min-width:90px;font-size:.65rem;padding:.4rem;">📖 15–17</button>
-      <button class="btn bs" onclick="setMode('adult');showToast('Stage: 18–22 ✓');" style="flex:1;min-width:90px;font-size:.65rem;padding:.4rem;">💼 18–22</button>
-    </div>
-  </div>
   <div style="font-family:var(--fh);font-size:.73rem;letter-spacing:1px;color:#c8d4e8;margin-bottom:.45rem;">SHOW / HIDE SECTIONS</div>
   <div id="sectionToggles"></div>
 
@@ -525,14 +511,14 @@
 <div id="deleteAccountModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;align-items:center;justify-content:center;padding:1rem;">
   <div style="background:var(--bg2,#1a1a2e);border:1px solid rgba(248,113,113,.3);border-radius:16px;padding:1.5rem;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5);">
     <div style="font-size:1.4rem;text-align:center;margin-bottom:.5rem;">⚠️</div>
-    <div style="font-size:1rem;font-weight:700;color:#f87171;text-align:center;margin-bottom:.5rem;">Delete your account?</div>
-    <div style="font-size:.75rem;color:var(--tx2);text-align:center;margin-bottom:1rem;line-height:1.6;">This permanently deletes your account, all family data, and cancels any active subscription. <strong style="color:var(--tx);">This cannot be undone.</strong></div>
+    <div style="font-size:1rem;font-weight:700;color:#f87171;text-align:center;margin-bottom:.5rem;">Delete Account & All Data</div>
+    <div style="font-size:.75rem;color:var(--tx2);text-align:center;margin-bottom:1rem;line-height:1.6;">This will permanently delete your account and every piece of data associated with it. <strong style="color:var(--tx);">This cannot be undone.</strong></div>
     <div style="font-size:.73rem;color:var(--tx2);margin-bottom:.4rem;">Type <strong style="color:#f87171;">DELETE</strong> to confirm:</div>
     <input id="deleteAccountConfirm" type="text" placeholder="Type DELETE here" style="width:100%;padding:.6rem .8rem;background:rgba(255,255,255,.06);border:1px solid rgba(248,113,113,.3);border-radius:8px;color:var(--tx);font-size:.85rem;box-sizing:border-box;margin-bottom:.75rem;font-family:var(--fn);" oninput="checkDeleteConfirm()">
     <div id="deleteAccountMsg" style="font-size:.68rem;color:#f87171;min-height:1rem;margin-bottom:.5rem;text-align:center;"></div>
     <div style="display:flex;gap:.5rem;">
       <button class="btn bgh bs" style="flex:1;" onclick="closeDeleteAccountModal()">Cancel</button>
-      <button id="deleteAccountBtn" class="btn bs" style="flex:1;background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.3);opacity:.4;cursor:not-allowed;" disabled onclick="confirmDeleteAccount()">Delete forever</button>
+      <button id="deleteAccountBtn" class="btn bs" style="flex:1;background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.3);opacity:.4;cursor:not-allowed;" disabled onclick="confirmDeleteAccount()">Delete Forever</button>
     </div>
   </div>
 </div>
@@ -596,6 +582,7 @@
   <button id="childLoginTopBtn" onclick="openChildLogin()" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.15);color:#38bdf8;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:var(--fn);display:flex;align-items:center;gap:.3rem;transition:all .15s;" onmouseenter="this.style.background='rgba(56,189,248,.16)'" onmouseleave="this.style.background='rgba(56,189,248,.08)'">👤 Child Login <span class="hlp" onmouseenter="hlp('childlogin',this,event)" onmouseleave="hlpHide()">?</span></button>
   <button onclick="quickParentHub()" style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.2);color:#a78bfa;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:var(--fn);display:flex;align-items:center;gap:.3rem;transition:all .15s;" onmouseenter="this.style.background='rgba(139,92,246,.2)'" onmouseleave="this.style.background='rgba(139,92,246,.12)'">👨‍👩‍👧 Parent</button>
   <button onclick="quickSettings()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--tx2);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:var(--fn);display:flex;align-items:center;gap:.3rem;transition:all .15s;" onmouseenter="this.style.background='rgba(255,255,255,.12)'" onmouseleave="this.style.background='rgba(255,255,255,.06)'">⚙ Settings</button>
+  <button id="themeBtnTop" onclick="toggleTheme()" title="Toggle dark / light mode" style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2);color:#a78bfa;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:var(--fn);display:flex;align-items:center;gap:.3rem;transition:all .15s;" onmouseenter="this.style.background='rgba(167,139,250,.18)'" onmouseleave="this.style.background='rgba(167,139,250,.08)'">🌙 Dark</button>
   <button onclick="showSection('s-referral')" style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);color:#22c55e;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:var(--fn);display:flex;align-items:center;gap:.3rem;transition:all .15s;" onmouseenter="this.style.background='rgba(34,197,94,.16)'" onmouseleave="this.style.background='rgba(34,197,94,.08)'">🤝 Refer & Earn</button>
 </div>
 
@@ -607,62 +594,14 @@
   <div style="background:#0f1523;border:1px solid rgba(56,189,248,.2);border-radius:20px;padding:2rem 1.8rem;width:92%;max-width:340px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.85);">
     <div style="font-size:2.5rem;margin-bottom:.6rem;">🚀</div>
     <div style="font-family:var(--fn);font-size:.8rem;font-weight:700;letter-spacing:2px;color:var(--c);margin-bottom:.3rem;">WELCOME TO LIFE OS</div>
-    <div style="font-size:.8rem;color:var(--tx2);margin-bottom:1.2rem;">Enter a name for the child using this account, or leave blank to use "Champion".</div>
-    <input id="welcomeNameInput" type="text" placeholder="Child's name (optional)" autocomplete="off"
+    <div style="font-size:.8rem;color:var(--tx2);margin-bottom:1.2rem;">What should we call you? You can add child profiles later from the Parent Hub.</div>
+    <input id="welcomeNameInput" type="text" placeholder="Your first name" autocomplete="given-name"
       style="width:100%;padding:.65rem .8rem;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff;font-size:.95rem;font-family:var(--fn);text-align:center;margin-bottom:1rem;box-sizing:border-box;"
       onkeydown="if(event.key==='Enter')welcomeSubmit()">
     <button onclick="welcomeSubmit()" class="btn bp" style="width:100%;font-size:.8rem;">Let's Go →</button>
-    <button onclick="document.getElementById('welcomeModal').style.display='none'" style="background:none;border:none;color:var(--tx3);font-size:.72rem;cursor:pointer;margin-top:.5rem;">Skip — use Champion</button>
+    <button onclick="document.getElementById('welcomeModal').style.display='none'" style="background:none;border:none;color:var(--tx3);font-size:.72rem;cursor:pointer;margin-top:.5rem;">Skip for now</button>
   </div>
 </div>
-
-<!-- ── PARENT-NAME CAPTURE MODAL ──────────────────────────────────
-     Shown by parent.js openParentNameCapture() when a brand-new account
-     reaches the app with no parent profile (or addChildFromHub guards
-     against creating an orphan child). Per product rules: never auto-fill
-     from email local-part, always require explicit name input. -->
-<div id="parentNameCaptureModal" style="display:none;position:fixed;inset:0;background:rgba(4,6,16,.95);backdrop-filter:blur(12px);z-index:99997;align-items:center;justify-content:center;">
-  <div style="background:#0f1523;border:1px solid rgba(56,189,248,.2);border-radius:20px;padding:2rem 1.8rem;width:92%;max-width:380px;box-shadow:0 24px 64px rgba(0,0,0,.85);">
-    <div style="text-align:center;font-size:2rem;margin-bottom:.5rem;">👋</div>
-    <div style="text-align:center;font-family:var(--fn);font-size:.72rem;font-weight:700;letter-spacing:2px;color:#38bdf8;margin-bottom:.5rem;">WELCOME</div>
-    <div style="text-align:center;font-size:1.05rem;font-weight:800;margin-bottom:.4rem;color:var(--tx);">What's your name?</div>
-    <div style="text-align:center;font-size:.78rem;color:var(--tx2);margin-bottom:1.1rem;line-height:1.55;">This is the parent profile name that shows on your dashboard.</div>
-    <input type="text" id="pncName" placeholder="Your first name" maxlength="40" autocomplete="given-name" style="width:100%;box-sizing:border-box;padding:.75rem 1rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;color:var(--tx);font-family:var(--fn);font-size:.95rem;outline:none;margin-bottom:1rem;">
-    <div style="font-family:var(--fn);font-size:.66rem;font-weight:700;letter-spacing:1.5px;color:var(--tx3);text-transform:uppercase;margin-bottom:.5rem;">I'm using YourLife CC as…</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1rem;">
-      <button class="pnc-role selected" data-role="parent" onclick="pncSelectRole(this,'parent')" style="padding:.7rem .6rem;border-radius:12px;border:1.5px solid rgba(56,189,248,.4);background:rgba(56,189,248,.1);color:#fff;font-family:var(--fn);font-size:.78rem;font-weight:700;cursor:pointer;text-align:left;line-height:1.3;">👨‍👩‍👧<br>A parent for my family</button>
-      <button class="pnc-role" data-role="solo" onclick="pncSelectRole(this,'solo')" style="padding:.7rem .6rem;border-radius:12px;border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:var(--tx2);font-family:var(--fn);font-size:.78rem;font-weight:700;cursor:pointer;text-align:left;line-height:1.3;">🙋<br>Just for myself</button>
-    </div>
-    <div id="pncErr" style="font-size:.72rem;color:#f87171;min-height:1rem;margin-bottom:.4rem;"></div>
-    <button onclick="pncSubmit()" class="btn bp" style="width:100%;font-size:.85rem;">Continue →</button>
-  </div>
-</div>
-<style>
-  #parentNameCaptureModal.open{ display:flex !important; }
-  #parentNameCaptureModal .pnc-role.selected{ border-color:rgba(56,189,248,.55) !important; background:rgba(56,189,248,.14) !important; color:#fff !important; }
-</style>
-
-<!-- ── PROFILE MIGRATION MODAL ─────────────────────────────────
-     Triggered by parent.js initProfiles() when it detects orphan-child
-     profiles with no parent record (the fingerprint of the corruption
-     bug). User confirms their name; we add a parent record without
-     touching existing children. No silent guessing. -->
-<div id="profileMigrationModal" style="display:none;position:fixed;inset:0;background:rgba(4,6,16,.95);backdrop-filter:blur(12px);z-index:99997;align-items:center;justify-content:center;">
-  <div style="background:#0f1523;border:1px solid rgba(245,158,11,.25);border-radius:20px;padding:2rem 1.8rem;width:92%;max-width:380px;box-shadow:0 24px 64px rgba(0,0,0,.85);">
-    <div style="text-align:center;font-size:2rem;margin-bottom:.5rem;">🛠️</div>
-    <div style="text-align:center;font-family:var(--fn);font-size:.72rem;font-weight:700;letter-spacing:2px;color:#fbbf24;margin-bottom:.5rem;">FAMILY PROFILE FIX</div>
-    <div style="text-align:center;font-size:1.02rem;font-weight:800;margin-bottom:.4rem;color:var(--tx);line-height:1.3;">Confirm your name as the parent</div>
-    <div style="text-align:center;font-size:.78rem;color:var(--tx2);margin-bottom:.9rem;line-height:1.55;">We've improved how family profiles are stored. We found these existing profiles on your account:</div>
-    <ul id="pmmChildList" style="list-style:none;padding:.5rem .8rem;margin:0 0 1rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;font-size:.8rem;"></ul>
-    <div style="font-size:.78rem;color:var(--tx2);margin-bottom:.6rem;line-height:1.55;">Enter your name so we can rebuild your parent profile (your children's data stays exactly as it was):</div>
-    <input type="text" id="pmmName" placeholder="Your first name" maxlength="40" autocomplete="given-name" style="width:100%;box-sizing:border-box;padding:.75rem 1rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;color:var(--tx);font-family:var(--fn);font-size:.95rem;outline:none;margin-bottom:.7rem;">
-    <div id="pmmErr" style="font-size:.72rem;color:#f87171;min-height:1rem;margin-bottom:.4rem;"></div>
-    <button onclick="pmmSubmit()" class="btn bp" style="width:100%;font-size:.85rem;">Save and continue →</button>
-  </div>
-</div>
-<style>
-  #profileMigrationModal.open{ display:flex !important; }
-</style>
 
 <!-- CHILD PIN REVEAL MODAL -->
 <div id="childPinReveal" style="display:none;position:fixed;inset:0;background:rgba(4,6,16,.95);backdrop-filter:blur(12px);z-index:99998;align-items:center;justify-content:center;">
@@ -713,63 +652,6 @@
   </div>
 </div>
 
-<!-- MIGRATION CHILD-PIN MODAL (Phase 1.1 add-on) — 4-digit PIN entry while
-     walking each child during PIN migration. -->
-<div id="migChildPinModal" style="display:none;position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#0a0a14,#1a1a2e,#16213e);align-items:center;justify-content:center;flex-direction:column;">
-  <div style="text-align:center;max-width:340px;width:92%;">
-    <div style="width:60px;height:60px;border-radius:50%;background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto .7rem;">🔐</div>
-    <div style="font-size:1.2rem;font-weight:900;color:#fff;margin-bottom:.2rem;">Set new 4-digit PIN</div>
-    <div style="font-size:.78rem;color:rgba(255,255,255,.55);margin-bottom:1.2rem;">For <span id="migChildPinName" style="color:var(--c);font-weight:700;"></span></div>
-    <div style="display:flex;gap:.7rem;justify-content:center;margin-bottom:1.2rem;">
-      <div class="pin-dot" id="mcd0"></div>
-      <div class="pin-dot" id="mcd1"></div>
-      <div class="pin-dot" id="mcd2"></div>
-      <div class="pin-dot" id="mcd3"></div>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem;max-width:240px;margin:0 auto .7rem;">
-      <button onclick="migChildPinKey('1')" class="pin-btn">1</button>
-      <button onclick="migChildPinKey('2')" class="pin-btn">2</button>
-      <button onclick="migChildPinKey('3')" class="pin-btn">3</button>
-      <button onclick="migChildPinKey('4')" class="pin-btn">4</button>
-      <button onclick="migChildPinKey('5')" class="pin-btn">5</button>
-      <button onclick="migChildPinKey('6')" class="pin-btn">6</button>
-      <button onclick="migChildPinKey('7')" class="pin-btn">7</button>
-      <button onclick="migChildPinKey('8')" class="pin-btn">8</button>
-      <button onclick="migChildPinKey('9')" class="pin-btn">9</button>
-      <button onclick="migChildPinSkip()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.4);border-radius:12px;padding:.9rem;font-size:.62rem;font-weight:700;cursor:pointer;font-family:var(--fn);">Skip</button>
-      <button onclick="migChildPinKey('0')" class="pin-btn">0</button>
-      <button onclick="migChildPinKey('⌫')" class="pin-btn" style="font-size:1.2rem;">⌫</button>
-    </div>
-    <div id="migChildPinError" style="font-size:.72rem;color:#f87171;min-height:1rem;"></div>
-  </div>
-</div>
-
-<!-- FORGOT PARENT PIN MODAL (Phase 1.1 add-on) — re-confirm Supabase password
-     to set a new parent PIN. No tokens, no email, no Edge Function. -->
-<div id="forgotPinModal" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.78);align-items:center;justify-content:center;">
-  <div style="background:#0a0e1a;border:1.5px solid rgba(56,189,248,.35);border-radius:18px;padding:1.6rem 1.4rem;max-width:380px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,.7);">
-    <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.7rem;">
-      <div style="width:42px;height:42px;border-radius:50%;background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);display:flex;align-items:center;justify-content:center;font-size:1.3rem;">🔑</div>
-      <div>
-        <div style="font-size:1rem;font-weight:900;color:#fff;">Reset parent PIN</div>
-        <div style="font-size:.7rem;color:var(--tx2);">Confirm your account password</div>
-      </div>
-    </div>
-    <div style="font-size:.72rem;color:var(--tx2);margin-bottom:.85rem;line-height:1.45;">
-      We'll verify your account password (<span id="forgotPinEmail" style="color:var(--c);font-weight:600;"></span>), then let you set a fresh 6-digit PIN.
-    </div>
-    <label style="display:block;font-size:.7rem;font-weight:700;color:var(--tx2);margin-bottom:.25rem;">Account password</label>
-    <input id="forgotPinPassword" type="password" autocomplete="current-password" style="width:100%;padding:.55rem .7rem;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--tx);font-size:.85rem;margin-bottom:.7rem;font-family:var(--fn);">
-    <label style="display:block;font-size:.7rem;font-weight:700;color:var(--tx2);margin-bottom:.25rem;">New 6-digit PIN</label>
-    <input id="forgotPinNew" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" style="width:100%;padding:.55rem .7rem;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--tx);font-size:.85rem;margin-bottom:.6rem;font-family:var(--fn);letter-spacing:.2rem;">
-    <div id="forgotPinError" style="font-size:.7rem;color:#f87171;min-height:1rem;margin-bottom:.5rem;"></div>
-    <div style="display:flex;gap:.5rem;justify-content:flex-end;">
-      <button onclick="closeForgotParentPinModal()" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--tx2);padding:.5rem .9rem;border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fn);">Cancel</button>
-      <button onclick="submitForgotParentPin()" class="btn bp" style="font-size:.78rem;padding:.5rem .9rem;">Reset PIN</button>
-    </div>
-  </div>
-</div>
-
 <!-- MOBILE TRANSLATE DROPDOWN — fixed, outside all overflow containers -->
 <div id="mob_translate_element"></div>
 
@@ -793,6 +675,7 @@
   <button id="childLoginMobBtn" class="mqb mqb-child" onclick="openChildLogin()">👤 Child Login</button>
   <button class="mqb mqb-parent" onclick="quickParentHub()">👨‍👩‍👧 Parent</button>
   <button class="mqb" onclick="quickSettings()">⚙ Settings</button>
+  <button id="themeBtnTopMob" class="mqb" onclick="toggleTheme()" title="Toggle dark / light mode" style="color:#a78bfa;background:rgba(167,139,250,.08);border-color:rgba(167,139,250,.2);">🌙 Dark</button>
   <button class="mqb" onclick="showSection('s-referral')" style="color:#22c55e;background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.2);">🤝 Refer</button>
 </div>
 
@@ -813,11 +696,6 @@
       </div>
     </div>
   </div>
-
-  <!-- SWITCH-TO-PARENT BUTTON HOST — populated by renderSwitchToParentBtn() in parent.js
-       only when the active profile is a child. PIN-gated only if a parent PIN is set
-       and the parent-PIN toggle is on (see switchToParentRequest). -->
-  <div id="switchToParentHost" style="display:none;justify-content:flex-end;margin-bottom:.55rem;"></div>
 
   <!-- HERO HEADER — child only, hidden in parent view -->
   <div id="heroCard" class="hero-card no-photo" style="margin-bottom:.7rem;">
@@ -840,17 +718,8 @@
         </div>
         <div>
           <div class="hero-greet" style="font-size:1rem;">Good <span id="greet">morning</span></div>
-          <div class="hero-name-wrap" style="display:flex;align-items:center;gap:.35rem;flex-wrap:wrap;position:relative;">
-            <span id="heroName" class="editable-name hero-name" title="Click to edit" onclick="editNameInline(this)">CHAMPION</span>
-            <span id="heroModeBadge" style="display:none;"></span>
-            <!-- Child header dropdown trigger (Phase 1.1 add-on) — visible
-                 only when active profile is a child. -->
-            <button id="heroProfileMenuBtn" type="button" aria-haspopup="menu" aria-expanded="false" onclick="toggleChildHeaderDropdown()" title="Profile menu" style="display:none;align-items:center;justify-content:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:var(--tx);width:44px;height:44px;border-radius:50%;font-size:1rem;cursor:pointer;font-family:var(--fn);font-weight:700;">▾</button>
-            <div id="heroProfileMenu" role="menu" style="display:none;position:absolute;top:calc(100% + 6px);right:0;min-width:180px;background:#0a0e1a;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.35rem;z-index:9500;box-shadow:0 8px 24px rgba(0,0,0,.5);">
-              <button type="button" role="menuitem" onclick="document.getElementById('heroProfileMenu').style.display='none';openChildLogin();" style="display:block;width:100%;text-align:left;background:none;border:none;color:var(--tx);font-family:var(--fn);font-size:.78rem;font-weight:600;padding:.55rem .7rem;border-radius:7px;cursor:pointer;">Switch profile</button>
-              <button type="button" role="menuitem" onclick="signOutChild()" style="display:block;width:100%;text-align:left;background:none;border:none;color:#f87171;font-family:var(--fn);font-size:.78rem;font-weight:700;padding:.55rem .7rem;border-radius:7px;cursor:pointer;">Sign out</button>
-            </div>
-          </div>
+          <div class="hero-name-wrap"><span id="heroName" class="editable-name hero-name" title="Click to edit" onclick="editNameInline(this)">CHAMPION</span>
+          <span id="heroModeBadge" style="display:none;"></span></div>
           <div class="hero-date" id="heroDate" style="font-size:.85rem;"></div>
           <div id="heroClock" style="font-family:var(--fn);font-size:1.8rem;font-weight:900;color:rgba(255,255,255,.85);margin-top:.3rem;letter-spacing:-1px;"></div>
         </div>
@@ -942,7 +811,7 @@
     </div>
 
     <!-- Earnings -->
-    <div class="dcard dcard-extra" onclick="showSection('s-chores')">
+    <div class="dcard" onclick="showSection('s-chores')">
       <div class="dcard-status" id="dcEarnStatus"></div>
       <div class="dcard-icon">💰</div>
       <div class="dcard-label">EARNINGS <span class="hlp" onmouseenter="hlp('earnings',this,event);hlpHintDone()" onmouseleave="hlpHide()">?<span class="hlp-arrow">▲</span></span></div>
@@ -951,7 +820,7 @@
     </div>
 
     <!-- Certificates -->
-    <div class="dcard dcard-extra" onclick="showSection('s-skills')">
+    <div class="dcard" onclick="showSection('s-skills')">
       <div class="dcard-status" id="dcCertStatus"></div>
       <div class="dcard-icon">🧠</div>
       <div class="dcard-label">CERTS <span class="hlp" onmouseenter="hlp('certs',this,event);hlpHintDone()" onmouseleave="hlpHide()">?<span class="hlp-arrow">▲</span></span></div>
@@ -978,7 +847,7 @@
     </div>
 
     <!-- Books -->
-    <div class="dcard dcard-extra" onclick="showSection('s-reading')">
+    <div class="dcard" onclick="showSection('s-reading')">
       <div class="dcard-status" id="dcBookStatus"></div>
       <div class="dcard-icon">📖</div>
       <div class="dcard-label">BOOKS <span class="hlp" onmouseenter="hlp('books',this,event);hlpHintDone()" onmouseleave="hlpHide()">?<span class="hlp-arrow">▲</span></span></div>
@@ -989,7 +858,7 @@
     <!-- Health -->
     
     <!-- Screen Time -->
-    <div class="dcard dcard-extra" onclick="showSection('s-chores')">
+    <div class="dcard" onclick="showSection('s-chores')">
       <div class="dcard-status" id="dcScreenStatus"></div>
       <div class="dcard-icon">📱</div>
       <div class="dcard-label">SCREEN TIME <span class="hlp" onmouseenter="hlp('screentime',this,event);hlpHintDone()" onmouseleave="hlpHide()">?<span class="hlp-arrow">▲</span></span></div>
@@ -998,7 +867,7 @@
     </div>
 
     <!-- Checking -->
-    <div class="dcard dcard-extra" onclick="showSection('s-finance')">
+    <div class="dcard" onclick="showSection('s-finance')">
       <div class="dcard-status" id="dcFinStatus"></div>
       <div class="dcard-icon">🏦</div>
       <div class="dcard-label">CHECKING <span class="hlp" onmouseenter="hlp('checking',this,event);hlpHintDone()" onmouseleave="hlpHide()">?<span class="hlp-arrow">▲</span></span></div>
@@ -1007,7 +876,7 @@
     </div>
 
     <!-- Upcoming -->
-    <div class="dcard dcard-extra" onclick="showSection('s-calendar')">
+    <div class="dcard" onclick="showSection('s-calendar')">
       <div class="dcard-status" id="dcCalStatus"></div>
       <div class="dcard-icon">📅</div>
       <div class="dcard-label">UPCOMING <span class="hlp" onmouseenter="hlp('upcoming',this,event);hlpHintDone()" onmouseleave="hlpHide()">?<span class="hlp-arrow">▲</span></span></div>
@@ -1028,7 +897,7 @@
     <!-- Journal -->
     
     <!-- Milestones -->
-    <div class="dcard dcard-extra" onclick="showSection('s-milestones')">
+    <div class="dcard" onclick="showSection('s-milestones')">
       <div class="dcard-status" id="dcMileStatus"></div>
       <div class="dcard-icon">🏆</div>
       <div class="dcard-label">MILESTONES <span class="hlp" onmouseenter="hlp('milestones',this,event);hlpHintDone()" onmouseleave="hlpHide()">?<span class="hlp-arrow">▲</span></span></div>
@@ -1037,7 +906,7 @@
     </div>
 
     <!-- Daily Scripture -->
-    <div class="dcard dcard-extra" onclick="showSection('s-scripture')">
+    <div class="dcard" onclick="showSection('s-scripture')">
       <div class="dcard-status" id="dcScrStatus"></div>
       <div class="dcard-icon">✝️</div>
       <div class="dcard-label">SCRIPTURE <span class="hlp" onmouseenter="hlp('scripture',this,event);hlpHintDone()" onmouseleave="hlpHide()">?<span class="hlp-arrow">▲</span></span></div>
@@ -1046,19 +915,13 @@
     </div>
 
     <!-- Parent Bucks (2nd instance) -->
-    <div class="dcard dcard-extra" onclick="showSection('s-chores')">
+    <div class="dcard" onclick="showSection('s-chores')">
       <div class="dcard-status" id="dcPBStatus2"></div>
       <div class="dcard-icon">🪙</div>
       <div class="dcard-label">PARENT BUCKS <span class="hlp" onmouseenter="hlp('parentbucks',this,event);hlpHintDone()" onmouseleave="hlpHide()">?<span class="hlp-arrow">▲</span></span></div>
       <div class="dcard-value" id="qsPB" style="color:#fbbf24;">0</div>
       <div class="dcard-sub" id="qsPBGames"></div>
     </div>
-  </div>
-
-  <!-- Hero compact mode toggle (Phase 2.2) — collapses non-priority cards. -->
-  <style>.dashGrid.compact .dcard-extra{display:none;}</style>
-  <div style="text-align:center;margin:-.3rem 0 .7rem;">
-    <button id="heroCompactToggle" onclick="toggleHeroCompact()" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--tx2);padding:.3rem .8rem;border-radius:8px;font-size:.65rem;font-weight:700;cursor:pointer;font-family:var(--fn);letter-spacing:.5px;">📊 Show all stats</button>
   </div>
 
     <!-- ═══ DAILY ACTIVITY CHECK ═══ -->
@@ -4626,10 +4489,6 @@
         <button onclick="pgPinKey('⌫')" class="pin-btn" style="font-size:1.2rem;">⌫</button>
       </div>
       <div id="parentGateError" style="font-size:.72rem;color:#f87171;min-height:1rem;margin-bottom:.4rem;"></div>
-      <div style="font-size:.7rem;color:var(--tx2);margin-top:.3rem;">
-        <a href="javascript:void(0)" onclick="openForgotParentPinModal()" style="color:var(--c);text-decoration:underline;font-weight:600;">Forgot PIN?</a>
-        <span style="color:var(--tx3);"> Reset with your account password.</span>
-      </div>
     </div>
     <!-- keep hidden input for compatibility -->
     <input type="hidden" id="parentPinInput" value="">
@@ -4637,9 +4496,6 @@
 
   <!-- PARENT DASHBOARD (after PIN unlock) -->
   <div id="parentDashContent" style="display:none;">
-
-    <!-- PIN MIGRATION BANNER (Phase 1.1 add-on) — populated by maybeShowPinMigrationBanner() -->
-    <div id="pinMigrationBanner" style="display:none;background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.25);border-radius:10px;padding:.7rem .85rem;margin-bottom:.7rem;"></div>
 
     <!-- BACK + LOCK ROW -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem;gap:.5rem;">
@@ -6052,41 +5908,6 @@
       </div>
     </div>
 
-    <!-- SLIDE 1: AGE TIER PICKER (Solo path only — Family path skips this slide via pobNav(2)) -->
-    <div class="ob-slide">
-      <div class="ob-hero">
-        <span class="ob-hero-emoji">🎯</span>
-        <div class="ob-hero-title">HOW OLD ARE YOU?</div>
-        <div class="ob-hero-sub">We'll tailor what you see to your stage. You can change this anytime in Settings.</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:.65rem;margin-top:.8rem;">
-        <button onclick="chooseAgeTier('middle')" style="display:flex;align-items:center;gap:.9rem;width:100%;padding:.95rem 1.1rem;background:linear-gradient(135deg,rgba(34,211,153,.08),rgba(34,197,94,.06));border:2px solid rgba(34,211,153,.3);border-radius:14px;cursor:pointer;text-align:left;font-family:var(--fn);transition:all .2s;" onmouseover="this.style.borderColor='#34d399'" onmouseout="this.style.borderColor='rgba(34,211,153,.3)'">
-          <span style="font-size:1.9rem;flex-shrink:0;">🎒</span>
-          <div>
-            <div style="font-size:.88rem;font-weight:900;color:#fff;margin-bottom:.15rem;">12–14 · Middle School</div>
-            <div style="font-size:.72rem;color:rgba(255,255,255,.45);line-height:1.5;">Core surface — chores, goals, mood, habits, reading, scripture, rewards.</div>
-          </div>
-          <span style="margin-left:auto;color:#34d399;font-size:1.2rem;flex-shrink:0;">→</span>
-        </button>
-        <button onclick="chooseAgeTier('mid_hs')" style="display:flex;align-items:center;gap:.9rem;width:100%;padding:.95rem 1.1rem;background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(79,143,255,.06));border:2px solid rgba(56,189,248,.3);border-radius:14px;cursor:pointer;text-align:left;font-family:var(--fn);transition:all .2s;" onmouseover="this.style.borderColor='#38bdf8'" onmouseout="this.style.borderColor='rgba(56,189,248,.3)'">
-          <span style="font-size:1.9rem;flex-shrink:0;">📖</span>
-          <div>
-            <div style="font-size:.88rem;font-weight:900;color:#fff;margin-bottom:.15rem;">15–17 · High School</div>
-            <div style="font-size:.72rem;color:rgba(255,255,255,.45);line-height:1.5;">Adds school tracking, health, finance basics, driving, and life skills.</div>
-          </div>
-          <span style="margin-left:auto;color:#38bdf8;font-size:1.2rem;flex-shrink:0;">→</span>
-        </button>
-        <button onclick="chooseAgeTier('adult')" style="display:flex;align-items:center;gap:.9rem;width:100%;padding:.95rem 1.1rem;background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(139,92,246,.06));border:2px solid rgba(167,139,250,.25);border-radius:14px;cursor:pointer;text-align:left;font-family:var(--fn);transition:all .2s;" onmouseover="this.style.borderColor='#a78bfa'" onmouseout="this.style.borderColor='rgba(167,139,250,.25)'">
-          <span style="font-size:1.9rem;flex-shrink:0;">💼</span>
-          <div>
-            <div style="font-size:.88rem;font-weight:900;color:#fff;margin-bottom:.15rem;">18–22 · Young Adult</div>
-            <div style="font-size:.72rem;color:rgba(255,255,255,.45);line-height:1.5;">Full surface — resume, jobs, bio page, mentors, milestones, all life skills.</div>
-          </div>
-          <span style="margin-left:auto;color:#a78bfa;font-size:1.2rem;flex-shrink:0;">→</span>
-        </button>
-      </div>
-    </div>
-
     <!-- SLIDE 1: WELCOME -->
     <div class="ob-slide">
       <div class="ob-hero">
@@ -6136,7 +5957,7 @@
         <div class="ob-step-card" style="--accent:#06b6d4"><span class="osc-icon">🎮</span><div class="osc-title">Prize Store</div><div class="osc-desc">Build a custom reward store — kids spend their Parent Bucks here.</div></div>
       </div>
       <div class="ob-tip">💡 <strong>Back button:</strong> Use the <b>← Dashboard</b> button inside the Parent Hub to return to the main screen anytime.</div>
-      <button onclick="wizGoTo('s-parent','parent',2);if(!isParentUnlocked())_doUnlockParent();" style="display:inline-flex;align-items:center;gap:.35rem;margin-top:.55rem;width:100%;justify-content:center;padding:.55rem 1rem;background:linear-gradient(135deg,#38bdf8,#818cf8);border:none;border-radius:10px;color:#06101e;font-size:.82rem;font-weight:900;cursor:pointer;font-family:var(--fn);box-shadow:0 4px 16px rgba(56,189,248,.35);">👉 Go to Parent Hub</button>
+      <button onclick="wizGoTo('s-parent','parent',2);if(!_parentDashUnlocked)_doUnlockParent();" style="display:inline-flex;align-items:center;gap:.35rem;margin-top:.55rem;width:100%;justify-content:center;padding:.55rem 1rem;background:linear-gradient(135deg,#38bdf8,#818cf8);border:none;border-radius:10px;color:#06101e;font-size:.82rem;font-weight:900;cursor:pointer;font-family:var(--fn);box-shadow:0 4px 16px rgba(56,189,248,.35);">👉 Go to Parent Hub</button>
     </div>
 
     <!-- SLIDE 3: CHORES & REWARDS -->
@@ -6760,19 +6581,9 @@ function _onboardSaveName(){
   }
   // Save name to D and to the parent profile in _profiles
   D.name = name;
-  if(typeof _profiles !== 'undefined'){
-    var parentProf = _profiles.find(function(p){ return p.isParent === true; });
-    if(parentProf){
-      parentProf.name = name;
-    } else if(typeof generateParentId === 'function'){
-      // No parent profile yet (existing user with corrupted state, or first
-      // login from an account that never had a parent profile created).
-      // Create one now so addChildFromHub and welcome card both have something
-      // to anchor on. Without this, downstream flows fire prompts again.
-      var newId = generateParentId();
-      _profiles.unshift({ id:newId, name:name, isParent:true, data:JSON.parse(JSON.stringify(D)) });
-      _activeProfileId = newId;
-    }
+  if(typeof _profiles !== 'undefined' && typeof _activeProfileId !== 'undefined'){
+    var parentProf = _profiles.find(function(p){ return p.isParent !== false; });
+    if(parentProf) parentProf.name = name;
     if(typeof saveProfiles === 'function') saveProfiles();
   }
   if(typeof applyName === 'function') applyName();
@@ -6782,39 +6593,20 @@ function _onboardSaveName(){
 function chooseSoloMode(){
   if(!_onboardSaveName()) return;
   D.soloMode = true;
+  D.parentWizardDone = true;
   save();
-  // Advance to age-tier picker (slide 1). chooseAgeTier finishes the wizard.
-  if(typeof pobNav === 'function') pobNav(1);
+  var ob = document.getElementById('parentOnboard');
+  if(ob) ob.classList.remove('open');
+  applySoloMode();
+  showSection('s-hero');
+  showToast('Welcome, ' + D.name + '! Your dashboard is ready. 🚀');
 }
 
 function chooseFamilyMode(){
   if(!_onboardSaveName()) return;
   D.soloMode = false;
-  // Parent presumed 18+. Default mode to 'adult' so they get the full surface.
-  if(!D.mode || D.mode === 'high') D.mode = 'adult';
   save();
-  // Skip the Solo-only age-picker slide (index 1) and jump to Welcome (index 2).
-  if(typeof pobNav === 'function') pobNav(2);
-}
-
-function chooseAgeTier(tier){
-  // tier: 'middle' (12-14) | 'mid_hs' (15-17) | 'adult' (18-22).
-  // Maps directly to existing STAGE_CONFIG entries (see ui.js).
-  if(typeof setMode === 'function'){
-    setMode(tier);
-  } else {
-    D.mode = tier; save();
-  }
-  if(typeof buildSideNav === 'function') buildSideNav();
-  D.parentWizardDone = true;
-  try{ localStorage.setItem(_ylccUserKey('ylcc_parentWizardDone'), '1'); }catch(e){}
-  save();
-  var ob = document.getElementById('parentOnboard');
-  if(ob){ ob.classList.remove('open'); ob.style.display='none'; }
-  document.body.style.overflow = '';
-  if(typeof applySoloMode === 'function') applySoloMode();
-  if(typeof showSection === 'function') showSection('s-hero');
-  if(typeof showToast === 'function') showToast('Welcome, ' + (D.name||'champion') + '! 🚀');
+  if(typeof pobNav === 'function') pobNav(1);
 }
 
 function applySoloMode(){
@@ -6827,40 +6619,6 @@ function applySoloMode(){
   // Update body class for CSS hooks
   document.body.classList.toggle('solo-mode', isSolo);
 }
-
-// ── HERO COMPACT MODE (Phase 2.2) ────────────────────────────
-// Default-compact dashboard: 8 priority cards visible, 9 extras hidden behind
-// "Show all stats" toggle. Preference persists per-user via the standard
-// _ylccUserKey pattern so it survives cloudLoad() overwrites.
-function toggleHeroCompact(){
-  var grid = document.querySelector('.dashGrid');
-  if(!grid) return;
-  var nowCompact = !grid.classList.contains('compact');
-  grid.classList.toggle('compact', nowCompact);
-  var btn = document.getElementById('heroCompactToggle');
-  if(btn) btn.textContent = nowCompact ? '📊 Show all stats' : '📉 Hide extra stats';
-  try {
-    var key = (typeof _ylccUserKey === 'function') ? _ylccUserKey('ylcc_heroCompact') : 'ylcc_heroCompact_local';
-    localStorage.setItem(key, nowCompact ? '1' : '0');
-  } catch(e){}
-}
-
-function _applyHeroCompact(){
-  var grid = document.querySelector('.dashGrid');
-  if(!grid) return;
-  var key = (typeof _ylccUserKey === 'function') ? _ylccUserKey('ylcc_heroCompact') : 'ylcc_heroCompact_local';
-  var stored = null;
-  try { stored = localStorage.getItem(key); } catch(e){}
-  // Default = compact (Phase 2.2). User toggles off → '0' is stored.
-  var compact = stored !== '0';
-  grid.classList.toggle('compact', compact);
-  var btn = document.getElementById('heroCompactToggle');
-  if(btn) btn.textContent = compact ? '📊 Show all stats' : '📉 Hide extra stats';
-}
-
-document.addEventListener('DOMContentLoaded', function(){
-  setTimeout(_applyHeroCompact, 350);
-});
 </script>
 
 <script>
@@ -6883,15 +6641,20 @@ function applyHeroViewMode() {
     var nameEl = document.getElementById('parentWelcomeName');
     var dateEl = document.getElementById('parentWelcomeDate');
     if (nameEl) {
-      // Use parent profile name first, then D.name if set, then a neutral default.
-      // Never the email local-part (per product rules — that\'s where "jason.vega07"
-      // was leaking through).
-      var parentProf = (_profiles || []).find(function(p){ return p.isParent === true; });
-      var pname = (parentProf && parentProf.name)
-        ? parentProf.name
-        : (typeof D !== 'undefined' && D && D.name && String(D.name).trim())
-          ? D.name
-          : 'Parent';
+      // Pick the best real name, never the email prefix.
+      var parentProf = (typeof _profiles !== 'undefined' && _profiles)
+        ? _profiles.find(function(p){ return p.isParent !== false; })
+        : null;
+      var meta = (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.user_metadata)
+        ? _supaUser.user_metadata
+        : {};
+      var pname =
+        (parentProf && parentProf.name && parentProf.name.trim()) ||
+        (typeof D !== 'undefined' && D && D.name && D.name.trim()) ||
+        (meta.first_name && String(meta.first_name).trim()) ||
+        (meta.name && String(meta.name).trim().split(/\s+/)[0]) ||
+        (meta.full_name && String(meta.full_name).trim().split(/\s+/)[0]) ||
+        'Friend';
       var hr = new Date().getHours();
       var greet = hr < 12 ? 'morning' : hr < 17 ? 'afternoon' : 'evening';
       nameEl.textContent = 'Good ' + greet + ', ' + pname;
@@ -6902,42 +6665,71 @@ function applyHeroViewMode() {
   }
 }
 
-// Hook into applyName so it fires on every name/profile update.
-// Guarded so a double-load of this script can never re-wrap and recurse.
-if (!window.__ylccApplyNameWrapped) {
-  window.__ylccApplyNameWrapped = true;
-  var _origApplyName = typeof applyName === 'function' ? applyName : null;
-  if (_origApplyName) {
-    applyName = function() {
-      _origApplyName();
-      applyHeroViewMode();
-      if(typeof applySoloMode === 'function') applySoloMode();
-    };
-  }
+// Hook into applyName so it fires on every name/profile update
+var _origApplyName = typeof applyName === 'function' ? applyName : null;
+if (_origApplyName) {
+  applyName = function() {
+    _origApplyName();
+    applyHeroViewMode();
+    if(typeof applySoloMode === 'function') applySoloMode();
+  };
 }
 
 // Also fire on load and after child login
-if (!window.__ylccHeroViewDomReadyAttached) {
-  window.__ylccHeroViewDomReadyAttached = true;
-  document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function(){
-      applyHeroViewMode();
-      if(typeof applySoloMode === 'function') applySoloMode();
-    }, 300);
-  });
-}
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function(){
+    applyHeroViewMode();
+    if(typeof applySoloMode === 'function') applySoloMode();
+  }, 300);
+});
 
-// Hook into refreshDashForCurrentChild — same idempotency guard.
-if (!window.__ylccRefreshDashWrapped) {
-  window.__ylccRefreshDashWrapped = true;
-  var _origRefresh = typeof refreshDashForCurrentChild === 'function' ? refreshDashForCurrentChild : null;
-  if (_origRefresh) {
-    refreshDashForCurrentChild = function() {
-      _origRefresh();
-      applyHeroViewMode();
-    };
-  }
+// Hook into refreshDashForCurrentChild
+var _origRefresh = typeof refreshDashForCurrentChild === 'function' ? refreshDashForCurrentChild : null;
+if (_origRefresh) {
+  refreshDashForCurrentChild = function() {
+    _origRefresh();
+    applyHeroViewMode();
+  };
 }
+</script>
+
+<!-- Service Worker registration with auto-update on new deploy -->
+<link rel="manifest" href="/manifest.json">
+<script>
+(function(){
+  if (!('serviceWorker' in navigator)) return;
+  if (location.protocol !== 'https:' && location.hostname !== 'localhost') return;
+
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('/service-worker.js').then(function(reg){
+      // When a new SW is found, tell it to take over right away.
+      reg.addEventListener('updatefound', function(){
+        var nw = reg.installing;
+        if (!nw) return;
+        nw.addEventListener('statechange', function(){
+          if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+            // New version waiting — activate it immediately.
+            nw.postMessage({ type: 'SKIP_WAITING' });
+          }
+        });
+      });
+      // Check for updates whenever the page becomes visible again.
+      document.addEventListener('visibilitychange', function(){
+        if (document.visibilityState === 'visible') reg.update().catch(function(){});
+      });
+    }).catch(function(err){
+      console.warn('[SW] registration failed:', err);
+    });
+
+    // When the controlling SW changes, reload once to pick up new assets.
+    var refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', function(){
+      if (refreshing) return;
+      refreshing = true;
+      location.reload();
+    });
+  });
+})();
 </script>
 </body>
 </html>
