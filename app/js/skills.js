@@ -4863,8 +4863,12 @@ function updateThemeBtn(){
   const icon  = isLight ? '☀️' : '🌙';
   const btn  = document.getElementById('themeBtn');
   const btnM = document.getElementById('themeBtnMob');
+  const btnT = document.getElementById('themeBtnTop');
+  const btnTM = document.getElementById('themeBtnTopMob');
   if(btn)  btn.textContent  = label;
   if(btnM) btnM.textContent = icon;
+  if(btnT) btnT.textContent = label;
+  if(btnTM) btnTM.textContent = label;
 }
 
 function applyTheme(){
@@ -4878,7 +4882,7 @@ function applyTheme(){
 // PARENT ONBOARDING WIZARD
 // ══════════════════════════════════════════════════════════
 let _pobStep = 0;
-const POB_TOTAL = 8;
+const POB_TOTAL = 7;
 
 function initPobDots(){
   const d = document.getElementById('pobDots'); if(!d) return;
