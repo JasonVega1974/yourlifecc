@@ -365,9 +365,24 @@ function printResume() {
 }
 
 // ── LIVE PREVIEW ──────────────────────────────────────────────
+// Debounced autosave timer for resume edits — coalesces rapid keystrokes
+// into one localStorage write + one cloudSync per ~600ms idle.
+let _resumeSaveTimer = null;
+function _resumeAutosave() {
+  if (_resumeRestoring) return;
+  clearTimeout(_resumeSaveTimer);
+  _resumeSaveTimer = setTimeout(() => {
+    if (typeof save === 'function') save();
+  }, 600);
+}
+
 function livePreview() {
   const el = document.getElementById('resumePreview');
   if (!el) return;
+  // Persist edits — save() reads form values into D.resume (sync.js:58-67)
+  // and writes to localStorage. Without this hook, every oninput="livePreview()"
+  // updated the preview but lost the user's typing on next page load.
+  _resumeAutosave();
   // If user manually edited the preview, don't overwrite — let them use ↺ Reset
   if (_resumeDirty && !_resumeRestoring) return;
 
