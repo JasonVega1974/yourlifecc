@@ -22,12 +22,22 @@
   <a href="/" style="color:#cbd5e1;text-decoration:underline;">Home</a>
   &nbsp;·&nbsp;
   <a href="/app" style="color:#7dd3fc;text-decoration:underline;font-weight:700;">Start free trial &rarr;</a>
-  <button onclick="document.getElementById('demoBanner').style.display='none';document.body.style.paddingTop='0';" aria-label="Dismiss demo banner" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:#cbd5e1;cursor:pointer;font-size:1rem;line-height:1;padding:4px 8px;">&times;</button>
+  <button onclick="dismissDemoBanner()" aria-label="Dismiss demo banner" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:#cbd5e1;cursor:pointer;font-size:1rem;line-height:1;padding:4px 8px;">&times;</button>
 </div>
+<style>
+  body.demo-banner-on{padding-top:28px;}
+  body.demo-banner-on #sidebar,
+  body.demo-banner-on #mBar,
+  body.demo-banner-on #topQuickBtns{top:28px;}
+</style>
 <script>
+  function dismissDemoBanner(){
+    document.getElementById('demoBanner').style.display='none';
+    document.body.classList.remove('demo-banner-on');
+  }
   if(new URLSearchParams(window.location.search).get("demo")==="true"){
     document.getElementById("demoBanner").style.display="block";
-    document.body.style.paddingTop="28px";
+    document.body.classList.add('demo-banner-on');
   }
 </script>
 
