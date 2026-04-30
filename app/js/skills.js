@@ -4711,6 +4711,21 @@ const PALETTES = {
   amber:   {c:'#f59e0b', p:'#8b5cf6', gr:'#34d399', g:'#fb923c'},
   coral:   {c:'#ff6b6b', p:'#4ecdc4', gr:'#45b7d1', g:'#ffd93d'},
   neon:    {c:'#39ff14', p:'#ff00ff', gr:'#00ffff', g:'#ffff00', bg:'#050505', s1:'#0a0a0a', s2:'#111', s3:'#161616', s4:'#1a1a1a'},
+  // Mom-persona Phase 7 — three full themes that ride on light mode and
+  // override accents + surface tones. Each entry sets theme:'light' so
+  // applyPalette flips html.light, then layers the warm/sage/teal tokens.
+  cream:   {theme:'light',
+            c:'#c97b63', p:'#b88842', gr:'#7a8a5a', g:'#d4a04c',
+            bg:'#f5f0e8', s1:'#ffffff', s2:'#fafaf6', s3:'#f0e9d8', s4:'#ebe4d6',
+            tx:'#3d2f23', tx2:'#6b5847', mt:'#a39280'},
+  sage:    {theme:'light',
+            c:'#5a7a5b', p:'#7d8a7f', gr:'#7a8a5a', g:'#d8a64f',
+            bg:'#eef2eb', s1:'#fafaf6', s2:'#f4f6ef', s3:'#e8ede2', s4:'#e2e8de',
+            tx:'#2d3a2e', tx2:'#5d6b5f', mt:'#9aa89c'},
+  teal:    {theme:'light',
+            c:'#5e8a8a', p:'#7d8a8c', gr:'#5a8a78', g:'#d4a04c',
+            bg:'#f2f5f6', s1:'#ffffff', s2:'#fafbfb', s3:'#ecf0f1', s4:'#e6ecee',
+            tx:'#233438', tx2:'#57676a', mt:'#9aabae'},
 laundry:[
   {q:'What water temperature works for 90% of laundry loads?',opts:['Hot','Warm','Cold','Boiling'],ans:2,explain:'Cold water works for almost everything, saves energy, and prevents color bleeding.'},
   {q:'What should you NEVER put in the dryer?',opts:['Jeans','Towels','Bras and elastic items','Socks'],ans:2,explain:'Athletic wear, bras, and anything with elastic should air dry to prevent damage.'},
@@ -4762,15 +4777,29 @@ function applyPalette(){
   // Also apply via JS for reliability
   const pal = PALETTES[name];
   if(pal){
-    if(pal.c)  root.style.setProperty('--c',  pal.c);
-    if(pal.p)  root.style.setProperty('--p',  pal.p);
-    if(pal.gr) root.style.setProperty('--gr', pal.gr);
-    if(pal.g)  root.style.setProperty('--g',  pal.g);
-    if(pal.bg) root.style.setProperty('--bg', pal.bg);
-    if(pal.s1) root.style.setProperty('--s1', pal.s1);
-    if(pal.s2) root.style.setProperty('--s2', pal.s2);
-    if(pal.s3) root.style.setProperty('--s3', pal.s3);
-    if(pal.s4) root.style.setProperty('--s4', pal.s4);
+    // Mom-persona Phase 7: a palette can declare an underlying theme so
+    // light-on-cream / sage / teal automatically gets the right text
+    // contrast from light mode's :root.light overrides.
+    if(pal.theme === 'light' && !root.classList.contains('light')){
+      root.classList.add('light');
+      try { localStorage.setItem('ylcc_theme_auto_light', '1'); } catch(e){}
+    } else if(pal.theme === 'dark' && root.classList.contains('light')){
+      // Only auto-flip back to dark if we were the ones who flipped to light.
+      try { if(localStorage.getItem('ylcc_theme_auto_light') === '1'){ root.classList.remove('light'); localStorage.removeItem('ylcc_theme_auto_light'); } } catch(e){}
+    }
+
+    if(pal.c)   root.style.setProperty('--c',   pal.c);
+    if(pal.p)   root.style.setProperty('--p',   pal.p);
+    if(pal.gr)  root.style.setProperty('--gr',  pal.gr);
+    if(pal.g)   root.style.setProperty('--g',   pal.g);
+    if(pal.bg)  root.style.setProperty('--bg',  pal.bg);
+    if(pal.s1)  root.style.setProperty('--s1',  pal.s1);
+    if(pal.s2)  root.style.setProperty('--s2',  pal.s2);
+    if(pal.s3)  root.style.setProperty('--s3',  pal.s3);
+    if(pal.s4)  root.style.setProperty('--s4',  pal.s4);
+    if(pal.tx)  root.style.setProperty('--tx',  pal.tx);
+    if(pal.tx2) root.style.setProperty('--tx2', pal.tx2);
+    if(pal.mt)  root.style.setProperty('--mt',  pal.mt);
   } else {
     // Reset to cyan defaults
     root.style.setProperty('--c',  '#38bdf8');
@@ -4782,6 +4811,12 @@ function applyPalette(){
     root.style.removeProperty('--s2');
     root.style.removeProperty('--s3');
     root.style.removeProperty('--s4');
+    root.style.removeProperty('--tx');
+    root.style.removeProperty('--tx2');
+    root.style.removeProperty('--mt');
+    // Auto-flip back to dark if we'd silently turned on light mode for a
+    // theme palette earlier.
+    try { if(localStorage.getItem('ylcc_theme_auto_light') === '1'){ root.classList.remove('light'); localStorage.removeItem('ylcc_theme_auto_light'); } } catch(e){}
   }
 
   // Highlight correct swatch
