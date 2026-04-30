@@ -3979,7 +3979,7 @@ function renderCertPanel(key){
           <div class="sk-cert-corner bl" style="border-color:${col};"></div>
           <div class="sk-cert-corner br" style="border-color:${col};"></div>
 
-          <div class="sk-cert-top" style="color:${col};">✦ LIFE OS ACADEMY ✦</div>
+          <div class="sk-cert-top" style="color:${col};">✦ YOURLIFE ACADEMY ✦</div>
           <div style="font-size:.62rem;letter-spacing:3px;color:rgba(255,255,255,.4);margin-bottom:1rem;text-transform:uppercase;">Certificate of Achievement</div>
           <div class="sk-cert-icon-big">${cat?.icon||'🎓'}</div>
           <div style="font-size:.75rem;color:rgba(255,255,255,.5);margin:.6rem 0 .2rem;font-style:italic;">This certifies that</div>
@@ -4001,7 +4001,7 @@ function renderCertPanel(key){
             </div>
             <div class="sk-cert-seal" style="border-color:${col};color:${col};">
               <div style="font-size:.55rem;font-weight:900;letter-spacing:1.5px;">VERIFIED</div>
-              <div style="font-size:.5rem;color:rgba(255,255,255,.5);">Life OS Academy</div>
+              <div style="font-size:.5rem;color:rgba(255,255,255,.5);">YourLife Academy</div>
             </div>
             <div style="text-align:center;">
               <div style="font-size:.55rem;color:rgba(255,255,255,.3);letter-spacing:1px;text-transform:uppercase;">Credential ID</div>
@@ -4016,7 +4016,7 @@ function renderCertPanel(key){
 function shareCert(key){
   const cat = SK_CATS.find(c=>c.key===key);
   const score = (D.skillQuizScores||{})[key];
-  const text = `I just earned my ${cat?.name} certificate on Life OS Academy with a score of ${score}%! 🏆 #LifeSkills`;
+  const text = `I just earned my ${cat?.name} certificate on YourLife Academy with a score of ${score}%! 🏆 #LifeSkills`;
   if(navigator.share) navigator.share({title:'My Certificate',text});
   else { navigator.clipboard?.writeText(text); showToast('Certificate text copied to clipboard! 📋'); }
 }

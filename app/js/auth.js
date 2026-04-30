@@ -109,6 +109,9 @@ async function authSubmit(){
       result = await supa.auth.signInWithPassword({ email, password: pass });
       if(result.error) throw result.error;
       _supaUser = result.data.user;
+      // Mom-persona: stamp the moment of fresh login so Parent Hub can skip
+      // PIN within a short grace window. Reset on Lock Hub or after 5 min.
+      try { localStorage.setItem('ylcc_post_login', String(Date.now())); } catch(e){}
       authSetMsg('Signed in!', 'var(--gr)');
       setTimeout(() => authComplete(true), 600);
     }

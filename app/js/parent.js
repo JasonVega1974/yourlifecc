@@ -61,6 +61,12 @@ function escapeHtml(s){
 function unlockParentDash(){
   initChoreData();
   if(D.parentPinDisabled){ _doUnlockParent(); return; }
+  // Mom-persona: skip PIN within 5 min of a fresh sign-in. Stamp is set in
+  // auth.js on successful signInWithPassword. Cleared by lockParentDash().
+  try {
+    const stamp = parseInt(localStorage.getItem('ylcc_post_login') || '0', 10);
+    if(stamp && Date.now() - stamp < 5*60*1000){ _doUnlockParent(); return; }
+  } catch(e){ /* localStorage blocked — fall through to PIN gate */ }
   // If no PIN set yet (hashed or plaintext), let them straight in
   if(!D.parentPinHash && !D.chorePin && !D.parentPIN){ _doUnlockParent(); return; }
   // Submission handled by pgPinKey / _pgSubmit
@@ -70,6 +76,9 @@ function lockParentDash(){
   _parentUnlockExpiresAt = 0;
   _parentUnlockHardCap = 0;
   _pgBuffer = ''; _pgUpdateDots();
+  // Mom-persona: locking the hub also burns the post-login grace window so
+  // anyone re-entering Parent Hub after Lock has to enter the PIN normally.
+  try { localStorage.removeItem('ylcc_post_login'); } catch(e){}
   // Cleanup of any stale flags from the previous deploy (storage-cache model).
   // Safe to remove this block in a future deploy once known users have rotated.
   try { sessionStorage.removeItem('parentUnlocked'); } catch(e){}
@@ -140,6 +149,10 @@ function toggleChildSection(cid,sid,btn){
 
 function renderParentDash(){
   if(!isParentUnlocked()) return;
+  // Mom-persona: every Parent Hub render syncs PIN-dependent UI
+  // (Lock Hub button visibility, gate message, etc). Catches the Phase 4
+  // direct-landing path that bypasses _doUnlockParent.
+  if(typeof updateParentPinToggleUI === 'function') updateParentPinToggleUI();
   populateParentChildSelect();
   populateChildSectionSel();
   renderParentGettingStarted();
@@ -173,7 +186,10 @@ function renderParentDash(){
     const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
     phST.textContent = h>0 ? h+'h '+m+'m' : m>0 ? m+'m '+String(sec).padStart(2,'0')+'s' : sec+'s';
   }
-  phNav('users');
+  // Mom-persona Phase 5: default landing inside Parent Hub is the new Hub Home
+  // (greeting + needs-approval + kid cards + quick actions). Manage Users still
+  // accessible via the Setup group; addChildProfile() still routes to it directly.
+  phNav('home');
 }
 
 // ── PARENT SCORE — THE BIG NUMBER ────────────────────────────
@@ -1158,13 +1174,13 @@ function resetGettingStarted(){
 // ── PARENT GETTING STARTED ───────────────────────────────────
 const GS_PARENT_STEPS = [
   {id:'gsp-pin', icon:'🔐', title:'Set Your Parent PIN',
-   tip:'Your PIN protects the Parent Hub and Chore verification. Only you should know it. Set it the first time you enter Parent Hub or Chore parent mode.',
+   tip:'Your PIN protects the Parent Hub and chore verification. Only you should know it. You\'ll be asked to set it the first time you enter Parent Hub.',
    check:()=>!!D.chorePin},
   {id:'gsp-chore', icon:'✅', title:'Add Your First Chore',
-   tip:'Go to <b>Chores → Parent Mode</b> and add tasks with point values. Daily chores reset each day. Weekly chores reset Monday. Kids submit, you verify.',
+   tip:'In <b>Parent Hub &rarr; Chores &amp; Deeds</b>, add tasks with point values. Daily chores reset each day. Weekly chores reset Monday. Kids submit, you verify.',
    check:()=>(Array.isArray(D.chores)?D.chores:[]).length>0},
   {id:'gsp-reward', icon:'🎁', title:'Set Up a Reward',
-   tip:'In <b>Chores → Parent Mode → Manage Rewards</b>, create rewards your child can earn with points. Examples: "Extra screen time = 50 pts", "Movie pick = 100 pts".',
+   tip:'In <b>Parent Hub &rarr; Rewards &amp; Bucks</b>, create rewards your child can earn with points. Examples: "Extra screen time = 50 pts", "Movie pick = 100 pts".',
    check:()=>(Array.isArray(D.rewards)?D.rewards:[]).length>0},
   {id:'gsp-incentive', icon:'🎯', title:'Create an Incentive',
    tip:'In <b>Parent Hub → Incentives</b>, tie rewards to real achievements. "GPA above 3.5 = new shoes", "Read 3 books = $20". Progress tracks automatically from the app data.',
@@ -1502,6 +1518,9 @@ function _doUnlockParent(){
   const content=document.getElementById('parentDashContent');
   if(gate) gate.style.display='none';
   if(content) content.style.display='block';
+  // Mom-persona: sync the Lock Hub button visibility on every unlock so it
+  // hides when no PIN is set (locking is meaningless without one).
+  if(typeof updateParentPinToggleUI === 'function') updateParentPinToggleUI();
   updateIncConditions(); renderParentDash();
   if(!D.parentWizardDone && localStorage.getItem(_ylccUserKey('ylcc_parentWizardDone')) !== '1'){ setTimeout(showParentOnboard,700); }
   // PIN migration banner — only shown when there's plaintext to migrate or a
@@ -1945,6 +1964,15 @@ function switchToProfile(id){
   const profile = _profiles.find(p=>p.id===id);
   if(!profile) return;
 
+  // Mom-persona security: when handing the device from parent to a child,
+  // clear the parent unlock state. Otherwise the kid (or anyone with the
+  // device) can navigate back to Parent Hub within the 5-min idle window
+  // and walk in unauthenticated. lockParentDash() resets _parentUnlockExpiresAt,
+  // hides the dashboard content, and clears the post-login grace stamp.
+  if(profile.isParent === false && typeof lockParentDash === 'function'){
+    lockParentDash();
+  }
+
   _activeProfileId = id;
   saveProfiles();
 
@@ -2367,8 +2395,118 @@ function toggleDriverCheck(id, val){
 function initDriving(){ if(typeof renderDriverChecklist==='function') renderDriverChecklist(); }
 
 
+// ── PARENT HUB HOME — action-first daily landing (mom-persona Phase 5) ──────
+// Renders the greeting, the needs-approval strip (only when there are pending
+// chore submissions), per-kid summary cards, and the four quick-action tiles.
+// Reads existing fields off each child profile in _profiles. No new schema.
+function _phEscape(s){
+  return String(s==null?'':s).replace(/[&<>"']/g, function(c){
+    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+  });
+}
+function _phChildSummary(child){
+  // child.data may not exist for the active profile (whose data is in D).
+  const data = (child && child.id === (typeof _activeProfileId!=='undefined'?_activeProfileId:null) && typeof D==='object')
+    ? D
+    : (child && child.data) || {};
+  const today = new Date().toISOString().slice(0,10);
+
+  const activeChores = (data.choreList||[]).filter(c => c.active);
+  const choresDue = activeChores.filter(c =>
+    !(data.choreLog||[]).some(l => l.choreId === c.id && l.date === today &&
+      (l.status === 'done' || l.status === 'pending' || l.status === 'verified'))
+  ).length;
+  const homeworkDue = (data.assignments||[]).filter(a => !a.done).length;
+  const goalsActive = (data.goals||[]).filter(g => !g.done).length;
+  const streak = data.streak || 0;
+
+  let status;
+  if(choresDue === 0 && homeworkDue === 0) status = 'Caught up today';
+  else if(choresDue + homeworkDue <= 2) status = (choresDue + homeworkDue) + ' thing' + (choresDue+homeworkDue===1?'':'s') + ' left';
+  else status = (choresDue + homeworkDue) + ' things still need attention';
+
+  const pills = [];
+  if(choresDue > 0) pills.push({cls:'due', t: choresDue + ' chore' + (choresDue>1?'s':'') + ' due'});
+  if(homeworkDue > 0) pills.push({cls:'due', t: homeworkDue + ' homework'});
+  if(goalsActive > 0) pills.push({cls:'', t: goalsActive + ' active goal' + (goalsActive>1?'s':'')});
+  if(streak >= 3) pills.push({cls:'win', t: streak + '-day streak 🔥'});
+  return { status, pills };
+}
+function _phPendingApprovalCount(){
+  // Pending submissions across all children. Tries each child's data blob;
+  // for the active child also checks live D.
+  let total = 0;
+  const profiles = (typeof _profiles !== 'undefined' && Array.isArray(_profiles)) ? _profiles : [];
+  profiles.filter(p => p.isParent === false).forEach(c => {
+    const data = (c.id === (typeof _activeProfileId!=='undefined'?_activeProfileId:null) && typeof D==='object')
+      ? D
+      : c.data || {};
+    total += (data.choreLog||[]).filter(l => l.status === 'pending').length;
+  });
+  return total;
+}
+function renderParentHubHome(){
+  const profiles = (typeof _profiles !== 'undefined' && Array.isArray(_profiles)) ? _profiles : [];
+  const parent = profiles.find(p => p.isParent === true);
+  const children = profiles.filter(p => p.isParent === false);
+
+  // Greeting
+  const greet = document.getElementById('phHomeGreeting');
+  if(greet){
+    const name = (parent && parent.name) || D.parentName || 'there';
+    const hr = new Date().getHours();
+    const tod = hr<12?'morning':hr<17?'afternoon':'evening';
+    greet.textContent = 'Good ' + tod + ', ' + name + ' 👋';
+  }
+  const summary = document.getElementById('phHomeSummary');
+  if(summary){
+    if(children.length === 0){
+      summary.innerHTML = 'No kids added yet. <a href="javascript:phNav(\'users\')" style="color:var(--c);">Add your first child →</a>';
+    } else {
+      summary.textContent = "Here's what's happening with the kid" + (children.length>1?'s':'') + ' today.';
+    }
+  }
+
+  // Needs-approval strip
+  const strip = document.getElementById('phApprovalStrip');
+  const head = document.getElementById('phApprovalHead');
+  if(strip && head){
+    const pending = _phPendingApprovalCount();
+    if(pending > 0){
+      strip.style.display = 'block';
+      head.textContent = pending + ' submission' + (pending>1?'s':'') + ' waiting for your approval';
+    } else {
+      strip.style.display = 'none';
+    }
+  }
+
+  // Per-kid summary cards
+  const kc = document.getElementById('phKidCards');
+  if(kc){
+    if(children.length === 0){
+      kc.innerHTML = '';
+    } else {
+      kc.innerHTML = children.map(c => {
+        const sum = _phChildSummary(c);
+        const avatar = c.avatar || '🧒';
+        return '<div class="phKidCard" onclick="switchToProfile(\''+_phEscape(c.id)+'\');showSection(\'s-hero\');">'
+          + '<div class="pkHead">'
+            + '<div class="pkAva">'+_phEscape(avatar)+'</div>'
+            + '<div><div class="pkName">'+_phEscape(c.name||'Child')+'</div>'
+            + '<div class="pkStatus">'+_phEscape(sum.status)+'</div></div>'
+          + '</div>'
+          + '<div class="pkPills">'
+            + sum.pills.map(p => '<span class="pkPill '+p.cls+'">'+_phEscape(p.t)+'</span>').join('')
+          + '</div>'
+        + '</div>';
+      }).join('');
+    }
+  }
+}
+
+
 function phNav(tab){
-  const panels = ['users','overview','rewards','chores','schedule','contests','quizzes','controls','behavior','activity','learning','growth','progress','referral'];
+  const panels = ['home','users','overview','rewards','chores','schedule','contests','quizzes','controls','behavior','activity','learning','growth','progress','referral'];
   panels.forEach(p=>{
     const el = document.getElementById('ph-'+p);
     if(el) el.style.display = p===tab ? 'block' : 'none';
@@ -2376,6 +2514,7 @@ function phNav(tab){
     if(nav) nav.classList.toggle('active', p===tab);
   });
   // Trigger renders for the active panel
+  if(tab==='home'){ renderParentHubHome(); }
   if(tab==='users'){ renderManageUsers(); }
   if(tab==='overview'){ renderParentGettingStarted(); renderParentMultiChild(); renderParentScore(); renderParentOverview(); renderWeeklyReportCard(); }
   if(tab==='rewards'){ renderPhRewards(); }
@@ -2667,7 +2806,9 @@ function renderParentGrowth(){
 }
 
 function saveParentGrowth(){
-  if(!D.parentGrowth) D.parentGrowth = [];
+  // Heal historical accounts where parentGrowth was {} (the wrong default
+  // in data.js — fixed forward but old rows still have it).
+  if(!Array.isArray(D.parentGrowth)) D.parentGrowth = [];
   const scores = {};
   PARENT_GROWTH_AREAS.forEach(a=>{
     const btns = document.querySelectorAll(`[data-area="${a.key}"]`);
@@ -2686,7 +2827,7 @@ function saveParentGrowth(){
 
 function renderParentGrowthHistory(){
   const el = document.getElementById('parentGrowthHistory'); if(!el) return;
-  const history = (D.parentGrowth||[]).slice().reverse();
+  const history = (Array.isArray(D.parentGrowth) ? D.parentGrowth : []).slice().reverse();
   if(!history.length){ el.innerHTML='<div style="font-size:.72rem;color:var(--tx3);text-align:center;padding:1rem;">No reflections yet. Complete your first weekly self-check above!</div>'; return; }
   el.innerHTML = history.map(h=>`
     <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:10px;padding:.6rem .8rem;margin-bottom:.4rem;">
@@ -4033,7 +4174,7 @@ async function submitBetaFeedback(){
       body:JSON.stringify({
         subject:emailSubject,
         textContent:emailBody,
-        senderName:'Life OS App'
+        senderName:'YourLife CC App'
       })
     });
     if(resp.ok){

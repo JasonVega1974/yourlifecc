@@ -224,9 +224,28 @@ function finishInit(cloudReady){
   if(typeof _lastRenderedProfileId !== 'undefined'){
     _lastRenderedProfileId = (typeof _activeProfileId !== 'undefined') ? _activeProfileId : null;
   }
-  // Show hero section by default
-  showSection('s-hero');
-  if(typeof trackSection === 'function') trackSection('s-hero');
+  // Mom-persona default landing: parents land in Parent Hub, not the child's hero.
+  // Three guards keep this safe:
+  //   1. The user can opt out via the Settings toggle (ylcc_default_view='child').
+  //   2. Demo mode keeps the existing hero-first flow so the demo banner makes sense.
+  //   3. Accounts with no parent profile (or where the active profile is a kid)
+  //      still go to s-hero — there's no parent dashboard to land in.
+  let _defaultLanding = 's-hero';
+  try {
+    const userPref = localStorage.getItem('ylcc_default_view');
+    const hasParent = (typeof _profiles !== 'undefined' && Array.isArray(_profiles))
+      ? _profiles.some(p => p && p.isParent === true)
+      : true; // No profile system loaded yet — assume parent (matches signup flow)
+    const activeIsChild = (typeof _profiles !== 'undefined' && Array.isArray(_profiles) && typeof _activeProfileId !== 'undefined')
+      ? _profiles.some(p => p && p.id === _activeProfileId && p.isParent === false)
+      : false;
+    const isDemo = (typeof IS_DEMO !== 'undefined' && IS_DEMO);
+    if(userPref !== 'child' && hasParent && !activeIsChild && !isDemo){
+      _defaultLanding = 's-parent';
+    }
+  } catch(e) { /* localStorage blocked or _profiles unavailable — fall through to hero */ }
+  showSection(_defaultLanding);
+  if(typeof trackSection === 'function') trackSection(_defaultLanding);
   // Show daily devotional popup once per day — skip if wizard is open
   // Use a short delay if cloud data is confirmed loaded, longer if we need to wait for sync
   const popupDelay = cloudReady ? 800 : 3500;
@@ -378,6 +397,10 @@ function finishInit(cloudReady){
 // from the previously-active child showing up briefly.
 function switchToChild(){
   // _activeProfileId must already be set to the matched child before calling this.
+  // Mom-persona security: clear the parent unlock state when a child takes
+  // the device. Otherwise the 5-min idle window keeps Parent Hub unlocked
+  // for whoever holds the device next.
+  if(typeof lockParentDash === 'function') lockParentDash();
   if(typeof load === 'function') load();                           // reload D for new child
   if(typeof _lastRenderedProfileId !== 'undefined'){
     _lastRenderedProfileId = (typeof _activeProfileId !== 'undefined') ? _activeProfileId : null;
@@ -387,4 +410,84 @@ function switchToChild(){
   }
   showSection('s-hero');
   if(typeof trackSection === 'function') trackSection('s-hero');
+}
+
+// ── HOME HEADLINE — answers "how is my kid doing today?" in plain English ─
+// Reads existing fields off D (the active child's data blob). No new schema.
+function summarizeChildStatus(){
+  const today = new Date().toISOString().slice(0,10);
+  const name = D.name || 'Your child';
+
+  // Chores due today: active chores with no log entry for today.
+  const activeChores = (D.choreList||[]).filter(c => c.active);
+  const choresDue = activeChores.filter(c =>
+    !(D.choreLog||[]).some(l => l.choreId === c.id && l.date === today &&
+      (l.status === 'done' || l.status === 'pending' || l.status === 'verified'))
+  ).length;
+
+  // Homework: assignments not yet marked done.
+  const homeworkDue = (D.assignments||[]).filter(a => !a.done).length;
+
+  // Active goals (in progress, not done).
+  const goalsActive = (D.goals||[]).filter(g => !g.done).length;
+
+  let answer;
+  if(choresDue === 0 && homeworkDue === 0){
+    answer = name + ' is fully caught up today.';
+  } else if(choresDue + homeworkDue <= 2){
+    const parts = [];
+    if(choresDue) parts.push(choresDue + ' chore' + (choresDue>1?'s':'') + ' left');
+    if(homeworkDue) parts.push(homeworkDue + ' assignment' + (homeworkDue>1?'s':'') + ' pending');
+    answer = 'Mostly on track — ' + parts.join(' and ') + '.';
+  } else {
+    answer = (choresDue + homeworkDue) + ' things still need attention today.';
+  }
+
+  const pills = [];
+  if(choresDue > 0) pills.push({icon:'📋', label: choresDue + ' chore' + (choresDue>1?'s':'') + ' due', kind:'due'});
+  if(homeworkDue > 0) pills.push({icon:'📚', label: homeworkDue + ' assignment' + (homeworkDue>1?'s':''), kind:'due'});
+  if(goalsActive > 0) pills.push({icon:'🎯', label: goalsActive + ' active goal' + (goalsActive>1?'s':''), kind:'info'});
+
+  return { question: 'How is ' + name + ' doing today?', answer, pills };
+}
+
+function renderHeroHeadline(){
+  const q = document.getElementById('heroHeadlineQuestion');
+  const a = document.getElementById('heroHeadlineAnswer');
+  const p = document.getElementById('heroHeadlinePills');
+  if(!q || !a || !p) return;
+
+  const s = summarizeChildStatus();
+  q.textContent = s.question;
+  a.textContent = s.answer;
+  p.innerHTML = s.pills.map(pill => {
+    const dueStyle = 'background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);color:#fde68a;';
+    const infoStyle = 'background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#e2e8f0;';
+    return '<span style="display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:99px;font-size:.74rem;' +
+      (pill.kind==='due' ? dueStyle : infoStyle) + '">' + pill.icon + ' ' + pill.label + '</span>';
+  }).join('');
+
+  // 3 micro-stats: streak, GPA, latest mood
+  const m = document.getElementById('heroMicroStats');
+  if(m){
+    const streakVal = (D.streak||0) + ' day' + ((D.streak||0)===1?'':'s') + ' 🔥';
+    const gpaVal = (typeof calcGPA==='function')
+      ? (() => { const g = calcGPA(); return (g && !isNaN(g)) ? g.toFixed(2) : '—'; })()
+      : '—';
+    const moodArr = D.moods || [];
+    const last = moodArr.length ? moodArr[moodArr.length-1] : null;
+    const moodMap = {1:'😢', 2:'🙁', 3:'😐', 4:'🙂', 5:'😄'};
+    const moodVal = last ? (moodMap[last.level] || '🙂') + ' ' + (last.date===new Date().toISOString().slice(0,10)?'today':'recent') : '—';
+    const cards = [
+      {l:'Streak', v: streakVal},
+      {l:'GPA',    v: gpaVal},
+      {l:'Mood',   v: moodVal},
+    ];
+    m.innerHTML = cards.map(c =>
+      '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 12px;">' +
+        '<div style="font-size:.58rem;color:#64748b;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;">' + c.l + '</div>' +
+        '<div style="font-size:1rem;font-weight:700;color:var(--tx);">' + c.v + '</div>' +
+      '</div>'
+    ).join('');
+  }
 }

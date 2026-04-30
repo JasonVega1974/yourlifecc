@@ -14,16 +14,16 @@ async function submitSupportBug(){
   msgEl.style.color='var(--tx2)';
   msgEl.textContent='Sending…';
 
-  const emailBody=`Bug Report from Life OS\n\nUser: ${_supaUser?_supaUser.email:'(local)'}\nArea: ${area||'Not specified'}\n\n${details}`;
+  const emailBody=`Bug Report from YourLife CC\n\nUser: ${_supaUser?_supaUser.email:'(local)'}\nArea: ${area||'Not specified'}\n\n${details}`;
   try{
     const resp = await fetch('/api/send-email',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         to:'info@kingdom-creatives.com',
-        subject:'Life OS Bug Report'+(area?' — '+area:''),
+        subject:'YourLife CC Bug Report'+(area?' — '+area:''),
         textContent:emailBody,
-        senderName:'Life OS App'
+        senderName:'YourLife CC App'
       })
     });
     const json = await resp.json().catch(()=>({}));
@@ -227,6 +227,16 @@ function updateParentPinToggleUI(){
   } else {
     if(unlockBtn) unlockBtn.style.display='none';
   }
+
+  // Mom-persona: hide "🔒 Lock Hub" when no PIN is configured AND the gate
+  // is enabled. Without a PIN, locking has nothing to lock against — clicking
+  // it appears to do nothing because the next entry auto-unlocks. Only show
+  // the button when locking is actually meaningful.
+  const lockBtn=document.getElementById('phLockHubBtn');
+  if(lockBtn){
+    const hasPin = !!(D.parentPinHash || D.chorePin || D.parentPIN);
+    lockBtn.style.display = (hasPin && !off) ? 'flex' : 'none';
+  }
 }
 
 async function changeParentPin(){
@@ -242,6 +252,9 @@ async function changeParentPin(){
   try { setPinMigrationStatus('parent_done'); } catch(e){}
   save();
   np.value=''; cp.value='';
+  // Re-sync any UI that depends on PIN state (Lock Hub button visibility,
+  // gate message, toggle knob position, parent avatar initial).
+  updateParentPinToggleUI();
   showToast('Parent PIN updated ✓');
 }
 
@@ -552,7 +565,7 @@ function renderParentBucks(){
   if(store){
     const items = D.pb.storeItems||[];
     if(!items.length){
-      store.innerHTML = '<div style="font-size:.65rem;color:var(--tx3);grid-column:1/-1;text-align:center;padding:.5rem;">Parent adds store items in Parent Mode</div>';
+      store.innerHTML = '<div style="font-size:.65rem;color:var(--tx3);grid-column:1/-1;text-align:center;padding:.5rem;">Parent adds store items in Parent Hub</div>';
     } else {
       store.innerHTML = items.map(it=>`
         <div style="background:rgba(255,255,255,.03);border:1px solid rgba(251,191,36,.1);border-radius:8px;padding:.5rem;text-align:center;">
@@ -1054,7 +1067,7 @@ function renderParentBucksControls(){
   if(!D.pb) initParentBucks();
 
   el.innerHTML = `
-    <div style="font-family:var(--fh);font-size:.7rem;letter-spacing:1.5px;color:#fbbf24;margin-bottom:.5rem;">🪙 PARENT BUCKS CONTROLS</div>
+    <div style="font-family:var(--fh);font-size:.7rem;letter-spacing:1.5px;color:#fbbf24;margin-bottom:.5rem;">🪙 Parent Bucks Controls</div>
     
     <div style="display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.5rem;">
       <div style="font-size:.68rem;color:var(--tx2);">Balance: <b style="color:#fbbf24;">${D.pb.balance} PB</b></div>

@@ -1520,7 +1520,7 @@ function refreshPmHeader(){
       subEl.textContent = pName ? `Parent account — ${pName}` : 'Parent / Guardian account';
     } else {
       const ageLabel = {under13:'Under 13',['13-15']:'13–15',['16-17']:'16–17',['18-22']:'18–22',['23-29']:'23–29','30plus':'30+'}[_pmAge] || '';
-      subEl.textContent = ageLabel ? `Age ${ageLabel}` : 'Personalize your Life OS';
+      subEl.textContent = ageLabel ? `Age ${ageLabel}` : 'Personalize your YourLife CC';
     }
   }
   // Badges
@@ -3202,14 +3202,14 @@ function copyRefLink(){
 function refShareSMS(){
   const el=document.getElementById('refLinkDisplay');
   const link=el?el.textContent.trim():'https://www.yourlifecc.com';
-  const msg=encodeURIComponent("Hey! Check out YourLife CC — it's a Life OS for families. Great for chores, goals, school tracking & more. Get $10 off with code REFER10: "+link);
+  const msg=encodeURIComponent("Hey! Check out YourLife CC — it's a family dashboard for chores, goals, school tracking & more. Get $10 off with code REFER10: "+link);
   window.location.href='sms:?body='+msg;
 }
 function refShareEmail(){
   const el=document.getElementById('refLinkDisplay');
   const link=el?el.textContent.trim():'https://www.yourlifecc.com';
   const sub=encodeURIComponent("Check out YourLife CC — get $10 off");
-  const body=encodeURIComponent("Hey!\n\nI've been using YourLife CC with my family — it's an all-in-one Life OS for chores, goals, school tracking, Bible study, and more.\n\nUse my link to sign up and get $10 off any plan with code REFER10:\n\n"+link+"\n\nHope your family loves it!");
+  const body=encodeURIComponent("Hey!\n\nI've been using YourLife CC with my family — it's an all-in-one family dashboard for chores, goals, school tracking, Bible study, and more.\n\nUse my link to sign up and get $10 off any plan with code REFER10:\n\n"+link+"\n\nHope your family loves it!");
   window.location.href='mailto:?subject='+sub+'&body='+body;
 }
 function copyRefCode(code,btn){

@@ -66,7 +66,7 @@ const DEF = {
   choreList:[], choreLog:[], chores:{}, selfChores:[], chorePoints:0, chorePin:'',
   rewards:[], incentives:[], behaviorLog:[], parentNotes:[],
   parentPIN:'', parentPinDisabled:false, parentWizardDone:false,
-  parentGrowth:{}, childAvatar:'', childAvatarPhoto:'',
+  parentGrowth:[], childAvatar:'', childAvatarPhoto:'',
   // challenges / contests
   helpfulDeeds:[], challengeProgress:{}, customContests:[], customFamilyRewards:[],
   // photos / media
