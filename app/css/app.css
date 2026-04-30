@@ -2164,6 +2164,16 @@ body.child-view  #parentWelcomeCard{ display: none !important; }
 body.parent-view #childDashContent { display: none !important; }
 body.child-view  #childDashContent { display: block !important; }
 
+/* ── HIDE ADULT-ONLY SURFACES IN CHILD PROFILE ──────────────
+   Kids shouldn't see referral CTAs, child-login (they're already
+   logged in), or the parent account/privacy/terms/sign-out block.
+   Sign-out in particular would log out the parent account if a kid
+   tapped it from within their own profile.
+─────────────────────────────────────────────────────────────── */
+body.child-view #topQuickBtns button[onclick*="s-referral"] { display: none !important; }
+body.child-view #childLoginTopBtn                            { display: none !important; }
+body.child-view #sideSignOutBtn                              { display: none !important; }
+
 
 
 /* ── TOP QUICK BUTTONS BAR — light mode fix ─────────────────
