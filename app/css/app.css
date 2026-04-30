@@ -2174,10 +2174,17 @@ body.child-view  #childDashContent { display: block !important; }
    logged in), or the parent account/privacy/terms/sign-out block.
    Sign-out in particular would log out the parent account if a kid
    tapped it from within their own profile.
+
+   Scoped with :not(.parent-unlocked) — body.child-view is set whenever
+   the active profile is a child, including the case where a parent has
+   PIN-unlocked Parent Hub from a child-profile context. In that case
+   the parent IS in control and needs full access to these surfaces.
+   parent.js sets/removes body.parent-unlocked on _doUnlockParent /
+   lockParentDash so the hides only fire in the kid-controlled state.
 ─────────────────────────────────────────────────────────────── */
-body.child-view #topQuickBtns button[onclick*="s-referral"] { display: none !important; }
-body.child-view #childLoginTopBtn                            { display: none !important; }
-body.child-view #sideSignOutBtn                              { display: none !important; }
+body.child-view:not(.parent-unlocked) #topQuickBtns button[onclick*="s-referral"] { display: none !important; }
+body.child-view:not(.parent-unlocked) #childLoginTopBtn                            { display: none !important; }
+body.child-view:not(.parent-unlocked) #sideSignOutBtn                              { display: none !important; }
 
 
 

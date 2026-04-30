@@ -76,6 +76,9 @@ function lockParentDash(){
   _parentUnlockExpiresAt = 0;
   _parentUnlockHardCap = 0;
   _pgBuffer = ''; _pgUpdateDots();
+  // Mom-persona: lift the parent-unlocked stamp so CSS hide rules fire again
+  // for the kid-controlled state.
+  document.body.classList.remove('parent-unlocked');
   // Mom-persona: locking the hub also burns the post-login grace window so
   // anyone re-entering Parent Hub after Lock has to enter the PIN normally.
   try { localStorage.removeItem('ylcc_post_login'); } catch(e){}
@@ -1518,6 +1521,12 @@ function _doUnlockParent(){
   const content=document.getElementById('parentDashContent');
   if(gate) gate.style.display='none';
   if(content) content.style.display='block';
+  // Mom-persona: stamp body so CSS knows the parent is currently authenticated
+  // into Parent Hub. Required because body.child-view stays set whenever the
+  // active profile is a child — even after the parent unlocks. Without this
+  // signal the child-view hide rules (Refer, Sign Out, Account, Child Login)
+  // would wrongly hide parent UI from a parent who is clearly in control.
+  document.body.classList.add('parent-unlocked');
   // Mom-persona: sync the Lock Hub button visibility on every unlock so it
   // hides when no PIN is set (locking is meaningless without one).
   if(typeof updateParentPinToggleUI === 'function') updateParentPinToggleUI();
