@@ -565,7 +565,7 @@ function renderParentBucks(){
   if(store){
     const items = D.pb.storeItems||[];
     if(!items.length){
-      store.innerHTML = '<div style="font-size:.65rem;color:var(--tx3);grid-column:1/-1;text-align:center;padding:.5rem;">Parent adds store items in Parent Mode</div>';
+      store.innerHTML = '<div style="font-size:.65rem;color:var(--tx3);grid-column:1/-1;text-align:center;padding:.5rem;">Parent adds store items in Parent Hub</div>';
     } else {
       store.innerHTML = items.map(it=>`
         <div style="background:rgba(255,255,255,.03);border:1px solid rgba(251,191,36,.1);border-radius:8px;padding:.5rem;text-align:center;">

@@ -1567,10 +1567,15 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 /* Dashboard Cards */
 .dcard{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:.8rem;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .dcard:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.12);box-shadow:0 6px 20px rgba(0,0,0,.2);}
-.dcard-status{position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0;}
-.dcard-status.green{background:#22c55e;}
-.dcard-status.red{background:#ef4444;}
-.dcard-status.yellow{background:#fbbf24;}
+/* Status indicator on home tiles. Mom-persona Phase 6: tone down so the
+   home view doesn't read as "alerts on every card."
+   - Green = "everything's fine" — silent. No bar shown.
+   - Yellow = soft heads-up.
+   - Red = real attention needed; still visible but less alarming. */
+.dcard-status{position:absolute;top:0;left:0;right:0;height:2px;border-radius:14px 14px 0 0;}
+.dcard-status.green{display:none;}
+.dcard-status.red{background:rgba(239,68,68,.55);}
+.dcard-status.yellow{background:rgba(251,191,36,.5);}
 .dcard-icon{font-size:1.4rem;margin-bottom:.15rem;}
 .dcard-label{font-size:.6rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--tx2);font-weight:700;margin-bottom:.1rem;}
 .dcard-value{font-size:1.7rem;font-weight:900;color:var(--tx);line-height:1.1;}

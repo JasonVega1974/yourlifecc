@@ -186,7 +186,7 @@ function renderChores(){
     });
 
     if(!activeChores.length){
-      todayEl.innerHTML = `<div style="text-align:center;padding:1.5rem;color:var(--tx2);font-size:.8rem;">${D.chores.length?'All caught up for today! 🎉':'No chores set up yet. Ask a parent to add some in Parent Mode.'}</div>`;
+      todayEl.innerHTML = `<div style="text-align:center;padding:1.5rem;color:var(--tx2);font-size:.8rem;">${D.chores.length?'All caught up for today! 🎉':'No chores set up yet. Ask a parent to add some in Parent Hub.'}</div>`;
     } else {
       todayEl.innerHTML = activeChores.map(c=>{
         const todayLog = D.choreLog.find(l=>l.choreId===c.id && l.date===today);
@@ -674,7 +674,7 @@ function renderEarnings(){
 
   // Savings goal
   const gn = document.getElementById('savingsGoalName');
-  if(gn) gn.textContent = e.goalName || 'Set a goal in Parent Mode';
+  if(gn) gn.textContent = e.goalName || 'Set a goal in Parent Hub';
   const fill = document.getElementById('savingsJarFill');
   const pctEl = document.getElementById('savingsJarPct');
   const amts = document.getElementById('savingsJarAmounts');

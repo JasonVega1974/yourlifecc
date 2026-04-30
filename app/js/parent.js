@@ -1174,13 +1174,13 @@ function resetGettingStarted(){
 // ── PARENT GETTING STARTED ───────────────────────────────────
 const GS_PARENT_STEPS = [
   {id:'gsp-pin', icon:'🔐', title:'Set Your Parent PIN',
-   tip:'Your PIN protects the Parent Hub and Chore verification. Only you should know it. Set it the first time you enter Parent Hub or Chore parent mode.',
+   tip:'Your PIN protects the Parent Hub and chore verification. Only you should know it. You\'ll be asked to set it the first time you enter Parent Hub.',
    check:()=>!!D.chorePin},
   {id:'gsp-chore', icon:'✅', title:'Add Your First Chore',
-   tip:'Go to <b>Chores → Parent Mode</b> and add tasks with point values. Daily chores reset each day. Weekly chores reset Monday. Kids submit, you verify.',
+   tip:'In <b>Parent Hub &rarr; Chores &amp; Deeds</b>, add tasks with point values. Daily chores reset each day. Weekly chores reset Monday. Kids submit, you verify.',
    check:()=>(Array.isArray(D.chores)?D.chores:[]).length>0},
   {id:'gsp-reward', icon:'🎁', title:'Set Up a Reward',
-   tip:'In <b>Chores → Parent Mode → Manage Rewards</b>, create rewards your child can earn with points. Examples: "Extra screen time = 50 pts", "Movie pick = 100 pts".',
+   tip:'In <b>Parent Hub &rarr; Rewards &amp; Bucks</b>, create rewards your child can earn with points. Examples: "Extra screen time = 50 pts", "Movie pick = 100 pts".',
    check:()=>(Array.isArray(D.rewards)?D.rewards:[]).length>0},
   {id:'gsp-incentive', icon:'🎯', title:'Create an Incentive',
    tip:'In <b>Parent Hub → Incentives</b>, tie rewards to real achievements. "GPA above 3.5 = new shoes", "Read 3 books = $20". Progress tracks automatically from the app data.',
@@ -2806,7 +2806,9 @@ function renderParentGrowth(){
 }
 
 function saveParentGrowth(){
-  if(!D.parentGrowth) D.parentGrowth = [];
+  // Heal historical accounts where parentGrowth was {} (the wrong default
+  // in data.js — fixed forward but old rows still have it).
+  if(!Array.isArray(D.parentGrowth)) D.parentGrowth = [];
   const scores = {};
   PARENT_GROWTH_AREAS.forEach(a=>{
     const btns = document.querySelectorAll(`[data-area="${a.key}"]`);
@@ -2825,7 +2827,7 @@ function saveParentGrowth(){
 
 function renderParentGrowthHistory(){
   const el = document.getElementById('parentGrowthHistory'); if(!el) return;
-  const history = (D.parentGrowth||[]).slice().reverse();
+  const history = (Array.isArray(D.parentGrowth) ? D.parentGrowth : []).slice().reverse();
   if(!history.length){ el.innerHTML='<div style="font-size:.72rem;color:var(--tx3);text-align:center;padding:1rem;">No reflections yet. Complete your first weekly self-check above!</div>'; return; }
   el.innerHTML = history.map(h=>`
     <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:10px;padding:.6rem .8rem;margin-bottom:.4rem;">
