@@ -183,6 +183,12 @@ input:focus,textarea:focus,select:focus{border-color:rgba(56,189,248,.6);backgro
 select option{background:var(--sel-bg);color:var(--tx);}
 textarea{resize:vertical;min-height:76px;}
 input[type=range]{padding:0;height:6px;accent-color:var(--c);}
+/* Radio + checkbox shouldn't inherit text-input box styling. The global
+   input,textarea,select rule above gives every <input> width:100% and
+   .58rem padding, which stretches radios/checkboxes to fill their column
+   and makes their labels wrap into a thin sliver. Override here. */
+input[type=radio],input[type=checkbox]{width:auto;padding:0;background:transparent;border:0;border-radius:0;}
+input[type=radio]:focus,input[type=checkbox]:focus{background:transparent;}
 input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 
 /* ── BUTTONS ───────────────────────────────────── */
