@@ -426,6 +426,10 @@ function updateQuickStats(){
 }
 
 function updateHeroDashboard(){
+  // Mom-persona home: render the plain-English headline first.
+  // Defined in init.js; null-guard in case of load order.
+  if(typeof renderHeroHeadline === 'function') renderHeroHeadline();
+
   const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.innerHTML=v; };
 
   // ── BILLS ALERT ──

@@ -388,3 +388,83 @@ function switchToChild(){
   showSection('s-hero');
   if(typeof trackSection === 'function') trackSection('s-hero');
 }
+
+// ── HOME HEADLINE — answers "how is my kid doing today?" in plain English ─
+// Reads existing fields off D (the active child's data blob). No new schema.
+function summarizeChildStatus(){
+  const today = new Date().toISOString().slice(0,10);
+  const name = D.name || 'Your child';
+
+  // Chores due today: active chores with no log entry for today.
+  const activeChores = (D.choreList||[]).filter(c => c.active);
+  const choresDue = activeChores.filter(c =>
+    !(D.choreLog||[]).some(l => l.choreId === c.id && l.date === today &&
+      (l.status === 'done' || l.status === 'pending' || l.status === 'verified'))
+  ).length;
+
+  // Homework: assignments not yet marked done.
+  const homeworkDue = (D.assignments||[]).filter(a => !a.done).length;
+
+  // Active goals (in progress, not done).
+  const goalsActive = (D.goals||[]).filter(g => !g.done).length;
+
+  let answer;
+  if(choresDue === 0 && homeworkDue === 0){
+    answer = name + ' is fully caught up today.';
+  } else if(choresDue + homeworkDue <= 2){
+    const parts = [];
+    if(choresDue) parts.push(choresDue + ' chore' + (choresDue>1?'s':'') + ' left');
+    if(homeworkDue) parts.push(homeworkDue + ' assignment' + (homeworkDue>1?'s':'') + ' pending');
+    answer = 'Mostly on track — ' + parts.join(' and ') + '.';
+  } else {
+    answer = (choresDue + homeworkDue) + ' things still need attention today.';
+  }
+
+  const pills = [];
+  if(choresDue > 0) pills.push({icon:'📋', label: choresDue + ' chore' + (choresDue>1?'s':'') + ' due', kind:'due'});
+  if(homeworkDue > 0) pills.push({icon:'📚', label: homeworkDue + ' assignment' + (homeworkDue>1?'s':''), kind:'due'});
+  if(goalsActive > 0) pills.push({icon:'🎯', label: goalsActive + ' active goal' + (goalsActive>1?'s':''), kind:'info'});
+
+  return { question: 'How is ' + name + ' doing today?', answer, pills };
+}
+
+function renderHeroHeadline(){
+  const q = document.getElementById('heroHeadlineQuestion');
+  const a = document.getElementById('heroHeadlineAnswer');
+  const p = document.getElementById('heroHeadlinePills');
+  if(!q || !a || !p) return;
+
+  const s = summarizeChildStatus();
+  q.textContent = s.question;
+  a.textContent = s.answer;
+  p.innerHTML = s.pills.map(pill => {
+    const dueStyle = 'background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);color:#fde68a;';
+    const infoStyle = 'background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#e2e8f0;';
+    return '<span style="display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:99px;font-size:.74rem;' +
+      (pill.kind==='due' ? dueStyle : infoStyle) + '">' + pill.icon + ' ' + pill.label + '</span>';
+  }).join('');
+
+  // 3 micro-stats: streak, GPA, latest mood
+  const m = document.getElementById('heroMicroStats');
+  if(m){
+    const streakVal = (D.streak||0) + ' day' + ((D.streak||0)===1?'':'s') + ' 🔥';
+    const gpaVal = (typeof calcGPA==='function')
+      ? (() => { const g = calcGPA(); return (g && !isNaN(g)) ? g.toFixed(2) : '—'; })()
+      : '—';
+    const moodArr = D.moods || [];
+    const last = moodArr.length ? moodArr[moodArr.length-1] : null;
+    const moodMap = {1:'😢', 2:'🙁', 3:'😐', 4:'🙂', 5:'😄'};
+    const moodVal = last ? (moodMap[last.level] || '🙂') + ' ' + (last.date===new Date().toISOString().slice(0,10)?'today':'recent') : '—';
+    const cards = [
+      {l:'Streak', v: streakVal},
+      {l:'GPA',    v: gpaVal},
+      {l:'Mood',   v: moodVal},
+    ];
+    m.innerHTML = cards.map(c =>
+      '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 12px;">' +
+        '<div style="font-size:.58rem;color:#64748b;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;">' + c.l + '</div>' +
+        '<div style="font-size:1rem;font-weight:700;color:var(--tx);">' + c.v + '</div>' +
+      '</div>'
+    ).join('');
+  }
+}

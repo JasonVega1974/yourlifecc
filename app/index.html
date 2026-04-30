@@ -752,6 +752,24 @@
   <!-- ALERTS -->
   <div id="heroAlertsStrip" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:.5rem;margin-bottom:.7rem;"></div>
 
+  <!-- HEADLINE STATUS — answers "how is my kid doing today?" before any metrics -->
+  <div id="heroHeadline" style="background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(167,139,250,.05));border:1px solid rgba(56,189,248,.2);border-radius:14px;padding:18px 20px;margin-bottom:.7rem;">
+    <div id="heroHeadlineQuestion" style="font-size:.68rem;color:var(--tx2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;font-weight:800;"></div>
+    <div id="heroHeadlineAnswer" style="font-size:1.2rem;font-weight:700;color:var(--tx);line-height:1.45;margin-bottom:10px;"></div>
+    <div id="heroHeadlinePills" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+  </div>
+
+  <!-- 3 MICRO-STATS (streak, GPA, mood) -->
+  <div id="heroMicroStats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:.7rem;"></div>
+
+  <!-- LINK TO FULL STATS (the 10-tile grid below stays available, just collapsed) -->
+  <div style="margin-bottom:.7rem;">
+    <a href="javascript:void(0)" id="heroFullStatsToggle" onclick="(function(el){var w=document.getElementById('heroFullStats');if(!w)return;var hidden=w.style.display==='none';w.style.display=hidden?'block':'none';el.textContent=hidden?'Hide full stats &uarr;':'See full stats &rarr;';})(this)" style="font-size:.78rem;color:var(--c);text-decoration:none;font-weight:600;">See full stats &rarr;</a>
+  </div>
+
+  <!-- FULL STATS — original 10-tile grid wrapped, hidden by default -->
+  <div id="heroFullStats" style="display:none;">
+
   <!-- ═══ PENDING QUIZ NOTIFICATION ═══ -->
   <div id="quizNotification" style="display:none;background:linear-gradient(135deg,rgba(139,92,246,.08),rgba(245,166,35,.06));border:1px solid rgba(139,92,246,.2);border-radius:12px;padding:.7rem 1rem;margin-bottom:.7rem;cursor:pointer;" onclick="openPendingQuiz()">
     <div style="display:flex;align-items:center;gap:.5rem;">
@@ -929,6 +947,7 @@
       <div class="dcard-sub" id="qsPBGames"></div>
     </div>
   </div>
+  </div><!-- /heroFullStats -->
 
     <!-- ═══ DAILY ACTIVITY CHECK ═══ -->
   <div style="background:linear-gradient(135deg,rgba(34,197,94,.04),rgba(56,189,248,.03));border:1px solid rgba(34,197,94,.12);border-radius:14px;padding:.8rem 1rem;margin-bottom:.7rem;">
