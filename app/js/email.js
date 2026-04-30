@@ -14,16 +14,16 @@ async function submitSupportBug(){
   msgEl.style.color='var(--tx2)';
   msgEl.textContent='Sending…';
 
-  const emailBody=`Bug Report from Life OS\n\nUser: ${_supaUser?_supaUser.email:'(local)'}\nArea: ${area||'Not specified'}\n\n${details}`;
+  const emailBody=`Bug Report from YourLife CC\n\nUser: ${_supaUser?_supaUser.email:'(local)'}\nArea: ${area||'Not specified'}\n\n${details}`;
   try{
     const resp = await fetch('/api/send-email',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         to:'info@kingdom-creatives.com',
-        subject:'Life OS Bug Report'+(area?' — '+area:''),
+        subject:'YourLife CC Bug Report'+(area?' — '+area:''),
         textContent:emailBody,
-        senderName:'Life OS App'
+        senderName:'YourLife CC App'
       })
     });
     const json = await resp.json().catch(()=>({}));

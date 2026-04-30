@@ -4033,7 +4033,7 @@ async function submitBetaFeedback(){
       body:JSON.stringify({
         subject:emailSubject,
         textContent:emailBody,
-        senderName:'Life OS App'
+        senderName:'YourLife CC App'
       })
     });
     if(resp.ok){
