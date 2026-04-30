@@ -149,6 +149,10 @@ function toggleChildSection(cid,sid,btn){
 
 function renderParentDash(){
   if(!isParentUnlocked()) return;
+  // Mom-persona: every Parent Hub render syncs PIN-dependent UI
+  // (Lock Hub button visibility, gate message, etc). Catches the Phase 4
+  // direct-landing path that bypasses _doUnlockParent.
+  if(typeof updateParentPinToggleUI === 'function') updateParentPinToggleUI();
   populateParentChildSelect();
   populateChildSectionSel();
   renderParentGettingStarted();

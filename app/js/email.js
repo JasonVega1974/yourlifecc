@@ -252,6 +252,9 @@ async function changeParentPin(){
   try { setPinMigrationStatus('parent_done'); } catch(e){}
   save();
   np.value=''; cp.value='';
+  // Re-sync any UI that depends on PIN state (Lock Hub button visibility,
+  // gate message, toggle knob position, parent avatar initial).
+  updateParentPinToggleUI();
   showToast('Parent PIN updated ✓');
 }
 
