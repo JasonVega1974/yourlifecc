@@ -61,6 +61,12 @@ function escapeHtml(s){
 function unlockParentDash(){
   initChoreData();
   if(D.parentPinDisabled){ _doUnlockParent(); return; }
+  // Mom-persona: skip PIN within 5 min of a fresh sign-in. Stamp is set in
+  // auth.js on successful signInWithPassword. Cleared by lockParentDash().
+  try {
+    const stamp = parseInt(localStorage.getItem('ylcc_post_login') || '0', 10);
+    if(stamp && Date.now() - stamp < 5*60*1000){ _doUnlockParent(); return; }
+  } catch(e){ /* localStorage blocked — fall through to PIN gate */ }
   // If no PIN set yet (hashed or plaintext), let them straight in
   if(!D.parentPinHash && !D.chorePin && !D.parentPIN){ _doUnlockParent(); return; }
   // Submission handled by pgPinKey / _pgSubmit
@@ -70,6 +76,9 @@ function lockParentDash(){
   _parentUnlockExpiresAt = 0;
   _parentUnlockHardCap = 0;
   _pgBuffer = ''; _pgUpdateDots();
+  // Mom-persona: locking the hub also burns the post-login grace window so
+  // anyone re-entering Parent Hub after Lock has to enter the PIN normally.
+  try { localStorage.removeItem('ylcc_post_login'); } catch(e){}
   // Cleanup of any stale flags from the previous deploy (storage-cache model).
   // Safe to remove this block in a future deploy once known users have rotated.
   try { sessionStorage.removeItem('parentUnlocked'); } catch(e){}

@@ -224,9 +224,28 @@ function finishInit(cloudReady){
   if(typeof _lastRenderedProfileId !== 'undefined'){
     _lastRenderedProfileId = (typeof _activeProfileId !== 'undefined') ? _activeProfileId : null;
   }
-  // Show hero section by default
-  showSection('s-hero');
-  if(typeof trackSection === 'function') trackSection('s-hero');
+  // Mom-persona default landing: parents land in Parent Hub, not the child's hero.
+  // Three guards keep this safe:
+  //   1. The user can opt out via the Settings toggle (ylcc_default_view='child').
+  //   2. Demo mode keeps the existing hero-first flow so the demo banner makes sense.
+  //   3. Accounts with no parent profile (or where the active profile is a kid)
+  //      still go to s-hero — there's no parent dashboard to land in.
+  let _defaultLanding = 's-hero';
+  try {
+    const userPref = localStorage.getItem('ylcc_default_view');
+    const hasParent = (typeof _profiles !== 'undefined' && Array.isArray(_profiles))
+      ? _profiles.some(p => p && p.isParent === true)
+      : true; // No profile system loaded yet — assume parent (matches signup flow)
+    const activeIsChild = (typeof _profiles !== 'undefined' && Array.isArray(_profiles) && typeof _activeProfileId !== 'undefined')
+      ? _profiles.some(p => p && p.id === _activeProfileId && p.isParent === false)
+      : false;
+    const isDemo = (typeof IS_DEMO !== 'undefined' && IS_DEMO);
+    if(userPref !== 'child' && hasParent && !activeIsChild && !isDemo){
+      _defaultLanding = 's-parent';
+    }
+  } catch(e) { /* localStorage blocked or _profiles unavailable — fall through to hero */ }
+  showSection(_defaultLanding);
+  if(typeof trackSection === 'function') trackSection(_defaultLanding);
   // Show daily devotional popup once per day — skip if wizard is open
   // Use a short delay if cloud data is confirmed loaded, longer if we need to wait for sync
   const popupDelay = cloudReady ? 800 : 3500;

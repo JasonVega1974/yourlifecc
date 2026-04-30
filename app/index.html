@@ -243,6 +243,25 @@
     <button class="btn bg_" style="width:100%;margin-bottom:.85rem;font-size:.75rem;white-space:normal;line-height:1.3;padding:.45rem .5rem;text-align:center;display:none;" onclick="closeSettings();setTimeout(openTutorial,320)">🎓 How to Use YourLife CC &mdash; Full Tutorial</button>
   </div><!-- /sp-pb -->
 
+  <!-- WHEN YOU SIGN IN — parent-only (sp-pb hides this on child profiles) -->
+  <div class="sp-pb" style="background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.12);border-radius:10px;padding:.9rem;margin-bottom:.85rem;">
+    <div style="font-family:var(--fh);font-size:.73rem;letter-spacing:1px;color:#38bdf8;margin-bottom:.5rem;">🏠 WHEN YOU SIGN IN</div>
+    <label style="display:flex;align-items:flex-start;gap:.55rem;font-size:.78rem;color:var(--tx);margin-bottom:.4rem;cursor:pointer;line-height:1.4;">
+      <input type="radio" name="ylccDefaultView" value="parent" id="dvParent" onchange="setDefaultView('parent')" style="margin-top:3px;accent-color:#38bdf8;flex-shrink:0;">
+      <div>
+        <div style="font-weight:700;">Land in Parent Hub <span style="font-size:.65rem;color:#22c55e;font-weight:600;">recommended</span></div>
+        <div style="font-size:.7rem;color:var(--tx2);margin-top:2px;">Open the family overview first. PIN skipped within 5 minutes of signing in.</div>
+      </div>
+    </label>
+    <label style="display:flex;align-items:flex-start;gap:.55rem;font-size:.78rem;color:var(--tx);cursor:pointer;line-height:1.4;">
+      <input type="radio" name="ylccDefaultView" value="child" id="dvChild" onchange="setDefaultView('child')" style="margin-top:3px;accent-color:#38bdf8;flex-shrink:0;">
+      <div>
+        <div style="font-weight:700;">Land in a child's view</div>
+        <div style="font-size:.7rem;color:var(--tx2);margin-top:2px;">Sign in straight to the child dashboard. Parent Hub still requires the PIN.</div>
+      </div>
+    </label>
+  </div>
+
   <!-- Child tutorial button — always visible, hidden for parent via sp-child-only class -->
   <div id="sp-child-tutorial" style="display:none;margin-bottom:.7rem;">
     <button style="width:100%;padding:.5rem;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;border:none;border-radius:9px;font-size:.78rem;font-weight:900;cursor:pointer;font-family:var(--fn);box-shadow:0 3px 12px rgba(245,158,11,.35);" onclick="closeSettings();D.kidOnboardDone=false;setTimeout(showKidOnboard,200);">📖 Take the Tour — Kid Tutorial</button>

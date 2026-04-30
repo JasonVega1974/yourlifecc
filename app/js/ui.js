@@ -728,7 +728,23 @@ function applySettings(){
   applyName();
 }
 
+// Mom-persona: persist "where do I land on sign-in?" preference. Single
+// localStorage flag, no Supabase column. Read in init.js finishInit() routing.
+function setDefaultView(value){
+  try {
+    if(value === 'parent') localStorage.removeItem('ylcc_default_view');
+    else localStorage.setItem('ylcc_default_view', value);
+  } catch(e){}
+}
+
 function openSettings(){
+  // Reflect current default-view preference in the radio group.
+  try {
+    const cur = localStorage.getItem('ylcc_default_view') === 'child' ? 'child' : 'parent';
+    const dv = document.querySelector('input[name="ylccDefaultView"][value="'+cur+'"]');
+    if(dv) dv.checked = true;
+  } catch(e){}
+
   const _snEl=document.getElementById('settingsName'); if(_snEl) _snEl.value=D.name||'';
   const _msEl=document.getElementById('modeSelect'); if(_msEl) _msEl.value=D.mode||'high';
   // Verse speed
