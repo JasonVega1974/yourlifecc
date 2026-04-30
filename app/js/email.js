@@ -1054,7 +1054,7 @@ function renderParentBucksControls(){
   if(!D.pb) initParentBucks();
 
   el.innerHTML = `
-    <div style="font-family:var(--fh);font-size:.7rem;letter-spacing:1.5px;color:#fbbf24;margin-bottom:.5rem;">🪙 PARENT BUCKS CONTROLS</div>
+    <div style="font-family:var(--fh);font-size:.7rem;letter-spacing:1.5px;color:#fbbf24;margin-bottom:.5rem;">🪙 Parent Bucks Controls</div>
     
     <div style="display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.5rem;">
       <div style="font-size:.68rem;color:var(--tx2);">Balance: <b style="color:#fbbf24;">${D.pb.balance} PB</b></div>
