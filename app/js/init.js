@@ -397,6 +397,10 @@ function finishInit(cloudReady){
 // from the previously-active child showing up briefly.
 function switchToChild(){
   // _activeProfileId must already be set to the matched child before calling this.
+  // Mom-persona security: clear the parent unlock state when a child takes
+  // the device. Otherwise the 5-min idle window keeps Parent Hub unlocked
+  // for whoever holds the device next.
+  if(typeof lockParentDash === 'function') lockParentDash();
   if(typeof load === 'function') load();                           // reload D for new child
   if(typeof _lastRenderedProfileId !== 'undefined'){
     _lastRenderedProfileId = (typeof _activeProfileId !== 'undefined') ? _activeProfileId : null;

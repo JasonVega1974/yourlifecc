@@ -1964,6 +1964,15 @@ function switchToProfile(id){
   const profile = _profiles.find(p=>p.id===id);
   if(!profile) return;
 
+  // Mom-persona security: when handing the device from parent to a child,
+  // clear the parent unlock state. Otherwise the kid (or anyone with the
+  // device) can navigate back to Parent Hub within the 5-min idle window
+  // and walk in unauthenticated. lockParentDash() resets _parentUnlockExpiresAt,
+  // hides the dashboard content, and clears the post-login grace stamp.
+  if(profile.isParent === false && typeof lockParentDash === 'function'){
+    lockParentDash();
+  }
+
   _activeProfileId = id;
   saveProfiles();
 
