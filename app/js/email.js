@@ -227,6 +227,16 @@ function updateParentPinToggleUI(){
   } else {
     if(unlockBtn) unlockBtn.style.display='none';
   }
+
+  // Mom-persona: hide "🔒 Lock Hub" when no PIN is configured AND the gate
+  // is enabled. Without a PIN, locking has nothing to lock against — clicking
+  // it appears to do nothing because the next entry auto-unlocks. Only show
+  // the button when locking is actually meaningful.
+  const lockBtn=document.getElementById('phLockHubBtn');
+  if(lockBtn){
+    const hasPin = !!(D.parentPinHash || D.chorePin || D.parentPIN);
+    lockBtn.style.display = (hasPin && !off) ? 'flex' : 'none';
+  }
 }
 
 async function changeParentPin(){

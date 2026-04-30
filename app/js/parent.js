@@ -1514,6 +1514,9 @@ function _doUnlockParent(){
   const content=document.getElementById('parentDashContent');
   if(gate) gate.style.display='none';
   if(content) content.style.display='block';
+  // Mom-persona: sync the Lock Hub button visibility on every unlock so it
+  // hides when no PIN is set (locking is meaningless without one).
+  if(typeof updateParentPinToggleUI === 'function') updateParentPinToggleUI();
   updateIncConditions(); renderParentDash();
   if(!D.parentWizardDone && localStorage.getItem(_ylccUserKey('ylcc_parentWizardDone')) !== '1'){ setTimeout(showParentOnboard,700); }
   // PIN migration banner — only shown when there's plaintext to migrate or a

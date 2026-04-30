@@ -4544,7 +4544,7 @@
     <!-- BACK + LOCK ROW -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem;gap:.5rem;">
       <button onclick="showSection('s-hero')" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--tx2);padding:.35rem .8rem;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:var(--fn);display:flex;align-items:center;gap:.35rem;">← Dashboard</button>
-      <button onclick="lockParentDash();showSection('s-hero');" style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);color:#f87171;padding:.35rem .8rem;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:var(--fn);display:flex;align-items:center;gap:.35rem;">🔒 Lock Hub</button>
+      <button id="phLockHubBtn" onclick="lockParentDash();showSection('s-hero');" style="display:none;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);color:#f87171;padding:.35rem .8rem;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:var(--fn);align-items:center;gap:.35rem;">🔒 Lock Hub</button>
     </div>
 
     <!-- CHILD SELECTOR (always visible at top) -->
