@@ -855,7 +855,7 @@ const NAV_ITEMS = [
     {id:'s-bio',       icon:'📋', label:'Bio Page',       key:'bio'},
     {id:'s-resources', icon:'📦', label:'School Resources', key:'resources'},
   ]},
-  {id:'s-cbt', icon:'💻', label:'CBT Training', key:'cbt'},
+  {id:'s-cbt', icon:'💻', label:'Tech Skills', key:'cbt'},
   {id:'_group_daily', icon:'📅', label:'Daily Life', isGroup:true, children:[
     {id:'s-chores',    icon:'✅', label:'Chores',         key:'chores'},
     {id:'s-goals',     icon:'🎯', icon:'🎯',label:'Goals',          key:'goals'},
@@ -901,7 +901,7 @@ function buildSideNav(){
   D._navGroups["Daily Life"]      = true;
   const openGroups = D._navGroups || {};
 
-  let navHTML = '<div class="sid-sep">SECTIONS</div>';
+  let navHTML = '<div class="sid-sep">Sections</div>';
 
   NAV_ITEMS.forEach(n=>{
     if(n.isGroup){
@@ -947,7 +947,7 @@ function buildSideNav(){
     cbtBtn.id = 'ni-s-cbt';
     cbtBtn.setAttribute('onclick', "showSection('s-cbt')");
     cbtBtn.style.cssText = 'padding-left:2.2rem;font-size:.78rem;';
-    cbtBtn.innerHTML = '<span class="ni">💻</span><span>CBT Training</span>';
+    cbtBtn.innerHTML = '<span class="ni">💻</span><span>Tech Skills</span>';
     // Find the School & Career group items div and append to it
     const allGroupDivs = el.querySelectorAll('.nav-group-items');
     let inserted = false;
