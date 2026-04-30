@@ -4558,24 +4558,59 @@
       
       <!-- LEFT PANEL -->
       <div style="width:180px;flex-shrink:0;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:.5rem;overflow-y:auto;" id="phLeftNav">
-        <div onclick="phNav('users')" class="ph-nav-item active" id="phn-users">👥 Manage Users <span class="hlp" onmouseenter="hlp('manageusers',this,event)" onmouseleave="hlpHide()">?</span></div>
-        <div onclick="phNav('overview')" class="ph-nav-item" id="phn-overview">📊 Overview</div>
-        <div onclick="phNav('rewards')" class="ph-nav-item" id="phn-rewards">🪙 Rewards & Bucks</div>
+        <!-- Hub home — action-first daily landing -->
+        <div onclick="phNav('home')" class="ph-nav-item active" id="phn-home">🏡 Hub Home</div>
+
+        <div class="ph-nav-group-label">Day-to-day</div>
         <div onclick="phNav('chores')" class="ph-nav-item" id="phn-chores">✅ Chores & Deeds <span id="phChoreNavBadge" style="display:none;background:#fbbf24;color:#1a1a2e;font-size:.55rem;font-weight:900;padding:.1rem .35rem;border-radius:8px;margin-left:.2rem;"></span></div>
+        <div onclick="phNav('rewards')" class="ph-nav-item" id="phn-rewards">🪙 Rewards & Bucks</div>
         <div onclick="phNav('schedule')" class="ph-nav-item" id="phn-schedule">📅 Schedule</div>
         <div onclick="phNav('contests')" class="ph-nav-item" id="phn-contests">🏆 Contests</div>
         <div onclick="phNav('quizzes')" class="ph-nav-item" id="phn-quizzes">📝 Quizzes</div>
-        <div onclick="phNav('controls')" class="ph-nav-item" id="phn-controls">⚙️ Controls</div>
+
+        <div class="ph-nav-group-label">Reports</div>
+        <div onclick="phNav('progress')" class="ph-nav-item" id="phn-progress">📈 Progress Reports</div>
         <div onclick="phNav('behavior')" class="ph-nav-item" id="phn-behavior">📋 Behavior & Grades</div>
         <div onclick="phNav('activity')" class="ph-nav-item" id="phn-activity">📊 Activity Log</div>
+
+        <div class="ph-nav-group-label">Setup</div>
+        <div onclick="phNav('users')" class="ph-nav-item" id="phn-users">👥 Manage Users <span class="hlp" onmouseenter="hlp('manageusers',this,event)" onmouseleave="hlpHide()">?</span></div>
+        <div onclick="phNav('controls')" class="ph-nav-item" id="phn-controls">⚙️ Controls</div>
+        <div onclick="phNav('overview')" class="ph-nav-item" id="phn-overview">📊 Overview</div>
         <div onclick="phNav('learning')" class="ph-nav-item" id="phn-learning">📚 Parent Learning</div>
         <div onclick="phNav('growth')" class="ph-nav-item" id="phn-growth">🌱 My Growth</div>
-        <div onclick="phNav('progress')" class="ph-nav-item" id="phn-progress">📈 Progress Reports</div>
+
+        <div class="ph-nav-group-label">More</div>
         <div onclick="phNav('referral')" class="ph-nav-item" id="phn-referral">🤝 Refer & Earn</div>
       </div>
 
       <!-- RIGHT CONTENT -->
       <div style="flex:1;min-width:0;width:100%;">
+
+        <!-- HUB HOME — action-first daily landing for parents (mom-persona Phase 5) -->
+        <div id="ph-home" style="display:none;">
+          <div id="phHomeGreeting" style="font-size:1.3rem;font-weight:800;color:var(--tx);margin-bottom:.2rem;letter-spacing:-.01em;">Hi 👋</div>
+          <div id="phHomeSummary" style="font-size:.85rem;color:var(--tx2);margin-bottom:14px;">Here's what's happening with the kids today.</div>
+
+          <!-- Needs-approval strip (only visible when there's pending work) -->
+          <div id="phApprovalStrip" style="display:none;background:linear-gradient(135deg,rgba(251,191,36,.1),rgba(251,191,36,.04));border:1px solid rgba(251,191,36,.3);border-radius:12px;padding:14px 16px;margin-bottom:16px;">
+            <div style="font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:#fcd34d;margin-bottom:6px;font-weight:800;">⚡ Needs your attention</div>
+            <div id="phApprovalHead" style="font-size:1rem;font-weight:700;color:#fff;margin-bottom:8px;"></div>
+            <button onclick="phNav('chores')" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;padding:6px 12px;border-radius:8px;font-size:.72rem;font-weight:700;cursor:pointer;">Review submissions →</button>
+          </div>
+
+          <!-- Per-kid summary cards -->
+          <div id="phKidCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-bottom:16px;"></div>
+
+          <!-- Quick actions — 4 buckets that cover the daily 80% -->
+          <div style="font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:#64748b;margin-bottom:8px;font-weight:800;">Quick actions</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;">
+            <div onclick="phNav('chores')" class="phHomeAction"><div class="phaIc">✅</div><div class="phaLb">Chores &amp; deeds</div><div class="phaSb">Assign · approve · history</div></div>
+            <div onclick="phNav('rewards')" class="phHomeAction"><div class="phaIc">🪙</div><div class="phaLb">Rewards</div><div class="phaSb">Bucks · shop · spins</div></div>
+            <div onclick="phNav('schedule')" class="phHomeAction"><div class="phaIc">📅</div><div class="phaLb">Schedule</div><div class="phaSb">This week · contests · quizzes</div></div>
+            <div onclick="phNav('progress')" class="phHomeAction"><div class="phaIc">📈</div><div class="phaLb">Reports</div><div class="phaSb">Behavior · grades · activity</div></div>
+          </div>
+        </div>
 
         <!-- MANAGE USERS -->
         <div id="ph-users" style="display:none;">

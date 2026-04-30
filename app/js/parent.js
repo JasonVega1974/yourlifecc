@@ -182,7 +182,10 @@ function renderParentDash(){
     const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
     phST.textContent = h>0 ? h+'h '+m+'m' : m>0 ? m+'m '+String(sec).padStart(2,'0')+'s' : sec+'s';
   }
-  phNav('users');
+  // Mom-persona Phase 5: default landing inside Parent Hub is the new Hub Home
+  // (greeting + needs-approval + kid cards + quick actions). Manage Users still
+  // accessible via the Setup group; addChildProfile() still routes to it directly.
+  phNav('home');
 }
 
 // ── PARENT SCORE — THE BIG NUMBER ────────────────────────────
@@ -2376,8 +2379,118 @@ function toggleDriverCheck(id, val){
 function initDriving(){ if(typeof renderDriverChecklist==='function') renderDriverChecklist(); }
 
 
+// ── PARENT HUB HOME — action-first daily landing (mom-persona Phase 5) ──────
+// Renders the greeting, the needs-approval strip (only when there are pending
+// chore submissions), per-kid summary cards, and the four quick-action tiles.
+// Reads existing fields off each child profile in _profiles. No new schema.
+function _phEscape(s){
+  return String(s==null?'':s).replace(/[&<>"']/g, function(c){
+    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+  });
+}
+function _phChildSummary(child){
+  // child.data may not exist for the active profile (whose data is in D).
+  const data = (child && child.id === (typeof _activeProfileId!=='undefined'?_activeProfileId:null) && typeof D==='object')
+    ? D
+    : (child && child.data) || {};
+  const today = new Date().toISOString().slice(0,10);
+
+  const activeChores = (data.choreList||[]).filter(c => c.active);
+  const choresDue = activeChores.filter(c =>
+    !(data.choreLog||[]).some(l => l.choreId === c.id && l.date === today &&
+      (l.status === 'done' || l.status === 'pending' || l.status === 'verified'))
+  ).length;
+  const homeworkDue = (data.assignments||[]).filter(a => !a.done).length;
+  const goalsActive = (data.goals||[]).filter(g => !g.done).length;
+  const streak = data.streak || 0;
+
+  let status;
+  if(choresDue === 0 && homeworkDue === 0) status = 'Caught up today';
+  else if(choresDue + homeworkDue <= 2) status = (choresDue + homeworkDue) + ' thing' + (choresDue+homeworkDue===1?'':'s') + ' left';
+  else status = (choresDue + homeworkDue) + ' things still need attention';
+
+  const pills = [];
+  if(choresDue > 0) pills.push({cls:'due', t: choresDue + ' chore' + (choresDue>1?'s':'') + ' due'});
+  if(homeworkDue > 0) pills.push({cls:'due', t: homeworkDue + ' homework'});
+  if(goalsActive > 0) pills.push({cls:'', t: goalsActive + ' active goal' + (goalsActive>1?'s':'')});
+  if(streak >= 3) pills.push({cls:'win', t: streak + '-day streak 🔥'});
+  return { status, pills };
+}
+function _phPendingApprovalCount(){
+  // Pending submissions across all children. Tries each child's data blob;
+  // for the active child also checks live D.
+  let total = 0;
+  const profiles = (typeof _profiles !== 'undefined' && Array.isArray(_profiles)) ? _profiles : [];
+  profiles.filter(p => p.isParent === false).forEach(c => {
+    const data = (c.id === (typeof _activeProfileId!=='undefined'?_activeProfileId:null) && typeof D==='object')
+      ? D
+      : c.data || {};
+    total += (data.choreLog||[]).filter(l => l.status === 'pending').length;
+  });
+  return total;
+}
+function renderParentHubHome(){
+  const profiles = (typeof _profiles !== 'undefined' && Array.isArray(_profiles)) ? _profiles : [];
+  const parent = profiles.find(p => p.isParent === true);
+  const children = profiles.filter(p => p.isParent === false);
+
+  // Greeting
+  const greet = document.getElementById('phHomeGreeting');
+  if(greet){
+    const name = (parent && parent.name) || D.parentName || 'there';
+    const hr = new Date().getHours();
+    const tod = hr<12?'morning':hr<17?'afternoon':'evening';
+    greet.textContent = 'Good ' + tod + ', ' + name + ' 👋';
+  }
+  const summary = document.getElementById('phHomeSummary');
+  if(summary){
+    if(children.length === 0){
+      summary.innerHTML = 'No kids added yet. <a href="javascript:phNav(\'users\')" style="color:var(--c);">Add your first child →</a>';
+    } else {
+      summary.textContent = "Here's what's happening with the kid" + (children.length>1?'s':'') + ' today.';
+    }
+  }
+
+  // Needs-approval strip
+  const strip = document.getElementById('phApprovalStrip');
+  const head = document.getElementById('phApprovalHead');
+  if(strip && head){
+    const pending = _phPendingApprovalCount();
+    if(pending > 0){
+      strip.style.display = 'block';
+      head.textContent = pending + ' submission' + (pending>1?'s':'') + ' waiting for your approval';
+    } else {
+      strip.style.display = 'none';
+    }
+  }
+
+  // Per-kid summary cards
+  const kc = document.getElementById('phKidCards');
+  if(kc){
+    if(children.length === 0){
+      kc.innerHTML = '';
+    } else {
+      kc.innerHTML = children.map(c => {
+        const sum = _phChildSummary(c);
+        const avatar = c.avatar || '🧒';
+        return '<div class="phKidCard" onclick="switchToProfile(\''+_phEscape(c.id)+'\');showSection(\'s-hero\');">'
+          + '<div class="pkHead">'
+            + '<div class="pkAva">'+_phEscape(avatar)+'</div>'
+            + '<div><div class="pkName">'+_phEscape(c.name||'Child')+'</div>'
+            + '<div class="pkStatus">'+_phEscape(sum.status)+'</div></div>'
+          + '</div>'
+          + '<div class="pkPills">'
+            + sum.pills.map(p => '<span class="pkPill '+p.cls+'">'+_phEscape(p.t)+'</span>').join('')
+          + '</div>'
+        + '</div>';
+      }).join('');
+    }
+  }
+}
+
+
 function phNav(tab){
-  const panels = ['users','overview','rewards','chores','schedule','contests','quizzes','controls','behavior','activity','learning','growth','progress','referral'];
+  const panels = ['home','users','overview','rewards','chores','schedule','contests','quizzes','controls','behavior','activity','learning','growth','progress','referral'];
   panels.forEach(p=>{
     const el = document.getElementById('ph-'+p);
     if(el) el.style.display = p===tab ? 'block' : 'none';
@@ -2385,6 +2498,7 @@ function phNav(tab){
     if(nav) nav.classList.toggle('active', p===tab);
   });
   // Trigger renders for the active panel
+  if(tab==='home'){ renderParentHubHome(); }
   if(tab==='users'){ renderManageUsers(); }
   if(tab==='overview'){ renderParentGettingStarted(); renderParentMultiChild(); renderParentScore(); renderParentOverview(); renderWeeklyReportCard(); }
   if(tab==='rewards'){ renderPhRewards(); }
