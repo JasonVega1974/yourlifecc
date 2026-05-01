@@ -4823,6 +4823,26 @@ function applyPalette(){
   document.querySelectorAll('.palette-swatch').forEach(s => {
     s.classList.toggle('active', s.dataset.palette === name);
   });
+
+  // Cache the resolved palette tokens so the inline boot script in
+  // app/index.html <head> can apply them on first paint of the *next*
+  // visit — eliminates the dark-mode flash returning users on cream/sage/
+  // teal saw before the full app initialized. Stored under a single key
+  // (most-recent palette wins across profiles, which is what the boot
+  // script needs — finishInit/applyPalette runs again with per-profile
+  // data to correct anything that should differ).
+  try {
+    const cache = {
+      name: name,
+      light: document.documentElement.classList.contains('light'),
+    };
+    if(pal){
+      ['bg','s1','s2','s3','s4','c','p','gr','g','tx','tx2','mt'].forEach(k => {
+        if(pal[k]) cache[k] = pal[k];
+      });
+    }
+    localStorage.setItem('ylcc_boot_palette_v1', JSON.stringify(cache));
+  } catch(e){}
 }
 
 // ── TAX ESTIMATOR ────────────────────────────────────────────────────

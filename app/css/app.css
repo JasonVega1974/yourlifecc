@@ -2225,3 +2225,76 @@ body.child-view:not(.parent-unlocked) #sideSignOutBtn                           
   border-color: rgba(0,0,0,.12) !important;
   color: #334155 !important;
 }
+
+/* ── LIGHT-MODE CONTENT TEXT FIXES ──────────────────────────
+   Many cards / modals / Parent Hub surfaces have inline color:#fff or
+   color:rgba(255,255,255,.x) that was correct under the dark default
+   but turns invisible on cream/sage/teal/light backgrounds. These rules
+   force inline-white text back to var(--tx) inside content containers.
+   Buttons with explicit dark gradient backgrounds keep their white via
+   the more-specific overrides above (e.g. #topQuickBtns button[...]).
+─────────────────────────────────────────────────────────────── */
+
+/* Generic: text inside main content sections, cards, parent-hub panels,
+   and the home dashboard cards switches to var(--tx) when inline-white. */
+:root.light .sec [style*="color:#fff"]:not(button):not(a),
+:root.light .sec [style*="color:white"]:not(button):not(a),
+:root.light .sec [style*="color: #fff"]:not(button):not(a),
+:root.light .sec [style*="color: white"]:not(button):not(a),
+:root.light .card [style*="color:#fff"]:not(button):not(a),
+:root.light .dcard [style*="color:#fff"]:not(button):not(a),
+:root.light #parentDashContent [style*="color:#fff"]:not(button):not(a),
+:root.light #heroCard [style*="color:#fff"]:not(button):not(a),
+:root.light #parentWelcomeCard [style*="color:#fff"]:not(button):not(a),
+:root.light #ph-home [style*="color:#fff"]:not(button):not(a) {
+  color: var(--tx) !important;
+}
+
+/* Translucent white (rgba(255,255,255,.X)) used for body text on dark
+   surfaces also needs to flip in light mode, but keep behavior on
+   buttons + clickable affordances that sit on dark gradients. */
+:root.light .sec [style*="color:rgba(255,255,255"]:not(button):not(a):not([style*="gradient"]),
+:root.light .card [style*="color:rgba(255,255,255"]:not(button):not(a):not([style*="gradient"]),
+:root.light #parentDashContent [style*="color:rgba(255,255,255"]:not(button):not(a):not([style*="gradient"]),
+:root.light #ph-home [style*="color:rgba(255,255,255"]:not(button):not(a):not([style*="gradient"]) {
+  color: var(--tx2) !important;
+}
+
+/* Modal panels — most use dark backgrounds in dark mode, but in light
+   mode they inherit the light surface tokens. Force their copy dark. */
+:root.light #welcomeModal [style*="color:#fff"]:not(button),
+:root.light #dailyDevModal [style*="color:#fff"]:not(button),
+:root.light #planPickerModal [style*="color:#fff"]:not(button),
+:root.light #firstTimePinGate [style*="color:#fff"]:not(button),
+:root.light #pinModal [style*="color:#fff"]:not(button),
+:root.light #characterModal [style*="color:#fff"]:not(button),
+:root.light #childLoginModal [style*="color:#fff"]:not(button),
+:root.light #deleteAccountModal [style*="color:#fff"]:not(button),
+:root.light #subBlockedScreen [style*="color:#fff"]:not(button),
+:root.light #scratchModal [style*="color:#fff"]:not(button) {
+  color: var(--tx) !important;
+}
+
+/* Specific known IDs that needed inline-white-on-glass in dark mode and
+   should now read as primary text in light mode. */
+:root.light #phApprovalHead,
+:root.light #ddmTitle,
+:root.light #charTitle,
+:root.light #devTitle,
+:root.light #devScripture,
+:root.light #pinModalTitle,
+:root.light #subBlockedMsg,
+:root.light #clChildName,
+:root.light #scratchResult,
+:root.light #savingsJarPct {
+  color: var(--tx) !important;
+  text-shadow: none !important;
+}
+
+/* Hero card greet text — gold verse + bright accents stay, but the
+   plain white name/greeting flip in calm-theme light mode. */
+:root.light .hero-greet,
+:root.light .hero-name,
+:root.light .hero-date {
+  color: var(--tx) !important;
+}

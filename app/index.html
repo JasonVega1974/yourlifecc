@@ -5,6 +5,27 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>YourLife CC — your family dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<!-- Boot-cache theme + palette BEFORE the stylesheet renders, to avoid the
+     dark-mode flash that returning users on calm-theme palettes (cream/sage/
+     teal) saw on every first paint. The cache is written by setPalette()
+     in skills.js whenever the user picks a palette; reading it here is
+     synchronous and adds <2ms to first paint. The full applyPalette() runs
+     later after auth/cloudLoad and corrects anything we missed. -->
+<script>
+  (function(){
+    try {
+      var raw = localStorage.getItem('ylcc_boot_palette_v1');
+      if(!raw) return;
+      var p = JSON.parse(raw);
+      if(!p || typeof p !== 'object') return;
+      var root = document.documentElement;
+      if(p.light) root.classList.add('light');
+      var keys = ['bg','s1','s2','s3','s4','c','p','gr','g','tx','tx2','mt'];
+      keys.forEach(function(k){ if(p[k]) root.style.setProperty('--'+k, p[k]); });
+      if(p.name) root.setAttribute('data-palette', p.name);
+    } catch(e){}
+  })();
+</script>
 <!-- App stylesheet -->
 <link rel="stylesheet" href="/app/css/app.css">
 <!-- Supabase -->
