@@ -230,6 +230,19 @@ async function authForgotPassword(){
   else authSetMsg('Password reset email sent!', 'var(--gr)');
 }
 
+// ── PLAN-BASED SECTION GATING ─────────────────────────────────
+// Sections faith_free can reach. Paid users / unknown plan / contest-free
+// short-circuit in isSectionAllowed below and never consult this list.
+const FAITH_FREE_ALLOWED = ['s-hero', 's-scripture', 's-parent'];
+
+// Single source of truth for "is this section reachable for the current user?"
+// Used by buildSideNav, showSection, and applySettings. Returning true for
+// non-faith_free users keeps existing paid-user behavior identical.
+function isSectionAllowed(id){
+  if(!window._faithFree) return true;
+  return FAITH_FREE_ALLOWED.indexOf(id) !== -1;
+}
+
 // ── SUBSCRIPTION GATE ─────────────────────────────────────────
 async function checkPlanStatus(){
   if(typeof IS_DEMO!=="undefined"&&IS_DEMO) return false;
@@ -259,6 +272,7 @@ async function checkPlanStatus(){
     // Store plan status globally for access control
     window._userPlanStatus = status;
     window._contestFreeUser = (status === 'free_contest');
+    window._faithFree       = (status === 'faith_free');
     // Block cancelled and past_due; allow active, trialing, null/undefined (legacy/free), free_contest
     if(status === 'cancelled' || status === 'past_due'){
       document.getElementById('authScreen').style.display = 'none';
