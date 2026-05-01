@@ -1997,6 +1997,13 @@ function switchToProfile(id){
   applyName();
   applyStageFilter();
   renderProfileSwitcher();
+  // Per-profile palette/theme: each profile keeps its own D.palette and
+  // D.theme. Without re-applying here, switching from a parent (cream)
+  // to a child (cyan) leaves the visual stuck on the previous profile's
+  // theme until refresh. applyPalette also rewrites the boot-cache so
+  // the next first-paint matches the active profile.
+  if(typeof applyTheme === 'function') applyTheme();
+  if(typeof applyPalette === 'function') applyPalette();
 
   // Trigger all renders
   try{
