@@ -723,6 +723,23 @@ function applySettings(){
     const key=s.id.replace('s-','');
     if((D.sections||{})[key]===0) el.style.display='none';
   });
+  // faith_free DOM hide — covers (a) every <section class="sec"> not in
+  // the allow-list, including ones not in ALL_SECTIONS (e.g. s-cbt);
+  // (b) the hero dashboard tile grid, which surfaces gated-section data
+  // (GPA/Bank/Parent Bucks/etc.) inside the allowed s-hero; (c) the
+  // Refer & Earn buttons in the global top bar, which sit outside any
+  // section.
+  if(window._faithFree){
+    document.querySelectorAll('section.sec').forEach(el => {
+      if(!isSectionAllowed(el.id)) el.style.display='none';
+    });
+    const tilesGrid = document.querySelector('#s-hero .dashGrid');
+    if(tilesGrid) tilesGrid.style.display = 'none';
+    // BRITTLE: onclick-attribute selector — migrate to a data-attribute
+    // or class-based selector when F2 touches the top bar.
+    document.querySelectorAll('button[onclick*="showSection(\'s-referral\'"]')
+      .forEach(b => b.style.display = 'none');
+  }
   const sb=document.getElementById('scriptureBanner');
   if(sb && D.hideScripture) sb.style.display='none';
   applyName();
@@ -928,6 +945,7 @@ function buildSideNav(){
       // Collapsible group — Phase 2.2: default closed unless user explicitly opened.
       const isOpen = openGroups[n.label] === true;
       const childHTML = (n.children||[]).map(c=>{
+        if(!isSectionAllowed(c.id)) return '';
         if(c.key && hidden[c.key]===0 && typeof hidden[c.key]!=='undefined') return '';
         return `<button class="nav-item nav-child${c.id===_activeSection?' active':''}" id="ni-${c.id}" onclick="showSection('${c.id}')" style="padding-left:2.2rem;font-size:.78rem;">
           <span class="ni">${c.icon}</span>
@@ -949,6 +967,7 @@ function buildSideNav(){
       </div>`;
     } else {
       // Regular item — CBT always visible regardless of D.sections
+      if(!isSectionAllowed(n.id)) return;
       if(n.key!=='cbt' && n.key && hidden[n.key]===0 && typeof hidden[n.key]!=='undefined') return;
       navHTML += `<button class="nav-item${n.id===_activeSection?' active':''}" id="ni-${n.id}" onclick="showSection('${n.id}')">
         <span class="ni">${n.icon}</span>
@@ -960,7 +979,7 @@ function buildSideNav(){
   el.innerHTML = navHTML;
 
   // Force-inject CBT button if missing (immune to section visibility settings)
-  if(!document.getElementById('ni-s-cbt')){
+  if(!document.getElementById('ni-s-cbt') && isSectionAllowed('s-cbt')){
     const schoolGroup = el.querySelector('[onclick*="_group_school"] + .nav-group-items, [id*="SchoolCareer"]');
     const cbtBtn = document.createElement('button');
     cbtBtn.className = 'nav-item nav-child' + ('s-cbt'===_activeSection?' active':'');
@@ -1004,6 +1023,10 @@ function toggleNavGroup(label){
 }
 
 function showSection(id, fromMobile){
+  // faith_free fail-closed: redirect to home if the requested section is
+  // outside the allow-list. Silent redirect — some callers fire from
+  // setTimeout chains where a throw would surface as an unhandled rejection.
+  if(!isSectionAllowed(id)) id = 's-hero';
   if(id==='s-referral') setTimeout(initReferralTab,50);
   // Hide all, show target
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
