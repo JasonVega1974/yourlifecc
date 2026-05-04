@@ -118,7 +118,7 @@ const MODE_LABELS={middle:'Middle School',fresh:'Freshman',mid_hs:'High School',
 const STAGE_CONFIG = {
   middle:{
     label:'Middle School',emoji:'🎒',
-    sections:['s-hero','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-reading','s-mood','s-chores','s-sports','s-parent'],
+    sections:['s-hero','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-reading','s-mood','s-chores','s-sports','s-parent','s-worship'],
     skillCats:['health','dental','cooking','relationships','faith','mental','emergency','family','digital','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
@@ -136,7 +136,7 @@ const STAGE_CONFIG = {
   },
   fresh:{
     label:'9th Grade',emoji:'📚',
-    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-reading','s-mentors','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-badges','s-driving','s-sports','s-parent'],
+    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-reading','s-mentors','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-badges','s-driving','s-sports','s-parent'],
     skillCats:['health','dental','cooking','car','relationships','faith','mental','emergency','family','digital','civic','credit','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
@@ -154,7 +154,7 @@ const STAGE_CONFIG = {
   },
   mid_hs:{
     label:'10th–11th Grade',emoji:'📖',
-    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-badges','s-driving','s-sports','s-parent'],
+    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-badges','s-driving','s-sports','s-parent'],
     skillCats:['taxes','car','health','dental','cooking','home','career','credit','relationships','faith','mental','civic','emergency','digital','family','college','adulting','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
@@ -172,7 +172,7 @@ const STAGE_CONFIG = {
   },
   senior:{
     label:'Senior Year',emoji:'🎓',
-    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-badges','s-driving','s-sports','s-parent'],
+    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-badges','s-driving','s-sports','s-parent'],
     skillCats:['taxes','car','health','dental','cooking','home','career','credit','relationships','faith','mental','civic','emergency','digital','family','college','legal','adulting','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
@@ -192,7 +192,7 @@ const STAGE_CONFIG = {
   },
   college:{
     label:'College',emoji:'🏛️',
-    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-badges','s-driving','s-sports','s-parent'],
+    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-badges','s-driving','s-sports','s-parent'],
     skillCats:['taxes','car','health','dental','cooking','home','career','credit','relationships','faith','mental','civic','emergency','digital','family','college','legal','adulting','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
@@ -211,7 +211,7 @@ const STAGE_CONFIG = {
   },
   adult:{
     label:'Young Adult',emoji:'💼',
-    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-badges','s-driving','s-sports','s-parent'],
+    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-badges','s-driving','s-sports','s-parent'],
     skillCats:['taxes','car','health','dental','cooking','home','career','credit','relationships','faith','mental','civic','emergency','digital','family','college','legal','adulting','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
@@ -261,6 +261,11 @@ function saveName(){
 function setMode(m){ D.mode=m; save(); applyName(); applyStageFilter(); }
 
 function applyStageFilter(){
+  // faith_free users skip stage filtering — their sidebar is governed entirely
+  // by FAITH_FREE_ALLOWED + buildSideNav. Without this guard, applyStageFilter
+  // hides any flat sidebar item not in D.mode's STAGE_CONFIG.sections list,
+  // including F1.0+ additions like Worship Playlist.
+  if(window._faithFree) return;
   const mode = D.mode||'mid_hs';
   const config = STAGE_CONFIG[mode]||STAGE_CONFIG.mid_hs;
 
