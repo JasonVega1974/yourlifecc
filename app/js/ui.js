@@ -765,6 +765,12 @@ function applySettings(){
     // to beat the stylesheet. Inline !important wins over stylesheet !important.
     const pw = document.getElementById('parentWelcomeCard');
     if(pw) pw.style.setProperty('display', 'none', 'important');
+    // Hero Card. The faith_free user is flagged as a parent (no child profile),
+    // so body.parent-view is set, and CSS at app.css:2155 hides #heroCard with
+    // `display: none !important`. Force-show it so the user sees greeting +
+    // name + date + scripture verse (the only hero content faith_free should see).
+    const hc = document.getElementById('heroCard');
+    if(hc) hc.style.setProperty('display', 'block', 'important');
     // Parent buttons in the global top bar (desktop + mobile quick bar).
     // BRITTLE: same onclick-attribute selector caveat as Refer & Earn — migrate
     // to a stable data-attribute when F2 touches the top bar.
