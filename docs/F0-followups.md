@@ -1,5 +1,7 @@
 # F0 Follow-ups
 
+**Status:** F0 CLOSED 2026-05-04. Faith-free gating is live, tested on a Stripe-free test account, demoable to a youth pastor. Subsequent work tracked in [`F1-spec.md`](F1-spec.md) and the deferred items below.
+
 Tracking items deliberately deferred during the Faith-Free Tier Foundation (F0) phase, plus tangential issues surfaced during F0 work.
 
 ## Punted from F0 to later phases
@@ -54,3 +56,5 @@ Tracking items deliberately deferred during the Faith-Free Tier Foundation (F0) 
 - ✅ `ui.js`: section gating in `buildSideNav()`, fail-closed redirect in `showSection()`, DOM hide block in `applySettings()` covering sections, hero tile grid, Refer & Earn buttons, hero child-stats widgets, Child Login buttons, child avatar, parent welcome card (with `setProperty('display','none','important')` to beat stylesheet `!important`), Parent top-bar buttons.
 - ✅ `init.js`: parent onboarding wizard suppressed for faith_free (`!window._faithFree` guard added to the `showParentOnboard` trigger).
 - ✅ `service-worker.js`: `CACHE_NAME` bumped from `yourlifecc-v6` → `yourlifecc-v7`
+- ✅ Sidebar IA flattened — `_group_faith` removed, `s-scripture` ("Bible & Faith") promoted to a top-level `NAV_ITEMS` entry. Removed the redundant nested "Faith → Bible & Faith" tab. F1 will re-introduce the Faith group with sub-items (Devotionals / Jesus & Purpose / Learn the Bible / Bible Study / Bible (ESV) / My Journey / Worship Playlist / Church Resources).
+- ✅ `faith.js`: `+5 pts` caption suppressed for faith_free on the daily devotional CTA + completed state. Internal `D.scrPoints` accumulation still runs (not surfaced in faith_free UI; harmless).
