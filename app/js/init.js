@@ -360,7 +360,8 @@ function finishInit(cloudReady){
   // being empty as a "new user" signal, because D.name is temporarily empty
   // on every sign-in before cloud data loads — that caused the wizard to
   // re-open on every refresh/login.
-  if(!IS_DEMO && !D.parentWizardDone && localStorage.getItem(_ylccUserKey('ylcc_parentWizardDone')) !== '1'){ setTimeout(showParentOnboard, 700); }
+  // faith_free users skip the parent/child wizard — single-person Bible-study tier.
+  if(!IS_DEMO && !window._faithFree && !D.parentWizardDone && localStorage.getItem(_ylccUserKey('ylcc_parentWizardDone')) !== '1'){ setTimeout(showParentOnboard, 700); }
 
   // Macro goal inputs
   const g=D.macroGoals||{};
