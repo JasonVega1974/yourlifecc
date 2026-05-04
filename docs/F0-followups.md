@@ -14,6 +14,26 @@ Tracking items deliberately deferred during the Faith-Free Tier Foundation (F0) 
 - **Where:** `s-hero` in `app/index.html`. F0 hides individual widgets via `display:none` in `applySettings()` (`#heroHeadline`, `#heroMicroStats`, parents of `#dacGrid` / `#lifeMapBoard` / `#checkinGrid`, `#childAvatarWrap`).
 - **Action when addressed:** F1 is supposed to ship a compact faith-themed Hero variant. When that lands, the F0 `if(window._faithFree){...}` block in `applySettings()` can be simplified — the new hero structure should render only faith content for faith_free in the first place, removing the need for the per-element hide loops.
 
+## Production-blocking — must be resolved before F2 launches a real signup flow
+
+### faith_free must never touch Stripe (architectural)
+- **Principle:** faith_free is a free, payment-free, Stripe-free tier. The user flow is `link → register → in`. No checkout, no Stripe customer, no Stripe webhook ever fires for a faith_free account.
+- **Why this matters (hit live during F0 testing on 2026-05-04):** The test account `jason.vega07@yahoo.com` was a real paid Stripe-linked account. We manually `UPDATE`'d `plan_status='faith_free'`, which worked. A subsequent Stripe webhook (subscription.updated or similar) overwrote the row back to `'active'` because the receiver blindly trusts Stripe as the source of truth for plan_status. Result: the gating silently stopped applying.
+- **Real fix (F2):** The faith_free signup flow must:
+  1. Create the `profiles` row with `plan_status='faith_free'` directly — no Stripe checkout step.
+  2. Never call `stripe.customers.create()` for these accounts.
+  3. Never write `stripe_customer_id` on these rows.
+  - Result: no Stripe customer exists → Stripe never sends a webhook for this user → the row is never clobbered.
+- **Belt-and-suspenders defense (recommended in the webhook receiver):** Even with the architectural fix, add a guard in the Stripe webhook handler: `IF existing plan_status = 'faith_free' THEN skip update`. Defends against future bugs where a paid user gets manually flipped to faith_free by support.
+- **Where the webhook likely lives:** check `api/` directory for the Stripe webhook receiver (likely a file like `api/stripe-webhook.js` or similar).
+- **Severity:** Production-blocking before F2's signup flow ships. If real faith_free users existed today, any Stripe webhook firing for an unrelated user could in theory have side effects depending on how the receiver is structured. Verify the receiver targets a specific user_id and not e.g. all rows.
+
+### URL routing — `/app/index.html` should be `/app/`
+- **Issue:** Visiting `yourlifecc.com/app/` works, but the URL bar sometimes shows the explicit filename `yourlifecc.com/app/index.html` after navigation — looks unprofessional and is harder to share verbally.
+- **Action:** Configure the host (Vercel: `cleanUrls: true` in `vercel.json`, or a redirect rule rewriting `/app/index.html` → `/app/`).
+- **Severity:** Cosmetic, but visible to every user.
+- **Where to fix:** repo-root `vercel.json` (or equivalent `_redirects` / `netlify.toml` / nginx config depending on host).
+
 ## Tangential — not strictly F0, worth tracking
 
 ### Brittle onclick-attribute selector for Refer & Earn button hide
@@ -30,6 +50,7 @@ Tracking items deliberately deferred during the Faith-Free Tier Foundation (F0) 
 ## Items completed in F0 (for reference)
 
 - ✅ Supabase: `plan_status` constraint extended to allow `'faith_free'`
-- ✅ `auth.js`: `FAITH_FREE_ALLOWED` const + `isSectionAllowed()` helper + `window._faithFree` flag in `checkPlanStatus()`
-- ✅ `ui.js`: section gating in `buildSideNav()`, fail-closed redirect in `showSection()`, DOM hide block in `applySettings()` covering sections, hero tile grid, Refer & Earn buttons, hero child-stats widgets, Child Login buttons, child avatar
+- ✅ `auth.js`: `FAITH_FREE_ALLOWED` const (`['s-hero', 's-scripture']` — `s-parent` removed 2026-05-04 because faith_free is a single-person tier with no parent/child role), `isSectionAllowed()` helper, `window._faithFree` flag in `checkPlanStatus()`, onboard.html redirect skipped for faith_free in `authComplete()`.
+- ✅ `ui.js`: section gating in `buildSideNav()`, fail-closed redirect in `showSection()`, DOM hide block in `applySettings()` covering sections, hero tile grid, Refer & Earn buttons, hero child-stats widgets, Child Login buttons, child avatar, parent welcome card (with `setProperty('display','none','important')` to beat stylesheet `!important`), Parent top-bar buttons.
+- ✅ `init.js`: parent onboarding wizard suppressed for faith_free (`!window._faithFree` guard added to the `showParentOnboard` trigger).
 - ✅ `service-worker.js`: `CACHE_NAME` bumped from `yourlifecc-v6` → `yourlifecc-v7`
