@@ -920,9 +920,7 @@ const NAV_ITEMS = [
     {id:'s-sports',    icon:'⚽', label:'Sports',         key:'sports'},
     {id:'s-mentors',   icon:'🤝', label:'My People',      key:'mentors'},
   ]},
-  {id:'_group_faith', icon:'✝️', label:'Faith', isGroup:true, children:[
-    {id:'s-scripture', icon:'✝️', label:'Bible & Faith',  key:'scripture'},
-  ]},
+  {id:'s-scripture', icon:'✝️', label:'Bible & Faith', key:'scripture'},
   {id:'_group_school', icon:'🎓', label:'School & Career', isGroup:true, children:[
     {id:'s-school',    icon:'📚', label:'School',         key:'school'},
     {id:'s-resume',    icon:'💼', label:'Jobs/Resume',    key:'resume'},

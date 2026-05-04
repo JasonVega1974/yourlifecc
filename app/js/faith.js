@@ -1314,10 +1314,13 @@ function renderDevotionals(){
   const da = document.getElementById('devAction');
   if(da){
     const today = new Date().toISOString().slice(0,10);
+    // faith_free users have no rewards/points system — strip the "+5 pts" caption.
+    const _ptsCaption = window._faithFree ? '' : ' +5 pts';
+    const _btnCaption = window._faithFree ? '' : ' (+5 pts)';
     if(D.scrReadDays && D.scrReadDays[today]){
-      da.innerHTML = '<div style="color:#22c55e;font-weight:700;font-size:.85rem;">✅ Completed today! +5 pts</div>';
+      da.innerHTML = '<div style="color:#22c55e;font-weight:700;font-size:.85rem;">✅ Completed today!' + _ptsCaption + '</div>';
     } else {
-      da.innerHTML = '<button class="btn bp" onclick="markDevotionalRead()" style="font-size:.9rem;padding:.6rem 1.5rem;">✅ I Read Todays Devotional (+5 pts)</button>';
+      da.innerHTML = '<button class="btn bp" onclick="markDevotionalRead()" style="font-size:.9rem;padding:.6rem 1.5rem;">✅ I Read Todays Devotional' + _btnCaption + '</button>';
     }
   }
 
