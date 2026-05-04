@@ -4234,6 +4234,229 @@
   </div>
 </section>
 
+<!-- ════ WORSHIP PLAYLIST (F1.0) ════ -->
+<section id="s-worship" class="sec">
+  <div class="sh">
+    <div class="si">🎵</div>
+    <div class="st">Worship Playlist</div>
+    <span class="tip-wrap"><span class="tip-btn">?</span><span class="tip-box tip-right"><span class="tip-title">HOW TO USE</span><br>Click any song to start worshiping. The player loads only after you click — no tracking until you choose to play. Use shuffle to mix it up.</span></span>
+    <div class="sl"></div>
+  </div>
+
+  <style>
+    /* Kingdom Creatives Worship Playlist styles. Scoped via .kc- prefixed
+       classes — global resets and body styles from the original template
+       have been stripped to avoid affecting the rest of the app. */
+    #s-worship .kc-worship-container { width:100%; }
+    #s-worship .kc-content-wrapper { padding: 0 1rem; }
+    #s-worship .kc-worship-header {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      padding: 60px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(124,58,237,.3);
+      width: 100%;
+      margin-bottom: 40px;
+      border-radius: 18px;
+    }
+    #s-worship .kc-worship-header::before {
+      content: ''; position: absolute; inset: 0;
+      background:
+        radial-gradient(circle at 20% 50%, rgba(255,255,255,.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255,255,255,.08) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    #s-worship .kc-worship-header-content { position: relative; z-index: 1; }
+    #s-worship .kc-worship-header h1 {
+      font-size: 42px; font-weight: 900; color: #fff;
+      margin-bottom: 16px; text-shadow: 0 4px 20px rgba(0,0,0,.2);
+    }
+    #s-worship .kc-worship-header p {
+      font-size: 18px; color: rgba(255,255,255,.95);
+      max-width: 600px; margin: 0 auto; line-height: 1.6;
+    }
+    #s-worship .kc-worship-icon {
+      font-size: 48px; margin-bottom: 16px; display: inline-block;
+      animation: kcWorshipFloat 3s ease-in-out infinite;
+    }
+    @keyframes kcWorshipFloat {
+      0%, 100% { transform: translateY(0px); }
+      50%      { transform: translateY(-10px); }
+    }
+    #s-worship .kc-player-section {
+      background: linear-gradient(135deg, rgba(102,126,234,.12), rgba(118,75,162,.12));
+      border: 2px solid rgba(124,58,237,.25);
+      border-radius: 24px; padding: 24px; margin-bottom: 40px;
+      box-shadow: 0 20px 50px rgba(124,58,237,.15);
+    }
+    #s-worship .kc-now-playing { margin-bottom: 16px; }
+    #s-worship .kc-now-playing h3 {
+      font-size: 14px; text-transform: uppercase; letter-spacing: 1px;
+      color: #764ba2; margin-bottom: 8px; font-weight: 800;
+    }
+    #s-worship .kc-now-playing h2 {
+      font-size: 24px; font-weight: 900; color: var(--tx); margin-bottom: 4px;
+    }
+    #s-worship .kc-now-playing p { font-size: 14px; color: var(--tx2); }
+    #s-worship .kc-video-wrapper {
+      position: relative; padding-bottom: 56.25%; height: 0;
+      overflow: hidden; border-radius: 16px; background: #000;
+      box-shadow: 0 10px 30px rgba(0,0,0,.3);
+    }
+    #s-worship .kc-video-wrapper iframe {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      border: 0; border-radius: 16px;
+    }
+    #s-worship .kc-player-controls {
+      display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap;
+    }
+    #s-worship .kc-control-btn {
+      flex: 1; min-width: 140px; padding: 14px 20px;
+      border: 2px solid rgba(124,58,237,.25);
+      background: rgba(255,255,255,.04); color: var(--tx);
+      font-weight: 800; font-size: 14px; border-radius: 12px;
+      cursor: pointer; transition: all .2s ease;
+    }
+    #s-worship .kc-control-btn:hover {
+      transform: translateY(-2px); box-shadow: 0 6px 20px rgba(124,58,237,.2);
+    }
+    #s-worship .kc-control-btn.primary {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff; border: none;
+    }
+    #s-worship .kc-control-btn.primary:hover {
+      box-shadow: 0 8px 25px rgba(124,58,237,.35);
+    }
+    #s-worship .kc-control-btn.shuffle.active {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff; border: none;
+    }
+    #s-worship .kc-playlist-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px; margin-bottom: 40px;
+    }
+    #s-worship .kc-video-card {
+      background: rgba(255,255,255,.03); border-radius: 20px; overflow: hidden;
+      border: 2px solid rgba(124,58,237,.15);
+      box-shadow: 0 10px 30px rgba(15,23,42,.08);
+      cursor: pointer; transition: all .3s ease;
+    }
+    #s-worship .kc-video-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(124,58,237,.2);
+      border-color: rgba(124,58,237,.35);
+    }
+    #s-worship .kc-video-card.active {
+      border-color: #764ba2; box-shadow: 0 20px 40px rgba(118,75,162,.3);
+    }
+    #s-worship .kc-video-thumbnail {
+      position: relative; width: 100%; padding-bottom: 56.25%;
+      background: #000; overflow: hidden;
+    }
+    #s-worship .kc-video-thumbnail img {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      object-fit: cover; transition: transform .3s ease;
+    }
+    #s-worship .kc-video-card:hover .kc-video-thumbnail img { transform: scale(1.05); }
+    #s-worship .kc-play-overlay {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60px; height: 60px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 20px rgba(124,58,237,.4);
+      transition: all .3s ease;
+    }
+    #s-worship .kc-video-card:hover .kc-play-overlay {
+      transform: translate(-50%, -50%) scale(1.1);
+      box-shadow: 0 12px 30px rgba(124,58,237,.5);
+    }
+    #s-worship .kc-play-icon {
+      width: 0; height: 0;
+      border-left: 16px solid #fff;
+      border-top: 10px solid transparent;
+      border-bottom: 10px solid transparent;
+      margin-left: 4px;
+    }
+    #s-worship .kc-video-info { padding: 20px; }
+    #s-worship .kc-video-title {
+      font-size: 16px; font-weight: 900; color: var(--tx);
+      margin-bottom: 8px; line-height: 1.4;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    #s-worship .kc-video-artist { font-size: 13px; color: var(--tx2); margin-bottom: 12px; }
+    #s-worship .kc-video-meta {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    #s-worship .kc-duration-badge {
+      display: inline-block; padding: 6px 12px;
+      background: rgba(102,126,234,.12);
+      border: 1px solid rgba(102,126,234,.25);
+      border-radius: 20px; font-size: 12px; font-weight: 800; color: #667eea;
+    }
+    #s-worship .kc-play-btn {
+      padding: 8px 16px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff; border: none; border-radius: 10px;
+      font-weight: 800; font-size: 13px; cursor: pointer;
+      transition: all .2s ease;
+    }
+    #s-worship .kc-play-btn:hover {
+      transform: scale(1.05); box-shadow: 0 6px 15px rgba(124,58,237,.3);
+    }
+    @media (max-width: 768px) {
+      #s-worship .kc-worship-header { padding: 40px 24px; margin-bottom: 30px; }
+      #s-worship .kc-worship-header h1 { font-size: 32px; }
+      #s-worship .kc-worship-header p { font-size: 16px; }
+      #s-worship .kc-worship-icon { font-size: 40px; }
+      #s-worship .kc-content-wrapper { padding: 0 .5rem; }
+      #s-worship .kc-playlist-grid { grid-template-columns: 1fr; }
+      #s-worship .kc-control-btn { min-width: 100px; font-size: 13px; padding: 12px 16px; }
+      #s-worship .kc-player-section { padding: 16px; }
+      #s-worship .kc-now-playing h2 { font-size: 20px; }
+    }
+  </style>
+
+  <div class="kc-worship-container">
+    <div class="kc-worship-header">
+      <div class="kc-worship-header-content">
+        <div class="kc-worship-icon">🎵</div>
+        <h1>Worship Playlist</h1>
+        <p>Click any song below to start worshiping. Let the music fill your spirit and draw you closer to His presence.</p>
+      </div>
+    </div>
+
+    <div class="kc-content-wrapper">
+      <div class="kc-player-section">
+        <div class="kc-now-playing">
+          <h3>NOW PLAYING</h3>
+          <h2 id="worship-nowPlayingTitle">Pick a song to start</h2>
+          <p id="worship-nowPlayingArtist">—</p>
+        </div>
+
+        <div class="kc-video-wrapper" id="worship-videoWrapper">
+          <!-- iframe src is intentionally empty until first click — privacy-friendly,
+               no requests to YouTube on page open. -->
+          <iframe id="worship-youtubePlayer" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+
+        <div class="kc-player-controls">
+          <button class="kc-control-btn" id="worship-prevBtn">⟵ Previous</button>
+          <button class="kc-control-btn primary" id="worship-playPauseBtn">▶ Play</button>
+          <button class="kc-control-btn" id="worship-nextBtn">Next ⟶</button>
+          <button class="kc-control-btn shuffle" id="worship-shuffleBtn">🔀 Shuffle Off</button>
+        </div>
+      </div>
+
+      <div class="kc-playlist-grid" id="worship-playlistGrid"></div>
+    </div>
+  </div>
+</section>
+
 <!-- ════ BADGES & ACHIEVEMENTS ════ -->
 <section id="s-badges" class="sec">
   <div class="sh">
@@ -6515,6 +6738,7 @@
 <script src="/app/js/chores.js"></script>
 <script src="/app/js/sports.js"></script>
 <script src="/app/js/faith.js"></script>
+<script src="/app/js/worship.js"></script>
 <script src="/app/js/parent.js"></script>
 <script src="/app/js/email.js"></script>
 <script src="/app/js/misc.js"></script>
