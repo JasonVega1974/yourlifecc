@@ -118,7 +118,7 @@ const MODE_LABELS={middle:'Middle School',fresh:'Freshman',mid_hs:'High School',
 const STAGE_CONFIG = {
   middle:{
     label:'Middle School',emoji:'🎒',
-    sections:['s-hero','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-reading','s-mood','s-chores','s-sports','s-parent','s-worship'],
+    sections:['s-hero','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-reading','s-mood','s-chores','s-sports','s-parent','s-worship','s-christian-living'],
     skillCats:['health','dental','cooking','relationships','faith','mental','emergency','family','digital','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
@@ -614,7 +614,7 @@ const ALL_SECTIONS=[
   {id:'s-school',label:'📚 School'},{id:'s-resources',label:'📐 School Resources'},{id:'s-schedule',label:'📅 Schedule'},
   {id:'s-calendar',label:'🗓️ Calendar'},{id:'s-health',label:'💪 Health'},
   {id:'s-goals',label:'🎯 Goals'},{id:'s-skills',label:'🧠 Life Skills'},{id:'s-growing',label:'🌱 Growing Up'},
-  {id:'s-craft',label:'🎵 Music & Practice'},{id:'s-contests',label:'🏆 Challenges'},{id:'s-rewards',label:'🎁 Rewards'},{id:'s-scripture',label:'✝️ Bible & Faith'},{id:'s-worship',label:'🎵 Worship Playlist'},{id:'s-badges',label:'🏅 Badges'},{id:'s-driving',label:'🚗 Driving'},{id:'s-sports',label:'🏆 Sports'},
+  {id:'s-craft',label:'🎵 Music & Practice'},{id:'s-contests',label:'🏆 Challenges'},{id:'s-rewards',label:'🎁 Rewards'},{id:'s-scripture',label:'✝️ Bible & Faith'},{id:'s-worship',label:'🎵 Worship Playlist'},{id:'s-christian-living',label:'📚 Christian Living & Life Guides'},{id:'s-badges',label:'🏅 Badges'},{id:'s-driving',label:'🚗 Driving'},{id:'s-sports',label:'🏆 Sports'},
   {id:'s-journal',label:'✍️ Journal'},{id:'s-motivation',label:'🔥 Fuel Wall'},{id:'s-resume',label:'📄 Jobs/Resume'},{id:'s-bio',label:'🪪 Bio Page'},{id:'s-reading',label:'📖 Reading List'},{id:'s-mentors',label:'🤝 My People'},{id:'s-milestones',label:'🏆 Milestones'},{id:'s-mood',label:'😊 Mood Tracker'},{id:'s-chores',label:'✅ Chores'},
 ];
 
@@ -927,6 +927,7 @@ const NAV_ITEMS = [
   ]},
   {id:'s-scripture', icon:'✝️', label:'Bible & Faith', key:'scripture'},
   {id:'s-worship',   icon:'🎵', label:'Worship Playlist', key:'worship'},
+  {id:'s-christian-living', icon:'📚', label:'Christian Living & Life Guides', key:'christianLiving'},
   {id:'_group_school', icon:'🎓', label:'School & Career', isGroup:true, children:[
     {id:'s-school',    icon:'📚', label:'School',         key:'school'},
     {id:'s-resume',    icon:'💼', label:'Jobs/Resume',    key:'resume'},
@@ -1163,6 +1164,7 @@ function showSection(id, fromMobile){
   },80);
   if(id==='s-driving')    setTimeout(()=>{ typeof initDriving==='function'&&initDriving(); },60);
   if(id==='s-worship')    setTimeout(()=>{ typeof worshipInit==='function'&&worshipInit(); },60);
+  if(id==='s-christian-living') setTimeout(()=>{ typeof faithResourcesInit==='function'&&faithResourcesInit(); },60);
   if(id==='s-craft')      setTimeout(()=>{ typeof buildCraftSection==='function'&&buildCraftSection(); typeof initMusicAndSports==='function'&&initMusicAndSports(); },60);
 }
 
