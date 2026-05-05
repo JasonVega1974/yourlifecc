@@ -1,5 +1,5 @@
 /* =============================================================
-   faith-resources.js — Christian Living & Life Guides (F1.1)
+   faith-resources.js — Christian Life Guide (F1.1)
    12 topical guides with full modal content. Filter tabs, modal
    open/close, ESC-to-close, click-outside-to-close, print support.
 ============================================================= */
