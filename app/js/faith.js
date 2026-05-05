@@ -434,21 +434,155 @@ function initScripture(){
   renderScrStats();
 }
 
-// Bible Study tab switcher
 // Bible & Faith tab switcher
+// F2-A: added 'home' (default), 'plans', 'prayer', 'memorize', 'academy' alongside
+// the original 6 tabs. New tabs without renderers are stubs awaiting later phases.
+// btn is optional — when bfTab() is called programmatically (e.g., from a Quick
+// Tile or stub-panel CTA), the matching button is found via [data-bf-tab].
+const BF_TABS = ['home','devotional','jesus','learnBible','reading','bible','journey','plans','prayer','memorize','academy'];
 function bfTab(tab, btn){
-  ['devotional','jesus','learnBible','reading','bible','journey'].forEach(t=>{
+  BF_TABS.forEach(t=>{
     const el = document.getElementById('bf-'+t);
     if(el) el.style.display = t===tab ? 'block' : 'none';
   });
   document.querySelectorAll('.scrTabs .tab').forEach(b=>b.classList.remove('active'));
+  if(!btn) btn = document.querySelector('.scrTabs .tab[data-bf-tab="'+tab+'"]');
   if(btn) btn.classList.add('active');
+  if(tab==='home') renderFaithHome();
   if(tab==='devotional') renderDevotionals();
   if(tab==='reading'){ populateBibleBooks(); renderBibleReadings(); }
   if(tab==='bible') initEsvBible();
   if(tab==='journey') renderFaithJourney();
   if(tab==='jesus') renderJesusGrid();
   if(tab==='learnBible') renderLearnBibleGrid();
+  // 'plans' / 'prayer' / 'memorize' / 'academy' are F2-B/E/F/I stubs — no render needed.
+}
+
+// ── FAITH HOME (F2-A) ────────────────────────────────────────
+// Default landing tab. Pulls from existing data — DAILY_SCRIPTURES (VOTD),
+// DEVOTIONALS + getDailyDevotionalIdx (today's devotional), D.scrReadDays
+// (streak via getScriptureStreak), D.scrPoints (Faith XP).
+// No new schema; F2-B/F2-C/F2-E swap each card to its richer version.
+function renderFaithHome(){
+  // Card 1 — Verse of the Day (uses existing 365-verse rotation)
+  try {
+    const s = getTodayScripture();
+    const dEl = document.getElementById('fhVotdDay'); if(dEl) dEl.textContent = s.day;
+    const tEl = document.getElementById('fhVotdText'); if(tEl) tEl.textContent = '“' + s.text + '”';
+    const rEl = document.getElementById('fhVotdRef'); if(rEl) rEl.textContent = '— ' + s.ref;
+  } catch(e){ /* DAILY_SCRIPTURES not loaded — leave placeholder */ }
+
+  // Card 2 — Today's Devotional preview
+  try {
+    const idx = getDailyDevotionalIdx();
+    const dev = DEVOTIONALS[idx];
+    if(dev){
+      const titleEl = document.getElementById('fhDevoTitle');
+      const snipEl  = document.getElementById('fhDevoSnippet');
+      if(titleEl) titleEl.textContent = 'Day ' + (idx+1) + ' · ' + dev.title;
+      if(snipEl){
+        const body = (dev.body || '').replace(/<[^>]+>/g,'');
+        snipEl.textContent = body.length > 180 ? body.slice(0,180) + '…' : body;
+      }
+    }
+    // Already-read state — disable the Mark button when today is checked off.
+    const today = new Date().toISOString().slice(0,10);
+    const markBtn = document.getElementById('fhDevoMark');
+    if(markBtn){
+      const read = D.scrReadDays && D.scrReadDays[today];
+      if(read){
+        markBtn.textContent = '✅ Read today';
+        markBtn.disabled = true;
+        markBtn.style.opacity = '.65';
+        markBtn.style.cursor = 'default';
+      } else {
+        markBtn.textContent = '✅ Mark Read +5 XP';
+        markBtn.disabled = false;
+        markBtn.style.opacity = '';
+        markBtn.style.cursor = 'pointer';
+      }
+    }
+  } catch(e){ /* DEVOTIONALS missing */ }
+
+  // Card 4 — Streak ring + Faith XP (animated stroke-dashoffset)
+  const streak = (typeof getScriptureStreak === 'function') ? getScriptureStreak() : 0;
+  const xp     = (D && D.scrPoints) || 0;
+  const numEl  = document.getElementById('fhStreakNum');
+  const subEl  = document.getElementById('fhStreakSub');
+  const arcEl  = document.getElementById('fhStreakArc');
+  const xpEl   = document.getElementById('fhXpVal');
+  if(numEl) numEl.textContent = streak;
+  if(xpEl)  xpEl.textContent  = xp;
+  if(subEl){
+    if(streak === 0)      subEl.textContent = 'Read a devotional or verse to start.';
+    else if(streak === 1) subEl.textContent = 'Day one — keep it going!';
+    else                  subEl.textContent = streak + ' days · longest yet, push for ' + (streak+1);
+  }
+  if(arcEl){
+    // Ring fills in 7-day visual cycle so the first week is rewarding,
+    // then resets-with-momentum for week 2+. Caps at full circle on 7+.
+    const C = 188.5; // 2*pi*r where r=30
+    const pct = Math.min(streak / 7, 1);
+    arcEl.style.strokeDashoffset = String(C - (C * pct));
+  }
+
+  // Streak shield indicator (forgiveness system lands in F2-H — placeholder hidden for F2-A).
+  const shieldEl = document.getElementById('fhStreakShield');
+  if(shieldEl) shieldEl.style.display = 'none';
+}
+
+// ── FAITH HOME ACTIONS (F2-A) ────────────────────────────────
+// VOTD context jump: opens the Bible reader at the verse's primary book/chapter
+// when parseable; falls back to switching to the Bible tab. F2-D's reader upgrade
+// will land us at the precise verse anchor.
+function fhOpenContext(){
+  let s; try { s = getTodayScripture(); } catch(e){}
+  if(!s){ bfTab('bible'); return; }
+  const m = String(s.ref).match(/^(\d?\s?[A-Za-z][A-Za-z ]+?)\s+(\d+)/);
+  if(!m){ bfTab('bible'); return; }
+  const book = m[1].trim(); const ch = m[2];
+  bfTab('bible');
+  setTimeout(function(){
+    const sel = document.getElementById('esvBook');
+    if(sel){
+      const opt = Array.from(sel.options).find(o => o.value && o.value.toLowerCase() === book.toLowerCase());
+      if(opt){ sel.value = opt.value; if(typeof onEsvBookChange === 'function') onEsvBookChange(); }
+    }
+    const chSel = document.getElementById('esvChapter');
+    if(chSel) chSel.value = ch;
+    if(typeof openEsvReader === 'function') openEsvReader();
+  }, 60);
+}
+
+// Save VOTD into the user's existing favorite-verses list.
+function fhSaveVotd(){
+  let s; try { s = getTodayScripture(); } catch(e){}
+  if(!s){ showToast('Verse not loaded yet'); return; }
+  if(!D.favVerses) D.favVerses = [];
+  const formatted = '"' + s.text + '" — ' + s.ref;
+  const dup = D.favVerses.some(v => v && v.text === formatted);
+  if(dup){ showToast('Already in your favorites 💎'); return; }
+  D.favVerses.push({ id: Date.now(), text: formatted, date: new Date().toISOString().slice(0,10) });
+  save();
+  if(typeof renderFavVerses === 'function') renderFavVerses();
+  showToast('Saved to favorites 💎');
+}
+
+// Share VOTD via Web Share API when available, fallback to clipboard.
+// Verse-card image generator (Canvas) lands in F2-C.
+function fhShareVotd(){
+  let s; try { s = getTodayScripture(); } catch(e){}
+  if(!s){ showToast('Verse not loaded yet'); return; }
+  const text = '"' + s.text + '" — ' + s.ref + '\n\nyourlifecc.com';
+  if(navigator.share){
+    navigator.share({ title: 'Verse of the Day', text: text }).catch(function(){});
+    return;
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){ showToast('Verse copied to clipboard ✓'); });
+    return;
+  }
+  showToast('Sharing not supported on this browser');
 }
 
 // ── ESV BIBLE READER ─────────────────────────────────────────
@@ -1403,6 +1537,7 @@ function markDevotionalRead(){
   showToast('Devotional read! +5 pts 🙏');
   if(typeof renderDevotionals === 'function') renderDevotionals();
   if(typeof renderScrStats === 'function') renderScrStats();
+  if(typeof renderFaithHome === 'function') renderFaithHome();
   if(typeof earnPB === 'function') earnPB(2, 'Devotional reading');
   if(typeof celebrateIfNeeded === 'function') celebrateIfNeeded('scripture');
   if(typeof logActivity === 'function') logActivity('scripture', 'Read daily devotional');
@@ -1463,6 +1598,7 @@ function markDevFromPopup(){
   showToast('Devotional read! +5 pts 🙏');
   if(typeof renderDevotionals === 'function') renderDevotionals();
   if(typeof renderScrStats === 'function') renderScrStats();
+  if(typeof renderFaithHome === 'function') renderFaithHome();
   if(typeof earnPB === 'function') earnPB(2, 'Devotional reading');
   if(typeof celebrateIfNeeded === 'function') celebrateIfNeeded('scripture');
   if(typeof logActivity === 'function') logActivity('scripture', 'Read daily devotional');
