@@ -4185,7 +4185,7 @@
           <div class="fh-tile" onclick="bfTab('prayer')"><span style="font-size:1.3rem;">🙏</span><span>Pray Now</span></div>
           <div class="fh-tile" onclick="bfTab('memorize')"><span style="font-size:1.3rem;">✨</span><span>Memorize</span></div>
           <div class="fh-tile" onclick="showSection('s-worship')"><span style="font-size:1.3rem;">🎵</span><span>Listen</span></div>
-          <div class="fh-tile fh-tile-soon" onclick="showToast('Ask the Bible — Claude-powered Q&amp;A coming in F2-G')"><span style="font-size:1.3rem;">🤖</span><span>Ask the Bible</span></div>
+          <div class="fh-tile" onclick="openAskBible()"><span style="font-size:1.3rem;">🤖</span><span>Ask the Bible</span></div>
         </div>
       </div>
     </div>
@@ -4294,15 +4294,23 @@
     <div id="brHistory" style="max-height:400px;overflow-y:auto;"></div>
   </div>
 
-  <!-- ESV BIBLE READER -->
+  <!-- ESV BIBLE READER (F2-D upgraded) -->
   <div id="bf-bible" style="display:none;">
-    <!-- Header bar -->
-    <div style="background:linear-gradient(135deg,#667eea,#764ba2);border-radius:14px;padding:1rem 1.2rem;margin-bottom:.9rem;text-align:center;">
-      <div style="font-size:1.1rem;font-weight:900;color:#fff;margin-bottom:.2rem;">📜 The Holy Bible</div>
-      <div style="font-size:.7rem;color:rgba(255,255,255,.8);letter-spacing:1.5px;text-transform:uppercase;font-weight:600;">English Standard Version (ESV)</div>
+    <!-- Header bar (brand-palette gradient — F2-D purge of leftover purple) -->
+    <div style="background:linear-gradient(135deg,#38bdf8,#a78bfa);border-radius:14px;padding:1rem 1.2rem;margin-bottom:.9rem;text-align:center;color:#0b1220;">
+      <div style="font-size:1.1rem;font-weight:900;margin-bottom:.2rem;">📜 The Holy Bible</div>
+      <div style="font-size:.7rem;opacity:.78;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;">English Standard Version (ESV)</div>
     </div>
 
-
+    <!-- F2-D: Search bar (full-text ESV + my notes & highlights) -->
+    <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:.7rem;margin-bottom:.6rem;">
+      <div style="display:flex;gap:.4rem;align-items:center;">
+        <span style="font-size:.95rem;">🔍</span>
+        <input type="text" id="esvSearchInput" placeholder="Search the Bible or your notes…" onkeydown="if(event.key==='Enter')runEsvSearch()" style="flex:1;font-size:.78rem;padding:.42rem .6rem;border-radius:8px;background:var(--input-bg);border:1px solid var(--input-border);color:var(--tx);">
+        <button onclick="runEsvSearch()" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:8px;padding:.42rem .85rem;font-size:.74rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Search</button>
+      </div>
+      <div id="esvSearchResults" style="margin-top:.55rem;display:none;max-height:300px;overflow-y:auto;"></div>
+    </div>
 
     <!-- Book + Chapter selector -->
     <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:.8rem;margin-bottom:.8rem;">
@@ -4437,16 +4445,221 @@
     </div>
   </div>
 
-  <!-- ════ PRAYER (F2-E stub) ════ -->
-  <div id="bf-prayer" style="display:none;">
-    <div style="background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.18);border-radius:18px;padding:1.6rem 1.2rem;text-align:center;">
-      <div style="font-size:2.4rem;margin-bottom:.5rem;">🙏</div>
-      <div style="font-size:1.05rem;font-weight:800;color:var(--tx);margin-bottom:.4rem;">Prayer</div>
-      <div style="font-size:.82rem;color:var(--tx2);line-height:1.65;max-width:480px;margin:0 auto .9rem;">Active &amp; Answered prayer wall, daily prayer prompt (30-prompt rotation), privacy levels (private / family / community), and family prayer mode. Until this lands, your existing prayer journal is still in <strong>🌟 Journey</strong>.</div>
-      <div style="display:flex;gap:.4rem;justify-content:center;flex-wrap:wrap;">
-        <button onclick="bfTab('journey')" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.5rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Open Journey →</button>
+  <!-- ════ VERSE CARD GENERATOR MODAL (F2-C) ════ -->
+  <!-- 1080×1080 Canvas-rendered shareable verse cards, three templates.
+       Triggered from Faith Home VOTD Share button and (later) any verse-tap
+       menu in F2-D's Bible reader. Output: PNG via toBlob → download / copy /
+       Web Share Level 2 (with files) where available. -->
+  <div id="verseCardModal" class="mo" onclick="if(event.target===this)closeVerseCard()">
+    <div class="md" style="max-width:540px;padding:0;">
+      <div style="padding:1rem 1.2rem .65rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid rgba(255,255,255,.06);">
+        <span style="font-size:1.1rem;">↗</span>
+        <span style="font-family:var(--fh,var(--fm));font-size:1rem;font-weight:800;letter-spacing:.04em;color:var(--tx);">Share Verse Card</span>
+        <button onclick="closeVerseCard()" style="margin-left:auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.78rem;font-weight:800;">✕</button>
       </div>
-      <div style="font-size:.62rem;font-weight:800;color:#a78bfa;text-transform:uppercase;letter-spacing:.18em;margin-top:.9rem;">Phase F2-E · Coming soon</div>
+
+      <div style="padding:.7rem 1.2rem 0;">
+        <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+          <button class="vc-tpl active" data-vc-tpl="ocean" onclick="vcSetTemplate('ocean',this)" style="flex:1;min-width:90px;background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.5rem .7rem;font-size:.74rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🌊 Ocean</button>
+          <button class="vc-tpl" data-vc-tpl="sunrise" onclick="vcSetTemplate('sunrise',this)" style="flex:1;min-width:90px;background:rgba(255,255,255,.06);color:var(--tx);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.5rem .7rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">🌅 Sunrise</button>
+          <button class="vc-tpl" data-vc-tpl="minimal" onclick="vcSetTemplate('minimal',this)" style="flex:1;min-width:90px;background:rgba(255,255,255,.06);color:var(--tx);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.5rem .7rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">⬜ Minimal</button>
+        </div>
+      </div>
+
+      <div style="padding:.85rem 1.2rem;display:flex;justify-content:center;">
+        <!-- Internal canvas renders at 1080×1080; CSS scales display to fit. -->
+        <canvas id="verseCardCanvas" width="1080" height="1080" style="width:100%;max-width:380px;aspect-ratio:1/1;border-radius:14px;background:rgba(0,0,0,.25);box-shadow:0 8px 30px rgba(0,0,0,.4);"></canvas>
+      </div>
+
+      <div style="padding:.65rem 1.2rem 1rem;display:flex;gap:.45rem;flex-wrap:wrap;">
+        <button onclick="vcDownload()" style="flex:1;min-width:110px;background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.6rem .85rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">⬇ Download PNG</button>
+        <button onclick="vcCopy()" style="flex:1;min-width:110px;background:rgba(255,255,255,.06);color:var(--tx);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.6rem .85rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);">📋 Copy Image</button>
+        <button id="vcShareBtn" onclick="vcShare()" style="flex:1;min-width:110px;background:rgba(255,255,255,.06);color:var(--tx);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.6rem .85rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);">↗ Share</button>
+      </div>
+      <div style="padding:0 1.2rem 1rem;font-size:.62rem;color:var(--tx3);text-align:center;line-height:1.5;">Renders at 1080×1080 (Instagram square). Wordmark: yourlifecc.com</div>
+    </div>
+  </div>
+
+  <!-- ════ VERSE TAP MENU (F2-D) — bottom sheet ════ -->
+  <!-- Floats above charModal (z-index 10001) so taps inside the ESV reader can
+       open the menu over the chapter text. Hidden by default; toggled via
+       esvVerseTap()/closeVerseMenu(). -->
+  <div id="verseTapMenu" style="display:none;position:fixed;left:0;right:0;bottom:0;z-index:10001;background:rgba(15,23,42,0.96);backdrop-filter:blur(12px);border-top:1px solid rgba(167,139,250,.25);border-radius:18px 18px 0 0;padding:.85rem 1rem 1rem;box-shadow:0 -10px 40px rgba(0,0,0,.5);max-width:520px;margin:0 auto;">
+    <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem;">
+      <span id="vtmTitle" style="font-size:.78rem;font-weight:800;color:var(--tx);letter-spacing:.02em;">—</span>
+      <button onclick="closeVerseMenu()" style="margin-left:auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:.74rem;font-weight:800;">✕</button>
+    </div>
+    <div id="vtmHighlights" style="display:flex;gap:.4rem;margin-bottom:.6rem;">
+      <button title="Yellow"   onclick="vtmHighlight('#fef08a')" style="flex:1;height:36px;border-radius:10px;background:#fef08a;border:2px solid transparent;cursor:pointer;"></button>
+      <button title="Green"    onclick="vtmHighlight('#bbf7d0')" style="flex:1;height:36px;border-radius:10px;background:#bbf7d0;border:2px solid transparent;cursor:pointer;"></button>
+      <button title="Blue"     onclick="vtmHighlight('#bfdbfe')" style="flex:1;height:36px;border-radius:10px;background:#bfdbfe;border:2px solid transparent;cursor:pointer;"></button>
+      <button title="Pink"     onclick="vtmHighlight('#fbcfe8')" style="flex:1;height:36px;border-radius:10px;background:#fbcfe8;border:2px solid transparent;cursor:pointer;"></button>
+      <button title="Lavender" onclick="vtmHighlight('#e9d5ff')" style="flex:1;height:36px;border-radius:10px;background:#e9d5ff;border:2px solid transparent;cursor:pointer;"></button>
+      <button title="Remove highlight" onclick="vtmHighlight('')" style="flex:0 0 36px;height:36px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);color:var(--tx2);cursor:pointer;font-size:.85rem;font-weight:800;">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;">
+      <button onclick="vtmNote()" style="background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.3);color:#38bdf8;border-radius:10px;padding:.55rem;font-size:.72rem;font-weight:800;cursor:pointer;font-family:var(--fm);">📝 Note</button>
+      <button id="vtmBookmarkBtn" onclick="vtmBookmark()" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.3);color:#a78bfa;border-radius:10px;padding:.55rem;font-size:.72rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🔖 Bookmark</button>
+      <button onclick="vtmShare()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:var(--tx);border-radius:10px;padding:.55rem;font-size:.72rem;font-weight:800;cursor:pointer;font-family:var(--fm);">↗ Share</button>
+      <button onclick="vtmCopy()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:var(--tx);border-radius:10px;padding:.55rem;font-size:.72rem;font-weight:800;cursor:pointer;font-family:var(--fm);">📋 Copy</button>
+      <button onclick="vtmExplain()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:var(--tx);border-radius:10px;padding:.55rem;font-size:.72rem;font-weight:800;cursor:pointer;font-family:var(--fm);">✨ Explain</button>
+    </div>
+  </div>
+
+  <!-- ════ NOTE EDITOR MODAL (F2-D) ════ -->
+  <div id="verseNoteModal" class="mo" onclick="if(event.target===this)closeVerseNote()">
+    <div class="md" style="max-width:480px;padding:0;">
+      <div style="padding:1rem 1.2rem .65rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid rgba(255,255,255,.06);">
+        <span style="font-size:1.1rem;">📝</span>
+        <span id="vnmTitle" style="font-family:var(--fh,var(--fm));font-size:1rem;font-weight:800;letter-spacing:.04em;color:var(--tx);">Verse Note</span>
+        <button onclick="closeVerseNote()" style="margin-left:auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.78rem;font-weight:800;">✕</button>
+      </div>
+      <div style="padding:.85rem 1.2rem;">
+        <div id="vnmVerseText" style="font-style:italic;color:var(--tx2);font-size:.78rem;line-height:1.6;background:rgba(167,139,250,.05);border-left:3px solid #a78bfa;border-radius:0 8px 8px 0;padding:.6rem .8rem;margin-bottom:.7rem;">—</div>
+        <textarea id="vnmTextarea" rows="6" placeholder="What did this verse say to you? How does it apply to your life?" style="width:100%;font-size:.85rem;line-height:1.5;background:var(--input-bg);border:1px solid var(--input-border);color:var(--tx);border-radius:8px;padding:.6rem .8rem;resize:vertical;font-family:var(--fm);"></textarea>
+      </div>
+      <div style="padding:.65rem 1.2rem 1rem;display:flex;gap:.4rem;justify-content:flex-end;">
+        <button id="vnmDelete" onclick="deleteVerseNote()" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f87171;border-radius:10px;padding:.5rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);display:none;">🗑 Delete</button>
+        <button onclick="closeVerseNote()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.5rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Cancel</button>
+        <button onclick="saveVerseNote()" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.5rem .9rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Save Note</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ READER SETTINGS MODAL (F2-D) ════ -->
+  <div id="readerSettingsModal" class="mo" onclick="if(event.target===this)closeReaderSettings()">
+    <div class="md" style="max-width:380px;padding:0;">
+      <div style="padding:1rem 1.2rem .65rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid rgba(255,255,255,.06);">
+        <span style="font-size:1.1rem;">⚙️</span>
+        <span style="font-family:var(--fh,var(--fm));font-size:1rem;font-weight:800;letter-spacing:.04em;color:var(--tx);">Reader Settings</span>
+        <button onclick="closeReaderSettings()" style="margin-left:auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.78rem;font-weight:800;">✕</button>
+      </div>
+      <div style="padding:.85rem 1.2rem 1rem;">
+        <div style="margin-bottom:.85rem;">
+          <div style="font-size:.66rem;color:var(--tx2);font-weight:800;text-transform:uppercase;letter-spacing:.12em;margin-bottom:.4rem;">Font Size</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.35rem;">
+            <button class="rs-opt" data-rs="size:small"  onclick="rsSet('fontSize','small',this)"  style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:var(--tx);border-radius:8px;padding:.45rem;font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Small</button>
+            <button class="rs-opt" data-rs="size:medium" onclick="rsSet('fontSize','medium',this)" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:var(--tx);border-radius:8px;padding:.45rem;font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Medium</button>
+            <button class="rs-opt" data-rs="size:large"  onclick="rsSet('fontSize','large',this)"  style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:var(--tx);border-radius:8px;padding:.45rem;font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Large</button>
+          </div>
+        </div>
+        <div style="margin-bottom:.85rem;">
+          <div style="font-size:.66rem;color:var(--tx2);font-weight:800;text-transform:uppercase;letter-spacing:.12em;margin-bottom:.4rem;">Line Spacing</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.35rem;">
+            <button class="rs-opt" data-rs="line:compact" onclick="rsSet('lineHeight','compact',this)" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:var(--tx);border-radius:8px;padding:.45rem;font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Compact</button>
+            <button class="rs-opt" data-rs="line:normal"  onclick="rsSet('lineHeight','normal',this)"  style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:var(--tx);border-radius:8px;padding:.45rem;font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Normal</button>
+            <button class="rs-opt" data-rs="line:relaxed" onclick="rsSet('lineHeight','relaxed',this)" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:var(--tx);border-radius:8px;padding:.45rem;font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Relaxed</button>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:.66rem;color:var(--tx2);font-weight:800;text-transform:uppercase;letter-spacing:.12em;margin-bottom:.4rem;">Font Family</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.35rem;">
+            <button class="rs-opt" data-rs="family:serif" onclick="rsSet('fontFamily','serif',this)" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:var(--tx);border-radius:8px;padding:.45rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:Georgia,serif;">Serif</button>
+            <button class="rs-opt" data-rs="family:sans"  onclick="rsSet('fontFamily','sans',this)"  style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:var(--tx);border-radius:8px;padding:.45rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Sans</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ PRAYER (F2-E) ════ -->
+  <div id="bf-prayer" style="display:none;">
+    <style>
+      #bf-prayer .pr-prompt{background:linear-gradient(135deg,#38bdf8,#a78bfa);border-radius:16px;padding:1.05rem 1.15rem;margin-bottom:.85rem;color:#0b1220;}
+      #bf-prayer .pr-prompt-eyebrow{font-size:.6rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;opacity:.78;margin-bottom:.35rem;}
+      #bf-prayer .pr-prompt-text{font-family:var(--fh,var(--fm));font-size:1.05rem;font-weight:700;letter-spacing:.01em;line-height:1.4;margin-bottom:.7rem;}
+      #bf-prayer .pr-prompt-cta{background:rgba(11,18,32,.85);color:#fff;border:none;border-radius:10px;padding:.45rem .85rem;font-size:.74rem;font-weight:800;cursor:pointer;font-family:var(--fm);}
+      #bf-prayer .pr-form{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:.85rem 1rem;margin-bottom:.85rem;}
+      #bf-prayer .pr-row{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.55rem;}
+      #bf-prayer .pr-row-label{flex:0 0 100%;font-size:.6rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.14em;margin-bottom:.05rem;}
+      #bf-prayer .pr-chip{flex:0 0 auto;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--tx2);border-radius:99px;padding:.3rem .7rem;font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fm);transition:all .15s;}
+      #bf-prayer .pr-chip:hover{background:rgba(255,255,255,.08);}
+      #bf-prayer .pr-chip.active{color:#0b1220;border-color:transparent;}
+      #bf-prayer .pr-chip.active[data-grp="type"]{background:linear-gradient(135deg,#38bdf8,#a78bfa);}
+      #bf-prayer .pr-chip.active[data-grp="cat"]{background:#a78bfa;}
+      #bf-prayer .pr-chip.active[data-grp="priv"]{background:#10b981;}
+      #bf-prayer .pr-tabs{display:flex;gap:.4rem;margin-bottom:.65rem;}
+      #bf-prayer .pr-tab{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--tx2);border-radius:10px;padding:.5rem .7rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);transition:all .15s;}
+      #bf-prayer .pr-tab.active{background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border-color:transparent;}
+      #bf-prayer .pr-list{display:flex;flex-direction:column;gap:.4rem;}
+      #bf-prayer .pr-item{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-left-width:4px;border-radius:10px;padding:.65rem .8rem;}
+      #bf-prayer .pr-item-meta{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;font-size:.6rem;color:var(--tx2);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem;}
+      #bf-prayer .pr-item-text{font-size:.84rem;color:var(--tx);line-height:1.55;margin-bottom:.4rem;}
+      #bf-prayer .pr-item-answer{background:rgba(16,185,129,.08);border-left:3px solid #10b981;border-radius:0 8px 8px 0;padding:.5rem .65rem;margin-top:.4rem;font-size:.78rem;color:var(--tx2);font-style:italic;line-height:1.5;}
+      #bf-prayer .pr-item-actions{display:flex;gap:.35rem;margin-top:.3rem;}
+      #bf-prayer .pr-item-btn{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#34d399;border-radius:8px;padding:.3rem .65rem;font-size:.66rem;font-weight:800;cursor:pointer;font-family:var(--fm);}
+      #bf-prayer .pr-item-btn.del{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.25);color:#f87171;}
+      #bf-prayer .pr-empty{text-align:center;padding:1.2rem;color:var(--tx2);font-size:.78rem;font-style:italic;}
+      #bf-prayer .pr-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;margin-bottom:.85rem;}
+      #bf-prayer .pr-stat{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:.5rem;text-align:center;}
+      #bf-prayer .pr-stat-num{font-size:1.2rem;font-weight:900;font-family:var(--fh,var(--fm));}
+      #bf-prayer .pr-stat-lbl{font-size:.58rem;color:var(--tx2);font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-top:.1rem;}
+    </style>
+
+    <!-- Daily prompt -->
+    <div class="pr-prompt">
+      <div class="pr-prompt-eyebrow">🙏 Today's Prayer Prompt</div>
+      <div class="pr-prompt-text" id="prPromptText">—</div>
+      <button class="pr-prompt-cta" onclick="prayerUsePrompt()">Pray About This</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="pr-stats">
+      <div class="pr-stat"><div class="pr-stat-num" id="prStatActive" style="color:#a78bfa;">0</div><div class="pr-stat-lbl">Active</div></div>
+      <div class="pr-stat"><div class="pr-stat-num" id="prStatAnswered" style="color:#10b981;">0</div><div class="pr-stat-lbl">Answered</div></div>
+      <div class="pr-stat"><div class="pr-stat-num" id="prStatTotal" style="color:#38bdf8;">0</div><div class="pr-stat-lbl">All Time</div></div>
+    </div>
+
+    <!-- Add prayer form -->
+    <div class="pr-form">
+      <textarea id="prInput" rows="3" placeholder="What are you praying for? What's on your heart today?" style="margin-bottom:.55rem;"></textarea>
+      <div class="pr-row">
+        <span class="pr-row-label">Type</span>
+        <button class="pr-chip active" data-grp="type" data-val="request" onclick="prayerSetChip('type','request',this)">🙏 Request</button>
+        <button class="pr-chip"        data-grp="type" data-val="praise"  onclick="prayerSetChip('type','praise',this)">🎉 Praise</button>
+      </div>
+      <div class="pr-row">
+        <span class="pr-row-label">For</span>
+        <button class="pr-chip active" data-grp="cat" data-val="self"   onclick="prayerSetChip('cat','self',this)">Self</button>
+        <button class="pr-chip"        data-grp="cat" data-val="family" onclick="prayerSetChip('cat','family',this)">Family</button>
+        <button class="pr-chip"        data-grp="cat" data-val="friend" onclick="prayerSetChip('cat','friend',this)">Friend</button>
+        <button class="pr-chip"        data-grp="cat" data-val="world"  onclick="prayerSetChip('cat','world',this)">World</button>
+      </div>
+      <div class="pr-row">
+        <span class="pr-row-label">Privacy</span>
+        <button class="pr-chip active" data-grp="priv" data-val="private"   onclick="prayerSetChip('priv','private',this)">🔒 Private</button>
+        <button class="pr-chip"        data-grp="priv" data-val="family"    onclick="prayerSetChip('priv','family',this)">👨‍👩‍👧 Family <span style="font-size:.55rem;opacity:.7;">(F2-H)</span></button>
+        <button class="pr-chip"        data-grp="priv" data-val="community" onclick="prayerSetChip('priv','community',this)">⛪ Community <span style="font-size:.55rem;opacity:.7;">(soon)</span></button>
+      </div>
+      <button class="btn bp" onclick="addPrayerFromForm()" style="width:100%;margin-top:.3rem;">Save Prayer</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="pr-tabs">
+      <button class="pr-tab active" data-pr-view="active"   onclick="setPrayerView('active',this)">Active <span id="prCountActive">0</span></button>
+      <button class="pr-tab"        data-pr-view="answered" onclick="setPrayerView('answered',this)">Answered <span id="prCountAnswered">0</span></button>
+    </div>
+
+    <div id="prList" class="pr-list"></div>
+  </div>
+
+  <!-- ════ MARK ANSWERED MODAL (F2-E) ════ -->
+  <div id="prayerAnswerModal" class="mo" onclick="if(event.target===this)closePrayerAnswer()">
+    <div class="md" style="max-width:440px;padding:0;">
+      <div style="padding:1rem 1.2rem .65rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid rgba(255,255,255,.06);">
+        <span style="font-size:1.2rem;">✅</span>
+        <span style="font-family:var(--fh,var(--fm));font-size:1rem;font-weight:800;letter-spacing:.04em;color:var(--tx);">Mark Answered</span>
+        <button onclick="closePrayerAnswer()" style="margin-left:auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.78rem;font-weight:800;">✕</button>
+      </div>
+      <div style="padding:.85rem 1.2rem;">
+        <div id="paOriginal" style="font-style:italic;color:var(--tx2);font-size:.78rem;line-height:1.6;background:rgba(167,139,250,.06);border-left:3px solid #a78bfa;border-radius:0 8px 8px 0;padding:.6rem .8rem;margin-bottom:.7rem;">—</div>
+        <div style="font-size:.7rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.35rem;">Answer Story (optional)</div>
+        <textarea id="paStory" rows="4" placeholder="How did God answer? What changed? Capture the story so you can look back later." style="width:100%;font-size:.85rem;line-height:1.5;background:var(--input-bg);border:1px solid var(--input-border);color:var(--tx);border-radius:8px;padding:.6rem .8rem;resize:vertical;font-family:var(--fm);"></textarea>
+      </div>
+      <div style="padding:.65rem 1.2rem 1rem;display:flex;gap:.4rem;justify-content:flex-end;">
+        <button onclick="closePrayerAnswer()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.5rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Cancel</button>
+        <button onclick="confirmPrayerAnswered()" style="background:linear-gradient(135deg,#10b981,#34d399);color:#0b1220;border:none;border-radius:10px;padding:.5rem .9rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">✅ Mark Answered</button>
+      </div>
     </div>
   </div>
 
@@ -4465,13 +4678,135 @@
     </div>
   </div>
 
-  <!-- ════ MEMORIZE (F2-F stub) ════ -->
+  <!-- ════ MEMORIZE (F2-F) ════ -->
   <div id="bf-memorize" style="display:none;">
-    <div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.18);border-radius:18px;padding:1.6rem 1.2rem;text-align:center;">
-      <div style="font-size:2.4rem;margin-bottom:.5rem;">✨</div>
-      <div style="font-size:1.05rem;font-weight:800;color:var(--tx);margin-bottom:.4rem;">Memory Verses</div>
-      <div style="font-size:.82rem;color:var(--tx2);line-height:1.65;max-width:480px;margin:0 auto .9rem;">50 starter verses, spaced-repetition queue (SM-2-lite), and three quiz modes: cloze deletion, type-to-recite, and multi-choice for younger kids. Family leaderboard included.</div>
-      <div style="font-size:.62rem;font-weight:800;color:#10b981;text-transform:uppercase;letter-spacing:.18em;">Phase F2-F · Coming soon</div>
+    <style>
+      #bf-memorize .mv-hero{background:linear-gradient(135deg,#10b981,#34d399);color:#0b1220;border-radius:16px;padding:1rem 1.15rem;margin-bottom:.85rem;display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
+      #bf-memorize .mv-hero-content{flex:1;min-width:200px;}
+      #bf-memorize .mv-hero-title{font-family:var(--fh,var(--fm));font-size:1.05rem;font-weight:800;letter-spacing:.02em;line-height:1.2;}
+      #bf-memorize .mv-hero-sub{font-size:.74rem;font-weight:600;opacity:.85;margin-top:.2rem;}
+      #bf-memorize .mv-hero-btn{background:rgba(11,18,32,.85);color:#fff;border:none;border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);}
+      #bf-memorize .mv-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;margin-bottom:.85rem;}
+      #bf-memorize .mv-stat{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:.55rem;text-align:center;}
+      #bf-memorize .mv-stat-num{font-size:1.3rem;font-weight:900;font-family:var(--fh,var(--fm));}
+      #bf-memorize .mv-stat-lbl{font-size:.58rem;color:var(--tx2);font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-top:.1rem;}
+      #bf-memorize .mv-tabs{display:flex;gap:.4rem;margin-bottom:.65rem;overflow-x:auto;padding-bottom:.15rem;}
+      #bf-memorize .mv-tab{flex:0 0 auto;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--tx2);border-radius:10px;padding:.45rem .8rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);transition:all .15s;}
+      #bf-memorize .mv-tab.active{background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border-color:transparent;}
+      #bf-memorize .mv-section-hdr{font-size:.66rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.16em;margin:.7rem 0 .45rem;}
+      #bf-memorize .mv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:.5rem;}
+      #bf-memorize .mv-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-left-width:4px;border-radius:12px;padding:.7rem .85rem;cursor:pointer;transition:transform .15s,background .15s;}
+      #bf-memorize .mv-card:hover{transform:translateY(-2px);background:rgba(255,255,255,.06);}
+      #bf-memorize .mv-card-ref{font-size:.72rem;font-weight:800;letter-spacing:.04em;margin-bottom:.25rem;}
+      #bf-memorize .mv-card-text{font-size:.74rem;color:var(--tx2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+      #bf-memorize .mv-card-meta{display:flex;align-items:center;gap:.4rem;margin-top:.35rem;font-size:.6rem;color:var(--tx2);font-weight:700;letter-spacing:.06em;}
+      #bf-memorize .mv-due-pill{background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.3);border-radius:99px;padding:.05rem .4rem;font-size:.55rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;}
+      #bf-memorize .mv-mastered-pill{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3);border-radius:99px;padding:.05rem .4rem;font-size:.55rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;}
+      #bf-memorize .mv-empty{text-align:center;padding:1rem;color:var(--tx2);font-size:.78rem;font-style:italic;}
+      #bf-memorize .mv-add-form{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:.85rem 1rem;margin-bottom:.85rem;display:none;}
+      #bf-memorize .mv-add-form.open{display:block;}
+      #bf-memorize .mv-cat-chip{flex:0 0 auto;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--tx2);border-radius:99px;padding:.25rem .65rem;font-size:.65rem;font-weight:700;cursor:pointer;font-family:var(--fm);}
+      #bf-memorize .mv-cat-chip.active{background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border-color:transparent;}
+    </style>
+
+    <!-- Today's review CTA -->
+    <div class="mv-hero">
+      <div style="font-size:2rem;flex-shrink:0;">✨</div>
+      <div class="mv-hero-content">
+        <div class="mv-hero-title">Memory Verses</div>
+        <div class="mv-hero-sub" id="mvHeroSub">Spaced repetition keeps verses in long-term memory.</div>
+      </div>
+      <button class="mv-hero-btn" id="mvQuizBtn" onclick="mvStartQuiz()">Start Today's Review</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="mv-stats">
+      <div class="mv-stat"><div class="mv-stat-num" id="mvStatDue"      style="color:#fbbf24;">0</div><div class="mv-stat-lbl">Due today</div></div>
+      <div class="mv-stat"><div class="mv-stat-num" id="mvStatActive"   style="color:#a78bfa;">0</div><div class="mv-stat-lbl">Active</div></div>
+      <div class="mv-stat"><div class="mv-stat-num" id="mvStatMastered" style="color:#10b981;">0</div><div class="mv-stat-lbl">Mastered</div></div>
+    </div>
+
+    <!-- Tabs: My Queue / Library / Mastered -->
+    <div class="mv-tabs">
+      <button class="mv-tab active" data-mv-view="queue"    onclick="mvSetView('queue',this)">📚 My Queue</button>
+      <button class="mv-tab"        data-mv-view="library"  onclick="mvSetView('library',this)">📖 Library (50)</button>
+      <button class="mv-tab"        data-mv-view="mastered" onclick="mvSetView('mastered',this)">🏆 Mastered</button>
+      <button class="mv-tab"        data-mv-view="custom"   onclick="mvSetView('custom',this)">+ Add Custom</button>
+    </div>
+
+    <!-- Custom verse form (hidden until tab selected) -->
+    <div id="mvAddForm" class="mv-add-form">
+      <div style="font-size:.74rem;font-weight:800;color:var(--tx);margin-bottom:.4rem;">Add Your Own Verse</div>
+      <input type="text" id="mvCustomRef"  placeholder="Reference (e.g. Romans 5:8)" style="font-size:.8rem;margin-bottom:.4rem;">
+      <textarea id="mvCustomText" rows="3" placeholder="Verse text…" style="font-size:.8rem;margin-bottom:.5rem;"></textarea>
+      <div style="font-size:.6rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.3rem;">Category</div>
+      <div id="mvCustomCats" style="display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:.5rem;"></div>
+      <button class="btn bp" onclick="mvAddCustom()" style="width:100%;">Add to My Queue</button>
+    </div>
+
+    <!-- View body -->
+    <div id="mvBody"></div>
+  </div>
+
+  <!-- ════ ASK THE BIBLE MODAL (F2-G) ════ -->
+  <!-- Calls /api/ai-summary with mode='ask-bible'. Renders a pastoral answer
+       + 3-5 ESV citations (each tappable to open the Bible reader) + a single
+       concrete application. History pane lists prior questions. Theological
+       guardrails enforced server-side via system prompt. Crisis-keyword pre-
+       check fires client-side before any API call to avoid AI-as-counselor
+       in true crisis moments. -->
+  <div id="askBibleModal" class="mo" onclick="if(event.target===this)closeAskBible()">
+    <div class="md" style="max-width:580px;padding:0;">
+      <div style="padding:1rem 1.2rem .65rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid rgba(255,255,255,.06);">
+        <span style="font-size:1.2rem;">🤖</span>
+        <span style="font-family:var(--fh,var(--fm));font-size:1rem;font-weight:800;letter-spacing:.04em;color:var(--tx);">Ask the Bible</span>
+        <button onclick="closeAskBible()" style="margin-left:auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.78rem;font-weight:800;">✕</button>
+      </div>
+
+      <!-- Question form -->
+      <div style="padding:.85rem 1.2rem .55rem;">
+        <textarea id="abQuestion" rows="3" placeholder="What does the Bible say about anxiety? Why did Jesus weep? How do I forgive someone who hasn't apologized?" style="font-size:.85rem;line-height:1.5;font-family:var(--fm);"></textarea>
+        <div style="display:flex;gap:.4rem;margin-top:.5rem;flex-wrap:wrap;">
+          <button onclick="askBibleSubmit()" id="abAskBtn" style="flex:1;background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🤖 Ask</button>
+          <button onclick="askBibleSuggest()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.55rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">💡 Suggest</button>
+        </div>
+        <div style="font-size:.6rem;color:var(--tx3);margin-top:.4rem;line-height:1.5;font-style:italic;">Powered by Claude · grounded in mainstream Protestant Scripture · not a substitute for pastoral or professional counsel.</div>
+      </div>
+
+      <!-- Answer display -->
+      <div id="abAnswer" style="display:none;padding:.4rem 1.2rem .85rem;max-height:60vh;overflow-y:auto;"></div>
+
+      <!-- History (collapsed by default) -->
+      <div id="abHistoryWrap" style="border-top:1px solid rgba(255,255,255,.06);">
+        <button onclick="askBibleToggleHistory()" id="abHistoryToggle" style="width:100%;background:none;border:none;color:var(--tx2);text-align:left;padding:.65rem 1.2rem;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;cursor:pointer;font-family:var(--fm);display:flex;align-items:center;gap:.4rem;">
+          <span>📜 Recent Questions</span>
+          <span id="abHistoryCount" style="margin-left:auto;background:rgba(255,255,255,.06);border-radius:99px;padding:.05rem .5rem;font-size:.6rem;">0</span>
+        </button>
+        <div id="abHistory" style="display:none;padding:0 1.2rem 1rem;max-height:200px;overflow-y:auto;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ MEMORY VERSE QUIZ MODAL (F2-F) ════ -->
+  <div id="mvQuizModal" class="mo" onclick="if(event.target===this)mvCloseQuiz()">
+    <div class="md" style="max-width:540px;padding:0;">
+      <div style="padding:1rem 1.2rem .65rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid rgba(255,255,255,.06);">
+        <span style="font-size:1.1rem;">✨</span>
+        <span id="mvqTitle" style="font-family:var(--fh,var(--fm));font-size:1rem;font-weight:800;letter-spacing:.04em;color:var(--tx);">Quiz</span>
+        <span id="mvqProgress" style="font-size:.66rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.08em;">—</span>
+        <button onclick="mvCloseQuiz()" style="margin-left:auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.78rem;font-weight:800;">✕</button>
+      </div>
+
+      <!-- Mode picker -->
+      <div style="padding:.55rem 1.2rem 0;display:flex;gap:.35rem;flex-wrap:wrap;">
+        <button class="mvq-mode active" data-mvq-mode="cloze"  onclick="mvSetQuizMode('cloze',this)"  style="flex:1;min-width:90px;background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:8px;padding:.4rem;font-size:.66rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Cloze (fill blanks)</button>
+        <button class="mvq-mode"        data-mvq-mode="recite" onclick="mvSetQuizMode('recite',this)" style="flex:1;min-width:90px;background:rgba(255,255,255,.06);color:var(--tx);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:.4rem;font-size:.66rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Recite (type all)</button>
+        <button class="mvq-mode"        data-mvq-mode="choice" onclick="mvSetQuizMode('choice',this)" style="flex:1;min-width:90px;background:rgba(255,255,255,.06);color:var(--tx);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:.4rem;font-size:.66rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Multi-choice (kids)</button>
+      </div>
+
+      <div id="mvqBody" style="padding:.85rem 1.2rem;min-height:200px;"></div>
+
+      <div id="mvqFooter" style="padding:.65rem 1.2rem 1rem;display:flex;gap:.4rem;justify-content:flex-end;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.06);"></div>
     </div>
   </div>
 </section>
@@ -4703,7 +5038,7 @@
 <section id="s-christian-living" class="sec">
   <div class="sh">
     <div class="si">📚</div>
-    <div class="st">Christian Living &amp; Life Guides</div>
+    <div class="st">Christian Life Guide</div>
     <span class="tip-wrap"><span class="tip-btn">?</span><span class="tip-box tip-right"><span class="tip-title">HOW TO USE</span><br>12 in-depth guides covering prayer, faith, family, mental health, recovery, and more. Tap any card to read the full guide. Use filter tabs to narrow by topic. Print any guide for offline reading.</span></span>
     <div class="sl"></div>
   </div>
@@ -4964,7 +5299,7 @@
 
   <!-- Header banner -->
   <div class="resource-header">
-    <h1>📚 Christian Living &amp; Life Guides</h1>
+    <h1>📚 Christian Life Guide</h1>
     <p>In-depth guides on faith, family, mental health, and life — biblical wisdom for everyday challenges.</p>
   </div>
 
@@ -7812,6 +8147,7 @@
 <script src="/app/js/chores.js"></script>
 <script src="/app/js/sports.js"></script>
 <script src="/app/js/data/plans.js"></script>
+<script src="/app/js/data/memory-verses.js"></script>
 <script src="/app/js/faith.js"></script>
 <script src="/app/js/worship.js"></script>
 <script src="/app/js/faith-resources.js"></script>
