@@ -333,11 +333,17 @@ function finishInit(cloudReady){
   if(typeof renderFaithJourney==="function") renderFaithJourney();
   if(typeof populateBibleBooks==="function") populateBibleBooks();
   (function(){
-    ["devotional","jesus","learnBible","reading","bible","journey"].forEach(function(t){
+    // F2-A: 'home' is the default landing tab. Hide all other panels;
+    // the first tab in the bar (Home) is set active via its data-bf-tab.
+    var BF=["home","devotional","jesus","learnBible","reading","bible","journey","plans","prayer","memorize","academy"];
+    BF.forEach(function(t){
       var el=document.getElementById("bf-"+t);
-      if(el) el.style.display=t==="devotional"?"block":"none";
+      if(el) el.style.display=t==="home"?"block":"none";
     });
-    document.querySelectorAll(".scrTabs .tab").forEach(function(b,i){b.classList.toggle("active",i===0);});
+    document.querySelectorAll(".scrTabs .tab").forEach(function(b){b.classList.remove("active");});
+    var homeTab=document.querySelector('.scrTabs .tab[data-bf-tab="home"]');
+    if(homeTab) homeTab.classList.add("active");
+    if(typeof renderFaithHome==="function") renderFaithHome();
   })();
   initParentBucks();
   renderParentBucks();
