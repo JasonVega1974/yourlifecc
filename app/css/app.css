@@ -8,7 +8,7 @@
 :root{
   --bg:#0d1117;--s1:#161b27;--s2:#1c2333;--s3:#232d42;--s4:#2a3652;
   --c:#38bdf8;--g:#fbbf24;--gr:#34d399;--p:#a78bfa;--pk:#f472b6;--or:#fb923c;
-  --tx:#f1f5f9;--tx2:#94a3b8;--tx3:#475569;--mt:#64748b;--br:rgba(56,189,248,0.15);--r:14px;
+  --tx:#f1f5f9;--tx2:#94a3b8;--tx3:#64748b;--mt:#64748b;--br:rgba(56,189,248,0.15);--r:14px;
   --fh:'Bebas Neue',sans-serif;--fm:'Inter',sans-serif;--fn:'Orbitron',sans-serif;--f:'Inter',sans-serif;
   --card-shadow:0 4px 24px rgba(0,0,0,.5);
   --sidebar:220px;
