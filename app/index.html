@@ -4043,16 +4043,156 @@
   </div>
 
   <div class="tabs scrTabs">
-    <button class="tab active" onclick="bfTab('devotional',this)">🕊️ Devotionals</button>
-    <button class="tab" onclick="bfTab('jesus',this)">✝️ Jesus & Purpose</button>
-    <button class="tab" onclick="bfTab('learnBible',this)">📖 Learn the Bible</button>
-    <button class="tab" onclick="bfTab('reading',this)">📖 Bible Study</button>
-    <button class="tab" onclick="bfTab('bible',this)">📜 Bible (ESV)</button>
-    <button class="tab" onclick="bfTab('journey',this)">🌟 My Journey</button>
+    <button class="tab active" data-bf-tab="home" onclick="bfTab('home',this)">🏠 Home</button>
+    <button class="tab" data-bf-tab="bible" onclick="bfTab('bible',this)">📖 Bible</button>
+    <button class="tab" data-bf-tab="plans" onclick="bfTab('plans',this)">📅 Plans</button>
+    <button class="tab" data-bf-tab="devotional" onclick="bfTab('devotional',this)">🕊️ Devotionals</button>
+    <button class="tab" data-bf-tab="prayer" onclick="bfTab('prayer',this)">🙏 Prayer</button>
+    <button class="tab" data-bf-tab="academy" onclick="bfTab('academy',this)">🎓 Academy</button>
+    <button class="tab" data-bf-tab="memorize" onclick="bfTab('memorize',this)">✨ Memorize</button>
+    <button class="tab" data-bf-tab="jesus" onclick="bfTab('jesus',this)">✝️ Jesus &amp; Purpose</button>
+    <button class="tab" data-bf-tab="learnBible" onclick="bfTab('learnBible',this)">📘 Learn</button>
+    <button class="tab" data-bf-tab="reading" onclick="bfTab('reading',this)">📕 Study Log</button>
+    <button class="tab" data-bf-tab="journey" onclick="bfTab('journey',this)">🌟 Journey</button>
+  </div>
+
+  <!-- ════ FAITH HOME (F2-A — default landing tab) ════ -->
+  <!-- Brand-palette discipline: cyan #38bdf8 + violet #a78bfa primary tokens only.
+       No #667eea / #764ba2 / Orbitron. Pulls from existing data — no new schema. -->
+  <div id="bf-home">
+    <style>
+      #bf-home .fh-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.85rem;}
+      #bf-home .fh-card-hdr{display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem;font-size:.78rem;font-weight:800;color:var(--tx);letter-spacing:.02em;}
+      #bf-home .fh-card-sub{color:var(--tx2);font-weight:600;font-size:.72rem;margin-left:auto;}
+      #bf-home .fh-btn{background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.55rem .95rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);transition:transform .15s,box-shadow .15s;}
+      #bf-home .fh-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(56,189,248,.25);}
+      #bf-home .fh-btn-ghost{background:rgba(255,255,255,.06);color:var(--tx);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.55rem .9rem;font-size:.76rem;font-weight:700;cursor:pointer;font-family:var(--fm);}
+      #bf-home .fh-btn-ghost:hover{background:rgba(255,255,255,.1);}
+      /* Card 1 — VOTD */
+      #bf-home .fh-votd{background:linear-gradient(135deg,#38bdf8,#a78bfa);border:none;color:#0b1220;}
+      #bf-home .fh-votd-eyebrow{font-size:.58rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;opacity:.78;margin-bottom:.4rem;}
+      #bf-home .fh-votd-text{font-family:var(--fh,var(--fm));font-size:1.05rem;font-weight:600;line-height:1.55;margin-bottom:.5rem;}
+      #bf-home .fh-votd-ref{font-size:.78rem;font-weight:800;opacity:.85;margin-bottom:.85rem;}
+      #bf-home .fh-votd-actions{display:flex;gap:.4rem;flex-wrap:wrap;}
+      #bf-home .fh-votd-actions button{background:rgba(11,18,32,.18);color:#0b1220;border:1px solid rgba(11,18,32,.22);border-radius:8px;padding:.4rem .7rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);}
+      #bf-home .fh-votd-actions button:hover{background:rgba(11,18,32,.28);}
+      /* Card 2 — Today's Devotional */
+      #bf-home .fh-devo-snippet{font-size:.82rem;color:var(--tx2);line-height:1.6;margin-bottom:.7rem;}
+      #bf-home .fh-devo-actions{display:flex;gap:.4rem;flex-wrap:wrap;}
+      /* Card 3 — Active Plan */
+      #bf-home .fh-plan-empty{font-size:.82rem;color:var(--tx2);line-height:1.6;margin-bottom:.7rem;}
+      /* Card 4 — Streak + XP */
+      #bf-home .fh-streak{display:grid;grid-template-columns:auto 1fr auto;gap:.9rem;align-items:center;}
+      #bf-home .fh-streak-ring{position:relative;width:72px;height:72px;}
+      #bf-home .fh-streak-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:900;color:var(--tx);}
+      #bf-home .fh-streak-label{font-size:.6rem;font-weight:800;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.15rem;}
+      #bf-home .fh-streak-sub{font-size:.78rem;color:var(--tx2);line-height:1.4;}
+      #bf-home .fh-xp{text-align:right;}
+      #bf-home .fh-xp-label{font-size:.58rem;font-weight:800;color:#a78bfa;text-transform:uppercase;letter-spacing:.16em;margin-bottom:.15rem;}
+      #bf-home .fh-xp-val{font-size:1.25rem;font-weight:900;color:var(--tx);font-family:var(--fh,var(--fm));}
+      #bf-home .fh-shield{display:inline-flex;align-items:center;gap:.25rem;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);color:#fbbf24;border-radius:99px;padding:.15rem .5rem;font-size:.6rem;font-weight:800;margin-top:.3rem;}
+      /* Card 5 — Quick tiles */
+      #bf-home .fh-tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem;}
+      #bf-home .fh-tile{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:.85rem .9rem;cursor:pointer;display:flex;align-items:center;gap:.55rem;font-size:.82rem;font-weight:800;color:var(--tx);transition:transform .15s,border-color .15s,background .15s;}
+      #bf-home .fh-tile:hover{transform:translateY(-2px);background:rgba(255,255,255,.07);border-color:rgba(167,139,250,.35);}
+      #bf-home .fh-tile-soon{opacity:.85;}
+      #bf-home .fh-tile-soon::after{content:'F2-G';font-size:.5rem;font-weight:800;background:rgba(167,139,250,.18);color:#a78bfa;border:1px solid rgba(167,139,250,.3);border-radius:4px;padding:.05rem .3rem;margin-left:auto;letter-spacing:.06em;}
+      @media (min-width:720px){
+        #bf-home .fh-grid{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;}
+        #bf-home .fh-grid > .fh-card{margin-bottom:0;}
+        #bf-home .fh-votd{grid-column:1 / -1;}
+      }
+    </style>
+
+    <div class="fh-grid">
+      <!-- Card 1: Verse of the Day -->
+      <div class="fh-card fh-votd">
+        <div class="fh-votd-eyebrow">Verse of the Day · Day <span id="fhVotdDay">—</span></div>
+        <div class="fh-votd-text" id="fhVotdText">Loading today's verse…</div>
+        <div class="fh-votd-ref" id="fhVotdRef">— …</div>
+        <div class="fh-votd-actions">
+          <button onclick="fhOpenContext()">📖 Read Context</button>
+          <button onclick="fhSaveVotd()">💎 Save</button>
+          <button onclick="fhShareVotd()">↗ Share</button>
+        </div>
+      </div>
+
+      <!-- Card 2: Today's Devotional preview -->
+      <div class="fh-card">
+        <div class="fh-card-hdr">
+          <span style="font-size:1.05rem;">🕊️</span>
+          <span>Today's Devotional</span>
+          <span class="fh-card-sub" id="fhDevoTitle">Day —</span>
+        </div>
+        <div class="fh-devo-snippet" id="fhDevoSnippet">Loading…</div>
+        <div class="fh-devo-actions">
+          <button class="fh-btn-ghost" onclick="bfTab('devotional')">Open Devotional</button>
+          <button class="fh-btn" id="fhDevoMark" onclick="markDevotionalRead()">✅ Mark Read +5 XP</button>
+        </div>
+      </div>
+
+      <!-- Card 3: Active Reading Plan -->
+      <div class="fh-card">
+        <div class="fh-card-hdr">
+          <span style="font-size:1.05rem;">📅</span>
+          <span>Active Reading Plan</span>
+        </div>
+        <div id="fhPlanBody">
+          <div class="fh-plan-empty">No plan started yet. Choose from 24 curated plans — topical, through-the-Bible, family, and beginner — coming next phase.</div>
+          <button class="fh-btn" onclick="bfTab('plans')">Browse Plans →</button>
+        </div>
+      </div>
+
+      <!-- Card 4: Streak + Faith XP -->
+      <div class="fh-card">
+        <div class="fh-card-hdr">
+          <span style="font-size:1.05rem;">🔥</span>
+          <span>Streak &amp; Faith XP</span>
+        </div>
+        <div class="fh-streak">
+          <div class="fh-streak-ring">
+            <svg width="72" height="72" viewBox="0 0 72 72" aria-hidden="true">
+              <defs>
+                <linearGradient id="fhStreakGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#38bdf8"/>
+                  <stop offset="100%" stop-color="#a78bfa"/>
+                </linearGradient>
+              </defs>
+              <circle cx="36" cy="36" r="30" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="6"/>
+              <circle id="fhStreakArc" cx="36" cy="36" r="30" fill="none" stroke="url(#fhStreakGrad)" stroke-width="6" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="188.5" transform="rotate(-90 36 36)" style="transition:stroke-dashoffset .6s ease;"/>
+            </svg>
+            <div class="fh-streak-num" id="fhStreakNum">0</div>
+          </div>
+          <div>
+            <div class="fh-streak-label">Streak</div>
+            <div class="fh-streak-sub" id="fhStreakSub">Start your streak today</div>
+            <div id="fhStreakShield" style="display:none;"><span class="fh-shield">🛡 Shield ready</span></div>
+          </div>
+          <div class="fh-xp">
+            <div class="fh-xp-label">Faith XP</div>
+            <div class="fh-xp-val" id="fhXpVal">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5: Quick tiles (full-width on desktop) -->
+      <div class="fh-card" style="grid-column:1 / -1;">
+        <div class="fh-card-hdr">
+          <span style="font-size:1.05rem;">⚡</span>
+          <span>Quick Actions</span>
+        </div>
+        <div class="fh-tiles">
+          <div class="fh-tile" onclick="bfTab('prayer')"><span style="font-size:1.3rem;">🙏</span><span>Pray Now</span></div>
+          <div class="fh-tile" onclick="bfTab('memorize')"><span style="font-size:1.3rem;">✨</span><span>Memorize</span></div>
+          <div class="fh-tile" onclick="showSection('s-worship')"><span style="font-size:1.3rem;">🎵</span><span>Listen</span></div>
+          <div class="fh-tile fh-tile-soon" onclick="showToast('Ask the Bible — Claude-powered Q&amp;A coming in F2-G')"><span style="font-size:1.3rem;">🤖</span><span>Ask the Bible</span></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- DAILY DEVOTIONALS -->
-  <div id="bf-devotional">
+  <div id="bf-devotional" style="display:none;">
     <!-- Today's Devotional Card -->
     <div style="border-radius:18px;overflow:hidden;margin-bottom:1rem;border:1px solid rgba(167,139,250,.12);">
       <!-- Gradient Header -->
@@ -4231,6 +4371,54 @@
       <button class="btn bp bs" onclick="saveFavVerse()">+ Save</button>
     </div>
     <div id="favVersesList" style="max-height:200px;overflow-y:auto;"></div>
+  </div>
+
+  <!-- ════ READING PLANS (F2-B stub) ════ -->
+  <div id="bf-plans" style="display:none;">
+    <div style="background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.18);border-radius:18px;padding:1.6rem 1.2rem;text-align:center;">
+      <div style="font-size:2.4rem;margin-bottom:.5rem;">📅</div>
+      <div style="font-size:1.05rem;font-weight:800;color:var(--tx);margin-bottom:.4rem;">Reading Plans</div>
+      <div style="font-size:.82rem;color:var(--tx2);line-height:1.65;max-width:480px;margin:0 auto .9rem;">24 curated plans coming next phase — topical 7- and 14-day, Bible-in-a-Year, Gospels in 30, Psalms in 30, family Advent &amp; Easter, plus beginner plans like <em>What is the Gospel?</em> and <em>Who is Jesus?</em>. Day-by-day progress, family-shared mode, completion badges.</div>
+      <div style="font-size:.62rem;font-weight:800;color:#38bdf8;text-transform:uppercase;letter-spacing:.18em;">Phase F2-B · Coming next</div>
+    </div>
+  </div>
+
+  <!-- ════ PRAYER (F2-E stub) ════ -->
+  <div id="bf-prayer" style="display:none;">
+    <div style="background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.18);border-radius:18px;padding:1.6rem 1.2rem;text-align:center;">
+      <div style="font-size:2.4rem;margin-bottom:.5rem;">🙏</div>
+      <div style="font-size:1.05rem;font-weight:800;color:var(--tx);margin-bottom:.4rem;">Prayer</div>
+      <div style="font-size:.82rem;color:var(--tx2);line-height:1.65;max-width:480px;margin:0 auto .9rem;">Active &amp; Answered prayer wall, daily prayer prompt (30-prompt rotation), privacy levels (private / family / community), and family prayer mode. Until this lands, your existing prayer journal is still in <strong>🌟 Journey</strong>.</div>
+      <div style="display:flex;gap:.4rem;justify-content:center;flex-wrap:wrap;">
+        <button onclick="bfTab('journey')" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.5rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Open Journey →</button>
+      </div>
+      <div style="font-size:.62rem;font-weight:800;color:#a78bfa;text-transform:uppercase;letter-spacing:.18em;margin-top:.9rem;">Phase F2-E · Coming soon</div>
+    </div>
+  </div>
+
+  <!-- ════ FAITH ACADEMY (F2-I stub) ════ -->
+  <div id="bf-academy" style="display:none;">
+    <div style="background:linear-gradient(135deg,rgba(56,189,248,.06),rgba(167,139,250,.06));border:1px solid rgba(167,139,250,.2);border-radius:18px;padding:1.6rem 1.2rem;text-align:center;">
+      <div style="font-size:2.4rem;margin-bottom:.5rem;">🎓</div>
+      <div style="font-size:1.05rem;font-weight:800;color:var(--tx);margin-bottom:.4rem;">Faith Academy</div>
+      <div style="font-size:.82rem;color:var(--tx2);line-height:1.65;max-width:520px;margin:0 auto .9rem;">5 modules · 18 courses · ~85 lessons · 18 quizzes · 18 certificates · 6 badges. Foundations of Faith, Bible Survey, Christian Life Skills, Topical Deep Dives, and For Families — same proven shape as Life Skills Academy and Roady's Training.</div>
+      <div style="display:flex;gap:.4rem;justify-content:center;flex-wrap:wrap;margin-bottom:.9rem;">
+        <button onclick="bfTab('jesus')" style="background:rgba(255,255,255,.06);color:var(--tx);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.5rem 1rem;font-size:.76rem;font-weight:700;cursor:pointer;font-family:var(--fm);">✝️ Jesus &amp; Purpose</button>
+        <button onclick="bfTab('learnBible')" style="background:rgba(255,255,255,.06);color:var(--tx);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.5rem 1rem;font-size:.76rem;font-weight:700;cursor:pointer;font-family:var(--fm);">📘 Learn the Bible</button>
+      </div>
+      <div style="font-size:.62rem;color:var(--tx3);font-style:italic;line-height:1.5;max-width:480px;margin:0 auto .6rem;">Existing Jesus &amp; Learn lessons port into Foundations and Bible Survey when Academy ships.</div>
+      <div style="font-size:.62rem;font-weight:800;color:#a78bfa;text-transform:uppercase;letter-spacing:.18em;">Phase F2-I · Final phase</div>
+    </div>
+  </div>
+
+  <!-- ════ MEMORIZE (F2-F stub) ════ -->
+  <div id="bf-memorize" style="display:none;">
+    <div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.18);border-radius:18px;padding:1.6rem 1.2rem;text-align:center;">
+      <div style="font-size:2.4rem;margin-bottom:.5rem;">✨</div>
+      <div style="font-size:1.05rem;font-weight:800;color:var(--tx);margin-bottom:.4rem;">Memory Verses</div>
+      <div style="font-size:.82rem;color:var(--tx2);line-height:1.65;max-width:480px;margin:0 auto .9rem;">50 starter verses, spaced-repetition queue (SM-2-lite), and three quiz modes: cloze deletion, type-to-recite, and multi-choice for younger kids. Family leaderboard included.</div>
+      <div style="font-size:.62rem;font-weight:800;color:#10b981;text-transform:uppercase;letter-spacing:.18em;">Phase F2-F · Coming soon</div>
+    </div>
   </div>
 </section>
 
@@ -4453,6 +4641,838 @@
       </div>
 
       <div class="kc-playlist-grid" id="worship-playlistGrid"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ CHRISTIAN LIVING & LIFE GUIDES (F1.1) ════ -->
+<section id="s-christian-living" class="sec">
+  <div class="sh">
+    <div class="si">📚</div>
+    <div class="st">Christian Living &amp; Life Guides</div>
+    <span class="tip-wrap"><span class="tip-btn">?</span><span class="tip-box tip-right"><span class="tip-title">HOW TO USE</span><br>12 in-depth guides covering prayer, faith, family, mental health, recovery, and more. Tap any card to read the full guide. Use filter tabs to narrow by topic. Print any guide for offline reading.</span></span>
+    <div class="sl"></div>
+  </div>
+
+  <style>
+    /* Kingdom Creatives "Church Resources" template, ported as Christian Living
+       & Life Guides for F1.1. All selectors scoped via #s-christian-living to
+       prevent leak. Global resets and body styles from the original have been
+       stripped. */
+    #s-christian-living .resource-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 60px 30px; text-align: center; color: white;
+      border-radius: 18px; margin-bottom: 0;
+    }
+    #s-christian-living .resource-header h1 {
+      font-size: 2.4em; margin-bottom: 12px; font-weight: 700;
+    }
+    #s-christian-living .resource-header p {
+      font-size: 1.1em; opacity: 0.95; max-width: 700px; margin: 0 auto;
+    }
+    #s-christian-living .filter-tabs {
+      display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+      padding: 24px 16px; background: rgba(255,255,255,.04);
+      border-bottom: 1px solid rgba(124,58,237,.15);
+      border-radius: 0 0 18px 18px; margin-bottom: 24px;
+    }
+    #s-christian-living .filter-tab {
+      padding: 10px 22px; background: rgba(102,126,234,.08);
+      color: #a78bfa; border: 2px solid transparent; border-radius: 25px;
+      cursor: pointer; font-size: .9em; font-weight: 600;
+      transition: all .3s ease; text-transform: uppercase; letter-spacing: .5px;
+    }
+    #s-christian-living .filter-tab:hover,
+    #s-christian-living .filter-tab.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white; transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102,126,234,.3);
+    }
+    #s-christian-living .resource-container { padding: 0 1rem 40px; }
+    #s-christian-living .resource-grid {
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 24px; margin-top: 24px;
+    }
+    @media (max-width: 1000px) {
+      #s-christian-living .resource-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 18px; }
+    }
+    @media (max-width: 650px) {
+      #s-christian-living .resource-grid { grid-template-columns: 1fr; gap: 18px; }
+    }
+    #s-christian-living .resource-card {
+      background: rgba(255,255,255,.03); border-radius: 16px; overflow: hidden;
+      cursor: pointer; position: relative; height: 420px;
+      display: flex; flex-direction: column;
+      border: 1.5px solid rgba(124,58,237,.35);
+      box-shadow: 0 10px 30px rgba(15,23,42,.10), 0 18px 55px rgba(124,58,237,.14);
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    }
+    #s-christian-living .resource-card::before {
+      content: ""; position: absolute; inset: -2px; border-radius: 18px;
+      pointer-events: none; opacity: 0;
+      box-shadow: 0 0 0 2px rgba(124,58,237,.30), 0 0 30px rgba(124,58,237,.22);
+      transition: opacity .25s ease;
+    }
+    #s-christian-living .resource-card:hover {
+      transform: translateY(-8px); border-color: rgba(124,58,237,.65);
+      box-shadow: 0 14px 40px rgba(15,23,42,.14), 0 26px 75px rgba(124,58,237,.22);
+    }
+    #s-christian-living .resource-card:hover::before { opacity: 1; }
+    #s-christian-living .card-header {
+      height: 180px; background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    #s-christian-living .card-header::before {
+      content: ''; position: absolute; width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,.1) 0%, transparent 70%);
+      animation: clgPulse 3s infinite;
+    }
+    @keyframes clgPulse {
+      0%, 100% { opacity: .5; transform: scale(1); }
+      50% { opacity: .8; transform: scale(1.1); }
+    }
+    #s-christian-living .card-icon {
+      font-size: 4.5em; z-index: 1;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,.2));
+    }
+    #s-christian-living .card-body {
+      padding: 22px; flex: 1; display: flex; flex-direction: column;
+    }
+    #s-christian-living .card-category {
+      display: inline-block;
+      background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      color: white; padding: 5px 14px; border-radius: 20px;
+      font-size: .7em; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; margin-bottom: 10px; align-self: flex-start;
+    }
+    #s-christian-living .card-title {
+      font-size: 1.18em; color: var(--tx); font-weight: 700; margin-bottom: 8px;
+    }
+    #s-christian-living .card-description {
+      font-size: .9em; line-height: 1.55; color: var(--tx2); flex: 1;
+      overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+    }
+    #s-christian-living .card-footer {
+      padding: 13px 22px; background: rgba(255,255,255,.02);
+      display: flex; justify-content: space-between; align-items: center;
+      border-top: 1px solid rgba(124,58,237,.12);
+    }
+    #s-christian-living .card-pages { color: var(--tx3); font-size: .8em; }
+    #s-christian-living .read-more-btn {
+      background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      color: white; padding: 7px 18px; border: none; border-radius: 6px;
+      font-size: .85em; font-weight: 700; cursor: pointer; transition: all .3s ease;
+    }
+    #s-christian-living .read-more-btn:hover {
+      transform: scale(1.05); box-shadow: 0 4px 12px rgba(102,126,234,.4);
+    }
+    /* Modals */
+    #s-christian-living .modal-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,.75); z-index: 10000;
+      overflow-y: auto; padding: 40px 20px;
+    }
+    #s-christian-living .modal-overlay.active {
+      display: flex; align-items: flex-start; justify-content: center;
+    }
+    #s-christian-living .modal-content {
+      background: var(--bg2, #fff); color: var(--tx, #333);
+      max-width: 900px; width: 100%; border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.5); position: relative; margin: auto;
+      max-height: 90vh; display: flex; flex-direction: column;
+    }
+    #s-christian-living .modal-header {
+      background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      padding: 36px 40px; text-align: center; border-radius: 16px 16px 0 0;
+      position: relative; flex-shrink: 0;
+    }
+    #s-christian-living .modal-header-icon {
+      font-size: 3.6em; margin-bottom: 12px;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,.2));
+    }
+    #s-christian-living .modal-category {
+      color: rgba(255,255,255,.95); font-size: .85em; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px;
+    }
+    #s-christian-living .modal-title {
+      color: white; font-size: 1.8em; font-weight: 700;
+    }
+    #s-christian-living .close-modal {
+      position: absolute; top: 16px; right: 16px;
+      background: rgba(255,255,255,.2); border: none; color: white;
+      font-size: 1.6em; width: 36px; height: 36px; border-radius: 50%;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all .3s ease; line-height: 1;
+    }
+    #s-christian-living .close-modal:hover {
+      background: rgba(255,255,255,.3); transform: rotate(90deg);
+    }
+    #s-christian-living .modal-body { padding: 36px 40px; overflow-y: auto; flex: 1; }
+    #s-christian-living .content-section { margin-bottom: 30px; }
+    #s-christian-living .content-section h2 { color: #667eea; font-size: 1.8em; margin-bottom: 14px; text-align: center; }
+    #s-christian-living .content-section h3 { color: #667eea; font-size: 1.4em; margin-bottom: 14px; border-bottom: 2px solid rgba(124,58,237,.15); padding-bottom: 8px; }
+    #s-christian-living .content-section h4 { color: #a78bfa; font-size: 1.1em; margin-bottom: 8px; }
+    #s-christian-living .intro-text { font-size: 1.1em; text-align: center; color: var(--tx2); line-height: 1.75; margin-bottom: 18px; }
+    #s-christian-living .scripture-box {
+      background: linear-gradient(135deg,rgba(102,126,234,.06) 0%,rgba(124,58,237,.04) 100%);
+      border-left: 4px solid #667eea; padding: 18px; margin: 16px 0; border-radius: 8px;
+    }
+    #s-christian-living .scripture-icon { font-size: 1.6em; margin-bottom: 8px; }
+    #s-christian-living .scripture-text { font-size: 1.05em; font-style: italic; line-height: 1.7; margin-bottom: 8px; }
+    #s-christian-living .scripture-ref { color: #667eea; font-weight: 600; text-align: right; display: block; }
+    #s-christian-living .modal-actions { display: flex; gap: 14px; padding: 0 40px 36px; flex-shrink: 0; }
+    #s-christian-living .print-btn {
+      flex: 1; background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color: white;
+      padding: 14px 28px; border: none; border-radius: 8px;
+      font-size: 1em; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 10px; transition: all .3s ease;
+    }
+    #s-christian-living .print-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102,126,234,.4); }
+    #s-christian-living .close-btn {
+      flex: 1; background: transparent; color: #667eea;
+      padding: 14px 28px; border: 2px solid #667eea; border-radius: 8px;
+      font-size: 1em; font-weight: 700; cursor: pointer; transition: all .3s ease;
+    }
+    #s-christian-living .close-btn:hover { background: #667eea; color: white; }
+    #s-christian-living .prayer-type, #s-christian-living .biblical-point,
+    #s-christian-living .giving-reason, #s-christian-living .giving-principle,
+    #s-christian-living .obstacle, #s-christian-living .faq-item {
+      margin-bottom: 22px; padding: 18px; background: rgba(255,255,255,.02); border-radius: 10px;
+    }
+    #s-christian-living .acts-method, #s-christian-living .challenge-grid,
+    #s-christian-living .how-to-give, #s-christian-living .debt-strategy { display: grid; gap: 18px; margin-top: 18px; }
+    #s-christian-living .acts-item, #s-christian-living .debt-step,
+    #s-christian-living .step, #s-christian-living .timeline-item {
+      display: flex; align-items: flex-start; gap: 18px; padding: 18px;
+      background: rgba(255,255,255,.02); border-radius: 10px;
+    }
+    #s-christian-living .acts-letter, #s-christian-living .step-number,
+    #s-christian-living .timeline-number {
+      background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color: white;
+      width: 46px; height: 46px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6em; font-weight: bold; flex-shrink: 0;
+    }
+    #s-christian-living .journal-template, #s-christian-living .giving-worksheet {
+      background: rgba(255,255,255,.02); border: 2px solid rgba(102,126,234,.4);
+      border-radius: 10px; padding: 22px; margin: 18px 0;
+    }
+    #s-christian-living .journal-lines p { color: var(--tx3); margin-bottom: 8px; font-family: 'Courier New', monospace; }
+    #s-christian-living .symbol-grid, #s-christian-living .offering-types {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 18px; margin-top: 18px;
+    }
+    #s-christian-living .symbol-item, #s-christian-living .offering-item {
+      background: rgba(255,255,255,.02); padding: 22px; border-radius: 10px; text-align: center;
+    }
+    #s-christian-living .symbol-icon { font-size: 2.6em; margin-bottom: 14px; }
+    #s-christian-living .budget-framework { display: grid; gap: 14px; margin: 18px 0; }
+    #s-christian-living .budget-category { display: flex; align-items: center; gap: 18px; padding: 18px; background: rgba(255,255,255,.02); border-radius: 10px; }
+    #s-christian-living .budget-percent {
+      background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color: white;
+      padding: 14px 18px; border-radius: 10px; font-size: 1.2em; font-weight: bold;
+      min-width: 76px; text-align: center;
+    }
+    #s-christian-living .closing-prayer {
+      background: linear-gradient(135deg,rgba(102,126,234,.08) 0%,rgba(124,58,237,.06) 100%);
+      padding: 28px; border-radius: 10px; text-align: center;
+    }
+    #s-christian-living .prayer-box { background: rgba(255,255,255,.04); padding: 22px; border-radius: 10px; margin-top: 16px; }
+    #s-christian-living .prayer-box p { font-size: 1.05em; line-height: 1.75; }
+    #s-christian-living .key-principle {
+      background: linear-gradient(135deg,rgba(255,180,0,.10) 0%,rgba(255,140,0,.08) 100%);
+      border-left: 4px solid #f59e0b; padding: 18px; margin: 18px 0;
+      border-radius: 8px; font-weight: 600; line-height: 1.65;
+    }
+    #s-christian-living .action-steps { display: grid; gap: 14px; margin-top: 18px; }
+    #s-christian-living .modal-body::-webkit-scrollbar { width: 8px; }
+    #s-christian-living .modal-body::-webkit-scrollbar-track { background: rgba(0,0,0,.06); border-radius: 10px; }
+    #s-christian-living .modal-body::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); border-radius: 10px;
+    }
+    @media (max-width: 768px) {
+      #s-christian-living .resource-header h1 { font-size: 1.8em; }
+      #s-christian-living .filter-tabs { padding: 16px 8px; }
+      #s-christian-living .filter-tab { padding: 7px 14px; font-size: .8em; }
+      #s-christian-living .modal-body { padding: 22px; }
+      #s-christian-living .modal-actions { flex-direction: column; padding: 0 22px 22px; }
+      #s-christian-living .symbol-grid, #s-christian-living .offering-types { grid-template-columns: 1fr; }
+      #s-christian-living .budget-category { flex-direction: column; text-align: center; }
+      #s-christian-living .acts-item, #s-christian-living .debt-step, #s-christian-living .timeline-item { flex-direction: column; align-items: center; text-align: center; }
+    }
+    @media print {
+      body * { visibility: hidden; }
+      #s-christian-living .modal-overlay.active, #s-christian-living .modal-overlay.active * { visibility: visible; }
+      #s-christian-living .modal-overlay.active { position: absolute; left: 0; top: 0; width: 100%; background: white !important; }
+      #s-christian-living .modal-actions, #s-christian-living .close-modal { display: none !important; }
+    }
+  </style>
+
+  <!-- Header banner -->
+  <div class="resource-header">
+    <h1>📚 Christian Living &amp; Life Guides</h1>
+    <p>In-depth guides on faith, family, mental health, and life — biblical wisdom for everyday challenges.</p>
+  </div>
+
+  <!-- Filter tabs -->
+  <div class="filter-tabs">
+    <div class="filter-tab active" data-category="all">All Guides</div>
+    <div class="filter-tab" data-category="family">Family &amp; Relationships</div>
+    <div class="filter-tab" data-category="spiritual">Spiritual Growth</div>
+    <div class="filter-tab" data-category="crisis">Crisis Support</div>
+    <div class="filter-tab" data-category="ministry">Ministry Tools</div>
+    <div class="filter-tab" data-category="life">Life Challenges</div>
+  </div>
+
+  <!-- 12 cards -->
+  <div class="resource-container">
+    <div class="resource-grid">
+      <div class="resource-card" data-category="spiritual" onclick="faithResOpenModal('prayer')">
+        <div class="card-header"><div class="card-icon">🙏</div></div>
+        <div class="card-body">
+          <span class="card-category">Spiritual Growth</span>
+          <div class="card-title">Prayer Guide for Beginners</div>
+          <div class="card-description">Develop a meaningful prayer life with practical templates, the A.C.T.S. method, and a 30-day challenge.</div>
+        </div>
+        <div class="card-footer"><span class="card-pages">12 pages</span><button class="read-more-btn">View Details</button></div>
+      </div>
+
+      <div class="resource-card" data-category="spiritual" onclick="faithResOpenModal('baptism')">
+        <div class="card-header"><div class="card-icon">💧</div></div>
+        <div class="card-body">
+          <span class="card-category">Spiritual Growth</span>
+          <div class="card-title">Understanding Baptism</div>
+          <div class="card-description">Comprehensive guide to baptism preparation with biblical foundation, what it symbolizes, and a testimony template.</div>
+        </div>
+        <div class="card-footer"><span class="card-pages">8 pages</span><button class="read-more-btn">View Details</button></div>
+      </div>
+
+      <div class="resource-card" data-category="spiritual" onclick="faithResOpenModal('giving')">
+        <div class="card-header"><div class="card-icon">💰</div></div>
+        <div class="card-body">
+          <span class="card-category">Spiritual Growth</span>
+          <div class="card-title">Biblical Giving &amp; Stewardship</div>
+          <div class="card-description">Why giving matters, tithing principles, budgeting framework, and a debt reduction strategy.</div>
+        </div>
+        <div class="card-footer"><span class="card-pages">11 pages</span><button class="read-more-btn">View Details</button></div>
+      </div>
+
+      <div class="resource-card" data-category="family" onclick="faithResOpenModal('marriage')">
+        <div class="card-header"><div class="card-icon">💑</div></div>
+        <div class="card-body">
+          <span class="card-category">Family &amp; Relationships</span>
+          <div class="card-title">Marriage Enrichment Guide</div>
+          <div class="card-description">Strengthen your marriage with the five love languages, communication essentials, and conflict resolution.</div>
+        </div>
+        <div class="card-footer"><span class="card-pages">16 pages</span><button class="read-more-btn">View Details</button></div>
+      </div>
+
+      <div class="resource-card" data-category="crisis" onclick="faithResOpenModal('suicide')">
+        <div class="card-header"><div class="card-icon">💚</div></div>
+        <div class="card-body">
+          <span class="card-category">Crisis Support</span>
+          <div class="card-title">Suicide Prevention &amp; Hope</div>
+          <div class="card-description">Crisis resources, safety planning, scripture for darkness, and how to help someone struggling.</div>
+        </div>
+        <div class="card-footer"><span class="card-pages">10 pages</span><button class="read-more-btn">View Details</button></div>
+      </div>
+
+      <div class="resource-card" data-category="life" onclick="faithResOpenModal('mental')">
+        <div class="card-header"><div class="card-icon">🧠</div></div>
+        <div class="card-body">
+          <span class="card-category">Life Challenges</span>
+          <div class="card-title">Mental Health &amp; Faith</div>
+          <div class="card-description">Common mental health challenges through a Christian lens, when to seek help, and the truth about medication.</div>
+        </div>
+        <div class="card-footer"><span class="card-pages">14 pages</span><button class="read-more-btn">View Details</button></div>
+      </div>
+
+      <div class="resource-card" data-category="ministry" onclick="faithResOpenModal('children')">
+        <div class="card-header"><div class="card-icon">🎨</div></div>
+        <div class="card-body">
+          <span class="card-category">Ministry Tools</span>
+          <div class="card-title">Children's Ministry Activities</div>
+          <div class="card-description">Ready-to-use Bible lessons, games, and crafts for children ages 3-12 with safety reminders.</div>
+        </div>
+        <div class="card-footer"><span class="card-pages">24 pages</span><button class="read-more-btn">View Details</button></div>
+      </div>
+
+      <div class="resource-card" data-category="family" onclick="faithResOpenModal('parenting')">
+        <div class="card-header"><div class="card-icon">👨‍👩‍👧‍👦</div></div>
+        <div class="card-body">
+          <span class="card-category">Family &amp; Relationships</span>
+          <div class="card-title">Parenting with Faith</div>
+          <div class="card-description">Raising children with biblical values through every developmental stage, from infants to teens.</div>
+        </div>
+        <div class="card-footer"><span class="card-pages">18 pages</span><button class="read-more-btn">View Details</button></div>
+      </div>
+
+      <div class="resource-card" data-category="crisis" onclick="faithResOpenModal('grief')">
+        <div class="card-header"><div class="card-icon">🕊️</div></div>
+        <div class="card-body">
+          <span class="card-category">Crisis Support</span>
+          <div class="card-title">Grief &amp; Loss Support</div>
+          <div class="card-description">Walking through grief with biblical comfort, coping strategies, and what to say (or not say) to someone grieving.</div>
+        </div>
+        <div class="card-footer"><span class="card-pages">13 pages</span><button class="read-more-btn">View Details</button></div>
+      </div>
+
+      <div class="resource-card" data-category="ministry" onclick="faithResOpenModal('smallgroups')">
+        <div class="card-header"><div class="card-icon">👥</div></div>
+        <div class="card-body">
+          <span class="card-category">Ministry Tools</span>
+          <div class="card-title">Small Group Leader Guide</div>
+          <div class="card-description">Tools for leading effective small groups: discussion questions, conflict resolution, and multiplication.</div>
+        </div>
+        <div class="card-footer"><span class="card-pages">20 pages</span><button class="read-more-btn">View Details</button></div>
+      </div>
+
+      <div class="resource-card" data-category="life" onclick="faithResOpenModal('addiction')">
+        <div class="card-header"><div class="card-icon">⛓️</div></div>
+        <div class="card-body">
+          <span class="card-category">Life Challenges</span>
+          <div class="card-title">Addiction Recovery Resources</div>
+          <div class="card-description">Faith-based recovery framework, accountability partner guidelines, and resources for loved ones.</div>
+        </div>
+        <div class="card-footer"><span class="card-pages">15 pages</span><button class="read-more-btn">View Details</button></div>
+      </div>
+
+      <div class="resource-card" data-category="spiritual" onclick="faithResOpenModal('biblestudy')">
+        <div class="card-header"><div class="card-icon">📖</div></div>
+        <div class="card-body">
+          <span class="card-category">Spiritual Growth</span>
+          <div class="card-title">How to Study the Bible</div>
+          <div class="card-description">The O.I.A. method, study tools, reading plans, and a sample study walkthrough.</div>
+        </div>
+        <div class="card-footer"><span class="card-pages">16 pages</span><button class="read-more-btn">View Details</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 12 modal payloads. Long-form content carried over from KC source. -->
+  <div class="modal-overlay" id="modal-prayer">
+    <div class="modal-content">
+      <div class="modal-header"><button class="close-modal" onclick="faithResCloseModal('prayer')">×</button><div class="modal-header-icon">🙏</div><div class="modal-category">Spiritual Growth</div><div class="modal-title">Prayer Guide for Beginners</div></div>
+      <div class="modal-body">
+        <div class="content-section"><p class="intro-text">Prayer is simply talking with God. It's not about fancy words or perfect grammar — it's about honest communication with your Heavenly Father who loves you deeply.</p></div>
+        <div class="content-section"><h3>What is Prayer?</h3><p>Prayer is a conversation with God. Just as you talk with friends and family, God desires to hear from you. Prayer isn't reserved for spiritual giants or perfect people — it's for everyone who wants to know God better.</p><div class="scripture-box"><p class="scripture-icon">📖</p><p class="scripture-text">"Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God."</p><p class="scripture-ref">— Philippians 4:6</p></div></div>
+        <div class="content-section"><h3>Types of Prayer</h3>
+          <div class="prayer-type"><h4>1. Adoration (Worship)</h4><p>Praising God for who He is — His character, nature, and attributes.</p><p><strong>Example:</strong> "God, You are mighty and powerful. You are loving and kind. You created the universe and yet You care about me personally."</p></div>
+          <div class="prayer-type"><h4>2. Confession</h4><p>Admitting our sins and shortcomings to God, knowing He forgives us.</p><div class="scripture-box"><p class="scripture-text">"If we confess our sins, he is faithful and just and will forgive us our sins and purify us from all unrighteousness."</p><p class="scripture-ref">— 1 John 1:9</p></div></div>
+          <div class="prayer-type"><h4>3. Thanksgiving</h4><p>Expressing gratitude for what God has done and provided.</p><div class="scripture-box"><p class="scripture-text">"Give thanks in all circumstances; for this is God's will for you in Christ Jesus."</p><p class="scripture-ref">— 1 Thessalonians 5:18</p></div></div>
+          <div class="prayer-type"><h4>4. Supplication (Requests)</h4><p>Asking God for what you need — for yourself and others.</p></div>
+        </div>
+        <div class="content-section"><h3>The A.C.T.S. Prayer Method</h3>
+          <div class="acts-method">
+            <div class="acts-item"><div class="acts-letter">A</div><div><h4>Adoration</h4><p>Begin by praising God for who He is</p></div></div>
+            <div class="acts-item"><div class="acts-letter">C</div><div><h4>Confession</h4><p>Admit your sins and ask for forgiveness</p></div></div>
+            <div class="acts-item"><div class="acts-letter">T</div><div><h4>Thanksgiving</h4><p>Thank God for His blessings and provision</p></div></div>
+            <div class="acts-item"><div class="acts-letter">S</div><div><h4>Supplication</h4><p>Present your requests and pray for others</p></div></div>
+          </div>
+        </div>
+        <div class="content-section"><h3>30-Day Prayer Challenge</h3>
+          <div class="challenge-grid">
+            <div class="prayer-type"><h4>Week 1: Foundation</h4><p><strong>Day 1-2:</strong> Pray for 5 minutes using A.C.T.S. method</p><p><strong>Day 3-4:</strong> Write out your prayers in a journal</p><p><strong>Day 5-7:</strong> Pray Scripture back to God (use Psalms)</p></div>
+            <div class="prayer-type"><h4>Week 2: Gratitude</h4><p><strong>Day 8-10:</strong> List 10 things you're thankful for each day</p><p><strong>Day 11-13:</strong> Thank God for difficult circumstances</p><p><strong>Day 14:</strong> Write a prayer of thanksgiving for your life story</p></div>
+            <div class="prayer-type"><h4>Week 3: Intercession</h4><p><strong>Day 15-17:</strong> Pray for family members by name</p><p><strong>Day 18-20:</strong> Pray for friends and neighbors</p><p><strong>Day 21:</strong> Pray for your church leaders and government</p></div>
+            <div class="prayer-type"><h4>Week 4: Listening</h4><p><strong>Day 22-24:</strong> Spend 10 minutes in silent prayer, just listening</p><p><strong>Day 25-27:</strong> Ask God a question and wait for His answer</p><p><strong>Day 28-30:</strong> Pray through a psalm slowly, meditating on each verse</p></div>
+          </div>
+        </div>
+        <div class="content-section"><h3>Your Next Steps</h3>
+          <div class="action-steps">
+            <div class="step"><div class="step-number">1</div><p>Choose a consistent time and place for daily prayer — even just 5 minutes</p></div>
+            <div class="step"><div class="step-number">2</div><p>Start the 30-Day Prayer Challenge today</p></div>
+            <div class="step"><div class="step-number">3</div><p>Begin a prayer journal</p></div>
+            <div class="step"><div class="step-number">4</div><p>Memorize one verse about prayer this week</p></div>
+          </div>
+        </div>
+        <div class="content-section closing-prayer"><h3>A Prayer to Begin</h3><div class="prayer-box"><p><em>"Heavenly Father, thank You for the gift of prayer. Thank You that I can come to You anytime, anywhere, about anything. Teach me to pray. Help me develop a consistent prayer life. I want to know You better and experience Your presence daily. In Jesus' name, Amen."</em></p></div></div>
+      </div>
+      <div class="modal-actions"><button class="print-btn" onclick="faithResPrintResource('prayer')">🖨 Print Resource</button><button class="close-btn" onclick="faithResCloseModal('prayer')">Close</button></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-baptism">
+    <div class="modal-content">
+      <div class="modal-header"><button class="close-modal" onclick="faithResCloseModal('baptism')">×</button><div class="modal-header-icon">💧</div><div class="modal-category">Spiritual Growth</div><div class="modal-title">Understanding Baptism</div></div>
+      <div class="modal-body">
+        <div class="content-section"><p class="intro-text">Baptism is a beautiful outward expression of an inward faith — a public declaration that you have chosen to follow Jesus Christ.</p></div>
+        <div class="content-section"><h3>What is Baptism?</h3><p>Baptism is an act of obedience to Jesus Christ where a believer is immersed in water as a symbol of their death to sin and resurrection to new life in Christ. It's not what saves you — faith in Jesus saves you. Baptism is your public testimony of what God has already done in your heart.</p><div class="scripture-box"><p class="scripture-text">"Therefore go and make disciples of all nations, baptizing them in the name of the Father and of the Son and of the Holy Spirit."</p><p class="scripture-ref">— Matthew 28:19</p></div></div>
+        <div class="content-section"><h3>What Baptism Symbolizes</h3>
+          <div class="symbol-grid">
+            <div class="symbol-item"><div class="symbol-icon">⚰️</div><h4>Death to Sin</h4><p>Going under the water represents being buried with Christ — your old life of sin is dead.</p></div>
+            <div class="symbol-item"><div class="symbol-icon">🌅</div><h4>Resurrection to New Life</h4><p>Coming up out of the water represents being raised to new life in Christ.</p></div>
+            <div class="symbol-item"><div class="symbol-icon">🧼</div><h4>Cleansing from Sin</h4><p>Water symbolizes the washing away of sin through Christ's blood.</p></div>
+            <div class="symbol-item"><div class="symbol-icon">👥</div><h4>Union with Christ</h4><p>Baptism declares you are united with Jesus in His death and resurrection.</p></div>
+          </div>
+        </div>
+        <div class="content-section"><h3>Preparing Your Testimony</h3><p>Most baptism services include sharing a brief testimony. A simple framework:</p>
+          <div class="journal-template">
+            <h4>1. My Life Before Christ</h4><p style="font-style:italic;color:var(--tx2);">Briefly describe what your life was like before you knew Jesus (1-2 minutes)</p>
+            <h4 style="margin-top:20px;">2. How I Came to Know Christ</h4><p style="font-style:italic;color:var(--tx2);">Share the moment or process of accepting Jesus (1-2 minutes)</p>
+            <h4 style="margin-top:20px;">3. My Life Since Following Jesus</h4><p style="font-style:italic;color:var(--tx2);">Describe how Jesus has changed your life (1-2 minutes)</p>
+          </div>
+        </div>
+        <div class="content-section"><h3>Frequently Asked Questions</h3>
+          <div class="faq-item"><h4>Q: Does baptism save me?</h4><p><strong>A:</strong> No. Baptism doesn't save you — faith in Jesus Christ saves you. Baptism is an outward sign of the inward faith you already have.</p></div>
+          <div class="faq-item"><h4>Q: Should I be baptized again if I was baptized as an infant?</h4><p><strong>A:</strong> Many Christians believe biblical baptism should follow a personal decision to trust Christ. If you were baptized as an infant, we encourage you to be baptized now as a believer.</p></div>
+          <div class="faq-item"><h4>Q: How soon after accepting Christ should I be baptized?</h4><p><strong>A:</strong> In the Bible, people were often baptized immediately after believing. There's no required waiting period.</p></div>
+        </div>
+        <div class="content-section closing-prayer"><h3>A Prayer of Commitment</h3><div class="prayer-box"><p><em>"Father God, thank You for saving me through Jesus Christ. I understand that baptism is a step of obedience and a public declaration of my faith. Give me courage to follow through on this commitment. May my baptism bring glory to You and point others to Jesus. In Jesus' name, Amen."</em></p></div></div>
+      </div>
+      <div class="modal-actions"><button class="print-btn" onclick="faithResPrintResource('baptism')">🖨 Print Resource</button><button class="close-btn" onclick="faithResCloseModal('baptism')">Close</button></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-giving">
+    <div class="modal-content">
+      <div class="modal-header"><button class="close-modal" onclick="faithResCloseModal('giving')">×</button><div class="modal-header-icon">💰</div><div class="modal-category">Spiritual Growth</div><div class="modal-title">Biblical Giving &amp; Stewardship</div></div>
+      <div class="modal-body">
+        <div class="content-section"><p class="intro-text">God owns everything. We are simply managers of the resources He's entrusted to us. Understanding biblical stewardship transforms how we view money, possessions, and generosity.</p></div>
+        <div class="content-section"><h3>The Foundation: It All Belongs to God</h3><div class="scripture-box"><p class="scripture-text">"The earth is the LORD's, and everything in it, the world, and all who live in it."</p><p class="scripture-ref">— Psalm 24:1</p></div><p class="key-principle">Key Principle: We don't "give God" a portion of our money. We manage all of God's money, and He allows us to keep most of it for our needs and wants.</p></div>
+        <div class="content-section"><h3>Tithing: The Biblical Standard</h3><p>A tithe means "tenth" — giving 10% of your income to God through your local church.</p><div class="scripture-box"><p class="scripture-text">"Bring the whole tithe into the storehouse, that there may be food in my house. Test me in this," says the LORD Almighty, "and see if I will not throw open the floodgates of heaven and pour out so much blessing."</p><p class="scripture-ref">— Malachi 3:10</p></div></div>
+        <div class="content-section"><h3>Budgeting Basics</h3>
+          <div class="budget-framework">
+            <div class="budget-category"><div class="budget-percent">10%</div><div><h4>Giving</h4><p>Tithe and offerings to your church</p></div></div>
+            <div class="budget-category"><div class="budget-percent">10%</div><div><h4>Saving</h4><p>Emergency fund, retirement, future goals</p></div></div>
+            <div class="budget-category"><div class="budget-percent">25-35%</div><div><h4>Housing</h4><p>Mortgage/rent, utilities, maintenance</p></div></div>
+            <div class="budget-category"><div class="budget-percent">10-15%</div><div><h4>Transportation</h4><p>Car payment, insurance, gas</p></div></div>
+          </div>
+        </div>
+        <div class="content-section"><h3>Debt Reduction Strategy</h3>
+          <div class="acts-method">
+            <div class="debt-step"><div class="step-number">1</div><div><h4>Stop Accumulating Debt</h4><p>Cut up credit cards if needed. Create a cash-based spending plan.</p></div></div>
+            <div class="debt-step"><div class="step-number">2</div><div><h4>Build Emergency Fund</h4><p>Save $1,000 quickly to avoid more debt when emergencies arise.</p></div></div>
+            <div class="debt-step"><div class="step-number">3</div><div><h4>Attack Smallest Debt First</h4><p>Pay minimum on all debts except the smallest. Put every extra dollar toward it.</p></div></div>
+          </div>
+        </div>
+        <div class="content-section closing-prayer"><h3>A Prayer of Commitment</h3><div class="prayer-box"><p><em>"Heavenly Father, everything I have comes from You. Help me to be a faithful steward of all You've entrusted to me. Give me a generous heart and the courage to trust You with my finances. I commit to honoring You with the firstfruits of my income. In Jesus' name, Amen."</em></p></div></div>
+      </div>
+      <div class="modal-actions"><button class="print-btn" onclick="faithResPrintResource('giving')">🖨 Print Resource</button><button class="close-btn" onclick="faithResCloseModal('giving')">Close</button></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-marriage">
+    <div class="modal-content">
+      <div class="modal-header"><button class="close-modal" onclick="faithResCloseModal('marriage')">×</button><div class="modal-header-icon">💑</div><div class="modal-category">Family &amp; Relationships</div><div class="modal-title">Marriage Enrichment Guide</div></div>
+      <div class="modal-body">
+        <div class="content-section"><p class="intro-text">Marriage is a sacred covenant designed by God to reflect Christ's love for the Church. This guide provides biblical principles and practical tools to strengthen your marriage at any stage.</p></div>
+        <div class="content-section"><h3>God's Design for Marriage</h3><div class="scripture-box"><p class="scripture-text">"Therefore a man shall leave his father and mother and be joined to his wife, and they shall become one flesh."</p><p class="scripture-ref">— Genesis 2:24</p></div><div class="scripture-box"><p class="scripture-text">"Husbands, love your wives, just as Christ loved the church and gave himself up for her."</p><p class="scripture-ref">— Ephesians 5:25</p></div><p class="key-principle">Biblical submission is mutual (Ephesians 5:21) and means putting your spouse's needs above your own — just as Christ does for us. This applies to both husband and wife.</p></div>
+        <div class="content-section"><h3>The Five Love Languages</h3>
+          <div class="symbol-grid">
+            <div class="symbol-item"><div class="symbol-icon">💬</div><h4>Words of Affirmation</h4><p>Verbal compliments, "I love you," encouragement, appreciation</p></div>
+            <div class="symbol-item"><div class="symbol-icon">🎁</div><h4>Gifts</h4><p>Thoughtful presents, symbols of love, visual reminders of affection</p></div>
+            <div class="symbol-item"><div class="symbol-icon">⏰</div><h4>Quality Time</h4><p>Undivided attention, meaningful conversation, shared activities</p></div>
+            <div class="symbol-item"><div class="symbol-icon">🤝</div><h4>Acts of Service</h4><p>Doing things to help, chores, practical assistance, lightening their load</p></div>
+            <div class="symbol-item"><div class="symbol-icon">🫂</div><h4>Physical Touch</h4><p>Hugs, kisses, holding hands, appropriate physical affection</p></div>
+          </div>
+        </div>
+        <div class="content-section"><h3>Communication Essentials</h3>
+          <div class="giving-reason"><h4>1. Listen to Understand, Not to Respond</h4><p>Give your full attention. Put away phones. Make eye contact. Try to truly hear what your spouse is saying — not just prepare your rebuttal.</p></div>
+          <div class="giving-reason"><h4>2. Use "I" Statements, Not "You" Accusations</h4><p><strong>Instead of:</strong> "You never help around the house!" <strong>Try:</strong> "I feel overwhelmed with housework and would appreciate your help."</p></div>
+          <div class="giving-reason"><h4>3. Take Breaks During Heated Discussions</h4><p>If emotions are running high, it's okay to pause. Say: "I need 20 minutes to calm down, then let's talk." Always come back to finish the conversation.</p></div>
+          <div class="giving-reason"><h4>4. Avoid the "Four Horsemen"</h4><p>Research shows these destroy marriages: <strong>Criticism</strong> (attacking character), <strong>Contempt</strong> (sarcasm, mockery), <strong>Defensiveness</strong> (excuses), <strong>Stonewalling</strong> (silent treatment).</p></div>
+        </div>
+        <div class="content-section"><h3>Conflict Resolution Framework</h3>
+          <div class="acts-method">
+            <div class="timeline-item"><div class="timeline-number">1</div><div><h4>Choose the Right Time &amp; Place</h4><p>Don't ambush your spouse when they're tired, hungry, or stressed.</p></div></div>
+            <div class="timeline-item"><div class="timeline-number">2</div><div><h4>Define the Issue Clearly</h4><p>Stick to one issue at a time. Don't bring up past grievances.</p></div></div>
+            <div class="timeline-item"><div class="timeline-number">3</div><div><h4>Listen to Understand Their Perspective</h4><p>Repeat back what you heard. Validate their feelings even if you disagree.</p></div></div>
+            <div class="timeline-item"><div class="timeline-number">4</div><div><h4>Find Common Ground</h4><p>Look for win-win solutions where both spouses' needs are met.</p></div></div>
+            <div class="timeline-item"><div class="timeline-number">5</div><div><h4>Agree on a Solution &amp; Follow Through</h4><p>Be specific about what each person will do differently.</p></div></div>
+          </div>
+        </div>
+        <div class="content-section closing-prayer"><h3>A Prayer for Your Marriage</h3><div class="prayer-box"><p><em>"Heavenly Father, thank You for the gift of marriage. We ask You to strengthen our union and help us love each other as You love us. Teach us to communicate with grace, resolve conflict with humility, and serve each other sacrificially. Protect our marriage from anything that would divide us. Help us to keep You at the center of our relationship. In Jesus' name, Amen."</em></p></div></div>
+      </div>
+      <div class="modal-actions"><button class="print-btn" onclick="faithResPrintResource('marriage')">🖨 Print Resource</button><button class="close-btn" onclick="faithResCloseModal('marriage')">Close</button></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-suicide">
+    <div class="modal-content">
+      <div class="modal-header"><button class="close-modal" onclick="faithResCloseModal('suicide')">×</button><div class="modal-header-icon">💚</div><div class="modal-category">Crisis Support</div><div class="modal-title">Suicide Prevention &amp; Hope</div></div>
+      <div class="modal-body">
+        <div class="content-section"><p class="intro-text">If you're experiencing suicidal thoughts, please know: You are not alone. Your life has immense value. There is hope, and there is help available right now.</p></div>
+        <div class="content-section" style="background:rgba(255,193,7,.12);border-left:5px solid #ffc107;padding:24px;border-radius:10px;"><h3 style="color:#f59e0b;">⚠️ IMMEDIATE HELP</h3><p style="font-size:1.1em;font-weight:600;margin-bottom:14px;">If you are in immediate danger or having thoughts of harming yourself:</p><div style="background:rgba(255,255,255,.04);padding:18px;border-radius:8px;margin:14px 0;"><h4 style="color:#dc3545;">📞 Crisis Hotlines (24/7)</h4><p style="font-size:1.2em;font-weight:700;color:#dc3545;margin:8px 0;">988 — Suicide &amp; Crisis Lifeline</p><p>Call or text 988 for immediate support</p><p>Crisis Text Line: Text HOME to 741741</p></div><div style="background:rgba(255,255,255,.04);padding:18px;border-radius:8px;margin:14px 0;"><h4 style="color:#dc3545;">🚑 Emergency Services</h4><p style="font-size:1.1em;font-weight:700;color:#dc3545;">Call 911 or go to your nearest emergency room</p></div></div>
+        <div class="content-section"><h3>You Are Not Alone</h3><p>Suicidal thoughts are more common than you might think. You are not weak. You are not crazy. You are human, and you are hurting. Many people who have felt exactly like you do now have found hope and healing.</p><div class="scripture-box"><p class="scripture-text">"The LORD is close to the brokenhearted and saves those who are crushed in spirit."</p><p class="scripture-ref">— Psalm 34:18</p></div></div>
+        <div class="content-section"><h3>God's Heart for You</h3><div class="scripture-box"><p class="scripture-text">"For I know the plans I have for you," declares the LORD, "plans to prosper you and not to harm you, plans to give you hope and a future."</p><p class="scripture-ref">— Jeremiah 29:11</p></div><div class="scripture-box"><p class="scripture-text">"Even though I walk through the darkest valley, I will fear no evil, for you are with me."</p><p class="scripture-ref">— Psalm 23:4</p></div></div>
+        <div class="content-section"><h3>Safety Planning</h3>
+          <div class="journal-template">
+            <h4>My Safety Plan</h4>
+            <p style="margin:14px 0;"><strong>Warning signs that I'm entering crisis:</strong></p><div class="journal-lines"><p>1. _____________________________</p><p>2. _____________________________</p></div>
+            <p style="margin:14px 0;"><strong>Things I can do to distract myself:</strong></p><div class="journal-lines"><p>1. _____________________________</p><p>2. _____________________________</p></div>
+            <p style="margin:14px 0;"><strong>People I can reach out to:</strong></p><div class="journal-lines"><p>1. Name: __________ Phone: ______</p><p>2. Name: __________ Phone: ______</p></div>
+            <p style="margin:14px 0;"><strong>Reasons I want to stay alive:</strong></p><div class="journal-lines"><p>1. _____________________________</p><p>2. _____________________________</p></div>
+          </div>
+        </div>
+        <div class="content-section"><h3>How to Help Someone in Crisis</h3>
+          <div class="acts-method">
+            <div class="timeline-item"><div class="timeline-number">1</div><div><h4>Take It Seriously</h4><p>Don't dismiss their feelings. Believe them.</p></div></div>
+            <div class="timeline-item"><div class="timeline-number">2</div><div><h4>Ask Directly</h4><p>It's okay to ask: "Are you thinking about suicide?" Asking won't put the idea in their head.</p></div></div>
+            <div class="timeline-item"><div class="timeline-number">3</div><div><h4>Listen Without Judgment</h4><p>Just listen. Show empathy: "That sounds incredibly painful. I'm here for you."</p></div></div>
+            <div class="timeline-item"><div class="timeline-number">4</div><div><h4>Don't Leave Them Alone</h4><p>If they are in immediate danger, stay with them. Call 911 or crisis services.</p></div></div>
+            <div class="timeline-item"><div class="timeline-number">5</div><div><h4>Get Professional Help</h4><p>Encourage them to call a crisis line or see a mental health professional.</p></div></div>
+          </div>
+        </div>
+        <div class="content-section closing-prayer"><h3>A Prayer for Hope</h3><div class="prayer-box"><p><em>"God, I'm hurting so badly right now. I feel hopeless and alone. But I'm choosing to believe that You are still here with me, even when I can't feel You. Please give me strength to get through this moment. Send people to help me. Show me that my life matters. Give me hope to hold on. In Jesus' name, Amen."</em></p></div></div>
+        <div class="content-section" style="background:rgba(40,167,69,.12);border-left:5px solid #28a745;padding:24px;border-radius:10px;"><h3 style="color:#22c55e;">💚 Remember</h3><p style="font-size:1.1em;font-weight:600;">Your life is precious. You are loved. There is hope. Please stay.</p></div>
+      </div>
+      <div class="modal-actions"><button class="print-btn" onclick="faithResPrintResource('suicide')">🖨 Print Resource</button><button class="close-btn" onclick="faithResCloseModal('suicide')">Close</button></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-mental">
+    <div class="modal-content">
+      <div class="modal-header"><button class="close-modal" onclick="faithResCloseModal('mental')">×</button><div class="modal-header-icon">🧠</div><div class="modal-category">Life Challenges</div><div class="modal-title">Mental Health &amp; Faith</div></div>
+      <div class="modal-body">
+        <div class="content-section"><p class="intro-text">Mental health challenges are real, common, and treatable. Having faith doesn't exempt you from mental illness, and struggling with mental health doesn't mean you lack faith. God cares about your whole person — body, mind, and spirit.</p></div>
+        <div class="content-section"><h3>The Truth About Mental Health</h3><p>Mental illness is not a spiritual failure. It's a medical condition that affects millions of believers. Just as diabetes requires insulin and broken bones require casts, mental health conditions often require professional treatment.</p><p class="key-principle">Mental health IS health. Taking care of your mental well-being is part of stewarding the body and mind God gave you.</p></div>
+        <div class="content-section"><h3>Common Mental Health Challenges</h3>
+          <div class="symbol-grid">
+            <div class="symbol-item"><div class="symbol-icon">😰</div><h4>Anxiety</h4><p>Excessive worry, panic attacks, racing thoughts, physical symptoms</p></div>
+            <div class="symbol-item"><div class="symbol-icon">😔</div><h4>Depression</h4><p>Persistent sadness, loss of interest, fatigue, changes in sleep/appetite</p></div>
+            <div class="symbol-item"><div class="symbol-icon">😵</div><h4>Trauma/PTSD</h4><p>Flashbacks, nightmares, hypervigilance, emotional numbness</p></div>
+            <div class="symbol-item"><div class="symbol-icon">🔄</div><h4>OCD</h4><p>Intrusive thoughts, compulsive behaviors, excessive need for order</p></div>
+            <div class="symbol-item"><div class="symbol-icon">😭</div><h4>Bipolar Disorder</h4><p>Extreme mood swings between depression and mania</p></div>
+            <div class="symbol-item"><div class="symbol-icon">😩</div><h4>Burnout</h4><p>Emotional exhaustion, cynicism, reduced effectiveness from chronic stress</p></div>
+          </div>
+        </div>
+        <div class="content-section"><h3>Biblical Examples of Mental Struggle</h3>
+          <div class="giving-reason"><h4>David — Depression &amp; Anxiety</h4><div class="scripture-box"><p class="scripture-text">"How long must I wrestle with my thoughts and day after day have sorrow in my heart?"</p><p class="scripture-ref">— Psalm 13:2</p></div></div>
+          <div class="giving-reason"><h4>Elijah — Burnout &amp; Suicidal Thoughts</h4><p>After a spiritual victory, Elijah became so depressed he wanted to die. God's response? Rest, food, and care for his physical needs before addressing the spiritual.</p></div>
+        </div>
+        <div class="content-section"><h3>The Truth About Medication</h3>
+          <div class="giving-reason"><h4>Myth: "Medication means you don't trust God."</h4><p><strong>Truth:</strong> Do you refuse insulin for diabetes because you trust God? Mental illness is a medical condition. Medication corrects chemical imbalances in the brain.</p></div>
+          <div class="giving-reason"><h4>Myth: "Medication will change who I am."</h4><p><strong>Truth:</strong> Proper medication helps you become MORE yourself by reducing symptoms that cloud your true personality.</p></div>
+        </div>
+        <div class="content-section"><h3>Self-Care for Mental Wellness</h3>
+          <div class="budget-framework">
+            <div class="budget-category"><div class="symbol-icon">😴</div><div><h4>Sleep</h4><p>Aim for 7-9 hours. Keep a consistent sleep schedule.</p></div></div>
+            <div class="budget-category"><div class="symbol-icon">🏃‍♀️</div><div><h4>Exercise</h4><p>Even 20 minutes of walking releases mood-boosting endorphins.</p></div></div>
+            <div class="budget-category"><div class="symbol-icon">🥗</div><div><h4>Nutrition</h4><p>Eat regular, balanced meals. Limit caffeine and alcohol.</p></div></div>
+            <div class="budget-category"><div class="symbol-icon">👥</div><div><h4>Connection</h4><p>Isolation worsens mental health. Stay connected to supportive people.</p></div></div>
+          </div>
+        </div>
+        <div class="content-section closing-prayer"><h3>A Prayer for Mental Wellness</h3><div class="prayer-box"><p><em>"Lord, You know the battle happening in my mind. Give me courage to seek treatment. Guide me to the right professionals. Help me be patient with the healing process. Bring me comfort, clarity, and peace. In Jesus' name, Amen."</em></p></div></div>
+      </div>
+      <div class="modal-actions"><button class="print-btn" onclick="faithResPrintResource('mental')">🖨 Print Resource</button><button class="close-btn" onclick="faithResCloseModal('mental')">Close</button></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-children">
+    <div class="modal-content">
+      <div class="modal-header"><button class="close-modal" onclick="faithResCloseModal('children')">×</button><div class="modal-header-icon">🎨</div><div class="modal-category">Ministry Tools</div><div class="modal-title">Children's Ministry Activities</div></div>
+      <div class="modal-body">
+        <div class="content-section"><p class="intro-text">Engaging, age-appropriate activities that teach children about God's love in fun and memorable ways. Perfect for Sunday School, VBS, or children's church.</p></div>
+        <div class="content-section"><h3>Age Group Guide</h3>
+          <div class="symbol-grid">
+            <div class="symbol-item"><div class="symbol-icon">👶</div><h4>Ages 3-5 (Preschool)</h4><p>Simple stories, hands-on activities, repetition, sensory learning</p></div>
+            <div class="symbol-item"><div class="symbol-icon">🧒</div><h4>Ages 6-8 (Early Elementary)</h4><p>Bible stories with application, games, crafts, concrete thinkers</p></div>
+            <div class="symbol-item"><div class="symbol-icon">👦</div><h4>Ages 9-12 (Older Elementary)</h4><p>Deeper Bible study, discussions, service projects, abstract thinking</p></div>
+          </div>
+        </div>
+        <div class="content-section"><h3>Sample Lessons</h3>
+          <div class="prayer-type"><h4>Lesson 1: God's Creation (Genesis 1)</h4><p><strong>Memory Verse:</strong> "God saw all that he had made, and it was very good." — Genesis 1:31</p><p><strong>Activity:</strong> Creation Days Match — kids match the day number with what God created.</p><p><strong>Craft:</strong> Creation Wheel — paper plates with each day of creation, attached with brass fasteners.</p></div>
+          <div class="prayer-type"><h4>Lesson 2: Noah's Ark (Genesis 6-9)</h4><p><strong>Memory Verse:</strong> "I have set my rainbow in the clouds." — Genesis 9:13</p><p><strong>Craft:</strong> Rainbow Promise Bookmark with watercolor stripes.</p></div>
+          <div class="prayer-type"><h4>Lesson 3: David and Goliath (1 Samuel 17)</h4><p><strong>Memory Verse:</strong> "The LORD is with me; I will not be afraid." — Psalm 118:6</p><p><strong>Activity:</strong> Giant Goliath Knockdown — decorate bottles like Goliath, use as bowling pins.</p></div>
+          <div class="prayer-type"><h4>Lesson 4: The Good Samaritan (Luke 10)</h4><p><strong>Memory Verse:</strong> "Love your neighbor as yourself." — Luke 10:27</p><p><strong>Service Project:</strong> Kindness Cards for nursing home residents or community helpers.</p></div>
+        </div>
+        <div class="content-section"><h3>Memory Verse Games</h3>
+          <div class="giving-reason"><h4>🎵 Verse in Motion</h4><p>Create simple hand motions for each word. Repeat together with actions until memorized.</p></div>
+          <div class="giving-reason"><h4>🧩 Word Puzzle</h4><p>Write the verse on a poster, cut into puzzle pieces. Kids work together to put it back in order.</p></div>
+          <div class="giving-reason"><h4>🏃 Verse Relay</h4><p>Write each word on a separate card. Teams race to put the verse in correct order.</p></div>
+        </div>
+        <div class="content-section"><h3>Safety Reminders</h3>
+          <div class="key-principle"><strong>Always follow your church's child protection policies.</strong> Never be alone with a child. Use the two-adult rule. Know emergency procedures. Always have children wash hands before snacks.</div>
+        </div>
+        <div class="content-section closing-prayer"><h3>A Prayer for Children's Ministry</h3><div class="prayer-box"><p><em>"Lord, thank You for these precious children. Help me teach them about Your love in ways they can understand. Give me patience, creativity, and energy. May seeds of faith planted today grow for a lifetime. Protect these children and help them know how deeply You love them. In Jesus' name, Amen."</em></p></div></div>
+      </div>
+      <div class="modal-actions"><button class="print-btn" onclick="faithResPrintResource('children')">🖨 Print Resource</button><button class="close-btn" onclick="faithResCloseModal('children')">Close</button></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-parenting">
+    <div class="modal-content">
+      <div class="modal-header"><button class="close-modal" onclick="faithResCloseModal('parenting')">×</button><div class="modal-header-icon">👨‍👩‍👧‍👦</div><div class="modal-category">Family &amp; Relationships</div><div class="modal-title">Parenting with Faith</div></div>
+      <div class="modal-body">
+        <div class="content-section"><p class="intro-text">Raising children who love God is one of the greatest privileges and challenges of life. This guide provides biblical principles and practical strategies for parenting at every stage.</p></div>
+        <div class="content-section"><h3>The Foundation: God's Design for Parenting</h3><div class="scripture-box"><p class="scripture-text">"Start children off on the way they should go, and even when they are old they will not turn from it."</p><p class="scripture-ref">— Proverbs 22:6</p></div><p class="key-principle">Your primary job as a parent isn't to raise good kids — it's to point them to a good God. You can't control their choices, but you can faithfully teach, model, and pray.</p></div>
+        <div class="content-section"><h3>Core Biblical Parenting Principles</h3>
+          <div class="giving-reason"><h4>1. Love Unconditionally</h4><p>Your child's behavior doesn't determine your love. Even when correcting or disciplining, communicate: "I love you always, no matter what."</p></div>
+          <div class="giving-reason"><h4>2. Model, Don't Just Lecture</h4><p>Kids learn more from what they see than what they hear. How do you handle anger? Do you pray? Do they see you reading the Bible?</p></div>
+          <div class="giving-reason"><h4>3. Balance Grace and Truth</h4><p>Kids need both boundaries (truth) and forgiveness (grace). Don't be permissive or overly strict — be balanced like Jesus.</p></div>
+          <div class="giving-reason"><h4>4. Pray Continually</h4><p>You can't parent perfectly, but God can work powerfully. Pray for your kids daily, pray with your kids regularly, and teach them to pray.</p></div>
+        </div>
+        <div class="content-section"><h3>Age-Specific Parenting Guide</h3>
+          <div class="faq-item"><h4>👶 Infants &amp; Toddlers (0-3 years)</h4><p>Sing worship songs, pray over them, read simple Bible board books. Respond consistently to needs (builds trust in God's faithfulness later).</p></div>
+          <div class="faq-item"><h4>🧒 Preschoolers (3-5 years)</h4><p>Teach basic right and wrong. Answer "Why?" questions with simple truths about God. Pray together about their concerns.</p></div>
+          <div class="faq-item"><h4>👦 Early Elementary (6-8 years)</h4><p>Explain the gospel clearly — ready to receive Christ at this age. Give age-appropriate responsibilities.</p></div>
+          <div class="faq-item"><h4>🧑 Older Elementary (9-12 years)</h4><p>Let them ask doubts and questions without punishment. Teach them to serve. Help them develop personal convictions.</p></div>
+          <div class="faq-item"><h4>👨 Teenagers (13-18 years)</h4><p>Transition from control to influence — they need space to make choices. Keep communication open even when they push away.</p></div>
+        </div>
+        <div class="content-section"><h3>Praying for Your Children</h3>
+          <div class="journal-template">
+            <h4>Daily Prayer Guide for Your Child</h4>
+            <p style="margin:14px 0;"><strong>Salvation &amp; Faith:</strong> "Lord, draw [child's name] to Yourself. Help them know and love You."</p>
+            <p style="margin:14px 0;"><strong>Protection:</strong> "Protect them physically, emotionally, and spiritually."</p>
+            <p style="margin:14px 0;"><strong>Friendships:</strong> "Surround them with godly friends. Help them resist peer pressure."</p>
+            <p style="margin:14px 0;"><strong>Character:</strong> "Develop integrity, kindness, courage, and humility in them."</p>
+          </div>
+        </div>
+        <div class="content-section closing-prayer"><h3>A Prayer for Parents</h3><div class="prayer-box"><p><em>"Heavenly Father, this parenting job is harder than I ever imagined. I need Your wisdom daily. Help me love like You love — unconditionally, patiently, sacrificially. When I fail, give me humility to apologize. When I'm weary, renew my strength. Protect my children and draw them to Yourself. In Jesus' name, Amen."</em></p></div></div>
+      </div>
+      <div class="modal-actions"><button class="print-btn" onclick="faithResPrintResource('parenting')">🖨 Print Resource</button><button class="close-btn" onclick="faithResCloseModal('parenting')">Close</button></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-grief">
+    <div class="modal-content">
+      <div class="modal-header"><button class="close-modal" onclick="faithResCloseModal('grief')">×</button><div class="modal-header-icon">🕊️</div><div class="modal-category">Crisis Support</div><div class="modal-title">Grief &amp; Loss Support</div></div>
+      <div class="modal-body">
+        <div class="content-section"><p class="intro-text">Grief is the natural response to loss. It's not something to "get over" quickly — it's a journey to walk through. You are not alone, and there is hope even in the deepest sorrow.</p></div>
+        <div class="content-section"><h3>God's Heart for the Grieving</h3><div class="scripture-box"><p class="scripture-text">"The LORD is close to the brokenhearted and saves those who are crushed in spirit."</p><p class="scripture-ref">— Psalm 34:18</p></div><div class="scripture-box"><p class="scripture-text">"Blessed are those who mourn, for they will be comforted."</p><p class="scripture-ref">— Matthew 5:4</p></div><p class="key-principle">God doesn't promise to remove your grief immediately, but He promises to walk through it with you. Your tears matter to Him.</p></div>
+        <div class="content-section"><h3>The Stages of Grief</h3><p>These aren't linear steps — you may cycle through them, skip some, or experience several at once.</p>
+          <div class="giving-reason"><h4>1. Denial &amp; Shock</h4><p>"This can't be real." Numbness, disbelief.</p></div>
+          <div class="giving-reason"><h4>2. Anger</h4><p>"This isn't fair! Why me?" Rage at God, others, yourself.</p></div>
+          <div class="giving-reason"><h4>3. Bargaining</h4><p>"If only I had..." Guilt, regret, "what ifs."</p></div>
+          <div class="giving-reason"><h4>4. Depression</h4><p>Deep sadness, exhaustion, withdrawal, emptiness.</p></div>
+          <div class="giving-reason"><h4>5. Acceptance</h4><p>"I'm learning to live with this new reality." Not "okay," but finding a way forward.</p></div>
+          <p class="key-principle">There's no timeline for grief. Don't let anyone tell you "it's been long enough."</p>
+        </div>
+        <div class="content-section"><h3>How to Help Someone Who's Grieving</h3>
+          <div class="giving-reason"><h4>✅ DO:</h4><p>• Show up — bring a meal, mow their lawn, just sit with them<br>• Say the person's name — don't avoid talking about them<br>• Listen without trying to fix it<br>• Remember them on hard days (anniversaries, birthdays)<br>• Check in weeks and months later — grief doesn't end after the funeral</p></div>
+          <div class="giving-reason"><h4>🚫 DON'T SAY:</h4><p>• "They're in a better place"<br>• "Everything happens for a reason"<br>• "At least..." (At least they didn't suffer, at least you had time, etc.)<br>• "I know how you feel"<br>• "God needed another angel"<br>• "Time heals all wounds"</p></div>
+          <div class="key-principle">Better to say: "I don't know what to say, but I'm here." "I'm so sorry." "Tell me about them." Your presence matters more than perfect words.</div>
+        </div>
+        <div class="content-section"><h3>Hope After Loss</h3><div class="scripture-box"><p class="scripture-text">"He will swallow up death forever. The Sovereign LORD will wipe away the tears from all faces."</p><p class="scripture-ref">— Isaiah 25:8</p></div><div class="scripture-box"><p class="scripture-text">"I am the resurrection and the life. The one who believes in me will live, even though they die."</p><p class="scripture-ref">— John 11:25</p></div></div>
+        <div class="content-section closing-prayer"><h3>A Prayer for the Grieving</h3><div class="prayer-box"><p><em>"God, my heart is broken. The pain feels unbearable. Please be near to me in this darkness. Comfort me with Your presence. Help me take one day, one hour, one breath at a time. Surround me with people who will walk with me through this valley. I trust that You are good even when life is not. In Jesus' name, Amen."</em></p></div></div>
+        <div class="content-section" style="background:rgba(40,167,69,.12);border-left:5px solid #28a745;padding:24px;border-radius:10px;"><h3 style="color:#22c55e;">💚 Remember</h3><p style="font-size:1.05em;">Grief is love with nowhere to go. The depth of your pain reflects the depth of your love. You will survive this. There is hope.</p></div>
+      </div>
+      <div class="modal-actions"><button class="print-btn" onclick="faithResPrintResource('grief')">🖨 Print Resource</button><button class="close-btn" onclick="faithResCloseModal('grief')">Close</button></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-smallgroups">
+    <div class="modal-content">
+      <div class="modal-header"><button class="close-modal" onclick="faithResCloseModal('smallgroups')">×</button><div class="modal-header-icon">👥</div><div class="modal-category">Ministry Tools</div><div class="modal-title">Small Group Leader Guide</div></div>
+      <div class="modal-body">
+        <div class="content-section"><p class="intro-text">Leading a small group is one of the most impactful ministries in the church. You're creating a space where people can know God and be known by others.</p></div>
+        <div class="content-section"><h3>Your Role as Leader</h3>
+          <div class="giving-reason"><h4>🧭 You're a Facilitator, Not a Teacher</h4><p>Your job isn't to have all the answers or preach a mini-sermon. You're creating space for discussion. Ask good questions more than you give answers.</p></div>
+          <div class="giving-reason"><h4>🏠 You're a Host</h4><p>Create a welcoming environment. Greet people warmly. Make sure everyone feels included.</p></div>
+          <div class="giving-reason"><h4>👂 You're a Listener</h4><p>Pay attention not just to words but to what's underneath. Who's hurting? Who needs encouragement?</p></div>
+          <div class="giving-reason"><h4>🌱 You're a Shepherd</h4><p>Care for people beyond the meeting. Follow up on prayer requests. Show up when someone's in crisis.</p></div>
+          <p class="key-principle">You don't have to be perfect or know everything. Your willingness to serve and your dependence on God are what matter most.</p>
+        </div>
+        <div class="content-section"><h3>Running an Effective Meeting</h3>
+          <div class="acts-method">
+            <div class="timeline-item"><div class="timeline-number">1</div><div><h4>Welcome &amp; Icebreaker (10-15 min)</h4><p>Begin promptly. Use a simple icebreaker.</p></div></div>
+            <div class="timeline-item"><div class="timeline-number">2</div><div><h4>Worship — optional (10-15 min)</h4><p>A few songs or even one meaningful song can refocus hearts on God.</p></div></div>
+            <div class="timeline-item"><div class="timeline-number">3</div><div><h4>Discussion (40-50 min)</h4><p>The heart of your meeting. Use prepared questions.</p></div></div>
+            <div class="timeline-item"><div class="timeline-number">4</div><div><h4>Prayer Time (15-20 min)</h4><p>Share prayer requests. Pray together.</p></div></div>
+            <div class="timeline-item"><div class="timeline-number">5</div><div><h4>End On Time</h4><p>Respect people's schedules.</p></div></div>
+          </div>
+        </div>
+        <div class="content-section"><h3>Asking Great Discussion Questions</h3>
+          <div class="giving-reason"><h4>Observation Questions (What does it say?)</h4><p>"What stands out to you in this passage?" "What do we learn about God here?"</p></div>
+          <div class="giving-reason"><h4>Interpretation Questions (What does it mean?)</h4><p>"Why do you think the author included this detail?" "How does this connect to other parts of Scripture?"</p></div>
+          <div class="giving-reason"><h4>Application Questions (How do we live it?)</h4><p>"How does this challenge the way you think or live?" "What's one thing God is asking you to do this week?"</p></div>
+          <div class="key-principle"><strong>Avoid:</strong> Yes/no questions. Questions that are too broad. Questions that lead to one "right" answer.</div>
+        </div>
+        <div class="content-section"><h3>Sample Group Covenant</h3>
+          <div class="journal-template">
+            <h4>Our Small Group Covenant</h4>
+            <p style="margin:12px 0;"><strong>Attendance:</strong> We'll prioritize being here.</p>
+            <p style="margin:12px 0;"><strong>Confidentiality:</strong> What's shared in the group stays in the group.</p>
+            <p style="margin:12px 0;"><strong>Respect:</strong> We'll listen without interrupting. We'll welcome different perspectives.</p>
+            <p style="margin:12px 0;"><strong>Participation:</strong> We'll contribute to discussions and engage with each other.</p>
+            <p style="margin:12px 0;"><strong>Care:</strong> We'll pray for each other, check in during the week, and show up in times of need.</p>
+          </div>
+        </div>
+        <div class="content-section closing-prayer"><h3>A Prayer for Small Group Leaders</h3><div class="prayer-box"><p><em>"Lord, thank You for trusting me to shepherd this group. I feel inadequate, but I know You are sufficient. Give me wisdom to lead well, discernment to know when to speak and when to listen, and courage to care for people sacrificially. Use this group to change lives — starting with mine. In Jesus' name, Amen."</em></p></div></div>
+      </div>
+      <div class="modal-actions"><button class="print-btn" onclick="faithResPrintResource('smallgroups')">🖨 Print Resource</button><button class="close-btn" onclick="faithResCloseModal('smallgroups')">Close</button></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-addiction">
+    <div class="modal-content">
+      <div class="modal-header"><button class="close-modal" onclick="faithResCloseModal('addiction')">×</button><div class="modal-header-icon">⛓️</div><div class="modal-category">Life Challenges</div><div class="modal-title">Addiction Recovery Resources</div></div>
+      <div class="modal-body">
+        <div class="content-section"><p class="intro-text">Addiction is powerful, but God's grace is more powerful. Recovery is possible. You are not your addiction, and there is hope for freedom.</p></div>
+        <div class="content-section"><h3>Understanding Addiction</h3><p>Addiction is a chronic condition characterized by compulsive substance use or behavior despite harmful consequences. It's not a moral failure or lack of willpower — it's a complex issue affecting the brain, body, emotions, and spirit.</p><p class="key-principle">Addiction is slavery. Recovery is freedom. Jesus came to set captives free.</p></div>
+        <div class="content-section"><h3>Signs You May Have an Addiction</h3>
+          <div class="action-steps">
+            <div class="step"><div class="step-number">✓</div><p>You can't stop despite wanting to or trying repeatedly</p></div>
+            <div class="step"><div class="step-number">✓</div><p>You've hidden it from loved ones or lied about it</p></div>
+            <div class="step"><div class="step-number">✓</div><p>It's causing problems in relationships, work, health, or finances</p></div>
+            <div class="step"><div class="step-number">✓</div><p>You feel guilt, shame, or anxiety about it but continue anyway</p></div>
+          </div>
+        </div>
+        <div class="content-section"><h3>Steps to Recovery</h3>
+          <div class="faq-item"><h4>Step 1: Admit You Have a Problem</h4><p>Stop minimizing, denying, or blaming others. Say it out loud: "I am addicted to _____ and I need help."</p></div>
+          <div class="faq-item"><h4>Step 2: Tell Someone</h4><p>Addiction thrives in secrecy. Tell a trusted friend, pastor, spouse, or counselor.</p></div>
+          <div class="faq-item"><h4>Step 3: Get Professional Help</h4><p>Inpatient treatment, outpatient counseling, 12-step programs (AA, NA, Celebrate Recovery), accountability groups.</p></div>
+          <div class="faq-item"><h4>Step 4: Remove Access &amp; Triggers</h4><p>Make it harder to use. Pour out alcohol, install accountability software, avoid triggering people/places.</p></div>
+          <div class="faq-item"><h4>Step 5: Build a Support Network</h4><p>Accountability partner, support group meetings, healthy friendships, faith community.</p></div>
+          <div class="faq-item"><h4>Step 6: Address the Root Issues</h4><p>Addiction is often a symptom of deeper pain — trauma, grief, mental illness, loneliness. Work with a counselor.</p></div>
+          <div class="faq-item"><h4>Step 7: Take It One Day at a Time</h4><p>Don't think about staying sober forever. Just focus on today. Sometimes just this hour.</p></div>
+        </div>
+        <div class="content-section"><h3>When You Relapse</h3><p>Relapse doesn't mean failure. It's a setback, not the end.</p>
+          <div class="action-steps">
+            <div class="step"><div class="step-number">1</div><p><strong>Stop immediately.</strong> Don't let one slip become a binge.</p></div>
+            <div class="step"><div class="step-number">2</div><p><strong>Tell someone.</strong> Don't hide it.</p></div>
+            <div class="step"><div class="step-number">3</div><p><strong>Identify the trigger.</strong> What led to this?</p></div>
+            <div class="step"><div class="step-number">4</div><p><strong>Receive God's grace.</strong> You are forgiven.</p></div>
+            <div class="step"><div class="step-number">5</div><p><strong>Get back up.</strong> Start over. Day 1 begins again.</p></div>
+          </div>
+        </div>
+        <div class="content-section"><h3>Resources for Recovery</h3>
+          <div class="faq-item"><h4>🤝 Support Groups</h4><p><strong>Celebrate Recovery:</strong> Faith-based 12-step program (celebraterecovery.com)<br><strong>AA:</strong> aa.org<br><strong>NA:</strong> na.org<br><strong>Al-Anon:</strong> For families of alcoholics</p></div>
+          <div class="faq-item"><h4>🏥 Professional Help</h4><p><strong>SAMHSA National Helpline:</strong> 1-800-662-4357 (free, confidential, 24/7)<br><strong>Find Treatment:</strong> findtreatment.gov</p></div>
+        </div>
+        <div class="content-section closing-prayer"><h3>A Prayer for Freedom</h3><div class="prayer-box"><p><em>"God, I am enslaved to this addiction, and I cannot break free on my own. I need You. I surrender this struggle to You today. Give me the courage to get help, the humility to admit my powerlessness, and the faith to believe You can set me free. Set me free, Lord. In Jesus' name, Amen."</em></p></div></div>
+      </div>
+      <div class="modal-actions"><button class="print-btn" onclick="faithResPrintResource('addiction')">🖨 Print Resource</button><button class="close-btn" onclick="faithResCloseModal('addiction')">Close</button></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-biblestudy">
+    <div class="modal-content">
+      <div class="modal-header"><button class="close-modal" onclick="faithResCloseModal('biblestudy')">×</button><div class="modal-header-icon">📖</div><div class="modal-category">Spiritual Growth</div><div class="modal-title">How to Study the Bible</div></div>
+      <div class="modal-body">
+        <div class="content-section"><p class="intro-text">The Bible is God's Word — living, active, and powerful. It's not just a book to read; it's a book to study, understand, and apply.</p></div>
+        <div class="content-section"><h3>Getting Started: The Basics</h3>
+          <div class="faq-item"><h4>Choose a Good Translation</h4><p><strong>Word-for-word:</strong> ESV, NASB, NKJV<br><strong>Thought-for-thought:</strong> NIV, NLT, CSB<br><strong>Recommendation:</strong> Start with NIV or ESV.</p></div>
+          <div class="faq-item"><h4>Set a Consistent Time &amp; Place</h4><p>Decide when and where you'll study daily. Even 10-15 minutes daily is better than sporadic longer sessions.</p></div>
+          <div class="faq-item"><h4>Start with Prayer</h4><p>Ask the Holy Spirit to teach you. "Open my eyes that I may see wonderful things in your law" (Psalm 119:18).</p></div>
+        </div>
+        <div class="content-section"><h3>The O.I.A. Method</h3>
+          <div class="acts-method">
+            <div class="timeline-item"><div class="timeline-number">O</div><div><h4>Observation — What does it say?</h4><p>Read carefully. Look for facts. Who is speaking? What is happening? Are there repeated words or themes?</p></div></div>
+            <div class="timeline-item"><div class="timeline-number">I</div><div><h4>Interpretation — What does it mean?</h4><p>Understand the meaning in its original context. What did this mean to the original audience?</p></div></div>
+            <div class="timeline-item"><div class="timeline-number">A</div><div><h4>Application — How do I live it?</h4><p>Make it personal. How does this truth change how you think or live?</p></div></div>
+          </div>
+        </div>
+        <div class="content-section"><h3>Study Methods</h3>
+          <div class="giving-reason"><h4>📚 Book Study</h4><p>Read an entire book of the Bible, chapter by chapter. <strong>Good starter books:</strong> John, Philippians, James, 1 John.</p></div>
+          <div class="giving-reason"><h4>🔍 Verse-by-Verse Study</h4><p>Deep dive into a short passage. Read multiple translations. Look up word meanings.</p></div>
+          <div class="giving-reason"><h4>📝 Topical Study</h4><p>Study what the Bible says about a specific topic — prayer, grace, wisdom, money.</p></div>
+          <div class="giving-reason"><h4>🤴 Character Study</h4><p>Trace a person through Scripture and learn from their life — David, Abraham, Peter, Paul, Ruth, Esther.</p></div>
+        </div>
+        <div class="content-section"><h3>Where to Start Reading</h3><p>If you're new to the Bible, don't start at Genesis. Try this path:</p>
+          <div class="action-steps">
+            <div class="step"><div class="step-number">1</div><p><strong>Gospel of John</strong> — Learn who Jesus is</p></div>
+            <div class="step"><div class="step-number">2</div><p><strong>Acts</strong> — See how the early church spread</p></div>
+            <div class="step"><div class="step-number">3</div><p><strong>Romans</strong> — Understand the gospel</p></div>
+            <div class="step"><div class="step-number">4</div><p><strong>Ephesians or Philippians</strong> — Learn how to live as a Christian</p></div>
+            <div class="step"><div class="step-number">5</div><p><strong>Genesis</strong> — Go back to the beginning</p></div>
+            <div class="step"><div class="step-number">6</div><p><strong>Psalms &amp; Proverbs</strong> — Worship, prayer, and practical wisdom</p></div>
+          </div>
+        </div>
+        <div class="content-section closing-prayer"><h3>A Prayer Before Study</h3><div class="prayer-box"><p><em>"Lord, open my eyes to see wonderful things in Your Word. Help me not just to read, but to understand. Not just to understand, but to obey. Teach me by Your Holy Spirit. Transform my mind and heart. I want to know You more. In Jesus' name, Amen."</em></p></div></div>
+      </div>
+      <div class="modal-actions"><button class="print-btn" onclick="faithResPrintResource('biblestudy')">🖨 Print Resource</button><button class="close-btn" onclick="faithResCloseModal('biblestudy')">Close</button></div>
     </div>
   </div>
 </section>
@@ -6739,6 +7759,7 @@
 <script src="/app/js/sports.js"></script>
 <script src="/app/js/faith.js"></script>
 <script src="/app/js/worship.js"></script>
+<script src="/app/js/faith-resources.js"></script>
 <script src="/app/js/parent.js"></script>
 <script src="/app/js/email.js"></script>
 <script src="/app/js/misc.js"></script>
