@@ -455,7 +455,10 @@ function bfTab(tab, btn){
   if(tab==='journey') renderFaithJourney();
   if(tab==='jesus') renderJesusGrid();
   if(tab==='learnBible') renderLearnBibleGrid();
-  // 'plans' / 'prayer' / 'memorize' / 'academy' are F2-B/E/F/I stubs — no render needed.
+  if(tab==='plans') renderPlanCatalog();
+  if(tab==='prayer') renderPrayerPanel();
+  if(tab==='memorize') renderMemorizePanel();
+  // 'academy' is F2-I stub — no render needed.
 }
 
 // ── FAITH HOME (F2-A) ────────────────────────────────────────
@@ -503,6 +506,43 @@ function renderFaithHome(){
       }
     }
   } catch(e){ /* DEVOTIONALS missing */ }
+
+  // Card 3 — Active Reading Plan (F2-B). Empty state stays from the static HTML
+  // when no plan is active; otherwise, swap to a progress strip with "Read Today".
+  const planBody = document.getElementById('fhPlanBody');
+  if(planBody){
+    const active = (typeof fhActivePlan === 'function') ? fhActivePlan() : null;
+    if(active){
+      const p = active.plan, prog = active.prog;
+      const pct = Math.round(((prog.currentDay - 1) / prog.totalDays) * 100);
+      const todayDay = prog.currentDay <= prog.totalDays ? prog.currentDay : prog.totalDays;
+      const todayData = (p.daysData || []).find(d => d.day === todayDay);
+      const firstRef = todayData && todayData.refs && todayData.refs[0];
+      planBody.innerHTML = `
+        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.55rem;">
+          <span style="font-size:1.4rem;">${p.badgeIcon}</span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:.85rem;font-weight:800;color:var(--tx);line-height:1.25;">${p.title}</div>
+            <div style="font-size:.66rem;color:var(--tx3);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-top:.1rem;">Day ${prog.currentDay} of ${prog.totalDays} · ${pct}% complete</div>
+          </div>
+        </div>
+        <div style="height:6px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-bottom:.7rem;">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#38bdf8,${p.brandColor});border-radius:99px;transition:width .5s;"></div>
+        </div>
+        <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+          ${firstRef ? `<button class="fh-btn" onclick="planJumpToVerse(${JSON.stringify(firstRef).replace(/"/g,'&quot;')})">📖 Read Today’s Passage</button>` : ''}
+          <button class="fh-btn-ghost" onclick="openPlanDetail('${p.id}')">View Plan</button>
+        </div>
+      `;
+    } else {
+      // Restore empty state — only re-render if currently in active-plan mode.
+      // Cheap idempotency: rebuild the empty state every render; it's tiny.
+      planBody.innerHTML = `
+        <div class="fh-plan-empty">No plan started yet. Choose from 8 plans now (more land in F2 follow-ups) — topical, beginner, and through-the-Bible.</div>
+        <button class="fh-btn" onclick="bfTab('plans')">Browse Plans →</button>
+      `;
+    }
+  }
 
   // Card 4 — Streak ring + Faith XP (animated stroke-dashoffset)
   const streak = (typeof getScriptureStreak === 'function') ? getScriptureStreak() : 0;
@@ -568,11 +608,17 @@ function fhSaveVotd(){
   showToast('Saved to favorites 💎');
 }
 
-// Share VOTD via Web Share API when available, fallback to clipboard.
-// Verse-card image generator (Canvas) lands in F2-C.
+// Share VOTD — opens the F2-C Verse Card Generator with today's verse.
+// The image generator handles native share / download / copy itself, so the
+// old text-only path is no longer the default.
 function fhShareVotd(){
   let s; try { s = getTodayScripture(); } catch(e){}
   if(!s){ showToast('Verse not loaded yet'); return; }
+  if(typeof openVerseCard === 'function'){
+    openVerseCard(s.text, s.ref);
+    return;
+  }
+  // Fallback if the F2-C module hasn't loaded for some reason.
   const text = '"' + s.text + '" — ' + s.ref + '\n\nyourlifecc.com';
   if(navigator.share){
     navigator.share({ title: 'Verse of the Day', text: text }).catch(function(){});
@@ -583,6 +629,594 @@ function fhShareVotd(){
     return;
   }
   showToast('Sharing not supported on this browser');
+}
+
+// ═════════════════════════════════════════════════════════════
+// F2-C — VERSE CARD GENERATOR (Canvas, 1080×1080)
+// ═════════════════════════════════════════════════════════════
+// Three templates per spec §4.10:
+//   Ocean   — brand cyan→violet gradient, white text
+//   Sunrise — warm amber→orange gradient, dark navy text
+//   Minimal — white card, black text, brand-cyan accent + wordmark
+// All renderers share the same word-wrap path so the verse fits any length.
+// Output: PNG blob → download / clipboard.write / Web Share Level 2 with files.
+
+let _vcText = '';
+let _vcRef  = '';
+let _vcTemplate = 'ocean';
+
+const VC_SIZE = 1080;
+const VC_PAD  = 110; // outer breathing room
+
+function openVerseCard(text, ref){
+  _vcText = text || '';
+  _vcRef  = ref  || '';
+  _vcTemplate = 'ocean';
+  // Reset chip active state so re-opens always start on Ocean.
+  document.querySelectorAll('#verseCardModal .vc-tpl').forEach(function(b){
+    const isOcean = b.getAttribute('data-vc-tpl') === 'ocean';
+    b.classList.toggle('active', isOcean);
+    if(isOcean){
+      b.style.background = 'linear-gradient(135deg,#38bdf8,#a78bfa)';
+      b.style.color      = '#0b1220';
+      b.style.border     = 'none';
+      b.style.fontWeight = '800';
+    } else {
+      b.style.background = 'rgba(255,255,255,.06)';
+      b.style.color      = 'var(--tx)';
+      b.style.border     = '1px solid rgba(255,255,255,.12)';
+      b.style.fontWeight = '700';
+    }
+  });
+  // Hide the Share button if Web Share Level 2 (with files) isn't supported.
+  const shareBtn = document.getElementById('vcShareBtn');
+  if(shareBtn) shareBtn.style.display = vcCanShareFiles() ? '' : 'none';
+  if(typeof openModal === 'function') openModal('verseCardModal');
+  // Slight defer so the canvas is in the layout tree before drawing.
+  setTimeout(vcRender, 30);
+}
+
+function closeVerseCard(){
+  if(typeof closeModal === 'function') closeModal('verseCardModal');
+}
+
+function vcSetTemplate(tpl, btn){
+  _vcTemplate = tpl;
+  document.querySelectorAll('#verseCardModal .vc-tpl').forEach(function(b){
+    const isActive = b === btn;
+    b.classList.toggle('active', isActive);
+    if(isActive){
+      const bg = (tpl === 'ocean')   ? 'linear-gradient(135deg,#38bdf8,#a78bfa)'
+              : (tpl === 'sunrise') ? 'linear-gradient(135deg,#fbbf24,#fb923c)'
+              : '#fff';
+      const color = (tpl === 'minimal') ? '#0b1220' : '#0b1220';
+      b.style.background = bg;
+      b.style.color      = color;
+      b.style.border     = (tpl === 'minimal') ? '1px solid rgba(255,255,255,.4)' : 'none';
+      b.style.fontWeight = '800';
+    } else {
+      b.style.background = 'rgba(255,255,255,.06)';
+      b.style.color      = 'var(--tx)';
+      b.style.border     = '1px solid rgba(255,255,255,.12)';
+      b.style.fontWeight = '700';
+    }
+  });
+  vcRender();
+}
+
+// Word-wrap a single string against a target maxWidth at the given font.
+// Returns an array of lines.
+function vcWrap(ctx, text, maxWidth){
+  const words = String(text).split(/\s+/);
+  const lines = [];
+  let line = '';
+  for(let i=0;i<words.length;i++){
+    const test = line ? (line + ' ' + words[i]) : words[i];
+    const w = ctx.measureText(test).width;
+    if(w > maxWidth && line){
+      lines.push(line);
+      line = words[i];
+    } else {
+      line = test;
+    }
+  }
+  if(line) lines.push(line);
+  return lines;
+}
+
+// Pick a verse font size that fits N lines inside the available height.
+// Returns { fontSize, lineHeight, lines }.
+function vcFitVerse(ctx, text, maxWidth, maxHeight, family, weight){
+  // Try sizes from large to small; aim for at most ~9 lines on long verses.
+  const candidates = [78, 70, 64, 58, 52, 46, 42, 38, 34];
+  for(let i=0;i<candidates.length;i++){
+    const size = candidates[i];
+    ctx.font = weight + ' ' + size + 'px ' + family;
+    const lines = vcWrap(ctx, text, maxWidth);
+    const lineHeight = Math.round(size * 1.32);
+    if(lines.length * lineHeight <= maxHeight) return { fontSize:size, lineHeight, lines };
+  }
+  // Last resort — smallest.
+  const size = 32;
+  ctx.font = weight + ' ' + size + 'px ' + family;
+  return { fontSize:size, lineHeight:Math.round(size*1.3), lines: vcWrap(ctx, text, maxWidth) };
+}
+
+function vcRender(){
+  const c = document.getElementById('verseCardCanvas');
+  if(!c) return;
+  const ctx = c.getContext('2d'); if(!ctx) return;
+
+  const tpl = _vcTemplate;
+  const W = VC_SIZE, H = VC_SIZE;
+
+  // Background
+  ctx.clearRect(0,0,W,H);
+  if(tpl === 'ocean'){
+    const g = ctx.createLinearGradient(0,0,W,H);
+    g.addColorStop(0, '#38bdf8');
+    g.addColorStop(1, '#a78bfa');
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,W,H);
+    // Subtle radial highlight
+    const r = ctx.createRadialGradient(W*0.25, H*0.18, 50, W*0.25, H*0.18, W*0.7);
+    r.addColorStop(0, 'rgba(255,255,255,0.18)');
+    r.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = r;
+    ctx.fillRect(0,0,W,H);
+  } else if(tpl === 'sunrise'){
+    const g = ctx.createLinearGradient(0,0,W,H);
+    g.addColorStop(0, '#fbbf24');
+    g.addColorStop(1, '#fb923c');
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,W,H);
+    const r = ctx.createRadialGradient(W*0.78, H*0.22, 40, W*0.78, H*0.22, W*0.7);
+    r.addColorStop(0, 'rgba(255,255,255,0.22)');
+    r.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = r;
+    ctx.fillRect(0,0,W,H);
+  } else { // minimal
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0,0,W,H);
+    // Brand-cyan accent line bottom-left
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillRect(VC_PAD, H - VC_PAD - 8, 90, 8);
+  }
+
+  // Decorative quote mark
+  const quoteColor = (tpl === 'minimal') ? 'rgba(56,189,248,0.15)' : 'rgba(255,255,255,0.18)';
+  ctx.fillStyle = quoteColor;
+  ctx.font = '900 280px "Bebas Neue", Inter, sans-serif';
+  ctx.textBaseline = 'top';
+  ctx.fillText('“', VC_PAD - 12, VC_PAD - 30);
+
+  // Verse text
+  const textColor = (tpl === 'minimal') ? '#0b1220'
+                  : (tpl === 'sunrise') ? '#0b1220'
+                  : '#ffffff';
+  const refColor  = (tpl === 'minimal') ? '#38bdf8'
+                  : (tpl === 'sunrise') ? '#7c2d12'
+                  : 'rgba(255,255,255,0.9)';
+  const wmColor   = (tpl === 'minimal') ? 'rgba(15,23,42,0.5)'
+                  : (tpl === 'sunrise') ? 'rgba(11,18,32,0.55)'
+                  : 'rgba(255,255,255,0.7)';
+
+  ctx.fillStyle = textColor;
+  ctx.textBaseline = 'top';
+  ctx.textAlign = 'left';
+
+  const innerWidth  = W - (VC_PAD * 2);
+  const refReserved = 130;       // space at bottom for ref + wordmark
+  const verseTopY   = VC_PAD + 90;
+  const verseMaxH   = H - verseTopY - VC_PAD - refReserved;
+
+  const fitted = vcFitVerse(ctx, _vcText, innerWidth, verseMaxH,
+                            '"Inter", system-ui, sans-serif', '600');
+  ctx.font = '600 ' + fitted.fontSize + 'px "Inter", system-ui, sans-serif';
+
+  // Vertical-centre the verse block within the available area.
+  const verseBlockH = fitted.lines.length * fitted.lineHeight;
+  let y = verseTopY + Math.max(0, (verseMaxH - verseBlockH) / 2);
+  fitted.lines.forEach(function(ln){
+    ctx.fillText(ln, VC_PAD, y);
+    y += fitted.lineHeight;
+  });
+
+  // Reference (Bebas Neue display, smaller)
+  ctx.fillStyle = refColor;
+  ctx.font = '700 56px "Bebas Neue", Inter, sans-serif';
+  ctx.textAlign = 'left';
+  const refY = H - VC_PAD - 90;
+  ctx.fillText('— ' + _vcRef, VC_PAD, refY);
+
+  // Wordmark
+  ctx.fillStyle = wmColor;
+  ctx.font = '600 28px "Inter", system-ui, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText('yourlifecc.com', W - VC_PAD, H - VC_PAD - 6);
+}
+
+function vcToBlob(){
+  return new Promise(function(resolve, reject){
+    const c = document.getElementById('verseCardCanvas');
+    if(!c){ reject(new Error('Canvas not found')); return; }
+    if(c.toBlob){
+      c.toBlob(function(blob){
+        if(!blob){ reject(new Error('Blob conversion failed')); return; }
+        resolve(blob);
+      }, 'image/png');
+    } else {
+      // Older Safari fallback: data URL → blob
+      try {
+        const url = c.toDataURL('image/png');
+        const bin = atob(url.split(',')[1]);
+        const arr = new Uint8Array(bin.length);
+        for(let i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+        resolve(new Blob([arr], { type:'image/png' }));
+      } catch(e){ reject(e); }
+    }
+  });
+}
+
+function vcDownload(){
+  vcToBlob().then(function(blob){
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'yourlifecc-verse-' + (_vcRef || 'card').replace(/[^a-z0-9]+/gi,'-').toLowerCase() + '.png';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 400);
+    if(typeof logActivity === 'function') logActivity('faith', 'Downloaded verse card: ' + _vcRef);
+    showToast('Verse card downloaded ✓');
+  }).catch(function(){
+    showToast('Could not generate image');
+  });
+}
+
+function vcCopy(){
+  if(!navigator.clipboard || typeof ClipboardItem === 'undefined' || !navigator.clipboard.write){
+    // Fallback — copy plain text reference + verse so the click isn't a no-op.
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText('"' + _vcText + '" — ' + _vcRef + '\n\nyourlifecc.com')
+        .then(function(){ showToast('Image copy not supported — text copied instead'); });
+    } else {
+      showToast('Copy not supported on this browser');
+    }
+    return;
+  }
+  vcToBlob().then(function(blob){
+    return navigator.clipboard.write([ new ClipboardItem({ 'image/png': blob }) ]);
+  }).then(function(){
+    if(typeof logActivity === 'function') logActivity('faith', 'Copied verse card: ' + _vcRef);
+    showToast('Image copied to clipboard ✓');
+  }).catch(function(){
+    // Some browsers block image-clipboard from non-user-activation contexts.
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText('"' + _vcText + '" — ' + _vcRef + '\n\nyourlifecc.com')
+        .then(function(){ showToast('Image copy blocked — text copied instead'); });
+    } else {
+      showToast('Could not copy image');
+    }
+  });
+}
+
+// Web Share Level 2 — share the PNG directly to native share sheets.
+function vcCanShareFiles(){
+  if(!navigator.share || !navigator.canShare) return false;
+  try {
+    // Browsers without File constructor predate Web Share Level 2.
+    if(typeof File === 'undefined') return false;
+    const probe = new File(['x'], 'probe.png', { type:'image/png' });
+    return navigator.canShare({ files: [probe] });
+  } catch(e){ return false; }
+}
+
+function vcShare(){
+  if(!vcCanShareFiles()){ vcDownload(); return; }
+  vcToBlob().then(function(blob){
+    const fname = 'yourlifecc-verse-' + (_vcRef || 'card').replace(/[^a-z0-9]+/gi,'-').toLowerCase() + '.png';
+    const file = new File([blob], fname, { type:'image/png' });
+    return navigator.share({
+      files: [file],
+      title: 'Verse of the Day',
+      text:  '"' + _vcText + '" — ' + _vcRef + '\n\nyourlifecc.com',
+    });
+  }).then(function(){
+    if(typeof logActivity === 'function') logActivity('faith', 'Shared verse card: ' + _vcRef);
+  }).catch(function(){
+    // User cancelled or share failed — silent. Don't toast on cancellation.
+  });
+}
+
+// ═════════════════════════════════════════════════════════════
+// F2-B — READING PLANS (catalog, progress, day completion)
+// ═════════════════════════════════════════════════════════════
+// Storage: D.faithPlans = { active: { [planId]: progress }, completed: [archive] }
+//   progress     = { planId, currentDay, totalDays, completedDays:{}, startedAt }
+//   archive      = { planId, totalDays, startedAt, completedAt, badgeIcon, title }
+// Source of truth for plan content is window.FAITH_PLANS (from data/plans.js).
+// Dedicated Supabase table is optional — see docs/migrations/F2-B-faith-plans.sql.
+
+let _planCatFilter = 'all';
+
+// Defensive accessor — guarantees the shape even if loaded from old cloud data
+// where D.faithPlans wasn't yet in DEF.
+function planStore(){
+  if(!D.faithPlans || typeof D.faithPlans !== 'object') D.faithPlans = { active:{}, completed:[] };
+  if(!D.faithPlans.active || typeof D.faithPlans.active !== 'object') D.faithPlans.active = {};
+  if(!Array.isArray(D.faithPlans.completed)) D.faithPlans.completed = [];
+  return D.faithPlans;
+}
+
+function planById(id){
+  const all = (typeof window !== 'undefined' && window.FAITH_PLANS) ? window.FAITH_PLANS : [];
+  return all.find(p => p && p.id === id) || null;
+}
+
+function planFilter(cat, btn){
+  _planCatFilter = cat || 'all';
+  document.querySelectorAll('#plFilters .pl-chip').forEach(c => c.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderPlanCatalog();
+}
+
+function renderPlanCatalog(){
+  const all = (typeof window !== 'undefined' && window.FAITH_PLANS) ? window.FAITH_PLANS : [];
+  const store = planStore();
+
+  // Active-plans banner (only the single most-recently-started plan to keep it tight;
+  // multiple-active rendering can come back later if users want it).
+  const activeWrap = document.getElementById('plActive');
+  if(activeWrap){
+    const activeIds = Object.keys(store.active);
+    if(!activeIds.length){
+      activeWrap.innerHTML = '';
+    } else {
+      // Most-recent first.
+      activeIds.sort((a,b) => (store.active[b].startedAt||'').localeCompare(store.active[a].startedAt||''));
+      activeWrap.innerHTML = activeIds.map(id => {
+        const prog = store.active[id];
+        const plan = planById(id);
+        if(!plan) return '';
+        const pct = Math.round(((prog.currentDay - 1) / prog.totalDays) * 100);
+        return `<div class="pl-active-banner">
+          <div style="font-size:1.4rem;flex-shrink:0;">${plan.badgeIcon}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:.78rem;font-weight:800;line-height:1.2;">${plan.title}</div>
+            <div class="pl-active-bar"><div class="pl-active-bar-fill" style="width:${pct}%;"></div></div>
+            <div style="font-size:.66rem;font-weight:700;opacity:.85;">Day ${prog.currentDay} of ${prog.totalDays} · ${pct}%</div>
+          </div>
+          <button onclick="openPlanDetail('${id}')" style="background:rgba(11,18,32,.85);color:#fff;border:none;border-radius:10px;padding:.5rem .85rem;font-size:.72rem;font-weight:800;cursor:pointer;font-family:var(--fm);flex-shrink:0;">Resume →</button>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  // Catalog grid
+  const el = document.getElementById('plCatalog');
+  if(!el) return;
+  let plans = all.slice();
+  if(_planCatFilter !== 'all') plans = plans.filter(p => p.category === _planCatFilter);
+  if(_planCatFilter === 'family'){
+    el.innerHTML = `<div class="pl-empty">Family plans land in F2-H — Family Devotional Month, Christmas Story (Advent), Easter Week. Same shape as topical plans, kid-safe day prompts, parent-assignable to the whole family.</div>`;
+    return;
+  }
+  if(!plans.length){
+    el.innerHTML = `<div class="pl-empty">No plans match this filter yet.</div>`;
+    return;
+  }
+  el.innerHTML = plans.map(p => {
+    const isActive    = !!store.active[p.id];
+    const isCompleted = store.completed.some(c => c && c.planId === p.id);
+    const status = isActive
+      ? `Day ${store.active[p.id].currentDay} of ${p.days}`
+      : isCompleted ? '✓ Completed' : `${p.days} days`;
+    return `<div class="pl-card" style="border-left-color:${p.brandColor};" onclick="openPlanDetail('${p.id}')">
+      <div class="pl-card-top">
+        <span class="pl-card-icon">${p.badgeIcon}</span>
+        <span class="pl-card-title">${p.title}</span>
+        <span class="pl-card-meta">${planCategoryLabel(p.category)}</span>
+      </div>
+      <div class="pl-card-short">${p.short}</div>
+      <div class="pl-card-cta">
+        <span class="pl-card-status" style="${isActive?'color:'+p.brandColor+';':''}">${status}</span>
+        <span class="pl-card-arrow" style="color:${p.brandColor};">${isActive?'Resume →':isCompleted?'Re-read →':'Start →'}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function planCategoryLabel(cat){
+  return ({
+    'topical':'Topical',
+    'beginner':'Beginner',
+    'through-the-bible':'Through Bible',
+    'family':'Family',
+  })[cat] || cat;
+}
+
+function openPlanDetail(planId){
+  const p = planById(planId);
+  if(!p){ showToast('Plan not found'); return; }
+  const store = planStore();
+  const prog = store.active[planId];
+  const completedArchive = store.completed.find(c => c && c.planId === planId);
+
+  const headerEl = document.getElementById('planDetailHeader');
+  if(headerEl) headerEl.style.background = 'linear-gradient(135deg,#38bdf8,'+p.brandColor+')';
+  document.getElementById('planDetailIcon').textContent = p.badgeIcon;
+  document.getElementById('planDetailTitle').textContent = p.title;
+  document.getElementById('planDetailShort').textContent = p.short;
+
+  const body = document.getElementById('planDetailBody');
+  const todayDay = prog ? prog.currentDay : 1;
+  body.innerHTML = `
+    <div style="font-size:.7rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.16em;font-weight:800;margin-bottom:.5rem;">${planCategoryLabel(p.category)} · ${p.days} days · ${p.audience==='all'?'For everyone':p.audience}</div>
+    <div style="display:flex;flex-direction:column;gap:.4rem;">
+      ${p.daysData.map(d => {
+        const completed = !!(prog && prog.completedDays && prog.completedDays[d.day]) || (!!completedArchive);
+        const isToday   = !!prog && d.day === todayDay && !completed;
+        const dayBg     = completed ? 'rgba(16,185,129,.08)' : isToday ? 'rgba(56,189,248,.1)' : 'rgba(255,255,255,.03)';
+        const dayBdr    = completed ? 'rgba(16,185,129,.3)' : isToday ? p.brandColor : 'rgba(255,255,255,.08)';
+        const refsHtml  = d.refs.map(r => `<button onclick="planJumpToVerse(${JSON.stringify(r).replace(/"/g,'&quot;')})" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:var(--tx);border-radius:6px;padding:.18rem .45rem;font-size:.65rem;font-weight:700;cursor:pointer;font-family:var(--fm);margin-right:.25rem;margin-bottom:.2rem;">📖 ${r}</button>`).join('');
+        return `<div style="background:${dayBg};border:1px solid ${dayBdr};border-radius:10px;padding:.6rem .7rem;">
+          <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem;">
+            <span style="font-size:.62rem;font-weight:800;background:${completed?'#10b981':p.brandColor};color:#0b1220;border-radius:99px;padding:.1rem .5rem;letter-spacing:.06em;">DAY ${d.day}</span>
+            ${completed?'<span style="font-size:.62rem;color:#10b981;font-weight:700;">✓ Read</span>':''}
+            ${isToday?'<span style="font-size:.55rem;color:#0b1220;background:'+p.brandColor+';font-weight:800;border-radius:4px;padding:.1rem .35rem;letter-spacing:.06em;">TODAY</span>':''}
+          </div>
+          <div style="margin-bottom:.4rem;">${refsHtml}</div>
+          <div style="font-size:.72rem;color:var(--tx2);font-style:italic;line-height:1.5;">${d.prompt}</div>
+          ${isToday?`<button onclick="planMarkDayDone('${planId}',${d.day})" style="background:linear-gradient(135deg,#38bdf8,${p.brandColor});color:#0b1220;border:none;border-radius:8px;padding:.4rem .8rem;font-size:.72rem;font-weight:800;cursor:pointer;font-family:var(--fm);margin-top:.5rem;">✅ Mark Day ${d.day} Done +10 XP</button>`:''}
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+
+  const footer = document.getElementById('planDetailFooter');
+  if(prog){
+    footer.innerHTML = `
+      <button onclick="planQuit('${planId}')" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f87171;border-radius:10px;padding:.55rem .9rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Quit Plan</button>
+      <button onclick="closePlanDetail()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.55rem .9rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Close</button>
+    `;
+  } else if(completedArchive){
+    footer.innerHTML = `
+      <button onclick="planStart('${planId}')" style="background:linear-gradient(135deg,#38bdf8,${p.brandColor});color:#0b1220;border:none;border-radius:10px;padding:.55rem .9rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Re-read from Day 1</button>
+      <button onclick="closePlanDetail()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.55rem .9rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Close</button>
+    `;
+  } else {
+    footer.innerHTML = `
+      <button onclick="closePlanDetail()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.55rem .9rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Close</button>
+      <button onclick="planStart('${planId}')" style="background:linear-gradient(135deg,#38bdf8,${p.brandColor});color:#0b1220;border:none;border-radius:10px;padding:.55rem .9rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Start ${p.days}-Day Plan →</button>
+    `;
+  }
+  if(typeof openModal === 'function') openModal('planDetailModal');
+}
+
+function closePlanDetail(){
+  if(typeof closeModal === 'function') closeModal('planDetailModal');
+}
+
+function planStart(planId){
+  const p = planById(planId);
+  if(!p){ showToast('Plan not found'); return; }
+  const store = planStore();
+  // If a previous archive exists for this plan, drop it so re-read starts fresh.
+  store.completed = store.completed.filter(c => !c || c.planId !== planId);
+  store.active[planId] = {
+    planId,
+    currentDay: 1,
+    totalDays: p.days,
+    completedDays: {},
+    startedAt: new Date().toISOString(),
+  };
+  save();
+  if(typeof logActivity === 'function') logActivity('faith', 'Started plan: ' + p.title);
+  showToast(p.badgeIcon + ' Plan started! Day 1 ready.');
+  openPlanDetail(planId); // refresh modal so DAY 1 shows TODAY tag + Mark Done CTA
+  renderPlanCatalog();
+  if(typeof renderFaithHome === 'function') renderFaithHome();
+}
+
+function planMarkDayDone(planId, dayNum){
+  const p = planById(planId);
+  if(!p){ return; }
+  const store = planStore();
+  const prog = store.active[planId];
+  if(!prog){ showToast('Plan not active'); return; }
+  if(prog.completedDays && prog.completedDays[dayNum]){ showToast('Day already complete'); return; }
+  if(!prog.completedDays) prog.completedDays = {};
+  prog.completedDays[dayNum] = new Date().toISOString();
+
+  // Faith XP +10 per completed plan day (per spec §4.1).
+  D.scrPoints = (D.scrPoints || 0) + 10;
+
+  // Streak protection: completing a plan day counts as a faith action for today.
+  if(!D.scrReadDays) D.scrReadDays = {};
+  D.scrReadDays[new Date().toISOString().slice(0,10)] = true;
+
+  // Advance currentDay if user completed the day they were on.
+  if(prog.currentDay === dayNum) prog.currentDay = dayNum + 1;
+
+  // Plan complete?
+  if(prog.currentDay > prog.totalDays){
+    store.completed.push({
+      planId,
+      title: p.title,
+      badgeIcon: p.badgeIcon,
+      totalDays: p.totalDays,
+      startedAt: prog.startedAt,
+      completedAt: new Date().toISOString(),
+    });
+    delete store.active[planId];
+    D.scrPoints = (D.scrPoints || 0) + 50; // Completion bonus
+    showToast(p.badgeIcon + ' Plan complete! +50 XP badge earned 🏆');
+    if(typeof logActivity === 'function') logActivity('faith', 'Completed plan: ' + p.title);
+    save();
+    closePlanDetail();
+    renderPlanCatalog();
+    if(typeof renderFaithHome === 'function') renderFaithHome();
+    if(typeof renderScrStats === 'function') renderScrStats();
+    return;
+  }
+
+  save();
+  showToast('Day ' + dayNum + ' complete! +10 XP 🙌');
+  if(typeof logActivity === 'function') logActivity('faith', p.title + ' · Day ' + dayNum + ' done');
+  // Refresh in-place — re-open modal so the next "TODAY" badge moves down.
+  openPlanDetail(planId);
+  renderPlanCatalog();
+  if(typeof renderFaithHome === 'function') renderFaithHome();
+  if(typeof renderScrStats === 'function') renderScrStats();
+}
+
+function planQuit(planId){
+  const p = planById(planId);
+  if(!p) return;
+  if(!confirm('Quit "' + p.title + '"? Your progress on this plan will be cleared.')) return;
+  const store = planStore();
+  delete store.active[planId];
+  save();
+  closePlanDetail();
+  renderPlanCatalog();
+  if(typeof renderFaithHome === 'function') renderFaithHome();
+  showToast('Plan removed');
+}
+
+// Open the Bible reader at a given verse reference. Reuses the existing ESV
+// reader path — same parsing as fhOpenContext but takes the ref as an arg.
+function planJumpToVerse(ref){
+  const m = String(ref).match(/^(\d?\s?[A-Za-z][A-Za-z ]+?)\s+(\d+)/);
+  if(!m){ bfTab('bible'); return; }
+  const book = m[1].trim(); const ch = m[2];
+  closePlanDetail();
+  bfTab('bible');
+  setTimeout(function(){
+    const sel = document.getElementById('esvBook');
+    if(sel){
+      const opt = Array.from(sel.options).find(o => o.value && o.value.toLowerCase() === book.toLowerCase());
+      if(opt){ sel.value = opt.value; if(typeof onEsvBookChange === 'function') onEsvBookChange(); }
+    }
+    const chSel = document.getElementById('esvChapter');
+    if(chSel) chSel.value = ch;
+    if(typeof openEsvReader === 'function') openEsvReader();
+  }, 60);
+}
+
+// Used by Faith Home Card 3 — returns the most-recent active plan or null.
+function fhActivePlan(){
+  const store = planStore();
+  const ids = Object.keys(store.active);
+  if(!ids.length) return null;
+  ids.sort((a,b) => (store.active[b].startedAt||'').localeCompare(store.active[a].startedAt||''));
+  const prog = store.active[ids[0]];
+  const plan = planById(prog.planId);
+  if(!plan) return null;
+  return { plan, prog };
 }
 
 // ── ESV BIBLE READER ─────────────────────────────────────────
@@ -682,6 +1316,12 @@ function quickOpenEsvBook(name, chapters){
   openEsvReader();
 }
 
+// Track the active chapter so the verse-tap menu and annotation lookups know
+// the context after a fetch completes.
+let _esvCurrentBook = '';
+let _esvCurrentChapter = 0;
+let _esvSelectedVerse = 0;
+
 async function openEsvReader(){
   const book = (document.getElementById('esvBook')||{}).value;
   const ch = (document.getElementById('esvChapter')||{}).value || '1';
@@ -693,11 +1333,16 @@ async function openEsvReader(){
   const totalCh = bookData ? bookData.ch : 1;
   const chNum = parseInt(ch,10);
 
-  // Use charModal (same modal devotionals use)
+  _esvCurrentBook    = book;
+  _esvCurrentChapter = chNum;
+  _esvSelectedVerse  = 0;
+
+  // Use charModal (same modal devotionals use). F2-D switches the header to
+  // brand palette — replaces the leftover #667eea/#764ba2 KC gradient.
   document.getElementById('charIcon').textContent = icon;
   document.getElementById('charTitle').textContent = book;
   document.getElementById('charSub').textContent = 'Chapter '+chNum+' · English Standard Version (ESV)';
-  document.getElementById('charModalHeader').style.background = 'linear-gradient(135deg,#667eea,#764ba2)';
+  document.getElementById('charModalHeader').style.background = 'linear-gradient(135deg,#38bdf8,#a78bfa)';
   document.getElementById('charBody').innerHTML = '<div style="text-align:center;padding:2rem;color:var(--tx2);font-size:.85rem;">⏳ Loading '+book+' '+chNum+'...</div>';
   document.getElementById('charQuiz').innerHTML = '';
   openModal('charModal');
@@ -711,29 +1356,42 @@ async function openEsvReader(){
     const data = await resp.json();
     const text = (data.passages&&data.passages[0])||'No text returned.';
 
-    // Extract verse numbers from the text [1], [2], etc.
-    const verseNums = [];
-    const _vm = text.matchAll(/\[(\d+)\]/g);
-    for(const m of _vm){ verseNums.push(parseInt(m[1])); }
-
-    // Navigation arrows + chapter jump dropdown
+    // Navigation arrows + chapter jump dropdown (brand-palette gradient)
     const prevDisabled = chNum<=1;
     const nextDisabled = chNum>=totalCh;
     const chapterOpts = Array.from({length:totalCh},(_,i)=>`<option value="${i+1}" ${i+1===chNum?'selected':''}>Chapter ${i+1}</option>`).join('');
     const navHtml = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;gap:.5rem;">
-      <button onclick="navigateEsvChapter('${book.replace(/'/g,"\\'")}',${chNum-1},${totalCh})" ${prevDisabled?'disabled style="opacity:.3;cursor:not-allowed;"':''} style="background:rgba(102,126,234,.15);border:1px solid rgba(102,126,234,.3);color:#a78bfa;border-radius:8px;padding:.4rem .8rem;font-size:.75rem;font-weight:700;cursor:pointer;">‹ Prev</button>
-      <select onchange="navigateEsvChapter('${book.replace(/'/g,"\\'")}',parseInt(this.value),${totalCh})" style="flex:1;margin:0 .4rem;padding:.3rem .5rem;border-radius:8px;background:rgba(102,126,234,.1);border:1px solid rgba(102,126,234,.25);color:#a78bfa;font-size:.75rem;text-align:center;">
+      <button onclick="navigateEsvChapter('${book.replace(/'/g,"\\'")}',${chNum-1},${totalCh})" ${prevDisabled?'disabled style="opacity:.3;cursor:not-allowed;"':''} style="background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.28);color:#38bdf8;border-radius:8px;padding:.4rem .8rem;font-size:.75rem;font-weight:700;cursor:pointer;">‹ Prev</button>
+      <select onchange="navigateEsvChapter('${book.replace(/'/g,"\\'")}',parseInt(this.value),${totalCh})" style="flex:1;margin:0 .4rem;padding:.3rem .5rem;border-radius:8px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);color:var(--tx);font-size:.75rem;text-align:center;">
         ${chapterOpts}
       </select>
-      <button onclick="navigateEsvChapter('${book.replace(/'/g,"\\'")}',${chNum+1},${totalCh})" ${nextDisabled?'disabled style="opacity:.3;cursor:not-allowed;"':''} style="background:rgba(102,126,234,.15);border:1px solid rgba(102,126,234,.3);color:#a78bfa;border-radius:8px;padding:.4rem .8rem;font-size:.75rem;font-weight:700;cursor:pointer;">Next ›</button>
+      <button onclick="navigateEsvChapter('${book.replace(/'/g,"\\'")}',${chNum+1},${totalCh})" ${nextDisabled?'disabled style="opacity:.3;cursor:not-allowed;"':''} style="background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.3);color:#a78bfa;border-radius:8px;padding:.4rem .8rem;font-size:.75rem;font-weight:700;cursor:pointer;">Next ›</button>
+    </div>
+    <div style="display:flex;gap:.4rem;margin-bottom:.6rem;flex-wrap:wrap;">
+      <button onclick="esvListenChapter('${book.replace(/'/g,"\\'")}',${chNum})" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);color:#38bdf8;border-radius:8px;padding:.35rem .7rem;font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fm);">🎧 Listen</button>
+      <button onclick="openReaderSettings()" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--tx2);border-radius:8px;padding:.35rem .7rem;font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fm);">⚙️ Settings</button>
+      <span style="margin-left:auto;font-size:.6rem;color:var(--tx3);font-weight:700;align-self:center;">Tap any verse to highlight, note, share</span>
     </div>`;
 
-    const formattedText = text.replace(/\[(\d+)\]/g,'<sup id="esv-v-$1" style="color:#a78bfa;font-size:.65em;font-weight:700;">[$1]</sup>');
+    // F2-D: process passage into verse spans, then apply annotations + place-tags.
+    const passageHtml = renderEsvPassage(text, book, chNum);
+
+    const settings = (D && D.faithReaderSettings) || { fontSize:'medium', lineHeight:'normal', fontFamily:'serif' };
+    const fontSize   = settings.fontSize === 'small' ? '.82rem' : settings.fontSize === 'large' ? '1.05rem' : '.95rem';
+    const lineHeight = settings.lineHeight === 'compact' ? '1.7' : settings.lineHeight === 'relaxed' ? '2.2' : '2';
+    const fontFamily = settings.fontFamily === 'sans'
+      ? "'Inter', system-ui, sans-serif"
+      : "'Georgia','Times New Roman',serif";
+
     document.getElementById('charBody').innerHTML = navHtml +
-      `<div id="esvPassageText" style="font-family:'Georgia','Times New Roman',serif;font-size:.9rem;line-height:2;color:var(--tx);white-space:pre-wrap;">${formattedText}</div>
+      `<div id="esvPassageText" style="font-family:${fontFamily};font-size:${fontSize};line-height:${lineHeight};color:var(--tx);white-space:pre-wrap;">${passageHtml}</div>
       <div style="margin-top:1.2rem;padding-top:.8rem;border-top:1px solid rgba(255,255,255,.06);font-size:.58rem;color:var(--tx3);line-height:1.6;">
         Scripture quotations are from the ESV® Bible (The Holy Bible, English Standard Version®), copyright © 2001 by Crossway, a publishing ministry of Good News Publishers. Used by permission. All rights reserved.
       </div>`;
+
+    // Mark this chapter as read for streak/XP. Lighter than a full devotional —
+    // +2 XP per chapter, capped to once per day per chapter.
+    awardEsvChapterXP(book, chNum);
   } catch(err){
     document.getElementById('charBody').innerHTML = `<div style="text-align:center;padding:1.5rem;color:#f87171;font-size:.82rem;">❌ ${err.message}</div>
       <div style="font-size:.75rem;color:var(--tx2);text-align:center;margin-top:.5rem;">Make sure your ESV API key is valid. Get one free at <span style="color:var(--c);">api.esv.org</span></div>`;
@@ -759,6 +1417,496 @@ function jumpToEsvVerse(verseNum){
     target.style.padding = '0 2px';
     setTimeout(()=>{ target.style.background=''; target.style.padding=''; }, 1500);
   }
+}
+
+// ═════════════════════════════════════════════════════════════
+// F2-D — BIBLE READER UPGRADE
+// Per-verse highlight / note / bookmark / share / copy / explain (F2-G stub),
+// chapter audio (YouTube search), full-text search, reader settings,
+// and F3 forward-compat place-tag attribute hooks.
+// ═════════════════════════════════════════════════════════════
+
+// Static map of place names → site IDs for F3 Biblical World. F2-D adds the
+// data-place attribute only; F3 wires the tap handler to open a site profile.
+// Keep small (high-precision known places); extending the map is part of F3.
+const ESV_PLACE_MAP = {
+  'Jerusalem':'jerusalem','Bethlehem':'bethlehem','Nazareth':'nazareth',
+  'Capernaum':'capernaum','Bethel':'bethel','Hebron':'hebron','Jericho':'jericho',
+  'Shechem':'shechem','Shiloh':'shiloh','Babylon':'babylon','Nineveh':'nineveh',
+  'Damascus':'damascus','Antioch':'antioch','Ephesus':'ephesus','Corinth':'corinth',
+  'Athens':'athens','Rome':'rome','Patmos':'patmos','Galilee':'galilee',
+  'Judea':'judea','Samaria':'samaria','Jordan':'jordan-river','Sinai':'mt-sinai',
+  'Carmel':'mt-carmel','Olives':'mt-olives','Egypt':'egypt','Ur':'ur',
+  'Haran':'haran','Megiddo':'megiddo','Hazor':'hazor','Lachish':'lachish',
+  'Qumran':'qumran','Masada':'masada','Caesarea':'caesarea-maritima',
+};
+
+// Build verse-by-verse HTML from raw ESV passage text. Splits on the [N] verse
+// markers and wraps each verse's prose in a tappable span. Section headings
+// before the first verse marker are kept as a small header line.
+function renderEsvPassage(text, book, chNum){
+  // Pull existing annotations for this chapter once.
+  const allHl   = (D && D.faithHighlights) || [];
+  const allNt   = (D && D.faithNotes) || [];
+  const allBm   = (D && D.faithBookmarks) || [];
+  const hlMap   = {}, ntMap = {}, bmMap = {};
+  allHl.forEach(h => { if(h && h.book===book && h.chapter===chNum) hlMap[h.verse] = h; });
+  allNt.forEach(n => { if(n && n.book===book && n.chapter===chNum) ntMap[n.verse] = n; });
+  allBm.forEach(b => { if(b && b.book===book && b.chapter===chNum) bmMap[b.verse] = b; });
+
+  const parts = String(text).split(/(\[\d+\])/);
+  let html = '';
+  let openVerse = false;
+  let intro = '';
+  let firstSeen = false;
+
+  for(let i=0;i<parts.length;i++){
+    const part = parts[i];
+    if(/^\[\d+\]$/.test(part)){
+      const verseNum = parseInt(part.slice(1,-1), 10);
+      // Close prior verse span if open
+      if(openVerse) html += '</span>';
+      // First-marker arrival — flush any intro/heading text we accumulated.
+      if(!firstSeen && intro.trim()){
+        html += '<div style="font-family:Bebas Neue,sans-serif;font-size:.95rem;letter-spacing:.05em;color:var(--tx2);margin-bottom:.6rem;">' + escapeHtml(intro.trim()) + '</div>';
+        firstSeen = true;
+        intro = '';
+      } else if(intro.trim()){
+        // In-passage section heading between verses
+        html += '<div style="font-family:Bebas Neue,sans-serif;font-size:.85rem;letter-spacing:.04em;color:var(--tx2);margin:.8rem 0 .4rem;">' + escapeHtml(intro.trim()) + '</div>';
+        intro = '';
+      }
+      const hl = hlMap[verseNum];
+      const nt = ntMap[verseNum];
+      const bm = bmMap[verseNum];
+      const hlBg = hl && hl.color ? hl.color : 'transparent';
+      const hlAttr = hl && hl.color ? `background:${hl.color};color:#0b1220;border-radius:3px;padding:0 3px;` : '';
+      html += `<span class="esv-v" data-verse="${verseNum}" data-book="${escapeHtml(book)}" data-chapter="${chNum}" onclick="esvVerseTap(${verseNum})" style="cursor:pointer;${hlAttr}">`;
+      html += `<sup id="esv-v-${verseNum}" style="color:#a78bfa;font-size:.65em;font-weight:700;">${bm ? '🔖' : ''}[${verseNum}]</sup>`;
+      if(nt) html += '<span title="You wrote a note on this verse" style="font-size:.7em;margin-left:2px;">📝</span>';
+      openVerse = true;
+      firstSeen = true;
+    } else {
+      if(!firstSeen) intro += part;
+      else html += escapeHtml(part);
+    }
+  }
+  if(openVerse) html += '</span>';
+
+  // F3 place-tag hook — wrap known place names with data-place attribute.
+  // No tap handler in F2-D; F3 wires it. Avoids re-touching the reader later.
+  // Word-boundary regex ensures we don't mangle "Jerusalemite" or partial matches.
+  const placeKeys = Object.keys(ESV_PLACE_MAP).sort((a,b) => b.length - a.length);
+  const placeRegex = new RegExp('\\b(' + placeKeys.map(k => k.replace(/[.*+?^${}()|[\\]\\\\]/g,'\\\\$&')).join('|') + ')\\b','g');
+  // Only run inside text nodes — avoid breaking attributes. Simplest safe pass:
+  // since our generated HTML wraps verse prose in escaped text inside spans,
+  // we can post-process by replacing within the assembled string but only in
+  // segments outside any tag. We split on tags and replace text-only segments.
+  html = html.replace(/(>)([^<]+)(<)/g, function(_, open, txt, close){
+    return open + txt.replace(placeRegex, function(m){
+      const id = ESV_PLACE_MAP[m];
+      return `<span data-place="${id}" style="border-bottom:1px dotted rgba(167,139,250,.4);cursor:default;" title="Biblical World — coming F3">${m}</span>`;
+    }) + close;
+  });
+
+  return html;
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, function(c){
+    return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c];
+  });
+}
+
+// Verse-tap entry point. Opens the bottom sheet menu with all verse actions.
+function esvVerseTap(verseNum){
+  if(!_esvCurrentBook || !_esvCurrentChapter){ return; }
+  _esvSelectedVerse = verseNum;
+  const titleEl = document.getElementById('vtmTitle');
+  if(titleEl) titleEl.textContent = _esvCurrentBook + ' ' + _esvCurrentChapter + ':' + verseNum;
+  // Reflect bookmark state on the button
+  const bmBtn = document.getElementById('vtmBookmarkBtn');
+  if(bmBtn){
+    const bm = (D && D.faithBookmarks || []).find(b => b && b.book===_esvCurrentBook && b.chapter===_esvCurrentChapter && b.verse===verseNum);
+    bmBtn.innerHTML = bm ? '🔖 Remove' : '🔖 Bookmark';
+  }
+  const m = document.getElementById('verseTapMenu');
+  if(m) m.style.display = 'block';
+}
+
+function closeVerseMenu(){
+  const m = document.getElementById('verseTapMenu');
+  if(m) m.style.display = 'none';
+  _esvSelectedVerse = 0;
+}
+
+// Apply / replace / remove highlight for the currently-selected verse.
+function vtmHighlight(color){
+  if(!_esvSelectedVerse) return;
+  if(!D.faithHighlights) D.faithHighlights = [];
+  const idx = D.faithHighlights.findIndex(h => h && h.book===_esvCurrentBook && h.chapter===_esvCurrentChapter && h.verse===_esvSelectedVerse);
+  if(!color){
+    if(idx >= 0){ D.faithHighlights.splice(idx,1); save(); showToast('Highlight removed'); }
+    rerenderEsvVerseInline(_esvSelectedVerse);
+    closeVerseMenu();
+    return;
+  }
+  if(idx >= 0){
+    D.faithHighlights[idx].color = color;
+    D.faithHighlights[idx].updatedAt = new Date().toISOString();
+  } else {
+    D.faithHighlights.push({
+      id: Date.now(),
+      book: _esvCurrentBook,
+      chapter: _esvCurrentChapter,
+      verse: _esvSelectedVerse,
+      color: color,
+      createdAt: new Date().toISOString(),
+    });
+  }
+  // Faith action — counts toward streak.
+  if(!D.scrReadDays) D.scrReadDays = {};
+  D.scrReadDays[new Date().toISOString().slice(0,10)] = true;
+  save();
+  if(typeof logActivity === 'function') logActivity('faith', 'Highlighted ' + _esvCurrentBook + ' ' + _esvCurrentChapter + ':' + _esvSelectedVerse);
+  rerenderEsvVerseInline(_esvSelectedVerse);
+  if(typeof renderFaithHome === 'function') renderFaithHome();
+  showToast('Highlight saved');
+  closeVerseMenu();
+}
+
+// Toggle a bookmark on the current verse.
+function vtmBookmark(){
+  if(!_esvSelectedVerse) return;
+  if(!D.faithBookmarks) D.faithBookmarks = [];
+  const idx = D.faithBookmarks.findIndex(b => b && b.book===_esvCurrentBook && b.chapter===_esvCurrentChapter && b.verse===_esvSelectedVerse);
+  if(idx >= 0){
+    D.faithBookmarks.splice(idx,1);
+    save();
+    showToast('Bookmark removed');
+  } else {
+    D.faithBookmarks.push({
+      id: Date.now(),
+      book: _esvCurrentBook,
+      chapter: _esvCurrentChapter,
+      verse: _esvSelectedVerse,
+      createdAt: new Date().toISOString(),
+    });
+    if(!D.scrReadDays) D.scrReadDays = {};
+    D.scrReadDays[new Date().toISOString().slice(0,10)] = true;
+    save();
+    if(typeof logActivity === 'function') logActivity('faith', 'Bookmarked ' + _esvCurrentBook + ' ' + _esvCurrentChapter + ':' + _esvSelectedVerse);
+    showToast('Bookmark saved 🔖');
+  }
+  rerenderEsvVerseInline(_esvSelectedVerse);
+  if(typeof renderFaithHome === 'function') renderFaithHome();
+  closeVerseMenu();
+}
+
+// Open note editor for the selected verse.
+function vtmNote(){
+  if(!_esvSelectedVerse) return;
+  const verseEl = document.querySelector('.esv-v[data-verse="'+_esvSelectedVerse+'"]');
+  const verseText = verseEl ? verseEl.textContent.replace(/^\s*🔖?\[\d+\]\s*/, '').replace(/📝/g,'').trim() : '';
+  const titleEl = document.getElementById('vnmTitle');
+  if(titleEl) titleEl.textContent = _esvCurrentBook + ' ' + _esvCurrentChapter + ':' + _esvSelectedVerse;
+  const verseTextEl = document.getElementById('vnmVerseText');
+  if(verseTextEl) verseTextEl.textContent = verseText || '(verse text unavailable)';
+  const ta = document.getElementById('vnmTextarea');
+  const existing = (D.faithNotes||[]).find(n => n && n.book===_esvCurrentBook && n.chapter===_esvCurrentChapter && n.verse===_esvSelectedVerse);
+  if(ta) ta.value = existing ? existing.text : '';
+  const delBtn = document.getElementById('vnmDelete');
+  if(delBtn) delBtn.style.display = existing ? '' : 'none';
+  if(typeof openModal === 'function') openModal('verseNoteModal');
+  closeVerseMenu();
+}
+
+function closeVerseNote(){
+  if(typeof closeModal === 'function') closeModal('verseNoteModal');
+}
+
+function saveVerseNote(){
+  const ta = document.getElementById('vnmTextarea');
+  const text = ta ? ta.value.trim() : '';
+  if(!text){ showToast('Write a note first'); return; }
+  if(!D.faithNotes) D.faithNotes = [];
+  const idx = D.faithNotes.findIndex(n => n && n.book===_esvCurrentBook && n.chapter===_esvCurrentChapter && n.verse===_esvSelectedVerse);
+  const now = new Date().toISOString();
+  if(idx >= 0){
+    D.faithNotes[idx].text = text;
+    D.faithNotes[idx].updatedAt = now;
+  } else {
+    D.faithNotes.push({
+      id: Date.now(),
+      book: _esvCurrentBook,
+      chapter: _esvCurrentChapter,
+      verse: _esvSelectedVerse,
+      text: text,
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
+  if(!D.scrReadDays) D.scrReadDays = {};
+  D.scrReadDays[new Date().toISOString().slice(0,10)] = true;
+  save();
+  if(typeof logActivity === 'function') logActivity('faith', 'Note on ' + _esvCurrentBook + ' ' + _esvCurrentChapter + ':' + _esvSelectedVerse);
+  rerenderEsvVerseInline(_esvSelectedVerse);
+  if(typeof renderFaithHome === 'function') renderFaithHome();
+  closeVerseNote();
+  showToast('Note saved 📝');
+}
+
+function deleteVerseNote(){
+  if(!confirm('Delete this note?')) return;
+  if(!D.faithNotes) D.faithNotes = [];
+  const idx = D.faithNotes.findIndex(n => n && n.book===_esvCurrentBook && n.chapter===_esvCurrentChapter && n.verse===_esvSelectedVerse);
+  if(idx >= 0){
+    D.faithNotes.splice(idx,1);
+    save();
+    rerenderEsvVerseInline(_esvSelectedVerse);
+    closeVerseNote();
+    showToast('Note deleted');
+  } else closeVerseNote();
+}
+
+// Share the selected verse via the F2-C verse card generator.
+function vtmShare(){
+  if(!_esvSelectedVerse) return;
+  const verseEl = document.querySelector('.esv-v[data-verse="'+_esvSelectedVerse+'"]');
+  const verseText = verseEl ? verseEl.textContent.replace(/^\s*🔖?\[\d+\]\s*/, '').replace(/📝/g,'').trim() : '';
+  const ref = _esvCurrentBook + ' ' + _esvCurrentChapter + ':' + _esvSelectedVerse;
+  if(typeof openVerseCard === 'function'){
+    closeVerseMenu();
+    openVerseCard(verseText, ref);
+  } else {
+    showToast('Share generator unavailable');
+  }
+}
+
+// Plain-text clipboard copy for the selected verse.
+function vtmCopy(){
+  if(!_esvSelectedVerse) return;
+  const verseEl = document.querySelector('.esv-v[data-verse="'+_esvSelectedVerse+'"]');
+  const verseText = verseEl ? verseEl.textContent.replace(/^\s*🔖?\[\d+\]\s*/, '').replace(/📝/g,'').trim() : '';
+  const ref = _esvCurrentBook + ' ' + _esvCurrentChapter + ':' + _esvSelectedVerse;
+  const out = '"' + verseText + '" — ' + ref + '\n\nyourlifecc.com';
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(out).then(function(){ showToast('Verse copied ✓'); });
+  } else {
+    showToast('Clipboard not supported');
+  }
+  closeVerseMenu();
+}
+
+// AI explain — opens the F2-G Ask the Bible modal pre-filled with the
+// selected verse, so the answer is grounded in that specific passage.
+function vtmExplain(){
+  if(!_esvSelectedVerse) return;
+  const verseEl = document.querySelector('.esv-v[data-verse="'+_esvSelectedVerse+'"]');
+  const verseText = verseEl ? verseEl.textContent.replace(/^\s*🔖?\[\d+\]\s*/, '').replace(/📝/g,'').trim() : '';
+  const ref = _esvCurrentBook + ' ' + _esvCurrentChapter + ':' + _esvSelectedVerse;
+  closeVerseMenu();
+  if(typeof openAskBible === 'function'){
+    const seed = 'Explain ' + ref + ' — what is this verse saying, in context, and how should it shape my life?\n\n"' + verseText + '"';
+    openAskBible(seed);
+  } else {
+    showToast('Ask the Bible unavailable');
+  }
+}
+
+// Re-render a single verse span in place after an annotation change. Cheaper
+// than re-running the whole passage, and keeps scroll position stable.
+function rerenderEsvVerseInline(verseNum){
+  const span = document.querySelector('.esv-v[data-verse="'+verseNum+'"]');
+  if(!span) return;
+  const hl = (D.faithHighlights||[]).find(h => h && h.book===_esvCurrentBook && h.chapter===_esvCurrentChapter && h.verse===verseNum);
+  const nt = (D.faithNotes||[]).find(n => n && n.book===_esvCurrentBook && n.chapter===_esvCurrentChapter && n.verse===verseNum);
+  const bm = (D.faithBookmarks||[]).find(b => b && b.book===_esvCurrentBook && b.chapter===_esvCurrentChapter && b.verse===verseNum);
+  if(hl && hl.color){
+    span.style.background = hl.color;
+    span.style.color = '#0b1220';
+    span.style.borderRadius = '3px';
+    span.style.padding = '0 3px';
+  } else {
+    span.style.background = '';
+    span.style.color = '';
+    span.style.borderRadius = '';
+    span.style.padding = '';
+  }
+  // Update the [N] / 🔖[N] / 📝 indicators.
+  const sup = span.querySelector('sup');
+  if(sup) sup.innerHTML = (bm ? '🔖' : '') + '[' + verseNum + ']';
+  // Remove any existing 📝 marker, then re-add if note exists.
+  const existingNote = span.querySelector('span[data-note-marker]');
+  if(existingNote) existingNote.remove();
+  if(nt){
+    const marker = document.createElement('span');
+    marker.setAttribute('data-note-marker','1');
+    marker.title = 'You wrote a note on this verse';
+    marker.style.cssText = 'font-size:.7em;margin-left:2px;';
+    marker.textContent = '📝';
+    if(sup && sup.nextSibling) sup.parentNode.insertBefore(marker, sup.nextSibling);
+    else if(sup) sup.parentNode.appendChild(marker);
+  }
+}
+
+// F2-D Listen: open YouTube search for "ESV Audio <book> <chapter>" in a new
+// tab. Static per-chapter video map is a future-phase content build.
+function esvListenChapter(book, ch){
+  const q = encodeURIComponent('ESV Audio ' + book + ' chapter ' + ch);
+  window.open('https://www.youtube.com/results?search_query=' + q, '_blank', 'noopener');
+}
+
+// Reader settings modal — font size, line height, font family.
+function openReaderSettings(){
+  const settings = (D && D.faithReaderSettings) || { fontSize:'medium', lineHeight:'normal', fontFamily:'serif' };
+  document.querySelectorAll('#readerSettingsModal .rs-opt').forEach(function(b){
+    b.style.background = 'rgba(255,255,255,.06)';
+    b.style.borderColor = 'rgba(255,255,255,.14)';
+    b.style.color = 'var(--tx)';
+  });
+  const map = { 'fontSize':'size', 'lineHeight':'line', 'fontFamily':'family' };
+  Object.keys(map).forEach(function(prop){
+    const v = settings[prop];
+    const sel = document.querySelector('#readerSettingsModal .rs-opt[data-rs="'+map[prop]+':'+v+'"]');
+    if(sel){
+      sel.style.background = 'linear-gradient(135deg,#38bdf8,#a78bfa)';
+      sel.style.borderColor = 'transparent';
+      sel.style.color = '#0b1220';
+    }
+  });
+  if(typeof openModal === 'function') openModal('readerSettingsModal');
+}
+
+function closeReaderSettings(){
+  if(typeof closeModal === 'function') closeModal('readerSettingsModal');
+}
+
+function rsSet(prop, value, btn){
+  if(!D.faithReaderSettings) D.faithReaderSettings = { fontSize:'medium', lineHeight:'normal', fontFamily:'serif' };
+  D.faithReaderSettings[prop] = value;
+  save();
+  // Visually mark active option
+  const groupKey = ({ 'fontSize':'size', 'lineHeight':'line', 'fontFamily':'family' })[prop];
+  document.querySelectorAll('#readerSettingsModal .rs-opt[data-rs^="'+groupKey+':"]').forEach(function(b){
+    if(b === btn){
+      b.style.background = 'linear-gradient(135deg,#38bdf8,#a78bfa)';
+      b.style.borderColor = 'transparent';
+      b.style.color = '#0b1220';
+    } else {
+      b.style.background = 'rgba(255,255,255,.06)';
+      b.style.borderColor = 'rgba(255,255,255,.14)';
+      b.style.color = 'var(--tx)';
+    }
+  });
+  // Apply live to the open passage if any
+  const txt = document.getElementById('esvPassageText');
+  if(txt){
+    const s = D.faithReaderSettings;
+    txt.style.fontSize   = s.fontSize === 'small' ? '.82rem' : s.fontSize === 'large' ? '1.05rem' : '.95rem';
+    txt.style.lineHeight = s.lineHeight === 'compact' ? '1.7' : s.lineHeight === 'relaxed' ? '2.2' : '2';
+    txt.style.fontFamily = s.fontFamily === 'sans' ? "'Inter', system-ui, sans-serif" : "'Georgia','Times New Roman',serif";
+  }
+}
+
+// F2-D Search — runs both: (a) local lookup in user's notes/highlights/bookmarks,
+// (b) ESV API passage/search. Results render in #esvSearchResults.
+async function runEsvSearch(){
+  const q = (document.getElementById('esvSearchInput')||{}).value || '';
+  const term = q.trim();
+  const out = document.getElementById('esvSearchResults');
+  if(!out) return;
+  if(!term){ out.style.display = 'none'; out.innerHTML = ''; return; }
+  out.style.display = 'block';
+  out.innerHTML = '<div style="font-size:.75rem;color:var(--tx2);padding:.5rem;">Searching…</div>';
+
+  // Local pass — case-insensitive.
+  const lcTerm = term.toLowerCase();
+  const localNotes = (D.faithNotes||[]).filter(n => n && (String(n.text||'').toLowerCase().includes(lcTerm) ||
+    (n.book + ' ' + n.chapter + ':' + n.verse).toLowerCase().includes(lcTerm)));
+  const localBookmarks = (D.faithBookmarks||[]).filter(b => b && (b.book + ' ' + b.chapter + ':' + b.verse).toLowerCase().includes(lcTerm));
+
+  let html = '';
+  if(localNotes.length || localBookmarks.length){
+    html += '<div style="font-size:.62rem;font-weight:800;color:var(--tx3);text-transform:uppercase;letter-spacing:.16em;margin:.3rem 0 .35rem;">Your notes &amp; bookmarks</div>';
+    localNotes.slice(0,10).forEach(function(n){
+      html += `<div onclick="esvJumpFromSearch('${encodeURIComponent(n.book)}',${n.chapter},${n.verse})" style="background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.18);border-radius:8px;padding:.5rem .65rem;margin-bottom:.3rem;cursor:pointer;">
+        <div style="font-size:.7rem;font-weight:800;color:#38bdf8;margin-bottom:.15rem;">📝 ${escapeHtml(n.book)} ${n.chapter}:${n.verse}</div>
+        <div style="font-size:.74rem;color:var(--tx2);line-height:1.45;">${escapeHtml((n.text||'').slice(0,140))}${(n.text||'').length>140?'…':''}</div>
+      </div>`;
+    });
+    localBookmarks.slice(0,5).forEach(function(b){
+      html += `<div onclick="esvJumpFromSearch('${encodeURIComponent(b.book)}',${b.chapter},${b.verse})" style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.18);border-radius:8px;padding:.5rem .65rem;margin-bottom:.3rem;cursor:pointer;">
+        <div style="font-size:.7rem;font-weight:800;color:#a78bfa;">🔖 ${escapeHtml(b.book)} ${b.chapter}:${b.verse}</div>
+      </div>`;
+    });
+  }
+
+  // ESV-side full-text search.
+  try {
+    const key = 'aaf4dd2ad7cb2e6aa19853ddd493136125afb18e';
+    const url = 'https://api.esv.org/v3/passage/search/?q=' + encodeURIComponent(term) + '&page-size=10';
+    const resp = await fetch(url, { headers: { 'Authorization':'Token '+key } });
+    if(resp.ok){
+      const data = await resp.json();
+      const results = (data && data.results) || [];
+      if(results.length){
+        html += '<div style="font-size:.62rem;font-weight:800;color:var(--tx3);text-transform:uppercase;letter-spacing:.16em;margin:.7rem 0 .35rem;">ESV results · ' + (data.total_results||results.length) + ' total</div>';
+        results.forEach(function(r){
+          html += `<div onclick="esvJumpFromRef('${encodeURIComponent(r.reference||'')}')" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.5rem .65rem;margin-bottom:.3rem;cursor:pointer;">
+            <div style="font-size:.7rem;font-weight:800;color:var(--tx);margin-bottom:.15rem;">📖 ${escapeHtml(r.reference||'')}</div>
+            <div style="font-size:.74rem;color:var(--tx2);line-height:1.5;">${escapeHtml((r.content||'').replace(/\s+/g,' ').slice(0,180))}${(r.content||'').length>180?'…':''}</div>
+          </div>`;
+        });
+      } else if(!localNotes.length && !localBookmarks.length){
+        html += '<div style="font-size:.74rem;color:var(--tx2);padding:.6rem;text-align:center;">No matches in ESV or your notes.</div>';
+      }
+    } else {
+      html += '<div style="font-size:.7rem;color:#f87171;padding:.5rem;">ESV search failed (' + resp.status + ').</div>';
+    }
+  } catch(e){
+    html += '<div style="font-size:.7rem;color:#f87171;padding:.5rem;">ESV search error — check connection.</div>';
+  }
+  out.innerHTML = html;
+}
+
+function esvJumpFromSearch(encodedBook, ch, verse){
+  const book = decodeURIComponent(encodedBook);
+  const sel = document.getElementById('esvBook');
+  if(sel){ sel.value = book; if(typeof onEsvBookChange === 'function') onEsvBookChange(); }
+  const chSel = document.getElementById('esvChapter');
+  if(chSel) chSel.value = String(ch);
+  openEsvReader();
+  setTimeout(function(){ if(typeof jumpToEsvVerse === 'function') jumpToEsvVerse(verse); }, 600);
+}
+
+function esvJumpFromRef(encodedRef){
+  const ref = decodeURIComponent(encodedRef);
+  const m = String(ref).match(/^(\d?\s?[A-Za-z][A-Za-z ]+?)\s+(\d+)(?::(\d+))?/);
+  if(!m){ showToast('Could not parse ' + ref); return; }
+  const book = m[1].trim(), ch = m[2], verse = m[3] ? parseInt(m[3],10) : 0;
+  const sel = document.getElementById('esvBook');
+  if(sel){ sel.value = book; if(typeof onEsvBookChange === 'function') onEsvBookChange(); }
+  const chSel = document.getElementById('esvChapter');
+  if(chSel) chSel.value = String(ch);
+  openEsvReader();
+  if(verse) setTimeout(function(){ if(typeof jumpToEsvVerse === 'function') jumpToEsvVerse(verse); }, 600);
+}
+
+// +2 Faith XP per chapter, capped to one award per chapter per day so opening
+// the same chapter repeatedly doesn't farm points. Also fires the streak.
+function awardEsvChapterXP(book, ch){
+  const today = new Date().toISOString().slice(0,10);
+  if(!D.faithChapterReadLog) D.faithChapterReadLog = {};
+  const key = today + '|' + book + '|' + ch;
+  if(D.faithChapterReadLog[key]) return;
+  D.faithChapterReadLog[key] = 1;
+  D.scrPoints = (D.scrPoints||0) + 2;
+  if(!D.scrReadDays) D.scrReadDays = {};
+  D.scrReadDays[today] = true;
+  save();
+  if(typeof logActivity === 'function') logActivity('faith', 'Read ' + book + ' ' + ch);
+  if(typeof renderFaithHome === 'function') renderFaithHome();
 }
 
 // ── JESUS & GOD'S PURPOSE ────────────────────────────────────
@@ -1818,5 +2966,957 @@ function toggleDailyScripture(btn){
   sec.style.display = hidden ? '' : 'none';
   if(navBtn) navBtn.style.display = hidden ? '' : 'none';
   if(btn) btn.classList.toggle('on', hidden);
+}
+
+// ═════════════════════════════════════════════════════════════
+// F2-E — PRAYER MODULE
+// Active / Answered prayer wall, 30-prompt daily rotation, privacy levels
+// (private / family / community), category tags. Reuses D.prayers from the
+// existing 🌟 Journey panel — schema is additive (category, privacy, answerText).
+// Family-shared rendering on Parent Hub lands in F2-H.
+// ═════════════════════════════════════════════════════════════
+
+const PRAYER_PROMPTS = [
+  "Pray for someone who's been on your mind lately.",
+  "Thank God for one thing in your day so far.",
+  "Confess one thing you'd rather not say out loud.",
+  "Pray for the person you find hardest to love right now.",
+  "Ask God for wisdom about a decision you're carrying.",
+  "Pray for a leader — pastor, boss, parent, teacher, official.",
+  "Pray for someone who is grieving today.",
+  "Ask for joy that doesn't depend on circumstances.",
+  "Pray for the youth in your church or community.",
+  "Bring a fear to God by name.",
+  "Thank Him for one provision you almost overlooked.",
+  "Pray for your marriage — yours, or one you love.",
+  "Pray for someone who doesn't know Jesus.",
+  "Ask for patience with someone in your home.",
+  "Pray for a missionary or persecuted church somewhere.",
+  "Ask God to reveal a sin you've been excusing.",
+  "Pray for healing — physical, emotional, or relational.",
+  "Thank Him for a friendship that has shaped you.",
+  "Pray for the next generation of your family by name.",
+  "Ask for boldness to share your faith this week.",
+  "Pray for the church to be more like Jesus.",
+  "Bring a grief to God without trying to fix it.",
+  "Pray for protection over your mind and your media intake.",
+  "Pray for your enemies — actually pray a blessing.",
+  "Ask for contentment in what God has already given.",
+  "Pray for someone serving in the military or first response.",
+  "Bring a hidden hope to God.",
+  "Pray for endurance in something you're tempted to quit.",
+  "Ask for a soft heart in a place you've gone hard.",
+  "Pray that God's name would be honored in your day.",
+];
+
+// Form state (chip selections) and list view state.
+let _prFormType    = 'request';     // request | praise
+let _prFormCat     = 'self';        // self | family | friend | world
+let _prFormPrivacy = 'private';     // private | family | community
+let _prView        = 'active';      // active | answered
+let _prAnswerId    = null;          // id of prayer being marked answered
+
+function getTodayPrayerPrompt(){
+  // Day-of-year mod 30 — every Apr 1 / Jul 1 / Oct 1 the cycle realigns. Same
+  // prompt for everyone same day, which is fine — prayer prompts aren't private.
+  const day = (typeof getDayOfYear === 'function') ? getDayOfYear() : Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+  return PRAYER_PROMPTS[(day - 1 + PRAYER_PROMPTS.length) % PRAYER_PROMPTS.length];
+}
+
+function renderPrayerPanel(){
+  // Today's prompt
+  const promptEl = document.getElementById('prPromptText');
+  if(promptEl) promptEl.textContent = getTodayPrayerPrompt();
+
+  // Stats — counts surface above the form so they update as you add/answer.
+  const all = (D && D.prayers) || [];
+  const active   = all.filter(p => p && !p.answered);
+  const answered = all.filter(p => p && p.answered);
+  const setStat = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+  setStat('prStatActive',   active.length);
+  setStat('prStatAnswered', answered.length);
+  setStat('prStatTotal',    all.length);
+  setStat('prCountActive',  active.length);
+  setStat('prCountAnswered', answered.length);
+
+  renderPrayerList();
+}
+
+function renderPrayerList(){
+  const el = document.getElementById('prList');
+  if(!el) return;
+  const all = (D && D.prayers) || [];
+  let items = (_prView === 'answered')
+    ? all.filter(p => p && p.answered)
+    : all.filter(p => p && !p.answered);
+  // Newest first.
+  items = items.slice().sort((a,b) => {
+    const ta = a.answered ? (a.answeredAt || a.answeredDate || a.date) : (a.date || '');
+    const tb = b.answered ? (b.answeredAt || b.answeredDate || b.date) : (b.date || '');
+    return String(tb).localeCompare(String(ta));
+  });
+
+  if(!items.length){
+    el.innerHTML = `<div class="pr-empty">${_prView === 'answered' ? 'No answered prayers yet — celebrate them as God shows up.' : 'No active prayers yet. Add one above to begin.'}</div>`;
+    return;
+  }
+
+  el.innerHTML = items.map(p => {
+    const type    = p.type || 'request';
+    const cat     = p.category || 'self';
+    const privacy = p.privacy  || 'private';
+    const accent  = (type === 'praise') ? '#10b981' : (privacy === 'family' ? '#fbbf24' : '#a78bfa');
+    const typeIcon = type === 'praise' ? '🎉' : '🙏';
+    const privIcon = privacy === 'family' ? '👨‍👩‍👧' : privacy === 'community' ? '⛪' : '🔒';
+    const created  = (p.date || '').slice(0,10);
+    const answered = p.answered;
+    const ansDate  = (p.answeredAt || p.answeredDate || '').slice(0,10);
+    return `<div class="pr-item" style="border-left-color:${accent};">
+      <div class="pr-item-meta">
+        <span style="color:${accent};">${typeIcon} ${type === 'praise' ? 'Praise' : 'Request'}</span>
+        <span>· ${escapeHtml(cat)}</span>
+        <span>· ${privIcon} ${escapeHtml(privacy)}</span>
+        ${created ? '<span style="margin-left:auto;">'+created+'</span>' : ''}
+      </div>
+      <div class="pr-item-text">${escapeHtml(p.text || '')}</div>
+      ${answered && p.answerText ? '<div class="pr-item-answer"><strong style="color:#10b981;font-style:normal;">✅ Answered '+(ansDate||'')+'</strong> — '+escapeHtml(p.answerText)+'</div>' : ''}
+      ${answered && !p.answerText ? '<div class="pr-item-answer" style="font-style:normal;"><strong style="color:#10b981;">✅ Answered '+(ansDate||'')+'</strong></div>' : ''}
+      <div class="pr-item-actions">
+        ${!answered ? `<button class="pr-item-btn" onclick="openPrayerAnswer(${p.id})">✅ Mark Answered</button>` : ''}
+        <button class="pr-item-btn del" onclick="deletePrayerItem(${p.id})">🗑 Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setPrayerView(view, btn){
+  _prView = view;
+  document.querySelectorAll('#bf-prayer .pr-tab').forEach(t => t.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderPrayerList();
+}
+
+function prayerSetChip(grp, val, btn){
+  if(grp === 'type')      _prFormType = val;
+  else if(grp === 'cat')  _prFormCat  = val;
+  else if(grp === 'priv') _prFormPrivacy = val;
+  document.querySelectorAll(`#bf-prayer .pr-chip[data-grp="${grp}"]`).forEach(c => c.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
+// "Pray About This" CTA on the daily prompt — pre-fills the textarea.
+function prayerUsePrompt(){
+  const ta = document.getElementById('prInput');
+  if(!ta) return;
+  if(!ta.value.trim()) ta.value = getTodayPrayerPrompt() + '\n\n';
+  ta.focus();
+  ta.scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+function addPrayerFromForm(){
+  const ta = document.getElementById('prInput');
+  const text = ta ? ta.value.trim() : '';
+  if(!text){ showToast('Write your prayer first'); return; }
+  if(!D.prayers) D.prayers = [];
+  const now = new Date().toISOString();
+  D.prayers.push({
+    id: Date.now(),
+    text: text,
+    type: _prFormType,
+    category: _prFormCat,
+    privacy: _prFormPrivacy,
+    date: now,
+    answered: false,
+  });
+  // Streak protection — counts as today's faith action.
+  if(!D.scrReadDays) D.scrReadDays = {};
+  D.scrReadDays[new Date().toISOString().slice(0,10)] = true;
+  if(ta) ta.value = '';
+  save();
+  if(typeof logActivity === 'function') logActivity('faith', _prFormType === 'praise' ? 'Praise report' : 'Prayer request');
+  if(typeof renderFaithJourney === 'function') renderFaithJourney(); // legacy Journey list
+  if(typeof renderFaithHome === 'function') renderFaithHome();
+  renderPrayerPanel();
+  showToast(_prFormType === 'praise' ? 'Praise saved 🎉' : 'Prayer saved 🙏');
+}
+
+function deletePrayerItem(id){
+  if(!confirm('Delete this prayer?')) return;
+  if(!D.prayers) D.prayers = [];
+  D.prayers = D.prayers.filter(p => p && p.id !== id);
+  save();
+  if(typeof renderFaithJourney === 'function') renderFaithJourney();
+  if(typeof renderFaithHome === 'function') renderFaithHome();
+  renderPrayerPanel();
+}
+
+function openPrayerAnswer(id){
+  _prAnswerId = id;
+  const p = (D.prayers || []).find(x => x && x.id === id);
+  const orig = document.getElementById('paOriginal');
+  if(orig) orig.textContent = p ? (p.text || '') : '—';
+  const story = document.getElementById('paStory');
+  if(story) story.value = '';
+  if(typeof openModal === 'function') openModal('prayerAnswerModal');
+}
+
+function closePrayerAnswer(){
+  if(typeof closeModal === 'function') closeModal('prayerAnswerModal');
+  _prAnswerId = null;
+}
+
+function confirmPrayerAnswered(){
+  if(!_prAnswerId){ closePrayerAnswer(); return; }
+  const p = (D.prayers || []).find(x => x && x.id === _prAnswerId);
+  if(!p){ closePrayerAnswer(); return; }
+  const story = document.getElementById('paStory');
+  p.answered    = true;
+  p.answerText  = story ? story.value.trim() : '';
+  p.answeredAt  = new Date().toISOString();
+  // Keep legacy field for older codepaths.
+  p.answeredDate = p.answeredAt.slice(0,10);
+  save();
+  if(typeof logActivity === 'function') logActivity('faith', 'Prayer answered');
+  if(typeof renderFaithJourney === 'function') renderFaithJourney();
+  if(typeof renderFaithHome === 'function') renderFaithHome();
+  renderPrayerPanel();
+  closePrayerAnswer();
+  showToast('Prayer answered! ✅ +5 XP');
+  D.scrPoints = (D.scrPoints || 0) + 5;
+  save();
+}
+
+// ═════════════════════════════════════════════════════════════
+// F2-F — MEMORY VERSES + SPACED REPETITION (SM-2-lite)
+// ═════════════════════════════════════════════════════════════
+// Storage: D.memoryVerses[] entries with ease/intervalDays/nextDue.
+// Library: window.MEMORY_VERSE_LIBRARY (50 verses across 9 categories,
+// loaded from app/js/data/memory-verses.js before faith.js).
+// Mastery: intervalDays >= 90 → marked mastered (still reviewable).
+
+let _mvView   = 'queue';      // queue | library | mastered | custom
+let _mvCustomCat = 'identity';
+let _mvQuizMode  = 'cloze';   // cloze | recite | choice
+let _mvQuizQueue = [];        // ids in current quiz session
+let _mvQuizIdx   = 0;
+let _mvQuizCorrect = 0;
+
+function _mvCats(){
+  return (typeof window !== 'undefined' && window.MEMORY_VERSE_CATEGORIES) ? window.MEMORY_VERSE_CATEGORIES : [];
+}
+function _mvLib(){
+  return (typeof window !== 'undefined' && window.MEMORY_VERSE_LIBRARY) ? window.MEMORY_VERSE_LIBRARY : [];
+}
+function _mvCatLookup(catId){
+  return _mvCats().find(c => c.id === catId) || { id:catId, label:catId, icon:'📖', color:'#a78bfa' };
+}
+function _mvTodayISO(){ return new Date().toISOString().slice(0,10); }
+
+function _mvDueCount(){
+  const t = _mvTodayISO();
+  return ((D && D.memoryVerses) || []).filter(v => v && !v.mastered && (!v.nextDue || v.nextDue <= t)).length;
+}
+
+function renderMemorizePanel(){
+  const all = (D && D.memoryVerses) || [];
+  const due       = all.filter(v => v && !v.mastered && (!v.nextDue || v.nextDue <= _mvTodayISO())).length;
+  const active    = all.filter(v => v && !v.mastered).length;
+  const mastered  = all.filter(v => v && v.mastered).length;
+
+  const setStat = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+  setStat('mvStatDue',      due);
+  setStat('mvStatActive',   active);
+  setStat('mvStatMastered', mastered);
+
+  const sub  = document.getElementById('mvHeroSub');
+  const btn  = document.getElementById('mvQuizBtn');
+  if(sub){
+    if(active === 0)  sub.textContent = 'Pick verses from the Library tab to start memorizing.';
+    else if(due === 0) sub.textContent = 'All caught up — next review is tomorrow. Great work.';
+    else              sub.textContent = due + (due === 1 ? ' verse' : ' verses') + ' due today · +25 XP per mastered verse.';
+  }
+  if(btn){
+    btn.textContent = (due > 0 ? "Start Today's Review (" + due + ")" : 'Quick Practice');
+    btn.disabled = active === 0;
+    btn.style.opacity = active === 0 ? '.55' : '';
+    btn.style.cursor  = active === 0 ? 'not-allowed' : 'pointer';
+  }
+
+  // Render the custom-cat chips once (idempotent).
+  const catWrap = document.getElementById('mvCustomCats');
+  if(catWrap && !catWrap.dataset.mvBuilt){
+    catWrap.innerHTML = _mvCats().map(c =>
+      `<button class="mv-cat-chip${c.id === _mvCustomCat ? ' active' : ''}" data-cat="${c.id}" onclick="mvSetCustomCat('${c.id}',this)">${c.icon} ${c.label}</button>`
+    ).join('');
+    catWrap.dataset.mvBuilt = '1';
+  }
+
+  // Show/hide the add form.
+  const addForm = document.getElementById('mvAddForm');
+  if(addForm) addForm.classList.toggle('open', _mvView === 'custom');
+
+  // Render the body for the selected view.
+  const body = document.getElementById('mvBody');
+  if(!body) return;
+  if(_mvView === 'queue')         body.innerHTML = _mvRenderQueue();
+  else if(_mvView === 'library')  body.innerHTML = _mvRenderLibrary();
+  else if(_mvView === 'mastered') body.innerHTML = _mvRenderMastered();
+  else if(_mvView === 'custom')   body.innerHTML = '';
+}
+
+function mvSetView(view, btn){
+  _mvView = view;
+  document.querySelectorAll('#bf-memorize .mv-tab').forEach(t => t.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderMemorizePanel();
+}
+
+function mvSetCustomCat(catId, btn){
+  _mvCustomCat = catId;
+  document.querySelectorAll('#mvCustomCats .mv-cat-chip').forEach(c => c.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
+function _mvRenderQueue(){
+  const t = _mvTodayISO();
+  const all = ((D && D.memoryVerses) || []).filter(v => v && !v.mastered);
+  if(!all.length){
+    return '<div class="mv-empty">No verses yet. Add from the Library tab — 50 starter verses ready to go.</div>';
+  }
+  // Due first, then by next-due ascending.
+  all.sort((a,b) => {
+    const ad = (a.nextDue || '');
+    const bd = (b.nextDue || '');
+    return String(ad).localeCompare(String(bd));
+  });
+  return '<div class="mv-grid">' + all.map(v => _mvCardHtml(v, false)).join('') + '</div>';
+}
+
+function _mvRenderLibrary(){
+  const lib = _mvLib();
+  if(!lib.length) return '<div class="mv-empty">Library failed to load.</div>';
+  const owned = new Set(((D && D.memoryVerses) || []).map(v => v && v.reference));
+  const cats = _mvCats();
+  return cats.map(c => {
+    const inCat = lib.filter(l => l.category === c.id);
+    const cards = inCat.map(l => {
+      const isOwned = owned.has(l.reference);
+      // Always call mvAddFromLibrary — it shows "Already in your queue" itself
+      // when the verse is a duplicate, so we don't need nested quoting.
+      const refAttr = escapeHtml(l.reference);
+      return `<div class="mv-card" style="border-left-color:${c.color};${isOwned ? 'opacity:.6;' : ''}" data-mv-ref="${refAttr}" onclick="mvAddFromLibrary(this.getAttribute('data-mv-ref'))">
+        <div class="mv-card-ref" style="color:${c.color};">${refAttr}${isOwned ? ' <span style="font-size:.55rem;color:var(--tx2);">✓ added</span>' : ''}</div>
+        <div class="mv-card-text">${escapeHtml(l.text)}</div>
+      </div>`;
+    }).join('');
+    return `<div class="mv-section-hdr" style="color:${c.color};">${c.icon} ${c.label} (${inCat.length})</div><div class="mv-grid">${cards}</div>`;
+  }).join('');
+}
+
+function _mvRenderMastered(){
+  const all = ((D && D.memoryVerses) || []).filter(v => v && v.mastered);
+  if(!all.length) return '<div class="mv-empty">No mastered verses yet — keep reviewing! Mastery hits when interval reaches 90 days.</div>';
+  return '<div class="mv-grid">' + all.map(v => _mvCardHtml(v, true)).join('') + '</div>';
+}
+
+function _mvCardHtml(v, isMastered){
+  const c = _mvCatLookup(v.category);
+  const t = _mvTodayISO();
+  const due = !isMastered && (!v.nextDue || v.nextDue <= t);
+  return `<div class="mv-card" style="border-left-color:${c.color};" onclick="mvOpenVerse(${v.id})">
+    <div class="mv-card-ref" style="color:${c.color};">${escapeHtml(v.reference)}</div>
+    <div class="mv-card-text">${escapeHtml(v.text)}</div>
+    <div class="mv-card-meta">
+      <span>${c.icon} ${escapeHtml(c.label)}</span>
+      ${isMastered ? '<span class="mv-mastered-pill">🏆 Mastered</span>' : (due ? '<span class="mv-due-pill">Due today</span>' : '<span style="color:var(--tx2);">Next: ' + (v.nextDue || '—') + '</span>')}
+    </div>
+  </div>`;
+}
+
+function mvAddFromLibrary(reference){
+  const lib = _mvLib();
+  const found = lib.find(l => l.reference === reference);
+  if(!found){ showToast('Verse not found'); return; }
+  if(!D.memoryVerses) D.memoryVerses = [];
+  if(D.memoryVerses.some(v => v && v.reference === reference)){ showToast('Already in your queue'); return; }
+  const now = new Date().toISOString();
+  D.memoryVerses.push({
+    id: Date.now() + Math.floor(Math.random() * 1000),
+    reference: found.reference,
+    text: found.text,
+    category: found.category,
+    ease: 2.5,
+    intervalDays: 1,
+    nextDue: _mvTodayISO(), // due today by default
+    lastReviewed: null,
+    mastered: false,
+    masteredAt: null,
+    createdAt: now,
+    totalReviews: 0,
+    correctReviews: 0,
+  });
+  if(!D.scrReadDays) D.scrReadDays = {};
+  D.scrReadDays[_mvTodayISO()] = true;
+  save();
+  if(typeof logActivity === 'function') logActivity('faith', 'Added memory verse: ' + reference);
+  if(typeof renderFaithHome === 'function') renderFaithHome();
+  showToast('Added to queue ✨');
+  renderMemorizePanel();
+}
+
+function mvAddCustom(){
+  const refEl  = document.getElementById('mvCustomRef');
+  const textEl = document.getElementById('mvCustomText');
+  const ref  = refEl ? refEl.value.trim() : '';
+  const text = textEl ? textEl.value.trim() : '';
+  if(!ref || !text){ showToast('Reference and text required'); return; }
+  if(!D.memoryVerses) D.memoryVerses = [];
+  if(D.memoryVerses.some(v => v && v.reference === ref)){ showToast('Already in your queue'); return; }
+  const now = new Date().toISOString();
+  D.memoryVerses.push({
+    id: Date.now() + Math.floor(Math.random() * 1000),
+    reference: ref,
+    text: text,
+    category: _mvCustomCat || 'identity',
+    ease: 2.5,
+    intervalDays: 1,
+    nextDue: _mvTodayISO(),
+    lastReviewed: null,
+    mastered: false,
+    masteredAt: null,
+    createdAt: now,
+    totalReviews: 0,
+    correctReviews: 0,
+  });
+  if(!D.scrReadDays) D.scrReadDays = {};
+  D.scrReadDays[_mvTodayISO()] = true;
+  save();
+  if(typeof logActivity === 'function') logActivity('faith', 'Added custom memory verse: ' + ref);
+  if(refEl) refEl.value = '';
+  if(textEl) textEl.value = '';
+  if(typeof renderFaithHome === 'function') renderFaithHome();
+  showToast('Custom verse added ✨');
+  // Switch to queue so user sees what they just added.
+  const queueTab = document.querySelector('#bf-memorize .mv-tab[data-mv-view="queue"]');
+  mvSetView('queue', queueTab);
+}
+
+// Single-verse drill-down: opens the quiz modal seeded with just this verse.
+function mvOpenVerse(id){
+  _mvQuizQueue   = [id];
+  _mvQuizIdx     = 0;
+  _mvQuizCorrect = 0;
+  _mvQuizMode    = 'cloze';
+  _mvSyncQuizModeChips();
+  if(typeof openModal === 'function') openModal('mvQuizModal');
+  _mvRenderQuestion();
+}
+
+function mvStartQuiz(){
+  const all = ((D && D.memoryVerses) || []).filter(v => v && !v.mastered);
+  if(!all.length){ showToast('Add a verse to start memorizing'); return; }
+  const t = _mvTodayISO();
+  let due = all.filter(v => !v.nextDue || v.nextDue <= t);
+  // If nothing due, do a "quick practice" sample of up to 5 active verses.
+  if(!due.length){
+    due = all.slice().sort(() => Math.random() - 0.5).slice(0, Math.min(5, all.length));
+  }
+  // Cap quiz length so it stays a reasonable session even if many are due.
+  if(due.length > 20) due = due.slice(0, 20);
+  _mvQuizQueue   = due.map(v => v.id);
+  _mvQuizIdx     = 0;
+  _mvQuizCorrect = 0;
+  _mvSyncQuizModeChips();
+  if(typeof openModal === 'function') openModal('mvQuizModal');
+  _mvRenderQuestion();
+}
+
+function mvCloseQuiz(){
+  if(typeof closeModal === 'function') closeModal('mvQuizModal');
+  renderMemorizePanel();
+  if(typeof renderFaithHome === 'function') renderFaithHome();
+}
+
+function mvSetQuizMode(mode, btn){
+  _mvQuizMode = mode;
+  document.querySelectorAll('#mvQuizModal .mvq-mode').forEach(b => {
+    const isActive = b === btn;
+    b.classList.toggle('active', isActive);
+    if(isActive){
+      b.style.background = 'linear-gradient(135deg,#38bdf8,#a78bfa)';
+      b.style.color = '#0b1220';
+      b.style.border = 'none';
+      b.style.fontWeight = '800';
+    } else {
+      b.style.background = 'rgba(255,255,255,.06)';
+      b.style.color = 'var(--tx)';
+      b.style.border = '1px solid rgba(255,255,255,.12)';
+      b.style.fontWeight = '700';
+    }
+  });
+  _mvRenderQuestion();
+}
+
+function _mvSyncQuizModeChips(){
+  document.querySelectorAll('#mvQuizModal .mvq-mode').forEach(b => {
+    const isActive = b.getAttribute('data-mvq-mode') === _mvQuizMode;
+    b.classList.toggle('active', isActive);
+    if(isActive){
+      b.style.background = 'linear-gradient(135deg,#38bdf8,#a78bfa)';
+      b.style.color = '#0b1220';
+      b.style.border = 'none';
+      b.style.fontWeight = '800';
+    } else {
+      b.style.background = 'rgba(255,255,255,.06)';
+      b.style.color = 'var(--tx)';
+      b.style.border = '1px solid rgba(255,255,255,.12)';
+      b.style.fontWeight = '700';
+    }
+  });
+}
+
+function _mvCurrentVerse(){
+  const id = _mvQuizQueue[_mvQuizIdx];
+  return ((D && D.memoryVerses) || []).find(v => v && v.id === id) || null;
+}
+
+function _mvNormalize(s){
+  return String(s || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function _mvWordSimilarity(user, target){
+  const u = _mvNormalize(user).split(/\s+/).filter(Boolean);
+  const t = _mvNormalize(target).split(/\s+/).filter(Boolean);
+  if(!t.length) return 0;
+  // Track multiset of user words so duplicates aren't double-counted.
+  const userBag = {};
+  u.forEach(w => { userBag[w] = (userBag[w] || 0) + 1; });
+  let matched = 0;
+  t.forEach(w => { if(userBag[w] > 0){ matched++; userBag[w]--; } });
+  return matched / t.length;
+}
+
+function _mvRenderQuestion(){
+  const v = _mvCurrentVerse();
+  const titleEl = document.getElementById('mvqTitle');
+  const progressEl = document.getElementById('mvqProgress');
+  const body = document.getElementById('mvqBody');
+  const footer = document.getElementById('mvqFooter');
+  if(!body || !footer) return;
+
+  if(!v){
+    // End of quiz
+    titleEl.textContent = 'Session Complete';
+    progressEl.textContent = '';
+    const total = _mvQuizQueue.length;
+    const pct = total ? Math.round((_mvQuizCorrect / total) * 100) : 0;
+    body.innerHTML = `<div style="text-align:center;padding:1.5rem 1rem;">
+      <div style="font-size:3rem;margin-bottom:.5rem;">${pct >= 80 ? '🏆' : pct >= 50 ? '✨' : '🌱'}</div>
+      <div style="font-family:var(--fh,var(--fm));font-size:1.4rem;font-weight:800;color:var(--tx);margin-bottom:.4rem;">${_mvQuizCorrect} / ${total} correct</div>
+      <div style="font-size:.85rem;color:var(--tx2);line-height:1.5;">${pct >= 80 ? 'Outstanding session — Scripture is sticking.' : pct >= 50 ? 'Solid work. Repetition is the key — come back tomorrow.' : 'Memorization is a long game. Show up again tomorrow.'}</div>
+    </div>`;
+    footer.innerHTML = `<button onclick="mvCloseQuiz()" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Done</button>`;
+    return;
+  }
+
+  const c = _mvCatLookup(v.category);
+  titleEl.textContent = v.reference;
+  progressEl.textContent = (_mvQuizIdx + 1) + ' / ' + _mvQuizQueue.length;
+
+  if(_mvQuizMode === 'cloze'){
+    // Hide every 5th word.
+    const words = String(v.text).split(/(\s+)/);
+    const wordIdxList = [];
+    words.forEach((w, i) => { if(/\S/.test(w)) wordIdxList.push(i); });
+    const hiddenWordIdx = wordIdxList.filter((_, n) => (n + 1) % 5 === 0);
+    const hiddenWords = hiddenWordIdx.map(i => words[i]);
+    const display = words.map((w, i) => hiddenWordIdx.indexOf(i) !== -1
+      ? `<span style="display:inline-block;min-width:60px;border-bottom:2px dashed ${c.color};text-align:center;padding:0 .25rem;color:${c.color};font-weight:800;">__</span>`
+      : escapeHtml(w)).join('');
+
+    body.innerHTML = `
+      <div style="font-size:.66rem;font-weight:800;color:${c.color};text-transform:uppercase;letter-spacing:.16em;margin-bottom:.4rem;">${c.icon} Fill in the blanks</div>
+      <div id="mvqVerseText" style="font-family:Georgia,serif;font-size:.95rem;line-height:1.85;color:var(--tx);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:.7rem .85rem;margin-bottom:.75rem;">${display}</div>
+      <div style="font-size:.62rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.3rem;">${hiddenWords.length} blank${hiddenWords.length === 1 ? '' : 's'} — type the missing words (in order, space-separated)</div>
+      <input type="text" id="mvqAnswer" placeholder="missing words…" style="font-size:.85rem;width:100%;" autofocus>
+    `;
+    footer.innerHTML = `
+      <button onclick="mvCloseQuiz()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.5rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">End Session</button>
+      <button onclick="_mvSubmitAnswer(${JSON.stringify(hiddenWords).replace(/"/g,'&quot;')})" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.5rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Check ✓</button>
+    `;
+  } else if(_mvQuizMode === 'recite'){
+    body.innerHTML = `
+      <div style="font-size:.66rem;font-weight:800;color:${c.color};text-transform:uppercase;letter-spacing:.16em;margin-bottom:.4rem;">${c.icon} Recite from memory</div>
+      <div style="font-size:1.4rem;font-family:var(--fh,var(--fm));font-weight:800;color:var(--tx);text-align:center;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:1rem;margin-bottom:.75rem;">${escapeHtml(v.reference)}</div>
+      <textarea id="mvqAnswer" rows="5" placeholder="Type the verse from memory…" style="font-size:.85rem;font-family:Georgia,serif;line-height:1.6;"></textarea>
+      <div style="font-size:.62rem;color:var(--tx2);font-style:italic;margin-top:.4rem;line-height:1.4;">Word-coverage match. Punctuation, capitalization, and small word order don't count against you.</div>
+    `;
+    footer.innerHTML = `
+      <button onclick="mvCloseQuiz()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.5rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">End Session</button>
+      <button onclick="_mvSubmitAnswer(null)" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.5rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Check ✓</button>
+    `;
+  } else { // 'choice'
+    // Build 3 distractors from other library/queue verses.
+    const all = (D && D.memoryVerses || []).concat(_mvLib());
+    const pool = all.filter(x => x.text !== v.text).map(x => x.text);
+    const distractors = [];
+    while(distractors.length < 3 && pool.length){
+      const i = Math.floor(Math.random() * pool.length);
+      const t = pool.splice(i, 1)[0];
+      if(distractors.indexOf(t) === -1) distractors.push(t);
+    }
+    const choices = distractors.concat([v.text]).sort(() => Math.random() - 0.5);
+    body.innerHTML = `
+      <div style="font-size:.66rem;font-weight:800;color:${c.color};text-transform:uppercase;letter-spacing:.16em;margin-bottom:.4rem;">${c.icon} Pick the correct verse</div>
+      <div style="font-size:1.4rem;font-family:var(--fh,var(--fm));font-weight:800;color:var(--tx);text-align:center;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:1rem;margin-bottom:.75rem;">${escapeHtml(v.reference)}</div>
+      <div style="display:flex;flex-direction:column;gap:.4rem;">
+        ${choices.map((t,i) => `<button class="mvq-choice" onclick="_mvSubmitAnswer(${JSON.stringify(t).replace(/"/g,'&quot;')})" style="text-align:left;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--tx);border-radius:10px;padding:.65rem .8rem;font-family:Georgia,serif;font-size:.82rem;line-height:1.5;cursor:pointer;">${escapeHtml(t)}</button>`).join('')}
+      </div>
+    `;
+    footer.innerHTML = `
+      <button onclick="mvCloseQuiz()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.5rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">End Session</button>
+    `;
+  }
+}
+
+function _mvSubmitAnswer(arg){
+  const v = _mvCurrentVerse();
+  if(!v){ return; }
+  let correct = false;
+
+  if(_mvQuizMode === 'cloze'){
+    const expected = Array.isArray(arg) ? arg : [];
+    const inp = (document.getElementById('mvqAnswer') || {}).value || '';
+    // Match each blank in order, allowing minor punctuation/case differences.
+    const userWords = _mvNormalize(inp).split(/\s+/).filter(Boolean);
+    const expectedNorm = expected.map(w => _mvNormalize(w)).filter(Boolean);
+    let matched = 0;
+    for(let i = 0; i < expectedNorm.length; i++){
+      if(userWords[i] === expectedNorm[i]) matched++;
+    }
+    correct = expectedNorm.length > 0 && matched / expectedNorm.length >= 0.7;
+  } else if(_mvQuizMode === 'recite'){
+    const inp = (document.getElementById('mvqAnswer') || {}).value || '';
+    const sim = _mvWordSimilarity(inp, v.text);
+    correct = sim >= 0.85;
+  } else if(_mvQuizMode === 'choice'){
+    correct = (typeof arg === 'string') && _mvNormalize(arg) === _mvNormalize(v.text);
+  }
+
+  // SR update + feedback.
+  _mvApplySrUpdate(v, correct);
+  _mvShowFeedback(v, correct);
+}
+
+function _mvShowFeedback(v, correct){
+  const body = document.getElementById('mvqBody');
+  const footer = document.getElementById('mvqFooter');
+  if(!body || !footer) return;
+  const c = _mvCatLookup(v.category);
+  body.innerHTML = `
+    <div style="text-align:center;padding:.4rem 0 .8rem;">
+      <div style="font-size:2.4rem;margin-bottom:.3rem;">${correct ? '✅' : '❌'}</div>
+      <div style="font-family:var(--fh,var(--fm));font-size:1.1rem;font-weight:800;color:${correct ? '#10b981' : '#f87171'};margin-bottom:.5rem;">${correct ? 'Correct!' : 'Not quite — here it is:'}</div>
+    </div>
+    <div style="background:rgba(${correct ? '16,185,129' : '239,68,68'},.06);border:1px solid rgba(${correct ? '16,185,129' : '239,68,68'},.25);border-radius:10px;padding:.7rem .85rem;margin-bottom:.7rem;">
+      <div style="font-size:.66rem;font-weight:800;color:${c.color};margin-bottom:.25rem;letter-spacing:.04em;">${escapeHtml(v.reference)}</div>
+      <div style="font-family:Georgia,serif;font-size:.9rem;line-height:1.7;color:var(--tx);">${escapeHtml(v.text)}</div>
+    </div>
+    <div style="font-size:.7rem;color:var(--tx2);text-align:center;line-height:1.5;">
+      Next review in <strong style="color:var(--tx);">${v.intervalDays}</strong> day${v.intervalDays === 1 ? '' : 's'} · ease ${v.ease.toFixed(2)}${v.mastered ? ' · 🏆 Mastered' : ''}
+    </div>
+  `;
+  footer.innerHTML = `
+    <button onclick="mvCloseQuiz()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.5rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">End Session</button>
+    <button onclick="_mvNextQuestion()" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.5rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Next →</button>
+  `;
+}
+
+function _mvNextQuestion(){
+  _mvQuizIdx++;
+  _mvRenderQuestion();
+}
+
+// ═════════════════════════════════════════════════════════════
+// F2-G — ASK THE BIBLE (Claude-powered Q&A)
+// ═════════════════════════════════════════════════════════════
+// Calls /api/ai-summary with mode='ask-bible'. Renders pastoral answer +
+// 3-5 ESV citations + concrete application. History stored in
+// D.faithAiHistory (capped at 50).
+//
+// Crisis-keyword pre-check fires client-side before any API call so users
+// in true distress get the 988 hotline immediately, not after a network
+// roundtrip. Server-side guardrails are the second layer.
+
+const ASK_BIBLE_CRISIS_KEYWORDS = [
+  'kill myself','killing myself','end my life','ending my life','suicide','suicidal',
+  'want to die','wanna die','no reason to live','worth living',
+  'cut myself','cutting myself','hurt myself','self harm','self-harm',
+  'end it all','take my life','better off dead',
+];
+
+const ASK_BIBLE_SUGGESTIONS = [
+  "What does the Bible say about anxiety?",
+  "Why did Jesus weep at Lazarus's tomb?",
+  "How do I forgive someone who hasn't apologized?",
+  "What does the Bible say about money and giving?",
+  "How do I know if I'm hearing from God?",
+  "What does Romans 8:28 actually mean?",
+  "How should I think about doubt as a Christian?",
+  "What does the Bible say about identity in Christ?",
+  "Why is suffering allowed if God is good?",
+  "How do I pray when I don't know what to say?",
+];
+
+function openAskBible(seedQuestion){
+  const ta = document.getElementById('abQuestion');
+  if(ta){
+    if(typeof seedQuestion === 'string' && seedQuestion) ta.value = seedQuestion;
+    setTimeout(function(){ try { ta.focus(); } catch(_){} }, 80);
+  }
+  // Clear any prior answer when opening fresh.
+  const ans = document.getElementById('abAnswer');
+  if(ans){ ans.style.display = 'none'; ans.innerHTML = ''; }
+  _abRefreshHistoryCount();
+  if(typeof openModal === 'function') openModal('askBibleModal');
+}
+
+function closeAskBible(){
+  if(typeof closeModal === 'function') closeModal('askBibleModal');
+}
+
+function askBibleSuggest(){
+  const ta = document.getElementById('abQuestion');
+  if(!ta) return;
+  const pick = ASK_BIBLE_SUGGESTIONS[Math.floor(Math.random() * ASK_BIBLE_SUGGESTIONS.length)];
+  ta.value = pick;
+  ta.focus();
+}
+
+function _abIsCrisis(q){
+  const lc = String(q || '').toLowerCase();
+  return ASK_BIBLE_CRISIS_KEYWORDS.some(k => lc.indexOf(k) !== -1);
+}
+
+function _abRenderCrisis(){
+  const out = document.getElementById('abAnswer');
+  if(!out) return;
+  out.style.display = 'block';
+  out.innerHTML = `
+    <div style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.3);border-radius:14px;padding:1rem 1.1rem;margin-bottom:.6rem;">
+      <div style="font-size:1.4rem;margin-bottom:.4rem;">🤍</div>
+      <div style="font-family:var(--fh,var(--fm));font-size:1.05rem;font-weight:800;color:var(--tx);margin-bottom:.4rem;letter-spacing:.02em;">You are not alone — please reach out right now.</div>
+      <div style="font-size:.85rem;color:var(--tx);line-height:1.55;margin-bottom:.7rem;">If you are in immediate danger, call <strong>911</strong>. To talk to someone right now, call or text <strong>988</strong> — the Suicide &amp; Crisis Lifeline (USA, 24/7, free, confidential).</div>
+      <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.7rem;">
+        <a href="tel:988" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:800;font-family:var(--fm);text-decoration:none;">📞 Call 988</a>
+        <a href="sms:988" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:var(--tx);border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:700;font-family:var(--fm);text-decoration:none;">💬 Text 988</a>
+      </div>
+      <div style="background:rgba(167,139,250,.05);border-left:3px solid #a78bfa;border-radius:0 8px 8px 0;padding:.6rem .8rem;font-style:italic;color:var(--tx2);font-size:.82rem;line-height:1.6;">"The LORD is near to the brokenhearted and saves the crushed in spirit." — Psalm 34:18</div>
+      <div style="font-size:.78rem;color:var(--tx2);margin-top:.7rem;line-height:1.55;">Please also reach out to a parent, pastor, school counselor, or trusted adult today. You don't have to carry this alone.</div>
+    </div>
+  `;
+}
+
+async function askBibleSubmit(){
+  const ta = document.getElementById('abQuestion');
+  const q = ta ? ta.value.trim() : '';
+  if(!q){ showToast('Type a question first'); return; }
+
+  // Crisis short-circuit — never sends to API.
+  if(_abIsCrisis(q)){
+    _abRenderCrisis();
+    if(typeof logActivity === 'function') logActivity('faith', 'Ask the Bible — crisis card shown');
+    return;
+  }
+
+  const out = document.getElementById('abAnswer');
+  const askBtn = document.getElementById('abAskBtn');
+  if(askBtn){ askBtn.disabled = true; askBtn.style.opacity = '.6'; askBtn.textContent = '⟳ Asking…'; }
+  if(out){
+    out.style.display = 'block';
+    out.innerHTML = `<div style="text-align:center;padding:1.2rem;color:var(--tx2);font-size:.85rem;">⏳ Searching Scripture…</div>`;
+  }
+
+  try {
+    const resp = await fetch('/api/ai-summary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'ask-bible', prompt: q }),
+    });
+    if(!resp.ok){
+      const status = resp.status;
+      out.innerHTML = `<div style="text-align:center;padding:1rem;color:#f87171;font-size:.82rem;">❌ AI service unavailable (${status}). Try again in a moment.</div>`;
+      return;
+    }
+    const data = await resp.json();
+
+    // Server returned { crisis:true, ... } when the model triggered Rule 1.
+    if(data && data.crisis){ _abRenderCrisis(); return; }
+
+    // JSON parse failure — show degraded view if we can.
+    if(data && data.ok === false){
+      out.innerHTML = `<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.85rem;color:var(--tx2);font-size:.85rem;line-height:1.6;white-space:pre-wrap;">${escapeHtml(data.raw || 'No answer returned.')}</div>`;
+      return;
+    }
+
+    _abRenderAnswer(q, data);
+    _abSaveHistory(q, data);
+    if(typeof logActivity === 'function') logActivity('faith', 'Asked the Bible: ' + q.slice(0,80));
+  } catch(e){
+    out.innerHTML = `<div style="text-align:center;padding:1rem;color:#f87171;font-size:.82rem;">❌ Network error. Check your connection.</div>`;
+  } finally {
+    if(askBtn){ askBtn.disabled = false; askBtn.style.opacity = ''; askBtn.textContent = '🤖 Ask'; }
+  }
+}
+
+function _abRenderAnswer(question, data){
+  const out = document.getElementById('abAnswer');
+  if(!out) return;
+  const answer = (data && data.answer) || '';
+  const verses = (data && Array.isArray(data.verses)) ? data.verses : [];
+  const application = (data && data.application) || '';
+
+  const versesHtml = verses.map(v => {
+    if(!v || !v.reference) return '';
+    const refAttr = escapeHtml(v.reference);
+    return `<div style="background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.18);border-left:4px solid #38bdf8;border-radius:10px;padding:.65rem .8rem;margin-bottom:.4rem;cursor:pointer;" data-ab-ref="${refAttr}" onclick="askBibleJumpRef(this.getAttribute('data-ab-ref'))">
+      <div style="font-size:.74rem;font-weight:800;color:#38bdf8;margin-bottom:.2rem;letter-spacing:.04em;">📖 ${refAttr}</div>
+      <div style="font-family:Georgia,serif;font-size:.84rem;line-height:1.6;color:var(--tx);">${escapeHtml(v.text || '')}</div>
+      <div style="font-size:.6rem;color:var(--tx3);margin-top:.3rem;font-style:italic;">Tap to open in the Bible reader →</div>
+    </div>`;
+  }).join('');
+
+  out.innerHTML = `
+    <div style="background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.18);border-radius:14px;padding:.85rem 1rem;margin-bottom:.7rem;">
+      <div style="font-size:.66rem;font-weight:800;color:#a78bfa;text-transform:uppercase;letter-spacing:.16em;margin-bottom:.3rem;">Pastoral Answer</div>
+      <div style="font-size:.92rem;line-height:1.7;color:var(--tx);">${escapeHtml(answer)}</div>
+    </div>
+    ${verses.length ? '<div style="font-size:.66rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.16em;margin:.5rem 0 .35rem;">Scripture (' + verses.length + ')</div>' + versesHtml : ''}
+    ${application ? `<div style="background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.25);border-left:4px solid #10b981;border-radius:10px;padding:.65rem .85rem;margin-top:.5rem;">
+      <div style="font-size:.66rem;font-weight:800;color:#10b981;text-transform:uppercase;letter-spacing:.16em;margin-bottom:.2rem;">🎯 Apply It Today</div>
+      <div style="font-size:.85rem;color:var(--tx);line-height:1.55;">${escapeHtml(application)}</div>
+    </div>` : ''}
+    <div style="font-size:.62rem;color:var(--tx3);margin-top:.7rem;line-height:1.5;font-style:italic;text-align:center;">For contested topics or personal crisis, please consult your pastor or a trusted Christian counselor.</div>
+  `;
+  if(!D.scrReadDays) D.scrReadDays = {};
+  D.scrReadDays[new Date().toISOString().slice(0,10)] = true;
+  save();
+  if(typeof renderFaithHome === 'function') renderFaithHome();
+}
+
+function _abSaveHistory(question, data){
+  if(!D.faithAiHistory) D.faithAiHistory = [];
+  D.faithAiHistory.push({
+    id: Date.now(),
+    question: question,
+    answer: (data && data.answer) || '',
+    verses: (data && Array.isArray(data.verses)) ? data.verses : [],
+    application: (data && data.application) || '',
+    createdAt: new Date().toISOString(),
+  });
+  // Cap at 50 to keep the cloud blob lean.
+  if(D.faithAiHistory.length > 50) D.faithAiHistory = D.faithAiHistory.slice(-50);
+  save();
+  _abRefreshHistoryCount();
+}
+
+function _abRefreshHistoryCount(){
+  const countEl = document.getElementById('abHistoryCount');
+  const list = (D && D.faithAiHistory) || [];
+  if(countEl) countEl.textContent = String(list.length);
+}
+
+function askBibleToggleHistory(){
+  const wrap = document.getElementById('abHistory');
+  if(!wrap) return;
+  const opening = wrap.style.display === 'none' || !wrap.style.display;
+  wrap.style.display = opening ? 'block' : 'none';
+  if(opening) _abRenderHistoryList();
+}
+
+function _abRenderHistoryList(){
+  const wrap = document.getElementById('abHistory');
+  if(!wrap) return;
+  const list = ((D && D.faithAiHistory) || []).slice().reverse();
+  if(!list.length){
+    wrap.innerHTML = '<div style="font-size:.74rem;color:var(--tx3);font-style:italic;text-align:center;padding:.6rem;">No questions yet.</div>';
+    return;
+  }
+  wrap.innerHTML = list.map(h => `<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:.55rem .7rem;margin-bottom:.3rem;cursor:pointer;" onclick="askBibleReplay(${h.id})">
+    <div style="font-size:.74rem;font-weight:700;color:var(--tx);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${escapeHtml(h.question || '')}</div>
+    <div style="font-size:.6rem;color:var(--tx3);font-weight:700;letter-spacing:.06em;margin-top:.2rem;">${(h.createdAt || '').slice(0,10)} · ${(h.verses||[]).length} verse${(h.verses||[]).length === 1 ? '' : 's'}</div>
+  </div>`).join('');
+}
+
+function askBibleReplay(id){
+  const list = (D && D.faithAiHistory) || [];
+  const h = list.find(x => x && x.id === id);
+  if(!h) return;
+  const ta = document.getElementById('abQuestion');
+  if(ta) ta.value = h.question || '';
+  _abRenderAnswer(h.question, { answer: h.answer, verses: h.verses, application: h.application });
+}
+
+// Tap a verse citation in an answer → open the Bible reader at that ref.
+function askBibleJumpRef(ref){
+  const m = String(ref).match(/^(\d?\s?[A-Za-z][A-Za-z ]+?)\s+(\d+)(?::(\d+))?/);
+  if(!m){ showToast('Could not parse ' + ref); return; }
+  const book = m[1].trim(), ch = m[2], verse = m[3] ? parseInt(m[3],10) : 0;
+  closeAskBible();
+  // Switch to Bible tab and open the chapter.
+  bfTab('bible');
+  setTimeout(function(){
+    const sel = document.getElementById('esvBook');
+    if(sel){
+      const opt = Array.from(sel.options).find(o => o.value && o.value.toLowerCase() === book.toLowerCase());
+      if(opt){ sel.value = opt.value; if(typeof onEsvBookChange === 'function') onEsvBookChange(); }
+    }
+    const chSel = document.getElementById('esvChapter');
+    if(chSel) chSel.value = String(ch);
+    if(typeof openEsvReader === 'function') openEsvReader();
+    if(verse) setTimeout(function(){ if(typeof jumpToEsvVerse === 'function') jumpToEsvVerse(verse); }, 600);
+  }, 80);
+}
+
+// SM-2-lite update — adjusts ease and intervalDays in place, sets nextDue.
+function _mvApplySrUpdate(v, correct){
+  const today = _mvTodayISO();
+  v.totalReviews   = (v.totalReviews || 0) + 1;
+  v.lastReviewed   = new Date().toISOString();
+
+  if(correct){
+    v.correctReviews = (v.correctReviews || 0) + 1;
+    if(_mvQuizCorrect !== undefined) _mvQuizCorrect++;
+    if(!v.intervalDays || v.intervalDays < 1)      v.intervalDays = 1;
+    else if(v.intervalDays === 1)                  v.intervalDays = 3;
+    else                                            v.intervalDays = Math.round(v.intervalDays * (v.ease || 2.5));
+    v.ease = Math.min(2.8, (v.ease || 2.5) + 0.1);
+    if(v.intervalDays >= 90 && !v.mastered){
+      v.mastered = true;
+      v.masteredAt = new Date().toISOString();
+      D.scrPoints = (D.scrPoints || 0) + 25;
+      showToast('🏆 ' + v.reference + ' mastered! +25 XP');
+      if(typeof logActivity === 'function') logActivity('faith', 'Memory verse mastered: ' + v.reference);
+    }
+  } else {
+    v.intervalDays = 1;
+    v.ease = Math.max(1.3, (v.ease || 2.5) - 0.2);
+  }
+
+  // Compute next due date.
+  const next = new Date();
+  next.setDate(next.getDate() + v.intervalDays);
+  v.nextDue = next.toISOString().slice(0,10);
+
+  // Streak protection — any review counts.
+  if(!D.scrReadDays) D.scrReadDays = {};
+  D.scrReadDays[today] = true;
+
+  save();
+  if(typeof renderFaithHome === 'function') renderFaithHome();
 }
 

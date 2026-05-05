@@ -614,7 +614,7 @@ const ALL_SECTIONS=[
   {id:'s-school',label:'📚 School'},{id:'s-resources',label:'📐 School Resources'},{id:'s-schedule',label:'📅 Schedule'},
   {id:'s-calendar',label:'🗓️ Calendar'},{id:'s-health',label:'💪 Health'},
   {id:'s-goals',label:'🎯 Goals'},{id:'s-skills',label:'🧠 Life Skills'},{id:'s-growing',label:'🌱 Growing Up'},
-  {id:'s-craft',label:'🎵 Music & Practice'},{id:'s-contests',label:'🏆 Challenges'},{id:'s-rewards',label:'🎁 Rewards'},{id:'s-scripture',label:'✝️ Bible & Faith'},{id:'s-worship',label:'🎵 Worship Playlist'},{id:'s-christian-living',label:'📚 Christian Living & Life Guides'},{id:'s-badges',label:'🏅 Badges'},{id:'s-driving',label:'🚗 Driving'},{id:'s-sports',label:'🏆 Sports'},
+  {id:'s-craft',label:'🎵 Music & Practice'},{id:'s-contests',label:'🏆 Challenges'},{id:'s-rewards',label:'🎁 Rewards'},{id:'s-scripture',label:'✝️ Bible & Faith'},{id:'s-worship',label:'🎵 Worship Playlist'},{id:'s-christian-living',label:'📚 Christian Life Guide'},{id:'s-badges',label:'🏅 Badges'},{id:'s-driving',label:'🚗 Driving'},{id:'s-sports',label:'🏆 Sports'},
   {id:'s-journal',label:'✍️ Journal'},{id:'s-motivation',label:'🔥 Fuel Wall'},{id:'s-resume',label:'📄 Jobs/Resume'},{id:'s-bio',label:'🪪 Bio Page'},{id:'s-reading',label:'📖 Reading List'},{id:'s-mentors',label:'🤝 My People'},{id:'s-milestones',label:'🏆 Milestones'},{id:'s-mood',label:'😊 Mood Tracker'},{id:'s-chores',label:'✅ Chores'},
 ];
 
@@ -927,7 +927,7 @@ const NAV_ITEMS = [
   ]},
   {id:'s-scripture', icon:'✝️', label:'Bible & Faith', key:'scripture'},
   {id:'s-worship',   icon:'🎵', label:'Worship Playlist', key:'worship'},
-  {id:'s-christian-living', icon:'📚', label:'Christian Living & Life Guides', key:'christianLiving'},
+  {id:'s-christian-living', icon:'📚', label:'Christian Life Guide', key:'christianLiving'},
   {id:'_group_school', icon:'🎓', label:'School & Career', isGroup:true, children:[
     {id:'s-school',    icon:'📚', label:'School',         key:'school'},
     {id:'s-resume',    icon:'💼', label:'Jobs/Resume',    key:'resume'},

@@ -19,6 +19,25 @@ const DEF = {
   verses:[], verseIdx:0, verseSpeed:60000, verseSpeedMs:60000,
   favVerses:[], prayers:[], bibleReadings:[], scrNotes:{}, scrHighlight:{},
   scrPoints:0, scrReadDays:{}, devPopupSeen:'',
+  // F2-B reading plans: active is keyed by planId (object so multiple plans
+  // can run concurrently); completed is an append-only list of planId archives.
+  faithPlans:{ active:{}, completed:[] },
+  // F2-D Bible reader annotations. Each entry is { id, book, chapter, verse, ... }.
+  // Highlights carry color, notes carry text, bookmarks just mark the verse.
+  faithHighlights:[], faithNotes:[], faithBookmarks:[],
+  // Per-user reader prefs (font size, line height, family). UI exposes these
+  // in a collapsible Settings cog on the ESV reader.
+  faithReaderSettings:{ fontSize:'medium', lineHeight:'normal', fontFamily:'serif' },
+  // Daily-keyed log so re-opening a chapter doesn't repeatedly grant +2 XP.
+  // Key shape: 'YYYY-MM-DD|<book>|<chapter>'. Pruned implicitly by date drift.
+  faithChapterReadLog:{},
+  // F2-F memory verses with SM-2-lite scheduling.
+  // Each entry: { id, reference, text, category, ease, intervalDays, nextDue (ISO date),
+  //               lastReviewed, mastered, masteredAt, createdAt, totalReviews, correctReviews }
+  memoryVerses:[],
+  // F2-G Ask the Bible history. Each entry: { id, question, answer, verses[], application, createdAt }.
+  // Capped client-side at 50 entries to keep the cloud-synced blob lean.
+  faithAiHistory:[],
   // streak / checkin
   streak:0, lastCheckin:null, checkin:{}, customHabits:[], dailyChecks:{},
   // money
