@@ -4373,13 +4373,67 @@
     <div id="favVersesList" style="max-height:200px;overflow-y:auto;"></div>
   </div>
 
-  <!-- ════ READING PLANS (F2-B stub) ════ -->
+  <!-- ════ READING PLANS (F2-B) ════ -->
   <div id="bf-plans" style="display:none;">
-    <div style="background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.18);border-radius:18px;padding:1.6rem 1.2rem;text-align:center;">
-      <div style="font-size:2.4rem;margin-bottom:.5rem;">📅</div>
-      <div style="font-size:1.05rem;font-weight:800;color:var(--tx);margin-bottom:.4rem;">Reading Plans</div>
-      <div style="font-size:.82rem;color:var(--tx2);line-height:1.65;max-width:480px;margin:0 auto .9rem;">24 curated plans coming next phase — topical 7- and 14-day, Bible-in-a-Year, Gospels in 30, Psalms in 30, family Advent &amp; Easter, plus beginner plans like <em>What is the Gospel?</em> and <em>Who is Jesus?</em>. Day-by-day progress, family-shared mode, completion badges.</div>
-      <div style="font-size:.62rem;font-weight:800;color:#38bdf8;text-transform:uppercase;letter-spacing:.18em;">Phase F2-B · Coming next</div>
+    <style>
+      #bf-plans .pl-hero{background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(167,139,250,.08));border:1px solid rgba(167,139,250,.22);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.85rem;}
+      #bf-plans .pl-hero-title{font-family:var(--fh,var(--fm));font-size:1.05rem;font-weight:800;color:var(--tx);margin-bottom:.25rem;letter-spacing:.02em;}
+      #bf-plans .pl-hero-sub{font-size:.78rem;color:var(--tx2);line-height:1.55;}
+      #bf-plans .pl-filters{display:flex;gap:.4rem;margin-bottom:.85rem;overflow-x:auto;padding-bottom:.2rem;}
+      #bf-plans .pl-chip{flex-shrink:0;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--tx2);border-radius:99px;padding:.32rem .8rem;font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fm);transition:all .15s;}
+      #bf-plans .pl-chip:hover{background:rgba(255,255,255,.08);}
+      #bf-plans .pl-chip.active{background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border-color:transparent;}
+      #bf-plans .pl-section-hdr{font-size:.68rem;font-weight:800;color:var(--tx3);text-transform:uppercase;letter-spacing:.16em;margin:.85rem 0 .5rem;}
+      #bf-plans .pl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.6rem;}
+      #bf-plans .pl-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-left-width:4px;border-radius:14px;padding:.85rem 1rem;cursor:pointer;transition:transform .15s,background .15s,border-color .15s;}
+      #bf-plans .pl-card:hover{transform:translateY(-2px);background:rgba(255,255,255,.06);}
+      #bf-plans .pl-card-top{display:flex;align-items:center;gap:.5rem;margin-bottom:.35rem;}
+      #bf-plans .pl-card-icon{font-size:1.4rem;}
+      #bf-plans .pl-card-title{font-size:.88rem;font-weight:800;color:var(--tx);line-height:1.3;}
+      #bf-plans .pl-card-meta{font-size:.62rem;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;margin-left:auto;}
+      #bf-plans .pl-card-short{font-size:.72rem;color:var(--tx2);line-height:1.55;margin-bottom:.55rem;}
+      #bf-plans .pl-card-cta{display:flex;justify-content:space-between;align-items:center;font-size:.7rem;}
+      #bf-plans .pl-card-status{color:var(--tx3);font-weight:700;}
+      #bf-plans .pl-card-arrow{font-weight:800;}
+      #bf-plans .pl-active-banner{background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border-radius:14px;padding:.75rem 1rem;margin-bottom:.75rem;display:flex;align-items:center;gap:.6rem;}
+      #bf-plans .pl-active-bar{flex:1;height:6px;background:rgba(11,18,32,.18);border-radius:99px;overflow:hidden;margin:.3rem 0;}
+      #bf-plans .pl-active-bar-fill{height:100%;background:rgba(11,18,32,.55);border-radius:99px;transition:width .5s;}
+      #bf-plans .pl-empty{text-align:center;color:var(--tx3);font-size:.78rem;padding:1rem;font-style:italic;}
+    </style>
+
+    <div class="pl-hero">
+      <div class="pl-hero-title">📅 Reading Plans</div>
+      <div class="pl-hero-sub">Pick a plan that fits where you are. Topical for tough seasons, beginner if you&rsquo;re new, through-the-Bible for steady habit. Day-by-day progress · Faith XP for each completed day · badges when you finish.</div>
+    </div>
+
+    <div class="pl-filters" id="plFilters">
+      <button class="pl-chip active" data-plan-cat="all" onclick="planFilter('all', this)">All</button>
+      <button class="pl-chip" data-plan-cat="topical" onclick="planFilter('topical', this)">Topical</button>
+      <button class="pl-chip" data-plan-cat="beginner" onclick="planFilter('beginner', this)">Beginner</button>
+      <button class="pl-chip" data-plan-cat="through-the-bible" onclick="planFilter('through-the-bible', this)">Through the Bible</button>
+      <button class="pl-chip" data-plan-cat="family" onclick="planFilter('family', this)">Family <span style="opacity:.6;">(F2-H)</span></button>
+    </div>
+
+    <!-- Active plans surface here when at least one is started -->
+    <div id="plActive"></div>
+
+    <!-- Catalog grid populated by renderPlanCatalog() -->
+    <div id="plCatalogHdr" class="pl-section-hdr">All plans (8 to start · 16 more in F2 follow-ups)</div>
+    <div id="plCatalog" class="pl-grid"></div>
+  </div>
+
+  <!-- ════ PLAN DETAIL MODAL (F2-B) ════ -->
+  <!-- Uses the same .mo / .md pattern as charModal — openModal/closeModal toggle .open -->
+  <div id="planDetailModal" class="mo" onclick="if(event.target===this)closePlanDetail()">
+    <div class="md" style="max-width:560px;padding:0;">
+      <div id="planDetailHeader" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);padding:1.4rem 1.4rem 1.2rem;text-align:center;color:#0b1220;border-radius:16px 16px 0 0;position:relative;">
+        <button onclick="closePlanDetail()" style="position:absolute;top:.7rem;right:.7rem;background:rgba(11,18,32,.18);border:1px solid rgba(11,18,32,.22);color:#0b1220;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.8rem;font-weight:800;">✕</button>
+        <div id="planDetailIcon" style="font-size:2rem;margin-bottom:.3rem;">📅</div>
+        <div id="planDetailTitle" style="font-family:var(--fh,var(--fm));font-size:1.25rem;font-weight:800;letter-spacing:.02em;margin-bottom:.25rem;">—</div>
+        <div id="planDetailShort" style="font-size:.78rem;font-weight:600;opacity:.85;">—</div>
+      </div>
+      <div id="planDetailBody" style="padding:1rem 1.2rem;max-height:55vh;overflow-y:auto;"></div>
+      <div id="planDetailFooter" style="padding:.85rem 1.2rem;border-top:1px solid rgba(255,255,255,.06);display:flex;gap:.4rem;justify-content:flex-end;flex-wrap:wrap;"></div>
     </div>
   </div>
 
@@ -7757,6 +7811,7 @@
 <script src="/app/js/skills.js"></script>
 <script src="/app/js/chores.js"></script>
 <script src="/app/js/sports.js"></script>
+<script src="/app/js/data/plans.js"></script>
 <script src="/app/js/faith.js"></script>
 <script src="/app/js/worship.js"></script>
 <script src="/app/js/faith-resources.js"></script>
