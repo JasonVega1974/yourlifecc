@@ -236,7 +236,8 @@ async function authForgotPassword(){
 // s-parent removed 2026-05-04 — faith_free is a single-person Bible-study
 // tier, not a parent/child product; Parent Hub access doesn't apply.
 // s-worship added in F1.0 — Worship Playlist available to all members.
-const FAITH_FREE_ALLOWED = ['s-hero', 's-scripture', 's-worship'];
+// s-christian-living added in F1.1 — Life Guides available to all members.
+const FAITH_FREE_ALLOWED = ['s-hero', 's-scripture', 's-worship', 's-christian-living'];
 
 // Single source of truth for "is this section reachable for the current user?"
 // Used by buildSideNav, showSection, and applySettings. Returning true for
