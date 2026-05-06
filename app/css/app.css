@@ -2349,3 +2349,30 @@ body.child-view:not(.parent-unlocked) #sideSignOutBtn                           
   border-color: var(--cd-card-border-hover);
   box-shadow: var(--cd-card-shadow-hover);
 }
+
+/* ─── FAITH-FREE TIER CHROME ────────────────────────────────────
+   The faith-only tier is a single-person Bible-study product. Hide
+   parent/child onboarding chrome and extra Settings sections via CSS
+   (more robust than JS-only — works even if applySettings hasn't run
+   yet, and survives any rendering race). The data attribute is set in
+   ui.js applySettings when window._faithFree is true. */
+html[data-faith-free="1"] #childLoginTopBtn,
+html[data-faith-free="1"] #childLoginMobBtn,
+html[data-faith-free="1"] #childAvatarWrap,
+html[data-faith-free="1"] #parentWelcomeCard,
+html[data-faith-free="1"] button[onclick*="quickParentHub"],
+html[data-faith-free="1"] button[onclick*="showSection('s-referral'"],
+html[data-faith-free="1"] #startHereBtn,
+html[data-faith-free="1"] #gettingStarted,
+html[data-faith-free="1"] .mqb-child,
+html[data-faith-free="1"] .mqb-parent {
+  display: none !important;
+}
+
+/* Simplify Settings for faith_free — only Appearance + Support remain. */
+html[data-faith-free="1"] #sp .sp-pb { display: none !important; }
+html[data-faith-free="1"] #sp-faith-support { display: block !important; }
+
+/* The faith-free Support card (hidden by default; shown only via the
+   data-faith-free selector above). */
+#sp-faith-support { display: none; }

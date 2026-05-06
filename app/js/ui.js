@@ -136,7 +136,7 @@ const STAGE_CONFIG = {
   },
   fresh:{
     label:'9th Grade',emoji:'📚',
-    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-reading','s-mentors','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-badges','s-driving','s-sports','s-parent'],
+    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-reading','s-mentors','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-christian-living','s-badges','s-driving','s-sports','s-parent'],
     skillCats:['health','dental','cooking','car','relationships','faith','mental','emergency','family','digital','civic','credit','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
@@ -154,7 +154,7 @@ const STAGE_CONFIG = {
   },
   mid_hs:{
     label:'10th–11th Grade',emoji:'📖',
-    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-badges','s-driving','s-sports','s-parent'],
+    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-christian-living','s-badges','s-driving','s-sports','s-parent'],
     skillCats:['taxes','car','health','dental','cooking','home','career','credit','relationships','faith','mental','civic','emergency','digital','family','college','adulting','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
@@ -172,7 +172,7 @@ const STAGE_CONFIG = {
   },
   senior:{
     label:'Senior Year',emoji:'🎓',
-    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-badges','s-driving','s-sports','s-parent'],
+    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-christian-living','s-badges','s-driving','s-sports','s-parent'],
     skillCats:['taxes','car','health','dental','cooking','home','career','credit','relationships','faith','mental','civic','emergency','digital','family','college','legal','adulting','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
@@ -192,7 +192,7 @@ const STAGE_CONFIG = {
   },
   college:{
     label:'College',emoji:'🏛️',
-    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-badges','s-driving','s-sports','s-parent'],
+    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-christian-living','s-badges','s-driving','s-sports','s-parent'],
     skillCats:['taxes','car','health','dental','cooking','home','career','credit','relationships','faith','mental','civic','emergency','digital','family','college','legal','adulting','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
@@ -211,7 +211,7 @@ const STAGE_CONFIG = {
   },
   adult:{
     label:'Young Adult',emoji:'💼',
-    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-badges','s-driving','s-sports','s-parent'],
+    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-christian-living','s-badges','s-driving','s-sports','s-parent'],
     skillCats:['taxes','car','health','dental','cooking','home','career','credit','relationships','faith','mental','civic','emergency','digital','family','college','legal','adulting','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
@@ -734,6 +734,11 @@ function applySettings(){
   // (GPA/Bank/Parent Bucks/etc.) inside the allowed s-hero; (c) the
   // Refer & Earn buttons in the global top bar, which sit outside any
   // section.
+  // Set/clear html[data-faith-free] so CSS can hide parent/child chrome and
+  // simplify Settings without depending on this JS path running first.
+  if(window._faithFree) document.documentElement.setAttribute('data-faith-free', '1');
+  else document.documentElement.removeAttribute('data-faith-free');
+
   if(window._faithFree){
     document.querySelectorAll('section.sec').forEach(el => {
       if(!isSectionAllowed(el.id)) el.style.display='none';

@@ -353,6 +353,18 @@
     </div>
   </div>
 
+  <!-- Faith-free Support card — only visible to faith_free users via the
+       html[data-faith-free="1"] selector in app.css. -->
+  <div id="sp-faith-support" style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.18);border-radius:10px;padding:.9rem;margin-bottom:.85rem;">
+    <div style="font-family:var(--fh);font-size:.73rem;letter-spacing:1px;color:#a78bfa;margin-bottom:.55rem;">💌 SUPPORT &amp; CONTACT</div>
+    <div style="font-size:.78rem;color:var(--tx2);line-height:1.55;margin-bottom:.7rem;">Questions, ideas, or something not working right? We read every email.</div>
+    <a href="mailto:info@kingdom-creatives.com?subject=YourLife%20CC%20Faith%20Hub" style="display:flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:10px;padding:.6rem .85rem;font-size:.78rem;font-weight:800;text-decoration:none;font-family:var(--fm);">
+      <span style="font-size:1rem;">✉️</span>
+      <span>info@kingdom-creatives.com</span>
+    </a>
+    <div style="font-size:.62rem;color:var(--tx3);margin-top:.55rem;line-height:1.5;font-style:italic;">Faith Hub is a Kingdom Creatives product. Free forever for individuals, with optional support for families through the full YourLife CC subscription.</div>
+  </div>
+
   <div class="sp-pb">
   <div style="font-family:var(--fh);font-size:.73rem;letter-spacing:1px;color:#c8d4e8;margin-bottom:.45rem;">SHOW / HIDE SECTIONS</div>
   <div id="sectionToggles"></div>
@@ -5416,11 +5428,21 @@
       display: flex; align-items: flex-start; justify-content: center;
     }
     #s-christian-living .modal-content {
-      background: var(--bg2, #fff); color: var(--tx, #333);
+      /* Use --s2 (theme-aware surface) instead of an undefined --bg2 var
+         that fell back to white in dark mode and made light text unreadable. */
+      background: var(--s2); color: var(--tx);
       max-width: 900px; width: 100%; border-radius: 16px;
       box-shadow: 0 20px 60px rgba(0,0,0,.5); position: relative; margin: auto;
       max-height: 90vh; display: flex; flex-direction: column;
     }
+    /* Body content tokens that previously inherited from white fallback. */
+    #s-christian-living .modal-body { color: var(--tx); }
+    #s-christian-living .modal-body p,
+    #s-christian-living .modal-body li,
+    #s-christian-living .modal-body div { color: inherit; }
+    #s-christian-living .modal-body strong,
+    #s-christian-living .modal-body b { color: var(--tx); }
+    #s-christian-living .scripture-text { color: var(--tx); }
     #s-christian-living .modal-header {
       background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
       padding: 36px 40px; text-align: center; border-radius: 16px 16px 0 0;
