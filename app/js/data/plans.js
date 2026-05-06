@@ -239,3 +239,114 @@ const FAITH_PLANS = [
 if (typeof window !== 'undefined') {
   window.FAITH_PLANS = FAITH_PLANS;
 }
+
+// ── F3-F: Geography reading plans tied to Biblical World ─────
+// Appended after launch in F3-F. Users walking the Walk-Where-Jesus-Walked
+// or Following-Paul plans encounter ESV chapters that include data-place
+// markers from F3-B; tapping place names opens the site profile drawer.
+const FAITH_GEOGRAPHY_PLANS = [
+  {
+    id: 'walk-where-jesus-walked-10',
+    title: 'Walk Where Jesus Walked',
+    short: 'Ten days reading Scripture in the towns Jesus actually visited.',
+    category: 'through-the-bible',
+    audience: 'all',
+    days: 10,
+    badgeIcon: '🚶',
+    brandColor: '#34d399',
+    daysData: [
+      { day: 1,  refs: ['Luke 2:1-20'],     prompt: 'Bethlehem — read where He was born. Tap Bethlehem in the text to see the site.' },
+      { day: 2,  refs: ['Luke 2:39-52'],    prompt: 'Nazareth — His hometown for 30 silent years. What does that say about ordinary obedience?' },
+      { day: 3,  refs: ['Matthew 3:13-17'], prompt: 'Jordan River — His baptism. The Father said "beloved" before any public ministry.' },
+      { day: 4,  refs: ['Mark 1:14-39'],    prompt: 'Capernaum — base of His ministry. What\'s your "Capernaum" — the place He keeps sending you back to?' },
+      { day: 5,  refs: ['Mark 4:35-41'],    prompt: 'Sea of Galilee — He calmed the storm. What storm needs that voice today?' },
+      { day: 6,  refs: ['Matthew 16:13-20'],prompt: 'Caesarea Philippi — "Who do you say I am?" Sit with the question.' },
+      { day: 7,  refs: ['John 4:1-42'],     prompt: 'Shechem (Sychar) — the woman at the well. What well do you keep going back to?' },
+      { day: 8,  refs: ['Matthew 21:1-17'], prompt: 'Jerusalem — triumphal entry, then Temple cleansing. The week begins.' },
+      { day: 9,  refs: ['Matthew 26:36-56'],prompt: 'Gethsemane — "Not my will, but yours." Pray it slowly tonight.' },
+      { day: 10, refs: ['John 19:17-42','John 20:1-18'], prompt: 'Golgotha and the empty tomb. Sit with both.' },
+    ],
+  },
+  {
+    id: 'following-paul-14',
+    title: 'Following Paul',
+    short: 'Fourteen days through the cities Paul evangelized.',
+    category: 'through-the-bible',
+    audience: 'all',
+    days: 14,
+    badgeIcon: '✉️',
+    brandColor: '#f472b6',
+    daysData: [
+      { day: 1,  refs: ['Acts 9:1-22'],   prompt: 'Damascus — Saul becomes Paul. Where has Jesus interrupted you?' },
+      { day: 2,  refs: ['Acts 11:19-30'], prompt: 'Antioch — disciples first called Christians. The church gets its name.' },
+      { day: 3,  refs: ['Acts 13:1-12'],  prompt: 'Cyprus — first missionary journey starts. The Spirit sends.' },
+      { day: 4,  refs: ['Acts 14:8-28'],  prompt: 'Lystra and Derbe — preaching, stoning, returning. Resilience.' },
+      { day: 5,  refs: ['Acts 16:6-15'],  prompt: 'Macedonia call → Philippi. Lydia\'s heart opened.' },
+      { day: 6,  refs: ['Acts 16:16-40'], prompt: 'Philippi prison — Paul and Silas singing at midnight. What can you sing in your prison?' },
+      { day: 7,  refs: ['Acts 17:1-15'],  prompt: 'Thessalonica + Berea — Bereans "examined the Scriptures daily." How is your daily reading?' },
+      { day: 8,  refs: ['Acts 17:16-34'], prompt: 'Athens — Mars Hill sermon. Cross-cultural witness.' },
+      { day: 9,  refs: ['Acts 18:1-17'],  prompt: 'Corinth — Paul stays 18 months. Slow ministry in a hard city.' },
+      { day: 10, refs: ['Acts 19:1-22'],  prompt: 'Ephesus — three years. The longest stop. What is your Ephesus?' },
+      { day: 11, refs: ['Acts 19:23-41'], prompt: 'Ephesus riots — when the gospel disrupts an economy.' },
+      { day: 12, refs: ['Acts 20:17-38'], prompt: 'Miletus — Paul\'s farewell to Ephesian elders. Read the tears.' },
+      { day: 13, refs: ['Acts 21:27 - 22:30'], prompt: 'Jerusalem arrest. The mission costs.' },
+      { day: 14, refs: ['Acts 28:11-31'], prompt: 'Rome — Paul preaches "openly and without hindrance" from house arrest. The end of Acts. The story keeps going.' },
+    ],
+  },
+  {
+    id: 'stones-that-speak-7',
+    title: 'Stones That Speak',
+    short: 'Seven days through Scripture confirmed by archaeology.',
+    category: 'through-the-bible',
+    audience: 'all',
+    days: 7,
+    badgeIcon: '🏺',
+    brandColor: '#fbbf24',
+    daysData: [
+      { day: 1, refs: ['2 Kings 18:13-19','2 Chronicles 32:9-23'], prompt: 'Sennacherib\'s siege of Jerusalem. The Assyrian prism agrees on every detail except the outcome.' },
+      { day: 2, refs: ['2 Kings 20:20','2 Chronicles 32:30'],     prompt: 'Hezekiah\'s tunnel. Still walkable today. The Bible mentions a specific construction project; archaeologists still walk through it.' },
+      { day: 3, refs: ['Numbers 6:24-26'],                          prompt: 'Aaronic blessing. The Ketef Hinnom silver scrolls have it inscribed in 7th-century BC silver — oldest biblical text we have.' },
+      { day: 4, refs: ['2 Samuel 7:12-16','1 Kings 14:30'],        prompt: 'House of David. Tel Dan Stele names it on stone — the same royal house, in the same century.' },
+      { day: 5, refs: ['Luke 3:1','John 19:1-22'],                 prompt: 'Pontius Pilate, prefect. The Pilate Stone confirms he existed, governing where the Bible says he did.' },
+      { day: 6, refs: ['John 5:1-15','John 9:1-12'],               prompt: 'Pools of Bethesda and Siloam. Both excavated. Both match John\'s description.' },
+      { day: 7, refs: ['Romans 16:23'],                              prompt: 'Erastus, Corinth\'s public-works director. A Latin pavement inscription names him in his role. Paul\'s greetings list is real social fabric.' },
+    ],
+  },
+  {
+    id: 'through-holy-land-21',
+    title: 'Through the Holy Land',
+    short: 'Three weeks across all the major biblical regions.',
+    category: 'through-the-bible',
+    audience: 'all',
+    days: 21,
+    badgeIcon: '🗺️',
+    brandColor: '#38bdf8',
+    daysData: [
+      { day: 1,  refs: ['Genesis 12:1-9'],   prompt: 'Ur to Canaan — Abraham\'s call.' },
+      { day: 2,  refs: ['Genesis 22:1-19'],  prompt: 'Mount Moriah — the binding of Isaac.' },
+      { day: 3,  refs: ['Genesis 28:10-22'], prompt: 'Bethel — Jacob\'s ladder.' },
+      { day: 4,  refs: ['Genesis 32:22-32'], prompt: 'Peniel — Jacob wrestles God.' },
+      { day: 5,  refs: ['Exodus 14'],        prompt: 'Red Sea crossing.' },
+      { day: 6,  refs: ['Exodus 19','Exodus 20'], prompt: 'Mount Sinai — the giving of the Law.' },
+      { day: 7,  refs: ['Joshua 6'],         prompt: 'Jericho — the walls fall.' },
+      { day: 8,  refs: ['Joshua 24'],        prompt: 'Shechem — covenant renewal.' },
+      { day: 9,  refs: ['1 Samuel 17'],      prompt: 'Valley of Elah — David and Goliath.' },
+      { day: 10, refs: ['1 Kings 8'],        prompt: 'Jerusalem — Solomon dedicates the Temple.' },
+      { day: 11, refs: ['1 Kings 18'],       prompt: 'Mount Carmel — Elijah and the prophets of Baal.' },
+      { day: 12, refs: ['Daniel 6'],         prompt: 'Babylon — Daniel in the lions\' den.' },
+      { day: 13, refs: ['Nehemiah 6'],       prompt: 'Jerusalem rebuilt — Nehemiah finishes the wall.' },
+      { day: 14, refs: ['Luke 2:1-20'],      prompt: 'Bethlehem — Jesus is born.' },
+      { day: 15, refs: ['Matthew 4:1-11'],   prompt: 'Wilderness — Jesus\'s temptation.' },
+      { day: 16, refs: ['Matthew 5:1-16'],   prompt: 'Mount of Beatitudes — the Sermon on the Mount.' },
+      { day: 17, refs: ['John 11:1-44'],     prompt: 'Bethany — Lazarus raised.' },
+      { day: 18, refs: ['Matthew 26:36 - 27:66'], prompt: 'Jerusalem — Gethsemane to the cross.' },
+      { day: 19, refs: ['John 20'],          prompt: 'The empty tomb.' },
+      { day: 20, refs: ['Acts 1:1-11','Acts 2'], prompt: 'Mount of Olives → Pentecost in Jerusalem. The church begins.' },
+      { day: 21, refs: ['Revelation 21:1-7','Revelation 22:1-5'], prompt: 'New Jerusalem — where the whole story is going.' },
+    ],
+  },
+];
+
+if (typeof window !== 'undefined') {
+  window.FAITH_PLANS = FAITH_PLANS.concat(FAITH_GEOGRAPHY_PLANS);
+}

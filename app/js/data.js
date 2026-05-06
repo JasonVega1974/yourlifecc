@@ -43,6 +43,9 @@ const DEF = {
   //          courses:{ '<courseId>': { quizAttempts, quizBestScore, quizPassedAt, certificateId, certificateIssuedAt } },
   //          badges:{ '<moduleId>': isoDate } }
   faithAcademyProgress:{ lessons:{}, courses:{}, badges:{} },
+  // F3-B/D Bible Lands visit + badge progress.
+  // Shape: { sites:{ '<siteId>': isoDate }, discoveries:{ '<discId>': isoDate }, badges:{ '<badgeId>': isoDate } }
+  faithBibleWorld:{ sites:{}, discoveries:{}, badges:{} },
   // F2-H sermon notes — added in 🌟 Journey tab. Each entry:
   // { id, date, church, speaker, title, scriptures, notes, takeaway, actionStep, createdAt, updatedAt }
   sermonNotes:[],

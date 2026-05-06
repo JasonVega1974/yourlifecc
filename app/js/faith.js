@@ -4921,6 +4921,7 @@ function openBwSite(siteId){
   }
   if(typeof openModal === 'function') openModal('bwSiteModal');
   if(typeof logActivity === 'function') logActivity('faith', 'Bible Lands site: ' + s.name);
+  if(typeof _bwMarkVisited === 'function') _bwMarkVisited('site', siteId);
 }
 
 function bwCloseSite(){
@@ -4943,6 +4944,210 @@ function _bwEsc(s){
   return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   })[c]);
+}
+
+// ═════════════════════════════════════════════════════════════
+// F3-D — ARCHAEOLOGICAL DISCOVERIES + F3-F (light) PILGRIMAGE BADGES
+// ═════════════════════════════════════════════════════════════
+let _bwView = 'sites';      // sites | discoveries | pilgrimage
+let _bwDiscFilter = 'all';  // all | confirmed | consistent | contested
+
+function _bwDiscoveries(){ return (typeof window !== 'undefined' && window.BIBLICAL_DISCOVERIES) ? window.BIBLICAL_DISCOVERIES : []; }
+function _bwDiscById(id){ return _bwDiscoveries().find(d => d && d.id === id) || null; }
+
+function bwSetView(view, btn){
+  _bwView = view;
+  // Toggle button styles.
+  document.querySelectorAll('#bf-bibleworld .bw-vtab').forEach(b => {
+    if(b === btn){
+      b.classList.add('active');
+      b.style.background = 'var(--cd-banner)';
+      b.style.color = 'var(--cd-banner-text)';
+      b.style.border = 'none';
+      b.style.fontWeight = '800';
+    } else {
+      b.classList.remove('active');
+      b.style.background = 'rgba(255,255,255,.04)';
+      b.style.color = 'var(--tx)';
+      b.style.border = '1px solid rgba(255,255,255,.1)';
+      b.style.fontWeight = '700';
+    }
+  });
+  const sites      = document.getElementById('bwSitesView');
+  const discoveries = document.getElementById('bwDiscoveriesView');
+  const pilgrim    = document.getElementById('bwPilgrimageView');
+  if(sites)       sites.style.display       = (view === 'sites') ? '' : 'none';
+  if(discoveries) discoveries.style.display = (view === 'discoveries') ? '' : 'none';
+  if(pilgrim)     pilgrim.style.display     = (view === 'pilgrimage') ? '' : 'none';
+
+  if(view === 'sites'){
+    // Re-trigger map size recalc; Leaflet needs invalidate when re-shown.
+    if(_bwMap){ try { _bwMap.invalidateSize(); } catch(_){} }
+  } else if(view === 'discoveries'){
+    bwRenderDiscoveries();
+  } else if(view === 'pilgrimage'){
+    bwRenderPilgrimage();
+  }
+}
+
+function bwDiscFilter(cert, btn){
+  _bwDiscFilter = cert;
+  document.querySelectorAll('#bwDiscFilters .bw-chip').forEach(c => {
+    c.classList.remove('active');
+    c.style.background = '';
+    c.style.color = '';
+    c.style.borderColor = '';
+  });
+  if(btn){
+    btn.classList.add('active');
+    btn.style.background = 'var(--cd-banner)';
+    btn.style.color = 'var(--cd-banner-text)';
+    btn.style.borderColor = 'transparent';
+  }
+  bwRenderDiscoveries();
+}
+
+function bwRenderDiscoveries(){
+  const grid = document.getElementById('bwDiscGrid');
+  const hdr = document.getElementById('bwDiscHdr');
+  if(!grid) return;
+  let list = _bwDiscoveries();
+  if(_bwDiscFilter !== 'all') list = list.filter(d => d && d.certainty === _bwDiscFilter);
+  if(hdr){
+    const label = (_bwDiscFilter === 'all' ? 'All discoveries' :
+      _bwDiscFilter === 'confirmed' ? 'Confirmed' :
+      _bwDiscFilter === 'consistent' ? 'Consistent with Scripture' : 'Contested');
+    hdr.textContent = label + ' (' + list.length + ')';
+  }
+  if(!list.length){
+    grid.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--tx2);font-size:.78rem;font-style:italic;">No discoveries match this filter.</div>';
+    return;
+  }
+  // Certainty colors — confirmed=green, consistent=cyan, contested=amber.
+  const certColor = (c) => c === 'confirmed' ? '#10b981' : c === 'consistent' ? '#38bdf8' : '#fbbf24';
+  const certIcon  = (c) => c === 'confirmed' ? '✓' : c === 'consistent' ? '≈' : '?';
+  grid.innerHTML = list.map(d => {
+    const c = certColor(d.certainty);
+    return '<div class="bw-card" style="border-left-color:'+c+';" onclick="openBwDiscovery(\''+d.id+'\')">'
+      + '<div class="bw-card-meta" style="color:'+c+';">'+certIcon(d.certainty)+' '+_bwEsc(d.certainty)+' · '+_bwEsc(String(d.yearFound))+'</div>'
+      + '<div class="bw-card-name">'+_bwEsc(d.name)+'</div>'
+      + '<div class="bw-card-tagline">'+_bwEsc(d.tagline||'')+'</div>'
+      + '</div>';
+  }).join('');
+}
+
+function openBwDiscovery(discId){
+  const d = _bwDiscById(discId);
+  if(!d){ showToast('Discovery not found'); return; }
+  const certLabel = (d.certainty === 'confirmed') ? '✓ Confirmed' : d.certainty === 'consistent' ? '≈ Consistent with Scripture' : '? Contested';
+  document.getElementById('bwDiscCert').textContent = certLabel + ' · Found ' + d.yearFound;
+  document.getElementById('bwDiscName').textContent = d.name;
+  document.getElementById('bwDiscTagline').textContent = d.tagline || '';
+  document.getElementById('bwDiscBody').innerHTML = d.body || '';
+  // Scripture refs
+  const refsEl = document.getElementById('bwDiscRefs');
+  if(refsEl){
+    if((d.scriptureRefs || []).length){
+      refsEl.innerHTML = d.scriptureRefs.map(r =>
+        '<button onclick="bwJumpToRef(\''+r.replace(/\'/g,"\\'")+'\')" style="background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.3);color:#38bdf8;border-radius:99px;padding:.25rem .65rem;font-size:.66rem;font-weight:800;cursor:pointer;font-family:var(--fm);">📖 '+_bwEsc(r)+'</button>'
+      ).join('');
+    } else refsEl.innerHTML = '';
+  }
+  // Meta — current location + related sites
+  const metaEl = document.getElementById('bwDiscMeta');
+  if(metaEl){
+    const relatedHtml = (d.relatedSiteIds || []).map(sid => {
+      const site = _bwSiteById(sid);
+      return site ? '<button onclick="openBwSite(\''+sid+'\')" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.3);color:#a78bfa;border-radius:99px;padding:.18rem .55rem;font-size:.6rem;font-weight:700;cursor:pointer;font-family:var(--fm);margin-right:.2rem;">📍 '+_bwEsc(site.name)+'</button>' : '';
+    }).filter(Boolean).join('');
+    metaEl.innerHTML =
+      '<div><div style="font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.1em;font-size:.58rem;margin-bottom:.15rem;">Currently At</div><div style="color:var(--tx);">'+_bwEsc(d.currentLocation || '—')+'</div></div>'
+      + (relatedHtml ? '<div><div style="font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.1em;font-size:.58rem;margin-bottom:.15rem;">Related Sites</div><div>'+relatedHtml+'</div></div>' : '');
+  }
+  if(typeof openModal === 'function') openModal('bwDiscoveryModal');
+  if(typeof logActivity === 'function') logActivity('faith', 'Discovery: ' + d.name);
+  if(typeof _bwMarkVisited === 'function') _bwMarkVisited('discovery', discId);
+}
+
+function bwCloseDiscovery(){
+  if(typeof closeModal === 'function') closeModal('bwDiscoveryModal');
+}
+
+// ── F3-F LIGHT — PILGRIMAGE BADGES ──────────────────────────
+const PILGRIMAGE_BADGES = [
+  { id:'holy-land-visitor',  icon:'🏛️', label:'Holy Land Visitor',  desc:'Read 10 site profiles', target:10, type:'sites' },
+  { id:'archaeology-buff',   icon:'🏺', label:'Archaeology Buff',   desc:'Read 10 discovery profiles', target:10, type:'discoveries' },
+  { id:'walked-with-jesus',  icon:'🚶', label:'Walked With Jesus',  desc:"Visit all Jesus-ministry sites", target:6, type:'sites-era', era:'jesus-ministry' },
+  { id:'followed-paul',      icon:'✉️', label:'Followed Paul',      desc:"Visit all Pauline-journey sites", target:7, type:'sites-era', era:'pauline-journeys' },
+  { id:'cultural-scholar',   icon:'📜', label:'Cultural Scholar',   desc:'Cross-link 5 discoveries to sites', target:5, type:'discovery-sites' },
+  { id:'bible-lands-explorer',icon:'🗺️',label:'Bible Lands Explorer',desc:'All 30 sites + all 20 discoveries', target:50, type:'all' },
+];
+
+function _bwVisitedStore(){
+  if(!D.faithBibleWorld || typeof D.faithBibleWorld !== 'object') D.faithBibleWorld = { sites:{}, discoveries:{}, badges:{} };
+  if(!D.faithBibleWorld.sites)       D.faithBibleWorld.sites = {};
+  if(!D.faithBibleWorld.discoveries) D.faithBibleWorld.discoveries = {};
+  if(!D.faithBibleWorld.badges)      D.faithBibleWorld.badges = {};
+  return D.faithBibleWorld;
+}
+
+function _bwBadgeProgress(b){
+  const store = _bwVisitedStore();
+  if(b.type === 'sites')         return Object.keys(store.sites).length;
+  if(b.type === 'discoveries')   return Object.keys(store.discoveries).length;
+  if(b.type === 'sites-era'){
+    const sites = _bwSites().filter(s => (s.eras || []).indexOf(b.era) !== -1);
+    return sites.filter(s => store.sites[s.id]).length;
+  }
+  if(b.type === 'discovery-sites'){
+    // Discoveries the user has read AND that have related site IDs the user has also visited.
+    return _bwDiscoveries().filter(d => store.discoveries[d.id] && (d.relatedSiteIds || []).some(sid => store.sites[sid])).length;
+  }
+  if(b.type === 'all'){
+    return Object.keys(store.sites).length + Object.keys(store.discoveries).length;
+  }
+  return 0;
+}
+
+function bwRenderPilgrimage(){
+  const grid = document.getElementById('bwBadgeGrid');
+  if(!grid) return;
+  const store = _bwVisitedStore();
+  grid.innerHTML = PILGRIMAGE_BADGES.map(b => {
+    const progress = _bwBadgeProgress(b);
+    const target = b.target;
+    const earned = !!store.badges[b.id] || progress >= target;
+    if(earned && !store.badges[b.id]){
+      // Award now (idempotent — only fires once).
+      store.badges[b.id] = new Date().toISOString();
+      D.scrPoints = (D.scrPoints || 0) + 50;
+      save();
+      if(typeof logActivity === 'function') logActivity('faith', 'Pilgrimage badge: ' + b.label);
+      showToast('🏆 ' + b.label + ' earned! +50 XP');
+    }
+    const pct = Math.min(100, Math.round((progress / target) * 100));
+    return '<div class="bw-card" style="border-left-color:'+(earned?'#fbbf24':'#a78bfa')+';cursor:default;'+(earned?'background:rgba(251,191,36,.06);':'')+'">'
+      + '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.35rem;">'
+      +   '<span style="font-size:1.5rem;">'+b.icon+'</span>'
+      +   '<div style="flex:1;"><div class="bw-card-name">'+_bwEsc(b.label)+'</div>'
+      +   '<div class="bw-card-meta" style="color:'+(earned?'#fbbf24':'var(--tx2)')+';">'+(earned?'🏆 Earned':progress + '/' + target)+'</div></div>'
+      + '</div>'
+      + '<div style="font-size:.74rem;color:var(--tx2);line-height:1.5;margin-bottom:.4rem;">'+_bwEsc(b.desc)+'</div>'
+      + '<div style="height:5px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,'+(earned?'#fbbf24,#fb923c':'#38bdf8,#a78bfa')+');border-radius:99px;transition:width .5s;"></div></div>'
+      + '</div>';
+  }).join('');
+}
+
+// Track visits on site/discovery open. Called from openBwSite / openBwDiscovery.
+function _bwMarkVisited(kind, id){
+  const store = _bwVisitedStore();
+  if(kind === 'site' && !store.sites[id]){
+    store.sites[id] = new Date().toISOString();
+    save();
+  } else if(kind === 'discovery' && !store.discoveries[id]){
+    store.discoveries[id] = new Date().toISOString();
+    save();
+  }
 }
 
 // ── F2-D place-tag taps → F3-B site drawer ──────────────────

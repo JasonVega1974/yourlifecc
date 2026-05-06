@@ -4819,17 +4819,61 @@
 
     <div class="bw-hero">
       <div class="bw-hero-title">🗺️ Biblical World</div>
-      <div class="bw-hero-sub">30 sites across 8 biblical periods. Tap a marker on the map or any card below to read its story. Photos and archaeology articles roll out as we license imagery — text and Scripture refs are live now.</div>
+      <div class="bw-hero-sub">30 sites · 20 archaeological discoveries · 8 biblical periods. Tap any card below — or any place name in the Bible reader — to read its story.</div>
     </div>
 
-    <div class="bw-filters" id="bwFilters">
-      <button class="bw-chip active" data-bw-era="all" onclick="bwFilter('all',this)">All eras</button>
+    <!-- View tabs: Sites · Discoveries · Pilgrimage -->
+    <div style="display:flex;gap:.4rem;margin-bottom:.7rem;">
+      <button class="bw-vtab active" data-bw-view="sites" onclick="bwSetView('sites',this)" style="flex:1;background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.5rem .8rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🗺️ Sites (30)</button>
+      <button class="bw-vtab" data-bw-view="discoveries" onclick="bwSetView('discoveries',this)" style="flex:1;background:rgba(255,255,255,.04);color:var(--tx);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.5rem .8rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);">🏺 Discoveries (20)</button>
+      <button class="bw-vtab" data-bw-view="pilgrimage" onclick="bwSetView('pilgrimage',this)" style="flex:1;background:rgba(255,255,255,.04);color:var(--tx);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.5rem .8rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);">🏆 Pilgrimage</button>
     </div>
 
-    <div id="bwMap"></div>
+    <!-- Sites view: era filters + map + grid -->
+    <div id="bwSitesView">
+      <div class="bw-filters" id="bwFilters">
+        <button class="bw-chip active" data-bw-era="all" onclick="bwFilter('all',this)">All eras</button>
+      </div>
+      <div id="bwMap"></div>
+      <div class="bw-section-hdr" id="bwListHdr">All sites</div>
+      <div class="bw-grid" id="bwGrid"></div>
+    </div>
 
-    <div class="bw-section-hdr" id="bwListHdr">All sites</div>
-    <div class="bw-grid" id="bwGrid"></div>
+    <!-- Discoveries view: certainty filters + grid -->
+    <div id="bwDiscoveriesView" style="display:none;">
+      <div class="bw-filters" id="bwDiscFilters">
+        <button class="bw-chip active" data-bw-cert="all" onclick="bwDiscFilter('all',this)">All</button>
+        <button class="bw-chip" data-bw-cert="confirmed" onclick="bwDiscFilter('confirmed',this)">✓ Confirmed</button>
+        <button class="bw-chip" data-bw-cert="consistent" onclick="bwDiscFilter('consistent',this)">≈ Consistent</button>
+        <button class="bw-chip" data-bw-cert="contested" onclick="bwDiscFilter('contested',this)">? Contested</button>
+      </div>
+      <div class="bw-section-hdr" id="bwDiscHdr">All discoveries (20)</div>
+      <div class="bw-grid" id="bwDiscGrid"></div>
+    </div>
+
+    <!-- Pilgrimage view: 6 badges + progress -->
+    <div id="bwPilgrimageView" style="display:none;">
+      <div class="bw-section-hdr">Pilgrimage Badges</div>
+      <div id="bwBadgeGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.5rem;"></div>
+    </div>
+  </div>
+
+  <!-- ════ DISCOVERY DETAIL MODAL (F3-D) ════ -->
+  <div id="bwDiscoveryModal" class="mo" onclick="if(event.target===this)bwCloseDiscovery()">
+    <div class="md" style="max-width:600px;padding:0;">
+      <div id="bwDiscHeader" style="background:var(--cd-banner);color:var(--cd-banner-text);border-radius:16px 16px 0 0;padding:1.1rem 1.2rem 1rem;position:relative;box-shadow:var(--cd-banner-shadow);">
+        <button onclick="bwCloseDiscovery()" style="position:absolute;top:.7rem;right:.7rem;background:rgba(11,18,32,.18);border:1px solid rgba(11,18,32,.22);color:inherit;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.78rem;font-weight:800;">✕</button>
+        <div id="bwDiscCert" style="font-size:.6rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;opacity:.78;margin-bottom:.3rem;">—</div>
+        <div id="bwDiscName" style="font-family:var(--fh,var(--fm));font-size:1.4rem;font-weight:800;letter-spacing:.02em;line-height:1.2;margin-bottom:.25rem;">—</div>
+        <div id="bwDiscTagline" style="font-size:.82rem;font-weight:600;line-height:1.4;opacity:.85;">—</div>
+      </div>
+      <div style="padding:0;max-height:55vh;overflow-y:auto;">
+        <div id="bwDiscPhoto" style="height:140px;background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(167,139,250,.08));display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--tx2);font-style:italic;border-bottom:1px solid rgba(255,255,255,.06);">📷 Photo coming when image library lands</div>
+        <div id="bwDiscBody" style="padding:.85rem 1.2rem;font-size:.84rem;line-height:1.7;color:var(--tx);">—</div>
+        <div id="bwDiscRefs" style="padding:0 1.2rem 1rem;display:flex;flex-wrap:wrap;gap:.3rem;"></div>
+        <div id="bwDiscMeta" style="padding:.65rem 1.2rem 1rem;border-top:1px solid rgba(255,255,255,.06);display:grid;grid-template-columns:1fr 1fr;gap:.5rem;font-size:.7rem;color:var(--tx2);"></div>
+      </div>
+    </div>
   </div>
 
   <!-- ════ BIBLICAL SITE DETAIL MODAL (F3-B) ════ -->
@@ -8375,6 +8419,7 @@
 <script src="/app/js/data/memory-verses.js"></script>
 <script src="/app/js/data/academy.js"></script>
 <script src="/app/js/data/biblical-sites.js"></script>
+<script src="/app/js/data/biblical-discoveries.js"></script>
 <!-- Leaflet (F3-B) — open-source map library, MIT-licensed. Only loads when used. -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
