@@ -2468,6 +2468,12 @@ html[data-faith-free="1"] #sp-faith-support { display: block !important; }
   animation: fxCrossLight 1.6s ease-out forwards;
   filter: drop-shadow(0 0 24px rgba(251,191,36,.6));
 }
+/* F4-H — Plan mini-map progress marker pulse. */
+@keyframes planMarkerPulse {
+  0%, 100% { transform: scale(1);   opacity: .35; }
+  50%      { transform: scale(1.45); opacity: .15; }
+}
+
 @keyframes fxFlameRise {
   0%   { transform: translate(-50%, 0)    scale(.4); opacity: 0; }
   30%  { opacity: 1; }

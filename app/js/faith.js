@@ -1105,7 +1105,13 @@ function openPlanDetail(planId){
 
   const body = document.getElementById('planDetailBody');
   const todayDay = prog ? prog.currentDay : 1;
+  // F4-H — Mini-map for plans tied to a Bible Lands route. Renders the
+  // polyline + a marker at progress = (currentDay-1) / totalDays.
+  const routeMapHtml = (p.routeId && (typeof window !== 'undefined' && window.BIBLICAL_ROUTES))
+    ? `<div id="planMiniMap" style="height:200px;border-radius:14px;overflow:hidden;margin-bottom:.85rem;border:1px solid rgba(167,139,250,.25);box-shadow:0 8px 24px rgba(15,23,42,.25);background:#0d1117;"></div>`
+    : '';
   body.innerHTML = `
+    ${routeMapHtml}
     <div style="font-size:.7rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.16em;font-weight:800;margin-bottom:.5rem;">${planCategoryLabel(p.category)} · ${p.days} days · ${p.audience==='all'?'For everyone':p.audience}</div>
     <div style="display:flex;flex-direction:column;gap:.4rem;">
       ${p.daysData.map(d => {
@@ -1146,10 +1152,118 @@ function openPlanDetail(planId){
     `;
   }
   if(typeof openModal === 'function') openModal('planDetailModal');
+  // F4-H — Init mini-map after modal is mounted so Leaflet sees real dimensions.
+  if(p.routeId){
+    setTimeout(function(){ _planMiniMapInit(p, prog); }, 80);
+  }
+}
+
+// F4-H — Render route + progress marker in the plan detail mini-map.
+let _planMiniMap = null;
+function _planMiniMapInit(plan, prog){
+  if(typeof L === 'undefined'){ setTimeout(() => _planMiniMapInit(plan, prog), 250); return; }
+  const el = document.getElementById('planMiniMap');
+  if(!el) return;
+  const route = (window.BIBLICAL_ROUTES || []).find(r => r && r.id === plan.routeId);
+  if(!route) return;
+  // Resolve waypoints to lat/lng (sites + intermediate).
+  const points = [];
+  (route.waypoints || []).forEach(w => {
+    if(typeof w.lat === 'number' && typeof w.lng === 'number'){
+      points.push({ lat: w.lat, lng: w.lng, label: w.label });
+    } else if(w.siteId){
+      const s = (window.BIBLICAL_SITES || []).find(x => x && x.id === w.siteId);
+      if(s) points.push({ lat: s.lat, lng: s.lng, label: w.label || s.name });
+    }
+  });
+  if(points.length < 2) return;
+
+  // Tear down any prior instance bound to a stale element.
+  if(_planMiniMap){ try { _planMiniMap.remove(); } catch(_){} _planMiniMap = null; }
+
+  _planMiniMap = L.map(el, {
+    zoomControl: false, attributionControl: false,
+    scrollWheelZoom: false, doubleClickZoom: false,
+    dragging: true, touchZoom: false,
+  });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    maxZoom: 18, subdomains: 'abcd',
+  }).addTo(_planMiniMap);
+
+  // Route polyline (full path, slightly faded so the marker pops).
+  const latlngs = points.map(p => [p.lat, p.lng]);
+  const poly = L.polyline(latlngs, {
+    color: route.color || plan.brandColor || '#a78bfa',
+    weight: 4, opacity: .55, lineJoin: 'round', lineCap: 'round',
+  }).addTo(_planMiniMap);
+
+  // Soft pulse-ring waypoint dots — small, brand-tinted.
+  points.forEach((pt, idx) => {
+    const last = idx === points.length - 1;
+    L.circleMarker([pt.lat, pt.lng], {
+      radius: last ? 6 : 4,
+      color: '#fff',
+      weight: 2,
+      fillColor: route.color || plan.brandColor || '#a78bfa',
+      fillOpacity: .95,
+    }).addTo(_planMiniMap).bindTooltip(pt.label || '', { direction: 'top', offset:[0,-6] });
+  });
+
+  // Progress marker — walking figure / ship / pin emoji at progress fraction.
+  const totalDays = plan.days;
+  const dayDone = prog ? Math.max(0, prog.currentDay - 1) : 0;
+  const progFrac = Math.min(1, totalDays > 0 ? dayDone / totalDays : 0);
+  const markerLatLng = _interpAlongPath(points, progFrac);
+  const completed = (dayDone >= totalDays);
+  const emoji = plan.markerEmoji || '📍';
+  const ringColor = route.color || plan.brandColor || '#a78bfa';
+  const markerIcon = L.divIcon({
+    className: 'plan-mini-marker',
+    html: '<div style="position:relative;width:42px;height:42px;display:flex;align-items:center;justify-content:center;">' +
+            '<div style="position:absolute;inset:0;border-radius:50%;background:' + ringColor + ';opacity:.35;animation:planMarkerPulse 1.8s ease-in-out infinite;"></div>' +
+            '<div style="position:relative;width:34px;height:34px;border-radius:50%;background:#0a0d1a;border:2.5px solid ' + ringColor + ';display:flex;align-items:center;justify-content:center;font-size:1.1rem;box-shadow:0 4px 12px rgba(0,0,0,.45),0 0 18px ' + ringColor + ';">' + (completed ? '🏆' : emoji) + '</div>' +
+          '</div>',
+    iconSize: [42,42], iconAnchor: [21,21],
+  });
+  L.marker(markerLatLng, { icon: markerIcon, zIndexOffset: 1000 }).addTo(_planMiniMap);
+
+  // Fit bounds, then zoom in just slightly so the marker is the focus.
+  _planMiniMap.fitBounds(poly.getBounds(), { padding: [22, 22] });
+}
+
+// Interpolate a point at fractional progress (0-1) along a polyline of latlng points.
+// Uses straight-line distances between successive waypoints.
+function _interpAlongPath(points, frac){
+  if(!points.length) return [0,0];
+  if(frac <= 0) return [points[0].lat, points[0].lng];
+  if(frac >= 1) return [points[points.length-1].lat, points[points.length-1].lng];
+  // Compute cumulative distances.
+  const dists = [0];
+  let total = 0;
+  for(let i = 1; i < points.length; i++){
+    const dx = points[i].lat - points[i-1].lat;
+    const dy = points[i].lng - points[i-1].lng;
+    const d = Math.sqrt(dx*dx + dy*dy);
+    total += d;
+    dists.push(total);
+  }
+  const target = total * frac;
+  for(let i = 1; i < points.length; i++){
+    if(dists[i] >= target){
+      const segFrac = (target - dists[i-1]) / (dists[i] - dists[i-1]);
+      const lat = points[i-1].lat + (points[i].lat - points[i-1].lat) * segFrac;
+      const lng = points[i-1].lng + (points[i].lng - points[i-1].lng) * segFrac;
+      return [lat, lng];
+    }
+  }
+  return [points[points.length-1].lat, points[points.length-1].lng];
 }
 
 function closePlanDetail(){
   if(typeof closeModal === 'function') closeModal('planDetailModal');
+  // F4-H — Tear down the mini-map so it doesn't leak Leaflet instances
+  // across plan-modal opens.
+  if(_planMiniMap){ try { _planMiniMap.remove(); } catch(_){} _planMiniMap = null; }
 }
 
 function planStart(planId){

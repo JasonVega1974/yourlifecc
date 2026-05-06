@@ -254,6 +254,8 @@ const FAITH_GEOGRAPHY_PLANS = [
     days: 10,
     badgeIcon: '🚶',
     brandColor: '#34d399',
+    routeId: 'walk-with-jesus',
+    markerEmoji: '🚶',
     daysData: [
       { day: 1,  refs: ['Luke 2:1-20'],     prompt: 'Bethlehem — read where He was born. Tap Bethlehem in the text to see the site.' },
       { day: 2,  refs: ['Luke 2:39-52'],    prompt: 'Nazareth — His hometown for 30 silent years. What does that say about ordinary obedience?' },
@@ -276,6 +278,8 @@ const FAITH_GEOGRAPHY_PLANS = [
     days: 14,
     badgeIcon: '✉️',
     brandColor: '#f472b6',
+    routeId: 'pauls-third-journey',
+    markerEmoji: '⛵',
     daysData: [
       { day: 1,  refs: ['Acts 9:1-22'],   prompt: 'Damascus — Saul becomes Paul. Where has Jesus interrupted you?' },
       { day: 2,  refs: ['Acts 11:19-30'], prompt: 'Antioch — disciples first called Christians. The church gets its name.' },
@@ -321,6 +325,8 @@ const FAITH_GEOGRAPHY_PLANS = [
     days: 21,
     badgeIcon: '🗺️',
     brandColor: '#38bdf8',
+    routeId: 'patriarchs',
+    markerEmoji: '📍',
     daysData: [
       { day: 1,  refs: ['Genesis 12:1-9'],   prompt: 'Ur to Canaan — Abraham\'s call.' },
       { day: 2,  refs: ['Genesis 22:1-19'],  prompt: 'Mount Moriah — the binding of Isaac.' },
