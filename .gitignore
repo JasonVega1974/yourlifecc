@@ -1,0 +1,17 @@
+# Claude Code + agent state — local only
+.claude/
+.claude2/
+.superpowers/
+docs/superpowers/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Node (if any tooling lands later)
+node_modules/
+npm-debug.log
