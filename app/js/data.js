@@ -53,6 +53,9 @@ const DEF = {
   // whether the user already cashed in their one free weekday skip this week.
   // Sundays are always auto-protected (Sabbath Rest) — no skip needed.
   faithStreakState:{ weekKey:'', skipUsed:false },
+  // F4-G — Story Mode completion log. Keyed by `${YYYY-MM-DD}::${storyId}`,
+  // value is true. Used to gate the per-day +10 XP award per story.
+  faithStoriesViewed:{},
   // streak / checkin
   streak:0, lastCheckin:null, checkin:{}, customHabits:[], dailyChecks:{},
   // money

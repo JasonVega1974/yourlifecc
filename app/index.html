@@ -4213,6 +4213,18 @@
           <div class="fh-tile" onclick="openAskBible()"><span style="font-size:1.3rem;">🤖</span><span>Ask the Bible</span></div>
         </div>
       </div>
+
+      <!-- Card 6 (F4-G): Story Mode — illustrated, narrated Bible stories -->
+      <div class="fh-card" id="fhStoriesCard" style="grid-column:1 / -1;background:linear-gradient(135deg, rgba(10,13,26,.95) 0%, rgba(26,18,51,.92) 100%);border:1px solid rgba(251,191,36,.18);position:relative;overflow:hidden;">
+        <div style="position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(251,191,36,.16), transparent 55%);pointer-events:none;"></div>
+        <div class="fh-card-hdr" style="position:relative;color:#fef3c7;">
+          <span style="font-size:1.1rem;">⭐</span>
+          <span style="font-family:'Bebas Neue',var(--fm);letter-spacing:.14em;font-size:.9rem;">Story Mode</span>
+          <span class="fh-card-sub" style="color:rgba(254,243,199,.6);">Illustrated &amp; narrated</span>
+        </div>
+        <div style="font-size:.78rem;color:rgba(254,243,199,.78);line-height:1.55;margin-bottom:.75rem;position:relative;font-family:Georgia,serif;font-style:italic;">Step inside the great moments of Scripture — hand-illustrated, scene by scene, with optional voice narration.</div>
+        <div id="fhStoryList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.55rem;position:relative;"></div>
+      </div>
     </div>
   </div>
 
@@ -5331,6 +5343,112 @@
       <div id="mvqBody" style="padding:.85rem 1.2rem;min-height:200px;"></div>
 
       <div id="mvqFooter" style="padding:.65rem 1.2rem 1rem;display:flex;gap:.4rem;justify-content:flex-end;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.06);"></div>
+    </div>
+  </div>
+
+  <!-- ════ STORY PLAYER MODAL (F4-G) ════
+       Cathedral-celestial aesthetic — full-bleed scene viewer, scripture
+       overlay, tap-to-advance, optional Web Speech narration. -->
+  <style>
+    #storyPlayerModal .md{
+      background:linear-gradient(180deg,#0a0d1a 0%, #1a1233 100%);
+      max-width:760px;width:96%;padding:0;border-radius:18px;
+      overflow:hidden;color:#fef3c7;
+      box-shadow:0 30px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(251,191,36,.12) inset;
+    }
+    #storyPlayerModal.mo-fullscreen .md{ max-width:100%; width:100%; height:100%; border-radius:0; }
+    #storyPlayerModal .sp-stage{ position:relative; width:100%; aspect-ratio:8/5; background:#0a0d1a; overflow:hidden; }
+    #storyPlayerModal.mo-fullscreen .sp-stage{ aspect-ratio:auto; flex:1; min-height:0; }
+    #storyPlayerModal.mo-fullscreen .md{ display:flex; flex-direction:column; }
+    #storyPlayerModal .sp-svg{ position:absolute; inset:0; width:100%; height:100%; }
+    #storyPlayerModal .sp-svg svg{ width:100%; height:100%; display:block; }
+    #storyPlayerModal .sp-vignette{ position:absolute; inset:0; pointer-events:none;
+      background:radial-gradient(ellipse at center, transparent 55%, rgba(10,13,26,.65) 100%);
+    }
+    #storyPlayerModal .sp-eyebrow{ position:absolute; top:14px; left:18px; right:140px;
+      font-family:'Bebas Neue',var(--fm); font-size:.62rem; letter-spacing:.32em;
+      color:rgba(254,243,199,.85); text-transform:uppercase; pointer-events:none;
+      text-shadow:0 1px 8px rgba(0,0,0,.7);
+    }
+    #storyPlayerModal .sp-title{ position:absolute; top:34px; left:18px; right:140px;
+      font-family:'Bebas Neue',var(--fm); font-size:1.55rem; letter-spacing:.06em;
+      color:#fef3c7; line-height:1; pointer-events:none;
+      text-shadow:0 2px 14px rgba(0,0,0,.75);
+    }
+    #storyPlayerModal .sp-bibletext{ position:absolute; left:0; right:0; bottom:0;
+      padding:1rem 1.4rem 1.05rem; background:linear-gradient(180deg, transparent 0%, rgba(10,13,26,.72) 60%, rgba(10,13,26,.95) 100%);
+      font-family:Georgia,serif; font-style:italic; font-size:.95rem; line-height:1.65;
+      color:rgba(254,243,199,.96); text-shadow:0 1px 4px rgba(0,0,0,.6);
+    }
+    #storyPlayerModal .sp-bibletext .sp-ref{ display:block; margin-top:.4rem;
+      font-family:'Bebas Neue',var(--fm); font-style:normal; font-size:.62rem;
+      letter-spacing:.28em; color:#fbbf24;
+    }
+    #storyPlayerModal .sp-narration{
+      padding:.9rem 1.3rem 1rem;
+      font-family:Georgia,serif; font-size:.9rem; line-height:1.7;
+      color:rgba(254,243,199,.9);
+      border-top:1px solid rgba(251,191,36,.12);
+      max-height:30vh; overflow-y:auto;
+    }
+    #storyPlayerModal .sp-controls{
+      display:flex; align-items:center; gap:.55rem; padding:.7rem 1rem .9rem;
+      border-top:1px solid rgba(251,191,36,.12);
+      background:rgba(10,13,26,.6);
+    }
+    #storyPlayerModal .sp-controls button{
+      background:rgba(251,191,36,.12); border:1px solid rgba(251,191,36,.32);
+      color:#fef3c7; border-radius:99px; padding:.45rem .9rem;
+      font-family:var(--fm); font-size:.72rem; font-weight:800; letter-spacing:.04em;
+      cursor:pointer; transition:background .15s, transform .15s;
+    }
+    #storyPlayerModal .sp-controls button:hover:not(:disabled){ background:rgba(251,191,36,.22); transform:translateY(-1px); }
+    #storyPlayerModal .sp-controls button:disabled{ opacity:.4; cursor:default; }
+    #storyPlayerModal .sp-controls .sp-narrate.on{ background:#fbbf24; color:#0a0d1a; border-color:#fbbf24; }
+    #storyPlayerModal .sp-progress{ flex:1; display:flex; gap:4px; align-items:center; justify-content:center; flex-wrap:wrap; padding:0 .4rem; }
+    #storyPlayerModal .sp-dot{ width:8px; height:8px; border-radius:50%; background:rgba(254,243,199,.25); transition:background .2s, transform .2s; cursor:pointer; }
+    #storyPlayerModal .sp-dot.done{ background:rgba(251,191,36,.55); }
+    #storyPlayerModal .sp-dot.active{ background:#fbbf24; transform:scale(1.4); box-shadow:0 0 10px rgba(251,191,36,.6); }
+    #storyPlayerModal .sp-close{ position:absolute; top:10px; right:10px; z-index:5;
+      width:30px; height:30px; border-radius:50%; border:1px solid rgba(254,243,199,.3);
+      background:rgba(10,13,26,.55); color:#fef3c7; cursor:pointer; font-size:.85rem; font-weight:800;
+      display:flex; align-items:center; justify-content:center; backdrop-filter:blur(6px);
+    }
+    #storyPlayerModal .sp-tap-zone{ position:absolute; top:0; bottom:0; width:30%; cursor:pointer; z-index:2; }
+    #storyPlayerModal .sp-tap-zone.left{ left:0; }
+    #storyPlayerModal .sp-tap-zone.right{ right:0; }
+    #storyPlayerModal .sp-fade-in{ animation:spFadeIn .55s ease both; }
+    @keyframes spFadeIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+    #storyPlayerModal .sp-closing{
+      padding:1.3rem 1.4rem 1.6rem; text-align:center;
+      background:radial-gradient(ellipse at top, rgba(251,191,36,.18), transparent 70%);
+    }
+    #storyPlayerModal .sp-closing .sp-cl-eye{ font-family:'Bebas Neue',var(--fm); letter-spacing:.32em; font-size:.62rem; color:#fbbf24; margin-bottom:.6rem; }
+    #storyPlayerModal .sp-closing .sp-cl-body{ font-family:Georgia,serif; font-size:.96rem; line-height:1.75; color:rgba(254,243,199,.92); margin-bottom:.9rem; font-style:italic; }
+    #storyPlayerModal .sp-closing .sp-cl-prompt{ font-family:Georgia,serif; font-size:.85rem; line-height:1.7; color:rgba(254,243,199,.78); padding:.75rem 1rem; background:rgba(251,191,36,.08); border:1px solid rgba(251,191,36,.22); border-radius:12px; }
+    @media (prefers-reduced-motion: reduce){
+      #storyPlayerModal .sp-fade-in{ animation:none; }
+    }
+  </style>
+  <div id="storyPlayerModal" class="mo" onclick="if(event.target===this)closeStory()">
+    <div class="md">
+      <button class="sp-close" onclick="closeStory()" aria-label="Close story">✕</button>
+      <div class="sp-stage" id="spStage">
+        <div class="sp-svg" id="spSvg"></div>
+        <div class="sp-vignette"></div>
+        <div class="sp-eyebrow" id="spEyebrow">Scene</div>
+        <div class="sp-title" id="spTitle">—</div>
+        <div class="sp-tap-zone left"  onclick="storyPrev()" aria-label="Previous scene"></div>
+        <div class="sp-tap-zone right" onclick="storyNext()" aria-label="Next scene"></div>
+        <div class="sp-bibletext" id="spBibleText">—<span class="sp-ref" id="spRef">—</span></div>
+      </div>
+      <div class="sp-narration" id="spNarration">—</div>
+      <div class="sp-controls">
+        <button onclick="storyPrev()" id="spPrevBtn" aria-label="Previous">‹ Prev</button>
+        <div class="sp-progress" id="spProgress"></div>
+        <button class="sp-narrate" id="spNarrateBtn" onclick="storyToggleNarrate()" aria-label="Toggle narration">🔊 Narrate</button>
+        <button onclick="storyNext()" id="spNextBtn" aria-label="Next">Next ›</button>
+      </div>
     </div>
   </div>
 </section>
@@ -8707,6 +8825,7 @@
 <script src="/app/js/data/biblical-routes.js"></script>
 <script src="/app/js/data/bible-timeline.js"></script>
 <script src="/app/js/data/biblical-infographics.js"></script>
+<script src="/app/js/data/bible-stories.js"></script>
 <!-- Leaflet (F3-B) — open-source map library, MIT-licensed. Only loads when used. -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>

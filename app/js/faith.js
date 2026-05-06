@@ -603,6 +603,9 @@ function renderFaithHome(){
     }
   }
 
+  // F4-G: Story Mode tile list (Faith Home Card 6).
+  if(typeof renderFaithHomeStories === 'function') renderFaithHomeStories();
+
   // F2-H: Family Verse of the Week (only when family profiles exist).
   const fvEl = document.getElementById('fhFamilyVerseCard');
   if(fvEl){
@@ -5888,4 +5891,239 @@ function _mvApplySrUpdate(v, correct){
   save();
   if(typeof renderFaithHome === 'function') renderFaithHome();
 }
+
+// ════════════════════════════════════════════════════════════════
+// F4-G — STORY MODE
+// Illustrated, narrated Bible stories. Data lives in
+// /app/js/data/bible-stories.js as window.BIBLE_STORIES.
+// ════════════════════════════════════════════════════════════════
+
+let _storyState = { storyId:null, sceneIdx:0, narrating:false };
+
+function _getStories(){
+  return (typeof window !== 'undefined' && Array.isArray(window.BIBLE_STORIES)) ? window.BIBLE_STORIES : [];
+}
+
+function _storyEsc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function renderFaithHomeStories(){
+  const list = document.getElementById('fhStoryList');
+  if(!list) return;
+  const stories = _getStories();
+  if(!stories.length){
+    list.innerHTML = '<div style="font-size:.78rem;color:rgba(254,243,199,.55);font-family:Georgia,serif;font-style:italic;padding:.4rem .2rem;">More stories arriving in upcoming releases.</div>';
+    return;
+  }
+  list.innerHTML = stories.map(function(s){
+    const sceneCount = (s.scenes || []).length;
+    const safeId = String(s.id).replace(/'/g, "\\'");
+    const accent = s.color || '#fbbf24';
+    return ''
+      + '<button class="fh-story-tile" onclick="openStory(\'' + safeId + '\')" '
+      + 'style="all:unset;cursor:pointer;display:block;background:rgba(254,243,199,.04);border:1px solid rgba(254,243,199,.12);'
+      + 'border-radius:14px;padding:.85rem .95rem;transition:transform .15s, border-color .15s, background .15s;'
+      + 'font-family:var(--fm);position:relative;overflow:hidden;"'
+      + ' onmouseenter="this.style.transform=\'translateY(-2px)\';this.style.background=\'rgba(254,243,199,.08)\';this.style.borderColor=\'' + accent + '\'"'
+      + ' onmouseleave="this.style.transform=\'\';this.style.background=\'rgba(254,243,199,.04)\';this.style.borderColor=\'rgba(254,243,199,.12)\'">'
+      + '<div style="display:flex;align-items:center;gap:.55rem;margin-bottom:.4rem;">'
+      +   '<span style="font-size:1.4rem;line-height:1;">' + (s.icon || '⭐') + '</span>'
+      +   '<div style="font-family:\'Bebas Neue\',var(--fm);letter-spacing:.06em;font-size:1.05rem;color:#fef3c7;line-height:1.05;">' + _storyEsc(s.title) + '</div>'
+      + '</div>'
+      + '<div style="font-family:Georgia,serif;font-style:italic;font-size:.76rem;color:rgba(254,243,199,.7);line-height:1.5;margin-bottom:.55rem;">' + _storyEsc(s.subtitle || '') + '</div>'
+      + '<div style="display:flex;align-items:center;gap:.5rem;font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:' + accent + ';">'
+      +   '<span>' + sceneCount + ' scenes</span>'
+      +   (s.duration ? '<span style="color:rgba(254,243,199,.4);">·</span><span style="color:rgba(254,243,199,.55);">' + _storyEsc(s.duration) + '</span>' : '')
+      +   '<span style="margin-left:auto;color:rgba(254,243,199,.55);">Begin →</span>'
+      + '</div>'
+      + '</button>';
+  }).join('');
+}
+
+function openStory(storyId){
+  const story = _getStories().find(function(s){ return s.id === storyId; });
+  if(!story){ if(typeof showToast==='function') showToast('Story not found'); return; }
+  _storyState = { storyId: storyId, sceneIdx: 0, narrating: false };
+  if(typeof openModal === 'function') openModal('storyPlayerModal');
+  _storyShowScene(0);
+}
+
+function closeStory(){
+  _storyStopNarration();
+  if(typeof closeModal === 'function') closeModal('storyPlayerModal');
+}
+
+function _storyCurrent(){
+  return _getStories().find(function(s){ return s.id === _storyState.storyId; }) || null;
+}
+
+function _storyShowScene(idx){
+  const story = _storyCurrent();
+  if(!story) return;
+  const scenes = story.scenes || [];
+  const total  = scenes.length;
+  const isClosing = idx >= total;
+
+  const stage     = document.getElementById('spStage');
+  const svgBox    = document.getElementById('spSvg');
+  const eyebrowEl = document.getElementById('spEyebrow');
+  const titleEl   = document.getElementById('spTitle');
+  const bibleEl   = document.getElementById('spBibleText');
+  const narrEl    = document.getElementById('spNarration');
+  const prevBtn   = document.getElementById('spPrevBtn');
+  const nextBtn   = document.getElementById('spNextBtn');
+
+  _storyStopNarration();
+  _storyState.sceneIdx = idx;
+
+  if(isClosing){
+    if(svgBox) svgBox.innerHTML = '';
+    if(eyebrowEl) eyebrowEl.textContent = 'Reflection';
+    if(titleEl)   titleEl.textContent   = story.title;
+    if(bibleEl){
+      bibleEl.innerHTML = '';
+      bibleEl.style.display = 'none';
+    }
+    if(narrEl){
+      narrEl.innerHTML = ''
+        + '<div class="sp-closing sp-fade-in">'
+        +   '<div class="sp-cl-eye">' + _storyEsc(story.scriptureRef || 'Closing') + '</div>'
+        +   '<div class="sp-cl-body">' + _storyEsc(story.closing || '') + '</div>'
+        +   (story.closingPrompt ? '<div class="sp-cl-prompt">' + _storyEsc(story.closingPrompt) + '</div>' : '')
+        + '</div>';
+    }
+    if(stage) stage.style.background = 'radial-gradient(ellipse at center, rgba(251,191,36,.16), #0a0d1a 70%)';
+    if(prevBtn) prevBtn.disabled = false;
+    if(nextBtn){ nextBtn.textContent = 'Done ✓'; nextBtn.onclick = closeStory; }
+    _storyRenderProgress(idx, total);
+    _storyAwardXp(story.id);
+    return;
+  }
+
+  const scene = scenes[idx];
+  if(!scene) return;
+  if(stage) stage.style.background = '#0a0d1a';
+  if(svgBox){
+    svgBox.classList.remove('sp-fade-in');
+    void svgBox.offsetWidth;
+    svgBox.innerHTML = scene.svg || '';
+    svgBox.classList.add('sp-fade-in');
+  }
+  if(eyebrowEl) eyebrowEl.textContent = 'Scene ' + (idx+1) + ' · ' + (scene.title || '');
+  if(titleEl)   titleEl.textContent   = story.title;
+  if(bibleEl){
+    bibleEl.style.display = '';
+    bibleEl.innerHTML = _storyEsc(scene.bibleText || '') + '<span class="sp-ref">' + _storyEsc(scene.scriptureRef || '') + '</span>';
+  }
+  if(narrEl){
+    narrEl.classList.remove('sp-fade-in');
+    void narrEl.offsetWidth;
+    narrEl.classList.add('sp-fade-in');
+    narrEl.textContent = scene.narration || '';
+  }
+  if(prevBtn) prevBtn.disabled = (idx === 0);
+  if(nextBtn){
+    nextBtn.disabled = false;
+    nextBtn.textContent = (idx === total - 1) ? 'Reflect ›' : 'Next ›';
+    nextBtn.onclick = storyNext;
+  }
+  _storyRenderProgress(idx, total);
+
+  if(_storyState.narrating){
+    _storySpeak(scene.narration || '');
+  }
+}
+
+function _storyRenderProgress(idx, total){
+  const progEl = document.getElementById('spProgress');
+  if(!progEl) return;
+  let html = '';
+  for(let i=0;i<total;i++){
+    const cls = i === idx ? 'sp-dot active' : (i < idx ? 'sp-dot done' : 'sp-dot');
+    html += '<span class="' + cls + '" onclick="_storyJumpScene(' + i + ')" role="button" aria-label="Scene ' + (i+1) + '"></span>';
+  }
+  progEl.innerHTML = html;
+}
+
+function _storyJumpScene(i){
+  const story = _storyCurrent(); if(!story) return;
+  const total = (story.scenes || []).length;
+  if(i < 0 || i > total) return;
+  _storyShowScene(i);
+}
+
+function storyNext(){
+  const story = _storyCurrent(); if(!story) return;
+  const total = (story.scenes || []).length;
+  if(_storyState.sceneIdx >= total) return;
+  _storyShowScene(_storyState.sceneIdx + 1);
+}
+
+function storyPrev(){
+  if(_storyState.sceneIdx <= 0) return;
+  _storyShowScene(_storyState.sceneIdx - 1);
+}
+
+function storyToggleNarrate(){
+  const btn = document.getElementById('spNarrateBtn');
+  if(!('speechSynthesis' in window)){
+    if(typeof showToast === 'function') showToast('Voice narration not supported on this device');
+    return;
+  }
+  _storyState.narrating = !_storyState.narrating;
+  if(btn) btn.classList.toggle('on', _storyState.narrating);
+  if(_storyState.narrating){
+    const story = _storyCurrent(); if(!story) return;
+    const scene = (story.scenes || [])[_storyState.sceneIdx];
+    _storySpeak(scene && scene.narration ? scene.narration : (story.closing || ''));
+  } else {
+    _storyStopNarration();
+  }
+}
+
+function _storySpeak(text){
+  if(!('speechSynthesis' in window)) return;
+  if(!text) return;
+  try {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 0.92; u.pitch = 1.0; u.volume = 1.0;
+    const voices = window.speechSynthesis.getVoices() || [];
+    const pref = voices.find(function(v){ return /en-(US|GB)/i.test(v.lang) && /female|samantha|karen|moira|google/i.test(v.name); })
+              || voices.find(function(v){ return /^en/i.test(v.lang); });
+    if(pref) u.voice = pref;
+    window.speechSynthesis.speak(u);
+  } catch(_){}
+}
+
+function _storyStopNarration(){
+  if('speechSynthesis' in window){
+    try { window.speechSynthesis.cancel(); } catch(_){}
+  }
+}
+
+function _storyAwardXp(storyId){
+  try {
+    if(!D.faithStoriesViewed) D.faithStoriesViewed = {};
+    const today = new Date().toISOString().slice(0,10);
+    const key = today + '::' + storyId;
+    if(D.faithStoriesViewed[key]) return;
+    D.faithStoriesViewed[key] = true;
+    D.scrPoints = (D.scrPoints || 0) + 10;
+    if(typeof save === 'function') save();
+    if(typeof renderFaithHome === 'function') renderFaithHome();
+    if(typeof showToast === 'function') showToast('+10 XP — story completed ✨');
+  } catch(_){}
+}
+
+document.addEventListener('keydown', function(e){
+  const modal = document.getElementById('storyPlayerModal');
+  if(!modal || !modal.classList.contains('open')) return;
+  if(e.key === 'ArrowRight' || e.key === ' '){ e.preventDefault(); storyNext(); }
+  else if(e.key === 'ArrowLeft'){ e.preventDefault(); storyPrev(); }
+  else if(e.key === 'Escape'){ closeStory(); }
+});
 
