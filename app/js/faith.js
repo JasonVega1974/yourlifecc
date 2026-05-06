@@ -5009,7 +5009,7 @@ function openBwSite(siteId){
   document.getElementById('bwSiteEra').textContent = eraLabels || '—';
   document.getElementById('bwSiteName').innerHTML = _bwEsc(s.name);
   document.getElementById('bwSiteTagline').textContent = s.tagline || '';
-  document.getElementById('bwSiteBody').innerHTML = s.body || '';
+  document.getElementById('bwSiteBody').innerHTML = (typeof renderInfographicFor === 'function' ? renderInfographicFor(siteId) : '') + (s.body || '');
   // Header gradient picks the FIRST matching era color for visual identity.
   const firstPeriod = periods.find(p => (s.eras || []).indexOf(p.id) !== -1);
   const c1 = '#38bdf8';
@@ -5158,7 +5158,7 @@ function openBwDiscovery(discId){
   document.getElementById('bwDiscCert').textContent = certLabel + ' · Found ' + d.yearFound;
   document.getElementById('bwDiscName').textContent = d.name;
   document.getElementById('bwDiscTagline').textContent = d.tagline || '';
-  document.getElementById('bwDiscBody').innerHTML = d.body || '';
+  document.getElementById('bwDiscBody').innerHTML = (typeof renderInfographicFor === 'function' ? renderInfographicFor(discId) : '') + (d.body || '');
   // Scripture refs
   const refsEl = document.getElementById('bwDiscRefs');
   if(refsEl){
@@ -5777,6 +5777,26 @@ function _tlEsc(s){
   return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   })[c]);
+}
+
+// ═════════════════════════════════════════════════════════════
+// F4-E — INFOGRAPHIC RENDERER (Bible Lands site + discovery modals)
+// ═════════════════════════════════════════════════════════════
+// Looks up window.BIBLICAL_INFOGRAPHICS by id and returns an HTML
+// block that wraps the SVG diagram with a title + caption. Used by
+// openBwSite and openBwDiscovery.
+function renderInfographicFor(id){
+  const map = (typeof window !== 'undefined' && window.BIBLICAL_INFOGRAPHICS) ? window.BIBLICAL_INFOGRAPHICS : {};
+  const info = map[id];
+  if(!info) return '';
+  const title   = info.title   || '';
+  const caption = info.caption || '';
+  const svg     = info.svg     || '';
+  return '<div style="background:rgba(10,13,26,0.55);border:1px solid rgba(251,191,36,0.18);border-radius:14px;padding:.7rem .8rem 1rem;margin-bottom:1rem;box-shadow:0 8px 24px rgba(15,23,42,.3);">'
+    + '<div style="font-family:Bebas Neue, var(--fm);font-size:.78rem;letter-spacing:.22em;color:#fef3c7;margin-bottom:.2rem;">' + _tlEsc(title) + '</div>'
+    + (caption ? '<div style="font-family:Georgia,serif;font-style:italic;font-size:.74rem;color:rgba(255,255,255,0.72);line-height:1.55;margin-bottom:.7rem;">' + _tlEsc(caption) + '</div>' : '')
+    + '<div style="border-radius:10px;overflow:hidden;">' + svg + '</div>'
+    + '</div>';
 }
 
 // ═════════════════════════════════════════════════════════════

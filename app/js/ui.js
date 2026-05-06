@@ -1193,8 +1193,84 @@ function closeSidebar(){
 
 // helpers
 function go(id){ showSection(id); }
-function openModal(id){ document.getElementById(id).classList.add('open'); }
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function openModal(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.classList.add('open');
+  // F4 — Inject a fullscreen toggle button into the modal's .md if it
+  // doesn't already have one. One implementation, every modal benefits.
+  _ensureFullscreenToggle(el);
+}
+function closeModal(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  // If the modal was in fullscreen, drop out of it on close.
+  if(document.fullscreenElement && el.contains(document.fullscreenElement)){
+    try { document.exitFullscreen(); } catch(_){}
+  }
+  el.classList.remove('open');
+  el.classList.remove('mo-fullscreen');
+}
+
+// Inject a fullscreen toggle button into the modal's dialog. Idempotent.
+function _ensureFullscreenToggle(modalEl){
+  const dialog = modalEl.querySelector('.md');
+  if(!dialog) return;
+  if(dialog.querySelector('[data-modal-fs]')) return;
+  const btn = document.createElement('button');
+  btn.setAttribute('data-modal-fs','1');
+  btn.setAttribute('aria-label','Toggle fullscreen');
+  btn.title = 'Fullscreen (Esc to exit)';
+  btn.innerHTML = '⛶';
+  btn.style.cssText = 'position:absolute;top:10px;right:46px;z-index:10;width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(15,23,42,.35);color:var(--cd-banner-text,#fff);cursor:pointer;font-size:1rem;font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);transition:background .15s,transform .15s;font-family:var(--fm);';
+  btn.addEventListener('mouseenter',function(){ this.style.background='rgba(15,23,42,.55)'; this.style.transform='scale(1.05)'; });
+  btn.addEventListener('mouseleave',function(){ this.style.background='rgba(15,23,42,.35)'; this.style.transform=''; });
+  btn.addEventListener('click', function(ev){
+    ev.preventDefault(); ev.stopPropagation();
+    toggleModalFullscreen(modalEl);
+  });
+  // .md must be position:relative so the absolute button anchors to it.
+  if(!dialog.style.position) dialog.style.position = 'relative';
+  dialog.appendChild(btn);
+}
+
+function toggleModalFullscreen(modalEl){
+  if(!modalEl) return;
+  const dialog = modalEl.querySelector('.md');
+  if(!dialog) return;
+  const inFs = document.fullscreenElement === dialog;
+  const btn  = dialog.querySelector('[data-modal-fs]');
+  if(inFs){
+    try { document.exitFullscreen(); } catch(_){}
+    modalEl.classList.remove('mo-fullscreen');
+    if(btn) btn.innerHTML = '⛶';
+  } else {
+    if(dialog.requestFullscreen){
+      dialog.requestFullscreen().then(function(){
+        modalEl.classList.add('mo-fullscreen');
+        if(btn) btn.innerHTML = '⤢';
+      }).catch(function(){
+        // Some Safari versions reject programmatic FS. Fall back to a CSS class.
+        modalEl.classList.add('mo-fullscreen');
+        if(btn) btn.innerHTML = '⤢';
+      });
+    } else {
+      modalEl.classList.add('mo-fullscreen');
+      if(btn) btn.innerHTML = '⤢';
+    }
+  }
+}
+
+// Listen for native fullscreen exit (Esc key) so our state matches the browser.
+document.addEventListener('fullscreenchange', function(){
+  if(!document.fullscreenElement){
+    document.querySelectorAll('.mo.mo-fullscreen').forEach(function(m){
+      m.classList.remove('mo-fullscreen');
+      const btn = m.querySelector('[data-modal-fs]');
+      if(btn) btn.innerHTML = '⛶';
+    });
+  }
+});
 function showToast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'),2400); }
 
 // ── CHILD-SWITCH FULL REFRESH ─────────────────────────────────

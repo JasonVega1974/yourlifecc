@@ -2468,6 +2468,23 @@ html[data-faith-free="1"] #sp-faith-support { display: block !important; }
   animation: fxCrossLight 1.6s ease-out forwards;
   filter: drop-shadow(0 0 24px rgba(251,191,36,.6));
 }
+/* F4-E — Modal fullscreen mode. Triggered by the .mo-fullscreen class
+   (set by toggleModalFullscreen in ui.js). Acts as a CSS fallback when
+   the native Fullscreen API is rejected and as the primary style when
+   the browser grants requestFullscreen() since the dialog itself becomes
+   the fullscreen element. */
+.mo.mo-fullscreen .md {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  border-radius: 0 !important;
+}
+/* When the dialog is the actual native fullscreen element, ensure inner
+   content can scroll and any inner panels stretch sensibly. */
+.md:fullscreen { width: 100vw; height: 100vh; max-width: 100vw; max-height: 100vh; overflow:auto; padding: 0 !important; }
+.md:-webkit-full-screen { width: 100vw; height: 100vh; max-width: 100vw; max-height: 100vh; overflow:auto; padding: 0 !important; }
+
 /* F4-H — Plan mini-map progress marker pulse. */
 @keyframes planMarkerPulse {
   0%, 100% { transform: scale(1);   opacity: .35; }
