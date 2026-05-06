@@ -38,6 +38,10 @@ const DEF = {
   // F2-G Ask the Bible history. Each entry: { id, question, answer, verses[], application, createdAt }.
   // Capped client-side at 50 entries to keep the cloud-synced blob lean.
   faithAiHistory:[],
+  // F2-I (proto) Faith Academy progress. Lesson completions keyed by lesson id;
+  // module badges by module id. Full curriculum (5 modules / 18 courses /
+  // ~85 lessons / quizzes / certificates) lands in F2-I.
+  faithAcademyProgress:{ lessons:{}, badges:{} },
   // streak / checkin
   streak:0, lastCheckin:null, checkin:{}, customHabits:[], dailyChecks:{},
   // money

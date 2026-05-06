@@ -458,7 +458,7 @@ function bfTab(tab, btn){
   if(tab==='plans') renderPlanCatalog();
   if(tab==='prayer') renderPrayerPanel();
   if(tab==='memorize') renderMemorizePanel();
-  // 'academy' is F2-I stub — no render needed.
+  if(tab==='academy') renderAcademyPanel();
 }
 
 // ── FAITH HOME (F2-A) ────────────────────────────────────────
@@ -2556,12 +2556,26 @@ function renderLearnBibleGrid(){
 function openBFLesson(type, idx){
   const banks = {jesus:JESUS_LESSONS, learn:LEARN_BIBLE_LESSONS};
   const l = banks[type][idx]; if(!l) return;
-  const gradients = {jesus:'linear-gradient(135deg,#667eea,#764ba2)',learn:'linear-gradient(135deg,#4facfe,#00f2fe)'};
+  // Brand-palette gradients (purple-purge from KC port). Per-module hue:
+  // Foundations of Faith → cyan→violet, Bible Survey → cyan→green.
+  const gradients = {
+    jesus: 'linear-gradient(135deg,#38bdf8,#a78bfa)',
+    learn: 'linear-gradient(135deg,#38bdf8,#10b981)',
+  };
   document.getElementById('charIcon').textContent = l.icon;
   document.getElementById('charTitle').textContent = l.title;
-  document.getElementById('charSub').textContent = type==='jesus'?'Jesus & God\'s Purpose':'Learning the Bible';
-  document.getElementById('charModalHeader').style.background = gradients[type]||'linear-gradient(135deg,#667eea,#764ba2)';
-  document.getElementById('charBody').innerHTML = l.body;
+  document.getElementById('charSub').textContent = type==='jesus'?'Foundations of Faith':'Bible Survey';
+  document.getElementById('charModalHeader').style.background = gradients[type]||'linear-gradient(135deg,#38bdf8,#a78bfa)';
+  // Body + Mark-Complete CTA. The CTA fires academyMarkLesson() which records
+  // completion in D.faithAcademyProgress and awards +5 Faith XP.
+  const lessonId = type + ':' + idx;
+  const done = !!(D.faithAcademyProgress && D.faithAcademyProgress.lessons && D.faithAcademyProgress.lessons[lessonId]);
+  const ctaHtml = done
+    ? `<div style="margin-top:1.2rem;padding:.75rem;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);border-radius:10px;text-align:center;font-size:.78rem;font-weight:700;color:#10b981;">✅ Lesson complete · +5 XP earned</div>`
+    : `<div style="margin-top:1.2rem;text-align:center;">
+         <button onclick="academyMarkLesson('${type}',${idx})" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.6rem 1.4rem;font-size:.82rem;font-weight:800;cursor:pointer;font-family:var(--fm);">✅ Mark Lesson Complete +5 XP</button>
+       </div>`;
+  document.getElementById('charBody').innerHTML = l.body + ctaHtml;
   document.getElementById('charQuiz').innerHTML = '';
   openModal('charModal');
   logActivity('faith', 'Read: '+l.title);
@@ -3880,6 +3894,162 @@ function askBibleJumpRef(ref){
     if(typeof openEsvReader === 'function') openEsvReader();
     if(verse) setTimeout(function(){ if(typeof jumpToEsvVerse === 'function') jumpToEsvVerse(verse); }, 600);
   }, 80);
+}
+
+// ═════════════════════════════════════════════════════════════
+// F2-I (proto) — FAITH ACADEMY (2 starter modules)
+// ═════════════════════════════════════════════════════════════
+// Two modules backed by the existing JESUS_LESSONS (17) and
+// LEARN_BIBLE_LESSONS (17). Lesson completion grants +5 XP and counts
+// toward the streak. Module badge unlocks when every lesson is read,
+// awards +100 XP. Full F2-I scope (5 modules, 18 courses with quizzes
+// and certificates) per spec §4.11 layers on top of this same
+// faithAcademyProgress shape.
+
+// Module catalog. Keep in faith.js so it can read JESUS_LESSONS /
+// LEARN_BIBLE_LESSONS directly without an extra data file.
+function _acModules(){
+  const j = (typeof JESUS_LESSONS !== 'undefined') ? JESUS_LESSONS : [];
+  const l = (typeof LEARN_BIBLE_LESSONS !== 'undefined') ? LEARN_BIBLE_LESSONS : [];
+  return [
+    {
+      id:    'foundations',
+      title: 'Foundations of Faith',
+      icon:  '⭐',
+      sub:   'Who Jesus is · Why He came · The gospel · The Spirit',
+      color: '#a78bfa',
+      type:  'jesus',
+      lessons: j,
+      badgeId:    'faith-foundations',
+      badgeLabel: 'Faith Foundations',
+    },
+    {
+      id:    'bible-survey',
+      title: 'Bible Survey',
+      icon:  '📖',
+      sub:   'Old + New Testament · how to read · key themes',
+      color: '#10b981',
+      type:  'learn',
+      lessons: l,
+      badgeId:    'bible-scholar',
+      badgeLabel: 'Bible Scholar',
+    },
+  ];
+}
+
+function _acStore(){
+  if(!D.faithAcademyProgress || typeof D.faithAcademyProgress !== 'object') D.faithAcademyProgress = { lessons:{}, badges:{} };
+  if(!D.faithAcademyProgress.lessons || typeof D.faithAcademyProgress.lessons !== 'object') D.faithAcademyProgress.lessons = {};
+  if(!D.faithAcademyProgress.badges  || typeof D.faithAcademyProgress.badges  !== 'object') D.faithAcademyProgress.badges  = {};
+  return D.faithAcademyProgress;
+}
+
+let _acExpanded = { 'foundations': true, 'bible-survey': false };
+
+function renderAcademyPanel(){
+  const modules = _acModules();
+  const store = _acStore();
+
+  // Stats
+  let totalLessons = 0, doneLessons = 0;
+  modules.forEach(m => {
+    totalLessons += m.lessons.length;
+    m.lessons.forEach((_, idx) => {
+      const id = m.type + ':' + idx;
+      if(store.lessons[id]) doneLessons++;
+    });
+  });
+  const badgesEarned = Object.keys(store.badges).length;
+
+  const setStat = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+  setStat('acStatLessons', doneLessons);
+  setStat('acStatTotal',   totalLessons);
+  setStat('acStatBadges',  badgesEarned);
+
+  // Modules
+  const wrap = document.getElementById('acModules');
+  if(!wrap) return;
+  wrap.innerHTML = modules.map(m => {
+    const moduleDone = m.lessons.reduce((acc, _, idx) => acc + (store.lessons[m.type+':'+idx] ? 1 : 0), 0);
+    const pct = m.lessons.length ? Math.round((moduleDone / m.lessons.length) * 100) : 0;
+    const isExpanded = !!_acExpanded[m.id];
+    const hasBadge = !!store.badges[m.badgeId];
+
+    const lessonsHtml = m.lessons.map((l, idx) => {
+      const lessonId = m.type + ':' + idx;
+      const isDone = !!store.lessons[lessonId];
+      return `<div class="ac-lesson${isDone?' done':''}" onclick="openBFLesson('${m.type}',${idx})">
+        <span class="ac-lesson-icon">${l.icon}</span>
+        <span class="ac-lesson-title">${escapeHtml(l.title)}</span>
+        <span class="ac-lesson-check">${isDone ? '✅' : '○'}</span>
+      </div>`;
+    }).join('');
+
+    return `<div class="ac-module" style="border-left-color:${m.color};">
+      <div class="ac-module-hdr" onclick="acToggleModule('${m.id}')">
+        <span class="ac-module-icon">${m.icon}</span>
+        <div style="flex:1;min-width:0;">
+          <div class="ac-module-title" style="color:${m.color};">${escapeHtml(m.title)}</div>
+          <div class="ac-module-meta">${m.lessons.length} lessons · ${moduleDone} read · ${pct}%</div>
+          ${hasBadge ? '<span class="ac-badge">🏆 '+escapeHtml(m.badgeLabel)+' earned</span>' : ''}
+        </div>
+        <span class="ac-module-toggle">${isExpanded ? '▼' : '▶'}</span>
+      </div>
+      <div class="ac-bar"><div class="ac-bar-fill" style="width:${pct}%;background:linear-gradient(90deg,#38bdf8,${m.color});"></div></div>
+      <div style="font-size:.72rem;color:var(--tx2);line-height:1.5;margin-bottom:${isExpanded?'.4rem':'0'};">${escapeHtml(m.sub)}</div>
+      <div class="ac-lessons" style="display:${isExpanded?'grid':'none'};">${lessonsHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+function acToggleModule(moduleId){
+  _acExpanded[moduleId] = !_acExpanded[moduleId];
+  renderAcademyPanel();
+}
+
+// Marks a lesson complete, awards +5 XP, fires streak. If completing the
+// lesson finishes the module, awards the module badge (+100 XP).
+function academyMarkLesson(type, idx){
+  const lessonId = type + ':' + idx;
+  const store = _acStore();
+  if(store.lessons[lessonId]){ showToast('Already complete'); return; }
+
+  const modules = _acModules();
+  const m = modules.find(x => x.type === type);
+  if(!m){ return; }
+  const lesson = m.lessons[idx];
+  if(!lesson){ return; }
+
+  const now = new Date().toISOString();
+  store.lessons[lessonId] = now;
+  D.scrPoints = (D.scrPoints || 0) + 5;
+  if(!D.scrReadDays) D.scrReadDays = {};
+  D.scrReadDays[now.slice(0,10)] = true;
+  if(typeof logActivity === 'function') logActivity('faith', 'Lesson complete: ' + lesson.title);
+
+  // Module-badge check
+  const moduleDone = m.lessons.reduce((acc, _, i) => acc + (store.lessons[m.type+':'+i] ? 1 : 0), 0);
+  let badgeJustEarned = false;
+  if(moduleDone === m.lessons.length && !store.badges[m.badgeId]){
+    store.badges[m.badgeId] = now;
+    D.scrPoints += 100;
+    badgeJustEarned = true;
+    if(typeof logActivity === 'function') logActivity('faith', 'Badge earned: ' + m.badgeLabel);
+  }
+
+  save();
+  if(badgeJustEarned){
+    showToast('🏆 ' + m.badgeLabel + ' earned! +100 XP');
+  } else {
+    showToast('Lesson complete +5 XP ✓');
+  }
+
+  // Refresh the modal CTA so it shows the green "complete" state.
+  // openBFLesson rebuilds charBody so calling it again is the cleanest refresh.
+  if(typeof openBFLesson === 'function') openBFLesson(type, idx);
+  // Also refresh the academy panel + Faith Home stats in the background.
+  if(typeof renderAcademyPanel === 'function') renderAcademyPanel();
+  if(typeof renderFaithHome === 'function') renderFaithHome();
 }
 
 // SM-2-lite update — adjusts ease and intervalDays in place, sets nextDue.
