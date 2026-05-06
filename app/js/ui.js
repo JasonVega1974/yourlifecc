@@ -781,6 +781,13 @@ function applySettings(){
     // to a stable data-attribute when F2 touches the top bar.
     document.querySelectorAll('button[onclick*="quickParentHub"]')
       .forEach(b => b.style.display = 'none');
+    // Floating "Start Here!" button is parent-onboard wizard. faith_free is
+    // a single-person tier — no wizard applies.
+    const sh = document.getElementById('startHereBtn');
+    if(sh) sh.style.display = 'none';
+    // Getting Started guide is also parent/child-framed; suppress for faith_free.
+    const gs = document.getElementById('gettingStarted');
+    if(gs) gs.style.display = 'none';
   }
   const sb=document.getElementById('scriptureBanner');
   if(sb && D.hideScripture) sb.style.display='none';
@@ -967,8 +974,10 @@ function buildSideNav(){
   // New sections added after launch - always visible, ignore saved hide state
   // Force-show new sections regardless of any saved hide state
   if(!D.sections) D.sections={};
-  // Always force CBT, resume, referral visible — delete any hidden=0 state
-  ['cbt','resume','referral'].forEach(k=>{ if(D.sections[k]===0) delete D.sections[k]; });
+  // Always force CBT, resume, referral visible — delete any hidden=0 state.
+  // Faith Hub sections are also force-visible so users who toggled them off
+  // pre-F2 see Christian Life Guide / Worship / Bible & Faith again.
+  ['cbt','resume','referral','christianLiving','worship','scripture'].forEach(k=>{ if(D.sections[k]===0) delete D.sections[k]; });
   delete D.sections.referral; // referral is now Parent Hub only
   const hidden = D.sections||{};
   // Force School & Career group open so CBT is never hidden by a collapsed group

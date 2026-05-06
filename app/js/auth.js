@@ -342,7 +342,7 @@ async function authComplete(isReturningUser){
   const loaded = isReturningUser ? await cloudLoad() : false;
   // Force-strip hidden sections that should always be visible
   if(!D.sections) D.sections={};
-  ['cbt','resume','motivation','mentors','hero','parent'].forEach(function(k){ delete D.sections[k]; });
+  ['cbt','resume','motivation','mentors','hero','parent','christianLiving','worship','scripture'].forEach(function(k){ delete D.sections[k]; });
   
   document.getElementById('authScreen').style.display = 'none';
   authSetLoading(false);

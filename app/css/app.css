@@ -216,6 +216,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .sh{display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;}
 .si{font-size:1.5rem;}
 .st{font-family:var(--fh);font-size:1.7rem;letter-spacing:2.5px;color:#fff;}
+:root.light .st{color:#0f172a;}
 .sl{flex:1;height:1px;background:linear-gradient(90deg,rgba(56,189,248,.3),transparent);}
 .sdiv{height:1px;background:linear-gradient(90deg,transparent,rgba(56,189,248,.08),transparent);margin:.6rem 0;}
 

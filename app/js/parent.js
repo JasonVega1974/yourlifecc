@@ -1112,6 +1112,9 @@ function gsAction(id, action){
 
 function renderGettingStarted(){
   const el = document.getElementById('gettingStarted'); if(!el) return;
+  // faith_free is a single-person Bible-study tier — no parent/child onboarding,
+  // so the Getting Started checklist (chores, finance, school, etc.) doesn't apply.
+  if(window._faithFree){ el.innerHTML=''; el.style.display='none'; return; }
   if(D.gsDismissed){ el.innerHTML=''; el.style.display='none'; return; }
 
   const results = GS_STEPS.map(s=>({...s, done:s.check()}));

@@ -210,7 +210,7 @@ async function init(){
 
 function finishInit(cloudReady){
   // Always ensure newly-added sections are visible regardless of saved state
-  if(D.sections){ ['cbt','resume','motivation','mentors'].forEach(function(k){ delete D.sections[k]; }); }
+  if(D.sections){ ['cbt','resume','motivation','mentors','christianLiving','worship','scripture'].forEach(function(k){ delete D.sections[k]; }); }
   // Belt+suspenders: force CBT on
   if(D.sections && D.sections.cbt===0) delete D.sections.cbt;
   // Apply saved theme

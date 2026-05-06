@@ -4240,14 +4240,9 @@
       </div>
     </div>
 
-    <!-- Stats -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-bottom:1rem;">
-      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:.6rem;text-align:center;"><div style="font-size:1.4rem;font-weight:900;color:#a78bfa;" id="scrPoints">0</div><div style="font-size:.65rem;color:var(--tx2);">Points</div></div>
-      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:.6rem;text-align:center;"><div style="font-size:1.4rem;font-weight:900;color:#f5a623;" id="scrStreak">0</div><div style="font-size:.65rem;color:var(--tx2);">Streak</div></div>
-      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:.6rem;text-align:center;"><div style="font-size:1.4rem;font-weight:900;color:#22c55e;" id="scrDaysRead">0</div><div style="font-size:.65rem;color:var(--tx2);">Days</div></div>
-      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:.6rem;text-align:center;"><div style="font-size:1.4rem;font-weight:900;color:#38bdf8;" id="scrPctComplete">0%</div><div style="font-size:.65rem;color:var(--tx2);">Done</div></div>
-    </div>
-    <div><div style="display:flex;justify-content:space-between;font-size:.6rem;color:var(--tx2);margin-bottom:.2rem;"><span>Day 1</span><span id="scrProgressLabel">0/365</span><span>Day 365</span></div><div style="height:8px;background:rgba(139,92,246,.1);border-radius:4px;overflow:hidden;"><div id="scrProgressBar" style="height:100%;background:linear-gradient(90deg,#8b5cf6,#22c55e);border-radius:4px;transition:width .5s;width:0%;"></div></div></div>
+    <!-- Stats consolidated into Faith Home Card 4 (F2-A). Keep dashboard
+         IDs out of the way — the renderScrStats / renderScripturePage
+         lookups guard with if(el) so removing the markup is safe. -->
 
     <!-- All 365 Devotionals -->
     <div style="margin-top:1rem;font-size:.78rem;font-weight:700;margin-bottom:.4rem;">📅 All 365 Devotionals</div>
@@ -5294,6 +5289,25 @@
       #s-christian-living .modal-overlay.active, #s-christian-living .modal-overlay.active * { visibility: visible; }
       #s-christian-living .modal-overlay.active { position: absolute; left: 0; top: 0; width: 100%; background: white !important; }
       #s-christian-living .modal-actions, #s-christian-living .close-modal { display: none !important; }
+    }
+    /* Light-mode rescue: cards used rgba(255,255,255,...) backgrounds that
+       go invisible against the light page bg. Swap to dark-on-light cards
+       and bump text contrast. */
+    :root.light #s-christian-living .resource-card {
+      background: rgba(15,23,42,0.025);
+      border-color: rgba(124,58,237,.25);
+    }
+    :root.light #s-christian-living .filter-tabs { background: rgba(15,23,42,0.03); }
+    :root.light #s-christian-living .filter-tab { background: rgba(102,126,234,.06); color: #5b21b6; }
+    :root.light #s-christian-living .card-footer { background: rgba(15,23,42,0.025); }
+    :root.light #s-christian-living .modal-content { background: #ffffff; color: #0f172a; }
+    :root.light #s-christian-living .journal-template,
+    :root.light #s-christian-living .giving-worksheet,
+    :root.light #s-christian-living .symbol-item,
+    :root.light #s-christian-living .offering-item,
+    :root.light #s-christian-living .budget-category,
+    :root.light #s-christian-living .prayer-box {
+      background: rgba(15,23,42,0.03);
     }
   </style>
 

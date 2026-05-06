@@ -89,7 +89,7 @@ function loadData(){
       if(!D.scrReadDays || Array.isArray(D.scrReadDays)) D.scrReadDays = {};
       if(!D.devPopupSeen) D.devPopupSeen = '';
       // Never hide sections added after initial registration
-      if(D.sections){ ['cbt','resume','motivation','mentors','hero','parent'].forEach(s=>{ delete D.sections[s]; }); }
+      if(D.sections){ ['cbt','resume','motivation','mentors','hero','parent','christianLiving','worship','scripture'].forEach(s=>{ delete D.sections[s]; }); }
       if(D.sections && D.sections.cbt===0) delete D.sections.cbt;
       if(k!==LS){ localStorage.setItem(LS,JSON.stringify(D)); }
       return;
@@ -179,7 +179,7 @@ async function cloudLoad(){
     if(!D.devPopupSeen) D.devPopupSeen = '';
     // Strip any sections that should never be hidden
     if(D.sections){
-      ['cbt','resume','motivation','mentors','hero','parent'].forEach(function(k){ delete D.sections[k]; });
+      ['cbt','resume','motivation','mentors','hero','parent','christianLiving','worship','scripture'].forEach(function(k){ delete D.sections[k]; });
         // Force CBT always visible after cloud load
         if(D.sections && D.sections.cbt===0) delete D.sections.cbt;
     }
