@@ -5150,6 +5150,369 @@ function _bwMarkVisited(kind, id){
   }
 }
 
+// ═════════════════════════════════════════════════════════════
+// F4-A — ANIMATED ROUTE OVERLAYS on the Bible Lands map
+// ═════════════════════════════════════════════════════════════
+let _bwActiveRoutes = {}; // routeId → { polyline, markers[] }
+
+function _bwRoutes(){ return (typeof window !== 'undefined' && window.BIBLICAL_ROUTES) ? window.BIBLICAL_ROUTES : []; }
+function _bwRouteById(id){ return _bwRoutes().find(r => r && r.id === id) || null; }
+
+function bwRenderRouteChips(){
+  const wrap = document.getElementById('bwRoutes');
+  if(!wrap || wrap.dataset.bwBuilt) return;
+  const routes = _bwRoutes();
+  wrap.innerHTML = routes.map(r =>
+    '<button class="bw-chip" data-bw-route="'+r.id+'" onclick="bwToggleRoute(\''+r.id+'\',this)" title="'+_bwEsc(r.description)+'">'+_bwEsc(r.label)+'</button>'
+  ).join('');
+  wrap.dataset.bwBuilt = '1';
+}
+
+function bwToggleRoute(routeId, btn){
+  if(!_bwMap){ showToast('Map still loading'); return; }
+  const r = _bwRouteById(routeId);
+  if(!r) return;
+
+  // If already on, remove it.
+  if(_bwActiveRoutes[routeId]){
+    const a = _bwActiveRoutes[routeId];
+    if(a.polyline) try { _bwMap.removeLayer(a.polyline); } catch(_){}
+    (a.markers || []).forEach(m => { try { _bwMap.removeLayer(m); } catch(_){} });
+    delete _bwActiveRoutes[routeId];
+    if(btn){
+      btn.classList.remove('active');
+      btn.style.background = '';
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }
+    return;
+  }
+
+  // Resolve waypoint coords from siteId references.
+  const points = [];
+  (r.waypoints || []).forEach(w => {
+    if(typeof w.lat === 'number' && typeof w.lng === 'number'){
+      points.push({ lat: w.lat, lng: w.lng, label: w.label, ref: w.ref });
+    } else if(w.siteId){
+      const s = _bwSiteById(w.siteId);
+      if(s) points.push({ lat: s.lat, lng: s.lng, label: w.label || s.name, ref: w.ref, siteId: s.id });
+    }
+  });
+  if(points.length < 2){ showToast('Route data incomplete'); return; }
+
+  // Polyline.
+  const latlngs = points.map(p => [p.lat, p.lng]);
+  const polyline = L.polyline(latlngs, {
+    color: r.color || '#a78bfa',
+    weight: 4,
+    opacity: 0.92,
+    lineJoin: 'round',
+    lineCap: 'round',
+  }).addTo(_bwMap);
+
+  // Animate stroke-dashoffset → 0. Need to wait one tick for SVG to render.
+  setTimeout(() => {
+    const path = polyline.getElement();
+    if(path && typeof path.getTotalLength === 'function'){
+      const len = path.getTotalLength();
+      path.style.setProperty('--bw-route-dur', (r.durationMs || 4500) + 'ms');
+      path.setAttribute('stroke-dasharray', len);
+      path.setAttribute('stroke-dashoffset', len);
+      // Force reflow to ensure animation starts.
+      void path.getBoundingClientRect();
+      path.classList.add('bw-route-anim');
+    }
+  }, 30);
+
+  // Waypoint markers — pulse in sequence as the line draws past them.
+  const markers = [];
+  const totalMs = r.durationMs || 4500;
+  points.forEach((p, idx) => {
+    const ratio = idx / Math.max(1, points.length - 1);
+    const delay = Math.round(totalMs * ratio);
+    setTimeout(() => {
+      const wpIcon = L.divIcon({
+        className: 'bw-route-waypoint',
+        html: '<div style="width:14px;height:14px;border-radius:50%;background:'+(r.color||'#a78bfa')+';border:2.5px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,.35);"></div>',
+        iconSize: [14,14], iconAnchor: [7,7],
+      });
+      const m = L.marker([p.lat, p.lng], { icon: wpIcon }).addTo(_bwMap);
+      const popup = '<b>'+_bwEsc(p.label || '')+'</b>'
+        + (p.ref ? '<br><span style="font-size:11px;color:#555;">'+_bwEsc(p.ref)+'</span>' : '')
+        + (p.siteId ? '<br><a href="javascript:void(0)" onclick="openBwSite(\''+p.siteId+'\')">Open site →</a>' : '');
+      m.bindPopup(popup);
+      markers.push(m);
+    }, delay);
+  });
+
+  _bwActiveRoutes[routeId] = { polyline, markers };
+
+  // Style chip as active.
+  if(btn){
+    btn.classList.add('active');
+    btn.style.background = r.color || '#a78bfa';
+    btn.style.color = '#0b1220';
+    btn.style.borderColor = 'transparent';
+  }
+
+  // Fit bounds with a soft padding (wait until last waypoint marker drops in).
+  setTimeout(() => {
+    try { _bwMap.fitBounds(polyline.getBounds(), { padding: [40, 40], maxZoom: 8 }); }
+    catch(_){}
+  }, totalMs + 100);
+
+  if(typeof logActivity === 'function') logActivity('faith', 'Played route: ' + r.label);
+}
+
+// Hook route chip rendering into the existing renderBibleWorld.
+const _bwOriginalRenderBibleWorld = (typeof renderBibleWorld === 'function') ? renderBibleWorld : null;
+if(_bwOriginalRenderBibleWorld){
+  renderBibleWorld = function(){
+    _bwOriginalRenderBibleWorld();
+    setTimeout(bwRenderRouteChips, 100);
+  };
+}
+
+// ═════════════════════════════════════════════════════════════
+// F4-B — BIBLE PROJECT VIDEO EMBEDS
+// ═════════════════════════════════════════════════════════════
+// Curated YouTube IDs from BibleProject's "Read Scripture" series for
+// each Old + New Testament book. Embeds are lazy — only the iframe URL
+// is set when the user clicks Watch. CC-BY-SA license, free to use.
+const BIBLE_PROJECT_VIDEOS = {
+  // OT
+  'Genesis':   { p1:'GQI72THyO5I', p2:'F4isSyennFo' },
+  'Exodus':    { p1:'jH_aojNJM3E', p2:'b06QXgjvSjI' },
+  'Leviticus': { p1:'IJ-FekWUZzE' },
+  'Numbers':   { p1:'tp5MIrMZFqo' },
+  'Deuteronomy':{ p1:'jVREoeUSrLM' },
+  'Joshua':    { p1:'JqOqJlFF_eU' },
+  'Judges':    { p1:'kOYy8iCfIJ4' },
+  'Ruth':      { p1:'0h1eoBeR4Jk' },
+  '1 Samuel':  { p1:'QJOju5Dw0V0' },
+  '2 Samuel':  { p1:'YvoWDXNDJgs' },
+  '1 Kings':   { p1:'bVFW3wbi9pk' },
+  '2 Kings':   { p1:'bVFW3wbi9pk' },
+  'Psalms':    { p1:'j9phNEaPrv8' },
+  'Proverbs':  { p1:'AzmYV8GNAIM' },
+  'Ecclesiastes':{ p1:'lrsQ1tc-2wk' },
+  'Song of Solomon':{ p1:'4KC7xE4fgOw' },
+  'Isaiah':    { p1:'d0A6Uchb1F8', p2:'_TzdEPuqgQg' },
+  'Jeremiah':  { p1:'RSK36cHbrk0' },
+  'Daniel':    { p1:'9cSC9uobtPM' },
+  // NT
+  'Matthew':   { p1:'3Dv4-n6OYGI', p2:'GGCF3OPWN14' },
+  'Mark':      { p1:'HGHqu9-DtXk' },
+  'Luke':      { p1:'26z_KhwNdD8', p2:'XGcZjdc1YIM' },
+  'John':      { p1:'G-2e9mMf7E8', p2:'RUfh_wOsauk' },
+  'Acts':      { p1:'CGbNw855ksw', p2:'Z-17KxpjL0Q' },
+  'Romans':    { p1:'ej_6dVdJSIU', p2:'0SVTl4Xa5fY' },
+  '1 Corinthians':{ p1:'yiHf8klCCc4' },
+  '2 Corinthians':{ p1:'3lfPK2vfC54' },
+  'Galatians': { p1:'vmx4UjRFp0M' },
+  'Ephesians': { p1:'Y71r-T98E2Q' },
+  'Philippians':{ p1:'oE9qqW1-BkU' },
+  'Colossians':{ p1:'pXTXlDxQsvc' },
+  'Hebrews':   { p1:'1fNWTZZwgbs' },
+  'James':     { p1:'qn-hLHWwRYY' },
+  '1 Peter':   { p1:'WhP7AZQlzCg' },
+  'Revelation':{ p1:'5nvVVcYD-0w', p2:'QpnIrbq2bKo' },
+};
+
+function bibleProjectFor(book){ return BIBLE_PROJECT_VIDEOS[book] || null; }
+
+function openBibleProjectVideo(book){
+  const v = bibleProjectFor(book);
+  if(!v || !v.p1){ showToast('No Bible Project video for this book yet'); return; }
+  // Open in a fresh popup-style overlay using charModal's structure.
+  document.getElementById('charIcon').textContent = '📺';
+  document.getElementById('charTitle').textContent = book;
+  document.getElementById('charSub').textContent = 'Bible Project · Free animated overview · CC-BY-SA';
+  document.getElementById('charModalHeader').style.background = 'var(--cd-banner)';
+  const part2 = v.p2 ? '<div style="margin-top:.85rem;"><div style="font-size:.7rem;font-weight:800;color:var(--tx2);margin-bottom:.35rem;text-transform:uppercase;letter-spacing:.1em;">Part 2</div><div style="position:relative;padding-bottom:56.25%;height:0;border-radius:10px;overflow:hidden;background:#000;"><iframe src="https://www.youtube-nocookie.com/embed/'+v.p2+'?rel=0" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe></div></div>' : '';
+  document.getElementById('charBody').innerHTML =
+    '<div style="font-size:.78rem;color:var(--tx2);line-height:1.55;margin-bottom:.7rem;">A 5-10 minute animated overview of '+escapeHtml(book)+' from <a href="https://bibleproject.com" target="_blank" rel="noopener" style="color:#38bdf8;">The Bible Project</a> — free, CC-BY-SA, beautifully animated.</div>'
+    + '<div style="position:relative;padding-bottom:56.25%;height:0;border-radius:10px;overflow:hidden;background:#000;">'
+    + '<iframe src="https://www.youtube-nocookie.com/embed/'+v.p1+'?rel=0" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>'
+    + '</div>' + part2;
+  document.getElementById('charQuiz').innerHTML = '';
+  openModal('charModal');
+  if(typeof logActivity === 'function') logActivity('faith', 'Watched Bible Project: ' + book);
+}
+
+// Augment the ESV reader nav with a "📺 Watch overview" button when a
+// Bible Project video exists for the current book.
+const _origOpenEsvReader_F4 = openEsvReader;
+openEsvReader = async function(){
+  await _origOpenEsvReader_F4.apply(this, arguments);
+  // After the reader paints, inject a Bible Project button if available.
+  setTimeout(function(){
+    const book = _esvCurrentBook;
+    const v = bibleProjectFor(book);
+    if(!v) return;
+    // Find the Listen+Settings row and append.
+    const charBody = document.getElementById('charBody');
+    if(!charBody) return;
+    const btnRow = charBody.querySelector('div[style*="display:flex"][style*="margin-bottom"]');
+    if(btnRow && !btnRow.querySelector('[data-bp-btn]')){
+      const btn = document.createElement('button');
+      btn.setAttribute('data-bp-btn','1');
+      btn.style.cssText = 'background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.3);color:#a78bfa;border-radius:8px;padding:.35rem .7rem;font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fm);';
+      btn.innerHTML = '📺 Watch Bible Project';
+      btn.onclick = function(){ openBibleProjectVideo(book); };
+      // Insert as third child so it appears next to Listen + Settings.
+      const settingsBtn = btnRow.querySelector('button[onclick*="openReaderSettings"]');
+      if(settingsBtn) settingsBtn.parentNode.insertBefore(btn, settingsBtn.nextSibling);
+      else btnRow.appendChild(btn);
+    }
+  }, 100);
+};
+
+// ═════════════════════════════════════════════════════════════
+// F4-C — CELEBRATION ANIMATIONS (CSS+SVG, no library dep)
+// ═════════════════════════════════════════════════════════════
+// playFx('dove' | 'sparkle' | 'confetti' | 'cross' | 'flame')
+// Auto-clears the overlay after the animation. Respects reduced-motion.
+function _fxReducedMotion(){
+  try { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+  catch(_){ return false; }
+}
+
+function playFx(type){
+  if(_fxReducedMotion()) return; // Toast still fires from caller; just skip visuals.
+  const overlay = document.getElementById('fxOverlay');
+  if(!overlay) return;
+  overlay.classList.add('fx-on');
+  let html = '', clearAfter = 2000;
+  if(type === 'dove'){
+    html = '<svg class="fx-dove" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">'
+      + '<path d="M44 12c-3 5-12 8-22 8 0 9 5 18 14 22 7 3 14 1 18-5 4-7 0-15-10-25z" fill="#fff" stroke="#a78bfa" stroke-width="1.2"/>'
+      + '<path d="M28 22c-6 4-12 12-12 24" stroke="#a78bfa" stroke-width="2" fill="none" stroke-linecap="round"/>'
+      + '<circle cx="46" cy="18" r="1.6" fill="#0f172a"/>'
+      + '</svg>';
+    clearAfter = 2700;
+  } else if(type === 'sparkle'){
+    html = '<svg class="fx-sparkle" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'
+      + '<g fill="#fbbf24"><polygon points="50,5 56,40 90,50 56,60 50,95 44,60 10,50 44,40"/></g>'
+      + '<g fill="#fef08a" opacity=".85"><polygon points="50,18 53,42 78,50 53,58 50,82 47,58 22,50 47,42"/></g>'
+      + '</svg>';
+    clearAfter = 1700;
+  } else if(type === 'cross'){
+    html = '<svg class="fx-cross" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'
+      + '<defs><radialGradient id="fxCrossG"><stop offset="0%" stop-color="#fef08a"/><stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/></radialGradient></defs>'
+      + '<circle cx="50" cy="50" r="48" fill="url(#fxCrossG)"/>'
+      + '<rect x="46" y="14" width="8" height="62" rx="1" fill="#fff"/>'
+      + '<rect x="28" y="32" width="44" height="8" rx="1" fill="#fff"/>'
+      + '</svg>';
+    clearAfter = 1700;
+  } else if(type === 'flame'){
+    html = '<svg class="fx-flame" viewBox="0 0 64 96" xmlns="http://www.w3.org/2000/svg">'
+      + '<defs><linearGradient id="fxFlameG" x1="0%" y1="100%" x2="0%" y2="0%"><stop offset="0%" stop-color="#fb923c"/><stop offset="60%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#fef08a"/></linearGradient></defs>'
+      + '<path d="M32 96c-14 0-22-10-22-22 0-12 14-20 12-36 8 4 14 14 14 22 4-6 6-14 6-22 8 8 14 22 14 36 0 12-8 22-24 22z" fill="url(#fxFlameG)"/>'
+      + '</svg>';
+    clearAfter = 1900;
+  } else if(type === 'confetti'){
+    const colors = ['#38bdf8','#a78bfa','#10b981','#fbbf24','#f472b6','#fb923c'];
+    const pieces = [];
+    for(let i = 0; i < 60; i++){
+      const left = Math.random() * 100;
+      const delay = Math.random() * 600;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const dur = 2200 + Math.floor(Math.random() * 1200);
+      pieces.push('<div class="fx-confetti-piece" style="left:'+left.toFixed(2)+'vw;background:'+color+';animation-delay:'+delay+'ms;animation-duration:'+dur+'ms;"></div>');
+    }
+    html = pieces.join('');
+    clearAfter = 3500;
+  }
+  overlay.innerHTML = html;
+  setTimeout(function(){
+    overlay.innerHTML = '';
+    overlay.classList.remove('fx-on');
+  }, clearAfter);
+}
+
+// Hook celebrations into existing faith actions. Each wrapper reuses the
+// original function and fires the appropriate visual on success.
+(function wireFxToFaithActions(){
+  // Prayer save → dove
+  if(typeof addPrayerFromForm === 'function'){
+    const _orig = addPrayerFromForm;
+    addPrayerFromForm = function(){ const before = (D.prayers||[]).length; _orig.apply(this, arguments); if((D.prayers||[]).length > before) playFx('dove'); };
+  }
+  // Devotional read → cross
+  if(typeof markDevotionalRead === 'function'){
+    const _orig = markDevotionalRead;
+    markDevotionalRead = function(){ const today = new Date().toISOString().slice(0,10); const wasRead = !!(D.scrReadDays && D.scrReadDays[today]); _orig.apply(this, arguments); if(!wasRead) playFx('cross'); };
+  }
+  if(typeof markDevFromPopup === 'function'){
+    const _orig = markDevFromPopup;
+    markDevFromPopup = function(){ const today = new Date().toISOString().slice(0,10); const wasRead = !!(D.scrReadDays && D.scrReadDays[today]); _orig.apply(this, arguments); if(!wasRead) playFx('cross'); };
+  }
+  // Memory verse mastered → sparkle (caught in _mvApplySrUpdate when intervalDays >= 90)
+  if(typeof _mvApplySrUpdate === 'function'){
+    const _orig = _mvApplySrUpdate;
+    _mvApplySrUpdate = function(v, correct){ const wasMastered = !!(v && v.mastered); _orig.apply(this, arguments); if(v && v.mastered && !wasMastered) playFx('sparkle'); };
+  }
+  // Plan day done → confetti when plan completes
+  if(typeof planMarkDayDone === 'function'){
+    const _orig = planMarkDayDone;
+    planMarkDayDone = function(planId, dayNum){
+      const store = (typeof planStore === 'function') ? planStore() : { active:{} };
+      const wasActive = !!(store.active && store.active[planId]);
+      _orig.apply(this, arguments);
+      const stillActive = !!(store.active && store.active[planId]);
+      if(wasActive && !stillActive) playFx('confetti');
+    };
+  }
+  // Quiz pass → confetti (acIssueCertificate first-time only)
+  if(typeof acIssueCertificate === 'function'){
+    const _orig = acIssueCertificate;
+    acIssueCertificate = function(courseId){
+      const store = _acStore();
+      const wasIssued = !!(store.courses[courseId] && store.courses[courseId].certificateIssuedAt);
+      _orig.apply(this, arguments);
+      const nowIssued = !!(store.courses[courseId] && store.courses[courseId].certificateIssuedAt);
+      if(!wasIssued && nowIssued) playFx('confetti');
+    };
+  }
+  // Streak milestone (day 7, 30, 100) → flame. Check inside renderFaithHome.
+  if(typeof renderFaithHome === 'function'){
+    const _orig = renderFaithHome;
+    let _lastStreakSeen = -1;
+    renderFaithHome = function(){
+      _orig.apply(this, arguments);
+      const streak = (typeof getScriptureStreak === 'function') ? getScriptureStreak() : 0;
+      const milestones = [7, 30, 100, 365];
+      if(milestones.indexOf(streak) !== -1 && streak !== _lastStreakSeen){
+        _lastStreakSeen = streak;
+        playFx('flame');
+      } else if(milestones.indexOf(streak) === -1){
+        _lastStreakSeen = streak;
+      }
+    };
+  }
+})();
+
+// ═════════════════════════════════════════════════════════════
+// F4-I — FAITH HOME ENTRANCE ANIMATION
+// ═════════════════════════════════════════════════════════════
+// Add the .fh-enter class on first render of bf-home each session so
+// CSS keyframe staggers fire. Removed after the animation completes.
+let _fhEnteredThisSession = false;
+(function wireFaithHomeEntrance(){
+  if(typeof renderFaithHome !== 'function') return;
+  const _orig = renderFaithHome;
+  renderFaithHome = function(){
+    _orig.apply(this, arguments);
+    const home = document.getElementById('bf-home');
+    if(!home || _fhEnteredThisSession) return;
+    if(_fxReducedMotion()){ _fhEnteredThisSession = true; return; }
+    home.classList.add('fh-enter');
+    _fhEnteredThisSession = true;
+    setTimeout(function(){ home.classList.remove('fh-enter'); }, 1100);
+  };
+})();
+
 // ── F2-D place-tag taps → F3-B site drawer ──────────────────
 // Activates the data-place attributes added in F2-D's renderEsvPassage.
 // One-time delegated listener on document body so it works regardless of

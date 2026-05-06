@@ -4846,6 +4846,13 @@
       <div class="bw-filters" id="bwFilters">
         <button class="bw-chip active" data-bw-era="all" onclick="bwFilter('all',this)">All eras</button>
       </div>
+
+      <!-- F4-A: Animated travel paths -->
+      <div style="display:flex;gap:.4rem;margin-bottom:.55rem;flex-wrap:wrap;align-items:center;">
+        <span style="font-size:.62rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.14em;">▶ Animated Paths:</span>
+        <div id="bwRoutes" style="display:flex;gap:.3rem;flex-wrap:wrap;"></div>
+      </div>
+
       <div id="bwMap"></div>
       <div class="bw-section-hdr" id="bwListHdr">All sites</div>
       <div class="bw-grid" id="bwGrid"></div>
@@ -8442,6 +8449,7 @@
 <script src="/app/js/data/academy.js"></script>
 <script src="/app/js/data/biblical-sites.js"></script>
 <script src="/app/js/data/biblical-discoveries.js"></script>
+<script src="/app/js/data/biblical-routes.js"></script>
 <!-- Leaflet (F3-B) — open-source map library, MIT-licensed. Only loads when used. -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -8452,6 +8460,10 @@
 <script src="/app/js/email.js"></script>
 <script src="/app/js/misc.js"></script>
 <script src="/app/js/resume.js"></script>
+
+<!-- F4-C — Global celebration overlay (fed by playFx() in faith.js).
+     Pointer-events:none so it never blocks interactions. -->
+<div id="fxOverlay" aria-hidden="true"></div>
 
 <!-- App bootstrap: must load last -->
 <script src="/app/js/init.js"></script>

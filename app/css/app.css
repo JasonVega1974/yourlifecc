@@ -2376,3 +2376,105 @@ html[data-faith-free="1"] #sp-faith-support { display: block !important; }
 /* The faith-free Support card (hidden by default; shown only via the
    data-faith-free selector above). */
 #sp-faith-support { display: none; }
+
+/* ─── F4 — VISUAL LAYER ─────────────────────────────────────────
+   Reduced-motion users get the same content with no movement —
+   transitions snap, celebrations don't fire visually (toast still does). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* F4-I — Faith Home card entrance: stagger fade + slide up. Only fires
+   on first paint via the .fh-enter class added by renderFaithHome and
+   removed after the animation. */
+@keyframes fhCardEnter {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+#bf-home.fh-enter > .fh-grid > .fh-card,
+#bf-home.fh-enter > #fhFamilyVerseCard {
+  animation: fhCardEnter .42s cubic-bezier(.21,.78,.35,1) both;
+}
+#bf-home.fh-enter > #fhFamilyVerseCard         { animation-delay: 0ms; }
+#bf-home.fh-enter > .fh-grid > .fh-card:nth-child(1) { animation-delay: 60ms; }
+#bf-home.fh-enter > .fh-grid > .fh-card:nth-child(2) { animation-delay: 140ms; }
+#bf-home.fh-enter > .fh-grid > .fh-card:nth-child(3) { animation-delay: 220ms; }
+#bf-home.fh-enter > .fh-grid > .fh-card:nth-child(4) { animation-delay: 300ms; }
+#bf-home.fh-enter > .fh-grid > .fh-card:nth-child(5) { animation-delay: 380ms; }
+
+/* F4-A — Animated route polylines. Each Leaflet polyline path gets
+   class .bw-route-anim with stroke-dasharray + dashoffset animated
+   from full length to 0 (line draws progressively). */
+@keyframes bwRouteDraw {
+  to { stroke-dashoffset: 0; }
+}
+.leaflet-pane path.bw-route-anim {
+  animation: bwRouteDraw var(--bw-route-dur, 4500ms) ease-out forwards;
+}
+@keyframes bwWaypointPulse {
+  0%   { transform: scale(1);   opacity: .9; }
+  60%  { transform: scale(1.6); opacity: 1;  }
+  100% { transform: scale(1);   opacity: .9; }
+}
+.bw-route-waypoint .leaflet-marker-icon { animation: bwWaypointPulse .9s ease-out 1; }
+
+/* F4-C — Celebration overlay (full-screen, pointer-events none, top of stack).
+   Used for dove / sparkle / confetti / cross / flame on key faith actions. */
+#fxOverlay {
+  position: fixed; inset: 0; pointer-events: none; z-index: 99998;
+  overflow: hidden; display: none;
+}
+#fxOverlay.fx-on { display: block; }
+@keyframes fxDoveFly {
+  0%   { transform: translate(-30vw, 60vh) rotate(-12deg); opacity: 0; }
+  20%  { opacity: 1; }
+  60%  { transform: translate(60vw, 22vh) rotate(8deg);    opacity: 1; }
+  100% { transform: translate(110vw, 8vh) rotate(2deg);    opacity: 0; }
+}
+.fx-dove {
+  position: absolute; left: 0; top: 0; width: 80px; height: 80px;
+  animation: fxDoveFly 2.6s cubic-bezier(.4,0,.3,1) forwards;
+  filter: drop-shadow(0 4px 12px rgba(167,139,250,.4));
+}
+@keyframes fxSparkleBurst {
+  0%   { transform: translate(-50%, -50%) scale(0)   rotate(0deg);  opacity: 0; }
+  20%  { opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(2.6) rotate(180deg); opacity: 0; }
+}
+.fx-sparkle {
+  position: absolute; left: 50%; top: 38%; width: 200px; height: 200px;
+  animation: fxSparkleBurst 1.6s cubic-bezier(.21,.78,.35,1) forwards;
+  filter: drop-shadow(0 0 18px rgba(251,191,36,.55));
+}
+@keyframes fxConfettiFall {
+  0%   { transform: translateY(-12vh) rotate(0deg);   opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+.fx-confetti-piece {
+  position: absolute; top: 0; width: 9px; height: 14px; border-radius: 2px;
+  animation: fxConfettiFall 2.6s linear forwards;
+}
+@keyframes fxCrossLight {
+  0%   { transform: translate(-50%, -50%) scale(.4); opacity: 0; }
+  30%  { opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1.8); opacity: 0; }
+}
+.fx-cross {
+  position: absolute; left: 50%; top: 42%; width: 160px; height: 160px;
+  animation: fxCrossLight 1.6s ease-out forwards;
+  filter: drop-shadow(0 0 24px rgba(251,191,36,.6));
+}
+@keyframes fxFlameRise {
+  0%   { transform: translate(-50%, 0)    scale(.4); opacity: 0; }
+  30%  { opacity: 1; }
+  100% { transform: translate(-50%, -40vh) scale(1.6); opacity: 0; }
+}
+.fx-flame {
+  position: absolute; left: 50%; bottom: 0; width: 120px; height: 120px;
+  animation: fxFlameRise 1.8s cubic-bezier(.21,.78,.35,1) forwards;
+  filter: drop-shadow(0 0 18px rgba(251,113,38,.7));
+}
