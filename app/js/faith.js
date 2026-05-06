@@ -566,9 +566,58 @@ function renderFaithHome(){
     arcEl.style.strokeDashoffset = String(C - (C * pct));
   }
 
-  // Streak shield indicator (forgiveness system lands in F2-H — placeholder hidden for F2-A).
+  // Streak shield indicator — F2-H forgiveness system surfaces the status:
+  //   sabbath → 🕊️ today is Sunday, auto-protected
+  //   ready   → 🛡 weekly skip available
+  //   used    → ⚠️ no skip left, read today to keep streak
+  //   done/0  → hidden (no shield needed when read or before streak starts)
   const shieldEl = document.getElementById('fhStreakShield');
-  if(shieldEl) shieldEl.style.display = 'none';
+  if(shieldEl){
+    if(streak === 0){ shieldEl.style.display = 'none'; }
+    else {
+      const status = (typeof getStreakShieldStatus === 'function') ? getStreakShieldStatus() : 'ready';
+      const inner  = shieldEl.querySelector('.fh-shield');
+      if(status === 'done'){
+        shieldEl.style.display = 'none';
+      } else if(status === 'sabbath' && inner){
+        shieldEl.style.display = '';
+        inner.innerHTML = '🕊️ Sabbath rest';
+        inner.style.background = 'rgba(251,191,36,.12)';
+        inner.style.borderColor = 'rgba(251,191,36,.3)';
+        inner.style.color = '#fbbf24';
+      } else if(status === 'ready' && inner){
+        shieldEl.style.display = '';
+        inner.innerHTML = '🛡 Shield ready';
+        inner.style.background = 'rgba(56,189,248,.12)';
+        inner.style.borderColor = 'rgba(56,189,248,.3)';
+        inner.style.color = '#38bdf8';
+      } else if(inner){
+        shieldEl.style.display = '';
+        inner.innerHTML = '⚠️ Read today to keep streak';
+        inner.style.background = 'rgba(239,68,68,.12)';
+        inner.style.borderColor = 'rgba(239,68,68,.3)';
+        inner.style.color = '#f87171';
+      }
+    }
+  }
+
+  // F2-H: Family Verse of the Week (only when family profiles exist).
+  const fvEl = document.getElementById('fhFamilyVerseCard');
+  if(fvEl){
+    const hasFamily = (typeof _profiles !== 'undefined' && Array.isArray(_profiles) && _profiles.length >= 2);
+    if(hasFamily){
+      const fv = (typeof getFamilyVerseOfWeek === 'function') ? getFamilyVerseOfWeek() : null;
+      if(fv){
+        fvEl.style.display = '';
+        const wkEl = document.getElementById('fhFamilyWeekNum');
+        const txEl = document.getElementById('fhFamilyVerseText');
+        const rfEl = document.getElementById('fhFamilyVerseRef');
+        if(wkEl) wkEl.textContent = fv.week;
+        if(txEl) txEl.textContent = '“' + fv.text + '”';
+        if(rfEl) rfEl.textContent = '— ' + fv.ref;
+      } else fvEl.style.display = 'none';
+    } else fvEl.style.display = 'none';
+  }
 }
 
 // ── FAITH HOME ACTIONS (F2-A) ────────────────────────────────
@@ -1989,6 +2038,7 @@ function renderFaithJourney(){
   renderPrayerList();
   renderFaithMilestones();
   renderFavVerses();
+  if(typeof renderSermonNotes === 'function') renderSermonNotes();
 }
 
 function savePrayer(type){
@@ -2861,15 +2911,70 @@ function markScriptureRead(){
   showToast('+5 scripture points ✓');
 }
 
+// F2-H: Sunday auto-protect + 1 free weekday skip per calendar week.
+// Spec §4.8 — streak forgiveness so a missed weekday doesn't kill momentum,
+// and Sundays count as "Sabbath Rest" without requiring an action.
 function getScriptureStreak(){
   let streak = 0;
   const d = new Date();
+  const weekSkipsLeft = {};   // sundayWeekKey -> 1 (initialized lazily)
   while(true){
     const ds = d.toISOString().slice(0,10);
-    if(D.scrReadDays && D.scrReadDays[ds]){ streak++; d.setDate(d.getDate()-1); }
-    else break;
+    const isSunday = d.getDay() === 0;
+    const wk = sundayWeekKey(d);
+    if(!(wk in weekSkipsLeft)) weekSkipsLeft[wk] = 1;
+
+    if(D.scrReadDays && D.scrReadDays[ds]){
+      streak++;
+      d.setDate(d.getDate() - 1);
+      continue;
+    }
+    if(isSunday){
+      // Sabbath auto-protect — counts as streak day even with no action.
+      streak++;
+      d.setDate(d.getDate() - 1);
+      continue;
+    }
+    if(weekSkipsLeft[wk] > 0){
+      weekSkipsLeft[wk]--;
+      streak++;
+      d.setDate(d.getDate() - 1);
+      continue;
+    }
+    break;
   }
   return streak;
+}
+
+// Sunday-anchored week key — Sundays start a new week per spec §4.8 ("resets Sunday").
+function sundayWeekKey(date){
+  const dt = new Date(date);
+  dt.setHours(0,0,0,0);
+  dt.setDate(dt.getDate() - dt.getDay()); // back to Sunday
+  return dt.toISOString().slice(0,10);
+}
+
+// Status for the Faith Home shield badge:
+//   'done'    — read today, shield not needed
+//   'sabbath' — today is Sunday, streak auto-protected
+//   'ready'   — current week's free skip still available
+//   'used'    — already missed a non-Sunday day this week (skip consumed)
+function getStreakShieldStatus(){
+  const today = new Date();
+  const todayDs = today.toISOString().slice(0,10);
+  if(D.scrReadDays && D.scrReadDays[todayDs]) return 'done';
+  if(today.getDay() === 0) return 'sabbath';
+  const currentWk = sundayWeekKey(today);
+  const cursor = new Date(today);
+  cursor.setDate(cursor.getDate() - 1);
+  // Walk back to the start of this week (last Sunday). Any missed weekday
+  // means the skip is already consumed.
+  while(cursor.getDay() !== 0 && sundayWeekKey(cursor) === currentWk){
+    const ds = cursor.toISOString().slice(0,10);
+    if(!D.scrReadDays || !D.scrReadDays[ds]) return 'used';
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  return 'ready';
 }
 
 function renderScripturePage(){
@@ -3060,9 +3165,10 @@ function renderPrayerList(){
   const el = document.getElementById('prList');
   if(!el) return;
   const all = (D && D.prayers) || [];
-  let items = (_prView === 'answered')
-    ? all.filter(p => p && p.answered)
-    : all.filter(p => p && !p.answered);
+  let items;
+  if(_prView === 'answered')      items = all.filter(p => p && p.answered);
+  else if(_prView === 'family')   items = all.filter(p => p && (p.privacy === 'family' || p.privacy === 'community'));
+  else                            items = all.filter(p => p && !p.answered);
   // Newest first.
   items = items.slice().sort((a,b) => {
     const ta = a.answered ? (a.answeredAt || a.answeredDate || a.date) : (a.date || '');
@@ -3070,8 +3176,17 @@ function renderPrayerList(){
     return String(tb).localeCompare(String(ta));
   });
 
+  // Family-tab count (used by the tab badge).
+  const famCount = all.filter(p => p && (p.privacy === 'family' || p.privacy === 'community')).length;
+  const fc = document.getElementById('prCountFamily');
+  if(fc) fc.textContent = famCount;
+
   if(!items.length){
-    el.innerHTML = `<div class="pr-empty">${_prView === 'answered' ? 'No answered prayers yet — celebrate them as God shows up.' : 'No active prayers yet. Add one above to begin.'}</div>`;
+    let empty;
+    if(_prView === 'answered')    empty = 'No answered prayers yet — celebrate them as God shows up.';
+    else if(_prView === 'family') empty = 'No family-shared prayers yet. Set Privacy → 👨‍👩‍👧 Family when adding one.<br><small style="opacity:.65;">Cross-account family wall lands in F3.</small>';
+    else                          empty = 'No active prayers yet. Add one above to begin.';
+    el.innerHTML = `<div class="pr-empty">${empty}</div>`;
     return;
   }
 
@@ -3894,6 +4009,162 @@ function askBibleJumpRef(ref){
     if(typeof openEsvReader === 'function') openEsvReader();
     if(verse) setTimeout(function(){ if(typeof jumpToEsvVerse === 'function') jumpToEsvVerse(verse); }, 600);
   }, 80);
+}
+
+// ═════════════════════════════════════════════════════════════
+// F2-H — SERMON NOTES + FAMILY VERSE (light Family Faith Mode)
+// ═════════════════════════════════════════════════════════════
+// Sermon Notes live in the 🌟 Journey tab. Family Verse of the Week
+// surfaces on Faith Home when D._profiles holds a parent + at least one
+// child profile. True cross-account family aggregation (family streak,
+// shared prayer wall across kids' accounts) requires a families table
+// and is part of F3.
+
+// ── SERMON NOTES ──────────────────────────────────────────────
+let _sermonEditingId = null;
+
+function openSermonNote(id){
+  _sermonEditingId = id || null;
+  const today = new Date().toISOString().slice(0,10);
+  const fields = {
+    snDate: today, snChurch: '', snSpeaker: '', snTitle: '',
+    snScriptures: '', snTakeaway: '', snNotes: '', snAction: '',
+  };
+  if(id){
+    const existing = (D.sermonNotes || []).find(s => s && s.id === id);
+    if(existing){
+      fields.snDate       = existing.date || today;
+      fields.snChurch     = existing.church || '';
+      fields.snSpeaker    = existing.speaker || '';
+      fields.snTitle      = existing.title || '';
+      fields.snScriptures = existing.scriptures || '';
+      fields.snTakeaway   = existing.takeaway || '';
+      fields.snNotes      = existing.notes || '';
+      fields.snAction     = existing.actionStep || '';
+    }
+  }
+  Object.keys(fields).forEach(k => {
+    const el = document.getElementById(k);
+    if(el) el.value = fields[k];
+  });
+  const titleEl = document.getElementById('snmTitle');
+  if(titleEl) titleEl.textContent = id ? 'Edit Sermon' : 'New Sermon';
+  const delBtn = document.getElementById('snDeleteBtn');
+  if(delBtn) delBtn.style.display = id ? '' : 'none';
+  if(typeof openModal === 'function') openModal('sermonNoteModal');
+}
+
+function closeSermonNote(){
+  if(typeof closeModal === 'function') closeModal('sermonNoteModal');
+  _sermonEditingId = null;
+}
+
+function saveSermonNote(){
+  const v = (id) => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const date    = v('snDate');
+  const takeaway = v('snTakeaway');
+  if(!date){ showToast('Date required'); return; }
+  if(!takeaway){ showToast('Add the One Big Takeaway'); return; }
+
+  const payload = {
+    date: date,
+    church:     v('snChurch'),
+    speaker:    v('snSpeaker'),
+    title:      v('snTitle'),
+    scriptures: v('snScriptures'),
+    notes:      v('snNotes'),
+    takeaway:   takeaway,
+    actionStep: v('snAction'),
+    updatedAt:  new Date().toISOString(),
+  };
+
+  if(!D.sermonNotes) D.sermonNotes = [];
+  if(_sermonEditingId){
+    const idx = D.sermonNotes.findIndex(s => s && s.id === _sermonEditingId);
+    if(idx >= 0) D.sermonNotes[idx] = Object.assign({}, D.sermonNotes[idx], payload);
+  } else {
+    payload.id = Date.now();
+    payload.createdAt = payload.updatedAt;
+    D.sermonNotes.push(payload);
+    // Streak protection — capturing a sermon counts as a faith action.
+    if(!D.scrReadDays) D.scrReadDays = {};
+    D.scrReadDays[new Date().toISOString().slice(0,10)] = true;
+    D.scrPoints = (D.scrPoints || 0) + 5;
+  }
+  save();
+  if(typeof logActivity === 'function') logActivity('faith', 'Sermon: ' + (payload.title || takeaway).slice(0, 80));
+  closeSermonNote();
+  renderSermonNotes();
+  if(typeof renderFaithHome === 'function') renderFaithHome();
+  showToast(_sermonEditingId ? 'Sermon updated' : 'Sermon saved +5 XP 📝');
+}
+
+function deleteSermonNote(){
+  if(!_sermonEditingId) return;
+  if(!confirm('Delete this sermon note?')) return;
+  D.sermonNotes = (D.sermonNotes || []).filter(s => s && s.id !== _sermonEditingId);
+  save();
+  closeSermonNote();
+  renderSermonNotes();
+  showToast('Sermon deleted');
+}
+
+function renderSermonNotes(){
+  const el = document.getElementById('sermonNotesList');
+  if(!el) return;
+  const list = (D.sermonNotes || []).slice().sort((a,b) => String(b.date || '').localeCompare(String(a.date || '')));
+  if(!list.length){
+    el.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--tx2);font-size:.78rem;font-style:italic;">No sermons yet. Tap "+ New Sermon" to capture today\'s message.</div>';
+    return;
+  }
+  // Group by month label (YYYY-MM).
+  const groups = {};
+  list.forEach(s => {
+    const k = (s.date || '').slice(0,7) || 'Undated';
+    if(!groups[k]) groups[k] = [];
+    groups[k].push(s);
+  });
+
+  const monthLabel = (k) => {
+    if(k === 'Undated') return 'Undated';
+    const [y,m] = k.split('-');
+    const dt = new Date(parseInt(y,10), parseInt(m,10) - 1, 1);
+    return dt.toLocaleDateString(undefined, { month:'long', year:'numeric' });
+  };
+
+  el.innerHTML = Object.keys(groups).sort().reverse().map(k => {
+    const cards = groups[k].map(s => {
+      const ref = [s.church, s.speaker].filter(Boolean).join(' · ');
+      return `<div onclick="openSermonNote(${s.id})" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-left:4px solid #38bdf8;border-radius:10px;padding:.65rem .8rem;margin-bottom:.4rem;cursor:pointer;">
+        <div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;font-size:.6rem;color:var(--tx2);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.25rem;">
+          <span>${s.date || ''}</span>
+          ${ref ? '<span>·</span><span>'+escapeHtml(ref)+'</span>' : ''}
+          ${s.title ? '<span>·</span><span style="color:var(--tx);text-transform:none;letter-spacing:0;font-weight:600;">'+escapeHtml(s.title)+'</span>' : ''}
+        </div>
+        <div style="font-size:.85rem;line-height:1.5;color:var(--tx);font-weight:600;margin-bottom:${s.scriptures||s.actionStep?'.3rem':'0'};">⭐ ${escapeHtml(s.takeaway || '')}</div>
+        ${s.scriptures ? '<div style="font-size:.7rem;color:#a78bfa;font-weight:700;margin-bottom:.2rem;">📖 '+escapeHtml(s.scriptures)+'</div>' : ''}
+        ${s.actionStep ? '<div style="font-size:.7rem;color:#10b981;font-weight:700;">🎯 '+escapeHtml(s.actionStep)+'</div>' : ''}
+      </div>`;
+    }).join('');
+    return `<div style="font-size:.66rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.16em;margin:.5rem 0 .35rem;">${monthLabel(k)}</div>${cards}`;
+  }).join('');
+}
+
+// ── FAMILY VERSE OF THE WEEK ──────────────────────────────────
+// Picks a verse from DAILY_SCRIPTURES seeded by year+ISO week so the same
+// verse shows for every family member (across profiles within the same
+// account) the entire week, then rotates Sunday at midnight.
+function getFamilyVerseOfWeek(){
+  if(typeof DAILY_SCRIPTURES === 'undefined' || !DAILY_SCRIPTURES.length) return null;
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 1);
+  // ISO-ish week index (Sunday-anchored to match the streak system).
+  const dayOfYear = Math.floor((now - start) / 86400000);
+  const week = Math.floor(dayOfYear / 7) + 1;
+  // Stride by 7 to give variety across the year, mod-clamp to array length.
+  const idx = (week * 7) % DAILY_SCRIPTURES.length;
+  const v = DAILY_SCRIPTURES[idx];
+  return { week: week, text: v[0], ref: v[1] };
 }
 
 // ═════════════════════════════════════════════════════════════

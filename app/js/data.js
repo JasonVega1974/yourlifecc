@@ -42,6 +42,13 @@ const DEF = {
   // module badges by module id. Full curriculum (5 modules / 18 courses /
   // ~85 lessons / quizzes / certificates) lands in F2-I.
   faithAcademyProgress:{ lessons:{}, badges:{} },
+  // F2-H sermon notes — added in 🌟 Journey tab. Each entry:
+  // { id, date, church, speaker, title, scriptures, notes, takeaway, actionStep, createdAt, updatedAt }
+  sermonNotes:[],
+  // F2-H streak-forgiveness state. weekKey is ISO YYYY-Www; skipUsed tracks
+  // whether the user already cashed in their one free weekday skip this week.
+  // Sundays are always auto-protected (Sabbath Rest) — no skip needed.
+  faithStreakState:{ weekKey:'', skipUsed:false },
   // streak / checkin
   streak:0, lastCheckin:null, checkin:{}, customHabits:[], dailyChecks:{},
   // money

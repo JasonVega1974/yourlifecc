@@ -4104,6 +4104,13 @@
       }
     </style>
 
+    <!-- Family Verse of the Week (F2-H) — surfaces only when family profiles exist -->
+    <div id="fhFamilyVerseCard" style="display:none;background:linear-gradient(135deg,#fbbf24,#fb923c);color:#0b1220;border-radius:14px;padding:.75rem 1rem;margin-bottom:.85rem;">
+      <div style="font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;margin-bottom:.2rem;opacity:.8;">👨‍👩‍👧 Family Verse · Week <span id="fhFamilyWeekNum">—</span></div>
+      <div id="fhFamilyVerseText" style="font-size:.88rem;font-weight:600;line-height:1.5;margin-bottom:.2rem;">…</div>
+      <div id="fhFamilyVerseRef" style="font-size:.74rem;font-weight:800;opacity:.78;">— …</div>
+    </div>
+
     <div class="fh-grid">
       <!-- Card 1: Verse of the Day -->
       <div class="fh-card fh-votd">
@@ -4362,6 +4369,13 @@
 
     <!-- Prayer List -->
     <div id="prayerList" style="max-height:300px;overflow-y:auto;margin-bottom:1rem;"></div>
+
+    <!-- Sermon Notes (F2-H) -->
+    <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;">
+      <span style="font-size:.8rem;font-weight:700;">📝 Sermon Notes</span>
+      <button onclick="openSermonNote()" style="margin-left:auto;background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:8px;padding:.32rem .7rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);">+ New Sermon</button>
+    </div>
+    <div id="sermonNotesList" style="margin-bottom:1rem;"></div>
 
     <!-- Faith Milestones -->
     <div style="font-size:.8rem;font-weight:700;margin-bottom:.4rem;">✨ Faith Milestones</div>
@@ -4633,9 +4647,64 @@
     <div class="pr-tabs">
       <button class="pr-tab active" data-pr-view="active"   onclick="setPrayerView('active',this)">Active <span id="prCountActive">0</span></button>
       <button class="pr-tab"        data-pr-view="answered" onclick="setPrayerView('answered',this)">Answered <span id="prCountAnswered">0</span></button>
+      <button class="pr-tab"        data-pr-view="family"   onclick="setPrayerView('family',this)">👨‍👩‍👧 Family <span id="prCountFamily">0</span></button>
     </div>
 
     <div id="prList" class="pr-list"></div>
+  </div>
+
+  <!-- ════ SERMON NOTE EDITOR MODAL (F2-H) ════ -->
+  <div id="sermonNoteModal" class="mo" onclick="if(event.target===this)closeSermonNote()">
+    <div class="md" style="max-width:540px;padding:0;">
+      <div style="padding:1rem 1.2rem .65rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid rgba(255,255,255,.06);">
+        <span style="font-size:1.2rem;">📝</span>
+        <span id="snmTitle" style="font-family:var(--fh,var(--fm));font-size:1rem;font-weight:800;letter-spacing:.04em;color:var(--tx);">Sermon Note</span>
+        <button onclick="closeSermonNote()" style="margin-left:auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.78rem;font-weight:800;">✕</button>
+      </div>
+      <div style="padding:.85rem 1.2rem;max-height:60vh;overflow-y:auto;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.5rem;">
+          <div>
+            <div style="font-size:.6rem;color:var(--tx2);font-weight:800;text-transform:uppercase;letter-spacing:.12em;margin-bottom:.2rem;">Date</div>
+            <input type="date" id="snDate" style="font-size:.82rem;">
+          </div>
+          <div>
+            <div style="font-size:.6rem;color:var(--tx2);font-weight:800;text-transform:uppercase;letter-spacing:.12em;margin-bottom:.2rem;">Church</div>
+            <input type="text" id="snChurch" placeholder="e.g. Grace Community" style="font-size:.82rem;">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.5rem;">
+          <div>
+            <div style="font-size:.6rem;color:var(--tx2);font-weight:800;text-transform:uppercase;letter-spacing:.12em;margin-bottom:.2rem;">Speaker</div>
+            <input type="text" id="snSpeaker" placeholder="Pastor's name" style="font-size:.82rem;">
+          </div>
+          <div>
+            <div style="font-size:.6rem;color:var(--tx2);font-weight:800;text-transform:uppercase;letter-spacing:.12em;margin-bottom:.2rem;">Sermon Title</div>
+            <input type="text" id="snTitle" placeholder="Series + title" style="font-size:.82rem;">
+          </div>
+        </div>
+        <div style="margin-bottom:.5rem;">
+          <div style="font-size:.6rem;color:var(--tx2);font-weight:800;text-transform:uppercase;letter-spacing:.12em;margin-bottom:.2rem;">Scripture Passages</div>
+          <input type="text" id="snScriptures" placeholder="e.g. Romans 8:28, John 14:1-6" style="font-size:.82rem;">
+        </div>
+        <div style="margin-bottom:.5rem;">
+          <div style="font-size:.6rem;color:#fbbf24;font-weight:800;text-transform:uppercase;letter-spacing:.12em;margin-bottom:.2rem;">⭐ One Big Takeaway</div>
+          <input type="text" id="snTakeaway" placeholder="The single sentence you want to remember" style="font-size:.85rem;font-weight:600;">
+        </div>
+        <div style="margin-bottom:.5rem;">
+          <div style="font-size:.6rem;color:var(--tx2);font-weight:800;text-transform:uppercase;letter-spacing:.12em;margin-bottom:.2rem;">Notes</div>
+          <textarea id="snNotes" rows="6" placeholder="Key points · quotes · stories · cross-references…" style="font-size:.85rem;line-height:1.5;font-family:var(--fm);"></textarea>
+        </div>
+        <div>
+          <div style="font-size:.6rem;color:#10b981;font-weight:800;text-transform:uppercase;letter-spacing:.12em;margin-bottom:.2rem;">🎯 Action Step</div>
+          <input type="text" id="snAction" placeholder="One concrete thing you'll do this week" style="font-size:.82rem;">
+        </div>
+      </div>
+      <div style="padding:.65rem 1.2rem 1rem;display:flex;gap:.4rem;justify-content:flex-end;flex-wrap:wrap;">
+        <button id="snDeleteBtn" onclick="deleteSermonNote()" style="display:none;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f87171;border-radius:10px;padding:.5rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">🗑 Delete</button>
+        <button onclick="closeSermonNote()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.5rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Cancel</button>
+        <button onclick="saveSermonNote()" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.5rem .9rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Save Sermon</button>
+      </div>
+    </div>
   </div>
 
   <!-- ════ MARK ANSWERED MODAL (F2-E) ════ -->
