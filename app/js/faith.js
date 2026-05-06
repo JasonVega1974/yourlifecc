@@ -439,7 +439,7 @@ function initScripture(){
 // the original 6 tabs. New tabs without renderers are stubs awaiting later phases.
 // btn is optional — when bfTab() is called programmatically (e.g., from a Quick
 // Tile or stub-panel CTA), the matching button is found via [data-bf-tab].
-const BF_TABS = ['home','devotional','jesus','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld'];
+const BF_TABS = ['home','devotional','jesus','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','timeline'];
 function bfTab(tab, btn){
   BF_TABS.forEach(t=>{
     const el = document.getElementById('bf-'+t);
@@ -460,6 +460,7 @@ function bfTab(tab, btn){
   if(tab==='memorize') renderMemorizePanel();
   if(tab==='academy') renderAcademyPanel();
   if(tab==='bibleworld') renderBibleWorld();
+  if(tab==='timeline') renderBibleTimeline();
 }
 
 // ── FAITH HOME (F2-A) ────────────────────────────────────────
@@ -5492,6 +5493,177 @@ function playFx(type){
     };
   }
 })();
+
+// ═════════════════════════════════════════════════════════════
+// F4-D — VISUAL BIBLE TIMELINE
+// ═════════════════════════════════════════════════════════════
+// Cathedral-celestial aesthetic. Events grouped by era; era bands carry
+// their own color glow; gold medallions for events; "You Are Here"
+// pulses at the present moment node. Scroll-reveal via IntersectionObserver.
+
+const TL_ERAS = [
+  { id:'patriarchs',       label:'Patriarchs',         range:'~2000-1500 BC',   color:'#a78bfa', glow:'rgba(167,139,250,.22)' },
+  { id:'exodus-conquest',  label:'Exodus & Conquest',  range:'~1450-1380 BC',   color:'#fbbf24', glow:'rgba(251,191,36,.22)' },
+  { id:'united-kingdom',   label:'United Kingdom',     range:'~1010-931 BC',    color:'#10b981', glow:'rgba(16,185,129,.22)' },
+  { id:'divided-kingdom',  label:'Divided Kingdom',    range:'931-722 BC',      color:'#fb923c', glow:'rgba(251,146,60,.22)' },
+  { id:'exile-return',     label:'Exile & Return',     range:'586-445 BC',      color:'#f472b6', glow:'rgba(244,114,182,.22)' },
+  { id:'second-temple',    label:'Second Temple',      range:'~516 BC-70 AD',   color:'#38bdf8', glow:'rgba(56,189,248,.22)' },
+  { id:'jesus-ministry',   label:"Jesus's Ministry",   range:'~6 BC-30 AD',     color:'#34d399', glow:'rgba(52,211,153,.30)' },
+  { id:'pauline-journeys', label:'Apostolic Era',      range:'~30-100 AD',      color:'#f87171', glow:'rgba(248,113,113,.22)' },
+  { id:'present',          label:'You Are Here',       range:'Now',             color:'#38bdf8', glow:'rgba(56,189,248,.32)' },
+  { id:'future',           label:"Christ's Return",    range:'When?',           color:'#fbbf24', glow:'rgba(251,191,36,.32)' },
+];
+
+function _tlEvents(){ return (typeof window !== 'undefined' && window.BIBLE_TIMELINE_EVENTS) ? window.BIBLE_TIMELINE_EVENTS : []; }
+function _tlEventById(id){ return _tlEvents().find(e => e && e.id === id) || null; }
+function _tlEraById(id){ return TL_ERAS.find(e => e && e.id === id) || null; }
+
+function renderBibleTimeline(){
+  const rail = document.getElementById('tlRail');
+  const legend = document.getElementById('tlLegend');
+  if(!rail) return;
+  if(rail.dataset.tlBuilt){
+    // Re-trigger reveal on revisit so it feels alive each time.
+    rail.querySelectorAll('.tl-event').forEach(el => {
+      el.classList.remove('reveal');
+      void el.offsetWidth;
+      el.classList.add('reveal');
+    });
+    return;
+  }
+
+  const events = _tlEvents();
+
+  // Group events by era, preserving curriculum order.
+  const groups = {};
+  events.forEach(ev => {
+    const eraId = ev.era || 'patriarchs';
+    if(!groups[eraId]) groups[eraId] = [];
+    groups[eraId].push(ev);
+  });
+
+  // Build era bands in TL_ERAS order so visually they read left-to-right
+  // through history. Skip eras with no events but keep ordering stable.
+  rail.innerHTML = TL_ERAS.map(era => {
+    const list = groups[era.id] || [];
+    if(!list.length) return '';
+    const eventsHtml = list.map((ev, idx) => {
+      const isNow = ev.id === 'present';
+      return `<div class="tl-event" tabindex="0" role="button" aria-label="${_tlEsc(ev.title)}" onclick="openTimelineEvent('${ev.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openTimelineEvent('${ev.id}')}" style="animation-delay:${(idx+1)*70}ms;">
+        <div class="tl-medallion${isNow?' now':''}" aria-hidden="true">${ev.icon}</div>
+        <div class="tl-year">${_tlEsc(ev.displayYear)}</div>
+        <div class="tl-event-title">${_tlEsc(ev.title)}</div>
+      </div>`;
+    }).join('');
+    return `<section class="tl-era-band" data-era="${era.id}" style="--era-color:${era.color};--era-glow:${era.glow};">
+      <div class="tl-era-label">${_tlEsc(era.label)}</div>
+      <div class="tl-era-range">${_tlEsc(era.range)}</div>
+      <div style="position:relative;">
+        <div class="tl-thread" aria-hidden="true"></div>
+        <div class="tl-events">${eventsHtml}</div>
+      </div>
+    </section>`;
+  }).join('');
+
+  rail.dataset.tlBuilt = '1';
+
+  // Legend below the stage — tappable era chips that scroll the rail.
+  if(legend){
+    legend.innerHTML = TL_ERAS.filter(era => groups[era.id] && groups[era.id].length).map(era =>
+      `<button class="tl-legend-chip" onclick="scrollTimelineTo('${era.id}')">
+        <span class="tl-legend-dot" style="background:${era.color};"></span>
+        ${_tlEsc(era.label)}
+      </button>`
+    ).join('');
+  }
+
+  // IntersectionObserver — events fade up as they scroll into view.
+  // Falls back gracefully on browsers without IO (animations just play immediately).
+  if('IntersectionObserver' in window){
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting){
+          entry.target.classList.add('reveal');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { root: document.getElementById('tlRailWrap'), threshold: 0.4 });
+    rail.querySelectorAll('.tl-event').forEach(el => io.observe(el));
+  } else {
+    rail.querySelectorAll('.tl-event').forEach(el => el.classList.add('reveal'));
+  }
+
+  // Scroll the rail so "You Are Here" is centered on first render —
+  // helps users orient immediately to where they live in the story.
+  setTimeout(() => {
+    const present = rail.querySelector('[data-era="present"]');
+    const wrap = document.getElementById('tlRailWrap');
+    if(present && wrap){
+      const offset = present.offsetLeft - wrap.offsetWidth / 2 + present.offsetWidth / 2;
+      wrap.scrollTo({ left: Math.max(0, offset - 80), behavior: 'smooth' });
+    }
+  }, 200);
+}
+
+function scrollTimelineTo(eraId){
+  const rail = document.getElementById('tlRail');
+  const wrap = document.getElementById('tlRailWrap');
+  if(!rail || !wrap) return;
+  const band = rail.querySelector('[data-era="'+eraId+'"]');
+  if(!band) return;
+  const offset = band.offsetLeft - 16;
+  wrap.scrollTo({ left: Math.max(0, offset), behavior: 'smooth' });
+}
+
+function openTimelineEvent(eventId){
+  const ev = _tlEventById(eventId);
+  if(!ev){ showToast('Event not found'); return; }
+  const era = _tlEraById(ev.era) || { label:'—', color:'#a78bfa', glow:'rgba(167,139,250,.22)' };
+
+  // Header glow tinted by era.
+  const glow = document.getElementById('tlEventEraGlow');
+  if(glow) glow.style.background = 'radial-gradient(ellipse at 50% 100%, ' + era.glow.replace('.22)','.4)').replace('.30)','.5)').replace('.32)','.5)') + ' 0%, transparent 65%)';
+  document.getElementById('tlEventMedallion').textContent = ev.icon || '⭐';
+  document.getElementById('tlEventEra').textContent = era.label.toUpperCase();
+  document.getElementById('tlEventYear').textContent = ev.displayYear || '';
+  document.getElementById('tlEventTitle').textContent = ev.title || '';
+  document.getElementById('tlEventSubtitle').textContent = ev.subtitle || '';
+  document.getElementById('tlEventBody').innerHTML = ev.body || '';
+
+  // Scripture refs as cyan chips that jump into the Bible reader.
+  const refsEl = document.getElementById('tlEventRefs');
+  if(refsEl){
+    if((ev.scriptureRefs || []).length){
+      refsEl.innerHTML = ev.scriptureRefs.map(r =>
+        '<button onclick="bwJumpToRef(\''+r.replace(/\'/g,"\\'")+'\')" style="background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.4);color:#7dd3fc;border-radius:99px;padding:.3rem .7rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);">📖 '+_tlEsc(r)+'</button>'
+      ).join('');
+    } else refsEl.innerHTML = '';
+  }
+
+  // Related site link if any.
+  const siteEl = document.getElementById('tlEventSite');
+  if(siteEl){
+    if(ev.relatedSiteId){
+      const s = _bwSiteById(ev.relatedSiteId);
+      if(s){
+        siteEl.innerHTML = '<button onclick="closeTimelineEvent();openBwSite(\''+ev.relatedSiteId+'\')" style="width:100%;background:linear-gradient(135deg,rgba(167,139,250,.15),rgba(167,139,250,.05));border:1px solid rgba(167,139,250,.35);color:#c4b5fd;border-radius:10px;padding:.55rem .85rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);text-align:left;display:flex;align-items:center;gap:.5rem;">📍 <span style="flex:1;">Visit <strong style="color:#fff;">'+_tlEsc(s.name)+'</strong> in Bible Lands</span><span style="opacity:.6;">→</span></button>';
+      } else siteEl.innerHTML = '';
+    } else siteEl.innerHTML = '';
+  }
+
+  if(typeof openModal === 'function') openModal('tlEventModal');
+  if(typeof logActivity === 'function') logActivity('faith', 'Timeline event: ' + ev.title);
+}
+
+function closeTimelineEvent(){
+  if(typeof closeModal === 'function') closeModal('tlEventModal');
+}
+
+function _tlEsc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  })[c]);
+}
 
 // ═════════════════════════════════════════════════════════════
 // F4-I — FAITH HOME ENTRANCE ANIMATION

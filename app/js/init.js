@@ -335,7 +335,7 @@ function finishInit(cloudReady){
   (function(){
     // F2-A: 'home' is the default landing tab. Hide all other panels;
     // the first tab in the bar (Home) is set active via its data-bf-tab.
-    var BF=["home","devotional","jesus","learnBible","reading","bible","journey","plans","prayer","memorize","academy"];
+    var BF=["home","devotional","jesus","learnBible","reading","bible","journey","plans","prayer","memorize","academy","bibleworld","timeline"];
     BF.forEach(function(t){
       var el=document.getElementById("bf-"+t);
       if(el) el.style.display=t==="home"?"block":"none";
