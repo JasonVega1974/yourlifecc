@@ -707,8 +707,8 @@ function openVerseCard(text, ref){
     const isOcean = b.getAttribute('data-vc-tpl') === 'ocean';
     b.classList.toggle('active', isOcean);
     if(isOcean){
-      b.style.background = 'linear-gradient(135deg,#38bdf8,#a78bfa)';
-      b.style.color      = '#0b1220';
+      b.style.background = 'var(--cd-banner)';
+      b.style.color      = 'var(--cd-banner-text)';
       b.style.border     = 'none';
       b.style.fontWeight = '800';
     } else {
@@ -736,7 +736,7 @@ function vcSetTemplate(tpl, btn){
     const isActive = b === btn;
     b.classList.toggle('active', isActive);
     if(isActive){
-      const bg = (tpl === 'ocean')   ? 'linear-gradient(135deg,#38bdf8,#a78bfa)'
+      const bg = (tpl === 'ocean')   ? 'var(--cd-banner)'
               : (tpl === 'sunrise') ? 'linear-gradient(135deg,#fbbf24,#fb923c)'
               : '#fff';
       const color = (tpl === 'minimal') ? '#0b1220' : '#0b1220';
@@ -1392,7 +1392,7 @@ async function openEsvReader(){
   document.getElementById('charIcon').textContent = icon;
   document.getElementById('charTitle').textContent = book;
   document.getElementById('charSub').textContent = 'Chapter '+chNum+' · English Standard Version (ESV)';
-  document.getElementById('charModalHeader').style.background = 'linear-gradient(135deg,#38bdf8,#a78bfa)';
+  document.getElementById('charModalHeader').style.background = 'var(--cd-banner)';
   document.getElementById('charBody').innerHTML = '<div style="text-align:center;padding:2rem;color:var(--tx2);font-size:.85rem;">⏳ Loading '+book+' '+chNum+'...</div>';
   document.getElementById('charQuiz').innerHTML = '';
   openModal('charModal');
@@ -1820,7 +1820,7 @@ function openReaderSettings(){
     const v = settings[prop];
     const sel = document.querySelector('#readerSettingsModal .rs-opt[data-rs="'+map[prop]+':'+v+'"]');
     if(sel){
-      sel.style.background = 'linear-gradient(135deg,#38bdf8,#a78bfa)';
+      sel.style.background = 'var(--cd-banner)';
       sel.style.borderColor = 'transparent';
       sel.style.color = '#0b1220';
     }
@@ -1840,7 +1840,7 @@ function rsSet(prop, value, btn){
   const groupKey = ({ 'fontSize':'size', 'lineHeight':'line', 'fontFamily':'family' })[prop];
   document.querySelectorAll('#readerSettingsModal .rs-opt[data-rs^="'+groupKey+':"]').forEach(function(b){
     if(b === btn){
-      b.style.background = 'linear-gradient(135deg,#38bdf8,#a78bfa)';
+      b.style.background = 'var(--cd-banner)';
       b.style.borderColor = 'transparent';
       b.style.color = '#0b1220';
     } else {
@@ -2610,13 +2610,13 @@ function openBFLesson(type, idx){
   // Brand-palette gradients (purple-purge from KC port). Per-module hue:
   // Foundations of Faith → cyan→violet, Bible Survey → cyan→green.
   const gradients = {
-    jesus: 'linear-gradient(135deg,#38bdf8,#a78bfa)',
+    jesus: 'var(--cd-banner)',
     learn: 'linear-gradient(135deg,#38bdf8,#10b981)',
   };
   document.getElementById('charIcon').textContent = l.icon;
   document.getElementById('charTitle').textContent = l.title;
   document.getElementById('charSub').textContent = type==='jesus'?'Foundations of Faith':'Bible Survey';
-  document.getElementById('charModalHeader').style.background = gradients[type]||'linear-gradient(135deg,#38bdf8,#a78bfa)';
+  document.getElementById('charModalHeader').style.background = gradients[type]||'var(--cd-banner)';
   // Body + Mark-Complete CTA. The CTA fires academyMarkLesson() which records
   // completion in D.faithAcademyProgress and awards +5 Faith XP.
   const lessonId = type + ':' + idx;
@@ -2624,7 +2624,7 @@ function openBFLesson(type, idx){
   const ctaHtml = done
     ? `<div style="margin-top:1.2rem;padding:.75rem;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);border-radius:10px;text-align:center;font-size:.78rem;font-weight:700;color:#10b981;">✅ Lesson complete · +5 XP earned</div>`
     : `<div style="margin-top:1.2rem;text-align:center;">
-         <button onclick="academyMarkLesson('${type}',${idx})" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.6rem 1.4rem;font-size:.82rem;font-weight:800;cursor:pointer;font-family:var(--fm);">✅ Mark Lesson Complete +5 XP</button>
+         <button onclick="academyMarkLesson('${type}',${idx})" style="background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.6rem 1.4rem;font-size:.82rem;font-weight:800;cursor:pointer;font-family:var(--fm);">✅ Mark Lesson Complete +5 XP</button>
        </div>`;
   document.getElementById('charBody').innerHTML = l.body + ctaHtml;
   document.getElementById('charQuiz').innerHTML = '';
@@ -3573,8 +3573,8 @@ function mvSetQuizMode(mode, btn){
     const isActive = b === btn;
     b.classList.toggle('active', isActive);
     if(isActive){
-      b.style.background = 'linear-gradient(135deg,#38bdf8,#a78bfa)';
-      b.style.color = '#0b1220';
+      b.style.background = 'var(--cd-banner)';
+      b.style.color = 'var(--cd-banner-text)';
       b.style.border = 'none';
       b.style.fontWeight = '800';
     } else {
@@ -3592,8 +3592,8 @@ function _mvSyncQuizModeChips(){
     const isActive = b.getAttribute('data-mvq-mode') === _mvQuizMode;
     b.classList.toggle('active', isActive);
     if(isActive){
-      b.style.background = 'linear-gradient(135deg,#38bdf8,#a78bfa)';
-      b.style.color = '#0b1220';
+      b.style.background = 'var(--cd-banner)';
+      b.style.color = 'var(--cd-banner-text)';
       b.style.border = 'none';
       b.style.fontWeight = '800';
     } else {
@@ -3649,7 +3649,7 @@ function _mvRenderQuestion(){
       <div style="font-family:var(--fh,var(--fm));font-size:1.4rem;font-weight:800;color:var(--tx);margin-bottom:.4rem;">${_mvQuizCorrect} / ${total} correct</div>
       <div style="font-size:.85rem;color:var(--tx2);line-height:1.5;">${pct >= 80 ? 'Outstanding session — Scripture is sticking.' : pct >= 50 ? 'Solid work. Repetition is the key — come back tomorrow.' : 'Memorization is a long game. Show up again tomorrow.'}</div>
     </div>`;
-    footer.innerHTML = `<button onclick="mvCloseQuiz()" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Done</button>`;
+    footer.innerHTML = `<button onclick="mvCloseQuiz()" style="background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Done</button>`;
     return;
   }
 
@@ -3676,7 +3676,7 @@ function _mvRenderQuestion(){
     `;
     footer.innerHTML = `
       <button onclick="mvCloseQuiz()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.5rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">End Session</button>
-      <button onclick="_mvSubmitAnswer(${JSON.stringify(hiddenWords).replace(/"/g,'&quot;')})" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.5rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Check ✓</button>
+      <button onclick="_mvSubmitAnswer(${JSON.stringify(hiddenWords).replace(/"/g,'&quot;')})" style="background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.5rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Check ✓</button>
     `;
   } else if(_mvQuizMode === 'recite'){
     body.innerHTML = `
@@ -3687,7 +3687,7 @@ function _mvRenderQuestion(){
     `;
     footer.innerHTML = `
       <button onclick="mvCloseQuiz()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.5rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">End Session</button>
-      <button onclick="_mvSubmitAnswer(null)" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.5rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Check ✓</button>
+      <button onclick="_mvSubmitAnswer(null)" style="background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.5rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Check ✓</button>
     `;
   } else { // 'choice'
     // Build 3 distractors from other library/queue verses.
@@ -3762,7 +3762,7 @@ function _mvShowFeedback(v, correct){
   `;
   footer.innerHTML = `
     <button onclick="mvCloseQuiz()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.5rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">End Session</button>
-    <button onclick="_mvNextQuestion()" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.5rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Next →</button>
+    <button onclick="_mvNextQuestion()" style="background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.5rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Next →</button>
   `;
 }
 
@@ -3842,7 +3842,7 @@ function _abRenderCrisis(){
       <div style="font-family:var(--fh,var(--fm));font-size:1.05rem;font-weight:800;color:var(--tx);margin-bottom:.4rem;letter-spacing:.02em;">You are not alone — please reach out right now.</div>
       <div style="font-size:.85rem;color:var(--tx);line-height:1.55;margin-bottom:.7rem;">If you are in immediate danger, call <strong>911</strong>. To talk to someone right now, call or text <strong>988</strong> — the Suicide &amp; Crisis Lifeline (USA, 24/7, free, confidential).</div>
       <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.7rem;">
-        <a href="tel:988" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:800;font-family:var(--fm);text-decoration:none;">📞 Call 988</a>
+        <a href="tel:988" style="background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:800;font-family:var(--fm);text-decoration:none;">📞 Call 988</a>
         <a href="sms:988" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:var(--tx);border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:700;font-family:var(--fm);text-decoration:none;">💬 Text 988</a>
       </div>
       <div style="background:rgba(167,139,250,.05);border-left:3px solid #a78bfa;border-radius:0 8px 8px 0;padding:.6rem .8rem;font-style:italic;color:var(--tx2);font-size:.82rem;line-height:1.6;">"The LORD is near to the brokenhearted and saves the crushed in spirit." — Psalm 34:18</div>
@@ -4342,7 +4342,7 @@ function _acCourseHtml(mod, course, store){
   } else if(quizPassed){
     quizCta = `<button onclick="acIssueCertificate('${course.id}')" style="background:linear-gradient(135deg,#10b981,#34d399);color:#0b1220;border:none;border-radius:8px;padding:.4rem .8rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🏆 Get Certificate</button>`;
   } else if(allLessonsDone){
-    quizCta = `<button onclick="acStartQuiz('${course.id}')" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:8px;padding:.4rem .8rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);">❓ Start Quiz</button>`;
+    quizCta = `<button onclick="acStartQuiz('${course.id}')" style="background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:8px;padding:.4rem .8rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);">❓ Start Quiz</button>`;
   } else {
     quizCta = `<span style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--tx3);border-radius:8px;padding:.4rem .8rem;font-size:.66rem;font-weight:700;cursor:not-allowed;">🔒 Finish lessons to unlock quiz</span>`;
   }
@@ -4493,7 +4493,7 @@ function _acRenderQuizQuestion(){
     footer.innerHTML = passed
       ? `<button onclick="acIssueCertificate('${_acQuizState.courseId}')" style="background:linear-gradient(135deg,#10b981,#34d399);color:#0b1220;border:none;border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🏆 Get Certificate</button>
         <button onclick="acCloseQuiz()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.55rem 1rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Close</button>`
-      : `<button onclick="acStartQuiz('${_acQuizState.courseId}')" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Try Again</button>
+      : `<button onclick="acStartQuiz('${_acQuizState.courseId}')" style="background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Try Again</button>
         <button onclick="acCloseQuiz()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.55rem 1rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Close</button>`;
     renderAcademyPanel();
     if(typeof renderFaithHome === 'function') renderFaithHome();
@@ -4551,7 +4551,7 @@ function _acAnswerQuiz(choiceIdx){
     ${q.explanation ? '<div style="margin-top:.7rem;background:rgba(56,189,248,.06);border-left:3px solid #38bdf8;border-radius:0 8px 8px 0;padding:.6rem .8rem;font-size:.78rem;line-height:1.55;color:var(--tx2);"><strong style="color:#38bdf8;">Why:</strong> ' + escapeHtml(q.explanation) + '</div>' : ''}`;
   const isLast = (_acQuizState.idx + 1 >= total);
   footer.innerHTML = `<button onclick="acCloseQuiz()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.5rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">End Session</button>
-    <button onclick="_acQuizNext()" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.5rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">${isLast?'See Results →':'Next →'}</button>`;
+    <button onclick="_acQuizNext()" style="background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.5rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">${isLast?'See Results →':'Next →'}</button>`;
 }
 
 function _acQuizNext(){
@@ -4868,8 +4868,8 @@ function bwFilter(eraId, btn){
   if(btn){
     btn.classList.add('active');
     if(eraId === 'all'){
-      btn.style.background = 'linear-gradient(135deg,#38bdf8,#a78bfa)';
-      btn.style.color = '#0b1220';
+      btn.style.background = 'var(--cd-banner)';
+      btn.style.color = 'var(--cd-banner-text)';
       btn.style.borderColor = 'transparent';
     } else {
       const p = _bwPeriodById(eraId);

@@ -9,6 +9,21 @@
   --bg:#0d1117;--s1:#161b27;--s2:#1c2333;--s3:#232d42;--s4:#2a3652;
   --c:#38bdf8;--g:#fbbf24;--gr:#34d399;--p:#a78bfa;--pk:#f472b6;--or:#fb923c;
   --tx:#f1f5f9;--tx2:#94a3b8;--tx3:#64748b;--mt:#64748b;--br:rgba(56,189,248,0.15);--r:14px;
+  /* ── UNIFIED CARD/BANNER SYSTEM (Settings → Card Style) ──────
+     Default: Kingdom — purple gradient + purple glow, matching the
+     Christian Life Guide and Worship Playlist sections. Toggle in
+     Settings sets data-card-theme="brand" on <html> to swap to the
+     cyan/violet brand palette. */
+  --cd-banner: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --cd-banner-text: #ffffff;
+  --cd-banner-text-muted: rgba(255,255,255,.78);
+  --cd-banner-shadow: 0 10px 40px rgba(124,58,237,.25);
+  --cd-card-bg: rgba(255,255,255,.03);
+  --cd-card-border: 1.5px solid rgba(124,58,237,.35);
+  --cd-card-border-hover: rgba(124,58,237,.65);
+  --cd-card-shadow: 0 10px 30px rgba(15,23,42,.10), 0 18px 55px rgba(124,58,237,.14);
+  --cd-card-shadow-hover: 0 14px 40px rgba(15,23,42,.14), 0 26px 75px rgba(124,58,237,.22);
+  --cd-card-radius: 16px;
   --fh:'Bebas Neue',sans-serif;--fm:'Inter',sans-serif;--fn:'Orbitron',sans-serif;--f:'Inter',sans-serif;
   --card-shadow:0 4px 24px rgba(0,0,0,.5);
   --sidebar:220px;
@@ -2298,4 +2313,39 @@ body.child-view:not(.parent-unlocked) #sideSignOutBtn                           
 :root.light .hero-name,
 :root.light .hero-date {
   color: var(--tx) !important;
+}
+
+/* ─── UNIFIED CARD / BANNER SYSTEM ─────────────────────────────
+   Brand alternative — Settings → Card Style flips this on. */
+:root[data-card-theme="brand"]{
+  --cd-banner: linear-gradient(135deg, #38bdf8 0%, #a78bfa 100%);
+  --cd-banner-text: #0b1220;
+  --cd-banner-text-muted: rgba(11,18,32,.7);
+  --cd-banner-shadow: 0 10px 40px rgba(56,189,248,.22);
+  --cd-card-border: 1.5px solid rgba(56,189,248,.35);
+  --cd-card-border-hover: rgba(56,189,248,.65);
+  --cd-card-shadow: 0 10px 30px rgba(15,23,42,.10), 0 18px 55px rgba(56,189,248,.14);
+  --cd-card-shadow-hover: 0 14px 40px rgba(15,23,42,.14), 0 26px 75px rgba(56,189,248,.22);
+}
+
+/* Banner — used for tab heroes, modal headers, big CTAs. */
+.ylcc-banner{
+  background: var(--cd-banner);
+  color: var(--cd-banner-text);
+  border-radius: 18px;
+  box-shadow: var(--cd-banner-shadow);
+}
+
+/* Card — Christian Life Guide style: subtle bg, purple glow, hover lift. */
+.ylcc-card{
+  background: var(--cd-card-bg);
+  border: var(--cd-card-border);
+  border-radius: var(--cd-card-radius);
+  box-shadow: var(--cd-card-shadow);
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+.ylcc-card:hover{
+  transform: translateY(-4px);
+  border-color: var(--cd-card-border-hover);
+  box-shadow: var(--cd-card-shadow-hover);
 }

@@ -4930,6 +4930,37 @@ function applyTheme(){
   const isLight = D.theme === 'light';
   document.documentElement.classList.toggle('light', isLight);
   updateThemeBtn();
+  applyCardTheme();
+}
+
+// F3-X — Card Style: 'kingdom' (purple gradient banners + glow) is the
+// default that matches Christian Life Guide and Worship Playlist. 'brand'
+// switches every banner/modal/card-shadow to brand cyan/violet.
+function applyCardTheme(){
+  const theme = (D && D.cardTheme === 'brand') ? 'brand' : 'kingdom';
+  const html = document.documentElement;
+  if(theme === 'brand') html.setAttribute('data-card-theme', 'brand');
+  else html.removeAttribute('data-card-theme');
+  // Reflect on the Settings buttons.
+  const k = document.getElementById('cardThemeKingdom');
+  const b = document.getElementById('cardThemeBrand');
+  if(k && b){
+    if(theme === 'kingdom'){
+      k.style.outline = '2px solid #fff'; k.style.outlineOffset = '2px';
+      b.style.outline = ''; b.style.outlineOffset = '';
+    } else {
+      b.style.outline = '2px solid #38bdf8'; b.style.outlineOffset = '2px';
+      k.style.outline = ''; k.style.outlineOffset = '';
+    }
+  }
+}
+
+function setCardTheme(theme, btn){
+  if(theme !== 'kingdom' && theme !== 'brand') return;
+  if(!D) return;
+  D.cardTheme = theme;
+  if(typeof save === 'function') save();
+  applyCardTheme();
 }
 // ── TUTORIAL ─────────────────────────────────────────────────
 

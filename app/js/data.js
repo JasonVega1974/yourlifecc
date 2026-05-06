@@ -8,7 +8,7 @@
 
 const DEF = {
   // identity
-  name:'', mode:'high', theme:'', palette:'', heroBg:'', heroBgPreset:'', appBgPreset:'',
+  name:'', mode:'high', theme:'', palette:'', heroBg:'', heroBgPreset:'', appBgPreset:'', cardTheme:'kingdom',
   heroCustomMsg:'', bannerMode:'', faithMode:true, hideScripture:false,
   // profile
   profile:{age:'',sex:'',education:'',parentMode:false,parentName:'',parentEmail:''},

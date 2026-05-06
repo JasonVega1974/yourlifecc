@@ -314,6 +314,13 @@
       <div class="palette-swatch" id="ps-sage" data-palette="sage" style="background:linear-gradient(135deg,#eef2eb 0%,#eef2eb 50%,#5a7a5b 50%,#5a7a5b 100%);border:1.5px solid rgba(90,122,91,.3);" onclick="setPalette('sage',this)" title="Sage Family"></div>
       <div class="palette-swatch" id="ps-teal" data-palette="teal" style="background:linear-gradient(135deg,#f2f5f6 0%,#f2f5f6 50%,#5e8a8a 50%,#5e8a8a 100%);border:1.5px solid rgba(94,138,138,.3);" onclick="setPalette('teal',this)" title="Dusty Teal"></div>
     </div>
+    <!-- Card Style — unified banner/card visual system -->
+    <div style="font-size:.65rem;font-weight:700;color:var(--tx2);margin-bottom:.35rem;">Card Style <span style="color:var(--tx3);font-weight:400;font-size:.6rem;">(banners, cards, modals)</span></div>
+    <div style="display:flex;gap:.4rem;margin-bottom:.7rem;">
+      <button id="cardThemeKingdom" onclick="setCardTheme('kingdom',this)" style="flex:1;padding:.5rem;border-radius:8px;border:1px solid rgba(124,58,237,.4);background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:.74rem;cursor:pointer;font-weight:700;font-family:var(--fm);">👑 Kingdom</button>
+      <button id="cardThemeBrand" onclick="setCardTheme('brand',this)" style="flex:1;padding:.5rem;border-radius:8px;border:1px solid rgba(56,189,248,.3);background:rgba(56,189,248,.1);color:#38bdf8;font-size:.74rem;cursor:pointer;font-weight:700;font-family:var(--fm);">✨ Brand</button>
+    </div>
+
     <!-- Banner Colors — visible to children -->
     <div style="font-size:.65rem;font-weight:700;color:var(--tx2);margin-bottom:.3rem;">🎨 Banner Color</div>
     <div class="swatch-row" style="display:flex;gap:.25rem;margin-bottom:.7rem;overflow-x:auto;padding-bottom:.2rem;">
@@ -4065,12 +4072,12 @@
       #bf-home .fh-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.85rem;}
       #bf-home .fh-card-hdr{display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem;font-size:.78rem;font-weight:800;color:var(--tx);letter-spacing:.02em;}
       #bf-home .fh-card-sub{color:var(--tx2);font-weight:600;font-size:.72rem;margin-left:auto;}
-      #bf-home .fh-btn{background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.55rem .95rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);transition:transform .15s,box-shadow .15s;}
+      #bf-home .fh-btn{background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.55rem .95rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);transition:transform .15s,box-shadow .15s;}
       #bf-home .fh-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(56,189,248,.25);}
       #bf-home .fh-btn-ghost{background:rgba(255,255,255,.06);color:var(--tx);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.55rem .9rem;font-size:.76rem;font-weight:700;cursor:pointer;font-family:var(--fm);}
       #bf-home .fh-btn-ghost:hover{background:rgba(255,255,255,.1);}
       /* Card 1 — VOTD */
-      #bf-home .fh-votd{background:linear-gradient(135deg,#38bdf8,#a78bfa);border:none;color:#0b1220;}
+      #bf-home .fh-votd{background:var(--cd-banner);border:none;color:var(--cd-banner-text);box-shadow:var(--cd-banner-shadow);}
       #bf-home .fh-votd-eyebrow{font-size:.58rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;opacity:.78;margin-bottom:.4rem;}
       #bf-home .fh-votd-text{font-family:var(--fh,var(--fm));font-size:1.05rem;font-weight:600;line-height:1.55;margin-bottom:.5rem;}
       #bf-home .fh-votd-ref{font-size:.78rem;font-weight:800;opacity:.85;margin-bottom:.85rem;}
@@ -4300,7 +4307,7 @@
   <!-- ESV BIBLE READER (F2-D upgraded) -->
   <div id="bf-bible" style="display:none;">
     <!-- Header bar (brand-palette gradient — F2-D purge of leftover purple) -->
-    <div style="background:linear-gradient(135deg,#38bdf8,#a78bfa);border-radius:14px;padding:1rem 1.2rem;margin-bottom:.9rem;text-align:center;color:#0b1220;">
+    <div style="background:var(--cd-banner);border-radius:14px;padding:1rem 1.2rem;margin-bottom:.9rem;text-align:center;color:var(--cd-banner-text);box-shadow:var(--cd-banner-shadow);">
       <div style="font-size:1.1rem;font-weight:900;margin-bottom:.2rem;">📜 The Holy Bible</div>
       <div style="font-size:.7rem;opacity:.78;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;">English Standard Version (ESV)</div>
     </div>
@@ -4310,7 +4317,7 @@
       <div style="display:flex;gap:.4rem;align-items:center;">
         <span style="font-size:.95rem;">🔍</span>
         <input type="text" id="esvSearchInput" placeholder="Search the Bible or your notes…" onkeydown="if(event.key==='Enter')runEsvSearch()" style="flex:1;font-size:.78rem;padding:.42rem .6rem;border-radius:8px;background:var(--input-bg);border:1px solid var(--input-border);color:var(--tx);">
-        <button onclick="runEsvSearch()" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:8px;padding:.42rem .85rem;font-size:.74rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Search</button>
+        <button onclick="runEsvSearch()" style="background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:8px;padding:.42rem .85rem;font-size:.74rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Search</button>
       </div>
       <div id="esvSearchResults" style="margin-top:.55rem;display:none;max-height:300px;overflow-y:auto;"></div>
     </div>
@@ -4374,7 +4381,7 @@
     <!-- Sermon Notes (F2-H) -->
     <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;">
       <span style="font-size:.8rem;font-weight:700;">📝 Sermon Notes</span>
-      <button onclick="openSermonNote()" style="margin-left:auto;background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:8px;padding:.32rem .7rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);">+ New Sermon</button>
+      <button onclick="openSermonNote()" style="margin-left:auto;background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:8px;padding:.32rem .7rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);">+ New Sermon</button>
     </div>
     <div id="sermonNotesList" style="margin-bottom:1rem;"></div>
 
@@ -4394,17 +4401,17 @@
   <!-- ════ READING PLANS (F2-B) ════ -->
   <div id="bf-plans" style="display:none;">
     <style>
-      #bf-plans .pl-hero{background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(167,139,250,.08));border:1px solid rgba(167,139,250,.22);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.85rem;}
-      #bf-plans .pl-hero-title{font-family:var(--fh,var(--fm));font-size:1.05rem;font-weight:800;color:var(--tx);margin-bottom:.25rem;letter-spacing:.02em;}
-      #bf-plans .pl-hero-sub{font-size:.78rem;color:var(--tx2);line-height:1.55;}
+      #bf-plans .pl-hero{background:var(--cd-banner);color:var(--cd-banner-text);box-shadow:var(--cd-banner-shadow);border:none;border-radius:16px;padding:1.05rem 1.15rem;margin-bottom:.85rem;}
+      #bf-plans .pl-hero-title{font-family:var(--fh,var(--fm));font-size:1.05rem;font-weight:800;color:inherit;margin-bottom:.25rem;letter-spacing:.02em;}
+      #bf-plans .pl-hero-sub{font-size:.78rem;color:var(--cd-banner-text-muted);line-height:1.55;}
       #bf-plans .pl-filters{display:flex;gap:.4rem;margin-bottom:.85rem;overflow-x:auto;padding-bottom:.2rem;}
       #bf-plans .pl-chip{flex-shrink:0;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--tx2);border-radius:99px;padding:.32rem .8rem;font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fm);transition:all .15s;}
       #bf-plans .pl-chip:hover{background:rgba(255,255,255,.08);}
-      #bf-plans .pl-chip.active{background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border-color:transparent;}
+      #bf-plans .pl-chip.active{background:var(--cd-banner);color:var(--cd-banner-text);border-color:transparent;}
       #bf-plans .pl-section-hdr{font-size:.68rem;font-weight:800;color:var(--tx3);text-transform:uppercase;letter-spacing:.16em;margin:.85rem 0 .5rem;}
       #bf-plans .pl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.6rem;}
-      #bf-plans .pl-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-left-width:4px;border-radius:14px;padding:.85rem 1rem;cursor:pointer;transition:transform .15s,background .15s,border-color .15s;}
-      #bf-plans .pl-card:hover{transform:translateY(-2px);background:rgba(255,255,255,.06);}
+      #bf-plans .pl-card{background:var(--cd-card-bg);border:var(--cd-card-border);border-left-width:4px;border-radius:var(--cd-card-radius);padding:.85rem 1rem;cursor:pointer;box-shadow:var(--cd-card-shadow);transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;}
+      #bf-plans .pl-card:hover{transform:translateY(-4px);box-shadow:var(--cd-card-shadow-hover);}
       #bf-plans .pl-card-top{display:flex;align-items:center;gap:.5rem;margin-bottom:.35rem;}
       #bf-plans .pl-card-icon{font-size:1.4rem;}
       #bf-plans .pl-card-title{font-size:.88rem;font-weight:800;color:var(--tx);line-height:1.3;}
@@ -4413,7 +4420,7 @@
       #bf-plans .pl-card-cta{display:flex;justify-content:space-between;align-items:center;font-size:.7rem;}
       #bf-plans .pl-card-status{color:var(--tx3);font-weight:700;}
       #bf-plans .pl-card-arrow{font-weight:800;}
-      #bf-plans .pl-active-banner{background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border-radius:14px;padding:.75rem 1rem;margin-bottom:.75rem;display:flex;align-items:center;gap:.6rem;}
+      #bf-plans .pl-active-banner{background:var(--cd-banner);color:var(--cd-banner-text);border-radius:14px;padding:.75rem 1rem;margin-bottom:.75rem;display:flex;align-items:center;gap:.6rem;}
       #bf-plans .pl-active-bar{flex:1;height:6px;background:rgba(11,18,32,.18);border-radius:99px;overflow:hidden;margin:.3rem 0;}
       #bf-plans .pl-active-bar-fill{height:100%;background:rgba(11,18,32,.55);border-radius:99px;transition:width .5s;}
       #bf-plans .pl-empty{text-align:center;color:var(--tx3);font-size:.78rem;padding:1rem;font-style:italic;}
@@ -4444,7 +4451,7 @@
   <!-- Uses the same .mo / .md pattern as charModal — openModal/closeModal toggle .open -->
   <div id="planDetailModal" class="mo" onclick="if(event.target===this)closePlanDetail()">
     <div class="md" style="max-width:560px;padding:0;">
-      <div id="planDetailHeader" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);padding:1.4rem 1.4rem 1.2rem;text-align:center;color:#0b1220;border-radius:16px 16px 0 0;position:relative;">
+      <div id="planDetailHeader" style="background:var(--cd-banner);padding:1.4rem 1.4rem 1.2rem;text-align:center;color:var(--cd-banner-text);border-radius:16px 16px 0 0;position:relative;">
         <button onclick="closePlanDetail()" style="position:absolute;top:.7rem;right:.7rem;background:rgba(11,18,32,.18);border:1px solid rgba(11,18,32,.22);color:#0b1220;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.8rem;font-weight:800;">✕</button>
         <div id="planDetailIcon" style="font-size:2rem;margin-bottom:.3rem;">📅</div>
         <div id="planDetailTitle" style="font-family:var(--fh,var(--fm));font-size:1.25rem;font-weight:800;letter-spacing:.02em;margin-bottom:.25rem;">—</div>
@@ -4470,7 +4477,7 @@
 
       <div style="padding:.7rem 1.2rem 0;">
         <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
-          <button class="vc-tpl active" data-vc-tpl="ocean" onclick="vcSetTemplate('ocean',this)" style="flex:1;min-width:90px;background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.5rem .7rem;font-size:.74rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🌊 Ocean</button>
+          <button class="vc-tpl active" data-vc-tpl="ocean" onclick="vcSetTemplate('ocean',this)" style="flex:1;min-width:90px;background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.5rem .7rem;font-size:.74rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🌊 Ocean</button>
           <button class="vc-tpl" data-vc-tpl="sunrise" onclick="vcSetTemplate('sunrise',this)" style="flex:1;min-width:90px;background:rgba(255,255,255,.06);color:var(--tx);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.5rem .7rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">🌅 Sunrise</button>
           <button class="vc-tpl" data-vc-tpl="minimal" onclick="vcSetTemplate('minimal',this)" style="flex:1;min-width:90px;background:rgba(255,255,255,.06);color:var(--tx);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.5rem .7rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">⬜ Minimal</button>
         </div>
@@ -4482,7 +4489,7 @@
       </div>
 
       <div style="padding:.65rem 1.2rem 1rem;display:flex;gap:.45rem;flex-wrap:wrap;">
-        <button onclick="vcDownload()" style="flex:1;min-width:110px;background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.6rem .85rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">⬇ Download PNG</button>
+        <button onclick="vcDownload()" style="flex:1;min-width:110px;background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.6rem .85rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">⬇ Download PNG</button>
         <button onclick="vcCopy()" style="flex:1;min-width:110px;background:rgba(255,255,255,.06);color:var(--tx);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.6rem .85rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);">📋 Copy Image</button>
         <button id="vcShareBtn" onclick="vcShare()" style="flex:1;min-width:110px;background:rgba(255,255,255,.06);color:var(--tx);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.6rem .85rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);">↗ Share</button>
       </div>
@@ -4531,7 +4538,7 @@
       <div style="padding:.65rem 1.2rem 1rem;display:flex;gap:.4rem;justify-content:flex-end;">
         <button id="vnmDelete" onclick="deleteVerseNote()" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f87171;border-radius:10px;padding:.5rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);display:none;">🗑 Delete</button>
         <button onclick="closeVerseNote()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.5rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Cancel</button>
-        <button onclick="saveVerseNote()" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.5rem .9rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Save Note</button>
+        <button onclick="saveVerseNote()" style="background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.5rem .9rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Save Note</button>
       </div>
     </div>
   </div>
@@ -4575,7 +4582,7 @@
   <!-- ════ PRAYER (F2-E) ════ -->
   <div id="bf-prayer" style="display:none;">
     <style>
-      #bf-prayer .pr-prompt{background:linear-gradient(135deg,#38bdf8,#a78bfa);border-radius:16px;padding:1.05rem 1.15rem;margin-bottom:.85rem;color:#0b1220;}
+      #bf-prayer .pr-prompt{background:var(--cd-banner);border-radius:16px;padding:1.05rem 1.15rem;margin-bottom:.85rem;color:var(--cd-banner-text);box-shadow:var(--cd-banner-shadow);}
       #bf-prayer .pr-prompt-eyebrow{font-size:.6rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;opacity:.78;margin-bottom:.35rem;}
       #bf-prayer .pr-prompt-text{font-family:var(--fh,var(--fm));font-size:1.05rem;font-weight:700;letter-spacing:.01em;line-height:1.4;margin-bottom:.7rem;}
       #bf-prayer .pr-prompt-cta{background:rgba(11,18,32,.85);color:#fff;border:none;border-radius:10px;padding:.45rem .85rem;font-size:.74rem;font-weight:800;cursor:pointer;font-family:var(--fm);}
@@ -4585,12 +4592,12 @@
       #bf-prayer .pr-chip{flex:0 0 auto;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--tx2);border-radius:99px;padding:.3rem .7rem;font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fm);transition:all .15s;}
       #bf-prayer .pr-chip:hover{background:rgba(255,255,255,.08);}
       #bf-prayer .pr-chip.active{color:#0b1220;border-color:transparent;}
-      #bf-prayer .pr-chip.active[data-grp="type"]{background:linear-gradient(135deg,#38bdf8,#a78bfa);}
+      #bf-prayer .pr-chip.active[data-grp="type"]{background:var(--cd-banner);color:var(--cd-banner-text);}
       #bf-prayer .pr-chip.active[data-grp="cat"]{background:#a78bfa;}
       #bf-prayer .pr-chip.active[data-grp="priv"]{background:#10b981;}
       #bf-prayer .pr-tabs{display:flex;gap:.4rem;margin-bottom:.65rem;}
       #bf-prayer .pr-tab{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--tx2);border-radius:10px;padding:.5rem .7rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);transition:all .15s;}
-      #bf-prayer .pr-tab.active{background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border-color:transparent;}
+      #bf-prayer .pr-tab.active{background:var(--cd-banner);color:var(--cd-banner-text);border-color:transparent;}
       #bf-prayer .pr-list{display:flex;flex-direction:column;gap:.4rem;}
       #bf-prayer .pr-item{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-left-width:4px;border-radius:10px;padding:.65rem .8rem;}
       #bf-prayer .pr-item-meta{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;font-size:.6rem;color:var(--tx2);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem;}
@@ -4703,7 +4710,7 @@
       <div style="padding:.65rem 1.2rem 1rem;display:flex;gap:.4rem;justify-content:flex-end;flex-wrap:wrap;">
         <button id="snDeleteBtn" onclick="deleteSermonNote()" style="display:none;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f87171;border-radius:10px;padding:.5rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">🗑 Delete</button>
         <button onclick="closeSermonNote()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.5rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Cancel</button>
-        <button onclick="saveSermonNote()" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.5rem .9rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Save Sermon</button>
+        <button onclick="saveSermonNote()" style="background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.5rem .9rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Save Sermon</button>
       </div>
     </div>
   </div>
@@ -4734,14 +4741,15 @@
        in app/js/data/academy.js. -->
   <div id="bf-academy" style="display:none;">
     <style>
-      #bf-academy .ac-hero{background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(167,139,250,.08));border:1px solid rgba(167,139,250,.22);border-radius:16px;padding:1rem 1.15rem;margin-bottom:.85rem;}
-      #bf-academy .ac-hero-title{font-family:var(--fh,var(--fm));font-size:1.05rem;font-weight:800;color:var(--tx);letter-spacing:.02em;margin-bottom:.2rem;}
-      #bf-academy .ac-hero-sub{font-size:.78rem;color:var(--tx2);line-height:1.55;}
+      #bf-academy .ac-hero{background:var(--cd-banner);color:var(--cd-banner-text);box-shadow:var(--cd-banner-shadow);border:none;border-radius:16px;padding:1.05rem 1.15rem;margin-bottom:.85rem;}
+      #bf-academy .ac-hero-title{font-family:var(--fh,var(--fm));font-size:1.05rem;font-weight:800;color:inherit;letter-spacing:.02em;margin-bottom:.2rem;}
+      #bf-academy .ac-hero-sub{font-size:.78rem;color:var(--cd-banner-text-muted);line-height:1.55;}
       #bf-academy .ac-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;margin-bottom:.85rem;}
       #bf-academy .ac-stat{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:.55rem;text-align:center;}
       #bf-academy .ac-stat-num{font-size:1.3rem;font-weight:900;font-family:var(--fh,var(--fm));}
       #bf-academy .ac-stat-lbl{font-size:.58rem;color:var(--tx2);font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-top:.1rem;}
-      #bf-academy .ac-module{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-left-width:4px;border-radius:14px;padding:.85rem 1rem;margin-bottom:.85rem;}
+      #bf-academy .ac-module{background:var(--cd-card-bg);border:var(--cd-card-border);border-left-width:4px;border-radius:var(--cd-card-radius);padding:.85rem 1rem;margin-bottom:.85rem;box-shadow:var(--cd-card-shadow);transition:box-shadow .25s ease,border-color .25s ease;}
+      #bf-academy .ac-module:hover{box-shadow:var(--cd-card-shadow-hover);}
       #bf-academy .ac-module-hdr{display:flex;align-items:center;gap:.55rem;margin-bottom:.45rem;cursor:pointer;}
       #bf-academy .ac-module-icon{font-size:1.5rem;flex-shrink:0;}
       #bf-academy .ac-module-title{font-family:var(--fh,var(--fm));font-size:.95rem;font-weight:800;letter-spacing:.02em;color:var(--tx);line-height:1.2;}
@@ -4790,9 +4798,9 @@
        taps in the Bible reader to open the site profile. -->
   <div id="bf-bibleworld" style="display:none;">
     <style>
-      #bf-bibleworld .bw-hero{background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(167,139,250,.08));border:1px solid rgba(167,139,250,.22);border-radius:16px;padding:1rem 1.15rem;margin-bottom:.85rem;}
-      #bf-bibleworld .bw-hero-title{font-family:var(--fh,var(--fm));font-size:1.05rem;font-weight:800;color:var(--tx);letter-spacing:.02em;margin-bottom:.2rem;}
-      #bf-bibleworld .bw-hero-sub{font-size:.78rem;color:var(--tx2);line-height:1.55;}
+      #bf-bibleworld .bw-hero{background:var(--cd-banner);color:var(--cd-banner-text);box-shadow:var(--cd-banner-shadow);border:none;border-radius:16px;padding:1.05rem 1.15rem;margin-bottom:.85rem;}
+      #bf-bibleworld .bw-hero-title{font-family:var(--fh,var(--fm));font-size:1.05rem;font-weight:800;color:inherit;letter-spacing:.02em;margin-bottom:.2rem;}
+      #bf-bibleworld .bw-hero-sub{font-size:.78rem;color:var(--cd-banner-text-muted);line-height:1.55;}
       #bf-bibleworld .bw-filters{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.65rem;}
       #bf-bibleworld .bw-chip{flex:0 0 auto;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--tx2);border-radius:99px;padding:.3rem .7rem;font-size:.66rem;font-weight:700;cursor:pointer;font-family:var(--fm);transition:all .15s;}
       #bf-bibleworld .bw-chip:hover{background:rgba(255,255,255,.08);}
@@ -4800,8 +4808,8 @@
       #bf-bibleworld #bwMap{height:380px;width:100%;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:#0d1117;margin-bottom:.85rem;}
       #bf-bibleworld .bw-section-hdr{font-size:.66rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.16em;margin:.6rem 0 .4rem;}
       #bf-bibleworld .bw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.5rem;}
-      #bf-bibleworld .bw-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-left-width:4px;border-radius:12px;padding:.7rem .85rem;cursor:pointer;transition:transform .15s,background .15s;}
-      #bf-bibleworld .bw-card:hover{transform:translateY(-2px);background:rgba(255,255,255,.06);}
+      #bf-bibleworld .bw-card{background:var(--cd-card-bg);border:var(--cd-card-border);border-left-width:4px;border-radius:var(--cd-card-radius);padding:.7rem .85rem;cursor:pointer;box-shadow:var(--cd-card-shadow);transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;}
+      #bf-bibleworld .bw-card:hover{transform:translateY(-4px);box-shadow:var(--cd-card-shadow-hover);}
       #bf-bibleworld .bw-card-name{font-size:.85rem;font-weight:800;color:var(--tx);margin-bottom:.15rem;}
       #bf-bibleworld .bw-card-meta{font-size:.6rem;color:var(--tx2);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.3rem;}
       #bf-bibleworld .bw-card-tagline{font-size:.74rem;color:var(--tx2);line-height:1.5;font-style:italic;}
@@ -4827,7 +4835,7 @@
   <!-- ════ BIBLICAL SITE DETAIL MODAL (F3-B) ════ -->
   <div id="bwSiteModal" class="mo" onclick="if(event.target===this)bwCloseSite()">
     <div class="md" style="max-width:600px;padding:0;">
-      <div id="bwSiteHeader" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border-radius:16px 16px 0 0;padding:1.1rem 1.2rem 1rem;position:relative;">
+      <div id="bwSiteHeader" style="background:var(--cd-banner);color:var(--cd-banner-text);border-radius:16px 16px 0 0;padding:1.1rem 1.2rem 1rem;position:relative;">
         <button onclick="bwCloseSite()" style="position:absolute;top:.7rem;right:.7rem;background:rgba(11,18,32,.18);border:1px solid rgba(11,18,32,.22);color:#0b1220;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.78rem;font-weight:800;">✕</button>
         <div id="bwSiteEra" style="font-size:.6rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;opacity:.78;margin-bottom:.3rem;">—</div>
         <div id="bwSiteName" style="font-family:var(--fh,var(--fm));font-size:1.4rem;font-weight:800;letter-spacing:.02em;line-height:1.2;margin-bottom:.25rem;">—</div>
@@ -4869,7 +4877,7 @@
         <canvas id="acCertCanvas" width="1080" height="780" style="width:100%;max-width:540px;aspect-ratio:1080/780;border-radius:10px;background:rgba(0,0,0,.25);box-shadow:0 8px 30px rgba(0,0,0,.4);"></canvas>
       </div>
       <div style="padding:.65rem 1.2rem 1rem;display:flex;gap:.4rem;flex-wrap:wrap;">
-        <button onclick="acCertDownload()" style="flex:1;min-width:130px;background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.6rem .85rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">⬇ Download PNG</button>
+        <button onclick="acCertDownload()" style="flex:1;min-width:130px;background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.6rem .85rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">⬇ Download PNG</button>
         <button onclick="acCertPrint()" style="flex:1;min-width:130px;background:rgba(255,255,255,.06);color:var(--tx);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.6rem .85rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);">🖨 Print</button>
       </div>
       <div style="padding:0 1.2rem 1rem;font-size:.62rem;color:var(--tx3);text-align:center;line-height:1.5;">Certificate ID: <span id="acCertIdLabel">—</span></div>
@@ -4879,7 +4887,7 @@
   <!-- ════ MEMORIZE (F2-F) ════ -->
   <div id="bf-memorize" style="display:none;">
     <style>
-      #bf-memorize .mv-hero{background:linear-gradient(135deg,#10b981,#34d399);color:#0b1220;border-radius:16px;padding:1rem 1.15rem;margin-bottom:.85rem;display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
+      #bf-memorize .mv-hero{background:var(--cd-banner);color:var(--cd-banner-text);box-shadow:var(--cd-banner-shadow);border-radius:16px;padding:1rem 1.15rem;margin-bottom:.85rem;display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
       #bf-memorize .mv-hero-content{flex:1;min-width:200px;}
       #bf-memorize .mv-hero-title{font-family:var(--fh,var(--fm));font-size:1.05rem;font-weight:800;letter-spacing:.02em;line-height:1.2;}
       #bf-memorize .mv-hero-sub{font-size:.74rem;font-weight:600;opacity:.85;margin-top:.2rem;}
@@ -4890,11 +4898,11 @@
       #bf-memorize .mv-stat-lbl{font-size:.58rem;color:var(--tx2);font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-top:.1rem;}
       #bf-memorize .mv-tabs{display:flex;gap:.4rem;margin-bottom:.65rem;overflow-x:auto;padding-bottom:.15rem;}
       #bf-memorize .mv-tab{flex:0 0 auto;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--tx2);border-radius:10px;padding:.45rem .8rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);transition:all .15s;}
-      #bf-memorize .mv-tab.active{background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border-color:transparent;}
+      #bf-memorize .mv-tab.active{background:var(--cd-banner);color:var(--cd-banner-text);border-color:transparent;}
       #bf-memorize .mv-section-hdr{font-size:.66rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.16em;margin:.7rem 0 .45rem;}
       #bf-memorize .mv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:.5rem;}
-      #bf-memorize .mv-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-left-width:4px;border-radius:12px;padding:.7rem .85rem;cursor:pointer;transition:transform .15s,background .15s;}
-      #bf-memorize .mv-card:hover{transform:translateY(-2px);background:rgba(255,255,255,.06);}
+      #bf-memorize .mv-card{background:var(--cd-card-bg);border:var(--cd-card-border);border-left-width:4px;border-radius:var(--cd-card-radius);padding:.7rem .85rem;cursor:pointer;box-shadow:var(--cd-card-shadow);transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;}
+      #bf-memorize .mv-card:hover{transform:translateY(-4px);box-shadow:var(--cd-card-shadow-hover);}
       #bf-memorize .mv-card-ref{font-size:.72rem;font-weight:800;letter-spacing:.04em;margin-bottom:.25rem;}
       #bf-memorize .mv-card-text{font-size:.74rem;color:var(--tx2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
       #bf-memorize .mv-card-meta{display:flex;align-items:center;gap:.4rem;margin-top:.35rem;font-size:.6rem;color:var(--tx2);font-weight:700;letter-spacing:.06em;}
@@ -4904,7 +4912,7 @@
       #bf-memorize .mv-add-form{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:.85rem 1rem;margin-bottom:.85rem;display:none;}
       #bf-memorize .mv-add-form.open{display:block;}
       #bf-memorize .mv-cat-chip{flex:0 0 auto;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--tx2);border-radius:99px;padding:.25rem .65rem;font-size:.65rem;font-weight:700;cursor:pointer;font-family:var(--fm);}
-      #bf-memorize .mv-cat-chip.active{background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border-color:transparent;}
+      #bf-memorize .mv-cat-chip.active{background:var(--cd-banner);color:var(--cd-banner-text);border-color:transparent;}
     </style>
 
     <!-- Today's review CTA -->
@@ -4965,7 +4973,7 @@
       <div style="padding:.85rem 1.2rem .55rem;">
         <textarea id="abQuestion" rows="3" placeholder="What does the Bible say about anxiety? Why did Jesus weep? How do I forgive someone who hasn't apologized?" style="font-size:.85rem;line-height:1.5;font-family:var(--fm);"></textarea>
         <div style="display:flex;gap:.4rem;margin-top:.5rem;flex-wrap:wrap;">
-          <button onclick="askBibleSubmit()" id="abAskBtn" style="flex:1;background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🤖 Ask</button>
+          <button onclick="askBibleSubmit()" id="abAskBtn" style="flex:1;background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🤖 Ask</button>
           <button onclick="askBibleSuggest()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.55rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">💡 Suggest</button>
         </div>
         <div style="font-size:.6rem;color:var(--tx3);margin-top:.4rem;line-height:1.5;font-style:italic;">Powered by Claude · grounded in mainstream Protestant Scripture · not a substitute for pastoral or professional counsel.</div>
@@ -4997,7 +5005,7 @@
 
       <!-- Mode picker -->
       <div style="padding:.55rem 1.2rem 0;display:flex;gap:.35rem;flex-wrap:wrap;">
-        <button class="mvq-mode active" data-mvq-mode="cloze"  onclick="mvSetQuizMode('cloze',this)"  style="flex:1;min-width:90px;background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:8px;padding:.4rem;font-size:.66rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Cloze (fill blanks)</button>
+        <button class="mvq-mode active" data-mvq-mode="cloze"  onclick="mvSetQuizMode('cloze',this)"  style="flex:1;min-width:90px;background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:8px;padding:.4rem;font-size:.66rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Cloze (fill blanks)</button>
         <button class="mvq-mode"        data-mvq-mode="recite" onclick="mvSetQuizMode('recite',this)" style="flex:1;min-width:90px;background:rgba(255,255,255,.06);color:var(--tx);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:.4rem;font-size:.66rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Recite (type all)</button>
         <button class="mvq-mode"        data-mvq-mode="choice" onclick="mvSetQuizMode('choice',this)" style="flex:1;min-width:90px;background:rgba(255,255,255,.06);color:var(--tx);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:.4rem;font-size:.66rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Multi-choice (kids)</button>
       </div>
