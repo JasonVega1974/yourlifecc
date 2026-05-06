@@ -4049,6 +4049,7 @@
     <button class="tab" data-bf-tab="devotional" onclick="bfTab('devotional',this)">🕊️ Devotionals</button>
     <button class="tab" data-bf-tab="prayer" onclick="bfTab('prayer',this)">🙏 Prayer</button>
     <button class="tab" data-bf-tab="academy" onclick="bfTab('academy',this)">🎓 Academy</button>
+    <button class="tab" data-bf-tab="bibleworld" onclick="bfTab('bibleworld',this)">🗺️ Bible Lands</button>
     <button class="tab" data-bf-tab="memorize" onclick="bfTab('memorize',this)">✨ Memorize</button>
     <button class="tab" data-bf-tab="jesus" onclick="bfTab('jesus',this)">✝️ Jesus &amp; Purpose</button>
     <button class="tab" data-bf-tab="learnBible" onclick="bfTab('learnBible',this)">📘 Learn</button>
@@ -4781,6 +4782,65 @@
     </div>
 
     <div id="acModules"></div>
+  </div>
+
+  <!-- ════ BIBLICAL WORLD (F3-B foundation) ════ -->
+  <!-- Leaflet map · 30 site markers · 8 period filter chips · text-only
+       site detail drawer (photo slot reserved). Wires F2-D's data-place
+       taps in the Bible reader to open the site profile. -->
+  <div id="bf-bibleworld" style="display:none;">
+    <style>
+      #bf-bibleworld .bw-hero{background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(167,139,250,.08));border:1px solid rgba(167,139,250,.22);border-radius:16px;padding:1rem 1.15rem;margin-bottom:.85rem;}
+      #bf-bibleworld .bw-hero-title{font-family:var(--fh,var(--fm));font-size:1.05rem;font-weight:800;color:var(--tx);letter-spacing:.02em;margin-bottom:.2rem;}
+      #bf-bibleworld .bw-hero-sub{font-size:.78rem;color:var(--tx2);line-height:1.55;}
+      #bf-bibleworld .bw-filters{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.65rem;}
+      #bf-bibleworld .bw-chip{flex:0 0 auto;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--tx2);border-radius:99px;padding:.3rem .7rem;font-size:.66rem;font-weight:700;cursor:pointer;font-family:var(--fm);transition:all .15s;}
+      #bf-bibleworld .bw-chip:hover{background:rgba(255,255,255,.08);}
+      #bf-bibleworld .bw-chip.active{color:#0b1220;border-color:transparent;}
+      #bf-bibleworld #bwMap{height:380px;width:100%;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:#0d1117;margin-bottom:.85rem;}
+      #bf-bibleworld .bw-section-hdr{font-size:.66rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.16em;margin:.6rem 0 .4rem;}
+      #bf-bibleworld .bw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.5rem;}
+      #bf-bibleworld .bw-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-left-width:4px;border-radius:12px;padding:.7rem .85rem;cursor:pointer;transition:transform .15s,background .15s;}
+      #bf-bibleworld .bw-card:hover{transform:translateY(-2px);background:rgba(255,255,255,.06);}
+      #bf-bibleworld .bw-card-name{font-size:.85rem;font-weight:800;color:var(--tx);margin-bottom:.15rem;}
+      #bf-bibleworld .bw-card-meta{font-size:.6rem;color:var(--tx2);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.3rem;}
+      #bf-bibleworld .bw-card-tagline{font-size:.74rem;color:var(--tx2);line-height:1.5;font-style:italic;}
+      .leaflet-popup-content{margin:.6rem .8rem!important;font-family:var(--fm);}
+      .leaflet-popup-content b{color:#0f172a;}
+    </style>
+
+    <div class="bw-hero">
+      <div class="bw-hero-title">🗺️ Biblical World</div>
+      <div class="bw-hero-sub">30 sites across 8 biblical periods. Tap a marker on the map or any card below to read its story. Photos and archaeology articles roll out as we license imagery — text and Scripture refs are live now.</div>
+    </div>
+
+    <div class="bw-filters" id="bwFilters">
+      <button class="bw-chip active" data-bw-era="all" onclick="bwFilter('all',this)">All eras</button>
+    </div>
+
+    <div id="bwMap"></div>
+
+    <div class="bw-section-hdr" id="bwListHdr">All sites</div>
+    <div class="bw-grid" id="bwGrid"></div>
+  </div>
+
+  <!-- ════ BIBLICAL SITE DETAIL MODAL (F3-B) ════ -->
+  <div id="bwSiteModal" class="mo" onclick="if(event.target===this)bwCloseSite()">
+    <div class="md" style="max-width:600px;padding:0;">
+      <div id="bwSiteHeader" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border-radius:16px 16px 0 0;padding:1.1rem 1.2rem 1rem;position:relative;">
+        <button onclick="bwCloseSite()" style="position:absolute;top:.7rem;right:.7rem;background:rgba(11,18,32,.18);border:1px solid rgba(11,18,32,.22);color:#0b1220;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.78rem;font-weight:800;">✕</button>
+        <div id="bwSiteEra" style="font-size:.6rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;opacity:.78;margin-bottom:.3rem;">—</div>
+        <div id="bwSiteName" style="font-family:var(--fh,var(--fm));font-size:1.4rem;font-weight:800;letter-spacing:.02em;line-height:1.2;margin-bottom:.25rem;">—</div>
+        <div id="bwSiteTagline" style="font-size:.82rem;font-weight:600;line-height:1.4;opacity:.85;">—</div>
+      </div>
+      <div style="padding:0;max-height:55vh;overflow-y:auto;">
+        <!-- Photo slot — placeholder until BiblePlaces.com licensing -->
+        <div id="bwSitePhoto" style="height:140px;background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(167,139,250,.08));display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--tx2);font-style:italic;border-bottom:1px solid rgba(255,255,255,.06);">📷 Photo coming when image library lands</div>
+        <div id="bwSiteBody" style="padding:.85rem 1.2rem;font-size:.84rem;line-height:1.7;color:var(--tx);">—</div>
+        <div id="bwSiteRefs" style="padding:0 1.2rem 1rem;display:flex;flex-wrap:wrap;gap:.3rem;"></div>
+        <div id="bwSiteMeta" style="padding:.65rem 1.2rem 1rem;border-top:1px solid rgba(255,255,255,.06);display:grid;grid-template-columns:1fr 1fr;gap:.5rem;font-size:.7rem;color:var(--tx2);"></div>
+      </div>
+    </div>
   </div>
 
   <!-- ════ FAITH ACADEMY QUIZ MODAL (F2-I) ════ -->
@@ -8306,6 +8366,10 @@
 <script src="/app/js/data/plans.js"></script>
 <script src="/app/js/data/memory-verses.js"></script>
 <script src="/app/js/data/academy.js"></script>
+<script src="/app/js/data/biblical-sites.js"></script>
+<!-- Leaflet (F3-B) — open-source map library, MIT-licensed. Only loads when used. -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script src="/app/js/faith.js"></script>
 <script src="/app/js/worship.js"></script>
 <script src="/app/js/faith-resources.js"></script>

@@ -439,7 +439,7 @@ function initScripture(){
 // the original 6 tabs. New tabs without renderers are stubs awaiting later phases.
 // btn is optional — when bfTab() is called programmatically (e.g., from a Quick
 // Tile or stub-panel CTA), the matching button is found via [data-bf-tab].
-const BF_TABS = ['home','devotional','jesus','learnBible','reading','bible','journey','plans','prayer','memorize','academy'];
+const BF_TABS = ['home','devotional','jesus','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld'];
 function bfTab(tab, btn){
   BF_TABS.forEach(t=>{
     const el = document.getElementById('bf-'+t);
@@ -459,6 +459,7 @@ function bfTab(tab, btn){
   if(tab==='prayer') renderPrayerPanel();
   if(tab==='memorize') renderMemorizePanel();
   if(tab==='academy') renderAcademyPanel();
+  if(tab==='bibleworld') renderBibleWorld();
 }
 
 // ── FAITH HOME (F2-A) ────────────────────────────────────────
@@ -1554,7 +1555,7 @@ function renderEsvPassage(text, book, chNum){
   html = html.replace(/(>)([^<]+)(<)/g, function(_, open, txt, close){
     return open + txt.replace(placeRegex, function(m){
       const id = ESV_PLACE_MAP[m];
-      return `<span data-place="${id}" style="border-bottom:1px dotted rgba(167,139,250,.4);cursor:default;" title="Biblical World — coming F3">${m}</span>`;
+      return `<span data-place="${id}" style="border-bottom:1px dotted rgba(167,139,250,.55);cursor:pointer;color:#a78bfa;" title="Open ${m} in Bible Lands">${m}</span>`;
     }) + close;
   });
 
@@ -4740,6 +4741,241 @@ function acCertPrint(){
   w.document.write('<!doctype html><html><head><title>Certificate</title><style>@page{margin:0;}body{margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#fff;}img{max-width:100%;height:auto;}</style></head><body><img src="' + url + '" onload="window.print();setTimeout(function(){window.close();},250);"></body></html>');
   w.document.close();
 }
+
+// ═════════════════════════════════════════════════════════════
+// F3-B — BIBLICAL WORLD (foundation: map · sites · place-tag taps)
+// ═════════════════════════════════════════════════════════════
+// Leaflet map (CDN, MIT-licensed) with 30 site markers + 8 period filters.
+// Site detail drawer wires up to F2-D's data-place taps in the Bible reader.
+// Photos plug in once BiblePlaces.com (or alternative) licensing lands —
+// each site has heroPhoto:null reserved.
+
+let _bwMap = null;
+let _bwMarkers = [];
+let _bwEra = 'all';
+
+function _bwSites(){ return (typeof window !== 'undefined' && window.BIBLICAL_SITES) ? window.BIBLICAL_SITES : []; }
+function _bwPeriods(){ return (typeof window !== 'undefined' && window.BIBLICAL_PERIODS) ? window.BIBLICAL_PERIODS : []; }
+function _bwSiteById(id){ return _bwSites().find(s => s && s.id === id) || null; }
+function _bwPeriodById(id){ return _bwPeriods().find(p => p && p.id === id) || null; }
+
+function renderBibleWorld(){
+  // Build filter chips (idempotent — only build once).
+  const filterWrap = document.getElementById('bwFilters');
+  if(filterWrap && !filterWrap.dataset.bwBuilt){
+    const periods = _bwPeriods();
+    let html = '<button class="bw-chip active" data-bw-era="all" onclick="bwFilter(\'all\',this)">All eras</button>';
+    periods.forEach(p => {
+      html += '<button class="bw-chip" data-bw-era="'+p.id+'" style="--era-color:'+p.color+';" onclick="bwFilter(\''+p.id+'\',this)">'+escapeHtml(p.label)+'</button>';
+    });
+    filterWrap.innerHTML = html;
+    filterWrap.dataset.bwBuilt = '1';
+  }
+
+  // Initialize map lazily — Leaflet may still be loading on first call.
+  _bwInitMap();
+  _bwRenderMarkers();
+  _bwRenderGrid();
+}
+
+function _bwInitMap(){
+  if(_bwMap) return;
+  if(typeof L === 'undefined'){
+    // Leaflet not loaded yet — retry after a short delay.
+    setTimeout(_bwInitMap, 200);
+    return;
+  }
+  const el = document.getElementById('bwMap');
+  if(!el) return;
+  // Center the initial view on Israel/Levant — most sites cluster here.
+  _bwMap = L.map(el, {
+    zoomControl: true,
+    scrollWheelZoom: false,  // avoid hijacking page scroll on mobile
+  }).setView([31.78, 35.21], 6);
+  // CartoDB Voyager — clean, neutral basemap. MIT/free for non-commercial-ish use;
+  // swap to OpenStreetMap (https://tile.openstreetmap.org/{z}/{x}/{y}.png) if needed.
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap, &copy; CARTO',
+    maxZoom: 18,
+    subdomains: 'abcd',
+  }).addTo(_bwMap);
+}
+
+function _bwRenderMarkers(){
+  if(!_bwMap) return;
+  // Clear previous markers.
+  _bwMarkers.forEach(m => { try { _bwMap.removeLayer(m); } catch(_){} });
+  _bwMarkers = [];
+
+  const sites = _bwSites().filter(s => s && (_bwEra === 'all' || (s.eras || []).indexOf(_bwEra) !== -1));
+  sites.forEach(s => {
+    if(typeof s.lat !== 'number' || typeof s.lng !== 'number') return;
+    // Pick the marker color from the first matching era for the active filter,
+    // or the most recent era if "all" is selected.
+    const eraId = (_bwEra !== 'all' ? _bwEra : (s.eras && s.eras[s.eras.length-1])) || '';
+    const period = _bwPeriodById(eraId);
+    const color  = period ? period.color : '#38bdf8';
+    const icon = L.divIcon({
+      className: 'bw-marker',
+      html: '<div style="width:18px;height:18px;border-radius:50%;background:'+color+';border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35);"></div>',
+      iconSize: [18,18],
+      iconAnchor: [9,9],
+    });
+    const m = L.marker([s.lat, s.lng], { icon: icon }).addTo(_bwMap);
+    m.bindPopup('<b>'+_bwEsc(s.name)+'</b><br><span style="font-size:11px;color:#555;">'+_bwEsc(s.tagline||'')+'</span><br><a href="javascript:void(0)" onclick="openBwSite(\''+s.id+'\')">Read more →</a>');
+    _bwMarkers.push(m);
+  });
+}
+
+function _bwRenderGrid(){
+  const el = document.getElementById('bwGrid');
+  const hdr = document.getElementById('bwListHdr');
+  if(!el) return;
+  const sites = _bwSites().filter(s => s && (_bwEra === 'all' || (s.eras || []).indexOf(_bwEra) !== -1));
+  if(hdr){
+    if(_bwEra === 'all') hdr.textContent = 'All sites (' + sites.length + ')';
+    else {
+      const p = _bwPeriodById(_bwEra);
+      hdr.textContent = (p ? p.label : _bwEra) + ' (' + sites.length + ')';
+    }
+  }
+  if(!sites.length){
+    el.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--tx2);font-size:.78rem;font-style:italic;">No sites for this era yet.</div>';
+    return;
+  }
+  el.innerHTML = sites.map(s => {
+    const eraIds = s.eras || [];
+    const lastEra = eraIds[eraIds.length-1];
+    const period = _bwPeriodById(lastEra);
+    const color = period ? period.color : '#38bdf8';
+    const eraLabels = eraIds.map(id => { const p = _bwPeriodById(id); return p ? p.label : id; }).join(' · ');
+    return '<div class="bw-card" style="border-left-color:'+color+';" onclick="openBwSite(\''+s.id+'\')">'
+         + '<div class="bw-card-name">'+_bwEsc(s.name)+'</div>'
+         + '<div class="bw-card-meta" style="color:'+color+';">'+_bwEsc(eraLabels)+'</div>'
+         + '<div class="bw-card-tagline">'+_bwEsc(s.tagline || '')+'</div>'
+         + '</div>';
+  }).join('');
+}
+
+function bwFilter(eraId, btn){
+  _bwEra = eraId;
+  document.querySelectorAll('#bwFilters .bw-chip').forEach(c => {
+    c.classList.remove('active');
+    c.style.background = '';
+    c.style.borderColor = '';
+    c.style.color = '';
+  });
+  if(btn){
+    btn.classList.add('active');
+    if(eraId === 'all'){
+      btn.style.background = 'linear-gradient(135deg,#38bdf8,#a78bfa)';
+      btn.style.color = '#0b1220';
+      btn.style.borderColor = 'transparent';
+    } else {
+      const p = _bwPeriodById(eraId);
+      const c = p ? p.color : '#38bdf8';
+      btn.style.background = c;
+      btn.style.color = '#0b1220';
+      btn.style.borderColor = 'transparent';
+    }
+  }
+  _bwRenderMarkers();
+  _bwRenderGrid();
+}
+
+function openBwSite(siteId){
+  const s = _bwSiteById(siteId);
+  if(!s){ showToast('Site not found'); return; }
+  const periods = _bwPeriods();
+  const eraLabels = (s.eras || []).map(id => {
+    const p = periods.find(x => x.id === id);
+    return p ? p.label : id;
+  }).join(' · ');
+  document.getElementById('bwSiteEra').textContent = eraLabels || '—';
+  document.getElementById('bwSiteName').innerHTML = _bwEsc(s.name);
+  document.getElementById('bwSiteTagline').textContent = s.tagline || '';
+  document.getElementById('bwSiteBody').innerHTML = s.body || '';
+  // Header gradient picks the FIRST matching era color for visual identity.
+  const firstPeriod = periods.find(p => (s.eras || []).indexOf(p.id) !== -1);
+  const c1 = '#38bdf8';
+  const c2 = firstPeriod ? firstPeriod.color : '#a78bfa';
+  document.getElementById('bwSiteHeader').style.background = 'linear-gradient(135deg,'+c1+','+c2+')';
+  // Scripture refs — render as cyan chips that jump into the Bible reader.
+  const refsEl = document.getElementById('bwSiteRefs');
+  if(refsEl){
+    if((s.scriptureRefs || []).length){
+      refsEl.innerHTML = s.scriptureRefs.map(r =>
+        '<button onclick="bwJumpToRef(\''+r.replace(/\'/g,"\\'")+'\')" style="background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.3);color:#38bdf8;border-radius:99px;padding:.25rem .65rem;font-size:.66rem;font-weight:800;cursor:pointer;font-family:var(--fm);">📖 '+_bwEsc(r)+'</button>'
+      ).join('');
+    } else refsEl.innerHTML = '';
+  }
+  // Meta — modern location + GPS + map link
+  const metaEl = document.getElementById('bwSiteMeta');
+  if(metaEl){
+    const mapUrl = (typeof s.lat === 'number' && typeof s.lng === 'number')
+      ? 'https://www.google.com/maps/search/?api=1&query=' + s.lat + ',' + s.lng
+      : '';
+    metaEl.innerHTML =
+      '<div><div style="font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.1em;font-size:.58rem;margin-bottom:.15rem;">Modern Location</div><div style="color:var(--tx);">'+_bwEsc(s.modernLocation || '—')+'</div></div>'
+      + (mapUrl ? '<div><div style="font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.1em;font-size:.58rem;margin-bottom:.15rem;">Coordinates</div><a href="'+mapUrl+'" target="_blank" rel="noopener" style="color:#38bdf8;text-decoration:none;">'+s.lat.toFixed(4)+', '+s.lng.toFixed(4)+' ↗</a></div>' : '');
+  }
+  if(typeof openModal === 'function') openModal('bwSiteModal');
+  if(typeof logActivity === 'function') logActivity('faith', 'Bible Lands site: ' + s.name);
+}
+
+function bwCloseSite(){
+  if(typeof closeModal === 'function') closeModal('bwSiteModal');
+}
+
+function bwJumpToRef(ref){
+  // Reuse the existing parser/jumper from F2-G.
+  if(typeof askBibleJumpRef === 'function'){
+    bwCloseSite();
+    askBibleJumpRef(ref);
+    return;
+  }
+  // Fallback: switch to Bible tab.
+  bwCloseSite();
+  bfTab('bible');
+}
+
+function _bwEsc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  })[c]);
+}
+
+// ── F2-D place-tag taps → F3-B site drawer ──────────────────
+// Activates the data-place attributes added in F2-D's renderEsvPassage.
+// One-time delegated listener on document body so it works regardless of
+// when chapters are loaded into the reader.
+(function(){
+  if(typeof document === 'undefined') return;
+  if(document.body && document.body.dataset.bwPlaceTapWired) return;
+  function handler(ev){
+    const t = ev.target && ev.target.closest && ev.target.closest('[data-place]');
+    if(!t) return;
+    const placeId = t.getAttribute('data-place');
+    if(!placeId) return;
+    // F2-D added a "coming F3" title; remove it now.
+    if(t.getAttribute('title') === 'Biblical World — coming F3') t.removeAttribute('title');
+    ev.preventDefault();
+    ev.stopPropagation();
+    // Confirm we have a site for this id; otherwise let the click pass through.
+    const site = _bwSiteById(placeId);
+    if(site) openBwSite(placeId);
+  }
+  // Wire on DOMContentLoaded so document.body exists.
+  if(document.body){
+    document.body.addEventListener('click', handler, true);
+    document.body.dataset.bwPlaceTapWired = '1';
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){
+      document.body.addEventListener('click', handler, true);
+      document.body.dataset.bwPlaceTapWired = '1';
+    });
+  }
+})();
 
 // SM-2-lite update — adjusts ease and intervalDays in place, sets nextDue.
 function _mvApplySrUpdate(v, correct){
