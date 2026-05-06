@@ -4168,109 +4168,196 @@ function getFamilyVerseOfWeek(){
 }
 
 // ═════════════════════════════════════════════════════════════
-// F2-I (proto) — FAITH ACADEMY (2 starter modules)
+// F2-I — FAITH ACADEMY (full curriculum: 5 modules · 18 courses · 18 quizzes)
 // ═════════════════════════════════════════════════════════════
-// Two modules backed by the existing JESUS_LESSONS (17) and
-// LEARN_BIBLE_LESSONS (17). Lesson completion grants +5 XP and counts
-// toward the streak. Module badge unlocks when every lesson is read,
-// awards +100 XP. Full F2-I scope (5 modules, 18 courses with quizzes
-// and certificates) per spec §4.11 layers on top of this same
-// faithAcademyProgress shape.
+// Curriculum lives in app/js/data/academy.js as window.FAITH_ACADEMY_CURRICULUM.
+// Per spec §4.11:
+//   Lesson read       → +5 XP
+//   Quiz pass (≥80%)  → +25 XP, certificate auto-issued
+//   Module badge      → +100 XP (when all courses certified)
+//   Master badge      → +500 XP (all 5 module badges)
 
-// Module catalog. Keep in faith.js so it can read JESUS_LESSONS /
-// LEARN_BIBLE_LESSONS directly without an extra data file.
-function _acModules(){
-  const j = (typeof JESUS_LESSONS !== 'undefined') ? JESUS_LESSONS : [];
-  const l = (typeof LEARN_BIBLE_LESSONS !== 'undefined') ? LEARN_BIBLE_LESSONS : [];
-  return [
-    {
-      id:    'foundations',
-      title: 'Foundations of Faith',
-      icon:  '⭐',
-      sub:   'Who Jesus is · Why He came · The gospel · The Spirit',
-      color: '#a78bfa',
-      type:  'jesus',
-      lessons: j,
-      badgeId:    'faith-foundations',
-      badgeLabel: 'Faith Foundations',
-    },
-    {
-      id:    'bible-survey',
-      title: 'Bible Survey',
-      icon:  '📖',
-      sub:   'Old + New Testament · how to read · key themes',
-      color: '#10b981',
-      type:  'learn',
-      lessons: l,
-      badgeId:    'bible-scholar',
-      badgeLabel: 'Bible Scholar',
-    },
-  ];
+let _acExpanded = {};       // moduleId → bool
+let _acExpandedCourse = {}; // courseId → bool
+let _acQuizState = null;    // { courseId, questions[], idx, answers[], correctCount }
+let _acCertId    = null;    // currently-displayed certificate id
+
+function _acCurriculum(){
+  return (typeof window !== 'undefined' && window.FAITH_ACADEMY_CURRICULUM) ? window.FAITH_ACADEMY_CURRICULUM : [];
 }
 
 function _acStore(){
-  if(!D.faithAcademyProgress || typeof D.faithAcademyProgress !== 'object') D.faithAcademyProgress = { lessons:{}, badges:{} };
+  if(!D.faithAcademyProgress || typeof D.faithAcademyProgress !== 'object') D.faithAcademyProgress = { lessons:{}, courses:{}, badges:{} };
   if(!D.faithAcademyProgress.lessons || typeof D.faithAcademyProgress.lessons !== 'object') D.faithAcademyProgress.lessons = {};
+  if(!D.faithAcademyProgress.courses || typeof D.faithAcademyProgress.courses !== 'object') D.faithAcademyProgress.courses = {};
   if(!D.faithAcademyProgress.badges  || typeof D.faithAcademyProgress.badges  !== 'object') D.faithAcademyProgress.badges  = {};
   return D.faithAcademyProgress;
 }
 
-let _acExpanded = { 'foundations': true, 'bible-survey': false };
+function _acIsParent(){
+  // For families-module gating. Treat as parent unless an active CHILD
+  // profile is identified (mirrors the Mom-persona default-landing logic).
+  if(typeof _profiles === 'undefined' || !Array.isArray(_profiles) || !_profiles.length) return true;
+  if(typeof _activeProfileId === 'undefined' || !_activeProfileId) return true;
+  const active = _profiles.find(p => p && p.id === _activeProfileId);
+  if(!active) return true;
+  return active.isParent === true;
+}
+
+function _acCourseDone(course){
+  // A course counts as "done" when all lessons are read AND quiz is passed.
+  const store = _acStore();
+  const allLessonsRead = (course.lessons || []).every(l => l && store.lessons[l.id]);
+  const courseProg = store.courses[course.id] || {};
+  const quizPassed = !!courseProg.quizPassedAt;
+  return allLessonsRead && quizPassed;
+}
+
+function _acModuleDone(mod){
+  const courses = (mod.courses || []);
+  if(!courses.length) return false;
+  return courses.every(_acCourseDone);
+}
+
+function _acAllModulesDone(){
+  const cur = _acCurriculum();
+  return cur.length > 0 && cur.every(m => !m.parentOnly || _acIsParent() ? _acModuleDone(m) : true)
+                       && cur.filter(m => !m.parentOnly || _acIsParent()).every(_acModuleDone);
+}
 
 function renderAcademyPanel(){
-  const modules = _acModules();
+  const cur = _acCurriculum();
+  if(!cur.length){
+    const wrap = document.getElementById('acModules');
+    if(wrap) wrap.innerHTML = '<div style="padding:1rem;text-align:center;color:var(--tx2);font-size:.78rem;">Curriculum failed to load.</div>';
+    return;
+  }
   const store = _acStore();
 
   // Stats
-  let totalLessons = 0, doneLessons = 0;
-  modules.forEach(m => {
-    totalLessons += m.lessons.length;
-    m.lessons.forEach((_, idx) => {
-      const id = m.type + ':' + idx;
-      if(store.lessons[id]) doneLessons++;
+  let totalLessons = 0, doneLessons = 0, certCount = 0;
+  cur.forEach(m => {
+    if(m.parentOnly && !_acIsParent()) return;
+    (m.courses || []).forEach(c => {
+      totalLessons += (c.lessons || []).length;
+      (c.lessons || []).forEach(l => { if(store.lessons[l.id]) doneLessons++; });
+      const cp = store.courses[c.id];
+      if(cp && cp.certificateIssuedAt) certCount++;
     });
   });
-  const badgesEarned = Object.keys(store.badges).length;
+  const visibleBadges = cur.filter(m => !m.parentOnly || _acIsParent()).filter(m => store.badges[m.badgeId]).length;
 
   const setStat = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
-  setStat('acStatLessons', doneLessons);
-  setStat('acStatTotal',   totalLessons);
-  setStat('acStatBadges',  badgesEarned);
+  setStat('acStatLessons', doneLessons + ' / ' + totalLessons);
+  setStat('acStatCerts',   certCount);
+  setStat('acStatBadges',  visibleBadges);
 
-  // Modules
+  // Master badge banner
+  const mb = document.getElementById('acMasterBadge');
+  if(mb){
+    const masterEarned = !!store.badges['faith-foundations-graduate'];
+    const allDone = _acAllModulesDone();
+    if(masterEarned){
+      mb.style.display = '';
+      const dt = document.getElementById('acMasterDate');
+      if(dt) dt.textContent = 'Earned ' + (store.badges['faith-foundations-graduate'] || '').slice(0,10);
+    } else if(allDone){
+      // Award now (idempotent)
+      store.badges['faith-foundations-graduate'] = new Date().toISOString();
+      D.scrPoints = (D.scrPoints || 0) + 500;
+      save();
+      if(typeof logActivity === 'function') logActivity('faith', 'Master badge earned: Faith Foundations Graduate');
+      showToast('🏅 Faith Foundations Graduate earned! +500 XP');
+      mb.style.display = '';
+    } else {
+      mb.style.display = 'none';
+    }
+  }
+
+  // Render module cards
   const wrap = document.getElementById('acModules');
   if(!wrap) return;
-  wrap.innerHTML = modules.map(m => {
-    const moduleDone = m.lessons.reduce((acc, _, idx) => acc + (store.lessons[m.type+':'+idx] ? 1 : 0), 0);
-    const pct = m.lessons.length ? Math.round((moduleDone / m.lessons.length) * 100) : 0;
-    const isExpanded = !!_acExpanded[m.id];
+
+  wrap.innerHTML = cur.map(m => {
+    const isLocked = !!m.parentOnly && !_acIsParent();
+    const courses = m.courses || [];
+    let moduleLessons = 0, moduleDone = 0;
+    courses.forEach(c => {
+      moduleLessons += (c.lessons || []).length;
+      (c.lessons || []).forEach(l => { if(store.lessons[l.id]) moduleDone++; });
+    });
+    const pct = moduleLessons ? Math.round((moduleDone / moduleLessons) * 100) : 0;
+    const expanded = !!_acExpanded[m.id];
     const hasBadge = !!store.badges[m.badgeId];
 
-    const lessonsHtml = m.lessons.map((l, idx) => {
-      const lessonId = m.type + ':' + idx;
-      const isDone = !!store.lessons[lessonId];
-      return `<div class="ac-lesson${isDone?' done':''}" onclick="openBFLesson('${m.type}',${idx})">
-        <span class="ac-lesson-icon">${l.icon}</span>
-        <span class="ac-lesson-title">${escapeHtml(l.title)}</span>
-        <span class="ac-lesson-check">${isDone ? '✅' : '○'}</span>
-      </div>`;
-    }).join('');
+    let coursesHtml = '';
+    if(!isLocked && expanded){
+      coursesHtml = courses.map(c => _acCourseHtml(m, c, store)).join('');
+    }
 
-    return `<div class="ac-module" style="border-left-color:${m.color};">
-      <div class="ac-module-hdr" onclick="acToggleModule('${m.id}')">
+    return `<div class="ac-module" style="border-left-color:${m.color};${isLocked?'opacity:.55;':''}">
+      <div class="ac-module-hdr" onclick="${isLocked?'':`acToggleModule('${m.id}')`}">
         <span class="ac-module-icon">${m.icon}</span>
         <div style="flex:1;min-width:0;">
-          <div class="ac-module-title" style="color:${m.color};">${escapeHtml(m.title)}</div>
-          <div class="ac-module-meta">${m.lessons.length} lessons · ${moduleDone} read · ${pct}%</div>
+          <div class="ac-module-title" style="color:${m.color};">${escapeHtml(m.title)}${isLocked?' <span style="font-size:.6rem;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;">· Parent only</span>':''}</div>
+          <div class="ac-module-meta">${courses.length} course${courses.length===1?'':'s'} · ${moduleLessons} lessons · ${moduleDone} read · ${pct}%</div>
           ${hasBadge ? '<span class="ac-badge">🏆 '+escapeHtml(m.badgeLabel)+' earned</span>' : ''}
         </div>
-        <span class="ac-module-toggle">${isExpanded ? '▼' : '▶'}</span>
+        ${isLocked?'<span style="font-size:.95rem;color:var(--tx3);">🔒</span>':`<span class="ac-module-toggle">${expanded?'▼':'▶'}</span>`}
       </div>
       <div class="ac-bar"><div class="ac-bar-fill" style="width:${pct}%;background:linear-gradient(90deg,#38bdf8,${m.color});"></div></div>
-      <div style="font-size:.72rem;color:var(--tx2);line-height:1.5;margin-bottom:${isExpanded?'.4rem':'0'};">${escapeHtml(m.sub)}</div>
-      <div class="ac-lessons" style="display:${isExpanded?'grid':'none'};">${lessonsHtml}</div>
+      <div style="font-size:.72rem;color:var(--tx2);line-height:1.5;margin-bottom:${expanded&&!isLocked?'.6rem':'0'};">${escapeHtml(m.description||'')}</div>
+      ${coursesHtml ? '<div style="display:flex;flex-direction:column;gap:.5rem;margin-top:.4rem;">'+coursesHtml+'</div>' : ''}
     </div>`;
   }).join('');
+}
+
+function _acCourseHtml(mod, course, store){
+  const lessons = course.lessons || [];
+  const done = lessons.filter(l => store.lessons[l.id]).length;
+  const pct = lessons.length ? Math.round((done / lessons.length) * 100) : 0;
+  const allLessonsDone = done === lessons.length && lessons.length > 0;
+  const cp = store.courses[course.id] || {};
+  const quizPassed = !!cp.quizPassedAt;
+  const certIssued = !!cp.certificateIssuedAt;
+  const expanded = !!_acExpandedCourse[course.id];
+
+  let lessonsHtml = '';
+  if(expanded){
+    lessonsHtml = lessons.map(l => {
+      const isDone = !!store.lessons[l.id];
+      return `<div onclick="openAcademyLesson('${course.id}','${l.id}')" style="background:rgba(255,255,255,.04);border:1px solid ${isDone?'rgba(16,185,129,.3)':'rgba(255,255,255,.08)'};${isDone?'background:rgba(16,185,129,.06);':''}border-radius:9px;padding:.5rem .65rem;cursor:pointer;display:flex;align-items:center;gap:.4rem;">
+        <span style="flex:1;font-size:.74rem;font-weight:700;color:${isDone?'var(--tx2)':'var(--tx)'};line-height:1.3;">${escapeHtml(l.title)}</span>
+        ${l.duration ? '<span style="font-size:.6rem;color:var(--tx3);font-weight:700;">'+escapeHtml(l.duration)+'</span>' : ''}
+        <span style="font-size:.85rem;flex-shrink:0;">${isDone?'✅':'○'}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // Quiz button — locked until all lessons done.
+  let quizCta;
+  if(certIssued){
+    quizCta = `<button onclick="openAcademyCertificate('${course.id}')" style="background:linear-gradient(135deg,#fbbf24,#fb923c);color:#0b1220;border:none;border-radius:8px;padding:.4rem .8rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🏆 View Certificate</button>`;
+  } else if(quizPassed){
+    quizCta = `<button onclick="acIssueCertificate('${course.id}')" style="background:linear-gradient(135deg,#10b981,#34d399);color:#0b1220;border:none;border-radius:8px;padding:.4rem .8rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🏆 Get Certificate</button>`;
+  } else if(allLessonsDone){
+    quizCta = `<button onclick="acStartQuiz('${course.id}')" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:8px;padding:.4rem .8rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);">❓ Start Quiz</button>`;
+  } else {
+    quizCta = `<span style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--tx3);border-radius:8px;padding:.4rem .8rem;font-size:.66rem;font-weight:700;cursor:not-allowed;">🔒 Finish lessons to unlock quiz</span>`;
+  }
+
+  return `<div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:.7rem .85rem;">
+    <div style="display:flex;align-items:center;gap:.4rem;cursor:pointer;" onclick="acToggleCourse('${course.id}')">
+      <div style="flex:1;">
+        <div style="font-size:.82rem;font-weight:800;color:var(--tx);line-height:1.3;">${escapeHtml(course.title)}</div>
+        <div style="font-size:.62rem;color:var(--tx2);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-top:.1rem;">${lessons.length} lessons · ${done} read · ${pct}%${quizPassed?' · Quiz passed '+(cp.quizBestScore?Math.round(cp.quizBestScore*100)+'%':''):''}</div>
+      </div>
+      <span style="font-size:.7rem;color:var(--tx3);">${expanded?'▼':'▶'}</span>
+    </div>
+    ${expanded ? `<div style="font-size:.7rem;color:var(--tx2);line-height:1.5;margin-top:.4rem;">${escapeHtml(course.description || '')}</div>
+      <div style="display:flex;flex-direction:column;gap:.3rem;margin-top:.5rem;">${lessonsHtml}</div>
+      <div style="display:flex;gap:.4rem;margin-top:.5rem;flex-wrap:wrap;align-items:center;">${quizCta}</div>` : ''}
+  </div>`;
 }
 
 function acToggleModule(moduleId){
@@ -4278,49 +4365,380 @@ function acToggleModule(moduleId){
   renderAcademyPanel();
 }
 
-// Marks a lesson complete, awards +5 XP, fires streak. If completing the
-// lesson finishes the module, awards the module badge (+100 XP).
-function academyMarkLesson(type, idx){
-  const lessonId = type + ':' + idx;
+function acToggleCourse(courseId){
+  _acExpandedCourse[courseId] = !_acExpandedCourse[courseId];
+  renderAcademyPanel();
+}
+
+// Open a curriculum lesson in charModal with Mark-Complete CTA.
+function openAcademyLesson(courseId, lessonId){
+  const cur = _acCurriculum();
+  let course=null, lesson=null, mod=null;
+  for(const m of cur){
+    for(const c of (m.courses || [])){
+      const l = (c.lessons || []).find(x => x.id === lessonId);
+      if(l && c.id === courseId){ course = c; lesson = l; mod = m; break; }
+    }
+    if(lesson) break;
+  }
+  if(!lesson){ showToast('Lesson not found'); return; }
+
+  const store = _acStore();
+  const isDone = !!store.lessons[lesson.id];
+
+  document.getElementById('charIcon').textContent  = mod.icon;
+  document.getElementById('charTitle').textContent = lesson.title;
+  document.getElementById('charSub').textContent   = course.title + ' · ' + (lesson.duration || '');
+  document.getElementById('charModalHeader').style.background = 'linear-gradient(135deg,#38bdf8,'+mod.color+')';
+  const refsHtml = (lesson.scriptureRefs && lesson.scriptureRefs.length)
+    ? '<div style="background:rgba(167,139,250,.05);border-left:3px solid #a78bfa;border-radius:0 8px 8px 0;padding:.6rem .8rem;margin-top:1rem;font-size:.75rem;color:var(--tx2);"><strong style="color:#a78bfa;">📖 Scripture:</strong> ' + lesson.scriptureRefs.map(r => escapeHtml(r)).join(', ') + '</div>'
+    : '';
+  const reflectHtml = lesson.reflectionPrompt
+    ? '<div style="background:rgba(16,185,129,.05);border-left:3px solid #10b981;border-radius:0 8px 8px 0;padding:.6rem .8rem;margin-top:.6rem;font-size:.78rem;color:var(--tx2);font-style:italic;line-height:1.6;"><strong style="color:#10b981;font-style:normal;">💭 Reflection:</strong> ' + escapeHtml(lesson.reflectionPrompt) + '</div>'
+    : '';
+  const cta = isDone
+    ? `<div style="margin-top:1.2rem;padding:.75rem;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);border-radius:10px;text-align:center;font-size:.78rem;font-weight:700;color:#10b981;">✅ Lesson complete · +5 XP earned</div>`
+    : `<div style="margin-top:1.2rem;text-align:center;"><button onclick="academyMarkLessonNew('${courseId}','${lesson.id}')" style="background:linear-gradient(135deg,#38bdf8,${mod.color});color:#0b1220;border:none;border-radius:10px;padding:.6rem 1.4rem;font-size:.82rem;font-weight:800;cursor:pointer;font-family:var(--fm);">✅ Mark Lesson Complete +5 XP</button></div>`;
+  document.getElementById('charBody').innerHTML = (lesson.body || '') + refsHtml + reflectHtml + cta;
+  document.getElementById('charQuiz').innerHTML = '';
+  openModal('charModal');
+  if(typeof logActivity === 'function') logActivity('faith', 'Academy lesson opened: ' + lesson.title);
+}
+
+function academyMarkLessonNew(courseId, lessonId){
   const store = _acStore();
   if(store.lessons[lessonId]){ showToast('Already complete'); return; }
-
-  const modules = _acModules();
-  const m = modules.find(x => x.type === type);
-  if(!m){ return; }
-  const lesson = m.lessons[idx];
-  if(!lesson){ return; }
-
-  const now = new Date().toISOString();
-  store.lessons[lessonId] = now;
+  store.lessons[lessonId] = new Date().toISOString();
   D.scrPoints = (D.scrPoints || 0) + 5;
   if(!D.scrReadDays) D.scrReadDays = {};
-  D.scrReadDays[now.slice(0,10)] = true;
-  if(typeof logActivity === 'function') logActivity('faith', 'Lesson complete: ' + lesson.title);
-
-  // Module-badge check
-  const moduleDone = m.lessons.reduce((acc, _, i) => acc + (store.lessons[m.type+':'+i] ? 1 : 0), 0);
-  let badgeJustEarned = false;
-  if(moduleDone === m.lessons.length && !store.badges[m.badgeId]){
-    store.badges[m.badgeId] = now;
-    D.scrPoints += 100;
-    badgeJustEarned = true;
-    if(typeof logActivity === 'function') logActivity('faith', 'Badge earned: ' + m.badgeLabel);
-  }
-
+  D.scrReadDays[new Date().toISOString().slice(0,10)] = true;
   save();
-  if(badgeJustEarned){
-    showToast('🏆 ' + m.badgeLabel + ' earned! +100 XP');
-  } else {
-    showToast('Lesson complete +5 XP ✓');
+  if(typeof logActivity === 'function') logActivity('faith', 'Lesson complete: ' + lessonId);
+  showToast('Lesson complete +5 XP ✓');
+  // Refresh modal in place + panel.
+  openAcademyLesson(courseId, lessonId);
+  renderAcademyPanel();
+  if(typeof renderFaithHome === 'function') renderFaithHome();
+}
+
+// ── QUIZ ─────────────────────────────────────────────────────
+function acStartQuiz(courseId){
+  const cur = _acCurriculum();
+  let course=null;
+  for(const m of cur){
+    for(const c of (m.courses || [])){ if(c.id === courseId){ course = c; break; } }
+    if(course) break;
+  }
+  if(!course || !course.quiz){ showToast('Quiz not available'); return; }
+  _acQuizState = {
+    courseId: courseId,
+    questions: course.quiz.questions || [],
+    idx: 0,
+    answers: [],
+    correctCount: 0,
+    locked: false, // current question locked after answering
+    passThreshold: course.quiz.passThreshold || 0.8,
+  };
+  document.getElementById('acqTitle').textContent = course.title + ' Quiz';
+  if(typeof openModal === 'function') openModal('acQuizModal');
+  _acRenderQuizQuestion();
+}
+
+function acCloseQuiz(){
+  _acQuizState = null;
+  if(typeof closeModal === 'function') closeModal('acQuizModal');
+}
+
+function _acRenderQuizQuestion(){
+  if(!_acQuizState) return;
+  const body = document.getElementById('acqBody');
+  const footer = document.getElementById('acqFooter');
+  const progressEl = document.getElementById('acqProgress');
+  if(!body || !footer) return;
+
+  const total = _acQuizState.questions.length;
+  if(_acQuizState.idx >= total){
+    // Quiz finished — show results + record.
+    const score = _acQuizState.correctCount / total;
+    const pct   = Math.round(score * 100);
+    const passed = score >= _acQuizState.passThreshold;
+
+    const store = _acStore();
+    if(!store.courses[_acQuizState.courseId]) store.courses[_acQuizState.courseId] = {};
+    const cp = store.courses[_acQuizState.courseId];
+    cp.quizAttempts = (cp.quizAttempts || 0) + 1;
+    if(!cp.quizBestScore || score > cp.quizBestScore){
+      cp.quizBestScore = score;
+    }
+    if(passed && !cp.quizPassedAt){
+      cp.quizPassedAt = new Date().toISOString();
+      D.scrPoints = (D.scrPoints || 0) + 25;
+      if(!D.scrReadDays) D.scrReadDays = {};
+      D.scrReadDays[new Date().toISOString().slice(0,10)] = true;
+      if(typeof logActivity === 'function') logActivity('faith', 'Quiz passed: ' + _acQuizState.courseId);
+    }
+    save();
+
+    progressEl.textContent = '';
+    body.innerHTML = `<div style="text-align:center;padding:1rem .5rem;">
+      <div style="font-size:3rem;margin-bottom:.4rem;">${passed ? '🏆' : '📚'}</div>
+      <div style="font-family:var(--fh,var(--fm));font-size:1.4rem;font-weight:800;color:${passed?'#10b981':'#fbbf24'};margin-bottom:.4rem;">${pct}%</div>
+      <div style="font-size:.9rem;color:var(--tx);font-weight:700;margin-bottom:.5rem;">${passed ? 'Passed!' : 'So close — keep going.'}</div>
+      <div style="font-size:.78rem;color:var(--tx2);line-height:1.55;">${passed
+        ? 'Course quiz cleared at ' + Math.round(_acQuizState.passThreshold * 100) + '%+. Issue your certificate when you are ready.'
+        : 'You need ' + Math.round(_acQuizState.passThreshold * 100) + '% to pass. Review the lessons and try again.'}</div>
+      <div style="font-size:.7rem;color:var(--tx3);margin-top:.5rem;">${_acQuizState.correctCount} of ${total} correct · attempt ${cp.quizAttempts}</div>
+    </div>`;
+    footer.innerHTML = passed
+      ? `<button onclick="acIssueCertificate('${_acQuizState.courseId}')" style="background:linear-gradient(135deg,#10b981,#34d399);color:#0b1220;border:none;border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🏆 Get Certificate</button>
+        <button onclick="acCloseQuiz()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.55rem 1rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Close</button>`
+      : `<button onclick="acStartQuiz('${_acQuizState.courseId}')" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Try Again</button>
+        <button onclick="acCloseQuiz()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.55rem 1rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Close</button>`;
+    renderAcademyPanel();
+    if(typeof renderFaithHome === 'function') renderFaithHome();
+    return;
   }
 
-  // Refresh the modal CTA so it shows the green "complete" state.
-  // openBFLesson rebuilds charBody so calling it again is the cleanest refresh.
-  if(typeof openBFLesson === 'function') openBFLesson(type, idx);
-  // Also refresh the academy panel + Faith Home stats in the background.
-  if(typeof renderAcademyPanel === 'function') renderAcademyPanel();
+  const q = _acQuizState.questions[_acQuizState.idx];
+  progressEl.textContent = (_acQuizState.idx + 1) + ' / ' + total;
+  const optionsHtml = (q.options || []).map((opt, i) =>
+    `<button onclick="_acAnswerQuiz(${i})" style="text-align:left;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--tx);border-radius:10px;padding:.6rem .85rem;font-family:var(--fm);font-size:.82rem;line-height:1.45;cursor:pointer;width:100%;margin-bottom:.35rem;">${String.fromCharCode(65+i)}. ${escapeHtml(opt)}</button>`
+  ).join('');
+
+  body.innerHTML = `<div style="font-size:.66rem;font-weight:800;color:#a78bfa;text-transform:uppercase;letter-spacing:.16em;margin-bottom:.45rem;">Question ${_acQuizState.idx + 1} of ${total}</div>
+    <div style="font-size:.95rem;line-height:1.55;color:var(--tx);font-weight:600;margin-bottom:.85rem;">${escapeHtml(q.q || '')}</div>
+    <div>${optionsHtml}</div>`;
+  footer.innerHTML = `<button onclick="acCloseQuiz()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.5rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">End Session</button>`;
+  _acQuizState.locked = false;
+}
+
+function _acAnswerQuiz(choiceIdx){
+  if(!_acQuizState || _acQuizState.locked) return;
+  _acQuizState.locked = true;
+  const q = _acQuizState.questions[_acQuizState.idx];
+  const correct = (choiceIdx === q.correctIdx);
+  if(correct) _acQuizState.correctCount++;
+  _acQuizState.answers.push({ chosen: choiceIdx, correct: correct });
+
+  // Re-render with feedback per Roady's Training fix: lock all options,
+  // mark user's choice ✅ or ❌, ALWAYS highlight the correct answer in green,
+  // reveal the explanation.
+  const body = document.getElementById('acqBody');
+  const footer = document.getElementById('acqFooter');
+  const total = _acQuizState.questions.length;
+
+  const optionsHtml = (q.options || []).map((opt, i) => {
+    let bg = 'rgba(255,255,255,.04)';
+    let bd = 'rgba(255,255,255,.1)';
+    let badge = '';
+    if(i === q.correctIdx){
+      bg = 'rgba(16,185,129,.15)';
+      bd = 'rgba(16,185,129,.45)';
+      badge = ' <span style="float:right;color:#10b981;font-weight:800;">✅ Correct</span>';
+    }
+    if(i === choiceIdx && i !== q.correctIdx){
+      bg = 'rgba(239,68,68,.12)';
+      bd = 'rgba(239,68,68,.35)';
+      badge = ' <span style="float:right;color:#f87171;font-weight:800;">❌ Your choice</span>';
+    }
+    return `<div style="background:${bg};border:1px solid ${bd};color:var(--tx);border-radius:10px;padding:.6rem .85rem;font-family:var(--fm);font-size:.82rem;line-height:1.45;width:100%;margin-bottom:.35rem;">${String.fromCharCode(65+i)}. ${escapeHtml(opt)}${badge}</div>`;
+  }).join('');
+
+  body.innerHTML = `<div style="font-size:.66rem;font-weight:800;color:#a78bfa;text-transform:uppercase;letter-spacing:.16em;margin-bottom:.45rem;">Question ${_acQuizState.idx + 1} of ${total}</div>
+    <div style="font-size:.95rem;line-height:1.55;color:var(--tx);font-weight:600;margin-bottom:.85rem;">${escapeHtml(q.q || '')}</div>
+    <div>${optionsHtml}</div>
+    ${q.explanation ? '<div style="margin-top:.7rem;background:rgba(56,189,248,.06);border-left:3px solid #38bdf8;border-radius:0 8px 8px 0;padding:.6rem .8rem;font-size:.78rem;line-height:1.55;color:var(--tx2);"><strong style="color:#38bdf8;">Why:</strong> ' + escapeHtml(q.explanation) + '</div>' : ''}`;
+  const isLast = (_acQuizState.idx + 1 >= total);
+  footer.innerHTML = `<button onclick="acCloseQuiz()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.5rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">End Session</button>
+    <button onclick="_acQuizNext()" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.5rem 1rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">${isLast?'See Results →':'Next →'}</button>`;
+}
+
+function _acQuizNext(){
+  if(!_acQuizState) return;
+  _acQuizState.idx++;
+  _acRenderQuizQuestion();
+}
+
+// ── CERTIFICATES ─────────────────────────────────────────────
+// Issue (or re-issue) a certificate for a passed course. Awards module
+// badge if all courses in the module are now certified.
+function acIssueCertificate(courseId){
+  const store = _acStore();
+  if(!store.courses[courseId]) store.courses[courseId] = {};
+  const cp = store.courses[courseId];
+  if(!cp.quizPassedAt){ showToast('Pass the quiz first'); return; }
+  if(!cp.certificateId){
+    cp.certificateId = _acGenCertId(courseId);
+    cp.certificateIssuedAt = new Date().toISOString();
+    D.scrPoints = (D.scrPoints || 0) + 50;
+    if(typeof logActivity === 'function') logActivity('faith', 'Certificate issued: ' + courseId);
+    showToast('🏆 Certificate issued! +50 XP');
+    // Module-badge check
+    const cur = _acCurriculum();
+    for(const m of cur){
+      const courses = m.courses || [];
+      const allCertified = courses.every(c => {
+        const ccp = store.courses[c.id];
+        return ccp && ccp.certificateIssuedAt;
+      });
+      if(allCertified && courses.length && !store.badges[m.badgeId]){
+        store.badges[m.badgeId] = new Date().toISOString();
+        D.scrPoints += 100;
+        if(typeof logActivity === 'function') logActivity('faith', 'Module badge: ' + m.badgeLabel);
+        showToast('🏆 ' + m.badgeLabel + ' module badge! +100 XP');
+      }
+    }
+    save();
+  }
+  openAcademyCertificate(courseId);
+  renderAcademyPanel();
   if(typeof renderFaithHome === 'function') renderFaithHome();
+}
+
+function _acGenCertId(courseId){
+  const slug = courseId.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8);
+  const rnd  = Math.random().toString(36).slice(2,6).toUpperCase();
+  return 'YLCC-FAITH-' + slug + '-' + rnd;
+}
+
+function openAcademyCertificate(courseId){
+  const cur = _acCurriculum();
+  let course=null, mod=null;
+  for(const m of cur){
+    for(const c of (m.courses || [])){ if(c.id === courseId){ course = c; mod = m; break; } }
+    if(course) break;
+  }
+  if(!course){ showToast('Certificate not found'); return; }
+  const store = _acStore();
+  const cp = store.courses[courseId];
+  if(!cp || !cp.certificateIssuedAt){ showToast('Certificate not yet issued'); return; }
+
+  _acCertId = cp.certificateId;
+  const idLabel = document.getElementById('acCertIdLabel');
+  if(idLabel) idLabel.textContent = cp.certificateId || '';
+  if(typeof openModal === 'function') openModal('acCertModal');
+  setTimeout(function(){ _acCertRender(course, mod, cp); }, 30);
+}
+
+function acCloseCert(){
+  if(typeof closeModal === 'function') closeModal('acCertModal');
+  _acCertId = null;
+}
+
+function _acCertRender(course, mod, cp){
+  const c = document.getElementById('acCertCanvas');
+  if(!c) return;
+  const ctx = c.getContext('2d'); if(!ctx) return;
+  const W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+
+  // Background — soft gradient
+  const g = ctx.createLinearGradient(0,0,W,H);
+  g.addColorStop(0, '#fdfdff');
+  g.addColorStop(1, '#f1f5fb');
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+
+  // Outer brand border
+  ctx.lineWidth = 14;
+  ctx.strokeStyle = '#38bdf8';
+  ctx.strokeRect(28, 28, W-56, H-56);
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = '#a78bfa';
+  ctx.strokeRect(56, 56, W-112, H-112);
+
+  ctx.fillStyle = '#0f172a';
+  ctx.textAlign = 'center';
+
+  // Top wordmark
+  ctx.font = '600 28px "Inter", system-ui, sans-serif';
+  ctx.fillStyle = '#475569';
+  ctx.fillText('YOURLIFECC · FAITH ACADEMY', W/2, 130);
+
+  // Title
+  ctx.font = '900 64px "Bebas Neue", Inter, sans-serif';
+  ctx.fillStyle = '#0f172a';
+  ctx.fillText('CERTIFICATE OF COMPLETION', W/2, 220);
+
+  // Sub
+  ctx.font = '600 22px "Inter", system-ui, sans-serif';
+  ctx.fillStyle = '#64748b';
+  ctx.fillText('This certifies that', W/2, 280);
+
+  // Recipient name
+  const recipient = (D && D.name) ? D.name : (D && D.profile && D.profile.parentName) ? D.profile.parentName : 'Faith Hub Member';
+  ctx.font = '900 56px "Bebas Neue", Inter, sans-serif';
+  ctx.fillStyle = mod && mod.color ? mod.color : '#a78bfa';
+  ctx.fillText(recipient, W/2, 360);
+
+  // Course
+  ctx.font = '600 22px "Inter", system-ui, sans-serif';
+  ctx.fillStyle = '#64748b';
+  ctx.fillText('has completed the course', W/2, 430);
+
+  ctx.font = '900 44px "Bebas Neue", Inter, sans-serif';
+  ctx.fillStyle = '#0f172a';
+  // Wrap title if very long
+  const courseTitle = (course && course.title) || '';
+  const moduleTitle = (mod && mod.title) || '';
+  ctx.fillText(courseTitle, W/2, 490);
+
+  ctx.font = '600 22px "Inter", system-ui, sans-serif';
+  ctx.fillStyle = '#64748b';
+  ctx.fillText('within ' + moduleTitle, W/2, 530);
+
+  // Date + ID footer
+  const issued = (cp && cp.certificateIssuedAt) ? cp.certificateIssuedAt.slice(0,10) : new Date().toISOString().slice(0,10);
+  ctx.font = '600 20px "Inter", system-ui, sans-serif';
+  ctx.fillStyle = '#475569';
+  ctx.fillText('Awarded ' + issued, W/2, 660);
+
+  ctx.font = '500 16px "Inter", system-ui, sans-serif';
+  ctx.fillStyle = '#94a3b8';
+  ctx.fillText('Certificate ID: ' + (cp && cp.certificateId ? cp.certificateId : '—'), W/2, 700);
+
+  ctx.font = '700 18px "Inter", system-ui, sans-serif';
+  ctx.fillStyle = '#38bdf8';
+  ctx.fillText('yourlifecc.com', W/2, 740);
+}
+
+function _acCertBlob(){
+  return new Promise(function(resolve, reject){
+    const c = document.getElementById('acCertCanvas');
+    if(!c){ reject(new Error('Canvas not found')); return; }
+    if(c.toBlob){ c.toBlob(function(blob){ if(!blob) reject(new Error('Blob fail')); else resolve(blob); }, 'image/png'); }
+    else {
+      try {
+        const url = c.toDataURL('image/png');
+        const bin = atob(url.split(',')[1]);
+        const arr = new Uint8Array(bin.length);
+        for(let i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+        resolve(new Blob([arr], { type:'image/png' }));
+      } catch(e){ reject(e); }
+    }
+  });
+}
+
+function acCertDownload(){
+  _acCertBlob().then(function(blob){
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'yourlifecc-certificate-' + (_acCertId || 'cert').toLowerCase() + '.png';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 400);
+    showToast('Certificate downloaded ✓');
+  }).catch(function(){ showToast('Could not download'); });
+}
+
+function acCertPrint(){
+  const c = document.getElementById('acCertCanvas');
+  if(!c){ showToast('Certificate not loaded'); return; }
+  const url = c.toDataURL('image/png');
+  const w = window.open('', '_blank');
+  if(!w){ showToast('Pop-ups blocked — try downloading instead'); return; }
+  w.document.write('<!doctype html><html><head><title>Certificate</title><style>@page{margin:0;}body{margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#fff;}img{max-width:100%;height:auto;}</style></head><body><img src="' + url + '" onload="window.print();setTimeout(function(){window.close();},250);"></body></html>');
+  w.document.close();
 }
 
 // SM-2-lite update — adjusts ease and intervalDays in place, sets nextDue.

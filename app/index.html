@@ -4727,12 +4727,10 @@
     </div>
   </div>
 
-  <!-- ════ FAITH ACADEMY (F2-I proto) ════ -->
-  <!-- Two starter modules backed by the existing JESUS_LESSONS (17) and
-       LEARN_BIBLE_LESSONS (17) banks. Lesson completion grants +5 XP and
-       fires the streak. Module badge unlocks when every lesson in the
-       module is read. Full F2-I expands this to 5 modules / 18 courses
-       with quizzes + certificates per spec §4.11. -->
+  <!-- ════ FAITH ACADEMY (F2-I) ════ -->
+  <!-- 5 modules · 18 courses · ~85 lessons · 18 quizzes · 18 certificates
+       · 5 module badges · 1 master badge per spec §4.11. Curriculum lives
+       in app/js/data/academy.js. -->
   <div id="bf-academy" style="display:none;">
     <style>
       #bf-academy .ac-hero{background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(167,139,250,.08));border:1px solid rgba(167,139,250,.22);border-radius:16px;padding:1rem 1.15rem;margin-bottom:.85rem;}
@@ -4767,23 +4765,54 @@
 
     <div class="ac-hero">
       <div class="ac-hero-title">🎓 Faith Academy</div>
-      <div class="ac-hero-sub">Two foundational modules ready now — 34 lessons grouped into Foundations of Faith and Bible Survey. Tap any lesson to read it; mark complete for +5 Faith XP. Complete a whole module to earn its badge.</div>
+      <div class="ac-hero-sub">5 modules · 18 courses · ~85 lessons · 18 quizzes · certificates per course · master "Faith Foundations Graduate" badge when all 5 module badges are earned.</div>
     </div>
 
     <div class="ac-stats">
       <div class="ac-stat"><div class="ac-stat-num" id="acStatLessons" style="color:#10b981;">0</div><div class="ac-stat-lbl">Lessons read</div></div>
-      <div class="ac-stat"><div class="ac-stat-num" id="acStatTotal"   style="color:#38bdf8;">34</div><div class="ac-stat-lbl">Total available</div></div>
-      <div class="ac-stat"><div class="ac-stat-num" id="acStatBadges"  style="color:#fbbf24;">0</div><div class="ac-stat-lbl">Module badges</div></div>
+      <div class="ac-stat"><div class="ac-stat-num" id="acStatCerts"   style="color:#38bdf8;">0</div><div class="ac-stat-lbl">Certificates</div></div>
+      <div class="ac-stat"><div class="ac-stat-num" id="acStatBadges"  style="color:#fbbf24;">0</div><div class="ac-stat-lbl">Badges</div></div>
+    </div>
+
+    <div id="acMasterBadge" style="display:none;background:linear-gradient(135deg,#fbbf24,#fb923c);color:#0b1220;border-radius:14px;padding:1rem 1.15rem;margin-bottom:.85rem;text-align:center;">
+      <div style="font-size:1.6rem;margin-bottom:.2rem;">🏅</div>
+      <div style="font-family:var(--fh,var(--fm));font-size:1rem;font-weight:800;letter-spacing:.04em;">Faith Foundations Graduate</div>
+      <div style="font-size:.74rem;font-weight:600;opacity:.78;margin-top:.15rem;" id="acMasterDate">Earned —</div>
     </div>
 
     <div id="acModules"></div>
+  </div>
 
-    <div class="ac-roadmap">
-      <div class="ac-roadmap-hdr">🗺️ Coming in F2-I</div>
-      <div class="ac-roadmap-row">📚 <strong>Christian Life Skills</strong> — Prayer · Doubt · Sharing Faith · Money · Purity</div>
-      <div class="ac-roadmap-row">💎 <strong>Topical Deep Dives</strong> — Anxiety · Identity · Suffering · Forgiveness</div>
-      <div class="ac-roadmap-row">🏡 <strong>For Families</strong> — Devotional rhythms · Talking to teens · Praying with kids</div>
-      <div class="ac-roadmap-row">❓ <strong>Quizzes + 🏆 Certificates</strong> per course · 🏅 Master badge "Faith Foundations Graduate"</div>
+  <!-- ════ FAITH ACADEMY QUIZ MODAL (F2-I) ════ -->
+  <div id="acQuizModal" class="mo" onclick="if(event.target===this)acCloseQuiz()">
+    <div class="md" style="max-width:560px;padding:0;">
+      <div style="padding:1rem 1.2rem .65rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid rgba(255,255,255,.06);">
+        <span style="font-size:1.2rem;">❓</span>
+        <span id="acqTitle" style="font-family:var(--fh,var(--fm));font-size:1rem;font-weight:800;letter-spacing:.04em;color:var(--tx);">Course Quiz</span>
+        <span id="acqProgress" style="font-size:.66rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.08em;">—</span>
+        <button onclick="acCloseQuiz()" style="margin-left:auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.78rem;font-weight:800;">✕</button>
+      </div>
+      <div id="acqBody" style="padding:.85rem 1.2rem;min-height:240px;max-height:60vh;overflow-y:auto;"></div>
+      <div id="acqFooter" style="padding:.65rem 1.2rem 1rem;display:flex;gap:.4rem;justify-content:flex-end;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.06);"></div>
+    </div>
+  </div>
+
+  <!-- ════ FAITH ACADEMY CERTIFICATE MODAL (F2-I) ════ -->
+  <div id="acCertModal" class="mo" onclick="if(event.target===this)acCloseCert()">
+    <div class="md" style="max-width:620px;padding:0;">
+      <div style="padding:1rem 1.2rem .65rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid rgba(255,255,255,.06);">
+        <span style="font-size:1.2rem;">🏆</span>
+        <span style="font-family:var(--fh,var(--fm));font-size:1rem;font-weight:800;letter-spacing:.04em;color:var(--tx);">Certificate of Completion</span>
+        <button onclick="acCloseCert()" style="margin-left:auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.78rem;font-weight:800;">✕</button>
+      </div>
+      <div style="padding:.85rem 1.2rem;display:flex;justify-content:center;">
+        <canvas id="acCertCanvas" width="1080" height="780" style="width:100%;max-width:540px;aspect-ratio:1080/780;border-radius:10px;background:rgba(0,0,0,.25);box-shadow:0 8px 30px rgba(0,0,0,.4);"></canvas>
+      </div>
+      <div style="padding:.65rem 1.2rem 1rem;display:flex;gap:.4rem;flex-wrap:wrap;">
+        <button onclick="acCertDownload()" style="flex:1;min-width:130px;background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#0b1220;border:none;border-radius:10px;padding:.6rem .85rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">⬇ Download PNG</button>
+        <button onclick="acCertPrint()" style="flex:1;min-width:130px;background:rgba(255,255,255,.06);color:var(--tx);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.6rem .85rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);">🖨 Print</button>
+      </div>
+      <div style="padding:0 1.2rem 1rem;font-size:.62rem;color:var(--tx3);text-align:center;line-height:1.5;">Certificate ID: <span id="acCertIdLabel">—</span></div>
     </div>
   </div>
 
@@ -8276,6 +8305,7 @@
 <script src="/app/js/sports.js"></script>
 <script src="/app/js/data/plans.js"></script>
 <script src="/app/js/data/memory-verses.js"></script>
+<script src="/app/js/data/academy.js"></script>
 <script src="/app/js/faith.js"></script>
 <script src="/app/js/worship.js"></script>
 <script src="/app/js/faith-resources.js"></script>
