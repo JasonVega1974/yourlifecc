@@ -3877,8 +3877,8 @@ function buildSkillsGrid(filter){
     const cc = cat.color || '#38bdf8';
     return `<div class="topic-card sk-topic-card" style="border-color:${cc}33;" onclick="openSkillCategory('${cat.key}')">
       ${hasCert?'<div class="sk-cert-pill">✓ Cert</div>':''}
-      <div class="topic-card-hero" style="background:linear-gradient(135deg, ${cc}33, ${cc}11);display:flex;align-items:center;justify-content:center;font-size:2.4rem;">${cat.icon}</div>
-      <div class="topic-card-title" style="padding-top:.75rem;">${cat.name}</div>
+      <div class="topic-card-hero-wrap topic-card-hero-fallback" style="background:linear-gradient(135deg, ${cc}55, ${cc}18);"></div>
+      <div class="topic-card-title">${cat.name}</div>
       <div class="topic-card-desc">${desc}</div>
     </div>`;
   }).join('');

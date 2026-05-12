@@ -1148,37 +1148,37 @@
   <!-- Phase 5.8 Pass D — topic card grid (default view) -->
   <div class="topic-card-grid" id="financeTopicGrid">
     <div class="topic-card accent-cyan" onclick="tgOpenTopic('s-finance','overview')">
-      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(167,139,250,.12));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">📊</div>
+      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(56,189,248,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/USDnotesNew.png/1280px-USDnotesNew.png" alt="Overview"></div>
       <div class="topic-card-title" style="padding-top:.75rem;">Overview</div>
       <div class="topic-card-desc">Balances &amp; month snapshot</div>
     </div>
     <div class="topic-card accent-pink" onclick="tgOpenTopic('s-finance','bills')">
-      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(244,114,182,.22),rgba(251,146,60,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">🧾</div>
+      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(244,114,182,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/US-BEP-Receipt_for_currency_%2823_July_1915%29.jpg/1280px-US-BEP-Receipt_for_currency_%2823_July_1915%29.jpg" alt="Bills"></div>
       <div class="topic-card-title" style="padding-top:.75rem;">Bills</div>
       <div class="topic-card-desc">Recurring bills tracker</div>
     </div>
     <div class="topic-card accent-violet" onclick="tgOpenTopic('s-finance','tx')">
-      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(167,139,250,.22),rgba(56,189,248,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">💳</div>
+      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(167,139,250,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Contactless_Payment_Card_opened_to_show_RF_antenna.jpg/1280px-Contactless_Payment_Card_opened_to_show_RF_antenna.jpg" alt="Transactions"></div>
       <div class="topic-card-title" style="padding-top:.75rem;">Transactions</div>
       <div class="topic-card-desc">Log income &amp; expenses</div>
     </div>
     <div class="topic-card accent-green" onclick="tgOpenTopic('s-finance','savings')">
-      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(52,211,153,.22),rgba(56,189,248,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">💚</div>
+      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(52,211,153,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/e/e2/Sparschwein_Haspa02.jpg" alt="Goal Savings"></div>
       <div class="topic-card-title" style="padding-top:.75rem;">Goal Savings</div>
       <div class="topic-card-desc">Quick add to savings goals</div>
     </div>
     <div class="topic-card accent-gold" onclick="tgOpenTopic('s-finance','savgoals')">
-      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(251,191,36,.22),rgba(52,211,153,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">🎯</div>
+      <div class="topic-card-hero-wrap topic-card-hero-fallback" style="background:linear-gradient(135deg,rgba(251,191,36,.22);"></div>
       <div class="topic-card-title" style="padding-top:.75rem;">Sav. Goals</div>
       <div class="topic-card-desc">Create savings targets</div>
     </div>
     <div class="topic-card accent-orange" onclick="tgOpenTopic('s-finance','budget')">
-      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(251,146,60,.22),rgba(251,191,36,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">📋</div>
+      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(251,146,60,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Casio_calculator_JS-20WK_in_201901_002.jpg/1280px-Casio_calculator_JS-20WK_in_201901_002.jpg" alt="Budget"></div>
       <div class="topic-card-title" style="padding-top:.75rem;">Budget</div>
       <div class="topic-card-desc">50/30/20 math</div>
     </div>
     <div class="topic-card accent-cyan" onclick="tgOpenTopic('s-finance','taxed')">
-      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(167,139,250,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">🧾</div>
+      <div class="topic-card-hero-wrap topic-card-hero-fallback" style="background:linear-gradient(135deg,rgba(56,189,248,.22);"></div>
       <div class="topic-card-title" style="padding-top:.75rem;">Tax Ed</div>
       <div class="topic-card-desc">Tax basics &amp; how-tos</div>
     </div>
@@ -1570,27 +1570,27 @@
        this grid and the existing tab panels via tgShowGrid / tgOpenTopic. -->
   <div class="topic-card-grid" id="schoolTopicGrid">
     <div class="topic-card accent-cyan" onclick="tgOpenTopic('s-school','classes')">
-      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(167,139,250,.12));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">📖</div>
+      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(56,189,248,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Elementary_classroom_in_Alaska.jpg/1280px-Elementary_classroom_in_Alaska.jpg" alt="My Classes"></div>
       <div class="topic-card-title" style="padding-top:.75rem;">My Classes</div>
       <div class="topic-card-desc">Subjects, grades, GPA inputs</div>
     </div>
     <div class="topic-card accent-orange" onclick="tgOpenTopic('s-school','assignments')">
-      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(251,146,60,.22),rgba(251,191,36,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">📝</div>
+      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(251,146,60,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Homework_-_vector_maths.jpg/1280px-Homework_-_vector_maths.jpg" alt="Assignments"></div>
       <div class="topic-card-title" style="padding-top:.75rem;">Assignments</div>
       <div class="topic-card-desc">Track tasks by due date</div>
     </div>
     <div class="topic-card accent-green" onclick="tgOpenTopic('s-school','gpa')">
-      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(52,211,153,.22),rgba(56,189,248,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">🎓</div>
+      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(52,211,153,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/2/26/Line_of_young_people_at_a_commencement_ceremony.jpg" alt="GPA"></div>
       <div class="topic-card-title" style="padding-top:.75rem;">GPA</div>
       <div class="topic-card-desc">Live grade-point calculator</div>
     </div>
     <div class="topic-card accent-violet" onclick="tgOpenTopic('s-school','study')">
-      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(167,139,250,.22),rgba(56,189,248,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">⏱</div>
+      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(167,139,250,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/3/34/Il_pomodoro.jpg" alt="Study Timer"></div>
       <div class="topic-card-title" style="padding-top:.75rem;">Study Timer</div>
       <div class="topic-card-desc">Pomodoro focus sessions</div>
     </div>
     <div class="topic-card accent-gold" onclick="tgOpenTopic('s-school','prep')">
-      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(251,191,36,.22),rgba(251,146,60,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">🎯</div>
+      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(251,191,36,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Four_Tulane_University_Students_Studying_January_2008.jpg/1280px-Four_Tulane_University_Students_Studying_January_2008.jpg" alt="Study Prep"></div>
       <div class="topic-card-title" style="padding-top:.75rem;">Study Prep</div>
       <div class="topic-card-desc">Test prep &amp; strategies</div>
     </div>
@@ -2048,27 +2048,27 @@
   <!-- Phase 5.8 Pass D — topic card grid (default view) -->
   <div class="topic-card-grid" id="healthTopicGrid">
     <div class="topic-card accent-cyan" onclick="tgOpenTopic('s-health','weight')">
-      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(167,139,250,.12));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">⚖️</div>
+      <div class="topic-card-hero-wrap topic-card-hero-fallback" style="background:linear-gradient(135deg,rgba(56,189,248,.22);"></div>
       <div class="topic-card-title" style="padding-top:.75rem;">Weight</div>
       <div class="topic-card-desc">Log weight &amp; track progress</div>
     </div>
     <div class="topic-card accent-green" onclick="tgOpenTopic('s-health','food')">
-      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(52,211,153,.22),rgba(56,189,248,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">🍽</div>
+      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(52,211,153,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Marketvegetables.jpg/1280px-Marketvegetables.jpg" alt="Nutrition"></div>
       <div class="topic-card-title" style="padding-top:.75rem;">Nutrition</div>
       <div class="topic-card-desc">Log meals &amp; macros</div>
     </div>
     <div class="topic-card accent-violet" onclick="tgOpenTopic('s-health','nutEd')">
-      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(167,139,250,.22),rgba(52,211,153,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">📚</div>
+      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(167,139,250,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Good_Food_Display_-_NCI_Visuals_Online.jpg/1280px-Good_Food_Display_-_NCI_Visuals_Online.jpg" alt="Learn"></div>
       <div class="topic-card-title" style="padding-top:.75rem;">Learn</div>
       <div class="topic-card-desc">Nutrition education</div>
     </div>
     <div class="topic-card accent-orange" onclick="tgOpenTopic('s-health','growth')">
-      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(251,146,60,.22),rgba(251,191,36,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">📏</div>
+      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(251,146,60,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/0/03/Tape_Measure_25%27_Klein_Tools.jpg" alt="Growth"></div>
       <div class="topic-card-title" style="padding-top:.75rem;">Growth</div>
       <div class="topic-card-desc">Height tracking</div>
     </div>
     <div class="topic-card accent-pink" onclick="tgOpenTopic('s-health','habits')">
-      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(244,114,182,.22),rgba(167,139,250,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">✅</div>
+      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(244,114,182,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Cycling_in_Amsterdam_%28893%29.jpg/1280px-Cycling_in_Amsterdam_%28893%29.jpg" alt="Habits"></div>
       <div class="topic-card-title" style="padding-top:.75rem;">Habits</div>
       <div class="topic-card-desc">Daily habit check-ins</div>
     </div>
@@ -4288,74 +4288,62 @@
          CLG / Flashcards / Worship). -->
     <div class="topic-card-grid" style="margin-bottom:1.1rem;">
       <div class="topic-card accent-gold" onclick="bfTab('stories')">
-        <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(251,191,36,.22),rgba(167,139,250,.12));display:flex;align-items:center;justify-content:center;font-size:2.2rem;">⭐</div>
-        <div class="topic-card-icon">📖</div>
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(251,191,36,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/3/3f/The_Wise_Men.jpg" alt="Story Mode"></div>
         <div class="topic-card-title">Story Mode</div>
         <div class="topic-card-desc">Illustrated, narrated Bible stories</div>
       </div>
       <div class="topic-card accent-violet" onclick="showSection('s-christian-living')">
-        <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(167,139,250,.22),rgba(102,126,234,.14));display:flex;align-items:center;justify-content:center;font-size:2.2rem;">📚</div>
-        <div class="topic-card-icon">📚</div>
+        <div class="topic-card-hero-wrap topic-card-hero-fallback" style="background:linear-gradient(135deg,rgba(167,139,250,.22);"></div>
         <div class="topic-card-title">Christian Life Guide</div>
         <div class="topic-card-desc">12 in-depth biblical topics</div>
       </div>
       <div class="topic-card accent-cyan" onclick="showSection('s-flashcards')">
-        <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(167,139,250,.12));display:flex;align-items:center;justify-content:center;font-size:2.2rem;">📇</div>
-        <div class="topic-card-icon">📇</div>
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(56,189,248,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Flash_cards_for_language_learning.jpg/1280px-Flash_cards_for_language_learning.jpg" alt="Bible Flashcards"></div>
         <div class="topic-card-title">Bible Flashcards</div>
         <div class="topic-card-desc">300 cards · 20-card rounds</div>
       </div>
       <div class="topic-card accent-pink" onclick="showSection('s-worship')">
-        <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(244,114,182,.22),rgba(251,191,36,.14));display:flex;align-items:center;justify-content:center;font-size:2.2rem;">🎵</div>
-        <div class="topic-card-icon">🎵</div>
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(244,114,182,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/4/49/RH_Worship_Team.jpg" alt="Worship Playlist"></div>
         <div class="topic-card-title">Worship Playlist</div>
         <div class="topic-card-desc">Curated songs &amp; albums</div>
       </div>
       <div class="topic-card accent-cyan" onclick="bfTab('bible')">
-        <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(102,126,234,.14));display:flex;align-items:center;justify-content:center;font-size:2.2rem;">📖</div>
-        <div class="topic-card-icon">🕊️</div>
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(56,189,248,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Gutenberg_Bible%2C_Lenox_Copy%2C_New_York_Public_Library%2C_2009._Pic_01.jpg/1280px-Gutenberg_Bible%2C_Lenox_Copy%2C_New_York_Public_Library%2C_2009._Pic_01.jpg" alt="Bible Hub"></div>
         <div class="topic-card-title">Bible Hub</div>
         <div class="topic-card-desc">Read · search · Ask the Bible</div>
       </div>
       <div class="topic-card accent-violet" onclick="bfTab('prayer')">
-        <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(167,139,250,.22),rgba(56,189,248,.14));display:flex;align-items:center;justify-content:center;font-size:2.2rem;">🙏</div>
-        <div class="topic-card-icon">🙏</div>
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(167,139,250,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/4/4b/John_William_Waterhouse_-_The_Missal.JPG" alt="Prayer"></div>
         <div class="topic-card-title">Prayer</div>
         <div class="topic-card-desc">Requests, praises &amp; answered</div>
       </div>
       <div class="topic-card accent-gold" onclick="bfTab('academy')">
-        <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(251,191,36,.22),rgba(56,189,248,.14));display:flex;align-items:center;justify-content:center;font-size:2.2rem;">🎓</div>
-        <div class="topic-card-icon">🎓</div>
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(251,191,36,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Church_and_Cloisters%2C_St_Stephen%27s_House_LV_2025.jpg/1280px-Church_and_Cloisters%2C_St_Stephen%27s_House_LV_2025.jpg" alt="Academy"></div>
         <div class="topic-card-title">Academy</div>
         <div class="topic-card-desc">Bite-size faith lessons</div>
       </div>
       <div class="topic-card accent-green" onclick="bfTab('bibleworld')">
-        <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(52,211,153,.22),rgba(56,189,248,.14));display:flex;align-items:center;justify-content:center;font-size:2.2rem;">🗺️</div>
-        <div class="topic-card-icon">🗺️</div>
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(52,211,153,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/%D7%94%D7%9E%D7%A6%D7%95%D7%93%D7%94_%D7%91%D7%9C%D7%99%D7%9C%D7%94.jpg/1280px-%D7%94%D7%9E%D7%A6%D7%95%D7%93%D7%94_%D7%91%D7%9C%D7%99%D7%9C%D7%94.jpg" alt="Bible Lands"></div>
         <div class="topic-card-title">Bible Lands</div>
         <div class="topic-card-desc">32 sites with photos &amp; refs</div>
       </div>
       <div class="topic-card accent-orange" onclick="bfTab('timeline')">
-        <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(251,146,60,.22),rgba(251,191,36,.14));display:flex;align-items:center;justify-content:center;font-size:2.2rem;">🕰️</div>
-        <div class="topic-card-icon">🕰️</div>
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(251,146,60,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Edward_Weller%2C_The_Kingdoms_of_Judah_and_Israel_%28FL36012236_3897579%29_%28cropped%29.jpg/1280px-Edward_Weller%2C_The_Kingdoms_of_Judah_and_Israel_%28FL36012236_3897579%29_%28cropped%29.jpg" alt="Timeline"></div>
         <div class="topic-card-title">Timeline</div>
         <div class="topic-card-desc">A visual Bible chronology</div>
       </div>
       <div class="topic-card accent-violet" onclick="bfTab('memorize')">
-        <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(167,139,250,.22),rgba(244,114,182,.12));display:flex;align-items:center;justify-content:center;font-size:2.2rem;">✨</div>
-        <div class="topic-card-icon">✨</div>
+        <div class="topic-card-hero-wrap topic-card-hero-fallback" style="background:linear-gradient(135deg,rgba(167,139,250,.22);"></div>
         <div class="topic-card-title">Memorize</div>
         <div class="topic-card-desc">Verse memory · SM-2 spaced</div>
       </div>
       <div class="topic-card accent-green" onclick="bfTab('journey')">
-        <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(52,211,153,.22),rgba(251,191,36,.14));display:flex;align-items:center;justify-content:center;font-size:2.2rem;">🌟</div>
-        <div class="topic-card-icon">🌟</div>
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(52,211,153,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Hiking_to_the_Ice_Lakes._San_Juan_National_Forest%2C_Colorado.jpg/1280px-Hiking_to_the_Ice_Lakes._San_Juan_National_Forest%2C_Colorado.jpg" alt="Journey"></div>
         <div class="topic-card-title">Journey</div>
         <div class="topic-card-desc">Your faith stages &amp; growth</div>
       </div>
       <div class="topic-card accent-cyan" onclick="bfTab('devotional')">
-        <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(52,211,153,.14));display:flex;align-items:center;justify-content:center;font-size:2.2rem;">📅</div>
-        <div class="topic-card-icon">🕊️</div>
+        <div class="topic-card-hero-wrap topic-card-hero-fallback" style="background:linear-gradient(135deg,rgba(56,189,248,.22);"></div>
         <div class="topic-card-title">Devotional</div>
         <div class="topic-card-desc">Today + the full 365 plan</div>
       </div>
@@ -6286,54 +6274,11 @@
       border-top-color: rgba(124,58,237,.15);
     }
 
-    /* ══════════ Phase 5.8 Pass B — harmonize with global .topic-card
-       pattern and render the modal inline (← Back, no fixed overlay). ══════════ */
-    /* Grid: auto-fill, minmax(160px, 1fr) — matches Pass A foundation */
-    #s-christian-living .resource-grid {
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
-      gap: .7rem !important;
-      margin-top: 16px !important;
-    }
-    @media (max-width: 1000px) {
-      #s-christian-living .resource-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important; gap: .7rem !important; }
-    }
-    @media (max-width: 650px) {
-      #s-christian-living .resource-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important; gap: .55rem !important; }
-    }
-    /* Card: shorter, scale-on-hover (matches .topic-card), softer shadow */
-    #s-christian-living .resource-card {
-      height: auto !important;
-      border-radius: 14px !important;
-      border: 1px solid rgba(124,58,237,.32) !important;
-      box-shadow: 0 2px 10px rgba(15,23,42,.08) !important;
-      transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease !important;
-    }
-    #s-christian-living .resource-card:hover {
-      transform: scale(1.02) !important;
-      border-color: rgba(167,139,250,.55) !important;
-      box-shadow: 0 6px 22px rgba(124,58,237,.20) !important;
-    }
-    #s-christian-living .resource-card:active { transform: scale(.98) !important; }
-    #s-christian-living .resource-card::before { display: none !important; }
-    /* Tighter card-header — was 180px, now ~120px per spec */
-    #s-christian-living .card-header { height: 120px !important; }
-    #s-christian-living .card-icon { font-size: 3em !important; }
-    /* Compact body / footer */
-    #s-christian-living .card-body { padding: 14px 14px 10px !important; flex: 0 0 auto !important; }
-    #s-christian-living .card-category {
-      font-size: .58em !important; padding: 3px 9px !important; margin-bottom: 7px !important; letter-spacing: .12em !important;
-    }
-    #s-christian-living .card-title {
-      font-size: 1em !important; margin-bottom: 5px !important;
-      font-family: var(--fh, var(--fm)) !important; line-height: 1.2 !important;
-    }
-    #s-christian-living .card-description {
-      font-size: .76em !important; -webkit-line-clamp: 2 !important; line-height: 1.45 !important;
-    }
-    #s-christian-living .card-footer { padding: 8px 14px !important; }
-    #s-christian-living .card-pages { font-size: .68em !important; }
-    #s-christian-living .read-more-btn { padding: 5px 12px !important; font-size: .7em !important; }
-
+    /* ══════════ Phase 5.8 Pass B — render the modal inline (← Back, no
+       fixed overlay). Card sizing was reverted to pre-5.8 (original 3-up
+       grid + 420px card height) per the user's "uniform & realistic"
+       polish pass — the harmonization-with-.topic-card override block
+       was removed; only the inline-modal rules remain. ══════════ */
     /* Inline modal mode — when active, render the modal in-place (no fixed overlay).
        JS hides .resource-container / .filter-tabs / .resource-header so the
        active modal occupies the section content area. */
