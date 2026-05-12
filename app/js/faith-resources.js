@@ -59,17 +59,58 @@ function faithResBindGlobalHandlers(){
 // inside the section markup). Prefixed with `faithRes` to avoid collision
 // with the existing `openModal` / `closeModal` in ui.js, which take element
 // IDs (not resource keys) and use a different `.open` class.
+//
+// Phase 5.8 Pass B: the modal renders INLINE inside #s-christian-living
+// (no fixed overlay). Opening hides the card grid / filter tabs / hero
+// banner and prepends a "← Back" pill at the top of the modal content.
+// Closing restores the grid view.
 function faithResOpenModal(resourceId){
   const modal = document.getElementById('modal-' + resourceId);
   if (!modal) return;
+  const section = document.getElementById('s-christian-living');
+  if (section) {
+    const grid    = section.querySelector('.resource-container');
+    const filters = section.querySelector('.filter-tabs');
+    const header  = section.querySelector('.resource-header');
+    if (grid)    grid.style.display    = 'none';
+    if (filters) filters.style.display = 'none';
+    if (header)  header.style.display  = 'none';
+    // Hide any other open modal so only one inline panel is active at a time
+    section.querySelectorAll('.modal-overlay.active').forEach(m => {
+      if (m !== modal) m.classList.remove('active');
+    });
+    // Inject the "← Back" pill at the top of the active modal once
+    const content = modal.querySelector('.modal-content');
+    if (content && !content.querySelector('.clg-back-btn')) {
+      const back = document.createElement('button');
+      back.className = 'clg-back-btn';
+      back.type = 'button';
+      back.innerHTML = '← Back to all topics';
+      back.onclick = function(){ faithResCloseModal(resourceId); };
+      content.insertBefore(back, content.firstChild);
+    }
+  }
   modal.classList.add('active');
-  document.body.style.overflow = 'hidden';
+  // Scroll the active modal into view so the user sees the topic top
+  try { modal.scrollIntoView({behavior:'smooth', block:'start'}); } catch(e){}
 }
 
 function faithResCloseModal(resourceId){
   const modal = document.getElementById('modal-' + resourceId);
   if (!modal) return;
   modal.classList.remove('active');
+  const section = document.getElementById('s-christian-living');
+  if (section) {
+    const grid    = section.querySelector('.resource-container');
+    const filters = section.querySelector('.filter-tabs');
+    const header  = section.querySelector('.resource-header');
+    if (grid)    grid.style.display    = '';
+    if (filters) filters.style.display = '';
+    if (header)  header.style.display  = '';
+    try { section.scrollIntoView({behavior:'smooth', block:'start'}); } catch(e){}
+  }
+  // Inline mode never locks body scroll; safe no-op restore for any legacy
+  // overlay state that might have leaked in.
   document.body.style.overflow = 'auto';
 }
 

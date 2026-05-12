@@ -957,10 +957,15 @@ const NAV_ITEMS = [
     {id:'s-sports',    icon:'⚽', label:'Sports',         key:'sports'},
     {id:'s-mentors',   icon:'🤝', label:'My People',      key:'mentors'},
   ]},
-  {id:'s-scripture', icon:'✝️', label:'Bible & Faith', key:'scripture'},
-  {id:'s-worship',   icon:'🎵', label:'Worship Playlist', key:'worship'},
-  {id:'s-christian-living', icon:'📚', label:'Christian Life Guide', key:'christianLiving'},
-  {id:'s-flashcards', icon:'📇', label:'Bible Flashcards', key:'flashcards'},
+  // Phase 5.8 Pass B — Bible & Faith collapses four related sections under
+  // one sidebar group. The Faith Home card grid still routes into each of
+  // these via showSection(...), so the group is just a visual cluster.
+  {id:'_group_faith', icon:'✝️', label:'Bible & Faith', isGroup:true, children:[
+    {id:'s-scripture',        icon:'📖', label:'Bible Hub',             key:'scripture'},
+    {id:'s-christian-living', icon:'📚', label:'Christian Life Guide',  key:'christianLiving'},
+    {id:'s-flashcards',       icon:'📇', label:'Bible Flashcards',      key:'flashcards'},
+    {id:'s-worship',          icon:'🎵', label:'Worship Playlist',      key:'worship'},
+  ]},
   {id:'_group_school', icon:'🎓', label:'School & Career', isGroup:true, children:[
     {id:'s-school',    icon:'📚', label:'School',         key:'school'},
     {id:'s-resume',    icon:'💼', label:'Jobs/Resume',    key:'resume'},
@@ -1003,7 +1008,7 @@ function buildSideNav(){
   // Always force CBT, resume, referral visible — delete any hidden=0 state.
   // Faith Hub sections are also force-visible so users who toggled them off
   // pre-F2 see Christian Life Guide / Worship / Bible & Faith again.
-  ['cbt','resume','referral','christianLiving','worship','scripture'].forEach(k=>{ if(D.sections[k]===0) delete D.sections[k]; });
+  ['cbt','resume','referral','christianLiving','worship','scripture','flashcards'].forEach(k=>{ if(D.sections[k]===0) delete D.sections[k]; });
   delete D.sections.referral; // referral is now Parent Hub only
   const hidden = D.sections||{};
   if(!D._navGroups) D._navGroups={};
@@ -1013,6 +1018,8 @@ function buildSideNav(){
   // start closed for new users. CBT injection below works regardless of
   // group open/closed state (DOM-based, not display-state-based).
   D._navGroups["Daily Life"] = true;
+  // Phase 5.8 Pass B — Bible & Faith is a high-frequency cluster, open by default
+  if(D._navGroups["Bible & Faith"] !== false) D._navGroups["Bible & Faith"] = true;
   const openGroups = D._navGroups || {};
 
   let navHTML = '<div class="sid-sep">Sections</div>';
