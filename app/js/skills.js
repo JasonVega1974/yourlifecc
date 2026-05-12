@@ -3859,6 +3859,10 @@ Please give a SHORT, warm, personalized analysis (3-4 sentences max). Mention 1-
 function initSkillsGrid(){
   buildSkillsGrid();
   updateSkillsStats();
+  // Phase 5.8 Pass C — relocate skillsModal into the section so it can
+  // render inline (rather than as a fixed overlay) and install a
+  // MutationObserver to restore the grid view when the modal closes.
+  _skillsRelocateModal();
 }
 
 function buildSkillsGrid(filter){
@@ -3869,13 +3873,69 @@ function buildSkillsGrid(filter){
     const lessons = SK_DATA[cat.key]||[];
     const hasCert = D.skillCerts && D.skillCerts[cat.key];
     const quizScore = D.skillQuizScores && D.skillQuizScores[cat.key];
-    return `<div onclick="openSkillCategory('${cat.key}')" style="background:rgba(255,255,255,.04);border:1px solid ${cat.color}22;border-left:3px solid ${cat.color};border-radius:12px;padding:.75rem .7rem;cursor:pointer;transition:all .15s;position:relative;${hasCert?'border-color:'+cat.color+'55;':''}" onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 12px rgba(0,0,0,.2)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
-      ${hasCert?'<div style="position:absolute;top:.4rem;right:.4rem;font-size:.55rem;background:rgba(34,197,94,.15);color:#22c55e;padding:.08rem .3rem;border-radius:4px;font-weight:700;">✓ Cert</div>':''}
-      <div style="font-size:1.4rem;margin-bottom:.3rem;">${cat.icon}</div>
-      <div style="font-size:.78rem;font-weight:800;color:var(--tx);margin-bottom:.15rem;">${cat.name}</div>
-      <div style="font-size:.6rem;color:var(--tx2);">${lessons.length} lessons${quizScore?' · '+quizScore+'%':''}</div>
+    const desc = lessons.length + ' lesson' + (lessons.length===1?'':'s') + (quizScore?(' · '+quizScore+'%'):'');
+    const cc = cat.color || '#38bdf8';
+    return `<div class="topic-card sk-topic-card" style="border-color:${cc}33;" onclick="openSkillCategory('${cat.key}')">
+      ${hasCert?'<div class="sk-cert-pill">✓ Cert</div>':''}
+      <div class="topic-card-hero" style="background:linear-gradient(135deg, ${cc}33, ${cc}11);display:flex;align-items:center;justify-content:center;font-size:2.4rem;">${cat.icon}</div>
+      <div class="topic-card-title" style="padding-top:.75rem;">${cat.name}</div>
+      <div class="topic-card-desc">${desc}</div>
     </div>`;
   }).join('');
+}
+
+// ── Phase 5.8 Pass C helpers — inline modal mode for Life Skills ────────
+function _skillsRelocateModal(){
+  const modal = document.getElementById('skillsModal');
+  const section = document.getElementById('s-skills');
+  if(!modal || !section) return;
+  // Move the modal into the section so CSS scoping (#s-skills > #skillsModal)
+  // can render it inline. Safe to call multiple times — only moves if needed.
+  if(modal.parentNode !== section){
+    section.appendChild(modal);
+  }
+  // Observe class changes to restore the grid view when .open is removed
+  // (i.e. when closeModal('skillsModal') is called from any button).
+  if(!modal._ylccSkillsObserver && typeof MutationObserver !== 'undefined'){
+    const obs = new MutationObserver(function(){
+      if(!modal.classList.contains('open')){
+        _skillsShowGridView();
+      }
+    });
+    obs.observe(modal, {attributes:true, attributeFilter:['class']});
+    modal._ylccSkillsObserver = obs;
+  }
+}
+
+function _skillsHideGridView(){
+  const grid = document.getElementById('skillsGrid');
+  if(grid) grid.style.display = 'none';
+  const search = document.getElementById('skSearch');
+  if(search && search.parentElement) search.parentElement.style.display = 'none';
+  const pb = document.getElementById('skillsPBBalance');
+  if(pb && pb.parentElement) pb.parentElement.style.display = 'none';
+}
+
+function _skillsShowGridView(){
+  const grid = document.getElementById('skillsGrid');
+  if(grid) grid.style.display = '';
+  const search = document.getElementById('skSearch');
+  if(search && search.parentElement) search.parentElement.style.display = '';
+  const pb = document.getElementById('skillsPBBalance');
+  if(pb && pb.parentElement) pb.parentElement.style.display = '';
+}
+
+function _skillsInjectBackBtn(){
+  const modal = document.getElementById('skillsModal');
+  if(!modal) return;
+  const inner = modal.querySelector('.md') || modal;
+  if(inner.querySelector('.sk-back-btn')) return;
+  const back = document.createElement('button');
+  back.className = 'sk-back-btn';
+  back.type = 'button';
+  back.innerHTML = '← Back to all topics';
+  back.onclick = function(){ closeModal('skillsModal'); };
+  inner.insertBefore(back, inner.firstChild);
 }
 
 function filterSkillsGrid(val){ buildSkillsGrid(val); }
@@ -3891,6 +3951,11 @@ function updateSkillsStats(){
 
 function openSkillCategory(key){
   const cat = SK_CATS.find(c=>c.key===key); if(!cat) return;
+  // Phase 5.8 Pass C — inline mode: relocate modal, hide the grid view,
+  // inject the ← Back pill. Existing modal-content logic below is unchanged.
+  _skillsRelocateModal();
+  _skillsHideGridView();
+  _skillsInjectBackBtn();
   const lessons = SK_DATA[key]||[];
   const hasCert = D.skillCerts && D.skillCerts[key];
 

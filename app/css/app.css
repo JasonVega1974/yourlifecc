@@ -2438,6 +2438,67 @@ body.solo-mode .mqb-parent {
    landing-preference panel. */
 body.solo-mode .sp-family-only { display: none !important; }
 
+/* ══════════ Phase 5.8 Pass C — LIFE SKILLS card grid + inline modal ══════════
+   The 42-category grid uses the global .topic-card-grid pattern. The
+   skillsModal is moved into #s-skills by JS and rendered inline (no
+   fixed overlay). Hides the grid / stats / PB bar when a category is
+   open; restores them on close via a MutationObserver in skills.js. */
+#s-skills #skillsGrid.topic-card-grid { /* already styled by the global rule */ }
+.sk-topic-card { position: relative; }
+.sk-cert-pill {
+  position: absolute; top: .4rem; right: .4rem;
+  font-size: .55rem; font-weight: 800; letter-spacing: .06em;
+  background: rgba(34,197,94,.18); color: #22c55e;
+  border: 1px solid rgba(34,197,94,.3);
+  padding: .12rem .35rem; border-radius: 5px;
+  z-index: 1;
+}
+:root.light .sk-cert-pill { background: rgba(34,197,94,.14); color: #166534; }
+
+/* Inline modal mode — skillsModal lives inside #s-skills after relocation */
+#s-skills > #skillsModal {
+  position: static !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  padding: 0 !important;
+  z-index: auto !important;
+  margin-top: .6rem;
+  inset: auto !important;
+}
+#s-skills > #skillsModal.open {
+  display: block !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+}
+#s-skills > #skillsModal > .md {
+  max-width: none !important;
+  max-height: none !important;
+  width: 100% !important;
+  border-radius: 14px !important;
+  box-shadow: 0 4px 18px rgba(15,23,42,.10) !important;
+  background: rgba(255,255,255,.04) !important;
+}
+:root.light #s-skills > #skillsModal > .md {
+  background: rgba(15,23,42,.03) !important;
+  border-color: rgba(15,23,42,.10) !important;
+}
+
+/* ← Back pill — injected at top of skillsModal */
+.sk-back-btn {
+  display: inline-flex; align-items: center; gap: .4rem;
+  background: rgba(56,189,248,.12);
+  border: 1px solid rgba(56,189,248,.3);
+  color: var(--c);
+  padding: .55rem 1.1rem;
+  border-radius: 10px;
+  font-size: .82rem; font-weight: 800;
+  cursor: pointer; font-family: var(--fm);
+  margin: 0 0 .85rem;
+  transition: background .15s, transform .1s;
+}
+.sk-back-btn:hover { background: rgba(56,189,248,.22); }
+.sk-back-btn:active { transform: scale(.97); }
+
 /* ══════════ Phase 5.8: GLOBAL CARD-GRID NAVIGATION ══════════
    Reusable .topic-card-grid + .topic-card pattern for any section
    that has sub-topics. Used by Bible & Faith Home (Pass A); future
