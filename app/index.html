@@ -4183,6 +4183,87 @@
       <div id="fhFamilyVerseRef" style="font-size:.74rem;font-weight:800;opacity:.78;">— …</div>
     </div>
 
+    <!-- Phase 5.8 — Card-grid navigation. Every Bible & Faith sub-section
+         is one tap from the Home tab. Cards route via existing handlers
+         (bfTab for in-tab panels; showSection for standalone sections like
+         CLG / Flashcards / Worship). -->
+    <div class="topic-card-grid" style="margin-bottom:1.1rem;">
+      <div class="topic-card accent-gold" onclick="bfTab('stories')">
+        <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(251,191,36,.22),rgba(167,139,250,.12));display:flex;align-items:center;justify-content:center;font-size:2.2rem;">⭐</div>
+        <div class="topic-card-icon">📖</div>
+        <div class="topic-card-title">Story Mode</div>
+        <div class="topic-card-desc">Illustrated, narrated Bible stories</div>
+      </div>
+      <div class="topic-card accent-violet" onclick="showSection('s-christian-living')">
+        <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(167,139,250,.22),rgba(102,126,234,.14));display:flex;align-items:center;justify-content:center;font-size:2.2rem;">📚</div>
+        <div class="topic-card-icon">📚</div>
+        <div class="topic-card-title">Christian Life Guide</div>
+        <div class="topic-card-desc">12 in-depth biblical topics</div>
+      </div>
+      <div class="topic-card accent-cyan" onclick="showSection('s-flashcards')">
+        <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(167,139,250,.12));display:flex;align-items:center;justify-content:center;font-size:2.2rem;">📇</div>
+        <div class="topic-card-icon">📇</div>
+        <div class="topic-card-title">Bible Flashcards</div>
+        <div class="topic-card-desc">300 cards · 20-card rounds</div>
+      </div>
+      <div class="topic-card accent-pink" onclick="showSection('s-worship')">
+        <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(244,114,182,.22),rgba(251,191,36,.14));display:flex;align-items:center;justify-content:center;font-size:2.2rem;">🎵</div>
+        <div class="topic-card-icon">🎵</div>
+        <div class="topic-card-title">Worship Playlist</div>
+        <div class="topic-card-desc">Curated songs &amp; albums</div>
+      </div>
+      <div class="topic-card accent-cyan" onclick="bfTab('bible')">
+        <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(102,126,234,.14));display:flex;align-items:center;justify-content:center;font-size:2.2rem;">📖</div>
+        <div class="topic-card-icon">🕊️</div>
+        <div class="topic-card-title">Bible Hub</div>
+        <div class="topic-card-desc">Read · search · Ask the Bible</div>
+      </div>
+      <div class="topic-card accent-violet" onclick="bfTab('prayer')">
+        <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(167,139,250,.22),rgba(56,189,248,.14));display:flex;align-items:center;justify-content:center;font-size:2.2rem;">🙏</div>
+        <div class="topic-card-icon">🙏</div>
+        <div class="topic-card-title">Prayer</div>
+        <div class="topic-card-desc">Requests, praises &amp; answered</div>
+      </div>
+      <div class="topic-card accent-gold" onclick="bfTab('academy')">
+        <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(251,191,36,.22),rgba(56,189,248,.14));display:flex;align-items:center;justify-content:center;font-size:2.2rem;">🎓</div>
+        <div class="topic-card-icon">🎓</div>
+        <div class="topic-card-title">Academy</div>
+        <div class="topic-card-desc">Bite-size faith lessons</div>
+      </div>
+      <div class="topic-card accent-green" onclick="bfTab('bibleworld')">
+        <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(52,211,153,.22),rgba(56,189,248,.14));display:flex;align-items:center;justify-content:center;font-size:2.2rem;">🗺️</div>
+        <div class="topic-card-icon">🗺️</div>
+        <div class="topic-card-title">Bible Lands</div>
+        <div class="topic-card-desc">32 sites with photos &amp; refs</div>
+      </div>
+      <div class="topic-card accent-orange" onclick="bfTab('timeline')">
+        <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(251,146,60,.22),rgba(251,191,36,.14));display:flex;align-items:center;justify-content:center;font-size:2.2rem;">🕰️</div>
+        <div class="topic-card-icon">🕰️</div>
+        <div class="topic-card-title">Timeline</div>
+        <div class="topic-card-desc">A visual Bible chronology</div>
+      </div>
+      <div class="topic-card accent-violet" onclick="bfTab('memorize')">
+        <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(167,139,250,.22),rgba(244,114,182,.12));display:flex;align-items:center;justify-content:center;font-size:2.2rem;">✨</div>
+        <div class="topic-card-icon">✨</div>
+        <div class="topic-card-title">Memorize</div>
+        <div class="topic-card-desc">Verse memory · SM-2 spaced</div>
+      </div>
+      <div class="topic-card accent-green" onclick="bfTab('journey')">
+        <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(52,211,153,.22),rgba(251,191,36,.14));display:flex;align-items:center;justify-content:center;font-size:2.2rem;">🌟</div>
+        <div class="topic-card-icon">🌟</div>
+        <div class="topic-card-title">Journey</div>
+        <div class="topic-card-desc">Your faith stages &amp; growth</div>
+      </div>
+      <div class="topic-card accent-cyan" onclick="bfTab('devotional')">
+        <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(52,211,153,.14));display:flex;align-items:center;justify-content:center;font-size:2.2rem;">📅</div>
+        <div class="topic-card-icon">🕊️</div>
+        <div class="topic-card-title">Devotional</div>
+        <div class="topic-card-desc">Today + the full 365 plan</div>
+      </div>
+    </div>
+
+    <!-- ── Today's Faith dashboard (existing dynamic content kept below the
+         navigation grid — VOTD, devotional preview, plan, streak, quick tiles) ── -->
     <div class="fh-grid">
       <!-- Card 1: Verse of the Day -->
       <div class="fh-card fh-votd">

@@ -1100,6 +1100,48 @@ function toggleNavGroup(label){
   save();
 }
 
+// ── Phase 5.8: Global card-grid navigation utilities ──────────
+// Two helpers that any section can use to toggle between a card-grid
+// landing view and a per-topic detail panel. Convention:
+//   - The grid is an element whose id ends with "-grid"
+//   - Each detail panel is an element whose id ends with "-panel-<topicId>"
+// showCardGrid(scope): hide all panels under scope, show the grid.
+// showTopicCard(scope, topicId): hide grid, show the matching panel.
+// `scope` is either an element id, the element itself, or a section id
+// like 's-skills' — the helper finds [data-topic-grid] / [data-topic-panel]
+// children inside the scope element.
+function _resolveScopeEl(scope){
+  if(!scope) return document;
+  if(typeof scope === 'string'){
+    const el = document.getElementById(scope);
+    return el || document;
+  }
+  return scope;
+}
+function showCardGrid(scope){
+  const root = _resolveScopeEl(scope);
+  if(!root || !root.querySelectorAll) return;
+  root.querySelectorAll('[data-topic-grid]').forEach(g => { g.style.display = ''; });
+  root.querySelectorAll('[data-topic-panel]').forEach(p => { p.style.display = 'none'; });
+  // Scroll the grid into view for tall sections
+  const grid = root.querySelector('[data-topic-grid]');
+  if(grid && typeof grid.scrollIntoView === 'function'){
+    try { grid.scrollIntoView({behavior:'smooth', block:'start'}); } catch(e){}
+  }
+}
+function showTopicCard(scope, topicId){
+  const root = _resolveScopeEl(scope);
+  if(!root || !root.querySelectorAll) return;
+  root.querySelectorAll('[data-topic-grid]').forEach(g => { g.style.display = 'none'; });
+  root.querySelectorAll('[data-topic-panel]').forEach(p => {
+    p.style.display = (p.getAttribute('data-topic-panel') === topicId) ? '' : 'none';
+  });
+  const target = root.querySelector('[data-topic-panel="' + topicId + '"]');
+  if(target && typeof target.scrollIntoView === 'function'){
+    try { target.scrollIntoView({behavior:'smooth', block:'start'}); } catch(e){}
+  }
+}
+
 function showSection(id, fromMobile){
   // faith_free fail-closed: redirect to home if the requested section is
   // outside the allow-list. Silent redirect — some callers fire from
