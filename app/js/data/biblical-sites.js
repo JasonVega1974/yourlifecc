@@ -1,10 +1,11 @@
 /* =============================================================
    biblical-sites.js — Biblical World site catalog (F3-B foundation)
 
-   30 launch sites per spec §4.12. Each entry includes era tags,
+   32 launch sites per spec §4.12. Each entry includes era tags,
    GPS coords, modern location, a tagline, and a multi-paragraph
-   "what happened here" body. Photo slots reserved (heroPhoto:null)
-   until the BiblePlaces.com licensing decision lands.
+   "what happened here" body. heroPhoto is a verified
+   upload.wikimedia.org URL (Phase 5.6 — CC-licensed Wikipedia lead
+   image, HEAD-checked at deploy time).
 
    Era IDs match the period overlays in the map UI:
      patriarchs        — ~2000-1500 BC (Abraham → Joseph)
@@ -29,7 +30,7 @@ const BIBLICAL_SITES = [
     tagline: 'The city God chose. Where the Temple stood, where Jesus died and rose.',
     body: `<p>Jerusalem appears in roughly two-thirds of the Bible. David captured it from the Jebusites around 1003 BC and made it Israel’s capital. Solomon built the first Temple here. Babylon destroyed it in 586 BC; the Jews returned and rebuilt under Ezra and Nehemiah. Herod the Great expanded the Second Temple — the one Jesus knew. Rome destroyed that Temple in 70 AD.</p><p>Jesus wept over Jerusalem (Luke 19:41), drove out the moneychangers there (Matthew 21:12), instituted the Last Supper, was tried and crucified just outside its walls, and rose from a tomb nearby. Acts 2 records the church being birthed here at Pentecost.</p>`,
     scriptureRefs: ['2 Samuel 5:7','1 Kings 8','Luke 19:41-44','Acts 2'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/%D7%94%D7%9E%D7%A6%D7%95%D7%93%D7%94_%D7%91%D7%9C%D7%99%D7%9C%D7%94.jpg/1280px-%D7%94%D7%9E%D7%A6%D7%95%D7%93%D7%94_%D7%91%D7%9C%D7%99%D7%9C%D7%94.jpg',
   },
   {
     id: 'temple-mount',
@@ -41,7 +42,7 @@ const BIBLICAL_SITES = [
     tagline: 'Where heaven and earth met for a thousand years.',
     body: `<p>Solomon’s Temple stood here from c. 957 BC until Babylon razed it in 586 BC. The Second Temple was rebuilt around 516 BC and dramatically expanded by Herod beginning in 19 BC. The Holy of Holies sat at its center — entered once a year by the high priest on Yom Kippur.</p><p>Jesus taught here often (John 7-10), cleared its courts (Matthew 21), and predicted its destruction (Matthew 24:2) — which Rome carried out in 70 AD. The Western Wall, still visible today, is part of the retaining structure Herod built.</p>`,
     scriptureRefs: ['1 Kings 8','Matthew 21:12-13','Matthew 24:1-2','John 2:13-22'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Jerusalem-2013%282%29-Aerial-Temple_Mount-%28south_exposure%29.jpg/1280px-Jerusalem-2013%282%29-Aerial-Temple_Mount-%28south_exposure%29.jpg',
   },
   {
     id: 'garden-tomb',
@@ -53,7 +54,7 @@ const BIBLICAL_SITES = [
     tagline: 'Where the cross stood and the tomb was found empty.',
     body: `<p>Two sites in Jerusalem are venerated as the place of the crucifixion and resurrection: the Church of the Holy Sepulchre (the older tradition, dating to the 4th century) and the Garden Tomb (a 19th-century identification). Both lie just outside the city walls of Jesus’s day, fitting the Gospels’ description.</p><p>What we know: Jesus was crucified outside Jerusalem at a place called Golgotha (Aramaic for “the Skull”), buried in a rock-cut tomb belonging to Joseph of Arimathea, and rose from that tomb on the third day. The empty tomb is the foundational claim of Christian faith.</p>`,
     scriptureRefs: ['John 19:17-42','Matthew 28:1-10','Mark 16:1-8','Luke 24:1-12'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Church_of_the_Holy_Sepulchre_by_Gerd_Eichmann_%28cropped%29.jpg/1280px-Church_of_the_Holy_Sepulchre_by_Gerd_Eichmann_%28cropped%29.jpg',
   },
   {
     id: 'mount-of-olives',
@@ -65,7 +66,7 @@ const BIBLICAL_SITES = [
     tagline: 'Jesus prayed here. Jesus ascended from here. Jesus will return here.',
     body: `<p>This ridge east of Jerusalem appears at every pivotal moment of Holy Week: Palm Sunday’s descent (Luke 19:37), the Olivet Discourse (Matthew 24-25), Gethsemane’s agony (Matthew 26:36), and the Ascension forty days after the resurrection (Acts 1:12). Zechariah 14:4 prophesies that the Messiah’s feet will stand on this very mount when He returns.</p>`,
     scriptureRefs: ['Luke 19:29-44','Matthew 26:30','Acts 1:12','Zechariah 14:4'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/2013-Aerial-Mount_of_Olives.jpg/1280px-2013-Aerial-Mount_of_Olives.jpg',
   },
   {
     id: 'gethsemane',
@@ -77,7 +78,7 @@ const BIBLICAL_SITES = [
     tagline: 'Where Jesus said, "Not my will, but yours."',
     body: `<p>Gethsemane (Aramaic for "olive press") sits at the foot of the Mount of Olives. Jesus came here often with His disciples (John 18:2). On the night before His crucifixion, He prayed in such anguish that His sweat became like drops of blood (Luke 22:44). It’s where Judas betrayed Him with a kiss and where He was arrested. Some of the olive trees there today are believed to descend from trees alive in Jesus’s day.</p>`,
     scriptureRefs: ['Matthew 26:36-56','Luke 22:39-46','John 18:1-12'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Jerusalem_Gethsemane_tango7174.jpg/1280px-Jerusalem_Gethsemane_tango7174.jpg',
   },
   {
     id: 'pool-of-bethesda',
@@ -89,7 +90,7 @@ const BIBLICAL_SITES = [
     tagline: 'Skeptics doubted it existed. Then archaeologists found it.',
     body: `<p>For centuries, scholars dismissed John 5:1-15 as legend because no pool fitting John’s description (with five porticoes) was known. Then in the 19th century, archaeologists excavated a twin-pool complex with five porticoes near the Sheep Gate — exactly as John described. Jesus healed a paralyzed man here, telling him simply, "Get up, take your mat and walk."</p>`,
     scriptureRefs: ['John 5:1-15'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Jerusalem_Bethesda_BW_1.JPG/1280px-Jerusalem_Bethesda_BW_1.JPG',
   },
   {
     id: 'pool-of-siloam',
@@ -101,7 +102,7 @@ const BIBLICAL_SITES = [
     tagline: 'The "I AM the light of the world" pool.',
     body: `<p>In John 9, Jesus healed a man born blind by sending him to wash in the Pool of Siloam — the destination of Hezekiah’s Tunnel water. Long thought to be the small Byzantine-era basin shown to pilgrims, the actual first-century Pool was rediscovered in 2004 during sewer work. Steps and stonework match the Gospel account precisely.</p>`,
     scriptureRefs: ['John 9:1-12','Isaiah 8:6'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/4/4c/Pool_of_Siloam_and_Lower_%28Old%29_Pool_in_the_Ordnance_Survey_of_Jerusalem.png',
   },
 
   // ── Jesus's ministry — Galilee ──────────────────────────────
@@ -115,7 +116,7 @@ const BIBLICAL_SITES = [
     tagline: 'The city of David. The birthplace of the Messiah.',
     body: `<p>Bethlehem (“House of Bread”) is where Ruth met Boaz (Ruth 2-4), where David was anointed king (1 Samuel 16), and where Micah 5:2 said the Messiah would be born — fulfilled when Jesus was born in a stable here, around 4 BC. Today the Church of the Nativity (built over the traditional cave-stable site) is one of the oldest continuously-operating churches in the world.</p>`,
     scriptureRefs: ['Ruth 1:1','1 Samuel 16:1','Micah 5:2','Luke 2:1-20','Matthew 2:1-12'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Church_of_the_Nativity_%287703592746%29.jpg/1280px-Church_of_the_Nativity_%287703592746%29.jpg',
   },
   {
     id: 'nazareth',
@@ -127,7 +128,7 @@ const BIBLICAL_SITES = [
     tagline: 'Where Jesus grew up. The town nobody expected anything from.',
     body: `<p>Jesus spent the first 30 years of His life in Nazareth — a small, obscure village in Galilee. Nathanael famously asked, “Can anything good come from Nazareth?” (John 1:46). Jesus preached His first hometown sermon here and was nearly thrown off a cliff for it (Luke 4:16-30). The angel announced His coming birth to Mary in this town (Luke 1:26-38).</p>`,
     scriptureRefs: ['Luke 1:26-38','Luke 2:39-40','Luke 4:16-30','John 1:46'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Nazareth_Panorama_Dafna_Tal_IMOT_%2814532097313%29.jpg/1280px-Nazareth_Panorama_Dafna_Tal_IMOT_%2814532097313%29.jpg',
   },
   {
     id: 'capernaum',
@@ -139,7 +140,7 @@ const BIBLICAL_SITES = [
     tagline: 'Jesus\'s adopted hometown. The base for His ministry.',
     body: `<p>Capernaum became Jesus’s headquarters during His public ministry (Matthew 4:13). Peter’s house was here — visible today as a 1st-century home that became one of the first house-churches. Jesus taught in the synagogue here (Mark 1:21), healed Peter’s mother-in-law (Mark 1:30), the centurion’s servant (Matthew 8:5), and the paralytic lowered through the roof (Mark 2:1-12). He pronounced woe on it for refusing to repent (Matthew 11:23).</p>`,
     scriptureRefs: ['Matthew 4:13','Mark 1:21-34','Mark 2:1-12','Matthew 11:23-24'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Sites_of_Christianity_in_the_Galillee_-_Ruins_of_the_ancient_Great_Synagogue_at_Capernaum_%28or_Kfar_Nahum%29_on_the_shore_of_the_Lake_of_Galilee%2C_Northern_Israel.jpg/1280px-thumbnail.jpg',
   },
   {
     id: 'sea-of-galilee',
@@ -151,7 +152,7 @@ const BIBLICAL_SITES = [
     tagline: 'The lake that watched Him walk on water.',
     body: `<p>This freshwater lake (also called the Sea of Tiberias or Lake Kinneret) is 13 miles long, 8 miles wide, and 700 feet below sea level. Jesus called His first disciples on its shores (Matthew 4:18-22), preached from a boat (Mark 4:1), calmed a storm (Mark 4:39), walked on its surface (Matthew 14:25), fed 5,000 nearby (Mark 6:30-44), and met the disciples here after His resurrection (John 21).</p>`,
     scriptureRefs: ['Matthew 4:18-22','Mark 4:35-41','Matthew 14:22-33','John 21:1-14'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Kinneret_cropped.jpg/1280px-Kinneret_cropped.jpg',
   },
   {
     id: 'jordan-river',
@@ -163,7 +164,7 @@ const BIBLICAL_SITES = [
     tagline: 'Where Israel entered the Promised Land. Where Jesus was baptized.',
     body: `<p>Joshua led Israel across the Jordan into the Promised Land (Joshua 3-4). Centuries later, John the Baptist preached here, and Jesus was baptized in the Jordan — the heavens opening as the Father affirmed Him publicly (Matthew 3:13-17). Tradition locates Jesus’s baptism at Bethany Beyond the Jordan, near the river’s mouth at the Dead Sea.</p>`,
     scriptureRefs: ['Joshua 3:14-17','Matthew 3:13-17','John 1:28'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/20100923_mer_morte13.JPG/1280px-20100923_mer_morte13.JPG',
   },
   {
     id: 'caesarea-philippi',
@@ -175,7 +176,7 @@ const BIBLICAL_SITES = [
     tagline: 'Where Peter said: "You are the Christ."',
     body: `<p>This town at the foot of Mount Hermon was a center of pagan worship — Greek and Roman shrines built around a deep grotto known as the “Gates of Hades.” In that exact setting, Jesus asked His disciples, “Who do you say that I am?” Peter answered, “You are the Christ, the Son of the living God.” Jesus replied, “On this rock I will build my church, and the gates of hell shall not prevail against it” (Matthew 16:13-19).</p>`,
     scriptureRefs: ['Matthew 16:13-20','Mark 8:27-30'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Banias_Spring_Cliff_Pan%27s_Cave.JPG/1280px-Banias_Spring_Cliff_Pan%27s_Cave.JPG',
   },
 
   // ── Old Testament locations ─────────────────────────────────
@@ -189,7 +190,7 @@ const BIBLICAL_SITES = [
     tagline: 'Where God gave the Law in fire and thunder.',
     body: `<p>After leaving Egypt, Israel camped at the foot of Mount Sinai for nearly a year. Moses ascended into thick darkness and received the Ten Commandments and the Law (Exodus 19-31). The mountain shook with thunder, lightning, and the sound of a trumpet (Exodus 19:16-19). The traditional site (Jebel Musa) hosts St. Catherine’s Monastery, founded in the 6th century AD.</p>`,
     scriptureRefs: ['Exodus 19','Exodus 20','Deuteronomy 5'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Mount_Sinai_from_the_southwest.jpg/1280px-Mount_Sinai_from_the_southwest.jpg',
   },
   {
     id: 'jericho',
@@ -201,7 +202,7 @@ const BIBLICAL_SITES = [
     tagline: 'The walls came down. The blind man saw. Zacchaeus came down.',
     body: `<p>One of the oldest continuously-inhabited cities in the world. Joshua marched Israel around it for seven days; on the seventh, the walls collapsed (Joshua 6). Centuries later, Jesus passed through Jericho twice: healing blind Bartimaeus (Mark 10:46-52) and dining with Zacchaeus the tax collector (Luke 19:1-10). Excavations have revealed a tower dating before 8000 BC.</p>`,
     scriptureRefs: ['Joshua 6','Mark 10:46-52','Luke 19:1-10'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Tell_es-sultan.jpg/1280px-Tell_es-sultan.jpg',
   },
   {
     id: 'bethel',
@@ -213,7 +214,7 @@ const BIBLICAL_SITES = [
     tagline: 'Where Jacob saw the ladder reaching heaven.',
     body: `<p>Bethel (“House of God”) is where Abraham first built an altar in the land (Genesis 12:8) and where Jacob saw the ladder of angels in his dream (Genesis 28:10-22), declaring, “Surely the LORD is in this place, and I did not know it.” After the kingdom divided, Jeroboam set up one of his rival golden calves here (1 Kings 12:28-29) — corrupting a holy place into idolatry.</p>`,
     scriptureRefs: ['Genesis 28:10-22','Genesis 35:1-7','1 Kings 12:28-33'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Bethel_MET_DP116361.jpg/1280px-Bethel_MET_DP116361.jpg',
   },
   {
     id: 'hebron',
@@ -225,7 +226,7 @@ const BIBLICAL_SITES = [
     tagline: 'Burial place of Abraham, Isaac, and Jacob.',
     body: `<p>Abraham bought the cave of Machpelah here as a burial site (Genesis 23). Abraham, Sarah, Isaac, Rebekah, Jacob, and Leah are all buried here. David ruled from Hebron for seven years before moving his capital to Jerusalem (2 Samuel 5:1-5).</p>`,
     scriptureRefs: ['Genesis 23','Genesis 49:29-32','2 Samuel 2:1-4'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/BTS_Hebron_Tour_280215_24.jpg/1280px-BTS_Hebron_Tour_280215_24.jpg',
   },
   {
     id: 'shechem',
@@ -237,7 +238,7 @@ const BIBLICAL_SITES = [
     tagline: 'Where Joshua renewed the covenant. Where Jesus met the Samaritan woman.',
     body: `<p>Abraham received the first specific land promise here (Genesis 12:6-7). Joshua led the covenant renewal ceremony at Shechem (Joshua 24). Centuries later, Jesus stopped at Jacob’s Well outside Shechem (called Sychar in John’s Gospel) and revealed Himself to the Samaritan woman as the Messiah (John 4).</p>`,
     scriptureRefs: ['Genesis 12:6-7','Joshua 24','John 4:1-42'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Tell_Balata.jpg/1280px-Tell_Balata.jpg',
   },
   {
     id: 'shiloh',
@@ -249,7 +250,7 @@ const BIBLICAL_SITES = [
     tagline: 'Israel\'s first long-term sanctuary, before Jerusalem.',
     body: `<p>The Tabernacle stood at Shiloh for roughly 300 years (Joshua 18:1) — Israel’s religious center until the Ark was captured by the Philistines (1 Samuel 4). Hannah prayed here for a son and was given Samuel (1 Samuel 1). The boy Samuel grew up in Shiloh’s Tabernacle, where God called him at night.</p>`,
     scriptureRefs: ['Joshua 18:1','1 Samuel 1','1 Samuel 3','Jeremiah 7:12'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Ancient_Shiloh_IMG_2924.JPG/1280px-Ancient_Shiloh_IMG_2924.JPG',
   },
   {
     id: 'mt-carmel',
@@ -261,7 +262,7 @@ const BIBLICAL_SITES = [
     tagline: 'Where Elijah called down fire on Baal.',
     body: `<p>Elijah faced down 450 prophets of Baal here in 1 Kings 18:20-40 — challenging them to call down fire on their offering. They failed for hours; Elijah then drenched his sacrifice and prayed once. Fire fell, the people declared “The LORD, He is God!”, and the prophets of Baal were executed.</p>`,
     scriptureRefs: ['1 Kings 18:20-40'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Caiobadner_-_mount_carmel.JPG/1280px-Caiobadner_-_mount_carmel.JPG',
   },
   {
     id: 'megiddo',
@@ -273,7 +274,7 @@ const BIBLICAL_SITES = [
     tagline: 'Site of major OT battles. The future Armageddon.',
     body: `<p>This strategic mound guarded the road between Egypt and Mesopotamia. Joshua defeated the king of Megiddo (Joshua 12:21). Solomon fortified it (1 Kings 9:15). King Josiah died in battle here (2 Kings 23:29). Revelation 16:16 names “Armageddon” — Hebrew “Har Megiddo” (Mount of Megiddo) — as the site of the final battle.</p>`,
     scriptureRefs: ['Joshua 12:21','1 Kings 9:15','2 Kings 23:29','Revelation 16:16'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/TEL_MEGIDO_AERIAL_C.JPG/1280px-TEL_MEGIDO_AERIAL_C.JPG',
   },
   {
     id: 'tel-dan',
@@ -285,7 +286,7 @@ const BIBLICAL_SITES = [
     tagline: 'Where the "House of David" inscription was found.',
     body: `<p>The northernmost city of biblical Israel. Jeroboam set up a golden calf here as a rival to Jerusalem worship (1 Kings 12:28-30). In 1993, archaeologists found the Tel Dan Stele — a 9th-century BC inscription that mentions the “House of David,” the first reference to King David found outside the Bible.</p>`,
     scriptureRefs: ['Judges 18','1 Kings 12:28-30','Amos 8:14'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Tel_Dan_Canaanite_Gate_1.jpg/1280px-Tel_Dan_Canaanite_Gate_1.jpg',
   },
   {
     id: 'babylon',
@@ -297,7 +298,7 @@ const BIBLICAL_SITES = [
     tagline: 'The city where Israel wept by the rivers.',
     body: `<p>Nebuchadnezzar destroyed Jerusalem and exiled Judah to Babylon in 586 BC. Daniel served kings here. Ezekiel prophesied here. Psalm 137 records the lament: “By the rivers of Babylon, there we sat down and wept.” In Revelation, “Babylon” becomes a symbol for every empire opposed to God.</p>`,
     scriptureRefs: ['2 Kings 25','Daniel 1-6','Psalm 137','Revelation 18'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/e/e6/Ishtar_Gate.jpg',
   },
   {
     id: 'qumran',
@@ -309,7 +310,7 @@ const BIBLICAL_SITES = [
     tagline: 'Where the Dead Sea Scrolls were hidden — and waited 2,000 years.',
     body: `<p>An Essene community lived here from c. 150 BC to 68 AD. They copied Scripture meticulously and hid their library in nearby caves before fleeing the Romans. A Bedouin shepherd rediscovered the first scrolls in 1947 — Old Testament texts dating 1,000 years older than any previously known, with stunning textual stability.</p>`,
     scriptureRefs: ['Isaiah 40:8'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/c/c1/Kumeran4.jpg',
   },
   {
     id: 'masada',
@@ -321,7 +322,7 @@ const BIBLICAL_SITES = [
     tagline: 'Herod\'s mountain fortress. Site of the last Jewish stand.',
     body: `<p>Herod the Great built this mountaintop palace as a refuge between 37 and 31 BC. After the Romans destroyed the Temple in 70 AD, around 960 Jewish rebels held out at Masada for three years. When Roman conquest became inevitable in 73 AD, the defenders chose mass suicide rather than slavery. Today it’s a national symbol of Jewish resistance.</p>`,
     scriptureRefs: [],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Israel-2013-Aerial_21-Masada.jpg/1280px-Israel-2013-Aerial_21-Masada.jpg',
   },
 
   // ── Apostolic / Pauline-era ──────────────────────────────────
@@ -335,7 +336,7 @@ const BIBLICAL_SITES = [
     tagline: 'Where Saul became Paul.',
     body: `<p>Saul of Tarsus was traveling to Damascus to arrest Christians when the risen Jesus appeared to him in blinding light (Acts 9:1-9). For three days he was blind. Ananias prayed over him, his sight returned, and the persecutor became the apostle Paul. The street called Straight, where this happened, still exists in modern Damascus.</p>`,
     scriptureRefs: ['Acts 9:1-22','Galatians 1:15-17'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Damascus_from_qasioun_mountain.jpg/1280px-Damascus_from_qasioun_mountain.jpg',
   },
   {
     id: 'antioch',
@@ -347,7 +348,7 @@ const BIBLICAL_SITES = [
     tagline: 'Where the disciples were first called Christians.',
     body: `<p>Antioch became the launching pad for the gospel’s spread to the Gentile world. Paul and Barnabas based their three missionary journeys here. Acts 11:26 — “The disciples were called Christians first at Antioch.” It was a major Greco-Roman city with a Jewish quarter and a flourishing early church.</p>`,
     scriptureRefs: ['Acts 11:19-26','Acts 13:1-3','Galatians 2:11'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Antioch_on_the_Orontes_en.svg/1280px-Antioch_on_the_Orontes_en.svg.png',
   },
   {
     id: 'ephesus',
@@ -359,7 +360,7 @@ const BIBLICAL_SITES = [
     tagline: 'Paul stayed three years. Riots broke out. Letters got written.',
     body: `<p>Paul ministered in Ephesus longer than anywhere else (Acts 19) — preaching daily in the lecture hall of Tyrannus until “all who lived in Asia heard the word of the Lord.” Such an exodus from idol worship hit local silversmiths’ sales of Artemis statues that they incited a city-wide riot. Paul’s letter to the Ephesians was probably written from Roman prison years later.</p>`,
     scriptureRefs: ['Acts 19','Ephesians 1','Revelation 2:1-7'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Ephesus_Celsus_Library_Fa%C3%A7ade.jpg/1280px-Ephesus_Celsus_Library_Fa%C3%A7ade.jpg',
   },
   {
     id: 'corinth',
@@ -371,7 +372,7 @@ const BIBLICAL_SITES = [
     tagline: 'A wealthy, hedonistic port. The church Paul wrote the most letters to.',
     body: `<p>Paul lived in Corinth eighteen months (Acts 18:11), working as a tent-maker and preaching. The Corinthian church was prosperous, gifted, and constantly drifting into the city’s sexual immorality and division. Paul’s two letters to them (1-2 Corinthians) are pastoral mail in a hard place — and the source of “love is patient, love is kind.”</p>`,
     scriptureRefs: ['Acts 18:1-17','1 Corinthians 13','2 Corinthians 12:7-10'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/4/41/Ravel_1008.2.jpg',
   },
   {
     id: 'athens',
@@ -383,7 +384,7 @@ const BIBLICAL_SITES = [
     tagline: 'Where Paul preached to the philosophers about the Unknown God.',
     body: `<p>Acts 17:16-34. Paul stood on the Areopagus (Mars Hill) and addressed Stoic and Epicurean philosophers, opening with the city’s altar inscribed “To an Unknown God.” His sermon weaves natural revelation, Greek poetry, and the resurrection — one of the great cross-cultural apologetic moments in the New Testament.</p>`,
     scriptureRefs: ['Acts 17:16-34'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Monastiraki_Square_and_Acropolis_in_Athens_%2844149181684%29.jpg/1280px-Monastiraki_Square_and_Acropolis_in_Athens_%2844149181684%29.jpg',
   },
   {
     id: 'rome',
@@ -395,7 +396,7 @@ const BIBLICAL_SITES = [
     tagline: 'Where Paul wrote his last letters and was eventually executed.',
     body: `<p>Paul reached Rome under house arrest around 60 AD (Acts 28:16). From there he wrote Ephesians, Philippians, Colossians, and Philemon — the “prison epistles.” Tradition holds that Paul was executed by Nero around 67 AD. Peter was also martyred in Rome around the same time. Within 300 years, the gospel that started in a Galilean fishing town became Rome’s official faith.</p>`,
     scriptureRefs: ['Acts 28:16-31','2 Timothy 4:6-8','Romans 1:7'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Trevi_Fountain%2C_Rome%2C_Italy_2_-_May_2007.jpg/1280px-Trevi_Fountain%2C_Rome%2C_Italy_2_-_May_2007.jpg',
   },
   {
     id: 'patmos',
@@ -407,7 +408,7 @@ const BIBLICAL_SITES = [
     tagline: 'Where John saw Revelation.',
     body: `<p>The apostle John was exiled here by the Emperor Domitian around 95 AD “on account of the word of God and the testimony of Jesus” (Revelation 1:9). On this small Aegean island he received the visions recorded in Revelation — letters to seven churches and the climactic vision of Christ’s victory and the new heaven and new earth.</p>`,
     scriptureRefs: ['Revelation 1:9-20','Revelation 21-22'],
-    heroPhoto: null,
+    heroPhoto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Chora-of-Patmos.JPG/1280px-Chora-of-Patmos.JPG',
   },
 ];
 

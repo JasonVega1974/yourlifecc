@@ -4998,6 +4998,22 @@ function openBwSite(siteId){
   document.getElementById('bwSiteName').innerHTML = _bwEsc(s.name);
   document.getElementById('bwSiteTagline').textContent = s.tagline || '';
   document.getElementById('bwSiteBody').innerHTML = (typeof renderInfographicFor === 'function' ? renderInfographicFor(siteId) : '') + (s.body || '');
+  // Phase 5.6 — render the verified Wikimedia hero photo when one is set;
+  // fall back to the placeholder text otherwise.
+  const photoEl = document.getElementById('bwSitePhoto');
+  if(photoEl){
+    if(s.heroPhoto){
+      photoEl.innerHTML = '<img loading="lazy" src="' + _bwEsc(s.heroPhoto) + '" alt="' + _bwEsc(s.name) + '" style="width:100%;height:220px;object-fit:cover;border-radius:8px;display:block;">';
+      photoEl.style.height = 'auto';
+      photoEl.style.background = 'transparent';
+      photoEl.style.padding = '.6rem .6rem 0';
+    } else {
+      photoEl.innerHTML = '📷 Photo coming when image library lands';
+      photoEl.style.height = '140px';
+      photoEl.style.background = 'linear-gradient(135deg,rgba(56,189,248,.08),rgba(167,139,250,.08))';
+      photoEl.style.padding = '';
+    }
+  }
   // Header gradient picks the FIRST matching era color for visual identity.
   const firstPeriod = periods.find(p => (s.eras || []).indexOf(p.id) !== -1);
   const c1 = '#38bdf8';
