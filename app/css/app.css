@@ -2442,6 +2442,11 @@ body.solo-mode .sp-family-only { display: none !important; }
 html[data-faith-free="1"] #sp .sp-pb { display: none !important; }
 html[data-faith-free="1"] #sp-faith-support { display: block !important; }
 
+/* Phase 5.4: Faith-free upgrade CTA card on Bible & Faith Home tab.
+   Visible only to faith_free users; paid users keep it hidden (default
+   inline display:none on the card). */
+html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
+
 /* The faith-free Support card (hidden by default; shown only via the
    data-faith-free selector above). */
 #sp-faith-support { display: none; }
