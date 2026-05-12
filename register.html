@@ -406,18 +406,14 @@ async function applyCoupon(){
   const code = document.getElementById('couponInput').value.trim().toUpperCase();
   const msg = document.getElementById('couponMsg');
   if(!code){ msg.style.display='none'; appliedCoupon=null; updateOrderSummary(); return; }
-  msg.style.display='block'; msg.style.color='var(--tx2)'; msg.textContent='Applying...';
-  // Store the code — it will be validated server-side when payment processes
-  // For display, apply a visual discount if it matches known test codes
-  const KNOWN_COUPONS = { 'TEST99': {id:'TEST99', percent_off:90} };
-  if(KNOWN_COUPONS[code]){
-    appliedCoupon = KNOWN_COUPONS[code];
-    msg.style.color='var(--ok)'; msg.textContent=`✓ ${appliedCoupon.percent_off}% off applied!`;
-  } else {
-    // Accept any code optimistically — edge function validates it
-    appliedCoupon = {id: code, percent_off: null};
-    msg.style.color='var(--ok)'; msg.textContent=`✓ Coupon "${code}" will be applied at checkout.`;
-  }
+  // Accept any code optimistically; Stripe validates + applies at checkout.
+  // We do NOT preview the discount client-side — the percent shown would only
+  // ever be a hardcoded guess (the source of the TEST99-90%-vs-100% bug).
+  // The user sees the real discounted total on the Stripe checkout page.
+  appliedCoupon = {id: code, percent_off: null};
+  msg.style.display='block';
+  msg.style.color='var(--ok)';
+  msg.textContent=`✓ Coupon "${code}" will be applied at checkout.`;
   updateOrderSummary();
 }
 
@@ -425,20 +421,9 @@ function updateOrderSummary(){
   const plan = sponsorData ? 'sponsored' : selectedPlan;
   if(!PLAN_INFO[plan]) return;
   document.getElementById('osPlan').textContent = PLAN_INFO[plan].name;
-  let priceStr = PLAN_INFO[plan].price;
-  if(appliedCoupon && appliedCoupon.percent_off && selectedPlan !== 'free'){
-    const prices = { monthly:9.99, yearly:79.99, lifetime:149 };
-    const orig = prices[selectedPlan];
-    if(orig){
-      const discounted = (orig * (1 - appliedCoupon.percent_off/100)).toFixed(2);
-      document.getElementById('discountRow').style.display='flex';
-      document.getElementById('discountAmt').textContent=`-${appliedCoupon.percent_off}%`;
-      priceStr = `$${discounted}${selectedPlan==='monthly'?'/mo':selectedPlan==='yearly'?'/yr':''}`;
-    }
-  } else {
-    document.getElementById('discountRow').style.display='none';
-  }
-  document.getElementById('osPrice').textContent = priceStr;
+  // Discount preview removed — Stripe shows the true final amount at checkout.
+  document.getElementById('discountRow').style.display='none';
+  document.getElementById('osPrice').textContent = PLAN_INFO[plan].price;
 }
 
 function selectPlan(plan){

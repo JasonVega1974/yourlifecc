@@ -795,6 +795,37 @@
     </div>
   </div>
 
+  <!-- PARENT HOME DASHBOARD — shown only when parent is viewing. Hidden in
+       child-view and solo-mode via CSS in app.css. -->
+  <div id="parentHomeContent" style="display:none;">
+
+    <!-- Card 1: What's New in YourLife CC -->
+    <div style="background:linear-gradient(135deg,rgba(56,189,248,.06),rgba(167,139,250,.05));border:1px solid rgba(56,189,248,.15);border-radius:14px;padding:1.2rem 1.4rem;margin-bottom:.7rem;">
+      <div style="display:flex;align-items:center;gap:.55rem;margin-bottom:.7rem;">
+        <span style="font-size:1.2rem;">✨</span>
+        <span style="font-family:var(--fh);font-size:.7rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--c);">What's New in YourLife CC</span>
+      </div>
+      <div style="display:grid;gap:.6rem;font-size:.85rem;color:var(--tx2);line-height:1.55;">
+        <div style="display:flex;align-items:flex-start;gap:.55rem;"><span style="flex-shrink:0;font-size:1.1rem;">📚</span><div><strong style="color:var(--tx);">Christian Life Guide</strong> — 12 in-depth biblical topics: prayer, marriage, mental health, recovery, and more.</div></div>
+        <div style="display:flex;align-items:flex-start;gap:.55rem;"><span style="flex-shrink:0;font-size:1.1rem;">🎵</span><div><strong style="color:var(--tx);">Worship Playlist</strong> — curated worship music to set the tone for your family.</div></div>
+        <div style="display:flex;align-items:flex-start;gap:.55rem;"><span style="flex-shrink:0;font-size:1.1rem;">🏆</span><div><strong style="color:var(--tx);">Life Skills Academy</strong> — 175+ lessons across 42 real-life categories.</div></div>
+      </div>
+    </div>
+
+    <!-- Card 2: Notifications / updates -->
+    <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:1.1rem 1.3rem;margin-bottom:.7rem;">
+      <div style="display:flex;align-items:center;gap:.55rem;margin-bottom:.7rem;">
+        <span style="font-size:1.2rem;">📬</span>
+        <span style="font-family:var(--fh);font-size:.7rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--tx);">Updates for You</span>
+      </div>
+      <div id="parentNotifList" style="display:flex;flex-direction:column;gap:.5rem;font-size:.82rem;color:var(--tx2);">
+        <!-- Rendered by renderParentNotifications() — graceful empty state on first paint. -->
+        <div style="font-size:.78rem;color:var(--tx3);font-style:italic;padding:.4rem 0;">Loading…</div>
+      </div>
+    </div>
+
+  </div>
+
   <!-- HERO HEADER — child only, hidden in parent view -->
   <div id="heroCard" class="hero-card no-photo" style="margin-bottom:.7rem;">
     <div id="heroBgLayer" class="hero-bg-layer"></div>
@@ -9126,6 +9157,8 @@ function applyHeroViewMode() {
 
   // Update parent welcome card (skip entirely for solo mode)
   if (!isChild && !isSolo) {
+    // Phase 5.x: parent home content (What's New + Notifications) renders here.
+    if (typeof renderParentNotifications === 'function') renderParentNotifications();
     var nameEl = document.getElementById('parentWelcomeName');
     var dateEl = document.getElementById('parentWelcomeDate');
     if (nameEl) {
@@ -9151,6 +9184,72 @@ function applyHeroViewMode() {
       dateEl.textContent = new Date().toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
     }
   }
+}
+
+// Phase 5.x: Parent Home notifications — surfaces pending chore approvals,
+// kid activity flags, and milestone celebrations from existing D state.
+// Called from applyHeroViewMode when parent-view is active. Idempotent;
+// rewrites #parentNotifList contents each call.
+function renderParentNotifications(){
+  var el = document.getElementById('parentNotifList');
+  if (!el) return;
+  if (typeof D === 'undefined' || !D) { el.innerHTML = ''; return; }
+  var items = [];
+
+  // Pending chore approvals — D.choreLog entries with status 'pending_approval'
+  try {
+    var pending = (Array.isArray(D.choreLog) ? D.choreLog : [])
+      .filter(function(c){ return c && c.status === 'pending_approval'; });
+    if (pending.length > 0) {
+      items.push({
+        icon: '✅',
+        title: pending.length + ' chore' + (pending.length > 1 ? 's' : '') + ' awaiting your approval',
+        sub: 'Review and approve in Chores',
+        action: "showSection('s-chores')"
+      });
+    }
+  } catch(e) {}
+
+  // Milestone celebrations — Life Skill certificates earned
+  try {
+    var certCount = Object.values(D.skillCerts || {}).filter(Boolean).length;
+    if (certCount > 0) {
+      items.push({
+        icon: '🎓',
+        title: certCount + ' Life Skill certificate' + (certCount > 1 ? 's' : '') + ' earned',
+        sub: 'See progress in Life Skills',
+        action: "showSection('s-skills')"
+      });
+    }
+  } catch(e) {}
+
+  // Kid activity flag — multi-day streak as a positive signal
+  try {
+    if (D.streak && D.streak >= 7) {
+      items.push({
+        icon: '🔥',
+        title: D.streak + '-day streak going strong',
+        sub: 'Daily habits are sticking',
+        action: "showSection('s-hero')"
+      });
+    }
+  } catch(e) {}
+
+  if (items.length === 0) {
+    el.innerHTML = '<div style="font-size:.78rem;color:var(--tx3);font-style:italic;padding:.4rem 0;">No new updates right now — check back tomorrow.</div>';
+    return;
+  }
+
+  el.innerHTML = items.map(function(it){
+    return '<div onclick="' + it.action + '" style="display:flex;align-items:center;gap:.7rem;padding:.6rem .8rem;background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.12);border-radius:10px;cursor:pointer;transition:background .15s;" onmouseenter="this.style.background=\'rgba(56,189,248,.08)\'" onmouseleave="this.style.background=\'rgba(56,189,248,.04)\'">' +
+      '<span style="font-size:1.3rem;flex-shrink:0;">' + it.icon + '</span>' +
+      '<div style="flex:1;">' +
+        '<div style="font-size:.85rem;font-weight:700;color:var(--tx);">' + it.title + '</div>' +
+        '<div style="font-size:.72rem;color:var(--tx2);margin-top:.15rem;">' + it.sub + '</div>' +
+      '</div>' +
+      '<span style="color:var(--c);font-size:.9rem;">→</span>' +
+    '</div>';
+  }).join('');
 }
 
 // Hook into applyName so it fires on every name/profile update

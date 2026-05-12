@@ -77,7 +77,7 @@ input:focus{border-color:rgba(56,189,248,.5);}
 
       <label class="terms">
         <input type="checkbox" id="faithTerms">
-        <span>I'm 18 or older and agree to the <a href="terms.html" target="_blank">Terms</a>, <a href="privacy.html" target="_blank">Privacy Policy</a>, and <a href="children-privacy.html" target="_blank">Children's Privacy Policy</a>.</span>
+        <span>I agree to the <a href="terms.html" target="_blank">Terms of Service</a>, <a href="privacy.html" target="_blank">Privacy Policy</a>, and <a href="children-privacy.html" target="_blank">Children's Privacy Policy</a>.</span>
       </label>
 
       <button class="btn" id="faithBtn" onclick="faithSignup()">Send My Confirmation Email</button>
@@ -95,7 +95,7 @@ input:focus{border-color:rgba(56,189,248,.5);}
         <div class="next-title">Next steps:</div>
         1. Open the email from YourLife CC<br>
         2. Click the confirmation link<br>
-        3. Set your password and verify your age (18+)<br>
+        3. Set your password<br>
         4. You're in — Bible &amp; Faith Hub awaits
       </div>
       <div class="foot">
@@ -124,7 +124,7 @@ async function faithSignup(){
   const btn = document.getElementById('faithBtn');
 
   if(!email || !email.includes('@')){ showErr('Please enter a valid email.'); return; }
-  if(!terms){ showErr('Please confirm you are 18 or older and agree to the Terms.'); return; }
+  if(!terms){ showErr('Please agree to the Terms, Privacy Policy, and Children\'s Privacy Policy to continue.'); return; }
 
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Sending confirmation...';

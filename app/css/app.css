@@ -2237,6 +2237,9 @@ body.child-view  #parentWelcomeCard{ display: none !important; }
 /* ── CHILD DASHBOARD CONTENT — hidden in parent view ────────── */
 body.parent-view #childDashContent { display: none !important; }
 body.child-view  #childDashContent { display: block !important; }
+/* Parent Home content (What's New + Updates) — shown only in parent view. */
+body.parent-view #parentHomeContent { display: block !important; }
+body.child-view  #parentHomeContent { display: none !important; }
 
 /* ── HIDE ADULT-ONLY SURFACES IN CHILD PROFILE ──────────────
    Kids shouldn't see referral CTAs, child-login (they're already
