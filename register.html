@@ -128,14 +128,8 @@ select option{background:#0c1220;}
           <label>EMAIL ADDRESS</label>
           <input type="email" id="regEmail" placeholder="you@email.com" autocomplete="email">
         </div>
-        <div class="field">
-          <label>PASSWORD</label>
-          <input type="password" id="regPass" placeholder="At least 8 characters" autocomplete="new-password">
-          <div class="field-hint">Min 8 characters. You'll use this to manage your family account.</div>
-        </div>
-        <div class="field">
-          <label>CONFIRM PASSWORD</label>
-          <input type="password" id="regPass2" placeholder="Confirm password" autocomplete="new-password">
+        <div class="field-hint" style="font-size:.78rem;color:var(--tx3);margin-bottom:1.25rem;line-height:1.6;padding:.7rem .9rem;background:var(--card);border:1px solid var(--border);border-radius:8px;">
+          🔒 We'll email you a confirmation link. After confirming, you'll set your password and land in your dashboard.
         </div>
 
         <div class="divider">or get free access</div>
@@ -169,8 +163,11 @@ select option{background:#0c1220;}
           <div id="refCodeMsg" style="font-size:.75rem;margin-top:.25rem;display:none;"></div>
         </div>
 
+        <label style="display:flex;align-items:flex-start;gap:.55rem;font-size:.78rem;color:var(--tx2);margin-bottom:.9rem;line-height:1.55;cursor:pointer;">
+          <input type="checkbox" id="termsCheck" style="margin-top:3px;width:16px;height:16px;flex-shrink:0;accent-color:var(--c1);cursor:pointer;">
+          <span>I'm 18 or older and agree to the <a href="terms.html" target="_blank" style="color:var(--c1);">Terms of Service</a>, <a href="privacy.html" target="_blank" style="color:var(--c1);">Privacy Policy</a>, and <a href="children-privacy.html" target="_blank" style="color:var(--c1);">Children's Privacy Policy</a>.</span>
+        </label>
         <button class="btn btn-main" onclick="step1Next()">Continue &#8594;</button>
-        <div style="text-align:center;margin-top:1rem;font-size:.75rem;color:var(--tx3);">By registering you agree to our <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a>.</div>
       </div>
 
       <!-- STEP 2: CHOOSE PLAN -->
@@ -252,18 +249,21 @@ select option{background:#0c1220;}
         <button class="btn btn-ghost" onclick="goStep(2)" style="margin-top:.5rem;">← Back</button>
       </div>
 
-      <!-- STEP 4: SUCCESS -->
+      <!-- STEP 4: CHECK YOUR EMAIL -->
       <div class="step-panel" id="s4" style="text-align:center;">
-        <div style="font-size:3.5rem;margin-bottom:1rem;">🎉</div>
-        <div class="form-title" style="margin-bottom:.5rem;">You're all set!</div>
-        <div class="form-sub" style="margin-bottom:1.5rem;">Your family's dashboard is ready.</div>
-        <div id="successUrl" style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem;font-size:.82rem;color:var(--tx2);margin-bottom:1.2rem;word-break:break-all;">
-          <div style="font-size:.7rem;color:var(--tx3);margin-bottom:.3rem;">YOUR FAMILY'S UNIQUE URL</div>
-          <div id="familyUrl" style="color:var(--c1);font-weight:600;"></div>
-          <button onclick="copyUrl()" style="margin-top:.6rem;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);color:var(--c1);border-radius:6px;padding:.3rem .8rem;font-size:.72rem;cursor:pointer;font-family:'DM Sans',sans-serif;">Copy Link</button>
+        <div style="font-size:3.5rem;margin-bottom:1rem;">📧</div>
+        <div class="form-title" style="margin-bottom:.5rem;">Check your email</div>
+        <div class="form-sub" style="margin-bottom:1.5rem;">We sent a confirmation link to <strong id="checkEmailAddr" style="color:var(--c1);font-weight:700;"></strong>. Click the link to set your password and finish setup.</div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem;font-size:.8rem;color:var(--tx2);margin-bottom:1.2rem;line-height:1.7;text-align:left;">
+          <div style="color:var(--tx);font-weight:700;margin-bottom:.4rem;">Next steps:</div>
+          1. Open the email from YourLife CC<br>
+          2. Click the confirmation link<br>
+          3. Set your password and verify your age (18+)<br>
+          4. You're in!
         </div>
-        <a id="goAppBtn" href="#" class="btn btn-main" style="display:block;text-decoration:none;">Go to My Dashboard →</a>
-        <div style="margin-top:.8rem;font-size:.73rem;color:var(--tx3);">Bookmark your unique URL on every device.</div>
+        <div style="font-size:.74rem;color:var(--tx3);line-height:1.7;">
+          Didn't get the email? Check spam, or <a href="/activate.html" style="color:var(--c1);text-decoration:underline;">request a fresh link</a>.
+        </div>
       </div>
 
     </div>
@@ -325,6 +325,12 @@ let createdFamilyId = null;
 // Read plan from URL
 const urlPlan = new URLSearchParams(location.search).get('plan');
 if(urlPlan && PLAN_INFO[urlPlan]) setTimeout(()=>selectPlan(urlPlan), 100);
+
+// Phase 5.0: Solo path indicator. When register.html is reached via
+// ?path=solo, user_metadata.signup_source = 'solo' instead of 'register'.
+// Downstream consumption (applySoloMode at app entry) lands in Phase 5.1+.
+const urlPath = new URLSearchParams(location.search).get('path');
+const _signupSource = (urlPath === 'solo') ? 'solo' : 'register';
 
 function showErr(msg){ const el=document.getElementById('errMsg'); el.textContent=msg; el.style.display='block'; document.getElementById('okMsg').style.display='none'; }
 function showOk(msg){ const el=document.getElementById('okMsg'); el.textContent=msg; el.style.display='block'; document.getElementById('errMsg').style.display='none'; }
@@ -447,14 +453,14 @@ async function step1Next(){
   hideMessages();
   const name=document.getElementById('regName').value.trim();
   const email=document.getElementById('regEmail').value.trim();
-  const pass=document.getElementById('regPass').value;
-  const pass2=document.getElementById('regPass2').value;
   const code=document.getElementById('sponsorCode').value.trim().toUpperCase();
 
   if(!name){ showErr('Please enter your name.'); return; }
   if(!email||!email.includes('@')){ showErr('Please enter a valid email.'); return; }
-  if(pass.length<8){ showErr('Password must be at least 8 characters.'); return; }
-  if(pass!==pass2){ showErr('Passwords do not match.'); return; }
+  if(!document.getElementById('termsCheck').checked){
+    showErr('Please agree to the Terms, Privacy Policy, and Children\'s Privacy Policy to continue.');
+    return;
+  }
 
   // Validate sponsor code if provided
   if(code){
@@ -518,110 +524,102 @@ async function createAccount(){
 
   const name=document.getElementById('regName').value.trim();
   const email=document.getElementById('regEmail').value.trim();
-  const pass=document.getElementById('regPass').value;
   const plan=sponsorData?'sponsored':selectedPlan;
 
+  // Temp password — overwritten by user at set-password.html after email
+  // confirmation. signUp requires a password param; we can't use signInWithOtp
+  // because the paid flow needs userId immediately for Stripe metadata.
+  const tempPass = ((typeof crypto!=='undefined' && crypto.randomUUID)
+    ? crypto.randomUUID()
+    : Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)
+  ) + '!A9z';
+
   try {
-    // 1. Create Supabase auth user
-    const {data:authData, error:authError} = await _sb.auth.signUp({email, password:pass, options:{data:{full_name:name}}});
+    // 1. Create Supabase auth user (no session yet — email confirmation gates it)
+    const {data:authData, error:authError} = await _sb.auth.signUp({
+      email,
+      password: tempPass,
+      options: {
+        emailRedirectTo: 'https://yourlifecc.com/activate.html',
+        // signup_source goes into user_metadata so it survives cross-device
+        // (desktop signup → mobile email click). localStorage isn't enough.
+        data: { full_name: name, signup_source: _signupSource }
+      }
+    });
     if(authError) throw new Error(authError.message);
 
     const userId = authData.user.id;
-    const familyId = generateFamilyId();
+    const isPaid = (plan!=='free' && plan!=='sponsored');
+    // Paid flow needs familyId BEFORE create-payment-intent (it's sealed into
+    // Stripe metadata for stripe-webhook to correlate later). Free/sponsored
+    // flows let register-family generate the id server-side.
+    let familyId = isPaid ? generateFamilyId() : null;
 
-    // 2. Handle payment if needed
+    // 2. Handle payment (if needed)
     let stripeCustomerId = null;
     let stripeSubId = null;
 
-    if(plan!=='free' && plan!=='sponsored'){
+    if(isPaid){
       btn.innerHTML='<span class="spinner"></span>Processing payment...';
-      // Create payment intent via your backend / Supabase Edge Function
-      const piResp = await fetch('https://hrohgwcbfgywkpnvqxhk.supabase.co/functions/v1/create-payment-intent', {
+      const piResp = await fetch(SUPABASE_URL+'/functions/v1/create-payment-intent', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhyb2hnd2NiZmd5d2twbnZxeGhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MjcxNDYsImV4cCI6MjA4ODQwMzE0Nn0.PuWtBpiMw2DiCLp26ZP_Rd9BwzFvWT0sNZrDUNdULyo' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer '+SUPABASE_ANON_KEY },
         body: JSON.stringify({plan, email, name, familyId, couponCode: appliedCoupon ? appliedCoupon.id : null})
       });
-   const piData = await piResp.json();
+      const piData = await piResp.json();
       if(!piResp.ok || piData.error) throw new Error(piData.error || 'Payment setup failed. Please try again.');
-      
-      // If coupon covered 100% of cost, no card confirmation needed
-      if(piData.free){
-        stripeCustomerId = piData.customerId;
-        stripeSubId = piData.subscriptionId;
-        // Skip card confirmation, jump to account creation
-        btn.innerHTML='<span class="spinner"></span>Setting up your account...';
-        const {error:dbError} = await _sb.from('families').insert({
-          id: familyId, user_id: userId, parent_name: name, email: email,
-          plan: plan, plan_status: 'active',
-          stripe_customer_id: stripeCustomerId,
-          stripe_subscription_id: stripeSubId,
-          sponsor_code_id: sponsorData?.id || null,
-          referred_by: referredBy || null,
-          created_at: new Date().toISOString(),
-        });
-        if(dbError) throw new Error('Account creation failed: '+dbError.message);
-        await _sb.from('family_data').insert({ family_id: familyId, data: JSON.stringify(getDefaultFamilyData(name, familyId)), updated_at: new Date().toISOString() });
-        createdFamilyId = familyId;
-        const appUrl = `${location.origin}/app?id=${familyId}`;
-        document.getElementById('familyUrl').textContent = appUrl;
-        document.getElementById('goAppBtn').href = appUrl;
-        goStep(4);
-        return;
-      }
 
-      if(plan==='lifetime'){
-        // One-time payment
-        const {error:pmError} = await stripe.confirmCardPayment(piData.clientSecret, {
-          payment_method:{card:cardElement, billing_details:{name, email}}
-        });
-        if(pmError) throw new Error(pmError.message);
+      if(piData.free){
+        // 100% coupon — no card confirmation needed
         stripeCustomerId = piData.customerId;
+        stripeSubId      = piData.subscriptionId;
       } else {
-        // Subscription
+        // Both lifetime + subscription paths use confirmCardPayment identically;
+        // only difference is whether a subscription id comes back.
         const {error:pmError} = await stripe.confirmCardPayment(piData.clientSecret, {
           payment_method:{card:cardElement, billing_details:{name, email}}
         });
         if(pmError) throw new Error(pmError.message);
         stripeCustomerId = piData.customerId;
-        stripeSubId = piData.subscriptionId;
+        stripeSubId      = piData.subscriptionId || null;
       }
     }
 
     btn.innerHTML='<span class="spinner"></span>Setting up your account...';
 
-    // 3. Create family record in database
-    const {error:dbError} = await _sb.from('families').insert({
-      id: familyId,
-      user_id: userId,
-      parent_name: name,
-      email: email,
-      plan: plan,
-      plan_status: (plan==='free'||plan==='sponsored')?'active':'active',
-      stripe_customer_id: stripeCustomerId,
-      stripe_subscription_id: stripeSubId,
-      sponsor_code_id: sponsorData?.id || null,
-      referred_by: referredBy || null,
-      created_at: new Date().toISOString(),
+    // 3. Register family via Edge Function (service-role bypasses RLS for
+    //    unconfirmed user; idempotent on retry; atomic sponsor-code decrement)
+    const regResp = await fetch(SUPABASE_URL+'/functions/v1/register-family', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer '+SUPABASE_ANON_KEY },
+      body: JSON.stringify({
+        userId,
+        name,
+        email,
+        plan,
+        familyId,                            // null for free/sponsored → server generates
+        stripeCustomerId,
+        stripeSubscriptionId: stripeSubId,
+        sponsorCodeId: sponsorData?.id || null,
+        referredBy: referredBy || null,
+      })
     });
-    if(dbError) throw new Error('Account creation failed: '+dbError.message);
+    const regData = await regResp.json();
+    if(!regResp.ok || regData.error) throw new Error(regData.error || 'Account creation failed.');
+    familyId = regData.familyId;             // server returns the canonical id
 
-    // 4. Initialize empty family data
-    await _sb.from('family_data').insert({
-      family_id: familyId,
-      data: JSON.stringify(getDefaultFamilyData(name, familyId)),
-      updated_at: new Date().toISOString(),
-    });
-
-    // 5. Decrement sponsor code usage
-    if(sponsorData){
-      await _sb.from('sponsor_codes').update({uses_remaining: sponsorData.uses_remaining-1}).eq('id',sponsorData.id);
-    }
-
-    // 6. Show success
+    // 4. Stash familyId so activate.html → set-password.html can route back
+    //    to /app/?id=... after the user confirms email + sets password.
+    //    Signup source is in user_metadata.signup_source (set above) — that
+    //    survives cross-device; localStorage doesn't.
+    try {
+      localStorage.setItem('ylcc_pending_family_id', familyId);
+      localStorage.setItem('ylcc_last_signup_email', email);
+    } catch(e) {}
     createdFamilyId = familyId;
-    const appUrl = `${location.origin}/app?id=${familyId}`;
-    document.getElementById('familyUrl').textContent = appUrl;
-    document.getElementById('goAppBtn').href = appUrl;
+
+    // 5. Show check-your-email screen
+    document.getElementById('checkEmailAddr').textContent = email;
     goStep(4);
 
   } catch(err){
@@ -637,23 +635,6 @@ function generateFamilyId(){
   let id='';
   for(let i=0;i<12;i++) id+=chars[Math.floor(Math.random()*chars.length)];
   return id;
-}
-
-function getDefaultFamilyData(parentName, familyId){
-  return {
-    name: parentName,
-    familyId: familyId,
-    streak: 0,
-    mode: 'mid_hs',
-    bank: 0, savings: 0,
-    goals: [], bills: [], transactions: [],
-    savingsGoals: [],
-    assignments: [], classes: [],
-    journal: [],
-    habitLog: {},
-    chorePin: '',
-    onboardDone: false,
-  };
 }
 
 function copyUrl(){

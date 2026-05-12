@@ -6,7 +6,11 @@
 function authSwitchTab(tab){
   const isSignup = tab === 'signup';
   document.getElementById('authHeading').textContent = isSignup ? 'Create Your Account' : 'Sign In to Your Account';
-  document.getElementById('authConfirmWrap').style.display = isSignup ? 'block' : 'none';
+  // Option A convergence: hide password fields in signup mode — user sets their
+  // password at set-password.html after email confirmation. Sign-in still needs it.
+  const pwField = document.getElementById('authPassword');
+  if(pwField) pwField.style.display = isSignup ? 'none' : '';
+  document.getElementById('authConfirmWrap').style.display = 'none'; // never shown — set-password.html handles confirm
   document.getElementById('authForgotWrap').style.display = isSignup ? 'none' : 'block';
   document.getElementById('authSigninLink').style.display = isSignup ? 'block' : 'none';
   document.getElementById('authPlanWrap').style.display = isSignup ? 'block' : 'none';
@@ -39,18 +43,23 @@ async function authSubmit(){
 
   const email = (document.getElementById('authEmail')||{}).value?.trim();
   const pass = (document.getElementById('authPassword')||{}).value;
-  const confirm = (document.getElementById('authConfirm')||{}).value;
   const tab = document.getElementById('authBtn').dataset.tab || 'login';
   const isSignup = tab === 'signup';
 
-  if(!email || !pass){ authSetMsg('Please enter email and password.'); return; }
   const selectedPlan = document.querySelector('input[name="authPlan"]:checked')?.value || 'paid';
-  if(isSignup && selectedPlan !== 'free_contest' && !document.getElementById('authTermsCheck')?.checked){
-    authSetMsg('Please agree to the Terms of Service and Privacy Policy to create an account.');
-    return;
+  if(isSignup){
+    // Option A convergence: signup no longer takes a password here. User sets
+    // it at set-password.html after confirming email.
+    if(!email){ authSetMsg('Please enter your email.'); return; }
+    if(selectedPlan !== 'free_contest' && !document.getElementById('authTermsCheck')?.checked){
+      authSetMsg('Please agree to the Terms of Service and Privacy Policy to create an account.');
+      return;
+    }
+  } else {
+    // Sign-in: still requires the user's existing password
+    if(!email || !pass){ authSetMsg('Please enter email and password.'); return; }
+    if(pass.length < 6){ authSetMsg('Password must be at least 6 characters.'); return; }
   }
-  if(pass.length < 6){ authSetMsg('Password must be at least 6 characters.'); return; }
-  if(tab === 'signup' && pass !== confirm){ authSetMsg('Passwords do not match.'); return; }
 
   authSetLoading(true);
   authSetMsg('');
@@ -58,7 +67,25 @@ async function authSubmit(){
   try {
     let result;
     if(tab === 'signup'){
-      result = await supa.auth.signUp({ email, password: pass });
+      // Temp password — overwritten by user at set-password.html. signUp
+      // requires a password param even though we're not collecting one here.
+      const tempPass = ((typeof crypto!=='undefined' && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)
+      ) + '!A9z';
+      // Phase 5.2: signup_source unification. free_contest = single-person
+      // contest tier → 'solo' (triggers Phase 5.1 init.js auto-toggle that
+      // sets D.soloMode=true and hides parent UI). paid = standard parent
+      // path → 'register' (same as register.html).
+      const signupSource = (selectedPlan === 'free_contest') ? 'solo' : 'register';
+      result = await supa.auth.signUp({
+        email,
+        password: tempPass,
+        options: {
+          emailRedirectTo: 'https://yourlifecc.com/activate.html',
+          data: { signup_source: signupSource }
+        }
+      });
       if(result.error) throw result.error;
       if(result.data?.user?.identities?.length === 0){
         authSetMsg('Account already exists. Please sign in.', '#fbbf24');
@@ -98,10 +125,13 @@ async function authSubmit(){
       window._contestFreeUser = (selectedPlan === 'free_contest');
       _supaUser = result.data.user;
       if(selectedPlan === 'free_contest'){
-        // Free contest — go straight into app
-        setTimeout(() => authComplete(false), 1200);
+        // Email confirmation required — show check-your-email message.
+        // User flows through emailed link → activate.html → set-password.html → /app/
+        authSetMsg('Account created! Check your email for a link to set your password and access the app.', 'var(--gr)');
+        authSetLoading(false);
       } else {
-        // Paid plan — show plan picker modal
+        // Paid plan — show plan picker. Next step is Stripe checkout, which goes
+        // through the webhook flow that already handles email confirmation.
         authSetMsg('Account created! Choose your plan below.', 'var(--gr)');
         setTimeout(() => showPlanPicker(), 800);
       }
@@ -243,18 +273,64 @@ const FAITH_FREE_ALLOWED = ['s-hero', 's-scripture', 's-worship', 's-christian-l
 // Used by buildSideNav, showSection, and applySettings. Returning true for
 // non-faith_free users keeps existing paid-user behavior identical.
 function isSectionAllowed(id){
-  if(!window._faithFree) return true;
-  return FAITH_FREE_ALLOWED.indexOf(id) !== -1;
+  // Faith-free: only the four faith sections + hero are reachable.
+  if(window._faithFree) return FAITH_FREE_ALLOWED.indexOf(id) !== -1;
+  // Solo mode: no children → no Parent Hub. Gate s-parent at the routing layer
+  // so buildSideNav skips the nav item AND showSection redirects to s-hero.
+  if(typeof D !== 'undefined' && D && D.soloMode && id === 's-parent') return false;
+  return true;
 }
 
 // ── SUBSCRIPTION GATE ─────────────────────────────────────────
+
+// Helper — show the locked subscription screen with reason-appropriate copy + CTA.
+// Reasons: 'past_due' | 'cancelled' | 'check_failed' | <any other status string>
+function showSubBlockedScreen(reason){
+  document.getElementById('authScreen').style.display = 'none';
+  authSetLoading(false);
+
+  const msgEl   = document.getElementById('subBlockedMsg');
+  const ctaEl   = document.getElementById('subBlockedCTA');
+  const emailEl = document.getElementById('subBlockedEmail');
+  if(emailEl) emailEl.textContent = (_supaUser && _supaUser.email) || '';
+
+  if(reason === 'past_due'){
+    if(msgEl) msgEl.textContent = 'Your last payment failed and your subscription is past due. Please update your payment method to continue.';
+    if(ctaEl){
+      ctaEl.textContent = 'Update Payment Method';
+      ctaEl.href = 'https://billing.stripe.com/p/login/5kQaEQ52j4r783cftH7wA00';
+      ctaEl.onclick = null;
+    }
+  } else if(reason === 'cancelled'){
+    if(msgEl) msgEl.textContent = 'Your subscription has been cancelled. Reactivate anytime to pick up right where you left off — your data is saved.';
+    if(ctaEl){
+      ctaEl.textContent = 'Reactivate Subscription';
+      ctaEl.href = 'https://yourlifecc.com/#pricing';
+      ctaEl.onclick = null;
+    }
+  } else {
+    // 'check_failed' OR any unknown status — block defensively, retry CTA.
+    if(msgEl) msgEl.textContent = "We couldn't verify your subscription right now. Please refresh and try again. If this keeps happening, email info@kingdom-creatives.com.";
+    if(ctaEl){
+      ctaEl.textContent = 'Refresh and Retry';
+      ctaEl.href = '#';
+      ctaEl.onclick = function(e){ e.preventDefault(); location.reload(); };
+    }
+    if(reason !== 'check_failed'){
+      console.warn('[LifeOS] Unknown plan_status — blocking defensively:', reason);
+    }
+  }
+
+  document.getElementById('subBlockedScreen').style.display = 'flex';
+}
+
 async function checkPlanStatus(){
   if(typeof IS_DEMO!=="undefined"&&IS_DEMO) return false;
   const supa = getSupabase();
   if(!supa || !_supaUser) return false; // local-only users pass through
 
   try {
-    // Try by user_id first; fall back to email for rows where user_id is NULL
+    // Try by user_id first; fall back to email for rows where user_id is NULL.
     let data, error;
     ({ data, error } = await supa
       .from('profiles')
@@ -270,37 +346,39 @@ async function checkPlanStatus(){
         .single());
     }
 
-    if(error || !data) return false; // no record yet = new user, let through
+    // PostgREST returns code 'PGRST116' when .single() finds zero rows — that's
+    // a legitimate "new user, no profile yet" signal, not a query failure.
+    // Anything else is a real error: network, RLS denial, server fault.
+    const isNoRowsError = error && (error.code === 'PGRST116' ||
+                                    /no rows|0 rows/i.test(error.message || ''));
 
-    const status = data.plan_status;
-    // Store plan status globally for access control
-    window._userPlanStatus = status;
+    // Real query error — couldn't verify. Fail CLOSED with retry CTA.
+    if(error && !isNoRowsError){
+      console.warn('[LifeOS] Plan status query failed — blocking:', error);
+      showSubBlockedScreen('check_failed');
+      return true;
+    }
+
+    // status is null when the profile row doesn't exist yet (legitimate during
+    // the brief window between signup and Stripe-webhook provisioning).
+    const status = data ? data.plan_status : null;
+
+    window._userPlanStatus  = status;
     window._contestFreeUser = (status === 'free_contest');
     window._faithFree       = (status === 'faith_free');
-    // Block cancelled and past_due; allow active, trialing, null/undefined (legacy/free), free_contest
-    if(status === 'cancelled' || status === 'past_due'){
-      document.getElementById('authScreen').style.display = 'none';
-      authSetLoading(false);
 
-      const msgEl = document.getElementById('subBlockedMsg');
-      const emailEl = document.getElementById('subBlockedEmail');
-      if(emailEl) emailEl.textContent = _supaUser.email || '';
-      if(msgEl){
-        if(status === 'past_due'){
-          msgEl.textContent = 'Your last payment failed and your subscription is past due. Please update your payment method to continue.';
-          const cta = document.getElementById('subBlockedCTA');
-          if(cta){ cta.textContent = 'Update Payment Method'; cta.href = 'https://billing.stripe.com/p/login/5kQaEQ52j4r783cftH7wA00'; }
-        } else {
-          msgEl.textContent = 'Your subscription has been cancelled. Reactivate anytime to pick up right where you left off — your data is saved.';
-        }
-      }
-      document.getElementById('subBlockedScreen').style.display = 'flex';
-      return true; // blocked
+    // Allowlist — anything else (cancelled, past_due, anything new/unknown) blocks.
+    const ALLOWED_STATUSES = ['active', 'trialing', 'free_contest', 'faith_free', null];
+    if(!ALLOWED_STATUSES.includes(status)){
+      showSubBlockedScreen(status);
+      return true;
     }
-    return false; // active / trialing / unknown = allow
+
+    return false; // allowlist hit — proceed
   } catch(e){
-    console.warn('[LifeOS] Plan status check failed, allowing through:', e);
-    return false; // fail open — don't lock out on network errors
+    console.warn('[LifeOS] Plan status check threw — blocking:', e);
+    showSubBlockedScreen('check_failed');
+    return true;
   }
 }
 

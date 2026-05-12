@@ -471,25 +471,36 @@ function goTo(step){
 
 // ── STEP 1: SIGNUP ─────────────────────────────────────────
 async function doSignup(){
+  // NOTE: step 1 markup is a stub (see #step1 around line 334) — this function
+  // is currently unreachable. Bug-fixes applied defensively per Option A
+  // convergence so if step 1 ever gets wired back up, the right behavior is here.
   const email = document.getElementById('s1Email').value.trim();
-  const pass  = document.getElementById('s1Pass').value;
   const errEl = document.getElementById('s1Err');
   const btn   = document.getElementById('s1Btn');
 
   errEl.textContent = '';
   if(!email || !email.includes('@')){ errEl.textContent = 'Please enter a valid email.'; return; }
-  if(pass.length < 8){ errEl.textContent = 'Password must be at least 8 characters.'; return; }
 
-  STATE.email    = email;
-  STATE.password = pass;
+  STATE.email = email;
 
   btn.disabled = true;
-  btn.textContent = 'Creating account…';
+  btn.textContent = 'Sending confirmation…';
+
+  // Temp password — overwritten by user at set-password.html after email
+  // confirmation (Option A convergence). signUp requires a password param.
+  const tempPass = ((typeof crypto!=='undefined' && crypto.randomUUID)
+    ? crypto.randomUUID()
+    : Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)
+  ) + '!A9z';
 
   try {
     const supa = getSupabase();
     if(supa){
-      const { data, error } = await supa.auth.signUp({ email, password: pass });
+      const { data, error } = await supa.auth.signUp({
+        email,
+        password: tempPass,
+        options: { emailRedirectTo: 'https://yourlifecc.com/activate.html' }
+      });
       if(error){ errEl.textContent = error.message; btn.disabled=false; btn.textContent='Create Account →'; return; }
       STATE.userId = data?.user?.id || null;
     }
@@ -497,9 +508,13 @@ async function doSignup(){
     // If Supabase unavailable, continue anyway (local mode)
   }
 
-  btn.textContent = 'Create Account →';
-  btn.disabled = false;
-  goTo(2);
+  // Email confirmation required — stop the wizard here. User clicks email link
+  // → activate.html → set-password.html → /app/. Child + first-task steps can
+  // be completed inside the app's onboarding wizard after sign-in.
+  btn.textContent = 'Check your email ✓';
+  btn.disabled = true;
+  errEl.style.color = '#22c55e';
+  errEl.textContent = 'We sent a confirmation link to ' + email + '. Click it to set your password and finish setup.';
 }
 
 // ── STEP 2: CHILD ──────────────────────────────────────────

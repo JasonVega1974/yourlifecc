@@ -190,6 +190,17 @@ async function init(){
       const loaded = await cloudLoad();
       if(!loaded){ loadData(); setTimeout(cloudSync, 1500); } // load local + write row to Supabase
       setSyncSt(loaded ? 'cloud' : 'cloud'); // user is signed in either way
+      // Phase 4: Age picker only fires for active child profiles. At parent-
+      // account init this is always false → skip picker. Picker for child
+      // profiles fires from parent.js switchToProfile when a child becomes active.
+      if(!D.ageBracket && !IS_DEMO && !window._faithFree && _isChildProfileActive()){
+        showAgePickerModal(function(){
+          if(!D.parentPinHash && !D.chorePin && !D.parentPIN){ showFirstTimeGate(); return; }
+          finishInit(true);
+          setTimeout(setupContestFreeUser, 500);
+        });
+        return;
+      }
       if(!D.parentPinHash && !D.chorePin && !D.parentPIN){ showFirstTimeGate(); return; }
       finishInit(true); // pass flag so popup shows after cloud data is confirmed loaded
       setTimeout(setupContestFreeUser, 500); // Show contest banner if applicable
@@ -199,6 +210,16 @@ async function init(){
     // Supabase not available - use localStorage
     loadData();
     setSyncSt('local');
+    // Phase 4: Age picker only fires for active child profiles (see helper above).
+    // Parent-account init always skips; picker fires later via parent.js when a
+    // child profile becomes active.
+    if(!D.ageBracket && !IS_DEMO && !window._faithFree && _isChildProfileActive()){
+      showAgePickerModal(function(){
+        if(!D.parentPinHash && !D.chorePin && !D.parentPIN){ showFirstTimeGate(); return; }
+        finishInit();
+      });
+      return;
+    }
     if(!D.parentPinHash && !D.chorePin && !D.parentPIN){ showFirstTimeGate(); return; }
     finishInit();
     return;
@@ -208,9 +229,83 @@ async function init(){
   document.getElementById('authScreen').style.display = 'flex';
 }
 
+// ── PHASE 2.1 AGE PICKER ─────────────────────────────────────
+// Three brackets map to D.sections allowlists. 18_22 = full surface (null
+// allowlist). Always-visible specials (s-hero, s-parent, s-cbt) bypass
+// this — they're force-shown elsewhere. Faith-only users skip the picker
+// entirely (FAITH_FREE_ALLOWED is the canonical filter for that plan).
+const _AGE_BRACKET_ALLOWLISTS = {
+  '12_14': new Set(['chores','goals','mood','reading','scripture','rewards']),
+  '15_17': new Set(['chores','goals','mood','reading','scripture','rewards','school','health','finance','driving','skills']),
+  '18_22': null, // null = full surface (don't hide anything)
+};
+
+function _bracketAllowedKeys(bracket){
+  if(!bracket) return null; // no bracket = no filtering
+  return _AGE_BRACKET_ALLOWLISTS[bracket] || null;
+}
+
+let _agePickerCallback = null;
+
+// Phase 4: Age picker only applies to a child profile. At parent-account init
+// (no child profiles yet, or the parent is the active profile), returns false
+// and the picker is suppressed. Picker fires later from parent.js's
+// switchToProfile path when a child becomes active.
+function _isChildProfileActive(){
+  if(typeof _profiles === 'undefined' || !Array.isArray(_profiles)) return false;
+  if(typeof _activeProfileId === 'undefined' || !_activeProfileId) return false;
+  const ap = _profiles.find(p => p && p.id === _activeProfileId);
+  return !!(ap && ap.isParent === false);
+}
+
+function showAgePickerModal(callback){
+  _agePickerCallback = (typeof callback === 'function') ? callback : null;
+  const m = document.getElementById('agePickerModal');
+  if(m) m.style.display = 'flex';
+}
+
+function selectAgeBracket(bracket){
+  if(!['12_14','15_17','18_22'].includes(bracket)) return;
+  if(typeof D === 'undefined' || !D) return;
+  D.ageBracket = bracket;
+  applyAgeBracketSections(bracket);
+  if(typeof save === 'function') save();
+  const m = document.getElementById('agePickerModal');
+  if(m) m.style.display = 'none';
+  const cb = _agePickerCallback;
+  _agePickerCallback = null;
+  if(typeof cb === 'function') cb();
+}
+
+function applyAgeBracketSections(bracket){
+  if(!D.sections) D.sections = {};
+  const allow = _bracketAllowedKeys(bracket);
+  if(typeof ALL_SECTIONS === 'undefined') return;
+  ALL_SECTIONS.forEach(function(s){
+    const key = s.id.replace('s-','');
+    if(allow === null){
+      // 18_22 = full surface — clear any hidden flags.
+      if(D.sections[key] === 0) delete D.sections[key];
+    } else {
+      // 12_14 or 15_17 — explicit 1 for allowed, 0 for hidden.
+      D.sections[key] = allow.has(key) ? 1 : 0;
+    }
+  });
+}
+
 function finishInit(cloudReady){
   // Always ensure newly-added sections are visible regardless of saved state
-  if(D.sections){ ['cbt','resume','motivation','mentors','christianLiving','worship','scripture'].forEach(function(k){ delete D.sections[k]; }); }
+  // Phase 2.1: force-show migration nudge respects age bracket. Sections the
+  // bracket hides stay hidden; everything else is force-shown.
+  if(D.sections){
+    const FORCE = ['cbt','resume','motivation','mentors','christianLiving','worship','scripture'];
+    const allowed = (typeof _bracketAllowedKeys === 'function') ? _bracketAllowedKeys(D.ageBracket) : null;
+    FORCE.forEach(function(k){
+      // 'cbt' is always visible regardless of bracket (CLAUDE.md design rule).
+      if(k === 'cbt'){ delete D.sections[k]; return; }
+      if(allowed === null || allowed.has(k)) delete D.sections[k];
+    });
+  }
   // Belt+suspenders: force CBT on
   if(D.sections && D.sections.cbt===0) delete D.sections.cbt;
   // Apply saved theme
@@ -362,6 +457,23 @@ function finishInit(cloudReady){
   applyFaithMode();
   renderDevMap();
   initResources();
+
+  // Phase 5.1: Solo path auto-toggle. When the user signed up via
+  // register.html?path=solo, user_metadata.signup_source === 'solo' is the
+  // durable cross-device flag. On first signin (parentWizardDone false),
+  // apply solo mode and mark the wizard done so it never opens with the
+  // mode-picker slide. Returning users who later toggled out of solo are
+  // protected by the parentWizardDone gate (one-shot).
+  if(!D.parentWizardDone
+     && typeof _supaUser !== 'undefined' && _supaUser
+     && _supaUser.user_metadata
+     && _supaUser.user_metadata.signup_source === 'solo'){
+    D.soloMode = true;
+    D.parentWizardDone = true;
+    try{ localStorage.setItem(_ylccUserKey('ylcc_parentWizardDone'), '1'); }catch(e){}
+    if(typeof save === 'function') save();
+    if(typeof applySoloMode === 'function') applySoloMode();
+  }
 
   // Auto-show Quick Start Wizard on first visit — skip in demo
   // Only show if user has NOT yet completed the wizard. Do NOT rely on D.name

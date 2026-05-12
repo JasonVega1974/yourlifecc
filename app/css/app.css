@@ -24,7 +24,7 @@
   --cd-card-shadow: 0 10px 30px rgba(15,23,42,.10), 0 18px 55px rgba(124,58,237,.14);
   --cd-card-shadow-hover: 0 14px 40px rgba(15,23,42,.14), 0 26px 75px rgba(124,58,237,.22);
   --cd-card-radius: 16px;
-  --fh:'Bebas Neue',sans-serif;--fm:'Inter',sans-serif;--fn:'Orbitron',sans-serif;--f:'Inter',sans-serif;
+  --fh:'Bebas Neue',sans-serif;--fm:'Inter',sans-serif;--fn:'Inter',sans-serif;--f:'Inter',sans-serif;
   --card-shadow:0 4px 24px rgba(0,0,0,.5);
   --sidebar:220px;
   --card-bg:rgba(255,255,255,.07);--card-border:rgba(255,255,255,.1);
@@ -541,7 +541,10 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 :root.light .nav-item:hover{color:#0f172a;background:rgba(0,0,0,.04);border-left-color:rgba(56,189,248,.5);}
 :root.light .nav-item.active{color:var(--c);background:rgba(56,189,248,.1);border-left-color:var(--c);}
 :root.light .sid-bottom{border-top-color:rgba(0,0,0,.08);}
-:root.light #mBar{background:rgba(255,255,255,.97);border-bottom-color:rgba(0,0,0,.08);}
+:root.light #mBar,
+:root.light #mobileQuickRow{background:rgba(255,255,255,.97);border-bottom-color:rgba(0,0,0,.08);}
+:root.light #mobileQuickRow .mqb{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.12);color:#334155;}
+:root.light #mobileQuickRow .mqb-lang{background:rgba(0,0,0,.04);}
 :root.light .mBar-title{color:var(--c);}
 :root.light .hamb{border-color:rgba(0,0,0,.2);color:#475569;}
 :root.light .card{background:#fff;border-color:rgba(0,0,0,.08);box-shadow:0 2px 12px rgba(0,0,0,.07);}
@@ -552,7 +555,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 :root.light .btn.bgh{background:rgba(0,0,0,.07);color:#334155;border-color:rgba(0,0,0,.15);}
 :root.light .btn.bgh:hover{background:rgba(0,0,0,.12);color:#0f172a;}
 :root.light .tab{color:#64748b;}
-:root.light .tab.on{background:var(--c);color:#000;}
+:root.light .tab.active{background:var(--c);color:#000;}
 :root.light .sh{border-bottom-color:rgba(0,0,0,.08);}
 :root.light .sl{background:rgba(0,0,0,.08);}
 :root.light .chi{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.1);color:#334155;}
@@ -590,6 +593,22 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 :root.light .md{background:#fff;border-color:rgba(0,0,0,.1);}
 :root.light #themeBtn{background:rgba(0,0,0,.06);border-color:rgba(0,0,0,.15);color:#475569;}
 :root.light #themeBtnMob{background:rgba(0,0,0,.08);border-color:rgba(0,0,0,.18);color:#475569;}
+/* ── Phase 3 light-mode contrast pass (bulk class rescue) ───── */
+:root.light .ai2{background:rgba(0,0,0,.04);color:#0f172a;}
+:root.light .ai2 .ck{border-color:rgba(0,0,0,.3);}
+:root.light .ai2 .pl{border-left-color:rgba(0,0,0,.18);}
+:root.light .cc{background:#fff;border-color:rgba(0,0,0,.08);box-shadow:0 1px 6px rgba(0,0,0,.06);}
+:root.light .stat-tile{background:#fff;border-color:rgba(0,0,0,.08);box-shadow:0 1px 6px rgba(0,0,0,.06);}
+:root.light .qsl,
+:root.light .stat-lbl{color:#64748b;}
+:root.light .pin-btn,
+:root.light .child-pin-btn{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.12);color:#0f172a;}
+:root.light .pin-btn:hover,
+:root.light .child-pin-btn:hover{background:rgba(0,0,0,.1);}
+:root.light .eb{color:#475569;}
+:root.light .eb:hover{color:var(--c);}
+:root.light .db{color:rgba(0,0,0,.45);}
+:root.light .db:hover{color:var(--pk);}
 
 /* ── RESUME BUILDER ─────────────────────────────── */
 .res-tmpl-btn{padding:.32rem .75rem;border-radius:7px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:var(--tx2);font-size:.75rem;font-weight:700;cursor:pointer;font-family:var(--fm);transition:all .15s;}
@@ -2090,6 +2109,34 @@ body{top:0!important;}
 :root.light #devScripture,
 :root.light #ddmTitle { color: #0f172a !important; }
 :root.light #ddmVerse { color: #475569 !important; }
+/* Devotional card sub-boxes — `rgba(<color>,.04)` backgrounds vanish on
+   light page bg; bump alpha so they read as cards, not phantom borders. */
+:root.light #bf-devotional [style*="rgba(167,139,250,.04)"]{background:rgba(167,139,250,.14) !important;}
+:root.light #bf-devotional [style*="rgba(34,197,94,.04)"]{background:rgba(34,197,94,.10) !important;}
+:root.light #bf-devotional [style*="rgba(244,114,182,.04)"]{background:rgba(244,114,182,.10) !important;}
+/* Story Mode card (F4-G) — dark gradient is intentional for the
+   "starry-night storybook" feel; in light mode swap to warm
+   cream/lavender to keep the warmth without dropping a dark slab
+   onto a light page. Cream/gold text is rerouted to deep purple
+   + slate so the headline, subhead, and italic blurb remain
+   legible against the new background. */
+:root.light #fhStoriesCard{
+  background:linear-gradient(135deg,#fef9e7 0%,#ede5f5 100%) !important;
+  border-color:rgba(251,191,36,.5) !important;
+}
+:root.light #fhStoriesCard .fh-card-hdr{ color:#5b21b6 !important; }
+:root.light #fhStoriesCard .fh-card-sub{ color:rgba(124,58,237,.7) !important; }
+:root.light #fhStoriesCard > div[style*="rgba(254,243,199,.78)"]{ color:#475569 !important; }
+/* Child PIN login screen — dark gradient is hardcoded inline at
+   #childLoginScreen; no light-mode override existed. Also rescues the
+   PIN dot 2px borders (existing 1px-border attribute rescue at
+   line 2140 doesn't match the dots' 2px pattern). */
+:root.light #childLoginScreen{
+  background:linear-gradient(135deg,#f0f4f8,#e2e8f0,#cbd5e1) !important;
+}
+:root.light #childLoginScreen [style*="border:2px solid rgba(255,255,255,.25)"]{
+  border-color:rgba(15,23,42,.3) !important;
+}
 
 /* Scripture section header labels (rgba white) */
 :root.light [style*="color:rgba(255,255,255,.7)"],
@@ -2369,6 +2416,16 @@ html[data-faith-free="1"] .mqb-parent {
   display: none !important;
 }
 
+/* Solo mode — single-user account with no parent/child split. Hides Parent Hub
+   entry points (header + mobile-quick-row buttons), the Parent Welcome card,
+   and the s-parent sidebar nav item. Mirrors the faith_free pattern above. */
+body.solo-mode button[onclick*="quickParentHub"],
+body.solo-mode #parentWelcomeCard,
+body.solo-mode #ni-s-parent,
+body.solo-mode .mqb-parent {
+  display: none !important;
+}
+
 /* Simplify Settings for faith_free — only Appearance + Support remain. */
 html[data-faith-free="1"] #sp .sp-pb { display: none !important; }
 html[data-faith-free="1"] #sp-faith-support { display: block !important; }
@@ -2500,4 +2557,74 @@ html[data-faith-free="1"] #sp-faith-support { display: block !important; }
   position: absolute; left: 50%; bottom: 0; width: 120px; height: 120px;
   animation: fxFlameRise 1.8s cubic-bezier(.21,.78,.35,1) forwards;
   filter: drop-shadow(0 0 18px rgba(251,113,38,.7));
+}
+
+/* ── PHASE 2.4 PARENT HUB TAB BAR ───────────────────────────────────────── */
+.ph-home-crumb {
+  margin-bottom: .35rem;
+}
+.ph-home-crumb a {
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--tx2);
+  text-decoration: none;
+  padding: .25rem .5rem;
+  border-radius: 6px;
+  transition: color .15s, background .15s;
+}
+.ph-home-crumb a:hover {
+  color: var(--c);
+  background: rgba(255,255,255,.04);
+}
+.ph-tab-bar {
+  display: flex;
+  gap: .35rem;
+  padding: .35rem;
+  background: rgba(255,255,255,.02);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 14px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  margin-bottom: .7rem;
+}
+.ph-tab {
+  flex: 1;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: .6rem .4rem;
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--tx2);
+  cursor: pointer;
+  transition: all .15s;
+  font-family: var(--fn);
+}
+.ph-tab:hover {
+  background: rgba(255,255,255,.04);
+  color: var(--tx);
+}
+.ph-tab.active {
+  background: linear-gradient(135deg, rgba(56,189,248,.12), rgba(167,139,250,.08));
+  border-color: rgba(56,189,248,.25);
+  color: var(--tx);
+}
+/* Mobile: smaller labels, tighter padding */
+@media (max-width: 600px) {
+  .ph-tab { font-size: .72rem; padding: .5rem .25rem; }
+}
+
+/* ── PHASE 2.1 AGE PICKER ──────────────────────────────────────────────── */
+.age-bracket-card:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.15);
+}
+.age-bracket-card:active {
+  transform: translateY(0);
+  filter: brightness(.95);
+}
+.age-bracket-card:focus-visible {
+  outline: 2px solid var(--c);
+  outline-offset: 2px;
 }

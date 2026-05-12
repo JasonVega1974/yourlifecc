@@ -4989,6 +4989,39 @@ function pobNav(dir){
   }
 }
 function showParentOnboard(){
+  // Phase 4: Option A convergence. Users who signed up via register.html or
+  // register-faith.html already declared their mode — read from
+  // user_metadata.signup_source (durable across devices, unlike localStorage).
+  // Only auto-route on first wizard open (parentWizardDone is set after the
+  // wizard fires once, so subsequent re-opens via Start Here behave normally).
+  let _autoAdvance = false;
+  try {
+    const src = (!D.parentWizardDone
+      && typeof _supaUser !== 'undefined' && _supaUser && _supaUser.user_metadata)
+      ? _supaUser.user_metadata.signup_source
+      : null;
+    if(src === 'register-faith' || src === 'solo'){
+      // Single-person tiers (faith_free or solo) — close wizard entirely, skip
+      // all tutorial slides. Phase 5.1: init.js usually catches the 'solo'
+      // case first and sets parentWizardDone before the wizard ever fires;
+      // this branch is belt-and-suspenders for any code path that bypasses
+      // init.js (e.g., manual showParentOnboard call from Settings).
+      D.soloMode = true;
+      D.parentWizardDone = true;
+      if(typeof save === 'function') save();
+      try{ localStorage.setItem(_ylccUserKey('ylcc_parentWizardDone'), '1'); }catch(e){}
+      if(typeof applySoloMode === 'function') applySoloMode();
+      return; // do not open the wizard
+    }
+    if(src === 'register'){
+      // Parent explicitly chose family mode at register.html — pre-apply and
+      // auto-advance past slide 0 (mode-picker).
+      D.soloMode = false;
+      if(typeof save === 'function') save();
+      _autoAdvance = true;
+    }
+  } catch(e) {}
+
   _pobStep = 0;
   initPobDots();
   const slides = document.getElementById('pobSlides');
@@ -5008,6 +5041,13 @@ function showParentOnboard(){
   D.parentWizardDone = true;
   try{ localStorage.setItem(_ylccUserKey('ylcc_parentWizardDone'), '1'); }catch(e){}
   save();
+
+  // Auto-advance past slide 0 for register.html users (they've already chosen
+  // Family mode). Tick delay lets the modal lay out so pobNav can compute
+  // slide width for the translate transform.
+  if(_autoAdvance){
+    setTimeout(function(){ if(typeof pobNav === 'function') pobNav(1); }, 60);
+  }
 }
 function closeParentOnboard(){
   const modal = document.getElementById('parentOnboard'); if(!modal) return;
@@ -5751,7 +5791,7 @@ ${(b.showQR&&b.qrUrl&&qrSvgInline)?`<div class="section">
   </div>
 </div>`:''}
 
-<div class="footer">Built with LifeOS</div>
+<div class="footer">Built with YourLife CC</div>
 
 </div>
 `;

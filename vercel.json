@@ -16,7 +16,7 @@
       ]
     },
     {
-      "source": "/(login|register|reset-password|set-password|activate|confirm|onboard|admin|account|app-bridge)\\.html",
+      "source": "/(login|register-faith|register|reset-password|set-password|activate|confirm|onboard|admin|account|app-bridge)\\.html",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
       ]

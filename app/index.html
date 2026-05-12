@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>YourLife CC — your family dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <!-- Boot-cache theme + palette BEFORE the stylesheet renders, to avoid the
      dark-mode flash that returning users on calm-theme palettes (cream/sage/
      teal) saw on every first paint. The cache is written by setPalette()
@@ -88,10 +88,10 @@
       <label style="display:flex;align-items:flex-start;gap:.7rem;cursor:pointer;">
         <input type="checkbox" id="authTermsCheck" style="margin-top:3px;accent-color:#38bdf8;width:16px;height:16px;flex-shrink:0;">
         <span style="font-size:.78rem;color:rgba(255,255,255,.65);line-height:1.6;">
-          I have read and agree to the 
-          <a href="https://yourlifecc.com/terms.html" target="_blank" style="color:#38bdf8;text-decoration:underline;font-weight:600;">Terms of Service</a> 
-          and 
-          <a href="https://yourlifecc.com/privacy.html" target="_blank" style="color:#38bdf8;text-decoration:underline;font-weight:600;">Privacy Policy</a> 
+          I have read and agree to the
+          <a href="https://yourlifecc.com/terms.html" target="_blank" style="color:#38bdf8;text-decoration:underline;font-weight:600;">Terms of Service</a>,
+          <a href="https://yourlifecc.com/privacy.html" target="_blank" style="color:#38bdf8;text-decoration:underline;font-weight:600;">Privacy Policy</a>, and
+          <a href="https://yourlifecc.com/children-privacy.html" target="_blank" style="color:#38bdf8;text-decoration:underline;font-weight:600;">Children's Privacy Policy</a>
           of Kingdom Creatives LLC. I understand this app provides tools and does not guarantee any specific results.
         </span>
       </label>
@@ -118,7 +118,7 @@
       </div>
     </div>
     <!-- Primary button -->
-    <button id="authBtn" onclick="authSubmit()" style="width:100%;padding:.9rem;background:linear-gradient(135deg,#38bdf8,#4f8fff);border:none;border-radius:12px;color:#000;font-weight:800;font-size:.95rem;cursor:pointer;margin-bottom:.7rem;transition:all .2s;">Sign In</button>
+    <button id="authBtn" onclick="authSubmit()" style="width:100%;padding:.9rem;background:linear-gradient(135deg,#38bdf8,#38bdf8);border:none;border-radius:12px;color:#000;font-weight:800;font-size:.95rem;cursor:pointer;margin-bottom:.7rem;transition:all .2s;">Sign In</button>
     <p id="authPaidLink" style="text-align:center;font-size:.78rem;color:var(--tx2);margin-top:.5rem;margin-bottom:.7rem;">Don't have an account? <a href="javascript:void(0)" onclick="authSwitchTab('signup')" style="color:var(--c);font-weight:700;">Create Account →</a> &nbsp;|&nbsp; <a href="../index.html#pricing" style="color:var(--tx2);font-weight:600;font-size:.72rem;">See Plans</a></p>
 
     <!-- Forgot password -->
@@ -215,9 +215,35 @@
     <div style="font-size:3rem;margin-bottom:1rem;">🔒</div>
     <div style="font-size:1.25rem;font-weight:800;color:#fff;margin-bottom:.5rem;">Subscription Required</div>
     <div id="subBlockedMsg" style="font-size:.88rem;color:rgba(255,255,255,.6);margin-bottom:1.5rem;line-height:1.6;">Your subscription is no longer active. Reactivate to continue using YourLife CC.</div>
-    <a id="subBlockedCTA" href="https://yourlifecc.vercel.app/#pricing" style="display:block;width:100%;padding:.9rem;background:linear-gradient(135deg,#38bdf8,#4f8fff);border:none;border-radius:12px;color:#000;font-weight:800;font-size:.95rem;cursor:pointer;margin-bottom:.75rem;text-decoration:none;box-sizing:border-box;">Reactivate Subscription</a>
+    <a id="subBlockedCTA" href="https://yourlifecc.vercel.app/#pricing" style="display:block;width:100%;padding:.9rem;background:linear-gradient(135deg,#38bdf8,#38bdf8);border:none;border-radius:12px;color:#000;font-weight:800;font-size:.95rem;cursor:pointer;margin-bottom:.75rem;text-decoration:none;box-sizing:border-box;">Reactivate Subscription</a>
     <button onclick="signOut()" style="width:100%;padding:.75rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:rgba(255,255,255,.6);font-size:.82rem;font-weight:600;cursor:pointer;">Sign Out</button>
     <div style="font-size:.7rem;color:rgba(255,255,255,.3);margin-top:1.2rem;">Signed in as <span id="subBlockedEmail" style="color:rgba(255,255,255,.5);"></span></div>
+  </div>
+</div>
+
+<!-- ── PHASE 2.1 AGE PICKER (first-launch, before PIN gate) ──────────── -->
+<div id="agePickerModal" style="display:none;position:fixed;inset:0;z-index:9999;background:linear-gradient(145deg,#050d1a,#0d1b2a);align-items:center;justify-content:center;padding:1.5rem;">
+  <div style="max-width:520px;width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:2rem 1.5rem;text-align:center;">
+    <div style="font-size:2.8rem;margin-bottom:.5rem;">🎂</div>
+    <div style="font-family:var(--fh);font-size:1.4rem;letter-spacing:2px;color:var(--c);margin-bottom:.4rem;">PICK YOUR AGE GROUP</div>
+    <div style="font-size:.83rem;color:var(--tx2);margin-bottom:1.5rem;line-height:1.6;">YourLife CC adapts to your stage. Pick the group that fits — you can fine-tune section visibility later in Settings.</div>
+
+    <div style="display:flex;flex-direction:column;gap:.7rem;">
+      <button onclick="selectAgeBracket('12_14')" class="age-bracket-card" style="background:rgba(56,189,248,.08);border:1.5px solid rgba(56,189,248,.25);border-radius:14px;padding:1rem;cursor:pointer;text-align:left;transition:all .15s;font-family:var(--fn);width:100%;">
+        <div style="font-size:1.1rem;font-weight:800;color:#38bdf8;">🎒 12 – 14</div>
+        <div style="font-size:.75rem;color:var(--tx2);margin-top:.25rem;line-height:1.5;">Middle school. Chores, goals, mood, reading, scripture, rewards.</div>
+      </button>
+
+      <button onclick="selectAgeBracket('15_17')" class="age-bracket-card" style="background:rgba(34,197,94,.08);border:1.5px solid rgba(34,197,94,.25);border-radius:14px;padding:1rem;cursor:pointer;text-align:left;transition:all .15s;font-family:var(--fn);width:100%;">
+        <div style="font-size:1.1rem;font-weight:800;color:#22c55e;">📚 15 – 17</div>
+        <div style="font-size:.75rem;color:var(--tx2);margin-top:.25rem;line-height:1.5;">High school. Above + school, health, finance, driving, life skills.</div>
+      </button>
+
+      <button onclick="selectAgeBracket('18_22')" class="age-bracket-card" style="background:rgba(167,139,250,.08);border:1.5px solid rgba(167,139,250,.25);border-radius:14px;padding:1rem;cursor:pointer;text-align:left;transition:all .15s;font-family:var(--fn);width:100%;">
+        <div style="font-size:1.1rem;font-weight:800;color:#a78bfa;">🚀 18 – 22</div>
+        <div style="font-size:.75rem;color:var(--tx2);margin-top:.25rem;line-height:1.5;">College + young adult. Everything unlocked — full life-management surface.</div>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -325,7 +351,7 @@
     <div style="font-size:.65rem;font-weight:700;color:var(--tx2);margin-bottom:.3rem;">🎨 Banner Color</div>
     <div class="swatch-row" style="display:flex;gap:.25rem;margin-bottom:.7rem;overflow-x:auto;padding-bottom:.2rem;">
       <button onclick="setPresetBg('none')" style="width:30px;height:30px;border-radius:6px;border:1.5px solid rgba(255,255,255,.1);background:var(--bg);cursor:pointer;font-size:.55rem;color:var(--tx2);flex-shrink:0;">✕</button>
-      <button onclick="setPresetBg('linear-gradient(135deg,#4f8fff,#06d6a0,#a78bfa)')" style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(255,255,255,.15);background:linear-gradient(135deg,#4f8fff,#06d6a0);cursor:pointer;flex-shrink:0;" title="Aurora"></button>
+      <button onclick="setPresetBg('linear-gradient(135deg,#38bdf8,#22c55e,#a78bfa)')" style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(255,255,255,.15);background:linear-gradient(135deg,#38bdf8,#22c55e);cursor:pointer;flex-shrink:0;" title="Aurora"></button>
       <button onclick="setPresetBg('linear-gradient(135deg,#667eea,#764ba2)')" style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(135deg,#667eea,#764ba2);cursor:pointer;flex-shrink:0;" title="Violet Dream"></button>
       <button onclick="setPresetBg('linear-gradient(135deg,#f093fb,#f5576c)')" style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(135deg,#f093fb,#f5576c);cursor:pointer;flex-shrink:0;" title="Pink Sunset"></button>
       <button onclick="setPresetBg('linear-gradient(135deg,#4facfe,#00f2fe)')" style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(135deg,#4facfe,#00f2fe);cursor:pointer;flex-shrink:0;" title="Sky Blue"></button>
@@ -340,7 +366,7 @@
     <div style="font-size:.65rem;font-weight:700;color:var(--tx2);margin-bottom:.3rem;">🖼️ Background Color</div>
     <div class="swatch-row" style="display:flex;gap:.25rem;overflow-x:auto;padding-bottom:.2rem;">
       <button onclick="setAppBg('none')" style="width:30px;height:30px;border-radius:6px;border:1.5px solid rgba(255,255,255,.1);background:var(--bg);cursor:pointer;font-size:.55rem;color:var(--tx2);flex-shrink:0;">✕</button>
-      <button onclick="setAppBg('linear-gradient(135deg,#4f8fff,#06d6a0,#a78bfa)')" style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(255,255,255,.15);background:linear-gradient(135deg,#4f8fff,#06d6a0);cursor:pointer;flex-shrink:0;" title="Aurora"></button>
+      <button onclick="setAppBg('linear-gradient(135deg,#38bdf8,#22c55e,#a78bfa)')" style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(255,255,255,.15);background:linear-gradient(135deg,#38bdf8,#22c55e);cursor:pointer;flex-shrink:0;" title="Aurora"></button>
       <button onclick="setAppBg('linear-gradient(135deg,#667eea,#764ba2)')" style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(135deg,#667eea,#764ba2);cursor:pointer;flex-shrink:0;" title="Violet Dream"></button>
       <button onclick="setAppBg('linear-gradient(135deg,#f093fb,#f5576c)')" style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(135deg,#f093fb,#f5576c);cursor:pointer;flex-shrink:0;" title="Pink Sunset"></button>
       <button onclick="setAppBg('linear-gradient(135deg,#4facfe,#00f2fe)')" style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(135deg,#4facfe,#00f2fe);cursor:pointer;flex-shrink:0;" title="Sky Blue"></button>
@@ -519,7 +545,7 @@
   <!-- BETA TESTING FEEDBACK -->
   <div style="margin-top:1.1rem;padding-top:.9rem;border-top:1px solid rgba(255,255,255,.06);">
     <div style="font-family:var(--fh);font-size:.73rem;letter-spacing:1px;color:#f5a623;margin-bottom:.55rem;">🧪 BETA TESTER FEEDBACK</div>
-    <div style="font-size:.73rem;color:var(--tx2);margin-bottom:.5rem;">Help us make LifeOS better! Report bugs, suggest features, or share what you love.</div>
+    <div style="font-size:.73rem;color:var(--tx2);margin-bottom:.5rem;">Help us make YourLife CC better! Report bugs, suggest features, or share what you love.</div>
     <label>Your Name</label>
     <input type="text" id="betaName" placeholder="Parent or child name">
     <label>Child's Age</label>
@@ -738,9 +764,9 @@
   </div>
   <!-- MENU BUTTON with bouncing down arrow -->
   <div style="position:relative;display:inline-flex;flex-direction:column;align-items:center;">
-    <button class="mqb" onclick="toggleSidebar()" style="background:rgba(79,143,255,.15);border-color:rgba(79,143,255,.4);color:#4f8fff;font-weight:800;white-space:nowrap;">☰ Menu</button>
+    <button class="mqb" onclick="toggleSidebar()" style="background:rgba(79,143,255,.15);border-color:rgba(79,143,255,.4);color:#38bdf8;font-weight:800;white-space:nowrap;">☰ Menu</button>
     <div style="position:absolute;top:calc(100% + 2px);left:50%;transform:translateX(-50%);animation:mqbArrow 1.2s ease-in-out infinite;pointer-events:none;">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4f8fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 4px rgba(79,143,255,.8));"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 4px rgba(79,143,255,.8));"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
     </div>
   </div>
   <style>@keyframes mqbArrow{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(5px);}}</style>
@@ -830,7 +856,7 @@
 
   <!-- LINK TO FULL STATS (the 10-tile grid below stays available, just collapsed) -->
   <div style="margin-bottom:.7rem;">
-    <a href="javascript:void(0)" id="heroFullStatsToggle" onclick="(function(el){var w=document.getElementById('heroFullStats');if(!w)return;var hidden=w.style.display==='none';w.style.display=hidden?'block':'none';el.textContent=hidden?'Hide full stats &uarr;':'See full stats &rarr;';})(this)" style="font-size:.78rem;color:var(--c);text-decoration:none;font-weight:600;">See full stats &rarr;</a>
+    <a href="javascript:void(0)" id="heroFullStatsToggle" onclick="toggleHeroFullStats()" style="font-size:.78rem;color:var(--c);text-decoration:none;font-weight:600;">See full stats &rarr;</a>
   </div>
 
   <!-- FULL STATS — original 10-tile grid wrapped, hidden by default -->
@@ -1004,14 +1030,6 @@
       <div class="dcard-sub" id="qsScrLabel">Read today</div>
     </div>
 
-    <!-- Parent Bucks (2nd instance) -->
-    <div class="dcard" onclick="showSection('s-chores')">
-      <div class="dcard-status" id="dcPBStatus2"></div>
-      <div class="dcard-icon">🪙</div>
-      <div class="dcard-label">Parent Bucks <span class="hlp" onmouseenter="hlp('parentbucks',this,event);hlpHintDone()" onmouseleave="hlpHide()">?<span class="hlp-arrow">▲</span></span></div>
-      <div class="dcard-value" id="qsPB" style="color:#fbbf24;">0</div>
-      <div class="dcard-sub" id="qsPBGames"></div>
-    </div>
   </div>
   </div><!-- /heroFullStats -->
 
@@ -5638,6 +5656,20 @@
       #s-worship .kc-player-section { padding: 16px; }
       #s-worship .kc-now-playing h2 { font-size: 20px; }
     }
+    /* Phase 3 light-mode contrast rescue */
+    :root.light #s-worship .kc-control-btn{
+      background:rgba(0,0,0,.04); border-color:rgba(102,126,234,.35); color:#1e293b;
+    }
+    :root.light #s-worship .kc-control-btn:hover{ background:rgba(102,126,234,.08); }
+    :root.light #s-worship .kc-now-playing h3{ color:#5b21b6; }
+    :root.light #s-worship .kc-video-card{
+      background:#fff; border-color:rgba(124,58,237,.25);
+      box-shadow:0 10px 30px rgba(15,23,42,.06);
+    }
+    :root.light #s-worship .kc-video-card:hover{ border-color:rgba(124,58,237,.5); }
+    :root.light #s-worship .kc-duration-badge{
+      background:rgba(102,126,234,.14); border-color:rgba(102,126,234,.4); color:#4338ca;
+    }
   </style>
 
   <div class="kc-worship-container">
@@ -5963,8 +5995,39 @@
     :root.light #s-christian-living .symbol-item,
     :root.light #s-christian-living .offering-item,
     :root.light #s-christian-living .budget-category,
-    :root.light #s-christian-living .prayer-box {
+    :root.light #s-christian-living .prayer-box,
+    :root.light #s-christian-living .prayer-type,
+    :root.light #s-christian-living .biblical-point,
+    :root.light #s-christian-living .giving-reason,
+    :root.light #s-christian-living .giving-principle,
+    :root.light #s-christian-living .obstacle,
+    :root.light #s-christian-living .faq-item,
+    :root.light #s-christian-living .acts-item,
+    :root.light #s-christian-living .debt-step,
+    :root.light #s-christian-living .step,
+    :root.light #s-christian-living .timeline-item {
       background: rgba(15,23,42,0.03);
+    }
+    /* Phase 3.1 — strengthen CLG card light-mode treatment. The prior
+       rgba(15,23,42,0.025) wash was 2.5% slate, effectively invisible
+       on the light page bg — cards had no visible surface. Force opaque
+       white card with proper shadow + explicit text colors so cards
+       read as real cards regardless of how var(--tx) resolves. */
+    :root.light #s-christian-living .resource-card {
+      background: #ffffff !important;
+      border: 1.5px solid rgba(124,58,237,.3);
+      box-shadow: 0 4px 14px rgba(15,23,42,.06), 0 12px 32px rgba(124,58,237,.08);
+    }
+    :root.light #s-christian-living .resource-card:hover {
+      border-color: rgba(124,58,237,.55);
+      box-shadow: 0 8px 24px rgba(15,23,42,.1), 0 18px 45px rgba(124,58,237,.15);
+    }
+    :root.light #s-christian-living .card-title { color: #0f172a; }
+    :root.light #s-christian-living .card-description { color: #475569; }
+    :root.light #s-christian-living .card-pages { color: #64748b; }
+    :root.light #s-christian-living .card-footer {
+      background: #f8fafc !important;
+      border-top-color: rgba(124,58,237,.15);
     }
   </style>
 
@@ -6542,7 +6605,7 @@
   <div class="sh">
     <div class="si">🏅</div>
     <div class="st">Badges & Achievements</div>
-    <span class="tip-wrap"><span class="tip-btn">?</span><span class="tip-box tip-right"><span class="tip-title">HOW TO USE</span><br>Earn badges by hitting milestones across LifeOS. Streaks, certificates, goals, books, journal entries, and more. Badges are earned automatically — keep using the app and they unlock!</span></span>
+    <span class="tip-wrap"><span class="tip-btn">?</span><span class="tip-box tip-right"><span class="tip-title">HOW TO USE</span><br>Earn badges by hitting milestones across YourLife CC. Streaks, certificates, goals, books, journal entries, and more. Badges are earned automatically — keep using the app and they unlock!</span></span>
     <div class="sl"></div>
   </div>
 
@@ -6885,41 +6948,27 @@
     </div>
 
     <!-- LEFT NAV + RIGHT CONTENT LAYOUT -->
-    <div style="display:flex;gap:.7rem;min-height:500px;" id="phLayout">
-      
-      <!-- LEFT PANEL -->
-      <div style="width:180px;flex-shrink:0;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:.5rem;overflow-y:auto;" id="phLeftNav">
-        <!-- Hub home — action-first daily landing -->
-        <div onclick="phNav('home')" class="ph-nav-item active" id="phn-home">🏡 Hub Home</div>
+    <div style="display:flex;flex-direction:column;gap:.7rem;min-height:500px;" id="phLayout">
 
-        <div class="ph-nav-group-label">Day-to-day</div>
-        <div onclick="phNav('chores')" class="ph-nav-item" id="phn-chores">✅ Chores & Deeds <span id="phChoreNavBadge" style="display:none;background:#fbbf24;color:#1a1a2e;font-size:.55rem;font-weight:900;padding:.1rem .35rem;border-radius:8px;margin-left:.2rem;"></span></div>
-        <div onclick="phNav('rewards')" class="ph-nav-item" id="phn-rewards">🪙 Rewards & Bucks</div>
-        <div onclick="phNav('schedule')" class="ph-nav-item" id="phn-schedule">📅 Schedule</div>
-        <div onclick="phNav('contests')" class="ph-nav-item" id="phn-contests">🏆 Contests</div>
-        <div onclick="phNav('quizzes')" class="ph-nav-item" id="phn-quizzes">📝 Quizzes</div>
-
-        <div class="ph-nav-group-label">Reports</div>
-        <div onclick="phNav('progress')" class="ph-nav-item" id="phn-progress">📈 Progress Reports</div>
-        <div onclick="phNav('behavior')" class="ph-nav-item" id="phn-behavior">📋 Behavior & Grades</div>
-        <div onclick="phNav('activity')" class="ph-nav-item" id="phn-activity">📊 Activity Log</div>
-
-        <div class="ph-nav-group-label">Setup</div>
-        <div onclick="phNav('users')" class="ph-nav-item" id="phn-users">👥 Manage Users <span class="hlp" onmouseenter="hlp('manageusers',this,event)" onmouseleave="hlpHide()">?</span></div>
-        <div onclick="phNav('controls')" class="ph-nav-item" id="phn-controls">⚙️ Controls</div>
-        <div onclick="phNav('overview')" class="ph-nav-item" id="phn-overview">📊 Overview</div>
-        <div onclick="phNav('learning')" class="ph-nav-item" id="phn-learning">📚 Parent Learning</div>
-        <div onclick="phNav('growth')" class="ph-nav-item" id="phn-growth">🌱 My Growth</div>
-
-        <div class="ph-nav-group-label">More</div>
-        <div onclick="phNav('referral')" class="ph-nav-item" id="phn-referral">🤝 Refer & Earn</div>
+      <!-- Phase 2.4 — Hub Home back-link above the 4-tab bar -->
+      <div class="ph-home-crumb">
+        <a href="javascript:void(0)" onclick="phNav('home')" id="phn-home-link">🏡 ← Hub Home</a>
       </div>
 
-      <!-- RIGHT CONTENT -->
-      <div style="flex:1;min-width:0;width:100%;">
+      <!-- Phase 2.4 — 4-tab bar. Home is default landing (no tab button).
+           Referral is reachable via direct phNav('referral') only (no UI surface). -->
+      <div class="ph-tab-bar">
+        <button onclick="phNav('activity')" class="ph-tab" id="phn-activity">📊 Activity</button>
+        <button onclick="phNav('rewards')" class="ph-tab" id="phn-rewards">🪙 Rewards <span id="phChoreNavBadge" style="display:none;background:#fbbf24;color:#1a1a2e;font-size:.55rem;font-weight:900;padding:.1rem .35rem;border-radius:8px;margin-left:.2rem;"></span></button>
+        <button onclick="phNav('controls')" class="ph-tab" id="phn-controls">⚙️ Controls</button>
+        <button onclick="phNav('reports')" class="ph-tab" id="phn-reports">📈 Reports</button>
+      </div>
+
+      <!-- Content region (full-width — left panel removed in Phase 2.4) -->
+      <div style="min-width:0;width:100%;">
 
         <!-- HUB HOME — action-first daily landing for parents (mom-persona Phase 5) -->
-        <div id="ph-home" style="display:none;">
+        <div id="ph-home" data-ph-tab="home" style="display:none;">
           <div id="phHomeGreeting" style="font-size:1.3rem;font-weight:800;color:var(--tx);margin-bottom:.2rem;letter-spacing:-.01em;">Hi 👋</div>
           <div id="phHomeSummary" style="font-size:.85rem;color:var(--tx2);margin-bottom:14px;">Here's what's happening with the kids today.</div>
 
@@ -6944,7 +6993,7 @@
         </div>
 
         <!-- MANAGE USERS -->
-        <div id="ph-users" style="display:none;">
+        <div id="ph-users" data-ph-tab="controls" style="display:none;">
           <div style="font-size:.85rem;font-weight:800;color:#e0e0e0;margin-bottom:.8rem;display:flex;align-items:center;gap:.4rem;">👥 Manage Users</div>
 
           <!-- CURRENT USERS LIST -->
@@ -7003,7 +7052,7 @@
         </div>
 
         <!-- OVERVIEW -->
-        <div id="ph-overview" style="display:none;">
+        <div id="ph-overview" data-ph-tab="reports" style="display:none;">
           <div id="parentGettingStarted"></div>
           <div id="parentMultiChildView" style="margin-bottom:.8rem;"></div>
           <!-- LIFE SCORE -->
@@ -7058,7 +7107,7 @@
 
 
         <!-- REWARDS & BUCKS -->
-        <div id="ph-rewards" style="display:none;">
+        <div id="ph-rewards" data-ph-tab="rewards" style="display:none;">
 
           <!-- Balance Overview -->
           <div style="background:linear-gradient(135deg,rgba(251,191,36,.1),rgba(245,158,11,.06));border:1px solid rgba(251,191,36,.25);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
@@ -7186,7 +7235,7 @@
         </div><!-- end ph-rewards -->
 
         <!-- CHORES & DEEDS -->
-        <div id="ph-chores" style="display:none;">
+        <div id="ph-chores" data-ph-tab="rewards" style="display:none;">
 
           <!-- PENDING VERIFICATION -->
           <div style="background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(251,146,60,.05));border:1px solid rgba(251,191,36,.25);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
@@ -7252,7 +7301,7 @@
         </div>
 
         <!-- SCHEDULE -->
-        <div id="ph-schedule" style="display:none;">
+        <div id="ph-schedule" data-ph-tab="activity" style="display:none;">
           <div style="font-size:.85rem;font-weight:800;color:#e0e0e0;margin-bottom:.8rem;display:flex;align-items:center;gap:.4rem;">📅 Schedule Planner</div>
 
           <!-- Child selector for schedule -->
@@ -7281,7 +7330,7 @@
         </div>
 
         <!-- CONTESTS -->
-        <div id="ph-contests" style="display:none;">
+        <div id="ph-contests" data-ph-tab="rewards" style="display:none;">
           <div style="background:rgba(251,191,36,.03);border:1px solid rgba(251,191,36,.1);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
             <div style="font-size:.85rem;font-weight:700;margin-bottom:.2rem;">🏆 Contests & Competition</div>
             <div style="font-size:.7rem;color:var(--tx2);margin-bottom:.6rem;">Create custom contests, set targets, and see who's winning.</div>
@@ -7324,7 +7373,7 @@
         </div>
 
         <!-- QUIZZES -->
-        <div id="ph-quizzes" style="display:none;">
+        <div id="ph-quizzes" data-ph-tab="reports" style="display:none;">
           <div style="background:rgba(139,92,246,.03);border:1px solid rgba(139,92,246,.1);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
             <div style="font-size:.85rem;font-weight:700;margin-bottom:.4rem;">📝 Send Quiz to Your Child</div>
             <div id="pqCompletionSummary" style="margin-bottom:.5rem;"></div>
@@ -7348,7 +7397,7 @@
         </div>
 
         <!-- CONTROLS -->
-        <div id="ph-controls" style="display:none;">
+        <div id="ph-controls" data-ph-tab="controls" style="display:none;">
           <!-- Screen Time -->
           <div style="background:rgba(56,189,248,.03);border:1px solid rgba(56,189,248,.1);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
             <div style="font-size:.85rem;font-weight:700;margin-bottom:.3rem;">📱 Screen Time Controls</div>
@@ -7398,7 +7447,7 @@
         </div>
 
         <!-- BEHAVIOR & GRADES -->
-        <div id="ph-behavior" style="display:none;">
+        <div id="ph-behavior" data-ph-tab="activity" style="display:none;">
           <!-- Behavior Log -->
           <div style="background:rgba(239,68,68,.03);border:1px solid rgba(239,68,68,.1);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
             <div style="font-size:.85rem;font-weight:700;margin-bottom:.3rem;">📋 Behavior Log</div>
@@ -7428,7 +7477,7 @@
         </div>
 
         <!-- ACTIVITY LOG -->
-        <div id="ph-activity" style="display:none;">
+        <div id="ph-activity" data-ph-tab="activity" style="display:none;">
           <div style="font-size:.85rem;font-weight:700;margin-bottom:.5rem;">📊 Activity Audit Trail</div>
           <div id="parentActivityAudit" style="max-height:300px;overflow-y:auto;margin-bottom:1rem;"></div>
           <div style="font-size:.85rem;font-weight:700;margin-bottom:.5rem;">📊 Detailed Activity Feed</div>
@@ -7436,7 +7485,7 @@
         </div>
 
         <!-- PARENT LEARNING -->
-        <div id="ph-learning" style="display:none;">
+        <div id="ph-learning" data-ph-tab="controls" style="display:none;">
           <div style="background:linear-gradient(135deg,rgba(96,165,250,.06),rgba(167,139,250,.04));border:1px solid rgba(96,165,250,.12);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
             <div style="font-size:1rem;font-weight:700;margin-bottom:.3rem;">📚 You're Learning Too</div>
             <div style="font-size:.8rem;color:var(--tx2);line-height:1.7;">Great parenting isn't something you're born with — it's something you build. Read one lesson a week and watch how your home transforms.</div>
@@ -7448,7 +7497,7 @@
         </div>
 
         <!-- MY GROWTH -->
-        <div id="ph-growth" style="display:none;">
+        <div id="ph-growth" data-ph-tab="controls" style="display:none;">
           <div style="background:linear-gradient(135deg,rgba(34,197,94,.06),rgba(56,189,248,.04));border:1px solid rgba(34,197,94,.12);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
             <div style="font-size:1rem;font-weight:700;margin-bottom:.3rem;">🌱 How Am I Doing This Week?</div>
             <div style="font-size:.75rem;color:var(--tx2);margin-bottom:.6rem;">Rate yourself honestly on each area (1-5). Track your growth over time.</div>
@@ -7461,7 +7510,7 @@
         </div>
 
         <!-- PROGRESS REPORTS -->
-        <div id="ph-progress" style="display:none;">
+        <div id="ph-progress" data-ph-tab="reports" style="display:none;">
           <div style="background:linear-gradient(135deg,rgba(56,189,248,.07),rgba(167,139,250,.05));border:1px solid rgba(56,189,248,.15);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem;margin-bottom:.5rem;">
               <div>
@@ -7484,7 +7533,7 @@
         </div>
 
         <!-- REFER & EARN -->
-        <div id="ph-referral" style="display:none;">
+        <div id="ph-referral" data-ph-tab="referral" style="display:none;">
           <div id="phReferralInner"></div>
         </div>
 
@@ -7664,7 +7713,7 @@
       <div class="tut-row"><div class="tut-icon">💬</div><div class="tut-row-text"><b>Daily Prompt</b> A new journaling question appears each day. Tap it to open your Journal with that prompt pre-loaded — just start typing.</div></div>
       <div class="tut-row"><div class="tut-icon">🎨</div><div class="tut-row-text"><b>Make it yours</b> Open Settings → Appearance to choose from 10 background styles and 10 accent colors. Light mode and dark mode are both available.</div></div>
       <div class="tut-row"><div class="tut-icon">✏️</div><div class="tut-row-text"><b>Edit your name</b> Click directly on your name at the top of the dashboard to edit it inline, or change it in Settings → Profile.</div></div>
-      <div class="tut-row"><div class="tut-icon">🔄</div><div class="tut-row-text"><b>Using on multiple devices or browsers</b> LifeOS saves data to <em>this browser only</em> by default. To access your data on another browser or device: go to <b>Settings → Data Management → Export Backup</b>, save the file, then open LifeOS on the other browser and use <b>Import</b> to load it. Do this regularly to keep devices in sync.</div></div>
+      <div class="tut-row"><div class="tut-icon">🔄</div><div class="tut-row-text"><b>Using on multiple devices or browsers</b> YourLife CC saves data to <em>this browser only</em> by default. To access your data on another browser or device: go to <b>Settings → Data Management → Export Backup</b>, save the file, then open YourLife CC on the other browser and use <b>Import</b> to load it. Do this regularly to keep devices in sync.</div></div>
     </div>
 
     <!-- STEP 2: DAILY HABITS -->
@@ -8364,7 +8413,7 @@
         <div class="ob-step-card" style="--accent:#06b6d4"><span class="osc-icon">🎮</span><div class="osc-title">Prize Store</div><div class="osc-desc">Build a custom reward store — kids spend their Parent Bucks here.</div></div>
       </div>
       <div class="ob-tip">💡 <strong>Back button:</strong> Use the <b>← Dashboard</b> button inside the Parent Hub to return to the main screen anytime.</div>
-      <button onclick="wizGoTo('s-parent','parent',2);if(!_parentDashUnlocked)_doUnlockParent();" style="display:inline-flex;align-items:center;gap:.35rem;margin-top:.55rem;width:100%;justify-content:center;padding:.55rem 1rem;background:linear-gradient(135deg,#38bdf8,#818cf8);border:none;border-radius:10px;color:#06101e;font-size:.82rem;font-weight:900;cursor:pointer;font-family:var(--fn);box-shadow:0 4px 16px rgba(56,189,248,.35);">👉 Go to Parent Hub</button>
+      <button onclick="wizGoTo('s-parent','parent',2);if(!isParentUnlocked())unlockParentDash();" style="display:inline-flex;align-items:center;gap:.35rem;margin-top:.55rem;width:100%;justify-content:center;padding:.55rem 1rem;background:linear-gradient(135deg,#38bdf8,#818cf8);border:none;border-radius:10px;color:#06101e;font-size:.82rem;font-weight:900;cursor:pointer;font-family:var(--fn);box-shadow:0 4px 16px rgba(56,189,248,.35);">👉 Go to Parent Hub</button>
     </div>
 
     <!-- SLIDE 3: CHORES & REWARDS -->
@@ -9041,6 +9090,17 @@ function applySoloMode(){
     var el = document.getElementById(id);
     if(el) el.style.display = isSolo ? 'none' : '';
   });
+  // Hide all Parent Hub entry buttons (top-bar + mobile quick row) — same
+  // onclick-attribute selector pattern used by the faith_free path in ui.js.
+  document.querySelectorAll('button[onclick*="quickParentHub"]').forEach(function(b){
+    b.style.display = isSolo ? 'none' : '';
+  });
+  // Hide the parent welcome card — solo users have no parent/child split.
+  var pw = document.getElementById('parentWelcomeCard');
+  if(pw) pw.style.display = isSolo ? 'none' : '';
+  // Rebuild sidebar so the s-parent nav item is filtered through isSectionAllowed
+  // (which now returns false for s-parent when D.soloMode is true).
+  if(typeof buildSideNav === 'function') buildSideNav();
   // Update body class for CSS hooks
   document.body.classList.toggle('solo-mode', isSolo);
 }
@@ -9057,12 +9117,15 @@ function applyHeroViewMode() {
 
   // isChild = explicitly flagged as a child profile
   var isChild = !!(prof && prof.isParent === false);
+  // isSolo = single-user mode (no parent/child split). Solo users get neither
+  // class — parent welcome card and parent-only chrome stay hidden.
+  var isSolo = !!(typeof D !== 'undefined' && D && D.soloMode);
 
   document.body.classList.toggle('child-view',  isChild);
-  document.body.classList.toggle('parent-view', !isChild);
+  document.body.classList.toggle('parent-view', !isChild && !isSolo);
 
-  // Update parent welcome card
-  if (!isChild) {
+  // Update parent welcome card (skip entirely for solo mode)
+  if (!isChild && !isSolo) {
     var nameEl = document.getElementById('parentWelcomeName');
     var dateEl = document.getElementById('parentWelcomeDate');
     if (nameEl) {

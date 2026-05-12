@@ -117,7 +117,7 @@ function resetParentPin(){
 function populateChildSectionSel(){
   var sel=document.getElementById('csaChildSel');if(!sel)return;
   var ch=_profiles.filter(function(p){return!p.isParent;});
-  sel.innerHTML='<option value="">— Select a child —</option>'+ch.map(function(c){return'<option value="'+c.id+'">'+c.name+'</option>';}).join('');
+  sel.innerHTML='<option value="">— Select a child —</option>'+ch.map(function(c){return'<option value="'+c.id+'">'+escapeHtml(c.name)+'</option>';}).join('');
   if(ch.length===1){sel.value=ch[0].id;renderChildSectionAccess();}
 }
 function renderChildSectionAccess(){
@@ -534,7 +534,7 @@ function renderIncentives(){
       const expired = inc.deadline && inc.deadline < new Date().toISOString().slice(0,10);
       return `<div style="background:rgba(255,255,255,.03);border:1px solid ${expired?'rgba(239,68,68,.2)':'rgba(34,197,94,.12)'};border-radius:12px;padding:.7rem .8rem;margin-bottom:.4rem;">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.3rem;">
-          <div><span style="font-size:.9rem;">${inc.emoji}</span> <span style="font-size:.82rem;font-weight:700;color:var(--tx);">${inc.name}</span>${inc.bonusPts?`<span style="font-size:.6rem;color:#22c55e;margin-left:.3rem;">+${inc.bonusPts}pts</span>`:''}</div>
+          <div><span style="font-size:.9rem;">${inc.emoji}</span> <span style="font-size:.82rem;font-weight:700;color:var(--tx);">${escapeHtml(inc.name)}</span>${inc.bonusPts?`<span style="font-size:.6rem;color:#22c55e;margin-left:.3rem;">+${inc.bonusPts}pts</span>`:''}</div>
           <div style="display:flex;gap:.25rem;">
             <button class="btn bp bs" onclick="completeIncentive(${inc.id})" style="font-size:.55rem;background:#22c55e;color:#000;">✓ Award</button>
             <button class="btn bda bs" onclick="removeIncentive(${inc.id})" style="font-size:.5rem;">✕</button>
@@ -557,7 +557,7 @@ function renderIncentives(){
       completed.slice(0,5).map(inc=>`
         <div style="display:flex;align-items:center;gap:.5rem;padding:.3rem .5rem;background:rgba(34,197,94,.05);border-radius:8px;margin-bottom:.2rem;opacity:.7;">
           <span>${inc.emoji}</span>
-          <span style="flex:1;font-size:.68rem;color:var(--tx);text-decoration:line-through;">${inc.name}</span>
+          <span style="flex:1;font-size:.68rem;color:var(--tx);text-decoration:line-through;">${escapeHtml(inc.name)}</span>
           <span style="font-size:.55rem;color:#22c55e;">✓ ${inc.completedDate||''}</span>
         </div>
       `).join('');
@@ -614,7 +614,7 @@ function renderBehaviorLog(){
     <div style="display:flex;align-items:flex-start;gap:.5rem;padding:.4rem .5rem;border-bottom:1px solid rgba(255,255,255,.04);">
       <span style="font-size:.85rem;">${l.type==='positive'?'👍':'👎'}</span>
       <div style="flex:1;">
-        <div style="font-size:.7rem;color:var(--tx);">${l.note}</div>
+        <div style="font-size:.7rem;color:var(--tx);">${escapeHtml(l.note)}</div>
         <div style="font-size:.55rem;color:var(--tx2);">${l.emoji} ${l.cat} · ${l.date} ${l.time}</div>
       </div>
       <button class="btn bda bs" onclick="removeBehLog(${l.id})" style="font-size:.45rem;padding:.1rem .2rem;">✕</button>
@@ -649,7 +649,7 @@ function renderGradeMonitor(){
     const assignCount = (D.assignments||[]).filter(a=>a.classId===c.id||a.className===c.name).length;
     return `<div style="display:flex;align-items:center;gap:.5rem;padding:.4rem .5rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px;margin-bottom:.25rem;">
       <div style="width:36px;height:36px;border-radius:8px;background:${pts>=3.5?'rgba(34,197,94,.12)':pts>=2.5?'rgba(251,191,36,.12)':'rgba(239,68,68,.12)'};display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:900;color:${pts>=3.5?'#22c55e':pts>=2.5?'#fbbf24':'#ef4444'};flex-shrink:0;">${c.grade||'—'}</div>
-      <div style="flex:1;"><div style="font-size:.75rem;font-weight:600;color:var(--tx);">${c.name||'Unnamed Class'}</div></div>
+      <div style="flex:1;"><div style="font-size:.75rem;font-weight:600;color:var(--tx);">${escapeHtml(c.name||'Unnamed Class')}</div></div>
     </div>`;
   }).join('');
 }
@@ -690,7 +690,7 @@ function renderParentActivityFeed(){
   el.innerHTML = feed.slice(0,30).map(f=>`
     <div style="display:flex;align-items:center;gap:.5rem;padding:.35rem .4rem;border-bottom:1px solid rgba(255,255,255,.04);">
       <span style="font-size:.85rem;">${f.icon}</span>
-      <div style="flex:1;font-size:.68rem;color:var(--tx);">${f.text}</div>
+      <div style="flex:1;font-size:.68rem;color:var(--tx);">${escapeHtml(f.text)}</div>
       <span style="font-size:.5rem;color:var(--tx2);white-space:nowrap;">${f.date?format(f.date):''} ${f.time||''}</span>
     </div>
   `).join('');
@@ -701,10 +701,10 @@ function populateStudySelects(){
   const classes = D.classes||[];
   // Populate datalist for spSubject text input
   const dl = document.getElementById('spSubjectList');
-  if(dl) dl.innerHTML = classes.map(c=>`<option value="${c.name}">`).join('') + '<option value="Math"><option value="Science"><option value="English"><option value="History"><option value="PE"><option value="Art"><option value="Other">';
+  if(dl) dl.innerHTML = classes.map(c=>`<option value="${escapeHtml(c.name)}">`).join('') + '<option value="Math"><option value="Science"><option value="English"><option value="History"><option value="PE"><option value="Art"><option value="Other">';
   // Populate examClass select (still a select)
   const ec = document.getElementById('examClass');
-  if(ec) ec.innerHTML = '<option value="">— Select Class —</option>' + classes.map(c=>`<option value="${c.name}">${c.name}</option>`).join('');
+  if(ec) ec.innerHTML = '<option value="">— Select Class —</option>' + classes.map(c=>`<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`).join('');
 }
 
 function addStudyBlock(){
@@ -770,7 +770,7 @@ function renderStudyPlan(){
   if(!combined.length){ deadEl.innerHTML='<div style="font-size:.7rem;color:var(--tx2);padding:.3rem;">No upcoming deadlines 🎉</div>'; return; }
   deadEl.innerHTML = combined.map(c=>`
     <div style="display:flex;align-items:center;gap:.4rem;padding:.3rem .4rem;border-left:3px solid ${c.color};margin-bottom:.2rem;">
-      <span style="font-size:.68rem;font-weight:600;color:var(--tx);">${c.name}</span>
+      <span style="font-size:.68rem;font-weight:600;color:var(--tx);">${escapeHtml(c.name)}</span>
       <span style="margin-left:auto;font-size:.58rem;color:${c.color};font-weight:700;">${c.diff===0?'TODAY':c.diff===1?'Tomorrow':c.diff+'d'}</span>
     </div>
   `).join('');
@@ -813,7 +813,7 @@ function renderExams(){
         <div style="font-size:.85rem;font-weight:900;color:${!past?diff<=2?'#ef4444':diff<=7?'#fbbf24':'var(--tx)':'var(--tx2)'};">${past?'✓':diff+'d'}</div>
       </div>
       <div style="flex:1;">
-        <div style="font-size:.72rem;font-weight:600;color:var(--tx);">${e.name}${e.class?' — '+e.class:''}</div>
+        <div style="font-size:.72rem;font-weight:600;color:var(--tx);">${escapeHtml(e.name)}${e.class?' — '+escapeHtml(e.class):''}</div>
         <div style="font-size:.55rem;color:var(--tx2);">${d.toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'})}</div>
       </div>
       ${e.score?`<span style="font-size:.7rem;font-weight:700;color:#22c55e;">${e.score}</span>`:`<button class="btn bgh bs" onclick="setExamScore(${e.id})" style="font-size:.55rem;">${past?'+ Score':'Upcoming'}</button>`}
@@ -1056,7 +1056,7 @@ const GS_STEPS = [
    check:()=>!!(D.name && D.name.trim()),
    action:"openModal('settingsModal');"},
   {id:'gs-stage', icon:'🎯', title:'Choose Your Life Stage',
-   tip:'<b>LifeOS adapts to where you are.</b> Go to <b>Settings ⚙️</b> and pick your level — Middle School through Young Adult. This controls which sections and learning pathways you see.',
+   tip:'<b>YourLife CC adapts to where you are.</b> Go to <b>Settings ⚙️</b> and pick your level — Middle School through Young Adult. This controls which sections and learning pathways you see.',
    check:()=>!!(D.mode && D.mode!=='mid_hs'),
    action:"openModal('settingsModal');"},
   {id:'gs-daily', icon:'✅', title:'Complete a Daily Activity',
@@ -1862,14 +1862,14 @@ function openChildLogin(){
   if(typeof IS_DEMO !== 'undefined' && IS_DEMO){ showSection('s-hero'); return; }
   const children = _profiles.filter(p => !p.isParent);
   if(children.length === 0){ showToast('No child profiles yet — add in Parent Hub'); return; }
-  const colors = ['#4f8fff','#06d6a0','#f5a623','#f472b6','#a78bfa','#22d3ee','#ef4444'];
+  const colors = ['#38bdf8','#22c55e','#f5a623','#f472b6','#a78bfa','#22d3ee','#ef4444'];
   const list = document.getElementById('clChildList');
   if(list){
     list.innerHTML = children.map((p,i)=>{
       const c = colors[i%colors.length];
       return `<button onclick="clSelectChild('${p.id}')" style="display:flex;align-items:center;gap:.8rem;padding:.75rem 1rem;border-radius:12px;border:1.5px solid ${c}44;background:${c}11;cursor:pointer;width:100%;font-family:var(--fn);" onmouseenter="this.style.background='${c}22'" onmouseleave="this.style.background='${c}11'">
-        <div style="width:38px;height:38px;border-radius:50%;background:${c};display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:900;color:#fff;flex-shrink:0;">${p.name.charAt(0).toUpperCase()}</div>
-        <span style="font-size:.95rem;font-weight:700;color:#fff;">${p.name}</span>
+        <div style="width:38px;height:38px;border-radius:50%;background:${c};display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:900;color:#fff;flex-shrink:0;">${escapeHtml(p.name.charAt(0).toUpperCase())}</div>
+        <span style="font-size:.95rem;font-weight:700;color:#fff;">${escapeHtml(p.name)}</span>
         <span style="margin-left:auto;color:${c};">→</span>
       </button>`;
     }).join('');
@@ -1889,7 +1889,7 @@ function clSelectChild(id){
   _clSelectedId=id; _childPinBuffer='';
   updateChildPinDots();
   const msgEl=document.getElementById('childLoginMsg'); if(msgEl) msgEl.textContent='';
-  const colors=['#4f8fff','#06d6a0','#f5a623','#f472b6','#a78bfa','#22d3ee','#ef4444'];
+  const colors=['#38bdf8','#22c55e','#f5a623','#f472b6','#a78bfa','#22d3ee','#ef4444'];
   const idx=_profiles.filter(x=>!x.isParent).findIndex(x=>x.id===id);
   const c=colors[idx%colors.length];
   const nm=document.getElementById('clChildName');
@@ -2052,9 +2052,23 @@ function switchToProfile(id){
 
   showToast('Welcome, '+profile.name+'! 👋');
   updateStartHereBtn();
-  // Show kid onboarding if this is a child profile who hasn't seen it yet
-  if(!profile.isParent && !D.kidOnboardDone){
-    setTimeout(showKidOnboard, 800);
+  // Phase 4: For child profiles, fire age picker (once on first switch where
+  // bracket is unset) followed by the kid onboarding tutorial. Age picker
+  // never fires for parent profiles (parent-account init suppresses it).
+  if(!profile.isParent){
+    const needAgePicker = !D.ageBracket && !window._faithFree
+                       && (typeof IS_DEMO === 'undefined' || !IS_DEMO)
+                       && typeof showAgePickerModal === 'function';
+    const needKidOnboard = !D.kidOnboardDone;
+    if(needAgePicker){
+      setTimeout(function(){
+        showAgePickerModal(function(){
+          if(needKidOnboard) setTimeout(showKidOnboard, 200);
+        });
+      }, 800);
+    } else if(needKidOnboard){
+      setTimeout(showKidOnboard, 800);
+    }
   }
 }
 
@@ -2077,7 +2091,7 @@ function renderProfileSwitcher(){
   if(!el || !tabs) return;
 
   el.style.display = 'none'; // Hidden from hero — use Child Login button instead
-  const colors = ['#4f8fff','#06d6a0','#f5a623','#f472b6','#a78bfa','#22d3ee','#ef4444'];
+  const colors = ['#38bdf8','#22c55e','#f5a623','#f472b6','#a78bfa','#22d3ee','#ef4444'];
 
   tabs.innerHTML = _profiles.map((p,i)=>{
     const active = p.id === _activeProfileId;
@@ -2087,8 +2101,8 @@ function renderProfileSwitcher(){
     // protected-state hint instead.
     const hint = p.isParent ? 'Parent' : (p.pinHash ? 'PIN protected' : 'Tap to switch');
     return `<button onclick="${active?`alert('${p.name}\\n\\nUse Parent Hub → Manage Users to reset this PIN.')`:`unlockProfile('${p.id}')`}" style="display:flex;align-items:center;gap:.3rem;padding:.35rem .7rem;border-radius:8px;border:1.5px solid ${active?c:'rgba(255,255,255,.08)'};background:${active?c+'15':'rgba(255,255,255,.02)'};cursor:pointer;transition:all .15s;font-family:var(--fn);" title="${active?'Active profile':'Enter PIN to switch'}">
-      <div style="width:24px;height:24px;border-radius:50%;background:${c};display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:800;color:#fff;">${p.name.charAt(0).toUpperCase()}</div>
-      <div style="text-align:left;"><div style="font-size:.65rem;font-weight:${active?'700':'500'};color:${active?c:'var(--tx2)'};">${p.name}</div><div style="font-size:.42rem;color:var(--tx3);">${hint}</div></div>
+      <div style="width:24px;height:24px;border-radius:50%;background:${c};display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:800;color:#fff;">${escapeHtml(p.name.charAt(0).toUpperCase())}</div>
+      <div style="text-align:left;"><div style="font-size:.65rem;font-weight:${active?'700':'500'};color:${active?c:'var(--tx2)'};">${escapeHtml(p.name)}</div><div style="font-size:.42rem;color:var(--tx3);">${hint}</div></div>
       ${active?'<span style="font-size:.45rem;color:'+c+';">●</span>':'<span style="font-size:.45rem;color:var(--tx3);">🔒</span>'}
     </button>`;
   }).join('') + `<button onclick="addChildProfile()" style="padding:.35rem .7rem;border-radius:8px;border:1.5px dashed rgba(255,255,255,.12);background:none;cursor:pointer;font-size:.65rem;color:var(--tx3);font-family:var(--fn);display:flex;align-items:center;gap:.3rem;"><span style="font-size:.85rem;">+</span> Add Child</button>`;
@@ -2270,7 +2284,7 @@ function renderParentMultiChild(){
   const el = document.getElementById('parentMultiChildView'); if(!el) return;
   if(_profiles.length <= 1){ el.innerHTML = ''; return; }
 
-  const colors = ['#4f8fff','#06d6a0','#f5a623','#f472b6','#a78bfa','#22d3ee'];
+  const colors = ['#38bdf8','#22c55e','#f5a623','#f472b6','#a78bfa','#22d3ee'];
 
   el.innerHTML = `
     <div style="font-family:var(--fh);font-size:.7rem;letter-spacing:1.5px;color:#fb923c;margin-bottom:.6rem;">👨‍👩‍👧‍👦 ALL CHILDREN OVERVIEW</div>
@@ -2291,8 +2305,8 @@ function renderParentMultiChild(){
 
         return `<div style="background:rgba(255,255,255,.03);border:1px solid ${c}30;border-radius:12px;padding:.8rem;cursor:pointer;" onclick="parentDrillChild('${p.id}')">
           <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
-            <div style="width:32px;height:32px;border-radius:50%;background:${c};display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:.75rem;">${p.name.charAt(0)}</div>
-            <div><div style="font-weight:700;font-size:.82rem;">${p.name}</div><div style="font-size:.5rem;color:var(--tx3);">ID: ${p.id}</div></div>
+            <div style="width:32px;height:32px;border-radius:50%;background:${c};display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:.75rem;">${escapeHtml(p.name.charAt(0))}</div>
+            <div><div style="font-weight:700;font-size:.82rem;">${escapeHtml(p.name)}</div><div style="font-size:.5rem;color:var(--tx3);">ID: ${p.id}</div></div>
           </div>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.3rem;text-align:center;font-size:.55rem;">
             <div><div style="font-size:.85rem;font-weight:800;color:${c};">${gpa}</div>GPA</div>
@@ -2525,29 +2539,36 @@ function renderParentHubHome(){
 
 
 function phNav(tab){
-  const panels = ['home','users','overview','rewards','chores','schedule','contests','quizzes','controls','behavior','activity','learning','growth','progress','referral'];
-  panels.forEach(p=>{
-    const el = document.getElementById('ph-'+p);
-    if(el) el.style.display = p===tab ? 'block' : 'none';
-    const nav = document.getElementById('phn-'+p);
-    if(nav) nav.classList.toggle('active', p===tab);
+  // Phase 2.4 — 4-tab pivot. Legacy panel names alias to the 4 new tabs.
+  // home + referral are reachable but don't surface as tab buttons.
+  const TAB_ALIASES = {
+    home:'home', activity:'activity', rewards:'rewards', controls:'controls', reports:'reports', referral:'referral',
+    // legacy → new tab
+    users:'controls', learning:'controls', growth:'controls',
+    overview:'reports', quizzes:'reports', progress:'reports',
+    chores:'rewards', contests:'rewards',
+    behavior:'activity', schedule:'activity',
+  };
+  const t = TAB_ALIASES[tab] || tab;
+
+  // Show every panel whose data-ph-tab matches t; hide the rest.
+  document.querySelectorAll('[data-ph-tab]').forEach(el => {
+    el.style.display = (el.getAttribute('data-ph-tab') === t) ? 'block' : 'none';
   });
-  // Trigger renders for the active panel
-  if(tab==='home'){ renderParentHubHome(); }
-  if(tab==='users'){ renderManageUsers(); }
-  if(tab==='overview'){ renderParentGettingStarted(); renderParentMultiChild(); renderParentScore(); renderParentOverview(); renderWeeklyReportCard(); }
-  if(tab==='rewards'){ renderPhRewards(); }
-  if(tab==='chores'){ renderParentChoreList(); renderParentSelfChores(); renderParentDeeds(); renderPhPendingChores(); }
-  if(tab==='schedule'){ initPhSchedPanel(); }
-  if(tab==='contests'){ renderParentLeaderboard(); renderParentContests(); renderParentFamilyRewards(); }
-  if(tab==='quizzes'){ renderCompletionSummary(); renderSentQuizzes(); }
-  if(tab==='controls'){ renderParentScreenControls(); renderParentEarningsControls(); renderParentBucksControls(); renderIncentives(); renderParentChoreList(); if(typeof updateIncConditions==='function') updateIncConditions(); }
-  if(tab==='behavior'){ renderBehaviorLog(); renderGradeMonitor(); renderParentNotes(); }
-  if(tab==='activity'){ renderParentActivityAudit(); renderParentActivityFeed(); }
-  if(tab==='learning'){ renderParentLessons(); }
-  if(tab==='growth'){ if(typeof renderParentGrowth==='function') renderParentGrowth(); if(typeof renderParentGrowthHistory==='function') renderParentGrowthHistory(); }
-  if(tab==='referral'){ renderPhReferral(); }
-  if(tab==='progress'){ renderProgressReportsTab(); }
+
+  // Update tab bar active state (only the 4 real tabs have visible buttons).
+  ['activity','rewards','controls','reports'].forEach(name => {
+    const btn = document.getElementById('phn-' + name);
+    if(btn) btn.classList.toggle('active', name === t);
+  });
+
+  // Fire renders for the resolved tab. Consolidates the legacy 15-case switch.
+  if(t === 'home')     { renderParentHubHome(); }
+  if(t === 'activity') { renderParentActivityAudit(); renderParentActivityFeed(); renderBehaviorLog(); renderGradeMonitor(); renderParentNotes(); initPhSchedPanel(); }
+  if(t === 'rewards')  { renderPhRewards(); renderParentChoreList(); renderParentSelfChores(); renderParentDeeds(); renderPhPendingChores(); renderParentLeaderboard(); renderParentContests(); renderParentFamilyRewards(); }
+  if(t === 'controls') { renderManageUsers(); renderParentScreenControls(); renderParentEarningsControls(); renderParentBucksControls(); renderIncentives(); renderParentChoreList(); if(typeof updateIncConditions==='function') updateIncConditions(); renderParentLessons(); if(typeof renderParentGrowth==='function') renderParentGrowth(); if(typeof renderParentGrowthHistory==='function') renderParentGrowthHistory(); }
+  if(t === 'reports')  { renderParentGettingStarted(); renderParentMultiChild(); renderParentScore(); renderParentOverview(); renderWeeklyReportCard(); renderCompletionSummary(); renderSentQuizzes(); renderProgressReportsTab(); }
+  if(t === 'referral') { renderPhReferral(); }
 }
 
 // ── PARENT HUB TABS ──────────────────────────────────────────
@@ -2576,7 +2597,7 @@ function initPhSchedPanel(){
   const children = _profiles.filter(p=>!p.isParent);
   sel.innerHTML = children.length === 0
     ? '<option value="">No children added yet</option>'
-    : children.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+    : children.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
   if(!_phSchedChildId && children.length) _phSchedChildId = children[0].id;
   if(_phSchedChildId) sel.value = _phSchedChildId;
   _phSchedOffset = 0;
@@ -2902,7 +2923,7 @@ function renderHelpfulChores(){
       const statusColor = c.status === 'approved' ? '#22c55e' : c.status === 'rejected' ? '#ef4444' : '#fbbf24';
       return `<div style="display:flex;align-items:center;gap:.4rem;padding:.3rem .4rem;border-bottom:1px solid rgba(255,255,255,.03);font-size:.68rem;">
         <span style="color:${statusColor};">${statusIcon}</span>
-        <span style="flex:1;color:var(--tx2);">${c.text}</span>
+        <span style="flex:1;color:var(--tx2);">${escapeHtml(c.text)}</span>
         ${c.pointsAwarded ? `<span style="font-size:.55rem;color:#22c55e;font-weight:700;">+${c.pointsAwarded} pts</span>` : ''}
         <span style="font-size:.5rem;color:var(--tx3);">${c.date.slice(5)} ${c.time}</span>
         ${c.status==='pending'?`<button onclick="deleteSelfChore(${c.id})" style="font-size:.5rem;color:var(--tx3);background:none;border:none;cursor:pointer;padding:.1rem .2rem;" title="Delete">✕</button>`:''}
@@ -2926,7 +2947,7 @@ function renderParentSelfChores(){
   el.innerHTML = pending.map(c=>`
     <div style="display:flex;align-items:center;gap:.4rem;padding:.35rem .4rem;border-bottom:1px solid rgba(255,255,255,.03);font-size:.72rem;">
       <span>⏳</span>
-      <span style="flex:1;color:var(--tx2);">${c.text}</span>
+      <span style="flex:1;color:var(--tx2);">${escapeHtml(c.text)}</span>
       <span style="font-size:.55rem;color:var(--tx3);">${c.date.slice(5)}</span>
       <div style="display:flex;gap:.2rem;">
         <button class="btn bp bs" onclick="approveSelfChore(${c.id}, 10)" style="font-size:.5rem;padding:.15rem .3rem;">+10</button>
@@ -3004,7 +3025,7 @@ function renderParentChoreList(){
     const freqLabel = c.freq==='daily'?'Daily':c.freq==='weekly'?'Weekly'+(c.day?' ('+c.day+')':''):'One-time';
     return `<div style="display:flex;align-items:center;gap:.4rem;padding:.3rem .4rem;border-bottom:1px solid rgba(255,255,255,.03);font-size:.72rem;">
       <span style="font-size:.9rem;">${c.emoji||'📌'}</span>
-      <span style="flex:1;">${c.name}</span>
+      <span style="flex:1;">${escapeHtml(c.name)}</span>
       <span style="font-size:.55rem;color:var(--tx3);">${freqLabel}</span>
       <span style="font-size:.6rem;color:#22c55e;font-weight:700;">${c.pts||c.points||10} pts</span>
       <button onclick="editChorePoints(${c.id})" style="font-size:.45rem;background:rgba(56,189,248,.1);color:#38bdf8;border:1px solid rgba(56,189,248,.15);border-radius:4px;padding:.1rem .25rem;cursor:pointer;">Edit</button>
@@ -3050,7 +3071,7 @@ function renderParentLeaderboard(){
     el.innerHTML = entries.map((e,i)=>`
       <div style="display:flex;align-items:center;gap:.4rem;padding:.3rem .4rem;${i===0?'background:rgba(251,191,36,.06);border-radius:6px;':''}border-bottom:1px solid rgba(255,255,255,.03);font-size:.72rem;">
         <span style="font-size:.9rem;width:22px;">${medals[i]||'#'+(i+1)}</span>
-        <span style="flex:1;font-weight:${i===0?'800':'500'};">${e.name}</span>
+        <span style="flex:1;font-weight:${i===0?'800':'500'};">${escapeHtml(e.name)}</span>
         <span style="font-size:.6rem;color:var(--tx3);">🪙${e.pts} 🔥${e.streak} 🧠${e.certs} ✅${e.chores}</span>
         <span style="font-weight:800;color:${i===0?'#fbbf24':'var(--tx2)'};">${e.score}</span>
       </div>
@@ -3211,7 +3232,7 @@ function renderParentFamilyRewards(){
     const unlocked = totalPB >= r.target;
     return `<div style="display:flex;align-items:center;gap:.4rem;padding:.25rem .3rem;border-bottom:1px solid rgba(255,255,255,.02);font-size:.68rem;">
       <span>${r.emoji}</span>
-      <span style="flex:1;font-weight:${unlocked?'700':'400'};color:${unlocked?'#22c55e':'var(--tx2)'};">${r.name}</span>
+      <span style="flex:1;font-weight:${unlocked?'700':'400'};color:${unlocked?'#22c55e':'var(--tx2)'};">${escapeHtml(r.name)}</span>
       <span style="font-size:.55rem;color:var(--tx3);">${totalPB}/${r.target} PB</span>
       <span style="font-size:.6rem;">${unlocked?'🎉':'🔒'}</span>
       <button onclick="D.customFamilyRewards=D.customFamilyRewards.filter(x=>x.id!==${r.id});save();renderParentFamilyRewards();" style="font-size:.4rem;color:var(--tx3);background:none;border:none;cursor:pointer;">✕</button>
@@ -3230,7 +3251,7 @@ function renderParentDeeds(){
   el.innerHTML = pending.map(d=>`
     <div style="display:flex;align-items:center;gap:.4rem;padding:.35rem .4rem;border-bottom:1px solid rgba(255,255,255,.03);font-size:.72rem;">
       <span>⏳</span>
-      <span style="flex:1;color:var(--tx2);">${d.text}</span>
+      <span style="flex:1;color:var(--tx2);">${escapeHtml(d.text)}</span>
       <span style="font-size:.55rem;color:var(--tx3);">${d.date}</span>
       <button class="btn bp bs" onclick="approveDeed(${d.id})" style="font-size:.5rem;padding:.15rem .4rem;">✅ +10 PB</button>
       <button class="btn bs" onclick="rejectDeed(${d.id})" style="font-size:.5rem;padding:.15rem .3rem;background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.15);">✕</button>
@@ -3906,7 +3927,7 @@ function renderLeaderboard(){
   el.innerHTML = entries.map((e,i)=>`
     <div style="display:flex;align-items:center;gap:.5rem;padding:.4rem .5rem;${i===0?'background:rgba(251,191,36,.06);border-radius:8px;':''}border-bottom:1px solid rgba(255,255,255,.03);">
       <span style="font-size:1rem;width:24px;text-align:center;">${medals[i]||'#'+(i+1)}</span>
-      <span style="flex:1;font-size:.8rem;font-weight:${i===0?'800':'500'};">${e.name}</span>
+      <span style="flex:1;font-size:.8rem;font-weight:${i===0?'800':'500'};">${escapeHtml(e.name)}</span>
       <span style="font-size:.65rem;color:var(--tx2);">🪙${e.pts} · 🔥${e.streak} · 🧠${e.certs}</span>
       <span style="font-size:.8rem;font-weight:800;color:${i===0?'#fbbf24':'var(--tx2)'};">${e.score}</span>
     </div>
@@ -4184,7 +4205,7 @@ async function submitBetaFeedback(){
   save();
   
   // Send silently via Brevo
-  const emailSubject = 'LifeOS Beta Feedback: '+(_betaType||'General');
+  const emailSubject = 'YourLife CC Beta Feedback: '+(_betaType||'General');
   const emailBody = 'Name: '+(name||'Anonymous')+'\nAge: '+(age||'N/A')+'\nFeature: '+(feature||'General')+'\nType: '+(_betaType||'General')+'\nDate: '+feedback.date+'\n\nFeedback:\n'+details;
   try{
     const resp = await fetch('/api/send-email',{
@@ -4439,7 +4460,7 @@ function renderParentActivityAudit(){
     const icons = {scripture:'✝️',habit:'⚡',chore:'✅',lesson:'🧠',quiz:'📝',goal:'🎯',journal:'✍️',mood:'😊',badge:'🏅',login:'👤'};
     return `<div style="display:flex;align-items:center;gap:.4rem;padding:.3rem .4rem;border-bottom:1px solid rgba(255,255,255,.03);font-size:.65rem;">
       <span>${icons[l.type]||'📌'}</span>
-      <span style="flex:1;color:var(--tx2);">${l.detail}</span>
+      <span style="flex:1;color:var(--tx2);">${escapeHtml(l.detail)}</span>
       <span style="font-size:.55rem;color:var(--tx3);white-space:nowrap;">${timeStr}</span>
     </div>`;
   }).join('');
@@ -4582,7 +4603,7 @@ function openSettingsPicker(){
   }
   children.forEach(function(c){
     html+='<button class="spm-btn child" onclick="closeSettingsPicker();_openChildSettings(\''+c.id+'\')">'
-      +'<span style="font-size:1.2rem;">'+(c.avatar||'👤')+'</span><div><div>'+c.name+'</div>'
+      +'<span style="font-size:1.2rem;">'+(c.avatar||'👤')+'</span><div><div>'+escapeHtml(c.name)+'</div>'
       +'<div style="font-size:.68rem;color:var(--tx2);font-weight:400;">Name, grade &amp; color</div></div></button>';
   });
   list.innerHTML=html;
