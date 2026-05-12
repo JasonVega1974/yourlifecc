@@ -1145,6 +1145,45 @@
     </div>
   </div>
 
+  <!-- Phase 5.8 Pass D — topic card grid (default view) -->
+  <div class="topic-card-grid" id="financeTopicGrid">
+    <div class="topic-card accent-cyan" onclick="tgOpenTopic('s-finance','overview')">
+      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(167,139,250,.12));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">📊</div>
+      <div class="topic-card-title" style="padding-top:.75rem;">Overview</div>
+      <div class="topic-card-desc">Balances &amp; month snapshot</div>
+    </div>
+    <div class="topic-card accent-pink" onclick="tgOpenTopic('s-finance','bills')">
+      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(244,114,182,.22),rgba(251,146,60,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">🧾</div>
+      <div class="topic-card-title" style="padding-top:.75rem;">Bills</div>
+      <div class="topic-card-desc">Recurring bills tracker</div>
+    </div>
+    <div class="topic-card accent-violet" onclick="tgOpenTopic('s-finance','tx')">
+      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(167,139,250,.22),rgba(56,189,248,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">💳</div>
+      <div class="topic-card-title" style="padding-top:.75rem;">Transactions</div>
+      <div class="topic-card-desc">Log income &amp; expenses</div>
+    </div>
+    <div class="topic-card accent-green" onclick="tgOpenTopic('s-finance','savings')">
+      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(52,211,153,.22),rgba(56,189,248,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">💚</div>
+      <div class="topic-card-title" style="padding-top:.75rem;">Goal Savings</div>
+      <div class="topic-card-desc">Quick add to savings goals</div>
+    </div>
+    <div class="topic-card accent-gold" onclick="tgOpenTopic('s-finance','savgoals')">
+      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(251,191,36,.22),rgba(52,211,153,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">🎯</div>
+      <div class="topic-card-title" style="padding-top:.75rem;">Sav. Goals</div>
+      <div class="topic-card-desc">Create savings targets</div>
+    </div>
+    <div class="topic-card accent-orange" onclick="tgOpenTopic('s-finance','budget')">
+      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(251,146,60,.22),rgba(251,191,36,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">📋</div>
+      <div class="topic-card-title" style="padding-top:.75rem;">Budget</div>
+      <div class="topic-card-desc">50/30/20 math</div>
+    </div>
+    <div class="topic-card accent-cyan" onclick="tgOpenTopic('s-finance','taxed')">
+      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(167,139,250,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">🧾</div>
+      <div class="topic-card-title" style="padding-top:.75rem;">Tax Ed</div>
+      <div class="topic-card-desc">Tax basics &amp; how-tos</div>
+    </div>
+  </div>
+
   <div class="tabs moneyTabs">
     <button class="tab active" onclick="mTab('overview',this)">📊 Overview</button>
     <button class="tab" onclick="mTab('bills',this)">🧾 Bills</button>
@@ -1526,6 +1565,37 @@
   <div class="sh"><div class="si">📚</div><div class="st">School</div><span class="tip-wrap"><span class="tip-btn">?</span><span class="tip-box tip-right"><span class="tip-title">HOW TO USE</span><br>Click <b>+ Add Class</b> to start. Enter your grade % and GPA updates instantly. Use <b>Assignments</b> to track tasks by due date. <b>Study Timer</b> logs Pomodoro sessions automatically.</span></span><div class="sl"></div>
     <button class="btn bp bs" onclick="openModal('classModal')">+ Add Class</button>
   </div>
+
+  <!-- Phase 5.8 Pass D — topic card grid (default view). JS toggles between
+       this grid and the existing tab panels via tgShowGrid / tgOpenTopic. -->
+  <div class="topic-card-grid" id="schoolTopicGrid">
+    <div class="topic-card accent-cyan" onclick="tgOpenTopic('s-school','classes')">
+      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(167,139,250,.12));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">📖</div>
+      <div class="topic-card-title" style="padding-top:.75rem;">My Classes</div>
+      <div class="topic-card-desc">Subjects, grades, GPA inputs</div>
+    </div>
+    <div class="topic-card accent-orange" onclick="tgOpenTopic('s-school','assignments')">
+      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(251,146,60,.22),rgba(251,191,36,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">📝</div>
+      <div class="topic-card-title" style="padding-top:.75rem;">Assignments</div>
+      <div class="topic-card-desc">Track tasks by due date</div>
+    </div>
+    <div class="topic-card accent-green" onclick="tgOpenTopic('s-school','gpa')">
+      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(52,211,153,.22),rgba(56,189,248,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">🎓</div>
+      <div class="topic-card-title" style="padding-top:.75rem;">GPA</div>
+      <div class="topic-card-desc">Live grade-point calculator</div>
+    </div>
+    <div class="topic-card accent-violet" onclick="tgOpenTopic('s-school','study')">
+      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(167,139,250,.22),rgba(56,189,248,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">⏱</div>
+      <div class="topic-card-title" style="padding-top:.75rem;">Study Timer</div>
+      <div class="topic-card-desc">Pomodoro focus sessions</div>
+    </div>
+    <div class="topic-card accent-gold" onclick="tgOpenTopic('s-school','prep')">
+      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(251,191,36,.22),rgba(251,146,60,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">🎯</div>
+      <div class="topic-card-title" style="padding-top:.75rem;">Study Prep</div>
+      <div class="topic-card-desc">Test prep &amp; strategies</div>
+    </div>
+  </div>
+
   <div class="tabs schoolTabs">
     <button class="tab active" onclick="sTab('classes',this)">📖 My Classes</button>
     <button class="tab" onclick="sTab('assignments',this)">📝 Assignments</button>
@@ -1975,6 +2045,35 @@
 <!-- ════════════ HEALTH ═══════════════════════════════════════ -->
 <section id="s-health" class="sec">
   <div class="sh"><div class="si">💪</div><div class="st">Health &amp; Fitness</div><span class="tip-wrap"><span class="tip-btn">?</span><span class="tip-box tip-right"><span class="tip-title">HOW TO USE</span><br><b>Weight:</b> Log weight + goal → see progress chart with dots labeled by date. <b>Nutrition:</b> Log meals → daily macro totals update live. <b>Habits:</b> Same as dashboard check-ins — synced.</span></span><div class="sl"></div></div>
+  <!-- Phase 5.8 Pass D — topic card grid (default view) -->
+  <div class="topic-card-grid" id="healthTopicGrid">
+    <div class="topic-card accent-cyan" onclick="tgOpenTopic('s-health','weight')">
+      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(167,139,250,.12));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">⚖️</div>
+      <div class="topic-card-title" style="padding-top:.75rem;">Weight</div>
+      <div class="topic-card-desc">Log weight &amp; track progress</div>
+    </div>
+    <div class="topic-card accent-green" onclick="tgOpenTopic('s-health','food')">
+      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(52,211,153,.22),rgba(56,189,248,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">🍽</div>
+      <div class="topic-card-title" style="padding-top:.75rem;">Nutrition</div>
+      <div class="topic-card-desc">Log meals &amp; macros</div>
+    </div>
+    <div class="topic-card accent-violet" onclick="tgOpenTopic('s-health','nutEd')">
+      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(167,139,250,.22),rgba(52,211,153,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">📚</div>
+      <div class="topic-card-title" style="padding-top:.75rem;">Learn</div>
+      <div class="topic-card-desc">Nutrition education</div>
+    </div>
+    <div class="topic-card accent-orange" onclick="tgOpenTopic('s-health','growth')">
+      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(251,146,60,.22),rgba(251,191,36,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">📏</div>
+      <div class="topic-card-title" style="padding-top:.75rem;">Growth</div>
+      <div class="topic-card-desc">Height tracking</div>
+    </div>
+    <div class="topic-card accent-pink" onclick="tgOpenTopic('s-health','habits')">
+      <div class="topic-card-hero" style="background:linear-gradient(135deg,rgba(244,114,182,.22),rgba(167,139,250,.14));display:flex;align-items:center;justify-content:center;font-size:2.4rem;">✅</div>
+      <div class="topic-card-title" style="padding-top:.75rem;">Habits</div>
+      <div class="topic-card-desc">Daily habit check-ins</div>
+    </div>
+  </div>
+
   <div class="tabs healthTabs">
     <button class="tab active" onclick="hTab('weight',this)">⚖️ Weight</button>
     <button class="tab" onclick="hTab('food',this)">🍽 Nutrition</button>

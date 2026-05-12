@@ -1107,6 +1107,113 @@ function toggleNavGroup(label){
   save();
 }
 
+// ── Phase 5.8 Pass D — Tab-replacement card grids for School / Finance / Health ──
+// Each section that has a tab bar now opens in "card grid" mode by default.
+// Tapping a card hides the grid + tab bar + PB-bar and shows the matching
+// tab panel. A "← Back" pill (.topic-back-btn) returns to the grid.
+const _TG_CONFIG = {
+  's-school': {
+    gridId: 'schoolTopicGrid',
+    tabBar: '.schoolTabs',
+    extraHide: ['#schoolPBBalance'],
+    panels: {
+      classes: 'st-classes',
+      assignments: 'st-assignments',
+      gpa: 'st-gpa',
+      study: 'st-study',
+      prep: 'st-prep',
+    },
+  },
+  's-finance': {
+    gridId: 'financeTopicGrid',
+    tabBar: '.moneyTabs',
+    extraHide: [],
+    panels: {
+      overview: 'mt-overview',
+      bills: 'mt-bills',
+      tx: 'mt-tx',
+      savings: 'mt-savings',
+      savgoals: 'mt-savgoals',
+      budget: 'mt-budget',
+      taxed: 'mt-taxed',
+    },
+  },
+  's-health': {
+    gridId: 'healthTopicGrid',
+    tabBar: '.healthTabs',
+    extraHide: [],
+    panels: {
+      weight: 'ht-weight',
+      food: 'ht-food',
+      nutEd: 'ht-nutEd',
+      growth: 'ht-growth',
+      habits: 'ht-habits',
+    },
+  },
+};
+
+function tgShowGrid(sectionId){
+  const cfg = _TG_CONFIG[sectionId]; if(!cfg) return;
+  const section = document.getElementById(sectionId); if(!section) return;
+  const grid = document.getElementById(cfg.gridId);
+  if(grid) grid.style.display = '';
+  const bar = section.querySelector(cfg.tabBar);
+  if(bar) bar.style.display = 'none';
+  Object.values(cfg.panels).forEach(pid => {
+    const e = document.getElementById(pid);
+    if(e) e.style.display = 'none';
+  });
+  (cfg.extraHide || []).forEach(sel => {
+    const e = section.querySelector(sel);
+    if(e && e.parentElement) e.parentElement.style.display = '';
+  });
+  const back = section.querySelector('.tg-back-btn');
+  if(back) back.remove();
+}
+
+function tgOpenTopic(sectionId, tabName){
+  const cfg = _TG_CONFIG[sectionId]; if(!cfg) return;
+  const section = document.getElementById(sectionId); if(!section) return;
+  const panelId = cfg.panels[tabName];
+  if(!panelId) return;
+  const grid = document.getElementById(cfg.gridId);
+  if(grid) grid.style.display = 'none';
+  const bar = section.querySelector(cfg.tabBar);
+  if(bar) bar.style.display = 'none';
+  Object.entries(cfg.panels).forEach(([t, pid]) => {
+    const e = document.getElementById(pid);
+    if(e) e.style.display = (t === tabName) ? '' : 'none';
+  });
+  (cfg.extraHide || []).forEach(sel => {
+    const e = section.querySelector(sel);
+    if(e && e.parentElement) e.parentElement.style.display = 'none';
+  });
+  // Inject ← Back pill once
+  if(!section.querySelector('.tg-back-btn')){
+    const back = document.createElement('button');
+    back.className = 'tg-back-btn topic-back-btn';
+    back.type = 'button';
+    back.innerHTML = '← Back to topics';
+    back.onclick = function(){ tgShowGrid(sectionId); };
+    const panel = document.getElementById(panelId);
+    if(panel && panel.parentNode) panel.parentNode.insertBefore(back, panel);
+    else section.appendChild(back);
+  }
+  // Fire any tab-specific side effects (charts, lists) by calling the
+  // original tab handler if available. It does double-work toggling the
+  // panel display we already set, but that's idempotent.
+  const fnName = sectionId === 's-school' ? 'sTab'
+              : sectionId === 's-finance' ? 'mTab'
+              : sectionId === 's-health'  ? 'hTab' : null;
+  if(fnName && typeof window[fnName] === 'function'){
+    try { window[fnName](tabName); } catch(e) {}
+  }
+}
+
+function tgInitAll(){
+  Object.keys(_TG_CONFIG).forEach(sid => tgShowGrid(sid));
+}
+
 // ── Phase 5.8: Global card-grid navigation utilities ──────────
 // Two helpers that any section can use to toggle between a card-grid
 // landing view and a per-topic detail panel. Convention:

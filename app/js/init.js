@@ -449,6 +449,9 @@ function finishInit(cloudReady){
   initQuizSystem();
   initCharacter();
   initSkillsGrid();
+  // Phase 5.8 Pass D — reset School / Finance / Health to topic-grid mode
+  // on every page load. Function is defined in ui.js.
+  if(typeof tgInitAll === 'function') tgInitAll();
   updateHeroClock();
   renderHeroMotivation();
   renderDailyActivityCheck();
