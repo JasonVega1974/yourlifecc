@@ -2429,6 +2429,15 @@ body.solo-mode .mqb-parent {
   display: none !important;
 }
 
+/* Phase 5.3: Solo mode — hide family-management UI inside Settings.
+   Functional/preference settings (theme, palette, sections toggle, cloud sync,
+   subscription, support, data management, etc.) remain available — solo users
+   get full feature access. Currently tags: Quick Start Wizard button (which
+   auto-closes for solo via showParentOnboard's signup_source check, so the
+   button does nothing visible), and the "When You Sign In" parent/child
+   landing-preference panel. */
+body.solo-mode .sp-family-only { display: none !important; }
+
 /* Simplify Settings for faith_free — only Appearance + Support remain. */
 html[data-faith-free="1"] #sp .sp-pb { display: none !important; }
 html[data-faith-free="1"] #sp-faith-support { display: block !important; }
