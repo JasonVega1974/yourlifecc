@@ -6653,6 +6653,164 @@
   </div>
 </section>
 
+<!-- ════ BIBLE FLASHCARDS (Phase 5.5) ════ -->
+<section id="s-flashcards" class="sec">
+  <div class="sh">
+    <div class="si">📇</div>
+    <div class="st">Bible Flashcards</div>
+    <span class="tip-wrap"><span class="tip-btn">?</span><span class="tip-box tip-right"><span class="tip-title">HOW TO USE</span><br>300 cards covering Bible trivia + memory verses. Tap to flip. Score yourself on each card. Shuffle anytime to restart in a new order. Mastery persists across sessions.</span></span>
+    <div class="sl"></div>
+  </div>
+
+  <div class="fc-controls">
+    <div class="fc-progress">Card <strong id="fcCurrentNum">1</strong> of <strong id="fcTotal">300</strong></div>
+    <button class="fc-shuffle" onclick="fcShuffle()">🔀 Shuffle</button>
+  </div>
+
+  <div class="fc-card-wrap">
+    <div class="fc-card" id="fcCard" onclick="fcFlip()">
+      <div class="fc-face fc-front">
+        <div class="fc-face-label">QUESTION</div>
+        <div class="fc-text" id="fcQuestion">Loading…</div>
+        <div class="fc-hint">Tap to flip</div>
+      </div>
+      <div class="fc-face fc-back">
+        <div class="fc-face-label">ANSWER</div>
+        <div class="fc-text" id="fcAnswer">Loading…</div>
+        <div class="fc-hint">Tap to flip back</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fc-score-row">
+    <button class="fc-btn fc-learning" onclick="fcScore('learning')">❌ Still Learning</button>
+    <button class="fc-btn fc-got" onclick="fcScore('got')">✅ Got It</button>
+  </div>
+
+  <div class="fc-stats">
+    <span>✅ Mastered: <strong id="fcGotCount">0</strong></span>
+    <span>📚 Still Learning: <strong id="fcLearningCount">0</strong></span>
+    <span>📇 Not Reviewed: <strong id="fcNewCount">300</strong></span>
+  </div>
+
+  <!-- Feedback overlay -->
+  <div id="fcFeedback" class="fc-feedback">
+    <div class="fc-feedback-icon" id="fcFeedbackIcon"></div>
+    <div class="fc-feedback-msg" id="fcFeedbackMsg"></div>
+    <div class="fc-feedback-ref" id="fcFeedbackRef"></div>
+  </div>
+
+  <script>
+  // Phase 5.5 — Bible Flashcards control logic. Data lives in
+  // /app/js/data/bible-flashcards.js (FC_CARDS, FC_CORRECT_RESPONSES,
+  // FC_INCORRECT_RESPONSES). Loaded into showSection('s-flashcards') via
+  // setTimeout init in ui.js.
+  let _fcOrder = [];
+  let _fcCurrent = 0;
+  let _fcFlipped = false;
+
+  function fcShuffleArray(arr){
+    for(let i = arr.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+  }
+
+  function fcInit(){
+    if(typeof FC_CARDS === 'undefined' || !Array.isArray(FC_CARDS)) return;
+    if(typeof D === 'undefined') return;
+    if(!D.flashMastery || typeof D.flashMastery !== 'object') D.flashMastery = {};
+    _fcOrder = FC_CARDS.map((_, i) => i);
+    fcShuffleArray(_fcOrder);
+    _fcCurrent = 0;
+    fcRender();
+  }
+
+  function fcShuffle(){
+    fcInit();
+    if(typeof showToast === 'function') showToast('Shuffled! 🔀');
+  }
+
+  function fcFlip(){
+    const card = document.getElementById('fcCard');
+    if(!card) return;
+    _fcFlipped = !_fcFlipped;
+    card.classList.toggle('flipped', _fcFlipped);
+  }
+
+  function fcRender(){
+    if(typeof FC_CARDS === 'undefined' || !_fcOrder.length) return;
+    const idx = _fcOrder[_fcCurrent];
+    const card = FC_CARDS[idx];
+    if(!card) return;
+    const qEl = document.getElementById('fcQuestion');
+    const aEl = document.getElementById('fcAnswer');
+    const cEl = document.getElementById('fcCurrentNum');
+    const tEl = document.getElementById('fcTotal');
+    if(qEl) qEl.textContent = card.q;
+    if(aEl) aEl.textContent = card.a;
+    if(cEl) cEl.textContent = _fcCurrent + 1;
+    if(tEl) tEl.textContent = FC_CARDS.length;
+    _fcFlipped = false;
+    const cardEl = document.getElementById('fcCard');
+    if(cardEl) cardEl.classList.remove('flipped');
+    fcRenderStats();
+  }
+
+  function fcRenderStats(){
+    const mastery = (typeof D !== 'undefined' && D && D.flashMastery) ? D.flashMastery : {};
+    let got = 0, learning = 0;
+    Object.values(mastery).forEach(v => {
+      if(v === 'got') got++;
+      else if(v === 'learning') learning++;
+    });
+    const total = (typeof FC_CARDS !== 'undefined') ? FC_CARDS.length : 300;
+    const gEl = document.getElementById('fcGotCount');
+    const lEl = document.getElementById('fcLearningCount');
+    const nEl = document.getElementById('fcNewCount');
+    if(gEl) gEl.textContent = got;
+    if(lEl) lEl.textContent = learning;
+    if(nEl) nEl.textContent = total - got - learning;
+  }
+
+  function fcScore(verdict){
+    if(typeof FC_CARDS === 'undefined' || !_fcOrder.length) return;
+    if(typeof D === 'undefined') return;
+    const idx = _fcOrder[_fcCurrent];
+    if(!D.flashMastery) D.flashMastery = {};
+    D.flashMastery[idx] = verdict;
+    if(typeof save === 'function') save();
+    fcShowFeedback(verdict === 'got');
+    setTimeout(() => {
+      fcHideFeedback();
+      _fcCurrent = (_fcCurrent + 1) % _fcOrder.length;
+      fcRender();
+    }, 1800);
+  }
+
+  function fcShowFeedback(correct){
+    const el = document.getElementById('fcFeedback');
+    if(!el) return;
+    const pool = correct
+      ? (typeof FC_CORRECT_RESPONSES !== 'undefined' ? FC_CORRECT_RESPONSES : [{msg:'Well done!', ref:''}])
+      : (typeof FC_INCORRECT_RESPONSES !== 'undefined' ? FC_INCORRECT_RESPONSES : [{msg:'Keep going.', ref:''}]);
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    const iconEl = document.getElementById('fcFeedbackIcon');
+    const msgEl = document.getElementById('fcFeedbackMsg');
+    const refEl = document.getElementById('fcFeedbackRef');
+    if(iconEl) iconEl.textContent = correct ? '🌟' : '🌱';
+    if(msgEl) msgEl.textContent = pick.msg;
+    if(refEl) refEl.textContent = pick.ref ? '— ' + pick.ref : '';
+    el.className = 'fc-feedback show ' + (correct ? 'correct' : 'incorrect');
+  }
+
+  function fcHideFeedback(){
+    const el = document.getElementById('fcFeedback');
+    if(el) el.className = 'fc-feedback';
+  }
+  </script>
+</section>
+
 <!-- ════ BADGES & ACHIEVEMENTS ════ -->
 <section id="s-badges" class="sec">
   <div class="sh">
@@ -8928,6 +9086,7 @@
 <script src="/app/js/data/bible-timeline.js"></script>
 <script src="/app/js/data/biblical-infographics.js"></script>
 <script src="/app/js/data/bible-stories.js"></script>
+<script src="/app/js/data/bible-flashcards.js"></script>
 <!-- Leaflet (F3-B) — open-source map library, MIT-licensed. Only loads when used. -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>

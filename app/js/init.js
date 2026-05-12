@@ -235,8 +235,8 @@ async function init(){
 // this — they're force-shown elsewhere. Faith-only users skip the picker
 // entirely (FAITH_FREE_ALLOWED is the canonical filter for that plan).
 const _AGE_BRACKET_ALLOWLISTS = {
-  '12_14': new Set(['chores','goals','mood','reading','scripture','rewards']),
-  '15_17': new Set(['chores','goals','mood','reading','scripture','rewards','school','health','finance','driving','skills']),
+  '12_14': new Set(['chores','goals','mood','reading','scripture','rewards','flashcards']),
+  '15_17': new Set(['chores','goals','mood','reading','scripture','rewards','school','health','finance','driving','skills','flashcards']),
   '18_22': null, // null = full surface (don't hide anything)
 };
 

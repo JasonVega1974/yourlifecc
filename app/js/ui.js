@@ -92,8 +92,8 @@ function renderVerseSettingsList(){
   if(!(D.verses||[]).length){ el.innerHTML='<div style="font-size:.73rem;color:var(--tx2);padding:.3rem 0;">No custom scriptures yet.</div>'; return; }
   el.innerHTML=D.verses.map((v,i)=>`
     <div style="display:flex;align-items:center;gap:.4rem;padding:.38rem .5rem;background:rgba(167,139,250,.07);border-radius:7px;margin-bottom:.28rem;">
-      <div style="flex:1;min-width:0;"><div style="font-size:.74rem;font-weight:700;color:var(--p);">${v.r}</div>
-      <div style="font-size:.68rem;color:var(--tx2);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">"${v.t.substring(0,60)}${v.t.length>60?'…':''}"</div></div>
+      <div style="flex:1;min-width:0;"><div style="font-size:.74rem;font-weight:700;color:var(--p);">${escapeHtml(v.r)}</div>
+      <div style="font-size:.68rem;color:var(--tx2);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">"${escapeHtml(v.t.substring(0,60))}${v.t.length>60?'…':''}"</div></div>
       <button class="db" onclick="deleteCustomVerse(${i})">✕</button>
     </div>`).join('');
 }
@@ -118,7 +118,7 @@ const MODE_LABELS={middle:'Middle School',fresh:'Freshman',mid_hs:'High School',
 const STAGE_CONFIG = {
   middle:{
     label:'Middle School',emoji:'🎒',
-    sections:['s-hero','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-reading','s-mood','s-chores','s-sports','s-parent','s-worship','s-christian-living'],
+    sections:['s-hero','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-reading','s-mood','s-chores','s-sports','s-parent','s-worship','s-christian-living','s-flashcards'],
     skillCats:['health','dental','cooking','relationships','faith','mental','emergency','family','digital','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
@@ -136,7 +136,7 @@ const STAGE_CONFIG = {
   },
   fresh:{
     label:'9th Grade',emoji:'📚',
-    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-reading','s-mentors','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-christian-living','s-badges','s-driving','s-sports','s-parent'],
+    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-reading','s-mentors','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-christian-living','s-flashcards','s-badges','s-driving','s-sports','s-parent'],
     skillCats:['health','dental','cooking','car','relationships','faith','mental','emergency','family','digital','civic','credit','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
@@ -154,7 +154,7 @@ const STAGE_CONFIG = {
   },
   mid_hs:{
     label:'10th–11th Grade',emoji:'📖',
-    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-christian-living','s-badges','s-driving','s-sports','s-parent'],
+    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-christian-living','s-flashcards','s-badges','s-driving','s-sports','s-parent'],
     skillCats:['taxes','car','health','dental','cooking','home','career','credit','relationships','faith','mental','civic','emergency','digital','family','college','adulting','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
@@ -172,7 +172,7 @@ const STAGE_CONFIG = {
   },
   senior:{
     label:'Senior Year',emoji:'🎓',
-    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-christian-living','s-badges','s-driving','s-sports','s-parent'],
+    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-christian-living','s-flashcards','s-badges','s-driving','s-sports','s-parent'],
     skillCats:['taxes','car','health','dental','cooking','home','career','credit','relationships','faith','mental','civic','emergency','digital','family','college','legal','adulting','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
@@ -192,7 +192,7 @@ const STAGE_CONFIG = {
   },
   college:{
     label:'College',emoji:'🏛️',
-    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-christian-living','s-badges','s-driving','s-sports','s-parent'],
+    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-christian-living','s-flashcards','s-badges','s-driving','s-sports','s-parent'],
     skillCats:['taxes','car','health','dental','cooking','home','career','credit','relationships','faith','mental','civic','emergency','digital','family','college','legal','adulting','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
@@ -211,7 +211,7 @@ const STAGE_CONFIG = {
   },
   adult:{
     label:'Young Adult',emoji:'💼',
-    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-christian-living','s-badges','s-driving','s-sports','s-parent'],
+    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-christian-living','s-flashcards','s-badges','s-driving','s-sports','s-parent'],
     skillCats:['taxes','car','health','dental','cooking','home','career','credit','relationships','faith','mental','civic','emergency','digital','family','college','legal','adulting','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
@@ -430,10 +430,30 @@ function updateQuickStats(){
   updateHeroDashboard();
 }
 
+// Phase 2.2 — persistent hero compact toggle. D.heroCompact=1 hides full
+// stats grid (default), 0 shows it. Reapplied on every hero refresh so the
+// state holds across renders and cloud-load.
+function applyHeroCompactState(){
+  const w = document.getElementById('heroFullStats');
+  const link = document.getElementById('heroFullStatsToggle');
+  if(!w) return;
+  const compact = (typeof D !== 'undefined' && D && D.heroCompact === 0) ? false : true;
+  w.style.display = compact ? 'none' : 'block';
+  if(link) link.innerHTML = compact ? 'See full stats &rarr;' : 'Hide full stats &uarr;';
+}
+
+function toggleHeroFullStats(){
+  if(typeof D === 'undefined' || !D) return;
+  D.heroCompact = (D.heroCompact === 0) ? 1 : 0;
+  if(typeof save === 'function') save();
+  applyHeroCompactState();
+}
+
 function updateHeroDashboard(){
   // Mom-persona home: render the plain-English headline first.
   // Defined in init.js; null-guard in case of load order.
   if(typeof renderHeroHeadline === 'function') renderHeroHeadline();
+  applyHeroCompactState();
 
   const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.innerHTML=v; };
 
@@ -614,7 +634,7 @@ const ALL_SECTIONS=[
   {id:'s-school',label:'📚 School'},{id:'s-resources',label:'📐 School Resources'},{id:'s-schedule',label:'📅 Schedule'},
   {id:'s-calendar',label:'🗓️ Calendar'},{id:'s-health',label:'💪 Health'},
   {id:'s-goals',label:'🎯 Goals'},{id:'s-skills',label:'🧠 Life Skills'},{id:'s-growing',label:'🌱 Growing Up'},
-  {id:'s-craft',label:'🎵 Music & Practice'},{id:'s-contests',label:'🏆 Challenges'},{id:'s-rewards',label:'🎁 Rewards'},{id:'s-scripture',label:'✝️ Bible & Faith'},{id:'s-worship',label:'🎵 Worship Playlist'},{id:'s-christian-living',label:'📚 Christian Life Guide'},{id:'s-badges',label:'🏅 Badges'},{id:'s-driving',label:'🚗 Driving'},{id:'s-sports',label:'🏆 Sports'},
+  {id:'s-craft',label:'🎵 Music & Practice'},{id:'s-contests',label:'🏆 Challenges'},{id:'s-rewards',label:'🎁 Rewards'},{id:'s-scripture',label:'✝️ Bible & Faith'},{id:'s-worship',label:'🎵 Worship Playlist'},{id:'s-christian-living',label:'📚 Christian Life Guide'},{id:'s-flashcards',label:'📇 Bible Flashcards'},{id:'s-badges',label:'🏅 Badges'},{id:'s-driving',label:'🚗 Driving'},{id:'s-sports',label:'🏆 Sports'},
   {id:'s-journal',label:'✍️ Journal'},{id:'s-motivation',label:'🔥 Fuel Wall'},{id:'s-resume',label:'📄 Jobs/Resume'},{id:'s-bio',label:'🪪 Bio Page'},{id:'s-reading',label:'📖 Reading List'},{id:'s-mentors',label:'🤝 My People'},{id:'s-milestones',label:'🏆 Milestones'},{id:'s-mood',label:'😊 Mood Tracker'},{id:'s-chores',label:'✅ Chores'},
 ];
 
@@ -725,7 +745,7 @@ function applySettings(){
   buildSideNav(); // rebuild sidebar with current visibility settings
   ALL_SECTIONS.forEach(s=>{
     const el=document.getElementById(s.id); if(!el) return;
-    const key=s.id.replace('s-','');
+    const key=s.key||s.id.replace('s-','');
     if((D.sections||{})[key]===0) el.style.display='none';
   });
   // faith_free DOM hide — covers (a) every <section class="sec"> not in
@@ -940,6 +960,7 @@ const NAV_ITEMS = [
   {id:'s-scripture', icon:'✝️', label:'Bible & Faith', key:'scripture'},
   {id:'s-worship',   icon:'🎵', label:'Worship Playlist', key:'worship'},
   {id:'s-christian-living', icon:'📚', label:'Christian Life Guide', key:'christianLiving'},
+  {id:'s-flashcards', icon:'📇', label:'Bible Flashcards', key:'flashcards'},
   {id:'_group_school', icon:'🎓', label:'School & Career', isGroup:true, children:[
     {id:'s-school',    icon:'📚', label:'School',         key:'school'},
     {id:'s-resume',    icon:'💼', label:'Jobs/Resume',    key:'resume'},
@@ -985,13 +1006,13 @@ function buildSideNav(){
   ['cbt','resume','referral','christianLiving','worship','scripture'].forEach(k=>{ if(D.sections[k]===0) delete D.sections[k]; });
   delete D.sections.referral; // referral is now Parent Hub only
   const hidden = D.sections||{};
-  // Force School & Career group open so CBT is never hidden by a collapsed group
   if(!D._navGroups) D._navGroups={};
-  // Force-open groups that must always be visible:
-  //   School & Career — CBT injection logic depends on it being open
-  //   Daily Life      — highest-frequency group, Phase 2.2 keeps this expanded by default
-  D._navGroups["School & Career"] = true;
-  D._navGroups["Daily Life"]      = true;
+  // Phase 2.2 spec: collapse sidebar groups by default. Only Daily Life is
+  // force-open (highest-frequency group). All others — School & Career,
+  // Wellness, Money & Rewards, Activities — respect user preference and
+  // start closed for new users. CBT injection below works regardless of
+  // group open/closed state (DOM-based, not display-state-based).
+  D._navGroups["Daily Life"] = true;
   const openGroups = D._navGroups || {};
 
   let navHTML = '<div class="sid-sep">Sections</div>';
@@ -1034,9 +1055,10 @@ function buildSideNav(){
   
   el.innerHTML = navHTML;
 
-  // Force-inject CBT button if missing (immune to section visibility settings)
+  // Force-inject CBT button if missing (immune to section visibility settings).
+  // Works whether School & Career group is open or closed — the .nav-group-items
+  // div exists in the DOM either way; display:none doesn't affect querySelector.
   if(!document.getElementById('ni-s-cbt') && isSectionAllowed('s-cbt')){
-    const schoolGroup = el.querySelector('[onclick*="_group_school"] + .nav-group-items, [id*="SchoolCareer"]');
     const cbtBtn = document.createElement('button');
     cbtBtn.className = 'nav-item nav-child' + ('s-cbt'===_activeSection?' active':'');
     cbtBtn.id = 'ni-s-cbt';
@@ -1087,7 +1109,7 @@ function showSection(id, fromMobile){
   // Hide all, show target
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
   const target = document.getElementById(id);
-  if(target) target.classList.add('active');
+  if(target){ target.style.display = ''; target.classList.add('active'); }
   _activeSection = id;
 
   // Update nav highlights
@@ -1179,6 +1201,7 @@ function showSection(id, fromMobile){
   if(id==='s-driving')    setTimeout(()=>{ typeof initDriving==='function'&&initDriving(); },60);
   if(id==='s-worship')    setTimeout(()=>{ typeof worshipInit==='function'&&worshipInit(); },60);
   if(id==='s-christian-living') setTimeout(()=>{ typeof faithResourcesInit==='function'&&faithResourcesInit(); },60);
+  if(id==='s-flashcards')       setTimeout(()=>{ typeof fcInit==='function'&&fcInit(); },60);
   if(id==='s-craft')      setTimeout(()=>{ typeof buildCraftSection==='function'&&buildCraftSection(); typeof initMusicAndSports==='function'&&initMusicAndSports(); },60);
 }
 

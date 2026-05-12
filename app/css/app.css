@@ -2438,6 +2438,59 @@ body.solo-mode .mqb-parent {
    landing-preference panel. */
 body.solo-mode .sp-family-only { display: none !important; }
 
+/* ══════════ Phase 5.5: BIBLE FLASHCARDS ══════════ */
+.fc-controls{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;gap:.5rem;flex-wrap:wrap;}
+.fc-progress{font-size:.88rem;font-weight:600;color:var(--tx2);}
+.fc-progress strong{color:var(--c);font-weight:900;}
+.fc-shuffle{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.3);color:var(--c);padding:.55rem 1rem;border-radius:9px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fn);transition:background .15s;}
+.fc-shuffle:hover{background:rgba(56,189,248,.2);}
+
+.fc-card-wrap{perspective:1200px;margin-bottom:1.2rem;}
+.fc-card{position:relative;width:100%;min-height:280px;transition:transform .6s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d;cursor:pointer;}
+.fc-card.flipped{transform:rotateY(180deg);}
+.fc-face{position:absolute;inset:0;min-height:280px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;border-radius:16px;text-align:center;}
+.fc-front{background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(167,139,250,.06));border:1px solid rgba(56,189,248,.2);}
+.fc-back{background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(56,189,248,.06));border:1px solid rgba(167,139,250,.25);transform:rotateY(180deg);}
+.fc-face-label{font-family:var(--fh);font-size:.66rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--tx3);margin-bottom:.9rem;}
+.fc-text{font-size:1.1rem;font-weight:600;color:var(--tx);line-height:1.6;flex:1;display:flex;align-items:center;}
+.fc-hint{font-size:.7rem;color:var(--tx3);margin-top:.9rem;font-style:italic;}
+
+.fc-score-row{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:1rem;}
+.fc-btn{padding:.9rem 1rem;border:none;border-radius:11px;font-size:.88rem;font-weight:800;cursor:pointer;font-family:var(--fn);transition:transform .12s,box-shadow .15s,background .15s;}
+.fc-btn:active{transform:scale(.97);}
+.fc-learning{background:rgba(244,114,182,.15);color:#f472b6;border:1px solid rgba(244,114,182,.35);}
+.fc-learning:hover{background:rgba(244,114,182,.25);}
+.fc-got{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;box-shadow:0 4px 14px rgba(34,197,94,.3);}
+.fc-got:hover{box-shadow:0 6px 22px rgba(34,197,94,.5);}
+
+.fc-stats{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;font-size:.78rem;color:var(--tx2);padding:.6rem 0;}
+.fc-stats strong{color:var(--tx);}
+
+.fc-feedback{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.92);background:rgba(10,15,26,.96);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:1.8rem 2rem;max-width:380px;width:90%;text-align:center;z-index:99999;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;}
+.fc-feedback.show{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:auto;}
+.fc-feedback.correct{border-color:rgba(251,191,36,.5);box-shadow:0 0 40px rgba(251,191,36,.25);animation:fcGoldPulse 1.2s ease-out;}
+.fc-feedback.incorrect{border-color:rgba(244,114,182,.4);}
+.fc-feedback-icon{font-size:2.8rem;margin-bottom:.7rem;animation:fcIconFloat 1.4s ease-in-out;}
+.fc-feedback-msg{font-size:1rem;font-weight:700;color:#fff;margin-bottom:.5rem;line-height:1.45;}
+.fc-feedback-ref{font-size:.78rem;color:#fbbf24;font-weight:700;font-style:italic;}
+
+@keyframes fcGoldPulse{
+  0%{box-shadow:0 0 0 0 rgba(251,191,36,.7),0 0 40px rgba(251,191,36,.25);}
+  50%{box-shadow:0 0 0 28px rgba(251,191,36,0),0 0 60px rgba(251,191,36,.35);}
+  100%{box-shadow:0 0 0 0 rgba(251,191,36,0),0 0 40px rgba(251,191,36,.25);}
+}
+@keyframes fcIconFloat{
+  0%{transform:scale(.5);opacity:0;}
+  50%{transform:scale(1.15);opacity:1;}
+  100%{transform:scale(1);opacity:1;}
+}
+
+/* Light-mode adjustments for flashcards */
+:root.light .fc-front{background:linear-gradient(135deg,rgba(56,189,248,.06),rgba(167,139,250,.04));}
+:root.light .fc-back{background:linear-gradient(135deg,rgba(167,139,250,.06),rgba(56,189,248,.04));}
+:root.light .fc-feedback{background:rgba(255,255,255,.98);color:#0f172a;}
+:root.light .fc-feedback-msg{color:#0f172a;}
+
 /* Simplify Settings for faith_free — only Appearance + Support remain. */
 html[data-faith-free="1"] #sp .sp-pb { display: none !important; }
 html[data-faith-free="1"] #sp-faith-support { display: block !important; }
