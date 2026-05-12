@@ -439,7 +439,7 @@ function initScripture(){
 // the original 6 tabs. New tabs without renderers are stubs awaiting later phases.
 // btn is optional — when bfTab() is called programmatically (e.g., from a Quick
 // Tile or stub-panel CTA), the matching button is found via [data-bf-tab].
-const BF_TABS = ['home','devotional','jesus','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','timeline'];
+const BF_TABS = ['home','devotional','jesus','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline'];
 function bfTab(tab, btn){
   BF_TABS.forEach(t=>{
     const el = document.getElementById('bf-'+t);
@@ -460,6 +460,7 @@ function bfTab(tab, btn){
   if(tab==='memorize') renderMemorizePanel();
   if(tab==='academy') renderAcademyPanel();
   if(tab==='bibleworld') renderBibleWorld();
+  if(tab==='stories') renderFaithHomeStories();
   if(tab==='timeline') renderBibleTimeline();
 }
 
@@ -2174,24 +2175,8 @@ function savePrayer(type){
   showToast(type==='praise'?'Praise logged! 🎉':'Prayer saved 🙏');
 }
 
-function renderPrayerList(){
-  const el = document.getElementById('prayerList'); if(!el) return;
-  const prayers = (D.prayers||[]).slice().reverse();
-  if(!prayers.length){ el.innerHTML='<div style="text-align:center;font-size:.72rem;color:var(--tx3);padding:.5rem;">Start your prayer journal above.</div>'; return; }
-  el.innerHTML = prayers.map(p=>`
-    <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-left:4px solid ${p.type==='praise'?'#22c55e':p.answered?'#fbbf24':'#a78bfa'};border-radius:0 10px 10px 0;padding:.6rem .8rem;margin-bottom:.35rem;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.2rem;">
-        <span style="font-size:.65rem;font-weight:700;color:${p.type==='praise'?'#22c55e':'#a78bfa'};">${p.type==='praise'?'🎉 Praise':'🙏 Prayer'}${p.answered?' · ✅ Answered':''}</span>
-        <span style="font-size:.55rem;color:var(--tx3);">${p.date}</span>
-      </div>
-      <div style="font-size:.78rem;color:var(--tx2);line-height:1.5;">${p.text}</div>
-      <div style="display:flex;gap:.3rem;margin-top:.3rem;">
-        ${p.type==='request'&&!p.answered?`<button onclick="markPrayerAnswered(${p.id})" style="font-size:.5rem;color:#fbbf24;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.15);border-radius:4px;padding:.12rem .3rem;cursor:pointer;">✅ Answered!</button>`:''}
-        <button onclick="deletePrayer(${p.id})" style="font-size:.45rem;color:var(--tx3);background:none;border:none;cursor:pointer;">🗑</button>
-      </div>
-    </div>
-  `).join('');
-}
+// renderPrayerList: see canonical implementation later in this file (uses escapeHtml).
+// Earlier duplicate definition removed 2026-05-09 — was XSS-vulnerable on p.text.
 
 function markPrayerAnswered(id){
   const p = (D.prayers||[]).find(x=>x.id===id);
@@ -2318,7 +2303,7 @@ function renderBibleReadings(){
   if(!readings.length){ el.innerHTML='<div style="text-align:center;padding:1rem;font-size:.75rem;color:var(--tx3);">No readings logged yet.</div>'; return; }
   el.innerHTML=readings.map(r=>`<div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:10px;padding:.6rem .8rem;margin-bottom:.35rem;${r.highlight?'border-left:4px solid '+r.highlight:''}">
     <div style="display:flex;justify-content:space-between;margin-bottom:.2rem;"><span style="font-size:.78rem;font-weight:700;color:var(--c);">📕 ${r.book}${r.chapter?' '+r.chapter:''}${r.verse?':'+r.verse:''}</span><span style="font-size:.55rem;color:var(--tx3);">${r.date}</span></div>
-    ${r.notes?`<div style="font-size:.75rem;color:var(--tx2);line-height:1.6;">${r.notes}</div>`:''}
+    ${r.notes?`<div style="font-size:.75rem;color:var(--tx2);line-height:1.6;">${escapeHtml(r.notes)}</div>`:''}
     <button onclick="D.bibleReadings=(D.bibleReadings||[]).filter(x=>x.id!==${r.id});save();renderBibleReadings();" style="font-size:.45rem;color:var(--tx3);background:none;border:none;cursor:pointer;float:right;">🗑</button>
   </div>`).join('');
 }
@@ -3007,7 +2992,7 @@ function renderStudyNotes(){
         <span style="font-size:.55rem;color:var(--tx3);">${n.date}</span>
       </div>
       <div style="font-size:.72rem;font-style:italic;color:var(--tx2);margin-bottom:.3rem;line-height:1.5;${n.highlight?'background:'+n.highlight+'20;padding:.2rem .3rem;border-radius:4px;':''}"><span style="font-size:.55rem;">📖</span> "${n.verse.substring(0,80)}${n.verse.length>80?'...':''}"</div>
-      <div style="font-size:.78rem;color:var(--tx);line-height:1.6;">${n.note}</div>
+      <div style="font-size:.78rem;color:var(--tx);line-height:1.6;">${escapeHtml(n.note)}</div>
       <button onclick="deleteStudyNote(${n.id})" style="font-size:.5rem;color:var(--tx3);background:none;border:none;cursor:pointer;margin-top:.2rem;float:right;">🗑</button>
     </div>
   `).join('');

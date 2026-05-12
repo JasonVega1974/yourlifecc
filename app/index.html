@@ -4122,6 +4122,7 @@
     <button class="tab" data-bf-tab="prayer" onclick="bfTab('prayer',this)">🙏 Prayer</button>
     <button class="tab" data-bf-tab="academy" onclick="bfTab('academy',this)">🎓 Academy</button>
     <button class="tab" data-bf-tab="bibleworld" onclick="bfTab('bibleworld',this)">🗺️ Bible Lands</button>
+    <button class="tab" data-bf-tab="stories" onclick="bfTab('stories',this)">📖 Story Mode</button>
     <button class="tab" data-bf-tab="timeline" onclick="bfTab('timeline',this)">🕰️ Timeline</button>
     <button class="tab" data-bf-tab="memorize" onclick="bfTab('memorize',this)">✨ Memorize</button>
     <button class="tab" data-bf-tab="journey" onclick="bfTab('journey',this)">🌟 Journey</button>
@@ -4267,16 +4268,18 @@
         </div>
       </div>
 
-      <!-- Card 6 (F4-G): Story Mode — illustrated, narrated Bible stories -->
-      <div class="fh-card" id="fhStoriesCard" style="grid-column:1 / -1;background:linear-gradient(135deg, rgba(10,13,26,.95) 0%, rgba(26,18,51,.92) 100%);border:1px solid rgba(251,191,36,.18);position:relative;overflow:hidden;">
+      <!-- Phase 5.7: Story Mode promoted to its own sub-tab.
+           The former #fhStoriesCard was removed from this Home grid.
+           See the bf-stories panel for the new entry point. -->
+      <div class="fh-card" id="fhStoriesPromoCard" style="grid-column:1 / -1;background:linear-gradient(135deg, rgba(10,13,26,.95) 0%, rgba(26,18,51,.92) 100%);border:1px solid rgba(251,191,36,.18);position:relative;overflow:hidden;cursor:pointer;" onclick="bfTab('stories')">
         <div style="position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(251,191,36,.16), transparent 55%);pointer-events:none;"></div>
         <div class="fh-card-hdr" style="position:relative;color:#fef3c7;">
           <span style="font-size:1.1rem;">⭐</span>
           <span style="font-family:'Bebas Neue',var(--fm);letter-spacing:.14em;font-size:.9rem;">Story Mode</span>
           <span class="fh-card-sub" style="color:rgba(254,243,199,.6);">Illustrated &amp; narrated</span>
         </div>
-        <div style="font-size:.78rem;color:rgba(254,243,199,.78);line-height:1.55;margin-bottom:.75rem;position:relative;font-family:Georgia,serif;font-style:italic;">Step inside the great moments of Scripture — hand-illustrated, scene by scene, with optional voice narration.</div>
-        <div id="fhStoryList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.55rem;position:relative;"></div>
+        <div style="font-size:.78rem;color:rgba(254,243,199,.78);line-height:1.55;margin-bottom:.55rem;position:relative;font-family:Georgia,serif;font-style:italic;">Step inside the great moments of Scripture — hand-illustrated, scene by scene, with optional voice narration.</div>
+        <div style="position:relative;display:inline-flex;align-items:center;gap:.4rem;background:rgba(251,191,36,.14);border:1px solid rgba(251,191,36,.32);color:#fbbf24;padding:.5rem .9rem;border-radius:10px;font-size:.78rem;font-weight:800;letter-spacing:.06em;">📖 Open Story Mode →</div>
       </div>
 
       <!-- Card 7 (Phase 5.4): Faith-free upgrade CTA — visible only to faith_free
@@ -4979,19 +4982,39 @@
   <!-- ════ BIBLICAL SITE DETAIL MODAL (F3-B) ════ -->
   <div id="bwSiteModal" class="mo" onclick="if(event.target===this)bwCloseSite()">
     <div class="md" style="max-width:600px;padding:0;">
-      <div id="bwSiteHeader" style="background:var(--cd-banner);color:var(--cd-banner-text);border-radius:16px 16px 0 0;padding:1.1rem 1.2rem 1rem;position:relative;">
-        <button onclick="bwCloseSite()" style="position:absolute;top:.7rem;right:.7rem;background:rgba(11,18,32,.18);border:1px solid rgba(11,18,32,.22);color:#0b1220;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.78rem;font-weight:800;">✕</button>
+      <div id="bwSiteHeader" style="background:var(--cd-banner);color:var(--cd-banner-text);border-radius:16px 16px 0 0;padding:1.1rem 3.4rem 1rem 1.2rem;position:relative;">
+        <button aria-label="Close" onclick="bwCloseSite()" style="position:absolute;top:.55rem;right:.55rem;background:rgba(11,18,32,.18);border:1px solid rgba(11,18,32,.22);color:#0b1220;width:44px;height:44px;min-width:44px;min-height:44px;border-radius:50%;cursor:pointer;font-size:1.05rem;font-weight:800;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
         <div id="bwSiteEra" style="font-size:.6rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;opacity:.78;margin-bottom:.3rem;">—</div>
         <div id="bwSiteName" style="font-family:var(--fh,var(--fm));font-size:1.4rem;font-weight:800;letter-spacing:.02em;line-height:1.2;margin-bottom:.25rem;">—</div>
         <div id="bwSiteTagline" style="font-size:.82rem;font-weight:600;line-height:1.4;opacity:.85;">—</div>
       </div>
       <div style="padding:0;max-height:55vh;overflow-y:auto;">
-        <!-- Photo slot — placeholder until BiblePlaces.com licensing -->
+        <!-- Photo slot — placeholder until image library lands -->
         <div id="bwSitePhoto" style="height:140px;background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(167,139,250,.08));display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--tx2);font-style:italic;border-bottom:1px solid rgba(255,255,255,.06);">📷 Photo coming when image library lands</div>
         <div id="bwSiteBody" style="padding:.85rem 1.2rem;font-size:.84rem;line-height:1.7;color:var(--tx);">—</div>
         <div id="bwSiteRefs" style="padding:0 1.2rem 1rem;display:flex;flex-wrap:wrap;gap:.3rem;"></div>
         <div id="bwSiteMeta" style="padding:.65rem 1.2rem 1rem;border-top:1px solid rgba(255,255,255,.06);display:grid;grid-template-columns:1fr 1fr;gap:.5rem;font-size:.7rem;color:var(--tx2);"></div>
       </div>
+      <div style="padding:.85rem 1.2rem 1rem;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:center;">
+        <button onclick="bwCloseSite()" style="background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.3);color:var(--c);padding:.7rem 1.6rem;border-radius:11px;font-size:.86rem;font-weight:800;cursor:pointer;font-family:var(--fm);min-height:44px;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ STORY MODE (Phase 5.7) — sub-tab home ════
+       Promoted from the Faith Home card grid. The tile renderer
+       (renderFaithHomeStories in faith.js) still writes to #fhStoryList,
+       which now lives inside this panel. -->
+  <div id="bf-stories" style="display:none;">
+    <div style="background:linear-gradient(135deg, rgba(10,13,26,.95) 0%, rgba(26,18,51,.92) 100%);border:1px solid rgba(251,191,36,.18);border-radius:16px;padding:1rem 1.1rem 1.1rem;position:relative;overflow:hidden;">
+      <div style="position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(251,191,36,.16), transparent 55%);pointer-events:none;"></div>
+      <div style="position:relative;display:flex;align-items:center;gap:.55rem;margin-bottom:.35rem;color:#fef3c7;">
+        <span style="font-size:1.2rem;">⭐</span>
+        <span style="font-family:'Bebas Neue',var(--fm);letter-spacing:.14em;font-size:1.05rem;">Story Mode</span>
+        <span style="font-size:.72rem;font-weight:600;color:rgba(254,243,199,.6);">Illustrated &amp; narrated</span>
+      </div>
+      <div style="position:relative;font-size:.82rem;color:rgba(254,243,199,.78);line-height:1.55;margin-bottom:.95rem;font-family:Georgia,serif;font-style:italic;">Step inside the great moments of Scripture — hand-illustrated, scene by scene, with optional voice narration.</div>
+      <div id="fhStoryList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.55rem;position:relative;"></div>
     </div>
   </div>
 
@@ -6658,56 +6681,76 @@
   <div class="sh">
     <div class="si">📇</div>
     <div class="st">Bible Flashcards</div>
-    <span class="tip-wrap"><span class="tip-btn">?</span><span class="tip-box tip-right"><span class="tip-title">HOW TO USE</span><br>300 cards covering Bible trivia + memory verses. Tap to flip. Score yourself on each card. Shuffle anytime to restart in a new order. Mastery persists across sessions.</span></span>
+    <span class="tip-wrap"><span class="tip-btn">?</span><span class="tip-box tip-right"><span class="tip-title">HOW TO USE</span><br>Each round is 20 random cards from a deck of 300. Tap one of the three choices to answer. The card flips to reveal the correct answer plus a scripture response. Tap “Next Card →” to continue. After 20 cards you get a 0–10 rating with a closing scripture.</span></span>
     <div class="sl"></div>
   </div>
 
-  <div class="fc-controls">
-    <div class="fc-progress">Card <strong id="fcCurrentNum">1</strong> of <strong id="fcTotal">300</strong></div>
-    <button class="fc-shuffle" onclick="fcShuffle()">🔀 Shuffle</button>
+  <!-- HUD: round progress + running score + New Round -->
+  <div class="fc-hud">
+    <div class="fc-hud-stat">
+      <span class="fc-hud-label">Card</span>
+      <span class="fc-hud-val"><strong id="fcCurrentNum">1</strong> / <strong id="fcRoundTotal">20</strong></span>
+    </div>
+    <div class="fc-hud-stat">
+      <span class="fc-hud-label">Score</span>
+      <span class="fc-hud-val"><strong id="fcRunningScore">0</strong> / <span id="fcRunningTotal">0</span></span>
+    </div>
+    <button class="fc-shuffle" onclick="fcNewRound()">🔀 New Round</button>
   </div>
 
+  <!-- Flip card: question + 3 MC choices on front; result + scripture on back -->
   <div class="fc-card-wrap">
-    <div class="fc-card" id="fcCard" onclick="fcFlip()">
+    <div class="fc-card" id="fcCard">
       <div class="fc-face fc-front">
         <div class="fc-face-label">QUESTION</div>
-        <div class="fc-text" id="fcQuestion">Loading…</div>
-        <div class="fc-hint">Tap to flip</div>
+        <div class="fc-question" id="fcQuestion">Loading…</div>
+        <div class="fc-choices" id="fcChoices"></div>
       </div>
       <div class="fc-face fc-back">
-        <div class="fc-face-label">ANSWER</div>
-        <div class="fc-text" id="fcAnswer">Loading…</div>
-        <div class="fc-hint">Tap to flip back</div>
+        <div class="fc-result-icon" id="fcResultIcon">✅</div>
+        <div class="fc-result-label" id="fcResultLabel">Correct!</div>
+        <div class="fc-correct-row">
+          <span class="fc-correct-tag">Answer:</span>
+          <span class="fc-correct-text" id="fcCorrectAnswer">—</span>
+        </div>
+        <div class="fc-scripture">
+          <div class="fc-scripture-msg" id="fcScriptureMsg">—</div>
+          <div class="fc-scripture-ref" id="fcScriptureRef">—</div>
+        </div>
+        <button class="fc-next-btn" onclick="fcNextCard()">Next Card →</button>
       </div>
     </div>
   </div>
 
-  <div class="fc-score-row">
-    <button class="fc-btn fc-learning" onclick="fcScore('learning')">❌ Still Learning</button>
-    <button class="fc-btn fc-got" onclick="fcScore('got')">✅ Got It</button>
-  </div>
-
-  <div class="fc-stats">
-    <span>✅ Mastered: <strong id="fcGotCount">0</strong></span>
-    <span>📚 Still Learning: <strong id="fcLearningCount">0</strong></span>
-    <span>📇 Not Reviewed: <strong id="fcNewCount">300</strong></span>
-  </div>
-
-  <!-- Feedback overlay -->
-  <div id="fcFeedback" class="fc-feedback">
-    <div class="fc-feedback-icon" id="fcFeedbackIcon"></div>
-    <div class="fc-feedback-msg" id="fcFeedbackMsg"></div>
-    <div class="fc-feedback-ref" id="fcFeedbackRef"></div>
+  <!-- End-of-round results screen -->
+  <div id="fcResults" class="fc-results">
+    <div class="fc-results-title">Round Complete</div>
+    <div class="fc-results-score">
+      <span class="fc-results-num" id="fcFinalScore">0</span>
+      <span class="fc-results-out">/ 20</span>
+    </div>
+    <div class="fc-results-rating">
+      <div class="fc-rating-label">Your Rating</div>
+      <div class="fc-rating-stars" id="fcRatingStars"></div>
+      <div class="fc-rating-num"><span id="fcRatingValue">0</span><span class="fc-rating-out"> / 10</span></div>
+    </div>
+    <div class="fc-results-msg-wrap">
+      <div class="fc-results-msg" id="fcResultsMsg">—</div>
+      <div class="fc-results-ref" id="fcResultsRef">—</div>
+    </div>
+    <button class="fc-new-round-btn" onclick="fcNewRound()">🔀 Start New Round</button>
   </div>
 
   <script>
-  // Phase 5.5 — Bible Flashcards control logic. Data lives in
-  // /app/js/data/bible-flashcards.js (FC_CARDS, FC_CORRECT_RESPONSES,
-  // FC_INCORRECT_RESPONSES). Loaded into showSection('s-flashcards') via
-  // setTimeout init in ui.js.
-  let _fcOrder = [];
+  // Phase 5.5 (revised) — Bible Flashcards multiple-choice. Data lives in
+  // /app/js/data/bible-flashcards.js (FLASH_CARDS, FC_CORRECT_RESPONSES,
+  // FC_INCORRECT_RESPONSES, FC_TIER_CLOSINGS). 20-card rounds, auto-scored
+  // by tap-a-choice; end-of-round 0–10 rating with tier-based closing scripture.
+  let _fcSession = [];
   let _fcCurrent = 0;
-  let _fcFlipped = false;
+  let _fcScore = 0;
+  let _fcAnswered = 0;
+  let _fcLocked = false;
 
   function fcShuffleArray(arr){
     for(let i = arr.length - 1; i > 0; i--){
@@ -6716,97 +6759,173 @@
     }
   }
 
+  function fcEsc(s){
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
   function fcInit(){
-    if(typeof FC_CARDS === 'undefined' || !Array.isArray(FC_CARDS)) return;
-    if(typeof D === 'undefined') return;
-    if(!D.flashMastery || typeof D.flashMastery !== 'object') D.flashMastery = {};
-    _fcOrder = FC_CARDS.map((_, i) => i);
-    fcShuffleArray(_fcOrder);
-    _fcCurrent = 0;
-    fcRender();
+    if(typeof FLASH_CARDS === 'undefined' || !Array.isArray(FLASH_CARDS) || !FLASH_CARDS.length) return;
+    if(typeof D !== 'undefined' && D){
+      if(!D.flashcardProgress || typeof D.flashcardProgress !== 'object') D.flashcardProgress = {};
+      if(!Array.isArray(D.flashcardHistory)) D.flashcardHistory = [];
+    }
+    fcNewRound(true);
   }
 
-  function fcShuffle(){
-    fcInit();
-    if(typeof showToast === 'function') showToast('Shuffled! 🔀');
-  }
-
-  function fcFlip(){
-    const card = document.getElementById('fcCard');
-    if(!card) return;
-    _fcFlipped = !_fcFlipped;
-    card.classList.toggle('flipped', _fcFlipped);
-  }
-
-  function fcRender(){
-    if(typeof FC_CARDS === 'undefined' || !_fcOrder.length) return;
-    const idx = _fcOrder[_fcCurrent];
-    const card = FC_CARDS[idx];
-    if(!card) return;
-    const qEl = document.getElementById('fcQuestion');
-    const aEl = document.getElementById('fcAnswer');
-    const cEl = document.getElementById('fcCurrentNum');
-    const tEl = document.getElementById('fcTotal');
-    if(qEl) qEl.textContent = card.q;
-    if(aEl) aEl.textContent = card.a;
-    if(cEl) cEl.textContent = _fcCurrent + 1;
-    if(tEl) tEl.textContent = FC_CARDS.length;
-    _fcFlipped = false;
+  function fcNewRound(silent){
+    if(typeof FLASH_CARDS === 'undefined' || !FLASH_CARDS.length) return;
+    const results = document.getElementById('fcResults');
+    if(results) results.classList.remove('show');
     const cardEl = document.getElementById('fcCard');
     if(cardEl) cardEl.classList.remove('flipped');
-    fcRenderStats();
+    const all = FLASH_CARDS.map((_, i) => i);
+    fcShuffleArray(all);
+    _fcSession = all.slice(0, Math.min(20, FLASH_CARDS.length));
+    _fcCurrent = 0;
+    _fcScore = 0;
+    _fcAnswered = 0;
+    _fcLocked = false;
+    fcRenderCard();
+    if(!silent && typeof showToast === 'function') showToast('New round started 🔀');
   }
 
-  function fcRenderStats(){
-    const mastery = (typeof D !== 'undefined' && D && D.flashMastery) ? D.flashMastery : {};
-    let got = 0, learning = 0;
-    Object.values(mastery).forEach(v => {
-      if(v === 'got') got++;
-      else if(v === 'learning') learning++;
+  function fcRenderCard(){
+    if(!_fcSession.length) return;
+    _fcLocked = false;
+    const idx = _fcSession[_fcCurrent];
+    const card = FLASH_CARDS[idx];
+    if(!card) return;
+    const cardEl = document.getElementById('fcCard');
+    if(cardEl) cardEl.classList.remove('flipped');
+    const cn = document.getElementById('fcCurrentNum');
+    const tn = document.getElementById('fcRoundTotal');
+    const rs = document.getElementById('fcRunningScore');
+    const rt = document.getElementById('fcRunningTotal');
+    if(cn) cn.textContent = _fcCurrent + 1;
+    if(tn) tn.textContent = _fcSession.length;
+    if(rs) rs.textContent = _fcScore;
+    if(rt) rt.textContent = _fcAnswered;
+    const qEl = document.getElementById('fcQuestion');
+    if(qEl) qEl.textContent = card.q;
+    const chEl = document.getElementById('fcChoices');
+    if(chEl){
+      const order = (card.choices || []).slice();
+      fcShuffleArray(order);
+      chEl.innerHTML = order.map(function(c){
+        return '<button class="fc-choice" onclick="fcSelectChoice(this)">' + fcEsc(c) + '</button>';
+      }).join('');
+    }
+  }
+
+  function fcSelectChoice(btnEl){
+    if(_fcLocked) return;
+    if(!_fcSession.length) return;
+    _fcLocked = true;
+    const idx = _fcSession[_fcCurrent];
+    const card = FLASH_CARDS[idx];
+    if(!card) return;
+    const selectedAnswer = btnEl ? btnEl.textContent : '';
+    const isCorrect = (selectedAnswer === card.answer);
+    _fcAnswered++;
+    if(isCorrect) _fcScore++;
+    if(typeof D !== 'undefined' && D){
+      if(!D.flashcardProgress) D.flashcardProgress = {};
+      D.flashcardProgress[idx] = isCorrect ? 'correct' : 'incorrect';
+      if(typeof save === 'function') save();
+    }
+    const buttons = document.querySelectorAll('#fcChoices .fc-choice');
+    buttons.forEach(function(b){
+      b.disabled = true;
+      if(b.textContent === card.answer) b.classList.add('fc-choice-correct');
+      else if(b === btnEl) b.classList.add('fc-choice-incorrect');
     });
-    const total = (typeof FC_CARDS !== 'undefined') ? FC_CARDS.length : 300;
-    const gEl = document.getElementById('fcGotCount');
-    const lEl = document.getElementById('fcLearningCount');
-    const nEl = document.getElementById('fcNewCount');
-    if(gEl) gEl.textContent = got;
-    if(lEl) lEl.textContent = learning;
-    if(nEl) nEl.textContent = total - got - learning;
+    const rs = document.getElementById('fcRunningScore');
+    const rt = document.getElementById('fcRunningTotal');
+    if(rs) rs.textContent = _fcScore;
+    if(rt) rt.textContent = _fcAnswered;
+    setTimeout(function(){
+      fcRenderBack(card, isCorrect);
+      const cardEl = document.getElementById('fcCard');
+      if(cardEl) cardEl.classList.add('flipped');
+    }, 600);
   }
 
-  function fcScore(verdict){
-    if(typeof FC_CARDS === 'undefined' || !_fcOrder.length) return;
-    if(typeof D === 'undefined') return;
-    const idx = _fcOrder[_fcCurrent];
-    if(!D.flashMastery) D.flashMastery = {};
-    D.flashMastery[idx] = verdict;
-    if(typeof save === 'function') save();
-    fcShowFeedback(verdict === 'got');
-    setTimeout(() => {
-      fcHideFeedback();
-      _fcCurrent = (_fcCurrent + 1) % _fcOrder.length;
-      fcRender();
-    }, 1800);
-  }
-
-  function fcShowFeedback(correct){
-    const el = document.getElementById('fcFeedback');
-    if(!el) return;
-    const pool = correct
-      ? (typeof FC_CORRECT_RESPONSES !== 'undefined' ? FC_CORRECT_RESPONSES : [{msg:'Well done!', ref:''}])
-      : (typeof FC_INCORRECT_RESPONSES !== 'undefined' ? FC_INCORRECT_RESPONSES : [{msg:'Keep going.', ref:''}]);
+  function fcRenderBack(card, isCorrect){
+    const iconEl = document.getElementById('fcResultIcon');
+    const labelEl = document.getElementById('fcResultLabel');
+    const ansEl = document.getElementById('fcCorrectAnswer');
+    const msgEl = document.getElementById('fcScriptureMsg');
+    const refEl = document.getElementById('fcScriptureRef');
+    if(iconEl) iconEl.textContent = isCorrect ? '✅' : '❌';
+    if(labelEl){
+      labelEl.textContent = isCorrect ? 'Correct!' : 'Not quite';
+      labelEl.className = 'fc-result-label ' + (isCorrect ? 'correct' : 'incorrect');
+    }
+    if(ansEl) ansEl.textContent = card.answer;
+    const pool = isCorrect
+      ? (typeof FC_CORRECT_RESPONSES !== 'undefined' ? FC_CORRECT_RESPONSES : [{msg:'Well done!',ref:''}])
+      : (typeof FC_INCORRECT_RESPONSES !== 'undefined' ? FC_INCORRECT_RESPONSES : [{msg:'Keep going.',ref:''}]);
     const pick = pool[Math.floor(Math.random() * pool.length)];
-    const iconEl = document.getElementById('fcFeedbackIcon');
-    const msgEl = document.getElementById('fcFeedbackMsg');
-    const refEl = document.getElementById('fcFeedbackRef');
-    if(iconEl) iconEl.textContent = correct ? '🌟' : '🌱';
-    if(msgEl) msgEl.textContent = pick.msg;
+    if(msgEl) msgEl.textContent = pick.msg || '';
     if(refEl) refEl.textContent = pick.ref ? '— ' + pick.ref : '';
-    el.className = 'fc-feedback show ' + (correct ? 'correct' : 'incorrect');
   }
 
-  function fcHideFeedback(){
-    const el = document.getElementById('fcFeedback');
-    if(el) el.className = 'fc-feedback';
+  function fcNextCard(){
+    if(!_fcSession.length) return;
+    _fcCurrent++;
+    if(_fcCurrent >= _fcSession.length){ fcShowResults(); return; }
+    fcRenderCard();
+  }
+
+  function fcShowResults(){
+    const results = document.getElementById('fcResults');
+    if(!results) return;
+    const score = _fcScore;
+    const total = _fcSession.length || 20;
+    const rating = Math.round((score / total) * 10);
+    let tier;
+    if(rating >= 9) tier = 'excellent';
+    else if(rating >= 7) tier = 'great';
+    else if(rating >= 5) tier = 'good';
+    else tier = 'keepGoing';
+    const tierData = (typeof FC_TIER_CLOSINGS !== 'undefined' && Array.isArray(FC_TIER_CLOSINGS))
+      ? FC_TIER_CLOSINGS.find(function(t){ return t.tier === tier; })
+      : null;
+    const fs = document.getElementById('fcFinalScore');
+    const rv = document.getElementById('fcRatingValue');
+    if(fs) fs.textContent = score;
+    if(rv) rv.textContent = rating;
+    const starsEl = document.getElementById('fcRatingStars');
+    if(starsEl){
+      let html = '';
+      for(let i = 0; i < 10; i++){
+        html += '<span class="fc-star ' + (i < rating ? 'fc-star-filled' : 'fc-star-empty') + '">★</span>';
+      }
+      starsEl.innerHTML = html;
+    }
+    const msgEl = document.getElementById('fcResultsMsg');
+    const refEl = document.getElementById('fcResultsRef');
+    if(tierData){
+      if(msgEl) msgEl.textContent = tierData.msg || '';
+      if(refEl) refEl.textContent = tierData.ref ? '— ' + tierData.ref : '';
+    } else {
+      if(msgEl) msgEl.textContent = 'Round complete.';
+      if(refEl) refEl.textContent = '';
+    }
+    if(typeof D !== 'undefined' && D){
+      if(!Array.isArray(D.flashcardHistory)) D.flashcardHistory = [];
+      D.flashcardHistory.push({
+        date: new Date().toISOString(),
+        score: score,
+        total: total,
+        rating: rating
+      });
+      if(D.flashcardHistory.length > 50) D.flashcardHistory = D.flashcardHistory.slice(-50);
+      if(typeof save === 'function') save();
+    }
+    results.classList.add('show');
   }
   </script>
 </section>
