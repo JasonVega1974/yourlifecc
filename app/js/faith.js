@@ -1168,7 +1168,7 @@ function renderPlanCatalog(){
         : '';
     const cta = isActive ? 'Resume →' : isCompleted ? 'Re-read →' : 'Start →';
     return ''
-      + '<button class="pl-card-v2" onclick="openPlanDetail(' + JSON.stringify(p.id) + ')" '
+      + '<button class="pl-card-v2" data-plan-id="' + _planEsc(p.id) + '" onclick="openPlanDetail(this.dataset.planId)" '
       +   'style="appearance:none;-webkit-appearance:none;cursor:pointer;display:block;width:100%;text-align:left;font:inherit;'
       +   'background:linear-gradient(135deg,' + brand.soft + '0.10),' + brand.soft + '0.02));'
       +   'border:1px solid ' + brand.soft + '0.28);border-radius:16px;padding:1rem 1.1rem;'
