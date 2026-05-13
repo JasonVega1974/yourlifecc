@@ -5465,23 +5465,189 @@
     <div class="tl-legend" id="tlLegend"></div>
   </div>
 
-  <!-- ════ TIMELINE EVENT MODAL (F4-D) ════ -->
+  <!-- ════ TIMELINE EVENT MODAL (F4-D · expanded study-Bible treatment) ════ -->
+  <style>
+    #tlEventModal .md{
+      max-width:680px;padding:0;
+      background:linear-gradient(180deg,#0a0d1a 0%,#100a26 100%);
+      display:flex;flex-direction:column;max-height:92vh;
+      border:1px solid rgba(251,191,36,.22);
+    }
+    #tlEventModal .tlm-svg{
+      position:relative;width:100%;aspect-ratio:800/300;
+      border-radius:16px 16px 0 0;overflow:hidden;
+      flex:0 0 auto;
+    }
+    #tlEventModal .tlm-svg::after{
+      content:"";position:absolute;left:0;right:0;bottom:0;height:48px;
+      background:linear-gradient(180deg,transparent 0%,rgba(10,13,26,.85) 100%);
+      pointer-events:none;
+    }
+    #tlEventModal .tlm-close{
+      position:absolute;top:.7rem;right:.7rem;z-index:5;
+      width:32px;height:32px;border-radius:50%;
+      background:rgba(10,13,26,.7);border:1px solid rgba(251,191,36,.4);
+      color:#fef3c7;cursor:pointer;font-size:.85rem;font-weight:800;
+      display:flex;align-items:center;justify-content:center;
+      backdrop-filter:blur(6px);
+    }
+    #tlEventModal .tlm-body-wrap{
+      flex:1 1 auto;overflow-y:auto;
+      padding:0;-webkit-overflow-scrolling:touch;
+    }
+    #tlEventModal .tlm-hdr{padding:1.3rem 1.5rem 1rem;text-align:left;border-bottom:1px solid rgba(251,191,36,.12);}
+    #tlEventModal .tlm-era{
+      font-family:var(--fm);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;
+      color:#fbbf24;opacity:.85;margin-bottom:.4rem;font-weight:700;
+    }
+    #tlEventModal .tlm-title{
+      font-family:'Bebas Neue',var(--fm);
+      font-size:2.1rem;line-height:1.05;letter-spacing:.04em;
+      background:linear-gradient(135deg,#fef3c7 0%,#fbbf24 60%,#d97706 100%);
+      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+      color:#fbbf24;margin-bottom:.5rem;
+      text-shadow:0 2px 28px rgba(251,191,36,.22);
+    }
+    #tlEventModal .tlm-subtitle{
+      font-family:Georgia,'Times New Roman',serif;font-style:italic;
+      font-size:.98rem;color:#fef3c7;opacity:.84;
+      line-height:1.55;font-weight:400;
+    }
+    #tlEventModal .tlm-section{padding:1.1rem 1.5rem;}
+    #tlEventModal .tlm-section + .tlm-section{padding-top:0;}
+    #tlEventModal .tlm-body{
+      font-family:Georgia,'Times New Roman',serif;
+      font-size:1rem;line-height:1.8;color:rgba(254,243,199,.92);
+      font-weight:400;
+    }
+    #tlEventModal .tlm-body p{margin:0 0 .95rem;}
+    #tlEventModal .tlm-body p:last-child{margin-bottom:0;}
+    #tlEventModal .tlm-callout{
+      margin:0 1.5rem 1.1rem;
+      background:linear-gradient(135deg,rgba(251,191,36,.10),rgba(251,191,36,.03));
+      border:1px solid rgba(251,191,36,.32);
+      border-left:4px solid #fbbf24;
+      border-radius:12px;
+      padding:1rem 1.15rem;
+    }
+    #tlEventModal .tlm-callout-eye{
+      font-family:var(--fm);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;
+      color:#fbbf24;font-weight:800;margin-bottom:.45rem;
+    }
+    #tlEventModal .tlm-callout p{
+      font-family:Georgia,serif;font-size:.95rem;line-height:1.7;
+      color:#fef3c7;font-weight:500;margin:0;
+    }
+    #tlEventModal .tlm-keyverse{
+      margin:0 1.5rem 1.1rem;
+      background:rgba(10,13,26,.55);
+      border:1px solid rgba(251,191,36,.22);
+      border-left:4px solid #fbbf24;
+      border-radius:12px;
+      padding:1rem 1.15rem;
+    }
+    #tlEventModal .tlm-keyverse-text{
+      font-family:Georgia,serif;font-style:italic;font-size:1rem;
+      color:#fef3c7;line-height:1.7;font-weight:400;
+      margin-bottom:.5rem;
+    }
+    #tlEventModal .tlm-keyverse-ref{
+      font-family:'Bebas Neue',var(--fm);font-size:.85rem;
+      letter-spacing:.18em;color:#fbbf24;font-weight:700;
+    }
+    #tlEventModal .tlm-meta{
+      padding:0 1.5rem 1.1rem;
+      display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;
+    }
+    #tlEventModal .tlm-meta-year{
+      font-family:'Bebas Neue',var(--fm);font-size:.85rem;letter-spacing:.18em;
+      color:#fef3c7;opacity:.75;margin-right:.5rem;
+    }
+    #tlEventModal .tlm-ref-chip{
+      background:rgba(56,189,248,.14);border:1px solid rgba(56,189,248,.4);
+      color:#7dd3fc;border-radius:99px;padding:.32rem .8rem;
+      font-size:.72rem;font-weight:700;cursor:pointer;font-family:var(--fm);
+      letter-spacing:.02em;
+    }
+    #tlEventModal .tlm-ref-chip:hover{background:rgba(56,189,248,.24);}
+    #tlEventModal .tlm-related{
+      margin:0 1.5rem 1.4rem;display:flex;flex-direction:column;gap:.5rem;
+    }
+    #tlEventModal .tlm-related-link{
+      display:flex;align-items:center;gap:.6rem;
+      background:linear-gradient(135deg,rgba(251,191,36,.14),rgba(251,191,36,.04));
+      border:1px solid rgba(251,191,36,.35);
+      color:#fef3c7;border-radius:12px;padding:.7rem 1rem;
+      font-family:var(--fm);font-size:.82rem;font-weight:700;
+      cursor:pointer;text-align:left;
+      transition:background .15s,transform .15s,box-shadow .15s;
+    }
+    #tlEventModal .tlm-related-link:hover{
+      background:linear-gradient(135deg,rgba(251,191,36,.22),rgba(251,191,36,.08));
+      transform:translateY(-1px);
+      box-shadow:0 4px 18px rgba(251,191,36,.22);
+    }
+    #tlEventModal .tlm-related-link strong{color:#fbbf24;}
+    /* Light-mode parchment treatment */
+    :root.light #tlEventModal .md{
+      background:linear-gradient(180deg,#fffaeb 0%,#fdf0c8 100%);
+      border-color:rgba(180,120,20,.45);
+    }
+    :root.light #tlEventModal .tlm-era{color:#b45309;}
+    :root.light #tlEventModal .tlm-subtitle{color:#3a2818;opacity:.92;}
+    :root.light #tlEventModal .tlm-body{color:#1a1233;}
+    :root.light #tlEventModal .tlm-callout{
+      background:linear-gradient(135deg,rgba(251,191,36,.18),rgba(251,191,36,.04));
+      border-color:rgba(180,120,20,.4);
+    }
+    :root.light #tlEventModal .tlm-callout p{color:#1a1233;}
+    :root.light #tlEventModal .tlm-keyverse{
+      background:rgba(255,255,255,.6);
+      border-color:rgba(180,120,20,.35);
+    }
+    :root.light #tlEventModal .tlm-keyverse-text{color:#1a1233;}
+    :root.light #tlEventModal .tlm-keyverse-ref{color:#b45309;}
+    :root.light #tlEventModal .tlm-meta-year{color:#3a2818;}
+    :root.light #tlEventModal .tlm-hdr{border-bottom-color:rgba(180,120,20,.22);}
+    :root.light #tlEventModal .tlm-related-link{color:#1a1233;}
+    :root.light #tlEventModal .tlm-related-link strong{color:#b45309;}
+    @media (max-width:640px){
+      #tlEventModal .tlm-title{font-size:1.7rem;}
+      #tlEventModal .tlm-hdr{padding:1rem 1.1rem .85rem;}
+      #tlEventModal .tlm-section{padding:1rem 1.1rem;}
+      #tlEventModal .tlm-callout,
+      #tlEventModal .tlm-keyverse,
+      #tlEventModal .tlm-related{margin-left:1.1rem;margin-right:1.1rem;}
+      #tlEventModal .tlm-meta{padding:0 1.1rem 1rem;}
+    }
+  </style>
   <div id="tlEventModal" class="mo" onclick="if(event.target===this)closeTimelineEvent()">
-    <div class="md" style="max-width:600px;padding:0;background:linear-gradient(180deg, #0a0d1a 0%, #1a1233 100%);">
-      <div id="tlEventHeader" style="position:relative;padding:1.4rem 1.4rem 1.2rem;text-align:center;border-radius:16px 16px 0 0;overflow:hidden;">
-        <div id="tlEventEraGlow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%, rgba(251,191,36,.25) 0%, transparent 65%);pointer-events:none;"></div>
-        <button onclick="closeTimelineEvent()" style="position:absolute;top:.7rem;right:.7rem;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.78rem;font-weight:800;z-index:2;">✕</button>
-        <div style="position:relative;z-index:1;">
-          <div id="tlEventMedallion" style="width:70px;height:70px;margin:0 auto .55rem;border-radius:50%;background:radial-gradient(circle at 30% 30%, #fef3c7 0%, #fbbf24 50%, #d97706 100%);display:flex;align-items:center;justify-content:center;font-size:1.8rem;box-shadow:0 0 0 4px rgba(10,13,26,1),0 0 0 5px rgba(251,191,36,.5),0 0 28px rgba(251,191,36,.5),inset 0 1px 2px rgba(255,255,255,.6);">⭐</div>
-          <div id="tlEventEra" style="font-family:'Bebas Neue',var(--fm);font-size:.7rem;letter-spacing:.28em;color:#fef3c7;opacity:.75;margin-bottom:.25rem;">—</div>
-          <div id="tlEventYear" style="font-family:'Bebas Neue',var(--fm);font-size:1.05rem;letter-spacing:.2em;color:#fbbf24;margin-bottom:.4rem;">—</div>
-          <div id="tlEventTitle" style="font-family:'Bebas Neue',var(--fm);font-size:1.7rem;letter-spacing:.04em;color:#fff;line-height:1;margin-bottom:.45rem;">—</div>
-          <div id="tlEventSubtitle" style="font-family:Georgia,serif;font-style:italic;font-size:.88rem;color:rgba(255,255,255,.85);line-height:1.5;">—</div>
+    <div class="md">
+      <button class="tlm-close" onclick="closeTimelineEvent()" aria-label="Close">✕</button>
+      <div class="tlm-svg" id="tlEventSvg" aria-hidden="true"></div>
+      <div class="tlm-body-wrap">
+        <div class="tlm-hdr">
+          <div class="tlm-era" id="tlEventEra">—</div>
+          <div class="tlm-title" id="tlEventTitle">—</div>
+          <div class="tlm-subtitle" id="tlEventSubtitle">—</div>
         </div>
+        <div class="tlm-section">
+          <div class="tlm-body" id="tlEventBody">—</div>
+        </div>
+        <div class="tlm-callout" id="tlEventWhyWrap" style="display:none;">
+          <div class="tlm-callout-eye">Why This Matters</div>
+          <p id="tlEventWhy">—</p>
+        </div>
+        <div class="tlm-keyverse" id="tlEventKeyWrap" style="display:none;">
+          <div class="tlm-keyverse-text" id="tlEventKeyText">—</div>
+          <div class="tlm-keyverse-ref" id="tlEventKeyRef">—</div>
+        </div>
+        <div class="tlm-meta" id="tlEventMeta">
+          <span class="tlm-meta-year" id="tlEventYear">—</span>
+          <span id="tlEventRefs" style="display:flex;gap:.35rem;flex-wrap:wrap;"></span>
+        </div>
+        <div class="tlm-related" id="tlEventRelated"></div>
       </div>
-      <div id="tlEventBody" style="padding:1rem 1.3rem;font-family:Georgia,serif;font-size:.92rem;line-height:1.75;color:rgba(255,255,255,.88);">—</div>
-      <div id="tlEventRefs" style="padding:0 1.3rem 1rem;display:flex;gap:.3rem;flex-wrap:wrap;"></div>
-      <div id="tlEventSite" style="padding:0 1.3rem 1.2rem;"></div>
     </div>
   </div>
   <div id="acQuizModal" class="mo" onclick="if(event.target===this)acCloseQuiz()">
@@ -5726,6 +5892,73 @@
     #storyPlayerModal .sp-closing .sp-cl-eye{ font-family:'Bebas Neue',var(--fm); letter-spacing:.32em; font-size:.62rem; color:#fbbf24; margin-bottom:.6rem; }
     #storyPlayerModal .sp-closing .sp-cl-body{ font-family:Georgia,serif; font-size:.96rem; line-height:1.75; color:rgba(254,243,199,.92); margin-bottom:.9rem; font-style:italic; }
     #storyPlayerModal .sp-closing .sp-cl-prompt{ font-family:Georgia,serif; font-size:.85rem; line-height:1.7; color:rgba(254,243,199,.78); padding:.75rem 1rem; background:rgba(251,191,36,.08); border:1px solid rgba(251,191,36,.22); border-radius:12px; }
+
+    /* ── Final reflection scene: SVG collapses to a thin gold strip and
+       the closing text fills the rest of the card. ── */
+    #storyPlayerModal .md.sp-final{
+      display:flex; flex-direction:column;
+      min-height:60vh; max-height:92vh;
+    }
+    #storyPlayerModal .md.sp-final .sp-stage{
+      aspect-ratio:auto; height:34px; flex:0 0 auto;
+      background:linear-gradient(90deg,#fbbf24 0%,#fef3c7 50%,#fbbf24 100%);
+      box-shadow:inset 0 -1px 0 rgba(120,80,20,.4), 0 0 24px rgba(251,191,36,.4);
+    }
+    #storyPlayerModal .md.sp-final .sp-svg,
+    #storyPlayerModal .md.sp-final .sp-vignette,
+    #storyPlayerModal .md.sp-final .sp-eyebrow,
+    #storyPlayerModal .md.sp-final .sp-title,
+    #storyPlayerModal .md.sp-final .sp-bibletext,
+    #storyPlayerModal .md.sp-final .sp-tap-zone{ display:none !important; }
+    #storyPlayerModal .md.sp-final .sp-narration{
+      flex:1 1 auto;
+      max-height:none;
+      padding:0;
+      border-top:none;
+      background:
+        radial-gradient(ellipse at top, rgba(251,191,36,.22), transparent 65%),
+        linear-gradient(180deg,#0a0d1a 0%,#100a26 100%);
+      overflow-y:auto;-webkit-overflow-scrolling:touch;
+    }
+    #storyPlayerModal .md.sp-final .sp-closing{
+      max-width:620px; margin:0 auto; padding:2.4rem 1.8rem 2.6rem;
+      text-align:center; background:none;
+    }
+    #storyPlayerModal .md.sp-final .sp-closing .sp-cl-story{
+      font-family:'Bebas Neue',var(--fm); font-size:.7rem;
+      letter-spacing:.32em; text-transform:uppercase;
+      color:#fbbf24; opacity:.78; margin-bottom:.5rem;
+    }
+    #storyPlayerModal .md.sp-final .sp-closing .sp-cl-heading{
+      font-family:'Bebas Neue',var(--fm); font-size:2rem;
+      letter-spacing:.04em; line-height:1.05;
+      background:linear-gradient(135deg,#fef3c7,#fbbf24 60%,#d97706);
+      -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+      color:#fbbf24; margin-bottom:1.2rem;
+      text-shadow:0 2px 28px rgba(251,191,36,.22);
+    }
+    #storyPlayerModal .md.sp-final .sp-closing .sp-cl-eye{
+      font-size:.66rem; letter-spacing:.32em; margin-bottom:.9rem;
+    }
+    #storyPlayerModal .md.sp-final .sp-closing .sp-cl-body{
+      font-size:1.05rem; line-height:1.85; margin-bottom:1.4rem;
+      color:rgba(254,243,199,.95); font-weight:400;
+    }
+    #storyPlayerModal .md.sp-final .sp-closing .sp-cl-prompt{
+      font-size:1rem; line-height:1.75;
+      color:#fbbf24; font-weight:500; font-style:italic;
+      padding:1.1rem 1.3rem;
+      background:rgba(251,191,36,.10);
+      border:1px solid rgba(251,191,36,.32);
+      border-left:4px solid #fbbf24;
+      border-radius:12px;
+      text-align:left;
+    }
+    /* On final scene, hide progress dots + narrate button — only Prev + Start Over remain. */
+    #storyPlayerModal .md.sp-final .sp-progress,
+    #storyPlayerModal .md.sp-final .sp-narrate{ display:none !important; }
+    #storyPlayerModal .md.sp-final .sp-controls{ justify-content:space-between; }
+
     @media (prefers-reduced-motion: reduce){
       #storyPlayerModal .sp-fade-in{ animation:none; }
     }

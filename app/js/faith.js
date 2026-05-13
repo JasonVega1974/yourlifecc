@@ -5878,6 +5878,213 @@ const TL_ERAS = [
   { id:'future',           label:"Christ's Return",    range:'When?',           color:'#fbbf24', glow:'rgba(251,191,36,.32)' },
 ];
 
+// Era SVG headers — one cathedral-blueprint illustration per era group.
+// Each SVG uses viewBox="0 0 800 300", deep navy #0a0d1a base, gold #fbbf24
+// accents, silhouette compositions. Shared by every event within the era.
+const TL_ERA_SVGS = {
+  'patriarchs': '<svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">'
+    + '<defs><linearGradient id="tlsvg-pat" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a0d1a"/><stop offset="55%" stop-color="#1a1233"/><stop offset="100%" stop-color="#3d2a5e"/></linearGradient>'
+    + '<radialGradient id="tlsvg-pat-glow" cx="50%" cy="35%" r="35%"><stop offset="0%" stop-color="rgba(251,191,36,.4)"/><stop offset="100%" stop-color="rgba(251,191,36,0)"/></radialGradient></defs>'
+    + '<rect width="800" height="300" fill="url(#tlsvg-pat)"/>'
+    + '<g fill="#fef3c7" opacity="0.85"><circle cx="80" cy="40" r="0.9"/><circle cx="142" cy="80" r="1.1"/><circle cx="220" cy="30" r="0.8"/><circle cx="320" cy="70" r="1.0"/><circle cx="420" cy="35" r="1.3"/><circle cx="500" cy="60" r="0.9"/><circle cx="580" cy="40" r="1.0"/><circle cx="660" cy="90" r="1.0"/><circle cx="720" cy="55" r="0.8"/></g>'
+    + '<rect width="800" height="300" fill="url(#tlsvg-pat-glow)"/>'
+    + '<circle cx="420" cy="80" r="6" fill="#fef3c7"/><circle cx="420" cy="80" r="14" fill="rgba(251,191,36,.32)"/>'
+    + '<path d="M 0 240 Q 200 200 400 215 T 800 230 L 800 300 L 0 300 Z" fill="#1e1638" opacity="0.92"/>'
+    + '<path d="M 0 265 Q 250 245 500 258 T 800 265 L 800 300 L 0 300 Z" fill="#0a0d1a" opacity="0.95"/>'
+    + '<path d="M 340 250 L 380 200 L 420 250 Z" fill="#0a0d1a" stroke="rgba(251,191,36,.55)" stroke-width="1.2"/>'
+    + '<line x1="380" y1="200" x2="380" y2="180" stroke="#fbbf24" stroke-width="1"/><circle cx="380" cy="178" r="2" fill="#fbbf24"/>'
+    + '</svg>',
+
+  'exodus-conquest': '<svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">'
+    + '<defs><linearGradient id="tlsvg-ex" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a0d1a"/><stop offset="60%" stop-color="#3a1414"/><stop offset="100%" stop-color="#5e2a0e"/></linearGradient>'
+    + '<linearGradient id="tlsvg-ex-fire" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#fbbf24"/><stop offset="50%" stop-color="#f59e0b"/><stop offset="100%" stop-color="rgba(251,191,36,0)"/></linearGradient></defs>'
+    + '<rect width="800" height="300" fill="url(#tlsvg-ex)"/>'
+    + '<g fill="#fef3c7" opacity="0.6"><circle cx="100" cy="45" r="0.7"/><circle cx="250" cy="30" r="0.9"/><circle cx="520" cy="40" r="0.8"/><circle cx="680" cy="55" r="0.9"/></g>'
+    + '<path d="M 380 280 Q 360 230 380 180 Q 410 130 390 70 Q 430 30 415 -10" fill="url(#tlsvg-ex-fire)" opacity="0.9"/>'
+    + '<ellipse cx="395" cy="275" rx="55" ry="10" fill="rgba(251,191,36,.35)" filter="blur(4px)"/>'
+    + '<path d="M 0 250 Q 200 235 400 245 T 800 250 L 800 300 L 0 300 Z" fill="#1a0a08" opacity="0.95"/>'
+    + '<g fill="#0a0d1a" opacity="0.95">'
+    + '<ellipse cx="90" cy="245" rx="6" ry="14"/><ellipse cx="120" cy="248" rx="5" ry="12"/><ellipse cx="155" cy="245" rx="6" ry="13"/><ellipse cx="190" cy="248" rx="5" ry="12"/>'
+    + '<ellipse cx="600" cy="248" rx="5" ry="13"/><ellipse cx="635" cy="246" rx="6" ry="14"/><ellipse cx="670" cy="248" rx="5" ry="12"/><ellipse cx="705" cy="246" rx="6" ry="13"/>'
+    + '</g>'
+    + '<g stroke="rgba(251,191,36,.45)" stroke-width="1" fill="none"><path d="M 80 235 L 80 220 M 110 235 L 110 218 M 145 235 L 145 220"/></g>'
+    + '</svg>',
+
+  'judges': '<svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">'
+    + '<defs><linearGradient id="tlsvg-jdg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a0d1a"/><stop offset="55%" stop-color="#2a1840"/><stop offset="100%" stop-color="#5d2e7e"/></linearGradient></defs>'
+    + '<rect width="800" height="300" fill="url(#tlsvg-jdg)"/>'
+    + '<g fill="#fef3c7" opacity="0.6"><circle cx="120" cy="40" r="0.8"/><circle cx="280" cy="55" r="1.0"/><circle cx="540" cy="30" r="0.9"/><circle cx="700" cy="60" r="0.8"/></g>'
+    + '<circle cx="400" cy="100" r="38" fill="#0a0d1a" stroke="rgba(251,191,36,.5)" stroke-width="1.2"/>'
+    + '<circle cx="400" cy="100" r="38" fill="rgba(251,191,36,.18)" opacity="0.6"/>'
+    + '<g stroke="rgba(251,191,36,.7)" stroke-width="1.5" fill="none"><path d="M 380 92 L 400 80 L 420 92"/><path d="M 380 110 L 400 122"/><path d="M 420 110 L 400 122"/></g>'
+    + '<path d="M 0 230 Q 80 210 160 225 L 200 225 L 200 280 L 0 280 Z" fill="#0a0d1a" opacity="0.95"/>'
+    + '<path d="M 240 235 L 280 235 L 280 280 L 240 280 Z M 320 240 L 360 240 L 360 280 L 320 280 Z" fill="#0a0d1a" opacity="0.95"/>'
+    + '<path d="M 440 240 L 480 240 L 480 280 L 440 280 Z M 520 235 L 560 235 L 560 280 L 520 280 Z M 620 240 L 800 245 L 800 280 L 620 280 Z" fill="#0a0d1a" opacity="0.95"/>'
+    + '<g stroke="rgba(251,191,36,.35)" stroke-width="1" stroke-dasharray="3 4"><line x1="200" y1="240" x2="240" y2="240"/><line x1="280" y1="245" x2="320" y2="245"/><line x1="360" y1="248" x2="400" y2="250"/><line x1="400" y1="250" x2="440" y2="248"/><line x1="480" y1="245" x2="520" y2="240"/><line x1="560" y1="240" x2="620" y2="245"/></g>'
+    + '<path d="M 386 200 Q 392 178 386 158 Q 380 138 388 118 L 400 100 L 412 118 Q 420 138 414 158 Q 408 178 414 200 Z" fill="#0a0d1a" stroke="rgba(251,191,36,.45)" stroke-width="1"/>'
+    + '</svg>',
+
+  'united-kingdom': '<svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">'
+    + '<defs><linearGradient id="tlsvg-uk" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a0d1a"/><stop offset="55%" stop-color="#0d2818"/><stop offset="100%" stop-color="#0f4030"/></linearGradient>'
+    + '<radialGradient id="tlsvg-uk-glow" cx="50%" cy="55%" r="35%"><stop offset="0%" stop-color="rgba(251,191,36,.5)"/><stop offset="100%" stop-color="rgba(251,191,36,0)"/></radialGradient></defs>'
+    + '<rect width="800" height="300" fill="url(#tlsvg-uk)"/>'
+    + '<g fill="#fef3c7" opacity="0.7"><circle cx="80" cy="40" r="0.9"/><circle cx="180" cy="55" r="0.8"/><circle cx="260" cy="30" r="1.0"/><circle cx="540" cy="40" r="1.1"/><circle cx="640" cy="60" r="0.8"/><circle cx="720" cy="35" r="0.9"/></g>'
+    + '<rect width="800" height="300" fill="url(#tlsvg-uk-glow)"/>'
+    + '<path d="M 0 240 Q 200 200 400 220 T 800 230 L 800 300 L 0 300 Z" fill="#0a1a0e" opacity="0.95"/>'
+    + '<rect x="320" y="155" width="160" height="95" fill="#0a0d1a" stroke="rgba(251,191,36,.6)" stroke-width="1.4"/>'
+    + '<rect x="340" y="175" width="20" height="50" fill="rgba(251,191,36,.25)"/>'
+    + '<rect x="370" y="175" width="20" height="50" fill="rgba(251,191,36,.4)"/>'
+    + '<rect x="400" y="175" width="20" height="50" fill="rgba(251,191,36,.25)"/>'
+    + '<rect x="430" y="175" width="20" height="50" fill="rgba(251,191,36,.4)"/>'
+    + '<rect x="460" y="175" width="20" height="50" fill="rgba(251,191,36,.25)"/>'
+    + '<path d="M 315 155 L 400 110 L 485 155 Z" fill="#0a0d1a" stroke="rgba(251,191,36,.55)" stroke-width="1.2"/>'
+    + '<path d="M 370 85 L 380 95 L 390 80 L 400 95 L 410 80 L 420 95 L 430 85 L 425 105 L 375 105 Z" fill="#fbbf24" opacity="0.85"/>'
+    + '<circle cx="380" cy="88" r="2" fill="#fef3c7"/><circle cx="400" cy="83" r="2" fill="#fef3c7"/><circle cx="420" cy="88" r="2" fill="#fef3c7"/>'
+    + '</svg>',
+
+  'divided-kingdom': '<svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">'
+    + '<defs><linearGradient id="tlsvg-dk" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a0d1a"/><stop offset="55%" stop-color="#3d1808"/><stop offset="100%" stop-color="#6b2810"/></linearGradient></defs>'
+    + '<rect width="800" height="300" fill="url(#tlsvg-dk)"/>'
+    + '<g fill="#fef3c7" opacity="0.6"><circle cx="100" cy="50" r="0.8"/><circle cx="200" cy="30" r="0.9"/><circle cx="600" cy="40" r="0.9"/><circle cx="720" cy="55" r="0.8"/></g>'
+    + '<path d="M 380 0 Q 395 60 372 130 Q 410 200 388 280 L 412 280 Q 432 200 395 130 Q 418 60 405 0 Z" fill="#0a0d1a" stroke="rgba(251,191,36,.4)" stroke-width="0.8" opacity="0.85"/>'
+    + '<path d="M 0 245 L 320 245 L 320 300 L 0 300 Z" fill="#1a0a04" opacity="0.95"/>'
+    + '<path d="M 470 245 L 800 245 L 800 300 L 470 300 Z" fill="#1a0a04" opacity="0.95"/>'
+    + '<g fill="#0a0d1a" stroke="rgba(251,191,36,.5)" stroke-width="1">'
+    + '<path d="M 130 245 L 130 175 L 180 175 L 180 195 L 200 195 L 200 175 L 250 175 L 250 245 Z"/>'
+    + '<path d="M 145 200 L 165 200 L 165 220 L 145 220 Z" fill="rgba(251,191,36,.3)"/>'
+    + '<path d="M 215 200 L 235 200 L 235 220 L 215 220 Z" fill="rgba(251,191,36,.3)"/>'
+    + '</g>'
+    + '<g fill="#0a0d1a" stroke="rgba(251,146,60,.5)" stroke-width="1">'
+    + '<path d="M 550 245 L 550 180 L 600 180 L 600 200 L 620 200 L 620 180 L 670 180 L 670 245 Z"/>'
+    + '<path d="M 565 205 L 585 205 L 585 225 L 565 225 Z" fill="rgba(251,146,60,.3)"/>'
+    + '<path d="M 635 205 L 655 205 L 655 225 L 635 225 Z" fill="rgba(251,146,60,.3)"/>'
+    + '</g>'
+    + '<line x1="160" y1="170" x2="160" y2="160" stroke="rgba(251,191,36,.6)" stroke-width="1"/><path d="M 155 158 L 165 158 L 162 152 L 158 152 Z" fill="#fbbf24" opacity="0.6"/>'
+    + '<line x1="600" y1="175" x2="600" y2="165" stroke="rgba(251,146,60,.6)" stroke-width="1"/><path d="M 595 163 L 605 163 L 602 157 L 598 157 Z" fill="#fb923c" opacity="0.6"/>'
+    + '</svg>',
+
+  'exile-return': '<svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">'
+    + '<defs><linearGradient id="tlsvg-ex2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a0d1a"/><stop offset="55%" stop-color="#1a1430"/><stop offset="100%" stop-color="#2a1840"/></linearGradient></defs>'
+    + '<rect width="800" height="300" fill="url(#tlsvg-ex2)"/>'
+    + '<g fill="#fef3c7" opacity="0.55"><circle cx="80" cy="35" r="0.8"/><circle cx="200" cy="55" r="1.0"/><circle cx="350" cy="40" r="0.9"/><circle cx="500" cy="35" r="1.0"/><circle cx="650" cy="55" r="0.9"/></g>'
+    + '<g fill="#0a0d1a" stroke="rgba(244,114,182,.45)" stroke-width="0.8">'
+    + '<rect x="500" y="180" width="220" height="20"/><rect x="520" y="155" width="180" height="25"/><rect x="540" y="130" width="140" height="25"/><rect x="560" y="105" width="100" height="25"/><rect x="580" y="80" width="60" height="25"/>'
+    + '</g>'
+    + '<rect x="606" y="65" width="8" height="15" fill="#fbbf24" opacity="0.5"/>'
+    + '<path d="M 0 245 L 800 245 L 800 280 L 0 280 Z" fill="rgba(56,30,90,.6)"/>'
+    + '<path d="M 0 245 Q 100 250 200 245 T 400 248 T 600 245 T 800 248 L 800 280 L 0 280 Z" fill="rgba(244,114,182,.18)"/>'
+    + '<g stroke="rgba(244,114,182,.35)" stroke-width="0.8" fill="none">'
+    + '<path d="M 80 245 Q 70 220 60 200 M 80 245 Q 90 215 95 200 M 80 245 Q 75 225 70 210"/>'
+    + '<path d="M 180 245 Q 168 215 160 200 M 180 245 Q 192 220 195 205 M 180 245 Q 175 220 170 205"/>'
+    + '<path d="M 280 245 Q 272 220 265 200 M 280 245 Q 288 220 295 205"/>'
+    + '<path d="M 380 245 Q 372 220 365 200 M 380 245 Q 388 215 395 200 M 380 245 Q 375 220 370 210"/>'
+    + '</g>'
+    + '<rect x="60" y="180" width="3" height="65" fill="#0a0d1a" opacity="0.9"/><rect x="78" y="175" width="3" height="70" fill="#0a0d1a" opacity="0.9"/><rect x="170" y="178" width="3" height="67" fill="#0a0d1a" opacity="0.9"/><rect x="190" y="175" width="3" height="70" fill="#0a0d1a" opacity="0.9"/><rect x="280" y="180" width="3" height="65" fill="#0a0d1a" opacity="0.9"/><rect x="370" y="178" width="3" height="67" fill="#0a0d1a" opacity="0.9"/>'
+    + '<path d="M 200 240 L 220 230 L 250 235 L 245 248 L 215 248 Z" fill="#0a0d1a" stroke="rgba(244,114,182,.4)" stroke-width="0.8"/>'
+    + '</svg>',
+
+  'second-temple': '<svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">'
+    + '<defs><linearGradient id="tlsvg-st" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a0d1a"/><stop offset="55%" stop-color="#0e2030"/><stop offset="100%" stop-color="#143850"/></linearGradient></defs>'
+    + '<rect width="800" height="300" fill="url(#tlsvg-st)"/>'
+    + '<g fill="#fef3c7" opacity="0.65"><circle cx="100" cy="40" r="0.9"/><circle cx="250" cy="30" r="0.8"/><circle cx="380" cy="50" r="1.0"/><circle cx="540" cy="35" r="0.9"/><circle cx="680" cy="55" r="0.9"/></g>'
+    + '<path d="M 0 250 L 800 250 L 800 300 L 0 300 Z" fill="#0a0d1a" opacity="0.92"/>'
+    + '<g fill="#0a0d1a" stroke="rgba(56,189,248,.5)" stroke-width="1">'
+    + '<rect x="120" y="120" width="22" height="130"/><path d="M 113 120 L 149 120 L 145 110 L 117 110 Z"/>'
+    + '<rect x="170" y="120" width="22" height="130"/><path d="M 163 120 L 199 120 L 195 110 L 167 110 Z"/>'
+    + '<rect x="220" y="120" width="22" height="130"/><path d="M 213 120 L 249 120 L 245 110 L 217 110 Z"/>'
+    + '<path d="M 105 110 L 257 110 L 252 95 L 110 95 Z"/>'
+    + '<path d="M 105 95 L 257 95 L 181 70 Z"/>'
+    + '</g>'
+    + '<g stroke="#fbbf24" stroke-width="2.2" fill="none" stroke-linecap="round">'
+    + '<line x1="540" y1="140" x2="540" y2="240"/>'
+    + '<line x1="500" y1="155" x2="500" y2="200" /><line x1="500" y1="155" x2="500" y2="200"/><line x1="500" y1="160" x2="500" y2="200"/>'
+    + '<line x1="520" y1="150" x2="520" y2="200"/><line x1="560" y1="150" x2="560" y2="200"/><line x1="580" y1="155" x2="580" y2="200"/>'
+    + '<path d="M 500 200 Q 500 220 520 220 L 560 220 Q 580 220 580 200"/>'
+    + '<path d="M 520 200 Q 520 215 540 215 Q 560 215 560 200"/>'
+    + '</g>'
+    + '<g fill="#fbbf24" opacity="0.9"><circle cx="500" cy="150" r="3"/><circle cx="520" cy="145" r="3"/><circle cx="540" cy="135" r="3.5"/><circle cx="560" cy="145" r="3"/><circle cx="580" cy="150" r="3"/></g>'
+    + '<g stroke="rgba(251,191,36,.5)" stroke-width="0.5" fill="none"><line x1="540" y1="130" x2="540" y2="115"/><line x1="500" y1="145" x2="500" y2="135"/><line x1="580" y1="145" x2="580" y2="135"/></g>'
+    + '</svg>',
+
+  'jesus-ministry': '<svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">'
+    + '<defs><linearGradient id="tlsvg-jm" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a0d1a"/><stop offset="40%" stop-color="#1e1450"/><stop offset="80%" stop-color="#5a2c80"/><stop offset="100%" stop-color="#c4724a"/></linearGradient>'
+    + '<radialGradient id="tlsvg-jm-sun" cx="50%" cy="78%" r="32%"><stop offset="0%" stop-color="rgba(251,191,36,.85)"/><stop offset="60%" stop-color="rgba(251,146,60,.5)"/><stop offset="100%" stop-color="rgba(251,191,36,0)"/></radialGradient></defs>'
+    + '<rect width="800" height="300" fill="url(#tlsvg-jm)"/>'
+    + '<g fill="#fef3c7" opacity="0.55"><circle cx="80" cy="30" r="0.7"/><circle cx="160" cy="50" r="0.9"/><circle cx="260" cy="25" r="0.8"/><circle cx="600" cy="35" r="0.7"/></g>'
+    + '<ellipse cx="400" cy="270" rx="280" ry="40" fill="url(#tlsvg-jm-sun)"/>'
+    + '<path d="M 0 260 Q 100 230 200 245 Q 300 215 400 235 Q 500 205 600 240 Q 700 220 800 245 L 800 300 L 0 300 Z" fill="#3d2814" opacity="0.92"/>'
+    + '<path d="M 0 275 Q 200 255 400 268 Q 600 248 800 268 L 800 300 L 0 300 Z" fill="#1a0d04" opacity="0.95"/>'
+    + '<g fill="#0a0d1a">'
+    + '<rect x="396" y="180" width="8" height="68"/><rect x="378" y="200" width="44" height="6"/>'
+    + '<rect x="320" y="195" width="6" height="55"/><rect x="306" y="208" width="34" height="5"/>'
+    + '<rect x="474" y="195" width="6" height="55"/><rect x="460" y="208" width="34" height="5"/>'
+    + '</g>'
+    + '<g stroke="rgba(251,191,36,.55)" stroke-width="0.8" fill="none">'
+    + '<line x1="400" y1="245" x2="350" y2="265"/><line x1="400" y1="245" x2="450" y2="265"/><line x1="400" y1="245" x2="400" y2="275"/>'
+    + '</g>'
+    + '</svg>',
+
+  'pauline-journeys': '<svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">'
+    + '<defs><linearGradient id="tlsvg-pj" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a0d1a"/><stop offset="55%" stop-color="#1a0d20"/><stop offset="100%" stop-color="#3d1818"/></linearGradient></defs>'
+    + '<rect width="800" height="300" fill="url(#tlsvg-pj)"/>'
+    + '<g fill="#fef3c7" opacity="0.55"><circle cx="80" cy="35" r="0.8"/><circle cx="200" cy="55" r="0.9"/><circle cx="400" cy="30" r="1.0"/><circle cx="540" cy="60" r="0.8"/><circle cx="700" cy="40" r="0.9"/></g>'
+    + '<path d="M 0 240 Q 200 230 400 245 T 800 240 L 800 300 L 0 300 Z" fill="rgba(56,30,40,.7)"/>'
+    + '<path d="M 0 260 Q 200 252 400 264 T 800 258 L 800 300 L 0 300 Z" fill="#0a0512" opacity="0.92"/>'
+    + '<g fill="#0a0d1a" stroke="rgba(248,113,113,.55)" stroke-width="1.2">'
+    + '<path d="M 320 232 L 480 232 L 460 260 L 340 260 Z"/>'
+    + '<rect x="395" y="160" width="3" height="72"/>'
+    + '<path d="M 360 180 L 395 168 L 395 232 L 360 232 Z" fill="rgba(248,113,113,.18)"/>'
+    + '<path d="M 398 168 L 435 180 L 435 232 L 398 232 Z" fill="rgba(248,113,113,.32)"/>'
+    + '<line x1="395" y1="160" x2="395" y2="155"/>'
+    + '</g>'
+    + '<g fill="#fbbf24" opacity="0.9"><path d="M 393 145 Q 396 130 400 145 Q 404 130 408 145 Q 404 152 400 148 Q 396 152 393 145 Z"/><circle cx="400" cy="142" r="2" opacity="0.8"/></g>'
+    + '<g stroke="rgba(251,191,36,.35)" stroke-width="0.7" fill="none" stroke-dasharray="2 4">'
+    + '<path d="M 80 250 Q 200 235 320 250"/><path d="M 480 250 Q 600 235 720 250"/>'
+    + '</g>'
+    + '</svg>',
+
+  'present': '<svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">'
+    + '<defs><linearGradient id="tlsvg-pr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a0d1a"/><stop offset="55%" stop-color="#0e2a3d"/><stop offset="100%" stop-color="#143850"/></linearGradient></defs>'
+    + '<rect width="800" height="300" fill="url(#tlsvg-pr)"/>'
+    + '<g fill="#fef3c7" opacity="0.6"><circle cx="80" cy="40" r="0.8"/><circle cx="220" cy="60" r="0.9"/><circle cx="380" cy="35" r="0.8"/><circle cx="560" cy="55" r="0.9"/><circle cx="700" cy="40" r="0.8"/></g>'
+    + '<g fill="#0a0d1a" opacity="0.92">'
+    + '<rect x="60" y="200" width="50" height="80"/><rect x="115" y="180" width="40" height="100"/><rect x="160" y="215" width="55" height="65"/><rect x="220" y="160" width="35" height="120"/><rect x="260" y="195" width="45" height="85"/><rect x="310" y="220" width="50" height="60"/>'
+    + '<rect x="440" y="190" width="40" height="90"/><rect x="485" y="170" width="45" height="110"/><rect x="535" y="200" width="35" height="80"/><rect x="575" y="155" width="40" height="125"/><rect x="620" y="210" width="50" height="70"/><rect x="675" y="195" width="45" height="85"/><rect x="725" y="225" width="55" height="55"/>'
+    + '</g>'
+    + '<g fill="rgba(56,189,248,.35)">'
+    + '<rect x="125" y="195" width="4" height="4"/><rect x="135" y="210" width="4" height="4"/><rect x="230" y="180" width="4" height="4"/><rect x="240" y="200" width="4" height="4"/><rect x="495" y="190" width="4" height="4"/><rect x="585" y="175" width="4" height="4"/><rect x="595" y="200" width="4" height="4"/><rect x="685" y="215" width="4" height="4"/>'
+    + '</g>'
+    + '<g fill="#fef3c7" stroke="#fbbf24" stroke-width="1">'
+    + '<path d="M 400 70 Q 388 60 384 75 Q 378 70 376 82 Q 372 80 374 92 L 388 92 Q 394 88 400 82 Q 406 88 412 92 L 426 92 Q 428 80 424 82 Q 422 70 416 75 Q 412 60 400 70 Z"/>'
+    + '<circle cx="400" cy="80" r="2" fill="#fbbf24"/>'
+    + '</g>'
+    + '<g stroke="rgba(251,191,36,.4)" stroke-width="0.6" fill="none" stroke-dasharray="2 3">'
+    + '<path d="M 400 105 Q 405 130 398 155 Q 392 175 400 195"/>'
+    + '</g>'
+    + '</svg>',
+
+  'future': '<svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">'
+    + '<defs><linearGradient id="tlsvg-fu" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fbbf24"/><stop offset="30%" stop-color="#f59e0b"/><stop offset="55%" stop-color="#7c2d12"/><stop offset="100%" stop-color="#0a0d1a"/></linearGradient>'
+    + '<radialGradient id="tlsvg-fu-glow" cx="50%" cy="30%" r="50%"><stop offset="0%" stop-color="rgba(255,255,255,.9)"/><stop offset="30%" stop-color="rgba(251,191,36,.7)"/><stop offset="100%" stop-color="rgba(251,191,36,0)"/></radialGradient></defs>'
+    + '<rect width="800" height="300" fill="url(#tlsvg-fu)"/>'
+    + '<rect width="800" height="300" fill="url(#tlsvg-fu-glow)" opacity="0.85"/>'
+    + '<g stroke="rgba(255,255,255,.55)" stroke-width="1.2" fill="none" opacity="0.7">'
+    + '<line x1="400" y1="80" x2="120" y2="280"/><line x1="400" y1="80" x2="250" y2="290"/><line x1="400" y1="80" x2="400" y2="290"/><line x1="400" y1="80" x2="550" y2="290"/><line x1="400" y1="80" x2="680" y2="280"/><line x1="400" y1="80" x2="50" y2="240"/><line x1="400" y1="80" x2="750" y2="240"/>'
+    + '</g>'
+    + '<g fill="rgba(10,13,26,.55)" stroke="rgba(251,191,36,.7)" stroke-width="1.5">'
+    + '<rect x="280" y="200" width="240" height="80"/>'
+    + '<path d="M 280 200 L 320 165 L 480 165 L 520 200 Z"/>'
+    + '<rect x="295" y="220" width="22" height="50" fill="rgba(251,191,36,.6)"/>'
+    + '<rect x="328" y="220" width="22" height="50" fill="rgba(251,191,36,.4)"/>'
+    + '<rect x="365" y="225" width="30" height="55" fill="rgba(251,191,36,.7)"/>'
+    + '<rect x="405" y="225" width="30" height="55" fill="rgba(251,191,36,.7)"/>'
+    + '<rect x="450" y="220" width="22" height="50" fill="rgba(251,191,36,.4)"/>'
+    + '<rect x="483" y="220" width="22" height="50" fill="rgba(251,191,36,.6)"/>'
+    + '</g>'
+    + '<g fill="#fef3c7" opacity="0.95"><polygon points="400,55 405,72 422,72 408,82 414,99 400,89 386,99 392,82 378,72 395,72"/></g>'
+    + '</svg>'
+};
+
 function _tlEvents(){ return (typeof window !== 'undefined' && window.BIBLE_TIMELINE_EVENTS) ? window.BIBLE_TIMELINE_EVENTS : []; }
 function _tlEventById(id){ return _tlEvents().find(e => e && e.id === id) || null; }
 function _tlEraById(id){ return TL_ERAS.find(e => e && e.id === id) || null; }
@@ -5981,39 +6188,93 @@ function scrollTimelineTo(eraId){
 
 function openTimelineEvent(eventId){
   const ev = _tlEventById(eventId);
-  if(!ev){ showToast('Event not found'); return; }
+  if(!ev){ if(typeof showToast==='function') showToast('Event not found'); return; }
   const era = _tlEraById(ev.era) || { label:'—', color:'#a78bfa', glow:'rgba(167,139,250,.22)' };
 
-  // Header glow tinted by era.
-  const glow = document.getElementById('tlEventEraGlow');
-  if(glow) glow.style.background = 'radial-gradient(ellipse at 50% 100%, ' + era.glow.replace('.22)','.4)').replace('.30)','.5)').replace('.32)','.5)') + ' 0%, transparent 65%)';
-  document.getElementById('tlEventMedallion').textContent = ev.icon || '⭐';
-  document.getElementById('tlEventEra').textContent = era.label.toUpperCase();
-  document.getElementById('tlEventYear').textContent = ev.displayYear || '';
-  document.getElementById('tlEventTitle').textContent = ev.title || '';
-  document.getElementById('tlEventSubtitle').textContent = ev.subtitle || '';
-  document.getElementById('tlEventBody').innerHTML = ev.body || '';
+  // Era SVG header (one illustration per era group, shared by all events).
+  const svgEl = document.getElementById('tlEventSvg');
+  if(svgEl){
+    const svg = (TL_ERA_SVGS && TL_ERA_SVGS[ev.era]) ? TL_ERA_SVGS[ev.era] : '';
+    svgEl.innerHTML = svg;
+  }
+
+  // Era label + scripture year context.
+  const eraEl = document.getElementById('tlEventEra');
+  if(eraEl) eraEl.textContent = (era.label.toUpperCase()) + ' · ' + (ev.displayYear || '').toUpperCase();
+  const yearEl = document.getElementById('tlEventYear');
+  if(yearEl) yearEl.textContent = ev.displayYear || '';
+
+  // Title + subtitle.
+  const titleEl = document.getElementById('tlEventTitle');
+  if(titleEl) titleEl.textContent = ev.title || '';
+  const subEl = document.getElementById('tlEventSubtitle');
+  if(subEl) subEl.textContent = ev.subtitle || '';
+
+  // Main narrative body (3-4 paragraphs).
+  const bodyEl = document.getElementById('tlEventBody');
+  if(bodyEl) bodyEl.innerHTML = ev.body || '';
+
+  // Why This Matters callout.
+  const whyWrap = document.getElementById('tlEventWhyWrap');
+  const whyEl = document.getElementById('tlEventWhy');
+  if(whyWrap && whyEl){
+    if(ev.whyMatters){
+      // Strip outer <p> tags if present so the <p> in markup doesn't double-wrap.
+      const cleaned = String(ev.whyMatters).replace(/^\s*<p>/, '').replace(/<\/p>\s*$/, '');
+      whyEl.innerHTML = cleaned;
+      whyWrap.style.display = '';
+    } else {
+      whyWrap.style.display = 'none';
+    }
+  }
+
+  // Key verse pull-quote.
+  const keyWrap = document.getElementById('tlEventKeyWrap');
+  const keyText = document.getElementById('tlEventKeyText');
+  const keyRef  = document.getElementById('tlEventKeyRef');
+  if(keyWrap && keyText && keyRef){
+    if(ev.keyVerse && ev.keyVerse.text && ev.keyVerse.ref){
+      keyText.textContent = '“' + ev.keyVerse.text + '”';
+      keyRef.textContent = '— ' + ev.keyVerse.ref;
+      keyWrap.style.display = '';
+    } else {
+      keyWrap.style.display = 'none';
+    }
+  }
 
   // Scripture refs as cyan chips that jump into the Bible reader.
   const refsEl = document.getElementById('tlEventRefs');
   if(refsEl){
     if((ev.scriptureRefs || []).length){
-      refsEl.innerHTML = ev.scriptureRefs.map(r =>
-        '<button onclick="bwJumpToRef(\''+r.replace(/\'/g,"\\'")+'\')" style="background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.4);color:#7dd3fc;border-radius:99px;padding:.3rem .7rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);">📖 '+_tlEsc(r)+'</button>'
-      ).join('');
+      refsEl.innerHTML = ev.scriptureRefs.map(function(r){
+        return '<button class="tlm-ref-chip" onclick="bwJumpToRef(\''+r.replace(/'/g,"\\'")+'\')">\u{1F4D6} '+_tlEsc(r)+'</button>';
+      }).join('');
     } else refsEl.innerHTML = '';
   }
 
-  // Related site link if any.
-  const siteEl = document.getElementById('tlEventSite');
-  if(siteEl){
+  // Related links: Story Mode + Bible Lands site.
+  const relEl = document.getElementById('tlEventRelated');
+  if(relEl){
+    let html = '';
+    if(ev.relatedStoryId){
+      html += '<button class="tlm-related-link" onclick="closeTimelineEvent();if(typeof openStory===\'function\')openStory(\''+ev.relatedStoryId+'\')">'
+           + '✨ <span style="flex:1;">See this in <strong>Story Mode</strong></span><span style="opacity:.7;">→</span>'
+           + '</button>';
+    }
     if(ev.relatedSiteId){
-      const s = _bwSiteById(ev.relatedSiteId);
+      const s = (typeof _bwSiteById === 'function') ? _bwSiteById(ev.relatedSiteId) : null;
       if(s){
-        siteEl.innerHTML = '<button onclick="closeTimelineEvent();openBwSite(\''+ev.relatedSiteId+'\')" style="width:100%;background:linear-gradient(135deg,rgba(167,139,250,.15),rgba(167,139,250,.05));border:1px solid rgba(167,139,250,.35);color:#c4b5fd;border-radius:10px;padding:.55rem .85rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);text-align:left;display:flex;align-items:center;gap:.5rem;">📍 <span style="flex:1;">Visit <strong style="color:#fff;">'+_tlEsc(s.name)+'</strong> in Bible Lands</span><span style="opacity:.6;">→</span></button>';
-      } else siteEl.innerHTML = '';
-    } else siteEl.innerHTML = '';
+        html += '<button class="tlm-related-link" onclick="closeTimelineEvent();openBwSite(\''+ev.relatedSiteId+'\')">'
+             + '\u{1F4CD} <span style="flex:1;">Visit <strong>'+_tlEsc(s.name)+'</strong> in Bible Lands</span><span style="opacity:.7;">→</span>'
+             + '</button>';
+      }
+    }
+    relEl.innerHTML = html;
   }
+
+  // Scroll body to top whenever a new event is opened.
+  const wrap = document.querySelector('#tlEventModal .tlm-body-wrap');
+  if(wrap) wrap.scrollTop = 0;
 
   if(typeof openModal === 'function') openModal('tlEventModal');
   if(typeof logActivity === 'function') logActivity('faith', 'Timeline event: ' + ev.title);
@@ -6242,10 +6503,16 @@ function _storyShowScene(idx){
   _storyStopNarration();
   _storyState.sceneIdx = idx;
 
+  // Lift the modal-level final-state class on/off the .md so the SVG collapses
+  // into a thin gold strip and the closing text can fill the card.
+  const modalEl = document.getElementById('storyPlayerModal');
+  const mdEl    = modalEl ? modalEl.querySelector('.md') : null;
+
   if(isClosing){
-    if(svgBox) svgBox.innerHTML = '';
-    if(eyebrowEl) eyebrowEl.textContent = 'Reflection';
-    if(titleEl)   titleEl.textContent   = story.title;
+    if(mdEl) mdEl.classList.add('sp-final');
+    if(svgBox){ svgBox.innerHTML = ''; svgBox.classList.remove('sp-fade-in'); }
+    if(eyebrowEl) eyebrowEl.textContent = '';
+    if(titleEl)   titleEl.textContent   = '';
     if(bibleEl){
       bibleEl.innerHTML = '';
       bibleEl.style.display = 'none';
@@ -6253,18 +6520,22 @@ function _storyShowScene(idx){
     if(narrEl){
       narrEl.innerHTML = ''
         + '<div class="sp-closing sp-fade-in">'
+        +   '<div class="sp-cl-story">' + _storyEsc(story.subtitle || '') + '</div>'
+        +   '<div class="sp-cl-heading">' + _storyEsc(story.title || '') + '</div>'
         +   '<div class="sp-cl-eye">' + _storyEsc(story.scriptureRef || 'Closing') + '</div>'
         +   '<div class="sp-cl-body">' + _storyEsc(story.closing || '') + '</div>'
         +   (story.closingPrompt ? '<div class="sp-cl-prompt">' + _storyEsc(story.closingPrompt) + '</div>' : '')
         + '</div>';
     }
-    if(stage) stage.style.background = 'radial-gradient(ellipse at center, rgba(251,191,36,.16), #0a0d1a 70%)';
-    if(prevBtn) prevBtn.disabled = false;
-    if(nextBtn){ nextBtn.textContent = 'Done ✓'; nextBtn.onclick = closeStory; }
+    if(stage) stage.style.background = '';
+    if(prevBtn){ prevBtn.disabled = false; prevBtn.textContent = '‹ Previous'; }
+    if(nextBtn){ nextBtn.textContent = '↻ Start Over'; nextBtn.onclick = function(){ _storyJumpScene(0); }; }
     _storyRenderProgress(idx, total);
     _storyAwardXp(story.id);
     return;
   }
+
+  if(mdEl) mdEl.classList.remove('sp-final');
 
   const scene = scenes[idx];
   if(!scene) return;
@@ -6287,7 +6558,7 @@ function _storyShowScene(idx){
     narrEl.classList.add('sp-fade-in');
     narrEl.textContent = scene.narration || '';
   }
-  if(prevBtn) prevBtn.disabled = (idx === 0);
+  if(prevBtn){ prevBtn.disabled = (idx === 0); prevBtn.textContent = '‹ Prev'; }
   if(nextBtn){
     nextBtn.disabled = false;
     nextBtn.textContent = (idx === total - 1) ? 'Reflect ›' : 'Next ›';
