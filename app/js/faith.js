@@ -1109,9 +1109,9 @@ async function togglePlanRefInline(refId, ref){
   }
 }
 function _planRefBoxHtml(ref, text){
-  return '<div style="background:rgba(11,18,32,.55);border:1px solid rgba(254,243,199,.18);border-radius:12px;padding:.85rem 1rem;font-family:Georgia,serif;font-size:.84rem;color:rgba(254,243,199,.92);line-height:1.75;white-space:pre-wrap;">'
+  return '<div style="background:var(--cd-card-bg,rgba(11,18,32,.55));border:1px solid rgba(127,127,127,.18);border-radius:12px;padding:.85rem 1rem;font-family:Georgia,serif;font-size:.84rem;color:var(--tx);line-height:1.75;white-space:pre-wrap;">'
     +   _planEsc(text)
-    +   '<div style="margin-top:.7rem;padding-top:.55rem;border-top:1px solid rgba(254,243,199,.08);font-size:.55rem;color:rgba(254,243,199,.4);font-style:italic;font-family:var(--fm);">Scripture from the ESV® Bible. © 2001 Crossway.</div>'
+    +   '<div style="margin-top:.7rem;padding-top:.55rem;border-top:1px solid rgba(127,127,127,.16);font-size:.55rem;color:var(--tx3);font-style:italic;font-family:var(--fm);">Scripture from the ESV® Bible. © 2001 Crossway.</div>'
     + '</div>';
 }
 
@@ -1138,9 +1138,9 @@ function renderPlanCatalog(){
         return `<div class="pl-active-banner" style="background:linear-gradient(135deg,${brand.soft}0.16),${brand.soft}0.04));border:1px solid ${brand.soft}0.32);">
           <div style="font-size:1.5rem;flex-shrink:0;">${plan.badgeIcon}</div>
           <div style="flex:1;min-width:0;">
-            <div style="font-family:'Bebas Neue',var(--fm);letter-spacing:.06em;font-size:1.05rem;color:#fef3c7;line-height:1.1;">${_planEsc(plan.title)}</div>
-            <div class="pl-active-bar" style="background:rgba(11,18,32,.5);"><div class="pl-active-bar-fill" style="width:${pct}%;background:${brand.color};"></div></div>
-            <div style="font-size:.66rem;font-weight:700;color:rgba(254,243,199,.75);">Day ${prog.currentDay} of ${prog.totalDays} · ${pct}%</div>
+            <div style="font-family:'Bebas Neue',var(--fm);letter-spacing:.06em;font-size:1.05rem;color:var(--tx);line-height:1.1;">${_planEsc(plan.title)}</div>
+            <div class="pl-active-bar" style="background:rgba(127,127,127,.18);"><div class="pl-active-bar-fill" style="width:${pct}%;background:${brand.color};"></div></div>
+            <div style="font-size:.66rem;font-weight:700;color:var(--tx2);">Day ${prog.currentDay} of ${prog.totalDays} · ${pct}%</div>
           </div>
           <button onclick="openPlanDetail('${id}')" style="background:${brand.color};color:#0b1220;border:none;border-radius:10px;padding:.55rem .95rem;font-size:.74rem;font-weight:800;cursor:pointer;font-family:var(--fm);flex-shrink:0;">Resume →</button>
         </div>`;
@@ -1162,30 +1162,30 @@ function renderPlanCatalog(){
     const isActive    = !!store.active[p.id];
     const isCompleted = store.completed.some(c => c && c.planId === p.id);
     const statusBit = isActive
-      ? `<span style="color:rgba(254,243,199,.4);">·</span><span style="color:#fef3c7;">Day ${store.active[p.id].currentDay} of ${p.days}</span>`
+      ? `<span style="color:var(--tx3);">·</span><span style="color:var(--tx);">Day ${store.active[p.id].currentDay} of ${p.days}</span>`
       : isCompleted
-        ? `<span style="color:rgba(254,243,199,.4);">·</span><span style="color:#22c55e;">✓ Done</span>`
+        ? `<span style="color:var(--tx3);">·</span><span style="color:#22c55e;">✓ Done</span>`
         : '';
     const cta = isActive ? 'Resume →' : isCompleted ? 'Re-read →' : 'Start →';
     return ''
       + '<button class="pl-card-v2" onclick="openPlanDetail(' + JSON.stringify(p.id) + ')" '
-      +   'style="all:unset;cursor:pointer;display:block;'
+      +   'style="appearance:none;-webkit-appearance:none;cursor:pointer;display:block;width:100%;text-align:left;font:inherit;'
       +   'background:linear-gradient(135deg,' + brand.soft + '0.10),' + brand.soft + '0.02));'
       +   'border:1px solid ' + brand.soft + '0.28);border-radius:16px;padding:1rem 1.1rem;'
       +   'transition:transform .15s, border-color .15s, background .15s, box-shadow .15s;'
-      +   'font-family:var(--fm);position:relative;overflow:hidden;box-shadow:0 4px 18px rgba(11,18,32,.18);"'
-      +   ' onmouseenter="this.style.transform=\'translateY(-3px) scale(1.01)\';this.style.borderColor=\'' + brand.color + '\';this.style.boxShadow=\'0 10px 28px rgba(11,18,32,.28)\'"'
-      +   ' onmouseleave="this.style.transform=\'\';this.style.borderColor=\'' + brand.soft + '0.28)\';this.style.boxShadow=\'0 4px 18px rgba(11,18,32,.18)\'">'
+      +   'font-family:var(--fm);position:relative;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.10);color:var(--tx);"'
+      +   ' onmouseenter="this.style.transform=\'translateY(-3px) scale(1.01)\';this.style.borderColor=\'' + brand.color + '\';this.style.boxShadow=\'0 10px 28px rgba(0,0,0,.18)\'"'
+      +   ' onmouseleave="this.style.transform=\'\';this.style.borderColor=\'' + brand.soft + '0.28)\';this.style.boxShadow=\'0 4px 18px rgba(0,0,0,.10)\'">'
       + '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;">'
       +   '<span style="font-size:1.7rem;line-height:1;">' + _planEsc(p.badgeIcon || '📖') + '</span>'
-      +   '<div style="font-family:\'Bebas Neue\',var(--fm);letter-spacing:.06em;font-size:1.18rem;color:#fef3c7;line-height:1.05;flex:1;min-width:0;">' + _planEsc(p.title) + '</div>'
+      +   '<div style="font-family:\'Bebas Neue\',var(--fm);letter-spacing:.06em;font-size:1.18rem;color:var(--tx);line-height:1.05;flex:1;min-width:0;">' + _planEsc(p.title) + '</div>'
       +   '<span style="font-size:.56rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:' + brand.color + ';background:' + brand.soft + '0.18);border:1px solid ' + brand.soft + '0.35);padding:.18rem .55rem;border-radius:99px;white-space:nowrap;">' + _planEsc(planCategoryLabel(p.category)) + '</span>'
       + '</div>'
-      + '<div style="font-family:Georgia,serif;font-style:italic;font-size:.78rem;color:rgba(254,243,199,.72);line-height:1.55;margin-bottom:.7rem;">' + _planEsc(p.short) + '</div>'
+      + '<div style="font-family:Georgia,serif;font-style:italic;font-size:.78rem;color:var(--tx2);line-height:1.55;margin-bottom:.7rem;">' + _planEsc(p.short) + '</div>'
       + '<div style="display:flex;align-items:center;gap:.45rem;font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:' + brand.color + ';">'
       +   '<span>' + p.days + ' days</span>'
       +   statusBit
-      +   '<span style="margin-left:auto;color:#fef3c7;">' + cta + '</span>'
+      +   '<span style="margin-left:auto;color:var(--tx);">' + cta + '</span>'
       + '</div>'
       + '</button>';
   }).join('');
@@ -1208,39 +1208,39 @@ function _planDayHtml(p, d, prog, completedArchive, todayDay){
   const brand = _planBrand(p);
   const completed = !!(prog && prog.completedDays && prog.completedDays[d.day]) || (!!completedArchive);
   const isToday   = !!prog && d.day === todayDay && !completed;
-  const dayBg  = completed ? 'rgba(34,197,94,.06)' : isToday ? brand.soft + '0.08)' : 'rgba(254,243,199,.025)';
+  const dayBg  = completed ? 'rgba(34,197,94,.06)' : isToday ? brand.soft + '0.08)' : 'rgba(127,127,127,.04)';
   const dayBdr = completed ? 'rgba(34,197,94,.32)' : isToday ? brand.color : brand.soft + '0.18)';
   const isEnriched = !!(d.dayTitle || d.devotional || d.keyVerse || d.prayerStarter);
 
   const dayBadge = '<span style="font-family:\'Bebas Neue\',var(--fm);font-size:.7rem;font-weight:800;background:' + (completed?'#22c55e':brand.color) + ';color:#0b1220;border-radius:99px;padding:.22rem .7rem;letter-spacing:.12em;">DAY ' + d.day + '</span>';
   const readMark = completed ? '<span style="font-size:.62rem;color:#22c55e;font-weight:800;letter-spacing:.1em;">✓ READ</span>' : '';
-  const todayMark = isToday ? '<span style="font-size:.55rem;color:#0b1220;background:#fef3c7;font-weight:800;border-radius:4px;padding:.15rem .45rem;letter-spacing:.1em;">TODAY</span>' : '';
+  const todayMark = isToday ? '<span style="font-size:.55rem;color:#0b1220;background:' + brand.color + ';font-weight:800;border-radius:4px;padding:.15rem .45rem;letter-spacing:.1em;">TODAY</span>' : '';
   const headerHtml = '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.65rem;">' + dayBadge + readMark + todayMark + '</div>';
 
   const dayTitleHtml = d.dayTitle
-    ? '<div style="font-family:\'Bebas Neue\',var(--fm);letter-spacing:.05em;font-size:1.35rem;color:#fef3c7;line-height:1.08;margin-bottom:.7rem;">' + _planEsc(d.dayTitle) + '</div>'
+    ? '<div style="font-family:\'Bebas Neue\',var(--fm);letter-spacing:.05em;font-size:1.35rem;color:var(--tx);line-height:1.08;margin-bottom:.7rem;">' + _planEsc(d.dayTitle) + '</div>'
     : '';
 
   const keyVerseHtml = (d.keyVerse && d.keyVerse.text)
     ? '<div style="background:' + brand.soft + '0.08);border-left:3px solid ' + brand.color + ';border-radius:0 10px 10px 0;padding:.75rem .95rem;margin-bottom:.85rem;">'
-        + '<div style="font-family:Georgia,serif;font-style:italic;font-size:.92rem;color:#fef3c7;line-height:1.6;">' + _planEsc(d.keyVerse.text) + '</div>'
+        + '<div style="font-family:Georgia,serif;font-style:italic;font-size:.92rem;color:var(--tx);line-height:1.6;">' + _planEsc(d.keyVerse.text) + '</div>'
         + '<div style="margin-top:.4rem;font-family:\'Bebas Neue\',var(--fm);font-size:.7rem;font-weight:800;letter-spacing:.14em;color:' + brand.color + ';">— ' + _planEsc(d.keyVerse.ref || '') + '</div>'
       + '</div>'
     : '';
 
   const devotionalHtml = d.devotional
     ? '<div style="font-family:\'Bebas Neue\',var(--fm);font-size:.7rem;font-weight:800;letter-spacing:.18em;color:' + brand.color + ';margin-bottom:.45rem;">DEVOTIONAL</div>'
-      + '<div style="font-family:Georgia,serif;font-size:.85rem;color:rgba(254,243,199,.88);line-height:1.7;margin-bottom:.95rem;">' + _planParaHtml(d.devotional) + '</div>'
+      + '<div style="font-family:Georgia,serif;font-size:.85rem;color:var(--tx);line-height:1.7;margin-bottom:.95rem;opacity:.92;">' + _planParaHtml(d.devotional) + '</div>'
     : '';
 
   const refsLabel = (d.devotional || d.keyVerse) ? 'ALSO READ' : "TODAY'S READING";
   const refsHtml = (d.refs && d.refs.length)
-    ? '<div style="font-family:\'Bebas Neue\',var(--fm);font-size:.7rem;font-weight:800;letter-spacing:.18em;color:rgba(254,243,199,.55);margin-bottom:.45rem;">' + refsLabel + '</div>'
+    ? '<div style="font-family:\'Bebas Neue\',var(--fm);font-size:.7rem;font-weight:800;letter-spacing:.18em;color:var(--tx3);margin-bottom:.45rem;">' + refsLabel + '</div>'
       + '<div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.85rem;">'
         + d.refs.map(function(r, i){
             const refId = 'planRef-' + p.id + '-d' + d.day + '-r' + i;
             const refJson = JSON.stringify(r).replace(/"/g,'&quot;');
-            return '<button onclick="togglePlanRefInline(\'' + refId + '\', ' + refJson + ')" style="background:' + brand.soft + '0.12);border:1px solid ' + brand.soft + '0.32);color:#fef3c7;border-radius:8px;padding:.35rem .7rem;font-size:.72rem;font-weight:700;cursor:pointer;font-family:var(--fm);">'
+            return '<button onclick="togglePlanRefInline(\'' + refId + '\', ' + refJson + ')" style="background:' + brand.soft + '0.12);border:1px solid ' + brand.soft + '0.32);color:var(--tx);border-radius:8px;padding:.35rem .7rem;font-size:.72rem;font-weight:700;cursor:pointer;font-family:var(--fm);">'
               + '📖 ' + _planEsc(r) + ' <span id="' + refId + '-caret" style="margin-left:.25rem;font-size:.6rem;opacity:.75;">▸</span>'
               + '</button>'
               + '<div id="' + refId + '-box" style="display:none;width:100%;margin-bottom:.4rem;"></div>';
@@ -1250,12 +1250,12 @@ function _planDayHtml(p, d, prog, completedArchive, todayDay){
 
   const promptHtml = d.prompt
     ? '<div style="font-family:\'Bebas Neue\',var(--fm);font-size:.7rem;font-weight:800;letter-spacing:.18em;color:' + brand.color + ';margin-bottom:.45rem;">REFLECT</div>'
-      + '<div style="font-family:Georgia,serif;font-style:italic;font-size:.82rem;color:rgba(254,243,199,.85);line-height:1.65;margin-bottom:.95rem;">' + _planEsc(d.prompt) + '</div>'
+      + '<div style="font-family:Georgia,serif;font-style:italic;font-size:.82rem;color:var(--tx2);line-height:1.65;margin-bottom:.95rem;">' + _planEsc(d.prompt) + '</div>'
     : '';
 
   const prayerHtml = d.prayerStarter
     ? '<div style="font-family:\'Bebas Neue\',var(--fm);font-size:.7rem;font-weight:800;letter-spacing:.18em;color:' + brand.color + ';margin-bottom:.45rem;">A PRAYER TO BEGIN</div>'
-      + '<div style="background:rgba(11,18,32,.45);border:1px solid ' + brand.soft + '0.22);border-radius:10px;padding:.7rem .9rem;font-family:Georgia,serif;font-style:italic;font-size:.82rem;color:#fef3c7;line-height:1.65;">' + _planEsc(d.prayerStarter) + '</div>'
+      + '<div style="background:' + brand.soft + '0.06);border:1px solid ' + brand.soft + '0.22);border-radius:10px;padding:.7rem .9rem;font-family:Georgia,serif;font-style:italic;font-size:.82rem;color:var(--tx);line-height:1.65;">' + _planEsc(d.prayerStarter) + '</div>'
     : '';
 
   const completeBtn = isToday
@@ -1265,7 +1265,7 @@ function _planDayHtml(p, d, prog, completedArchive, todayDay){
   // Padding scales with whether the day is rich or minimal so legacy
   // days still feel intentional, not anaemic.
   const pad = isEnriched ? '1.05rem 1.15rem' : '.85rem 1rem';
-  return '<div style="background:' + dayBg + ';border:1px solid ' + dayBdr + ';border-radius:16px;padding:' + pad + ';box-shadow:0 2px 10px rgba(11,18,32,.15);">'
+  return '<div style="background:' + dayBg + ';border:1px solid ' + dayBdr + ';border-radius:16px;padding:' + pad + ';box-shadow:0 2px 10px rgba(0,0,0,.08);">'
     + headerHtml + dayTitleHtml + keyVerseHtml + devotionalHtml + refsHtml + promptHtml + prayerHtml + completeBtn
     + '</div>';
 }
@@ -1294,7 +1294,7 @@ function openPlanDetail(planId){
   body.innerHTML = ''
     + routeMapHtml
     + '<div style="font-family:\'Bebas Neue\',var(--fm);font-size:.72rem;color:' + brand.color + ';text-transform:uppercase;letter-spacing:.2em;font-weight:800;margin-bottom:.65rem;">'
-    +   _planEsc(planCategoryLabel(p.category)) + ' · ' + p.days + ' days · ' + (p.audience === 'all' ? 'For everyone' : _planEsc(p.audience))
+    +   _planEsc(planCategoryLabel(p.category)) + ' <span style="color:var(--tx3);">·</span> ' + p.days + ' days <span style="color:var(--tx3);">·</span> <span style="color:var(--tx2);">' + (p.audience === 'all' ? 'For everyone' : _planEsc(p.audience)) + '</span>'
     + '</div>'
     + '<div style="display:flex;flex-direction:column;gap:.55rem;">'
     +   p.daysData.map(function(d){ return _planDayHtml(p, d, prog, completedArchive, todayDay); }).join('')
@@ -6078,32 +6078,46 @@ function renderFaithHomeStories(){
   if(!list) return;
   const stories = _getStories();
   if(!stories.length){
-    list.innerHTML = '<div style="font-size:.78rem;color:rgba(254,243,199,.55);font-family:Georgia,serif;font-style:italic;padding:.4rem .2rem;">More stories arriving in upcoming releases.</div>';
+    list.innerHTML = '<div style="font-size:.78rem;color:var(--tx3);font-family:Georgia,serif;font-style:italic;padding:.4rem .2rem;">More stories arriving in upcoming releases.</div>';
     return;
   }
+  // Story cards now use data-story-id + a delegated click handler instead of
+  // an inline onclick. The previous inline `onclick` on a `<button style="all:unset">`
+  // was occasionally not firing on mobile/iOS — `all:unset` plus inline handlers
+  // is a fragile combination. Delegated click on the grid container is bulletproof.
   list.innerHTML = stories.map(function(s){
     const sceneCount = (s.scenes || []).length;
-    const safeId = String(s.id).replace(/'/g, "\\'");
     const accent = s.color || '#fbbf24';
     return ''
-      + '<button class="fh-story-tile" onclick="openStory(\'' + safeId + '\')" '
-      + 'style="all:unset;cursor:pointer;display:block;background:rgba(254,243,199,.04);border:1px solid rgba(254,243,199,.12);'
+      + '<button type="button" class="fh-story-tile" data-story-id="' + _storyEsc(s.id) + '" '
+      + 'style="appearance:none;-webkit-appearance:none;background:rgba(254,243,199,.04);border:1px solid rgba(254,243,199,.12);'
+      + 'color:inherit;font:inherit;text-align:left;cursor:pointer;display:block;width:100%;'
       + 'border-radius:14px;padding:.85rem .95rem;transition:transform .15s, border-color .15s, background .15s;'
       + 'font-family:var(--fm);position:relative;overflow:hidden;"'
       + ' onmouseenter="this.style.transform=\'translateY(-2px)\';this.style.background=\'rgba(254,243,199,.08)\';this.style.borderColor=\'' + accent + '\'"'
       + ' onmouseleave="this.style.transform=\'\';this.style.background=\'rgba(254,243,199,.04)\';this.style.borderColor=\'rgba(254,243,199,.12)\'">'
       + '<div style="display:flex;align-items:center;gap:.55rem;margin-bottom:.4rem;">'
       +   '<span style="font-size:1.4rem;line-height:1;">' + (s.icon || '⭐') + '</span>'
-      +   '<div style="font-family:\'Bebas Neue\',var(--fm);letter-spacing:.06em;font-size:1.05rem;color:#fef3c7;line-height:1.05;">' + _storyEsc(s.title) + '</div>'
+      +   '<div style="font-family:\'Bebas Neue\',var(--fm);letter-spacing:.06em;font-size:1.05rem;color:var(--tx);line-height:1.05;">' + _storyEsc(s.title) + '</div>'
       + '</div>'
-      + '<div style="font-family:Georgia,serif;font-style:italic;font-size:.76rem;color:rgba(254,243,199,.7);line-height:1.5;margin-bottom:.55rem;">' + _storyEsc(s.subtitle || '') + '</div>'
+      + '<div style="font-family:Georgia,serif;font-style:italic;font-size:.76rem;color:var(--tx2);line-height:1.5;margin-bottom:.55rem;">' + _storyEsc(s.subtitle || '') + '</div>'
       + '<div style="display:flex;align-items:center;gap:.5rem;font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:' + accent + ';">'
       +   '<span>' + sceneCount + ' scenes</span>'
-      +   (s.duration ? '<span style="color:rgba(254,243,199,.4);">·</span><span style="color:rgba(254,243,199,.55);">' + _storyEsc(s.duration) + '</span>' : '')
-      +   '<span style="margin-left:auto;color:rgba(254,243,199,.55);">Begin →</span>'
+      +   (s.duration ? '<span style="color:var(--tx3);">·</span><span style="color:var(--tx3);">' + _storyEsc(s.duration) + '</span>' : '')
+      +   '<span style="margin-left:auto;color:var(--tx2);">Begin →</span>'
       + '</div>'
       + '</button>';
   }).join('');
+  // Wire delegated click. Idempotent — replace any prior listener via a flag.
+  if(!list.__storyClickBound){
+    list.addEventListener('click', function(e){
+      const btn = e.target && e.target.closest ? e.target.closest('[data-story-id]') : null;
+      if(!btn) return;
+      const id = btn.getAttribute('data-story-id');
+      if(id && typeof openStory === 'function') openStory(id);
+    });
+    list.__storyClickBound = true;
+  }
 }
 
 function openStory(storyId){
