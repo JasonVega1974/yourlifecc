@@ -12134,6 +12134,1363 @@ const BIBLE_STORIES = [
     closingPrompt: 'What is your "one thing I know" — the moment in your life that you cannot explain away and would not trade for any argument the world has made against your faith?'
   },
 
+  // ════════════════════════════════════════════════════════════
+  // STORY 39 — Creation
+  // ════════════════════════════════════════════════════════════
+  {
+    id: 'creation',
+    title: 'Creation',
+    subtitle: 'Six days. Out of nothing. By a Word.',
+    icon: '🌍',
+    color: '#34d399',
+    accentColor: '#fef3c7',
+    era: 'creation',
+    scriptureRef: 'Genesis 1-2',
+    duration: '~7 min',
+    scenes: [
+      {
+        id: 'in-beginning',
+        title: 'In the Beginning',
+        scriptureRef: 'Genesis 1:1-5',
+        bibleText: '"In the beginning, God created the heavens and the earth. The earth was without form and void, and darkness was over the face of the deep… And God said, ‘Let there be light,’ and there was light."',
+        narration: 'There was no "before." There was no light, no time, no matter, no space. Just God, alone, sufficient, eternal. Then He spoke. Light flooded what had been only darkness. He saw that the light was good, and He separated the light from the dark. He called the light "day" and the dark "night." Evening and morning — the first day. The universe had a beginning, and the beginning had a Person standing over it.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          <defs>
+            <linearGradient id="crd1" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#000a14"/>
+              <stop offset="40%" stop-color="#0a0d1a"/>
+              <stop offset="60%" stop-color="#fbbf24"/>
+              <stop offset="100%" stop-color="#fef3c7"/>
+            </linearGradient>
+            <radialGradient id="crd1Burst" cx="0.5" cy="0.5" r="0.55">
+              <stop offset="0%" stop-color="#fef3c7"/>
+              <stop offset="35%" stop-color="rgba(254,243,199,0.85)"/>
+              <stop offset="100%" stop-color="rgba(251,191,36,0)"/>
+            </radialGradient>
+          </defs>
+          <rect width="800" height="500" fill="url(#crd1)"/>
+          <!-- The single sphere of light, just appearing, with dark void around it -->
+          <ellipse cx="400" cy="250" rx="500" ry="280" fill="url(#crd1Burst)"/>
+          <circle cx="400" cy="250" r="80" fill="#fef3c7"/>
+          <circle cx="400" cy="250" r="50" fill="#ffffff"/>
+          <!-- Vertical separator: light vs darkness -->
+          <line x1="400" y1="0" x2="400" y2="500" stroke="rgba(254,243,199,0.55)" stroke-width="1" stroke-dasharray="3 6"/>
+          <text x="200" y="120" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="14" letter-spacing="4" fill="rgba(254,243,199,0.65)">NIGHT</text>
+          <text x="600" y="120" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="14" letter-spacing="4" fill="#0a0d1a">DAY</text>
+          <text x="400" y="80" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="22" letter-spacing="6" fill="rgba(254,243,199,0.95)">"LET THERE BE LIGHT"</text>
+          <!-- Ground / waters below -->
+          <path d="M 0 420 Q 400 410 800 420 L 800 500 L 0 500 Z" fill="rgba(56,189,248,0.4)" opacity="0.55"/>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.85)">Evening and morning · the first day</text>
+        </svg>`
+      },
+      {
+        id: 'sky-sea-land',
+        title: 'Sky · Sea · Land',
+        scriptureRef: 'Genesis 1:6-13',
+        bibleText: '"And God said, ‘Let the dry land appear.’ And it was so… God called the dry land Earth, and the waters that were gathered together he called Seas. And God saw that it was good."',
+        narration: 'On the second day He separated the waters above from the waters below — sky from sea. On the third day He gathered the waters together and let the dry land appear. Then He spoke to the land: "Let the earth sprout vegetation, plants yielding seed, fruit trees bearing fruit in which is their seed, each according to its kind." Everything that grows since has come from that first word.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          <defs>
+            <linearGradient id="crd2Sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#3d2a5e"/>
+              <stop offset="60%" stop-color="#a78bfa"/>
+              <stop offset="100%" stop-color="#fbbf24"/>
+            </linearGradient>
+          </defs>
+          <rect width="800" height="500" fill="url(#crd2Sky)"/>
+          <!-- Sea -->
+          <path d="M 0 280 Q 200 270 400 280 Q 600 270 800 280 L 800 360 L 0 360 Z" fill="#1e1846"/>
+          <g stroke="rgba(254,243,199,0.55)" stroke-width="1.5" fill="none">
+            <path d="M 60 300 Q 100 290 140 300"/>
+            <path d="M 240 320 Q 280 310 320 320"/>
+            <path d="M 460 310 Q 500 300 540 310"/>
+            <path d="M 660 320 Q 700 310 740 320"/>
+          </g>
+          <!-- Dry land emerging -->
+          <path d="M 100 360 Q 200 320 300 340 Q 400 310 500 340 Q 600 320 700 360 L 700 500 L 100 500 Z" fill="rgba(74,52,32,0.85)"/>
+          <path d="M 100 380 Q 400 360 700 380 L 700 500 L 100 500 Z" fill="rgba(34,197,94,0.45)"/>
+          <!-- Plants sprouting -->
+          <g>
+            <line x1="200" y1="430" x2="200" y2="400" stroke="rgba(34,197,94,0.85)" stroke-width="2"/>
+            <ellipse cx="195" cy="400" rx="8" ry="3" transform="rotate(-30 195 400)" fill="rgba(34,197,94,0.7)"/>
+            <ellipse cx="205" cy="402" rx="8" ry="3" transform="rotate(30 205 402)" fill="rgba(34,197,94,0.7)"/>
+            <line x1="300" y1="440" x2="300" y2="395" stroke="rgba(34,197,94,0.85)" stroke-width="2"/>
+            <ellipse cx="300" cy="390" rx="14" ry="10" fill="rgba(34,197,94,0.7)"/>
+            <circle cx="298" cy="395" r="2" fill="rgba(251,113,38,0.85)"/>
+            <line x1="500" y1="430" x2="500" y2="400" stroke="rgba(34,197,94,0.85)" stroke-width="2"/>
+            <ellipse cx="495" cy="400" rx="9" ry="3" transform="rotate(-30 495 400)" fill="rgba(34,197,94,0.7)"/>
+            <ellipse cx="505" cy="402" rx="9" ry="3" transform="rotate(30 505 402)" fill="rgba(34,197,94,0.7)"/>
+            <!-- Small fruit tree -->
+            <line x1="600" y1="440" x2="600" y2="390" stroke="#3d2a16" stroke-width="3"/>
+            <ellipse cx="600" cy="380" rx="22" ry="18" fill="rgba(34,197,94,0.75)"/>
+            <circle cx="592" cy="378" r="3" fill="rgba(251,113,38,0.95)"/>
+            <circle cx="608" cy="382" r="3" fill="rgba(251,113,38,0.95)"/>
+          </g>
+          <!-- Sun rising small -->
+          <circle cx="660" cy="180" r="22" fill="#fef3c7"/>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">Day two · day three · "and it was good"</text>
+        </svg>`
+      },
+      {
+        id: 'lights-creatures',
+        title: 'Lights · Fish · Birds',
+        scriptureRef: 'Genesis 1:14-23',
+        bibleText: '"God made the two great lights — the greater light to govern the day and the lesser light to govern the night — and the stars… So God created the great sea creatures and every living creature that moves… And God blessed them."',
+        narration: 'On the fourth day He hung the sun in the sky and the moon and the stars. He set them to mark seasons and years and days. On the fifth day He filled the seas with creatures of every kind and the sky with birds. He blessed them: "Be fruitful and multiply. Fill the waters in the seas, and let birds multiply on the earth." Life everywhere, by His word, in days.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'crd3', skyTop:'#3d2a5e', skyMid:'#a78bfa', skyBot:'#fbbf24', stars:true})}
+          <!-- Sun -->
+          <circle cx="200" cy="120" r="40" fill="#fef3c7"/>
+          <circle cx="200" cy="120" r="60" fill="rgba(251,113,38,0.45)"/>
+          <!-- Moon -->
+          <g transform="translate(600 110)">
+            <circle r="32" fill="#fef3c7" opacity="0.85"/>
+            <circle r="26" fill="#fef3c7"/>
+            <circle r="26" fill="#3d2a5e" transform="translate(8 -3)"/>
+          </g>
+          <!-- Sea -->
+          <path d="M 0 320 Q 400 308 800 320 L 800 500 L 0 500 Z" fill="#1e1846"/>
+          <g stroke="rgba(254,243,199,0.5)" stroke-width="1.5" fill="none">
+            <path d="M 60 340 Q 100 330 140 340"/>
+            <path d="M 360 350 Q 400 340 440 350"/>
+            <path d="M 660 345 Q 700 335 740 345"/>
+          </g>
+          <!-- Fish in sea -->
+          <g fill="rgba(254,243,199,0.85)">
+            <g transform="translate(120 380)">
+              <path d="M 0 0 Q 14 -6 22 0 L 28 -4 L 28 4 Z"/>
+              <circle cx="6" cy="-2" r="1.5" fill="#0a0d1a"/>
+            </g>
+            <g transform="translate(300 420)">
+              <path d="M 0 0 Q 14 -6 22 0 L 28 -4 L 28 4 Z"/>
+              <circle cx="6" cy="-2" r="1.5" fill="#0a0d1a"/>
+            </g>
+            <g transform="translate(480 400)">
+              <path d="M 0 0 Q 14 -6 22 0 L 28 -4 L 28 4 Z"/>
+              <circle cx="6" cy="-2" r="1.5" fill="#0a0d1a"/>
+            </g>
+            <g transform="translate(640 430)">
+              <path d="M 0 0 Q 14 -6 22 0 L 28 -4 L 28 4 Z"/>
+              <circle cx="6" cy="-2" r="1.5" fill="#0a0d1a"/>
+            </g>
+          </g>
+          <!-- Whale silhouette -->
+          <g transform="translate(180 440)" fill="#0a0d1a">
+            <ellipse cx="0" cy="0" rx="60" ry="14"/>
+            <path d="M 56 -4 L 80 -16 L 80 12 L 56 4 Z"/>
+            <circle cx="-32" cy="-4" r="2" fill="rgba(254,243,199,0.85)"/>
+          </g>
+          <!-- Birds in sky -->
+          <g stroke="#0a0d1a" stroke-width="1.8" fill="none">
+            <path d="M 100 220 Q 110 212 120 220 Q 130 212 140 220"/>
+            <path d="M 280 180 Q 290 172 300 180 Q 310 172 320 180"/>
+            <path d="M 440 220 Q 450 212 460 220 Q 470 212 480 220"/>
+            <path d="M 540 160 Q 550 152 560 160 Q 570 152 580 160"/>
+            <path d="M 700 200 Q 710 192 720 200 Q 730 192 740 200"/>
+          </g>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">Day four · day five · "be fruitful and multiply"</text>
+        </svg>`
+      },
+      {
+        id: 'animals-adam',
+        title: 'Beasts · Adam · Eve',
+        scriptureRef: 'Genesis 1:24-31 · 2:7, 2:21-22',
+        bibleText: '"Then God said, ‘Let us make man in our image, after our likeness.’ …Then the Lord God formed the man of dust from the ground and breathed into his nostrils the breath of life, and the man became a living creature."',
+        narration: 'On the sixth day He filled the land with every kind of animal — beasts and creeping things and livestock. And then, set apart from all the rest, He bent down in the dust of His new world and shaped a creature from clay. He breathed into him. The man stood up — living, conscious, alive — bearing the image of his Maker. And then, knowing it was not good for him to be alone, He made the woman from the man\'s own side. They were given a garden and a vocation and each other.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'crd4', skyTop:'#a78bfa', skyMid:'#fbbf24', skyBot:'#fef3c7', stars:false})}
+          <ellipse cx="660" cy="100" r="40" fill="#fef3c7"/>
+          <ellipse cx="660" cy="100" r="60" fill="rgba(251,191,36,0.5)"/>
+          <!-- Green garden -->
+          <path d="M 0 280 Q 400 250 800 280 L 800 500 L 0 500 Z" fill="rgba(34,197,94,0.4)"/>
+          <path d="M 0 380 Q 400 368 800 380 L 800 500 L 0 500 Z" fill="rgba(34,197,94,0.6)"/>
+          <!-- Tree of life center back -->
+          <g transform="translate(400 280)">
+            <line x1="0" y1="0" x2="0" y2="-90" stroke="#3d2a16" stroke-width="8"/>
+            <ellipse cx="0" cy="-110" rx="60" ry="44" fill="rgba(34,197,94,0.75)"/>
+            <circle cx="-30" cy="-118" r="4" fill="rgba(251,113,38,0.9)"/>
+            <circle cx="30" cy="-110" r="4" fill="rgba(251,113,38,0.9)"/>
+            <circle cx="-10" cy="-130" r="4" fill="rgba(251,113,38,0.9)"/>
+            <circle cx="14" cy="-128" r="4" fill="rgba(251,113,38,0.9)"/>
+          </g>
+          <!-- Animals scattered -->
+          <g fill="#1a1233" opacity="0.85">
+            <!-- Lion (left) -->
+            <g transform="translate(120 380)">
+              <ellipse cx="0" cy="0" rx="32" ry="12"/>
+              <circle cx="-28" cy="-6" r="14"/>
+              <circle cx="-28" cy="-6" r="20" fill="none" stroke="#0a0d1a" stroke-width="3"/>
+              <line x1="-18" y1="10" x2="-18" y2="24" stroke="#1a1233" stroke-width="3"/>
+              <line x1="0" y1="10" x2="0" y2="24" stroke="#1a1233" stroke-width="3"/>
+              <line x1="20" y1="10" x2="20" y2="24" stroke="#1a1233" stroke-width="3"/>
+            </g>
+            <!-- Deer (right back) -->
+            <g transform="translate(640 360)">
+              <ellipse cx="0" cy="0" rx="22" ry="10"/>
+              <ellipse cx="-22" cy="-8" rx="6" ry="7"/>
+              <line x1="-22" y1="-16" x2="-26" y2="-26" stroke="#1a1233" stroke-width="2"/>
+              <line x1="-22" y1="-16" x2="-18" y2="-26" stroke="#1a1233" stroke-width="2"/>
+              <line x1="-12" y1="10" x2="-12" y2="22" stroke="#1a1233" stroke-width="2.5"/>
+              <line x1="12" y1="10" x2="12" y2="22" stroke="#1a1233" stroke-width="2.5"/>
+            </g>
+            <!-- Cow / bovine -->
+            <g transform="translate(700 410)">
+              <ellipse cx="0" cy="0" rx="26" ry="11"/>
+              <ellipse cx="-24" cy="-4" rx="8" ry="7"/>
+              <line x1="-12" y1="11" x2="-12" y2="22" stroke="#1a1233" stroke-width="2.5"/>
+              <line x1="12" y1="11" x2="12" y2="22" stroke="#1a1233" stroke-width="2.5"/>
+            </g>
+            <!-- Small creature (rabbit) -->
+            <g transform="translate(220 420)">
+              <ellipse cx="0" cy="0" rx="10" ry="7"/>
+              <ellipse cx="-7" cy="-6" rx="4" ry="4"/>
+              <line x1="-8" y1="-10" x2="-9" y2="-16" stroke="#1a1233" stroke-width="1.5"/>
+              <line x1="-5" y1="-10" x2="-4" y2="-16" stroke="#1a1233" stroke-width="1.5"/>
+            </g>
+          </g>
+          <!-- Adam standing on the left -->
+          <g transform="translate(300 410)">
+            <path d="M -14 0 Q -12 -44 0 -54 Q 12 -44 14 0 Z" fill="#3d2a16" stroke="rgba(251,191,36,0.95)" stroke-width="1.4"/>
+            <ellipse cx="0" cy="-62" rx="11" ry="13" fill="#241846"/>
+            <!-- Halo bright (image of God) -->
+            <circle cx="0" cy="-62" r="24" fill="none" stroke="rgba(251,191,36,0.95)" stroke-width="1.7"/>
+            <circle cx="0" cy="-62" r="36" fill="none" stroke="rgba(251,191,36,0.5)" stroke-width="1"/>
+          </g>
+          <text x="300" y="334" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="9" letter-spacing="2.5" fill="rgba(251,191,36,0.85)">ADAM</text>
+          <!-- Eve on the right -->
+          <g transform="translate(500 410)">
+            <path d="M -14 0 Q -12 -44 0 -54 Q 12 -44 14 0 Z" fill="#3d2a5e" stroke="rgba(251,191,36,0.95)" stroke-width="1.4"/>
+            <ellipse cx="0" cy="-62" rx="11" ry="13" fill="#241846"/>
+            <!-- Long hair -->
+            <path d="M -10 -56 Q -14 -34 -12 -10" stroke="#0a0d1a" stroke-width="2" fill="none"/>
+            <path d="M 10 -56 Q 14 -34 12 -10" stroke="#0a0d1a" stroke-width="2" fill="none"/>
+            <circle cx="0" cy="-62" r="24" fill="none" stroke="rgba(251,191,36,0.95)" stroke-width="1.7"/>
+            <circle cx="0" cy="-62" r="36" fill="none" stroke="rgba(251,191,36,0.5)" stroke-width="1"/>
+          </g>
+          <text x="500" y="334" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="9" letter-spacing="2.5" fill="rgba(251,191,36,0.85)">EVE</text>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">Made in the image of God · very good</text>
+        </svg>`
+      },
+      {
+        id: 'sabbath',
+        title: 'And He Rested',
+        scriptureRef: 'Genesis 2:1-3',
+        bibleText: '"On the seventh day God finished his work that he had done, and he rested on the seventh day from all his work that he had done. So God blessed the seventh day and made it holy."',
+        narration: 'On the seventh day God rested. Not because He was tired — He cannot be tired. Because the work was finished. He blessed that day and set it apart. The pattern was woven into the world before sin even entered it: six days of making, one day of resting. The Creator who needed no rest gave rest as a gift to His creatures from the first week onward.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'crd5', skyTop:'#1e1846', skyMid:'#a78bfa', skyBot:'#fbbf24', stars:false})}
+          <g fill="#fef3c7" opacity="0.6">
+            <circle cx="80" cy="60" r="0.8"/><circle cx="200" cy="80" r="0.9"/>
+            <circle cx="340" cy="40" r="0.7"/><circle cx="500" cy="70" r="0.9"/>
+            <circle cx="640" cy="60" r="0.8"/>
+          </g>
+          <!-- Moon -->
+          <g transform="translate(120 100)">
+            <circle r="32" fill="#fef3c7" opacity="0.5"/>
+            <circle r="26" fill="#fef3c7"/>
+            <circle r="26" fill="#3d2a5e" transform="translate(8 -3)"/>
+          </g>
+          <!-- Calm landscape -->
+          <path d="M 0 280 Q 400 260 800 280 L 800 500 L 0 500 Z" fill="rgba(34,197,94,0.32)"/>
+          <path d="M 0 380 Q 400 370 800 380 L 800 500 L 0 500 Z" fill="rgba(34,197,94,0.5)"/>
+          <!-- Tree under which God's pattern of rest is symbolized -->
+          <g transform="translate(400 380)">
+            <line x1="0" y1="0" x2="0" y2="-90" stroke="#3d2a16" stroke-width="6"/>
+            <ellipse cx="0" cy="-110" rx="50" ry="38" fill="rgba(34,197,94,0.55)"/>
+          </g>
+          <!-- Adam and Eve sitting peacefully together -->
+          <g transform="translate(360 380)">
+            <ellipse cx="0" cy="0" rx="22" ry="9" fill="#3d2a16"/>
+            <ellipse cx="0" cy="-12" rx="11" ry="14" fill="#241846"/>
+            <ellipse cx="0" cy="-30" rx="9" ry="11" fill="#1a1233"/>
+            <circle cx="0" cy="-30" r="18" fill="none" stroke="rgba(251,191,36,0.8)" stroke-width="1.2"/>
+          </g>
+          <g transform="translate(440 380)">
+            <ellipse cx="0" cy="0" rx="22" ry="9" fill="#3d2a5e"/>
+            <ellipse cx="0" cy="-12" rx="11" ry="14" fill="#241846"/>
+            <ellipse cx="0" cy="-30" rx="9" ry="11" fill="#1a1233"/>
+            <path d="M -8 -26 Q -10 -16 -8 0" stroke="#0a0d1a" stroke-width="1.5" fill="none"/>
+            <path d="M 8 -26 Q 10 -16 8 0" stroke="#0a0d1a" stroke-width="1.5" fill="none"/>
+            <circle cx="0" cy="-30" r="18" fill="none" stroke="rgba(251,191,36,0.8)" stroke-width="1.2"/>
+          </g>
+          <!-- Numbered days 1-6 small at top, then large 7 -->
+          <g font-family="Bebas Neue, sans-serif" letter-spacing="3" text-anchor="middle">
+            <text x="200" y="180" font-size="14" fill="rgba(254,243,199,0.55)">DAY 1 · 2 · 3 · 4 · 5 · 6</text>
+            <text x="400" y="80" font-size="48" letter-spacing="10" fill="rgba(251,191,36,0.95)">DAY · 7</text>
+            <text x="400" y="120" font-size="12" letter-spacing="3" fill="rgba(254,243,199,0.85)">HOLY · BLESSED · REST</text>
+          </g>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">"He rested · and made the day holy"</text>
+        </svg>`
+      }
+    ],
+    closing: 'Before there was a Bible to read, there was a world to walk in — and every part of it was a sermon. The light, the seas, the stars, the birds, the animals, the man, the woman, the rest. All of it was made on purpose, by a Word, by a Person who looked at it and said, "It is good." Your own life is part of that "very good." You were made in the image of the God who spoke the universe into being. There is nothing in your DNA that is an accident.',
+    closingPrompt: 'Look at one created thing today — a tree, a face, your own hands — and let yourself believe it was made on purpose. What does that change in the next hour?'
+  },
+
+  // ════════════════════════════════════════════════════════════
+  // STORY 40 — The Fall
+  // ════════════════════════════════════════════════════════════
+  {
+    id: 'the-fall',
+    title: 'The Fall',
+    subtitle: 'A garden. A serpent. A question that changed everything.',
+    icon: '🍎',
+    color: '#5a4378',
+    accentColor: '#fef3c7',
+    era: 'creation',
+    scriptureRef: 'Genesis 3',
+    duration: '~6 min',
+    scenes: [
+      {
+        id: 'garden-warning',
+        title: 'The One Tree',
+        scriptureRef: 'Genesis 2:15-17',
+        bibleText: '"You may surely eat of every tree of the garden, but of the tree of the knowledge of good and evil you shall not eat, for in the day that you eat of it you shall surely die."',
+        narration: 'The garden of Eden had every tree imaginable — fruit of every kind, beauty in every direction. God set the man and woman in it and said: eat freely from every tree. Every one. Except one. The tree in the middle, the tree of the knowledge of good and evil — do not eat from that one. The day you eat of it, you will die. Adam and Eve walked in a yes-saturated paradise built around exactly one no.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'fg1', skyTop:'#a78bfa', skyMid:'#fbbf24', skyBot:'#fef3c7', stars:false})}
+          <ellipse cx="660" cy="100" r="40" fill="#fef3c7"/>
+          <ellipse cx="660" cy="100" r="62" fill="rgba(251,191,36,0.4)"/>
+          <!-- Lush garden -->
+          <path d="M 0 280 Q 400 260 800 280 L 800 500 L 0 500 Z" fill="rgba(34,197,94,0.4)"/>
+          <path d="M 0 380 Q 400 370 800 380 L 800 500 L 0 500 Z" fill="rgba(34,197,94,0.6)"/>
+          <!-- Lots of fruit trees around -->
+          <g>
+            <g transform="translate(120 380)">
+              <line x1="0" y1="0" x2="0" y2="-80" stroke="#3d2a16" stroke-width="6"/>
+              <ellipse cx="0" cy="-95" rx="36" ry="28" fill="rgba(34,197,94,0.7)"/>
+              <circle cx="-12" cy="-100" r="3" fill="rgba(251,113,38,0.95)"/>
+              <circle cx="14" cy="-92" r="3" fill="rgba(251,113,38,0.95)"/>
+            </g>
+            <g transform="translate(220 360)">
+              <line x1="0" y1="0" x2="0" y2="-70" stroke="#3d2a16" stroke-width="5"/>
+              <ellipse cx="0" cy="-82" rx="30" ry="24" fill="rgba(34,197,94,0.7)"/>
+              <circle cx="-10" cy="-86" r="3" fill="rgba(251,191,36,0.95)"/>
+              <circle cx="10" cy="-78" r="3" fill="rgba(251,191,36,0.95)"/>
+            </g>
+            <g transform="translate(600 360)">
+              <line x1="0" y1="0" x2="0" y2="-70" stroke="#3d2a16" stroke-width="5"/>
+              <ellipse cx="0" cy="-82" rx="30" ry="24" fill="rgba(34,197,94,0.7)"/>
+              <circle cx="-10" cy="-86" r="3" fill="rgba(251,113,38,0.95)"/>
+            </g>
+            <g transform="translate(700 380)">
+              <line x1="0" y1="0" x2="0" y2="-80" stroke="#3d2a16" stroke-width="6"/>
+              <ellipse cx="0" cy="-95" rx="36" ry="28" fill="rgba(34,197,94,0.7)"/>
+              <circle cx="-12" cy="-100" r="3" fill="rgba(251,191,36,0.95)"/>
+            </g>
+          </g>
+          <!-- THE FORBIDDEN tree center, marked differently — taller, darker fruit -->
+          <g transform="translate(400 380)">
+            <line x1="0" y1="0" x2="0" y2="-110" stroke="#3d2a16" stroke-width="8"/>
+            <ellipse cx="0" cy="-128" rx="56" ry="44" fill="rgba(34,197,94,0.7)"/>
+            <!-- Fruit (red, glossy) -->
+            <circle cx="-20" cy="-130" r="5" fill="rgba(120,20,20,0.95)" stroke="#fef3c7" stroke-width="0.5"/>
+            <circle cx="14" cy="-118" r="5" fill="rgba(120,20,20,0.95)" stroke="#fef3c7" stroke-width="0.5"/>
+            <circle cx="-4" cy="-148" r="5" fill="rgba(120,20,20,0.95)" stroke="#fef3c7" stroke-width="0.5"/>
+            <circle cx="28" cy="-138" r="5" fill="rgba(120,20,20,0.95)" stroke="#fef3c7" stroke-width="0.5"/>
+            <!-- "DO NOT EAT" subtle sign nailed to trunk -->
+            <rect x="-26" y="-50" width="52" height="14" fill="#fef3c7" stroke="rgba(120,20,20,0.85)" stroke-width="1"/>
+            <text x="0" y="-40" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="8" letter-spacing="2" fill="rgba(120,20,20,0.95)">DO NOT EAT</text>
+          </g>
+          <!-- Adam and Eve walking together, far back -->
+          <g transform="translate(300 420)" opacity="0.85">
+            <ellipse cx="0" cy="0" rx="9" ry="22" fill="#3d2a16"/>
+            <ellipse cx="0" cy="-24" rx="8" ry="9" fill="#241846"/>
+            <circle cx="0" cy="-24" r="15" fill="none" stroke="rgba(251,191,36,0.7)" stroke-width="1"/>
+          </g>
+          <g transform="translate(340 420)" opacity="0.85">
+            <ellipse cx="0" cy="0" rx="9" ry="22" fill="#3d2a5e"/>
+            <ellipse cx="0" cy="-24" rx="8" ry="9" fill="#241846"/>
+            <circle cx="0" cy="-24" r="15" fill="none" stroke="rgba(251,191,36,0.7)" stroke-width="1"/>
+          </g>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.85)">Every tree · except one</text>
+        </svg>`
+      },
+      {
+        id: 'serpent',
+        title: '"Did God Really Say…?"',
+        scriptureRef: 'Genesis 3:1-6',
+        bibleText: '"Did God actually say, ‘You shall not eat of any tree in the garden’? …You will not surely die. For God knows that when you eat of it your eyes will be opened, and you will be like God."',
+        narration: 'The serpent slid up alongside Eve at the one forbidden tree. He did not lie at first. He asked. "Did God really say…?" Just enough doubt to crack the door. She corrected him — God said only this ONE tree. Then he lied: "You will not surely die. God just doesn\'t want you to be like Him." And in that sentence the whole world tilted. The woman looked at the fruit. It looked good. She took. She ate. She gave to her husband, who was there with her — and he ate too. They did not turn into gods. They turned into hiders.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'fg2', skyTop:'#3d2a5e', skyMid:'#5a4378', skyBot:'#3d2a16', stars:false})}
+          <!-- Garden, dimmer than scene 1 -->
+          <path d="M 0 320 Q 400 300 800 320 L 800 500 L 0 500 Z" fill="rgba(34,197,94,0.3)"/>
+          <path d="M 0 400 Q 400 388 800 400 L 800 500 L 0 500 Z" fill="rgba(34,197,94,0.45)"/>
+          <!-- Forbidden tree, prominent -->
+          <g transform="translate(400 400)">
+            <line x1="0" y1="0" x2="0" y2="-120" stroke="#3d2a16" stroke-width="10"/>
+            <ellipse cx="0" cy="-138" rx="70" ry="56" fill="rgba(34,197,94,0.65)"/>
+            <!-- The fruit — luminous, glossy -->
+            <g>
+              <radialGradient id="fg2Fruit" cx="0.5" cy="0.5" r="0.5">
+                <stop offset="0%" stop-color="#fef3c7"/>
+                <stop offset="60%" stop-color="rgba(120,20,20,0.95)"/>
+                <stop offset="100%" stop-color="rgba(120,20,20,1)"/>
+              </radialGradient>
+            </g>
+            <circle cx="-22" cy="-140" r="8" fill="url(#fg2Fruit)" stroke="#fef3c7" stroke-width="0.7"/>
+            <circle cx="16" cy="-130" r="8" fill="url(#fg2Fruit)" stroke="#fef3c7" stroke-width="0.7"/>
+            <circle cx="-6" cy="-160" r="8" fill="url(#fg2Fruit)" stroke="#fef3c7" stroke-width="0.7"/>
+            <!-- Serpent COILED around the trunk -->
+            <g>
+              <path d="M 6 -40 Q -8 -56 6 -72 Q 22 -86 4 -100 Q -14 -114 8 -126" stroke="#0a0d1a" stroke-width="6" fill="none"/>
+              <path d="M 6 -40 Q -8 -56 6 -72 Q 22 -86 4 -100 Q -14 -114 8 -126" stroke="rgba(251,191,36,0.55)" stroke-width="1.5" fill="none" stroke-dasharray="2 4"/>
+              <!-- Head with forked tongue -->
+              <ellipse cx="14" cy="-130" rx="8" ry="5" fill="#0a0d1a"/>
+              <circle cx="18" cy="-132" r="2" fill="rgba(251,113,38,0.95)"/>
+              <line x1="20" y1="-130" x2="28" y2="-126" stroke="rgba(251,113,38,0.85)" stroke-width="1.4"/>
+              <line x1="20" y1="-130" x2="28" y2="-134" stroke="rgba(251,113,38,0.85)" stroke-width="1.4"/>
+            </g>
+          </g>
+          <!-- Eve standing beside the tree, hand reaching up toward fruit -->
+          <g transform="translate(310 400)">
+            <path d="M -14 0 Q -12 -44 0 -54 Q 12 -44 14 0 Z" fill="#3d2a5e" stroke="rgba(251,191,36,0.85)" stroke-width="1.2"/>
+            <ellipse cx="0" cy="-62" rx="11" ry="13" fill="#241846"/>
+            <path d="M -10 -56 Q -14 -34 -12 -10" stroke="#0a0d1a" stroke-width="2" fill="none"/>
+            <path d="M 10 -56 Q 14 -34 12 -10" stroke="#0a0d1a" stroke-width="2" fill="none"/>
+            <!-- Hand reaching forward toward the fruit -->
+            <line x1="14" y1="-36" x2="44" y2="-60" stroke="#3d2a5e" stroke-width="5"/>
+            <ellipse cx="46" cy="-62" rx="5" ry="3" fill="#3d2a5e"/>
+            <!-- Halo dashed (faith fracturing) -->
+            <circle cx="0" cy="-62" r="20" fill="none" stroke="rgba(251,191,36,0.5)" stroke-width="1" stroke-dasharray="2 3"/>
+          </g>
+          <!-- Adam right behind her, watching -->
+          <g transform="translate(260 410)" opacity="0.85">
+            <path d="M -12 0 Q -10 -42 0 -52 Q 10 -42 12 0 Z" fill="#3d2a16"/>
+            <ellipse cx="0" cy="-60" rx="10" ry="12" fill="#241846"/>
+            <circle cx="0" cy="-60" r="16" fill="none" stroke="rgba(251,191,36,0.5)" stroke-width="0.9" stroke-dasharray="2 3"/>
+          </g>
+          <!-- Speech bubble from serpent: "DID GOD REALLY SAY…?" -->
+          <g transform="translate(560 220)">
+            <rect x="-100" y="-26" width="200" height="40" fill="#fef3c7" stroke="rgba(120,20,20,0.85)" stroke-width="1" rx="5"/>
+            <polygon points="-50,14 -60,28 -36,14" fill="#fef3c7" stroke="rgba(120,20,20,0.85)" stroke-width="1"/>
+            <text x="0" y="-6" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="11" letter-spacing="2" fill="#3d2a16">"DID GOD REALLY</text>
+            <text x="0" y="8" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="11" letter-spacing="2" fill="#3d2a16">SAY…?"</text>
+          </g>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.85)">"You will be like God"</text>
+        </svg>`
+      },
+      {
+        id: 'hiding',
+        title: 'Hiding Among the Trees',
+        scriptureRef: 'Genesis 3:7-13',
+        bibleText: '"Then the eyes of both were opened, and they knew that they were naked… The Lord God called to the man, ‘Where are you?’ And he said, ‘I heard the sound of you in the garden, and I was afraid, because I was naked, and I hid myself.’"',
+        narration: 'Their eyes were opened. They saw differently. The first thing they saw was their own nakedness — and they were ashamed of what God had made very good. They sewed fig leaves and hid among the trees. In the cool of the day they heard the sound of God walking in the garden — the same God who had walked with them every evening — and now they ran from Him. He called: "Where are you?" Adam blamed Eve. Eve blamed the serpent. Nobody owned what they had done.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'fg3', skyTop:'#1e1846', skyMid:'#3d2a16', skyBot:'#241846', stars:false})}
+          <!-- Dim evening garden -->
+          <path d="M 0 320 Q 400 300 800 320 L 800 500 L 0 500 Z" fill="rgba(34,197,94,0.18)"/>
+          <path d="M 0 400 Q 400 388 800 400 L 800 500 L 0 500 Z" fill="rgba(34,197,94,0.28)"/>
+          <!-- Trees with shadowy figures hiding behind -->
+          <g>
+            <g transform="translate(180 380)">
+              <line x1="0" y1="0" x2="0" y2="-90" stroke="#0a0d1a" stroke-width="6"/>
+              <ellipse cx="0" cy="-108" rx="48" ry="38" fill="rgba(34,197,94,0.35)"/>
+            </g>
+            <!-- Adam hiding behind the tree (just visible) -->
+            <g transform="translate(200 400)">
+              <ellipse cx="0" cy="-20" rx="10" ry="20" fill="#0a0d1a"/>
+              <ellipse cx="0" cy="-42" rx="8" ry="10" fill="#0a0d1a"/>
+              <!-- Fig leaf -->
+              <path d="M -4 -12 Q 0 -22 4 -12 L 0 -2 Z" fill="rgba(34,197,94,0.65)" stroke="rgba(254,243,199,0.4)" stroke-width="0.5"/>
+              <!-- One worried eye visible peeking from behind trunk -->
+              <circle cx="6" cy="-44" r="1.5" fill="#fef3c7"/>
+            </g>
+            <g transform="translate(560 380)">
+              <line x1="0" y1="0" x2="0" y2="-90" stroke="#0a0d1a" stroke-width="6"/>
+              <ellipse cx="0" cy="-108" rx="48" ry="38" fill="rgba(34,197,94,0.35)"/>
+            </g>
+            <g transform="translate(580 400)">
+              <ellipse cx="0" cy="-20" rx="10" ry="20" fill="#0a0d1a"/>
+              <ellipse cx="0" cy="-42" rx="8" ry="10" fill="#0a0d1a"/>
+              <path d="M -4 -12 Q 0 -22 4 -12 L 0 -2 Z" fill="rgba(34,197,94,0.65)" stroke="rgba(254,243,199,0.4)" stroke-width="0.5"/>
+              <path d="M -10 -34 Q -14 -16 -12 0" stroke="#0a0d1a" stroke-width="1.5" fill="none"/>
+              <path d="M 10 -34 Q 14 -16 12 0" stroke="#0a0d1a" stroke-width="1.5" fill="none"/>
+              <circle cx="-6" cy="-44" r="1.5" fill="#fef3c7"/>
+            </g>
+          </g>
+          <!-- God walking through the garden (luminous figure center) -->
+          <g transform="translate(400 380)">
+            <ellipse cx="0" cy="0" rx="22" ry="50" fill="rgba(254,243,199,0.7)"/>
+            <ellipse cx="0" cy="-58" rx="14" ry="16" fill="rgba(254,243,199,0.95)"/>
+            <!-- Massive halo -->
+            <circle cx="0" cy="-58" r="32" fill="none" stroke="rgba(251,191,36,0.95)" stroke-width="2"/>
+            <circle cx="0" cy="-58" r="50" fill="none" stroke="rgba(251,191,36,0.55)" stroke-width="1.2"/>
+            <circle cx="0" cy="-58" r="68" fill="none" stroke="rgba(251,191,36,0.3)" stroke-width="1"/>
+          </g>
+          <!-- "WHERE ARE YOU?" floating above God -->
+          <text x="400" y="90" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="22" letter-spacing="6" fill="rgba(251,191,36,0.95)">"WHERE ARE YOU?"</text>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">The first question God asked the human race</text>
+        </svg>`
+      },
+      {
+        id: 'curse-promise',
+        title: 'The Curse · The Promise',
+        scriptureRef: 'Genesis 3:14-24',
+        bibleText: '"I will put enmity between you and the woman, and between your offspring and her offspring; he shall bruise your head, and you shall bruise his heel."',
+        narration: 'There were consequences. Pain in childbearing. Sweat in work. Thorns in the ground. Death entering the world — for them, for every animal, for every leaf. Sent out of the garden. A flaming sword set at the gate. But before any of the curses came down, God spoke a single sentence to the serpent — the first promise of the gospel, hidden in the middle of the punishment. "He will crush your head." Someone is coming. He will be wounded, but He will end you. The whole rest of Scripture is the unfolding of that one sentence.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'fg4', skyTop:'#0a0d1a', skyMid:'#241846', skyBot:'#3d2a16', stars:false})}
+          <!-- Garden behind, fading -->
+          <path d="M 0 300 Q 400 280 800 300 L 800 500 L 0 500 Z" fill="#241846"/>
+          <!-- The flaming sword at the garden gate, far left -->
+          <g transform="translate(120 360)">
+            <!-- Cherubim suggested as two upright figures with wings -->
+            <ellipse cx="-20" cy="-10" rx="11" ry="22" fill="rgba(254,243,199,0.75)"/>
+            <ellipse cx="-20" cy="-32" rx="9" ry="10" fill="rgba(254,243,199,0.9)"/>
+            <path d="M -30 -22 Q -50 -8 -40 22" stroke="rgba(251,191,36,0.7)" stroke-width="1.5" fill="rgba(254,243,199,0.2)"/>
+            <ellipse cx="20" cy="-10" rx="11" ry="22" fill="rgba(254,243,199,0.75)"/>
+            <ellipse cx="20" cy="-32" rx="9" ry="10" fill="rgba(254,243,199,0.9)"/>
+            <path d="M 30 -22 Q 50 -8 40 22" stroke="rgba(251,191,36,0.7)" stroke-width="1.5" fill="rgba(254,243,199,0.2)"/>
+            <!-- Flaming sword between them, vertical, twirling -->
+            <polygon points="-3,-70 3,-70 0,-130" fill="rgba(254,243,199,0.95)" stroke="rgba(251,113,38,0.95)" stroke-width="1.5"/>
+            <ellipse cx="0" cy="-130" rx="14" ry="20" fill="#fb923c"/>
+            <ellipse cx="0" cy="-134" rx="8" ry="14" fill="#fbbf24"/>
+            <ellipse cx="0" cy="-138" rx="4" ry="8" fill="#fef3c7"/>
+            <!-- Crossguard -->
+            <line x1="-10" y1="-70" x2="10" y2="-70" stroke="#3d2a16" stroke-width="3"/>
+          </g>
+          <text x="120" y="430" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="9" letter-spacing="2" fill="rgba(248,113,113,0.85)">CLOSED · GUARDED</text>
+          <!-- Adam and Eve walking out, clothed in animal skins now, heads down -->
+          <g transform="translate(420 420)">
+            <!-- Adam in skins -->
+            <path d="M -14 0 Q -12 -44 0 -54 Q 12 -44 14 0 Z" fill="#3d2a16" stroke="rgba(74,52,32,0.85)" stroke-width="1.2"/>
+            <ellipse cx="0" cy="-62" rx="11" ry="13" fill="#241846"/>
+            <!-- Head down -->
+            <path d="M -3 -64 Q 0 -56 3 -64" stroke="rgba(254,243,199,0.4)" stroke-width="1" fill="none"/>
+            <!-- Halo dim -->
+            <circle cx="0" cy="-62" r="18" fill="none" stroke="rgba(251,191,36,0.4)" stroke-width="1" stroke-dasharray="3 4"/>
+          </g>
+          <g transform="translate(470 420)">
+            <path d="M -14 0 Q -12 -44 0 -54 Q 12 -44 14 0 Z" fill="#3d2a16" stroke="rgba(74,52,32,0.85)" stroke-width="1.2"/>
+            <ellipse cx="0" cy="-62" rx="11" ry="13" fill="#241846"/>
+            <path d="M -10 -56 Q -14 -34 -12 -10" stroke="#0a0d1a" stroke-width="2" fill="none"/>
+            <path d="M 10 -56 Q 14 -34 12 -10" stroke="#0a0d1a" stroke-width="2" fill="none"/>
+            <circle cx="0" cy="-62" r="18" fill="none" stroke="rgba(251,191,36,0.4)" stroke-width="1" stroke-dasharray="3 4"/>
+          </g>
+          <!-- A small lamb sacrificed in the background — symbol of the skins God provided -->
+          <g transform="translate(560 440)">
+            <ellipse cx="0" cy="0" rx="20" ry="8" fill="rgba(254,243,199,0.45)"/>
+            <ellipse cx="-15" cy="-3" rx="6" ry="5" fill="rgba(254,243,199,0.55)"/>
+            <line x1="-12" y1="6" x2="-12" y2="14" stroke="#3d2a16" stroke-width="2"/>
+            <line x1="6" y1="6" x2="6" y2="14" stroke="#3d2a16" stroke-width="2"/>
+            <!-- Red mark indicating sacrifice -->
+            <ellipse cx="-10" cy="-3" rx="3" ry="1.5" fill="rgba(120,20,20,0.85)"/>
+          </g>
+          <!-- The promise: small text floating above -->
+          <text x="400" y="80" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="14" letter-spacing="3" fill="rgba(251,191,36,0.95)">"HE WILL CRUSH YOUR HEAD"</text>
+          <text x="400" y="105" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="9" letter-spacing="2" fill="rgba(254,243,199,0.65)">— GENESIS 3:15 · THE FIRST GOSPEL</text>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.85)">Out of the garden · but not out of God\'s plan</text>
+        </svg>`
+      }
+    ],
+    closing: 'The Fall is not a quaint story for children. It is the diagnosis on every human heart, including yours. The serpent\'s question — "Did God really say…?" — is still being asked. You still hear it. The good news hidden in the very middle of the curse is that God did not write us off. He sewed garments of skin (which meant the first death in the world, the first sacrifice). He set a guard at Eden — not to keep us out forever, but to keep us from eating the tree of life in our fallen state. And He made a promise: someone is coming who will crush the serpent. He came. His name is Jesus.',
+    closingPrompt: 'Where today is "did God really say…?" being whispered to you — and what would it look like to answer with what God actually said?'
+  },
+
+  // ════════════════════════════════════════════════════════════
+  // STORY 41 — The Tower of Babel
+  // ════════════════════════════════════════════════════════════
+  {
+    id: 'tower-babel',
+    title: 'The Tower of Babel',
+    subtitle: '"Let us make a name for ourselves." One language, one ambition, one tower — confounded.',
+    icon: '🗼',
+    color: '#a78bfa',
+    accentColor: '#fef3c7',
+    era: 'creation',
+    scriptureRef: 'Genesis 11:1-9',
+    duration: '~5 min',
+    scenes: [
+      {
+        id: 'one-language',
+        title: 'One Language',
+        scriptureRef: 'Genesis 11:1-2',
+        bibleText: '"Now the whole earth had one language and the same words. And as people migrated from the east, they found a plain in the land of Shinar and settled there."',
+        narration: 'After the flood, the people of the earth still spoke one language. They wandered east and came to a wide plain in the land of Shinar — Mesopotamia — and they decided to stop there. The world was empty, the soil was good, there was clay for bricks and bitumen for mortar. They had everything they needed. They said: let us stay here. Let us NOT scatter, as God told Noah\'s sons to do. Let us stay together. And let us build.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'tb1', skyTop:'#3d2a5e', skyMid:'#a78bfa', skyBot:'#fbbf24', stars:false})}
+          <ellipse cx="660" cy="120" r="36" fill="#fef3c7"/>
+          <ellipse cx="660" cy="120" r="58" fill="rgba(251,113,38,0.4)"/>
+          <!-- Plain of Shinar — flat ground, river hint -->
+          <path d="M 0 320 Q 400 310 800 320 L 800 500 L 0 500 Z" fill="#3d2a16"/>
+          <path d="M 0 380 Q 400 370 800 380 L 800 500 L 0 500 Z" fill="rgba(74,52,32,0.6)"/>
+          <!-- River winding through -->
+          <path d="M 0 410 Q 200 400 400 410 Q 600 400 800 410 L 800 440 Q 600 432 400 442 Q 200 432 0 440 Z" fill="#1e1846" opacity="0.7"/>
+          <!-- People settling — many small clusters of tents -->
+          <g fill="#0a0d1a">
+            <g transform="translate(120 360)">
+              <polygon points="-22,0 0,-30 22,0" stroke="rgba(251,191,36,0.55)" stroke-width="1"/>
+            </g>
+            <g transform="translate(200 358)">
+              <polygon points="-22,0 0,-30 22,0" stroke="rgba(251,191,36,0.55)" stroke-width="1"/>
+            </g>
+            <g transform="translate(560 360)">
+              <polygon points="-22,0 0,-30 22,0" stroke="rgba(251,191,36,0.55)" stroke-width="1"/>
+            </g>
+            <g transform="translate(640 358)">
+              <polygon points="-22,0 0,-30 22,0" stroke="rgba(251,191,36,0.55)" stroke-width="1"/>
+            </g>
+            <g transform="translate(720 362)">
+              <polygon points="-22,0 0,-30 22,0" stroke="rgba(251,191,36,0.55)" stroke-width="1"/>
+            </g>
+          </g>
+          <!-- Crowd of people in the middle gesturing, all together -->
+          <g fill="#0a0d1a">
+            <g transform="translate(340 400)"><ellipse cx="0" cy="0" rx="9" ry="22"/><ellipse cx="0" cy="-22" rx="8" ry="9"/></g>
+            <g transform="translate(380 402)"><ellipse cx="0" cy="0" rx="9" ry="22"/><ellipse cx="0" cy="-22" rx="8" ry="9"/></g>
+            <g transform="translate(420 400)"><ellipse cx="0" cy="0" rx="9" ry="22"/><ellipse cx="0" cy="-22" rx="8" ry="9"/></g>
+            <g transform="translate(460 402)"><ellipse cx="0" cy="0" rx="9" ry="22"/><ellipse cx="0" cy="-22" rx="8" ry="9"/></g>
+          </g>
+          <!-- Big "ONE LANGUAGE" banner -->
+          <text x="400" y="100" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="26" letter-spacing="8" fill="rgba(251,191,36,0.95)">ONE LANGUAGE</text>
+          <text x="400" y="130" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="12" letter-spacing="3" fill="rgba(254,243,199,0.85)">THE SAME WORDS · ONE PLAN</text>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.85)">The plain of Shinar</text>
+        </svg>`
+      },
+      {
+        id: 'tower-rising',
+        title: 'Let Us Make a Name',
+        scriptureRef: 'Genesis 11:3-4',
+        bibleText: '"Come, let us build ourselves a city and a tower with its top in the heavens, and let us make a name for ourselves, lest we be dispersed over the face of the whole earth."',
+        narration: 'They said to one another: let us build. Bricks for stone, tar for mortar. Let us build a city. Let us build a tower whose top reaches the sky. Let us — and listen carefully here — let us make a NAME for ourselves. The whole project was an upside-down theology: a tower to heaven instead of God coming down, a name they would give themselves instead of receiving from Him, a refusal to be scattered after He had told them to fill the earth. Every brick was a small no. The tower grew.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'tb2', skyTop:'#1e1846', skyMid:'#3d2a5e', skyBot:'#fb923c', stars:false})}
+          <!-- Ground -->
+          <path d="M 0 400 Q 400 388 800 400 L 800 500 L 0 500 Z" fill="#241846"/>
+          <!-- The Tower — a massive ziggurat with stepped levels rising into the clouds -->
+          <g>
+            <!-- Bottom -->
+            <polygon points="200,400 600,400 580,360 220,360" fill="#3d2a16" stroke="rgba(251,191,36,0.75)" stroke-width="1.4"/>
+            <polygon points="220,360 580,360 560,320 240,320" fill="#3d2a16" stroke="rgba(251,191,36,0.75)" stroke-width="1.4"/>
+            <polygon points="240,320 560,320 540,280 260,280" fill="#3d2a16" stroke="rgba(251,191,36,0.75)" stroke-width="1.4"/>
+            <polygon points="260,280 540,280 520,240 280,240" fill="#3d2a16" stroke="rgba(251,191,36,0.75)" stroke-width="1.4"/>
+            <polygon points="280,240 520,240 500,200 300,200" fill="#3d2a16" stroke="rgba(251,191,36,0.75)" stroke-width="1.4"/>
+            <polygon points="300,200 500,200 480,160 320,160" fill="#3d2a16" stroke="rgba(251,191,36,0.75)" stroke-width="1.4"/>
+            <polygon points="320,160 480,160 460,120 340,120" fill="#3d2a16" stroke="rgba(251,191,36,0.75)" stroke-width="1.4"/>
+            <polygon points="340,120 460,120 440,80 360,80" fill="#3d2a16" stroke="rgba(251,191,36,0.75)" stroke-width="1.4"/>
+            <polygon points="360,80 440,80 420,40 380,40" fill="#3d2a16" stroke="rgba(251,191,36,0.75)" stroke-width="1.4"/>
+            <!-- Brick texture suggestion -->
+            <g stroke="rgba(254,243,199,0.4)" stroke-width="0.6">
+              <line x1="220" y1="380" x2="580" y2="380"/>
+              <line x1="240" y1="340" x2="560" y2="340"/>
+              <line x1="260" y1="300" x2="540" y2="300"/>
+              <line x1="280" y1="260" x2="520" y2="260"/>
+              <line x1="300" y1="220" x2="500" y2="220"/>
+            </g>
+            <!-- Workers ramps on the side -->
+            <line x1="200" y1="400" x2="220" y2="360" stroke="#3d2a16" stroke-width="6"/>
+            <line x1="600" y1="400" x2="580" y2="360" stroke="#3d2a16" stroke-width="6"/>
+          </g>
+          <!-- Tiny workers carrying bricks up the ramps -->
+          <g fill="#0a0d1a">
+            <g transform="translate(208 388)"><ellipse cx="0" cy="0" rx="4" ry="10"/><ellipse cx="0" cy="-12" rx="4" ry="4"/><rect x="-5" y="-8" width="10" height="4" fill="#3d2a16"/></g>
+            <g transform="translate(218 372)"><ellipse cx="0" cy="0" rx="4" ry="10"/><ellipse cx="0" cy="-12" rx="4" ry="4"/></g>
+            <g transform="translate(592 388)"><ellipse cx="0" cy="0" rx="4" ry="10"/><ellipse cx="0" cy="-12" rx="4" ry="4"/><rect x="-5" y="-8" width="10" height="4" fill="#3d2a16"/></g>
+            <g transform="translate(582 372)"><ellipse cx="0" cy="0" rx="4" ry="10"/><ellipse cx="0" cy="-12" rx="4" ry="4"/></g>
+            <!-- Workers on top -->
+            <g transform="translate(380 60)"><ellipse cx="0" cy="0" rx="4" ry="9"/><ellipse cx="0" cy="-10" rx="3" ry="4"/></g>
+            <g transform="translate(420 60)"><ellipse cx="0" cy="0" rx="4" ry="9"/><ellipse cx="0" cy="-10" rx="3" ry="4"/></g>
+          </g>
+          <!-- "MAKE A NAME" banner -->
+          <text x="100" y="80" font-family="Bebas Neue, sans-serif" font-size="16" letter-spacing="4" fill="rgba(251,191,36,0.85)">"LET US MAKE</text>
+          <text x="100" y="105" font-family="Bebas Neue, sans-serif" font-size="16" letter-spacing="4" fill="rgba(251,191,36,0.85)">A NAME"</text>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.85)">A name they would give themselves</text>
+        </svg>`
+      },
+      {
+        id: 'god-comes-down',
+        title: 'The Lord Came Down',
+        scriptureRef: 'Genesis 11:5-7',
+        bibleText: '"And the Lord came down to see the city and the tower… ‘Behold, they are one people, and they have all one language… nothing that they propose to do will now be impossible for them. Come, let us go down and there confuse their language.’"',
+        narration: 'There is a quiet joke in the Hebrew: they were building a tower whose top would reach to the heavens. Then the Lord "came down" to see it. Not down to the top — He had to come down further than that. He looked at what unified humanity was doing without Him and said: "If they do this, nothing they propose will be impossible for them." So God did what they had refused to do: He scattered them. He confused their language. The cooperation snapped. They could not understand each other any more.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          <defs>
+            <radialGradient id="tb3Glory" cx="0.5" cy="0.1" r="0.65">
+              <stop offset="0%" stop-color="rgba(254,243,199,0.95)"/>
+              <stop offset="40%" stop-color="rgba(251,191,36,0.6)"/>
+              <stop offset="100%" stop-color="rgba(251,191,36,0)"/>
+            </radialGradient>
+          </defs>
+          <rect width="800" height="500" fill="#0a0d1a"/>
+          <!-- Heavens torn open with massive light -->
+          <ellipse cx="400" cy="60" rx="500" ry="180" fill="url(#tb3Glory)"/>
+          <polygon points="320,0 280,420 520,420 480,0" fill="rgba(254,243,199,0.35)"/>
+          <!-- The tower (small now in perspective) -->
+          <g transform="translate(0 80)">
+            <polygon points="200,400 600,400 580,360 220,360" fill="#3d2a16" stroke="rgba(251,191,36,0.65)" stroke-width="1.2"/>
+            <polygon points="220,360 580,360 560,320 240,320" fill="#3d2a16" stroke="rgba(251,191,36,0.65)" stroke-width="1.2"/>
+            <polygon points="240,320 560,320 540,280 260,280" fill="#3d2a16" stroke="rgba(251,191,36,0.65)" stroke-width="1.2"/>
+            <polygon points="260,280 540,280 520,240 280,240" fill="#3d2a16" stroke="rgba(251,191,36,0.65)" stroke-width="1.2"/>
+            <polygon points="280,240 520,240 500,200 300,200" fill="#3d2a16" stroke="rgba(251,191,36,0.65)" stroke-width="1.2"/>
+            <polygon points="300,200 500,200 480,160 320,160" fill="#3d2a16" stroke="rgba(251,191,36,0.65)" stroke-width="1.2"/>
+            <polygon points="320,160 480,160 460,120 340,120" fill="#3d2a16" stroke="rgba(251,191,36,0.65)" stroke-width="1.2"/>
+          </g>
+          <!-- The descent — hand of God reaching down out of the light -->
+          <g transform="translate(400 200)">
+            <ellipse cx="0" cy="0" rx="40" ry="50" fill="rgba(254,243,199,0.95)"/>
+            <!-- Index finger pointing DOWN -->
+            <path d="M -10 30 L -10 60 Q -10 70 -2 70 Q 6 70 6 60 L 6 30" fill="rgba(254,243,199,0.95)" stroke="rgba(251,191,36,0.85)" stroke-width="0.8"/>
+          </g>
+          <!-- "COME LET US GO DOWN" -->
+          <text x="400" y="70" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="18" letter-spacing="5" fill="rgba(251,113,38,0.95)">"COME · LET US GO DOWN"</text>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">The Lord had to come DOWN to see it</text>
+        </svg>`
+      },
+      {
+        id: 'scattered',
+        title: 'Scattered',
+        scriptureRef: 'Genesis 11:8-9',
+        bibleText: '"So the Lord dispersed them from there over the face of all the earth, and they left off building the city. Therefore its name was called Babel, because there the Lord confused the language of all the earth."',
+        narration: 'They had wanted ONE place. He gave them many. They had wanted ONE tongue. He gave them many. They had wanted ONE name. He gave them many — they became "the families of the earth." It was judgment, yes — but it was also mercy, because what they would have built if left unified would have been a pure monument to themselves. Centuries later, when God\'s Spirit came at Pentecost, the languages did not go away. The Spirit reversed the curse — letting each person hear in their OWN language. Babel scattered. Pentecost gathered.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'tb4', skyTop:'#3d2a5e', skyMid:'#fb923c', skyBot:'#fbbf24', stars:false})}
+          <!-- Half-finished tower on the horizon, abandoned -->
+          <g transform="translate(0 0)" opacity="0.7">
+            <polygon points="300,360 500,360 490,330 310,330" fill="#3d2a16" stroke="rgba(251,191,36,0.5)" stroke-width="1"/>
+            <polygon points="310,330 490,330 480,300 320,300" fill="#3d2a16" stroke="rgba(251,191,36,0.5)" stroke-width="1"/>
+            <polygon points="320,300 480,300 470,270 330,270" fill="#3d2a16" stroke="rgba(251,191,36,0.5)" stroke-width="1"/>
+            <polygon points="330,270 470,270 460,240 340,240" fill="#3d2a16" stroke="rgba(251,191,36,0.5)" stroke-width="1"/>
+            <!-- Jagged broken top -->
+            <polygon points="340,240 350,210 365,235 380,205 395,230 410,210 425,235 440,210 455,230 470,210 478,240" fill="#3d2a16" stroke="rgba(251,191,36,0.5)" stroke-width="1"/>
+            <!-- Scaffolding hanging broken -->
+            <line x1="350" y1="240" x2="330" y2="220" stroke="#3d2a16" stroke-width="2"/>
+            <line x1="460" y1="240" x2="480" y2="220" stroke="#3d2a16" stroke-width="2"/>
+          </g>
+          <!-- Ground -->
+          <path d="M 0 380 Q 400 370 800 380 L 800 500 L 0 500 Z" fill="#241846"/>
+          <!-- Arrows scattering OUTWARD from tower in all 8 directions -->
+          <g stroke="rgba(254,243,199,0.85)" stroke-width="2" fill="none" stroke-dasharray="6 6">
+            <line x1="400" y1="380" x2="80" y2="440"/>
+            <line x1="400" y1="380" x2="720" y2="440"/>
+            <line x1="400" y1="380" x2="40" y2="380"/>
+            <line x1="400" y1="380" x2="760" y2="380"/>
+            <line x1="400" y1="380" x2="120" y2="480"/>
+            <line x1="400" y1="380" x2="680" y2="480"/>
+          </g>
+          <!-- Groups of people walking in different directions (silhouettes with different speech bubbles) -->
+          <g fill="#0a0d1a">
+            <g transform="translate(80 440)">
+              <ellipse cx="0" cy="0" rx="7" ry="20"/>
+              <ellipse cx="0" cy="-22" rx="6" ry="7"/>
+              <line x1="6" y1="-12" x2="20" y2="-2" stroke="#0a0d1a" stroke-width="2"/>
+            </g>
+            <g transform="translate(720 440)">
+              <ellipse cx="0" cy="0" rx="7" ry="20"/>
+              <ellipse cx="0" cy="-22" rx="6" ry="7"/>
+              <line x1="-6" y1="-12" x2="-20" y2="-2" stroke="#0a0d1a" stroke-width="2"/>
+            </g>
+            <g transform="translate(40 400)">
+              <ellipse cx="0" cy="0" rx="7" ry="20"/>
+              <ellipse cx="0" cy="-22" rx="6" ry="7"/>
+            </g>
+            <g transform="translate(760 400)">
+              <ellipse cx="0" cy="0" rx="7" ry="20"/>
+              <ellipse cx="0" cy="-22" rx="6" ry="7"/>
+            </g>
+            <g transform="translate(140 470)">
+              <ellipse cx="0" cy="0" rx="7" ry="20"/>
+              <ellipse cx="0" cy="-22" rx="6" ry="7"/>
+            </g>
+            <g transform="translate(660 470)">
+              <ellipse cx="0" cy="0" rx="7" ry="20"/>
+              <ellipse cx="0" cy="-22" rx="6" ry="7"/>
+            </g>
+          </g>
+          <!-- Speech bubbles with garbled different "?#@!" symbols showing language confusion -->
+          <g font-family="Bebas Neue, sans-serif" font-size="10" letter-spacing="2" fill="#3d2a16">
+            <g transform="translate(120 380)">
+              <rect x="-30" y="-14" width="60" height="22" fill="#fef3c7" stroke="rgba(251,191,36,0.85)" stroke-width="0.6" rx="3"/>
+              <text x="0" y="0" text-anchor="middle">?#@&amp;!</text>
+            </g>
+            <g transform="translate(680 380)">
+              <rect x="-30" y="-14" width="60" height="22" fill="#fef3c7" stroke="rgba(251,191,36,0.85)" stroke-width="0.6" rx="3"/>
+              <text x="0" y="0" text-anchor="middle">¿§©¬!</text>
+            </g>
+            <g transform="translate(80 470)">
+              <rect x="-30" y="-14" width="60" height="22" fill="#fef3c7" stroke="rgba(251,191,36,0.85)" stroke-width="0.6" rx="3"/>
+              <text x="0" y="0" text-anchor="middle">¥§%¶!</text>
+            </g>
+            <g transform="translate(720 470)">
+              <rect x="-30" y="-14" width="60" height="22" fill="#fef3c7" stroke="rgba(251,191,36,0.85)" stroke-width="0.6" rx="3"/>
+              <text x="0" y="0" text-anchor="middle">§£¥¬?</text>
+            </g>
+          </g>
+          <text x="400" y="80" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="24" letter-spacing="6" fill="rgba(251,191,36,0.95)">BABEL · CONFUSION</text>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">Pentecost will reverse this · centuries later</text>
+        </svg>`
+      }
+    ],
+    closing: 'Babel is what humanity does when we have everything and refuse to give it back to God: we build monuments to ourselves. The Lord scatters not because He is afraid of us, but because He loves us enough to interrupt our worst impulses. Every "let us make a name for ourselves" project in your own life is a tiny tower. The good news is that God\'s answer to Babel was not just to scatter — it was, in time, to come down Himself and bring us back together, with our different languages still intact, around one Name He gave us.',
+    closingPrompt: 'Where in your life are you building a "tower" — making a name for yourself — that you would rather God interrupted than honored?'
+  },
+
+  // ════════════════════════════════════════════════════════════
+  // STORY 42 — Abraham's Covenant
+  // ════════════════════════════════════════════════════════════
+  {
+    id: 'abrahams-covenant',
+    title: "Abraham's Covenant",
+    subtitle: '"Go from your country." A 75-year-old, a promise, and a covenant signed in the dark.',
+    icon: '🌌',
+    color: '#fbbf24',
+    accentColor: '#fef3c7',
+    era: 'patriarchs',
+    scriptureRef: 'Genesis 12 · 15 · 17',
+    duration: '~6 min',
+    scenes: [
+      {
+        id: 'call',
+        title: '"Go"',
+        scriptureRef: 'Genesis 12:1-4',
+        bibleText: '"Now the Lord said to Abram, ‘Go from your country and your kindred and your father\'s house to the land that I will show you. And I will make of you a great nation, and I will bless you and make your name great.’"',
+        narration: 'Abram was 75 years old, settled in Haran, comfortable, prosperous, childless. The Lord — whose name he probably did not yet know — spoke to him. "Go. Leave your country. Leave your family. I will not tell you where. I will show you when you get there." There were three promises folded into that command: a land, descendants like the stars, and through him every family on earth would be blessed. Abram packed up his wife Sarai, his nephew Lot, and everything they owned. He left. He was 75.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'ab1', skyTop:'#3d2a5e', skyMid:'#a78bfa', skyBot:'#fbbf24', stars:false})}
+          <ellipse cx="660" cy="120" r="36" fill="#fef3c7"/>
+          <ellipse cx="660" cy="120" r="58" fill="rgba(251,191,36,0.4)"/>
+          <!-- Haran city silhouette on the left -->
+          <g transform="translate(80 360)" opacity="0.85">
+            <rect x="-40" y="-60" width="80" height="60" fill="#3d2a16" stroke="rgba(251,191,36,0.65)" stroke-width="1"/>
+            <polygon points="-46,-60 0,-90 46,-60" fill="#241846" stroke="rgba(251,191,36,0.65)" stroke-width="1"/>
+            <rect x="-8" y="-30" width="16" height="30" fill="#0a0d1a"/>
+            <rect x="-30" y="-50" width="14" height="14" fill="rgba(251,191,36,0.55)"/>
+            <rect x="16" y="-50" width="14" height="14" fill="rgba(251,191,36,0.55)"/>
+          </g>
+          <text x="80" y="278" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="10" letter-spacing="2.5" fill="rgba(251,191,36,0.75)">HARAN · HOME</text>
+          <!-- Long road going off to the right edge -->
+          <path d="M 130 410 Q 300 380 480 360 Q 640 340 800 320" stroke="rgba(254,243,199,0.55)" stroke-width="6" fill="none" stroke-dasharray="6 10"/>
+          <text x="660" y="300" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="10" letter-spacing="2.5" fill="rgba(254,243,199,0.85)">→ THE LAND HE WILL SHOW YOU</text>
+          <!-- Ground -->
+          <path d="M 0 420 Q 400 412 800 420 L 800 500 L 0 500 Z" fill="#241846"/>
+          <!-- Abram + Sarai walking with camels and tents being packed -->
+          <g transform="translate(280 410)">
+            <!-- Abram -->
+            <path d="M -14 0 Q -12 -50 0 -60 Q 12 -50 14 0 Z" fill="#3d2a16" stroke="rgba(251,191,36,0.95)" stroke-width="1.4"/>
+            <ellipse cx="0" cy="-68" rx="12" ry="14" fill="#1a1233"/>
+            <!-- Long white beard (he's 75) -->
+            <path d="M -8 -60 Q 0 -40 8 -60" stroke="rgba(254,243,199,0.95)" stroke-width="2" fill="none"/>
+            <path d="M -5 -48 Q 0 -32 5 -48" stroke="rgba(254,243,199,0.95)" stroke-width="1.5" fill="none"/>
+            <!-- Staff -->
+            <line x1="14" y1="-30" x2="22" y2="22" stroke="#3d2a16" stroke-width="2.5"/>
+            <!-- Halo -->
+            <circle cx="0" cy="-68" r="22" fill="none" stroke="rgba(251,191,36,0.95)" stroke-width="1.5"/>
+          </g>
+          <text x="280" y="332" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="9" letter-spacing="2.5" fill="rgba(251,191,36,0.85)">ABRAM · 75</text>
+          <!-- Sarai walking beside -->
+          <g transform="translate(330 412)">
+            <path d="M -12 0 Q -10 -44 0 -54 Q 10 -44 12 0 Z" fill="#3d2a5e" stroke="rgba(251,191,36,0.85)" stroke-width="1.2"/>
+            <ellipse cx="0" cy="-62" rx="10" ry="12" fill="#1a1233"/>
+            <path d="M -9 -56 Q 0 -68 9 -56 Q 11 -44 0 -42 Q -11 -44 -9 -56 Z" fill="#241846" stroke="rgba(251,191,36,0.65)" stroke-width="1"/>
+            <circle cx="0" cy="-62" r="18" fill="none" stroke="rgba(251,191,36,0.85)" stroke-width="1.3"/>
+          </g>
+          <!-- A camel laden with goods -->
+          <g transform="translate(400 420)">
+            <ellipse cx="0" cy="0" rx="44" ry="14" fill="#3d2a16"/>
+            <path d="M -16 -8 Q -18 -30 -6 -30 Q 4 -30 4 -8" fill="#3d2a16"/>
+            <path d="M 14 -8 Q 16 -34 28 -34 Q 38 -34 36 -8" fill="#3d2a16"/>
+            <line x1="-32" y1="14" x2="-32" y2="30" stroke="#3d2a16" stroke-width="3"/>
+            <line x1="-16" y1="14" x2="-16" y2="30" stroke="#3d2a16" stroke-width="3"/>
+            <line x1="16" y1="14" x2="16" y2="30" stroke="#3d2a16" stroke-width="3"/>
+            <line x1="32" y1="14" x2="32" y2="30" stroke="#3d2a16" stroke-width="3"/>
+            <ellipse cx="-40" cy="-28" rx="6" ry="8" fill="#3d2a16"/>
+            <line x1="-40" y1="-36" x2="-46" y2="-46" stroke="#3d2a16" stroke-width="2"/>
+            <!-- Bundle on top -->
+            <rect x="-8" y="-44" width="22" height="14" fill="#5a4378" stroke="rgba(251,191,36,0.65)" stroke-width="0.8"/>
+          </g>
+          <!-- Voice from above -->
+          <text x="500" y="100" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="18" letter-spacing="4" fill="rgba(251,191,36,0.95)">"GO"</text>
+          <text x="500" y="130" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="10" letter-spacing="3" fill="rgba(254,243,199,0.85)">— TO A LAND I WILL SHOW YOU</text>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.85)">75 years old · and just getting started</text>
+        </svg>`
+      },
+      {
+        id: 'stars',
+        title: 'Count the Stars',
+        scriptureRef: 'Genesis 15:1-6',
+        bibleText: '"He brought him outside and said, ‘Look toward heaven, and number the stars, if you are able to number them.’ Then he said to him, ‘So shall your offspring be.’ And he believed the Lord, and he counted it to him as righteousness."',
+        narration: 'Years had passed in the new land. Still no child. Abram complained: "What can you give me, since I remain childless? The heir of my house will be my servant." The Lord took him outside that night. The sky over Mesopotamia, with no electric lights for thousands of miles, was an ocean of stars. "Look up. Count them, if you can. So shall your offspring be." And Abram — looking at a sky he could not even begin to count — believed. The Lord counted that belief as righteousness. Not his works. His trust.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          <defs>
+            <linearGradient id="ab2Sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#000a14"/>
+              <stop offset="60%" stop-color="#0a0d1a"/>
+              <stop offset="100%" stop-color="#241846"/>
+            </linearGradient>
+          </defs>
+          <rect width="800" height="500" fill="url(#ab2Sky)"/>
+          <!-- DENSE star field -->
+          <g fill="#fef3c7">
+            <circle cx="40" cy="30" r="1"/><circle cx="80" cy="60" r="1.5"/>
+            <circle cx="120" cy="40" r="0.9"/><circle cx="160" cy="80" r="1.2"/>
+            <circle cx="200" cy="30" r="1.4"/><circle cx="240" cy="70" r="0.8"/>
+            <circle cx="280" cy="50" r="1.5"/><circle cx="320" cy="20" r="0.9"/>
+            <circle cx="360" cy="60" r="1.2"/><circle cx="400" cy="40" r="1.4"/>
+            <circle cx="440" cy="70" r="0.9"/><circle cx="480" cy="30" r="1.5"/>
+            <circle cx="520" cy="60" r="1.2"/><circle cx="560" cy="20" r="0.9"/>
+            <circle cx="600" cy="50" r="1.4"/><circle cx="640" cy="80" r="1"/>
+            <circle cx="680" cy="40" r="1.5"/><circle cx="720" cy="70" r="0.9"/>
+            <circle cx="760" cy="30" r="1.2"/>
+            <circle cx="60" cy="120" r="1"/><circle cx="100" cy="140" r="1.4"/>
+            <circle cx="140" cy="110" r="0.9"/><circle cx="180" cy="150" r="1.5"/>
+            <circle cx="220" cy="130" r="1.2"/><circle cx="260" cy="100" r="0.8"/>
+            <circle cx="300" cy="140" r="1.5"/><circle cx="340" cy="120" r="0.9"/>
+            <circle cx="380" cy="100" r="1.4"/><circle cx="420" cy="150" r="1.2"/>
+            <circle cx="460" cy="120" r="1"/><circle cx="500" cy="140" r="1.4"/>
+            <circle cx="540" cy="110" r="0.9"/><circle cx="580" cy="150" r="1.2"/>
+            <circle cx="620" cy="130" r="1.5"/><circle cx="660" cy="100" r="0.9"/>
+            <circle cx="700" cy="140" r="1.4"/><circle cx="740" cy="120" r="1.2"/>
+            <circle cx="40" cy="200" r="0.9"/><circle cx="100" cy="220" r="1.5"/>
+            <circle cx="160" cy="190" r="1.2"/><circle cx="220" cy="230" r="0.8"/>
+            <circle cx="280" cy="210" r="1.4"/><circle cx="340" cy="190" r="0.9"/>
+            <circle cx="400" cy="230" r="1.5"/><circle cx="460" cy="200" r="1.2"/>
+            <circle cx="520" cy="220" r="0.9"/><circle cx="580" cy="200" r="1.4"/>
+            <circle cx="640" cy="230" r="0.9"/><circle cx="700" cy="190" r="1.5"/>
+            <circle cx="760" cy="220" r="1.2"/>
+          </g>
+          <!-- Ground -->
+          <path d="M 0 360 Q 400 350 800 360 L 800 500 L 0 500 Z" fill="#241846"/>
+          <!-- Abram with arms outstretched looking UP -->
+          <g transform="translate(400 380)">
+            <path d="M -16 0 Q -14 -54 0 -64 Q 14 -54 16 0 Z" fill="#3d2a16" stroke="rgba(251,191,36,0.95)" stroke-width="1.5"/>
+            <ellipse cx="0" cy="-74" rx="12" ry="14" fill="#1a1233"/>
+            <!-- Long white beard -->
+            <path d="M -8 -66 Q 0 -46 8 -66" stroke="rgba(254,243,199,0.95)" stroke-width="2" fill="none"/>
+            <!-- Head tilted UP -->
+            <line x1="-4" y1="-76" x2="-1" y2="-78" stroke="rgba(254,243,199,0.65)" stroke-width="1"/>
+            <line x1="1" y1="-78" x2="4" y2="-76" stroke="rgba(254,243,199,0.65)" stroke-width="1"/>
+            <!-- Arms UP toward the stars -->
+            <line x1="-14" y1="-46" x2="-30" y2="-90" stroke="#3d2a16" stroke-width="5"/>
+            <line x1="14" y1="-46" x2="30" y2="-90" stroke="#3d2a16" stroke-width="5"/>
+            <!-- Halo -->
+            <circle cx="0" cy="-74" r="28" fill="none" stroke="rgba(251,191,36,0.95)" stroke-width="1.7"/>
+            <circle cx="0" cy="-74" r="42" fill="none" stroke="rgba(251,191,36,0.5)" stroke-width="1.2"/>
+          </g>
+          <!-- "SO SHALL YOUR OFFSPRING BE" -->
+          <text x="400" y="320" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="16" letter-spacing="4" fill="rgba(251,191,36,0.95)">"SO SHALL YOUR OFFSPRING BE"</text>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">"He believed the Lord · and it was counted to him as righteousness"</text>
+        </svg>`
+      },
+      {
+        id: 'covenant-cut',
+        title: 'The Covenant in the Dark',
+        scriptureRef: 'Genesis 15:7-21',
+        bibleText: '"When the sun had gone down and it was dark, behold, a smoking fire pot and a flaming torch passed between these pieces."',
+        narration: 'The Lord told Abram to cut animals in half and lay them in two rows. Ancient covenant cutting: BOTH parties walked between the halves, swearing — "may this happen to ME if I break this promise." Abram waited. A deep darkness fell over him, almost a vision. He saw the future — his descendants in slavery, then delivered, then back in this land. Then, in the dark, only ONE party walked between the halves. A smoking firepot and a flaming torch — the LORD Himself — passed through alone. Abram did not walk through with Him. The covenant was on God\'s shoulders alone.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'ab3', skyTop:'#0a0d1a', skyMid:'#241846', skyBot:'#3d2a16', stars:false})}
+          <g fill="#fef3c7" opacity="0.5">
+            <circle cx="80" cy="50" r="0.8"/><circle cx="220" cy="80" r="0.9"/>
+            <circle cx="540" cy="60" r="0.8"/><circle cx="700" cy="100" r="0.7"/>
+          </g>
+          <!-- Ground -->
+          <path d="M 0 360 Q 400 350 800 360 L 800 500 L 0 500 Z" fill="#1a1233"/>
+          <!-- Two rows of split animal halves laid out as a path -->
+          <g fill="#3d2a16" stroke="rgba(120,20,20,0.55)" stroke-width="1">
+            <!-- Left side halves -->
+            <ellipse cx="200" cy="430" rx="36" ry="14"/>
+            <ellipse cx="300" cy="430" rx="36" ry="14"/>
+            <ellipse cx="400" cy="430" rx="36" ry="14"/>
+            <ellipse cx="500" cy="430" rx="36" ry="14"/>
+            <ellipse cx="600" cy="430" rx="36" ry="14"/>
+            <!-- Right side halves -->
+            <ellipse cx="200" cy="470" rx="36" ry="14"/>
+            <ellipse cx="300" cy="470" rx="36" ry="14"/>
+            <ellipse cx="400" cy="470" rx="36" ry="14"/>
+            <ellipse cx="500" cy="470" rx="36" ry="14"/>
+            <ellipse cx="600" cy="470" rx="36" ry="14"/>
+          </g>
+          <!-- The path BETWEEN the halves -->
+          <rect x="160" y="440" width="480" height="22" fill="#241846"/>
+          <!-- Smoking firepot in the middle of the path -->
+          <g transform="translate(380 450)">
+            <ellipse cx="0" cy="0" rx="18" ry="8" fill="#3d2a16" stroke="rgba(251,191,36,0.85)" stroke-width="1.4"/>
+            <ellipse cx="0" cy="-4" rx="14" ry="6" fill="#0a0d1a"/>
+            <ellipse cx="0" cy="-14" rx="9" ry="14" fill="#fb923c"/>
+            <ellipse cx="0" cy="-18" rx="5" ry="10" fill="#fbbf24"/>
+            <!-- Smoke trailing -->
+            <ellipse cx="-4" cy="-30" rx="8" ry="14" fill="rgba(254,243,199,0.18)"/>
+            <ellipse cx="-8" cy="-46" rx="12" ry="18" fill="rgba(254,243,199,0.12)"/>
+          </g>
+          <!-- Flaming torch -->
+          <g transform="translate(440 444)">
+            <line x1="0" y1="0" x2="0" y2="-20" stroke="#3d2a16" stroke-width="2.5"/>
+            <ellipse cx="0" cy="-28" rx="8" ry="14" fill="#fb923c"/>
+            <ellipse cx="0" cy="-32" rx="4" ry="9" fill="#fbbf24"/>
+            <ellipse cx="0" cy="-36" rx="2" ry="5" fill="#fef3c7"/>
+          </g>
+          <!-- Trail of light through the corridor (the LORD passing through) -->
+          <path d="M 200 451 Q 280 449 380 450 Q 440 449 600 451" stroke="rgba(251,191,36,0.55)" stroke-width="4" fill="none" opacity="0.7"/>
+          <!-- Abram far back, asleep in the deep dread (only one party walked through!) -->
+          <g transform="translate(120 360)" opacity="0.85">
+            <ellipse cx="0" cy="0" rx="40" ry="10" fill="#1a1233"/>
+            <ellipse cx="-32" cy="-8" rx="11" ry="13" fill="#1a1233"/>
+            <!-- Long white beard -->
+            <path d="M -40 -2 Q -32 12 -24 -2" stroke="rgba(254,243,199,0.85)" stroke-width="1.5" fill="none"/>
+            <!-- Closed eyes -->
+            <line x1="-38" y1="-12" x2="-34" y2="-12" stroke="rgba(254,243,199,0.5)" stroke-width="0.8"/>
+            <circle cx="-32" cy="-8" r="20" fill="none" stroke="rgba(251,191,36,0.85)" stroke-width="1.3"/>
+          </g>
+          <text x="120" y="320" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="9" letter-spacing="2" fill="rgba(254,243,199,0.65)">ABRAM · DEEP SLEEP</text>
+          <!-- "ONE PARTY · ALONE" banner -->
+          <text x="600" y="120" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="14" letter-spacing="4" fill="rgba(251,191,36,0.95)">ONE PARTY ALONE</text>
+          <text x="600" y="142" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="9" letter-spacing="2" fill="rgba(254,243,199,0.75)">THE COVENANT IS ON GOD</text>
+          <text x="400" y="120" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">"The Lord made a covenant with Abram"</text>
+        </svg>`
+      },
+      {
+        id: 'isaac-born',
+        title: 'Sarah Laughs · Isaac is Born',
+        scriptureRef: 'Genesis 17 · Genesis 21:1-7',
+        bibleText: '"And the Lord visited Sarah as he had said, and the Lord did to Sarah as he had promised. And Sarah conceived and bore Abraham a son in his old age."',
+        narration: 'Twenty-five years after God\'s first promise, when Abraham was 99 and Sarah was 89, the Lord visited their tent under the oaks of Mamre. He told them — in plain words — that within a year Sarah would have a son. Sarah laughed behind the tent flap. The Lord heard her laughing and asked, "Is anything too hard for the Lord?" A year later she held a baby in her arms. She named him Isaac — "laughter." She said, "God has made laughter for me; everyone who hears will laugh with me." The promise made under the stars became a boy in his mother\'s lap.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'ab4', skyTop:'#a78bfa', skyMid:'#fbbf24', skyBot:'#fef3c7', stars:false})}
+          <ellipse cx="660" cy="100" r="38" fill="#fef3c7"/>
+          <ellipse cx="660" cy="100" r="58" fill="rgba(251,191,36,0.5)"/>
+          <!-- Oaks of Mamre — large tree on the left -->
+          <g transform="translate(140 380)">
+            <line x1="0" y1="0" x2="0" y2="-110" stroke="#3d2a16" stroke-width="8"/>
+            <ellipse cx="0" cy="-130" rx="60" ry="48" fill="rgba(34,197,94,0.55)"/>
+          </g>
+          <!-- Tent -->
+          <g transform="translate(300 380)">
+            <path d="M -60 0 L 60 0 L 30 -60 L -30 -60 Z" fill="#3d2a16" stroke="rgba(251,191,36,0.85)" stroke-width="1.4"/>
+            <path d="M -10 -60 L 0 -90 L 10 -60" fill="#3d2a16" stroke="rgba(251,191,36,0.85)" stroke-width="1.2"/>
+            <!-- Tent flap opening (slightly parted) -->
+            <path d="M -10 0 L -4 -40 L -10 -60" fill="none" stroke="rgba(254,243,199,0.55)" stroke-width="1"/>
+          </g>
+          <!-- Ground -->
+          <path d="M 0 380 Q 400 372 800 380 L 800 500 L 0 500 Z" fill="rgba(34,197,94,0.4)"/>
+          <!-- Sarah and Abraham sitting under the tree with Isaac in lap, joyful -->
+          <g transform="translate(540 410)">
+            <!-- Abraham (right) -->
+            <path d="M 12 0 Q 14 -50 26 -56 Q 38 -50 40 0 Z" fill="#3d2a16" stroke="rgba(251,191,36,0.95)" stroke-width="1.4"/>
+            <ellipse cx="26" cy="-66" rx="11" ry="13" fill="#1a1233"/>
+            <path d="M 18 -58 Q 26 -42 34 -58" stroke="rgba(254,243,199,0.95)" stroke-width="2" fill="none"/>
+            <!-- Smile -->
+            <path d="M 22 -54 Q 26 -52 30 -54" stroke="rgba(254,243,199,0.7)" stroke-width="0.9" fill="none"/>
+            <circle cx="26" cy="-66" r="22" fill="none" stroke="rgba(251,191,36,0.95)" stroke-width="1.5"/>
+            <!-- Sarah (left) -->
+            <path d="M -40 0 Q -38 -50 -26 -56 Q -14 -50 -12 0 Z" fill="#3d2a5e" stroke="rgba(251,191,36,0.95)" stroke-width="1.4"/>
+            <ellipse cx="-26" cy="-66" rx="11" ry="13" fill="#1a1233"/>
+            <!-- Grey hair under veil -->
+            <path d="M -36 -72 Q -26 -84 -16 -72 Q -14 -60 -26 -56 Q -38 -60 -36 -72 Z" fill="#241846" stroke="rgba(251,191,36,0.65)" stroke-width="1"/>
+            <!-- Smile -->
+            <path d="M -30 -54 Q -26 -52 -22 -54" stroke="rgba(254,243,199,0.7)" stroke-width="0.9" fill="none"/>
+            <circle cx="-26" cy="-66" r="22" fill="none" stroke="rgba(251,191,36,0.95)" stroke-width="1.5"/>
+            <!-- Baby Isaac in Sarah's arms -->
+            <ellipse cx="-12" cy="-30" rx="16" ry="7" fill="#fef3c7"/>
+            <ellipse cx="-12" cy="-32" rx="6" ry="5" fill="#fef3c7"/>
+            <!-- Tiny halo on Isaac (child of promise) -->
+            <circle cx="-12" cy="-32" r="14" fill="none" stroke="rgba(251,191,36,0.95)" stroke-width="1.3"/>
+            <!-- Sarah's arm cradling baby -->
+            <path d="M -22 -20 Q -12 -36 0 -20" stroke="#3d2a5e" stroke-width="5" fill="none"/>
+          </g>
+          <text x="500" y="332" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="9" letter-spacing="2.5" fill="rgba(251,191,36,0.85)">SARAH · ABRAHAM · ISAAC</text>
+          <!-- "ISAAC = LAUGHTER" banner -->
+          <text x="400" y="80" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="22" letter-spacing="6" fill="rgba(251,191,36,0.95)">ISAAC = LAUGHTER</text>
+          <text x="400" y="110" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="11" letter-spacing="3" fill="rgba(254,243,199,0.85)">25 YEARS LATER · THE PROMISE KEPT</text>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">"Is anything too hard for the Lord?"</text>
+        </svg>`
+      }
+    ],
+    closing: 'God made a covenant with one man — and through him He blessed every family on earth. Abraham\'s descendants by faith are not just one ethnic group; Paul says in Romans 4 that EVERYONE who trusts Jesus is a child of Abraham. The promise made under the stars is YOUR inheritance. And the most important thing about the covenant — the thing Abraham saw in the dark vision — is that it was on God\'s shoulders alone. He walked through the pieces. We did not. Centuries later, on a cross, He kept the covenant for both of us.',
+    closingPrompt: 'Where in your life is God asking you to "go" before He shows you where — and what one small step in that direction could you take today?'
+  },
+
+  // ════════════════════════════════════════════════════════════
+  // STORY 43 — Jacob & Esau
+  // ════════════════════════════════════════════════════════════
+  {
+    id: 'jacob-esau',
+    title: 'Jacob & Esau',
+    subtitle: 'Two brothers · a stolen blessing · a wrestling match by a river.',
+    icon: '👬',
+    color: '#fbbf24',
+    accentColor: '#fef3c7',
+    era: 'patriarchs',
+    scriptureRef: 'Genesis 25-33',
+    duration: '~7 min',
+    scenes: [
+      {
+        id: 'soup',
+        title: 'The Bowl of Soup',
+        scriptureRef: 'Genesis 25:24-34',
+        bibleText: '"Esau said, ‘I am about to die; of what use is a birthright to me?’ …Thus Esau despised his birthright."',
+        narration: 'Twins were born to Isaac and Rebekah — wrestling in the womb. Esau came out first, red and hairy. Jacob came out clutching his brother\'s heel; his name meant "grabber" or "deceiver." They grew up opposites: Esau the hunter, Isaac\'s favorite. Jacob the quiet one in the tents, Rebekah\'s favorite. One afternoon Esau came in from the field starving. Jacob was cooking lentil stew. "Give me some of that red stuff!" Esau demanded. Jacob said: "First sell me your birthright." Esau, smelling the soup, said, "What good is a birthright to a dying man?" He swore. He ate. He went back out. He had just traded his future for a bowl.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'js1', skyTop:'#3d2a5e', skyMid:'#a78bfa', skyBot:'#fbbf24', stars:false})}
+          <ellipse cx="660" cy="120" r="36" fill="#fef3c7"/>
+          <ellipse cx="660" cy="120" r="56" fill="rgba(251,191,36,0.4)"/>
+          <!-- Tent on the right -->
+          <g transform="translate(580 360)">
+            <path d="M -60 60 L 60 60 L 30 0 L -30 0 Z" fill="#3d2a16" stroke="rgba(251,191,36,0.85)" stroke-width="1.4"/>
+            <path d="M -10 0 L 0 -30 L 10 0" fill="#3d2a16" stroke="rgba(251,191,36,0.85)" stroke-width="1.2"/>
+          </g>
+          <!-- Ground -->
+          <path d="M 0 380 Q 400 370 800 380 L 800 500 L 0 500 Z" fill="rgba(74,52,32,0.5)"/>
+          <!-- Cookpot with steaming soup -->
+          <g transform="translate(440 430)">
+            <ellipse cx="0" cy="0" rx="30" ry="10" fill="#0a0d1a" stroke="rgba(251,191,36,0.85)" stroke-width="1.2"/>
+            <path d="M -30 0 Q -30 28 0 30 Q 30 28 30 0" fill="#0a0d1a"/>
+            <ellipse cx="0" cy="-4" rx="24" ry="6" fill="rgba(120,20,20,0.85)"/>
+            <ellipse cx="0" cy="-6" rx="18" ry="4" fill="rgba(251,113,38,0.95)"/>
+            <!-- Steam -->
+            <path d="M -12 -16 Q -16 -28 -10 -36" stroke="rgba(254,243,199,0.6)" stroke-width="2" fill="none"/>
+            <path d="M 0 -18 Q 2 -32 -4 -44" stroke="rgba(254,243,199,0.6)" stroke-width="2" fill="none"/>
+            <path d="M 12 -16 Q 16 -30 10 -40" stroke="rgba(254,243,199,0.6)" stroke-width="2" fill="none"/>
+          </g>
+          <!-- Esau (left, hairy, with bow on back, kneeling in front of pot, hungry) -->
+          <g transform="translate(340 420)">
+            <!-- Body bent forward -->
+            <ellipse cx="0" cy="0" rx="22" ry="14" fill="#3d2a16" stroke="rgba(74,52,32,0.95)" stroke-width="1.2"/>
+            <ellipse cx="0" cy="-20" rx="14" ry="22" fill="#3d2a16" stroke="rgba(74,52,32,0.95)" stroke-width="1.2"/>
+            <ellipse cx="0" cy="-50" rx="11" ry="13" fill="#1a1233"/>
+            <!-- Bushy hair (lots of strokes) -->
+            <g stroke="#0a0d1a" stroke-width="2" fill="none">
+              <path d="M -10 -54 Q -16 -64 -10 -64"/>
+              <path d="M -4 -56 Q -8 -66 -2 -64"/>
+              <path d="M 2 -56 Q 6 -66 8 -64"/>
+              <path d="M 10 -54 Q 16 -64 12 -62"/>
+            </g>
+            <!-- Bushy beard -->
+            <path d="M -10 -40 Q 0 -20 10 -40" stroke="rgba(74,52,32,0.95)" stroke-width="3" fill="none"/>
+            <path d="M -6 -34 Q 0 -22 6 -34" stroke="rgba(74,52,32,0.95)" stroke-width="2" fill="none"/>
+            <!-- Hands reaching toward pot -->
+            <line x1="14" y1="-24" x2="44" y2="-2" stroke="#3d2a16" stroke-width="5"/>
+            <!-- Bow slung on back -->
+            <path d="M -22 -34 Q -36 -10 -22 14" stroke="#0a0d1a" stroke-width="2" fill="none"/>
+            <line x1="-22" y1="-34" x2="-22" y2="14" stroke="rgba(254,243,199,0.6)" stroke-width="0.8"/>
+          </g>
+          <text x="340" y="350" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="9" letter-spacing="2.5" fill="rgba(74,52,32,0.95)">ESAU</text>
+          <!-- Jacob behind the pot, calm, holding a wooden spoon -->
+          <g transform="translate(520 420)">
+            <path d="M -14 0 Q -12 -48 0 -58 Q 12 -48 14 0 Z" fill="#3d2a5e" stroke="rgba(251,191,36,0.85)" stroke-width="1.4"/>
+            <ellipse cx="0" cy="-66" rx="11" ry="13" fill="#1a1233"/>
+            <path d="M -6 -58 Q 0 -50 6 -58" stroke="rgba(254,243,199,0.55)" stroke-width="1.2" fill="none"/>
+            <!-- Spoon being lifted -->
+            <line x1="-14" y1="-30" x2="-30" y2="-46" stroke="#3d2a16" stroke-width="2.5"/>
+            <ellipse cx="-32" cy="-48" rx="5" ry="3" fill="#3d2a16"/>
+            <!-- A subtle smirk -->
+            <path d="M -3 -55 Q 0 -53 3 -55" stroke="rgba(254,243,199,0.5)" stroke-width="0.8" fill="none"/>
+            <circle cx="0" cy="-66" r="18" fill="none" stroke="rgba(251,191,36,0.55)" stroke-width="1" stroke-dasharray="3 4"/>
+          </g>
+          <text x="520" y="334" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="9" letter-spacing="2.5" fill="rgba(251,191,36,0.65)">JACOB</text>
+          <!-- "BIRTHRIGHT FOR A BOWL" banner -->
+          <text x="400" y="80" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="22" letter-spacing="6" fill="rgba(251,191,36,0.95)">BIRTHRIGHT</text>
+          <text x="400" y="110" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="14" letter-spacing="4" fill="rgba(254,243,199,0.85)">FOR A BOWL OF SOUP</text>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.85)">"Esau despised his birthright"</text>
+        </svg>`
+      },
+      {
+        id: 'stolen-blessing',
+        title: 'The Stolen Blessing',
+        scriptureRef: 'Genesis 27:1-40',
+        bibleText: '"Are you really my son Esau?" he asked. "I am," he replied.',
+        narration: 'Years later, Isaac was old and blind. He sent Esau out to hunt and prepare a meal so he could give him the final blessing. Rebekah overheard. She rushed to Jacob: "Quick — bring me two young goats. I\'ll cook them like wild game. Wear your brother\'s clothes. Wrap goatskins on your hands and neck. Take it to your father and get the blessing instead." Jacob did it. He stood in front of his blind father, wearing his brother\'s smell, lying with his brother\'s name in his mouth. Isaac\'s hands trembled. "The voice is Jacob\'s, but the hands are Esau\'s." He blessed him. The blessing could not be taken back. When Esau came in moments later, all the air left the room.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'js2', skyTop:'#1e1846', skyMid:'#3d2a16', skyBot:'#241846', stars:false})}
+          <!-- Tent interior — dim lamp light -->
+          <radialGradient id="js2Lamp" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0%" stop-color="rgba(251,113,38,0.3)"/>
+            <stop offset="100%" stop-color="rgba(251,191,36,0)"/>
+          </radialGradient>
+          <ellipse cx="400" cy="320" rx="380" ry="200" fill="url(#js2Lamp)"/>
+          <!-- Hanging oil lamp -->
+          <line x1="400" y1="0" x2="400" y2="80" stroke="rgba(251,191,36,0.5)" stroke-width="1"/>
+          <ellipse cx="400" cy="88" rx="14" ry="6" fill="#3d2a16" stroke="rgba(251,191,36,0.85)" stroke-width="1"/>
+          <ellipse cx="400" cy="84" rx="6" ry="7" fill="#fbbf24"/>
+          <!-- Floor -->
+          <rect x="0" y="420" width="800" height="80" fill="#1a1233"/>
+          <!-- Isaac lying on a low cushion / bed, propped up, blind -->
+          <g transform="translate(540 400)">
+            <!-- Bed -->
+            <rect x="-90" y="0" width="180" height="22" fill="#3d2a5e" stroke="rgba(251,191,36,0.55)" stroke-width="1"/>
+            <!-- Body lying -->
+            <ellipse cx="20" cy="-8" rx="80" ry="14" fill="#3d2a5e" stroke="rgba(251,191,36,0.55)" stroke-width="1"/>
+            <!-- Head propped -->
+            <ellipse cx="-58" cy="-16" rx="14" ry="16" fill="#1a1233"/>
+            <!-- Long WHITE beard (old age) -->
+            <path d="M -64 -8 Q -58 8 -52 -8" stroke="rgba(254,243,199,0.95)" stroke-width="2.5" fill="none"/>
+            <path d="M -60 2 Q -58 12 -56 2" stroke="rgba(254,243,199,0.95)" stroke-width="1.5" fill="none"/>
+            <!-- White hair -->
+            <path d="M -66 -28 Q -58 -36 -50 -28" stroke="rgba(254,243,199,0.85)" stroke-width="2" fill="none"/>
+            <!-- Eyes shown as horizontal lines (blind) -->
+            <line x1="-62" y1="-20" x2="-58" y2="-20" stroke="rgba(254,243,199,0.65)" stroke-width="0.8"/>
+            <line x1="-56" y1="-20" x2="-52" y2="-20" stroke="rgba(254,243,199,0.65)" stroke-width="0.8"/>
+            <!-- Hand reaching out to touch Jacob's "hairy" hand -->
+            <line x1="-44" y1="-12" x2="-12" y2="-2" stroke="#3d2a5e" stroke-width="5"/>
+          </g>
+          <text x="540" y="360" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="9" letter-spacing="2.5" fill="rgba(254,243,199,0.75)">ISAAC · BLIND</text>
+          <!-- Jacob kneeling at his side, IN ESAU'S CLOTHES, hand extended with goatskin wrapped -->
+          <g transform="translate(360 410)">
+            <!-- Body (kneeling) -->
+            <ellipse cx="0" cy="0" rx="22" ry="11" fill="#3d2a16" stroke="rgba(251,191,36,0.7)" stroke-width="1"/>
+            <ellipse cx="0" cy="-16" rx="14" ry="20" fill="#3d2a16" stroke="rgba(251,191,36,0.7)" stroke-width="1"/>
+            <ellipse cx="0" cy="-44" rx="11" ry="13" fill="#1a1233"/>
+            <path d="M -6 -36 Q 0 -28 6 -36" stroke="rgba(254,243,199,0.55)" stroke-width="1.2" fill="none"/>
+            <!-- Goatskin wrapped on the hand he extends -->
+            <line x1="14" y1="-22" x2="40" y2="-12" stroke="#3d2a16" stroke-width="5"/>
+            <ellipse cx="40" cy="-12" rx="10" ry="6" fill="#74523A" stroke="rgba(74,52,32,0.95)" stroke-width="1"/>
+            <g stroke="#3d2a16" stroke-width="0.8" fill="none">
+              <path d="M 34 -14 Q 38 -18 42 -14"/>
+              <path d="M 36 -10 Q 40 -14 44 -10"/>
+            </g>
+            <!-- A platter of "game" food being offered -->
+            <ellipse cx="-30" cy="-10" rx="16" ry="6" fill="#3d2a16" stroke="rgba(251,191,36,0.7)" stroke-width="0.8"/>
+            <line x1="-14" y1="-22" x2="-28" y2="-14" stroke="#3d2a16" stroke-width="3"/>
+            <!-- Halo dashed broken (he's lying) -->
+            <circle cx="0" cy="-44" r="18" fill="none" stroke="rgba(248,113,113,0.55)" stroke-width="1" stroke-dasharray="2 3"/>
+          </g>
+          <text x="360" y="340" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="9" letter-spacing="2.5" fill="rgba(248,113,113,0.85)">JACOB · IN DISGUISE</text>
+          <!-- Rebekah peeking through tent flap on far left -->
+          <g transform="translate(120 400)" opacity="0.75">
+            <ellipse cx="0" cy="-22" rx="9" ry="20" fill="#3d2a5e"/>
+            <ellipse cx="0" cy="-44" rx="9" ry="11" fill="#1a1233"/>
+            <path d="M -8 -50 Q 0 -60 8 -50 Q 10 -38 0 -36 Q -10 -38 -8 -50 Z" fill="#241846" stroke="rgba(251,191,36,0.55)" stroke-width="0.8"/>
+          </g>
+          <text x="120" y="340" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="9" letter-spacing="2.5" fill="rgba(254,243,199,0.65)">REBEKAH · WATCHING</text>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">"The voice is Jacob\'s · but the hands are Esau\'s"</text>
+        </svg>`
+      },
+      {
+        id: 'ladder',
+        title: "Jacob's Ladder",
+        scriptureRef: 'Genesis 28:10-22',
+        bibleText: '"Behold, the Lord stood above it and said, ‘I am the Lord, the God of Abraham your father and the God of Isaac… I am with you and will keep you wherever you go.’"',
+        narration: 'Esau was so furious he swore to kill Jacob the moment their father died. Jacob fled — a thief running through the desert with a single stone for a pillow. The first night he lay down somewhere outside Bethel and dreamed. He saw a stairway from earth to heaven with angels going up and coming down — and at the top, the Lord standing over it. "I am the God of Abraham your father. I am with you and will keep you wherever you go. I will not leave you." Jacob woke up shaking. "Surely the Lord was in this place — and I did not know it." He set up the stone as a pillar and called the place Bethel — "house of God."',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'js3', skyTop:'#0a0d1a', skyMid:'#241846', skyBot:'#3d2a16', stars:false})}
+          <g fill="#fef3c7" opacity="0.7">
+            <circle cx="80" cy="50" r="0.9"/><circle cx="220" cy="80" r="1"/>
+            <circle cx="380" cy="40" r="0.7"/><circle cx="540" cy="60" r="0.9"/>
+            <circle cx="680" cy="50" r="1"/><circle cx="720" cy="120" r="0.8"/>
+          </g>
+          <!-- Ground -->
+          <path d="M 0 400 Q 400 388 800 400 L 800 500 L 0 500 Z" fill="#1a1233"/>
+          <!-- The LADDER / staircase rising from earth to heaven center -->
+          <g>
+            <!-- Two rails -->
+            <line x1="380" y1="400" x2="350" y2="40" stroke="rgba(251,191,36,0.95)" stroke-width="3"/>
+            <line x1="430" y1="400" x2="460" y2="40" stroke="rgba(251,191,36,0.95)" stroke-width="3"/>
+            <!-- Rungs -->
+            <line x1="378" y1="370" x2="432" y2="370" stroke="rgba(251,191,36,0.85)" stroke-width="2"/>
+            <line x1="375" y1="330" x2="436" y2="330" stroke="rgba(251,191,36,0.85)" stroke-width="2"/>
+            <line x1="372" y1="290" x2="438" y2="290" stroke="rgba(251,191,36,0.85)" stroke-width="2"/>
+            <line x1="368" y1="250" x2="441" y2="250" stroke="rgba(251,191,36,0.85)" stroke-width="2"/>
+            <line x1="364" y1="210" x2="445" y2="210" stroke="rgba(251,191,36,0.85)" stroke-width="2"/>
+            <line x1="360" y1="170" x2="448" y2="170" stroke="rgba(251,191,36,0.85)" stroke-width="2"/>
+            <line x1="356" y1="130" x2="452" y2="130" stroke="rgba(251,191,36,0.85)" stroke-width="2"/>
+            <line x1="352" y1="90" x2="456" y2="90" stroke="rgba(251,191,36,0.85)" stroke-width="2"/>
+          </g>
+          <!-- Angels ascending and descending — small luminous figures on the ladder -->
+          <g fill="rgba(254,243,199,0.85)">
+            <g transform="translate(395 340)">
+              <ellipse cx="0" cy="0" rx="6" ry="10"/>
+              <ellipse cx="0" cy="-12" rx="5" ry="5"/>
+              <path d="M -6 -2 Q -14 4 -10 14" stroke="rgba(251,191,36,0.6)" stroke-width="1" fill="rgba(254,243,199,0.25)"/>
+              <path d="M 6 -2 Q 14 4 10 14" stroke="rgba(251,191,36,0.6)" stroke-width="1" fill="rgba(254,243,199,0.25)"/>
+            </g>
+            <g transform="translate(420 260)">
+              <ellipse cx="0" cy="0" rx="6" ry="10"/>
+              <ellipse cx="0" cy="-12" rx="5" ry="5"/>
+              <path d="M -6 -2 Q -14 4 -10 14" stroke="rgba(251,191,36,0.6)" stroke-width="1" fill="rgba(254,243,199,0.25)"/>
+              <path d="M 6 -2 Q 14 4 10 14" stroke="rgba(251,191,36,0.6)" stroke-width="1" fill="rgba(254,243,199,0.25)"/>
+            </g>
+            <g transform="translate(390 180)">
+              <ellipse cx="0" cy="0" rx="6" ry="10"/>
+              <ellipse cx="0" cy="-12" rx="5" ry="5"/>
+              <path d="M -6 -2 Q -14 4 -10 14" stroke="rgba(251,191,36,0.6)" stroke-width="1" fill="rgba(254,243,199,0.25)"/>
+              <path d="M 6 -2 Q 14 4 10 14" stroke="rgba(251,191,36,0.6)" stroke-width="1" fill="rgba(254,243,199,0.25)"/>
+            </g>
+            <g transform="translate(420 100)">
+              <ellipse cx="0" cy="0" rx="6" ry="10"/>
+              <ellipse cx="0" cy="-12" rx="5" ry="5"/>
+              <path d="M -6 -2 Q -14 4 -10 14" stroke="rgba(251,191,36,0.6)" stroke-width="1" fill="rgba(254,243,199,0.25)"/>
+              <path d="M 6 -2 Q 14 4 10 14" stroke="rgba(251,191,36,0.6)" stroke-width="1" fill="rgba(254,243,199,0.25)"/>
+            </g>
+          </g>
+          <!-- The Lord at the top, brilliant -->
+          <g transform="translate(400 40)">
+            <ellipse cx="0" cy="0" rx="22" ry="40" fill="rgba(254,243,199,0.85)"/>
+            <ellipse cx="0" cy="-44" rx="14" ry="16" fill="rgba(254,243,199,0.95)"/>
+            <circle cx="0" cy="-44" r="26" fill="none" stroke="rgba(251,191,36,0.95)" stroke-width="1.8"/>
+            <circle cx="0" cy="-44" r="40" fill="none" stroke="rgba(251,191,36,0.55)" stroke-width="1.2"/>
+          </g>
+          <!-- Jacob asleep at the bottom — stone pillow -->
+          <g transform="translate(200 430)">
+            <ellipse cx="0" cy="0" rx="40" ry="10" fill="#1a1233"/>
+            <ellipse cx="-32" cy="-6" rx="10" ry="13" fill="#1a1233"/>
+            <!-- Stone pillow -->
+            <ellipse cx="-46" cy="-2" rx="12" ry="6" fill="#3d2a16" stroke="rgba(251,191,36,0.55)" stroke-width="0.8"/>
+            <!-- Halo dashed — dream state -->
+            <circle cx="-32" cy="-6" r="18" fill="none" stroke="rgba(251,191,36,0.85)" stroke-width="1" stroke-dasharray="2 3"/>
+          </g>
+          <text x="200" y="378" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="9" letter-spacing="2.5" fill="rgba(254,243,199,0.75)">JACOB · DREAMING</text>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">"Surely the Lord was in this place · and I did not know it"</text>
+        </svg>`
+      },
+      {
+        id: 'wrestle',
+        title: 'Wrestling at Peniel',
+        scriptureRef: 'Genesis 32:22-32',
+        bibleText: '"I will not let you go unless you bless me." …"Your name shall no longer be called Jacob, but Israel, for you have striven with God and with men, and have prevailed."',
+        narration: 'Twenty years later, Jacob was coming home, terrified. Esau was meeting him with four hundred men. He sent his family across the Jabbok river and stayed alone on the far bank. In the dark, a man wrestled him until daybreak. Jacob hung on — even when his hip was wrenched out of joint, even when he could barely stand. "Let me go, for the day has broken." "I will not let you go unless you bless me." "What is your name?" "Jacob." "No longer. Now Israel — because you have wrestled with God and with men, and have prevailed." Jacob limped into the sunrise with a new name. The next morning he met Esau — who ran to him and kissed him. The brothers wept on each other\'s shoulders.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'js4', skyTop:'#0a0d1a', skyMid:'#3d2a5e', skyBot:'#fbbf24', stars:false})}
+          <g fill="#fef3c7" opacity="0.55">
+            <circle cx="80" cy="50" r="0.8"/><circle cx="200" cy="80" r="0.9"/>
+            <circle cx="540" cy="60" r="0.8"/>
+          </g>
+          <!-- Dawn on horizon -->
+          <ellipse cx="660" cy="280" rx="200" ry="48" fill="rgba(251,113,38,0.35)"/>
+          <!-- Jabbok river -->
+          <path d="M 0 320 Q 400 305 800 320 L 800 380 Q 400 370 0 380 Z" fill="#1e1846" stroke="rgba(56,189,248,0.55)" stroke-width="1"/>
+          <g fill="rgba(254,243,199,0.4)">
+            <ellipse cx="160" cy="345" rx="20" ry="2"/>
+            <ellipse cx="420" cy="355" rx="22" ry="2"/>
+            <ellipse cx="660" cy="345" rx="20" ry="2"/>
+          </g>
+          <!-- Ground -->
+          <path d="M 0 400 Q 400 388 800 400 L 800 500 L 0 500 Z" fill="#241846"/>
+          <!-- Wrestling figures: Jacob and the mysterious man — locked, mid-grapple -->
+          <g transform="translate(400 380)">
+            <!-- The MAN (luminous) -->
+            <g>
+              <path d="M -22 0 Q -22 -50 -10 -60 Q 2 -50 4 0 Z" fill="rgba(254,243,199,0.85)" stroke="rgba(251,191,36,0.95)" stroke-width="1.4"/>
+              <ellipse cx="-10" cy="-70" rx="11" ry="13" fill="rgba(254,243,199,0.95)"/>
+              <!-- Arm gripping Jacob's shoulder -->
+              <line x1="0" y1="-30" x2="32" y2="-12" stroke="rgba(254,243,199,0.95)" stroke-width="6"/>
+              <!-- Halo blinding -->
+              <circle cx="-10" cy="-70" r="26" fill="none" stroke="rgba(251,191,36,0.95)" stroke-width="2"/>
+              <circle cx="-10" cy="-70" r="40" fill="none" stroke="rgba(251,191,36,0.55)" stroke-width="1.2"/>
+            </g>
+            <!-- JACOB locked with him -->
+            <g>
+              <path d="M 16 0 Q 16 -50 30 -60 Q 42 -50 42 0 Z" fill="#3d2a16" stroke="rgba(251,191,36,0.85)" stroke-width="1.4"/>
+              <ellipse cx="30" cy="-70" rx="11" ry="13" fill="#1a1233"/>
+              <path d="M 22 -62 Q 30 -50 38 -62" stroke="rgba(254,243,199,0.6)" stroke-width="1.4" fill="none"/>
+              <!-- Arm gripping the MAN's shoulder -->
+              <line x1="20" y1="-30" x2="-12" y2="-12" stroke="#3d2a16" stroke-width="6"/>
+              <!-- Hip wrenched — line indicating the wrench -->
+              <path d="M 38 -8 Q 50 0 56 12" stroke="rgba(120,20,20,0.85)" stroke-width="2"/>
+              <!-- Halo bright (he is wrestling FOR a blessing) -->
+              <circle cx="30" cy="-70" r="22" fill="none" stroke="rgba(251,191,36,0.95)" stroke-width="1.5"/>
+            </g>
+          </g>
+          <!-- "JACOB → ISRAEL" big text -->
+          <text x="400" y="80" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="22" letter-spacing="6" fill="rgba(251,191,36,0.95)">JACOB → ISRAEL</text>
+          <text x="400" y="108" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="10" letter-spacing="3" fill="rgba(254,243,199,0.75)">"YOU HAVE WRESTLED WITH GOD"</text>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">He limped into the sunrise with a new name</text>
+        </svg>`
+      }
+    ],
+    closing: 'Jacob is the great example that God\'s grace does not need our virtue to operate. He was the grabber, the deceiver, the heel-clutcher — and God still gave him the covenant, still met him in the dream, still wrestled with him in the dark, still gave him a new name and made him into the nation of Israel. If you feel disqualified by your own past, by your own scheming, by your own deception — read Jacob\'s story again. The Lord does not write you off when you trade your birthright for a bowl. He follows you across rivers and waits for you in the dark.',
+    closingPrompt: 'Where in your story would you most like the Lord to give you a new name — and what would limping into the sunrise look like for you?'
+  },
+
 ];
 
 if (typeof window !== 'undefined') {
