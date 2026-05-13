@@ -440,6 +440,38 @@ function initScripture(){
 // btn is optional — when bfTab() is called programmatically (e.g., from a Quick
 // Tile or stub-panel CTA), the matching button is found via [data-bf-tab].
 const BF_TABS = ['home','devotional','jesus','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline'];
+
+// Phase 5.8 v3 — Home-grid restorer. Defensive against any prior code
+// that may have set .topic-card-grid display:none inside #bf-home. The
+// canonical Home view is the navigation card-grid sitting above the
+// dashboard (.fh-grid). Called whenever bfTab('home') runs — directly,
+// via the Home tab button, or via a "← Back to Home" pill on a sub-tab.
+function bfShowHomeGrid(){
+  const home = document.getElementById('bf-home');
+  if(!home) return;
+  home.querySelectorAll('.topic-card-grid').forEach(el=>{ el.style.display = ''; });
+  const dash = home.querySelector('.fh-grid');
+  if(dash) dash.style.display = '';
+}
+
+// Phase 5.8 v3 — Back-to-Home pill management. Every Bible & Faith
+// sub-tab gets a "← Back to Home" pill at the top so the navigation
+// card-grid is always one click away. Idempotent — won't double-insert.
+function bfRemoveAllBackPills(){
+  document.querySelectorAll('.bf-back-btn').forEach(b => b.remove());
+}
+function bfInjectBackPill(panelId){
+  const el = document.getElementById(panelId);
+  if(!el) return;
+  if(el.querySelector('.bf-back-btn')) return;
+  const back = document.createElement('button');
+  back.className = 'bf-back-btn topic-back-btn';
+  back.type = 'button';
+  back.innerHTML = '← Back to Home';
+  back.onclick = function(){ bfTab('home'); };
+  el.insertBefore(back, el.firstChild);
+}
+
 function bfTab(tab, btn){
   BF_TABS.forEach(t=>{
     const el = document.getElementById('bf-'+t);
@@ -448,6 +480,10 @@ function bfTab(tab, btn){
   document.querySelectorAll('.scrTabs .tab').forEach(b=>b.classList.remove('active'));
   if(!btn) btn = document.querySelector('.scrTabs .tab[data-bf-tab="'+tab+'"]');
   if(btn) btn.classList.add('active');
+  // Phase 5.8 v3 — Restore Home grid view + inject Back pill on every sub-tab.
+  bfRemoveAllBackPills();
+  if(tab === 'home') bfShowHomeGrid();
+  else bfInjectBackPill('bf-' + tab);
   if(tab==='home') renderFaithHome();
   if(tab==='devotional') renderDevotionals();
   if(tab==='reading'){ populateBibleBooks(); renderBibleReadings(); }
