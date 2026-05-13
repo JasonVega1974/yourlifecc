@@ -2625,6 +2625,119 @@ img.topic-card-hero{
 :root.light .topic-card:hover{border-color:rgba(56,189,248,.45);}
 :root.light .topic-card-hero{background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(167,139,250,.08));border-bottom-color:rgba(15,23,42,.06);}
 
+/* ──────────────────────────────────────────────────────────────
+   Story Mode tiles (inside #bf-stories) + Reading Plan tiles
+   (inside #bf-plans) — pinned to the .topic-card spec so they
+   visually align with the Faith Home navigation grid and respond
+   to :root.light theme swap correctly. The per-story / per-plan
+   accent comes in via inline `--accent` CSS variable.
+   ────────────────────────────────────────────────────────────── */
+#fhStoryList,
+#bf-plans .pl-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:1rem;
+}
+.fh-story-tile,
+.pl-card-v2{
+  background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
+  border:1px solid rgba(255,255,255,.08);
+  color:var(--tx);
+  border-radius:14px;
+  padding:1rem 1.1rem;
+  min-height:150px;
+  cursor:pointer;
+  display:block;
+  width:100%;
+  text-align:left;
+  font:inherit;
+  font-family:var(--fm);
+  appearance:none;
+  -webkit-appearance:none;
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 4px 18px rgba(0,0,0,.10);
+  transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease,background .15s ease;
+}
+.fh-story-tile:hover,
+.pl-card-v2:hover{
+  transform:scale(1.02);
+  border-color:var(--accent,rgba(56,189,248,.55));
+  box-shadow:0 10px 28px rgba(0,0,0,.18);
+}
+.fh-story-tile:active,
+.pl-card-v2:active{transform:scale(.98);}
+
+:root.light .fh-story-tile,
+:root.light .pl-card-v2{
+  background:linear-gradient(135deg,rgba(15,23,42,.04),rgba(15,23,42,.02));
+  border-color:rgba(15,23,42,.1);
+}
+:root.light .fh-story-tile:hover,
+:root.light .pl-card-v2:hover{border-color:var(--accent,rgba(56,189,248,.45));}
+
+/* ──────────────────────────────────────────────────────────────
+   Modal scroll-area fix — Plan Detail, Story Player, charModal
+   used to clip content with fixed max-heights. Convert .md into
+   a flex column so the body grows to fill space between header
+   and footer. -webkit-overflow-scrolling for iOS smooth scroll.
+   Body padding aligned to the 1.25rem/1.5rem/2rem spec.
+   ────────────────────────────────────────────────────────────── */
+#planDetailModal .md,
+#storyPlayerModal .md,
+#charModal .md{
+  display:flex;
+  flex-direction:column;
+  max-height:92vh;
+  padding:0;
+  overflow:hidden;
+}
+#planDetailHeader,
+#planDetailFooter,
+#storyPlayerModal .sp-stage,
+#storyPlayerModal .sp-controls,
+#charModal .md > .md-head,
+#charModal .md > .md-foot{flex:0 0 auto;}
+
+/* Body sections grow + scroll. !important needed to override the
+   inline max-height/padding on planDetailBody and charBody. */
+#planDetailBody{
+  flex:1 1 auto !important;
+  max-height:none !important;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:1.25rem 1.5rem 2rem !important;
+  min-height:0;
+}
+#storyPlayerModal .sp-narration{
+  flex:1 1 auto;
+  max-height:none;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:1.25rem 1.5rem 2rem;
+  min-height:0;
+}
+#charBody{
+  flex:1 1 auto !important;
+  max-height:none !important;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:1.25rem 1.5rem 2rem !important;
+  min-height:0;
+}
+
+/* Mobile: shrink the fixed-height modal headers so the scroll
+   area gets more vertical room. Plan-detail icon + title compress. */
+@media (max-width:640px){
+  #planDetailHeader{padding:.85rem 1rem .8rem !important;}
+  #planDetailHeader #planDetailIcon{font-size:1.5rem !important;margin-bottom:.18rem !important;}
+  #planDetailHeader #planDetailTitle{font-size:1.05rem !important;}
+  #planDetailHeader #planDetailShort{font-size:.72rem !important;}
+  #planDetailBody{padding:1rem 1.1rem 1.6rem !important;}
+  #charBody{padding:1rem 1.1rem 1.6rem !important;}
+  #storyPlayerModal .sp-narration{padding:1rem 1.1rem 1.6rem;}
+}
+
 /* ══════════ Phase 5.5 (revised): BIBLE FLASHCARDS — multiple-choice ══════════ */
 .fc-hud{display:flex;align-items:center;gap:.6rem;margin-bottom:.9rem;flex-wrap:wrap;}
 .fc-hud-stat{display:flex;align-items:center;gap:.35rem;background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.18);border-radius:10px;padding:.45rem .75rem;}
