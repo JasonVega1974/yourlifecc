@@ -3599,3 +3599,208 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   outline: 2px solid var(--c);
   outline-offset: 2px;
 }
+
+/* ════════════════════════════════════════════════════════════════════
+   PHASE 7 — Bible & Faith typography unification (Timeline-style)
+   Replaces purple rounded banners with a clean header pattern, and
+   lightens body-text weight + adds breathing room throughout the
+   Bible & Faith tabs.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* Reusable section-header pattern — match the Timeline hero */
+.bf-section-hdr{
+  padding:1.1rem 0 1rem;
+  margin-bottom:1.1rem;
+  border-bottom:1px solid rgba(251,191,36,0.15);
+}
+.bf-eyebrow{
+  font-family:var(--fm);
+  font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;
+  color:#fbbf24;opacity:.78;
+  margin-bottom:.45rem;
+}
+.bf-title{
+  font-family:'Bebas Neue', var(--fm);
+  font-size:1.95rem;line-height:1;letter-spacing:.04em;
+  background:linear-gradient(135deg,#fef3c7 0%,#fbbf24 60%,#d97706 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  color:#fbbf24; /* fallback */
+  margin-bottom:.45rem;
+}
+.bf-sub{
+  font-family:Georgia, 'Times New Roman', serif;font-style:italic;
+  font-size:.95rem;line-height:1.6;
+  color:#fef3c7;opacity:.82;
+  max-width:560px;
+  font-weight:400;
+}
+:root.light .bf-eyebrow{color:#b45309;opacity:.9;}
+:root.light .bf-sub{color:#3a2818;opacity:.92;}
+:root.light .bf-section-hdr{border-bottom-color:rgba(180,120,20,.22);}
+
+/* Recolor the purple "active" chips/tabs to gold so the palette stays unified */
+#bf-plans .pl-chip.active{
+  background:linear-gradient(135deg,#fbbf24,#f59e0b) !important;
+  color:#0a0d1a !important;
+  border-color:transparent !important;
+  box-shadow:0 4px 14px rgba(251,191,36,.35) !important;
+}
+#bf-memorize .mv-tab.active{
+  background:linear-gradient(135deg,#fbbf24,#f59e0b) !important;
+  color:#0a0d1a !important;
+  border-color:transparent !important;
+}
+#bf-memorize .mv-cat-chip.active{
+  background:linear-gradient(135deg,#fbbf24,#f59e0b) !important;
+  color:#0a0d1a !important;
+  border-color:transparent !important;
+}
+
+/* Active-plan banner inside #bf-plans: navy+gold instead of purple */
+#bf-plans .pl-active-banner{
+  background:
+    radial-gradient(ellipse at top, rgba(251,191,36,.16), transparent 60%),
+    linear-gradient(180deg,#1a1233 0%,#0a0d1a 100%) !important;
+  color:#fef3c7 !important;
+  border:1px solid rgba(251,191,36,.32) !important;
+  box-shadow:0 0 28px rgba(251,191,36,.18) !important;
+}
+#bf-plans .pl-active-bar{background:rgba(251,191,36,.18) !important;}
+#bf-plans .pl-active-bar-fill{background:linear-gradient(90deg,#fbbf24,#f59e0b) !important;}
+
+/* ─── Typography cleanup across #bf-* tabs ────────────────────────
+   Lighter body weight + more line-height + remove forced 900s on
+   non-headings. Headings (Bebas Neue titles, stat numbers, badges)
+   keep their existing weights. */
+[id^="bf-"] p{
+  font-weight:400;
+  line-height:1.65;
+}
+[id^="bf-"] .pl-card-short,
+[id^="bf-"] .pl-hero-sub,
+[id^="bf-"] .fh-devo-snippet,
+[id^="bf-"] .fh-plan-empty,
+[id^="bf-"] .mv-hero-sub,
+[id^="bf-"] .mv-card-text,
+[id^="bf-"] .fh-streak-sub,
+[id^="bf-"] .pl-empty,
+[id^="bf-"] .mv-empty,
+[id^="bf-"] .dev-snippet,
+[id^="bf-"] .dev-body,
+[id^="bf-"] [class*="-desc"],
+[id^="bf-"] [class*="-description"]{
+  font-weight:400 !important;
+  line-height:1.65 !important;
+}
+/* Verse-of-the-day body keeps slight weight for readability but not bold */
+[id^="bf-"] .fh-votd-text{
+  font-weight:500 !important;
+  line-height:1.7 !important;
+}
+/* Card headers stay readable but drop from 800 to 600 */
+[id^="bf-"] .fh-card-hdr,
+[id^="bf-"] .fh-card-title{
+  font-weight:600 !important;
+  letter-spacing:.02em;
+}
+/* Section sub-headers (small caps) keep their identity but soften */
+[id^="bf-"] .pl-section-hdr,
+[id^="bf-"] .mv-section-hdr{
+  font-weight:700 !important;
+  letter-spacing:.18em !important;
+  color:#fbbf24 !important;
+  opacity:.78;
+}
+:root.light [id^="bf-"] .pl-section-hdr,
+:root.light [id^="bf-"] .mv-section-hdr{color:#b45309 !important;}
+
+/* Devotional inner body text (the inline-styled blocks in bf-devotional) */
+#bf-devotional [id="devBody"],
+#bf-devotional [id="devReflect"],
+#bf-devotional [id="devPrayer"]{
+  font-weight:400 !important;
+  line-height:1.7 !important;
+}
+
+/* ─── Override the purple `--cd-banner` blocks that act as banners ── */
+#bf-home .fh-votd{
+  background:
+    radial-gradient(ellipse at top, rgba(251,191,36,.18), transparent 60%),
+    linear-gradient(180deg,#1a1233 0%,#0a0d1a 100%) !important;
+  border:1px solid rgba(251,191,36,.32) !important;
+  color:#fef3c7 !important;
+  box-shadow:0 0 32px rgba(251,191,36,.18) !important;
+}
+#bf-home .fh-votd-eyebrow{color:#fbbf24 !important;opacity:.8;}
+#bf-home .fh-votd-text{color:#fef3c7 !important;}
+#bf-home .fh-votd-ref{color:#fbbf24 !important;opacity:.9;}
+#bf-home .fh-votd-actions button{
+  background:rgba(251,191,36,.12) !important;
+  color:#fef3c7 !important;
+  border:1px solid rgba(251,191,36,.32) !important;
+}
+#bf-home .fh-votd-actions button:hover{
+  background:rgba(251,191,36,.22) !important;
+}
+:root.light #bf-home .fh-votd{
+  background:
+    radial-gradient(ellipse at top, rgba(251,191,36,.18), transparent 60%),
+    linear-gradient(180deg,#fffaeb 0%,#fdf0c8 100%) !important;
+  border-color:rgba(180,120,20,.45) !important;
+  color:#1a1233 !important;
+}
+:root.light #bf-home .fh-votd-text{color:#1a1233 !important;}
+:root.light #bf-home .fh-votd-eyebrow{color:#b45309 !important;}
+:root.light #bf-home .fh-votd-ref{color:#b45309 !important;}
+:root.light #bf-home .fh-votd-actions button{
+  background:rgba(251,191,36,.18) !important;
+  color:#1a1233 !important;
+  border-color:rgba(180,120,20,.4) !important;
+}
+
+/* CTA buttons keep purple-gradient identity since they're action targets,
+   but live-plan/active state buttons get gold treatment via .pl-chip.active
+   and .mv-tab.active overrides above. The .fh-btn primary action remains
+   purple by design (it's a button, not a banner). */
+
+/* Prayer prompt card — drop purple banner, navy+gold instead */
+#bf-prayer .pr-prompt{
+  background:
+    radial-gradient(ellipse at top, rgba(251,191,36,.14), transparent 60%),
+    linear-gradient(180deg,#1a1233 0%,#0a0d1a 100%) !important;
+  border:1px solid rgba(251,191,36,.28) !important;
+  color:#fef3c7 !important;
+  box-shadow:0 0 28px rgba(251,191,36,.16) !important;
+}
+#bf-prayer .pr-prompt-eyebrow{color:#fbbf24 !important;opacity:.85;}
+#bf-prayer .pr-prompt-text{color:#fef3c7 !important;font-weight:500 !important;line-height:1.55;}
+#bf-prayer .pr-prompt-cta{
+  background:linear-gradient(135deg,#fbbf24,#f59e0b) !important;
+  color:#0a0d1a !important;
+}
+#bf-prayer .pr-chip.active[data-grp="type"]{
+  background:linear-gradient(135deg,#fbbf24,#f59e0b) !important;
+  color:#0a0d1a !important;
+}
+#bf-prayer .pr-tab.active{
+  background:linear-gradient(135deg,#fbbf24,#f59e0b) !important;
+  color:#0a0d1a !important;
+}
+
+#bf-bibleworld .bw-chip.active{
+  background:linear-gradient(135deg,#fbbf24,#f59e0b) !important;
+  color:#0a0d1a !important;
+}
+
+/* Light-mode variants for the navy → parchment swap on the de-purpled banners */
+:root.light #bf-prayer .pr-prompt,
+:root.light #bf-plans .pl-active-banner{
+  background:
+    radial-gradient(ellipse at top, rgba(251,191,36,.16), transparent 60%),
+    linear-gradient(180deg,#fffaeb 0%,#fdf0c8 100%) !important;
+  color:#1a1233 !important;
+  border-color:rgba(180,120,20,.4) !important;
+}
+:root.light #bf-prayer .pr-prompt-eyebrow{color:#b45309 !important;}
+:root.light #bf-prayer .pr-prompt-text{color:#1a1233 !important;}

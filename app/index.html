@@ -4255,6 +4255,11 @@
   <!-- Brand-palette discipline: cyan #38bdf8 + violet #a78bfa primary tokens only.
        No #667eea / #764ba2 / Orbitron. Pulls from existing data — no new schema. -->
   <div id="bf-home">
+    <div class="bf-section-hdr">
+      <div class="bf-eyebrow">SCRIPTURE · PRAYER · PRACTICE</div>
+      <div class="bf-title">Bible &amp; Faith</div>
+      <div class="bf-sub">Today's verse, today's devotional, your reading plan, and your streak — gathered in one quiet place to anchor the day.</div>
+    </div>
     <style>
       #bf-home .fh-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.85rem;}
       #bf-home .fh-card-hdr{display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem;font-size:.78rem;font-weight:800;color:var(--tx);letter-spacing:.02em;}
@@ -4496,14 +4501,20 @@
 
   <!-- DAILY DEVOTIONALS -->
   <div id="bf-devotional" style="display:none;">
+    <div class="bf-section-hdr">
+      <div class="bf-eyebrow">DAILY DEVOTIONAL · 365 DAYS</div>
+      <div class="bf-title">Devotionals</div>
+      <div class="bf-sub">A scripture, a reflection, a way to apply it, a prayer — five minutes shaped around one verse.</div>
+    </div>
+
     <!-- Today's Devotional Card -->
-    <div style="border-radius:18px;overflow:hidden;margin-bottom:1rem;border:1px solid rgba(167,139,250,.12);">
-      <!-- Gradient Header -->
-      <div style="background:linear-gradient(135deg,#667eea,#764ba2);padding:1.2rem 1.2rem 1rem;text-align:center;">
-        <div style="font-size:.55rem;text-transform:uppercase;letter-spacing:2.5px;color:rgba(255,255,255,.7);font-weight:700;margin-bottom:.3rem;">TODAY'S DEVOTIONAL · DAY <span id="devDayNum">1</span></div>
-        <div style="font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:.2rem;" id="devTitle"></div>
+    <div style="border-radius:18px;overflow:hidden;margin-bottom:1rem;border:1px solid rgba(251,191,36,.22);background:linear-gradient(180deg,#1a1233 0%,#0a0d1a 100%);">
+      <!-- Header -->
+      <div style="padding:1.2rem 1.2rem 1rem;text-align:center;border-bottom:1px solid rgba(251,191,36,.18);">
+        <div style="font-family:var(--fm);font-size:.62rem;text-transform:uppercase;letter-spacing:.22em;color:#fbbf24;opacity:.78;font-weight:600;margin-bottom:.35rem;">TODAY'S DEVOTIONAL · DAY <span id="devDayNum">1</span></div>
+        <div style="font-family:'Bebas Neue',var(--fm);font-size:1.45rem;letter-spacing:.04em;color:#fef3c7;line-height:1.15;" id="devTitle"></div>
       </div>
-      
+
       <!-- Scripture Quote -->
       <div style="padding:1rem 1.2rem;">
         <div style="background:rgba(167,139,250,.04);border-left:3px solid #a78bfa;border-radius:0 10px 10px 0;padding:.8rem 1rem;margin-bottom:.8rem;">
@@ -4594,10 +4605,10 @@
 
   <!-- ESV BIBLE READER (F2-D upgraded) -->
   <div id="bf-bible" style="display:none;">
-    <!-- Header bar (brand-palette gradient — F2-D purge of leftover purple) -->
-    <div style="background:var(--cd-banner);border-radius:14px;padding:1rem 1.2rem;margin-bottom:.9rem;text-align:center;color:var(--cd-banner-text);box-shadow:var(--cd-banner-shadow);">
-      <div style="font-size:1.1rem;font-weight:900;margin-bottom:.2rem;">📜 The Holy Bible</div>
-      <div style="font-size:.7rem;opacity:.78;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;">English Standard Version (ESV)</div>
+    <div class="bf-section-hdr">
+      <div class="bf-eyebrow">ESV · SEARCH · NOTES · HIGHLIGHTS</div>
+      <div class="bf-title">The Holy Bible</div>
+      <div class="bf-sub">Read any chapter, search the whole text or your notes, and keep the verses you mark coming back to you.</div>
     </div>
 
     <!-- F2-D: Search bar (full-text ESV + my notes & highlights) -->
@@ -4714,9 +4725,10 @@
       #bf-plans .pl-empty{text-align:center;color:var(--tx3);font-size:.78rem;padding:1rem;font-style:italic;}
     </style>
 
-    <div class="pl-hero">
-      <div class="pl-hero-title">📅 Reading Plans</div>
-      <div class="pl-hero-sub">Pick a plan that fits where you are. Topical for tough seasons, beginner if you&rsquo;re new, through-the-Bible for steady habit. Day-by-day progress · Faith XP for each completed day · badges when you finish.</div>
+    <div class="bf-section-hdr">
+      <div class="bf-eyebrow">DAY · BY · DAY · THROUGH SCRIPTURE</div>
+      <div class="bf-title">Reading Plans</div>
+      <div class="bf-sub">Pick a plan that fits where you are — topical for tough seasons, beginner if you&rsquo;re new, through-the-Bible for the long road. Faith XP each day, a badge when you finish.</div>
     </div>
 
     <div class="pl-filters" id="plFilters">
@@ -4901,6 +4913,12 @@
       #bf-prayer .pr-stat-lbl{font-size:.58rem;color:var(--tx2);font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-top:.1rem;}
     </style>
 
+    <div class="bf-section-hdr">
+      <div class="bf-eyebrow">REQUESTS · PRAISES · ANSWERED</div>
+      <div class="bf-title">Prayer</div>
+      <div class="bf-sub">A space to write what's on your heart, mark the answers as they come, and watch a longer story emerge over time.</div>
+    </div>
+
     <!-- Daily prompt -->
     <div class="pr-prompt">
       <div class="pr-prompt-eyebrow">🙏 Today's Prayer Prompt</div>
@@ -5060,9 +5078,10 @@
       #bf-academy .ac-roadmap-row strong{color:var(--tx);font-weight:700;}
     </style>
 
-    <div class="ac-hero">
-      <div class="ac-hero-title">🎓 Faith Academy</div>
-      <div class="ac-hero-sub">5 modules · 18 courses · ~85 lessons · 18 quizzes · certificates per course · master "Faith Foundations Graduate" badge when all 5 module badges are earned.</div>
+    <div class="bf-section-hdr">
+      <div class="bf-eyebrow">MODULES · COURSES · CERTIFICATES</div>
+      <div class="bf-title">Faith Academy</div>
+      <div class="bf-sub">Five modules, eighteen courses, around eighty-five lessons — earn a certificate per course and the "Faith Foundations Graduate" badge when all five module badges are yours.</div>
     </div>
 
     <div class="ac-stats">
@@ -5105,9 +5124,10 @@
       .leaflet-popup-content b{color:#0f172a;}
     </style>
 
-    <div class="bw-hero">
-      <div class="bw-hero-title">🗺️ Biblical World</div>
-      <div class="bw-hero-sub">30 sites · 20 archaeological discoveries · 8 biblical periods. Tap any card below — or any place name in the Bible reader — to read its story.</div>
+    <div class="bf-section-hdr">
+      <div class="bf-eyebrow">SITES · DISCOVERIES · PILGRIMAGES</div>
+      <div class="bf-title">Biblical World</div>
+      <div class="bf-sub">Thirty sites, twenty archaeological discoveries, eight biblical periods — tap any card or any place name in the Bible reader to walk its story.</div>
     </div>
 
     <!-- View tabs: Sites · Discoveries · Pilgrimage -->
@@ -5198,16 +5218,12 @@
        (renderFaithHomeStories in faith.js) still writes to #fhStoryList,
        which now lives inside this panel. -->
   <div id="bf-stories" style="display:none;">
-    <div style="background:linear-gradient(135deg, rgba(10,13,26,.95) 0%, rgba(26,18,51,.92) 100%);border:1px solid rgba(251,191,36,.18);border-radius:16px;padding:1rem 1.1rem 1.1rem;position:relative;overflow:hidden;">
-      <div style="position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(251,191,36,.16), transparent 55%);pointer-events:none;"></div>
-      <div style="position:relative;display:flex;align-items:center;gap:.55rem;margin-bottom:.35rem;color:#fef3c7;">
-        <span style="font-size:1.2rem;">⭐</span>
-        <span style="font-family:'Bebas Neue',var(--fm);letter-spacing:.14em;font-size:1.05rem;">Story Mode</span>
-        <span style="font-size:.72rem;font-weight:600;color:rgba(254,243,199,.6);">Illustrated &amp; narrated</span>
-      </div>
-      <div style="position:relative;font-size:.82rem;color:rgba(254,243,199,.78);line-height:1.55;margin-bottom:.95rem;font-family:Georgia,serif;font-style:italic;">Step inside the great moments of Scripture — hand-illustrated, scene by scene, with optional voice narration.</div>
-      <div id="fhStoryList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.55rem;position:relative;"></div>
+    <div class="bf-section-hdr">
+      <div class="bf-eyebrow">ILLUSTRATED · NARRATED · SCENE BY SCENE</div>
+      <div class="bf-title">Story Mode</div>
+      <div class="bf-sub">Step inside the great moments of Scripture — hand-illustrated, scene by scene, with optional voice narration.</div>
     </div>
+    <div id="fhStoryList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.6rem;"></div>
   </div>
 
   <!-- ════ VISUAL BIBLE TIMELINE (F4-D) ════ -->
@@ -5531,14 +5547,12 @@
       #bf-memorize .mv-cat-chip.active{background:var(--cd-banner);color:var(--cd-banner-text);border-color:transparent;}
     </style>
 
-    <!-- Today's review CTA -->
-    <div class="mv-hero">
-      <div style="font-size:2rem;flex-shrink:0;">✨</div>
-      <div class="mv-hero-content">
-        <div class="mv-hero-title">Memory Verses</div>
-        <div class="mv-hero-sub" id="mvHeroSub">Spaced repetition keeps verses in long-term memory.</div>
-      </div>
-      <button class="mv-hero-btn" id="mvQuizBtn" onclick="mvStartQuiz()">Start Today's Review</button>
+    <!-- Section header + Today's review CTA -->
+    <div class="bf-section-hdr">
+      <div class="bf-eyebrow">SPACED · REPETITION · HIDDEN IN HEART</div>
+      <div class="bf-title">Memory Verses</div>
+      <div class="bf-sub" id="mvHeroSub">Spaced repetition keeps verses in long-term memory — quick daily reviews that move from "due" to "mastered" over weeks.</div>
+      <button class="mv-hero-btn" id="mvQuizBtn" onclick="mvStartQuiz()" style="margin-top:.9rem;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a0d1a;border:none;border-radius:99px;padding:.7rem 1.3rem;font-size:.82rem;font-weight:900;letter-spacing:.04em;cursor:pointer;font-family:var(--fm);box-shadow:0 4px 16px rgba(251,191,36,.35);">▶ Start Today's Review</button>
     </div>
 
     <!-- Stats -->
