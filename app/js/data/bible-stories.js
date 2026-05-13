@@ -8982,6 +8982,1565 @@ const BIBLE_STORIES = [
     closingPrompt: 'What "exile" are you in right now — a season, a place, a relationship, a job you did not choose — and where might God already be teaching you to worship Him there?'
   },
 
+  // ════════════════════════════════════════════════════════════
+  // STORY 29 — Lazarus Raised
+  // ════════════════════════════════════════════════════════════
+  {
+    id: 'lazarus-raised',
+    title: 'Lazarus Raised',
+    subtitle: 'Four days in the grave. One word from Jesus. The dead walked out.',
+    icon: '🕊️',
+    color: '#a78bfa',
+    accentColor: '#fef3c7',
+    era: 'new-testament',
+    scriptureRef: 'John 11',
+    duration: '~6 min',
+    scenes: [
+      {
+        id: 'message',
+        title: 'Word of Sickness',
+        scriptureRef: 'John 11:1-6',
+        bibleText: '"Lord, the one you love is sick."',
+        narration: 'A messenger came running across the Jordan from Bethany. "Lord, the one you love is sick." Mary and Martha had sent for Jesus. He was their dearest friend in the world. He could heal a stranger from a hundred miles away with a single word — surely He would come now. Jesus heard the message. He said, "This sickness will not end in death. It is for the glory of God." And then He stayed where He was. Two more days. The disciples did not understand.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'lzm', skyTop:'#1e1846', skyMid:'#3d2a5e', skyBot:'#5a4378', stars:false})}
+          <!-- Sun low on horizon -->
+          <circle cx="660" cy="120" r="34" fill="#fef3c7"/>
+          <circle cx="660" cy="120" r="52" fill="rgba(251,191,36,0.4)"/>
+          <!-- Hills + ground -->
+          <path d="M 0 320 Q 200 290 400 310 Q 600 290 800 320 L 800 500 L 0 500 Z" fill="#241846"/>
+          <path d="M 0 400 Q 400 388 800 400 L 800 500 L 0 500 Z" fill="#0a0d1a"/>
+          <!-- Distant Bethany on horizon -->
+          <g transform="translate(700 290)" opacity="0.6">
+            <rect x="-14" y="-10" width="10" height="10" fill="#0a0d1a" stroke="rgba(251,191,36,0.5)" stroke-width="0.7"/>
+            <rect x="0" y="-15" width="12" height="15" fill="#0a0d1a" stroke="rgba(251,191,36,0.5)" stroke-width="0.7"/>
+            <polygon points="-1,-15 5,-22 11,-15" fill="#0a0d1a" stroke="rgba(251,191,36,0.5)" stroke-width="0.7"/>
+            <rect x="14" y="-8" width="10" height="8" fill="#0a0d1a" stroke="rgba(251,191,36,0.5)" stroke-width="0.7"/>
+          </g>
+          <text x="700" y="280" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="9" letter-spacing="2" fill="rgba(251,191,36,0.7)">BETHANY</text>
+          <!-- Jesus seated on stone, disciples around -->
+          <g transform="translate(280 360)">
+            <path d="M -22 0 Q -18 -44 0 -56 Q 18 -44 22 0 Z" fill="#3d2a16" stroke="rgba(251,191,36,0.85)" stroke-width="1.4"/>
+            <ellipse cx="0" cy="-66" rx="12" ry="14" fill="#1a1233"/>
+            <path d="M -8 -58 Q 0 -46 8 -58" stroke="rgba(254,243,199,0.6)" stroke-width="1.4" fill="none"/>
+            <path d="M -10 -66 Q -16 -52 -12 -36 M 10 -66 Q 16 -52 12 -36" stroke="#0a0d1a" stroke-width="2" fill="none"/>
+            <circle cx="0" cy="-66" r="22" fill="none" stroke="rgba(251,191,36,0.95)" stroke-width="1.5"/>
+          </g>
+          <!-- Disciples -->
+          <g fill="#0a0d1a" opacity="0.8">
+            <g transform="translate(200 410)"><ellipse cx="0" cy="0" rx="7" ry="20"/><ellipse cx="0" cy="-22" rx="6" ry="7"/></g>
+            <g transform="translate(360 415)"><ellipse cx="0" cy="0" rx="7" ry="20"/><ellipse cx="0" cy="-22" rx="6" ry="7"/></g>
+          </g>
+          <!-- Messenger running toward Jesus, urgent — leaning forward -->
+          <g transform="translate(500 400)">
+            <ellipse cx="0" cy="0" rx="9" ry="22" transform="rotate(-18 0 0)" fill="#1a1233"/>
+            <ellipse cx="-4" cy="-22" rx="8" ry="9" fill="#1a1233"/>
+            <line x1="-6" y1="-10" x2="-20" y2="-30" stroke="#1a1233" stroke-width="4"/>
+            <line x1="6"  y1="-10" x2="18" y2="-30" stroke="#1a1233" stroke-width="4"/>
+            <line x1="-4" y1="20" x2="-16" y2="36" stroke="#1a1233" stroke-width="4"/>
+            <line x1="4"  y1="18" x2="16" y2="32" stroke="#1a1233" stroke-width="4"/>
+          </g>
+          <!-- Dust kicked up behind messenger -->
+          <g fill="rgba(254,243,199,0.3)">
+            <ellipse cx="540" cy="425" rx="22" ry="6"/>
+            <ellipse cx="580" cy="430" rx="18" ry="4"/>
+          </g>
+          <text x="400" y="475" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.85)">"Lord, the one you love is sick"</text>
+        </svg>`
+      },
+      {
+        id: 'late',
+        title: 'Four Days Too Late',
+        scriptureRef: 'John 11:17-27',
+        bibleText: '"Lord, if you had been here, my brother would not have died… But even now, I know that whatever you ask, God will give you."',
+        narration: 'When Jesus finally arrived, Lazarus had been dead four days. Martha heard He was coming and ran out of the village to meet Him. She did not say hello. She said: "Lord, if you had been here, my brother would not have died." Then she added a sentence that has rung in the heart of every grieving believer since: "But even now, I know that whatever you ask, God will give you." Jesus looked at her and said, "I am the resurrection and the life. Whoever believes in me, though he die, yet shall he live. Do you believe this?" "Yes, Lord. I believe."',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'lzl', skyTop:'#0a0d1a', skyMid:'#241846', skyBot:'#3d2a16', stars:false})}
+          <g fill="#fef3c7" opacity="0.55">
+            <circle cx="80" cy="50" r="0.8"/><circle cx="220" cy="80" r="0.9"/>
+            <circle cx="380" cy="40" r="0.7"/><circle cx="540" cy="60" r="0.9"/>
+          </g>
+          <!-- Bethany — closer now, several houses on the right -->
+          <g transform="translate(620 380)">
+            <rect x="-50" y="-60" width="100" height="60" fill="#3d2a16" stroke="rgba(251,191,36,0.7)" stroke-width="1.2"/>
+            <polygon points="-58,-60 0,-94 58,-60" fill="#241846" stroke="rgba(251,191,36,0.7)" stroke-width="1.2"/>
+            <rect x="-10" y="-30" width="20" height="30" fill="#0a0d1a"/>
+            <rect x="-34" y="-50" width="14" height="14" fill="rgba(251,191,36,0.55)"/>
+            <rect x="22"  y="-50" width="14" height="14" fill="rgba(251,191,36,0.55)"/>
+          </g>
+          <g transform="translate(720 400)" opacity="0.8">
+            <rect x="-30" y="-40" width="60" height="40" fill="#3d2a16" stroke="rgba(251,191,36,0.7)" stroke-width="1"/>
+            <polygon points="-36,-40 0,-60 36,-40" fill="#241846" stroke="rgba(251,191,36,0.7)" stroke-width="1"/>
+            <rect x="-8" y="-22" width="16" height="22" fill="#0a0d1a"/>
+          </g>
+          <!-- Ground / road -->
+          <path d="M 0 410 Q 400 400 800 410 L 800 500 L 0 500 Z" fill="#1a1233"/>
+          <path d="M 80 460 Q 300 430 540 410" stroke="rgba(254,243,199,0.5)" stroke-width="6" fill="none" stroke-dasharray="6 8"/>
+          <!-- Martha running down the road in mourning robes -->
+          <g transform="translate(400 410)">
+            <path d="M -20 0 Q -18 -42 0 -52 Q 18 -42 20 0 Z" fill="#1a1233" stroke="rgba(254,243,199,0.5)" stroke-width="1"/>
+            <ellipse cx="0" cy="-62" rx="12" ry="14" fill="#1a1233"/>
+            <!-- Mourning veil -->
+            <path d="M -12 -68 Q 0 -82 12 -68 Q 14 -54 0 -50 Q -14 -54 -12 -68 Z" fill="#0a0d1a" stroke="rgba(251,191,36,0.55)" stroke-width="0.7"/>
+            <!-- Hands extended forward toward Jesus, palms up -->
+            <line x1="-18" y1="-32" x2="-42" y2="-26" stroke="#1a1233" stroke-width="5"/>
+            <line x1="18"  y1="-32" x2="42" y2="-26" stroke="#1a1233" stroke-width="5"/>
+            <!-- Tear streaks on cheek -->
+            <line x1="-3" y1="-62" x2="-3" y2="-56" stroke="rgba(56,189,248,0.7)" stroke-width="1"/>
+            <line x1="3"  y1="-62" x2="3"  y2="-56" stroke="rgba(56,189,248,0.7)" stroke-width="1"/>
+            <!-- Halo (faith returning) -->
+            <circle cx="0" cy="-62" r="20" fill="none" stroke="rgba(251,191,36,0.85)" stroke-width="1.3"/>
+          </g>
+          <!-- Jesus walking up the road from the left, hand extended toward Martha -->
+          <g transform="translate(220 400)">
+            <path d="M -16 0 Q -14 -46 0 -56 Q 14 -46 16 0 Z" fill="#3d2a16" stroke="rgba(251,191,36,0.85)" stroke-width="1.4"/>
+            <ellipse cx="0" cy="-66" rx="12" ry="14" fill="#1a1233"/>
+            <path d="M -8 -58 Q 0 -46 8 -58" stroke="rgba(254,243,199,0.6)" stroke-width="1.4" fill="none"/>
+            <path d="M -10 -66 Q -16 -52 -12 -38 M 10 -66 Q 16 -52 12 -38" stroke="#0a0d1a" stroke-width="2" fill="none"/>
+            <!-- Hand extended to Martha -->
+            <line x1="14" y1="-30" x2="40" y2="-20" stroke="#3d2a16" stroke-width="5"/>
+            <circle cx="0" cy="-66" r="26" fill="none" stroke="rgba(251,191,36,0.95)" stroke-width="1.7"/>
+          </g>
+          <text x="400" y="475" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">"I am the resurrection and the life"</text>
+        </svg>`
+      },
+      {
+        id: 'jesus-wept',
+        title: 'Jesus Wept',
+        scriptureRef: 'John 11:33-38',
+        bibleText: '"When Jesus saw her weeping, and the Jews who had come along with her also weeping, he was deeply moved in spirit and troubled… Jesus wept."',
+        narration: 'Mary came too. She fell at His feet sobbing. The whole village was wailing. Jesus, who knew exactly what He was about to do, did not skip ahead to the joyful part. He stood at the tomb of His friend and He cried. The shortest verse in the Bible: Jesus wept. The bystanders said, "See how he loved him." And then they led Him to the tomb — a cave with a stone rolled across its mouth.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'lzw', skyTop:'#0a0d1a', skyMid:'#1a1233', skyBot:'#241846', stars:false})}
+          <!-- Cliff face with cave tomb cut into it -->
+          <path d="M 0 500 L 0 220 Q 100 180 280 200 Q 460 220 580 200 Q 740 180 800 220 L 800 500 Z" fill="#241846" stroke="rgba(251,191,36,0.45)" stroke-width="1.2"/>
+          <!-- The tomb — round opening sealed with a large rolled stone -->
+          <g transform="translate(580 360)">
+            <!-- Cave opening (visible behind stone, half covered) -->
+            <ellipse cx="0" cy="0" rx="56" ry="46" fill="#000a14" stroke="rgba(251,191,36,0.6)" stroke-width="1.4"/>
+            <!-- Large round rolling stone (mostly covering opening) -->
+            <circle cx="-10" cy="6" r="48" fill="#3d2a16" stroke="rgba(254,243,199,0.55)" stroke-width="1.4"/>
+            <circle cx="-18" cy="0" r="3" fill="rgba(254,243,199,0.45)"/>
+            <circle cx="-2" cy="14" r="2" fill="rgba(254,243,199,0.4)"/>
+          </g>
+          <!-- "LAZARUS" small inscription above tomb -->
+          <text x="580" y="290" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="9" letter-spacing="2.5" fill="rgba(251,191,36,0.6)">LAZARUS · 4 DAYS</text>
+          <!-- Ground -->
+          <path d="M 0 460 Q 400 452 800 460 L 800 500 L 0 500 Z" fill="#0a0d1a"/>
+          <!-- Jesus standing center-left, facing the tomb, weeping — head bowed, hand to face -->
+          <g transform="translate(360 410)">
+            <path d="M -22 0 Q -18 -50 0 -60 Q 18 -50 22 0 Z" fill="#3d2a16" stroke="rgba(251,191,36,0.95)" stroke-width="1.5"/>
+            <ellipse cx="0" cy="-70" rx="13" ry="15" fill="#1a1233"/>
+            <path d="M -8 -62 Q 0 -50 8 -62" stroke="rgba(254,243,199,0.65)" stroke-width="1.5" fill="none"/>
+            <path d="M -10 -70 Q -16 -56 -12 -40 M 10 -70 Q 16 -56 12 -40" stroke="#0a0d1a" stroke-width="2" fill="none"/>
+            <!-- Hand to face -->
+            <line x1="-12" y1="-44" x2="-4" y2="-66" stroke="#3d2a16" stroke-width="4"/>
+            <!-- TEARS visible -->
+            <line x1="-4" y1="-66" x2="-4" y2="-58" stroke="rgba(56,189,248,0.85)" stroke-width="1.2"/>
+            <line x1="4" y1="-68" x2="4" y2="-58" stroke="rgba(56,189,248,0.85)" stroke-width="1.2"/>
+            <circle cx="-4" cy="-56" r="1.5" fill="rgba(56,189,248,0.85)"/>
+            <circle cx="4"  cy="-56" r="1.5" fill="rgba(56,189,248,0.85)"/>
+            <!-- Halo subdued (grief) -->
+            <circle cx="0" cy="-70" r="24" fill="none" stroke="rgba(251,191,36,0.7)" stroke-width="1.3"/>
+          </g>
+          <!-- Mary collapsed at Jesus's feet -->
+          <g transform="translate(290 442)">
+            <ellipse cx="0" cy="0" rx="24" ry="9" fill="#1a1233"/>
+            <ellipse cx="0" cy="-12" rx="13" ry="14" fill="#1a1233"/>
+            <ellipse cx="0" cy="-30" rx="11" ry="13" fill="#1a1233"/>
+            <line x1="-9" y1="-22" x2="-3" y2="-30" stroke="#1a1233" stroke-width="3"/>
+            <line x1="9"  y1="-22" x2="3"  y2="-30" stroke="#1a1233" stroke-width="3"/>
+            <line x1="-3" y1="-28" x2="-3" y2="-22" stroke="rgba(56,189,248,0.85)" stroke-width="1.2"/>
+            <line x1="3"  y1="-28" x2="3"  y2="-22" stroke="rgba(56,189,248,0.85)" stroke-width="1.2"/>
+          </g>
+          <!-- Other mourners around, also weeping -->
+          <g fill="#1a1233" opacity="0.85">
+            <g transform="translate(160 430)">
+              <ellipse cx="0" cy="0" rx="9" ry="22"/>
+              <ellipse cx="0" cy="-22" rx="8" ry="9"/>
+              <line x1="-6" y1="-14" x2="-2" y2="-22" stroke="#1a1233" stroke-width="3"/>
+              <line x1="6" y1="-14" x2="2" y2="-22" stroke="#1a1233" stroke-width="3"/>
+            </g>
+            <g transform="translate(220 432)">
+              <ellipse cx="0" cy="0" rx="9" ry="22"/>
+              <ellipse cx="0" cy="-22" rx="8" ry="9"/>
+              <line x1="-6" y1="-14" x2="-2" y2="-22" stroke="#1a1233" stroke-width="3"/>
+              <line x1="6" y1="-14" x2="2" y2="-22" stroke="#1a1233" stroke-width="3"/>
+            </g>
+            <g transform="translate(430 432)">
+              <ellipse cx="0" cy="0" rx="9" ry="22"/>
+              <ellipse cx="0" cy="-22" rx="8" ry="9"/>
+              <line x1="-6" y1="-14" x2="-2" y2="-22" stroke="#1a1233" stroke-width="3"/>
+              <line x1="6" y1="-14" x2="2" y2="-22" stroke="#1a1233" stroke-width="3"/>
+            </g>
+            <g transform="translate(490 430)">
+              <ellipse cx="0" cy="0" rx="9" ry="22"/>
+              <ellipse cx="0" cy="-22" rx="8" ry="9"/>
+              <line x1="-6" y1="-14" x2="-2" y2="-22" stroke="#1a1233" stroke-width="3"/>
+              <line x1="6" y1="-14" x2="2" y2="-22" stroke="#1a1233" stroke-width="3"/>
+            </g>
+          </g>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">"Jesus wept"</text>
+        </svg>`
+      },
+      {
+        id: 'come-out',
+        title: 'Lazarus · Come Out!',
+        scriptureRef: 'John 11:39-44',
+        bibleText: '"Take away the stone." …Then Jesus called in a loud voice, "Lazarus, come out!" The dead man came out, his hands and feet wrapped with strips of linen.',
+        narration: 'Take away the stone. Martha objected — Lord, by now he stinks; it has been four days. Jesus said, "Did I not tell you that if you believed, you would see the glory of God?" They rolled the stone aside. Jesus looked up to heaven and prayed out loud — not because He needed to, but so the people would hear. Then He cried with a great shout: "Lazarus! Come out!" And the dead man came out. Hands and feet wrapped in linen. Face still covered. Living. Jesus said: "Unbind him. Let him go."',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          <defs>
+            <radialGradient id="lzcGlory" cx="0.5" cy="0.4" r="0.55">
+              <stop offset="0%" stop-color="rgba(254,243,199,0.85)"/>
+              <stop offset="50%" stop-color="rgba(251,191,36,0.4)"/>
+              <stop offset="100%" stop-color="rgba(251,191,36,0)"/>
+            </radialGradient>
+          </defs>
+          <rect width="800" height="500" fill="#0a0d1a"/>
+          <ellipse cx="500" cy="240" rx="420" ry="280" fill="url(#lzcGlory)"/>
+          <!-- Cliff face with tomb opening WIDE OPEN -->
+          <path d="M 0 500 L 0 220 Q 100 180 280 200 Q 460 220 580 200 Q 740 180 800 220 L 800 500 Z" fill="#241846" stroke="rgba(251,191,36,0.6)" stroke-width="1.4"/>
+          <!-- Massive dark cave opening (stone rolled all the way aside) -->
+          <g transform="translate(580 340)">
+            <path d="M -64 80 Q -70 -40 0 -70 Q 70 -40 64 80 Z" fill="#000a14" stroke="rgba(251,191,36,0.85)" stroke-width="2"/>
+            <!-- Glow from inside -->
+            <radialGradient id="lzcCave" cx="0.5" cy="0.5" r="0.6">
+              <stop offset="0%" stop-color="rgba(254,243,199,0.6)"/>
+              <stop offset="100%" stop-color="rgba(251,191,36,0)"/>
+            </radialGradient>
+            <ellipse cx="0" cy="0" rx="50" ry="40" fill="url(#lzcCave)"/>
+          </g>
+          <!-- Rolled-aside stone in front -->
+          <circle cx="660" cy="430" r="44" fill="#3d2a16" stroke="rgba(254,243,199,0.55)" stroke-width="1.4"/>
+          <!-- Lazarus emerging from the tomb opening, wrapped in linen, shuffling forward -->
+          <g transform="translate(580 410)">
+            <!-- Body wrapped head-to-toe in linen strips -->
+            <ellipse cx="0" cy="0" rx="16" ry="40" fill="#fef3c7" stroke="rgba(251,191,36,0.65)" stroke-width="1"/>
+            <ellipse cx="0" cy="-44" rx="14" ry="16" fill="#fef3c7" stroke="rgba(251,191,36,0.65)" stroke-width="1"/>
+            <!-- Linen wrapping lines on body -->
+            <g stroke="rgba(251,113,38,0.55)" stroke-width="0.7" fill="none">
+              <line x1="-16" y1="-30" x2="16" y2="-30"/>
+              <line x1="-16" y1="-15" x2="16" y2="-15"/>
+              <line x1="-16" y1="0" x2="16" y2="0"/>
+              <line x1="-16" y1="15" x2="16" y2="15"/>
+              <line x1="-16" y1="30" x2="16" y2="30"/>
+              <!-- Face wrap -->
+              <line x1="-14" y1="-50" x2="14" y2="-50"/>
+              <line x1="-14" y1="-44" x2="14" y2="-44"/>
+              <line x1="-14" y1="-38" x2="14" y2="-38"/>
+            </g>
+            <!-- Halo big and bright (life returning) -->
+            <circle cx="0" cy="-44" r="26" fill="none" stroke="rgba(251,191,36,0.95)" stroke-width="1.8"/>
+            <circle cx="0" cy="-44" r="40" fill="none" stroke="rgba(251,191,36,0.45)" stroke-width="1.2"/>
+          </g>
+          <text x="580" y="450" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="9" letter-spacing="2" fill="rgba(251,191,36,0.85)">LAZARUS</text>
+          <!-- Jesus center-left, arm extended TOWARD the tomb, head thrown back, calling -->
+          <g transform="translate(280 390)">
+            <path d="M -22 0 Q -18 -50 0 -60 Q 18 -50 22 0 Z" fill="#3d2a16" stroke="rgba(251,191,36,0.95)" stroke-width="1.6"/>
+            <ellipse cx="0" cy="-72" rx="13" ry="15" fill="#1a1233"/>
+            <!-- Head thrown UP -->
+            <path d="M -8 -64 Q 0 -52 8 -64" stroke="rgba(254,243,199,0.65)" stroke-width="1.5" fill="none"/>
+            <path d="M -10 -72 Q -18 -86 -8 -90" stroke="#0a0d1a" stroke-width="2" fill="none"/>
+            <path d="M 10 -72 Q 18 -86 8 -90" stroke="#0a0d1a" stroke-width="2" fill="none"/>
+            <!-- Arm extended forward toward tomb (right side) -->
+            <line x1="22" y1="-36" x2="80" y2="-32" stroke="#3d2a16" stroke-width="6"/>
+            <!-- Pointing finger -->
+            <line x1="80" y1="-32" x2="92" y2="-30" stroke="#3d2a16" stroke-width="4"/>
+            <!-- Bright halo + outer ring -->
+            <circle cx="0" cy="-72" r="32" fill="none" stroke="rgba(251,191,36,0.95)" stroke-width="2"/>
+            <circle cx="0" cy="-72" r="46" fill="none" stroke="rgba(251,191,36,0.5)" stroke-width="1.2"/>
+          </g>
+          <!-- HUGE shouted command floating between them -->
+          <text x="400" y="160" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="34" letter-spacing="8" fill="rgba(251,191,36,0.95)">"LAZARUS,</text>
+          <text x="400" y="210" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="34" letter-spacing="8" fill="rgba(251,191,36,0.95)">COME OUT!"</text>
+          <!-- Crowd witnessing (left edge) -->
+          <g fill="#0a0d1a" opacity="0.75">
+            <g transform="translate(80 430)"><ellipse cx="0" cy="0" rx="6" ry="16"/><ellipse cx="0" cy="-18" rx="5" ry="6"/></g>
+            <g transform="translate(120 432)"><ellipse cx="0" cy="0" rx="6" ry="16"/><ellipse cx="0" cy="-18" rx="5" ry="6"/></g>
+            <g transform="translate(160 430)"><ellipse cx="0" cy="0" rx="6" ry="16"/><ellipse cx="0" cy="-18" rx="5" ry="6"/></g>
+          </g>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">"Unbind him · let him go"</text>
+        </svg>`
+      }
+    ],
+    closing: 'Jesus could have shown up before the funeral and there would have been no funeral. He chose to come after. He let four days of grief happen so that Mary and Martha and the whole village would see — with their own eyes — that He has authority not just over sickness but over death itself. Sometimes Jesus is "late" by your calendar. He is on time by His. The story you are in the middle of may look like a tomb. It may smell like one. He is on the way. And He has not forgotten how to call a name into the dark.',
+    closingPrompt: 'What in your life has been dead long enough that you have stopped expecting Jesus to do anything about it — and what would it look like to bring Him to the tomb anyway?'
+  },
+
+  // ════════════════════════════════════════════════════════════
+  // STORY 30 — Peter Walks on Water
+  // ════════════════════════════════════════════════════════════
+  {
+    id: 'peter-walks-water',
+    title: 'Peter Walks on Water',
+    subtitle: 'A storm at the fourth watch — and a fisherman who got out of the boat.',
+    icon: '🌊',
+    color: '#38bdf8',
+    accentColor: '#fef3c7',
+    era: 'new-testament',
+    scriptureRef: 'Matthew 14:22-33',
+    duration: '~5 min',
+    scenes: [
+      {
+        id: 'storm-boat',
+        title: 'A Storm in the Fourth Watch',
+        scriptureRef: 'Matthew 14:22-25',
+        bibleText: '"Shortly before dawn Jesus went out to them, walking on the lake."',
+        narration: 'Jesus had sent the disciples ahead of Him across the Sea of Galilee while He stayed back to pray on a mountainside. Out on the open water, a sudden wind came down on them. Waves rose higher than the gunwales. They rowed hard against it all night. By three in the morning — the fourth watch — they were exhausted, terrified, and getting nowhere.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          <defs>
+            <linearGradient id="psbSky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#0a0d1a"/>
+              <stop offset="60%" stop-color="#241846"/>
+              <stop offset="100%" stop-color="#3d2a5e"/>
+            </linearGradient>
+          </defs>
+          <rect width="800" height="500" fill="url(#psbSky)"/>
+          <!-- Lightning -->
+          <polyline points="160,40 200,180 170,170 200,310" stroke="rgba(254,243,199,0.85)" stroke-width="2" fill="none"/>
+          <polyline points="620,60 660,180 630,170 660,300" stroke="rgba(254,243,199,0.85)" stroke-width="2" fill="none"/>
+          <!-- Heavy storm clouds -->
+          <g fill="#0a0d1a" opacity="0.9">
+            <ellipse cx="160" cy="80" rx="140" ry="40"/>
+            <ellipse cx="400" cy="60" rx="180" ry="44"/>
+            <ellipse cx="640" cy="80" rx="140" ry="42"/>
+          </g>
+          <!-- Massive waves -->
+          <path d="M 0 340 Q 100 270 220 340 Q 340 270 460 340 Q 580 270 700 340 L 800 340 L 800 500 L 0 500 Z" fill="#1e1846"/>
+          <path d="M 0 410 Q 200 360 400 410 Q 600 360 800 410 L 800 500 L 0 500 Z" fill="#0a0d1a"/>
+          <g stroke="rgba(254,243,199,0.5)" stroke-width="1.6" fill="none">
+            <path d="M 100 310 Q 130 296 160 310"/>
+            <path d="M 340 312 Q 370 296 400 312"/>
+            <path d="M 580 308 Q 610 294 640 308"/>
+          </g>
+          <!-- Boat tossed -->
+          <g transform="translate(420 340) rotate(-15)">
+            <path d="M -68 0 Q -52 22 0 26 Q 52 22 68 0 Z" fill="#3d2a16" stroke="rgba(251,191,36,0.6)" stroke-width="1.4"/>
+            <line x1="0" y1="0" x2="0" y2="-60" stroke="#3d2a16" stroke-width="3"/>
+            <!-- Sail torn, flapping -->
+            <path d="M 0 -58 L -28 -16 L 22 -10 Z" fill="#fef3c7" opacity="0.7" stroke="rgba(251,191,36,0.4)" stroke-width="1"/>
+            <!-- Disciples gripping the boat -->
+            <g fill="#0a0d1a">
+              <ellipse cx="-40" cy="6" rx="5" ry="7"/>
+              <ellipse cx="-20" cy="8" rx="5" ry="7"/>
+              <ellipse cx="0" cy="8" rx="5" ry="7"/>
+              <ellipse cx="20" cy="8" rx="5" ry="7"/>
+              <ellipse cx="40" cy="6" rx="5" ry="7"/>
+            </g>
+          </g>
+          <text x="400" y="475" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.85)">The fourth watch of the night · still no shore in sight</text>
+        </svg>`
+      },
+      {
+        id: 'figure-walking',
+        title: 'A Figure on the Water',
+        scriptureRef: 'Matthew 14:25-27',
+        bibleText: '"\'Take courage! It is I. Don\'t be afraid.\'"',
+        narration: 'In the gray-black hour before dawn, one of the disciples pointed. Out on the open water — walking ON it — was a man. They thought it was a ghost. They cried out in terror. And then a voice they had all heard a hundred times said over the wind: "Take courage. It is I. Do not be afraid."',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'pfw', skyTop:'#0a0d1a', skyMid:'#241846', skyBot:'#3d2a5e', stars:false})}
+          <!-- Hint of dawn on horizon -->
+          <ellipse cx="700" cy="240" rx="160" ry="40" fill="rgba(251,113,38,0.25)"/>
+          <!-- Receding storm clouds -->
+          <g fill="#0a0d1a" opacity="0.7">
+            <ellipse cx="200" cy="100" rx="160" ry="36"/>
+            <ellipse cx="500" cy="80" rx="180" ry="36"/>
+          </g>
+          <!-- Wavy sea -->
+          <path d="M 0 320 Q 200 290 400 320 Q 600 290 800 320 L 800 500 L 0 500 Z" fill="#1e1846"/>
+          <path d="M 0 380 Q 400 360 800 380 L 800 500 L 0 500 Z" fill="#0a0d1a"/>
+          <g stroke="rgba(254,243,199,0.45)" stroke-width="1.5" fill="none">
+            <path d="M 60 330 Q 100 320 140 330"/>
+            <path d="M 460 328 Q 500 318 540 328"/>
+            <path d="M 680 332 Q 720 322 760 332"/>
+          </g>
+          <!-- Boat in foreground -->
+          <g transform="translate(640 360) rotate(-8)">
+            <path d="M -56 0 Q -42 18 0 22 Q 42 18 56 0 Z" fill="#3d2a16" stroke="rgba(251,191,36,0.65)" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="0" y2="-46" stroke="#3d2a16" stroke-width="2.5"/>
+            <!-- Disciples — multiple silhouettes, one pointing -->
+            <g fill="#0a0d1a">
+              <ellipse cx="-32" cy="4" rx="5" ry="9"/>
+              <ellipse cx="-32" cy="-6" rx="4" ry="4"/>
+              <line x1="-30" y1="-4" x2="-46" y2="-14" stroke="#0a0d1a" stroke-width="2"/>
+              <ellipse cx="-12" cy="6" rx="5" ry="8"/>
+              <ellipse cx="-12" cy="-2" rx="4" ry="4"/>
+              <ellipse cx="8" cy="6" rx="5" ry="8"/>
+              <ellipse cx="8" cy="-2" rx="4" ry="4"/>
+              <ellipse cx="28" cy="6" rx="5" ry="8"/>
+              <ellipse cx="28" cy="-2" rx="4" ry="4"/>
+            </g>
+          </g>
+          <!-- Jesus walking ON the water, far across, glowing -->
+          <g transform="translate(220 360)">
+            <!-- Glowing path on water beneath Him -->
+            <ellipse cx="0" cy="20" rx="48" ry="6" fill="rgba(251,191,36,0.45)"/>
+            <ellipse cx="0" cy="22" rx="32" ry="4" fill="rgba(254,243,199,0.55)"/>
+            <!-- Figure -->
+            <path d="M -18 20 Q -16 -36 0 -50 Q 16 -36 18 20 Z" fill="#3d2a16" stroke="rgba(251,191,36,0.95)" stroke-width="1.6"/>
+            <ellipse cx="0" cy="-60" rx="12" ry="14" fill="#1a1233"/>
+            <path d="M -8 -52 Q 0 -38 8 -52" stroke="rgba(254,243,199,0.6)" stroke-width="1.4" fill="none"/>
+            <path d="M -10 -60 Q -16 -46 -12 -32 M 10 -60 Q 16 -46 12 -32" stroke="#0a0d1a" stroke-width="2" fill="none"/>
+            <!-- Halo brilliant -->
+            <circle cx="0" cy="-60" r="28" fill="none" stroke="rgba(251,191,36,0.95)" stroke-width="1.8"/>
+            <circle cx="0" cy="-60" r="42" fill="none" stroke="rgba(251,191,36,0.5)" stroke-width="1.2"/>
+          </g>
+          <text x="400" y="475" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">"Take courage · it is I · do not be afraid"</text>
+        </svg>`
+      },
+      {
+        id: 'peter-steps-out',
+        title: 'Lord — Tell Me to Come',
+        scriptureRef: 'Matthew 14:28-29',
+        bibleText: '"\'Lord, if it\'s you,\' Peter replied, \'tell me to come to you on the water.\' \'Come,\' he said. Then Peter got down out of the boat, walked on the water and came toward Jesus."',
+        narration: 'Of the twelve men in that boat, only one asked the question Peter asked: "Lord — if it really is you — tell me to come to you on the water." Jesus said, "Come." And Peter swung his legs over the side of the boat and stepped down. The water held. For a few astonishing seconds, a Galilean fisherman walked on the surface of the Sea of Galilee toward the only Person who had ever called him out there. The other eleven watched from inside the boat.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'pso', skyTop:'#1e1846', skyMid:'#3d2a5e', skyBot:'#fb923c', stars:false})}
+          <!-- Dawn -->
+          <circle cx="680" cy="180" r="28" fill="#fef3c7"/>
+          <circle cx="680" cy="180" r="44" fill="rgba(251,113,38,0.5)"/>
+          <!-- Sea -->
+          <path d="M 0 340 Q 400 320 800 340 L 800 500 L 0 500 Z" fill="#1e1846"/>
+          <g stroke="rgba(254,243,199,0.4)" stroke-width="1.5" fill="none">
+            <path d="M 100 360 Q 140 350 180 360"/>
+            <path d="M 380 372 Q 420 362 460 372"/>
+            <path d="M 620 368 Q 660 358 700 368"/>
+          </g>
+          <!-- Boat on right with disciples watching -->
+          <g transform="translate(620 360)">
+            <path d="M -54 0 Q -40 18 0 22 Q 40 18 54 0 Z" fill="#3d2a16" stroke="rgba(251,191,36,0.65)" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="0" y2="-44" stroke="#3d2a16" stroke-width="2.5"/>
+            <!-- Disciples leaning over edge -->
+            <g fill="#0a0d1a">
+              <ellipse cx="-30" cy="-2" rx="5" ry="7"/>
+              <ellipse cx="-12" cy="-2" rx="5" ry="7"/>
+              <ellipse cx="6" cy="-2" rx="5" ry="7"/>
+              <ellipse cx="24" cy="-2" rx="5" ry="7"/>
+            </g>
+            <!-- One missing — where Peter was sitting (empty bench, oar on the floor) -->
+            <line x1="-46" y1="-2" x2="-30" y2="-8" stroke="#3d2a16" stroke-width="2"/>
+          </g>
+          <!-- Peter mid-water, taking second or third step, arms slightly out for balance -->
+          <g transform="translate(400 360)">
+            <!-- Splash ring under his feet -->
+            <ellipse cx="0" cy="20" rx="32" ry="5" fill="rgba(254,243,199,0.55)"/>
+            <ellipse cx="0" cy="22" rx="20" ry="3" fill="rgba(254,243,199,0.85)"/>
+            <!-- Body -->
+            <path d="M -16 18 Q -14 -32 0 -42 Q 14 -32 16 18 Z" fill="#3d2a16" stroke="rgba(251,191,36,0.85)" stroke-width="1.3"/>
+            <ellipse cx="0" cy="-50" rx="11" ry="13" fill="#1a1233"/>
+            <path d="M -7 -42 Q 0 -28 7 -42" stroke="rgba(254,243,199,0.55)" stroke-width="1.3" fill="none"/>
+            <!-- Arms outstretched -->
+            <line x1="-14" y1="-22" x2="-32" y2="-30" stroke="#3d2a16" stroke-width="4"/>
+            <line x1="14"  y1="-22" x2="32" y2="-30" stroke="#3d2a16" stroke-width="4"/>
+            <!-- Halo (faith glowing) -->
+            <circle cx="0" cy="-50" r="20" fill="none" stroke="rgba(251,191,36,0.85)" stroke-width="1.4"/>
+          </g>
+          <text x="400" y="395" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="10" letter-spacing="2.5" fill="rgba(251,191,36,0.85)">PETER</text>
+          <!-- Jesus at far left, arm extended welcoming, glowing -->
+          <g transform="translate(160 360)">
+            <ellipse cx="0" cy="20" rx="44" ry="6" fill="rgba(251,191,36,0.55)"/>
+            <ellipse cx="0" cy="22" rx="28" ry="4" fill="rgba(254,243,199,0.85)"/>
+            <path d="M -20 18 Q -16 -40 0 -54 Q 16 -40 20 18 Z" fill="#3d2a16" stroke="rgba(251,191,36,0.95)" stroke-width="1.5"/>
+            <ellipse cx="0" cy="-66" rx="12" ry="14" fill="#1a1233"/>
+            <path d="M -8 -58 Q 0 -44 8 -58" stroke="rgba(254,243,199,0.6)" stroke-width="1.4" fill="none"/>
+            <!-- Arm extended welcoming Peter (forward) -->
+            <line x1="20" y1="-30" x2="60" y2="-22" stroke="#3d2a16" stroke-width="6"/>
+            <line x1="60" y1="-22" x2="80" y2="-20" stroke="#3d2a16" stroke-width="4"/>
+            <circle cx="0" cy="-66" r="28" fill="none" stroke="rgba(251,191,36,0.95)" stroke-width="1.8"/>
+            <circle cx="0" cy="-66" r="44" fill="none" stroke="rgba(251,191,36,0.55)" stroke-width="1.2"/>
+          </g>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">"Come"</text>
+        </svg>`
+      },
+      {
+        id: 'sinking-caught',
+        title: 'Lord — Save Me!',
+        scriptureRef: 'Matthew 14:30-32',
+        bibleText: '"Immediately Jesus reached out his hand and caught him. \'You of little faith,\' he said, \'why did you doubt?\'"',
+        narration: 'But then Peter saw the wind. He felt how high the waves really were. He thought about what he was doing — and as soon as he did, he started to sink. He cried out the shortest prayer in the New Testament: "Lord, save me!" Immediately Jesus reached out His hand and caught him. He pulled him up. He walked him back to the boat. He said, very gently, "You of little faith — why did you doubt?" The moment they climbed into the boat together, the wind died. The other eleven worshipped Him: "Truly you are the Son of God."',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'psk', skyTop:'#3d2a5e', skyMid:'#fb923c', skyBot:'#fbbf24', stars:false})}
+          <circle cx="660" cy="120" r="34" fill="#fef3c7"/>
+          <circle cx="660" cy="120" r="54" fill="rgba(251,191,36,0.4)"/>
+          <!-- Sea calmer than the storm now, but Peter is in trouble -->
+          <path d="M 0 320 Q 200 305 400 320 Q 600 305 800 320 L 800 500 L 0 500 Z" fill="#1e1846"/>
+          <g stroke="rgba(254,243,199,0.45)" stroke-width="1.5" fill="none">
+            <path d="M 100 350 Q 140 340 180 350"/>
+            <path d="M 480 358 Q 520 348 560 358"/>
+          </g>
+          <!-- Peter sinking — only upper body above water, splashing, arm reaching UP -->
+          <g transform="translate(440 360)">
+            <!-- Big splash around him -->
+            <ellipse cx="0" cy="0" rx="50" ry="10" fill="rgba(254,243,199,0.55)"/>
+            <ellipse cx="0" cy="-2" rx="36" ry="6" fill="rgba(254,243,199,0.85)"/>
+            <!-- Spray droplets -->
+            <g fill="rgba(254,243,199,0.95)">
+              <circle cx="-40" cy="-12" r="2"/><circle cx="-30" cy="-22" r="2.5"/>
+              <circle cx="40" cy="-12" r="2"/><circle cx="32" cy="-22" r="2.5"/>
+              <circle cx="0" cy="-32" r="2"/>
+            </g>
+            <!-- Body half-submerged -->
+            <path d="M -14 0 Q -12 -18 0 -22 Q 12 -18 14 0 Z" fill="#3d2a16" stroke="rgba(251,191,36,0.75)" stroke-width="1.2"/>
+            <ellipse cx="0" cy="-28" rx="10" ry="12" fill="#1a1233"/>
+            <!-- Wet beard -->
+            <path d="M -7 -22 Q 0 -10 7 -22" stroke="rgba(254,243,199,0.65)" stroke-width="1.4" fill="none"/>
+            <!-- One arm thrown UP, frantic -->
+            <line x1="6" y1="-12" x2="2" y2="-60" stroke="#3d2a16" stroke-width="6"/>
+            <!-- Wide-open hand reaching -->
+            <circle cx="2" cy="-64" r="6" fill="#3d2a16"/>
+            <!-- Other arm under water -->
+            <line x1="-10" y1="-6" x2="-22" y2="2" stroke="#3d2a16" stroke-width="4"/>
+            <!-- Mouth open shouting -->
+            <ellipse cx="0" cy="-25" rx="2" ry="3" fill="rgba(254,243,199,0.65)"/>
+            <!-- Halo flickering (dashed) -->
+            <circle cx="0" cy="-28" r="18" fill="none" stroke="rgba(251,191,36,0.55)" stroke-width="1" stroke-dasharray="3 4"/>
+          </g>
+          <!-- Jesus right there, arm reaching DOWN, grasping Peter's upraised hand -->
+          <g transform="translate(380 340)">
+            <ellipse cx="0" cy="40" rx="36" ry="6" fill="rgba(251,191,36,0.45)"/>
+            <ellipse cx="0" cy="42" rx="24" ry="4" fill="rgba(254,243,199,0.85)"/>
+            <path d="M -20 40 Q -16 -22 0 -36 Q 16 -22 20 40 Z" fill="#3d2a16" stroke="rgba(251,191,36,0.95)" stroke-width="1.6"/>
+            <ellipse cx="0" cy="-48" rx="12" ry="14" fill="#1a1233"/>
+            <path d="M -8 -40 Q 0 -26 8 -40" stroke="rgba(254,243,199,0.65)" stroke-width="1.4" fill="none"/>
+            <path d="M -10 -48 Q -16 -32 -12 -16 M 10 -48 Q 16 -32 12 -16" stroke="#0a0d1a" stroke-width="2" fill="none"/>
+            <!-- Arm reaching down forward -->
+            <line x1="14" y1="-12" x2="60" y2="20" stroke="#3d2a16" stroke-width="7"/>
+            <!-- Hand gripping Peter's hand (overlapping circles where hands meet) -->
+            <circle cx="62" cy="20" r="9" fill="#3d2a16"/>
+            <!-- Halo huge and bright -->
+            <circle cx="0" cy="-48" r="32" fill="none" stroke="rgba(251,191,36,0.95)" stroke-width="2"/>
+            <circle cx="0" cy="-48" r="46" fill="none" stroke="rgba(251,191,36,0.5)" stroke-width="1.2"/>
+          </g>
+          <!-- Boat in distance, calm now -->
+          <g transform="translate(680 340)" opacity="0.85">
+            <path d="M -34 0 Q -22 14 0 16 Q 22 14 34 0 Z" fill="#3d2a16"/>
+            <line x1="0" y1="0" x2="0" y2="-30" stroke="#3d2a16" stroke-width="2"/>
+          </g>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">"Lord · save me!" · "Why did you doubt?"</text>
+        </svg>`
+      }
+    ],
+    closing: 'Peter gets the wrong reputation for this story. The other eleven disciples never got out of the boat. He got out — and he sank halfway across — and Jesus did not call him a failure for sinking. He called him "of little faith" for doubting in the middle of a miracle that was already happening. The next time you find yourself sinking in the middle of obedience, remember: Jesus did not let go. The moment you cry out, the hand is already there.',
+    closingPrompt: 'Where in your life is Jesus saying "come" — and what is the wind around you trying to convince you to look at instead?'
+  },
+
+  // ════════════════════════════════════════════════════════════
+  // STORY 31 — The Last Supper
+  // ════════════════════════════════════════════════════════════
+  {
+    id: 'last-supper',
+    title: 'The Last Supper',
+    subtitle: 'A Passover meal that became the first communion.',
+    icon: '🍞',
+    color: '#a78bfa',
+    accentColor: '#fef3c7',
+    era: 'new-testament',
+    scriptureRef: 'John 13 · Luke 22 · Matthew 26',
+    duration: '~6 min',
+    scenes: [
+      {
+        id: 'upper-room',
+        title: 'The Upper Room',
+        scriptureRef: 'Luke 22:7-13',
+        bibleText: '"\'A man carrying a jar of water will meet you. Follow him to the house that he enters… He will show you a large room upstairs, all furnished. Make preparations there.\'"',
+        narration: 'On the first day of Unleavened Bread, Jesus sent Peter and John ahead into Jerusalem. "You\'ll see a man carrying a water jar — which men never did. Follow him." They followed and were shown a large upper room, fully furnished and ready. They cooked the Passover lamb. They set out the bitter herbs and the unleavened bread and four cups of wine. As the sun went down, the twelve arrived. The room glowed with the warm light of a dozen oil lamps. Jesus took His place at the table and said, "I have eagerly desired to eat this Passover with you before I suffer."',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'lsu', skyTop:'#0a0d1a', skyMid:'#241846', skyBot:'#3d2a16', stars:false})}
+          <!-- Interior — upper room. Stone walls and ceiling beams -->
+          <rect x="0" y="0" width="800" height="500" fill="#1a1233"/>
+          <g fill="#3d2a16" opacity="0.7">
+            <rect x="0" y="0" width="800" height="14"/>
+            <rect x="0" y="160" width="800" height="6"/>
+          </g>
+          <!-- Hanging oil lamps -->
+          <g>
+            <line x1="200" y1="0" x2="200" y2="60" stroke="rgba(251,191,36,0.5)" stroke-width="1"/>
+            <ellipse cx="200" cy="68" rx="14" ry="6" fill="#3d2a16" stroke="rgba(251,191,36,0.85)" stroke-width="1"/>
+            <ellipse cx="200" cy="64" rx="6" ry="7" fill="#fbbf24"/>
+            <ellipse cx="200" cy="40" rx="40" ry="22" fill="rgba(251,191,36,0.2)"/>
+            <line x1="400" y1="0" x2="400" y2="60" stroke="rgba(251,191,36,0.5)" stroke-width="1"/>
+            <ellipse cx="400" cy="68" rx="14" ry="6" fill="#3d2a16" stroke="rgba(251,191,36,0.85)" stroke-width="1"/>
+            <ellipse cx="400" cy="64" rx="6" ry="7" fill="#fbbf24"/>
+            <ellipse cx="400" cy="40" rx="40" ry="22" fill="rgba(251,191,36,0.22)"/>
+            <line x1="600" y1="0" x2="600" y2="60" stroke="rgba(251,191,36,0.5)" stroke-width="1"/>
+            <ellipse cx="600" cy="68" rx="14" ry="6" fill="#3d2a16" stroke="rgba(251,191,36,0.85)" stroke-width="1"/>
+            <ellipse cx="600" cy="64" rx="6" ry="7" fill="#fbbf24"/>
+            <ellipse cx="600" cy="40" rx="40" ry="22" fill="rgba(251,191,36,0.2)"/>
+          </g>
+          <!-- Warm pool of light filling middle -->
+          <radialGradient id="lsuLamp" cx="0.5" cy="0.55" r="0.55">
+            <stop offset="0%" stop-color="rgba(251,113,38,0.3)"/>
+            <stop offset="60%" stop-color="rgba(251,191,36,0.12)"/>
+            <stop offset="100%" stop-color="rgba(251,191,36,0)"/>
+          </radialGradient>
+          <ellipse cx="400" cy="320" rx="380" ry="160" fill="url(#lsuLamp)"/>
+          <!-- Low table (people would have reclined around it). Modern depiction works fine -->
+          <g>
+            <rect x="140" y="320" width="520" height="32" fill="#3d2a16" stroke="rgba(251,191,36,0.85)" stroke-width="1.4"/>
+            <rect x="140" y="350" width="520" height="12" fill="#241846"/>
+            <!-- Wine cups + bread plates + bitter herbs -->
+            <ellipse cx="220" cy="316" rx="10" ry="5" fill="#3d2a16" stroke="rgba(251,191,36,0.85)" stroke-width="0.8"/>
+            <line x1="220" y1="311" x2="220" y2="300" stroke="#3d2a16" stroke-width="2"/>
+            <ellipse cx="320" cy="318" rx="14" ry="5" fill="#3d2a16" stroke="rgba(251,191,36,0.85)" stroke-width="0.8"/>
+            <!-- Round flat bread -->
+            <ellipse cx="320" cy="312" rx="11" ry="3" fill="#fef3c7" stroke="rgba(251,191,36,0.85)" stroke-width="0.5"/>
+            <!-- Cup -->
+            <ellipse cx="420" cy="316" rx="11" ry="5" fill="#3d2a16" stroke="rgba(251,191,36,0.85)" stroke-width="0.8"/>
+            <line x1="420" y1="311" x2="420" y2="298" stroke="#3d2a16" stroke-width="2"/>
+            <!-- Bread loaf 2 -->
+            <ellipse cx="500" cy="316" rx="14" ry="5" fill="#3d2a16" stroke="rgba(251,191,36,0.85)" stroke-width="0.8"/>
+            <ellipse cx="500" cy="312" rx="11" ry="3" fill="#fef3c7" stroke="rgba(251,191,36,0.85)" stroke-width="0.5"/>
+            <!-- Bitter herbs -->
+            <line x1="560" y1="312" x2="558" y2="306" stroke="rgba(34,197,94,0.85)" stroke-width="1.5"/>
+            <line x1="564" y1="312" x2="566" y2="304" stroke="rgba(34,197,94,0.85)" stroke-width="1.5"/>
+            <line x1="568" y1="314" x2="570" y2="307" stroke="rgba(34,197,94,0.85)" stroke-width="1.5"/>
+          </g>
+          <!-- Jesus at center of the back of the table -->
+          <g transform="translate(400 290)">
+            <ellipse cx="0" cy="0" rx="16" ry="22" fill="#3d2a16" stroke="rgba(251,191,36,0.95)" stroke-width="1.4"/>
+            <ellipse cx="0" cy="-26" rx="13" ry="15" fill="#1a1233"/>
+            <path d="M -8 -18 Q 0 -6 8 -18" stroke="rgba(254,243,199,0.6)" stroke-width="1.4" fill="none"/>
+            <path d="M -10 -26 Q -16 -12 -12 4 M 10 -26 Q 16 -12 12 4" stroke="#0a0d1a" stroke-width="2" fill="none"/>
+            <circle cx="0" cy="-26" r="24" fill="none" stroke="rgba(251,191,36,0.95)" stroke-width="1.8"/>
+            <circle cx="0" cy="-26" r="36" fill="none" stroke="rgba(251,191,36,0.5)" stroke-width="1.2"/>
+          </g>
+          <!-- Disciples around the table — 6 on each side -->
+          <g fill="#0a0d1a">
+            <!-- Back side (further) -->
+            <g transform="translate(200 290)"><ellipse cx="0" cy="0" rx="11" ry="16"/><ellipse cx="0" cy="-22" rx="10" ry="11"/><path d="M -7 -14 Q 0 -2 7 -14" stroke="rgba(254,243,199,0.5)" stroke-width="1.2" fill="none"/></g>
+            <g transform="translate(260 286)"><ellipse cx="0" cy="0" rx="11" ry="16"/><ellipse cx="0" cy="-22" rx="10" ry="11"/><path d="M -7 -14 Q 0 -2 7 -14" stroke="rgba(254,243,199,0.5)" stroke-width="1.2" fill="none"/></g>
+            <g transform="translate(320 288)"><ellipse cx="0" cy="0" rx="11" ry="16"/><ellipse cx="0" cy="-22" rx="10" ry="11"/><path d="M -7 -14 Q 0 -2 7 -14" stroke="rgba(254,243,199,0.5)" stroke-width="1.2" fill="none"/></g>
+            <g transform="translate(480 288)"><ellipse cx="0" cy="0" rx="11" ry="16"/><ellipse cx="0" cy="-22" rx="10" ry="11"/><path d="M -7 -14 Q 0 -2 7 -14" stroke="rgba(254,243,199,0.5)" stroke-width="1.2" fill="none"/></g>
+            <g transform="translate(540 286)"><ellipse cx="0" cy="0" rx="11" ry="16"/><ellipse cx="0" cy="-22" rx="10" ry="11"/><path d="M -7 -14 Q 0 -2 7 -14" stroke="rgba(254,243,199,0.5)" stroke-width="1.2" fill="none"/></g>
+            <g transform="translate(600 290)"><ellipse cx="0" cy="0" rx="11" ry="16"/><ellipse cx="0" cy="-22" rx="10" ry="11"/><path d="M -7 -14 Q 0 -2 7 -14" stroke="rgba(254,243,199,0.5)" stroke-width="1.2" fill="none"/></g>
+            <!-- Front side (closer) -->
+            <g transform="translate(220 400)"><ellipse cx="0" cy="0" rx="13" ry="18"/><ellipse cx="0" cy="-24" rx="11" ry="12"/></g>
+            <g transform="translate(280 405)"><ellipse cx="0" cy="0" rx="13" ry="18"/><ellipse cx="0" cy="-24" rx="11" ry="12"/></g>
+            <g transform="translate(340 402)"><ellipse cx="0" cy="0" rx="13" ry="18"/><ellipse cx="0" cy="-24" rx="11" ry="12"/></g>
+            <g transform="translate(460 402)"><ellipse cx="0" cy="0" rx="13" ry="18"/><ellipse cx="0" cy="-24" rx="11" ry="12"/></g>
+            <g transform="translate(520 405)"><ellipse cx="0" cy="0" rx="13" ry="18"/><ellipse cx="0" cy="-24" rx="11" ry="12"/></g>
+            <g transform="translate(580 400)"><ellipse cx="0" cy="0" rx="13" ry="18"/><ellipse cx="0" cy="-24" rx="11" ry="12"/></g>
+          </g>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.85)">"I have eagerly desired to eat this Passover with you"</text>
+        </svg>`
+      },
+      {
+        id: 'washing-feet',
+        title: 'He Washed Their Feet',
+        scriptureRef: 'John 13:1-5',
+        bibleText: '"He poured water into a basin and began to wash his disciples\' feet, drying them with the towel that was wrapped around him."',
+        narration: 'The disciples had walked all day on dusty roads. There was a basin and a towel and a water jar by the door — but no servant to do the foot-washing, and none of the twelve had volunteered. Halfway through the meal, Jesus got up from the table. He took off His outer cloak. He wrapped a towel around His waist. He poured water into the basin. And He — the rabbi, the Master, the Son of God in the room — knelt down at the feet of His disciples and washed them, one by one. Peter protested. Jesus said, "Unless I wash you, you have no part with me." Peter shut up.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'lswf', skyTop:'#1a1233', skyMid:'#3d2a16', skyBot:'#241846', stars:false})}
+          <!-- Soft lamp light on the scene -->
+          <radialGradient id="lswfLamp" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0%" stop-color="rgba(251,113,38,0.4)"/>
+            <stop offset="60%" stop-color="rgba(251,191,36,0.12)"/>
+            <stop offset="100%" stop-color="rgba(251,191,36,0)"/>
+          </radialGradient>
+          <ellipse cx="400" cy="320" rx="360" ry="200" fill="url(#lswfLamp)"/>
+          <!-- Floor stones -->
+          <rect x="0" y="380" width="800" height="120" fill="#1a1233"/>
+          <g stroke="rgba(254,243,199,0.18)" stroke-width="0.7">
+            <line x1="0" y1="430" x2="800" y2="430"/>
+            <line x1="0" y1="470" x2="800" y2="470"/>
+          </g>
+          <!-- Disciple seated on a low bench/cushion (Peter), one foot extended -->
+          <g transform="translate(540 380)">
+            <!-- Cushion -->
+            <rect x="-44" y="0" width="88" height="22" fill="#5a4378" stroke="rgba(251,191,36,0.65)" stroke-width="1"/>
+            <!-- Body -->
+            <path d="M -22 0 Q -20 -50 0 -60 Q 20 -50 22 0 Z" fill="#1a1233" stroke="rgba(251,191,36,0.55)" stroke-width="1"/>
+            <ellipse cx="0" cy="-68" rx="12" ry="14" fill="#1a1233"/>
+            <path d="M -8 -60 Q 0 -46 8 -60" stroke="rgba(254,243,199,0.5)" stroke-width="1.3" fill="none"/>
+            <!-- Right foot extended forward over basin -->
+            <line x1="-2" y1="22" x2="-50" y2="46" stroke="#1a1233" stroke-width="6"/>
+            <ellipse cx="-54" cy="46" rx="9" ry="4" fill="#1a1233"/>
+            <!-- Halo -->
+            <circle cx="0" cy="-68" r="22" fill="none" stroke="rgba(251,191,36,0.7)" stroke-width="1.2"/>
+          </g>
+          <text x="540" y="290" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="9" letter-spacing="2.5" fill="rgba(251,191,36,0.85)">PETER</text>
+          <!-- Basin of water on the floor -->
+          <g transform="translate(440 440)">
+            <ellipse cx="0" cy="0" rx="48" ry="14" fill="#3d2a16" stroke="rgba(251,191,36,0.85)" stroke-width="1.2"/>
+            <ellipse cx="0" cy="-4" rx="42" ry="10" fill="rgba(56,189,248,0.7)"/>
+            <!-- Water ripples -->
+            <ellipse cx="0" cy="-4" rx="22" ry="3" fill="none" stroke="rgba(254,243,199,0.65)" stroke-width="0.7"/>
+            <ellipse cx="-8" cy="-3" rx="6" ry="2" fill="rgba(254,243,199,0.85)"/>
+            <!-- The foot dipped in -->
+            <ellipse cx="-12" cy="-2" rx="8" ry="3" fill="rgba(74,52,32,0.85)"/>
+          </g>
+          <!-- Jesus kneeling, towel around waist, hands on the foot -->
+          <g transform="translate(360 410)">
+            <!-- Bent kneeling body -->
+            <ellipse cx="0" cy="0" rx="34" ry="14" fill="#3d2a16" stroke="rgba(251,191,36,0.95)" stroke-width="1.4"/>
+            <!-- Towel around waist (off-white wrapped) -->
+            <path d="M -22 -6 Q 0 -14 22 -6 L 16 14 Q 0 10 -16 14 Z" fill="#fef3c7" stroke="rgba(251,191,36,0.85)" stroke-width="0.8"/>
+            <!-- Upper body bent forward -->
+            <ellipse cx="0" cy="-26" rx="18" ry="22" fill="#3d2a16" stroke="rgba(251,191,36,0.95)" stroke-width="1.4"/>
+            <!-- Head bowed -->
+            <ellipse cx="14" cy="-46" rx="11" ry="13" fill="#1a1233"/>
+            <path d="M 6 -38 Q 14 -28 22 -38" stroke="rgba(254,243,199,0.6)" stroke-width="1.4" fill="none"/>
+            <!-- Two arms forward, washing -->
+            <line x1="6" y1="-30" x2="36" y2="-2" stroke="#3d2a16" stroke-width="6"/>
+            <line x1="14" y1="-22" x2="42" y2="-4" stroke="#3d2a16" stroke-width="6"/>
+            <!-- Halo big and bright -->
+            <circle cx="14" cy="-46" r="26" fill="none" stroke="rgba(251,191,36,0.95)" stroke-width="1.8"/>
+          </g>
+          <!-- Other disciples watching from the side -->
+          <g fill="#0a0d1a" opacity="0.75">
+            <g transform="translate(120 420)"><ellipse cx="0" cy="0" rx="8" ry="22"/><ellipse cx="0" cy="-24" rx="7" ry="9"/></g>
+            <g transform="translate(170 420)"><ellipse cx="0" cy="0" rx="8" ry="22"/><ellipse cx="0" cy="-24" rx="7" ry="9"/></g>
+            <g transform="translate(220 420)"><ellipse cx="0" cy="0" rx="8" ry="22"/><ellipse cx="0" cy="-24" rx="7" ry="9"/></g>
+            <g transform="translate(680 420)"><ellipse cx="0" cy="0" rx="8" ry="22"/><ellipse cx="0" cy="-24" rx="7" ry="9"/></g>
+            <g transform="translate(720 420)"><ellipse cx="0" cy="0" rx="8" ry="22"/><ellipse cx="0" cy="-24" rx="7" ry="9"/></g>
+          </g>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">The Lord and Teacher · on his knees</text>
+        </svg>`
+      },
+      {
+        id: 'bread-cup',
+        title: 'This is My Body · This is My Blood',
+        scriptureRef: 'Luke 22:19-20',
+        bibleText: '"This is my body given for you; do this in remembrance of me." …"This cup is the new covenant in my blood, which is poured out for you."',
+        narration: 'When they were back at the table, Jesus took a loaf of unleavened bread. He gave thanks. He broke it. He gave it to them. "This is my body, given for you. Do this in remembrance of me." Then He took the cup. "This cup is the new covenant in my blood, which is poured out for you." Two thousand years of churches every Sunday — small towns and stadiums, persecution and prosperity — have been re-enacting that thirty-second moment. He turned the oldest Jewish meal in the world into the doorway of the New Covenant.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'lsbc', skyTop:'#0a0d1a', skyMid:'#241846', skyBot:'#3d2a5e', stars:false})}
+          <!-- Glory beam from above -->
+          <radialGradient id="lsbcGlory" cx="0.5" cy="0.2" r="0.55">
+            <stop offset="0%" stop-color="rgba(254,243,199,0.85)"/>
+            <stop offset="50%" stop-color="rgba(251,191,36,0.4)"/>
+            <stop offset="100%" stop-color="rgba(251,191,36,0)"/>
+          </radialGradient>
+          <ellipse cx="400" cy="120" rx="400" ry="200" fill="url(#lsbcGlory)"/>
+          <polygon points="380,0 340,400 460,400 420,0" fill="rgba(254,243,199,0.35)"/>
+          <!-- Table -->
+          <g>
+            <rect x="120" y="360" width="560" height="34" fill="#3d2a16" stroke="rgba(251,191,36,0.85)" stroke-width="1.4"/>
+            <rect x="120" y="392" width="560" height="12" fill="#241846"/>
+          </g>
+          <!-- Disciples seated on far side of table, watching reverently -->
+          <g fill="#0a0d1a" opacity="0.85">
+            <g transform="translate(180 340)"><ellipse cx="0" cy="0" rx="11" ry="16"/><ellipse cx="0" cy="-22" rx="10" ry="11"/></g>
+            <g transform="translate(240 336)"><ellipse cx="0" cy="0" rx="11" ry="16"/><ellipse cx="0" cy="-22" rx="10" ry="11"/></g>
+            <g transform="translate(300 338)"><ellipse cx="0" cy="0" rx="11" ry="16"/><ellipse cx="0" cy="-22" rx="10" ry="11"/></g>
+            <g transform="translate(500 338)"><ellipse cx="0" cy="0" rx="11" ry="16"/><ellipse cx="0" cy="-22" rx="10" ry="11"/></g>
+            <g transform="translate(560 336)"><ellipse cx="0" cy="0" rx="11" ry="16"/><ellipse cx="0" cy="-22" rx="10" ry="11"/></g>
+            <g transform="translate(620 340)"><ellipse cx="0" cy="0" rx="11" ry="16"/><ellipse cx="0" cy="-22" rx="10" ry="11"/></g>
+          </g>
+          <!-- Jesus at center, BOTH arms raised — bread in left hand, cup in right -->
+          <g transform="translate(400 320)">
+            <!-- Body -->
+            <ellipse cx="0" cy="0" rx="20" ry="30" fill="#3d2a16" stroke="rgba(251,191,36,0.95)" stroke-width="1.6"/>
+            <ellipse cx="0" cy="-36" rx="14" ry="16" fill="#1a1233"/>
+            <path d="M -8 -28 Q 0 -14 8 -28" stroke="rgba(254,243,199,0.65)" stroke-width="1.4" fill="none"/>
+            <path d="M -10 -36 Q -16 -22 -12 -8 M 10 -36 Q 16 -22 12 -8" stroke="#0a0d1a" stroke-width="2" fill="none"/>
+            <!-- LEFT arm raised holding bread -->
+            <line x1="-16" y1="-18" x2="-44" y2="-44" stroke="#3d2a16" stroke-width="6"/>
+            <ellipse cx="-50" cy="-46" rx="16" ry="6" fill="#fef3c7" stroke="rgba(251,191,36,0.95)" stroke-width="1.2"/>
+            <!-- Break in the bread -->
+            <line x1="-50" y1="-46" x2="-44" y2="-52" stroke="#3d2a16" stroke-width="1.5"/>
+            <!-- RIGHT arm raised holding cup -->
+            <line x1="16" y1="-18" x2="44" y2="-44" stroke="#3d2a16" stroke-width="6"/>
+            <path d="M 38 -50 L 56 -50 L 54 -36 Q 46 -32 38 -36 Z" fill="#3d2a16" stroke="rgba(251,191,36,0.95)" stroke-width="1.2"/>
+            <ellipse cx="47" cy="-50" rx="8" ry="2" fill="rgba(120,20,20,0.85)"/>
+            <!-- Massive halo -->
+            <circle cx="0" cy="-36" r="32" fill="none" stroke="rgba(251,191,36,0.95)" stroke-width="2"/>
+            <circle cx="0" cy="-36" r="46" fill="none" stroke="rgba(251,191,36,0.55)" stroke-width="1.2"/>
+          </g>
+          <!-- Bread + cup labels -->
+          <text x="290" y="240" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="14" letter-spacing="3" fill="rgba(251,191,36,0.85)">"THIS IS MY BODY"</text>
+          <text x="520" y="240" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="14" letter-spacing="3" fill="rgba(251,191,36,0.85)">"THIS IS MY BLOOD"</text>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">"Do this · in remembrance of me"</text>
+        </svg>`
+      },
+      {
+        id: 'judas-leaves',
+        title: 'And It Was Night',
+        scriptureRef: 'John 13:21-30',
+        bibleText: '"As soon as Judas took the bread, he went out. And it was night."',
+        narration: 'Late in the meal, Jesus said quietly: "One of you will betray me." They all asked, "Surely not I, Lord?" John leaned back against Jesus and whispered, "Lord — who is it?" Jesus dipped a piece of bread into the dish and handed it to Judas. "What you are about to do, do quickly." Judas took the bread, stood up, and walked out of the room. The other eleven thought he was going to give to the poor or buy something for the festival. The reader of John\'s gospel is told the truth in five short words: "And it was night."',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'lsjl', skyTop:'#0a0d1a', skyMid:'#1a1233', skyBot:'#241846', stars:false})}
+          <!-- Lamp glow softer, more confined to the room -->
+          <radialGradient id="lsjlLamp" cx="0.5" cy="0.5" r="0.4">
+            <stop offset="0%" stop-color="rgba(251,113,38,0.3)"/>
+            <stop offset="100%" stop-color="rgba(251,191,36,0)"/>
+          </radialGradient>
+          <ellipse cx="380" cy="320" rx="300" ry="160" fill="url(#lsjlLamp)"/>
+          <!-- Floor -->
+          <rect x="0" y="400" width="800" height="100" fill="#0a0d1a"/>
+          <!-- Doorway on the right — open to NIGHT (deep black + a single star outside) -->
+          <g>
+            <rect x="640" y="120" width="120" height="280" fill="#000a14" stroke="rgba(251,191,36,0.6)" stroke-width="1.4"/>
+            <!-- Just darkness beyond -->
+            <circle cx="700" cy="180" r="1" fill="#fef3c7"/>
+            <circle cx="730" cy="240" r="1" fill="#fef3c7"/>
+          </g>
+          <!-- Table center-left -->
+          <g>
+            <rect x="60" y="340" width="500" height="32" fill="#3d2a16" stroke="rgba(251,191,36,0.65)" stroke-width="1.2"/>
+            <rect x="60" y="370" width="500" height="12" fill="#241846"/>
+            <!-- Vessels still on table -->
+            <ellipse cx="120" cy="336" rx="10" ry="5" fill="#3d2a16" stroke="rgba(251,191,36,0.7)" stroke-width="0.7"/>
+            <ellipse cx="200" cy="336" rx="12" ry="5" fill="#3d2a16" stroke="rgba(251,191,36,0.7)" stroke-width="0.7"/>
+            <ellipse cx="200" cy="332" rx="9" ry="3" fill="#fef3c7"/>
+            <ellipse cx="300" cy="336" rx="10" ry="5" fill="#3d2a16" stroke="rgba(251,191,36,0.7)" stroke-width="0.7"/>
+            <ellipse cx="420" cy="336" rx="14" ry="5" fill="#3d2a16" stroke="rgba(251,191,36,0.7)" stroke-width="0.7"/>
+            <ellipse cx="500" cy="336" rx="10" ry="5" fill="#3d2a16" stroke="rgba(251,191,36,0.7)" stroke-width="0.7"/>
+          </g>
+          <!-- Jesus center of the bench at the table, watching Judas leave -->
+          <g transform="translate(310 320)">
+            <ellipse cx="0" cy="0" rx="14" ry="18" fill="#3d2a16" stroke="rgba(251,191,36,0.95)" stroke-width="1.4"/>
+            <ellipse cx="0" cy="-22" rx="12" ry="14" fill="#1a1233"/>
+            <path d="M -8 -14 Q 0 -2 8 -14" stroke="rgba(254,243,199,0.6)" stroke-width="1.3" fill="none"/>
+            <!-- Halo subdued (sorrow) -->
+            <circle cx="0" cy="-22" r="20" fill="none" stroke="rgba(251,191,36,0.7)" stroke-width="1.3"/>
+          </g>
+          <!-- John leaning against Jesus (left side) -->
+          <g transform="translate(260 330)">
+            <ellipse cx="0" cy="0" rx="11" ry="14" fill="#0a0d1a"/>
+            <ellipse cx="6" cy="-12" rx="9" ry="11" fill="#0a0d1a"/>
+          </g>
+          <!-- Other disciples around table, oblivious to what's happening -->
+          <g fill="#0a0d1a" opacity="0.85">
+            <g transform="translate(120 326)"><ellipse cx="0" cy="0" rx="11" ry="15"/><ellipse cx="0" cy="-20" rx="9" ry="10"/></g>
+            <g transform="translate(170 322)"><ellipse cx="0" cy="0" rx="11" ry="15"/><ellipse cx="0" cy="-20" rx="9" ry="10"/></g>
+            <g transform="translate(380 322)"><ellipse cx="0" cy="0" rx="11" ry="15"/><ellipse cx="0" cy="-20" rx="9" ry="10"/></g>
+            <g transform="translate(440 326)"><ellipse cx="0" cy="0" rx="11" ry="15"/><ellipse cx="0" cy="-20" rx="9" ry="10"/></g>
+            <g transform="translate(500 322)"><ellipse cx="0" cy="0" rx="11" ry="15"/><ellipse cx="0" cy="-20" rx="9" ry="10"/></g>
+          </g>
+          <!-- JUDAS — silhouette mid-stride, walking AWAY toward the open door, money bag in one hand -->
+          <g transform="translate(620 400)">
+            <ellipse cx="0" cy="0" rx="10" ry="30" fill="#0a0d1a"/>
+            <ellipse cx="2" cy="-30" rx="9" ry="11" fill="#0a0d1a"/>
+            <!-- Walking forward into night -->
+            <line x1="-4" y1="26" x2="-10" y2="40" stroke="#0a0d1a" stroke-width="4"/>
+            <line x1="4"  y1="26" x2="10" y2="40" stroke="#0a0d1a" stroke-width="4"/>
+            <!-- Money bag in right hand, swung slightly -->
+            <line x1="9" y1="-14" x2="20" y2="0" stroke="#0a0d1a" stroke-width="3"/>
+            <ellipse cx="22" cy="2" rx="9" ry="8" fill="#3d2a16" stroke="rgba(251,191,36,0.55)" stroke-width="0.8"/>
+            <!-- Halo absent / gone -->
+          </g>
+          <!-- "AND IT WAS NIGHT" banner across top -->
+          <text x="400" y="80" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="22" letter-spacing="6" fill="rgba(248,113,113,0.85)">"AND IT WAS NIGHT"</text>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.85)">Five words · weighed with everything</text>
+        </svg>`
+      }
+    ],
+    closing: 'The Last Supper is the one moment in Scripture where Jesus tells His disciples to keep doing something forever. Not "build a temple," not "write me a creed," not "start a denomination." Just: take this bread, take this cup, and remember me. The Christian church for two millennia has been a movement of broken bread and shared wine — billions of people in tens of thousands of languages, around a Table that was first set by Him.',
+    closingPrompt: 'The next time you take communion (or sit at any meal), what would change if you slowed down enough to actually do it in remembrance of Him?'
+  },
+
+  // ════════════════════════════════════════════════════════════
+  // STORY 32 — The Crucifixion
+  // ════════════════════════════════════════════════════════════
+  {
+    id: 'crucifixion',
+    title: 'The Crucifixion',
+    subtitle: 'A Roman cross. The sky goes black. The veil tears in two.',
+    icon: '✝️',
+    color: '#5a4378',
+    accentColor: '#fef3c7',
+    era: 'new-testament',
+    scriptureRef: 'Matthew 27 · John 19',
+    duration: '~7 min',
+    scenes: [
+      {
+        id: 'via-dolorosa',
+        title: 'The Road of Sorrows',
+        scriptureRef: 'Matthew 27:31-32 · Luke 23:26',
+        bibleText: '"A certain man from Cyrene, Simon, the father of Alexander and Rufus, was passing by on his way in from the country, and they forced him to carry the cross."',
+        narration: 'After a night of mockery and a hurried trial, the Roman soldiers stripped Jesus of his robe and led him out to crucify Him. He walked through the streets of Jerusalem carrying the crossbeam on His own shoulders. He had been beaten so badly He could barely stand. He fell. The soldiers grabbed a man at random from the crowd — Simon, a North African on his way into the city — and forced him to carry the wood the rest of the way. Behind them walked the women, weeping. Jesus turned and told them: weep for yourselves, not for me.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'cvd', skyTop:'#3d2a5e', skyMid:'#5a4378', skyBot:'#fb923c', stars:false})}
+          <!-- Late morning sun -->
+          <circle cx="660" cy="120" r="32" fill="#fef3c7"/>
+          <circle cx="660" cy="120" r="50" fill="rgba(251,113,38,0.45)"/>
+          <!-- Jerusalem walls on the right with city gate -->
+          <g fill="#1a1233" stroke="rgba(251,191,36,0.55)" stroke-width="1">
+            <rect x="540" y="200" width="260" height="220"/>
+            <!-- Battlements -->
+            <g>
+              <rect x="540" y="192" width="14" height="10"/>
+              <rect x="570" y="192" width="14" height="10"/>
+              <rect x="600" y="192" width="14" height="10"/>
+              <rect x="630" y="192" width="14" height="10"/>
+            </g>
+            <!-- Open gate -->
+            <path d="M 540 360 Q 540 280 600 280 Q 660 280 660 360" fill="#0a0d1a" stroke="rgba(251,191,36,0.65)" stroke-width="1.4"/>
+          </g>
+          <!-- Cobblestone road leading away from gate -->
+          <path d="M 540 360 Q 380 380 60 460" stroke="rgba(254,243,199,0.45)" stroke-width="10" fill="none"/>
+          <g stroke="rgba(254,243,199,0.4)" stroke-width="0.7" fill="none">
+            <path d="M 540 360 Q 380 380 60 460" stroke-dasharray="6 12"/>
+          </g>
+          <!-- Ground -->
+          <path d="M 0 430 Q 400 416 800 430 L 800 500 L 0 500 Z" fill="#241846"/>
+          <!-- Simon of Cyrene (forced) carrying the crossbeam — broad-shouldered, beam across shoulders -->
+          <g transform="translate(280 400)">
+            <!-- Body -->
+            <ellipse cx="0" cy="0" rx="14" ry="30" fill="#3d2a16" stroke="rgba(251,191,36,0.5)" stroke-width="0.7"/>
+            <ellipse cx="0" cy="-34" rx="12" ry="14" fill="#1a1233"/>
+            <path d="M -8 -26 Q 0 -10 8 -26" stroke="rgba(254,243,199,0.5)" stroke-width="1.3" fill="none"/>
+            <!-- Crossbeam (horizontal beam) across shoulders -->
+            <rect x="-60" y="-38" width="120" height="10" fill="#3d2a16" stroke="rgba(251,191,36,0.7)" stroke-width="1.2"/>
+            <!-- Bound hands gripping the beam from above -->
+            <ellipse cx="-32" cy="-34" rx="4" ry="3" fill="#1a1233"/>
+            <ellipse cx="32" cy="-34" rx="4" ry="3" fill="#1a1233"/>
+          </g>
+          <text x="280" y="360" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="9" letter-spacing="2.5" fill="rgba(254,243,199,0.7)">SIMON · CYRENE</text>
+          <!-- Jesus walking just ahead, body bowed, crown of thorns -->
+          <g transform="translate(200 410)">
+            <path d="M -16 0 Q -14 -50 0 -60 Q 14 -50 16 0 Z" fill="#241846" stroke="rgba(120,20,20,0.7)" stroke-width="1"/>
+            <ellipse cx="0" cy="-70" rx="12" ry="14" fill="#1a1233"/>
+            <path d="M -8 -62 Q 0 -50 8 -62" stroke="rgba(254,243,199,0.55)" stroke-width="1.4" fill="none"/>
+            <!-- Crown of thorns — small spikes around the head -->
+            <g stroke="rgba(120,20,20,0.9)" stroke-width="1.5" fill="none">
+              <path d="M -12 -78 Q 0 -86 12 -78"/>
+              <line x1="-10" y1="-80" x2="-12" y2="-86"/>
+              <line x1="-4" y1="-84" x2="-5" y2="-90"/>
+              <line x1="4" y1="-84" x2="5" y2="-90"/>
+              <line x1="10" y1="-80" x2="12" y2="-86"/>
+            </g>
+            <!-- Blood drips from forehead -->
+            <line x1="-3" y1="-72" x2="-3" y2="-66" stroke="rgba(120,20,20,0.85)" stroke-width="1.2"/>
+            <line x1="3" y1="-70" x2="3" y2="-64" stroke="rgba(120,20,20,0.85)" stroke-width="1.2"/>
+            <!-- Body slumped -->
+            <line x1="0" y1="-44" x2="-12" y2="-30" stroke="#241846" stroke-width="1.5"/>
+            <!-- Halo dimmer -->
+            <circle cx="0" cy="-70" r="20" fill="none" stroke="rgba(251,191,36,0.6)" stroke-width="1.2"/>
+          </g>
+          <!-- Roman soldiers — one with whip in hand, walking alongside -->
+          <g transform="translate(100 410)">
+            <ellipse cx="0" cy="0" rx="11" ry="32" fill="#0a0d1a"/>
+            <ellipse cx="0" cy="-34" rx="9" ry="11" fill="#0a0d1a"/>
+            <!-- Crested helmet -->
+            <path d="M -9 -42 Q 0 -54 9 -42 L 5 -48 Z" fill="rgba(248,113,113,0.85)"/>
+            <line x1="9" y1="-22" x2="22" y2="-44" stroke="#0a0d1a" stroke-width="3"/>
+            <polygon points="20,-44 24,-50 18,-48" fill="rgba(251,191,36,0.85)"/>
+            <line x1="9" y1="-14" x2="32" y2="-2" stroke="#0a0d1a" stroke-width="2"/>
+            <path d="M 32 -2 Q 36 6 30 12" stroke="rgba(248,113,113,0.85)" stroke-width="1.4" fill="none"/>
+          </g>
+          <!-- Weeping women behind, smaller silhouettes -->
+          <g fill="#1a1233" opacity="0.85">
+            <g transform="translate(440 420)"><ellipse cx="0" cy="0" rx="7" ry="20"/><ellipse cx="0" cy="-22" rx="6" ry="8"/><line x1="-5" y1="-14" x2="-2" y2="-22" stroke="#1a1233" stroke-width="3"/></g>
+            <g transform="translate(490 422)"><ellipse cx="0" cy="0" rx="7" ry="20"/><ellipse cx="0" cy="-22" rx="6" ry="8"/></g>
+          </g>
+          <text x="400" y="475" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.85)">The Via Dolorosa · the road of sorrows</text>
+        </svg>`
+      },
+      {
+        id: 'three-crosses',
+        title: 'Three Crosses on the Hill',
+        scriptureRef: 'Luke 23:33-34 · 39-43',
+        bibleText: '"\'Father, forgive them, for they do not know what they are doing.\'" …"Today you will be with me in paradise."',
+        narration: 'They reached the place called Skull — Golgotha — outside the city wall. They drove nails through His wrists and His feet and lifted the crossbeam onto the upright. They did the same to two criminals on either side of Him. From the cross He prayed for the men who had killed Him: "Father, forgive them. They don\'t know what they are doing." One of the criminals taunted Him. The other one defended Him and asked, "Remember me when you come into your kingdom." Jesus answered, "Truly I tell you — today you will be with me in paradise."',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          <defs>
+            <linearGradient id="ctcSky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#1a1233"/>
+              <stop offset="60%" stop-color="#3d2a16"/>
+              <stop offset="100%" stop-color="#5a4378"/>
+            </linearGradient>
+          </defs>
+          <rect width="800" height="500" fill="url(#ctcSky)"/>
+          <!-- Dimmed afternoon sun, partially obscured -->
+          <circle cx="660" cy="130" r="28" fill="rgba(254,243,199,0.4)"/>
+          <!-- Hill of Skull (Golgotha) — bare rounded mound -->
+          <path d="M 0 440 Q 200 400 400 380 Q 600 400 800 440 L 800 500 L 0 500 Z" fill="#241846"/>
+          <!-- Skull rocks faintly visible -->
+          <g fill="rgba(254,243,199,0.18)">
+            <ellipse cx="120" cy="450" rx="14" ry="6"/>
+            <ellipse cx="680" cy="450" rx="14" ry="6"/>
+          </g>
+          <!-- Three crosses — center higher, two flanking shorter -->
+          <!-- LEFT cross with criminal -->
+          <g transform="translate(220 400)">
+            <line x1="0" y1="0" x2="0" y2="-220" stroke="#3d2a16" stroke-width="10"/>
+            <line x1="-40" y1="-160" x2="40" y2="-160" stroke="#3d2a16" stroke-width="8"/>
+            <!-- Bound figure -->
+            <g transform="translate(0 -130)">
+              <ellipse cx="0" cy="0" rx="12" ry="34" fill="#1a1233"/>
+              <ellipse cx="0" cy="-36" rx="10" ry="11" fill="#1a1233"/>
+              <line x1="-12" y1="-30" x2="-40" y2="-30" stroke="#1a1233" stroke-width="6"/>
+              <line x1="12" y1="-30" x2="40" y2="-30" stroke="#1a1233" stroke-width="6"/>
+            </g>
+          </g>
+          <!-- CENTER cross — taller, Jesus -->
+          <g transform="translate(400 400)">
+            <line x1="0" y1="0" x2="0" y2="-260" stroke="#3d2a16" stroke-width="12"/>
+            <line x1="-56" y1="-200" x2="56" y2="-200" stroke="#3d2a16" stroke-width="10"/>
+            <!-- INRI inscription at top -->
+            <rect x="-22" y="-256" width="44" height="14" fill="#3d2a16" stroke="rgba(251,191,36,0.95)" stroke-width="1"/>
+            <text x="0" y="-246" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="9" letter-spacing="2" fill="rgba(254,243,199,0.95)">INRI</text>
+            <!-- Jesus body -->
+            <g transform="translate(0 -170)">
+              <!-- Crown of thorns -->
+              <g stroke="rgba(120,20,20,0.9)" stroke-width="1.5" fill="none">
+                <path d="M -14 -38 Q 0 -46 14 -38"/>
+                <line x1="-10" y1="-40" x2="-12" y2="-48"/>
+                <line x1="-4" y1="-44" x2="-5" y2="-52"/>
+                <line x1="4" y1="-44" x2="5" y2="-52"/>
+                <line x1="10" y1="-40" x2="12" y2="-48"/>
+              </g>
+              <!-- Head -->
+              <ellipse cx="0" cy="-32" rx="13" ry="15" fill="#1a1233"/>
+              <!-- Beard -->
+              <path d="M -8 -22 Q 0 -8 8 -22" stroke="rgba(254,243,199,0.6)" stroke-width="1.5" fill="none"/>
+              <!-- Body -->
+              <ellipse cx="0" cy="0" rx="16" ry="36" fill="#241846" stroke="rgba(254,243,199,0.5)" stroke-width="0.8"/>
+              <!-- Loincloth -->
+              <path d="M -16 -2 Q 0 -8 16 -2 L 14 14 Q 0 10 -14 14 Z" fill="rgba(254,243,199,0.7)" stroke="rgba(251,191,36,0.55)" stroke-width="0.8"/>
+              <!-- Arms outstretched on the crossbeam -->
+              <line x1="-16" y1="-22" x2="-56" y2="-30" stroke="#241846" stroke-width="8"/>
+              <line x1="16"  y1="-22" x2="56" y2="-30" stroke="#241846" stroke-width="8"/>
+              <!-- Nails -->
+              <circle cx="-50" cy="-30" r="2.5" fill="rgba(120,20,20,0.95)"/>
+              <circle cx="50" cy="-30" r="2.5" fill="rgba(120,20,20,0.95)"/>
+              <!-- Nail in feet -->
+              <circle cx="0" cy="38" r="2.5" fill="rgba(120,20,20,0.95)"/>
+              <!-- Spear wound (side) -->
+              <line x1="14" y1="-2" x2="20" y2="6" stroke="rgba(120,20,20,0.85)" stroke-width="2"/>
+              <!-- Halo (subdued but present) -->
+              <circle cx="0" cy="-32" r="24" fill="none" stroke="rgba(251,191,36,0.95)" stroke-width="1.6"/>
+              <circle cx="0" cy="-32" r="36" fill="none" stroke="rgba(251,191,36,0.5)" stroke-width="1"/>
+            </g>
+          </g>
+          <!-- RIGHT cross with the other criminal (the "good thief", head turned toward Jesus) -->
+          <g transform="translate(580 400)">
+            <line x1="0" y1="0" x2="0" y2="-220" stroke="#3d2a16" stroke-width="10"/>
+            <line x1="-40" y1="-160" x2="40" y2="-160" stroke="#3d2a16" stroke-width="8"/>
+            <g transform="translate(0 -130)">
+              <ellipse cx="0" cy="0" rx="12" ry="34" fill="#1a1233"/>
+              <ellipse cx="-3" cy="-36" rx="10" ry="11" fill="#1a1233"/>
+              <line x1="-12" y1="-30" x2="-40" y2="-30" stroke="#1a1233" stroke-width="6"/>
+              <line x1="12" y1="-30" x2="40" y2="-30" stroke="#1a1233" stroke-width="6"/>
+              <!-- Small halo (he just believed) -->
+              <circle cx="-3" cy="-36" r="14" fill="none" stroke="rgba(251,191,36,0.7)" stroke-width="1"/>
+            </g>
+          </g>
+          <!-- Soldiers gambling for the robe at the base, women kneeling on the other side -->
+          <g fill="#0a0d1a" opacity="0.8">
+            <g transform="translate(120 460)">
+              <ellipse cx="0" cy="0" rx="22" ry="6"/>
+              <ellipse cx="-14" cy="-2" rx="6" ry="5"/>
+            </g>
+            <g transform="translate(180 462)">
+              <ellipse cx="0" cy="0" rx="20" ry="6"/>
+              <ellipse cx="14" cy="-2" rx="6" ry="5"/>
+            </g>
+            <!-- Three dice -->
+            <rect x="148" y="450" width="6" height="6" fill="rgba(251,191,36,0.85)" stroke="#3d2a16" stroke-width="0.4"/>
+            <rect x="158" y="450" width="6" height="6" fill="rgba(251,191,36,0.85)" stroke="#3d2a16" stroke-width="0.4"/>
+            <rect x="168" y="450" width="6" height="6" fill="rgba(251,191,36,0.85)" stroke="#3d2a16" stroke-width="0.4"/>
+          </g>
+          <!-- Mary, John, women on the right side of the center cross -->
+          <g transform="translate(440 460)">
+            <ellipse cx="0" cy="0" rx="10" ry="14" fill="#3d2a5e" stroke="rgba(251,191,36,0.5)" stroke-width="0.7"/>
+            <ellipse cx="0" cy="-16" rx="7" ry="8" fill="#1a1233"/>
+            <line x1="-4" y1="-12" x2="-2" y2="-16" stroke="rgba(56,189,248,0.85)" stroke-width="1"/>
+            <line x1="4" y1="-12" x2="2" y2="-16" stroke="rgba(56,189,248,0.85)" stroke-width="1"/>
+          </g>
+          <g transform="translate(478 462)">
+            <ellipse cx="0" cy="0" rx="10" ry="14" fill="#1a1233"/>
+            <ellipse cx="0" cy="-16" rx="7" ry="8" fill="#1a1233"/>
+          </g>
+          <text x="400" y="475" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">"Father · forgive them"</text>
+        </svg>`
+      },
+      {
+        id: 'darkness',
+        title: 'Darkness over the Land',
+        scriptureRef: 'Matthew 27:45-46 · Luke 23:44',
+        bibleText: '"From noon until three in the afternoon darkness came over all the land… Jesus cried out in a loud voice, \'My God, my God, why have you forsaken me?\'"',
+        narration: 'At noon — when the sun should have been the brightest — the sky went dark. For three hours. Not a normal eclipse. Not a sudden storm. The sun itself was withheld. At three o\'clock Jesus cried out the opening line of Psalm 22 in a voice loud enough to carry to the back of the crowd: "My God, my God — why have you forsaken me?" Then He said, "It is finished." He bowed His head. And He breathed His last.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          <defs>
+            <linearGradient id="cdkSky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#000a14"/>
+              <stop offset="100%" stop-color="#0a0d1a"/>
+            </linearGradient>
+          </defs>
+          <rect width="800" height="500" fill="url(#cdkSky)"/>
+          <!-- Black sun (eclipsed) -->
+          <circle cx="660" cy="130" r="36" fill="#0a0d1a" stroke="rgba(254,243,199,0.5)" stroke-width="1.5"/>
+          <!-- Corona of light around the eclipsed sun -->
+          <g fill="none" stroke="rgba(254,243,199,0.35)" stroke-width="1.2">
+            <circle cx="660" cy="130" r="44"/>
+            <circle cx="660" cy="130" r="54" stroke-dasharray="2 4"/>
+          </g>
+          <!-- Hill -->
+          <path d="M 0 440 Q 200 400 400 380 Q 600 400 800 440 L 800 500 L 0 500 Z" fill="#0a0d1a"/>
+          <!-- Center cross (taller), the only one visible in detail -->
+          <g transform="translate(400 400)">
+            <line x1="0" y1="0" x2="0" y2="-260" stroke="#3d2a16" stroke-width="12"/>
+            <line x1="-56" y1="-200" x2="56" y2="-200" stroke="#3d2a16" stroke-width="10"/>
+            <rect x="-22" y="-256" width="44" height="14" fill="#3d2a16" stroke="rgba(251,191,36,0.7)" stroke-width="1"/>
+            <text x="0" y="-246" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="9" letter-spacing="2" fill="rgba(254,243,199,0.85)">INRI</text>
+            <g transform="translate(0 -170)">
+              <g stroke="rgba(120,20,20,0.9)" stroke-width="1.5" fill="none">
+                <path d="M -14 -38 Q 0 -46 14 -38"/>
+                <line x1="-10" y1="-40" x2="-12" y2="-48"/>
+                <line x1="-4" y1="-44" x2="-5" y2="-52"/>
+                <line x1="4" y1="-44" x2="5" y2="-52"/>
+                <line x1="10" y1="-40" x2="12" y2="-48"/>
+              </g>
+              <ellipse cx="0" cy="-32" rx="13" ry="15" fill="#1a1233"/>
+              <!-- Head bowed -->
+              <line x1="0" y1="-22" x2="0" y2="-14" stroke="#1a1233" stroke-width="1"/>
+              <ellipse cx="0" cy="0" rx="16" ry="36" fill="#241846" stroke="rgba(254,243,199,0.5)" stroke-width="0.8"/>
+              <path d="M -16 -2 Q 0 -8 16 -2 L 14 14 Q 0 10 -14 14 Z" fill="rgba(254,243,199,0.7)" stroke="rgba(251,191,36,0.55)" stroke-width="0.8"/>
+              <line x1="-16" y1="-22" x2="-56" y2="-30" stroke="#241846" stroke-width="8"/>
+              <line x1="16"  y1="-22" x2="56" y2="-30" stroke="#241846" stroke-width="8"/>
+              <circle cx="-50" cy="-30" r="2.5" fill="rgba(120,20,20,0.95)"/>
+              <circle cx="50" cy="-30" r="2.5" fill="rgba(120,20,20,0.95)"/>
+              <!-- Big halo barely visible -->
+              <circle cx="0" cy="-32" r="24" fill="none" stroke="rgba(251,191,36,0.6)" stroke-width="1.3"/>
+            </g>
+          </g>
+          <!-- Side crosses faded to silhouettes -->
+          <g opacity="0.5">
+            <g transform="translate(220 400)">
+              <line x1="0" y1="0" x2="0" y2="-220" stroke="#1a1233" stroke-width="10"/>
+              <line x1="-40" y1="-160" x2="40" y2="-160" stroke="#1a1233" stroke-width="8"/>
+            </g>
+            <g transform="translate(580 400)">
+              <line x1="0" y1="0" x2="0" y2="-220" stroke="#1a1233" stroke-width="10"/>
+              <line x1="-40" y1="-160" x2="40" y2="-160" stroke="#1a1233" stroke-width="8"/>
+            </g>
+          </g>
+          <!-- Soldiers/Crowd dimmed silhouettes at base -->
+          <g fill="#0a0d1a" opacity="0.6">
+            <ellipse cx="320" cy="460" rx="6" ry="14"/>
+            <ellipse cx="320" cy="450" rx="5" ry="6"/>
+            <ellipse cx="480" cy="460" rx="6" ry="14"/>
+            <ellipse cx="480" cy="450" rx="5" ry="6"/>
+          </g>
+          <!-- "ELI, ELI, LAMA SABACHTHANI?" floating in dark space -->
+          <text x="400" y="80" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="18" letter-spacing="5" fill="rgba(254,243,199,0.85)">"MY GOD · MY GOD ·</text>
+          <text x="400" y="108" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="18" letter-spacing="5" fill="rgba(254,243,199,0.85)">WHY HAVE YOU FORSAKEN ME?"</text>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">"It is finished"</text>
+        </svg>`
+      },
+      {
+        id: 'veil-torn',
+        title: 'The Veil Torn in Two',
+        scriptureRef: 'Matthew 27:51-54',
+        bibleText: '"At that moment the curtain of the temple was torn in two from top to bottom. The earth shook, the rocks split and the tombs broke open."',
+        narration: 'The instant He died, two miles away in the temple, the great curtain that hung between the holy place and the most holy place — the one that had stood between God and humanity for centuries — was ripped from top to bottom. Not bottom to top, as if a human had done it. Top to bottom, as if God had done it. The earth shook. Rocks split. The Roman centurion at the foot of the cross — a hardened man who had seen many crucifixions — looked up at the dead man on the wood and said, "Surely this man was the Son of God."',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'cvt', skyTop:'#0a0d1a', skyMid:'#241846', skyBot:'#3d2a16', stars:false})}
+          <!-- Massive crack of lightning across sky -->
+          <polyline points="80,30 200,160 170,170 240,310" stroke="rgba(254,243,199,0.85)" stroke-width="2" fill="none"/>
+          <polyline points="620,30 540,180 570,190 500,320" stroke="rgba(254,243,199,0.85)" stroke-width="2" fill="none"/>
+          <!-- Inside the temple — Holy of Holies behind the curtain -->
+          <g>
+            <rect x="100" y="80" width="600" height="280" fill="#241846" stroke="rgba(251,191,36,0.7)" stroke-width="1.4"/>
+            <!-- Columns left + right -->
+            <rect x="120" y="100" width="22" height="260" fill="#3d2a16" stroke="rgba(251,191,36,0.6)" stroke-width="0.8"/>
+            <rect x="658" y="100" width="22" height="260" fill="#3d2a16" stroke="rgba(251,191,36,0.6)" stroke-width="0.8"/>
+            <!-- Inner sanctuary glow -->
+            <radialGradient id="cvtHoly" cx="0.5" cy="0.5" r="0.4">
+              <stop offset="0%" stop-color="rgba(254,243,199,0.55)"/>
+              <stop offset="60%" stop-color="rgba(251,191,36,0.18)"/>
+              <stop offset="100%" stop-color="rgba(251,191,36,0)"/>
+            </radialGradient>
+            <ellipse cx="400" cy="220" rx="200" ry="120" fill="url(#cvtHoly)"/>
+            <!-- Ark of the Covenant glimpsed through torn curtain -->
+            <g transform="translate(400 250)">
+              <rect x="-26" y="-12" width="52" height="22" fill="rgba(251,191,36,0.85)" stroke="#fef3c7" stroke-width="1"/>
+              <ellipse cx="-12" cy="-22" rx="5" ry="6" fill="rgba(251,191,36,0.95)"/>
+              <ellipse cx="12"  cy="-22" rx="5" ry="6" fill="rgba(251,191,36,0.95)"/>
+            </g>
+          </g>
+          <!-- The curtain — two halves split down the middle, edges jagged like cloth ripped -->
+          <g>
+            <!-- LEFT half (torn, dropping away to the left) -->
+            <path d="M 142 80 L 380 80 L 380 100 L 376 120 L 384 140 L 374 160 L 388 180 L 380 200 L 392 220 L 380 240 L 394 260 L 382 280 L 396 300 L 380 320 L 388 340 L 380 360 L 142 360 Z"
+                  fill="rgba(120,20,20,0.85)" stroke="rgba(251,191,36,0.65)" stroke-width="1"/>
+            <!-- Gold embroidery hint -->
+            <g stroke="rgba(251,191,36,0.55)" stroke-width="0.6" fill="none">
+              <line x1="160" y1="100" x2="370" y2="100"/>
+              <line x1="160" y1="160" x2="370" y2="160"/>
+              <line x1="160" y1="220" x2="370" y2="220"/>
+              <line x1="160" y1="280" x2="370" y2="280"/>
+              <line x1="160" y1="340" x2="370" y2="340"/>
+            </g>
+            <!-- RIGHT half (torn, dropping away to the right) -->
+            <path d="M 658 80 L 420 80 L 420 100 L 424 120 L 416 140 L 426 160 L 412 180 L 420 200 L 408 220 L 420 240 L 406 260 L 418 280 L 404 300 L 420 320 L 412 340 L 420 360 L 658 360 Z"
+                  fill="rgba(120,20,20,0.85)" stroke="rgba(251,191,36,0.65)" stroke-width="1"/>
+            <g stroke="rgba(251,191,36,0.55)" stroke-width="0.6" fill="none">
+              <line x1="430" y1="100" x2="640" y2="100"/>
+              <line x1="430" y1="160" x2="640" y2="160"/>
+              <line x1="430" y1="220" x2="640" y2="220"/>
+              <line x1="430" y1="280" x2="640" y2="280"/>
+              <line x1="430" y1="340" x2="640" y2="340"/>
+            </g>
+          </g>
+          <!-- "TOP TO BOTTOM" arrow from top of curtain down through the tear -->
+          <g>
+            <line x1="400" y1="40" x2="400" y2="80" stroke="rgba(254,243,199,0.85)" stroke-width="2"/>
+            <polygon points="395,80 405,80 400,90" fill="rgba(254,243,199,0.85)"/>
+          </g>
+          <text x="400" y="60" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="11" letter-spacing="3" fill="rgba(254,243,199,0.85)">TOP TO BOTTOM</text>
+          <!-- Cracked floor at the bottom, earthquake -->
+          <path d="M 0 380 L 800 380" stroke="rgba(254,243,199,0.55)" stroke-width="1"/>
+          <g stroke="rgba(248,113,113,0.85)" stroke-width="2" fill="none">
+            <polyline points="80,420 130,400 110,440 180,420 160,460 220,440"/>
+            <polyline points="540,420 590,400 570,440 640,420 620,460 700,440"/>
+          </g>
+          <text x="400" y="475" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">"Surely this man was the Son of God"</text>
+        </svg>`
+      }
+    ],
+    closing: 'The crucifixion is the strangest moment in the universe\'s history. The Author of life let humans kill Him. The Holy One let Himself be reckoned a criminal. Heaven hid its face from the sun. And the curtain that had stood between sinful humanity and the holy presence of God — torn from top to bottom by the only hand strong enough to do it. The cross is not a tragic accident in a beautiful gospel. It IS the gospel.',
+    closingPrompt: 'What weight are you still carrying that He carried up that hill so you would not have to — and what would it look like to lay it down at the foot of the cross today?'
+  },
+
+  // ════════════════════════════════════════════════════════════
+  // STORY 33 — Pentecost
+  // ════════════════════════════════════════════════════════════
+  {
+    id: 'pentecost',
+    title: 'Pentecost',
+    subtitle: 'A rushing wind. Tongues of fire. The Church begins.',
+    icon: '🔥',
+    color: '#fb923c',
+    accentColor: '#fef3c7',
+    era: 'new-testament',
+    scriptureRef: 'Acts 2',
+    duration: '~6 min',
+    scenes: [
+      {
+        id: 'upper-room-wait',
+        title: 'A Hundred and Twenty in Prayer',
+        scriptureRef: 'Acts 1:13-14 · 2:1',
+        bibleText: '"They all joined together constantly in prayer… When the day of Pentecost came, they were all together in one place."',
+        narration: 'Forty days after the resurrection, Jesus ascended into heaven and told the disciples to wait in Jerusalem for the gift the Father had promised. A hundred and twenty of them gathered in an upper room — the eleven apostles, Mary the mother of Jesus, His brothers, the women who had followed Him from Galilee. For ten days they prayed. They had no idea what they were waiting for or how they would know when it arrived. On the morning of Pentecost — the Jewish feast of the harvest — they found out.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'pur', skyTop:'#1a1233', skyMid:'#3d2a16', skyBot:'#241846', stars:false})}
+          <!-- Upper room interior — stone walls, simple window on one side -->
+          <rect x="0" y="0" width="800" height="500" fill="#1a1233"/>
+          <g fill="#3d2a16" opacity="0.6">
+            <rect x="0" y="0" width="800" height="12"/>
+            <rect x="0" y="100" width="800" height="6"/>
+          </g>
+          <!-- Window on the right -->
+          <g transform="translate(700 200)">
+            <rect x="-30" y="-50" width="60" height="100" fill="#3d2a5e" stroke="rgba(251,191,36,0.65)" stroke-width="1.2"/>
+            <line x1="0" y1="-50" x2="0" y2="50" stroke="rgba(251,191,36,0.65)" stroke-width="1"/>
+            <line x1="-30" y1="0" x2="30" y2="0" stroke="rgba(251,191,36,0.65)" stroke-width="1"/>
+          </g>
+          <!-- Soft pool of light from a single lamp -->
+          <radialGradient id="purLamp" cx="0.5" cy="0.5" r="0.45">
+            <stop offset="0%" stop-color="rgba(251,113,38,0.25)"/>
+            <stop offset="100%" stop-color="rgba(251,191,36,0)"/>
+          </radialGradient>
+          <ellipse cx="400" cy="320" rx="380" ry="180" fill="url(#purLamp)"/>
+          <!-- Lamp -->
+          <line x1="400" y1="0" x2="400" y2="80" stroke="rgba(251,191,36,0.5)" stroke-width="1"/>
+          <ellipse cx="400" cy="88" rx="14" ry="6" fill="#3d2a16" stroke="rgba(251,191,36,0.85)" stroke-width="1"/>
+          <ellipse cx="400" cy="84" rx="6" ry="7" fill="#fbbf24"/>
+          <!-- Many people gathered in prayer — concentric clusters kneeling, heads bowed -->
+          <g fill="#0a0d1a">
+            <!-- Inner circle -->
+            <g transform="translate(320 380)"><ellipse cx="0" cy="0" rx="14" ry="6"/><ellipse cx="-2" cy="-8" rx="6" ry="6"/></g>
+            <g transform="translate(370 376)"><ellipse cx="0" cy="0" rx="14" ry="6"/><ellipse cx="-2" cy="-8" rx="6" ry="6"/></g>
+            <g transform="translate(420 380)"><ellipse cx="0" cy="0" rx="14" ry="6"/><ellipse cx="-2" cy="-8" rx="6" ry="6"/></g>
+            <g transform="translate(470 376)"><ellipse cx="0" cy="0" rx="14" ry="6"/><ellipse cx="-2" cy="-8" rx="6" ry="6"/></g>
+            <!-- Middle circle -->
+            <g transform="translate(220 410)" opacity="0.9"><ellipse cx="0" cy="0" rx="12" ry="5"/><ellipse cx="-2" cy="-6" rx="5" ry="5"/></g>
+            <g transform="translate(270 412)" opacity="0.9"><ellipse cx="0" cy="0" rx="12" ry="5"/><ellipse cx="-2" cy="-6" rx="5" ry="5"/></g>
+            <g transform="translate(520 412)" opacity="0.9"><ellipse cx="0" cy="0" rx="12" ry="5"/><ellipse cx="-2" cy="-6" rx="5" ry="5"/></g>
+            <g transform="translate(570 410)" opacity="0.9"><ellipse cx="0" cy="0" rx="12" ry="5"/><ellipse cx="-2" cy="-6" rx="5" ry="5"/></g>
+            <!-- Outer scatter -->
+            <g opacity="0.75">
+              <g transform="translate(140 440)"><ellipse cx="0" cy="0" rx="10" ry="5"/><ellipse cx="-2" cy="-6" rx="5" ry="5"/></g>
+              <g transform="translate(180 444)"><ellipse cx="0" cy="0" rx="10" ry="5"/><ellipse cx="-2" cy="-6" rx="5" ry="5"/></g>
+              <g transform="translate(620 444)"><ellipse cx="0" cy="0" rx="10" ry="5"/><ellipse cx="-2" cy="-6" rx="5" ry="5"/></g>
+              <g transform="translate(660 440)"><ellipse cx="0" cy="0" rx="10" ry="5"/><ellipse cx="-2" cy="-6" rx="5" ry="5"/></g>
+            </g>
+          </g>
+          <!-- Counter banner -->
+          <text x="80" y="60" font-family="Bebas Neue, sans-serif" font-size="11" letter-spacing="3" fill="rgba(251,191,36,0.75)">120 PEOPLE · 10 DAYS · PRAYING</text>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.85)">"All together in one place"</text>
+        </svg>`
+      },
+      {
+        id: 'wind-fire',
+        title: 'Wind · Fire · Voices',
+        scriptureRef: 'Acts 2:1-4',
+        bibleText: '"Suddenly a sound like the blowing of a violent wind came from heaven and filled the whole house… They saw what seemed to be tongues of fire that separated and came to rest on each of them. All of them were filled with the Holy Spirit."',
+        narration: 'It came all at once. A roar from heaven like a violent rushing wind — not a wind they could feel on their skin, but a sound that filled the entire house. The walls vibrated. Doors blew open. And then over each one of the hundred and twenty, a small tongue of fire appeared — separate, individual, not consuming. The Holy Spirit had come. They were filled with Him. And they began to speak — and the words coming out of their mouths were not the words they had been about to say.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          <defs>
+            <radialGradient id="pwfGlory" cx="0.5" cy="0.2" r="0.7">
+              <stop offset="0%" stop-color="rgba(254,243,199,0.95)"/>
+              <stop offset="50%" stop-color="rgba(251,113,38,0.5)"/>
+              <stop offset="100%" stop-color="rgba(251,113,38,0)"/>
+            </radialGradient>
+          </defs>
+          <rect width="800" height="500" fill="#0a0d1a"/>
+          <ellipse cx="400" cy="120" rx="500" ry="240" fill="url(#pwfGlory)"/>
+          <!-- Wind lines streaming downward through the room -->
+          <g stroke="rgba(254,243,199,0.6)" stroke-width="2" fill="none">
+            <path d="M 100 40 Q 150 200 200 340"/>
+            <path d="M 220 40 Q 270 200 320 340"/>
+            <path d="M 340 40 Q 390 200 440 340"/>
+            <path d="M 460 40 Q 510 200 560 340"/>
+            <path d="M 580 40 Q 630 200 680 340"/>
+            <path d="M 700 40 Q 720 200 740 340"/>
+          </g>
+          <!-- Floor -->
+          <rect x="0" y="440" width="800" height="60" fill="#1a1233"/>
+          <!-- People standing in awe, faces up — many small figures arranged across the room -->
+          <g fill="#1a1233">
+            <g transform="translate(120 410)">
+              <ellipse cx="0" cy="0" rx="9" ry="28"/>
+              <ellipse cx="0" cy="-30" rx="8" ry="9"/>
+              <!-- Tongue of fire above head -->
+              <ellipse cx="0" cy="-46" rx="5" ry="10" fill="#fb923c"/>
+              <ellipse cx="0" cy="-48" rx="3" ry="6" fill="#fbbf24"/>
+              <ellipse cx="0" cy="-50" rx="1.5" ry="3" fill="#fef3c7"/>
+              <!-- Hands lifted in awe -->
+              <line x1="-7" y1="-18" x2="-14" y2="-32" stroke="#1a1233" stroke-width="3"/>
+              <line x1="7" y1="-18" x2="14" y2="-32" stroke="#1a1233" stroke-width="3"/>
+            </g>
+            <g transform="translate(200 410)">
+              <ellipse cx="0" cy="0" rx="9" ry="28"/>
+              <ellipse cx="0" cy="-30" rx="8" ry="9"/>
+              <ellipse cx="0" cy="-46" rx="5" ry="10" fill="#fb923c"/>
+              <ellipse cx="0" cy="-48" rx="3" ry="6" fill="#fbbf24"/>
+              <line x1="-7" y1="-18" x2="-14" y2="-32" stroke="#1a1233" stroke-width="3"/>
+              <line x1="7" y1="-18" x2="14" y2="-32" stroke="#1a1233" stroke-width="3"/>
+            </g>
+            <g transform="translate(280 410)">
+              <ellipse cx="0" cy="0" rx="9" ry="28"/>
+              <ellipse cx="0" cy="-30" rx="8" ry="9"/>
+              <ellipse cx="0" cy="-46" rx="5" ry="10" fill="#fb923c"/>
+              <ellipse cx="0" cy="-48" rx="3" ry="6" fill="#fbbf24"/>
+              <line x1="-7" y1="-18" x2="-14" y2="-32" stroke="#1a1233" stroke-width="3"/>
+              <line x1="7" y1="-18" x2="14" y2="-32" stroke="#1a1233" stroke-width="3"/>
+            </g>
+            <g transform="translate(360 410)">
+              <ellipse cx="0" cy="0" rx="9" ry="28"/>
+              <ellipse cx="0" cy="-30" rx="8" ry="9"/>
+              <ellipse cx="0" cy="-46" rx="6" ry="12" fill="#fb923c"/>
+              <ellipse cx="0" cy="-50" rx="3" ry="7" fill="#fbbf24"/>
+              <ellipse cx="0" cy="-52" rx="1.5" ry="4" fill="#fef3c7"/>
+              <line x1="-7" y1="-18" x2="-14" y2="-32" stroke="#1a1233" stroke-width="3"/>
+              <line x1="7" y1="-18" x2="14" y2="-32" stroke="#1a1233" stroke-width="3"/>
+            </g>
+            <g transform="translate(440 410)">
+              <ellipse cx="0" cy="0" rx="9" ry="28"/>
+              <ellipse cx="0" cy="-30" rx="8" ry="9"/>
+              <ellipse cx="0" cy="-46" rx="6" ry="12" fill="#fb923c"/>
+              <ellipse cx="0" cy="-50" rx="3" ry="7" fill="#fbbf24"/>
+              <ellipse cx="0" cy="-52" rx="1.5" ry="4" fill="#fef3c7"/>
+              <line x1="-7" y1="-18" x2="-14" y2="-32" stroke="#1a1233" stroke-width="3"/>
+              <line x1="7" y1="-18" x2="14" y2="-32" stroke="#1a1233" stroke-width="3"/>
+            </g>
+            <g transform="translate(520 410)">
+              <ellipse cx="0" cy="0" rx="9" ry="28"/>
+              <ellipse cx="0" cy="-30" rx="8" ry="9"/>
+              <ellipse cx="0" cy="-46" rx="5" ry="10" fill="#fb923c"/>
+              <ellipse cx="0" cy="-48" rx="3" ry="6" fill="#fbbf24"/>
+              <line x1="-7" y1="-18" x2="-14" y2="-32" stroke="#1a1233" stroke-width="3"/>
+              <line x1="7" y1="-18" x2="14" y2="-32" stroke="#1a1233" stroke-width="3"/>
+            </g>
+            <g transform="translate(600 410)">
+              <ellipse cx="0" cy="0" rx="9" ry="28"/>
+              <ellipse cx="0" cy="-30" rx="8" ry="9"/>
+              <ellipse cx="0" cy="-46" rx="5" ry="10" fill="#fb923c"/>
+              <ellipse cx="0" cy="-48" rx="3" ry="6" fill="#fbbf24"/>
+              <line x1="-7" y1="-18" x2="-14" y2="-32" stroke="#1a1233" stroke-width="3"/>
+              <line x1="7" y1="-18" x2="14" y2="-32" stroke="#1a1233" stroke-width="3"/>
+            </g>
+            <g transform="translate(680 410)">
+              <ellipse cx="0" cy="0" rx="9" ry="28"/>
+              <ellipse cx="0" cy="-30" rx="8" ry="9"/>
+              <ellipse cx="0" cy="-46" rx="5" ry="10" fill="#fb923c"/>
+              <ellipse cx="0" cy="-48" rx="3" ry="6" fill="#fbbf24"/>
+              <line x1="-7" y1="-18" x2="-14" y2="-32" stroke="#1a1233" stroke-width="3"/>
+              <line x1="7" y1="-18" x2="14" y2="-32" stroke="#1a1233" stroke-width="3"/>
+            </g>
+          </g>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">"All of them were filled with the Holy Spirit"</text>
+        </svg>`
+      },
+      {
+        id: 'languages',
+        title: 'Every Tongue Heard',
+        scriptureRef: 'Acts 2:5-12',
+        bibleText: '"How is it that each of us hears them in our native language?"',
+        narration: 'A crowd was already gathering in Jerusalem because it was a feast day — Jews from every nation under heaven. Parthians, Medes, Elamites, residents of Mesopotamia, Cappadocia, Pontus, Asia, Phrygia, Pamphylia, Egypt, parts of Libya, Romans, Cretans, Arabs. They heard the noise and came running to the upper-room house. And every one of them — Persian, Egyptian, Libyan, Greek — heard the disciples praising God in their OWN language. They stood there asking each other, "What does this mean?"',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'plg', skyTop:'#3d2a5e', skyMid:'#fbbf24', skyBot:'#fef3c7', stars:false})}
+          <!-- The upper-room house in center, glowing -->
+          <radialGradient id="plgGlow" cx="0.5" cy="0.5" r="0.4">
+            <stop offset="0%" stop-color="rgba(251,191,36,0.5)"/>
+            <stop offset="100%" stop-color="rgba(251,191,36,0)"/>
+          </radialGradient>
+          <ellipse cx="400" cy="250" rx="240" ry="200" fill="url(#plgGlow)"/>
+          <g transform="translate(400 280)">
+            <rect x="-80" y="-80" width="160" height="100" fill="#3d2a16" stroke="rgba(251,191,36,0.95)" stroke-width="1.4"/>
+            <polygon points="-90,-80 0,-130 90,-80" fill="#241846" stroke="rgba(251,191,36,0.95)" stroke-width="1.4"/>
+            <!-- Tongues of fire visible through every window -->
+            <rect x="-60" y="-60" width="22" height="22" fill="rgba(251,113,38,0.8)"/>
+            <rect x="-20" y="-60" width="22" height="22" fill="rgba(251,113,38,0.8)"/>
+            <rect x="38"  y="-60" width="22" height="22" fill="rgba(251,113,38,0.8)"/>
+            <!-- Wide-open door pouring sound -->
+            <rect x="-14" y="-22" width="28" height="40" fill="rgba(254,243,199,0.85)"/>
+          </g>
+          <!-- Sound waves radiating outward from the house -->
+          <g fill="none" stroke="rgba(251,191,36,0.55)" stroke-width="1.5" stroke-dasharray="4 6">
+            <ellipse cx="400" cy="280" rx="200" ry="140"/>
+            <ellipse cx="400" cy="280" rx="260" ry="180"/>
+            <ellipse cx="400" cy="280" rx="320" ry="220"/>
+          </g>
+          <!-- Crowd around the building from every nation, each with their language word on speech bubble -->
+          <g fill="#0a0d1a">
+            <!-- Top-left -->
+            <g transform="translate(120 220)">
+              <ellipse cx="0" cy="0" rx="10" ry="22"/>
+              <ellipse cx="0" cy="-22" rx="9" ry="10"/>
+              <!-- Speech bubble: "Parthian" -->
+              <rect x="20" y="-26" width="60" height="14" fill="#fef3c7" stroke="rgba(251,191,36,0.85)" stroke-width="0.6" rx="2"/>
+              <text x="50" y="-16" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="7" letter-spacing="1.4" fill="#3d2a16">PARTHIA</text>
+            </g>
+            <!-- Top-right -->
+            <g transform="translate(680 220)">
+              <ellipse cx="0" cy="0" rx="10" ry="22"/>
+              <ellipse cx="0" cy="-22" rx="9" ry="10"/>
+              <rect x="-80" y="-26" width="60" height="14" fill="#fef3c7" stroke="rgba(251,191,36,0.85)" stroke-width="0.6" rx="2"/>
+              <text x="-50" y="-16" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="7" letter-spacing="1.4" fill="#3d2a16">MEDIA</text>
+            </g>
+            <!-- Left middle -->
+            <g transform="translate(80 380)">
+              <ellipse cx="0" cy="0" rx="10" ry="22"/>
+              <ellipse cx="0" cy="-22" rx="9" ry="10"/>
+              <rect x="20" y="-26" width="60" height="14" fill="#fef3c7" stroke="rgba(251,191,36,0.85)" stroke-width="0.6" rx="2"/>
+              <text x="50" y="-16" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="7" letter-spacing="1.4" fill="#3d2a16">EGYPT</text>
+            </g>
+            <!-- Right middle -->
+            <g transform="translate(720 380)">
+              <ellipse cx="0" cy="0" rx="10" ry="22"/>
+              <ellipse cx="0" cy="-22" rx="9" ry="10"/>
+              <rect x="-80" y="-26" width="60" height="14" fill="#fef3c7" stroke="rgba(251,191,36,0.85)" stroke-width="0.6" rx="2"/>
+              <text x="-50" y="-16" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="7" letter-spacing="1.4" fill="#3d2a16">ROME</text>
+            </g>
+            <!-- Bottom-left -->
+            <g transform="translate(220 440)">
+              <ellipse cx="0" cy="0" rx="9" ry="22"/>
+              <ellipse cx="0" cy="-22" rx="8" ry="10"/>
+              <rect x="20" y="-26" width="60" height="14" fill="#fef3c7" stroke="rgba(251,191,36,0.85)" stroke-width="0.6" rx="2"/>
+              <text x="50" y="-16" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="7" letter-spacing="1.4" fill="#3d2a16">LIBYA</text>
+            </g>
+            <!-- Bottom-right -->
+            <g transform="translate(580 440)">
+              <ellipse cx="0" cy="0" rx="9" ry="22"/>
+              <ellipse cx="0" cy="-22" rx="8" ry="10"/>
+              <rect x="-80" y="-26" width="60" height="14" fill="#fef3c7" stroke="rgba(251,191,36,0.85)" stroke-width="0.6" rx="2"/>
+              <text x="-50" y="-16" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="7" letter-spacing="1.4" fill="#3d2a16">ARABIA</text>
+            </g>
+            <!-- Bottom-center -->
+            <g transform="translate(380 460)" opacity="0.85">
+              <ellipse cx="0" cy="0" rx="9" ry="22"/>
+              <ellipse cx="0" cy="-22" rx="8" ry="10"/>
+            </g>
+            <g transform="translate(420 462)" opacity="0.85">
+              <ellipse cx="0" cy="0" rx="9" ry="22"/>
+              <ellipse cx="0" cy="-22" rx="8" ry="10"/>
+            </g>
+          </g>
+          <text x="400" y="100" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="16" letter-spacing="4" fill="rgba(251,191,36,0.85)">"WHAT DOES THIS MEAN?"</text>
+          <text x="400" y="478" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="13" fill="rgba(254,243,199,0.95)">"Each of us hears in our native language"</text>
+        </svg>`
+      },
+      {
+        id: 'three-thousand',
+        title: 'Three Thousand in One Day',
+        scriptureRef: 'Acts 2:14-41',
+        bibleText: '"Those who accepted his message were baptized, and about three thousand were added to their number that day."',
+        narration: 'Peter — the same Peter who had denied Jesus three times two months earlier — stood up in front of the crowd and preached the first Christian sermon. He explained that the wind and the fire were the Holy Spirit promised by the prophet Joel. He told them Jesus of Nazareth had been crucified, raised, and was now seated at the right hand of God. The crowd was cut to the heart. "Brothers — what must we do?" Peter said: "Repent and be baptized in the name of Jesus Christ for the forgiveness of your sins." Three thousand people said yes that morning. The Church was born.',
+        svg: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+          ${_bsBackdrop({idPrefix:'p3k', skyTop:'#a78bfa', skyMid:'#fbbf24', skyBot:'#fef3c7', stars:false})}
+          <ellipse cx="660" cy="120" r="38" fill="#fef3c7"/>
+          <ellipse cx="660" cy="120" r="62" fill="rgba(251,191,36,0.4)"/>
+          <!-- Stone steps where Peter stands -->
+          <g fill="#3d2a16" stroke="rgba(251,191,36,0.85)" stroke-width="1.2">
+            <rect x="300" y="280" width="200" height="20"/>
+            <rect x="280" y="300" width="240" height="20"/>
+            <rect x="260" y="320" width="280" height="20"/>
+          </g>
+          <!-- Peter on top step, arm extended, preaching, with tongue of fire still over his head -->
+          <g transform="translate(400 280)">
+            <path d="M -16 0 Q -14 -50 0 -60 Q 14 -50 16 0 Z" fill="#3d2a16" stroke="rgba(251,191,36,0.95)" stroke-width="1.4"/>
+            <ellipse cx="0" cy="-70" rx="12" ry="14" fill="#1a1233"/>
+            <path d="M -8 -62 Q 0 -50 8 -62" stroke="rgba(254,243,199,0.6)" stroke-width="1.4" fill="none"/>
+            <!-- Tongue of fire above -->
+            <ellipse cx="0" cy="-92" rx="6" ry="12" fill="#fb923c"/>
+            <ellipse cx="0" cy="-94" rx="3" ry="7" fill="#fbbf24"/>
+            <ellipse cx="0" cy="-96" rx="1.5" ry="4" fill="#fef3c7"/>
+            <!-- Arm extended, preaching gesture -->
+            <line x1="14" y1="-32" x2="48" y2="-52" stroke="#3d2a16" stroke-width="6"/>
+            <!-- Bright halo -->
+            <circle cx="0" cy="-70" r="24" fill="none" stroke="rgba(251,191,36,0.95)" stroke-width="1.6"/>
+            <circle cx="0" cy="-70" r="38" fill="none" stroke="rgba(251,191,36,0.5)" stroke-width="1.2"/>
+          </g>
+          <text x="400" y="240" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="9" letter-spacing="2.5" fill="rgba(251,191,36,0.85)">PETER · FIRST SERMON</text>
+          <!-- Other apostles standing on lower step -->
+          <g fill="#0a0d1a" opacity="0.85">
+            <g transform="translate(330 350)"><ellipse cx="0" cy="0" rx="8" ry="20"/><ellipse cx="0" cy="-22" rx="7" ry="9"/></g>
+            <g transform="translate(370 350)"><ellipse cx="0" cy="0" rx="8" ry="20"/><ellipse cx="0" cy="-22" rx="7" ry="9"/></g>
+            <g transform="translate(430 350)"><ellipse cx="0" cy="0" rx="8" ry="20"/><ellipse cx="0" cy="-22" rx="7" ry="9"/></g>
+            <g transform="translate(470 350)"><ellipse cx="0" cy="0" rx="8" ry="20"/><ellipse cx="0" cy="-22" rx="7" ry="9"/></g>
+          </g>
+          <!-- Massive crowd filling the foreground — multi-row pattern -->
+          <g fill="#0a0d1a">
+            <g opacity="0.85">
+              <circle cx="60" cy="390" r="5"/><circle cx="110" cy="388" r="5"/>
+              <circle cx="160" cy="390" r="5"/><circle cx="210" cy="388" r="5"/>
+              <circle cx="600" cy="388" r="5"/><circle cx="650" cy="390" r="5"/>
+              <circle cx="700" cy="388" r="5"/><circle cx="750" cy="390" r="5"/>
+            </g>
+            <g opacity="0.92">
+              <circle cx="40" cy="420" r="6"/><circle cx="90" cy="418" r="6"/>
+              <circle cx="140" cy="420" r="6"/><circle cx="190" cy="418" r="6"/>
+              <circle cx="240" cy="420" r="6"/><circle cx="560" cy="418" r="6"/>
+              <circle cx="610" cy="420" r="6"/><circle cx="660" cy="418" r="6"/>
+              <circle cx="710" cy="420" r="6"/><circle cx="760" cy="418" r="6"/>
+            </g>
+            <g>
+              <circle cx="60" cy="450" r="7"/><circle cx="115" cy="448" r="7"/>
+              <circle cx="170" cy="450" r="7"/><circle cx="225" cy="448" r="7"/>
+              <circle cx="280" cy="450" r="7"/><circle cx="530" cy="450" r="7"/>
+              <circle cx="585" cy="448" r="7"/><circle cx="640" cy="450" r="7"/>
+              <circle cx="695" cy="448" r="7"/><circle cx="750" cy="450" r="7"/>
+            </g>
+            <g>
+              <circle cx="40" cy="478" r="8"/><circle cx="100" cy="475" r="8"/>
+              <circle cx="160" cy="478" r="8"/><circle cx="220" cy="475" r="8"/>
+              <circle cx="280" cy="478" r="8"/><circle cx="340" cy="475" r="8"/>
+              <circle cx="460" cy="475" r="8"/><circle cx="520" cy="478" r="8"/>
+              <circle cx="580" cy="475" r="8"/><circle cx="640" cy="478" r="8"/>
+              <circle cx="700" cy="475" r="8"/><circle cx="760" cy="478" r="8"/>
+            </g>
+          </g>
+          <!-- Counter banner -->
+          <g>
+            <text x="400" y="60" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="30" letter-spacing="6" fill="rgba(251,191,36,0.95)">3,000 BAPTIZED</text>
+            <text x="400" y="90" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="11" letter-spacing="3" fill="rgba(254,243,199,0.85)">IN ONE DAY · THE CHURCH IS BORN</text>
+          </g>
+        </svg>`
+      }
+    ],
+    closing: 'Pentecost is the inverse of Babel. At Babel, humanity tried to climb up to God on their own and was scattered into a thousand languages they could not understand. At Pentecost, God came down — and a thousand languages became one Gospel that every one of them understood. The Spirit who came that morning has not left. Every person who has trusted Jesus since has received the same Spirit — not a different one, not a smaller portion. He is in you the same way He was in the upper room.',
+    closingPrompt: 'Where in your life are you living as if the Spirit who fell at Pentecost is somewhere far away — and what would change today if you remembered He is actually in you?'
+  },
+
 ];
 
 if (typeof window !== 'undefined') {
