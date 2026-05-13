@@ -6076,39 +6076,45 @@ function _storyEsc(s){
 function renderFaithHomeStories(){
   const list = document.getElementById('fhStoryList');
   if(!list) return;
+  // Defensively pin openStory to window. `function` declarations at file scope
+  // are normally global, but on cached PWAs and some bundlers this can drift.
+  if(typeof window !== 'undefined' && typeof openStory === 'function' && window.openStory !== openStory){
+    window.openStory = openStory;
+  }
   const stories = _getStories();
   if(!stories.length){
     list.innerHTML = '<div style="font-size:.78rem;color:var(--tx3);font-family:Georgia,serif;font-style:italic;padding:.4rem .2rem;">More stories arriving in upcoming releases.</div>';
     return;
   }
-  // Story cards now use data-story-id + a delegated click handler instead of
-  // an inline onclick. The previous inline `onclick` on a `<button style="all:unset">`
-  // was occasionally not firing on mobile/iOS — `all:unset` plus inline handlers
-  // is a fragile combination. Delegated click on the grid container is bulletproof.
+  // Belt + suspenders click handling:
+  //   1) Inline `onclick` reads from `this.dataset.storyId` — no string
+  //      escaping risk, fires on every browser including iOS Safari.
+  //   2) Delegated `click` on #fhStoryList catches if the inline fails.
+  // Hover effect dropped — fragile and not required for the click bug.
   list.innerHTML = stories.map(function(s){
     const sceneCount = (s.scenes || []).length;
     const accent = s.color || '#fbbf24';
     return ''
       + '<button type="button" class="fh-story-tile" data-story-id="' + _storyEsc(s.id) + '" '
-      + 'style="appearance:none;-webkit-appearance:none;background:rgba(254,243,199,.04);border:1px solid rgba(254,243,199,.12);'
+      + 'onclick="(typeof openStory===\'function\')&&openStory(this.dataset.storyId)" '
+      + 'style="background:rgba(254,243,199,.04);border:1px solid rgba(254,243,199,.12);'
       + 'color:inherit;font:inherit;text-align:left;cursor:pointer;display:block;width:100%;'
       + 'border-radius:14px;padding:.85rem .95rem;transition:transform .15s, border-color .15s, background .15s;'
-      + 'font-family:var(--fm);position:relative;overflow:hidden;"'
-      + ' onmouseenter="this.style.transform=\'translateY(-2px)\';this.style.background=\'rgba(254,243,199,.08)\';this.style.borderColor=\'' + accent + '\'"'
-      + ' onmouseleave="this.style.transform=\'\';this.style.background=\'rgba(254,243,199,.04)\';this.style.borderColor=\'rgba(254,243,199,.12)\'">'
-      + '<div style="display:flex;align-items:center;gap:.55rem;margin-bottom:.4rem;">'
+      + 'font-family:var(--fm);position:relative;overflow:hidden;pointer-events:auto;"'
+      + '>'
+      + '<div style="display:flex;align-items:center;gap:.55rem;margin-bottom:.4rem;pointer-events:none;">'
       +   '<span style="font-size:1.4rem;line-height:1;">' + (s.icon || '⭐') + '</span>'
       +   '<div style="font-family:\'Bebas Neue\',var(--fm);letter-spacing:.06em;font-size:1.05rem;color:var(--tx);line-height:1.05;">' + _storyEsc(s.title) + '</div>'
       + '</div>'
-      + '<div style="font-family:Georgia,serif;font-style:italic;font-size:.76rem;color:var(--tx2);line-height:1.5;margin-bottom:.55rem;">' + _storyEsc(s.subtitle || '') + '</div>'
-      + '<div style="display:flex;align-items:center;gap:.5rem;font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:' + accent + ';">'
+      + '<div style="font-family:Georgia,serif;font-style:italic;font-size:.76rem;color:var(--tx2);line-height:1.5;margin-bottom:.55rem;pointer-events:none;">' + _storyEsc(s.subtitle || '') + '</div>'
+      + '<div style="display:flex;align-items:center;gap:.5rem;font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:' + accent + ';pointer-events:none;">'
       +   '<span>' + sceneCount + ' scenes</span>'
       +   (s.duration ? '<span style="color:var(--tx3);">·</span><span style="color:var(--tx3);">' + _storyEsc(s.duration) + '</span>' : '')
       +   '<span style="margin-left:auto;color:var(--tx2);">Begin →</span>'
       + '</div>'
       + '</button>';
   }).join('');
-  // Wire delegated click. Idempotent — replace any prior listener via a flag.
+  // Wire delegated click as the second safety net. Idempotent.
   if(!list.__storyClickBound){
     list.addEventListener('click', function(e){
       const btn = e.target && e.target.closest ? e.target.closest('[data-story-id]') : null;
