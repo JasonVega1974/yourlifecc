@@ -261,7 +261,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .tg.on::after{transform:translateX(19px);}
 
 /* ── MODALS ────────────────────────────────────── */
-.mo{display:none;position:fixed;inset:0;background:rgba(10,15,30,.88);backdrop-filter:blur(10px);z-index:9999;align-items:center;justify-content:center;padding:1rem;}
+.mo{display:none;position:fixed;inset:0;background:rgba(10,15,30,.88);backdrop-filter:blur(10px);z-index:100000;align-items:center;justify-content:center;padding:1rem;}
 .mo.open{display:flex;}
 .md{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:1.8rem;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.5);}
 .md.wide{max-width:740px;}
@@ -2713,6 +2713,42 @@ img.topic-card-hero{
 /* Story-tile inline text colors set via inline style on inner spans
    (var(--tx), var(--tx2), var(--tx3)) already swap via the variable
    system. Nothing more needed for those. */
+
+/* Home-tab Devotional card scripture quote is `color:#fff` inline in
+   index.html (#devScripture). White on the white light-mode background
+   is invisible. Override via id selector + !important. */
+:root.light #devScripture{color:var(--tx) !important;}
+
+/* Light-mode rescue for any other lingering #fff text inside the
+   Devotional section that wasn't caught by the var(--tx*) sweep. */
+:root.light #bf-devotional [style*="color:#fff"]{color:var(--tx) !important;}
+
+/* ──────────────────────────────────────────────────────────────
+   Defensive uniform sizing for every .topic-card living inside
+   a .topic-card-grid. Some cards (notably Devotional and Bible
+   Flashcards) were rendering smaller than Story Mode and other
+   tiles in the home grid. Lock the spec with !important so any
+   per-section inline overrides cannot drift below 300px tall or
+   180px-photo-hero.
+   ────────────────────────────────────────────────────────────── */
+.topic-card-grid > .topic-card{
+  min-height:300px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  padding:0 !important; /* hero-wrap + title/desc handle their own padding */
+}
+.topic-card-grid > .topic-card > .topic-card-hero-wrap{
+  height:180px !important;
+  flex:0 0 180px !important;
+}
+.topic-card-grid > .topic-card > .topic-card-title{
+  font-size:1rem !important;
+  padding:.95rem .9rem .35rem !important;
+}
+.topic-card-grid > .topic-card > .topic-card-desc{
+  font-size:.74rem !important;
+  padding:0 .9rem 1rem !important;
+}
 
 /* ──────────────────────────────────────────────────────────────
    Modal scroll-area fix — Plan Detail, Story Player, charModal

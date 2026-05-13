@@ -2965,7 +2965,7 @@ function openDevotionalCard(idx){
   
   document.getElementById('charBody').innerHTML = `
     <div style="background:rgba(167,139,250,.05);border-left:3px solid #a78bfa;border-radius:0 10px 10px 0;padding:1rem 1.2rem;margin-bottom:1rem;">
-      <div style="font-size:1.05rem;font-style:italic;color:#fff;line-height:1.8;">"${d.scripture}"</div>
+      <div style="font-size:1.05rem;font-style:italic;color:var(--tx);line-height:1.8;">"${d.scripture}"</div>
       <div style="font-size:.78rem;color:#a78bfa;font-weight:700;margin-top:.4rem;">— ${d.verse}</div>
     </div>
     
