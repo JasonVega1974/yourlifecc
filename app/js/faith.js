@@ -1159,14 +1159,33 @@ function renderPlanCatalog(){
   }
   el.innerHTML = plans.map(p => {
     const brand = _planBrand(p);
-    const isActive    = !!store.active[p.id];
+    const progActive  = store.active[p.id];
+    const isActive    = !!progActive;
     const isCompleted = store.completed.some(c => c && c.planId === p.id);
+    // Completed-day count for the progress bar — active plans count via
+    // completedDays; archived plans are 100%; never-started are 0.
+    const doneCount = progActive
+      ? Object.keys(progActive.completedDays || {}).length
+      : (isCompleted ? p.days : 0);
+    const pct = Math.round((doneCount / p.days) * 100);
+
     const statusBit = isActive
-      ? `<span style="color:var(--tx3);">·</span><span style="color:var(--tx);">Day ${store.active[p.id].currentDay} of ${p.days}</span>`
+      ? `<span style="color:var(--tx3);">·</span><span style="color:var(--tx);">Day ${progActive.currentDay} of ${p.days}</span>`
       : isCompleted
         ? `<span style="color:var(--tx3);">·</span><span style="color:#22c55e;">✓ Done</span>`
         : '';
     const cta = isActive ? 'Resume →' : isCompleted ? 'Re-read →' : 'Start →';
+
+    // Progress strip — only rendered when there is something to show.
+    const progressStrip = doneCount > 0
+      ? '<div style="margin-top:.55rem;height:5px;border-radius:99px;background:rgba(127,127,127,.22);overflow:hidden;">'
+        +   '<div style="height:100%;width:' + pct + '%;background:' + brand.color + ';transition:width .35s ease;border-radius:99px;"></div>'
+        + '</div>'
+        + '<div style="margin-top:.3rem;font-size:.58rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--tx3);">'
+        +   doneCount + ' / ' + p.days + ' days complete · ' + pct + '%'
+        + '</div>'
+      : '';
+
     return ''
       + '<button class="pl-card-v2" data-plan-id="' + _planEsc(p.id) + '" onclick="openPlanDetail(this.dataset.planId)" '
       +   'style="--accent:' + brand.color + ';">'
@@ -1181,6 +1200,7 @@ function renderPlanCatalog(){
       +   statusBit
       +   '<span style="margin-left:auto;color:var(--tx);">' + cta + '</span>'
       + '</div>'
+      + progressStrip
       + '</button>';
   }).join('');
 }
@@ -1252,9 +1272,21 @@ function _planDayHtml(p, d, prog, completedArchive, todayDay){
       + '<div style="background:' + brand.soft + '0.06);border:1px solid ' + brand.soft + '0.22);border-radius:10px;padding:.7rem .9rem;font-family:Georgia,serif;font-style:italic;font-size:.82rem;color:var(--tx);line-height:1.65;">' + _planEsc(d.prayerStarter) + '</div>'
     : '';
 
-  const completeBtn = isToday
-    ? '<button onclick="planMarkDayDone(\'' + p.id + '\',' + d.day + ')" style="background:linear-gradient(135deg,' + brand.color + ',#fef3c7);color:#0b1220;border:none;border-radius:12px;padding:.6rem 1.1rem;font-family:\'Bebas Neue\',var(--fm);font-size:.95rem;font-weight:800;letter-spacing:.08em;cursor:pointer;margin-top:1rem;display:block;width:100%;">✅ MARK DAY ' + d.day + ' DONE  +10 XP</button>'
-    : '';
+  // Completion toggle — always rendered. Styling + label change with state.
+  // Completed state shows green "✓ COMPLETED · TAP TO UNDO". Untapped shows
+  // the brand-gradient "MARK DAY N COMPLETE +10 XP". Same onclick =>
+  // planMarkDayDone which now toggles either direction.
+  const completeBtn = completed
+    ? '<button onclick="planMarkDayDone(\'' + p.id + '\',' + d.day + ')" '
+      + 'style="background:#22c55e;color:#fff;border:none;border-radius:12px;padding:.65rem 1.1rem;'
+      + 'font-family:\'Bebas Neue\',var(--fm);font-size:.95rem;font-weight:800;letter-spacing:.08em;'
+      + 'cursor:pointer;margin-top:1rem;display:block;width:100%;box-shadow:0 4px 14px rgba(34,197,94,.28);">'
+      + '✓ COMPLETED · TAP TO UNDO</button>'
+    : '<button onclick="planMarkDayDone(\'' + p.id + '\',' + d.day + ')" '
+      + 'style="background:linear-gradient(135deg,' + brand.color + ',#fef3c7);color:#0b1220;border:none;'
+      + 'border-radius:12px;padding:.65rem 1.1rem;font-family:\'Bebas Neue\',var(--fm);font-size:.95rem;'
+      + 'font-weight:800;letter-spacing:.08em;cursor:pointer;margin-top:1rem;display:block;width:100%;">'
+      + '✅ MARK DAY ' + d.day + ' COMPLETE  +10 XP</button>';
 
   // Padding scales with whether the day is rich or minimal so legacy
   // days still feel intentional, not anaemic.
@@ -1447,33 +1479,91 @@ function planStart(planId){
   if(typeof renderFaithHome === 'function') renderFaithHome();
 }
 
+// Toggle a plan day between complete / incomplete. Same function name +
+// signature so the line-5732 confetti wrapper and every existing inline
+// onclick caller (rendered HTML) keep working without changes.
+//
+// Behavior:
+//   1. Auto-starts the plan on first click if it's not already active.
+//   2. If the plan is in store.completed and a day gets un-marked, the
+//      plan is restored to store.active so progress can keep adjusting.
+//   3. Recomputes currentDay = lowest un-completed day after each toggle.
+//   4. +10 XP on mark, -10 on unmark (floored at 0). Streak read-day
+//      stamp is set on mark only — once today counts, leave it.
 function planMarkDayDone(planId, dayNum){
   const p = planById(planId);
-  if(!p){ return; }
+  if(!p) return;
   const store = planStore();
+
+  // Restore archived completion if user is un-marking a day on a finished plan.
+  const archiveIdx = store.completed.findIndex(c => c && c.planId === planId);
+  if(archiveIdx >= 0 && !store.active[planId]){
+    const archived = store.completed[archiveIdx];
+    const completedDays = {};
+    const stamp = archived.completedAt || new Date().toISOString();
+    for(let i = 1; i <= p.days; i++) completedDays[i] = stamp;
+    store.active[planId] = {
+      planId,
+      currentDay: p.days + 1,
+      totalDays: p.days,
+      completedDays,
+      startedAt: archived.startedAt || stamp,
+    };
+    store.completed.splice(archiveIdx, 1);
+  }
+
+  // Auto-start the plan on first day-toggle click if no active record exists.
+  if(!store.active[planId]){
+    store.active[planId] = {
+      planId,
+      currentDay: 1,
+      totalDays: p.days,
+      completedDays: {},
+      startedAt: new Date().toISOString(),
+    };
+    if(typeof logActivity === 'function') logActivity('faith', 'Started plan: ' + p.title);
+  }
+
   const prog = store.active[planId];
-  if(!prog){ showToast('Plan not active'); return; }
-  if(prog.completedDays && prog.completedDays[dayNum]){ showToast('Day already complete'); return; }
   if(!prog.completedDays) prog.completedDays = {};
+  const wasCompleted = !!prog.completedDays[dayNum];
+
+  if(wasCompleted){
+    // ── Toggle OFF ──
+    delete prog.completedDays[dayNum];
+    D.scrPoints = Math.max(0, (D.scrPoints || 0) - 10);
+    // Recompute currentDay = lowest un-completed day.
+    let nextDay = 1;
+    while(nextDay <= prog.totalDays && prog.completedDays[nextDay]) nextDay++;
+    prog.currentDay = nextDay;
+    save();
+    showToast('Day ' + dayNum + ' un-marked (-10 XP)');
+    if(typeof logActivity === 'function') logActivity('faith', p.title + ' · Day ' + dayNum + ' un-marked');
+    openPlanDetail(planId);
+    renderPlanCatalog();
+    if(typeof renderFaithHome === 'function') renderFaithHome();
+    if(typeof renderScrStats === 'function') renderScrStats();
+    return;
+  }
+
+  // ── Toggle ON ──
   prog.completedDays[dayNum] = new Date().toISOString();
-
-  // Faith XP +10 per completed plan day (per spec §4.1).
   D.scrPoints = (D.scrPoints || 0) + 10;
-
-  // Streak protection: completing a plan day counts as a faith action for today.
   if(!D.scrReadDays) D.scrReadDays = {};
   D.scrReadDays[new Date().toISOString().slice(0,10)] = true;
 
-  // Advance currentDay if user completed the day they were on.
-  if(prog.currentDay === dayNum) prog.currentDay = dayNum + 1;
+  // Recompute currentDay = lowest un-completed day.
+  let nextDay = 1;
+  while(nextDay <= prog.totalDays && prog.completedDays[nextDay]) nextDay++;
+  prog.currentDay = nextDay;
 
-  // Plan complete?
+  // Plan complete? (every day marked done)
   if(prog.currentDay > prog.totalDays){
     store.completed.push({
       planId,
       title: p.title,
       badgeIcon: p.badgeIcon,
-      totalDays: p.totalDays,
+      totalDays: prog.totalDays,
       startedAt: prog.startedAt,
       completedAt: new Date().toISOString(),
     });
@@ -1492,7 +1582,6 @@ function planMarkDayDone(planId, dayNum){
   save();
   showToast('Day ' + dayNum + ' complete! +10 XP 🙌');
   if(typeof logActivity === 'function') logActivity('faith', p.title + ' · Day ' + dayNum + ' done');
-  // Refresh in-place — re-open modal so the next "TODAY" badge moves down.
   openPlanDetail(planId);
   renderPlanCatalog();
   if(typeof renderFaithHome === 'function') renderFaithHome();
