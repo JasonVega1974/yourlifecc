@@ -1257,6 +1257,54 @@ function tgInitAll(){
   Object.keys(_TG_CONFIG).forEach(sid => tgShowGrid(sid));
 }
 
+// ── Admin Photo Manager — runtime override loader ──────────────
+// On boot (init.js calls this after tgInitAll), pull any admin-defined
+// photo URL overrides from the Vercel function. The endpoint is the
+// only entry point because admin_card_photos has service-role-only
+// RLS — the anon Supabase client cannot read the table directly.
+//
+// For every override row whose card_id matches a <img data-card-id="…">
+// in the DOM, swap the src. For Life Skills card_ids (sk-<key>), also
+// mutate SK_CAT_PHOTOS so subsequent buildSkillsGrid() re-renders pick
+// up the override (the dynamic template reads SK_CAT_PHOTOS each call).
+async function loadCardPhotoOverrides(){
+  try {
+    const resp = await fetch('/api/admin-card-photo', { method:'GET' });
+    if(!resp.ok) return;
+    const data = await resp.json();
+    const overrides = (data && data.overrides) || {};
+    let appliedDom = 0;
+    let appliedSk  = 0;
+    Object.keys(overrides).forEach(cardId => {
+      const url = overrides[cardId];
+      if(!url) return;
+      // Update every matching hero img in the DOM (static cards).
+      document.querySelectorAll('img[data-card-id="' + cardId + '"]').forEach(img => {
+        if(img.getAttribute('src') !== url){
+          img.setAttribute('src', url);
+          appliedDom++;
+        }
+      });
+      // Mutate the SK_CAT_PHOTOS map so dynamic Life Skills cards (built
+      // by buildSkillsGrid) honor the override on the next render.
+      if(cardId.indexOf('sk-') === 0 && typeof SK_CAT_PHOTOS !== 'undefined'){
+        const key = cardId.slice(3);
+        if(SK_CAT_PHOTOS[key] !== url){
+          SK_CAT_PHOTOS[key] = url;
+          appliedSk++;
+        }
+      }
+    });
+    // If any skills overrides changed, re-render the grid (cheap, idempotent).
+    if(appliedSk > 0 && typeof buildSkillsGrid === 'function'){
+      try { buildSkillsGrid(); } catch(e){}
+    }
+  } catch(e){
+    // Fail silently — overrides are non-essential. The base photo set
+    // baked into the HTML/skills.js is always a safe fallback.
+  }
+}
+
 // ── Phase 5.8: Global card-grid navigation utilities ──────────
 // Two helpers that any section can use to toggle between a card-grid
 // landing view and a per-topic detail panel. Convention:

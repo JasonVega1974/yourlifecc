@@ -452,6 +452,10 @@ function finishInit(cloudReady){
   // Phase 5.8 Pass D — reset School / Finance / Health to topic-grid mode
   // on every page load. Function is defined in ui.js.
   if(typeof tgInitAll === 'function') tgInitAll();
+  // Admin Photo Manager — fetch override URLs in the background and swap
+  // hero <img src> for any card_id the admin has customized. Defined in
+  // ui.js. Non-blocking; fails silently if /api/admin-card-photo is down.
+  if(typeof loadCardPhotoOverrides === 'function') loadCardPhotoOverrides();
   updateHeroClock();
   renderHeroMotivation();
   renderDailyActivityCheck();

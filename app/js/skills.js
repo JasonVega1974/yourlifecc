@@ -3927,9 +3927,10 @@ function buildSkillsGrid(filter){
     const desc = lessons.length + ' lesson' + (lessons.length===1?'':'s') + (quizScore?(' · '+quizScore+'%'):'');
     const cc = cat.color || '#38bdf8';
     const photo = (typeof SK_CAT_PHOTOS !== 'undefined') ? SK_CAT_PHOTOS[cat.key] : null;
+    const cardId = 'sk-' + cat.key;
     const hero = photo
-      ? `<div class="topic-card-hero-wrap" style="background:linear-gradient(135deg, ${cc}55, ${cc}18);"><img class="topic-card-hero" loading="lazy" src="${photo}" alt="${cat.name}"></div>`
-      : `<div class="topic-card-hero-wrap topic-card-hero-fallback" style="background:linear-gradient(135deg, ${cc}55, ${cc}18);"></div>`;
+      ? `<div class="topic-card-hero-wrap" style="background:linear-gradient(135deg, ${cc}55, ${cc}18);"><img class="topic-card-hero" data-card-id="${cardId}" loading="lazy" src="${photo}" alt="${cat.name}"></div>`
+      : `<div class="topic-card-hero-wrap topic-card-hero-fallback" data-card-id="${cardId}" style="background:linear-gradient(135deg, ${cc}55, ${cc}18);"></div>`;
     return `<div class="topic-card sk-topic-card" style="border-color:${cc}33;" onclick="openSkillCategory('${cat.key}')">
       ${hasCert?'<div class="sk-cert-pill">✓ Cert</div>':''}
       ${hero}

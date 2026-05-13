@@ -149,6 +149,56 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 .preview-chips{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.35rem;}
 .preview-chip{font-family:var(--fm);font-size:.6rem;padding:.18rem .5rem;border-radius:4px;background:rgba(56,189,248,.07);border:1px solid var(--border);color:var(--tx2);}
 .no-recipients{padding:1.5rem;text-align:center;color:var(--tx3);font-family:var(--fm);font-size:.7rem;letter-spacing:.08em;}
+
+/* ── PHOTOS TAB — Admin Photo Manager ───────────────────────── */
+.pm-bar{display:flex;align-items:center;gap:.75rem;padding:.85rem 1.25rem;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.pm-secret{flex:1;min-width:240px;display:flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:.45rem .7rem;font-family:var(--fm);font-size:.7rem;}
+.pm-secret input{flex:1;background:transparent;border:none;outline:none;color:var(--tx);font-family:var(--fm);font-size:.72rem;}
+.pm-secret-ok{color:var(--green);}
+.pm-secret-missing{color:var(--amber);}
+.pm-search{flex:1;min-width:200px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:.45rem .7rem;color:var(--tx);font-family:var(--fm);font-size:.72rem;outline:none;}
+.pm-search:focus{border-color:var(--border2);}
+.pm-section{margin-bottom:1.5rem;}
+.pm-section-hdr{font-family:var(--fm);font-size:.66rem;letter-spacing:.14em;color:var(--blue);text-transform:uppercase;padding:.7rem 1.25rem;border-bottom:1px solid var(--border);background:rgba(56,189,248,.04);display:flex;align-items:center;justify-content:space-between;}
+.pm-section-count{font-family:var(--fm);font-size:.6rem;color:var(--tx3);}
+.pm-row{display:grid;grid-template-columns:90px 1fr auto;gap:.85rem;align-items:center;padding:.65rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.03);}
+.pm-row:last-child{border-bottom:none;}
+.pm-row:hover{background:rgba(56,189,248,.03);}
+.pm-row.hidden{display:none;}
+.pm-thumb{width:80px;height:55px;border-radius:6px;object-fit:cover;background:rgba(56,189,248,.05);border:1px solid var(--border);display:block;}
+.pm-thumb-empty{width:80px;height:55px;border-radius:6px;background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(167,139,250,.08));border:1px dashed var(--border2);display:flex;align-items:center;justify-content:center;color:var(--tx3);font-size:.65rem;font-family:var(--fm);}
+.pm-meta{min-width:0;}
+.pm-title{font-family:var(--fn);font-size:.85rem;font-weight:600;color:var(--tx);margin-bottom:.18rem;}
+.pm-id{font-family:var(--fm);font-size:.6rem;color:var(--tx3);letter-spacing:.05em;margin-bottom:.18rem;}
+.pm-url{font-family:var(--fm);font-size:.62rem;color:var(--tx3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:520px;}
+.pm-url.override{color:var(--green);}
+.pm-edit-btn{background:rgba(56,189,248,.08);border:1px solid var(--border2);color:var(--blue);font-family:var(--fm);font-size:.65rem;font-weight:700;padding:.38rem .85rem;border-radius:7px;cursor:pointer;letter-spacing:.04em;}
+.pm-edit-btn:hover{background:rgba(56,189,248,.15);}
+.pm-edit-panel{background:rgba(0,0,0,.25);border:1px solid var(--border2);border-radius:10px;margin:0 1.25rem .8rem;padding:1rem 1.1rem;}
+.pm-edit-row{display:flex;gap:.6rem;align-items:center;margin-bottom:.7rem;flex-wrap:wrap;}
+.pm-edit-input{flex:1;min-width:300px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:7px;padding:.5rem .75rem;color:var(--tx);font-family:var(--fm);font-size:.72rem;outline:none;}
+.pm-edit-input:focus{border-color:var(--border2);}
+.pm-edit-btn-grp{display:flex;gap:.4rem;flex-wrap:wrap;}
+.pm-action{background:rgba(56,189,248,.08);border:1px solid var(--border2);color:var(--blue);font-family:var(--fm);font-size:.65rem;font-weight:700;padding:.42rem .85rem;border-radius:7px;cursor:pointer;letter-spacing:.04em;}
+.pm-action:hover{background:rgba(56,189,248,.16);}
+.pm-action.green{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.3);color:var(--green);}
+.pm-action.green:hover{background:rgba(34,197,94,.2);}
+.pm-action.red{background:rgba(248,113,113,.08);border-color:rgba(248,113,113,.25);color:var(--red);}
+.pm-action.red:hover{background:rgba(248,113,113,.15);}
+.pm-action:disabled{opacity:.5;cursor:not-allowed;}
+.pm-search-results{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.5rem;margin-top:.7rem;}
+.pm-result{cursor:pointer;border-radius:6px;overflow:hidden;border:1px solid var(--border);transition:border-color .15s,transform .1s;}
+.pm-result:hover{border-color:var(--border2);transform:translateY(-1px);}
+.pm-result img{width:100%;height:90px;object-fit:cover;display:block;}
+.pm-result-title{font-family:var(--fm);font-size:.55rem;color:var(--tx3);padding:.3rem .4rem;background:rgba(0,0,0,.25);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pm-preview{margin-top:.7rem;}
+.pm-preview img{max-width:320px;width:100%;height:180px;object-fit:cover;border-radius:8px;border:1px solid var(--border2);display:block;}
+.pm-msg{font-family:var(--fm);font-size:.65rem;margin-top:.5rem;min-height:.9rem;letter-spacing:.04em;}
+.pm-msg.ok{color:var(--green);}
+.pm-msg.err{color:var(--red);}
+.pm-toast{position:fixed;top:1.5rem;right:1.5rem;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:.7rem 1.1rem;color:var(--tx);font-family:var(--fm);font-size:.75rem;box-shadow:0 8px 30px rgba(0,0,0,.5);z-index:10000;display:none;}
+.pm-toast.ok{border-color:rgba(34,197,94,.4);color:var(--green);}
+.pm-toast.err{border-color:rgba(248,113,113,.4);color:var(--red);}
 </style>
 </head>
 <body>
@@ -198,6 +248,7 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
       <button class="tab-btn" onclick="switchTab('waitlist',this)">❤️ WAITLIST</button>
       <button class="tab-btn" onclick="switchTab('contest',this)">🏆 CONTEST</button>
       <button class="tab-btn" onclick="switchTab('outreach',this)">📣 OUTREACH</button>
+      <button class="tab-btn" onclick="switchTab('photos',this)">📷 PHOTOS</button>
     </div>
 
     <!-- USERS TAB -->
@@ -475,8 +526,32 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 
     </div><!-- end tab-outreach -->
 
+    <!-- ══ PHOTOS TAB — Admin Photo Manager ══ -->
+    <div class="tab-panel" id="tab-photos">
+      <div class="card card-full">
+        <div class="card-header" style="gap:.75rem;flex-wrap:wrap;">
+          <span class="card-title">📷 Card Photo Manager</span>
+          <span class="card-badge" id="pmOverrideBadge">— overrides</span>
+          <button class="btn-sm btn-blue" style="margin-left:auto;" onclick="pmReload()">🔄 Reload from DB</button>
+        </div>
+        <div class="pm-bar">
+          <div class="pm-secret" id="pmSecretBar">
+            <span id="pmSecretLabel" class="pm-secret-missing">🔒 Admin photo secret —</span>
+            <input id="pmSecretInput" type="password" placeholder="paste ADMIN_PHOTO_SECRET here…" autocomplete="off">
+            <button class="pm-action" onclick="pmSaveSecret()">Set</button>
+            <button class="pm-action red" onclick="pmClearSecret()">Clear</button>
+          </div>
+          <input class="pm-search" id="pmFilter" type="text" placeholder="Filter by id, title or section…" oninput="pmFilterCards()">
+        </div>
+        <div id="pmGrid"><div class="empty-state">LOADING CARDS…</div></div>
+      </div>
+    </div><!-- end tab-photos -->
+
   </div>
 </div>
+
+<!-- Toast for photo manager save feedback -->
+<div class="pm-toast" id="pmToast"></div>
 
 <script>
 const EDGE_URL    = 'https://hrohgwcbfgywkpnvqxhk.supabase.co/functions/v1/admin-data';
@@ -1302,6 +1377,403 @@ async function approveWaitlist(id, btn){
     }
   }catch(e){ btn.disabled=false; btn.textContent='✓ Match'; }
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   PHOTO MANAGER — Admin tab for editing the 81 card hero images.
+   Reads override URLs from /api/admin-card-photo (GET, public).
+   Writes via the same endpoint (POST, HMAC-authenticated). The HMAC
+   key (ADMIN_PHOTO_SECRET) is held in sessionStorage; the admin types
+   it once per session. It never travels over the wire — only HMACs
+   computed from it do.
+══════════════════════════════════════════════════════════════════ */
+const PM_INVENTORY = [
+  // ── Bible & Faith (12) ──
+  {id:'bf-stories',         section:'Bible & Faith',   title:'Story Mode',            defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/3/3f/The_Wise_Men.jpg'},
+  {id:'bf-clg',             section:'Bible & Faith',   title:'Christian Life Guide',  defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/6/6f/1956_General_Conference_Mennonite_Church_meeting_%2816044807152%29.jpg'},
+  {id:'bf-flashcards',      section:'Bible & Faith',   title:'Bible Flashcards',      defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Flash_cards_for_language_learning.jpg/1280px-Flash_cards_for_language_learning.jpg'},
+  {id:'bf-worship',         section:'Bible & Faith',   title:'Worship Playlist',      defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/4/49/RH_Worship_Team.jpg'},
+  {id:'bf-biblehub',        section:'Bible & Faith',   title:'Bible Hub',             defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Gutenberg_Bible%2C_Lenox_Copy%2C_New_York_Public_Library%2C_2009._Pic_01.jpg/1280px-Gutenberg_Bible%2C_Lenox_Copy%2C_New_York_Public_Library%2C_2009._Pic_01.jpg'},
+  {id:'bf-prayer',          section:'Bible & Faith',   title:'Prayer',                defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/4/4b/John_William_Waterhouse_-_The_Missal.JPG'},
+  {id:'bf-academy',         section:'Bible & Faith',   title:'Academy',               defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Church_and_Cloisters%2C_St_Stephen%27s_House_LV_2025.jpg/1280px-Church_and_Cloisters%2C_St_Stephen%27s_House_LV_2025.jpg'},
+  {id:'bf-biblelands',      section:'Bible & Faith',   title:'Bible Lands',           defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/%D7%94%D7%9E%D7%A6%D7%95%D7%93%D7%94_%D7%91%D7%9C%D7%99%D7%9C%D7%94.jpg/1280px-%D7%94%D7%9E%D7%A6%D7%95%D7%93%D7%94_%D7%91%D7%9C%D7%99%D7%9C%D7%94.jpg'},
+  {id:'bf-timeline',        section:'Bible & Faith',   title:'Timeline',              defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Edward_Weller%2C_The_Kingdoms_of_Judah_and_Israel_%28FL36012236_3897579%29_%28cropped%29.jpg/1280px-Edward_Weller%2C_The_Kingdoms_of_Judah_and_Israel_%28FL36012236_3897579%29_%28cropped%29.jpg'},
+  {id:'bf-memorize',        section:'Bible & Faith',   title:'Memorize',              defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Carter-notes-pope-mtg-xl.jpg/1280px-Carter-notes-pope-mtg-xl.jpg'},
+  {id:'bf-journey',         section:'Bible & Faith',   title:'Journey',               defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Hiking_to_the_Ice_Lakes._San_Juan_National_Forest%2C_Colorado.jpg/1280px-Hiking_to_the_Ice_Lakes._San_Juan_National_Forest%2C_Colorado.jpg'},
+  {id:'bf-devotional',      section:'Bible & Faith',   title:'Devotional',            defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/a/a2/Home_Altar.jpg'},
+
+  // ── School (5) ──
+  {id:'school-classes',     section:'School',          title:'My Classes',            defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Elementary_classroom_in_Alaska.jpg/1280px-Elementary_classroom_in_Alaska.jpg'},
+  {id:'school-assignments', section:'School',          title:'Assignments',           defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Homework_-_vector_maths.jpg/1280px-Homework_-_vector_maths.jpg'},
+  {id:'school-gpa',         section:'School',          title:'GPA',                   defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/2/26/Line_of_young_people_at_a_commencement_ceremony.jpg'},
+  {id:'school-study',       section:'School',          title:'Study Timer',           defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/3/34/Il_pomodoro.jpg'},
+  {id:'school-prep',        section:'School',          title:'Study Prep',            defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Four_Tulane_University_Students_Studying_January_2008.jpg/1280px-Four_Tulane_University_Students_Studying_January_2008.jpg'},
+
+  // ── Finance (7) ──
+  {id:'finance-overview',   section:'Money Manager',   title:'Overview',              defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/USDnotesNew.png/1280px-USDnotesNew.png'},
+  {id:'finance-bills',      section:'Money Manager',   title:'Bills',                 defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/US-BEP-Receipt_for_currency_%2823_July_1915%29.jpg/1280px-US-BEP-Receipt_for_currency_%2823_July_1915%29.jpg'},
+  {id:'finance-tx',         section:'Money Manager',   title:'Transactions',          defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Contactless_Payment_Card_opened_to_show_RF_antenna.jpg/1280px-Contactless_Payment_Card_opened_to_show_RF_antenna.jpg'},
+  {id:'finance-savings',    section:'Money Manager',   title:'Goal Savings',          defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/e/e2/Sparschwein_Haspa02.jpg'},
+  {id:'finance-savgoals',   section:'Money Manager',   title:'Sav. Goals',            defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/PreservedFood1.jpg/1280px-PreservedFood1.jpg'},
+  {id:'finance-budget',     section:'Money Manager',   title:'Budget',                defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Casio_calculator_JS-20WK_in_201901_002.jpg/1280px-Casio_calculator_JS-20WK_in_201901_002.jpg'},
+  {id:'finance-taxed',      section:'Money Manager',   title:'Tax Ed',                defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Mantelb%C3%B6gen.JPG/1280px-Mantelb%C3%B6gen.JPG'},
+
+  // ── Health (5) ──
+  {id:'health-weight',      section:'Health & Wellness', title:'Weight',              defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/e/e5/A_Simple_Balance.jpg'},
+  {id:'health-food',        section:'Health & Wellness', title:'Nutrition',           defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Marketvegetables.jpg/1280px-Marketvegetables.jpg'},
+  {id:'health-learn',       section:'Health & Wellness', title:'Learn',               defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Good_Food_Display_-_NCI_Visuals_Online.jpg/1280px-Good_Food_Display_-_NCI_Visuals_Online.jpg'},
+  {id:'health-growth',      section:'Health & Wellness', title:'Growth',              defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/0/03/Tape_Measure_25%27_Klein_Tools.jpg'},
+  {id:'health-habits',      section:'Health & Wellness', title:'Habits',              defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Cycling_in_Amsterdam_%28893%29.jpg/1280px-Cycling_in_Amsterdam_%28893%29.jpg'},
+
+  // ── Driving (4) ──
+  {id:'drv-license',        section:'Driving',         title:'License',               defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/c/c0/Driving_licence_Poland_2013_recto.png'},
+  {id:'drv-safety',         section:'Driving',         title:'Safety',                defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Female_driver_buckling_seatbelt.jpg/1280px-Female_driver_buckling_seatbelt.jpg'},
+  {id:'drv-maintenance',    section:'Driving',         title:'Car Care',              defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/2008-04-17_1989_Saab_900_Turbo_getting_new_tyres.jpg/1280px-2008-04-17_1989_Saab_900_Turbo_getting_new_tyres.jpg'},
+  {id:'drv-costs',          section:'Driving',         title:'Costs',                 defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/3/3f/WaynePump-sm.jpg'},
+
+  // ── Sports (2) ──
+  {id:'spt-explore',        section:'Sports',          title:'Explore Sports',        defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Narendra_Modi_Stadium_view_from_the_gallery.jpg/1280px-Narendra_Modi_Stadium_view_from_the_gallery.jpg'},
+  {id:'spt-mine',           section:'Sports',          title:'My Sports',             defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/f/f5/Benin%2C_Championnats_nationaux_de_scrabble_2019%2C_troph%C3%A9es.jpg'},
+
+  // ── Resume / Jobs (4) ──
+  {id:'rsm-builder',        section:'Resume / Jobs',   title:'Builder',               defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/9/9b/Southmayd_letter_1_0.jpg'},
+  {id:'rsm-tracker',        section:'Resume / Jobs',   title:'Job Tracker',           defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/1/19/Company_Information_Session_in_Japan_003_%28cropped%29.jpg'},
+  {id:'rsm-prep',           section:'Resume / Jobs',   title:'Interview Prep',        defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Job_interview.jpg/1280px-Job_interview.jpg'},
+  {id:'rsm-practice',       section:'Resume / Jobs',   title:'Practice',              defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/5/52/Mirror.jpg'},
+
+  // ── Life Skills (42) ──
+  {id:'sk-taxes',         section:'Life Skills', title:'Taxes & Filing',                defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/9/9f/H%26R_Block_Headquarters_Kansas_City.jpg'},
+  {id:'sk-car',           section:'Life Skills', title:'Car & Driving',                 defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Convertible_Mercedes_Car_Driving_On_A_Highway.jpg/1280px-Convertible_Mercedes_Car_Driving_On_A_Highway.jpg'},
+  {id:'sk-health',        section:'Life Skills', title:'Health & Body',                 defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/d/d2/Stethoscope-2.png'},
+  {id:'sk-dental',        section:'Life Skills', title:'Dental & Hygiene',              defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Toothbrush_20050716_004.jpg/1280px-Toothbrush_20050716_004.jpg'},
+  {id:'sk-cooking',       section:'Life Skills', title:'Cooking & Food',                defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Agdz-rosino-05.jpg/1280px-Agdz-rosino-05.jpg'},
+  {id:'sk-home',          section:'Life Skills', title:'Home & Renting',                defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/2019.07.10_metro_California-housing_Blog-post_related.webp/1280px-2019.07.10_metro_California-housing_Blog-post_related.webp.png'},
+  {id:'sk-career',        section:'Life Skills', title:'Career & Work',                 defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/West_side_of_Manhattan_from_Hudson_Commons_%2895103p%29.jpg/1280px-West_side_of_Manhattan_from_Hudson_Commons_%2895103p%29.jpg'},
+  {id:'sk-credit',        section:'Life Skills', title:'Credit & Banking',              defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Credit-cards.jpg/1280px-Credit-cards.jpg'},
+  {id:'sk-relationships', section:'Life Skills', title:'Relationships',                 defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Hindu_wedding_rituals_b_%28cropped%29.jpg/1280px-Hindu_wedding_rituals_b_%28cropped%29.jpg'},
+  {id:'sk-faith',         section:'Life Skills', title:'Faith & Purpose',               defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Basilica_cattedrale_di_San_Giusto_Martire_%28IV%29_%2839452708702%29.jpg/1280px-Basilica_cattedrale_di_San_Giusto_Martire_%28IV%29_%2839452708702%29.jpg'},
+  {id:'sk-mental',        section:'Life Skills', title:'Mental Health',                 defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/2/26/Wonderlane%2C_Between_two_diamond_white_birch_trees_Buddha_meditates_in_Broadview%2C_Seattle%2C_Washington%2C_USA.jpg'},
+  {id:'sk-civic',         section:'Life Skills', title:'Civic Life',                    defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/a/a6/Papeletareferendum2006.jpg'},
+  {id:'sk-emergency',     section:'Life Skills', title:'Emergency Skills',              defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Stockholm%2C_ambulans%2C_2014%2C_21.jpg/1280px-Stockholm%2C_ambulans%2C_2014%2C_21.jpg'},
+  {id:'sk-digital',       section:'Life Skills', title:'Digital Life',                  defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Wikipedia_homepage_on_a_large_Android_phone%2C_2015-04-16.jpg/1280px-Wikipedia_homepage_on_a_large_Android_phone%2C_2015-04-16.jpg'},
+  {id:'sk-family',        section:'Life Skills', title:'Family & People',               defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Sauk_Indian_family_by_Frank_Rinehart_1899.jpg/1280px-Sauk_Indian_family_by_Frank_Rinehart_1899.jpg'},
+  {id:'sk-college',       section:'Life Skills', title:'College & Future',              defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Columbia_University%2C_NYC_%28June_2014%29_-_09.JPG/1280px-Columbia_University%2C_NYC_%28June_2014%29_-_09.JPG'},
+  {id:'sk-legal',         section:'Life Skills', title:'Legal Basics',                  defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/e/ea/Helena_Normanton.jpg'},
+  {id:'sk-adulting',      section:'Life Skills', title:'Adulting 101',                  defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/3/38/1st_Dental_Battalion_teaches_children_good_dental_hygeine_160223-M-QB247-008.jpg'},
+  {id:'sk-communication', section:'Life Skills', title:'Communication',                 defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/c/cb/Reijiro_Wakatsuki_giving_a_speech_at_the_London_Naval_Conference.jpg'},
+  {id:'sk-diy',           section:'Life Skills', title:'Home Repairs & DIY',            defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/%22site_toolbox_Armorgard_TuffBank_London_construction_site_20_November_2019.jpg%22.jpg/1280px-%22site_toolbox_Armorgard_TuffBank_London_construction_site_20_November_2019.jpg%22.jpg'},
+  {id:'sk-shopping',      section:'Life Skills', title:'Shopping Smart',                defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Stop%26Shop.jpg/1280px-Stop%26Shop.jpg'},
+  {id:'sk-writing',       section:'Life Skills', title:'Professional Writing',          defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Fountain_pen_writing_%28literacy%29.jpg/1280px-Fountain_pen_writing_%28literacy%29.jpg'},
+  {id:'sk-laundry',       section:'Life Skills', title:'Laundry & Clothes',             defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/e/ec/LG_%EB%93%9C%EB%9F%BC%EC%84%B8%ED%83%81%EA%B8%B0%EC%99%80_%EC%8B%9D%EA%B8%B0%EC%84%B8%EC%B2%99%EA%B8%B0%2C_%EC%98%81%EA%B5%AD%EC%84%9C_%EB%AC%BC%EC%82%AC%EC%9A%A9_%ED%9A%A8%EC%9C%A8_%EC%B5%9C%EC%9A%B0%EC%88%98_%EC%A0%9C%ED%92%88_%EC%88%98%EC%83%81.jpg'},
+  {id:'sk-cleaning',      section:'Life Skills', title:'Cleaning & Home Care',          defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Numatic_Henry_vacuum_cleaner_%283308986870%29_%28cropped%29.jpg/1280px-Numatic_Henry_vacuum_cleaner_%283308986870%29_%28cropped%29.jpg'},
+  {id:'sk-timemanage',    section:'Life Skills', title:'Time Management',               defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Pendulum_clock_by_Jacob_Kock%2C_antique_furniture_photography%2C_IMG_0931_edit.jpg/1280px-Pendulum_clock_by_Jacob_Kock%2C_antique_furniture_photography%2C_IMG_0931_edit.jpg'},
+  {id:'sk-organize',      section:'Life Skills', title:'Organization',                  defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/1/16/Metal_File_Cabinet.jpg'},
+  {id:'sk-safety',        section:'Life Skills', title:'Situational Awareness & Safety', defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Abbey_Road_zebra_crossing%2C_24-11-2015.jpg/1280px-Abbey_Road_zebra_crossing%2C_24-11-2015.jpg'},
+  {id:'sk-investing',     section:'Life Skills', title:'Investing & Retirement',        defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/New_York_Stock_Exchange_Facade_2015.jpg/1280px-New_York_Stock_Exchange_Facade_2015.jpg'},
+  {id:'sk-insurance',     section:'Life Skills', title:'Insurance Explained',           defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Insurance_contract.jpg/1280px-Insurance_contract.jpg'},
+  {id:'sk-travel',        section:'Life Skills', title:'Travel & World Readiness',      defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/c/c0/Suitcase1.jpg'},
+  {id:'sk-nutrition',     section:'Life Skills', title:'Nutrition & Meal Planning',     defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/DIETA_MEDITERRANEA_ITALIA.JPG/1280px-DIETA_MEDITERRANEA_ITALIA.JPG'},
+  {id:'sk-fitness',       section:'Life Skills', title:'Fitness & Exercise',            defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Amsterdam_-_Gymnasium_-_0591.jpg/1280px-Amsterdam_-_Gymnasium_-_0591.jpg'},
+  {id:'sk-sleep',         section:'Life Skills', title:'Sleep Science',                 defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/2008-04-12_Freilichtmuseum_Detmold_%2811%29.jpg/1280px-2008-04-12_Freilichtmuseum_Detmold_%2811%29.jpg'},
+  {id:'sk-critical',      section:'Life Skills', title:'Critical Thinking',             defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/a/a3/SanDiegoCityCollegeLearningResource_-_bookshelf.jpg'},
+  {id:'sk-budgeting',     section:'Life Skills', title:'Budgeting & Saving',            defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/WalletMpegMan.jpg/1280px-WalletMpegMan.jpg'},
+  {id:'sk-environment',   section:'Life Skills', title:'Environmental Awareness',       defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Aerial_view_of_the_Amazon_Rainforest.jpg/1280px-Aerial_view_of_the_Amazon_Rainforest.jpg'},
+  {id:'sk-firstaid',      section:'Life Skills', title:'Basic First Aid',               defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/British_Red_Cross_First_Aid_Kits.jpg/1280px-British_Red_Cross_First_Aid_Kits.jpg'},
+  {id:'sk-speaking',      section:'Life Skills', title:'Public Speaking',               defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Shure_mikrofon_55S.jpg/1280px-Shure_mikrofon_55S.jpg'},
+  {id:'sk-stress',        section:'Life Skills', title:'Stress & Resilience',           defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/7/70/A_yogi_seated_in_a_garden.jpg'},
+  {id:'sk-socialmedia',   section:'Life Skills', title:'Social Media & Reputation',     defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/b/b7/Lueg_im_SWR1_Studio.jpg'},
+  {id:'sk-onlinesafety',  section:'Life Skills', title:'Online Safety & Privacy',       defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/4/48/Padlock_kl%C3%B3dka_ubt.JPG'},
+  {id:'sk-entrepreneur',  section:'Life Skills', title:'Entrepreneurship Basics',       defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/d/d7/Small_Businesses_-_geograph.org.uk_-_682645.jpg'},
+];
+
+const PM_SECTION_ORDER = ['Bible & Faith','Life Skills','School','Money Manager','Health & Wellness','Driving','Sports','Resume / Jobs'];
+let PM_OVERRIDES = {};
+let PM_INITED    = false;
+
+function pmEscape(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+}
+
+function pmCurrentUrl(cardId){
+  return PM_OVERRIDES[cardId] || (PM_INVENTORY.find(c => c.id === cardId) || {}).defaultUrl || '';
+}
+
+function pmRender(){
+  const grid = document.getElementById('pmGrid');
+  if(!grid) return;
+  const bySection = {};
+  PM_INVENTORY.forEach(c => {
+    if(!bySection[c.section]) bySection[c.section] = [];
+    bySection[c.section].push(c);
+  });
+  let html = '';
+  PM_SECTION_ORDER.forEach(sec => {
+    const cards = bySection[sec] || [];
+    if(!cards.length) return;
+    html += `<div class="pm-section" data-pm-section="${pmEscape(sec)}">`;
+    html += `<div class="pm-section-hdr"><span>${pmEscape(sec)}</span><span class="pm-section-count">${cards.length} cards</span></div>`;
+    cards.forEach(c => {
+      const url = pmCurrentUrl(c.id);
+      const isOverride = !!PM_OVERRIDES[c.id];
+      const haystack = (c.id + ' ' + c.title + ' ' + c.section).toLowerCase();
+      html += `<div class="pm-row" data-pm-card="${pmEscape(c.id)}" data-pm-haystack="${pmEscape(haystack)}">`;
+      html += url
+        ? `<img class="pm-thumb" data-pm-thumb="${pmEscape(c.id)}" loading="lazy" src="${pmEscape(url)}" alt="">`
+        : `<div class="pm-thumb-empty" data-pm-thumb="${pmEscape(c.id)}">no photo</div>`;
+      html += `<div class="pm-meta">`;
+      html += `<div class="pm-title">${pmEscape(c.title)}</div>`;
+      html += `<div class="pm-id">${pmEscape(c.id)} · ${pmEscape(c.section)}${isOverride ? ' · <span style="color:var(--green);">override</span>' : ''}</div>`;
+      html += `<div class="pm-url ${isOverride ? 'override' : ''}" data-pm-url="${pmEscape(c.id)}">${pmEscape(url || '—')}</div>`;
+      html += `</div>`;
+      html += `<button class="pm-edit-btn" onclick="pmOpenEdit('${pmEscape(c.id)}')">✏️ Edit</button>`;
+      html += `</div>`;
+      html += `<div class="pm-edit-panel" data-pm-editor="${pmEscape(c.id)}" style="display:none;"></div>`;
+    });
+    html += `</div>`;
+  });
+  grid.innerHTML = html;
+  document.getElementById('pmOverrideBadge').textContent =
+    Object.keys(PM_OVERRIDES).length + ' overrides';
+}
+
+function pmFilterCards(){
+  const q = (document.getElementById('pmFilter').value || '').toLowerCase().trim();
+  document.querySelectorAll('#pmGrid .pm-row').forEach(row => {
+    const hay = row.getAttribute('data-pm-haystack') || '';
+    row.classList.toggle('hidden', q && hay.indexOf(q) === -1);
+  });
+  // Hide section header if all rows are hidden
+  document.querySelectorAll('#pmGrid .pm-section').forEach(sec => {
+    const any = Array.from(sec.querySelectorAll('.pm-row')).some(r => !r.classList.contains('hidden'));
+    sec.style.display = any ? '' : 'none';
+  });
+}
+
+function pmOpenEdit(cardId){
+  const editor = document.querySelector(`.pm-edit-panel[data-pm-editor="${cardId}"]`);
+  if(!editor) return;
+  if(editor.style.display !== 'none'){
+    editor.style.display = 'none';
+    return;
+  }
+  const url = pmCurrentUrl(cardId);
+  editor.innerHTML = `
+    <div class="pm-edit-row">
+      <input class="pm-edit-input" data-pm-urlinput="${cardId}" type="text" value="${pmEscape(url)}" placeholder="https://upload.wikimedia.org/...">
+      <div class="pm-edit-btn-grp">
+        <button class="pm-action" onclick="pmPreview('${cardId}')">👁 Preview</button>
+        <button class="pm-action green" onclick="pmSavePhoto('${cardId}')">💾 Save</button>
+        <button class="pm-action red"   onclick="pmCloseEdit('${cardId}')">Cancel</button>
+      </div>
+    </div>
+    <div class="pm-edit-row">
+      <input class="pm-edit-input" data-pm-search="${cardId}" type="text" placeholder="Search Wikimedia Commons (e.g. 'modern classroom')">
+      <button class="pm-action" onclick="pmWikimediaSearch('${cardId}')">🔍 Search Wikimedia</button>
+    </div>
+    <div class="pm-search-results" data-pm-results="${cardId}"></div>
+    <div class="pm-preview" data-pm-preview="${cardId}"></div>
+    <div class="pm-msg" data-pm-msg="${cardId}"></div>
+  `;
+  editor.style.display = 'block';
+}
+
+function pmCloseEdit(cardId){
+  const editor = document.querySelector(`.pm-edit-panel[data-pm-editor="${cardId}"]`);
+  if(editor){ editor.style.display = 'none'; editor.innerHTML = ''; }
+}
+
+function pmPreview(cardId){
+  const input = document.querySelector(`[data-pm-urlinput="${cardId}"]`);
+  const slot  = document.querySelector(`[data-pm-preview="${cardId}"]`);
+  if(!input || !slot) return;
+  const url = (input.value || '').trim();
+  if(!url){ slot.innerHTML = ''; return; }
+  slot.innerHTML = `<img src="${pmEscape(url)}" alt="preview">`;
+}
+
+async function pmWikimediaSearch(cardId){
+  const term = (document.querySelector(`[data-pm-search="${cardId}"]`).value || '').trim();
+  const slot = document.querySelector(`[data-pm-results="${cardId}"]`);
+  if(!term || !slot) return;
+  slot.innerHTML = '<div style="font-family:var(--fm);font-size:.65rem;color:var(--tx3);padding:.5rem;">searching…</div>';
+  try {
+    const url = 'https://commons.wikimedia.org/w/api.php?action=query&list=search&srnamespace=6&srsearch=' +
+                encodeURIComponent(term) + '&srlimit=6&format=json&origin=*';
+    const resp = await fetch(url);
+    const data = await resp.json();
+    const hits = (data && data.query && data.query.search) || [];
+    if(!hits.length){ slot.innerHTML = '<div style="font-family:var(--fm);font-size:.65rem;color:var(--tx3);padding:.5rem;">no results</div>'; return; }
+    // Resolve direct URLs via imageinfo for each File: hit
+    const titles = hits.map(h => h.title).filter(t => t && t.indexOf('File:') === 0);
+    if(!titles.length){ slot.innerHTML = '<div style="font-family:var(--fm);font-size:.65rem;color:var(--tx3);padding:.5rem;">no File: results</div>'; return; }
+    const infoUrl = 'https://commons.wikimedia.org/w/api.php?action=query&titles=' +
+                    encodeURIComponent(titles.join('|')) + '&prop=imageinfo&iiprop=url|mime&iiurlwidth=320&format=json&origin=*';
+    const infoResp = await fetch(infoUrl);
+    const infoData = await infoResp.json();
+    const pages = (infoData && infoData.query && infoData.query.pages) || {};
+    const cards = [];
+    Object.keys(pages).forEach(k => {
+      const p = pages[k];
+      const info = (p.imageinfo || [])[0];
+      if(!info) return;
+      const thumb = info.thumburl || info.url;
+      const full  = info.url;
+      const mime  = info.mime || '';
+      if(!thumb || !full) return;
+      if(mime && !(mime.startsWith('image/jpeg') || mime.startsWith('image/png'))) return;
+      cards.push({ title: p.title || '', thumb: thumb, url: full });
+    });
+    if(!cards.length){ slot.innerHTML = '<div style="font-family:var(--fm);font-size:.65rem;color:var(--tx3);padding:.5rem;">no usable photos in results</div>'; return; }
+    slot.innerHTML = cards.slice(0, 6).map(c =>
+      `<div class="pm-result" onclick="pmPickResult('${cardId}', ${pmEscape(JSON.stringify(c.url))})">
+         <img src="${pmEscape(c.thumb)}" alt="">
+         <div class="pm-result-title">${pmEscape((c.title || '').replace(/^File:/, ''))}</div>
+       </div>`
+    ).join('');
+  } catch(e){
+    slot.innerHTML = '<div style="font-family:var(--fm);font-size:.65rem;color:var(--red);padding:.5rem;">search failed</div>';
+  }
+}
+
+function pmPickResult(cardId, jsonUrl){
+  let url;
+  try { url = JSON.parse(jsonUrl); } catch(e){ url = jsonUrl; }
+  const input = document.querySelector(`[data-pm-urlinput="${cardId}"]`);
+  if(input){ input.value = url; pmPreview(cardId); }
+}
+
+async function pmHmac(key, message){
+  const enc = new TextEncoder();
+  const cryptoKey = await crypto.subtle.importKey(
+    'raw', enc.encode(key), { name:'HMAC', hash:'SHA-256' }, false, ['sign']
+  );
+  const sig = await crypto.subtle.sign('HMAC', cryptoKey, enc.encode(message));
+  return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function pmSavePhoto(cardId){
+  const msg   = document.querySelector(`[data-pm-msg="${cardId}"]`);
+  const input = document.querySelector(`[data-pm-urlinput="${cardId}"]`);
+  if(!input) return;
+  const url = (input.value || '').trim();
+  if(!url || !/^https:\/\/upload\.wikimedia\.org\//.test(url)){
+    msg.textContent = 'URL must start with https://upload.wikimedia.org/';
+    msg.className = 'pm-msg err';
+    return;
+  }
+  const secret = sessionStorage.getItem('ylcc_admin_photo_secret');
+  if(!secret){
+    msg.textContent = 'Set ADMIN_PHOTO_SECRET first (top of the panel).';
+    msg.className = 'pm-msg err';
+    return;
+  }
+  const ts = Date.now();
+  msg.textContent = 'saving…';
+  msg.className   = 'pm-msg';
+  try {
+    const hmac = await pmHmac(secret, cardId + '|' + url + '|' + ts);
+    const resp = await fetch('/api/admin-card-photo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ card_id: cardId, photo_url: url, ts: ts, hmac: hmac }),
+    });
+    const data = await resp.json().catch(() => ({}));
+    if(!resp.ok){
+      msg.textContent = 'Save failed — ' + (data && data.error ? data.error : resp.status);
+      msg.className   = 'pm-msg err';
+      pmToast('Save failed — ' + (data && data.error ? data.error : resp.status), 'err');
+      return;
+    }
+    PM_OVERRIDES[cardId] = url;
+    // Update the row's thumbnail + URL display
+    const thumb = document.querySelector(`[data-pm-thumb="${cardId}"]`);
+    if(thumb && thumb.tagName === 'IMG') thumb.src = url;
+    else if(thumb){
+      const img = document.createElement('img');
+      img.className = 'pm-thumb';
+      img.setAttribute('data-pm-thumb', cardId);
+      img.loading = 'lazy';
+      img.src = url;
+      img.alt = '';
+      thumb.replaceWith(img);
+    }
+    const urlEl = document.querySelector(`[data-pm-url="${cardId}"]`);
+    if(urlEl){ urlEl.textContent = url; urlEl.classList.add('override'); }
+    document.getElementById('pmOverrideBadge').textContent = Object.keys(PM_OVERRIDES).length + ' overrides';
+    msg.textContent = '✓ saved';
+    msg.className   = 'pm-msg ok';
+    pmToast('Photo saved for ' + cardId, 'ok');
+  } catch(e){
+    msg.textContent = 'Save failed — ' + (e && e.message ? e.message : 'unknown error');
+    msg.className   = 'pm-msg err';
+    pmToast('Save failed', 'err');
+  }
+}
+
+async function pmReload(){
+  document.getElementById('pmOverrideBadge').textContent = 'loading…';
+  try {
+    const resp = await fetch('/api/admin-card-photo', { method:'GET' });
+    const data = await resp.json();
+    PM_OVERRIDES = (data && data.overrides) || {};
+    pmRender();
+    pmToast('Reloaded ' + Object.keys(PM_OVERRIDES).length + ' overrides', 'ok');
+  } catch(e){
+    pmToast('Reload failed — ' + (e && e.message ? e.message : 'unknown error'), 'err');
+    document.getElementById('pmOverrideBadge').textContent = 'load failed';
+  }
+}
+
+function pmSaveSecret(){
+  const v = (document.getElementById('pmSecretInput').value || '').trim();
+  if(!v){ pmToast('Paste the secret first', 'err'); return; }
+  sessionStorage.setItem('ylcc_admin_photo_secret', v);
+  document.getElementById('pmSecretInput').value = '';
+  pmUpdateSecretUI();
+  pmToast('Secret stored in session', 'ok');
+}
+
+function pmClearSecret(){
+  sessionStorage.removeItem('ylcc_admin_photo_secret');
+  pmUpdateSecretUI();
+  pmToast('Secret cleared', 'ok');
+}
+
+function pmUpdateSecretUI(){
+  const has = !!sessionStorage.getItem('ylcc_admin_photo_secret');
+  const lbl = document.getElementById('pmSecretLabel');
+  if(!lbl) return;
+  lbl.textContent = has ? '🔓 Admin photo secret —' : '🔒 Admin photo secret —';
+  lbl.className   = has ? 'pm-secret-ok' : 'pm-secret-missing';
+}
+
+let _pmToastTimer = null;
+function pmToast(msg, kind){
+  const el = document.getElementById('pmToast');
+  if(!el) return;
+  el.textContent = msg;
+  el.className   = 'pm-toast ' + (kind === 'ok' ? 'ok' : (kind === 'err' ? 'err' : ''));
+  el.style.display = 'block';
+  if(_pmToastTimer) clearTimeout(_pmToastTimer);
+  _pmToastTimer = setTimeout(() => { el.style.display = 'none'; }, 3200);
+}
+
+async function pmInit(){
+  if(PM_INITED) return;
+  PM_INITED = true;
+  pmUpdateSecretUI();
+  await pmReload();
+}
+
+// Intercept the existing switchTab so the photo manager lazy-loads when
+// the user first clicks the PHOTOS tab. Wrapping rather than editing
+// switchTab() directly keeps the rest of the admin code untouched.
+(function(){
+  const _origSwitch = window.switchTab;
+  window.switchTab = function(name, btn){
+    if(typeof _origSwitch === 'function') _origSwitch(name, btn);
+    if(name === 'photos') pmInit();
+  };
+})();
 </script>
 </body>
 </html>
