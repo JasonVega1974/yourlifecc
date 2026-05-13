@@ -2670,11 +2670,49 @@ img.topic-card-hero{
 
 :root.light .fh-story-tile,
 :root.light .pl-card-v2{
-  background:linear-gradient(135deg,rgba(15,23,42,.04),rgba(15,23,42,.02));
-  border-color:rgba(15,23,42,.1);
+  background:linear-gradient(135deg,rgba(15,23,42,.04),rgba(15,23,42,.02)) !important;
+  border-color:rgba(15,23,42,.1) !important;
+  color:var(--tx) !important;
 }
 :root.light .fh-story-tile:hover,
 :root.light .pl-card-v2:hover{border-color:var(--accent,rgba(56,189,248,.45));}
+
+/* The Story Mode tab wrapper and Home-grid story-promo card carry a
+   hardcoded dark navy/purple gradient inline in index.html
+   ("background:linear-gradient(135deg, rgba(10,13,26,.95) 0%, rgba(26,18,51,.92) 100%)").
+   That gradient is opaque enough to block any tile-level light-mode
+   styling — the cards LOOK dark because their container is dark. The
+   only safe way to override an inline style is via [style*=""] +
+   !important (same pattern already used at lines 2114-2116 for
+   #bf-devotional). */
+:root.light #fhStoriesPromoCard,
+:root.light #bf-stories [style*="rgba(10,13,26,.95)"]{
+  background:linear-gradient(135deg,rgba(15,23,42,.04) 0%,rgba(56,189,248,.06) 100%) !important;
+  border-color:rgba(15,23,42,.12) !important;
+  color:var(--tx) !important;
+}
+
+/* Hardcoded cream text colors inside those wrappers — flip to slate. */
+:root.light #fhStoriesPromoCard [style*="color:#fef3c7"],
+:root.light #bf-stories [style*="color:#fef3c7"]{
+  color:var(--tx) !important;
+}
+:root.light #fhStoriesPromoCard [style*="rgba(254,243,199"],
+:root.light #bf-stories [style*="rgba(254,243,199"]{
+  color:var(--tx2) !important;
+}
+
+/* The hero-grid #fhStoryList carries an inline grid-template-columns
+   minmax(220px,1fr). Inline styles beat plain CSS without !important —
+   pin our 260px / 1rem spec so the grid actually picks it up. */
+#fhStoryList{
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr)) !important;
+  gap:1rem !important;
+}
+
+/* Story-tile inline text colors set via inline style on inner spans
+   (var(--tx), var(--tx2), var(--tx3)) already swap via the variable
+   system. Nothing more needed for those. */
 
 /* ──────────────────────────────────────────────────────────────
    Modal scroll-area fix — Plan Detail, Story Player, charModal
