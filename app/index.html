@@ -6922,11 +6922,11 @@
   <div class="sh">
     <div class="si">📇</div>
     <div class="st">Bible Flashcards</div>
-    <span class="tip-wrap"><span class="tip-btn">?</span><span class="tip-box tip-right"><span class="tip-title">HOW TO USE</span><br>Each round is 20 random cards from a deck of 300. Tap one of the three choices to answer. The card flips to reveal the correct answer plus a scripture response. Tap “Next Card →” to continue. After 20 cards you get a 0–10 rating with a closing scripture.</span></span>
+    <span class="tip-wrap"><span class="tip-btn">?</span><span class="tip-box tip-right"><span class="tip-title">HOW TO USE</span><br>Each round is 20 random cards. Tap a choice to answer. The card flips to reveal the answer with a scripture response — correct answers build a streak. After 20 cards you get a star rating with a closing scripture.</span></span>
     <div class="sl"></div>
   </div>
 
-  <!-- HUD: round progress + running score + New Round -->
+  <!-- HUD: round progress + score + streak + New Round -->
   <div class="fc-hud">
     <div class="fc-hud-stat">
       <span class="fc-hud-label">Card</span>
@@ -6936,29 +6936,58 @@
       <span class="fc-hud-label">Score</span>
       <span class="fc-hud-val"><strong id="fcRunningScore">0</strong> / <span id="fcRunningTotal">0</span></span>
     </div>
+    <div class="fc-streak" id="fcStreak" aria-hidden="true">
+      <span class="fc-streak-flame">🔥</span>
+      <span id="fcStreakNum">3</span>
+    </div>
     <button class="fc-shuffle" onclick="fcNewRound()">🔀 New Round</button>
   </div>
 
-  <!-- Flip card: question + 3 MC choices on front; result + scripture on back -->
-  <div class="fc-card-wrap">
-    <div class="fc-card" id="fcCard">
-      <div class="fc-face fc-front">
-        <div class="fc-face-label">QUESTION</div>
-        <div class="fc-question" id="fcQuestion">Loading…</div>
-        <div class="fc-choices" id="fcChoices"></div>
+  <!-- Cinematic stage: page-flip opener overlays a 3D flip card -->
+  <div class="fc-stage" id="fcStage">
+    <div class="fc-opener" id="fcOpener" aria-hidden="true">
+      <div class="fc-book">
+        <div class="fc-book-half left"></div>
+        <div class="fc-book-half right"></div>
+        <div class="fc-page p1"></div>
+        <div class="fc-page p2"></div>
+        <div class="fc-page p3"></div>
+        <div class="fc-page p4"></div>
       </div>
-      <div class="fc-face fc-back">
-        <div class="fc-result-icon" id="fcResultIcon">✅</div>
-        <div class="fc-result-label" id="fcResultLabel">Correct!</div>
-        <div class="fc-correct-row">
-          <span class="fc-correct-tag">Answer:</span>
-          <span class="fc-correct-text" id="fcCorrectAnswer">—</span>
+      <div class="fc-opener-glow"></div>
+    </div>
+
+    <div class="fc-card-wrap">
+      <div class="fc-card before-init" id="fcCard">
+        <div class="fc-face fc-front">
+          <div class="fc-card-ref" id="fcCardRef">CARD 1</div>
+          <div class="fc-card-sub" id="fcCardSub">From the Word of God</div>
+          <div class="fc-question" id="fcQuestion">Loading…</div>
+          <div class="fc-choices" id="fcChoices"></div>
         </div>
-        <div class="fc-scripture">
-          <div class="fc-scripture-msg" id="fcScriptureMsg">—</div>
-          <div class="fc-scripture-ref" id="fcScriptureRef">—</div>
+        <div class="fc-face fc-back">
+          <div class="fc-particles" id="fcParticles" aria-hidden="true"></div>
+          <div class="fc-result-icon" id="fcResultIcon">✓</div>
+          <div class="fc-result-label" id="fcResultLabel">Correct!</div>
+          <div class="fc-correct-row">
+            <span class="fc-correct-tag">Answer</span>
+            <span class="fc-correct-text" id="fcCorrectAnswer">—</span>
+          </div>
+          <div class="fc-scripture">
+            <div class="fc-scripture-msg" id="fcScriptureMsg">—</div>
+            <div class="fc-scripture-ref" id="fcScriptureRef">—</div>
+          </div>
+          <div class="fc-next-wrap">
+            <div class="fc-countdown" id="fcCountdown" aria-label="Next card countdown">
+              <svg viewBox="0 0 54 54">
+                <circle class="fc-countdown-track" cx="27" cy="27" r="24"></circle>
+                <circle class="fc-countdown-bar" id="fcCountdownBar" cx="27" cy="27" r="24"></circle>
+              </svg>
+              <div class="fc-countdown-num" id="fcCountdownNum">3</div>
+            </div>
+            <button class="fc-next-btn" onclick="fcNextCard()">Next →</button>
+          </div>
         </div>
-        <button class="fc-next-btn" onclick="fcNextCard()">Next Card →</button>
       </div>
     </div>
   </div>
@@ -6968,30 +6997,43 @@
     <div class="fc-results-title">Round Complete</div>
     <div class="fc-results-score">
       <span class="fc-results-num" id="fcFinalScore">0</span>
-      <span class="fc-results-out">/ 20</span>
+      <span class="fc-results-out">/ <span id="fcFinalTotal">20</span></span>
     </div>
-    <div class="fc-results-rating">
-      <div class="fc-rating-label">Your Rating</div>
-      <div class="fc-rating-stars" id="fcRatingStars"></div>
-      <div class="fc-rating-num"><span id="fcRatingValue">0</span><span class="fc-rating-out"> / 10</span></div>
-    </div>
+    <div class="fc-rating-stars" id="fcRatingStars"></div>
     <div class="fc-results-msg-wrap">
       <div class="fc-results-msg" id="fcResultsMsg">—</div>
       <div class="fc-results-ref" id="fcResultsRef">—</div>
     </div>
-    <button class="fc-new-round-btn" onclick="fcNewRound()">🔀 Start New Round</button>
+    <div class="fc-results-actions">
+      <button class="fc-play-again-btn" onclick="fcNewRound()">▶ Play Again</button>
+      <button class="fc-new-round-btn" onclick="fcNewRound()">🔀 New Round</button>
+    </div>
   </div>
 
   <script>
-  // Phase 5.5 (revised) — Bible Flashcards multiple-choice. Data lives in
+  // Bible Flashcards — cinematic redesign (Phase 7). Data lives in
   // /app/js/data/bible-flashcards.js (FLASH_CARDS, FC_CORRECT_RESPONSES,
-  // FC_INCORRECT_RESPONSES, FC_TIER_CLOSINGS). 20-card rounds, auto-scored
-  // by tap-a-choice; end-of-round 0–10 rating with tier-based closing scripture.
+  // FC_INCORRECT_RESPONSES, FC_TIER_CLOSINGS). 20-card rounds with
+  // page-flip opener, 3D card entrance, stagger-in choices, streak badge,
+  // countdown ring, gold confetti, and animated results.
   let _fcSession = [];
   let _fcCurrent = 0;
   let _fcScore = 0;
   let _fcAnswered = 0;
+  let _fcStreak = 0;
   let _fcLocked = false;
+  let _fcCountdownTimer = null;
+  let _fcCountdownEnd = 0;
+
+  const FC_SUBS = [
+    "From the Word of God",
+    "Scripture remembered",
+    "Truth illuminated",
+    "From the pages of Scripture",
+    "Hidden in the heart",
+    "Light to your path",
+    "Walk in His wisdom"
+  ];
 
   function fcShuffleArray(arr){
     for(let i = arr.length - 1; i > 0; i--){
@@ -7017,29 +7059,53 @@
 
   function fcNewRound(silent){
     if(typeof FLASH_CARDS === 'undefined' || !FLASH_CARDS.length) return;
+    fcCancelCountdown();
     const results = document.getElementById('fcResults');
     if(results) results.classList.remove('show');
     const cardEl = document.getElementById('fcCard');
-    if(cardEl) cardEl.classList.remove('flipped');
+    if(cardEl){ cardEl.classList.remove('flipped','shake','entering'); cardEl.classList.add('before-init'); }
+    const streakEl = document.getElementById('fcStreak');
+    if(streakEl) streakEl.classList.remove('show');
     const all = FLASH_CARDS.map((_, i) => i);
     fcShuffleArray(all);
     _fcSession = all.slice(0, Math.min(20, FLASH_CARDS.length));
     _fcCurrent = 0;
     _fcScore = 0;
     _fcAnswered = 0;
+    _fcStreak = 0;
     _fcLocked = false;
-    fcRenderCard();
+    fcPlayOpener(function(){ fcRenderCard(true); });
     if(!silent && typeof showToast === 'function') showToast('New round started 🔀');
   }
 
-  function fcRenderCard(){
+  // Plays the Bible page-flip opener, then runs cb() (~1.3s).
+  function fcPlayOpener(cb){
+    const op = document.getElementById('fcOpener');
+    if(!op){ if(typeof cb==='function') cb(); return; }
+    op.classList.remove('run');
+    void op.offsetWidth; // reflow so animation can replay
+    op.classList.add('run');
+    setTimeout(function(){
+      op.classList.remove('run');
+      if(typeof cb==='function') cb();
+    }, 1300);
+  }
+
+  function fcRenderCard(animateIn){
     if(!_fcSession.length) return;
+    fcCancelCountdown();
     _fcLocked = false;
     const idx = _fcSession[_fcCurrent];
     const card = FLASH_CARDS[idx];
     if(!card) return;
     const cardEl = document.getElementById('fcCard');
-    if(cardEl) cardEl.classList.remove('flipped');
+    if(cardEl){
+      cardEl.classList.remove('flipped','shake','entering','before-init');
+      if(animateIn){
+        void cardEl.offsetWidth;
+        cardEl.classList.add('entering');
+      }
+    }
     const cn = document.getElementById('fcCurrentNum');
     const tn = document.getElementById('fcRoundTotal');
     const rs = document.getElementById('fcRunningScore');
@@ -7048,15 +7114,26 @@
     if(tn) tn.textContent = _fcSession.length;
     if(rs) rs.textContent = _fcScore;
     if(rt) rt.textContent = _fcAnswered;
+    const refEl = document.getElementById('fcCardRef');
+    if(refEl) refEl.textContent = 'CARD ' + (_fcCurrent + 1) + ' OF ' + _fcSession.length;
+    const subEl = document.getElementById('fcCardSub');
+    if(subEl) subEl.textContent = FC_SUBS[idx % FC_SUBS.length];
     const qEl = document.getElementById('fcQuestion');
     if(qEl) qEl.textContent = card.q;
     const chEl = document.getElementById('fcChoices');
     if(chEl){
       const order = (card.choices || []).slice();
       fcShuffleArray(order);
-      chEl.innerHTML = order.map(function(c){
-        return '<button class="fc-choice" onclick="fcSelectChoice(this)">' + fcEsc(c) + '</button>';
+      chEl.innerHTML = order.map(function(c, i){
+        const delay = (animateIn ? 350 : 120) + i * 90;
+        return '<button class="fc-choice" style="animation-delay:' + delay + 'ms;" onclick="fcSelectChoice(this)">'
+             + fcEsc(c) + '</button>';
       }).join('');
+      // Trigger stagger-in on the next frame
+      requestAnimationFrame(function(){
+        const btns = chEl.querySelectorAll('.fc-choice');
+        btns.forEach(function(b){ b.classList.add('in'); });
+      });
     }
   }
 
@@ -7070,27 +7147,50 @@
     const selectedAnswer = btnEl ? btnEl.textContent : '';
     const isCorrect = (selectedAnswer === card.answer);
     _fcAnswered++;
-    if(isCorrect) _fcScore++;
+    if(isCorrect){ _fcScore++; _fcStreak++; }
+    else { _fcStreak = 0; }
+
     if(typeof D !== 'undefined' && D){
       if(!D.flashcardProgress) D.flashcardProgress = {};
       D.flashcardProgress[idx] = isCorrect ? 'correct' : 'incorrect';
       if(typeof save === 'function') save();
     }
+
     const buttons = document.querySelectorAll('#fcChoices .fc-choice');
     buttons.forEach(function(b){
       b.disabled = true;
       if(b.textContent === card.answer) b.classList.add('fc-choice-correct');
       else if(b === btnEl) b.classList.add('fc-choice-incorrect');
     });
+
     const rs = document.getElementById('fcRunningScore');
     const rt = document.getElementById('fcRunningTotal');
     if(rs) rs.textContent = _fcScore;
     if(rt) rt.textContent = _fcAnswered;
+
+    const streakEl = document.getElementById('fcStreak');
+    const streakNum = document.getElementById('fcStreakNum');
+    if(streakEl){
+      if(_fcStreak >= 3){
+        if(streakNum) streakNum.textContent = _fcStreak;
+        streakEl.classList.add('show');
+      } else {
+        streakEl.classList.remove('show');
+      }
+    }
+
+    const cardEl = document.getElementById('fcCard');
+    if(!isCorrect && cardEl){
+      cardEl.classList.add('shake');
+      setTimeout(function(){ cardEl.classList.remove('shake'); }, 450);
+    }
+
     setTimeout(function(){
       fcRenderBack(card, isCorrect);
-      const cardEl = document.getElementById('fcCard');
       if(cardEl) cardEl.classList.add('flipped');
-    }, 600);
+      if(isCorrect) fcSpawnParticles();
+      fcStartCountdown();
+    }, isCorrect ? 800 : 1100);
   }
 
   function fcRenderBack(card, isCorrect){
@@ -7099,7 +7199,7 @@
     const ansEl = document.getElementById('fcCorrectAnswer');
     const msgEl = document.getElementById('fcScriptureMsg');
     const refEl = document.getElementById('fcScriptureRef');
-    if(iconEl) iconEl.textContent = isCorrect ? '✅' : '❌';
+    if(iconEl) iconEl.textContent = isCorrect ? '✓' : '✕';
     if(labelEl){
       labelEl.textContent = isCorrect ? 'Correct!' : 'Not quite';
       labelEl.className = 'fc-result-label ' + (isCorrect ? 'correct' : 'incorrect');
@@ -7113,11 +7213,65 @@
     if(refEl) refEl.textContent = pick.ref ? '— ' + pick.ref : '';
   }
 
+  function fcSpawnParticles(){
+    const wrap = document.getElementById('fcParticles');
+    if(!wrap) return;
+    wrap.innerHTML = '';
+    for(let i = 0; i < 14; i++){
+      const p = document.createElement('div');
+      p.className = 'fc-particle';
+      const angle = (Math.PI * 2) * (i / 14) + Math.random() * 0.4;
+      const dist = 80 + Math.random() * 60;
+      const x = Math.cos(angle) * dist;
+      const y = Math.sin(angle) * dist - 30;
+      p.style.left = '50%';
+      p.style.top = '40%';
+      p.style.setProperty('--fc-x', x + 'px');
+      p.style.setProperty('--fc-y', y + 'px');
+      p.style.background = (i % 2 === 0) ? '#fbbf24' : '#fef3c7';
+      wrap.appendChild(p);
+      setTimeout(function(){ p.classList.add('go'); }, i * 22);
+    }
+  }
+
+  function fcStartCountdown(){
+    const bar = document.getElementById('fcCountdownBar');
+    const num = document.getElementById('fcCountdownNum');
+    if(!bar || !num) return;
+    fcCancelCountdown();
+    const C = 150.8; // 2πr for r=24
+    bar.style.transition = 'none';
+    bar.style.strokeDashoffset = '0';
+    num.textContent = '3';
+    requestAnimationFrame(function(){
+      bar.style.transition = 'stroke-dashoffset 3s linear';
+      bar.style.strokeDashoffset = C;
+    });
+    _fcCountdownEnd = Date.now() + 3000;
+    _fcCountdownTimer = setInterval(function(){
+      const remaining = Math.max(0, Math.ceil((_fcCountdownEnd - Date.now()) / 1000));
+      num.textContent = remaining;
+      if(remaining <= 0){
+        fcCancelCountdown();
+        fcNextCard();
+      }
+    }, 100);
+  }
+
+  function fcCancelCountdown(){
+    if(_fcCountdownTimer){ clearInterval(_fcCountdownTimer); _fcCountdownTimer = null; }
+    const bar = document.getElementById('fcCountdownBar');
+    if(bar){ bar.style.transition = 'none'; bar.style.strokeDashoffset = '0'; }
+  }
+
   function fcNextCard(){
     if(!_fcSession.length) return;
+    fcCancelCountdown();
     _fcCurrent++;
     if(_fcCurrent >= _fcSession.length){ fcShowResults(); return; }
-    fcRenderCard();
+    const cardEl = document.getElementById('fcCard');
+    if(cardEl) cardEl.classList.add('before-init');
+    fcPlayOpener(function(){ fcRenderCard(true); });
   }
 
   function fcShowResults(){
@@ -7126,6 +7280,11 @@
     const score = _fcScore;
     const total = _fcSession.length || 20;
     const rating = Math.round((score / total) * 10);
+    let stars;
+    if(rating >= 9) stars = 3;
+    else if(rating >= 6) stars = 2;
+    else if(rating >= 3) stars = 1;
+    else stars = 0;
     let tier;
     if(rating >= 9) tier = 'excellent';
     else if(rating >= 7) tier = 'great';
@@ -7135,14 +7294,14 @@
       ? FC_TIER_CLOSINGS.find(function(t){ return t.tier === tier; })
       : null;
     const fs = document.getElementById('fcFinalScore');
-    const rv = document.getElementById('fcRatingValue');
+    const ft = document.getElementById('fcFinalTotal');
     if(fs) fs.textContent = score;
-    if(rv) rv.textContent = rating;
+    if(ft) ft.textContent = total;
     const starsEl = document.getElementById('fcRatingStars');
     if(starsEl){
       let html = '';
-      for(let i = 0; i < 10; i++){
-        html += '<span class="fc-star ' + (i < rating ? 'fc-star-filled' : 'fc-star-empty') + '">★</span>';
+      for(let i = 0; i < 3; i++){
+        html += '<span class="fc-star-lg ' + (i < stars ? 'filled' : 'empty') + '">★</span>';
       }
       starsEl.innerHTML = html;
     }
