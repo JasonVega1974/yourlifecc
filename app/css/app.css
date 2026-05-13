@@ -3274,7 +3274,7 @@ img.topic-card-hero{
   .fc-book{width:200px;height:140px;}
 }
 
-/* Light-mode: stage stays cinematic dark (by design) — only HUD adapts */
+/* ── Light-mode: warm parchment treatment (gold accents kept) ── */
 :root.light .fc-hud{
   background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(251,191,36,.02));
   border-color:rgba(180,120,20,.32);
@@ -3283,7 +3283,114 @@ img.topic-card-hero{
 :root.light .fc-hud-label{color:#7c5a00;opacity:.9;}
 :root.light .fc-hud-val{color:#1a1233;}
 :root.light .fc-hud-val strong{color:#b45309;}
-:root.light .fc-streak{color:#b45309;border-color:rgba(180,120,20,.5);}
+:root.light .fc-streak{
+  color:#b45309;border-color:rgba(180,120,20,.55);
+  background:linear-gradient(135deg,rgba(251,191,36,.32),rgba(251,191,36,.12));
+  box-shadow:0 0 18px rgba(251,191,36,.35);
+}
+
+/* Stage flips to parchment with subtle gold radial halo */
+:root.light .fc-stage{
+  background:
+    radial-gradient(ellipse at top, rgba(251,191,36,.20), transparent 65%),
+    linear-gradient(180deg,#fdf6e3 0%,#f3e6c4 100%);
+  border-color:rgba(180,120,20,.32);
+}
+:root.light .fc-stage::before{opacity:.35;}
+
+/* Opener: page tones already cream — soften the glow + half-page tint */
+:root.light .fc-book-half{
+  background:linear-gradient(180deg,#fffaeb,#e9d8a6);
+  border-color:rgba(120,80,20,.45);
+}
+:root.light .fc-opener-glow{
+  background:radial-gradient(ellipse at center, rgba(251,191,36,.55), transparent 70%);
+}
+
+/* Card body: ivory page on gold ring instead of navy */
+:root.light .fc-face{
+  background:linear-gradient(180deg,#fffaeb 0%,#fdf0c8 100%);
+  border-color:rgba(180,120,20,.55);
+  box-shadow:
+    0 0 36px rgba(251,191,36,.28),
+    inset 0 1px 0 rgba(180,120,20,.18);
+}
+:root.light .fc-face::before{border-color:rgba(180,120,20,.32);}
+
+:root.light .fc-card-ref{
+  color:#b45309;
+  text-shadow:0 0 12px rgba(251,191,36,.4);
+}
+:root.light .fc-card-sub{color:#7c5a00;opacity:.85;}
+:root.light .fc-question{color:#1a1233;}
+
+/* Choice pills: gold-on-cream */
+:root.light .fc-choice{
+  background:linear-gradient(180deg, rgba(251,191,36,.22), rgba(251,191,36,.06));
+  border-color:rgba(180,120,20,.55);
+  color:#3a2818;
+}
+:root.light .fc-choice:hover:not(:disabled){
+  background:linear-gradient(180deg, rgba(251,191,36,.34), rgba(251,191,36,.12));
+  border-color:rgba(180,120,20,.85);
+  box-shadow:0 0 22px rgba(251,191,36,.4);
+}
+:root.light .fc-choice-correct{
+  background:linear-gradient(180deg,rgba(34,197,94,.22),rgba(22,163,74,.10)) !important;
+  border-color:#16a34a !important;
+  color:#14532d !important;
+  box-shadow:0 0 26px rgba(34,197,94,.45) !important;
+}
+:root.light .fc-choice-incorrect{
+  background:linear-gradient(180deg,rgba(239,68,68,.20),rgba(220,38,38,.08)) !important;
+  border-color:#dc2626 !important;
+  color:#7f1d1d !important;
+  box-shadow:0 0 22px rgba(239,68,68,.4) !important;
+}
+:root.light .fc-choice-correct::after{color:#16a34a;}
+
+/* Back face elements */
+:root.light .fc-correct-row{
+  background:rgba(251,191,36,.18);
+  border-color:rgba(180,120,20,.5);
+}
+:root.light .fc-correct-tag{color:#b45309;}
+:root.light .fc-correct-text{color:#1a1233;}
+:root.light .fc-scripture-msg{color:#1a1233;}
+:root.light .fc-scripture-ref{color:#b45309;}
+:root.light .fc-result-label.correct{color:#16a34a;}
+:root.light .fc-result-label.incorrect{color:#b91c1c;}
+
+/* Countdown ring in light */
+:root.light .fc-countdown-track{stroke:rgba(180,120,20,.25);}
+:root.light .fc-countdown-bar{stroke:#b45309;}
+:root.light .fc-countdown-num{color:#b45309;}
+
+/* Results screen */
+:root.light .fc-results{
+  background:
+    radial-gradient(ellipse at top, rgba(251,191,36,.22), transparent 65%),
+    linear-gradient(180deg,#fffaeb 0%,#fdf0c8 100%);
+  border-color:rgba(180,120,20,.55);
+  box-shadow:0 0 40px rgba(251,191,36,.28);
+}
+:root.light .fc-results-title{
+  color:#b45309;
+  text-shadow:0 0 14px rgba(251,191,36,.4);
+}
+:root.light .fc-results-num{
+  color:#b45309;
+  text-shadow:0 0 18px rgba(251,191,36,.45);
+}
+:root.light .fc-results-out{color:#7c5a00;opacity:.85;}
+:root.light .fc-star-lg.empty{color:rgba(180,120,20,.25);}
+:root.light .fc-star-lg.filled{color:#d97706;text-shadow:0 0 14px rgba(251,191,36,.55);}
+:root.light .fc-results-msg-wrap{
+  background:rgba(251,191,36,.14);
+  border-color:rgba(180,120,20,.4);
+}
+:root.light .fc-results-msg{color:#1a1233;}
+:root.light .fc-results-ref{color:#b45309;}
 
 /* Simplify Settings for faith_free — only Appearance + Support remain. */
 html[data-faith-free="1"] #sp .sp-pb { display: none !important; }
