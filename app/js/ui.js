@@ -1107,14 +1107,18 @@ function toggleNavGroup(label){
   save();
 }
 
-// ── Phase 5.8 Pass D — Tab-replacement card grids for School / Finance / Health ──
-// Each section that has a tab bar now opens in "card grid" mode by default.
+// ── Phase 5.8 Pass D/E — Tab-replacement card grids ──
+// Each section that has a tab bar opens in "card grid" mode by default.
 // Tapping a card hides the grid + tab bar + PB-bar and shows the matching
 // tab panel. A "← Back" pill (.topic-back-btn) returns to the grid.
+// Pass E (this commit) adds Driving / Sports / Resume and replaces the
+// hardcoded fnName ternary in tgOpenTopic with a per-section `tabFn`
+// field — so new sections plug in without touching tgOpenTopic.
 const _TG_CONFIG = {
   's-school': {
     gridId: 'schoolTopicGrid',
     tabBar: '.schoolTabs',
+    tabFn: 'sTab',
     extraHide: ['#schoolPBBalance'],
     panels: {
       classes: 'st-classes',
@@ -1127,6 +1131,7 @@ const _TG_CONFIG = {
   's-finance': {
     gridId: 'financeTopicGrid',
     tabBar: '.moneyTabs',
+    tabFn: 'mTab',
     extraHide: [],
     panels: {
       overview: 'mt-overview',
@@ -1141,6 +1146,7 @@ const _TG_CONFIG = {
   's-health': {
     gridId: 'healthTopicGrid',
     tabBar: '.healthTabs',
+    tabFn: 'hTab',
     extraHide: [],
     panels: {
       weight: 'ht-weight',
@@ -1148,6 +1154,44 @@ const _TG_CONFIG = {
       nutEd: 'ht-nutEd',
       growth: 'ht-growth',
       habits: 'ht-habits',
+    },
+  },
+  // ── Pass E ──────────────────────────────────────────────────────
+  's-driving': {
+    gridId: 'drivingTopicGrid',
+    tabBar: '.driveTabs',
+    tabFn: 'sTab',  // Driving shares sTab with School (legacy — the same
+                    // global handler swaps both st-* prefixes).
+    extraHide: [],
+    panels: {
+      drLicense: 'st-drLicense',
+      drSafety: 'st-drSafety',
+      drMaintenance: 'st-drMaintenance',
+      drCosts: 'st-drCosts',
+    },
+  },
+  's-sports': {
+    gridId: 'sportsTopicGrid',
+    tabBar: '.sportsTabs',
+    tabFn: 'sportMainTab',
+    extraHide: [],
+    panels: {
+      explore: 'sp-explore',
+      mine: 'sp-mine',
+    },
+  },
+  's-resume': {
+    gridId: 'resumeTopicGrid',
+    tabBar: '.resumeTabs',
+    tabFn: 'resumeTab',
+    // Resume's panels also need the .r-panel.active class flipped — the
+    // resumeTab() handler does that itself when we invoke it below.
+    extraHide: [],
+    panels: {
+      resume: 'rPanel-resume',
+      tracker: 'rPanel-tracker',
+      prep: 'rPanel-prep',
+      practice: 'rPanel-practice',
     },
   },
 };
@@ -1200,11 +1244,10 @@ function tgOpenTopic(sectionId, tabName){
     else section.appendChild(back);
   }
   // Fire any tab-specific side effects (charts, lists) by calling the
-  // original tab handler if available. It does double-work toggling the
-  // panel display we already set, but that's idempotent.
-  const fnName = sectionId === 's-school' ? 'sTab'
-              : sectionId === 's-finance' ? 'mTab'
-              : sectionId === 's-health'  ? 'hTab' : null;
+  // original tab handler. It re-does the panel display we already set,
+  // but that's idempotent. Pulled from cfg.tabFn so new sections plug
+  // in without editing this function.
+  const fnName = cfg.tabFn || null;
   if(fnName && typeof window[fnName] === 'function'){
     try { window[fnName](tabName); } catch(e) {}
   }

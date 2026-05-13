@@ -2668,8 +2668,32 @@
     <div class="sl"></div>
   </div>
 
+  <!-- Phase 5.8 Pass E — topic card grid (default view) -->
+  <div class="topic-card-grid" id="resumeTopicGrid">
+    <div class="topic-card accent-cyan" onclick="tgOpenTopic('s-resume','resume')">
+      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(56,189,248,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/9/9b/Southmayd_letter_1_0.jpg" alt="Builder"></div>
+      <div class="topic-card-title" style="padding-top:.75rem;">Builder</div>
+      <div class="topic-card-desc">4 templates · live preview · save versions</div>
+    </div>
+    <div class="topic-card accent-violet" onclick="tgOpenTopic('s-resume','tracker')">
+      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(167,139,250,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/1/19/Company_Information_Session_in_Japan_003_%28cropped%29.jpg" alt="Job Tracker"></div>
+      <div class="topic-card-title" style="padding-top:.75rem;">Job Tracker</div>
+      <div class="topic-card-desc">Log every application &amp; follow-up</div>
+    </div>
+    <div class="topic-card accent-gold" onclick="tgOpenTopic('s-resume','prep')">
+      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(251,191,36,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Job_interview.jpg/1280px-Job_interview.jpg" alt="Interview Prep"></div>
+      <div class="topic-card-title" style="padding-top:.75rem;">Interview Prep</div>
+      <div class="topic-card-desc">Behavioral questions · STAR method</div>
+    </div>
+    <div class="topic-card accent-green" onclick="tgOpenTopic('s-resume','practice')">
+      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(52,211,153,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/5/52/Mirror.jpg" alt="Practice"></div>
+      <div class="topic-card-title" style="padding-top:.75rem;">Practice</div>
+      <div class="topic-card-desc">Rehearse out loud · self-record &amp; review</div>
+    </div>
+  </div>
+
   <!-- Jobs/Resume Tabs -->
-  <div class="tabs" style="margin-bottom:1rem;">
+  <div class="tabs resumeTabs" style="margin-bottom:1rem;">
     <button class="tab active" onclick="resumeTab('resume',this)">📄 Builder</button>
     <button class="tab" onclick="resumeTab('tracker',this)">🎯 Job Tracker</button>
     <button class="tab" onclick="resumeTab('prep',this)">🏆 Interview Prep</button>
@@ -7188,6 +7212,30 @@
     <div class="sl"></div>
   </div>
 
+  <!-- Phase 5.8 Pass E — topic card grid (default view) -->
+  <div class="topic-card-grid" id="drivingTopicGrid">
+    <div class="topic-card accent-cyan" onclick="tgOpenTopic('s-driving','drLicense')">
+      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(56,189,248,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/c/c0/Driving_licence_Poland_2013_recto.png" alt="License"></div>
+      <div class="topic-card-title" style="padding-top:.75rem;">License</div>
+      <div class="topic-card-desc">Permit, road test &amp; ID rules</div>
+    </div>
+    <div class="topic-card accent-pink" onclick="tgOpenTopic('s-driving','drSafety')">
+      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(244,114,182,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Female_driver_buckling_seatbelt.jpg/1280px-Female_driver_buckling_seatbelt.jpg" alt="Safety"></div>
+      <div class="topic-card-title" style="padding-top:.75rem;">Safety</div>
+      <div class="topic-card-desc">Distractions, weather &amp; defensive driving</div>
+    </div>
+    <div class="topic-card accent-green" onclick="tgOpenTopic('s-driving','drMaintenance')">
+      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(52,211,153,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/2008-04-17_1989_Saab_900_Turbo_getting_new_tyres.jpg/1280px-2008-04-17_1989_Saab_900_Turbo_getting_new_tyres.jpg" alt="Car Care"></div>
+      <div class="topic-card-title" style="padding-top:.75rem;">Car Care</div>
+      <div class="topic-card-desc">Oil, tires, fluids &amp; what to do in a crash</div>
+    </div>
+    <div class="topic-card accent-gold" onclick="tgOpenTopic('s-driving','drCosts')">
+      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(251,191,36,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/3/3f/WaynePump-sm.jpg" alt="Costs"></div>
+      <div class="topic-card-title" style="padding-top:.75rem;">Costs</div>
+      <div class="topic-card-desc">Gas, insurance &amp; the real monthly total</div>
+    </div>
+  </div>
+
   <div class="tabs driveTabs">
     <button class="tab active" onclick="sTab('drLicense',this)">🪪 License</button>
     <button class="tab" onclick="sTab('drSafety',this)">🛡️ Safety</button>
@@ -7349,8 +7397,22 @@
     <div class="sl"></div>
   </div>
 
+  <!-- Phase 5.8 Pass E — topic card grid (default view) -->
+  <div class="topic-card-grid" id="sportsTopicGrid">
+    <div class="topic-card accent-cyan" onclick="tgOpenTopic('s-sports','explore')">
+      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(56,189,248,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Narendra_Modi_Stadium_view_from_the_gallery.jpg/1280px-Narendra_Modi_Stadium_view_from_the_gallery.jpg" alt="Explore Sports"></div>
+      <div class="topic-card-title" style="padding-top:.75rem;">Explore Sports</div>
+      <div class="topic-card-desc">Middle school, HS &amp; college · scholarships</div>
+    </div>
+    <div class="topic-card accent-orange" onclick="tgOpenTopic('s-sports','mine')">
+      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(251,146,60,.22);"><img class="topic-card-hero" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/f/f5/Benin%2C_Championnats_nationaux_de_scrabble_2019%2C_troph%C3%A9es.jpg" alt="My Sports"></div>
+      <div class="topic-card-title" style="padding-top:.75rem;">My Sports</div>
+      <div class="topic-card-desc">Track your team, season &amp; stats</div>
+    </div>
+  </div>
+
   <!-- Top-level tab: Explore / My Sports -->
-  <div class="tabs" style="margin-bottom:.8rem;">
+  <div class="tabs sportsTabs" style="margin-bottom:.8rem;">
     <button class="tab active" onclick="sportMainTab('explore',this)">🔍 Explore Sports</button>
     <button class="tab" onclick="sportMainTab('mine',this)">⭐ My Sports</button>
   </div>
