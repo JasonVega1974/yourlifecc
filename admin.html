@@ -196,6 +196,15 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 .pm-msg{font-family:var(--fm);font-size:.65rem;margin-top:.5rem;min-height:.9rem;letter-spacing:.04em;}
 .pm-msg.ok{color:var(--green);}
 .pm-msg.err{color:var(--red);}
+/* Local-file upload row — matches the .pm-edit-row aesthetic but with a
+   distinct gold accent so admins know it's a different code path than the
+   URL save flow. */
+.pm-upload-row{background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.18);border-radius:8px;padding:.7rem .85rem;margin-bottom:.7rem;}
+.pm-upload-label{font-family:var(--fm);font-size:.6rem;color:#fbbf24;letter-spacing:.06em;text-transform:uppercase;font-weight:700;margin-bottom:.45rem;opacity:.85;}
+.pm-upload-controls{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
+.pm-file-info{font-family:var(--fm);font-size:.62rem;color:var(--tx2);flex:1;min-width:160px;}
+.pm-file-preview{margin-top:.45rem;}
+.pm-file-preview img{max-width:120px;max-height:80px;border-radius:6px;border:1px solid var(--border);object-fit:cover;}
 .pm-toast{position:fixed;top:1.5rem;right:1.5rem;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:.7rem 1.1rem;color:var(--tx);font-family:var(--fm);font-size:.75rem;box-shadow:0 8px 30px rgba(0,0,0,.5);z-index:10000;display:none;}
 .pm-toast.ok{border-color:rgba(34,197,94,.4);color:var(--green);}
 .pm-toast.err{border-color:rgba(248,113,113,.4);color:var(--red);}
@@ -1558,12 +1567,22 @@ function pmOpenEdit(cardId){
   const url = pmCurrentUrl(cardId);
   editor.innerHTML = `
     <div class="pm-edit-row">
-      <input class="pm-edit-input" data-pm-urlinput="${cardId}" type="text" value="${pmEscape(url)}" placeholder="https://upload.wikimedia.org/...">
+      <input class="pm-edit-input" data-pm-urlinput="${cardId}" type="text" value="${pmEscape(url)}" placeholder="https://upload.wikimedia.org/... or upload below">
       <div class="pm-edit-btn-grp">
         <button class="pm-action" onclick="pmPreview('${cardId}')">👁 Preview</button>
         <button class="pm-action green" onclick="pmSavePhoto('${cardId}')">💾 Save</button>
         <button class="pm-action red"   onclick="pmCloseEdit('${cardId}')">Cancel</button>
       </div>
+    </div>
+    <div class="pm-upload-row" data-pm-uploadrow="${cardId}">
+      <div class="pm-upload-label">Or upload from computer (JPEG · PNG · WebP · GIF, max 5MB)</div>
+      <div class="pm-upload-controls">
+        <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" data-pm-file="${cardId}" onchange="pmFileSelected('${cardId}')" style="display:none;">
+        <button class="pm-action" type="button" onclick="pmTriggerFileInput('${cardId}')">📁 Choose Photo</button>
+        <span class="pm-file-info" data-pm-fileinfo="${cardId}"></span>
+        <button class="pm-action green" type="button" data-pm-uploadbtn="${cardId}" onclick="pmUploadFile('${cardId}')" disabled>⬆️ Upload &amp; Save</button>
+      </div>
+      <div class="pm-file-preview" data-pm-filepreview="${cardId}"></div>
     </div>
     <div class="pm-edit-row">
       <input class="pm-edit-input" data-pm-search="${cardId}" type="text" placeholder="Search Wikimedia Commons (e.g. 'modern classroom')">
@@ -1639,6 +1658,110 @@ function pmPickResult(cardId, jsonUrl){
   try { url = JSON.parse(jsonUrl); } catch(e){ url = jsonUrl; }
   const input = document.querySelector(`[data-pm-urlinput="${cardId}"]`);
   if(input){ input.value = url; pmPreview(cardId); }
+  // Auto-save in the same tap — admins no longer need a separate Save click.
+  pmSavePhoto(cardId);
+}
+
+// ── Local file upload ──────────────────────────────────────────────
+function pmTriggerFileInput(cardId){
+  const inp = document.querySelector(`[data-pm-file="${cardId}"]`);
+  if(inp) inp.click();
+}
+
+function pmFileSelected(cardId){
+  const inp  = document.querySelector(`[data-pm-file="${cardId}"]`);
+  const info = document.querySelector(`[data-pm-fileinfo="${cardId}"]`);
+  const prev = document.querySelector(`[data-pm-filepreview="${cardId}"]`);
+  const btn  = document.querySelector(`[data-pm-uploadbtn="${cardId}"]`);
+  if(!inp || !inp.files || !inp.files[0]){
+    if(info) info.textContent = '';
+    if(prev) prev.innerHTML   = '';
+    if(btn)  btn.disabled     = true;
+    return;
+  }
+  const f       = inp.files[0];
+  const sizeKb  = Math.round(f.size / 1024);
+  const sizeStr = sizeKb >= 1024 ? (sizeKb/1024).toFixed(1) + ' MB' : sizeKb + ' KB';
+  if(info) info.textContent = f.name + ' · ' + sizeStr;
+  if(prev){
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      prev.innerHTML = `<img src="${e.target.result}" alt="">`;
+    };
+    reader.readAsDataURL(f);
+  }
+  if(btn) btn.disabled = false;
+}
+
+async function pmUploadFile(cardId){
+  const inp = document.querySelector(`[data-pm-file="${cardId}"]`);
+  const msg = document.querySelector(`[data-pm-msg="${cardId}"]`);
+  const btn = document.querySelector(`[data-pm-uploadbtn="${cardId}"]`);
+  if(!inp || !inp.files || !inp.files[0]){
+    if(msg){ msg.textContent = 'No file selected.'; msg.className = 'pm-msg err'; }
+    return;
+  }
+  const f = inp.files[0];
+  if(f.size > 5 * 1024 * 1024){
+    if(msg){ msg.textContent = 'File exceeds 5MB limit.'; msg.className = 'pm-msg err'; }
+    return;
+  }
+  const allowed = ['image/jpeg','image/png','image/webp','image/gif'];
+  if(!allowed.includes(f.type)){
+    if(msg){ msg.textContent = 'Unsupported file type — must be JPEG, PNG, WebP, or GIF.'; msg.className = 'pm-msg err'; }
+    return;
+  }
+  const secret = sessionStorage.getItem('ylcc_admin_photo_secret');
+  if(!secret){
+    if(msg){ msg.textContent = 'Set ADMIN_PHOTO_SECRET first (top of the panel).'; msg.className = 'pm-msg err'; }
+    return;
+  }
+  const ts = Date.now();
+  if(msg){ msg.textContent = 'uploading…'; msg.className = 'pm-msg'; }
+  if(btn) btn.disabled = true;
+  try {
+    const hmac = await pmHmac(secret, cardId + '|' + f.name + '|' + ts);
+    const form = new FormData();
+    form.append('card_id', cardId);
+    form.append('ts',      String(ts));
+    form.append('hmac',    hmac);
+    form.append('file',    f, f.name);
+    const resp = await fetch('/api/upload-card-photo', { method: 'POST', body: form });
+    const data = await resp.json().catch(() => ({}));
+    if(!resp.ok || !data.ok){
+      const errText = data && data.error ? data.error : ('HTTP ' + resp.status);
+      if(msg){ msg.textContent = 'Upload failed — ' + errText; msg.className = 'pm-msg err'; }
+      pmToast('Upload failed — ' + errText, 'err');
+      if(btn) btn.disabled = false;
+      return;
+    }
+    // Fill URL input + thumbnail + override badge — same UI updates pmSavePhoto does.
+    const urlInput = document.querySelector(`[data-pm-urlinput="${cardId}"]`);
+    if(urlInput) urlInput.value = data.url;
+    PM_OVERRIDES[cardId] = data.url;
+    const thumb = document.querySelector(`[data-pm-thumb="${cardId}"]`);
+    if(thumb && thumb.tagName === 'IMG'){
+      thumb.src = data.url;
+    } else if(thumb){
+      const img = document.createElement('img');
+      img.className = 'pm-thumb';
+      img.setAttribute('data-pm-thumb', cardId);
+      img.loading = 'lazy';
+      img.src     = data.url;
+      img.alt     = '';
+      thumb.replaceWith(img);
+    }
+    const urlEl = document.querySelector(`[data-pm-url="${cardId}"]`);
+    if(urlEl){ urlEl.textContent = data.url; urlEl.classList.add('override'); }
+    document.getElementById('pmOverrideBadge').textContent = Object.keys(PM_OVERRIDES).length + ' overrides';
+    if(msg){ msg.textContent = '✓ uploaded'; msg.className = 'pm-msg ok'; }
+    pmToast('Photo uploaded ✓', 'ok');
+    if(btn) btn.disabled = false;
+  } catch(e){
+    if(msg){ msg.textContent = 'Upload failed — ' + (e && e.message ? e.message : 'network error'); msg.className = 'pm-msg err'; }
+    pmToast('Upload failed', 'err');
+    if(btn) btn.disabled = false;
+  }
 }
 
 async function pmHmac(key, message){
@@ -1655,8 +1778,8 @@ async function pmSavePhoto(cardId){
   const input = document.querySelector(`[data-pm-urlinput="${cardId}"]`);
   if(!input) return;
   const url = (input.value || '').trim();
-  if(!url || !/^https:\/\/upload\.wikimedia\.org\//.test(url)){
-    msg.textContent = 'URL must start with https://upload.wikimedia.org/';
+  if(!url || !/^https:\/\/(upload\.wikimedia\.org|hrohgwcbfgywkpnvqxhk\.supabase\.co\/storage)\//.test(url)){
+    msg.textContent = 'URL must be from upload.wikimedia.org or Supabase Storage';
     msg.className = 'pm-msg err';
     return;
   }

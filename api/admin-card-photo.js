@@ -110,8 +110,10 @@ module.exports = async (req, res) => {
 
     // Shape checks
     if (!card_id || !/^[a-z0-9_-]{2,64}$/i.test(card_id))           return res.status(400).json({ error: 'Bad card_id' });
-    if (!photo_url || !/^https:\/\/upload\.wikimedia\.org\//.test(photo_url)){
-      return res.status(400).json({ error: 'photo_url must be an https://upload.wikimedia.org/ URL' });
+    // Accept either a Wikimedia Commons URL or the project's own Supabase
+    // Storage public URL (populated by /api/upload-card-photo).
+    if (!photo_url || !/^https:\/\/(upload\.wikimedia\.org|hrohgwcbfgywkpnvqxhk\.supabase\.co\/storage)\//.test(photo_url)){
+      return res.status(400).json({ error: 'photo_url must be from upload.wikimedia.org or Supabase Storage' });
     }
     if (!Number.isFinite(ts) || Math.abs(Date.now() - ts) > STALE_MS){
       return res.status(401).json({ error: 'Stale or missing timestamp' });
