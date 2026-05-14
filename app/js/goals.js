@@ -4,17 +4,49 @@
 ============================================================= */
 
 // ── GOALS ─────────────────────────────────────────────────────
-function saveGoal(){ const text=(document.getElementById('gText').value||'').trim(),type=document.getElementById('gType').value,cat=document.getElementById('gCat').value; if(!text){showToast('Enter your goal');return;} if(!D.goals) D.goals=[]; D.goals.push({id:Date.now(),text,type,cat,done:false,date:new Date().toLocaleDateString()}); document.getElementById('gText').value=''; save(); renderGoals(); closeModal('goalAddModal'); showToast('Goal added! 🎯'); }
+// Phase C-Goals (2026-05-15) — additions:
+//   • motivation field on the goal ("What would completing this make possible?")
+//   • milestones[] (2-5 mini-goals per goal) with actions[] (1-3 daily steps per milestone)
+//   • SVG progress ring on each card (reuses svgProgressRing from finance.js)
+//   • Auto-complete when all milestones are checked + slide-in completion card
+//   • All cards carry --section-goals (#f97316) accent
+function saveGoal(){
+  const text = (document.getElementById('gText').value||'').trim();
+  const type = document.getElementById('gType').value;
+  const cat  = document.getElementById('gCat').value;
+  const motivation = ((document.getElementById('gMotivation')||{}).value || '').trim();
+  if(!text){ showToast('Enter your goal'); return; }
+  if(!D.goals) D.goals = [];
+  D.goals.push({
+    id: Date.now(),
+    text, type, cat,
+    motivation,            // Phase C-Goals
+    milestones: [],        // Phase C-Goals — { id, text, done, actions:[{id,text,done}] }
+    done: false,
+    date: new Date().toLocaleDateString()
+  });
+  document.getElementById('gText').value = '';
+  const mEl = document.getElementById('gMotivation'); if(mEl) mEl.value = '';
+  save(); renderGoals(); closeModal('goalAddModal'); showToast('Goal added! 🎯');
+}
 function toggleGoal(id){ const g=(Array.isArray(D.goals)?D.goals:[]).find(g=>g.id===id); if(g){g.done=!g.done;if(g.done)g.achievedDate=new Date().toLocaleDateString();save();renderGoals();showToast(g.done?'🏆 Goal achieved!':'Unchecked');} }
 function editGoal(id){ const g=(Array.isArray(D.goals)?D.goals:[]).find(g=>g.id===id); if(!g) return; const n=prompt('Edit:',g.text); if(!n) return; g.text=n.trim(); save(); renderGoals(); }
 function gFilter(f,btn){ _gFilter=f; document.querySelectorAll('.goalTabs .tab').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); renderGoals(); }
 
+// Progress = completed milestones / total milestones. Goals with no
+// milestones report 0% (incomplete) or 100% (completed via top check).
+function goalProgressPct(g){
+  const ms = g.milestones || [];
+  if(!ms.length) return g.done ? 100 : 0;
+  const done = ms.filter(m => m.done).length;
+  return Math.round((done / ms.length) * 100);
+}
+
 function renderGoals(){
   const el = document.getElementById('goalsList'); if(!el) return;
   let goals = D.goals || [];
-  const all = goals;
 
-  // Stats
+  // Stats (unchanged)
   const statsEl = document.getElementById('gvStats');
   if(statsEl){
     const total   = goals.length;
@@ -29,7 +61,7 @@ function renderGoals(){
     `;
   }
 
-  // Filter
+  // Filter (unchanged)
   if(_gFilter==='long')       goals = goals.filter(g=>g.type==='long'&&!g.done);
   else if(_gFilter==='short') goals = goals.filter(g=>g.type==='short'&&!g.done);
   else if(_gFilter==='done')  goals = goals.filter(g=>g.done);
@@ -40,48 +72,238 @@ function renderGoals(){
     return;
   }
 
-  el.innerHTML = goals.map(g => {
-    const typeTag = g.done
-      ? `<span class="gv-goal-tag done-tag">✅ Achieved</span>`
-      : g.type==='long'
-        ? `<span class="gv-goal-tag long">🏔 Long-Term</span>`
-        : `<span class="gv-goal-tag short">⚡ Short-Term</span>`;
-    return `
-    <div class="gv-goal-card ${g.done?'done':''}" id="gc-${g.id}">
-      <div class="gv-goal-check" onclick="completeGoal(${g.id})">${g.done?'✓':''}</div>
-      <div class="gv-goal-body">
-        <div class="gv-goal-text">${escapeHtml(g.text)}</div>
-        <div class="gv-goal-meta">
-          ${typeTag}
-          <span class="gv-goal-cat">${g.cat||''}</span>
-          <span class="gv-goal-date">${g.doneDate||g.date||''}</span>
+  el.innerHTML = goals.map(g => renderGoalCard(g)).join('');
+}
+
+function renderGoalCard(g){
+  const pct = goalProgressPct(g);
+  const typeTag = g.done
+    ? `<span class="gv-goal-tag done-tag">✅ Achieved</span>`
+    : g.type==='long'
+      ? `<span class="gv-goal-tag long">🏔 Long-Term</span>`
+      : `<span class="gv-goal-tag short">⚡ Short-Term</span>`;
+  const ms = g.milestones || [];
+  const hasBreakdown = ms.length > 0;
+
+  // SVG progress ring — uses svgProgressRing from finance.js (global).
+  // Graceful fallback to a plain percent number if for any reason that
+  // function isn't loaded (e.g. faith-free who doesn't load finance).
+  const ringHtml = (typeof svgProgressRing === 'function' && !g.done)
+    ? svgProgressRing(pct, 72, 'var(--section-goals)')
+    : '';
+
+  // Motivation block — Georgia italic, left-bordered in --section-goals.
+  const motHtml = g.motivation
+    ? `<div style="font-family:Georgia,serif;font-style:italic;font-size:.86rem;color:var(--tx2);line-height:1.55;margin:.55rem 0 .65rem;padding:.35rem 0 .35rem .85rem;border-left:2px solid var(--section-goals);">${escapeHtml(g.motivation)}</div>`
+    : '';
+
+  // Milestones nested under the goal.
+  const breakdownHtml = hasBreakdown
+    ? '<div style="margin-top:.65rem;">' + ms.map(m => renderMilestone(g.id, m)).join('') + '</div>'
+    : '';
+
+  // "Break it down" CTA (no milestones yet) or "+ Add milestone" (existing + room for more).
+  const breakBtn = !hasBreakdown && !g.done
+    ? `<button type="button" onclick="addMilestone(${g.id})" style="background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.28);color:var(--section-goals);padding:.45rem .9rem;border-radius:8px;cursor:pointer;font-size:.78rem;font-weight:600;font-family:var(--fm);margin-top:.6rem;">+ Break it down</button>`
+    : '';
+  const addMsBtn = hasBreakdown && !g.done && ms.length < 5
+    ? `<button type="button" onclick="addMilestone(${g.id})" style="background:rgba(249,115,22,.04);border:1px dashed rgba(249,115,22,.35);color:var(--section-goals);padding:.4rem .8rem;border-radius:8px;cursor:pointer;font-size:.72rem;font-weight:600;font-family:var(--fm);margin-top:.45rem;width:100%;">+ Add milestone (${ms.length}/5)</button>`
+    : '';
+
+  // Completion stamp shown only when done.
+  const doneStamp = g.done
+    ? `<div style="margin-top:.55rem;padding:.4rem .8rem;background:rgba(249,115,22,.08);border-radius:8px;font-size:.78rem;color:var(--section-goals);font-weight:600;">🎉 Completed ${g.doneDate||''}</div>`
+    : '';
+
+  return `
+    <div class="gv-goal-card ${g.done?'done':''}" id="gc-${g.id}" style="border-left:4px solid var(--section-goals);">
+      <div style="display:flex;align-items:flex-start;gap:.85rem;">
+        <div class="gv-goal-check" onclick="completeGoal(${g.id})" style="${g.done?'background:var(--section-goals);border-color:var(--section-goals);color:#fff;':''}">${g.done?'✓':''}</div>
+        <div class="gv-goal-body" style="flex:1;min-width:0;">
+          <div class="gv-goal-text">${escapeHtml(g.text)}</div>
+          <div class="gv-goal-meta">${typeTag}<span class="gv-goal-cat">${g.cat||''}</span><span class="gv-goal-date">${g.doneDate||g.date||''}</span></div>
+          ${motHtml}
         </div>
+        ${ringHtml ? `<div style="flex-shrink:0;align-self:flex-start;">${ringHtml}</div>` : ''}
+        <button class="gv-goal-del" onclick="deleteGoal(${g.id})" title="Delete">✕</button>
       </div>
-      <button class="gv-goal-del" onclick="deleteGoal(${g.id})" title="Delete">✕</button>
+      ${breakdownHtml}
+      ${addMsBtn}
+      ${breakBtn}
+      ${doneStamp}
     </div>`;
-  }).join('');
+}
+
+function renderMilestone(gid, m){
+  const acts = m.actions || [];
+  const checkBoxStyle = m.done
+    ? 'background:var(--section-goals);border:2px solid var(--section-goals);color:#fff;'
+    : 'background:transparent;border:2px solid rgba(249,115,22,.55);color:transparent;';
+
+  const actsHtml = acts.length
+    ? '<div style="margin-top:.4rem;padding-left:1.75rem;">'
+      + acts.map(a => {
+          const ac = a.done
+            ? 'background:var(--section-goals);border:1.5px solid var(--section-goals);color:#fff;'
+            : 'background:transparent;border:1.5px solid rgba(249,115,22,.45);color:transparent;';
+          return `<div style="display:flex;align-items:center;gap:.55rem;padding:.28rem 0;font-size:.78rem;color:${a.done?'var(--tx2)':'var(--tx)'};${a.done?'text-decoration:line-through;':''}">
+            <span onclick="toggleAction(${gid},${m.id},${a.id})" style="width:16px;height:16px;border-radius:4px;${ac}display:flex;align-items:center;justify-content:center;font-size:.7rem;cursor:pointer;flex-shrink:0;">${a.done?'✓':''}</span>
+            <span style="flex:1;">${escapeHtml(a.text)}</span>
+            <button onclick="deleteAction(${gid},${m.id},${a.id})" style="background:none;border:none;color:rgba(255,255,255,.25);cursor:pointer;font-size:.78rem;padding:0 .25rem;">✕</button>
+          </div>`;
+        }).join('')
+      + '</div>'
+    : '';
+
+  const addActBtn = !m.done && acts.length < 3
+    ? `<button type="button" onclick="addAction(${gid},${m.id})" style="margin-top:.3rem;margin-left:1.75rem;background:none;border:none;color:rgba(249,115,22,.75);font-size:.72rem;font-weight:600;cursor:pointer;font-family:var(--fm);padding:0;">+ Add daily action</button>`
+    : '';
+
+  return `
+    <div style="padding:.6rem .75rem;background:rgba(249,115,22,.05);border-left:3px solid var(--section-goals);border-radius:6px;margin-bottom:.4rem;margin-left:.4rem;">
+      <div style="display:flex;align-items:center;gap:.55rem;">
+        <span onclick="toggleMilestone(${gid},${m.id})" style="width:18px;height:18px;border-radius:4px;${checkBoxStyle}display:flex;align-items:center;justify-content:center;font-size:.78rem;cursor:pointer;flex-shrink:0;">${m.done?'✓':''}</span>
+        <span style="flex:1;font-size:.86rem;font-weight:600;color:${m.done?'var(--tx2)':'var(--tx)'};${m.done?'text-decoration:line-through;':''}">${escapeHtml(m.text)}</span>
+        <button onclick="deleteMilestone(${gid},${m.id})" style="background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:.78rem;padding:0 .25rem;">✕</button>
+      </div>
+      ${actsHtml}
+      ${addActBtn}
+    </div>`;
+}
+
+function addMilestone(gid){
+  const g = (D.goals||[]).find(g => g.id === gid);
+  if(!g) return;
+  if(!g.milestones) g.milestones = [];
+  if(g.milestones.length >= 5){ showToast('Max 5 milestones per goal'); return; }
+  const text = prompt('Milestone (mini-goal):');
+  if(!text || !text.trim()) return;
+  g.milestones.push({id: Date.now(), text: text.trim(), done: false, actions: []});
+  save(); renderGoals();
+}
+
+function deleteMilestone(gid, mid){
+  const g = (D.goals||[]).find(g => g.id === gid);
+  if(!g || !g.milestones) return;
+  if(!confirm('Delete this milestone and its actions?')) return;
+  g.milestones = g.milestones.filter(m => m.id !== mid);
+  save(); renderGoals();
+}
+
+function toggleMilestone(gid, mid){
+  const g = (D.goals||[]).find(g => g.id === gid);
+  if(!g || !g.milestones) return;
+  const m = g.milestones.find(m => m.id === mid);
+  if(!m) return;
+  m.done = !m.done;
+  save();
+  checkGoalAutoComplete(gid);
+  renderGoals();
+}
+
+function addAction(gid, mid){
+  const g = (D.goals||[]).find(g => g.id === gid);
+  if(!g || !g.milestones) return;
+  const m = g.milestones.find(m => m.id === mid);
+  if(!m) return;
+  if(!m.actions) m.actions = [];
+  if(m.actions.length >= 3){ showToast('Max 3 actions per milestone'); return; }
+  const text = prompt('Daily action (specific small step):');
+  if(!text || !text.trim()) return;
+  m.actions.push({id: Date.now() + Math.floor(Math.random()*1000), text: text.trim(), done: false});
+  save(); renderGoals();
+}
+
+function deleteAction(gid, mid, aid){
+  const g = (D.goals||[]).find(g => g.id === gid);
+  if(!g || !g.milestones) return;
+  const m = g.milestones.find(m => m.id === mid);
+  if(!m || !m.actions) return;
+  m.actions = m.actions.filter(a => a.id !== aid);
+  save(); renderGoals();
+}
+
+function toggleAction(gid, mid, aid){
+  const g = (D.goals||[]).find(g => g.id === gid);
+  if(!g || !g.milestones) return;
+  const m = g.milestones.find(m => m.id === mid);
+  if(!m || !m.actions) return;
+  const a = m.actions.find(a => a.id === aid);
+  if(!a) return;
+  a.done = !a.done;
+  save(); renderGoals();
+  // Goal-action ticks do not feed the hero's "tasks today" counter today —
+  // that reads choreLog + assignments. If a unified task surface is wanted
+  // later, route through a shared task source.
+}
+
+function checkGoalAutoComplete(gid){
+  const g = (D.goals||[]).find(g => g.id === gid);
+  if(!g || !g.milestones || !g.milestones.length) return;
+  const allDone = g.milestones.every(m => m.done);
+  if(allDone && !g.done){
+    g.done = true;
+    g.doneDate = new Date().toLocaleDateString();
+    save();
+    const pbAmt = g.type === 'long' ? 25 : 10;
+    if(typeof earnPB === 'function') earnPB(pbAmt, 'Goal completed: '+g.text);
+    if(typeof launchSideConfetti === 'function') launchSideConfetti();
+    showGoalCompletionCard(g);
+  }
+}
+
+function showGoalCompletionCard(g){
+  // Slide-in completion card. Auto-dismisses after 4s, dismissable on tap.
+  // Respects prefers-reduced-motion via opacity-only transition (no transform).
+  const existing = document.getElementById('goalCompletionCard');
+  if(existing) existing.remove();
+  const reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const card = document.createElement('div');
+  card.id = 'goalCompletionCard';
+  card.style.cssText = 'position:fixed;left:50%;top:80px;transform:translateX(-50%) translateY(' + (reduce?'0':'-20px') + ');opacity:0;background:linear-gradient(135deg,rgba(249,115,22,.95),rgba(251,146,60,.92));color:#fff;padding:1.2rem 1.8rem;border-radius:20px;box-shadow:0 18px 60px rgba(249,115,22,.45);z-index:99997;max-width:90%;text-align:center;font-family:var(--fm);transition:opacity .35s ease, transform .35s ease;cursor:pointer;';
+  card.onclick = () => card.remove();
+  card.innerHTML = '<div style="font-size:1.9rem;line-height:1;margin-bottom:.4rem;">🎉</div>'
+    + '<div style="font-family:var(--fh);font-size:1.35rem;letter-spacing:.04em;margin-bottom:.3rem;">You did it!</div>'
+    + '<div style="font-size:.94rem;font-weight:600;line-height:1.4;">'+escapeHtml(g.text)+'</div>'
+    + '<div style="font-size:.74rem;opacity:.85;margin-top:.4rem;">Completed '+(g.doneDate||new Date().toLocaleDateString())+'</div>';
+  document.body.appendChild(card);
+  requestAnimationFrame(() => {
+    card.style.opacity = '1';
+    card.style.transform = 'translateX(-50%) translateY(0)';
+  });
+  setTimeout(() => {
+    if(card.parentNode){
+      card.style.opacity = '0';
+      if(!reduce) card.style.transform = 'translateX(-50%) translateY(-20px)';
+      setTimeout(() => { try{ card.remove(); }catch(e){} }, 400);
+    }
+  }, 4000);
 }
 
 function completeGoal(id){
   if(!D.goals) return;
   const g = D.goals.find(g=>g.id===id); if(!g) return;
+  const wasDone = g.done;
   g.done = !g.done;
   g.doneDate = g.done ? new Date().toLocaleDateString() : null;
   save(); renderGoals();
-  if(g.done){
+  if(g.done && !wasDone){
     const pbAmt = g.type==='long' ? 25 : 10;
-    earnPB(pbAmt, 'Goal completed: '+g.text);
+    if(typeof earnPB === 'function') earnPB(pbAmt, 'Goal completed: '+g.text);
     const totalDone = (Array.isArray(D.goals)?D.goals:[]).filter(x=>x.done).length;
-    // Every 5th goal earns a scratch card
     if(totalDone % 5 === 0){
-      if(!D.pb) initParentBucks();
-      D.pb.scratchTickets = (D.pb.scratchTickets||0) + 1;
-      save(); renderGameTickets();
+      if(!D.pb && typeof initParentBucks === 'function') initParentBucks();
+      if(D.pb){
+        D.pb.scratchTickets = (D.pb.scratchTickets||0) + 1;
+        save();
+        if(typeof renderGameTickets === 'function') renderGameTickets();
+      }
       showToast(`🏆 Goal achieved! +${pbAmt} PB 🪙 +1 Scratch Card! 🎫`);
     } else {
       showToast(`🏆 Goal achieved! +${pbAmt} PB 🪙`);
     }
     if(typeof launchSideConfetti === 'function') launchSideConfetti();
+    showGoalCompletionCard(g);
   }
 }
 

@@ -9657,9 +9657,13 @@
       <option>School / Education</option><option>Career / Work</option><option>Relationships</option>
       <option>DJ / Music</option><option>Sports / Martial Arts</option><option>Personal Growth</option><option>Other</option>
     </select>
+    <!-- Phase C-Goals: motivation prompt. Optional but encouraged — shows
+         on the goal card in Georgia italic as inspiration when set. -->
+    <label>What would completing this make possible?</label>
+    <textarea id="gMotivation" rows="2" placeholder="Optional — the why behind this goal. Shows on the card as inspiration." style="resize:vertical;min-height:60px;"></textarea>
     <div class="ma">
       <button class="btn bgh" onclick="closeModal('goalAddModal')">Cancel</button>
-      <button class="btn bp" onclick="saveGoal()">Add Goal</button>
+      <button class="btn bp" onclick="saveGoal()" style="background:var(--section-goals);border-color:var(--section-goals);color:#0b1020;">Add Goal</button>
     </div>
   </div>
 </div>
