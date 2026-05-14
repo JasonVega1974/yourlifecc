@@ -3960,3 +3960,85 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   color:#fbbf24 !important;
   border-color:rgba(251,191,36,.3) !important;
 }
+
+/* ════════════════════════════════════════════════════════════════════
+   F9.1 — Targeted fixes (Devotional modal, Bible Lands cards, Family
+   verse home card). The Devotional and Family verse fixes are inline
+   in index.html / faith.js; this block covers the Bible Lands cards
+   that needed CSS to match the .topic-card visual spec.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ─── Bible Lands site cards: match .topic-card spec exactly ─── */
+#bf-bibleworld .bw-card{
+  background:linear-gradient(135deg,rgba(251,191,36,.06),rgba(167,139,250,.04)) !important;
+  border:1px solid rgba(251,191,36,.18) !important;
+  border-left-width:1px !important;
+  border-radius:16px !important;
+  min-height:150px !important;
+  padding:1.1rem 1rem 1rem !important;
+  box-shadow:0 4px 14px rgba(15,23,42,.18), 0 0 12px rgba(251,191,36,.04) !important;
+}
+#bf-bibleworld .bw-card:hover{
+  transform:translateY(-3px) !important;
+  border-color:rgba(251,191,36,.5) !important;
+  box-shadow:0 8px 28px rgba(251,191,36,.18) !important;
+}
+#bf-bibleworld .bw-card-name{
+  font-family:'Bebas Neue', var(--fh, var(--fm)) !important;
+  font-size:1.05rem !important;
+  letter-spacing:.12em !important;
+  color:#fbbf24 !important;
+  font-weight:700 !important;
+  margin-bottom:.3rem !important;
+  text-shadow:0 0 14px rgba(251,191,36,.18);
+}
+#bf-bibleworld .bw-card-meta{
+  font-family:var(--fm);
+  font-size:.6rem !important;
+  letter-spacing:.18em !important;
+  color:#fbbf24 !important;
+  opacity:.78;
+  font-weight:700 !important;
+  text-transform:uppercase;
+  margin-bottom:.4rem !important;
+}
+#bf-bibleworld .bw-card-tagline{
+  font-family:Georgia,'Times New Roman',serif !important;
+  font-style:italic !important;
+  font-size:.85rem !important;
+  font-weight:400 !important;
+  line-height:1.6 !important;
+  color:#fef3c7 !important;
+  opacity:.82;
+}
+/* If individual cards include a photo thumbnail (.bw-card-photo / .bw-card-img),
+   round the corners and add a gold hairline. */
+#bf-bibleworld .bw-card img,
+#bf-bibleworld .bw-card-photo,
+#bf-bibleworld .bw-card-img{
+  border-radius:8px;
+  border:1px solid rgba(251,191,36,.2);
+}
+
+/* Light-mode parchment treatment for Bible Lands cards */
+:root.light #bf-bibleworld .bw-card{
+  background:linear-gradient(135deg,rgba(255,255,255,.85),rgba(255,250,235,.72)) !important;
+  border-color:rgba(180,120,20,.32) !important;
+  box-shadow:0 4px 14px rgba(60,40,15,.08) !important;
+}
+:root.light #bf-bibleworld .bw-card:hover{
+  border-color:rgba(180,120,20,.55) !important;
+  box-shadow:0 8px 28px rgba(180,120,20,.22) !important;
+}
+:root.light #bf-bibleworld .bw-card-name{color:#b45309 !important;text-shadow:none;}
+:root.light #bf-bibleworld .bw-card-meta{color:#b45309 !important;}
+:root.light #bf-bibleworld .bw-card-tagline{color:#3a2818 !important;opacity:.92;}
+
+/* ─── Family verse card light-mode parchment ─── */
+:root.light #fhFamilyVerseCard{
+  background:rgba(255,255,255,.65) !important;
+  border-color:rgba(180,120,20,.28) !important;
+}
+:root.light #fhFamilyVerseCard #fhFamilyVerseText{color:#1a1233 !important;}
+:root.light #fhFamilyVerseCard #fhFamilyVerseRef{color:#92400e !important;}
+:root.light #fhFamilyVerseCard > div:first-child{color:#b45309 !important;}

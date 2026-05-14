@@ -3056,44 +3056,31 @@ function renderDevotionals(){
 
 function openDevotionalCard(idx){
   const d = DEVOTIONALS[idx]; if(!d) return;
-  const colors = ['#667eea,#764ba2','#f093fb,#f5576c','#4facfe,#00f2fe','#43e97b,#38f9d7','#fa709a,#fee140','#a18cd1,#fbc2eb','#fccb90,#d57eeb','#667eea,#764ba2','#e0c3fc,#8ec5fc','#f5576c,#ff8a65'];
-  const gradient = colors[idx % colors.length];
-  
+  // F9.1: every devotional now uses the same gold/navy register —
+  // no more rotating purple/pink/cyan gradients per card. The modal
+  // markup default in index.html already paints a gold radial header.
   document.getElementById('charIcon').textContent = '🕊️';
   document.getElementById('charTitle').textContent = d.title;
   document.getElementById('charSub').textContent = 'Day ' + (idx+1) + ' · ' + d.verse;
-  document.getElementById('charModalHeader').style.background = 'linear-gradient(135deg,' + gradient + ')';
-  
-  document.getElementById('charBody').innerHTML = `
-    <div style="background:rgba(167,139,250,.05);border-left:3px solid #a78bfa;border-radius:0 10px 10px 0;padding:1rem 1.2rem;margin-bottom:1rem;">
-      <div style="font-size:1.05rem;font-style:italic;color:var(--tx);line-height:1.8;">"${d.scripture}"</div>
-      <div style="font-size:.78rem;color:#a78bfa;font-weight:700;margin-top:.4rem;">— ${d.verse}</div>
-    </div>
-    
-    <div style="margin-bottom:1rem;">
-      <div style="display:flex;align-items:center;gap:.3rem;margin-bottom:.4rem;">
-        <span style="font-size:.9rem;">💭</span>
-        <span style="font-size:.85rem;font-weight:800;color:var(--c);">Reflection</span>
-      </div>
-      <p style="margin:0;line-height:1.8;">${d.body}</p>
-    </div>
-    
-    <div style="background:rgba(244,114,182,.04);border-left:3px solid #f472b6;border-radius:0 10px 10px 0;padding:.8rem 1rem;">
-      <div style="display:flex;align-items:center;gap:.3rem;margin-bottom:.3rem;">
-        <span style="font-size:.85rem;">🙏</span>
-        <span style="font-size:.8rem;font-weight:800;color:#f472b6;">Prayer</span>
-      </div>
-      <p style="margin:0;font-style:italic;line-height:1.8;color:var(--tx2);">${d.prayer||''}</p>
-    </div>
-    
-    <div style="background:rgba(34,197,94,.04);border-left:3px solid #22c55e;border-radius:0 10px 10px 0;padding:.8rem 1rem;margin-top:1rem;">
-      <div style="display:flex;align-items:center;gap:.3rem;margin-bottom:.3rem;">
-        <span style="font-size:.85rem;">🎯</span>
-        <span style="font-size:.8rem;font-weight:800;color:#22c55e;">Apply It Today</span>
-      </div>
-      <p style="margin:0;line-height:1.8;">${d.reflect}</p>
-    </div>
-  `;
+  document.getElementById('charModalHeader').style.background = 'radial-gradient(ellipse at top, rgba(251,191,36,.18), transparent 60%)';
+
+  document.getElementById('charBody').innerHTML = ''
+    + '<div style="background:rgba(251,191,36,.06);border-left:4px solid #fbbf24;border-radius:0 12px 12px 0;padding:1rem 1.15rem;margin-bottom:1.2rem;">'
+    +   '<div style="font-family:Georgia,serif;font-style:italic;font-size:1.05rem;color:#fef3c7;line-height:1.75;font-weight:400;">&ldquo;' + d.scripture + '&rdquo;</div>'
+    +   '<div style="font-family:\'Bebas Neue\',var(--fm);font-size:.85rem;letter-spacing:.16em;color:#fbbf24;font-weight:700;margin-top:.5rem;">&mdash; ' + d.verse + '</div>'
+    + '</div>'
+    + '<div style="margin-bottom:1.1rem;">'
+    +   '<div style="font-family:var(--fm);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:#fbbf24;font-weight:800;margin-bottom:.5rem;opacity:.9;">💭 Reflection</div>'
+    +   '<p style="margin:0;font-family:Georgia,serif;font-size:.98rem;line-height:1.75;color:rgba(254,243,199,.92);font-weight:400;">' + d.body + '</p>'
+    + '</div>'
+    + '<div style="background:rgba(251,191,36,.06);border-left:4px solid #fbbf24;border-radius:0 12px 12px 0;padding:.95rem 1.1rem;margin-bottom:1rem;">'
+    +   '<div style="font-family:var(--fm);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:#fbbf24;font-weight:800;margin-bottom:.4rem;opacity:.9;">🙏 Prayer</div>'
+    +   '<p style="margin:0;font-family:Georgia,serif;font-style:italic;font-size:.95rem;line-height:1.7;color:#fef3c7;font-weight:400;">' + (d.prayer || '') + '</p>'
+    + '</div>'
+    + '<div style="background:rgba(34,197,94,.06);border-left:4px solid #22c55e;border-radius:0 12px 12px 0;padding:.95rem 1.1rem;">'
+    +   '<div style="font-family:var(--fm);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:#22c55e;font-weight:800;margin-bottom:.4rem;">🎯 Apply It Today</div>'
+    +   '<p style="margin:0;font-family:Georgia,serif;font-size:.95rem;line-height:1.7;color:rgba(254,243,199,.92);font-weight:400;">' + d.reflect + '</p>'
+    + '</div>';
   document.getElementById('charQuiz').innerHTML = '';
   openModal('charModal');
 }
@@ -3125,8 +3112,9 @@ function showDailyDevModal(){
   if(D.scrReadDays && D.scrReadDays[today]) return;
   const idx = getDailyDevotionalIdx();
   const d = DEVOTIONALS[idx]; if(!d) return;
-  const colors = ['linear-gradient(135deg,#667eea,#764ba2)','linear-gradient(135deg,#f093fb,#f5576c)','linear-gradient(135deg,#4facfe,#00f2fe)','linear-gradient(135deg,#43e97b,#38f9d7)','linear-gradient(135deg,#fa709a,#fee140)','linear-gradient(135deg,#a18cd1,#fbc2eb)'];
-  const hdr = document.getElementById('ddmHeader'); if(hdr) hdr.style.background = colors[idx % colors.length];
+  // F9.1: every popup uses the same gold/navy register — no rotating purples.
+  const hdr = document.getElementById('ddmHeader');
+  if(hdr) hdr.style.background = 'radial-gradient(ellipse at top, rgba(251,191,36,.18), transparent 60%)';
   const el = document.getElementById('dailyDevModal'); if(!el) return;
   document.getElementById('ddmTitle').textContent = d.title;
   document.getElementById('ddmVerse').textContent = d.verse;
