@@ -43,6 +43,10 @@ let _worshipIsShuffleOn = false;
 let _worshipPlayedSongs = [];
 let _worshipInitDone = false;
 let _worshipAutoplayListenerAdded = false;
+// Tracks live YouTube player state from postMessage events:
+//   1 = playing, 2 = paused, 0 = ended, 3 = buffering, -1 = unstarted
+let _worshipPlayerState = -1;
+let _worshipLastEndedAt = 0;
 
 // Privacy: youtube-nocookie.com sets no cookies on first load.
 const WORSHIP_EMBED_BASE = 'https://www.youtube-nocookie.com/embed/';
@@ -92,7 +96,7 @@ function worshipPlayVideo(index) {
   }
 
   const player = document.getElementById('worship-youtubePlayer');
-  if (player) player.src = WORSHIP_EMBED_BASE + video.id + '?autoplay=1&rel=0&enablejsapi=1';
+  if (player) player.src = WORSHIP_EMBED_BASE + video.id + '?autoplay=1&rel=0&enablejsapi=1&origin=' + encodeURIComponent(window.location.origin);
 
   const titleEl = document.getElementById('worship-nowPlayingTitle');
   const artistEl = document.getElementById('worship-nowPlayingArtist');
@@ -105,12 +109,42 @@ function worshipPlayVideo(index) {
   const mini = document.getElementById('wpMini');
   if (mini) mini.classList.remove('hidden');
 
-  const playBtn = document.getElementById('worship-playPauseBtn');
-  if (playBtn) playBtn.textContent = '❚❚';
+  // Optimistic state: autoplay=1 means we expect "playing" once the iframe finishes loading.
+  // The real state will be reconciled the moment YouTube sends its first message event.
+  _worshipPlayerState = 1;
+  worshipUpdatePlayPauseIcon();
 
   worshipUpdateActiveCard();
   worshipStartProgressTick(video.duration);
   worshipSetupAutoplayListener();
+  // Subscribe to YouTube playerState events from this freshly-loaded iframe.
+  // Without this handshake nocookie iframes never push state to the parent.
+  setTimeout(worshipSubscribeToPlayer, 800);
+}
+
+// Tell the embedded player to start sending us state/info events.
+function worshipSubscribeToPlayer(){
+  const iframe = document.getElementById('worship-youtubePlayer');
+  if(!iframe || !iframe.contentWindow) return;
+  try {
+    iframe.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 'worship-youtubePlayer', channel: 'widget' }), '*');
+  } catch(e) { /* no-op */ }
+}
+
+// Send a command (playVideo / pauseVideo / etc.) to the embedded player via postMessage.
+function worshipSendPlayerCommand(func, args){
+  const iframe = document.getElementById('worship-youtubePlayer');
+  if(!iframe || !iframe.contentWindow) return;
+  try {
+    iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: func, args: args || [] }), '*');
+  } catch(e) { /* no-op */ }
+}
+
+function worshipUpdatePlayPauseIcon(){
+  const btn = document.getElementById('worship-playPauseBtn');
+  if(!btn) return;
+  // 1 = playing → show pause glyph. Anything else (paused/ended/buffering/unstarted) → show play glyph.
+  btn.textContent = (_worshipPlayerState === 1) ? '❚❚' : '▶';
 }
 
 // Approximate progress bar — drives the thin gold strip across the top of
@@ -146,14 +180,21 @@ function worshipToggleFullscreen(){
 }
 
 function worshipTogglePlayPause() {
+  // No song queued yet → start the first one.
   if (_worshipCurrentIndex === -1) {
     worshipPlayVideo(0);
     return;
   }
-  const video = WORSHIP_PLAYLIST[_worshipCurrentIndex];
-  const player = document.getElementById('worship-youtubePlayer');
-  if (player) player.src = WORSHIP_EMBED_BASE + video.id + '?autoplay=1&rel=0&enablejsapi=1';
-  worshipSetupAutoplayListener();
+  // Toggle via the IFrame API instead of reloading the src (which would restart the song).
+  // If we're playing, pause. Otherwise (paused / ended / buffering / unstarted) play.
+  if (_worshipPlayerState === 1) {
+    worshipSendPlayerCommand('pauseVideo');
+    _worshipPlayerState = 2;
+  } else {
+    worshipSendPlayerCommand('playVideo');
+    _worshipPlayerState = 1;
+  }
+  worshipUpdatePlayPauseIcon();
 }
 
 function worshipSetupAutoplayListener() {
@@ -162,13 +203,33 @@ function worshipSetupAutoplayListener() {
   window.addEventListener('message', function(event) {
     // Accept messages from both nocookie and main YouTube origins.
     if (event.origin !== 'https://www.youtube-nocookie.com' && event.origin !== 'https://www.youtube.com') return;
-    try {
-      const data = JSON.parse(event.data);
-      // state 0 = video ended → autoplay next
-      if (data.event === 'onStateChange' && data.info === 0) {
+    let data;
+    try { data = JSON.parse(event.data); } catch(e) { return; }
+    if (!data || typeof data !== 'object') return;
+
+    // YouTube fires two relevant event shapes depending on lifecycle stage:
+    //   { event: 'onStateChange', info: <0|1|2|3|-1> }
+    //   { event: 'infoDelivery',  info: { playerState: <0|1|2|3|-1>, ... } }
+    let state = null;
+    if (data.event === 'onStateChange' && typeof data.info === 'number') {
+      state = data.info;
+    } else if (data.event === 'infoDelivery' && data.info && typeof data.info.playerState === 'number') {
+      state = data.info.playerState;
+    }
+    if (state === null) return;
+
+    _worshipPlayerState = state;
+    worshipUpdatePlayPauseIcon();
+
+    // State 0 = ENDED → auto-advance to next song (shuffle-aware via worshipPlayNext).
+    // Dedupe: infoDelivery + onStateChange can both fire for the same ENDED event within a few ms.
+    if (state === 0) {
+      const now = Date.now();
+      if (now - _worshipLastEndedAt > 1500) {
+        _worshipLastEndedAt = now;
         setTimeout(worshipPlayNext, 500);
       }
-    } catch(e) { /* ignore parse errors from non-JSON YT messages */ }
+    }
   });
 }
 
