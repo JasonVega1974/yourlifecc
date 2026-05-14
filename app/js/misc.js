@@ -886,6 +886,9 @@ document.addEventListener('keydown', e=>{
   };
 
   window.launchBigConfetti = function(){
+    // Phase B-Lite session 3: reduced-motion guard. Canvas + rAF confetti
+    // can't be stopped by CSS @media — bail at the call site instead.
+    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     // Big burst — used for quiz pass / cert earn
     launchConfetti({count:200, origin:{x:.5,y:.5}, spread:120, scalar:1.2, decay:.91});
     setTimeout(()=>launchConfetti({count:80, origin:{x:.2,y:.6}, spread:60}), 200);
@@ -893,6 +896,10 @@ document.addEventListener('keydown', e=>{
   };
 
   window.launchSideConfetti = function(){
+    // Phase B-Lite session 3: reduced-motion guard. Catches all 5 callers
+    // (chores.js:93, goals.js:84, email.js:1433/1475, skills.js:3797) in
+    // one place since the function definition is the single source.
+    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     // Small side burst — used for single correct answer
     launchConfetti({count:40, origin:{x:.5,y:.6}, spread:50, scalar:.9, decay:.94});
   };

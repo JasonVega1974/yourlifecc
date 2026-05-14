@@ -1036,21 +1036,32 @@ const TAB_IA = [
   },
   {id:'learn', label:'Learn', icon:'📚', accent:'var(--c)',
     primary:[
-      {sectionId:'s-school', label:'School',        icon:'🎓', accent:'var(--section-school)'},
-      {sectionId:'s-skills', label:'Life Skills',   icon:'🧠', accent:'var(--section-life-skills)'},
-      {sectionId:'s-cbt',    label:'Tech Skills',   icon:'💻', accent:'var(--section-life-skills)'},
-      {sectionId:'s-sports', label:'Sports',        icon:'⚽', accent:'var(--section-sports)'},
-      {wellTab:'academy',    label:'Faith Academy', icon:'🎓', accent:'var(--accent,#4338ca)'}
+      {sectionId:'s-school',    label:'School',           icon:'🎓', accent:'var(--section-school)'},
+      {sectionId:'s-skills',    label:'Life Skills',      icon:'🧠', accent:'var(--section-life-skills)'},
+      {sectionId:'s-cbt',       label:'Tech Skills',      icon:'💻', accent:'var(--section-life-skills)'},
+      {sectionId:'s-sports',    label:'Sports',           icon:'⚽', accent:'var(--section-sports)'},
+      {wellTab:'academy',       label:'Faith Academy',    icon:'🎓', accent:'var(--accent,#4338ca)'},
+      {sectionId:'s-resume',    label:'Jobs / Resume',    icon:'💼', accent:'var(--section-school)'},
+      {sectionId:'s-resources', label:'School Resources', icon:'📦', accent:'var(--section-school)'},
+      {sectionId:'s-growing',   label:'Growing Up',       icon:'🌱', accent:'var(--section-daily-life)'},
+      {sectionId:'s-driving',   label:'Driving',          icon:'🚗', accent:'var(--section-life-skills)'},
+      {sectionId:'s-craft',     label:'Music & Practice', icon:'🎵', accent:'var(--section-life-skills)'}
     ]
   },
   {id:'life',  label:'Life',  icon:'🌱', accent:'var(--c)',
     primary:[
-      {sectionId:'s-chores',  label:'Chores',  icon:'✅', accent:'var(--section-daily-life)'},
-      {sectionId:'s-goals',   label:'Goals',   icon:'🎯', accent:'var(--section-goals)'},
-      {sectionId:'s-health',  label:'Health',  icon:'💪', accent:'var(--section-health)'},
-      {sectionId:'s-finance', label:'Finance', icon:'💰', accent:'var(--section-finance)'},
-      {sectionId:'s-journal', label:'Journal', icon:'✍️', accent:'var(--section-journal)'},
-      {sectionId:'s-mood',    label:'Mood',    icon:'😊', accent:'var(--section-journal)'}
+      {sectionId:'s-chores',     label:'Chores',       icon:'✅', accent:'var(--section-daily-life)'},
+      {sectionId:'s-goals',      label:'Goals',        icon:'🎯', accent:'var(--section-goals)'},
+      {sectionId:'s-health',     label:'Health',       icon:'💪', accent:'var(--section-health)'},
+      {sectionId:'s-finance',    label:'Finance',      icon:'💰', accent:'var(--section-finance)'},
+      {sectionId:'s-journal',    label:'Journal',      icon:'✍️', accent:'var(--section-journal)'},
+      {sectionId:'s-mood',       label:'Mood',         icon:'😊', accent:'var(--section-journal)'},
+      {sectionId:'s-schedule',   label:'Schedule',     icon:'📝', accent:'var(--section-daily-life)'},
+      {sectionId:'s-calendar',   label:'Calendar',     icon:'📅', accent:'var(--section-daily-life)'},
+      {sectionId:'s-rewards',    label:'Rewards',      icon:'🎰', accent:'var(--section-daily-life)'},
+      {sectionId:'s-contests',   label:'Challenges',   icon:'🏆', accent:'var(--section-goals)'},
+      {sectionId:'s-motivation', label:'Fuel Wall',    icon:'🔥', accent:'var(--section-goals)'},
+      {sectionId:'s-reading',    label:'Reading List', icon:'📖', accent:'var(--section-journal)'}
     ]
   },
   {id:'faith', label:'Faith', icon:'✝️', accent:'var(--accent,#4338ca)',
@@ -1068,25 +1079,33 @@ const TAB_IA = [
   },
   {id:'me',    label:'Me',    icon:'👤', accent:'var(--c)',
     primary:[
-      {sectionId:'s-badges',   label:'Badges',   icon:'🏅'},
-      {sectionId:'s-referral', label:'Refer',    icon:'🤝'},
-      {action:'settings',      label:'Settings', icon:'⚙️'},
-      {action:'profile',       label:'Profile',  icon:'👤'},
-      {action:'sign-out',      label:'Sign Out', icon:'🚪'}
+      {sectionId:'s-badges',     label:'Badges',     icon:'🏅', accent:'var(--c)'},
+      {sectionId:'s-milestones', label:'Milestones', icon:'🗺️', accent:'var(--section-goals)'},
+      {sectionId:'s-bio',        label:'Bio Page',   icon:'📋', accent:'var(--c)'},
+      {sectionId:'s-mentors',    label:'My People',  icon:'🤝', accent:'var(--section-journal)'},
+      {sectionId:'s-referral',   label:'Refer',      icon:'🎁', accent:'var(--c)'},
+      {action:'settings',        label:'Settings',   icon:'⚙️', accent:'var(--c)'},
+      {action:'profile',         label:'Profile',    icon:'👤', accent:'var(--c)'},
+      {action:'sign-out',        label:'Sign Out',   icon:'🚪', accent:'var(--c)'}
     ]
   }
 ];
 
-// Sections currently NOT mapped to a tab. Resolved in session 2 when
-// the landing pages render — either added to a tab's primary[] as a
-// card, surfaced via a "More" overflow, or kept reachable via the
-// desktop sidebar only:
-//   Learn candidates: s-resume, s-bio, s-resources, s-growing,
-//                     s-driving, s-mentors, s-schedule, s-calendar
-//   Life candidates:  s-rewards, s-contests, s-motivation, s-craft,
-//                     s-reading, s-milestones
-//   Outside teen tabs by design: s-christian-living (dormant per F8),
-//                                s-parent (parent surface only)
+// Tab IA coverage status (Phase B-Lite session 3):
+// All 14 previously-unmapped teen sections are now placed:
+//   Learn  +5: s-resume, s-resources, s-growing, s-driving, s-craft
+//   Life   +6: s-schedule, s-calendar, s-rewards, s-contests,
+//              s-motivation, s-reading
+//   Me     +3: s-bio, s-mentors, s-milestones
+// Outside teen tabs by design — reachable only via desktop sidebar or
+// other entry points (no tab card):
+//   s-christian-living (dormant CLG section per F8 — the 10 topics
+//                       moved to FAITH_LIFE_TOPICS_PLANS)
+//   s-parent           (parent surface — accessed via avatar switcher
+//                       or the Phase 4 default-landing branch)
+//   s-referral         (mapped to Me tab as 'Refer' card — preserved
+//                       here as a note that referral entry is also
+//                       reachable via the top-right CTA on desktop)
 
 // ── Bottom tab bar + tab landing renderers (Phase B-Lite session 2) ──
 // Render targets declared in app/index.html:

@@ -4568,3 +4568,28 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
   line-height:1.1;
 }
 
+/* ════════════════════════════════════════════════════════════
+   Phase B-Lite session 3 — Reduced-motion accessibility
+   Per docs/design-system.md §5: collapse all motion to near-zero
+   when prefers-reduced-motion is set. Cross-fades stay perceptible
+   via the .cross-fade opt-in class. Celebration FX (canvas + rAF
+   confetti in misc.js) is guarded at the JS function level — see
+   launchBigConfetti / launchSideConfetti.
+   WCAG 2.3.3 accessibility requirement, not a preference.
+   ════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* Cross-fade exception — opacity transitions stay at 100ms so they
+     don't become harsh flashes. Opt-in via the .cross-fade class. */
+  .cross-fade {
+    transition-duration: 100ms !important;
+  }
+}
+
