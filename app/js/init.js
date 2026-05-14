@@ -679,13 +679,113 @@ function renderHeroQuickStats(){
   }
 }
 
+// ═══════════════════════════════════════════════════════════════════
+// Phase F — DAILY REFLECTION (AI mode='daily-reflection') — 2026-05-15
+// Fetches one reflection question from /api/ai-summary using today's
+// verse + (optional) name + today's mood. User can save their response
+// to D.journal. Loading + error states match the ask-bible pattern.
+// ═══════════════════════════════════════════════════════════════════
+let _heroReflectQuestion = '';
+
+function openHeroReflect(){
+  const body = document.getElementById('heroReflectBody');
+  const status = document.getElementById('heroReflectStatus');
+  const q = document.getElementById('heroReflectQuestion');
+  const ta = document.getElementById('heroReflectResponse');
+  const acts = document.getElementById('heroReflectActions');
+  const btn = document.getElementById('heroReflectBtn');
+  if(!body) return;
+  body.style.display = '';
+  if(btn) btn.style.display = 'none';
+  if(q){ q.style.display = 'none'; q.textContent = ''; }
+  if(ta){ ta.style.display = 'none'; ta.value = ''; }
+  if(acts) acts.style.display = 'none';
+  if(status){
+    status.style.display = '';
+    status.textContent = '✨ Thinking…';
+  }
+  // Compose prompt — verse, name, mood. Tolerates missing fields.
+  const verseText = (document.getElementById('heroTodaysVerseText')||{}).textContent || '';
+  const verseRef  = (document.getElementById('heroTodaysVerseRef')||{}).textContent || '';
+  let name = (D && D.name) ? String(D.name).trim().split(/\s+/)[0] : '';
+  let mood = '';
+  const today = new Date().toISOString().slice(0,10);
+  const todayMood = (D.moods||[]).find(m => m.date === today);
+  if(todayMood){
+    const moodMap = {1:'rough',2:'low',3:'okay',4:'good',5:'great'};
+    mood = moodMap[todayMood.level] || '';
+  }
+  const promptText = [
+    verseText ? ('Verse: ' + verseText) : 'No specific verse today.',
+    verseRef ? ('Reference: ' + verseRef.replace(/^—\s*/, '')) : '',
+    name ? ('User name: ' + name) : '',
+    mood ? ('Today\'s mood: ' + mood) : '',
+    '',
+    'Ask one warm reflection question.'
+  ].filter(Boolean).join('\n');
+
+  fetch('/api/ai-summary', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mode: 'daily-reflection', prompt: promptText })
+  })
+  .then(r => r.ok ? r.json() : Promise.reject(r.status))
+  .then(data => {
+    if(!data || !data.text){
+      throw new Error('Empty reflection');
+    }
+    _heroReflectQuestion = data.text.trim();
+    if(status) status.style.display = 'none';
+    if(q){ q.textContent = _heroReflectQuestion; q.style.display = ''; }
+    if(ta) ta.style.display = '';
+    if(acts) acts.style.display = 'flex';
+  })
+  .catch(err => {
+    if(status){
+      status.innerHTML = '<span style="color:#f87171;">Couldn\'t connect — </span>'
+        + '<button type="button" onclick="openHeroReflect()" style="background:none;border:none;color:#fbbf24;cursor:pointer;font-size:.85rem;font-weight:600;text-decoration:underline;font-family:var(--fm);">try again</button>';
+    }
+  });
+}
+
+function closeHeroReflect(){
+  const body = document.getElementById('heroReflectBody');
+  const btn = document.getElementById('heroReflectBtn');
+  if(body) body.style.display = 'none';
+  if(btn) btn.style.display = '';
+}
+
+function saveHeroReflect(){
+  const ta = document.getElementById('heroReflectResponse');
+  const responseText = ta ? ta.value.trim() : '';
+  if(!_heroReflectQuestion && !responseText){
+    closeHeroReflect();
+    return;
+  }
+  if(!D.journal) D.journal = [];
+  D.journal.unshift({
+    id: Date.now(),
+    text: (responseText || '(saved without a response)')
+        + '\n\n— Reflection prompt: ' + _heroReflectQuestion,
+    cat: 'reflection',
+    date: new Date().toLocaleDateString()
+  });
+  if(D.journal.length > 500) D.journal = D.journal.slice(0, 500);
+  save();
+  showToast(responseText ? 'Reflection saved to journal ✓' : 'Closed');
+  closeHeroReflect();
+}
+
 // ── TODAY'S VERSE on hero (Phase B-Lite session 2) ────────────────────
 // Uses the existing verse pool ([...VERSES, ...D.verses]) — same source as
 // renderVerse() in ui.js. Tap routes to the faith hub via wellGoto('home')
 // (already wired on the #heroTodaysVerse onclick attr in index.html).
 function renderTodaysVerseHero(){
   const card = document.getElementById('heroTodaysVerse');
-  if(!card) return;
+  // Phase F — show the reflect-with-AI card alongside the verse. Same
+  // visibility rules: only when there's a verse to reflect on.
+  const reflectCard = document.getElementById('heroReflectCard');
+  if(reflectCard) reflectCard.style.display = '';
   // VERSES is a global defined by data.js or similar — guard for load order.
   const pool = [].concat(
     (typeof VERSES !== 'undefined' && Array.isArray(VERSES)) ? VERSES : [],

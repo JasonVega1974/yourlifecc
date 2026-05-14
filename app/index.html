@@ -825,6 +825,23 @@
     <div id="heroTodaysVerseRef" style="font-family:var(--fn);font-size:.72rem;letter-spacing:.15em;color:rgba(251,191,36,.85);text-transform:uppercase;font-weight:700;"></div>
   </div>
 
+  <!-- Phase F — Daily reflection card. Tap "Reflect with AI" to expand;
+       calls /api/ai-summary mode=daily-reflection with the day's verse +
+       (optional) user name + today's mood. Response shown as a Georgia-
+       italic question; user can type a response saved to D.journal. -->
+  <div id="heroReflectCard" style="display:none;cursor:default;background:linear-gradient(135deg,rgba(251,191,36,.06),rgba(251,191,36,.02));border:1px solid rgba(251,191,36,.22);border-radius:14px;padding:.85rem 1.1rem;margin-bottom:1rem;">
+    <button type="button" id="heroReflectBtn" onclick="openHeroReflect()" style="width:100%;background:none;border:none;color:#fbbf24;font-family:var(--fm);font-size:.85rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.35rem 0;">✨ Reflect with AI</button>
+    <div id="heroReflectBody" style="display:none;margin-top:.85rem;">
+      <div id="heroReflectStatus" style="font-size:.85rem;color:var(--tx2);text-align:center;padding:.7rem;"></div>
+      <div id="heroReflectQuestion" style="display:none;font-family:Georgia,serif;font-style:italic;font-size:1rem;color:var(--tx);line-height:1.6;padding:.7rem .9rem;background:rgba(251,191,36,.05);border-left:3px solid #fbbf24;border-radius:0 8px 8px 0;margin-bottom:.7rem;"></div>
+      <textarea id="heroReflectResponse" rows="3" placeholder="Your reflection (optional — saved to your journal)" style="display:none;width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.6rem .8rem;color:var(--tx);font-family:var(--fm);font-size:.85rem;resize:vertical;min-height:70px;"></textarea>
+      <div id="heroReflectActions" style="display:none;gap:.4rem;margin-top:.55rem;justify-content:flex-end;">
+        <button type="button" onclick="closeHeroReflect()" style="background:none;border:1px solid rgba(255,255,255,.14);color:var(--tx2);padding:.4rem .85rem;border-radius:8px;cursor:pointer;font-size:.75rem;font-family:var(--fm);">Close</button>
+        <button type="button" onclick="saveHeroReflect()" style="background:#fbbf24;border:1px solid #fbbf24;color:#0b1020;padding:.4rem .9rem;border-radius:8px;cursor:pointer;font-size:.75rem;font-weight:700;font-family:var(--fm);">Save to journal</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 4 quick action cards (2x2 grid on all viewports per the brief).
        Each card carries the matching section accent on its left border. -->
   <div id="heroQuickActions" style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1rem;">
@@ -1655,6 +1672,7 @@
     <button class="tab" onclick="sTab('gpa',this)">🎓 GPA</button>
     <button class="tab" onclick="sTab('study',this)">⏱ Study Timer</button>
     <button class="tab" onclick="sTab('prep',this)">🎯 Study Prep</button>
+    <button class="tab" onclick="sTab('aiTutor',this)">✨ AI Partner</button>
   </div>
 
   <!-- PB Mini Bar -->
@@ -1782,6 +1800,29 @@
 </div>
 
 <!-- ══ STUDY PREP TAB ══════════════════════════════════════ -->
+<!-- Phase F — AI Study Partner. Three sub-modes: Explain / Quiz / Help me write.
+     User picks a sub-mode, types a subject + (optional) topic / draft,
+     gets a response. Quiz mode renders interactive multiple-choice cards. -->
+<div id="st-aiTutor" style="display:none;">
+  <div class="card" style="border-left:4px solid var(--section-school);">
+    <div class="ct">✨ AI Study Partner</div>
+    <div style="font-size:.8rem;color:var(--tx2);line-height:1.55;margin-bottom:.85rem;">
+      Pick how you want help. Type your subject and topic; I'll explain, quiz, or coach your writing.
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem;margin-bottom:.85rem;">
+      <button type="button" id="apModeExplain" class="ap-mode-btn" onclick="aiPartnerSetMode('explain',this)" style="background:rgba(56,189,248,.18);border:1px solid var(--section-school);color:var(--tx);padding:.55rem .4rem;border-radius:9px;cursor:pointer;font-family:var(--fm);font-size:.75rem;font-weight:600;">📖 Explain it</button>
+      <button type="button" id="apModeQuiz" class="ap-mode-btn" onclick="aiPartnerSetMode('quiz',this)" style="background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.2);color:var(--tx2);padding:.55rem .4rem;border-radius:9px;cursor:pointer;font-family:var(--fm);font-size:.75rem;font-weight:600;">🎯 Quiz me</button>
+      <button type="button" id="apModeWrite" class="ap-mode-btn" onclick="aiPartnerSetMode('write',this)" style="background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.2);color:var(--tx2);padding:.55rem .4rem;border-radius:9px;cursor:pointer;font-family:var(--fm);font-size:.75rem;font-weight:600;">✍️ Help me write</button>
+    </div>
+    <label style="margin-top:0;">Subject</label>
+    <input type="text" id="apSubject" placeholder="Biology, Algebra, History…">
+    <label id="apTopicLbl">Topic or question</label>
+    <textarea id="apTopic" rows="3" placeholder="Photosynthesis · Quadratic formula · Causes of WWI · paste your draft here for writing mode" style="resize:vertical;min-height:70px;"></textarea>
+    <button type="button" onclick="aiPartnerSubmit()" style="width:100%;margin-top:.7rem;background:var(--section-school);border:1px solid var(--section-school);color:#0b1020;padding:.6rem;border-radius:9px;cursor:pointer;font-family:var(--fm);font-size:.85rem;font-weight:700;">Ask the AI Partner</button>
+    <div id="apOutput" style="margin-top:1rem;"></div>
+  </div>
+</div>
+
 <div id="st-prep" style="display:none;">
   <div class="tabs" id="prepTabs" style="flex-wrap:wrap;gap:.3rem;margin-bottom:.9rem;">
     <button class="tab active" onclick="prepTab('sat',this)">📝 SAT</button>
@@ -2482,6 +2523,14 @@
     <button class="tab" onclick="gFilter('short',this)">⚡ Short-Term</button>
     <button class="tab" onclick="gFilter('done',this)">✅ Achieved</button>
   </div>
+  <!-- Phase F — "Need inspiration?" button. Pops a modal with 3 AI
+       suggestions tailored to the user's age bracket + active sections.
+       Each suggestion has an "Add this goal" CTA that prefills the
+       Add Goal modal. -->
+  <div style="display:flex;justify-content:flex-end;margin-bottom:.7rem;">
+    <button type="button" onclick="openGoalSuggest()" style="background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.28);color:var(--section-goals);padding:.5rem 1rem;border-radius:9px;cursor:pointer;font-size:.8rem;font-weight:700;font-family:var(--fm);display:inline-flex;align-items:center;gap:.4rem;">✨ Need inspiration?</button>
+  </div>
+
   <div id="goalsList" style="margin-bottom:1.2rem;"></div>
 
   <!-- ── Career Explorer ────────────────────────────────────────── -->
@@ -4332,6 +4381,19 @@
     <div class="st">The Well</div>
     <span class="tip-wrap"><span class="tip-btn" onmouseenter="hlp('scripture',this,event)" onmouseleave="hlpHide()">?</span></span>
     <div class="sl"></div>
+  </div>
+
+  <!-- Phase F — Faith chat prominent entry. The 'ask-bible' AI mode
+       was shipped in F2-G; this card surfaces it on every Well view so
+       users don't have to hunt for the Q&A surface. openAskBible() in
+       faith.js opens the existing modal. -->
+  <div onclick="(typeof openAskBible==='function')&&openAskBible()" style="cursor:pointer;background:linear-gradient(135deg,rgba(67,56,202,.14),rgba(20,184,166,.06));border:1px solid rgba(67,56,202,.3);border-left:4px solid var(--accent,#4338ca);border-radius:14px;padding:.95rem 1.15rem;margin-bottom:1rem;display:flex;align-items:center;gap:.85rem;-webkit-tap-highlight-color:transparent;">
+    <div style="font-size:1.7rem;line-height:1;flex-shrink:0;">💬</div>
+    <div style="flex:1;min-width:0;">
+      <div style="font-family:var(--fh);font-size:1.05rem;letter-spacing:.04em;color:var(--tx);line-height:1.2;">Ask anything about Scripture</div>
+      <div style="font-family:Georgia,serif;font-style:italic;font-size:.82rem;color:var(--tx2);margin-top:.15rem;line-height:1.45;">Bring your honest question — get a thoughtful, Scripture-grounded answer.</div>
+    </div>
+    <div style="font-size:1.3rem;color:var(--accent,#4338ca);flex-shrink:0;">→</div>
   </div>
 
   <!-- Top tab bar — single-row horizontal scroll on desktop so all 13
@@ -9664,6 +9726,20 @@
     <div class="ma">
       <button class="btn bgh" onclick="closeModal('goalAddModal')">Cancel</button>
       <button class="btn bp" onclick="saveGoal()" style="background:var(--section-goals);border-color:var(--section-goals);color:#0b1020;">Add Goal</button>
+    </div>
+  </div>
+</div>
+
+<!-- Phase F — Goal Suggest modal (AI mode='goal-suggest'). 3 cards
+     with title / why / firstStep, each with an "Add this goal" CTA. -->
+<div class="mo" id="goalSuggestModal">
+  <div class="md" style="max-width:540px;">
+    <div class="mdt" style="color:var(--section-goals);">✨ GOAL SUGGESTIONS</div>
+    <div style="font-size:.82rem;color:var(--tx2);margin-bottom:.85rem;line-height:1.55;">Three goals picked for where you are right now. Tap any to add it.</div>
+    <div id="gsStatus" style="text-align:center;padding:1.5rem 0;color:var(--tx2);font-size:.85rem;"></div>
+    <div id="gsList" style="display:none;"></div>
+    <div class="ma" style="margin-top:.85rem;">
+      <button class="btn bgh" onclick="closeModal('goalSuggestModal')">Close</button>
     </div>
   </div>
 </div>

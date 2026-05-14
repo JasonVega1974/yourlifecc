@@ -280,6 +280,95 @@ function showGoalCompletionCard(g){
   }, 4000);
 }
 
+// ═══════════════════════════════════════════════════════════════════
+// Phase F — GOAL SUGGEST (AI mode='goal-suggest') — 2026-05-15
+// Pops the suggestion modal, fetches 3 AI-tailored goal ideas, lets
+// the user prefill the Add-Goal modal with any of them.
+// ═══════════════════════════════════════════════════════════════════
+function openGoalSuggest(){
+  if(typeof openModal === 'function') openModal('goalSuggestModal');
+  const status = document.getElementById('gsStatus');
+  const list = document.getElementById('gsList');
+  if(status){ status.style.display = ''; status.textContent = '✨ Thinking…'; }
+  if(list){ list.style.display = 'none'; list.innerHTML = ''; }
+
+  // Compose context: age bracket, top active sections (from sidebar
+  // usage if tracked, else from existing goal types), existing goal titles.
+  const age = (D && D.ageBracket) || 'unspecified';
+  const existing = (D.goals||[]).filter(g => !g.done).slice(0, 8).map(g => g.text).join('; ');
+  const sectionsActive = [
+    (D.goals||[]).length ? 'goals' : null,
+    (D.choreList||[]).length ? 'chores' : null,
+    (D.classes||[]).length ? 'school' : null,
+    (D.weightLog||[]).length || (D.sleepLog||[]).length ? 'health' : null,
+    (D.transactions||[]).length ? 'finance' : null,
+    (D.scrPoints||0) > 0 || (D.faithPlans && Object.keys(D.faithPlans.active||{}).length) ? 'faith' : null
+  ].filter(Boolean).join(', ') || 'none yet';
+
+  const promptText = [
+    'Age bracket: ' + age,
+    'Active sections: ' + sectionsActive,
+    'Existing goals: ' + (existing || '(none)'),
+    '',
+    'Suggest 3 specific, achievable goals appropriate for this user.'
+  ].join('\n');
+
+  fetch('/api/ai-summary', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mode: 'goal-suggest', prompt: promptText })
+  })
+  .then(r => r.ok ? r.json() : Promise.reject(r.status))
+  .then(data => {
+    if(!data || data.crisis){ throw new Error('Unable to suggest'); }
+    if(data.ok === false || !data.suggestions || !Array.isArray(data.suggestions)){
+      throw new Error('Parse error');
+    }
+    renderGoalSuggestions(data.suggestions);
+  })
+  .catch(err => {
+    if(status){
+      status.innerHTML = '<span style="color:#f87171;">Couldn\'t connect — </span>'
+        + '<button type="button" onclick="openGoalSuggest()" style="background:none;border:none;color:var(--section-goals);cursor:pointer;font-size:.85rem;font-weight:600;text-decoration:underline;font-family:var(--fm);">try again</button>';
+    }
+  });
+}
+
+function renderGoalSuggestions(suggestions){
+  const status = document.getElementById('gsStatus');
+  const list = document.getElementById('gsList');
+  if(!list) return;
+  if(status) status.style.display = 'none';
+  list.style.display = '';
+  // Store the suggestions on a global so applyGoalSuggest can find them
+  // by index without quoting strings in onclick attrs.
+  window._goalSuggestions = suggestions.slice(0, 3);
+  list.innerHTML = window._goalSuggestions.map((s, i) =>
+    '<div style="background:rgba(249,115,22,.04);border:1px solid rgba(249,115,22,.2);border-left:4px solid var(--section-goals);border-radius:12px;padding:.85rem 1rem;margin-bottom:.6rem;">'
+    + '<div style="font-family:var(--fh);font-size:1.1rem;letter-spacing:.04em;margin-bottom:.35rem;color:var(--tx);">' + escapeHtml(s.title || '') + '</div>'
+    + '<div style="font-family:Georgia,serif;font-style:italic;font-size:.82rem;color:var(--tx2);margin-bottom:.5rem;line-height:1.5;">' + escapeHtml(s.why || '') + '</div>'
+    + (s.firstStep
+        ? '<div style="font-size:.78rem;color:var(--tx);padding:.4rem .65rem;background:rgba(255,255,255,.04);border-radius:8px;margin-bottom:.55rem;"><b style="color:var(--section-goals);">First step:</b> ' + escapeHtml(s.firstStep) + '</div>'
+        : '')
+    + '<button type="button" onclick="applyGoalSuggest(' + i + ')" style="background:var(--section-goals);border:none;color:#0b1020;padding:.45rem .9rem;border-radius:8px;cursor:pointer;font-size:.78rem;font-weight:700;font-family:var(--fm);">Add this goal →</button>'
+    + '</div>'
+  ).join('');
+}
+
+function applyGoalSuggest(idx){
+  const list = window._goalSuggestions || [];
+  const s = list[idx];
+  if(!s) return;
+  // Prefill the Add-Goal modal with this suggestion.
+  if(typeof closeModal === 'function') closeModal('goalSuggestModal');
+  setTimeout(() => {
+    if(typeof openModal === 'function') openModal('goalAddModal');
+    const t = document.getElementById('gText'); if(t) t.value = s.title || '';
+    const m = document.getElementById('gMotivation'); if(m) m.value = s.why || '';
+    const tp = document.getElementById('gType'); if(tp && s.type) tp.value = s.type;
+  }, 200);
+}
+
 function completeGoal(id){
   if(!D.goals) return;
   const g = D.goals.find(g=>g.id===id); if(!g) return;

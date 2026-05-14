@@ -12,6 +12,11 @@ function sTab(tab,btn){
   if(te) te.style.display='block';
   if(btn) btn.classList.add('active');
   if(tab==='gpa') renderGPA();
+  // Phase F: AI Study Partner — initialize default mode visual state on first open.
+  if(tab==='aiTutor'){
+    const def = document.getElementById('apModeExplain');
+    if(def && typeof aiPartnerSetMode === 'function') aiPartnerSetMode('explain', def);
+  }
 }
 function prepTab(tab,btn){
   document.querySelectorAll('[id^="pp-"]').forEach(t=>t.style.display='none');
@@ -660,5 +665,130 @@ function renderUpcoming(){
       <button class="db" onclick="deleteEvent(${ev.id})">✕</button>
     </div>`;
   }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// Phase F — AI STUDY PARTNER (AI mode='study-partner') — 2026-05-15
+// Three sub-modes: explain / quiz / write. Calls /api/ai-summary with
+// the chosen submode in req.body.submode. Quiz mode renders interactive
+// multiple-choice cards; explain/write render plain text feedback.
+// ═══════════════════════════════════════════════════════════════════
+let _aiPartnerMode = 'explain';
+
+function aiPartnerSetMode(mode, btn){
+  _aiPartnerMode = mode;
+  document.querySelectorAll('.ap-mode-btn').forEach(b => {
+    b.style.background = 'rgba(56,189,248,.06)';
+    b.style.borderColor = 'rgba(56,189,248,.2)';
+    b.style.color = 'var(--tx2)';
+  });
+  if(btn){
+    btn.style.background = 'rgba(56,189,248,.18)';
+    btn.style.borderColor = 'var(--section-school)';
+    btn.style.color = 'var(--tx)';
+  }
+  const lbl = document.getElementById('apTopicLbl');
+  const ta  = document.getElementById('apTopic');
+  if(mode === 'explain'){
+    if(lbl) lbl.textContent = 'What do you want explained?';
+    if(ta)  ta.placeholder  = 'Photosynthesis · Quadratic formula · Causes of WWI';
+  } else if(mode === 'quiz'){
+    if(lbl) lbl.textContent = 'Topic to quiz on';
+    if(ta)  ta.placeholder  = 'Cell biology · Algebra basics · Civil War causes';
+  } else if(mode === 'write'){
+    if(lbl) lbl.textContent = 'Paste your draft (or describe what you are writing)';
+    if(ta)  ta.placeholder  = 'Paste your essay paragraph here for coaching feedback…';
+  }
+}
+
+function aiPartnerSubmit(){
+  const subject = (document.getElementById('apSubject').value || '').trim();
+  const topic   = (document.getElementById('apTopic').value   || '').trim();
+  if(!topic){ showToast('Type a topic or question first'); return; }
+  const out = document.getElementById('apOutput');
+  if(out) out.innerHTML = '<div style="text-align:center;padding:1.2rem;color:var(--tx2);font-size:.85rem;">✨ Thinking…</div>';
+
+  const promptText = (subject ? 'Subject: ' + subject + '\n' : '') + topic;
+  fetch('/api/ai-summary', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mode: 'study-partner', submode: _aiPartnerMode, prompt: promptText })
+  })
+  .then(r => r.ok ? r.json() : Promise.reject(r.status))
+  .then(data => {
+    if(_aiPartnerMode === 'quiz'){
+      if(data.ok === false || !data.questions || !Array.isArray(data.questions)){
+        aiPartnerError(); return;
+      }
+      renderAiPartnerQuiz(data.questions);
+    } else {
+      if(!data || !data.text){ aiPartnerError(); return; }
+      renderAiPartnerText(data.text);
+    }
+  })
+  .catch(() => aiPartnerError());
+}
+
+function aiPartnerError(){
+  const out = document.getElementById('apOutput');
+  if(!out) return;
+  out.innerHTML = '<div style="text-align:center;padding:1rem;color:#f87171;font-size:.85rem;">Couldn\'t connect — '
+    + '<button type="button" onclick="aiPartnerSubmit()" style="background:none;border:none;color:var(--section-school);cursor:pointer;font-size:.85rem;font-weight:600;text-decoration:underline;font-family:var(--fm);">try again</button></div>';
+}
+
+function renderAiPartnerText(text){
+  const out = document.getElementById('apOutput');
+  if(!out) return;
+  out.innerHTML = '<div style="background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.18);border-left:4px solid var(--section-school);border-radius:12px;padding:.95rem 1.1rem;color:var(--tx);font-size:.88rem;line-height:1.65;white-space:pre-wrap;">' + escapeHtml(text) + '</div>';
+}
+
+function renderAiPartnerQuiz(questions){
+  const out = document.getElementById('apOutput');
+  if(!out) return;
+  window._apQuiz = questions;
+  window._apQuizAnswers = {};
+  out.innerHTML = questions.map((q, i) =>
+    '<div id="apq-' + i + '" style="background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.18);border-left:4px solid var(--section-school);border-radius:12px;padding:.85rem 1rem;margin-bottom:.65rem;">'
+    + '<div style="font-size:.85rem;font-weight:700;color:var(--tx);margin-bottom:.6rem;line-height:1.5;"><span style="color:var(--section-school);">Q' + (i+1) + '.</span> ' + escapeHtml(q.q || '') + '</div>'
+    + '<div style="display:flex;flex-direction:column;gap:.35rem;">'
+    + (q.options || []).map((opt, j) => {
+        const letter = String.fromCharCode(65 + j);
+        return '<button type="button" onclick="apQuizPick(' + i + ',\'' + letter + '\')" data-qi="' + i + '" data-opt="' + letter + '" style="text-align:left;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--tx);padding:.55rem .75rem;border-radius:8px;cursor:pointer;font-family:var(--fm);font-size:.82rem;line-height:1.45;"><b style="color:var(--section-school);margin-right:.4rem;">' + letter + '.</b>' + escapeHtml(opt) + '</button>';
+      }).join('')
+    + '</div>'
+    + '<div id="apq-fb-' + i + '" style="display:none;margin-top:.5rem;font-size:.78rem;line-height:1.5;"></div>'
+    + '</div>'
+  ).join('');
+}
+
+function apQuizPick(qi, letter){
+  const q = (window._apQuiz || [])[qi];
+  if(!q) return;
+  window._apQuizAnswers = window._apQuizAnswers || {};
+  if(window._apQuizAnswers[qi]) return; // already answered — lock in.
+  window._apQuizAnswers[qi] = letter;
+  const correct = String(q.correct || '').toUpperCase();
+  const isRight = letter === correct;
+  document.querySelectorAll('#apq-' + qi + ' [data-qi]').forEach(b => {
+    const lt = b.getAttribute('data-opt');
+    if(lt === correct){
+      b.style.background = 'rgba(52,211,153,.18)';
+      b.style.borderColor = 'var(--gr)';
+    } else if(lt === letter){
+      b.style.background = 'rgba(239,68,68,.14)';
+      b.style.borderColor = '#ef4444';
+    } else {
+      b.style.opacity = '.55';
+    }
+    b.disabled = true;
+    b.style.cursor = 'default';
+  });
+  const fb = document.getElementById('apq-fb-' + qi);
+  if(fb){
+    fb.style.display = '';
+    fb.style.color = isRight ? 'var(--gr)' : '#f87171';
+    const lead = isRight ? '✓ Correct.' : '✗ Correct answer: ' + correct + '.';
+    fb.innerHTML = '<b>' + lead + '</b> ' + (q.why ? escapeHtml(q.why) : '');
+  }
 }
 
