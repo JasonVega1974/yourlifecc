@@ -40,16 +40,28 @@ module.exports = async (req, res) => {
     // only — never the value). Helps triage 500s without burning a
     // Stripe call. Safe to leave on in production.
     if (req.method === 'GET') {
+      const _k = process.env.STRIPE_SECRET_KEY || '';
+      // Stripe's documented secret-key prefixes (verified against
+      // docs.stripe.com Authentication, current API):
+      //   sk_live_ / sk_test_  — Standard secret keys
+      //   rk_live_ / rk_test_  — Restricted API keys (granular permissions)
+      // Both can authenticate POST /v1/checkout/sessions in their
+      // respective modes; restricted keys just need write scope on
+      // Checkout Sessions in the Stripe Dashboard.
+      const stripeKeyKind =
+        (_k.startsWith('sk_live_') || _k.startsWith('rk_live_')) ? 'live' :
+        (_k.startsWith('sk_test_') || _k.startsWith('rk_test_')) ? 'test' :
+        'unknown';
       return res.status(200).json({
-        ok: true,
-        runtime:        process.version,
-        stripeKey:      Boolean(process.env.STRIPE_SECRET_KEY),
-        stripeKeyKind:  (process.env.STRIPE_SECRET_KEY || '').startsWith('sk_live_')
-                          ? 'live'
-                          : (process.env.STRIPE_SECRET_KEY || '').startsWith('sk_test_')
-                              ? 'test'
-                              : 'unknown',
-        method:         'donate.js v2 — defensive',
+        ok:            true,
+        runtime:       process.version,
+        stripeKey:     Boolean(_k),
+        stripeKeyKind: stripeKeyKind,
+        // Literal prefix (everything before the first underscore plus
+        // the underscore) so the user sees exactly what they pasted.
+        // Empty string if the key is empty / missing.
+        stripeKeyPrefix: _k ? (_k.split('_').slice(0,2).join('_') + '_') : '',
+        method:        'donate.js v3 — rk_ accepted',
       });
     }
 
@@ -85,10 +97,12 @@ module.exports = async (req, res) => {
 
     // Log key presence + kind (boolean / prefix only — never the value).
     // Shows up in Vercel logs to confirm env wiring on every call.
-    console.log('donate: invoked — stripeKeyPresent=true, kind=' +
-      (stripeKey.startsWith('sk_live_') ? 'live'
-        : stripeKey.startsWith('sk_test_') ? 'test'
-        : 'unknown') +
+    // Accepts both Standard secret keys (sk_) and Restricted keys (rk_).
+    const _kind =
+      (stripeKey.startsWith('sk_live_') || stripeKey.startsWith('rk_live_')) ? 'live' :
+      (stripeKey.startsWith('sk_test_') || stripeKey.startsWith('rk_test_')) ? 'test' :
+      'unknown';
+    console.log('donate: invoked — stripeKeyPresent=true, kind=' + _kind +
       ', amount=' + amount + ', currency=' + currency);
 
     // Mirror metadata on Session AND PaymentIntent. The webhook reads
