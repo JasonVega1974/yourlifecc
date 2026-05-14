@@ -4334,3 +4334,98 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   font-weight:400 !important;
   line-height:1.55 !important;
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   F11.1 — Mobile audit fixes (iPhone-focused, 2026-05-14)
+   Implements 9 of the 11 findings from docs/F11-mobile-audit-iphone.md.
+   Skipped: P1-02 schedule mobile variant, P1-03 marketing compare-table
+   mobile variant — both need design work, tracked as follow-ups.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── P0-01 — iOS X+ home-indicator safe area ─────────────────────
+   Pair with viewport-fit=cover on app/index.html. env() resolves to 0
+   on devices without an indicator, so this is harmless everywhere. */
+@media (max-width: 860px){
+  #app{ padding-bottom: calc(5rem + env(safe-area-inset-bottom)); }
+}
+.toast{ bottom: calc(1.8rem + env(safe-area-inset-bottom)); }
+#tutReturnBtn{ bottom: calc(1.4rem + env(safe-area-inset-bottom)); }
+#s-worship .wp-mini{ padding-bottom: env(safe-area-inset-bottom); }
+
+/* ── P0-02 — Apple HIG 44pt action button minimum ──────────────── */
+.btn{ min-height:44px; padding:.7rem 1.15rem; }
+
+/* ── P1-01 — Enlarge tap targets on small icons & controls.
+      Visual size stays close to current; hit area expands via either
+      a transparent ::before overlay (icons, toggles) or a small size
+      bump (the checkbox, which IS a primary user action). */
+.hlp, .tip-btn{ position:relative; }
+.hlp::before, .tip-btn::before{
+  content:''; position:absolute; inset:-12px; border-radius:50%;
+}
+/* Checkbox bumped from 18→24px + hit-area overlay → 44px tappable. */
+.ck{ width:24px; height:24px; font-size:.78rem; position:relative; }
+.ck::before{ content:''; position:absolute; inset:-10px; border-radius:8px; }
+/* Toggle: keep visible track at 42×23 but expand hit area to 44×45. */
+.tg::before{
+  content:''; position:absolute; inset:-11px -1px;
+  border-radius:100px; z-index:0;
+}
+.tg::after{ z-index:1; }   /* keep the thumb above the new ::before overlay */
+/* Inline edit/delete text buttons — expand vertical hit area only so
+   rows of these don't visually merge horizontally. */
+.eb, .db{ position:relative; }
+.eb::before, .db::before{
+  content:''; position:absolute; inset:-10px 0;
+}
+
+/* ── P1-05 — Modal padding compresses on phones ─────────────────── */
+@media (max-width: 520px){
+  .md{ padding:1.1rem; }
+}
+
+/* ── P2-01 — Dynamic viewport height (100dvh) where used.
+      100vh on iOS Safari includes the address bar; when it collapses
+      on scroll, layouts sized to 100vh have 60-90px of content cut
+      off the bottom. 100dvh follows the dynamic viewport. We pair the
+      two declarations so older browsers fall back to 100vh. */
+body{ min-height:100vh; min-height:100dvh; }
+#mainWrap{ min-height:100vh; min-height:100dvh; }
+#sp{ height:100vh; height:100dvh; }
+.md:fullscreen{
+  height:100vh; height:100dvh;
+  max-height:100vh; max-height:100dvh;
+}
+.md:-webkit-full-screen{
+  height:100vh; height:100dvh;
+  max-height:100vh; max-height:100dvh;
+}
+
+/* ── P2-03 — Form inputs ≥16px to prevent iOS Safari focus-zoom.
+      html font-size is 17px, so 1rem = 17px = safely > 16. */
+input, textarea, select{ font-size:1rem; }
+input[type=file]{ font-size:1rem; }
+
+/* ── P2-04 — Marketing-style CTA buttons meet 44pt where the .btn
+      class isn't applied (rare, but covers the inline-styled pattern
+      cases). Anything that uses the standard .btn class is already
+      handled above. */
+button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
+
+/* ── P3-02 — Long toast strings wrap on phones instead of clipping
+      off both edges of the viewport. */
+@media (max-width: 520px){
+  .toast{
+    white-space:normal;
+    max-width:calc(100vw - 2rem);
+    left:1rem;
+    right:1rem;
+    transform:translateY(100px);
+    text-align:center;
+  }
+  .toast.show{ transform:translateY(0); }   /* defensive — kept consistent with the desktop reveal */
+}
+
+/* ── P3-03 — Sidebar overlay clearly tappable to close drawer. */
+#sideOverlay{ cursor:pointer; }
+
