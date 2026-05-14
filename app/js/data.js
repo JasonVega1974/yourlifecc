@@ -110,6 +110,10 @@ const DEF = {
   photos:[],
   // settings / misc
   betaFeedback:[], gsDismissed:false, gspDismissed:false, kidOnboardDone:false, soloMode:false,
+  // Phase 2.2 hero: 1 = compact (cards collapsed under "See full stats" link); 0 = expanded
+  heroCompact:1,
+  // Phase 2.1 age picker: '' (unset, picker fires on first launch) | '12_14' | '15_17' | '18_22'
+  ageBracket:'',
   bannerMode:'scroll',
 };
 

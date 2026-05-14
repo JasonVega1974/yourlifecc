@@ -89,7 +89,15 @@ function loadData(){
       if(!D.scrReadDays || Array.isArray(D.scrReadDays)) D.scrReadDays = {};
       if(!D.devPopupSeen) D.devPopupSeen = '';
       // Never hide sections added after initial registration
-      if(D.sections){ ['cbt','resume','motivation','mentors','hero','parent','christianLiving','worship','scripture'].forEach(s=>{ delete D.sections[s]; }); }
+      if(D.sections){
+        const FORCE = ['cbt','resume','motivation','mentors','hero','parent','christianLiving','worship','scripture'];
+        const allowed = (typeof _bracketAllowedKeys === 'function') ? _bracketAllowedKeys(D.ageBracket) : null;
+        FORCE.forEach(function(s){
+          // 'hero', 'parent', 'cbt' are always-visible specials regardless of bracket.
+          if(s === 'hero' || s === 'parent' || s === 'cbt'){ delete D.sections[s]; return; }
+          if(allowed === null || allowed.has(s)) delete D.sections[s];
+        });
+      }
       if(D.sections && D.sections.cbt===0) delete D.sections.cbt;
       if(k!==LS){ localStorage.setItem(LS,JSON.stringify(D)); }
       return;
@@ -131,29 +139,24 @@ function setSyncSt(s){
 
 // ── CLOUD SYNC (Supabase) ─────────────────────────────────────
 async function cloudSync(){
-  console.log('[LifeOS Sync] cloudSync called. _supaUser:', _supaUser ? _supaUser.email : 'NULL');
   const supa = getSupabase();
-  console.log('[LifeOS Sync] supa client:', supa ? 'OK' : 'NULL');
-  if(!supa || !_supaUser){ 
-    console.log('[LifeOS Sync] Aborting - no supa or no user');
-    setSyncSt('local'); 
-    return; 
+  if(!supa || !_supaUser){
+    setSyncSt('local');
+    return;
   }
   try {
-    console.log('[LifeOS Sync] Attempting upsert for user:', _supaUser.id);
-    const { data, error } = await supa.from('profiles').upsert({
+    const { error } = await supa.from('profiles').upsert({
       user_id: _supaUser.id,
       email: _supaUser.email,
       data: D,
       updated_at: new Date().toISOString()
     }, { onConflict: 'user_id' }).select();
-    console.log('[LifeOS Sync] Result - error:', error, 'data:', data);
     setSyncSt(error ? 'local' : 'cloud');
+    if(error) console.error('[LifeOS Sync] upsert failed');
     if(!error) localStorage.setItem('lifeos_last_sync', Date.now());
-    if(error) console.error('[LifeOS Sync] Upsert error details:', JSON.stringify(error));
-  } catch(e){ 
-    console.error('[LifeOS Sync] Exception:', e); 
-    setSyncSt('local'); 
+  } catch(e){
+    console.error('[LifeOS Sync] Exception:', e);
+    setSyncSt('local');
   }
 }
 
@@ -179,9 +182,14 @@ async function cloudLoad(){
     if(!D.devPopupSeen) D.devPopupSeen = '';
     // Strip any sections that should never be hidden
     if(D.sections){
-      ['cbt','resume','motivation','mentors','hero','parent','christianLiving','worship','scripture'].forEach(function(k){ delete D.sections[k]; });
-        // Force CBT always visible after cloud load
-        if(D.sections && D.sections.cbt===0) delete D.sections.cbt;
+      const FORCE = ['cbt','resume','motivation','mentors','hero','parent','christianLiving','worship','scripture'];
+      const allowed = (typeof _bracketAllowedKeys === 'function') ? _bracketAllowedKeys(D.ageBracket) : null;
+      FORCE.forEach(function(k){
+        if(k === 'hero' || k === 'parent' || k === 'cbt'){ delete D.sections[k]; return; }
+        if(allowed === null || allowed.has(k)) delete D.sections[k];
+      });
+      // Force CBT always visible after cloud load
+      if(D.sections.cbt===0) delete D.sections.cbt;
     }
     localStorage.setItem('lifeos_last_sync', Date.now());
     // Restore profiles from cloud data into localStorage for this device.

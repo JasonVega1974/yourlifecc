@@ -522,15 +522,17 @@ function updateDashCards(){
   if(lsLbl) lsLbl.textContent = hasEnoughData ? lsSubLabel : 'Just getting started!';
   setStatus('dcLifeScoreStatus', !hasEnoughData ? 'green' : effectiveScore>=80?'green':effectiveScore>=60?'yellow':'red');
 
-  // Parent Bucks
+  // Parent Bucks — writes go to card #1 (heroPBBalance/heroPBSub).
+  // Card #2 (qsPB/qsPBGames) deleted 2026-05-10 in Phase 2.2 hero compact.
+  // Format matches email.js renderParentBucks for consistency.
   const pbBal = (D.pb||{}).balance||0;
-  const pbEl = document.getElementById('qsPB');
+  const pbEl = document.getElementById('heroPBBalance');
   if(pbEl) pbEl.textContent = pbBal;
-  const pbGames = document.getElementById('qsPBGames');
-  if(pbGames){
+  const pbSub = document.getElementById('heroPBSub');
+  if(pbSub){
     const spins = (D.pb||{}).spinTickets||0;
     const scratches = (D.pb||{}).scratchTickets||0;
-    pbGames.textContent = (spins+scratches)>0 ? spins+' spins · '+scratches+' scratches' : 'Earn from activities';
+    pbSub.textContent = (spins+scratches)>0 ? '🎰'+spins+' 🎫'+scratches : 'Tap to spend';
   }
   setStatus('dcPBStatus', pbBal>0?'green':'yellow');
 }
