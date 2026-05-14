@@ -4449,6 +4449,20 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 /* ── P3-03 — Sidebar overlay clearly tappable to close drawer. */
 #sideOverlay{ cursor:pointer; }
 
+/* Phase C-fix-2 (2026-05-15) — Google Translate widget positioning.
+   Anchors the native widget below the mBar (54px content + safe-area
+   top inset) on the right side, clear of the iPhone status bar /
+   Dynamic Island. !important needed because the widget element at
+   index.html:682 carries an inline top:50px;right:16px;z-index:999999
+   that would otherwise win the cascade. */
+#google_translate_element {
+  position: fixed !important;
+  top: max(calc(env(safe-area-inset-top) + 54px), 70px) !important;
+  right: 8px !important;
+  left: auto !important;
+  z-index: 9999 !important;
+}
+
 /* ════════════════════════════════════════════════════════════
    Phase B-Lite session 2 — Bottom tab bar + tab landing pages
    Mobile-only (≤860px), teen accounts only (hidden under

@@ -2986,7 +2986,13 @@ function closeLangPicker(){
 }
 
 function toggleMobTranslate(){
-  const btn = document.querySelector('#mobileQuickRow .mqb-lang');
+  // Phase C-fix: prefer the mBar globe button as anchor. Under
+  // body.teen-tabs the #mobileQuickRow is hidden, so the previous
+  // selector returned null → fell back to document.body, which
+  // positioned the picker at the bottom of the viewport (off-screen)
+  // and visually drifted to the top under iOS Safari clamping.
+  const btn = document.getElementById('mBarLangBtn')
+           || document.querySelector('#mobileQuickRow .mqb-lang');
   toggleLangPicker(btn || document.body);
 }
 

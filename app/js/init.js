@@ -614,8 +614,69 @@ function renderHeroHeadline(){
     ).join('');
   }
 
-  // Phase B-Lite session 2: render Today's Verse alongside the headline.
+  // Phase C-hero: warm-opener renders alongside the headline so every
+  // hero refresh updates the greeting + quick stats. (Today's Verse
+  // moved above the greeting — same renderer, same ID, new position.)
+  renderHeroGreeting();
+  renderHeroQuickStats();
   renderTodaysVerseHero();
+}
+
+// ── HERO GREETING (Phase C-hero, 2026-05-15) ──────────────────────
+// Time-of-day greeting + first name. Resolution order for the name:
+//   1. D.name (user-typed)
+//   2. _supaUser.user_metadata first_name / name / full_name first token
+//   3. local-part of _supaUser.email (split on . + _ -)
+//   4. 'friend' fallback
+function renderHeroGreeting(){
+  const tEl = document.getElementById('heroGreetTime');
+  const nEl = document.getElementById('heroGreetName');
+  if(!tEl || !nEl) return;
+  const hr = new Date().getHours();
+  tEl.textContent = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+  let name = (typeof D !== 'undefined' && D && D.name) ? String(D.name).trim() : '';
+  if(!name && typeof _supaUser !== 'undefined' && _supaUser){
+    const meta = _supaUser.user_metadata || {};
+    name = (meta.first_name
+         || (meta.name || '').split(/\s+/)[0]
+         || (meta.full_name || '').split(/\s+/)[0]
+         || '').trim();
+    if(!name && _supaUser.email){
+      name = String(_supaUser.email).split('@')[0].split(/[.+_-]/)[0];
+    }
+  }
+  if(!name) name = 'friend';
+  name = name.split(/\s+/)[0];
+  name = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+  nEl.textContent = name;
+}
+
+// ── HERO QUICK STATS (Phase C-hero, 2026-05-15) ───────────────────
+// Streak · tasks today · total points. Reads existing D fields so no
+// new schema. chorePoints handles both legacy-number and {total,spent}
+// object shapes per chores.js migration logic.
+function renderHeroQuickStats(){
+  const sE = document.getElementById('heroQsStreak');
+  const tE = document.getElementById('heroQsTasks');
+  const pE = document.getElementById('heroQsPoints');
+  if(!sE && !tE && !pE) return;
+  const today = new Date().toISOString().slice(0,10);
+  if(sE) sE.textContent = (D.streak || 0);
+  if(tE){
+    const choresDone = (D.choreLog||[]).filter(l =>
+      l.date === today && (l.status === 'done' || l.status === 'verified')
+    ).length;
+    const asgDone = (D.assignments||[]).filter(a =>
+      a.done && (a.doneDate === today || a.completedDate === today)
+    ).length;
+    tE.textContent = choresDone + asgDone;
+  }
+  if(pE){
+    const cp = D.chorePoints;
+    const chorePts = (cp && typeof cp === 'object') ? (cp.total || 0) : (cp || 0);
+    const scrPts = D.scrPoints || 0;
+    pE.textContent = chorePts + scrPts;
+  }
 }
 
 // ── TODAY'S VERSE on hero (Phase B-Lite session 2) ────────────────────
