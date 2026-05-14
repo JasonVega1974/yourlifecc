@@ -4502,21 +4502,22 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 }
 
 @media (max-width:860px){
-  body:not(.parent-view) #bottomTabBar{ display:flex; }
-  /* Reserve room for the tab bar + iPhone home-indicator strip so
-     fixed-bottom content (like Worship mini-player) isn't covered.
-     The .8rem .7rem 5rem rule at line 178 (mobile #app padding) is
-     overridden here for teen-mode only. */
-  body:not(.parent-view) #app{
+  /* Phase B-Lite session 4: gate flipped from body:not(.parent-view) to
+     body.teen-tabs. The old inverse gate relied on parent-view being a
+     "currently in parent UI" signal, but in this codebase parent-view
+     is set for ANY account whose active profile isn't explicitly a
+     child — i.e. the default state for most users. That hid the tab
+     bar by default. body.teen-tabs is now a positive signal added by
+     applyHeroViewMode and toggled by showSection (off only inside
+     s-parent), preserving the Greenlight dual-surface intent. */
+  body.teen-tabs #bottomTabBar{ display:flex; }
+  body.teen-tabs #app{
     padding-bottom: calc(72px + env(safe-area-inset-bottom, 0)) !important;
   }
-  /* Hide slide-in sidebar + hamburger + overlay + menu hint for teen
-     mode — bottom tab bar is the primary nav surface. Parent accounts
-     keep the existing slide-in pattern unchanged. */
-  body:not(.parent-view) #sidebar,
-  body:not(.parent-view) #mBar,
-  body:not(.parent-view) #sideOverlay,
-  body:not(.parent-view) #mobileMenuHint{
+  body.teen-tabs #sidebar,
+  body.teen-tabs #mBar,
+  body.teen-tabs #sideOverlay,
+  body.teen-tabs #mobileMenuHint{
     display:none !important;
   }
 }

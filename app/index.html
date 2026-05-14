@@ -10635,6 +10635,13 @@ function applyHeroViewMode() {
   document.body.classList.toggle('child-view',  isChild);
   document.body.classList.toggle('parent-view', !isChild && !isSolo);
 
+  // Phase B-Lite session 4: teen-tabs visibility gate. Default ON for all
+  // users; showSection() turns it off when entering s-parent and back on
+  // when leaving. This is the bottom tab bar visibility signal; the old
+  // body:not(.parent-view) gate was hiding it for default-state accounts.
+  var _inParentHub = (typeof _activeSection !== 'undefined') && _activeSection === 's-parent';
+  document.body.classList.toggle('teen-tabs', !_inParentHub);
+
   // Update parent welcome card (skip entirely for solo mode)
   if (!isChild && !isSolo) {
     // Phase 5.x: parent home content (What's New + Notifications) renders here.

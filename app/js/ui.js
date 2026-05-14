@@ -278,7 +278,9 @@ function applyStageFilter(){
         if(btn) btn.style.display = config.sections.includes(c.id) ? '' : 'none';
       });
     } else {
-      if(n.key==='cbt') return; // CBT always visible — never hide it
+      // CBT and the tab landings (Learn / Life / Me) are always visible —
+      // they're the desktop sidebar fallback for the mobile bottom tabs.
+      if(n.key==='cbt' || n.key==='learn' || n.key==='life' || n.key==='me') return;
       const btn = document.getElementById('ni-'+n.id);
       if(btn) btn.style.display = config.sections.includes(n.id) ? '' : 'none';
     }
@@ -950,6 +952,14 @@ async function refreshSettingsPlanStatus(){
 // ── SIDEBAR NAV ──────────────────────────────────────────────
 const NAV_ITEMS = [
   {id:'s-hero', icon:'🏠', label:'Home', key:'home'},
+  // Phase B-Lite session 4: tab landing entries — desktop sidebar fallback
+  // for the mobile bottom tab bar. Card grids inside each section are
+  // populated from TAB_IA by renderAllTabLandings(). Stage filter
+  // exception added below (key 'learn'/'life'/'me') keeps these visible
+  // regardless of D.mode.
+  {id:'s-learn', icon:'📚', label:'Learn', key:'learn'},
+  {id:'s-life',  icon:'🌱', label:'Life',  key:'life'},
+  {id:'s-me',    icon:'👤', label:'Me',    key:'me'},
   {id:'_group_learn', icon:'📚', label:'Learning', isGroup:true, children:[
     {id:'s-skills',    icon:'🎓', icon:'🧠',label:'Life Skills',    key:'skills'},
     {id:'s-growing',   icon:'🌱', label:'Growing Up',     key:'growing'},
@@ -1600,6 +1610,12 @@ function showSection(id, fromMobile){
     const _tabId = _tabForSection(id);
     if(_tabId) setActiveBottomTab(_tabId);
   }
+
+  // Phase B-Lite session 4: teen-tabs visibility gate. Show bottom tab
+  // bar everywhere except Parent Hub. Inside s-parent the body class is
+  // removed so the slide-in sidebar pattern is restored (Greenlight
+  // dual-surface model).
+  document.body.classList.toggle('teen-tabs', id !== 's-parent');
 
   // Update nav highlights
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
