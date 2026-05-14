@@ -329,7 +329,7 @@ const SCREEN_CATS = [
   {key:'games',icon:'🎮',label:'Video Games',color:'#8b5cf6'},
   {key:'tv',icon:'📺',label:'TV / Streaming',color:'#38bdf8'},
   {key:'phone',icon:'📱',label:'Phone / Social',color:'#f472b6'},
-  {key:'tablet',icon:'📲',label:'Tablet / iPad',color:'#06d6a0'},
+  {key:'tablet',icon:'📲',label:'Tablet / iPad',color:'#22c55e'},
 ];
 
 function initScreenTime(){

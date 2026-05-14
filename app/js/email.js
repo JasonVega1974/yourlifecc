@@ -261,10 +261,10 @@ async function changeParentPin(){
 function renderManageUsers(){
   updateParentPinToggleUI();
   const el=document.getElementById('manageUsersList'); if(!el) return;
-  const colors=['#a78bfa','#4f8fff','#06d6a0','#f5a623','#f472b6','#22d3ee','#ef4444'];
+  const colors=['#a78bfa','#38bdf8','#22c55e','#f5a623','#f472b6','#22d3ee','#ef4444'];
   const bannerPresets=[
     {g:'none',label:'✕'},
-    {g:'linear-gradient(135deg,#4f8fff,#06d6a0,#a78bfa)',label:'Aurora'},
+    {g:'linear-gradient(135deg,#38bdf8,#22c55e,#a78bfa)',label:'Aurora'},
     {g:'linear-gradient(135deg,#667eea,#764ba2)',label:'Violet'},
     {g:'linear-gradient(135deg,#f093fb,#f5576c)',label:'Pink'},
     {g:'linear-gradient(135deg,#4facfe,#00f2fe)',label:'Sky'},

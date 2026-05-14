@@ -32,7 +32,7 @@ module.exports = async function handler(req, res) {
   if (!apiKey) return res.status(500).json({ error: 'BREVO_API_KEY not set' });
 
   const payload = JSON.stringify({
-    sender: { name: senderName || 'Life OS App', email: 'info@kingdom-creatives.com' },
+    sender: { name: senderName || 'YourLife CC App', email: 'info@kingdom-creatives.com' },
     to: [{ email: 'info@kingdom-creatives.com', name: 'Jason Vega' }],
     subject,
     textContent

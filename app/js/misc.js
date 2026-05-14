@@ -2396,7 +2396,7 @@ const GROWING_TOPICS = [
     icon:'⚖️',
     title:'Balancing Life — When Everything Demands Your Time',
     sub:'School, sports, friends, family, work, sleep — and somehow staying sane',
-    color:'#06d6a0',
+    color:'#22c55e',
     showFor:['M','F','O',''],
     body:`
 <p><strong>You are probably doing more than any previous generation of teenagers.</strong> School, homework, sports practice, part-time job, college prep, social media, family expectations, friend groups, church, hobbies, and somehow you are supposed to sleep 8 hours. It is not lazy to feel overwhelmed — it is honest.</p>
