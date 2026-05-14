@@ -3968,15 +3968,20 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
    that needed CSS to match the .topic-card visual spec.
    ════════════════════════════════════════════════════════════════════ */
 
-/* ─── Bible Lands site cards: match .topic-card spec exactly ─── */
+/* ─── Biblical Archaeology cards: match the Reading Plans card hierarchy
+   (F9.2). Title white, era pill badges colored per period, italic Georgia
+   tagline in cream. Previous all-gold treatment had no hierarchy. */
 #bf-bibleworld .bw-card{
-  background:linear-gradient(135deg,rgba(251,191,36,.06),rgba(167,139,250,.04)) !important;
+  background:linear-gradient(135deg,rgba(251,191,36,.05),rgba(167,139,250,.04)) !important;
   border:1px solid rgba(251,191,36,.18) !important;
   border-left-width:1px !important;
   border-radius:16px !important;
-  min-height:150px !important;
+  min-height:160px !important;
   padding:1.1rem 1rem 1rem !important;
   box-shadow:0 4px 14px rgba(15,23,42,.18), 0 0 12px rgba(251,191,36,.04) !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:.55rem !important;
 }
 #bf-bibleworld .bw-card:hover{
   transform:translateY(-3px) !important;
@@ -3985,34 +3990,65 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
 }
 #bf-bibleworld .bw-card-name{
   font-family:'Bebas Neue', var(--fh, var(--fm)) !important;
-  font-size:1.05rem !important;
-  letter-spacing:.12em !important;
-  color:#fbbf24 !important;
+  font-size:1.15rem !important;
+  letter-spacing:.04em !important;
+  color:var(--tx) !important;
   font-weight:700 !important;
-  margin-bottom:.3rem !important;
-  text-shadow:0 0 14px rgba(251,191,36,.18);
+  margin-bottom:0 !important;
+  line-height:1.15 !important;
+  text-shadow:none !important;
 }
+/* Era pill badges — colored background per period, matching the
+   TOPICAL / BEGINNER / THROUGH BIBLE chips on Reading Plans cards. */
+#bf-bibleworld .bw-card-eras{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:.3rem !important;
+  margin:0 !important;
+}
+#bf-bibleworld .bw-card-era{
+  display:inline-flex;
+  align-items:center;
+  padding:.18rem .55rem;
+  border-radius:99px;
+  background:color-mix(in srgb, var(--era-c, #38bdf8) 22%, transparent);
+  border:1px solid color-mix(in srgb, var(--era-c, #38bdf8) 45%, transparent);
+  color:#fff;
+  font-family:var(--fm);
+  font-size:.6rem;
+  font-weight:800;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  line-height:1.2;
+}
+/* Fallback for browsers without color-mix (older Safari) — flat tints */
+@supports not (color: color-mix(in srgb, red, blue)){
+  #bf-bibleworld .bw-card-era{
+    background:rgba(56,189,248,.22);
+    border-color:rgba(56,189,248,.45);
+  }
+}
+/* Legacy .bw-card-meta retained in case any other render path uses it */
 #bf-bibleworld .bw-card-meta{
   font-family:var(--fm);
-  font-size:.6rem !important;
-  letter-spacing:.18em !important;
-  color:#fbbf24 !important;
-  opacity:.78;
+  font-size:.62rem !important;
+  letter-spacing:.16em !important;
+  color:var(--tx2) !important;
   font-weight:700 !important;
   text-transform:uppercase;
-  margin-bottom:.4rem !important;
+  margin-bottom:0 !important;
 }
 #bf-bibleworld .bw-card-tagline{
   font-family:Georgia,'Times New Roman',serif !important;
   font-style:italic !important;
-  font-size:.85rem !important;
+  font-size:.88rem !important;
   font-weight:400 !important;
-  line-height:1.6 !important;
-  color:#fef3c7 !important;
-  opacity:.82;
+  line-height:1.55 !important;
+  color:var(--tx2) !important;
+  opacity:1 !important;
+  margin-bottom:0 !important;
 }
-/* If individual cards include a photo thumbnail (.bw-card-photo / .bw-card-img),
-   round the corners and add a gold hairline. */
+/* Photo thumbs if a card includes one */
 #bf-bibleworld .bw-card img,
 #bf-bibleworld .bw-card-photo,
 #bf-bibleworld .bw-card-img{
@@ -4020,7 +4056,7 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   border:1px solid rgba(251,191,36,.2);
 }
 
-/* Light-mode parchment treatment for Bible Lands cards */
+/* Light-mode parchment treatment */
 :root.light #bf-bibleworld .bw-card{
   background:linear-gradient(135deg,rgba(255,255,255,.85),rgba(255,250,235,.72)) !important;
   border-color:rgba(180,120,20,.32) !important;
@@ -4030,9 +4066,9 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   border-color:rgba(180,120,20,.55) !important;
   box-shadow:0 8px 28px rgba(180,120,20,.22) !important;
 }
-:root.light #bf-bibleworld .bw-card-name{color:#b45309 !important;text-shadow:none;}
-:root.light #bf-bibleworld .bw-card-meta{color:#b45309 !important;}
-:root.light #bf-bibleworld .bw-card-tagline{color:#3a2818 !important;opacity:.92;}
+:root.light #bf-bibleworld .bw-card-name{color:#1a1233 !important;}
+:root.light #bf-bibleworld .bw-card-tagline{color:#3a2818 !important;opacity:.95;}
+:root.light #bf-bibleworld .bw-card-era{color:#1a1233;}
 
 /* ─── Family verse card light-mode parchment ─── */
 :root.light #fhFamilyVerseCard{

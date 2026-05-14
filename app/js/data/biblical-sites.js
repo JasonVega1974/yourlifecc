@@ -46,7 +46,7 @@ const BIBLICAL_SITES = [
   },
   {
     id: 'garden-tomb',
-    name: 'Golgotha &amp; the Garden Tomb',
+    name: 'Golgotha & the Garden Tomb',
     eras: ['jesus-ministry'],
     modernLocation: 'Jerusalem, Israel',
     lat: 31.7833,

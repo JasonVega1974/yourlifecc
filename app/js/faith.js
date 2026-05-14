@@ -1929,7 +1929,7 @@ function renderEsvPassage(text, book, chNum){
   html = html.replace(/(>)([^<]+)(<)/g, function(_, open, txt, close){
     return open + txt.replace(placeRegex, function(m){
       const id = ESV_PLACE_MAP[m];
-      return `<span data-place="${id}" style="border-bottom:1px dotted rgba(167,139,250,.55);cursor:pointer;color:#a78bfa;" title="Open ${m} in Bible Lands">${m}</span>`;
+      return `<span data-place="${id}" style="border-bottom:1px dotted rgba(167,139,250,.55);cursor:pointer;color:#a78bfa;" title="Open ${m} in Biblical Archaeology">${m}</span>`;
     }) + close;
   });
 
@@ -5460,13 +5460,16 @@ function _bwRenderGrid(){
   }
   el.innerHTML = sites.map(s => {
     const eraIds = s.eras || [];
-    const lastEra = eraIds[eraIds.length-1];
-    const period = _bwPeriodById(lastEra);
-    const color = period ? period.color : '#38bdf8';
-    const eraLabels = eraIds.map(id => { const p = _bwPeriodById(id); return p ? p.label : id; }).join(' · ');
-    return '<div class="bw-card" style="border-left-color:'+color+';" onclick="openBwSite(\''+s.id+'\')">'
+    // Era pill badges — colored per period, matching Reading Plans category chips
+    const pills = eraIds.map(id => {
+      const p = _bwPeriodById(id);
+      const c = p ? p.color : '#38bdf8';
+      const label = p ? p.label : id;
+      return '<span class="bw-card-era" style="--era-c:'+c+';">'+_bwEsc(label)+'</span>';
+    }).join('');
+    return '<div class="bw-card" onclick="openBwSite(\''+s.id+'\')">'
          + '<div class="bw-card-name">'+_bwEsc(s.name)+'</div>'
-         + '<div class="bw-card-meta" style="color:'+color+';">'+_bwEsc(eraLabels)+'</div>'
+         + (pills ? '<div class="bw-card-eras">'+pills+'</div>' : '')
          + '<div class="bw-card-tagline">'+_bwEsc(s.tagline || '')+'</div>'
          + '</div>';
   }).join('');
@@ -5551,7 +5554,7 @@ function openBwSite(siteId){
       + (mapUrl ? '<div><div style="font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.1em;font-size:.58rem;margin-bottom:.15rem;">Coordinates</div><a href="'+mapUrl+'" target="_blank" rel="noopener" style="color:#38bdf8;text-decoration:none;">'+s.lat.toFixed(4)+', '+s.lng.toFixed(4)+' ↗</a></div>' : '');
   }
   if(typeof openModal === 'function') openModal('bwSiteModal');
-  if(typeof logActivity === 'function') logActivity('faith', 'Bible Lands site: ' + s.name);
+  if(typeof logActivity === 'function') logActivity('faith', 'Biblical Archaeology site: ' + s.name);
   if(typeof _bwMarkVisited === 'function') _bwMarkVisited('site', siteId);
 }
 
@@ -5659,9 +5662,12 @@ function bwRenderDiscoveries(){
   const certIcon  = (c) => c === 'confirmed' ? '✓' : c === 'consistent' ? '≈' : '?';
   grid.innerHTML = list.map(d => {
     const c = certColor(d.certainty);
-    return '<div class="bw-card" style="border-left-color:'+c+';" onclick="openBwDiscovery(\''+d.id+'\')">'
-      + '<div class="bw-card-meta" style="color:'+c+';">'+certIcon(d.certainty)+' '+_bwEsc(d.certainty)+' · '+_bwEsc(String(d.yearFound))+'</div>'
+    return '<div class="bw-card" onclick="openBwDiscovery(\''+d.id+'\')">'
       + '<div class="bw-card-name">'+_bwEsc(d.name)+'</div>'
+      + '<div class="bw-card-eras">'
+      +   '<span class="bw-card-era" style="--era-c:'+c+';">'+certIcon(d.certainty)+' '+_bwEsc(d.certainty)+'</span>'
+      +   '<span class="bw-card-era" style="--era-c:#fbbf24;">'+_bwEsc(String(d.yearFound))+'</span>'
+      + '</div>'
       + '<div class="bw-card-tagline">'+_bwEsc(d.tagline||'')+'</div>'
       + '</div>';
   }).join('');
@@ -5711,7 +5717,7 @@ const PILGRIMAGE_BADGES = [
   { id:'walked-with-jesus',  icon:'🚶', label:'Walked With Jesus',  desc:"Visit all Jesus-ministry sites", target:6, type:'sites-era', era:'jesus-ministry' },
   { id:'followed-paul',      icon:'✉️', label:'Followed Paul',      desc:"Visit all Pauline-journey sites", target:7, type:'sites-era', era:'pauline-journeys' },
   { id:'cultural-scholar',   icon:'📜', label:'Cultural Scholar',   desc:'Cross-link 5 discoveries to sites', target:5, type:'discovery-sites' },
-  { id:'bible-lands-explorer',icon:'🗺️',label:'Bible Lands Explorer',desc:'All 30 sites + all 20 discoveries', target:50, type:'all' },
+  { id:'bible-lands-explorer',icon:'🏺',label:'Biblical Archaeology Explorer',desc:'All 30 sites + all 20 discoveries', target:50, type:'all' },
 ];
 
 function _bwVisitedStore(){
@@ -6533,7 +6539,7 @@ function openTimelineEvent(eventId){
       const s = (typeof _bwSiteById === 'function') ? _bwSiteById(ev.relatedSiteId) : null;
       if(s){
         html += '<button class="tlm-related-link" onclick="closeTimelineEvent();openBwSite(\''+ev.relatedSiteId+'\')">'
-             + '\u{1F4CD} <span style="flex:1;">Visit <strong>'+_tlEsc(s.name)+'</strong> in Bible Lands</span><span style="opacity:.7;">→</span>'
+             + '\u{1F4CD} <span style="flex:1;">Visit <strong>'+_tlEsc(s.name)+'</strong> in Biblical Archaeology</span><span style="opacity:.7;">→</span>'
              + '</button>';
       }
     }
