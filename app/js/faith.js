@@ -434,7 +434,7 @@ function initScripture(){
   renderScrStats();
 }
 
-// Bible & Faith tab switcher
+// The Well tab switcher
 // F2-A: added 'home' (default), 'plans', 'prayer', 'memorize', 'academy' alongside
 // the original 6 tabs. New tabs without renderers are stubs awaiting later phases.
 // btn is optional — when bfTab() is called programmatically (e.g., from a Quick
@@ -454,7 +454,7 @@ function bfShowHomeGrid(){
   if(dash) dash.style.display = '';
 }
 
-// Phase 5.8 v3 — Back-to-Home pill management. Every Bible & Faith
+// Phase 5.8 v3 — Back-to-Home pill management. Every The Well
 // sub-tab gets a "← Back to Home" pill at the top so the navigation
 // card-grid is always one click away. Idempotent — won't double-insert.
 function bfRemoveAllBackPills(){
@@ -1063,6 +1063,7 @@ const PLAN_CAT_BRAND = {
   'beginner':          { color:'#38bdf8', soft:'rgba(56,189,248,',  name:'Cyan'   },
   'through-the-bible': { color:'#fbbf24', soft:'rgba(251,191,36,',  name:'Amber'  },
   'family':            { color:'#22c55e', soft:'rgba(34,197,94,',   name:'Green'  },
+  'life-topics':       { color:'#fbbf24', soft:'rgba(251,191,36,',  name:'Amber'  },
 };
 function _planBrand(p){ return PLAN_CAT_BRAND[p && p.category] || PLAN_CAT_BRAND.topical; }
 function _planEsc(s){ if(typeof escapeHtml === 'function') return escapeHtml(String(s==null?'':s)); return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }

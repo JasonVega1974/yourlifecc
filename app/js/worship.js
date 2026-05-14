@@ -66,21 +66,17 @@ function worshipRenderPlaylist() {
 
 function worshipCreateVideoCard(video, index) {
   const card = document.createElement('div');
-  card.className = 'kc-video-card';
+  card.className = 'wp-card';
   card.setAttribute('data-index', index);
   const thumbUrl = 'https://img.youtube.com/vi/' + video.id + '/maxresdefault.jpg';
   card.innerHTML = `
-    <div class="kc-video-thumbnail">
+    <div class="wp-thumb">
       <img src="${thumbUrl}" alt="${video.title}" loading="lazy">
-      <div class="kc-play-overlay"><div class="kc-play-icon"></div></div>
     </div>
-    <div class="kc-video-info">
-      <h3 class="kc-video-title">${video.title}</h3>
-      <p class="kc-video-artist">${video.artist || 'Worship Music'}</p>
-      <div class="kc-video-meta">
-        <span class="kc-duration-badge">${video.duration || '—'}</span>
-        <button class="kc-play-btn">Play Now</button>
-      </div>
+    <div class="wp-info">
+      <div class="wp-info-title">${video.title}</div>
+      <div class="wp-info-artist">${video.artist || 'Worship Music'}</div>
+      <span class="wp-info-meta">${video.duration || '—'}</span>
     </div>`;
   card.addEventListener('click', () => worshipPlayVideo(index));
   return card;
@@ -103,17 +99,50 @@ function worshipPlayVideo(index) {
   if (titleEl) titleEl.textContent = video.title;
   if (artistEl) artistEl.textContent = video.artist || 'Worship Music';
 
+  // Mini-player thumbnail + show
+  const miniImg = document.getElementById('wpMiniThumbImg');
+  if (miniImg) miniImg.src = 'https://img.youtube.com/vi/' + video.id + '/mqdefault.jpg';
+  const mini = document.getElementById('wpMini');
+  if (mini) mini.classList.remove('hidden');
+
   const playBtn = document.getElementById('worship-playPauseBtn');
-  if (playBtn) playBtn.textContent = '▶ Play';
+  if (playBtn) playBtn.textContent = '❚❚';
 
   worshipUpdateActiveCard();
-
-  if (window.innerWidth < 768) {
-    const ps = document.querySelector('#s-worship .kc-player-section');
-    if (ps) ps.scrollIntoView({ behavior:'smooth', block:'start' });
-  }
-
+  worshipStartProgressTick(video.duration);
   worshipSetupAutoplayListener();
+}
+
+// Approximate progress bar — drives the thin gold strip across the top of
+// the mini-player. Animates linearly over the song duration so the user
+// gets a visual cue of where they are. Resets on every play call.
+let _worshipProgressTimer = null;
+function worshipStartProgressTick(durationStr){
+  const bar = document.getElementById('wpProgressBar');
+  if(!bar) return;
+  if(_worshipProgressTimer){ clearInterval(_worshipProgressTimer); _worshipProgressTimer = null; }
+  // Parse "5:32" → 332 seconds
+  let total = 240;
+  if(typeof durationStr === 'string'){
+    const parts = durationStr.split(':').map(n => parseInt(n,10) || 0);
+    if(parts.length === 2) total = parts[0]*60 + parts[1];
+    else if(parts.length === 3) total = parts[0]*3600 + parts[1]*60 + parts[2];
+  }
+  bar.style.transition = 'none';
+  bar.style.width = '0%';
+  // Force reflow so the next transition takes effect
+  void bar.offsetWidth;
+  bar.style.transition = 'width ' + total + 's linear';
+  bar.style.width = '100%';
+}
+
+// Fullscreen toggle — expands artwork to fill the panel above the mini-player
+function worshipToggleFullscreen(){
+  const sec = document.getElementById('s-worship');
+  const btn = document.getElementById('wpFullscreenBtn');
+  if(!sec) return;
+  const isOn = sec.classList.toggle('wp-fullscreen');
+  if(btn) btn.textContent = isOn ? '⊟' : '⛶';
 }
 
 function worshipTogglePlayPause() {
@@ -144,7 +173,7 @@ function worshipSetupAutoplayListener() {
 }
 
 function worshipUpdateActiveCard() {
-  const cards = document.querySelectorAll('#s-worship .kc-video-card');
+  const cards = document.querySelectorAll('#s-worship .wp-card');
   cards.forEach((card, idx) => {
     card.classList.toggle('active', idx === _worshipCurrentIndex);
   });
@@ -183,10 +212,10 @@ function worshipToggleShuffle() {
   _worshipIsShuffleOn = !_worshipIsShuffleOn;
   const btn = document.getElementById('worship-shuffleBtn');
   if (_worshipIsShuffleOn) {
-    if (btn) { btn.textContent = '🔀 Shuffle On'; btn.classList.add('active'); }
+    if (btn) btn.classList.add('active');
     _worshipPlayedSongs = _worshipCurrentIndex >= 0 ? [_worshipCurrentIndex] : [];
   } else {
-    if (btn) { btn.textContent = '🔀 Shuffle Off'; btn.classList.remove('active'); }
+    if (btn) btn.classList.remove('active');
     _worshipPlayedSongs = [];
   }
 }

@@ -5259,7 +5259,7 @@ const HTIPS = {
   skills:     ["🧠 Life Skills Academy","140+ lessons across 16 categories. Tap a card to open the full guide. Pass the 5-question quiz (80%+) to earn a shareable certificate for that category."],
   growing:    ["🌱 Growing Up","Real-talk guides on puberty, mental health, relationships, substance use, and identity — filtered by gender. Crisis helplines (988, 741741) are always visible."],
   journal:    ["✍️ Journal","Pick a category, write your entry, and save. All entries are private and saved locally. Tap any saved entry to re-read it. Daily prompts appear on your dashboard."],
-  scripture:  ["✝️ Bible & Faith","365 daily verses by monthly theme. Earn 5 pts per day you read. Calendar shows your full year. Devotionals, Jesus & Purpose, and faith guides are in the tabs."],
+  scripture:  ["✝️ The Well","365 daily verses, devotionals, reading plans, prayer, memory verses, story mode, timeline, and more — gathered in one quiet place."],
   driving:    ["🚗 Driving","License prep (permit test + practice hours) · Safety · Car maintenance · Costs & insurance · Accident procedures. Interactive checklists track your progress."],
   sports:     ["🏆 Sports","14 sport profiles: prep tips, scholarship info, health & safety, participation stats. Filter by Boys / Girls / Both and by school level."],
   chores:     ["✅ Chores","Parents assign chores with point values in Parent Hub. Complete them and hit Done to request verification. Earn Parent Bucks, screen time, and cash rewards."],
