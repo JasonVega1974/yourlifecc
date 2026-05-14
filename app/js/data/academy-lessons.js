@@ -857,6 +857,747 @@ const ACADEMY_LESSONS = [
       { q: 'Which century did the Babylonian exile of Judah begin?', options: ['1000 BC', '722 BC (that was Israel/north)', '586 BC', 'AD 70'], correctIdx: 2, explanation: 'Israel (north) fell to Assyria in 722 BC. Judah (south) fell to Babylon in 586 BC — the start of the Babylonian exile.' },
     ],
   },
+
+  // ═══════════════════════ THEOLOGY · Batch 2 (3) ═══════════════════════
+
+  {
+    id: 'second-coming',
+    category: 'theology',
+    title: 'The Second Coming & End Times',
+    description: 'What Jesus actually said about His return, and how to live in the meantime without losing your mind.',
+    duration: '8 min',
+    sections: [
+      {
+        heading: 'He Is Coming Back',
+        paragraphs: [
+          "Jesus did not leave the question of His return open. The angels at the Ascension delivered the message in one sentence: this same Jesus, who was taken up from you into heaven, will come in the same way as you saw him go (Acts 1:11). Visibly. Bodily. Personally. The early creeds — Apostles' and Nicene — confess it: \"He will come again to judge the living and the dead.\"",
+          "Every New Testament writer addresses it. Paul writes about the trumpet sound and the dead in Christ rising first (1 Thessalonians 4). Peter writes about scoffers who will say \"where is the promise of his coming?\" (2 Peter 3:4). John ends the entire Bible with Jesus's words: \"Surely I am coming soon\" (Revelation 22:20). The Second Coming is not a side doctrine. It is the destination the whole story is pointed at.",
+        ],
+      },
+      {
+        heading: 'The Signs Jesus Named',
+        paragraphs: [
+          "In Matthew 24 and Mark 13, Jesus answers His disciples' questions about the end of the age. He names: false messiahs who will mislead many, wars and rumors of wars, famines and earthquakes, persecution of His followers, the gospel preached to all nations, an \"abomination of desolation\" in a holy place, cosmic disturbances. Then the Son of Man appearing on the clouds.",
+          "He warns explicitly against date-setting: \"concerning that day and hour no one knows, not even the angels of heaven, nor the Son, but the Father only\" (Matthew 24:36). Every Christian who has set a date has been wrong. The signs are not a calendar — they are a posture. They tell us how to live in the meantime: alert, faithful, doing the master's work.",
+        ],
+      },
+      {
+        heading: 'What Different Christians Believe',
+        paragraphs: [
+          "Faithful Christians disagree about the timing and order of end-time events. Some hold to a pretribulation rapture (the church removed before a 7-year tribulation), some to a post-tribulation rapture (the church goes through it), some to amillennialism (the \"1,000 years\" of Revelation 20 is symbolic of the church age). Pre-millennial / post-millennial / amillennial are technical positions about how Christ's reign relates to a literal millennium.",
+          "These are secondary debates among believers who agree on the core: Jesus is coming back, He will judge, He will set all things right, He will dwell with His people forever. Don't get so tangled in the order of events that you forget the point. The point is that He's coming.",
+        ],
+      },
+      {
+        heading: 'How to Live Waiting',
+        paragraphs: [
+          "Jesus's parables about the end all converge on one image: a master who returns. The wise servants are doing their assigned work when he arrives. The foolish are caught unprepared. The faithful are not predicting the date; they are living each day so that whenever He shows up, they will not be ashamed.",
+          "Practically, this means: stay in the Word, stay in prayer, stay in fellowship, share the gospel, serve the poor, fight sin, love your neighbor. Not because the end is near (it may not be in your lifetime) — but because the King is real and watching, and the moment of His return will be the moment everything is recalibrated to truth.",
+        ],
+      },
+    ],
+    keyVerse: { ref: 'Revelation 22:20', text: 'He who testifies to these things says, Surely I am coming soon. Amen. Come, Lord Jesus!' },
+    whatThisMeans: 'You do not need to know the date. You need to be ready. Live every ordinary day as though the King might return before lunch — not in panic, but in steady faithfulness. The story does end. Christ wins. That changes how you handle today.',
+    quiz: [
+      { q: 'Acts 1:11 says Jesus will return…', options: ['Spiritually only', 'In the same way the disciples saw him go — visibly, bodily', 'Through the actions of believers', 'Only in dreams'], correctIdx: 1, explanation: 'The angels at the Ascension were clear: this same Jesus, visibly and bodily.' },
+      { q: 'What does Jesus say about the date of His return (Matthew 24:36)?', options: ['He will reveal it to His apostles', 'Only the Father knows — not even the Son or angels', 'It will be exactly 2,000 years', 'It depends on human readiness'], correctIdx: 1, explanation: 'No one — not even the Son or the angels — knows the day or hour. Date-setting is repeatedly forbidden.' },
+      { q: 'Which of the following is NOT one of the signs Jesus named in Matthew 24?', options: ['False messiahs misleading many', 'Wars and rumors of wars', 'Stock market crashes', 'The gospel preached to all nations'], correctIdx: 2, explanation: 'Stock markets aren\'t in the Olivet Discourse. The actual signs are deception, conflict, natural disasters, persecution, global gospel proclamation.' },
+      { q: 'What is the right Christian response to disagreement about end-time timing?', options: ['Cut off other Christians who disagree', 'Don\'t care at all', 'Hold the core (He is coming, He will judge, He will renew) and treat order/timing as a secondary debate', 'Pick one view and condemn all others'], correctIdx: 2, explanation: 'Faithful Christians have differed on rapture/millennium order for centuries. The core matters; the schedule is secondary.' },
+      { q: 'Jesus\'s parables about His return all converge on what practical instruction?', options: ['Sell everything immediately', 'Predict the date', 'Be found doing the master\'s assigned work whenever He arrives', 'Hide until it\'s safe'], correctIdx: 2, explanation: 'Wise servants are at their post when the master returns. Live every day as though He might come before lunch — not in panic, but in faithfulness.' },
+    ],
+  },
+
+  {
+    id: 'heaven-hell-eternity',
+    category: 'theology',
+    title: 'Heaven, Hell & Eternity',
+    description: 'What the Bible actually teaches about what comes next — and why eternity changes how you live today.',
+    duration: '9 min',
+    sections: [
+      {
+        heading: 'Eternity Is Real',
+        paragraphs: [
+          "Most modern people assume that whatever happens at death, it is brief and uncertain. The Bible insists otherwise. Eternity is real. Every human being lives forever — somewhere. Daniel 12:2 says some will rise to everlasting life and some to everlasting contempt. Jesus uses the same word (*aiōnion*, eternal) for both heaven and hell in Matthew 25:46. The two destinies are durably parallel.",
+          "This is uncomfortable. C.S. Lewis put it this way: \"There are no ordinary people. You have never talked to a mere mortal.\" Every person you have ever met is going somewhere forever. Take that seriously, and the way you treat people in line at the coffee shop changes.",
+        ],
+      },
+      {
+        heading: 'What Heaven Actually Is',
+        paragraphs: [
+          "Most people picture heaven as clouds and harps and disembodied souls. That is not the biblical picture. The Bible's picture is a new heavens and a new earth (Isaiah 65:17, 2 Peter 3:13, Revelation 21:1) — God's renewed physical creation, with His people in resurrection bodies, dwelling with Him face to face. The holy city comes down from heaven to earth (Revelation 21:2-3) — the direction of travel is downward, not upward.",
+          "Eternal life is not floating. It is the fullness of life as it was meant to be. Work without frustration. Relationships without sin. Worship without distraction. Bodies without decay. The river of life, the tree of life, the face of God — \"His servants will worship him. They will see his face, and his name will be on their foreheads\" (Revelation 22:3-4). The best moments of this life are previews of that life.",
+        ],
+      },
+      {
+        heading: 'What Hell Actually Is',
+        paragraphs: [
+          "Hell is the hardest doctrine in Christianity, and modern people often dismiss it. But Jesus taught it more than anyone else in the Bible. He used three images: outer darkness (Matthew 8:12), unquenchable fire (Mark 9:43), and weeping and gnashing of teeth (Matthew 13:42). The common thread: separation from God, conscious experience, no end.",
+          "The most honest summary: hell is what happens when a soul gets, forever, what it spent its life choosing — separation from God, the source of every good thing. C.S. Lewis: \"There are only two kinds of people in the end: those who say to God, 'Thy will be done,' and those to whom God says, in the end, 'Thy will be done.'\" God does not send anyone to hell against their wishes. He honors the choice some have made every day to live without Him.",
+        ],
+      },
+      {
+        heading: 'Why It Changes Today',
+        paragraphs: [
+          "If eternity is real, two things follow. First, evangelism matters infinitely. The friend or family member or stranger you love who does not yet know Christ is heading somewhere they were never made for. You do not have to be aggressive — but you do not have the option of being silent. Pray for them. Tell them. Love them toward Jesus.",
+          "Second, your own daily life is being weighed by an eternal scale. \"For we will all stand before the judgment seat of God\" (Romans 14:10). Every Christian will give an account. Not for salvation (that is settled by Christ) but for how we spent the time, the gifts, the money, the influence we were given. Live with eternity behind your eyelids and the day becomes precious.",
+        ],
+      },
+    ],
+    keyVerse: { ref: 'Revelation 21:3-4', text: 'Behold, the dwelling place of God is with man. He will dwell with them, and they will be his people, and God himself will be with them as their God. He will wipe away every tear from their eyes, and death shall be no more, neither shall there be mourning, nor crying, nor pain anymore, for the former things have passed away.' },
+    whatThisMeans: 'You are not a mere mortal. The person in line behind you is not either. If eternity is real, evangelism matters infinitely and so does how you spend Tuesday. Live today like it counts forever — because it does.',
+    quiz: [
+      { q: 'What\'s the biblical picture of the final destination of believers?', options: ['Clouds and harps in disembodied bliss', 'A new heavens and new earth — renewed physical creation, resurrection bodies, God dwelling with people', 'Reincarnation', 'A spiritual realm with no physical reality'], correctIdx: 1, explanation: 'Revelation 21 — new heavens, new earth, holy city coming down. The direction is downward, not upward.' },
+      { q: 'Who taught more about hell in the Bible than anyone else?', options: ['Paul', 'Moses', 'Jesus', 'John the Baptist'], correctIdx: 2, explanation: 'Jesus used three images repeatedly — outer darkness, unquenchable fire, weeping and gnashing of teeth.' },
+      { q: 'According to Daniel 12:2 and Matthew 25:46, what\'s true of both heaven and hell?', options: ['They are equally pleasant', 'They are both temporary', 'They are both described as eternal (everlasting)', 'They are metaphorical'], correctIdx: 2, explanation: 'The same Greek word (aiōnion / eternal) is used for both destinies. They are durably parallel.' },
+      { q: 'C.S. Lewis described two kinds of people in the end. What was his framework?', options: ['Religious vs irreligious', 'Those who say "Thy will be done" to God, and those to whom God says "thy will be done"', 'Rich vs poor', 'Educated vs uneducated'], correctIdx: 1, explanation: 'God honors the choice. He doesn\'t send anyone to hell against their will — He gives them, forever, what they chose every day.' },
+      { q: 'Romans 14:10 says every Christian will…', options: ['Be punished for sins', 'Stand before the judgment seat of God to give an account', 'Decide their own eternity', 'Skip judgment entirely'], correctIdx: 1, explanation: 'Not for salvation (settled by Christ) but for how we stewarded what we were given — time, gifts, money, influence.' },
+    ],
+  },
+
+  {
+    id: 'prayer-answers',
+    category: 'theology',
+    title: 'Prayer & How God Answers',
+    description: 'Why prayer matters even though God already knows, and how to read His answers — yes, no, wait, or different.',
+    duration: '8 min',
+    sections: [
+      {
+        heading: 'Why Pray If God Already Knows?',
+        paragraphs: [
+          "It's the question every honest person asks eventually. If God is sovereign and already knows what I need, why am I telling Him? The answer is that prayer is not primarily about informing God. It's about relationship with Him. Jesus tells us to pray \"Our Father\" (Matthew 6:9) — the language of family, not information transfer.",
+          "Prayer also moves the world. God has ordained that real prayer produces real results. \"The prayer of a righteous person has great power as it is working\" (James 5:16). He could accomplish His purposes without our prayers, but He has chosen, in love, to do many of them through our prayers. The privilege is real. The participation is real.",
+        ],
+      },
+      {
+        heading: 'The Four Answers',
+        paragraphs: [
+          "God answers every prayer with one of four answers: yes, no, wait, or something better than you asked. The first three are easy to recognize. The fourth — \"different\" — is the one that takes faith to see. Sometimes God answers a prayer in a way the person didn't think to ask for, because He sees a need they didn't see in themselves.",
+          "Paul prayed three times for the thorn in his flesh to be removed (2 Corinthians 12:7-9). God's answer: \"My grace is sufficient for you, for my power is made perfect in weakness.\" Not a removed thorn. A reframed thorn. A bigger gift than the one Paul asked for. Look for the \"different\" answers in your own life. They are often where God is most visible.",
+        ],
+      },
+      {
+        heading: 'When God Says No',
+        paragraphs: [
+          "Some prayers are answered with a clear no. Jesus prayed in Gethsemane for the cup to pass. The Father's answer was no — and the result was the salvation of the world (Matthew 26:39). David prayed for his sick child to live; the child died (2 Samuel 12:15-23). Both prayers were heard. Both received a no. Neither was wasted.",
+          "When God says no, it's almost never because the prayer was wrong or the faith was small. It's because His view of the situation is bigger than ours. C.S. Lewis again: \"I am sure that if [God] heard our prayers as we wanted them heard, we should have done ourselves harm beyond measure.\" Trust the no. Sometimes it's a kindness you can only see later.",
+        ],
+      },
+      {
+        heading: 'The Patterns That Help',
+        paragraphs: [
+          "Jesus gave us a model in the Lord's Prayer (Matthew 6:9-13). Adoration, His kingdom coming, daily provision, forgiveness, deliverance. Many believers find ACTS helpful: Adoration, Confession, Thanksgiving, Supplication. Some pray Scripture back to God — read a psalm and turn it into prayer line by line. Some keep a prayer journal so they can see God's faithfulness over months and years.",
+          "What doesn't help: fancy language, performance, or treating prayer like a vending machine where the right words produce the right outcome. God listens for honesty, not eloquence. Hannah at Shiloh prayed silently with moving lips, and God heard (1 Samuel 1:13-17). Pray the prayer you can actually pray. He hears it.",
+        ],
+      },
+    ],
+    keyVerse: { ref: 'Philippians 4:6-7', text: 'Do not be anxious about anything, but in everything by prayer and supplication with thanksgiving let your requests be made known to God. And the peace of God, which surpasses all understanding, will guard your hearts and your minds in Christ Jesus.' },
+    whatThisMeans: 'You don\'t have to pray well to pray. You have to pray honestly. God\'s answers come in four flavors — yes, no, wait, different. Watch for the "different" ones; they are usually where the deepest work happens. He hears every single word, including the ones you can\'t get out loud.',
+    quiz: [
+      { q: 'Why does prayer matter if God already knows what we need?', options: ['It doesn\'t — Jesus said skip it', 'Because prayer is primarily relationship with God, not information transfer', 'God might forget without reminders', 'It activates our willpower'], correctIdx: 1, explanation: 'Jesus tells us to pray "Our Father" — family language. Prayer is relationship, not memo.' },
+      { q: 'What does James 5:16 say about prayer?', options: ['Prayer never accomplishes anything', 'The prayer of a righteous person has great power as it is working', 'Only pray when in trouble', 'Only pastors\' prayers count'], correctIdx: 1, explanation: 'God has ordained that real prayer produces real results. He works through our prayers — not because He has to, but because He chose to.' },
+      { q: 'How did God answer Paul\'s prayer for the removal of his "thorn in the flesh" (2 Corinthians 12:7-9)?', options: ['Yes, instantly', 'No, but with "my grace is sufficient — power perfected in weakness"', 'He ignored it', 'Wait'], correctIdx: 1, explanation: 'A "different" answer — bigger than Paul asked for. Reframed grace instead of removed thorn.' },
+      { q: 'When God says no to a prayer, why is it usually?', options: ['The prayer was wrong', 'Faith was too small', 'His view of the situation is bigger than ours, and the no is a kindness only visible later', 'God is being mean'], correctIdx: 2, explanation: 'Even Jesus\'s prayer in Gethsemane got a no — and the result was the salvation of the world. Trust the no.' },
+      { q: 'What does prayer NOT depend on?', options: ['Honesty', 'Fancy language and performance', 'Being a relationship', 'God\'s love for you'], correctIdx: 1, explanation: 'Hannah prayed silently with moving lips. God hears the prayer you can actually pray.' },
+    ],
+  },
+
+  // ═══════════════════ CHURCH HISTORY · Batch 2 (3) ═══════════════════
+
+  {
+    id: 'nicaea',
+    category: 'church-history',
+    title: 'The Council of Nicaea',
+    description: 'How 318 bishops in AD 325 defined the Trinity — and why it still shapes every Christian creed today.',
+    duration: '8 min',
+    sections: [
+      {
+        heading: 'A Crisis Over Christ',
+        paragraphs: [
+          "In the early 300s, a priest in Alexandria named Arius started teaching that Jesus was the highest of God's creations — but a creation, not God Himself. There was a time, Arius said, when the Son did not exist. The slogan caught fire: \"there was when he was not.\" Churches split. Bishops took sides. The new emperor Constantine, who had just legalized Christianity, watched the empire's most important new religion fracturing on a doctrinal question he didn't fully understand.",
+          "If Arius was right, then Jesus was not God incarnate but a divine messenger — closer to the way Islam would later describe Him than to anything the New Testament said. The gospel itself was at stake: only if Jesus is fully God can His death actually pay for sin and bridge the gap between God and humanity.",
+        ],
+      },
+      {
+        heading: 'The Council of Nicaea',
+        paragraphs: [
+          "Constantine called a council. In June AD 325, about 318 bishops gathered in Nicaea (modern Iznik, Turkey). Many bore the scars of recent persecution — eye sockets empty from imperial torture, limbs maimed. They were not Constantine's puppets. They were veterans of the faith, gathered to settle who Jesus is.",
+          "Arius presented his case. The opposing view was championed by a young deacon from Alexandria named Athanasius. The council deliberated. The result, after weeks of debate, was overwhelming: only two bishops sided with Arius. The rest produced the Nicene Creed, which states that Jesus is \"of the same substance\" (*homoousios*) as the Father — fully, truly, eternally God.",
+        ],
+      },
+      {
+        heading: 'What the Creed Says',
+        paragraphs: [
+          "The Nicene Creed (refined slightly in AD 381 to its final form) is the most universally accepted Christian statement of faith in history. Catholics, Eastern Orthodox, Protestants, Anglicans, and most Reformed churches recite it. It confesses: one God in three persons. Jesus \"begotten, not made, of one being with the Father.\" The Holy Spirit \"the Lord and giver of life... worshiped and glorified together with the Father and the Son.\"",
+          "It also confesses the resurrection, the church (\"one, holy, catholic, and apostolic\"), one baptism, the forgiveness of sins, the resurrection of the dead, and the life of the world to come. In about 220 words it summarizes the irreducible content of the Christian faith. Memorizing it gives you a portable theology.",
+        ],
+      },
+      {
+        heading: 'Why It Still Matters',
+        paragraphs: [
+          "Every generation faces a version of the Arian challenge. Today it shows up as \"Jesus was a great moral teacher, but not God.\" Or \"all paths lead to the same destination.\" The Council of Nicaea's answer remains: if Jesus is not God, He cannot save. The gospel that has changed billions of lives depends on the doctrine the council defended.",
+          "When you stand in a service and recite the Nicene Creed, you are speaking words that have been confessed by Christians on every continent for 1,700 years. Athanasius was eventually exiled five times for defending this doctrine. He held his ground. The whole church owes him — and the bishops at Nicaea — a debt that survives every century since.",
+        ],
+      },
+    ],
+    keyVerse: { ref: 'Colossians 2:9', text: 'For in him the whole fullness of deity dwells bodily.' },
+    whatThisMeans: 'The Christianity you have inherited was not invented yesterday. It was forged at moments like Nicaea by people who could lose everything to defend the truth that Jesus is God. Recite the creed sometimes. You are joining a 1,700-year-old chorus.',
+    quiz: [
+      { q: 'What did Arius teach about Jesus?', options: ['Jesus was fully God', 'Jesus was a creation of God — the highest, but not God Himself', 'Jesus never existed', 'Jesus and the Father were the same person'], correctIdx: 1, explanation: 'Arius said "there was when he was not" — Jesus as the highest creation but not God. This is what Nicaea rejected.' },
+      { q: 'In what year was the Council of Nicaea held?', options: ['AD 50', 'AD 325', 'AD 800', 'AD 1517'], correctIdx: 1, explanation: 'AD 325, called by Emperor Constantine. About 318 bishops gathered.' },
+      { q: 'What Greek word did the Nicene Creed use to define Jesus\'s relationship to the Father?', options: ['Logos (Word)', 'Homoousios (of the same substance)', 'Theos (God)', 'Kyrios (Lord)'], correctIdx: 1, explanation: 'Homoousios — same substance. Jesus is "begotten, not made, of one being with the Father."' },
+      { q: 'Why was Arianism a threat to the gospel?', options: ['It wasn\'t', 'If Jesus isn\'t fully God, His death cannot actually pay for sin or bridge God and humanity', 'It rejected the Old Testament', 'It denied prayer'], correctIdx: 1, explanation: 'The gospel itself depends on Jesus being God incarnate. Only God can save. Arius\'s Jesus couldn\'t.' },
+      { q: 'How long has the Nicene Creed been confessed by Christians?', options: ['About 50 years', 'About 500 years', 'About 1,700 years', 'About 100 years'], correctIdx: 2, explanation: 'AD 325 (refined AD 381) to today — about 1,700 years. The most universally accepted Christian statement of faith in history.' },
+    ],
+  },
+
+  {
+    id: 'great-commission-history',
+    category: 'church-history',
+    title: 'The Great Commission Through History',
+    description: 'How a dozen scared disciples in Jerusalem turned into 2.4 billion Christians across every continent.',
+    duration: '8 min',
+    sections: [
+      {
+        heading: 'Jesus\'s Last Words',
+        paragraphs: [
+          "Matthew ends his gospel on a Galilean mountain. The risen Jesus tells eleven men: \"Go therefore and make disciples of all nations, baptizing them in the name of the Father and of the Son and of the Holy Spirit, teaching them to observe all that I have commanded you. And behold, I am with you always, to the end of the age\" (Matthew 28:19-20). Four imperatives, one promise. The Great Commission.",
+          "From an external view, this was absurd. Eleven Galilean peasants, no money, no army, no political backing, told to evangelize the entire world. Within three centuries, Christianity was the official religion of the Roman Empire. Within twenty centuries, it would be the largest religion in human history, present on every continent. The unlikeliest movement on earth.",
+        ],
+      },
+      {
+        heading: 'The First Five Centuries',
+        paragraphs: [
+          "By AD 100, churches existed in Jerusalem, Antioch, Ephesus, Corinth, Rome, Alexandria, and dozens of cities between. By AD 200, Christianity had reached India (the Mar Thoma tradition still traces itself to the apostle Thomas), Ethiopia, North Africa, and Britain. By AD 300, Armenia became the first officially Christian nation in AD 301 — 12 years before Constantine's edict. By AD 500, Patrick had evangelized Ireland. The faith spread through martyrdom, traders, slaves, scholars, monks, and ordinary believers moving across roads built by the empire that crucified the founder.",
+          "It also spread through suffering. Tertullian wrote around AD 200: \"The blood of the martyrs is the seed of the church.\" Roman emperors killed Christians sporadically through the second and third centuries. Each persecution, paradoxically, swelled the movement.",
+        ],
+      },
+      {
+        heading: 'The Modern Missionary Movement',
+        paragraphs: [
+          "After centuries of mostly internal expansion within Europe and the Middle East, the modern missionary movement began with William Carey, a self-taught English shoemaker who in 1792 published a pamphlet titled \"An Enquiry into the Obligations of Christians to Use Means for the Conversion of the Heathens.\" He sailed for India in 1793. He translated the Bible into more than 40 languages over his lifetime.",
+          "Carey's example sparked Hudson Taylor (China Inland Mission), David Livingstone (Africa), Adoniram Judson (Burma), Lottie Moon (China), Amy Carmichael (India), Jim Elliot (Ecuador), and thousands more. Today, the church has crossed nearly every cultural and linguistic boundary. The most rapidly growing churches in the 21st century are in sub-Saharan Africa, China (despite restrictions), India, Iran, and Latin America.",
+        ],
+      },
+      {
+        heading: 'The Commission Is Not Finished',
+        paragraphs: [
+          "Today, approximately 7,400 \"unreached people groups\" exist — ethno-linguistic communities with less than 2% evangelical Christians. About 3.4 billion people live in those communities. The Great Commission was given to the church as a whole, not to a specialized class of missionaries. Every Christian inherits it.",
+          "You may not move overseas. But the people God has placed in your life — coworkers, classmates, neighbors, family — are part of the Commission too. Pray for them by name. Invite them. Tell them honestly what Jesus has done for you. The chain that runs from those eleven men on a Galilean mountain to your story runs through you to the next person.",
+        ],
+      },
+    ],
+    keyVerse: { ref: 'Matthew 28:18-20', text: 'All authority in heaven and on earth has been given to me. Go therefore and make disciples of all nations, baptizing them in the name of the Father and of the Son and of the Holy Spirit, teaching them to observe all that I have commanded you. And behold, I am with you always, to the end of the age.' },
+    whatThisMeans: 'The Commission did not stop at the eleven. It rolled forward, through martyrs and missionaries and ordinary believers, to your inbox. You are the next link in a chain that has not broken in 2,000 years. Pray for one person who needs Jesus this week. Then introduce them.',
+    quiz: [
+      { q: 'How many imperatives are in the Great Commission?', options: ['One', 'Four (go, make disciples, baptize, teach)', 'Ten', 'Zero'], correctIdx: 1, explanation: 'Go, make disciples, baptize, teach — with the promise "I am with you always." Four verbs.' },
+      { q: 'What was the first officially Christian nation?', options: ['Rome (under Constantine)', 'Armenia (AD 301)', 'Ethiopia', 'England'], correctIdx: 1, explanation: 'Armenia in AD 301 — twelve years before Constantine\'s Edict of Milan. King Tiridates III converted, then his nation.' },
+      { q: 'Who is often called the father of the modern missionary movement?', options: ['William Carey (1793, India)', 'Martin Luther', 'John Wesley', 'D.L. Moody'], correctIdx: 0, explanation: 'Self-taught English shoemaker. Translated Bible into 40+ languages. Sailed for India in 1793.' },
+      { q: 'What did Tertullian say about persecution and church growth (~AD 200)?', options: ['Persecution destroys faith', 'The blood of the martyrs is the seed of the church', 'Hide until safe', 'Compromise is wisdom'], correctIdx: 1, explanation: 'Each Roman persecution swelled the movement. Watching Christians die well converted thousands of pagans.' },
+      { q: 'How many "unreached people groups" still exist today?', options: ['Zero', 'About 100', 'About 7,400 — roughly 3.4 billion people', 'Only 12'], correctIdx: 2, explanation: 'The Commission is not finished. Every Christian inherits it — pray, give, send, or go.' },
+    ],
+  },
+
+  {
+    id: 'modern-christianity',
+    category: 'church-history',
+    title: 'Modern Christianity',
+    description: 'Why there are so many denominations, what most Christians actually agree on, and where the global church stands today.',
+    duration: '9 min',
+    sections: [
+      {
+        heading: 'Why So Many Denominations?',
+        paragraphs: [
+          "There are roughly 33,000 distinct Christian denominations worldwide. That number sounds catastrophic — until you realize most of those differences are about secondary issues (baptism mode, church governance, worship style, end-times timing) and that on the core gospel, the vast majority of these churches agree.",
+          "The divisions trace through four major historical fractures: the AD 1054 East-West Schism (Roman Catholic vs Eastern Orthodox over papal authority and theological language), the 1500s Protestant Reformation (Luther, Calvin, the English Reformation under Cranmer), the 1700s evangelical awakenings that produced Methodists, Baptists, and others, and the 1900s charismatic/Pentecostal movement that reshaped global worship.",
+        ],
+      },
+      {
+        heading: 'The Four Main Traditions',
+        paragraphs: [
+          "**Roman Catholic** — the largest Christian body (~1.4 billion). Pope as central authority, sacramental theology, strong continuity with the medieval church, rich liturgy. Holds the Apostles' and Nicene Creeds.",
+          "**Eastern Orthodox** — ~220 million, mostly in Eastern Europe, Russia, Greece, and the Middle East. No pope; led by patriarchs. Emphasizes mystery, the divine liturgy, and *theosis* (growing into God's likeness). Same creeds as Catholics.",
+          "**Protestant** — ~800 million, in countless denominations: Lutheran, Anglican, Reformed/Presbyterian, Baptist, Methodist, Pentecostal, non-denominational. United by the Reformation solas: Scripture alone, faith alone, grace alone, Christ alone, glory to God alone.",
+          "**Independent/Indigenous churches** — ~280 million, particularly in Africa and Asia. Often combine local cultural elements with biblical Christianity. Growing rapidly.",
+        ],
+      },
+      {
+        heading: 'What All Faithful Christians Agree On',
+        paragraphs: [
+          "Despite the denominational fences, there is remarkable agreement on the core. C.S. Lewis called it \"mere Christianity\" — the central beliefs that have united followers of Jesus across centuries and continents:",
+          "One God in three persons. Jesus is fully God and fully human. He died on the cross for sin and rose bodily. Salvation is by grace through faith. The Bible is God's authoritative word. The church is Christ's body. Christ will return to judge and to renew all things. There is a real heaven and a real hell. The Holy Spirit lives in every believer. The Apostles' Creed and Nicene Creed summarize these in short form.",
+          "If a body of believers affirms these, you can call them brothers and sisters even if you disagree about other things. If they deny these, you are dealing with a different religion that uses Christian vocabulary.",
+        ],
+      },
+      {
+        heading: 'Where the Global Church Is Now',
+        paragraphs: [
+          "For most of the 20th century, the center of Christianity was North America and Europe. That has shifted. The fastest-growing churches now are in sub-Saharan Africa, China (about 100 million believers despite government restrictions), Brazil and Latin America, South Korea, Iran (one of the fastest-growing underground churches in the world), and parts of India and the Philippines.",
+          "Western Christianity is in a period of decline in raw numbers and cultural influence — but the global church has never been larger or more diverse. There are more Anglicans in Nigeria today than in England. More Christians worship in Mandarin every Sunday than in any other language. The center of gravity of world Christianity is now somewhere over the Atlantic, drifting south and east. This is not the church dying. This is the Spirit moving where He has always moved — wherever there is hunger for Christ.",
+        ],
+      },
+    ],
+    keyVerse: { ref: 'John 17:20-21', text: 'I do not ask for these only, but also for those who will believe in me through their word, that they may all be one, just as you, Father, are in me, and I in you, that they also may be in us, so that the world may believe that you have sent me.' },
+    whatThisMeans: 'Denominations are a flawed but mostly normal feature of a global movement. Don\'t let them shake your confidence. The Christ-confessing church is one — fractured at its edges, united at its core. Find a doctrinally faithful local church, plant your feet, and don\'t leave because of secondary disagreements.',
+    quiz: [
+      { q: 'Roughly how many Christian denominations exist worldwide?', options: ['About 5', 'About 33,000', 'About 100', 'About 500,000'], correctIdx: 1, explanation: 'Most differences are secondary (baptism mode, governance, worship style). On the core gospel, the vast majority agree.' },
+      { q: 'The Great Schism of 1054 split Christianity into…', options: ['Catholic vs Protestant', 'Roman Catholic vs Eastern Orthodox', 'Liberal vs Conservative', 'Old vs New Testament churches'], correctIdx: 1, explanation: 'The first major fracture — papal authority and theological language. The Reformation came 500 years later.' },
+      { q: 'Which of the following is NOT a core belief all faithful Christians share?', options: ['The Trinity', 'The bodily resurrection of Christ', 'Salvation by grace through faith', 'A specific mode of baptism'], correctIdx: 3, explanation: 'Baptism mode (immersion vs sprinkling) is a secondary debate. The first three are core "mere Christianity."' },
+      { q: 'Where are the fastest-growing churches in the world today?', options: ['Western Europe', 'Sub-Saharan Africa, China, Iran, Latin America, South Korea', 'North America', 'Antarctica'], correctIdx: 1, explanation: 'The center of gravity of world Christianity has shifted south and east. There are more Anglicans in Nigeria than in England.' },
+      { q: 'Approximately how many believers are in China today?', options: ['10,000', 'About 100 million', '50 million', 'Christianity is illegal there'], correctIdx: 1, explanation: 'About 100 million despite government restrictions. One of the great untold stories of modern Christianity.' },
+    ],
+  },
+
+  // ═════════════════ CHRISTIAN LIVING · Batch 2 (4) ═════════════════
+
+  {
+    id: 'forgiveness',
+    category: 'christian-living',
+    title: 'Forgiveness',
+    description: 'How to forgive what doesn\'t deserve to be forgiven — without pretending it didn\'t happen.',
+    duration: '8 min',
+    sections: [
+      {
+        heading: 'The Command That Sounds Impossible',
+        paragraphs: [
+          "Peter once asked Jesus how many times he should forgive someone who sinned against him. \"As many as seven times?\" he asked, probably feeling generous. Jesus's answer: \"I do not say to you seven times, but seventy-seven times\" (Matthew 18:22). Other translations render it \"seventy times seven.\" Either way, the math is the point: stop counting.",
+          "This sounds impossible because some wounds feel unforgivable. Abuse. Betrayal. The friend who lied. The parent who left. The classmate who humiliated you. Christianity does not minimize any of that. But it does insist that holding the wound — feeding it, replaying it, letting it run your inner life — does more damage to you than to them. Forgiveness is the only door out.",
+        ],
+      },
+      {
+        heading: 'What Forgiveness Is Not',
+        paragraphs: [
+          "Forgiveness is not saying \"it was okay.\" If it wasn't okay, don't pretend it was. Forgiveness is not forgetting. God does not have amnesia about your sin; He chooses not to count it. Forgiveness is not trust. Trust is rebuilt by changed behavior over time, and only when the offender is safe. Forgiveness is not staying. If someone is hurting you, leave first, then work on forgiveness from a distance.",
+          "Forgiveness is releasing your right to retaliate, to keep the score, to define the offender by their worst moment. It is handing the case over to God — \"Vengeance is mine, I will repay, says the Lord\" (Romans 12:19). You are not the judge. You are stepping out of the courtroom.",
+        ],
+      },
+      {
+        heading: 'Why You Have To',
+        paragraphs: [
+          "Jesus tells a parable in Matthew 18 about a servant forgiven an enormous debt who then refuses to forgive a tiny debt owed to him. The master is furious. The point lands hard: every Christian has been forgiven an infinite debt by God. Refusing to forgive others while accepting that forgiveness is moral incoherence.",
+          "There is also a practical reason. Unforgiveness is acid in the soul. You drink it expecting the other person to die. Anne Lamott: \"Not forgiving is like drinking rat poison and then waiting for the rat to die.\" The person who hurt you has moved on. You are the one still bound.",
+        ],
+      },
+      {
+        heading: 'How to Actually Do It',
+        paragraphs: [
+          "Name the wound honestly to God. Not in vague spiritual language. Specifically — \"They said this, they did that, it hurt this much.\" God can handle your rage; He invented the Psalms of lament. Then, with His help, release the right to repay. Not because you feel like it, but as an act of will. You may have to do this dozens of times for the same wound. That is normal.",
+          "Pray for the person who hurt you. Even if you have to grit your teeth. Jesus said \"pray for those who persecute you\" (Matthew 5:44) — not because they deserve it, but because praying for someone slowly disassembles your enemy frame of them. Last, be patient with yourself. Forgiveness is a process, not a single event. The wound that took years to inflict may take years to fully heal.",
+        ],
+      },
+    ],
+    keyVerse: { ref: 'Ephesians 4:32', text: 'Be kind to one another, tenderhearted, forgiving one another, as God in Christ forgave you.' },
+    whatThisMeans: 'The wound is real. The hurt is real. And forgiveness is still the door out. It does not mean what they did was fine; it means you are no longer carrying it. Hand the case to God. Pray for them through gritted teeth. Repeat as many times as it takes.',
+    quiz: [
+      { q: 'How many times does Jesus say to forgive (Matthew 18:22)?', options: ['Seven times', 'Seventy-seven (or seventy times seven) — stop counting', 'Three times', 'Only once'], correctIdx: 1, explanation: 'The math is the point — stop counting. Forgiveness is not a budget you spend down.' },
+      { q: 'Which of the following IS forgiveness?', options: ['Saying it was okay', 'Forgetting it happened', 'Releasing your right to retaliate, handing the case to God', 'Immediately restoring trust'], correctIdx: 2, explanation: 'Forgiveness is releasing the right to repay. Trust is separate — rebuilt by changed behavior over time.' },
+      { q: 'What does Romans 12:19 say about vengeance?', options: ['Take revenge quickly', 'Vengeance is mine, says the Lord — I will repay', 'Vengeance is impossible', 'Forgiveness means no consequences ever'], correctIdx: 1, explanation: 'You\'re stepping out of the courtroom. God is the judge — and a better one than you would be.' },
+      { q: 'What metaphor did Anne Lamott use for unforgiveness?', options: ['A locked door', 'Drinking rat poison and waiting for the rat to die', 'A weight you can\'t lift', 'An infinite loop'], correctIdx: 1, explanation: 'The person who hurt you has moved on. You\'re the one still bound. Unforgiveness damages the unforgiving more than the unforgiven.' },
+      { q: 'According to the lesson, forgiveness is best understood as…', options: ['A one-time event', 'A process — you may have to do it dozens of times for the same wound', 'Something only saints can do', 'Optional'], correctIdx: 1, explanation: 'Be patient with yourself. The wound that took years to inflict may take years to fully heal.' },
+    ],
+  },
+
+  {
+    id: 'dating-relationships',
+    category: 'christian-living',
+    title: "Dating & Relationships God's Way",
+    description: 'How to date as a Christian — without the legalism, without the chaos, with eyes open.',
+    duration: '9 min',
+    sections: [
+      {
+        heading: 'Start With the End in Mind',
+        paragraphs: [
+          "Christian dating is not just \"normal dating but no sex.\" It is a different category. The end of dating is not entertainment; it is to figure out whether this person should become your spouse. If marriage isn't on the table — because of age, season, readiness, or character — there's no point in performing the simulation of a relationship that isn't going anywhere.",
+          "This sounds intense, especially in a culture where teens \"date\" for six weeks at a time. But starting with the end in mind frees you. It means you can be a friend to many people without forcing every cute classmate into a romantic frame. It means when you do date someone, you take it seriously. It means you are not auditioning your future for entertainment now.",
+        ],
+      },
+      {
+        heading: 'What to Look For',
+        paragraphs: [
+          "The single most important question about a potential partner is: do they love Jesus more than they love me? Anyone who loves you more than they love Jesus is borrowing from a tank that will eventually run dry. Anyone who loves Jesus first will love you out of an inexhaustible reserve.",
+          "Beyond that: 2 Corinthians 6:14 warns Christians not to be \"unequally yoked\" with unbelievers. It is not snobbery; it is realism. The most important decisions of your life — how to raise kids, how to handle suffering, what to die for — will be unrecognizable to a partner who does not share your faith. Look for character, faith, sense of calling, kindness to weak people, honesty under pressure, response to authority, and how they treat their parents. Looks fade. Character compounds.",
+        ],
+      },
+      {
+        heading: 'The Hard Parts: Sex and Boundaries',
+        paragraphs: [
+          "The Bible is clear that sex belongs inside marriage (1 Corinthians 6:18-20, Hebrews 13:4). This is not because sex is bad — it's because sex is so powerful that it requires the container of lifelong covenant. Outside that container, it tears people apart. Studies confirm what Scripture said three thousand years ago: cohabitation before marriage correlates with higher divorce rates, and the number of premarital sexual partners correlates with marital dissatisfaction.",
+          "Practical boundaries: set them in your head before you're alone with someone, not in the moment. Decide what you will and won't do before your bloodstream is full of dopamine. Date in public. Be home by a reasonable time. Don't get drunk. If you have already crossed lines — and many have — God forgives. Confession, repentance, and a fresh start are always available. \"If we confess our sins, he is faithful and just to forgive us\" (1 John 1:9).",
+        ],
+      },
+      {
+        heading: 'Breaking Up Without Wreckage',
+        paragraphs: [
+          "Most dating relationships end. That is normal. Breaking up is not a failure; it is a discovery — you learned this was not the person, and you saved both of you from a much worse mistake.",
+          "Break up in person when possible. Be honest but kind. Don't slow-fade. Don't ghost. Don't humiliate them publicly afterward. Take time alone before the next relationship — a rule of thumb is one month single per year of dating, or at least a few months no matter what. Read Scripture. Talk to wise older Christians. Pray about what you learned. Then, if and when it's time, try again — wiser.",
+        ],
+      },
+    ],
+    keyVerse: { ref: '2 Corinthians 6:14', text: 'Do not be unequally yoked with unbelievers. For what partnership has righteousness with lawlessness? Or what fellowship has light with darkness?' },
+    whatThisMeans: 'Date with the end in mind. Look for someone who loves Jesus more than they love you. Set boundaries before you need them. Break up kindly when it\'s time. None of this is restriction — it\'s a path to something genuinely good. The world\'s playbook produces wreckage. God\'s playbook produces marriages worth having.',
+    quiz: [
+      { q: 'What is the right "end" of Christian dating?', options: ['Entertainment', 'To figure out whether this person should become your spouse', 'Social status', 'Sexual experience'], correctIdx: 1, explanation: 'If marriage isn\'t on the table — because of age, season, or character — there\'s no point in dating someone now.' },
+      { q: 'What\'s the single most important question about a potential partner?', options: ['How attractive are they?', 'Do they love Jesus more than they love me?', 'How much money do they have?', 'Are they popular?'], correctIdx: 1, explanation: 'Anyone who loves you more than Jesus is borrowing from a tank that runs dry. Anyone who loves Jesus first loves you from an inexhaustible reserve.' },
+      { q: 'Why does 2 Corinthians 6:14 warn against being "unequally yoked"?', options: ['Snobbery', 'Realism — the most important life decisions will be unrecognizable to a partner who doesn\'t share your faith', 'Cultural prejudice', 'It doesn\'t — that\'s a misreading'], correctIdx: 1, explanation: 'How to raise kids, handle suffering, what to die for — these decisions need shared foundations.' },
+      { q: 'Why does the Bible reserve sex for marriage?', options: ['Sex is bad', 'Sex is so powerful it requires the container of lifelong covenant — outside that, it tears people apart', 'God is restrictive', 'Old cultural rule with no current relevance'], correctIdx: 1, explanation: 'Not because sex is bad, but because it\'s too powerful for anything less than a marriage covenant.' },
+      { q: 'When breaking up, the lesson recommends…', options: ['Ghost them', 'Slow-fade', 'Be honest and kind, in person when possible, then take time alone before the next relationship', 'Make a scene online'], correctIdx: 2, explanation: 'Most dating ends. Breaking up is a discovery, not a failure. Take time alone, learn, then try again — wiser.' },
+    ],
+  },
+
+  {
+    id: 'social-media-faith',
+    category: 'christian-living',
+    title: 'Social Media & Christian Life',
+    description: 'How to use the feed without letting the feed use you — wisdom for a tool the Bible never imagined.',
+    duration: '8 min',
+    sections: [
+      {
+        heading: 'A Tool the Bible Never Imagined',
+        paragraphs: [
+          "Scripture does not mention TikTok, Instagram, or Snapchat. But it has enormous amounts to say about the heart — and social media is a heart accelerator. It amplifies whatever was already there. Insecurity becomes worse. Comparison becomes constant. Anger becomes performative. Vanity becomes scalable. The platform is not neutral; it is engineered to maximize the attention you spend on it, often by exploiting the worst parts of human psychology.",
+          "That doesn't mean Christians must leave social media. It means we have to use it like an adult uses a power tool — eyes open, with a job in mind, putting it down when finished. The default mode (passive, infinite scroll, comparison) is bad for almost everyone, especially teens and young adults.",
+        ],
+      },
+      {
+        heading: 'What Studies Confirm',
+        paragraphs: [
+          "The data is increasingly stark. Teen girls who spend more than 3 hours per day on social media show roughly double the rates of depression and anxiety as those who spend less than an hour. The U.S. Surgeon General issued a 2023 advisory warning of \"a profound risk of harm to the mental health and well-being of children and adolescents.\" The rise in teen mental health crises closely tracks smartphone and social media adoption (2010-2015 onward).",
+          "The mechanisms are predictable: algorithmic amplification of negativity, social comparison with curated highlight reels, sleep disruption from late-night use, reduced face-to-face time. None of this is moralistic hand-wringing — it is the conclusion of the researchers who originally believed these platforms would be neutral or beneficial.",
+        ],
+      },
+      {
+        heading: 'What the Bible Says About the Heart',
+        paragraphs: [
+          "\"Above all else, guard your heart, for everything you do flows from it\" (Proverbs 4:23). The feed is constant input directly into your heart. If you don't curate it, the algorithm will — and the algorithm is optimized for engagement, not your flourishing.",
+          "\"Whatever is true, whatever is honorable, whatever is just, whatever is pure, whatever is lovely, whatever is commendable, if there is any excellence, if there is anything worthy of praise, think about these things\" (Philippians 4:8). Audit your feed against that verse. If a follow makes you angry, anxious, lustful, or envious every time you see it, unfollow. Your inputs shape your outputs.",
+        ],
+      },
+      {
+        heading: 'Practical Wisdom',
+        paragraphs: [
+          "Set time limits — most phones have screen-time tools. Keep phones out of the bedroom at night. Do not check social media first thing in the morning; that decision determines what colonizes your brain for the rest of the day. Be slow to post when emotional. Never argue theology or politics in comments — no one has ever changed their mind from a comment war.",
+          "And remember: every minute you spend on someone else's life is a minute you didn't spend on your own. The most striking thing about the heroes of the Bible is that they were not famous in their time. David was a shepherd. Mary was a teenager in a backwater village. They built things that lasted. Your real life — your friendships, your skills, your prayer life, your service to people in front of you — is the only life God has assigned you. The feed is not it.",
+        ],
+      },
+    ],
+    keyVerse: { ref: 'Philippians 4:8', text: 'Finally, brothers, whatever is true, whatever is honorable, whatever is just, whatever is pure, whatever is lovely, whatever is commendable, if there is any excellence, if there is anything worthy of praise, think about these things.' },
+    whatThisMeans: 'You don\'t have to delete every app. You have to use them like an adult with a job to do, then put them down. Audit your follows. Set limits. Keep phones out of the bedroom at night. Your real life — the people in front of you, the skills you\'re building, the prayer life you\'re developing — is the only life God assigned you. The feed is not it.',
+    quiz: [
+      { q: 'According to the U.S. Surgeon General\'s 2023 advisory, social media poses what risk to teens?', options: ['No measurable risk', 'A profound risk of harm to mental health and well-being', 'Only a risk if used illegally', 'Risk only to kids under 10'], correctIdx: 1, explanation: 'The data is increasingly clear: depression and anxiety roughly double for teens spending >3 hours/day on social media.' },
+      { q: 'What does Proverbs 4:23 say about the heart?', options: ['Ignore it', 'Above all else, guard your heart — for everything you do flows from it', 'It is unreliable', 'Replace it with reason'], correctIdx: 1, explanation: 'If you don\'t curate your inputs, the algorithm will — and it\'s optimized for engagement, not your flourishing.' },
+      { q: 'What standard does Philippians 4:8 give for what we should think about?', options: ['Whatever is entertaining', 'Whatever is true, honorable, just, pure, lovely, commendable, excellent, praiseworthy', 'Whatever is popular', 'Whatever feels good'], correctIdx: 1, explanation: 'Audit your feed against this verse. If a follow makes you angry, anxious, or envious every time, unfollow.' },
+      { q: 'Which is NOT a practical recommendation from this lesson?', options: ['Set time limits', 'Keep phones out of the bedroom at night', 'Argue theology in comments to convert people', 'Be slow to post when emotional'], correctIdx: 2, explanation: 'No one has ever changed their mind from a comment war. That\'s not where evangelism happens.' },
+      { q: 'What\'s the bigger point about social media?', options: ['Quit forever', 'Use it constantly', 'Your real life — the people in front of you, the skills you\'re building, the prayer life you\'re developing — is the only life God assigned you', 'It doesn\'t matter'], correctIdx: 2, explanation: 'Every minute on someone else\'s life is a minute not on your own. The feed is not your life.' },
+    ],
+  },
+
+  {
+    id: 'handling-doubt',
+    category: 'christian-living',
+    title: 'Handling Doubt Without Losing Faith',
+    description: 'Doubt is normal. Many heroes of the Bible had it. Here\'s how to walk through doubt without it destroying your faith.',
+    duration: '8 min',
+    sections: [
+      {
+        heading: 'The People Who Doubted',
+        paragraphs: [
+          "John the Baptist was the greatest prophet Jesus ever named — and he doubted. From prison, awaiting execution, he sent disciples to ask Jesus: \"Are you the one who is to come, or shall we look for another?\" (Matthew 11:3). Thomas, the disciple, refused to believe in the resurrection until he could touch the wounds. The psalmist asks \"How long, O Lord? Will you forget me forever?\" (Psalm 13:1).",
+          "Doubt is not the opposite of faith. Unbelief — a settled refusal to consider — is the opposite of faith. Doubt is the wrestling that often *strengthens* faith. If your parents or church told you doubt was dangerous, they meant well, but they were partly wrong. Doubt that is brought into the light, asked honestly, and pursued with rigor is one of the chief ways God matures believers.",
+        ],
+      },
+      {
+        heading: 'Where Doubt Usually Comes From',
+        paragraphs: [
+          "Most doubt is not actually intellectual, even when it sounds intellectual. Most doubt comes from one of three sources. First: suffering. Something bad happened, and the easy slogans of childhood faith collapsed under the weight. Second: cultural pressure. Smart people around you act like Christianity is silly, and you feel embarrassed. Third: hidden sin. You're living in a way that contradicts your faith, and doubt becomes the rationalization for the lifestyle.",
+          "Diagnose your doubt honestly. If it is intellectual, study. If it is suffering, lament and seek a wise friend. If it is sin, repent. The treatment depends on the source. The same Tylenol does not cure both a broken arm and a fever.",
+        ],
+      },
+      {
+        heading: 'What To Do With Honest Questions',
+        paragraphs: [
+          "Bring them into the light. Doubt thrives in darkness, in 3 a.m. spirals, in the unspoken anxiety you don't dare voice. Write the doubt down explicitly: \"I'm not sure I believe X because Y.\" Then take it to (a) Scripture, (b) a wise older Christian, (c) a substantive book or podcast. Don't try to handle it alone in your head.",
+          "Read C.S. Lewis (*Mere Christianity*, *The Problem of Pain*). Read Tim Keller (*The Reason for God*). Read Lee Strobel (*The Case for Christ*). Christianity has answered the hard questions for 2,000 years, often by smarter people than the social media accounts dunking on faith today. The answers are not always emotionally satisfying, but they are intellectually serious.",
+        ],
+      },
+      {
+        heading: 'Faith Through the Fog',
+        paragraphs: [
+          "Sometimes doubt is a season, not a crisis. You may not feel God for weeks or months. Many great Christians — Mother Teresa, C.S. Lewis after his wife died — described long stretches of spiritual dryness. Keep showing up. Read Scripture even when it feels flat. Pray even when it feels like the words are bouncing off the ceiling. Worship with God's people even when you'd rather sleep in. Faith is not a feeling. It is allegiance to what you have seen to be true, even when the feeling temporarily evaporates.",
+          "Jude 22 gives the church a simple instruction: \"have mercy on those who doubt.\" If you doubt, you are not a second-class Christian. If a friend doubts, do not panic and do not lecture. Be patient. Pray. Walk with them. Faith is a journey, and the doubts that come on the way are often the very tools God uses to deepen it.",
+        ],
+      },
+    ],
+    keyVerse: { ref: 'Mark 9:24', text: 'I believe; help my unbelief!' },
+    whatThisMeans: 'Doubt is normal, not disqualifying. The same disciple who saw Jesus walk on water also asked for proof of the resurrection. Diagnose the source — intellectual, suffering, or hidden sin — and treat accordingly. Bring doubt into the light. Read serious answers. Keep showing up. The faith on the other side of honest doubt is sturdier than the faith that never wrestled.',
+    quiz: [
+      { q: 'Who, from prison and facing execution, sent disciples to ask Jesus "are you really the one"?', options: ['Peter', 'John the Baptist', 'Paul', 'Stephen'], correctIdx: 1, explanation: 'Matthew 11:3. The greatest prophet Jesus ever named, doubting at the lowest moment. Doubt is not disqualifying.' },
+      { q: 'What is the actual opposite of faith?', options: ['Doubt', 'Unbelief — settled refusal to consider', 'Worship', 'Knowledge'], correctIdx: 1, explanation: 'Doubt wrestles. Unbelief settles. The Bible is patient with the first and warns against the second.' },
+      { q: 'What are the three most common sources of doubt named in this lesson?', options: ['Money, fame, power', 'Suffering, cultural pressure, hidden sin', 'School, work, family', 'Music, movies, books'], correctIdx: 1, explanation: 'Diagnose honestly. The same treatment doesn\'t fix all three. Intellectual doubt needs study; suffering needs lament; sin needs repentance.' },
+      { q: 'What does Jude 22 say about doubters?', options: ['Excommunicate them', 'Have mercy on those who doubt', 'Argue them into faith', 'Ignore them'], correctIdx: 1, explanation: 'If you or a friend doubts — be patient, walk with them, don\'t panic. Faith is a journey.' },
+      { q: 'In a season of spiritual dryness, what should a Christian do?', options: ['Walk away — clearly God isn\'t real', 'Keep showing up — read Scripture, pray, worship with God\'s people even when it feels flat', 'Switch religions', 'Wait for the feeling to come back before doing anything'], correctIdx: 1, explanation: 'Faith is allegiance to what you have seen to be true, not a feeling. Many great Christians described long stretches of dryness.' },
+    ],
+  },
+
+  // ═══════════════════ APOLOGETICS · Batch 2 (3) ═══════════════════
+
+  {
+    id: 'resurrection-evidence',
+    category: 'apologetics',
+    title: 'Resurrection — Historical Evidence',
+    description: 'Why even most non-Christian historians accept the basic facts surrounding the resurrection — and what those facts demand.',
+    duration: '9 min',
+    sections: [
+      {
+        heading: 'The Claim That Should Be Easy to Disprove',
+        paragraphs: [
+          "Christianity rises or falls on a single historical claim: that Jesus of Nazareth was crucified, buried, and three days later physically rose from the dead. Paul says it himself: \"if Christ has not been raised, then our preaching is in vain and your faith is in vain\" (1 Corinthians 15:14). Christianity is not a philosophy that survives if its founder didn't get up. It survives only if He did.",
+          "This makes the religion uniquely falsifiable. Disprove the resurrection — produce a body, find a confession of fraud, demonstrate a coherent natural explanation — and the religion collapses. For 2,000 years, smart, motivated people have tried. None have succeeded.",
+        ],
+      },
+      {
+        heading: 'The Facts Most Historians Accept',
+        paragraphs: [
+          "Even skeptical New Testament scholars (Bart Ehrman, Gerd Lüdemann, others who do not personally believe in the resurrection) accept what historians call the \"minimal facts\": Jesus was crucified under Pontius Pilate around AD 30-33; His tomb was found empty by His female followers a few days later; multiple disciples claimed to see Him alive afterward (including individuals like Peter and Thomas, groups like the Twelve, women, more than 500 at once per Paul, and former skeptics like James His brother and Paul of Tarsus); and the earliest disciples — who were in the best position to know whether they had made up the story — went on to suffer and in many cases die for their claim, with no apparent earthly motive for the fabrication.",
+          "These are not Sunday school facts. They are historical conclusions accepted across the ideological spectrum.",
+        ],
+      },
+      {
+        heading: 'The Theories That Don\'t Work',
+        paragraphs: [
+          "**Stolen body** — Matthew 28:13 notes this was the earliest counter-explanation. But it requires terrified, scattered disciples to outwit a Roman guard at a sealed tomb, then somehow inspire one another to risk torture and death for a corpse they hid.",
+          "**Wrong tomb** — But the women, the Jewish authorities, and the Romans could all have produced the right tomb in days. They didn't, because there was no body in any tomb.",
+          "**Hallucinations** — Hallucinations are individual experiences, not group experiences. They don't appear to skeptics like James and Paul. And hallucinations don't leave empty tombs.",
+          "**Swoon theory (Jesus didn't really die)** — Asks us to believe a man who was scourged, crucified, and pierced through the side with a spear later revived in a cold tomb, rolled away a multi-ton stone, overpowered a Roman guard, and walked miles on freshly nailed feet to convince His disciples He had triumphed over death. Roman soldiers were professional executioners. He died.",
+        ],
+      },
+      {
+        heading: 'What the Best Explanation Is',
+        paragraphs: [
+          "The cumulative case from N.T. Wright, William Lane Craig, and many others is straightforward: the simplest explanation that accounts for all the facts is that Jesus actually rose from the dead. Empty tomb + multiple independent appearances + transformed disciples + sudden growth of the church in the same city where He was executed — the resurrection is the explanation that makes the most pieces fit.",
+          "You do not have to be a historian to find the case persuasive. Read Lee Strobel's *The Case for Christ* — a former atheist journalist's investigation. Read N.T. Wright's *The Resurrection of the Son of God* — 800 pages of academic rigor. The evidence is not the kind that compels belief at gunpoint. It is the kind that, examined honestly, makes faith deeply reasonable.",
+        ],
+      },
+    ],
+    keyVerse: { ref: '1 Corinthians 15:3-6', text: 'For I delivered to you as of first importance what I also received: that Christ died for our sins in accordance with the Scriptures, that he was buried, that he was raised on the third day in accordance with the Scriptures, and that he appeared to Cephas, then to the twelve. Then he appeared to more than five hundred brothers at one time, most of whom are still alive.' },
+    whatThisMeans: 'Christianity is uniquely falsifiable — show a body and the whole thing collapses. 2,000 years in, no one has done it. The historical case is not magic-thinking. It is one of the most evidence-backed claims about an ancient figure that exists. When skeptics ask, you can answer with confidence.',
+    quiz: [
+      { q: 'What does 1 Corinthians 15:14 say about the resurrection?', options: ['It\'s a metaphor', 'If Christ has not been raised, our preaching is in vain and your faith is in vain', 'It doesn\'t matter historically', 'Only the spiritual resurrection counts'], correctIdx: 1, explanation: 'Christianity rises or falls on this claim. Paul stakes the entire religion on it.' },
+      { q: 'How many people did Paul say saw the risen Jesus at one time (1 Corinthians 15:6)?', options: ['12', '50', 'More than 500 — most still alive when he wrote', 'Only Peter'], correctIdx: 2, explanation: '"Most of whom are still alive" — Paul was essentially inviting his readers to check with the witnesses.' },
+      { q: 'Which is NOT one of the "minimal facts" most historians accept?', options: ['Jesus was crucified under Pilate', 'His tomb was found empty', 'Disciples claimed to see Him alive', 'Pilate personally converted to Christianity'], correctIdx: 3, explanation: 'The first three are accepted across the ideological spectrum. The fourth is not historical.' },
+      { q: 'What\'s the main problem with the "hallucination theory"?', options: ['Hallucinations don\'t exist', 'Hallucinations are individual experiences, not group — and don\'t leave empty tombs', 'Christians invented the term', 'It actually works perfectly'], correctIdx: 1, explanation: 'Group hallucinations of the same person aren\'t a real phenomenon. And hallucinations can\'t empty tombs.' },
+      { q: 'What\'s the best historical explanation for all the facts?', options: ['Mass conspiracy', 'Group hallucinations', 'That Jesus actually rose from the dead', 'No one really knows'], correctIdx: 2, explanation: 'The simplest explanation that accounts for empty tomb + multiple appearances + transformed disciples + sudden church growth in Jerusalem is exactly what the disciples claimed.' },
+    ],
+  },
+
+  {
+    id: 'why-suffering',
+    category: 'apologetics',
+    title: 'Why Does God Allow Suffering?',
+    description: 'The oldest, hardest question — and the answers Christianity actually gives. Not a dodge, not a cliché.',
+    duration: '9 min',
+    sections: [
+      {
+        heading: 'The Question Behind Most Doubt',
+        paragraphs: [
+          "If God is all-powerful and all-loving, why is there cancer? Why are there school shootings? Why was that child abused? The question is at least 3,000 years old — the book of Job, the laments of the psalmists, Habakkuk yelling at God for ignoring injustice. It is not a modern problem. It is the deepest problem in any worldview that posits a good God.",
+          "Most people who have lost their faith point to suffering as the precipitating reason. So this is not a side issue. It is the question. And Christianity does not duck it. It actually has the most substantive answers of any worldview — but those answers require patience to receive.",
+        ],
+      },
+      {
+        heading: 'The Free Will Answer',
+        paragraphs: [
+          "Most evil in the world is moral evil — caused by human choices. War. Abuse. Theft. Lies. Neglect. God could have made a world without these — but only by removing genuine moral freedom. A robot that always does the right thing is not a moral being. Love is not love if it is forced. God's risk in creating beings who could love Him was the same risk in creating beings who could reject Him and hurt one another.",
+          "C.S. Lewis: \"God created things which had free will. That means creatures which can go wrong or right. Some people think they can imagine a creature which was free but had no possibility of going wrong, but I can't.\" The price of love is the possibility of hate. God paid that price, and so do we.",
+        ],
+      },
+      {
+        heading: 'Natural Evil and the Broken World',
+        paragraphs: [
+          "But what about earthquakes, cancer, tsunamis — \"natural evils\" not caused by human choice? Christianity offers two layers of answer. First, Genesis 3 teaches that human rebellion broke not just human relationships but the natural order itself. \"Cursed is the ground because of you\" (Genesis 3:17). Creation \"was subjected to futility\" and \"groans together in the pains of childbirth\" (Romans 8:20-22). The world we live in is not the world God designed; it is a fallen version of it.",
+          "Second, God promises that this is temporary. Revelation 21:4: \"He will wipe away every tear... death shall be no more, neither shall there be mourning, nor crying, nor pain anymore.\" The current state of suffering is not the final state. It is the wreckage on the way to something restored.",
+        ],
+      },
+      {
+        heading: 'Where God Actually Goes With Suffering',
+        paragraphs: [
+          "But none of those answers, by themselves, would be enough if Christianity were just an explanation. What makes Christianity unique is that God did not stay outside the suffering He allows. He stepped into it. Jesus was born into poverty, betrayed by friends, tortured, executed unjustly. \"He was despised and rejected by men, a man of sorrows and acquainted with grief\" (Isaiah 53:3).",
+          "The Christian God is the only one in any major religion who has personally suffered. When you cry to Him, you are not crying to a distant being who has never felt your pain. You are crying to a person who has been there. The cross does not explain suffering. It does something better — it puts God inside it.",
+        ],
+      },
+      {
+        heading: 'How to Live in It',
+        paragraphs: [
+          "Christians do not have to pretend. The Psalms model the full range of human grief — anger, despair, complaint to God, even questioning Him. Lament is biblical. Forced positivity is not. When you suffer, you can be honest with God; He can take it.",
+          "And Christianity has the most durable framework for staying upright through suffering: this is not the end of the story, God Himself entered it with us, and one day every tear will be wiped away. Romans 8:28 says \"all things work together for good for those who love God\" — not that all things are good, but that God can take even the wreckage and weave it into something redemptive. Many of the deepest Christians you will ever meet were forged in suffering. Your suffering is real. It is not the final word.",
+        ],
+      },
+    ],
+    keyVerse: { ref: 'Romans 8:18', text: 'For I consider that the sufferings of this present time are not worth comparing with the glory that is to be revealed to us.' },
+    whatThisMeans: 'Christianity does not dodge the question of suffering. It gives you free will to explain moral evil, a fallen creation to explain natural evil, a coming restoration to anchor hope, and — most importantly — a God who stepped into the suffering with you on a Roman cross. You can be honest. You can lament. And you can hold on, because the story does end well.',
+    quiz: [
+      { q: 'Where does most evil in the world come from?', options: ['God', 'Human moral choices (war, abuse, theft, lies, neglect)', 'Random chance', 'Other religions'], correctIdx: 1, explanation: 'God could have removed all moral evil — but only by removing genuine moral freedom. Love that\'s forced isn\'t love.' },
+      { q: 'What did C.S. Lewis say about free will and evil?', options: ['God forces good outcomes', 'God could create free creatures with no possibility of going wrong', 'God created creatures which can go wrong or right — the price of love is the possibility of hate', 'Free will doesn\'t exist'], correctIdx: 2, explanation: 'A robot that always does right is not a moral being. The price of love is the possibility of hate.' },
+      { q: 'How does Christianity explain "natural evil" like earthquakes and disease?', options: ['God doesn\'t care', 'Genesis 3 teaches that human rebellion broke not just relationships but the natural order itself — creation is fallen', 'They\'re random with no meaning', 'God enjoys suffering'], correctIdx: 1, explanation: 'Romans 8:20-22 — creation groans, subjected to futility. This is a fallen version of the world God designed.' },
+      { q: 'What does Christianity claim is unique about the Christian God compared to other religions?', options: ['He is most powerful', 'He personally entered suffering — born into poverty, betrayed, tortured, executed', 'He doesn\'t exist', 'He doesn\'t care about suffering'], correctIdx: 1, explanation: 'Isaiah 53:3 — a man of sorrows, acquainted with grief. The cross puts God inside the suffering He allows.' },
+      { q: 'What does Romans 8:28 actually claim?', options: ['All things are good', 'All things work together for good for those who love God — He can weave even wreckage into something redemptive', 'Suffering is fake', 'God prevents all bad things'], correctIdx: 1, explanation: 'Not that all things are good, but that God can take wreckage and make something redemptive from it. Many of the deepest Christians were forged in suffering.' },
+    ],
+  },
+
+  {
+    id: 'science-and-faith',
+    category: 'apologetics',
+    title: 'Science & Faith — Are They Compatible?',
+    description: 'The "science vs religion" framing is a modern myth. Here\'s what the actual history shows — and where the lines really are.',
+    duration: '9 min',
+    sections: [
+      {
+        heading: 'The Myth You\'ve Probably Been Told',
+        paragraphs: [
+          "The popular story goes: religion was the dark ages, science came along, and the two have been at war ever since. This narrative was invented in the late 1800s by two specific authors (John William Draper and Andrew Dickson White), and historians of science have spent the last century systematically dismantling it. Most contemporary academic historians of science (the actual experts) describe a \"complexity thesis\" instead — a long, mostly cooperative relationship punctuated by genuine but rare conflicts.",
+          "What history actually shows: modern science largely emerged from a Christian Europe that believed (a) the universe was created by a rational God and therefore would be rationally ordered, and (b) the human mind, made in God's image, was capable of understanding that order. These two beliefs are not incidental to science — they are its philosophical foundations.",
+        ],
+      },
+      {
+        heading: 'The Christian Scientists',
+        paragraphs: [
+          "Most of the founders of modern science were Christians, often quite serious ones. Copernicus was a Catholic cleric. Galileo was a devout Catholic (the conflict with the Church was more about politics and theology of Scripture interpretation than about science vs religion — and he died comfortably in his own house). Kepler called his work \"thinking God's thoughts after Him.\" Newton wrote more on theology than on physics. Boyle, Faraday, Pasteur, Mendel (the monk who founded genetics), Lord Kelvin, Maxwell — all devout believers.",
+          "In the 20th century: Werner Heisenberg, Max Planck, George Lemaître (the Catholic priest and physicist who proposed the Big Bang theory), Francis Collins (the geneticist who led the Human Genome Project). The notion that working scientists cannot be Christians is contradicted by the entire history of working scientists.",
+        ],
+      },
+      {
+        heading: 'Where the Conflict Is Real',
+        paragraphs: [
+          "There are genuine tensions, but they are narrower than the popular story suggests. Most are about the origin of the universe, the origin of life, and evolution. Christians hold a range of views: young-earth creationism (6,000-10,000 year old earth, literal six-day creation), old-earth creationism (the days of Genesis 1 are long ages), and theistic evolution (God created through the evolutionary process). All are held by faithful, thoughtful Christians.",
+          "The Bible does not contradict science. The two ask different questions. Science asks \"how?\" — by what mechanism, with what timing. The Bible asks \"who?\" and \"why?\" — by what intent, for what purpose. A poem about a sunset and a physics paper about light wavelengths are not in conflict; they are doing different work.",
+        ],
+      },
+      {
+        heading: 'Where Science Actually Points',
+        paragraphs: [
+          "Modern cosmology has, if anything, made theism more reasonable, not less. The universe had a beginning (Big Bang) — which is what Genesis 1:1 has said for three thousand years. The fundamental constants of physics are fine-tuned to an extraordinary degree to permit life — what physicists call the \"fine-tuning problem.\" The information density of DNA is staggering. None of this proves God; the data is interpretable various ways. But the science is not the slam-dunk against faith that many people assume it is.",
+          "The biggest question science cannot answer is the most important one: why is there something rather than nothing? Science explains how things in the universe behave. It cannot explain why the universe is here in the first place. That is a question for philosophy and theology — and the Christian answer (an eternal, personal God created it) remains coherent and powerful.",
+        ],
+      },
+    ],
+    keyVerse: { ref: 'Psalm 19:1-2', text: 'The heavens declare the glory of God, and the sky above proclaims his handiwork. Day to day pours out speech, and night to night reveals knowledge.' },
+    whatThisMeans: 'You do not have to choose between believing the Bible and believing physics. The actual history of science and Christianity is one of partnership. Faithful Christians hold a range of views on Genesis. Modern cosmology, if anything, has made belief in a Creator more reasonable. Don\'t let a 19th-century myth talk you out of either your faith or your interest in science. You can have both.',
+    quiz: [
+      { q: 'According to historians of science, the "science vs religion war" narrative…', options: ['Is solid history', 'Was invented in the late 1800s and has been largely dismantled by historians since', 'Has been confirmed by modern research', 'Is a Christian conspiracy'], correctIdx: 1, explanation: 'Draper and White in the late 1800s. Most academic historians of science now describe a "complexity thesis" — long cooperation with rare genuine conflicts.' },
+      { q: 'Which is true about most founders of modern science?', options: ['They were all atheists', 'Most were Christians, often quite serious ones (Newton wrote more on theology than physics)', 'They had no religious views', 'They opposed Christianity'], correctIdx: 1, explanation: 'Copernicus, Kepler, Newton, Boyle, Faraday, Pasteur, Mendel — almost all devout believers. The notion that scientists can\'t be Christian is contradicted by the entire history of science.' },
+      { q: 'Who proposed the Big Bang theory?', options: ['An atheist astronomer', 'Georges Lemaître — a Catholic priest and physicist', 'Stephen Hawking', 'Charles Darwin'], correctIdx: 1, explanation: 'A Catholic priest. The Big Bang theory, far from disproving Genesis, is consistent with Genesis 1:1\'s claim that the universe had a beginning.' },
+      { q: 'What questions do science and the Bible primarily ask, respectively?', options: ['Both ask "how"', 'Science asks "how"; the Bible asks "who" and "why"', 'They ask the same questions', 'Neither asks any real questions'], correctIdx: 1, explanation: 'A poem about a sunset and a physics paper about light wavelengths aren\'t in conflict — they\'re doing different work.' },
+      { q: 'What\'s the biggest question science cannot answer?', options: ['How chemistry works', 'Why there is something rather than nothing', 'How DNA replicates', 'How stars form'], correctIdx: 1, explanation: 'Science explains how things in the universe behave. It cannot explain why the universe is here at all. That\'s a question for philosophy and theology.' },
+    ],
+  },
+
+  // ═══════════════════ BIBLE STUDY · Batch 2 (2) ═══════════════════
+
+  {
+    id: 'nt-overview',
+    category: 'bible-study',
+    title: 'New Testament Overview',
+    description: 'A bird\'s-eye view of the 27 books — Gospels, Acts, Letters, Revelation — and how they fit into one unified story.',
+    duration: '9 min',
+    sections: [
+      {
+        heading: 'One Story, 27 Books, ~95 Years',
+        paragraphs: [
+          "The New Testament was written between roughly AD 45 and AD 95 — fifty years of explosive growth from a small Jewish renewal movement in Galilee to a faith stretching across the Roman Empire. Twenty-seven books in four main groupings: four Gospels, one history (Acts), twenty-one letters, and one apocalyptic vision (Revelation). All originally written in Greek, the *lingua franca* of the eastern Mediterranean.",
+          "What unites them is a single conviction: that Jesus of Nazareth — crucified under Pontius Pilate around AD 30 — rose from the dead, fulfilled the entire Old Testament, and inaugurated the long-promised kingdom of God. Every New Testament book is, in some way, working out what that means.",
+        ],
+      },
+      {
+        heading: 'The Four Gospels',
+        paragraphs: [
+          "Matthew, Mark, Luke, and John — four portraits of Jesus from four angles. Matthew (written for Jewish audiences) emphasizes Jesus as the fulfillment of Old Testament prophecy and the new Moses. Mark (the shortest, fastest-paced) presents Jesus as the suffering Servant, in action. Luke (the most polished Greek prose; written by a physician) emphasizes Jesus as Savior of all people — Gentiles, women, the poor, the outcast. John (the latest, most theological) presents Jesus as the eternal Word made flesh.",
+          "Together they preserve the central event of human history: the life, teaching, death, and resurrection of Jesus. They are not four contradictory biographies but four complementary witnesses — the same event from four perspectives, like four photographs of one wedding from four angles.",
+        ],
+      },
+      {
+        heading: 'Acts and Paul\'s Letters',
+        paragraphs: [
+          "Acts (also written by Luke) is the only book of church history in the New Testament. It picks up where Luke's Gospel ends — the resurrection — and traces the first 30 years of the church, from Jerusalem to Rome. The Holy Spirit is the protagonist; Peter dominates the first half, Paul the second.",
+          "Then come Paul's letters — thirteen books written to churches he planted (Romans, 1-2 Corinthians, Galatians, Ephesians, Philippians, Colossians, 1-2 Thessalonians) or to individuals (1-2 Timothy, Titus, Philemon). Romans is the most systematic — Paul's full theological vision. 1 Corinthians is the most practical — a church behaving badly being lovingly corrected. Galatians is the most urgent — Paul fighting for the gospel of grace. Each letter is occasioned by a specific situation but has shaped Christian thought for two millennia.",
+        ],
+      },
+      {
+        heading: 'General Letters and Revelation',
+        paragraphs: [
+          "Hebrews (anonymous, though traditionally attributed to Paul or one of his circle) is a sustained argument that Christ is superior to every Old Testament institution — better than angels, better than Moses, better than the high priest, the perfect sacrifice. James is the most Old-Testament-flavored, full of practical wisdom (\"faith without works is dead\"). 1-2 Peter, 1-2-3 John, and Jude round out the \"General Letters\" — short, pastoral, focused on perseverance and faithfulness under pressure.",
+          "Revelation — the only book of biblical apocalyptic — was written by John on the island of Patmos around AD 95, during persecution under the Emperor Domitian. Its language is dense with Old Testament imagery and symbolism. Its message is simple: Christ wins. Empires fall. God dwells with His people forever. Don't read it as a chronological prediction; read it as a vision designed to comfort persecuted Christians and rally their hope.",
+        ],
+      },
+      {
+        heading: 'How to Read It as a Whole',
+        paragraphs: [
+          "A common reading order for first-time readers: start with Mark (the shortest Gospel), then read John, then Acts, then Romans, then the rest. This gives you Jesus's life, the founding of the church, Paul's theology, and the rest of the picture in roughly that order.",
+          "What you'll see, reading the New Testament whole, is one cohesive story: the long-promised King arrives, dies for the world's sin, rises, sends His Spirit, builds His church across cultures and centuries, and one day will return to make all things new. Twenty-seven books. One story. Every chapter you read is a chapter you are part of.",
+        ],
+      },
+    ],
+    keyVerse: { ref: 'John 20:30-31', text: 'Now Jesus did many other signs in the presence of the disciples, which are not written in this book; but these are written so that you may believe that Jesus is the Christ, the Son of God, and that by believing you may have life in his name.' },
+    whatThisMeans: 'The New Testament is not a random collection of religious writings. It is a unified witness to the most important event in history, written by people who were there or one degree removed. If you have never read it cover to cover, start with Mark this week. The story is the one your life is already inside.',
+    quiz: [
+      { q: 'How many books are in the New Testament?', options: ['27', '39', '66', '100'], correctIdx: 0, explanation: '27 books — 4 Gospels, 1 history (Acts), 21 letters, 1 apocalyptic vision (Revelation).' },
+      { q: 'Which Gospel is the shortest, fastest-paced, presenting Jesus as Servant in action?', options: ['Matthew', 'Mark', 'Luke', 'John'], correctIdx: 1, explanation: 'Mark is the action Gospel — often the recommended starting point for first-time readers.' },
+      { q: 'Who wrote Acts?', options: ['Peter', 'Paul', 'Luke — the physician who also wrote the Gospel of Luke', 'Mark'], correctIdx: 2, explanation: 'Acts is volume 2 of Luke\'s work. It traces the first 30 years of the church from Jerusalem to Rome.' },
+      { q: 'How many letters did Paul write that are in the New Testament?', options: ['3', '7', '13', '21'], correctIdx: 2, explanation: 'Thirteen — Romans, 1-2 Corinthians, Galatians, Ephesians, Philippians, Colossians, 1-2 Thessalonians, 1-2 Timothy, Titus, Philemon.' },
+      { q: 'What is the main message of Revelation?', options: ['A precise prediction of dates', 'Christ wins, empires fall, God dwells with His people forever — comfort and hope for persecuted Christians', 'How to interpret prophecy', 'An apocalyptic warning to non-believers only'], correctIdx: 1, explanation: 'Written under Domitian\'s persecution. Don\'t read it as a calendar — read it as a vision designed to rally hope.' },
+    ],
+  },
+
+  {
+    id: 'memorize-scripture',
+    category: 'bible-study',
+    title: 'How to Memorize Scripture',
+    description: 'Why memorizing Scripture is one of the most life-changing disciplines — and a practical system that actually works.',
+    duration: '8 min',
+    sections: [
+      {
+        heading: 'Why Memorize at All?',
+        paragraphs: [
+          "Psalm 119:11 — \"I have stored up your word in my heart, that I might not sin against you.\" Memorization is not a parlor trick. It is a way of letting Scripture become your inner soundtrack — the voice that argues back at temptation, that comforts you at 2 a.m. when you can't sleep, that gives you words for prayer when you don't have your own.",
+          "Jesus quoted Scripture from memory in His temptation in the wilderness (Matthew 4) — He did not pull out a scroll. The early apostles preached extensively from memory. Persecuted Christians under hostile regimes have sustained themselves on memorized Scripture when their Bibles were taken. Once it is in you, no one can take it away. Few disciplines pay larger dividends.",
+        ],
+      },
+      {
+        heading: 'The System That Works',
+        paragraphs: [
+          "The single most effective method is *spaced repetition* — reviewing each verse on an expanding schedule (day 1, day 2, day 4, day 7, day 14, day 30, day 60, day 90). This matches how human memory actually consolidates. Most failed memorization attempts fail not because the person isn't smart enough but because they reviewed the verse three times in a row and then forgot it. Spaced repetition guarantees the verse moves from short-term to long-term memory.",
+          "The Memorize feature in YourLife CC's Faith Hub uses a simplified SM-2 algorithm — the same engine behind Anki and similar systems. Each verse gets a difficulty rating. Easier verses come back less often. Harder ones come back sooner. It does the spaced-repetition math for you. Use it.",
+        ],
+      },
+      {
+        heading: 'How to Memorize a Single Verse',
+        paragraphs: [
+          "Start with the reference: \"John 3:16.\" Say it out loud first. Read the verse aloud three times slowly. Then cover it and try to say it from memory. Look at the first word, then say the next phrase. Keep going. Make mistakes. Look back. Try again. Do this for about 3-5 minutes. Then move on with your day.",
+          "Come back to that verse the next day. Then 3 days later. Then a week later. Within a month, that verse will be solid. Within a year of doing this with one new verse per week, you will have memorized fifty verses — more Scripture than most Christians know by heart in their entire lifetime.",
+        ],
+      },
+      {
+        heading: 'What to Memorize First',
+        paragraphs: [
+          "Start with verses you would actually use. The Beatitudes (Matthew 5:3-12). The Lord's Prayer (Matthew 6:9-13). John 3:16. Romans 8:28. Romans 8:38-39. Psalm 23. Psalm 1. Philippians 4:6-7. Philippians 4:13. Ephesians 2:8-9. The Great Commission (Matthew 28:18-20). 1 Corinthians 13. The fruit of the Spirit (Galatians 5:22-23). 1 John 1:9.",
+          "Then move to passages: Romans 8, John 14-17, Hebrews 11, James 1. Eventually, whole books — Ephesians is a favorite. Some Christians memorize all of Philippians (4 chapters) or 1 John (5 chapters). It is not just for ancient monks. Ordinary Christians have done this throughout history. Start small. Be patient. Compound.",
+        ],
+      },
+      {
+        heading: 'The Spiritual Effect',
+        paragraphs: [
+          "Memorized Scripture changes you in ways that read-and-forget Scripture cannot. Words you have memorized come back to you uninvited — in the middle of a hard conversation, in a moment of temptation, in a wave of fear. The Holy Spirit uses what is already inside you. He does not have to wait for you to find your Bible.",
+          "The promise of Joshua 1:8: \"This Book of the Law shall not depart from your mouth, but you shall meditate on it day and night, so that you may be careful to do according to all that is written in it. For then you will make your way prosperous, and then you will have good success.\" Memorization is the discipline that puts the Word in your mouth. The other promises follow.",
+        ],
+      },
+    ],
+    keyVerse: { ref: 'Psalm 119:11', text: 'I have stored up your word in my heart, that I might not sin against you.' },
+    whatThisMeans: 'Memorizing Scripture is one of the most life-changing disciplines available to any Christian, and you don\'t need to be smart or have a special memory to do it. Use spaced repetition. Start with one verse a week. In a year you\'ll know fifty. In a decade you\'ll be a different person. The Holy Spirit works with what is already in you — give Him plenty.',
+    quiz: [
+      { q: 'What does Psalm 119:11 say about Scripture memorization?', options: ['It\'s optional', 'I have stored up your word in my heart, that I might not sin against you', 'Only priests need to memorize', 'It\'s impossible for most people'], correctIdx: 1, explanation: 'Memorization is for sin-fighting, comfort, prayer. Scripture inside you is Scripture the Spirit can reach for in any moment.' },
+      { q: 'How did Jesus answer Satan in the temptation in the wilderness (Matthew 4)?', options: ['By reading from a scroll', 'By quoting Scripture from memory', 'By calling on angels', 'By staying silent'], correctIdx: 1, explanation: 'Each temptation, Jesus responded "It is written..." — from memory. The model is set.' },
+      { q: 'What is the most effective memorization technique?', options: ['Repeating the verse 100 times in one sitting', 'Spaced repetition — reviewing on an expanding schedule (day 1, 2, 4, 7, 14, 30)', 'Just hoping you remember', 'Writing it once'], correctIdx: 1, explanation: 'Matches how human memory consolidates. Cramming fails; spacing succeeds. YourLife CC\'s Memorize feature handles this for you.' },
+      { q: 'What is a realistic memorization goal for a year?', options: ['Memorize the entire Bible', '50 verses (one per week)', 'Zero verses', 'Only short verses'], correctIdx: 1, explanation: 'One new verse per week, with spaced repetition, gets you 50 in a year — more than most Christians know in their entire lifetime.' },
+      { q: 'What\'s the deeper spiritual effect of memorized Scripture?', options: ['Pride', 'Words come back uninvited in moments of temptation, fear, or hard conversation — the Holy Spirit uses what is already in you', 'Nothing special', 'It only helps in church'], correctIdx: 1, explanation: 'The Spirit doesn\'t have to wait for you to find your Bible. Memorized Word is always within reach.' },
+    ],
+  },
 ];
 
 if (typeof window !== 'undefined') {
