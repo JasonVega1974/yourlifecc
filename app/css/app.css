@@ -4657,3 +4657,198 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
   }
 }
 
+/* ════════════════════════════════════════════════════════════
+   2026-05-15 — Light-mode pass for Phase B-Lite + C + F surfaces.
+   The earlier :root.light block (around line 48–600) doesn't touch
+   the new elements because they use inline rgba(255,255,255,...)
+   styles set at render time. !important is the only way to override
+   inline styles cleanly. Targeted at IDs/classes added in:
+     • Phase B-Lite: bottom tab bar, tab landings, hero opener
+     • Phase C-Health: mood check-in, sleep / mind / meals tabs
+     • Phase C-Finance: summary opener, donut card, paycheck sim
+     • Phase C-Goals: gv-goal-card with milestones
+     • Phase F: study partner card, goal suggest modal, faith entry
+     • Phase E: onboarding overlay
+   Section accent tokens (--section-*) are kept — they read in both
+   themes. Where inline styles set rgba(255,255,255,X) for bg or
+   borders, the override flips to rgba(0,0,0,X) or solid white.
+   ════════════════════════════════════════════════════════════ */
+:root.light #heroGreeting{
+  background:linear-gradient(135deg,rgba(56,189,248,.10),rgba(167,139,250,.06)) !important;
+  border-color:rgba(56,189,248,.25) !important;
+}
+:root.light #heroGreeting > div:first-child{ color:#0f172a !important; }
+:root.light #heroGreeting > div:last-child{ color:#475569 !important; }
+
+:root.light #heroTodaysVerse{
+  background:linear-gradient(135deg,rgba(251,191,36,.18),rgba(251,146,60,.08)) !important;
+  border-color:rgba(251,191,36,.45) !important;
+}
+:root.light #heroTodaysVerseText{ color:#1f2937 !important; }
+
+:root.light #heroReflectCard{
+  background:linear-gradient(135deg,rgba(251,191,36,.10),rgba(251,191,36,.04)) !important;
+  border-color:rgba(251,191,36,.35) !important;
+}
+:root.light #heroReflectBody #heroReflectStatus{ color:#475569 !important; }
+:root.light #heroReflectQuestion{
+  background:rgba(251,191,36,.10) !important;
+  color:#1f2937 !important;
+}
+:root.light #heroReflectResponse{
+  background:#fff !important;
+  border-color:rgba(0,0,0,.15) !important;
+  color:#0f172a !important;
+}
+
+:root.light #heroQuickActions button{
+  background:#fff !important;
+  border-color:rgba(0,0,0,.10) !important;
+  box-shadow:0 2px 10px rgba(0,0,0,.05);
+  color:#0f172a !important;
+}
+:root.light #heroQuickActions button > div:nth-child(2){ color:#0f172a !important; }
+:root.light #heroQuickActions button > div:nth-child(3){ color:#475569 !important; }
+
+:root.light #heroQuickStats{ border-bottom-color:rgba(0,0,0,.08) !important; color:#475569 !important; }
+:root.light #heroQuickStats b{ color:#0f172a !important; }
+
+/* Bottom tab bar — light surface, dark icons. --tab-accent stays for active state. */
+:root.light #bottomTabBar{
+  background:#ffffff !important;
+  border-top-color:rgba(0,0,0,.08) !important;
+  box-shadow:0 -4px 20px rgba(0,0,0,.08) !important;
+}
+:root.light #bottomTabBar .tab-btn{ color:#64748b !important; }
+:root.light #bottomTabBar .tab-btn .tab-icon{ filter:none !important; }
+
+/* Tab landing cards (s-learn / s-life / s-me) */
+:root.light .tab-landing-card{
+  background:#fff !important;
+  border-color:rgba(0,0,0,.08) !important;
+  box-shadow:0 2px 12px rgba(0,0,0,.05);
+  color:#0f172a !important;
+}
+:root.light .tab-landing-card .tlc-label{ color:#0f172a !important; }
+
+/* mBar globe + avatar buttons (Phase C mobile-header fix) */
+:root.light #mBarLangBtn{
+  background:rgba(0,0,0,.05) !important;
+  border-color:rgba(0,0,0,.14) !important;
+  color:#0f172a !important;
+}
+:root.light #mBarAvatarBtn{
+  background:rgba(56,189,248,.14) !important;
+  border-color:rgba(56,189,248,.4) !important;
+  color:var(--c) !important;
+}
+
+/* Phase C-Health — mood check-in, sleep panel, PHQ-2 cards, meal log */
+:root.light #healthMoodCheckin{
+  background:linear-gradient(135deg,rgba(52,211,153,.10),rgba(34,197,94,.06)) !important;
+  border-color:rgba(52,211,153,.35) !important;
+}
+:root.light #healthMoodCheckin > div:first-child{ color:#0f172a !important; }
+:root.light #healthMoodCheckin > div:nth-child(2){ color:#1f2937 !important; }
+:root.light #healthMoodCheckin button{ background:#fff !important; border-color:rgba(52,211,153,.35) !important; color:#0f172a !important; }
+:root.light #ht-sleep .card,
+:root.light #ht-mind .card,
+:root.light #ht-meals .card{ background:#fff !important; border-color:rgba(0,0,0,.08) !important; }
+:root.light #ht-sleep #sleepList > div,
+:root.light #ht-meals .card > div[style*="background:rgba(255,255,255,.04)"]{
+  background:rgba(0,0,0,.04) !important;
+}
+:root.light .phq2-opt{ background:#fff !important; border-color:rgba(52,211,153,.35) !important; color:#0f172a !important; }
+
+/* Phase C-Finance — summary opener, donut card, paycheck sim */
+:root.light .finance-summary-opener{
+  background:linear-gradient(135deg,rgba(22,163,74,.10),rgba(34,211,153,.05)) !important;
+  border-color:rgba(22,163,74,.30) !important;
+}
+:root.light .finance-summary-opener > div:first-child{ color:var(--section-finance) !important; }
+:root.light #finSumBalance, :root.light #finSumMonthSpend{ color:#0f172a !important; }
+:root.light #spendingDonut text[fill="var(--tx)"]{ fill:#0f172a !important; }
+:root.light #spendingDonut text[fill="var(--tx2)"]{ fill:#475569 !important; }
+:root.light #paySimOutput > div{
+  background:#fff !important;
+  border-color:rgba(0,0,0,.08) !important;
+}
+
+/* Phase C-Goals — goal cards + milestones + motivation + completion stamp */
+:root.light .gv-goal-card{ background:#fff !important; }
+:root.light .gv-goal-card .gv-goal-text{ color:#0f172a !important; }
+:root.light .gv-goal-card svg text{ fill:#0f172a !important; }
+:root.light .gv-goal-card > div > div[style*="background:rgba(249,115,22,.04)"],
+:root.light .gv-goal-card > div > div[style*="background:rgba(249,115,22,.05)"]{
+  background:rgba(249,115,22,.08) !important;
+}
+
+/* Phase F — AI Study Partner, Goal Suggest modal, Faith entry card */
+:root.light #st-aiTutor .card{ background:#fff !important; }
+:root.light #apOutput > div{
+  background:#fff !important;
+  border-color:rgba(0,0,0,.08) !important;
+  color:#0f172a !important;
+}
+:root.light .ap-mode-btn{ background:#fff !important; border-color:rgba(56,189,248,.30) !important; color:#475569 !important; }
+:root.light .ap-mode-btn[style*="background:rgba(56,189,248,.18)"]{
+  background:rgba(56,189,248,.18) !important; color:#0f172a !important;
+}
+:root.light #goalSuggestModal .md{ background:#fff !important; }
+:root.light #gsList > div{
+  background:#fff !important;
+  border-color:rgba(249,115,22,.30) !important;
+}
+:root.light #s-scripture > div[onclick*="openAskBible"]{
+  background:linear-gradient(135deg,rgba(67,56,202,.14),rgba(20,184,166,.06)) !important;
+  border-color:rgba(67,56,202,.35) !important;
+}
+:root.light #s-scripture > div[onclick*="openAskBible"] div[style*="font-family:var(--fh)"]{
+  color:#0f172a !important;
+}
+
+/* Phase E — onboarding overlay flips to light surface */
+:root.light #onboardingOverlay{ background:#ffffff !important; }
+:root.light #onboardingOverlay h2{ color:#0f172a !important; }
+:root.light #onboardingOverlay .onb-sub{ color:#475569 !important; }
+:root.light #onboardingOverlay .onb-card{
+  background:#fff !important;
+  border-color:rgba(0,0,0,.12) !important;
+  box-shadow:0 2px 10px rgba(0,0,0,.04);
+}
+:root.light #onboardingOverlay .onb-card .onb-label{ color:#0f172a !important; }
+:root.light #onboardingOverlay .onb-card .onb-cap{ color:#475569 !important; }
+:root.light #onboardingOverlay .onb-card.selected{ box-shadow:0 6px 20px rgba(251,191,36,.20); }
+:root.light #onboardingOverlay .onb-tile{
+  background:#fff !important;
+  border-color:rgba(0,0,0,.12) !important;
+}
+:root.light #onboardingOverlay .onb-tile .onb-tile-label{ color:#0f172a !important; }
+:root.light #onboardingOverlay .onb-toggle-row{
+  background:#fff !important;
+  border-color:rgba(0,0,0,.10) !important;
+}
+:root.light #onboardingOverlay .onb-toggle-row .onb-toggle-label{ color:#0f172a !important; }
+:root.light #onboardingOverlay .onb-toggle-row .onb-toggle-cap{ color:#64748b !important; }
+:root.light #onboardingOverlay input[type=text]{
+  background:#fff !important;
+  border-color:rgba(0,0,0,.18) !important;
+  color:#0f172a !important;
+}
+:root.light #onboardingOverlay .onb-yesno{ background:rgba(0,0,0,.06) !important; }
+:root.light #onboardingOverlay .onb-yesno button{ color:#475569 !important; }
+:root.light #onboardingOverlay .onb-dot{ background:rgba(0,0,0,.18) !important; }
+:root.light #onboardingOverlay .onb-dot.done{ background:rgba(251,191,36,.55) !important; }
+:root.light #onboardingOverlay .onb-back{
+  background:rgba(0,0,0,.05) !important;
+  border-color:rgba(0,0,0,.14) !important;
+  color:#0f172a !important;
+}
+
+/* Generic fallback — any inline-styled "card-like" block using rgba
+   white-on-dark text colors stays readable. These attribute selectors
+   target the very common inline patterns added by Phase C/F rendering. */
+:root.light *[style*="color:var(--tx);"]:not(button):not(a){ color:#0f172a !important; }
+:root.light *[style*="color:var(--tx2)"]:not(button):not(a){ color:#475569 !important; }
+:root.light *[style*="color:var(--tx3)"]:not(button):not(a){ color:#64748b !important; }
+

@@ -472,9 +472,16 @@ function dismissDonationPrompt(){
 }
 
 function renderWellDonationPrompt(){
-  // Gate: only faith-only users; never if already dismissed. Faith path
-  // is identified by window._faithFree (set in auth.js checkPlanStatus);
-  // there is no D.faithOnly mirror in the data layer today.
+  // 2026-05-15 — Donation prompt card REMOVED from the Well home for
+  // faith-free users. The function becomes a no-op + defensive cleanup
+  // so any lingering DOM from a prior render disappears on next call.
+  // Keep the function name + caller intact so other entry points (Stripe
+  // Checkout, faith.html donation page) stay reachable through the
+  // existing URL, just not via this in-app card.
+  const stale = document.getElementById('fhDonationPrompt');
+  if(stale && stale.parentNode) stale.parentNode.removeChild(stale);
+  return;
+  // ---- legacy gate kept below for reference; unreachable. ----
   if(!window._faithFree) return;
   if(typeof D !== 'undefined' && D && D.donationPromptDismissed) return;
 
