@@ -30,6 +30,18 @@
   --card-bg:rgba(255,255,255,.07);--card-border:rgba(255,255,255,.1);
   --input-bg:#2a3652;--input-border:rgba(255,255,255,.15);
   --sel-bg:#1c2236;
+  /* ── Section accent tokens (Phase B-Lite, 2026-05-14) ───
+     One persistent accent per non-faith section. Indigo + teal stay
+     reserved for faith chrome per docs/design-system.md §1.
+     Applied progressively across sections in later Phase B-Lite sessions. */
+  --section-daily-life:#f59e0b;
+  --section-school:#0284c7;
+  --section-health:#34d399;
+  --section-finance:#16a34a;
+  --section-goals:#f97316;
+  --section-journal:#c084fc;
+  --section-sports:#dc2626;
+  --section-life-skills:var(--c);
 }
 
 /* ── LIGHT MODE ─────────────────────────────────── */

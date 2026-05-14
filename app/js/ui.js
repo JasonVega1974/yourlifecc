@@ -1014,6 +1014,80 @@ const NAV_ITEMS = [
   ]},
 
 ];
+
+// ── TAB IA (Phase B-Lite, 2026-05-14) ──────────────────────────
+// Five-tab mobile bottom-nav model: Home · Learn · Life · Faith · Me.
+// Session 1 declares the data; session 2 wires it to render the bottom
+// tab bar, render tab landing pages, and route taps. NAV_ITEMS above
+// stays the source of truth for the desktop sidebar; TAB_IA is the
+// mobile-only surface (and Greenlight-style teen-only — parent accounts
+// continue to route to s-parent directly with no bottom tab bar).
+//
+// Card entries route by one of:
+//   sectionId: route via showSection(id) to a top-level section
+//   wellTab:   route via wellGoto(tab) into s-scripture's tab system
+//   action:    JS handler ('settings' → quickSettings(), 'sign-out' →
+//              signOut(), etc.) wired in session 2
+const TAB_IA = [
+  {id:'home',  label:'Home',  icon:'🏠', accent:'var(--c)',
+    primary:[
+      {sectionId:'s-hero', label:'Home', icon:'🏠'}
+    ]
+  },
+  {id:'learn', label:'Learn', icon:'📚', accent:'var(--c)',
+    primary:[
+      {sectionId:'s-school', label:'School',        icon:'🎓', accent:'var(--section-school)'},
+      {sectionId:'s-skills', label:'Life Skills',   icon:'🧠', accent:'var(--section-life-skills)'},
+      {sectionId:'s-cbt',    label:'Tech Skills',   icon:'💻', accent:'var(--section-life-skills)'},
+      {sectionId:'s-sports', label:'Sports',        icon:'⚽', accent:'var(--section-sports)'},
+      {wellTab:'academy',    label:'Faith Academy', icon:'🎓', accent:'var(--accent,#4338ca)'}
+    ]
+  },
+  {id:'life',  label:'Life',  icon:'🌱', accent:'var(--c)',
+    primary:[
+      {sectionId:'s-chores',  label:'Chores',  icon:'✅', accent:'var(--section-daily-life)'},
+      {sectionId:'s-goals',   label:'Goals',   icon:'🎯', accent:'var(--section-goals)'},
+      {sectionId:'s-health',  label:'Health',  icon:'💪', accent:'var(--section-health)'},
+      {sectionId:'s-finance', label:'Finance', icon:'💰', accent:'var(--section-finance)'},
+      {sectionId:'s-journal', label:'Journal', icon:'✍️', accent:'var(--section-journal)'},
+      {sectionId:'s-mood',    label:'Mood',    icon:'😊', accent:'var(--section-journal)'}
+    ]
+  },
+  {id:'faith', label:'Faith', icon:'✝️', accent:'var(--accent,#4338ca)',
+    primary:[
+      {wellTab:'home',           label:'Well Home',  icon:'🏠'},
+      {wellTab:'bible',          label:'Bible',      icon:'📖'},
+      {wellTab:'plans',          label:'Plans',      icon:'📅'},
+      {wellTab:'devotional',     label:'Devotional', icon:'🕊️'},
+      {wellTab:'prayer',         label:'Prayer',     icon:'🙏'},
+      {wellTab:'timeline',       label:'Timeline',   icon:'🕰️'},
+      {wellTab:'stories',        label:'Stories',    icon:'📖'},
+      {sectionId:'s-worship',    label:'Worship',    icon:'🎵'},
+      {sectionId:'s-flashcards', label:'Flashcards', icon:'📇'}
+    ]
+  },
+  {id:'me',    label:'Me',    icon:'👤', accent:'var(--c)',
+    primary:[
+      {sectionId:'s-badges',   label:'Badges',   icon:'🏅'},
+      {sectionId:'s-referral', label:'Refer',    icon:'🤝'},
+      {action:'settings',      label:'Settings', icon:'⚙️'},
+      {action:'profile',       label:'Profile',  icon:'👤'},
+      {action:'sign-out',      label:'Sign Out', icon:'🚪'}
+    ]
+  }
+];
+
+// Sections currently NOT mapped to a tab. Resolved in session 2 when
+// the landing pages render — either added to a tab's primary[] as a
+// card, surfaced via a "More" overflow, or kept reachable via the
+// desktop sidebar only:
+//   Learn candidates: s-resume, s-bio, s-resources, s-growing,
+//                     s-driving, s-mentors, s-schedule, s-calendar
+//   Life candidates:  s-rewards, s-contests, s-motivation, s-craft,
+//                     s-reading, s-milestones
+//   Outside teen tabs by design: s-christian-living (dormant per F8),
+//                                s-parent (parent surface only)
+
 let _activeSection = 's-hero';
 
 function buildSideNav(){
