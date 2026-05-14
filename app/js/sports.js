@@ -426,8 +426,8 @@ function renderMySports(){
       <div style="display:flex;align-items:center;gap:.7rem;padding:.8rem 1rem;background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.08);">
         <div style="font-size:1.6rem;">${s.emoji}</div>
         <div style="flex:1;">
-          <div style="font-size:.9rem;font-weight:900;color:var(--tx);">${s.name}</div>
-          <div style="font-size:.7rem;color:var(--tx2);margin-top:.1rem;">${[s.team,s.position,s.level,s.season,s.year].filter(Boolean).join(' · ')||'No details added'}</div>
+          <div style="font-size:.9rem;font-weight:900;color:var(--tx);">${escapeHtml(s.name)}</div>
+          <div style="font-size:.7rem;color:var(--tx2);margin-top:.1rem;">${escapeHtml([s.team,s.position,s.level,s.season,s.year].filter(Boolean).join(' · ')||'No details added')}</div>
         </div>
         <div style="display:flex;gap:.35rem;">
           <button onclick="openSportEditor(${s.id})" style="background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.25);border-radius:7px;padding:.3rem .65rem;color:#38bdf8;font-size:.7rem;cursor:pointer;font-weight:700;">✏️ Edit</button>

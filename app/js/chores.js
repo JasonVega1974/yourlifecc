@@ -200,7 +200,7 @@ function renderChores(){
         return `<div style="display:flex;align-items:center;gap:.6rem;padding:.55rem .7rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:.3rem;${status==='verified'?'opacity:.6;':''}">
           <span style="font-size:1rem;">${c.emoji}</span>
           <div style="flex:1;">
-            <div style="font-size:.78rem;font-weight:600;color:var(--tx);${status==='verified'?'text-decoration:line-through;':''}">${c.name}</div>
+            <div style="font-size:.78rem;font-weight:600;color:var(--tx);${status==='verified'?'text-decoration:line-through;':''}">${escapeHtml(c.name)}</div>
             <div style="font-size:.58rem;color:var(--tx2);">${c.pts} pts · ${c.freq}</div>
           </div>
           ${statusBadge[status]||statusBadge.todo}
@@ -217,7 +217,7 @@ function renderChores(){
       allEl.innerHTML = (Array.isArray(D.chores)?D.chores:[]).map(c=>`
         <div style="display:flex;align-items:center;gap:.5rem;padding:.4rem .5rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px;margin-bottom:.25rem;${c.active?'':'opacity:.5;'}">
           <span>${c.emoji}</span>
-          <span style="flex:1;font-size:.72rem;font-weight:600;color:var(--tx);">${c.name}</span>
+          <span style="flex:1;font-size:.72rem;font-weight:600;color:var(--tx);">${escapeHtml(c.name)}</span>
           <span style="font-size:.6rem;color:var(--c);">${c.pts}pts</span>
           <span style="font-size:.55rem;color:var(--tx2);">${c.freq}</span>
           <button class="btn bgh bs" onclick="toggleChoreActive(${c.id})" style="font-size:.5rem;">${c.active?'Pause':'Resume'}</button>
@@ -237,7 +237,7 @@ function renderChores(){
           <div style="display:flex;align-items:center;gap:.5rem;padding:.5rem .6rem;background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.12);border-radius:10px;margin-bottom:.3rem;">
             <span style="font-size:1rem;">${p.emoji}</span>
             <div style="flex:1;">
-              <div style="font-size:.75rem;font-weight:600;color:var(--tx);">${p.choreName}</div>
+              <div style="font-size:.75rem;font-weight:600;color:var(--tx);">${escapeHtml(p.choreName)}</div>
               <div style="font-size:.58rem;color:var(--tx2);">${p.date} at ${p.time} · ${p.pts} pts</div>
             </div>
             <button class="btn bp bs" onclick="verifyChore(${p.id},true)" style="font-size:.6rem;background:#22c55e;">✓ Verify</button>
@@ -253,7 +253,7 @@ function renderChores(){
       rmEl.innerHTML = (Array.isArray(D.rewards)?D.rewards:[]).map(r=>`
         <div style="display:flex;align-items:center;gap:.5rem;padding:.4rem .5rem;background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.1);border-radius:8px;margin-bottom:.25rem;">
           <span>🎁</span>
-          <span style="flex:1;font-size:.72rem;font-weight:600;color:var(--tx);">${r.name}</span>
+          <span style="flex:1;font-size:.72rem;font-weight:600;color:var(--tx);">${escapeHtml(r.name)}</span>
           <span style="font-size:.62rem;color:#fbbf24;font-weight:700;">${r.pts} pts</span>
           <button class="btn bda bs" onclick="removeReward(${r.id})" style="font-size:.5rem;">✕</button>
         </div>
@@ -291,7 +291,7 @@ function renderChores(){
         return `<div style="display:flex;align-items:center;gap:.6rem;padding:.55rem .7rem;background:${canAfford?'rgba(251,191,36,.06)':'rgba(255,255,255,.02)'};border:1px solid ${canAfford?'rgba(251,191,36,.15)':'rgba(255,255,255,.06)'};border-radius:10px;margin-bottom:.3rem;">
           <span style="font-size:1.1rem;">🎁</span>
           <div style="flex:1;">
-            <div style="font-size:.78rem;font-weight:600;color:var(--tx);">${r.name}</div>
+            <div style="font-size:.78rem;font-weight:600;color:var(--tx);">${escapeHtml(r.name)}</div>
             <div style="font-size:.6rem;color:#fbbf24;font-weight:700;">${r.pts} points</div>
           </div>
           <button class="btn ${canAfford?'bp':'bgh'} bs" onclick="${canAfford?`redeemReward(${r.id})`:`showToast('Need ${r.pts-avail} more points')`}" style="font-size:.65rem;${canAfford?'':'opacity:.5;'}">${canAfford?'🎉 Redeem':'🔒 '+r.pts+'pts'}</button>
@@ -312,7 +312,7 @@ function renderChores(){
       histEl.innerHTML = recent.map(l=>`
         <div style="display:flex;align-items:center;gap:.4rem;padding:.3rem .4rem;border-bottom:1px solid rgba(255,255,255,.04);font-size:.65rem;">
           <span>${l.emoji}</span>
-          <span style="flex:1;color:var(--tx);">${l.choreName}</span>
+          <span style="flex:1;color:var(--tx);">${escapeHtml(l.choreName)}</span>
           <span style="color:${l.pts>0?'#22c55e':'#a78bfa'};font-weight:700;">${l.pts>0?'+':'-'}${Math.abs(l.pts)}</span>
           <span style="color:${statusColors[l.status]||'var(--tx2)'};font-size:.55rem;">${statusLabels[l.status]||l.status}</span>
           <span style="color:var(--tx2);font-size:.5rem;">${l.date.slice(5)}</span>
@@ -696,7 +696,7 @@ function renderEarnings(){
   hist.innerHTML = log.map(l=>`
     <div style="display:flex;align-items:center;gap:.35rem;padding:.25rem .3rem;border-bottom:1px solid rgba(255,255,255,.03);font-size:.63rem;">
       <span>${l.type==='earn'?'💰':'🎯'}</span>
-      <span style="flex:1;color:var(--tx2);">${l.reason}</span>
+      <span style="flex:1;color:var(--tx2);">${escapeHtml(l.reason)}</span>
       <span style="font-weight:700;color:${l.type==='earn'?'#22c55e':'#60a5fa'};">${l.type==='earn'?'+':'-'}$${l.amount.toFixed(2)}</span>
       <span style="font-size:.48rem;color:var(--tx3);">${l.date.slice(5)}</span>
     </div>

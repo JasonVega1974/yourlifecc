@@ -50,7 +50,7 @@ function renderGoals(){
     <div class="gv-goal-card ${g.done?'done':''}" id="gc-${g.id}">
       <div class="gv-goal-check" onclick="completeGoal(${g.id})">${g.done?'✓':''}</div>
       <div class="gv-goal-body">
-        <div class="gv-goal-text">${g.text}</div>
+        <div class="gv-goal-text">${escapeHtml(g.text)}</div>
         <div class="gv-goal-meta">
           ${typeTag}
           <span class="gv-goal-cat">${g.cat||''}</span>
@@ -107,7 +107,7 @@ function renderVision(){
   const el = document.getElementById('gvVisionText'); if(!el) return;
   const v = (D.vision||'').trim();
   el.innerHTML = v
-    ? v
+    ? escapeHtml(v)
     : '<span class="gv-vision-placeholder">Tap to write your life vision statement — who do you want to become?</span>';
 }
 

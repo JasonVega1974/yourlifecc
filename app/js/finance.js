@@ -61,7 +61,7 @@ function renderBills(){
   el.innerHTML=D.bills.map(b=>`
     <div style="display:flex;align-items:center;gap:.55rem;padding:.55rem .8rem;background:rgba(255,255,255,.1);border-radius:9px;margin-bottom:.3rem;border-left:3px solid ${b.paid?'var(--gr)':'var(--pk)'};${b.paid?'opacity:.55;':''}cursor:pointer;" onclick="toggleBill(${b.id})">
       <div style="font-size:.95rem;">${b.paid?'✅':'⭕'}</div>
-      <div style="flex:1;"><div style="font-weight:700;font-size:.87rem;${b.paid?'text-decoration:line-through;':''}">${b.name}</div>
+      <div style="flex:1;"><div style="font-weight:700;font-size:.87rem;${b.paid?'text-decoration:line-through;':''}">${escapeHtml(b.name)}</div>
       <div style="font-size:.68rem;color:#c8d4e8;">${b.cat} · Due ${ord(b.day)}</div></div>
       <div style="font-weight:800;color:${b.paid?'var(--gr)':'var(--pk)'};">$${(b.amt||0).toFixed(2)}</div>
       <button class="eb" onclick="event.stopPropagation();editBill(${b.id})">✎</button>
@@ -99,7 +99,7 @@ function renderTx(){
   const cols={income:'var(--c)',expense:'var(--pk)',savings:'var(--gr)'};
   el.innerHTML=list.slice(0,80).map(t=>`
     <div style="display:flex;align-items:center;gap:.55rem;padding:.5rem .75rem;background:rgba(255,255,255,.1);border-radius:9px;margin-bottom:.28rem;border-left:3px solid ${cols[t.type]||'var(--mt)'};">
-      <div style="flex:1;"><div style="font-weight:700;font-size:.85rem;">${t.name}</div>
+      <div style="flex:1;"><div style="font-weight:700;font-size:.85rem;">${escapeHtml(t.name)}</div>
       <div style="font-size:.68rem;color:#c8d4e8;">${t.cat} · ${t.date}</div></div>
       <div style="font-weight:800;color:${cols[t.type]||'var(--mt)'};">${t.type==='income'?'+':'-'}$${(t.amt||0).toFixed(2)}</div>
       <button class="eb" onclick="editTx(${t.id})">✎</button>
@@ -202,7 +202,7 @@ function renderSavGoalCards(){
     const pct=Math.min(100,((g.current||0)/g.target)*100);
     return`<div class="card" style="border-top:3px solid var(--gr);">
       <span style="font-size:1.55rem;display:block;margin-bottom:.4rem;">${g.emoji}</span>
-      <div style="font-weight:700;font-size:.95rem;margin-bottom:.48rem;">${g.name}</div>
+      <div style="font-weight:700;font-size:.95rem;margin-bottom:.48rem;">${escapeHtml(g.name)}</div>
       <div style="display:flex;gap:.4rem;align-items:baseline;font-size:.82rem;margin-bottom:.35rem;">
         <span style="color:var(--gr);font-weight:800;font-family:var(--fn);">$${(g.current||0).toLocaleString()}</span>
         <span style="color:#c8d4e8;">/ $${g.target.toLocaleString()}</span>
@@ -228,7 +228,7 @@ function renderSavingsTab(){
   set('savNeed','$'+Math.max(0,tt-ts).toLocaleString()); set('savPct',pct.toFixed(1)+'%');
   const b=document.getElementById('savBigBar'); if(b) b.style.width=pct+'%';
   const sel=document.getElementById('qaGoal');
-  if(sel) sel.innerHTML=goals.map(g=>`<option value="${g.id}">${g.emoji} ${g.name}</option>`).join('');
+  if(sel) sel.innerHTML=goals.map(g=>`<option value="${g.id}">${escapeHtml(g.emoji)} ${escapeHtml(g.name)}</option>`).join('');
   const det=document.getElementById('savDetailCards'); if(!det) return;
   det.innerHTML=goals.map(g=>{
     const p=Math.min(100,((g.current||0)/g.target)*100);
@@ -236,7 +236,7 @@ function renderSavingsTab(){
     return`<div class="card" style="border-top:3px solid ${col};">
       <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem;">
         <span style="font-size:1.35rem;">${g.emoji}</span>
-        <div style="flex:1;"><div style="font-weight:800;font-size:.9rem;">${g.name}</div>
+        <div style="flex:1;"><div style="font-weight:800;font-size:.9rem;">${escapeHtml(g.name)}</div>
         <div style="font-size:.68rem;color:#c8d4e8;">$${Math.max(0,g.target-(g.current||0)).toLocaleString()} to go</div></div>
         <div style="font-family:var(--fn);font-size:.95rem;font-weight:700;color:${col};">${p.toFixed(0)}%</div>
       </div>

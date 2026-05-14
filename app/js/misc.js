@@ -404,8 +404,8 @@ function renderBooks(){
     <div style="display:flex;align-items:center;gap:.6rem;padding:.5rem .6rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:.3rem;">
       <span style="font-size:1.1rem;">${statusIcons[b.status]}</span>
       <div style="flex:1;min-width:0;">
-        <div style="font-size:.78rem;font-weight:600;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${b.title}</div>
-        ${b.author?`<div style="font-size:.62rem;color:var(--tx2);">by ${b.author}</div>`:''}
+        <div style="font-size:.78rem;font-weight:600;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(b.title)}</div>
+        ${b.author?`<div style="font-size:.62rem;color:var(--tx2);">by ${escapeHtml(b.author)}</div>`:''}
       </div>
       <select onchange="updateBookStatus(${b.id},this.value)" style="width:90px;font-size:.6rem;padding:.2rem;">
         <option value="want" ${b.status==='want'?'selected':''}>📋 Want</option>
@@ -458,12 +458,12 @@ function renderMentors(){
     <div style="display:flex;align-items:flex-start;gap:.6rem;padding:.6rem .7rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:.35rem;">
       <div style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">${m.emoji}</div>
       <div style="flex:1;min-width:0;">
-        <div style="font-size:.8rem;font-weight:700;color:var(--tx);">${m.name} <span style="font-weight:400;font-size:.65rem;color:var(--c);margin-left:.3rem;">${m.roleLabel}</span></div>
+        <div style="font-size:.8rem;font-weight:700;color:var(--tx);">${escapeHtml(m.name)} <span style="font-weight:400;font-size:.65rem;color:var(--c);margin-left:.3rem;">${escapeHtml(m.roleLabel)}</span></div>
         <div style="display:flex;gap:.6rem;flex-wrap:wrap;font-size:.62rem;color:var(--tx2);margin-top:.15rem;">
-          ${m.phone?`<span>☎ ${m.phone}</span>`:''}
-          ${m.email?`<span>✉ ${m.email}</span>`:''}
+          ${m.phone?`<span>☎ ${escapeHtml(m.phone)}</span>`:''}
+          ${m.email?`<span>✉ ${escapeHtml(m.email)}</span>`:''}
         </div>
-        ${m.notes?`<div style="font-size:.62rem;color:var(--tx2);margin-top:.2rem;font-style:italic;">${m.notes}</div>`:''}
+        ${m.notes?`<div style="font-size:.62rem;color:var(--tx2);margin-top:.2rem;font-style:italic;">${escapeHtml(m.notes)}</div>`:''}
       </div>
       <button class="btn bda bs" onclick="removeMentor(${m.id})" style="font-size:.55rem;padding:.15rem .3rem;">✕</button>
     </div>
@@ -502,7 +502,7 @@ function renderMilestones(){
         <div style="width:18px;height:18px;border-radius:50%;background:var(--c);display:flex;align-items:center;justify-content:center;font-size:.55rem;flex-shrink:0;z-index:1;border:2px solid var(--bg);">${m.emoji}</div>
         <div style="flex:1;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:.5rem .7rem;">
           <div style="display:flex;justify-content:space-between;align-items:center;">
-            <span style="font-size:.8rem;font-weight:700;color:var(--tx);">${m.title}</span>
+            <span style="font-size:.8rem;font-weight:700;color:var(--tx);">${escapeHtml(m.title)}</span>
             <button class="btn bda bs" onclick="removeMilestone(${m.id})" style="font-size:.5rem;padding:.1rem .25rem;">✕</button>
           </div>
           <div style="font-size:.6rem;color:var(--tx2);margin-top:.1rem;">${mon} ${d.getDate()}, ${yr}</div>
@@ -566,7 +566,7 @@ function renderMoodTracker(){
       <span style="font-size:1rem;">${moodEmojis[m.level]}</span>
       <div style="flex:1;">
         <div style="font-size:.68rem;color:var(--tx);">${d.toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'})}</div>
-        ${m.note?`<div style="font-size:.58rem;color:var(--tx2);">${m.note}</div>`:''}
+        ${m.note?`<div style="font-size:.58rem;color:var(--tx2);">${escapeHtml(m.note)}</div>`:''}
       </div>
       <span style="font-size:.55rem;color:var(--tx2);">${m.time||''}</span>
     </div>`;

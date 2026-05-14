@@ -570,7 +570,7 @@ function renderParentBucks(){
       store.innerHTML = items.map(it=>`
         <div style="background:rgba(255,255,255,.03);border:1px solid rgba(251,191,36,.1);border-radius:8px;padding:.5rem;text-align:center;">
           <div style="font-size:1rem;">${it.emoji||'🎁'}</div>
-          <div style="font-size:.65rem;font-weight:700;margin:.15rem 0;">${it.name}</div>
+          <div style="font-size:.65rem;font-weight:700;margin:.15rem 0;">${escapeHtml(it.name)}</div>
           <div style="font-size:.75rem;font-weight:800;color:#fbbf24;">${it.cost} PB</div>
           <button class="btn bp bs" onclick="spendPB(${it.cost},'${it.name.replace(/'/g,"\\'")}')" style="font-size:.5rem;margin-top:.2rem;padding:.15rem .4rem;${D.pb.balance>=it.cost?'':'opacity:.4;pointer-events:none;'}">Redeem</button>
         </div>
@@ -585,7 +585,7 @@ function renderParentBucks(){
     if(!log.length){ hist.innerHTML='<div style="font-size:.6rem;color:var(--tx3);padding:.2rem;">No transactions yet</div>'; }
     else {
       hist.innerHTML = log.map(l=>`<div style="display:flex;justify-content:space-between;padding:.15rem .2rem;font-size:.58rem;border-bottom:1px solid rgba(255,255,255,.02);">
-        <span style="color:var(--tx2);">${l.reason}</span>
+        <span style="color:var(--tx2);">${escapeHtml(l.reason)}</span>
         <span style="font-weight:700;color:${l.type==='earn'?'#fbbf24':'#fb923c'};">${l.type==='earn'?'+':'-'}${l.amount} PB</span>
       </div>`).join('');
     }
@@ -1137,7 +1137,7 @@ function renderParentBucksControls(){
     const items = D.pb.storeItems||[];
     manage.innerHTML = items.map((it,i)=>`<div style="display:flex;align-items:center;gap:.3rem;padding:.15rem 0;font-size:.6rem;border-bottom:1px solid rgba(255,255,255,.02);">
       <span>${it.emoji||'🎁'}</span>
-      <span style="flex:1;">${it.name}</span>
+      <span style="flex:1;">${escapeHtml(it.name)}</span>
       <span style="color:#fbbf24;font-weight:700;">${it.cost} PB</span>
       <button class="btn bda bs" onclick="removePBStoreItem(${i})" style="font-size:.4rem;padding:.1rem .2rem;">✕</button>
     </div>`).join('') || '<div style="font-size:.55rem;color:var(--tx3);">No items yet</div>';
@@ -1149,7 +1149,7 @@ function renderParentBucksControls(){
     const slices = D.pb.spinnerSlices||[];
     spinManage.innerHTML = slices.length ? slices.map((s,i)=>`<div style="display:flex;align-items:center;gap:.3rem;padding:.15rem 0;font-size:.6rem;border-bottom:1px solid rgba(255,255,255,.02);">
       <div style="width:12px;height:12px;border-radius:3px;background:${s.color||'#fde68a'};flex-shrink:0;"></div>
-      <span style="flex:1;">${s.label} (${s.type==='pb'?s.value+' PB':s.value+' min screen'})</span>
+      <span style="flex:1;">${escapeHtml(s.label)} (${s.type==='pb'?s.value+' PB':s.value+' min screen'})</span>
       <button onclick="removeSpinnerSlice(${i})" style="font-size:.5rem;color:#f87171;background:none;border:none;cursor:pointer;">✕</button>
     </div>`).join('') : '<div style="font-size:.55rem;color:var(--tx3);">Using default 8-slice wheel</div>';
   }
@@ -1570,7 +1570,7 @@ function renderPhPendingChores(){
     <div style="display:flex;align-items:center;gap:.5rem;padding:.55rem .7rem;background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.12);border-radius:10px;margin-bottom:.35rem;">
       <span style="font-size:1.1rem;">${p.emoji||'📌'}</span>
       <div style="flex:1;">
-        <div style="font-size:.78rem;font-weight:700;color:var(--tx);">${p.choreName}</div>
+        <div style="font-size:.78rem;font-weight:700;color:var(--tx);">${escapeHtml(p.choreName)}</div>
         <div style="font-size:.6rem;color:var(--tx2);">${p.date} at ${p.time} · <span style="color:#fbbf24;font-weight:700;">${p.pts} pts</span> · <span style="color:#22c55e;">+${p.pts} PB if verified</span></div>
       </div>
       <div style="display:flex;gap:.3rem;flex-shrink:0;">

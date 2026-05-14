@@ -62,12 +62,12 @@ function renderClasses(){
     return`<div class="cc" style="border-top:3px solid ${col};">
       <div style="display:flex;align-items:center;gap:.65rem;margin-bottom:.65rem;">
         <div class="gb g${letter.charAt(0)}">${letter}</div>
-        <div style="flex:1;"><div style="font-weight:800;font-size:.97rem;">${c.name}</div>
-        <div style="font-size:.72rem;color:#c8d4e8;">${c.teacher?c.teacher+' · ':''}${c.room||''}</div></div>
+        <div style="flex:1;"><div style="font-weight:800;font-size:.97rem;">${escapeHtml(c.name)}</div>
+        <div style="font-size:.72rem;color:#c8d4e8;">${c.teacher?escapeHtml(c.teacher)+' · ':''}${escapeHtml(c.room||'')}</div></div>
         <div style="font-family:var(--fn);font-size:.97rem;font-weight:700;color:${col};">${c.grade||0}%</div>
       </div>
       <div class="pt" style="height:5px;margin-bottom:.55rem;"><div class="pf" style="background:${col};width:${c.grade||0}%;"></div></div>
-      ${c.notes?`<div style="font-size:.73rem;color:#c8d4e8;margin-bottom:.48rem;">${c.notes}</div>`:''}
+      ${c.notes?`<div style="font-size:.73rem;color:#c8d4e8;margin-bottom:.48rem;">${escapeHtml(c.notes)}</div>`:''}
       <div style="display:flex;gap:.32rem;">
         <button class="btn bo bs" style="color:${col};border-color:${col};flex:1;" onclick="editClass(${c.id})">✎ Edit</button>
         <button class="btn bda bs" onclick="deleteClass(${c.id})">✕</button>
@@ -91,7 +91,7 @@ function renderGPA(){
   }).join('');
 }
 
-function refreshAsgClassSelect(){ const sel=document.getElementById('asgClass'); if(!sel) return; sel.innerHTML='<option value="">— Select Class —</option>'+(D.classes||[]).map(c=>`<option value="${c.id}">${c.name}</option>`).join(''); }
+function refreshAsgClassSelect(){ const sel=document.getElementById('asgClass'); if(!sel) return; sel.innerHTML='<option value="">— Select Class —</option>'+(D.classes||[]).map(c=>`<option value="${c.id}">${escapeHtml(c.name)}</option>`).join(''); }
 function addAsg(){ const name=(document.getElementById('asgName').value||'').trim(),classId=document.getElementById('asgClass').value,due=document.getElementById('asgDue').value,pri=document.getElementById('asgPri').value,notes=(document.getElementById('asgNotes').value||'').trim(); if(!name){showToast('Enter assignment name');return;} if(!D.assignments) D.assignments=[]; D.assignments.push({id:Date.now(),name,classId,due,pri,notes,done:false}); D.assignments.sort((a,b)=>(a.due||'').localeCompare(b.due||'')); document.getElementById('asgName').value=''; document.getElementById('asgNotes').value=''; save(); renderAsg(); showToast('Added!'); }
 function toggleAsg(id){ const a=(D.assignments||[]).find(a=>a.id===id); if(a){a.done=!a.done;save();renderAsg();} }
 function editAsg(id){ const a=(D.assignments||[]).find(a=>a.id===id); if(!a) return; const n=prompt('Edit:',a.name); if(!n) return; a.name=n.trim(); save(); renderAsg(); }
@@ -110,7 +110,7 @@ function renderAsg(){
     const ov=a.due&&!a.done&&new Date(a.due)<new Date();
     return`<div class="ai2 ${pc[a.pri]||'pl'}" style="${a.done?'opacity:.5;':''}">
       <div class="ck${a.done?' on':''}" onclick="toggleAsg(${a.id})">${a.done?'✓':''}</div>
-      <div style="flex:1;"><div style="font-size:.85rem;font-weight:600;${a.done?'text-decoration:line-through;':''}">${a.name}</div>
+      <div style="flex:1;"><div style="font-size:.85rem;font-weight:600;${a.done?'text-decoration:line-through;':''}">${escapeHtml(a.name)}</div>
       <div style="font-size:.68rem;color:#c8d4e8;">${cN?cN+' · ':''}${a.due?'Due: '+a.due:''}${ov?' <span style="color:var(--pk);">OVERDUE</span>':''}</div></div>
       <button class="eb" onclick="editAsg(${a.id})">✎</button>
       <button class="db" onclick="deleteAsg(${a.id})">✕</button>
@@ -637,7 +637,7 @@ function renderCalendar(){
     const ds=_calY+'-'+String(_calM+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
     const isT=today.getDate()===d&&today.getMonth()===_calM&&today.getFullYear()===_calY;
     const evs=(evMap[ds]||[]).slice(0,3);
-    html+=`<div class="cd${isT?' td':''}" onclick="calClick('${ds}')"><span class="cdn">${d}</span>${evs.map(ev=>`<span class="cep ${ECLS[ev.cat]||'eot'}" onclick="event.stopPropagation();delEvCf(${ev.id})">${ev.title}</span>`).join('')}</div>`;
+    html+=`<div class="cd${isT?' td':''}" onclick="calClick('${ds}')"><span class="cdn">${d}</span>${evs.map(ev=>`<span class="cep ${ECLS[ev.cat]||'eot'}" onclick="event.stopPropagation();delEvCf(${ev.id})">${escapeHtml(ev.title)}</span>`).join('')}</div>`;
   }
   const total=Math.ceil((first+dim)/7)*7;
   for(let d=1;d<=total-first-dim;d++) html+=`<div class="cd om"><span class="cdn">${d}</span></div>`;
@@ -656,7 +656,7 @@ function renderUpcoming(){
     const d=new Date(ev.date+'T00:00:00');
     return`<div style="display:flex;align-items:center;gap:.65rem;padding:.52rem .7rem;background:rgba(255,255,255,.1);border-radius:9px;margin-bottom:.32rem;">
       <div style="text-align:center;min-width:32px;"><div style="font-size:1rem;font-weight:900;color:var(--c);">${d.getDate()}</div><div style="font-size:.54rem;color:#c8d4e8;">${d.toLocaleDateString('en-US',{month:'short'}).toUpperCase()}</div></div>
-      <div style="flex:1;"><div style="font-weight:700;font-size:.86rem;">${ev.title}</div><div style="font-size:.68rem;color:#c8d4e8;">${ENAMES[ev.cat]||''}${ev.time?' · '+ev.time:''}</div></div>
+      <div style="flex:1;"><div style="font-weight:700;font-size:.86rem;">${escapeHtml(ev.title)}</div><div style="font-size:.68rem;color:#c8d4e8;">${ENAMES[ev.cat]||''}${ev.time?' · '+ev.time:''}</div></div>
       <button class="db" onclick="deleteEvent(${ev.id})">✕</button>
     </div>`;
   }).join('');
