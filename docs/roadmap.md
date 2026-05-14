@@ -79,7 +79,7 @@ Key facts: 29 sections, ~95–110 features, 27 sidebar nav items in 8 groups, ~3
 
 ## Current status
 
-**Phase 1 (security) complete and live.** Phase 0 + Phase 1.1 add-on + Phase 1.1 main hardening + emergency hotfix all shipped and QA-passed as of 2026-04-28. Jason wants A++ across all three paths (Trusted Family Dashboard + Skills Library + Best UX). Next decision: Phase 2 (progressive disclosure — biggest visible UX delta) or pivot to Phase 5 differentiator items.
+**Phase 1 (security) complete and live.** Phase 0 + Phase 1.1 add-on + Phase 1.1 main hardening + emergency hotfix all shipped and QA-passed as of 2026-04-28. **F6 (Stripe webhook splice, Phase 6 prerequisite) shipped and verified live 2026-05-14** — donation router + faith_only guard + invoice-shape bug fixes all running in production with live data in the `donations` table. Jason wants A++ across all three paths (Trusted Family Dashboard + Skills Library + Best UX). Next decision: Phase 2 (progressive disclosure — biggest visible UX delta) or pivot to Phase 5 differentiator items.
 
 ## Phase 1.1 add-on (2026-04-28) — SHIPPED AND LIVE
 
@@ -115,3 +115,25 @@ Key facts: 29 sections, ~95–110 features, 27 sidebar nav items in 8 groups, ~3
 **Files touched:** `app/index.html`, `service-worker.js`.
 
 **Still TBD (not blocking):** Why scripts were double-loading in the first place. Defenses now make it cosmetic (console noise) instead of fatal. Investigate by viewing raw deployed `https://yourlifecc.com/app/index.html` and counting `<script src="/app/js/config.js">` occurrences — if 2+, server-side duplication is the cause.
+
+## F6 — Stripe webhook splice (Phase 6 prerequisite) (2026-05-14) — SHIPPED AND LIVE
+
+Closes the "faith_free must never touch Stripe (architectural)" production-blocking item in `docs/F0-followups.md`. F6 is a prerequisite for the full Phase 6 (Faith-Only path) signup flow — without the webhook guards in place, any stray Stripe event could clobber a `plan_status='faith_free'` row back to `'active'` and silently break gating.
+
+**What shipped:**
+- **F6 SPLICE POINT 1 — donation router** at the top of the main webhook `try` block. Any event tagged `metadata.purpose='donation'` (direct on PaymentIntent/Charge, or via parent/legacy `subscription_details.metadata` for invoices, or directly on `customer.subscription.*`) is short-circuited into a dedicated handler. Inserts row into `donations` table with `user_id`, `stripe_payment_intent_id`, `stripe_subscription_id`, `amount_cents`, `currency`, `status` (succeeded/failed/refunded/pending), `is_recurring`, `campaign_id`, `donor_email`. Fires Brevo confirmation email on `succeeded` rows fire-and-forget — email failures never fail the webhook (would cause Stripe retries and double-inserts).
+- **F6 SPLICE POINT 2 — faith_only guard** inside `syncStatus()`. Reads `profiles.plan_status` and `profiles.faith_only` for the resolved customer; if both indicate a faith_free user, the entire profile/family plan_status sync is short-circuited with log line `🛡️ faith_only guard: skipped plan_status sync for cust ...`. Belt-and-suspenders defense per faith-only-spec §1, §10.
+- **Bug fix #10** — `invoice_payment.paid` (new Stripe API ≥ 2024-04-10 event) now resolves the InvoicePayment to its parent Invoice via `stripeGet('invoices/{id}')` before processing, since the InvoicePayment shape lacks `subscription`/`customer` on the top-level event object.
+- **Bug fix #11** — every `invoice.*` handler reads subscription via `invoice.parent?.subscription_details?.subscription` first (Stripe API 2024-04-10+ relocation per the Invoice Payments model restructure), falling back to legacy `invoice.subscription` only for older API versions.
+- **Env var rename to APP_ prefix** — `SUPABASE_URL` → `APP_SUPABASE_URL`, `SERVICE_ROLE_KEY` → `APP_SERVICE_KEY`. Works around Supabase's reserved `SUPABASE_` prefix for system env vars in Edge Functions.
+
+**Files touched (function source only — no client-side code):** Supabase Edge Function `stripe-webhook` (source mirrored at `docs/stripe-webhook-spliced.ts`, 896 lines, deployed 2026-05-14 to project `hrohgwcbfgywkpnvqxhk`). Schema migrations `docs/migrations/F6-A-faith-only-profile-columns.sql` and `docs/migrations/F6-B-faith-only-tables.sql` applied to Supabase. Rollback artifact preserved at `docs/stripe-webhook-pre-F6.ts` (547 lines, snapshot from before deploy).
+
+**Live verification (2026-05-14):** `donations` table has live data including `status='succeeded'`, `status='refunded'`, and recurring (`is_recurring=true`) rows. End-to-end flow confirmed: Stripe event → webhook receives → row inserted with correct shape → no `profiles.plan_status` regression for the test donor account.
+
+**Deploy artifacts:**
+- `docs/F6-deploy-checklist.md` — the 15–25 min step-by-step deploy sequence used for the live cut
+- `docs/F6-stripe-webhook-deploy-runbook.md` — full reference (deeper than the checklist)
+- `docs/F6-stripe-webhook-splice-plan.md` — splice rationale + the rev-2 plan that produced spliced.ts
+- `docs/stripe-webhook-pre-F6.ts` — pre-deploy snapshot (rollback artifact)
+- `docs/stripe-webhook-spliced.ts` — the deployed source (single source of truth — function code in Supabase should match this file byte-for-byte)
