@@ -5460,18 +5460,54 @@ function _bwRenderGrid(){
   }
   el.innerHTML = sites.map(s => {
     const eraIds = s.eras || [];
-    // Era pill badges — colored per period, matching Reading Plans category chips
-    const pills = eraIds.map(id => {
+    const firstEra = eraIds[0] || '';
+    // Each era family gets its own warm tint, matching Reading Plans cards.
+    // Two stops of low-opacity color blended diagonally.
+    const eraTints = {
+      'patriarchs':       'rgba(251,191,36,.08), rgba(251,191,36,.03)',
+      'exodus-conquest':  'rgba(251,146,60,.08), rgba(251,191,36,.03)',
+      'judges':           'rgba(167,139,250,.08), rgba(139,92,246,.04)',
+      'united-kingdom':   'rgba(56,189,248,.08), rgba(167,139,250,.04)',
+      'divided-kingdom':  'rgba(56,189,248,.08), rgba(167,139,250,.04)',
+      'exile-return':     'rgba(167,139,250,.08), rgba(139,92,246,.04)',
+      'second-temple':    'rgba(52,211,153,.08), rgba(34,197,94,.04)',
+      'jesus-ministry':   'rgba(34,211,238,.08), rgba(56,189,248,.04)',
+      'pauline-journeys': 'rgba(248,113,113,.08), rgba(251,146,60,.04)',
+    };
+    const tint = eraTints[firstEra] || 'rgba(251,191,36,.06), rgba(167,139,250,.04)';
+    const firstPeriod = _bwPeriodById(firstEra);
+    const accent = firstPeriod ? firstPeriod.color : '#fbbf24';
+    // Pill badges per era — color-mix tinted bg + border (CSS handles fallback)
+    const pills = eraIds.slice(0, 3).map(id => {
       const p = _bwPeriodById(id);
       const c = p ? p.color : '#38bdf8';
       const label = p ? p.label : id;
       return '<span class="bw-card-era" style="--era-c:'+c+';">'+_bwEsc(label)+'</span>';
     }).join('');
-    return '<div class="bw-card" onclick="openBwSite(\''+s.id+'\')">'
-         + '<div class="bw-card-name">'+_bwEsc(s.name)+'</div>'
-         + (pills ? '<div class="bw-card-eras">'+pills+'</div>' : '')
+    // Photo thumbnail (40x40 rounded, gold hairline) or 🏺 emoji fallback
+    const photo = s.heroPhoto
+      ? '<div class="bw-card-photo"><img src="'+_bwEsc(s.heroPhoto)+'" alt="" loading="lazy"></div>'
+      : '<div class="bw-card-photo bw-card-photo-fallback">🏺</div>';
+    // First scripture ref as a small pill at the bottom
+    const refPill = (s.scriptureRefs && s.scriptureRefs.length)
+      ? '<span class="bw-card-ref">📖 '+_bwEsc(s.scriptureRefs[0])+'</span>'
+      : '';
+    return '<button class="bw-card" data-bw-id="'+_bwEsc(s.id)+'" '
+         +   'onclick="openBwSite(this.dataset.bwId)" '
+         +   'style="--era-tint:'+tint+';--era-c:'+accent+';">'
+         + '<div class="bw-card-top">'
+         +   '<div class="bw-card-head">'
+         +     '<div class="bw-card-name">'+_bwEsc(s.name)+'</div>'
+         +     (pills ? '<div class="bw-card-eras">'+pills+'</div>' : '')
+         +   '</div>'
+         +   photo
+         + '</div>'
          + '<div class="bw-card-tagline">'+_bwEsc(s.tagline || '')+'</div>'
-         + '</div>';
+         + '<div class="bw-card-foot">'
+         +   refPill
+         +   '<span class="bw-card-cta">Explore →</span>'
+         + '</div>'
+         + '</button>';
   }).join('');
 }
 

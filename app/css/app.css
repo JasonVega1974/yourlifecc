@@ -3968,67 +3968,150 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
    that needed CSS to match the .topic-card visual spec.
    ════════════════════════════════════════════════════════════════════ */
 
-/* ─── Biblical Archaeology cards: match the Reading Plans card hierarchy
-   (F9.2). Title white, era pill badges colored per period, italic Georgia
-   tagline in cream. Previous all-gold treatment had no hierarchy. */
+/* ════════════════════════════════════════════════════════════════════
+   F9.3 — Biblical Archaeology cards visual warmth match
+   Goal: same feel as Reading Plans cards. Era-tinted gradient bg,
+   photo thumb top-right, Bebas title + pill row, Georgia italic
+   tagline, scripture ref + EXPLORE → CTA at the bottom.
+   The render function sets --era-tint (two color stops) and --era-c
+   (period accent color) as inline CSS vars on each .bw-card.
+   ════════════════════════════════════════════════════════════════════ */
+#bf-bibleworld .bw-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:1rem;
+}
 #bf-bibleworld .bw-card{
-  background:linear-gradient(135deg,rgba(251,191,36,.05),rgba(167,139,250,.04)) !important;
+  background:linear-gradient(135deg, var(--era-tint, rgba(251,191,36,.06), rgba(167,139,250,.04))) !important;
   border:1px solid rgba(251,191,36,.18) !important;
   border-left-width:1px !important;
   border-radius:16px !important;
-  min-height:160px !important;
-  padding:1.1rem 1rem 1rem !important;
-  box-shadow:0 4px 14px rgba(15,23,42,.18), 0 0 12px rgba(251,191,36,.04) !important;
+  min-height:180px !important;
+  padding:1.1rem 1.1rem 1rem !important;
+  box-shadow:0 4px 18px rgba(0,0,0,.10) !important;
   display:flex !important;
   flex-direction:column !important;
-  gap:.55rem !important;
+  gap:.65rem !important;
+  cursor:pointer;
+  width:100%;
+  text-align:left;
+  appearance:none;
+  -webkit-appearance:none;
+  position:relative;
+  overflow:hidden;
+  font:inherit;
+  font-family:var(--fm);
+  color:var(--tx);
+  transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease, background .15s ease;
 }
 #bf-bibleworld .bw-card:hover{
   transform:translateY(-3px) !important;
   border-color:rgba(251,191,36,.5) !important;
   box-shadow:0 8px 28px rgba(251,191,36,.18) !important;
 }
+#bf-bibleworld .bw-card:active{transform:scale(.98) !important;}
+
+/* Top row: title block on the left, photo thumb top-right */
+#bf-bibleworld .bw-card-top{
+  display:flex;
+  align-items:flex-start;
+  gap:.7rem;
+}
+#bf-bibleworld .bw-card-head{flex:1;min-width:0;display:flex;flex-direction:column;gap:.45rem;}
 #bf-bibleworld .bw-card-name{
   font-family:'Bebas Neue', var(--fh, var(--fm)) !important;
-  font-size:1.15rem !important;
-  letter-spacing:.04em !important;
+  font-size:1.1rem !important;
+  letter-spacing:.06em !important;
   color:var(--tx) !important;
   font-weight:700 !important;
-  margin-bottom:0 !important;
   line-height:1.15 !important;
+  margin:0 !important;
   text-shadow:none !important;
 }
-/* Era pill badges — colored background per period, matching the
-   TOPICAL / BEGINNER / THROUGH BIBLE chips on Reading Plans cards. */
+#bf-bibleworld .bw-card-photo{
+  flex:0 0 auto;
+  width:48px;height:48px;
+  border-radius:10px;overflow:hidden;
+  background:rgba(10,13,26,.4);
+  border:1px solid rgba(251,191,36,.22);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;
+}
+#bf-bibleworld .bw-card-photo img{
+  width:100%;height:100%;object-fit:cover;display:block;
+}
+#bf-bibleworld .bw-card-photo-fallback{
+  background:linear-gradient(135deg, rgba(251,191,36,.18), rgba(251,191,36,.06));
+}
+
+/* Era pill row — same compact treatment as plan category chips */
 #bf-bibleworld .bw-card-eras{
   display:flex !important;
   flex-wrap:wrap !important;
-  gap:.3rem !important;
+  gap:.25rem !important;
   margin:0 !important;
 }
 #bf-bibleworld .bw-card-era{
   display:inline-flex;
   align-items:center;
-  padding:.18rem .55rem;
+  padding:.16rem .5rem;
   border-radius:99px;
-  background:color-mix(in srgb, var(--era-c, #38bdf8) 22%, transparent);
-  border:1px solid color-mix(in srgb, var(--era-c, #38bdf8) 45%, transparent);
-  color:#fff;
+  background:color-mix(in srgb, var(--era-c, #38bdf8) 18%, transparent);
+  border:1px solid color-mix(in srgb, var(--era-c, #38bdf8) 38%, transparent);
+  color:var(--era-c, #38bdf8);
   font-family:var(--fm);
-  font-size:.6rem;
+  font-size:.56rem;
   font-weight:800;
-  letter-spacing:.1em;
+  letter-spacing:.16em;
   text-transform:uppercase;
   line-height:1.2;
+  white-space:nowrap;
 }
-/* Fallback for browsers without color-mix (older Safari) — flat tints */
 @supports not (color: color-mix(in srgb, red, blue)){
   #bf-bibleworld .bw-card-era{
-    background:rgba(56,189,248,.22);
-    border-color:rgba(56,189,248,.45);
+    background:rgba(56,189,248,.18);
+    border-color:rgba(56,189,248,.4);
+    color:#7dd3fc;
   }
 }
-/* Legacy .bw-card-meta retained in case any other render path uses it */
+
+#bf-bibleworld .bw-card-tagline{
+  font-family:Georgia,'Times New Roman',serif !important;
+  font-style:italic !important;
+  font-size:.88rem !important;
+  font-weight:400 !important;
+  line-height:1.55 !important;
+  color:var(--tx2) !important;
+  opacity:1 !important;
+  margin:0 !important;
+  flex:1 1 auto;
+}
+
+/* Bottom row: scripture ref pill on the left, EXPLORE → on the right */
+#bf-bibleworld .bw-card-foot{
+  display:flex;align-items:center;gap:.5rem;
+  margin-top:auto;padding-top:.3rem;
+  border-top:1px solid rgba(251,191,36,.1);
+}
+#bf-bibleworld .bw-card-ref{
+  display:inline-flex;align-items:center;gap:.25rem;
+  font-family:var(--fm);
+  font-size:.6rem;font-weight:700;letter-spacing:.06em;
+  color:var(--tx2);
+  background:rgba(56,189,248,.12);
+  border:1px solid rgba(56,189,248,.28);
+  border-radius:99px;
+  padding:.15rem .55rem;
+  white-space:nowrap;
+}
+#bf-bibleworld .bw-card-cta{
+  margin-left:auto;
+  font-family:var(--fm);
+  font-size:.6rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--era-c, #fbbf24);
+}
+
+/* Legacy .bw-card-meta retained in case other render paths still use it */
 #bf-bibleworld .bw-card-meta{
   font-family:var(--fm);
   font-size:.62rem !important;
@@ -4038,29 +4121,13 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   text-transform:uppercase;
   margin-bottom:0 !important;
 }
-#bf-bibleworld .bw-card-tagline{
-  font-family:Georgia,'Times New Roman',serif !important;
-  font-style:italic !important;
-  font-size:.88rem !important;
-  font-weight:400 !important;
-  line-height:1.55 !important;
-  color:var(--tx2) !important;
-  opacity:1 !important;
-  margin-bottom:0 !important;
-}
-/* Photo thumbs if a card includes one */
-#bf-bibleworld .bw-card img,
-#bf-bibleworld .bw-card-photo,
-#bf-bibleworld .bw-card-img{
-  border-radius:8px;
-  border:1px solid rgba(251,191,36,.2);
-}
 
 /* Light-mode parchment treatment */
 :root.light #bf-bibleworld .bw-card{
-  background:linear-gradient(135deg,rgba(255,255,255,.85),rgba(255,250,235,.72)) !important;
+  background:linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,250,235,.78)) !important;
   border-color:rgba(180,120,20,.32) !important;
   box-shadow:0 4px 14px rgba(60,40,15,.08) !important;
+  color:#1a1233 !important;
 }
 :root.light #bf-bibleworld .bw-card:hover{
   border-color:rgba(180,120,20,.55) !important;
@@ -4068,7 +4135,10 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
 }
 :root.light #bf-bibleworld .bw-card-name{color:#1a1233 !important;}
 :root.light #bf-bibleworld .bw-card-tagline{color:#3a2818 !important;opacity:.95;}
-:root.light #bf-bibleworld .bw-card-era{color:#1a1233;}
+:root.light #bf-bibleworld .bw-card-era{color:var(--era-c, #1a1233);}
+:root.light #bf-bibleworld .bw-card-photo{background:rgba(255,250,235,.7);border-color:rgba(180,120,20,.32);}
+:root.light #bf-bibleworld .bw-card-ref{background:rgba(56,189,248,.16);border-color:rgba(56,189,248,.4);color:#1e3a8a;}
+:root.light #bf-bibleworld .bw-card-foot{border-top-color:rgba(180,120,20,.18);}
 
 /* ─── Family verse card light-mode parchment ─── */
 :root.light #fhFamilyVerseCard{
