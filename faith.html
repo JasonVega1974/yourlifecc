@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Faith Path · YourLife CC — Free Bible, Devotionals & Discipleship for Teens & Families</title>
+<meta name="description" content="A free, all-ages faith path for teens, parents, and families. Bible reader, daily devotionals, reading plans, memory verses, worship, prayer, and biblical timelines — all in one place. No subscription, no credit card.">
+
+<!-- SEO: Canonical & Robots -->
+<link rel="canonical" href="https://yourlifecc.com/faith.html">
+<meta name="robots" content="index, follow">
+<meta name="author" content="YourLifeCC">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://yourlifecc.com/faith.html">
+<meta property="og:title" content="Faith Path · YourLife CC — Free for Teens & Families">
+<meta property="og:description" content="Bible, devotionals, reading plans, memory verses, worship and prayer — free, forever. Built for the Faith Community.">
+<meta property="og:image" content="https://yourlifecc.com/app/icons/icon-512.png">
+<meta property="og:site_name" content="YourLifeCC">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Faith Path · YourLife CC — Free for Teens & Families">
+<meta name="twitter:description" content="Bible, devotionals, reading plans, memory verses, worship and prayer — free, forever. Built for the Faith Community.">
+<meta name="twitter:image" content="https://yourlifecc.com/app/icons/icon-512.png">
+
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#4f8fff">
+<link rel="apple-touch-icon" href="/app/icons/icon-192.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#06090f;--bg2:#0c1220;--bg3:#131c30;
+  --tx:#eef2f7;--tx2:#8b9ab8;--tx3:#5a6a85;
+  --blue:#4f8fff;--cyan:#06d6a0;--green:#22c55e;
+  --gold:#f5a623;--purple:#a78bfa;--red:#ef4444;
+  --grad:linear-gradient(135deg,#4f8fff,#06d6a0);
+  --grad2:linear-gradient(135deg,#f5a623,#06d6a0);
+  --fn:'DM Sans',sans-serif;--fh:'Sora',sans-serif;
+}
+html{scroll-behavior:smooth;}
+body{font-family:var(--fn);background:var(--bg);color:var(--tx);line-height:1.7;overflow-x:hidden;}
+a{color:var(--blue);text-decoration:none;}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px;}
+.sec{padding:88px 0;}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 0;backdrop-filter:blur(20px);background:rgba(6,9,15,.85);border-bottom:1px solid rgba(255,255,255,.05);}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-family:var(--fh);font-size:1.3rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.nav-links{display:flex;gap:1.8rem;align-items:center;}
+.nav-links a{color:var(--tx2);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+.nav-links a:hover{color:var(--tx);}
+.nav-links a.active{color:var(--tx);}
+.nav-cta{background:var(--grad);color:#fff!important;padding:9px 20px;border-radius:10px;font-weight:700!important;text-transform:uppercase;letter-spacing:.05em;}
+
+.nav-ham{display:none;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:9px;padding:.45rem .6rem;cursor:pointer;flex-direction:column;gap:4px;flex-shrink:0;}
+.nav-ham span{display:block;width:20px;height:2px;background:var(--tx);border-radius:2px;transition:all .25s;}
+.nav-ham.open span:nth-child(1){transform:translateY(6px) rotate(45deg);}
+.nav-ham.open span:nth-child(2){opacity:0;}
+.nav-ham.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
+
+.nav-drawer{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:200;background:rgba(6,9,15,.98);backdrop-filter:blur(20px);padding:80px 24px 40px;flex-direction:column;gap:0;overflow-y:auto;}
+.nav-drawer.open{display:flex;}
+.nav-drawer a{color:var(--tx2);font-size:1.1rem;font-weight:600;padding:1rem 0;border-bottom:1px solid rgba(255,255,255,.05);display:block;}
+.nav-drawer a:hover{color:var(--tx);}
+.nav-drawer .nav-cta-mob{margin-top:1.2rem;background:var(--grad);color:#fff!important;padding:1rem;border-radius:13px;text-align:center;font-weight:700;font-size:1rem;border:none;}
+
+@media(max-width:860px){
+  .nav-links{display:none;}
+  .nav-ham{display:flex;}
+  .nav .wrap{padding:0 4px;}
+}
+
+/* HERO */
+.hero{padding:160px 0 80px;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:900px;height:900px;background:radial-gradient(ellipse,rgba(245,166,35,.06) 0%,transparent 70%);pointer-events:none;}
+.hero-eyebrow{font-family:var(--fh);font-size:.72rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--gold);margin-bottom:1rem;}
+.hero h1{font-family:var(--fh);font-size:clamp(2.2rem,5vw,4rem);font-weight:900;line-height:1.15;margin-bottom:1.2rem;letter-spacing:-.02em;}
+.hero h1 em{font-style:normal;background:var(--grad2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:inline-block;padding-bottom:.05em;}
+.hero p.lead{font-size:1.12rem;color:var(--tx);max-width:640px;margin:0 auto 1.4rem;line-height:1.7;font-weight:500;}
+.hero p.sub{font-size:.98rem;color:var(--tx2);max-width:580px;margin:0 auto 2rem;line-height:1.75;}
+.hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:1rem;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:15px 32px;border-radius:13px;font-family:var(--fn);font-weight:700;font-size:.95rem;border:none;cursor:pointer;transition:all .25s;text-decoration:none;}
+.btn-primary{background:var(--grad2);color:#0a0a14;box-shadow:0 8px 28px rgba(245,166,35,.25);}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(245,166,35,.35);}
+.btn-ghost{background:rgba(255,255,255,.06);color:var(--tx);border:1px solid rgba(255,255,255,.1);}
+.btn-ghost:hover{background:rgba(255,255,255,.1);}
+.hero-trust{font-size:.82rem;color:var(--tx3);margin-top:.4rem;}
+
+/* THREE BETS */
+.bets{background:linear-gradient(180deg,var(--bg),var(--bg2));padding:80px 0;}
+.bets-eyebrow{font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--gold);text-align:center;margin-bottom:.6rem;}
+.bets h2{font-family:var(--fh);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;text-align:center;margin-bottom:.6rem;letter-spacing:-.02em;}
+.bets-sub{text-align:center;color:var(--tx2);font-size:1rem;max-width:580px;margin:0 auto 3rem;line-height:1.7;}
+.bets-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;}
+.bet{background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:2rem 1.6rem;text-align:left;transition:border-color .25s,transform .25s;}
+.bet:hover{border-color:rgba(245,166,35,.25);transform:translateY(-2px);}
+.bet-num{font-family:var(--fh);font-size:.7rem;font-weight:800;letter-spacing:.14em;color:var(--gold);margin-bottom:.6rem;}
+.bet h3{font-family:var(--fh);font-size:1.3rem;font-weight:800;margin-bottom:.6rem;color:var(--tx);}
+.bet p{font-size:.92rem;color:var(--tx2);line-height:1.7;}
+.bets-tag{text-align:center;margin-top:2.4rem;font-family:var(--fh);font-size:.92rem;color:var(--tx2);font-weight:600;}
+.bets-tag strong{color:var(--gold);font-weight:800;}
+@media(max-width:760px){.bets-grid{grid-template-columns:1fr;}}
+
+/* FEATURE GRID */
+.features{padding:88px 0;}
+.features-eyebrow{font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--cyan);text-align:center;margin-bottom:.6rem;}
+.features h2{font-family:var(--fh);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;text-align:center;margin-bottom:.6rem;letter-spacing:-.02em;}
+.features-sub{text-align:center;color:var(--tx2);font-size:1rem;max-width:580px;margin:0 auto 3rem;line-height:1.7;}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;}
+.feat{background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:1.6rem 1.4rem;transition:border-color .25s;}
+.feat:hover{border-color:rgba(79,143,255,.25);}
+.feat-icon{font-size:1.9rem;margin-bottom:.7rem;display:block;}
+.feat h3{font-family:var(--fh);font-size:1.05rem;font-weight:800;margin-bottom:.4rem;color:var(--tx);}
+.feat p{font-size:.86rem;color:var(--tx2);line-height:1.65;}
+@media(max-width:860px){.feat-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:520px){.feat-grid{grid-template-columns:1fr;}}
+
+/* SOCIAL PROOF */
+.proof{background:var(--bg2);padding:80px 0;border-top:1px solid rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.03);}
+.proof-eyebrow{font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--gold);text-align:center;margin-bottom:.8rem;}
+.proof h2{font-family:var(--fh);font-size:clamp(1.6rem,3.6vw,2.4rem);font-weight:900;text-align:center;margin-bottom:.4rem;letter-spacing:-.02em;}
+.proof-note{text-align:center;color:rgba(255,255,255,.45);font-size:.85rem;margin-bottom:2rem;font-style:italic;}
+.quote-card{max-width:680px;margin:0 auto;background:var(--bg);border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:2.2rem 2rem;text-align:center;}
+.quote-stars{color:var(--gold);font-size:1.1rem;letter-spacing:.2em;margin-bottom:1rem;}
+.quote-text{font-size:1.1rem;color:var(--tx);font-style:italic;line-height:1.65;margin-bottom:1.2rem;}
+.quote-author{font-family:var(--fh);font-size:.92rem;font-weight:800;color:var(--tx);margin-bottom:.15rem;}
+.quote-role{font-size:.78rem;color:var(--tx3);}
+
+/* SIGNUP CTA */
+.signup-cta{padding:96px 0;text-align:center;background:linear-gradient(180deg,var(--bg2),var(--bg));position:relative;overflow:hidden;}
+.signup-cta::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(245,166,35,.07) 0%,transparent 70%);pointer-events:none;}
+.signup-cta .wrap{position:relative;}
+.signup-cta .emoji{font-size:2.8rem;margin-bottom:.8rem;}
+.signup-cta h2{font-family:var(--fh);font-size:clamp(2rem,4.5vw,3.2rem);font-weight:900;margin-bottom:1rem;letter-spacing:-.03em;}
+.signup-cta p.lead{color:var(--tx);font-size:1.1rem;max-width:580px;margin:0 auto 1.2rem;line-height:1.75;font-weight:500;}
+.signup-cta p.sub{color:var(--tx2);font-size:.95rem;max-width:520px;margin:0 auto 2.2rem;line-height:1.75;}
+.signup-cta .btn-primary{padding:20px 48px;font-size:1.1rem;border-radius:16px;box-shadow:0 12px 40px rgba(245,166,35,.32);}
+.donation-line{margin-top:1.4rem;font-size:.78rem;color:var(--tx3);max-width:520px;margin-left:auto;margin-right:auto;line-height:1.6;}
+.donation-line a{color:var(--gold);font-weight:700;}
+
+/* FOOTER */
+footer{background:var(--bg);padding:60px 0 30px;border-top:1px solid rgba(255,255,255,.05);}
+.ft-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:2rem;margin-bottom:2rem;}
+.ft-col h4{font-family:var(--fh);font-size:.78rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--tx);margin-bottom:.9rem;}
+.ft-col a{display:block;color:var(--tx2);font-size:.85rem;padding:.3rem 0;}
+.ft-col a:hover{color:var(--tx);}
+.ft-bottom{border-top:1px solid rgba(255,255,255,.06);padding-top:1.4rem;font-size:.78rem;color:var(--tx3);text-align:center;}
+@media(max-width:760px){.ft-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:480px){.ft-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="wrap">
+    <a href="/" style="text-decoration:none;">
+      <span class="nav-logo" style="line-height:1.1;display:flex;flex-direction:column;">YourLife CC<span style="font-size:.5rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);-webkit-text-fill-color:var(--tx3);background:none;margin-top:1px;">Your Life Command Center</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="/#features">Features</a>
+      <a href="/#pricing">Pricing</a>
+      <a href="/faith.html" class="active">Faith Path</a>
+      <a href="/about.html">About</a>
+      <a href="/app/index.html">Sign In</a>
+      <a href="/register-faith.html" class="nav-cta">Start Free →</a>
+    </div>
+    <button class="nav-ham" id="navHam" onclick="toggleMobNav()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</div>
+
+<!-- MOBILE DRAWER -->
+<div class="nav-drawer" id="navDrawer">
+  <a href="/#features" onclick="closeMobNav()">⚡ Features</a>
+  <a href="/#pricing" onclick="closeMobNav()">💳 Pricing</a>
+  <a href="/faith.html" onclick="closeMobNav()">✝️ Faith Path</a>
+  <a href="/about.html" onclick="closeMobNav()">👤 About</a>
+  <a href="/app/index.html" onclick="closeMobNav()">Sign In</a>
+  <a href="/register-faith.html" onclick="closeMobNav()" class="nav-cta-mob">Start Free →</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-eyebrow">✝️ Free Faith Path — Built for the Faith Community</div>
+    <h1>Faith, Scripture &amp; Discipleship —<br><em>Free for Teens &amp; Families.</em></h1>
+    <p class="lead">A daily home for the Word — for kids, teens, parents, and groups. No subscription. No credit card. Just open it and grow.</p>
+    <p class="sub">Bible reader, devotionals, reading plans, memory verses, worship and prayer — all in one place. Built on the same family-first platform as YourLife CC, but with the Faith path completely free.</p>
+    <div class="hero-btns">
+      <a href="/register-faith.html" class="btn btn-primary">Start Free →</a>
+      <a href="#features" class="btn btn-ghost">See What's Inside</a>
+    </div>
+    <div class="hero-trust">No card · No subscription · Donations optional</div>
+  </div>
+</section>
+
+<!-- THREE BETS -->
+<section class="bets">
+  <div class="wrap">
+    <div class="bets-eyebrow">⭐ The Three That Matter</div>
+    <h2>Stories. Plans. Academy.</h2>
+    <p class="bets-sub">Most faith apps pick one. We built all three — and tied them together so kids, teens, and parents grow on the same path.</p>
+    <div class="bets-grid">
+      <div class="bet">
+        <div class="bet-num">01 / STORIES</div>
+        <h3>Story Mode Bible</h3>
+        <p>The whole biblical narrative as connected stories — illustrated for kids, deeper for teens, contextual for adults. Genesis through Revelation as one story, not 66 disconnected books.</p>
+      </div>
+      <div class="bet">
+        <div class="bet-num">02 / PLANS</div>
+        <h3>Reading Plans</h3>
+        <p>Daily reading plans that actually finish: 30-day book walks, topical arcs, life-stage plans for teens and parents. Streaks, check-ins, and a real sense of finishing what you start.</p>
+      </div>
+      <div class="bet">
+        <div class="bet-num">03 / ACADEMY</div>
+        <h3>Faith Academy</h3>
+        <p>Bite-sized lessons on Bible literacy, theology basics, and "how do I read this book?" — taught for normal people, not seminarians. Quizzes, badges, and a knowledge base that compounds.</p>
+      </div>
+    </div>
+    <p class="bets-tag"><strong>No other faith app does all three.</strong> Most pick one — Bible reader, devotionals, or curriculum. We built the whole table.</p>
+  </div>
+</section>
+
+<!-- FEATURE GRID -->
+<section class="features" id="features">
+  <div class="wrap">
+    <div class="features-eyebrow">📖 What's Inside</div>
+    <h2>Everything you'd expect — and a few things you wouldn't.</h2>
+    <p class="features-sub">Six features that turn casual Bible time into a daily rhythm. Free forever for the Faith Community.</p>
+    <div class="feat-grid">
+      <div class="feat">
+        <span class="feat-icon">🏛️</span>
+        <h3>Biblical Archaeology</h3>
+        <p>Real sites, real ruins, real photos. Walk through Jericho, Capernaum, the Pool of Bethesda — and see how the Bible meets the ground beneath it.</p>
+      </div>
+      <div class="feat">
+        <span class="feat-icon">🃏</span>
+        <h3>Flashcards</h3>
+        <p>Bible facts, names, places, and verses on a spaced-repetition deck. The fastest way to actually remember what you read instead of forgetting it Tuesday.</p>
+      </div>
+      <div class="feat">
+        <span class="feat-icon">🎵</span>
+        <h3>Worship Playlist</h3>
+        <p>A curated, in-app worship player. Set the tone before reading; carry the songs with you through the day. No leaving the app, no ads, no noise.</p>
+      </div>
+      <div class="feat">
+        <span class="feat-icon">🙏</span>
+        <h3>Prayer Journal</h3>
+        <p>A private, personal place to write prayers, track answers, and look back at what God has done over weeks and months. The receipts of a praying life.</p>
+      </div>
+      <div class="feat">
+        <span class="feat-icon">🗓️</span>
+        <h3>Bible Timeline</h3>
+        <p>From Creation to Christ's Return, plotted on a single timeline. See how the prophets, kings, exiles, gospels, and Acts fit together at a glance.</p>
+      </div>
+      <div class="feat">
+        <span class="feat-icon">✨</span>
+        <h3>Memory Verses</h3>
+        <p>A built-in memorization system with SM-2 spaced repetition. Hide words, type them back, and have the verse stick — not just for the test, for the year.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<section class="proof">
+  <div class="wrap">
+    <div class="proof-eyebrow">⭐ Early Voices</div>
+    <h2>What people are saying</h2>
+    <p class="proof-note">We're just opening the Faith path — this reflects the kind of response we're hearing. Real names and reviews coming soon.</p>
+    <div class="quote-card">
+      <div class="quote-stars">★ ★ ★ ★ ★</div>
+      <div class="quote-text">"Our youth group has been looking for something like this for years — a Bible app that's actually built for teens to use daily, not just on Sunday. The free Faith path made it a no-brainer to put it in every kid's hands."</div>
+      <div class="quote-author">Pastor Ryan D.</div>
+      <div class="quote-role">Youth Pastor</div>
+    </div>
+  </div>
+</section>
+
+<!-- SIGNUP CTA -->
+<section class="signup-cta">
+  <div class="wrap">
+    <div class="emoji">✝️</div>
+    <h2>Free forever for the Faith Community.</h2>
+    <p class="lead">No credit card. No subscription. Sign up in 60 seconds and start reading today.</p>
+    <p class="sub">Built and maintained by Kingdom Creatives LLC. Optional donations keep it free for every family, youth group, and ministry — never required to access anything.</p>
+    <a href="/register-faith.html" class="btn btn-primary">Start Free →</a>
+    <div class="donation-line">Donations to Kingdom Creatives LLC are not tax-deductible. <a href="/about.html">Learn more about supporting the mission</a>.</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="ft-grid">
+      <div class="ft-col">
+        <div style="font-family:var(--fh);font-size:1.3rem;font-weight:800;margin-bottom:.5rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:inline-block;">YourLife CC</div>
+        <p style="font-size:.82rem;color:var(--tx3);max-width:280px;margin-bottom:1rem;">The complete life operating system for the next generation. A product of Kingdom Creatives.</p>
+      </div>
+      <div class="ft-col"><h4>Product</h4><a href="/#features">Features</a><a href="/#pricing">Pricing</a><a href="/faith.html">Faith Path</a><a href="/about.html">About Us</a></div>
+      <div class="ft-col"><h4>Account</h4><a href="/register-faith.html">Start Free</a><a href="/register.html">See Plans &amp; Pricing</a><a href="/app/index.html">Sign In</a></div>
+      <div class="ft-col"><h4>Legal</h4><a href="/privacy.html">Privacy Policy</a><a href="/children-privacy.html">Children's Privacy</a><a href="/terms.html">Terms of Service</a></div>
+    </div>
+    <div class="ft-bottom">© 2026 Kingdom Creatives LLC · YourLife.cc · All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+function toggleMobNav(){
+  document.getElementById('navHam').classList.toggle('open');
+  document.getElementById('navDrawer').classList.toggle('open');
+}
+function closeMobNav(){
+  document.getElementById('navHam').classList.remove('open');
+  document.getElementById('navDrawer').classList.remove('open');
+}
+</script>
+
+</body>
+</html>
