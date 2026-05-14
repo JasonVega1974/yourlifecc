@@ -4514,10 +4514,18 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
   body.teen-tabs #app{
     padding-bottom: calc(72px + env(safe-area-inset-bottom, 0)) !important;
   }
+  /* mBar (mobile top bar) stays visible so the logo persists. Hide
+     only the hamburger inside it — the bottom tab bar handles all
+     navigation in teen-tabs mode, so the slide-in sidebar is dead
+     weight. Also hide #mobileQuickRow: its horizontally-scrolling
+     button row (Child Login / Parent / Settings / Theme / Refer)
+     is redundant with the bottom tab bar and was making the top
+     of the screen feel cluttered. */
   body.teen-tabs #sidebar,
-  body.teen-tabs #mBar,
   body.teen-tabs #sideOverlay,
-  body.teen-tabs #mobileMenuHint{
+  body.teen-tabs #mobileMenuHint,
+  body.teen-tabs #mobileQuickRow,
+  body.teen-tabs #mBar .hamb{
     display:none !important;
   }
 }
