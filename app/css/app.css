@@ -3804,3 +3804,159 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
 }
 :root.light #bf-prayer .pr-prompt-eyebrow{color:#b45309 !important;}
 :root.light #bf-prayer .pr-prompt-text{color:#1a1233 !important;}
+
+/* ════════════════════════════════════════════════════════════════════
+   F9 — Final consistency sweep across The Well
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ─── Shared .well-card alias — future tabs can use this to inherit
+   the topic-card spec without re-declaring CSS. */
+.well-card{
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(251,191,36,.18);
+  border-radius:14px;
+  min-height:260px;
+  padding:1rem;
+  cursor:pointer;
+  transition:transform .25s, box-shadow .25s, border-color .25s;
+}
+.well-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 14px 36px rgba(251,191,36,.22);
+  border-color:rgba(251,191,36,.5);
+}
+:root.light .well-card{background:rgba(255,255,255,.65);border-color:rgba(180,120,20,.28);}
+
+/* ─── Plans tab: hero + plan-detail modal header + card glow → gold ─── */
+#bf-plans .pl-hero{
+  background:
+    radial-gradient(ellipse at top, rgba(251,191,36,.16), transparent 60%),
+    linear-gradient(180deg,#1a1233 0%,#0a0d1a 100%) !important;
+  color:#fef3c7 !important;
+  border:1px solid rgba(251,191,36,.32) !important;
+  box-shadow:0 0 28px rgba(251,191,36,.18) !important;
+}
+#bf-plans .pl-hero-title{color:#fbbf24 !important;}
+#bf-plans .pl-hero-sub{color:#fef3c7 !important;opacity:.85;}
+#bf-plans .pl-card{
+  box-shadow:0 8px 24px rgba(15,23,42,.18), 0 0 16px rgba(251,191,36,.08) !important;
+}
+#bf-plans .pl-card:hover{
+  box-shadow:0 14px 36px rgba(15,23,42,.28), 0 0 28px rgba(251,191,36,.22) !important;
+}
+#planDetailModal #planDetailHeader{
+  background:
+    radial-gradient(ellipse at top, rgba(251,191,36,.18), transparent 60%),
+    linear-gradient(180deg,#1a1233 0%,#0a0d1a 100%) !important;
+  color:#fef3c7 !important;
+  border-bottom:1px solid rgba(251,191,36,.22);
+}
+
+/* ─── Bible Lands: modal headers + card glow + tagline font ─── */
+#bf-bibleworld .bw-card{
+  background:rgba(255,255,255,.03) !important;
+  border:1px solid rgba(251,191,36,.2) !important;
+  box-shadow:0 8px 24px rgba(15,23,42,.18), 0 0 16px rgba(251,191,36,.08) !important;
+}
+#bf-bibleworld .bw-card:hover{
+  border-color:rgba(251,191,36,.5) !important;
+  box-shadow:0 14px 36px rgba(15,23,42,.28), 0 0 28px rgba(251,191,36,.22) !important;
+}
+#bf-bibleworld .bw-card-tagline{
+  font-family:Georgia,'Times New Roman',serif !important;
+  font-style:italic !important;
+  font-weight:400 !important;
+  line-height:1.6 !important;
+}
+#bf-bibleworld .bw-chip.active{
+  background:linear-gradient(135deg,#fbbf24,#f59e0b) !important;
+  color:#0a0d1a !important;
+  border-color:transparent !important;
+  box-shadow:0 4px 14px rgba(251,191,36,.32) !important;
+}
+#bwDiscoveryModal .md > div:first-of-type,
+#bwSiteModal .md > div:first-of-type{
+  background:
+    radial-gradient(ellipse at top, rgba(251,191,36,.18), transparent 60%),
+    linear-gradient(180deg,#1a1233 0%,#0a0d1a 100%) !important;
+  color:#fef3c7 !important;
+}
+#bwDiscHeader,
+#bwSiteHeader{color:#fbbf24 !important;}
+
+/* ─── Memorize: hero + card glow → gold ─── */
+#bf-memorize .mv-hero{
+  background:
+    radial-gradient(ellipse at top, rgba(251,191,36,.16), transparent 60%),
+    linear-gradient(180deg,#1a1233 0%,#0a0d1a 100%) !important;
+  color:#fef3c7 !important;
+  border:1px solid rgba(251,191,36,.32) !important;
+}
+#bf-memorize .mv-card{
+  background:rgba(255,255,255,.03) !important;
+  border:1px solid rgba(251,191,36,.2) !important;
+  box-shadow:0 8px 24px rgba(15,23,42,.18), 0 0 16px rgba(251,191,36,.08) !important;
+}
+#bf-memorize .mv-card:hover{
+  border-color:rgba(251,191,36,.5) !important;
+  box-shadow:0 14px 36px rgba(15,23,42,.28), 0 0 28px rgba(251,191,36,.22) !important;
+}
+#bf-memorize .mv-card-text{line-height:1.6 !important;}
+
+/* ─── Bible tab: replace remaining cd-banner CTAs with gold ─── */
+#bf-bible button[onclick="runEsvSearch()"]{
+  background:linear-gradient(135deg,#fbbf24,#f59e0b) !important;
+  color:#0a0d1a !important;
+  border:none !important;
+}
+#askBibleModal button[type="submit"],
+#askBibleModal .ask-bible-submit{
+  background:linear-gradient(135deg,#fbbf24,#f59e0b) !important;
+  color:#0a0d1a !important;
+}
+
+/* ─── Home tab: VOTD action buttons + tile hover + XP label → gold ─── */
+#bf-home .fh-tile:hover{
+  border-color:rgba(251,191,36,.45) !important;
+}
+#bf-home .fh-xp-label{color:#fbbf24 !important;}
+
+/* ─── Devotional tab: title gradient + scripture cream + reflection cyan→gold ─── */
+#bf-devotional #devTitle{
+  font-family:'Bebas Neue',var(--fm) !important;
+  background:linear-gradient(135deg,#fef3c7 0%,#fbbf24 60%,#d97706 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  color:#fbbf24;
+  text-shadow:0 2px 28px rgba(251,191,36,.22);
+}
+:root.light #bf-devotional #devTitle{
+  background:linear-gradient(135deg,#d97706 0%,#b45309 60%,#7c2d12 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  color:#b45309;
+}
+#bf-devotional #devScripture{color:#fef3c7 !important;}
+
+/* ─── Universal modal polish — close button minimum 44x44, modal z-index ─── */
+.mo .md > [onclick*="close"],
+.mo .md button[aria-label="Close"]{
+  min-width:44px;
+  min-height:44px;
+}
+/* Story characters / Bible reader chapter / Bible Project popup all share #charModal.
+   Already updated inline. Keep modal-base z-index uniform. */
+.mo{z-index:100000;}
+
+/* ─── Bottom nav: active state must inherit gold from top tab when tab is active ─── */
+#s-scripture .scrTabs-bottom .tab.active{
+  background:linear-gradient(135deg,rgba(251,191,36,.22),rgba(251,191,36,.06)) !important;
+  border-color:rgba(251,191,36,.55) !important;
+  color:#fef3c7 !important;
+}
+
+/* ─── "Coming Soon" replacement for old phase tag ─── */
+#bf-home .fh-tile-soon::after{
+  content:'Coming Soon' !important;
+  background:rgba(251,191,36,.12) !important;
+  color:#fbbf24 !important;
+  border-color:rgba(251,191,36,.3) !important;
+}

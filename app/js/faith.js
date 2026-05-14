@@ -477,9 +477,17 @@ function bfTab(tab, btn){
     const el = document.getElementById('bf-'+t);
     if(el) el.style.display = t===tab ? 'block' : 'none';
   });
+  // Both top + bottom tab bars share the .scrTabs class, so this one
+  // selector keeps them in sync. Activate ALL matching buttons (not just
+  // the clicked one) so the other bar reflects the new active state.
   document.querySelectorAll('.scrTabs .tab').forEach(b=>b.classList.remove('active'));
-  if(!btn) btn = document.querySelector('.scrTabs .tab[data-bf-tab="'+tab+'"]');
-  if(btn) btn.classList.add('active');
+  document.querySelectorAll('.scrTabs .tab[data-bf-tab="'+tab+'"]').forEach(b=>b.classList.add('active'));
+  // F9: persist last-visited tab so showSection('s-scripture') can return
+  // the user to where they left off instead of forcing the Home tab.
+  if(typeof D !== 'undefined' && D){
+    D.wellLastTab = tab;
+    if(typeof save === 'function') save();
+  }
   // Phase 5.8 v3 — Restore Home grid view + inject Back pill on every sub-tab.
   bfRemoveAllBackPills();
   if(tab === 'home') bfShowHomeGrid();
@@ -1757,7 +1765,8 @@ async function openEsvReader(){
   document.getElementById('charIcon').textContent = icon;
   document.getElementById('charTitle').textContent = book;
   document.getElementById('charSub').textContent = 'Chapter '+chNum+' · English Standard Version (ESV)';
-  document.getElementById('charModalHeader').style.background = 'var(--cd-banner)';
+  // F9: gold register inside Well — was var(--cd-banner) purple
+  document.getElementById('charModalHeader').style.background = 'radial-gradient(ellipse at top, rgba(251,191,36,.18), transparent 60%)';
   document.getElementById('charBody').innerHTML = '<div style="text-align:center;padding:2rem;color:var(--tx2);font-size:.85rem;">⏳ Loading '+book+' '+chNum+'...</div>';
   document.getElementById('charQuiz').innerHTML = '';
   openModal('charModal');
@@ -2958,14 +2967,16 @@ function openBFLesson(type, idx){
   const l = banks[type][idx]; if(!l) return;
   // Brand-palette gradients (purple-purge from KC port). Per-module hue:
   // Foundations of Faith → cyan→violet, Bible Survey → cyan→green.
+  // F9: gold register inside Well — was var(--cd-banner) purple
+  const wellGold = 'radial-gradient(ellipse at top, rgba(251,191,36,.18), transparent 60%)';
   const gradients = {
-    jesus: 'var(--cd-banner)',
-    learn: 'linear-gradient(135deg,#38bdf8,#10b981)',
+    jesus: wellGold,
+    learn: 'radial-gradient(ellipse at top, rgba(34,197,94,.18), transparent 60%)',
   };
   document.getElementById('charIcon').textContent = l.icon;
   document.getElementById('charTitle').textContent = l.title;
   document.getElementById('charSub').textContent = type==='jesus'?'Foundations of Faith':'Bible Survey';
-  document.getElementById('charModalHeader').style.background = gradients[type]||'var(--cd-banner)';
+  document.getElementById('charModalHeader').style.background = gradients[type] || wellGold;
   // Body + Mark-Complete CTA. The CTA fires academyMarkLesson() which records
   // completion in D.faithAcademyProgress and awards +5 Faith XP.
   const lessonId = type + ':' + idx;
@@ -5960,7 +5971,8 @@ function openBibleProjectVideo(book){
   document.getElementById('charIcon').textContent = '📺';
   document.getElementById('charTitle').textContent = book;
   document.getElementById('charSub').textContent = 'Bible Project · Free animated overview · CC-BY-SA';
-  document.getElementById('charModalHeader').style.background = 'var(--cd-banner)';
+  // F9: gold register inside Well — was var(--cd-banner) purple
+  document.getElementById('charModalHeader').style.background = 'radial-gradient(ellipse at top, rgba(251,191,36,.18), transparent 60%)';
   const part2 = v.p2 ? '<div style="margin-top:.85rem;"><div style="font-size:.7rem;font-weight:800;color:var(--tx2);margin-bottom:.35rem;text-transform:uppercase;letter-spacing:.1em;">Part 2</div><div style="position:relative;padding-bottom:56.25%;height:0;border-radius:10px;overflow:hidden;background:#000;"><iframe src="https://www.youtube-nocookie.com/embed/'+v.p2+'?rel=0" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe></div></div>' : '';
   document.getElementById('charBody').innerHTML =
     '<div style="font-size:.78rem;color:var(--tx2);line-height:1.55;margin-bottom:.7rem;">A 5-10 minute animated overview of '+escapeHtml(book)+' from <a href="https://bibleproject.com" target="_blank" rel="noopener" style="color:#38bdf8;">The Bible Project</a> — free, CC-BY-SA, beautifully animated.</div>'

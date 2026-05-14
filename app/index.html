@@ -4590,18 +4590,19 @@
 
   <!-- MY FAITH JOURNEY -->
   <div id="bf-journey" style="display:none;">
-    <div style="background:linear-gradient(135deg,rgba(167,139,250,.06),rgba(245,166,35,.04));border:1px solid rgba(167,139,250,.12);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
-      <div style="font-size:.9rem;font-weight:700;margin-bottom:.3rem;">🌟 My Faith Journey</div>
-      <div style="font-size:.78rem;color:var(--tx2);line-height:1.6;margin-bottom:.6rem;">Track your spiritual growth. Write prayers, record answered prayers, and reflect on how God is working in your life.</div>
+    <div class="bf-section-hdr">
+      <div class="bf-eyebrow">PRAYER · MILESTONES · REFLECTION</div>
+      <div class="bf-title">Faith Journey</div>
+      <div class="bf-sub">Track your spiritual growth — write prayers, record the ones God has answered, capture sermon notes, and remember the moments that mattered.</div>
     </div>
 
     <!-- Prayer Journal -->
-    <div style="font-size:.8rem;font-weight:700;margin-bottom:.4rem;">🙏 Prayer Journal</div>
-    <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:.8rem 1rem;margin-bottom:1rem;">
+    <div class="bf-sub-eye" style="font-family:var(--fm);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:#fbbf24;opacity:.85;font-weight:700;margin:1rem 0 .55rem;">🙏 Prayer Journal</div>
+    <div style="background:rgba(255,255,255,.03);border:1px solid rgba(251,191,36,.18);border-radius:12px;padding:.8rem 1rem;margin-bottom:1rem;">
       <textarea id="prayerInput" rows="3" placeholder="What are you praying for? What is on your heart today?" style="margin-bottom:.4rem;"></textarea>
-      <div style="display:flex;gap:.3rem;">
-        <button class="btn bp" onclick="savePrayer('request')" style="flex:1;">🙏 Prayer Request</button>
-        <button class="btn bg" onclick="savePrayer('praise')" style="flex:1;">🎉 Praise Report</button>
+      <div style="display:flex;gap:.4rem;">
+        <button onclick="savePrayer('request')" style="flex:1;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a0d1a;border:none;border-radius:99px;padding:.55rem .85rem;font-size:.78rem;font-weight:900;letter-spacing:.04em;cursor:pointer;font-family:var(--fm);box-shadow:0 4px 14px rgba(251,191,36,.32);">🙏 Prayer Request</button>
+        <button onclick="savePrayer('praise')" style="flex:1;background:linear-gradient(135deg,#22c55e,#16a34a);color:#0a0d1a;border:none;border-radius:99px;padding:.55rem .85rem;font-size:.78rem;font-weight:900;letter-spacing:.04em;cursor:pointer;font-family:var(--fm);box-shadow:0 4px 14px rgba(34,197,94,.32);">🎉 Praise Report</button>
       </div>
     </div>
 
@@ -4609,18 +4610,18 @@
     <div id="prayerList" style="max-height:300px;overflow-y:auto;margin-bottom:1rem;"></div>
 
     <!-- Sermon Notes (F2-H) -->
-    <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;">
-      <span style="font-size:.8rem;font-weight:700;">📝 Sermon Notes</span>
-      <button onclick="openSermonNote()" style="margin-left:auto;background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:8px;padding:.32rem .7rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);">+ New Sermon</button>
+    <div style="display:flex;align-items:center;gap:.5rem;margin:1rem 0 .55rem;">
+      <span class="bf-sub-eye" style="font-family:var(--fm);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:#fbbf24;opacity:.85;font-weight:700;">📝 Sermon Notes</span>
+      <button onclick="openSermonNote()" style="margin-left:auto;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a0d1a;border:none;border-radius:99px;padding:.4rem .85rem;font-size:.72rem;font-weight:900;letter-spacing:.04em;cursor:pointer;font-family:var(--fm);box-shadow:0 4px 14px rgba(251,191,36,.32);">+ New Sermon</button>
     </div>
     <div id="sermonNotesList" style="margin-bottom:1rem;"></div>
 
     <!-- Faith Milestones -->
-    <div style="font-size:.8rem;font-weight:700;margin-bottom:.4rem;">✨ Faith Milestones</div>
+    <div class="bf-sub-eye" style="font-family:var(--fm);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:#fbbf24;opacity:.85;font-weight:700;margin:1rem 0 .55rem;">✨ Faith Milestones</div>
     <div id="faithMilestones" style="margin-bottom:1rem;"></div>
 
     <!-- Favorite Verses -->
-    <div style="font-size:.8rem;font-weight:700;margin-bottom:.4rem;">💎 My Favorite Verses</div>
+    <div class="bf-sub-eye" style="font-family:var(--fm);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:#fbbf24;opacity:.85;font-weight:700;margin:1rem 0 .55rem;">💎 My Favorite Verses</div>
     <div style="display:grid;grid-template-columns:1fr 80px;gap:.3rem;margin-bottom:.4rem;">
       <input type="text" id="favVerseInput" placeholder="Type a verse (e.g. Philippians 4:13 - I can do all things...)">
       <button class="btn bp bs" onclick="saveFavVerse()">+ Save</button>
@@ -10191,16 +10192,17 @@
 
 
 <!-- ═══ OVERLAY MODALS (moved from misc.js) ═══ -->
+<!-- F9: charModal migrated to Well gold register (was hardcoded #667eea→#764ba2) -->
 <div id="charModal" class="mo" onclick="if(event.target===this)closeModal('charModal')">
-  <div class="md" style="max-width:620px;padding:0;overflow:hidden;">
-    <div id="charModalHeader" style="background:linear-gradient(135deg,#667eea,#764ba2);padding:1.5rem 1.5rem 1.2rem;text-align:center;position:relative;">
-      <button onclick="closeModal('charModal')" style="position:absolute;top:.8rem;right:.8rem;background:rgba(255,255,255,.15);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.8rem;backdrop-filter:blur(4px);">✕</button>
-      <div id="charIcon" style="font-size:2.2rem;margin-bottom:.3rem;"></div>
-      <div id="charTitle" style="font-size:1.1rem;font-weight:800;color:#fff;letter-spacing:.5px;"></div>
-      <div id="charSub" style="font-size:.72rem;color:rgba(255,255,255,.7);margin-top:.15rem;"></div>
+  <div class="md" style="max-width:620px;padding:0;overflow:hidden;background:linear-gradient(180deg,#0a0d1a 0%,#100a26 100%);border:1px solid rgba(251,191,36,.22);display:flex;flex-direction:column;max-height:92vh;">
+    <div id="charModalHeader" style="background:radial-gradient(ellipse at top, rgba(251,191,36,.18), transparent 60%);padding:1.5rem 1.5rem 1.2rem;text-align:center;position:relative;border-bottom:1px solid rgba(251,191,36,.18);">
+      <button onclick="closeModal('charModal')" aria-label="Close" style="position:absolute;top:.7rem;right:.7rem;background:rgba(10,13,26,.7);border:1px solid rgba(251,191,36,.4);color:#fef3c7;width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:.95rem;font-weight:800;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);">✕</button>
+      <div id="charIcon" style="font-size:2.4rem;margin-bottom:.5rem;"></div>
+      <div id="charTitle" style="font-family:'Bebas Neue',var(--fm);font-size:1.7rem;letter-spacing:.04em;line-height:1.05;background:linear-gradient(135deg,#fef3c7 0%,#fbbf24 60%,#d97706 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#fbbf24;text-shadow:0 2px 28px rgba(251,191,36,.22);"></div>
+      <div id="charSub" style="font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:.92rem;color:#fef3c7;opacity:.84;margin-top:.4rem;line-height:1.5;font-weight:400;"></div>
     </div>
-    <div id="charBody" class="lesson-body" style="padding:1.3rem 1.5rem;max-height:55vh;overflow-y:auto;font-size:.88rem;line-height:1.8;color:var(--tx2);"></div>
-    <div id="charQuiz" style="padding:0 1.5rem 1.2rem;"></div>
+    <div id="charBody" class="lesson-body" style="padding:1.3rem 1.5rem;overflow-y:auto;font-family:Georgia,serif;font-size:.97rem;line-height:1.75;color:rgba(254,243,199,.92);font-weight:400;flex:1 1 auto;"></div>
+    <div id="charQuiz" style="padding:0 1.5rem 1.2rem;flex:0 0 auto;"></div>
   </div>
 </div>
 <!-- ═══ CHILD AVATAR PICKER MODAL ═══ -->

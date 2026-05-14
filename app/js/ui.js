@@ -1436,16 +1436,12 @@ function showSection(id, fromMobile){
   if(id==='s-scripture')  setTimeout(()=>{
     typeof initScripture==='function'&&initScripture();
     typeof renderScripturePage==='function'&&renderScripturePage();
-    typeof renderDevotionals==='function'&&renderDevotionals();
-    typeof renderBibleReadings==='function'&&renderBibleReadings();
-    typeof renderLearnBibleGrid==='function'&&renderLearnBibleGrid();
-    typeof renderJesusGrid==='function'&&renderJesusGrid();
-    typeof renderFaithJourney==='function'&&renderFaithJourney();
-    ['devotional','jesus','learnBible','reading','bible','journey'].forEach(t=>{
-      const el=document.getElementById('bf-'+t);
-      if(el) el.style.display = t==='devotional' ? 'block' : 'none';
-    });
-    document.querySelectorAll('.scrTabs .tab').forEach((b,i)=>b.classList.toggle('active',i===0));
+    // F9: Auto-show the user's last-visited Well sub-tab (or Home on first
+    // visit). Replaces the old hardcoded "open Devotional first" branch.
+    const lastTab = (typeof D !== 'undefined' && D && D.wellLastTab) ? D.wellLastTab : 'home';
+    const validTabs = ['home','bible','plans','devotional','prayer','academy','bibleworld','stories','timeline','memorize','journey'];
+    const target = validTabs.indexOf(lastTab) >= 0 ? lastTab : 'home';
+    if(typeof bfTab === 'function') bfTab(target);
   },80);
   if(id==='s-driving')    setTimeout(()=>{ typeof initDriving==='function'&&initDriving(); },60);
   if(id==='s-worship')    setTimeout(()=>{ typeof worshipInit==='function'&&worshipInit(); },60);
