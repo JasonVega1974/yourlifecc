@@ -1640,7 +1640,13 @@ function showSection(id, fromMobile){
 
   // Trigger renders that need visible DOM
   if(id==='s-schedule') setTimeout(buildSchedule,60);
-  if(id==='s-health') setTimeout(()=>{ renderWeightChart(); renderHealthHabits(); },80);
+  if(id==='s-health') setTimeout(()=>{
+    renderWeightChart();
+    renderHealthHabits();
+    // Phase C-Health: mood opener renders on every section entry so the
+    // greeting is fresh (today's existing mood reflected if already logged).
+    if(typeof renderHealthMoodCheckin === 'function') renderHealthMoodCheckin();
+  },80);
   if(id==='s-school'){ renderSchool&&renderSchool(); setTimeout(()=>{ renderStudyPlan&&renderStudyPlan(); renderExams&&renderExams(); },100); }
   if(id==='s-resources') setTimeout(()=>{
     // Show Math tab by default

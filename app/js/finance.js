@@ -15,6 +15,9 @@ function mTab(tab,btn){
   if(tab==='bills') renderBills();
   if(tab==='tx') renderTx();
   if(tab==='taxed') calcTax();
+  // Phase C-Finance additions
+  if(tab==='overview') renderSpendingDonut();
+  if(tab==='paycheck') calcPaycheckSim();
 }
 
 function saveBal(){
@@ -122,6 +125,21 @@ function updateFinSum(){
   const ne=document.getElementById('statNet'); if(ne){ne.textContent='$'+Math.abs(net).toFixed(2); ne.style.color=net>=0?'var(--or)':'var(--pk)';}
   updateSavStats(); updateQuickStats();
   renderMonthSnap(inc,exp,bills);
+  // Phase C-Finance: write the warm summary opener (3-number card that
+  // replaced the legacy 6-stat row). Balance + month spending + savings %.
+  const goals = D.savingsGoals||[];
+  const ts = goals.reduce((a,g)=>a+(g.current||0),0);
+  const tt = goals.reduce((a,g)=>a+(g.target||0),0);
+  const savPct = tt > 0 ? Math.min(100, (ts/tt)*100) : 0;
+  set('finSumBalance', '$'+(D.bank||0).toLocaleString());
+  set('finSumMonthSpend', '$'+exp.toFixed(2));
+  set('finSumSavPct', savPct.toFixed(0)+'%');
+  // The donut chart re-renders on overview-tab activation; refresh here
+  // too so it stays current when transactions change while overview is open.
+  if(typeof renderSpendingDonut === 'function'){
+    const donutEl = document.getElementById('spendingDonut');
+    if(donutEl && donutEl.offsetParent !== null) renderSpendingDonut();
+  }
 }
 
 function renderMonthSnap(inc,exp,bills){
@@ -192,30 +210,74 @@ function saveSavingsGoal(){
   save(); renderSavingsTab(); renderSavGoalCards(); closeModal('goalModal'); showToast('Goal created! 🎯');
 }
 
-function addToGoal(id){ const a=parseFloat(prompt('Amount to add ($):')); if(isNaN(a)||a<=0) return; const g=(D.savingsGoals||[]).find(g=>g.id===id); if(!g) return; g.current=(g.current||0)+a; save(); renderSavingsTab(); renderSavGoalCards(); updateFinSum(); showToast('+$'+a+' added! 💚'); }
+function addToGoal(id){
+  const a = parseFloat(prompt('Amount to add ($):'));
+  if(isNaN(a) || a <= 0) return;
+  const g = (D.savingsGoals||[]).find(g => g.id === id);
+  if(!g) return;
+  const wasIncomplete = (g.current || 0) < g.target;
+  g.current = (g.current || 0) + a;
+  save();
+  renderSavingsTab();
+  renderSavGoalCards();
+  updateFinSum();
+  // Phase C-Finance: celebration when a goal crosses the finish line.
+  // launchSideConfetti is reduced-motion guarded (misc.js).
+  if(wasIncomplete && g.current >= g.target){
+    showToast('🎉 Goal complete! ' + g.emoji + ' ' + g.name);
+    if(typeof launchSideConfetti === 'function') launchSideConfetti();
+  } else {
+    showToast('+$' + a + ' added! 💚');
+  }
+}
 function editSavGoal(id){ const g=(D.savingsGoals||[]).find(g=>g.id===id); if(!g) return; const n=prompt('Goal name:',g.name); if(!n) return; const t=parseFloat(prompt('Target ($):',g.target)); if(!isNaN(t)) g.target=t; g.name=n.trim(); save(); renderSavingsTab(); renderSavGoalCards(); }
 function delSavGoal(id){ if(!confirm('Delete this goal?')) return; D.savingsGoals=(D.savingsGoals||[]).filter(g=>g.id!==id); save(); renderSavingsTab(); renderSavGoalCards(); updateFinSum(); }
 
 function renderSavGoalCards(){
-  const el=document.getElementById('savGoalCards'); if(!el) return;
-  el.innerHTML=(D.savingsGoals||[]).map(g=>{
-    const pct=Math.min(100,((g.current||0)/g.target)*100);
-    return`<div class="card" style="border-top:3px solid var(--gr);">
-      <span style="font-size:1.55rem;display:block;margin-bottom:.4rem;">${g.emoji}</span>
-      <div style="font-weight:700;font-size:.95rem;margin-bottom:.48rem;">${escapeHtml(g.name)}</div>
-      <div style="display:flex;gap:.4rem;align-items:baseline;font-size:.82rem;margin-bottom:.35rem;">
-        <span style="color:var(--gr);font-weight:800;font-family:var(--fn);">$${(g.current||0).toLocaleString()}</span>
-        <span style="color:#c8d4e8;">/ $${g.target.toLocaleString()}</span>
-        <span style="color:var(--gr);font-family:var(--fn);font-weight:700;margin-left:auto;">${pct.toFixed(0)}%</span>
-      </div>
-      <div class="pt" style="height:7px;margin-bottom:.65rem;"><div class="pf" style="background:var(--gr);width:${pct}%;"></div></div>
-      <div style="display:flex;gap:.32rem;">
-        <button class="btn bgr bs" style="flex:1;" onclick="addToGoal(${g.id})">+ Add</button>
-        <button class="btn bgh bs" onclick="editSavGoal(${g.id})">✎</button>
-        <button class="btn bda bs" onclick="delSavGoal(${g.id})">✕</button>
-      </div>
-    </div>`;
+  // Phase C-Finance: SVG progress rings replace the linear bars. Card layout
+  // stays the same so the existing edit/delete actions are unchanged.
+  const el = document.getElementById('savGoalCards');
+  if(!el) return;
+  el.innerHTML = (D.savingsGoals||[]).map(g => {
+    const pct = Math.min(100, ((g.current||0) / g.target) * 100);
+    const done = pct >= 100;
+    const ringColor = done ? 'var(--gr)' : 'var(--section-finance)';
+    return '<div class="card" style="border-top:3px solid var(--section-finance);">'
+      + '<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:.7rem;">'
+      +   '<span style="font-size:1.5rem;flex-shrink:0;">'+g.emoji+'</span>'
+      +   '<div style="flex:1;min-width:0;">'
+      +     '<div style="font-weight:700;font-size:.95rem;line-height:1.2;">'+escapeHtml(g.name)+'</div>'
+      +     '<div style="font-size:.74rem;color:var(--tx2);margin-top:.15rem;font-family:var(--fn);">$'+(g.current||0).toLocaleString()+' / $'+g.target.toLocaleString()+'</div>'
+      +   '</div>'
+      + '</div>'
+      + '<div style="display:flex;justify-content:center;margin-bottom:.7rem;">'
+      +   svgProgressRing(pct, 96, ringColor)
+      + '</div>'
+      + (done
+          ? '<div style="text-align:center;font-size:.78rem;color:var(--gr);font-weight:700;margin-bottom:.6rem;">🎉 Goal reached!</div>'
+          : '<div style="text-align:center;font-size:.72rem;color:var(--tx2);margin-bottom:.6rem;">$'+Math.max(0, g.target-(g.current||0)).toLocaleString()+' to go</div>')
+      + '<div style="display:flex;gap:.32rem;">'
+      +   '<button class="btn bgr bs" style="flex:1;" onclick="addToGoal('+g.id+')">+ Add</button>'
+      +   '<button class="btn bgh bs" onclick="editSavGoal('+g.id+')">✎</button>'
+      +   '<button class="btn bda bs" onclick="delSavGoal('+g.id+')">✕</button>'
+      + '</div>'
+      + '</div>';
   }).join('');
+}
+
+// SVG progress ring helper — Phase C-Finance. Renders a single ring with
+// a centered percent label. Color and size are tunable.
+function svgProgressRing(pct, size, color){
+  const r = size/2 - 6;
+  const c = 2 * Math.PI * r;
+  const dash = Math.max(0, Math.min(1, pct/100)) * c;
+  const cx = size/2, cy = size/2;
+  const fontSize = size >= 88 ? 19 : 14;
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" role="img" aria-label="'+pct.toFixed(0)+'% complete">'
+    + '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="6"/>'
+    + '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="6" stroke-linecap="round" stroke-dasharray="'+dash+' '+c+'" transform="rotate(-90 '+cx+' '+cy+')"/>'
+    + '<text x="'+cx+'" y="'+(cy+fontSize*0.35)+'" text-anchor="middle" font-size="'+fontSize+'" font-weight="800" font-family="var(--fn)" fill="var(--tx)">'+pct.toFixed(0)+'%</text>'
+    + '</svg>';
 }
 
 function renderSavingsTab(){
@@ -253,5 +315,164 @@ function quickAdd(){
   g.current=(g.current||0)+amt; document.getElementById('qaAmt').value='';
   save(); renderSavingsTab(); renderSavGoalCards(); updateFinSum();
   if(fb){fb.textContent=`✅ Added $${amt} to ${g.emoji} ${g.name}!`; setTimeout(()=>fb.textContent='',3000);}
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// Phase C-Finance additions — 2026-05-15
+// Spending donut · Paycheck simulator. (Summary opener writes to
+// finSum* IDs from updateFinSum above; SVG rings live in renderSavGoalCards.)
+// ═══════════════════════════════════════════════════════════════════
+
+// ── 1. SVG DONUT — monthly spending by category ────────────────────
+// Maps transaction categories to 5 visual buckets per the user spec:
+// Food · Entertainment · Clothing · Transport · Other.
+const FIN_DONUT_BUCKETS = {
+  'Food / Groceries': 'Food',
+  'Entertainment':    'Entertainment',
+  'Clothing':         'Clothing',
+  'Gas':              'Transport',
+  'Car':              'Transport'
+};
+const FIN_DONUT_COLORS = {
+  Food:          '#f59e0b',
+  Entertainment: '#c084fc',
+  Clothing:      '#f472b6',
+  Transport:     '#38bdf8',
+  Other:         '#94a3b8'
+};
+const FIN_DONUT_ORDER = ['Food','Entertainment','Clothing','Transport','Other'];
+
+function renderSpendingDonut(){
+  const el = document.getElementById('spendingDonut');
+  if(!el) return;
+  const now = new Date();
+  const ym = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  const sums = {Food:0, Entertainment:0, Clothing:0, Transport:0, Other:0};
+  (D.transactions||[]).forEach(t => {
+    if(t.type !== 'expense' || !t.date || !t.date.startsWith(ym)) return;
+    const bucket = FIN_DONUT_BUCKETS[t.cat] || 'Other';
+    sums[bucket] += (t.amt || 0);
+  });
+  const total = FIN_DONUT_ORDER.reduce((a,k) => a + sums[k], 0);
+  if(total === 0){
+    el.innerHTML = '<div style="text-align:center;padding:2rem 1rem;color:var(--tx2);font-size:.85rem;line-height:1.6;">No expenses logged this month yet.<br><span style="font-size:.75rem;color:var(--tx3);">Log a transaction on the Transactions tab to see this chart fill in.</span></div>';
+    return;
+  }
+  const size = 180, r = 70, cx = size/2, cy = size/2, sw = 22;
+  const circ = 2 * Math.PI * r;
+  let offset = 0;
+  let segs = '';
+  FIN_DONUT_ORDER.forEach(k => {
+    if(sums[k] <= 0) return;
+    const dash = (sums[k] / total) * circ;
+    segs += '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none"'
+      + ' stroke="'+FIN_DONUT_COLORS[k]+'" stroke-width="'+sw+'"'
+      + ' stroke-dasharray="'+dash+' '+(circ-dash)+'"'
+      + ' stroke-dashoffset="'+(-offset)+'"'
+      + ' transform="rotate(-90 '+cx+' '+cy+')"'
+      + ' style="cursor:pointer;"'
+      + ' onclick="finDonutOpenCategory(\''+k+'\')"'
+      + '><title>'+k+': $'+sums[k].toFixed(2)+'</title></circle>';
+    offset += dash;
+  });
+  const centerHtml = '<text x="'+cx+'" y="'+(cy-2)+'" text-anchor="middle" fill="var(--tx)" font-size="22" font-weight="800" font-family="var(--fn)">$'+total.toFixed(0)+'</text>'
+    + '<text x="'+cx+'" y="'+(cy+18)+'" text-anchor="middle" fill="var(--tx2)" font-size="10" font-weight="600" letter-spacing="1">THIS MONTH</text>';
+  const legend = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-top:.7rem;">'
+    + FIN_DONUT_ORDER.filter(k => sums[k] > 0).map(k =>
+        '<button type="button" onclick="finDonutOpenCategory(\''+k+'\')" style="display:flex;align-items:center;gap:.45rem;font-size:.78rem;cursor:pointer;background:none;border:none;padding:.25rem 0;color:var(--tx);text-align:left;font-family:var(--fm);">'
+        + '<span style="width:10px;height:10px;background:'+FIN_DONUT_COLORS[k]+';border-radius:3px;flex-shrink:0;"></span>'
+        + '<span style="color:var(--tx2);">'+k+'</span>'
+        + '<span style="margin-left:auto;font-weight:700;color:var(--tx);font-family:var(--fn);">$'+sums[k].toFixed(0)+'</span>'
+        + '</button>'
+      ).join('')
+    + '</div>';
+  el.innerHTML = '<div style="display:flex;justify-content:center;">'
+    + '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" role="img" aria-label="Spending by category">'
+    + segs + centerHtml
+    + '</svg></div>' + legend;
+}
+
+function finDonutOpenCategory(bucket){
+  // Phase C-Finance v1: tap → navigate to the Transactions tab and filter to
+  // expenses. A future iteration can add category-level filtering on top of
+  // the existing _txFilter type/all switch; for now the user lands where
+  // they can see their expense list.
+  _txFilter = 'expense';
+  const tabs = document.querySelectorAll('.moneyTabs .tab');
+  // Find the Transactions tab (index 2 in the current 7-tab list)
+  let txTab = null;
+  tabs.forEach(t => { if(t.textContent && t.textContent.indexOf('Transactions') !== -1) txTab = t; });
+  if(txTab) mTab('tx', txTab);
+  // Also light up the Expenses filter button for clarity
+  const filterBtns = document.querySelectorAll('.txf');
+  filterBtns.forEach(b => b.classList.remove('active'));
+  filterBtns.forEach(b => { if(b.textContent && b.textContent.trim() === 'Expenses') b.classList.add('active'); });
+  showToast('Showing this month\'s '+bucket.toLowerCase()+' & other expenses');
+}
+
+// ── 2. FIRST PAYCHECK SIMULATOR ────────────────────────────────────
+// Spec: wage + hours/week → gross, simplified fed (15%) + state (5%),
+// net, and a 50/30/20 split on the net. Educational copy explains why
+// the first check feels smaller than expected.
+function calcPaycheckSim(){
+  const wage  = parseFloat((document.getElementById('paySimWage')||{}).value) || 0;
+  const hours = parseFloat((document.getElementById('paySimHours')||{}).value) || 0;
+  const el = document.getElementById('paySimOutput');
+  if(!el) return;
+  if(wage <= 0 || hours <= 0){
+    el.innerHTML = '<div style="text-align:center;padding:1.2rem 1rem;color:var(--tx2);font-size:.85rem;line-height:1.6;">Enter your wage and hours to see the breakdown.<br><span style="font-size:.75rem;color:var(--tx3);">This is a simplified estimate — your actual paycheck will also have FICA and possibly insurance/401k.</span></div>';
+    return;
+  }
+  const gross = wage * hours;
+  const fed   = gross * 0.15;
+  const state = gross * 0.05;
+  const net   = gross - fed - state;
+  const needs = net * 0.5;
+  const wants = net * 0.3;
+  const sav   = net * 0.2;
+
+  el.innerHTML =
+    '<div style="background:linear-gradient(135deg,rgba(22,163,74,.08),rgba(34,211,153,.05));border:1px solid rgba(22,163,74,.18);border-left:4px solid var(--section-finance);border-radius:14px;padding:1rem 1.2rem;margin-bottom:.8rem;">'
+    + '<div style="font-family:var(--fh);font-size:.85rem;letter-spacing:.06em;color:var(--section-finance);margin-bottom:.5rem;">YOUR WEEKLY PAYCHECK</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;">'
+    +   '<div style="padding:.6rem .8rem;background:rgba(255,255,255,.04);border-radius:10px;">'
+    +     '<div style="font-size:.62rem;color:var(--tx2);text-transform:uppercase;letter-spacing:.05em;font-weight:700;">Gross pay</div>'
+    +     '<div style="font-family:var(--fn);font-size:1.3rem;font-weight:800;color:var(--tx);">$'+gross.toFixed(2)+'</div>'
+    +   '</div>'
+    +   '<div style="padding:.6rem .8rem;background:rgba(255,255,255,.04);border-radius:10px;">'
+    +     '<div style="font-size:.62rem;color:#f87171;text-transform:uppercase;letter-spacing:.05em;font-weight:700;">Federal (~15%)</div>'
+    +     '<div style="font-family:var(--fn);font-size:1.3rem;font-weight:800;color:#f87171;">-$'+fed.toFixed(2)+'</div>'
+    +   '</div>'
+    +   '<div style="padding:.6rem .8rem;background:rgba(255,255,255,.04);border-radius:10px;">'
+    +     '<div style="font-size:.62rem;color:#fb923c;text-transform:uppercase;letter-spacing:.05em;font-weight:700;">State (~5%)</div>'
+    +     '<div style="font-family:var(--fn);font-size:1.3rem;font-weight:800;color:#fb923c;">-$'+state.toFixed(2)+'</div>'
+    +   '</div>'
+    +   '<div style="padding:.6rem .8rem;background:rgba(22,163,74,.12);border:1px solid rgba(22,163,74,.3);border-radius:10px;">'
+    +     '<div style="font-size:.62rem;color:var(--section-finance);text-transform:uppercase;letter-spacing:.05em;font-weight:700;">Take-home</div>'
+    +     '<div style="font-family:var(--fn);font-size:1.45rem;font-weight:800;color:var(--section-finance);">$'+net.toFixed(2)+'</div>'
+    +   '</div>'
+    + '</div></div>'
+    + '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:1rem 1.2rem;margin-bottom:.8rem;">'
+    + '<div style="font-family:var(--fh);font-size:.85rem;letter-spacing:.06em;color:var(--tx);margin-bottom:.5rem;">SUGGESTED 50 / 30 / 20 SPLIT</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;">'
+    +   '<div style="padding:.55rem .7rem;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);border-radius:9px;text-align:center;">'
+    +     '<div style="font-size:.6rem;color:#c8d4e8;text-transform:uppercase;letter-spacing:.05em;font-weight:700;">Needs 50%</div>'
+    +     '<div style="font-family:var(--fn);font-size:1.1rem;font-weight:800;color:var(--c);">$'+needs.toFixed(2)+'</div>'
+    +   '</div>'
+    +   '<div style="padding:.55rem .7rem;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:9px;text-align:center;">'
+    +     '<div style="font-size:.6rem;color:#c8d4e8;text-transform:uppercase;letter-spacing:.05em;font-weight:700;">Wants 30%</div>'
+    +     '<div style="font-family:var(--fn);font-size:1.1rem;font-weight:800;color:var(--g);">$'+wants.toFixed(2)+'</div>'
+    +   '</div>'
+    +   '<div style="padding:.55rem .7rem;background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.25);border-radius:9px;text-align:center;">'
+    +     '<div style="font-size:.6rem;color:#c8d4e8;text-transform:uppercase;letter-spacing:.05em;font-weight:700;">Savings 20%</div>'
+    +     '<div style="font-family:var(--fn);font-size:1.1rem;font-weight:800;color:var(--section-finance);">$'+sav.toFixed(2)+'</div>'
+    +   '</div>'
+    + '</div></div>'
+    + '<div style="background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.15);border-radius:14px;padding:1rem 1.2rem;font-size:.82rem;color:var(--tx2);line-height:1.7;">'
+    +   '<b style="color:var(--tx);">Your first paycheck will feel smaller than you expect — here\'s why.</b> '
+    +   'Taxes are taken out before the money ever reaches you. The federal and state percentages here are simplified estimates; your real W-2 paycheck will also have FICA '
+    +   '(Social Security + Medicare, ~7.65%), and might have health insurance or 401(k) contributions deducted on top. The take-home above is roughly right for a teen earning under ~$45k a year. '
+    +   '<b style="color:var(--tx);">Always plan on net, never gross.</b>'
+    + '</div>';
 }
 

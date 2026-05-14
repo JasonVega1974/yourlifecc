@@ -80,6 +80,11 @@ const DEF = {
   foodLog:[], macroGoals:{cal:2000,pro:150,carb:200,fat:65},
   growthLog:[], activityLog:[], customActivities:[], hiddenActivities:[],
   screenTime:{}, sessionLog:[],
+  // Phase C-Health: sleep (D.sleepLog[]), weekly PHQ-2 mind check-ins
+  // (D.phq2Log[]), and simple breakfast/lunch/dinner/snack meal log
+  // (D.foodMeals[]) — distinct from D.foodLog above which is the macro
+  // tracker. Capped client-side: sleep 90d, phq2 52 entries, meals 500.
+  sleepLog:[], phq2Log:[], foodMeals:[],
   // mood
   moods:[],
   // goals / milestones
