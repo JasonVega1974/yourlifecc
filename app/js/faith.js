@@ -1162,6 +1162,13 @@ function renderPlanCatalog(){
   if(!el) return;
   let plans = all.slice();
   if(_planCatFilter !== 'all') plans = plans.filter(p => p.category === _planCatFilter);
+  // F10: dynamic header reflects current filter + total count (was static
+  // copy: "All plans (8 to start · 16 more in F2 follow-ups)").
+  const hdr = document.getElementById('plCatalogHdr');
+  if(hdr){
+    const catLabel = _planCatFilter === 'all' ? 'All Plans' : (typeof planCategoryLabel === 'function' ? planCategoryLabel(_planCatFilter) + ' Plans' : 'Plans');
+    hdr.textContent = catLabel + ' (' + plans.length + ' of ' + all.length + ')';
+  }
   if(!plans.length){
     el.innerHTML = `<div class="pl-empty">No plans match this filter yet.</div>`;
     return;

@@ -4148,3 +4148,189 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
 :root.light #fhFamilyVerseCard #fhFamilyVerseText{color:#1a1233 !important;}
 :root.light #fhFamilyVerseCard #fhFamilyVerseRef{color:#92400e !important;}
 :root.light #fhFamilyVerseCard > div:first-child{color:#b45309 !important;}
+
+/* ════════════════════════════════════════════════════════════════════
+   F10 — Close-out consistency pass for The Well
+   Final sweep across every tab. Resolves P0 close-button sizing
+   (the F9 selector used > child instead of descendant — most buttons
+   bypassed it), P1 purple holdouts + light-mode gaps, P2 card spec
+   gaps on Memorize/Plans, P3 typography/color polish.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ─── P0 · Universal 44×44 minimum on every Well modal close button ─── */
+.mo .md [onclick*="close"],
+.mo .md button[aria-label="Close"],
+.mo .md .lm-close,
+.mo .md .tlm-close,
+.mo .md .sp-close{
+  min-width:44px !important;
+  min-height:44px !important;
+}
+/* Daily devotional popup lives outside .mo — explicit selector */
+#dailyDevModal [onclick*="closeDailyDevModal"]{
+  min-width:44px !important;
+  min-height:44px !important;
+}
+
+/* ─── P1 · Remaining purple CTAs and hero blocks → gold ─── */
+#sermonNoteModal button[onclick*="saveSermon"],
+#sermonNoteModal button[onclick*="Save"]{
+  background:linear-gradient(135deg,#fbbf24,#f59e0b) !important;
+  color:#0a0d1a !important;
+  border:none !important;
+}
+#acCertModal button[onclick*="Download"],
+#acCertModal button[onclick*="acCertDownload"]{
+  background:linear-gradient(135deg,#fbbf24,#f59e0b) !important;
+  color:#0a0d1a !important;
+  border:none !important;
+}
+#bf-bibleworld .bw-hero{
+  background:
+    radial-gradient(ellipse at top, rgba(251,191,36,.16), transparent 60%),
+    linear-gradient(180deg,#1a1233 0%,#0a0d1a 100%) !important;
+  color:#fef3c7 !important;
+  border:1px solid rgba(251,191,36,.28) !important;
+  box-shadow:0 0 24px rgba(251,191,36,.16) !important;
+}
+#bf-bibleworld .bw-vtab.active,
+#bf-bibleworld button.bw-vtab[onclick*="bwView"][style*="cd-banner"]{
+  background:linear-gradient(135deg,#fbbf24,#f59e0b) !important;
+  color:#0a0d1a !important;
+  border-color:transparent !important;
+}
+/* Devotional scripture reference: violet #a78bfa → gold */
+#bf-devotional #devRef{color:#fbbf24 !important;}
+/* Devotional "Reflection" label: cyan var(--c) → gold */
+#bf-devotional .content-section span[style*="color:var(--c)"],
+#bf-devotional > div:first-of-type span[style*="color:var(--c)"]{
+  color:#fbbf24 !important;
+}
+/* Academy legacy hero (.ac-hero) — wasn't overridden in F9 */
+#bf-academy .ac-hero{
+  background:
+    radial-gradient(ellipse at top, rgba(251,191,36,.16), transparent 60%),
+    linear-gradient(180deg,#1a1233 0%,#0a0d1a 100%) !important;
+  color:#fef3c7 !important;
+  border:1px solid rgba(251,191,36,.28) !important;
+  box-shadow:0 0 24px rgba(251,191,36,.16) !important;
+}
+
+/* ─── P1 · Light-mode parchment for surfaces that were missing it ─── */
+
+/* Devotional inner card body — was hardcoded dark gradient with no
+   light-mode swap. Now flips to parchment with dark text. */
+:root.light #bf-devotional > div:nth-of-type(2){
+  background:linear-gradient(180deg,#fffaeb 0%,#fdf0c8 100%) !important;
+  border-color:rgba(180,120,20,.32) !important;
+}
+:root.light #bf-devotional #devScripture{color:#1a1233 !important;}
+:root.light #bf-devotional #devRef{color:#b45309 !important;}
+:root.light #bf-devotional #devBody,
+:root.light #bf-devotional #devReflect,
+:root.light #bf-devotional #devPrayer{color:#3a2818 !important;}
+
+/* Journey tab surfaces */
+:root.light #bf-journey div[style*="rgba(255,255,255,.03)"]{
+  background:rgba(255,255,255,.7) !important;
+  border-color:rgba(180,120,20,.22) !important;
+}
+:root.light #bf-journey .bf-sub-eye{color:#b45309 !important;}
+
+/* Memorize hero — was overridden to dark navy in F9. Now flips to
+   parchment in light mode. */
+:root.light #bf-memorize .mv-hero{
+  background:
+    radial-gradient(ellipse at top, rgba(251,191,36,.18), transparent 60%),
+    linear-gradient(180deg,#fffaeb 0%,#fdf0c8 100%) !important;
+  color:#1a1233 !important;
+  border-color:rgba(180,120,20,.4) !important;
+}
+:root.light #bf-memorize .mv-card{
+  background:rgba(255,255,255,.7) !important;
+  border-color:rgba(180,120,20,.28) !important;
+}
+
+/* Academy hero light mode */
+:root.light #bf-academy .ac-hero{
+  background:
+    radial-gradient(ellipse at top, rgba(251,191,36,.18), transparent 60%),
+    linear-gradient(180deg,#fffaeb 0%,#fdf0c8 100%) !important;
+  color:#1a1233 !important;
+  border-color:rgba(180,120,20,.4) !important;
+}
+
+/* ─── P2 · Academy legacy modules: gold border (was purple via --cd-card-border) ─── */
+#bf-academy .ac-module{
+  background:rgba(255,255,255,.03) !important;
+  border:1px solid rgba(251,191,36,.18) !important;
+  border-left-width:4px !important;
+  border-left-color:rgba(251,191,36,.45) !important;
+  box-shadow:0 4px 14px rgba(15,23,42,.18) !important;
+}
+#bf-academy .ac-module:hover{
+  border-color:rgba(251,191,36,.4) !important;
+  box-shadow:0 8px 24px rgba(251,191,36,.12) !important;
+}
+:root.light #bf-academy .ac-module{
+  background:rgba(255,255,255,.7) !important;
+  border-color:rgba(180,120,20,.28) !important;
+}
+
+/* ─── P2 · Default modal gold-on-dark for the seven that lacked it ─── */
+#sermonNoteModal .md,
+#prayerAnswerModal .md,
+#verseNoteModal .md,
+#readerSettingsModal .md,
+#askBibleModal .md,
+#acQuizModal .md,
+#acCertModal .md{
+  background:linear-gradient(180deg,#1a1233 0%,#0a0d1a 100%) !important;
+  border:1px solid rgba(251,191,36,.32) !important;
+  box-shadow:0 0 40px rgba(251,191,36,.18), 0 30px 80px rgba(0,0,0,.5) !important;
+}
+:root.light #sermonNoteModal .md,
+:root.light #prayerAnswerModal .md,
+:root.light #verseNoteModal .md,
+:root.light #readerSettingsModal .md,
+:root.light #askBibleModal .md,
+:root.light #acQuizModal .md,
+:root.light #acCertModal .md{
+  background:linear-gradient(180deg,#fffaeb 0%,#fdf0c8 100%) !important;
+  border-color:rgba(180,120,20,.4) !important;
+}
+
+/* ─── P3 · Memorize verse text: Georgia italic (was plain Inter) ─── */
+#bf-memorize .mv-card-text{
+  font-family:Georgia,'Times New Roman',serif !important;
+  font-style:italic !important;
+  font-weight:400 !important;
+  line-height:1.6 !important;
+}
+
+/* ─── P3 · Bring lessonModal + tlEventModal border opacity up to .45 spec ─── */
+#lessonModal .md,
+#tlEventModal .md{
+  border-color:rgba(251,191,36,.45) !important;
+  box-shadow:0 0 40px rgba(251,191,36,.20), 0 30px 80px rgba(0,0,0,.5) !important;
+}
+
+/* ─── P3 · Story player needs a real border (inset box-shadow disappears in light) ─── */
+#storyPlayerModal .md{
+  border:1px solid rgba(251,191,36,.32) !important;
+}
+
+/* ─── P3 · Hover transform on home topic-cards (translateY matches well-card spec) ─── */
+#bf-home .topic-card:hover{
+  transform:translateY(-3px) !important;
+}
+
+/* ─── P3 · Faith-card description text → Georgia italic on Well surfaces only.
+   Scoped to #s-scripture so general topic-card-desc elsewhere is untouched. */
+#s-scripture .topic-card-desc,
+#bf-home .topic-card-desc{
+  font-family:Georgia,'Times New Roman',serif !important;
+  font-style:italic !important;
+  font-weight:400 !important;
+  line-height:1.55 !important;
+}
