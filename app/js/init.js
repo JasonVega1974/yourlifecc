@@ -324,26 +324,16 @@ function finishInit(cloudReady){
   if(typeof _lastRenderedProfileId !== 'undefined'){
     _lastRenderedProfileId = (typeof _activeProfileId !== 'undefined') ? _activeProfileId : null;
   }
-  // Mom-persona default landing: parents land in Parent Hub, not the child's hero.
-  // Three guards keep this safe:
-  //   1. The user can opt out via the Settings toggle (ylcc_default_view='child').
-  //   2. Demo mode keeps the existing hero-first flow so the demo banner makes sense.
-  //   3. Accounts with no parent profile (or where the active profile is a kid)
-  //      still go to s-hero — there's no parent dashboard to land in.
+  // 2026-05-15 — Mom-persona parent-default landing REMOVED per Option B.
+  // Every account now lands on s-hero with the bottom tab bar (teen-tabs)
+  // visible. Parent Hub is reached intentionally via the Me tab card or
+  // any of the existing entry buttons (top quick-buttons / mobileQuickRow /
+  // parent-mode profile switcher) — it is no longer the auto-landing for
+  // parent accounts. The localStorage ylcc_default_view flag, the
+  // hasParent / activeIsChild / IS_DEMO branch, and the s-parent fallback
+  // are intentionally deleted. Keeping the default constant simplifies the
+  // mental model: init → s-hero, every time, unchanged by account shape.
   let _defaultLanding = 's-hero';
-  try {
-    const userPref = localStorage.getItem('ylcc_default_view');
-    const hasParent = (typeof _profiles !== 'undefined' && Array.isArray(_profiles))
-      ? _profiles.some(p => p && p.isParent === true)
-      : true; // No profile system loaded yet — assume parent (matches signup flow)
-    const activeIsChild = (typeof _profiles !== 'undefined' && Array.isArray(_profiles) && typeof _activeProfileId !== 'undefined')
-      ? _profiles.some(p => p && p.id === _activeProfileId && p.isParent === false)
-      : false;
-    const isDemo = (typeof IS_DEMO !== 'undefined' && IS_DEMO);
-    if(userPref !== 'child' && hasParent && !activeIsChild && !isDemo){
-      _defaultLanding = 's-parent';
-    }
-  } catch(e) { /* localStorage blocked or _profiles unavailable — fall through to hero */ }
   showSection(_defaultLanding);
   if(typeof trackSection === 'function') trackSection(_defaultLanding);
   // Show daily devotional popup once per day — skip if wizard is open
