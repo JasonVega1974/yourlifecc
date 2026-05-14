@@ -784,53 +784,13 @@
 <!-- ════════════ HERO ════════════════════════════════════════ -->
 <section id="s-hero" class="sec active">
 
-  <!-- PARENT WELCOME HEADER — shown only when parent is viewing (not a child profile) -->
-  <div id="parentWelcomeCard" style="display:none;margin-bottom:.7rem;background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(167,139,250,.06));border:1px solid rgba(56,189,248,.15);border-radius:18px;padding:1.4rem 1.8rem;">
-    <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
-      <div style="font-size:2.8rem;">👨‍👩‍👧</div>
-      <div style="flex:1;">
-        <div style="font-size:.72rem;font-weight:700;color:var(--c);letter-spacing:2px;text-transform:uppercase;margin-bottom:.2rem;">Parent Dashboard</div>
-        <div style="font-size:1.6rem;font-weight:900;color:var(--tx);line-height:1.1;" id="parentWelcomeName">Welcome</div>
-        <div style="font-size:.8rem;color:var(--tx2);margin-top:.25rem;" id="parentWelcomeDate"></div>
-      </div>
-      <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
-        <button onclick="showSection('s-parent')" style="background:linear-gradient(135deg,var(--c),var(--p));border:none;color:#06101e;padding:.55rem 1.1rem;border-radius:10px;font-size:.82rem;font-weight:900;cursor:pointer;font-family:var(--fn);">👨‍👩‍👧 Parent Hub</button>
-      </div>
-    </div>
-  </div>
+  <!-- Phase B-Lite session 2: parentWelcomeCard + parentHomeContent removed.
+       Parent accounts route directly to s-parent (init.js:328-343, Greenlight
+       dual-surface). s-hero is now teen/child surface only. Legacy CSS rules
+       in app.css and the inline applyHeroViewMode() handler graceful-null on
+       lookup — left in place for safety, will be swept in a later pass. -->
 
-  <!-- PARENT HOME DASHBOARD — shown only when parent is viewing. Hidden in
-       child-view and solo-mode via CSS in app.css. -->
-  <div id="parentHomeContent" style="display:none;">
-
-    <!-- Card 1: What's New in YourLife CC -->
-    <div style="background:linear-gradient(135deg,rgba(56,189,248,.06),rgba(167,139,250,.05));border:1px solid rgba(56,189,248,.15);border-radius:14px;padding:1.2rem 1.4rem;margin-bottom:.7rem;">
-      <div style="display:flex;align-items:center;gap:.55rem;margin-bottom:.7rem;">
-        <span style="font-size:1.2rem;">✨</span>
-        <span style="font-family:var(--fh);font-size:.7rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--c);">What's New in YourLife CC</span>
-      </div>
-      <div style="display:grid;gap:.6rem;font-size:.85rem;color:var(--tx2);line-height:1.55;">
-        <div style="display:flex;align-items:flex-start;gap:.55rem;"><span style="flex-shrink:0;font-size:1.1rem;">📚</span><div><strong style="color:var(--tx);">Christian Life Guide</strong> — 12 in-depth biblical topics: prayer, marriage, mental health, recovery, and more.</div></div>
-        <div style="display:flex;align-items:flex-start;gap:.55rem;"><span style="flex-shrink:0;font-size:1.1rem;">🎵</span><div><strong style="color:var(--tx);">Worship Playlist</strong> — curated worship music to set the tone for your family.</div></div>
-        <div style="display:flex;align-items:flex-start;gap:.55rem;"><span style="flex-shrink:0;font-size:1.1rem;">🏆</span><div><strong style="color:var(--tx);">Life Skills Academy</strong> — 175+ lessons across 42 real-life categories.</div></div>
-      </div>
-    </div>
-
-    <!-- Card 2: Notifications / updates -->
-    <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:1.1rem 1.3rem;margin-bottom:.7rem;">
-      <div style="display:flex;align-items:center;gap:.55rem;margin-bottom:.7rem;">
-        <span style="font-size:1.2rem;">📬</span>
-        <span style="font-family:var(--fh);font-size:.7rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--tx);">Updates for You</span>
-      </div>
-      <div id="parentNotifList" style="display:flex;flex-direction:column;gap:.5rem;font-size:.82rem;color:var(--tx2);">
-        <!-- Rendered by renderParentNotifications() — graceful empty state on first paint. -->
-        <div style="font-size:.78rem;color:var(--tx3);font-style:italic;padding:.4rem 0;">Loading…</div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- HERO HEADER — child only, hidden in parent view -->
+  <!-- HERO HEADER — child only -->
   <div id="heroCard" class="hero-card no-photo" style="margin-bottom:.7rem;">
     <div id="heroBgLayer" class="hero-bg-layer"></div>
     <div class="hero-overlay"></div>
@@ -881,9 +841,18 @@
 
   <!-- HEADLINE STATUS — answers "how is my kid doing today?" before any metrics -->
   <div id="heroHeadline" style="background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(167,139,250,.05));border:1px solid rgba(56,189,248,.2);border-radius:14px;padding:18px 20px;margin-bottom:.7rem;">
-    <div id="heroHeadlineQuestion" style="font-size:.68rem;color:var(--tx2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;font-weight:800;"></div>
+    <div id="heroHeadlineQuestion" style="font-size:.75rem;color:var(--tx2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;font-weight:800;"></div>
     <div id="heroHeadlineAnswer" style="font-size:1.2rem;font-weight:700;color:var(--tx);line-height:1.45;margin-bottom:10px;"></div>
     <div id="heroHeadlinePills" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+  </div>
+
+  <!-- TODAY'S VERSE — Phase B-Lite session 2. Renders from the existing
+       VERSES + D.verses pool (same data as renderVerse). Tap routes to the
+       faith hub. Populated by renderTodaysVerseHero() in init.js. -->
+  <div id="heroTodaysVerse" onclick="wellGoto&&wellGoto('home')" style="display:none;cursor:pointer;background:linear-gradient(135deg,rgba(67,56,202,.10),rgba(20,184,166,.06));border:1px solid rgba(67,56,202,.25);border-radius:14px;padding:14px 18px;margin-bottom:.7rem;">
+    <div style="font-size:.72rem;color:var(--tx2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;font-weight:800;">📖 Today's Verse</div>
+    <div id="heroTodaysVerseText" style="font-size:1rem;font-weight:600;color:var(--tx);line-height:1.5;font-style:italic;margin-bottom:6px;"></div>
+    <div id="heroTodaysVerseRef" style="font-size:.78rem;color:var(--tx2);font-weight:600;"></div>
   </div>
 
   <!-- 3 MICRO-STATS (streak, GPA, mood) -->
@@ -8403,6 +8372,37 @@
   </div><!-- /sp-mine -->
 </section>
 
+<!-- ════ TAB LANDING: LEARN (Phase B-Lite session 2) ════ -->
+<!-- Populated by renderTabLanding('learn') in ui.js from TAB_IA. -->
+<section id="s-learn" class="sec">
+  <div class="sh">
+    <div class="si">📚</div>
+    <div class="st">Learn</div>
+    <div class="sl"></div>
+  </div>
+  <div class="tab-landing" data-tab="learn"></div>
+</section>
+
+<!-- ════ TAB LANDING: LIFE (Phase B-Lite session 2) ════ -->
+<section id="s-life" class="sec">
+  <div class="sh">
+    <div class="si">🌱</div>
+    <div class="st">Life</div>
+    <div class="sl"></div>
+  </div>
+  <div class="tab-landing" data-tab="life"></div>
+</section>
+
+<!-- ════ TAB LANDING: ME (Phase B-Lite session 2) ════ -->
+<section id="s-me" class="sec">
+  <div class="sh">
+    <div class="si">👤</div>
+    <div class="st">Me</div>
+    <div class="sl"></div>
+  </div>
+  <div class="tab-landing" data-tab="me"></div>
+</section>
+
 <!-- ════ PARENT HUB ════ -->
 <section id="s-parent" class="sec">
   <div class="sh">
@@ -10798,5 +10798,12 @@ if (_origRefresh) {
   });
 })();
 </script>
+
+<!-- ════ BOTTOM TAB BAR (Phase B-Lite session 2) ════
+     Mobile-only (≤860px), teen accounts only (hidden when body.parent-view).
+     Buttons populated by renderBottomTabBar() in ui.js from TAB_IA.
+     safe-area-inset-bottom handled in app.css. -->
+<nav id="bottomTabBar" role="navigation" aria-label="Primary tabs"></nav>
+
 </body>
 </html>

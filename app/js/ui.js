@@ -1088,6 +1088,117 @@ const TAB_IA = [
 //   Outside teen tabs by design: s-christian-living (dormant per F8),
 //                                s-parent (parent surface only)
 
+// ── Bottom tab bar + tab landing renderers (Phase B-Lite session 2) ──
+// Render targets declared in app/index.html:
+//   <nav id="bottomTabBar"> just before </body>
+//   <div class="tab-landing" data-tab="learn"> inside s-learn
+//   <div class="tab-landing" data-tab="life">  inside s-life
+//   <div class="tab-landing" data-tab="me">    inside s-me
+// Home and Faith tabs route to existing surfaces (s-hero / s-scripture)
+// and don't have a landing — their primary[] entries are still useful
+// for keyboard / a11y wiring later, but session 2 only renders the
+// three new landings.
+function renderBottomTabBar(){
+  // Faith-free users have a constrained UI governed by FAITH_FREE_ALLOWED
+  // (auth.js). Skip the tab bar entirely — their nav stays the sidebar.
+  if(window._faithFree) return;
+  const bar = document.getElementById('bottomTabBar');
+  if(!bar) return;
+  bar.innerHTML = TAB_IA.map(tab =>
+    '<button type="button" class="tab-btn" data-tab="'+tab.id+'"'
+      + ' style="--tab-accent:'+tab.accent+';"'
+      + ' onclick="handleTabBarTap(\''+tab.id+'\')"'
+      + ' aria-label="'+tab.label+' tab">'
+      + '<span class="tab-icon" aria-hidden="true">'+tab.icon+'</span>'
+      + '<span class="tab-label">'+tab.label+'</span>'
+    + '</button>'
+  ).join('');
+  setActiveBottomTab(_tabForSection(_activeSection) || 'home');
+}
+
+function renderTabLanding(tabId){
+  const tab = TAB_IA.find(t => t.id === tabId);
+  if(!tab) return;
+  const host = document.querySelector('.tab-landing[data-tab="'+tabId+'"]');
+  if(!host) return;
+  host.innerHTML = tab.primary.map(card => {
+    const accent = card.accent || tab.accent || 'var(--c)';
+    let onclick = '';
+    if(card.sectionId){
+      onclick = "showSection('" + card.sectionId + "')";
+    } else if(card.wellTab){
+      onclick = "(typeof wellGoto==='function')&&wellGoto('" + card.wellTab + "')";
+    } else if(card.action){
+      onclick = "handleTabAction('" + card.action + "')";
+    }
+    return '<button type="button" class="tab-landing-card"'
+      + ' style="--card-accent:'+accent+';"'
+      + ' onclick="'+onclick+'"'
+      + ' aria-label="'+card.label+'">'
+      + '<span class="tlc-icon" aria-hidden="true">'+(card.icon||'•')+'</span>'
+      + '<span class="tlc-label">'+card.label+'</span>'
+    + '</button>';
+  }).join('');
+}
+
+function renderAllTabLandings(){
+  renderTabLanding('learn');
+  renderTabLanding('life');
+  renderTabLanding('me');
+}
+
+function setActiveBottomTab(tabId){
+  document.querySelectorAll('#bottomTabBar .tab-btn').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-tab') === tabId);
+  });
+}
+
+// Reverse lookup: which tab owns this section?
+// Returns 'home' | 'learn' | 'life' | 'faith' | 'me' | null.
+function _tabForSection(sectionId){
+  if(!sectionId) return null;
+  if(sectionId === 's-hero')  return 'home';
+  if(sectionId === 's-learn') return 'learn';
+  if(sectionId === 's-life')  return 'life';
+  if(sectionId === 's-me')    return 'me';
+  if(sectionId === 's-scripture' || sectionId === 's-worship' ||
+     sectionId === 's-flashcards' || sectionId === 's-christian-living'){
+    return 'faith';
+  }
+  for(let i=0;i<TAB_IA.length;i++){
+    const tab = TAB_IA[i];
+    for(let j=0;j<tab.primary.length;j++){
+      if(tab.primary[j].sectionId === sectionId) return tab.id;
+    }
+  }
+  return null;
+}
+
+function handleTabBarTap(tabId){
+  // Tab bar buttons route to the tab's primary section.
+  const dest = {home:'s-hero', learn:'s-learn', life:'s-life',
+                faith:'s-scripture', me:'s-me'}[tabId];
+  if(dest) showSection(dest);
+}
+
+function handleTabAction(action){
+  // Settings / Profile / Sign-out cards on the Me tab.
+  // Wires to the app's existing handlers if present, otherwise no-ops.
+  switch(action){
+    case 'settings':
+      if(typeof quickSettings === 'function') quickSettings();
+      else if(typeof openSettings === 'function') openSettings();
+      break;
+    case 'profile':
+      if(typeof openProfileSwitcher === 'function') openProfileSwitcher();
+      else if(typeof renderProfileSwitcher === 'function') renderProfileSwitcher();
+      break;
+    case 'sign-out':
+      if(typeof signOut === 'function') signOut();
+      break;
+  }
+}
+
 let _activeSection = 's-hero';
 
 function buildSideNav(){
@@ -1463,6 +1574,13 @@ function showSection(id, fromMobile){
   const target = document.getElementById(id);
   if(target){ target.style.display = ''; target.classList.add('active'); }
   _activeSection = id;
+
+  // Phase B-Lite session 2: sync bottom tab bar active state to the
+  // tab that owns this section.
+  if(typeof setActiveBottomTab === 'function'){
+    const _tabId = _tabForSection(id);
+    if(_tabId) setActiveBottomTab(_tabId);
+  }
 
   // Update nav highlights
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));

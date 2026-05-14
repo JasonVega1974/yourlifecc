@@ -4441,3 +4441,130 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 /* ── P3-03 — Sidebar overlay clearly tappable to close drawer. */
 #sideOverlay{ cursor:pointer; }
 
+/* ════════════════════════════════════════════════════════════
+   Phase B-Lite session 2 — Bottom tab bar + tab landing pages
+   Mobile-only (≤860px), teen accounts only (hidden under
+   body.parent-view per the Greenlight dual-surface model).
+   Parents on mobile keep the slide-in sidebar pattern.
+   ════════════════════════════════════════════════════════════ */
+#bottomTabBar{
+  display:none;
+  position:fixed; left:0; right:0; bottom:0;
+  z-index:950;
+  background:var(--s1);
+  border-top:1px solid rgba(255,255,255,.08);
+  padding-bottom:env(safe-area-inset-bottom, 0);
+  box-shadow:0 -4px 24px rgba(0,0,0,.45);
+}
+#bottomTabBar .tab-btn{
+  flex:1 1 0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:3px;
+  padding:8px 4px 6px;
+  min-height:56px;
+  background:none; border:none;
+  color:var(--tx2);
+  font-family:var(--fm);
+  cursor:pointer;
+  transition:color .15s ease;
+  position:relative;
+  -webkit-tap-highlight-color:transparent;
+}
+#bottomTabBar .tab-btn .tab-icon{
+  font-size:1.35rem; line-height:1;
+  filter:grayscale(.3); opacity:.75;
+  transition:filter .15s ease, opacity .15s ease, transform .15s ease;
+}
+#bottomTabBar .tab-btn .tab-label{
+  font-size:.66rem;
+  letter-spacing:.02em;
+  font-weight:600;
+  line-height:1;
+}
+#bottomTabBar .tab-btn:hover .tab-icon,
+#bottomTabBar .tab-btn:focus-visible .tab-icon{
+  filter:none; opacity:1;
+}
+#bottomTabBar .tab-btn.active{
+  color:var(--tab-accent, var(--c));
+}
+#bottomTabBar .tab-btn.active .tab-icon{
+  filter:none; opacity:1;
+  transform:translateY(-2px);
+}
+#bottomTabBar .tab-btn.active::before{
+  content:'';
+  position:absolute;
+  top:0; left:18%; right:18%;
+  height:3px;
+  border-radius:0 0 3px 3px;
+  background:var(--tab-accent, var(--c));
+}
+
+@media (max-width:860px){
+  body:not(.parent-view) #bottomTabBar{ display:flex; }
+  /* Reserve room for the tab bar + iPhone home-indicator strip so
+     fixed-bottom content (like Worship mini-player) isn't covered.
+     The .8rem .7rem 5rem rule at line 178 (mobile #app padding) is
+     overridden here for teen-mode only. */
+  body:not(.parent-view) #app{
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0)) !important;
+  }
+  /* Hide slide-in sidebar + hamburger + overlay + menu hint for teen
+     mode — bottom tab bar is the primary nav surface. Parent accounts
+     keep the existing slide-in pattern unchanged. */
+  body:not(.parent-view) #sidebar,
+  body:not(.parent-view) #mBar,
+  body:not(.parent-view) #sideOverlay,
+  body:not(.parent-view) #mobileMenuHint{
+    display:none !important;
+  }
+}
+
+/* ── Tab landing card grid ────────────────────────────────── */
+.tab-landing{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:14px;
+  padding:8px 0 24px;
+}
+@media (max-width:520px){
+  .tab-landing{ grid-template-columns:1fr; gap:12px; }
+}
+@media (min-width:861px){
+  .tab-landing{ grid-template-columns:repeat(3, 1fr); gap:18px; }
+}
+.tab-landing-card{
+  position:relative;
+  background:var(--card-bg, rgba(255,255,255,.04));
+  border:1px solid var(--card-border, rgba(255,255,255,.08));
+  border-left:4px solid var(--card-accent, var(--c));
+  border-radius:16px;
+  padding:18px 18px 16px;
+  cursor:pointer;
+  text-align:left;
+  font-family:var(--fm);
+  color:var(--tx);
+  transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+  display:flex; flex-direction:column; gap:4px;
+  min-height:96px;
+  -webkit-tap-highlight-color:transparent;
+}
+.tab-landing-card:hover,
+.tab-landing-card:focus-visible{
+  transform:translateY(-2px);
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
+  outline:none;
+}
+.tab-landing-card .tlc-icon{
+  font-size:1.7rem; line-height:1;
+  margin-bottom:4px;
+}
+.tab-landing-card .tlc-label{
+  font-family:var(--fh);
+  font-size:1.25rem;
+  letter-spacing:.04em;
+  color:var(--tx);
+  line-height:1.1;
+}
+

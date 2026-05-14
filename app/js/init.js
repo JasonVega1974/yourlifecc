@@ -314,6 +314,11 @@ function finishInit(cloudReady){
   applyHeroBg();
   // Build sidebar nav
   buildSideNav();
+  // Phase B-Lite session 2: build the mobile bottom tab bar and the
+  // three tab landing card grids (Learn / Life / Me). Faith-free users
+  // skip the tab bar via the window._faithFree guard in renderBottomTabBar.
+  if(typeof renderBottomTabBar === 'function') renderBottomTabBar();
+  if(typeof renderAllTabLandings === 'function') renderAllTabLandings();
   // Stamp the baseline profile so the child-switch guard in ui.js
   // knows who is active right now and can detect a PIN login switch.
   if(typeof _lastRenderedProfileId !== 'undefined'){
@@ -613,9 +618,40 @@ function renderHeroHeadline(){
     ];
     m.innerHTML = cards.map(c =>
       '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 12px;">' +
-        '<div style="font-size:.58rem;color:#64748b;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;">' + c.l + '</div>' +
+        '<div style="font-size:.72rem;color:#64748b;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;">' + c.l + '</div>' +
         '<div style="font-size:1rem;font-weight:700;color:var(--tx);">' + c.v + '</div>' +
       '</div>'
     ).join('');
   }
+
+  // Phase B-Lite session 2: render Today's Verse alongside the headline.
+  renderTodaysVerseHero();
+}
+
+// ── TODAY'S VERSE on hero (Phase B-Lite session 2) ────────────────────
+// Uses the existing verse pool ([...VERSES, ...D.verses]) — same source as
+// renderVerse() in ui.js. Tap routes to the faith hub via wellGoto('home')
+// (already wired on the #heroTodaysVerse onclick attr in index.html).
+function renderTodaysVerseHero(){
+  const card = document.getElementById('heroTodaysVerse');
+  if(!card) return;
+  // VERSES is a global defined by data.js or similar — guard for load order.
+  const pool = [].concat(
+    (typeof VERSES !== 'undefined' && Array.isArray(VERSES)) ? VERSES : [],
+    (typeof D !== 'undefined' && D && Array.isArray(D.verses)) ? D.verses : []
+  );
+  if(!pool.length){ card.style.display = 'none'; return; }
+  // Deterministic verse-of-the-day: index by day-of-year, so the same
+  // verse shows all day and rotates daily without touching D.verseIdx
+  // (which the user can drive manually elsewhere).
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const doy = Math.floor((now - start) / 86400000);
+  const v = pool[doy % pool.length];
+  if(!v || !v.t){ card.style.display = 'none'; return; }
+  const txt = document.getElementById('heroTodaysVerseText');
+  const ref = document.getElementById('heroTodaysVerseRef');
+  if(txt) txt.textContent = '"' + v.t + '"';
+  if(ref) ref.textContent = v.r ? '— ' + v.r : '';
+  card.style.display = '';
 }
