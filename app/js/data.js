@@ -114,6 +114,10 @@ const DEF = {
   heroCompact:1,
   // Phase 2.1 age picker: '' (unset, picker fires on first launch) | '12_14' | '15_17' | '18_22'
   ageBracket:'',
+  // F6.3 — Data-layer mirror of window._faithFree. Set true alongside
+  // window._faithFree in auth.js when plan_status='faith_free'. Either
+  // flag may be read by feature code; both stay in sync.
+  faithOnly:false,
   bannerMode:'scroll',
 };
 

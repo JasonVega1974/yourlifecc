@@ -366,6 +366,9 @@ async function checkPlanStatus(){
     window._userPlanStatus  = status;
     window._contestFreeUser = (status === 'free_contest');
     window._faithFree       = (status === 'faith_free');
+    // F6.3 — Mirror onto D so feature code can read either flag.
+    // window._faithFree remains the original source; both stay in sync.
+    if(typeof D !== 'undefined' && D) D.faithOnly = (status === 'faith_free');
 
     // Allowlist — anything else (cancelled, past_due, anything new/unknown) blocks.
     const ALLOWED_STATUSES = ['active', 'trialing', 'free_contest', 'faith_free', null];
