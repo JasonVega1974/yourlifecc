@@ -4463,6 +4463,31 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
   z-index: 9999 !important;
 }
 
+/* Phase C-fix-3 (2026-05-15) — Tab landing layout: clear bottom tab
+   bar + cards start near the top of the visible area. */
+@media (max-width: 860px) {
+  body.teen-tabs #mainWrap,
+  body.teen-tabs .section-content,
+  body.teen-tabs #contentArea {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  }
+}
+/* Tab landings (s-learn / s-life / s-me) — trim section-header bottom
+   margin (default .sh is 1.5rem / ~25px) and tab-landing padding-top
+   so the first card sits closer to the section header. The default
+   header → card gap was pushing the first card below the fold on
+   small phones. */
+#s-learn .sh,
+#s-life  .sh,
+#s-me    .sh {
+  margin-bottom: .6rem;
+}
+#s-learn .tab-landing,
+#s-life  .tab-landing,
+#s-me    .tab-landing {
+  padding-top: 0;
+}
+
 /* ════════════════════════════════════════════════════════════
    Phase B-Lite session 2 — Bottom tab bar + tab landing pages
    Mobile-only (≤860px), teen accounts only (hidden under
