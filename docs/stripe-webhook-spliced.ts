@@ -16,8 +16,10 @@
 //     invoice.subscription only for old API versions
 //
 // Env vars required (Supabase → Edge Functions → Secrets):
-//   STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, SUPABASE_URL,
-//   SERVICE_ROLE_KEY (unprefixed), BREVO_API_KEY
+//   STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, APP_SUPABASE_URL,
+//   APP_SERVICE_KEY, BREVO_API_KEY
+//   (APP_ prefix on Supabase ones: Supabase reserves the SUPABASE_
+//    prefix for system-injected env vars in Edge Functions.)
 //
 // See docs/F6-stripe-webhook-deploy-runbook.md for deploy steps.
 // ═══════════════════════════════════════════════════════════════

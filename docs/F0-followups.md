@@ -19,6 +19,7 @@ Tracking items deliberately deferred during the Faith-Free Tier Foundation (F0) 
 ## Production-blocking — must be resolved before F2 launches a real signup flow
 
 ### faith_free must never touch Stripe (architectural)
+- ✅ **Resolved 2026-05-14 — F6 SPLICE POINT 2 faith_only guard now live.** The Stripe webhook handler now checks `profiles.plan_status='faith_free'` AND `profiles.faith_only=true` before any `syncStatus()` write and short-circuits with log line `🛡️ faith_only guard: skipped plan_status sync for cust ...`. Combined with the donation router (SPLICE POINT 1) that prevents donation-tagged events from reaching the subscription path, this closes the production-blocking gap. The architectural fix (faith_free signup never creating a Stripe customer) is still the canonical safety; SPLICE POINT 2 is the belt-and-suspenders defense documented below.
 - **Principle:** faith_free is a free, payment-free, Stripe-free tier. The user flow is `link → register → in`. No checkout, no Stripe customer, no Stripe webhook ever fires for a faith_free account.
 - **Why this matters (hit live during F0 testing on 2026-05-04):** The test account `jason.vega07@yahoo.com` was a real paid Stripe-linked account. We manually `UPDATE`'d `plan_status='faith_free'`, which worked. A subsequent Stripe webhook (subscription.updated or similar) overwrote the row back to `'active'` because the receiver blindly trusts Stripe as the source of truth for plan_status. Result: the gating silently stopped applying.
 - **Real fix (F2):** The faith_free signup flow must:
