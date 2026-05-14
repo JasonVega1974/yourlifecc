@@ -457,6 +457,67 @@ function bfShowHomeGrid(){
 // Phase 5.8 v3 — Back-to-Home pill management. Every The Well
 // sub-tab gets a "← Back to Home" pill at the top so the navigation
 // card-grid is always one click away. Idempotent — won't double-insert.
+// ── DONATION PROMPT (faith-only users, The Well home tab) ────
+// Subtle, dismissible card injected on first render of bf-home for
+// users on the free faith path. Persists dismissal in D so it stays
+// hidden across reloads / cloud sync. The card links out to
+// faith.html#donate where the actual Stripe Checkout lives.
+function dismissDonationPrompt(){
+  if(typeof D !== 'undefined' && D){
+    D.donationPromptDismissed = true;
+    if(typeof save === 'function') save();
+  }
+  const el = document.getElementById('fhDonationPrompt');
+  if(el) el.style.display = 'none';
+}
+
+function renderWellDonationPrompt(){
+  // Gate: only faith-only users; never if already dismissed. Faith path
+  // is identified by window._faithFree (set in auth.js checkPlanStatus);
+  // there is no D.faithOnly mirror in the data layer today.
+  if(!window._faithFree) return;
+  if(typeof D !== 'undefined' && D && D.donationPromptDismissed) return;
+
+  // Re-render: if the card already exists, just ensure it's visible.
+  let card = document.getElementById('fhDonationPrompt');
+  if(card){ card.style.display = ''; return; }
+
+  // First render: build and insert the card. Placed at the top of the
+  // bf-home flow (after the verse-of-the-day + welcome strip, before
+  // fhFamilyVerseCard / the main card grid).
+  const home = document.getElementById('bf-home');
+  if(!home) return;
+
+  card = document.createElement('div');
+  card.id = 'fhDonationPrompt';
+  card.style.cssText = 'background:rgba(245,166,35,.04);border:1px solid rgba(245,166,35,.22);border-radius:12px;padding:.85rem 1.1rem;margin-bottom:.85rem;position:relative;';
+  card.innerHTML =
+    '<button onclick="dismissDonationPrompt()" aria-label="Dismiss" style="position:absolute;top:.4rem;right:.5rem;background:none;border:none;color:var(--tx3);font-size:1.1rem;cursor:pointer;line-height:1;padding:.2rem .45rem;">×</button>' +
+    '<div style="display:flex;align-items:center;gap:.7rem;padding-right:1.4rem;">' +
+      '<span style="font-size:1.4rem;flex-shrink:0;">💛</span>' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div style="font-size:.78rem;font-weight:800;color:#fbbf24;margin-bottom:.2rem;">Faith features are free — always.</div>' +
+        '<div style="font-size:.72rem;color:var(--tx2);line-height:1.5;">If you’d like to support the mission, even $5 helps.</div>' +
+      '</div>' +
+      '<a href="https://yourlifecc.com/faith.html#donate" target="_blank" rel="noopener" style="background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.35);color:#fbbf24;border-radius:8px;padding:.42rem .8rem;font-size:.74rem;font-weight:700;text-decoration:none;flex-shrink:0;white-space:nowrap;">Support →</a>' +
+    '</div>';
+
+  // Insert position: prefer just before fhFamilyVerseCard so the card
+  // sits at the top of the home grid. Fall back to after .well-welcome.
+  const familyCard = document.getElementById('fhFamilyVerseCard');
+  if(familyCard && familyCard.parentNode === home){
+    home.insertBefore(card, familyCard);
+    return;
+  }
+  const welcome = home.querySelector('.well-welcome');
+  if(welcome && welcome.parentNode === home){
+    if(welcome.nextSibling) home.insertBefore(card, welcome.nextSibling);
+    else home.appendChild(card);
+    return;
+  }
+  home.appendChild(card);
+}
+
 // wellGoto(target) — single entry point for any external nav into The Well.
 // Used by the expanded sidebar (13 items) so one click both opens the
 // section and switches to the chosen tab. 'worship' and 'flashcards' are
@@ -681,6 +742,10 @@ function renderFaithHome(){
 
   // F4-G: Story Mode tile list (Faith Home Card 6).
   if(typeof renderFaithHomeStories === 'function') renderFaithHomeStories();
+
+  // F6.2: Subtle donation prompt for faith_only users. Self-gates on
+  // window._faithFree + D.donationPromptDismissed; safe to call always.
+  renderWellDonationPrompt();
 
   // F2-H: Family Verse of the Week (only when family profiles exist).
   const fvEl = document.getElementById('fhFamilyVerseCard');
