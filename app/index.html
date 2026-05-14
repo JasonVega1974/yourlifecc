@@ -661,10 +661,18 @@
 <div id="sideOverlay" onclick="closeSidebar()"></div>
 
 <!-- MOBILE TOP BAR -->
+<!-- Phase C-fix-2/3 (2026-05-15): added compact globe + avatar buttons
+     that surface only under body.teen-tabs. CSS at app.css (the
+     @media ≤860px teen-tabs block) hides the hamburger and shows these
+     two instead. The globe button carries class="mqb-lang" so the
+     outside-click handler in misc.js#toggleLangPicker recognizes it as
+     a translate trigger and doesn't immediately close the dropdown. -->
 <div id="mBar">
   <div class="mBar-title">YourLife CC</div>
   <div style="display:flex;gap:.4rem;align-items:center;">
     <span id="svi2" style="font-size:.62rem;color:var(--gr);opacity:0;transition:opacity .3s;">✓</span>
+    <button id="mBarLangBtn" class="mqb-lang" onclick="toggleMobTranslate()" title="Language" aria-label="Change language" style="display:none;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:var(--tx);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.05rem;padding:0;align-items:center;justify-content:center;">🌐</button>
+    <button id="mBarAvatarBtn" onclick="(typeof showSection==='function')&&showSection('s-me')" title="Profile" aria-label="Open profile" style="display:none;background:rgba(56,189,248,.14);border:1px solid rgba(56,189,248,.28);color:#38bdf8;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.05rem;padding:0;align-items:center;justify-content:center;font-family:var(--fm);">👤</button>
     <button class="hamb" onclick="toggleSidebar()">☰</button>
   </div>
 </div>

@@ -98,11 +98,16 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 
 /* ─── MOBILE TOP BAR ──────────────────────────── */
 #mBar{
-  display:none;position:fixed;top:0;left:0;right:0;height:54px;z-index:910;
+  display:none;position:fixed;top:0;left:0;right:0;z-index:910;
+  /* Phase C-fix-1: safe-area-inset-top so the logo clears the iPhone
+     status bar / Dynamic Island. min() floor keeps a reasonable top
+     padding on devices without notches. */
+  min-height:54px;
+  padding:max(env(safe-area-inset-top), 8px) 1rem 0;
   -webkit-transform:translateZ(0);transform:translateZ(0);
   background:rgba(13,17,23,.98);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   border-bottom:1px solid rgba(255,255,255,.08);
-  align-items:center;justify-content:space-between;padding:0 1rem;
+  align-items:center;justify-content:space-between;
 }
 .mBar-title{font-family:var(--fh);font-size:1.25rem;letter-spacing:3px;color:var(--c);}
 /* ── MOBILE QUICK ROW (below mBar) ─────────────── */
@@ -180,7 +185,10 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   #mainWrap{margin-left:0 !important;width:100% !important;}
   #app{padding:1rem .95rem 5rem;}
   #mBar{display:flex;}
-  #mainWrap{padding-top:54px;}
+  /* Phase C-fix-1: offset matches the new mBar height (54px content +
+     safe-area top padding). calc + max keeps the visible content below
+     the status bar on iPhone X+. */
+  #mainWrap{padding-top: calc(54px + max(env(safe-area-inset-top), 8px));}
 
   #topQuickBtns{display:none !important;}
   #mobileQuickRow{display:flex !important;}
@@ -4515,18 +4523,26 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
     padding-bottom: calc(72px + env(safe-area-inset-bottom, 0)) !important;
   }
   /* mBar (mobile top bar) stays visible so the logo persists. Hide
-     only the hamburger inside it — the bottom tab bar handles all
-     navigation in teen-tabs mode, so the slide-in sidebar is dead
-     weight. Also hide #mobileQuickRow: its horizontally-scrolling
-     button row (Child Login / Parent / Settings / Theme / Refer)
-     is redundant with the bottom tab bar and was making the top
-     of the screen feel cluttered. */
+     hamburger and the horizontally-scrolling button row — the bottom
+     tab bar handles all navigation in teen-tabs mode.
+     Phase C-fix-2: specificity doubled via the body.teen-tabs.teen-tabs
+     repeat-class trick (valid CSS, raises (0,1,1,0) to (0,2,1,0)). This
+     defeats a recent commit that re-introduced higher-specificity show
+     rules on the quick row. */
   body.teen-tabs #sidebar,
   body.teen-tabs #sideOverlay,
   body.teen-tabs #mobileMenuHint,
-  body.teen-tabs #mobileQuickRow,
-  body.teen-tabs #mBar .hamb{
+  body.teen-tabs.teen-tabs #mobileQuickRow,
+  body.teen-tabs.teen-tabs #mBar .hamb,
+  body.teen-tabs.teen-tabs #mBar button.hamb{
     display:none !important;
+  }
+  /* Phase C-fix-2/3: the new globe + avatar buttons live in mBar always
+     but stay hidden until teen-tabs is on. inline-flex preserves the
+     icon-centering style on the button. */
+  body.teen-tabs #mBarLangBtn,
+  body.teen-tabs #mBarAvatarBtn{
+    display:inline-flex !important;
   }
 }
 
