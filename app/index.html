@@ -4237,6 +4237,22 @@
     <div class="sl"></div>
   </div>
 
+  <!-- Top tab bar — single-row horizontal scroll on desktop so all 13
+       tabs are visible without wrapping. Mirrors .scrTabs-bottom behavior. -->
+  <style>
+    #s-scripture .scrTabs:not(.scrTabs-bottom){
+      flex-wrap:nowrap;
+      overflow-x:auto;
+      scrollbar-width:thin;
+      scrollbar-color:rgba(251,191,36,.35) transparent;
+    }
+    #s-scripture .scrTabs:not(.scrTabs-bottom) .tab{
+      flex:0 0 auto;
+      white-space:nowrap;
+    }
+    #s-scripture .scrTabs:not(.scrTabs-bottom)::-webkit-scrollbar{height:6px;}
+    #s-scripture .scrTabs:not(.scrTabs-bottom)::-webkit-scrollbar-thumb{background:rgba(251,191,36,.3);border-radius:3px;}
+  </style>
   <div class="tabs scrTabs">
     <button class="tab active" data-bf-tab="home" onclick="bfTab('home',this)">🏠 Home</button>
     <button class="tab" data-bf-tab="bible" onclick="bfTab('bible',this)">📖 Bible</button>
@@ -4249,6 +4265,8 @@
     <button class="tab" data-bf-tab="timeline" onclick="bfTab('timeline',this)">🕰️ Timeline</button>
     <button class="tab" data-bf-tab="memorize" onclick="bfTab('memorize',this)">✨ Memorize</button>
     <button class="tab" data-bf-tab="journey" onclick="bfTab('journey',this)">🌟 Journey</button>
+    <button class="tab" onclick="wellGoto('worship')">🎵 Worship</button>
+    <button class="tab" onclick="wellGoto('flashcards')">📇 Flashcards</button>
   </div>
 
   <!-- ════ FAITH HOME (F2-A — default landing tab) ════ -->
@@ -6345,6 +6363,8 @@
     <button class="tab" data-bf-tab="timeline" onclick="bfTab('timeline',this)"><span class="scrtab-icon">🕰️</span><span>Timeline</span></button>
     <button class="tab" data-bf-tab="memorize" onclick="bfTab('memorize',this)"><span class="scrtab-icon">✨</span><span>Memorize</span></button>
     <button class="tab" data-bf-tab="journey" onclick="bfTab('journey',this)"><span class="scrtab-icon">🌟</span><span>Journey</span></button>
+    <button class="tab" onclick="wellGoto('worship')"><span class="scrtab-icon">🎵</span><span>Worship</span></button>
+    <button class="tab" onclick="wellGoto('flashcards')"><span class="scrtab-icon">📇</span><span>Flashcards</span></button>
   </div>
 </section>
 

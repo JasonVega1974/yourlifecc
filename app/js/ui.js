@@ -961,10 +961,26 @@ const NAV_ITEMS = [
   // its 10 unique topics live as Life Topics reading plans now
   // (see FAITH_LIFE_TOPICS_PLANS in plans.js). The s-christian-living
   // section markup remains in index.html as dormant content.
+  //
+  // Children with `wellTab` are tabs inside #s-scripture surfaced as
+  // first-class sidebar items — onclick routes through wellGoto() which
+  // opens the section AND switches the tab in one click. Children with
+  // a regular `id` (worship, flashcards) are separate sections preserved
+  // as siblings in the Well nav cluster.
   {id:'_group_faith', icon:'✝️', label:'The Well', isGroup:true, children:[
-    {id:'s-scripture',        icon:'📖', label:'The Well',              key:'scripture'},
-    {id:'s-flashcards',       icon:'📇', label:'Bible Flashcards',      key:'flashcards'},
-    {id:'s-worship',          icon:'🎵', label:'Worship Playlist',      key:'worship'},
+    {wellTab:'home',       icon:'🏠', label:'Home',                  key:'scripture'},
+    {wellTab:'bible',      icon:'📖', label:'Bible',                 key:'scripture'},
+    {wellTab:'plans',      icon:'📅', label:'Plans',                 key:'scripture'},
+    {wellTab:'devotional', icon:'🕊️', label:'Devotionals',           key:'scripture'},
+    {wellTab:'prayer',     icon:'🙏', label:'Prayer',                key:'scripture'},
+    {wellTab:'academy',    icon:'🎓', label:'Academy',               key:'scripture'},
+    {wellTab:'bibleworld', icon:'🏺', label:'Biblical Archaeology',  key:'scripture'},
+    {wellTab:'stories',    icon:'📖', label:'Story Mode',            key:'scripture'},
+    {wellTab:'timeline',   icon:'🕰️', label:'Timeline',              key:'scripture'},
+    {wellTab:'memorize',   icon:'✨', label:'Memorize',              key:'scripture'},
+    {wellTab:'journey',    icon:'🌟', label:'Journey',               key:'scripture'},
+    {id:'s-worship',       icon:'🎵', label:'Worship',               key:'worship'},
+    {id:'s-flashcards',    icon:'📇', label:'Flashcards',            key:'flashcards'},
   ]},
   {id:'_group_school', icon:'🎓', label:'School & Career', isGroup:true, children:[
     {id:'s-school',    icon:'📚', label:'School',         key:'school'},
@@ -1031,6 +1047,19 @@ function buildSideNav(){
       // Collapsible group — Phase 2.2: default closed unless user explicitly opened.
       const isOpen = openGroups[n.label] === true;
       const childHTML = (n.children||[]).map(c=>{
+        // Well-tab children: route through wellGoto(), use data-well-tab
+        // for sidebar↔tab-bar active-state sync. They live inside
+        // #s-scripture, so allow-list against that section id.
+        if(c.wellTab){
+          if(!isSectionAllowed('s-scripture')) return '';
+          if(c.key && hidden[c.key]===0 && typeof hidden[c.key]!=='undefined') return '';
+          const currentTab = (D && D.wellLastTab) ? D.wellLastTab : 'home';
+          const isActive = _activeSection === 's-scripture' && currentTab === c.wellTab;
+          return `<button class="nav-item nav-child${isActive?' active':''}" id="ni-well-${c.wellTab}" data-well-tab="${c.wellTab}" onclick="wellGoto('${c.wellTab}')" style="padding-left:2.2rem;font-size:.78rem;">
+            <span class="ni">${c.icon}</span>
+            <span>${c.label}</span>
+          </button>`;
+        }
         if(!isSectionAllowed(c.id)) return '';
         if(c.key && hidden[c.key]===0 && typeof hidden[c.key]!=='undefined') return '';
         return `<button class="nav-item nav-child${c.id===_activeSection?' active':''}" id="ni-${c.id}" onclick="showSection('${c.id}')" style="padding-left:2.2rem;font-size:.78rem;">

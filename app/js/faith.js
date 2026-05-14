@@ -457,6 +457,32 @@ function bfShowHomeGrid(){
 // Phase 5.8 v3 — Back-to-Home pill management. Every The Well
 // sub-tab gets a "← Back to Home" pill at the top so the navigation
 // card-grid is always one click away. Idempotent — won't double-insert.
+// wellGoto(target) — single entry point for any external nav into The Well.
+// Used by the expanded sidebar (13 items) so one click both opens the
+// section and switches to the chosen tab. 'worship' and 'flashcards' are
+// historically separate sections rather than bfTab targets, so they
+// short-circuit to showSection on those section ids; everything else
+// routes through bfTab inside #s-scripture.
+function wellGoto(target){
+  if(target === 'worship'){
+    if(typeof showSection === 'function') showSection('s-worship');
+    return;
+  }
+  if(target === 'flashcards'){
+    if(typeof showSection === 'function') showSection('s-flashcards');
+    return;
+  }
+  // Persist the chosen tab BEFORE showSection so its built-in
+  // s-scripture handler reads the right value when it calls bfTab.
+  // Belt-and-suspenders: also call bfTab directly after a short delay
+  // in case D.wellLastTab persistence is missed.
+  if(typeof D !== 'undefined' && D){
+    D.wellLastTab = target;
+    if(typeof save === 'function') save();
+  }
+  if(typeof showSection === 'function') showSection('s-scripture');
+}
+
 function bfRemoveAllBackPills(){
   document.querySelectorAll('.bf-back-btn').forEach(b => b.remove());
 }
@@ -482,6 +508,11 @@ function bfTab(tab, btn){
   // the clicked one) so the other bar reflects the new active state.
   document.querySelectorAll('.scrTabs .tab').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.scrTabs .tab[data-bf-tab="'+tab+'"]').forEach(b=>b.classList.add('active'));
+  // Sidebar Well-tab items use data-well-tab for sync. Match the same
+  // active state so the left sidebar, top tab bar, and bottom tab bar
+  // all reflect the current tab simultaneously.
+  document.querySelectorAll('#sideNav [data-well-tab]').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#sideNav [data-well-tab="'+tab+'"]').forEach(b=>b.classList.add('active'));
   // F9: persist last-visited tab so showSection('s-scripture') can return
   // the user to where they left off instead of forcing the Home tab.
   if(typeof D !== 'undefined' && D){
