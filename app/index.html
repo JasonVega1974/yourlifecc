@@ -5010,16 +5010,129 @@
       #bf-academy .ac-roadmap-row strong{color:var(--tx);font-weight:700;}
     </style>
 
+    <style>
+      /* Featured lesson card grid — matches Story Mode / Plans card quality */
+      #bf-academy .ac-featured-hdr{
+        display:flex;align-items:center;gap:.5rem;margin:.4rem 0 .8rem;
+      }
+      #bf-academy .ac-featured-eye{
+        font-family:var(--fm);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;
+        color:#fbbf24;font-weight:700;opacity:.85;
+      }
+      #bf-academy .ac-featured-line{
+        flex:1;height:1px;background:linear-gradient(90deg,rgba(251,191,36,.35),transparent);
+      }
+      #bf-academy .ac-grid{
+        display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+        gap:.7rem;margin-bottom:1.4rem;
+      }
+      #bf-academy .ac-card{
+        position:relative;cursor:pointer;
+        background:linear-gradient(180deg, rgba(10,13,26,.85), rgba(10,13,26,.65));
+        border:1px solid var(--ac-card-border,rgba(251,191,36,.35));
+        border-radius:14px;overflow:hidden;
+        transition:transform .25s, box-shadow .25s, border-color .25s;
+      }
+      #bf-academy .ac-card:hover{
+        transform:translateY(-3px);
+        box-shadow:0 14px 36px var(--ac-card-glow,rgba(251,191,36,.22));
+        border-color:var(--ac-card-color,#fbbf24);
+      }
+      #bf-academy .ac-card-tint{
+        position:absolute;inset:0;
+        background:radial-gradient(ellipse at top, var(--ac-card-tint,rgba(251,191,36,.22)), transparent 60%);
+        pointer-events:none;
+      }
+      #bf-academy .ac-card-body{position:relative;padding:.95rem 1.05rem 1rem;}
+      #bf-academy .ac-card-eye{
+        font-family:var(--fm);font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;
+        color:var(--ac-card-color,#fbbf24);opacity:.85;font-weight:700;
+        margin-bottom:.4rem;
+      }
+      #bf-academy .ac-card-title{
+        font-family:'Bebas Neue',var(--fm);font-size:1.4rem;letter-spacing:.04em;
+        line-height:1.05;color:#fef3c7;
+        text-shadow:0 0 18px rgba(251,191,36,.25);
+        margin-bottom:.4rem;
+      }
+      :root.light #bf-academy .ac-card-title{color:#1a1233;text-shadow:0 0 12px rgba(251,191,36,.18);}
+      #bf-academy .ac-card-desc{
+        font-family:Georgia,'Times New Roman',serif;font-style:italic;
+        font-size:.84rem;line-height:1.55;color:rgba(254,243,199,.82);
+        font-weight:400;margin-bottom:.65rem;
+      }
+      :root.light #bf-academy .ac-card-desc{color:#3a2818;opacity:.95;}
+      #bf-academy .ac-card-meta{
+        display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;
+        font-size:.66rem;color:rgba(254,243,199,.7);font-weight:600;
+        letter-spacing:.04em;
+      }
+      :root.light #bf-academy .ac-card-meta{color:#7c5a00;}
+      #bf-academy .ac-card-badge{
+        display:inline-flex;align-items:center;gap:.25rem;
+        background:rgba(251,191,36,.14);border:1px solid rgba(251,191,36,.3);
+        color:var(--ac-card-color,#fbbf24);
+        padding:.12rem .5rem;border-radius:99px;
+        font-size:.6rem;font-weight:700;letter-spacing:.06em;
+      }
+      #bf-academy .ac-card.done{border-color:#22c55e;}
+      #bf-academy .ac-card.done .ac-card-check{
+        position:absolute;top:.6rem;right:.7rem;
+        background:#22c55e;color:#0a0d1a;
+        width:24px;height:24px;border-radius:50%;
+        display:flex;align-items:center;justify-content:center;
+        font-size:.85rem;font-weight:900;
+        box-shadow:0 0 14px rgba(34,197,94,.5);
+      }
+      #bf-academy .ac-card-progress{
+        position:absolute;bottom:0;left:0;right:0;height:3px;
+        background:rgba(251,191,36,.15);
+      }
+      #bf-academy .ac-card-progress-bar{
+        height:100%;width:0;background:var(--ac-card-color,#fbbf24);
+        transition:width .35s ease;
+      }
+      #bf-academy .ac-section-divider{
+        margin:1.6rem 0 .9rem;padding-bottom:.8rem;
+        border-bottom:1px solid rgba(251,191,36,.15);
+      }
+      #bf-academy .ac-section-divider .ac-featured-eye{margin-bottom:.35rem;display:block;}
+      #bf-academy .ac-section-divider-title{
+        font-family:'Bebas Neue',var(--fm);font-size:1.4rem;letter-spacing:.04em;
+        color:#fbbf24;line-height:1;margin-bottom:.3rem;
+      }
+      :root.light #bf-academy .ac-section-divider-title{color:#b45309;}
+      #bf-academy .ac-section-divider-sub{
+        font-family:Georgia,serif;font-style:italic;font-size:.92rem;
+        color:#fef3c7;opacity:.82;font-weight:400;line-height:1.5;
+      }
+      :root.light #bf-academy .ac-section-divider-sub{color:#3a2818;opacity:.9;}
+    </style>
+
     <div class="bf-section-hdr">
-      <div class="bf-eyebrow">MODULES · COURSES · CERTIFICATES</div>
+      <div class="bf-eyebrow">FEATURED · COURSES · CERTIFICATES</div>
       <div class="bf-title">Faith Academy</div>
-      <div class="bf-sub">Five modules, eighteen courses, around eighty-five lessons — earn a certificate per course and the "Faith Foundations Graduate" badge when all five module badges are yours.</div>
+      <div class="bf-sub">Fifteen featured lessons across five categories — plus the full eighteen-course curriculum below. Pass the quiz at 80% to mark a lesson complete.</div>
     </div>
 
     <div class="ac-stats">
       <div class="ac-stat"><div class="ac-stat-num" id="acStatLessons" style="color:#10b981;">0</div><div class="ac-stat-lbl">Lessons read</div></div>
       <div class="ac-stat"><div class="ac-stat-num" id="acStatCerts"   style="color:#38bdf8;">0</div><div class="ac-stat-lbl">Certificates</div></div>
       <div class="ac-stat"><div class="ac-stat-num" id="acStatBadges"  style="color:#fbbf24;">0</div><div class="ac-stat-lbl">Badges</div></div>
+    </div>
+
+    <!-- Featured Lessons (15 new — academy-lessons.js) -->
+    <div class="ac-featured-hdr">
+      <span class="ac-featured-eye">✨ Featured Lessons</span>
+      <span class="ac-featured-line"></span>
+    </div>
+    <div class="ac-grid" id="acFeaturedGrid"></div>
+
+    <!-- Existing modules + courses (legacy curriculum) -->
+    <div class="ac-section-divider">
+      <span class="ac-featured-eye">FOUNDATIONAL CURRICULUM</span>
+      <div class="ac-section-divider-title">Full Course Catalog</div>
+      <div class="ac-section-divider-sub">Five modules · eighteen courses · roughly eighty-five short lessons. Open any module to see its courses, lessons, and quiz.</div>
     </div>
 
     <div id="acMasterBadge" style="display:none;background:linear-gradient(135deg,#fbbf24,#fb923c);color:#0b1220;border-radius:14px;padding:1rem 1.15rem;margin-bottom:.85rem;text-align:center;">
@@ -5029,6 +5142,275 @@
     </div>
 
     <div id="acModules"></div>
+  </div>
+
+  <!-- ════ FEATURED LESSON MODAL — Story Mode visual quality + inline quiz ════ -->
+  <style>
+    #lessonModal .md{
+      max-width:680px;padding:0;
+      background:linear-gradient(180deg,#0a0d1a 0%,#100a26 100%);
+      display:flex;flex-direction:column;max-height:92vh;
+      border:1px solid rgba(251,191,36,.22);
+    }
+    #lessonModal .lm-svg{
+      position:relative;width:100%;aspect-ratio:800/300;
+      border-radius:16px 16px 0 0;overflow:hidden;flex:0 0 auto;
+    }
+    #lessonModal .lm-svg::after{
+      content:"";position:absolute;left:0;right:0;bottom:0;height:48px;
+      background:linear-gradient(180deg,transparent 0%,rgba(10,13,26,.85) 100%);
+      pointer-events:none;
+    }
+    #lessonModal .lm-close{
+      position:absolute;top:.7rem;right:.7rem;z-index:5;
+      width:32px;height:32px;border-radius:50%;
+      background:rgba(10,13,26,.7);border:1px solid rgba(251,191,36,.4);
+      color:#fef3c7;cursor:pointer;font-size:.85rem;font-weight:800;
+      display:flex;align-items:center;justify-content:center;
+      backdrop-filter:blur(6px);
+    }
+    #lessonModal .lm-body-wrap{
+      flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0;
+    }
+    #lessonModal .lm-hdr{
+      padding:1.3rem 1.5rem 1rem;text-align:left;
+      border-bottom:1px solid rgba(251,191,36,.12);
+    }
+    #lessonModal .lm-eye{
+      font-family:var(--fm);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;
+      color:#fbbf24;font-weight:700;margin-bottom:.4rem;opacity:.85;
+    }
+    #lessonModal .lm-title{
+      font-family:'Bebas Neue',var(--fm);
+      font-size:2.1rem;line-height:1.05;letter-spacing:.04em;
+      background:linear-gradient(135deg,#fef3c7 0%,#fbbf24 60%,#d97706 100%);
+      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+      color:#fbbf24;margin-bottom:.5rem;
+      text-shadow:0 2px 28px rgba(251,191,36,.22);
+    }
+    #lessonModal .lm-sub{
+      font-family:Georgia,'Times New Roman',serif;font-style:italic;
+      font-size:.98rem;color:#fef3c7;opacity:.84;
+      line-height:1.55;font-weight:400;
+    }
+    #lessonModal .lm-section{padding:1.2rem 1.5rem;}
+    #lessonModal .lm-section h4{
+      font-family:'Bebas Neue',var(--fm);font-size:1.2rem;letter-spacing:.05em;
+      color:#fbbf24;margin:0 0 .55rem;font-weight:700;
+    }
+    #lessonModal .lm-section p{
+      font-family:Georgia,serif;font-size:.97rem;line-height:1.75;
+      color:rgba(254,243,199,.92);margin:0 0 .85rem;font-weight:400;
+    }
+    #lessonModal .lm-section p:last-child{margin-bottom:0;}
+    #lessonModal .lm-keyverse{
+      margin:0 1.5rem 1.1rem;
+      background:rgba(10,13,26,.55);
+      border:1px solid rgba(251,191,36,.22);
+      border-left:4px solid #fbbf24;
+      border-radius:12px;padding:1rem 1.15rem;
+    }
+    #lessonModal .lm-keyverse-text{
+      font-family:Georgia,serif;font-style:italic;font-size:1rem;
+      color:#fef3c7;line-height:1.7;font-weight:400;margin-bottom:.5rem;
+    }
+    #lessonModal .lm-keyverse-ref{
+      font-family:'Bebas Neue',var(--fm);font-size:.85rem;
+      letter-spacing:.18em;color:#fbbf24;font-weight:700;
+    }
+    #lessonModal .lm-callout{
+      margin:0 1.5rem 1.4rem;
+      background:linear-gradient(135deg,rgba(251,191,36,.10),rgba(251,191,36,.03));
+      border:1px solid rgba(251,191,36,.32);
+      border-left:4px solid #fbbf24;border-radius:12px;
+      padding:1rem 1.15rem;
+    }
+    #lessonModal .lm-callout-eye{
+      font-family:var(--fm);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;
+      color:#fbbf24;font-weight:800;margin-bottom:.45rem;
+    }
+    #lessonModal .lm-callout p{
+      font-family:Georgia,serif;font-size:.95rem;line-height:1.7;
+      color:#fef3c7;font-weight:500;margin:0;
+    }
+    #lessonModal .lm-cta{
+      margin:0 1.5rem 1.6rem;display:flex;justify-content:center;
+    }
+    #lessonModal .lm-quiz-btn{
+      background:linear-gradient(135deg,#fbbf24,#f59e0b);
+      color:#0a0d1a;border:none;border-radius:99px;
+      padding:.85rem 1.7rem;font-size:.95rem;font-weight:900;
+      letter-spacing:.05em;cursor:pointer;font-family:var(--fm);
+      box-shadow:0 6px 20px rgba(251,191,36,.4);
+      transition:transform .15s, box-shadow .15s;
+    }
+    #lessonModal .lm-quiz-btn:hover{
+      transform:translateY(-1px);box-shadow:0 8px 28px rgba(251,191,36,.55);
+    }
+
+    /* Inline quiz styles — mirror flashcard pill design */
+    #lessonModal .lm-quiz{padding:1.4rem 1.5rem 1.6rem;}
+    #lessonModal .lm-quiz-progress{
+      font-family:var(--fm);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;
+      color:#fbbf24;opacity:.85;margin-bottom:.5rem;font-weight:700;
+    }
+    #lessonModal .lm-quiz-q{
+      font-family:Georgia,serif;font-size:1.05rem;line-height:1.6;
+      color:#fef3c7;margin-bottom:1.1rem;font-weight:500;
+    }
+    #lessonModal .lm-quiz-options{display:flex;flex-direction:column;gap:.55rem;}
+    #lessonModal .lm-quiz-opt{
+      position:relative;
+      background:linear-gradient(180deg, rgba(251,191,36,.12), rgba(251,191,36,.04));
+      border:1.5px solid rgba(251,191,36,.4);
+      color:#fef3c7;text-align:left;
+      padding:.85rem 1.1rem;border-radius:99px;
+      font-size:.92rem;font-weight:600;letter-spacing:.02em;
+      cursor:pointer;font-family:var(--fm);
+      opacity:0;transform:translateY(14px);
+    }
+    #lessonModal .lm-quiz-opt.in{
+      animation:lmOptIn .42s cubic-bezier(.34,1.56,.64,1) forwards;
+    }
+    @keyframes lmOptIn{
+      0%{opacity:0;transform:translateY(14px);}
+      100%{opacity:1;transform:translateY(0);}
+    }
+    #lessonModal .lm-quiz-opt:hover:not(:disabled){
+      background:linear-gradient(180deg, rgba(251,191,36,.22), rgba(251,191,36,.06));
+      border-color:rgba(251,191,36,.8);
+      box-shadow:0 0 18px rgba(251,191,36,.28);
+    }
+    #lessonModal .lm-quiz-opt:disabled{cursor:default;}
+    #lessonModal .lm-quiz-opt.correct{
+      background:linear-gradient(180deg,rgba(34,197,94,.28),rgba(22,163,74,.14)) !important;
+      border-color:#22c55e !important;color:#bbf7d0 !important;
+      animation:lmCorrect 1s ease-out;
+    }
+    #lessonModal .lm-quiz-opt.wrong{
+      background:linear-gradient(180deg,rgba(239,68,68,.24),rgba(220,38,38,.12)) !important;
+      border-color:#ef4444 !important;color:#fecaca !important;
+      animation:lmShake .42s ease-in-out;
+    }
+    @keyframes lmCorrect{
+      0%{box-shadow:0 0 22px rgba(34,197,94,.4);}
+      50%{box-shadow:0 0 42px rgba(34,197,94,.75);}
+      100%{box-shadow:0 0 22px rgba(34,197,94,.4);}
+    }
+    @keyframes lmShake{
+      0%,100%{transform:translateX(0);}
+      20%{transform:translateX(-8px);}
+      40%{transform:translateX(8px);}
+      60%{transform:translateX(-5px);}
+      80%{transform:translateX(5px);}
+    }
+    #lessonModal .lm-quiz-feedback{
+      margin-top:1rem;padding:.85rem 1rem;
+      background:rgba(10,13,26,.55);
+      border:1px solid rgba(251,191,36,.22);
+      border-radius:12px;
+      font-family:Georgia,serif;font-size:.9rem;line-height:1.6;
+      color:#fef3c7;font-weight:400;display:none;
+    }
+    #lessonModal .lm-quiz-feedback.show{display:block;}
+    #lessonModal .lm-quiz-next{
+      margin-top:1rem;display:flex;justify-content:flex-end;
+    }
+    #lessonModal .lm-quiz-next button{
+      background:linear-gradient(135deg,#fbbf24,#f59e0b);
+      color:#0a0d1a;border:none;border-radius:99px;
+      padding:.7rem 1.4rem;font-size:.85rem;font-weight:900;
+      letter-spacing:.04em;cursor:pointer;font-family:var(--fm);
+      box-shadow:0 4px 16px rgba(251,191,36,.35);
+    }
+    #lessonModal .lm-quiz-result{
+      text-align:center;padding:1.5rem .5rem;
+    }
+    #lessonModal .lm-quiz-result-title{
+      font-family:'Bebas Neue',var(--fm);font-size:1.6rem;letter-spacing:.06em;
+      color:#fbbf24;margin-bottom:.55rem;text-shadow:0 2px 18px rgba(251,191,36,.4);
+    }
+    #lessonModal .lm-quiz-result-score{
+      font-family:'Bebas Neue',var(--fm);font-size:3rem;font-weight:900;
+      color:#fbbf24;line-height:1;margin-bottom:.4rem;
+    }
+    #lessonModal .lm-quiz-result-stars{
+      display:flex;justify-content:center;gap:.4rem;margin:.5rem 0 1rem;
+    }
+    #lessonModal .lm-quiz-star{font-size:2rem;line-height:1;}
+    #lessonModal .lm-quiz-star.filled{color:#fbbf24;text-shadow:0 0 14px rgba(251,191,36,.5);}
+    #lessonModal .lm-quiz-star.empty{color:rgba(251,191,36,.18);}
+    #lessonModal .lm-quiz-pass{
+      font-family:Georgia,serif;font-size:1rem;line-height:1.7;
+      color:#fef3c7;margin-bottom:1.2rem;
+      max-width:90%;margin-left:auto;margin-right:auto;font-weight:400;
+    }
+    #lessonModal .lm-quiz-passmsg{color:#22c55e;font-weight:700;}
+    #lessonModal .lm-quiz-failmsg{color:#f87171;font-weight:700;}
+    #lessonModal .lm-quiz-actions{
+      display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;
+    }
+    #lessonModal .lm-quiz-actions button{
+      background:linear-gradient(135deg,#fbbf24,#f59e0b);
+      color:#0a0d1a;border:none;border-radius:99px;
+      padding:.75rem 1.4rem;font-size:.85rem;font-weight:900;
+      letter-spacing:.04em;cursor:pointer;font-family:var(--fm);
+      box-shadow:0 4px 16px rgba(251,191,36,.35);
+    }
+    #lessonModal .lm-quiz-actions button.secondary{
+      background:rgba(255,255,255,.06);color:#fef3c7;
+      border:1px solid rgba(254,243,199,.22);box-shadow:none;
+    }
+
+    /* Light-mode parchment */
+    :root.light #lessonModal .md{
+      background:linear-gradient(180deg,#fffaeb 0%,#fdf0c8 100%);
+      border-color:rgba(180,120,20,.45);
+    }
+    :root.light #lessonModal .lm-eye,
+    :root.light #lessonModal .lm-callout-eye,
+    :root.light #lessonModal .lm-quiz-progress,
+    :root.light #lessonModal .lm-keyverse-ref{color:#b45309;}
+    :root.light #lessonModal .lm-sub,
+    :root.light #lessonModal .lm-section p,
+    :root.light #lessonModal .lm-keyverse-text,
+    :root.light #lessonModal .lm-callout p,
+    :root.light #lessonModal .lm-quiz-q,
+    :root.light #lessonModal .lm-quiz-feedback,
+    :root.light #lessonModal .lm-quiz-pass{color:#1a1233;}
+    :root.light #lessonModal .lm-section h4{color:#b45309;}
+    :root.light #lessonModal .lm-keyverse{background:rgba(255,255,255,.6);border-color:rgba(180,120,20,.35);}
+    :root.light #lessonModal .lm-callout{
+      background:linear-gradient(135deg,rgba(251,191,36,.18),rgba(251,191,36,.04));
+      border-color:rgba(180,120,20,.4);
+    }
+    :root.light #lessonModal .lm-quiz-opt{color:#3a2818;border-color:rgba(180,120,20,.5);}
+
+    @media (max-width:640px){
+      #lessonModal .lm-title{font-size:1.7rem;}
+      #lessonModal .lm-hdr{padding:1rem 1.1rem .85rem;}
+      #lessonModal .lm-section{padding:1rem 1.1rem;}
+      #lessonModal .lm-keyverse,
+      #lessonModal .lm-callout,
+      #lessonModal .lm-cta{margin-left:1.1rem;margin-right:1.1rem;}
+      #lessonModal .lm-quiz{padding:1.2rem 1.1rem 1.4rem;}
+      #lessonModal .lm-quiz-result-score{font-size:2.4rem;}
+      #lessonModal .lm-quiz-star{font-size:1.6rem;}
+    }
+  </style>
+  <div id="lessonModal" class="mo" onclick="if(event.target===this)closeLessonModal()">
+    <div class="md">
+      <button class="lm-close" onclick="closeLessonModal()" aria-label="Close">✕</button>
+      <div class="lm-svg" id="lmSvg" aria-hidden="true"></div>
+      <div class="lm-body-wrap" id="lmBodyWrap">
+        <div class="lm-hdr">
+          <div class="lm-eye" id="lmEye">—</div>
+          <div class="lm-title" id="lmTitle">—</div>
+          <div class="lm-sub" id="lmSub">—</div>
+        </div>
+        <div id="lmContent"></div>
+      </div>
+    </div>
   </div>
 
   <!-- ════ BIBLICAL WORLD (F3-B foundation) ════ -->
@@ -9983,6 +10365,7 @@
 <script src="/app/js/data/plans.js"></script>
 <script src="/app/js/data/memory-verses.js"></script>
 <script src="/app/js/data/academy.js"></script>
+<script src="/app/js/data/academy-lessons.js"></script>
 <script src="/app/js/data/biblical-sites.js"></script>
 <script src="/app/js/data/biblical-discoveries.js"></script>
 <script src="/app/js/data/biblical-routes.js"></script>

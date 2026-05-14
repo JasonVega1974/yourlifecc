@@ -4575,7 +4575,274 @@ function _acAllModulesDone(){
                        && cur.filter(m => !m.parentOnly || _acIsParent()).every(_acModuleDone);
 }
 
+// ═════════════════════════════════════════════════════════════════
+// F8: Featured Academy lessons — 15 new lessons from
+// window.ACADEMY_LESSONS (app/js/data/academy-lessons.js).
+// Renders a card grid above the legacy module browser. Click a card
+// to open #lessonModal with Story-Mode-style content + inline quiz.
+// Progress saves to D.academyProgress['lesson-'+id] = {score,total,passed,date}.
+// A lesson is "complete" when its quiz is passed at >= 80%.
+// ═════════════════════════════════════════════════════════════════
+function _acFeatured(){ return (typeof window !== 'undefined' && window.ACADEMY_LESSONS) ? window.ACADEMY_LESSONS : []; }
+function _acCats(){     return (typeof window !== 'undefined' && window.ACADEMY_CATEGORIES) ? window.ACADEMY_CATEGORIES : {}; }
+function _acSvgs(){     return (typeof window !== 'undefined' && window.ACADEMY_CATEGORY_SVGS) ? window.ACADEMY_CATEGORY_SVGS : {}; }
+function _acFeaturedById(id){ return _acFeatured().find(l => l && l.id === id) || null; }
+function _acLessonProgress(id){
+  if(typeof D === 'undefined' || !D) return null;
+  if(!D.academyProgress) D.academyProgress = {};
+  return D.academyProgress['lesson-' + id] || null;
+}
+function _acEsc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function renderFeaturedAcademy(){
+  const grid = document.getElementById('acFeaturedGrid');
+  if(!grid) return;
+  const lessons = _acFeatured();
+  const cats = _acCats();
+  if(!lessons.length){
+    grid.innerHTML = '<div style="grid-column:1/-1;padding:1rem;text-align:center;color:var(--tx2);font-size:.78rem;font-style:italic;">Featured lessons unavailable.</div>';
+    return;
+  }
+  grid.innerHTML = lessons.map(function(l){
+    const cat = cats[l.category] || { label:'Lesson', color:'#fbbf24', soft:'rgba(251,191,36,', icon:'📖' };
+    const prog = _acLessonProgress(l.id);
+    const done = prog && prog.passed;
+    const styleVars = '--ac-card-color:' + cat.color + ';'
+                    + '--ac-card-border:' + cat.soft + '.35);'
+                    + '--ac-card-tint:'   + cat.soft + '.22);'
+                    + '--ac-card-glow:'   + cat.soft + '.25);';
+    const checkHtml = done ? '<div class="ac-card-check">✓</div>' : '';
+    const progPct = done ? 100 : (prog && prog.total ? Math.round(prog.score / prog.total * 100) : 0);
+    const progHtml = (prog && !done && prog.total)
+      ? '<div class="ac-card-progress"><div class="ac-card-progress-bar" style="width:' + progPct + '%;background:' + cat.color + ';"></div></div>'
+      : '';
+    return '<div class="ac-card' + (done ? ' done' : '') + '" data-academy-id="' + _acEsc(l.id) + '" '
+         + 'onclick="openLessonModal(\'' + l.id + '\')" '
+         + 'style="' + styleVars + '">'
+         + '<div class="ac-card-tint"></div>'
+         + checkHtml
+         + '<div class="ac-card-body">'
+         +   '<div class="ac-card-eye">' + _acEsc(cat.icon + ' ' + cat.label.toUpperCase()) + '</div>'
+         +   '<div class="ac-card-title">' + _acEsc(l.title) + '</div>'
+         +   '<div class="ac-card-desc">' + _acEsc(l.description) + '</div>'
+         +   '<div class="ac-card-meta">'
+         +     '<span class="ac-card-badge">⏱ ' + _acEsc(l.duration || '—') + '</span>'
+         +     '<span class="ac-card-badge">❓ ' + ((l.quiz || []).length) + ' quiz Qs</span>'
+         + (done ? '<span class="ac-card-badge" style="background:rgba(34,197,94,.18);border-color:rgba(34,197,94,.5);color:#22c55e;">✓ Complete</span>' : '')
+         +   '</div>'
+         + '</div>'
+         + progHtml
+         + '</div>';
+  }).join('');
+}
+
+// ── Lesson modal ─────────────────────────────────────────────────
+let _lmQuizState = null; // { lessonId, qIdx, score, answeredAt }
+
+function openLessonModal(lessonId){
+  const lesson = _acFeaturedById(lessonId);
+  if(!lesson){ if(typeof showToast === 'function') showToast('Lesson not found'); return; }
+  const cats = _acCats();
+  const svgs = _acSvgs();
+  const cat = cats[lesson.category] || { label:'Lesson', color:'#fbbf24', icon:'📖' };
+
+  const svgEl = document.getElementById('lmSvg');
+  if(svgEl) svgEl.innerHTML = svgs[lesson.category] || '';
+
+  const eyeEl = document.getElementById('lmEye');
+  if(eyeEl) eyeEl.textContent = (cat.label || '').toUpperCase() + ' · ' + (lesson.duration || '');
+  const titleEl = document.getElementById('lmTitle');
+  if(titleEl) titleEl.textContent = lesson.title || '';
+  const subEl = document.getElementById('lmSub');
+  if(subEl) subEl.textContent = lesson.description || '';
+
+  _lmRenderLesson(lesson);
+
+  const wrap = document.getElementById('lmBodyWrap');
+  if(wrap) wrap.scrollTop = 0;
+  if(typeof openModal === 'function') openModal('lessonModal');
+  if(typeof logActivity === 'function') logActivity('faith', 'Academy lesson: ' + lesson.title);
+}
+
+function _lmRenderLesson(lesson){
+  const content = document.getElementById('lmContent');
+  if(!content) return;
+  let html = '';
+  (lesson.sections || []).forEach(function(s){
+    html += '<div class="lm-section">';
+    html += '<h4>' + _acEsc(s.heading) + '</h4>';
+    (s.paragraphs || []).forEach(function(p){
+      html += '<p>' + _acEsc(p) + '</p>';
+    });
+    html += '</div>';
+  });
+  if(lesson.keyVerse && lesson.keyVerse.text){
+    html += '<div class="lm-keyverse">'
+         +    '<div class="lm-keyverse-text">' + _acEsc('“' + lesson.keyVerse.text + '”') + '</div>'
+         +    '<div class="lm-keyverse-ref">— ' + _acEsc(lesson.keyVerse.ref || '') + '</div>'
+         +  '</div>';
+  }
+  if(lesson.whatThisMeans){
+    html += '<div class="lm-callout">'
+         +    '<div class="lm-callout-eye">What This Means For You</div>'
+         +    '<p>' + _acEsc(lesson.whatThisMeans) + '</p>'
+         +  '</div>';
+  }
+  const prog = _acLessonProgress(lesson.id);
+  const btnLabel = (prog && prog.passed) ? '✓ Retake Quiz' : '▶ Start Quiz';
+  html += '<div class="lm-cta">'
+       +    '<button class="lm-quiz-btn" onclick="startLessonQuiz(\'' + lesson.id + '\')">' + btnLabel + '</button>'
+       +  '</div>';
+  content.innerHTML = html;
+}
+
+function closeLessonModal(){
+  if(typeof closeModal === 'function') closeModal('lessonModal');
+  _lmQuizState = null;
+}
+
+// ── Inline quiz ──────────────────────────────────────────────────
+function startLessonQuiz(lessonId){
+  const lesson = _acFeaturedById(lessonId);
+  if(!lesson || !lesson.quiz || !lesson.quiz.length) return;
+  _lmQuizState = { lessonId: lessonId, qIdx: 0, score: 0, answered: false };
+  _lmRenderQuizQuestion(lesson);
+}
+
+function _lmRenderQuizQuestion(lesson){
+  const content = document.getElementById('lmContent');
+  if(!content || !_lmQuizState) return;
+  const q = lesson.quiz[_lmQuizState.qIdx];
+  if(!q) return;
+  const total = lesson.quiz.length;
+  let html = '<div class="lm-quiz">'
+           +   '<div class="lm-quiz-progress">Question ' + (_lmQuizState.qIdx + 1) + ' of ' + total + '</div>'
+           +   '<div class="lm-quiz-q">' + _acEsc(q.q) + '</div>'
+           +   '<div class="lm-quiz-options">';
+  (q.options || []).forEach(function(opt, i){
+    html += '<button class="lm-quiz-opt" data-idx="' + i + '" '
+         +  'style="animation-delay:' + (i * 90) + 'ms;" '
+         +  'onclick="lessonQuizSelect(' + i + ',this)">' + _acEsc(opt) + '</button>';
+  });
+  html += '</div>'
+       +  '<div class="lm-quiz-feedback" id="lmQuizFeedback"></div>'
+       +  '<div class="lm-quiz-next" id="lmQuizNextWrap"></div>'
+       + '</div>';
+  content.innerHTML = html;
+  requestAnimationFrame(function(){
+    content.querySelectorAll('.lm-quiz-opt').forEach(function(b){ b.classList.add('in'); });
+  });
+  _lmQuizState.answered = false;
+}
+
+function lessonQuizSelect(idx, btn){
+  if(!_lmQuizState || _lmQuizState.answered) return;
+  const lesson = _acFeaturedById(_lmQuizState.lessonId);
+  if(!lesson) return;
+  const q = lesson.quiz[_lmQuizState.qIdx];
+  if(!q) return;
+  _lmQuizState.answered = true;
+  const correct = (idx === q.correctIdx);
+  if(correct) _lmQuizState.score++;
+  const buttons = document.querySelectorAll('#lmContent .lm-quiz-opt');
+  buttons.forEach(function(b, i){
+    b.disabled = true;
+    if(i === q.correctIdx) b.classList.add('correct');
+    else if(b === btn) b.classList.add('wrong');
+  });
+  const fb = document.getElementById('lmQuizFeedback');
+  if(fb){
+    const msg = correct
+      ? '<strong style="color:#22c55e;">✓ Correct.</strong> '
+      : '<strong style="color:#f87171;">✕ Not quite.</strong> ';
+    fb.innerHTML = msg + _acEsc(q.explanation || '');
+    fb.classList.add('show');
+  }
+  const nextWrap = document.getElementById('lmQuizNextWrap');
+  if(nextWrap){
+    const isLast = (_lmQuizState.qIdx + 1) >= lesson.quiz.length;
+    nextWrap.innerHTML = '<button onclick="lessonQuizNext()">' + (isLast ? 'See Result →' : 'Next Question →') + '</button>';
+  }
+}
+
+function lessonQuizNext(){
+  if(!_lmQuizState) return;
+  const lesson = _acFeaturedById(_lmQuizState.lessonId);
+  if(!lesson) return;
+  _lmQuizState.qIdx++;
+  if(_lmQuizState.qIdx >= lesson.quiz.length){
+    _lmFinishQuiz(lesson);
+    return;
+  }
+  _lmRenderQuizQuestion(lesson);
+}
+
+function _lmFinishQuiz(lesson){
+  const content = document.getElementById('lmContent');
+  if(!content || !_lmQuizState) return;
+  const total = lesson.quiz.length;
+  const score = _lmQuizState.score;
+  const pct = score / total;
+  const passed = pct >= 0.8;
+  let stars;
+  if(pct >= 0.95) stars = 3;
+  else if(pct >= 0.8) stars = 2;
+  else if(pct >= 0.6) stars = 1;
+  else stars = 0;
+
+  // Persist progress
+  if(typeof D !== 'undefined' && D){
+    if(!D.academyProgress) D.academyProgress = {};
+    D.academyProgress['lesson-' + lesson.id] = {
+      score: score,
+      total: total,
+      passed: passed,
+      date: new Date().toISOString().slice(0,10),
+    };
+    if(typeof save === 'function') save();
+    // Toast + XP for first-time pass
+    const wasComplete = D.academyProgress['lesson-' + lesson.id + '-firstPass'];
+    if(passed && !wasComplete){
+      D.academyProgress['lesson-' + lesson.id + '-firstPass'] = true;
+      D.scrPoints = (D.scrPoints || 0) + 15;
+      if(typeof save === 'function') save();
+      if(typeof showToast === 'function') showToast('Lesson complete +15 XP ✨');
+    }
+  }
+
+  const passMsg = passed
+    ? '<span class="lm-quiz-passmsg">Passed — lesson complete.</span>'
+    : '<span class="lm-quiz-failmsg">Below 80%.</span> Review the lesson and try again.';
+  let starsHtml = '';
+  for(let i = 0; i < 3; i++){
+    starsHtml += '<span class="lm-quiz-star ' + (i < stars ? 'filled' : 'empty') + '">★</span>';
+  }
+  content.innerHTML = '<div class="lm-quiz">'
+    + '<div class="lm-quiz-result">'
+    +   '<div class="lm-quiz-result-title">Quiz Complete</div>'
+    +   '<div class="lm-quiz-result-score">' + score + ' / ' + total + '</div>'
+    +   '<div class="lm-quiz-result-stars">' + starsHtml + '</div>'
+    +   '<div class="lm-quiz-pass">' + passMsg + '</div>'
+    +   '<div class="lm-quiz-actions">'
+    +     '<button onclick="startLessonQuiz(\'' + lesson.id + '\')">Retake Quiz</button>'
+    +     '<button class="secondary" onclick="_lmRenderLesson(_acFeaturedById(\'' + lesson.id + '\'))">Back to Lesson</button>'
+    +     '<button class="secondary" onclick="closeLessonModal();renderFeaturedAcademy();">Done</button>'
+    +   '</div>'
+    + '</div>'
+    + '</div>';
+  _lmQuizState = null;
+  // Refresh the card grid so the "Complete ✓" badge shows up on return
+  renderFeaturedAcademy();
+}
+
 function renderAcademyPanel(){
+  // F8: render the featured grid first (15 new lessons), then the
+  // legacy module browser below.
+  renderFeaturedAcademy();
   const cur = _acCurriculum();
   if(!cur.length){
     const wrap = document.getElementById('acModules');
