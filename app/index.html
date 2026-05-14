@@ -11020,5 +11020,118 @@ if (_origRefresh) {
      safe-area-inset-bottom handled in app.css. -->
 <nav id="bottomTabBar" role="navigation" aria-label="Primary tabs"></nav>
 
+<!-- ════════════════════════════════════════════════════════════
+     Phase E — ONBOARDING OVERLAY (2026-05-15)
+     4-step warm welcome flow, runs once on first launch when
+     !D.onboardingDone. Skipped entirely on every later session.
+     Step transitions handled by JS toggling display + opacity;
+     CSS @media prefers-reduced-motion collapses the slide animation
+     to a snap via the existing universal motion-reduce rule.
+     ════════════════════════════════════════════════════════════ -->
+<style>
+  #onboardingOverlay{ position:fixed; inset:0; z-index:99999; background:#0d1117; overflow-y:auto; padding:env(safe-area-inset-top) 1.2rem env(safe-area-inset-bottom); }
+  #onboardingOverlay .onb-dots{ position:sticky; top:max(env(safe-area-inset-top), 18px); display:flex; gap:8px; justify-content:center; margin:.5rem 0 1.6rem; z-index:1; }
+  #onboardingOverlay .onb-dot{ width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.18); transition:background .25s ease, transform .25s ease; }
+  #onboardingOverlay .onb-dot.active{ background:#fbbf24; transform:scale(1.3); }
+  #onboardingOverlay .onb-dot.done{ background:rgba(251,191,36,.55); }
+  #onboardingOverlay .onb-back{ position:absolute; top:max(env(safe-area-inset-top), 16px); left:16px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); color:var(--tx); width:40px; height:40px; border-radius:50%; cursor:pointer; font-size:1.1rem; font-family:var(--fm); display:flex; align-items:center; justify-content:center; z-index:2; }
+  #onboardingOverlay .onb-step{ max-width:520px; margin:0 auto; padding:1rem 0 3rem; opacity:0; transform:translateY(8px); transition:opacity .35s ease, transform .35s ease; }
+  #onboardingOverlay .onb-step.shown{ opacity:1; transform:translateY(0); }
+  #onboardingOverlay h2{ font-family:var(--fh); font-size:2rem; letter-spacing:.04em; color:#f1f5f9; line-height:1.15; margin:0 0 .7rem; }
+  #onboardingOverlay .onb-sub{ font-family:var(--fm); font-size:.95rem; color:rgba(255,255,255,.6); line-height:1.55; margin-bottom:1.6rem; }
+  #onboardingOverlay .onb-card{ display:flex; flex-direction:column; gap:.45rem; padding:1.1rem 1.1rem; background:rgba(255,255,255,.04); border:1.5px solid rgba(255,255,255,.1); border-radius:16px; cursor:pointer; transition:background .2s ease, border-color .2s ease, transform .15s ease; color:var(--tx); font-family:var(--fm); text-align:left; -webkit-tap-highlight-color:transparent; }
+  #onboardingOverlay .onb-card:hover, #onboardingOverlay .onb-card:focus-visible{ background:rgba(255,255,255,.06); outline:none; }
+  #onboardingOverlay .onb-card.selected{ border-color:#fbbf24; background:linear-gradient(135deg,rgba(251,191,36,.10),rgba(251,191,36,.04)); box-shadow:0 6px 20px rgba(251,191,36,.12); }
+  #onboardingOverlay .onb-card .onb-emoji{ font-size:2.1rem; line-height:1; }
+  #onboardingOverlay .onb-card .onb-label{ font-family:var(--fh); font-size:1.15rem; letter-spacing:.04em; color:#f1f5f9; }
+  #onboardingOverlay .onb-card .onb-cap{ font-size:.78rem; font-style:italic; color:rgba(255,255,255,.55); }
+  #onboardingOverlay .onb-primary{ width:100%; padding:.95rem 1rem; background:linear-gradient(135deg,#fbbf24,#fb923c); border:none; color:#0b1020; border-radius:14px; font-family:var(--fm); font-size:1rem; font-weight:800; cursor:pointer; box-shadow:0 10px 30px rgba(251,191,36,.25); margin-top:1.4rem; -webkit-tap-highlight-color:transparent; }
+  #onboardingOverlay .onb-primary:disabled{ opacity:.4; cursor:not-allowed; box-shadow:none; }
+  #onboardingOverlay .onb-tile{ display:flex; align-items:center; gap:.7rem; padding:1rem 1rem; background:rgba(255,255,255,.04); border:1.5px solid rgba(255,255,255,.1); border-radius:14px; cursor:pointer; transition:background .2s ease, border-color .2s ease; -webkit-tap-highlight-color:transparent; }
+  #onboardingOverlay .onb-tile.selected{ border-color:var(--tile-accent, #fbbf24); background:var(--tile-bg, rgba(251,191,36,.08)); }
+  #onboardingOverlay .onb-tile .onb-tile-emoji{ font-size:1.7rem; line-height:1; flex-shrink:0; }
+  #onboardingOverlay .onb-tile .onb-tile-label{ font-size:.92rem; font-weight:600; color:var(--tx); font-family:var(--fm); }
+  #onboardingOverlay .onb-toggle-row{ display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1rem 1.1rem; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:12px; margin-bottom:.65rem; }
+  #onboardingOverlay .onb-toggle-row .onb-toggle-label{ font-size:.92rem; color:var(--tx); font-weight:600; }
+  #onboardingOverlay .onb-toggle-row .onb-toggle-cap{ font-size:.74rem; color:var(--tx2); margin-top:.15rem; }
+  #onboardingOverlay input[type=text]{ width:100%; padding:.85rem 1rem; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.14); border-radius:12px; color:#f1f5f9; font-family:var(--fm); font-size:1rem; box-sizing:border-box; }
+  #onboardingOverlay input[type=text]:focus{ outline:none; border-color:#fbbf24; }
+  #onboardingOverlay .onb-yesno{ display:inline-flex; background:rgba(255,255,255,.06); border-radius:99px; padding:3px; gap:3px; }
+  #onboardingOverlay .onb-yesno button{ background:none; border:none; color:rgba(255,255,255,.55); padding:.4rem 1rem; border-radius:99px; cursor:pointer; font-family:var(--fm); font-size:.78rem; font-weight:700; }
+  #onboardingOverlay .onb-yesno button.active{ background:#fbbf24; color:#0b1020; }
+</style>
+
+<div id="onboardingOverlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="onbStepHeading">
+  <div class="onb-dots" aria-hidden="true">
+    <span class="onb-dot active" data-dot="1"></span>
+    <span class="onb-dot" data-dot="2"></span>
+    <span class="onb-dot" data-dot="3"></span>
+    <span class="onb-dot" data-dot="4"></span>
+  </div>
+  <button id="onbBackBtn" class="onb-back" onclick="onbBack()" style="display:none;" aria-label="Go back">←</button>
+
+  <!-- Step 1 — Welcome -->
+  <div id="onbStep1" class="onb-step" style="text-align:center;padding-top:14vh;">
+    <div style="font-family:var(--fh);font-size:3.4rem;letter-spacing:.06em;color:#f1f5f9;line-height:1;margin-bottom:1.2rem;">YourLife<span style="color:#fbbf24;">CC</span></div>
+    <div style="font-family:Georgia,serif;font-style:italic;font-size:1.2rem;color:#fbbf24;line-height:1.45;margin-bottom:.55rem;">Your life. Your journey. Your app.</div>
+    <div style="font-family:var(--fm);font-size:.92rem;color:rgba(255,255,255,.55);line-height:1.55;margin-bottom:2rem;">Built for teens and young adults who want to grow.</div>
+    <button class="onb-primary" onclick="onbGoToStep(2)">Let's get started →</button>
+  </div>
+
+  <!-- Step 2 — Who are you? -->
+  <div id="onbStep2" class="onb-step" style="display:none;padding-top:6vh;">
+    <h2 id="onbStepHeading">First, tell us about yourself</h2>
+    <div class="onb-sub">This shapes what the app surfaces for you.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.85rem;">
+      <button type="button" class="onb-card" data-age="12_14" onclick="onbSelectAge('12_14',this)"><span class="onb-emoji">🧒</span><span class="onb-label">12–14</span><span class="onb-cap">Middle school years</span></button>
+      <button type="button" class="onb-card" data-age="15_17" onclick="onbSelectAge('15_17',this)"><span class="onb-emoji">🎒</span><span class="onb-label">15–17</span><span class="onb-cap">High school life</span></button>
+      <button type="button" class="onb-card" data-age="18_22" onclick="onbSelectAge('18_22',this)"><span class="onb-emoji">🎓</span><span class="onb-label">18–22</span><span class="onb-cap">College &amp; beyond</span></button>
+      <button type="button" class="onb-card" data-age="parent" onclick="onbSelectAge('parent',this)"><span class="onb-emoji">👨‍👩‍👧</span><span class="onb-label">Parent</span><span class="onb-cap">Supporting someone I love</span></button>
+    </div>
+  </div>
+
+  <!-- Step 3 — What matters? -->
+  <div id="onbStep3" class="onb-step" style="display:none;padding-top:6vh;">
+    <h2>What's important in your life right now?</h2>
+    <div class="onb-sub">Pick as many as you like — you can change this later.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem;">
+      <button type="button" class="onb-tile" data-interest="faith"   style="--tile-accent:#4338ca;--tile-bg:rgba(67,56,202,.10);" onclick="onbToggleInterest('faith',this)"><span class="onb-tile-emoji">✝️</span><span class="onb-tile-label">Faith &amp; Scripture</span></button>
+      <button type="button" class="onb-tile" data-interest="school"  style="--tile-accent:#0284c7;--tile-bg:rgba(2,132,199,.10);" onclick="onbToggleInterest('school',this)"><span class="onb-tile-emoji">📚</span><span class="onb-tile-label">School &amp; Learning</span></button>
+      <button type="button" class="onb-tile" data-interest="health"  style="--tile-accent:#34d399;--tile-bg:rgba(52,211,153,.10);" onclick="onbToggleInterest('health',this)"><span class="onb-tile-emoji">💪</span><span class="onb-tile-label">Health &amp; Wellness</span></button>
+      <button type="button" class="onb-tile" data-interest="goals"   style="--tile-accent:#f97316;--tile-bg:rgba(249,115,22,.10);" onclick="onbToggleInterest('goals',this)"><span class="onb-tile-emoji">🎯</span><span class="onb-tile-label">Goals &amp; Growth</span></button>
+      <button type="button" class="onb-tile" data-interest="finance" style="--tile-accent:#16a34a;--tile-bg:rgba(22,163,74,.10);" onclick="onbToggleInterest('finance',this)"><span class="onb-tile-emoji">💰</span><span class="onb-tile-label">Money &amp; Finance</span></button>
+      <button type="button" class="onb-tile" data-interest="family"  style="--tile-accent:#c084fc;--tile-bg:rgba(192,132,252,.10);" onclick="onbToggleInterest('family',this)"><span class="onb-tile-emoji">👨‍👩‍👧</span><span class="onb-tile-label">Family &amp; Relationships</span></button>
+    </div>
+    <button id="onbStep3Next" class="onb-primary" onclick="onbGoToStep(4)" disabled>Continue →</button>
+  </div>
+
+  <!-- Step 4 — Set up your space -->
+  <div id="onbStep4" class="onb-step" style="display:none;padding-top:6vh;">
+    <h2>Almost there! A few quick choices</h2>
+    <div class="onb-sub">You can change any of these later in Settings.</div>
+
+    <div class="onb-toggle-row">
+      <div><div class="onb-toggle-label">Show faith content?</div><div class="onb-toggle-cap">Scripture, plans, prayer, devotionals</div></div>
+      <div class="onb-yesno" id="onbFaithToggle">
+        <button type="button" data-val="yes" class="active" onclick="onbSetFaith('yes',this)">Yes</button>
+        <button type="button" data-val="no"  onclick="onbSetFaith('no',this)">No</button>
+      </div>
+    </div>
+
+    <div class="onb-toggle-row">
+      <div><div class="onb-toggle-label">Daily reminder?</div><div class="onb-toggle-cap">A gentle nudge to open the app each morning</div></div>
+      <div class="onb-yesno" id="onbReminderToggle">
+        <button type="button" data-val="on" class="active" onclick="onbSetReminder('on',this)">On</button>
+        <button type="button" data-val="off" onclick="onbSetReminder('off',this)">Off</button>
+      </div>
+    </div>
+
+    <div style="margin-top:.6rem;margin-bottom:.5rem;font-size:.85rem;color:var(--tx2);">Your name</div>
+    <input type="text" id="onbName" placeholder="First name" autocomplete="given-name">
+
+    <button class="onb-primary" onclick="onbComplete()">Start my journey →</button>
+  </div>
+</div>
+
 </body>
 </html>

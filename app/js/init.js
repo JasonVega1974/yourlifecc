@@ -362,6 +362,11 @@ function finishInit(cloudReady){
   applyChildAvatar();
   renderVerse();
   startVerseAutoRotation();
+  // Phase E (2026-05-15): show the 4-step onboarding overlay on first
+  // launch. Skipped for demo, faith-free, and any user whose
+  // D.onboardingDone is already true. Sits above the rendered app so
+  // dismissal reveals s-hero already painted underneath.
+  if(typeof maybeShowOnboarding === 'function') maybeShowOnboarding();
   // Start session timer
   if(typeof startSessionTimer === 'function') startSessionTimer();
   // Initial cloud sync after login
@@ -753,6 +758,167 @@ function closeHeroReflect(){
   const btn = document.getElementById('heroReflectBtn');
   if(body) body.style.display = 'none';
   if(btn) btn.style.display = '';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// Phase E — ONBOARDING OVERLAY (4-step warm welcome) — 2026-05-15
+// Markup lives in app/index.html (#onboardingOverlay near </body>).
+// Triggered once for any user whose D.onboardingDone is false. Skipped
+// in demo mode. On completion: saves D.ageBracket / D.onboardingInterests
+// / D.name / D.faithMode / D.onboardingDone, fires launchBigConfetti,
+// fades out, and reveals s-hero (which is already rendered behind).
+// ═══════════════════════════════════════════════════════════════════
+let _onbCurrentStep = 1;
+let _onbSelectedAge = null;
+let _onbInterests = [];
+let _onbFaith = 'yes';
+let _onbReminder = 'on';
+
+function maybeShowOnboarding(){
+  // Skip when already done, in demo, or in faith-free constrained UI.
+  if(typeof D === 'undefined' || !D) return;
+  if(D.onboardingDone) return;
+  if(typeof IS_DEMO !== 'undefined' && IS_DEMO) return;
+  if(typeof window !== 'undefined' && window._faithFree) return;
+  const overlay = document.getElementById('onboardingOverlay');
+  if(!overlay) return;
+  _onbCurrentStep = 1;
+  _onbSelectedAge = null;
+  _onbInterests = [];
+  _onbFaith = 'yes';
+  _onbReminder = 'on';
+  overlay.style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  // Prefill name from existing sources (matches the hero-greeting resolution).
+  const ni = document.getElementById('onbName');
+  if(ni){
+    let n = (D.name||'').trim();
+    if(!n && typeof _supaUser !== 'undefined' && _supaUser){
+      const meta = _supaUser.user_metadata || {};
+      n = (meta.first_name || (meta.name||'').split(/\s+/)[0] || (meta.full_name||'').split(/\s+/)[0] || '').trim();
+      if(!n && _supaUser.email) n = _supaUser.email.split('@')[0].split(/[.+_-]/)[0];
+    }
+    if(n){ ni.value = n.charAt(0).toUpperCase() + n.slice(1).toLowerCase(); }
+  }
+  _onbShowStep(1);
+}
+
+function _onbShowStep(n){
+  _onbCurrentStep = n;
+  for(let i=1;i<=4;i++){
+    const el = document.getElementById('onbStep'+i);
+    if(!el) continue;
+    el.style.display = (i === n) ? '' : 'none';
+    el.classList.toggle('shown', i === n);
+  }
+  // Progress dots
+  document.querySelectorAll('#onboardingOverlay .onb-dot').forEach(d => {
+    const idx = parseInt(d.getAttribute('data-dot'));
+    d.classList.remove('active', 'done');
+    if(idx < n) d.classList.add('done');
+    else if(idx === n) d.classList.add('active');
+  });
+  // Back button visibility — hidden on step 1 only.
+  const back = document.getElementById('onbBackBtn');
+  if(back) back.style.display = (n === 1) ? 'none' : 'flex';
+  // Scroll the overlay to the top so the new step is in view.
+  const overlay = document.getElementById('onboardingOverlay');
+  if(overlay) overlay.scrollTop = 0;
+  // Trigger the fade-in by re-adding .shown on next frame.
+  requestAnimationFrame(() => {
+    const el = document.getElementById('onbStep'+n);
+    if(el) el.classList.add('shown');
+  });
+}
+
+function onbGoToStep(n){
+  if(n < 1 || n > 4) return;
+  _onbShowStep(n);
+}
+
+function onbBack(){
+  if(_onbCurrentStep > 1) _onbShowStep(_onbCurrentStep - 1);
+}
+
+function onbSelectAge(bracket, btn){
+  _onbSelectedAge = bracket;
+  document.querySelectorAll('#onbStep2 .onb-card').forEach(c => c.classList.remove('selected'));
+  if(btn) btn.classList.add('selected');
+  // Auto-advance after a brief beat so the user sees the selection register.
+  setTimeout(() => onbGoToStep(3), 400);
+}
+
+function onbToggleInterest(key, btn){
+  const idx = _onbInterests.indexOf(key);
+  if(idx === -1) _onbInterests.push(key);
+  else _onbInterests.splice(idx, 1);
+  if(btn) btn.classList.toggle('selected', _onbInterests.indexOf(key) !== -1);
+  const nextBtn = document.getElementById('onbStep3Next');
+  if(nextBtn) nextBtn.disabled = _onbInterests.length === 0;
+}
+
+function onbSetFaith(val, btn){
+  _onbFaith = val;
+  document.querySelectorAll('#onbFaithToggle button').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
+function onbSetReminder(val, btn){
+  _onbReminder = val;
+  document.querySelectorAll('#onbReminderToggle button').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
+function onbComplete(){
+  // Persist all answers to D, then fade out the overlay.
+  if(_onbSelectedAge && _onbSelectedAge !== 'parent') D.ageBracket = _onbSelectedAge;
+  // 'parent' answer doesn't fit the age bracket allowlist — leave D.ageBracket
+  // empty (which means full surface) and rely on profile.parentMode instead.
+  if(_onbSelectedAge === 'parent'){
+    if(!D.profile) D.profile = {};
+    D.profile.parentMode = true;
+  }
+  D.onboardingInterests = _onbInterests.slice();
+  // Faith toggle: store as D.settings.faithMode (matches existing convention
+  // used by init.js line 349 and other faith-gating checks).
+  if(!D.settings) D.settings = {};
+  D.settings.faithMode = (_onbFaith === 'yes');
+  D.faithMode = D.settings.faithMode;
+  // Reminder preference — surface for a future notification system.
+  D.dailyReminderOn = (_onbReminder === 'on');
+  // Name confirmation.
+  const ni = document.getElementById('onbName');
+  const nameVal = ni ? ni.value.trim() : '';
+  if(nameVal) D.name = nameVal;
+  D.onboardingDone = true;
+  if(typeof save === 'function') save();
+
+  // Refresh dependent UI surfaces.
+  if(typeof applyName === 'function') applyName();
+  if(typeof renderHeroGreeting === 'function') renderHeroGreeting();
+  if(typeof applyStageFilter === 'function') applyStageFilter();
+
+  // Celebration — already reduced-motion guarded inside launchBigConfetti.
+  if(typeof launchBigConfetti === 'function') launchBigConfetti();
+
+  // Fade out the overlay (opacity-only so reduced-motion users still get a
+  // gentle dismissal rather than a hard cut).
+  const overlay = document.getElementById('onboardingOverlay');
+  if(overlay){
+    overlay.style.transition = 'opacity .45s ease';
+    overlay.style.opacity = '0';
+    setTimeout(() => {
+      overlay.style.display = 'none';
+      overlay.style.opacity = '';
+      overlay.style.transition = '';
+      document.body.style.overflow = '';
+      if(typeof showSection === 'function') showSection('s-hero');
+    }, 450);
+  } else {
+    document.body.style.overflow = '';
+    if(typeof showSection === 'function') showSection('s-hero');
+  }
+  if(typeof showToast === 'function') showToast('Welcome aboard 🎉');
 }
 
 function saveHeroReflect(){

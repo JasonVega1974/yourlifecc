@@ -123,6 +123,11 @@ const DEF = {
   // window._faithFree in auth.js when plan_status='faith_free'. Either
   // flag may be read by feature code; both stay in sync.
   faithOnly:false,
+  // Phase E (2026-05-15) — 4-step onboarding overlay shows once for
+  // every new user, never again after completion. onboardingInterests
+  // is the multi-select from step 3 — used by goal-suggest, content
+  // personalization, and future home-screen curation.
+  onboardingDone:false, onboardingInterests:[],
   bannerMode:'scroll',
 };
 
