@@ -1570,10 +1570,10 @@ function pmOpenEdit(cardId){
     <div class="pm-upload-row" data-pm-uploadrow="${cardId}">
       <div class="pm-upload-label">Or upload from computer (JPEG · PNG · WebP · GIF, max 5MB)</div>
       <div class="pm-upload-controls">
-        <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" data-pm-file="${cardId}" onchange="pmFileSelected('${cardId}')" style="display:none;">
+        <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" data-pm-file="${cardId}" onchange="pmFileSelected(this.dataset.pmFile)" style="display:none;">
         <button class="pm-action" type="button" onclick="pmTriggerFileInput('${cardId}')">📁 Choose Photo</button>
         <span class="pm-file-info" data-pm-fileinfo="${cardId}"></span>
-        <button class="pm-action green" type="button" data-pm-uploadbtn="${cardId}" onclick="pmUploadFile('${cardId}')" disabled>⬆️ Upload &amp; Save</button>
+        <button class="pm-action green" type="button" data-pm-uploadbtn="${cardId}" onclick="pmUploadFile(this.dataset.pmUploadbtn)" disabled>⬆️ Upload &amp; Save</button>
       </div>
       <div class="pm-file-preview" data-pm-filepreview="${cardId}"></div>
     </div>
