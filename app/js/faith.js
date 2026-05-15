@@ -7796,9 +7796,9 @@ function ppCardHtml(proof){
     + '<div style="font-family:Georgia,serif;font-style:italic;font-size:.88rem;color:var(--tx2);margin-bottom:.5rem;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">' + _ppEsc(proof.summary) + '</div>'
     + '<div style="display:flex;align-items:center;gap:.5rem;margin-top:auto;">'
     +   ppStarsHtml(proof.impactScore)
-    +   '<button style="margin-left:auto;background:none;border:none;padding:0;cursor:pointer;font-size:1.1rem;color:' + (saved ? '#f59e0b' : 'var(--tx3)') + ';" onclick="event.stopPropagation();ppToggleBookmark(\'' + _ppEsc(proof.id) + '\',this)" aria-label="Bookmark">'
+    +   '<span role="button" tabindex="0" style="margin-left:auto;cursor:pointer;font-size:1.1rem;color:' + (saved ? '#f59e0b' : 'var(--tx3)') + ';" onclick="event.stopPropagation();ppToggleBookmark(\'' + _ppEsc(proof.id) + '\',this)" aria-label="Bookmark">'
     +     (saved ? '★' : '☆')
-    +   '</button>'
+    +   '</span>'
     +   '<span style="color:var(--tx);font-size:.8rem;">Read More →</span>'
     + '</div>'
     + '</button>';
