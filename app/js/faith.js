@@ -5224,9 +5224,9 @@ function renderFeaturedAcademy(){
     return '<div class="ac-card' + (done ? ' done' : '') + '" data-academy-id="' + _acEsc(l.id) + '" '
          + 'onclick="openLessonModal(\'' + l.id + '\')" '
          + 'style="--ac-card-color:' + cat.color + ';">'
-         +   '<div class="ac-card-photo" style="background:linear-gradient(135deg,' + cat.soft + '0.25),' + cat.soft + '0.07));display:flex;align-items:center;justify-content:center;">'
-         +     '<span class="ac-card-cat">' + _acEsc(cat.label) + '</span>'
-         +     '<span style="font-size:2.4rem;line-height:1;filter:drop-shadow(0 2px 12px ' + cat.soft + '0.5));">' + _acEsc(cat.icon) + '</span>'
+         +   '<div style="height:90px;background:linear-gradient(135deg,' + cat.soft + '0.25),' + cat.soft + '0.06));position:relative;display:flex;align-items:center;justify-content:center;border-radius:12px 12px 0 0;overflow:hidden;flex-shrink:0;">'
+         +     '<span style="position:absolute;top:.5rem;left:.65rem;font-family:var(--fm);font-size:.58rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;background:' + cat.soft + '0.2);border:1px solid ' + cat.soft + '0.35);color:' + cat.color + ';padding:.2rem .55rem;border-radius:99px;">' + _acEsc(cat.label) + '</span>'
+         +     '<span style="font-size:2.2rem;line-height:1;">' + _acEsc(cat.icon) + '</span>'
          +   '</div>'
          +   '<div class="ac-card-body">'
          +     '<div class="ac-card-title">' + _acEsc(l.title) + '</div>'
@@ -5644,7 +5644,8 @@ function openAcademyLesson(courseId, lessonId){
   const _acHdrEl = document.getElementById('charModalHeader');
   _acHdrEl.style.background = 'linear-gradient(135deg,#0a0d1a 0%,#1a1233 100%)';
   document.getElementById('charIcon').textContent = mod.icon;
-  document.getElementById('charTitle').textContent = lesson.title;
+  const _ctEl = document.getElementById('charTitle');
+  if(_ctEl){ _ctEl.textContent = lesson.title; _ctEl.style.webkitTextFillColor = '#fbbf24'; _ctEl.style.color = '#fbbf24'; }
   const _chipColor = mod.color || '#fbbf24';
   document.getElementById('charSub').innerHTML =
     '<span style="display:inline-block;font-family:var(--fm);font-size:.58rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;border:1px solid ' + _chipColor + '88;color:' + _chipColor + ';padding:.2rem .65rem;border-radius:99px;margin-bottom:.35rem;">' +
