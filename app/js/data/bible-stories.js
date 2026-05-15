@@ -49,7 +49,7 @@ function _bsBackdrop(opts){
   `;
 }
 
-const BIBLE_STORIES = [
+window.BIBLE_STORIES = [
 
   // ════════════════════════════════════════════════════════════
   // STORY 1 — The Christmas Story
@@ -16219,6 +16219,3 @@ const BIBLE_STORIES = [
 
 ];
 
-if (typeof window !== 'undefined') {
-  window.BIBLE_STORIES = BIBLE_STORIES;
-}
