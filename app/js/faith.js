@@ -4759,8 +4759,24 @@ function openLessonModal(lessonId){
   const svgs = _acSvgs();
   const cat = cats[lesson.category] || { label:'Lesson', color:'#fbbf24', icon:'📖' };
 
+  const _lmCatPhotos = {
+    'theology':         'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Jerusalem-2013%282%29-Aerial-Temple_Mount-%28south_exposure%29.jpg/1280px-Jerusalem-2013%282%29-Aerial-Temple_Mount-%28south_exposure%29.jpg',
+    'church-history':   'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Church_of_the_Holy_Sepulchre_by_Gerd_Eichmann_%28cropped%29.jpg/1280px-Church_of_the_Holy_Sepulchre_by_Gerd_Eichmann_%28cropped%29.jpg',
+    'christian-living': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Kinneret_cropped.jpg/1280px-Kinneret_cropped.jpg',
+    'apologetics':      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Mount_Sinai_from_the_southwest.jpg/1280px-Mount_Sinai_from_the_southwest.jpg',
+    'bible-study':      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Gutenberg_Bible%2C_Lenox_Copy%2C_New_York_Public_Library%2C_2009._Pic_01.jpg/1280px-Gutenberg_Bible%2C_Lenox_Copy%2C_New_York_Public_Library%2C_2009._Pic_01.jpg',
+  };
   const svgEl = document.getElementById('lmSvg');
-  if(svgEl) svgEl.innerHTML = svgs[lesson.category] || '';
+  if(svgEl){
+    const _lmPhoto = _lmCatPhotos[lesson.category];
+    if(_lmPhoto){
+      svgEl.innerHTML = '';
+      svgEl.style.background = 'linear-gradient(rgba(0,0,0,.32),rgba(0,0,0,.62)),url("' + _lmPhoto + '") center/cover no-repeat';
+    } else {
+      svgEl.innerHTML = svgs[lesson.category] || '';
+      svgEl.style.background = '';
+    }
+  }
 
   const eyeEl = document.getElementById('lmEye');
   if(eyeEl) eyeEl.textContent = (cat.label || '').toUpperCase() + ' · ' + (lesson.duration || '');
