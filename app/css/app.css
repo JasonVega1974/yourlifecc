@@ -51,22 +51,23 @@
    bg was the worst readability issue — handled by the override block
    at the bottom of this file. */
 :root.light{
-  --bg:#f8f9fa;            /* off-white body */
-  --s1:#ffffff;            /* cards / sidebar surface */
-  --s2:#f5f7fa;            /* section headers */
-  --s3:#e9eef5;            /* hover / subtle inset */
-  --s4:#dde4ee;            /* deeper accent surface */
-  --tx:#111827;            /* near-black body text */
-  --tx2:#6b7280;           /* secondary text */
-  --tx3:#9ca3af;           /* tertiary text */
-  --mt:#9ca3af;            /* very muted */
-  --br:rgba(56,189,248,0.25);
-  --card-shadow:0 1px 3px rgba(0,0,0,.06);
-  --card-bg:#ffffff;
-  --card-border:#e5e7eb;
+  --bg:#e8e9ec;            /* medium cool gray — macOS desktop feel */
+  --s1:#f2f3f5;            /* cards / surfaces */
+  --s2:#e4e5e8;            /* section headers */
+  --s3:#d8d9de;            /* hover / inset */
+  --s4:#cccdd4;            /* deeper accent */
+  --c:#5a5c6b;             /* generic accent → neutral slate (not sky-blue) */
+  --tx:#1a1b1e;            /* near-black body text */
+  --tx2:#4a4b52;           /* secondary text */
+  --tx3:#7a7b85;           /* tertiary text */
+  --mt:#7a7b85;            /* very muted */
+  --br:rgba(0,0,0,0.15);
+  --card-shadow:0 1px 4px rgba(0,0,0,.10);
+  --card-bg:#f2f3f5;
+  --card-border:#d0d1d6;
   --input-bg:#ffffff;
-  --input-border:#d1d5db;
-  --sel-bg:#f3f4f6;
+  --input-border:#c0c1c6;
+  --sel-bg:#eaebef;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{font-size:17px;scroll-behavior:smooth;}
@@ -569,79 +570,79 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 
 /* ── LIGHT MODE OVERRIDES ───────────────────────── */
 :root.light body{background:var(--bg);}
-:root.light #sidebar{background:#fff;border-right-color:rgba(0,0,0,.08);}
-:root.light .sid-logo{border-bottom-color:rgba(0,0,0,.08);}
-:root.light .sid-logo-sub{color:#94a3b8;}
-:root.light .nav-item{color:#64748b;}
-:root.light .nav-item:hover{color:#0f172a;background:rgba(0,0,0,.04);border-left-color:rgba(56,189,248,.5);}
-:root.light .nav-item.active{color:var(--c);background:rgba(56,189,248,.1);border-left-color:var(--c);}
-:root.light .sid-bottom{border-top-color:rgba(0,0,0,.08);}
+:root.light #sidebar{background:#dfe0e4;border-right-color:#c8c9ce;}
+:root.light .sid-logo{border-bottom-color:#c8c9ce;}
+:root.light .sid-logo-sub{color:#7a7b85;}
+:root.light .nav-item{color:#4a4b52;}
+:root.light .nav-item:hover{color:#1a1b1e;background:rgba(0,0,0,.06);border-left-color:rgba(0,0,0,.25);}
+:root.light .nav-item.active{color:#1a1b1e;background:rgba(0,0,0,.08);border-left-color:#5a5c6b;font-weight:700;}
+:root.light .sid-bottom{border-top-color:#c8c9ce;}
 :root.light #mBar,
-:root.light #mobileQuickRow{background:rgba(255,255,255,.97);border-bottom-color:rgba(0,0,0,.08);}
-:root.light #mobileQuickRow .mqb{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.12);color:#334155;}
-:root.light #mobileQuickRow .mqb-lang{background:rgba(0,0,0,.04);}
-:root.light .mBar-title{color:var(--c);}
-:root.light .hamb{border-color:rgba(0,0,0,.2);color:#475569;}
-:root.light .card{background:#fff;border-color:rgba(0,0,0,.08);box-shadow:0 2px 12px rgba(0,0,0,.07);}
-:root.light .card-dark{background:#f8fafc;}
-:root.light input,:root.light textarea,:root.light select{background:#f1f5f9;border-color:rgba(0,0,0,.15);color:#0f172a;}
-:root.light input:focus,:root.light textarea:focus,:root.light select:focus{background:#e9eef5;}
-:root.light select option{background:#f1f5f9;color:#0f172a;}
-:root.light .btn.bgh{background:rgba(0,0,0,.07);color:#334155;border-color:rgba(0,0,0,.15);}
-:root.light .btn.bgh:hover{background:rgba(0,0,0,.12);color:#0f172a;}
-:root.light .tab{color:#64748b;}
-:root.light .tab.active{background:var(--c);color:#000;}
-:root.light .sh{border-bottom-color:rgba(0,0,0,.08);}
-:root.light .sl{background:rgba(0,0,0,.08);}
-:root.light .chi{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.1);color:#334155;}
+:root.light #mobileQuickRow{background:#dfe0e4;border-bottom-color:#c8c9ce;}
+:root.light #mobileQuickRow .mqb{background:rgba(0,0,0,.07);border-color:rgba(0,0,0,.15);color:#4a4b52;}
+:root.light #mobileQuickRow .mqb-lang{background:rgba(0,0,0,.06);}
+:root.light .mBar-title{color:#1a1b1e;}
+:root.light .hamb{border-color:rgba(0,0,0,.25);color:#4a4b52;}
+:root.light .card{background:#f2f3f5;border-color:#d0d1d6;box-shadow:0 1px 4px rgba(0,0,0,.10);}
+:root.light .card-dark{background:#e8e9ec;}
+:root.light input,:root.light textarea,:root.light select{background:#ffffff;border-color:#c0c1c6;color:#1a1b1e;}
+:root.light input:focus,:root.light textarea:focus,:root.light select:focus{background:#ffffff;border-color:#9a9ba6;}
+:root.light select option{background:#ffffff;color:#1a1b1e;}
+:root.light .btn.bgh{background:rgba(0,0,0,.08);color:#4a4b52;border-color:rgba(0,0,0,.18);}
+:root.light .btn.bgh:hover{background:rgba(0,0,0,.13);color:#1a1b1e;}
+:root.light .tab{color:#4a4b52;}
+:root.light .tab.active{background:#5a5c6b;color:#ffffff;}
+:root.light .sh{border-bottom-color:#c8c9ce;}
+:root.light .sl{background:rgba(0,0,0,.12);}
+:root.light .chi{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.12);color:#4a4b52;}
 :root.light .chi.done{background:rgba(52,211,153,.12);border-color:rgba(52,211,153,.4);}
-:root.light .sb{background:rgba(56,189,248,.07);border-color:rgba(56,189,248,.25);}
+:root.light .sb{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.12);}
 :root.light .qs{background:transparent;}
-:root.light .qsc{background:#fff;border:1px solid rgba(0,0,0,.08);box-shadow:0 1px 6px rgba(0,0,0,.06);}
-:root.light .fst{background:#fff;border:1px solid rgba(0,0,0,.08);}
-:root.light .tip-btn{background:rgba(56,189,248,.15);border-color:rgba(56,189,248,.4);}
-:root.light .tip-box{background:#fff;border-color:rgba(56,189,248,.3);box-shadow:0 8px 24px rgba(0,0,0,.15);color:#334155;}
-:root.light .tip-title{color:var(--c);}
-:root.light .tip-box b{color:#0f172a;}
-:root.light #sp{background:#fff;border-left-color:rgba(0,0,0,.1);}
-:root.light #sp label{color:#475569;}
-:root.light .sched-table th{background:#e9eef5;color:#475569;}
-:root.light .sched-table td.time-cell{background:#f0f4f8;color:#475569;}
-:root.light .sched-table td{border-color:rgba(0,0,0,.07);}
-:root.light .act-cell{background:#f8fafc;}
-:root.light .act-cell select{background:#f1f5f9;color:#0f172a;}
-:root.light .act-cell select option{background:#f1f5f9;color:#0f172a;}
-:root.light #schedPicker{background:#fff;border-color:rgba(56,189,248,.3);}
-:root.light .toast{background:#0f172a;color:#fff;}
-:root.light .bdg{color:#334155;}
+:root.light .qsc{background:#f2f3f5;border:1px solid #d0d1d6;box-shadow:0 1px 6px rgba(0,0,0,.08);}
+:root.light .fst{background:#f2f3f5;border:1px solid #d0d1d6;}
+:root.light .tip-btn{background:rgba(0,0,0,.08);border-color:rgba(0,0,0,.18);}
+:root.light .tip-box{background:#f2f3f5;border-color:#d0d1d6;box-shadow:0 8px 24px rgba(0,0,0,.15);color:#4a4b52;}
+:root.light .tip-title{color:#1a1b1e;}
+:root.light .tip-box b{color:#1a1b1e;}
+:root.light #sp{background:#f2f3f5;border-left-color:#c8c9ce;}
+:root.light #sp label{color:#4a4b52;}
+:root.light .sched-table th{background:#d8d9de;color:#4a4b52;}
+:root.light .sched-table td.time-cell{background:#e4e5e8;color:#4a4b52;}
+:root.light .sched-table td{border-color:rgba(0,0,0,.08);}
+:root.light .act-cell{background:#edeef1;}
+:root.light .act-cell select{background:#ffffff;color:#1a1b1e;}
+:root.light .act-cell select option{background:#ffffff;color:#1a1b1e;}
+:root.light #schedPicker{background:#f2f3f5;border-color:#d0d1d6;}
+:root.light .toast{background:#1a1b1e;color:#fff;}
+:root.light .bdg{color:#4a4b52;}
 :root.light .bdg.bp2{background:rgba(167,139,250,.15);color:var(--p);}
 :root.light .bdg.bg2{background:rgba(52,211,153,.15);color:var(--gr);}
-:root.light .ct{color:var(--c);}
-:root.light label{color:#475569;}
-:root.light .tut-body,:root.light #tutInner{background:#fff;}
-:root.light .tut-header{background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(167,139,250,.05));}
-:root.light .tut-nav,:root.light .tut-foot{background:#f8fafc;}
-:root.light .tut-nb{background:rgba(0,0,0,.06);color:#475569;}
+:root.light .ct{color:#5a5c6b;}
+:root.light label{color:#4a4b52;}
+:root.light .tut-body,:root.light #tutInner{background:#f2f3f5;}
+:root.light .tut-header{background:rgba(0,0,0,.04);}
+:root.light .tut-nav,:root.light .tut-foot{background:#e8e9ec;}
+:root.light .tut-nb{background:rgba(0,0,0,.08);color:#4a4b52;}
 
-:root.light .tut-step p{color:#475569;}
-:root.light .mo{background:rgba(0,0,0,.5);}
-:root.light .md{background:#fff;border-color:rgba(0,0,0,.1);}
-:root.light #themeBtn{background:rgba(0,0,0,.06);border-color:rgba(0,0,0,.15);color:#475569;}
-:root.light #themeBtnMob{background:rgba(0,0,0,.08);border-color:rgba(0,0,0,.18);color:#475569;}
+:root.light .tut-step p{color:#4a4b52;}
+:root.light .mo{background:rgba(0,0,0,.55);}
+:root.light .md{background:#f2f3f5;border-color:#d0d1d6;}
+:root.light #themeBtn{background:rgba(0,0,0,.08);border-color:rgba(0,0,0,.18);color:#4a4b52;}
+:root.light #themeBtnMob{background:rgba(0,0,0,.10);border-color:rgba(0,0,0,.20);color:#4a4b52;}
 /* ── Phase 3 light-mode contrast pass (bulk class rescue) ───── */
-:root.light .ai2{background:rgba(0,0,0,.04);color:#0f172a;}
+:root.light .ai2{background:rgba(0,0,0,.05);color:#1a1b1e;}
 :root.light .ai2 .ck{border-color:rgba(0,0,0,.3);}
 :root.light .ai2 .pl{border-left-color:rgba(0,0,0,.18);}
-:root.light .cc{background:#fff;border-color:rgba(0,0,0,.08);box-shadow:0 1px 6px rgba(0,0,0,.06);}
-:root.light .stat-tile{background:#fff;border-color:rgba(0,0,0,.08);box-shadow:0 1px 6px rgba(0,0,0,.06);}
+:root.light .cc{background:#f2f3f5;border-color:#d0d1d6;box-shadow:0 1px 6px rgba(0,0,0,.08);}
+:root.light .stat-tile{background:#f2f3f5;border-color:#d0d1d6;box-shadow:0 1px 6px rgba(0,0,0,.08);}
 :root.light .qsl,
-:root.light .stat-lbl{color:#64748b;}
+:root.light .stat-lbl{color:#7a7b85;}
 :root.light .pin-btn,
-:root.light .child-pin-btn{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.12);color:#0f172a;}
+:root.light .child-pin-btn{background:rgba(0,0,0,.06);border-color:rgba(0,0,0,.14);color:#1a1b1e;}
 :root.light .pin-btn:hover,
-:root.light .child-pin-btn:hover{background:rgba(0,0,0,.1);}
-:root.light .eb{color:#475569;}
-:root.light .eb:hover{color:var(--c);}
+:root.light .child-pin-btn:hover{background:rgba(0,0,0,.12);}
+:root.light .eb{color:#4a4b52;}
+:root.light .eb:hover{color:#1a1b1e;}
 :root.light .db{color:rgba(0,0,0,.45);}
 :root.light .db:hover{color:var(--pk);}
 
@@ -2112,7 +2113,7 @@ body{top:0!important;}
 ─────────────────────────────────────────────────────────────── */
 
 /* Hero — scripture/motivation text (hardcoded #fde68a yellow) */
-:root.light #heroMotivation { color: #b45309 !important; }
+:root.light #heroMotivation { color: #8a5200 !important; }
 :root.light #heroMotivationAuthor { color: rgba(120,53,15,.6) !important; }
 
 /* Hero — clock (hardcoded rgba(255,255,255,.85)) */
@@ -2134,10 +2135,10 @@ body{top:0!important;}
 :root.light #qsPB,
 :root.light #schoolPBBalance,
 :root.light #goalsPBBalance,
-:root.light #skillsPBBalance { color: #b45309 !important; }
+:root.light #skillsPBBalance { color: #8a5200 !important; }
 
 /* Parent Bucks label */
-:root.light [style*="color:#fbbf24"] { color: #b45309 !important; }
+:root.light [style*="color:#fbbf24"] { color: #8a5200 !important; }
 
 /* Scripture / Devotional section — hardcoded white text on dark cards */
 :root.light #devTitle,
@@ -3315,120 +3316,22 @@ img.topic-card-hero{
   .fc-book{width:200px;height:140px;}
 }
 
-/* ── Light-mode: clean editorial (white surfaces, amber accents) ── */
-:root.light .fc-hud{
-  background:#ffffff;
-  border-color:#e5e7eb;
+/* ── Flashcards: always dark navy/gold regardless of body theme ── */
+:root.light #flashcardGame,
+:root.light .fc-container,
+:root.light .fc-stage,
+:root.light .fc-stage::before {
+  /* Reset CSS variable scope so child elements use dark values */
+  --bg:#0a0d1a;
+  --s1:#161b27;
+  --s2:#1c2333;
+  --tx:#f1f5f9;
+  --tx2:#94a3b8;
+  --g:#fbbf24;
 }
-:root.light .fc-hud-stat{background:#f8f9fa;border-color:#e5e7eb;}
-:root.light .fc-hud-label{color:#6b7280;opacity:1;}
-:root.light .fc-hud-val{color:#111827;}
-:root.light .fc-hud-val strong{color:#b45309;}
-:root.light .fc-streak{
-  color:#b45309;border-color:rgba(180,83,9,.35);
-  background:rgba(180,83,9,.07);
-  box-shadow:none;
-}
-
-/* Stage: clean gray page, white card on top */
-:root.light .fc-stage{
-  background:#f8f9fa;
-  border-color:#e5e7eb;
-}
-:root.light .fc-stage::before{opacity:0;}
-
-/* Opener: clean surfaces */
-:root.light .fc-book-half{
-  background:#f0f4f8;
-  border-color:#e5e7eb;
-}
-:root.light .fc-opener-glow{
-  background:none;
-  opacity:0;
-}
-
-/* Card body: clean white */
-:root.light .fc-face{
-  background:#ffffff;
-  border-color:#e5e7eb;
-  box-shadow:0 2px 12px rgba(0,0,0,.08);
-}
-:root.light .fc-face::before{border-color:#e5e7eb;}
-
-:root.light .fc-card-ref{
-  color:#b45309;
-  text-shadow:none;
-}
-:root.light .fc-card-sub{color:#6b7280;opacity:1;}
-:root.light .fc-question{color:#111827;}
-
-/* Choice pills: gold-on-cream */
-:root.light .fc-choice{
-  background:#ffffff;
-  border-color:#e5e7eb;
-  color:#111827;
-}
-:root.light .fc-choice:hover:not(:disabled){
-  background:#f3f4f6;
-  border-color:#d1d5db;
-  box-shadow:none;
-}
-:root.light .fc-choice-correct{
-  background:linear-gradient(180deg,rgba(34,197,94,.22),rgba(22,163,74,.10)) !important;
-  border-color:#16a34a !important;
-  color:#14532d !important;
-  box-shadow:0 0 26px rgba(34,197,94,.45) !important;
-}
-:root.light .fc-choice-incorrect{
-  background:linear-gradient(180deg,rgba(239,68,68,.20),rgba(220,38,38,.08)) !important;
-  border-color:#dc2626 !important;
-  color:#7f1d1d !important;
-  box-shadow:0 0 22px rgba(239,68,68,.4) !important;
-}
-:root.light .fc-choice-correct::after{color:#16a34a;}
-
-/* Back face elements */
-:root.light .fc-correct-row{
-  background:rgba(180,83,9,.06);
-  border-color:rgba(180,83,9,.25);
-}
-:root.light .fc-correct-tag{color:#b45309;}
-:root.light .fc-correct-text{color:#111827;}
-:root.light .fc-scripture-msg{color:#111827;}
-:root.light .fc-scripture-ref{color:#b45309;}
-:root.light .fc-result-label.correct{color:#16a34a;}
-:root.light .fc-result-label.incorrect{color:#b91c1c;}
-
-/* Countdown ring in light */
-:root.light .fc-countdown-track{stroke:rgba(180,120,20,.25);}
-:root.light .fc-countdown-bar{stroke:#b45309;}
-:root.light .fc-countdown-num{color:#b45309;}
-
-/* Results screen */
-:root.light .fc-results{
-  background:
-    radial-gradient(ellipse at top, rgba(251,191,36,.22), transparent 65%),
-    linear-gradient(180deg,#fffaeb 0%,#fdf0c8 100%);
-  border-color:rgba(180,120,20,.55);
-  box-shadow:0 0 40px rgba(251,191,36,.28);
-}
-:root.light .fc-results-title{
-  color:#b45309;
-  text-shadow:0 0 14px rgba(251,191,36,.4);
-}
-:root.light .fc-results-num{
-  color:#b45309;
-  text-shadow:0 0 18px rgba(251,191,36,.45);
-}
-:root.light .fc-results-out{color:#6b7280;opacity:1;}
-:root.light .fc-star-lg.empty{color:rgba(180,120,20,.25);}
-:root.light .fc-star-lg.filled{color:#d97706;text-shadow:0 0 14px rgba(251,191,36,.55);}
-:root.light .fc-results-msg-wrap{
-  background:#f8f9fa;
-  border-color:#e5e7eb;
-}
-:root.light .fc-results-msg{color:#111827;}
-:root.light .fc-results-ref{color:#b45309;}
+:root.light #flashcardGame{ background:#0a0d1a !important; color:#f1f5f9 !important; }
+:root.light .fc-stage{ background:linear-gradient(180deg,#0f1324 0%,#070a14 100%) !important; border-color:rgba(251,191,36,.18) !important; }
+:root.light .fc-stage::before{ opacity:1; }
 
 /* Simplify Settings for faith_free — only Appearance + Support remain. */
 html[data-faith-free="1"] #sp .sp-pb { display: none !important; }
@@ -3673,8 +3576,8 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   max-width:560px;
   font-weight:400;
 }
-:root.light .bf-eyebrow{color:#b45309;opacity:.9;}
-:root.light .bf-sub{color:#374151;opacity:1;}
+:root.light .bf-eyebrow{color:#8a5200;opacity:.9;}
+:root.light .bf-sub{color:#4a4b52;opacity:1;}
 :root.light .bf-section-hdr{border-bottom-color:rgba(180,120,20,.22);}
 
 /* Recolor the purple "active" chips/tabs to gold so the palette stays unified */
@@ -3751,7 +3654,7 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   opacity:.78;
 }
 :root.light [id^="bf-"] .pl-section-hdr,
-:root.light [id^="bf-"] .mv-section-hdr{color:#b45309 !important;}
+:root.light [id^="bf-"] .mv-section-hdr{color:#8a5200 !important;}
 
 /* Devotional inner body text (the inline-styled blocks in bf-devotional) */
 #bf-devotional [id="devBody"],
@@ -3789,8 +3692,8 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   color:#111827 !important;
 }
 :root.light #bf-home .fh-votd-text{color:#111827 !important;}
-:root.light #bf-home .fh-votd-eyebrow{color:#b45309 !important;}
-:root.light #bf-home .fh-votd-ref{color:#b45309 !important;}
+:root.light #bf-home .fh-votd-eyebrow{color:#8a5200 !important;}
+:root.light #bf-home .fh-votd-ref{color:#8a5200 !important;}
 :root.light #bf-home .fh-votd-actions button{
   background:rgba(251,191,36,.18) !important;
   color:#111827 !important;
@@ -3840,7 +3743,7 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   color:#111827 !important;
   border-color:rgba(180,120,20,.4) !important;
 }
-:root.light #bf-prayer .pr-prompt-eyebrow{color:#b45309 !important;}
+:root.light #bf-prayer .pr-prompt-eyebrow{color:#8a5200 !important;}
 :root.light #bf-prayer .pr-prompt-text{color:#111827 !important;}
 
 /* ════════════════════════════════════════════════════════════════════
@@ -3863,7 +3766,7 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   box-shadow:0 14px 36px rgba(251,191,36,.22);
   border-color:rgba(251,191,36,.5);
 }
-:root.light .well-card{background:#ffffff;border-color:#e5e7eb;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+:root.light .well-card{background:#ffffff;border-color:#d0d1d6;box-shadow:0 1px 3px rgba(0,0,0,.06);}
 
 /* ─── Plans tab: hero + plan-detail modal header + card glow → gold ─── */
 #bf-plans .pl-hero{
@@ -3968,9 +3871,9 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   text-shadow:0 2px 28px rgba(251,191,36,.22);
 }
 :root.light #bf-devotional #devTitle{
-  background:linear-gradient(135deg,#d97706 0%,#b45309 60%,#7c2d12 100%);
+  background:linear-gradient(135deg,#d97706 0%,#8a5200 60%,#7c2d12 100%);
   -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
-  color:#b45309;
+  color:#8a5200;
 }
 #bf-devotional #devScripture{color:#fef3c7 !important;}
 
@@ -4172,7 +4075,7 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   box-shadow:0 8px 28px rgba(180,120,20,.22) !important;
 }
 :root.light #bf-bibleworld .bw-card-name{color:#111827 !important;}
-:root.light #bf-bibleworld .bw-card-tagline{color:#6b7280 !important;opacity:1;}
+:root.light #bf-bibleworld .bw-card-tagline{color:#7a7b85 !important;opacity:1;}
 :root.light #bf-bibleworld .bw-card-era{color:var(--era-c, #111827);}
 :root.light #bf-bibleworld .bw-card-photo{background:rgba(255,250,235,.7);border-color:rgba(180,120,20,.32);}
 :root.light #bf-bibleworld .bw-card-ref{background:rgba(56,189,248,.16);border-color:rgba(56,189,248,.4);color:#1e3a8a;}
@@ -4184,8 +4087,8 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   border-color:rgba(180,120,20,.28) !important;
 }
 :root.light #fhFamilyVerseCard #fhFamilyVerseText{color:#111827 !important;}
-:root.light #fhFamilyVerseCard #fhFamilyVerseRef{color:#b45309 !important;}
-:root.light #fhFamilyVerseCard > div:first-child{color:#b45309 !important;}
+:root.light #fhFamilyVerseCard #fhFamilyVerseRef{color:#8a5200 !important;}
+:root.light #fhFamilyVerseCard > div:first-child{color:#8a5200 !important;}
 
 /* ════════════════════════════════════════════════════════════════════
    F10 — Close-out consistency pass for The Well
@@ -4259,20 +4162,20 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
 /* Devotional inner card body */
 :root.light #bf-devotional > div:nth-of-type(2){
   background:#ffffff !important;
-  border-color:#e5e7eb !important;
+  border-color:#d0d1d6 !important;
 }
 :root.light #bf-devotional #devScripture{color:#111827 !important;}
-:root.light #bf-devotional #devRef{color:#b45309 !important;}
+:root.light #bf-devotional #devRef{color:#8a5200 !important;}
 :root.light #bf-devotional #devBody,
 :root.light #bf-devotional #devReflect,
-:root.light #bf-devotional #devPrayer{color:#374151 !important;}
+:root.light #bf-devotional #devPrayer{color:#4a4b52 !important;}
 
 /* Journey tab surfaces */
 :root.light #bf-journey div[style*="rgba(255,255,255,.03)"]{
   background:rgba(255,255,255,.7) !important;
   border-color:rgba(180,120,20,.22) !important;
 }
-:root.light #bf-journey .bf-sub-eye{color:#b45309 !important;}
+:root.light #bf-journey .bf-sub-eye{color:#8a5200 !important;}
 
 /* Memorize hero — was overridden to dark navy in F9. Now flips to
    parchment in light mode. */
@@ -4334,7 +4237,7 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
 :root.light #acQuizModal .md,
 :root.light #acCertModal .md{
   background:#ffffff !important;
-  border-color:#e5e7eb !important;
+  border-color:#d0d1d6 !important;
 }
 
 /* ─── P3 · Memorize verse text: Georgia italic (was plain Inter) ─── */
@@ -4699,20 +4602,20 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 
 :root.light #heroTodaysVerse{
   background:#ffffff !important;
-  border:1px solid #e5e7eb !important;
-  border-left:3px solid #b45309 !important;
+  border:1px solid #d0d1d6 !important;
+  border-left:3px solid #8a5200 !important;
 }
-:root.light #heroTodaysVerseText{ color:#1f2937 !important; }
+:root.light #heroTodaysVerseText{ color:#4a4b52 !important; }
 
 :root.light #heroReflectCard{
   background:#ffffff !important;
-  border-color:#e5e7eb !important;
+  border-color:#d0d1d6 !important;
 }
-:root.light #heroReflectBody #heroReflectStatus{ color:#6b7280 !important; }
+:root.light #heroReflectBody #heroReflectStatus{ color:#7a7b85 !important; }
 :root.light #heroReflectQuestion{
   background:#f3f4f6 !important;
-  color:#374151 !important;
-  border-left-color:#b45309 !important;
+  color:#4a4b52 !important;
+  border-left-color:#8a5200 !important;
 }
 :root.light #heroReflectResponse{
   background:#fff !important;
@@ -4768,7 +4671,7 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
   border-color:rgba(52,211,153,.35) !important;
 }
 :root.light #healthMoodCheckin > div:first-child{ color:#0f172a !important; }
-:root.light #healthMoodCheckin > div:nth-child(2){ color:#1f2937 !important; }
+:root.light #healthMoodCheckin > div:nth-child(2){ color:#4a4b52 !important; }
 :root.light #healthMoodCheckin button{ background:#fff !important; border-color:rgba(52,211,153,.35) !important; color:#0f172a !important; }
 :root.light #ht-sleep .card,
 :root.light #ht-mind .card,
@@ -4865,98 +4768,102 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 }
 
 /* ════════════════════════════════════════════════════════════
-   2026-05-15 — PROFESSIONAL LIGHT-MODE OVERHAUL.
-   The single biggest readability problem was gold text (#fbbf24)
-   on white. This block fixes that systematically + brings cards,
-   sidebars, modals, inputs, and bottom nav to a polished light
-   look. Section accent tokens stay (they read in both themes).
-   Order: token-driven surfaces first, then class overrides, then
-   attribute selectors for inline-styled gold/var(--tx) text.
+   LIGHT-MODE GRAY SYSTEM — all surfaces gray, not white.
+   Body #e8e9ec · Cards #f2f3f5 · Chrome #dfe0e4 · Inputs white.
+   Gold text → #8a5200. Generic blue → slate #5a5c6b.
+   Flashcards always dark (override in flashcard section above).
    ════════════════════════════════════════════════════════════ */
 
 /* ── Chrome surfaces ─────────────────────────────────────── */
 :root.light body{ background:var(--bg); }
-:root.light #sidebar{ background:#ffffff !important; border-right-color:#e5e7eb !important; }
+:root.light #sidebar{ background:#dfe0e4 !important; border-right-color:#c8c9ce !important; }
 :root.light #mBar{
-  background:#ffffff !important;
-  border-bottom-color:#e5e7eb !important;
-  box-shadow:0 1px 3px rgba(0,0,0,.06);
+  background:#dfe0e4 !important;
+  border-bottom-color:#c8c9ce !important;
+  box-shadow:0 1px 3px rgba(0,0,0,.08);
 }
-:root.light .mBar-title{ color:var(--c) !important; }
-:root.light .sh{ background:#f5f7fa !important; border-radius:10px; padding:.75rem 1rem; }
-:root.light .sh .st{ color:#111827 !important; }
-:root.light #topQuickBtns{ background:#ffffff !important; border-bottom-color:#e5e7eb !important; }
+:root.light .mBar-title{ color:#1a1b1e !important; }
+:root.light .sh{ background:#e4e5e8 !important; border-radius:10px; padding:.75rem 1rem; }
+:root.light .sh .st{ color:#1a1b1e !important; }
+:root.light #topQuickBtns{ background:#dfe0e4 !important; border-bottom-color:#c8c9ce !important; }
 
 /* ── Cards everywhere ────────────────────────────────────── */
 :root.light .card{
-  background:#ffffff !important;
-  border-color:#e5e7eb !important;
-  box-shadow:0 1px 3px rgba(0,0,0,.06) !important;
+  background:#f2f3f5 !important;
+  border-color:#d0d1d6 !important;
+  box-shadow:0 1px 4px rgba(0,0,0,.10) !important;
 }
-:root.light .card:hover{ background:#fafbfc !important; }
-
-/* ── Hero opener (Phase C) ───────────────────────────────── */
+:root.light .card:hover{ background:#edeef1 !important; }
+/* ── Hero opener ─────────────────────────────────────────── */
 :root.light #heroGreeting{
-  background:linear-gradient(135deg,rgba(56,189,248,.10),rgba(167,139,250,.06)) !important;
-  border-color:rgba(56,189,248,.25) !important;
-  box-shadow:0 1px 3px rgba(0,0,0,.06);
+  background:#f2f3f5 !important;
+  border-color:#d0d1d6 !important;
+  box-shadow:0 1px 4px rgba(0,0,0,.10);
 }
-:root.light #heroGreeting > div:first-child{ color:#111827 !important; }
-:root.light #heroGreeting > div:last-child{ color:#374151 !important; }
+:root.light #heroGreeting > div:first-child{ color:#1a1b1e !important; }
+:root.light #heroGreeting > div:last-child{ color:#4a4b52 !important; }
 :root.light #heroTodaysVerse{
-  background:#ffffff !important;
-  border:1px solid #e5e7eb !important;
-  border-left:3px solid #b45309 !important;
-  box-shadow:0 1px 3px rgba(0,0,0,.06);
+  background:#f2f3f5 !important;
+  border:1px solid #d0d1d6 !important;
+  border-left:3px solid #8a5200 !important;
+  box-shadow:0 1px 4px rgba(0,0,0,.10);
 }
-:root.light #heroTodaysVerseText{ color:#1f2937 !important; }
+:root.light #heroTodaysVerseText{ color:#4a4b52 !important; }
 :root.light #heroReflectCard{
-  background:#ffffff !important;
-  border-color:#e5e7eb !important;
+  background:#f2f3f5 !important;
+  border-color:#d0d1d6 !important;
 }
-:root.light #heroReflectBtn{ color:#b45309 !important; }
-:root.light #heroReflectQuestion{ background:#f3f4f6 !important; color:#374151 !important; border-left-color:#b45309 !important; }
-:root.light #heroReflectResponse{ background:#fff !important; border-color:rgba(0,0,0,.15) !important; color:#111827 !important; }
+:root.light #heroReflectBtn{ color:#8a5200 !important; }
+:root.light #heroReflectQuestion{ background:#e4e5e8 !important; color:#4a4b52 !important; border-left-color:#8a5200 !important; }
+:root.light #heroReflectResponse{ background:#ffffff !important; border-color:#c0c1c6 !important; color:#1a1b1e !important; }
 :root.light #heroQuickActions button{
-  background:#fff !important;
-  border-color:rgba(0,0,0,.10) !important;
-  box-shadow:0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
-  color:#111827 !important;
+  background:#f2f3f5 !important;
+  border-color:#d0d1d6 !important;
+  box-shadow:0 1px 4px rgba(0,0,0,.10);
+  color:#1a1b1e !important;
 }
-:root.light #heroQuickActions button > div:nth-child(2){ color:#111827 !important; }
-:root.light #heroQuickActions button > div:nth-child(3){ color:#374151 !important; }
-:root.light #heroQuickStats{ border-bottom-color:rgba(0,0,0,.08) !important; color:#374151 !important; }
-:root.light #heroQuickStats b{ color:#111827 !important; }
+:root.light #heroQuickActions button > div:nth-child(2){ color:#1a1b1e !important; }
+:root.light #heroQuickActions button > div:nth-child(3){ color:#4a4b52 !important; }
+:root.light #heroQuickStats{ border-bottom-color:#d0d1d6 !important; color:#4a4b52 !important; }
+:root.light #heroQuickStats b{ color:#1a1b1e !important; }
 
 /* ── Bottom tab bar ──────────────────────────────────────── */
 :root.light #bottomTabBar{
-  background:#ffffff !important;
-  border-top-color:#e5e7eb !important;
-  box-shadow:0 -2px 12px rgba(0,0,0,.06) !important;
+  background:#dfe0e4 !important;
+  border-top-color:#c8c9ce !important;
+  box-shadow:0 -1px 4px rgba(0,0,0,.08) !important;
 }
-:root.light #bottomTabBar .tab-btn{ color:#374151 !important; }
+:root.light #bottomTabBar .tab-btn{ color:#4a4b52 !important; }
 :root.light #bottomTabBar .tab-btn .tab-icon{ filter:none !important; }
 
 /* ── Tab landings (s-learn / s-life / s-me) ──────────────── */
 :root.light .tab-landing-card{
-  background:#ffffff !important;
-  border-color:rgba(0,0,0,.08) !important;
-  box-shadow:0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
-  color:#111827 !important;
+  background:#f2f3f5 !important;
+  border-color:#d0d1d6 !important;
+  box-shadow:0 1px 4px rgba(0,0,0,.10);
+  color:#1a1b1e !important;
 }
-:root.light .tab-landing-card .tlc-label{ color:#111827 !important; }
+:root.light .tab-landing-card .tlc-label{ color:#1a1b1e !important; }
 
-/* ── Faith stack — gold readability ──────────────────────── */
-:root.light .bf-eyebrow{ color:#b45309 !important; opacity:1 !important; }
-:root.light .bf-title{ color:#b45309 !important; }
-:root.light .bf-card{ background:#fff !important; border-color:rgba(0,0,0,.08) !important; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+/* ── Misc surfaces ───────────────────────────────────────── */
+:root.light .well-card{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; box-shadow:0 1px 4px rgba(0,0,0,.10) !important; }
+:root.light .ja-card{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; }
+:root.light .sk-q-opt-btn{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; color:#1a1b1e !important; }
+:root.light .gv-tl-card{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; }
+:root.light .cv-card{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; }
+:root.light .dcard{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; }
+
+/* ── Faith stack — amber readability ─────────────────────── */
+:root.light .bf-eyebrow{ color:#8a5200 !important; opacity:1 !important; }
+:root.light .bf-title{ color:#8a5200 !important; }
+:root.light .bf-card{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; box-shadow:0 1px 4px rgba(0,0,0,.10); }
 :root.light .scrTabs .tab.active,
-:root.light .scrTabs-bottom .tab.active{ color:#b45309 !important; }
-:root.light #s-scripture .sh .st{ color:#b45309 !important; }
+:root.light .scrTabs-bottom .tab.active{ color:#8a5200 !important; }
+:root.light #s-scripture .sh .st{ color:#8a5200 !important; }
 :root.light #s-scripture > div[onclick*="openAskBible"]{
-  background:linear-gradient(135deg,rgba(67,56,202,.10),rgba(20,184,166,.05)) !important;
-  border-color:rgba(55,48,163,.30) !important;
-  box-shadow:0 1px 3px rgba(0,0,0,.06);
+  background:#f2f3f5 !important;
+  border-color:#d0d1d6 !important;
+  box-shadow:0 1px 4px rgba(0,0,0,.10);
 }
 
 /* ── Phase C-Health ──────────────────────────────────────── */
@@ -4964,10 +4871,10 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
   background:linear-gradient(135deg,rgba(52,211,153,.10),rgba(34,197,94,.06)) !important;
   border-color:rgba(22,101,52,.25) !important;
 }
-:root.light #healthMoodCheckin > div:first-child{ color:#111827 !important; }
-:root.light #healthMoodCheckin > div:nth-child(2){ color:#374151 !important; }
-:root.light #healthMoodCheckin button{ background:#fff !important; border-color:rgba(22,101,52,.25) !important; color:#111827 !important; }
-:root.light .phq2-opt{ background:#fff !important; border-color:rgba(22,101,52,.25) !important; color:#111827 !important; }
+:root.light #healthMoodCheckin > div:first-child{ color:#1a1b1e !important; }
+:root.light #healthMoodCheckin > div:nth-child(2){ color:#4a4b52 !important; }
+:root.light #healthMoodCheckin button{ background:#f2f3f5 !important; border-color:rgba(22,101,52,.25) !important; color:#1a1b1e !important; }
+:root.light .phq2-opt{ background:#f2f3f5 !important; border-color:rgba(22,101,52,.25) !important; color:#1a1b1e !important; }
 
 /* ── Phase C-Finance ─────────────────────────────────────── */
 :root.light .finance-summary-opener{
@@ -4975,103 +4882,98 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
   border-color:rgba(20,83,45,.30) !important;
 }
 :root.light .finance-summary-opener > div:first-child{ color:#14532d !important; }
-:root.light #finSumBalance, :root.light #finSumMonthSpend{ color:#111827 !important; }
+:root.light #finSumBalance, :root.light #finSumMonthSpend{ color:#1a1b1e !important; }
 :root.light #finSumSavPct{ color:#14532d !important; }
-:root.light #spendingDonut text[fill="var(--tx)"]{ fill:#111827 !important; }
-:root.light #spendingDonut text[fill="var(--tx2)"]{ fill:#374151 !important; }
-:root.light #paySimOutput > div{ background:#ffffff !important; border-color:rgba(0,0,0,.10) !important; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+:root.light #spendingDonut text[fill="var(--tx)"]{ fill:#1a1b1e !important; }
+:root.light #spendingDonut text[fill="var(--tx2)"]{ fill:#4a4b52 !important; }
+:root.light #paySimOutput > div{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; box-shadow:0 1px 4px rgba(0,0,0,.10); }
 
 /* ── Phase C-Goals ───────────────────────────────────────── */
 :root.light .gv-goal-card{
-  background:#ffffff !important;
-  border-color:rgba(0,0,0,.08) !important;
-  box-shadow:0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+  background:#f2f3f5 !important;
+  border-color:#d0d1d6 !important;
+  box-shadow:0 1px 4px rgba(0,0,0,.10);
 }
-:root.light .gv-goal-card .gv-goal-text{ color:#111827 !important; }
-:root.light .gv-goal-card svg text{ fill:#111827 !important; }
+:root.light .gv-goal-card .gv-goal-text{ color:#1a1b1e !important; }
+:root.light .gv-goal-card svg text{ fill:#1a1b1e !important; }
 
 /* ── Phase F — AI surfaces ───────────────────────────────── */
-:root.light #st-aiTutor .card{ background:#fff !important; }
-:root.light #apOutput > div{ background:#fff !important; border-color:rgba(0,0,0,.10) !important; color:#111827 !important; box-shadow:0 1px 3px rgba(0,0,0,.06); }
-:root.light .ap-mode-btn{ background:#fff !important; border-color:rgba(3,105,161,.25) !important; color:#374151 !important; }
+:root.light #st-aiTutor .card{ background:#f2f3f5 !important; }
+:root.light #apOutput > div{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; color:#1a1b1e !important; box-shadow:0 1px 4px rgba(0,0,0,.10); }
+:root.light .ap-mode-btn{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; color:#4a4b52 !important; }
 :root.light .ap-mode-btn[style*="background:rgba(56,189,248,.18)"]{
-  background:rgba(3,105,161,.14) !important; border-color:#0369a1 !important; color:#111827 !important;
+  background:rgba(90,92,107,.15) !important; border-color:#5a5c6b !important; color:#1a1b1e !important;
 }
-:root.light #goalSuggestModal .md{ background:#ffffff !important; box-shadow:0 20px 60px rgba(0,0,0,.15) !important; }
-:root.light #gsList > div{ background:#ffffff !important; border-color:rgba(154,52,18,.30) !important; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+:root.light #goalSuggestModal .md{ background:#f2f3f5 !important; box-shadow:0 20px 60px rgba(0,0,0,.18) !important; }
+:root.light #gsList > div{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; box-shadow:0 1px 4px rgba(0,0,0,.10); }
 
 /* ── Phase E — onboarding overlay ────────────────────────── */
-:root.light #onboardingOverlay{ background:#ffffff !important; }
-:root.light #onboardingOverlay h2{ color:#111827 !important; }
-:root.light #onboardingOverlay .onb-sub{ color:#374151 !important; }
-:root.light #onboardingOverlay .onb-step > div[style*="font-family:var(--fh)"]{ color:#111827 !important; }
+:root.light #onboardingOverlay{ background:#e8e9ec !important; }
+:root.light #onboardingOverlay h2{ color:#1a1b1e !important; }
+:root.light #onboardingOverlay .onb-sub{ color:#4a4b52 !important; }
+:root.light #onboardingOverlay .onb-step > div[style*="font-family:var(--fh)"]{ color:#1a1b1e !important; }
 :root.light #onboardingOverlay .onb-card{
-  background:#fff !important; border-color:rgba(0,0,0,.12) !important;
-  box-shadow:0 1px 3px rgba(0,0,0,.06);
+  background:#f2f3f5 !important; border-color:#d0d1d6 !important;
+  box-shadow:0 1px 4px rgba(0,0,0,.10);
 }
-:root.light #onboardingOverlay .onb-card .onb-label{ color:#111827 !important; }
-:root.light #onboardingOverlay .onb-card .onb-cap{ color:#374151 !important; }
-:root.light #onboardingOverlay .onb-card.selected{ box-shadow:0 6px 20px rgba(146,64,14,.18); border-color:#b45309 !important; }
-:root.light #onboardingOverlay .onb-tile{ background:#fff !important; border-color:rgba(0,0,0,.12) !important; }
-:root.light #onboardingOverlay .onb-tile .onb-tile-label{ color:#111827 !important; }
-:root.light #onboardingOverlay .onb-toggle-row{ background:#fff !important; border-color:rgba(0,0,0,.10) !important; }
-:root.light #onboardingOverlay .onb-toggle-row .onb-toggle-label{ color:#111827 !important; }
-:root.light #onboardingOverlay .onb-toggle-row .onb-toggle-cap{ color:#6b7280 !important; }
-:root.light #onboardingOverlay input[type=text]{ background:#fff !important; border-color:#d1d5db !important; color:#111827 !important; }
-:root.light #onboardingOverlay .onb-yesno{ background:rgba(0,0,0,.06) !important; }
-:root.light #onboardingOverlay .onb-yesno button{ color:#374151 !important; }
-:root.light #onboardingOverlay .onb-yesno button.active{ background:#b45309 !important; color:#fff !important; }
-:root.light #onboardingOverlay .onb-dot{ background:rgba(0,0,0,.18) !important; }
-:root.light #onboardingOverlay .onb-dot.active{ background:#b45309 !important; }
-:root.light #onboardingOverlay .onb-dot.done{ background:rgba(146,64,14,.55) !important; }
-:root.light #onboardingOverlay .onb-back{ background:rgba(0,0,0,.05) !important; border-color:rgba(0,0,0,.14) !important; color:#111827 !important; }
-:root.light #onboardingOverlay .onb-primary{ background:linear-gradient(135deg,#f59e0b,#ea580c) !important; box-shadow:0 8px 24px rgba(146,64,14,.22) !important; color:#ffffff !important; }
+:root.light #onboardingOverlay .onb-card .onb-label{ color:#1a1b1e !important; }
+:root.light #onboardingOverlay .onb-card .onb-cap{ color:#4a4b52 !important; }
+:root.light #onboardingOverlay .onb-card.selected{ box-shadow:0 6px 20px rgba(138,82,0,.18); border-color:#8a5200 !important; }
+:root.light #onboardingOverlay .onb-tile{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; }
+:root.light #onboardingOverlay .onb-tile .onb-tile-label{ color:#1a1b1e !important; }
+:root.light #onboardingOverlay .onb-toggle-row{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; }
+:root.light #onboardingOverlay .onb-toggle-row .onb-toggle-label{ color:#1a1b1e !important; }
+:root.light #onboardingOverlay .onb-toggle-row .onb-toggle-cap{ color:#7a7b85 !important; }
+:root.light #onboardingOverlay input[type=text]{ background:#ffffff !important; border-color:#c0c1c6 !important; color:#1a1b1e !important; }
+:root.light #onboardingOverlay .onb-yesno{ background:rgba(0,0,0,.08) !important; }
+:root.light #onboardingOverlay .onb-yesno button{ color:#4a4b52 !important; }
+:root.light #onboardingOverlay .onb-yesno button.active{ background:#8a5200 !important; color:#fff !important; }
+:root.light #onboardingOverlay .onb-dot{ background:rgba(0,0,0,.20) !important; }
+:root.light #onboardingOverlay .onb-dot.active{ background:#8a5200 !important; }
+:root.light #onboardingOverlay .onb-dot.done{ background:rgba(138,82,0,.55) !important; }
+:root.light #onboardingOverlay .onb-back{ background:rgba(0,0,0,.06) !important; border-color:rgba(0,0,0,.15) !important; color:#1a1b1e !important; }
+:root.light #onboardingOverlay .onb-primary{ background:linear-gradient(135deg,#f59e0b,#ea580c) !important; box-shadow:0 8px 24px rgba(138,82,0,.22) !important; color:#ffffff !important; }
 
 /* ── Modals (.mo / .md) ──────────────────────────────────── */
-:root.light .mo{ background:rgba(0,0,0,.5) !important; }
+:root.light .mo{ background:rgba(0,0,0,.55) !important; }
 :root.light .md{
-  background:#ffffff !important;
-  border-color:rgba(0,0,0,.08) !important;
-  box-shadow:0 20px 60px rgba(0,0,0,.15) !important;
+  background:#f2f3f5 !important;
+  border-color:#d0d1d6 !important;
+  box-shadow:0 20px 60px rgba(0,0,0,.18) !important;
 }
-:root.light .mdt{ color:#111827 !important; }
-:root.light .md label{ color:#374151 !important; }
+:root.light .mdt{ color:#1a1b1e !important; }
+:root.light .md label{ color:#4a4b52 !important; }
 
 /* ── Inputs ──────────────────────────────────────────────── */
 :root.light input, :root.light textarea, :root.light select{
   background:#ffffff !important;
-  border-color:#d1d5db !important;
-  color:#111827 !important;
+  border-color:#c0c1c6 !important;
+  color:#1a1b1e !important;
 }
-:root.light input::placeholder, :root.light textarea::placeholder{ color:#9ca3af !important; }
+:root.light input::placeholder, :root.light textarea::placeholder{ color:#7a7b85 !important; }
 
-/* ── GOLD-TEXT INVISIBILITY FIX ──────────────────────────────
-   Inline styles using gold #fbbf24/#f5c842/#fde68a/#fef3c7 as TEXT
-   color on a white surface become invisible. Remap to dark amber
-   #b45309 via attribute selectors. Excludes button + a so branded
-   button text stays branded; excludes elements with style declaring
-   a background-color on the same element (those are colored chips
-   where the gold is the surface, not the text). */
+/* ── GOLD-TEXT → DARK AMBER #8a5200 ─────────────────────────
+   Inline gold on gray surfaces would be illegible. All gold/amber
+   text remapped to dark amber that reads on #f2f3f5 / #e8e9ec. */
 :root.light *[style*="color:#fbbf24"]:not(button):not(a):not([style*="background:#fbbf24"]):not([style*="background:linear-gradient"]){
-  color:#b45309 !important;
+  color:#8a5200 !important;
 }
-:root.light *[style*="color:#f5c842"]:not(button):not(a){ color:#b45309 !important; }
-:root.light *[style*="color:#fde68a"]:not(button):not(a){ color:#b45309 !important; }
-:root.light *[style*="color:#fef3c7"]:not(button):not(a){ color:#b45309 !important; }
-:root.light *[style*="color:var(--g)"]:not(button):not(a){ color:#b45309 !important; }
-:root.light *[style*="color:var(--gold)"]:not(button):not(a){ color:#b45309 !important; }
+:root.light *[style*="color:#f5c842"]:not(button):not(a){ color:#8a5200 !important; }
+:root.light *[style*="color:#fde68a"]:not(button):not(a){ color:#8a5200 !important; }
+:root.light *[style*="color:#fef3c7"]:not(button):not(a){ color:#8a5200 !important; }
+:root.light *[style*="color:var(--g)"]:not(button):not(a){ color:#8a5200 !important; }
+:root.light *[style*="color:var(--gold)"]:not(button):not(a){ color:#8a5200 !important; }
 
-/* var(--accent) indigo as text → darker indigo in light mode. */
+/* var(--accent) indigo → darker indigo. */
 :root.light *[style*="color:var(--accent"]:not(button):not(a){ color:#3730a3 !important; }
 
-/* var(--c) sky as text → darker sky in light mode (only when used
-   on white-ish backgrounds, i.e. as plain text not a bg accent). */
+/* var(--c) now slate in light mode via token — belt-and-suspenders for inline styles. */
 :root.light *[style*="color:var(--c);"]:not(button):not(a):not([style*="background:var(--c)"]){
-  color:#0369a1 !important;
+  color:#5a5c6b !important;
 }
 
-/* Section accents as text — darken roughly 20% so they read on white. */
-:root.light *[style*="color:var(--section-daily-life)"]:not(button):not(a){ color:#b45309 !important; }
+/* Section accents as text — darken so they read on gray. */
+:root.light *[style*="color:var(--section-daily-life)"]:not(button):not(a){ color:#8a5200 !important; }
 :root.light *[style*="color:var(--section-school)"]:not(button):not(a){ color:#075985 !important; }
 :root.light *[style*="color:var(--section-health)"]:not(button):not(a){ color:#047857 !important; }
 :root.light *[style*="color:var(--section-finance)"]:not(button):not(a){ color:#15803d !important; }
@@ -5079,88 +4981,57 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 :root.light *[style*="color:var(--section-journal)"]:not(button):not(a){ color:#7c3aed !important; }
 :root.light *[style*="color:var(--section-sports)"]:not(button):not(a){ color:#991b1b !important; }
 
-/* Generic text remap — keep dark text readable on light surfaces. */
-:root.light *[style*="color:var(--tx);"]:not(button):not(a){ color:#111827 !important; }
-:root.light *[style*="color:var(--tx2)"]:not(button):not(a){ color:#374151 !important; }
-:root.light *[style*="color:var(--tx3)"]:not(button):not(a){ color:#6b7280 !important; }
-:root.light *[style*="color:#c8d4e8"]:not(button):not(a){ color:#374151 !important; }
-:root.light *[style*="color:rgba(255,255,255"]:not(button):not(a){ color:#111827 !important; }
+/* Generic text remap. */
+:root.light *[style*="color:var(--tx);"]:not(button):not(a){ color:#1a1b1e !important; }
+:root.light *[style*="color:var(--tx2)"]:not(button):not(a){ color:#4a4b52 !important; }
+:root.light *[style*="color:var(--tx3)"]:not(button):not(a){ color:#7a7b85 !important; }
+:root.light *[style*="color:#c8d4e8"]:not(button):not(a){ color:#4a4b52 !important; }
+:root.light *[style*="color:rgba(255,255,255"]:not(button):not(a){ color:#1a1b1e !important; }
 
-/* Inline rgba(255,255,255,X) backgrounds + borders → light equivalents.
-   Excludes buttons (branded), elements that are clearly chips/pills
-   (small radius, gradient bg) handled via .selected/.active classes. */
+/* Inline rgba(255,255,255,X) backgrounds → gray equivalents. */
 :root.light *[style*="background:rgba(255,255,255,.04)"]:not(button):not(.tab){
-  background:rgba(0,0,0,.04) !important;
+  background:rgba(0,0,0,.05) !important;
 }
 :root.light *[style*="background:rgba(255,255,255,.06)"]:not(button):not(.tab){
-  background:rgba(0,0,0,.04) !important;
+  background:rgba(0,0,0,.05) !important;
 }
 :root.light *[style*="background:rgba(255,255,255,.08)"]:not(button):not(.tab){
-  background:rgba(0,0,0,.06) !important;
+  background:rgba(0,0,0,.07) !important;
 }
 :root.light *[style*="background:rgba(255,255,255,.1)"]:not(button):not(.tab){
-  background:rgba(0,0,0,.06) !important;
+  background:rgba(0,0,0,.07) !important;
 }
 :root.light *[style*="border:1px solid rgba(255,255,255"]{
-  border-color:rgba(0,0,0,.10) !important;
+  border-color:rgba(0,0,0,.12) !important;
 }
 :root.light *[style*="border-color:rgba(255,255,255"]{
-  border-color:rgba(0,0,0,.10) !important;
+  border-color:rgba(0,0,0,.12) !important;
 }
 
-/* ── Gold-text gaps caught in the post-overhaul audit ──────────
-   These are class-applied gold colors that bypass the inline-style
-   attribute selectors above. */
-
-/* .bf-title uses -webkit-text-fill-color:transparent to clip a gradient
-   onto text — `color:#b45309` alone can't override the gradient on
-   WebKit/Blink. Unset the clip and set the fill color explicitly. */
+/* .bf-title gradient clip — must unset -webkit-text-fill-color too */
 :root.light .bf-title{
   background:none !important;
   -webkit-background-clip:initial !important;
   background-clip:initial !important;
-  -webkit-text-fill-color:#b45309 !important;
-  color:#b45309 !important;
+  -webkit-text-fill-color:#8a5200 !important;
+  color:#8a5200 !important;
 }
-
-/* .ob-tip kid-onboarding wizard tips set color:#fde68a at the class
-   level — inline attribute selectors don't catch class-set colors. */
-:root.light .ob-tip{ color:#b45309 !important; }
-
-/* .hero-greet / .hero-name from the legacy heroCard. heroCard is now
-   hidden (display:none !important) so this is mostly defensive, but
-   ensures the markup stays readable if anything ever un-hides it. */
+:root.light .ob-tip{ color:#8a5200 !important; }
 :root.light .hero-greet,
-:root.light .hero-name{ color:#111827 !important; }
-
-/* Daily devotional modal — body text uses rgba(254,243,199,.92) which
-   doesn't match any rgba(255,255,255,...) attribute selector. The
-   modal renders against a dark gradient bg even in light mode (it's
-   an overlay), so its text stays cream — but if a future change
-   flips the bg to light, this rescue kicks in. */
+:root.light .hero-name{ color:#1a1b1e !important; }
 :root.light #ddmBody,
 :root.light #ddmReflect,
-:root.light #ddmPrayer{ color:#1f2937 !important; }
-
-/* Belt-and-suspenders: any element using a gold-toned text class
-   pattern that we might have missed (faith-themed gold-on-dark
-   classes commonly written as .gold-*, .amber-*, .bf-gold, etc.). */
+:root.light #ddmPrayer{ color:#4a4b52 !important; }
 :root.light .bf-gold,
-:root.light [class*="gold-text"]{ color:#b45309 !important; }
-
-/* 2026-05-14 — Inline gold text colors used in faith / verse / Phase F
-   reflection UI (#fbbf24 amber, #f5c842 alt amber, var(--gold)). They
-   are readable on the dark shell but vanish on the white light-mode
-   background. Force them all to a deep amber (#b45309) that retains
-   the "gold accent" feel while passing WCAG on white. */
+:root.light [class*="gold-text"]{ color:#8a5200 !important; }
 :root.light [style*="color:#fbbf24"],
 :root.light [style*="color: #fbbf24"],
 :root.light [style*="color:#f5c842"],
 :root.light [style*="color: #f5c842"],
 :root.light [style*="color:var(--gold)"],
 :root.light [style*="color: var(--gold)"]{
-  color:#b45309 !important;
+  color:#8a5200 !important;
 }
-:root.light [style*="color:rgba(251,191,36"]{ color:#b45309 !important; }
-:root.light [style*="color:rgba(245,200,66"]{ color:#b45309 !important; }
+:root.light [style*="color:rgba(251,191,36"]{ color:#8a5200 !important; }
+:root.light [style*="color:rgba(245,200,66"]{ color:#8a5200 !important; }
 
