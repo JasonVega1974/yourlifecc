@@ -1509,6 +1509,13 @@ function tgInitAll(){
 // in the DOM, swap the src. For Life Skills card_ids (sk-<key>), also
 // mutate SK_CAT_PHOTOS so subsequent buildSkillsGrid() re-renders pick
 // up the override (the dynamic template reads SK_CAT_PHOTOS each call).
+// Map of academy lesson card_id -> override URL, populated by
+// loadCardPhotoOverrides() and read by _acLessonPhoto() in faith.js.
+// Lives on window so it survives the renderFeaturedAcademy() boundary.
+if (typeof window !== 'undefined' && !window.ACADEMY_PHOTO_OVERRIDES){
+  window.ACADEMY_PHOTO_OVERRIDES = {};
+}
+
 async function loadCardPhotoOverrides(){
   try {
     const resp = await fetch('/api/admin-card-photo', { method:'GET' });
@@ -1517,6 +1524,7 @@ async function loadCardPhotoOverrides(){
     const overrides = (data && data.overrides) || {};
     let appliedDom = 0;
     let appliedSk  = 0;
+    let appliedAc  = 0;
     Object.keys(overrides).forEach(cardId => {
       const url = overrides[cardId];
       if(!url) return;
@@ -1536,10 +1544,25 @@ async function loadCardPhotoOverrides(){
           appliedSk++;
         }
       }
+      // Faith Academy: store per-lesson override so the card grid + lesson
+      // modal can swap the category photo for a custom one. Keys look like
+      // "academy-creation-doctrine" → lessonId "creation-doctrine".
+      if(cardId.indexOf('academy-') === 0 && typeof window !== 'undefined'){
+        const lessonId = cardId.slice('academy-'.length);
+        if(window.ACADEMY_PHOTO_OVERRIDES[lessonId] !== url){
+          window.ACADEMY_PHOTO_OVERRIDES[lessonId] = url;
+          appliedAc++;
+        }
+      }
     });
     // If any skills overrides changed, re-render the grid (cheap, idempotent).
     if(appliedSk > 0 && typeof buildSkillsGrid === 'function'){
       try { buildSkillsGrid(); } catch(e){}
+    }
+    // If any academy overrides arrived after the featured grid rendered,
+    // re-render so the new photos show without a page reload.
+    if(appliedAc > 0 && typeof renderFeaturedAcademy === 'function'){
+      try { renderFeaturedAcademy(); } catch(e){}
     }
   } catch(e){
     // Fail silently — overrides are non-essential. The base photo set

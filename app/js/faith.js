@@ -5175,6 +5175,17 @@ function _acCatPhotos(){
     'bible-study':      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Aleppo_Codex_%28Deut%29.jpg/1280px-Aleppo_Codex_%28Deut%29.jpg',
   };
 }
+// Per-lesson photo resolver. Honors the admin override map populated by
+// loadCardPhotoOverrides() in ui.js (window.ACADEMY_PHOTO_OVERRIDES,
+// keyed by lessonId — admin row id is 'academy-' + lessonId) and falls
+// back to the shared category photo when no override exists.
+function _acLessonPhoto(lesson){
+  if(!lesson) return '';
+  const ov = (typeof window !== 'undefined' && window.ACADEMY_PHOTO_OVERRIDES) || {};
+  if(ov[lesson.id]) return ov[lesson.id];
+  const photos = _acCatPhotos();
+  return photos[lesson.category] || '';
+}
 // Active filter for the academy grid. 'all' or a category key. Mutated by acFilter().
 let _acActiveFilter = 'all';
 function _acFeaturedById(id){ return _acFeatured().find(l => l && l.id === id) || null; }
@@ -5208,7 +5219,8 @@ function renderFeaturedAcademy(){
     const cat = cats[l.category] || { label:'Lesson', color:'#fbbf24', soft:'rgba(251,191,36,', icon:'📖' };
     const prog = _acLessonProgress(l.id);
     const done = prog && prog.passed;
-    const photoUrl = photos[l.category] || '';
+    // Admin override beats the per-category photo (honors admin_card_photos row).
+    const photoUrl = _acLessonPhoto(l) || photos[l.category] || '';
     const progPct = done ? 100 : (prog && prog.total ? Math.round(prog.score / prog.total * 100) : 0);
     const progHtml = (prog && !done && prog.total)
       ? '<div class="ac-card-progress"><div class="ac-card-progress-bar" style="width:' + progPct + '%;background:' + cat.color + ';"></div></div>'
@@ -5259,8 +5271,8 @@ function openLessonModal(lessonId){
   if(!lesson){ if(typeof showToast === 'function') showToast('Lesson not found'); return; }
   const cats = _acCats();
   const cat = cats[lesson.category] || { label:'Lesson', color:'#fbbf24', icon:'📖' };
-  const photos = _acCatPhotos();
-  const photoUrl = photos[lesson.category] || '';
+  // Admin override (per-lesson) wins over the shared category photo.
+  const photoUrl = _acLessonPhoto(lesson);
 
   // Photo header: set the category photo on .lm-svg. Drives the category-color
   // CSS var used by .lm-cat (border + text color).

@@ -557,6 +557,10 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 <!-- Toast for photo manager save feedback -->
 <div class="pm-toast" id="pmToast"></div>
 
+<!-- Data scripts: load BEFORE the inline admin script so PM_INVENTORY can
+     read ACADEMY_LESSONS to expand its dynamic Faith Academy rows. -->
+<script src="/app/js/data/academy-lessons.js"></script>
+
 <script>
 const EDGE_URL    = 'https://hrohgwcbfgywkpnvqxhk.supabase.co/functions/v1/admin-data';
 const ADMIN_TOKEN = 'ylcc-admin-2729';
@@ -1383,11 +1387,20 @@ async function approveWaitlist(id, btn){
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   PHOTO MANAGER — Admin tab for editing the 81 card hero images.
+   PHOTO MANAGER — Admin tab for editing the card hero images.
    Reads override URLs from /api/admin-card-photo (GET, public).
    Writes via the same endpoint (POST). HMAC + ADMIN_PHOTO_SECRET
    requirement removed 2026-05-14 — the Supabase service key on the
    server side is the real security gate.
+
+   TO ADD A NEW SECTION: push entries to PM_INVENTORY with
+       { id, section, title, defaultUrl }
+   The `id` must match what loadCardPhotoOverrides() in app/js/ui.js
+   uses to look up rows in the admin_card_photos table — keep it
+   stable across the admin row and the live render call site.
+   For dynamic per-record sections (academy lessons, plans, story
+   chapters), define the static block first, then extend the array
+   AFTER it — see the Faith Academy loop below for the pattern.
 ══════════════════════════════════════════════════════════════════ */
 const PM_INVENTORY = [
   // ── Bible & Faith (12) ──
@@ -1488,7 +1501,32 @@ const PM_INVENTORY = [
   {id:'sk-entrepreneur',  section:'Life Skills', title:'Entrepreneurship Basics',       defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/d/d7/Small_Businesses_-_geograph.org.uk_-_682645.jpg'},
 ];
 
-const PM_SECTION_ORDER = ['Bible & Faith','Life Skills','School','Money Manager','Health & Wellness','Driving','Sports','Resume / Jobs'];
+// Dynamic Faith Academy lessons — one admin row per featured lesson so the
+// per-lesson modal photo (Hagia Sofia for theology, etc.) can be overridden
+// individually. The `id` here mirrors what _acLessonPhoto() / openLessonModal()
+// reads at render time in app/js/faith.js. Loads from window.ACADEMY_LESSONS
+// which is provided by /app/js/data/academy-lessons.js (loaded above the
+// inline script tag).
+const PM_ACADEMY_CAT_PHOTOS = {
+  'theology':         'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Interior_of_Hagia_Sofia.JPG/1280px-Interior_of_Hagia_Sofia.JPG',
+  'church-history':   'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Baptistery_wall_painting_Good_Shepherd_and_Adam_and_Eve.jpg/1280px-Baptistery_wall_painting_Good_Shepherd_and_Adam_and_Eve.jpg',
+  'christian-living': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Holy_Land_2016_P0129_Olive_trees_in_Gethsemane.jpg/1280px-Holy_Land_2016_P0129_Olive_trees_in_Gethsemane.jpg',
+  'apologetics':      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Areopagus_from_the_Acropolis.jpg/1280px-Areopagus_from_the_Acropolis.jpg',
+  'bible-study':      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Aleppo_Codex_%28Deut%29.jpg/1280px-Aleppo_Codex_%28Deut%29.jpg',
+};
+if (typeof ACADEMY_LESSONS !== 'undefined' && Array.isArray(ACADEMY_LESSONS)) {
+  ACADEMY_LESSONS.forEach(function(lesson){
+    if (!lesson || !lesson.id) return;
+    PM_INVENTORY.push({
+      id:         'academy-' + lesson.id,
+      section:    'Faith Academy',
+      title:      lesson.title || ('Lesson — ' + lesson.id),
+      defaultUrl: PM_ACADEMY_CAT_PHOTOS[lesson.category] || '',
+    });
+  });
+}
+
+const PM_SECTION_ORDER = ['Bible & Faith','Faith Academy','Life Skills','School','Money Manager','Health & Wellness','Driving','Sports','Resume / Jobs'];
 let PM_OVERRIDES = {};
 let PM_INITED    = false;
 
