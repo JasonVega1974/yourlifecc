@@ -5115,7 +5115,20 @@ function openAcademyLesson(courseId, lessonId){
   document.getElementById('charIcon').textContent  = mod.icon;
   document.getElementById('charTitle').textContent = lesson.title;
   document.getElementById('charSub').textContent   = course.title + ' · ' + (lesson.duration || '');
-  document.getElementById('charModalHeader').style.background = 'linear-gradient(135deg,#38bdf8,'+mod.color+')';
+  const _acModPhotoMap = {
+    'foundations':  'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Jerusalem-2013%282%29-Aerial-Temple_Mount-%28south_exposure%29.jpg/1280px-Jerusalem-2013%282%29-Aerial-Temple_Mount-%28south_exposure%29.jpg',
+    'bible-survey': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Gutenberg_Bible%2C_Lenox_Copy%2C_New_York_Public_Library%2C_2009._Pic_01.jpg/1280px-Gutenberg_Bible%2C_Lenox_Copy%2C_New_York_Public_Library%2C_2009._Pic_01.jpg',
+    'life-skills':  'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Kinneret_cropped.jpg/1280px-Kinneret_cropped.jpg',
+    'topical':      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Mount_Sinai_from_the_southwest.jpg/1280px-Mount_Sinai_from_the_southwest.jpg',
+    'families':     'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Church_of_the_Holy_Sepulchre_by_Gerd_Eichmann_%28cropped%29.jpg/1280px-Church_of_the_Holy_Sepulchre_by_Gerd_Eichmann_%28cropped%29.jpg',
+  };
+  const _acModPhoto = _acModPhotoMap[mod.id];
+  const _acHdrEl = document.getElementById('charModalHeader');
+  if (_acModPhoto) {
+    _acHdrEl.style.background = 'linear-gradient(rgba(0,0,0,.42),rgba(0,0,0,.66)),url("' + _acModPhoto + '") center/cover no-repeat';
+  } else {
+    _acHdrEl.style.background = 'linear-gradient(135deg,#38bdf8,' + mod.color + ')';
+  }
   const refsHtml = (lesson.scriptureRefs && lesson.scriptureRefs.length)
     ? '<div style="background:rgba(167,139,250,.05);border-left:3px solid #a78bfa;border-radius:0 8px 8px 0;padding:.6rem .8rem;margin-top:1rem;font-size:.75rem;color:var(--tx2);"><strong style="color:#a78bfa;">📖 Scripture:</strong> ' + lesson.scriptureRefs.map(r => escapeHtml(r)).join(', ') + '</div>'
     : '';

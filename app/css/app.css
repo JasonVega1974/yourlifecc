@@ -5114,3 +5114,63 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
   -webkit-text-fill-color:#8a5200 !important;
 }
 
+/* ── Faith Academy featured lesson modal light mode ─────────── */
+:root.light #lessonModal .md{
+  background:#f2f3f5 !important;
+  border-color:#d0d1d6 !important;
+}
+:root.light #lessonModal .lm-svg::after{
+  background:linear-gradient(180deg,transparent 0%,rgba(242,243,245,.92) 100%) !important;
+}
+:root.light #lessonModal .lm-close{
+  background:rgba(0,0,0,.12) !important;
+  border-color:rgba(138,82,0,.35) !important;
+  color:#1a1b1e !important;
+}
+:root.light #lessonModal .lm-hdr{ border-bottom-color:#d0d1d6 !important; }
+:root.light #lessonModal .lm-eye{ color:#8a5200 !important; opacity:1 !important; }
+:root.light #lessonModal .lm-title{
+  background:none !important;
+  -webkit-background-clip:initial !important;
+  background-clip:initial !important;
+  -webkit-text-fill-color:#1a1b1e !important;
+  color:#1a1b1e !important;
+  text-shadow:none !important;
+}
+:root.light #lessonModal .lm-sub{ color:#4a4b52 !important; opacity:1 !important; }
+:root.light #lessonModal .lm-section h4{ color:#8a5200 !important; }
+:root.light #lessonModal .lm-section p{ color:#1a1b1e !important; }
+:root.light #lessonModal .lm-keyverse{
+  background:rgba(138,82,0,.06) !important;
+  border-color:rgba(138,82,0,.22) !important;
+  border-left-color:#8a5200 !important;
+}
+:root.light #lessonModal .lm-keyverse-text{ color:#1a1b1e !important; }
+:root.light #lessonModal .lm-keyverse-ref{ color:#8a5200 !important; }
+:root.light #lessonModal .lm-callout{
+  background:rgba(138,82,0,.07) !important;
+  border-color:rgba(138,82,0,.28) !important;
+  border-left-color:#8a5200 !important;
+}
+:root.light #lessonModal .lm-callout-eye{ color:#8a5200 !important; }
+:root.light #lessonModal .lm-callout p{ color:#1a1b1e !important; }
+:root.light #lessonModal .lm-quiz-progress{ color:#8a5200 !important; opacity:1 !important; }
+:root.light #lessonModal .lm-quiz-q{ color:#1a1b1e !important; }
+:root.light #lessonModal .lm-quiz-opt{
+  background:rgba(0,0,0,.05) !important;
+  border-color:#c0c1c6 !important;
+  color:#1a1b1e !important;
+}
+:root.light #lessonModal .lm-quiz-opt:hover:not(:disabled){
+  background:rgba(0,0,0,.09) !important;
+  border-color:rgba(138,82,0,.55) !important;
+  box-shadow:none !important;
+}
+:root.light #lessonModal .lm-quiz-feedback{
+  background:rgba(0,0,0,.04) !important;
+  border-color:#d0d1d6 !important;
+  color:#1a1b1e !important;
+}
+:root.light #lessonModal .lm-quiz-result-title{ color:#8a5200 !important; text-shadow:none !important; }
+:root.light #lessonModal .lm-quiz-result-score{ color:#8a5200 !important; }
+:root.light #lessonModal .lm-quiz-star.empty{ color:rgba(138,82,0,.22) !important; }
