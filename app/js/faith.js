@@ -439,7 +439,7 @@ function initScripture(){
 // the original 6 tabs. New tabs without renderers are stubs awaiting later phases.
 // btn is optional — when bfTab() is called programmatically (e.g., from a Quick
 // Tile or stub-panel CTA), the matching button is found via [data-bf-tab].
-const BF_TABS = ['home','devotional','jesus','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline'];
+const BF_TABS = ['home','devotional','jesus','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy'];
 
 // Phase 5.8 v3 — Home-grid restorer. Defensive against any prior code
 // that may have set .topic-card-grid display:none inside #bf-home. The
@@ -605,6 +605,7 @@ function bfTab(tab, btn){
   if(tab==='bibleworld') renderBibleWorld();
   if(tab==='stories') renderFaithHomeStories();
   if(tab==='timeline') renderBibleTimeline();
+  if(tab==='proofProphecy') renderProofProphecy();
 }
 
 // ── FAITH HOME (F2-A) ────────────────────────────────────────
@@ -7641,5 +7642,423 @@ document.addEventListener('keydown', function(e){
   if(e.key === 'ArrowRight' || e.key === ' '){ e.preventDefault(); storyNext(); }
   else if(e.key === 'ArrowLeft'){ e.preventDefault(); storyPrev(); }
   else if(e.key === 'Escape'){ closeStory(); }
+});
+
+// ────────────────────────────────────────────────────────────
+// PROOF & PROPHECY — 100 apologetics proofs across 6 categories
+// Data: PROOF_PROPHECY_DATA in /app/js/data/proof-prophecy.js
+// Schema per proof: { id, category, title, year, eyebrow, summary,
+//   scripture, source, impactScore (1-10), image (or null), detail }
+// User state: D.savedProofs[] — array of bookmarked proof ids.
+// ────────────────────────────────────────────────────────────
+
+let _ppActiveCategory = 'all';
+let _ppCurrentProofId = null;
+let _ppConvDeck = [];
+let _ppConvIdx = 0;
+let _ppCounterAnimated = false;
+
+function _ppEsc(s){
+  if(typeof escapeHtml === 'function') return escapeHtml(String(s||''));
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function ppProofById(id){
+  if(typeof PROOF_PROPHECY_DATA === 'undefined') return null;
+  return PROOF_PROPHECY_DATA.find(p => p.id === id) || null;
+}
+
+function ppCategoryAccent(cat){
+  if(typeof PROOF_PROPHECY_CATEGORIES === 'undefined') return '#fbbf24';
+  const c = PROOF_PROPHECY_CATEGORIES.find(c => c.key === cat);
+  return c ? c.accent : '#fbbf24';
+}
+
+function ppCategoryLabel(cat){
+  if(typeof PROOF_PROPHECY_CATEGORIES === 'undefined') return cat;
+  const c = PROOF_PROPHECY_CATEGORIES.find(c => c.key === cat);
+  return c ? c.short : cat;
+}
+
+function ppImageFor(proof){
+  if(!proof) return '';
+  if(proof.image) return proof.image;
+  if(typeof PROOF_PROPHECY_FALLBACK_IMG !== 'undefined' && PROOF_PROPHECY_FALLBACK_IMG[proof.category]){
+    return PROOF_PROPHECY_FALLBACK_IMG[proof.category];
+  }
+  return '';
+}
+
+function ppStarsInner(score){
+  // 10-segment gold star meter; one star per impactScore point.
+  const filled = Math.max(0, Math.min(10, parseInt(score,10)||0));
+  let html = '';
+  for(let i=0;i<10;i++){
+    html += '<span class="pp-star'+(i<filled?' on':'')+'">★</span>';
+  }
+  return html;
+}
+
+function ppStarsHtml(score){
+  const filled = Math.max(0, Math.min(10, parseInt(score,10)||0));
+  return '<span class="pp-stars" aria-label="Impact '+filled+' of 10">'+ ppStarsInner(score) +'</span>';
+}
+
+function ppIsSaved(id){
+  return !!(typeof D !== 'undefined' && D && Array.isArray(D.savedProofs) && D.savedProofs.indexOf(id) !== -1);
+}
+
+function ppToggleBookmark(id, btnEl){
+  if(typeof D === 'undefined' || !D) return;
+  if(!Array.isArray(D.savedProofs)) D.savedProofs = [];
+  const idx = D.savedProofs.indexOf(id);
+  if(idx === -1) D.savedProofs.push(id);
+  else D.savedProofs.splice(idx,1);
+  if(typeof save === 'function') save();
+  // Refresh the specific card icon if provided
+  if(btnEl){
+    const saved = ppIsSaved(id);
+    btnEl.classList.toggle('saved', saved);
+    btnEl.textContent = saved ? '★' : '☆';
+  }
+  // Also refresh the modal bookmark button if the same proof is open
+  if(_ppCurrentProofId === id){
+    const mb = document.getElementById('ppModalBookmark');
+    if(mb){
+      const saved = ppIsSaved(id);
+      mb.classList.toggle('saved', saved);
+      mb.textContent = saved ? '★' : '☆';
+    }
+  }
+}
+
+function ppToggleBookmarkCurrent(){
+  if(_ppCurrentProofId) ppToggleBookmark(_ppCurrentProofId);
+}
+
+function ppCardHtml(proof){
+  const img = ppImageFor(proof);
+  const accent = ppCategoryAccent(proof.category);
+  const catLabel = ppCategoryLabel(proof.category);
+  const saved = ppIsSaved(proof.id);
+  return ''
+    + '<div class="pp-card" onclick="ppOpenModal(\''+ _ppEsc(proof.id) +'\')">'
+    +   '<div class="pp-card-photo">'
+    +     '<div class="pp-card-badge" style="background:rgba(10,13,26,.65);color:#fff;border-left:2px solid '+ accent +';">'+ _ppEsc(catLabel) +'</div>'
+    +     '<button class="pp-card-bookmark'+(saved?' saved':'')+'" onclick="event.stopPropagation();ppToggleBookmark(\''+ _ppEsc(proof.id) +'\',this)" aria-label="Bookmark">'+ (saved?'★':'☆') +'</button>'
+    +     (img ? '<img loading="lazy" src="'+ _ppEsc(img) +'" alt="'+ _ppEsc(proof.title) +'">' : '')
+    +   '</div>'
+    +   '<div class="pp-card-body">'
+    +     '<div class="pp-card-eye">'+ _ppEsc(proof.eyebrow||'') +'</div>'
+    +     '<div class="pp-card-title">'+ _ppEsc(proof.title) +'</div>'
+    +     '<div class="pp-card-summary">'+ _ppEsc(proof.summary) +'</div>'
+    +     '<div class="pp-card-foot">'
+    +       ppStarsHtml(proof.impactScore)
+    +       '<span class="pp-readmore">READ MORE →</span>'
+    +     '</div>'
+    +   '</div>'
+    + '</div>';
+}
+
+function ppRenderSubtabs(){
+  const wrap = document.getElementById('ppSubtabs');
+  if(!wrap || typeof PROOF_PROPHECY_CATEGORIES === 'undefined' || typeof PROOF_PROPHECY_DATA === 'undefined') return;
+  const total = PROOF_PROPHECY_DATA.length;
+  const counts = {all: total};
+  PROOF_PROPHECY_DATA.forEach(p => { counts[p.category] = (counts[p.category]||0) + 1; });
+  let html = '<button class="pp-subtab'+(_ppActiveCategory==='all'?' active':'')+'" onclick="ppSetCategory(\'all\')">All<span class="pp-subtab-count">('+ counts.all +')</span></button>';
+  PROOF_PROPHECY_CATEGORIES.forEach(cat => {
+    const active = _ppActiveCategory === cat.key;
+    html += '<button class="pp-subtab'+(active?' active':'')+'" onclick="ppSetCategory(\''+ cat.key +'\')" style="'+(active?'border-left:3px solid '+cat.accent+';':'')+'">'
+         +    cat.icon + ' ' + _ppEsc(cat.short)
+         +    '<span class="pp-subtab-count">('+ (counts[cat.key]||0) +')</span>'
+         +  '</button>';
+  });
+  wrap.innerHTML = html;
+}
+
+function ppSetCategory(cat){
+  _ppActiveCategory = cat;
+  ppRenderSubtabs();
+  ppRenderGrid();
+}
+
+function ppRenderGrid(){
+  const grid = document.getElementById('ppGrid');
+  if(!grid || typeof PROOF_PROPHECY_DATA === 'undefined') return;
+  const searchEl = document.getElementById('ppSearch');
+  const q = (searchEl && searchEl.value || '').trim().toLowerCase();
+  let list = PROOF_PROPHECY_DATA.slice();
+  if(_ppActiveCategory !== 'all') list = list.filter(p => p.category === _ppActiveCategory);
+  if(q){
+    list = list.filter(p =>
+      (p.title||'').toLowerCase().indexOf(q) !== -1 ||
+      (p.summary||'').toLowerCase().indexOf(q) !== -1 ||
+      (p.eyebrow||'').toLowerCase().indexOf(q) !== -1 ||
+      (p.scripture||'').toLowerCase().indexOf(q) !== -1 ||
+      (p.detail||'').toLowerCase().indexOf(q) !== -1
+    );
+  }
+  // Sort by impactScore desc, stable
+  list.sort((a,b) => (b.impactScore||0) - (a.impactScore||0));
+  if(!list.length){
+    grid.innerHTML = '<div class="pp-empty" style="grid-column:1/-1;">No proofs match your search. Try a different term.</div>';
+    return;
+  }
+  grid.innerHTML = list.map(ppCardHtml).join('');
+}
+
+function ppAnimateCounter(){
+  if(_ppCounterAnimated) return;
+  const el = document.getElementById('ppCounter');
+  if(!el || typeof PROOF_PROPHECY_DATA === 'undefined') return;
+  _ppCounterAnimated = true;
+  const target = PROOF_PROPHECY_DATA.length;
+  const duration = 1200;
+  const startedAt = performance.now();
+  function tick(now){
+    const t = Math.min(1, (now - startedAt) / duration);
+    // ease-out cubic
+    const eased = 1 - Math.pow(1 - t, 3);
+    el.textContent = Math.round(target * eased);
+    if(t < 1) requestAnimationFrame(tick);
+    else el.textContent = String(target);
+  }
+  requestAnimationFrame(tick);
+}
+
+function renderProofProphecy(){
+  if(typeof PROOF_PROPHECY_DATA === 'undefined'){
+    const grid = document.getElementById('ppGrid');
+    if(grid) grid.innerHTML = '<div class="pp-empty" style="grid-column:1/-1;">Proof &amp; Prophecy data not loaded. Reload the page.</div>';
+    return;
+  }
+  ppRenderSubtabs();
+  ppRenderGrid();
+  _ppCounterAnimated = false;
+  // Defer counter slightly to make the count-up feel intentional
+  setTimeout(ppAnimateCounter, 120);
+}
+
+function ppOpenModal(id){
+  const proof = ppProofById(id);
+  if(!proof) return;
+  _ppCurrentProofId = id;
+  const modal = document.getElementById('ppModal');
+  if(!modal) return;
+  const img = ppImageFor(proof);
+  const photoWrap = document.getElementById('ppModalPhoto');
+  const imgEl = document.getElementById('ppModalImg');
+  if(img && imgEl){
+    imgEl.src = img;
+    imgEl.alt = proof.title;
+    if(photoWrap) photoWrap.style.display = '';
+  } else if(photoWrap){
+    photoWrap.style.display = 'none';
+  }
+  const eye = document.getElementById('ppModalEye');
+  if(eye) eye.textContent = proof.eyebrow || '';
+  const title = document.getElementById('ppModalTitle');
+  if(title) title.textContent = proof.title || '';
+  const stars = document.getElementById('ppModalStars');
+  if(stars){
+    stars.innerHTML = ppStarsInner(proof.impactScore);
+    stars.setAttribute('aria-label', 'Impact '+Math.max(0,Math.min(10,parseInt(proof.impactScore,10)||0))+' of 10');
+  }
+  const detail = document.getElementById('ppModalDetail');
+  if(detail){
+    const paras = String(proof.detail||'').split(/\n\n+/).map(p => '<p>'+ _ppEsc(p) +'</p>').join('');
+    detail.innerHTML = paras;
+  }
+  const scr = document.getElementById('ppModalScripture');
+  if(scr) scr.textContent = proof.scripture || '';
+  const src = document.getElementById('ppModalSource');
+  if(src) src.textContent = 'Source: ' + (proof.source || '—');
+  const bmk = document.getElementById('ppModalBookmark');
+  if(bmk){
+    const saved = ppIsSaved(id);
+    bmk.classList.toggle('saved', saved);
+    bmk.textContent = saved ? '★' : '☆';
+  }
+  modal.classList.add('open');
+}
+
+function ppCloseModal(){
+  const modal = document.getElementById('ppModal');
+  if(modal) modal.classList.remove('open');
+  _ppCurrentProofId = null;
+}
+
+function ppShareCurrent(){
+  const proof = ppProofById(_ppCurrentProofId);
+  if(!proof) return;
+  const text = proof.title + ' — ' + (proof.eyebrow||'') + '\n\n' + (proof.summary||'') + '\n\nScripture: ' + (proof.scripture||'') + '\n\nMore: yourlifecc.com/app/#proof-prophecy\n— Shared from YourLife CC';
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>{
+      if(typeof showToast === 'function') showToast('Copied to clipboard');
+    }).catch(()=>{
+      if(typeof showToast === 'function') showToast('Copy failed — long-press to copy manually');
+    });
+  } else {
+    if(typeof showToast === 'function') showToast('Clipboard not available');
+  }
+}
+
+function ppAskBibleFromProof(){
+  const proof = ppProofById(_ppCurrentProofId);
+  if(!proof) return;
+  ppCloseModal();
+  // Switch to Bible tab; if a question-prefill is supported via a known
+  // input id, prefill it. Otherwise just go to Bible.
+  if(typeof bfTab === 'function') bfTab('bible');
+  setTimeout(function(){
+    const q = document.getElementById('faithAiInput') || document.getElementById('atbInput') || document.querySelector('[data-ask-bible-input]');
+    if(q){
+      const seed = 'Tell me more about: ' + proof.title + ' (' + (proof.scripture||'') + ')';
+      q.value = seed;
+      q.focus();
+    }
+  }, 250);
+}
+
+// ── Convince Me — 5-card swipe deck of high-impact proofs ──
+function ppOpenConvince(){
+  if(typeof PROOF_PROPHECY_DATA === 'undefined') return;
+  // Pick 5 random high-impact (>=8) proofs, but ensure category variety.
+  const high = PROOF_PROPHECY_DATA.filter(p => (p.impactScore||0) >= 8);
+  // Shuffle high-impact pool
+  const pool = high.slice();
+  for(let i = pool.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+  }
+  // Greedy pick 5 with category variety
+  const picked = [];
+  const usedCats = {};
+  for(const p of pool){
+    if(picked.length >= 5) break;
+    if(!usedCats[p.category]){ picked.push(p); usedCats[p.category] = true; }
+  }
+  // Fill remaining slots if fewer than 5 categories
+  for(const p of pool){
+    if(picked.length >= 5) break;
+    if(picked.indexOf(p) === -1) picked.push(p);
+  }
+  _ppConvDeck = picked.slice(0,5);
+  _ppConvIdx = 0;
+  const modal = document.getElementById('ppConvinceModal');
+  if(!modal) return;
+  modal.classList.add('open');
+  ppConvRender();
+}
+
+function ppCloseConvince(){
+  const modal = document.getElementById('ppConvinceModal');
+  if(modal) modal.classList.remove('open');
+  _ppConvDeck = [];
+  _ppConvIdx = 0;
+}
+
+function ppConvRender(){
+  const slot = document.getElementById('ppConvSlot');
+  const prog = document.getElementById('ppConvProgress');
+  if(!slot) return;
+  if(_ppConvIdx >= _ppConvDeck.length){
+    if(prog) prog.textContent = 'COMPLETE';
+    slot.innerHTML = ''
+      + '<div class="pp-conv-finale">'
+      +   ppScaleSvg()
+      +   '<div class="pp-conv-finale-title">The evidence is heavy.</div>'
+      +   '<div class="pp-conv-finale-text">Five proofs. Six categories. 100 reasons total. Still have questions? Ask the Bible directly, or keep exploring the full collection.</div>'
+      +   '<div class="pp-conv-finale-actions">'
+      +     '<button class="pp-conv-btn pp-conv-btn-next" onclick="ppCloseConvince();bfTab(\'bible\');">Ask the Bible →</button>'
+      +     '<button class="pp-conv-btn pp-conv-btn-skip" onclick="ppCloseConvince()">Back to all proofs</button>'
+      +   '</div>'
+      + '</div>';
+    return;
+  }
+  const proof = _ppConvDeck[_ppConvIdx];
+  if(prog) prog.textContent = 'PROOF '+(_ppConvIdx+1)+' of '+_ppConvDeck.length;
+  const img = ppImageFor(proof);
+  slot.innerHTML = ''
+    + '<div class="pp-conv-card" id="ppConvCard">'
+    +   (img ? '<div class="pp-conv-photo"><img src="'+ _ppEsc(img) +'" alt="'+ _ppEsc(proof.title) +'"></div>' : '')
+    +   '<div class="pp-conv-body">'
+    +     '<div class="pp-conv-eye">'+ _ppEsc(proof.eyebrow||'') +'</div>'
+    +     '<div class="pp-conv-title">'+ _ppEsc(proof.title) +'</div>'
+    +     '<div class="pp-conv-summary">'+ _ppEsc(proof.summary) +'</div>'
+    +     '<div class="pp-conv-stars">'+ ppStarsHtml(proof.impactScore) +'</div>'
+    +     '<div class="pp-conv-actions">'
+    +       '<button class="pp-conv-btn pp-conv-btn-skip" onclick="ppConvAdvance(\'left\')">Skip</button>'
+    +       '<button class="pp-conv-btn pp-conv-btn-next" onclick="ppConvAdvance(\'right\')">Next proof →</button>'
+    +     '</div>'
+    +   '</div>'
+    + '</div>';
+}
+
+function ppConvAdvance(dir){
+  const card = document.getElementById('ppConvCard');
+  if(card){
+    card.classList.add(dir === 'left' ? 'swipe-left' : 'swipe-right');
+  }
+  setTimeout(function(){
+    _ppConvIdx++;
+    ppConvRender();
+  }, 320);
+}
+
+function ppScaleSvg(){
+  // Hand-authored cinematic balance scale — gold tones, evidence side
+  // weighted down. No external deps, no /imagine — drawn inline.
+  return ''
+    + '<svg class="pp-conv-finale-scale" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+    +   '<defs>'
+    +     '<linearGradient id="ppGoldGrad" x1="0" y1="0" x2="0" y2="1">'
+    +       '<stop offset="0%" stop-color="#fef3c7"/>'
+    +       '<stop offset="55%" stop-color="#fbbf24"/>'
+    +       '<stop offset="100%" stop-color="#b45309"/>'
+    +     '</linearGradient>'
+    +     '<radialGradient id="ppHaloGrad" cx="50%" cy="50%" r="50%">'
+    +       '<stop offset="0%" stop-color="#fbbf24" stop-opacity=".35"/>'
+    +       '<stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/>'
+    +     '</radialGradient>'
+    +   '</defs>'
+    +   '<circle cx="70" cy="70" r="60" fill="url(#ppHaloGrad)"/>'
+    // Base
+    +   '<rect x="58" y="116" width="24" height="6" rx="2" fill="url(#ppGoldGrad)"/>'
+    +   '<rect x="64" y="50" width="12" height="68" rx="3" fill="url(#ppGoldGrad)"/>'
+    // Top knob
+    +   '<circle cx="70" cy="48" r="5" fill="url(#ppGoldGrad)" stroke="#7c2d12" stroke-width=".6"/>'
+    // Crossbar — slightly tilted (evidence side down on left)
+    +   '<g transform="rotate(-8 70 48)">'
+    +     '<rect x="18" y="46" width="104" height="4" rx="2" fill="url(#ppGoldGrad)"/>'
+    +   '</g>'
+    // Left pan (evidence — lower, fuller)
+    +   '<g>'
+    +     '<line x1="30" y1="50" x2="30" y2="84" stroke="#d97706" stroke-width="1"/>'
+    +     '<path d="M14 84 Q30 102 46 84 Q30 92 14 84 Z" fill="url(#ppGoldGrad)" stroke="#7c2d12" stroke-width=".6"/>'
+    // Evidence stack (books)
+    +     '<rect x="20" y="76" width="20" height="4" rx="1" fill="#fef3c7" opacity=".85"/>'
+    +     '<rect x="22" y="71" width="16" height="4" rx="1" fill="#fbbf24" opacity=".95"/>'
+    +     '<rect x="24" y="66" width="12" height="4" rx="1" fill="#d97706"/>'
+    +   '</g>'
+    // Right pan (doubt — higher, lighter)
+    +   '<g>'
+    +     '<line x1="110" y1="50" x2="110" y2="72" stroke="#d97706" stroke-width="1"/>'
+    +     '<path d="M96 72 Q110 88 124 72 Q110 80 96 72 Z" fill="url(#ppGoldGrad)" stroke="#7c2d12" stroke-width=".6" opacity=".75"/>'
+    // Tiny feather
+    +     '<path d="M105 64 Q110 60 115 64" stroke="#fef3c7" stroke-width="1.2" fill="none" opacity=".7"/>'
+    +   '</g>'
+    +   '<text x="70" y="138" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="8" letter-spacing=".18em" fill="#fbbf24">EVIDENCE · DOUBT</text>'
+    + '</svg>';
+}
+
+// ESC key closes Proof & Prophecy modals.
+document.addEventListener('keydown', function(e){
+  if(e.key !== 'Escape') return;
+  const m = document.getElementById('ppModal');
+  if(m && m.classList.contains('open')){ ppCloseModal(); return; }
+  const cm = document.getElementById('ppConvinceModal');
+  if(cm && cm.classList.contains('open')){ ppCloseConvince(); return; }
 });
 

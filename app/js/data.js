@@ -56,6 +56,10 @@ const DEF = {
   // F4-G — Story Mode completion log. Keyed by `${YYYY-MM-DD}::${storyId}`,
   // value is true. Used to gate the per-day +10 XP award per story.
   faithStoriesViewed:{},
+  // Proof & Prophecy — array of proof ids the user has bookmarked. Persisted
+  // through cloudSync. Tab is read-only otherwise (D.savedProofs is the only
+  // proof-prophecy field that mutates).
+  savedProofs:[],
   // streak / checkin
   streak:0, lastCheckin:null, checkin:{}, customHabits:[], dailyChecks:{},
   // money
