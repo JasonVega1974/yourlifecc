@@ -5394,6 +5394,18 @@
 
     <style>
       /* ── Faith Academy: rich educational cards with photo headers ── */
+      /* Title override: white (not the global gold gradient) — Academy is the
+         only Well section where the H1 reads white over the dark navy. */
+      #bf-academy .bf-title{
+        background:none;
+        -webkit-background-clip:initial;background-clip:initial;
+        -webkit-text-fill-color:#ffffff;
+        color:#ffffff;
+        text-shadow:none;
+      }
+      :root.light #bf-academy .bf-title{
+        -webkit-text-fill-color:#1a1b1e !important;color:#1a1b1e !important;
+      }
       /* Category filter pills (sit above the grid). Active = gold fill, dark text. */
       #bf-academy .ac-filters{
         display:flex;gap:.4rem;flex-wrap:wrap;margin:.4rem 0 1rem;
@@ -5549,8 +5561,8 @@
 
     <div class="bf-section-hdr">
       <div class="bf-eyebrow">LEARN · GROW · GO DEEPER</div>
-      <div class="bf-title">Faith Academy</div>
-      <div class="bf-sub">Bite-size lessons on theology, history, and Christian life.</div>
+      <div class="bf-title">FAITH ACADEMY</div>
+      <div class="bf-sub">Bite-size lessons on theology, history, and Christian life</div>
     </div>
 
     <div class="ac-stats">
