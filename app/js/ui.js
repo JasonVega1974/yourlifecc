@@ -1515,6 +1515,10 @@ function tgInitAll(){
 if (typeof window !== 'undefined' && !window.ACADEMY_PHOTO_OVERRIDES){
   window.ACADEMY_PHOTO_OVERRIDES = {};
 }
+// Same pattern for Proof & Prophecy cards. Admin row id is 'proof-' + proof.id.
+if (typeof window !== 'undefined' && !window.PROOF_PHOTO_OVERRIDES){
+  window.PROOF_PHOTO_OVERRIDES = {};
+}
 
 async function loadCardPhotoOverrides(){
   try {
@@ -1525,6 +1529,7 @@ async function loadCardPhotoOverrides(){
     let appliedDom = 0;
     let appliedSk  = 0;
     let appliedAc  = 0;
+    let appliedPp  = 0;
     Object.keys(overrides).forEach(cardId => {
       const url = overrides[cardId];
       if(!url) return;
@@ -1554,6 +1559,15 @@ async function loadCardPhotoOverrides(){
           appliedAc++;
         }
       }
+      // Proof & Prophecy: per-proof override, keyed by proof.id. Admin row
+      // id is 'proof-' + proof.id. Read by ppImageFor() in faith.js.
+      if(cardId.indexOf('proof-') === 0 && typeof window !== 'undefined'){
+        const proofId = cardId.slice('proof-'.length);
+        if(window.PROOF_PHOTO_OVERRIDES[proofId] !== url){
+          window.PROOF_PHOTO_OVERRIDES[proofId] = url;
+          appliedPp++;
+        }
+      }
     });
     // If any skills overrides changed, re-render the grid (cheap, idempotent).
     if(appliedSk > 0 && typeof buildSkillsGrid === 'function'){
@@ -1563,6 +1577,11 @@ async function loadCardPhotoOverrides(){
     // re-render so the new photos show without a page reload.
     if(appliedAc > 0 && typeof renderFeaturedAcademy === 'function'){
       try { renderFeaturedAcademy(); } catch(e){}
+    }
+    // Same for Proof & Prophecy — re-render the grid if any new overrides
+    // arrived after first paint.
+    if(appliedPp > 0 && typeof ppRenderGrid === 'function'){
+      try { ppRenderGrid(); } catch(e){}
     }
   } catch(e){
     // Fail silently — overrides are non-essential. The base photo set
@@ -1747,6 +1766,10 @@ function openModal(id){
   const el = document.getElementById(id);
   if(!el) return;
   el.classList.add('open');
+  // Hide top nav (#mBar) + mobile quick row while any modal is open so the
+  // modal header never sits under the OS-style top bar. The CSS lives in
+  // app/index.html inline styles: body.modal-open #mBar { display:none }.
+  document.body.classList.add('modal-open');
   // F4 — Inject a fullscreen toggle button into the modal's .md if it
   // doesn't already have one. One implementation, every modal benefits.
   _ensureFullscreenToggle(el);
@@ -1760,6 +1783,12 @@ function closeModal(id){
   }
   el.classList.remove('open');
   el.classList.remove('mo-fullscreen');
+  // Only drop body.modal-open if no other .mo modal is still open. Proof &
+  // Prophecy modals (#ppModal, #ppConvinceModal) toggle the class themselves
+  // since they don't go through this helper.
+  if(!document.querySelector('.mo.open, #ppModal.open, #ppConvinceModal.open')){
+    document.body.classList.remove('modal-open');
+  }
 }
 
 // Inject a fullscreen toggle button into the modal's dialog. Idempotent.

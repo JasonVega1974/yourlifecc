@@ -5072,6 +5072,7 @@
   <div id="planDetailModal" class="mo" onclick="if(event.target===this)closePlanDetail()">
     <div class="md" style="max-width:560px;padding:0;">
       <div id="planDetailHeader" style="background:var(--cd-banner);padding:1.4rem 1.4rem 1.2rem;text-align:center;color:var(--cd-banner-text);border-radius:16px 16px 0 0;position:relative;">
+        <button class="pp-back-btn" onclick="closePlanDetail()" aria-label="Back" style="background:rgba(11,18,32,.22);color:#0b1220;border-color:rgba(11,18,32,.28);">← Back</button>
         <button onclick="closePlanDetail()" style="position:absolute;top:.7rem;right:.7rem;background:rgba(11,18,32,.18);border:1px solid rgba(11,18,32,.22);color:#0b1220;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.8rem;font-weight:800;">✕</button>
         <div id="planDetailIcon" style="font-size:2rem;margin-bottom:.3rem;">📅</div>
         <div id="planDetailTitle" style="font-family:var(--fh,var(--fm));font-size:1.25rem;font-weight:800;letter-spacing:.02em;margin-bottom:.25rem;">—</div>
@@ -6167,9 +6168,9 @@
       display:flex;align-items:center;justify-content:center;
       backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
     }
-    /* Category badge sits on top-left of the photo */
+    /* Category badge sits on top-left of the photo, below the Back pill. */
     #lessonModal .lm-cat{
-      position:absolute;top:1rem;left:1.1rem;z-index:4;
+      position:absolute;top:3rem;left:1.1rem;z-index:4;
       font-family:var(--fm);font-size:.66rem;font-weight:800;
       letter-spacing:.18em;text-transform:uppercase;
       background:rgba(10,13,26,.7);
@@ -6418,6 +6419,7 @@
     <div class="md">
       <!-- Photo header: close button, category badge, and lesson title overlay -->
       <div class="lm-svg" id="lmSvg">
+        <button class="pp-back-btn" onclick="closeLessonModal()" aria-label="Back">← Back</button>
         <button class="lm-close" onclick="closeLessonModal()" aria-label="Close">✕</button>
         <span class="lm-cat" id="lmCat">—</span>
         <h2 class="lm-title" id="lmTitle">—</h2>
@@ -6566,6 +6568,26 @@
        in faith.js using PROOF_PROPHECY_DATA from /app/js/data/proof-prophecy.js. -->
   <div id="bf-proofProphecy" style="display:none;">
     <style>
+      /* Global modal-open guard — when any modal is open, the top mobile
+         nav (#mBar) and the mobile quick row (#mqRow) get out of the way
+         so the modal title isn't covered. Triggered by openModal/closeModal
+         in ui.js and by ppOpenModal/ppCloseModal/ppOpenConvince in faith.js. */
+      body.modal-open #mBar,
+      body.modal-open #mqRow { display:none !important; }
+
+      /* Shared back-pill button styling — reused by every Well modal. */
+      .pp-back-btn{
+        position:absolute; top:.7rem; left:.85rem; z-index:5;
+        background:rgba(10,13,26,.7); border:1px solid rgba(255,255,255,.2);
+        color:#fff; cursor:pointer;
+        padding:.4rem .8rem; border-radius:999px;
+        font-family:var(--fm); font-size:.7rem; font-weight:800;
+        letter-spacing:.06em; backdrop-filter:blur(8px);
+        display:inline-flex; align-items:center; gap:.3rem;
+        transition:background .15s, transform .15s;
+      }
+      .pp-back-btn:hover{background:rgba(10,13,26,.88); transform:translateX(-2px);}
+
       #bf-proofProphecy{ --pp-gold:#fbbf24; --pp-gold-deep:#d97706; --pp-cream:#fef3c7; --pp-navy:#0a0d1a; }
       #bf-proofProphecy .pp-hero{
         position:relative; padding:2.2rem 1.4rem 1.6rem;
@@ -6672,25 +6694,46 @@
         box-shadow:0 14px 32px rgba(15,23,42,.28);
       }
       #bf-proofProphecy .pp-card-photo{
-        position:relative; height:140px; overflow:hidden;
+        position:relative; height:140px; min-height:140px; flex:0 0 140px;
+        overflow:hidden; isolation:isolate;
         background:linear-gradient(135deg,#1a1233,#0a0d1a);
       }
-      #bf-proofProphecy .pp-card-photo img{
+      #bf-proofProphecy .pp-card-photo > img{
+        position:absolute; inset:0;
         width:100%; height:100%; object-fit:cover; display:block;
         filter:brightness(.82) saturate(1.04);
         transition:transform .35s, filter .25s;
       }
-      #bf-proofProphecy .pp-card:hover .pp-card-photo img{transform:scale(1.04); filter:brightness(.92) saturate(1.1);}
+      #bf-proofProphecy .pp-card:hover .pp-card-photo > img{transform:scale(1.04); filter:brightness(.92) saturate(1.1);}
       #bf-proofProphecy .pp-card-photo::after{
-        content:''; position:absolute; inset:0; pointer-events:none;
+        content:''; position:absolute; inset:0; pointer-events:none; z-index:1;
         background:linear-gradient(180deg, rgba(10,13,26,0) 40%, rgba(10,13,26,.85) 100%);
       }
       #bf-proofProphecy .pp-card-badge{
-        position:absolute; top:.5rem; left:.5rem; z-index:2;
-        padding:.22rem .55rem; border-radius:8px;
-        font-family:var(--fm); font-size:.58rem; font-weight:800; letter-spacing:.14em;
+        position:absolute; top:.55rem; left:.55rem; z-index:3;
+        max-width:calc(100% - 4rem); white-space:nowrap;
+        padding:.28rem .6rem; border-radius:8px;
+        font-family:var(--fm); font-size:.6rem; font-weight:800; letter-spacing:.14em;
         text-transform:uppercase; backdrop-filter:blur(8px);
-        color:#fff; background:rgba(10,13,26,.55); border:1px solid rgba(255,255,255,.18);
+        color:#fff; background:rgba(10,13,26,.7); border:1px solid rgba(255,255,255,.18);
+        line-height:1.1;
+      }
+      /* No-photo placeholder — clean styled state with category icon. */
+      #bf-proofProphecy .pp-card-placeholder{
+        position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+        overflow:hidden;
+      }
+      #bf-proofProphecy .pp-card-placeholder::before{
+        content:''; position:absolute; inset:0;
+        background-image:
+          radial-gradient(1px 1px at 22% 28%, rgba(255,255,255,.32), transparent),
+          radial-gradient(1px 1px at 78% 64%, rgba(255,255,255,.28), transparent),
+          radial-gradient(1px 1px at 48% 80%, rgba(255,255,255,.24), transparent);
+      }
+      #bf-proofProphecy .pp-placeholder-icon{
+        position:relative; z-index:1;
+        font-size:3.2rem; line-height:1; filter:drop-shadow(0 4px 14px rgba(0,0,0,.4));
+        opacity:.92;
       }
       #bf-proofProphecy .pp-card-bookmark{
         position:absolute; top:.5rem; right:.5rem; z-index:2;
@@ -6754,9 +6797,11 @@
         box-shadow:0 30px 80px rgba(0,0,0,.55);
       }
       #ppModal .pp-modal-photo{
-        height:220px; overflow:hidden; position:relative;
+        height:220px; min-height:220px; overflow:hidden; position:relative;
       }
       #ppModal .pp-modal-photo img{width:100%; height:100%; object-fit:cover; filter:brightness(.82);}
+      #ppModal .pp-modal-photo .pp-card-placeholder .pp-placeholder-icon{font-size:4.2rem;}
+      #ppConvinceModal .pp-conv-photo .pp-card-placeholder .pp-placeholder-icon{font-size:3.8rem;}
       #ppModal .pp-modal-photo::after{
         content:''; position:absolute; inset:0;
         background:linear-gradient(180deg, rgba(10,13,26,0) 30%, rgba(10,13,26,.92) 100%);
@@ -6933,6 +6978,7 @@
   <!-- Proof & Prophecy — detail modal (single, reused) -->
   <div id="ppModal" onclick="if(event.target===this)ppCloseModal()">
     <div class="pp-modal-card">
+      <button class="pp-back-btn" onclick="ppCloseModal()" aria-label="Back">← Back</button>
       <button class="pp-modal-close" onclick="ppCloseModal()" aria-label="Close">×</button>
       <div class="pp-modal-photo" id="ppModalPhoto"><img id="ppModalImg" src="" alt=""></div>
       <div class="pp-modal-body">
@@ -6959,7 +7005,7 @@
   <!-- Proof & Prophecy — Convince Me deck modal -->
   <div id="ppConvinceModal" onclick="if(event.target===this)ppCloseConvince()">
     <div class="pp-conv-wrap">
-      <button class="pp-conv-close" onclick="ppCloseConvince()">CLOSE ×</button>
+      <button class="pp-back-btn pp-conv-back" onclick="ppCloseConvince()" aria-label="Back" style="top:-3rem;left:0;">← Back</button>
       <div class="pp-conv-progress" id="ppConvProgress">PROOF 1 of 5</div>
       <div id="ppConvSlot"></div>
     </div>

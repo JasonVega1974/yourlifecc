@@ -7682,11 +7682,33 @@ function ppCategoryLabel(cat){
 
 function ppImageFor(proof){
   if(!proof) return '';
-  if(proof.image) return proof.image;
-  if(typeof PROOF_PROPHECY_FALLBACK_IMG !== 'undefined' && PROOF_PROPHECY_FALLBACK_IMG[proof.category]){
-    return PROOF_PROPHECY_FALLBACK_IMG[proof.category];
+  // 1. Admin override (admin_card_photos table, key 'proof-' + proof.id)
+  if(typeof window !== 'undefined' && window.PROOF_PHOTO_OVERRIDES && window.PROOF_PHOTO_OVERRIDES[proof.id]){
+    return window.PROOF_PHOTO_OVERRIDES[proof.id];
   }
+  // 2. Hand-picked Wikimedia photo on the proof itself
+  if(proof.image) return proof.image;
+  // 3. No photo — caller renders a styled placeholder. Category fallback URL
+  //    intentionally dropped per UX request (no repeated category photos).
   return '';
+}
+
+function ppPlaceholderHtml(proof){
+  if(!proof) return '';
+  const accent = ppCategoryAccent(proof.category);
+  const cat = (typeof PROOF_PROPHECY_CATEGORIES !== 'undefined')
+    ? PROOF_PROPHECY_CATEGORIES.find(c => c.key === proof.category)
+    : null;
+  const icon = (cat && cat.icon) || '⚖️';
+  // Inline-styled gradient placeholder with centered category icon. No image
+  // request, no repeated photo — looks intentional rather than missing.
+  return '<div class="pp-card-placeholder" style="'
+       +   'background:radial-gradient(ellipse at 30% 30%, '+ accent +'33, transparent 60%),'
+       +   ' radial-gradient(ellipse at 75% 75%, '+ accent +'22, transparent 60%),'
+       +   ' linear-gradient(180deg, #181232 0%, #0a0d1a 100%);'
+       + '">'
+       +   '<span class="pp-placeholder-icon" aria-hidden="true">'+ icon +'</span>'
+       + '</div>';
 }
 
 function ppStarsInner(score){
@@ -7741,12 +7763,15 @@ function ppCardHtml(proof){
   const accent = ppCategoryAccent(proof.category);
   const catLabel = ppCategoryLabel(proof.category);
   const saved = ppIsSaved(proof.id);
+  const photoInner = img
+    ? '<img loading="lazy" data-card-id="proof-'+ _ppEsc(proof.id) +'" src="'+ _ppEsc(img) +'" alt="'+ _ppEsc(proof.title) +'">'
+    : ppPlaceholderHtml(proof);
   return ''
     + '<div class="pp-card" onclick="ppOpenModal(\''+ _ppEsc(proof.id) +'\')">'
     +   '<div class="pp-card-photo">'
-    +     '<div class="pp-card-badge" style="background:rgba(10,13,26,.65);color:#fff;border-left:2px solid '+ accent +';">'+ _ppEsc(catLabel) +'</div>'
+    +     photoInner
+    +     '<div class="pp-card-badge" style="background:rgba(10,13,26,.7);color:#fff;border-left:2px solid '+ accent +';">'+ _ppEsc(catLabel) +'</div>'
     +     '<button class="pp-card-bookmark'+(saved?' saved':'')+'" onclick="event.stopPropagation();ppToggleBookmark(\''+ _ppEsc(proof.id) +'\',this)" aria-label="Bookmark">'+ (saved?'★':'☆') +'</button>'
-    +     (img ? '<img loading="lazy" src="'+ _ppEsc(img) +'" alt="'+ _ppEsc(proof.title) +'">' : '')
     +   '</div>'
     +   '<div class="pp-card-body">'
     +     '<div class="pp-card-eye">'+ _ppEsc(proof.eyebrow||'') +'</div>'
@@ -7848,13 +7873,14 @@ function ppOpenModal(id){
   if(!modal) return;
   const img = ppImageFor(proof);
   const photoWrap = document.getElementById('ppModalPhoto');
-  const imgEl = document.getElementById('ppModalImg');
-  if(img && imgEl){
-    imgEl.src = img;
-    imgEl.alt = proof.title;
-    if(photoWrap) photoWrap.style.display = '';
-  } else if(photoWrap){
-    photoWrap.style.display = 'none';
+  if(photoWrap){
+    photoWrap.style.display = '';
+    if(img){
+      photoWrap.innerHTML = '<img id="ppModalImg" data-card-id="proof-'+ _ppEsc(proof.id) +'" src="'+ _ppEsc(img) +'" alt="'+ _ppEsc(proof.title) +'">';
+    } else {
+      // Placeholder header — same gradient/icon treatment as the card.
+      photoWrap.innerHTML = ppPlaceholderHtml(proof);
+    }
   }
   const eye = document.getElementById('ppModalEye');
   if(eye) eye.textContent = proof.eyebrow || '';
@@ -7881,12 +7907,17 @@ function ppOpenModal(id){
     bmk.textContent = saved ? '★' : '☆';
   }
   modal.classList.add('open');
+  document.body.classList.add('modal-open');
 }
 
 function ppCloseModal(){
   const modal = document.getElementById('ppModal');
   if(modal) modal.classList.remove('open');
   _ppCurrentProofId = null;
+  // Only drop the body class if no other modal is still open.
+  if(!document.querySelector('.mo.open, #ppConvinceModal.open')){
+    document.body.classList.remove('modal-open');
+  }
 }
 
 function ppShareCurrent(){
@@ -7949,6 +7980,7 @@ function ppOpenConvince(){
   const modal = document.getElementById('ppConvinceModal');
   if(!modal) return;
   modal.classList.add('open');
+  document.body.classList.add('modal-open');
   ppConvRender();
 }
 
@@ -7957,6 +7989,9 @@ function ppCloseConvince(){
   if(modal) modal.classList.remove('open');
   _ppConvDeck = [];
   _ppConvIdx = 0;
+  if(!document.querySelector('.mo.open, #ppModal.open')){
+    document.body.classList.remove('modal-open');
+  }
 }
 
 function ppConvRender(){
@@ -7980,9 +8015,12 @@ function ppConvRender(){
   const proof = _ppConvDeck[_ppConvIdx];
   if(prog) prog.textContent = 'PROOF '+(_ppConvIdx+1)+' of '+_ppConvDeck.length;
   const img = ppImageFor(proof);
+  const photoBlock = img
+    ? '<div class="pp-conv-photo"><img data-card-id="proof-'+ _ppEsc(proof.id) +'" src="'+ _ppEsc(img) +'" alt="'+ _ppEsc(proof.title) +'"></div>'
+    : '<div class="pp-conv-photo">'+ ppPlaceholderHtml(proof) +'</div>';
   slot.innerHTML = ''
     + '<div class="pp-conv-card" id="ppConvCard">'
-    +   (img ? '<div class="pp-conv-photo"><img src="'+ _ppEsc(img) +'" alt="'+ _ppEsc(proof.title) +'"></div>' : '')
+    +   photoBlock
     +   '<div class="pp-conv-body">'
     +     '<div class="pp-conv-eye">'+ _ppEsc(proof.eyebrow||'') +'</div>'
     +     '<div class="pp-conv-title">'+ _ppEsc(proof.title) +'</div>'
