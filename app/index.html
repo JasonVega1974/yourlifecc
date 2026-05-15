@@ -806,6 +806,88 @@
        persona "how is X doing today?") + 15-tile dashboard stay below
        behind the existing "See full stats" toggle. -->
 
+  <!-- ── Faith-only "Enter The Well" cinematic hero (window._faithFree)
+       Populated by renderFaithOnlyHero() in init.js. Hidden for all other users. ── -->
+  <style>
+    /* ── Faith-only hero panel ── */
+    .fo-hero{
+      position:relative;min-height:340px;border-radius:20px;overflow:hidden;
+      margin-bottom:1rem;
+      background:
+        linear-gradient(160deg,rgba(11,16,32,.78) 0%,rgba(22,10,54,.90) 55%,rgba(11,16,32,.96) 100%),
+        url('https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Kinneret_cropped.jpg/1280px-Kinneret_cropped.jpg') center/cover no-repeat scroll;
+      display:flex;align-items:center;justify-content:center;
+      animation:foFadeIn 600ms ease both;
+    }
+    @media(prefers-reduced-motion:reduce){.fo-hero{animation:none;}}
+    @keyframes foFadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+    .fo-hero-scrim{
+      position:absolute;inset:0;pointer-events:none;
+      background:linear-gradient(to top,rgba(11,16,32,.85) 0%,transparent 55%);
+    }
+    .fo-hero-content{
+      position:relative;z-index:1;text-align:center;
+      padding:2.5rem 1.8rem 2.2rem;max-width:600px;width:100%;
+    }
+    .fo-hero-greeting{
+      font-family:var(--fm);font-size:.9rem;font-weight:600;
+      color:rgba(254,243,199,.85);letter-spacing:.08em;text-transform:uppercase;
+      margin-bottom:.85rem;
+    }
+    .fo-hero-title{
+      font-family:'Bebas Neue',var(--fh);
+      font-size:clamp(2.8rem,8vw,5rem);letter-spacing:.06em;line-height:.95;
+      background:linear-gradient(135deg,#fef3c7 0%,#fbbf24 60%,#d97706 100%);
+      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+      color:#fbbf24;margin-bottom:1rem;
+    }
+    .fo-hero-sub{
+      font-family:Georgia,'Times New Roman',serif;font-style:italic;
+      font-size:1rem;color:rgba(254,243,199,.82);line-height:1.65;
+      max-width:460px;margin:0 auto 1.6rem;
+    }
+    .fo-hero-cta{
+      display:inline-flex;align-items:center;gap:.4rem;
+      background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a0d1a;
+      border:none;border-radius:99px;padding:1rem 2.4rem;
+      font-family:var(--fm);font-size:1rem;font-weight:800;letter-spacing:.04em;
+      cursor:pointer;min-height:52px;
+      box-shadow:0 6px 24px rgba(251,191,36,.4);
+      transition:transform .15s,box-shadow .15s;
+    }
+    .fo-hero-cta:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(251,191,36,.5);}
+    /* ── Entry cards ── */
+    .fo-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin-bottom:1rem;}
+    .fo-card{
+      text-align:left;background:rgba(10,13,26,.75);border:1px solid rgba(255,255,255,.1);
+      border-radius:14px;padding:1.05rem 1.1rem;cursor:pointer;
+      font-family:var(--fm);-webkit-tap-highlight-color:transparent;
+      transition:transform .2s,box-shadow .2s,border-color .2s;
+    }
+    .fo-card:hover{transform:translateY(-3px);}
+    .fo-card-stories{border-left:4px solid rgba(67,56,202,.8);background:linear-gradient(135deg,rgba(67,56,202,.12),rgba(10,13,26,.75));}
+    .fo-card-stories:hover{box-shadow:0 10px 28px rgba(67,56,202,.28);border-color:rgba(67,56,202,.6);}
+    .fo-card-plans{border-left:4px solid rgba(20,184,166,.8);background:linear-gradient(135deg,rgba(20,184,166,.10),rgba(10,13,26,.75));}
+    .fo-card-plans:hover{box-shadow:0 10px 28px rgba(20,184,166,.28);border-color:rgba(20,184,166,.6);}
+    .fo-card-academy{border-left:4px solid rgba(251,191,36,.8);background:linear-gradient(135deg,rgba(251,191,36,.10),rgba(10,13,26,.75));}
+    .fo-card-academy:hover{box-shadow:0 10px 28px rgba(251,191,36,.28);border-color:rgba(251,191,36,.5);}
+    .fo-card-icon{font-size:1.6rem;line-height:1;margin-bottom:.5rem;}
+    .fo-card-title{font-family:var(--fh);font-size:1.05rem;letter-spacing:.03em;color:var(--tx);margin-bottom:.2rem;}
+    .fo-card-sub{font-size:.72rem;color:var(--tx2);line-height:1.4;}
+    @media(max-width:480px){
+      .fo-cards{grid-template-columns:1fr;}
+      .fo-hero-cta{width:100%;justify-content:center;}
+    }
+    /* Light mode: entry cards adapt; hero panel stays dark always */
+    :root.light .fo-card{background:#f2f3f5 !important;border-color:#d0d1d6 !important;}
+    :root.light .fo-card-stories{border-left-color:rgba(67,56,202,.7) !important;}
+    :root.light .fo-card-plans{border-left-color:rgba(20,184,166,.7) !important;}
+    :root.light .fo-card-academy{border-left-color:rgba(138,82,0,.7) !important;}
+    :root.light .fo-card-title{color:#1a1b1e !important;}
+    :root.light .fo-card-sub{color:#4a4b52 !important;}
+  </style>
+  <div id="faithHeroCinematic" style="display:none;"></div>
+
   <!-- Greeting card — time-of-day + first name resolved in init.js
        renderHeroGreeting() from D.name → _supaUser metadata → email
        prefix → 'friend' fallback. -->
@@ -841,6 +923,9 @@
       </div>
     </div>
   </div>
+
+  <!-- Faith-only 3 entry cards — populated by renderFaithOnlyHero() -->
+  <div id="faithEntryCards" style="display:none;"></div>
 
   <!-- 4 quick action cards (2x2 grid on all viewports per the brief).
        Each card carries the matching section accent on its left border. -->

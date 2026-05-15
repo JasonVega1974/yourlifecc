@@ -494,7 +494,80 @@ function summarizeChildStatus(){
   return { question: 'How is ' + name + ' doing today?', answer, pills };
 }
 
+// ── FAITH-ONLY HERO ("Enter The Well") ── window._faithFree users only ──────
+function renderFaithOnlyHero(){
+  // Hide generic teen-dashboard elements that don't belong on the faith path
+  ['heroGreeting','heroQuickActions','heroQuickStats','childDashContent'].forEach(function(id){
+    const el = document.getElementById(id); if(el) el.style.display = 'none';
+  });
+
+  // Resolve greeting + first name (same logic as renderHeroGreeting)
+  const hr = new Date().getHours();
+  const greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+  let name = (typeof D !== 'undefined' && D && D.name) ? String(D.name).trim() : '';
+  if(!name && typeof _supaUser !== 'undefined' && _supaUser){
+    const meta = _supaUser.user_metadata || {};
+    name = (meta.first_name || (meta.name||'').split(/\s+/)[0] ||
+            (meta.full_name||'').split(/\s+/)[0] || '').trim();
+    if(!name && _supaUser.email)
+      name = String(_supaUser.email).split('@')[0].split(/[.+_-]/)[0];
+  }
+  if(!name) name = 'friend';
+  name = name.split(/\s+/)[0];
+  name = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+  name = name.replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]||c));
+
+  // Cinematic hero panel
+  const hero = document.getElementById('faithHeroCinematic');
+  if(hero){
+    hero.style.display = '';
+    hero.innerHTML =
+      '<div class="fo-hero">' +
+        '<div class="fo-hero-scrim"></div>' +
+        '<div class="fo-hero-content">' +
+          '<div class="fo-hero-greeting">' + greet + ', ' + name + ' 👋</div>' +
+          '<div class="fo-hero-title">WELCOME TO THE WELL</div>' +
+          '<p class="fo-hero-sub">Everything you need to grow in faith — stories, plans, prayer, and Scripture — is here.</p>' +
+          '<button class="fo-hero-cta" onclick="if(typeof wellGoto===\'function\')wellGoto(\'home\');else if(typeof showSection===\'function\')showSection(\'s-scripture\')">Enter The Well →</button>' +
+        '</div>' +
+      '</div>';
+  }
+
+  // 3 faith entry cards
+  const cards = document.getElementById('faithEntryCards');
+  if(cards){
+    cards.style.display = '';
+    cards.innerHTML =
+      '<div class="fo-cards">' +
+        '<button class="fo-card fo-card-stories" onclick="foGotoTab(\'stories\')">' +
+          '<div class="fo-card-icon">📖</div>' +
+          '<div class="fo-card-title">Bible Stories</div>' +
+          '<div class="fo-card-sub">52 illustrated stories</div>' +
+        '</button>' +
+        '<button class="fo-card fo-card-plans" onclick="foGotoTab(\'plans\')">' +
+          '<div class="fo-card-icon">📅</div>' +
+          '<div class="fo-card-title">Reading Plans</div>' +
+          '<div class="fo-card-sub">45 plans, 580 days</div>' +
+        '</button>' +
+        '<button class="fo-card fo-card-academy" onclick="foGotoTab(\'academy\')">' +
+          '<div class="fo-card-icon">🎓</div>' +
+          '<div class="fo-card-title">Faith Academy</div>' +
+          '<div class="fo-card-sub">30 lessons + quizzes</div>' +
+        '</button>' +
+      '</div>';
+  }
+
+  // Render today's verse card (shown between hero and entry cards)
+  if(typeof renderTodaysVerseHero === 'function') renderTodaysVerseHero();
+}
+
+function foGotoTab(tab){
+  if(typeof showSection === 'function') showSection('s-scripture');
+  setTimeout(function(){ if(typeof bfTab === 'function') bfTab(tab); }, 60);
+}
+
 function renderHeroHeadline(){
+  if(window._faithFree){ renderFaithOnlyHero(); return; }
   const q = document.getElementById('heroHeadlineQuestion');
   const a = document.getElementById('heroHeadlineAnswer');
   const p = document.getElementById('heroHeadlinePills');
