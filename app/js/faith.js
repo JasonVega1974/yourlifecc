@@ -4760,11 +4760,11 @@ function openLessonModal(lessonId){
   const cat = cats[lesson.category] || { label:'Lesson', color:'#fbbf24', icon:'📖' };
 
   const _lmCatPhotos = {
-    'theology':         'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Jerusalem-2013%282%29-Aerial-Temple_Mount-%28south_exposure%29.jpg/1280px-Jerusalem-2013%282%29-Aerial-Temple_Mount-%28south_exposure%29.jpg',
-    'church-history':   'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Church_of_the_Holy_Sepulchre_by_Gerd_Eichmann_%28cropped%29.jpg/1280px-Church_of_the_Holy_Sepulchre_by_Gerd_Eichmann_%28cropped%29.jpg',
-    'christian-living': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Kinneret_cropped.jpg/1280px-Kinneret_cropped.jpg',
-    'apologetics':      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Mount_Sinai_from_the_southwest.jpg/1280px-Mount_Sinai_from_the_southwest.jpg',
-    'bible-study':      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Gutenberg_Bible%2C_Lenox_Copy%2C_New_York_Public_Library%2C_2009._Pic_01.jpg/1280px-Gutenberg_Bible%2C_Lenox_Copy%2C_New_York_Public_Library%2C_2009._Pic_01.jpg',
+    'theology':         'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Interior_of_Hagia_Sofia.JPG/1280px-Interior_of_Hagia_Sofia.JPG',
+    'church-history':   'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Baptistery_wall_painting_Good_Shepherd_and_Adam_and_Eve.jpg/1280px-Baptistery_wall_painting_Good_Shepherd_and_Adam_and_Eve.jpg',
+    'christian-living': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Holy_Land_2016_P0129_Olive_trees_in_Gethsemane.jpg/1280px-Holy_Land_2016_P0129_Olive_trees_in_Gethsemane.jpg',
+    'apologetics':      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Areopagus_from_the_Acropolis.jpg/1280px-Areopagus_from_the_Acropolis.jpg',
+    'bible-study':      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Aleppo_Codex_%28Deut%29.jpg/1280px-Aleppo_Codex_%28Deut%29.jpg',
   };
   const svgEl = document.getElementById('lmSvg');
   if(svgEl){
@@ -5132,11 +5132,11 @@ function openAcademyLesson(courseId, lessonId){
   document.getElementById('charTitle').textContent = lesson.title;
   document.getElementById('charSub').textContent   = course.title + ' · ' + (lesson.duration || '');
   const _acModPhotoMap = {
-    'foundations':  'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Jerusalem-2013%282%29-Aerial-Temple_Mount-%28south_exposure%29.jpg/1280px-Jerusalem-2013%282%29-Aerial-Temple_Mount-%28south_exposure%29.jpg',
-    'bible-survey': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Gutenberg_Bible%2C_Lenox_Copy%2C_New_York_Public_Library%2C_2009._Pic_01.jpg/1280px-Gutenberg_Bible%2C_Lenox_Copy%2C_New_York_Public_Library%2C_2009._Pic_01.jpg',
-    'life-skills':  'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Kinneret_cropped.jpg/1280px-Kinneret_cropped.jpg',
-    'topical':      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Mount_Sinai_from_the_southwest.jpg/1280px-Mount_Sinai_from_the_southwest.jpg',
-    'families':     'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Church_of_the_Holy_Sepulchre_by_Gerd_Eichmann_%28cropped%29.jpg/1280px-Church_of_the_Holy_Sepulchre_by_Gerd_Eichmann_%28cropped%29.jpg',
+    'foundations':  'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Jerusalem-2013-Aerial-Temple_Mount_03.jpg/1280px-Jerusalem-2013-Aerial-Temple_Mount_03.jpg',
+    'bible-survey': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Holy_Land_2016_P0977_Caves_of_Qumran.jpg/1280px-Holy_Land_2016_P0977_Caves_of_Qumran.jpg',
+    'life-skills':  'https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/King%27s_College_Chapel%2C_Cambridge%2C_fan_vault.jpg/1280px-King%27s_College_Chapel%2C_Cambridge%2C_fan_vault.jpg',
+    'topical':      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Jerusalem_Temple_Mount_view_from_Mount_of_Olives_%286035890417%29.jpg/1280px-Jerusalem_Temple_Mount_view_from_Mount_of_Olives_%286035890417%29.jpg',
+    'families':     'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Sea_of_Galilee_2008.JPG/1280px-Sea_of_Galilee_2008.JPG',
   };
   const _acModPhoto = _acModPhotoMap[mod.id];
   const _acHdrEl = document.getElementById('charModalHeader');
