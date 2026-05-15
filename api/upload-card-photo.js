@@ -10,9 +10,9 @@
 //     fileName  original filename (informational only)
 //     mimeType  image/jpeg | png | webp | gif
 //
-// Body size limit set to 8 MB — covers a 5 MB file plus base64 overhead
-// (~33%). Vercel's built-in JSON parser handles decoding; no multipart
-// parsing or bodyParser:false tricks needed.
+// bodyParser is disabled — we read the raw stream and JSON.parse
+// ourselves. This is more reliable than relying on req.body for
+// large payloads in plain Vercel serverless functions.
 //
 // Env vars required:
 //   SUPA_SERVICE_KEY  service-role key for the project
@@ -23,7 +23,8 @@ const SUPA_PROJECT_REF = 'hrohgwcbfgywkpnvqxhk';
 const SUPA_HOST        = SUPA_PROJECT_REF + '.supabase.co';
 const BUCKET           = 'card-photos';
 const TABLE            = 'admin_card_photos';
-const MAX_BYTES        = 5 * 1024 * 1024;  // decoded 5 MB hard limit
+const MAX_FILE_BYTES   = 5 * 1024 * 1024;   // 5 MB decoded limit
+const MAX_BODY_BYTES   = 8 * 1024 * 1024;   // 8 MB raw JSON (base64 overhead ~33%)
 
 const ALLOWED_MIME = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 
@@ -33,6 +34,25 @@ const MIME_EXT = {
   'image/webp': 'webp',
   'image/gif':  'gif',
 };
+
+function readRawBody(req){
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    let bytes = 0;
+    req.on('data', (chunk) => {
+      bytes += chunk.length;
+      if (bytes > MAX_BODY_BYTES){
+        req.destroy();
+        const err = new Error('Payload too large');
+        err.code = 'PAYLOAD_TOO_LARGE';
+        return reject(err);
+      }
+      chunks.push(chunk);
+    });
+    req.on('end',   () => resolve(Buffer.concat(chunks)));
+    req.on('error', reject);
+  });
+}
 
 function supaUploadFile(path, data, contentType){
   return new Promise((resolve, reject) => {
@@ -107,7 +127,18 @@ module.exports = async (req, res) => {
     return res.status(500).json({ error: 'Server not configured' });
   }
 
-  const body     = req.body || {};
+  // Read and parse the JSON body from the raw stream so we are not
+  // dependent on Vercel's req.body parsing or its size-limit config.
+  let body;
+  try {
+    const raw = await readRawBody(req);
+    body = JSON.parse(raw.toString('utf8'));
+  } catch(e){
+    if (e && e.code === 'PAYLOAD_TOO_LARGE')
+      return res.status(413).json({ error: 'Request body exceeds 8 MB limit' });
+    return res.status(400).json({ error: 'Invalid JSON body' });
+  }
+
   const card_id  = typeof body.card_id  === 'string' ? body.card_id.trim()  : '';
   const fileData = typeof body.fileData === 'string' ? body.fileData.trim() : '';
   const mimeType = typeof body.mimeType === 'string'
@@ -133,7 +164,7 @@ module.exports = async (req, res) => {
   if (!fileBuffer.length){
     return res.status(400).json({ error: 'Empty file' });
   }
-  if (fileBuffer.length > MAX_BYTES){
+  if (fileBuffer.length > MAX_FILE_BYTES){
     return res.status(413).json({ error: 'File exceeds 5 MB limit' });
   }
 
@@ -143,8 +174,9 @@ module.exports = async (req, res) => {
   try {
     await supaUploadFile(objectPath, fileBuffer, mimeType);
   } catch(e){
-    console.error('[upload-card-photo storage]', e && e.message);
-    return res.status(500).json({ error: 'Storage upload failed' });
+    const detail = e && e.message ? e.message : String(e);
+    console.error('[upload-card-photo storage]', detail);
+    return res.status(500).json({ error: 'Storage upload failed', detail });
   }
 
   const publicUrl =
@@ -153,12 +185,13 @@ module.exports = async (req, res) => {
   try {
     await supaUpsertRow({ card_id, photo_url: publicUrl, updated_at: new Date().toISOString() });
   } catch(e){
-    console.error('[upload-card-photo upsert]', e && e.message);
-    return res.status(500).json({ error: 'Saved file but failed to record override' });
+    const detail = e && e.message ? e.message : String(e);
+    console.error('[upload-card-photo upsert]', detail);
+    return res.status(500).json({ error: 'DB upsert failed', detail });
   }
 
   return res.status(200).json({ ok: true, url: publicUrl });
 };
 
-// 8 MB body limit — accommodates a 5 MB image after base64 encoding (~33% overhead).
-module.exports.config = { api: { bodyParser: { sizeLimit: '8mb' } } };
+// Disable Vercel's body parser — we read the raw stream directly.
+module.exports.config = { api: { bodyParser: false } };

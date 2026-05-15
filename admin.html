@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>YourLife.CC — Admin</title>
+<link rel="icon" href="/app/icons/icon-192.png">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
 :root{--bg:#070b14;--bg2:#0d1424;--bg3:#111d32;--border:rgba(56,189,248,.12);--border2:rgba(56,189,248,.22);--tx:#f1f5f9;--tx2:#cbd5e1;--tx3:#94a3b8;--blue:#38bdf8;--green:#34d399;--red:#f87171;--amber:#fbbf24;--purple:#a78bfa;--fn:'IBM Plex Sans',sans-serif;--fm:'IBM Plex Mono',monospace}
@@ -1721,7 +1722,9 @@ async function pmUploadFile(cardId){
     });
     const data = await resp.json().catch(() => ({}));
     if(!resp.ok || !data.ok){
-      const errText = data && data.error ? data.error : ('HTTP ' + resp.status);
+      const errText = data && data.error
+        ? (data.error + (data.detail ? ': ' + data.detail : ''))
+        : ('HTTP ' + resp.status);
       if(msg){ msg.textContent = 'Upload failed — ' + errText; msg.className = 'pm-msg err'; }
       pmToast('Upload failed — ' + errText, 'err');
       if(btn) btn.disabled = false;
