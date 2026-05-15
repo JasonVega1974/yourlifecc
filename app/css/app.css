@@ -2699,7 +2699,6 @@ body.modal-open .navbar{
   color:var(--tx);
   border-radius:14px;
   padding:1rem 1.1rem;
-  min-height:150px;
   cursor:pointer;
   display:block;
   width:100%;
