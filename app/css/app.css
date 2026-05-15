@@ -4940,7 +4940,7 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 :root.light #onboardingOverlay input[type=text]{ background:#ffffff !important; border-color:#c0c1c6 !important; color:#1a1b1e !important; }
 :root.light #onboardingOverlay .onb-yesno{ background:rgba(0,0,0,.08) !important; }
 :root.light #onboardingOverlay .onb-yesno button{ color:#4a4b52 !important; }
-:root.light #onboardingOverlay .onb-yesno button.active{ background:#92400e !important; color:#fff !important; }
+:root.light #onboardingOverlay .onb-yesno button.active{ background:rgba(255,255,255,0.15) !important; color:#fff !important; }
 :root.light #onboardingOverlay .onb-dot{ background:rgba(0,0,0,.20) !important; }
 :root.light #onboardingOverlay .onb-dot.active{ background:#92400e !important; }
 :root.light #onboardingOverlay .onb-dot.done{ background:rgba(146,64,14,.55) !important; }
