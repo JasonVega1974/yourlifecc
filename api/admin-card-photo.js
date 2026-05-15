@@ -75,7 +75,7 @@ module.exports = async (req, res) => {
       (rows || []).forEach((r) => { if (r && r.card_id && r.photo_url) out[r.card_id] = r.photo_url; });
       // Short cache — fast TTL keeps the override map close to live without
       // hammering the Supabase REST API on every page load.
-      res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+      res.setHeader('Cache-Control', 'public, max-age=60');
       return res.status(200).json({ ok: true, overrides: out });
     } catch(e){
       console.error('[admin-card-photo GET]', e && e.message);

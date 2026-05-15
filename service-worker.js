@@ -1,7 +1,7 @@
 // YourLifeCC Service Worker
 // Version bump this string whenever you deploy a major update
 // to force old caches to clear.
-const CACHE_NAME = 'yourlifecc-v141';
+const CACHE_NAME = 'yourlifecc-v142';
 
 // Core assets to pre-cache on install — the app shell
 const PRECACHE_ASSETS = [
@@ -59,7 +59,8 @@ self.addEventListener('fetch', event => {
     'googleapis.com',
     'translate.googleapis.com'
   ];
-  if (networkOnly.some(host => url.hostname.includes(host))) {
+  // API routes must always hit the network — never serve stale overrides.
+  if (networkOnly.some(host => url.hostname.includes(host)) || url.pathname.startsWith('/api/')) {
     return; // Let browser handle it normally
   }
 
