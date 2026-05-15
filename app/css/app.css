@@ -5072,3 +5072,45 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 :root.light [style*="color:rgba(251,191,36"]{ color:#8a5200 !important; }
 :root.light [style*="color:rgba(245,200,66"]{ color:#8a5200 !important; }
 
+/* ── Story Player — keep cinematic dark even in light mode ── */
+:root.light #storyPlayerModal .md{
+  background:linear-gradient(180deg,#0a0d1a 0%,#1a1233 100%) !important;
+  color:#fef3c7 !important;
+}
+:root.light #storyPlayerModal .sp-narration{
+  color:rgba(254,243,199,.9) !important;
+  border-top-color:rgba(251,191,36,.12) !important;
+}
+:root.light #storyPlayerModal .sp-controls{
+  background:rgba(10,13,26,.6) !important;
+  border-top-color:rgba(251,191,36,.12) !important;
+}
+
+/* ── Faith Academy cards — light backgrounds ── */
+:root.light #bf-academy .ac-card{
+  background:#f2f3f5 !important;
+  border-color:#d0d1d6 !important;
+  box-shadow:0 1px 4px rgba(0,0,0,.10) !important;
+}
+:root.light #bf-academy .ac-card-tint{ opacity:0 !important; }
+:root.light #bf-academy .ac-card-eye{ color:#8a5200 !important; opacity:1 !important; }
+:root.light #bf-academy .ac-card-title{ color:#1a1b1e !important; text-shadow:none !important; }
+:root.light #bf-academy .ac-card-desc{ color:#4a4b52 !important; }
+:root.light #bf-academy .ac-card-meta{ color:#7a7b85 !important; }
+:root.light #bf-academy .ac-card-badge{
+  color:#8a5200 !important;
+  background:rgba(138,82,0,.10) !important;
+  border-color:rgba(138,82,0,.30) !important;
+}
+
+/* ── Devotional — fix white scripture text and dark background ── */
+:root.light #bf-devotional > div[style*="linear-gradient"]{
+  background:#f2f3f5 !important;
+  border-color:#d0d1d6 !important;
+}
+:root.light #devScripture{ color:#4a4b52 !important; }
+:root.light #devTitle{
+  color:#8a5200 !important;
+  -webkit-text-fill-color:#8a5200 !important;
+}
+
