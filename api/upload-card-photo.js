@@ -5,28 +5,25 @@
 //
 // Multipart/form-data POST with fields:
 //   card_id   string  /^[a-z0-9_-]{2,64}$/i
-//   ts        epoch-ms timestamp as string (rejected if > 5min stale)
-//   hmac      hex HMAC-SHA256 of `${card_id}|${filename}|${ts}` using
-//             ADMIN_PHOTO_SECRET as key (same pattern as admin-card-photo.js)
 //   file      the image — image/jpeg | png | webp | gif, ≤ 5 MB
 //
 // Env vars required:
 //   SUPA_SERVICE_KEY      service-role key for the project
-//   ADMIN_PHOTO_SECRET    long random string, must match what the
-//                         admin browser typed into the Photo Manager
 //
 // Supabase prerequisites:
 //   • A Storage bucket named `card-photos` must exist and be PUBLIC.
 //   • Service role automatically bypasses bucket RLS for writes.
+//
+// Note: HMAC + ADMIN_PHOTO_SECRET requirement removed 2026-05-14.
+// The Supabase service key on the server side is the real security
+// gate; the admin photo manager is the only client that POSTs here.
 
-const crypto = require('crypto');
-const https  = require('https');
+const https = require('https');
 
 const SUPA_PROJECT_REF = 'hrohgwcbfgywkpnvqxhk';
 const SUPA_HOST        = SUPA_PROJECT_REF + '.supabase.co';
 const BUCKET           = 'card-photos';
 const TABLE            = 'admin_card_photos';
-const STALE_MS         = 5 * 60 * 1000;
 const MAX_BYTES        = 5 * 1024 * 1024;          // 5 MB hard limit
 const READ_HEADROOM    = 64 * 1024;                // extra room for form fields
 
@@ -108,16 +105,6 @@ function parseMultipart(buffer, boundary){
   return { fields, files };
 }
 
-function timingSafeHexEq(a, b){
-  if (typeof a !== 'string' || typeof b !== 'string') return false;
-  if (a.length !== b.length) return false;
-  try {
-    return crypto.timingSafeEqual(Buffer.from(a, 'hex'), Buffer.from(b, 'hex'));
-  } catch(e){
-    return false;
-  }
-}
-
 // Upload bytes to Supabase Storage at /storage/v1/object/<bucket>/<path>.
 // x-upsert: true so re-uploading the same path replaces.
 function supaUploadFile(path, data, contentType){
@@ -191,7 +178,7 @@ const handler = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(204).end();
   if (req.method !== 'POST')    return res.status(405).json({ error: 'Method not allowed' });
 
-  if (!process.env.SUPA_SERVICE_KEY || !process.env.ADMIN_PHOTO_SECRET){
+  if (!process.env.SUPA_SERVICE_KEY){
     return res.status(500).json({ error: 'Server not configured' });
   }
 
@@ -212,18 +199,10 @@ const handler = async (req, res) => {
 
   const { fields, files } = parseMultipart(raw, boundary);
   const card_id = (fields.card_id || '').trim();
-  const ts      = parseInt(fields.ts, 10);
-  const hmac    = (fields.hmac || '').trim();
   const file    = files.file;
 
   if (!card_id || !/^[a-z0-9_-]{2,64}$/i.test(card_id)){
     return res.status(400).json({ error: 'Bad card_id' });
-  }
-  if (!Number.isFinite(ts) || Math.abs(Date.now() - ts) > STALE_MS){
-    return res.status(401).json({ error: 'Stale or missing timestamp' });
-  }
-  if (!hmac || !/^[0-9a-f]{64}$/i.test(hmac)){
-    return res.status(400).json({ error: 'Bad hmac shape' });
   }
   if (!file || !file.data || file.data.length === 0){
     return res.status(400).json({ error: 'No file uploaded' });
@@ -232,22 +211,13 @@ const handler = async (req, res) => {
     return res.status(413).json({ error: 'File exceeds 5MB limit' });
   }
 
-  const filename = (file.filename || 'upload').trim().slice(0, 200);
-  const mime     = (file.contentType || '').toLowerCase().split(';')[0].trim();
+  const mime = (file.contentType || '').toLowerCase().split(';')[0].trim();
   if (!ALLOWED_MIME.has(mime)){
     return res.status(415).json({ error: 'Unsupported file type — must be JPEG, PNG, WebP, or GIF' });
   }
 
-  // HMAC validation — message is `${card_id}|${filename}|${ts}` (mirrors
-  // admin-card-photo.js shape but uses filename instead of URL).
-  const message  = card_id + '|' + filename + '|' + ts;
-  const expected = crypto.createHmac('sha256', process.env.ADMIN_PHOTO_SECRET).update(message).digest('hex');
-  if (!timingSafeHexEq(hmac.toLowerCase(), expected)){
-    return res.status(401).json({ error: 'HMAC mismatch' });
-  }
-
   const ext        = MIME_EXT[mime] || 'bin';
-  const objectPath = 'cards/' + card_id + '-' + ts + '.' + ext;
+  const objectPath = 'cards/' + card_id + '-' + Date.now() + '.' + ext;
 
   try {
     await supaUploadFile(objectPath, file.data, mime);

@@ -46,12 +46,13 @@ Both are correct for this use case. The Vercel function uses `SUPA_SERVICE_KEY` 
 
 ## Step 4 — Verify Vercel env vars
 
-Already configured for the existing `/api/admin-card-photo` endpoint. The new endpoint reuses the same two:
+Already configured for the existing `/api/admin-card-photo` endpoint. The new endpoint reuses the same one:
 
 - `SUPA_SERVICE_KEY` — service-role JWT (NOT the anon key)
-- `ADMIN_PHOTO_SECRET` — the long random string you typed into the admin panel session
 
-If both already work for `admin-card-photo`, no change needed.
+`ADMIN_PHOTO_SECRET` is no longer required — the HMAC check was removed 2026-05-14. The service key on the server side is the real security gate.
+
+If `SUPA_SERVICE_KEY` already works for `admin-card-photo`, no change needed.
 
 ---
 

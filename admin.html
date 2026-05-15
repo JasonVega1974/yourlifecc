@@ -544,12 +544,6 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
           <button class="btn-sm btn-blue" style="margin-left:auto;" onclick="pmReload()">🔄 Reload from DB</button>
         </div>
         <div class="pm-bar">
-          <div class="pm-secret" id="pmSecretBar">
-            <span id="pmSecretLabel" class="pm-secret-missing">🔒 Admin photo secret —</span>
-            <input id="pmSecretInput" type="password" placeholder="paste ADMIN_PHOTO_SECRET here…" autocomplete="off">
-            <button class="pm-action" onclick="pmSaveSecret()">Set</button>
-            <button class="pm-action red" onclick="pmClearSecret()">Clear</button>
-          </div>
           <input class="pm-search" id="pmFilter" type="text" placeholder="Filter by id, title or section…" oninput="pmFilterCards()">
         </div>
         <div id="pmGrid"><div class="empty-state">LOADING CARDS…</div></div>
@@ -1390,10 +1384,9 @@ async function approveWaitlist(id, btn){
 /* ══════════════════════════════════════════════════════════════════
    PHOTO MANAGER — Admin tab for editing the 81 card hero images.
    Reads override URLs from /api/admin-card-photo (GET, public).
-   Writes via the same endpoint (POST, HMAC-authenticated). The HMAC
-   key (ADMIN_PHOTO_SECRET) is held in sessionStorage; the admin types
-   it once per session. It never travels over the wire — only HMACs
-   computed from it do.
+   Writes via the same endpoint (POST). HMAC + ADMIN_PHOTO_SECRET
+   requirement removed 2026-05-14 — the Supabase service key on the
+   server side is the real security gate.
 ══════════════════════════════════════════════════════════════════ */
 const PM_INVENTORY = [
   // ── Bible & Faith (12) ──
@@ -1711,20 +1704,11 @@ async function pmUploadFile(cardId){
     if(msg){ msg.textContent = 'Unsupported file type — must be JPEG, PNG, WebP, or GIF.'; msg.className = 'pm-msg err'; }
     return;
   }
-  const secret = sessionStorage.getItem('ylcc_admin_photo_secret');
-  if(!secret){
-    if(msg){ msg.textContent = 'Set ADMIN_PHOTO_SECRET first (top of the panel).'; msg.className = 'pm-msg err'; }
-    return;
-  }
-  const ts = Date.now();
   if(msg){ msg.textContent = 'uploading…'; msg.className = 'pm-msg'; }
   if(btn) btn.disabled = true;
   try {
-    const hmac = await pmHmac(secret, cardId + '|' + f.name + '|' + ts);
     const form = new FormData();
     form.append('card_id', cardId);
-    form.append('ts',      String(ts));
-    form.append('hmac',    hmac);
     form.append('file',    f, f.name);
     const resp = await fetch('/api/upload-card-photo', { method: 'POST', body: form });
     const data = await resp.json().catch(() => ({}));
@@ -1764,15 +1748,6 @@ async function pmUploadFile(cardId){
   }
 }
 
-async function pmHmac(key, message){
-  const enc = new TextEncoder();
-  const cryptoKey = await crypto.subtle.importKey(
-    'raw', enc.encode(key), { name:'HMAC', hash:'SHA-256' }, false, ['sign']
-  );
-  const sig = await crypto.subtle.sign('HMAC', cryptoKey, enc.encode(message));
-  return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
 async function pmSavePhoto(cardId){
   const msg   = document.querySelector(`[data-pm-msg="${cardId}"]`);
   const input = document.querySelector(`[data-pm-urlinput="${cardId}"]`);
@@ -1783,21 +1758,13 @@ async function pmSavePhoto(cardId){
     msg.className = 'pm-msg err';
     return;
   }
-  const secret = sessionStorage.getItem('ylcc_admin_photo_secret');
-  if(!secret){
-    msg.textContent = 'Set ADMIN_PHOTO_SECRET first (top of the panel).';
-    msg.className = 'pm-msg err';
-    return;
-  }
-  const ts = Date.now();
   msg.textContent = 'saving…';
   msg.className   = 'pm-msg';
   try {
-    const hmac = await pmHmac(secret, cardId + '|' + url + '|' + ts);
     const resp = await fetch('/api/admin-card-photo', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ card_id: cardId, photo_url: url, ts: ts, hmac: hmac }),
+      body: JSON.stringify({ card_id: cardId, photo_url: url }),
     });
     const data = await resp.json().catch(() => ({}));
     if(!resp.ok){
@@ -1846,29 +1813,6 @@ async function pmReload(){
   }
 }
 
-function pmSaveSecret(){
-  const v = (document.getElementById('pmSecretInput').value || '').trim();
-  if(!v){ pmToast('Paste the secret first', 'err'); return; }
-  sessionStorage.setItem('ylcc_admin_photo_secret', v);
-  document.getElementById('pmSecretInput').value = '';
-  pmUpdateSecretUI();
-  pmToast('Secret stored in session', 'ok');
-}
-
-function pmClearSecret(){
-  sessionStorage.removeItem('ylcc_admin_photo_secret');
-  pmUpdateSecretUI();
-  pmToast('Secret cleared', 'ok');
-}
-
-function pmUpdateSecretUI(){
-  const has = !!sessionStorage.getItem('ylcc_admin_photo_secret');
-  const lbl = document.getElementById('pmSecretLabel');
-  if(!lbl) return;
-  lbl.textContent = has ? '🔓 Admin photo secret —' : '🔒 Admin photo secret —';
-  lbl.className   = has ? 'pm-secret-ok' : 'pm-secret-missing';
-}
-
 let _pmToastTimer = null;
 function pmToast(msg, kind){
   const el = document.getElementById('pmToast');
@@ -1883,7 +1827,6 @@ function pmToast(msg, kind){
 async function pmInit(){
   if(PM_INITED) return;
   PM_INITED = true;
-  pmUpdateSecretUI();
   await pmReload();
 }
 

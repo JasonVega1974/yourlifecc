@@ -10,24 +10,20 @@
 //     Used by app/js/ui.js loadCardPhotoOverrides() on app boot.
 //
 //   POST  /api/admin-card-photo
-//     → HMAC-authenticated — upserts a single { card_id, photo_url }
-//     Body: { card_id, photo_url, ts, hmac }
-//       ts:    integer epoch-ms timestamp (rejected if > 5min stale)
-//       hmac:  hex HMAC-SHA256 of `${card_id}|${photo_url}|${ts}`
-//              using process.env.ADMIN_PHOTO_SECRET as the key
-//     The admin's browser holds ADMIN_PHOTO_SECRET in sessionStorage
-//     (typed once per session). The secret never travels over the wire.
+//     → Upserts a single { card_id, photo_url }
+//     Body: { card_id, photo_url }
 //
 // Environment variables required:
 //   SUPA_SERVICE_KEY      service-role key for the YourLife CC project
-//   ADMIN_PHOTO_SECRET    long random string, same value in browser session
+//
+// Note: HMAC + ADMIN_PHOTO_SECRET requirement removed 2026-05-14.
+// The Supabase service key on the server side is the real security
+// gate; the admin photo manager is the only client that POSTs here.
 
-const crypto = require('crypto');
-const https  = require('https');
+const https = require('https');
 
-const SUPA_HOST    = 'hrohgwcbfgywkpnvqxhk.supabase.co';
-const TABLE        = 'admin_card_photos';
-const STALE_MS     = 5 * 60 * 1000;  // 5-minute replay window
+const SUPA_HOST = 'hrohgwcbfgywkpnvqxhk.supabase.co';
+const TABLE     = 'admin_card_photos';
 
 function supaRequest(method, path, body){
   return new Promise((resolve, reject) => {
@@ -62,16 +58,6 @@ function supaRequest(method, path, body){
   });
 }
 
-function timingSafeHexEq(a, b){
-  if (typeof a !== 'string' || typeof b !== 'string') return false;
-  if (a.length !== b.length) return false;
-  try {
-    return crypto.timingSafeEqual(Buffer.from(a, 'hex'), Buffer.from(b, 'hex'));
-  } catch(e){
-    return false;
-  }
-}
-
 module.exports = async (req, res) => {
   // CORS for browser usage from yourlifecc.com / localhost
   res.setHeader('Access-Control-Allow-Origin',  '*');
@@ -98,33 +84,21 @@ module.exports = async (req, res) => {
   }
 
   if (req.method === 'POST'){
-    if (!process.env.SUPA_SERVICE_KEY || !process.env.ADMIN_PHOTO_SECRET){
+    if (!process.env.SUPA_SERVICE_KEY){
       return res.status(500).json({ error: 'Server not configured' });
     }
 
     const body = req.body || {};
     const card_id   = typeof body.card_id   === 'string' ? body.card_id.trim()   : '';
     const photo_url = typeof body.photo_url === 'string' ? body.photo_url.trim() : '';
-    const ts        = typeof body.ts        === 'number' ? body.ts               : parseInt(body.ts, 10);
-    const hmac      = typeof body.hmac      === 'string' ? body.hmac.trim()      : '';
 
-    // Shape checks
-    if (!card_id || !/^[a-z0-9_-]{2,64}$/i.test(card_id))           return res.status(400).json({ error: 'Bad card_id' });
+    if (!card_id || !/^[a-z0-9_-]{2,64}$/i.test(card_id)){
+      return res.status(400).json({ error: 'Bad card_id' });
+    }
     // Accept either a Wikimedia Commons URL or the project's own Supabase
     // Storage public URL (populated by /api/upload-card-photo).
     if (!photo_url || !/^https:\/\/(upload\.wikimedia\.org|hrohgwcbfgywkpnvqxhk\.supabase\.co\/storage)\//.test(photo_url)){
       return res.status(400).json({ error: 'photo_url must be from upload.wikimedia.org or Supabase Storage' });
-    }
-    if (!Number.isFinite(ts) || Math.abs(Date.now() - ts) > STALE_MS){
-      return res.status(401).json({ error: 'Stale or missing timestamp' });
-    }
-    if (!hmac || !/^[0-9a-f]{64}$/i.test(hmac))                     return res.status(400).json({ error: 'Bad hmac shape' });
-
-    // HMAC validation
-    const message  = card_id + '|' + photo_url + '|' + ts;
-    const expected = crypto.createHmac('sha256', process.env.ADMIN_PHOTO_SECRET).update(message).digest('hex');
-    if (!timingSafeHexEq(hmac.toLowerCase(), expected)){
-      return res.status(401).json({ error: 'HMAC mismatch' });
     }
 
     try {
