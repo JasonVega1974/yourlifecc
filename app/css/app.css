@@ -45,13 +45,28 @@
 }
 
 /* ── LIGHT MODE ─────────────────────────────────── */
+/* 2026-05-15 — Professional light-mode overhaul. Tokens tuned per the
+   spec: soft blue-gray body, white cards with subtle shadow, light
+   gray sidebar, near-black text. Inline gold #fbbf24 text on white
+   bg was the worst readability issue — handled by the override block
+   at the bottom of this file. */
 :root.light{
-  --bg:#f0f4f8;--s1:#ffffff;--s2:#f8fafc;--s3:#e9eef5;--s4:#dde4ee;
-  --tx:#0f172a;--tx2:#475569;--mt:#94a3b8;--br:rgba(56,189,248,0.25);
-  --card-shadow:0 2px 12px rgba(0,0,0,.08);
-  --card-bg:rgba(255,255,255,.9);--card-border:rgba(0,0,0,.08);
-  --input-bg:#f1f5f9;--input-border:rgba(0,0,0,.15);
-  --sel-bg:#f1f5f9;
+  --bg:#f0f2f5;            /* soft blue-gray, not pure white */
+  --s1:#ffffff;            /* cards / sidebar surface */
+  --s2:#f5f7fa;            /* section headers */
+  --s3:#e9eef5;            /* hover / subtle inset */
+  --s4:#dde4ee;            /* deeper accent surface */
+  --tx:#111827;            /* near-black body text */
+  --tx2:#374151;           /* secondary text */
+  --tx3:#6b7280;           /* tertiary text */
+  --mt:#9ca3af;            /* very muted */
+  --br:rgba(56,189,248,0.25);
+  --card-shadow:0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+  --card-bg:#ffffff;
+  --card-border:rgba(0,0,0,.08);
+  --input-bg:#ffffff;
+  --input-border:#d1d5db;
+  --sel-bg:#f3f4f6;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{font-size:17px;scroll-behavior:smooth;}
@@ -2236,8 +2251,14 @@ body{top:0!important;}
    body.child-view  = a child profile is active
 ─────────────────────────────────────────────────────────────── */
 body.parent-view #heroCard         { display: none !important; }
+/* 2026-05-15 — Legacy #heroCard photo-hero (Good Evening, CHAMPION)
+   force-shown by body.child-view here was overriding the inline
+   display:none added in the Phase C-hero rebuild. The new warm
+   greeting opener (#heroGreeting) replaces it everywhere. The
+   markup is preserved so chores.js / skills.js / ui.js references
+   stay graceful-null. */
 body.parent-view #parentWelcomeCard{ display: block !important; }
-body.child-view  #heroCard         { display: block !important; }
+body.child-view  #heroCard         { display: none !important; }
 body.child-view  #parentWelcomeCard{ display: none !important; }
 
 /* ── SETTINGS PANEL — color swatch visibility in light mode ──
@@ -4845,10 +4866,286 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
   color:#0f172a !important;
 }
 
-/* Generic fallback — any inline-styled "card-like" block using rgba
-   white-on-dark text colors stays readable. These attribute selectors
-   target the very common inline patterns added by Phase C/F rendering. */
-:root.light *[style*="color:var(--tx);"]:not(button):not(a){ color:#0f172a !important; }
-:root.light *[style*="color:var(--tx2)"]:not(button):not(a){ color:#475569 !important; }
-:root.light *[style*="color:var(--tx3)"]:not(button):not(a){ color:#64748b !important; }
+/* ════════════════════════════════════════════════════════════
+   2026-05-15 — PROFESSIONAL LIGHT-MODE OVERHAUL.
+   The single biggest readability problem was gold text (#fbbf24)
+   on white. This block fixes that systematically + brings cards,
+   sidebars, modals, inputs, and bottom nav to a polished light
+   look. Section accent tokens stay (they read in both themes).
+   Order: token-driven surfaces first, then class overrides, then
+   attribute selectors for inline-styled gold/var(--tx) text.
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Chrome surfaces ─────────────────────────────────────── */
+:root.light body{ background:var(--bg); }
+:root.light #sidebar{ background:#e8eaed !important; border-right-color:rgba(0,0,0,.08) !important; }
+:root.light #mBar{
+  background:#ffffff !important;
+  border-bottom-color:rgba(0,0,0,.10) !important;
+  box-shadow:0 1px 3px rgba(0,0,0,.06);
+}
+:root.light .mBar-title{ color:var(--c) !important; }
+:root.light .sh{ background:#f5f7fa !important; border-radius:10px; padding:.75rem 1rem; }
+:root.light .sh .st{ color:#111827 !important; }
+:root.light #topQuickBtns{ background:rgba(255,255,255,.97) !important; border-bottom-color:rgba(0,0,0,.10) !important; }
+
+/* ── Cards everywhere ────────────────────────────────────── */
+:root.light .card{
+  background:#ffffff !important;
+  border-color:rgba(0,0,0,.08) !important;
+  box-shadow:0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04) !important;
+}
+:root.light .card:hover{ background:#fafbfc !important; }
+
+/* ── Hero opener (Phase C) ───────────────────────────────── */
+:root.light #heroGreeting{
+  background:linear-gradient(135deg,rgba(56,189,248,.10),rgba(167,139,250,.06)) !important;
+  border-color:rgba(56,189,248,.25) !important;
+  box-shadow:0 1px 3px rgba(0,0,0,.06);
+}
+:root.light #heroGreeting > div:first-child{ color:#111827 !important; }
+:root.light #heroGreeting > div:last-child{ color:#374151 !important; }
+:root.light #heroTodaysVerse{
+  background:linear-gradient(135deg,rgba(251,191,36,.20),rgba(251,146,60,.10)) !important;
+  border-color:rgba(146,64,14,.30) !important;
+  box-shadow:0 1px 3px rgba(146,64,14,.06);
+}
+:root.light #heroTodaysVerseText{ color:#1f2937 !important; }
+:root.light #heroReflectCard{
+  background:linear-gradient(135deg,rgba(251,191,36,.10),rgba(251,191,36,.04)) !important;
+  border-color:rgba(146,64,14,.25) !important;
+}
+:root.light #heroReflectBtn{ color:#92400e !important; }
+:root.light #heroReflectQuestion{ background:rgba(251,191,36,.12) !important; color:#1f2937 !important; border-left-color:#92400e !important; }
+:root.light #heroReflectResponse{ background:#fff !important; border-color:rgba(0,0,0,.15) !important; color:#111827 !important; }
+:root.light #heroQuickActions button{
+  background:#fff !important;
+  border-color:rgba(0,0,0,.10) !important;
+  box-shadow:0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+  color:#111827 !important;
+}
+:root.light #heroQuickActions button > div:nth-child(2){ color:#111827 !important; }
+:root.light #heroQuickActions button > div:nth-child(3){ color:#374151 !important; }
+:root.light #heroQuickStats{ border-bottom-color:rgba(0,0,0,.08) !important; color:#374151 !important; }
+:root.light #heroQuickStats b{ color:#111827 !important; }
+
+/* ── Bottom tab bar ──────────────────────────────────────── */
+:root.light #bottomTabBar{
+  background:#ffffff !important;
+  border-top-color:rgba(0,0,0,.10) !important;
+  box-shadow:0 -2px 12px rgba(0,0,0,.06) !important;
+}
+:root.light #bottomTabBar .tab-btn{ color:#374151 !important; }
+:root.light #bottomTabBar .tab-btn .tab-icon{ filter:none !important; }
+
+/* ── Tab landings (s-learn / s-life / s-me) ──────────────── */
+:root.light .tab-landing-card{
+  background:#ffffff !important;
+  border-color:rgba(0,0,0,.08) !important;
+  box-shadow:0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+  color:#111827 !important;
+}
+:root.light .tab-landing-card .tlc-label{ color:#111827 !important; }
+
+/* ── Faith stack — gold readability ──────────────────────── */
+:root.light .bf-eyebrow{ color:#92400e !important; opacity:1 !important; }
+:root.light .bf-title{ color:#92400e !important; }
+:root.light .bf-card{ background:#fff !important; border-color:rgba(0,0,0,.08) !important; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+:root.light .scrTabs .tab.active,
+:root.light .scrTabs-bottom .tab.active{ color:#92400e !important; }
+:root.light #s-scripture .sh .st{ color:#92400e !important; }
+:root.light #s-scripture > div[onclick*="openAskBible"]{
+  background:linear-gradient(135deg,rgba(67,56,202,.10),rgba(20,184,166,.05)) !important;
+  border-color:rgba(55,48,163,.30) !important;
+  box-shadow:0 1px 3px rgba(0,0,0,.06);
+}
+
+/* ── Phase C-Health ──────────────────────────────────────── */
+:root.light #healthMoodCheckin{
+  background:linear-gradient(135deg,rgba(52,211,153,.10),rgba(34,197,94,.06)) !important;
+  border-color:rgba(22,101,52,.25) !important;
+}
+:root.light #healthMoodCheckin > div:first-child{ color:#111827 !important; }
+:root.light #healthMoodCheckin > div:nth-child(2){ color:#374151 !important; }
+:root.light #healthMoodCheckin button{ background:#fff !important; border-color:rgba(22,101,52,.25) !important; color:#111827 !important; }
+:root.light .phq2-opt{ background:#fff !important; border-color:rgba(22,101,52,.25) !important; color:#111827 !important; }
+
+/* ── Phase C-Finance ─────────────────────────────────────── */
+:root.light .finance-summary-opener{
+  background:linear-gradient(135deg,rgba(22,163,74,.12),rgba(34,211,153,.05)) !important;
+  border-color:rgba(20,83,45,.30) !important;
+}
+:root.light .finance-summary-opener > div:first-child{ color:#14532d !important; }
+:root.light #finSumBalance, :root.light #finSumMonthSpend{ color:#111827 !important; }
+:root.light #finSumSavPct{ color:#14532d !important; }
+:root.light #spendingDonut text[fill="var(--tx)"]{ fill:#111827 !important; }
+:root.light #spendingDonut text[fill="var(--tx2)"]{ fill:#374151 !important; }
+:root.light #paySimOutput > div{ background:#ffffff !important; border-color:rgba(0,0,0,.10) !important; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+
+/* ── Phase C-Goals ───────────────────────────────────────── */
+:root.light .gv-goal-card{
+  background:#ffffff !important;
+  border-color:rgba(0,0,0,.08) !important;
+  box-shadow:0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+}
+:root.light .gv-goal-card .gv-goal-text{ color:#111827 !important; }
+:root.light .gv-goal-card svg text{ fill:#111827 !important; }
+
+/* ── Phase F — AI surfaces ───────────────────────────────── */
+:root.light #st-aiTutor .card{ background:#fff !important; }
+:root.light #apOutput > div{ background:#fff !important; border-color:rgba(0,0,0,.10) !important; color:#111827 !important; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+:root.light .ap-mode-btn{ background:#fff !important; border-color:rgba(3,105,161,.25) !important; color:#374151 !important; }
+:root.light .ap-mode-btn[style*="background:rgba(56,189,248,.18)"]{
+  background:rgba(3,105,161,.14) !important; border-color:#0369a1 !important; color:#111827 !important;
+}
+:root.light #goalSuggestModal .md{ background:#ffffff !important; box-shadow:0 20px 60px rgba(0,0,0,.15) !important; }
+:root.light #gsList > div{ background:#ffffff !important; border-color:rgba(154,52,18,.30) !important; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+
+/* ── Phase E — onboarding overlay ────────────────────────── */
+:root.light #onboardingOverlay{ background:#ffffff !important; }
+:root.light #onboardingOverlay h2{ color:#111827 !important; }
+:root.light #onboardingOverlay .onb-sub{ color:#374151 !important; }
+:root.light #onboardingOverlay .onb-step > div[style*="font-family:var(--fh)"]{ color:#111827 !important; }
+:root.light #onboardingOverlay .onb-card{
+  background:#fff !important; border-color:rgba(0,0,0,.12) !important;
+  box-shadow:0 1px 3px rgba(0,0,0,.06);
+}
+:root.light #onboardingOverlay .onb-card .onb-label{ color:#111827 !important; }
+:root.light #onboardingOverlay .onb-card .onb-cap{ color:#374151 !important; }
+:root.light #onboardingOverlay .onb-card.selected{ box-shadow:0 6px 20px rgba(146,64,14,.18); border-color:#92400e !important; }
+:root.light #onboardingOverlay .onb-tile{ background:#fff !important; border-color:rgba(0,0,0,.12) !important; }
+:root.light #onboardingOverlay .onb-tile .onb-tile-label{ color:#111827 !important; }
+:root.light #onboardingOverlay .onb-toggle-row{ background:#fff !important; border-color:rgba(0,0,0,.10) !important; }
+:root.light #onboardingOverlay .onb-toggle-row .onb-toggle-label{ color:#111827 !important; }
+:root.light #onboardingOverlay .onb-toggle-row .onb-toggle-cap{ color:#6b7280 !important; }
+:root.light #onboardingOverlay input[type=text]{ background:#fff !important; border-color:#d1d5db !important; color:#111827 !important; }
+:root.light #onboardingOverlay .onb-yesno{ background:rgba(0,0,0,.06) !important; }
+:root.light #onboardingOverlay .onb-yesno button{ color:#374151 !important; }
+:root.light #onboardingOverlay .onb-yesno button.active{ background:#92400e !important; color:#fff !important; }
+:root.light #onboardingOverlay .onb-dot{ background:rgba(0,0,0,.18) !important; }
+:root.light #onboardingOverlay .onb-dot.active{ background:#92400e !important; }
+:root.light #onboardingOverlay .onb-dot.done{ background:rgba(146,64,14,.55) !important; }
+:root.light #onboardingOverlay .onb-back{ background:rgba(0,0,0,.05) !important; border-color:rgba(0,0,0,.14) !important; color:#111827 !important; }
+:root.light #onboardingOverlay .onb-primary{ background:linear-gradient(135deg,#f59e0b,#ea580c) !important; box-shadow:0 8px 24px rgba(146,64,14,.22) !important; color:#ffffff !important; }
+
+/* ── Modals (.mo / .md) ──────────────────────────────────── */
+:root.light .mo{ background:rgba(0,0,0,.5) !important; }
+:root.light .md{
+  background:#ffffff !important;
+  border-color:rgba(0,0,0,.08) !important;
+  box-shadow:0 20px 60px rgba(0,0,0,.15) !important;
+}
+:root.light .mdt{ color:#111827 !important; }
+:root.light .md label{ color:#374151 !important; }
+
+/* ── Inputs ──────────────────────────────────────────────── */
+:root.light input, :root.light textarea, :root.light select{
+  background:#ffffff !important;
+  border-color:#d1d5db !important;
+  color:#111827 !important;
+}
+:root.light input::placeholder, :root.light textarea::placeholder{ color:#9ca3af !important; }
+
+/* ── GOLD-TEXT INVISIBILITY FIX ──────────────────────────────
+   Inline styles using gold #fbbf24/#f5c842/#fde68a/#fef3c7 as TEXT
+   color on a white surface become invisible. Remap to dark amber
+   #92400e via attribute selectors. Excludes button + a so branded
+   button text stays branded; excludes elements with style declaring
+   a background-color on the same element (those are colored chips
+   where the gold is the surface, not the text). */
+:root.light *[style*="color:#fbbf24"]:not(button):not(a):not([style*="background:#fbbf24"]):not([style*="background:linear-gradient"]){
+  color:#92400e !important;
+}
+:root.light *[style*="color:#f5c842"]:not(button):not(a){ color:#92400e !important; }
+:root.light *[style*="color:#fde68a"]:not(button):not(a){ color:#92400e !important; }
+:root.light *[style*="color:#fef3c7"]:not(button):not(a){ color:#92400e !important; }
+:root.light *[style*="color:var(--g)"]:not(button):not(a){ color:#92400e !important; }
+:root.light *[style*="color:var(--gold)"]:not(button):not(a){ color:#92400e !important; }
+
+/* var(--accent) indigo as text → darker indigo in light mode. */
+:root.light *[style*="color:var(--accent"]:not(button):not(a){ color:#3730a3 !important; }
+
+/* var(--c) sky as text → darker sky in light mode (only when used
+   on white-ish backgrounds, i.e. as plain text not a bg accent). */
+:root.light *[style*="color:var(--c);"]:not(button):not(a):not([style*="background:var(--c)"]){
+  color:#0369a1 !important;
+}
+
+/* Section accents as text — darken roughly 20% so they read on white. */
+:root.light *[style*="color:var(--section-daily-life)"]:not(button):not(a){ color:#b45309 !important; }
+:root.light *[style*="color:var(--section-school)"]:not(button):not(a){ color:#075985 !important; }
+:root.light *[style*="color:var(--section-health)"]:not(button):not(a){ color:#047857 !important; }
+:root.light *[style*="color:var(--section-finance)"]:not(button):not(a){ color:#15803d !important; }
+:root.light *[style*="color:var(--section-goals)"]:not(button):not(a){ color:#9a3412 !important; }
+:root.light *[style*="color:var(--section-journal)"]:not(button):not(a){ color:#7c3aed !important; }
+:root.light *[style*="color:var(--section-sports)"]:not(button):not(a){ color:#991b1b !important; }
+
+/* Generic text remap — keep dark text readable on light surfaces. */
+:root.light *[style*="color:var(--tx);"]:not(button):not(a){ color:#111827 !important; }
+:root.light *[style*="color:var(--tx2)"]:not(button):not(a){ color:#374151 !important; }
+:root.light *[style*="color:var(--tx3)"]:not(button):not(a){ color:#6b7280 !important; }
+:root.light *[style*="color:#c8d4e8"]:not(button):not(a){ color:#374151 !important; }
+:root.light *[style*="color:rgba(255,255,255"]:not(button):not(a){ color:#111827 !important; }
+
+/* Inline rgba(255,255,255,X) backgrounds + borders → light equivalents.
+   Excludes buttons (branded), elements that are clearly chips/pills
+   (small radius, gradient bg) handled via .selected/.active classes. */
+:root.light *[style*="background:rgba(255,255,255,.04)"]:not(button):not(.tab){
+  background:rgba(0,0,0,.04) !important;
+}
+:root.light *[style*="background:rgba(255,255,255,.06)"]:not(button):not(.tab){
+  background:rgba(0,0,0,.04) !important;
+}
+:root.light *[style*="background:rgba(255,255,255,.08)"]:not(button):not(.tab){
+  background:rgba(0,0,0,.06) !important;
+}
+:root.light *[style*="background:rgba(255,255,255,.1)"]:not(button):not(.tab){
+  background:rgba(0,0,0,.06) !important;
+}
+:root.light *[style*="border:1px solid rgba(255,255,255"]{
+  border-color:rgba(0,0,0,.10) !important;
+}
+:root.light *[style*="border-color:rgba(255,255,255"]{
+  border-color:rgba(0,0,0,.10) !important;
+}
+
+/* ── Gold-text gaps caught in the post-overhaul audit ──────────
+   These are class-applied gold colors that bypass the inline-style
+   attribute selectors above. */
+
+/* .bf-title uses -webkit-text-fill-color:transparent to clip a gradient
+   onto text — `color:#92400e` alone can't override the gradient on
+   WebKit/Blink. Unset the clip and set the fill color explicitly. */
+:root.light .bf-title{
+  background:none !important;
+  -webkit-background-clip:initial !important;
+  background-clip:initial !important;
+  -webkit-text-fill-color:#92400e !important;
+  color:#92400e !important;
+}
+
+/* .ob-tip kid-onboarding wizard tips set color:#fde68a at the class
+   level — inline attribute selectors don't catch class-set colors. */
+:root.light .ob-tip{ color:#92400e !important; }
+
+/* .hero-greet / .hero-name from the legacy heroCard. heroCard is now
+   hidden (display:none !important) so this is mostly defensive, but
+   ensures the markup stays readable if anything ever un-hides it. */
+:root.light .hero-greet,
+:root.light .hero-name{ color:#111827 !important; }
+
+/* Daily devotional modal — body text uses rgba(254,243,199,.92) which
+   doesn't match any rgba(255,255,255,...) attribute selector. The
+   modal renders against a dark gradient bg even in light mode (it's
+   an overlay), so its text stays cream — but if a future change
+   flips the bg to light, this rescue kicks in. */
+:root.light #ddmBody,
+:root.light #ddmReflect,
+:root.light #ddmPrayer{ color:#1f2937 !important; }
+
+/* Belt-and-suspenders: any element using a gold-toned text class
+   pattern that we might have missed (faith-themed gold-on-dark
+   classes commonly written as .gold-*, .amber-*, .bf-gold, etc.). */
+:root.light .bf-gold,
+:root.light [class*="gold-text"]{ color:#92400e !important; }
 
