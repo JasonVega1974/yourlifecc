@@ -4577,6 +4577,15 @@
   </div>
 
   <!-- DAILY DEVOTIONALS -->
+  <style>
+    /* ── Devotional light mode — fix inline-style dark container + hardcoded text colors ── */
+    :root.light #bf-devotional > div[style*="linear-gradient"]{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; }
+    :root.light #devTitle{ color:#8a5200 !important; -webkit-text-fill-color:#8a5200 !important; }
+    :root.light #devScripture{ color:#4a4b52 !important; }
+    :root.light #devRef{ color:#8a5200 !important; }
+    :root.light #bf-devotional [style*="color:#fbbf24"]{ color:#8a5200 !important; }
+    :root.light #bf-devotional [style*="background:rgba(167,139,250"]{ background:rgba(138,82,0,.06) !important; border-left-color:#8a5200 !important; }
+  </style>
   <div id="bf-devotional" style="display:none;">
     <div class="bf-section-hdr">
       <div class="bf-eyebrow">DAILY DEVOTIONAL · 365 DAYS</div>
@@ -5202,7 +5211,7 @@
         text-shadow:0 0 18px rgba(251,191,36,.25);
         margin-bottom:.4rem;
       }
-      :root.light #bf-academy .ac-card-title{color:#1a1233;text-shadow:0 0 12px rgba(251,191,36,.18);}
+      :root.light #bf-academy .ac-card-title{color:#1a1b1e !important;text-shadow:none !important;}
       #bf-academy .ac-card-desc{
         font-family:Georgia,'Times New Roman',serif;font-style:italic;
         font-size:.84rem;line-height:1.55;color:rgba(254,243,199,.82);
@@ -5254,6 +5263,16 @@
         color:#fef3c7;opacity:.82;font-weight:400;line-height:1.5;
       }
       :root.light #bf-academy .ac-section-divider-sub{color:#3a2818;opacity:.9;}
+      /* ── Light mode: card backgrounds and eye labels ── */
+      :root.light #bf-academy .ac-card{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; box-shadow:0 1px 4px rgba(0,0,0,.10) !important; }
+      :root.light #bf-academy .ac-card:hover{ box-shadow:0 6px 18px rgba(0,0,0,.14) !important; border-color:#8a5200 !important; }
+      :root.light #bf-academy .ac-card-tint{ opacity:0 !important; }
+      :root.light #bf-academy .ac-card-eye{ color:#8a5200 !important; opacity:1 !important; }
+      :root.light #bf-academy .ac-featured-eye{ color:#8a5200 !important; opacity:1 !important; }
+      :root.light #bf-academy .ac-featured-line{ background:linear-gradient(90deg,rgba(138,82,0,.35),transparent) !important; }
+      :root.light #bf-academy .ac-card-desc{ color:#4a4b52 !important; opacity:1 !important; }
+      :root.light #bf-academy .ac-card-meta{ color:#7a7b85 !important; }
+      :root.light #bf-academy .ac-card-badge{ color:#8a5200 !important; background:rgba(138,82,0,.10) !important; border-color:rgba(138,82,0,.30) !important; }
     </style>
 
     <div class="bf-section-hdr">
@@ -6423,6 +6442,16 @@
     @media (prefers-reduced-motion: reduce){
       #storyPlayerModal .sp-fade-in{ animation:none; }
     }
+    /* ── Light mode: keep cinematic dark — never let .md override paint this gray ── */
+    :root.light #storyPlayerModal .md{ background:linear-gradient(180deg,#0a0d1a 0%,#1a1233 100%) !important; color:#fef3c7 !important; box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 0 1px rgba(251,191,36,.12) inset !important; }
+    :root.light #storyPlayerModal .sp-narration{ color:rgba(254,243,199,.9) !important; border-top-color:rgba(251,191,36,.12) !important; }
+    :root.light #storyPlayerModal .sp-controls{ background:rgba(10,13,26,.6) !important; border-top-color:rgba(251,191,36,.12) !important; }
+    :root.light #storyPlayerModal .sp-bibletext{ color:rgba(254,243,199,.96) !important; }
+    :root.light #storyPlayerModal .sp-bibletext .sp-ref{ color:#fbbf24 !important; }
+    :root.light #storyPlayerModal .sp-title{ color:#fef3c7 !important; }
+    :root.light #storyPlayerModal .sp-eyebrow{ color:rgba(254,243,199,.85) !important; }
+    :root.light #storyPlayerModal .sp-stage{ background:#0a0d1a !important; }
+    :root.light #storyPlayerModal .sp-close{ background:rgba(10,13,26,.55) !important; border-color:rgba(254,243,199,.3) !important; color:#fef3c7 !important; }
   </style>
   <div id="storyPlayerModal" class="mo" onclick="if(event.target===this)closeStory()">
     <div class="md">
