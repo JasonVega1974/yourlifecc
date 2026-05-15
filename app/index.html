@@ -10409,6 +10409,27 @@
 
 
 <!-- ═══ OVERLAY MODALS (moved from misc.js) ═══ -->
+<style>
+  /* ── charModal light mode — devotional, lesson, faith card modal ── */
+  :root.light #charTitle{
+    background:none !important;
+    -webkit-background-clip:initial !important;
+    background-clip:initial !important;
+    -webkit-text-fill-color:#8a5200 !important;
+    color:#8a5200 !important;
+    text-shadow:none !important;
+  }
+  :root.light #charSub{ color:#4a4b52 !important; opacity:1 !important; }
+  :root.light #charBody{ color:#4a4b52 !important; }
+  /* JS-injected content from openDevotionalCard / openAcademyLesson */
+  :root.light #charBody [style*="color:#fef3c7"]{ color:#4a4b52 !important; }
+  :root.light #charBody [style*="color:rgba(254,243,199"]{ color:#4a4b52 !important; }
+  :root.light #charBody [style*="color:#fbbf24"]{ color:#8a5200 !important; }
+  :root.light #charBody [style*="background:rgba(251,191,36"]{ background:rgba(138,82,0,.06) !important; }
+  :root.light #charBody [style*="border-left:4px solid #fbbf24"]{ border-left-color:rgba(138,82,0,.4) !important; }
+  /* Close button in header */
+  :root.light #charModalHeader button{ background:rgba(138,82,0,.08) !important; border-color:rgba(138,82,0,.25) !important; color:#4a4b52 !important; }
+</style>
 <!-- F9: charModal migrated to Well gold register (was hardcoded #667eea→#764ba2) -->
 <div id="charModal" class="mo" onclick="if(event.target===this)closeModal('charModal')">
   <div class="md" style="max-width:620px;padding:0;overflow:hidden;background:linear-gradient(180deg,#0a0d1a 0%,#100a26 100%);border:1px solid rgba(251,191,36,.22);display:flex;flex-direction:column;max-height:92vh;">
