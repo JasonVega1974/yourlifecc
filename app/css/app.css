@@ -5229,6 +5229,8 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 :root.light #lessonModal .lm-sub{ color:#4a4b52 !important; opacity:1 !important; }
 :root.light #lessonModal .lm-section h4{ color:#92400e !important; }
 :root.light #lessonModal .lm-section p{ color:#1a1b1e !important; }
+.lm-section h4{font-weight:600 !important;}
+.lm-section p{font-weight:400 !important;}
 :root.light #lessonModal .lm-keyverse{
   background:rgba(146,64,14,.06) !important;
   border-color:rgba(146,64,14,.22) !important;

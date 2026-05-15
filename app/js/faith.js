@@ -5270,7 +5270,7 @@ function openLessonModal(lessonId){
   const photoUrl = adminOverride;
 
   const headerEl = document.getElementById('lmHeader');
-  if(headerEl) headerEl.style.background = 'linear-gradient(135deg,' + cat.color + ',#fef3c7)';
+  if(headerEl) headerEl.style.background = 'linear-gradient(135deg,rgba(20,15,40,0.95),rgba(40,25,60,0.92))';
   const iconEl = document.getElementById('lmIcon');
   if(iconEl) iconEl.textContent = cat.icon || '📖';
   const titleEl = document.getElementById('lmTitle');
