@@ -1,7 +1,7 @@
 // YourLifeCC Service Worker
 // Version bump this string whenever you deploy a major update
 // to force old caches to clear.
-const CACHE_NAME = 'yourlifecc-v196';
+const CACHE_NAME = 'yourlifecc-v197';
 
 // Core assets to pre-cache on install — the app shell
 const PRECACHE_ASSETS = [
@@ -78,6 +78,21 @@ self.addEventListener('fetch', event => {
           // Offline fallback — serve cached app shell
           return caches.match('/app/index.html') || caches.match('/app/');
         })
+    );
+    return;
+  }
+
+  // JS and CSS — network first so deploys are always visible; cache as offline fallback
+  const isAppAsset = (url.pathname.startsWith('/app/js/') || url.pathname.startsWith('/app/css/'));
+  if (isAppAsset) {
+    event.respondWith(
+      fetch(event.request).then(response => {
+        if (response && response.status === 200) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        }
+        return response;
+      }).catch(() => caches.match(event.request))
     );
     return;
   }
