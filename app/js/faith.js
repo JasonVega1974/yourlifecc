@@ -7420,6 +7420,7 @@ function renderFaithHomeStories(){
       + '</div>'
       + '</button>';
   }).join('');
+  const grid2 = document.getElementById('bfStoriesGrid'); if(grid2) grid2.innerHTML = list ? list.innerHTML : '';
   // Wire delegated click as the second safety net. Idempotent.
   if(!list.__storyClickBound){
     list.addEventListener('click', function(e){
