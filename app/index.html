@@ -809,150 +809,189 @@
   <!-- ── Faith-only "Enter The Well" cinematic hero (window._faithFree)
        Populated by renderFaithOnlyHero() in init.js. Hidden for all other users. ── -->
   <style>
-    /* ── Faith-only hero panel ── */
+    /* ── Faith-only hero panel (FULL SCREEN, no cards below) ── */
     .fo-hero{
-      position:relative;min-height:480px;border-radius:20px;overflow:hidden;
-      margin-bottom:1rem;background:#01030a;
-      display:flex;align-items:center;justify-content:center;
+      position:relative;
+      min-height:calc(100vh - 80px);
+      border-radius:20px;overflow:hidden;
+      margin-bottom:1rem;
+      background:linear-gradient(180deg,#000208 0%,#040b22 45%,#0a1538 100%);
       animation:foFadeIn 1.1s ease both;
     }
-    .fo-svg-scene{position:absolute;inset:0;width:100%;height:100%;z-index:0;}
-    .fo-svg-scene > g{transition:transform 280ms ease-out;will-change:transform;}
-    .fo-hero-scrim{
-      position:absolute;inset:0;pointer-events:none;z-index:1;
+    /* ── CSS Star field (fills entire hero) ── */
+    .fo-night-stars{position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden;}
+    .fo-star{
+      position:absolute;background:#fff;border-radius:50%;
+      animation:foTwinkle var(--dur,3s) ease-in-out infinite;
+      animation-delay:var(--del,0s);will-change:opacity,transform;
+    }
+    .fo-star-glow{box-shadow:0 0 4px 1px rgba(255,255,255,.45);}
+    .fo-star-bright{box-shadow:0 0 9px 2px rgba(254,243,199,.78),0 0 18px 4px rgba(251,191,36,.25);}
+    .fo-shooting-star{
+      position:absolute;width:3px;height:3px;background:#fff;border-radius:50%;
+      box-shadow:0 0 12px 3px rgba(255,255,255,.95),
+        -40px -12px 18px -6px rgba(255,255,255,.4),
+        -80px -24px 24px -8px rgba(255,255,255,.15);
+      animation:foShoot 9s linear infinite;opacity:0;
+    }
+    @keyframes foTwinkle{
+      0%,100%{opacity:var(--max,.9);transform:scale(1);}
+      50%{opacity:var(--min,.15);transform:scale(.4);}
+    }
+    @keyframes foShoot{
+      0%,93%{opacity:0;transform:translate(0,0);}
+      94%{opacity:1;}
+      100%{opacity:0;transform:translate(var(--sx,260px),var(--sy,180px));}
+    }
+    /* ── Full Moon (large, layered, glowing) ── */
+    .fo-moon{
+      position:absolute;top:7%;right:10%;
+      width:clamp(110px,12vw,160px);height:clamp(110px,12vw,160px);
+      z-index:2;border-radius:50%;
       background:
-        radial-gradient(ellipse 80% 55% at 50% 45%,transparent 0%,rgba(1,3,10,.32) 65%,rgba(1,3,10,.65) 100%),
-        linear-gradient(180deg,rgba(1,3,10,.42) 0%,rgba(1,3,10,.08) 35%,rgba(1,3,10,.4) 100%);
+        radial-gradient(circle at 38% 38%,#fffefb 0%,#fef9e0 25%,#fde68a 58%,#fbbf24 90%,transparent 100%);
+      box-shadow:
+        inset -8px -10px 28px rgba(76,40,8,.18),
+        inset 8px 8px 24px rgba(255,255,255,.18),
+        0 0 70px 14px rgba(254,243,199,.42),
+        0 0 160px 60px rgba(251,191,36,.24),
+        0 0 280px 120px rgba(251,191,36,.10);
+      animation:foMoonPulse 5s ease-in-out infinite;
     }
+    .fo-moon::before{
+      content:'';position:absolute;
+      width:22%;height:22%;top:18%;left:24%;border-radius:50%;
+      background:radial-gradient(circle,rgba(140,100,40,.34),rgba(140,100,40,.04) 70%);
+    }
+    .fo-moon::after{
+      content:'';position:absolute;
+      width:14%;height:14%;top:52%;left:58%;border-radius:50%;
+      background:radial-gradient(circle,rgba(140,100,40,.30),rgba(140,100,40,.04) 70%);
+    }
+    @keyframes foMoonPulse{
+      0%,100%{
+        box-shadow:
+          inset -8px -10px 28px rgba(76,40,8,.18),
+          inset 8px 8px 24px rgba(255,255,255,.18),
+          0 0 70px 14px rgba(254,243,199,.42),
+          0 0 160px 60px rgba(251,191,36,.24),
+          0 0 280px 120px rgba(251,191,36,.10);
+      }
+      50%{
+        box-shadow:
+          inset -8px -10px 28px rgba(76,40,8,.18),
+          inset 8px 8px 24px rgba(255,255,255,.18),
+          0 0 90px 22px rgba(254,243,199,.58),
+          0 0 200px 80px rgba(251,191,36,.34),
+          0 0 340px 150px rgba(251,191,36,.15);
+      }
+    }
+    /* ── SVG well scene (fills entire hero; with slice scaling the well anchors near bottom) ── */
+    .fo-svg-scene{position:absolute;inset:0;width:100%;height:100%;z-index:3;}
+    .fo-svg-scene > g{transition:transform 280ms ease-out;will-change:transform;}
+    /* ── Scrim (subtle vignette) ── */
+    .fo-hero-scrim{
+      position:absolute;inset:0;pointer-events:none;z-index:4;
+      background:
+        radial-gradient(ellipse 70% 30% at 50% 22%,rgba(1,3,10,.28) 0%,transparent 80%),
+        linear-gradient(180deg,rgba(1,3,10,.18) 0%,transparent 32%,transparent 68%,rgba(1,3,10,.42) 100%);
+    }
+    /* ── Top content (greeting / title / subtitle) ── */
     .fo-hero-content{
-      position:relative;z-index:2;text-align:center;
-      padding:3rem 1.8rem 2.4rem;max-width:680px;width:100%;
+      position:relative;z-index:5;
+      width:100%;max-width:780px;margin:0 auto;
+      padding:7vh 1.8rem 0;text-align:center;
     }
-    /* ── Greeting (letter-by-letter) ── */
     .fo-hero-greeting{
-      font-family:var(--fm);font-size:.84rem;font-weight:700;
-      color:transparent;letter-spacing:.22em;text-transform:uppercase;
-      margin-bottom:1.15rem;line-height:1;
+      font-family:var(--fm);font-size:.86rem;font-weight:700;
+      color:transparent;letter-spacing:.24em;text-transform:uppercase;
+      margin-bottom:1.25rem;line-height:1;
     }
     .fo-gl{
-      display:inline-block;color:rgba(254,243,199,.88);
+      display:inline-block;color:rgba(254,243,199,.9);
       animation:foGlIn .42s ease both;
     }
     .fo-gl-space{display:inline-block;width:.4em;}
-    /* ── Title (split entry) ── */
     .fo-hero-title{
       display:flex;flex-direction:column;align-items:center;
-      line-height:.9;margin-bottom:1.25rem;
+      line-height:.88;margin-bottom:1.5rem;
       font-family:'Bebas Neue',var(--fh);
     }
     .fo-title-1{
-      font-size:clamp(1.4rem,3.4vw,2.15rem);letter-spacing:.18em;
+      font-size:clamp(1.5rem,3.6vw,2.3rem);letter-spacing:.2em;
       background:linear-gradient(135deg,#fef3c7 0%,#fde68a 70%,#fbbf24 100%);
       -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
-      animation:foSlideInL .8s .8s cubic-bezier(.2,.7,.2,1) both;
-      margin-bottom:.25rem;
+      animation:foSlideInL .85s .8s cubic-bezier(.2,.7,.2,1) both;
+      margin-bottom:.3rem;
     }
     .fo-title-2{
-      font-size:clamp(3.6rem,10vw,6.4rem);letter-spacing:.08em;
+      font-size:clamp(4rem,11.5vw,7.4rem);letter-spacing:.09em;
       background:linear-gradient(135deg,#fef3c7 0%,#fbbf24 55%,#d97706 100%);
       -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
-      filter:drop-shadow(0 4px 28px rgba(251,191,36,.4));
-      animation:foSlideInR .85s 1s cubic-bezier(.2,.7,.2,1) both;
+      filter:drop-shadow(0 4px 32px rgba(251,191,36,.45));
+      animation:foSlideInR .9s 1s cubic-bezier(.2,.7,.2,1) both;
     }
-    /* ── Subtitle ── */
     .fo-hero-sub{
       font-family:Georgia,'Times New Roman',serif;font-style:italic;
-      font-size:1.08rem;color:rgba(254,243,199,.86);line-height:1.6;
-      max-width:520px;margin:0 auto 1.95rem;
-      animation:foFadeUp .75s 1.4s ease both;
+      font-size:1.12rem;color:rgba(254,243,199,.88);line-height:1.6;
+      max-width:540px;margin:0 auto;
+      animation:foFadeUp .8s 1.4s ease both;
     }
-    .fo-quote-mark{color:rgba(251,191,36,.65);font-size:1.4em;line-height:0;vertical-align:-.1em;}
+    .fo-quote-mark{color:rgba(251,191,36,.7);font-size:1.4em;line-height:0;vertical-align:-.1em;}
     .fo-cite{
       display:block;font-style:normal;font-family:var(--fm);font-size:.78rem;
-      color:rgba(254,243,199,.55);margin-top:.45rem;letter-spacing:.06em;
+      color:rgba(254,243,199,.6);margin-top:.5rem;letter-spacing:.07em;
     }
-    /* ── CTA (jewel button) ── */
+    /* ── CTA Zone (positioned at the base of the well) ── */
+    .fo-cta-zone{
+      position:absolute;
+      bottom:9%;left:0;right:0;
+      z-index:6;text-align:center;
+      pointer-events:none;
+    }
+    .fo-cta-zone > *{pointer-events:auto;}
     .fo-hero-cta{
       position:relative;overflow:hidden;
-      display:inline-flex;align-items:center;justify-content:center;gap:.55rem;
+      display:inline-flex;align-items:center;justify-content:center;gap:.6rem;
       background:linear-gradient(135deg,#f59e0b 0%,#d97706 25%,#f59e0b 50%,#fbbf24 75%,#f59e0b 100%);
-      background-size:300% 300%;
-      color:#1a0f02;
-      border:none;border-radius:99px;padding:1.1rem 2.7rem;
-      font-family:'Bebas Neue',var(--fh);font-size:1.2rem;font-weight:800;
-      letter-spacing:.16em;text-transform:uppercase;
-      cursor:pointer;min-height:54px;
+      background-size:300% 300%;color:#1a0f02;
+      border:none;border-radius:99px;padding:1.2rem 3rem;
+      font-family:'Bebas Neue',var(--fh);font-size:1.3rem;font-weight:800;
+      letter-spacing:.18em;text-transform:uppercase;
+      cursor:pointer;min-height:58px;
       box-shadow:
-        0 0 32px rgba(251,191,36,.6),
-        0 0 64px rgba(251,191,36,.3),
-        0 8px 26px rgba(0,0,0,.45),
-        inset 0 1px 2px rgba(255,255,255,.5),
-        inset 0 -2px 4px rgba(120,53,15,.32);
+        0 0 44px rgba(251,191,36,.75),
+        0 0 90px rgba(251,191,36,.4),
+        0 10px 32px rgba(0,0,0,.55),
+        inset 0 1px 2px rgba(255,255,255,.6),
+        inset 0 -2px 4px rgba(120,53,15,.34);
       animation:
-        foCtaIn .6s 1.9s cubic-bezier(.2,.7,.2,1) both,
+        foCtaIn .65s 1.9s cubic-bezier(.2,.7,.2,1) both,
         foCtaShimmerBg 5s 2.55s linear infinite,
         foCtaPulse 3s 2.55s ease-in-out infinite;
       transition:filter .25s ease,box-shadow .25s ease;
     }
     .fo-hero-cta:hover{
-      filter:brightness(1.1) saturate(1.15);
+      filter:brightness(1.12) saturate(1.18);
       box-shadow:
-        0 0 52px rgba(251,191,36,.88),
-        0 0 96px rgba(251,191,36,.55),
-        0 12px 34px rgba(0,0,0,.55),
-        inset 0 1px 2px rgba(255,255,255,.58),
-        inset 0 -2px 4px rgba(120,53,15,.32);
-      animation-duration:.6s,2.5s,3s;
+        0 0 64px rgba(251,191,36,.98),
+        0 0 130px rgba(251,191,36,.62),
+        0 14px 42px rgba(0,0,0,.6),
+        inset 0 1px 2px rgba(255,255,255,.62),
+        inset 0 -2px 4px rgba(120,53,15,.34);
+      animation-duration:.65s,2.5s,3s;
     }
     .fo-cta-text{position:relative;z-index:2;}
     .fo-cta-spark{
-      position:relative;z-index:2;color:#7c2d12;font-size:.9em;
+      position:relative;z-index:2;color:#7c2d12;font-size:.95em;
       display:inline-block;animation:foSparkSpin 4s ease-in-out infinite;
     }
     .fo-cta-shimmer{
       position:absolute;top:0;left:-80%;width:55%;height:100%;pointer-events:none;
-      background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);
       animation:foShimmer 3s 3s ease-in-out infinite;z-index:1;
     }
-    /* ── Entry cards (photo-BG) ── */
-    .fo-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin-bottom:1rem;}
-    .fo-card{
-      position:relative;overflow:hidden;text-align:left;
-      border-radius:14px;cursor:pointer;min-height:148px;
-      padding:0;background:#0a0d1a;
-      border:none;border-left:3px solid rgba(251,191,36,.65);
-      font-family:var(--fm);-webkit-tap-highlight-color:transparent;
-      transition:transform .3s ease,box-shadow .3s ease,border-left-color .3s ease;
-      animation:foSlideUp .65s ease both;
-    }
-    .fo-card:hover{
-      transform:translateY(-5px);
-      box-shadow:0 18px 38px rgba(0,0,0,.55),0 0 26px rgba(251,191,36,.32);
-      border-left-color:#fbbf24;
-    }
-    .fo-card-bg{
-      position:absolute;inset:0;background-size:cover;background-position:center;
-      transition:transform .55s ease;
-    }
-    .fo-card:hover .fo-card-bg{transform:scale(1.08);}
-    .fo-card-overlay{
-      position:absolute;inset:0;
-      background:linear-gradient(168deg,rgba(10,13,26,.4) 0%,rgba(10,13,26,.75) 55%,rgba(10,13,26,.96) 100%);
-    }
-    .fo-card-body{
-      position:relative;z-index:1;padding:1.15rem 1.2rem;height:100%;
-      display:flex;flex-direction:column;justify-content:flex-end;
-    }
-    .fo-card-icon{
-      font-size:1.6rem;line-height:1;margin-bottom:.4rem;
-      filter:drop-shadow(0 2px 4px rgba(0,0,0,.45));
-    }
-    .fo-card-title{
-      font-family:'Bebas Neue',var(--fh);font-size:1.2rem;
-      letter-spacing:.06em;color:#fff;margin-bottom:.2rem;
-    }
-    .fo-card-sub{font-size:.72rem;color:rgba(254,243,199,.72);line-height:1.4;}
-    /* ── Rising sparkles ── */
+    /* ── Rising sparkles (gold particles from well opening) ── */
     .fo-sparkle{
       position:fixed;pointer-events:none;z-index:9999;
       width:12px;height:12px;border-radius:50%;
@@ -962,31 +1001,30 @@
     /* ── Keyframes ── */
     @keyframes foFadeIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
     @keyframes foFadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
-    @keyframes foSlideUp{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:none;}}
     @keyframes foGlIn{from{opacity:0;transform:translateY(-14px);}to{opacity:1;transform:none;}}
     @keyframes foSlideInL{from{opacity:0;transform:translateX(-90px);}to{opacity:1;transform:none;}}
     @keyframes foSlideInR{from{opacity:0;transform:translateX(90px);}to{opacity:1;transform:none;}}
     @keyframes foCtaIn{from{opacity:0;transform:scale(.82);}to{opacity:1;transform:scale(1);}}
     @keyframes foCtaShimmerBg{0%{background-position:0% 50%;}100%{background-position:300% 50%;}}
-    @keyframes foCtaPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.032);}}
+    @keyframes foCtaPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.035);}}
     @keyframes foShimmer{0%,55%{left:-80%;}100%{left:130%;}}
     @keyframes foSparkSpin{0%,100%{transform:rotate(0deg);}50%{transform:rotate(180deg);}}
     @keyframes foSparkleRise{
       0%{opacity:1;transform:translate(0,0) scale(1);}
       60%{opacity:.88;}
-      100%{opacity:0;transform:translate(var(--dx,0px),var(--dy,-130px)) scale(.22);}
+      100%{opacity:0;transform:translate(var(--dx,0px),var(--dy,-150px)) scale(.22);}
     }
     @media(max-width:560px){
-      .fo-hero{min-height:400px;}
-      .fo-cards{grid-template-columns:1fr;}
-      .fo-hero-cta{width:100%;justify-content:center;}
-      .fo-hero-content{padding:2.2rem 1.4rem 1.9rem;}
+      .fo-hero{min-height:calc(100vh - 60px);}
+      .fo-hero-content{padding:5vh 1.4rem 0;}
+      .fo-hero-cta{padding:1rem 2.2rem;font-size:1.1rem;}
+      .fo-cta-zone{bottom:11%;}
     }
     @media(prefers-reduced-motion:reduce){
-      .fo-hero,.fo-gl,.fo-title-1,.fo-title-2,.fo-hero-sub,
-      .fo-hero-cta,.fo-card,.fo-sparkle,.fo-cta-shimmer,
-      .fo-cta-spark,.fo-svg-scene > g{animation:none !important;transition:none !important;}
-      .fo-gl,.fo-title-1,.fo-title-2,.fo-hero-sub,.fo-hero-cta,.fo-card{opacity:1 !important;}
+      .fo-hero,.fo-gl,.fo-title-1,.fo-title-2,.fo-hero-sub,.fo-hero-cta,
+      .fo-sparkle,.fo-cta-shimmer,.fo-cta-spark,.fo-star,.fo-moon,
+      .fo-shooting-star,.fo-svg-scene > g{animation:none !important;transition:none !important;}
+      .fo-gl,.fo-title-1,.fo-title-2,.fo-hero-sub,.fo-hero-cta{opacity:1 !important;}
     }
   </style>
   <div id="faithHeroCinematic" style="display:none;"></div>

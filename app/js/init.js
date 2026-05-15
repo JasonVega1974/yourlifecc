@@ -688,7 +688,14 @@ function attachFaithParallax() {
 }
 
 function renderFaithOnlyHero() {
-  ['heroGreeting','heroQuickActions','heroQuickStats','childDashContent'].forEach(id => {
+  // Hide ALL home-dashboard elements — faith-free home is fullscreen "Enter The Well" only.
+  // Entry to Bible Stories / Plans / Academy happens after click via wellGoto('home').
+  ['heroGreeting','heroQuickActions','heroQuickStats','childDashContent',
+   'heroTodaysVerse','heroReflectCard','heroHeadline','heroHeadlineCard',
+   'faithEntryCards','dashboardWrap','dashGrid','heroDashStats','homeStatsGrid',
+   'heroReflect','aiDailyReflection','homeStudyPartner','heroGoalRow',
+   'todayVerseCard','heroVerseCard'
+  ].forEach(id => {
     const el = document.getElementById(id); if (el) el.style.display = 'none';
   });
 
@@ -707,33 +714,32 @@ function renderFaithOnlyHero() {
   name = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
   name = name.replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]||c));
 
-  const stars = _foStars(110);
-  const fireflies = _foFireflies(25);
+  // ── 160 CSS-based stars (each absolutely positioned, unique twinkle) ──
+  let starsHtml = '';
+  for (let i = 0; i < 160; i++) {
+    const top = (Math.random() * 78).toFixed(2);     // keep stars in upper 78% of hero (above well)
+    const left = (Math.random() * 100).toFixed(2);
+    const size = (0.8 + Math.random() * 2.4).toFixed(2);
+    const maxOp = (0.45 + Math.random() * 0.55).toFixed(2);
+    const minOp = (+maxOp * (0.1 + Math.random() * 0.25)).toFixed(3);
+    const dur = (2.5 + Math.random() * 3.8).toFixed(2);
+    const del = (Math.random() * 8).toFixed(2);
+    const roll = Math.random();
+    const cls = roll < 0.15 ? ' fo-star-bright' : (roll < 0.55 ? ' fo-star-glow' : '');
+    starsHtml += `<div class="fo-star${cls}" style="top:${top}%;left:${left}%;width:${size}px;height:${size}px;--max:${maxOp};--min:${minOp};--dur:${dur}s;--del:${del}s"></div>`;
+  }
+  // Two shooting stars at different times
+  starsHtml += `<div class="fo-shooting-star" style="top:14%;left:6%;--sx:320px;--sy:140px;animation-delay:2.5s"></div>`;
+  starsHtml += `<div class="fo-shooting-star" style="top:22%;left:62%;--sx:-260px;--sy:180px;animation-delay:6.5s"></div>`;
+
+  // SVG well scene — no moon, no stars, no sky rect (those are now CSS)
+  const fireflies = _foFireflies(28);
   const goldRise = _foGoldRise();
   const stones = _foWellStones();
 
   const svgScene =
     `<svg class="fo-svg-scene" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">` +
     `<defs>` +
-      `<linearGradient id="foSky" x1="0" y1="0" x2="0" y2="1">` +
-        `<stop offset="0%" stop-color="#01030a"/>` +
-        `<stop offset="45%" stop-color="#070e26"/>` +
-        `<stop offset="100%" stop-color="#0d1838"/>` +
-      `</linearGradient>` +
-      `<radialGradient id="foMoonCore" cx="50%" cy="48%" r="50%">` +
-        `<stop offset="0%" stop-color="#fffef0"/>` +
-        `<stop offset="55%" stop-color="#fef9d0"/>` +
-        `<stop offset="100%" stop-color="#fde68a" stop-opacity=".95"/>` +
-      `</radialGradient>` +
-      `<radialGradient id="foMoonHalo" cx="50%" cy="50%" r="50%">` +
-        `<stop offset="0%" stop-color="#fef9d0" stop-opacity=".6"/>` +
-        `<stop offset="55%" stop-color="#fbbf24" stop-opacity=".18"/>` +
-        `<stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/>` +
-      `</radialGradient>` +
-      `<radialGradient id="foMoonAura" cx="50%" cy="50%" r="50%">` +
-        `<stop offset="0%" stop-color="#fde68a" stop-opacity=".25"/>` +
-        `<stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/>` +
-      `</radialGradient>` +
       `<radialGradient id="foWellCore" cx="50%" cy="50%" r="50%">` +
         `<stop offset="0%" stop-color="#fef9e7"/>` +
         `<stop offset="50%" stop-color="#fbbf24" stop-opacity=".85"/>` +
@@ -744,61 +750,46 @@ function renderFaithOnlyHero() {
         `<stop offset="100%" stop-color="#d97706" stop-opacity="0"/>` +
       `</radialGradient>` +
       `<radialGradient id="foWellBloom" cx="50%" cy="50%" r="50%">` +
-        `<stop offset="0%" stop-color="#fbbf24" stop-opacity=".4"/>` +
+        `<stop offset="0%" stop-color="#fbbf24" stop-opacity=".42"/>` +
         `<stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/>` +
       `</radialGradient>` +
       `<radialGradient id="foGroundGlow" cx="50%" cy="40%" r="50%">` +
-        `<stop offset="0%" stop-color="#fbbf24" stop-opacity=".42"/>` +
+        `<stop offset="0%" stop-color="#fbbf24" stop-opacity=".5"/>` +
         `<stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/>` +
       `</radialGradient>` +
       `<filter id="foBlurSm" x="-50%" y="-50%" width="200%" height="200%">` +
         `<feGaussianBlur stdDeviation="1.4"/>` +
       `</filter>` +
     `</defs>` +
-    `<rect x="0" y="0" width="800" height="400" fill="url(#foSky)"/>` +
-    `<g class="fo-layer-stars">${stars}</g>` +
-    `<g class="fo-layer-moon">` +
-      `<circle cx="648" cy="74" r="84" fill="url(#foMoonAura)" opacity=".55"/>` +
-      `<circle cx="648" cy="74" r="56" fill="url(#foMoonHalo)" opacity=".75">` +
-        `<animate attributeName="opacity" values=".75;.95;.75" dur="4s" repeatCount="indefinite"/>` +
-      `</circle>` +
-      `<circle cx="648" cy="74" r="32" fill="url(#foMoonCore)">` +
-        `<animate attributeName="opacity" values="1;.92;1" dur="4s" repeatCount="indefinite"/>` +
-      `</circle>` +
-      `<circle cx="636" cy="66" r="6.5" fill="#e8e0a4" opacity=".34"/>` +
-      `<circle cx="657" cy="82" r="4" fill="#e8e0a4" opacity=".28"/>` +
-      `<circle cx="652" cy="64" r="2.5" fill="#e8e0a4" opacity=".22"/>` +
-      `<circle cx="640" cy="80" r="3" fill="#e8e0a4" opacity=".18"/>` +
-      `<circle cx="660" cy="72" r="2" fill="#e8e0a4" opacity=".2"/>` +
-    `</g>` +
     `<g class="fo-layer-mid">` +
-      `<path d="M0,290 Q72,240 170,256 Q262,228 374,253 Q468,228 558,248 Q658,228 760,247 Q780,243 800,250 L800,400 L0,400 Z" fill="#0a1224"/>` +
-      `<path d="M0,310 Q120,278 240,295 Q360,272 480,290 Q600,274 720,289 Q760,283 800,291 L800,400 L0,400 Z" fill="#070d1c" opacity=".9"/>` +
-      `<rect x="0" y="314" width="800" height="86" fill="#050a18"/>` +
-      `<ellipse cx="400" cy="334" rx="190" ry="38" fill="url(#foGroundGlow)">` +
-        `<animate attributeName="opacity" values="1;.6;1" dur="2.5s" repeatCount="indefinite"/>` +
-        `<animate attributeName="rx" values="190;215;190" dur="2.5s" repeatCount="indefinite"/>` +
+      // Two hill silhouettes — extra dark for separation against sky gradient
+      `<path d="M0,290 Q72,240 170,256 Q262,228 374,253 Q468,228 558,248 Q658,228 760,247 Q780,243 800,250 L800,400 L0,400 Z" fill="#080f22"/>` +
+      `<path d="M0,310 Q120,278 240,295 Q360,272 480,290 Q600,274 720,289 Q760,283 800,291 L800,400 L0,400 Z" fill="#040820" opacity=".95"/>` +
+      `<rect x="0" y="314" width="800" height="86" fill="#02061a"/>` +
+      `<ellipse cx="400" cy="334" rx="220" ry="44" fill="url(#foGroundGlow)">` +
+        `<animate attributeName="opacity" values="1;.55;1" dur="2.5s" repeatCount="indefinite"/>` +
+        `<animate attributeName="rx" values="220;260;220" dur="2.5s" repeatCount="indefinite"/>` +
       `</ellipse>` +
     `</g>` +
     `<g class="fo-layer-well">` +
-      `<ellipse cx="400" cy="350" rx="70" ry="14" fill="#000" opacity=".55"/>` +
+      `<ellipse cx="400" cy="350" rx="78" ry="15" fill="#000" opacity=".62"/>` +
       `<rect x="348" y="272" width="104" height="76" rx="4" fill="#252836"/>` +
       stones +
       `<ellipse cx="400" cy="272" rx="54" ry="14" fill="#3a4054"/>` +
       `<ellipse cx="400" cy="269" rx="52" ry="11" fill="#4a546c" opacity=".55"/>` +
       `<ellipse cx="400" cy="266" rx="48" ry="8" fill="#5a657f" opacity=".35"/>` +
       `<ellipse cx="400" cy="272" rx="42" ry="10" fill="#02040d"/>` +
-      `<ellipse cx="400" cy="272" rx="82" ry="36" fill="url(#foWellBloom)" opacity=".9">` +
-        `<animate attributeName="opacity" values=".9;.55;.9" dur="2.5s" repeatCount="indefinite"/>` +
-        `<animate attributeName="rx" values="82;94;82" dur="2.5s" repeatCount="indefinite"/>` +
+      `<ellipse cx="400" cy="272" rx="92" ry="40" fill="url(#foWellBloom)" opacity=".92">` +
+        `<animate attributeName="opacity" values=".92;.58;.92" dur="2.5s" repeatCount="indefinite"/>` +
+        `<animate attributeName="rx" values="92;108;92" dur="2.5s" repeatCount="indefinite"/>` +
       `</ellipse>` +
-      `<ellipse cx="400" cy="273" rx="50" ry="14" fill="url(#foWellMid)">` +
+      `<ellipse cx="400" cy="273" rx="52" ry="15" fill="url(#foWellMid)">` +
         `<animate attributeName="opacity" values="1;.7;1" dur="2.5s" repeatCount="indefinite"/>` +
-        `<animate attributeName="rx" values="50;60;50" dur="2.5s" repeatCount="indefinite"/>` +
+        `<animate attributeName="rx" values="52;64;52" dur="2.5s" repeatCount="indefinite"/>` +
       `</ellipse>` +
-      `<ellipse cx="400" cy="274" rx="36" ry="9" fill="url(#foWellCore)">` +
+      `<ellipse cx="400" cy="274" rx="38" ry="10" fill="url(#foWellCore)">` +
         `<animate attributeName="opacity" values="1;.78;1" dur="2.5s" repeatCount="indefinite"/>` +
-        `<animate attributeName="rx" values="36;44;36" dur="2.5s" repeatCount="indefinite"/>` +
+        `<animate attributeName="rx" values="38;46;38" dur="2.5s" repeatCount="indefinite"/>` +
       `</ellipse>` +
       goldRise +
       `<line x1="370" y1="270" x2="345" y2="206" stroke="#6b4c2a" stroke-width="6" stroke-linecap="round"/>` +
@@ -821,37 +812,38 @@ function renderFaithOnlyHero() {
     `</g>` +
     `<g class="fo-layer-fireflies">${fireflies}</g>` +
     `<g class="fo-layer-fg">` +
-      `<ellipse cx="295" cy="355" rx="34" ry="13" fill="#060b18" opacity=".95"/>` +
-      `<ellipse cx="282" cy="350" rx="22" ry="7" fill="#0c1428" opacity=".7"/>` +
-      `<ellipse cx="510" cy="365" rx="28" ry="11" fill="#060b18" opacity=".9"/>` +
-      `<ellipse cx="498" cy="361" rx="18" ry="6" fill="#0c1428" opacity=".65"/>` +
-      `<ellipse cx="142" cy="370" rx="24" ry="9" fill="#060b18" opacity=".85"/>` +
-      `<ellipse cx="654" cy="358" rx="22" ry="8" fill="#060b18" opacity=".82"/>` +
-      `<ellipse cx="50" cy="378" rx="20" ry="8" fill="#060b18" opacity=".75"/>` +
-      `<ellipse cx="745" cy="380" rx="22" ry="8" fill="#060b18" opacity=".78"/>` +
-      `<path d="M258,348 Q262,330 266,348" stroke="#0a2010" stroke-width="1.7" fill="none"/>` +
-      `<path d="M266,348 Q272,326 276,348" stroke="#0a2010" stroke-width="1.7" fill="none"/>` +
-      `<path d="M273,348 Q280,328 285,348" stroke="#0a2010" stroke-width="1.7" fill="none"/>` +
-      `<path d="M533,358 Q538,338 542,358" stroke="#0a2010" stroke-width="1.6" fill="none"/>` +
-      `<path d="M540,358 Q547,335 551,358" stroke="#0a2010" stroke-width="1.6" fill="none"/>` +
-      `<path d="M548,358 Q553,338 557,358" stroke="#0a2010" stroke-width="1.6" fill="none"/>` +
-      `<path d="M170,365 Q175,348 178,365" stroke="#0a2010" stroke-width="1.6" fill="none"/>` +
-      `<path d="M178,365 Q184,346 188,365" stroke="#0a2010" stroke-width="1.6" fill="none"/>` +
-      `<path d="M680,355 Q686,335 690,355" stroke="#0a2010" stroke-width="1.7" fill="none"/>` +
-      `<path d="M690,355 Q696,332 700,355" stroke="#0a2010" stroke-width="1.7" fill="none"/>` +
+      `<ellipse cx="295" cy="355" rx="34" ry="13" fill="#040814" opacity=".95"/>` +
+      `<ellipse cx="282" cy="350" rx="22" ry="7" fill="#0a1224" opacity=".7"/>` +
+      `<ellipse cx="510" cy="365" rx="28" ry="11" fill="#040814" opacity=".9"/>` +
+      `<ellipse cx="498" cy="361" rx="18" ry="6" fill="#0a1224" opacity=".65"/>` +
+      `<ellipse cx="142" cy="370" rx="24" ry="9" fill="#040814" opacity=".85"/>` +
+      `<ellipse cx="654" cy="358" rx="22" ry="8" fill="#040814" opacity=".82"/>` +
+      `<ellipse cx="50" cy="378" rx="20" ry="8" fill="#040814" opacity=".75"/>` +
+      `<ellipse cx="745" cy="380" rx="22" ry="8" fill="#040814" opacity=".78"/>` +
+      `<path d="M258,348 Q262,330 266,348" stroke="#08180c" stroke-width="1.7" fill="none"/>` +
+      `<path d="M266,348 Q272,326 276,348" stroke="#08180c" stroke-width="1.7" fill="none"/>` +
+      `<path d="M273,348 Q280,328 285,348" stroke="#08180c" stroke-width="1.7" fill="none"/>` +
+      `<path d="M533,358 Q538,338 542,358" stroke="#08180c" stroke-width="1.6" fill="none"/>` +
+      `<path d="M540,358 Q547,335 551,358" stroke="#08180c" stroke-width="1.6" fill="none"/>` +
+      `<path d="M548,358 Q553,338 557,358" stroke="#08180c" stroke-width="1.6" fill="none"/>` +
+      `<path d="M170,365 Q175,348 178,365" stroke="#08180c" stroke-width="1.6" fill="none"/>` +
+      `<path d="M178,365 Q184,346 188,365" stroke="#08180c" stroke-width="1.6" fill="none"/>` +
+      `<path d="M680,355 Q686,335 690,355" stroke="#08180c" stroke-width="1.7" fill="none"/>` +
+      `<path d="M690,355 Q696,332 700,355" stroke="#08180c" stroke-width="1.7" fill="none"/>` +
       `<g transform="translate(105,372)">` +
-        `<path d="M-14,0 Q-17,-13 -9,-15 Q-3,-19 4,-15 Q13,-16 16,-7 Q18,3 9,5 Q-3,7 -9,5 Q-15,5 -14,0Z" fill="#091c10" opacity=".95"/>` +
-        `<path d="M-5,-11 Q0,-16 5,-11" stroke="#14301a" stroke-width="1" fill="none"/>` +
-        `<path d="M-9,-5 Q-4,-10 1,-5" stroke="#14301a" stroke-width="1" fill="none"/>` +
-        `<path d="M3,-8 Q7,-13 11,-8" stroke="#14301a" stroke-width="1" fill="none"/>` +
+        `<path d="M-14,0 Q-17,-13 -9,-15 Q-3,-19 4,-15 Q13,-16 16,-7 Q18,3 9,5 Q-3,7 -9,5 Q-15,5 -14,0Z" fill="#06150b" opacity=".95"/>` +
+        `<path d="M-5,-11 Q0,-16 5,-11" stroke="#0e2412" stroke-width="1" fill="none"/>` +
+        `<path d="M-9,-5 Q-4,-10 1,-5" stroke="#0e2412" stroke-width="1" fill="none"/>` +
+        `<path d="M3,-8 Q7,-13 11,-8" stroke="#0e2412" stroke-width="1" fill="none"/>` +
       `</g>` +
       `<g transform="translate(720,370)">` +
-        `<path d="M-11,0 Q-14,-11 -7,-13 Q-2,-17 3,-13 Q11,-14 13,-6 Q15,3 7,5 Q-1,5 -7,3 Q-13,3 -11,0Z" fill="#091c10" opacity=".92"/>` +
-        `<path d="M-3,-8 Q1,-13 5,-8" stroke="#14301a" stroke-width="1" fill="none"/>` +
+        `<path d="M-11,0 Q-14,-11 -7,-13 Q-2,-17 3,-13 Q11,-14 13,-6 Q15,3 7,5 Q-1,5 -7,3 Q-13,3 -11,0Z" fill="#06150b" opacity=".92"/>` +
+        `<path d="M-3,-8 Q1,-13 5,-8" stroke="#0e2412" stroke-width="1" fill="none"/>` +
       `</g>` +
     `</g>` +
     `</svg>`;
 
+  // ── Cinematic greeting (letter-by-letter) ──
   const greetingText = (greet + ', ' + name).toUpperCase();
   let greetingHtml = '';
   for (let i = 0; i < greetingText.length; i++) {
@@ -866,6 +858,8 @@ function renderFaithOnlyHero() {
     hero.style.display = '';
     hero.innerHTML =
       '<div class="fo-hero" id="faithOnlyHero">' +
+        `<div class="fo-night-stars">${starsHtml}</div>` +
+        '<div class="fo-moon"></div>' +
         svgScene +
         '<div class="fo-hero-scrim"></div>' +
         '<div class="fo-hero-content">' +
@@ -878,6 +872,8 @@ function renderFaithOnlyHero() {
             '<span class="fo-quote-mark">“</span>Come, all you who are thirsty, come to the waters.<span class="fo-quote-mark">”</span>' +
             '<span class="fo-cite">— Isaiah 55:1</span>' +
           '</p>' +
+        '</div>' +
+        '<div class="fo-cta-zone">' +
           '<button class="fo-hero-cta" onclick="if(typeof wellGoto===\'function\')wellGoto(\'home\');else if(typeof showSection===\'function\')showSection(\'s-scripture\')">' +
             '<span class="fo-cta-spark">✦</span>' +
             '<span class="fo-cta-text">Enter The Well</span>' +
@@ -888,38 +884,14 @@ function renderFaithOnlyHero() {
       '</div>';
   }
 
-  const cards = document.getElementById('faithEntryCards');
-  if (cards) {
-    cards.style.display = '';
-    const cardDefs = [
-      { delay:'0.10s',
-        bg:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Stortinget_library_1.jpg/1280px-Stortinget_library_1.jpg',
-        icon:'📖', title:'Bible Stories', sub:'52 illustrated stories', tab:'stories' },
-      { delay:'0.25s',
-        bg:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Kinneret_cropped.jpg/1280px-Kinneret_cropped.jpg',
-        icon:'📅', title:'Reading Plans', sub:'45 plans, 580 days', tab:'plans' },
-      { delay:'0.40s',
-        bg:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Jerusalem-2013%282%29-Aerial-Temple_Mount-%28south_exposure%29.jpg/1280px-Jerusalem-2013%282%29-Aerial-Temple_Mount-%28south_exposure%29.jpg',
-        icon:'🎓', title:'Faith Academy', sub:'30 lessons + quizzes', tab:'academy' },
-    ];
-    cards.innerHTML = '<div class="fo-cards">' + cardDefs.map(c =>
-      `<button class="fo-card" style="animation-delay:${c.delay}" onclick="foGotoTab('${c.tab}')">` +
-        `<div class="fo-card-bg" style="background-image:url('${c.bg}')"></div>` +
-        '<div class="fo-card-overlay"></div>' +
-        '<div class="fo-card-body">' +
-          `<div class="fo-card-icon">${c.icon}</div>` +
-          `<div class="fo-card-title">${c.title}</div>` +
-          `<div class="fo-card-sub">${c.sub}</div>` +
-        '</div>' +
-      '</button>'
-    ).join('') + '</div>';
-  }
-
-  if (typeof renderTodaysVerseHero === 'function') renderTodaysVerseHero();
+  // ── Entry cards & today's verse intentionally NOT rendered. ──
+  // After clicking "Enter The Well", wellGoto('home') takes them inside where
+  // they choose Bible Stories / Reading Plans / Faith Academy / Prayer.
   setTimeout(() => launchFaithSparkles(40), 1800);
   setTimeout(startFaithSparkleLoop, 5500);
   attachFaithParallax();
 }
+
 
 
 function foGotoTab(tab) {
