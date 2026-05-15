@@ -5272,19 +5272,36 @@ function openLessonModal(lessonId){
   if(!lesson){ if(typeof showToast === 'function') showToast('Lesson not found'); return; }
   const cats = _acCats();
   const cat = cats[lesson.category] || { label:'Lesson', color:'#fbbf24', icon:'📖' };
-  // Admin override (per-lesson) wins over the shared category photo.
-  const photoUrl = _acLessonPhoto(lesson);
+  // Modal header uses ONLY the admin override (so the default is a clean
+  // navy gradient). Cards still call _acLessonPhoto which falls back to
+  // the per-category photo.
+  const adminOverride = (typeof window !== 'undefined' && window.ACADEMY_PHOTO_OVERRIDES && window.ACADEMY_PHOTO_OVERRIDES[lesson.id]) || '';
+  const photoUrl = adminOverride;
 
-  // Photo header: set the category photo on .lm-svg. Drives the category-color
-  // CSS var used by .lm-cat (border + text color).
+  // Navy-gradient header by default. If a photo override exists (or the
+  // legacy per-category photo), layer it behind the dark overlay so the
+  // gold title is still readable. Header structure now mirrors the Plans
+  // modal: centered category pill, icon, gold-gradient title.
   const svgEl = document.getElementById('lmSvg');
   if(svgEl){
-    svgEl.style.backgroundImage = photoUrl ? ('url("' + photoUrl + '")') : '';
+    if(photoUrl){
+      svgEl.style.backgroundImage = 'url("' + photoUrl + '")';
+      svgEl.style.backgroundSize = 'cover';
+      svgEl.style.backgroundPosition = 'center';
+      svgEl.classList.add('has-photo');
+      svgEl.classList.remove('no-photo');
+    } else {
+      svgEl.style.backgroundImage = '';
+      svgEl.classList.add('no-photo');
+      svgEl.classList.remove('has-photo');
+    }
     svgEl.style.setProperty('--lm-cat-color', cat.color || '#fbbf24');
   }
-  // Category badge on the photo (top-left).
+  // Category pill — centered above the title.
   const catEl = document.getElementById('lmCat');
   if(catEl) catEl.textContent = (cat.label || '').toString();
+  const iconEl = document.getElementById('lmIcon');
+  if(iconEl) iconEl.textContent = cat.icon || '📖';
   // Eyebrow below the photo: "8 MIN · 5 QUESTIONS".
   const eyeEl = document.getElementById('lmEye');
   if(eyeEl) eyeEl.textContent = (lesson.duration || '') + ' · ' + ((lesson.quiz || []).length) + ' questions';
@@ -7758,31 +7775,51 @@ function ppToggleBookmarkCurrent(){
   if(_ppCurrentProofId) ppToggleBookmark(_ppCurrentProofId);
 }
 
+function ppCategoryIcon(cat){
+  if(typeof PROOF_PROPHECY_CATEGORIES === 'undefined') return '⚖️';
+  const c = PROOF_PROPHECY_CATEGORIES.find(c => c.key === cat);
+  return c ? c.icon : '⚖️';
+}
+
+function ppCategorySoftRgba(cat){
+  // Compose the brand.soft prefix used by the Plans pattern. Returns the
+  // string 'rgba(R,G,B,' so callers append e.g. '0.18)' for alpha.
+  const accent = ppCategoryAccent(cat);
+  // Convert hex (#RRGGBB) to "rgba(R,G,B,"
+  const hex = accent.replace('#','');
+  const r = parseInt(hex.substring(0,2),16);
+  const g = parseInt(hex.substring(2,4),16);
+  const b = parseInt(hex.substring(4,6),16);
+  return 'rgba(' + r + ',' + g + ',' + b + ',';
+}
+
 function ppCardHtml(proof){
-  const img = ppImageFor(proof);
   const accent = ppCategoryAccent(proof.category);
+  const soft = ppCategorySoftRgba(proof.category);
+  const icon = ppCategoryIcon(proof.category);
   const catLabel = ppCategoryLabel(proof.category);
   const saved = ppIsSaved(proof.id);
-  const photoInner = img
-    ? '<img loading="lazy" data-card-id="proof-'+ _ppEsc(proof.id) +'" src="'+ _ppEsc(img) +'" alt="'+ _ppEsc(proof.title) +'">'
-    : ppPlaceholderHtml(proof);
+  const impact = Math.max(0, Math.min(10, parseInt(proof.impactScore,10)||0));
   return ''
-    + '<div class="pp-card" onclick="ppOpenModal(\''+ _ppEsc(proof.id) +'\')">'
-    +   '<div class="pp-card-photo">'
-    +     photoInner
-    +     '<div class="pp-card-badge" style="background:rgba(10,13,26,.7);color:#fff;border-left:2px solid '+ accent +';">'+ _ppEsc(catLabel) +'</div>'
-    +     '<button class="pp-card-bookmark'+(saved?' saved':'')+'" onclick="event.stopPropagation();ppToggleBookmark(\''+ _ppEsc(proof.id) +'\',this)" aria-label="Bookmark">'+ (saved?'★':'☆') +'</button>'
-    +   '</div>'
-    +   '<div class="pp-card-body">'
-    +     '<div class="pp-card-eye">'+ _ppEsc(proof.eyebrow||'') +'</div>'
-    +     '<div class="pp-card-title">'+ _ppEsc(proof.title) +'</div>'
-    +     '<div class="pp-card-summary">'+ _ppEsc(proof.summary) +'</div>'
-    +     '<div class="pp-card-foot">'
-    +       ppStarsHtml(proof.impactScore)
-    +       '<span class="pp-readmore">READ MORE →</span>'
-    +     '</div>'
-    +   '</div>'
-    + '</div>';
+    + '<button class="pl-card-v2" data-proof-id="' + _ppEsc(proof.id) + '" onclick="ppOpenModal(this.dataset.proofId)" '
+    +   'style="--accent:' + accent + ';">'
+    + '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;">'
+    +   '<span style="font-size:1.7rem;line-height:1;">' + icon + '</span>'
+    +   '<div style="font-family:\'Bebas Neue\',var(--fm);letter-spacing:.06em;font-size:1.18rem;color:var(--tx);line-height:1.05;flex:1;min-width:0;">' + _ppEsc(proof.title) + '</div>'
+    +   '<span style="font-size:.56rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:' + accent + ';background:' + soft + '0.18);border:1px solid ' + soft + '0.35);padding:.18rem .55rem;border-radius:99px;white-space:nowrap;">' + _ppEsc(catLabel) + '</span>'
+    + '</div>'
+    + '<div style="font-family:Georgia,serif;font-style:italic;font-size:.78rem;color:var(--tx2);line-height:1.55;margin-bottom:.7rem;">' + _ppEsc(proof.summary) + '</div>'
+    + '<div style="display:flex;align-items:center;gap:.5rem;font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:' + accent + ';">'
+    +   '<span class="pp-stars" aria-label="Impact ' + impact + ' of 10" style="display:inline-flex;gap:1px;">' + ppStarsInner(proof.impactScore) + '</span>'
+    +   '<span style="color:var(--tx3);">·</span>'
+    +   '<span>IMPACT ' + impact + '/10</span>'
+    +   '<button onclick="event.stopPropagation();ppToggleBookmark(\'' + _ppEsc(proof.id) + '\',this)" aria-label="Bookmark" '
+    +     'style="margin-left:auto;background:' + (saved ? accent : 'transparent') + ';border:1px solid ' + (saved ? accent : soft + '0.32)') + ';color:' + (saved ? '#0b1220' : accent) + ';border-radius:99px;width:26px;height:26px;cursor:pointer;font-size:.78rem;display:inline-flex;align-items:center;justify-content:center;padding:0;line-height:1;">'
+    +     (saved ? '★' : '☆')
+    +   '</button>'
+    +   '<span style="color:var(--tx);">Read More →</span>'
+    + '</div>'
+    + '</button>';
 }
 
 function ppRenderSubtabs(){
@@ -7869,55 +7906,82 @@ function ppOpenModal(id){
   const proof = ppProofById(id);
   if(!proof) return;
   _ppCurrentProofId = id;
-  const modal = document.getElementById('ppModal');
-  if(!modal) return;
+  const accent = ppCategoryAccent(proof.category);
+  const soft = ppCategorySoftRgba(proof.category);
+  const icon = ppCategoryIcon(proof.category);
+  const catLabel = ppCategoryLabel(proof.category);
   const img = ppImageFor(proof);
-  const photoWrap = document.getElementById('ppModalPhoto');
-  if(photoWrap){
-    photoWrap.style.display = '';
+  const impact = Math.max(0, Math.min(10, parseInt(proof.impactScore,10)||0));
+
+  // Header — navy gradient is the default; an admin-uploaded photo (or the
+  // proof's hand-picked Wikimedia image) sits behind it with a heavy dark
+  // overlay so text stays readable.
+  const header = document.getElementById('ppModalHeader');
+  if(header){
+    const overlay = 'linear-gradient(135deg, rgba(10,13,26,.86) 0%, rgba(26,18,51,.82) 100%)';
     if(img){
-      photoWrap.innerHTML = '<img id="ppModalImg" data-card-id="proof-'+ _ppEsc(proof.id) +'" src="'+ _ppEsc(img) +'" alt="'+ _ppEsc(proof.title) +'">';
+      header.style.background = overlay + ', url("' + img.replace(/"/g,'\\"') + '") center/cover no-repeat, linear-gradient(135deg,#0a0d1a,#1a1233)';
     } else {
-      // Placeholder header — same gradient/icon treatment as the card.
-      photoWrap.innerHTML = ppPlaceholderHtml(proof);
+      header.style.background = 'linear-gradient(135deg,#0a0d1a 0%,#1a1233 100%)';
     }
   }
-  const eye = document.getElementById('ppModalEye');
-  if(eye) eye.textContent = proof.eyebrow || '';
+  const iconEl = document.getElementById('ppModalIcon');
+  if(iconEl) iconEl.textContent = icon;
   const title = document.getElementById('ppModalTitle');
   if(title) title.textContent = proof.title || '';
-  const stars = document.getElementById('ppModalStars');
-  if(stars){
-    stars.innerHTML = ppStarsInner(proof.impactScore);
-    stars.setAttribute('aria-label', 'Impact '+Math.max(0,Math.min(10,parseInt(proof.impactScore,10)||0))+' of 10');
+  const eye = document.getElementById('ppModalEye');
+  if(eye) eye.textContent = proof.eyebrow || '';
+
+  // Body — Plans-style metadata row, then detail paragraphs, then scripture
+  // block (category-tinted with soft background + accent left border), then
+  // source attribution.
+  const body = document.getElementById('ppModalBody');
+  if(body){
+    const paras = String(proof.detail||'').split(/\n\n+/).map(p => '<p style="margin:0 0 .85rem 0;font-family:Georgia,serif;font-size:.92rem;line-height:1.7;color:var(--tx);">' + _ppEsc(p) + '</p>').join('');
+    const yearBit = proof.year != null
+      ? ' <span style="color:var(--tx3);">·</span> <span style="color:var(--tx2);">' + (proof.year < 0 ? (Math.abs(proof.year) + ' BC') : (proof.year + (proof.year > 1000 ? ' AD' : ' AD'))) + '</span>'
+      : '';
+    body.innerHTML = ''
+      + '<div style="font-family:\'Bebas Neue\',var(--fm);font-size:.72rem;color:' + accent + ';text-transform:uppercase;letter-spacing:.2em;font-weight:800;margin-bottom:.85rem;">'
+      +   _ppEsc(catLabel) + ' <span style="color:var(--tx3);">·</span> ' + 'IMPACT ' + impact + '/10' + yearBit
+      + '</div>'
+      + '<div style="margin-bottom:1rem;">' + paras + '</div>'
+      + (proof.scripture
+          ? '<div style="background:' + soft + '0.08);border-left:3px solid ' + accent + ';border-radius:0 10px 10px 0;padding:.85rem 1rem;margin-bottom:1rem;">'
+              + '<div style="font-family:\'Bebas Neue\',var(--fm);font-size:.62rem;letter-spacing:.18em;color:' + accent + ';font-weight:800;text-transform:uppercase;margin-bottom:.35rem;">Scripture</div>'
+              + '<div style="font-family:\'Bebas Neue\',var(--fm);font-size:1.05rem;letter-spacing:.04em;color:var(--tx);">' + _ppEsc(proof.scripture) + '</div>'
+            + '</div>'
+          : '')
+      + (proof.source
+          ? '<div style="font-family:var(--fm);font-size:.72rem;color:var(--tx3);line-height:1.55;padding-top:.5rem;border-top:1px solid rgba(255,255,255,.06);">Source: ' + _ppEsc(proof.source) + '</div>'
+          : '');
   }
-  const detail = document.getElementById('ppModalDetail');
-  if(detail){
-    const paras = String(proof.detail||'').split(/\n\n+/).map(p => '<p>'+ _ppEsc(p) +'</p>').join('');
-    detail.innerHTML = paras;
-  }
-  const scr = document.getElementById('ppModalScripture');
-  if(scr) scr.textContent = proof.scripture || '';
-  const src = document.getElementById('ppModalSource');
-  if(src) src.textContent = 'Source: ' + (proof.source || '—');
-  const bmk = document.getElementById('ppModalBookmark');
-  if(bmk){
+
+  // Footer — Bookmark · Share · Ask the Bible · Close, in the same pill
+  // style Plans uses.
+  const footer = document.getElementById('ppModalFooter');
+  if(footer){
     const saved = ppIsSaved(id);
-    bmk.classList.toggle('saved', saved);
-    bmk.textContent = saved ? '★' : '☆';
+    footer.innerHTML = ''
+      + '<button onclick="ppToggleBookmarkCurrent()" style="background:' + (saved ? accent : 'rgba(255,255,255,.06)') + ';border:1px solid ' + (saved ? accent : 'rgba(255,255,255,.12)') + ';color:' + (saved ? '#0b1220' : 'var(--tx)') + ';border-radius:10px;padding:.55rem .9rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">' + (saved ? '★ Saved' : '☆ Save') + '</button>'
+      + '<button onclick="ppShareCurrent()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.55rem .9rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">📋 Share</button>'
+      + '<button onclick="ppAskBibleFromProof()" style="background:linear-gradient(135deg,' + accent + ',#fef3c7);color:#0b1220;border:none;border-radius:10px;padding:.55rem .9rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">💬 Ask the Bible →</button>';
   }
-  modal.classList.add('open');
-  document.body.classList.add('modal-open');
+
+  if(typeof openModal === 'function') openModal('ppModal');
+  else { document.getElementById('ppModal').classList.add('open'); document.body.classList.add('modal-open'); }
 }
 
 function ppCloseModal(){
-  const modal = document.getElementById('ppModal');
-  if(modal) modal.classList.remove('open');
-  _ppCurrentProofId = null;
-  // Only drop the body class if no other modal is still open.
-  if(!document.querySelector('.mo.open, #ppConvinceModal.open')){
-    document.body.classList.remove('modal-open');
+  if(typeof closeModal === 'function') closeModal('ppModal');
+  else {
+    const modal = document.getElementById('ppModal');
+    if(modal) modal.classList.remove('open');
+    if(!document.querySelector('.mo.open, #ppConvinceModal.open')){
+      document.body.classList.remove('modal-open');
+    }
   }
+  _ppCurrentProofId = null;
 }
 
 function ppShareCurrent(){

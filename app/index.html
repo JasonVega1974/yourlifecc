@@ -6148,46 +6148,59 @@
       display:flex;flex-direction:column;max-height:92vh;
       border:1px solid rgba(251,191,36,.22);
     }
-    /* Photo header — 220px full-width with dark bottom gradient */
+    /* Navy gradient header — centered icon + gold Bebas Neue title.
+       Matches the Plans modal pattern. Photo (if uploaded in admin or
+       hand-picked on the lesson) appears as a background layer behind
+       a heavy dark overlay so the gold title remains readable. */
     #lessonModal .lm-svg{
-      position:relative;width:100%;height:220px;
-      background-size:cover;background-position:center;
-      background-color:#0a0d1a;
+      position:relative;width:100%;
+      padding:1.4rem 1.4rem 1.2rem;
+      background:linear-gradient(135deg,#0a0d1a 0%,#1a1233 100%);
       border-radius:16px 16px 0 0;overflow:hidden;flex:0 0 auto;
+      text-align:center;color:#fef3c7;
     }
-    #lessonModal .lm-svg::after{
-      content:"";position:absolute;left:0;right:0;bottom:0;height:75%;
-      background:linear-gradient(180deg,transparent 0%,rgba(10,13,26,.55) 50%,rgba(10,13,26,.95) 100%);
-      pointer-events:none;
+    #lessonModal .lm-svg.has-photo{
+      /* Photo bg gets layered via inline style in openLessonModal —
+         see _acLessonPhoto path. The :before below is the readability
+         overlay; we keep gradient as fallback if image fails. */
     }
+    #lessonModal .lm-svg::before{
+      content:""; position:absolute; inset:0; pointer-events:none;
+      background:linear-gradient(135deg,rgba(10,13,26,.86) 0%, rgba(26,18,51,.78) 100%);
+      z-index:1;
+    }
+    #lessonModal .lm-svg.no-photo::before{display:none;}
+    #lessonModal .lm-svg > *{position:relative; z-index:2;}
     #lessonModal .lm-close{
-      position:absolute;top:.75rem;right:.75rem;z-index:5;
+      position:absolute;top:.7rem;right:.7rem;z-index:5;
       width:34px;height:34px;border-radius:50%;
-      background:rgba(10,13,26,.72);border:1px solid rgba(251,191,36,.45);
+      background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
       color:#fef3c7;cursor:pointer;font-size:.9rem;font-weight:800;
       display:flex;align-items:center;justify-content:center;
       backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
     }
-    /* Category badge sits on top-left of the photo, below the Back pill. */
+    /* Category pill — centered above the title. */
     #lessonModal .lm-cat{
-      position:absolute;top:3rem;left:1.1rem;z-index:4;
-      font-family:var(--fm);font-size:.66rem;font-weight:800;
+      position:relative; display:inline-block;
+      font-family:var(--fm);font-size:.6rem;font-weight:800;
       letter-spacing:.18em;text-transform:uppercase;
-      background:rgba(10,13,26,.7);
+      background:rgba(255,255,255,.08);
       border:1px solid var(--lm-cat-color,#fbbf24);
       color:var(--lm-cat-color,#fbbf24);
-      padding:.32rem .7rem;border-radius:99px;
-      backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+      padding:.24rem .7rem;border-radius:99px;
+      margin-bottom:.6rem;
     }
-    /* Title overlays the bottom-left of the photo */
+    #lessonModal .lm-icon{
+      position:relative; font-size:2.2rem; line-height:1; margin-bottom:.45rem;
+    }
+    /* Gold gradient title, centered, no longer absolute-positioned. */
     #lessonModal .lm-title{
-      position:absolute;left:0;right:0;bottom:0;z-index:3;
-      padding:0 1.5rem 1.25rem;text-align:left;
+      position:relative; margin:0; padding:0;
       font-family:'Bebas Neue',var(--fm);
-      font-size:2.1rem;line-height:1.05;letter-spacing:.04em;
-      color:#fef3c7;
-      text-shadow:0 2px 14px rgba(0,0,0,.55),0 0 28px rgba(0,0,0,.4);
-      -webkit-text-fill-color:#fef3c7;background:none;
+      font-size:1.7rem;line-height:1.05;letter-spacing:.05em;font-weight:700;
+      background:linear-gradient(180deg,#fef3c7 0%,#fbbf24 55%,#d97706 100%);
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+      -webkit-text-fill-color:transparent;
     }
     #lessonModal .lm-body-wrap{
       flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0;
@@ -6418,10 +6431,11 @@
   <div id="lessonModal" class="mo" onclick="if(event.target===this)closeLessonModal()">
     <div class="md">
       <!-- Photo header: close button, category badge, and lesson title overlay -->
-      <div class="lm-svg" id="lmSvg">
+      <div class="lm-svg no-photo" id="lmSvg">
         <button class="pp-back-btn" onclick="closeLessonModal()" aria-label="Back">← Back</button>
         <button class="lm-close" onclick="closeLessonModal()" aria-label="Close">✕</button>
         <span class="lm-cat" id="lmCat">—</span>
+        <div class="lm-icon" id="lmIcon">📖</div>
         <h2 class="lm-title" id="lmTitle">—</h2>
       </div>
       <div class="lm-body-wrap" id="lmBodyWrap">
@@ -6783,13 +6797,9 @@
       }
 
       /* Detail modal */
-      #ppModal{
-        position:fixed; inset:0; z-index:1000; display:none;
-        align-items:flex-start; justify-content:center;
-        background:rgba(10,13,26,.78); backdrop-filter:blur(6px);
-        overflow-y:auto; padding:2rem 1rem;
-      }
-      #ppModal.open{display:flex;}
+      /* #ppModal shell is governed by the global .mo / .mo.open rules in
+         app.css now — same modal infrastructure as planDetailModal. The
+         orphan `.pp-modal-*` rules below remain only as no-op fallbacks. */
       #ppModal .pp-modal-card{
         background:linear-gradient(180deg,#181232 0%, #0a0d1a 100%);
         border:1px solid rgba(251,191,36,.22); border-radius:16px;
@@ -6976,29 +6986,21 @@
   </div>
 
   <!-- Proof & Prophecy — detail modal (single, reused) -->
-  <div id="ppModal" onclick="if(event.target===this)ppCloseModal()">
-    <div class="pp-modal-card">
-      <button class="pp-back-btn" onclick="ppCloseModal()" aria-label="Back">← Back</button>
-      <button class="pp-modal-close" onclick="ppCloseModal()" aria-label="Close">×</button>
-      <div class="pp-modal-photo" id="ppModalPhoto"><img id="ppModalImg" src="" alt=""></div>
-      <div class="pp-modal-body">
-        <div class="pp-modal-eye" id="ppModalEye"></div>
-        <div class="pp-modal-title" id="ppModalTitle"></div>
-        <div class="pp-modal-meta">
-          <span class="pp-stars" id="ppModalStars"></span>
-          <button class="pp-card-bookmark" id="ppModalBookmark" style="position:static;" onclick="ppToggleBookmarkCurrent()" aria-label="Bookmark">☆</button>
-        </div>
-        <div class="pp-modal-detail" id="ppModalDetail"></div>
-        <div class="pp-modal-scripture">
-          <div class="pp-modal-scripture-lbl">Scripture</div>
-          <div class="pp-modal-scripture-ref" id="ppModalScripture"></div>
-        </div>
-        <div class="pp-modal-source" id="ppModalSource"></div>
-        <div class="pp-modal-share-row">
-          <button class="pp-modal-share-btn" onclick="ppShareCurrent()">📋 Copy share text</button>
-          <button class="pp-modal-share-btn" onclick="ppAskBibleFromProof()">💬 Ask the Bible</button>
-        </div>
+  <!-- Proof & Prophecy detail modal — mirrors planDetailModal structure.
+       Header (navy gradient + optional admin photo bg) carries the icon,
+       title, and eyebrow. Body holds metadata row + detail + scripture
+       block + source. Footer carries actions. -->
+  <div id="ppModal" class="mo" onclick="if(event.target===this)ppCloseModal()">
+    <div class="md" style="max-width:560px;padding:0;">
+      <div id="ppModalHeader" style="background:linear-gradient(135deg,#0a0d1a 0%,#1a1233 100%);padding:1.4rem 1.4rem 1.2rem;text-align:center;color:#fef3c7;border-radius:16px 16px 0 0;position:relative;overflow:hidden;">
+        <button class="pp-back-btn" onclick="ppCloseModal()" aria-label="Back">← Back</button>
+        <button onclick="ppCloseModal()" aria-label="Close" style="position:absolute;top:.7rem;right:.7rem;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#fef3c7;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.8rem;font-weight:800;z-index:5;">✕</button>
+        <div id="ppModalIcon" style="position:relative;z-index:2;font-size:2.4rem;line-height:1;margin-bottom:.45rem;">⚖️</div>
+        <div id="ppModalTitle" style="position:relative;z-index:2;font-family:'Bebas Neue',var(--fm);font-size:1.6rem;letter-spacing:.05em;line-height:1.05;font-weight:700;background:linear-gradient(180deg,#fef3c7 0%,#fbbf24 55%,#d97706 100%);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:.45rem;">—</div>
+        <div id="ppModalEye" style="position:relative;z-index:2;font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:.82rem;color:#e2d6a8;opacity:.88;line-height:1.5;">—</div>
       </div>
+      <div id="ppModalBody" style="padding:1rem 1.2rem;max-height:55vh;overflow-y:auto;"></div>
+      <div id="ppModalFooter" style="padding:.85rem 1.2rem;border-top:1px solid rgba(255,255,255,.06);display:flex;gap:.4rem;justify-content:flex-end;flex-wrap:wrap;"></div>
     </div>
   </div>
 

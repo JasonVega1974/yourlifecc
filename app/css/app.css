@@ -2682,6 +2682,17 @@ img.topic-card-hero{
   gap:1rem;
 }
 .fh-story-tile,
+/* Modal-open guard — hide top mobile nav and quick row whenever any
+   modal is open (planDetailModal, lessonModal, ppModal, ppConvinceModal,
+   storyPlayerModal, etc.). Wired via document.body.classList.toggle
+   in ui.js openModal/closeModal and in the per-feature open/close
+   helpers for modals that don't route through ui.js. */
+body.modal-open #mBar,
+body.modal-open #mqRow,
+body.modal-open .navbar{
+  display:none !important;
+}
+
 .pl-card-v2{
   background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
   border:1px solid rgba(255,255,255,.08);
