@@ -1707,10 +1707,18 @@ async function pmUploadFile(cardId){
   if(msg){ msg.textContent = 'uploading…'; msg.className = 'pm-msg'; }
   if(btn) btn.disabled = true;
   try {
-    const form = new FormData();
-    form.append('card_id', cardId);
-    form.append('file',    f, f.name);
-    const resp = await fetch('/api/upload-card-photo', { method: 'POST', body: form });
+    // Read file as base64 and POST as JSON — avoids multipart parsing on Vercel.
+    const fileData = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload  = (e) => resolve(e.target.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(f);
+    });
+    const resp = await fetch('/api/upload-card-photo', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ card_id: cardId, fileData: fileData, fileName: f.name, mimeType: f.type }),
+    });
     const data = await resp.json().catch(() => ({}));
     if(!resp.ok || !data.ok){
       const errText = data && data.error ? data.error : ('HTTP ' + resp.status);
