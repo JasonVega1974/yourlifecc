@@ -981,8 +981,9 @@ const NAV_ITEMS = [
     {wellTab:'devotional', icon:'🕊️', label:'Devotionals',           key:'scripture'},
     {wellTab:'prayer',     icon:'🙏', label:'Prayer',                key:'scripture'},
     {wellTab:'academy',    icon:'🎓', label:'Academy',               key:'scripture'},
-    {wellTab:'bibleworld', icon:'🏺', label:'Biblical Archaeology',  key:'scripture'},
-    {wellTab:'stories',    icon:'📖', label:'Story Mode',            key:'scripture'},
+    {wellTab:'bibleworld',    icon:'🏺', label:'Biblical Archaeology', key:'scripture'},
+    {wellTab:'proofProphecy', icon:'⚖️', label:'Proof & Prophecy',   key:'scripture'},
+    {wellTab:'stories',       icon:'📖', label:'Story Mode',          key:'scripture'},
     {wellTab:'timeline',   icon:'🕰️', label:'Timeline',              key:'scripture'},
     {wellTab:'memorize',   icon:'✨', label:'Memorize',              key:'scripture'},
     {wellTab:'journey',    icon:'🌟', label:'Journey',               key:'scripture'},
@@ -1740,7 +1741,7 @@ function showSection(id, fromMobile){
     // F9: Auto-show the user's last-visited Well sub-tab (or Home on first
     // visit). Replaces the old hardcoded "open Devotional first" branch.
     const lastTab = (typeof D !== 'undefined' && D && D.wellLastTab) ? D.wellLastTab : 'home';
-    const validTabs = ['home','bible','plans','devotional','prayer','academy','bibleworld','stories','timeline','memorize','journey'];
+    const validTabs = ['home','bible','plans','devotional','prayer','academy','bibleworld','proofProphecy','stories','timeline','memorize','journey'];
     const target = validTabs.indexOf(lastTab) >= 0 ? lastTab : 'home';
     if(typeof bfTab === 'function') bfTab(target);
   },80);

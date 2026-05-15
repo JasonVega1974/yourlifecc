@@ -7762,29 +7762,23 @@ function ppCardHtml(proof){
   const accent = ppCategoryAccent(proof.category);
   const catLabel = ppCategoryLabel(proof.category);
   const saved = ppIsSaved(proof.id);
-  const img = ppImageFor(proof);
-  const photoContent = img
-    ? '<img src="' + _ppEsc(img) + '" alt="' + _ppEsc(proof.title) + '" loading="lazy">'
-    : ppPlaceholderHtml(proof);
   return ''
-    + '<div class="pp-card" data-proof-id="' + _ppEsc(proof.id) + '" onclick="ppOpenModal(this.dataset.proofId)">'
-    + '<div class="pp-card-photo">'
-    +   photoContent
-    +   '<div class="pp-card-badge">' + _ppEsc(catLabel) + '</div>'
-    +   '<button class="pp-card-bookmark' + (saved ? ' saved' : '') + '" onclick="event.stopPropagation();ppToggleBookmark(\'' + _ppEsc(proof.id) + '\',this)" aria-label="Bookmark">'
+    + '<button class="pl-card-v2 pp-card" data-proof-id="' + _ppEsc(proof.id) + '" onclick="ppOpenModal(this.dataset.proofId)" style="--accent:' + _ppEsc(accent) + ';">'
+    + '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;">'
+    +   '<span style="font-size:1.5rem;line-height:1;">' + ppCategoryIcon(proof.category) + '</span>'
+    +   '<div style="font-family:\'Bebas Neue\',var(--fh,var(--fm));font-size:1.1rem;letter-spacing:.04em;flex:1;text-align:left;">' + _ppEsc(proof.title) + '</div>'
+    +   '<span style="font-size:.68rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:.2rem .55rem;border-radius:99px;color:' + _ppEsc(accent) + ';background:' + ppCategorySoftRgba(proof.category) + '0.18);">' + _ppEsc(catLabel) + '</span>'
+    + '</div>'
+    + (proof.eyebrow ? '<div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);margin-bottom:.25rem;">' + _ppEsc(proof.eyebrow) + '</div>' : '')
+    + '<div style="font-family:Georgia,serif;font-style:italic;font-size:.88rem;color:var(--tx2);margin-bottom:.75rem;line-height:1.5;">' + _ppEsc(proof.summary) + '</div>'
+    + '<div style="display:flex;align-items:center;gap:.5rem;">'
+    +   ppStarsHtml(proof.impactScore)
+    +   '<button style="margin-left:auto;background:none;border:none;padding:0;cursor:pointer;font-size:1.1rem;color:' + (saved ? '#f59e0b' : 'var(--tx3)') + ';" onclick="event.stopPropagation();ppToggleBookmark(\'' + _ppEsc(proof.id) + '\',this)" aria-label="Bookmark">'
     +     (saved ? '★' : '☆')
     +   '</button>'
+    +   '<span style="color:var(--tx);font-size:.8rem;">Read More →</span>'
     + '</div>'
-    + '<div class="pp-card-body">'
-    +   (proof.eyebrow ? '<div class="pp-card-eye">' + _ppEsc(proof.eyebrow) + '</div>' : '')
-    +   '<div class="pp-card-title">' + _ppEsc(proof.title) + '</div>'
-    +   '<div class="pp-card-summary">' + _ppEsc(proof.summary) + '</div>'
-    +   '<div class="pp-card-foot">'
-    +     ppStarsHtml(proof.impactScore)
-    +     '<span class="pp-readmore">Read More →</span>'
-    +   '</div>'
-    + '</div>'
-    + '</div>';
+    + '</button>';
 }
 
 function ppRenderSubtabs(){
