@@ -495,44 +495,196 @@ function summarizeChildStatus(){
 }
 
 // ── FAITH-ONLY HERO ("Enter The Well") ── window._faithFree users only ──────
-function _foWellBricks() {
+
+// Varied stone fills for realistic well construction
+const _FO_STONE_FILLS = [
+  '#3a4150','#4a4d58','#525560','#42444f','#3d4250',
+  '#525050','#4a4845','#3f3d3a','#48453f','#4d4c4a',
+  '#3e3f48','#454751','#4b4e58','#3a3c46','#454854',
+  '#4f4d48','#3c3e48','#494a52','#414048','#4a4d52'
+];
+
+function _foStone(x, y, w, h, idx) {
+  const fill = _FO_STONE_FILLS[idx % _FO_STONE_FILLS.length];
+  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="1.5" fill="${fill}" stroke="#1a1d28" stroke-width=".4"/>` +
+    `<rect x="${(x + 0.6).toFixed(1)}" y="${(y + 0.6).toFixed(1)}" width="${(w - 1.2).toFixed(1)}" height="1.8" rx=".5" fill="rgba(255,255,255,.08)"/>` +
+    `<rect x="${(x + 0.6).toFixed(1)}" y="${(y + h - 2.4).toFixed(1)}" width="${(w - 1.2).toFixed(1)}" height="1.8" rx=".5" fill="rgba(0,0,0,.45)"/>`;
+}
+
+function _foWellStones() {
   const rows = [
-    {y:280, stones:[20,24,22,20,14]},
-    {y:292, stones:[16,22,24,20,18]},
-    {y:304, stones:[22,20,20,24,14]},
-    {y:316, stones:[18,22,22,22,16]},
-    {y:328, stones:[20,22,22,20,16]},
-    {y:340, stones:[16,24,20,22,18]},
+    {y:278, sizes:[20,23,22,21,18]},
+    {y:290, sizes:[17,24,21,18,24]},
+    {y:302, sizes:[22,18,22,23,19]},
+    {y:314, sizes:[17,22,24,20,21]},
+    {y:326, sizes:[20,21,22,19,22]},
+    {y:338, sizes:[17,25,20,23,19]},
   ];
   let out = '';
+  let idx = 0;
   rows.forEach(row => {
     let x = 350;
-    row.stones.forEach(w => {
-      out += `<rect x="${x}" y="${row.y}" width="${w - 2}" height="10" rx="1" fill="#252d40" stroke="#1a2130" stroke-width=".5"/>`;
+    row.sizes.forEach(w => {
+      out += _foStone(x, row.y, w - 1.5, 10, idx++);
       x += w;
     });
   });
   return out;
 }
 
-function launchFaithSparkles() {
+function _foMossPatch(cx, cy, scale) {
+  const s = scale;
+  return `<path d="M${(cx-12*s).toFixed(1)},${cy.toFixed(1)} ` +
+    `Q${(cx-14*s).toFixed(1)},${(cy-3*s).toFixed(1)} ${(cx-8*s).toFixed(1)},${(cy-4*s).toFixed(1)} ` +
+    `Q${(cx-3*s).toFixed(1)},${(cy-6*s).toFixed(1)} ${(cx+2*s).toFixed(1)},${(cy-4*s).toFixed(1)} ` +
+    `Q${(cx+8*s).toFixed(1)},${(cy-5*s).toFixed(1)} ${(cx+12*s).toFixed(1)},${(cy-2*s).toFixed(1)} ` +
+    `Q${(cx+14*s).toFixed(1)},${(cy+1*s).toFixed(1)} ${(cx+10*s).toFixed(1)},${(cy+3*s).toFixed(1)} ` +
+    `Q${(cx+5*s).toFixed(1)},${(cy+4*s).toFixed(1)} ${(cx-2*s).toFixed(1)},${(cy+3*s).toFixed(1)} ` +
+    `Q${(cx-8*s).toFixed(1)},${(cy+3*s).toFixed(1)} ${(cx-12*s).toFixed(1)},${cy.toFixed(1)}Z" ` +
+    `fill="#1f3a17" opacity=".7"/>` +
+    `<ellipse cx="${(cx-3*s).toFixed(1)}" cy="${(cy-1*s).toFixed(1)}" rx="${(3*s).toFixed(1)}" ry="${(1.5*s).toFixed(1)}" fill="#2c5020" opacity=".55"/>` +
+    `<ellipse cx="${(cx+5*s).toFixed(1)}" cy="${(cy+1*s).toFixed(1)}" rx="${(2*s).toFixed(1)}" ry="${(1*s).toFixed(1)}" fill="#385c28" opacity=".45"/>`;
+}
+
+function _foRope() {
+  let out = '';
+  out += `<line x1="400" y1="216" x2="400" y2="266" stroke="#7a5f38" stroke-width="2.6" opacity=".92"/>`;
+  out += `<line x1="400" y1="216" x2="400" y2="266" stroke="#a88752" stroke-width="1.4" opacity=".8"/>`;
+  for (let y = 219; y < 263; y += 4) {
+    out += `<line x1="398.6" y1="${y}" x2="401.4" y2="${y + 1.5}" stroke="#5a3f25" stroke-width="1" opacity=".75"/>`;
+  }
+  return out;
+}
+
+function _foStars(count) {
+  let out = '';
+  for (let i = 0; i < count; i++) {
+    const sx = +(8 + Math.random() * 784).toFixed(1);
+    const sy = +(4 + Math.random() * 216).toFixed(1);
+    const sr = +(0.3 + Math.random() * 2.1).toFixed(2);
+    const baseOp = +(0.32 + Math.random() * 0.68).toFixed(2);
+    const dimOp = +(baseOp * (0.1 + Math.random() * 0.3)).toFixed(2);
+    const dur = +(2 + Math.random() * 4).toFixed(2);
+    const del = +(Math.random() * 8).toFixed(2);
+    const peakR = +(sr * (1.3 + Math.random() * 0.7)).toFixed(2);
+    out += `<circle cx="${sx}" cy="${sy}" r="${sr}" fill="#fff" opacity="${baseOp}">` +
+      `<animate attributeName="opacity" values="${baseOp};${dimOp};${baseOp}" dur="${dur}s" begin="${del}s" repeatCount="indefinite"/>` +
+      `<animate attributeName="r" values="${sr};${peakR};${sr}" dur="${dur}s" begin="${del}s" repeatCount="indefinite"/>` +
+      `</circle>`;
+  }
+  return out;
+}
+
+function _foFireflies(count) {
+  let out = '';
+  for (let i = 0; i < count; i++) {
+    const fx = Math.round(70 + Math.random() * 660);
+    const fy = Math.round(205 + Math.random() * 135);
+    const pts = ['0,0'];
+    for (let k = 0; k < 4; k++) {
+      pts.push(`${Math.round(-55 + Math.random() * 110)},${Math.round(-45 + Math.random() * 90)}`);
+    }
+    pts.push('0,0');
+    const fdur = +(4 + Math.random() * 8).toFixed(1);
+    const fdel = +(Math.random() * 6).toFixed(2);
+    const fop = +(0.55 + Math.random() * 0.45).toFixed(2);
+    const fr = +(1.5 + Math.random() * 1.7).toFixed(2);
+    const path = pts.join(';');
+    out += `<circle cx="${fx}" cy="${fy}" r="${fr}" fill="#fde68a" opacity="0" filter="url(#foBlurSm)">` +
+      `<animate attributeName="opacity" values="0;${fop};${fop};${(fop * 0.5).toFixed(2)};0" dur="${fdur}s" begin="${fdel}s" repeatCount="indefinite"/>` +
+      `<animateTransform attributeName="transform" type="translate" values="${path}" dur="${fdur}s" begin="${fdel}s" repeatCount="indefinite" additive="sum"/>` +
+      `</circle>` +
+      `<circle cx="${fx}" cy="${fy}" r="${(fr * 0.4).toFixed(2)}" fill="#fffce0" opacity="0">` +
+      `<animate attributeName="opacity" values="0;1;1;.55;0" dur="${fdur}s" begin="${fdel}s" repeatCount="indefinite"/>` +
+      `<animateTransform attributeName="transform" type="translate" values="${path}" dur="${fdur}s" begin="${fdel}s" repeatCount="indefinite" additive="sum"/>` +
+      `</circle>`;
+  }
+  return out;
+}
+
+function _foGoldRise() {
+  let out = '';
+  for (let i = 0; i < 15; i++) {
+    const startX = +(382 + Math.random() * 36).toFixed(1);
+    const driftX = Math.round(-35 + Math.random() * 70);
+    const riseY = -(70 + Math.round(Math.random() * 110));
+    const dur = +(3.5 + Math.random() * 4).toFixed(2);
+    const del = +(Math.random() * 7).toFixed(2);
+    const r = +(1.2 + Math.random() * 1.5).toFixed(2);
+    out += `<circle cx="${startX}" cy="272" r="${r}" fill="#fbbf24" opacity="0">` +
+      `<animate attributeName="opacity" values="0;.95;.7;0" keyTimes="0;.15;.55;1" dur="${dur}s" begin="${del}s" repeatCount="indefinite"/>` +
+      `<animateTransform attributeName="transform" type="translate" values="0,0;${(driftX / 2).toFixed(1)},${(riseY / 2).toFixed(1)};${driftX},${riseY}" dur="${dur}s" begin="${del}s" repeatCount="indefinite" additive="sum"/>` +
+      `</circle>`;
+  }
+  return out;
+}
+
+function launchFaithSparkles(count) {
   const hero = document.querySelector('.fo-hero');
   if (!hero) return;
   const rect = hero.getBoundingClientRect();
-  for (let i = 0; i < 22; i++) {
+  const n = count || 40;
+  // Origin = well opening (~50% horizontal, ~72% vertical of hero)
+  const wellX = rect.left + rect.width * 0.5;
+  const wellY = rect.top + rect.height * 0.72;
+  for (let i = 0; i < n; i++) {
     setTimeout(() => {
       const sp = document.createElement('div');
       sp.className = 'fo-sparkle';
-      const cx = rect.left + 50 + Math.random() * (rect.width - 100);
-      const cy = rect.top + 30 + Math.random() * (rect.height - 60);
-      const dx = Math.round(-65 + Math.random() * 130);
-      const dy = Math.round(-110 + Math.random() * -40);
-      const dur = Math.round(480 + Math.random() * 580);
-      sp.style.cssText = `left:${cx}px;top:${cy}px;--dx:${dx}px;--dy:${dy}px;--dur:${dur}ms;`;
+      const cx = wellX + (-30 + Math.random() * 60);
+      const cy = wellY + (-8 + Math.random() * 16);
+      const dx = Math.round(-90 + Math.random() * 180);
+      const dy = Math.round(-200 + Math.random() * -60);
+      const size = Math.round(8 + Math.random() * 12);
+      const dur = Math.round(1200 + Math.random() * 1600);
+      sp.style.cssText = `left:${cx}px;top:${cy}px;width:${size}px;height:${size}px;--dx:${dx}px;--dy:${dy}px;--dur:${dur}ms;`;
       document.body.appendChild(sp);
       setTimeout(() => sp.remove(), dur + 100);
-    }, i * 58);
+    }, i * 30);
   }
+}
+
+let _foSparkleIntervalId = null;
+function startFaithSparkleLoop() {
+  if (_foSparkleIntervalId) return;
+  _foSparkleIntervalId = setInterval(() => {
+    if (!document.querySelector('.fo-hero')) {
+      clearInterval(_foSparkleIntervalId);
+      _foSparkleIntervalId = null;
+      return;
+    }
+    launchFaithSparkles(20);
+  }, 5000);
+}
+
+let _foParallaxRAF = null;
+let _foParallaxLastE = null;
+function _foParallaxMove(e) {
+  _foParallaxLastE = e;
+  if (_foParallaxRAF) return;
+  _foParallaxRAF = requestAnimationFrame(() => {
+    _foParallaxRAF = null;
+    if (!window._faithFree || !_foParallaxLastE) return;
+    const hero = document.getElementById('faithHeroCinematic');
+    if (!hero || hero.style.display === 'none') return;
+    const ev = _foParallaxLastE;
+    const x = (ev.clientX / window.innerWidth - 0.5) * 16;
+    const y = (ev.clientY / window.innerHeight - 0.5) * 16;
+    const stars = hero.querySelector('.fo-layer-stars');
+    const moon = hero.querySelector('.fo-layer-moon');
+    const mid = hero.querySelector('.fo-layer-mid');
+    const fg = hero.querySelector('.fo-layer-fg');
+    if (stars) stars.style.transform = `translate(${(x * 0.22).toFixed(2)}px,${(y * 0.22).toFixed(2)}px)`;
+    if (moon) moon.style.transform = `translate(${(x * 0.45).toFixed(2)}px,${(y * 0.45).toFixed(2)}px)`;
+    if (mid) mid.style.transform = `translate(${(x * 1).toFixed(2)}px,${(y * 1).toFixed(2)}px)`;
+    if (fg) fg.style.transform = `translate(${(x * 2.4).toFixed(2)}px,${(y * 2.4).toFixed(2)}px)`;
+  });
+}
+let _foParallaxAttached = false;
+function attachFaithParallax() {
+  if (_foParallaxAttached) return;
+  document.addEventListener('mousemove', _foParallaxMove, { passive: true });
+  _foParallaxAttached = true;
 }
 
 function renderFaithOnlyHero() {
@@ -555,149 +707,181 @@ function renderFaithOnlyHero() {
   name = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
   name = name.replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]||c));
 
-  // ── Star field (85 stars, each with unique twinkle) ──
-  let stars = '';
-  for (let s = 0; s < 85; s++) {
-    const sx = Math.round(10 + Math.random() * 780);
-    const sy = Math.round(4 + Math.random() * 212);
-    const sr = (0.4 + Math.random() * 1.9).toFixed(1);
-    const so = (0.28 + Math.random() * 0.72).toFixed(2);
-    const dur = (2.2 + Math.random() * 3.1).toFixed(1);
-    const del = (Math.random() * 4.5).toFixed(2);
-    stars += `<circle cx="${sx}" cy="${sy}" r="${sr}" fill="#fff" opacity="${so}">` +
-      `<animate attributeName="opacity" values="${so};${(+so * 0.18).toFixed(2)};${so}" dur="${dur}s" begin="${del}s" repeatCount="indefinite"/>` +
-      `</circle>`;
-  }
+  const stars = _foStars(110);
+  const fireflies = _foFireflies(25);
+  const goldRise = _foGoldRise();
+  const stones = _foWellStones();
 
-  // ── Fireflies (14 drifting golden motes) ──
-  let fireflies = '';
-  for (let f = 0; f < 14; f++) {
-    const fx = Math.round(110 + Math.random() * 580);
-    const fy = Math.round(225 + Math.random() * 115);
-    const dx1 = Math.round(-38 + Math.random() * 76);
-    const dy1 = Math.round(-28 + Math.random() * 56);
-    const dx2 = Math.round(-38 + Math.random() * 76);
-    const dy2 = Math.round(-28 + Math.random() * 56);
-    const fdur = (3.2 + Math.random() * 4.2).toFixed(1);
-    const fdel = (Math.random() * 5.5).toFixed(2);
-    const fop = (0.52 + Math.random() * 0.48).toFixed(2);
-    fireflies += `<circle cx="${fx}" cy="${fy}" r="2.2" fill="#fbbf24" opacity="0">` +
-      `<animate attributeName="opacity" values="0;${fop};0" dur="${fdur}s" begin="${fdel}s" repeatCount="indefinite"/>` +
-      `<animateTransform attributeName="transform" type="translate" values="0,0;${dx1},${dy1};${dx2},${dy2};0,0" dur="${fdur}s" begin="${fdel}s" repeatCount="indefinite" additive="sum"/>` +
-      `</circle>`;
-  }
-
-  // ── Full SVG well-at-night scene ──
   const svgScene =
     `<svg class="fo-svg-scene" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">` +
     `<defs>` +
       `<linearGradient id="foSky" x1="0" y1="0" x2="0" y2="1">` +
-        `<stop offset="0%" stop-color="#020509"/>` +
-        `<stop offset="52%" stop-color="#08102a"/>` +
-        `<stop offset="100%" stop-color="#0e1938"/>` +
+        `<stop offset="0%" stop-color="#01030a"/>` +
+        `<stop offset="45%" stop-color="#070e26"/>` +
+        `<stop offset="100%" stop-color="#0d1838"/>` +
       `</linearGradient>` +
+      `<radialGradient id="foMoonCore" cx="50%" cy="48%" r="50%">` +
+        `<stop offset="0%" stop-color="#fffef0"/>` +
+        `<stop offset="55%" stop-color="#fef9d0"/>` +
+        `<stop offset="100%" stop-color="#fde68a" stop-opacity=".95"/>` +
+      `</radialGradient>` +
       `<radialGradient id="foMoonHalo" cx="50%" cy="50%" r="50%">` +
-        `<stop offset="0%" stop-color="#fef9e7" stop-opacity=".7"/>` +
+        `<stop offset="0%" stop-color="#fef9d0" stop-opacity=".6"/>` +
+        `<stop offset="55%" stop-color="#fbbf24" stop-opacity=".18"/>` +
         `<stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/>` +
       `</radialGradient>` +
-      `<radialGradient id="foWellGlow" cx="50%" cy="35%" r="50%">` +
-        `<stop offset="0%" stop-color="#fbbf24" stop-opacity=".62"/>` +
+      `<radialGradient id="foMoonAura" cx="50%" cy="50%" r="50%">` +
+        `<stop offset="0%" stop-color="#fde68a" stop-opacity=".25"/>` +
         `<stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/>` +
       `</radialGradient>` +
-      `<radialGradient id="foInnerLight" cx="50%" cy="28%" r="60%">` +
-        `<stop offset="0%" stop-color="#fef3c7" stop-opacity="1"/>` +
-        `<stop offset="55%" stop-color="#fbbf24" stop-opacity=".5"/>` +
+      `<radialGradient id="foWellCore" cx="50%" cy="50%" r="50%">` +
+        `<stop offset="0%" stop-color="#fef9e7"/>` +
+        `<stop offset="50%" stop-color="#fbbf24" stop-opacity=".85"/>` +
         `<stop offset="100%" stop-color="#d97706" stop-opacity="0"/>` +
       `</radialGradient>` +
+      `<radialGradient id="foWellMid" cx="50%" cy="50%" r="50%">` +
+        `<stop offset="0%" stop-color="#fbbf24" stop-opacity=".7"/>` +
+        `<stop offset="100%" stop-color="#d97706" stop-opacity="0"/>` +
+      `</radialGradient>` +
+      `<radialGradient id="foWellBloom" cx="50%" cy="50%" r="50%">` +
+        `<stop offset="0%" stop-color="#fbbf24" stop-opacity=".4"/>` +
+        `<stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/>` +
+      `</radialGradient>` +
+      `<radialGradient id="foGroundGlow" cx="50%" cy="40%" r="50%">` +
+        `<stop offset="0%" stop-color="#fbbf24" stop-opacity=".42"/>` +
+        `<stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/>` +
+      `</radialGradient>` +
+      `<filter id="foBlurSm" x="-50%" y="-50%" width="200%" height="200%">` +
+        `<feGaussianBlur stdDeviation="1.4"/>` +
+      `</filter>` +
     `</defs>` +
-    // Sky
     `<rect x="0" y="0" width="800" height="400" fill="url(#foSky)"/>` +
-    stars +
-    // Moon halo pulse
-    `<ellipse cx="650" cy="70" rx="60" ry="60" fill="url(#foMoonHalo)" opacity=".38">` +
-      `<animate attributeName="opacity" values=".38;.62;.38" dur="4.8s" repeatCount="indefinite"/>` +
-    `</ellipse>` +
-    // Moon
-    `<circle cx="650" cy="70" r="33" fill="#fef9e7">` +
-      `<animate attributeName="opacity" values="1;.88;1" dur="7.2s" repeatCount="indefinite"/>` +
-    `</circle>` +
-    `<circle cx="637" cy="64" r="9" fill="#fef3c7" opacity=".18"/>` +
-    `<circle cx="658" cy="79" r="5" fill="#fef3c7" opacity=".14"/>` +
-    // Far hills
-    `<path d="M0,288 Q75,242 175,258 Q268,230 375,255 Q468,232 558,250 Q658,230 758,248 Q778,244 800,250 L800,400 L0,400 Z" fill="#0c1526"/>` +
-    // Ground
-    `<rect x="0" y="298" width="800" height="102" fill="#090d1e"/>` +
-    // Ground glow beneath well
-    `<ellipse cx="400" cy="324" rx="98" ry="26" fill="url(#foWellGlow)">` +
-      `<animate attributeName="opacity" values="1;.68;1" dur="3s" repeatCount="indefinite"/>` +
-    `</ellipse>` +
-    fireflies +
-    // Well base shadow
-    `<ellipse cx="400" cy="347" rx="64" ry="14" fill="#000" opacity=".42"/>` +
-    // Well stone cylinder
-    `<rect x="348" y="272" width="104" height="76" rx="4" fill="#1e2535"/>` +
-    _foWellBricks() +
-    // Rim ellipse
-    `<ellipse cx="400" cy="272" rx="54" ry="14" fill="#2a3147"/>` +
-    `<ellipse cx="400" cy="270" rx="52" ry="11" fill="#3a4460" opacity=".6"/>` +
-    // Interior dark
-    `<ellipse cx="400" cy="272" rx="42" ry="10" fill="#03050f"/>` +
-    // Inner golden light (animated breathing)
-    `<ellipse cx="400" cy="275" rx="35" ry="8" fill="url(#foInnerLight)">` +
-      `<animate attributeName="rx" values="35;41;35" dur="3.4s" repeatCount="indefinite"/>` +
-      `<animate attributeName="opacity" values="1;.72;1" dur="3.4s" repeatCount="indefinite"/>` +
-    `</ellipse>` +
-    // Wooden frame — left post
-    `<line x1="370" y1="272" x2="345" y2="207" stroke="#6b4c2a" stroke-width="5" stroke-linecap="round"/>` +
-    // Right post
-    `<line x1="430" y1="272" x2="455" y2="207" stroke="#6b4c2a" stroke-width="5" stroke-linecap="round"/>` +
-    // Crossbeam
-    `<line x1="343" y1="208" x2="457" y2="208" stroke="#5a3e1f" stroke-width="6" stroke-linecap="round"/>` +
-    // Pulley
-    `<circle cx="400" cy="208" r="7" fill="#8b6914" stroke="#5a3e1f" stroke-width="2"/>` +
-    `<circle cx="400" cy="208" r="3" fill="#5a3e1f"/>` +
-    // Rope + bucket
-    `<line x1="400" y1="215" x2="400" y2="268" stroke="#c8a96e" stroke-width="1.5" opacity=".72"/>` +
-    `<rect x="392" y="256" width="16" height="14" rx="2" fill="#4a3520" stroke="#8b6914" stroke-width="1.2"/>` +
-    `<line x1="392" y1="258" x2="408" y2="258" stroke="#8b6914" stroke-width="1"/>` +
-    // Moss patches
-    `<ellipse cx="362" cy="312" rx="14" ry="4" fill="#1e3a12" opacity=".62"/>` +
-    `<ellipse cx="442" cy="328" rx="10" ry="3" fill="#1e3a12" opacity=".52"/>` +
-    // Foreground rocks
-    `<ellipse cx="312" cy="350" rx="28" ry="10" fill="#0e1828" opacity=".88"/>` +
-    `<ellipse cx="503" cy="360" rx="22" ry="8" fill="#0e1828" opacity=".78"/>` +
-    `<ellipse cx="155" cy="364" rx="19" ry="7" fill="#0e1828" opacity=".68"/>` +
-    `<ellipse cx="636" cy="354" rx="17" ry="6" fill="#0e1828" opacity=".72"/>` +
-    // Grass wisps
-    `<path d="M292,344 Q297,327 301,344" stroke="#16280e" stroke-width="1.5" fill="none"/>` +
-    `<path d="M300,344 Q307,323 311,344" stroke="#16280e" stroke-width="1.5" fill="none"/>` +
-    `<path d="M482,352 Q487,334 491,352" stroke="#16280e" stroke-width="1.5" fill="none"/>` +
-    `<path d="M490,352 Q497,330 501,352" stroke="#16280e" stroke-width="1.5" fill="none"/>` +
+    `<g class="fo-layer-stars">${stars}</g>` +
+    `<g class="fo-layer-moon">` +
+      `<circle cx="648" cy="74" r="84" fill="url(#foMoonAura)" opacity=".55"/>` +
+      `<circle cx="648" cy="74" r="56" fill="url(#foMoonHalo)" opacity=".75">` +
+        `<animate attributeName="opacity" values=".75;.95;.75" dur="4s" repeatCount="indefinite"/>` +
+      `</circle>` +
+      `<circle cx="648" cy="74" r="32" fill="url(#foMoonCore)">` +
+        `<animate attributeName="opacity" values="1;.92;1" dur="4s" repeatCount="indefinite"/>` +
+      `</circle>` +
+      `<circle cx="636" cy="66" r="6.5" fill="#e8e0a4" opacity=".34"/>` +
+      `<circle cx="657" cy="82" r="4" fill="#e8e0a4" opacity=".28"/>` +
+      `<circle cx="652" cy="64" r="2.5" fill="#e8e0a4" opacity=".22"/>` +
+      `<circle cx="640" cy="80" r="3" fill="#e8e0a4" opacity=".18"/>` +
+      `<circle cx="660" cy="72" r="2" fill="#e8e0a4" opacity=".2"/>` +
+    `</g>` +
+    `<g class="fo-layer-mid">` +
+      `<path d="M0,290 Q72,240 170,256 Q262,228 374,253 Q468,228 558,248 Q658,228 760,247 Q780,243 800,250 L800,400 L0,400 Z" fill="#0a1224"/>` +
+      `<path d="M0,310 Q120,278 240,295 Q360,272 480,290 Q600,274 720,289 Q760,283 800,291 L800,400 L0,400 Z" fill="#070d1c" opacity=".9"/>` +
+      `<rect x="0" y="314" width="800" height="86" fill="#050a18"/>` +
+      `<ellipse cx="400" cy="334" rx="190" ry="38" fill="url(#foGroundGlow)">` +
+        `<animate attributeName="opacity" values="1;.6;1" dur="2.5s" repeatCount="indefinite"/>` +
+        `<animate attributeName="rx" values="190;215;190" dur="2.5s" repeatCount="indefinite"/>` +
+      `</ellipse>` +
+    `</g>` +
+    `<g class="fo-layer-well">` +
+      `<ellipse cx="400" cy="350" rx="70" ry="14" fill="#000" opacity=".55"/>` +
+      `<rect x="348" y="272" width="104" height="76" rx="4" fill="#252836"/>` +
+      stones +
+      `<ellipse cx="400" cy="272" rx="54" ry="14" fill="#3a4054"/>` +
+      `<ellipse cx="400" cy="269" rx="52" ry="11" fill="#4a546c" opacity=".55"/>` +
+      `<ellipse cx="400" cy="266" rx="48" ry="8" fill="#5a657f" opacity=".35"/>` +
+      `<ellipse cx="400" cy="272" rx="42" ry="10" fill="#02040d"/>` +
+      `<ellipse cx="400" cy="272" rx="82" ry="36" fill="url(#foWellBloom)" opacity=".9">` +
+        `<animate attributeName="opacity" values=".9;.55;.9" dur="2.5s" repeatCount="indefinite"/>` +
+        `<animate attributeName="rx" values="82;94;82" dur="2.5s" repeatCount="indefinite"/>` +
+      `</ellipse>` +
+      `<ellipse cx="400" cy="273" rx="50" ry="14" fill="url(#foWellMid)">` +
+        `<animate attributeName="opacity" values="1;.7;1" dur="2.5s" repeatCount="indefinite"/>` +
+        `<animate attributeName="rx" values="50;60;50" dur="2.5s" repeatCount="indefinite"/>` +
+      `</ellipse>` +
+      `<ellipse cx="400" cy="274" rx="36" ry="9" fill="url(#foWellCore)">` +
+        `<animate attributeName="opacity" values="1;.78;1" dur="2.5s" repeatCount="indefinite"/>` +
+        `<animate attributeName="rx" values="36;44;36" dur="2.5s" repeatCount="indefinite"/>` +
+      `</ellipse>` +
+      goldRise +
+      `<line x1="370" y1="270" x2="345" y2="206" stroke="#6b4c2a" stroke-width="6" stroke-linecap="round"/>` +
+      `<line x1="368.5" y1="268" x2="343.5" y2="204" stroke="#8b6914" stroke-width="2" stroke-linecap="round" opacity=".65"/>` +
+      `<line x1="430" y1="270" x2="455" y2="206" stroke="#6b4c2a" stroke-width="6" stroke-linecap="round"/>` +
+      `<line x1="431.5" y1="268" x2="456.5" y2="204" stroke="#8b6914" stroke-width="2" stroke-linecap="round" opacity=".65"/>` +
+      `<line x1="343" y1="207" x2="457" y2="207" stroke="#5a3e1f" stroke-width="7" stroke-linecap="round"/>` +
+      `<line x1="343" y1="205.5" x2="457" y2="205.5" stroke="#8b6914" stroke-width="2" stroke-linecap="round" opacity=".5"/>` +
+      `<circle cx="400" cy="207" r="9" fill="#3a2810" stroke="#1d1408" stroke-width="1.5"/>` +
+      `<circle cx="400" cy="207" r="6" fill="#7c5018"/>` +
+      `<circle cx="400" cy="207" r="2.5" fill="#1d1408"/>` +
+      _foRope() +
+      `<rect x="390" y="254" width="20" height="16" rx="2" fill="#3a2810" stroke="#8b6914" stroke-width="1.2"/>` +
+      `<line x1="390" y1="257" x2="410" y2="257" stroke="#8b6914" stroke-width="1.2"/>` +
+      `<line x1="390" y1="262" x2="410" y2="262" stroke="#a88752" stroke-width=".8" opacity=".6"/>` +
+      `<path d="M388,254 Q400,250 412,254" stroke="#8b6914" stroke-width="1.2" fill="none"/>` +
+      _foMossPatch(356, 308, 0.85) +
+      _foMossPatch(446, 326, 0.75) +
+      _foMossPatch(394, 344, 0.7) +
+    `</g>` +
+    `<g class="fo-layer-fireflies">${fireflies}</g>` +
+    `<g class="fo-layer-fg">` +
+      `<ellipse cx="295" cy="355" rx="34" ry="13" fill="#060b18" opacity=".95"/>` +
+      `<ellipse cx="282" cy="350" rx="22" ry="7" fill="#0c1428" opacity=".7"/>` +
+      `<ellipse cx="510" cy="365" rx="28" ry="11" fill="#060b18" opacity=".9"/>` +
+      `<ellipse cx="498" cy="361" rx="18" ry="6" fill="#0c1428" opacity=".65"/>` +
+      `<ellipse cx="142" cy="370" rx="24" ry="9" fill="#060b18" opacity=".85"/>` +
+      `<ellipse cx="654" cy="358" rx="22" ry="8" fill="#060b18" opacity=".82"/>` +
+      `<ellipse cx="50" cy="378" rx="20" ry="8" fill="#060b18" opacity=".75"/>` +
+      `<ellipse cx="745" cy="380" rx="22" ry="8" fill="#060b18" opacity=".78"/>` +
+      `<path d="M258,348 Q262,330 266,348" stroke="#0a2010" stroke-width="1.7" fill="none"/>` +
+      `<path d="M266,348 Q272,326 276,348" stroke="#0a2010" stroke-width="1.7" fill="none"/>` +
+      `<path d="M273,348 Q280,328 285,348" stroke="#0a2010" stroke-width="1.7" fill="none"/>` +
+      `<path d="M533,358 Q538,338 542,358" stroke="#0a2010" stroke-width="1.6" fill="none"/>` +
+      `<path d="M540,358 Q547,335 551,358" stroke="#0a2010" stroke-width="1.6" fill="none"/>` +
+      `<path d="M548,358 Q553,338 557,358" stroke="#0a2010" stroke-width="1.6" fill="none"/>` +
+      `<path d="M170,365 Q175,348 178,365" stroke="#0a2010" stroke-width="1.6" fill="none"/>` +
+      `<path d="M178,365 Q184,346 188,365" stroke="#0a2010" stroke-width="1.6" fill="none"/>` +
+      `<path d="M680,355 Q686,335 690,355" stroke="#0a2010" stroke-width="1.7" fill="none"/>` +
+      `<path d="M690,355 Q696,332 700,355" stroke="#0a2010" stroke-width="1.7" fill="none"/>` +
+      `<g transform="translate(105,372)">` +
+        `<path d="M-14,0 Q-17,-13 -9,-15 Q-3,-19 4,-15 Q13,-16 16,-7 Q18,3 9,5 Q-3,7 -9,5 Q-15,5 -14,0Z" fill="#091c10" opacity=".95"/>` +
+        `<path d="M-5,-11 Q0,-16 5,-11" stroke="#14301a" stroke-width="1" fill="none"/>` +
+        `<path d="M-9,-5 Q-4,-10 1,-5" stroke="#14301a" stroke-width="1" fill="none"/>` +
+        `<path d="M3,-8 Q7,-13 11,-8" stroke="#14301a" stroke-width="1" fill="none"/>` +
+      `</g>` +
+      `<g transform="translate(720,370)">` +
+        `<path d="M-11,0 Q-14,-11 -7,-13 Q-2,-17 3,-13 Q11,-14 13,-6 Q15,3 7,5 Q-1,5 -7,3 Q-13,3 -11,0Z" fill="#091c10" opacity=".92"/>` +
+        `<path d="M-3,-8 Q1,-13 5,-8" stroke="#14301a" stroke-width="1" fill="none"/>` +
+      `</g>` +
+    `</g>` +
     `</svg>`;
 
-  // ── Letter-by-letter title entrance ──
-  const TITLE = 'WELCOME TO THE WELL';
-  let titleHtml = '';
-  for (let i = 0; i < TITLE.length; i++) {
-    const ch = TITLE[i];
-    if (ch === ' ') { titleHtml += ' '; continue; }
-    const delay = (0.75 + i * 0.055).toFixed(3);
-    titleHtml += `<span class="fo-letter" style="animation-delay:${delay}s">${ch}</span>`;
+  const greetingText = (greet + ', ' + name).toUpperCase();
+  let greetingHtml = '';
+  for (let i = 0; i < greetingText.length; i++) {
+    const ch = greetingText[i];
+    if (ch === ' ') { greetingHtml += '<span class="fo-gl-space">&nbsp;</span>'; continue; }
+    const delay = (0.3 + i * 0.04).toFixed(3);
+    greetingHtml += `<span class="fo-gl" style="animation-delay:${delay}s">${ch}</span>`;
   }
 
   const hero = document.getElementById('faithHeroCinematic');
   if (hero) {
     hero.style.display = '';
     hero.innerHTML =
-      '<div class="fo-hero">' +
+      '<div class="fo-hero" id="faithOnlyHero">' +
         svgScene +
         '<div class="fo-hero-scrim"></div>' +
         '<div class="fo-hero-content">' +
-          '<div class="fo-hero-greeting">' + greet + ', ' + name + '</div>' +
-          '<div class="fo-hero-title">' + titleHtml + '</div>' +
-          '<p class="fo-hero-sub">“Come, all you who are thirsty, come to the waters.” — Isaiah 55:1</p>' +
+          '<div class="fo-hero-greeting">' + greetingHtml + '</div>' +
+          '<div class="fo-hero-title">' +
+            '<span class="fo-title-1">WELCOME TO</span>' +
+            '<span class="fo-title-2">THE WELL</span>' +
+          '</div>' +
+          '<p class="fo-hero-sub">' +
+            '<span class="fo-quote-mark">“</span>Come, all you who are thirsty, come to the waters.<span class="fo-quote-mark">”</span>' +
+            '<span class="fo-cite">— Isaiah 55:1</span>' +
+          '</p>' +
           '<button class="fo-hero-cta" onclick="if(typeof wellGoto===\'function\')wellGoto(\'home\');else if(typeof showSection===\'function\')showSection(\'s-scripture\')">' +
-            'Enter The Well →' +
+            '<span class="fo-cta-spark">✦</span>' +
+            '<span class="fo-cta-text">Enter The Well</span>' +
+            '<span class="fo-cta-spark">✦</span>' +
             '<span class="fo-cta-shimmer"></span>' +
           '</button>' +
         '</div>' +
@@ -708,14 +892,14 @@ function renderFaithOnlyHero() {
   if (cards) {
     cards.style.display = '';
     const cardDefs = [
-      { delay:'0.08s',
-        bg:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Kinneret_cropped.jpg/1280px-Kinneret_cropped.jpg',
+      { delay:'0.10s',
+        bg:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Stortinget_library_1.jpg/1280px-Stortinget_library_1.jpg',
         icon:'📖', title:'Bible Stories', sub:'52 illustrated stories', tab:'stories' },
-      { delay:'0.22s',
-        bg:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Jerusalem-2013%282%29-Aerial-Temple_Mount-%28south_exposure%29.jpg/1280px-Jerusalem-2013%282%29-Aerial-Temple_Mount-%28south_exposure%29.jpg',
+      { delay:'0.25s',
+        bg:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Kinneret_cropped.jpg/1280px-Kinneret_cropped.jpg',
         icon:'📅', title:'Reading Plans', sub:'45 plans, 580 days', tab:'plans' },
-      { delay:'0.36s',
-        bg:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Mount_Sinai_from_the_southwest.jpg/1280px-Mount_Sinai_from_the_southwest.jpg',
+      { delay:'0.40s',
+        bg:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Jerusalem-2013%282%29-Aerial-Temple_Mount-%28south_exposure%29.jpg/1280px-Jerusalem-2013%282%29-Aerial-Temple_Mount-%28south_exposure%29.jpg',
         icon:'🎓', title:'Faith Academy', sub:'30 lessons + quizzes', tab:'academy' },
     ];
     cards.innerHTML = '<div class="fo-cards">' + cardDefs.map(c =>
@@ -732,8 +916,11 @@ function renderFaithOnlyHero() {
   }
 
   if (typeof renderTodaysVerseHero === 'function') renderTodaysVerseHero();
-  setTimeout(launchFaithSparkles, 750);
+  setTimeout(() => launchFaithSparkles(40), 1800);
+  setTimeout(startFaithSparkleLoop, 5500);
+  attachFaithParallax();
 }
+
 
 function foGotoTab(tab) {
   if (typeof showSection === 'function') showSection('s-scripture');
