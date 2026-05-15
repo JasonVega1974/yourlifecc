@@ -6692,13 +6692,6 @@
         margin-left:.35rem; opacity:.7; font-size:.68rem;
       }
 
-      #bf-proofProphecy .pp-grid{
-        display:grid !important; grid-template-columns:repeat(2,1fr) !important;
-        gap:1rem !important;
-      }
-      @media(max-width:700px){
-        #bf-proofProphecy .pp-grid{ grid-template-columns:1fr !important; }
-      }
       #bf-proofProphecy .pp-card{
         background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08);
         border-radius:14px; overflow:hidden; cursor:pointer;
@@ -6968,6 +6961,10 @@
       #ppConvinceModal .pp-conv-finale-actions{
         display:flex; gap:.6rem; justify-content:center; flex-wrap:wrap;
       }
+#bf-proofProphecy .pp-grid{display:grid !important;grid-template-columns:repeat(2,1fr) !important;gap:1rem !important;width:100% !important;}
+@media(max-width:700px){#bf-proofProphecy .pp-grid{grid-template-columns:1fr !important;}}
+#bottomTabBar{display:none !important;}
+@media(max-width:860px){#bottomTabBar{display:flex !important;}}
     </style>
 
     <div class="pp-hero">
