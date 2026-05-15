@@ -3030,7 +3030,7 @@ img.topic-card-hero{
   display:flex;flex-direction:column;
   padding:1.4rem 1.4rem 1.5rem;
   border-radius:18px;
-  background:linear-gradient(180deg,#1a1233 0%,#100a26 100%);
+  background:linear-gradient(180deg,#111827 0%,#100a26 100%);
   border:1px solid rgba(251,191,36,.48);
   box-shadow:
     0 0 40px rgba(251,191,36,.30),
@@ -3215,7 +3215,7 @@ img.topic-card-hero{
   display:none;position:relative;overflow:hidden;
   background:
     radial-gradient(ellipse at top, rgba(251,191,36,.14), transparent 60%),
-    linear-gradient(180deg,#1a1233 0%,#0a0d1a 100%);
+    linear-gradient(180deg,#111827 0%,#0a0d1a 100%);
   border:1px solid rgba(251,191,36,.48);
   border-radius:18px;
   box-shadow:0 0 50px rgba(251,191,36,.30);
@@ -3315,55 +3315,52 @@ img.topic-card-hero{
   .fc-book{width:200px;height:140px;}
 }
 
-/* ── Light-mode: warm parchment treatment (gold accents kept) ── */
+/* ── Light-mode: clean editorial (white surfaces, amber accents) ── */
 :root.light .fc-hud{
-  background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(251,191,36,.02));
-  border-color:rgba(180,120,20,.32);
+  background:#ffffff;
+  border-color:#e5e7eb;
 }
-:root.light .fc-hud-stat{background:rgba(255,255,255,.7);border-color:rgba(180,120,20,.28);}
-:root.light .fc-hud-label{color:#7c5a00;opacity:.9;}
-:root.light .fc-hud-val{color:#1a1233;}
+:root.light .fc-hud-stat{background:#f8f9fa;border-color:#e5e7eb;}
+:root.light .fc-hud-label{color:#6b7280;opacity:1;}
+:root.light .fc-hud-val{color:#111827;}
 :root.light .fc-hud-val strong{color:#b45309;}
 :root.light .fc-streak{
-  color:#b45309;border-color:rgba(180,120,20,.55);
-  background:linear-gradient(135deg,rgba(251,191,36,.32),rgba(251,191,36,.12));
-  box-shadow:0 0 18px rgba(251,191,36,.35);
+  color:#b45309;border-color:rgba(180,83,9,.35);
+  background:rgba(180,83,9,.07);
+  box-shadow:none;
 }
 
-/* Stage flips to parchment with subtle gold radial halo */
+/* Stage: clean gray page, white card on top */
 :root.light .fc-stage{
-  background:
-    radial-gradient(ellipse at top, rgba(251,191,36,.20), transparent 65%),
-    linear-gradient(180deg,#fdf6e3 0%,#f3e6c4 100%);
-  border-color:rgba(180,120,20,.32);
+  background:#f8f9fa;
+  border-color:#e5e7eb;
 }
-:root.light .fc-stage::before{opacity:.35;}
+:root.light .fc-stage::before{opacity:0;}
 
-/* Opener: page tones already cream — soften the glow + half-page tint */
+/* Opener: clean surfaces */
 :root.light .fc-book-half{
-  background:linear-gradient(180deg,#fffaeb,#e9d8a6);
-  border-color:rgba(120,80,20,.45);
+  background:#f0f4f8;
+  border-color:#e5e7eb;
 }
 :root.light .fc-opener-glow{
-  background:radial-gradient(ellipse at center, rgba(251,191,36,.55), transparent 70%);
+  background:none;
+  opacity:0;
 }
 
-/* Card body: ivory page on gold ring instead of navy */
+/* Card body: clean white */
 :root.light .fc-face{
   background:#ffffff;
   border-color:#e5e7eb;
-  box-shadow:
-    0 0 36px rgba(251,191,36,.28),
-    inset 0 1px 0 rgba(180,120,20,.18);
+  box-shadow:0 2px 12px rgba(0,0,0,.08);
 }
-:root.light .fc-face::before{border-color:rgba(180,120,20,.32);}
+:root.light .fc-face::before{border-color:#e5e7eb;}
 
 :root.light .fc-card-ref{
   color:#b45309;
-  text-shadow:0 0 12px rgba(251,191,36,.4);
+  text-shadow:none;
 }
-:root.light .fc-card-sub{color:#7c5a00;opacity:.85;}
-:root.light .fc-question{color:#1a1233;}
+:root.light .fc-card-sub{color:#6b7280;opacity:1;}
+:root.light .fc-question{color:#111827;}
 
 /* Choice pills: gold-on-cream */
 :root.light .fc-choice{
@@ -3372,9 +3369,9 @@ img.topic-card-hero{
   color:#111827;
 }
 :root.light .fc-choice:hover:not(:disabled){
-  background:linear-gradient(180deg, rgba(251,191,36,.34), rgba(251,191,36,.12));
-  border-color:rgba(180,120,20,.85);
-  box-shadow:0 0 22px rgba(251,191,36,.4);
+  background:#f3f4f6;
+  border-color:#d1d5db;
+  box-shadow:none;
 }
 :root.light .fc-choice-correct{
   background:linear-gradient(180deg,rgba(34,197,94,.22),rgba(22,163,74,.10)) !important;
@@ -3392,12 +3389,12 @@ img.topic-card-hero{
 
 /* Back face elements */
 :root.light .fc-correct-row{
-  background:rgba(251,191,36,.18);
-  border-color:rgba(180,120,20,.5);
+  background:rgba(180,83,9,.06);
+  border-color:rgba(180,83,9,.25);
 }
 :root.light .fc-correct-tag{color:#b45309;}
-:root.light .fc-correct-text{color:#1a1233;}
-:root.light .fc-scripture-msg{color:#1a1233;}
+:root.light .fc-correct-text{color:#111827;}
+:root.light .fc-scripture-msg{color:#111827;}
 :root.light .fc-scripture-ref{color:#b45309;}
 :root.light .fc-result-label.correct{color:#16a34a;}
 :root.light .fc-result-label.incorrect{color:#b91c1c;}
@@ -3423,14 +3420,14 @@ img.topic-card-hero{
   color:#b45309;
   text-shadow:0 0 18px rgba(251,191,36,.45);
 }
-:root.light .fc-results-out{color:#7c5a00;opacity:.85;}
+:root.light .fc-results-out{color:#6b7280;opacity:1;}
 :root.light .fc-star-lg.empty{color:rgba(180,120,20,.25);}
 :root.light .fc-star-lg.filled{color:#d97706;text-shadow:0 0 14px rgba(251,191,36,.55);}
 :root.light .fc-results-msg-wrap{
-  background:rgba(251,191,36,.14);
-  border-color:rgba(180,120,20,.4);
+  background:#f8f9fa;
+  border-color:#e5e7eb;
 }
-:root.light .fc-results-msg{color:#1a1233;}
+:root.light .fc-results-msg{color:#111827;}
 :root.light .fc-results-ref{color:#b45309;}
 
 /* Simplify Settings for faith_free — only Appearance + Support remain. */
@@ -3677,7 +3674,7 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   font-weight:400;
 }
 :root.light .bf-eyebrow{color:#b45309;opacity:.9;}
-:root.light .bf-sub{color:#3a2818;opacity:.92;}
+:root.light .bf-sub{color:#374151;opacity:1;}
 :root.light .bf-section-hdr{border-bottom-color:rgba(180,120,20,.22);}
 
 /* Recolor the purple "active" chips/tabs to gold so the palette stays unified */
@@ -3702,7 +3699,7 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
 #bf-plans .pl-active-banner{
   background:
     radial-gradient(ellipse at top, rgba(251,191,36,.16), transparent 60%),
-    linear-gradient(180deg,#1a1233 0%,#0a0d1a 100%) !important;
+    linear-gradient(180deg,#111827 0%,#0a0d1a 100%) !important;
   color:#fef3c7 !important;
   border:1px solid rgba(251,191,36,.32) !important;
   box-shadow:0 0 28px rgba(251,191,36,.18) !important;
@@ -3768,7 +3765,7 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
 #bf-home .fh-votd{
   background:
     radial-gradient(ellipse at top, rgba(251,191,36,.18), transparent 60%),
-    linear-gradient(180deg,#1a1233 0%,#0a0d1a 100%) !important;
+    linear-gradient(180deg,#111827 0%,#0a0d1a 100%) !important;
   border:1px solid rgba(251,191,36,.32) !important;
   color:#fef3c7 !important;
   box-shadow:0 0 32px rgba(251,191,36,.18) !important;
@@ -3789,14 +3786,14 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
     radial-gradient(ellipse at top, rgba(251,191,36,.18), transparent 60%),
     linear-gradient(180deg,#fffaeb 0%,#fdf0c8 100%) !important;
   border-color:rgba(180,120,20,.45) !important;
-  color:#1a1233 !important;
+  color:#111827 !important;
 }
-:root.light #bf-home .fh-votd-text{color:#1a1233 !important;}
+:root.light #bf-home .fh-votd-text{color:#111827 !important;}
 :root.light #bf-home .fh-votd-eyebrow{color:#b45309 !important;}
 :root.light #bf-home .fh-votd-ref{color:#b45309 !important;}
 :root.light #bf-home .fh-votd-actions button{
   background:rgba(251,191,36,.18) !important;
-  color:#1a1233 !important;
+  color:#111827 !important;
   border-color:rgba(180,120,20,.4) !important;
 }
 
@@ -3809,7 +3806,7 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
 #bf-prayer .pr-prompt{
   background:
     radial-gradient(ellipse at top, rgba(251,191,36,.14), transparent 60%),
-    linear-gradient(180deg,#1a1233 0%,#0a0d1a 100%) !important;
+    linear-gradient(180deg,#111827 0%,#0a0d1a 100%) !important;
   border:1px solid rgba(251,191,36,.28) !important;
   color:#fef3c7 !important;
   box-shadow:0 0 28px rgba(251,191,36,.16) !important;
@@ -3840,11 +3837,11 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   background:
     radial-gradient(ellipse at top, rgba(251,191,36,.16), transparent 60%),
     linear-gradient(180deg,#fffaeb 0%,#fdf0c8 100%) !important;
-  color:#1a1233 !important;
+  color:#111827 !important;
   border-color:rgba(180,120,20,.4) !important;
 }
 :root.light #bf-prayer .pr-prompt-eyebrow{color:#b45309 !important;}
-:root.light #bf-prayer .pr-prompt-text{color:#1a1233 !important;}
+:root.light #bf-prayer .pr-prompt-text{color:#111827 !important;}
 
 /* ════════════════════════════════════════════════════════════════════
    F9 — Final consistency sweep across The Well
@@ -3866,13 +3863,13 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   box-shadow:0 14px 36px rgba(251,191,36,.22);
   border-color:rgba(251,191,36,.5);
 }
-:root.light .well-card{background:rgba(255,255,255,.65);border-color:rgba(180,120,20,.28);}
+:root.light .well-card{background:#ffffff;border-color:#e5e7eb;box-shadow:0 1px 3px rgba(0,0,0,.06);}
 
 /* ─── Plans tab: hero + plan-detail modal header + card glow → gold ─── */
 #bf-plans .pl-hero{
   background:
     radial-gradient(ellipse at top, rgba(251,191,36,.16), transparent 60%),
-    linear-gradient(180deg,#1a1233 0%,#0a0d1a 100%) !important;
+    linear-gradient(180deg,#111827 0%,#0a0d1a 100%) !important;
   color:#fef3c7 !important;
   border:1px solid rgba(251,191,36,.32) !important;
   box-shadow:0 0 28px rgba(251,191,36,.18) !important;
@@ -3888,7 +3885,7 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
 #planDetailModal #planDetailHeader{
   background:
     radial-gradient(ellipse at top, rgba(251,191,36,.18), transparent 60%),
-    linear-gradient(180deg,#1a1233 0%,#0a0d1a 100%) !important;
+    linear-gradient(180deg,#111827 0%,#0a0d1a 100%) !important;
   color:#fef3c7 !important;
   border-bottom:1px solid rgba(251,191,36,.22);
 }
@@ -3919,7 +3916,7 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
 #bwSiteModal .md > div:first-of-type{
   background:
     radial-gradient(ellipse at top, rgba(251,191,36,.18), transparent 60%),
-    linear-gradient(180deg,#1a1233 0%,#0a0d1a 100%) !important;
+    linear-gradient(180deg,#111827 0%,#0a0d1a 100%) !important;
   color:#fef3c7 !important;
 }
 #bwDiscHeader,
@@ -3929,7 +3926,7 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
 #bf-memorize .mv-hero{
   background:
     radial-gradient(ellipse at top, rgba(251,191,36,.16), transparent 60%),
-    linear-gradient(180deg,#1a1233 0%,#0a0d1a 100%) !important;
+    linear-gradient(180deg,#111827 0%,#0a0d1a 100%) !important;
   color:#fef3c7 !important;
   border:1px solid rgba(251,191,36,.32) !important;
 }
@@ -4168,15 +4165,15 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   background:linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,250,235,.78)) !important;
   border-color:rgba(180,120,20,.32) !important;
   box-shadow:0 4px 14px rgba(60,40,15,.08) !important;
-  color:#1a1233 !important;
+  color:#111827 !important;
 }
 :root.light #bf-bibleworld .bw-card:hover{
   border-color:rgba(180,120,20,.55) !important;
   box-shadow:0 8px 28px rgba(180,120,20,.22) !important;
 }
-:root.light #bf-bibleworld .bw-card-name{color:#1a1233 !important;}
-:root.light #bf-bibleworld .bw-card-tagline{color:#3a2818 !important;opacity:.95;}
-:root.light #bf-bibleworld .bw-card-era{color:var(--era-c, #1a1233);}
+:root.light #bf-bibleworld .bw-card-name{color:#111827 !important;}
+:root.light #bf-bibleworld .bw-card-tagline{color:#6b7280 !important;opacity:1;}
+:root.light #bf-bibleworld .bw-card-era{color:var(--era-c, #111827);}
 :root.light #bf-bibleworld .bw-card-photo{background:rgba(255,250,235,.7);border-color:rgba(180,120,20,.32);}
 :root.light #bf-bibleworld .bw-card-ref{background:rgba(56,189,248,.16);border-color:rgba(56,189,248,.4);color:#1e3a8a;}
 :root.light #bf-bibleworld .bw-card-foot{border-top-color:rgba(180,120,20,.18);}
@@ -4186,7 +4183,7 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   background:rgba(255,255,255,.65) !important;
   border-color:rgba(180,120,20,.28) !important;
 }
-:root.light #fhFamilyVerseCard #fhFamilyVerseText{color:#1a1233 !important;}
+:root.light #fhFamilyVerseCard #fhFamilyVerseText{color:#111827 !important;}
 :root.light #fhFamilyVerseCard #fhFamilyVerseRef{color:#b45309 !important;}
 :root.light #fhFamilyVerseCard > div:first-child{color:#b45309 !important;}
 
@@ -4229,7 +4226,7 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
 #bf-bibleworld .bw-hero{
   background:
     radial-gradient(ellipse at top, rgba(251,191,36,.16), transparent 60%),
-    linear-gradient(180deg,#1a1233 0%,#0a0d1a 100%) !important;
+    linear-gradient(180deg,#111827 0%,#0a0d1a 100%) !important;
   color:#fef3c7 !important;
   border:1px solid rgba(251,191,36,.28) !important;
   box-shadow:0 0 24px rgba(251,191,36,.16) !important;
@@ -4251,7 +4248,7 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
 #bf-academy .ac-hero{
   background:
     radial-gradient(ellipse at top, rgba(251,191,36,.16), transparent 60%),
-    linear-gradient(180deg,#1a1233 0%,#0a0d1a 100%) !important;
+    linear-gradient(180deg,#111827 0%,#0a0d1a 100%) !important;
   color:#fef3c7 !important;
   border:1px solid rgba(251,191,36,.28) !important;
   box-shadow:0 0 24px rgba(251,191,36,.16) !important;
@@ -4259,17 +4256,16 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
 
 /* ─── P1 · Light-mode parchment for surfaces that were missing it ─── */
 
-/* Devotional inner card body — was hardcoded dark gradient with no
-   light-mode swap. Now flips to parchment with dark text. */
+/* Devotional inner card body */
 :root.light #bf-devotional > div:nth-of-type(2){
-  background:linear-gradient(180deg,#fffaeb 0%,#fdf0c8 100%) !important;
-  border-color:rgba(180,120,20,.32) !important;
+  background:#ffffff !important;
+  border-color:#e5e7eb !important;
 }
-:root.light #bf-devotional #devScripture{color:#1a1233 !important;}
+:root.light #bf-devotional #devScripture{color:#111827 !important;}
 :root.light #bf-devotional #devRef{color:#b45309 !important;}
 :root.light #bf-devotional #devBody,
 :root.light #bf-devotional #devReflect,
-:root.light #bf-devotional #devPrayer{color:#3a2818 !important;}
+:root.light #bf-devotional #devPrayer{color:#374151 !important;}
 
 /* Journey tab surfaces */
 :root.light #bf-journey div[style*="rgba(255,255,255,.03)"]{
@@ -4284,7 +4280,7 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   background:
     radial-gradient(ellipse at top, rgba(251,191,36,.18), transparent 60%),
     linear-gradient(180deg,#fffaeb 0%,#fdf0c8 100%) !important;
-  color:#1a1233 !important;
+  color:#111827 !important;
   border-color:rgba(180,120,20,.4) !important;
 }
 :root.light #bf-memorize .mv-card{
@@ -4297,7 +4293,7 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   background:
     radial-gradient(ellipse at top, rgba(251,191,36,.18), transparent 60%),
     linear-gradient(180deg,#fffaeb 0%,#fdf0c8 100%) !important;
-  color:#1a1233 !important;
+  color:#111827 !important;
   border-color:rgba(180,120,20,.4) !important;
 }
 
@@ -4326,7 +4322,7 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
 #askBibleModal .md,
 #acQuizModal .md,
 #acCertModal .md{
-  background:linear-gradient(180deg,#1a1233 0%,#0a0d1a 100%) !important;
+  background:linear-gradient(180deg,#111827 0%,#0a0d1a 100%) !important;
   border:1px solid rgba(251,191,36,.32) !important;
   box-shadow:0 0 40px rgba(251,191,36,.18), 0 30px 80px rgba(0,0,0,.5) !important;
 }
@@ -4337,8 +4333,8 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
 :root.light #askBibleModal .md,
 :root.light #acQuizModal .md,
 :root.light #acCertModal .md{
-  background:linear-gradient(180deg,#fffaeb 0%,#fdf0c8 100%) !important;
-  border-color:rgba(180,120,20,.4) !important;
+  background:#ffffff !important;
+  border-color:#e5e7eb !important;
 }
 
 /* ─── P3 · Memorize verse text: Georgia italic (was plain Inter) ─── */
@@ -4709,13 +4705,14 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 :root.light #heroTodaysVerseText{ color:#1f2937 !important; }
 
 :root.light #heroReflectCard{
-  background:linear-gradient(135deg,rgba(251,191,36,.10),rgba(251,191,36,.04)) !important;
-  border-color:rgba(251,191,36,.35) !important;
+  background:#ffffff !important;
+  border-color:#e5e7eb !important;
 }
-:root.light #heroReflectBody #heroReflectStatus{ color:#475569 !important; }
+:root.light #heroReflectBody #heroReflectStatus{ color:#6b7280 !important; }
 :root.light #heroReflectQuestion{
-  background:rgba(251,191,36,.10) !important;
-  color:#1f2937 !important;
+  background:#f3f4f6 !important;
+  color:#374151 !important;
+  border-left-color:#b45309 !important;
 }
 :root.light #heroReflectResponse{
   background:#fff !important;
@@ -4914,11 +4911,11 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 }
 :root.light #heroTodaysVerseText{ color:#1f2937 !important; }
 :root.light #heroReflectCard{
-  background:linear-gradient(135deg,rgba(251,191,36,.10),rgba(251,191,36,.04)) !important;
-  border-color:rgba(146,64,14,.25) !important;
+  background:#ffffff !important;
+  border-color:#e5e7eb !important;
 }
 :root.light #heroReflectBtn{ color:#b45309 !important; }
-:root.light #heroReflectQuestion{ background:rgba(251,191,36,.12) !important; color:#1f2937 !important; border-left-color:#b45309 !important; }
+:root.light #heroReflectQuestion{ background:#f3f4f6 !important; color:#374151 !important; border-left-color:#b45309 !important; }
 :root.light #heroReflectResponse{ background:#fff !important; border-color:rgba(0,0,0,.15) !important; color:#111827 !important; }
 :root.light #heroQuickActions button{
   background:#fff !important;
