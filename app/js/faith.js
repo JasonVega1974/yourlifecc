@@ -3618,8 +3618,14 @@ function getTodayWhoSuggestion(){
 // ── Sub-tab navigation ────────────────────────────────────────
 function prSubTab(sub, btn){
   _prCurrentSub = sub;
-  document.querySelectorAll('#bf-prayer .pr-subtab').forEach(t => t.classList.remove('active'));
-  if(btn) btn.classList.add('active');
+  document.querySelectorAll('#bf-prayer .pr-subtab').forEach(t => {
+    t.classList.remove('active');
+    t.setAttribute('aria-selected', 'false');
+  });
+  if(btn){
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected', 'true');
+  }
   ['mine','wall','howto','examples','who'].forEach(s => {
     const pane = document.getElementById('pr-pane-' + s);
     if(pane) pane.style.display = (s === sub) ? '' : 'none';
@@ -4033,19 +4039,28 @@ async function prSubmitWallPost(){
 
 // ── How to Pray pane (ACTS + 8 types + Lectio Divina) ─────────
 function renderHowToPrayPane(){
-  // ACTS framework
+  // ACTS framework — horizontal sequence with step numbers + connecting arrows
   const actsEl = document.getElementById('prActsGrid');
   const acts = (typeof window !== 'undefined' && window.ACTS_FRAMEWORK) || [];
   if(actsEl){
-    actsEl.innerHTML = acts.map((a, i) =>
-      `<div class="pr-acts-card" style="--acts-hex:${a.hex};--d:${i * 0.12}s;">
-        <div class="pr-acts-letter">${escapeHtml(a.letter)}</div>
-        <div class="pr-acts-word">${escapeHtml(a.word)}</div>
-        <div class="pr-acts-line">${escapeHtml(a.oneLine)}</div>
-        <div class="pr-acts-explain">${escapeHtml(a.explanation)}</div>
-        <div class="pr-acts-example">${escapeHtml(a.examplePrayer)}</div>
-      </div>`
-    ).join('');
+    let html = '<div class="pr-acts-row" role="list">';
+    acts.forEach((a, i) => {
+      const letterKey = (a.letter || '').toLowerCase();
+      html += `<div class="pr-acts-card acts-${letterKey}" role="listitem" style="--acts-hex:${a.hex};--d:${(i * 0.12).toFixed(2)}s;">` +
+        `<div class="pr-acts-step-lbl">STEP ${i + 1}</div>` +
+        `<div class="pr-acts-num">${i + 1}</div>` +
+        `<div class="pr-acts-letter">${escapeHtml(a.letter)}</div>` +
+        `<div class="pr-acts-word">${escapeHtml(a.word)}</div>` +
+        `<div class="pr-acts-line">${escapeHtml(a.oneLine)}</div>` +
+        `<div class="pr-acts-explain">${escapeHtml(a.explanation)}</div>` +
+        `<div class="pr-acts-example">${escapeHtml(a.examplePrayer)}</div>` +
+        `</div>`;
+      if(i < acts.length - 1){
+        html += `<div class="pr-acts-arrow" aria-hidden="true">→</div>`;
+      }
+    });
+    html += '</div>';
+    actsEl.innerHTML = html;
   }
   // 8 Types of Prayer
   const typesEl = document.getElementById('prTypesGrid');

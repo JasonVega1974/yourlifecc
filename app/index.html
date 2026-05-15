@@ -956,7 +956,7 @@
       background:linear-gradient(135deg,#f59e0b 0%,#d97706 25%,#f59e0b 50%,#fbbf24 75%,#f59e0b 100%);
       background-size:300% 300%;color:#1a0f02;
       border:none;border-radius:99px;padding:1.2rem 3rem;
-      font-family:'Bebas Neue',var(--fh);font-size:1.3rem;font-weight:800;
+      font-family:'Bebas Neue',var(--fh);font-size:1.3rem;font-weight:400;
       letter-spacing:.18em;text-transform:uppercase;
       cursor:pointer;min-height:58px;
       box-shadow:
@@ -4806,11 +4806,11 @@
   <style>
     /* ── Devotional light mode — fix inline-style dark container + hardcoded text colors ── */
     :root.light #bf-devotional > div[style*="linear-gradient"]{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; }
-    :root.light #devTitle{ color:#8a5200 !important; -webkit-text-fill-color:#8a5200 !important; }
+    :root.light #devTitle{ color:#92400e !important; -webkit-text-fill-color:#92400e !important; }
     :root.light #devScripture{ color:#4a4b52 !important; }
-    :root.light #devRef{ color:#8a5200 !important; }
-    :root.light #bf-devotional [style*="color:#fbbf24"]{ color:#8a5200 !important; }
-    :root.light #bf-devotional [style*="background:rgba(167,139,250"]{ background:rgba(138,82,0,.06) !important; border-left-color:#8a5200 !important; }
+    :root.light #devRef{ color:#92400e !important; }
+    :root.light #bf-devotional [style*="color:#92400e"]{ color:#92400e !important; }
+    :root.light #bf-devotional [style*="background:rgba(167,139,250"]{ background:rgba(146,64,14,.06) !important; border-left-color:#92400e !important; }
   </style>
   <div id="bf-devotional" style="display:none;">
     <div class="bf-section-hdr">
@@ -5235,7 +5235,7 @@
         box-shadow:0 4px 14px rgba(251,191,36,.32);
       }
       :root.light #bf-prayer .pr-subtab{background:rgba(15,23,42,.04) !important;border-color:rgba(15,23,42,.12) !important;color:#4a4b52 !important;}
-      :root.light #bf-prayer .pr-subtab.active{background:linear-gradient(135deg,#fbbf24,#f59e0b) !important;color:#0b1220 !important;}
+      :root.light #bf-prayer .pr-subtab.active{background:linear-gradient(135deg,#92400e,#78350f) !important;color:#0b1220 !important;}
 
       /* ── Pane base ── */
       #bf-prayer .pr-pane{animation:prPaneIn .3s ease both;}
@@ -5266,7 +5266,7 @@
       #bf-prayer .pr-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;margin-bottom:.85rem;}
       #bf-prayer .pr-stat{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:.5rem;text-align:center;}
       #bf-prayer .pr-stat-num{font-size:1.3rem;font-weight:900;font-family:var(--fh,var(--fm));}
-      #bf-prayer .pr-stat-lbl{font-size:.58rem;color:var(--tx2);font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-top:.1rem;}
+      #bf-prayer .pr-stat-lbl{font-size:.72rem;color:var(--tx2);font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-top:.15rem;}
 
       /* ── Filter chips (My Prayers, Wall) ── */
       #bf-prayer .pr-mine-filters,#bf-prayer .pr-wall-filters{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.7rem;}
@@ -5283,7 +5283,7 @@
         width:100%;background:linear-gradient(135deg,#fbbf24,#f59e0b);
         color:#0b1220;border:none;border-radius:12px;
         padding:.85rem 1rem;margin-bottom:.85rem;
-        font-family:'Bebas Neue',var(--fm);font-size:1rem;font-weight:800;
+        font-family:'Bebas Neue',var(--fm);font-size:1rem;font-weight:400;
         letter-spacing:.1em;text-transform:uppercase;cursor:pointer;
         box-shadow:0 4px 16px rgba(251,191,36,.32);
         transition:transform .15s,box-shadow .15s;
@@ -5371,11 +5371,11 @@
       @keyframes prWallIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
       #bf-prayer .pr-wall-card-cat{
         display:inline-block;
-        font-size:.56rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+        font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
         color:var(--pr-wall-color,#b45309);
         background:rgba(180,120,20,.10);
         border:1px solid var(--pr-wall-color,rgba(180,120,20,.3));
-        padding:.18rem .55rem;border-radius:99px;margin-bottom:.5rem;
+        padding:.22rem .6rem;border-radius:99px;margin-bottom:.5rem;
       }
       #bf-prayer .pr-wall-card-text{
         font-family:Georgia,'Times New Roman',serif;font-style:italic;
@@ -5388,9 +5388,10 @@
       #bf-prayer .pr-wall-card-actions{display:flex;align-items:center;gap:.5rem;}
       #bf-prayer .pr-praying-btn{
         background:rgba(180,120,20,.10);border:1px solid rgba(180,120,20,.32);
-        color:#b45309;border-radius:99px;padding:.32rem .75rem;
-        font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);
-        display:inline-flex;align-items:center;gap:.35rem;
+        color:#b45309;border-radius:99px;padding:.6rem 1rem;
+        min-height:44px;
+        font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);
+        display:inline-flex;align-items:center;justify-content:center;gap:.4rem;
         transition:all .15s;
       }
       #bf-prayer .pr-praying-btn:hover{background:rgba(180,120,20,.18);transform:translateY(-1px);}
@@ -5420,40 +5421,81 @@
       }
       :root.light #bf-prayer .pr-section-title{color:#1a1b1e;}
 
-      /* ACTS: 4 cards, one per letter, color per spec */
-      #bf-prayer .pr-acts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.7rem;margin-bottom:1.2rem;}
+      /* ACTS: horizontal sequence (snap-scroll on mobile, arrows on desktop)
+         Card shell normalized to match Types + Lectio: dark-navy bg, accent
+         left-border, no gradient fill — accent color survives only as the
+         left rule + step numerals + word label so the four steps read as a
+         consistent visual sequence rather than four unrelated pills. */
+      #bf-prayer .pr-acts-host{margin-bottom:1.2rem;}
+      #bf-prayer .pr-acts-row{
+        display:flex;align-items:stretch;gap:.6rem;
+        overflow-x:auto;-webkit-overflow-scrolling:touch;
+        scroll-snap-type:x mandatory;
+        padding-bottom:.5rem;
+        scrollbar-width:thin;scrollbar-color:rgba(251,191,36,.35) transparent;
+      }
+      #bf-prayer .pr-acts-row::-webkit-scrollbar{height:4px;}
+      #bf-prayer .pr-acts-row::-webkit-scrollbar-thumb{background:rgba(251,191,36,.35);border-radius:99px;}
       #bf-prayer .pr-acts-card{
-        position:relative;overflow:hidden;
-        background:linear-gradient(160deg,var(--acts-hex,#fbbf24) 0%,rgba(10,13,26,.95) 100%);
-        border:1px solid var(--acts-hex,#fbbf24);border-radius:14px;
-        padding:1rem 1.05rem;
+        flex:0 0 240px;scroll-snap-align:start;
+        position:relative;
+        background:rgba(255,255,255,.04);
+        border:1px solid rgba(251,191,36,.18);
+        border-left:4px solid var(--acts-hex,#fbbf24);
+        border-radius:14px;padding:.95rem 1.05rem;
         animation:prActsIn .55s ease both;animation-delay:var(--d,0s);opacity:0;
       }
       @keyframes prActsIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
-      #bf-prayer .pr-acts-letter{
-        font-family:'Bebas Neue',var(--fm);font-size:3.2rem;line-height:.9;
-        color:#fff;letter-spacing:0;margin-bottom:.2rem;
-        text-shadow:0 4px 18px rgba(0,0,0,.5);
-      }
-      #bf-prayer .pr-acts-word{
-        font-family:var(--fm);font-size:.68rem;font-weight:800;
+      #bf-prayer .pr-acts-step-lbl{
+        font-family:var(--fm);font-size:.6rem;font-weight:700;
         letter-spacing:.22em;text-transform:uppercase;
-        color:rgba(255,255,255,.92);margin-bottom:.55rem;
+        color:var(--acts-hex,#fbbf24);opacity:.85;margin-bottom:.1rem;
+      }
+      #bf-prayer .pr-acts-num{
+        font-family:'Bebas Neue',var(--fm);font-size:2.8rem;line-height:.85;
+        color:var(--acts-hex,#fbbf24);letter-spacing:0;margin-bottom:.1rem;
+        font-weight:400;
+      }
+      #bf-prayer .pr-acts-letter{
+        font-family:'Bebas Neue',var(--fm);font-size:1.5rem;line-height:1;
+        color:#fff;letter-spacing:.02em;margin-bottom:.2rem;font-weight:400;
+      }
+      :root.light #bf-prayer .pr-acts-letter{color:#1a1b1e;}
+      #bf-prayer .pr-acts-word{
+        font-family:var(--fm);font-size:.66rem;font-weight:700;
+        letter-spacing:.22em;text-transform:uppercase;
+        color:var(--acts-hex,#fbbf24);opacity:.95;margin-bottom:.55rem;
       }
       #bf-prayer .pr-acts-line{
         font-family:'Bebas Neue',var(--fm);font-size:1rem;letter-spacing:.03em;
-        color:#fff;line-height:1.25;margin-bottom:.55rem;
+        color:#fff;line-height:1.25;margin-bottom:.55rem;font-weight:400;
       }
+      :root.light #bf-prayer .pr-acts-line{color:#1a1b1e;}
       #bf-prayer .pr-acts-explain{
         font-family:var(--fm);font-size:.78rem;line-height:1.55;
-        color:rgba(255,255,255,.82);margin-bottom:.65rem;
+        color:var(--tx2);margin-bottom:.6rem;
       }
       #bf-prayer .pr-acts-example{
-        font-family:Georgia,serif;font-style:italic;font-size:.82rem;line-height:1.5;
-        color:#fff;background:rgba(0,0,0,.28);
-        border-left:3px solid rgba(255,255,255,.5);
-        border-radius:0 8px 8px 0;padding:.55rem .7rem;
+        font-family:Georgia,serif;font-style:italic;font-size:.8rem;line-height:1.5;
+        color:#fef3c7;background:rgba(251,191,36,.08);
+        border-left:3px solid var(--acts-hex,#fbbf24);
+        border-radius:0 8px 8px 0;padding:.5rem .65rem;
       }
+      :root.light #bf-prayer .pr-acts-example{color:#3a2818;background:rgba(146,64,14,.14);}
+      /* Connecting arrow between cards — desktop only (mobile uses scroll-snap) */
+      #bf-prayer .pr-acts-arrow{
+        flex:0 0 auto;display:none;align-items:center;
+        font-family:'Bebas Neue',var(--fm);font-size:1.7rem;
+        color:#fbbf24;opacity:.7;letter-spacing:0;font-weight:400;
+      }
+      @media (min-width:640px){
+        #bf-prayer .pr-acts-arrow{display:flex;}
+      }
+      /* Per-letter darkened accents in light mode (Task B amber-brown system) */
+      :root.light #bf-prayer .pr-acts-card.acts-a{--acts-hex:#92400e !important;}
+      :root.light #bf-prayer .pr-acts-card.acts-c{--acts-hex:#5b21b6 !important;}
+      :root.light #bf-prayer .pr-acts-card.acts-t{--acts-hex:#15803d !important;}
+      :root.light #bf-prayer .pr-acts-card.acts-s{--acts-hex:#0369a1 !important;}
 
       /* 8 Types: card grid */
       #bf-prayer .pr-types-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.6rem;margin-bottom:1.2rem;}
@@ -5484,7 +5526,7 @@
         border-left:3px solid #fbbf24;border-radius:0 8px 8px 0;padding:.45rem .65rem;
         margin-bottom:.4rem;
       }
-      :root.light #bf-prayer .pr-type-example{color:#3a2818;background:rgba(251,191,36,.14);}
+      :root.light #bf-prayer .pr-type-example{color:#3a2818;background:rgba(146,64,14,.14);}
       #bf-prayer .pr-type-ref{font-size:.62rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#fbbf24;opacity:.85;}
 
       /* Lectio Divina: practice verse box + 4 stepped cards */
@@ -5504,7 +5546,7 @@
         background:rgba(255,255,255,.04);
         border:1px solid rgba(251,191,36,.18);
         border-left:4px solid #fbbf24;
-        border-radius:12px;padding:.85rem .95rem;
+        border-radius:12px;padding:.95rem 1.05rem;
       }
       #bf-prayer .pr-lectio-step-num{font-family:'Bebas Neue',var(--fm);font-size:.72rem;color:#fbbf24;letter-spacing:.18em;}
       #bf-prayer .pr-lectio-step-name{font-family:'Bebas Neue',var(--fm);font-size:1.1rem;color:#fff;letter-spacing:.04em;line-height:1.15;margin-bottom:.1rem;}
@@ -5626,12 +5668,12 @@
     </div>
 
     <!-- Sub-tab navigation -->
-    <div class="pr-subtabs" role="tablist">
-      <button class="pr-subtab active" data-pr-sub="mine"     onclick="prSubTab('mine',this)">🙏 My Prayers</button>
-      <button class="pr-subtab"        data-pr-sub="wall"     onclick="prSubTab('wall',this)">🌍 Prayer Wall</button>
-      <button class="pr-subtab"        data-pr-sub="howto"    onclick="prSubTab('howto',this)">📖 How to Pray</button>
-      <button class="pr-subtab"        data-pr-sub="examples" onclick="prSubTab('examples',this)">📜 Examples</button>
-      <button class="pr-subtab"        data-pr-sub="who"      onclick="prSubTab('who',this)">👥 Who to Pray For</button>
+    <div class="pr-subtabs" role="tablist" aria-label="Prayer sub-sections">
+      <button class="pr-subtab active" role="tab" aria-selected="true"  data-pr-sub="mine"     onclick="prSubTab('mine',this)">🙏 My Prayers</button>
+      <button class="pr-subtab"        role="tab" aria-selected="false" data-pr-sub="wall"     onclick="prSubTab('wall',this)">🌍 Prayer Wall</button>
+      <button class="pr-subtab"        role="tab" aria-selected="false" data-pr-sub="howto"    onclick="prSubTab('howto',this)">📖 How to Pray</button>
+      <button class="pr-subtab"        role="tab" aria-selected="false" data-pr-sub="examples" onclick="prSubTab('examples',this)">📜 Examples</button>
+      <button class="pr-subtab"        role="tab" aria-selected="false" data-pr-sub="who"      onclick="prSubTab('who',this)">👥 Who to Pray For</button>
     </div>
 
     <!-- Pane: My Prayers (default) -->
@@ -5671,7 +5713,7 @@
         <span class="pr-section-eye">FRAMEWORK</span>
         <div class="pr-section-title">The ACTS of Prayer</div>
       </div>
-      <div id="prActsGrid" class="pr-acts-grid"></div>
+      <div id="prActsGrid" class="pr-acts-host"></div>
 
       <div class="pr-section-hdr">
         <span class="pr-section-eye">EIGHT WAYS</span>
@@ -6027,7 +6069,7 @@
         color:#4a4b52 !important;
       }
       :root.light #bf-academy .ac-chip.active{
-        background:linear-gradient(135deg,#fbbf24,#f59e0b) !important;
+        background:linear-gradient(135deg,#92400e,#78350f) !important;
         color:#0b1220 !important;
       }
       :root.light #bf-academy .ac-card{
@@ -6036,7 +6078,7 @@
       }
       :root.light #bf-academy .ac-card:hover{
         border-color:rgba(180,120,20,.5) !important;
-        box-shadow:0 14px 38px rgba(0,0,0,.10),0 0 22px rgba(251,191,36,.22) !important;
+        box-shadow:0 14px 38px rgba(0,0,0,.10),0 0 22px rgba(146,64,14,.22) !important;
       }
       :root.light #bf-academy .ac-card-cat{
         background:rgba(255,255,255,.85) !important;
@@ -6345,7 +6387,7 @@
     :root.light #lessonModal .lm-section h4{color:#b45309;}
     :root.light #lessonModal .lm-keyverse{background:rgba(255,255,255,.6);border-color:rgba(180,120,20,.35);}
     :root.light #lessonModal .lm-callout{
-      background:linear-gradient(135deg,rgba(251,191,36,.18),rgba(251,191,36,.04));
+      background:linear-gradient(135deg,rgba(146,64,14,.18),rgba(146,64,14,.04));
       border-color:rgba(180,120,20,.4);
     }
     :root.light #lessonModal .lm-quiz-opt{color:#3a2818;border-color:rgba(180,120,20,.5);}
@@ -6882,7 +6924,7 @@
     :root.light #tlEventModal .tlm-subtitle{color:#3a2818;opacity:.92;}
     :root.light #tlEventModal .tlm-body{color:#1a1233;}
     :root.light #tlEventModal .tlm-callout{
-      background:linear-gradient(135deg,rgba(251,191,36,.18),rgba(251,191,36,.04));
+      background:linear-gradient(135deg,rgba(146,64,14,.18),rgba(146,64,14,.04));
       border-color:rgba(180,120,20,.4);
     }
     :root.light #tlEventModal .tlm-callout p{color:#1a1233;}
@@ -7248,11 +7290,11 @@
       #storyPlayerModal .sp-fade-in{ animation:none; }
     }
     /* ── Light mode: keep cinematic dark — never let .md override paint this gray ── */
-    :root.light #storyPlayerModal .md{ background:linear-gradient(180deg,#0a0d1a 0%,#1a1233 100%) !important; color:#fef3c7 !important; box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 0 1px rgba(251,191,36,.12) inset !important; }
-    :root.light #storyPlayerModal .sp-narration{ color:rgba(254,243,199,.9) !important; border-top-color:rgba(251,191,36,.12) !important; }
-    :root.light #storyPlayerModal .sp-controls{ background:rgba(10,13,26,.6) !important; border-top-color:rgba(251,191,36,.12) !important; }
+    :root.light #storyPlayerModal .md{ background:linear-gradient(180deg,#0a0d1a 0%,#1a1233 100%) !important; color:#fef3c7 !important; box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 0 1px rgba(146,64,14,.12) inset !important; }
+    :root.light #storyPlayerModal .sp-narration{ color:rgba(254,243,199,.9) !important; border-top-color:rgba(146,64,14,.12) !important; }
+    :root.light #storyPlayerModal .sp-controls{ background:rgba(10,13,26,.6) !important; border-top-color:rgba(146,64,14,.12) !important; }
     :root.light #storyPlayerModal .sp-bibletext{ color:rgba(254,243,199,.96) !important; }
-    :root.light #storyPlayerModal .sp-bibletext .sp-ref{ color:#fbbf24 !important; }
+    :root.light #storyPlayerModal .sp-bibletext .sp-ref{ color:#92400e !important; }
     :root.light #storyPlayerModal .sp-title{ color:#fef3c7 !important; }
     :root.light #storyPlayerModal .sp-eyebrow{ color:rgba(254,243,199,.85) !important; }
     :root.light #storyPlayerModal .sp-stage{ background:#0a0d1a !important; }
@@ -11220,8 +11262,8 @@
     background:none !important;
     -webkit-background-clip:initial !important;
     background-clip:initial !important;
-    -webkit-text-fill-color:#8a5200 !important;
-    color:#8a5200 !important;
+    -webkit-text-fill-color:#92400e !important;
+    color:#92400e !important;
     text-shadow:none !important;
   }
   :root.light #charSub{ color:#4a4b52 !important; opacity:1 !important; }
@@ -11229,11 +11271,11 @@
   /* JS-injected content from openDevotionalCard / openAcademyLesson */
   :root.light #charBody [style*="color:#fef3c7"]{ color:#4a4b52 !important; }
   :root.light #charBody [style*="color:rgba(254,243,199"]{ color:#4a4b52 !important; }
-  :root.light #charBody [style*="color:#fbbf24"]{ color:#8a5200 !important; }
-  :root.light #charBody [style*="background:rgba(251,191,36"]{ background:rgba(138,82,0,.06) !important; }
-  :root.light #charBody [style*="border-left:4px solid #fbbf24"]{ border-left-color:rgba(138,82,0,.4) !important; }
+  :root.light #charBody [style*="color:#92400e"]{ color:#92400e !important; }
+  :root.light #charBody [style*="background:rgba(251,191,36"]{ background:rgba(146,64,14,.06) !important; }
+  :root.light #charBody [style*="border-left:4px solid #92400e"]{ border-left-color:rgba(146,64,14,.4) !important; }
   /* Close button in header */
-  :root.light #charModalHeader button{ background:rgba(138,82,0,.08) !important; border-color:rgba(138,82,0,.25) !important; color:#4a4b52 !important; }
+  :root.light #charModalHeader button{ background:rgba(146,64,14,.08) !important; border-color:rgba(146,64,14,.25) !important; color:#4a4b52 !important; }
 </style>
 <!-- F9: charModal migrated to Well gold register (was hardcoded #667eea→#764ba2) -->
 <div id="charModal" class="mo" onclick="if(event.target===this)closeModal('charModal')">
