@@ -5789,6 +5789,152 @@
       #lessonModal .lm-quiz-result-score{font-size:2.4rem;}
       #lessonModal .lm-quiz-star{font-size:1.6rem;}
     }
+
+    /* ─────────────────────────────────────────────────────────────────────
+       ACADEMY → PLANS PARITY
+       Re-skins Academy cards and lesson modal to match the Plans cards
+       and Plan Detail modal exactly: same neutral card surfaces, accent
+       left-border using the per-category color, gradient banner header
+       on the modal (no photo). The per-category --ac-card-color injected
+       by renderFeaturedAcademy() still drives the accent.
+       ───────────────────────────────────────────────────────────────── */
+    /* Card grid: match Plans grid sizing */
+    #bf-academy .ac-grid{
+      grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+      gap:.6rem;
+    }
+    /* Card: neutral Plans surface + 4px category accent border */
+    #bf-academy .ac-card{
+      background:var(--cd-card-bg);
+      border:var(--cd-card-border);
+      border-left:4px solid var(--ac-card-color,#7c3aed);
+      border-radius:var(--cd-card-radius);
+      box-shadow:var(--cd-card-shadow);
+      overflow:visible;
+    }
+    #bf-academy .ac-card:hover{
+      transform:translateY(-4px);
+      box-shadow:var(--cd-card-shadow-hover);
+      border-color:var(--cd-card-border-hover,rgba(124,58,237,.65));
+      border-left-color:var(--ac-card-color,#7c3aed);
+    }
+    /* Kill the gold radial tint overlay */
+    #bf-academy .ac-card-tint{display:none;}
+    /* Card body: match Plans padding */
+    #bf-academy .ac-card-body{padding:.85rem 1rem;}
+    /* Eye label: small uppercase, accent color, tighter tracking */
+    #bf-academy .ac-card-eye{
+      font-family:var(--fm);font-size:.62rem;font-weight:700;
+      letter-spacing:.1em;text-transform:uppercase;
+      color:var(--ac-card-color,#7c3aed);opacity:1;
+      margin-bottom:.3rem;
+    }
+    /* Title: Plans card title size + neutral color */
+    #bf-academy .ac-card-title{
+      font-family:var(--fm);font-size:.88rem;font-weight:800;
+      letter-spacing:0;line-height:1.3;
+      color:var(--tx);text-shadow:none;
+      margin-bottom:.3rem;
+    }
+    /* Description: smaller, neutral, sans-serif (drop Georgia italic) */
+    #bf-academy .ac-card-desc{
+      font-family:var(--fm);font-style:normal;font-weight:400;
+      font-size:.72rem;color:var(--tx2);
+      line-height:1.55;margin-bottom:.5rem;opacity:1;
+    }
+    /* Meta row: dim micro-label */
+    #bf-academy .ac-card-meta{
+      font-family:var(--fm);font-size:.62rem;font-weight:700;
+      letter-spacing:.1em;text-transform:uppercase;
+      color:var(--tx3);
+    }
+    /* Badge: inline text rather than pill, matches plan meta tone */
+    #bf-academy .ac-card-badge{
+      background:transparent;border:none;padding:0;
+      font-size:.62rem;font-weight:700;letter-spacing:.1em;
+      color:var(--tx3);
+    }
+    /* Progress bar: keep but use accent color */
+    #bf-academy .ac-card-progress{background:rgba(0,0,0,.08);}
+
+    /* Light-mode parity: same Plans neutral surface */
+    :root.light #bf-academy .ac-card{
+      background:var(--cd-card-bg) !important;
+      border:var(--cd-card-border) !important;
+      border-left:4px solid var(--ac-card-color,#7c3aed) !important;
+      box-shadow:var(--cd-card-shadow) !important;
+    }
+    :root.light #bf-academy .ac-card:hover{
+      box-shadow:var(--cd-card-shadow-hover) !important;
+      border-color:var(--cd-card-border-hover) !important;
+      border-left-color:var(--ac-card-color,#7c3aed) !important;
+    }
+    :root.light #bf-academy .ac-card-eye{color:var(--ac-card-color,#7c3aed) !important;opacity:1 !important;}
+    :root.light #bf-academy .ac-card-title{color:var(--tx) !important;text-shadow:none !important;}
+    :root.light #bf-academy .ac-card-desc{color:var(--tx2) !important;opacity:1 !important;}
+    :root.light #bf-academy .ac-card-meta,
+    :root.light #bf-academy .ac-card-badge{color:var(--tx3) !important;background:transparent !important;border:none !important;}
+
+    /* ── Lesson modal: match Plans modal shell + gradient banner header ── */
+    #lessonModal .md{
+      max-width:560px;
+      background:var(--card-bg,#0a0d1a);
+      border:1px solid rgba(255,255,255,.06);
+    }
+    /* Remove the photo header entirely */
+    #lessonModal .lm-svg{display:none;}
+    /* Restyle .lm-hdr as the gradient banner header */
+    #lessonModal .lm-hdr{
+      background:var(--cd-banner);
+      color:var(--cd-banner-text);
+      box-shadow:var(--cd-banner-shadow);
+      border-radius:var(--cd-card-radius,16px) var(--cd-card-radius,16px) 0 0;
+      padding:1.4rem 1.4rem 1.2rem;
+      text-align:center;
+      border-bottom:none;
+      position:relative;
+    }
+    #lessonModal .lm-eye{
+      color:var(--cd-banner-text-muted);opacity:1;font-weight:700;
+    }
+    #lessonModal .lm-title{
+      background:none !important;
+      -webkit-background-clip:initial !important;background-clip:initial !important;
+      -webkit-text-fill-color:var(--cd-banner-text) !important;
+      color:var(--cd-banner-text) !important;
+      text-shadow:none !important;
+    }
+    #lessonModal .lm-sub{
+      color:var(--cd-banner-text-muted);opacity:1;
+    }
+    /* Close button: visible on the gradient banner */
+    #lessonModal .lm-close{
+      background:rgba(0,0,0,.32);
+      border:1px solid rgba(255,255,255,.4);
+      color:var(--cd-banner-text);
+    }
+    /* Body padding: match Plans modal body */
+    #lessonModal .lm-body-wrap{padding:0;}
+    #lessonModal .lm-section{padding:1rem 1.2rem;}
+    #lessonModal .lm-keyverse,
+    #lessonModal .lm-callout,
+    #lessonModal .lm-cta{margin-left:1.2rem;margin-right:1.2rem;}
+
+    /* Light-mode modal: same Plans look */
+    :root.light #lessonModal .md{
+      background:#ffffff !important;
+      border-color:rgba(0,0,0,.08) !important;
+    }
+    :root.light #lessonModal .lm-hdr{
+      background:var(--cd-banner) !important;
+      color:var(--cd-banner-text) !important;
+    }
+    :root.light #lessonModal .lm-title{
+      -webkit-text-fill-color:var(--cd-banner-text) !important;
+      color:var(--cd-banner-text) !important;
+    }
+    :root.light #lessonModal .lm-eye,
+    :root.light #lessonModal .lm-sub{color:var(--cd-banner-text-muted) !important;}
   </style>
   <div id="lessonModal" class="mo" onclick="if(event.target===this)closeLessonModal()">
     <div class="md">
