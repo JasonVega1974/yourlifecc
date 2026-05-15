@@ -51,19 +51,19 @@
    bg was the worst readability issue — handled by the override block
    at the bottom of this file. */
 :root.light{
-  --bg:#f0f2f5;            /* soft blue-gray, not pure white */
+  --bg:#f8f9fa;            /* off-white body */
   --s1:#ffffff;            /* cards / sidebar surface */
   --s2:#f5f7fa;            /* section headers */
   --s3:#e9eef5;            /* hover / subtle inset */
   --s4:#dde4ee;            /* deeper accent surface */
   --tx:#111827;            /* near-black body text */
-  --tx2:#374151;           /* secondary text */
-  --tx3:#6b7280;           /* tertiary text */
+  --tx2:#6b7280;           /* secondary text */
+  --tx3:#9ca3af;           /* tertiary text */
   --mt:#9ca3af;            /* very muted */
   --br:rgba(56,189,248,0.25);
-  --card-shadow:0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+  --card-shadow:0 1px 3px rgba(0,0,0,.06);
   --card-bg:#ffffff;
-  --card-border:rgba(0,0,0,.08);
+  --card-border:#e5e7eb;
   --input-bg:#ffffff;
   --input-border:#d1d5db;
   --sel-bg:#f3f4f6;
@@ -2112,7 +2112,7 @@ body{top:0!important;}
 ─────────────────────────────────────────────────────────────── */
 
 /* Hero — scripture/motivation text (hardcoded #fde68a yellow) */
-:root.light #heroMotivation { color: #92400e !important; }
+:root.light #heroMotivation { color: #b45309 !important; }
 :root.light #heroMotivationAuthor { color: rgba(120,53,15,.6) !important; }
 
 /* Hero — clock (hardcoded rgba(255,255,255,.85)) */
@@ -3350,8 +3350,8 @@ img.topic-card-hero{
 
 /* Card body: ivory page on gold ring instead of navy */
 :root.light .fc-face{
-  background:linear-gradient(180deg,#fffaeb 0%,#fdf0c8 100%);
-  border-color:rgba(180,120,20,.55);
+  background:#ffffff;
+  border-color:#e5e7eb;
   box-shadow:
     0 0 36px rgba(251,191,36,.28),
     inset 0 1px 0 rgba(180,120,20,.18);
@@ -3367,9 +3367,9 @@ img.topic-card-hero{
 
 /* Choice pills: gold-on-cream */
 :root.light .fc-choice{
-  background:linear-gradient(180deg, rgba(251,191,36,.22), rgba(251,191,36,.06));
-  border-color:rgba(180,120,20,.55);
-  color:#3a2818;
+  background:#ffffff;
+  border-color:#e5e7eb;
+  color:#111827;
 }
 :root.light .fc-choice:hover:not(:disabled){
   background:linear-gradient(180deg, rgba(251,191,36,.34), rgba(251,191,36,.12));
@@ -4187,7 +4187,7 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   border-color:rgba(180,120,20,.28) !important;
 }
 :root.light #fhFamilyVerseCard #fhFamilyVerseText{color:#1a1233 !important;}
-:root.light #fhFamilyVerseCard #fhFamilyVerseRef{color:#92400e !important;}
+:root.light #fhFamilyVerseCard #fhFamilyVerseRef{color:#b45309 !important;}
 :root.light #fhFamilyVerseCard > div:first-child{color:#b45309 !important;}
 
 /* ════════════════════════════════════════════════════════════════════
@@ -4702,8 +4702,9 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 :root.light #heroGreeting > div:last-child{ color:#475569 !important; }
 
 :root.light #heroTodaysVerse{
-  background:linear-gradient(135deg,rgba(251,191,36,.18),rgba(251,146,60,.08)) !important;
-  border-color:rgba(251,191,36,.45) !important;
+  background:#ffffff !important;
+  border:1px solid #e5e7eb !important;
+  border-left:3px solid #b45309 !important;
 }
 :root.light #heroTodaysVerseText{ color:#1f2937 !important; }
 
@@ -4878,22 +4879,22 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 
 /* ── Chrome surfaces ─────────────────────────────────────── */
 :root.light body{ background:var(--bg); }
-:root.light #sidebar{ background:#e8eaed !important; border-right-color:rgba(0,0,0,.08) !important; }
+:root.light #sidebar{ background:#ffffff !important; border-right-color:#e5e7eb !important; }
 :root.light #mBar{
   background:#ffffff !important;
-  border-bottom-color:rgba(0,0,0,.10) !important;
+  border-bottom-color:#e5e7eb !important;
   box-shadow:0 1px 3px rgba(0,0,0,.06);
 }
 :root.light .mBar-title{ color:var(--c) !important; }
 :root.light .sh{ background:#f5f7fa !important; border-radius:10px; padding:.75rem 1rem; }
 :root.light .sh .st{ color:#111827 !important; }
-:root.light #topQuickBtns{ background:rgba(255,255,255,.97) !important; border-bottom-color:rgba(0,0,0,.10) !important; }
+:root.light #topQuickBtns{ background:#ffffff !important; border-bottom-color:#e5e7eb !important; }
 
 /* ── Cards everywhere ────────────────────────────────────── */
 :root.light .card{
   background:#ffffff !important;
-  border-color:rgba(0,0,0,.08) !important;
-  box-shadow:0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04) !important;
+  border-color:#e5e7eb !important;
+  box-shadow:0 1px 3px rgba(0,0,0,.06) !important;
 }
 :root.light .card:hover{ background:#fafbfc !important; }
 
@@ -4906,17 +4907,18 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 :root.light #heroGreeting > div:first-child{ color:#111827 !important; }
 :root.light #heroGreeting > div:last-child{ color:#374151 !important; }
 :root.light #heroTodaysVerse{
-  background:linear-gradient(135deg,rgba(251,191,36,.20),rgba(251,146,60,.10)) !important;
-  border-color:rgba(146,64,14,.30) !important;
-  box-shadow:0 1px 3px rgba(146,64,14,.06);
+  background:#ffffff !important;
+  border:1px solid #e5e7eb !important;
+  border-left:3px solid #b45309 !important;
+  box-shadow:0 1px 3px rgba(0,0,0,.06);
 }
 :root.light #heroTodaysVerseText{ color:#1f2937 !important; }
 :root.light #heroReflectCard{
   background:linear-gradient(135deg,rgba(251,191,36,.10),rgba(251,191,36,.04)) !important;
   border-color:rgba(146,64,14,.25) !important;
 }
-:root.light #heroReflectBtn{ color:#92400e !important; }
-:root.light #heroReflectQuestion{ background:rgba(251,191,36,.12) !important; color:#1f2937 !important; border-left-color:#92400e !important; }
+:root.light #heroReflectBtn{ color:#b45309 !important; }
+:root.light #heroReflectQuestion{ background:rgba(251,191,36,.12) !important; color:#1f2937 !important; border-left-color:#b45309 !important; }
 :root.light #heroReflectResponse{ background:#fff !important; border-color:rgba(0,0,0,.15) !important; color:#111827 !important; }
 :root.light #heroQuickActions button{
   background:#fff !important;
@@ -4932,7 +4934,7 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 /* ── Bottom tab bar ──────────────────────────────────────── */
 :root.light #bottomTabBar{
   background:#ffffff !important;
-  border-top-color:rgba(0,0,0,.10) !important;
+  border-top-color:#e5e7eb !important;
   box-shadow:0 -2px 12px rgba(0,0,0,.06) !important;
 }
 :root.light #bottomTabBar .tab-btn{ color:#374151 !important; }
@@ -4948,12 +4950,12 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 :root.light .tab-landing-card .tlc-label{ color:#111827 !important; }
 
 /* ── Faith stack — gold readability ──────────────────────── */
-:root.light .bf-eyebrow{ color:#92400e !important; opacity:1 !important; }
-:root.light .bf-title{ color:#92400e !important; }
+:root.light .bf-eyebrow{ color:#b45309 !important; opacity:1 !important; }
+:root.light .bf-title{ color:#b45309 !important; }
 :root.light .bf-card{ background:#fff !important; border-color:rgba(0,0,0,.08) !important; box-shadow:0 1px 3px rgba(0,0,0,.08); }
 :root.light .scrTabs .tab.active,
-:root.light .scrTabs-bottom .tab.active{ color:#92400e !important; }
-:root.light #s-scripture .sh .st{ color:#92400e !important; }
+:root.light .scrTabs-bottom .tab.active{ color:#b45309 !important; }
+:root.light #s-scripture .sh .st{ color:#b45309 !important; }
 :root.light #s-scripture > div[onclick*="openAskBible"]{
   background:linear-gradient(135deg,rgba(67,56,202,.10),rgba(20,184,166,.05)) !important;
   border-color:rgba(55,48,163,.30) !important;
@@ -5012,7 +5014,7 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 }
 :root.light #onboardingOverlay .onb-card .onb-label{ color:#111827 !important; }
 :root.light #onboardingOverlay .onb-card .onb-cap{ color:#374151 !important; }
-:root.light #onboardingOverlay .onb-card.selected{ box-shadow:0 6px 20px rgba(146,64,14,.18); border-color:#92400e !important; }
+:root.light #onboardingOverlay .onb-card.selected{ box-shadow:0 6px 20px rgba(146,64,14,.18); border-color:#b45309 !important; }
 :root.light #onboardingOverlay .onb-tile{ background:#fff !important; border-color:rgba(0,0,0,.12) !important; }
 :root.light #onboardingOverlay .onb-tile .onb-tile-label{ color:#111827 !important; }
 :root.light #onboardingOverlay .onb-toggle-row{ background:#fff !important; border-color:rgba(0,0,0,.10) !important; }
@@ -5021,9 +5023,9 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 :root.light #onboardingOverlay input[type=text]{ background:#fff !important; border-color:#d1d5db !important; color:#111827 !important; }
 :root.light #onboardingOverlay .onb-yesno{ background:rgba(0,0,0,.06) !important; }
 :root.light #onboardingOverlay .onb-yesno button{ color:#374151 !important; }
-:root.light #onboardingOverlay .onb-yesno button.active{ background:#92400e !important; color:#fff !important; }
+:root.light #onboardingOverlay .onb-yesno button.active{ background:#b45309 !important; color:#fff !important; }
 :root.light #onboardingOverlay .onb-dot{ background:rgba(0,0,0,.18) !important; }
-:root.light #onboardingOverlay .onb-dot.active{ background:#92400e !important; }
+:root.light #onboardingOverlay .onb-dot.active{ background:#b45309 !important; }
 :root.light #onboardingOverlay .onb-dot.done{ background:rgba(146,64,14,.55) !important; }
 :root.light #onboardingOverlay .onb-back{ background:rgba(0,0,0,.05) !important; border-color:rgba(0,0,0,.14) !important; color:#111827 !important; }
 :root.light #onboardingOverlay .onb-primary{ background:linear-gradient(135deg,#f59e0b,#ea580c) !important; box-shadow:0 8px 24px rgba(146,64,14,.22) !important; color:#ffffff !important; }
@@ -5049,18 +5051,18 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 /* ── GOLD-TEXT INVISIBILITY FIX ──────────────────────────────
    Inline styles using gold #fbbf24/#f5c842/#fde68a/#fef3c7 as TEXT
    color on a white surface become invisible. Remap to dark amber
-   #92400e via attribute selectors. Excludes button + a so branded
+   #b45309 via attribute selectors. Excludes button + a so branded
    button text stays branded; excludes elements with style declaring
    a background-color on the same element (those are colored chips
    where the gold is the surface, not the text). */
 :root.light *[style*="color:#fbbf24"]:not(button):not(a):not([style*="background:#fbbf24"]):not([style*="background:linear-gradient"]){
-  color:#92400e !important;
+  color:#b45309 !important;
 }
-:root.light *[style*="color:#f5c842"]:not(button):not(a){ color:#92400e !important; }
-:root.light *[style*="color:#fde68a"]:not(button):not(a){ color:#92400e !important; }
-:root.light *[style*="color:#fef3c7"]:not(button):not(a){ color:#92400e !important; }
-:root.light *[style*="color:var(--g)"]:not(button):not(a){ color:#92400e !important; }
-:root.light *[style*="color:var(--gold)"]:not(button):not(a){ color:#92400e !important; }
+:root.light *[style*="color:#f5c842"]:not(button):not(a){ color:#b45309 !important; }
+:root.light *[style*="color:#fde68a"]:not(button):not(a){ color:#b45309 !important; }
+:root.light *[style*="color:#fef3c7"]:not(button):not(a){ color:#b45309 !important; }
+:root.light *[style*="color:var(--g)"]:not(button):not(a){ color:#b45309 !important; }
+:root.light *[style*="color:var(--gold)"]:not(button):not(a){ color:#b45309 !important; }
 
 /* var(--accent) indigo as text → darker indigo in light mode. */
 :root.light *[style*="color:var(--accent"]:not(button):not(a){ color:#3730a3 !important; }
@@ -5114,19 +5116,19 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
    attribute selectors above. */
 
 /* .bf-title uses -webkit-text-fill-color:transparent to clip a gradient
-   onto text — `color:#92400e` alone can't override the gradient on
+   onto text — `color:#b45309` alone can't override the gradient on
    WebKit/Blink. Unset the clip and set the fill color explicitly. */
 :root.light .bf-title{
   background:none !important;
   -webkit-background-clip:initial !important;
   background-clip:initial !important;
-  -webkit-text-fill-color:#92400e !important;
-  color:#92400e !important;
+  -webkit-text-fill-color:#b45309 !important;
+  color:#b45309 !important;
 }
 
 /* .ob-tip kid-onboarding wizard tips set color:#fde68a at the class
    level — inline attribute selectors don't catch class-set colors. */
-:root.light .ob-tip{ color:#92400e !important; }
+:root.light .ob-tip{ color:#b45309 !important; }
 
 /* .hero-greet / .hero-name from the legacy heroCard. heroCard is now
    hidden (display:none !important) so this is mostly defensive, but
@@ -5147,5 +5149,21 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
    pattern that we might have missed (faith-themed gold-on-dark
    classes commonly written as .gold-*, .amber-*, .bf-gold, etc.). */
 :root.light .bf-gold,
-:root.light [class*="gold-text"]{ color:#92400e !important; }
+:root.light [class*="gold-text"]{ color:#b45309 !important; }
+
+/* 2026-05-14 — Inline gold text colors used in faith / verse / Phase F
+   reflection UI (#fbbf24 amber, #f5c842 alt amber, var(--gold)). They
+   are readable on the dark shell but vanish on the white light-mode
+   background. Force them all to a deep amber (#b45309) that retains
+   the "gold accent" feel while passing WCAG on white. */
+:root.light [style*="color:#fbbf24"],
+:root.light [style*="color: #fbbf24"],
+:root.light [style*="color:#f5c842"],
+:root.light [style*="color: #f5c842"],
+:root.light [style*="color:var(--gold)"],
+:root.light [style*="color: var(--gold)"]{
+  color:#b45309 !important;
+}
+:root.light [style*="color:rgba(251,191,36"]{ color:#b45309 !important; }
+:root.light [style*="color:rgba(245,200,66"]{ color:#b45309 !important; }
 
