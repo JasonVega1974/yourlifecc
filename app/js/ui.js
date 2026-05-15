@@ -797,12 +797,9 @@ function applySettings(){
     // to beat the stylesheet. Inline !important wins over stylesheet !important.
     const pw = document.getElementById('parentWelcomeCard');
     if(pw) pw.style.setProperty('display', 'none', 'important');
-    // Hero Card. The faith_free user is flagged as a parent (no child profile),
-    // so body.parent-view is set, and CSS at app.css:2155 hides #heroCard with
-    // `display: none !important`. Force-show it so the user sees greeting +
-    // name + date + scripture verse (the only hero content faith_free should see).
-    const hc = document.getElementById('heroCard');
-    if(hc) hc.style.setProperty('display', 'block', 'important');
+    // Hero Card markup removed 2026-05-14 — Phase C-hero #heroGreeting
+    // opener is shown to all users (including faith_free). The greeting,
+    // name, and scripture verse all live in the new opener block.
     // Parent buttons in the global top bar (desktop + mobile quick bar).
     // BRITTLE: same onclick-attribute selector caveat as Refer & Earn — migrate
     // to a stable data-attribute when F2 touches the top bar.
@@ -1820,5 +1817,48 @@ function refreshDashForCurrentChild(){
   if(typeof renderVerse === 'function') renderVerse();
   if(typeof buildToggles === 'function') buildToggles();
 }
+
+// ── LIGHT MODE GOLD-TEXT FIX ──────────────────────────────────
+// CSS attribute selectors like [style*="color:#fbbf24"] only match
+// static HTML attributes, not values set by JS at runtime. This
+// function walks all [style] elements and remaps gold/yellow text
+// to dark amber (#8a5200) so it stays legible on gray surfaces.
+// Called from toggleTheme/applyTheme in skills.js, and debounced
+// via a MutationObserver so it catches post-render JS-injected text.
+var _lmFixTimer = null;
+function applyLightModeTextFix(){
+  if(!document.documentElement.classList.contains('light')) return;
+  var GOLD = ['#fbbf24','#f5c842','#fde68a','#fef3c7','#f59e0b','rgba(251,191,36'];
+  document.querySelectorAll('[style]').forEach(function(el){
+    if(el.tagName === 'BUTTON' || el.tagName === 'A') return;
+    if(el.closest && el.closest('#flashcardGame')) return;
+    var s = el.style;
+    var c = s.color || '';
+    var wf = s.webkitTextFillColor || '';
+    if(GOLD.some(function(g){ return c.indexOf(g) !== -1 || wf.indexOf(g) !== -1; })){
+      s.color = '#8a5200';
+      if(wf) s.webkitTextFillColor = '#8a5200';
+      s.backgroundImage = '';
+      s.webkitBackgroundClip = '';
+      s.backgroundClip = '';
+    }
+  });
+}
+
+// Wire a debounced MutationObserver on #mainWrap so JS-rendered
+// sections get fixed automatically whenever the DOM changes.
+(function _wireLightFixObserver(){
+  var obs = new MutationObserver(function(){
+    if(!document.documentElement.classList.contains('light')) return;
+    clearTimeout(_lmFixTimer);
+    _lmFixTimer = setTimeout(applyLightModeTextFix, 150);
+  });
+  function _start(){
+    var wrap = document.getElementById('mainWrap');
+    if(wrap) obs.observe(wrap, { childList:true, subtree:true, attributes:true, attributeFilter:['style'] });
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _start);
+  else _start();
+})();
 
 

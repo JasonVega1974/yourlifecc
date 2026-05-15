@@ -4964,6 +4964,7 @@ function applyPalette(){
     }
     localStorage.setItem('ylcc_boot_palette_v1', JSON.stringify(cache));
   } catch(e){}
+  if(typeof applyLightModeTextFix === 'function') applyLightModeTextFix();
 }
 
 // ── TAX ESTIMATOR ────────────────────────────────────────────────────
@@ -5031,6 +5032,7 @@ function toggleTheme(){
   D.theme = isLight ? 'light' : 'dark';
   save();
   updateThemeBtn();
+  if(typeof applyLightModeTextFix === 'function') applyLightModeTextFix();
 }
 
 function updateThemeBtn(){
@@ -5052,6 +5054,7 @@ function applyTheme(){
   document.documentElement.classList.toggle('light', isLight);
   updateThemeBtn();
   applyCardTheme();
+  if(typeof applyLightModeTextFix === 'function') applyLightModeTextFix();
 }
 
 // F3-X — Card Style: 'kingdom' (purple gradient banners + glow) is the
