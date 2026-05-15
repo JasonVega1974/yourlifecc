@@ -5211,11 +5211,15 @@
       }
       :root.light #bf-prayer .bf-title{-webkit-text-fill-color:#1a1b1e !important;color:#1a1b1e !important;}
 
-      /* ── Sub-tab navigation (horizontal scroll on mobile) ── */
+      /* ── Sub-tab navigation (horizontal scroll, edge fade signals scroll) ── */
       #bf-prayer .pr-subtabs{
-        display:flex;gap:.4rem;flex-wrap:wrap;margin:.4rem 0 1rem;
+        display:flex;gap:.4rem;flex-wrap:nowrap;margin:.4rem 0 1rem;
         overflow-x:auto;-webkit-overflow-scrolling:touch;
+        padding-right:1.4rem;
+        -webkit-mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 24px),transparent 100%);
+        mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 24px),transparent 100%);
       }
+      #bf-prayer .pr-subtabs::-webkit-scrollbar{display:none;}
       #bf-prayer .pr-subtab{
         flex:0 0 auto;
         background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
@@ -5237,6 +5241,27 @@
       #bf-prayer .pr-pane{animation:prPaneIn .3s ease both;}
       @keyframes prPaneIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
 
+      /* ── Daily-prompt banner (top of My Prayers — the daily-return hook) ── */
+      #bf-prayer .pr-mine-daily{
+        background:linear-gradient(135deg,rgba(251,191,36,.14),rgba(251,191,36,.04));
+        border:1px solid rgba(251,191,36,.32);border-left:3px solid #fbbf24;
+        border-radius:10px;padding:.7rem .9rem;margin-bottom:.75rem;
+        font-family:Georgia,'Times New Roman',serif;font-style:italic;
+        font-size:.84rem;color:var(--tx);line-height:1.5;
+        cursor:pointer;transition:background .15s,transform .15s;
+        display:flex;align-items:flex-start;gap:.55rem;flex-wrap:wrap;
+      }
+      #bf-prayer .pr-mine-daily:hover{background:linear-gradient(135deg,rgba(251,191,36,.2),rgba(251,191,36,.06));transform:translateY(-1px);}
+      #bf-prayer .pr-mine-daily-eye{
+        font-family:var(--fm);font-style:normal;font-size:.6rem;font-weight:800;
+        letter-spacing:.18em;color:#fbbf24;flex:0 0 auto;padding-top:.15rem;
+      }
+      #bf-prayer .pr-mine-daily-text{flex:1;min-width:0;}
+      #bf-prayer .pr-mine-daily-cta{
+        font-family:var(--fm);font-style:normal;font-weight:800;
+        color:#fbbf24;font-size:.72rem;letter-spacing:.06em;
+        flex:0 0 auto;align-self:center;
+      }
       /* ── Stats row (My Prayers) ── */
       #bf-prayer .pr-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;margin-bottom:.85rem;}
       #bf-prayer .pr-stat{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:.5rem;text-align:center;}
@@ -5336,9 +5361,10 @@
         break-inside:avoid;page-break-inside:avoid;
         display:inline-block;width:100%;
         background:#fffbeb;color:#3a2818;
-        border:1px solid rgba(180,120,20,.28);border-left:4px solid var(--pr-wall-color,#fbbf24);
+        border:1px solid rgba(180,120,20,.32);border-left:4px solid var(--pr-wall-color,#fbbf24);
         border-radius:12px;padding:.85rem .95rem;margin-bottom:.7rem;
-        box-shadow:0 4px 14px rgba(0,0,0,.18);
+        /* Heavy shadow so the cream paper reads as physically lifted off the dark navy surface */
+        box-shadow:0 14px 36px rgba(0,0,0,.55),0 4px 10px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.7);
         font-family:var(--fm);
         animation:prWallIn .55s ease both;
       }
@@ -5579,14 +5605,15 @@
       .pr-chip-c.active{background:#fbbf24;color:#0b1220;border-color:transparent;}
     </style>
 
-    <!-- Atmospheric watermark — praying hands silhouette ~3% opacity -->
+    <!-- Atmospheric watermark — abstract concentric ripples (no religious silhouette) -->
     <div class="pr-watermark">
-      <svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">
-        <!-- Two stylized hands pressed together, fingertips up -->
-        <g fill="currentColor">
-          <path d="M86 22 Q78 18 74 30 L70 110 Q64 130 56 145 Q48 170 50 210 Q52 240 95 250 L98 220 Q96 180 96 150 L98 110 Q100 60 98 30 Z"/>
-          <path d="M114 22 Q122 18 126 30 L130 110 Q136 130 144 145 Q152 170 150 210 Q148 240 105 250 L102 220 Q104 180 104 150 L102 110 Q100 60 102 30 Z"/>
-          <path d="M86 22 Q100 12 114 22 L108 36 Q100 30 92 36 Z"/>
+      <svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+        <g fill="none" stroke="currentColor" stroke-width="1.2">
+          <circle cx="110" cy="110" r="32"/>
+          <circle cx="110" cy="110" r="54"/>
+          <circle cx="110" cy="110" r="78"/>
+          <circle cx="110" cy="110" r="102"/>
+          <circle cx="110" cy="110" r="128"/>
         </g>
       </svg>
     </div>
@@ -5609,6 +5636,8 @@
 
     <!-- Pane: My Prayers (default) -->
     <div id="pr-pane-mine" class="pr-pane">
+      <!-- Day-rotating daily prompt — taps to Who-to-Pray-For for expanded suggestions -->
+      <div id="prMineDailyBanner" class="pr-mine-daily" style="display:none;" onclick="prSubTab('who',document.querySelector('#bf-prayer .pr-subtab[data-pr-sub=&quot;who&quot;]'))"></div>
       <div class="pr-stats">
         <div class="pr-stat"><div class="pr-stat-num" id="prStatActive"   style="color:#a78bfa;">0</div><div class="pr-stat-lbl">Active</div></div>
         <div class="pr-stat"><div class="pr-stat-num" id="prStatAnswered" style="color:#22c55e;">0</div><div class="pr-stat-lbl">Answered</div></div>

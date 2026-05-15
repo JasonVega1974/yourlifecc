@@ -3645,6 +3645,22 @@ function renderPrayerPanel(){
 
 // ── My Prayers pane ───────────────────────────────────────────
 function renderMyPrayersPane(){
+  // Daily-return hook — condensed "Today, pray for X" banner at the very top.
+  // Surfaced here (not just on the Who tab) because My Prayers is the default
+  // and the rotating prompt is the strongest daily-revisit mechanic.
+  const banner = document.getElementById('prMineDailyBanner');
+  const daily = getTodayWhoSuggestion();
+  if(banner){
+    if(daily){
+      banner.style.display = '';
+      banner.innerHTML =
+        `<span class="pr-mine-daily-eye">TODAY · ${escapeHtml((daily.cat.name || '').toUpperCase())}</span>` +
+        `<span class="pr-mine-daily-text">${escapeHtml(daily.suggestion)}</span>` +
+        `<span class="pr-mine-daily-cta">SEE ALL →</span>`;
+    } else {
+      banner.style.display = 'none';
+    }
+  }
   const all = (D && D.prayers) || [];
   const setStat = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
   const active   = all.filter(p => p && !p.answered && p.status !== 'ongoing');
