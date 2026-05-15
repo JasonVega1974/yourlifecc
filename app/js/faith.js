@@ -6505,6 +6505,23 @@ const TL_ERA_SVGS = {
     + '</svg>'
 };
 
+// Wikimedia Commons CC-licensed geographic photos — one per era.
+// Fallback when a timeline event has no per-event image and no relatedSiteId.
+// All URLs confirmed from biblical-sites.js asset set + same domain pattern.
+const TL_ERA_PHOTOS = {
+  'patriarchs':       'https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/BTS_Hebron_Tour_280215_24.jpg/1280px-BTS_Hebron_Tour_280215_24.jpg',
+  'exodus-conquest':  'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Mount_Sinai_from_the_southwest.jpg/1280px-Mount_Sinai_from_the_southwest.jpg',
+  'judges':           'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Ancient_Shiloh_IMG_2924.JPG/1280px-Ancient_Shiloh_IMG_2924.JPG',
+  'united-kingdom':   'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Jerusalem-2013%282%29-Aerial-Temple_Mount-%28south_exposure%29.jpg/1280px-Jerusalem-2013%282%29-Aerial-Temple_Mount-%28south_exposure%29.jpg',
+  'divided-kingdom':  'https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Tell_Balata.jpg/1280px-Tell_Balata.jpg',
+  'prophets':         'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/2013-Aerial-Mount_of_Olives.jpg/1280px-2013-Aerial-Mount_of_Olives.jpg',
+  'exilic':           'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/20100923_mer_morte13.JPG/1280px-20100923_mer_morte13.JPG',
+  'second-temple':    'https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Jerusalem_Bethesda_BW_1.JPG/1280px-Jerusalem_Bethesda_BW_1.JPG',
+  'intertestamental': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/%D7%94%D7%9E%D7%A6%D7%95%D7%93%D7%94_%D7%91%D7%9C%D7%99%D7%9C%D7%94.jpg/1280px-%D7%94%D7%9E%D7%A6%D7%95%D7%93%D7%94_%D7%91%D7%9C%D7%99%D7%9C%D7%94.jpg',
+  'jesus-life':       'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Kinneret_cropped.jpg/1280px-Kinneret_cropped.jpg',
+  'pauline-journeys': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Church_of_the_Holy_Sepulchre_by_Gerd_Eichmann_%28cropped%29.jpg/1280px-Church_of_the_Holy_Sepulchre_by_Gerd_Eichmann_%28cropped%29.jpg',
+};
+
 function _tlEvents(){ return (typeof window !== 'undefined' && window.BIBLE_TIMELINE_EVENTS) ? window.BIBLE_TIMELINE_EVENTS : []; }
 function _tlEventById(id){ return _tlEvents().find(e => e && e.id === id) || null; }
 function _tlEraById(id){ return TL_ERAS.find(e => e && e.id === id) || null; }
@@ -6611,11 +6628,20 @@ function openTimelineEvent(eventId){
   if(!ev){ if(typeof showToast==='function') showToast('Event not found'); return; }
   const era = _tlEraById(ev.era) || { label:'—', color:'#a78bfa', glow:'rgba(167,139,250,.22)' };
 
-  // Era SVG header (one illustration per era group, shared by all events).
+  // Header image — prefer: per-event photo → relatedSite heroPhoto → era photo → era SVG.
   const svgEl = document.getElementById('tlEventSvg');
   if(svgEl){
-    const svg = (TL_ERA_SVGS && TL_ERA_SVGS[ev.era]) ? TL_ERA_SVGS[ev.era] : '';
-    svgEl.innerHTML = svg;
+    let photoUrl = ev.image || null;
+    if(!photoUrl && ev.relatedSiteId){
+      const site = (typeof _bwSiteById === 'function') ? _bwSiteById(ev.relatedSiteId) : null;
+      if(site && site.heroPhoto) photoUrl = site.heroPhoto;
+    }
+    if(!photoUrl && TL_ERA_PHOTOS && TL_ERA_PHOTOS[ev.era]) photoUrl = TL_ERA_PHOTOS[ev.era];
+    if(photoUrl){
+      svgEl.innerHTML = '<img src="'+_tlEsc(photoUrl)+'" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy">';
+    } else {
+      svgEl.innerHTML = (TL_ERA_SVGS && TL_ERA_SVGS[ev.era]) ? TL_ERA_SVGS[ev.era] : '';
+    }
   }
 
   // Era label + scripture year context.

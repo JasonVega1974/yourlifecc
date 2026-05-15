@@ -5008,6 +5008,42 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
   border-color:rgba(0,0,0,.12) !important;
 }
 
+/* ── Timeline modal — title / era color in light mode ────── */
+:root.light #tlEventModal .tlm-title{
+  background:none !important;
+  -webkit-text-fill-color:#1a1b1e !important;
+  color:#1a1b1e !important;
+  text-shadow:none !important;
+}
+:root.light #tlEventModal .tlm-era{ color:#8a5200 !important; opacity:1 !important; }
+:root.light #tlEventModal .md{ background:#f2f3f5 !important; }
+:root.light #tlEventModal .tlm-hdr{ border-bottom-color:#d0d1d6 !important; }
+:root.light #tlEventModal .tlm-subtitle{ color:#4a4b52 !important; }
+:root.light #tlEventModal .tlm-body,
+:root.light #tlEventModal .tlm-body p{ color:#4a4b52 !important; }
+:root.light #tlEventModal .tlm-callout{
+  background:rgba(138,82,0,.08) !important;
+  border-color:rgba(138,82,0,.25) !important;
+}
+:root.light #tlEventModal .tlm-callout-eye{ color:#8a5200 !important; }
+:root.light #tlEventModal .tlm-callout p{ color:#4a4b52 !important; }
+:root.light #tlEventModal .tlm-keyverse{
+  background:rgba(0,0,0,.04) !important;
+  border-color:#d0d1d6 !important;
+}
+:root.light #tlEventModal .tlm-keyverse-text{ color:#1a1b1e !important; }
+:root.light #tlEventModal .tlm-keyverse-ref{ color:#8a5200 !important; }
+:root.light #tlEventModal .tlm-ref-chip{
+  background:#e4e5e8 !important;
+  border-color:#d0d1d6 !important;
+  color:#1a1b1e !important;
+}
+:root.light #tlEventModal .tlm-related-link{
+  background:#f2f3f5 !important;
+  border-color:#d0d1d6 !important;
+  color:#1a1b1e !important;
+}
+
 /* .bf-title gradient clip — must unset -webkit-text-fill-color too */
 :root.light .bf-title{
   background:none !important;
