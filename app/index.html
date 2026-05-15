@@ -6429,19 +6429,17 @@
        above; modal photo header restored above.) */
   </style>
   <div id="lessonModal" class="mo" onclick="if(event.target===this)closeLessonModal()">
-    <div class="md">
-      <!-- Photo header: close button, category badge, and lesson title overlay -->
-      <div class="lm-svg no-photo" id="lmSvg">
-        <button class="pp-back-btn" onclick="closeLessonModal()" aria-label="Back">← Back</button>
-        <button class="lm-close" onclick="closeLessonModal()" aria-label="Close">✕</button>
-        <span class="lm-cat" id="lmCat">—</span>
-        <div class="lm-icon" id="lmIcon">📖</div>
-        <h2 class="lm-title" id="lmTitle">—</h2>
+    <div class="md" style="max-width:560px;padding:0;">
+      <div id="lmHeader" style="background:var(--cd-banner);padding:1.4rem 1.4rem 1.2rem;text-align:center;color:var(--cd-banner-text);border-radius:16px 16px 0 0;position:relative;">
+        <button class="pp-back-btn" onclick="closeLessonModal()" aria-label="Back" style="background:rgba(11,18,32,.22);color:#0b1220;border-color:rgba(11,18,32,.28);">← Back</button>
+        <button onclick="closeLessonModal()" style="position:absolute;top:.7rem;right:.7rem;background:rgba(11,18,32,.18);border:1px solid rgba(11,18,32,.22);color:#0b1220;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.8rem;font-weight:800;">✕</button>
+        <div id="lmIcon" style="font-size:2rem;margin-bottom:.3rem;">📖</div>
+        <div id="lmTitle" style="font-family:var(--fh,var(--fm));font-size:1.25rem;font-weight:800;letter-spacing:.02em;margin-bottom:.25rem;">—</div>
+        <div id="lmSub" style="font-size:.78rem;font-weight:600;opacity:.85;">—</div>
       </div>
       <div class="lm-body-wrap" id="lmBodyWrap">
         <div class="lm-hdr">
           <div class="lm-eye" id="lmEye">—</div>
-          <div class="lm-sub" id="lmSub">—</div>
         </div>
         <div id="lmContent"></div>
       </div>

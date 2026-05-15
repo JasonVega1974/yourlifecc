@@ -5216,28 +5216,31 @@ function renderFeaturedAcademy(){
     const cat = cats[l.category] || { label:'Lesson', color:'#fbbf24', soft:'rgba(251,191,36,', icon:'📖' };
     const prog = _acLessonProgress(l.id);
     const done = prog && prog.passed;
-    const progPct = done ? 100 : (prog && prog.total ? Math.round(prog.score / prog.total * 100) : 0);
-    const progHtml = (prog && !done && prog.total)
-      ? '<div class="ac-card-progress"><div class="ac-card-progress-bar" style="width:' + progPct + '%;background:' + cat.color + ';"></div></div>'
-      : '';
     const ctaLabel = done ? 'Retake Lesson →' : (prog && prog.total ? 'Continue →' : 'Start Lesson →');
-    return '<div class="ac-card' + (done ? ' done' : '') + '" data-academy-id="' + _acEsc(l.id) + '" '
-         + 'onclick="openLessonModal(\'' + l.id + '\')" '
-         + 'style="--ac-card-color:' + cat.color + ';">'
-         +   '<div style="height:90px;background:linear-gradient(135deg,' + cat.soft + '0.25),' + cat.soft + '0.06));position:relative;display:flex;align-items:center;justify-content:center;border-radius:12px 12px 0 0;overflow:hidden;flex-shrink:0;">'
-         +     '<span style="position:absolute;top:.5rem;left:.65rem;font-family:var(--fm);font-size:.58rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;background:' + cat.soft + '0.2);border:1px solid ' + cat.soft + '0.35);color:' + cat.color + ';padding:.2rem .55rem;border-radius:99px;">' + _acEsc(cat.label) + '</span>'
-         +     '<span style="font-size:2.2rem;line-height:1;">' + _acEsc(cat.icon) + '</span>'
-         +   '</div>'
-         +   '<div class="ac-card-body">'
-         +     '<div class="ac-card-title">' + _acEsc(l.title) + '</div>'
-         +     '<div class="ac-card-desc">' + _acEsc(l.description) + '</div>'
-         +     '<div class="ac-card-foot">'
-         +       '<div class="ac-card-stats">⏱ ' + _acEsc(l.duration || '—') + ' · ❓ ' + ((l.quiz || []).length) + ' quiz Qs</div>'
-         +       '<div class="ac-card-cta">' + ctaLabel + '</div>'
-         +     '</div>'
-         +   '</div>'
-         +   progHtml
-         + '</div>';
+    const statusBit = done
+      ? '<span style="color:var(--tx3);">·</span><span style="color:#22c55e;">✓ Done</span>'
+      : (prog && prog.total ? '<span style="color:var(--tx3);">·</span><span style="color:var(--tx);">In progress</span>' : '');
+    const progressStrip = done
+      ? '<div style="margin-top:.55rem;height:5px;border-radius:99px;background:rgba(127,127,127,.22);overflow:hidden;">'
+        + '<div style="height:100%;width:100%;background:' + cat.color + ';transition:width .35s ease;border-radius:99px;"></div>'
+        + '</div>'
+      : '';
+    return ''
+      + '<button class="pl-card-v2" data-academy-id="' + _acEsc(l.id) + '" onclick="openLessonModal(this.dataset.academyId)" '
+      +   'style="--accent:' + cat.color + ';">'
+      + '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;">'
+      +   '<span style="font-size:1.7rem;line-height:1;">' + _acEsc(cat.icon) + '</span>'
+      +   '<div style="font-family:\'Bebas Neue\',var(--fm);letter-spacing:.06em;font-size:1.18rem;color:var(--tx);line-height:1.05;flex:1;min-width:0;">' + _acEsc(l.title) + '</div>'
+      +   '<span style="font-size:.56rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:' + cat.color + ';background:' + cat.soft + '0.18);border:1px solid ' + cat.soft + '0.35);padding:.18rem .55rem;border-radius:99px;white-space:nowrap;">' + _acEsc(cat.label) + '</span>'
+      + '</div>'
+      + '<div style="font-family:Georgia,serif;font-style:italic;font-size:.78rem;color:var(--tx2);line-height:1.55;margin-bottom:.7rem;">' + _acEsc(l.description) + '</div>'
+      + '<div style="display:flex;align-items:center;gap:.45rem;font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:' + cat.color + ';">'
+      +   '<span>' + _acEsc(l.duration || '8 min') + '</span>'
+      +   statusBit
+      +   '<span style="margin-left:auto;color:var(--tx);">' + ctaLabel + '</span>'
+      + '</div>'
+      + progressStrip
+      + '</button>';
   }).join('');
 }
 
@@ -5266,37 +5269,16 @@ function openLessonModal(lessonId){
   const adminOverride = (typeof window !== 'undefined' && window.ACADEMY_PHOTO_OVERRIDES && window.ACADEMY_PHOTO_OVERRIDES[lesson.id]) || '';
   const photoUrl = adminOverride;
 
-  // Navy-gradient header by default. If a photo override exists (or the
-  // legacy per-category photo), layer it behind the dark overlay so the
-  // gold title is still readable. Header structure now mirrors the Plans
-  // modal: centered category pill, icon, gold-gradient title.
-  const svgEl = document.getElementById('lmSvg');
-  if(svgEl){
-    if(photoUrl){
-      svgEl.style.backgroundImage = 'url("' + photoUrl + '")';
-      svgEl.style.backgroundSize = 'cover';
-      svgEl.style.backgroundPosition = 'center';
-      svgEl.classList.add('has-photo');
-      svgEl.classList.remove('no-photo');
-    } else {
-      svgEl.style.backgroundImage = '';
-      svgEl.classList.add('no-photo');
-      svgEl.classList.remove('has-photo');
-    }
-    svgEl.style.setProperty('--lm-cat-color', cat.color || '#fbbf24');
-  }
-  // Category pill — centered above the title.
-  const catEl = document.getElementById('lmCat');
-  if(catEl) catEl.textContent = (cat.label || '').toString();
+  const headerEl = document.getElementById('lmHeader');
+  if(headerEl) headerEl.style.background = 'linear-gradient(135deg,' + cat.color + ',#fef3c7)';
   const iconEl = document.getElementById('lmIcon');
   if(iconEl) iconEl.textContent = cat.icon || '📖';
-  // Eyebrow below the photo: "8 MIN · 5 QUESTIONS".
-  const eyeEl = document.getElementById('lmEye');
-  if(eyeEl) eyeEl.textContent = (lesson.duration || '') + ' · ' + ((lesson.quiz || []).length) + ' questions';
   const titleEl = document.getElementById('lmTitle');
   if(titleEl) titleEl.textContent = lesson.title || '';
   const subEl = document.getElementById('lmSub');
   if(subEl) subEl.textContent = lesson.description || '';
+  const eyeEl = document.getElementById('lmEye');
+  if(eyeEl) eyeEl.textContent = (lesson.duration || '8 min') + ' · ' + ((lesson.quiz || []).length) + ' questions';
 
   _lmRenderLesson(lesson);
 
