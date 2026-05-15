@@ -168,7 +168,6 @@ async function init(){
   // Check for existing Supabase session
   const supa = getSupabase();
   if(supa){
-    // Keep _supaUser current whenever Supabase refreshes the token
     supa.auth.onAuthStateChange(function(event, session){
       if(session && session.user){
         _supaUser = session.user;
@@ -183,16 +182,12 @@ async function init(){
     if(session?.user){
       _supaUser = session.user;
 
-      // ── CHECK SUBSCRIPTION STATUS ON EXISTING SESSION ──────
       const blocked = await checkPlanStatus();
-      if(blocked) return; // show blocked screen, stop here
+      if(blocked) return;
 
       const loaded = await cloudLoad();
-      if(!loaded){ loadData(); setTimeout(cloudSync, 1500); } // load local + write row to Supabase
-      setSyncSt(loaded ? 'cloud' : 'cloud'); // user is signed in either way
-      // Phase 4: Age picker only fires for active child profiles. At parent-
-      // account init this is always false → skip picker. Picker for child
-      // profiles fires from parent.js switchToProfile when a child becomes active.
+      if(!loaded){ loadData(); setTimeout(cloudSync, 1500); }
+      setSyncSt(loaded ? 'cloud' : 'cloud');
       if(!D.ageBracket && !IS_DEMO && !window._faithFree && _isChildProfileActive()){
         showAgePickerModal(function(){
           if(!D.parentPinHash && !D.chorePin && !D.parentPIN){ showFirstTimeGate(); return; }
@@ -202,17 +197,13 @@ async function init(){
         return;
       }
       if(!D.parentPinHash && !D.chorePin && !D.parentPIN){ showFirstTimeGate(); return; }
-      finishInit(true); // pass flag so popup shows after cloud data is confirmed loaded
-      setTimeout(setupContestFreeUser, 500); // Show contest banner if applicable
+      finishInit(true);
+      setTimeout(setupContestFreeUser, 500);
       return;
     }
   } else {
-    // Supabase not available - use localStorage
     loadData();
     setSyncSt('local');
-    // Phase 4: Age picker only fires for active child profiles (see helper above).
-    // Parent-account init always skips; picker fires later via parent.js when a
-    // child profile becomes active.
     if(!D.ageBracket && !IS_DEMO && !window._faithFree && _isChildProfileActive()){
       showAgePickerModal(function(){
         if(!D.parentPinHash && !D.chorePin && !D.parentPIN){ showFirstTimeGate(); return; }
@@ -225,32 +216,23 @@ async function init(){
     return;
   }
 
-  // No session - show auth screen
   document.getElementById('authScreen').style.display = 'flex';
 }
 
 // ── PHASE 2.1 AGE PICKER ─────────────────────────────────────
-// Three brackets map to D.sections allowlists. 18_22 = full surface (null
-// allowlist). Always-visible specials (s-hero, s-parent, s-cbt) bypass
-// this — they're force-shown elsewhere. Faith-only users skip the picker
-// entirely (FAITH_FREE_ALLOWED is the canonical filter for that plan).
 const _AGE_BRACKET_ALLOWLISTS = {
   '12_14': new Set(['chores','goals','mood','reading','scripture','rewards','flashcards']),
   '15_17': new Set(['chores','goals','mood','reading','scripture','rewards','school','health','finance','driving','skills','flashcards']),
-  '18_22': null, // null = full surface (don't hide anything)
+  '18_22': null,
 };
 
 function _bracketAllowedKeys(bracket){
-  if(!bracket) return null; // no bracket = no filtering
+  if(!bracket) return null;
   return _AGE_BRACKET_ALLOWLISTS[bracket] || null;
 }
 
 let _agePickerCallback = null;
 
-// Phase 4: Age picker only applies to a child profile. At parent-account init
-// (no child profiles yet, or the parent is the active profile), returns false
-// and the picker is suppressed. Picker fires later from parent.js's
-// switchToProfile path when a child becomes active.
 function _isChildProfileActive(){
   if(typeof _profiles === 'undefined' || !Array.isArray(_profiles)) return false;
   if(typeof _activeProfileId === 'undefined' || !_activeProfileId) return false;
@@ -284,60 +266,44 @@ function applyAgeBracketSections(bracket){
   ALL_SECTIONS.forEach(function(s){
     const key = s.id.replace('s-','');
     if(allow === null){
-      // 18_22 = full surface — clear any hidden flags.
       if(D.sections[key] === 0) delete D.sections[key];
     } else {
-      // 12_14 or 15_17 — explicit 1 for allowed, 0 for hidden.
       D.sections[key] = allow.has(key) ? 1 : 0;
     }
   });
 }
 
 function finishInit(cloudReady){
-  // Always ensure newly-added sections are visible regardless of saved state
-  // Phase 2.1: force-show migration nudge respects age bracket. Sections the
-  // bracket hides stay hidden; everything else is force-shown.
   if(D.sections){
     const FORCE = ['cbt','resume','motivation','mentors','christianLiving','worship','scripture'];
     const allowed = (typeof _bracketAllowedKeys === 'function') ? _bracketAllowedKeys(D.ageBracket) : null;
     FORCE.forEach(function(k){
-      // 'cbt' is always visible regardless of bracket (CLAUDE.md design rule).
       if(k === 'cbt'){ delete D.sections[k]; return; }
       if(allowed === null || allowed.has(k)) delete D.sections[k];
     });
   }
   // Belt+suspenders: force CBT on
   if(D.sections && D.sections.cbt===0) delete D.sections.cbt;
+
+  // ── PERMANENT FIX: remove the old heroCard from the DOM entirely ──
+  // The #heroCard element (Good Evening / CHAMPION / clock) is replaced
+  // by the new Phase C hero greeting. Remove it on every init so no JS
+  // or CSS rule can ever show it again.
+  document.getElementById('heroCard')?.remove();
+
   // Apply saved theme
   applyTheme();
   applyPalette();
   applyHeroBg();
-  // Build sidebar nav
   buildSideNav();
-  // Phase B-Lite session 2: build the mobile bottom tab bar and the
-  // three tab landing card grids (Learn / Life / Me). Faith-free users
-  // skip the tab bar via the window._faithFree guard in renderBottomTabBar.
   if(typeof renderBottomTabBar === 'function') renderBottomTabBar();
   if(typeof renderAllTabLandings === 'function') renderAllTabLandings();
-  // Stamp the baseline profile so the child-switch guard in ui.js
-  // knows who is active right now and can detect a PIN login switch.
   if(typeof _lastRenderedProfileId !== 'undefined'){
     _lastRenderedProfileId = (typeof _activeProfileId !== 'undefined') ? _activeProfileId : null;
   }
-  // 2026-05-15 — Mom-persona parent-default landing REMOVED per Option B.
-  // Every account now lands on s-hero with the bottom tab bar (teen-tabs)
-  // visible. Parent Hub is reached intentionally via the Me tab card or
-  // any of the existing entry buttons (top quick-buttons / mobileQuickRow /
-  // parent-mode profile switcher) — it is no longer the auto-landing for
-  // parent accounts. The localStorage ylcc_default_view flag, the
-  // hasParent / activeIsChild / IS_DEMO branch, and the s-parent fallback
-  // are intentionally deleted. Keeping the default constant simplifies the
-  // mental model: init → s-hero, every time, unchanged by account shape.
   let _defaultLanding = 's-hero';
   showSection(_defaultLanding);
   if(typeof trackSection === 'function') trackSection(_defaultLanding);
-  // Show daily devotional popup once per day — skip if wizard is open
-  // Use a short delay if cloud data is confirmed loaded, longer if we need to wait for sync
   const popupDelay = cloudReady ? 800 : 3500;
   setTimeout(function(){
     const today = new Date().toISOString().slice(0,10);
@@ -345,13 +311,9 @@ function finishInit(cloudReady){
     const wizardOpen = (document.getElementById('parentOnboard')||{}).classList&&document.getElementById('parentOnboard').classList.contains('open');
     const kidWizOpen = (document.getElementById('kidOnboard')||{}).classList&&document.getElementById('kidOnboard').classList.contains('open');
     const alreadyRead = D.scrReadDays && D.scrReadDays[today];
-    // Check localStorage FIRST (per-user key, survives cloudLoad overwrites).
-    // Fall back to D.devPopupSeen for data migrated from older sessions.
     const alreadySeen = localStorage.getItem(_ylccUserKey('ylcc_devPopupSeen')) === today || (D.devPopupSeen && D.devPopupSeen === today);
     if(!IS_DEMO && faithOn && !alreadyRead && !alreadySeen && !wizardOpen && !kidWizOpen){
       showDailyDevModal();
-      // Mark as seen today in BOTH localStorage (per-user, survives cloudLoad)
-      // and D (cloud-synced).
       try{ localStorage.setItem(_ylccUserKey('ylcc_devPopupSeen'), today); }catch(e){}
       D.devPopupSeen = today;
     }
@@ -362,14 +324,8 @@ function finishInit(cloudReady){
   applyChildAvatar();
   renderVerse();
   startVerseAutoRotation();
-  // Phase E (2026-05-15): show the 4-step onboarding overlay on first
-  // launch. Skipped for demo, faith-free, and any user whose
-  // D.onboardingDone is already true. Sits above the rendered app so
-  // dismissal reveals s-hero already painted underneath.
   if(typeof maybeShowOnboarding === 'function') maybeShowOnboarding();
-  // Start session timer
   if(typeof startSessionTimer === 'function') startSessionTimer();
-  // Initial cloud sync after login
   setTimeout(function(){ if(_supaUser) cloudSync(); }, 1500);
   buildCheckins();
   updateStreak();
@@ -428,8 +384,6 @@ function finishInit(cloudReady){
   if(typeof renderFaithJourney==="function") renderFaithJourney();
   if(typeof populateBibleBooks==="function") populateBibleBooks();
   (function(){
-    // F2-A: 'home' is the default landing tab. Hide all other panels;
-    // the first tab in the bar (Home) is set active via its data-bf-tab.
     var BF=["home","devotional","jesus","learnBible","reading","bible","journey","plans","prayer","memorize","academy","bibleworld","timeline"];
     BF.forEach(function(t){
       var el=document.getElementById("bf-"+t);
@@ -439,7 +393,6 @@ function finishInit(cloudReady){
     var homeTab=document.querySelector('.scrTabs .tab[data-bf-tab="home"]');
     if(homeTab) homeTab.classList.add("active");
     if(typeof renderFaithHome==="function") renderFaithHome();
-    // F2-B: pre-render the plans catalog so the panel is ready when navigated to.
     if(typeof renderPlanCatalog==="function") renderPlanCatalog();
   })();
   initParentBucks();
@@ -449,12 +402,7 @@ function finishInit(cloudReady){
   initQuizSystem();
   initCharacter();
   initSkillsGrid();
-  // Phase 5.8 Pass D — reset School / Finance / Health to topic-grid mode
-  // on every page load. Function is defined in ui.js.
   if(typeof tgInitAll === 'function') tgInitAll();
-  // Admin Photo Manager — fetch override URLs in the background and swap
-  // hero <img src> for any card_id the admin has customized. Defined in
-  // ui.js. Non-blocking; fails silently if /api/admin-card-photo is down.
   if(typeof loadCardPhotoOverrides === 'function') loadCardPhotoOverrides();
   updateHeroClock();
   renderHeroMotivation();
@@ -465,12 +413,6 @@ function finishInit(cloudReady){
   renderDevMap();
   initResources();
 
-  // Phase 5.1: Solo path auto-toggle. When the user signed up via
-  // register.html?path=solo, user_metadata.signup_source === 'solo' is the
-  // durable cross-device flag. On first signin (parentWizardDone false),
-  // apply solo mode and mark the wizard done so it never opens with the
-  // mode-picker slide. Returning users who later toggled out of solo are
-  // protected by the parentWizardDone gate (one-shot).
   if(!D.parentWizardDone
      && typeof _supaUser !== 'undefined' && _supaUser
      && _supaUser.user_metadata
@@ -482,12 +424,6 @@ function finishInit(cloudReady){
     if(typeof applySoloMode === 'function') applySoloMode();
   }
 
-  // Auto-show Quick Start Wizard on first visit — skip in demo
-  // Only show if user has NOT yet completed the wizard. Do NOT rely on D.name
-  // being empty as a "new user" signal, because D.name is temporarily empty
-  // on every sign-in before cloud data loads — that caused the wizard to
-  // re-open on every refresh/login.
-  // faith_free users skip the parent/child wizard — single-person Bible-study tier.
   if(!IS_DEMO && !window._faithFree && !D.parentWizardDone && localStorage.getItem(_ylccUserKey('ylcc_parentWizardDone')) !== '1'){ setTimeout(showParentOnboard, 700); }
 
   // Macro goal inputs
@@ -502,7 +438,7 @@ function finishInit(cloudReady){
   if(D.budgetIncome){ const bi=document.getElementById('budgInc'); if(bi) bi.value=D.budgetIncome; }
   if(D.budgetSavings){ const bs=document.getElementById('budgSav'); if(bs) bs.value=D.budgetSavings; }
 
-  // Auto-open Parent Hub after onboarding flow (onboard.html sets this flag)
+  // Auto-open Parent Hub after onboarding flow
   if(localStorage.getItem('ylcc_goto_parent') === '1'){
     localStorage.removeItem('ylcc_goto_parent');
     setTimeout(function(){ showSection('s-parent'); }, 400);
@@ -510,53 +446,32 @@ function finishInit(cloudReady){
 }
 
 
-
-
-
 // ── CHILD PIN LOGIN — CLEAN DASHBOARD SWITCH ─────────────────
-// Call this function from parent.js (or wherever childPinInput()
-// confirms a match) INSTEAD of calling showSection('s-hero') directly.
-//
-//   replaceWith:  showSection('s-hero');
-//   use instead:  switchToChild();
-//
-// It ensures D is fully reloaded from the new child's localStorage
-// key before any dashboard widget reads it, preventing stale data
-// from the previously-active child showing up briefly.
 function switchToChild(){
-  // _activeProfileId must already be set to the matched child before calling this.
-  // Mom-persona security: clear the parent unlock state when a child takes
-  // the device. Otherwise the 5-min idle window keeps Parent Hub unlocked
-  // for whoever holds the device next.
   if(typeof lockParentDash === 'function') lockParentDash();
-  if(typeof load === 'function') load();                           // reload D for new child
+  if(typeof load === 'function') load();
   if(typeof _lastRenderedProfileId !== 'undefined'){
     _lastRenderedProfileId = (typeof _activeProfileId !== 'undefined') ? _activeProfileId : null;
   }
   if(typeof refreshDashForCurrentChild === 'function'){
-    refreshDashForCurrentChild();                                   // full widget reset
+    refreshDashForCurrentChild();
   }
   showSection('s-hero');
   if(typeof trackSection === 'function') trackSection('s-hero');
 }
 
-// ── HOME HEADLINE — answers "how is my kid doing today?" in plain English ─
-// Reads existing fields off D (the active child's data blob). No new schema.
+// ── HOME HEADLINE ─────────────────────────────────────────────
 function summarizeChildStatus(){
   const today = new Date().toISOString().slice(0,10);
   const name = D.name || 'Your child';
 
-  // Chores due today: active chores with no log entry for today.
   const activeChores = (D.choreList||[]).filter(c => c.active);
   const choresDue = activeChores.filter(c =>
     !(D.choreLog||[]).some(l => l.choreId === c.id && l.date === today &&
       (l.status === 'done' || l.status === 'pending' || l.status === 'verified'))
   ).length;
 
-  // Homework: assignments not yet marked done.
   const homeworkDue = (D.assignments||[]).filter(a => !a.done).length;
-
-  // Active goals (in progress, not done).
   const goalsActive = (D.goals||[]).filter(g => !g.done).length;
 
   let answer;
@@ -595,7 +510,6 @@ function renderHeroHeadline(){
       (pill.kind==='due' ? dueStyle : infoStyle) + '">' + pill.icon + ' ' + pill.label + '</span>';
   }).join('');
 
-  // 3 micro-stats: streak, GPA, latest mood
   const m = document.getElementById('heroMicroStats');
   if(m){
     const streakVal = (D.streak||0) + ' day' + ((D.streak||0)===1?'':'s') + ' 🔥';
@@ -619,20 +533,12 @@ function renderHeroHeadline(){
     ).join('');
   }
 
-  // Phase C-hero: warm-opener renders alongside the headline so every
-  // hero refresh updates the greeting + quick stats. (Today's Verse
-  // moved above the greeting — same renderer, same ID, new position.)
   renderHeroGreeting();
   renderHeroQuickStats();
   renderTodaysVerseHero();
 }
 
-// ── HERO GREETING (Phase C-hero, 2026-05-15) ──────────────────────
-// Time-of-day greeting + first name. Resolution order for the name:
-//   1. D.name (user-typed)
-//   2. _supaUser.user_metadata first_name / name / full_name first token
-//   3. local-part of _supaUser.email (split on . + _ -)
-//   4. 'friend' fallback
+// ── HERO GREETING ─────────────────────────────────────────────
 function renderHeroGreeting(){
   const tEl = document.getElementById('heroGreetTime');
   const nEl = document.getElementById('heroGreetName');
@@ -656,10 +562,7 @@ function renderHeroGreeting(){
   nEl.textContent = name;
 }
 
-// ── HERO QUICK STATS (Phase C-hero, 2026-05-15) ───────────────────
-// Streak · tasks today · total points. Reads existing D fields so no
-// new schema. chorePoints handles both legacy-number and {total,spent}
-// object shapes per chores.js migration logic.
+// ── HERO QUICK STATS ──────────────────────────────────────────
 function renderHeroQuickStats(){
   const sE = document.getElementById('heroQsStreak');
   const tE = document.getElementById('heroQsTasks');
@@ -684,12 +587,7 @@ function renderHeroQuickStats(){
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// Phase F — DAILY REFLECTION (AI mode='daily-reflection') — 2026-05-15
-// Fetches one reflection question from /api/ai-summary using today's
-// verse + (optional) name + today's mood. User can save their response
-// to D.journal. Loading + error states match the ask-bible pattern.
-// ═══════════════════════════════════════════════════════════════════
+// ── PHASE F — DAILY REFLECTION ────────────────────────────────
 let _heroReflectQuestion = '';
 
 function openHeroReflect(){
@@ -709,7 +607,6 @@ function openHeroReflect(){
     status.style.display = '';
     status.textContent = '✨ Thinking…';
   }
-  // Compose prompt — verse, name, mood. Tolerates missing fields.
   const verseText = (document.getElementById('heroTodaysVerseText')||{}).textContent || '';
   const verseRef  = (document.getElementById('heroTodaysVerseRef')||{}).textContent || '';
   let name = (D && D.name) ? String(D.name).trim().split(/\s+/)[0] : '';
@@ -736,9 +633,7 @@ function openHeroReflect(){
   })
   .then(r => r.ok ? r.json() : Promise.reject(r.status))
   .then(data => {
-    if(!data || !data.text){
-      throw new Error('Empty reflection');
-    }
+    if(!data || !data.text) throw new Error('Empty reflection');
     _heroReflectQuestion = data.text.trim();
     if(status) status.style.display = 'none';
     if(q){ q.textContent = _heroReflectQuestion; q.style.display = ''; }
@@ -760,14 +655,7 @@ function closeHeroReflect(){
   if(btn) btn.style.display = '';
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// Phase E — ONBOARDING OVERLAY (4-step warm welcome) — 2026-05-15
-// Markup lives in app/index.html (#onboardingOverlay near </body>).
-// Triggered once for any user whose D.onboardingDone is false. Skipped
-// in demo mode. On completion: saves D.ageBracket / D.onboardingInterests
-// / D.name / D.faithMode / D.onboardingDone, fires launchBigConfetti,
-// fades out, and reveals s-hero (which is already rendered behind).
-// ═══════════════════════════════════════════════════════════════════
+// ── PHASE E — ONBOARDING OVERLAY ─────────────────────────────
 let _onbCurrentStep = 1;
 let _onbSelectedAge = null;
 let _onbInterests = [];
@@ -775,7 +663,6 @@ let _onbFaith = 'yes';
 let _onbReminder = 'on';
 
 function maybeShowOnboarding(){
-  // Skip when already done, in demo, or in faith-free constrained UI.
   if(typeof D === 'undefined' || !D) return;
   if(D.onboardingDone) return;
   if(typeof IS_DEMO !== 'undefined' && IS_DEMO) return;
@@ -789,7 +676,6 @@ function maybeShowOnboarding(){
   _onbReminder = 'on';
   overlay.style.display = 'block';
   document.body.style.overflow = 'hidden';
-  // Prefill name from existing sources (matches the hero-greeting resolution).
   const ni = document.getElementById('onbName');
   if(ni){
     let n = (D.name||'').trim();
@@ -811,20 +697,16 @@ function _onbShowStep(n){
     el.style.display = (i === n) ? '' : 'none';
     el.classList.toggle('shown', i === n);
   }
-  // Progress dots
   document.querySelectorAll('#onboardingOverlay .onb-dot').forEach(d => {
     const idx = parseInt(d.getAttribute('data-dot'));
     d.classList.remove('active', 'done');
     if(idx < n) d.classList.add('done');
     else if(idx === n) d.classList.add('active');
   });
-  // Back button visibility — hidden on step 1 only.
   const back = document.getElementById('onbBackBtn');
   if(back) back.style.display = (n === 1) ? 'none' : 'flex';
-  // Scroll the overlay to the top so the new step is in view.
   const overlay = document.getElementById('onboardingOverlay');
   if(overlay) overlay.scrollTop = 0;
-  // Trigger the fade-in by re-adding .shown on next frame.
   requestAnimationFrame(() => {
     const el = document.getElementById('onbStep'+n);
     if(el) el.classList.add('shown');
@@ -844,7 +726,6 @@ function onbSelectAge(bracket, btn){
   _onbSelectedAge = bracket;
   document.querySelectorAll('#onbStep2 .onb-card').forEach(c => c.classList.remove('selected'));
   if(btn) btn.classList.add('selected');
-  // Auto-advance after a brief beat so the user sees the selection register.
   setTimeout(() => onbGoToStep(3), 400);
 }
 
@@ -870,39 +751,28 @@ function onbSetReminder(val, btn){
 }
 
 function onbComplete(){
-  // Persist all answers to D, then fade out the overlay.
   if(_onbSelectedAge && _onbSelectedAge !== 'parent') D.ageBracket = _onbSelectedAge;
-  // 'parent' answer doesn't fit the age bracket allowlist — leave D.ageBracket
-  // empty (which means full surface) and rely on profile.parentMode instead.
   if(_onbSelectedAge === 'parent'){
     if(!D.profile) D.profile = {};
     D.profile.parentMode = true;
   }
   D.onboardingInterests = _onbInterests.slice();
-  // Faith toggle: store as D.settings.faithMode (matches existing convention
-  // used by init.js line 349 and other faith-gating checks).
   if(!D.settings) D.settings = {};
   D.settings.faithMode = (_onbFaith === 'yes');
   D.faithMode = D.settings.faithMode;
-  // Reminder preference — surface for a future notification system.
   D.dailyReminderOn = (_onbReminder === 'on');
-  // Name confirmation.
   const ni = document.getElementById('onbName');
   const nameVal = ni ? ni.value.trim() : '';
   if(nameVal) D.name = nameVal;
   D.onboardingDone = true;
   if(typeof save === 'function') save();
 
-  // Refresh dependent UI surfaces.
   if(typeof applyName === 'function') applyName();
   if(typeof renderHeroGreeting === 'function') renderHeroGreeting();
   if(typeof applyStageFilter === 'function') applyStageFilter();
 
-  // Celebration — already reduced-motion guarded inside launchBigConfetti.
   if(typeof launchBigConfetti === 'function') launchBigConfetti();
 
-  // Fade out the overlay (opacity-only so reduced-motion users still get a
-  // gentle dismissal rather than a hard cut).
   const overlay = document.getElementById('onboardingOverlay');
   if(overlay){
     overlay.style.transition = 'opacity .45s ease';
@@ -942,25 +812,16 @@ function saveHeroReflect(){
   closeHeroReflect();
 }
 
-// ── TODAY'S VERSE on hero (Phase B-Lite session 2) ────────────────────
-// Uses the existing verse pool ([...VERSES, ...D.verses]) — same source as
-// renderVerse() in ui.js. Tap routes to the faith hub via wellGoto('home')
-// (already wired on the #heroTodaysVerse onclick attr in index.html).
+// ── TODAY'S VERSE on hero ─────────────────────────────────────
 function renderTodaysVerseHero(){
   const card = document.getElementById('heroTodaysVerse');
-  // Phase F — show the reflect-with-AI card alongside the verse. Same
-  // visibility rules: only when there's a verse to reflect on.
   const reflectCard = document.getElementById('heroReflectCard');
   if(reflectCard) reflectCard.style.display = '';
-  // VERSES is a global defined by data.js or similar — guard for load order.
   const pool = [].concat(
     (typeof VERSES !== 'undefined' && Array.isArray(VERSES)) ? VERSES : [],
     (typeof D !== 'undefined' && D && Array.isArray(D.verses)) ? D.verses : []
   );
   if(!pool.length){ card.style.display = 'none'; return; }
-  // Deterministic verse-of-the-day: index by day-of-year, so the same
-  // verse shows all day and rotates daily without touching D.verseIdx
-  // (which the user can drive manually elsewhere).
   const now = new Date();
   const start = new Date(now.getFullYear(), 0, 0);
   const doy = Math.floor((now - start) / 86400000);
