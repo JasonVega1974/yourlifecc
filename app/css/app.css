@@ -2711,6 +2711,7 @@ body.modal-open .navbar{
   overflow:hidden;
   box-shadow:0 4px 18px rgba(0,0,0,.10);
   transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease,background .15s ease;
+  align-self:start;
 }
 .fh-story-tile:hover,
 .pl-card-v2:hover{
