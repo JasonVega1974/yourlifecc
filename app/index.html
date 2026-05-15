@@ -5393,118 +5393,164 @@
     </style>
 
     <style>
-      /* Featured lesson card grid — matches Story Mode / Plans card quality */
-      #bf-academy .ac-featured-hdr{
-        display:flex;align-items:center;gap:.5rem;margin:.4rem 0 .8rem;
+      /* ── Faith Academy: rich educational cards with photo headers ── */
+      /* Category filter pills (sit above the grid). Active = gold fill, dark text. */
+      #bf-academy .ac-filters{
+        display:flex;gap:.4rem;flex-wrap:wrap;margin:.4rem 0 1rem;
       }
-      #bf-academy .ac-featured-eye{
-        font-family:var(--fm);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;
-        color:#fbbf24;font-weight:700;opacity:.85;
+      #bf-academy .ac-chip{
+        flex:0 0 auto;
+        background:rgba(255,255,255,.05);
+        border:1px solid rgba(255,255,255,.12);
+        color:var(--tx2);border-radius:99px;
+        padding:.42rem .9rem;font-size:.72rem;font-weight:700;
+        cursor:pointer;font-family:var(--fm);
+        letter-spacing:.02em;
+        transition:all .15s ease;
       }
-      #bf-academy .ac-featured-line{
-        flex:1;height:1px;background:linear-gradient(90deg,rgba(251,191,36,.35),transparent);
+      #bf-academy .ac-chip:hover{background:rgba(255,255,255,.09);color:var(--tx);}
+      #bf-academy .ac-chip.active{
+        background:linear-gradient(135deg,#fbbf24,#f59e0b);
+        color:#0b1220;border-color:transparent;
+        box-shadow:0 4px 14px rgba(251,191,36,.32);
       }
+      /* Grid: a bit wider per card than Plans, to make room for photo headers */
       #bf-academy .ac-grid{
-        display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
-        gap:.7rem;margin-bottom:1.4rem;
+        display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+        gap:.85rem;margin-bottom:1.4rem;
       }
+      /* Card: dark navy bg, gold border, 16px radius; lift + gold glow on hover */
       #bf-academy .ac-card{
-        position:relative;cursor:pointer;
-        background:linear-gradient(180deg, rgba(10,13,26,.85), rgba(10,13,26,.65));
-        border:1px solid var(--ac-card-border,rgba(251,191,36,.35));
-        border-radius:14px;overflow:hidden;
-        transition:transform .25s, box-shadow .25s, border-color .25s;
+        position:relative;cursor:pointer;overflow:hidden;
+        background:rgba(255,255,255,.04);
+        border:1px solid rgba(251,191,36,.18);
+        border-radius:16px;
+        box-shadow:0 4px 18px rgba(0,0,0,.10);
+        transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
+        display:flex;flex-direction:column;
+        font-family:var(--fm);
       }
       #bf-academy .ac-card:hover{
-        transform:translateY(-3px);
-        box-shadow:0 14px 36px var(--ac-card-glow,rgba(251,191,36,.22));
-        border-color:var(--ac-card-color,#fbbf24);
+        transform:translateY(-4px);
+        box-shadow:0 14px 38px rgba(0,0,0,.18),0 0 28px rgba(251,191,36,.22);
+        border-color:rgba(251,191,36,.45);
       }
-      #bf-academy .ac-card-tint{
-        position:absolute;inset:0;
-        background:radial-gradient(ellipse at top, var(--ac-card-tint,rgba(251,191,36,.22)), transparent 60%);
+      #bf-academy .ac-card-photo{
+        position:relative;width:100%;height:140px;flex-shrink:0;
+        background-size:cover;background-position:center;
+        background-color:#0a0d1a;
+      }
+      #bf-academy .ac-card-photo::after{
+        content:'';position:absolute;left:0;right:0;bottom:0;height:60%;
+        background:linear-gradient(180deg,transparent 0%,rgba(10,13,26,.82) 100%);
         pointer-events:none;
       }
-      #bf-academy .ac-card-body{position:relative;padding:.95rem 1.05rem 1rem;}
-      #bf-academy .ac-card-eye{
-        font-family:var(--fm);font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;
-        color:var(--ac-card-color,#fbbf24);opacity:.85;font-weight:700;
-        margin-bottom:.4rem;
-      }
-      #bf-academy .ac-card-title{
-        font-family:'Bebas Neue',var(--fm);font-size:1.4rem;letter-spacing:.04em;
-        line-height:1.05;color:#fef3c7;
-        text-shadow:0 0 18px rgba(251,191,36,.25);
-        margin-bottom:.4rem;
-      }
-      :root.light #bf-academy .ac-card-title{color:#1a1b1e !important;text-shadow:none !important;}
-      #bf-academy .ac-card-desc{
-        font-family:Georgia,'Times New Roman',serif;font-style:italic;
-        font-size:.84rem;line-height:1.55;color:rgba(254,243,199,.82);
-        font-weight:400;margin-bottom:.65rem;
-      }
-      :root.light #bf-academy .ac-card-desc{color:#3a2818;opacity:.95;}
-      #bf-academy .ac-card-meta{
-        display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;
-        font-size:.66rem;color:rgba(254,243,199,.7);font-weight:600;
-        letter-spacing:.04em;
-      }
-      :root.light #bf-academy .ac-card-meta{color:#7c5a00;}
-      #bf-academy .ac-card-badge{
-        display:inline-flex;align-items:center;gap:.25rem;
-        background:rgba(251,191,36,.14);border:1px solid rgba(251,191,36,.3);
+      #bf-academy .ac-card-cat{
+        position:absolute;top:.6rem;left:.7rem;z-index:2;
+        font-family:var(--fm);font-size:.58rem;font-weight:800;
+        letter-spacing:.14em;text-transform:uppercase;
+        background:rgba(10,13,26,.72);
+        border:1px solid var(--ac-card-color,#fbbf24);
         color:var(--ac-card-color,#fbbf24);
-        padding:.12rem .5rem;border-radius:99px;
-        font-size:.6rem;font-weight:700;letter-spacing:.06em;
+        padding:.26rem .6rem;border-radius:99px;
+        backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
       }
-      #bf-academy .ac-card.done{border-color:#22c55e;}
-      #bf-academy .ac-card.done .ac-card-check{
-        position:absolute;top:.6rem;right:.7rem;
+      #bf-academy .ac-card.done .ac-card-photo::before{
+        content:'✓';position:absolute;top:.55rem;right:.7rem;z-index:2;
+        width:26px;height:26px;border-radius:50%;
         background:#22c55e;color:#0a0d1a;
-        width:24px;height:24px;border-radius:50%;
         display:flex;align-items:center;justify-content:center;
         font-size:.85rem;font-weight:900;
         box-shadow:0 0 14px rgba(34,197,94,.5);
       }
+      #bf-academy .ac-card-body{
+        position:relative;padding:.9rem 1rem 1rem;
+        flex:1;display:flex;flex-direction:column;
+      }
+      #bf-academy .ac-card-title{
+        font-family:'Bebas Neue',var(--fm);font-size:1.1rem;letter-spacing:.04em;
+        line-height:1.15;color:#fff;
+        margin:0 0 .35rem;text-shadow:none;
+      }
+      #bf-academy .ac-card-desc{
+        font-family:Georgia,'Times New Roman',serif;font-style:italic;
+        font-size:.85rem;line-height:1.5;color:var(--tx2);
+        margin:0 0 .85rem;font-weight:400;
+        display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+        overflow:hidden;text-overflow:ellipsis;
+      }
+      #bf-academy .ac-card-foot{
+        display:flex;align-items:center;justify-content:space-between;
+        gap:.65rem;margin-top:auto;
+      }
+      #bf-academy .ac-card-stats{
+        font-size:.7rem;color:var(--tx3);font-weight:600;letter-spacing:.02em;
+      }
+      #bf-academy .ac-card-cta{
+        font-size:.74rem;font-weight:800;letter-spacing:.06em;
+        color:#fbbf24;white-space:nowrap;
+      }
       #bf-academy .ac-card-progress{
-        position:absolute;bottom:0;left:0;right:0;height:3px;
-        background:rgba(251,191,36,.15);
+        position:relative;height:3px;
+        background:rgba(255,255,255,.08);
       }
       #bf-academy .ac-card-progress-bar{
         height:100%;width:0;background:var(--ac-card-color,#fbbf24);
         transition:width .35s ease;
       }
+      /* ── Foundational curriculum divider (below the featured grid) ── */
       #bf-academy .ac-section-divider{
         margin:1.6rem 0 .9rem;padding-bottom:.8rem;
         border-bottom:1px solid rgba(251,191,36,.15);
       }
-      #bf-academy .ac-section-divider .ac-featured-eye{margin-bottom:.35rem;display:block;}
+      #bf-academy .ac-section-divider-eye{
+        display:block;font-family:var(--fm);
+        font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;
+        color:#fbbf24;font-weight:700;opacity:.85;
+        margin-bottom:.4rem;
+      }
       #bf-academy .ac-section-divider-title{
         font-family:'Bebas Neue',var(--fm);font-size:1.4rem;letter-spacing:.04em;
         color:#fbbf24;line-height:1;margin-bottom:.3rem;
       }
-      :root.light #bf-academy .ac-section-divider-title{color:#b45309;}
       #bf-academy .ac-section-divider-sub{
         font-family:Georgia,serif;font-style:italic;font-size:.92rem;
         color:#fef3c7;opacity:.82;font-weight:400;line-height:1.5;
       }
-      :root.light #bf-academy .ac-section-divider-sub{color:#3a2818;opacity:.9;}
-      /* ── Light mode: card backgrounds and eye labels ── */
-      :root.light #bf-academy .ac-card{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; box-shadow:0 1px 4px rgba(0,0,0,.10) !important; }
-      :root.light #bf-academy .ac-card:hover{ box-shadow:0 6px 18px rgba(0,0,0,.14) !important; border-color:#8a5200 !important; }
-      :root.light #bf-academy .ac-card-tint{ opacity:0 !important; }
-      :root.light #bf-academy .ac-card-eye{ color:#8a5200 !important; opacity:1 !important; }
-      :root.light #bf-academy .ac-featured-eye{ color:#8a5200 !important; opacity:1 !important; }
-      :root.light #bf-academy .ac-featured-line{ background:linear-gradient(90deg,rgba(138,82,0,.35),transparent) !important; }
-      :root.light #bf-academy .ac-card-desc{ color:#4a4b52 !important; opacity:1 !important; }
-      :root.light #bf-academy .ac-card-meta{ color:#7a7b85 !important; }
-      :root.light #bf-academy .ac-card-badge{ color:#8a5200 !important; background:rgba(138,82,0,.10) !important; border-color:rgba(138,82,0,.30) !important; }
+      /* ── Light-mode parity ── */
+      :root.light #bf-academy .ac-chip{
+        background:rgba(15,23,42,.04) !important;
+        border-color:rgba(15,23,42,.12) !important;
+        color:#4a4b52 !important;
+      }
+      :root.light #bf-academy .ac-chip.active{
+        background:linear-gradient(135deg,#fbbf24,#f59e0b) !important;
+        color:#0b1220 !important;
+      }
+      :root.light #bf-academy .ac-card{
+        background:#fafafa !important;
+        border-color:rgba(180,120,20,.25) !important;
+      }
+      :root.light #bf-academy .ac-card:hover{
+        border-color:rgba(180,120,20,.5) !important;
+        box-shadow:0 14px 38px rgba(0,0,0,.10),0 0 22px rgba(251,191,36,.22) !important;
+      }
+      :root.light #bf-academy .ac-card-cat{
+        background:rgba(255,255,255,.85) !important;
+      }
+      :root.light #bf-academy .ac-card-title{color:#1a1b1e !important;}
+      :root.light #bf-academy .ac-card-desc{color:#3a3a3a !important;}
+      :root.light #bf-academy .ac-card-stats{color:#7a7b85 !important;}
+      :root.light #bf-academy .ac-card-cta{color:#b45309 !important;}
+      :root.light #bf-academy .ac-section-divider-title,
+      :root.light #bf-academy .ac-section-divider-eye{color:#b45309 !important;}
+      :root.light #bf-academy .ac-section-divider-sub{color:#3a2818 !important;opacity:.9 !important;}
     </style>
 
     <div class="bf-section-hdr">
-      <div class="bf-eyebrow">FEATURED · COURSES · CERTIFICATES</div>
+      <div class="bf-eyebrow">LEARN · GROW · GO DEEPER</div>
       <div class="bf-title">Faith Academy</div>
-      <div class="bf-sub">Fifteen featured lessons across five categories — plus the full eighteen-course curriculum below. Pass the quiz at 80% to mark a lesson complete.</div>
+      <div class="bf-sub">Bite-size lessons on theology, history, and Christian life.</div>
     </div>
 
     <div class="ac-stats">
@@ -5513,16 +5559,22 @@
       <div class="ac-stat"><div class="ac-stat-num" id="acStatBadges"  style="color:#fbbf24;">0</div><div class="ac-stat-lbl">Badges</div></div>
     </div>
 
-    <!-- Featured Lessons (15 new — academy-lessons.js) -->
-    <div class="ac-featured-hdr">
-      <span class="ac-featured-eye">✨ Featured Lessons</span>
-      <span class="ac-featured-line"></span>
+    <!-- Category filter pills (acFilter in faith.js handles the toggle) -->
+    <div class="ac-filters" id="acFilters">
+      <button class="ac-chip active" data-ac-cat="all"              onclick="acFilter('all',this)">All</button>
+      <button class="ac-chip"        data-ac-cat="theology"         onclick="acFilter('theology',this)">Theology</button>
+      <button class="ac-chip"        data-ac-cat="church-history"   onclick="acFilter('church-history',this)">Church History</button>
+      <button class="ac-chip"        data-ac-cat="christian-living" onclick="acFilter('christian-living',this)">Christian Living</button>
+      <button class="ac-chip"        data-ac-cat="apologetics"      onclick="acFilter('apologetics',this)">Apologetics</button>
+      <button class="ac-chip"        data-ac-cat="bible-study"      onclick="acFilter('bible-study',this)">Bible Study</button>
     </div>
+
+    <!-- Lesson card grid (rendered by renderFeaturedAcademy()) -->
     <div class="ac-grid" id="acFeaturedGrid"></div>
 
     <!-- Existing modules + courses (legacy curriculum) -->
     <div class="ac-section-divider">
-      <span class="ac-featured-eye">FOUNDATIONAL CURRICULUM</span>
+      <span class="ac-section-divider-eye">FOUNDATIONAL CURRICULUM</span>
       <div class="ac-section-divider-title">Full Course Catalog</div>
       <div class="ac-section-divider-sub">Five modules · eighteen courses · roughly eighty-five short lessons. Open any module to see its courses, lessons, and quiz.</div>
     </div>
@@ -5544,41 +5596,58 @@
       display:flex;flex-direction:column;max-height:92vh;
       border:1px solid rgba(251,191,36,.22);
     }
+    /* Photo header — 220px full-width with dark bottom gradient */
     #lessonModal .lm-svg{
-      position:relative;width:100%;aspect-ratio:800/300;
+      position:relative;width:100%;height:220px;
+      background-size:cover;background-position:center;
+      background-color:#0a0d1a;
       border-radius:16px 16px 0 0;overflow:hidden;flex:0 0 auto;
     }
     #lessonModal .lm-svg::after{
-      content:"";position:absolute;left:0;right:0;bottom:0;height:48px;
-      background:linear-gradient(180deg,transparent 0%,rgba(10,13,26,.85) 100%);
+      content:"";position:absolute;left:0;right:0;bottom:0;height:75%;
+      background:linear-gradient(180deg,transparent 0%,rgba(10,13,26,.55) 50%,rgba(10,13,26,.95) 100%);
       pointer-events:none;
     }
     #lessonModal .lm-close{
-      position:absolute;top:.7rem;right:.7rem;z-index:5;
-      width:32px;height:32px;border-radius:50%;
-      background:rgba(10,13,26,.7);border:1px solid rgba(251,191,36,.4);
-      color:#fef3c7;cursor:pointer;font-size:.85rem;font-weight:800;
+      position:absolute;top:.75rem;right:.75rem;z-index:5;
+      width:34px;height:34px;border-radius:50%;
+      background:rgba(10,13,26,.72);border:1px solid rgba(251,191,36,.45);
+      color:#fef3c7;cursor:pointer;font-size:.9rem;font-weight:800;
       display:flex;align-items:center;justify-content:center;
-      backdrop-filter:blur(6px);
+      backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    }
+    /* Category badge sits on top-left of the photo */
+    #lessonModal .lm-cat{
+      position:absolute;top:1rem;left:1.1rem;z-index:4;
+      font-family:var(--fm);font-size:.66rem;font-weight:800;
+      letter-spacing:.18em;text-transform:uppercase;
+      background:rgba(10,13,26,.7);
+      border:1px solid var(--lm-cat-color,#fbbf24);
+      color:var(--lm-cat-color,#fbbf24);
+      padding:.32rem .7rem;border-radius:99px;
+      backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    }
+    /* Title overlays the bottom-left of the photo */
+    #lessonModal .lm-title{
+      position:absolute;left:0;right:0;bottom:0;z-index:3;
+      padding:0 1.5rem 1.25rem;text-align:left;
+      font-family:'Bebas Neue',var(--fm);
+      font-size:2.1rem;line-height:1.05;letter-spacing:.04em;
+      color:#fef3c7;
+      text-shadow:0 2px 14px rgba(0,0,0,.55),0 0 28px rgba(0,0,0,.4);
+      -webkit-text-fill-color:#fef3c7;background:none;
     }
     #lessonModal .lm-body-wrap{
       flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0;
     }
+    /* Text header below the photo — eyebrow (duration · quiz Qs) + description */
     #lessonModal .lm-hdr{
-      padding:1.3rem 1.5rem 1rem;text-align:left;
+      padding:1.1rem 1.5rem .9rem;text-align:left;
       border-bottom:1px solid rgba(251,191,36,.12);
     }
     #lessonModal .lm-eye{
       font-family:var(--fm);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;
       color:#fbbf24;font-weight:700;margin-bottom:.4rem;opacity:.85;
-    }
-    #lessonModal .lm-title{
-      font-family:'Bebas Neue',var(--fm);
-      font-size:2.1rem;line-height:1.05;letter-spacing:.04em;
-      background:linear-gradient(135deg,#fef3c7 0%,#fbbf24 60%,#d97706 100%);
-      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
-      color:#fbbf24;margin-bottom:.5rem;
-      text-shadow:0 2px 28px rgba(251,191,36,.22);
     }
     #lessonModal .lm-sub{
       font-family:Georgia,'Times New Roman',serif;font-style:italic;
@@ -5790,157 +5859,21 @@
       #lessonModal .lm-quiz-star{font-size:1.6rem;}
     }
 
-    /* ─────────────────────────────────────────────────────────────────────
-       ACADEMY → PLANS PARITY (v2)
-       Mirrors the Plans `.pl-card-v2` catalog tiles and the per-plan
-       gradient banner header used by openPlanDetail() (NOT --cd-banner,
-       which is the global purple/teal). The per-category cat.color
-       drives the same `linear-gradient(135deg, COLOR, #fef3c7)` banner
-       and the card hover-accent.
-       ───────────────────────────────────────────────────────────────── */
-    /* Card grid: match Plans grid sizing */
-    #bf-academy .ac-grid{
-      grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
-      gap:.6rem;
-    }
-    /* Card shell: cloned from .pl-card-v2 */
-    #bf-academy .ac-card{
-      background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
-      border:1px solid rgba(255,255,255,.08);
-      color:var(--tx);
-      border-radius:14px;
-      padding:1rem 1.1rem;
-      min-height:150px;
-      cursor:pointer;
-      display:block;width:100%;text-align:left;
-      font:inherit;font-family:var(--fm);
-      position:relative;overflow:hidden;
-      box-shadow:0 4px 18px rgba(0,0,0,.10);
-      transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease,background .15s ease;
-    }
-    #bf-academy .ac-card:hover{
-      transform:scale(1.02);
-      border-color:var(--ac-card-color,rgba(56,189,248,.55));
-      box-shadow:0 10px 28px rgba(0,0,0,.18);
-    }
-    #bf-academy .ac-card:active{transform:scale(.98);}
-    /* Kill the gold tint overlay */
-    #bf-academy .ac-card-tint{display:none;}
-    /* Inner layout — mirrors Plans card inline-styled structure */
-    #bf-academy .ac-card-body{padding:0;position:relative;}
-    #bf-academy .ac-card-top{
-      display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;
-    }
-    #bf-academy .ac-card-icon{font-size:1.7rem;line-height:1;flex-shrink:0;}
-    #bf-academy .ac-card-title{
-      font-family:'Bebas Neue',var(--fm);letter-spacing:.06em;
-      font-size:1.18rem;color:var(--tx);line-height:1.05;
-      flex:1;min-width:0;text-shadow:none;margin:0;
-    }
-    #bf-academy .ac-card-pill{
-      font-size:.56rem;font-weight:800;letter-spacing:.18em;
-      text-transform:uppercase;color:var(--ac-card-color,#fbbf24);
-      background:rgba(255,255,255,.05);
-      border:1px solid var(--ac-card-color,rgba(251,191,36,.35));
-      padding:.18rem .55rem;border-radius:99px;
-      white-space:nowrap;flex-shrink:0;
-    }
-    #bf-academy .ac-card-desc{
-      font-family:Georgia,'Times New Roman',serif;font-style:italic;
-      font-size:.78rem;color:var(--tx2);line-height:1.55;
-      margin-bottom:.7rem;font-weight:400;opacity:1;
-    }
-    #bf-academy .ac-card-meta{
-      display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;
-      font-size:.6rem;font-weight:800;letter-spacing:.16em;
-      text-transform:uppercase;color:var(--ac-card-color,#fbbf24);
-    }
-    #bf-academy .ac-card-meta-cta{margin-left:auto;color:var(--tx);}
-    /* Progress strip: match Plans pattern (5px pill at bottom of card body) */
-    #bf-academy .ac-card-progress{
-      position:static;height:5px;border-radius:99px;
-      background:rgba(127,127,127,.22);overflow:hidden;
-      margin-top:.55rem;
-    }
-    #bf-academy .ac-card-progress-bar{border-radius:99px;}
-    /* Light-mode: translucent dark surface like .pl-card-v2 light */
-    :root.light #bf-academy .ac-card{
-      background:linear-gradient(135deg,rgba(15,23,42,.04),rgba(15,23,42,.02)) !important;
-      border-color:rgba(15,23,42,.1) !important;
-      color:var(--tx) !important;
-    }
-    :root.light #bf-academy .ac-card:hover{
-      border-color:var(--ac-card-color,rgba(56,189,248,.45)) !important;
-    }
-    :root.light #bf-academy .ac-card-title{color:var(--tx) !important;text-shadow:none !important;}
-    :root.light #bf-academy .ac-card-desc{color:var(--tx2) !important;opacity:1 !important;}
-
-    /* ── Lesson modal: match Plans modal shell exactly ── */
-    #lessonModal .md{
-      max-width:560px;
-      background:var(--card-bg,#0a0d1a);
-      border:1px solid rgba(255,255,255,.06);
-    }
-    /* Remove the photo header entirely */
-    #lessonModal .lm-svg{display:none;}
-    /* .lm-hdr is the gradient banner. JS sets per-category gradient inline
-       on open (same pattern as openPlanDetail); the default below is a
-       fallback used before the JS fires. */
-    #lessonModal .lm-hdr{
-      background:linear-gradient(135deg,#fbbf24,#fef3c7);
-      color:#0b1220;
-      border-radius:16px 16px 0 0;
-      padding:1.4rem 1.4rem 1.2rem;
-      text-align:center;
-      border-bottom:none;
-      position:relative;
-    }
-    #lessonModal .lm-eye{
-      color:rgba(11,18,32,.72);opacity:1;font-weight:700;
-    }
-    #lessonModal .lm-title{
-      background:none !important;
-      -webkit-background-clip:initial !important;background-clip:initial !important;
-      -webkit-text-fill-color:#0b1220 !important;
-      color:#0b1220 !important;
-      text-shadow:none !important;
-    }
-    #lessonModal .lm-sub{
-      color:rgba(11,18,32,.72);opacity:1;
-    }
-    /* Close button: dark on the cream end of the gradient */
-    #lessonModal .lm-close{
-      background:rgba(0,0,0,.18);
-      border:1px solid rgba(0,0,0,.2);
-      color:#0b1220;
-    }
-    /* Body padding: match Plans modal body */
-    #lessonModal .lm-body-wrap{padding:0;}
-    #lessonModal .lm-section{padding:1rem 1.2rem;}
-    #lessonModal .lm-keyverse,
-    #lessonModal .lm-callout,
-    #lessonModal .lm-cta{margin-left:1.2rem;margin-right:1.2rem;}
-
-    /* Light-mode modal: white card body, same per-category banner */
-    :root.light #lessonModal .md{
-      background:#ffffff !important;
-      border-color:rgba(0,0,0,.08) !important;
-    }
-    :root.light #lessonModal .lm-title{
-      -webkit-text-fill-color:#0b1220 !important;
-      color:#0b1220 !important;
-    }
-    :root.light #lessonModal .lm-eye,
-    :root.light #lessonModal .lm-sub{color:rgba(11,18,32,.7) !important;}
+    /* (prior Plans-parity override removed — Academy now has its own
+       photo-header card identity defined in the #bf-academy style block
+       above; modal photo header restored above.) */
   </style>
   <div id="lessonModal" class="mo" onclick="if(event.target===this)closeLessonModal()">
     <div class="md">
-      <button class="lm-close" onclick="closeLessonModal()" aria-label="Close">✕</button>
-      <div class="lm-svg" id="lmSvg" aria-hidden="true"></div>
+      <!-- Photo header: close button, category badge, and lesson title overlay -->
+      <div class="lm-svg" id="lmSvg">
+        <button class="lm-close" onclick="closeLessonModal()" aria-label="Close">✕</button>
+        <span class="lm-cat" id="lmCat">—</span>
+        <h2 class="lm-title" id="lmTitle">—</h2>
+      </div>
       <div class="lm-body-wrap" id="lmBodyWrap">
         <div class="lm-hdr">
           <div class="lm-eye" id="lmEye">—</div>
-          <div class="lm-title" id="lmTitle">—</div>
           <div class="lm-sub" id="lmSub">—</div>
         </div>
         <div id="lmContent"></div>

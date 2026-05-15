@@ -4695,6 +4695,18 @@ function _acAllModulesDone(){
 function _acFeatured(){ return (typeof window !== 'undefined' && window.ACADEMY_LESSONS) ? window.ACADEMY_LESSONS : []; }
 function _acCats(){     return (typeof window !== 'undefined' && window.ACADEMY_CATEGORIES) ? window.ACADEMY_CATEGORIES : {}; }
 function _acSvgs(){     return (typeof window !== 'undefined' && window.ACADEMY_CATEGORY_SVGS) ? window.ACADEMY_CATEGORY_SVGS : {}; }
+// One real photo per category — used for card headers AND modal header.
+function _acCatPhotos(){
+  return {
+    'theology':         'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Interior_of_Hagia_Sofia.JPG/1280px-Interior_of_Hagia_Sofia.JPG',
+    'church-history':   'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Baptistery_wall_painting_Good_Shepherd_and_Adam_and_Eve.jpg/1280px-Baptistery_wall_painting_Good_Shepherd_and_Adam_and_Eve.jpg',
+    'christian-living': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Holy_Land_2016_P0129_Olive_trees_in_Gethsemane.jpg/1280px-Holy_Land_2016_P0129_Olive_trees_in_Gethsemane.jpg',
+    'apologetics':      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Areopagus_from_the_Acropolis.jpg/1280px-Areopagus_from_the_Acropolis.jpg',
+    'bible-study':      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Aleppo_Codex_%28Deut%29.jpg/1280px-Aleppo_Codex_%28Deut%29.jpg',
+  };
+}
+// Active filter for the academy grid. 'all' or a category key. Mutated by acFilter().
+let _acActiveFilter = 'all';
 function _acFeaturedById(id){ return _acFeatured().find(l => l && l.id === id) || null; }
 function _acLessonProgress(id){
   if(typeof D === 'undefined' || !D) return null;
@@ -4710,53 +4722,63 @@ function _acEsc(s){
 function renderFeaturedAcademy(){
   const grid = document.getElementById('acFeaturedGrid');
   if(!grid) return;
-  const lessons = _acFeatured();
+  const allLessons = _acFeatured();
   const cats = _acCats();
+  const photos = _acCatPhotos();
+  // Filter by active category pill (defaults to 'all').
+  const filter = _acActiveFilter || 'all';
+  const lessons = filter === 'all'
+    ? allLessons
+    : allLessons.filter(l => l && l.category === filter);
   if(!lessons.length){
-    grid.innerHTML = '<div style="grid-column:1/-1;padding:1rem;text-align:center;color:var(--tx2);font-size:.78rem;font-style:italic;">Featured lessons unavailable.</div>';
+    grid.innerHTML = '<div style="grid-column:1/-1;padding:1.4rem 1rem;text-align:center;color:var(--tx2);font-size:.84rem;font-style:italic;font-family:Georgia,serif;">No lessons in this category yet.</div>';
     return;
   }
   grid.innerHTML = lessons.map(function(l){
     const cat = cats[l.category] || { label:'Lesson', color:'#fbbf24', soft:'rgba(251,191,36,', icon:'📖' };
     const prog = _acLessonProgress(l.id);
     const done = prog && prog.passed;
-    const styleVars = '--ac-card-color:' + cat.color + ';'
-                    + '--ac-card-border:' + cat.soft + '.35);'
-                    + '--ac-card-tint:'   + cat.soft + '.22);'
-                    + '--ac-card-glow:'   + cat.soft + '.25);';
-    const checkHtml = done ? '<div class="ac-card-check">✓</div>' : '';
+    const photoUrl = photos[l.category] || '';
     const progPct = done ? 100 : (prog && prog.total ? Math.round(prog.score / prog.total * 100) : 0);
     const progHtml = (prog && !done && prog.total)
       ? '<div class="ac-card-progress"><div class="ac-card-progress-bar" style="width:' + progPct + '%;background:' + cat.color + ';"></div></div>'
       : '';
-    // Mirror the Plans `.pl-card-v2` inline-styled layout:
-    //  top row → [icon] [Bebas-Neue title]   [pill badge]
-    //  mid     → Georgia italic description
-    //  bottom  → brand-color uppercase meta row + CTA arrow
-    //  optional progress strip (5px pill, matching Plans)
-    const ctaLabel = done ? 'Retake →' : (prog && prog.total ? 'Continue →' : 'Start →');
+    // Rich course-card layout:
+    //  [photo header — 140px, category badge top-left, dark gradient overlay]
+    //  [title — Bebas Neue 1.1rem white]
+    //  [description — Georgia italic, 2-line clamp]
+    //  [⏱ duration · ❓ quiz Qs        Start Lesson →]
+    //  [optional 3px progress bar pinned to card bottom]
+    const ctaLabel = done ? 'Retake Lesson →' : (prog && prog.total ? 'Continue →' : 'Start Lesson →');
+    const photoStyle = photoUrl ? ('background-image:url(\'' + photoUrl + '\');') : '';
     return '<div class="ac-card' + (done ? ' done' : '') + '" data-academy-id="' + _acEsc(l.id) + '" '
          + 'onclick="openLessonModal(\'' + l.id + '\')" '
-         + 'style="' + styleVars + '">'
-         + checkHtml
-         + '<div class="ac-card-body">'
-         +   '<div class="ac-card-top">'
-         +     '<span class="ac-card-icon">' + _acEsc(cat.icon || '📖') + '</span>'
-         +     '<div class="ac-card-title">' + _acEsc(l.title) + '</div>'
-         +     '<span class="ac-card-pill">' + _acEsc(cat.label) + '</span>'
+         + 'style="--ac-card-color:' + cat.color + ';">'
+         +   '<div class="ac-card-photo" style="' + photoStyle + '">'
+         +     '<span class="ac-card-cat">' + _acEsc(cat.label) + '</span>'
          +   '</div>'
-         +   '<div class="ac-card-desc">' + _acEsc(l.description) + '</div>'
-         +   '<div class="ac-card-meta">'
-         +     '<span>' + _acEsc(l.duration || '—') + '</span>'
-         +     '<span style="opacity:.55;">·</span>'
-         +     '<span>' + ((l.quiz || []).length) + ' QS</span>'
-         + (done ? '<span style="opacity:.55;">·</span><span style="color:#22c55e;">✓ Done</span>' : '')
-         +     '<span class="ac-card-meta-cta">' + ctaLabel + '</span>'
+         +   '<div class="ac-card-body">'
+         +     '<div class="ac-card-title">' + _acEsc(l.title) + '</div>'
+         +     '<div class="ac-card-desc">' + _acEsc(l.description) + '</div>'
+         +     '<div class="ac-card-foot">'
+         +       '<div class="ac-card-stats">⏱ ' + _acEsc(l.duration || '—') + ' · ❓ ' + ((l.quiz || []).length) + ' quiz Qs</div>'
+         +       '<div class="ac-card-cta">' + ctaLabel + '</div>'
+         +     '</div>'
          +   '</div>'
          +   progHtml
-         + '</div>'
          + '</div>';
   }).join('');
+}
+
+// Category filter pill handler. Re-renders the grid with the chosen filter.
+function acFilter(category, el){
+  _acActiveFilter = category || 'all';
+  const filters = document.getElementById('acFilters');
+  if(filters){
+    filters.querySelectorAll('.ac-chip').forEach(c => c.classList.remove('active'));
+  }
+  if(el && el.classList) el.classList.add('active');
+  renderFeaturedAcademy();
 }
 
 // ── Lesson modal ─────────────────────────────────────────────────
@@ -4766,23 +4788,23 @@ function openLessonModal(lessonId){
   const lesson = _acFeaturedById(lessonId);
   if(!lesson){ if(typeof showToast === 'function') showToast('Lesson not found'); return; }
   const cats = _acCats();
-  const svgs = _acSvgs();
   const cat = cats[lesson.category] || { label:'Lesson', color:'#fbbf24', icon:'📖' };
+  const photos = _acCatPhotos();
+  const photoUrl = photos[lesson.category] || '';
 
-  const _lmCatPhotos = {
-    'theology':         'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Interior_of_Hagia_Sofia.JPG/1280px-Interior_of_Hagia_Sofia.JPG',
-    'church-history':   'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Baptistery_wall_painting_Good_Shepherd_and_Adam_and_Eve.jpg/1280px-Baptistery_wall_painting_Good_Shepherd_and_Adam_and_Eve.jpg',
-    'christian-living': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Holy_Land_2016_P0129_Olive_trees_in_Gethsemane.jpg/1280px-Holy_Land_2016_P0129_Olive_trees_in_Gethsemane.jpg',
-    'apologetics':      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Areopagus_from_the_Acropolis.jpg/1280px-Areopagus_from_the_Acropolis.jpg',
-    'bible-study':      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Aleppo_Codex_%28Deut%29.jpg/1280px-Aleppo_Codex_%28Deut%29.jpg',
-  };
-  // Banner: per-category gradient (mirrors openPlanDetail's `linear-gradient(135deg, brand.color, #fef3c7)`).
-  // The .lm-svg photo header is hidden via CSS; we only touch .lm-hdr now.
-  const hdrEl = document.querySelector('#lessonModal .lm-hdr');
-  if(hdrEl) hdrEl.style.background = 'linear-gradient(135deg,' + (cat.color || '#fbbf24') + ',#fef3c7)';
-
+  // Photo header: set the category photo on .lm-svg. Drives the category-color
+  // CSS var used by .lm-cat (border + text color).
+  const svgEl = document.getElementById('lmSvg');
+  if(svgEl){
+    svgEl.style.backgroundImage = photoUrl ? ('url("' + photoUrl + '")') : '';
+    svgEl.style.setProperty('--lm-cat-color', cat.color || '#fbbf24');
+  }
+  // Category badge on the photo (top-left).
+  const catEl = document.getElementById('lmCat');
+  if(catEl) catEl.textContent = (cat.label || '').toString();
+  // Eyebrow below the photo: "8 MIN · 5 QUESTIONS".
   const eyeEl = document.getElementById('lmEye');
-  if(eyeEl) eyeEl.textContent = (cat.label || '').toUpperCase() + ' · ' + (lesson.duration || '');
+  if(eyeEl) eyeEl.textContent = (lesson.duration || '') + ' · ' + ((lesson.quiz || []).length) + ' questions';
   const titleEl = document.getElementById('lmTitle');
   if(titleEl) titleEl.textContent = lesson.title || '';
   const subEl = document.getElementById('lmSub');
