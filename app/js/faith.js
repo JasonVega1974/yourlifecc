@@ -2521,7 +2521,7 @@ const LEARN_BIBLE_LESSONS = [
 
 // ── FAITH JOURNEY ────────────────────────────────────────────
 function renderFaithJourney(){
-  renderPrayerList();
+  renderMyPrayersPane();
   renderFaithMilestones();
   renderFavVerses();
   if(typeof renderSermonNotes === 'function') renderSermonNotes();
@@ -2536,22 +2536,19 @@ function savePrayer(type){
     date:new Date().toISOString().slice(0,10), answered:false
   });
   input.value = '';
-  save(); renderPrayerList();
+  save(); renderMyPrayersPane();
   logActivity('faith', type==='praise'?'Praise report':'Prayer request');
   showToast(type==='praise'?'Praise logged! 🎉':'Prayer saved 🙏');
 }
 
-// renderPrayerList: see canonical implementation later in this file (uses escapeHtml).
-// Earlier duplicate definition removed 2026-05-09 — was XSS-vulnerable on p.text.
-
 function markPrayerAnswered(id){
   const p = (D.prayers||[]).find(x=>x.id===id);
-  if(p){ p.answered = true; p.answeredDate = new Date().toISOString().slice(0,10); save(); renderPrayerList(); showToast('Prayer answered! ✅'); }
+  if(p){ p.answered = true; p.answeredDate = new Date().toISOString().slice(0,10); save(); renderMyPrayersPane(); showToast('Prayer answered! ✅'); }
 }
 
 function deletePrayer(id){
   D.prayers = (D.prayers||[]).filter(x=>x.id!==id);
-  save(); renderPrayerList();
+  save(); renderMyPrayersPane();
 }
 
 function renderFaithMilestones(){
