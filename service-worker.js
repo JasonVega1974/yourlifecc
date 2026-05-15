@@ -1,7 +1,7 @@
 // YourLifeCC Service Worker
 // Version bump this string whenever you deploy a major update
 // to force old caches to clear.
-const CACHE_NAME = 'yourlifecc-v144';
+const CACHE_NAME = 'yourlifecc-v150';
 
 // Core assets to pre-cache on install — the app shell
 const PRECACHE_ASSETS = [

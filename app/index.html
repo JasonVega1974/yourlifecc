@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-<title>YourLife CC — your family dashboard</title>
+<title>YourLife CC — your life. your journey.</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <!-- Boot-cache theme + palette BEFORE the stylesheet renders, to avoid the
      dark-mode flash that returning users on calm-theme palettes (cream/sage/
@@ -875,42 +875,11 @@
     <span style="display:flex;align-items:center;gap:.35rem;"><span style="font-size:1rem;">⭐</span><b id="heroQsPoints" style="color:var(--tx);font-family:var(--fn);">0</b><span>points</span></span>
   </div>
 
-  <!-- HERO HEADER — child only. HIDDEN (Phase C-hero) by the new
-       greeting opener above. Markup preserved so existing references
-       to heroBgLayer / profileSwitcher / childAvatarWrap / heroName /
-       greet / heroClock / heroMotivation graceful-null cleanly. -->
-  <div id="heroCard" class="hero-card no-photo" style="display:none !important;margin-bottom:.7rem;">
-    <div id="heroBgLayer" class="hero-bg-layer"></div>
-    <div class="hero-overlay"></div>
-    <label class="hero-photo-btn" title="Set background photo">📷<input type="file" accept="image/*" onchange="setHeroBg(this)" style="display:none;"></label>
-    <button id="heroRemoveBtn" class="hero-remove-btn" onclick="removeHeroBg()" style="display:none;" title="Remove photo">✕</button>
-    <div class="hero-content">
-      <div id="profileSwitcher" style="display:none;">
-        <div id="profileTabs"></div>
-      </div>
-      <div class="hero-left" style="flex-shrink:0;display:flex;align-items:center;gap:.9rem;">
-        <!-- Child Avatar Circle (desktop only) -->
-        <div id="childAvatarWrap" class="child-avatar-hero" title="Upload child photo or choose avatar">
-          <div id="childAvatarImg" class="child-avatar-circle" onclick="openChildAvatarPicker()">
-            <span id="childAvatarDefault">👤</span>
-            <img id="childAvatarPhoto" src="" style="display:none;">
-          </div>
-          <div class="child-avatar-edit-btn" onclick="openChildAvatarPicker()">✏️</div>
-        </div>
-        <div>
-          <div class="hero-greet" style="font-size:1rem;">Good <span id="greet">morning</span></div>
-          <div class="hero-name-wrap"><span id="heroName" class="editable-name hero-name" title="Click to edit" onclick="editNameInline(this)">CHAMPION</span>
-          <span id="heroModeBadge" style="display:none;"></span></div>
-          <div class="hero-date" id="heroDate" style="font-size:.85rem;"></div>
-          <div id="heroClock" style="font-family:var(--fn);font-size:1.8rem;font-weight:900;color:rgba(255,255,255,.85);margin-top:.3rem;letter-spacing:-1px;"></div>
-        </div>
-      </div>
-      <div style="flex:1;text-align:center;cursor:pointer;padding:0 .5rem;" onclick="toggleCustomMessage()" title="Tap to customize">
-        <div id="heroMotivation" style="font-size:1.05rem;font-style:italic;color:#fde68a;line-height:1.6;"></div>
-        <div id="heroMotivationAuthor" style="font-size:.72rem;color:rgba(253,230,138,.5);margin-top:.25rem;"></div>
-      </div>
-    </div>
-  </div>
+  <!-- 2026-05-14 — Legacy #heroCard photo-hero ("Good Evening,
+       CHAMPION") removed. The Phase C-hero #heroGreeting opener
+       above is the only hero greeting now. JS callers in chores.js,
+       skills.js, and ui.js graceful-null on missing #heroCard /
+       #heroBgLayer / #heroName / #greet / #heroClock / #heroMotivation. -->
 
   <!-- CHILD-ONLY DASHBOARD CONTENT — hidden when parent is viewing -->
   <div id="childDashContent">
@@ -10983,7 +10952,7 @@ if (_origRefresh) {
   if (location.protocol !== 'https:' && location.hostname !== 'localhost') return;
 
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('/service-worker.js').then(function(reg){
+    navigator.serviceWorker.register('/service-worker.js', { updateViaCache: 'none' }).then(function(reg){
       // When a new SW is found, tell it to take over right away.
       reg.addEventListener('updatefound', function(){
         var nw = reg.installing;
