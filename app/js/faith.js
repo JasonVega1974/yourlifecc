@@ -603,7 +603,7 @@ function bfTab(tab, btn){
   if(tab==='memorize') renderMemorizePanel();
   if(tab==='academy') renderAcademyPanel();
   if(tab==='bibleworld') renderBibleWorld();
-  if(tab==='stories') renderFaithHomeStories();
+  if(tab==='stories') renderStoriesTabDirect();
   if(tab==='timeline') renderBibleTimeline();
   if(tab==='proofProphecy') renderProofProphecy();
 }
@@ -7431,6 +7431,28 @@ function renderFaithHomeStories(){
     });
     list.__storyClickBound = true;
   }
+}
+
+function renderStoriesTabDirect(){
+  const grid = document.getElementById('bfStoriesGrid');
+  if(!grid) return;
+  const stories = _getStories();
+  if(!stories.length){
+    grid.innerHTML = '<div style="font-size:.78rem;color:var(--tx3);font-family:Georgia,serif;font-style:italic;padding:.8rem .2rem;">More stories arriving in upcoming releases.</div>';
+    return;
+  }
+  grid.innerHTML = stories.map(function(s){
+    const sceneCount = (s.scenes||[]).length;
+    const accent = s.color||'#fbbf24';
+    return '<button type="button" class="fh-story-tile" data-story-id="'+_storyEsc(s.id)+'" onclick="(typeof openStory===\'function\')&&openStory(this.dataset.storyId)" style="--accent:'+accent+';">'
+      +'<div style="display:flex;align-items:center;gap:.55rem;margin-bottom:.4rem;">'
+      +'<span style="font-size:1.4rem;line-height:1;">'+(s.icon||'⭐')+'</span>'
+      +'<div style="font-family:\'Bebas Neue\',var(--fm);letter-spacing:.06em;font-size:1.05rem;color:var(--tx);line-height:1.05;">'+_storyEsc(s.title)+'</div>'
+      +'</div>'
+      +'<div style="font-family:Georgia,serif;font-style:italic;font-size:.76rem;color:var(--tx2);line-height:1.5;margin-bottom:.55rem;">'+_storyEsc(s.subtitle||'')+'</div>'
+      +'<div style="font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:'+accent+';">'+sceneCount+' scenes</div>'
+      +'</button>';
+  }).join('');
 }
 
 function openStory(storyId){
