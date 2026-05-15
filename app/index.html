@@ -5193,92 +5193,481 @@
     </div>
   </div>
 
-  <!-- ════ PRAYER (F2-E) ════ -->
-  <div id="bf-prayer" style="display:none;">
+  <!-- ════ PRAYER (F2-E + Phase 7 redesign — personal prayer sanctuary) ════ -->
+  <div id="bf-prayer" style="display:none;position:relative;">
     <style>
-      #bf-prayer .pr-prompt{background:var(--cd-banner);border-radius:16px;padding:1.05rem 1.15rem;margin-bottom:.85rem;color:var(--cd-banner-text);box-shadow:var(--cd-banner-shadow);}
-      #bf-prayer .pr-prompt-eyebrow{font-size:.6rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;opacity:.78;margin-bottom:.35rem;}
-      #bf-prayer .pr-prompt-text{font-family:var(--fh,var(--fm));font-size:1.05rem;font-weight:700;letter-spacing:.01em;line-height:1.4;margin-bottom:.7rem;}
-      #bf-prayer .pr-prompt-cta{background:rgba(11,18,32,.85);color:#fff;border:none;border-radius:10px;padding:.45rem .85rem;font-size:.74rem;font-weight:800;cursor:pointer;font-family:var(--fm);}
-      #bf-prayer .pr-form{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:.85rem 1rem;margin-bottom:.85rem;}
-      #bf-prayer .pr-row{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.55rem;}
-      #bf-prayer .pr-row-label{flex:0 0 100%;font-size:.6rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.14em;margin-bottom:.05rem;}
-      #bf-prayer .pr-chip{flex:0 0 auto;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--tx2);border-radius:99px;padding:.3rem .7rem;font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fm);transition:all .15s;}
-      #bf-prayer .pr-chip:hover{background:rgba(255,255,255,.08);}
-      #bf-prayer .pr-chip.active{color:#0b1220;border-color:transparent;}
-      #bf-prayer .pr-chip.active[data-grp="type"]{background:var(--cd-banner);color:var(--cd-banner-text);}
-      #bf-prayer .pr-chip.active[data-grp="cat"]{background:#a78bfa;}
-      #bf-prayer .pr-chip.active[data-grp="priv"]{background:#10b981;}
-      #bf-prayer .pr-tabs{display:flex;gap:.4rem;margin-bottom:.65rem;}
-      #bf-prayer .pr-tab{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--tx2);border-radius:10px;padding:.5rem .7rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);transition:all .15s;}
-      #bf-prayer .pr-tab.active{background:var(--cd-banner);color:var(--cd-banner-text);border-color:transparent;}
-      #bf-prayer .pr-list{display:flex;flex-direction:column;gap:.4rem;}
-      #bf-prayer .pr-item{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-left-width:4px;border-radius:10px;padding:.65rem .8rem;}
-      #bf-prayer .pr-item-meta{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;font-size:.6rem;color:var(--tx2);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem;}
-      #bf-prayer .pr-item-text{font-size:.84rem;color:var(--tx);line-height:1.55;margin-bottom:.4rem;}
-      #bf-prayer .pr-item-answer{background:rgba(16,185,129,.08);border-left:3px solid #10b981;border-radius:0 8px 8px 0;padding:.5rem .65rem;margin-top:.4rem;font-size:.78rem;color:var(--tx2);font-style:italic;line-height:1.5;}
-      #bf-prayer .pr-item-actions{display:flex;gap:.35rem;margin-top:.3rem;}
-      #bf-prayer .pr-item-btn{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#34d399;border-radius:8px;padding:.3rem .65rem;font-size:.66rem;font-weight:800;cursor:pointer;font-family:var(--fm);}
-      #bf-prayer .pr-item-btn.del{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.25);color:#f87171;}
-      #bf-prayer .pr-empty{text-align:center;padding:1.2rem;color:var(--tx2);font-size:.78rem;font-style:italic;}
+      /* ── Atmospheric watermark behind the whole tab (subtle, ~3% opacity) ── */
+      #bf-prayer .pr-watermark{
+        position:absolute;top:60px;right:-30px;width:220px;height:280px;
+        color:#fbbf24;opacity:.035;pointer-events:none;z-index:0;
+      }
+      #bf-prayer .pr-watermark svg{width:100%;height:100%;display:block;}
+      #bf-prayer > *:not(.pr-watermark){position:relative;z-index:1;}
+
+      /* ── Title override: white (Academy pattern) ── */
+      #bf-prayer .bf-title{
+        background:none;-webkit-background-clip:initial;background-clip:initial;
+        -webkit-text-fill-color:#ffffff;color:#ffffff;text-shadow:none;
+      }
+      :root.light #bf-prayer .bf-title{-webkit-text-fill-color:#1a1b1e !important;color:#1a1b1e !important;}
+
+      /* ── Sub-tab navigation (horizontal scroll on mobile) ── */
+      #bf-prayer .pr-subtabs{
+        display:flex;gap:.4rem;flex-wrap:wrap;margin:.4rem 0 1rem;
+        overflow-x:auto;-webkit-overflow-scrolling:touch;
+      }
+      #bf-prayer .pr-subtab{
+        flex:0 0 auto;
+        background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
+        color:var(--tx2);border-radius:99px;
+        padding:.45rem 1rem;font-size:.74rem;font-weight:700;
+        cursor:pointer;font-family:var(--fm);letter-spacing:.02em;
+        transition:all .15s ease;white-space:nowrap;
+      }
+      #bf-prayer .pr-subtab:hover{background:rgba(255,255,255,.09);color:var(--tx);}
+      #bf-prayer .pr-subtab.active{
+        background:linear-gradient(135deg,#fbbf24,#f59e0b);
+        color:#0b1220;border-color:transparent;
+        box-shadow:0 4px 14px rgba(251,191,36,.32);
+      }
+      :root.light #bf-prayer .pr-subtab{background:rgba(15,23,42,.04) !important;border-color:rgba(15,23,42,.12) !important;color:#4a4b52 !important;}
+      :root.light #bf-prayer .pr-subtab.active{background:linear-gradient(135deg,#fbbf24,#f59e0b) !important;color:#0b1220 !important;}
+
+      /* ── Pane base ── */
+      #bf-prayer .pr-pane{animation:prPaneIn .3s ease both;}
+      @keyframes prPaneIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+      /* ── Stats row (My Prayers) ── */
       #bf-prayer .pr-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;margin-bottom:.85rem;}
       #bf-prayer .pr-stat{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:.5rem;text-align:center;}
-      #bf-prayer .pr-stat-num{font-size:1.2rem;font-weight:900;font-family:var(--fh,var(--fm));}
+      #bf-prayer .pr-stat-num{font-size:1.3rem;font-weight:900;font-family:var(--fh,var(--fm));}
       #bf-prayer .pr-stat-lbl{font-size:.58rem;color:var(--tx2);font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-top:.1rem;}
+
+      /* ── Filter chips (My Prayers, Wall) ── */
+      #bf-prayer .pr-mine-filters,#bf-prayer .pr-wall-filters{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.7rem;}
+      #bf-prayer .pr-chip-flt{
+        flex:0 0 auto;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
+        color:var(--tx2);border-radius:99px;padding:.35rem .85rem;
+        font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fm);transition:all .15s;
+      }
+      #bf-prayer .pr-chip-flt:hover{background:rgba(255,255,255,.08);}
+      #bf-prayer .pr-chip-flt.active{background:rgba(251,191,36,.18);border-color:rgba(251,191,36,.45);color:#fbbf24;}
+
+      /* ── Primary "add" button ── */
+      #bf-prayer .pr-add-btn{
+        width:100%;background:linear-gradient(135deg,#fbbf24,#f59e0b);
+        color:#0b1220;border:none;border-radius:12px;
+        padding:.85rem 1rem;margin-bottom:.85rem;
+        font-family:'Bebas Neue',var(--fm);font-size:1rem;font-weight:800;
+        letter-spacing:.1em;text-transform:uppercase;cursor:pointer;
+        box-shadow:0 4px 16px rgba(251,191,36,.32);
+        transition:transform .15s,box-shadow .15s;
+      }
+      #bf-prayer .pr-add-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(251,191,36,.4);}
+
+      /* ── My Prayers cards (dark navy + gold left border + status badge) ── */
+      #bf-prayer .pr-mine-list{display:flex;flex-direction:column;gap:.55rem;}
+      #bf-prayer .pr-mine-card{
+        background:rgba(255,255,255,.04);
+        border:1px solid rgba(251,191,36,.16);
+        border-left:4px solid #a78bfa;
+        border-radius:14px;padding:.85rem 1rem;
+        animation:prMineIn .42s ease both;
+      }
+      #bf-prayer .pr-mine-card.answered{border-left-color:#22c55e;background:rgba(34,197,94,.06);}
+      #bf-prayer .pr-mine-card.ongoing{border-left-color:#fbbf24;}
+      @keyframes prMineIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+      #bf-prayer .pr-mine-hdr{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.4rem;}
+      #bf-prayer .pr-mine-status{
+        font-size:.58rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+        padding:.2rem .55rem;border-radius:99px;
+      }
+      #bf-prayer .pr-mine-status.active{background:rgba(167,139,250,.18);color:#a78bfa;}
+      #bf-prayer .pr-mine-status.ongoing{background:rgba(251,191,36,.18);color:#fbbf24;}
+      #bf-prayer .pr-mine-status.answered{background:rgba(34,197,94,.18);color:#22c55e;}
+      #bf-prayer .pr-mine-cat{font-size:.6rem;color:var(--tx3);font-weight:700;text-transform:uppercase;letter-spacing:.1em;}
+      #bf-prayer .pr-mine-date{font-size:.6rem;color:var(--tx3);margin-left:auto;}
+      #bf-prayer .pr-mine-title{
+        font-family:'Bebas Neue',var(--fm);font-size:1.05rem;letter-spacing:.04em;
+        color:var(--tx);line-height:1.2;margin-bottom:.25rem;
+      }
+      #bf-prayer .pr-mine-text{
+        font-family:Georgia,'Times New Roman',serif;font-style:italic;
+        font-size:.86rem;color:var(--tx);line-height:1.55;margin-bottom:.5rem;
+      }
+      #bf-prayer .pr-mine-answer{
+        background:rgba(34,197,94,.06);border-left:3px solid #22c55e;border-radius:0 8px 8px 0;
+        padding:.55rem .7rem;margin-bottom:.5rem;
+        font-size:.78rem;color:var(--tx2);font-style:italic;line-height:1.55;
+      }
+      #bf-prayer .pr-mine-answer strong{color:#22c55e;font-style:normal;}
+      #bf-prayer .pr-mine-actions{display:flex;gap:.4rem;flex-wrap:wrap;}
+      #bf-prayer .pr-mine-btn{
+        background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
+        color:var(--tx);border-radius:8px;padding:.32rem .65rem;
+        font-size:.66rem;font-weight:700;cursor:pointer;font-family:var(--fm);
+        letter-spacing:.04em;transition:all .15s;
+      }
+      #bf-prayer .pr-mine-btn:hover{background:rgba(255,255,255,.1);}
+      #bf-prayer .pr-mine-btn.go{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.32);color:#34d399;}
+      #bf-prayer .pr-mine-btn.del{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.25);color:#f87171;}
+      #bf-prayer .pr-mine-empty{
+        text-align:center;padding:2.5rem 1.2rem;
+        background:rgba(255,255,255,.02);border:1px dashed rgba(251,191,36,.22);
+        border-radius:14px;
+      }
+      #bf-prayer .pr-mine-empty-svg{width:90px;height:90px;margin:0 auto .9rem;color:rgba(251,191,36,.55);}
+      #bf-prayer .pr-mine-empty-svg svg{width:100%;height:100%;}
+      #bf-prayer .pr-mine-empty-title{font-family:'Bebas Neue',var(--fm);font-size:1.25rem;letter-spacing:.05em;color:#fbbf24;margin-bottom:.35rem;}
+      #bf-prayer .pr-mine-empty-sub{font-family:Georgia,serif;font-style:italic;font-size:.92rem;color:var(--tx2);line-height:1.55;margin-bottom:1rem;max-width:340px;margin-left:auto;margin-right:auto;}
+
+      /* ── Prayer Wall (warm cream sticky-note cards) ── */
+      #bf-prayer .pr-wall-intro{
+        background:linear-gradient(135deg,rgba(251,191,36,.10),rgba(251,191,36,.04));
+        border:1px solid rgba(251,191,36,.28);
+        border-radius:14px;padding:.95rem 1.1rem;margin-bottom:.85rem;
+      }
+      #bf-prayer .pr-wall-intro-eye{font-size:.7rem;font-weight:800;color:#fbbf24;letter-spacing:.14em;text-transform:uppercase;margin-bottom:.35rem;}
+      #bf-prayer .pr-wall-intro p{font-family:Georgia,serif;font-style:italic;font-size:.86rem;color:var(--tx2);line-height:1.55;margin:0;}
+      #bf-prayer .pr-wall-list{
+        column-count:2;column-gap:.7rem;column-fill:balance;
+      }
+      #bf-prayer .pr-wall-card{
+        break-inside:avoid;page-break-inside:avoid;
+        display:inline-block;width:100%;
+        background:#fffbeb;color:#3a2818;
+        border:1px solid rgba(180,120,20,.28);border-left:4px solid var(--pr-wall-color,#fbbf24);
+        border-radius:12px;padding:.85rem .95rem;margin-bottom:.7rem;
+        box-shadow:0 4px 14px rgba(0,0,0,.18);
+        font-family:var(--fm);
+        animation:prWallIn .55s ease both;
+      }
+      @keyframes prWallIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+      #bf-prayer .pr-wall-card-cat{
+        display:inline-block;
+        font-size:.56rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+        color:var(--pr-wall-color,#b45309);
+        background:rgba(180,120,20,.10);
+        border:1px solid var(--pr-wall-color,rgba(180,120,20,.3));
+        padding:.18rem .55rem;border-radius:99px;margin-bottom:.5rem;
+      }
+      #bf-prayer .pr-wall-card-text{
+        font-family:Georgia,'Times New Roman',serif;font-style:italic;
+        font-size:.92rem;line-height:1.55;color:#1a1233;margin-bottom:.6rem;
+      }
+      #bf-prayer .pr-wall-card-meta{
+        font-size:.62rem;color:#7c5a00;font-weight:600;letter-spacing:.04em;
+        margin-bottom:.55rem;
+      }
+      #bf-prayer .pr-wall-card-actions{display:flex;align-items:center;gap:.5rem;}
+      #bf-prayer .pr-praying-btn{
+        background:rgba(180,120,20,.10);border:1px solid rgba(180,120,20,.32);
+        color:#b45309;border-radius:99px;padding:.32rem .75rem;
+        font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);
+        display:inline-flex;align-items:center;gap:.35rem;
+        transition:all .15s;
+      }
+      #bf-prayer .pr-praying-btn:hover{background:rgba(180,120,20,.18);transform:translateY(-1px);}
+      #bf-prayer .pr-praying-btn.tapped{
+        background:#fbbf24;color:#0b1220;border-color:transparent;
+        animation:prPulse .65s ease;
+      }
+      @keyframes prPulse{0%{transform:scale(1);}40%{transform:scale(1.14);}100%{transform:scale(1);}}
+      #bf-prayer .pr-wall-loading,#bf-prayer .pr-wall-empty{
+        column-span:all;
+        text-align:center;padding:1.5rem 1rem;
+        color:var(--tx2);font-size:.84rem;font-style:italic;font-family:Georgia,serif;
+      }
+
+      /* ── How to Pray ── */
+      #bf-prayer .pr-section-hdr{margin:1.3rem 0 .7rem;}
+      #bf-prayer .pr-section-hdr:first-of-type{margin-top:.2rem;}
+      #bf-prayer .pr-section-eye{
+        font-family:var(--fm);font-size:.62rem;font-weight:800;
+        letter-spacing:.22em;text-transform:uppercase;
+        color:#fbbf24;opacity:.85;
+        display:block;margin-bottom:.3rem;
+      }
+      #bf-prayer .pr-section-title{
+        font-family:'Bebas Neue',var(--fm);font-size:1.35rem;
+        letter-spacing:.04em;color:#fff;line-height:1.05;
+      }
+      :root.light #bf-prayer .pr-section-title{color:#1a1b1e;}
+
+      /* ACTS: 4 cards, one per letter, color per spec */
+      #bf-prayer .pr-acts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.7rem;margin-bottom:1.2rem;}
+      #bf-prayer .pr-acts-card{
+        position:relative;overflow:hidden;
+        background:linear-gradient(160deg,var(--acts-hex,#fbbf24) 0%,rgba(10,13,26,.95) 100%);
+        border:1px solid var(--acts-hex,#fbbf24);border-radius:14px;
+        padding:1rem 1.05rem;
+        animation:prActsIn .55s ease both;animation-delay:var(--d,0s);opacity:0;
+      }
+      @keyframes prActsIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+      #bf-prayer .pr-acts-letter{
+        font-family:'Bebas Neue',var(--fm);font-size:3.2rem;line-height:.9;
+        color:#fff;letter-spacing:0;margin-bottom:.2rem;
+        text-shadow:0 4px 18px rgba(0,0,0,.5);
+      }
+      #bf-prayer .pr-acts-word{
+        font-family:var(--fm);font-size:.68rem;font-weight:800;
+        letter-spacing:.22em;text-transform:uppercase;
+        color:rgba(255,255,255,.92);margin-bottom:.55rem;
+      }
+      #bf-prayer .pr-acts-line{
+        font-family:'Bebas Neue',var(--fm);font-size:1rem;letter-spacing:.03em;
+        color:#fff;line-height:1.25;margin-bottom:.55rem;
+      }
+      #bf-prayer .pr-acts-explain{
+        font-family:var(--fm);font-size:.78rem;line-height:1.55;
+        color:rgba(255,255,255,.82);margin-bottom:.65rem;
+      }
+      #bf-prayer .pr-acts-example{
+        font-family:Georgia,serif;font-style:italic;font-size:.82rem;line-height:1.5;
+        color:#fff;background:rgba(0,0,0,.28);
+        border-left:3px solid rgba(255,255,255,.5);
+        border-radius:0 8px 8px 0;padding:.55rem .7rem;
+      }
+
+      /* 8 Types: card grid */
+      #bf-prayer .pr-types-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.6rem;margin-bottom:1.2rem;}
+      #bf-prayer .pr-type-card{
+        background:rgba(255,255,255,.04);
+        border:1px solid rgba(251,191,36,.18);
+        border-radius:14px;padding:.95rem 1.05rem;
+        transition:transform .18s,border-color .18s,box-shadow .18s;
+      }
+      #bf-prayer .pr-type-card:hover{
+        transform:translateY(-3px);
+        border-color:rgba(251,191,36,.45);
+        box-shadow:0 10px 24px rgba(251,191,36,.18);
+      }
+      #bf-prayer .pr-type-hdr{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;}
+      #bf-prayer .pr-type-icon{font-size:1.4rem;line-height:1;}
+      #bf-prayer .pr-type-name{font-family:'Bebas Neue',var(--fm);font-size:1.15rem;letter-spacing:.04em;color:#fff;}
+      :root.light #bf-prayer .pr-type-name{color:#1a1b1e;}
+      #bf-prayer .pr-type-one{
+        font-family:Georgia,serif;font-style:italic;font-size:.84rem;
+        color:rgba(254,243,199,.85);line-height:1.5;margin-bottom:.5rem;
+      }
+      :root.light #bf-prayer .pr-type-one{color:#3a2818;}
+      #bf-prayer .pr-type-long{font-family:var(--fm);font-size:.74rem;line-height:1.55;color:var(--tx2);margin-bottom:.55rem;}
+      #bf-prayer .pr-type-example{
+        font-family:Georgia,serif;font-style:italic;font-size:.78rem;line-height:1.5;
+        color:#fef3c7;background:rgba(251,191,36,.08);
+        border-left:3px solid #fbbf24;border-radius:0 8px 8px 0;padding:.45rem .65rem;
+        margin-bottom:.4rem;
+      }
+      :root.light #bf-prayer .pr-type-example{color:#3a2818;background:rgba(251,191,36,.14);}
+      #bf-prayer .pr-type-ref{font-size:.62rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#fbbf24;opacity:.85;}
+
+      /* Lectio Divina: practice verse box + 4 stepped cards */
+      #bf-prayer .pr-lectio-verse{
+        background:linear-gradient(135deg,rgba(251,191,36,.10),rgba(251,191,36,.04));
+        border:1px solid rgba(251,191,36,.28);border-left:4px solid #fbbf24;
+        border-radius:12px;padding:.9rem 1.1rem;margin-bottom:.7rem;
+      }
+      #bf-prayer .pr-lectio-verse-text{
+        font-family:Georgia,serif;font-style:italic;font-size:1.05rem;line-height:1.55;
+        color:#fef3c7;margin-bottom:.35rem;
+      }
+      :root.light #bf-prayer .pr-lectio-verse-text{color:#3a2818;}
+      #bf-prayer .pr-lectio-verse-ref{font-family:'Bebas Neue',var(--fm);font-size:.82rem;letter-spacing:.16em;color:#fbbf24;}
+      #bf-prayer .pr-lectio-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.6rem;margin-bottom:1rem;}
+      #bf-prayer .pr-lectio-card{
+        background:rgba(255,255,255,.04);
+        border:1px solid rgba(251,191,36,.18);
+        border-left:4px solid #fbbf24;
+        border-radius:12px;padding:.85rem .95rem;
+      }
+      #bf-prayer .pr-lectio-step-num{font-family:'Bebas Neue',var(--fm);font-size:.72rem;color:#fbbf24;letter-spacing:.18em;}
+      #bf-prayer .pr-lectio-step-name{font-family:'Bebas Neue',var(--fm);font-size:1.1rem;color:#fff;letter-spacing:.04em;line-height:1.15;margin-bottom:.1rem;}
+      :root.light #bf-prayer .pr-lectio-step-name{color:#1a1b1e;}
+      #bf-prayer .pr-lectio-step-latin{font-size:.66rem;color:var(--tx3);font-style:italic;margin-bottom:.4rem;}
+      #bf-prayer .pr-lectio-step-one{font-family:Georgia,serif;font-style:italic;font-size:.84rem;color:var(--tx2);line-height:1.5;margin-bottom:.4rem;}
+      #bf-prayer .pr-lectio-step-how{font-family:var(--fm);font-size:.76rem;line-height:1.55;color:var(--tx2);}
+
+      /* ── Prayer Examples ── */
+      #bf-prayer .pr-examples-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.7rem;margin-bottom:1rem;}
+      #bf-prayer .pr-example-card{
+        background:rgba(255,255,255,.04);border:1px solid rgba(251,191,36,.2);
+        border-radius:14px;padding:1rem 1.05rem;cursor:pointer;
+        transition:transform .2s,border-color .2s,box-shadow .2s;
+        animation:prExIn .5s ease both;
+      }
+      @keyframes prExIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+      #bf-prayer .pr-example-card:hover{
+        transform:translateY(-3px);
+        border-color:rgba(251,191,36,.55);
+        box-shadow:0 10px 26px rgba(251,191,36,.18);
+      }
+      #bf-prayer .pr-example-hdr{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;flex-wrap:wrap;}
+      #bf-prayer .pr-example-title{font-family:'Bebas Neue',var(--fm);font-size:1.1rem;color:#fff;letter-spacing:.04em;line-height:1.1;}
+      :root.light #bf-prayer .pr-example-title{color:#1a1b1e;}
+      #bf-prayer .pr-example-cat{
+        font-size:.56rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+        color:#fbbf24;background:rgba(251,191,36,.12);
+        border:1px solid rgba(251,191,36,.35);
+        padding:.18rem .5rem;border-radius:99px;margin-left:auto;
+      }
+      #bf-prayer .pr-example-preview{
+        font-family:Georgia,serif;font-style:italic;font-size:.86rem;color:var(--tx2);
+        line-height:1.55;margin-bottom:.55rem;
+      }
+      #bf-prayer .pr-example-cta{font-size:.74rem;font-weight:800;letter-spacing:.06em;color:#fbbf24;}
+
+      /* ── Who to Pray For ── */
+      #bf-prayer .pr-daily-prompt{
+        background:linear-gradient(135deg,rgba(251,191,36,.18),rgba(251,191,36,.04));
+        border:1px solid rgba(251,191,36,.4);border-left:4px solid #fbbf24;
+        border-radius:14px;padding:1rem 1.15rem;margin-bottom:.85rem;
+      }
+      #bf-prayer .pr-daily-eye{font-family:var(--fm);font-size:.64rem;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:#fbbf24;margin-bottom:.4rem;}
+      #bf-prayer .pr-daily-text{font-family:Georgia,serif;font-style:italic;font-size:1rem;line-height:1.55;color:#fef3c7;}
+      :root.light #bf-prayer .pr-daily-text{color:#3a2818;}
+      #bf-prayer .pr-who-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;}
+      #bf-prayer .pr-who-card{
+        background:rgba(255,255,255,.04);border:1px solid rgba(251,191,36,.18);
+        border-radius:14px;padding:.85rem 1rem;cursor:pointer;
+        transition:transform .18s,border-color .18s,box-shadow .18s;
+      }
+      #bf-prayer .pr-who-card:hover{transform:translateY(-2px);border-color:rgba(251,191,36,.45);box-shadow:0 8px 20px rgba(251,191,36,.16);}
+      #bf-prayer .pr-who-hdr{display:flex;align-items:center;gap:.5rem;margin-bottom:.35rem;}
+      #bf-prayer .pr-who-emoji{font-size:1.6rem;line-height:1;}
+      #bf-prayer .pr-who-name{font-family:'Bebas Neue',var(--fm);font-size:1.1rem;color:#fff;letter-spacing:.04em;}
+      :root.light #bf-prayer .pr-who-name{color:#1a1b1e;}
+      #bf-prayer .pr-who-prompt{font-family:Georgia,serif;font-style:italic;font-size:.82rem;color:var(--tx2);line-height:1.55;margin-bottom:.45rem;}
+      #bf-prayer .pr-who-toggle{font-size:.66rem;font-weight:800;letter-spacing:.06em;color:#fbbf24;}
+      #bf-prayer .pr-who-suggestions{display:none;margin-top:.55rem;padding-top:.6rem;border-top:1px solid rgba(251,191,36,.18);flex-direction:column;gap:.4rem;}
+      #bf-prayer .pr-who-card.open .pr-who-suggestions{display:flex;}
+      #bf-prayer .pr-who-card.open .pr-who-toggle::after{content:" ▴";}
+      #bf-prayer .pr-who-card:not(.open) .pr-who-toggle::after{content:" ▾";}
+      #bf-prayer .pr-who-sugg{
+        display:flex;align-items:flex-start;gap:.5rem;
+        background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);
+        border-radius:8px;padding:.5rem .65rem;
+        font-family:Georgia,serif;font-size:.78rem;line-height:1.5;color:var(--tx);
+      }
+      #bf-prayer .pr-who-sugg-text{flex:1;}
+      #bf-prayer .pr-who-sugg-add{
+        flex:0 0 auto;background:rgba(251,191,36,.16);border:1px solid rgba(251,191,36,.4);
+        color:#fbbf24;border-radius:6px;padding:.22rem .5rem;
+        font-size:.6rem;font-weight:800;cursor:pointer;font-family:var(--fm);white-space:nowrap;
+      }
+      #bf-prayer .pr-who-sugg-add:hover{background:rgba(251,191,36,.28);}
+
+      /* ── Mobile ── */
+      @media (max-width:560px){
+        #bf-prayer .pr-watermark{display:none;}
+        #bf-prayer .pr-stats{grid-template-columns:repeat(3,1fr);}
+        #bf-prayer .pr-wall-list{column-count:1;}
+        #bf-prayer .pr-who-grid{grid-template-columns:1fr;}
+      }
+
+      /* ── Reduced motion ── */
+      @media (prefers-reduced-motion:reduce){
+        #bf-prayer .pr-pane,#bf-prayer .pr-mine-card,#bf-prayer .pr-wall-card,
+        #bf-prayer .pr-acts-card,#bf-prayer .pr-example-card{animation:none !important;}
+      }
+
+      /* ── Compose modal status chips ── */
+      .pr-chip-c{
+        background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);
+        color:var(--tx2);border-radius:99px;padding:.3rem .8rem;
+        font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fm);
+      }
+      .pr-chip-c.active{background:#fbbf24;color:#0b1220;border-color:transparent;}
     </style>
 
+    <!-- Atmospheric watermark — praying hands silhouette ~3% opacity -->
+    <div class="pr-watermark">
+      <svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">
+        <!-- Two stylized hands pressed together, fingertips up -->
+        <g fill="currentColor">
+          <path d="M86 22 Q78 18 74 30 L70 110 Q64 130 56 145 Q48 170 50 210 Q52 240 95 250 L98 220 Q96 180 96 150 L98 110 Q100 60 98 30 Z"/>
+          <path d="M114 22 Q122 18 126 30 L130 110 Q136 130 144 145 Q152 170 150 210 Q148 240 105 250 L102 220 Q104 180 104 150 L102 110 Q100 60 102 30 Z"/>
+          <path d="M86 22 Q100 12 114 22 L108 36 Q100 30 92 36 Z"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Section header -->
     <div class="bf-section-hdr">
-      <div class="bf-eyebrow">REQUESTS · PRAISES · ANSWERED</div>
-      <div class="bf-title">Prayer</div>
-      <div class="bf-sub">A space to write what's on your heart, mark the answers as they come, and watch a longer story emerge over time.</div>
+      <div class="bf-eyebrow">TALK TO GOD</div>
+      <div class="bf-title">PRAYER</div>
+      <div class="bf-sub">Bring it all to Him. Mark the answers. Pray with others.</div>
     </div>
 
-    <!-- Daily prompt -->
-    <div class="pr-prompt">
-      <div class="pr-prompt-eyebrow">🙏 Today's Prayer Prompt</div>
-      <div class="pr-prompt-text" id="prPromptText">—</div>
-      <button class="pr-prompt-cta" onclick="prayerUsePrompt()">Pray About This</button>
+    <!-- Sub-tab navigation -->
+    <div class="pr-subtabs" role="tablist">
+      <button class="pr-subtab active" data-pr-sub="mine"     onclick="prSubTab('mine',this)">🙏 My Prayers</button>
+      <button class="pr-subtab"        data-pr-sub="wall"     onclick="prSubTab('wall',this)">🌍 Prayer Wall</button>
+      <button class="pr-subtab"        data-pr-sub="howto"    onclick="prSubTab('howto',this)">📖 How to Pray</button>
+      <button class="pr-subtab"        data-pr-sub="examples" onclick="prSubTab('examples',this)">📜 Examples</button>
+      <button class="pr-subtab"        data-pr-sub="who"      onclick="prSubTab('who',this)">👥 Who to Pray For</button>
     </div>
 
-    <!-- Stats -->
-    <div class="pr-stats">
-      <div class="pr-stat"><div class="pr-stat-num" id="prStatActive" style="color:#a78bfa;">0</div><div class="pr-stat-lbl">Active</div></div>
-      <div class="pr-stat"><div class="pr-stat-num" id="prStatAnswered" style="color:#10b981;">0</div><div class="pr-stat-lbl">Answered</div></div>
-      <div class="pr-stat"><div class="pr-stat-num" id="prStatTotal" style="color:#38bdf8;">0</div><div class="pr-stat-lbl">All Time</div></div>
-    </div>
-
-    <!-- Add prayer form -->
-    <div class="pr-form">
-      <textarea id="prInput" rows="3" placeholder="What are you praying for? What's on your heart today?" style="margin-bottom:.55rem;"></textarea>
-      <div class="pr-row">
-        <span class="pr-row-label">Type</span>
-        <button class="pr-chip active" data-grp="type" data-val="request" onclick="prayerSetChip('type','request',this)">🙏 Request</button>
-        <button class="pr-chip"        data-grp="type" data-val="praise"  onclick="prayerSetChip('type','praise',this)">🎉 Praise</button>
+    <!-- Pane: My Prayers (default) -->
+    <div id="pr-pane-mine" class="pr-pane">
+      <div class="pr-stats">
+        <div class="pr-stat"><div class="pr-stat-num" id="prStatActive"   style="color:#a78bfa;">0</div><div class="pr-stat-lbl">Active</div></div>
+        <div class="pr-stat"><div class="pr-stat-num" id="prStatAnswered" style="color:#22c55e;">0</div><div class="pr-stat-lbl">Answered</div></div>
+        <div class="pr-stat"><div class="pr-stat-num" id="prStatTotal"    style="color:#fbbf24;">0</div><div class="pr-stat-lbl">All Time</div></div>
       </div>
-      <div class="pr-row">
-        <span class="pr-row-label">For</span>
-        <button class="pr-chip active" data-grp="cat" data-val="self"   onclick="prayerSetChip('cat','self',this)">Self</button>
-        <button class="pr-chip"        data-grp="cat" data-val="family" onclick="prayerSetChip('cat','family',this)">Family</button>
-        <button class="pr-chip"        data-grp="cat" data-val="friend" onclick="prayerSetChip('cat','friend',this)">Friend</button>
-        <button class="pr-chip"        data-grp="cat" data-val="world"  onclick="prayerSetChip('cat','world',this)">World</button>
+      <div class="pr-mine-filters">
+        <button class="pr-chip-flt active" data-pr-flt="all"      onclick="prFilterMine('all',this)">All</button>
+        <button class="pr-chip-flt"        data-pr-flt="active"   onclick="prFilterMine('active',this)">Active</button>
+        <button class="pr-chip-flt"        data-pr-flt="ongoing"  onclick="prFilterMine('ongoing',this)">Ongoing</button>
+        <button class="pr-chip-flt"        data-pr-flt="answered" onclick="prFilterMine('answered',this)">Answered</button>
       </div>
-      <div class="pr-row">
-        <span class="pr-row-label">Privacy</span>
-        <button class="pr-chip active" data-grp="priv" data-val="private"   onclick="prayerSetChip('priv','private',this)">🔒 Private</button>
-        <button class="pr-chip"        data-grp="priv" data-val="family"    onclick="prayerSetChip('priv','family',this)">👨‍👩‍👧 Family <span style="font-size:.55rem;opacity:.7;">(F2-H)</span></button>
-        <button class="pr-chip"        data-grp="priv" data-val="community" onclick="prayerSetChip('priv','community',this)">⛪ Community <span style="font-size:.55rem;opacity:.7;">(soon)</span></button>
-      </div>
-      <button class="btn bp" onclick="addPrayerFromForm()" style="width:100%;margin-top:.3rem;">Save Prayer</button>
+      <button class="pr-add-btn" onclick="prOpenCompose()">＋ New Prayer</button>
+      <div id="prMineList" class="pr-mine-list"></div>
     </div>
 
-    <!-- Tabs -->
-    <div class="pr-tabs">
-      <button class="pr-tab active" data-pr-view="active"   onclick="setPrayerView('active',this)">Active <span id="prCountActive">0</span></button>
-      <button class="pr-tab"        data-pr-view="answered" onclick="setPrayerView('answered',this)">Answered <span id="prCountAnswered">0</span></button>
-      <button class="pr-tab"        data-pr-view="family"   onclick="setPrayerView('family',this)">👨‍👩‍👧 Family <span id="prCountFamily">0</span></button>
+    <!-- Pane: Prayer Wall -->
+    <div id="pr-pane-wall" class="pr-pane" style="display:none;">
+      <div class="pr-wall-intro">
+        <div class="pr-wall-intro-eye">🌍 You are not praying alone</div>
+        <p>Share a request anonymously, or carry someone else's to God. Every note here was written by a real person who needed prayer.</p>
+      </div>
+      <button class="pr-add-btn" onclick="prOpenWallPost()">＋ Post to the Wall</button>
+      <div id="prWallList" class="pr-wall-list">
+        <div class="pr-wall-loading">Loading prayer wall…</div>
+      </div>
     </div>
 
-    <div id="prList" class="pr-list"></div>
+    <!-- Pane: How to Pray (ACTS + 8 types + Lectio) -->
+    <div id="pr-pane-howto" class="pr-pane" style="display:none;">
+      <div class="pr-section-hdr">
+        <span class="pr-section-eye">FRAMEWORK</span>
+        <div class="pr-section-title">The ACTS of Prayer</div>
+      </div>
+      <div id="prActsGrid" class="pr-acts-grid"></div>
+
+      <div class="pr-section-hdr">
+        <span class="pr-section-eye">EIGHT WAYS</span>
+        <div class="pr-section-title">Types of Prayer</div>
+      </div>
+      <div id="prTypesGrid" class="pr-types-grid"></div>
+
+      <div class="pr-section-hdr">
+        <span class="pr-section-eye">ANCIENT PRACTICE · MADE SIMPLE</span>
+        <div class="pr-section-title">Lectio Divina</div>
+      </div>
+      <div class="pr-lectio-verse" id="prLectioVerse"></div>
+      <div id="prLectioGrid" class="pr-lectio-grid"></div>
+    </div>
+
+    <!-- Pane: Prayer Examples (12 templates) -->
+    <div id="pr-pane-examples" class="pr-pane" style="display:none;">
+      <div id="prExamplesGrid" class="pr-examples-grid"></div>
+    </div>
+
+    <!-- Pane: Who to Pray For (10 categories + daily rotation) -->
+    <div id="pr-pane-who" class="pr-pane" style="display:none;">
+      <div class="pr-daily-prompt" id="prDailyPrompt"></div>
+      <div id="prWhoGrid" class="pr-who-grid"></div>
+    </div>
   </div>
 
   <!-- ════ SERMON NOTE EDITOR MODAL (F2-H) ════ -->
@@ -5351,6 +5740,79 @@
       <div style="padding:.65rem 1.2rem 1rem;display:flex;gap:.4rem;justify-content:flex-end;">
         <button onclick="closePrayerAnswer()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.5rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Cancel</button>
         <button onclick="confirmPrayerAnswered()" style="background:linear-gradient(135deg,#10b981,#34d399);color:#0b1220;border:none;border-radius:10px;padding:.5rem .9rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">✅ Mark Answered</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ COMPOSE NEW PRAYER MODAL ════ -->
+  <div id="prComposeModal" class="mo" onclick="if(event.target===this)closePrCompose()">
+    <div class="md" style="max-width:520px;padding:0;">
+      <div style="padding:1rem 1.2rem .65rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid rgba(255,255,255,.06);">
+        <span style="font-size:1.2rem;">🙏</span>
+        <span style="font-family:var(--fh,var(--fm));font-size:1rem;font-weight:800;letter-spacing:.04em;color:var(--tx);">New Prayer</span>
+        <button onclick="closePrCompose()" style="margin-left:auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.78rem;font-weight:800;">✕</button>
+      </div>
+      <div style="padding:.85rem 1.2rem;max-height:60vh;overflow-y:auto;">
+        <div style="font-size:.6rem;color:var(--tx2);font-weight:800;text-transform:uppercase;letter-spacing:.14em;margin-bottom:.25rem;">Title (optional)</div>
+        <input type="text" id="prComposeTitle" placeholder="A short label so you can spot it later" style="width:100%;font-size:.86rem;margin-bottom:.6rem;">
+        <div style="font-size:.6rem;color:var(--tx2);font-weight:800;text-transform:uppercase;letter-spacing:.14em;margin-bottom:.25rem;">Prayer</div>
+        <textarea id="prComposeText" rows="5" placeholder="What are you bringing to God? Be specific." style="width:100%;font-size:.9rem;line-height:1.55;margin-bottom:.6rem;"></textarea>
+        <div style="font-size:.6rem;color:var(--tx2);font-weight:800;text-transform:uppercase;letter-spacing:.14em;margin-bottom:.3rem;">Category</div>
+        <div id="prComposeCats" style="display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.7rem;"></div>
+        <div style="font-size:.6rem;color:var(--tx2);font-weight:800;text-transform:uppercase;letter-spacing:.14em;margin-bottom:.3rem;">Status</div>
+        <div style="display:flex;flex-wrap:wrap;gap:.35rem;">
+          <button class="pr-chip-c active" data-val="active"  onclick="prSetComposeStatus('active',this)">Active</button>
+          <button class="pr-chip-c"        data-val="ongoing" onclick="prSetComposeStatus('ongoing',this)">Ongoing</button>
+        </div>
+      </div>
+      <div style="padding:.65rem 1.2rem 1rem;display:flex;gap:.4rem;justify-content:flex-end;">
+        <button onclick="closePrCompose()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.5rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Cancel</button>
+        <button onclick="prSubmitCompose()" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0b1220;border:none;border-radius:10px;padding:.5rem .95rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🙏 Save Prayer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ WALL POST MODAL ════ -->
+  <div id="prWallPostModal" class="mo" onclick="if(event.target===this)closePrWallPost()">
+    <div class="md" style="max-width:520px;padding:0;">
+      <div style="padding:1rem 1.2rem .65rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid rgba(255,255,255,.06);">
+        <span style="font-size:1.2rem;">🌍</span>
+        <span style="font-family:var(--fh,var(--fm));font-size:1rem;font-weight:800;letter-spacing:.04em;color:var(--tx);">Post to Prayer Wall</span>
+        <button onclick="closePrWallPost()" style="margin-left:auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.78rem;font-weight:800;">✕</button>
+      </div>
+      <div style="padding:.85rem 1.2rem;max-height:60vh;overflow-y:auto;">
+        <div style="font-family:Georgia,serif;font-style:italic;font-size:.82rem;color:var(--tx2);line-height:1.55;margin-bottom:.7rem;background:rgba(251,191,36,.06);border-left:3px solid #fbbf24;border-radius:0 8px 8px 0;padding:.55rem .75rem;">Posts are visible to other YourLife CC members. Names are never attached unless you opt out of anonymity below.</div>
+        <div style="font-size:.6rem;color:var(--tx2);font-weight:800;text-transform:uppercase;letter-spacing:.14em;margin-bottom:.25rem;">Prayer request</div>
+        <textarea id="prWallText" rows="4" placeholder="What can the community pray for today?" style="width:100%;font-size:.9rem;line-height:1.55;margin-bottom:.6rem;"></textarea>
+        <div style="font-size:.6rem;color:var(--tx2);font-weight:800;text-transform:uppercase;letter-spacing:.14em;margin-bottom:.3rem;">Category</div>
+        <div id="prWallCats" style="display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.7rem;"></div>
+        <label style="display:flex;align-items:center;gap:.5rem;font-size:.78rem;color:var(--tx2);cursor:pointer;">
+          <input type="checkbox" id="prWallAnon" checked style="width:auto;cursor:pointer;">
+          Post anonymously (recommended)
+        </label>
+      </div>
+      <div style="padding:.65rem 1.2rem 1rem;display:flex;gap:.4rem;justify-content:flex-end;">
+        <button onclick="closePrWallPost()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.5rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Cancel</button>
+        <button onclick="prSubmitWallPost()" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0b1220;border:none;border-radius:10px;padding:.5rem .95rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🌍 Post to Wall</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ PRAYER EXAMPLE DETAIL MODAL ════ -->
+  <div id="prExampleModal" class="mo" onclick="if(event.target===this)closePrExample()">
+    <div class="md" style="max-width:560px;padding:0;">
+      <div style="padding:1rem 1.2rem .65rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid rgba(255,255,255,.06);">
+        <span id="prExEye" style="font-size:.62rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#fbbf24;">—</span>
+        <button onclick="closePrExample()" style="margin-left:auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.78rem;font-weight:800;">✕</button>
+      </div>
+      <div style="padding:1rem 1.4rem 1.2rem;max-height:65vh;overflow-y:auto;">
+        <div id="prExTitle" style="font-family:'Bebas Neue',var(--fm);font-size:1.7rem;letter-spacing:.04em;color:#fff;line-height:1.05;margin-bottom:1rem;">—</div>
+        <div id="prExBody" style="font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:1rem;line-height:1.75;color:#fef3c7;background:rgba(255,255,255,.03);border-left:4px solid #fbbf24;border-radius:0 10px 10px 0;padding:1rem 1.2rem;margin-bottom:.75rem;">—</div>
+        <div id="prExRef" style="font-family:'Bebas Neue',var(--fm);font-size:.86rem;letter-spacing:.16em;color:#fbbf24;text-align:right;"></div>
+      </div>
+      <div style="padding:.65rem 1.2rem 1rem;display:flex;gap:.4rem;justify-content:flex-end;flex-wrap:wrap;">
+        <button onclick="prCopyExample()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.55rem .9rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">📋 Copy</button>
+        <button onclick="prMakeMyPrayer()" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0b1220;border:none;border-radius:10px;padding:.55rem .95rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🙏 Make This My Prayer</button>
       </div>
     </div>
   </div>
@@ -10927,6 +11389,7 @@
 <script src="/app/js/data/biblical-infographics.js"></script>
 <script src="/app/js/data/bible-stories.js"></script>
 <script src="/app/js/data/bible-flashcards.js"></script>
+<script src="/app/js/data/prayer-content.js"></script>
 <!-- Leaflet (F3-B) — open-source map library, MIT-licensed. Only loads when used. -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>

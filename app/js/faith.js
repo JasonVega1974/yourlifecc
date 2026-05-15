@@ -3547,11 +3547,13 @@ function toggleDailyScripture(btn){
 }
 
 // ═════════════════════════════════════════════════════════════
-// F2-E — PRAYER MODULE
-// Active / Answered prayer wall, 30-prompt daily rotation, privacy levels
-// (private / family / community), category tags. Reuses D.prayers from the
-// existing 🌟 Journey panel — schema is additive (category, privacy, answerText).
-// Family-shared rendering on Parent Hub lands in F2-H.
+// ═════════════════════════════════════════════════════════════
+// F2-E + Phase 7 — PRAYER MODULE (personal prayer sanctuary)
+// Five sub-tabs: My Prayers · Prayer Wall · How to Pray · Examples · Who to Pray For.
+// Content from /app/js/data/prayer-content.js (PRAYER_TYPES, PRAYER_EXAMPLES,
+// PRAY_FOR_CATEGORIES, ACTS_FRAMEWORK, LECTIO_DIVINA, LECTIO_PRACTICE_VERSE).
+// Data: D.prayers[] (legacy schema preserved + .title / .status fields)
+//       prayer_requests (Supabase) for the community wall.
 // ═════════════════════════════════════════════════════════════
 
 const PRAYER_PROMPTS = [
@@ -3587,145 +3589,142 @@ const PRAYER_PROMPTS = [
   "Pray that God's name would be honored in your day.",
 ];
 
-// Form state (chip selections) and list view state.
-let _prFormType    = 'request';     // request | praise
-let _prFormCat     = 'self';        // self | family | friend | world
-let _prFormPrivacy = 'private';     // private | family | community
-let _prView        = 'active';      // active | answered
-let _prAnswerId    = null;          // id of prayer being marked answered
+// ── State ─────────────────────────────────────────────────────
+let _prCurrentSub  = 'mine';            // mine | wall | howto | examples | who
+let _prMineFilter  = 'all';             // all | active | ongoing | answered
+let _prComposeCat  = 'self';            // chip selection in compose modal
+let _prComposeStatus = 'active';        // active | ongoing
+let _prWallCat     = 'general';         // chip selection in wall-post modal
+let _prAnswerId    = null;              // id of prayer being marked answered (legacy)
+let _prExampleOpenId = null;            // id of example currently in modal
 
 function getTodayPrayerPrompt(){
-  // Day-of-year mod 30 — every Apr 1 / Jul 1 / Oct 1 the cycle realigns. Same
-  // prompt for everyone same day, which is fine — prayer prompts aren't private.
-  const day = (typeof getDayOfYear === 'function') ? getDayOfYear() : Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+  const day = (typeof getDayOfYear === 'function') ? getDayOfYear() :
+    Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
   return PRAYER_PROMPTS[(day - 1 + PRAYER_PROMPTS.length) % PRAYER_PROMPTS.length];
 }
 
-function renderPrayerPanel(){
-  // Today's prompt
-  const promptEl = document.getElementById('prPromptText');
-  if(promptEl) promptEl.textContent = getTodayPrayerPrompt();
-
-  // Stats — counts surface above the form so they update as you add/answer.
-  const all = (D && D.prayers) || [];
-  const active   = all.filter(p => p && !p.answered);
-  const answered = all.filter(p => p && p.answered);
-  const setStat = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
-  setStat('prStatActive',   active.length);
-  setStat('prStatAnswered', answered.length);
-  setStat('prStatTotal',    all.length);
-  setStat('prCountActive',  active.length);
-  setStat('prCountAnswered', answered.length);
-
-  renderPrayerList();
+// Day-rotating "Today, pray for ..." prompt — cycles through PRAY_FOR_CATEGORIES.
+function getTodayWhoSuggestion(){
+  const cats = (typeof window !== 'undefined' && window.PRAY_FOR_CATEGORIES) || [];
+  if(!cats.length) return null;
+  const day = (typeof getDayOfYear === 'function') ? getDayOfYear() :
+    Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+  const cat = cats[(day - 1 + cats.length) % cats.length];
+  const idx = (day - 1 + cat.suggestions.length) % cat.suggestions.length;
+  return { cat: cat, suggestion: cat.suggestions[idx] };
 }
 
-function renderPrayerList(){
-  const el = document.getElementById('prList');
+// ── Sub-tab navigation ────────────────────────────────────────
+function prSubTab(sub, btn){
+  _prCurrentSub = sub;
+  document.querySelectorAll('#bf-prayer .pr-subtab').forEach(t => t.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  ['mine','wall','howto','examples','who'].forEach(s => {
+    const pane = document.getElementById('pr-pane-' + s);
+    if(pane) pane.style.display = (s === sub) ? '' : 'none';
+  });
+  if(sub === 'mine')         renderMyPrayersPane();
+  else if(sub === 'wall')    renderPrayerWallPane();
+  else if(sub === 'howto')   renderHowToPrayPane();
+  else if(sub === 'examples') renderPrayerExamplesPane();
+  else if(sub === 'who')     renderWhoToPrayPane();
+}
+
+// Entry point — called by bfTab('prayer').
+function renderPrayerPanel(){
+  // Default: refresh My Prayers + stats.
+  renderMyPrayersPane();
+  // If user has been on a non-default sub before, re-render that too so
+  // returning to the prayer tab feels stateful.
+  if(_prCurrentSub === 'wall')      renderPrayerWallPane();
+  else if(_prCurrentSub === 'howto')   renderHowToPrayPane();
+  else if(_prCurrentSub === 'examples') renderPrayerExamplesPane();
+  else if(_prCurrentSub === 'who')     renderWhoToPrayPane();
+}
+
+// ── My Prayers pane ───────────────────────────────────────────
+function renderMyPrayersPane(){
+  const all = (D && D.prayers) || [];
+  const setStat = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+  const active   = all.filter(p => p && !p.answered && p.status !== 'ongoing');
+  const ongoing  = all.filter(p => p && !p.answered && p.status === 'ongoing');
+  const answered = all.filter(p => p && p.answered);
+  setStat('prStatActive',   active.length + ongoing.length);
+  setStat('prStatAnswered', answered.length);
+  setStat('prStatTotal',    all.length);
+  renderMyPrayersList();
+}
+
+function renderMyPrayersList(){
+  const el = document.getElementById('prMineList');
   if(!el) return;
   const all = (D && D.prayers) || [];
   let items;
-  if(_prView === 'answered')      items = all.filter(p => p && p.answered);
-  else if(_prView === 'family')   items = all.filter(p => p && (p.privacy === 'family' || p.privacy === 'community'));
-  else                            items = all.filter(p => p && !p.answered);
-  // Newest first.
-  items = items.slice().sort((a,b) => {
+  if(_prMineFilter === 'active')        items = all.filter(p => p && !p.answered && p.status !== 'ongoing');
+  else if(_prMineFilter === 'ongoing')  items = all.filter(p => p && !p.answered && p.status === 'ongoing');
+  else if(_prMineFilter === 'answered') items = all.filter(p => p && p.answered);
+  else                                  items = all.slice();
+  items = items.sort((a,b) => {
     const ta = a.answered ? (a.answeredAt || a.answeredDate || a.date) : (a.date || '');
     const tb = b.answered ? (b.answeredAt || b.answeredDate || b.date) : (b.date || '');
     return String(tb).localeCompare(String(ta));
   });
-
-  // Family-tab count (used by the tab badge).
-  const famCount = all.filter(p => p && (p.privacy === 'family' || p.privacy === 'community')).length;
-  const fc = document.getElementById('prCountFamily');
-  if(fc) fc.textContent = famCount;
-
   if(!items.length){
-    let empty;
-    if(_prView === 'answered')    empty = 'No answered prayers yet — celebrate them as God shows up.';
-    else if(_prView === 'family') empty = 'No family-shared prayers yet. Set Privacy → 👨‍👩‍👧 Family when adding one.<br><small style="opacity:.65;">Cross-account family wall lands in F3.</small>';
-    else                          empty = 'No active prayers yet. Add one above to begin.';
-    el.innerHTML = `<div class="pr-empty">${empty}</div>`;
+    el.innerHTML = `
+      <div class="pr-mine-empty">
+        <div class="pr-mine-empty-svg">
+          <svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true">
+            <g>
+              <path d="M52 12 Q46 10 44 22 L42 70 Q38 84 32 92 Q26 110 28 128 Q30 138 60 138 L62 120 Q60 92 60 76 L62 30 Q63 18 60 12 Z"/>
+              <path d="M68 12 Q74 10 76 22 L78 70 Q82 84 88 92 Q94 110 92 128 Q90 138 60 138 L58 120 Q60 92 60 76 L58 30 Q57 18 60 12 Z"/>
+              <path d="M52 12 Q60 6 68 12 L64 22 Q60 18 56 22 Z"/>
+            </g>
+          </svg>
+        </div>
+        <div class="pr-mine-empty-title">YOUR PRAYERS MATTER</div>
+        <div class="pr-mine-empty-sub">Start your first one. Write what's on your heart — God is listening.</div>
+        <button class="pr-add-btn" style="max-width:240px;margin:0 auto;display:block;" onclick="prOpenCompose()">＋ Write Your First Prayer</button>
+      </div>`;
     return;
   }
-
   el.innerHTML = items.map(p => {
-    const type    = p.type || 'request';
-    const cat     = p.category || 'self';
-    const privacy = p.privacy  || 'private';
-    const accent  = (type === 'praise') ? '#10b981' : (privacy === 'family' ? '#fbbf24' : '#a78bfa');
-    const typeIcon = type === 'praise' ? '🎉' : '🙏';
-    const privIcon = privacy === 'family' ? '👨‍👩‍👧' : privacy === 'community' ? '⛪' : '🔒';
+    const status   = p.answered ? 'answered' : (p.status === 'ongoing' ? 'ongoing' : 'active');
+    const cat      = p.category || 'self';
     const created  = (p.date || '').slice(0,10);
-    const answered = p.answered;
     const ansDate  = (p.answeredAt || p.answeredDate || '').slice(0,10);
-    return `<div class="pr-item" style="border-left-color:${accent};">
-      <div class="pr-item-meta">
-        <span style="color:${accent};">${typeIcon} ${type === 'praise' ? 'Praise' : 'Request'}</span>
-        <span>· ${escapeHtml(cat)}</span>
-        <span>· ${privIcon} ${escapeHtml(privacy)}</span>
-        ${created ? '<span style="margin-left:auto;">'+created+'</span>' : ''}
+    const title    = p.title ? escapeHtml(p.title) : '';
+    return `<div class="pr-mine-card ${status}">
+      <div class="pr-mine-hdr">
+        <span class="pr-mine-status ${status}">${status === 'answered' ? '✓ Answered' : status}</span>
+        <span class="pr-mine-cat">${escapeHtml(cat)}</span>
+        <span class="pr-mine-date">${status === 'answered' && ansDate ? ansDate : created}</span>
       </div>
-      <div class="pr-item-text">${escapeHtml(p.text || '')}</div>
-      ${answered && p.answerText ? '<div class="pr-item-answer"><strong style="color:#10b981;font-style:normal;">✅ Answered '+(ansDate||'')+'</strong> — '+escapeHtml(p.answerText)+'</div>' : ''}
-      ${answered && !p.answerText ? '<div class="pr-item-answer" style="font-style:normal;"><strong style="color:#10b981;">✅ Answered '+(ansDate||'')+'</strong></div>' : ''}
-      <div class="pr-item-actions">
-        ${!answered ? `<button class="pr-item-btn" onclick="openPrayerAnswer(${p.id})">✅ Mark Answered</button>` : ''}
-        <button class="pr-item-btn del" onclick="deletePrayerItem(${p.id})">🗑 Delete</button>
+      ${title ? `<div class="pr-mine-title">${title}</div>` : ''}
+      <div class="pr-mine-text">${escapeHtml(p.text || '')}</div>
+      ${p.answered && p.answerText ? `<div class="pr-mine-answer"><strong>How God answered:</strong> ${escapeHtml(p.answerText)}</div>` : ''}
+      <div class="pr-mine-actions">
+        ${!p.answered ? `<button class="pr-mine-btn go" onclick="openPrayerAnswer(${p.id})">✅ Mark Answered</button>` : ''}
+        ${!p.answered ? `<button class="pr-mine-btn" onclick="prToggleOngoing(${p.id})">${p.status === 'ongoing' ? '↻ Mark Active' : '↻ Mark Ongoing'}</button>` : ''}
+        <button class="pr-mine-btn del" onclick="deletePrayerItem(${p.id})">🗑 Delete</button>
       </div>
     </div>`;
   }).join('');
 }
 
-function setPrayerView(view, btn){
-  _prView = view;
-  document.querySelectorAll('#bf-prayer .pr-tab').forEach(t => t.classList.remove('active'));
+function prFilterMine(filter, btn){
+  _prMineFilter = filter;
+  document.querySelectorAll('#bf-prayer .pr-mine-filters .pr-chip-flt').forEach(c => c.classList.remove('active'));
   if(btn) btn.classList.add('active');
-  renderPrayerList();
+  renderMyPrayersList();
 }
 
-function prayerSetChip(grp, val, btn){
-  if(grp === 'type')      _prFormType = val;
-  else if(grp === 'cat')  _prFormCat  = val;
-  else if(grp === 'priv') _prFormPrivacy = val;
-  document.querySelectorAll(`#bf-prayer .pr-chip[data-grp="${grp}"]`).forEach(c => c.classList.remove('active'));
-  if(btn) btn.classList.add('active');
-}
-
-// "Pray About This" CTA on the daily prompt — pre-fills the textarea.
-function prayerUsePrompt(){
-  const ta = document.getElementById('prInput');
-  if(!ta) return;
-  if(!ta.value.trim()) ta.value = getTodayPrayerPrompt() + '\n\n';
-  ta.focus();
-  ta.scrollIntoView({ behavior:'smooth', block:'center' });
-}
-
-function addPrayerFromForm(){
-  const ta = document.getElementById('prInput');
-  const text = ta ? ta.value.trim() : '';
-  if(!text){ showToast('Write your prayer first'); return; }
-  if(!D.prayers) D.prayers = [];
-  const now = new Date().toISOString();
-  D.prayers.push({
-    id: Date.now(),
-    text: text,
-    type: _prFormType,
-    category: _prFormCat,
-    privacy: _prFormPrivacy,
-    date: now,
-    answered: false,
-  });
-  // Streak protection — counts as today's faith action.
-  if(!D.scrReadDays) D.scrReadDays = {};
-  D.scrReadDays[new Date().toISOString().slice(0,10)] = true;
-  if(ta) ta.value = '';
+function prToggleOngoing(id){
+  const p = (D.prayers || []).find(x => x && x.id === id);
+  if(!p) return;
+  p.status = (p.status === 'ongoing') ? 'active' : 'ongoing';
   save();
-  if(typeof logActivity === 'function') logActivity('faith', _prFormType === 'praise' ? 'Praise report' : 'Prayer request');
-  if(typeof renderFaithJourney === 'function') renderFaithJourney(); // legacy Journey list
-  if(typeof renderFaithHome === 'function') renderFaithHome();
-  renderPrayerPanel();
-  showToast(_prFormType === 'praise' ? 'Praise saved 🎉' : 'Prayer saved 🙏');
+  renderMyPrayersPane();
 }
 
 function deletePrayerItem(id){
@@ -3735,9 +3734,103 @@ function deletePrayerItem(id){
   save();
   if(typeof renderFaithJourney === 'function') renderFaithJourney();
   if(typeof renderFaithHome === 'function') renderFaithHome();
-  renderPrayerPanel();
+  renderMyPrayersPane();
 }
 
+// ── Compose modal ─────────────────────────────────────────────
+const _PR_COMPOSE_CATS = [
+  { key:'self',    name:'Self',    emoji:'🪞' },
+  { key:'family',  name:'Family',  emoji:'🏠' },
+  { key:'friend',  name:'Friend',  emoji:'🤝' },
+  { key:'church',  name:'Church',  emoji:'⛪' },
+  { key:'leaders', name:'Leaders', emoji:'🏛️' },
+  { key:'nation',  name:'Nation',  emoji:'🗺️' },
+  { key:'world',   name:'World',   emoji:'🌍' },
+];
+
+function prOpenCompose(prefill){
+  _prComposeCat = (prefill && prefill.category) || 'self';
+  _prComposeStatus = 'active';
+  const titleEl = document.getElementById('prComposeTitle');
+  const textEl  = document.getElementById('prComposeText');
+  if(titleEl) titleEl.value = (prefill && prefill.title) || '';
+  if(textEl)  textEl.value  = (prefill && prefill.text) || '';
+  _prRenderComposeCats();
+  // Reset status chips
+  document.querySelectorAll('#prComposeModal .pr-chip-c').forEach(c => {
+    c.classList.toggle('active', c.getAttribute('data-val') === _prComposeStatus);
+  });
+  if(typeof openModal === 'function') openModal('prComposeModal');
+  setTimeout(() => { if(textEl) textEl.focus(); }, 80);
+}
+
+function _prRenderComposeCats(){
+  const host = document.getElementById('prComposeCats');
+  if(!host) return;
+  host.innerHTML = _PR_COMPOSE_CATS.map(c =>
+    `<button class="pr-chip-c ${c.key === _prComposeCat ? 'active' : ''}" data-val="${c.key}" onclick="prSetComposeCat('${c.key}',this)">${c.emoji} ${c.name}</button>`
+  ).join('');
+}
+
+function prSetComposeCat(cat, btn){
+  _prComposeCat = cat;
+  document.querySelectorAll('#prComposeCats .pr-chip-c').forEach(c => c.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
+function prSetComposeStatus(status, btn){
+  _prComposeStatus = status;
+  document.querySelectorAll('#prComposeModal .pr-chip-c[data-val]').forEach(c => {
+    if(c.parentElement && c.parentElement.id !== 'prComposeCats'){
+      c.classList.toggle('active', c.getAttribute('data-val') === status);
+    }
+  });
+  // simpler fallback — re-mark inside the status row only
+  if(btn){
+    const row = btn.parentElement;
+    if(row) row.querySelectorAll('.pr-chip-c').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+  }
+}
+
+function closePrCompose(){
+  if(typeof closeModal === 'function') closeModal('prComposeModal');
+}
+
+function prSubmitCompose(){
+  const textEl = document.getElementById('prComposeText');
+  const titleEl = document.getElementById('prComposeTitle');
+  const text = textEl ? textEl.value.trim() : '';
+  if(!text){
+    if(typeof showToast === 'function') showToast('Write your prayer first');
+    if(textEl) textEl.focus();
+    return;
+  }
+  if(!D.prayers) D.prayers = [];
+  const now = new Date().toISOString();
+  D.prayers.push({
+    id: Date.now(),
+    title: titleEl ? titleEl.value.trim() : '',
+    text: text,
+    type: 'request',
+    category: _prComposeCat,
+    privacy: 'private',
+    status: _prComposeStatus,
+    date: now,
+    answered: false,
+  });
+  if(!D.scrReadDays) D.scrReadDays = {};
+  D.scrReadDays[now.slice(0,10)] = true;
+  save();
+  if(typeof logActivity === 'function') logActivity('faith', 'Prayer added');
+  if(typeof renderFaithJourney === 'function') renderFaithJourney();
+  if(typeof renderFaithHome === 'function') renderFaithHome();
+  renderMyPrayersPane();
+  closePrCompose();
+  if(typeof showToast === 'function') showToast('Prayer saved 🙏');
+}
+
+// ── Mark Answered (existing flow + confetti) ─────────────────
 function openPrayerAnswer(id){
   _prAnswerId = id;
   const p = (D.prayers || []).find(x => x && x.id === id);
@@ -3761,18 +3854,364 @@ function confirmPrayerAnswered(){
   p.answered    = true;
   p.answerText  = story ? story.value.trim() : '';
   p.answeredAt  = new Date().toISOString();
-  // Keep legacy field for older codepaths.
   p.answeredDate = p.answeredAt.slice(0,10);
   save();
   if(typeof logActivity === 'function') logActivity('faith', 'Prayer answered');
   if(typeof renderFaithJourney === 'function') renderFaithJourney();
   if(typeof renderFaithHome === 'function') renderFaithHome();
-  renderPrayerPanel();
+  renderMyPrayersPane();
   closePrayerAnswer();
-  showToast('Prayer answered! ✅ +5 XP');
+  // 🎉 confetti + toast
+  if(typeof launchSideConfetti === 'function') launchSideConfetti();
+  if(typeof showToast === 'function') showToast('Prayer answered! 🎉 +5 XP');
   D.scrPoints = (D.scrPoints || 0) + 5;
   save();
 }
+
+// ── Prayer Wall pane (Supabase prayer_requests, privacy='community') ──
+async function renderPrayerWallPane(){
+  const el = document.getElementById('prWallList');
+  if(!el) return;
+  el.innerHTML = '<div class="pr-wall-loading">Loading prayer wall…</div>';
+  let rows = [];
+  try {
+    const supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+    if(supa){
+      const { data, error } = await supa
+        .from('prayer_requests')
+        .select('id, text, category, created_at')
+        .eq('privacy', 'community')
+        .order('created_at', { ascending: false })
+        .limit(60);
+      if(error) console.warn('[wall] fetch error', error);
+      rows = data || [];
+    }
+  } catch(e){ console.warn('[wall] failed', e); }
+  if(!rows.length){
+    el.innerHTML = `
+      <div class="pr-wall-empty">
+        The wall is quiet right now. Be the first to post — your request matters, and someone will pray.
+      </div>`;
+    return;
+  }
+  // Color per category — mirrors PRAY_FOR_CATEGORIES emoji set.
+  const catColor = {
+    family:'#fb923c', friends:'#38bdf8', enemies:'#a78bfa',
+    leaders:'#fbbf24', church:'#f472b6', nation:'#22c55e',
+    'the-lost':'#fbbf24', 'the-suffering':'#ef4444',
+    yourself:'#a78bfa', 'the-world':'#06b6d4',
+    self:'#a78bfa', friend:'#38bdf8', world:'#06b6d4', general:'#fbbf24',
+  };
+  el.innerHTML = rows.map((r, i) => {
+    const color = catColor[r.category] || '#fbbf24';
+    const stamp = _prRelativeTime(r.created_at);
+    const localPrayedKey = 'ylcc_prayed_' + r.id;
+    const alreadyPrayed = typeof localStorage !== 'undefined' && localStorage.getItem(localPrayedKey);
+    return `<div class="pr-wall-card" style="--pr-wall-color:${color};animation-delay:${(i * 60)}ms;">
+      <span class="pr-wall-card-cat">${escapeHtml(r.category || 'prayer')}</span>
+      <div class="pr-wall-card-text">${escapeHtml(r.text || '')}</div>
+      <div class="pr-wall-card-meta">— Anonymous · ${stamp}</div>
+      <div class="pr-wall-card-actions">
+        <button class="pr-praying-btn ${alreadyPrayed ? 'tapped' : ''}" data-pr-wall="${escapeHtml(r.id)}" onclick="prWallPrayed('${escapeHtml(r.id)}',this)">
+          <span>🙏</span><span class="pr-praying-label">${alreadyPrayed ? 'Prayed' : 'Praying'}</span>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function _prRelativeTime(iso){
+  if(!iso) return 'just now';
+  const t = new Date(iso).getTime();
+  const diff = Date.now() - t;
+  const m = Math.floor(diff / 60000);
+  if(m < 1) return 'just now';
+  if(m < 60) return m + ' min ago';
+  const h = Math.floor(m / 60);
+  if(h < 24) return h + ' hr ago';
+  const d = Math.floor(h / 24);
+  if(d < 7) return d + ' day' + (d===1?'':'s') + ' ago';
+  return new Date(iso).toLocaleDateString();
+}
+
+function prWallPrayed(id, btn){
+  if(!btn) return;
+  if(btn.classList.contains('tapped')) return;
+  btn.classList.add('tapped');
+  const lbl = btn.querySelector('.pr-praying-label');
+  if(lbl) lbl.textContent = 'Prayed';
+  try { localStorage.setItem('ylcc_prayed_' + id, '1'); } catch(_){}
+  if(typeof showToast === 'function') showToast('Praying with you 🙏');
+}
+
+// Wall post modal
+function prOpenWallPost(){
+  _prWallCat = 'general';
+  const textEl = document.getElementById('prWallText');
+  if(textEl) textEl.value = '';
+  const host = document.getElementById('prWallCats');
+  if(host){
+    const cats = (typeof window !== 'undefined' && window.PRAY_FOR_CATEGORIES) || [];
+    const list = [{ key:'general', name:'General', emoji:'🙏' }].concat(
+      cats.map(c => ({ key: c.key, name: c.name, emoji: c.emoji }))
+    );
+    host.innerHTML = list.map(c =>
+      `<button class="pr-chip-c ${c.key === _prWallCat ? 'active' : ''}" data-val="${c.key}" onclick="prSetWallCat('${c.key}',this)">${c.emoji} ${c.name}</button>`
+    ).join('');
+  }
+  if(typeof openModal === 'function') openModal('prWallPostModal');
+  setTimeout(() => { if(textEl) textEl.focus(); }, 80);
+}
+
+function prSetWallCat(cat, btn){
+  _prWallCat = cat;
+  document.querySelectorAll('#prWallCats .pr-chip-c').forEach(c => c.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
+function closePrWallPost(){
+  if(typeof closeModal === 'function') closeModal('prWallPostModal');
+}
+
+async function prSubmitWallPost(){
+  const textEl = document.getElementById('prWallText');
+  const text = textEl ? textEl.value.trim() : '';
+  if(!text){
+    if(typeof showToast === 'function') showToast('Write your prayer first');
+    if(textEl) textEl.focus();
+    return;
+  }
+  const supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+  if(!supa){
+    if(typeof showToast === 'function') showToast('Sign-in required to post to the wall');
+    return;
+  }
+  try {
+    const { data: sess } = await supa.auth.getUser();
+    const uid = sess && sess.user && sess.user.id;
+    if(!uid){
+      if(typeof showToast === 'function') showToast('Sign in to post to the wall');
+      return;
+    }
+    const { error } = await supa.from('prayer_requests').insert({
+      user_id: uid,
+      text: text,
+      type: 'request',
+      category: _prWallCat,
+      privacy: 'community',
+    });
+    if(error){
+      console.warn('[wall] insert error', error);
+      if(typeof showToast === 'function') showToast('Could not post — try again');
+      return;
+    }
+    if(typeof logActivity === 'function') logActivity('faith', 'Prayer wall post');
+    closePrWallPost();
+    if(typeof showToast === 'function') showToast('Posted to the wall 🌍');
+    renderPrayerWallPane();
+  } catch(e){
+    console.warn('[wall] failed', e);
+    if(typeof showToast === 'function') showToast('Could not post — try again');
+  }
+}
+
+// ── How to Pray pane (ACTS + 8 types + Lectio Divina) ─────────
+function renderHowToPrayPane(){
+  // ACTS framework
+  const actsEl = document.getElementById('prActsGrid');
+  const acts = (typeof window !== 'undefined' && window.ACTS_FRAMEWORK) || [];
+  if(actsEl){
+    actsEl.innerHTML = acts.map((a, i) =>
+      `<div class="pr-acts-card" style="--acts-hex:${a.hex};--d:${i * 0.12}s;">
+        <div class="pr-acts-letter">${escapeHtml(a.letter)}</div>
+        <div class="pr-acts-word">${escapeHtml(a.word)}</div>
+        <div class="pr-acts-line">${escapeHtml(a.oneLine)}</div>
+        <div class="pr-acts-explain">${escapeHtml(a.explanation)}</div>
+        <div class="pr-acts-example">${escapeHtml(a.examplePrayer)}</div>
+      </div>`
+    ).join('');
+  }
+  // 8 Types of Prayer
+  const typesEl = document.getElementById('prTypesGrid');
+  const types = (typeof window !== 'undefined' && window.PRAYER_TYPES) || [];
+  if(typesEl){
+    typesEl.innerHTML = types.map(t =>
+      `<div class="pr-type-card">
+        <div class="pr-type-hdr">
+          <span class="pr-type-icon">${escapeHtml(t.icon)}</span>
+          <span class="pr-type-name">${escapeHtml(t.name)}</span>
+        </div>
+        <div class="pr-type-one">${escapeHtml(t.oneLineDesc)}</div>
+        <div class="pr-type-long">${escapeHtml(t.longDesc)}</div>
+        <div class="pr-type-example">"${escapeHtml(t.exampleSentence)}"</div>
+        <div class="pr-type-ref">${escapeHtml(t.scriptureRef)}</div>
+      </div>`
+    ).join('');
+  }
+  // Lectio Divina practice verse + 4 steps
+  const verseEl = document.getElementById('prLectioVerse');
+  const lectioVerse = (typeof window !== 'undefined' && window.LECTIO_PRACTICE_VERSE) || null;
+  if(verseEl && lectioVerse){
+    verseEl.innerHTML =
+      `<div class="pr-lectio-verse-text">"${escapeHtml(lectioVerse.text)}"</div>
+       <div class="pr-lectio-verse-ref">— ${escapeHtml(lectioVerse.ref)}</div>
+       <div style="font-size:.7rem;color:var(--tx2);margin-top:.4rem;font-style:italic;">Practice the four movements below on this single verse.</div>`;
+  }
+  const lectioEl = document.getElementById('prLectioGrid');
+  const lectio = (typeof window !== 'undefined' && window.LECTIO_DIVINA) || [];
+  if(lectioEl){
+    lectioEl.innerHTML = lectio.map(s =>
+      `<div class="pr-lectio-card">
+        <div class="pr-lectio-step-num">STEP ${s.step}</div>
+        <div class="pr-lectio-step-name">${escapeHtml(s.englishName)}</div>
+        <div class="pr-lectio-step-latin">${escapeHtml(s.latinName)}</div>
+        <div class="pr-lectio-step-one">${escapeHtml(s.oneLine)}</div>
+        <div class="pr-lectio-step-how">${escapeHtml(s.howTo)}</div>
+      </div>`
+    ).join('');
+  }
+}
+
+// ── Prayer Examples pane (12 templates) ───────────────────────
+function renderPrayerExamplesPane(){
+  const el = document.getElementById('prExamplesGrid');
+  const examples = (typeof window !== 'undefined' && window.PRAYER_EXAMPLES) || [];
+  if(!el) return;
+  el.innerHTML = examples.map((e, i) =>
+    `<div class="pr-example-card" style="animation-delay:${(i * 50)}ms;" onclick="prOpenExample('${escapeHtml(e.id)}')">
+      <div class="pr-example-hdr">
+        <div class="pr-example-title">${escapeHtml(e.title)}</div>
+        <span class="pr-example-cat">${escapeHtml(e.category)}</span>
+      </div>
+      <div class="pr-example-preview">${escapeHtml(e.previewLine)}</div>
+      <div class="pr-example-cta">Read full →</div>
+    </div>`
+  ).join('');
+}
+
+function prOpenExample(id){
+  const examples = (typeof window !== 'undefined' && window.PRAYER_EXAMPLES) || [];
+  const ex = examples.find(x => x && x.id === id);
+  if(!ex) return;
+  _prExampleOpenId = id;
+  const eye   = document.getElementById('prExEye');
+  const title = document.getElementById('prExTitle');
+  const body  = document.getElementById('prExBody');
+  const ref   = document.getElementById('prExRef');
+  if(eye)   eye.textContent   = (ex.category || '').toString().toUpperCase();
+  if(title) title.textContent = ex.title;
+  if(body)  body.textContent  = ex.fullPrayer;
+  if(ref)   ref.textContent   = ex.scriptureAnchor || '';
+  if(typeof openModal === 'function') openModal('prExampleModal');
+}
+
+function closePrExample(){
+  if(typeof closeModal === 'function') closeModal('prExampleModal');
+}
+
+function prCopyExample(){
+  if(!_prExampleOpenId) return;
+  const examples = (typeof window !== 'undefined' && window.PRAYER_EXAMPLES) || [];
+  const ex = examples.find(x => x && x.id === _prExampleOpenId);
+  if(!ex) return;
+  const txt = ex.fullPrayer + '\n— ' + (ex.scriptureAnchor || '');
+  try {
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt);
+      if(typeof showToast === 'function') showToast('Prayer copied 📋');
+      return;
+    }
+  } catch(_){}
+  // Fallback
+  const ta = document.createElement('textarea');
+  ta.value = txt; document.body.appendChild(ta);
+  ta.select(); try { document.execCommand('copy'); } catch(_){}
+  document.body.removeChild(ta);
+  if(typeof showToast === 'function') showToast('Prayer copied 📋');
+}
+
+function prMakeMyPrayer(){
+  if(!_prExampleOpenId) return;
+  const examples = (typeof window !== 'undefined' && window.PRAYER_EXAMPLES) || [];
+  const ex = examples.find(x => x && x.id === _prExampleOpenId);
+  if(!ex) return;
+  closePrExample();
+  // Map example category to a compose-modal category where possible.
+  const catMap = {
+    morning:'self', evening:'self', anxiety:'self', surrender:'self',
+    gratitude:'self', healing:'self', guidance:'self', strength:'self',
+    family:'family', enemies:'self', nation:'nation',
+    'lost-loved-ones':'friend',
+  };
+  prOpenCompose({
+    title: ex.title,
+    text: ex.fullPrayer,
+    category: catMap[ex.category] || 'self',
+  });
+}
+
+// ── Who to Pray For pane (10 categories + daily rotation) ──────
+function renderWhoToPrayPane(){
+  const daily = getTodayWhoSuggestion();
+  const dailyEl = document.getElementById('prDailyPrompt');
+  if(dailyEl && daily){
+    dailyEl.innerHTML =
+      `<div class="pr-daily-eye">Today, pray for ${escapeHtml(daily.cat.name)}</div>
+       <div class="pr-daily-text">${escapeHtml(daily.suggestion)}</div>`;
+  }
+  const gridEl = document.getElementById('prWhoGrid');
+  const cats = (typeof window !== 'undefined' && window.PRAY_FOR_CATEGORIES) || [];
+  if(gridEl){
+    gridEl.innerHTML = cats.map(c =>
+      `<div class="pr-who-card" data-who-key="${escapeHtml(c.key)}" onclick="prToggleWho('${escapeHtml(c.key)}',this)">
+        <div class="pr-who-hdr">
+          <span class="pr-who-emoji">${escapeHtml(c.emoji)}</span>
+          <span class="pr-who-name">${escapeHtml(c.name)}</span>
+        </div>
+        <div class="pr-who-prompt">${escapeHtml(c.prompt)}</div>
+        <div class="pr-who-toggle">Suggestions</div>
+        <div class="pr-who-suggestions">
+          ${c.suggestions.map(s =>
+            `<div class="pr-who-sugg">
+              <span class="pr-who-sugg-text">${escapeHtml(s)}</span>
+              <button class="pr-who-sugg-add" onclick="event.stopPropagation();prAddSuggestionToMine('${escapeHtml(c.key)}',${JSON.stringify(s).replace(/"/g,'&quot;')})">＋ Add</button>
+            </div>`
+          ).join('')}
+        </div>
+      </div>`
+    ).join('');
+  }
+}
+
+function prToggleWho(key, el){
+  if(!el) return;
+  el.classList.toggle('open');
+}
+
+function prAddSuggestionToMine(catKey, suggestionText){
+  prOpenCompose({
+    title: '',
+    text: suggestionText,
+    category: catKey,
+  });
+}
+
+// ── Backward-compat shims for legacy callers ──────────────────
+// Older code paths (init.js, faith home tile, etc.) may still call:
+//   addPrayerFromForm()  — replaced by prSubmitCompose / prOpenCompose
+//   prayerUsePrompt()    — open compose with today's rotating prompt
+//   setPrayerView()      — replaced by prFilterMine
+//   prayerSetChip()      — no-op (legacy form is gone)
+function addPrayerFromForm(){ prOpenCompose(); }
+function prayerUsePrompt(){
+  const w = getTodayWhoSuggestion();
+  prOpenCompose({ text: w ? w.suggestion : getTodayPrayerPrompt(), category: (w && w.cat && w.cat.key) || 'self' });
+}
+function setPrayerView(view){
+  if(view === 'active' || view === 'answered') prFilterMine(view, null);
+  prSubTab('mine', document.querySelector('#bf-prayer .pr-subtab[data-pr-sub="mine"]'));
+}
+function prayerSetChip(/* legacy */){}
 
 // ═════════════════════════════════════════════════════════════
 // F2-F — MEMORY VERSES + SPACED REPETITION (SM-2-lite)
