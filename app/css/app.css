@@ -4516,6 +4516,7 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
     display:inline-flex !important;
   }
 }
+@media (min-width:861px){ #bottomTabBar{ display:none !important; } }
 
 /* ── Tab landing card grid ────────────────────────────────── */
 .tab-landing{
@@ -5105,9 +5106,8 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 :root.light #bf-prayer .pr-add-btn:hover,
 :root.light .fo-hero-cta:hover,
 :root.light #lessonModal .lm-quiz-btn:hover{
-  background:#78350f !important;
-  color:#ffffff !important;
-  box-shadow:0 8px 24px rgba(146,64,14,.4) !important;
+  background:rgba(0,0,0,.08) !important;
+  box-shadow:none !important;
 }
 
 /* Today's verse hero card — gold left-border / glow → amber */
@@ -5140,23 +5140,23 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
   border-color:#92400e !important;
 }
 :root.light #bf-prayer .pr-praying-btn:hover{
-  background:#78350f !important;
+  background:rgba(0,0,0,.08) !important;
 }
 
-/* Active sub-tab pill — gold gradient becomes solid amber with white text */
+/* Active sub-tab pill */
 :root.light #bf-prayer .pr-subtab.active{
-  background:#92400e !important;
+  background:rgba(0,0,0,.08) !important;
   background-image:none !important;
-  color:#ffffff !important;
-  box-shadow:0 4px 14px rgba(146,64,14,.32) !important;
+  color:#1a1b1e !important;
+  box-shadow:none !important;
 }
 
 /* Active filter chips in faith surfaces */
 :root.light #bf-academy .ac-chip.active,
 :root.light .pr-chip-c.active{
-  background:#92400e !important;
+  background:rgba(0,0,0,.08) !important;
   background-image:none !important;
-  color:#ffffff !important;
+  color:#1a1b1e !important;
 }
 
 /* ── Story Player — keep cinematic dark even in light mode ── */

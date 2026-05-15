@@ -5206,7 +5206,6 @@ function renderFeaturedAcademy(){
   if(!grid) return;
   const allLessons = _acFeatured();
   const cats = _acCats();
-  const photos = _acCatPhotos();
   // Filter by active category pill (defaults to 'all').
   const filter = _acActiveFilter || 'all';
   const lessons = filter === 'all'
@@ -5220,25 +5219,17 @@ function renderFeaturedAcademy(){
     const cat = cats[l.category] || { label:'Lesson', color:'#fbbf24', soft:'rgba(251,191,36,', icon:'📖' };
     const prog = _acLessonProgress(l.id);
     const done = prog && prog.passed;
-    // Admin override beats the per-category photo (honors admin_card_photos row).
-    const photoUrl = _acLessonPhoto(l) || photos[l.category] || '';
     const progPct = done ? 100 : (prog && prog.total ? Math.round(prog.score / prog.total * 100) : 0);
     const progHtml = (prog && !done && prog.total)
       ? '<div class="ac-card-progress"><div class="ac-card-progress-bar" style="width:' + progPct + '%;background:' + cat.color + ';"></div></div>'
       : '';
-    // Rich course-card layout:
-    //  [photo header — 140px, category badge top-left, dark gradient overlay]
-    //  [title — Bebas Neue 1.1rem white]
-    //  [description — Georgia italic, 2-line clamp]
-    //  [⏱ duration · ❓ quiz Qs        Start Lesson →]
-    //  [optional 3px progress bar pinned to card bottom]
     const ctaLabel = done ? 'Retake Lesson →' : (prog && prog.total ? 'Continue →' : 'Start Lesson →');
-    const photoStyle = photoUrl ? ('background-image:url(\'' + photoUrl + '\');') : '';
     return '<div class="ac-card' + (done ? ' done' : '') + '" data-academy-id="' + _acEsc(l.id) + '" '
          + 'onclick="openLessonModal(\'' + l.id + '\')" '
          + 'style="--ac-card-color:' + cat.color + ';">'
-         +   '<div class="ac-card-photo" style="' + photoStyle + '">'
+         +   '<div class="ac-card-photo" style="background:linear-gradient(135deg,' + cat.soft + '0.25),' + cat.soft + '0.07));display:flex;align-items:center;justify-content:center;">'
          +     '<span class="ac-card-cat">' + _acEsc(cat.label) + '</span>'
+         +     '<span style="font-size:2.4rem;line-height:1;filter:drop-shadow(0 2px 12px ' + cat.soft + '0.5));">' + _acEsc(cat.icon) + '</span>'
          +   '</div>'
          +   '<div class="ac-card-body">'
          +     '<div class="ac-card-title">' + _acEsc(l.title) + '</div>'
@@ -5653,23 +5644,17 @@ function openAcademyLesson(courseId, lessonId){
   const store = _acStore();
   const isDone = !!store.lessons[lesson.id];
 
-  document.getElementById('charIcon').textContent  = mod.icon;
-  document.getElementById('charTitle').textContent = lesson.title;
-  document.getElementById('charSub').textContent   = course.title + ' · ' + (lesson.duration || '');
-  const _acModPhotoMap = {
-    'foundations':  'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Jerusalem-2013-Aerial-Temple_Mount_03.jpg/1280px-Jerusalem-2013-Aerial-Temple_Mount_03.jpg',
-    'bible-survey': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Holy_Land_2016_P0977_Caves_of_Qumran.jpg/1280px-Holy_Land_2016_P0977_Caves_of_Qumran.jpg',
-    'life-skills':  'https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/King%27s_College_Chapel%2C_Cambridge%2C_fan_vault.jpg/1280px-King%27s_College_Chapel%2C_Cambridge%2C_fan_vault.jpg',
-    'topical':      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Jerusalem_Temple_Mount_view_from_Mount_of_Olives_%286035890417%29.jpg/1280px-Jerusalem_Temple_Mount_view_from_Mount_of_Olives_%286035890417%29.jpg',
-    'families':     'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Sea_of_Galilee_2008.JPG/1280px-Sea_of_Galilee_2008.JPG',
-  };
-  const _acModPhoto = _acModPhotoMap[mod.id];
   const _acHdrEl = document.getElementById('charModalHeader');
-  if (_acModPhoto) {
-    _acHdrEl.style.background = 'linear-gradient(rgba(0,0,0,.42),rgba(0,0,0,.66)),url("' + _acModPhoto + '") center/cover no-repeat';
-  } else {
-    _acHdrEl.style.background = 'linear-gradient(135deg,#38bdf8,' + mod.color + ')';
-  }
+  _acHdrEl.style.background = 'linear-gradient(135deg,#0a0d1a 0%,#1a1233 100%)';
+  document.getElementById('charIcon').textContent = mod.icon;
+  document.getElementById('charTitle').textContent = lesson.title;
+  const _chipColor = mod.color || '#fbbf24';
+  document.getElementById('charSub').innerHTML =
+    '<span style="display:inline-block;font-family:var(--fm);font-size:.58rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;border:1px solid ' + _chipColor + '88;color:' + _chipColor + ';padding:.2rem .65rem;border-radius:99px;margin-bottom:.35rem;">' +
+    escapeHtml(mod.title) +
+    '</span><br><span style="font-family:Georgia,serif;font-style:italic;opacity:.84;">' +
+    escapeHtml(course.title + ' · ' + (lesson.duration || '')) +
+    '</span>';
   const refsHtml = (lesson.scriptureRefs && lesson.scriptureRefs.length)
     ? '<div style="background:rgba(167,139,250,.05);border-left:3px solid #a78bfa;border-radius:0 8px 8px 0;padding:.6rem .8rem;margin-top:1rem;font-size:.75rem;color:var(--tx2);"><strong style="color:#a78bfa;">📖 Scripture:</strong> ' + lesson.scriptureRefs.map(r => escapeHtml(r)).join(', ') + '</div>'
     : '';
