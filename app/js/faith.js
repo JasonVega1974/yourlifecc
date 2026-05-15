@@ -4729,22 +4729,32 @@ function renderFeaturedAcademy(){
     const progHtml = (prog && !done && prog.total)
       ? '<div class="ac-card-progress"><div class="ac-card-progress-bar" style="width:' + progPct + '%;background:' + cat.color + ';"></div></div>'
       : '';
+    // Mirror the Plans `.pl-card-v2` inline-styled layout:
+    //  top row → [icon] [Bebas-Neue title]   [pill badge]
+    //  mid     → Georgia italic description
+    //  bottom  → brand-color uppercase meta row + CTA arrow
+    //  optional progress strip (5px pill, matching Plans)
+    const ctaLabel = done ? 'Retake →' : (prog && prog.total ? 'Continue →' : 'Start →');
     return '<div class="ac-card' + (done ? ' done' : '') + '" data-academy-id="' + _acEsc(l.id) + '" '
          + 'onclick="openLessonModal(\'' + l.id + '\')" '
          + 'style="' + styleVars + '">'
-         + '<div class="ac-card-tint"></div>'
          + checkHtml
          + '<div class="ac-card-body">'
-         +   '<div class="ac-card-eye">' + _acEsc(cat.icon + ' ' + cat.label.toUpperCase()) + '</div>'
-         +   '<div class="ac-card-title">' + _acEsc(l.title) + '</div>'
+         +   '<div class="ac-card-top">'
+         +     '<span class="ac-card-icon">' + _acEsc(cat.icon || '📖') + '</span>'
+         +     '<div class="ac-card-title">' + _acEsc(l.title) + '</div>'
+         +     '<span class="ac-card-pill">' + _acEsc(cat.label) + '</span>'
+         +   '</div>'
          +   '<div class="ac-card-desc">' + _acEsc(l.description) + '</div>'
          +   '<div class="ac-card-meta">'
-         +     '<span class="ac-card-badge">⏱ ' + _acEsc(l.duration || '—') + '</span>'
-         +     '<span class="ac-card-badge">❓ ' + ((l.quiz || []).length) + ' quiz Qs</span>'
-         + (done ? '<span class="ac-card-badge" style="background:rgba(34,197,94,.18);border-color:rgba(34,197,94,.5);color:#22c55e;">✓ Complete</span>' : '')
+         +     '<span>' + _acEsc(l.duration || '—') + '</span>'
+         +     '<span style="opacity:.55;">·</span>'
+         +     '<span>' + ((l.quiz || []).length) + ' QS</span>'
+         + (done ? '<span style="opacity:.55;">·</span><span style="color:#22c55e;">✓ Done</span>' : '')
+         +     '<span class="ac-card-meta-cta">' + ctaLabel + '</span>'
          +   '</div>'
+         +   progHtml
          + '</div>'
-         + progHtml
          + '</div>';
   }).join('');
 }
@@ -4766,17 +4776,10 @@ function openLessonModal(lessonId){
     'apologetics':      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Areopagus_from_the_Acropolis.jpg/1280px-Areopagus_from_the_Acropolis.jpg',
     'bible-study':      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Aleppo_Codex_%28Deut%29.jpg/1280px-Aleppo_Codex_%28Deut%29.jpg',
   };
-  const svgEl = document.getElementById('lmSvg');
-  if(svgEl){
-    const _lmPhoto = _lmCatPhotos[lesson.category];
-    if(_lmPhoto){
-      svgEl.innerHTML = '';
-      svgEl.style.background = 'linear-gradient(rgba(0,0,0,.32),rgba(0,0,0,.62)),url("' + _lmPhoto + '") center/cover no-repeat';
-    } else {
-      svgEl.innerHTML = svgs[lesson.category] || '';
-      svgEl.style.background = '';
-    }
-  }
+  // Banner: per-category gradient (mirrors openPlanDetail's `linear-gradient(135deg, brand.color, #fef3c7)`).
+  // The .lm-svg photo header is hidden via CSS; we only touch .lm-hdr now.
+  const hdrEl = document.querySelector('#lessonModal .lm-hdr');
+  if(hdrEl) hdrEl.style.background = 'linear-gradient(135deg,' + (cat.color || '#fbbf24') + ',#fef3c7)';
 
   const eyeEl = document.getElementById('lmEye');
   if(eyeEl) eyeEl.textContent = (cat.label || '').toUpperCase() + ' · ' + (lesson.duration || '');
