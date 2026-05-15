@@ -6879,6 +6879,9 @@
         display:flex; gap:.6rem; justify-content:center; flex-wrap:wrap;
       }
 #bf-proofProphecy .pp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;}
+#bf-proofProphecy .pp-card{display:flex !important;flex-direction:column !important;}
+#bf-proofProphecy .pp-card>div:nth-last-child(2){display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;flex:none;}
+#bf-proofProphecy .pp-card>div:last-child{margin-top:auto;padding-top:.5rem;}
 #bottomTabBar{display:none !important;}
 @media(max-width:860px){#bottomTabBar{display:flex !important;}}
     </style>
