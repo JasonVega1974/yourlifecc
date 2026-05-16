@@ -7465,6 +7465,7 @@ function openStory(storyId){
 
 function closeStory(){
   _storyStopNarration();
+  if(document.fullscreenElement) document.exitFullscreen();
   if(typeof closeModal === 'function') closeModal('storyPlayerModal');
 }
 

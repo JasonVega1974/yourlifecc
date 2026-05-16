@@ -5265,6 +5265,3 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 :root.light #lessonModal .lm-quiz-result-title{ color:#92400e !important; text-shadow:none !important; }
 :root.light #lessonModal .lm-quiz-result-score{ color:#92400e !important; }
 :root.light #lessonModal .lm-quiz-star.empty{ color:rgba(146,64,14,.22) !important; }
-
-#bottomTabBar{display:none !important;}
-@media(max-width:860px){#bottomTabBar{display:flex !important;}}
