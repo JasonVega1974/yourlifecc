@@ -366,6 +366,12 @@ async function checkPlanStatus(){
     window._userPlanStatus  = status;
     window._contestFreeUser = (status === 'free_contest');
     window._faithFree       = (status === 'faith_free');
+    // Cache plan hint for early-load flash prevention (read in <head> before body renders).
+    if(window._faithFree){
+      localStorage.setItem('ylcc_plan_hint', 'faith_free');
+    } else {
+      localStorage.removeItem('ylcc_plan_hint');
+    }
     // F6.3 — Mirror onto D so feature code can read either flag.
     // window._faithFree remains the original source; both stay in sync.
     if(typeof D !== 'undefined' && D) D.faithOnly = (status === 'faith_free');

@@ -31,6 +31,14 @@
 <!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>@media(min-width:861px){#bottomTabBar{display:none!important;}}</style>
+<script>
+/* Prevent faith-free flash — apply gate before first paint */
+(function(){
+  if(localStorage.getItem('ylcc_plan_hint') === 'faith_free'){
+    document.documentElement.setAttribute('data-faith-free','1');
+  }
+})();
+</script>
 </head>
 <body>
 <!-- FIRST TIME PARENT PIN SETUP -->
