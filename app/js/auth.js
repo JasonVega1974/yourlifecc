@@ -375,6 +375,10 @@ async function checkPlanStatus(){
     // F6.3 — Mirror onto D so feature code can read either flag.
     // window._faithFree remains the original source; both stay in sync.
     if(typeof D !== 'undefined' && D) D.faithOnly = (status === 'faith_free');
+    // Collapse login.html out of the browser history stack so back doesn't loop.
+    if(window.history && window.history.replaceState){
+      window.history.replaceState(null, '', window.location.href);
+    }
 
     // Allowlist — anything else (cancelled, past_due, anything new/unknown) blocks.
     const ALLOWED_STATUSES = ['active', 'trialing', 'free_contest', 'faith_free', null];

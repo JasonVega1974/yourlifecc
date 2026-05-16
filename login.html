@@ -134,6 +134,19 @@ const SUPABASE_URL = 'https://hrohgwcbfgywkpnvqxhk.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhyb2hnd2NiZmd5d2twbnZxeGhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MjcxNDYsImV4cCI6MjA4ODQwMzE0Nn0.PuWtBpiMw2DiCLp26ZP_Rd9BwzFvWT0sNZrDUNdULyo';
 const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// If user already has an active session, skip the form and go straight to the app.
+// replace() removes login.html from the history stack so the back button can't return here.
+(async function(){
+  try {
+    const { data } = await _sb.auth.getSession();
+    if(data && data.session){
+      const next = new URLSearchParams(location.search).get('next');
+      const section = next === 'referral' ? '?section=s-referral' : '';
+      window.location.replace('/app/index.html' + section);
+    }
+  } catch(e){ /* no session or error — fall through to login form */ }
+})();
+
 function showErr(msg){ const el=document.getElementById('errMsg'); el.textContent=msg; el.style.display='block'; document.getElementById('okMsg').style.display='none'; }
 function showOk(msg){ const el=document.getElementById('okMsg'); el.textContent=msg; el.style.display='block'; document.getElementById('errMsg').style.display='none'; }
 
@@ -160,10 +173,10 @@ async function signIn(){
     if(error) throw new Error(error.message);
 
 
-    // Redirect to app — deep-link to section if requested
+    // Redirect to app — replace so login.html is removed from history stack
     const next = new URLSearchParams(location.search).get('next');
     const section = next === 'referral' ? '?section=s-referral' : '';
-    window.location.href = `/app/index.html${section}`;
+    window.location.replace('/app/index.html' + section);
 
 
   } catch(err){
