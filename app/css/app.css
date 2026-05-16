@@ -5729,3 +5729,9 @@ html[data-faith-free="1"] #mBarAvatarBtn { display: none !important; }
   font-size: .9rem;
   flex-shrink: 0;
 }
+
+/* ── FAITH-FREE FLASH PREVENTION ───────────────────────────── */
+/* Applied before JS runs via data-faith-free="1" set in <head>  */
+html[data-faith-free="1"] #mainWrap { visibility: hidden; }
+html[data-faith-free="1"] #faithHeroCinematic { visibility: visible; }
+html[data-faith-free="1"] #bottomTabBar { display: none !important; }
