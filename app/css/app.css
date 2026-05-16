@@ -5595,12 +5595,14 @@ html[data-faith-free="1"] #mBarAvatarBtn { display: none !important; }
 /* ── Faith-free Search overlay ─────────────────────────────── */
 #ffSearchOverlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 80px;
   background: var(--bg, #070b14);
   z-index: 1200;
   display: none;
   flex-direction: column;
-  padding-bottom: 80px;
 }
 #ffSearchOverlay.open { display: flex; }
 

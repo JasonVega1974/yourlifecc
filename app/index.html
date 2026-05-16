@@ -12522,7 +12522,6 @@ if (_origRefresh) {
 <!-- FAITH-FREE SEARCH OVERLAY -->
 <div id="ffSearchOverlay" aria-label="Search The Well" role="dialog">
   <div class="ff-search-header">
-    <button class="ff-search-back" onclick="ffCloseSearch()">←</button>
     <input
       class="ff-search-input"
       id="ffSearchInput"
@@ -12531,7 +12530,7 @@ if (_origRefresh) {
       autocomplete="off"
       oninput="ffDoSearch(this.value)"
     >
-    <button class="ff-search-clear" id="ffSearchClear" onclick="ffClearSearch()" style="display:none;">✕</button>
+    <button class="ff-search-clear" id="ffSearchClear" onclick="ffClearSearch()">✕</button>
   </div>
   <div class="ff-search-body" id="ffSearchBody">
     <div class="ff-search-empty" id="ffSearchEmpty">
@@ -12674,7 +12673,6 @@ if (_origRefresh) {
     var overlay = document.getElementById('ffSearchOverlay');
     if(!overlay) return;
     overlay.classList.add('open');
-    document.body.style.overflow = 'hidden';
     setTimeout(function(){
       var inp = document.getElementById('ffSearchInput');
       if(inp) inp.focus();
@@ -12685,15 +12683,18 @@ if (_origRefresh) {
     var overlay = document.getElementById('ffSearchOverlay');
     if(!overlay || !overlay.classList.contains('open')) return;
     overlay.classList.remove('open');
-    document.body.style.overflow = '';
     ffSetActive('home');
   };
 
   window.ffClearSearch = function(){
     var inp = document.getElementById('ffSearchInput');
-    if(inp){ inp.value = ''; inp.focus(); }
-    var clr = document.getElementById('ffSearchClear');
-    if(clr) clr.style.display = 'none';
+    if(inp && inp.value){
+      inp.value = '';
+      inp.focus();
+      ffDoSearch('');
+      return;
+    }
+    ffCloseSearch();
     var res = document.getElementById('ffSearchResults');
     if(res) res.style.display = 'none';
     var emp = document.getElementById('ffSearchEmpty');
@@ -12705,7 +12706,7 @@ if (_origRefresh) {
     var clrBtn  = document.getElementById('ffSearchClear');
     var resultsEl = document.getElementById('ffSearchResults');
     var emptyEl   = document.getElementById('ffSearchEmpty');
-    if(clrBtn) clrBtn.style.display = q ? 'flex' : 'none';
+    if(clrBtn) clrBtn.style.display = 'flex';
     if(!q){
       if(resultsEl) resultsEl.style.display = 'none';
       if(emptyEl)   emptyEl.style.display   = 'flex';
