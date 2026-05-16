@@ -5370,6 +5370,15 @@ html[data-faith-free="1"] #ffBottomNav {
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
 }
+.ff-theme-btn {
+  background: rgba(255,255,255,.08);
+  border: none;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .85rem;
+}
 .ff-sheet-user {
   padding: .75rem 1.25rem;
   font-size: .78rem;

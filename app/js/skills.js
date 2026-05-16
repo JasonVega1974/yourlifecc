@@ -5043,10 +5043,12 @@ function updateThemeBtn(){
   const btnM = document.getElementById('themeBtnMob');
   const btnT = document.getElementById('themeBtnTop');
   const btnTM = document.getElementById('themeBtnTopMob');
+  const ffIcon = document.getElementById('ffThemeIcon');
   if(btn)  btn.textContent  = label;
   if(btnM) btnM.textContent = icon;
   if(btnT) btnT.textContent = label;
   if(btnTM) btnTM.textContent = label;
+  if(ffIcon) ffIcon.textContent = icon;
 }
 
 function applyTheme(){
