@@ -669,8 +669,8 @@
       <button onclick="signOut()" style="width:100%;padding:.35rem;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);border-radius:7px;color:#f87171;font-size:.68rem;font-weight:700;cursor:pointer;">Sign Out</button>
       <div style="display:flex;gap:.4rem;margin-top:.4rem;">
         <a href="/account.html" target="_blank" style="flex:1;text-align:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:rgba(160,160,184,.7);border-radius:6px;padding:.3rem .2rem;font-size:.6rem;text-decoration:none;">⚙️ Account</a>
-        <a href="/privacy.html" target="_blank" style="flex:1;text-align:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:rgba(160,160,184,.7);border-radius:6px;padding:.3rem .2rem;font-size:.6rem;text-decoration:none;">🔒 Privacy</a>
-        <a href="/terms.html" target="_blank" style="flex:1;text-align:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:rgba(160,160,184,.7);border-radius:6px;padding:.3rem .2rem;font-size:.6rem;text-decoration:none;">📋 Terms</a>
+        <a href="https://yourlifecc.com/privacy.html" target="_blank" style="flex:1;text-align:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:rgba(160,160,184,.7);border-radius:6px;padding:.3rem .2rem;font-size:.6rem;text-decoration:none;">🔒 Privacy</a>
+        <a href="https://yourlifecc.com/terms.html" target="_blank" style="flex:1;text-align:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:rgba(160,160,184,.7);border-radius:6px;padding:.3rem .2rem;font-size:.6rem;text-decoration:none;">📋 Terms</a>
       </div>
     </div>
     </div>
@@ -12458,6 +12458,13 @@ if (_origRefresh) {
     </div>
 
     <div class="ff-sheet-divider"></div>
+    <button class="ff-sheet-row ff-signout-row" onclick="ffNavGo('signOut')">
+      <span class="ff-row-icon">🚪</span>
+      <span>Sign Out</span>
+      <span class="ff-row-arrow">›</span>
+    </button>
+
+    <div class="ff-sheet-divider"></div>
     <div class="ff-sheet-version" id="ffSheetVersion"></div>
   </div>
 
@@ -12530,10 +12537,10 @@ if (_origRefresh) {
       window.location.href = 'mailto:info@kingdom-creatives.com?subject=YourLife%20CC%20Support%20Request&body=Please%20describe%20your%20issue%3A';
     } else if(target === 'terms'){
       ffCloseProfile();
-      window.open('https://yourlifecc.com/terms', '_blank');
+      window.open('https://yourlifecc.com/terms.html', '_blank');
     } else if(target === 'privacy'){
       ffCloseProfile();
-      window.open('https://yourlifecc.com/privacy', '_blank');
+      window.open('https://yourlifecc.com/privacy.html', '_blank');
     } else if(target === 'cookies'){
       ffOpenCookies();
     } else if(target === 'upgrade'){
@@ -12542,15 +12549,37 @@ if (_origRefresh) {
     } else if(target === 'closeAccount'){
       ffCloseProfile();
       if(typeof openDeleteAccountModal === 'function') openDeleteAccountModal();
+    } else if(target === 'signOut'){
+      ffCloseProfile();
+      if(typeof signOut === 'function') signOut();
+      else if(typeof getSupabase === 'function'){
+        getSupabase().auth.signOut().then(function(){ window.location.reload(); });
+      }
     }
   };
 
-  window.ffOpenProfile = function(){
+  window.ffOpenProfile = async function(){
     var sheet    = document.getElementById('ffProfileSheet');
     var backdrop = document.getElementById('ffProfileBackdrop');
     if(!sheet || !backdrop) return;
+
     var emailEl = document.getElementById('ffSheetUserEmail');
-    if(emailEl && window.D && D.email) emailEl.textContent = D.email;
+    if(emailEl){
+      var email = (window._supaUser && window._supaUser.email)
+               || (window.D && D.email)
+               || '';
+      if(!email && typeof getSupabase === 'function'){
+        try {
+          var supa = getSupabase();
+          if(supa){
+            var result = await supa.auth.getUser();
+            email = (result.data && result.data.user && result.data.user.email) || '';
+          }
+        } catch(e){}
+      }
+      emailEl.textContent = email || 'Not signed in';
+    }
+
     backdrop.classList.add('open');
     sheet.classList.add('open');
     document.body.style.overflow = 'hidden';

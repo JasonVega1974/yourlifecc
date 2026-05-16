@@ -5581,3 +5581,6 @@ html[data-faith-free="1"] #ffBottomNav {
 }
 .btn-clear-cache:hover { background: rgba(248,113,113,.15); }
 .btn-clear-cache:disabled { opacity: .5; cursor: not-allowed; }
+
+.ff-signout-row { color: #f87171; }
+.ff-signout-row .ff-row-arrow { color: #f87171; }
