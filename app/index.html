@@ -588,6 +588,13 @@
     <div style="font-family:var(--fh);font-size:.73rem;letter-spacing:1px;color:#38bdf8;margin-bottom:.45rem;">🔄 REFRESH APP</div>
     <div style="font-size:.72rem;color:var(--tx2);margin-bottom:.5rem;">Seeing an old version or wrong account on mobile? Force a fresh reload that bypasses all cached files.</div>
     <button class="btn bs" style="width:100%;background:rgba(56,189,248,.1);color:#38bdf8;border:1px solid rgba(56,189,248,.25);" onclick="hardRefreshApp()">🔄 Hard Refresh / Clear Cache</button>
+    <div class="settings-row" style="margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;gap:.75rem;">
+      <div>
+        <div class="settings-row-label" style="font-size:.82rem;font-weight:700;color:var(--tx);">Clear App Cache</div>
+        <div class="settings-row-sub" style="font-size:.7rem;color:var(--tx2);margin-top:.15rem;line-height:1.4;">Forces a fresh download of app files. Your data is not affected.</div>
+      </div>
+      <button class="btn-clear-cache" id="clearCacheBtnPc" onclick="clearAppCache()">Clear</button>
+    </div>
   </div>
 
   <!-- DATA MANAGEMENT -->
@@ -12605,7 +12612,7 @@ if (_origRefresh) {
 
 <script>
 window.clearAppCache = async function(){
-  var btns = [document.getElementById('clearCacheBtn'), document.getElementById('clearCacheBtnFf')];
+  var btns = [document.getElementById('clearCacheBtn'), document.getElementById('clearCacheBtnFf'), document.getElementById('clearCacheBtnPc')];
   btns.forEach(function(b){ if(b){ b.disabled = true; b.textContent = 'Clearing…'; } });
   try {
     var keys = await caches.keys();
