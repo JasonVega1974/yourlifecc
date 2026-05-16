@@ -5591,3 +5591,136 @@ html[data-faith-free="1"] #mBarAvatarBtn { display: none !important; }
 
 /* Fix 2 reverted — the flex/overflow approach caused .dashGrid to appear
    below the cinematic hero within #s-hero instead of staying hidden. */
+
+/* ── Faith-free Search overlay ─────────────────────────────── */
+#ffSearchOverlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg, #070b14);
+  z-index: 1200;
+  display: none;
+  flex-direction: column;
+  padding-bottom: 80px;
+}
+#ffSearchOverlay.open { display: flex; }
+
+.ff-search-header {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .75rem .9rem;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  background: rgba(11,18,40,.9);
+  backdrop-filter: blur(8px);
+  flex-shrink: 0;
+}
+.ff-search-back {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.25rem;
+  line-height: 1;
+  padding: .25rem .4rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.ff-search-back:hover { color: #fff; }
+.ff-search-input {
+  flex: 1;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 10px;
+  color: #e2e8f0;
+  font-size: .95rem;
+  padding: .5rem .75rem;
+  outline: none;
+  font-family: var(--fs, sans-serif);
+}
+.ff-search-input::placeholder { color: #64748b; }
+.ff-search-input:focus { border-color: rgba(56,189,248,.4); background: rgba(255,255,255,.09); }
+.ff-search-clear {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 1rem;
+  padding: .25rem .4rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.ff-search-clear:hover { color: #e2e8f0; }
+
+.ff-search-body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: .5rem 0 .5rem;
+}
+.ff-search-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .75rem;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+.ff-search-empty-icon { font-size: 2.5rem; opacity: .4; }
+.ff-search-empty-text { color: #64748b; font-size: .88rem; line-height: 1.5; }
+
+.ff-search-no-results {
+  text-align: center;
+  color: #64748b;
+  font-size: .88rem;
+  padding: 2.5rem 1.5rem;
+}
+
+.ff-search-group {
+  padding: .25rem 0;
+}
+.ff-search-group-label {
+  font-size: .65rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #475569;
+  padding: .6rem .95rem .3rem;
+}
+.ff-search-item {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  padding: .65rem .95rem;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  transition: background .12s;
+}
+.ff-search-item:hover { background: rgba(255,255,255,.05); }
+.ff-search-item:last-child { border-bottom: none; }
+.ff-search-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  width: 2rem;
+  text-align: center;
+}
+.ff-search-text { flex: 1; min-width: 0; }
+.ff-search-title {
+  font-size: .88rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ff-search-sub {
+  font-size: .72rem;
+  color: #64748b;
+  margin-top: .1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ff-search-arrow {
+  color: #475569;
+  font-size: .9rem;
+  flex-shrink: 0;
+}

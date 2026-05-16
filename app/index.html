@@ -12412,6 +12412,10 @@ if (_origRefresh) {
     <span class="ff-nav-icon">👤</span>
     <span class="ff-nav-label">Profile</span>
   </button>
+  <button class="ff-nav-btn" id="ffNavSearch" onclick="ffNavGo('search')">
+    <span class="ff-nav-icon">🔍</span>
+    <span class="ff-nav-label">Search</span>
+  </button>
 </nav>
 
 <!-- FAITH-FREE PROFILE SHEET -->
@@ -12507,6 +12511,29 @@ if (_origRefresh) {
   </div>
 </div>
 
+<!-- FAITH-FREE SEARCH OVERLAY -->
+<div id="ffSearchOverlay" aria-label="Search The Well" role="dialog">
+  <div class="ff-search-header">
+    <button class="ff-search-back" onclick="ffCloseSearch()">←</button>
+    <input
+      class="ff-search-input"
+      id="ffSearchInput"
+      type="search"
+      placeholder="Search proofs, lessons, stories…"
+      autocomplete="off"
+      oninput="ffDoSearch(this.value)"
+    >
+    <button class="ff-search-clear" id="ffSearchClear" onclick="ffClearSearch()" style="display:none;">✕</button>
+  </div>
+  <div class="ff-search-body" id="ffSearchBody">
+    <div class="ff-search-empty" id="ffSearchEmpty">
+      <div class="ff-search-empty-icon">⛪</div>
+      <div class="ff-search-empty-text">Search across Proof &amp; Prophecy,<br>Faith Academy, and Bible Stories</div>
+    </div>
+    <div id="ffSearchResults" style="display:none;"></div>
+  </div>
+</div>
+
 <script>
 /* ── FAITH-FREE BOTTOM NAV ──────────────────────────────── */
 (function(){
@@ -12541,6 +12568,9 @@ if (_origRefresh) {
     } else if(target === 'privacy'){
       ffCloseProfile();
       window.open('https://yourlifecc.com/privacy.html', '_blank');
+    } else if(target === 'search'){
+      ffSetActive('search');
+      ffOpenSearch();
     } else if(target === 'cookies'){
       ffOpenCookies();
     } else if(target === 'upgrade'){
@@ -12622,14 +12652,186 @@ if (_origRefresh) {
 
   function ffSetActive(tab){
     document.querySelectorAll('.ff-nav-btn').forEach(function(b){ b.classList.remove('active'); });
-    var map = { home:'ffNavHome', settings:'ffNavSettings', profile:'ffNavProfile' };
+    var map = { home:'ffNavHome', settings:'ffNavSettings', profile:'ffNavProfile', search:'ffNavSearch' };
     var btn = document.getElementById(map[tab]);
     if(btn) btn.classList.add('active');
   }
 
   document.addEventListener('keydown', function(e){
-    if(e.key === 'Escape') ffCloseProfile();
+    if(e.key === 'Escape'){ ffCloseProfile(); ffCloseSearch(); }
   });
+
+  /* ── FAITH-FREE SEARCH ──────────────────────────────────── */
+  window.ffOpenSearch = function(){
+    var overlay = document.getElementById('ffSearchOverlay');
+    if(!overlay) return;
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function(){
+      var inp = document.getElementById('ffSearchInput');
+      if(inp) inp.focus();
+    }, 120);
+  };
+
+  window.ffCloseSearch = function(){
+    var overlay = document.getElementById('ffSearchOverlay');
+    if(!overlay || !overlay.classList.contains('open')) return;
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+    ffSetActive('home');
+  };
+
+  window.ffClearSearch = function(){
+    var inp = document.getElementById('ffSearchInput');
+    if(inp){ inp.value = ''; inp.focus(); }
+    var clr = document.getElementById('ffSearchClear');
+    if(clr) clr.style.display = 'none';
+    var res = document.getElementById('ffSearchResults');
+    if(res) res.style.display = 'none';
+    var emp = document.getElementById('ffSearchEmpty');
+    if(emp) emp.style.display = 'flex';
+  };
+
+  window.ffDoSearch = function(raw){
+    var q = (raw || '').trim().toLowerCase();
+    var clrBtn  = document.getElementById('ffSearchClear');
+    var resultsEl = document.getElementById('ffSearchResults');
+    var emptyEl   = document.getElementById('ffSearchEmpty');
+    if(clrBtn) clrBtn.style.display = q ? 'flex' : 'none';
+    if(!q){
+      if(resultsEl) resultsEl.style.display = 'none';
+      if(emptyEl)   emptyEl.style.display   = 'flex';
+      return;
+    }
+    var results = ffSearchAll(q);
+    if(emptyEl) emptyEl.style.display = 'none';
+    if(!resultsEl) return;
+    resultsEl.style.display = 'block';
+    if(!results.length){
+      resultsEl.innerHTML = '<div class="ff-search-no-results">No results for "<strong style="color:#e2e8f0;">' + ffEsc(raw) + '</strong>"<br><span style="font-size:.75rem;">Try a keyword like "resurrection" or "prayer"</span></div>';
+      return;
+    }
+    var groups = {};
+    results.forEach(function(r){
+      if(!groups[r.group]) groups[r.group] = [];
+      groups[r.group].push(r);
+    });
+    var ORDER = ['Proof & Prophecy','Faith Academy','Bible Stories'];
+    var html = '';
+    ORDER.forEach(function(grp){
+      var items = groups[grp];
+      if(!items || !items.length) return;
+      html += '<div class="ff-search-group"><div class="ff-search-group-label">' + ffEsc(grp) + '</div>';
+      items.slice(0, 8).forEach(function(item){
+        var hiliteTitle = ffHighlight(item.title, q);
+        html += '<button class="ff-search-item" onclick=\'ffSearchGo(' + JSON.stringify(item.action) + ')\'>'
+          + '<span class="ff-search-item-icon">' + item.icon + '</span>'
+          + '<span class="ff-search-item-body">'
+          + '<div class="ff-search-item-title">' + hiliteTitle + '</div>'
+          + '<div class="ff-search-item-sub">' + ffEsc(item.sub) + '</div>'
+          + '</span>'
+          + '<span class="ff-search-item-arrow">›</span>'
+          + '</button>';
+      });
+      if(items.length > 8){
+        html += '<div style="padding:.4rem 1.25rem;font-size:.68rem;color:#475569;">+' + (items.length - 8) + ' more — refine your search</div>';
+      }
+      html += '</div>';
+    });
+    resultsEl.innerHTML = html;
+  };
+
+  function ffSearchAll(q){
+    var results = [];
+    var catIcons = {archaeology:'🏺',prophecy:'📜',manuscripts:'📖',witnesses:'⚖️',science:'🔬',resurrection:'✝️'};
+
+    // Proof & Prophecy
+    var proofs = window.PROOF_PROPHECY_DATA || [];
+    proofs.forEach(function(p){
+      var hay = ((p.title||'') + ' ' + (p.summary||'') + ' ' + (p.category||'')).toLowerCase();
+      if(hay.includes(q)){
+        var cat = p.category || '';
+        results.push({
+          group:'Proof & Prophecy',
+          icon: catIcons[cat] || '⚖️',
+          title: p.title || 'Proof',
+          sub: cat ? cat.charAt(0).toUpperCase() + cat.slice(1) : 'Apologetics',
+          action:{type:'proof', id:p.id}
+        });
+      }
+    });
+
+    // Faith Academy
+    var lessons = window.ACADEMY_LESSONS || [];
+    lessons.forEach(function(l){
+      var hay = ((l.title||'') + ' ' + (l.description||'') + ' ' + (l.category||'')).toLowerCase();
+      if(hay.includes(q)){
+        results.push({
+          group:'Faith Academy',
+          icon:'🎓',
+          title: l.title || 'Lesson',
+          sub: l.category ? l.category.charAt(0).toUpperCase() + l.category.slice(1) : 'Faith Academy',
+          action:{type:'lesson', id:l.id}
+        });
+      }
+    });
+
+    // Bible Stories
+    var stories = window.BIBLE_STORIES || [];
+    stories.forEach(function(s){
+      var hay = ((s.title||'') + ' ' + (s.subtitle||'') + ' ' + (s.scriptureRef||'')).toLowerCase();
+      if(hay.includes(q)){
+        results.push({
+          group:'Bible Stories',
+          icon: s.icon || '📖',
+          title: s.title || 'Story',
+          sub: s.scriptureRef || s.subtitle || 'Bible Story',
+          action:{type:'story', id:s.id}
+        });
+      }
+    });
+
+    return results;
+  }
+
+  window.ffSearchGo = function(action){
+    ffCloseSearch();
+    if(typeof showSection === 'function') showSection('s-scripture');
+    setTimeout(function(){
+      if(action.type === 'proof'){
+        if(typeof bfTab === 'function') bfTab('proofProphecy');
+        setTimeout(function(){
+          if(typeof ppOpenModal === 'function') ppOpenModal(action.id);
+        }, 200);
+      } else if(action.type === 'lesson'){
+        if(typeof bfTab === 'function') bfTab('academy');
+        setTimeout(function(){
+          if(typeof openLessonModal === 'function') openLessonModal(action.id);
+        }, 200);
+      } else if(action.type === 'story'){
+        if(typeof bfTab === 'function') bfTab('stories');
+        setTimeout(function(){
+          if(typeof openStory === 'function') openStory(action.id);
+        }, 200);
+      }
+    }, 100);
+  };
+
+  function ffHighlight(text, q){
+    if(!text || !q) return ffEsc(text);
+    var lower = text.toLowerCase();
+    var idx = lower.indexOf(q.toLowerCase());
+    if(idx === -1) return ffEsc(text);
+    return ffEsc(text.slice(0, idx))
+      + '<mark>' + ffEsc(text.slice(idx, idx + q.length)) + '</mark>'
+      + ffEsc(text.slice(idx + q.length));
+  }
+
+  function ffEsc(s){
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
 
   var _ffPoll = 0;
   var _ffTimer = setInterval(function(){
