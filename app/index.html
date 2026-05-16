@@ -614,6 +614,15 @@
     </div>
   </div>
 
+  <!-- CLEAR APP CACHE -->
+  <div class="settings-row" style="margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;gap:.75rem;">
+    <div>
+      <div class="settings-row-label" style="font-size:.82rem;font-weight:700;color:var(--tx);">Clear App Cache</div>
+      <div class="settings-row-sub" style="font-size:.7rem;color:var(--tx2);margin-top:.15rem;line-height:1.4;">Forces a fresh download of app files. Your data is not affected.</div>
+    </div>
+    <button class="btn-clear-cache" id="clearCacheBtn" onclick="clearAppCache()">Clear</button>
+  </div>
+
   </div><!-- /sp-pb -->
 </div>
 
@@ -12433,6 +12442,13 @@ if (_origRefresh) {
     <button class="ff-sheet-row" onclick="ffNavGo('cookies')">
       <span class="ff-row-icon">🍪</span><span>Cookie Settings</span><span class="ff-row-arrow">›</span>
     </button>
+    <div class="settings-row" style="display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.75rem 1.25rem;">
+      <div>
+        <div style="font-size:.82rem;font-weight:700;color:var(--tx);">Clear App Cache</div>
+        <div style="font-size:.7rem;color:var(--tx2);margin-top:.1rem;line-height:1.4;">Forces a fresh download of app files. Your data is not affected.</div>
+      </div>
+      <button class="btn-clear-cache" id="clearCacheBtnFf" onclick="clearAppCache()">Clear</button>
+    </div>
 
     <div class="ff-sheet-divider"></div>
     <div class="ff-sheet-version" id="ffSheetVersion"></div>
@@ -12585,6 +12601,22 @@ if (_origRefresh) {
     if(++_ffPoll > 40)    clearInterval(_ffTimer);
   }, 250);
 })();
+</script>
+
+<script>
+window.clearAppCache = async function(){
+  var btns = [document.getElementById('clearCacheBtn'), document.getElementById('clearCacheBtnFf')];
+  btns.forEach(function(b){ if(b){ b.disabled = true; b.textContent = 'Clearing…'; } });
+  try {
+    var keys = await caches.keys();
+    await Promise.all(keys.map(function(k){ return caches.delete(k); }));
+    btns.forEach(function(b){ if(b) b.textContent = '✓ Cleared — reloading…'; });
+    setTimeout(function(){ window.location.reload(true); }, 1200);
+  } catch(e){
+    btns.forEach(function(b){ if(b){ b.disabled = false; b.textContent = 'Clear'; } });
+    console.error('[clearAppCache]', e);
+  }
+};
 </script>
 
 </body>

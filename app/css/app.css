@@ -5565,3 +5565,19 @@ html[data-faith-free="1"] #ffBottomNav {
 }
 .ff-toggle input:checked + .ff-toggle-track { background: rgba(56,189,248,.25); border-color: #38bdf8; }
 .ff-toggle input:checked + .ff-toggle-track::before { transform: translateX(18px); background: #38bdf8; }
+
+.btn-clear-cache {
+  background: rgba(248,113,113,.08);
+  border: 1px solid rgba(248,113,113,.25);
+  color: #f87171;
+  font-size: .72rem;
+  font-weight: 700;
+  padding: .4rem .9rem;
+  border-radius: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: var(--fm, monospace);
+  transition: background .15s;
+}
+.btn-clear-cache:hover { background: rgba(248,113,113,.15); }
+.btn-clear-cache:disabled { opacity: .5; cursor: not-allowed; }
