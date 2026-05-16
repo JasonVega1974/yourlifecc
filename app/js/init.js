@@ -701,7 +701,7 @@ function renderFaithOnlyHero() {
   // CSS hid #mainWrap early to prevent flash; dashboard elements are now hidden
   // via the loop above so it's safe to restore visibility before rendering The Well.
   var _mw = document.getElementById('mainWrap');
-  if(_mw) _mw.style.visibility = '';
+  if(_mw) _mw.style.visibility = 'visible';
 
   const hr = new Date().getHours();
   const greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
