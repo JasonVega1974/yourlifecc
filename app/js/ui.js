@@ -1792,6 +1792,14 @@ function closeModal(id){
   }
 }
 
+// Global Escape key handler — closes whichever .mo modal is currently open.
+// Per-modal handlers (story, PP) also listen for Escape; double-close is a no-op.
+document.addEventListener('keydown', function(e){
+  if(e.key !== 'Escape') return;
+  const open = document.querySelector('.mo.open');
+  if(open) closeModal(open.id);
+});
+
 // Inject a fullscreen toggle button into the modal's dialog. Idempotent.
 function _ensureFullscreenToggle(modalEl){
   const dialog = modalEl.querySelector('.md');

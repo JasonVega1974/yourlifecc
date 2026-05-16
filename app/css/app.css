@@ -5416,3 +5416,21 @@ html[data-faith-free="1"] #ffBottomNav {
   letter-spacing: .06em;
   text-align: center;
 }
+
+/* ── Standard modal close button ───────────────────────────── */
+.modal-close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+  background: rgba(255,255,255,.1);
+  border: none;
+  color: #f1f5f9;
+  font-size: 1.1rem;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+}
+.modal-close-btn:active { opacity: .6; }
