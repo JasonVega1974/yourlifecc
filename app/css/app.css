@@ -5584,3 +5584,27 @@ html[data-faith-free="1"] #ffBottomNav {
 
 .ff-signout-row { color: #f87171; }
 .ff-signout-row .ff-row-arrow { color: #f87171; }
+
+/* ── Faith-free mobile fixes ─────────────────────────────── */
+/* Fix 1: hide profile icon — s-me is not in FAITH_FREE_ALLOWED */
+html[data-faith-free="1"] #mBarAvatarBtn { display: none !important; }
+
+/* Fix 2: hero fits one screen on mobile without scrolling */
+@media (max-width: 767px) {
+  html[data-faith-free="1"] #s-hero {
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  html[data-faith-free="1"] #s-hero .dashGrid {
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+  }
+}

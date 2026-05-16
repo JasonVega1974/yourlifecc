@@ -12525,7 +12525,18 @@ if (_origRefresh) {
   window.ffNavGo = function(target){
     if(target === 'home'){
       ffSetActive('home');
-      if(typeof showSection === 'function') showSection('s-hero');
+      // Navigate to The Well (s-scripture) then switch to its home tab
+      var wellSection = document.querySelector('[id^="s-"][id*="scripture"],[id^="s-"][id*="faith"],[id^="s-"][id*="well"]');
+      var wellId = wellSection ? wellSection.id : 's-scripture';
+      if(typeof showSection === 'function') showSection(wellId);
+      setTimeout(function(){
+        if(typeof bfTab === 'function') bfTab('home');
+        else if(typeof bfShowHomeGrid === 'function') bfShowHomeGrid();
+        else {
+          var homeTab = document.querySelector('.bf-tab-btn[data-tab="home"], [onclick*="bfTab(\'home\')"]');
+          if(homeTab) homeTab.click();
+        }
+      }, 80);
     } else if(target === 'settings'){
       ffSetActive('settings');
       if(typeof openSettings === 'function') openSettings();
