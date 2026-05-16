@@ -197,9 +197,6 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 .pm-msg{font-family:var(--fm);font-size:.65rem;margin-top:.5rem;min-height:.9rem;letter-spacing:.04em;}
 .pm-msg.ok{color:var(--green);}
 .pm-msg.err{color:var(--red);}
-/* Local-file upload row — matches the .pm-edit-row aesthetic but with a
-   distinct gold accent so admins know it's a different code path than the
-   URL save flow. */
 .pm-upload-row{background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.18);border-radius:8px;padding:.7rem .85rem;margin-bottom:.7rem;}
 .pm-upload-label{font-family:var(--fm);font-size:.6rem;color:#fbbf24;letter-spacing:.06em;text-transform:uppercase;font-weight:700;margin-bottom:.45rem;opacity:.85;}
 .pm-upload-controls{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
@@ -350,7 +347,6 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
         <div class="kpi-card" style="--accent-color:var(--amber)"><div class="kpi-label">Pending Match</div><div class="kpi-value" id="kWaitPending">—</div><div class="kpi-sub">Awaiting sponsor</div></div>
         <div class="kpi-card" style="--accent-color:var(--green)"><div class="kpi-label">Approved</div><div class="kpi-value" id="kWaitApproved">—</div><div class="kpi-sub">Matched with sponsor</div></div>
       </div>
-
       <div class="card card-full">
         <div class="card-header"><span class="card-title">Waitlist Applications</span><span class="card-badge" id="waitBadge">—</span></div>
         <table class="data-table">
@@ -558,8 +554,9 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 <div class="pm-toast" id="pmToast"></div>
 
 <!-- Data scripts: load BEFORE the inline admin script so PM_INVENTORY can
-     read ACADEMY_LESSONS to expand its dynamic Faith Academy rows. -->
+     read these arrays to expand its dynamic section rows. -->
 <script src="/app/js/data/academy-lessons.js"></script>
+<script src="/app/js/data/proof-prophecy.js"></script>
 
 <script>
 const EDGE_URL    = 'https://hrohgwcbfgywkpnvqxhk.supabase.co/functions/v1/admin-data';
@@ -629,7 +626,7 @@ function engagementScore(sessions){
 // ── ALL USERS — SORT & SEARCH ───────────────────────────────
 let _allUsers = [];
 let _sortCol = 'created_at';
-let _sortDir = -1; // -1 = desc, 1 = asc
+let _sortDir = -1;
 
 function sortUsers(col, th){
   if(_sortCol === col){
@@ -676,12 +673,10 @@ function renderUsers(){
   const q = ((document.getElementById('userSearch')||{}).value||'').toLowerCase().trim();
   let users = _allUsers.slice();
 
-  // Filter
   if(q){
     users = users.filter(u=>(u.email||'').toLowerCase().includes(q)||(u.last_section||'').toLowerCase().includes(q)||(u.plan||'').toLowerCase().includes(q)||(u.plan_status||'').toLowerCase().includes(q));
   }
 
-  // Sort
   users.sort((a,b)=>{
     const av = _getVal(a, _sortCol);
     const bv = _getVal(b, _sortCol);
@@ -690,7 +685,6 @@ function renderUsers(){
     return 0;
   });
 
-  // Count display
   const countEl = document.getElementById('searchCount');
   if(countEl) countEl.textContent = q ? `${users.length} of ${_allUsers.length}` : '';
 
@@ -910,7 +904,6 @@ async function awardSponsorEntries(){
   msg.style.color = 'var(--tx2)'; msg.textContent = 'Looking up user…';
 
   try {
-    // Look up user_id from profiles table by email
     const profiles = await supaFetch('profiles?email=eq.'+encodeURIComponent(email)+'&select=user_id,email&limit=1');
     const profile  = profiles && profiles[0];
     const userId   = profile ? profile.user_id : null;
@@ -938,7 +931,6 @@ async function awardSponsorEntries(){
     msg.textContent = '✅ Awarded '+entries+' sponsor entries to '+email+(userId?' (user matched)':' (email only — user not found in profiles)');
     document.getElementById('awardEmail').value = '';
     document.getElementById('awardEntries').value = '5';
-    // Refresh the contest data
     setTimeout(loadContest, 800);
   } catch(e){
     msg.style.color = '#f87171';
@@ -963,7 +955,6 @@ async function loadContest(){
       return;
     }
 
-    // ── KPIs ──
     const totalEntries = entries.reduce((s,e)=>s+(e.entries_awarded||0),0);
     const uniqueUsers  = new Set(entries.map(e=>e.email||e.user_id)).size;
     const freeTypes    = ['account_created','setup_complete','first_task','social_share'];
@@ -975,7 +966,6 @@ async function loadContest(){
     document.getElementById('kContestFree').textContent  = freeEntries.toLocaleString();
     document.getElementById('kContestBonus').textContent = bonusEntries.toLocaleString();
 
-    // ── ENTRY TYPE BREAKDOWN ──
     const byType = {};
     entries.forEach(e=>{
       const t = e.entry_type || 'unknown';
@@ -1011,7 +1001,6 @@ async function loadContest(){
         </tr>`;
       }).join('');
 
-    // ── LEADERBOARD ──
     const byUser = {};
     entries.forEach(e=>{
       const key = e.email || e.user_id || 'unknown';
@@ -1032,7 +1021,6 @@ async function loadContest(){
           <td style="font-size:.72rem;color:var(--tx3);">${fmtAgo(u.last)}</td>
         </tr>`).join('');
 
-    // ── RECENT ENTRIES ──
     document.getElementById('contestRecentTable').innerHTML = entries.slice(0,30).map(e=>`<tr>
       <td class="email-cell">${e.email||'—'}</td>
       <td style="font-size:.78rem;">${typeLabels[e.entry_type]||e.entry_type||'—'}</td>
@@ -1045,7 +1033,7 @@ async function loadContest(){
 }
 
 // ── OUTREACH ────────────────────────────────────────────────────
-let outContacts   = [];   // full contact list [{email, tag, phone}]
+let outContacts   = [];
 let selectedEmails= new Set();
 let activeGroup   = 'all';
 let activeChannel = 'email';
@@ -1054,7 +1042,6 @@ let sendLog       = [];
 
 async function loadOutreach(){
   try{
-    // Pull profiles + affiliates + waitlist in parallel
     const [profiles, affiliates, waitlist] = await Promise.all([
       supaFetch('profiles?select=email,plan,plan_status,updated_at,created_at&order=created_at.desc'),
       supaFetch('affiliate_applications?select=email,status&order=applied_at.desc'),
@@ -1065,7 +1052,6 @@ async function loadOutreach(){
     const contacts = [];
     const seen = new Set();
 
-    // Profiles → users
     (profiles||[]).forEach(u=>{
       if(!u.email || seen.has(u.email)) return;
       seen.add(u.email);
@@ -1077,7 +1063,6 @@ async function loadOutreach(){
       contacts.push({email:u.email, tag, phone:'', group:'users'});
     });
 
-    // Affiliates
     (affiliates||[]).forEach(a=>{
       if(!a.email) return;
       if(!seen.has(a.email)){
@@ -1086,7 +1071,6 @@ async function loadOutreach(){
       }
     });
 
-    // Waitlist
     (waitlist||[]).forEach(w=>{
       if(!w.email) return;
       if(!seen.has(w.email)){
@@ -1260,8 +1244,6 @@ async function sendViaBrevo(recipients, subject, body, fromName){
   const results = [];
   const BREVO_URL = 'https://api.brevo.com/v3/smtp/email';
 
-  // Send individually so each gets a personalized To: field
-  // Batch in groups of 5 to avoid hammering (adjust as needed)
   for(let i=0;i<recipients.length;i++){
     const email = recipients[i];
     try{
@@ -1280,10 +1262,6 @@ async function sendViaBrevo(recipients, subject, body, fromName){
         })
       });
       results.push({email, ok:res.ok, status:res.status});
-      if(res.ok && !window.BREVO_API_KEY){
-        // Key worked — cache it for this session
-        window.BREVO_API_KEY = document.querySelector('input') ? window.BREVO_API_KEY : window.BREVO_API_KEY;
-      }
     }catch(e){
       results.push({email, ok:false, status:e.message});
     }
@@ -1306,7 +1284,6 @@ async function sendViaBrevo(recipients, subject, body, fromName){
 }
 
 async function sendViaSMS(recipients, body){
-  // SMS via Brevo SMS API (requires SMS plan)
   const btn = document.getElementById('sendBtn');
   btn.disabled=true; btn.textContent='Sending…';
 
@@ -1346,7 +1323,6 @@ function showSendStatus(msg, color){
 function logSend({channel, subject, total, ok, err, recipients, note, ts}){
   sendLog.unshift({channel, subject, total, ok, err, recipients, note, ts});
   document.getElementById('logBadge').textContent = sendLog.length + ' sent';
-  const icon = channel==='email'?'📧':'💬';
   document.getElementById('outreachLog').innerHTML = sendLog.map(l=>`
     <div class="log-entry">
       <div class="log-icon">${l.channel==='email'?'📧':'💬'}</div>
@@ -1359,7 +1335,6 @@ function logSend({channel, subject, total, ok, err, recipients, note, ts}){
     </div>`).join('');
 }
 
-// Cache Brevo API key for session (prompted once on first send)
 window.BREVO_API_KEY = '';
 
 async function approveWaitlist(id, btn){
@@ -1387,20 +1362,15 @@ async function approveWaitlist(id, btn){
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   PHOTO MANAGER — Admin tab for editing the card hero images.
-   Reads override URLs from /api/admin-card-photo (GET, public).
-   Writes via the same endpoint (POST). HMAC + ADMIN_PHOTO_SECRET
-   requirement removed 2026-05-14 — the Supabase service key on the
-   server side is the real security gate.
+   PHOTO MANAGER — Admin tab for editing card hero images.
 
    TO ADD A NEW SECTION: push entries to PM_INVENTORY with
        { id, section, title, defaultUrl }
    The `id` must match what loadCardPhotoOverrides() in app/js/ui.js
-   uses to look up rows in the admin_card_photos table — keep it
-   stable across the admin row and the live render call site.
-   For dynamic per-record sections (academy lessons, plans, story
-   chapters), define the static block first, then extend the array
-   AFTER it — see the Faith Academy loop below for the pattern.
+   uses to look up rows in the admin_card_photos table.
+   For dynamic per-record sections (academy lessons, proof cards,
+   bible stories, etc.), define a category-photo map then loop the
+   data array — see the Faith Academy and Proof & Prophecy patterns.
 ══════════════════════════════════════════════════════════════════ */
 const PM_INVENTORY = [
   // ── Bible & Faith (12) ──
@@ -1501,12 +1471,9 @@ const PM_INVENTORY = [
   {id:'sk-entrepreneur',  section:'Life Skills', title:'Entrepreneurship Basics',       defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/d/d7/Small_Businesses_-_geograph.org.uk_-_682645.jpg'},
 ];
 
-// Dynamic Faith Academy lessons — one admin row per featured lesson so the
-// per-lesson modal photo (Hagia Sofia for theology, etc.) can be overridden
-// individually. The `id` here mirrors what _acLessonPhoto() / openLessonModal()
-// reads at render time in app/js/faith.js. Loads from window.ACADEMY_LESSONS
-// which is provided by /app/js/data/academy-lessons.js (loaded above the
-// inline script tag).
+// ── Dynamic Faith Academy entries ─────────────────────────────
+// One admin row per lesson so the per-lesson photo can be overridden.
+// card_id mirrors what _acLessonPhoto() reads in app/js/faith.js.
 const PM_ACADEMY_CAT_PHOTOS = {
   'theology':         'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Interior_of_Hagia_Sofia.JPG/1280px-Interior_of_Hagia_Sofia.JPG',
   'church-history':   'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Baptistery_wall_painting_Good_Shepherd_and_Adam_and_Eve.jpg/1280px-Baptistery_wall_painting_Good_Shepherd_and_Adam_and_Eve.jpg',
@@ -1526,7 +1493,37 @@ if (typeof ACADEMY_LESSONS !== 'undefined' && Array.isArray(ACADEMY_LESSONS)) {
   });
 }
 
-const PM_SECTION_ORDER = ['Bible & Faith','Faith Academy','Life Skills','School','Money Manager','Health & Wellness','Driving','Sports','Resume / Jobs'];
+// ── Dynamic Proof & Prophecy entries ──────────────────────────
+// One admin row per proof so individual card photos can be overridden.
+// card_id mirrors ppImageFor(proof) in faith.js: 'proof-' + proof.id
+// Falls back to proof.image (the Wikimedia URL on the data object)
+// before the category default, matching the live render fallback chain.
+const PM_PROOF_CAT_PHOTOS = {
+  'archaeology':  'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Masada_overview_BW_2.jpg/1280px-Masada_overview_BW_2.jpg',
+  'prophecy':     'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Jerusalem_-_Temple_Mount.jpg/1280px-Jerusalem_-_Temple_Mount.jpg',
+  'manuscripts':  'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Dead_Sea_Scrolls_-_general_view.jpg/1280px-Dead_Sea_Scrolls_-_general_view.jpg',
+  'witnesses':    'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Tyre_Al_Mina_excavations.jpg/1280px-Tyre_Al_Mina_excavations.jpg',
+  'science':      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Kinneret2.jpg/1280px-Kinneret2.jpg',
+  'resurrection': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Church_of_the_Holy_Sepulchre_-_Entrance.jpg/1280px-Church_of_the_Holy_Sepulchre_-_Entrance.jpg',
+};
+// PROOF_PROPHECY_DATA is exported by /app/js/data/proof-prophecy.js
+// (loaded via the <script> tag above). Check that file's export name
+// if this section shows 0 cards — it must match exactly.
+if (typeof PROOF_PROPHECY_DATA !== 'undefined' && Array.isArray(PROOF_PROPHECY_DATA)) {
+  PROOF_PROPHECY_DATA.forEach(function(proof){
+    if (!proof || !proof.id) return;
+    PM_INVENTORY.push({
+      id:         'proof-' + proof.id,
+      section:    'Proof & Prophecy',
+      title:      proof.title || ('Proof — ' + proof.id),
+      defaultUrl: proof.image || PM_PROOF_CAT_PHOTOS[proof.category] || '',
+    });
+  });
+}
+
+// Section display order — add new sections here to control their position.
+const PM_SECTION_ORDER = ['Bible & Faith','Proof & Prophecy','Faith Academy','Life Skills','School','Money Manager','Health & Wellness','Driving','Sports','Resume / Jobs'];
+
 let PM_OVERRIDES = {};
 let PM_INITED    = false;
 
@@ -1582,7 +1579,6 @@ function pmFilterCards(){
     const hay = row.getAttribute('data-pm-haystack') || '';
     row.classList.toggle('hidden', q && hay.indexOf(q) === -1);
   });
-  // Hide section header if all rows are hidden
   document.querySelectorAll('#pmGrid .pm-section').forEach(sec => {
     const any = Array.from(sec.querySelectorAll('.pm-row')).some(r => !r.classList.contains('hidden'));
     sec.style.display = any ? '' : 'none';
@@ -1617,7 +1613,7 @@ function pmOpenEdit(cardId){
       <div class="pm-file-preview" data-pm-filepreview="${cardId}"></div>
     </div>
     <div class="pm-edit-row">
-      <input class="pm-edit-input" data-pm-search="${cardId}" type="text" placeholder="Search Wikimedia Commons (e.g. 'modern classroom')">
+      <input class="pm-edit-input" data-pm-search="${cardId}" type="text" placeholder="Search Wikimedia Commons (e.g. 'Dead Sea Scrolls')">
       <button class="pm-action" onclick="pmWikimediaSearch('${cardId}')">🔍 Search Wikimedia</button>
     </div>
     <div class="pm-search-results" data-pm-results="${cardId}"></div>
@@ -1653,7 +1649,6 @@ async function pmWikimediaSearch(cardId){
     const data = await resp.json();
     const hits = (data && data.query && data.query.search) || [];
     if(!hits.length){ slot.innerHTML = '<div style="font-family:var(--fm);font-size:.65rem;color:var(--tx3);padding:.5rem;">no results</div>'; return; }
-    // Resolve direct URLs via imageinfo for each File: hit
     const titles = hits.map(h => h.title).filter(t => t && t.indexOf('File:') === 0);
     if(!titles.length){ slot.innerHTML = '<div style="font-family:var(--fm);font-size:.65rem;color:var(--tx3);padding:.5rem;">no File: results</div>'; return; }
     const infoUrl = 'https://commons.wikimedia.org/w/api.php?action=query&titles=' +
@@ -1690,11 +1685,9 @@ function pmPickResult(cardId, jsonUrl){
   try { url = JSON.parse(jsonUrl); } catch(e){ url = jsonUrl; }
   const input = document.querySelector(`[data-pm-urlinput="${cardId}"]`);
   if(input){ input.value = url; pmPreview(cardId); }
-  // Auto-save in the same tap — admins no longer need a separate Save click.
   pmSavePhoto(cardId);
 }
 
-// ── Local file upload ──────────────────────────────────────────────
 function pmTriggerFileInput(cardId){
   const inp = document.querySelector(`[data-pm-file="${cardId}"]`);
   if(inp) inp.click();
@@ -1725,9 +1718,6 @@ function pmFileSelected(cardId){
   if(btn) btn.disabled = false;
 }
 
-// Resize + re-encode image to JPEG ≤1280px using Canvas before upload.
-// Keeps the JSON payload well under Vercel's body-size limit regardless
-// of how large the source file is.
 function pmCompressImage(file){
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -1777,8 +1767,6 @@ async function pmUploadFile(cardId){
   if(msg){ msg.textContent = 'compressing…'; msg.className = 'pm-msg'; }
   if(btn) btn.disabled = true;
   try {
-    // Resize + re-encode to JPEG ≤1280px so the base64 JSON body stays
-    // well under Vercel's infrastructure body-size limit.
     const { fileData, mimeType } = await pmCompressImage(f);
     if(msg){ msg.textContent = 'uploading…'; msg.className = 'pm-msg'; }
     const resp = await fetch('/api/upload-card-photo', {
@@ -1796,7 +1784,6 @@ async function pmUploadFile(cardId){
       if(btn) btn.disabled = false;
       return;
     }
-    // Fill URL input + thumbnail + override badge — same UI updates pmSavePhoto does.
     const urlInput = document.querySelector(`[data-pm-urlinput="${cardId}"]`);
     if(urlInput) urlInput.value = data.url;
     PM_OVERRIDES[cardId] = data.url;
@@ -1851,7 +1838,6 @@ async function pmSavePhoto(cardId){
       return;
     }
     PM_OVERRIDES[cardId] = url;
-    // Update the row's thumbnail + URL display
     const thumb = document.querySelector(`[data-pm-thumb="${cardId}"]`);
     if(thumb && thumb.tagName === 'IMG') thumb.src = url;
     else if(thumb){
@@ -1907,9 +1893,6 @@ async function pmInit(){
   await pmReload();
 }
 
-// Intercept the existing switchTab so the photo manager lazy-loads when
-// the user first clicks the PHOTOS tab. Wrapping rather than editing
-// switchTab() directly keeps the rest of the admin code untouched.
 (function(){
   const _origSwitch = window.switchTab;
   window.switchTab = function(name, btn){
