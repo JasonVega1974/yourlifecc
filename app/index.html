@@ -12381,5 +12381,128 @@ if (_origRefresh) {
   </div>
 </div>
 
+<!-- FAITH-FREE MOBILE BOTTOM NAV -->
+<nav id="ffBottomNav" aria-label="Faith navigation">
+  <button class="ff-nav-btn" id="ffNavHome" onclick="ffNavGo('home')">
+    <span class="ff-nav-icon">⛪</span>
+    <span class="ff-nav-label">Home</span>
+  </button>
+  <button class="ff-nav-btn" id="ffNavSettings" onclick="ffNavGo('settings')">
+    <span class="ff-nav-icon">⚙️</span>
+    <span class="ff-nav-label">Settings</span>
+  </button>
+  <button class="ff-nav-btn" id="ffNavProfile" onclick="ffNavGo('profile')">
+    <span class="ff-nav-icon">👤</span>
+    <span class="ff-nav-label">Profile</span>
+  </button>
+</nav>
+
+<!-- FAITH-FREE PROFILE SHEET -->
+<div id="ffProfileBackdrop" onclick="ffCloseProfile()"></div>
+<div id="ffProfileSheet" role="dialog" aria-modal="true" aria-label="Profile">
+  <div class="ff-sheet-handle"></div>
+  <div class="ff-sheet-header">
+    <span class="ff-sheet-title">My Account</span>
+    <button class="ff-sheet-close" onclick="ffCloseProfile()">✕</button>
+  </div>
+  <div class="ff-sheet-body">
+    <div class="ff-sheet-user" id="ffSheetUserEmail"></div>
+    <div class="ff-sheet-divider"></div>
+    <button class="ff-sheet-row" onclick="ffNavGo('help')">
+      <span class="ff-row-icon">❓</span><span>Help</span><span class="ff-row-arrow">›</span>
+    </button>
+    <button class="ff-sheet-row" onclick="ffNavGo('terms')">
+      <span class="ff-row-icon">📄</span><span>Terms of Use</span><span class="ff-row-arrow">›</span>
+    </button>
+    <button class="ff-sheet-row" onclick="ffNavGo('privacy')">
+      <span class="ff-row-icon">🔒</span><span>Privacy Notice</span><span class="ff-row-arrow">›</span>
+    </button>
+    <button class="ff-sheet-row" onclick="ffNavGo('cookies')">
+      <span class="ff-row-icon">🍪</span><span>Cookie Settings</span><span class="ff-row-arrow">›</span>
+    </button>
+    <div class="ff-sheet-divider"></div>
+    <div class="ff-sheet-version" id="ffSheetVersion"></div>
+  </div>
+</div>
+
+<script>
+/* ── FAITH-FREE BOTTOM NAV ──────────────────────────────── */
+(function(){
+  function ffInit(){
+    if(!window._faithFree) return;
+
+    var emailEl = document.getElementById('ffSheetUserEmail');
+    if(emailEl && window.D && D.email) emailEl.textContent = D.email;
+
+    var verEl = document.getElementById('ffSheetVersion');
+    if(verEl) verEl.textContent = 'YourLife CC v200';
+
+    ffSetActive('home');
+  }
+
+  window.ffNavGo = function(target){
+    if(target === 'home'){
+      ffSetActive('home');
+      if(typeof showSection === 'function') showSection('s-hero');
+    } else if(target === 'settings'){
+      ffSetActive('settings');
+      if(typeof openSettings === 'function') openSettings();
+    } else if(target === 'profile'){
+      ffSetActive('profile');
+      ffOpenProfile();
+    } else if(target === 'help'){
+      ffCloseProfile();
+      window.open('https://yourlifecc.com/help','_blank');
+    } else if(target === 'terms'){
+      ffCloseProfile();
+      window.open('https://yourlifecc.com/terms','_blank');
+    } else if(target === 'privacy'){
+      ffCloseProfile();
+      window.open('https://yourlifecc.com/privacy','_blank');
+    } else if(target === 'cookies'){
+      ffCloseProfile();
+      if(typeof openCookieSettings === 'function') openCookieSettings();
+    }
+  };
+
+  window.ffOpenProfile = function(){
+    var sheet    = document.getElementById('ffProfileSheet');
+    var backdrop = document.getElementById('ffProfileBackdrop');
+    if(!sheet || !backdrop) return;
+    var emailEl = document.getElementById('ffSheetUserEmail');
+    if(emailEl && window.D && D.email) emailEl.textContent = D.email;
+    backdrop.classList.add('open');
+    sheet.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.ffCloseProfile = function(){
+    var sheet    = document.getElementById('ffProfileSheet');
+    var backdrop = document.getElementById('ffProfileBackdrop');
+    if(sheet)    sheet.classList.remove('open');
+    if(backdrop) backdrop.classList.remove('open');
+    document.body.style.overflow = '';
+    ffSetActive('home');
+  };
+
+  function ffSetActive(tab){
+    document.querySelectorAll('.ff-nav-btn').forEach(function(b){ b.classList.remove('active'); });
+    var map = { home:'ffNavHome', settings:'ffNavSettings', profile:'ffNavProfile' };
+    var btn = document.getElementById(map[tab]);
+    if(btn) btn.classList.add('active');
+  }
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') ffCloseProfile();
+  });
+
+  var _ffPoll = 0;
+  var _ffTimer = setInterval(function(){
+    if(window._faithFree){ clearInterval(_ffTimer); ffInit(); }
+    if(++_ffPoll > 40)    clearInterval(_ffTimer);
+  }, 250);
+})();
+</script>
+
 </body>
 </html>
