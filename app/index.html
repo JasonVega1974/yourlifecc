@@ -12408,22 +12408,72 @@ if (_origRefresh) {
     <button class="ff-sheet-close" onclick="ffCloseProfile()">✕</button>
   </div>
   <div class="ff-sheet-body">
-    <div class="ff-sheet-user" id="ffSheetUserEmail"></div>
+
+    <!-- Account block -->
+    <div class="ff-account-block">
+      <div class="ff-account-label">Signed in as</div>
+      <div class="ff-account-email" id="ffSheetUserEmail">—</div>
+      <div class="ff-account-actions">
+        <button class="ff-account-btn ff-btn-upgrade" onclick="ffNavGo('upgrade')">⭐ Upgrade Plan</button>
+        <button class="ff-account-btn ff-btn-close-account" onclick="ffNavGo('closeAccount')">Close Account</button>
+      </div>
+    </div>
+
     <div class="ff-sheet-divider"></div>
-    <button class="ff-sheet-row" onclick="ffNavGo('help')">
-      <span class="ff-row-icon">❓</span><span>Help</span><span class="ff-row-arrow">›</span>
+
+    <button class="ff-sheet-row" onclick="ffNavGo('support')">
+      <span class="ff-row-icon">✉️</span><span>Support</span><span class="ff-row-arrow">›</span>
     </button>
     <button class="ff-sheet-row" onclick="ffNavGo('terms')">
       <span class="ff-row-icon">📄</span><span>Terms of Use</span><span class="ff-row-arrow">›</span>
     </button>
     <button class="ff-sheet-row" onclick="ffNavGo('privacy')">
-      <span class="ff-row-icon">🔒</span><span>Privacy Notice</span><span class="ff-row-arrow">›</span>
+      <span class="ff-row-icon">🔒</span><span>Privacy Policy</span><span class="ff-row-arrow">›</span>
     </button>
     <button class="ff-sheet-row" onclick="ffNavGo('cookies')">
       <span class="ff-row-icon">🍪</span><span>Cookie Settings</span><span class="ff-row-arrow">›</span>
     </button>
+
     <div class="ff-sheet-divider"></div>
     <div class="ff-sheet-version" id="ffSheetVersion"></div>
+  </div>
+
+  <!-- Cookie Settings modal (nested, shown on demand) -->
+  <div id="ffCookieModal" style="display:none;">
+    <div class="ff-cookie-header">
+      <button class="ff-cookie-back" onclick="ffCloseCookies()">← Back</button>
+      <span class="ff-cookie-title">Cookie Settings</span>
+    </div>
+    <div class="ff-cookie-body">
+      <p class="ff-cookie-desc">We use cookies to keep you signed in and remember your preferences. You can control optional cookies below.</p>
+      <div class="ff-cookie-row">
+        <div>
+          <div class="ff-cookie-name">Essential Cookies</div>
+          <div class="ff-cookie-sub">Required for the app to function. Cannot be disabled.</div>
+        </div>
+        <div class="ff-cookie-badge">Always On</div>
+      </div>
+      <div class="ff-cookie-row">
+        <div>
+          <div class="ff-cookie-name">Preference Cookies</div>
+          <div class="ff-cookie-sub">Remember your theme, language, and settings.</div>
+        </div>
+        <label class="ff-toggle">
+          <input type="checkbox" id="ffCookiePref" onchange="ffSaveCookies()">
+          <span class="ff-toggle-track"></span>
+        </label>
+      </div>
+      <div class="ff-cookie-row">
+        <div>
+          <div class="ff-cookie-name">Analytics Cookies</div>
+          <div class="ff-cookie-sub">Help us understand how the app is used (anonymous).</div>
+        </div>
+        <label class="ff-toggle">
+          <input type="checkbox" id="ffCookieAnalytics" onchange="ffSaveCookies()">
+          <span class="ff-toggle-track"></span>
+        </label>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -12437,7 +12487,7 @@ if (_origRefresh) {
     if(emailEl && window.D && D.email) emailEl.textContent = D.email;
 
     var verEl = document.getElementById('ffSheetVersion');
-    if(verEl) verEl.textContent = 'YourLife CC v200';
+    if(verEl) verEl.textContent = 'YourLife CC v203';
 
     ffSetActive('home');
   }
@@ -12452,18 +12502,23 @@ if (_origRefresh) {
     } else if(target === 'profile'){
       ffSetActive('profile');
       ffOpenProfile();
-    } else if(target === 'help'){
+    } else if(target === 'support'){
       ffCloseProfile();
-      window.open('https://yourlifecc.com/help','_blank');
+      window.location.href = 'mailto:info@kingdom-creatives.com?subject=YourLife%20CC%20Support%20Request&body=Please%20describe%20your%20issue%3A';
     } else if(target === 'terms'){
       ffCloseProfile();
-      window.open('https://yourlifecc.com/terms','_blank');
+      window.open('https://yourlifecc.com/terms', '_blank');
     } else if(target === 'privacy'){
       ffCloseProfile();
-      window.open('https://yourlifecc.com/privacy','_blank');
+      window.open('https://yourlifecc.com/privacy', '_blank');
     } else if(target === 'cookies'){
+      ffOpenCookies();
+    } else if(target === 'upgrade'){
       ffCloseProfile();
-      if(typeof openCookieSettings === 'function') openCookieSettings();
+      window.open('https://yourlifecc.com', '_blank');
+    } else if(target === 'closeAccount'){
+      ffCloseProfile();
+      if(typeof openDeleteAccountModal === 'function') openDeleteAccountModal();
     }
   };
 
@@ -12485,6 +12540,32 @@ if (_origRefresh) {
     if(backdrop) backdrop.classList.remove('open');
     document.body.style.overflow = '';
     ffSetActive('home');
+  };
+
+  window.ffOpenCookies = function(){
+    var modal = document.getElementById('ffCookieModal');
+    if(!modal) return;
+    var prefs        = JSON.parse(localStorage.getItem('ylcc_cookie_prefs') || '{}');
+    var prefBox      = document.getElementById('ffCookiePref');
+    var analyticsBox = document.getElementById('ffCookieAnalytics');
+    if(prefBox)      prefBox.checked      = prefs.pref      !== false;
+    if(analyticsBox) analyticsBox.checked = prefs.analytics !== false;
+    modal.style.display = 'block';
+  };
+
+  window.ffCloseCookies = function(){
+    var modal = document.getElementById('ffCookieModal');
+    if(modal) modal.style.display = 'none';
+  };
+
+  window.ffSaveCookies = function(){
+    var prefEl      = document.getElementById('ffCookiePref');
+    var analyticsEl = document.getElementById('ffCookieAnalytics');
+    var prefs = {
+      pref:      prefEl      ? prefEl.checked      : true,
+      analytics: analyticsEl ? analyticsEl.checked : true,
+    };
+    localStorage.setItem('ylcc_cookie_prefs', JSON.stringify(prefs));
   };
 
   function ffSetActive(tab){
