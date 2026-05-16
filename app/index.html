@@ -7682,6 +7682,7 @@
   <div id="storyPlayerModal" class="mo" onclick="if(event.target===this)closeStory()">
     <div class="md">
       <button class="sp-close" onclick="closeStory()" aria-label="Close story">✕</button>
+      <button onclick="document.exitFullscreen&&document.exitFullscreen()" style="position:absolute;top:.75rem;right:3rem;background:rgba(0,0,0,.5);border:none;color:#fff;border-radius:8px;padding:.4rem .7rem;font-size:1.1rem;cursor:pointer;z-index:999;">✕</button>
       <div class="sp-stage" id="spStage">
         <div class="sp-svg" id="spSvg"></div>
         <div class="sp-vignette"></div>
