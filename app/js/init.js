@@ -449,6 +449,9 @@ function finishInit(cloudReady){
     localStorage.removeItem('ylcc_goto_parent');
     setTimeout(function(){ showSection('s-parent'); }, 400);
   }
+
+  // Phase 1A — Streaks Engine
+  if(typeof initStreaks === 'function') initStreaks();
 }
 
 
