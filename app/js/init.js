@@ -334,7 +334,7 @@ function finishInit(cloudReady){
   if(typeof _lastRenderedProfileId !== 'undefined'){
     _lastRenderedProfileId = (typeof _activeProfileId !== 'undefined') ? _activeProfileId : null;
   }
-  let _defaultLanding = window._faithFree ? 's-scripture' : 's-hero';
+  let _defaultLanding = 's-hero'; // faith-free hero rendered via renderFaithOnlyHero(); session restore skips login, not the hero
   showSection(_defaultLanding);
   document.documentElement.removeAttribute('data-app-loading');
   if(!window._faithFree){
