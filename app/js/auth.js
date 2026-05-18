@@ -587,6 +587,7 @@ function showContestUpgradePrompt(){
 
 // ── SIGN OUT ──────────────────────────────────────────────────
 async function signOut(){
+  _appInitialized = false;
   const supa = getSupabase();
   if(supa && _supaUser) await supa.auth.signOut();
   _supaUser = null;

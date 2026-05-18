@@ -13,6 +13,11 @@ function _ylccUserKey(base){
   return base + '_' + uid;
 }
 
+// Prevents finishInit() running twice on the same page load (e.g. onAuthStateChange
+// SIGNED_IN fires and then authComplete() also calls finishInit). Reset on sign-out
+// so the user can sign back in on the same page.
+let _appInitialized = false;
+
 function loadDemoData(){
   D.name = 'Emma';
   D.chorePin = null;
@@ -171,15 +176,41 @@ async function init(){
     supa.auth.onAuthStateChange(function(event, session){
       if(session && session.user){
         _supaUser = session.user;
-        if(event === 'TOKEN_REFRESHED') cloudSync();
+        if(event === 'TOKEN_REFRESHED'){
+          cloudSync();
+        } else if(event === 'SIGNED_IN' && !_appInitialized){
+          // Fires on explicit sign-in AND on deferred token restore (getSession returned
+          // null because the access token was expired, but Supabase later refreshed it).
+          // Only route if the auth screen is currently visible; authComplete() will handle
+          // the explicit sign-in path ~600 ms later, and finishInit's _appInitialized guard
+          // prevents a second init.
+          var _authEl = document.getElementById('authScreen');
+          if(_authEl && _authEl.style.display === 'flex'){
+            checkPlanStatus().then(function(blocked){
+              if(blocked) return;
+              cloudLoad().then(function(loaded){
+                if(!loaded){ loadData(); setTimeout(cloudSync, 1500); }
+                var _ae = document.getElementById('authScreen');
+                if(_ae) _ae.style.display = 'none';
+                authSetLoading(false);
+                setSyncSt(loaded ? 'cloud' : 'local');
+                finishInit(true);
+                setTimeout(setupContestFreeUser, 500);
+              });
+            });
+          }
+        }
       } else if(event === 'SIGNED_OUT'){
+        _appInitialized = false;
         _supaUser = null;
         setSyncSt('local');
       }
     });
 
-    const { data: { session } } = await supa.auth.getSession();
-    if(session?.user){
+    let _gsResult;
+    try { _gsResult = await supa.auth.getSession(); } catch(_e){ console.warn('[LifeOS] getSession failed:', _e); }
+    const session = _gsResult && _gsResult.data && _gsResult.data.session;
+    if(session && session.user){
       _supaUser = session.user;
 
       const blocked = await checkPlanStatus();
@@ -274,6 +305,8 @@ function applyAgeBracketSections(bracket){
 }
 
 function finishInit(cloudReady){
+  if(_appInitialized) return;
+  _appInitialized = true;
   if(D.sections){
     const FORCE = ['cbt','resume','motivation','mentors','christianLiving','worship','scripture'];
     const allowed = (typeof _bracketAllowedKeys === 'function') ? _bracketAllowedKeys(D.ageBracket) : null;
@@ -301,7 +334,7 @@ function finishInit(cloudReady){
   if(typeof _lastRenderedProfileId !== 'undefined'){
     _lastRenderedProfileId = (typeof _activeProfileId !== 'undefined') ? _activeProfileId : null;
   }
-  let _defaultLanding = 's-hero';
+  let _defaultLanding = window._faithFree ? 's-scripture' : 's-hero';
   showSection(_defaultLanding);
   document.documentElement.removeAttribute('data-app-loading');
   if(!window._faithFree){
