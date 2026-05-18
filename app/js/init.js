@@ -735,8 +735,11 @@ function _foStartCanvasScene() {
              dir:Math.random()>0.5?1:-1 };
   });
   var PUFFS = [[-.52,.20,.95,.52],[0,0,1.28,.62],[.52,.18,.95,.52],[.04,-.32,.65,.42]];
-  var TREES = Array.from({length:55}, function(_,i){
-    return { x:(i+0.2+Math.random()*0.6)/55, h:0.004+Math.random()*0.003, w:0.005+Math.random()*0.004 };
+  var TREES_MID = Array.from({length:48}, function(_,i){
+    return { x:(i+0.15+Math.random()*0.70)/48, h:0.008+Math.random()*0.010, w:0.003+Math.random()*0.003 };
+  });
+  var TREES_NEAR = Array.from({length:30}, function(_,i){
+    return { x:(i+0.10+Math.random()*0.80)/30, h:0.018+Math.random()*0.010, w:0.005+Math.random()*0.004 };
   });
 
   // Sky phases [t, topRGB, botRGB]
@@ -827,91 +830,141 @@ function _foStartCanvasScene() {
       });
     });
   }
-  function dFarMtns(W,H){
-    var shade=H*0.006;
-    // Ultra-far atmospheric depth layer
-    ctx.beginPath(); ctx.moveTo(0,H*.76);
-    ctx.quadraticCurveTo(W*.10,H*.71, W*.20,H*.73);
-    ctx.quadraticCurveTo(W*.30,H*.67, W*.40,H*.70);
-    ctx.quadraticCurveTo(W*.50,H*.65, W*.58,H*.68);
-    ctx.quadraticCurveTo(W*.68,H*.71, W*.78,H*.68);
-    ctx.quadraticCurveTo(W*.89,H*.72, W,H*.74);
-    ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
-    ctx.fillStyle='#030609'; ctx.fill();
-    // Far range — organic 17-segment ridge
-    ctx.beginPath(); ctx.moveTo(0,H*.66);
-    ctx.quadraticCurveTo(W*.03,H*.62, W*.06,H*.59);
-    ctx.quadraticCurveTo(W*.09,H*.55, W*.13,H*.57);
-    ctx.quadraticCurveTo(W*.16,H*.52, W*.20,H*.47);
-    ctx.quadraticCurveTo(W*.23,H*.42, W*.27,H*.45);
-    ctx.quadraticCurveTo(W*.30,H*.48, W*.33,H*.51);
-    ctx.quadraticCurveTo(W*.36,H*.49, W*.38,H*.45);
-    ctx.quadraticCurveTo(W*.40,H*.38, W*.41,H*.38);
-    ctx.quadraticCurveTo(W*.43,H*.38, W*.46,H*.43);
-    ctx.quadraticCurveTo(W*.49,H*.48, W*.52,H*.44);
-    ctx.quadraticCurveTo(W*.55,H*.38, W*.58,H*.39);
-    ctx.quadraticCurveTo(W*.61,H*.43, W*.64,H*.46);
-    ctx.quadraticCurveTo(W*.67,H*.51, W*.70,H*.48);
-    ctx.quadraticCurveTo(W*.73,H*.44, W*.76,H*.47);
-    ctx.quadraticCurveTo(W*.80,H*.52, W*.84,H*.49);
-    ctx.quadraticCurveTo(W*.88,H*.54, W*.92,H*.52);
-    ctx.quadraticCurveTo(W*.96,H*.56, W,H*.61);
-    ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
-    ctx.fillStyle='#060c1a'; ctx.fill();
-    // Ridge face shading — lit-face depth cue, offset 4-5px below crest
-    ctx.beginPath(); ctx.moveTo(0,H*.66+shade);
-    ctx.quadraticCurveTo(W*.03,H*.62+shade, W*.06,H*.59+shade);
-    ctx.quadraticCurveTo(W*.09,H*.55+shade, W*.13,H*.57+shade);
-    ctx.quadraticCurveTo(W*.16,H*.52+shade, W*.20,H*.47+shade);
-    ctx.quadraticCurveTo(W*.23,H*.42+shade, W*.27,H*.45+shade);
-    ctx.quadraticCurveTo(W*.30,H*.48+shade, W*.33,H*.51+shade);
-    ctx.quadraticCurveTo(W*.36,H*.49+shade, W*.38,H*.45+shade);
-    ctx.quadraticCurveTo(W*.40,H*.38+shade, W*.41,H*.38+shade);
-    ctx.quadraticCurveTo(W*.43,H*.38+shade, W*.46,H*.43+shade);
-    ctx.quadraticCurveTo(W*.49,H*.48+shade, W*.52,H*.44+shade);
-    ctx.quadraticCurveTo(W*.55,H*.38+shade, W*.58,H*.39+shade);
-    ctx.quadraticCurveTo(W*.61,H*.43+shade, W*.64,H*.46+shade);
-    ctx.quadraticCurveTo(W*.67,H*.51+shade, W*.70,H*.48+shade);
-    ctx.quadraticCurveTo(W*.73,H*.44+shade, W*.76,H*.47+shade);
-    ctx.quadraticCurveTo(W*.80,H*.52+shade, W*.84,H*.49+shade);
-    ctx.quadraticCurveTo(W*.88,H*.54+shade, W*.92,H*.52+shade);
-    ctx.quadraticCurveTo(W*.96,H*.56+shade, W,H*.61+shade);
-    ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
-    ctx.fillStyle='rgba(15,25,45,0.4)'; ctx.fill();
-    // Snow caps on 2 highest peaks
-    [[W*.41,H*.38,W*.045,H*.015],[W*.58,H*.39,W*.040,H*.014]].forEach(function(pk){
+  function dFarMtns(W,H,t){
+    function pathL1(){
+      ctx.beginPath(); ctx.moveTo(0,H*.68);
+      ctx.bezierCurveTo(W*.02,H*.67,W*.04,H*.65,W*.06,H*.63);
+      ctx.bezierCurveTo(W*.07,H*.62,W*.09,H*.60,W*.11,H*.59);
+      ctx.bezierCurveTo(W*.12,H*.58,W*.14,H*.57,W*.16,H*.57);
+      ctx.bezierCurveTo(W*.17,H*.56,W*.19,H*.55,W*.21,H*.54);
+      ctx.bezierCurveTo(W*.22,H*.53,W*.23,H*.52,W*.25,H*.53);
+      ctx.bezierCurveTo(W*.26,H*.54,W*.28,H*.57,W*.30,H*.58);
+      ctx.bezierCurveTo(W*.32,H*.59,W*.35,H*.61,W*.38,H*.61);
+      ctx.bezierCurveTo(W*.40,H*.60,W*.42,H*.59,W*.43,H*.57);
+      ctx.bezierCurveTo(W*.44,H*.55,W*.45,H*.54,W*.47,H*.53);
+      ctx.bezierCurveTo(W*.49,H*.54,W*.51,H*.57,W*.54,H*.59);
+      ctx.bezierCurveTo(W*.56,H*.61,W*.59,H*.62,W*.62,H*.61);
+      ctx.bezierCurveTo(W*.63,H*.60,W*.65,H*.58,W*.67,H*.56);
+      ctx.bezierCurveTo(W*.68,H*.55,W*.70,H*.54,W*.71,H*.55);
+      ctx.bezierCurveTo(W*.73,H*.57,W*.75,H*.60,W*.78,H*.62);
+      ctx.bezierCurveTo(W*.80,H*.63,W*.83,H*.63,W*.86,H*.63);
+      ctx.bezierCurveTo(W*.88,H*.63,W*.91,H*.64,W*.93,H*.65);
+      ctx.bezierCurveTo(W*.95,H*.66,W*.98,H*.67,W,H*.68);
+      ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
+    }
+    function pathL2(){
+      ctx.beginPath(); ctx.moveTo(0,H*.63);
+      ctx.bezierCurveTo(W*.02,H*.61,W*.04,H*.59,W*.06,H*.57);
+      ctx.bezierCurveTo(W*.08,H*.55,W*.10,H*.52,W*.12,H*.50);
+      ctx.bezierCurveTo(W*.13,H*.48,W*.15,H*.46,W*.17,H*.47);
+      ctx.bezierCurveTo(W*.19,H*.48,W*.21,H*.51,W*.23,H*.53);
+      ctx.bezierCurveTo(W*.25,H*.55,W*.27,H*.54,W*.29,H*.51);
+      ctx.bezierCurveTo(W*.30,H*.49,W*.32,H*.46,W*.34,H*.44);
+      ctx.bezierCurveTo(W*.35,H*.42,W*.37,H*.39,W*.38,H*.38);
+      ctx.bezierCurveTo(W*.39,H*.37,W*.40,H*.35,W*.41,H*.34);
+      ctx.bezierCurveTo(W*.42,H*.34,W*.43,H*.35,W*.44,H*.37);
+      ctx.bezierCurveTo(W*.45,H*.39,W*.46,H*.40,W*.47,H*.39);
+      ctx.bezierCurveTo(W*.48,H*.38,W*.49,H*.37,W*.50,H*.38);
+      ctx.bezierCurveTo(W*.51,H*.40,W*.52,H*.43,W*.54,H*.47);
+      ctx.bezierCurveTo(W*.55,H*.49,W*.57,H*.51,W*.59,H*.49);
+      ctx.bezierCurveTo(W*.60,H*.48,W*.61,H*.46,W*.63,H*.44);
+      ctx.bezierCurveTo(W*.64,H*.43,W*.65,H*.44,W*.67,H*.47);
+      ctx.bezierCurveTo(W*.68,H*.49,W*.70,H*.52,W*.72,H*.51);
+      ctx.bezierCurveTo(W*.73,H*.50,W*.75,H*.48,W*.77,H*.50);
+      ctx.bezierCurveTo(W*.78,H*.52,W*.80,H*.55,W*.82,H*.54);
+      ctx.bezierCurveTo(W*.83,H*.53,W*.85,H*.55,W*.87,H*.57);
+      ctx.bezierCurveTo(W*.89,H*.58,W*.91,H*.59,W*.93,H*.59);
+      ctx.bezierCurveTo(W*.95,H*.60,W*.97,H*.61,W*.99,H*.62);
+      ctx.bezierCurveTo(W*.995,H*.62,W,H*.63,W,H*.63);
+      ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
+    }
+    pathL1(); ctx.fillStyle='#030508'; ctx.fill();
+    pathL2(); ctx.fillStyle='#060c1a'; ctx.fill();
+    ctx.save(); ctx.translate(0,H*0.006);
+    pathL2(); ctx.fillStyle='rgba(18,30,55,0.45)'; ctx.fill();
+    ctx.restore();
+    [[W*.41,H*.34,W*.038,H*.012],[W*.50,H*.38,W*.030,H*.010],[W*.63,H*.44,W*.022,H*.007]].forEach(function(pk){
       var sg=ctx.createRadialGradient(pk[0],pk[1],0,pk[0],pk[1],pk[2]);
-      sg.addColorStop(0,'rgba(180,190,210,0.12)'); sg.addColorStop(1,'rgba(180,190,210,0)');
+      sg.addColorStop(0,'rgba(200,210,225,0.15)'); sg.addColorStop(1,'rgba(200,210,225,0)');
       ctx.beginPath(); ctx.ellipse(pk[0],pk[1],pk[2],pk[3],0,0,PI2); ctx.fillStyle=sg; ctx.fill();
     });
+    ctx.fillStyle='rgba(20,40,80,0.18)';
+    ctx.fillRect(0,H*0.60,W,H*0.015);
   }
-  function dMidMtns(W,H){
-    ctx.beginPath(); ctx.moveTo(0,H*.78);
-    ctx.quadraticCurveTo(W*.03,H*.74, W*.07,H*.71);
-    ctx.quadraticCurveTo(W*.11,H*.68, W*.15,H*.72);
-    ctx.quadraticCurveTo(W*.19,H*.67, W*.23,H*.64);
-    ctx.quadraticCurveTo(W*.26,H*.61, W*.29,H*.65);
-    ctx.quadraticCurveTo(W*.32,H*.68, W*.35,H*.64);
-    ctx.quadraticCurveTo(W*.38,H*.60, W*.41,H*.63);
-    ctx.quadraticCurveTo(W*.44,H*.58, W*.47,H*.61);
-    ctx.quadraticCurveTo(W*.50,H*.65, W*.53,H*.61);
-    ctx.quadraticCurveTo(W*.56,H*.57, W*.59,H*.60);
-    ctx.quadraticCurveTo(W*.63,H*.63, W*.66,H*.66);
-    ctx.quadraticCurveTo(W*.69,H*.63, W*.72,H*.61);
-    ctx.quadraticCurveTo(W*.76,H*.65, W*.80,H*.68);
-    ctx.quadraticCurveTo(W*.84,H*.65, W*.88,H*.69);
-    ctx.quadraticCurveTo(W*.93,H*.68, W*.97,H*.71);
-    ctx.quadraticCurveTo(W*.99,H*.72, W,H*.73);
-    ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
-    ctx.fillStyle='#0a1422'; ctx.fill();
-    ctx.fillStyle='#080f1c';
+  function dMidMtns(W,H,t){
+    function pathM(){
+      ctx.beginPath(); ctx.moveTo(0,H*.76);
+      ctx.bezierCurveTo(W*.02,H*.74,W*.04,H*.72,W*.06,H*.70);
+      ctx.bezierCurveTo(W*.08,H*.68,W*.10,H*.66,W*.12,H*.67);
+      ctx.bezierCurveTo(W*.14,H*.68,W*.17,H*.65,W*.20,H*.62);
+      ctx.bezierCurveTo(W*.22,H*.60,W*.24,H*.58,W*.26,H*.59);
+      ctx.bezierCurveTo(W*.27,H*.60,W*.29,H*.62,W*.31,H*.63);
+      ctx.bezierCurveTo(W*.33,H*.62,W*.35,H*.59,W*.37,H*.56);
+      ctx.bezierCurveTo(W*.38,H*.55,W*.40,H*.53,W*.42,H*.52);
+      ctx.bezierCurveTo(W*.43,H*.51,W*.44,H*.52,W*.46,H*.54);
+      ctx.bezierCurveTo(W*.47,H*.56,W*.48,H*.59,W*.50,H*.61);
+      ctx.bezierCurveTo(W*.52,H*.63,W*.54,H*.62,W*.56,H*.59);
+      ctx.bezierCurveTo(W*.57,H*.57,W*.59,H*.55,W*.60,H*.56);
+      ctx.bezierCurveTo(W*.62,H*.57,W*.63,H*.60,W*.65,H*.63);
+      ctx.bezierCurveTo(W*.66,H*.64,W*.68,H*.65,W*.70,H*.63);
+      ctx.bezierCurveTo(W*.71,H*.62,W*.73,H*.60,W*.75,H*.62);
+      ctx.bezierCurveTo(W*.76,H*.63,W*.78,H*.65,W*.80,H*.67);
+      ctx.bezierCurveTo(W*.82,H*.68,W*.84,H*.66,W*.86,H*.68);
+      ctx.bezierCurveTo(W*.87,H*.69,W*.89,H*.70,W*.91,H*.70);
+      ctx.bezierCurveTo(W*.93,H*.70,W*.95,H*.71,W*.97,H*.72);
+      ctx.bezierCurveTo(W*.98,H*.725,W*.99,H*.73,W,H*.73);
+      ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
+    }
+    pathM(); ctx.fillStyle='#0a1422'; ctx.fill();
+    ctx.strokeStyle='rgba(20,38,65,0.50)'; ctx.lineWidth=1.2;
+    [[W*.06,H*.71,W*.25,H*.61,W*.44,H*.63],[W*.22,H*.66,W*.42,H*.57,W*.62,H*.61],[W*.44,H*.61,W*.62,H*.58,W*.80,H*.67],[W*.62,H*.65,W*.78,H*.68,W*.96,H*.72]].forEach(function(r){
+      ctx.beginPath(); ctx.moveTo(r[0],r[1]); ctx.quadraticCurveTo(r[2],r[3],r[4],r[5]); ctx.stroke();
+    });
+    ctx.fillStyle='#060d18';
     ctx.beginPath();
-    TREES.forEach(function(tr){
-      var tx=tr.x*W, baseY=H*0.715;
-      ctx.moveTo(tx-tr.w*W, baseY);
-      ctx.quadraticCurveTo(tx, baseY-tr.h*H, tx+tr.w*W, baseY);
+    TREES_MID.forEach(function(tr){
+      var tx=tr.x*W, baseY=H*0.718, tH=tr.h*H, tW=tr.w*W;
+      ctx.moveTo(tx-tW,baseY); ctx.lineTo(tx,baseY-tH); ctx.lineTo(tx+tW,baseY); ctx.closePath();
     });
     ctx.fill();
+    ctx.fillStyle='rgba(15,30,60,0.22)';
+    ctx.fillRect(0,H*0.70,W,H*0.015);
+  }
+  function dNearMtns(W,H,t){
+    ctx.beginPath(); ctx.moveTo(0,H*.82);
+    ctx.bezierCurveTo(W*.02,H*.80,W*.05,H*.77,W*.08,H*.74);
+    ctx.bezierCurveTo(W*.10,H*.72,W*.12,H*.70,W*.14,H*.71);
+    ctx.bezierCurveTo(W*.16,H*.72,W*.18,H*.74,W*.20,H*.73);
+    ctx.bezierCurveTo(W*.22,H*.71,W*.24,H*.68,W*.26,H*.67);
+    ctx.bezierCurveTo(W*.28,H*.67,W*.30,H*.69,W*.32,H*.71);
+    ctx.bezierCurveTo(W*.33,H*.72,W*.35,H*.71,W*.37,H*.69);
+    ctx.bezierCurveTo(W*.38,H*.67,W*.40,H*.65,W*.42,H*.66);
+    ctx.bezierCurveTo(W*.43,H*.67,W*.45,H*.70,W*.47,H*.72);
+    ctx.bezierCurveTo(W*.49,H*.73,W*.51,H*.72,W*.53,H*.69);
+    ctx.bezierCurveTo(W*.55,H*.67,W*.57,H*.65,W*.59,H*.66);
+    ctx.bezierCurveTo(W*.60,H*.67,W*.62,H*.70,W*.64,H*.72);
+    ctx.bezierCurveTo(W*.65,H*.73,W*.67,H*.72,W*.69,H*.70);
+    ctx.bezierCurveTo(W*.71,H*.69,W*.72,H*.70,W*.74,H*.72);
+    ctx.bezierCurveTo(W*.75,H*.74,W*.77,H*.75,W*.79,H*.74);
+    ctx.bezierCurveTo(W*.81,H*.73,W*.83,H*.74,W*.85,H*.75);
+    ctx.bezierCurveTo(W*.87,H*.76,W*.90,H*.77,W*.93,H*.77);
+    ctx.bezierCurveTo(W*.95,H*.77,W*.97,H*.78,W*.99,H*.79);
+    ctx.bezierCurveTo(W*.995,H*.795,W,H*.80,W,H*.80);
+    ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
+    ctx.fillStyle='#0e1a2e'; ctx.fill();
+    ctx.fillStyle='#080e1a';
+    ctx.beginPath();
+    TREES_NEAR.forEach(function(tr){
+      var tx=tr.x*W, baseY=H*0.740, tH=tr.h*H, tW=tr.w*W;
+      ctx.moveTo(tx-tW,baseY); ctx.lineTo(tx,baseY-tH); ctx.lineTo(tx+tW,baseY); ctx.closePath();
+    });
+    ctx.fill();
+    var dawnF=fade(t,.18,.25,.29,.36), duskF=fade(t,.60,.66,.71,.76);
+    var tA=Math.max(dawnF,duskF)*0.08;
+    if(tA>0.005){
+      ctx.fillStyle='rgba(200,100,30,'+tA.toFixed(2)+')';
+      ctx.fillRect(0,H*0.33,W,H*0.55);
+    }
   }
   function dCross(W,H,t,now){
     var cx=W*.41, cy=H*.36;
@@ -1046,7 +1099,7 @@ function _foStartCanvasScene() {
     var t = (_elapsed % CYCLE) / CYCLE;
     var W = cv.width, H = cv.height, sky = getSky(t), na = nightA(t);
     dSky(W,H,sky); dStars(W,H,ts,na); dMoon(W,H,na); dHorizonGlow(W,H,t); dSun(W,H,t);
-    dClouds(W,H,t,ts); dFarMtns(W,H); dMidMtns(W,H); dCross(W,H,t,ts); dMist(W,H,t);
+    dClouds(W,H,t,ts); dFarMtns(W,H,t); dMidMtns(W,H,t); dNearMtns(W,H,t); dCross(W,H,t,ts); dMist(W,H,t);
     dBirds(W,H,t,ts); dWell(W,H,sky.top); dFG(W,H); dSparks(W,H,t,ts); dScrim(W,H);
     window._foCanvasRaf = requestAnimationFrame(tick);
   }
