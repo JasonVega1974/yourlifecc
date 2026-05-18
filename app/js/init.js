@@ -826,6 +826,7 @@ function _foStartCanvasScene() {
     });
   }
   function dFarMtns(W,H,t){
+    var pkS = Math.max(0.010, 11/W);
     function pathL1(){
       ctx.beginPath(); ctx.moveTo(0,H*.68);
       ctx.bezierCurveTo(W*.02,H*.67,W*.04,H*.65,W*.06,H*.63);
@@ -851,16 +852,16 @@ function _foStartCanvasScene() {
       ctx.beginPath(); ctx.moveTo(0,H*.63);
       ctx.bezierCurveTo(W*.02,H*.61,W*.04,H*.59,W*.06,H*.57);
       ctx.bezierCurveTo(W*.08,H*.55,W*.10,H*.52,W*.12,H*.50);
-      ctx.bezierCurveTo(W*.13,H*.48,W*.15,H*.46,W*.17,H*.47);
+      ctx.bezierCurveTo(W*.12,H*.49,W*.15,H*.47,W*.17,H*.47);
       ctx.bezierCurveTo(W*.19,H*.48,W*.21,H*.51,W*.23,H*.53);
       ctx.bezierCurveTo(W*.25,H*.55,W*.27,H*.54,W*.29,H*.51);
       ctx.bezierCurveTo(W*.30,H*.49,W*.32,H*.46,W*.34,H*.44);
       ctx.bezierCurveTo(W*.35,H*.42,W*.37,H*.39,W*.38,H*.38);
-      ctx.bezierCurveTo(W*.39,H*.37,W*.40,H*.35,W*.41,H*.34);
-      ctx.bezierCurveTo(W*.42,H*.34,W*.43,H*.35,W*.44,H*.37);
+      ctx.bezierCurveTo(W*.39,H*.37,W*(0.41-pkS),H*.34,W*.41,H*.34);
+      ctx.bezierCurveTo(W*(0.41+pkS),H*.34,W*.43,H*.35,W*.44,H*.37);
       ctx.bezierCurveTo(W*.45,H*.39,W*.46,H*.40,W*.47,H*.39);
-      ctx.bezierCurveTo(W*.48,H*.38,W*.49,H*.37,W*.50,H*.38);
-      ctx.bezierCurveTo(W*.51,H*.40,W*.52,H*.43,W*.54,H*.47);
+      ctx.bezierCurveTo(W*.47,H*.40,W*(0.50-pkS),H*.38,W*.50,H*.38);
+      ctx.bezierCurveTo(W*(0.50+pkS),H*.385,W*.52,H*.43,W*.54,H*.47);
       ctx.bezierCurveTo(W*.55,H*.49,W*.57,H*.51,W*.59,H*.49);
       ctx.bezierCurveTo(W*.60,H*.48,W*.61,H*.46,W*.63,H*.44);
       ctx.bezierCurveTo(W*.64,H*.43,W*.65,H*.44,W*.67,H*.47);
@@ -887,6 +888,7 @@ function _foStartCanvasScene() {
     ctx.fillRect(0,H*0.60,W,H*0.015);
   }
   function dMidMtns(W,H,t){
+    var pkS = Math.max(0.010, 11/W);
     function pathM(){
       ctx.beginPath(); ctx.moveTo(0,H*.76);
       ctx.bezierCurveTo(W*.02,H*.74,W*.04,H*.72,W*.06,H*.70);
@@ -895,11 +897,11 @@ function _foStartCanvasScene() {
       ctx.bezierCurveTo(W*.22,H*.60,W*.24,H*.58,W*.26,H*.59);
       ctx.bezierCurveTo(W*.27,H*.60,W*.29,H*.62,W*.31,H*.63);
       ctx.bezierCurveTo(W*.33,H*.62,W*.35,H*.59,W*.37,H*.56);
-      ctx.bezierCurveTo(W*.38,H*.55,W*.40,H*.53,W*.42,H*.52);
-      ctx.bezierCurveTo(W*.43,H*.51,W*.44,H*.52,W*.46,H*.54);
+      ctx.bezierCurveTo(W*.37,H*.56,W*(0.42-pkS),H*.52,W*.42,H*.52);
+      ctx.bezierCurveTo(W*(0.42+pkS),H*.52,W*.44,H*.54,W*.46,H*.55);
       ctx.bezierCurveTo(W*.47,H*.56,W*.48,H*.59,W*.50,H*.61);
       ctx.bezierCurveTo(W*.52,H*.63,W*.54,H*.62,W*.56,H*.59);
-      ctx.bezierCurveTo(W*.57,H*.57,W*.59,H*.55,W*.60,H*.56);
+      ctx.bezierCurveTo(W*.56,H*.58,W*(0.60-pkS),H*.56,W*.60,H*.56);
       ctx.bezierCurveTo(W*.62,H*.57,W*.63,H*.60,W*.65,H*.63);
       ctx.bezierCurveTo(W*.66,H*.64,W*.68,H*.65,W*.70,H*.63);
       ctx.bezierCurveTo(W*.71,H*.62,W*.73,H*.60,W*.75,H*.62);
