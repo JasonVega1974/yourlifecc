@@ -918,6 +918,9 @@
     /* ── SVG well scene (fills entire hero; with slice scaling the well anchors near bottom) ── */
     .fo-svg-scene{position:absolute;inset:0;width:100%;height:100%;z-index:3;}
     .fo-svg-scene > g{transition:transform 280ms ease-out;will-change:transform;}
+    /* ── Full mountain scene SVG (replaces well scene + separate star/moon divs) ── */
+    .fo-full-scene{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;}
+    .fo-full-scene > g{transition:transform 280ms ease-out;will-change:transform;}
     /* ── Scrim (subtle vignette) ── */
     .fo-hero-scrim{
       position:absolute;inset:0;pointer-events:none;z-index:4;

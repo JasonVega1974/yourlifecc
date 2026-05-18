@@ -726,132 +726,85 @@ function renderFaithOnlyHero() {
   name = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
   name = name.replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]||c));
 
-  // ── 160 CSS-based stars (each absolutely positioned, unique twinkle) ──
-  let starsHtml = '';
-  for (let i = 0; i < 160; i++) {
-    const top = (Math.random() * 78).toFixed(2);     // keep stars in upper 78% of hero (above well)
-    const left = (Math.random() * 100).toFixed(2);
-    const size = (0.8 + Math.random() * 2.4).toFixed(2);
-    const maxOp = (0.45 + Math.random() * 0.55).toFixed(2);
-    const minOp = (+maxOp * (0.1 + Math.random() * 0.25)).toFixed(3);
-    const dur = (2.5 + Math.random() * 3.8).toFixed(2);
-    const del = (Math.random() * 8).toFixed(2);
-    const roll = Math.random();
-    const cls = roll < 0.15 ? ' fo-star-bright' : (roll < 0.55 ? ' fo-star-glow' : '');
-    starsHtml += `<div class="fo-star${cls}" style="top:${top}%;left:${left}%;width:${size}px;height:${size}px;--max:${maxOp};--min:${minOp};--dur:${dur}s;--del:${del}s"></div>`;
+  // ── SVG mountain scene — sky, stars, moon, mountains, cross, birds, mist ──
+  let svgStars = '';
+  for(let i=0;i<72;i++){
+    const sx=(5+Math.random()*380).toFixed(1);
+    const sy=(8+Math.random()*258).toFixed(1);
+    const sr=(0.4+Math.random()*2.0).toFixed(2);
+    const sop=(0.35+Math.random()*0.65).toFixed(2);
+    const sdur=(2.2+Math.random()*5.5).toFixed(1);
+    const sdel=(Math.random()*9).toFixed(2);
+    const smin=(sop*0.09).toFixed(3);
+    svgStars+=`<circle cx="${sx}" cy="${sy}" r="${sr}" fill="#fff" opacity="${sop}"><animate attributeName="opacity" values="${sop};${smin};${sop}" dur="${sdur}s" begin="${sdel}s" repeatCount="indefinite"/></circle>`;
   }
-  // Two shooting stars at different times
-  starsHtml += `<div class="fo-shooting-star" style="top:14%;left:6%;--sx:320px;--sy:140px;animation-delay:2.5s"></div>`;
-  starsHtml += `<div class="fo-shooting-star" style="top:22%;left:62%;--sx:-260px;--sy:180px;animation-delay:6.5s"></div>`;
 
-  // SVG well scene — no moon, no stars, no sky rect (those are now CSS)
-  const fireflies = _foFireflies(28);
-  const goldRise = _foGoldRise();
-  const stones = _foWellStones();
-
-  const svgScene =
-    `<svg class="fo-svg-scene" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">` +
+  const svgFullScene =
+    `<svg class="fo-full-scene" viewBox="0 0 390 520" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">` +
     `<defs>` +
-      `<radialGradient id="foWellCore" cx="50%" cy="50%" r="50%">` +
-        `<stop offset="0%" stop-color="#fef9e7"/>` +
-        `<stop offset="50%" stop-color="#fbbf24" stop-opacity=".85"/>` +
-        `<stop offset="100%" stop-color="#d97706" stop-opacity="0"/>` +
+      `<linearGradient id="foMtnSky" x1="0" y1="0" x2="0" y2="1">` +
+        `<stop offset="0%" stop-color="#060a1e"/>` +
+        `<stop offset="45%" stop-color="#0a1530"/>` +
+        `<stop offset="100%" stop-color="#091226"/>` +
+      `</linearGradient>` +
+      `<radialGradient id="foMtnMoonHalo" cx="50%" cy="50%" r="50%">` +
+        `<stop offset="0%" stop-color="#c8c0a0" stop-opacity="0"/>` +
+        `<stop offset="60%" stop-color="#c8c0a0" stop-opacity=".08"/>` +
+        `<stop offset="100%" stop-color="#c8c0a0" stop-opacity="0"/>` +
       `</radialGradient>` +
-      `<radialGradient id="foWellMid" cx="50%" cy="50%" r="50%">` +
-        `<stop offset="0%" stop-color="#fbbf24" stop-opacity=".7"/>` +
-        `<stop offset="100%" stop-color="#d97706" stop-opacity="0"/>` +
+      `<radialGradient id="foMtnCrossGlow" cx="50%" cy="50%" r="50%">` +
+        `<stop offset="0%" stop-color="#fef3c7" stop-opacity=".9"/>` +
+        `<stop offset="40%" stop-color="#fbbf24" stop-opacity=".4"/>` +
+        `<stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>` +
       `</radialGradient>` +
-      `<radialGradient id="foWellBloom" cx="50%" cy="50%" r="50%">` +
-        `<stop offset="0%" stop-color="#fbbf24" stop-opacity=".42"/>` +
-        `<stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/>` +
-      `</radialGradient>` +
-      `<radialGradient id="foGroundGlow" cx="50%" cy="40%" r="50%">` +
-        `<stop offset="0%" stop-color="#fbbf24" stop-opacity=".5"/>` +
-        `<stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/>` +
-      `</radialGradient>` +
-      `<filter id="foBlurSm" x="-50%" y="-50%" width="200%" height="200%">` +
-        `<feGaussianBlur stdDeviation="1.4"/>` +
+      `<filter id="foMtnBlur" x="-100%" y="-100%" width="300%" height="300%">` +
+        `<feGaussianBlur stdDeviation="4"/>` +
+      `</filter>` +
+      `<filter id="foMtnCrossBlur" x="-200%" y="-200%" width="500%" height="500%">` +
+        `<feGaussianBlur stdDeviation="3"/>` +
       `</filter>` +
     `</defs>` +
+    `<rect width="390" height="520" fill="url(#foMtnSky)"/>` +
+    `<g class="fo-layer-stars">${svgStars}</g>` +
+    `<g class="fo-layer-moon">` +
+      `<circle cx="315" cy="82" r="80" fill="url(#foMtnMoonHalo)">` +
+        `<animate attributeName="opacity" values="1;.55;1" dur="4s" repeatCount="indefinite"/>` +
+      `</circle>` +
+      `<circle cx="315" cy="82" r="42" fill="#d6d0be"/>` +
+      `<circle cx="304" cy="74" r="7" fill="#c4bda8" opacity=".7"/>` +
+      `<circle cx="326" cy="90" r="5" fill="#c4bda8" opacity=".6"/>` +
+      `<circle cx="318" cy="68" r="3.5" fill="#c0b9a4" opacity=".55"/>` +
+      `<circle cx="298" cy="88" r="4" fill="#c0b9a4" opacity=".5"/>` +
+      `<circle cx="308" cy="70" r="42" fill="#e8e2ce" opacity=".12" filter="url(#foMtnBlur)"/>` +
+    `</g>` +
+    `<path d="M48,110 Q52,104 57,110 Q62,104 67,110" stroke="#1a2a3a" stroke-width="1.4" fill="none" opacity=".8"/>` +
+    `<path d="M74,98 Q79,91 85,98 Q91,91 97,98" stroke="#1a2a3a" stroke-width="1.5" fill="none" opacity=".85"/>` +
+    `<path d="M112,118 Q116,112 121,118 Q126,112 131,118" stroke="#1a2a3a" stroke-width="1.3" fill="none" opacity=".7"/>` +
+    `<path d="M155,108 Q161,100 168,108 Q175,100 182,108" stroke="#1a2a3a" stroke-width="1.6" fill="none" opacity=".9"/>` +
+    `<path d="M210,125 Q214,119 219,125 Q224,119 229,125" stroke="#1a2a3a" stroke-width="1.3" fill="none" opacity=".65"/>` +
+    `<path d="M245,100 Q252,92 260,100 Q268,92 276,100" stroke="#1a2a3a" stroke-width="1.7" fill="none" opacity=".8"/>` +
     `<g class="fo-layer-mid">` +
-      // Two hill silhouettes — extra dark for separation against sky gradient
-      `<path d="M0,290 Q72,240 170,256 Q262,228 374,253 Q468,228 558,248 Q658,228 760,247 Q780,243 800,250 L800,400 L0,400 Z" fill="#080f22"/>` +
-      `<path d="M0,310 Q120,278 240,295 Q360,272 480,290 Q600,274 720,289 Q760,283 800,291 L800,400 L0,400 Z" fill="#040820" opacity=".95"/>` +
-      `<rect x="0" y="314" width="800" height="86" fill="#02061a"/>` +
-      `<ellipse cx="400" cy="334" rx="220" ry="44" fill="url(#foGroundGlow)">` +
-        `<animate attributeName="opacity" values="1;.55;1" dur="2.5s" repeatCount="indefinite"/>` +
-        `<animate attributeName="rx" values="220;260;220" dur="2.5s" repeatCount="indefinite"/>` +
-      `</ellipse>` +
+      `<ellipse cx="195" cy="350" rx="280" ry="30" fill="#0d1f35" opacity=".6"/>` +
+      `<path d="M0,380 Q40,310 80,340 Q120,290 160,330 Q200,280 240,325 Q280,300 320,335 Q355,305 390,330 L390,520 L0,520 Z" fill="#0c1928"/>` +
+      `<path d="M0,400 Q50,345 100,370 Q145,320 185,355 Q225,310 265,350 Q305,325 350,360 Q370,348 390,355 L390,520 L0,520 Z" fill="#060e1a"/>` +
     `</g>` +
-    `<g class="fo-layer-well">` +
-      `<ellipse cx="400" cy="350" rx="78" ry="15" fill="#000" opacity=".62"/>` +
-      `<rect x="348" y="272" width="104" height="76" rx="4" fill="#252836"/>` +
-      stones +
-      `<ellipse cx="400" cy="272" rx="54" ry="14" fill="#3a4054"/>` +
-      `<ellipse cx="400" cy="269" rx="52" ry="11" fill="#4a546c" opacity=".55"/>` +
-      `<ellipse cx="400" cy="266" rx="48" ry="8" fill="#5a657f" opacity=".35"/>` +
-      `<ellipse cx="400" cy="272" rx="42" ry="10" fill="#02040d"/>` +
-      `<ellipse cx="400" cy="272" rx="92" ry="40" fill="url(#foWellBloom)" opacity=".92">` +
-        `<animate attributeName="opacity" values=".92;.58;.92" dur="2.5s" repeatCount="indefinite"/>` +
-        `<animate attributeName="rx" values="92;108;92" dur="2.5s" repeatCount="indefinite"/>` +
-      `</ellipse>` +
-      `<ellipse cx="400" cy="273" rx="52" ry="15" fill="url(#foWellMid)">` +
-        `<animate attributeName="opacity" values="1;.7;1" dur="2.5s" repeatCount="indefinite"/>` +
-        `<animate attributeName="rx" values="52;64;52" dur="2.5s" repeatCount="indefinite"/>` +
-      `</ellipse>` +
-      `<ellipse cx="400" cy="274" rx="38" ry="10" fill="url(#foWellCore)">` +
-        `<animate attributeName="opacity" values="1;.78;1" dur="2.5s" repeatCount="indefinite"/>` +
-        `<animate attributeName="rx" values="38;46;38" dur="2.5s" repeatCount="indefinite"/>` +
-      `</ellipse>` +
-      goldRise +
-      `<line x1="370" y1="270" x2="345" y2="206" stroke="#6b4c2a" stroke-width="6" stroke-linecap="round"/>` +
-      `<line x1="368.5" y1="268" x2="343.5" y2="204" stroke="#8b6914" stroke-width="2" stroke-linecap="round" opacity=".65"/>` +
-      `<line x1="430" y1="270" x2="455" y2="206" stroke="#6b4c2a" stroke-width="6" stroke-linecap="round"/>` +
-      `<line x1="431.5" y1="268" x2="456.5" y2="204" stroke="#8b6914" stroke-width="2" stroke-linecap="round" opacity=".65"/>` +
-      `<line x1="343" y1="207" x2="457" y2="207" stroke="#5a3e1f" stroke-width="7" stroke-linecap="round"/>` +
-      `<line x1="343" y1="205.5" x2="457" y2="205.5" stroke="#8b6914" stroke-width="2" stroke-linecap="round" opacity=".5"/>` +
-      `<circle cx="400" cy="207" r="9" fill="#3a2810" stroke="#1d1408" stroke-width="1.5"/>` +
-      `<circle cx="400" cy="207" r="6" fill="#7c5018"/>` +
-      `<circle cx="400" cy="207" r="2.5" fill="#1d1408"/>` +
-      _foRope() +
-      `<rect x="390" y="254" width="20" height="16" rx="2" fill="#3a2810" stroke="#8b6914" stroke-width="1.2"/>` +
-      `<line x1="390" y1="257" x2="410" y2="257" stroke="#8b6914" stroke-width="1.2"/>` +
-      `<line x1="390" y1="262" x2="410" y2="262" stroke="#a88752" stroke-width=".8" opacity=".6"/>` +
-      `<path d="M388,254 Q400,250 412,254" stroke="#8b6914" stroke-width="1.2" fill="none"/>` +
-      _foMossPatch(356, 308, 0.85) +
-      _foMossPatch(446, 326, 0.75) +
-      _foMossPatch(394, 344, 0.7) +
-    `</g>` +
-    `<g class="fo-layer-fireflies">${fireflies}</g>` +
     `<g class="fo-layer-fg">` +
-      `<ellipse cx="295" cy="355" rx="34" ry="13" fill="#040814" opacity=".95"/>` +
-      `<ellipse cx="282" cy="350" rx="22" ry="7" fill="#0a1224" opacity=".7"/>` +
-      `<ellipse cx="510" cy="365" rx="28" ry="11" fill="#040814" opacity=".9"/>` +
-      `<ellipse cx="498" cy="361" rx="18" ry="6" fill="#0a1224" opacity=".65"/>` +
-      `<ellipse cx="142" cy="370" rx="24" ry="9" fill="#040814" opacity=".85"/>` +
-      `<ellipse cx="654" cy="358" rx="22" ry="8" fill="#040814" opacity=".82"/>` +
-      `<ellipse cx="50" cy="378" rx="20" ry="8" fill="#040814" opacity=".75"/>` +
-      `<ellipse cx="745" cy="380" rx="22" ry="8" fill="#040814" opacity=".78"/>` +
-      `<path d="M258,348 Q262,330 266,348" stroke="#08180c" stroke-width="1.7" fill="none"/>` +
-      `<path d="M266,348 Q272,326 276,348" stroke="#08180c" stroke-width="1.7" fill="none"/>` +
-      `<path d="M273,348 Q280,328 285,348" stroke="#08180c" stroke-width="1.7" fill="none"/>` +
-      `<path d="M533,358 Q538,338 542,358" stroke="#08180c" stroke-width="1.6" fill="none"/>` +
-      `<path d="M540,358 Q547,335 551,358" stroke="#08180c" stroke-width="1.6" fill="none"/>` +
-      `<path d="M548,358 Q553,338 557,358" stroke="#08180c" stroke-width="1.6" fill="none"/>` +
-      `<path d="M170,365 Q175,348 178,365" stroke="#08180c" stroke-width="1.6" fill="none"/>` +
-      `<path d="M178,365 Q184,346 188,365" stroke="#08180c" stroke-width="1.6" fill="none"/>` +
-      `<path d="M680,355 Q686,335 690,355" stroke="#08180c" stroke-width="1.7" fill="none"/>` +
-      `<path d="M690,355 Q696,332 700,355" stroke="#08180c" stroke-width="1.7" fill="none"/>` +
-      `<g transform="translate(105,372)">` +
-        `<path d="M-14,0 Q-17,-13 -9,-15 Q-3,-19 4,-15 Q13,-16 16,-7 Q18,3 9,5 Q-3,7 -9,5 Q-15,5 -14,0Z" fill="#06150b" opacity=".95"/>` +
-        `<path d="M-5,-11 Q0,-16 5,-11" stroke="#0e2412" stroke-width="1" fill="none"/>` +
-        `<path d="M-9,-5 Q-4,-10 1,-5" stroke="#0e2412" stroke-width="1" fill="none"/>` +
-        `<path d="M3,-8 Q7,-13 11,-8" stroke="#0e2412" stroke-width="1" fill="none"/>` +
+      `<path d="M0,430 Q30,395 70,410 Q105,370 145,400 Q170,340 195,308 Q220,340 245,400 Q285,370 325,405 Q360,388 390,410 L390,520 L0,520 Z" fill="#03070f"/>` +
+      `<ellipse cx="195" cy="322" rx="55" ry="55" fill="url(#foMtnCrossGlow)">` +
+        `<animate attributeName="opacity" values="1;.6;1" dur="3s" repeatCount="indefinite"/>` +
+        `<animate attributeName="rx" values="55;68;55" dur="3s" repeatCount="indefinite"/>` +
+        `<animate attributeName="ry" values="55;68;55" dur="3s" repeatCount="indefinite"/>` +
+      `</ellipse>` +
+      `<g filter="url(#foMtnCrossBlur)" opacity=".65">` +
+        `<rect x="191" y="272" width="8" height="60" rx="2" fill="#fef9e7"/>` +
+        `<rect x="177" y="288" width="36" height="7" rx="2" fill="#fef9e7"/>` +
       `</g>` +
-      `<g transform="translate(720,370)">` +
-        `<path d="M-11,0 Q-14,-11 -7,-13 Q-2,-17 3,-13 Q11,-14 13,-6 Q15,3 7,5 Q-1,5 -7,3 Q-13,3 -11,0Z" fill="#06150b" opacity=".92"/>` +
-        `<path d="M-3,-8 Q1,-13 5,-8" stroke="#0e2412" stroke-width="1" fill="none"/>` +
-      `</g>` +
+      `<rect x="192" y="274" width="6" height="56" rx="1.5" fill="#fef3c7"/>` +
+      `<rect x="178" y="289" width="34" height="6" rx="1.5" fill="#fef3c7"/>` +
+      `<ellipse cx="100" cy="395" rx="130" ry="16" fill="#0d1e30" opacity=".55"/>` +
+      `<ellipse cx="290" cy="408" rx="120" ry="14" fill="#0d1e30" opacity=".5"/>` +
+      `<ellipse cx="195" cy="420" rx="200" ry="20" fill="#091526" opacity=".65"/>` +
+      `<rect x="0" y="475" width="390" height="45" fill="#020509"/>` +
     `</g>` +
     `</svg>`;
 
@@ -870,9 +823,7 @@ function renderFaithOnlyHero() {
     hero.style.display = '';
     hero.innerHTML =
       '<div class="fo-hero" id="faithOnlyHero">' +
-        `<div class="fo-night-stars">${starsHtml}</div>` +
-        '<div class="fo-moon"></div>' +
-        svgScene +
+        svgFullScene +
         '<div class="fo-hero-scrim"></div>' +
         '<div class="fo-hero-content">' +
           '<div class="fo-hero-greeting">' + greetingHtml + '</div>' +
