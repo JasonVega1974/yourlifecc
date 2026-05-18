@@ -532,6 +532,8 @@ function renderWellDonationPrompt(){
 // short-circuit to showSection on those section ids; everything else
 // routes through bfTab inside #s-scripture.
 function wellGoto(target){
+  // Unlock scroll when user enters The Well from the hero home screen
+  document.body.classList.remove('ff-hero-active');
   if(target === 'worship'){
     if(typeof showSection === 'function') showSection('s-worship');
     return;

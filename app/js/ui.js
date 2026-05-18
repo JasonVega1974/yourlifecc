@@ -1228,6 +1228,28 @@ function handleTabAction(action){
 
 let _activeSection = 's-hero';
 
+// ── Sidebar collapse ──────────────────────────────────────────────────
+var _SIDEBAR_COL_KEY = 'ylcc_sidebar_collapsed';
+
+function toggleSidebarCollapse(){
+  var collapsed = document.body.classList.toggle('sidebar-collapsed');
+  try{ localStorage.setItem(_SIDEBAR_COL_KEY, collapsed ? '1' : '0'); }catch(e){}
+  var btn = document.getElementById('sideCollapseBtn');
+  if(btn) btn.textContent = collapsed ? '›' : '‹';
+}
+
+function initSidebarCollapse(){
+  if(window.innerWidth < 861) return; // mobile: sidebar already off-screen
+  var stored = '';
+  try{ stored = localStorage.getItem(_SIDEBAR_COL_KEY) || ''; }catch(e){}
+  if(stored === '1'){
+    document.body.classList.add('sidebar-collapsed');
+    var btn = document.getElementById('sideCollapseBtn');
+    if(btn) btn.textContent = '›';
+  }
+}
+// ─────────────────────────────────────────────────────────────────────
+
 function buildSideNav(){
   const el = document.getElementById('sideNav'); if(!el) return;
   // New sections added after launch - always visible, ignore saved hide state

@@ -661,6 +661,7 @@
 <!-- NAV -->
 <!-- SIDEBAR -->
 <div id="sidebar">
+  <button class="sid-collapse-btn" id="sideCollapseBtn" onclick="toggleSidebarCollapse()" aria-label="Collapse sidebar" title="Collapse sidebar">‹</button>
   <div class="sid-logo">
     <div class="sid-logo-title">YourLife CC</div>
     <div class="sid-logo-sub">YOUR LIFE. YOUR JOURNEY.</div>
@@ -685,6 +686,7 @@
     </div>
 </div>
 <div id="sideOverlay" onclick="closeSidebar()"></div>
+<button id="sideExpandTab" onclick="toggleSidebarCollapse()" aria-label="Expand sidebar" title="Expand sidebar">MENU</button>
 
 <!-- MOBILE TOP BAR -->
 <!-- Phase C-fix-2/3 (2026-05-15): added compact globe + avatar buttons
@@ -12577,6 +12579,7 @@ if (_origRefresh) {
   window.ffNavGo = function(target){
     if(target === 'home'){
       ffSetActive('home');
+      document.body.classList.add('ff-hero-active');
       if(typeof showSection === 'function') showSection('s-hero');
     } else if(target === 'settings'){
       ffSetActive('settings');

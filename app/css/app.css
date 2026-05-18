@@ -5742,3 +5742,49 @@ html[data-faith-free="1"] #faithHeroCinematic { visibility: visible; }
 html[data-faith-free="1"] #bottomTabBar { display: none !important; }
 /* Remove bottom padding so fo-hero fills the viewport without extra scroll */
 html[data-faith-free="1"] #app { padding-bottom: 0 !important; }
+
+/* ── Fix 2: Hide Well bottom tab bar for faith-free users ────────── */
+html[data-faith-free="1"] #s-scripture .scrTabs-bottom { display: none !important; }
+
+/* ── Fix 1: Sidebar collapse toggle ─────────────────────────────── */
+.sid-collapse-btn{
+  position:absolute;top:.85rem;right:.45rem;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:6px;color:var(--tx3);font-size:.75rem;font-weight:700;
+  width:22px;height:22px;cursor:pointer;display:flex;
+  align-items:center;justify-content:center;
+  transition:background .15s,color .15s;z-index:1;line-height:1;padding:0;
+}
+.sid-collapse-btn:hover{background:rgba(255,255,255,.15);color:var(--tx);}
+#sideExpandTab{
+  display:none;position:fixed;left:0;top:50%;
+  transform:translateY(-50%);z-index:901;
+  background:var(--s1);border:1px solid rgba(255,255,255,.1);
+  border-left:none;border-radius:0 8px 8px 0;
+  padding:.6rem .3rem;color:var(--tx3);cursor:pointer;
+  font-size:.55rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  writing-mode:vertical-lr;line-height:1;
+  transition:background .15s,color .15s;
+}
+#sideExpandTab:hover{background:var(--bg2);color:var(--tx);}
+@media(min-width:861px){
+  body.sidebar-collapsed #sidebar{transform:translateX(-220px);}
+  body.sidebar-collapsed #mainWrap{margin-left:0;width:100vw;}
+  body.sidebar-collapsed #sideExpandTab{display:flex;align-items:center;}
+}
+
+/* ── Fix 3: Lock Well hero home screen — no scroll ───────────────── */
+body.ff-hero-active{overflow:hidden;}
+body.ff-hero-active #mainWrap{padding-top:0;overflow:hidden;}
+body.ff-hero-active #app{padding:0 !important;overflow:hidden;}
+body.ff-hero-active #faithHeroCinematic .fo-hero{
+  min-height:100dvh !important;max-height:100dvh !important;
+  border-radius:0 !important;margin:0 !important;
+}
+@media(max-width:860px){
+  body.ff-hero-active #mainWrap{padding-top:44px;}
+  body.ff-hero-active #faithHeroCinematic .fo-hero{
+    min-height:calc(100dvh - 44px) !important;
+    max-height:calc(100dvh - 44px) !important;
+  }
+}

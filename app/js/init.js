@@ -308,6 +308,7 @@ function finishInit(cloudReady){
     var _mwEl = document.getElementById('mainWrap');
     if(_mwEl) _mwEl.style.visibility = 'visible';
   }
+  if(typeof initSidebarCollapse === 'function') initSidebarCollapse();
   if(typeof trackSection === 'function') trackSection(_defaultLanding);
   const popupDelay = cloudReady ? 800 : 3500;
   setTimeout(function(){
@@ -707,6 +708,8 @@ function renderFaithOnlyHero() {
   // via the loop above so it's safe to restore visibility before rendering The Well.
   var _mw = document.getElementById('mainWrap');
   if(_mw) _mw.style.visibility = 'visible';
+  // Lock scroll so the hero fills the viewport without any overflow
+  document.body.classList.add('ff-hero-active');
 
   const hr = new Date().getHours();
   const greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
