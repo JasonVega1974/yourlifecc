@@ -5768,8 +5768,8 @@ html[data-faith-free="1"] #s-scripture .scrTabs-bottom { display: none !importan
 }
 #sideExpandTab:hover{background:var(--bg2);color:var(--tx);}
 @media(min-width:861px){
-  body.sidebar-collapsed #sidebar{transform:translateX(-220px);}
-  body.sidebar-collapsed #mainWrap{margin-left:0;width:100vw;}
+  body.sidebar-collapsed #sidebar{transform:translateX(-220px) !important;}
+  body.sidebar-collapsed #mainWrap{margin-left:0 !important;width:100vw !important;}
   body.sidebar-collapsed #sideExpandTab{display:flex;align-items:center;}
 }
 
