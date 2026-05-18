@@ -733,20 +733,42 @@ function _foStartCanvasScene() {
   if (window._foCanvasRaf) { cancelAnimationFrame(window._foCanvasRaf); window._foCanvasRaf = null; }
   var cv = document.getElementById('fo-canvas-scene');
   if (!cv) return;
-  cv.width = cv.offsetWidth || 390;
-  cv.height = cv.offsetHeight || 700;
+  // Retry until the hero has real layout dimensions — Android Chrome often
+  // reports 0 immediately after innerHTML injection.
+  var _hero = document.getElementById('faithOnlyHero');
+  if (!_hero || _hero.offsetWidth === 0 || _hero.offsetHeight === 0) {
+    setTimeout(_foStartCanvasScene, 80);
+    return;
+  }
+  cv.width  = _hero.offsetWidth;
+  cv.height = _hero.offsetHeight;
+  // Promote canvas to its own GPU layer to prevent rasterisation stalls on Android.
+  cv.style.transform = 'translateZ(0)';
+  cv.style.webkitTransform = 'translateZ(0)';
   var ctx = cv.getContext('2d');
   var PI2 = Math.PI * 2, CYCLE = 60000;
-  var _elapsed = 0, _lastTs = null, _rafPaused = false;
+  // _t: cycle position [0,1). 0 = midnight — hard start so first frame is always
+  // the dark night sky regardless of wall-clock time.
+  // _lastTs: 0 (falsy) means "first frame — skip delta accumulation".
+  var _t = 0, _lastTs = 0;
   var _visChange = function() {
-    _rafPaused = document.hidden;
-    if (!_rafPaused) _lastTs = null;
+    if (document.visibilityState === 'visible') {
+      _lastTs = 0; // discard the hidden gap so t doesn't jump forward on re-entry
+      if (!window._foCanvasRaf) window._foCanvasRaf = requestAnimationFrame(tick);
+    } else {
+      if (window._foCanvasRaf) { cancelAnimationFrame(window._foCanvasRaf); window._foCanvasRaf = null; }
+    }
   };
   document.addEventListener('visibilitychange', _visChange);
   var _rsz;
   var _onResize = function() {
     clearTimeout(_rsz);
-    _rsz = setTimeout(function() { if (cv.isConnected) { cv.width = cv.offsetWidth || 390; cv.height = cv.offsetHeight || 700; } }, 120);
+    _rsz = setTimeout(function() {
+      if (!cv.isConnected) return;
+      var _rh = document.getElementById('faithOnlyHero');
+      cv.width  = (_rh && _rh.offsetWidth)  || cv.offsetWidth  || 390;
+      cv.height = (_rh && _rh.offsetHeight) || cv.offsetHeight || 700;
+    }, 120);
   };
   window.addEventListener('resize', _onResize);
 
@@ -1123,20 +1145,29 @@ function _foStartCanvasScene() {
 
   // ── RAF loop ──
   function tick(ts) {
-    if (!cv.isConnected) {
-      document.removeEventListener('visibilitychange', _visChange);
-      window.removeEventListener('resize', _onResize);
-      window._foCanvasRaf = null; return;
+    try {
+      if (!cv.isConnected) {
+        document.removeEventListener('visibilitychange', _visChange);
+        window.removeEventListener('resize', _onResize);
+        window._foCanvasRaf = null; return;
+      }
+      // Advance t. _lastTs=0 on first frame so this branch is skipped → t stays at
+      // midnight for tick 1. Cap dt to 50ms so a background tab wake-up doesn't
+      // jump the sky forward by minutes.
+      if (_lastTs) { _t = (_t + Math.min(ts - _lastTs, 50) / CYCLE) % 1; }
+      _lastTs = ts;
+      var t = _t;
+      var W = cv.width, H = cv.height, sky = getSky(t), na = nightA(t);
+      dSky(W,H,sky); dStars(W,H,ts,na); dMoon(W,H,na); dHorizonGlow(W,H,t); dSun(W,H,t);
+      dClouds(W,H,t,ts); dFarMtns(W,H,t); dMidMtns(W,H,t); dNearMtns(W,H,t); dCross(W,H,t,ts); dMist(W,H,t);
+      dBirds(W,H,t,ts); dWell(W,H,sky.top,ts); dFG(W,H); dSparks(W,H,t,ts); dScrim(W,H);
+      window._foCanvasRaf = requestAnimationFrame(tick);
+    } catch(e) {
+      console.warn('[Well] canvas error:', e);
+      window._foCanvasRaf = null;
+      // Restart loop rather than dying silently.
+      setTimeout(function() { if (cv.isConnected) window._foCanvasRaf = requestAnimationFrame(tick); }, 500);
     }
-    if (_rafPaused) { window._foCanvasRaf = requestAnimationFrame(tick); return; }
-    if (_lastTs !== null) _elapsed += ts - _lastTs;
-    _lastTs = ts;
-    var t = (_elapsed % CYCLE) / CYCLE;
-    var W = cv.width, H = cv.height, sky = getSky(t), na = nightA(t);
-    dSky(W,H,sky); dStars(W,H,ts,na); dMoon(W,H,na); dHorizonGlow(W,H,t); dSun(W,H,t);
-    dClouds(W,H,t,ts); dFarMtns(W,H,t); dMidMtns(W,H,t); dNearMtns(W,H,t); dCross(W,H,t,ts); dMist(W,H,t);
-    dBirds(W,H,t,ts); dWell(W,H,sky.top,ts); dFG(W,H); dSparks(W,H,t,ts); dScrim(W,H);
-    window._foCanvasRaf = requestAnimationFrame(tick);
   }
   window._foCanvasRaf = requestAnimationFrame(tick);
 }
@@ -1214,7 +1245,21 @@ function renderFaithOnlyHero() {
         '</div>' +
       '</div>';
   }
-  setTimeout(_foStartCanvasScene, 0);
+  // Fix Android Chrome: 100vh includes the address bar, pushing the "Enter The
+  // Well" button below the visible fold. window.innerHeight is the real viewport.
+  (function() {
+    var _fhEl = document.getElementById('faithOnlyHero');
+    if (_fhEl) _fhEl.style.height = window.innerHeight + 'px';
+    if (!window._foResizeAttached) {
+      window._foResizeAttached = true;
+      window.addEventListener('resize', function() {
+        var _h2 = document.getElementById('faithOnlyHero');
+        if (_h2) _h2.style.height = window.innerHeight + 'px';
+      });
+    }
+  })();
+  // 150ms gives Android Chrome time to finish layout before canvas reads dimensions.
+  setTimeout(_foStartCanvasScene, 150);
 
   // ── Entry cards & today's verse intentionally NOT rendered. ──
   // After clicking "Enter The Well", wellGoto('home') takes them inside where

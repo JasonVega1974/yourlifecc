@@ -5778,6 +5778,8 @@ body.ff-hero-active{overflow:hidden;}
 body.ff-hero-active #mainWrap{padding-top:0;overflow:hidden;}
 body.ff-hero-active #app{padding:0 !important;overflow:hidden;}
 body.ff-hero-active #faithHeroCinematic .fo-hero{
+  /* dvh first; JS sets exact window.innerHeight for Android Chrome fallback */
+  height:100dvh;min-height:-webkit-fill-available;
   min-height:100dvh !important;max-height:100dvh !important;
   border-radius:0 !important;margin:0 !important;
 }
@@ -5787,4 +5789,16 @@ body.ff-hero-active #faithHeroCinematic .fo-hero{
     min-height:calc(100dvh - 44px) !important;
     max-height:calc(100dvh - 44px) !important;
   }
+}
+/* ── Fix 4: Button always visible — safe-area and z-index ────────── */
+body.ff-hero-active #faithHeroCinematic .fo-hero-content{
+  position:relative;z-index:10;
+  padding-bottom:env(safe-area-inset-bottom,20px);
+}
+body.ff-hero-active #faithHeroCinematic .fo-cta-zone{
+  bottom:max(9%,env(safe-area-inset-bottom,16px));
+}
+body.ff-hero-active #faithHeroCinematic .fo-hero-cta{
+  position:relative;z-index:10;
+  margin-bottom:max(20px,env(safe-area-inset-bottom));
 }
