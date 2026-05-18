@@ -1007,7 +1007,7 @@ function _foStartCanvasScene() {
     });
   }
   function dWell(W,H,skyTop){
-    var wcx=W*.50, wcy=H*.74, wr=W*.11, wh=H*.12;
+    var ws=Math.min(1,W/520), wcx=W*.50, wcy=H*.74, wr=57*ws, wh=H*.12;
     // Ground shadow
     var bsg=ctx.createRadialGradient(wcx,wcy+wh*.70,0,wcx,wcy+wh*.70,wr*2.0);
     bsg.addColorStop(0,'rgba(0,0,0,0.60)'); bsg.addColorStop(1,'rgba(0,0,0,0)');
