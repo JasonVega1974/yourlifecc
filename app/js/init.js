@@ -303,6 +303,11 @@ function finishInit(cloudReady){
   }
   let _defaultLanding = 's-hero';
   showSection(_defaultLanding);
+  document.documentElement.removeAttribute('data-app-loading');
+  if(!window._faithFree){
+    var _mwEl = document.getElementById('mainWrap');
+    if(_mwEl) _mwEl.style.visibility = 'visible';
+  }
   if(typeof trackSection === 'function') trackSection(_defaultLanding);
   const popupDelay = cloudReady ? 800 : 3500;
   setTimeout(function(){

@@ -32,8 +32,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>@media(min-width:861px){#bottomTabBar{display:none!important;}}</style>
 <script>
-/* Prevent faith-free flash — apply gate before first paint */
+/* Prevent flash — hide mainWrap before first paint; revealed in finishInit */
 (function(){
+  document.documentElement.setAttribute('data-app-loading','1');
   if(localStorage.getItem('ylcc_plan_hint') === 'faith_free'){
     document.documentElement.setAttribute('data-faith-free','1');
   }
@@ -838,6 +839,7 @@
     .fo-hero{
       position:relative;
       min-height:calc(100vh - 80px);
+      max-height:calc(100dvh - 80px);
       border-radius:20px;overflow:hidden;
       margin-bottom:1rem;
       background:linear-gradient(180deg,#000208 0%,#040b22 45%,#0a1538 100%);
@@ -1040,7 +1042,7 @@
       100%{opacity:0;transform:translate(var(--dx,0px),var(--dy,-150px)) scale(.22);}
     }
     @media(max-width:560px){
-      .fo-hero{min-height:calc(100vh - 60px);}
+      .fo-hero{min-height:calc(100vh - 60px);max-height:calc(100dvh - 60px);}
       .fo-hero-content{padding:5vh 1.4rem 0;}
       .fo-hero-cta{padding:1rem 2.2rem;font-size:1.1rem;}
       .fo-cta-zone{bottom:11%;}

@@ -8170,16 +8170,10 @@ function renderBibleStudyHub(activeTrack){
   const tracks = (typeof window.BIBLE_STUDY_TRACKS !== 'undefined') ? window.BIBLE_STUDY_TRACKS : {};
   const trackKeys = ['family','group','kids','teens'];
 
-  const trackCards = trackKeys.map(function(key){
+  const trackSelectOptions = trackKeys.map(function(key){
     const t = tracks[key] || {};
-    const isActive = key === _bsActiveTrack;
-    return '<button class="bs-track-card'+(isActive?' bs-track-active':'')+'" onclick="renderBibleStudyHub(\''+key+'\')" type="button">'
-      + '<span class="bs-track-icon">'+(t.icon||'📖')+'</span>'
-      + '<div class="bs-track-info">'
-      +   '<div class="bs-track-label">'+(t.label||key)+'</div>'
-      +   '<div class="bs-track-meta">'+(t.badge||'')+' · '+(t.duration||'')+'</div>'
-      + '</div>'
-      + '</button>';
+    const sel = key === _bsActiveTrack ? ' selected' : '';
+    return '<option value="'+key+'"'+sel+'>'+(t.icon||'')+'  '+(t.label||key)+' — '+(t.badge||'')+' · '+(t.duration||'')+'</option>';
   }).join('');
 
   const active = tracks[_bsActiveTrack] || {};
@@ -8192,13 +8186,6 @@ function renderBibleStudyHub(activeTrack){
   + '#bibleStudyRoot .bs-eyebrow{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:#fbbf24;font-weight:700;margin-bottom:.35rem;}'
   + '#bibleStudyRoot .bs-title{font-family:var(--fh,var(--fm));font-size:1.4rem;font-weight:800;color:var(--tx);line-height:1.15;margin-bottom:.25rem;}'
   + '#bibleStudyRoot .bs-desc{font-size:.78rem;color:var(--tx2);line-height:1.5;margin-bottom:1rem;}'
-  + '#bibleStudyRoot .bs-tracks{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1rem;}'
-  + '#bibleStudyRoot .bs-track-card{display:flex;align-items:center;gap:.55rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:.65rem .75rem;cursor:pointer;text-align:left;font-family:var(--fm);color:var(--tx);width:100%;-webkit-tap-highlight-color:transparent;}'
-  + '#bibleStudyRoot .bs-track-card:hover{border-color:rgba(251,191,36,.35);}'
-  + '#bibleStudyRoot .bs-track-active{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.45);}'
-  + '#bibleStudyRoot .bs-track-icon{font-size:1.35rem;line-height:1;flex-shrink:0;}'
-  + '#bibleStudyRoot .bs-track-label{font-size:.8rem;font-weight:700;line-height:1.2;}'
-  + '#bibleStudyRoot .bs-track-meta{font-size:.63rem;color:var(--tx3);margin-top:.1rem;}'
   + '#bibleStudyRoot .bs-picker{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:.85rem 1rem 1rem;margin-bottom:.85rem;}'
   + '#bibleStudyRoot .bs-picker-label{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#fbbf24;margin-bottom:.45rem;}'
   + '#bibleStudyRoot .bs-picker select{width:100%;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:.5rem .75rem;font-size:.84rem;color:var(--tx);font-family:var(--fm);cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'10\' height=\'6\'%3E%3Cpath d=\'M0 0l5 6 5-6z\' fill=\'%23fbbf24\'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .75rem center;padding-right:2rem;}'
@@ -8236,7 +8223,10 @@ function renderBibleStudyHub(activeTrack){
   +   '<div class="bs-title">Bible Study Hub</div>'
   +   '<div class="bs-desc">Generate fresh, structured studies for any audience. New content every time.</div>'
   + '</div>'
-  + '<div class="bs-tracks">'+trackCards+'</div>'
+  + '<div class="bs-picker">'
+  +   '<div class="bs-picker-label">Study Track</div>'
+  +   '<select id="bsTrackSelect" onchange="renderBibleStudyHub(this.value)">'+trackSelectOptions+'</select>'
+  + '</div>'
   + '<div class="bs-picker">'
   +   '<div class="bs-picker-label">'+(active.label||'Study')+' — Choose a Topic</div>'
   +   '<select id="bsTopicSelect">'+topicOptions+'</select>'

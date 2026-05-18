@@ -5730,8 +5730,15 @@ html[data-faith-free="1"] #mBarAvatarBtn { display: none !important; }
   flex-shrink: 0;
 }
 
-/* ── FAITH-FREE FLASH PREVENTION ───────────────────────────── */
-/* Applied before JS runs via data-faith-free="1" set in <head>  */
+/* ── FLASH PREVENTION ──────────────────────────────────────── */
+/* data-app-loading="1" set unconditionally in <head> before first paint;
+   removed in finishInit() after routing settles. */
+html[data-app-loading="1"] #mainWrap { visibility: hidden; }
+
+/* data-faith-free="1" set in <head> for faith_free users; mainWrap
+   stays hidden until renderFaithOnlyHero() reveals it. */
 html[data-faith-free="1"] #mainWrap { visibility: hidden; }
 html[data-faith-free="1"] #faithHeroCinematic { visibility: visible; }
 html[data-faith-free="1"] #bottomTabBar { display: none !important; }
+/* Remove bottom padding so fo-hero fills the viewport without extra scroll */
+html[data-faith-free="1"] #app { padding-bottom: 0 !important; }
