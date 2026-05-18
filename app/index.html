@@ -4645,6 +4645,7 @@
     <button class="tab" data-bf-tab="timeline" onclick="bfTab('timeline',this)">🕰️ Timeline</button>
     <button class="tab" data-bf-tab="memorize" onclick="bfTab('memorize',this)">✨ Memorize</button>
     <button class="tab" data-bf-tab="journey" onclick="bfTab('journey',this)">🌟 Journey</button>
+    <button class="tab" data-bf-tab="bibleStudy" onclick="bfTab('bibleStudy',this)">📚 Bible Study Hub</button>
     <button class="tab" onclick="wellGoto('worship')">🎵 Worship</button>
     <button class="tab" onclick="wellGoto('flashcards')">📇 Flashcards</button>
   </div>
@@ -4808,6 +4809,11 @@
         <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(56,189,248,.22);"><img class="topic-card-hero" data-card-id="bf-devotional" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Home_Altar.jpg" alt="Devotional"></div>
         <div class="topic-card-title">Devotional</div>
         <div class="topic-card-desc">Today + the full 365 plan</div>
+      </div>
+      <div class="topic-card accent-gold" onclick="bfTab('bibleStudy')">
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(251,191,36,.22),rgba(245,158,11,.12));"><img class="topic-card-hero" data-card-id="bf-bibleStudy" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Bible_Verses_and_Prayers_-_geograph.org.uk_-_1009046.jpg/1280px-Bible_Verses_and_Prayers_-_geograph.org.uk_-_1009046.jpg" alt="Bible Study Hub"></div>
+        <div class="topic-card-title">Bible Study Hub</div>
+        <div class="topic-card-desc">AI-powered · family, group, kids, teens</div>
       </div>
     </div>
 
@@ -7726,6 +7732,14 @@
     </div>
   </div>
 
+  <!-- ════ BIBLE STUDY HUB (Phase F-BSH) ════
+       AI-powered curriculum generator. Track selector → topic picker → POST
+       /api/bible-study → structured lesson. Rendered by initBibleStudyTab()
+       in faith.js. Data registry from app/js/bible-study-data.js. -->
+  <div id="bf-bibleStudy" style="display:none;">
+    <div id="bibleStudyRoot"></div>
+  </div>
+
   <!-- ════ THE WELL — bottom nav (mirrors top .scrTabs; bfTab keeps both in sync) ════ -->
   <style>
     #s-scripture .scrTabs-bottom{
@@ -7772,6 +7786,7 @@
     <button class="tab" data-bf-tab="timeline" onclick="bfTab('timeline',this)"><span class="scrtab-icon">🕰️</span><span>Timeline</span></button>
     <button class="tab" data-bf-tab="memorize" onclick="bfTab('memorize',this)"><span class="scrtab-icon">✨</span><span>Memorize</span></button>
     <button class="tab" data-bf-tab="journey" onclick="bfTab('journey',this)"><span class="scrtab-icon">🌟</span><span>Journey</span></button>
+    <button class="tab" data-bf-tab="bibleStudy" onclick="bfTab('bibleStudy',this)"><span class="scrtab-icon">📚</span><span>Study Hub</span></button>
     <button class="tab" onclick="wellGoto('worship')"><span class="scrtab-icon">🎵</span><span>Worship</span></button>
     <button class="tab" onclick="wellGoto('flashcards')"><span class="scrtab-icon">📇</span><span>Flashcards</span></button>
   </div>
@@ -11870,6 +11885,7 @@
 <!-- Leaflet (F3-B) — open-source map library, MIT-licensed. Only loads when used. -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="/app/js/bible-study-data.js"></script>
 <script src="/app/js/faith.js"></script>
 <script src="/app/js/worship.js"></script>
 <script src="/app/js/faith-resources.js"></script>

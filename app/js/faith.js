@@ -439,7 +439,7 @@ function initScripture(){
 // the original 6 tabs. New tabs without renderers are stubs awaiting later phases.
 // btn is optional — when bfTab() is called programmatically (e.g., from a Quick
 // Tile or stub-panel CTA), the matching button is found via [data-bf-tab].
-const BF_TABS = ['home','devotional','jesus','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy'];
+const BF_TABS = ['home','devotional','jesus','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy'];
 
 // Phase 5.8 v3 — Home-grid restorer. Defensive against any prior code
 // that may have set .topic-card-grid display:none inside #bf-home. The
@@ -606,6 +606,7 @@ function bfTab(tab, btn){
   if(tab==='stories') renderStoriesTabDirect();
   if(tab==='timeline') renderBibleTimeline();
   if(tab==='proofProphecy') renderProofProphecy();
+  if(tab==='bibleStudy') initBibleStudyTab();
 }
 
 // ── FAITH HOME (F2-A) ────────────────────────────────────────
@@ -8146,4 +8147,204 @@ document.addEventListener('keydown', function(e){
   const cm = document.getElementById('ppConvinceModal');
   if(cm && cm.classList.contains('open')){ ppCloseConvince(); return; }
 });
+
+// ── BIBLE STUDY HUB (Phase F-BSH) ────────────────────────────
+// AI-powered curriculum generator. Track selector + topic picker → POST
+// /api/bible-study → structured lesson rendered per track format.
+// Data registry: window.BIBLE_STUDY_TRACKS from app/js/bible-study-data.js.
+
+let _bsInited = false;
+let _bsActiveTrack = 'family';
+
+function initBibleStudyTab(){
+  if(_bsInited) return;
+  _bsInited = true;
+  renderBibleStudyHub('family');
+}
+
+function renderBibleStudyHub(activeTrack){
+  _bsActiveTrack = activeTrack || 'family';
+  const root = document.getElementById('bibleStudyRoot');
+  if(!root) return;
+
+  const tracks = (typeof window.BIBLE_STUDY_TRACKS !== 'undefined') ? window.BIBLE_STUDY_TRACKS : {};
+  const trackKeys = ['family','group','kids','teens'];
+
+  const trackCards = trackKeys.map(function(key){
+    const t = tracks[key] || {};
+    const isActive = key === _bsActiveTrack;
+    return '<button class="bs-track-card'+(isActive?' bs-track-active':'')+'" onclick="renderBibleStudyHub(\''+key+'\')" type="button">'
+      + '<span class="bs-track-icon">'+(t.icon||'📖')+'</span>'
+      + '<div class="bs-track-info">'
+      +   '<div class="bs-track-label">'+(t.label||key)+'</div>'
+      +   '<div class="bs-track-meta">'+(t.badge||'')+' · '+(t.duration||'')+'</div>'
+      + '</div>'
+      + '</button>';
+  }).join('');
+
+  const active = tracks[_bsActiveTrack] || {};
+  const topics = active.topics || [];
+  const topicOptions = topics.map(function(t){ return '<option value="'+escapeHtml(t)+'">'+escapeHtml(t)+'</option>'; }).join('');
+
+  root.innerHTML =
+    '<style>'
+  + '#bibleStudyRoot .bs-header{padding:1rem 0 .6rem;}'
+  + '#bibleStudyRoot .bs-eyebrow{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:#fbbf24;font-weight:700;margin-bottom:.35rem;}'
+  + '#bibleStudyRoot .bs-title{font-family:var(--fh,var(--fm));font-size:1.4rem;font-weight:800;color:var(--tx);line-height:1.15;margin-bottom:.25rem;}'
+  + '#bibleStudyRoot .bs-desc{font-size:.78rem;color:var(--tx2);line-height:1.5;margin-bottom:1rem;}'
+  + '#bibleStudyRoot .bs-tracks{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1rem;}'
+  + '#bibleStudyRoot .bs-track-card{display:flex;align-items:center;gap:.55rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:.65rem .75rem;cursor:pointer;text-align:left;font-family:var(--fm);color:var(--tx);width:100%;-webkit-tap-highlight-color:transparent;}'
+  + '#bibleStudyRoot .bs-track-card:hover{border-color:rgba(251,191,36,.35);}'
+  + '#bibleStudyRoot .bs-track-active{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.45);}'
+  + '#bibleStudyRoot .bs-track-icon{font-size:1.35rem;line-height:1;flex-shrink:0;}'
+  + '#bibleStudyRoot .bs-track-label{font-size:.8rem;font-weight:700;line-height:1.2;}'
+  + '#bibleStudyRoot .bs-track-meta{font-size:.63rem;color:var(--tx3);margin-top:.1rem;}'
+  + '#bibleStudyRoot .bs-picker{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:.85rem 1rem 1rem;margin-bottom:.85rem;}'
+  + '#bibleStudyRoot .bs-picker-label{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#fbbf24;margin-bottom:.45rem;}'
+  + '#bibleStudyRoot .bs-picker select{width:100%;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:.5rem .75rem;font-size:.84rem;color:var(--tx);font-family:var(--fm);cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'10\' height=\'6\'%3E%3Cpath d=\'M0 0l5 6 5-6z\' fill=\'%23fbbf24\'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .75rem center;padding-right:2rem;}'
+  + ':root.light #bibleStudyRoot .bs-picker select{background-color:rgba(255,255,255,.9);color:#1a1233;}'
+  + '#bibleStudyRoot .bs-picker-desc{font-size:.72rem;color:var(--tx3);margin-top:.4rem;font-style:italic;line-height:1.4;}'
+  + '#bibleStudyRoot .bs-gen-btn{width:100%;padding:.75rem 1rem;border-radius:12px;border:none;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a0e02;font-family:var(--fm);font-size:.9rem;font-weight:800;cursor:pointer;letter-spacing:.04em;display:flex;align-items:center;justify-content:center;gap:.5rem;-webkit-tap-highlight-color:transparent;}'
+  + '#bibleStudyRoot .bs-gen-btn:disabled{opacity:.55;cursor:not-allowed;}'
+  + '#bibleStudyRoot .bs-loading{text-align:center;padding:2rem 1rem;color:var(--tx2);font-size:.82rem;line-height:1.7;}'
+  + '#bibleStudyRoot .bs-spinner{display:inline-block;width:20px;height:20px;border:3px solid rgba(251,191,36,.25);border-top-color:#fbbf24;border-radius:50%;animation:bs-spin .7s linear infinite;margin-bottom:.6rem;}'
+  + '@keyframes bs-spin{to{transform:rotate(360deg);}}'
+  + '#bibleStudyRoot .bs-lesson{background:rgba(255,255,255,.03);border:1px solid rgba(251,191,36,.2);border-radius:16px;padding:1.1rem 1rem;margin-top:.9rem;}'
+  + '#bibleStudyRoot .bs-lesson-title{font-family:var(--fh,var(--fm));font-size:1.15rem;font-weight:800;color:#fef3c7;margin-bottom:.2rem;line-height:1.25;}'
+  + ':root.light #bibleStudyRoot .bs-lesson-title{color:#1a1233;}'
+  + '#bibleStudyRoot .bs-lesson-ref{font-size:.68rem;font-weight:700;letter-spacing:.14em;color:#fbbf24;text-transform:uppercase;margin-bottom:.75rem;}'
+  + '#bibleStudyRoot .bs-verse-box{background:rgba(251,191,36,.07);border-left:3px solid #fbbf24;border-radius:6px 12px 12px 6px;padding:.7rem .9rem;margin-bottom:.9rem;}'
+  + '#bibleStudyRoot .bs-verse-text{font-family:Georgia,serif;font-style:italic;font-size:.88rem;color:#fef3c7;line-height:1.65;}'
+  + ':root.light #bibleStudyRoot .bs-verse-text{color:#3b2a6e;}'
+  + '#bibleStudyRoot .bs-sec{margin-bottom:.8rem;}'
+  + '#bibleStudyRoot .bs-sec-lbl{font-size:.6rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#fbbf24;opacity:.85;margin-bottom:.28rem;}'
+  + '#bibleStudyRoot .bs-sec-body{font-size:.8rem;color:var(--tx2);line-height:1.6;}'
+  + '#bibleStudyRoot .bs-q-list{list-style:none;padding:0;margin:0;display:grid;gap:.38rem;}'
+  + '#bibleStudyRoot .bs-q-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.52rem .7rem;font-size:.78rem;color:var(--tx2);line-height:1.5;}'
+  + '#bibleStudyRoot .bs-q-num{font-weight:700;color:#fbbf24;margin-right:.3rem;font-size:.68rem;}'
+  + '#bibleStudyRoot .bs-act{background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2);border-radius:10px;padding:.65rem .8rem;margin-bottom:.45rem;}'
+  + '#bibleStudyRoot .bs-act-title{font-size:.72rem;font-weight:700;color:#a78bfa;margin-bottom:.18rem;}'
+  + '#bibleStudyRoot .bs-act-body{font-size:.76rem;color:var(--tx2);line-height:1.5;}'
+  + '#bibleStudyRoot .bs-prayer{background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.18);border-radius:10px;padding:.7rem .9rem;font-family:Georgia,serif;font-style:italic;font-size:.8rem;color:var(--tx2);line-height:1.65;margin-bottom:.8rem;}'
+  + '#bibleStudyRoot .bs-tip{background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.18);border-radius:8px;padding:.52rem .8rem;}'
+  + '#bibleStudyRoot .bs-tip-lbl{font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#34d399;margin-bottom:.12rem;}'
+  + '#bibleStudyRoot .bs-tip-body{font-size:.76rem;color:var(--tx2);line-height:1.5;}'
+  + '#bibleStudyRoot .bs-new-btn{margin-top:.9rem;width:100%;padding:.6rem 1rem;border-radius:10px;border:1px solid rgba(251,191,36,.3);background:rgba(251,191,36,.08);color:#fbbf24;font-family:var(--fm);font-size:.8rem;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;}'
+  + '</style>'
+  + '<div class="bs-header">'
+  +   '<div class="bs-eyebrow">AI-POWERED · CURRICULUM QUALITY</div>'
+  +   '<div class="bs-title">Bible Study Hub</div>'
+  +   '<div class="bs-desc">Generate fresh, structured studies for any audience. New content every time.</div>'
+  + '</div>'
+  + '<div class="bs-tracks">'+trackCards+'</div>'
+  + '<div class="bs-picker">'
+  +   '<div class="bs-picker-label">'+(active.label||'Study')+' — Choose a Topic</div>'
+  +   '<select id="bsTopicSelect">'+topicOptions+'</select>'
+  +   '<div class="bs-picker-desc">'+escapeHtml(active.description||'')+'</div>'
+  + '</div>'
+  + '<button class="bs-gen-btn" id="bsGenerateBtn" onclick="_bsGenerate()" type="button">'
+  +   '<span>✦</span> Generate Study'
+  + '</button>'
+  + '<div id="bsOutput"></div>';
+}
+
+async function _bsGenerate(){
+  const btn = document.getElementById('bsGenerateBtn');
+  const out = document.getElementById('bsOutput');
+  const sel = document.getElementById('bsTopicSelect');
+  if(!btn || !out || !sel) return;
+  const topic = sel.value;
+  if(!topic) return;
+
+  btn.disabled = true;
+  out.innerHTML = '<div class="bs-loading"><div class="bs-spinner"></div><br>Generating your study on &ldquo;'+escapeHtml(topic)+'&rdquo;&hellip;</div>';
+
+  let token = '';
+  try {
+    const supa = getSupabase();
+    if(supa){
+      const { data } = await supa.auth.getSession();
+      token = (data && data.session && data.session.access_token) || '';
+    }
+  } catch(_){}
+
+  try {
+    const headers = { 'Content-Type': 'application/json' };
+    if(token) headers['Authorization'] = 'Bearer '+token;
+    const resp = await fetch('/api/bible-study', {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify({ track: _bsActiveTrack, topic: topic }),
+    });
+    const data = await resp.json();
+    if(data.upgrade){
+      out.innerHTML = '<div class="bs-loading">Sign in to generate Bible studies.</div>';
+    } else if(data.lesson){
+      _bsRenderLesson(out, data.lesson, _bsActiveTrack);
+    } else {
+      throw new Error(data.error || 'Unknown error');
+    }
+  } catch(e){
+    out.innerHTML = '<div class="bs-loading" style="color:#f87171;">Could not generate study. Please try again.</div>';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function _bsRenderLesson(out, lesson, track){
+  const esc = function(s){ return escapeHtml(String(s||'')); };
+
+  const sec = function(lbl, body){
+    if(!body) return '';
+    return '<div class="bs-sec"><div class="bs-sec-lbl">'+lbl+'</div><div class="bs-sec-body">'+body+'</div></div>';
+  };
+
+  const actCard = function(a){
+    if(!a) return '';
+    return '<div class="bs-act"><div class="bs-act-title">'+esc(a.title||'')+'</div><div class="bs-act-body">'+esc(a.desc||a.description||'')+'</div></div>';
+  };
+
+  const qs = (lesson.questions || []).map(function(q, i){
+    return '<li class="bs-q-item"><span class="bs-q-num">Q'+(i+1)+'</span>'+esc(q.q||'')+'</li>';
+  }).join('');
+
+  let extra = '';
+  if(track === 'family'){
+    extra = actCard(lesson.kids_activity)
+      + actCard(lesson.teen_reflection)
+      + sec('FAMILY CHALLENGE', esc(lesson.family_challenge))
+      + (lesson.facilitator_tip ? '<div class="bs-tip"><div class="bs-tip-lbl">Facilitator Tip</div><div class="bs-tip-body">'+esc(lesson.facilitator_tip)+'</div></div>' : '');
+  } else if(track === 'group'){
+    extra = sec('ICE BREAKER', esc(lesson.icebreaker))
+      + sec('DIG DEEPER', esc(lesson.dig_deeper))
+      + sec('WEEKLY CHALLENGE', esc(lesson.weekly_challenge))
+      + (lesson.facilitator_tip ? '<div class="bs-tip"><div class="bs-tip-lbl">Leader Tip</div><div class="bs-tip-body">'+esc(lesson.facilitator_tip)+'</div></div>' : '');
+  } else if(track === 'kids'){
+    extra = sec('BIG IDEA', '<strong>'+esc(lesson.big_idea)+'</strong>')
+      + actCard(lesson.craft_activity)
+      + actCard(lesson.game_activity)
+      + sec('MEMORY CHALLENGE', esc(lesson.memory_challenge))
+      + sec('PARENT NOTE', esc(lesson.parent_note));
+  } else if(track === 'teens'){
+    extra = sec('REAL TALK', esc(lesson.real_talk))
+      + sec('WEEKLY DARE', esc(lesson.weekly_dare))
+      + sec('JOURNAL PROMPT', esc(lesson.journal_prompt))
+      + (lesson.leader_note ? '<div class="bs-tip"><div class="bs-tip-lbl">Leader Note</div><div class="bs-tip-body">'+esc(lesson.leader_note)+'</div></div>' : '');
+  }
+
+  out.innerHTML =
+    '<div class="bs-lesson">'
+  +   '<div class="bs-lesson-title">'+esc(lesson.title)+'</div>'
+  +   '<div class="bs-lesson-ref">'+esc(lesson.reference)+'</div>'
+  +   '<div class="bs-verse-box"><div class="bs-verse-text">&ldquo;'+esc(lesson.verse)+'&rdquo;</div></div>'
+  +   sec('OVERVIEW', esc(lesson.overview))
+  +   (lesson.hook ? sec('HOOK', esc(lesson.hook)) : '')
+  +   (lesson.story_summary ? sec('STORY', esc(lesson.story_summary)) : '')
+  +   (lesson.passage_intro ? sec('PASSAGE INTRO', esc(lesson.passage_intro)) : '')
+  +   (qs ? '<div class="bs-sec"><div class="bs-sec-lbl">DISCUSSION QUESTIONS</div><ul class="bs-q-list">'+qs+'</ul></div>' : '')
+  +   extra
+  +   (lesson.prayer_starter ? '<div class="bs-sec"><div class="bs-sec-lbl">PRAYER</div><div class="bs-prayer">'+esc(lesson.prayer_starter)+'</div></div>' : '')
+  + '</div>'
+  + '<button class="bs-new-btn" onclick="_bsGenerate()" type="button">&#8635; Generate Another Study</button>';
+}
 
