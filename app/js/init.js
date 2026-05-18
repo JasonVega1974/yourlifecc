@@ -989,7 +989,7 @@ function _foStartCanvasScene() {
       ctx.strokeStyle='rgba(18,30,46,'+(ba*.88).toFixed(2)+')'; ctx.lineWidth=1.4; ctx.stroke();
     });
   }
-  function dWell(W,H,skyTop){
+  function dWell(W,H,skyTop,now){
     var ws=Math.min(1,W/520), wcx=W*.50, wcy=H*.74, wr=57*ws, wh=H*.12;
     // Ground shadow
     var bsg=ctx.createRadialGradient(wcx,wcy+wh*.70,0,wcx,wcy+wh*.70,wr*2.0);
@@ -1015,10 +1015,26 @@ function _foStartCanvasScene() {
     // Rim — wide ellipse
     ctx.beginPath(); ctx.ellipse(wcx,wcy-wh*.5,wr*1.08,wr*.28,0,0,PI2);
     ctx.fillStyle='#575762'; ctx.fill(); ctx.strokeStyle='#909098'; ctx.lineWidth=1.5; ctx.stroke();
-    // Water surface (sky reflection)
+    // Upward light spill — soft blue glow rising from water through rim opening
+    var wog=ctx.createRadialGradient(wcx,wcy-wh*.5,0,wcx,wcy-wh*.5,wr*1.5);
+    wog.addColorStop(0,'rgba(30,120,220,0.13)'); wog.addColorStop(1,'rgba(30,120,220,0)');
+    ctx.beginPath(); ctx.ellipse(wcx,wcy-wh*.5-6,wr*1.2,wr*.50,0,0,PI2); ctx.fillStyle=wog; ctx.fill();
+    // Deep water base
     ctx.beginPath(); ctx.ellipse(wcx,wcy-wh*.5+2,wr*.80,wr*.20,0,0,PI2);
-    ctx.fillStyle='rgb('+skyTop[0]+','+skyTop[1]+','+skyTop[2]+')'; ctx.fill();
-    ctx.strokeStyle='#1c1c25'; ctx.lineWidth=0.8; ctx.stroke();
+    ctx.fillStyle='rgba(15,55,120,0.92)'; ctx.fill();
+    // Radial glow from center of water
+    var wg=ctx.createRadialGradient(wcx,wcy-wh*.5+2,0,wcx,wcy-wh*.5+2,wr*.80);
+    wg.addColorStop(0,'rgba(80,180,255,0.75)');
+    wg.addColorStop(0.4,'rgba(30,100,200,0.55)');
+    wg.addColorStop(0.8,'rgba(10,50,140,0.35)');
+    wg.addColorStop(1,'rgba(5,20,80,0)');
+    ctx.beginPath(); ctx.ellipse(wcx,wcy-wh*.5+2,wr*1.12,wr*.36,0,0,PI2); ctx.fillStyle=wg; ctx.fill();
+    // Animated shimmer ripple
+    var shimA=(0.15+0.10*Math.sin(now*0.003)).toFixed(2);
+    ctx.fillStyle='rgba(140,210,255,'+shimA+')';
+    ctx.beginPath(); ctx.ellipse(wcx,wcy-wh*.5+2,wr*.48,wr*.10,0,0,PI2); ctx.fill();
+    ctx.strokeStyle='#0a2860'; ctx.lineWidth=0.8;
+    ctx.beginPath(); ctx.ellipse(wcx,wcy-wh*.5+2,wr*.80,wr*.20,0,0,PI2); ctx.stroke();
     // Posts (wood)
     var ptopY=wcy-wh*.5-wh*.58;
     [wcx-wr*.76,wcx+wr*.76].forEach(function(px){
@@ -1083,7 +1099,7 @@ function _foStartCanvasScene() {
     var W = cv.width, H = cv.height, sky = getSky(t), na = nightA(t);
     dSky(W,H,sky); dStars(W,H,ts,na); dMoon(W,H,na); dHorizonGlow(W,H,t); dSun(W,H,t);
     dClouds(W,H,t,ts); dFarMtns(W,H,t); dMidMtns(W,H,t); dNearMtns(W,H,t); dCross(W,H,t,ts); dMist(W,H,t);
-    dBirds(W,H,t,ts); dWell(W,H,sky.top); dFG(W,H); dSparks(W,H,t,ts); dScrim(W,H);
+    dBirds(W,H,t,ts); dWell(W,H,sky.top,ts); dFG(W,H); dSparks(W,H,t,ts); dScrim(W,H);
     window._foCanvasRaf = requestAnimationFrame(tick);
   }
   window._foCanvasRaf = requestAnimationFrame(tick);
