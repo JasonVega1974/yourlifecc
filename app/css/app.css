@@ -5793,6 +5793,7 @@ body.ff-hero-active #faithHeroCinematic .fo-hero{
 /* ── Fix 4: Button always visible — safe-area and z-index ────────── */
 body.ff-hero-active #faithHeroCinematic .fo-hero-content{
   position:relative;z-index:10;
+  padding-top:max(12px,2vh);
   padding-bottom:env(safe-area-inset-bottom,20px);
 }
 body.ff-hero-active #faithHeroCinematic .fo-cta-zone{
@@ -5805,6 +5806,14 @@ body.ff-hero-active #faithHeroCinematic .fo-hero-cta{
 /* ── Fix 5: Tighten bottom nav for faith-free so hero CTA isn't obscured ── */
 html[data-faith-free="1"] #bottomTabBar{
   padding-top:4px;
+  padding-bottom:max(4px,env(safe-area-inset-bottom,4px));
+}
+html[data-faith-free="1"] #bottomTabBar .tab-btn{
+  padding:6px 4px 4px;
+  min-height:48px;
+}
+html[data-faith-free="1"] #bottomTabBar .tab-btn .tab-icon{
+  font-size:1.1rem;
 }
 body.ff-hero-active #faithHeroCinematic .fo-cta-zone,
 body.ff-hero-active #faithHeroCinematic .fo-hero-cta{
