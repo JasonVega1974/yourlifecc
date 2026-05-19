@@ -1261,6 +1261,8 @@ function renderFaithOnlyHero() {
       });
     }
   })();
+  var ctaBtn = document.querySelector('.fo-hero-cta') || document.querySelector('.fo-enter-btn');
+  if (ctaBtn) ctaBtn.style.marginBottom = 'max(32px, env(safe-area-inset-bottom, 32px))';
   // 150ms gives Android Chrome time to finish layout before canvas reads dimensions.
   setTimeout(_foStartCanvasScene, 150);
 
