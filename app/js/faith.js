@@ -3203,18 +3203,19 @@ function markDevotionalRead(){
   D.scrReadDays[today] = true;
   D.devPopupSeen = today;
   try{ if(typeof _ylccUserKey === 'function') localStorage.setItem(_ylccUserKey('ylcc_devPopupSeen'), today); }catch(e){}
-  D.scrPoints = (D.scrPoints||0) + 5;
+  if(!window._faithFree) D.scrPoints = (D.scrPoints||0) + 5;
   save();
-  showToast('Devotional read! +5 pts 🙏');
+  showToast(window._faithFree ? 'Devotional read ✓' : 'Devotional read! +5 pts 🙏');
   if(typeof renderDevotionals === 'function') renderDevotionals();
   if(typeof renderScrStats === 'function') renderScrStats();
   if(typeof renderFaithHome === 'function') renderFaithHome();
-  if(typeof earnPB === 'function') earnPB(2, 'Devotional reading');
+  if(!window._faithFree && typeof earnPB === 'function') earnPB(2, 'Devotional reading');
   if(typeof celebrateIfNeeded === 'function') celebrateIfNeeded('scripture');
   if(typeof logActivity === 'function') logActivity('scripture', 'Read daily devotional');
 }
 
 function showDailyDevModal(){
+  if(window._faithFree) return;
   // Don't show if already read today OR already dismissed today.
   // Per-user localStorage flag is authoritative — it survives cloudLoad() overwrites.
   const today = new Date().toISOString().slice(0,10);
@@ -3263,15 +3264,15 @@ function markDevFromPopup(){
   D.scrReadDays[today] = true;
   D.devPopupSeen = today;
   try{ if(typeof _ylccUserKey === 'function') localStorage.setItem(_ylccUserKey('ylcc_devPopupSeen'), today); }catch(e){}
-  D.scrPoints = (D.scrPoints||0) + 5;
+  if(!window._faithFree) D.scrPoints = (D.scrPoints||0) + 5;
   save();
   // Close and update UI first — guards ensure missing modules don't block this
   closeDailyDevModal();
-  showToast('Devotional read! +5 pts 🙏');
+  showToast(window._faithFree ? 'Devotional read ✓' : 'Devotional read! +5 pts 🙏');
   if(typeof renderDevotionals === 'function') renderDevotionals();
   if(typeof renderScrStats === 'function') renderScrStats();
   if(typeof renderFaithHome === 'function') renderFaithHome();
-  if(typeof earnPB === 'function') earnPB(2, 'Devotional reading');
+  if(!window._faithFree && typeof earnPB === 'function') earnPB(2, 'Devotional reading');
   if(typeof celebrateIfNeeded === 'function') celebrateIfNeeded('scripture');
   if(typeof logActivity === 'function') logActivity('scripture', 'Read daily devotional');
 }

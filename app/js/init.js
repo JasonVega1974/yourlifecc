@@ -351,7 +351,7 @@ function finishInit(cloudReady){
     const kidWizOpen = (document.getElementById('kidOnboard')||{}).classList&&document.getElementById('kidOnboard').classList.contains('open');
     const alreadyRead = D.scrReadDays && D.scrReadDays[today];
     const alreadySeen = localStorage.getItem(_ylccUserKey('ylcc_devPopupSeen')) === today || (D.devPopupSeen && D.devPopupSeen === today);
-    if(!IS_DEMO && faithOn && !alreadyRead && !alreadySeen && !wizardOpen && !kidWizOpen){
+    if(!IS_DEMO && !window._faithFree && faithOn && !alreadyRead && !alreadySeen && !wizardOpen && !kidWizOpen){
       showDailyDevModal();
       try{ localStorage.setItem(_ylccUserKey('ylcc_devPopupSeen'), today); }catch(e){}
       D.devPopupSeen = today;
