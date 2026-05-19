@@ -5802,3 +5802,11 @@ body.ff-hero-active #faithHeroCinematic .fo-hero-cta{
   position:relative;z-index:10;
   margin-bottom:max(20px,env(safe-area-inset-bottom));
 }
+/* ── Fix 5: Tighten bottom nav for faith-free so hero CTA isn't obscured ── */
+html[data-faith-free="1"] #bottomTabBar{
+  padding-top:4px;
+}
+body.ff-hero-active #faithHeroCinematic .fo-cta-zone,
+body.ff-hero-active #faithHeroCinematic .fo-hero-cta{
+  margin-bottom:calc(env(safe-area-inset-bottom,0px) + 8px);
+}
