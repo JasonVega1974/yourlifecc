@@ -1270,6 +1270,8 @@ function renderFaithOnlyHero() {
   setTimeout(() => launchFaithSparkles(40), 1800);
   setTimeout(startFaithSparkleLoop, 5500);
   attachFaithParallax();
+  // Phase 2A — show onboarding overlay for first-time visitors
+  _checkWellOnboarding();
 }
 
 
@@ -1717,4 +1719,145 @@ function _initPushPrompt() {
     localStorage.setItem('ylcc_push_prompted', perm);
     if (perm === 'granted') _pushSubscribeAndSave();
   });
+}
+
+// ── PHASE 2A — THE WELL ONBOARDING ───────────────────────────
+// Full-screen 3-screen intro overlay shown once to first-time
+// faith_free users. Reads profiles.well_onboarded from Supabase;
+// sets it to true on completion or skip. Overlay is injected into
+// document.body and removed from DOM completely on dismissal.
+
+async function _checkWellOnboarding() {
+  if (document.getElementById('wellOnboardOverlay')) return;
+  var supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+  if (!supa || typeof _supaUser === 'undefined' || !_supaUser) return;
+  try {
+    var res = await supa.from('profiles')
+      .select('well_onboarded')
+      .eq('user_id', _supaUser.id)
+      .maybeSingle();
+    if (res.error) { console.warn('[well-onboard]', res.error.message); return; }
+    if (!res.data || !res.data.well_onboarded) _showWellOnboarding();
+  } catch (e) { console.warn('[well-onboard] check failed', e); }
+}
+
+async function _completeWellOnboarding(overlay) {
+  if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+  var supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+  if (!supa || typeof _supaUser === 'undefined' || !_supaUser) return;
+  try {
+    await supa.from('profiles')
+      .update({ well_onboarded: true })
+      .eq('user_id', _supaUser.id);
+  } catch (e) { console.warn('[well-onboard] update failed', e); }
+}
+
+function _showWellOnboarding() {
+  if (document.getElementById('wellOnboardOverlay')) return;
+
+  var overlay = document.createElement('div');
+  overlay.id = 'wellOnboardOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:#03061a;overflow:hidden;font-family:var(--fn,system-ui,sans-serif);';
+
+  // ── Sliding track (3 screens side-by-side) ───────────────────
+  var track = document.createElement('div');
+  track.style.cssText = 'display:flex;height:100%;width:300%;transition:transform .45s cubic-bezier(.4,0,.2,1);will-change:transform;';
+
+  function goTo(n) {
+    track.style.transform = 'translateX(-' + (n * 100 / 3).toFixed(4) + '%)';
+    overlay.querySelectorAll('.wo-dot').forEach(function(d, i) {
+      d.style.background = i === n ? 'rgba(195,145,35,.92)' : 'rgba(195,145,35,.2)';
+      d.style.transform  = i === n ? 'scale(1.4)' : 'scale(1)';
+    });
+  }
+
+  function done() { _completeWellOnboarding(overlay); }
+
+  // ── Shared inline style strings ──────────────────────────────
+  var scrBase = 'position:relative;flex:0 0 calc(100% / 3);height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:clamp(1rem,4vw,1.6rem) clamp(1.2rem,5vw,2.5rem);box-sizing:border-box;overflow:hidden;';
+  var skipSty = 'position:absolute;top:1.1rem;right:1.1rem;background:none;border:none;color:rgba(195,145,35,.48);font-size:clamp(.68rem,2.3vw,.78rem);cursor:pointer;letter-spacing:.1em;font-family:inherit;padding:.35rem .6rem;';
+  var h2Sty   = 'font-size:clamp(1.4rem,5.5vw,2rem);font-weight:800;color:#f5e6c0;text-align:center;line-height:1.2;margin:0 0 .75rem;';
+  var pSty    = 'font-size:clamp(.8rem,3vw,.95rem);color:rgba(245,230,192,.6);text-align:center;line-height:1.65;max-width:320px;margin:0 auto;';
+  var btnSty  = 'display:inline-flex;align-items:center;gap:.35rem;background:linear-gradient(135deg,rgba(195,145,35,.92),rgba(170,112,16,.88));color:#1a0e02;border:none;border-radius:12px;padding:clamp(.65rem,2.5vw,.88rem) clamp(1.3rem,5.5vw,2rem);font-size:clamp(.84rem,3.5vw,1rem);font-weight:800;cursor:pointer;letter-spacing:.04em;box-shadow:0 4px 20px rgba(195,145,35,.2);transition:opacity .15s;';
+
+  // ── Simple well SVG (screen 1 hero icon) ─────────────────────
+  var wellSvg =
+    '<svg viewBox="0 0 100 90" width="92" height="92" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+      '<path d="M15 38 Q50 6 85 38" stroke="rgba(195,145,35,.85)" stroke-width="3.5" fill="none" stroke-linecap="round"/>' +
+      '<rect x="13" y="35" width="7" height="45" rx="2" fill="rgba(195,145,35,.4)"/>' +
+      '<rect x="80" y="35" width="7" height="45" rx="2" fill="rgba(195,145,35,.4)"/>' +
+      '<rect x="19" y="32" width="62" height="5" rx="2.5" fill="rgba(195,145,35,.55)"/>' +
+      '<rect x="26" y="50" width="48" height="30" rx="5" fill="rgba(195,145,35,.08)" stroke="rgba(195,145,35,.45)" stroke-width="1.5"/>' +
+      '<line x1="26" y1="62" x2="74" y2="62" stroke="rgba(195,145,35,.2)" stroke-width="1"/>' +
+      '<line x1="26" y1="71" x2="74" y2="71" stroke="rgba(195,145,35,.2)" stroke-width="1"/>' +
+      '<line x1="50" y1="37" x2="50" y2="56" stroke="rgba(195,145,35,.6)" stroke-width="1.5" stroke-dasharray="3,2"/>' +
+      '<rect x="44" y="55" width="12" height="9" rx="2" fill="rgba(195,145,35,.5)" stroke="rgba(195,145,35,.88)" stroke-width="1"/>' +
+      '<ellipse cx="50" cy="80" rx="20" ry="3" fill="rgba(56,189,248,.28)"/>' +
+    '</svg>';
+
+  // ── Screen 1: Welcome ─────────────────────────────────────────
+  var s1 = document.createElement('div');
+  s1.style.cssText = scrBase;
+  s1.innerHTML =
+    '<button class="wo-skip" style="' + skipSty + '">SKIP</button>' +
+    '<div style="margin-bottom:1.5rem;filter:drop-shadow(0 0 22px rgba(195,145,35,.3));">' + wellSvg + '</div>' +
+    '<h2 style="' + h2Sty + '">A place to draw near</h2>' +
+    '<p style="' + pSty + '">The Well is your daily space for Scripture, prayer, and faith — built for you and your family.</p>' +
+    '<div style="margin-top:1.8rem;"><button class="wo-next" style="' + btnSty + '">Next →</button></div>';
+
+  // ── Screen 2: What's Inside ───────────────────────────────────
+  var s2 = document.createElement('div');
+  s2.style.cssText = scrBase;
+  var crd = 'background:rgba(195,145,35,.07);border:1px solid rgba(195,145,35,.18);border-radius:13px;padding:.85rem .7rem;display:flex;flex-direction:column;align-items:center;gap:.35rem;';
+  var cEm = 'font-size:clamp(1.4rem,4.5vw,1.65rem);line-height:1;';
+  var cLb = 'font-size:clamp(.66rem,2.2vw,.76rem);font-weight:700;color:#f5e6c0;text-align:center;letter-spacing:.04em;';
+  s2.innerHTML =
+    '<button class="wo-skip" style="' + skipSty + '">SKIP</button>' +
+    '<h2 style="' + h2Sty + 'margin-bottom:.5rem;">Everything you need to grow</h2>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem;width:100%;max-width:296px;margin:.75rem 0;">' +
+      '<div style="' + crd + '"><span style="' + cEm + '">&#x1F4D6;</span><span style="' + cLb + '">Bible Study</span></div>' +
+      '<div style="' + crd + '"><span style="' + cEm + '">&#x1F64F;</span><span style="' + cLb + '">Prayer Wall</span></div>' +
+      '<div style="' + crd + '"><span style="' + cEm + '">&#x2B50;</span><span style="' + cLb + '">Faith Proof</span></div>' +
+      '<div style="' + crd + '"><span style="' + cEm + '">&#x1F525;</span><span style="' + cLb + '">Devotionals</span></div>' +
+    '</div>' +
+    '<p style="' + pSty + '">Guided studies, prayer tools, evidence for faith, and daily devotionals for every age.</p>' +
+    '<div style="margin-top:1.4rem;"><button class="wo-next" style="' + btnSty + '">Next →</button></div>';
+
+  // ── Screen 3: Community ───────────────────────────────────────
+  var s3 = document.createElement('div');
+  s3.style.cssText = scrBase;
+  s3.innerHTML =
+    '<div style="font-size:clamp(2.8rem,9vw,3.8rem);margin-bottom:1.1rem;line-height:1;">&#x1F91D;</div>' +
+    '<h2 style="' + h2Sty + '">Built for families and groups</h2>' +
+    '<p style="' + pSty + '">Study together, pray together, grow together. Invite your family or small group to join you.</p>' +
+    '<div style="margin-top:1.8rem;">' +
+      '<button class="wo-enter" style="' + btnSty + '">✦ Enter The Well ✦</button>' +
+    '</div>';
+
+  // ── Progress dots ─────────────────────────────────────────────
+  var dotsEl = document.createElement('div');
+  dotsEl.style.cssText = 'position:absolute;bottom:1.8rem;left:0;right:0;display:flex;justify-content:center;gap:.55rem;pointer-events:none;z-index:2;';
+  for (var di = 0; di < 3; di++) {
+    var dot = document.createElement('span');
+    dot.className = 'wo-dot';
+    dot.style.cssText = 'width:8px;height:8px;border-radius:50%;display:inline-block;transition:all .3s;';
+    dot.style.background = di === 0 ? 'rgba(195,145,35,.92)' : 'rgba(195,145,35,.2)';
+    dot.style.transform  = di === 0 ? 'scale(1.4)' : 'scale(1)';
+    dotsEl.appendChild(dot);
+  }
+
+  // ── Assemble ──────────────────────────────────────────────────
+  track.appendChild(s1);
+  track.appendChild(s2);
+  track.appendChild(s3);
+  overlay.appendChild(track);
+  overlay.appendChild(dotsEl);
+  document.body.appendChild(overlay);
+
+  // ── Wire buttons ──────────────────────────────────────────────
+  s1.querySelector('.wo-next').addEventListener('click', function() { goTo(1); });
+  s2.querySelector('.wo-next').addEventListener('click', function() { goTo(2); });
+  s1.querySelector('.wo-skip').addEventListener('click', function() { done(); });
+  s2.querySelector('.wo-skip').addEventListener('click', function() { done(); });
+  s3.querySelector('.wo-enter').addEventListener('click', function() { done(); });
 }
