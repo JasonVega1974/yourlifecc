@@ -5276,12 +5276,13 @@ html[data-faith-free="1"] #ffBottomNav {
   display: flex;
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  height: 80px;
+  height: 60px;
   background: var(--bg, #0d1424);
   border-top: 1px solid rgba(56,189,248,.15);
   z-index: 900;
   align-items: stretch;
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-top: 2px;
+  padding-bottom: max(2px, env(safe-area-inset-bottom, 2px));
 }
 
 /* Hide on desktop */
@@ -5291,7 +5292,7 @@ html[data-faith-free="1"] #ffBottomNav {
 
 /* Push page content above the nav bar on mobile */
 @media (max-width: 767px) {
-  html[data-faith-free="1"] body { padding-bottom: 80px; }
+  html[data-faith-free="1"] body { padding-bottom: 60px; }
 }
 
 .ff-nav-btn {
@@ -5318,6 +5319,8 @@ html[data-faith-free="1"] #ffBottomNav {
   text-transform: uppercase;
   color: #64748b;
 }
+html[data-faith-free="1"] .ff-nav-icon { font-size: 1.1rem !important; line-height: 1 !important; }
+html[data-faith-free="1"] .ff-nav-label { font-size: 9px !important; line-height: 1 !important; margin-top: 1px !important; }
 
 /* Profile bottom sheet */
 #ffProfileBackdrop {
