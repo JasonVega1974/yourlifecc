@@ -854,6 +854,32 @@ function renderFaithHome(){
   }
 }
 
+// ── PHASE 3B — FAITH ACTIVITY LOGGING ────────────────────────
+// Fire-and-forget insert into faith_activity_log. Never blocks the UI.
+// activityType must match the DB CHECK constraint:
+//   'devotional'|'prayer'|'memory_verse'|'study'|'sermon_note'|
+//   'academy_lesson'|'reading_plan'
+function logFaithActivity(activityType, metadata) {
+  try {
+    if(typeof _supaUser === 'undefined' || !_supaUser) return;
+    const supa = typeof getSupabase === 'function' ? getSupabase() : null;
+    if(!supa) return;
+    const profileId = (typeof _activeProfileId !== 'undefined' && _activeProfileId)
+      ? String(_activeProfileId) : null;
+    supa.from('faith_activity_log').insert({
+      user_id:       _supaUser.id,
+      profile_id:    profileId,
+      activity_type: activityType,
+      activity_date: new Date().toISOString().slice(0, 10),
+      metadata:      metadata || null,
+    }).then(function(result) {
+      if(result.error) console.warn('[faith-log] insert failed:', result.error.message);
+    });
+  } catch(e) {
+    console.warn('[faith-log] error:', e.message);
+  }
+}
+
 // ── PHASE 4B — GLOBAL FAITH SEARCH ──────────────────────────
 let _faithSearchTimer = null;
 
@@ -2760,6 +2786,7 @@ function savePrayer(type){
   input.value = '';
   save(); renderMyPrayersPane();
   logActivity('faith', type==='praise'?'Praise report':'Prayer request');
+  logFaithActivity('prayer', { type: type });
   showToast(type==='praise'?'Praise logged! 🎉':'Prayer saved 🙏');
 }
 
@@ -3431,6 +3458,9 @@ function markDevotionalRead(){
   if(!window._faithFree && typeof earnPB === 'function') earnPB(2, 'Devotional reading');
   if(typeof celebrateIfNeeded === 'function') celebrateIfNeeded('scripture');
   if(typeof logActivity === 'function') logActivity('scripture', 'Read daily devotional');
+  var _devTitle = '';
+  try { var _di = getDailyDevotionalIdx(); if(DEVOTIONALS && DEVOTIONALS[_di]) _devTitle = DEVOTIONALS[_di].title; } catch(_){}
+  logFaithActivity('devotional', { title: _devTitle });
 }
 
 function showDailyDevModal(){
@@ -4066,6 +4096,7 @@ function prSubmitCompose(){
   D.scrReadDays[now.slice(0,10)] = true;
   save();
   if(typeof logActivity === 'function') logActivity('faith', 'Prayer added');
+  logFaithActivity('prayer', { category: _prComposeCat || null });
   if(typeof renderFaithJourney === 'function') renderFaithJourney();
   if(typeof renderFaithHome === 'function') renderFaithHome();
   renderMyPrayersPane();
@@ -5882,6 +5913,9 @@ function academyMarkLessonNew(courseId, lessonId){
   D.scrReadDays[new Date().toISOString().slice(0,10)] = true;
   save();
   if(typeof logActivity === 'function') logActivity('faith', 'Lesson complete: ' + lessonId);
+  var _lessonTitle = lessonId;
+  try { var _acl = _acFeatured(); var _acItem = _acl.find(function(x){ return x.id === lessonId; }); if(_acItem) _lessonTitle = _acItem.title; } catch(_){}
+  logFaithActivity('academy_lesson', { lessonId: lessonId, title: _lessonTitle });
   showToast('Lesson complete +5 XP ✓');
   // Refresh modal in place + panel.
   openAcademyLesson(courseId, lessonId);
