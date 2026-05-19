@@ -8261,6 +8261,7 @@ async function _bsGenerate(){
     }
   } catch(_){}
 
+  const _bsOfflineKey = 'ylcc_offline_lesson_' + _bsActiveTrack + '_' + topic;
   try {
     const headers = { 'Content-Type': 'application/json' };
     if(token) headers['Authorization'] = 'Bearer '+token;
@@ -8274,11 +8275,28 @@ async function _bsGenerate(){
       out.innerHTML = '<div class="bs-loading">Sign in to generate Bible studies.</div>';
     } else if(data.lesson){
       _bsRenderLesson(out, data.lesson, _bsActiveTrack);
+      // Cache lesson for offline use — keep at most 5 lessons
+      try {
+        localStorage.setItem(_bsOfflineKey, JSON.stringify(data.lesson));
+        var _bsKeys = Object.keys(localStorage).filter(function(k){ return k.startsWith('ylcc_offline_lesson_'); });
+        while(_bsKeys.length > 5){ localStorage.removeItem(_bsKeys.shift()); }
+      } catch(_){}
     } else {
       throw new Error(data.error || 'Unknown error');
     }
   } catch(e){
-    out.innerHTML = '<div class="bs-loading" style="color:#f87171;">Could not generate study. Please try again.</div>';
+    var _bsCached = null;
+    try { _bsCached = JSON.parse(localStorage.getItem(_bsOfflineKey) || 'null'); } catch(_){}
+    if(_bsCached){
+      _bsRenderLesson(out, _bsCached, _bsActiveTrack);
+      out.innerHTML =
+        '<div style="background:rgba(195,145,35,.12);border:1px solid rgba(195,145,35,.3);border-radius:8px;padding:.55rem .85rem;margin-bottom:.75rem;font-size:.75rem;color:#fbbf24;font-weight:600;">'
+        + '⚡ You’re offline — showing your last saved study'
+        + '</div>'
+        + out.innerHTML;
+    } else {
+      out.innerHTML = '<div class="bs-loading" style="color:#f87171;">Could not generate study. Please try again.</div>';
+    }
   } finally {
     btn.disabled = false;
   }

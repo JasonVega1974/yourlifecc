@@ -1,13 +1,20 @@
 // YourLifeCC Service Worker
 // Version bump this string whenever you deploy a major update
 // to force old caches to clear.
-const CACHE_NAME = 'yourlifecc-v217';
+const CACHE_NAME = 'yourlifecc-v218';
 
-// Core assets to pre-cache on install — the app shell
+// Core assets to pre-cache on install — the app shell + key Well modules
 const PRECACHE_ASSETS = [
   '/app/',
   '/app/index.html',
-  '/manifest.json'
+  '/manifest.json',
+  '/app/css/app.css',
+  '/app/js/init.js',
+  '/app/js/faith.js',
+  '/app/js/bible-study-data.js',
+  '/app/js/ui.js',
+  '/app/js/sync.js',
+  '/app/js/streaks.js'
 ];
 
 // ─── Install ───────────────────────────────────────────────────────────────
@@ -59,9 +66,22 @@ self.addEventListener('fetch', event => {
     'googleapis.com',
     'translate.googleapis.com'
   ];
-  // API routes must always hit the network — never serve stale overrides.
-  if (networkOnly.some(host => url.hostname.includes(host)) || url.pathname.startsWith('/api/')) {
-    return; // Let browser handle it normally
+  if (networkOnly.some(host => url.hostname.includes(host))) {
+    return; // Pass through — never cache auth/payment/external calls
+  }
+
+  // First-party /api/ routes — network first, degrade to offline JSON on failure.
+  // Actual lesson content is cached in localStorage by _bsGenerate() in faith.js.
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(
+      fetch(event.request).catch(function() {
+        return caches.match(event.request) ||
+          new Response(JSON.stringify({ error: 'offline' }), {
+            headers: { 'Content-Type': 'application/json' }
+          });
+      })
+    );
+    return;
   }
 
   // For navigation (HTML page loads) — network first, fallback to shell

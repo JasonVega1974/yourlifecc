@@ -1861,3 +1861,19 @@ function _showWellOnboarding() {
   s2.querySelector('.wo-skip').addEventListener('click', function() { done(); });
   s3.querySelector('.wo-enter').addEventListener('click', function() { done(); });
 }
+
+// ── PHASE 2B — OFFLINE INDICATOR ─────────────────────────────
+// Fixed gold banner at top shown whenever navigator.onLine is false.
+// Injected once; never duplicated. Shows immediately if already offline.
+function initOfflineIndicator() {
+  if(document.getElementById('ylcc-offline-banner')) return;
+  var banner = document.createElement('div');
+  banner.id = 'ylcc-offline-banner';
+  banner.style.cssText = 'display:none;position:fixed;top:0;left:0;right:0;z-index:99999;background:rgba(195,145,35,.95);color:#1a0c00;text-align:center;font-size:13px;font-weight:600;padding:8px;font-family:Georgia,serif;';
+  banner.textContent = '⚡ You’re offline — showing saved content';
+  document.body.appendChild(banner);
+  window.addEventListener('offline', function() { banner.style.display = 'block'; });
+  window.addEventListener('online',  function() { banner.style.display = 'none';  });
+  if(!navigator.onLine) banner.style.display = 'block';
+}
+initOfflineIndicator();
