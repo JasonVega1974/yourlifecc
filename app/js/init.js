@@ -1224,27 +1224,29 @@ function renderFaithOnlyHero() {
   if (hero) {
     hero.style.display = '';
     hero.innerHTML =
-      '<div class="fo-hero" id="faithOnlyHero">' +
-        '<canvas id="fo-canvas-scene" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;"></canvas>' +
-        '<div class="fo-hero-scrim"></div>' +
-        '<div class="fo-hero-content">' +
-          '<div class="fo-hero-greeting">' + greetingHtml + '</div>' +
-          '<div class="fo-hero-title">' +
-            '<span class="fo-title-1">WELCOME TO</span>' +
-            '<span class="fo-title-2">THE WELL</span>' +
+      '<div class=”fo-hero” id=”faithOnlyHero”>' +
+        '<canvas id=”fo-canvas-scene”></canvas>' +
+        '<div class=”fo-hero-scrim”></div>' +
+        '<div class=”fo-hero-content”>' +
+          '<div class=”fo-hero-top”>' +
+            '<div class=”fo-hero-greeting”>' + greetingHtml + '</div>' +
+            '<div class=”fo-hero-title”>' +
+              '<span class=”fo-title-1”>WELCOME TO</span>' +
+              '<span class=”fo-title-2”>THE WELL</span>' +
+            '</div>' +
+            '<p class=”fo-hero-sub”>' +
+              '<span class=”fo-quote-mark”>”</span>Come, all you who are thirsty, come to the waters.<span class=”fo-quote-mark”>”</span>' +
+              '<span class=”fo-cite”>— Isaiah 55:1</span>' +
+            '</p>' +
           '</div>' +
-          '<p class="fo-hero-sub">' +
-            '<span class="fo-quote-mark">“</span>Come, all you who are thirsty, come to the waters.<span class="fo-quote-mark">”</span>' +
-            '<span class="fo-cite">— Isaiah 55:1</span>' +
-          '</p>' +
-        '</div>' +
-        '<div class="fo-cta-zone">' +
-          '<button class="fo-hero-cta" onclick="if(typeof wellGoto===\'function\')wellGoto(\'home\');else if(typeof showSection===\'function\')showSection(\'s-scripture\')">' +
-            '<span class="fo-cta-spark">✦</span>' +
-            '<span class="fo-cta-text">Enter The Well</span>' +
-            '<span class="fo-cta-spark">✦</span>' +
-            '<span class="fo-cta-shimmer"></span>' +
-          '</button>' +
+          '<div class=”fo-cta-zone”>' +
+            '<button class=”fo-hero-cta” onclick=”if(typeof wellGoto===\'function\')wellGoto(\'home\');else if(typeof showSection===\'function\')showSection(\'s-scripture\')”>' +
+              '<span class=”fo-cta-spark”>✦</span>' +
+              '<span class=”fo-cta-text”>Enter The Well</span>' +
+              '<span class=”fo-cta-spark”>✦</span>' +
+              '<span class=”fo-cta-shimmer”></span>' +
+            '</button>' +
+          '</div>' +
         '</div>' +
       '</div>';
   }
