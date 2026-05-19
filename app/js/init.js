@@ -485,6 +485,9 @@ function finishInit(cloudReady){
 
   // Phase 1A — Streaks Engine
   if(typeof initStreaks === 'function') initStreaks();
+
+  // Phase 1B — Push Notifications
+  if(!IS_DEMO) setTimeout(_initPushPrompt, 3000);
 }
 
 
@@ -1615,4 +1618,103 @@ function renderTodaysVerseHero(){
   if(txt) txt.textContent = '"' + v.t + '"';
   if(ref) ref.textContent = v.r ? '— ' + v.r : '';
   card.style.display = '';
+}
+
+// ── PHASE 1B — PUSH NOTIFICATION PROMPT ──────────────────────
+// Shows a soft in-app banner (never the browser native prompt) asking
+// the user to enable push. Only runs once per browser — once they
+// choose Allow or Not Now, ylcc_push_prompted is set and we never ask again.
+
+function _vapidUrlB64ToUint8(base64String) {
+  var padding = '='.repeat((4 - base64String.length % 4) % 4);
+  var base64  = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  var raw = window.atob(base64);
+  var arr = new Uint8Array(raw.length);
+  for (var i = 0; i < raw.length; ++i) arr[i] = raw.charCodeAt(i);
+  return arr;
+}
+
+async function _pushSubscribeAndSave() {
+  try {
+    var keyResp = await fetch('/api/push-vapid-key');
+    if (!keyResp.ok) return;
+    var keyData = await keyResp.json();
+    var applicationServerKey = _vapidUrlB64ToUint8(keyData.publicKey);
+
+    var reg = await navigator.serviceWorker.ready;
+    var sub = await reg.pushManager.subscribe({
+      userVisibleOnly:      true,
+      applicationServerKey: applicationServerKey,
+    });
+
+    var token = (typeof _supaUser !== 'undefined' && _supaUser)
+      ? (await (typeof getSupabase === 'function' ? getSupabase() : null)
+          ?.auth?.getSession())?.data?.session?.access_token
+      : null;
+    if (!token) return;
+
+    await fetch('/api/push-subscribe', {
+      method:  'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': 'Bearer ' + token,
+      },
+      body: JSON.stringify({ subscription: sub.toJSON() }),
+    });
+  } catch (e) {
+    console.warn('[push] subscribe failed:', e);
+  }
+}
+
+function _initPushPrompt() {
+  if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
+  if (localStorage.getItem('ylcc_push_prompted')) return;
+  if (Notification.permission === 'granted') {
+    // Already granted (e.g. reinstall) — just subscribe silently
+    localStorage.setItem('ylcc_push_prompted', 'granted');
+    _pushSubscribeAndSave();
+    return;
+  }
+  if (Notification.permission === 'denied') {
+    localStorage.setItem('ylcc_push_prompted', 'denied');
+    return;
+  }
+
+  // Build soft prompt banner
+  var banner = document.createElement('div');
+  banner.id = 'pushPromptBanner';
+  banner.style.cssText = [
+    'position:fixed','bottom:1.2rem','left:50%','transform:translateX(-50%)',
+    'z-index:8000','background:#0d1424','border:1px solid rgba(245,166,35,.35)',
+    'border-radius:14px','padding:.9rem 1.2rem','display:flex','align-items:center',
+    'gap:.85rem','box-shadow:0 8px 32px rgba(0,0,0,.55)','max-width:420px',
+    'width:calc(100% - 2.4rem)','font-family:var(--fn,sans-serif)',
+  ].join(';');
+
+  banner.innerHTML =
+    '<span style="font-size:1.4rem;flex-shrink:0;">🔔</span>' +
+    '<div style="flex:1;min-width:0;">' +
+      '<div style="font-size:.82rem;font-weight:700;color:#f1f5f9;line-height:1.3;">Get daily verses and reminders?</div>' +
+      '<div style="font-size:.72rem;color:#94a3b8;margin-top:.15rem;">Stay connected to your faith journey</div>' +
+    '</div>' +
+    '<button id="pushAllowBtn" style="background:linear-gradient(135deg,#f5a623,#f97316);color:#1a0e02;border:none;border-radius:8px;padding:.45rem .85rem;font-size:.75rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">Allow</button>' +
+    '<button id="pushDenyBtn"  style="background:none;border:1px solid rgba(255,255,255,.12);color:#94a3b8;border-radius:8px;padding:.45rem .75rem;font-size:.75rem;cursor:pointer;flex-shrink:0;">Not Now</button>';
+
+  document.body.appendChild(banner);
+
+  function _dismiss() {
+    if (banner.parentNode) banner.parentNode.removeChild(banner);
+  }
+
+  document.getElementById('pushDenyBtn').addEventListener('click', function() {
+    localStorage.setItem('ylcc_push_prompted', 'denied');
+    _dismiss();
+  });
+
+  document.getElementById('pushAllowBtn').addEventListener('click', async function() {
+    _dismiss();
+    var perm = await Notification.requestPermission();
+    localStorage.setItem('ylcc_push_prompted', perm);
+    if (perm === 'granted') _pushSubscribeAndSave();
+  });
 }

@@ -1,0 +1,12 @@
+{
+  "name": "yourlifecc",
+  "version": "1.0.0",
+  "private": true,
+  "description": "YourLife CC — Kingdom Creatives LLC",
+  "dependencies": {
+    "web-push": "^3.6.7"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

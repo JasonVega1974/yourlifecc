@@ -256,6 +256,7 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
       <button class="tab-btn" onclick="switchTab('contest',this)">🏆 CONTEST</button>
       <button class="tab-btn" onclick="switchTab('outreach',this)">📣 OUTREACH</button>
       <button class="tab-btn" onclick="switchTab('photos',this)">📷 PHOTOS</button>
+      <button class="tab-btn" onclick="switchTab('push',this)">🔔 PUSH</button>
     </div>
 
     <!-- USERS TAB -->
@@ -546,6 +547,50 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
         <div id="pmGrid"><div class="empty-state">LOADING CARDS…</div></div>
       </div>
     </div><!-- end tab-photos -->
+
+    <div class="tab-panel" id="tab-push">
+      <div class="card card-full" style="max-width:580px;">
+        <div class="card-header">
+          <span class="card-title">🔔 Send Push Notification</span>
+          <span class="card-badge" id="pushSubBadge">— subscribers</span>
+        </div>
+        <div style="padding:1.25rem;display:flex;flex-direction:column;gap:.85rem;">
+          <div>
+            <label style="font-family:var(--fm);font-size:.65rem;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase;display:block;margin-bottom:.35rem;">Title</label>
+            <input id="pushTitle" type="text" placeholder="Daily Verse &amp; Reminder"
+              style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--tx);font-family:var(--fn);font-size:.85rem;padding:.55rem .85rem;outline:none;"
+              onfocus="this.style.borderColor='var(--border2)'" onblur="this.style.borderColor='var(--border)'">
+          </div>
+          <div>
+            <label style="font-family:var(--fm);font-size:.65rem;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase;display:block;margin-bottom:.35rem;">Body</label>
+            <textarea id="pushBody" rows="3" placeholder="Your daily verse is waiting…"
+              style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--tx);font-family:var(--fn);font-size:.85rem;padding:.55rem .85rem;outline:none;resize:vertical;"
+              onfocus="this.style.borderColor='var(--border2)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+          </div>
+          <div>
+            <label style="font-family:var(--fm);font-size:.65rem;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase;display:block;margin-bottom:.35rem;">URL (optional)</label>
+            <input id="pushUrl" type="url" placeholder="https://yourlifecc.com"
+              style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--tx);font-family:var(--fn);font-size:.85rem;padding:.55rem .85rem;outline:none;"
+              onfocus="this.style.borderColor='var(--border2)'" onblur="this.style.borderColor='var(--border)'">
+          </div>
+          <div>
+            <label style="font-family:var(--fm);font-size:.65rem;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase;display:block;margin-bottom:.35rem;">Target Audience</label>
+            <select id="pushTarget"
+              style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--tx);font-family:var(--fn);font-size:.85rem;padding:.55rem .85rem;outline:none;cursor:pointer;">
+              <option value="all">All subscribers</option>
+              <option value="faith">Faith users only</option>
+            </select>
+          </div>
+          <div style="display:flex;align-items:center;gap:1rem;padding-top:.25rem;">
+            <button onclick="sendPushNotif()" id="pushSendBtn"
+              style="background:linear-gradient(135deg,rgba(56,189,248,.15),rgba(56,189,248,.08));border:1px solid var(--border2);color:var(--blue);font-family:var(--fm);font-size:.72rem;letter-spacing:.06em;padding:.55rem 1.25rem;border-radius:8px;cursor:pointer;transition:all .15s;font-weight:700;">
+              SEND NOTIFICATION
+            </button>
+            <span id="pushResult" style="font-family:var(--fm);font-size:.72rem;color:var(--tx3);"></span>
+          </div>
+        </div>
+      </div>
+    </div><!-- end tab-push -->
 
   </div>
 </div>
@@ -1899,8 +1944,58 @@ async function pmInit(){
   window.switchTab = function(name, btn){
     if(typeof _origSwitch === 'function') _origSwitch(name, btn);
     if(name === 'photos') pmInit();
+    if(name === 'push')   loadPushSubCount();
   };
 })();
+
+// ── PUSH NOTIFICATIONS ──────────────────────────────────────────
+async function loadPushSubCount(){
+  try {
+    const rows = await supaFetch('push_subscriptions?select=user_id');
+    const badge = document.getElementById('pushSubBadge');
+    if(badge) badge.textContent = (rows.length || 0) + ' subscriber' + (rows.length === 1 ? '' : 's');
+  } catch(e) {
+    console.warn('push: sub count failed', e);
+  }
+}
+
+async function sendPushNotif(){
+  const title  = (document.getElementById('pushTitle')  || {}).value?.trim();
+  const body   = (document.getElementById('pushBody')   || {}).value?.trim();
+  const url    = (document.getElementById('pushUrl')    || {}).value?.trim();
+  const target = (document.getElementById('pushTarget') || {}).value || 'all';
+  const result = document.getElementById('pushResult');
+  const btn    = document.getElementById('pushSendBtn');
+
+  if(!title || !body){
+    if(result) result.textContent = 'Title and body are required.';
+    return;
+  }
+
+  if(result){ result.style.color = 'var(--tx3)'; result.textContent = 'Sending…'; }
+  if(btn)    btn.disabled = true;
+
+  try {
+    const resp = await fetch('/api/push-send', {
+      method:  'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'x-admin-token': ADMIN_TOKEN,
+      },
+      body: JSON.stringify({ title, body, url: url || undefined, target }),
+    });
+    const data = await resp.json();
+    if(!resp.ok) throw new Error(data.error || resp.status);
+    if(result){
+      result.style.color = 'var(--green)';
+      result.textContent = 'Sent to ' + data.sent + ' subscriber' + (data.sent === 1 ? '' : 's');
+    }
+  } catch(e) {
+    if(result){ result.style.color = 'var(--red)'; result.textContent = 'Error: ' + e.message; }
+  } finally {
+    if(btn) btn.disabled = false;
+  }
+}
 </script>
 </body>
 </html>

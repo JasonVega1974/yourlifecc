@@ -1,7 +1,7 @@
 // YourLifeCC Service Worker
 // Version bump this string whenever you deploy a major update
 // to force old caches to clear.
-const CACHE_NAME = 'yourlifecc-v216';
+const CACHE_NAME = 'yourlifecc-v217';
 
 // Core assets to pre-cache on install — the app shell
 const PRECACHE_ASSETS = [
@@ -132,16 +132,16 @@ self.addEventListener('sync', event => {
   }
 });
 
-// ─── Push Notifications (optional future use) ──────────────────────────────
+// ─── Push Notifications ────────────────────────────────────────────────────
 self.addEventListener('push', event => {
   if (!event.data) return;
   const data = event.data.json();
   event.waitUntil(
     self.registration.showNotification(data.title || 'YourLifeCC', {
-      body: data.body || '',
-      icon: '/app/icons/icon-192.png',
-      badge: '/app/icons/icon-192.png',
-      data: { url: data.url || '/app/' }
+      body:  data.body || '',
+      icon:  '/app/icons/icon-192.png',
+      badge: '/app/icons/badge-72.png',
+      data:  { url: data.url || 'https://yourlifecc.com' }
     })
   );
 });
@@ -149,6 +149,6 @@ self.addEventListener('push', event => {
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   event.waitUntil(
-    clients.openWindow(event.notification.data.url || '/app/')
+    clients.openWindow(event.notification.data.url || 'https://yourlifecc.com')
   );
 });
