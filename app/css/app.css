@@ -5773,11 +5773,12 @@ html[data-faith-free="1"] #s-scripture .scrTabs-bottom { display: none !importan
   body.sidebar-collapsed #sideExpandTab{display:flex;align-items:center;}
 }
 
-/* ── Fix 3: Hero scrollable on all devices — canvas fixed behind content ── */
+/* ── Fix 3: Hero fills viewport — canvas fixed, button pinned to bottom ── */
 body.ff-hero-active{overflow:hidden;}
 body.ff-hero-active #mainWrap{padding-top:0;overflow:hidden;}
 body.ff-hero-active #app{padding:0 !important;overflow:hidden;}
 body.ff-hero-active #faithHeroCinematic .fo-hero{
+  position:relative;
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
   height:100vh;
@@ -5792,25 +5793,26 @@ body.ff-hero-active #faithHeroCinematic .fo-hero canvas{
   width:100% !important;height:100% !important;
   z-index:0;
 }
-/* Content layers scroll over the fixed canvas */
-body.ff-hero-active #faithHeroCinematic .fo-hero-content,
-body.ff-hero-active #faithHeroCinematic .fo-cta-zone{
+/* Top content sits above canvas */
+body.ff-hero-active #faithHeroCinematic .fo-hero-content{
   position:relative;
   z-index:1;
+  padding-bottom:env(safe-area-inset-bottom,20px);
+}
+/* CTA pinned to the bottom of the 100dvh container — never shifts with content */
+body.ff-hero-active #faithHeroCinematic .fo-cta-zone{
+  position:absolute;
+  bottom:max(8%,env(safe-area-inset-bottom,20px));
+  left:0;right:0;
+  text-align:center;
+  z-index:10;
+}
+body.ff-hero-active #faithHeroCinematic .fo-hero-cta{
+  margin-bottom:max(20px,env(safe-area-inset-bottom));
 }
 @media(max-width:860px){
   body.ff-hero-active #mainWrap{padding-top:44px;}
   body.ff-hero-active #faithHeroCinematic .fo-hero{
     height:calc(100dvh - 44px);
   }
-}
-/* ── Fix 4: Button always visible — safe-area ────────────────────── */
-body.ff-hero-active #faithHeroCinematic .fo-hero-content{
-  padding-bottom:env(safe-area-inset-bottom,20px);
-}
-body.ff-hero-active #faithHeroCinematic .fo-cta-zone{
-  bottom:max(9%,env(safe-area-inset-bottom,16px));
-}
-body.ff-hero-active #faithHeroCinematic .fo-hero-cta{
-  margin-bottom:max(20px,env(safe-area-inset-bottom));
 }
