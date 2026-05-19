@@ -5773,65 +5773,32 @@ html[data-faith-free="1"] #s-scripture .scrTabs-bottom { display: none !importan
   body.sidebar-collapsed #sideExpandTab{display:flex;align-items:center;}
 }
 
-/* ── Fix 3: Hero flex-column — scrollable on Android, button always reachable ── */
+/* ── Fix 3: Lock Well hero home screen — no scroll ───────────────── */
 body.ff-hero-active{overflow:hidden;}
 body.ff-hero-active #mainWrap{padding-top:0;overflow:hidden;}
 body.ff-hero-active #app{padding:0 !important;overflow:hidden;}
 body.ff-hero-active #faithHeroCinematic .fo-hero{
-  position:relative;
-  height:100vh;
-  height:100dvh;
-  min-height:-webkit-fill-available;
-  overflow-y:auto;
-  -webkit-overflow-scrolling:touch;
+  /* dvh first; JS sets exact window.innerHeight for Android Chrome fallback */
+  height:100dvh;min-height:-webkit-fill-available;
+  min-height:100dvh !important;max-height:100dvh !important;
   border-radius:0 !important;margin:0 !important;
-}
-/* Canvas fixed behind everything — pointer-events off so scrolling works */
-body.ff-hero-active #faithHeroCinematic .fo-hero canvas{
-  position:fixed;
-  top:0;left:0;
-  width:100%;height:100%;
-  z-index:0;
-  pointer-events:none;
-}
-/* Single scrollable flex column — text at top, button at bottom */
-body.ff-hero-active #faithHeroCinematic .fo-hero-content{
-  position:relative;
-  z-index:2;
-  min-height:100vh;
-  min-height:100dvh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:space-between;
-  padding:max(48px,8vh) 24px max(32px,5vh);
-  box-sizing:border-box;
-}
-/* Top block — greeting, title, verse */
-body.ff-hero-active #faithHeroCinematic .fo-hero-top{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  text-align:center;
-  gap:6px;
-}
-/* Bottom block — divider + Enter button */
-body.ff-hero-active #faithHeroCinematic .fo-cta-zone{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:12px;
-  width:100%;
-  padding-bottom:env(safe-area-inset-bottom,0px);
 }
 @media(max-width:860px){
   body.ff-hero-active #mainWrap{padding-top:44px;}
   body.ff-hero-active #faithHeroCinematic .fo-hero{
-    height:calc(100dvh - 44px);
-    min-height:calc(100vh - 44px);
+    min-height:calc(100dvh - 44px) !important;
+    max-height:calc(100dvh - 44px) !important;
   }
-  body.ff-hero-active #faithHeroCinematic .fo-hero-content{
-    min-height:calc(100dvh - 44px);
-    min-height:calc(100vh - 44px);
-  }
+}
+/* ── Fix 4: Button always visible — safe-area and z-index ────────── */
+body.ff-hero-active #faithHeroCinematic .fo-hero-content{
+  position:relative;z-index:10;
+  padding-bottom:env(safe-area-inset-bottom,20px);
+}
+body.ff-hero-active #faithHeroCinematic .fo-cta-zone{
+  bottom:max(9%,env(safe-area-inset-bottom,16px));
+}
+body.ff-hero-active #faithHeroCinematic .fo-hero-cta{
+  position:relative;z-index:10;
+  margin-bottom:max(20px,env(safe-area-inset-bottom));
 }
