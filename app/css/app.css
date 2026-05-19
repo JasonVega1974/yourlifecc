@@ -5828,3 +5828,18 @@ body.ff-hero-active #faithHeroCinematic .fo-cta-zone,
 body.ff-hero-active #faithHeroCinematic .fo-hero-cta{
   margin-bottom:calc(env(safe-area-inset-bottom,0px) + 8px);
 }
+/* ── Fix 6: Eliminate top gap — zero mainWrap offset on mobile for faith-free ── */
+/* The @media(max-width:860px) block restores padding-top:44px on #mainWrap which
+   creates the gap between the top bar and hero. Zero it for faith-free and restore
+   the hero to full 100dvh. Add matching padding-top to fo-hero-content so the
+   greeting text starts below the mBar rather than behind it. */
+html[data-faith-free="1"] body.ff-hero-active #mainWrap{
+  padding-top:0 !important;
+}
+html[data-faith-free="1"] body.ff-hero-active #faithHeroCinematic .fo-hero{
+  min-height:100dvh !important;
+  max-height:100dvh !important;
+}
+html[data-faith-free="1"] body.ff-hero-active #faithHeroCinematic .fo-hero-content{
+  padding-top:calc(54px + max(env(safe-area-inset-top),8px)) !important;
+}
