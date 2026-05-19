@@ -257,6 +257,7 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
       <button class="tab-btn" onclick="switchTab('outreach',this)">📣 OUTREACH</button>
       <button class="tab-btn" onclick="switchTab('photos',this)">📷 PHOTOS</button>
       <button class="tab-btn" onclick="switchTab('push',this)">🔔 PUSH</button>
+      <button class="tab-btn" onclick="switchTab('calendar',this)">📅 CALENDAR</button>
     </div>
 
     <!-- USERS TAB -->
@@ -591,6 +592,80 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
         </div>
       </div>
     </div><!-- end tab-push -->
+
+    <!-- CONTENT CALENDAR TAB -->
+    <div class="tab-panel" id="tab-calendar">
+      <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.5rem;">
+        <div class="kpi-card" style="--accent-color:var(--blue)"><div class="kpi-label">Month</div><div class="kpi-value" id="calMonth" style="font-size:1.4rem;">—</div></div>
+        <div class="kpi-card" style="--accent-color:var(--green)"><div class="kpi-label">Published This Month</div><div class="kpi-value" id="calPublished">—</div></div>
+        <div class="kpi-card" style="--accent-color:var(--amber)"><div class="kpi-label">Drafts</div><div class="kpi-value" id="calDrafts">—</div></div>
+      </div>
+      <div class="section-grid">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📅 Calendar</span>
+            <div style="display:flex;gap:.5rem;">
+              <button class="btn-sm btn-blue" onclick="calPrevMonth()">← Prev</button>
+              <button class="btn-sm btn-blue" onclick="calNextMonth()">Next →</button>
+            </div>
+          </div>
+          <div id="calGrid" style="padding:1rem;display:grid;grid-template-columns:repeat(7,1fr);gap:4px;"></div>
+          <div style="padding:.75rem 1rem;border-top:1px solid var(--border);display:flex;gap:1rem;font-family:var(--fm);font-size:.62rem;color:var(--tx3);">
+            <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--green);margin-right:4px;"></span>Published</span>
+            <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--amber);margin-right:4px;"></span>Draft</span>
+            <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.12);margin-right:4px;"></span>Empty</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title" id="calEditorTitle">Schedule Content</span>
+          </div>
+          <div style="padding:1.1rem;display:flex;flex-direction:column;gap:.75rem;">
+            <div>
+              <label style="font-family:var(--fm);font-size:.62rem;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase;display:block;margin-bottom:.3rem;">Date</label>
+              <input id="calDate" type="date" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--tx);font-family:var(--fn);font-size:.82rem;padding:.5rem .75rem;outline:none;" onfocus="this.style.borderColor='var(--border2)'" onblur="this.style.borderColor='var(--border)'">
+            </div>
+            <div>
+              <label style="font-family:var(--fm);font-size:.62rem;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase;display:block;margin-bottom:.3rem;">Type</label>
+              <select id="calType" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--tx);font-family:var(--fn);font-size:.82rem;padding:.5rem .75rem;outline:none;cursor:pointer;">
+                <option value="verse">Verse of the Day</option>
+                <option value="devotional">Devotional</option>
+                <option value="challenge">Faith Challenge</option>
+                <option value="study_prompt">Study Prompt</option>
+                <option value="announcement">Announcement</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-family:var(--fm);font-size:.62rem;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase;display:block;margin-bottom:.3rem;">Title</label>
+              <input id="calTitle" type="text" placeholder="Seek First His Kingdom" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--tx);font-family:var(--fn);font-size:.82rem;padding:.5rem .75rem;outline:none;" onfocus="this.style.borderColor='var(--border2)'" onblur="this.style.borderColor='var(--border)'">
+            </div>
+            <div>
+              <label style="font-family:var(--fm);font-size:.62rem;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase;display:block;margin-bottom:.3rem;">Content Body</label>
+              <textarea id="calBody" rows="5" placeholder="The content text…" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--tx);font-family:var(--fn);font-size:.82rem;padding:.5rem .75rem;outline:none;resize:vertical;" onfocus="this.style.borderColor='var(--border2)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+            </div>
+            <div style="display:flex;gap:.5rem;">
+              <div style="flex:1;">
+                <label style="font-family:var(--fm);font-size:.62rem;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase;display:block;margin-bottom:.3rem;">CTA Label (optional)</label>
+                <input id="calCtaLabel" type="text" placeholder="Read more" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--tx);font-family:var(--fn);font-size:.75rem;padding:.45rem .65rem;outline:none;" onfocus="this.style.borderColor='var(--border2)'" onblur="this.style.borderColor='var(--border)'">
+              </div>
+              <div style="flex:1;">
+                <label style="font-family:var(--fm);font-size:.62rem;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase;display:block;margin-bottom:.3rem;">CTA Action (optional)</label>
+                <input id="calCtaAction" type="text" placeholder="bfTab('devotional')" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--tx);font-family:var(--fn);font-size:.75rem;padding:.45rem .65rem;outline:none;" onfocus="this.style.borderColor='var(--border2)'" onblur="this.style.borderColor='var(--border)'">
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:.5rem;">
+              <input type="checkbox" id="calPublish" style="accent-color:var(--green);width:14px;height:14px;">
+              <label for="calPublish" style="font-family:var(--fm);font-size:.72rem;color:var(--tx2);cursor:pointer;">Publish immediately</label>
+            </div>
+            <div style="display:flex;gap:.6rem;align-items:center;padding-top:.25rem;">
+              <button onclick="calSave()" id="calSaveBtn" style="background:linear-gradient(135deg,rgba(56,189,248,.15),rgba(56,189,248,.08));border:1px solid var(--border2);color:var(--blue);font-family:var(--fm);font-size:.72rem;letter-spacing:.06em;padding:.55rem 1.25rem;border-radius:8px;cursor:pointer;transition:all .15s;font-weight:700;">SAVE</button>
+              <button onclick="calClear()" style="background:none;border:1px solid var(--border);color:var(--tx3);font-family:var(--fm);font-size:.72rem;padding:.55rem 1rem;border-radius:8px;cursor:pointer;">Clear</button>
+              <span id="calSaveResult" style="font-family:var(--fm);font-size:.72rem;color:var(--tx3);"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- end tab-calendar -->
 
   </div>
 </div>
@@ -1943,8 +2018,9 @@ async function pmInit(){
   const _origSwitch = window.switchTab;
   window.switchTab = function(name, btn){
     if(typeof _origSwitch === 'function') _origSwitch(name, btn);
-    if(name === 'photos') pmInit();
-    if(name === 'push')   loadPushSubCount();
+    if(name === 'photos')   pmInit();
+    if(name === 'push')     loadPushSubCount();
+    if(name === 'calendar') loadCalendar();
   };
 })();
 
@@ -1957,6 +2033,149 @@ async function loadPushSubCount(){
   } catch(e) {
     console.warn('push: sub count failed', e);
   }
+}
+
+// ── CONTENT CALENDAR ────────────────────────────────────────────
+let _calYear = new Date().getFullYear();
+let _calMonth = new Date().getMonth(); // 0-based
+let _calEntries = []; // fetched rows for current month
+
+async function loadCalendar(){
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('calMonth').textContent = monthNames[_calMonth] + ' ' + _calYear;
+  const startDate = `${_calYear}-${String(_calMonth+1).padStart(2,'0')}-01`;
+  const endDate   = new Date(_calYear, _calMonth+1, 0).toISOString().slice(0,10);
+
+  try {
+    const rows = await supaFetch(
+      `featured_content?select=id,title,content_type,scheduled_date,is_published&scheduled_date=gte.${startDate}&scheduled_date=lte.${endDate}&order=scheduled_date.asc`
+    );
+    _calEntries = Array.isArray(rows) ? rows : [];
+  } catch(e) {
+    console.error('calendar: load failed', e);
+    _calEntries = [];
+  }
+
+  const published = _calEntries.filter(r => r.is_published).length;
+  const drafts    = _calEntries.filter(r => !r.is_published).length;
+  document.getElementById('calPublished').textContent = published;
+  document.getElementById('calDrafts').textContent    = drafts;
+
+  renderCalGrid();
+}
+
+function renderCalGrid(){
+  const grid = document.getElementById('calGrid');
+  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const daysInMonth = new Date(_calYear, _calMonth+1, 0).getDate();
+  const firstDay    = new Date(_calYear, _calMonth, 1).getDay();
+  const today = new Date().toISOString().slice(0,10);
+
+  let html = dayNames.map(d =>
+    `<div style="font-family:var(--fm);font-size:.58rem;color:var(--tx3);text-align:center;padding:.25rem;letter-spacing:.06em;">${d}</div>`
+  ).join('');
+
+  for(let i = 0; i < firstDay; i++){
+    html += `<div></div>`;
+  }
+
+  for(let day = 1; day <= daysInMonth; day++){
+    const dateStr = `${_calYear}-${String(_calMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const entry   = _calEntries.find(r => r.scheduled_date === dateStr);
+    const isToday = dateStr === today;
+    const dotColor = entry ? (entry.is_published ? 'var(--green)' : 'var(--amber)') : '';
+    const bg  = isToday ? 'rgba(56,189,248,.15)' : entry ? 'rgba(255,255,255,.05)' : 'rgba(255,255,255,.02)';
+    const bdr = isToday ? '1px solid var(--border2)' : '1px solid rgba(255,255,255,.06)';
+    html += `<div onclick="calSelectDay('${dateStr}',${JSON.stringify(entry||null).replace(/"/g,'&quot;')})"
+      style="background:${bg};border:${bdr};border-radius:8px;padding:.4rem;cursor:pointer;min-height:48px;position:relative;transition:background .15s;"
+      onmouseenter="this.style.background='rgba(56,189,248,.1)'" onmouseleave="this.style.background='${bg}'">
+      <div style="font-family:var(--fm);font-size:.72rem;color:${isToday?'var(--blue)':'var(--tx2)'};">${day}</div>
+      ${entry ? `<div style="width:8px;height:8px;border-radius:50%;background:${dotColor};position:absolute;bottom:5px;right:5px;"></div>` : ''}
+      ${entry ? `<div style="font-size:.5rem;color:var(--tx3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;margin-top:.1rem;">${entry.content_type}</div>` : ''}
+    </div>`;
+  }
+
+  grid.innerHTML = html;
+}
+
+function calSelectDay(dateStr, entry){
+  document.getElementById('calDate').value = dateStr;
+  document.getElementById('calEditorTitle').textContent = entry ? 'Edit — ' + dateStr : 'New — ' + dateStr;
+  if(entry){
+    document.getElementById('calType').value    = entry.content_type || 'verse';
+    document.getElementById('calTitle').value   = entry.title || '';
+    document.getElementById('calBody').value    = '';
+    document.getElementById('calCtaLabel').value  = '';
+    document.getElementById('calCtaAction').value = '';
+    document.getElementById('calPublish').checked = !!entry.is_published;
+  } else {
+    calClear();
+    document.getElementById('calDate').value = dateStr;
+  }
+}
+
+function calClear(){
+  ['calDate','calTitle','calBody','calCtaLabel','calCtaAction'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  const pub = document.getElementById('calPublish'); if(pub) pub.checked = false;
+  const res = document.getElementById('calSaveResult'); if(res) res.textContent = '';
+  document.getElementById('calEditorTitle').textContent = 'Schedule Content';
+}
+
+async function calSave(){
+  const btn = document.getElementById('calSaveBtn');
+  const res = document.getElementById('calSaveResult');
+  const date      = (document.getElementById('calDate')      ||{}).value?.trim();
+  const type      = (document.getElementById('calType')      ||{}).value;
+  const title     = (document.getElementById('calTitle')     ||{}).value?.trim();
+  const body      = (document.getElementById('calBody')      ||{}).value?.trim();
+  const ctaLabel  = (document.getElementById('calCtaLabel')  ||{}).value?.trim();
+  const ctaAction = (document.getElementById('calCtaAction') ||{}).value?.trim();
+  const publish   = (document.getElementById('calPublish')   ||{}).checked;
+
+  if(!date || !title || !body){
+    if(res){ res.style.color='var(--red)'; res.textContent='Date, title, and body are required.'; } return;
+  }
+
+  btn.disabled = true;
+  if(res){ res.style.color='var(--tx3)'; res.textContent='Saving…'; }
+
+  try {
+    const resp = await fetch('/api/content-calendar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': ADMIN_TOKEN },
+      body: JSON.stringify({
+        scheduled_date: date,
+        content_type: type,
+        title,
+        content_body: body,
+        cta_label: ctaLabel || null,
+        cta_action: ctaAction || null,
+        is_published: publish,
+      }),
+    });
+    const data = await resp.json();
+    if(!resp.ok) throw new Error(data.error || resp.status);
+    if(res){ res.style.color='var(--green)'; res.textContent='Saved! ID: '+data.id; }
+    await loadCalendar();
+  } catch(e){
+    if(res){ res.style.color='var(--red)'; res.textContent='Error: '+e.message; }
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function calPrevMonth(){
+  _calMonth--;
+  if(_calMonth < 0){ _calMonth = 11; _calYear--; }
+  loadCalendar();
+}
+
+function calNextMonth(){
+  _calMonth++;
+  if(_calMonth > 11){ _calMonth = 0; _calYear++; }
+  loadCalendar();
 }
 
 async function sendPushNotif(){

@@ -462,6 +462,80 @@ function bfShowHomeGrid(){
 // users on the free faith path. Persists dismissal in D so it stays
 // hidden across reloads / cloud sync. The card links out to
 // faith.html#donate where the actual Stripe Checkout lives.
+// Phase 4A — Featured Content Card
+// Fetches today's admin-scheduled content from /api/content-calendar.
+// Cached for the calendar day; auto-clears at midnight.
+let _featuredContentCache = null;
+let _featuredContentCacheDate = '';
+
+async function renderFeaturedContentCard(){
+  const home = document.getElementById('bf-home'); if(!home) return;
+  const today = new Date().toISOString().slice(0,10);
+
+  // Clear stale cache
+  if(_featuredContentCacheDate !== today){
+    _featuredContentCache = null;
+    _featuredContentCacheDate = today;
+  }
+
+  // Remove any prior card so we can re-render cleanly
+  const stale = document.getElementById('featuredContentCard');
+  if(stale && stale.parentNode) stale.parentNode.removeChild(stale);
+
+  // Use cache if available
+  if(_featuredContentCache === null){
+    try {
+      const resp = await fetch('/api/content-calendar');
+      if(!resp.ok) return;
+      const data = await resp.json();
+      _featuredContentCache = (data && data.content) || false;
+    } catch(_) { return; }
+  }
+
+  const content = _featuredContentCache;
+  if(!content) return; // no content today
+
+  const typeLabels = {
+    verse:'Verse of the Day', devotional:'Featured Devotional',
+    challenge:'Faith Challenge', study_prompt:'Study Prompt', announcement:'From the Team'
+  };
+  const typeColors = {
+    verse:'rgba(251,191,36,.18)', devotional:'rgba(56,189,248,.14)',
+    challenge:'rgba(34,197,94,.14)', study_prompt:'rgba(167,139,250,.14)', announcement:'rgba(248,113,113,.12)'
+  };
+  const typeBorders = {
+    verse:'rgba(251,191,36,.35)', devotional:'rgba(56,189,248,.3)',
+    challenge:'rgba(34,197,94,.3)', study_prompt:'rgba(167,139,250,.3)', announcement:'rgba(248,113,113,.28)'
+  };
+  const bg  = typeColors[content.content_type]  || typeColors.verse;
+  const bdr = typeBorders[content.content_type] || typeBorders.verse;
+  const label = typeLabels[content.content_type] || 'Featured';
+
+  const card = document.createElement('div');
+  card.id = 'featuredContentCard';
+  card.style.cssText = `background:${bg};border:1px solid ${bdr};border-radius:14px;padding:1rem 1.15rem;margin-bottom:.85rem;`;
+
+  let ctaHtml = '';
+  if(content.cta_label && content.cta_action){
+    const safeAction = content.cta_action.replace(/"/g,'&quot;');
+    ctaHtml = `<button onclick="${safeAction}" style="margin-top:.7rem;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--tx);border-radius:8px;padding:.42rem .9rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fn);">${escapeHtml(content.cta_label)} →</button>`;
+  }
+
+  card.innerHTML =
+    `<div style="font-size:.58rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);margin-bottom:.35rem;">${label}</div>` +
+    `<div style="font-size:.9rem;font-weight:800;color:var(--tx);margin-bottom:.45rem;">${escapeHtml(content.title)}</div>` +
+    `<div style="font-size:.78rem;color:var(--tx2);line-height:1.6;">${escapeHtml(content.content_body)}</div>` +
+    ctaHtml;
+
+  // Insert before donation prompt / family verse card, or append to bf-home
+  const anchor = document.getElementById('fhFamilyVerseCard') || document.getElementById('fhDonationPrompt');
+  if(anchor && anchor.parentNode === home){
+    home.insertBefore(card, anchor);
+  } else {
+    home.insertBefore(card, home.firstChild);
+  }
+}
+
 function dismissDonationPrompt(){
   if(typeof D !== 'undefined' && D){
     D.donationPromptDismissed = true;
@@ -758,6 +832,9 @@ function renderFaithHome(){
   // window._faithFree + D.donationPromptDismissed; safe to call always.
   renderWellDonationPrompt();
 
+  // Phase 4A: Featured content card (admin-scheduled, today's entry)
+  renderFeaturedContentCard();
+
   // F2-H: Family Verse of the Week (only when family profiles exist).
   const fvEl = document.getElementById('fhFamilyVerseCard');
   if(fvEl){
@@ -775,6 +852,148 @@ function renderFaithHome(){
       } else fvEl.style.display = 'none';
     } else fvEl.style.display = 'none';
   }
+}
+
+// ── PHASE 4B — GLOBAL FAITH SEARCH ──────────────────────────
+let _faithSearchTimer = null;
+
+function faithSearchDebounced(q){
+  clearTimeout(_faithSearchTimer);
+  _faithSearchTimer = setTimeout(function(){ faithSearch(q); }, 250);
+}
+
+function faithSearchClear(){
+  const inp = document.getElementById('faithSearchInput');
+  if(inp) inp.value = '';
+  const clr = document.getElementById('faithSearchClear');
+  if(clr) clr.style.display = 'none';
+  const res = document.getElementById('faithSearchResults');
+  if(res){ res.style.display = 'none'; res.innerHTML = ''; }
+  const grid = document.getElementById('bf-home');
+  if(grid) grid.querySelectorAll('.topic-card-grid,.fh-grid,.fh-card').forEach(function(el){ el.style.display = ''; });
+}
+
+async function faithSearch(q){
+  const inp = document.getElementById('faithSearchInput');
+  const clr = document.getElementById('faithSearchClear');
+  const res = document.getElementById('faithSearchResults');
+  if(!res) return;
+
+  q = (q || '').trim();
+  if(clr) clr.style.display = q ? '' : 'none';
+
+  if(!q){
+    faithSearchClear();
+    return;
+  }
+
+  // Hide home content while showing results
+  const home = document.getElementById('bf-home');
+  if(home) home.querySelectorAll('.topic-card-grid,.fh-grid,.fh-card').forEach(function(el){ el.style.display = 'none'; });
+  res.style.display = '';
+  res.innerHTML = '<div style="font-size:.75rem;color:var(--tx3);padding:.5rem 0;">Searching…</div>';
+
+  const ql = q.toLowerCase();
+
+  // ── 1. Devotionals (client-side) ────────────────────────────
+  const devotionalHits = [];
+  if(typeof DEVOTIONALS !== 'undefined' && Array.isArray(DEVOTIONALS)){
+    DEVOTIONALS.forEach(function(d, i){
+      const text = ((d.title||'') + ' ' + (d.verse||'') + ' ' + (d.body||'')).toLowerCase();
+      if(text.indexOf(ql) !== -1){
+        devotionalHits.push({ label: (d.title||'Day '+(i+1)), sub: d.verse||'', action: "bfTab('devotional')" });
+      }
+    });
+  }
+
+  // ── 2. Academy lessons (client-side) ────────────────────────
+  const academyHits = [];
+  const acLessons = (typeof window.ACADEMY_LESSONS !== 'undefined') ? window.ACADEMY_LESSONS : [];
+  acLessons.forEach(function(l){
+    const text = ((l.title||'') + ' ' + (l.track||'') + ' ' + (l.summary||'')).toLowerCase();
+    if(text.indexOf(ql) !== -1){
+      academyHits.push({ label: l.title||'Lesson', sub: l.track||'Academy', action: "bfTab('academy')" });
+    }
+  });
+
+  // ── 3. Proof & Prophecy (client-side) ────────────────────────
+  const proofHits = [];
+  if(typeof PROOF_PROPHECY_DATA !== 'undefined' && Array.isArray(PROOF_PROPHECY_DATA)){
+    PROOF_PROPHECY_DATA.forEach(function(p){
+      const text = ((p.title||'') + ' ' + (p.category||'') + ' ' + (p.summary||'')).toLowerCase();
+      if(text.indexOf(ql) !== -1){
+        proofHits.push({ label: p.title||'Proof', sub: p.category||'Proof & Prophecy', action: "bfTab('proofProphecy')" });
+      }
+    });
+  }
+
+  // ── 4. Bible Study tracks (client-side) ─────────────────────
+  const studyHits = [];
+  if(typeof window.BIBLE_STUDY_TRACKS !== 'undefined'){
+    const tracks = window.BIBLE_STUDY_TRACKS;
+    Object.keys(tracks).forEach(function(trackKey){
+      const track = tracks[trackKey];
+      const topics = Array.isArray(track.topics) ? track.topics : (Array.isArray(track) ? track : []);
+      topics.forEach(function(topic){
+        const text = (typeof topic === 'string' ? topic : (topic.name||topic.title||'')).toLowerCase();
+        if(text.indexOf(ql) !== -1){
+          const label = typeof topic === 'string' ? topic : (topic.name||topic.title);
+          studyHits.push({ label: label||trackKey, sub: 'Bible Study · '+trackKey, action: "bfTab('bibleStudy')" });
+        }
+      });
+    });
+  }
+
+  // ── 5. Shared lessons (Supabase full-text) ──────────────────
+  const groupHits = [];
+  try {
+    const supa = typeof getSupabase === 'function' ? getSupabase() : null;
+    if(supa){
+      const { data } = await supa
+        .from('shared_lessons')
+        .select('id,topic,track,note')
+        .textSearch('topic', q, { type: 'websearch', config: 'english' })
+        .limit(5);
+      if(Array.isArray(data)){
+        data.forEach(function(row){
+          groupHits.push({ label: row.topic||'Shared Lesson', sub: (row.track||'Group') + (row.note ? ' · ' + row.note.slice(0,40) : ''), action: "bfTab('bibleStudy')" });
+        });
+      }
+    }
+  } catch(_) { /* shared_lessons not migrated yet — non-fatal */ }
+
+  // ── Render results ───────────────────────────────────────────
+  const total = devotionalHits.length + academyHits.length + proofHits.length + studyHits.length + groupHits.length;
+
+  if(total === 0){
+    res.innerHTML = '<div style="font-size:.78rem;color:var(--tx3);text-align:center;padding:1.5rem 0;">No results for "' + escapeHtml(q) + '"</div>';
+    return;
+  }
+
+  function renderGroup(title, hits, color){
+    if(!hits.length) return '';
+    return '<div style="margin-bottom:.85rem;">' +
+      '<div style="font-size:.58rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:' + color + ';margin-bottom:.4rem;">' + escapeHtml(title) + ' (' + hits.length + ')</div>' +
+      hits.slice(0,5).map(function(h){
+        return '<div onclick="' + h.action + '" style="display:flex;align-items:flex-start;gap:.6rem;padding:.55rem .75rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:.3rem;cursor:pointer;transition:background .15s;" onmouseenter="this.style.background=\'rgba(255,255,255,.07)\'" onmouseleave="this.style.background=\'rgba(255,255,255,.03)\'">' +
+          '<div style="flex:1;min-width:0;">' +
+            '<div style="font-size:.8rem;font-weight:700;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escapeHtml(h.label) + '</div>' +
+            (h.sub ? '<div style="font-size:.65rem;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escapeHtml(h.sub) + '</div>' : '') +
+          '</div>' +
+          '<span style="color:var(--tx3);font-size:.8rem;flex-shrink:0;">→</span>' +
+        '</div>';
+      }).join('') +
+      (hits.length > 5 ? '<div style="font-size:.65rem;color:var(--tx3);padding:.25rem .75rem;">…and ' + (hits.length - 5) + ' more — refine your search</div>' : '') +
+    '</div>';
+  }
+
+  res.innerHTML =
+    '<div style="font-size:.72rem;color:var(--tx3);margin-bottom:.75rem;">' + total + ' result' + (total>1?'s':'') + ' for "' + escapeHtml(q) + '"</div>' +
+    renderGroup('Devotionals', devotionalHits, '#38bdf8') +
+    renderGroup('Bible Study', studyHits, '#a78bfa') +
+    renderGroup('Academy', academyHits, '#22c55e') +
+    renderGroup('Proof & Prophecy', proofHits, '#fbbf24') +
+    renderGroup('Group Lessons', groupHits, '#fb923c');
 }
 
 // ── FAITH HOME ACTIONS (F2-A) ────────────────────────────────

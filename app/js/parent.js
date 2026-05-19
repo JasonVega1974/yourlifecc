@@ -180,6 +180,7 @@ function renderParentDash(){
   renderParentFamilyRewards();
   renderParentActivityFeed();
   if(typeof renderPhPendingChores==='function') renderPhPendingChores();
+  renderParentFaithReport();
   // Render session log in parent hub
   if(typeof renderSessionLog === 'function') renderSessionLog();
   // Update live session time display
@@ -313,6 +314,88 @@ function renderWeeklyReportCard(){
   <div style="margin-top:.6rem;padding-top:.5rem;border-top:1px solid rgba(255,255,255,.06);font-size:.6rem;color:var(--tx2);text-align:center;">
     Week of ${weekStart.toLocaleDateString('en',{month:'short',day:'numeric'})} — ${new Date().toLocaleDateString('en',{month:'short',day:'numeric'})}
   </div>`;
+}
+
+// ── PARENT FAITH REPORT (Phase 3B) ───────────────────────────
+let _faithReportCache = null;
+let _faithReportFetching = false;
+
+async function renderParentFaithReport(){
+  const el = document.getElementById('phFaithReportCards'); if(!el) return;
+  if(_faithReportFetching) return;
+
+  // Use cached data if available (cleared on manual refresh)
+  if(_faithReportCache){
+    _renderFaithReportCards(el, _faithReportCache);
+    return;
+  }
+
+  // Need a Supabase session to call the API
+  if(typeof _supaUser === 'undefined' || !_supaUser) return;
+
+  _faithReportFetching = true;
+  el.innerHTML = '<div style="font-size:.72rem;color:var(--tx3);text-align:center;padding:1rem;">Loading faith activity…</div>';
+
+  try {
+    const supa = typeof getSupabase === 'function' ? getSupabase() : null;
+    let token = null;
+    if(supa){
+      const { data } = await supa.auth.getSession();
+      token = data && data.session && data.session.access_token;
+    }
+    if(!token){ el.innerHTML = '<div style="font-size:.72rem;color:var(--tx3);text-align:center;padding:1rem;">Sign in to view faith activity.</div>'; return; }
+
+    const resp = await fetch('/api/faith-report', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if(!resp.ok){ throw new Error('HTTP ' + resp.status); }
+    const data = await resp.json();
+    _faithReportCache = data;
+    _renderFaithReportCards(el, data);
+  } catch(e) {
+    console.warn('[faith-report]', e.message);
+    el.innerHTML = '<div style="font-size:.72rem;color:var(--tx3);text-align:center;padding:1rem;">Could not load faith data — try again.</div>';
+  } finally {
+    _faithReportFetching = false;
+  }
+}
+
+function _renderFaithReportCards(el, data){
+  const children = (data && Array.isArray(data.children)) ? data.children : [];
+  if(!children.length){
+    el.innerHTML = '<div style="font-size:.72rem;color:var(--tx3);text-align:center;padding:1rem;">No faith activity recorded yet.</div>';
+    return;
+  }
+
+  el.innerHTML = children.map(function(c){
+    const streakColor = c.streak >= 7 ? '#22c55e' : c.streak >= 3 ? '#fbbf24' : '#94a3b8';
+    const prayerLabel = c.lastPrayerDate ? ('Last prayer: ' + c.lastPrayerDate) : 'No prayer logged';
+    const groupLabel  = c.groupCount > 0 ? (c.groupCount + ' group' + (c.groupCount > 1 ? 's' : '')) : 'No groups';
+    return `<div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:.85rem 1rem;display:flex;align-items:flex-start;gap:.85rem;">
+      <div style="width:38px;height:38px;border-radius:50%;background:rgba(251,191,36,.1);border:2px solid rgba(251,191,36,.25);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">${c.isParent ? '\u{1F4D6}' : '✨'}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:.82rem;font-weight:800;color:var(--tx);margin-bottom:.35rem;">${escapeHtml(c.name || 'Unknown')}</div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:.35rem;">
+          <div style="background:rgba(255,255,255,.03);border-radius:8px;padding:.4rem .6rem;">
+            <div style="font-size:.58rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.15rem;">Streak</div>
+            <div style="font-size:1rem;font-weight:900;color:${streakColor};">${c.streak}<span style="font-size:.55rem;color:var(--tx3);font-weight:400;"> days</span></div>
+          </div>
+          <div style="background:rgba(255,255,255,.03);border-radius:8px;padding:.4rem .6rem;">
+            <div style="font-size:.58rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.15rem;">Lessons (7d)</div>
+            <div style="font-size:1rem;font-weight:900;color:${c.lessonsThisWeek > 0 ? '#22c55e' : '#94a3b8'};">${c.lessonsThisWeek}</div>
+          </div>
+          <div style="background:rgba(255,255,255,.03);border-radius:8px;padding:.4rem .6rem;">
+            <div style="font-size:.58rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.15rem;">Last Prayer</div>
+            <div style="font-size:.65rem;color:var(--tx2);font-weight:600;">${escapeHtml(prayerLabel)}</div>
+          </div>
+          <div style="background:rgba(255,255,255,.03);border-radius:8px;padding:.4rem .6rem;">
+            <div style="font-size:.58rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.15rem;">Study Groups</div>
+            <div style="font-size:.65rem;color:var(--tx2);font-weight:600;">${escapeHtml(groupLabel)}</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 // ── PARENT NOTES ─────────────────────────────────────────────
@@ -2567,7 +2650,7 @@ function phNav(tab){
   if(t === 'activity') { renderParentActivityAudit(); renderParentActivityFeed(); renderBehaviorLog(); renderGradeMonitor(); renderParentNotes(); initPhSchedPanel(); }
   if(t === 'rewards')  { renderPhRewards(); renderParentChoreList(); renderParentSelfChores(); renderParentDeeds(); renderPhPendingChores(); renderParentLeaderboard(); renderParentContests(); renderParentFamilyRewards(); }
   if(t === 'controls') { renderManageUsers(); renderParentScreenControls(); renderParentEarningsControls(); renderParentBucksControls(); renderIncentives(); renderParentChoreList(); if(typeof updateIncConditions==='function') updateIncConditions(); renderParentLessons(); if(typeof renderParentGrowth==='function') renderParentGrowth(); if(typeof renderParentGrowthHistory==='function') renderParentGrowthHistory(); }
-  if(t === 'reports')  { renderParentGettingStarted(); renderParentMultiChild(); renderParentScore(); renderParentOverview(); renderWeeklyReportCard(); renderCompletionSummary(); renderSentQuizzes(); renderProgressReportsTab(); }
+  if(t === 'reports')  { renderParentGettingStarted(); renderParentMultiChild(); renderParentScore(); renderParentOverview(); renderWeeklyReportCard(); renderCompletionSummary(); renderSentQuizzes(); renderProgressReportsTab(); renderParentFaithReport(); }
   if(t === 'referral') { renderPhReferral(); }
 }
 
