@@ -5791,10 +5791,19 @@ body.ff-hero-active #faithHeroCinematic .fo-hero{
   }
 }
 /* ── Fix 4: Button always visible — safe-area and z-index ────────── */
+body.ff-hero-active #faithHeroCinematic{
+  margin-top:0;padding-top:0;
+}
+body.ff-hero-active #faithHeroCinematic .fo-hero{
+  margin-top:0 !important;padding-top:0 !important;
+}
 body.ff-hero-active #faithHeroCinematic .fo-hero-content{
   position:relative;z-index:10;
-  padding-top:max(12px,2vh);
+  padding-top:0 !important;margin-top:0 !important;
   padding-bottom:env(safe-area-inset-bottom,20px);
+}
+html[data-faith-free="1"] #mBar{
+  margin-bottom:0;
 }
 body.ff-hero-active #faithHeroCinematic .fo-cta-zone{
   bottom:max(9%,env(safe-area-inset-bottom,16px));
