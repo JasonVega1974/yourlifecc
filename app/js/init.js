@@ -1195,14 +1195,17 @@ function renderFaithOnlyHero() {
 
   const hr = new Date().getHours();
   const greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
-  let name = (typeof D !== 'undefined' && D && D.name) ? String(D.name).trim() : '';
-  if (!name && typeof _supaUser !== 'undefined' && _supaUser) {
+  // Auth metadata is always the current user — check it before D.name which
+  // can hold a stale value from localStorage if cloudLoad hasn't finished yet.
+  let name = '';
+  if (typeof _supaUser !== 'undefined' && _supaUser) {
     const meta = _supaUser.user_metadata || {};
     name = (meta.first_name || (meta.name||'').split(/\s+/)[0] ||
             (meta.full_name||'').split(/\s+/)[0] || '').trim();
     if (!name && _supaUser.email)
       name = String(_supaUser.email).split('@')[0].split(/[.+_-]/)[0];
   }
+  if (!name && typeof D !== 'undefined' && D && D.name) name = String(D.name).trim();
   if (!name) name = 'friend';
   name = name.split(/\s+/)[0];
   name = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
