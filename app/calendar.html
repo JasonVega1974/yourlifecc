@@ -562,7 +562,7 @@
     overlay.innerHTML = '<div class="cal-modal">'
       +'<div class="cal-modal-hdr">'
       +'<div class="cal-modal-title">'+(ev?'Edit Event':'Add Event')+'</div>'
-      +'<button class="cal-modal-close" onclick="calCloseModal()">✕</button>'
+      +'<button type="button" class="cal-modal-close" onclick="calCloseModal()">✕</button>'
       +'</div>'
       +'<div class="cal-field"><div class="cal-label">Event Name *</div>'
       +'<input class="cal-input" id="calEvtName" placeholder="e.g. Sunday Service" value="'+esc(ev?ev.name:'')+'"></div>'

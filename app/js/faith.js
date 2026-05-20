@@ -9104,7 +9104,7 @@ function openDenomModal(denomId){
   var modal = document.createElement('div');
   modal.id = 'denomModal';
   modal.style.cssText = 'position:fixed;inset:0;z-index:9998;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;';
-  modal.innerHTML = '<div style="max-width:680px;margin:0 auto;padding:1rem 1rem 3rem;">'
+  modal.innerHTML = '<div style="max-width:680px;margin:0 auto;padding:max(env(safe-area-inset-top),1rem) 1rem 3rem;">'
     +'<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1rem;padding-top:.4rem;">'
     +'<button type="button" onclick="closeDenomModal()" style="background:rgba(5,150,105,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
     +'<div><span style="font-size:1.4rem;margin-right:.3rem;">'+_jEsc(d.icon||'✝️')+'</span><span style="font-size:1.05rem;font-weight:800;color:var(--tx);">'+_jEsc(d.name)+'</span></div>'
@@ -9325,7 +9325,7 @@ function openFaithProfileModal(){
   var modal = document.createElement('div');
   modal.id = 'fjProfileModal';
   modal.style.cssText = 'position:fixed;inset:0;z-index:9500;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;';
-  modal.innerHTML = '<div style="max-width:640px;margin:0 auto;padding:1rem 1rem 3rem;">'
+  modal.innerHTML = '<div style="max-width:640px;margin:0 auto;padding:max(env(safe-area-inset-top),1rem) 1rem 3rem;">'
     +'<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.2rem;padding-top:.4rem;">'
     +'<button type="button" onclick="closeFaithProfileModal()" style="background:rgba(167,139,250,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
     +'<span style="font-size:1rem;font-weight:800;color:var(--tx);">My Faith Profile</span>'
@@ -9489,7 +9489,7 @@ function openMilestoneModal(editId){
   var modal = document.createElement('div');
   modal.id = 'fjMilestoneModal';
   modal.style.cssText = 'position:fixed;inset:0;z-index:9500;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;';
-  modal.innerHTML = '<div style="max-width:640px;margin:0 auto;padding:1rem 1rem 3rem;">'
+  modal.innerHTML = '<div style="max-width:640px;margin:0 auto;padding:max(env(safe-area-inset-top),1rem) 1rem 3rem;">'
     +'<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.2rem;padding-top:.4rem;">'
     +'<button type="button" onclick="closeMilestoneModal()" style="background:rgba(167,139,250,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
     +'<span style="font-size:1rem;font-weight:800;color:var(--tx);">'+(editId?'Edit':'Add')+' Milestone</span>'
@@ -9591,7 +9591,7 @@ function _fjMilestoneDetail(id){
   var modal = document.createElement('div');
   modal.id = 'fjMilestoneDetail';
   modal.style.cssText = 'position:fixed;inset:0;z-index:9500;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;';
-  modal.innerHTML = '<div style="max-width:640px;margin:0 auto;padding:1rem 1rem 3rem;">'
+  modal.innerHTML = '<div style="max-width:640px;margin:0 auto;padding:max(env(safe-area-inset-top),1rem) 1rem 3rem;">'
     +'<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.2rem;padding-top:.4rem;">'
     +'<button type="button" onclick="closeMilestoneDetail()" style="background:rgba(167,139,250,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
     +'<button type="button" onclick="closeMilestoneDetail();openMilestoneModal(\''+_jEsc(id)+'\')" style="margin-left:auto;background:rgba(167,139,250,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--accent,#a78bfa);font-size:.75rem;">Edit</button>'
@@ -9693,7 +9693,7 @@ function openDonationModal(){
   var modal = document.createElement('div');
   modal.id = 'fjDonationModal';
   modal.style.cssText = 'position:fixed;inset:0;z-index:9500;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;';
-  modal.innerHTML = '<div style="max-width:560px;margin:0 auto;padding:1rem 1rem 3rem;">'
+  modal.innerHTML = '<div style="max-width:560px;margin:0 auto;padding:max(env(safe-area-inset-top),1rem) 1rem 3rem;">'
     +'<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.2rem;padding-top:.4rem;">'
     +'<button type="button" onclick="closeDonationModal()" style="background:rgba(34,197,94,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
     +'<span style="font-size:1rem;font-weight:800;color:var(--tx);">Record a Gift</span>'
@@ -11064,6 +11064,7 @@ function startMeditation(medId){
   overlay.id = 'meditationOverlay';
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9500;background:#0b0b1a;display:flex;flex-direction:column;overflow:hidden;';
   document.body.appendChild(overlay);
+  document.body.style.overflow = 'hidden';
   _medRenderPlayer(med);
   _medPlaySegment(med, 0);
 }
@@ -11081,11 +11082,11 @@ function _medRenderPlayer(med){
     return '<div style="width:7px;height:7px;border-radius:99px;background:'+bg+';display:inline-block;margin:0 2px;transition:background .3s;"></div>';
   }).join('');
   overlay.innerHTML = [
-    '<div style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.1rem .5rem;flex-shrink:0;">',
-    '<button onclick="_medClose()" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);border-radius:8px;padding:.3rem .7rem;font-size:.76rem;cursor:pointer;font-family:var(--fm);">✕ Close</button>',
+    '<div style="display:flex;align-items:center;justify-content:space-between;padding:max(env(safe-area-inset-top),1rem) 1.1rem .5rem;flex-shrink:0;">',
+    '<button type="button" onclick="_medClose()" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);border-radius:8px;padding:.3rem .7rem;font-size:.76rem;cursor:pointer;font-family:var(--fm);">✕ Close</button>',
     '<div style="text-align:center;flex:1;padding:0 .5rem;"><div style="font-size:1.25rem;">'+med.icon+'</div>',
     '<div style="font-size:.76rem;font-weight:800;color:rgba(255,255,255,.8);margin-top:.1rem;">'+escapeHtml(med.title)+'</div></div>',
-    '<button onclick="_medSkip()" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);border-radius:8px;padding:.3rem .7rem;font-size:.76rem;cursor:pointer;font-family:var(--fm);">⏭ Skip</button>',
+    '<button type="button" onclick="_medSkip()" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);border-radius:8px;padding:.3rem .7rem;font-size:.76rem;cursor:pointer;font-family:var(--fm);">⏭ Skip</button>',
     '</div>',
     '<div style="padding:0 1.1rem .7rem;flex-shrink:0;">',
     '<div style="height:3px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden;margin-bottom:.35rem;">',
@@ -11100,8 +11101,8 @@ function _medRenderPlayer(med){
     '</div></div>',
     '<div style="padding:0 1.1rem .45rem;flex-shrink:0;text-align:center;" id="medSegDots">'+dots+'</div>',
     '<div style="padding:.45rem 1.1rem;flex-shrink:0;display:flex;justify-content:center;gap:.55rem;">',
-    '<button id="medPauseBtn" onclick="_medTogglePause()" style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.35);color:#a78bfa;border-radius:12px;padding:.6rem 1.4rem;font-size:.84rem;font-weight:800;cursor:pointer;font-family:var(--fm);">⏸ Pause</button>',
-    '<button onclick="_medSkip()" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.45);border-radius:12px;padding:.6rem 1.4rem;font-size:.84rem;cursor:pointer;font-family:var(--fm);">⏭ Skip</button>',
+    '<button type="button" id="medPauseBtn" onclick="_medTogglePause()" style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.35);color:#a78bfa;border-radius:12px;padding:.6rem 1.4rem;font-size:.84rem;font-weight:800;cursor:pointer;font-family:var(--fm);">⏸ Pause</button>',
+    '<button type="button" onclick="_medSkip()" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.45);border-radius:12px;padding:.6rem 1.4rem;font-size:.84rem;cursor:pointer;font-family:var(--fm);">⏭ Skip</button>',
     '</div>',
     '<div style="padding:.3rem 1.1rem 1rem;flex-shrink:0;border-top:1px solid rgba(255,255,255,.05);">',
     '<div style="font-size:.55rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:.3rem;">🎵 Ambient</div>',
@@ -11190,6 +11191,7 @@ function _medClose(){
   if('speechSynthesis' in window && !_ssId) window.speechSynthesis.cancel();
   var overlay = document.getElementById('meditationOverlay');
   if(overlay) overlay.remove();
+  document.body.style.overflow = '';
   _medId = null; _medSegIdx = 0; _medPaused = false; _medElapsed = 0; _medAdvancePending = false;
 }
 
@@ -11255,6 +11257,7 @@ function startSleepStory(storyId){
   overlay.id = 'sleepStoryOverlay';
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9600;background:#020209;display:flex;flex-direction:column;overflow:hidden;';
   document.body.appendChild(overlay);
+  document.body.style.overflow = 'hidden';
   _ssRenderPlayer(story);
   _ssPlaySegment(story, 0);
   var fadeMs = (story.fadeOutAt||story.duration)*60000;
@@ -11266,8 +11269,8 @@ function _ssRenderPlayer(story){
   if(!overlay) return;
   var seg = _ssSegments[_ssIdx]||'';
   overlay.innerHTML = [
-    '<div style="display:flex;align-items:center;justify-content:space-between;padding:.85rem 1.1rem .4rem;flex-shrink:0;opacity:.3;">',
-    '<button onclick="_ssClose()" style="background:none;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.4);border-radius:8px;padding:.28rem .65rem;font-size:.7rem;cursor:pointer;font-family:var(--fm);">✕</button>',
+    '<div style="display:flex;align-items:center;justify-content:space-between;padding:max(env(safe-area-inset-top),.85rem) 1.1rem .4rem;flex-shrink:0;opacity:.3;">',
+    '<button type="button" onclick="_ssClose()" style="background:none;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.4);border-radius:8px;padding:.28rem .65rem;font-size:.7rem;cursor:pointer;font-family:var(--fm);">✕</button>',
     '<span style="font-size:.7rem;color:rgba(255,255,255,.3);font-weight:600;">'+escapeHtml(story.title)+'</span>',
     '<span style="font-size:.62rem;color:rgba(255,255,255,.2);">'+story.duration+' min</span>',
     '</div>',
@@ -11281,8 +11284,8 @@ function _ssRenderPlayer(story){
     '<iframe src="https://www.youtube-nocookie.com/embed/'+story.ambientYouTube+'?autoplay=1&loop=1&playlist='+story.ambientYouTube+'&controls=1&modestbranding=1" frameborder="0" allow="autoplay;encrypted-media" style="width:100%;height:48px;border:none;border-radius:6px;display:block;"></iframe>',
     '</div>',
     '<div style="padding:.35rem 1.1rem 1rem;flex-shrink:0;display:flex;justify-content:center;gap:.55rem;opacity:.22;">',
-    '<button id="ssPauseBtn" onclick="_ssTogglePause()" style="background:none;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.45);border-radius:10px;padding:.45rem 1.1rem;font-size:.78rem;cursor:pointer;font-family:var(--fm);">⏸</button>',
-    '<button onclick="_ssClose()" style="background:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.35);border-radius:10px;padding:.45rem 1.1rem;font-size:.78rem;cursor:pointer;font-family:var(--fm);">✕ Stop</button>',
+    '<button type="button" id="ssPauseBtn" onclick="_ssTogglePause()" style="background:none;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.45);border-radius:10px;padding:.45rem 1.1rem;font-size:.78rem;cursor:pointer;font-family:var(--fm);">⏸</button>',
+    '<button type="button" onclick="_ssClose()" style="background:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.35);border-radius:10px;padding:.45rem 1.1rem;font-size:.78rem;cursor:pointer;font-family:var(--fm);">✕ Stop</button>',
     '</div>',
     '<div style="padding:0 1rem .55rem;text-align:center;font-size:.58rem;color:rgba(255,255,255,.1);">Fades out at '+story.duration+' min</div>'
   ].join('');
@@ -11344,6 +11347,7 @@ function _ssClose(){
   _ssReleaseWakeLock();
   var overlay = document.getElementById('sleepStoryOverlay');
   if(overlay) overlay.remove();
+  document.body.style.overflow = '';
   _ssId = null; _ssIdx = 0; _ssPaused = false; _ssTtsVol = 1.0; _ssSegments = [];
 }
 
