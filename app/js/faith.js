@@ -439,7 +439,7 @@ function initScripture(){
 // the original 6 tabs. New tabs without renderers are stubs awaiting later phases.
 // btn is optional — when bfTab() is called programmatically (e.g., from a Quick
 // Tile or stub-panel CTA), the matching button is found via [data-bf-tab].
-const BF_TABS = ['home','devotional','jesus','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy'];
+const BF_TABS = ['home','devotional','jesus','denominations','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy'];
 
 // Phase 5.8 v3 — Home-grid restorer. Defensive against any prior code
 // that may have set .topic-card-grid display:none inside #bf-home. The
@@ -672,7 +672,8 @@ function bfTab(tab, btn){
   if(tab==='reading'){ populateBibleBooks(); renderBibleReadings(); }
   if(tab==='bible') initEsvBible();
   if(tab==='journey') renderFaithJourney();
-  if(tab==='jesus') renderJesusGrid();
+  if(tab==='jesus') renderJesusCard();
+  if(tab==='denominations') renderDenominationsCard();
   if(tab==='learnBible') renderLearnBibleGrid();
   if(tab==='plans') renderPlanCatalog();
   if(tab==='prayer') renderPrayerPanel();
@@ -2769,6 +2770,12 @@ const LEARN_BIBLE_LESSONS = [
 
 // ── FAITH JOURNEY ────────────────────────────────────────────
 function renderFaithJourney(){
+  // Worker 2 — new sections at top of journey tab
+  renderFJProfile();
+  renderFJMilestones();
+  renderFJDonations();
+  renderFJDisciplines();
+  // Existing sections below
   renderMyPrayersPane();
   renderFaithMilestones();
   renderFavVerses();
@@ -8612,3 +8619,1175 @@ function _bsRenderLesson(out, lesson, track){
   + '<button class="bs-new-btn" onclick="_bsGenerate()" type="button">&#8635; Generate Another Study</button>';
 }
 
+
+// ═══════════════════════════════════════════════════════════════
+// WORKER 1 — Who Is Jesus? card + Christian Traditions card
+// renderJesusCard(), renderDenominationsCard(), and helpers
+// Uses: JESUS_DATA (jesus-data.js) · CHRISTIAN_DENOMINATIONS (denominations.js)
+// ═══════════════════════════════════════════════════════════════
+
+function _jEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── WHO IS JESUS? ─────────────────────────────────────────────
+
+function renderJesusCard(){
+  var el = document.getElementById('jesusCardContainer');
+  if(!el) return;
+  if(el.dataset.rendered) return;
+  var d = (typeof JESUS_DATA !== 'undefined') ? JESUS_DATA : null;
+  if(!d){ el.innerHTML = '<p style="color:var(--tx2);font-size:.82rem;">Jesus data not available.</p>'; return; }
+
+  var tabBtns = [
+    {id:'life', label:'His Life'},
+    {id:'crucifixion', label:'The Cross'},
+    {id:'teachings', label:'Teachings'},
+    {id:'words', label:'His Words'},
+    {id:'names', label:'Names &amp; Titles'}
+  ].map(function(t,i){
+    return '<button class="jtab'+(i===0?' jtab-active':'')+'" onclick="switchJesusTab(\''+t.id+'\')" data-jtab="'+t.id+'" style="flex-shrink:0;font-size:.75rem;font-weight:700;padding:.3rem .65rem;border-radius:20px;border:1px solid rgba(167,139,250,.3);background:'+(i===0?'rgba(167,139,250,.25)':'none')+';color:var(--tx);cursor:pointer;white-space:nowrap;">'+t.label+'</button>';
+  }).join('');
+
+  el.innerHTML = '<div class="faith-card card-jesus" id="card-jesus" style="border-radius:12px;overflow:hidden;border:1px solid rgba(167,139,250,.15);">'
+    +'<div style="background:linear-gradient(135deg,#3b0764,#6d28d9,#92400e);padding:1.3rem 1rem 1rem;text-align:center;">'
+    +'<div style="font-size:1.8rem;margin-bottom:.35rem;">✝</div>'
+    +'<h2 style="color:#fff;font-size:1.25rem;font-weight:900;margin:0 0 .2rem;">'+_jEsc(d.overview.title)+'</h2>'
+    +'<p style="color:rgba(255,255,255,.8);font-size:.8rem;margin:0;">'+_jEsc(d.overview.subtitle)+'</p>'
+    +'</div>'
+    +'<div style="display:flex;gap:.3rem;overflow-x:auto;padding:.6rem .6rem .4rem;-webkit-overflow-scrolling:touch;scrollbar-width:none;background:var(--bg);border-bottom:1px solid rgba(167,139,250,.1);">'
+    +tabBtns
+    +'</div>'
+    +'<div style="padding:.7rem .6rem;">'
+    +'<div id="jtab-life" class="jtab-content" style="display:block;">'+_buildJesusLifeTab(d.life, d.resurrection)+'</div>'
+    +'<div id="jtab-crucifixion" class="jtab-content" style="display:none;">'+_buildJesusCruxTab(d.crucifixion)+'</div>'
+    +'<div id="jtab-teachings" class="jtab-content" style="display:none;">'+_buildJesusTeachingsTab(d.teachings)+'</div>'
+    +'<div id="jtab-words" class="jtab-content" style="display:none;">'+_buildJesusWordsTab(d.redLetterWords)+'</div>'
+    +'<div id="jtab-names" class="jtab-content" style="display:none;">'+_buildJesusNamesTab(d.overview.keyTitles, d.strongsKeyTerms, d.crossReferences)+'</div>'
+    +'</div>'
+    +'</div>';
+
+  el.dataset.rendered = '1';
+}
+
+function switchJesusTab(tabId){
+  var contents = document.querySelectorAll('#card-jesus .jtab-content');
+  for(var i=0;i<contents.length;i++) contents[i].style.display = 'none';
+  var tab = document.getElementById('jtab-'+tabId);
+  if(tab) tab.style.display = 'block';
+  var btns = document.querySelectorAll('#card-jesus .jtab');
+  for(var j=0;j<btns.length;j++){
+    var isActive = btns[j].getAttribute('data-jtab') === tabId;
+    btns[j].style.background = isActive ? 'rgba(167,139,250,.25)' : 'none';
+    if(isActive) btns[j].classList.add('jtab-active'); else btns[j].classList.remove('jtab-active');
+  }
+}
+
+function filterJesusWords(category){
+  var container = document.getElementById('jWordsContainer');
+  if(!container) return;
+  var cards = container.querySelectorAll('.rl-verse');
+  for(var i=0;i<cards.length;i++){
+    cards[i].style.display = (category === 'all' || cards[i].getAttribute('data-cat') === category) ? '' : 'none';
+  }
+}
+
+function jesusVerseCopy(btn){
+  var ref = btn.getAttribute('data-ref') || '';
+  var words = btn.getAttribute('data-words') || '';
+  var text = ref + ' — ' + words;
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){
+      if(typeof showToast === 'function') showToast('Verse copied!');
+    }).catch(function(){ _jesusFallbackCopy(text); });
+  } else {
+    _jesusFallbackCopy(text);
+  }
+}
+
+function _jesusFallbackCopy(text){
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); if(typeof showToast === 'function') showToast('Verse copied!'); } catch(e){}
+  document.body.removeChild(ta);
+}
+
+// Tab content builders ─────────────────────────────────────────
+
+function _buildJesusLifeTab(life, resurrection){
+  if(!life) return '';
+  var acc = function(icon, title, body){
+    return '<details style="margin-bottom:.45rem;">'
+      +'<summary style="cursor:pointer;padding:.55rem .7rem;background:rgba(167,139,250,.07);border-radius:8px;font-size:.83rem;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;"><span>'+icon+' '+_jEsc(title)+'</span><span style="font-size:.7rem;opacity:.5;">▼</span></summary>'
+      +'<div style="padding:.65rem .5rem .3rem;font-size:.81rem;line-height:1.65;color:var(--tx2);">'+body+'</div>'
+      +'</details>';
+  };
+
+  var birthBody = _jEsc(life.birth.details);
+  if(life.birth.propheciesFulfilled && life.birth.propheciesFulfilled.length){
+    birthBody += '<div style="font-size:.77rem;font-weight:700;margin:.6rem 0 .3rem;color:var(--tx);">Prophecies Fulfilled</div>'
+      +'<table style="width:100%;border-collapse:collapse;font-size:.75rem;">'
+      +'<thead><tr><th style="text-align:left;padding:.25rem .4rem;color:var(--tx2);font-weight:600;">Prophecy</th><th style="text-align:left;padding:.25rem .4rem;color:var(--tx2);font-weight:600;">Reference</th></tr></thead>'
+      +'<tbody>'+life.birth.propheciesFulfilled.map(function(p){
+        return '<tr><td style="padding:.3rem .4rem;border-top:1px solid rgba(167,139,250,.08);color:var(--tx);">'+_jEsc(p.prophecy)+'</td><td style="padding:.3rem .4rem;border-top:1px solid rgba(167,139,250,.08);color:var(--tx2);">'+_jEsc(p.reference)+'</td></tr>';
+      }).join('')+'</tbody></table>';
+  }
+
+  var baptismBody = _jEsc(life.baptism.details);
+  if(life.baptism.significance) baptismBody += '<p style="margin:.5rem 0 0;font-style:italic;color:#a78bfa;font-size:.78rem;">'+_jEsc(life.baptism.significance)+'</p>';
+
+  var ministryBody = _jEsc(life.ministry.details);
+  if(life.ministry.miracles && life.ministry.miracles.length){
+    ministryBody += '<div style="font-size:.77rem;font-weight:700;margin:.6rem 0 .3rem;color:var(--tx);">Key Miracles</div>'
+      +'<ul style="margin:0;padding-left:1.1rem;">'+life.ministry.miracles.map(function(m){
+        return '<li style="font-size:.78rem;color:var(--tx2);margin-bottom:.2rem;">'+_jEsc(m)+'</li>';
+      }).join('')+'</ul>';
+  }
+
+  var resBody = '';
+  if(resurrection){
+    resBody = '<p style="margin:0 0 .5rem;">'+_jEsc(resurrection.summary)+'</p>';
+    if(resurrection.appearances && resurrection.appearances.length){
+      resBody += '<div style="font-size:.77rem;font-weight:700;margin-bottom:.3rem;color:var(--tx);">Post-Resurrection Appearances</div>'
+        +'<ul style="margin:0;padding-left:1.1rem;">'+resurrection.appearances.map(function(a){
+          return '<li style="font-size:.78rem;color:var(--tx2);margin-bottom:.2rem;">'+_jEsc(a)+'</li>';
+        }).join('')+'</ul>';
+    }
+  }
+
+  return acc('✨','The Incarnation — God Becomes Flesh', birthBody)
+    + acc('🏠','The Hidden Years', _jEsc(life.earlyLife.details))
+    + acc('💧','Baptism by John', baptismBody)
+    + acc('⚔️','Temptation in the Wilderness', _jEsc(life.temptation.details))
+    + acc('🌟','The Three-Year Ministry', ministryBody)
+    + (resurrection ? acc('🌅', resurrection.title, resBody) : '');
+}
+
+function _buildJesusCruxTab(crux){
+  if(!crux) return '';
+  var html = '<p style="font-size:.81rem;color:var(--tx2);line-height:1.65;margin-bottom:.7rem;">'+_jEsc(crux.overview)+'</p>';
+
+  if(crux.timeline && crux.timeline.length){
+    html += '<div style="font-size:.83rem;font-weight:700;margin-bottom:.5rem;color:var(--tx);">Passion Week Timeline</div>'
+      +'<div style="position:relative;padding-left:1.8rem;margin-bottom:1rem;">';
+    crux.timeline.forEach(function(ev, i){
+      html += '<div style="position:relative;padding-bottom:.75rem;">'
+        +'<div style="position:absolute;left:-1.75rem;top:.18rem;width:.85rem;height:.85rem;background:#7c3aed;border-radius:50%;border:2px solid var(--bg);z-index:1;"></div>'
+        +(i < crux.timeline.length-1 ? '<div style="position:absolute;left:-1.32rem;top:.85rem;width:2px;height:100%;background:rgba(124,58,237,.2);"></div>' : '')
+        +'<div style="font-size:.81rem;font-weight:700;color:var(--tx);">'+_jEsc(ev.event)+'</div>'
+        +'<div style="font-size:.77rem;color:var(--tx2);line-height:1.5;margin:.1rem 0;">'+_jEsc(ev.detail)+'</div>'
+        +'<div style="font-size:.7rem;color:#a78bfa;">'+_jEsc(ev.ref)+'</div>'
+        +'</div>';
+    });
+    html += '</div>';
+  }
+
+  if(crux.sevenLastWords && crux.sevenLastWords.length){
+    html += '<div style="font-size:.83rem;font-weight:700;margin-bottom:.5rem;color:var(--tx);">The Seven Last Words from the Cross</div>';
+    crux.sevenLastWords.forEach(function(w){
+      html += '<div style="background:rgba(180,83,9,.05);border-left:3px solid #b45309;border-radius:0 8px 8px 0;padding:.55rem .75rem;margin-bottom:.45rem;">'
+        +'<div style="font-size:.81rem;color:#c0392b;font-style:italic;font-weight:600;margin-bottom:.2rem;">"'+_jEsc(w.words)+'"</div>'
+        +'<div style="font-size:.7rem;color:#a78bfa;margin-bottom:.2rem;">'+_jEsc(w.ref)+'</div>'
+        +'<div style="font-size:.77rem;color:var(--tx2);">'+_jEsc(w.meaning)+'</div>'
+        +'</div>';
+    });
+  }
+
+  if(crux.significance){
+    html += '<div style="font-size:.83rem;font-weight:700;margin:.8rem 0 .4rem;color:var(--tx);">Why the Cross Matters</div>';
+    var sigLabels = {substitutionary:'Substitution', propitiation:'Propitiation', redemption:'Redemption', reconciliation:'Reconciliation', justification:'Justification'};
+    Object.keys(crux.significance).forEach(function(k){
+      html += '<div style="display:flex;gap:.5rem;align-items:flex-start;margin-bottom:.45rem;">'
+        +'<span style="flex-shrink:0;font-size:.68rem;font-weight:700;color:#7c3aed;padding:.15rem .35rem;background:rgba(124,58,237,.1);border-radius:4px;">'+(sigLabels[k]||k)+'</span>'
+        +'<span style="font-size:.78rem;color:var(--tx2);line-height:1.5;">'+_jEsc(crux.significance[k])+'</span>'
+        +'</div>';
+    });
+  }
+  return html;
+}
+
+function _buildJesusTeachingsTab(teachings){
+  if(!teachings || !teachings.categories) return '';
+  return teachings.categories.map(function(cat){
+    var body = '<p style="margin:0 0 .5rem;font-size:.81rem;line-height:1.65;color:var(--tx2);">'+_jEsc(cat.summary)+'</p>';
+    if(cat.parables && cat.parables.length){
+      body += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:.35rem;margin-top:.4rem;">'
+        +cat.parables.map(function(p){
+          return '<div style="background:rgba(124,58,237,.06);border-radius:6px;padding:.4rem .55rem;">'
+            +'<div style="font-size:.77rem;font-weight:700;color:var(--tx);">'+_jEsc(p.name)+'</div>'
+            +'<div style="font-size:.68rem;color:#a78bfa;margin:.1rem 0;">'+_jEsc(p.ref)+'</div>'
+            +'<div style="font-size:.72rem;color:var(--tx2);font-style:italic;">'+_jEsc(p.theme)+'</div>'
+            +'</div>';
+        }).join('')+'</div>';
+    }
+    if(cat.statements && cat.statements.length){
+      body += '<div style="margin-top:.4rem;">'
+        +cat.statements.map(function(s){
+          return '<div style="border-left:3px solid #7c3aed;padding:.4rem .6rem;margin-bottom:.4rem;">'
+            +'<div style="font-size:.81rem;font-weight:700;color:#7c3aed;">'+_jEsc(s.statement)+'</div>'
+            +'<div style="font-size:.68rem;color:#a78bfa;margin:.15rem 0;">'+_jEsc(s.ref)+'</div>'
+            +'<div style="font-size:.77rem;color:var(--tx);">'+_jEsc(s.meaning)+'</div>'
+            +'</div>';
+        }).join('')+'</div>';
+    }
+    if(cat.keyPassages && cat.keyPassages.length){
+      body += '<div style="margin-top:.4rem;font-size:.72rem;color:var(--tx2);">Key passages: '+_jEsc(cat.keyPassages.join(' · '))+'</div>';
+    }
+    return '<details style="margin-bottom:.45rem;">'
+      +'<summary style="cursor:pointer;padding:.55rem .7rem;background:rgba(124,58,237,.06);border-radius:8px;font-size:.83rem;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;"><span>'+_jEsc(cat.label)+'</span><span style="font-size:.7rem;opacity:.5;">▼</span></summary>'
+      +'<div style="padding:.65rem .5rem .3rem;">'+body+'</div>'
+      +'</details>';
+  }).join('');
+}
+
+function _buildJesusWordsTab(redLetterWords){
+  if(!redLetterWords || !redLetterWords.length) return '';
+  var opts = '<option value="all">All Categories</option>'
+    +redLetterWords.map(function(c){ return '<option value="'+_jEsc(c.category)+'">'+_jEsc(c.category)+'</option>'; }).join('');
+
+  var cards = redLetterWords.map(function(cat){
+    return cat.verses.map(function(v){
+      var strHtml = '';
+      if(v.strongs){
+        Object.keys(v.strongs).forEach(function(term){
+          strHtml += '<span style="display:inline-block;font-size:.67rem;background:rgba(59,130,246,.12);color:#3b82f6;border-radius:3px;padding:.1rem .3rem;margin:.1rem .1rem 0 0;">'+_jEsc(term)+': '+_jEsc(v.strongs[term])+'</span>';
+        });
+      }
+      return '<div class="rl-verse" data-cat="'+_jEsc(cat.category)+'" style="background:rgba(192,57,43,.04);border-left:3px solid #c0392b;border-radius:0 8px 8px 0;padding:.55rem .75rem;margin-bottom:.45rem;">'
+        +'<div style="font-size:.7rem;color:#c0392b;font-weight:700;margin-bottom:.25rem;">'+_jEsc(v.ref)+'</div>'
+        +'<div style="font-size:.83rem;color:#c0392b;line-height:1.6;font-style:italic;margin-bottom:.25rem;">"'+_jEsc(v.words)+'"</div>'
+        +(strHtml ? '<div style="margin-top:.25rem;">'+strHtml+'</div>' : '')
+        +'<button onclick="jesusVerseCopy(this)" data-ref="'+_jEsc(v.ref)+'" data-words="'+_jEsc(v.words)+'" style="margin-top:.35rem;font-size:.68rem;background:none;border:1px solid rgba(192,57,43,.3);border-radius:4px;padding:.1rem .4rem;color:#c0392b;cursor:pointer;">Copy</button>'
+        +'</div>';
+    }).join('');
+  }).join('');
+
+  return '<div style="margin-bottom:.6rem;">'
+    +'<select id="jWordsFilter" onchange="filterJesusWords(this.value)" style="width:100%;font-size:.81rem;padding:.4rem .5rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);">'+opts+'</select>'
+    +'</div>'
+    +'<div id="jWordsContainer">'+cards+'</div>';
+}
+
+function _buildJesusNamesTab(keyTitles, strongsTerms, crossRefs){
+  var html = '';
+  if(keyTitles && keyTitles.length){
+    html += '<div style="font-size:.83rem;font-weight:700;margin-bottom:.5rem;color:var(--tx);">Names &amp; Titles of Jesus</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:.45rem;margin-bottom:1rem;">'
+      +keyTitles.map(function(t){
+        return '<div style="background:rgba(167,139,250,.07);border-radius:8px;padding:.55rem .7rem;">'
+          +'<div style="font-size:.83rem;font-weight:700;color:var(--tx);margin-bottom:.2rem;">'+_jEsc(t.title)+'</div>'
+          +'<div style="font-size:.76rem;color:var(--tx2);margin-bottom:.25rem;">'+_jEsc(t.meaning)+'</div>'
+          +(t.greek ? '<span style="font-size:.66rem;background:rgba(59,130,246,.1);color:#3b82f6;border-radius:3px;padding:.1rem .25rem;margin-right:.2rem;">'+_jEsc(t.greek)+'</span>' : '')
+          +(t.hebrew ? '<span style="font-size:.66rem;background:rgba(16,185,129,.1);color:#059669;border-radius:3px;padding:.1rem .25rem;margin-right:.2rem;">'+_jEsc(t.hebrew)+'</span>' : '')
+          +(t.ref ? '<div style="font-size:.67rem;color:var(--tx2);margin-top:.2rem;">'+_jEsc(t.ref)+'</div>' : '')
+          +'</div>';
+      }).join('')+'</div>';
+  }
+
+  if(strongsTerms && strongsTerms.length){
+    html += '<details style="margin-bottom:.7rem;">'
+      +'<summary style="cursor:pointer;padding:.55rem .7rem;background:rgba(59,130,246,.06);border-radius:8px;font-size:.83rem;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;"><span>Strong\'s Key Terms</span><span style="font-size:.7rem;opacity:.5;">▼</span></summary>'
+      +'<div style="padding:.65rem .5rem .3rem;">'
+      +strongsTerms.map(function(t){
+        return '<div style="display:flex;gap:.5rem;align-items:flex-start;margin-bottom:.45rem;padding-bottom:.45rem;border-bottom:1px solid rgba(167,139,250,.07);">'
+          +'<span style="flex-shrink:0;min-width:3.2rem;font-size:.68rem;font-weight:700;color:#3b82f6;">'+_jEsc(t.strongs)+'</span>'
+          +'<div><div style="font-size:.78rem;font-weight:700;color:var(--tx);">'+_jEsc(t.term)+'</div><div style="font-size:.73rem;color:var(--tx2);">'+_jEsc(t.definition)+'</div></div>'
+          +'</div>';
+      }).join('')
+      +'</div></details>';
+  }
+
+  if(crossRefs && crossRefs.length){
+    html += '<details>'
+      +'<summary style="cursor:pointer;padding:.55rem .7rem;background:rgba(167,139,250,.07);border-radius:8px;font-size:.83rem;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;"><span>Cross References by Topic</span><span style="font-size:.7rem;opacity:.5;">▼</span></summary>'
+      +'<div style="padding:.65rem .5rem .3rem;">'
+      +crossRefs.map(function(r){
+        return '<div style="margin-bottom:.5rem;">'
+          +'<div style="font-size:.78rem;font-weight:700;color:var(--tx);margin-bottom:.2rem;">'+_jEsc(r.topic)+'</div>'
+          +'<div style="display:flex;flex-wrap:wrap;gap:.2rem;">'
+          +r.refs.map(function(ref){ return '<span style="font-size:.71rem;background:rgba(167,139,250,.1);color:#a78bfa;border-radius:4px;padding:.1rem .3rem;">'+_jEsc(ref)+'</span>'; }).join('')
+          +'</div></div>';
+      }).join('')
+      +'</div></details>';
+  }
+  return html;
+}
+
+
+// ── CHRISTIAN TRADITIONS (Denominations) ──────────────────────
+
+function renderDenominationsCard(){
+  var el = document.getElementById('denomCardContainer');
+  if(!el) return;
+  if(el.dataset.rendered) return;
+  var data = (typeof CHRISTIAN_DENOMINATIONS !== 'undefined') ? CHRISTIAN_DENOMINATIONS : null;
+  if(!data){ el.innerHTML = '<p style="color:var(--tx2);font-size:.82rem;">Denominations data not available.</p>'; return; }
+
+  var filterPills = ['All','Mainline','Evangelical','Charismatic','Liturgical','Anabaptist'].map(function(f,i){
+    return '<button class="denom-filter'+(i===0?' denom-filter-active':'')+'" onclick="filterDenomsBy(\''+f+'\',null)" data-filter="'+f+'" style="flex-shrink:0;font-size:.71rem;font-weight:700;padding:.2rem .55rem;border-radius:12px;border:1px solid rgba(167,139,250,.25);background:'+(i===0?'rgba(167,139,250,.2)':'none')+';color:var(--tx);cursor:pointer;white-space:nowrap;">'+f+'</button>';
+  }).join('');
+
+  el.innerHTML = '<div class="faith-card card-denominations" id="card-denominations" style="border-radius:12px;overflow:hidden;border:1px solid rgba(5,150,105,.2);">'
+    +'<div style="background:linear-gradient(135deg,#064e3b,#059669,#10b981);padding:1.1rem 1rem .9rem;text-align:center;">'
+    +'<h2 style="color:#fff;font-size:1.2rem;font-weight:900;margin:0 0 .2rem;">⛪ Christian Traditions</h2>'
+    +'<p style="color:rgba(255,255,255,.85);font-size:.8rem;margin:0;">Explore the rich diversity within Christianity</p>'
+    +'</div>'
+    +'<div style="padding:.7rem .6rem;">'
+    +'<input type="text" id="denomSearch" placeholder="Search denominations..." oninput="filterDenomsBy(null,this.value)" style="width:100%;font-size:.81rem;padding:.42rem .55rem;border-radius:8px;border:1px solid rgba(5,150,105,.2);background:var(--bg);color:var(--tx);margin-bottom:.5rem;box-sizing:border-box;">'
+    +'<div style="display:flex;gap:.3rem;overflow-x:auto;padding:.1rem 0 .5rem;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-bottom:.5rem;">'
+    +filterPills
+    +'</div>'
+    +'<div id="denomGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:.45rem;">'
+    +_renderDenomCards(data)
+    +'</div>'
+    +'</div>'
+    +'</div>'
+    +'<div id="denomModal" style="display:none;position:fixed;inset:0;z-index:9998;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;">'
+    +'<div id="denomModalInner" style="max-width:680px;margin:0 auto;padding:1rem 1rem 3rem;"></div>'
+    +'</div>';
+
+  el.dataset.rendered = '1';
+}
+
+function _renderDenomCards(list){
+  return list.map(function(d){
+    return '<div onclick="openDenomModal(\''+d.id+'\')" style="background:rgba(5,150,105,.05);border:1px solid rgba(5,150,105,.12);border-radius:10px;padding:.75rem .6rem;cursor:pointer;transition:background .15s;">'
+      +'<div style="font-size:1.5rem;margin-bottom:.25rem;">'+_jEsc(d.icon||'✝️')+'</div>'
+      +'<div style="font-size:.83rem;font-weight:700;color:var(--tx);margin-bottom:.15rem;">'+_jEsc(d.name)+'</div>'
+      +'<div style="font-size:.71rem;color:var(--tx2);line-height:1.4;margin-bottom:.3rem;">'+_jEsc(d.tagline||'')+'</div>'
+      +'<div style="font-size:.67rem;color:#059669;">'+_jEsc(d.globalMembers||'')+'</div>'
+      +'</div>';
+  }).join('') || '<p style="grid-column:1/-1;color:var(--tx2);font-size:.81rem;">No denominations found.</p>';
+}
+
+var _denomTypeMap = {
+  baptist:'Evangelical', catholic:'Liturgical', 'eastern-orthodox':'Liturgical',
+  pentecostal:'Charismatic', 'non-denominational':'Evangelical',
+  methodist:'Mainline', lutheran:'Mainline', presbyterian:'Mainline',
+  anglican:'Mainline', 'assemblies-of-god':'Charismatic', 'church-of-christ':'Evangelical',
+  'seventh-day-adventist':'Evangelical', charismatic:'Charismatic',
+  evangelical:'Evangelical', mennonite:'Anabaptist'
+};
+
+function filterDenomsBy(type, query){
+  var data = (typeof CHRISTIAN_DENOMINATIONS !== 'undefined') ? CHRISTIAN_DENOMINATIONS : [];
+  if(type !== null && type !== undefined){
+    var pills = document.querySelectorAll('#denomCardContainer .denom-filter');
+    for(var i=0;i<pills.length;i++){
+      var isActive = pills[i].getAttribute('data-filter') === type;
+      pills[i].classList.toggle('denom-filter-active', isActive);
+      pills[i].style.background = isActive ? 'rgba(167,139,250,.2)' : 'none';
+    }
+  }
+  var activePill = document.querySelector('#denomCardContainer .denom-filter-active');
+  var activeType = activePill ? activePill.getAttribute('data-filter') : 'All';
+  var searchEl = document.getElementById('denomSearch');
+  var q = (query !== null && query !== undefined ? query : (searchEl ? searchEl.value : '')).toLowerCase();
+
+  var filtered = data.filter(function(d){
+    var matchType = activeType === 'All' || (_denomTypeMap[d.id] === activeType);
+    var matchQ = !q || d.name.toLowerCase().indexOf(q) !== -1 || (d.tagline && d.tagline.toLowerCase().indexOf(q) !== -1);
+    return matchType && matchQ;
+  });
+
+  var grid = document.getElementById('denomGrid');
+  if(grid) grid.innerHTML = _renderDenomCards(filtered);
+}
+
+function openDenomModal(denomId){
+  var data = (typeof CHRISTIAN_DENOMINATIONS !== 'undefined') ? CHRISTIAN_DENOMINATIONS : [];
+  var d = null;
+  for(var i=0;i<data.length;i++){ if(data[i].id === denomId){ d = data[i]; break; } }
+  if(!d) return;
+
+  var stats = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;margin-bottom:.8rem;">'
+    +[['Founded',d.founded],['Members',d.globalMembers],['Branches',(d.keyBranches?d.keyBranches.length:'—')]].map(function(s){
+      return '<div style="background:rgba(5,150,105,.06);border-radius:8px;padding:.45rem;text-align:center;">'
+        +'<div style="font-size:.67rem;color:var(--tx2);">'+s[0]+'</div>'
+        +'<div style="font-size:.76rem;font-weight:700;color:var(--tx);">'+_jEsc(String(s[1]||'—'))+'</div>'
+        +'</div>';
+    }).join('')+'</div>';
+
+  var coreBeliefs = d.coreBeliefs && d.coreBeliefs.length ? '<div style="font-size:.83rem;font-weight:700;margin:.8rem 0 .4rem;color:var(--tx);">Core Beliefs</div>'
+    +'<ol style="margin:0;padding-left:1.25rem;">'+d.coreBeliefs.map(function(b){ return '<li style="font-size:.78rem;color:var(--tx2);margin-bottom:.25rem;">'+_jEsc(b)+'</li>'; }).join('')+'</ol>' : '';
+
+  function section(label, text, color){
+    if(!text) return '';
+    return '<div style="background:rgba('+color+',0.06);border-radius:8px;padding:.55rem .75rem;margin-bottom:.45rem;">'
+      +'<div style="font-size:.76rem;font-weight:700;color:rgb('+color+');margin-bottom:.2rem;">'+label+'</div>'
+      +'<div style="font-size:.78rem;color:var(--tx2);line-height:1.5;">'+_jEsc(text)+'</div>'
+      +'</div>';
+  }
+
+  var uniqueFeatures = d.uniqueFeatures && d.uniqueFeatures.length ? '<div style="font-size:.83rem;font-weight:700;margin:.8rem 0 .4rem;color:var(--tx);">Unique Features</div>'
+    +'<ul style="margin:0;padding-left:1.2rem;">'+d.uniqueFeatures.map(function(f){ return '<li style="font-size:.78rem;color:var(--tx2);margin-bottom:.2rem;">'+_jEsc(f)+'</li>'; }).join('')+'</ul>' : '';
+
+  var keyBranches = d.keyBranches && d.keyBranches.length ? '<div style="font-size:.83rem;font-weight:700;margin:.8rem 0 .35rem;color:var(--tx);">Key Branches</div>'
+    +'<div style="display:flex;flex-wrap:wrap;gap:.25rem;">'+d.keyBranches.map(function(b){ return '<span style="font-size:.73rem;background:rgba(5,150,105,.09);color:#059669;border-radius:4px;padding:.12rem .35rem;">'+_jEsc(b)+'</span>'; }).join('')+'</div>' : '';
+
+  var famousLeaders = d.famousLeaders && d.famousLeaders.length ? '<div style="font-size:.83rem;font-weight:700;margin:.8rem 0 .35rem;color:var(--tx);">Notable Figures</div>'
+    +'<div style="display:flex;flex-wrap:wrap;gap:.25rem;">'+d.famousLeaders.map(function(l){ return '<span style="font-size:.73rem;background:rgba(167,139,250,.1);color:#a78bfa;border-radius:4px;padding:.12rem .35rem;">'+_jEsc(l)+'</span>'; }).join('')+'</div>' : '';
+
+  var keyVerses = d.keyVerses && d.keyVerses.length ? '<div style="font-size:.83rem;font-weight:700;margin:.8rem 0 .35rem;color:var(--tx);">Key Verses</div>'
+    +'<div style="display:flex;flex-wrap:wrap;gap:.25rem;">'+d.keyVerses.map(function(v){ return '<span style="font-size:.73rem;background:rgba(192,57,43,.08);color:#c0392b;border-radius:4px;padding:.12rem .35rem;">'+_jEsc(v)+'</span>'; }).join('')+'</div>' : '';
+
+  var mc = d.commonMisconceptions;
+  var misconceptions = mc ? '<details style="margin-top:.8rem;">'
+    +'<summary style="cursor:pointer;padding:.45rem .65rem;background:rgba(239,68,68,.05);border-radius:8px;font-size:.8rem;font-weight:700;list-style:none;">Common Misconceptions</summary>'
+    +'<div style="padding:.5rem .5rem 0;font-size:.77rem;color:var(--tx2);line-height:1.55;">'
+    +(Array.isArray(mc) ? '<ul style="margin:0;padding-left:1.1rem;">'+mc.map(function(m){ return '<li style="margin-bottom:.2rem;">'+_jEsc(m)+'</li>'; }).join('')+'</ul>' : _jEsc(mc))
+    +'</div></details>' : '';
+
+  var inner = document.getElementById('denomModalInner');
+  if(!inner) return;
+  inner.innerHTML = '<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1rem;padding-top:.4rem;">'
+    +'<button onclick="closeDenomModal()" style="background:rgba(5,150,105,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
+    +'<div><span style="font-size:1.4rem;margin-right:.3rem;">'+_jEsc(d.icon||'✝️')+'</span><span style="font-size:1.05rem;font-weight:800;color:var(--tx);">'+_jEsc(d.name)+'</span></div>'
+    +'</div>'
+    +stats
+    +(d.tagline ? '<p style="font-size:.83rem;color:var(--tx2);margin-bottom:.8rem;font-style:italic;">"'+_jEsc(d.tagline)+'"</p>' : '')
+    +coreBeliefs
+    +section('Salvation', d.salvation, '5,150,105')
+    +section('Worship', d.worship, '124,58,237')
+    +section('Sacraments', d.sacraments, '59,130,246')
+    +section('Scripture', d.scripture, '245,158,11')
+    +uniqueFeatures
+    +keyBranches
+    +famousLeaders
+    +keyVerses
+    +misconceptions;
+
+  var modal = document.getElementById('denomModal');
+  if(modal){ modal.style.display = 'block'; modal.scrollTop = 0; }
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDenomModal(){
+  var modal = document.getElementById('denomModal');
+  if(modal) modal.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// WORKER 2 — Faith Journey Complete Overhaul
+// Sections: Faith Profile · Milestones · Donation Tracker · Spiritual Disciplines
+// Storage: localStorage (_ylccUserKey) primary · Supabase async backup
+// ═══════════════════════════════════════════════════════════════
+
+// ── localStorage helpers ───────────────────────────────────────
+
+function _fjKey(name){
+  return (typeof _ylccUserKey === 'function') ? _ylccUserKey('ylcc_fj_' + name) : ('ylcc_fj_' + name + '_local');
+}
+
+function _fjGetProfile(){
+  try { var raw = localStorage.getItem(_fjKey('profile')); return raw ? JSON.parse(raw) : {}; } catch(e){ return {}; }
+}
+
+function _fjSaveProfileLocal(profile){
+  try { localStorage.setItem(_fjKey('profile'), JSON.stringify(profile)); } catch(e){}
+}
+
+function _fjGetMilestones(){
+  try { var raw = localStorage.getItem(_fjKey('milestones')); return raw ? JSON.parse(raw) : []; } catch(e){ return []; }
+}
+
+function _fjSaveMilestonesLocal(list){
+  try { localStorage.setItem(_fjKey('milestones'), JSON.stringify(list)); } catch(e){}
+}
+
+function _fjGetDonations(){
+  try { var raw = localStorage.getItem(_fjKey('donations')); return raw ? JSON.parse(raw) : []; } catch(e){ return []; }
+}
+
+function _fjSaveDonationsLocal(list){
+  try { localStorage.setItem(_fjKey('donations'), JSON.stringify(list)); } catch(e){}
+}
+
+// ── Supabase async loaders (fire-and-forget) ───────────────────
+
+function _fjCloudLoadProfile(){
+  if(typeof _supaUser === 'undefined' || !_supaUser) return;
+  var supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+  if(!supa) return;
+  supa.from('faith_profile').select('*').eq('user_id', _supaUser.id).single().then(function(res){
+    if(res.error || !res.data) return;
+    var d = res.data;
+    var profile = {
+      church_name: d.church_name || '', pastor_name: d.pastor_name || '',
+      denomination: d.denomination || '', saved_date: d.saved_date || '',
+      saved_description: d.saved_description || '', baptism_date: d.baptism_date || '',
+      baptism_description: d.baptism_description || '',
+      spiritual_gifts: d.spiritual_gifts || [],
+      accountability_partner: d.accountability_partner || '',
+      small_group: d.small_group || ''
+    };
+    _fjSaveProfileLocal(profile);
+    renderFJProfile();
+  });
+}
+
+function _fjCloudLoadEntries(type, onDone){
+  if(typeof _supaUser === 'undefined' || !_supaUser) return;
+  var supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+  if(!supa) return;
+  supa.from('faith_journey_entries').select('*')
+    .eq('user_id', _supaUser.id).eq('entry_type', type)
+    .order('date', {ascending: false})
+    .then(function(res){
+      if(res.error || !res.data) return;
+      if(typeof onDone === 'function') onDone(res.data);
+    });
+}
+
+function _fjCloudSaveProfile(profile){
+  if(typeof _supaUser === 'undefined' || !_supaUser) return;
+  var supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+  if(!supa) return;
+  var row = Object.assign({user_id: _supaUser.id, updated_at: new Date().toISOString()}, profile);
+  supa.from('faith_profile').upsert(row).then(function(res){
+    if(res.error) console.warn('[fj-profile] upsert error:', res.error.message);
+  });
+}
+
+function _fjCloudSaveEntry(entry){
+  if(typeof _supaUser === 'undefined' || !_supaUser) return;
+  var supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+  if(!supa) return;
+  var row = Object.assign({user_id: _supaUser.id}, entry);
+  delete row._local; // strip internal flag
+  supa.from('faith_journey_entries').upsert(row).then(function(res){
+    if(res.error) console.warn('[fj-entry] upsert error:', res.error.message);
+  });
+}
+
+function _fjCloudDeleteEntry(id){
+  if(typeof _supaUser === 'undefined' || !_supaUser) return;
+  var supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+  if(!supa) return;
+  supa.from('faith_journey_entries').delete().eq('id', id).eq('user_id', _supaUser.id).then(function(){});
+}
+
+
+// ── Section 1: Faith Profile ───────────────────────────────────
+
+var _FJ_SPIRITUAL_GIFTS = [
+  'Teaching','Prophecy','Leadership','Evangelism','Mercy','Giving',
+  'Administration','Faith','Healing','Tongues','Interpretation',
+  'Discernment','Hospitality','Helps','Wisdom','Knowledge'
+];
+
+var _FJ_DENOMINATIONS = (typeof CHRISTIAN_DENOMINATIONS !== 'undefined')
+  ? CHRISTIAN_DENOMINATIONS.map(function(d){ return d.name; })
+  : ['Baptist','Catholic','Eastern Orthodox','Lutheran','Methodist','Presbyterian',
+     'Pentecostal','Anglican','Non-Denominational','Assemblies of God','Evangelical','Other'];
+
+function renderFJProfile(){
+  var el = document.getElementById('fjProfileContainer');
+  if(!el) return;
+  var p = _fjGetProfile();
+  var hasData = p.church_name || p.denomination || p.saved_date;
+
+  el.innerHTML = '<div style="background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.15);border-radius:12px;padding:.85rem 1rem;margin-bottom:1rem;">'
+    +'<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem;">'
+    +'<span style="font-size:1.1rem;">✝</span>'
+    +'<span style="font-size:.88rem;font-weight:800;color:var(--tx);">My Faith Profile</span>'
+    +'<button onclick="openFaithProfileModal()" style="margin-left:auto;font-size:.72rem;font-weight:700;padding:.25rem .65rem;border-radius:99px;border:1px solid rgba(167,139,250,.35);background:rgba(167,139,250,.1);color:var(--accent,#a78bfa);cursor:pointer;">'+(hasData?'Edit':'Set Up')+'</button>'
+    +'</div>'
+    + (hasData
+      ? '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.35rem;">'
+        + (p.church_name ? _fjProfileRow('⛪','Church', p.church_name) : '')
+        + (p.pastor_name ? _fjProfileRow('👤','Pastor', p.pastor_name) : '')
+        + (p.denomination ? _fjProfileRow('📖','Tradition', p.denomination) : '')
+        + (p.saved_date ? _fjProfileRow('🌟','Saved', p.saved_date) : '')
+        + (p.small_group ? _fjProfileRow('👥','Small Group', p.small_group) : '')
+        + (p.accountability_partner ? _fjProfileRow('🤝','Partner', p.accountability_partner) : '')
+        + '</div>'
+        + (p.spiritual_gifts && p.spiritual_gifts.length
+          ? '<div style="margin-top:.5rem;display:flex;flex-wrap:wrap;gap:.25rem;">'
+            + p.spiritual_gifts.map(function(g){ return '<span style="font-size:.7rem;background:rgba(167,139,250,.15);color:#a78bfa;border-radius:4px;padding:.1rem .35rem;">'+_jEsc(g)+'</span>'; }).join('')
+            +'</div>' : '')
+      : '<div style="font-size:.8rem;color:var(--tx2);">Add your church, denomination, and faith story.</div>')
+    +'</div>';
+
+  // Fire-and-forget cloud refresh on first open
+  if(!el.dataset.cloudLoaded){ el.dataset.cloudLoaded = '1'; _fjCloudLoadProfile(); }
+}
+
+function _fjProfileRow(icon, label, value){
+  return '<div style="background:rgba(255,255,255,.03);border-radius:8px;padding:.35rem .5rem;">'
+    +'<div style="font-size:.66rem;color:var(--tx2);">'+icon+' '+label+'</div>'
+    +'<div style="font-size:.77rem;font-weight:700;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+_jEsc(value)+'</div>'
+    +'</div>';
+}
+
+function openFaithProfileModal(){
+  var existing = document.getElementById('fjProfileModal');
+  if(existing) existing.remove();
+
+  var p = _fjGetProfile();
+  var denomOpts = _FJ_DENOMINATIONS.map(function(d){
+    return '<option value="'+_jEsc(d)+'"'+(p.denomination===d?' selected':'')+'>'+_jEsc(d)+'</option>';
+  }).join('');
+
+  var giftChips = _FJ_SPIRITUAL_GIFTS.map(function(g){
+    var sel = p.spiritual_gifts && p.spiritual_gifts.indexOf(g) !== -1;
+    return '<button type="button" class="fj-gift-chip'+(sel?' fj-gift-sel':'')+'" onclick="_fjToggleGift(this,\''+_jEsc(g)+'\')" style="font-size:.72rem;padding:.2rem .55rem;border-radius:12px;border:1px solid rgba(167,139,250,.3);background:'+(sel?'rgba(167,139,250,.25)':'none')+';color:var(--tx);cursor:pointer;transition:background .12s;">'+_jEsc(g)+'</button>';
+  }).join('');
+
+  var modal = document.createElement('div');
+  modal.id = 'fjProfileModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9500;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;';
+  modal.innerHTML = '<div style="max-width:640px;margin:0 auto;padding:1rem 1rem 3rem;">'
+    +'<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.2rem;padding-top:.4rem;">'
+    +'<button onclick="closeFaithProfileModal()" style="background:rgba(167,139,250,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
+    +'<span style="font-size:1rem;font-weight:800;color:var(--tx);">My Faith Profile</span>'
+    +'</div>'
+
+    +'<div style="margin-bottom:.65rem;"><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Church Name</label>'
+    +'<input id="fjpChurch" type="text" value="'+_jEsc(p.church_name||'')+'" placeholder="e.g. Celebration Church" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+
+    +'<div style="margin-bottom:.65rem;"><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Pastor / Lead Pastor</label>'
+    +'<input id="fjpPastor" type="text" value="'+_jEsc(p.pastor_name||'')+'" placeholder="e.g. Pastor Tim" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+
+    +'<div style="margin-bottom:.65rem;"><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Denomination / Tradition</label>'
+    +'<select id="fjpDenom" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;">'
+    +'<option value="">Select...</option>'+denomOpts+'</select></div>'
+
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.65rem;">'
+    +'<div><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Date Saved / Born Again</label>'
+    +'<input id="fjpSavedDate" type="date" value="'+_jEsc(p.saved_date||'')+'" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+    +'<div><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Date Baptized</label>'
+    +'<input id="fjpBaptismDate" type="date" value="'+_jEsc(p.baptism_date||'')+'" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+    +'</div>'
+
+    +'<div style="margin-bottom:.65rem;"><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">My Salvation Story (optional)</label>'
+    +'<textarea id="fjpSavedDesc" rows="3" placeholder="How did you come to faith in Jesus?" style="width:100%;font-size:.82rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;resize:vertical;">'+_jEsc(p.saved_description||'')+'</textarea></div>'
+
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.65rem;">'
+    +'<div><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Small Group</label>'
+    +'<input id="fjpSmallGroup" type="text" value="'+_jEsc(p.small_group||'')+'" placeholder="Group name / night" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+    +'<div><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Accountability Partner</label>'
+    +'<input id="fjpPartner" type="text" value="'+_jEsc(p.accountability_partner||'')+'" placeholder="Name" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+    +'</div>'
+
+    +'<div style="margin-bottom:1rem;"><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.4rem;">Spiritual Gifts</label>'
+    +'<div style="display:flex;flex-wrap:wrap;gap:.3rem;" id="fjpGiftsRow">'+giftChips+'</div></div>'
+
+    +'<button onclick="saveFaithProfile()" style="width:100%;background:linear-gradient(135deg,#6d28d9,#7c3aed);color:#fff;border:none;border-radius:10px;padding:.65rem;font-size:.88rem;font-weight:800;cursor:pointer;">Save Profile</button>'
+    +'</div>';
+
+  document.body.appendChild(modal);
+  document.body.style.overflow = 'hidden';
+}
+
+function _fjToggleGift(btn, gift){
+  var sel = btn.classList.toggle('fj-gift-sel');
+  btn.style.background = sel ? 'rgba(167,139,250,.25)' : 'none';
+}
+
+function saveFaithProfile(){
+  var gifts = [];
+  var chips = document.querySelectorAll('#fjpGiftsRow .fj-gift-sel');
+  for(var i=0;i<chips.length;i++) gifts.push(chips[i].textContent.trim());
+
+  var profile = {
+    church_name:            (document.getElementById('fjpChurch')||{}).value||'',
+    pastor_name:            (document.getElementById('fjpPastor')||{}).value||'',
+    denomination:           (document.getElementById('fjpDenom')||{}).value||'',
+    saved_date:             (document.getElementById('fjpSavedDate')||{}).value||'',
+    saved_description:      (document.getElementById('fjpSavedDesc')||{}).value||'',
+    baptism_date:           (document.getElementById('fjpBaptismDate')||{}).value||'',
+    accountability_partner: (document.getElementById('fjpPartner')||{}).value||'',
+    small_group:            (document.getElementById('fjpSmallGroup')||{}).value||'',
+    spiritual_gifts:        gifts
+  };
+
+  _fjSaveProfileLocal(profile);
+  _fjCloudSaveProfile(profile);
+  closeFaithProfileModal();
+  renderFJProfile();
+  if(typeof showToast === 'function') showToast('Faith profile saved!');
+}
+
+function closeFaithProfileModal(){
+  var modal = document.getElementById('fjProfileModal');
+  if(modal) modal.remove();
+  document.body.style.overflow = '';
+}
+
+
+// ── Section 2: Spiritual Milestones Timeline ───────────────────
+
+var FJ_MILESTONE_TYPES = [
+  {id:'saved',         icon:'🌟', label:'Saved / Born Again'},
+  {id:'baptized-water',icon:'💧', label:'Water Baptism'},
+  {id:'baptized-spirit',icon:'🔥',label:'Holy Spirit Baptism'},
+  {id:'communion',     icon:'🍷', label:'First Communion / Eucharist'},
+  {id:'catechism',     icon:'📖', label:'Completed Catechism'},
+  {id:'confirmation',  icon:'✋', label:'Confirmation'},
+  {id:'retreat',       icon:'⛺', label:'Faith Retreat'},
+  {id:'mission',       icon:'✈️', label:'Mission Trip'},
+  {id:'volunteer',     icon:'🤝', label:'Volunteer / Service'},
+  {id:'small-group',   icon:'👥', label:'Joined Small Group'},
+  {id:'recovery',      icon:'💪', label:'Addiction Recovery'},
+  {id:'healing',       icon:'🙌', label:'Healing / Miracle'},
+  {id:'leadership',    icon:'👑', label:'Ministry Leadership'},
+  {id:'prayer-fast',   icon:'🤲', label:'Fasting / Prayer'},
+  {id:'scripture',     icon:'📜', label:'Scripture Memorized'},
+  {id:'evangelism',    icon:'📣', label:'Led Someone to Christ'},
+  {id:'worship',       icon:'🎵', label:'Worship Team / Choir'},
+  {id:'custom',        icon:'✨', label:'Custom Milestone'}
+];
+
+function renderFJMilestones(){
+  var el = document.getElementById('fjMilestonesContainer');
+  if(!el) return;
+  var milestones = _fjGetMilestones().slice().sort(function(a,b){ return (b.date||'') > (a.date||'') ? 1 : -1; });
+
+  var timelineHtml = milestones.length ? milestones.map(function(m,i){
+    var typeInfo = FJ_MILESTONE_TYPES.find(function(t){ return t.id === m.milestone_type; }) || {icon:'✨'};
+    return '<div style="position:relative;padding-left:2rem;padding-bottom:.8rem;">'
+      +'<div style="position:absolute;left:.1rem;top:.2rem;font-size:1rem;z-index:1;">'+typeInfo.icon+'</div>'
+      +(i < milestones.length-1 ? '<div style="position:absolute;left:.55rem;top:1.4rem;width:2px;height:calc(100% - .4rem);background:rgba(167,139,250,.2);"></div>' : '')
+      +'<div style="background:rgba(255,255,255,.03);border:1px solid rgba(167,139,250,.12);border-radius:10px;padding:.55rem .75rem;cursor:pointer;" onclick="_fjMilestoneDetail(\''+_jEsc(m.id)+'\')">'
+      +'<div style="display:flex;align-items:baseline;gap:.5rem;">'
+      +'<span style="font-size:.83rem;font-weight:700;color:var(--tx);">'+_jEsc(m.title)+'</span>'
+      +'<span style="font-size:.7rem;color:var(--tx2);margin-left:auto;white-space:nowrap;">'+_jEsc(m.date||'')+'</span>'
+      +'</div>'
+      +(m.church_name ? '<div style="font-size:.72rem;color:var(--tx2);margin-top:.15rem;">'+_jEsc(m.church_name)+'</div>' : '')
+      +(m.description ? '<div style="font-size:.75rem;color:var(--tx2);margin-top:.2rem;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">'+_jEsc(m.description)+'</div>' : '')
+      +'</div></div>';
+  }).join('') : '<div style="font-size:.8rem;color:var(--tx2);text-align:center;padding:.8rem 0;">No milestones yet — record your first faith moment!</div>';
+
+  el.innerHTML = '<div style="margin-bottom:1rem;">'
+    +'<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem;">'
+    +'<span style="font-size:.88rem;font-weight:800;color:var(--tx);">Spiritual Milestones</span>'
+    +'<button onclick="openMilestoneModal(null)" style="margin-left:auto;font-size:.72rem;font-weight:700;padding:.25rem .65rem;border-radius:99px;border:none;background:linear-gradient(135deg,#6d28d9,#7c3aed);color:#fff;cursor:pointer;">+ Add</button>'
+    +'</div>'
+    +'<div>'+timelineHtml+'</div>'
+    +'</div>';
+
+  // Async cloud refresh once per session
+  if(!el.dataset.cloudLoaded){
+    el.dataset.cloudLoaded = '1';
+    _fjCloudLoadEntries('milestone', function(rows){
+      var mapped = rows.map(function(r){
+        return {id:r.id, milestone_type:r.milestone_type||'custom', title:r.title,
+          date:r.date, description:r.description||'', church_name:r.church_name||'',
+          pastor_name:r.pastor_name||'', metadata:r.metadata||{}};
+      });
+      _fjSaveMilestonesLocal(mapped);
+      renderFJMilestones();
+    });
+  }
+}
+
+function openMilestoneModal(editId){
+  var existing = document.getElementById('fjMilestoneModal');
+  if(existing) existing.remove();
+
+  var editing = null;
+  if(editId){
+    var all = _fjGetMilestones();
+    editing = all.find(function(m){ return m.id === editId; });
+  }
+  var e = editing || {};
+  var p = _fjGetProfile();
+
+  var typeOpts = FJ_MILESTONE_TYPES.map(function(t){
+    return '<option value="'+t.id+'"'+(e.milestone_type===t.id?' selected':'')+'>'+t.icon+' '+t.label+'</option>';
+  }).join('');
+
+  var modal = document.createElement('div');
+  modal.id = 'fjMilestoneModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9500;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;';
+  modal.innerHTML = '<div style="max-width:640px;margin:0 auto;padding:1rem 1rem 3rem;">'
+    +'<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.2rem;padding-top:.4rem;">'
+    +'<button onclick="closeMilestoneModal()" style="background:rgba(167,139,250,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
+    +'<span style="font-size:1rem;font-weight:800;color:var(--tx);">'+(editId?'Edit':'Add')+'Milestone</span>'
+    +(editId ? '<button onclick="deleteMilestone(\''+_jEsc(editId)+'\')" style="margin-left:auto;background:rgba(239,68,68,.1);border:none;border-radius:8px;padding:.3rem .6rem;cursor:pointer;color:#ef4444;font-size:.75rem;">Delete</button>' : '')
+    +'</div>'
+    +'<input id="fjmEditId" type="hidden" value="'+_jEsc(editId||'')+'">'
+
+    +'<div style="margin-bottom:.6rem;"><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Milestone Type</label>'
+    +'<select id="fjmType" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;">'+typeOpts+'</select></div>'
+
+    +'<div style="margin-bottom:.6rem;"><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Title <span style="color:#ef4444;">*</span></label>'
+    +'<input id="fjmTitle" type="text" value="'+_jEsc(e.title||'')+'" placeholder="e.g. Water Baptism at Celebration Church" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+
+    +'<div style="margin-bottom:.6rem;"><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Date <span style="color:#ef4444;">*</span></label>'
+    +'<input id="fjmDate" type="date" value="'+_jEsc(e.date||new Date().toISOString().slice(0,10))+'" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+
+    +'<div style="margin-bottom:.6rem;"><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Tell the Story</label>'
+    +'<textarea id="fjmDesc" rows="4" placeholder="What happened? How did you feel? What did God do?" style="width:100%;font-size:.82rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;resize:vertical;">'+_jEsc(e.description||'')+'</textarea></div>'
+
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.6rem;">'
+    +'<div><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Church</label>'
+    +'<input id="fjmChurch" type="text" value="'+_jEsc(e.church_name||p.church_name||'')+'" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+    +'<div><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Pastor / Leader</label>'
+    +'<input id="fjmPastor" type="text" value="'+_jEsc(e.pastor_name||p.pastor_name||'')+'" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+    +'</div>'
+
+    +'<div style="margin-bottom:1rem;"><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Who Was There (Witnesses)</label>'
+    +'<input id="fjmWitnesses" type="text" value="'+_jEsc((e.metadata&&e.metadata.witnesses)||'')+'" placeholder="e.g. Mom, Dad, Youth Group" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+
+    +'<button onclick="saveMilestone()" style="width:100%;background:linear-gradient(135deg,#6d28d9,#7c3aed);color:#fff;border:none;border-radius:10px;padding:.65rem;font-size:.88rem;font-weight:800;cursor:pointer;">Save Milestone</button>'
+    +'</div>';
+
+  document.body.appendChild(modal);
+  document.body.style.overflow = 'hidden';
+}
+
+function saveMilestone(){
+  var title = (document.getElementById('fjmTitle')||{}).value||'';
+  var date = (document.getElementById('fjmDate')||{}).value||'';
+  if(!title.trim()){ if(typeof showToast==='function') showToast('Title is required'); return; }
+  if(!date){ if(typeof showToast==='function') showToast('Date is required'); return; }
+
+  var editId = (document.getElementById('fjmEditId')||{}).value||'';
+  var id = editId || ('m_'+Date.now());
+  var entry = {
+    id: id,
+    entry_type: 'milestone',
+    milestone_type: (document.getElementById('fjmType')||{}).value||'custom',
+    title: title.trim(),
+    date: date,
+    description: (document.getElementById('fjmDesc')||{}).value||'',
+    church_name: (document.getElementById('fjmChurch')||{}).value||'',
+    pastor_name: (document.getElementById('fjmPastor')||{}).value||'',
+    metadata: { witnesses: (document.getElementById('fjmWitnesses')||{}).value||'' }
+  };
+
+  var milestones = _fjGetMilestones().filter(function(m){ return m.id !== id; });
+  milestones.push(entry);
+  _fjSaveMilestonesLocal(milestones);
+  _fjCloudSaveEntry(entry);
+
+  closeMilestoneModal();
+  renderFJMilestones();
+  if(typeof showToast==='function') showToast('Milestone saved!');
+}
+
+function closeMilestoneModal(){
+  var modal = document.getElementById('fjMilestoneModal');
+  if(modal) modal.remove();
+  var detail = document.getElementById('fjMilestoneDetail');
+  if(detail) detail.remove();
+  document.body.style.overflow = '';
+}
+
+function deleteMilestone(id){
+  if(!confirm('Delete this milestone?')) return;
+  var milestones = _fjGetMilestones().filter(function(m){ return m.id !== id; });
+  _fjSaveMilestonesLocal(milestones);
+  _fjCloudDeleteEntry(id);
+  closeMilestoneModal();
+  renderFJMilestones();
+  if(typeof showToast==='function') showToast('Milestone deleted');
+}
+
+function _fjMilestoneDetail(id){
+  var m = _fjGetMilestones().find(function(x){ return x.id === id; });
+  if(!m) return;
+  var typeInfo = FJ_MILESTONE_TYPES.find(function(t){ return t.id === m.milestone_type; }) || {icon:'✨', label:'Milestone'};
+
+  var existing = document.getElementById('fjMilestoneDetail');
+  if(existing) existing.remove();
+
+  var modal = document.createElement('div');
+  modal.id = 'fjMilestoneDetail';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9500;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;';
+  modal.innerHTML = '<div style="max-width:640px;margin:0 auto;padding:1rem 1rem 3rem;">'
+    +'<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.2rem;padding-top:.4rem;">'
+    +'<button onclick="document.getElementById(\'fjMilestoneDetail\').remove();document.body.style.overflow=\'\';" style="background:rgba(167,139,250,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
+    +'<button onclick="document.getElementById(\'fjMilestoneDetail\').remove();document.body.style.overflow=\'\';openMilestoneModal(\''+_jEsc(id)+'\')" style="margin-left:auto;background:rgba(167,139,250,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--accent,#a78bfa);font-size:.75rem;">Edit</button>'
+    +'</div>'
+    +'<div style="text-align:center;margin-bottom:1.2rem;">'
+    +'<div style="font-size:3rem;margin-bottom:.4rem;">'+typeInfo.icon+'</div>'
+    +'<div style="font-size:1.1rem;font-weight:900;color:var(--tx);margin-bottom:.2rem;">'+_jEsc(m.title)+'</div>'
+    +'<div style="font-size:.8rem;color:#a78bfa;">'+_jEsc(m.date||'')+'</div>'
+    +'</div>'
+    +(m.description ? '<p style="font-size:.85rem;line-height:1.7;color:var(--tx2);margin-bottom:.8rem;white-space:pre-wrap;">'+_jEsc(m.description)+'</p>' : '')
+    +(m.church_name ? '<div style="font-size:.78rem;color:var(--tx2);margin-bottom:.3rem;">⛪ '+_jEsc(m.church_name)+'</div>' : '')
+    +(m.pastor_name ? '<div style="font-size:.78rem;color:var(--tx2);margin-bottom:.3rem;">👤 '+_jEsc(m.pastor_name)+'</div>' : '')
+    +((m.metadata&&m.metadata.witnesses) ? '<div style="font-size:.78rem;color:var(--tx2);">👥 '+_jEsc(m.metadata.witnesses)+'</div>' : '')
+    +'</div>';
+
+  document.body.appendChild(modal);
+  document.body.style.overflow = 'hidden';
+}
+
+
+// ── Section 3: Donation Tracker ────────────────────────────────
+
+var _FJ_DON_CATS = ['Tithe','Offering','Missions','Building Fund','Benevolence','Other'];
+
+function renderFJDonations(){
+  var el = document.getElementById('fjDonationsContainer');
+  if(!el) return;
+  var donations = _fjGetDonations();
+  var now = new Date();
+  var thisYear = now.getFullYear();
+
+  // Annual total
+  var annualTotal = donations.filter(function(d){ return d.date && d.date.startsWith(String(thisYear)); })
+    .reduce(function(sum,d){ return sum + (parseFloat(d.amount)||0); }, 0);
+
+  // Monthly totals for the bar chart (current year)
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var monthTotals = months.map(function(_,i){
+    var prefix = thisYear+'-'+(i<9?'0':'')+(i+1);
+    return donations.filter(function(d){ return d.date && d.date.startsWith(prefix); })
+      .reduce(function(sum,d){ return sum + (parseFloat(d.amount)||0); }, 0);
+  });
+  var maxMonth = Math.max.apply(null, monthTotals.concat([1]));
+
+  var barsHtml = months.map(function(m,i){
+    var pct = Math.round((monthTotals[i]/maxMonth)*100);
+    var amt = monthTotals[i];
+    return '<div style="display:flex;flex-direction:column;align-items:center;gap:.2rem;min-width:0;">'
+      +'<div style="font-size:.65rem;color:#22c55e;font-weight:700;">'+(amt>0?'$'+Math.round(amt):'')+'</div>'
+      +'<div style="width:100%;height:60px;background:rgba(255,255,255,.04);border-radius:4px;display:flex;align-items:flex-end;overflow:hidden;">'
+      +'<div style="width:100%;height:'+pct+'%;background:linear-gradient(180deg,#16a34a,#22c55e);border-radius:4px 4px 0 0;"></div>'
+      +'</div>'
+      +'<div style="font-size:.62rem;color:var(--tx2);">'+m+'</div>'
+      +'</div>';
+  }).join('');
+
+  // Recent donations list
+  var recentHtml = donations.length
+    ? donations.slice().sort(function(a,b){ return (b.date||'')>(a.date||'')?1:-1; }).slice(0,5).map(function(d){
+        return '<div style="display:flex;align-items:center;gap:.5rem;padding:.35rem 0;border-bottom:1px solid rgba(255,255,255,.04);">'
+          +'<span style="font-size:.77rem;color:var(--tx2);">'+_jEsc(d.date||'')+'</span>'
+          +'<span style="font-size:.8rem;color:var(--tx);flex:1;">'+_jEsc(d.church_name||'—')+'</span>'
+          +'<span style="font-size:.78rem;color:#22c55e;font-weight:700;">$'+parseFloat(d.amount||0).toFixed(2)+'</span>'
+          +'<button onclick="deleteDonation(\''+_jEsc(d.id)+'\')" style="font-size:.6rem;color:var(--tx2);background:none;border:none;cursor:pointer;padding:.1rem .2rem;">✕</button>'
+          +'</div>';
+      }).join('')
+    : '<div style="font-size:.8rem;color:var(--tx2);">No giving recorded yet.</div>';
+
+  el.innerHTML = '<div style="background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.15);border-radius:12px;padding:.85rem 1rem;margin-bottom:1rem;">'
+    +'<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem;">'
+    +'<span style="font-size:.88rem;font-weight:800;color:var(--tx);">Giving Tracker</span>'
+    +'<span style="font-size:.72rem;color:var(--tx2);">'+thisYear+' Total: <strong style="color:#22c55e;">$'+annualTotal.toFixed(2)+'</strong></span>'
+    +'<button onclick="openDonationModal()" style="margin-left:auto;font-size:.72rem;font-weight:700;padding:.25rem .65rem;border-radius:99px;border:none;background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;cursor:pointer;">+ Add Gift</button>'
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(12,1fr);gap:.15rem;margin-bottom:.8rem;">'+barsHtml+'</div>'
+    +recentHtml
+    +(donations.length ? '<div style="margin-top:.5rem;text-align:right;"><button onclick="exportDonationsCSV()" style="font-size:.7rem;color:var(--tx2);background:none;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:.2rem .5rem;cursor:pointer;">Export CSV</button></div>' : '')
+    +'</div>';
+
+  if(!el.dataset.cloudLoaded){
+    el.dataset.cloudLoaded = '1';
+    _fjCloudLoadEntries('donation', function(rows){
+      var mapped = rows.map(function(r){
+        return {id:r.id, amount:r.amount, date:r.date, church_name:r.church_name||'',
+          metadata:r.metadata||{}};
+      });
+      _fjSaveDonationsLocal(mapped);
+      renderFJDonations();
+    });
+  }
+}
+
+function openDonationModal(){
+  var existing = document.getElementById('fjDonationModal');
+  if(existing) existing.remove();
+  var p = _fjGetProfile();
+  var catOpts = _FJ_DON_CATS.map(function(c){ return '<option value="'+c+'">'+c+'</option>'; }).join('');
+
+  var modal = document.createElement('div');
+  modal.id = 'fjDonationModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9500;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;';
+  modal.innerHTML = '<div style="max-width:560px;margin:0 auto;padding:1rem 1rem 3rem;">'
+    +'<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.2rem;padding-top:.4rem;">'
+    +'<button onclick="closeDonationModal()" style="background:rgba(34,197,94,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
+    +'<span style="font-size:1rem;font-weight:800;color:var(--tx);">Record a Gift</span>'
+    +'</div>'
+
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.6rem;">'
+    +'<div><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Date <span style="color:#ef4444;">*</span></label>'
+    +'<input id="fjdDate" type="date" value="'+new Date().toISOString().slice(0,10)+'" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(34,197,94,.25);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+    +'<div><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Amount ($) <span style="color:#ef4444;">*</span></label>'
+    +'<input id="fjdAmount" type="number" min="0" step="0.01" placeholder="0.00" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(34,197,94,.25);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+    +'</div>'
+
+    +'<div style="margin-bottom:.6rem;"><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Church / Organization</label>'
+    +'<input id="fjdChurch" type="text" value="'+_jEsc(p.church_name||'')+'" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(34,197,94,.25);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+
+    +'<div style="margin-bottom:.6rem;"><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Category</label>'
+    +'<select id="fjdCat" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(34,197,94,.25);background:var(--bg);color:var(--tx);box-sizing:border-box;">'+catOpts+'</select></div>'
+
+    +'<div style="margin-bottom:.6rem;"><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Notes</label>'
+    +'<textarea id="fjdNotes" rows="2" placeholder="Optional notes..." style="width:100%;font-size:.82rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(34,197,94,.25);background:var(--bg);color:var(--tx);box-sizing:border-box;resize:vertical;"></textarea></div>'
+
+    +'<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;">'
+    +'<input id="fjdTax" type="checkbox" checked style="width:1rem;height:1rem;cursor:pointer;">'
+    +'<label for="fjdTax" style="font-size:.8rem;color:var(--tx2);cursor:pointer;">Tax-deductible</label>'
+    +'</div>'
+
+    +'<button onclick="saveDonation()" style="width:100%;background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;border:none;border-radius:10px;padding:.65rem;font-size:.88rem;font-weight:800;cursor:pointer;">Save Gift</button>'
+    +'</div>';
+
+  document.body.appendChild(modal);
+  document.body.style.overflow = 'hidden';
+}
+
+function saveDonation(){
+  var date = (document.getElementById('fjdDate')||{}).value||'';
+  var amount = parseFloat((document.getElementById('fjdAmount')||{}).value)||0;
+  if(!date){ if(typeof showToast==='function') showToast('Date is required'); return; }
+  if(!amount){ if(typeof showToast==='function') showToast('Amount is required'); return; }
+
+  var id = 'd_' + Date.now();
+  var entry = {
+    id: id,
+    entry_type: 'donation',
+    title: 'Gift — ' + ((document.getElementById('fjdCat')||{}).value||'Giving'),
+    date: date,
+    amount: amount,
+    church_name: (document.getElementById('fjdChurch')||{}).value||'',
+    metadata: {
+      category: (document.getElementById('fjdCat')||{}).value||'',
+      notes: (document.getElementById('fjdNotes')||{}).value||'',
+      taxDeductible: (document.getElementById('fjdTax')||{}).checked
+    }
+  };
+
+  var donations = _fjGetDonations();
+  donations.push(entry);
+  _fjSaveDonationsLocal(donations);
+  _fjCloudSaveEntry(entry);
+
+  closeDonationModal();
+  renderFJDonations();
+  if(typeof showToast==='function') showToast('Gift recorded!');
+}
+
+function closeDonationModal(){
+  var modal = document.getElementById('fjDonationModal');
+  if(modal) modal.remove();
+  document.body.style.overflow = '';
+}
+
+function deleteDonation(id){
+  if(!confirm('Delete this gift record?')) return;
+  var donations = _fjGetDonations().filter(function(d){ return d.id !== id; });
+  _fjSaveDonationsLocal(donations);
+  _fjCloudDeleteEntry(id);
+  renderFJDonations();
+  if(typeof showToast==='function') showToast('Gift removed');
+}
+
+function exportDonationsCSV(){
+  var donations = _fjGetDonations().slice().sort(function(a,b){ return (a.date||'')>(b.date||'')?1:-1; });
+  var lines = ['Date,Amount,Church/Org,Category,Notes,Tax-Deductible'];
+  donations.forEach(function(d){
+    var meta = d.metadata||{};
+    lines.push([
+      d.date||'', d.amount||'0', '"'+(d.church_name||'').replace(/"/g,'""')+'"',
+      meta.category||'', '"'+(meta.notes||'').replace(/"/g,'""')+'"',
+      meta.taxDeductible?'Yes':'No'
+    ].join(','));
+  });
+  var blob = new Blob([lines.join('\n')], {type:'text/csv'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'giving-'+new Date().getFullYear()+'.csv';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 400);
+  if(typeof showToast==='function') showToast('CSV downloaded');
+}
+
+
+// ── Section 4: Spiritual Disciplines ──────────────────────────
+
+var _FJ_DISCIPLINES = [
+  {
+    icon: '🕊️',
+    title: 'Walking with the Spirit',
+    content: [
+      'The Holy Spirit is not a force or a feeling — He is a Person, the third Person of the Trinity, who comes to live inside every believer at the moment of salvation (Romans 8:9). Walking with the Spirit means learning to be aware of His presence, sensitive to His voice, and cooperative with His work in your life. The Spirit\'s role is to guide you into truth (John 16:13), convict you of sin, produce fruit in your character (Galatians 5:22-23), and empower you to live differently.',
+      'Being filled with the Spirit (Ephesians 5:18) is not a one-time event but a continual practice — like breathing. You are filled as you surrender, pray, worship, and yield. When you "quench the Spirit" (1 Thessalonians 5:19), you suppress His prompting through sin, pride, or willful disobedience. When you "grieve the Spirit" (Ephesians 4:30), you sadden Him through habitual sin. The solution to both is confession and renewed surrender.',
+      'The fruit of the Spirit (Galatians 5:22-23) — love, joy, peace, patience, kindness, goodness, faithfulness, gentleness, self-control — is the signature of a Spirit-led life. These aren\'t things you manufacture; they are the natural result of staying connected to Jesus. Just as a branch produces fruit by remaining in the vine, you produce spiritual fruit by abiding in Christ (John 15:5).'
+    ],
+    scriptures: ['Galatians 5:16-25', 'Ephesians 5:18', 'Romans 8:14', 'John 16:13'],
+    goDeeper: 'Podcast: Ask Pastor John — search "Walking in the Spirit"'
+  },
+  {
+    icon: '🤲',
+    title: 'Fasting',
+    content: [
+      'Fasting is the voluntary denial of food (or other things) for a spiritual purpose. Jesus did not say "if you fast" — He said "when you fast" (Matthew 6:16), assuming it as a normal part of the Christian life. Fasting is not about earning favor with God. It is about expressing hunger for God that is stronger than your hunger for food. It clears the noise, sharpens spiritual awareness, and positions you to hear God more clearly.',
+      'Biblical examples of fasting are everywhere: Jesus fasted 40 days before His ministry began (Matthew 4:2), Esther called a 3-day fast before approaching the king (Esther 4:16), Daniel fasted 21 days for breakthrough (Daniel 10:3), and the early church fasted before appointing leaders (Acts 13:2-3). Types of fasting include: full fast (water only), partial fast (Daniel Fast — fruits, vegetables, water), media fast (giving up entertainment), and extended fast.',
+      'How to start: Begin with a one-meal fast (skip lunch) and spend that hour in prayer. As you grow, try a 24-hour fast from dinner to dinner. During your fast, drink plenty of water. When hunger comes, turn it into a prayer: "Lord, I\'m hungry for You more than food." Do not announce your fasting publicly (Matthew 6:16-18). End your fast with a simple meal — don\'t immediately return to large meals.'
+    ],
+    scriptures: ['Matthew 6:16-18', 'Isaiah 58:6-7', 'Acts 13:2-3', 'Daniel 10:12-13'],
+    goDeeper: 'Podcast: Pray First with Chris Hodges — search "fasting"'
+  },
+  {
+    icon: '🙏',
+    title: 'Prayer Life',
+    content: [
+      'Prayer is conversation with God — not a performance, not a formula. The goal is a living, breathing relationship where you both speak and listen. Jesus modeled prayer that was intimate ("Abba, Father"), honest ("Not my will, but Yours"), persistent (Luke 18:1-8), and filled with Scripture. The Lord\'s Prayer (Matthew 6:9-13) is a model that covers all of prayer\'s dimensions: worship, surrender, provision, forgiveness, and protection.',
+      'One practical framework is ACTS: Adoration (start by praising God for who He is), Confession (bring sin honestly to Him), Thanksgiving (thank Him for specific blessings), and Supplication (bring requests — for yourself and others). Intercessory prayer — praying on behalf of others — is one of the most powerful things a believer can do. You become a bridge between heaven and earth for another person.',
+      'Hearing God requires practice. He most often speaks through His Word (Scripture comes alive and speaks to your situation), through the Holy Spirit\'s prompting (a quiet inner impression or conviction), through other believers, and through circumstances. Keep a prayer journal — writing prayers helps you focus and gives you a record of how God has answered. Even a few minutes daily beats an hour once a week.'
+    ],
+    scriptures: ['Matthew 6:9-13', 'Philippians 4:6-7', '1 Thessalonians 5:17', 'Luke 18:1'],
+    goDeeper: 'Podcast: WHOA That\'s Good — Sadie Robertson Huff on prayer'
+  },
+  {
+    icon: '⚔️',
+    title: 'Understanding Sin',
+    content: [
+      'Sin is not just doing bad things — it is falling short of God\'s glory (Romans 3:23), missing the mark of what humanity was created to be. Sins of commission are things we do that we should not (lying, stealing, lust). Sins of omission are things we fail to do that we should (loving our neighbor, forgiving). Sins of weakness are failures despite wanting to do right (Romans 7:19). Sins of rebellion are deliberate defiance of God\'s known will.',
+      'The grace-repentance cycle is foundational: God\'s grace is not a license to sin, but the power to stop. Repentance (metanoeō in Greek — a complete change of mind and direction) is not just feeling sorry. It is turning around. When you sin, the path back is: 1. Acknowledge it honestly (1 John 1:9). 2. Confess it specifically. 3. Receive God\'s complete forgiveness. 4. Make any restitution possible. 5. Walk in the new direction.',
+      'You are not under condemnation (Romans 8:1). This is one of the most liberating truths in Scripture. Once you confess, God removes the sin "as far as the east is from the west" (Psalm 103:12). The enemy\'s strategy is to keep you rehearsing past sins God has already forgiven. Healthy guilt leads to repentance and then freedom. Toxic shame is a trap — it keeps you hiding from God rather than running to Him.'
+    ],
+    scriptures: ['Romans 3:23', '1 John 1:9', 'Romans 8:1', 'Psalm 103:12'],
+    goDeeper: 'Podcast: Think Biblically (Sean McDowell) — search "sin and grace"'
+  },
+  {
+    icon: '📖',
+    title: 'Spiritual Disciplines',
+    content: [
+      'Spiritual disciplines are practices that open us up to God\'s transforming work. They don\'t earn grace — they position us to receive it. Scripture reading is the foundation: a plan like The Bible Recap (Tara-Leigh Cobble) or the YouVersion Bible in a Year plan provides structure. Inductive Bible study means observing (What does it say?), interpreting (What does it mean?), and applying (What do I do?). Even 15 minutes of focused study daily transforms your mind over time (Romans 12:2).',
+      'Memorizing Scripture is a weapon (Psalm 119:11; Matthew 4 — Jesus answered every temptation with "It is written"). Start with one verse per week. Write it on a card. Review it morning and evening. Within a year, you can have 50 verses anchored in your memory — an arsenal for temptation, anxiety, and doubt. Solitude — scheduled time alone with God without devices — is where deep spiritual formation happens. Jesus regularly withdrew to lonely places (Luke 5:16).',
+      'The Sabbath is not just an Old Testament rule — it is a gift. Taking one day each week to rest, worship, and delight in God rather than work resets your soul. It is an act of trust that says "God, I believe You run the world without my constant effort." Journaling faith, tracking answered prayers, and regular worship (in community and alone) round out a life shaped by spiritual discipline. Start small, be consistent, and let the Holy Spirit do the deep work.'
+    ],
+    scriptures: ['Psalm 119:11', 'Romans 12:2', 'Luke 5:16', '2 Timothy 3:16-17'],
+    goDeeper: 'Podcast: The Bible Recap (Tara-Leigh Cobble) — daily Bible reading'
+  }
+];
+
+function renderFJDisciplines(){
+  var el = document.getElementById('fjDisciplinesContainer');
+  if(!el) return;
+  if(el.dataset.rendered) return;
+
+  var sectionsHtml = _FJ_DISCIPLINES.map(function(d){
+    var paras = d.content.map(function(p){ return '<p style="margin:0 0 .65rem;font-size:.82rem;line-height:1.7;color:var(--tx2);">'+_jEsc(p)+'</p>'; }).join('');
+    var refs = d.scriptures.map(function(s){ return '<span style="font-size:.72rem;background:rgba(167,139,250,.1);color:#a78bfa;border-radius:4px;padding:.1rem .35rem;white-space:nowrap;">'+_jEsc(s)+'</span>'; }).join('');
+    return '<details style="margin-bottom:.5rem;">'
+      +'<summary style="cursor:pointer;padding:.6rem .75rem;background:rgba(167,139,250,.06);border-radius:8px;font-size:.85rem;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;"><span>'+d.icon+' '+_jEsc(d.title)+'</span><span style="font-size:.7rem;opacity:.5;">▼</span></summary>'
+      +'<div style="padding:.75rem .5rem .3rem;">'
+      +paras
+      +'<div style="display:flex;flex-wrap:wrap;gap:.25rem;margin-bottom:.5rem;">'+refs+'</div>'
+      +'<div style="font-size:.72rem;color:var(--tx2);font-style:italic;">'+_jEsc(d.goDeeper)+'</div>'
+      +'</div>'
+      +'</details>';
+  }).join('');
+
+  el.innerHTML = '<div style="margin-bottom:1rem;">'
+    +'<div style="font-size:.88rem;font-weight:800;color:var(--tx);margin-bottom:.6rem;">Faith Journey Notes</div>'
+    +sectionsHtml
+    +'</div>';
+
+  el.dataset.rendered = '1';
+}
