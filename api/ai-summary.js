@@ -89,25 +89,28 @@ module.exports = async function handler(req, res) {
   }
 
   const { prompt, mode } = req.body || {};
-  if (!prompt) {
+  // meditation-generator builds its own prompt from structured fields — no client prompt required
+  if (!prompt && mode !== 'meditation-generator') {
     return res.status(400).json({ error: 'Missing prompt' });
   }
 
-  const isAskBible        = mode === 'ask-bible';
-  const isDailyReflection = mode === 'daily-reflection';
-  const isStudyPartner    = mode === 'study-partner';
-  const isGoalSuggest     = mode === 'goal-suggest';
-  const isVotdReflection  = mode === 'votd-reflection';
+  const isAskBible           = mode === 'ask-bible';
+  const isDailyReflection    = mode === 'daily-reflection';
+  const isStudyPartner       = mode === 'study-partner';
+  const isGoalSuggest        = mode === 'goal-suggest';
+  const isVotdReflection     = mode === 'votd-reflection';
+  const isMeditationGenerator = mode === 'meditation-generator';
 
   // Per-mode prompt cap (tight to control cost + abuse). default summary
   // keeps its longer 4000-char allowance.
-  const cap = isAskBible        ? 1500
-            : isDailyReflection ? 600
-            : isStudyPartner    ? 1200
-            : isGoalSuggest     ? 800
-            : isVotdReflection  ? 600
+  const cap = isAskBible             ? 1500
+            : isDailyReflection      ? 600
+            : isStudyPartner         ? 1200
+            : isGoalSuggest          ? 800
+            : isVotdReflection       ? 600
+            : isMeditationGenerator  ? 200  // theme/mood short input only
             : 4000;
-  const safePrompt = String(prompt).slice(0, cap);
+  const safePrompt = String(prompt || '').slice(0, cap);
 
   // Phase F: study-partner sub-mode controls the system prompt.
   // Accept either body.submode or a {"submode":...} property — frontend
@@ -157,6 +160,56 @@ module.exports = async function handler(req, res) {
         system: [{ type: 'text', text: VOTD_REFLECTION_SYSTEM, cache_control: { type: 'ephemeral' } }],
         messages: [{ role: 'user', content: safePrompt }],
       };
+    } else if (isMeditationGenerator) {
+      const { theme, scripture, duration, mood, userAge, denomination } = req.body || {};
+      const minutes = Math.min(30, Math.max(1, parseInt(duration, 10) || 10));
+      const approxSecs = minutes * 60;
+      const medPrompt = `You are a warm, theologically-sound faith companion creating a personalized guided meditation.
+
+User context:
+- Age: ${userAge || '13-22'}
+- Denomination preference: ${denomination || 'evangelical'}
+- Current mood: ${mood || 'open'}
+- Theme requested: ${String(theme || '').slice(0,120) || "God's love and presence"}
+- Scripture focus: ${String(scripture || '').slice(0,60) || 'choose an appropriate verse'}
+- Target length: ${minutes} minutes (~${approxSecs} seconds total)
+
+Generate a guided meditation as a JSON object with this exact structure:
+
+{
+  "title": "Short evocative title (max 4 words)",
+  "icon": "Single emoji that fits the theme",
+  "theme": "One-sentence theme description",
+  "duration": ${minutes},
+  "scriptureFocus": "Book Chapter:Verse",
+  "ambientSuggestion": "calm",
+  "segments": [
+    { "duration": 30, "type": "opening", "text": "Brief welcoming intro (under 50 words)" },
+    { "duration": 60, "type": "scripture", "text": "The scripture text verbatim", "verse": "Book Chapter:Verse" },
+    { "duration": 90, "type": "reflection", "text": "Personal reflection connecting verse to their age and mood (under 55 words)" },
+    { "duration": 60, "type": "silence", "text": "Brief instruction to sit in silence (under 20 words)" },
+    { "duration": 90, "type": "scripture", "text": "A second supporting scripture verbatim", "verse": "Book Chapter:Verse" },
+    { "duration": 60, "type": "reflection", "text": "Deeper reflection or practical application (under 55 words)" },
+    { "duration": 90, "type": "prayer", "text": "Prayer the user can echo or pray themselves (under 60 words)" },
+    { "duration": 30, "type": "close", "text": "Brief closing that sends them into their day (under 25 words)" }
+  ]
+}
+
+Rules:
+- ambientSuggestion must be exactly one of: calm, worship, nature, prayer
+- Use real, accurate Bible verses (KJV, NIV, or ESV)
+- Write in second person ("you", not "we")
+- Warm, real tone — not preachy, no religious clichés
+- Like a trusted older friend, not a preacher
+
+Return ONLY the JSON object, no preamble, no markdown fences.`;
+
+      body = {
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 2000,
+        system: [{ type: 'text', text: SAFETY_PREAMBLE, cache_control: { type: 'ephemeral' } }],
+        messages: [{ role: 'user', content: medPrompt }],
+      };
     } else {
       body = {
         model: 'claude-haiku-4-5-20251001',  // cheapest model — ~$0.0003 per summary
@@ -187,6 +240,7 @@ module.exports = async function handler(req, res) {
     // JSON-shaped modes — strip markdown fences, parse, return ok:true on success.
     const wantsJson = isAskBible
                    || isGoalSuggest
+                   || isMeditationGenerator
                    || (isStudyPartner && submode === 'quiz');
     if (wantsJson) {
       const cleaned = String(text).replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();

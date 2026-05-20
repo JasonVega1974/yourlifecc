@@ -439,7 +439,7 @@ function initScripture(){
 // the original 6 tabs. New tabs without renderers are stubs awaiting later phases.
 // btn is optional — when bfTab() is called programmatically (e.g., from a Quick
 // Tile or stub-panel CTA), the matching button is found via [data-bf-tab].
-const BF_TABS = ['home','devotional','jesus','denominations','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy','studyTools','readingPlans','audioBible','audioMeditations','sleepStories','ambientLibrary'];
+const BF_TABS = ['home','devotional','jesus','denominations','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy','studyTools','readingPlans','audioBible','audioMeditations','sleepStories','ambientLibrary','createMeditation'];
 
 // Phase 5.8 v3 — Home-grid restorer. Defensive against any prior code
 // that may have set .topic-card-grid display:none inside #bf-home. The
@@ -690,6 +690,7 @@ function bfTab(tab, btn){
   if(tab==='audioMeditations') renderAudioMeditationsCard();
   if(tab==='sleepStories') renderSleepStoriesCard();
   if(tab==='ambientLibrary') renderAmbientLibraryCard();
+  if(tab==='createMeditation') renderCreateMeditationCard();
 }
 
 // ── FAITH HOME (F2-A) ────────────────────────────────────────
@@ -11112,6 +11113,7 @@ function _abListen(){
 // Sleep player: very dark full-screen overlay, slow TTS (0.75), fade-out, Wake Lock.
 
 var _medId = null;
+var _medCurrentObj = null; // holds the active meditation object (built-in or custom-generated)
 var _medSegIdx = 0;
 var _medSegTimer = null;
 var _medPaused = false;
@@ -11148,6 +11150,7 @@ function renderAudioMeditationsCard(){
   html += '<div class="bf-section-hdr"><div class="bf-eyebrow">SCRIPTURE · BREATH · REST</div>';
   html += '<div class="bf-title">🧘 Audio Meditations</div>';
   html += '<div class="bf-sub">Scripture-led guided sessions. Each one speaks verses, reflection, and prayer — through your headphones.</div></div>';
+  html += '<button type="button" onclick="bfTab(\'createMeditation\')" style="width:100%;background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(56,189,248,.12));border:1px solid rgba(167,139,250,.35);color:#a78bfa;border-radius:12px;padding:.6rem;font-size:.82rem;font-weight:800;cursor:pointer;font-family:var(--fm);margin-bottom:.75rem;letter-spacing:.02em;">✨ + Create Your Own Meditation</button>';
   html += '<div style="display:grid;gap:.55rem;">';
   AUDIO_MEDITATIONS.forEach(function(m){
     html += '<div style="background:rgba(167,139,250,.04);border:1px solid rgba(167,139,250,.1);border-radius:14px;padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;" onclick="startMeditation(\''+m.id+'\')">';
@@ -11263,12 +11266,232 @@ function _ttsShowDebugPanel(){
   });
 }
 
+// ── AI Meditation Generator (Worker 1) ──────────────────────────────────────
+
+var _genMedLatest = null;
+var _genMedLastParams = null;
+
+function _ambientForSuggestion(sug){
+  var map = { calm:'VYXDfhgwTyM', worship:'_QqFhkOcljI', nature:'eKFTSSKCzWA', prayer:'VYXDfhgwTyM' };
+  return map[(sug||'').toLowerCase()] || 'VYXDfhgwTyM';
+}
+
+function _genMedKey(){
+  return (typeof _ylccUserKey==='function') ? _ylccUserKey('custom_meditations') : 'ylcc_custom_meditations';
+}
+
+function _genMedLoadLibrary(){
+  try{ return JSON.parse(localStorage.getItem(_genMedKey())||'[]'); }catch(e){ return []; }
+}
+
+function saveMeditationToLibrary(med){
+  if(!med || !med.id) return;
+  try{
+    var list = _genMedLoadLibrary();
+    list = list.filter(function(m){ return m.id !== med.id; }); // dedupe
+    list.unshift(med);
+    localStorage.setItem(_genMedKey(), JSON.stringify(list.slice(0,20)));
+  }catch(e){}
+}
+
+function _genMedBuildLibraryHtml(){
+  var saved = _genMedLoadLibrary();
+  if(!saved.length) return '';
+  var html = '<div id="genMedLibrary" style="margin-top:1rem;">';
+  html += '<div style="font-size:.65rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.09em;margin-bottom:.5rem;">My Meditations</div>';
+  saved.forEach(function(m){
+    var ago = m.generatedAt ? new Date(m.generatedAt).toLocaleDateString() : '';
+    html += '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:.6rem .85rem;margin-bottom:.4rem;display:flex;align-items:center;gap:.6rem;">';
+    html += '<span style="font-size:1.35rem;flex-shrink:0;">'+(m.icon||'✨')+'</span>';
+    html += '<div style="flex:1;min-width:0;">';
+    html += '<div style="font-size:.84rem;font-weight:800;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+escapeHtml(m.title||'My Meditation')+'</div>';
+    html += '<div style="font-size:.66rem;color:var(--tx3);">'+(m.duration||'?')+' min · '+ago+'</div>';
+    html += '</div>';
+    html += '<button type="button" onclick="_genMedPlaySaved(\''+_jEsc(m.id)+'\')" style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:#a78bfa;border-radius:8px;padding:.28rem .6rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);">▶</button>';
+    html += '<button type="button" onclick="_genMedDeleteSaved(\''+_jEsc(m.id)+'\',this)" style="background:none;border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.3);border-radius:8px;padding:.28rem .45rem;font-size:.66rem;cursor:pointer;font-family:var(--fm);margin-left:.3rem;" title="Delete">🗑</button>';
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function renderCreateMeditationCard(){
+  var root = document.getElementById('createMeditationRoot');
+  if(!root) return;
+  var moods = [
+    {e:'😊',l:'Grateful',id:'grateful'},{e:'😟',l:'Anxious',id:'anxious'},
+    {e:'😔',l:'Sad',id:'sad'},{e:'😤',l:'Frustrated',id:'angry'},
+    {e:'😶',l:'Lost',id:'lost'},{e:'💪',l:'Hopeful',id:'hopeful'},
+    {e:'😴',l:'Tired',id:'tired'}
+  ];
+  var html = '<div style="padding:.2rem 0 1rem;">';
+  html += '<div class="bf-section-hdr"><div class="bf-eyebrow">AI · PERSONALIZED · GUIDED</div>';
+  html += '<div class="bf-title">✨ Create Your Meditation</div>';
+  html += '<div class="bf-sub">Tell us what\'s on your heart. Claude writes a personalized guided session just for you — Scripture, reflection, prayer.</div></div>';
+  html += '<div style="background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.12);border-radius:14px;padding:1rem 1.1rem;">';
+  // Theme
+  html += '<div style="margin-bottom:.8rem;">';
+  html += '<label style="font-size:.66rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:.3rem;">What\'s on your heart?</label>';
+  html += '<input id="genMedTheme" type="text" maxlength="120" placeholder="e.g. trusting God when I\'m scared" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:8px;padding:.5rem .65rem;font-size:.85rem;font-family:var(--fm);outline:none;" />';
+  html += '</div>';
+  // Mood picker
+  html += '<div style="margin-bottom:.8rem;">';
+  html += '<div style="font-size:.66rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem;">Or pick a feeling:</div>';
+  html += '<div style="display:flex;gap:.4rem;flex-wrap:wrap;">';
+  moods.forEach(function(m){
+    html += '<button type="button" onclick="_genMedPickMood(this,\''+m.id+'\')" data-mood-id="'+m.id+'" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--tx);border-radius:10px;padding:.35rem .55rem;font-size:.8rem;cursor:pointer;font-family:var(--fm);" title="'+m.l+'">'+m.e+' <span style="font-size:.62rem;">'+m.l+'</span></button>';
+  });
+  html += '</div>';
+  html += '<input type="hidden" id="genMedMood" value="" />';
+  html += '</div>';
+  // Duration
+  html += '<div style="margin-bottom:.8rem;">';
+  html += '<div style="font-size:.66rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem;">Length:</div>';
+  html += '<div style="display:flex;gap:.65rem;">';
+  [{v:'5',l:'5 min'},{v:'10',l:'10 min'},{v:'15',l:'15 min'}].forEach(function(opt,i){
+    html += '<label style="display:flex;align-items:center;gap:.3rem;cursor:pointer;font-size:.82rem;color:var(--tx);">'
+      +'<input type="radio" name="genMedDuration" value="'+opt.v+'"'+(i===1?' checked':'')+' style="accent-color:#a78bfa;" /> '+opt.l+'</label>';
+  });
+  html += '</div></div>';
+  // Scripture
+  html += '<div style="margin-bottom:1rem;">';
+  html += '<label style="font-size:.66rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:.3rem;">Scripture focus <span style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.55;">(optional — leave blank to let AI choose)</span></label>';
+  html += '<input id="genMedScripture" type="text" maxlength="60" placeholder="e.g. Psalm 23 or John 3:16" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:8px;padding:.5rem .65rem;font-size:.82rem;font-family:var(--fm);outline:none;" />';
+  html += '</div>';
+  // Generate button
+  html += '<button type="button" id="genMedBtn" onclick="generateMeditation()" style="width:100%;background:linear-gradient(135deg,rgba(167,139,250,.3),rgba(56,189,248,.2));border:1px solid rgba(167,139,250,.4);color:var(--tx);border-radius:12px;padding:.75rem;font-size:.9rem;font-weight:800;cursor:pointer;font-family:var(--fm);">✨ Generate Meditation</button>';
+  html += '</div>';
+  // Result area + library
+  html += '<div id="genMedResult" style="margin-top:.75rem;"></div>';
+  html += _genMedBuildLibraryHtml();
+  html += '</div>';
+  root.innerHTML = html;
+}
+
+function _genMedPickMood(btn, moodId){
+  var all = document.querySelectorAll('[data-mood-id]');
+  all.forEach(function(b){ b.style.background='rgba(255,255,255,.05)'; b.style.border='1px solid rgba(255,255,255,.1)'; b.style.color='var(--tx)'; });
+  var hidden = document.getElementById('genMedMood');
+  if(hidden && hidden.value === moodId){ hidden.value = ''; return; }
+  btn.style.background = 'rgba(167,139,250,.2)';
+  btn.style.border = '1px solid rgba(167,139,250,.45)';
+  btn.style.color = '#a78bfa';
+  if(hidden) hidden.value = moodId;
+}
+
+async function generateMeditation(){
+  var theme = (document.getElementById('genMedTheme')||{}).value||'';
+  var mood  = (document.getElementById('genMedMood')||{}).value||'';
+  var scripture = (document.getElementById('genMedScripture')||{}).value||'';
+  var durEl = document.querySelector('input[name="genMedDuration"]:checked');
+  var duration = durEl ? durEl.value : '10';
+  var userAge = (typeof D!=='undefined'&&D&&D.user&&D.user.age)?D.user.age:'13-22';
+  var denomination = (typeof D!=='undefined'&&D&&D.user&&D.user.denomination)?D.user.denomination:'evangelical';
+  if(!theme && !mood){ if(typeof showToast==='function') showToast('Add a theme or pick a feeling first'); return; }
+  _genMedLastParams = { theme, mood, scripture, duration, userAge, denomination };
+  var btn = document.getElementById('genMedBtn');
+  var result = document.getElementById('genMedResult');
+  if(btn){ btn.disabled=true; btn.textContent='⏳ Generating…'; btn.style.opacity='.6'; }
+  if(result) result.innerHTML='<div style="text-align:center;padding:1.2rem;color:var(--tx2);font-size:.82rem;">✨ Writing your meditation…<br><span style="font-size:.7rem;opacity:.55;">10–20 seconds</span></div>';
+  try{
+    var resp = await fetch('/api/ai-summary', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ mode:'meditation-generator', prompt:theme||mood, theme, scripture, duration:parseInt(duration,10), mood, userAge, denomination })
+    });
+    if(!resp.ok) throw new Error('API '+resp.status);
+    var data = await resp.json();
+    if(!data||!data.ok||!Array.isArray(data.segments)||!data.segments.length) throw new Error('Bad response');
+    data.id = 'gen-'+Date.now();
+    data.generatedAt = new Date().toISOString();
+    _genMedLatest = data;
+    saveMeditationToLibrary(data);
+    if(result){
+      result.innerHTML = '<div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.22);border-radius:12px;padding:.85rem 1rem;">'
+        +'<div style="font-size:.82rem;font-weight:800;color:#10b981;margin-bottom:.4rem;">✅ Meditation created!</div>'
+        +'<div style="font-size:.78rem;color:var(--tx);margin-bottom:.2rem;">'+(data.icon||'✨')+' '+escapeHtml(data.title||'My Meditation')+'</div>'
+        +'<div style="font-size:.68rem;color:var(--tx3);margin-bottom:.65rem;">'+escapeHtml(data.scriptureFocus||data.theme||'')+'</div>'
+        +'<div style="display:flex;gap:.5rem;">'
+        +'<button type="button" onclick="_genMedLaunch()" style="flex:1;background:rgba(167,139,250,.2);border:1px solid rgba(167,139,250,.4);color:#a78bfa;border-radius:10px;padding:.5rem;font-size:.82rem;font-weight:800;cursor:pointer;font-family:var(--fm);">▶ Play Now</button>'
+        +'<button type="button" onclick="regenerateMeditation()" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--tx2);border-radius:10px;padding:.5rem .75rem;font-size:.8rem;cursor:pointer;font-family:var(--fm);">🔄 Try Again</button>'
+        +'</div></div>';
+    }
+    // Refresh library section
+    var lib = document.getElementById('genMedLibrary');
+    if(lib) lib.outerHTML = _genMedBuildLibraryHtml();
+    else {
+      var root = document.getElementById('createMeditationRoot');
+      if(root) root.insertAdjacentHTML('beforeend', _genMedBuildLibraryHtml());
+    }
+  }catch(err){
+    console.error('[generateMeditation]',err);
+    if(result) result.innerHTML='<div style="background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.2);border-radius:10px;padding:.75rem .9rem;font-size:.8rem;color:#f87171;">❌ Could not generate. Check your connection and try again.</div>';
+    if(btn){ btn.disabled=false; btn.textContent='✨ Generate Meditation'; btn.style.opacity='1'; }
+  }
+}
+
+async function regenerateMeditation(){
+  if(!_genMedLastParams){ renderCreateMeditationCard(); return; }
+  // Restore form values then call generate
+  renderCreateMeditationCard();
+  await new Promise(function(r){ setTimeout(r,50); });
+  var p = _genMedLastParams;
+  var themeEl = document.getElementById('genMedTheme');
+  var scripEl = document.getElementById('genMedScripture');
+  if(themeEl) themeEl.value = p.theme||'';
+  if(scripEl) scripEl.value = p.scripture||'';
+  var durRadio = document.querySelector('input[name="genMedDuration"][value="'+p.duration+'"]');
+  if(durRadio) durRadio.checked = true;
+  if(p.mood){
+    var moodBtn = document.querySelector('[data-mood-id="'+p.mood+'"]');
+    if(moodBtn) _genMedPickMood(moodBtn, p.mood);
+  }
+  generateMeditation();
+}
+
+function _genMedLaunch(){
+  if(!_genMedLatest) return;
+  startCustomMeditation(_genMedLatest);
+}
+
+function _genMedPlaySaved(id){
+  var saved = _genMedLoadLibrary();
+  var med = saved.find(function(m){ return m.id===id; });
+  if(med) startCustomMeditation(med);
+}
+
+function _genMedDeleteSaved(id, btn){
+  try{
+    var list = _genMedLoadLibrary();
+    localStorage.setItem(_genMedKey(), JSON.stringify(list.filter(function(m){ return m.id!==id; })));
+  }catch(e){}
+  var card = btn && btn.closest ? btn.closest('div[style*="border-radius:12px"]') : null;
+  if(card) card.remove();
+}
+
+function startCustomMeditation(med){
+  if(!med || !med.segments || !med.segments.length) return;
+  // Ensure med has ambientYouTube field the player expects
+  if(!med.ambientYouTube) med.ambientYouTube = _ambientForSuggestion(med.ambientSuggestion);
+  _medClose();
+  _medId = med.id;
+  _medCurrentObj = med;
+  _medSegIdx = 0; _medPaused = false; _medElapsed = 0; _medAdvancePending = false;
+  var overlay = document.createElement('div');
+  overlay.id = 'meditationOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9500;background:#0b0b1a;display:flex;flex-direction:column;overflow:hidden;';
+  document.body.appendChild(overlay);
+  document.body.style.overflow = 'hidden';
+  _medRenderPlayer(med);
+  _medPlaySegment(med, 0);
+}
+
 function startMeditation(medId){
   if(typeof AUDIO_MEDITATIONS==='undefined') return;
   var med = AUDIO_MEDITATIONS.find(function(m){ return m.id===medId; });
   if(!med) return;
   _medClose();
-  _medId = medId; _medSegIdx = 0; _medPaused = false; _medElapsed = 0; _medAdvancePending = false;
+  _medId = medId; _medCurrentObj = med; _medSegIdx = 0; _medPaused = false; _medElapsed = 0; _medAdvancePending = false;
   var overlay = document.createElement('div');
   overlay.id = 'meditationOverlay';
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9500;background:#0b0b1a;display:flex;flex-direction:column;overflow:hidden;';
@@ -11374,7 +11597,7 @@ function _medUpdateSegmentUI(med, segIdx){
 function _medTogglePause(){
   if(_medPaused){
     _medPaused = false;
-    var med = (typeof AUDIO_MEDITATIONS!=='undefined')?AUDIO_MEDITATIONS.find(function(m){return m.id===_medId;}):null;
+    var med = _medCurrentObj || ((typeof AUDIO_MEDITATIONS!=='undefined')?AUDIO_MEDITATIONS.find(function(m){return m.id===_medId;}):null);
     if(med) _medPlaySegment(med, _medSegIdx);
     var btn = document.getElementById('medPauseBtn');
     if(btn) btn.innerHTML = '⏸ Pause';
@@ -11388,7 +11611,7 @@ function _medTogglePause(){
 }
 
 function _medSkip(){
-  var med = (typeof AUDIO_MEDITATIONS!=='undefined')?AUDIO_MEDITATIONS.find(function(m){return m.id===_medId;}):null;
+  var med = _medCurrentObj || ((typeof AUDIO_MEDITATIONS!=='undefined')?AUDIO_MEDITATIONS.find(function(m){return m.id===_medId;}):null);
   if(!med) return;
   if(_medSegTimer){ clearTimeout(_medSegTimer); _medSegTimer = null; }
   if('speechSynthesis' in window) window.speechSynthesis.cancel();
@@ -11403,7 +11626,7 @@ function _medClose(){
   var overlay = document.getElementById('meditationOverlay');
   if(overlay) overlay.remove();
   document.body.style.overflow = '';
-  _medId = null; _medSegIdx = 0; _medPaused = false; _medElapsed = 0; _medAdvancePending = false;
+  _medId = null; _medCurrentObj = null; _medSegIdx = 0; _medPaused = false; _medElapsed = 0; _medAdvancePending = false;
 }
 
 function _medComplete(med){
