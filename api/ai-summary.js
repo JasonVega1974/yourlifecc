@@ -98,8 +98,9 @@ module.exports = async function handler(req, res) {
   const isDailyReflection    = mode === 'daily-reflection';
   const isStudyPartner       = mode === 'study-partner';
   const isGoalSuggest        = mode === 'goal-suggest';
-  const isVotdReflection     = mode === 'votd-reflection';
+  const isVotdReflection      = mode === 'votd-reflection';
   const isMeditationGenerator = mode === 'meditation-generator';
+  const isDailyDevotional     = mode === 'daily-devotional';
 
   // Per-mode prompt cap (tight to control cost + abuse). default summary
   // keeps its longer 4000-char allowance.
@@ -109,6 +110,7 @@ module.exports = async function handler(req, res) {
             : isGoalSuggest          ? 800
             : isVotdReflection       ? 600
             : isMeditationGenerator  ? 200  // theme/mood short input only
+            : isDailyDevotional      ? 40   // date string (YYYY-MM-DD) only
             : 4000;
   const safePrompt = String(prompt || '').slice(0, cap);
 
@@ -210,6 +212,36 @@ Return ONLY the JSON object, no preamble, no markdown fences.`;
         system: [{ type: 'text', text: SAFETY_PREAMBLE, cache_control: { type: 'ephemeral' } }],
         messages: [{ role: 'user', content: medPrompt }],
       };
+    } else if (isDailyDevotional) {
+      const { userAge, denomination, streakDays, lastTheme } = req.body || {};
+      const todayStr = String(prompt || new Date().toISOString().slice(0,10)).slice(0,10);
+      const devPrompt = `Generate a fresh daily devotional for a young person.
+
+Context:
+- Today: ${todayStr}
+- Age: ${userAge || '13-22'}
+- Denomination: ${denomination || 'evangelical'}
+- Reading streak: ${streakDays || 0} days${lastTheme ? '\n- Previous theme (avoid repeating): ' + String(lastTheme).slice(0,60) : ''}
+
+Style: Warm, real, not preachy. Like a trusted older friend sharing what God laid on their heart.
+Write in second person ("you", not "we"). Non-denominational evangelical.
+
+Return ONLY valid JSON in this exact shape (no prose before or after):
+{
+  "title": "<max 5 words>",
+  "icon": "<single emoji>",
+  "scripture": "<full verse text — accurate ESV/NIV/KJV>",
+  "scriptureRef": "<Book Chapter:Verse>",
+  "devotional": "<200-word reflection in second person>",
+  "question": "<one journaling/application question>",
+  "prayer": "<60-word prayer the user can echo>"
+}`;
+      body = {
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 700,
+        system: [{ type: 'text', text: SAFETY_PREAMBLE, cache_control: { type: 'ephemeral' } }],
+        messages: [{ role: 'user', content: devPrompt }],
+      };
     } else {
       body = {
         model: 'claude-haiku-4-5-20251001',  // cheapest model — ~$0.0003 per summary
@@ -241,6 +273,7 @@ Return ONLY the JSON object, no preamble, no markdown fences.`;
     const wantsJson = isAskBible
                    || isGoalSuggest
                    || isMeditationGenerator
+                   || isDailyDevotional
                    || (isStudyPartner && submode === 'quiz');
     if (wantsJson) {
       const cleaned = String(text).replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();

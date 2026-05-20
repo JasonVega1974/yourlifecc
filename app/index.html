@@ -471,6 +471,18 @@
     </div>
   </div>
 
+  <!-- 🎙 VOICE FOR AUDIO -->
+  <div style="margin-top:1.1rem;padding-top:.9rem;border-top:1px solid rgba(255,255,255,.06);">
+    <div style="font-family:var(--fh);font-size:.73rem;letter-spacing:1px;color:#c8d4e8;margin-bottom:.55rem;">🎙 VOICE FOR AUDIO</div>
+    <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;">
+      <select id="spTtsVoicePicker" onchange="saveTtsVoicePref(this.value)" style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:var(--tx);font-size:.72rem;padding:.4rem .6rem;outline:none;cursor:pointer;"><option value="">Auto (recommended)</option></select>
+      <button type="button" onclick="testTtsVoice()" style="flex-shrink:0;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.25);border-radius:8px;color:#38bdf8;font-size:.72rem;padding:.4rem .75rem;cursor:pointer;">&#x25B6; Test</button>
+    </div>
+    <div id="spTtsAutoVoiceHint" style="font-size:.6rem;color:var(--tx3);margin-bottom:.2rem;"></div>
+    <div id="spTtsActiveVoiceLabel" style="font-size:.6rem;color:rgba(16,185,129,.7);min-height:.85rem;"></div>
+    <div style="margin-top:.45rem;font-size:.65rem;color:var(--tx3);">Used in: Audio Meditations, Sleep Stories, Verse of the Day</div>
+  </div>
+
   <!-- 💳 MANAGE SUBSCRIPTION -->
   <div style="margin-top:1.1rem;padding-top:.9rem;border-top:1px solid rgba(255,255,255,.06);">
     <div style="font-family:var(--fh);font-size:.73rem;letter-spacing:1px;color:#38bdf8;margin-bottom:.55rem;">💳 SUBSCRIPTION</div>
@@ -4787,6 +4799,9 @@
       <div class="fh-card-hdr"><span>📚</span> Active Reading Plan <span class="fh-card-sub" onclick="bfTab('readingPlans')" style="cursor:pointer;">Browse →</span></div>
       <div id="fhPlanBody"><div class="fh-plan-empty">No plan started yet. Choose from 5 reading plans.</div><button class="fh-btn" onclick="bfTab('readingPlans')">Browse Plans →</button></div>
     </div>
+
+    <!-- Worker 4 — Daily AI Devotional (rendered by renderDailyAiDevotional()) -->
+    <div id="dailyAiDevRoot" style="margin-bottom:.85rem;"></div>
 
     <!-- Phase 5.8 — Card-grid navigation. Every The Well sub-section
          is one tap from the Home tab. Cards route via existing handlers

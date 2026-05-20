@@ -851,6 +851,7 @@ function openSettings(){
   // Populate sync + subscription status
   refreshSettingsSyncStatus();
   refreshSettingsPlanStatus();
+  if(typeof _populateTtsVoicePicker === 'function') _populateTtsVoicePicker();
   document.getElementById('sp').classList.add('open');
   document.getElementById('so').classList.add('open');
   var _spProf=(_profiles||[]).find(function(p){return p.id===_activeProfileId;});

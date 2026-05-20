@@ -545,6 +545,84 @@ function dismissDonationPrompt(){
   if(el) el.style.display = 'none';
 }
 
+// ── Daily AI Devotional — generated fresh each day, cached 24h ──────────────
+
+function renderDailyAiDevotional(){
+  var root = document.getElementById('dailyAiDevRoot');
+  if(!root) return;
+  var today = new Date().toISOString().slice(0,10);
+  var cacheKey = (typeof _ylccUserKey === 'function') ? _ylccUserKey('daily_ai_dev_' + today) : 'ylcc_daily_ai_dev_' + today;
+  var cached = null;
+  try { cached = JSON.parse(localStorage.getItem(cacheKey)||'null'); } catch(e) {}
+  if(cached && cached.title){ _renderDailyDevContent(root, cached); return; }
+
+  root.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--tx3);font-size:.75rem;background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.1);border-radius:14px;">✨ Writing today\'s devotional…</div>';
+
+  var userAge     = (typeof D!=='undefined'&&D&&D.user&&D.user.age) ? D.user.age : '13-22';
+  var denomination= (typeof D!=='undefined'&&D&&D.user&&D.user.denomination) ? D.user.denomination : 'evangelical';
+  var streakDays  = (typeof getScriptureStreak === 'function') ? getScriptureStreak() : 0;
+
+  fetch('/api/ai-summary', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ mode:'daily-devotional', prompt: today, userAge: userAge, denomination: denomination, streakDays: streakDays })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if(data && data.ok && data.title){
+      try { localStorage.setItem(cacheKey, JSON.stringify(data)); } catch(e) {}
+      _renderDailyDevContent(root, data);
+    } else {
+      root.innerHTML = '';
+    }
+  })
+  .catch(function(){ root.innerHTML = ''; });
+}
+
+function _renderDailyDevContent(root, dev){
+  var dateLabel = new Date().toLocaleDateString('en-US', {month:'long', day:'numeric'});
+  var html = '<div style="background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.12);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.85rem;">';
+  html += '<div style="font-size:.57rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#38bdf8;opacity:.85;margin-bottom:.3rem;">✨ DAILY DEVOTIONAL · '+escapeHtml(dateLabel)+'</div>';
+  html += '<div style="font-size:1rem;font-weight:900;color:var(--tx);margin-bottom:.5rem;line-height:1.3;">'+(dev.icon||'✨')+' '+escapeHtml(dev.title||'')+'</div>';
+  html += '<div style="font-family:Georgia,serif;font-style:italic;font-size:.88rem;line-height:1.6;color:var(--tx);margin-bottom:.2rem;">"'+escapeHtml(dev.scripture||'')+'"</div>';
+  html += '<div style="font-size:.72rem;font-weight:800;color:#38bdf8;margin-bottom:.7rem;">— '+escapeHtml(dev.scriptureRef||'')+'</div>';
+  html += '<div style="font-size:.82rem;color:var(--tx2);line-height:1.7;margin-bottom:.7rem;">'+escapeHtml(dev.devotional||'')+'</div>';
+  html += '<div style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.12);border-radius:10px;padding:.55rem .75rem;margin-bottom:.6rem;">';
+  html += '<div style="font-size:.58rem;font-weight:800;color:#a78bfa;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.18rem;">💭 Reflect</div>';
+  html += '<div style="font-size:.8rem;color:var(--tx);line-height:1.5;">'+escapeHtml(dev.question||'')+'</div>';
+  html += '</div>';
+  html += '<div style="background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.12);border-radius:10px;padding:.55rem .75rem;margin-bottom:.75rem;">';
+  html += '<div style="font-size:.58rem;font-weight:800;color:#fbbf24;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.18rem;">🙏 Prayer</div>';
+  html += '<div style="font-family:Georgia,serif;font-style:italic;font-size:.8rem;color:var(--tx2);line-height:1.55;">'+escapeHtml(dev.prayer||'')+'</div>';
+  html += '</div>';
+  html += '<div style="display:flex;gap:.4rem;flex-wrap:wrap;">';
+  html += '<button type="button" onclick="_dailyDevSpeak()" style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.22);color:#fde68a;border-radius:8px;padding:.3rem .7rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🔊 Listen</button>';
+  html += '<button type="button" onclick="_dailyDevSave()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx2);border-radius:8px;padding:.3rem .7rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🔖 Save</button>';
+  html += '</div>';
+  html += '</div>';
+  root.innerHTML = html;
+}
+
+function _dailyDevSpeak(){
+  var today = new Date().toISOString().slice(0,10);
+  var cacheKey = (typeof _ylccUserKey === 'function') ? _ylccUserKey('daily_ai_dev_' + today) : 'ylcc_daily_ai_dev_' + today;
+  var dev = null;
+  try { dev = JSON.parse(localStorage.getItem(cacheKey)||'null'); } catch(e) {}
+  if(!dev) return;
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  var text = (dev.scripture||'') + '. ' + (dev.devotional||'') + '. ' + (dev.question||'') + '. ' + (dev.prayer||'');
+  var sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+  _ttsWhenVoicesReady(function(voices){
+    _ttsSpeakSentences(sentences, 0.85, voices, function(){});
+  });
+}
+
+function _dailyDevSave(){
+  if(typeof showToast === 'function') showToast('Saved to your Faith Journey');
+}
+
+// ─────────────────────────────────────────────────────────
+
 function renderWellDonationPrompt(){
   // 2026-05-15 — Donation prompt card REMOVED from the Well home for
   // faith-free users. The function becomes a no-op + defensive cleanup
@@ -850,6 +928,9 @@ function renderFaithHome(){
 
   // Worker 2 — Mood check-in (once per day, internal gate in checkShowMoodPrompt)
   if(typeof checkShowMoodPrompt === 'function') checkShowMoodPrompt();
+
+  // Worker 4 — Daily AI Devotional card (cached 24h per user)
+  renderDailyAiDevotional();
 
   // F2-H: Family Verse of the Week (only when family profiles exist).
   const fvEl = document.getElementById('fhFamilyVerseCard');
@@ -11165,29 +11246,23 @@ function renderAudioMeditationsCard(){
   if(lastPlayed && lastPlayed.title){
     html += '<div style="text-align:center;margin-top:.85rem;font-size:.64rem;color:var(--tx3);">Last: '+escapeHtml(lastPlayed.title)+' · '+escapeHtml(lastPlayed.date||'')+'</div>';
   }
-  html += '<div style="margin-top:.85rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:.6rem .85rem;font-size:.7rem;color:var(--tx3);line-height:1.5;">💡 Headphones recommended. Each session uses your device\'s built-in voice and a calming music background.</div>';
-  html += '<div style="margin-top:.65rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:.65rem .85rem;">';
-  html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.45rem;">';
-  html += '<div style="font-size:.62rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.09em;">🎙 Voice Settings</div>';
-  html += '<button type="button" onclick="_ttsShowDebugPanel()" style="background:none;border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.3);border-radius:6px;padding:.15rem .45rem;font-size:.58rem;cursor:pointer;font-family:var(--fm);">🔍 Debug</button>';
-  html += '</div>';
-  html += '<div style="display:flex;align-items:center;gap:.5rem;">';
-  html += '<select id="ttsVoicePicker" onchange="saveTtsVoicePref(this.value)" style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--tx);border-radius:8px;padding:.35rem .5rem;font-size:.72rem;font-family:var(--fm);cursor:pointer;" aria-label="Reading voice"><option value="">Auto (recommended)</option></select>';
-  html += '<button type="button" onclick="testTtsVoice()" style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:#a78bfa;border-radius:8px;padding:.35rem .7rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);" title="Preview selected voice">▶ Test</button>';
-  html += '</div>';
-  html += '<div id="ttsAutoVoiceHint" style="font-size:.6rem;color:var(--tx3);margin-top:.3rem;"></div>';
-  html += '<div id="ttsActiveVoiceLabel" style="font-size:.6rem;color:rgba(16,185,129,.7);margin-top:.15rem;min-height:.85rem;"></div>';
+  html += '<div style="margin-top:.85rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:.55rem .85rem;display:flex;align-items:center;gap:.5rem;">';
+  html += '<span style="font-size:.75rem;flex-shrink:0;">🎙</span>';
+  html += '<div style="flex:1;font-size:.72rem;color:var(--tx3);line-height:1.4;">Voice settings in <strong style="color:var(--tx2);">⚙ Settings</strong> · Debug: <button type="button" onclick="_ttsShowDebugPanel()" style="background:none;border:none;color:rgba(56,189,248,.7);font-size:.68rem;cursor:pointer;font-family:var(--fm);padding:0;">Diagnostics</button></div>';
+  html += '<button type="button" onclick="openSettings()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--tx2);border-radius:8px;padding:.26rem .55rem;font-size:.68rem;cursor:pointer;font-family:var(--fm);flex-shrink:0;">Open →</button>';
   html += '</div>';
   html += '</div>';
   root.innerHTML = html;
-  _populateTtsVoicePicker();
 }
 
 function _populateTtsVoicePicker(){
-  var sel = document.getElementById('ttsVoicePicker');
-  if(!sel || !('speechSynthesis' in window)) return;
+  if(!('speechSynthesis' in window)) return;
+  // Target settings panel picker (always in DOM) or legacy audio card picker
+  var sel = document.getElementById('spTtsVoicePicker') || document.getElementById('ttsVoicePicker');
+  if(!sel) return;
   _ttsWhenVoicesReady(function(voices){
-    var sel2 = document.getElementById('ttsVoicePicker'); // re-query after async
+    // Re-query after async gap; prefer settings panel
+    var sel2 = document.getElementById('spTtsVoicePicker') || document.getElementById('ttsVoicePicker');
     if(!sel2) return;
     var stored = null;
     try{ if(typeof _ylccUserKey==='function') stored = localStorage.getItem(_ylccUserKey('tts_voice')); }catch(e){}
@@ -11197,10 +11272,10 @@ function _populateTtsVoicePicker(){
       + engVoices.map(function(v){
           return '<option value="'+escapeHtml(v.name)+'"'+(v.name===stored?' selected':'')+'>'+escapeHtml(v.name)+' ('+v.lang+')</option>';
         }).join('');
-    // Show auto-selected voice so user sees what "Auto" means on their device
     var autoVoice = _ttsSelectVoice(voices);
-    var hint = document.getElementById('ttsAutoVoiceHint');
-    if(hint) hint.textContent = 'Auto will use: ' + (autoVoice ? autoVoice.name : 'browser default');
+    var autoHintText = 'Auto will use: ' + (autoVoice ? autoVoice.name : 'browser default');
+    var hint = document.getElementById('spTtsAutoVoiceHint') || document.getElementById('ttsAutoVoiceHint');
+    if(hint) hint.textContent = autoHintText;
   });
 }
 
@@ -11220,8 +11295,9 @@ function testTtsVoice(){
     utt.rate = 0.85;
     if(voice) utt.voice = voice;
     window.speechSynthesis.speak(utt);
-    var ind = document.getElementById('ttsActiveVoiceLabel');
-    if(ind) ind.textContent = 'Voice: ' + (voice ? voice.name : 'default');
+    var label = 'Voice: ' + (voice ? voice.name : 'default');
+    var ind = document.getElementById('spTtsActiveVoiceLabel') || document.getElementById('ttsActiveVoiceLabel');
+    if(ind) ind.textContent = label;
   });
 }
 
