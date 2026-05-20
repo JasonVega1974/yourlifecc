@@ -10796,7 +10796,7 @@ function renderPrayerSessionView(session, stepIndex){
     '</div>' +
     '<div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;overflow:hidden;">' +
     '<div style="font-size:.56rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);padding:.4rem .7rem .2rem;">🎵 Ambient Audio</div>' +
-    '<iframe src="https://www.youtube-nocookie.com/embed/' + session.ambientYouTube + '?autoplay=1&loop=1&playlist=' + session.ambientYouTube + '&controls=1&modestbranding=1" frameborder="0" allow="autoplay;encrypted-media" allowfullscreen style="width:100%;height:80px;border:none;display:block;"></iframe>' +
+    '<iframe src="https://www.youtube-nocookie.com/embed/' + session.ambientYouTube + '?autoplay=1&loop=1&playlist=' + session.ambientYouTube + '&controls=1&modestbranding=1&playsinline=1&rel=0" frameborder="0" allow="autoplay;encrypted-media" style="width:100%;height:80px;border:none;display:block;" onerror="this.src=\'https://www.youtube-nocookie.com/embed/VYXDfhgwTyM?autoplay=1&loop=1&playlist=VYXDfhgwTyM&controls=1&modestbranding=1&playsinline=1&rel=0\';"></iframe>' +
     '</div>';
 }
 
@@ -10858,6 +10858,54 @@ function completePrayerSession(sessionId){
 var _ttsUtterance = null;
 var _ttsSpeaking = false;
 
+function _ttsSelectVoice(){
+  if(!('speechSynthesis' in window)) return null;
+  var stored = null;
+  try{ if(typeof _ylccUserKey==='function') stored = localStorage.getItem(_ylccUserKey('tts_voice')); }catch(e){}
+  var voices = window.speechSynthesis.getVoices();
+  if(!voices || !voices.length) return null;
+  if(stored){
+    var pref = voices.find(function(v){ return v.name === stored; });
+    if(pref) return pref;
+  }
+  var p = [
+    function(v){ return v.name === 'Samantha'; },
+    function(v){ return v.name === 'Google US English'; },
+    function(v){ return v.name.indexOf('Aria Online') !== -1 && v.name.indexOf('Natural') !== -1; },
+    function(v){ return v.name.indexOf('Jenny Online') !== -1 && v.name.indexOf('Natural') !== -1; },
+    function(v){ return v.name === 'Karen'; },
+    function(v){ return v.name === 'Daniel'; },
+    function(v){ return v.name.indexOf('Natural') !== -1 && v.lang && v.lang.indexOf('en') === 0; },
+    function(v){ return v.name.indexOf('Premium') !== -1 && v.lang && v.lang.indexOf('en') === 0; },
+    function(v){ return v.name.indexOf('Enhanced') !== -1 && v.lang && v.lang.indexOf('en') === 0; },
+    function(v){ return v.lang === 'en-US'; },
+    function(v){ return v.lang && v.lang.indexOf('en') === 0; }
+  ];
+  for(var i=0; i<p.length; i++){
+    var v = voices.find(p[i]);
+    if(v) return v;
+  }
+  return null;
+}
+
+function _ttsSpeakSentences(sentences, rate, onDone){
+  if(!sentences || !sentences.length){ if(onDone) onDone(); return; }
+  var idx = 0;
+  function next(){
+    if(idx >= sentences.length){ if(onDone) onDone(); return; }
+    var s = sentences[idx++];
+    if(!s || !s.trim()){ next(); return; }
+    var utt = new SpeechSynthesisUtterance(s.trim());
+    utt.rate = rate || 0.85;
+    var voice = _ttsSelectVoice();
+    if(voice) utt.voice = voice;
+    utt.onend = function(){ setTimeout(next, 300); };
+    utt.onerror = function(){ setTimeout(next, 300); };
+    window.speechSynthesis.speak(utt);
+  }
+  next();
+}
+
 function speakVerse(text, ref){
   if(!('speechSynthesis' in window)){
     if(typeof showToast==='function') showToast('Text-to-speech not supported in this browser.');
@@ -10865,13 +10913,10 @@ function speakVerse(text, ref){
   }
   window.speechSynthesis.cancel();
   if(_ttsSpeaking){ _ttsSpeaking = false; return; }
-  var rate = (typeof TTS_CONFIG !== 'undefined' && TTS_CONFIG.freeTier) ? (TTS_CONFIG.freeTier.rate || 0.9) : 0.9;
-  _ttsUtterance = new SpeechSynthesisUtterance((ref ? ref + '. ' : '') + (text || ''));
-  _ttsUtterance.rate = rate;
-  _ttsUtterance.onstart = function(){ _ttsSpeaking = true; };
-  _ttsUtterance.onend = function(){ _ttsSpeaking = false; };
-  _ttsUtterance.onerror = function(){ _ttsSpeaking = false; };
-  window.speechSynthesis.speak(_ttsUtterance);
+  _ttsSpeaking = true;
+  var fullText = (ref ? ref + '. ' : '') + (text || '');
+  var sentences = fullText.match(/[^.!?]+[.!?]*/g) || [fullText];
+  _ttsSpeakSentences(sentences, 0.85, function(){ _ttsSpeaking = false; });
 }
 
 function speakVotd(){
@@ -11063,8 +11108,46 @@ function renderAudioMeditationsCard(){
     html += '<div style="text-align:center;margin-top:.85rem;font-size:.64rem;color:var(--tx3);">Last: '+escapeHtml(lastPlayed.title)+' · '+escapeHtml(lastPlayed.date||'')+'</div>';
   }
   html += '<div style="margin-top:.85rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:.6rem .85rem;font-size:.7rem;color:var(--tx3);line-height:1.5;">💡 Headphones recommended. Each session uses your device\'s built-in voice and a calming music background.</div>';
+  html += '<div style="margin-top:.65rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:.65rem .85rem;">';
+  html += '<div style="font-size:.62rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.09em;margin-bottom:.45rem;">🎙 Voice Settings</div>';
+  html += '<div style="display:flex;align-items:center;gap:.5rem;">';
+  html += '<select id="ttsVoicePicker" onchange="saveTtsVoicePref(this.value)" style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--tx);border-radius:8px;padding:.35rem .5rem;font-size:.72rem;font-family:var(--fm);cursor:pointer;" aria-label="Reading voice"><option value="">Auto (recommended)</option></select>';
+  html += '<button type="button" onclick="testTtsVoice()" style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:#a78bfa;border-radius:8px;padding:.35rem .7rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);" title="Preview selected voice">▶ Test</button>';
+  html += '</div></div>';
   html += '</div>';
   root.innerHTML = html;
+  setTimeout(_populateTtsVoicePicker, 80);
+}
+
+function _populateTtsVoicePicker(){
+  var sel = document.getElementById('ttsVoicePicker');
+  if(!sel || !('speechSynthesis' in window)) return;
+  var voices = window.speechSynthesis.getVoices();
+  if(!voices || !voices.length){
+    window.speechSynthesis.onvoiceschanged = _populateTtsVoicePicker;
+    return;
+  }
+  var stored = null;
+  try{ if(typeof _ylccUserKey==='function') stored = localStorage.getItem(_ylccUserKey('tts_voice')); }catch(e){}
+  var engVoices = voices.filter(function(v){ return v.lang && v.lang.indexOf('en') === 0; });
+  sel.innerHTML = '<option value="">Auto (recommended)</option>'
+    + engVoices.map(function(v){
+        return '<option value="'+escapeHtml(v.name)+'"'+(v.name===stored?' selected':'')+'>'+escapeHtml(v.name)+' ('+v.lang+')</option>';
+      }).join('');
+}
+
+function saveTtsVoicePref(name){
+  try{ if(typeof _ylccUserKey==='function') localStorage.setItem(_ylccUserKey('tts_voice'), name||''); }catch(e){}
+}
+
+function testTtsVoice(){
+  if(!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  var utt = new SpeechSynthesisUtterance('The Lord is my shepherd. I shall not want. He restores my soul.');
+  utt.rate = 0.85;
+  var voice = _ttsSelectVoice();
+  if(voice) utt.voice = voice;
+  window.speechSynthesis.speak(utt);
 }
 
 function startMeditation(medId){
@@ -11119,7 +11202,7 @@ function _medRenderPlayer(med){
     '</div>',
     '<div style="padding:.3rem 1.1rem 1rem;flex-shrink:0;border-top:1px solid rgba(255,255,255,.05);">',
     '<div style="font-size:.55rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:.3rem;">🎵 Ambient</div>',
-    '<iframe src="https://www.youtube-nocookie.com/embed/'+med.ambientYouTube+'?autoplay=1&loop=1&playlist='+med.ambientYouTube+'&controls=1&modestbranding=1" frameborder="0" allow="autoplay;encrypted-media" style="width:100%;height:58px;border:none;border-radius:8px;display:block;"></iframe>',
+    '<iframe src="https://www.youtube-nocookie.com/embed/'+med.ambientYouTube+'?autoplay=1&loop=1&playlist='+med.ambientYouTube+'&controls=1&modestbranding=1&playsinline=1&rel=0" frameborder="0" allow="autoplay;encrypted-media" style="width:100%;height:58px;border:none;border-radius:8px;display:block;" onerror="this.src=\'https://www.youtube-nocookie.com/embed/VYXDfhgwTyM?autoplay=1&loop=1&playlist=VYXDfhgwTyM&controls=1&modestbranding=1&playsinline=1&rel=0\';if(typeof showToast===\'function\')showToast(\'Track unavailable — playing fallback\');"></iframe>',
     '</div>'
   ].join('');
 }
@@ -11132,11 +11215,11 @@ function _medPlaySegment(med, segIdx){
   if(_medSegTimer){ clearTimeout(_medSegTimer); _medSegTimer = null; }
   if(!_medPaused && 'speechSynthesis' in window){
     window.speechSynthesis.cancel();
-    var utt = new SpeechSynthesisUtterance((seg.text||'')+(seg.verse?' — '+seg.verse:''));
-    utt.rate = (typeof TTS_CONFIG!=='undefined'&&TTS_CONFIG.freeTier)?TTS_CONFIG.freeTier.rate:0.9;
-    utt.onend = function(){ _medAdvance(med); };
-    utt.onerror = function(){ _medAdvance(med); };
-    window.speechSynthesis.speak(utt);
+    var medText = (seg.text||'')+(seg.verse?' — '+seg.verse:'');
+    var medSentences = medText.match(/[^.!?]+[.!?]*/g) || [medText];
+    var medDone = false;
+    function _medTtsDone(){ if(!medDone){ medDone=true; _medAdvance(med); } }
+    _ttsSpeakSentences(medSentences, 0.85, _medTtsDone);
   }
   _medSegTimer = setTimeout(function(){ if(!_medPaused) _medAdvance(med); }, seg.duration*1000);
 }
@@ -11294,7 +11377,7 @@ function _ssRenderPlayer(story){
     '</div>',
     '<div style="padding:.35rem 1.1rem .4rem;flex-shrink:0;opacity:.22;">',
     '<div style="font-size:.52rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:.28rem;">🎵 Ambient</div>',
-    '<iframe src="https://www.youtube-nocookie.com/embed/'+story.ambientYouTube+'?autoplay=1&loop=1&playlist='+story.ambientYouTube+'&controls=1&modestbranding=1" frameborder="0" allow="autoplay;encrypted-media" style="width:100%;height:48px;border:none;border-radius:6px;display:block;"></iframe>',
+    '<iframe src="https://www.youtube-nocookie.com/embed/'+story.ambientYouTube+'?autoplay=1&loop=1&playlist='+story.ambientYouTube+'&controls=1&modestbranding=1&playsinline=1&rel=0" frameborder="0" allow="autoplay;encrypted-media" style="width:100%;height:48px;border:none;border-radius:6px;display:block;" onerror="this.src=\'https://www.youtube-nocookie.com/embed/IXsIRMmfudw?autoplay=1&loop=1&playlist=IXsIRMmfudw&controls=1&modestbranding=1&playsinline=1&rel=0\';if(typeof showToast===\'function\')showToast(\'Track unavailable — playing fallback\');"></iframe>',
     '</div>',
     '<div style="padding:.35rem 1.1rem 1rem;flex-shrink:0;display:flex;justify-content:center;gap:.55rem;opacity:.22;">',
     '<button type="button" id="ssPauseBtn" onclick="_ssTogglePause()" style="background:none;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.45);border-radius:10px;padding:.45rem 1.1rem;font-size:.78rem;cursor:pointer;font-family:var(--fm);">⏸</button>',
@@ -11321,18 +11404,29 @@ function _ssPlaySegment(story, idx){
   }, 600);
   if('speechSynthesis' in window && !_ssPaused){
     window.speechSynthesis.cancel();
-    var utt = new SpeechSynthesisUtterance(seg);
-    utt.rate = 0.75;
-    utt.volume = Math.max(0.05, _ssTtsVol);
     var storyRef = story;
     var idxRef = idx;
-    utt.onend = function(){
-      _ssSegTimer = setTimeout(function(){ if(!_ssPaused) _ssPlaySegment(storyRef,idxRef+1); }, 3000);
-    };
-    utt.onerror = function(){
-      _ssSegTimer = setTimeout(function(){ if(!_ssPaused) _ssPlaySegment(storyRef,idxRef+1); }, 3000);
-    };
-    window.speechSynthesis.speak(utt);
+    var ssSentences = seg.match(/[^.!?]+[.!?]*/g) || [seg];
+    var ssVol = Math.max(0.05, _ssTtsVol);
+    var ssOrigSpeak = window.speechSynthesis.speak.bind(window.speechSynthesis);
+    var ssIdx2 = 0;
+    function ssSpeakNext(){
+      if(ssIdx2 >= ssSentences.length){
+        _ssSegTimer = setTimeout(function(){ if(!_ssPaused) _ssPlaySegment(storyRef,idxRef+1); }, 3000);
+        return;
+      }
+      var s = ssSentences[ssIdx2++];
+      if(!s || !s.trim()){ ssSpeakNext(); return; }
+      var utt = new SpeechSynthesisUtterance(s.trim());
+      utt.rate = 0.75;
+      utt.volume = ssVol;
+      var voice = _ttsSelectVoice();
+      if(voice) utt.voice = voice;
+      utt.onend = function(){ setTimeout(ssSpeakNext, 300); };
+      utt.onerror = function(){ setTimeout(ssSpeakNext, 300); };
+      ssOrigSpeak(utt);
+    }
+    ssSpeakNext();
   }
 }
 
@@ -11477,7 +11571,7 @@ function ensureAmbientMiniPlayer(track){
     document.body.appendChild(mp);
   }
   mp.style.display = 'block';
-  var iframeSrc = 'https://www.youtube-nocookie.com/embed/'+track.youtubeId+'?autoplay=1&loop=1&playlist='+track.youtubeId+'&controls=0&modestbranding=1';
+  var iframeSrc = 'https://www.youtube-nocookie.com/embed/'+track.youtubeId+'?autoplay=1&loop=1&playlist='+track.youtubeId+'&controls=0&modestbranding=1&playsinline=1&rel=0';
   mp.innerHTML = '<div style="display:flex;align-items:center;gap:.65rem;padding:.45rem 1rem;">'
     +'<span style="font-size:.95rem;flex-shrink:0;">🎵</span>'
     +'<div style="flex:1;min-width:0;">'
@@ -11486,7 +11580,7 @@ function ensureAmbientMiniPlayer(track){
     +'</div>'
     +'<button type="button" onclick="stopAmbient()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);border-radius:8px;padding:.28rem .6rem;font-size:.72rem;cursor:pointer;font-family:var(--fm);">✕ Stop</button>'
     +'</div>'
-    +'<iframe id="ambientIframe" src="'+iframeSrc+'" frameborder="0" allow="autoplay;encrypted-media" style="width:100%;height:36px;border:none;display:block;opacity:.28;" title="Ambient audio"></iframe>';
+    +'<iframe id="ambientIframe" src="'+iframeSrc+'" frameborder="0" allow="autoplay;encrypted-media" style="width:100%;height:36px;border:none;display:block;opacity:.28;" title="Ambient audio" onerror="this.src=\'https://www.youtube-nocookie.com/embed/VYXDfhgwTyM?autoplay=1&loop=1&playlist=VYXDfhgwTyM&controls=0&modestbranding=1&playsinline=1&rel=0\';if(typeof showToast===\'function\')showToast(\'Track unavailable — playing fallback\');"></iframe>';
 }
 
 // ── Sermon Podcast Linking ─────────────────────────────────────
@@ -11516,5 +11610,5 @@ function getOptimalTTS(){
     // Falls through to free tier until ElevenLabs is configured.
   }
   if(typeof TTS_CONFIG !== 'undefined' && TTS_CONFIG.freeTier) return TTS_CONFIG.freeTier;
-  return { provider:'web-speech-api', rate:0.9, pitch:1.0, volume:1.0 };
+  return { provider:'web-speech-api', rate:0.85, pitch:1.0, volume:1.0 };
 }

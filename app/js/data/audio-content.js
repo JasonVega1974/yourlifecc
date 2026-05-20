@@ -14,7 +14,7 @@ const AUDIO_MEDITATIONS = [
     duration: 8,
     theme: 'Starting the day in God\'s presence',
     description: 'A gentle 8-minute meditation to anchor your morning in Scripture before the day begins.',
-    ambientYouTube: 'jfKfPfyJRdk', // Peaceful piano worship
+    ambientYouTube: 'VYXDfhgwTyM', // 24/7 peaceful worship piano
     scriptureFocus: 'Lamentations 3:22-23',
     segments: [
       { duration: 30, type: 'opening', text: 'Take three slow breaths. Let your body settle. God is already here with you.' },
@@ -34,7 +34,7 @@ const AUDIO_MEDITATIONS = [
     duration: 10,
     theme: 'When anxiety is loud',
     description: 'A 10-minute meditation for moments of anxiety, panic, or overwhelm.',
-    ambientYouTube: 'yJgBFCEaO-I', // Calm worship instrumental
+    ambientYouTube: 'VYXDfhgwTyM', // 24/7 peaceful worship piano
     scriptureFocus: 'Philippians 4:6-7',
     segments: [
       { duration: 60, type: 'opening', text: 'Wherever you are right now, you are safe in this moment. Take a slow breath. Hold it. Release it.' },
@@ -56,7 +56,7 @@ const AUDIO_MEDITATIONS = [
     duration: 7,
     theme: 'Training the eyes to see grace',
     description: 'A 7-minute meditation to shift your heart from striving to thankfulness.',
-    ambientYouTube: 'jfKfPfyJRdk',
+    ambientYouTube: 'VYXDfhgwTyM', // 24/7 peaceful worship piano
     scriptureFocus: 'Psalm 100',
     segments: [
       { duration: 30, type: 'opening', text: 'Settle into stillness. Notice your breath. Notice your heartbeat. Both are gifts you didn\'t earn.' },
@@ -75,7 +75,7 @@ const AUDIO_MEDITATIONS = [
     duration: 9,
     theme: 'Your identity in Christ',
     description: 'A 9-minute meditation declaring biblical truths about who you are.',
-    ambientYouTube: 'UfcAVejslrU',
+    ambientYouTube: 'VYXDfhgwTyM', // 24/7 peaceful worship piano
     scriptureFocus: 'Ephesians 1:3-14',
     segments: [
       { duration: 30, type: 'opening', text: 'Sit comfortably. Let your shoulders drop. The world has been telling you things about yourself today. Time to hear the truth.' },
@@ -96,7 +96,7 @@ const AUDIO_MEDITATIONS = [
     duration: 12,
     theme: 'Resting in God\'s finished work',
     description: 'A 12-minute meditation to enter true rest — body, mind, and spirit.',
-    ambientYouTube: 'hlWiI4xVXKY',
+    ambientYouTube: 'VYXDfhgwTyM', // 24/7 peaceful worship piano
     scriptureFocus: 'Matthew 11:28-30',
     segments: [
       { duration: 60, type: 'opening', text: 'You are not behind. You are not too much. Wherever you are right now is where God wants to meet you.' },
@@ -118,7 +118,7 @@ const AUDIO_MEDITATIONS = [
     duration: 9,
     theme: 'Hope in dark seasons',
     description: 'A 9-minute meditation for grief, loss, or seasons of waiting.',
-    ambientYouTube: 'yJgBFCEaO-I',
+    ambientYouTube: 'VYXDfhgwTyM', // 24/7 peaceful worship piano
     scriptureFocus: 'Romans 8:18-28',
     segments: [
       { duration: 30, type: 'opening', text: 'Wherever you are in this season — God sees it. He hasn\'t looked away.' },
@@ -138,7 +138,7 @@ const AUDIO_MEDITATIONS = [
     duration: 8,
     theme: 'Trust when the path is unclear',
     description: 'An 8-minute meditation for trusting God in uncertainty.',
-    ambientYouTube: 'jfKfPfyJRdk',
+    ambientYouTube: 'VYXDfhgwTyM', // 24/7 peaceful worship piano
     scriptureFocus: 'Hebrews 11:1',
     segments: [
       { duration: 30, type: 'opening', text: 'Faith doesn\'t mean you have no doubts. It means you choose trust in spite of them.' },
@@ -163,7 +163,7 @@ const SLEEP_STORIES = [
     icon: '🌙',
     duration: 15,
     description: 'Fall asleep meditating on the most beloved psalm.',
-    ambientYouTube: 'OMHe5w0CkJ8', // 8-hour piano lullaby
+    ambientYouTube: 'IXsIRMmfudw', // 24/7 sleep worship music
     fadeOutAt: 15,
     content: `The Lord is my shepherd... I shall not want. He makes me lie down in green pastures... He leads me beside still waters... He restores my soul. He leads me in paths of righteousness... for His name's sake. Even though I walk through the valley of the shadow of death... I will fear no evil... for You are with me. Your rod and Your staff... they comfort me. You prepare a table before me in the presence of my enemies. You anoint my head with oil... my cup overflows. Surely goodness and mercy shall follow me... all the days of my life. And I will dwell in the house of the Lord... forever.`,
     repeatCount: 3
@@ -174,7 +174,7 @@ const SLEEP_STORIES = [
     icon: '🌊',
     duration: 20,
     description: 'Verses of peace, repeated slowly, to quiet a busy mind.',
-    ambientYouTube: 'OMHe5w0CkJ8',
+    ambientYouTube: 'IXsIRMmfudw', // 24/7 sleep worship music
     fadeOutAt: 20,
     verses: [
       'Peace I leave with you. My peace I give to you. Not as the world gives do I give to you. Let not your hearts be troubled, neither let them be afraid. — John 14:27',
@@ -191,7 +191,7 @@ const SLEEP_STORIES = [
     icon: '💫',
     duration: 18,
     description: 'Sleep wrapped in the promises God has spoken over you.',
-    ambientYouTube: 'OMHe5w0CkJ8',
+    ambientYouTube: 'IXsIRMmfudw', // 24/7 sleep worship music
     fadeOutAt: 18,
     verses: [
       'I will never leave you nor forsake you. — Hebrews 13:5',
@@ -210,7 +210,7 @@ const SLEEP_STORIES = [
     icon: '⭐',
     duration: 20,
     description: 'Drift to sleep listening to the beginning of all things.',
-    ambientYouTube: 'OMHe5w0CkJ8',
+    ambientYouTube: 'IXsIRMmfudw', // 24/7 sleep worship music
     fadeOutAt: 20,
     content: `In the beginning, God created the heavens and the earth. The earth was without form and void, and darkness was over the face of the deep. And the Spirit of God was hovering over the face of the waters. And God said, Let there be light, and there was light. And God saw that the light was good. And God separated the light from the darkness. God called the light Day, and the darkness He called Night. And there was evening and there was morning, the first day...`,
     fullPassage: 'Genesis 1:1-31'
@@ -221,7 +221,7 @@ const SLEEP_STORIES = [
     icon: '💗',
     duration: 15,
     description: 'A gentle reminder of God\'s love as you fall asleep.',
-    ambientYouTube: 'OMHe5w0CkJ8',
+    ambientYouTube: 'IXsIRMmfudw', // 24/7 sleep worship music
     fadeOutAt: 15,
     verses: [
       'See what kind of love the Father has given to us, that we should be called children of God; and so we are. — 1 John 3:1',
@@ -237,7 +237,7 @@ const SLEEP_STORIES = [
     icon: '🤲',
     duration: 12,
     description: 'Surrender the day. Rest in safety.',
-    ambientYouTube: 'OMHe5w0CkJ8',
+    ambientYouTube: 'IXsIRMmfudw', // 24/7 sleep worship music
     fadeOutAt: 12,
     verses: [
       'Into Your hand I commit my spirit; You have redeemed me, O Lord, faithful God. — Psalm 31:5',
@@ -253,7 +253,7 @@ const SLEEP_STORIES = [
     icon: '🐑',
     duration: 16,
     description: 'Rest knowing the Shepherd is watching.',
-    ambientYouTube: 'OMHe5w0CkJ8',
+    ambientYouTube: 'IXsIRMmfudw', // 24/7 sleep worship music
     fadeOutAt: 16,
     content: `I am the good shepherd. The good shepherd lays down His life for the sheep. I am the good shepherd. I know My own and My own know Me. My sheep hear My voice, and I know them, and they follow Me. I give them eternal life, and they will never perish, and no one will snatch them out of My hand. My Father, who has given them to Me, is greater than all, and no one is able to snatch them out of the Father's hand.`,
     fullPassage: 'John 10:11-29'
@@ -268,45 +268,45 @@ const AMBIENT_LIBRARY = [
     category: 'Focus & Study',
     icon: '🎯',
     tracks: [
-      { id: 'lofi-christian', title: 'Lo-Fi Christian Hip Hop', youtubeId: '1mfYqIdWZCk', description: 'Beats for studying Scripture or homework' },
-      { id: 'piano-instrumental', title: 'Christian Piano Instrumental', youtubeId: 'GciHJpYBVZA', description: 'Soft worship piano for focus time' },
-      { id: 'hillsong-instrumental', title: 'Hillsong Instrumental', youtubeId: 'IzlNbLkE7r8', description: 'Hillsong worship without vocals' }
+      { id: 'lofi-christian', title: 'Lo-Fi Christian Hip Hop', youtubeId: 'qXPoj_VYb3U', description: 'Beats for studying Scripture or homework' },
+      { id: 'piano-instrumental', title: 'Christian Piano Instrumental', youtubeId: 'qXPoj_VYb3U', description: 'Soft worship piano for focus time' },
+      { id: 'hillsong-instrumental', title: 'Hillsong Instrumental', youtubeId: 'qXPoj_VYb3U', description: 'Hillsong worship without vocals' }
     ]
   },
   {
     category: 'Calm & Peace',
     icon: '🕊️',
     tracks: [
-      { id: 'peaceful-worship', title: 'Peaceful Worship', youtubeId: 'yJgBFCEaO-I', description: 'Soft worship for quiet moments' },
-      { id: 'nature-piano', title: 'Nature + Piano', youtubeId: 'jfKfPfyJRdk', description: 'Birds, water, gentle piano' },
-      { id: 'soaking-worship', title: 'Soaking Worship', youtubeId: 'UfcAVejslrU', description: 'Slow worship to soak in God\'s presence' }
+      { id: 'peaceful-worship', title: 'Peaceful Worship', youtubeId: 'VYXDfhgwTyM', description: 'Soft worship for quiet moments' },
+      { id: 'nature-piano', title: 'Nature + Piano', youtubeId: 'VYXDfhgwTyM', description: 'Birds, water, gentle piano' },
+      { id: 'soaking-worship', title: 'Soaking Worship', youtubeId: 'VYXDfhgwTyM', description: 'Slow worship to soak in God\'s presence' }
     ]
   },
   {
     category: 'Prayer & Meditation',
     icon: '🙏',
     tracks: [
-      { id: 'gregorian-chant', title: 'Gregorian Chant', youtubeId: 'xz3wzLBu-Qc', description: 'Ancient chants for deep prayer' },
-      { id: 'instrumental-prayer', title: 'Instrumental Prayer', youtubeId: 'GciHJpYBVZA', description: 'Background for prayer time' },
-      { id: 'spontaneous-worship', title: 'Spontaneous Worship', youtubeId: 'UfcAVejslrU', description: 'Free-flowing worship instrumental' }
+      { id: 'gregorian-chant', title: 'Gregorian Chant', youtubeId: 'VYXDfhgwTyM', description: 'Ancient chants for deep prayer' },
+      { id: 'instrumental-prayer', title: 'Instrumental Prayer', youtubeId: 'VYXDfhgwTyM', description: 'Background for prayer time' },
+      { id: 'spontaneous-worship', title: 'Spontaneous Worship', youtubeId: 'VYXDfhgwTyM', description: 'Free-flowing worship instrumental' }
     ]
   },
   {
     category: 'Sleep',
     icon: '🌙',
     tracks: [
-      { id: 'lullaby-piano', title: '8-Hour Piano Lullaby', youtubeId: 'OMHe5w0CkJ8', description: 'All-night gentle piano' },
-      { id: 'rain-worship', title: 'Rain + Worship Piano', youtubeId: 'kFE--KS5tg4', description: 'Rain sounds with soft worship' },
-      { id: 'psalms-night', title: 'Psalms Through the Night', youtubeId: 'hlWiI4xVXKY', description: 'Scripture spoken softly' }
+      { id: 'lullaby-piano', title: '8-Hour Piano Lullaby', youtubeId: 'IXsIRMmfudw', description: 'All-night gentle piano' },
+      { id: 'rain-worship', title: 'Rain + Worship Piano', youtubeId: 'IXsIRMmfudw', description: 'Rain sounds with soft worship' },
+      { id: 'psalms-night', title: 'Psalms Through the Night', youtubeId: 'IXsIRMmfudw', description: 'Scripture spoken softly' }
     ]
   },
   {
     category: 'Worship',
     icon: '🎵',
     tracks: [
-      { id: 'bethel-instrumental', title: 'Bethel Instrumental', youtubeId: 'IzlNbLkE7r8', description: 'Bethel worship without vocals' },
-      { id: 'elevation-instrumental', title: 'Elevation Worship Instrumental', youtubeId: 'GciHJpYBVZA', description: 'Elevation tracks instrumental' },
-      { id: 'piano-worship', title: 'Piano Worship', youtubeId: 'jfKfPfyJRdk', description: 'Popular worship songs on piano' }
+      { id: 'bethel-instrumental', title: 'Bethel Instrumental', youtubeId: '_QqFhkOcljI', description: 'Bethel worship without vocals' },
+      { id: 'elevation-instrumental', title: 'Elevation Worship Instrumental', youtubeId: 'vBe4Y0iyS60', description: 'Elevation tracks instrumental' },
+      { id: 'piano-worship', title: 'Piano Worship', youtubeId: '_QqFhkOcljI', description: 'Popular worship songs on piano' }
     ]
   },
   {
@@ -352,7 +352,7 @@ const TTS_CONFIG = {
   freeTier: {
     provider: 'web-speech-api',
     defaultVoice: null, // auto-selects best available
-    rate: 0.9, // slightly slower for clarity
+    rate: 0.85, // natural reading pace
     pitch: 1.0,
     volume: 1.0
   },
