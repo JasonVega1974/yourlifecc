@@ -439,7 +439,7 @@ function initScripture(){
 // the original 6 tabs. New tabs without renderers are stubs awaiting later phases.
 // btn is optional — when bfTab() is called programmatically (e.g., from a Quick
 // Tile or stub-panel CTA), the matching button is found via [data-bf-tab].
-const BF_TABS = ['home','devotional','jesus','denominations','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy','studyTools','readingPlans'];
+const BF_TABS = ['home','devotional','jesus','denominations','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy','studyTools','readingPlans','audioBible'];
 
 // Phase 5.8 v3 — Home-grid restorer. Defensive against any prior code
 // that may have set .topic-card-grid display:none inside #bf-home. The
@@ -686,6 +686,7 @@ function bfTab(tab, btn){
   if(tab==='bibleStudy') initBibleStudyTab();
   if(tab==='studyTools') renderBibleStudyCard();
   if(tab==='readingPlans') renderReadingPlansCard();
+  if(tab==='audioBible') renderAudioBibleCard();
 }
 
 // ── FAITH HOME (F2-A) ────────────────────────────────────────
@@ -1617,7 +1618,10 @@ function _planDayHtml(p, d, prog, completedArchive, todayDay){
   const keyVerseHtml = (d.keyVerse && d.keyVerse.text)
     ? '<div style="background:' + brand.soft + '0.08);border-left:3px solid ' + brand.color + ';border-radius:0 10px 10px 0;padding:.75rem .95rem;margin-bottom:.85rem;">'
         + '<div style="font-family:Georgia,serif;font-style:italic;font-size:.92rem;color:var(--tx);line-height:1.6;">' + _planEsc(d.keyVerse.text) + '</div>'
-        + '<div style="margin-top:.4rem;font-family:\'Bebas Neue\',var(--fm);font-size:.7rem;font-weight:800;letter-spacing:.14em;color:' + brand.color + ';">— ' + _planEsc(d.keyVerse.ref || '') + '</div>'
+        + '<div style="margin-top:.4rem;display:flex;align-items:center;gap:.4rem;">'
+        + '<span style="font-family:\'Bebas Neue\',var(--fm);font-size:.7rem;font-weight:800;letter-spacing:.14em;color:' + brand.color + ';flex:1;">— ' + _planEsc(d.keyVerse.ref || '') + '</span>'
+        + '<button onclick="_pdSpeakVerse(this)" style="background:none;border:1px solid rgba(255,255,255,.15);border-radius:4px;padding:.1rem .35rem;font-size:.65rem;color:var(--tx2);cursor:pointer;">🔊</button>'
+        + '</div>'
       + '</div>'
     : '';
 
@@ -5613,9 +5617,12 @@ function _lmRenderLesson(lesson){
     html += '</div>';
   });
   if(lesson.keyVerse && lesson.keyVerse.text){
-    html += '<div class="lm-keyverse">'
-         +    '<div class="lm-keyverse-text">' + _acEsc('“' + lesson.keyVerse.text + '”') + '</div>'
-         +    '<div class="lm-keyverse-ref">— ' + _acEsc(lesson.keyVerse.ref || '') + '</div>'
+    html += '<div class=”lm-keyverse”>'
+         +    '<div class=”lm-keyverse-text”>' + _acEsc('”' + lesson.keyVerse.text + '”') + '</div>'
+         +    '<div style=”display:flex;align-items:center;gap:.4rem;”>'
+         +    '<div class=”lm-keyverse-ref” style=”flex:1;”>— ' + _acEsc(lesson.keyVerse.ref || '') + '</div>'
+         +    '<button onclick=”_acSpeakVerse(this)” style=”background:none;border:1px solid rgba(255,255,255,.15);border-radius:4px;padding:.1rem .35rem;font-size:.65rem;color:var(--tx2);cursor:pointer;”>🔊</button>'
+         +    '</div>'
          +  '</div>';
   }
   if(lesson.whatThisMeans){
@@ -8910,6 +8917,7 @@ function _buildJesusWordsTab(redLetterWords){
         +'<div style="font-size:.7rem;color:#c0392b;font-weight:700;margin-bottom:.25rem;">'+_jEsc(v.ref)+'</div>'
         +'<div style="font-size:.83rem;color:#c0392b;line-height:1.6;font-style:italic;margin-bottom:.25rem;">"'+_jEsc(v.words)+'"</div>'
         +(strHtml ? '<div style="margin-top:.25rem;">'+strHtml+'</div>' : '')
+        +'<button onclick="speakVerse(this.getAttribute(\'data-words\'),this.getAttribute(\'data-ref\'))" data-ref="'+_jEsc(v.ref)+'" data-words="'+_jEsc(v.words)+'" style="margin-top:.35rem;margin-right:.35rem;font-size:.68rem;background:none;border:1px solid rgba(192,57,43,.3);border-radius:4px;padding:.1rem .4rem;color:#c0392b;cursor:pointer;">🔊</button>'
         +'<button onclick="jesusVerseCopy(this)" data-ref="'+_jEsc(v.ref)+'" data-words="'+_jEsc(v.words)+'" style="margin-top:.35rem;font-size:.68rem;background:none;border:1px solid rgba(192,57,43,.3);border-radius:4px;padding:.1rem .4rem;color:#c0392b;cursor:pointer;">Copy</button>'
         +'</div>';
     }).join('');
@@ -10137,7 +10145,10 @@ function _stShowPassage(data, origRef){
   var vHtml = verses.map(function(v){
     return '<div class="st-verse-box">'
       +'<div class="st-verse-text">'+_jEsc((v.text||'').trim())+'</div>'
-      +'<div class="st-verse-ref-lbl">'+_jEsc(v.book_name||'')+' '+_jEsc(String(v.chapter||''))+':'+_jEsc(String(v.verse||''))+'</div>'
+      +'<div style="display:flex;align-items:center;gap:.4rem;">'
+      +'<div class="st-verse-ref-lbl" style="flex:1;">'+_jEsc(v.book_name||'')+' '+_jEsc(String(v.chapter||''))+':'+_jEsc(String(v.verse||''))+'</div>'
+      +'<button onclick="_stSpeakVerse(this)" style="background:none;border:1px solid rgba(56,189,248,.2);border-radius:4px;padding:.1rem .35rem;font-size:.65rem;color:#38bdf8;cursor:pointer;">🔊</button>'
+      +'</div>'
       +'</div>';
   }).join('');
   var yvLink = 'https://www.bible.com/search/bible?q='+encodeURIComponent(origRef)+'&version_id=111';
@@ -10631,7 +10642,10 @@ function renderMoodScripture(moodId){
   var versesHtml = (moodData.verses || []).map(function(v){
     return '<div style="background:rgba(255,255,255,.04);border-left:3px solid rgba(167,139,250,.45);border-radius:0 10px 10px 0;padding:.65rem .85rem;margin-bottom:.5rem;">' +
       '<div style="font-size:.8rem;font-style:italic;line-height:1.55;color:var(--tx);margin-bottom:.25rem;">"' + escapeHtml(v.text) + '"</div>' +
-      '<div style="font-size:.65rem;font-weight:800;color:#a78bfa;letter-spacing:.06em;">' + escapeHtml(v.ref) + '</div>' +
+      '<div style="display:flex;align-items:center;gap:.4rem;">' +
+      '<div style="font-size:.65rem;font-weight:800;color:#a78bfa;letter-spacing:.06em;flex:1;">' + escapeHtml(v.ref) + '</div>' +
+      '<button onclick="_msSpeakVerse(this)" style="background:none;border:1px solid rgba(167,139,250,.3);border-radius:4px;padding:.1rem .35rem;font-size:.65rem;color:#a78bfa;cursor:pointer;">🔊</button>' +
+      '</div>' +
       '</div>';
   }).join('');
   overlay.innerHTML = '<div style="position:absolute;bottom:0;left:0;right:0;background:var(--bg2,#1a1233);border-top:1px solid rgba(255,255,255,.12);border-radius:20px 20px 0 0;padding:1.1rem 1rem 2rem;animation:slideUp .22s ease-out;max-width:520px;margin:0 auto;max-height:80vh;overflow-y:auto;">' +
@@ -10817,4 +10831,156 @@ function completePrayerSession(sessionId){
   }catch(e){}
   if(typeof showToast === 'function') showToast('Prayer session complete! 🙏');
   renderGuidedPrayerPane();
+}
+
+// ── TTS + AUDIO BIBLE — Audio Layer Worker 1 ─────────────────────────────────
+// speakVerse(): free Web Speech API for per-verse TTS.
+// renderAudioBibleCard(): 66-book dropdown that opens Bible.is for full chapters.
+
+var _ttsUtterance = null;
+var _ttsSpeaking = false;
+
+function speakVerse(text, ref){
+  if(!('speechSynthesis' in window)){
+    if(typeof showToast==='function') showToast('Text-to-speech not supported in this browser.');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  if(_ttsSpeaking){ _ttsSpeaking = false; return; }
+  var rate = (typeof TTS_CONFIG !== 'undefined' && TTS_CONFIG.freeTier) ? (TTS_CONFIG.freeTier.rate || 0.9) : 0.9;
+  _ttsUtterance = new SpeechSynthesisUtterance((ref ? ref + '. ' : '') + (text || ''));
+  _ttsUtterance.rate = rate;
+  _ttsUtterance.onstart = function(){ _ttsSpeaking = true; };
+  _ttsUtterance.onend = function(){ _ttsSpeaking = false; };
+  _ttsUtterance.onerror = function(){ _ttsSpeaking = false; };
+  window.speechSynthesis.speak(_ttsUtterance);
+}
+
+function speakVotd(){
+  var textEl = document.getElementById('fhVotdText');
+  var refEl = document.getElementById('fhVotdRef');
+  var text = textEl ? textEl.textContent.replace(/^[“"]/,'').replace(/[”"]$/,'').trim() : '';
+  var ref = refEl ? refEl.textContent.replace(/^—\s*/,'').trim() : '';
+  if(!text) return;
+  speakVerse(text, ref);
+}
+
+function updateAllSpeakButtons(speaking){
+  if(!speaking && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+}
+
+function _stSpeakVerse(btn){
+  var box = btn.closest ? btn.closest('.st-verse-box') : btn.parentNode.parentNode;
+  var textEl = box && box.querySelector('.st-verse-text');
+  var refEl = box && box.querySelector('.st-verse-ref-lbl');
+  speakVerse(textEl ? textEl.textContent.trim() : '', refEl ? refEl.textContent.trim() : '');
+}
+
+function _msSpeakVerse(btn){
+  var card = btn.closest ? btn.closest('div[style*="border-left"]') : btn.parentNode.parentNode;
+  if(!card) return;
+  var italicDiv = card.querySelector('div[style*="italic"]');
+  var refDiv = card.querySelector('div[style*="a78bfa"]');
+  var text = italicDiv ? italicDiv.textContent.replace(/^["“]|["”]$/g,'').trim() : '';
+  var ref = refDiv ? refDiv.textContent.trim() : '';
+  speakVerse(text, ref);
+}
+
+function _pdSpeakVerse(btn){
+  var card = btn.closest ? btn.closest('div[style*="border-left"]') : btn.parentNode.parentNode;
+  if(!card) return;
+  var italicDiv = card.querySelector('div[style*="italic"]');
+  var text = italicDiv ? italicDiv.textContent.trim() : '';
+  var refSpan = card.querySelector('span[style*="letter-spacing"]');
+  var ref = refSpan ? refSpan.textContent.replace(/^—\s*/,'').trim() : '';
+  speakVerse(text, ref);
+}
+
+function _acSpeakVerse(btn){
+  var card = btn.closest ? btn.closest('.lm-keyverse') : btn.parentNode.parentNode;
+  if(!card) return;
+  var textDiv = card.querySelector('.lm-keyverse-text');
+  var refDiv = card.querySelector('.lm-keyverse-ref');
+  var text = textDiv ? textDiv.textContent.replace(/^["“]|["”]$/g,'').trim() : '';
+  var ref = refDiv ? refDiv.textContent.replace(/^—\s*/,'').trim() : '';
+  speakVerse(text, ref);
+}
+
+// ── AUDIO BIBLE CARD (Worker 1) — book/chapter selector → Bible.is link-out ──
+
+var _abBooks = [
+  ['GEN','Genesis',50],['EXO','Exodus',40],['LEV','Leviticus',27],['NUM','Numbers',36],
+  ['DEU','Deuteronomy',34],['JOS','Joshua',24],['JDG','Judges',21],['RUT','Ruth',4],
+  ['1SA','1 Samuel',31],['2SA','2 Samuel',24],['1KI','1 Kings',22],['2KI','2 Kings',25],
+  ['1CH','1 Chronicles',29],['2CH','2 Chronicles',36],['EZR','Ezra',10],['NEH','Nehemiah',13],
+  ['EST','Esther',10],['JOB','Job',42],['PSA','Psalms',150],['PRO','Proverbs',31],
+  ['ECC','Ecclesiastes',12],['SOS','Song of Songs',8],['ISA','Isaiah',66],['JER','Jeremiah',52],
+  ['LAM','Lamentations',5],['EZK','Ezekiel',48],['DAN','Daniel',12],['HOS','Hosea',14],
+  ['JOL','Joel',3],['AMO','Amos',9],['OBA','Obadiah',1],['JON','Jonah',4],
+  ['MIC','Micah',7],['NAH','Nahum',3],['HAB','Habakkuk',3],['ZEP','Zephaniah',3],
+  ['HAG','Haggai',2],['ZEC','Zechariah',14],['MAL','Malachi',4],
+  ['MAT','Matthew',28],['MRK','Mark',16],['LUK','Luke',24],['JHN','John',21],
+  ['ACT','Acts',28],['ROM','Romans',16],['1CO','1 Corinthians',16],['2CO','2 Corinthians',13],
+  ['GAL','Galatians',6],['EPH','Ephesians',6],['PHP','Philippians',4],['COL','Colossians',4],
+  ['1TH','1 Thessalonians',5],['2TH','2 Thessalonians',3],['1TI','1 Timothy',6],
+  ['2TI','2 Timothy',4],['TIT','Titus',3],['PHM','Philemon',1],['HEB','Hebrews',13],
+  ['JAS','James',5],['1PE','1 Peter',5],['2PE','2 Peter',3],['1JO','1 John',5],
+  ['2JO','2 John',1],['3JO','3 John',1],['JUD','Jude',1],['REV','Revelation',22]
+];
+
+function renderAudioBibleCard(){
+  var root = document.getElementById('audioBibleRoot');
+  if(!root) return;
+  var baseUrl = (typeof BIBLE_IS_CONFIG !== 'undefined') ? BIBLE_IS_CONFIG.webBaseUrl : 'https://live.bible.is/bible/ENGNIV/';
+  var bookOpts = _abBooks.map(function(b){
+    return '<option value="'+b[0]+'" data-ch="'+b[2]+'">'+b[1]+'</option>';
+  }).join('');
+  root.innerHTML = [
+    '<div style="padding:.25rem 0 1.1rem;">',
+    '<div style="font-size:1.15rem;font-weight:900;color:var(--tx);margin-bottom:.25rem;">🔊 Audio Bible</div>',
+    '<div style="font-size:.78rem;color:var(--tx2);margin-bottom:1rem;line-height:1.55;">Listen to any chapter of the Bible — free, no app required. Powered by <a href="https://live.bible.is" target="_blank" rel="noopener" style="color:#38bdf8;text-decoration:none;">Bible.is</a>.</div>',
+    '<div style="background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.18);border-radius:14px;padding:.9rem 1rem;margin-bottom:.85rem;">',
+    '<div style="margin-bottom:.65rem;">',
+    '<label style="font-size:.67rem;font-weight:800;color:#38bdf8;text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:.3rem;">Book</label>',
+    '<select id="abBookSel" onchange="_abUpdateChMax()" style="width:100%;padding:.45rem .6rem;border-radius:9px;border:1px solid rgba(56,189,248,.22);background:var(--bg);color:var(--tx);font-size:.84rem;font-family:var(--fm);">'+bookOpts+'</select>',
+    '</div>',
+    '<div style="margin-bottom:.75rem;">',
+    '<label style="font-size:.67rem;font-weight:800;color:#38bdf8;text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:.3rem;">Chapter</label>',
+    '<div style="display:flex;align-items:center;gap:.5rem;">',
+    '<input id="abChInput" type="number" min="1" max="50" value="1" style="width:80px;padding:.45rem .6rem;border-radius:9px;border:1px solid rgba(56,189,248,.22);background:var(--bg);color:var(--tx);font-size:.9rem;font-family:var(--fm);">',
+    '<span id="abChMax" style="font-size:.7rem;color:var(--tx3);">of 50</span>',
+    '</div>',
+    '</div>',
+    '<button onclick="_abListen()" style="width:100%;padding:.6rem .9rem;border-radius:10px;background:linear-gradient(135deg,#38bdf8,#0ea5e9);border:none;color:#fff;font-size:.84rem;font-weight:900;cursor:pointer;font-family:var(--fm);letter-spacing:.02em;">▶ Listen on Bible.is</button>',
+    '</div>',
+    '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:.75rem .9rem;margin-bottom:.75rem;">',
+    '<div style="font-size:.72rem;font-weight:800;color:var(--tx2);margin-bottom:.4rem;">🎙 Per-verse listening</div>',
+    '<div style="font-size:.74rem;color:var(--tx3);line-height:1.55;">Tap the <strong style="color:var(--tx2);">🔊</strong> button on any verse in the app — Jesus words, devotionals, reading plans, and more — to hear it read aloud using your device\'s text-to-speech.</div>',
+    '</div>',
+    '<div style="text-align:center;font-size:.63rem;color:var(--tx3);line-height:1.5;">Free audio Bible by <a href="https://live.bible.is" target="_blank" rel="noopener" style="color:var(--tx2);text-decoration:none;">Faith Comes By Hearing</a> · English NIV</div>',
+    '</div>'
+  ].join('');
+  _abUpdateChMax();
+}
+
+function _abUpdateChMax(){
+  var sel = document.getElementById('abBookSel');
+  var inp = document.getElementById('abChInput');
+  var lbl = document.getElementById('abChMax');
+  if(!sel || !inp || !lbl) return;
+  var opt = sel.options[sel.selectedIndex];
+  var max = opt ? parseInt(opt.getAttribute('data-ch') || '1', 10) : 1;
+  inp.max = max;
+  lbl.textContent = 'of ' + max;
+  if(parseInt(inp.value,10) > max) inp.value = 1;
+}
+
+function _abListen(){
+  var sel = document.getElementById('abBookSel');
+  var inp = document.getElementById('abChInput');
+  if(!sel || !inp) return;
+  var code = sel.value;
+  var ch = Math.max(1, parseInt(inp.value,10) || 1);
+  var base = (typeof BIBLE_IS_CONFIG !== 'undefined') ? BIBLE_IS_CONFIG.webBaseUrl : 'https://live.bible.is/bible/ENGNIV/';
+  window.open(base + code + '/' + ch, '_blank', 'noopener');
 }

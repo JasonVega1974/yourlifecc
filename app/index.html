@@ -4640,6 +4640,7 @@
     <button class="tab" data-bf-tab="denominations" onclick="bfTab('denominations',this)">⛪ Traditions</button>
     <button class="tab" data-bf-tab="studyTools" onclick="bfTab('studyTools',this)">🔍 Study Tools</button>
     <button class="tab" data-bf-tab="readingPlans" onclick="bfTab('readingPlans',this)">📚 Reading Plans</button>
+    <button class="tab" data-bf-tab="audioBible" onclick="bfTab('audioBible',this)">🔊 Audio Bible</button>
     <button class="tab" onclick="window.location.href='/app/podcasts.html'">🎧 Podcasts</button>
     <button class="tab" onclick="window.location.href='/app/calendar.html'">📅 Faith Calendar</button>
     <button class="tab" onclick="wellGoto('worship')">🎵 Worship</button>
@@ -4691,6 +4692,7 @@
         <button onclick="_votdCopyVerse()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:var(--tx2);border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">📋 Copy</button>
         <button onclick="_votdSaveToJourney()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:var(--tx2);border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🔖 Journey</button>
         <button onclick="checkShowMoodPrompt(true)" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.25);color:#a78bfa;border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">😊 How I feel</button>
+        <button onclick="speakVotd()" style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.22);color:#fde68a;border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🔊 Listen</button>
       </div>
     </div>
     <div class="well-welcome">Welcome to The Well. Everything you need to grow in faith — stories, plans, prayer, and Scripture — is here.</div>
@@ -4883,6 +4885,11 @@
         <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(251,191,36,.22));"><img class="topic-card-hero" data-card-id="bf-stories" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/3/3f/The_Wise_Men.jpg" alt="Story Mode"></div>
         <div class="topic-card-title">Story Mode</div>
         <div class="topic-card-desc">Illustrated, narrated Bible stories</div>
+      </div>
+      <div class="topic-card accent-cyan" onclick="bfTab('audioBible')">
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(14,165,233,.12));"><img class="topic-card-hero" data-card-id="bf-audioBible" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Psalms_of_David.jpg/1280px-Psalms_of_David.jpg" alt="Audio Bible"></div>
+        <div class="topic-card-title">Audio Bible</div>
+        <div class="topic-card-desc">Listen to any chapter · 66 books</div>
       </div>
     </div>
 
@@ -7837,6 +7844,11 @@
     <div id="readingPlansRoot"></div>
   </div>
 
+  <!-- ════ Audio Bible (Audio Layer Worker 1) ════ -->
+  <div id="bf-audioBible" style="display:none;">
+    <div id="audioBibleRoot"></div>
+  </div>
+
   <!-- ════ THE WELL — bottom nav (mirrors top .scrTabs; bfTab keeps both in sync) ════ -->
   <style>
     #s-scripture .scrTabs-bottom{
@@ -7888,6 +7900,7 @@
     <button class="tab" data-bf-tab="denominations" onclick="bfTab('denominations',this)"><span class="scrtab-icon">⛪</span><span>Traditions</span></button>
     <button class="tab" data-bf-tab="studyTools" onclick="bfTab('studyTools',this)"><span class="scrtab-icon">🔍</span><span>Study Tools</span></button>
     <button class="tab" data-bf-tab="readingPlans" onclick="bfTab('readingPlans',this)"><span class="scrtab-icon">📚</span><span>Read Plans</span></button>
+    <button class="tab" data-bf-tab="audioBible" onclick="bfTab('audioBible',this)"><span class="scrtab-icon">🔊</span><span>Audio Bible</span></button>
     <button class="tab" onclick="window.location.href='/app/podcasts.html'"><span class="scrtab-icon">🎧</span><span>Podcasts</span></button>
     <button class="tab" onclick="window.location.href='/app/calendar.html'"><span class="scrtab-icon">📅</span><span>Calendar</span></button>
     <button class="tab" onclick="wellGoto('worship')"><span class="scrtab-icon">🎵</span><span>Worship</span></button>
@@ -12011,6 +12024,7 @@
 <script src="/app/js/data/denominations.js"></script>
 <script src="/app/js/data/podcasts.js"></script>
 <script src="/app/js/data/reading-plans.js"></script>
+<script src="/app/js/data/audio-content.js"></script>
 <!-- Leaflet (F3-B) — open-source map library, MIT-licensed. Only loads when used. -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
