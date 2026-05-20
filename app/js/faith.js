@@ -11270,6 +11270,7 @@ function _ttsShowDebugPanel(){
 
 var _genMedLatest = null;
 var _genMedLastParams = null;
+var _genMedLibSearchQuery = '';
 
 function _ambientForSuggestion(sug){
   var map = { calm:'VYXDfhgwTyM', worship:'_QqFhkOcljI', nature:'eKFTSSKCzWA', prayer:'VYXDfhgwTyM' };
@@ -11286,29 +11287,64 @@ function _genMedLoadLibrary(){
 
 function saveMeditationToLibrary(med){
   if(!med || !med.id) return;
+  if(med.playCount === undefined) med.playCount = 0;
+  if(med.isPublic  === undefined) med.isPublic  = false;
   try{
     var list = _genMedLoadLibrary();
     list = list.filter(function(m){ return m.id !== med.id; }); // dedupe
     list.unshift(med);
     localStorage.setItem(_genMedKey(), JSON.stringify(list.slice(0,20)));
   }catch(e){}
+  _genMedSupaUpsert(med); // fire-and-forget cloud backup
 }
 
 function _genMedBuildLibraryHtml(){
-  var saved = _genMedLoadLibrary();
-  if(!saved.length) return '';
+  var all = _genMedLoadLibrary();
+  if(!all.length) return '';
+  var q = (_genMedLibSearchQuery||'').trim().toLowerCase();
+  var saved = q ? all.filter(function(m){
+    return ((m.title||'')+(m.theme||'')+(m.scriptureFocus||'')).toLowerCase().indexOf(q) !== -1;
+  }) : all;
+
   var html = '<div id="genMedLibrary" style="margin-top:1rem;">';
-  html += '<div style="font-size:.65rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.09em;margin-bottom:.5rem;">My Meditations</div>';
+  html += '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.55rem;">';
+  html += '<div style="flex:1;font-size:.65rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.09em;">My Meditations <span style="font-weight:400;opacity:.55;">('+all.length+')</span></div>';
+  html += '</div>';
+  if(all.length > 3){
+    html += '<div style="position:relative;margin-bottom:.6rem;">';
+    html += '<input type="search" value="'+escapeHtml(_genMedLibSearchQuery)+'" oninput="_genMedSearchLibrary(this.value)" placeholder="Search title, theme, scripture…" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.4rem .75rem .4rem 2rem;font-size:.78rem;color:var(--tx);font-family:var(--fm);outline:none;" />';
+    html += '<span style="position:absolute;left:.55rem;top:50%;transform:translateY(-50%);font-size:.78rem;pointer-events:none;opacity:.45;">🔍</span>';
+    html += '</div>';
+  }
+  if(!saved.length){
+    html += '<div style="text-align:center;padding:1.2rem;color:var(--tx3);font-size:.78rem;">No meditations match your search.</div></div>';
+    return html;
+  }
   saved.forEach(function(m){
     var ago = m.generatedAt ? new Date(m.generatedAt).toLocaleDateString() : '';
-    html += '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:.6rem .85rem;margin-bottom:.4rem;display:flex;align-items:center;gap:.6rem;">';
+    var playCount = m.playCount || 0;
+    var isPublic  = m.isPublic  || false;
+    html += '<div id="genMedCard-'+m.id+'" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:.65rem .85rem;margin-bottom:.4rem;">';
+    // Title row
+    html += '<div style="display:flex;align-items:center;gap:.6rem;">';
     html += '<span style="font-size:1.35rem;flex-shrink:0;">'+(m.icon||'✨')+'</span>';
     html += '<div style="flex:1;min-width:0;">';
     html += '<div style="font-size:.84rem;font-weight:800;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+escapeHtml(m.title||'My Meditation')+'</div>';
-    html += '<div style="font-size:.66rem;color:var(--tx3);">'+(m.duration||'?')+' min · '+ago+'</div>';
+    html += '<div style="font-size:.66rem;color:var(--tx3);margin-top:.05rem;">';
+    html += escapeHtml(m.theme||m.scriptureFocus||'')+(ago?' · '+ago:'');
+    html += playCount ? ' · <span style="color:#a78bfa;">▶ '+playCount+(playCount===1?' play':' plays')+'</span>' : '';
     html += '</div>';
-    html += '<button type="button" onclick="_genMedPlaySaved(\''+_jEsc(m.id)+'\')" style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:#a78bfa;border-radius:8px;padding:.28rem .6rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);">▶</button>';
-    html += '<button type="button" onclick="_genMedDeleteSaved(\''+_jEsc(m.id)+'\',this)" style="background:none;border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.3);border-radius:8px;padding:.28rem .45rem;font-size:.66rem;cursor:pointer;font-family:var(--fm);margin-left:.3rem;" title="Delete">🗑</button>';
+    html += '</div>';
+    html += '<button type="button" onclick="_genMedPlaySaved(\''+_jEsc(m.id)+'\')" style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:#a78bfa;border-radius:8px;padding:.28rem .6rem;font-size:.74rem;font-weight:800;cursor:pointer;font-family:var(--fm);flex-shrink:0;">▶ Play</button>';
+    html += '</div>';
+    // Share + delete row
+    html += '<div style="display:flex;align-items:center;gap:.5rem;margin-top:.5rem;padding-top:.4rem;border-top:1px solid rgba(255,255,255,.05);">';
+    html += '<label style="display:flex;align-items:center;gap:.3rem;cursor:pointer;flex:1;">';
+    html += '<input type="checkbox" '+(isPublic?'checked':'')+' onchange="_genMedTogglePublic(\''+_jEsc(m.id)+'\',this.checked)" style="accent-color:#a78bfa;cursor:pointer;" />';
+    html += '<span style="font-size:.67rem;color:var(--tx3);">Share with community</span>';
+    html += '</label>';
+    html += '<button type="button" onclick="_genMedDeleteSaved(\''+_jEsc(m.id)+'\',this)" style="background:none;border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.3);border-radius:8px;padding:.22rem .4rem;font-size:.62rem;cursor:pointer;font-family:var(--fm);" title="Delete">🗑</button>';
+    html += '</div>';
     html += '</div>';
   });
   html += '</div>';
@@ -11364,8 +11400,12 @@ function renderCreateMeditationCard(){
   // Result area + library
   html += '<div id="genMedResult" style="margin-top:.75rem;"></div>';
   html += _genMedBuildLibraryHtml();
+  // Phase 4+ — community discovery feed goes here
+  html += '<div id="communityDiscoveryFeed" style="display:none;" aria-hidden="true"></div>';
   html += '</div>';
   root.innerHTML = html;
+  // Async: pull from Supabase and merge any cross-device meditations
+  setTimeout(_genMedSupaPull, 800);
 }
 
 function _genMedPickMood(btn, moodId){
@@ -11457,7 +11497,11 @@ function _genMedLaunch(){
 function _genMedPlaySaved(id){
   var saved = _genMedLoadLibrary();
   var med = saved.find(function(m){ return m.id===id; });
-  if(med) startCustomMeditation(med);
+  if(!med) return;
+  med.playCount = (med.playCount || 0) + 1;
+  try{ localStorage.setItem(_genMedKey(), JSON.stringify(saved)); }catch(e){}
+  _genMedSupaIncrementPlayCount(id);
+  startCustomMeditation(med);
 }
 
 function _genMedDeleteSaved(id, btn){
@@ -11465,8 +11509,122 @@ function _genMedDeleteSaved(id, btn){
     var list = _genMedLoadLibrary();
     localStorage.setItem(_genMedKey(), JSON.stringify(list.filter(function(m){ return m.id!==id; })));
   }catch(e){}
+  // Cloud delete (fire-and-forget)
+  if(typeof _supaUser !== 'undefined' && _supaUser && _supaUser.id){
+    var supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+    if(supa) supa.from('custom_meditations').delete().eq('user_id', _supaUser.id).eq('local_id', id).then(function(){});
+  }
   var card = btn && btn.closest ? btn.closest('div[style*="border-radius:12px"]') : null;
   if(card) card.remove();
+}
+
+function _genMedSearchLibrary(q){
+  _genMedLibSearchQuery = q || '';
+  var lib = document.getElementById('genMedLibrary');
+  if(lib) lib.outerHTML = _genMedBuildLibraryHtml();
+}
+
+function _genMedTogglePublic(id, isPublic){
+  var list = _genMedLoadLibrary();
+  var med = list.find(function(m){ return m.id === id; });
+  if(!med) return;
+  med.isPublic = !!isPublic;
+  try{ localStorage.setItem(_genMedKey(), JSON.stringify(list)); }catch(e){}
+  _genMedSupaUpsert(med);
+  if(typeof showToast === 'function') showToast(isPublic ? 'Shared with the community' : 'Meditation set to private');
+}
+
+function _genMedSupaUpsert(med){
+  if(typeof _supaUser === 'undefined' || !_supaUser || !_supaUser.id) return;
+  var supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+  if(!supa) return;
+  var row = {
+    user_id:            _supaUser.id,
+    local_id:           med.id,
+    title:              med.title || 'My Meditation',
+    theme:              med.theme || null,
+    icon:               med.icon  || null,
+    duration:           med.duration || null,
+    scripture_focus:    med.scriptureFocus || null,
+    ambient_suggestion: med.ambientSuggestion || null,
+    segments:           med.segments || [],
+    is_public:          med.isPublic  || false,
+    play_count:         med.playCount || 0
+  };
+  supa.from('custom_meditations')
+    .upsert(row, { onConflict: 'user_id,local_id' })
+    .then(function(res){
+      if(res.error) console.warn('[genMed] upsert error:', res.error.message);
+    });
+}
+
+function _genMedSupaPull(){
+  if(typeof _supaUser === 'undefined' || !_supaUser || !_supaUser.id) return;
+  var supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+  if(!supa) return;
+  supa.from('custom_meditations')
+    .select('local_id,title,theme,icon,duration,scripture_focus,ambient_suggestion,segments,is_public,play_count,created_at')
+    .eq('user_id', _supaUser.id)
+    .order('created_at', { ascending: false })
+    .limit(20)
+    .then(function(res){
+      if(res.error || !res.data || !res.data.length) return;
+      var local = _genMedLoadLibrary();
+      var changed = false;
+      res.data.forEach(function(row){
+        var loc = local.find(function(m){ return m.id === row.local_id; });
+        if(!loc){
+          // Remote-only: add to local library
+          local.push({
+            id:               row.local_id,
+            title:            row.title,
+            theme:            row.theme || '',
+            icon:             row.icon  || '✨',
+            duration:         row.duration || 10,
+            scriptureFocus:   row.scripture_focus  || '',
+            ambientSuggestion: row.ambient_suggestion || 'calm',
+            segments:         row.segments || [],
+            isPublic:         row.is_public  || false,
+            playCount:        row.play_count || 0,
+            generatedAt:      row.created_at
+          });
+          changed = true;
+        } else {
+          // Sync cloud values if they're ahead of local
+          if(row.play_count > (loc.playCount||0)){ loc.playCount = row.play_count; changed = true; }
+          if(row.is_public !== loc.isPublic){       loc.isPublic  = row.is_public;  changed = true; }
+        }
+      });
+      if(changed){
+        local.sort(function(a,b){ return new Date(b.generatedAt||0) - new Date(a.generatedAt||0); });
+        try{ localStorage.setItem(_genMedKey(), JSON.stringify(local.slice(0,20))); }catch(e){}
+        var lib = document.getElementById('genMedLibrary');
+        if(lib) lib.outerHTML = _genMedBuildLibraryHtml();
+        else {
+          var root = document.getElementById('createMeditationRoot');
+          if(root) root.insertAdjacentHTML('beforeend', _genMedBuildLibraryHtml());
+        }
+      }
+    });
+}
+
+function _genMedSupaIncrementPlayCount(id){
+  if(typeof _supaUser === 'undefined' || !_supaUser || !_supaUser.id) return;
+  var supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+  if(!supa) return;
+  supa.from('custom_meditations')
+    .select('play_count')
+    .eq('user_id', _supaUser.id)
+    .eq('local_id', id)
+    .single()
+    .then(function(res){
+      if(res.error || !res.data) return;
+      supa.from('custom_meditations')
+        .update({ play_count: (res.data.play_count||0) + 1 })
+        .eq('user_id', _supaUser.id)
+        .eq('local_id', id)
+        .then(function(){});
+    });
 }
 
 function startCustomMeditation(med){
