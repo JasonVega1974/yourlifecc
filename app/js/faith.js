@@ -5296,6 +5296,7 @@ function saveSermonNote(){
     D.scrPoints = (D.scrPoints || 0) + 5;
   }
   save();
+  _snSyncToCloud(Object.assign({}, _sermonEditingId ? D.sermonNotes.find(s => s && s.id === _sermonEditingId) : payload, {id: _sermonEditingId || payload.id}));
   if(typeof logActivity === 'function') logActivity('faith', 'Sermon: ' + (payload.title || takeaway).slice(0, 80));
   closeSermonNote();
   renderSermonNotes();
@@ -5311,6 +5312,39 @@ function deleteSermonNote(){
   closeSermonNote();
   renderSermonNotes();
   showToast('Sermon deleted');
+}
+
+function _snSyncToCloud(note){
+  try{
+    var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
+    var uid = (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.id) ? _supaUser.id : null;
+    if(!sb || !uid || !note) return;
+    sb.from('sermon_notes').upsert({
+      user_id: uid, note_date: note.date || new Date().toISOString().slice(0,10),
+      church_name: note.church || null, pastor_name: note.speaker || null,
+      sermon_title: note.title || null, scripture_ref: note.scriptures || null,
+      notes: note.notes || null, key_verse: note.takeaway || null,
+      action_this_week: note.actionStep || null,
+      updated_at: new Date().toISOString()
+    }, {onConflict: 'user_id,note_date'}).then(function(){});
+  }catch(e){}
+}
+
+function exportSermonNote(id){
+  const note = (D.sermonNotes || []).find(s => s && s.id === id);
+  if(!note) return;
+  const parts = [
+    note.date ? '📅 ' + note.date : '',
+    note.church ? '⛪ ' + note.church : '',
+    note.speaker ? '👤 ' + note.speaker : '',
+    note.title ? '"' + note.title + '"' : '',
+    note.scriptures ? '📖 ' + note.scriptures : '',
+    note.takeaway ? '\n⭐ Takeaway: ' + note.takeaway : '',
+    note.notes ? '\n📝 Notes: ' + note.notes : '',
+    note.actionStep ? '\n🎯 This week: ' + note.actionStep : '',
+  ].filter(Boolean);
+  const text = parts.join(' · ').replace(' · \n', '\n');
+  if(navigator.clipboard){ navigator.clipboard.writeText(text).then(function(){ showToast('Copied to clipboard!'); }); }
 }
 
 function renderSermonNotes(){
@@ -5344,6 +5378,7 @@ function renderSermonNotes(){
           <span>${s.date || ''}</span>
           ${ref ? '<span>·</span><span>'+escapeHtml(ref)+'</span>' : ''}
           ${s.title ? '<span>·</span><span style="color:var(--tx);text-transform:none;letter-spacing:0;font-weight:600;">'+escapeHtml(s.title)+'</span>' : ''}
+          <span onclick="event.stopPropagation();exportSermonNote(${s.id})" style="margin-left:auto;cursor:pointer;opacity:.6;font-size:.7rem;" title="Copy to clipboard">📋</span>
         </div>
         <div style="font-size:.85rem;line-height:1.5;color:var(--tx);font-weight:600;margin-bottom:${s.scriptures||s.actionStep?'.3rem':'0'};">⭐ ${escapeHtml(s.takeaway || '')}</div>
         ${s.scriptures ? '<div style="font-size:.7rem;color:#a78bfa;font-weight:700;margin-bottom:.2rem;">📖 '+escapeHtml(s.scriptures)+'</div>' : ''}
