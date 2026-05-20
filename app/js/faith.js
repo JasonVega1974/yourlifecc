@@ -698,9 +698,11 @@ function renderFaithHome(){
   try {
     const s = getTodayScripture();
     const dEl = document.getElementById('fhVotdDay'); if(dEl) dEl.textContent = s.day;
-    const tEl = document.getElementById('fhVotdText'); if(tEl) tEl.textContent = '“' + s.text + '”';
+    const tEl = document.getElementById('fhVotdText'); if(tEl) tEl.textContent = '”' + s.text + '”';
     const rEl = document.getElementById('fhVotdRef'); if(rEl) rEl.textContent = '— ' + s.ref;
   } catch(e){ /* DAILY_SCRIPTURES not loaded — leave placeholder */ }
+  // Worker 2 — AI reflection below VOTD (cached per user per day)
+  if(typeof renderVotdAiReflection === 'function') renderVotdAiReflection();
 
   // Card 2 — Today's Devotional preview
   try {
@@ -840,6 +842,9 @@ function renderFaithHome(){
 
   // Engagement Loop — reading plan streak banner above topic grid
   if(typeof renderRpStreakBanner === 'function') renderRpStreakBanner();
+
+  // Worker 2 — Mood check-in (once per day, internal gate in checkShowMoodPrompt)
+  if(typeof checkShowMoodPrompt === 'function') checkShowMoodPrompt();
 
   // F2-H: Family Verse of the Week (only when family profiles exist).
   const fvEl = document.getElementById('fhFamilyVerseCard');
@@ -10437,4 +10442,180 @@ function _rpPreviewNext(planId, currentDay){
   prog.currentDay = Math.min(currentDay + 1, plan.days);
   _rpSaveProgress(planId, prog);
   _rpOpenDay(planId);
+}
+
+// ── VOTD AI REFLECTION + MOOD CHECK-IN — Engagement Loop Worker 2 ─────────────
+// VOTD: fetches a 2-sentence Claude reflection for today's verse once per day,
+// caches in localStorage, renders into #votdAiBlock in the well-votd strip.
+// Mood: once-per-day bottom sheet → scripture view keyed to MOOD_SCRIPTURE data.
+
+function renderVotdAiReflection(){
+  var block = document.getElementById('votdAiBlock');
+  if(!block) return;
+  var cacheKey = _ylccUserKey('ylcc_votd_' + new Date().toDateString());
+  var cached = null;
+  try{ var r = localStorage.getItem(cacheKey); cached = r ? JSON.parse(r) : null; }catch(e){}
+  if(cached && cached.text){ _votdShowReflection(cached.text, block); return; }
+  var s = null;
+  try{ s = getTodayScripture(); }catch(e){}
+  if(!s || !s.text) return;
+  var streak = (typeof _rpBestStreak === 'function') ? _rpBestStreak() : 0;
+  block.style.display = '';
+  block.innerHTML = '<div style="font-size:.68rem;color:rgba(255,255,255,.38);font-style:italic;padding:.1rem 0;">Getting reflection…</div>';
+  fetch('/api/ai-summary', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      mode: 'votd-reflection',
+      prompt: 'Verse: ' + s.ref + ' — "' + s.text + '"\nStreak: ' + streak + ' days reading'
+    })
+  }).then(function(r){ return r.json(); }).then(function(data){
+    var text = (data && data.text) ? data.text.trim() : '';
+    if(text){
+      try{ localStorage.setItem(cacheKey, JSON.stringify({text: text})); }catch(e){}
+      _votdShowReflection(text, block);
+    } else {
+      block.style.display = 'none';
+    }
+  }).catch(function(){ block.style.display = 'none'; });
+}
+
+function _votdShowReflection(text, block){
+  if(!block) block = document.getElementById('votdAiBlock');
+  if(!block) return;
+  block.style.display = '';
+  block.innerHTML = '<div style="font-size:.56rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:.25rem;">✦ Reflection</div>' +
+    '<div style="font-size:.78rem;line-height:1.6;opacity:.82;">' + escapeHtml(text) + '</div>';
+}
+
+function _votdCopyVerse(){
+  var s = null;
+  try{ s = getTodayScripture(); }catch(e){}
+  if(!s) return;
+  var txt = '"' + s.text + '" — ' + s.ref;
+  if(navigator.clipboard){ navigator.clipboard.writeText(txt).then(function(){ if(typeof showToast==='function') showToast('Verse copied!'); }); }
+}
+
+function _votdSaveToJourney(){
+  var s = null;
+  try{ s = getTodayScripture(); }catch(e){}
+  if(!s) return;
+  var key = (typeof _ylccUserKey === 'function') ? _ylccUserKey('ylcc_fj_manual') : 'ylcc_fj_manual_local';
+  try{
+    var notes = JSON.parse(localStorage.getItem(key) || '[]');
+    notes.unshift({ id: Date.now(), date: new Date().toISOString().slice(0,10), type:'verse', ref: s.ref, text: s.text, source:'votd' });
+    localStorage.setItem(key, JSON.stringify(notes.slice(0,200)));
+    if(typeof showToast==='function') showToast('Saved to Faith Journey!');
+  }catch(e){}
+}
+
+// ── MOOD CHECK-IN ─────────────────────────────────────────────────────────────
+
+var MOOD_TO_PRAYER = { grateful:'gratitude', anxious:'anxiety', sad:'anxiety', angry:'morning', lost:'fasting' };
+
+function _moodKey(suffix){
+  var uid = (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.id) ? _supaUser.id : 'anon';
+  return 'ylcc_mood_' + uid + '_' + suffix;
+}
+
+// checkShowMoodPrompt(force) — pass force=true from the "How I feel" button to always show.
+// Without force: gates on once-per-day + skip count <= 3 logic.
+function checkShowMoodPrompt(force){
+  if(force){ renderMoodPicker(); return; }
+  var today = new Date().toDateString();
+  try{
+    if(localStorage.getItem(_moodKey('last_shown')) === today) return;
+    var skipCount = parseInt(localStorage.getItem(_moodKey('skip_count')) || '0', 10);
+    if(skipCount >= 3){
+      var skipDate = localStorage.getItem(_moodKey('skip_date'));
+      if(skipDate){
+        var daysSince = Math.floor((Date.now() - new Date(skipDate).getTime()) / 86400000);
+        if(daysSince < 7) return;
+        localStorage.removeItem(_moodKey('skip_count'));
+        localStorage.removeItem(_moodKey('skip_date'));
+      }
+    }
+  }catch(e){ return; }
+  setTimeout(function(){ renderMoodPicker(); }, 900);
+}
+
+function renderMoodPicker(){
+  var overlay = document.getElementById('moodCheckInOverlay');
+  if(!overlay) return;
+  var btns = ['grateful','anxious','sad','angry','lost'].map(function(id){
+    var map = {grateful:{e:'😊',l:'Grateful'},anxious:{e:'😟',l:'Anxious'},sad:{e:'😔',l:'Sad'},angry:{e:'😤',l:'Frustrated'},lost:{e:'😶',l:'Lost'}};
+    var m = map[id];
+    return '<button onclick="selectMood(\'' + id + '\')" style="background:none;border:2px solid rgba(255,255,255,.1);border-radius:14px;padding:.5rem .55rem;cursor:pointer;font-family:var(--fm);display:flex;flex-direction:column;align-items:center;gap:.25rem;min-width:3rem;transition:border-color .15s;" ' +
+      'onmouseover="this.style.borderColor=\'rgba(167,139,250,.5)\'" onmouseout="this.style.borderColor=\'rgba(255,255,255,.1)\'">' +
+      '<span style="font-size:1.8rem;">' + m.e + '</span>' +
+      '<span style="font-size:.6rem;font-weight:700;color:var(--tx2);">' + m.l + '</span>' +
+      '</button>';
+  }).join('');
+  overlay.innerHTML = '<div style="position:absolute;bottom:0;left:0;right:0;background:var(--bg2,#1a1233);border-top:1px solid rgba(255,255,255,.12);border-radius:20px 20px 0 0;padding:1.1rem 1rem 2rem;animation:slideUp .22s ease-out;max-width:520px;margin:0 auto;">' +
+    '<div style="width:36px;height:4px;background:rgba(255,255,255,.18);border-radius:2px;margin:0 auto .9rem;"></div>' +
+    '<div style="font-size:.85rem;font-weight:800;color:var(--tx);margin-bottom:.85rem;text-align:center;">How are you feeling today?</div>' +
+    '<div style="display:flex;justify-content:center;gap:.7rem;margin-bottom:1rem;flex-wrap:wrap;">' + btns + '</div>' +
+    '<div style="text-align:center;"><button onclick="_moodSkip()" style="background:none;border:none;color:var(--tx2);font-size:.72rem;cursor:pointer;font-family:var(--fm);padding:.3rem .6rem;">Skip for today</button></div>' +
+    '</div>';
+  overlay.style.display = 'block';
+}
+
+function selectMood(moodId){
+  saveMoodLog(moodId);
+  try{
+    localStorage.setItem(_moodKey('last_shown'), new Date().toDateString());
+    localStorage.removeItem(_moodKey('skip_count'));
+    localStorage.removeItem(_moodKey('skip_date'));
+  }catch(e){}
+  renderMoodScripture(moodId);
+}
+
+function _moodSkip(){
+  try{
+    localStorage.setItem(_moodKey('last_shown'), new Date().toDateString());
+    var count = parseInt(localStorage.getItem(_moodKey('skip_count')) || '0', 10) + 1;
+    localStorage.setItem(_moodKey('skip_count'), String(count));
+    if(count === 1) localStorage.setItem(_moodKey('skip_date'), new Date().toDateString());
+  }catch(e){}
+  _moodClose();
+}
+
+function _moodClose(){
+  var overlay = document.getElementById('moodCheckInOverlay');
+  if(overlay){ overlay.style.display = 'none'; overlay.innerHTML = ''; }
+}
+
+function renderMoodScripture(moodId){
+  if(typeof MOOD_SCRIPTURE === 'undefined'){ _moodClose(); return; }
+  var moodData = MOOD_SCRIPTURE[moodId];
+  if(!moodData){ _moodClose(); return; }
+  var overlay = document.getElementById('moodCheckInOverlay');
+  if(!overlay) return;
+  var prayerSessionId = (MOOD_TO_PRAYER[moodId] || 'morning');
+  var versesHtml = (moodData.verses || []).map(function(v){
+    return '<div style="background:rgba(255,255,255,.04);border-left:3px solid rgba(167,139,250,.45);border-radius:0 10px 10px 0;padding:.65rem .85rem;margin-bottom:.5rem;">' +
+      '<div style="font-size:.8rem;font-style:italic;line-height:1.55;color:var(--tx);margin-bottom:.25rem;">"' + escapeHtml(v.text) + '"</div>' +
+      '<div style="font-size:.65rem;font-weight:800;color:#a78bfa;letter-spacing:.06em;">' + escapeHtml(v.ref) + '</div>' +
+      '</div>';
+  }).join('');
+  overlay.innerHTML = '<div style="position:absolute;bottom:0;left:0;right:0;background:var(--bg2,#1a1233);border-top:1px solid rgba(255,255,255,.12);border-radius:20px 20px 0 0;padding:1.1rem 1rem 2rem;animation:slideUp .22s ease-out;max-width:520px;margin:0 auto;max-height:80vh;overflow-y:auto;">' +
+    '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.85rem;">' +
+    '<button onclick="_moodClose()" style="background:none;border:none;color:var(--tx2);font-size:.95rem;cursor:pointer;padding:.2rem .3rem;font-family:var(--fm);">← Back</button>' +
+    '<div style="flex:1;font-size:.82rem;font-weight:800;color:var(--tx);">You\'re feeling <span style="color:#a78bfa;">' + escapeHtml(moodData.label || moodId) + '</span> today</div>' +
+    '</div>' +
+    '<div style="font-size:.7rem;color:var(--tx2);font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.55rem;">Here\'s what God says:</div>' +
+    versesHtml +
+    '<div style="margin-top:.75rem;"><button onclick="if(typeof startPrayerSession===\'function\')startPrayerSession(\'' + prayerSessionId + '\');else bfTab(\'prayer\');_moodClose();" ' +
+    'style="width:100%;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.35);color:#a78bfa;border-radius:12px;padding:.6rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🙏 Pray about this</button></div>' +
+    '</div>';
+  overlay.style.display = 'block';
+}
+
+function saveMoodLog(moodId){
+  try{
+    var key = _moodKey('log');
+    var log = JSON.parse(localStorage.getItem(key) || '[]');
+    log.unshift({ date: new Date().toISOString().slice(0,10), mood: moodId });
+    localStorage.setItem(key, JSON.stringify(log.slice(0,365)));
+  }catch(e){}
 }

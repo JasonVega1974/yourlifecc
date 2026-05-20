@@ -4686,6 +4686,12 @@
       <div class="well-votd-eye">Verse of the Day · Day <span id="fhVotdDay">—</span></div>
       <div class="well-votd-text" id="fhVotdText">Loading today's verse…</div>
       <div class="well-votd-ref" id="fhVotdRef">— …</div>
+      <div id="votdAiBlock" style="display:none;margin-top:.45rem;border-top:1px solid rgba(255,255,255,.1);padding-top:.4rem;"></div>
+      <div style="display:flex;gap:.35rem;margin-top:.5rem;flex-wrap:wrap;">
+        <button onclick="_votdCopyVerse()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:var(--tx2);border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">📋 Copy</button>
+        <button onclick="_votdSaveToJourney()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:var(--tx2);border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🔖 Journey</button>
+        <button onclick="checkShowMoodPrompt(true)" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.25);color:#a78bfa;border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">😊 How I feel</button>
+      </div>
     </div>
     <div class="well-welcome">Welcome to The Well. Everything you need to grow in faith — stories, plans, prayer, and Scripture — is here.</div>
 
@@ -7883,6 +7889,10 @@
     <button class="tab" onclick="wellGoto('worship')"><span class="scrtab-icon">🎵</span><span>Worship</span></button>
     <button class="tab" onclick="wellGoto('flashcards')"><span class="scrtab-icon">📇</span><span>Flashcards</span></button>
   </div>
+
+  <!-- Mood check-in bottom sheet overlay (Worker 2) -->
+  <style>@keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}</style>
+  <div id="moodCheckInOverlay" style="display:none;position:fixed;inset:0;z-index:9090;background:rgba(0,0,0,.45);" onclick="if(event.target===this)_moodClose()"></div>
 </section>
 
 <!-- ════ WORSHIP PLAYLIST (F1.0) ════ -->
