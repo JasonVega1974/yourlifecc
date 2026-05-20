@@ -4639,6 +4639,7 @@
     <button class="tab" data-bf-tab="jesus" onclick="bfTab('jesus',this)">✝️ Who Is Jesus</button>
     <button class="tab" data-bf-tab="denominations" onclick="bfTab('denominations',this)">⛪ Traditions</button>
     <button class="tab" data-bf-tab="studyTools" onclick="bfTab('studyTools',this)">🔍 Study Tools</button>
+    <button class="tab" data-bf-tab="readingPlans" onclick="bfTab('readingPlans',this)">📚 Reading Plans</button>
     <button class="tab" onclick="window.location.href='/app/podcasts.html'">🎧 Podcasts</button>
     <button class="tab" onclick="window.location.href='/app/calendar.html'">📅 Faith Calendar</button>
     <button class="tab" onclick="wellGoto('worship')">🎵 Worship</button>
@@ -4756,10 +4757,23 @@
       <div id="fhFamilyVerseRef" style="font-family:'Bebas Neue',var(--fm);font-size:.78rem;letter-spacing:.16em;font-weight:700;color:rgba(251,191,36,.75);">— …</div>
     </div>
 
+    <!-- Reading Plans streak banner — shown/hidden by renderRpStreakBanner() -->
+    <div id="rpStreakBanner" style="display:none;background:linear-gradient(135deg,rgba(16,185,129,.18),rgba(5,150,105,.10));border:1px solid rgba(16,185,129,.3);border-radius:12px;padding:.75rem 1rem;margin-bottom:.85rem;cursor:pointer;align-items:center;gap:.55rem;" onclick="bfTab('readingPlans')">
+      <span style="font-size:1.3rem;">🔥</span>
+      <span id="rpStreakBannerText" style="font-size:.85rem;font-weight:800;color:#6ee7b7;flex:1;"></span>
+      <span style="font-size:.8rem;color:rgba(110,231,183,.6);">→</span>
+    </div>
+
     <!-- Quick-access bar: Podcasts + Calendar external pages -->
     <div style="display:flex;gap:.5rem;margin-bottom:.85rem;">
       <a href="/app/podcasts.html" style="flex:1;display:flex;align-items:center;justify-content:center;gap:.35rem;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);border-radius:10px;padding:.48rem .7rem;text-decoration:none;color:var(--tx);font-size:.8rem;font-weight:800;transition:background .12s;" onmouseover="this.style.background='rgba(56,189,248,.15)'" onmouseout="this.style.background='rgba(56,189,248,.08)'">🎧 <span>Podcasts</span></a>
       <a href="/app/calendar.html" style="flex:1;display:flex;align-items:center;justify-content:center;gap:.35rem;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:.48rem .7rem;text-decoration:none;color:var(--tx);font-size:.8rem;font-weight:800;transition:background .12s;" onmouseover="this.style.background='rgba(16,185,129,.15)'" onmouseout="this.style.background='rgba(16,185,129,.08)'">📅 <span>Faith Calendar</span></a>
+    </div>
+
+    <!-- Active Reading Plan card — populated by renderFaithHome() via fhActivePlan() -->
+    <div id="fhPlanCard" class="fh-card" style="margin-bottom:.85rem;">
+      <div class="fh-card-hdr"><span>📚</span> Active Reading Plan <span class="fh-card-sub" onclick="bfTab('readingPlans')" style="cursor:pointer;">Browse →</span></div>
+      <div id="fhPlanBody"><div class="fh-plan-empty">No plan started yet. Choose from 5 reading plans.</div><button class="fh-btn" onclick="bfTab('readingPlans')">Browse Plans →</button></div>
     </div>
 
     <!-- Phase 5.8 — Card-grid navigation. Every The Well sub-section
@@ -4843,6 +4857,11 @@
         <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(14,165,233,.12));"><img class="topic-card-hero" data-card-id="bf-studyTools" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Aleppo_Codex_%28Deut%29.jpg/1280px-Aleppo_Codex_%28Deut%29.jpg" alt="Study Tools"></div>
         <div class="topic-card-title">Study Tools</div>
         <div class="topic-card-desc">Strong's · cross refs · passage · notes</div>
+      </div>
+      <div class="topic-card accent-green" onclick="bfTab('readingPlans')">
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(16,185,129,.22),rgba(5,150,105,.12));"><img class="topic-card-hero" data-card-id="bf-readingPlans" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Biblio2.jpg/1280px-Biblio2.jpg" alt="Bible Reading Plans"></div>
+        <div class="topic-card-title">Reading Plans</div>
+        <div class="topic-card-desc">3-day · 7-day · 30-day · 90-day · 365-day</div>
       </div>
       <div class="topic-card" style="--accent-light:rgba(56,189,248,.22)" onclick="window.location.href='/app/podcasts.html'">
         <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(99,102,241,.15));"><img class="topic-card-hero" data-card-id="bf-podcasts" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Shure_mikrofon_55S.jpg/1280px-Shure_mikrofon_55S.jpg" alt="Podcasts"></div>
@@ -7799,6 +7818,15 @@
     <div id="studyToolsRoot"></div>
   </div>
 
+  <!-- ════ Reading Plans (Engagement Loop Worker 1) ════ -->
+  <div id="bf-readingPlans" style="display:none;">
+    <style>
+      .rp-btn{background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.55rem .95rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);}
+      .rp-btn:hover{filter:brightness(1.1);}
+    </style>
+    <div id="readingPlansRoot"></div>
+  </div>
+
   <!-- ════ THE WELL — bottom nav (mirrors top .scrTabs; bfTab keeps both in sync) ════ -->
   <style>
     #s-scripture .scrTabs-bottom{
@@ -7849,6 +7877,7 @@
     <button class="tab" data-bf-tab="jesus" onclick="bfTab('jesus',this)"><span class="scrtab-icon">✝️</span><span>Jesus</span></button>
     <button class="tab" data-bf-tab="denominations" onclick="bfTab('denominations',this)"><span class="scrtab-icon">⛪</span><span>Traditions</span></button>
     <button class="tab" data-bf-tab="studyTools" onclick="bfTab('studyTools',this)"><span class="scrtab-icon">🔍</span><span>Study Tools</span></button>
+    <button class="tab" data-bf-tab="readingPlans" onclick="bfTab('readingPlans',this)"><span class="scrtab-icon">📚</span><span>Read Plans</span></button>
     <button class="tab" onclick="window.location.href='/app/podcasts.html'"><span class="scrtab-icon">🎧</span><span>Podcasts</span></button>
     <button class="tab" onclick="window.location.href='/app/calendar.html'"><span class="scrtab-icon">📅</span><span>Calendar</span></button>
     <button class="tab" onclick="wellGoto('worship')"><span class="scrtab-icon">🎵</span><span>Worship</span></button>
@@ -11967,6 +11996,7 @@
 <script src="/app/js/data/jesus-data.js"></script>
 <script src="/app/js/data/denominations.js"></script>
 <script src="/app/js/data/podcasts.js"></script>
+<script src="/app/js/data/reading-plans.js"></script>
 <!-- Leaflet (F3-B) — open-source map library, MIT-licensed. Only loads when used. -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>

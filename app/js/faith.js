@@ -439,7 +439,7 @@ function initScripture(){
 // the original 6 tabs. New tabs without renderers are stubs awaiting later phases.
 // btn is optional — when bfTab() is called programmatically (e.g., from a Quick
 // Tile or stub-panel CTA), the matching button is found via [data-bf-tab].
-const BF_TABS = ['home','devotional','jesus','denominations','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy','studyTools'];
+const BF_TABS = ['home','devotional','jesus','denominations','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy','studyTools','readingPlans'];
 
 // Phase 5.8 v3 — Home-grid restorer. Defensive against any prior code
 // that may have set .topic-card-grid display:none inside #bf-home. The
@@ -685,6 +685,7 @@ function bfTab(tab, btn){
   if(tab==='proofProphecy') renderProofProphecy();
   if(tab==='bibleStudy') initBibleStudyTab();
   if(tab==='studyTools') renderBibleStudyCard();
+  if(tab==='readingPlans') renderReadingPlansCard();
 }
 
 // ── FAITH HOME (F2-A) ────────────────────────────────────────
@@ -836,6 +837,9 @@ function renderFaithHome(){
 
   // Phase 4A: Featured content card (admin-scheduled, today's entry)
   renderFeaturedContentCard();
+
+  // Engagement Loop — reading plan streak banner above topic grid
+  if(typeof renderRpStreakBanner === 'function') renderRpStreakBanner();
 
   // F2-H: Family Verse of the Week (only when family profiles exist).
   const fvEl = document.getElementById('fhFamilyVerseCard');
@@ -1667,6 +1671,11 @@ function _planDayHtml(p, d, prog, completedArchive, todayDay){
 }
 
 function openPlanDetail(planId){
+  if(typeof READING_PLANS !== 'undefined' && READING_PLANS.some(function(p){return p.id===planId;})){
+    bfTab('readingPlans');
+    setTimeout(function(){ _rpOpenDay(planId); }, 60);
+    return;
+  }
   const p = planById(planId);
   if(!p){ showToast('Plan not found'); return; }
   const store = planStore();
@@ -10173,4 +10182,259 @@ function _stNoteFromPassage(ref){
     var ta = document.getElementById('stNoteText');
     if(ta) ta.focus();
   }, 60);
+}
+
+// ── READING PLANS — Engagement Loop Worker 1 ─────────────────────────────────
+// Data: READING_PLANS, MOOD_SCRIPTURE, PRAYER_SESSIONS from app/js/data/reading-plans.js
+// Storage: per-user localStorage keys via _rpKey() — survives cloudLoad overwrites.
+// Supabase sync: fire-and-forget on markComplete (migration in docs/migrations/engagement-loop.sql).
+
+function _rpKey(suffix){
+  var uid = (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.id) ? _supaUser.id : 'anon';
+  return 'ylcc_rp_' + uid + '_' + suffix;
+}
+
+function _rpGetProgress(planId){
+  try { var r = localStorage.getItem(_rpKey('prog_' + planId)); return r ? JSON.parse(r) : null; } catch(e){ return null; }
+}
+
+function _rpSaveProgress(planId, prog){
+  try { localStorage.setItem(_rpKey('prog_' + planId), JSON.stringify(prog)); } catch(e){}
+  // Fire-and-forget Supabase sync (non-blocking)
+  _rpSyncToCloud(planId, prog);
+}
+
+function _rpSyncToCloud(planId, prog){
+  try {
+    var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
+    var uid = (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.id) ? _supaUser.id : null;
+    if(!sb || !uid) return;
+    sb.from('reading_plan_progress').upsert({
+      user_id: uid, plan_id: planId,
+      current_day: prog.currentDay || 1,
+      started_date: prog.startedDate || new Date().toISOString().slice(0,10),
+      last_read_date: prog.lastReadDate || null,
+      completed_days: prog.completedDays || [],
+      streak: prog.streak || 0,
+      longest_streak: prog.longestStreak || 0,
+      completed: prog.completed || false,
+      updated_at: new Date().toISOString()
+    }, {onConflict: 'user_id,plan_id'}).then(function(){});
+  } catch(e){}
+}
+
+function _rpCalculateStreak(completedDays, lastReadDate){
+  if(!completedDays || !completedDays.length || !lastReadDate) return 0;
+  var today = new Date().toISOString().slice(0,10);
+  var yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+  if(lastReadDate !== today && lastReadDate !== yesterday) return 0;
+  var sorted = completedDays.slice().sort(function(a,b){ return b - a; });
+  var streak = 1;
+  for(var i = 1; i < sorted.length; i++){
+    if(sorted[i] === sorted[i-1] - 1) streak++;
+    else break;
+  }
+  return streak;
+}
+
+function _rpBestStreak(){
+  if(typeof READING_PLANS === 'undefined') return 0;
+  var best = 0;
+  READING_PLANS.forEach(function(p){
+    var prog = _rpGetProgress(p.id);
+    if(!prog) return;
+    var s = _rpCalculateStreak(prog.completedDays || [], prog.lastReadDate || '');
+    if(s > best) best = s;
+  });
+  return best;
+}
+
+function renderRpStreakBanner(){
+  var banner = document.getElementById('rpStreakBanner');
+  if(!banner) return;
+  var streak = _rpBestStreak();
+  if(streak < 1){ banner.style.display = 'none'; return; }
+  banner.style.display = 'flex';
+  var txt = document.getElementById('rpStreakBannerText');
+  if(txt) txt.textContent = streak + (streak === 1 ? ' day' : ' days') + ' reading streak — keep it going!';
+}
+
+// Returns active plan data shaped for renderFaithHome Card 3 fhPlanBody
+function fhActivePlan(){
+  if(typeof READING_PLANS === 'undefined') return null;
+  var best = null, bestDate = '';
+  READING_PLANS.forEach(function(p){
+    var prog = _rpGetProgress(p.id);
+    if(!prog || prog.completed) return;
+    if(!best || (prog.lastReadDate || '') >= bestDate){
+      best = {plan: p, prog: prog};
+      bestDate = prog.lastReadDate || '';
+    }
+  });
+  if(!best) return null;
+  var p = best.plan, prog = best.prog;
+  return {
+    plan: { id: p.id, title: p.title, badgeIcon: p.icon, brandColor: '#10b981', daysData: [] },
+    prog: { currentDay: Math.min(prog.currentDay || 1, p.days), totalDays: p.days }
+  };
+}
+
+function renderReadingPlansCard(){
+  var root = document.getElementById('readingPlansRoot');
+  if(!root) return;
+  if(typeof READING_PLANS === 'undefined'){
+    root.innerHTML = '<div style="color:var(--tx2);padding:1rem;">Reading plans loading…</div>';
+    return;
+  }
+  var DIFF_LABELS = {beginner:'✦ Beginner', intermediate:'✦✦ Intermediate', advanced:'✦✦✦ Advanced'};
+  var DIFF_COLORS = {beginner:'#10b981', intermediate:'#38bdf8', advanced:'#a78bfa'};
+
+  var activePlans = [];
+  READING_PLANS.forEach(function(p){
+    var prog = _rpGetProgress(p.id);
+    if(prog && !prog.completed) activePlans.push({plan:p, prog:prog});
+  });
+
+  var html = '<div style="padding:.2rem 0 1rem;">';
+  html += '<div class="bf-section-hdr"><div class="bf-eyebrow">SCRIPTURE · GROWTH · CONSISTENCY</div><div class="bf-title">Reading Plans</div><div class="bf-sub">Choose a plan and read through Scripture day by day. Track your streak.</div></div>';
+
+  if(activePlans.length){
+    html += '<div style="margin-bottom:1.2rem;"><div style="font-size:.63rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#38bdf8;margin-bottom:.6rem;">ACTIVE PLANS</div>';
+    activePlans.forEach(function(item){
+      var p = item.plan, prog = item.prog;
+      var pct = Math.round(((prog.currentDay - 1) / p.days) * 100);
+      var streak = _rpCalculateStreak(prog.completedDays || [], prog.lastReadDate || '');
+      html += '<div style="background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.2);border-radius:14px;padding:1rem;margin-bottom:.65rem;cursor:pointer;" onclick="_rpOpenDay(\'' + p.id + '\')">';
+      html += '<div style="display:flex;align-items:center;gap:.55rem;margin-bottom:.5rem;"><span style="font-size:1.5rem;">' + p.icon + '</span><div style="flex:1;min-width:0;"><div style="font-size:.9rem;font-weight:800;color:var(--tx);">' + p.title + '</div><div style="font-size:.67rem;color:var(--tx3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Day ' + prog.currentDay + ' of ' + p.days + (streak > 0 ? ' · 🔥 ' + streak + ' day streak' : '') + '</div></div><div style="font-size:.78rem;font-weight:800;color:#38bdf8;">' + pct + '%</div></div>';
+      html += '<div style="height:5px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-bottom:.65rem;"><div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#38bdf8,#10b981);border-radius:99px;"></div></div>';
+      html += '<button class="rp-btn" onclick="event.stopPropagation();_rpOpenDay(\'' + p.id + '\')">📖 Read Day ' + prog.currentDay + '</button>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  html += '<div style="font-size:.63rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--tx3);margin-bottom:.6rem;">' + (activePlans.length ? 'ALL PLANS' : 'CHOOSE A PLAN') + '</div>';
+  html += '<div style="display:grid;gap:.6rem;">';
+  READING_PLANS.forEach(function(p){
+    var prog = _rpGetProgress(p.id);
+    var isActive = prog && !prog.completed;
+    var isDone = prog && prog.completed;
+    html += '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;" onclick="_rpStartOrContinue(\'' + p.id + '\')">';
+    html += '<span style="font-size:2rem;line-height:1;flex-shrink:0;">' + p.icon + '</span>';
+    html += '<div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;margin-bottom:.18rem;">';
+    html += '<span style="font-size:.88rem;font-weight:800;color:var(--tx);">' + p.title + '</span>';
+    if(isDone) html += '<span style="font-size:.6rem;font-weight:800;background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3);border-radius:99px;padding:.08rem .4rem;">✓ Done</span>';
+    else if(isActive) html += '<span style="font-size:.6rem;font-weight:800;background:rgba(56,189,248,.15);color:#38bdf8;border:1px solid rgba(56,189,248,.3);border-radius:99px;padding:.08rem .4rem;">In Progress</span>';
+    html += '</div><div style="font-size:.75rem;color:var(--tx2);line-height:1.4;margin-bottom:.28rem;">' + p.subtitle + '</div>';
+    html += '<div style="display:flex;align-items:center;gap:.4rem;"><span style="font-size:.6rem;font-weight:700;color:' + (DIFF_COLORS[p.difficulty]||'#a78bfa') + ';">' + (DIFF_LABELS[p.difficulty]||p.difficulty) + '</span><span style="font-size:.6rem;color:var(--tx3);">·</span><span style="font-size:.6rem;color:var(--tx3);font-weight:600;">' + p.days + ' days</span></div>';
+    html += '</div><span style="font-size:1.1rem;color:var(--tx3);flex-shrink:0;">' + (isActive ? '▶' : isDone ? '↺' : '+') + '</span></div>';
+  });
+  html += '</div></div>';
+  root.innerHTML = html;
+}
+
+function _rpStartOrContinue(planId){
+  var prog = _rpGetProgress(planId);
+  if(prog && !prog.completed){ _rpOpenDay(planId); return; }
+  var today = new Date().toISOString().slice(0,10);
+  _rpSaveProgress(planId, {planId:planId, currentDay:1, startedDate:today, lastReadDate:null, completedDays:[], streak:0, longestStreak:0, completed:false});
+  _rpOpenDay(planId);
+}
+
+function _rpOpenDay(planId){
+  var plan = (typeof READING_PLANS !== 'undefined') ? READING_PLANS.find(function(p){ return p.id === planId; }) : null;
+  if(!plan) return;
+  var prog = _rpGetProgress(planId);
+  if(!prog){ _rpStartOrContinue(planId); return; }
+
+  var root = document.getElementById('readingPlansRoot');
+  if(!root) return;
+  var dayNum = Math.min(prog.currentDay || 1, plan.days);
+  var dayData = plan.days_content[dayNum - 1];
+  if(!dayData) return;
+
+  var streak = _rpCalculateStreak(prog.completedDays || [], prog.lastReadDate || '');
+  var today = new Date().toISOString().slice(0,10);
+  var markedToday = (prog.completedDays || []).indexOf(dayNum) >= 0 && prog.lastReadDate === today;
+  var pct = Math.round(((dayNum - 1) / plan.days) * 100);
+
+  var html = '<div style="padding:.2rem 0 1rem;">';
+  html += '<button class="pp-back-btn" onclick="renderReadingPlansCard()" aria-label="Back to Plans" style="margin-bottom:.7rem;">← Plans</button>';
+  html += '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.9rem;"><span style="font-size:1.4rem;">' + plan.icon + '</span><div style="flex:1;"><div style="font-size:.78rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em;">' + plan.title + '</div><div style="font-size:.67rem;color:var(--tx3);">Day ' + dayNum + ' of ' + plan.days + (streak > 0 ? ' · 🔥 ' + streak + ' day streak' : '') + '</div></div></div>';
+  html += '<div style="height:6px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-bottom:1.1rem;"><div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#38bdf8,#10b981);border-radius:99px;"></div></div>';
+
+  html += '<div style="background:var(--cd-banner);border-radius:16px;padding:1.15rem;margin-bottom:.9rem;box-shadow:var(--cd-banner-shadow);">';
+  html += '<div style="font-size:.6rem;font-weight:800;letter-spacing:.2em;text-transform:uppercase;opacity:.75;margin-bottom:.3rem;">Day ' + dayNum + ' · ' + (dayData.theme||'') + '</div>';
+  html += '<div style="font-family:var(--fh,var(--fm));font-size:1.12rem;font-weight:700;line-height:1.4;">' + (dayData.title||'') + '</div>';
+  html += '</div>';
+
+  if(dayData.readings && dayData.readings.length){
+    html += '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:1rem;margin-bottom:.85rem;">';
+    html += '<div style="font-size:.62rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:#38bdf8;margin-bottom:.5rem;">📖 Today\'s Readings</div>';
+    dayData.readings.forEach(function(ref){ html += '<div style="font-size:.84rem;color:var(--tx);font-weight:600;padding:.18rem 0;">• ' + ref + '</div>'; });
+    html += '</div>';
+  }
+
+  if(dayData.keyVerse){
+    html += '<div style="background:rgba(251,191,36,.06);border-left:3px solid #fbbf24;border-radius:0 12px 12px 0;padding:.8rem 1rem;margin-bottom:.85rem;">';
+    html += '<div style="font-size:.6rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:#fbbf24;margin-bottom:.3rem;">✨ Key Verse</div>';
+    html += '<div style="font-size:.88rem;font-weight:700;color:var(--tx);">' + dayData.keyVerse + '</div>';
+    html += '</div>';
+  }
+
+  if(dayData.reflection){
+    html += '<div style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.18);border-radius:14px;padding:1rem;margin-bottom:.85rem;">';
+    html += '<div style="font-size:.6rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:#a78bfa;margin-bottom:.4rem;">💭 Reflection</div>';
+    html += '<div style="font-size:.87rem;color:var(--tx2);line-height:1.65;font-style:italic;">' + dayData.reflection + '</div>';
+    html += '</div>';
+  }
+
+  if(dayData.prayer){
+    html += '<div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2);border-radius:14px;padding:1rem;margin-bottom:1.1rem;">';
+    html += '<div style="font-size:.6rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:#10b981;margin-bottom:.4rem;">🙏 Prayer</div>';
+    html += '<div style="font-size:.87rem;color:var(--tx2);line-height:1.65;font-style:italic;">' + dayData.prayer + '</div>';
+    html += '</div>';
+  }
+
+  if(!markedToday){
+    html += '<button style="width:100%;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:14px;padding:.95rem;font-size:.9rem;font-weight:900;cursor:pointer;font-family:var(--fm);letter-spacing:.02em;" onclick="_rpMarkComplete(\'' + planId + '\',' + dayNum + ')">✅ Mark Day ' + dayNum + ' Complete</button>';
+  } else {
+    html += '<div style="text-align:center;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-radius:14px;padding:.85rem;font-size:.87rem;font-weight:800;color:#6ee7b7;">✅ Day ' + dayNum + ' complete — see you tomorrow!</div>';
+    if(dayNum < plan.days){
+      html += '<button style="width:100%;margin-top:.55rem;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.22);color:#38bdf8;border-radius:14px;padding:.65rem;font-size:.82rem;font-weight:800;cursor:pointer;font-family:var(--fm);" onclick="_rpPreviewNext(\'' + planId + '\',' + dayNum + ')">→ Preview Day ' + (dayNum+1) + '</button>';
+    }
+  }
+  html += '</div>';
+  root.innerHTML = html;
+}
+
+function _rpMarkComplete(planId, dayNum){
+  var plan = (typeof READING_PLANS !== 'undefined') ? READING_PLANS.find(function(p){ return p.id === planId; }) : null;
+  if(!plan) return;
+  var today = new Date().toISOString().slice(0,10);
+  var prog = _rpGetProgress(planId) || {planId:planId, currentDay:1, startedDate:today, lastReadDate:null, completedDays:[], streak:0, longestStreak:0, completed:false};
+
+  if((prog.completedDays||[]).indexOf(dayNum) < 0) prog.completedDays = (prog.completedDays||[]).concat([dayNum]);
+  prog.lastReadDate = today;
+  if(dayNum >= (prog.currentDay||1)) prog.currentDay = Math.min(dayNum + 1, plan.days + 1);
+  prog.streak = _rpCalculateStreak(prog.completedDays, prog.lastReadDate);
+  prog.longestStreak = Math.max(prog.longestStreak || 0, prog.streak);
+  if(prog.currentDay > plan.days) prog.completed = true;
+
+  _rpSaveProgress(planId, prog);
+  if(typeof renderRpStreakBanner === 'function') renderRpStreakBanner();
+  if(typeof renderFaithHome === 'function') renderFaithHome();
+
+  if(prog.streak >= 2 && typeof showToast === 'function') showToast('🔥 ' + prog.streak + ' day streak!');
+  _rpOpenDay(planId);
+}
+
+function _rpPreviewNext(planId, currentDay){
+  var plan = (typeof READING_PLANS !== 'undefined') ? READING_PLANS.find(function(p){ return p.id === planId; }) : null;
+  if(!plan) return;
+  var prog = _rpGetProgress(planId);
+  if(!prog) return;
+  prog.currentDay = Math.min(currentDay + 1, plan.days);
+  _rpSaveProgress(planId, prog);
+  _rpOpenDay(planId);
 }

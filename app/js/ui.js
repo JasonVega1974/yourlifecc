@@ -990,6 +990,7 @@ const NAV_ITEMS = [
     {wellTab:'jesus',          icon:'✝️', label:'Who Is Jesus',        key:'scripture'},
     {wellTab:'denominations',  icon:'⛪', label:'Christian Traditions', key:'scripture'},
     {wellTab:'studyTools',     icon:'🔍', label:'Study Tools',         key:'scripture'},
+    {wellTab:'readingPlans',   icon:'📚', label:'Reading Plans',       key:'scripture'},
     {href:'/app/podcasts.html',  icon:'🎧', label:'Podcasts'},
     {href:'/app/calendar.html',  icon:'📅', label:'Faith Calendar'},
     {id:'s-worship',       icon:'🎵', label:'Worship',               key:'worship'},
