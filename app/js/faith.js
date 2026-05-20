@@ -439,7 +439,7 @@ function initScripture(){
 // the original 6 tabs. New tabs without renderers are stubs awaiting later phases.
 // btn is optional — when bfTab() is called programmatically (e.g., from a Quick
 // Tile or stub-panel CTA), the matching button is found via [data-bf-tab].
-const BF_TABS = ['home','devotional','jesus','denominations','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy','studyTools','readingPlans','audioBible'];
+const BF_TABS = ['home','devotional','jesus','denominations','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy','studyTools','readingPlans','audioBible','audioMeditations','sleepStories'];
 
 // Phase 5.8 v3 — Home-grid restorer. Defensive against any prior code
 // that may have set .topic-card-grid display:none inside #bf-home. The
@@ -687,6 +687,8 @@ function bfTab(tab, btn){
   if(tab==='studyTools') renderBibleStudyCard();
   if(tab==='readingPlans') renderReadingPlansCard();
   if(tab==='audioBible') renderAudioBibleCard();
+  if(tab==='audioMeditations') renderAudioMeditationsCard();
+  if(tab==='sleepStories') renderSleepStoriesCard();
 }
 
 // ── FAITH HOME (F2-A) ────────────────────────────────────────
@@ -10869,7 +10871,10 @@ function speakVotd(){
 }
 
 function updateAllSpeakButtons(speaking){
-  if(!speaking && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+  if(!speaking && 'speechSynthesis' in window){
+    // Don't cancel while a meditation or sleep story player is active
+    if(!_medId && !_ssId) window.speechSynthesis.cancel();
+  }
 }
 
 function _stSpeakVerse(btn){
@@ -10986,4 +10991,375 @@ function _abListen(){
   var ch = Math.max(1, parseInt(inp.value,10) || 1);
   var base = (typeof BIBLE_IS_CONFIG !== 'undefined') ? BIBLE_IS_CONFIG.webBaseUrl : 'https://live.bible.is/bible/ENGNIV/';
   window.open(base + code + '/' + ch, '_blank', 'noopener');
+}
+
+// ── AUDIO MEDITATIONS + SLEEP STORIES — Audio Layer Worker 2 ─────────────────
+// AUDIO_MEDITATIONS (7) and SLEEP_STORIES (7) from app/js/data/audio-content.js.
+// Meditation player: full-screen overlay, segment TTS, YouTube ambient, auto-advance.
+// Sleep player: very dark full-screen overlay, slow TTS (0.75), fade-out, Wake Lock.
+
+var _medId = null;
+var _medSegIdx = 0;
+var _medSegTimer = null;
+var _medPaused = false;
+var _medElapsed = 0;
+var _medAdvancePending = false;
+
+var _ssId = null;
+var _ssIdx = 0;
+var _ssSegments = [];
+var _ssSegTimer = null;
+var _ssFadeTimer = null;
+var _ssPaused = false;
+var _ssTtsVol = 1.0;
+var _ssWakeLock = null;
+
+var _MED_TYPE_COLOR = {scripture:'#38bdf8',reflection:'#a78bfa',prayer:'#10b981',opening:'#fde68a',close:'#fde68a',breath:'#38bdf8',silence:'#a78bfa',declaration:'#10b981',practice:'#a78bfa',cast:'#38bdf8'};
+var _MED_TYPE_LABEL = {scripture:'SCRIPTURE',reflection:'REFLECTION',prayer:'PRAYER',opening:'TO BEGIN',close:'CLOSING',breath:'BREATHE',silence:'SILENCE',declaration:'DECLARE',practice:'PRACTICE',cast:'ACTION'};
+
+function _medTotStr(sec){
+  var m = Math.floor(sec/60), s = sec%60;
+  return m+':'+(s<10?'0':'')+s;
+}
+
+function renderAudioMeditationsCard(){
+  var root = document.getElementById('audioMeditationsRoot');
+  if(!root) return;
+  if(typeof AUDIO_MEDITATIONS==='undefined'){
+    root.innerHTML='<div style="color:var(--tx2);padding:1rem;">Loading meditations…</div>';
+    return;
+  }
+  var lastPlayed = null;
+  try { lastPlayed = JSON.parse(localStorage.getItem('ylcc_med_last')||'null'); } catch(e){}
+  var html = '<div style="padding:.2rem 0 1rem;">';
+  html += '<div class="bf-section-hdr"><div class="bf-eyebrow">SCRIPTURE · BREATH · REST</div>';
+  html += '<div class="bf-title">🧘 Audio Meditations</div>';
+  html += '<div class="bf-sub">Scripture-led guided sessions. Each one speaks verses, reflection, and prayer — through your headphones.</div></div>';
+  html += '<div style="display:grid;gap:.55rem;">';
+  AUDIO_MEDITATIONS.forEach(function(m){
+    html += '<div style="background:rgba(167,139,250,.04);border:1px solid rgba(167,139,250,.1);border-radius:14px;padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;" onclick="startMeditation(\''+m.id+'\')">';
+    html += '<span style="font-size:1.6rem;line-height:1;flex-shrink:0;">'+m.icon+'</span>';
+    html += '<div style="flex:1;min-width:0;"><div style="font-size:.88rem;font-weight:800;color:var(--tx);margin-bottom:.1rem;">'+escapeHtml(m.title)+'</div>';
+    html += '<div style="font-size:.73rem;color:var(--tx2);line-height:1.35;">'+escapeHtml(m.theme)+'</div></div>';
+    html += '<div style="text-align:right;flex-shrink:0;"><div style="font-size:.68rem;font-weight:800;color:var(--tx3);">'+m.duration+' min</div>';
+    html += '<div style="margin-top:.2rem;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:#a78bfa;border-radius:8px;padding:.18rem .5rem;font-size:.7rem;font-weight:800;">▶</div></div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  if(lastPlayed && lastPlayed.title){
+    html += '<div style="text-align:center;margin-top:.85rem;font-size:.64rem;color:var(--tx3);">Last: '+escapeHtml(lastPlayed.title)+' · '+escapeHtml(lastPlayed.date||'')+'</div>';
+  }
+  html += '<div style="margin-top:.85rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:.6rem .85rem;font-size:.7rem;color:var(--tx3);line-height:1.5;">💡 Headphones recommended. Each session uses your device\'s built-in voice and a calming music background.</div>';
+  html += '</div>';
+  root.innerHTML = html;
+}
+
+function startMeditation(medId){
+  if(typeof AUDIO_MEDITATIONS==='undefined') return;
+  var med = AUDIO_MEDITATIONS.find(function(m){ return m.id===medId; });
+  if(!med) return;
+  _medClose();
+  _medId = medId; _medSegIdx = 0; _medPaused = false; _medElapsed = 0; _medAdvancePending = false;
+  var overlay = document.createElement('div');
+  overlay.id = 'meditationOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9500;background:#0b0b1a;display:flex;flex-direction:column;overflow:hidden;';
+  document.body.appendChild(overlay);
+  _medRenderPlayer(med);
+  _medPlaySegment(med, 0);
+}
+
+function _medRenderPlayer(med){
+  var overlay = document.getElementById('meditationOverlay');
+  if(!overlay) return;
+  var seg = med.segments[_medSegIdx]||{};
+  var totalSec = med.segments.reduce(function(a,s){ return a+s.duration; },0);
+  var pct = Math.round((_medElapsed/Math.max(1,totalSec))*100);
+  var segColor = _MED_TYPE_COLOR[seg.type]||'#a78bfa';
+  var segLabel = _MED_TYPE_LABEL[seg.type]||(seg.type||'').toUpperCase();
+  var dots = med.segments.map(function(s,i){
+    var bg = i<_medSegIdx?'rgba(167,139,250,.45)':(i===_medSegIdx?'#a78bfa':'rgba(255,255,255,.12)');
+    return '<div style="width:7px;height:7px;border-radius:99px;background:'+bg+';display:inline-block;margin:0 2px;transition:background .3s;"></div>';
+  }).join('');
+  overlay.innerHTML = [
+    '<div style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.1rem .5rem;flex-shrink:0;">',
+    '<button onclick="_medClose()" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);border-radius:8px;padding:.3rem .7rem;font-size:.76rem;cursor:pointer;font-family:var(--fm);">✕ Close</button>',
+    '<div style="text-align:center;flex:1;padding:0 .5rem;"><div style="font-size:1.25rem;">'+med.icon+'</div>',
+    '<div style="font-size:.76rem;font-weight:800;color:rgba(255,255,255,.8);margin-top:.1rem;">'+escapeHtml(med.title)+'</div></div>',
+    '<button onclick="_medSkip()" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);border-radius:8px;padding:.3rem .7rem;font-size:.76rem;cursor:pointer;font-family:var(--fm);">⏭ Skip</button>',
+    '</div>',
+    '<div style="padding:0 1.1rem .7rem;flex-shrink:0;">',
+    '<div style="height:3px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden;margin-bottom:.35rem;">',
+    '<div id="medProgressBar" style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,#a78bfa,#38bdf8);border-radius:99px;transition:width .6s;"></div></div>',
+    '<div style="display:flex;justify-content:space-between;font-size:.6rem;color:rgba(255,255,255,.3);">',
+    '<span id="medElapsedLbl">'+_medTotStr(_medElapsed)+'</span><span>'+_medTotStr(totalSec)+'</span></div></div>',
+    '<div style="flex:1;overflow-y:auto;display:flex;flex-direction:column;justify-content:center;padding:0 1.4rem;min-height:0;">',
+    '<div style="text-align:center;max-width:520px;margin:0 auto;width:100%;">',
+    '<div id="medSegLabel" style="font-size:.6rem;font-weight:900;letter-spacing:.22em;text-transform:uppercase;color:'+segColor+';margin-bottom:.9rem;">'+segLabel+'</div>',
+    '<div id="medSegText" style="font-family:Georgia,serif;font-size:1.05rem;line-height:1.8;color:rgba(255,255,255,.88);font-style:italic;margin-bottom:.75rem;">“'+escapeHtml(seg.text||'')+'”</div>',
+    '<div id="medSegVerse" style="font-size:.72rem;font-weight:700;color:'+segColor+';letter-spacing:.06em;">'+escapeHtml(seg.verse||'')+'</div>',
+    '</div></div>',
+    '<div style="padding:0 1.1rem .45rem;flex-shrink:0;text-align:center;" id="medSegDots">'+dots+'</div>',
+    '<div style="padding:.45rem 1.1rem;flex-shrink:0;display:flex;justify-content:center;gap:.55rem;">',
+    '<button id="medPauseBtn" onclick="_medTogglePause()" style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.35);color:#a78bfa;border-radius:12px;padding:.6rem 1.4rem;font-size:.84rem;font-weight:800;cursor:pointer;font-family:var(--fm);">⏸ Pause</button>',
+    '<button onclick="_medSkip()" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.45);border-radius:12px;padding:.6rem 1.4rem;font-size:.84rem;cursor:pointer;font-family:var(--fm);">⏭ Skip</button>',
+    '</div>',
+    '<div style="padding:.3rem 1.1rem 1rem;flex-shrink:0;border-top:1px solid rgba(255,255,255,.05);">',
+    '<div style="font-size:.55rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:.3rem;">🎵 Ambient</div>',
+    '<iframe src="https://www.youtube-nocookie.com/embed/'+med.ambientYouTube+'?autoplay=1&loop=1&playlist='+med.ambientYouTube+'&controls=1&modestbranding=1" frameborder="0" allow="autoplay;encrypted-media" style="width:100%;height:58px;border:none;border-radius:8px;display:block;"></iframe>',
+    '</div>'
+  ].join('');
+}
+
+function _medPlaySegment(med, segIdx){
+  if(!med || segIdx>=med.segments.length){ _medComplete(med); return; }
+  _medSegIdx = segIdx; _medAdvancePending = false;
+  var seg = med.segments[segIdx];
+  _medUpdateSegmentUI(med, segIdx);
+  if(_medSegTimer){ clearTimeout(_medSegTimer); _medSegTimer = null; }
+  if(!_medPaused && 'speechSynthesis' in window){
+    window.speechSynthesis.cancel();
+    var utt = new SpeechSynthesisUtterance((seg.text||'')+(seg.verse?' — '+seg.verse:''));
+    utt.rate = (typeof TTS_CONFIG!=='undefined'&&TTS_CONFIG.freeTier)?TTS_CONFIG.freeTier.rate:0.9;
+    utt.onend = function(){ _medAdvance(med); };
+    utt.onerror = function(){ _medAdvance(med); };
+    window.speechSynthesis.speak(utt);
+  }
+  _medSegTimer = setTimeout(function(){ if(!_medPaused) _medAdvance(med); }, seg.duration*1000);
+}
+
+function _medAdvance(med){
+  if(_medAdvancePending) return;
+  _medAdvancePending = true;
+  if(_medSegTimer){ clearTimeout(_medSegTimer); _medSegTimer = null; }
+  _medElapsed += (med.segments[_medSegIdx]||{}).duration||0;
+  _medPlaySegment(med, _medSegIdx+1);
+}
+
+function _medUpdateSegmentUI(med, segIdx){
+  var seg = med.segments[segIdx]||{};
+  var totalSec = med.segments.reduce(function(a,s){ return a+s.duration; },0);
+  var pct = Math.round((_medElapsed/Math.max(1,totalSec))*100);
+  var pb = document.getElementById('medProgressBar');
+  if(pb) pb.style.width = pct+'%';
+  var el = document.getElementById('medElapsedLbl');
+  if(el) el.textContent = _medTotStr(_medElapsed);
+  var segColor = _MED_TYPE_COLOR[seg.type]||'#a78bfa';
+  var lbl = document.getElementById('medSegLabel');
+  if(lbl){ lbl.textContent = _MED_TYPE_LABEL[seg.type]||(seg.type||'').toUpperCase(); lbl.style.color = segColor; }
+  var txt = document.getElementById('medSegText');
+  if(txt) txt.innerHTML = '“'+escapeHtml(seg.text||'')+'”';
+  var vrs = document.getElementById('medSegVerse');
+  if(vrs){ vrs.textContent = seg.verse||''; vrs.style.color = segColor; }
+  var dotsEl = document.getElementById('medSegDots');
+  if(dotsEl){
+    var kids = dotsEl.children;
+    for(var i=0;i<kids.length;i++){
+      kids[i].style.background = i<segIdx?'rgba(167,139,250,.45)':(i===segIdx?'#a78bfa':'rgba(255,255,255,.12)');
+    }
+  }
+}
+
+function _medTogglePause(){
+  if(_medPaused){
+    _medPaused = false;
+    var med = (typeof AUDIO_MEDITATIONS!=='undefined')?AUDIO_MEDITATIONS.find(function(m){return m.id===_medId;}):null;
+    if(med) _medPlaySegment(med, _medSegIdx);
+    var btn = document.getElementById('medPauseBtn');
+    if(btn) btn.innerHTML = '⏸ Pause';
+  } else {
+    _medPaused = true;
+    if(_medSegTimer){ clearTimeout(_medSegTimer); _medSegTimer = null; }
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
+    var btn2 = document.getElementById('medPauseBtn');
+    if(btn2) btn2.innerHTML = '▶ Resume';
+  }
+}
+
+function _medSkip(){
+  var med = (typeof AUDIO_MEDITATIONS!=='undefined')?AUDIO_MEDITATIONS.find(function(m){return m.id===_medId;}):null;
+  if(!med) return;
+  if(_medSegTimer){ clearTimeout(_medSegTimer); _medSegTimer = null; }
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  _medElapsed += (med.segments[_medSegIdx]||{}).duration||0;
+  _medAdvancePending = false;
+  _medPlaySegment(med, _medSegIdx+1);
+}
+
+function _medClose(){
+  if(_medSegTimer){ clearTimeout(_medSegTimer); _medSegTimer = null; }
+  if('speechSynthesis' in window && !_ssId) window.speechSynthesis.cancel();
+  var overlay = document.getElementById('meditationOverlay');
+  if(overlay) overlay.remove();
+  _medId = null; _medSegIdx = 0; _medPaused = false; _medElapsed = 0; _medAdvancePending = false;
+}
+
+function _medComplete(med){
+  if(_medSegTimer){ clearTimeout(_medSegTimer); _medSegTimer = null; }
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  try {
+    var today = new Date().toISOString().slice(0,10);
+    localStorage.setItem('ylcc_med_last', JSON.stringify({id:_medId,title:med?med.title:_medId,date:today}));
+    var hist = JSON.parse(localStorage.getItem('ylcc_med_history')||'[]');
+    hist.unshift({id:_medId,title:med?med.title:_medId,date:today,completed:true});
+    localStorage.setItem('ylcc_med_history', JSON.stringify(hist.slice(0,90)));
+  } catch(e){}
+  if(typeof showToast==='function') showToast((med?med.icon:'')+' Meditation complete.');
+  _medClose();
+  renderAudioMeditationsCard();
+}
+
+// --- SLEEP STORIES ---
+
+function renderSleepStoriesCard(){
+  var root = document.getElementById('sleepStoriesRoot');
+  if(!root) return;
+  if(typeof SLEEP_STORIES==='undefined'){
+    root.innerHTML='<div style="color:var(--tx2);padding:1rem;">Loading sleep stories…</div>';
+    return;
+  }
+  var html = '<div style="padding:.2rem 0 1rem;">';
+  html += '<div class="bf-section-hdr"><div class="bf-eyebrow">SCRIPTURE · PEACE · SLEEP</div>';
+  html += '<div class="bf-title">🌙 Sleep Stories</div>';
+  html += '<div class="bf-sub">Drift to sleep with Scripture spoken gently over calming music. Audio fades out automatically.</div></div>';
+  html += '<div style="display:grid;gap:.55rem;">';
+  SLEEP_STORIES.forEach(function(s){
+    html += '<div style="background:rgba(15,10,40,.5);border:1px solid rgba(167,139,250,.1);border-radius:14px;padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;" onclick="startSleepStory(\''+s.id+'\')">';
+    html += '<span style="font-size:1.6rem;line-height:1;flex-shrink:0;">'+s.icon+'</span>';
+    html += '<div style="flex:1;min-width:0;"><div style="font-size:.88rem;font-weight:800;color:var(--tx);margin-bottom:.1rem;">'+escapeHtml(s.title)+'</div>';
+    html += '<div style="font-size:.73rem;color:var(--tx2);line-height:1.35;">'+escapeHtml(s.description)+'</div></div>';
+    html += '<div style="text-align:right;flex-shrink:0;"><div style="font-size:.68rem;font-weight:800;color:var(--tx3);">'+s.duration+' min</div>';
+    html += '<div style="margin-top:.2rem;background:rgba(30,20,80,.6);border:1px solid rgba(167,139,250,.2);color:#a78bfa;border-radius:8px;padding:.18rem .5rem;font-size:.7rem;font-weight:800;">▶</div></div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  html += '<div style="margin-top:.85rem;background:rgba(15,10,40,.4);border:1px solid rgba(167,139,250,.08);border-radius:10px;padding:.6rem .85rem;font-size:.7rem;color:var(--tx3);line-height:1.5;">💡 Use headphones at bedtime. Audio fades out at the end — no need to stop it. Screen stays on.</div>';
+  html += '</div>';
+  root.innerHTML = html;
+}
+
+function startSleepStory(storyId){
+  if(typeof SLEEP_STORIES==='undefined') return;
+  var story = SLEEP_STORIES.find(function(s){ return s.id===storyId; });
+  if(!story) return;
+  _ssClose();
+  _ssId = storyId; _ssIdx = 0; _ssPaused = false; _ssTtsVol = 1.0;
+  if(story.verses && story.verses.length){
+    _ssSegments = story.verses.slice();
+  } else if(story.content){
+    _ssSegments = story.content.split('...').map(function(t){ return t.trim(); }).filter(Boolean);
+  } else {
+    _ssSegments = [story.title];
+  }
+  _ssRequestWakeLock();
+  var overlay = document.createElement('div');
+  overlay.id = 'sleepStoryOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9600;background:#020209;display:flex;flex-direction:column;overflow:hidden;';
+  document.body.appendChild(overlay);
+  _ssRenderPlayer(story);
+  _ssPlaySegment(story, 0);
+  var fadeMs = (story.fadeOutAt||story.duration)*60000;
+  _ssFadeTimer = setTimeout(function(){ _ssFadeOut(story); }, fadeMs);
+}
+
+function _ssRenderPlayer(story){
+  var overlay = document.getElementById('sleepStoryOverlay');
+  if(!overlay) return;
+  var seg = _ssSegments[_ssIdx]||'';
+  overlay.innerHTML = [
+    '<div style="display:flex;align-items:center;justify-content:space-between;padding:.85rem 1.1rem .4rem;flex-shrink:0;opacity:.3;">',
+    '<button onclick="_ssClose()" style="background:none;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.4);border-radius:8px;padding:.28rem .65rem;font-size:.7rem;cursor:pointer;font-family:var(--fm);">✕</button>',
+    '<span style="font-size:.7rem;color:rgba(255,255,255,.3);font-weight:600;">'+escapeHtml(story.title)+'</span>',
+    '<span style="font-size:.62rem;color:rgba(255,255,255,.2);">'+story.duration+' min</span>',
+    '</div>',
+    '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:1rem 1.5rem;overflow:hidden;">',
+    '<div style="font-size:2.4rem;margin-bottom:1rem;opacity:.3;">'+story.icon+'</div>',
+    '<div id="ssVerseText" style="font-family:Georgia,serif;font-size:1.05rem;line-height:1.9;color:rgba(255,255,255,.58);text-align:center;font-style:italic;max-width:440px;transition:opacity .8s;opacity:1;">'+escapeHtml(seg)+'</div>',
+    '<div id="ssVerseNum" style="margin-top:1.1rem;font-size:.6rem;color:rgba(255,255,255,.16);letter-spacing:.1em;">'+(_ssIdx+1)+' / '+_ssSegments.length+'</div>',
+    '</div>',
+    '<div style="padding:.35rem 1.1rem .4rem;flex-shrink:0;opacity:.22;">',
+    '<div style="font-size:.52rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:.28rem;">🎵 Ambient</div>',
+    '<iframe src="https://www.youtube-nocookie.com/embed/'+story.ambientYouTube+'?autoplay=1&loop=1&playlist='+story.ambientYouTube+'&controls=1&modestbranding=1" frameborder="0" allow="autoplay;encrypted-media" style="width:100%;height:48px;border:none;border-radius:6px;display:block;"></iframe>',
+    '</div>',
+    '<div style="padding:.35rem 1.1rem 1rem;flex-shrink:0;display:flex;justify-content:center;gap:.55rem;opacity:.22;">',
+    '<button id="ssPauseBtn" onclick="_ssTogglePause()" style="background:none;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.45);border-radius:10px;padding:.45rem 1.1rem;font-size:.78rem;cursor:pointer;font-family:var(--fm);">⏸</button>',
+    '<button onclick="_ssClose()" style="background:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.35);border-radius:10px;padding:.45rem 1.1rem;font-size:.78rem;cursor:pointer;font-family:var(--fm);">✕ Stop</button>',
+    '</div>',
+    '<div style="padding:0 1rem .55rem;text-align:center;font-size:.58rem;color:rgba(255,255,255,.1);">Fades out at '+story.duration+' min</div>'
+  ].join('');
+}
+
+function _ssPlaySegment(story, idx){
+  if(!_ssSegments || idx>=_ssSegments.length){
+    if(story.repeatCount && story.repeatCount>1){ _ssPlaySegment(story,0); return; }
+    _ssClose(); return;
+  }
+  _ssIdx = idx;
+  var seg = _ssSegments[idx];
+  var textEl = document.getElementById('ssVerseText');
+  if(textEl) textEl.style.opacity = '0';
+  setTimeout(function(){
+    var el = document.getElementById('ssVerseText');
+    if(el){ el.textContent = seg; el.style.opacity = '1'; }
+    var numEl = document.getElementById('ssVerseNum');
+    if(numEl) numEl.textContent = (idx+1)+' / '+_ssSegments.length;
+  }, 600);
+  if('speechSynthesis' in window && !_ssPaused){
+    window.speechSynthesis.cancel();
+    var utt = new SpeechSynthesisUtterance(seg);
+    utt.rate = 0.75;
+    utt.volume = Math.max(0.05, _ssTtsVol);
+    var storyRef = story;
+    var idxRef = idx;
+    utt.onend = function(){
+      _ssSegTimer = setTimeout(function(){ if(!_ssPaused) _ssPlaySegment(storyRef,idxRef+1); }, 3000);
+    };
+    utt.onerror = function(){
+      _ssSegTimer = setTimeout(function(){ if(!_ssPaused) _ssPlaySegment(storyRef,idxRef+1); }, 3000);
+    };
+    window.speechSynthesis.speak(utt);
+  }
+}
+
+function _ssTogglePause(){
+  if(_ssPaused){
+    _ssPaused = false;
+    if('speechSynthesis' in window) window.speechSynthesis.resume();
+    var btn = document.getElementById('ssPauseBtn');
+    if(btn) btn.innerHTML = '⏸';
+    var story = (typeof SLEEP_STORIES!=='undefined')?SLEEP_STORIES.find(function(s){return s.id===_ssId;}):null;
+    if(story) _ssPlaySegment(story, _ssIdx);
+  } else {
+    _ssPaused = true;
+    if(_ssSegTimer){ clearTimeout(_ssSegTimer); _ssSegTimer = null; }
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
+    var btn2 = document.getElementById('ssPauseBtn');
+    if(btn2) btn2.innerHTML = '▶';
+  }
+}
+
+function _ssClose(){
+  if(_ssSegTimer){ clearTimeout(_ssSegTimer); _ssSegTimer = null; }
+  if(_ssFadeTimer){ clearTimeout(_ssFadeTimer); _ssFadeTimer = null; }
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  _ssReleaseWakeLock();
+  var overlay = document.getElementById('sleepStoryOverlay');
+  if(overlay) overlay.remove();
+  _ssId = null; _ssIdx = 0; _ssPaused = false; _ssTtsVol = 1.0; _ssSegments = [];
+}
+
+function _ssFadeOut(story){
+  var steps = 10, i = 0;
+  var iv = setInterval(function(){
+    i++;
+    _ssTtsVol = Math.max(0, 1.0-(i/steps));
+    if(i>=steps){ clearInterval(iv); _ssClose(); }
+  }, 3000);
+}
+
+async function _ssRequestWakeLock(){
+  try { if('wakeLock' in navigator){ _ssWakeLock = await navigator.wakeLock.request('screen'); } } catch(e){}
+}
+
+function _ssReleaseWakeLock(){
+  try { if(_ssWakeLock){ _ssWakeLock.release(); _ssWakeLock = null; } } catch(e){}
 }

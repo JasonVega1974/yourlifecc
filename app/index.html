@@ -4641,6 +4641,8 @@
     <button class="tab" data-bf-tab="studyTools" onclick="bfTab('studyTools',this)">🔍 Study Tools</button>
     <button class="tab" data-bf-tab="readingPlans" onclick="bfTab('readingPlans',this)">📚 Reading Plans</button>
     <button class="tab" data-bf-tab="audioBible" onclick="bfTab('audioBible',this)">🔊 Audio Bible</button>
+    <button class="tab" data-bf-tab="audioMeditations" onclick="bfTab('audioMeditations',this)">🧘 Meditations</button>
+    <button class="tab" data-bf-tab="sleepStories" onclick="bfTab('sleepStories',this)">🌙 Sleep Stories</button>
     <button class="tab" onclick="window.location.href='/app/podcasts.html'">🎧 Podcasts</button>
     <button class="tab" onclick="window.location.href='/app/calendar.html'">📅 Faith Calendar</button>
     <button class="tab" onclick="wellGoto('worship')">🎵 Worship</button>
@@ -4890,6 +4892,16 @@
         <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(14,165,233,.12));"><img class="topic-card-hero" data-card-id="bf-audioBible" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Psalms_of_David.jpg/1280px-Psalms_of_David.jpg" alt="Audio Bible"></div>
         <div class="topic-card-title">Audio Bible</div>
         <div class="topic-card-desc">Listen to any chapter · 66 books</div>
+      </div>
+      <div class="topic-card accent-violet" onclick="bfTab('audioMeditations')">
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(167,139,250,.22),rgba(109,40,217,.12));"><img class="topic-card-hero" data-card-id="bf-audioMeditations" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/The_Praying_Hands.jpg/1280px-The_Praying_Hands.jpg" alt="Audio Meditations"></div>
+        <div class="topic-card-title">Audio Meditations</div>
+        <div class="topic-card-desc">7 guided sessions · Scripture-led</div>
+      </div>
+      <div class="topic-card" style="--accent-light:rgba(167,139,250,.15)" onclick="bfTab('sleepStories')">
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(30,20,80,.5),rgba(167,139,250,.15));"><img class="topic-card-hero" data-card-id="bf-sleepStories" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1280px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg" alt="Sleep Stories"></div>
+        <div class="topic-card-title">Sleep Stories</div>
+        <div class="topic-card-desc">7 bedtime Scripture stories · fades out</div>
       </div>
     </div>
 
@@ -7849,6 +7861,16 @@
     <div id="audioBibleRoot"></div>
   </div>
 
+  <!-- ════ Audio Meditations (Audio Layer Worker 2) ════ -->
+  <div id="bf-audioMeditations" style="display:none;">
+    <div id="audioMeditationsRoot"></div>
+  </div>
+
+  <!-- ════ Sleep Stories (Audio Layer Worker 2) ════ -->
+  <div id="bf-sleepStories" style="display:none;">
+    <div id="sleepStoriesRoot"></div>
+  </div>
+
   <!-- ════ THE WELL — bottom nav (mirrors top .scrTabs; bfTab keeps both in sync) ════ -->
   <style>
     #s-scripture .scrTabs-bottom{
@@ -7901,6 +7923,8 @@
     <button class="tab" data-bf-tab="studyTools" onclick="bfTab('studyTools',this)"><span class="scrtab-icon">🔍</span><span>Study Tools</span></button>
     <button class="tab" data-bf-tab="readingPlans" onclick="bfTab('readingPlans',this)"><span class="scrtab-icon">📚</span><span>Read Plans</span></button>
     <button class="tab" data-bf-tab="audioBible" onclick="bfTab('audioBible',this)"><span class="scrtab-icon">🔊</span><span>Audio Bible</span></button>
+    <button class="tab" data-bf-tab="audioMeditations" onclick="bfTab('audioMeditations',this)"><span class="scrtab-icon">🧘</span><span>Meditations</span></button>
+    <button class="tab" data-bf-tab="sleepStories" onclick="bfTab('sleepStories',this)"><span class="scrtab-icon">🌙</span><span>Sleep Stories</span></button>
     <button class="tab" onclick="window.location.href='/app/podcasts.html'"><span class="scrtab-icon">🎧</span><span>Podcasts</span></button>
     <button class="tab" onclick="window.location.href='/app/calendar.html'"><span class="scrtab-icon">📅</span><span>Calendar</span></button>
     <button class="tab" onclick="wellGoto('worship')"><span class="scrtab-icon">🎵</span><span>Worship</span></button>
