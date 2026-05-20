@@ -11261,11 +11261,12 @@ function renderAudioMeditationsCard(){
   html += '<button type="button" onclick="bfTab(\'createMeditation\')" style="width:100%;background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(56,189,248,.12));border:1px solid rgba(167,139,250,.35);color:#a78bfa;border-radius:12px;padding:.6rem;font-size:.82rem;font-weight:800;cursor:pointer;font-family:var(--fm);margin-bottom:.75rem;letter-spacing:.02em;">✨ + Create Your Own Meditation</button>';
   html += '<div style="display:grid;gap:.55rem;">';
   AUDIO_MEDITATIONS.forEach(function(m){
-    html += '<div style="background:rgba(167,139,250,.04);border:1px solid rgba(167,139,250,.1);border-radius:14px;padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;" onclick="startMeditation(\''+m.id+'\')">';
-    html += '<span style="font-size:1.6rem;line-height:1;flex-shrink:0;">'+m.icon+'</span>';
-    html += '<div style="flex:1;min-width:0;"><div style="font-size:.88rem;font-weight:800;color:var(--tx);margin-bottom:.1rem;">'+escapeHtml(m.title)+'</div>';
-    html += '<div style="font-size:.73rem;color:var(--tx2);line-height:1.35;">'+escapeHtml(m.theme)+'</div></div>';
-    html += '<div style="text-align:right;flex-shrink:0;"><div style="font-size:.68rem;font-weight:800;color:var(--tx3);">'+m.duration+' min</div>';
+    var safeT = escapeHtml(m.title); var safeThm = escapeHtml(m.theme);
+    html += '<div role="button" tabindex="0" onclick="startMeditation(\''+m.id+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();startMeditation(\''+m.id+'\');}" onfocus="this.style.outline=\'2px solid rgba(99,102,241,.7)\';this.style.outlineOffset=\'2px\'" onblur="this.style.outline=\'none\'" aria-label="Play '+safeT+', '+m.duration+' minutes, '+safeThm+'" style="background:rgba(167,139,250,.04);border:1px solid rgba(167,139,250,.1);border-radius:14px;padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;outline:none;">';
+    html += '<span style="font-size:1.6rem;line-height:1;flex-shrink:0;" aria-hidden="true">'+m.icon+'</span>';
+    html += '<div style="flex:1;min-width:0;"><div style="font-size:.88rem;font-weight:800;color:var(--tx);margin-bottom:.1rem;">'+safeT+'</div>';
+    html += '<div style="font-size:.73rem;color:var(--tx2);line-height:1.35;">'+safeThm+'</div></div>';
+    html += '<div style="text-align:right;flex-shrink:0;" aria-hidden="true"><div style="font-size:.68rem;font-weight:800;color:var(--tx3);">'+m.duration+' min</div>';
     html += '<div style="margin-top:.2rem;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:#a78bfa;border-radius:8px;padding:.18rem .5rem;font-size:.7rem;font-weight:800;">▶</div></div>';
     html += '</div>';
   });
@@ -11405,7 +11406,14 @@ function saveMeditationToLibrary(med){
 
 function _genMedBuildLibraryHtml(){
   var all = _genMedLoadLibrary();
-  if(!all.length) return '';
+  if(!all.length){
+    return '<div id="genMedLibrary" style="margin-top:1rem;">'
+      + '<div style="text-align:center;padding:1.5rem 1rem;background:rgba(67,56,202,.04);border:1px solid rgba(67,56,202,.12);border-radius:14px;">'
+      + '<div style="font-size:2.5rem;margin-bottom:.5rem;">✨</div>'
+      + '<div style="font-size:.88rem;font-weight:800;color:var(--tx);margin-bottom:.3rem;">No meditations yet</div>'
+      + '<div style="font-size:.75rem;color:var(--tx3);line-height:1.5;">Create your first AI meditation above to get started</div>'
+      + '</div></div>';
+  }
   var q = (_genMedLibSearchQuery||'').trim().toLowerCase();
   var saved = q ? all.filter(function(m){
     return ((m.title||'')+(m.theme||'')+(m.scriptureFocus||'')).toLowerCase().indexOf(q) !== -1;
@@ -11429,26 +11437,27 @@ function _genMedBuildLibraryHtml(){
     var ago = m.generatedAt ? new Date(m.generatedAt).toLocaleDateString() : '';
     var playCount = m.playCount || 0;
     var isPublic  = m.isPublic  || false;
-    html += '<div id="genMedCard-'+m.id+'" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:.65rem .85rem;margin-bottom:.4rem;">';
-    // Title row
-    html += '<div style="display:flex;align-items:center;gap:.6rem;">';
-    html += '<span style="font-size:1.35rem;flex-shrink:0;">'+(m.icon||'✨')+'</span>';
+    var safeTitle = escapeHtml(m.title||'My Meditation');
+    html += '<div id="genMedCard-'+m.id+'" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.11);border-radius:12px;padding:.65rem .85rem;margin-bottom:.4rem;">';
+    // Title row — keyboard-navigable play trigger
+    html += '<div role="button" tabindex="0" onclick="_genMedPlaySaved(\''+_jEsc(m.id)+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();_genMedPlaySaved(\''+_jEsc(m.id)+'\');}" onfocus="this.style.outline=\'2px solid rgba(99,102,241,.7)\';this.style.outlineOffset=\'2px\'" onblur="this.style.outline=\'none\'" aria-label="Play '+safeTitle+'" style="display:flex;align-items:center;gap:.6rem;outline:none;border-radius:8px;cursor:pointer;">';
+    html += '<span style="font-size:1.35rem;flex-shrink:0;" aria-hidden="true">'+(m.icon||'✨')+'</span>';
     html += '<div style="flex:1;min-width:0;">';
-    html += '<div style="font-size:.84rem;font-weight:800;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+escapeHtml(m.title||'My Meditation')+'</div>';
-    html += '<div style="font-size:.66rem;color:var(--tx3);margin-top:.05rem;">';
+    html += '<div style="font-size:.84rem;font-weight:800;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+safeTitle+'</div>';
+    html += '<div style="font-size:.6875rem;color:var(--tx3);margin-top:.05rem;">';
     html += escapeHtml(m.theme||m.scriptureFocus||'')+(ago?' · '+ago:'');
-    html += playCount ? ' · <span style="color:#a78bfa;">▶ '+playCount+(playCount===1?' play':' plays')+'</span>' : '';
+    html += playCount ? ' · <span style="color:#a78bfa;" aria-hidden="true">▶ '+playCount+(playCount===1?' play':' plays')+'</span>' : '';
     html += '</div>';
     html += '</div>';
-    html += '<button type="button" onclick="_genMedPlaySaved(\''+_jEsc(m.id)+'\')" style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:#a78bfa;border-radius:8px;padding:.28rem .6rem;font-size:.74rem;font-weight:800;cursor:pointer;font-family:var(--fm);flex-shrink:0;">▶ Play</button>';
+    html += '<div style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:#a78bfa;border-radius:8px;padding:.28rem .6rem;font-size:.74rem;font-weight:800;flex-shrink:0;" aria-hidden="true">▶ Play</div>';
     html += '</div>';
     // Share + delete row
     html += '<div style="display:flex;align-items:center;gap:.5rem;margin-top:.5rem;padding-top:.4rem;border-top:1px solid rgba(255,255,255,.05);">';
-    html += '<label style="display:flex;align-items:center;gap:.3rem;cursor:pointer;flex:1;">';
+    html += '<label style="display:flex;align-items:center;gap:.3rem;cursor:pointer;flex:1;min-height:44px;" aria-label="Share '+safeTitle+' with community">';
     html += '<input type="checkbox" '+(isPublic?'checked':'')+' onchange="_genMedTogglePublic(\''+_jEsc(m.id)+'\',this.checked)" style="accent-color:#a78bfa;cursor:pointer;" />';
-    html += '<span style="font-size:.67rem;color:var(--tx3);">Share with community</span>';
+    html += '<span style="font-size:.6875rem;color:var(--tx3);">Share with community</span>';
     html += '</label>';
-    html += '<button type="button" onclick="_genMedDeleteSaved(\''+_jEsc(m.id)+'\',this)" style="background:none;border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.3);border-radius:8px;padding:.22rem .4rem;font-size:.62rem;cursor:pointer;font-family:var(--fm);" title="Delete">🗑</button>';
+    html += '<button type="button" onclick="_genMedDeleteSaved(\''+_jEsc(m.id)+'\',this)" style="background:none;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);border-radius:8px;min-width:44px;min-height:44px;font-size:.75rem;cursor:pointer;font-family:var(--fm);display:flex;align-items:center;justify-content:center;" aria-label="Delete meditation: '+safeTitle+'">🗑</button>';
     html += '</div>';
     html += '</div>';
   });
@@ -11925,11 +11934,12 @@ function renderSleepStoriesCard(){
   html += '<div class="bf-sub">Drift to sleep with Scripture spoken gently over calming music. Audio fades out automatically.</div></div>';
   html += '<div style="display:grid;gap:.55rem;">';
   SLEEP_STORIES.forEach(function(s){
-    html += '<div style="background:rgba(15,10,40,.5);border:1px solid rgba(167,139,250,.1);border-radius:14px;padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;" onclick="startSleepStory(\''+s.id+'\')">';
-    html += '<span style="font-size:1.6rem;line-height:1;flex-shrink:0;">'+s.icon+'</span>';
-    html += '<div style="flex:1;min-width:0;"><div style="font-size:.88rem;font-weight:800;color:var(--tx);margin-bottom:.1rem;">'+escapeHtml(s.title)+'</div>';
-    html += '<div style="font-size:.73rem;color:var(--tx2);line-height:1.35;">'+escapeHtml(s.description)+'</div></div>';
-    html += '<div style="text-align:right;flex-shrink:0;"><div style="font-size:.68rem;font-weight:800;color:var(--tx3);">'+s.duration+' min</div>';
+    var safeT = escapeHtml(s.title); var safeD = escapeHtml(s.description);
+    html += '<div role="button" tabindex="0" onclick="startSleepStory(\''+s.id+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();startSleepStory(\''+s.id+'\');}" onfocus="this.style.outline=\'2px solid rgba(99,102,241,.7)\';this.style.outlineOffset=\'2px\'" onblur="this.style.outline=\'none\'" aria-label="Play '+safeT+', '+s.duration+' minutes" style="background:rgba(15,10,40,.5);border:1px solid rgba(167,139,250,.1);border-radius:14px;padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;outline:none;">';
+    html += '<span style="font-size:1.6rem;line-height:1;flex-shrink:0;" aria-hidden="true">'+s.icon+'</span>';
+    html += '<div style="flex:1;min-width:0;"><div style="font-size:.88rem;font-weight:800;color:var(--tx);margin-bottom:.1rem;">'+safeT+'</div>';
+    html += '<div style="font-size:.73rem;color:var(--tx2);line-height:1.35;">'+safeD+'</div></div>';
+    html += '<div style="text-align:right;flex-shrink:0;" aria-hidden="true"><div style="font-size:.68rem;font-weight:800;color:var(--tx3);">'+s.duration+' min</div>';
     html += '<div style="margin-top:.2rem;background:rgba(30,20,80,.6);border:1px solid rgba(167,139,250,.2);color:#a78bfa;border-radius:8px;padding:.18rem .5rem;font-size:.7rem;font-weight:800;">▶</div></div>';
     html += '</div>';
   });
@@ -12099,18 +12109,22 @@ function _ambientGetLibrary(){
 
 function _ambientTrackRow(track, catName, catIcon){
   var isPlay = _ambientTrackId === track.id;
+  var safeTitle = escapeHtml(track.title);
   var verifiedBadge = track.verified
-    ? '<span style="font-size:.6rem;font-weight:800;color:#4ade80;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:4px;padding:.05rem .3rem;margin-left:.35rem;letter-spacing:.04em;">✓ Verified</span>'
-    : '<span style="font-size:.6rem;color:var(--tx3);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:.05rem .3rem;margin-left:.35rem;">Unverified</span>';
+    ? '<span style="font-size:.6rem;font-weight:800;color:#4ade80;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:4px;padding:.05rem .3rem;margin-left:.35rem;letter-spacing:.04em;" aria-hidden="true">✓ Verified</span>'
+    : '<span style="font-size:.6rem;color:var(--tx3);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:.05rem .3rem;margin-left:.35rem;" aria-hidden="true">Unverified</span>';
   var hostLine = track.host ? '<span style="color:var(--tx3);">'+escapeHtml(track.host)+'</span>' : '';
+  var ariaLabel = (isPlay ? 'Now playing: ' : 'Play: ') + safeTitle + (track.host ? ', by ' + escapeHtml(track.host) : '');
   var row = '<div style="display:flex;align-items:center;gap:.6rem;padding:.45rem .35rem;border-radius:8px;background:'+(isPlay?'rgba(56,189,248,.08)':'none')+';margin-bottom:.1rem;">';
-  row += '<div onclick="playAmbientTrack(\''+track.id+'\')" style="width:28px;height:28px;border-radius:50%;background:'+(isPlay?'rgba(56,189,248,.2)':'rgba(255,255,255,.05)')+';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.7rem;color:'+(isPlay?'#38bdf8':'var(--tx2)')+';cursor:pointer;">'+(isPlay?'⏸':'▶')+'</div>';
-  row += '<div onclick="playAmbientTrack(\''+track.id+'\')" style="flex:1;min-width:0;cursor:pointer;">';
-  row += '<div style="font-size:.84rem;font-weight:700;color:'+(isPlay?'#38bdf8':'var(--tx)')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+escapeHtml(track.title)+verifiedBadge+'</div>';
+  row += '<div role="button" tabindex="0" onclick="playAmbientTrack(\''+track.id+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();playAmbientTrack(\''+track.id+'\');}" onfocus="this.style.outline=\'2px solid rgba(99,102,241,.7)\';this.style.outlineOffset=\'2px\'" onblur="this.style.outline=\'none\'" aria-label="'+ariaLabel+'" style="display:flex;align-items:center;gap:.6rem;flex:1;min-width:0;cursor:pointer;outline:none;border-radius:6px;">';
+  row += '<div style="width:28px;height:28px;border-radius:50%;background:'+(isPlay?'rgba(56,189,248,.2)':'rgba(255,255,255,.05)')+';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.7rem;color:'+(isPlay?'#38bdf8':'var(--tx2)')+';" aria-hidden="true">'+(isPlay?'⏸':'▶')+'</div>';
+  row += '<div style="flex:1;min-width:0;">';
+  row += '<div style="font-size:.84rem;font-weight:700;color:'+(isPlay?'#38bdf8':'var(--tx)')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+safeTitle+verifiedBadge+'</div>';
   row += '<div style="font-size:.69rem;color:var(--tx3);line-height:1.4;">'+escapeHtml(track.description)+(hostLine?' · '+hostLine:'')+'</div>';
   row += '</div>';
+  row += '</div>';
   if(!track.verified){
-    row += '<button type="button" onclick="reportBrokenTrack(\''+track.id+'\',\''+_jEsc(track.title)+'\')" title="Report broken link" style="background:none;border:none;color:var(--tx3);font-size:.75rem;cursor:pointer;padding:.2rem .3rem;flex-shrink:0;opacity:.6;" aria-label="Report broken">⚑</button>';
+    row += '<button type="button" onclick="reportBrokenTrack(\''+track.id+'\',\''+_jEsc(track.title)+'\')" title="Report broken link" style="background:none;border:none;color:var(--tx3);font-size:.75rem;cursor:pointer;padding:.2rem .3rem;flex-shrink:0;opacity:.6;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;" aria-label="Report broken link for '+safeTitle+'">⚑</button>';
   }
   row += '</div>';
   return row;
