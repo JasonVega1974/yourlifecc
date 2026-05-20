@@ -439,7 +439,7 @@ function initScripture(){
 // the original 6 tabs. New tabs without renderers are stubs awaiting later phases.
 // btn is optional — when bfTab() is called programmatically (e.g., from a Quick
 // Tile or stub-panel CTA), the matching button is found via [data-bf-tab].
-const BF_TABS = ['home','devotional','jesus','denominations','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy'];
+const BF_TABS = ['home','devotional','jesus','denominations','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy','studyTools'];
 
 // Phase 5.8 v3 — Home-grid restorer. Defensive against any prior code
 // that may have set .topic-card-grid display:none inside #bf-home. The
@@ -684,6 +684,7 @@ function bfTab(tab, btn){
   if(tab==='timeline') renderBibleTimeline();
   if(tab==='proofProphecy') renderProofProphecy();
   if(tab==='bibleStudy') initBibleStudyTab();
+  if(tab==='studyTools') renderBibleStudyCard();
 }
 
 // ── FAITH HOME (F2-A) ────────────────────────────────────────
@@ -9819,4 +9820,357 @@ function renderFJDisciplines(){
     +'</div>';
 
   el.dataset.rendered = '1';
+}
+
+// ──────────────────────────────────────────────────────────────
+// Worker 4 — Study Tools: Strong's · Cross Refs · Passage · Notes
+// ──────────────────────────────────────────────────────────────
+
+var _stActiveTab = 'strongs';
+
+var _ST_EXTRA_TERMS = [
+  {term:'Salvation (Soteria)',        strongs:'G4991', definition:'Deliverance from sin and its consequences; the rescue of the whole person — body, soul, and spirit'},
+  {term:'Faith (Pistis)',             strongs:'G4102', definition:'Belief, trust, and fidelity to God; conviction in the truth of the Gospel and faithfulness in living it out'},
+  {term:'Love (Agape)',               strongs:'G26',   definition:'Unconditional, self-giving love; God\'s own nature expressed toward humanity — the highest Greek word for love'},
+  {term:'Prayer (Proseuche)',         strongs:'G4335', definition:'Earnest, devoted petitioning of God; a direct and persistent address to God in worship or need'},
+  {term:'Sin (Hamartia)',             strongs:'G266',  definition:'Missing the mark; falling short of God\'s holy standard — both the act of sinning and the condition of sinfulness'},
+  {term:'Repentance (Metanoia)',      strongs:'G3341', definition:'A change of mind and direction; turning from sin toward God with a genuinely transformed heart and will'},
+  {term:'Baptism (Baptisma)',         strongs:'G908',  definition:'Immersion in water; the outward sign of inward faith and identification with Christ\'s death and resurrection'},
+  {term:'Spirit (Pneuma)',            strongs:'G4151', definition:'Wind, breath, spirit; used of the Holy Spirit — the divine Person indwelling every believer at salvation'},
+  {term:'Church (Ekklesia)',          strongs:'G1577', definition:'The called-out ones; the assembly of all believers gathered in Christ\'s name — His living body on earth'},
+  {term:'Covenant (Diatheke)',        strongs:'G1242', definition:'A binding agreement initiated by God; His solemn, unbreakable promise sealed in the blood of Christ'},
+  {term:'Righteousness (Dikaiosyne)',strongs:'G1343', definition:'Right standing before God; conformity to His holy standard — credited to believers through faith in Christ alone'},
+  {term:'Mercy (Eleos)',              strongs:'G1656', definition:'Compassion shown to those in distress; God\'s tender, steadfast kindness extended to the undeserving'},
+  {term:'Peace (Eirene)',             strongs:'G1515', definition:'Wholeness and well-being; the reconciled relationship between God and humanity established through Christ\'s atoning work'},
+  {term:'Joy (Chara)',                strongs:'G5479', definition:'Deep gladness and delight; an inner rejoicing rooted in God\'s goodness that transcends outward circumstances'},
+  {term:'Hope (Elpis)',               strongs:'G1680', definition:'Confident expectation; certain trust in God\'s fulfilled promises — not wishful thinking but sure assurance'},
+  {term:'Truth (Aletheia)',           strongs:'G225',  definition:'Reality as God defines it; what is in agreement with His word, character, and revealed will in Scripture'},
+  {term:'Light (Phos)',               strongs:'G5457', definition:'Physical light; used of God\'s holiness, truth, and the revelation of Christ who is the light of the world'},
+  {term:'Darkness (Skotos)',          strongs:'G4655', definition:'Moral and spiritual darkness; the realm of sin, ignorance, and separation from the life and light of God'},
+  {term:'Flesh (Sarx)',               strongs:'G4561', definition:'Human nature in its fallen aspect; the inner pull toward sin that wages war against the Spirit within us'},
+  {term:'World (Kosmos)',             strongs:'G2889', definition:'The ordered creation; or the fallen world system organized in opposition to God\'s kingdom and values'},
+  {term:'Eternal (Aionios)',          strongs:'G166',  definition:'Belonging to the coming age; everlasting; the quality of life that comes from knowing God himself (John 17:3)'},
+  {term:'Sanctification (Hagiasmos)',strongs:'G38',   definition:'The ongoing process of being set apart and made holy; growth in Christlikeness worked in us by the Spirit'},
+  {term:'Atonement (Hilasmos)',       strongs:'G2434', definition:'Propitiation; the satisfying of God\'s just wrath through Christ\'s sacrifice — making restored relationship possible'},
+  {term:'Redemption (Apolytrosis)',   strongs:'G629',  definition:'A buying back; Christ paid the ransom price to free believers from slavery to sin and its eternal penalty'},
+  {term:'Gospel (Euangelion)',        strongs:'G2098', definition:'Good news; the message of Christ\'s life, death, and resurrection — the power of God for salvation to all who believe'},
+  {term:'Kingdom (Basileia)',         strongs:'G932',  definition:'The royal reign of God; His sovereign rule present now in believers\' hearts and coming fully at Christ\'s return'},
+  {term:'Disciple (Mathetes)',        strongs:'G3101', definition:'A learner and follower; one who commits to learn from and imitate Jesus in every area of life — not just a believer'},
+  {term:'Witness (Martys)',           strongs:'G3144', definition:'One who testifies to what they have seen; the root of "martyr" — bearing witness even at great personal cost'},
+  {term:'Shepherd (Poimen)',          strongs:'G4166', definition:'A shepherd who guides and protects sheep; Jesus as the Good Shepherd who lays down His life for His flock'},
+  {term:'Abide (Meno)',               strongs:'G3306', definition:'To remain, stay, and continue; John\'s term for sustained communion with Christ as the source of all fruit-bearing'},
+];
+
+var _ST_CROSS_REFS = [
+  {ref:'John 3:16',              related:[{ref:'Romans 5:8', label:'God\'s love demonstrated'},{ref:'1 John 4:9-10', label:'Love sent in the Son'},{ref:'Ephesians 2:4-5', label:'Rich in mercy'}]},
+  {ref:'Romans 8:28',            related:[{ref:'Genesis 50:20', label:'Meant for good'},{ref:'Jeremiah 29:11', label:'Plans for a future'},{ref:'Philippians 1:6', label:'He will complete it'}]},
+  {ref:'Philippians 4:13',       related:[{ref:'Isaiah 40:31', label:'Strength renewed'},{ref:'2 Corinthians 12:9', label:'Grace is sufficient'},{ref:'Psalm 28:7', label:'My strength and shield'}]},
+  {ref:'Jeremiah 29:11',         related:[{ref:'Romans 8:28', label:'All things for good'},{ref:'Isaiah 55:8-9', label:'His thoughts higher'},{ref:'Proverbs 16:9', label:'Lord directs steps'}]},
+  {ref:'Proverbs 3:5-6',         related:[{ref:'Isaiah 26:3', label:'Perfect peace'},{ref:'Psalm 37:5', label:'Commit your way'},{ref:'Matthew 6:33', label:'Seek first the kingdom'}]},
+  {ref:'Galatians 5:22-23',      related:[{ref:'Romans 5:5', label:'Love poured in'},{ref:'Ephesians 5:9', label:'Fruit of light'},{ref:'John 15:5', label:'Apart from me nothing'}]},
+  {ref:'Matthew 28:19-20',       related:[{ref:'Mark 16:15', label:'Preach to all creation'},{ref:'Acts 1:8', label:'Witnesses to the ends'},{ref:'2 Corinthians 5:20', label:'Ambassadors for Christ'}]},
+  {ref:'John 14:6',              related:[{ref:'Acts 4:12', label:'No other name'},{ref:'1 Timothy 2:5', label:'One mediator'},{ref:'Hebrews 7:25', label:'Saves completely'}]},
+  {ref:'Romans 3:23',            related:[{ref:'Isaiah 53:6', label:'All gone astray'},{ref:'1 John 1:8', label:'If we say no sin'},{ref:'Psalm 51:5', label:'Born in sin'}]},
+  {ref:'Romans 6:23',            related:[{ref:'John 3:16', label:'Eternal life through Son'},{ref:'Ephesians 2:8-9', label:'Saved by grace'},{ref:'Romans 5:12', label:'Sin entered world'}]},
+  {ref:'Hebrews 4:12',           related:[{ref:'Psalm 119:105', label:'A lamp to my feet'},{ref:'2 Timothy 3:16', label:'God-breathed'},{ref:'Isaiah 55:11', label:'Word accomplishes purpose'}]},
+  {ref:'Psalm 23:1',             related:[{ref:'John 10:11', label:'Good shepherd'},{ref:'Ezekiel 34:15', label:'I will shepherd them'},{ref:'1 Peter 5:4', label:'Chief shepherd'}]},
+  {ref:'1 Corinthians 13:4-7',   related:[{ref:'Romans 8:35-39', label:'Nothing separates'},{ref:'1 John 4:8', label:'God is love'},{ref:'John 15:13', label:'Greatest love'}]},
+  {ref:'James 1:5',              related:[{ref:'Proverbs 2:6', label:'Wisdom from God'},{ref:'Colossians 1:9', label:'Filled with wisdom'},{ref:'1 Kings 3:9', label:'Solomon\'s request'}]},
+  {ref:'Isaiah 40:31',           related:[{ref:'Psalm 27:14', label:'Wait on the Lord'},{ref:'Matthew 11:28-30', label:'Come to me weary'},{ref:'Lamentations 3:25', label:'Good to those who wait'}]},
+  {ref:'Matthew 5:44',           related:[{ref:'Romans 12:20', label:'Heap coals of fire'},{ref:'Luke 6:27-28', label:'Love your enemies'},{ref:'Proverbs 25:21-22', label:'Feed your enemy'}]},
+  {ref:'John 1:1',               related:[{ref:'Genesis 1:1', label:'In the beginning'},{ref:'Colossians 1:16-17', label:'All things through him'},{ref:'Revelation 19:13', label:'Word of God'}]},
+  {ref:'Revelation 21:4',        related:[{ref:'Isaiah 25:8', label:'Death swallowed up'},{ref:'2 Corinthians 5:17', label:'New creation'},{ref:'Isaiah 65:17', label:'New heavens and earth'}]},
+  {ref:'Ephesians 2:8-9',        related:[{ref:'Titus 3:5', label:'Not by works'},{ref:'Romans 11:6', label:'Grace or works'},{ref:'2 Timothy 1:9', label:'Not because of deeds'}]},
+  {ref:'1 Peter 5:7',            related:[{ref:'Psalm 55:22', label:'Cast your cares'},{ref:'Matthew 6:25-27', label:'Do not worry'},{ref:'Philippians 4:6', label:'With thanksgiving'}]},
+  {ref:'Matthew 6:33',           related:[{ref:'Luke 12:31', label:'Seek his kingdom'},{ref:'Psalm 37:4', label:'Delight in the Lord'},{ref:'1 Kings 3:13', label:'Riches also given'}]},
+  {ref:'Psalm 46:1',             related:[{ref:'Nahum 1:7', label:'Stronghold in trouble'},{ref:'Deuteronomy 31:6', label:'He will not forsake'},{ref:'Isaiah 41:10', label:'Do not fear'}]},
+  {ref:'John 16:33',             related:[{ref:'Romans 5:1', label:'Peace with God'},{ref:'Philippians 4:7', label:'Peace that guards'},{ref:'Isaiah 26:3', label:'Perfect peace'}]},
+  {ref:'2 Timothy 3:16-17',      related:[{ref:'Psalm 119:160', label:'All truth endures'},{ref:'Proverbs 30:5-6', label:'Every word true'},{ref:'John 17:17', label:'Word is truth'}]},
+  {ref:'Hebrews 11:1',           related:[{ref:'Romans 4:18', label:'Abraham\'s hope'},{ref:'Mark 9:23', label:'All things possible'},{ref:'2 Corinthians 4:18', label:'What is unseen'}]},
+  {ref:'Romans 12:2',            related:[{ref:'Ephesians 4:23', label:'Renewed in spirit'},{ref:'Colossians 3:10', label:'Renewed in knowledge'},{ref:'Titus 3:5', label:'Renewing of Spirit'}]},
+  {ref:'1 Thessalonians 5:16-18',related:[{ref:'Philippians 4:4-6', label:'Rejoice always'},{ref:'Psalm 100:1-2', label:'Shout to the Lord'},{ref:'Colossians 3:17', label:'In word and deed'}]},
+  {ref:'Isaiah 41:10',           related:[{ref:'Joshua 1:9', label:'Strong and courageous'},{ref:'Psalm 118:6', label:'Lord is my helper'},{ref:'2 Timothy 1:7', label:'Spirit of power'}]},
+  {ref:'Colossians 3:23',        related:[{ref:'Ecclesiastes 9:10', label:'Whatever your hand finds'},{ref:'1 Corinthians 10:31', label:'To God\'s glory'},{ref:'Ephesians 6:7', label:'Serve wholeheartedly'}]},
+  {ref:'Ephesians 6:10-11',      related:[{ref:'1 Peter 5:8-9', label:'Resist the devil'},{ref:'James 4:7', label:'Submit and resist'},{ref:'2 Corinthians 10:4', label:'Weapons not worldly'}]},
+  {ref:'Proverbs 18:10',         related:[{ref:'Psalm 61:3', label:'Strong tower'},{ref:'2 Samuel 22:3', label:'My rock and fortress'},{ref:'Psalm 91:2', label:'My refuge and fortress'}]},
+  {ref:'John 15:13',             related:[{ref:'1 John 3:16', label:'Laid down his life'},{ref:'Romans 5:7-8', label:'Christ died for sinners'},{ref:'Galatians 2:20', label:'Loved me and gave himself'}]},
+  {ref:'Psalm 119:11',           related:[{ref:'Deuteronomy 6:6', label:'In your heart'},{ref:'Luke 2:51-52', label:'Treasured these things'},{ref:'Colossians 3:16', label:'Let word dwell richly'}]},
+  {ref:'Romans 10:9',            related:[{ref:'Acts 16:31', label:'Believe and be saved'},{ref:'John 3:16-17', label:'Believe in the Son'},{ref:'1 John 4:15', label:'Acknowledge the Son'}]},
+  {ref:'Matthew 11:28',          related:[{ref:'John 6:35', label:'Bread of life'},{ref:'Psalm 116:7', label:'Return to your rest'},{ref:'Psalm 55:22', label:'Cast your burden'}]},
+  {ref:'Galatians 2:20',         related:[{ref:'Romans 6:11', label:'Dead to sin, alive to God'},{ref:'Colossians 3:3', label:'Hidden with Christ'},{ref:'2 Corinthians 5:17', label:'New creation'}]},
+  {ref:'Hebrews 12:2',           related:[{ref:'Philippians 3:14', label:'Press toward the goal'},{ref:'Isaiah 53:3', label:'Despised and rejected'},{ref:'1 Peter 2:21', label:'Christ\'s example'}]},
+  {ref:'Luke 9:23',              related:[{ref:'Matthew 16:24', label:'Take up your cross'},{ref:'Mark 8:34', label:'Deny yourself'},{ref:'Romans 12:1', label:'Living sacrifice'}]},
+  {ref:'James 4:8',              related:[{ref:'Psalm 145:18', label:'Near to all who call'},{ref:'Proverbs 3:7', label:'Fear the Lord'},{ref:'Zechariah 1:3', label:'Return to me'}]},
+  {ref:'Matthew 5:16',           related:[{ref:'1 Peter 2:12', label:'Good deeds among nations'},{ref:'Philippians 2:15', label:'Shine like stars'},{ref:'Colossians 4:5', label:'Wise toward outsiders'}]},
+  {ref:'Psalm 139:14',           related:[{ref:'Genesis 1:27', label:'Made in God\'s image'},{ref:'Isaiah 43:1', label:'Called by name'},{ref:'Ephesians 2:10', label:'God\'s handiwork'}]},
+];
+
+function renderBibleStudyCard(){
+  var root = document.getElementById('studyToolsRoot');
+  if(!root) return;
+  _stActiveTab = _stActiveTab || 'strongs';
+  root.innerHTML = _stBuildShell();
+  _stRenderPanel(_stActiveTab);
+}
+
+function _stBuildShell(){
+  var tabDefs = [
+    {id:'strongs',  icon:'📖', label:"Strong’s"},
+    {id:'crossref', icon:'🔗', label:'Cross Refs'},
+    {id:'passage',  icon:'📜', label:'Passage'},
+    {id:'notes',    icon:'📝', label:'My Notes'},
+  ];
+  var tabBtns = tabDefs.map(function(t){
+    return '<button type="button" class="st-tab-btn'+(t.id===_stActiveTab?' active':'')+'" data-tab="'+t.id+'" onclick="_stTab(\''+t.id+'\')">'
+      +'<span style="display:block;font-size:1.15rem;margin-bottom:.18rem;">'+t.icon+'</span>'
+      +t.label+'</button>';
+  }).join('');
+  return '<style>'
+    +'#studyToolsRoot .st-tab-btn{flex:1;padding:.5rem .2rem;border:1px solid rgba(255,255,255,.08);border-radius:8px;font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fm);letter-spacing:.02em;background:rgba(255,255,255,.04);color:var(--tx2);transition:all .15s;text-align:center;}'
+    +'#studyToolsRoot .st-tab-btn.active{background:rgba(56,189,248,.18);border-color:rgba(56,189,248,.45);color:#38bdf8;}'
+    +'#studyToolsRoot .st-inp{width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.6rem .75rem;font-size:.85rem;color:var(--tx);font-family:var(--fm);outline:none;}'
+    +'#studyToolsRoot .st-inp:focus{border-color:rgba(56,189,248,.5);}'
+    +':root.light #studyToolsRoot .st-inp{background:rgba(0,0,0,.05);color:#1a1233;}'
+    +'#studyToolsRoot .st-btn{display:block;width:100%;padding:.65rem 1rem;border-radius:10px;border:none;background:linear-gradient(135deg,#38bdf8,#0ea5e9);color:#fff;font-family:var(--fm);font-size:.85rem;font-weight:700;cursor:pointer;margin-top:.45rem;}'
+    +'#studyToolsRoot .st-card{background:rgba(255,255,255,.04);border:1px solid rgba(56,189,248,.2);border-radius:12px;padding:.8rem .9rem;margin-bottom:.6rem;}'
+    +'#studyToolsRoot .st-term{font-size:.92rem;font-weight:800;color:var(--tx);}'
+    +'#studyToolsRoot .st-strongs-num{font-size:.68rem;font-weight:700;color:#38bdf8;letter-spacing:.1em;text-transform:uppercase;margin:.1rem 0 .3rem;}'
+    +'#studyToolsRoot .st-def{font-size:.8rem;color:var(--tx2);line-height:1.55;}'
+    +'#studyToolsRoot .st-ref-tag{display:inline-block;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.22);border-radius:6px;padding:.18rem .5rem;font-size:.7rem;font-weight:700;color:#38bdf8;margin:.2rem .2rem .2rem 0;cursor:pointer;}'
+    +'#studyToolsRoot .st-note-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:.75rem .9rem;margin-bottom:.5rem;}'
+    +'#studyToolsRoot .st-note-ref{font-size:.75rem;font-weight:800;color:#38bdf8;}'
+    +'#studyToolsRoot .st-note-date{font-size:.65rem;color:var(--tx3);margin-left:.45rem;}'
+    +'#studyToolsRoot .st-note-body{font-size:.8rem;color:var(--tx2);line-height:1.55;margin-top:.35rem;white-space:pre-wrap;}'
+    +'#studyToolsRoot .st-del-btn{float:right;background:none;border:none;cursor:pointer;color:var(--tx3);font-size:.75rem;padding:.15rem .35rem;border-radius:5px;line-height:1;}'
+    +'#studyToolsRoot .st-verse-box{background:rgba(56,189,248,.06);border-left:3px solid #38bdf8;border-radius:4px 10px 10px 4px;padding:.7rem .9rem;margin:.5rem 0;}'
+    +'#studyToolsRoot .st-verse-text{font-family:Georgia,serif;font-style:italic;font-size:.87rem;color:var(--tx);line-height:1.7;}'
+    +'#studyToolsRoot .st-verse-ref-lbl{font-size:.63rem;font-weight:700;letter-spacing:.1em;color:#38bdf8;text-transform:uppercase;margin-top:.3rem;}'
+    +'#studyToolsRoot .st-empty{text-align:center;padding:1.8rem 1rem;color:var(--tx3);font-size:.82rem;line-height:1.6;}'
+    +'</style>'
+    +'<div style="display:flex;gap:.3rem;margin-bottom:.8rem;">'+tabBtns+'</div>'
+    +'<div id="stPanel"></div>';
+}
+
+function _stTab(t){
+  _stActiveTab = t;
+  document.querySelectorAll('#studyToolsRoot .st-tab-btn').forEach(function(b){
+    b.classList.toggle('active', b.dataset.tab === t);
+  });
+  _stRenderPanel(t);
+}
+
+function _stRenderPanel(t, extra){
+  var panel = document.getElementById('stPanel');
+  if(!panel) return;
+  if(t==='strongs')       panel.innerHTML = _stBuildStrongs();
+  else if(t==='crossref') panel.innerHTML = _stBuildCrossRef();
+  else if(t==='passage')  panel.innerHTML = _stBuildPassage(extra);
+  else if(t==='notes')    panel.innerHTML = _stBuildNotes();
+}
+
+function _stBuildStrongs(){
+  return '<div>'
+    +'<input type="text" class="st-inp" id="stStrongsQ" placeholder="Search word or G/H number…" oninput="_stSearchStrongs(this.value)" style="margin-bottom:.65rem;">'
+    +'<div id="stStrongsResults">'+_stStrongsHits('')+'</div>'
+    +'</div>';
+}
+
+function _stSearchStrongs(q){
+  var el = document.getElementById('stStrongsResults');
+  if(el) el.innerHTML = _stStrongsHits(q||'');
+}
+
+function _stAllTerms(){
+  var base = (typeof JESUS_DATA !== 'undefined' && Array.isArray(JESUS_DATA.strongsKeyTerms))
+    ? JESUS_DATA.strongsKeyTerms : [];
+  return base.concat(_ST_EXTRA_TERMS);
+}
+
+function _stStrongsHits(q){
+  var all = _stAllTerms();
+  q = (q||'').trim().toLowerCase();
+  var hits = q ? all.filter(function(t){
+    return t.term.toLowerCase().indexOf(q) !== -1
+      || t.strongs.toLowerCase().indexOf(q) !== -1
+      || (t.definition||'').toLowerCase().indexOf(q) !== -1;
+  }) : all.slice(0, 20);
+  if(!hits.length) return '<div class="st-empty">No results for "'+_jEsc(q)+'".<br>Try: love, G26, faith, salvation, spirit</div>';
+  return hits.map(function(t){
+    return '<div class="st-card">'
+      +'<div class="st-term">'+_jEsc(t.term)+'</div>'
+      +'<div class="st-strongs-num">'+_jEsc(t.strongs)+'</div>'
+      +'<div class="st-def">'+_jEsc(t.definition||'')+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+function _stBuildCrossRef(){
+  return '<div>'
+    +'<input type="text" class="st-inp" id="stCrossQ" placeholder="Enter a verse reference (e.g. John 3:16)…" oninput="_stSearchCrossRef(this.value)" style="margin-bottom:.65rem;">'
+    +'<div id="stCrossResults">'+_stCrossHits('')+'</div>'
+    +'</div>';
+}
+
+function _stSearchCrossRef(q){
+  var el = document.getElementById('stCrossResults');
+  if(el) el.innerHTML = _stCrossHits(q||'');
+}
+
+function _stCrossHits(q){
+  q = (q||'').trim();
+  var ql = q.toLowerCase();
+  var hits = q ? _ST_CROSS_REFS.filter(function(p){ return p.ref.toLowerCase().indexOf(ql) !== -1; })
+               : _ST_CROSS_REFS.slice(0, 8);
+  if(q && !hits.length) return '<div class="st-empty">No cross-references seeded for "'+_jEsc(q)+'".<br>Try: John 3:16, Psalm 23:1, Romans 8:28, Isaiah 40:31</div>';
+  var prefix = q ? '' : '<div style="font-size:.72rem;color:var(--tx3);margin-bottom:.5rem;">Browse '+_ST_CROSS_REFS.length+' seeded pairs — type a reference to filter:</div>';
+  return prefix + hits.map(function(p){
+    var tags = p.related.map(function(r){
+      return '<span class="st-ref-tag" onclick="_stJumpPassage(\''+_jEsc(r.ref)+'\')">'+_jEsc(r.ref)
+        +'<span style="font-weight:400;opacity:.65;margin-left:.25rem;">'+_jEsc(r.label)+'</span></span>';
+    }).join('');
+    return '<div class="st-card"><div class="st-term" style="margin-bottom:.4rem;">'+_jEsc(p.ref)+'</div>'+tags+'</div>';
+  }).join('');
+}
+
+function _stJumpPassage(ref){
+  _stActiveTab = 'passage';
+  document.querySelectorAll('#studyToolsRoot .st-tab-btn').forEach(function(b){
+    b.classList.toggle('active', b.dataset.tab === 'passage');
+  });
+  _stRenderPanel('passage', ref);
+}
+
+function _stBuildPassage(preloadRef){
+  var val = preloadRef ? ' value="'+_jEsc(preloadRef)+'"' : '';
+  if(preloadRef) setTimeout(function(){ _stFetchPassage(); }, 60);
+  return '<div>'
+    +'<div style="display:flex;gap:.45rem;margin-bottom:.5rem;">'
+    +'<input type="text" class="st-inp" id="stPassageQ" placeholder="e.g. John 3:16 or Psalm 23:1"'+val+' style="flex:1;">'
+    +'<button type="button" style="flex-shrink:0;padding:.6rem .9rem;border-radius:10px;border:none;background:linear-gradient(135deg,#38bdf8,#0ea5e9);color:#fff;font-family:var(--fm);font-size:.85rem;font-weight:700;cursor:pointer;" onclick="_stFetchPassage()">View</button>'
+    +'</div>'
+    +'<div id="stPassageResult"></div>'
+    +'</div>';
+}
+
+function _stParseRef(ref){
+  var m = ref.trim().match(/^((?:\d\s?)?[A-Za-z]+(?:\s+[A-Za-z]+)*)\s+(\d+):(\d+)$/);
+  if(!m) return null;
+  return {book:m[1].trim(), chapter:parseInt(m[2],10), verse:parseInt(m[3],10)};
+}
+
+function _stFetchPassage(){
+  var q = ((document.getElementById('stPassageQ')||{}).value||'').trim();
+  if(!q) return;
+  var el = document.getElementById('stPassageResult');
+  if(!el) return;
+  el.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--tx3);font-size:.82rem;">Loading…</div>';
+  var parsed = _stParseRef(q);
+  var apiQ;
+  if(parsed){
+    var v1 = Math.max(1, parsed.verse - 2);
+    var v2 = parsed.verse + 2;
+    apiQ = encodeURIComponent(parsed.book + ' ' + parsed.chapter + ':' + v1 + '-' + v2);
+  } else {
+    apiQ = encodeURIComponent(q);
+  }
+  fetch('https://bible-api.com/' + apiQ + '?translation=web')
+    .then(function(r){ return r.ok ? r.json() : Promise.reject(r.status); })
+    .then(function(data){ _stShowPassage(data, q); })
+    .catch(function(){ _stPassageFallback(q); });
+}
+
+function _stShowPassage(data, origRef){
+  var el = document.getElementById('stPassageResult');
+  if(!el) return;
+  var verses = data.verses || [];
+  if(!verses.length){ _stPassageFallback(origRef); return; }
+  var vHtml = verses.map(function(v){
+    return '<div class="st-verse-box">'
+      +'<div class="st-verse-text">'+_jEsc((v.text||'').trim())+'</div>'
+      +'<div class="st-verse-ref-lbl">'+_jEsc(v.book_name||'')+' '+_jEsc(String(v.chapter||''))+':'+_jEsc(String(v.verse||''))+'</div>'
+      +'</div>';
+  }).join('');
+  var yvLink = 'https://www.bible.com/search/bible?q='+encodeURIComponent(origRef)+'&version_id=111';
+  var bgLink = 'https://www.biblegateway.com/passage/?search='+encodeURIComponent(origRef)+'&version=NIV';
+  el.innerHTML = vHtml
+    +'<div style="font-size:.65rem;color:var(--tx3);margin:.3rem 0 .5rem;">World English Bible via bible-api.com</div>'
+    +'<div style="display:flex;gap:.4rem;margin-bottom:.4rem;">'
+    +'<a href="'+_jEsc(yvLink)+'" target="_blank" rel="noopener" style="flex:1;display:block;text-align:center;padding:.5rem;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.22);border-radius:8px;color:#38bdf8;font-size:.76rem;font-weight:700;text-decoration:none;">YouVersion</a>'
+    +'<a href="'+_jEsc(bgLink)+'" target="_blank" rel="noopener" style="flex:1;display:block;text-align:center;padding:.5rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:var(--tx2);font-size:.76rem;font-weight:700;text-decoration:none;">Bible Gateway</a>'
+    +'</div>'
+    +'<button type="button" onclick="_stNoteFromPassage(\''+_jEsc(origRef)+'\')" style="width:100%;padding:.5rem;border-radius:8px;border:1px solid rgba(56,189,248,.2);background:rgba(56,189,248,.05);color:#38bdf8;font-size:.76rem;font-weight:700;cursor:pointer;font-family:var(--fm);">+ Add Study Note</button>';
+}
+
+function _stPassageFallback(ref){
+  var el = document.getElementById('stPassageResult');
+  if(!el) return;
+  var yvLink = 'https://www.bible.com/search/bible?q='+encodeURIComponent(ref)+'&version_id=111';
+  el.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--tx3);font-size:.8rem;line-height:1.6;">Could not load passage text — check connection.</div>'
+    +'<a href="'+_jEsc(yvLink)+'" target="_blank" rel="noopener" style="display:block;text-align:center;padding:.65rem 1rem;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);border-radius:10px;color:#38bdf8;font-size:.82rem;font-weight:700;text-decoration:none;">Open "'+_jEsc(ref)+'" in YouVersion</a>';
+}
+
+function _stNoteKey(){
+  return typeof _ylccUserKey === 'function' ? _ylccUserKey('st_notes') : 'ylcc_st_notes_local';
+}
+
+function _stGetNotes(){
+  try{ return JSON.parse(localStorage.getItem(_stNoteKey())||'[]'); }
+  catch(e){ return []; }
+}
+
+function _stSaveAllNotes(arr){ localStorage.setItem(_stNoteKey(), JSON.stringify(arr)); }
+
+function _stBuildNotes(){
+  var notes = _stGetNotes().slice().sort(function(a,b){ return (b.date||'') > (a.date||'') ? 1 : -1; });
+  var listHtml = notes.length ? notes.map(function(n){
+    var d = '';
+    try{ d = new Date(n.date).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}); }catch(e){}
+    return '<div class="st-note-item" id="stni-'+_jEsc(n.id)+'">'
+      +'<button type="button" class="st-del-btn" onclick="_stDelNote(\''+_jEsc(n.id)+'\')" title="Delete">&#10005;</button>'
+      +'<div><span class="st-note-ref">'+_jEsc(n.reference||'General')+'</span>'
+      +'<span class="st-note-date">'+d+'</span></div>'
+      +'<div class="st-note-body">'+_jEsc(n.note||'')+'</div>'
+      +'</div>';
+  }).join('') : '<div class="st-empty">No notes yet.<br>Add your first note below.</div>';
+  return '<div>'
+    +listHtml
+    +'<div style="margin-top:.9rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:.85rem;">'
+    +'<div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#38bdf8;margin-bottom:.45rem;">New Note</div>'
+    +'<input type="text" class="st-inp" id="stNoteRef" placeholder="Reference (e.g. John 3:16)" style="margin-bottom:.4rem;">'
+    +'<textarea class="st-inp" id="stNoteText" rows="4" placeholder="Your notes…" style="resize:vertical;min-height:80px;"></textarea>'
+    +'<button type="button" class="st-btn" onclick="_stAddNote()">Save Note</button>'
+    +'</div>'
+    +'</div>';
+}
+
+function _stAddNote(){
+  var ref = ((document.getElementById('stNoteRef')||{}).value||'').trim();
+  var txt = ((document.getElementById('stNoteText')||{}).value||'').trim();
+  if(!txt) return;
+  var notes = _stGetNotes();
+  notes.push({
+    id: Date.now().toString(36)+Math.random().toString(36).slice(2,5),
+    reference: ref||'General',
+    note: txt,
+    date: new Date().toISOString()
+  });
+  _stSaveAllNotes(notes);
+  if(typeof showToast==='function') showToast('Note saved');
+  _stRenderPanel('notes');
+}
+
+function _stDelNote(id){
+  if(!confirm('Delete this note?')) return;
+  _stSaveAllNotes(_stGetNotes().filter(function(n){ return n.id !== id; }));
+  _stRenderPanel('notes');
+}
+
+function _stNoteFromPassage(ref){
+  _stTab('notes');
+  setTimeout(function(){
+    var el = document.getElementById('stNoteRef');
+    if(el) el.value = ref;
+    var ta = document.getElementById('stNoteText');
+    if(ta) ta.focus();
+  }, 60);
 }

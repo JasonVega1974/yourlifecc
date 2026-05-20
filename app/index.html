@@ -4834,13 +4834,18 @@
         <div class="topic-card-title">Christian Traditions</div>
         <div class="topic-card-desc">15 denominations explained</div>
       </div>
+      <div class="topic-card accent-cyan" onclick="bfTab('studyTools')">
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(14,165,233,.12));"><img class="topic-card-hero" data-card-id="bf-studyTools" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Aleppo_Codex_%28Deut%29.jpg/1280px-Aleppo_Codex_%28Deut%29.jpg" alt="Study Tools"></div>
+        <div class="topic-card-title">Study Tools</div>
+        <div class="topic-card-desc">Strong's · cross refs · passage · notes</div>
+      </div>
       <div class="topic-card" style="--accent-light:rgba(56,189,248,.22)" onclick="window.location.href='/app/podcasts.html'">
-        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(99,102,241,.15));"><span style="font-size:2.8rem;display:flex;align-items:center;justify-content:center;height:100%;">🎧</span></div>
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(99,102,241,.15));"><img class="topic-card-hero" data-card-id="bf-podcasts" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Shure_mikrofon_55S.jpg/1280px-Shure_mikrofon_55S.jpg" alt="Podcasts"></div>
         <div class="topic-card-title">Podcasts</div>
         <div class="topic-card-desc">Best Christian voices to grow your faith</div>
       </div>
       <div class="topic-card" style="--accent-light:rgba(16,185,129,.22)" onclick="window.location.href='/app/calendar.html'">
-        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(16,185,129,.22),rgba(5,150,105,.12));"><span style="font-size:2.8rem;display:flex;align-items:center;justify-content:center;height:100%;">📅</span></div>
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(16,185,129,.22),rgba(5,150,105,.12));"><img class="topic-card-hero" data-card-id="bf-calendar" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Baptistery_wall_painting_Good_Shepherd_and_Adam_and_Eve.jpg/1280px-Baptistery_wall_painting_Good_Shepherd_and_Adam_and_Eve.jpg" alt="Faith Calendar"></div>
         <div class="topic-card-title">Faith Calendar</div>
         <div class="topic-card-desc">Church events, milestones &amp; commitments</div>
       </div>
@@ -7782,6 +7787,11 @@
        in faith.js. Data registry from app/js/bible-study-data.js. -->
   <div id="bf-bibleStudy" style="display:none;">
     <div id="bibleStudyRoot"></div>
+  </div>
+
+  <!-- ════ Study Tools (Worker 4) — Strong's · Cross Refs · Passage · Notes ════ -->
+  <div id="bf-studyTools" style="display:none;">
+    <div id="studyToolsRoot"></div>
   </div>
 
   <!-- ════ THE WELL — bottom nav (mirrors top .scrTabs; bfTab keeps both in sync) ════ -->
