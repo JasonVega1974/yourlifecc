@@ -556,7 +556,25 @@ function renderDailyAiDevotional(){
   try { cached = JSON.parse(localStorage.getItem(cacheKey)||'null'); } catch(e) {}
   if(cached && cached.title){ _renderDailyDevContent(root, cached); return; }
 
-  root.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--tx3);font-size:.75rem;background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.1);border-radius:14px;">✨ Writing today\'s devotional…</div>';
+  // Shimmer skeleton — inject keyframe once
+  if(!document.getElementById('_devSkelStyle')){
+    var _sk = document.createElement('style');
+    _sk.id = '_devSkelStyle';
+    _sk.textContent = '@keyframes _devSk{0%{background-position:-200% 0}100%{background-position:200% 0}}'
+      + '@media(prefers-reduced-motion:reduce){@keyframes _devSk{from,to{background-position:0 0}}}';
+    document.head.appendChild(_sk);
+  }
+  var _sklA = window.matchMedia('(prefers-reduced-motion:reduce)').matches ? 'none' : '_devSk 1.6s ease-in-out infinite';
+  var _sklGrad = 'linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.09) 50%,rgba(255,255,255,.04) 75%)';
+  root.innerHTML = '<div role="status" aria-label="Loading today\'s devotional" style="background:rgba(67,56,202,.04);border:1px solid rgba(67,56,202,.12);border-radius:16px;padding:1rem 1.1rem;">'
+    + '<div style="height:.55rem;width:58%;background:'+_sklGrad+';background-size:200% 100%;border-radius:6px;margin-bottom:.65rem;animation:'+_sklA+'"></div>'
+    + '<div style="height:1.1rem;width:82%;background:'+_sklGrad+';background-size:200% 100%;border-radius:6px;margin-bottom:.5rem;animation:'+_sklA+'"></div>'
+    + '<div style="height:.75rem;width:100%;background:'+_sklGrad+';background-size:200% 100%;border-radius:4px;margin-bottom:.28rem;animation:'+_sklA+'"></div>'
+    + '<div style="height:.75rem;width:88%;background:'+_sklGrad+';background-size:200% 100%;border-radius:4px;margin-bottom:.28rem;animation:'+_sklA+'"></div>'
+    + '<div style="height:.75rem;width:70%;background:'+_sklGrad+';background-size:200% 100%;border-radius:4px;margin-bottom:.9rem;animation:'+_sklA+'"></div>'
+    + '<div style="height:3.4rem;background:rgba(167,139,250,.03);border:1px solid rgba(167,139,250,.06);border-radius:10px;margin-bottom:.5rem;"></div>'
+    + '<div style="height:3.4rem;background:rgba(251,191,36,.02);border:1px solid rgba(251,191,36,.05);border-radius:10px;"></div>'
+    + '</div>';
 
   var userAge     = (typeof D!=='undefined'&&D&&D.user&&D.user.age) ? D.user.age : '13-22';
   var denomination= (typeof D!=='undefined'&&D&&D.user&&D.user.denomination) ? D.user.denomination : 'evangelical';
@@ -581,18 +599,18 @@ function renderDailyAiDevotional(){
 
 function _renderDailyDevContent(root, dev){
   var dateLabel = new Date().toLocaleDateString('en-US', {month:'long', day:'numeric'});
-  var html = '<div style="background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.12);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.85rem;">';
-  html += '<div style="font-size:.57rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#38bdf8;opacity:.85;margin-bottom:.3rem;">✨ DAILY DEVOTIONAL · '+escapeHtml(dateLabel)+'</div>';
+  var html = '<div style="background:rgba(67,56,202,.04);border:1px solid rgba(67,56,202,.12);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.85rem;">';
+  html += '<div style="font-size:.6875rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#4338ca;opacity:.85;margin-bottom:.3rem;">✨ DAILY DEVOTIONAL · '+escapeHtml(dateLabel)+'</div>';
   html += '<div style="font-size:1rem;font-weight:900;color:var(--tx);margin-bottom:.5rem;line-height:1.3;">'+(dev.icon||'✨')+' '+escapeHtml(dev.title||'')+'</div>';
   html += '<div style="font-family:Georgia,serif;font-style:italic;font-size:.88rem;line-height:1.6;color:var(--tx);margin-bottom:.2rem;">"'+escapeHtml(dev.scripture||'')+'"</div>';
-  html += '<div style="font-size:.72rem;font-weight:800;color:#38bdf8;margin-bottom:.7rem;">— '+escapeHtml(dev.scriptureRef||'')+'</div>';
+  html += '<div style="font-size:.72rem;font-weight:800;color:#4338ca;margin-bottom:.7rem;">— '+escapeHtml(dev.scriptureRef||'')+'</div>';
   html += '<div style="font-size:.82rem;color:var(--tx2);line-height:1.7;margin-bottom:.7rem;">'+escapeHtml(dev.devotional||'')+'</div>';
   html += '<div style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.12);border-radius:10px;padding:.55rem .75rem;margin-bottom:.6rem;">';
-  html += '<div style="font-size:.58rem;font-weight:800;color:#a78bfa;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.18rem;">💭 Reflect</div>';
+  html += '<div style="font-size:.6875rem;font-weight:800;color:#a78bfa;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.18rem;">💭 Reflect</div>';
   html += '<div style="font-size:.8rem;color:var(--tx);line-height:1.5;">'+escapeHtml(dev.question||'')+'</div>';
   html += '</div>';
   html += '<div style="background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.12);border-radius:10px;padding:.55rem .75rem;margin-bottom:.75rem;">';
-  html += '<div style="font-size:.58rem;font-weight:800;color:#fbbf24;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.18rem;">🙏 Prayer</div>';
+  html += '<div style="font-size:.6875rem;font-weight:800;color:#fbbf24;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.18rem;">🙏 Prayer</div>';
   html += '<div style="font-family:Georgia,serif;font-style:italic;font-size:.8rem;color:var(--tx2);line-height:1.55;">'+escapeHtml(dev.prayer||'')+'</div>';
   html += '</div>';
   html += '<div style="display:flex;gap:.4rem;flex-wrap:wrap;">';
@@ -721,6 +739,7 @@ function bfInjectBackPill(panelId){
 }
 
 function bfTab(tab, btn){
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
   BF_TABS.forEach(t=>{
     const el = document.getElementById('bf-'+t);
     if(el) el.style.display = t===tab ? 'block' : 'none';
@@ -11200,6 +11219,7 @@ var _medSegTimer = null;
 var _medPaused = false;
 var _medElapsed = 0;
 var _medAdvancePending = false;
+var _medPushedState = false;
 
 var _ssId = null;
 var _ssIdx = 0;
@@ -11208,6 +11228,13 @@ var _ssSegTimer = null;
 var _ssFadeTimer = null;
 var _ssPaused = false;
 var _ssTtsVol = 1.0;
+var _ssPushedState = false;
+
+// Intercept system back button while either full-screen overlay is open
+window.addEventListener('popstate', function(){
+  if(document.getElementById('meditationOverlay')){ _medPushedState = false; _medClose(); }
+  else if(document.getElementById('sleepStoryOverlay')){ _ssPushedState = false; _ssClose(); }
+});
 var _ssWakeLock = null;
 
 var _MED_TYPE_COLOR = {scripture:'#38bdf8',reflection:'#a78bfa',prayer:'#10b981',opening:'#fde68a',close:'#fde68a',breath:'#38bdf8',silence:'#a78bfa',declaration:'#10b981',practice:'#a78bfa',cast:'#38bdf8'};
@@ -11248,7 +11275,9 @@ function renderAudioMeditationsCard(){
   }
   html += '<div style="margin-top:.85rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:.55rem .85rem;display:flex;align-items:center;gap:.5rem;">';
   html += '<span style="font-size:.75rem;flex-shrink:0;">🎙</span>';
-  html += '<div style="flex:1;font-size:.72rem;color:var(--tx3);line-height:1.4;">Voice settings in <strong style="color:var(--tx2);">⚙ Settings</strong> · Debug: <button type="button" onclick="_ttsShowDebugPanel()" style="background:none;border:none;color:rgba(56,189,248,.7);font-size:.68rem;cursor:pointer;font-family:var(--fm);padding:0;">Diagnostics</button></div>';
+  html += '<div style="flex:1;font-size:.72rem;color:var(--tx3);line-height:1.4;">Voice settings in <strong style="color:var(--tx2);">⚙ Settings</strong>'
+    + (localStorage.getItem('ylcc_dev')==='1' ? ' · <button type="button" onclick="_ttsShowDebugPanel()" style="background:none;border:none;color:rgba(56,189,248,.7);font-size:.68rem;cursor:pointer;font-family:var(--fm);padding:0;">Diagnostics</button>' : '')
+    + '</div>';
   html += '<button type="button" onclick="openSettings()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--tx2);border-radius:8px;padding:.26rem .55rem;font-size:.68rem;cursor:pointer;font-family:var(--fm);flex-shrink:0;">Open →</button>';
   html += '</div>';
   html += '</div>';
@@ -11443,7 +11472,7 @@ function renderCreateMeditationCard(){
   html += '<div style="background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.12);border-radius:14px;padding:1rem 1.1rem;">';
   // Theme
   html += '<div style="margin-bottom:.8rem;">';
-  html += '<label style="font-size:.66rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:.3rem;">What\'s on your heart?</label>';
+  html += '<label for="genMedTheme" style="font-size:.66rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:.3rem;">What\'s on your heart?</label>';
   html += '<input id="genMedTheme" type="text" maxlength="120" placeholder="e.g. trusting God when I\'m scared" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:8px;padding:.5rem .65rem;font-size:.85rem;font-family:var(--fm);outline:none;" />';
   html += '</div>';
   // Mood picker
@@ -11451,7 +11480,7 @@ function renderCreateMeditationCard(){
   html += '<div style="font-size:.66rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem;">Or pick a feeling:</div>';
   html += '<div style="display:flex;gap:.4rem;flex-wrap:wrap;">';
   moods.forEach(function(m){
-    html += '<button type="button" onclick="_genMedPickMood(this,\''+m.id+'\')" data-mood-id="'+m.id+'" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--tx);border-radius:10px;padding:.35rem .55rem;font-size:.8rem;cursor:pointer;font-family:var(--fm);" title="'+m.l+'">'+m.e+' <span style="font-size:.62rem;">'+m.l+'</span></button>';
+    html += '<button type="button" onclick="_genMedPickMood(this,\''+m.id+'\')" data-mood-id="'+m.id+'" aria-pressed="false" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--tx);border-radius:10px;padding:.35rem .55rem;font-size:.8rem;cursor:pointer;font-family:var(--fm);" title="'+m.l+'">'+m.e+' <span style="font-size:.62rem;">'+m.l+'</span></button>';
   });
   html += '</div>';
   html += '<input type="hidden" id="genMedMood" value="" />';
@@ -11467,14 +11496,14 @@ function renderCreateMeditationCard(){
   html += '</div></div>';
   // Scripture
   html += '<div style="margin-bottom:1rem;">';
-  html += '<label style="font-size:.66rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:.3rem;">Scripture focus <span style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.55;">(optional — leave blank to let AI choose)</span></label>';
+  html += '<label for="genMedScripture" style="font-size:.66rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:.3rem;">Scripture focus <span style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.55;">(optional — leave blank to let AI choose)</span></label>';
   html += '<input id="genMedScripture" type="text" maxlength="60" placeholder="e.g. Psalm 23 or John 3:16" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:8px;padding:.5rem .65rem;font-size:.82rem;font-family:var(--fm);outline:none;" />';
   html += '</div>';
   // Generate button
-  html += '<button type="button" id="genMedBtn" onclick="generateMeditation()" style="width:100%;background:linear-gradient(135deg,rgba(167,139,250,.3),rgba(56,189,248,.2));border:1px solid rgba(167,139,250,.4);color:var(--tx);border-radius:12px;padding:.75rem;font-size:.9rem;font-weight:800;cursor:pointer;font-family:var(--fm);">✨ Generate Meditation</button>';
+  html += '<button type="button" id="genMedBtn" onclick="generateMeditation()" style="width:100%;background:#4338ca;border:1px solid rgba(67,56,202,.5);color:#fff;border-radius:12px;padding:.75rem;font-size:.9rem;font-weight:800;cursor:pointer;font-family:var(--fm);">✨ Generate Meditation</button>';
   html += '</div>';
   // Result area + library
-  html += '<div id="genMedResult" style="margin-top:.75rem;"></div>';
+  html += '<div id="genMedResult" role="status" aria-live="polite" style="margin-top:.75rem;"></div>';
   html += _genMedBuildLibraryHtml();
   // Phase 4+ — community discovery feed goes here
   html += '<div id="communityDiscoveryFeed" style="display:none;" aria-hidden="true"></div>';
@@ -11486,12 +11515,13 @@ function renderCreateMeditationCard(){
 
 function _genMedPickMood(btn, moodId){
   var all = document.querySelectorAll('[data-mood-id]');
-  all.forEach(function(b){ b.style.background='rgba(255,255,255,.05)'; b.style.border='1px solid rgba(255,255,255,.1)'; b.style.color='var(--tx)'; });
+  all.forEach(function(b){ b.style.background='rgba(255,255,255,.05)'; b.style.border='1px solid rgba(255,255,255,.1)'; b.style.color='var(--tx)'; b.setAttribute('aria-pressed','false'); });
   var hidden = document.getElementById('genMedMood');
   if(hidden && hidden.value === moodId){ hidden.value = ''; return; }
   btn.style.background = 'rgba(167,139,250,.2)';
   btn.style.border = '1px solid rgba(167,139,250,.45)';
   btn.style.color = '#a78bfa';
+  btn.setAttribute('aria-pressed','true');
   if(hidden) hidden.value = moodId;
 }
 
@@ -11725,6 +11755,7 @@ function startMeditation(medId){
   var med = AUDIO_MEDITATIONS.find(function(m){ return m.id===medId; });
   if(!med) return;
   _medClose();
+  if('pushState' in history){ history.pushState({ylccMed:true},''); _medPushedState = true; }
   _medId = medId; _medCurrentObj = med; _medSegIdx = 0; _medPaused = false; _medElapsed = 0; _medAdvancePending = false;
   var overlay = document.createElement('div');
   overlay.id = 'meditationOverlay';
@@ -11861,6 +11892,7 @@ function _medClose(){
   if(overlay) overlay.remove();
   document.body.style.overflow = '';
   _medId = null; _medCurrentObj = null; _medSegIdx = 0; _medPaused = false; _medElapsed = 0; _medAdvancePending = false;
+  if(_medPushedState){ _medPushedState = false; try{ history.back(); }catch(e){} }
 }
 
 function _medComplete(med){
@@ -11912,6 +11944,7 @@ function startSleepStory(storyId){
   var story = SLEEP_STORIES.find(function(s){ return s.id===storyId; });
   if(!story) return;
   _ssClose();
+  if('pushState' in history){ history.pushState({ylccSS:true},''); _ssPushedState = true; }
   _ssId = storyId; _ssIdx = 0; _ssPaused = false; _ssTtsVol = 1.0;
   if(story.verses && story.verses.length){
     _ssSegments = story.verses.slice();
@@ -12029,6 +12062,7 @@ function _ssClose(){
   if(overlay) overlay.remove();
   document.body.style.overflow = '';
   _ssId = null; _ssIdx = 0; _ssPaused = false; _ssTtsVol = 1.0; _ssSegments = [];
+  if(_ssPushedState){ _ssPushedState = false; try{ history.back(); }catch(e){} }
 }
 
 function _ssFadeOut(story){

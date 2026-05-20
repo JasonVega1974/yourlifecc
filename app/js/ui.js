@@ -1687,6 +1687,8 @@ function showTopicCard(scope, topicId){
 }
 
 function showSection(id, fromMobile){
+  // Stop any ongoing TTS when navigating between sections
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
   // faith_free fail-closed: redirect to home if the requested section is
   // outside the allow-list. Silent redirect — some callers fire from
   // setTimeout chains where a throw would surface as an unhandled rejection.
