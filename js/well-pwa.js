@@ -1,6 +1,15 @@
 // PWA install prompt for Enter the Well (faith.html)
 // Keys: well_pwa_dismissed, well_ios_prompt_shown, well_visit_count
 (function () {
+  if (localStorage.getItem('well_just_registered')) {
+    localStorage.removeItem('well_just_registered');
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        window.dispatchEvent(new CustomEvent('well:registered'));
+      }, 2000);
+    });
+  }
+
   var BANNER_ID = 'well-install-banner';
   var DISMISS_KEY = 'well_pwa_dismissed';
   var IOS_SHOWN_KEY = 'well_ios_prompt_shown';

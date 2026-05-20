@@ -197,6 +197,7 @@ async function faithSignup(){
     try {
       localStorage.setItem('ylcc_pending_plan', 'faith_free');
       localStorage.setItem('ylcc_last_signup_email', email);
+      localStorage.setItem('well_just_registered', '1');
     } catch(e) {}
 
     window.location.href = '/app/';
