@@ -28,6 +28,18 @@
 </script>
 <!-- App stylesheet -->
 <link rel="stylesheet" href="/app/css/app.css">
+
+<!-- PWA manifest -->
+<link rel="manifest" href="/manifest.json">
+
+<!-- iOS PWA support -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="YourLife CC">
+<link rel="apple-touch-icon" href="/app/icons/icon-192.png">
+
+<!-- Theme color -->
+<meta name="theme-color" content="#0a1f5e">
 <!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>@media(min-width:861px){#bottomTabBar{display:none!important;}}</style>
@@ -11945,6 +11957,9 @@
 <!-- App bootstrap: must load last -->
 <script src="/app/js/init.js"></script>
 
+<!-- PWA install prompt — self-contained IIFE, safe after init -->
+<script src="/app/js/pwa.js"></script>
+
 <!-- Google Translate widget loader — required for language picker -->
 <script src="//translate.googleapis.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
@@ -12309,7 +12324,6 @@ if (_origRefresh) {
 </script>
 
 <!-- Service Worker registration with auto-update on new deploy -->
-<link rel="manifest" href="/manifest.json">
 <script>
 (function(){
   if (!('serviceWorker' in navigator)) return;
