@@ -12089,6 +12089,7 @@ function _ssReleaseWakeLock(){
 var _ambientTrackId = null;
 var _ambientExpanded = null;
 var _ambientSearchQuery = '';
+var _ambientMuted = true; // starts muted for reliable autoplay; user unmutes via button
 
 function _ambientGetLibrary(){
   return (typeof CURATED_AUDIO_LIBRARY !== 'undefined') ? CURATED_AUDIO_LIBRARY
@@ -12228,6 +12229,7 @@ function playAmbientTrack(trackId){
 }
 
 function stopAmbient(){
+  _ambientMuted = true;
   _ambientTrackId = null;
   var mp = document.getElementById('ambientMiniPlayer');
   if(mp) mp.style.display = 'none';
@@ -12245,16 +12247,52 @@ function ensureAmbientMiniPlayer(track){
     document.body.appendChild(mp);
   }
   mp.style.display = 'block';
-  var iframeSrc = 'https://www.youtube-nocookie.com/embed/'+track.youtubeId+'?autoplay=1&loop=1&playlist='+track.youtubeId+'&controls=0&modestbranding=1&playsinline=1&rel=0';
+  _ambientMuted = true;
+
+  // Build UI row first — no iframe in innerHTML so the element ref stays clean
   mp.innerHTML = '<div style="display:flex;align-items:center;gap:.65rem;padding:.45rem 1rem;">'
     +'<span style="font-size:.95rem;flex-shrink:0;">🎵</span>'
     +'<div style="flex:1;min-width:0;">'
     +'<div style="font-size:.6rem;font-weight:800;color:#38bdf8;text-transform:uppercase;letter-spacing:.06em;">Now Playing</div>'
     +'<div style="font-size:.82rem;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+escapeHtml(track.title)+'</div>'
     +'</div>'
+    +'<button type="button" id="ambientUnmuteBtn" onclick="toggleAmbientMute()" style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);color:#fbbf24;border-radius:8px;padding:.28rem .55rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);margin-right:.3rem;">🔇 Unmute</button>'
     +'<button type="button" onclick="stopAmbient()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);border-radius:8px;padding:.28rem .6rem;font-size:.72rem;cursor:pointer;font-family:var(--fm);">✕ Stop</button>'
-    +'</div>'
-    +'<iframe id="ambientIframe" src="'+iframeSrc+'" frameborder="0" allow="autoplay;encrypted-media" style="width:100%;height:36px;border:none;display:block;opacity:.28;" title="Ambient audio" onerror="this.src=\'https://www.youtube-nocookie.com/embed/VYXDfhgwTyM?autoplay=1&loop=1&playlist=VYXDfhgwTyM&controls=0&modestbranding=1&playsinline=1&rel=0\';if(typeof showToast===\'function\')showToast(\'Track unavailable — playing fallback\');"></iframe>';
+    +'</div>';
+
+  // Create iframe via DOM API — preserves user-gesture activation that innerHTML loses.
+  // mute=1 guarantees autoplay in all modern browsers (unmuted autoplay is blocked
+  // in cross-origin iframes by Chrome/Safari autoplay policy regardless of allow attr).
+  var iframe = document.createElement('iframe');
+  iframe.id = 'ambientIframe';
+  iframe.allow = 'autoplay; encrypted-media; accelerometer; gyroscope; picture-in-picture';
+  iframe.frameBorder = '0';
+  iframe.title = 'Ambient audio: ' + track.title;
+  iframe.style.cssText = 'width:0;height:0;position:absolute;border:none;pointer-events:none;top:0;left:0;';
+  iframe.src = 'https://www.youtube-nocookie.com/embed/'+track.youtubeId
+    + '?autoplay=1&mute=1&loop=1&playlist='+track.youtubeId
+    + '&controls=0&modestbranding=1&playsinline=1&rel=0&enablejsapi=1'
+    + '&origin='+encodeURIComponent(location.origin);
+  mp.appendChild(iframe);
+}
+
+function toggleAmbientMute(){
+  var iframe = document.getElementById('ambientIframe');
+  var btn = document.getElementById('ambientUnmuteBtn');
+  if(!iframe) return;
+  _ambientMuted = !_ambientMuted;
+  try {
+    iframe.contentWindow.postMessage(
+      JSON.stringify({event:'command', func: _ambientMuted ? 'mute' : 'unMute', args:''}),
+      'https://www.youtube-nocookie.com'
+    );
+  } catch(e){}
+  if(btn){
+    btn.textContent = _ambientMuted ? '🔇 Unmute' : '🔊 Mute';
+    btn.style.background = _ambientMuted ? 'rgba(251,191,36,.12)' : 'rgba(56,189,248,.12)';
+    btn.style.border = '1px solid '+(_ambientMuted ? 'rgba(251,191,36,.3)' : 'rgba(56,189,248,.3)');
+    btn.style.color = _ambientMuted ? '#fbbf24' : '#38bdf8';
+  }
 }
 
 // ── Sermon Podcast Linking ─────────────────────────────────────
