@@ -11517,7 +11517,7 @@ function _genMedPickMood(btn, moodId){
   var all = document.querySelectorAll('[data-mood-id]');
   all.forEach(function(b){ b.style.background='rgba(255,255,255,.05)'; b.style.border='1px solid rgba(255,255,255,.1)'; b.style.color='var(--tx)'; b.setAttribute('aria-pressed','false'); });
   var hidden = document.getElementById('genMedMood');
-  if(hidden && hidden.value === moodId){ hidden.value = ''; return; }
+  if(hidden && hidden.value === moodId){ hidden.value = ''; btn.setAttribute('aria-pressed','false'); return; }
   btn.style.background = 'rgba(167,139,250,.2)';
   btn.style.border = '1px solid rgba(167,139,250,.45)';
   btn.style.color = '#a78bfa';
