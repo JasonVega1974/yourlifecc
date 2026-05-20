@@ -355,35 +355,6 @@
       <div class="palette-swatch" id="ps-coral" data-palette="coral" style="background:#ff6b6b;" onclick="setPalette('coral',this)" title="Coral"></div>
       <div class="palette-swatch" id="ps-neon" data-palette="neon" style="background:linear-gradient(135deg,#39ff14,#ff00ff);" onclick="setPalette('neon',this)" title="Neon"></div>
     </div>
-    <!-- Calm Themes — full background + accent themes (mom-persona Phase 7) -->
-    <div style="font-size:.65rem;font-weight:700;color:var(--tx2);margin-bottom:.35rem;">Calm Themes <span style="color:var(--tx3);font-weight:400;font-size:.6rem;">(full background + accent)</span></div>
-    <div style="display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.8rem;">
-      <div class="palette-swatch" id="ps-cream" data-palette="cream" style="background:linear-gradient(135deg,#f5f0e8 0%,#f5f0e8 50%,#c97b63 50%,#c97b63 100%);border:1.5px solid rgba(120,95,70,.3);" onclick="setPalette('cream',this)" title="Warm Cream"></div>
-      <div class="palette-swatch" id="ps-sage" data-palette="sage" style="background:linear-gradient(135deg,#eef2eb 0%,#eef2eb 50%,#5a7a5b 50%,#5a7a5b 100%);border:1.5px solid rgba(90,122,91,.3);" onclick="setPalette('sage',this)" title="Sage Family"></div>
-      <div class="palette-swatch" id="ps-teal" data-palette="teal" style="background:linear-gradient(135deg,#f2f5f6 0%,#f2f5f6 50%,#5e8a8a 50%,#5e8a8a 100%);border:1.5px solid rgba(94,138,138,.3);" onclick="setPalette('teal',this)" title="Dusty Teal"></div>
-    </div>
-    <!-- Card Style — unified banner/card visual system -->
-    <div style="font-size:.65rem;font-weight:700;color:var(--tx2);margin-bottom:.35rem;">Card Style <span style="color:var(--tx3);font-weight:400;font-size:.6rem;">(banners, cards, modals)</span></div>
-    <div style="display:flex;gap:.4rem;margin-bottom:.7rem;">
-      <button id="cardThemeKingdom" onclick="setCardTheme('kingdom',this)" style="flex:1;padding:.5rem;border-radius:8px;border:1px solid rgba(124,58,237,.4);background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:.74rem;cursor:pointer;font-weight:700;font-family:var(--fm);">👑 Kingdom</button>
-      <button id="cardThemeBrand" onclick="setCardTheme('brand',this)" style="flex:1;padding:.5rem;border-radius:8px;border:1px solid rgba(56,189,248,.3);background:rgba(56,189,248,.1);color:#38bdf8;font-size:.74rem;cursor:pointer;font-weight:700;font-family:var(--fm);">✨ Brand</button>
-    </div>
-
-    <!-- Banner Colors — visible to children -->
-    <div style="font-size:.65rem;font-weight:700;color:var(--tx2);margin-bottom:.3rem;">🎨 Banner Color</div>
-    <div class="swatch-row" style="display:flex;gap:.25rem;margin-bottom:.7rem;overflow-x:auto;padding-bottom:.2rem;">
-      <button onclick="setPresetBg('none')" style="width:30px;height:30px;border-radius:6px;border:1.5px solid rgba(255,255,255,.1);background:var(--bg);cursor:pointer;font-size:.55rem;color:var(--tx2);flex-shrink:0;">✕</button>
-      <button onclick="setPresetBg('linear-gradient(135deg,#38bdf8,#22c55e,#a78bfa)')" style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(255,255,255,.15);background:linear-gradient(135deg,#38bdf8,#22c55e);cursor:pointer;flex-shrink:0;" title="Aurora"></button>
-      <button onclick="setPresetBg('linear-gradient(135deg,#667eea,#764ba2)')" style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(135deg,#667eea,#764ba2);cursor:pointer;flex-shrink:0;" title="Violet Dream"></button>
-      <button onclick="setPresetBg('linear-gradient(135deg,#f093fb,#f5576c)')" style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(135deg,#f093fb,#f5576c);cursor:pointer;flex-shrink:0;" title="Pink Sunset"></button>
-      <button onclick="setPresetBg('linear-gradient(135deg,#4facfe,#00f2fe)')" style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(135deg,#4facfe,#00f2fe);cursor:pointer;flex-shrink:0;" title="Sky Blue"></button>
-      <button onclick="setPresetBg('linear-gradient(135deg,#43e97b,#38f9d7)')" style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(135deg,#43e97b,#38f9d7);cursor:pointer;flex-shrink:0;" title="Mint Fresh"></button>
-      <button onclick="setPresetBg('linear-gradient(135deg,#fa709a,#fee140)')" style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(135deg,#fa709a,#fee140);cursor:pointer;flex-shrink:0;" title="Warm Glow"></button>
-      <button onclick="setPresetBg('linear-gradient(135deg,#0f2027,#203a43,#2c5364)')" style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(255,255,255,.05);background:linear-gradient(135deg,#0f2027,#2c5364);cursor:pointer;flex-shrink:0;" title="Deep Ocean"></button>
-      <button onclick="setPresetBg('linear-gradient(135deg,#2d1b69,#11001c)')" style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(255,255,255,.05);background:linear-gradient(135deg,#2d1b69,#11001c);cursor:pointer;flex-shrink:0;" title="Royal"></button>
-      <button onclick="setPresetBg('linear-gradient(135deg,#200122,#6f0000)')" style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(255,255,255,.05);background:linear-gradient(135deg,#200122,#6f0000);cursor:pointer;flex-shrink:0;" title="Crimson"></button>
-      <button onclick="setPresetBg('linear-gradient(135deg,#1d1d1d,#333)')" style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(255,255,255,.05);background:linear-gradient(135deg,#1d1d1d,#333);cursor:pointer;flex-shrink:0;" title="Charcoal"></button>
-    </div>
     <!-- Background Colors — visible to children -->
     <div style="font-size:.65rem;font-weight:700;color:var(--tx2);margin-bottom:.3rem;">🖼️ Background Color</div>
     <div class="swatch-row" style="display:flex;gap:.25rem;overflow-x:auto;padding-bottom:.2rem;">
@@ -4785,10 +4756,10 @@
          (bfTab for in-tab panels; showSection for standalone sections like
          CLG / Flashcards / Worship). -->
     <div class="topic-card-grid" style="margin-bottom:1.1rem;">
-      <div class="topic-card accent-gold" onclick="bfTab('stories')">
-        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(251,191,36,.22);"><img class="topic-card-hero" data-card-id="bf-stories" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/3/3f/The_Wise_Men.jpg" alt="Story Mode"></div>
-        <div class="topic-card-title">Story Mode</div>
-        <div class="topic-card-desc">Illustrated, narrated Bible stories</div>
+      <div class="topic-card accent-violet" onclick="bfTab('jesus')">
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(167,139,250,.22));"><img class="topic-card-hero" data-card-id="bf-jesus" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Bloch-SermonOnTheMount.jpg/1280px-Bloch-SermonOnTheMount.jpg" alt="Who Is Jesus?"></div>
+        <div class="topic-card-title">Who Is Jesus?</div>
+        <div class="topic-card-desc">Life · teachings · red-letter words</div>
       </div>
       <!-- Christian Life Guide card removed — content ported to Reading Plans
            Life Topics filter. See FAITH_LIFE_TOPICS_PLANS in plans.js. -->
@@ -4851,6 +4822,11 @@
         <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(251,191,36,.22),rgba(245,158,11,.12));"><img class="topic-card-hero" data-card-id="bf-bibleStudy" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Bible_Verses_and_Prayers_-_geograph.org.uk_-_1009046.jpg/1280px-Bible_Verses_and_Prayers_-_geograph.org.uk_-_1009046.jpg" alt="Bible Study Hub"></div>
         <div class="topic-card-title">Bible Study Hub</div>
         <div class="topic-card-desc">AI-powered · family, group, kids, teens</div>
+      </div>
+      <div class="topic-card accent-gold" onclick="bfTab('stories')">
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(251,191,36,.22);"><img class="topic-card-hero" data-card-id="bf-stories" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/3/3f/The_Wise_Men.jpg" alt="Story Mode"></div>
+        <div class="topic-card-title">Story Mode</div>
+        <div class="topic-card-desc">Illustrated, narrated Bible stories</div>
       </div>
     </div>
 
