@@ -214,11 +214,29 @@
 
   window.podFilter = function(){ renderAll(); };
 
+  // ── Denomination → curated podcast ID map (8+ traditions) ──
+  var DENOM_MAP = {
+    'Baptist':               ['ask-pastor-john','john-macarthur','bible-recap'],
+    'Presbyterian/Reformed': ['rc-sproul','ask-pastor-john','john-macarthur'],
+    'Non-Denominational':    ['elevation-church','andy-stanley','mark-batterson'],
+    'Pentecostal':           ['hillsong-channel','bethel-sermons','pray-first'],
+    'Assemblies of God':     ['hillsong-channel','bethel-sermons','elevation-church'],
+    'Catholic':              ['nt-wright','unbelievable','bible-project'],
+    'Methodist/Wesleyan':    ['rick-warren','louie-giglio','priscilla-shirer'],
+    'Lutheran':              ['nt-wright','rc-sproul','bible-project'],
+    'Anglican/Episcopalian': ['nt-wright','unbelievable','bible-project'],
+    'Evangelical':           ['ask-pastor-john','bible-recap','louie-giglio'],
+    'Charismatic':           ['hillsong-channel','bethel-sermons','elevation-church'],
+    'Eastern Orthodox':      ['nt-wright','unbelievable','bible-project'],
+    'Church of Christ':      ['john-macarthur','ask-pastor-john','bible-recap'],
+    'Seventh-day Adventist': ['bible-project','bible-recap','rc-sproul'],
+    'Mennonite/Anabaptist':  ['francis-chan','bible-project','nt-wright']
+  };
+
   // ── Recommended based on faith profile ──
   function buildRecommended(){
     var recEl = document.getElementById('podRecommended');
     if(!recEl) return;
-    // Read denomination from faith profile
     var denom = '';
     try {
       var keys = Object.keys(localStorage);
@@ -231,25 +249,42 @@
     } catch(e){}
     if(!denom) return;
 
+    var targetIds = DENOM_MAP[denom] || null;
     var data = (typeof CHRISTIAN_PODCASTS !== 'undefined') ? CHRISTIAN_PODCASTS : [];
-    var picks = [];
-    var keywords = denom.toLowerCase().split(/[\s\/,]+/);
+
+    // Build flat id → podcast lookup
+    var podById = {};
     data.forEach(function(cat){
-      cat.podcasts.forEach(function(p){
-        if(picks.length >= 3) return;
-        var text = (p.name+' '+p.description+' '+(p.tags||[]).join(' ')).toLowerCase();
-        if(keywords.some(function(kw){ return kw.length > 3 && text.indexOf(kw) !== -1; })){
-          picks.push({cat:cat.category, podcast:p});
-        }
-      });
+      cat.podcasts.forEach(function(p){ podById[p.id] = p; });
     });
+
+    var picks = [];
+    if(targetIds){
+      targetIds.forEach(function(id){
+        if(podById[id]) picks.push(podById[id]);
+      });
+    }
+
+    // Fallback: keyword search if denomination not in map
+    if(!picks.length){
+      var kws = denom.toLowerCase().split(/[\s\/,]+/);
+      data.forEach(function(cat){
+        cat.podcasts.forEach(function(p){
+          if(picks.length >= 3) return;
+          var text = (p.name+' '+p.description+' '+(p.tags||[]).join(' ')).toLowerCase();
+          if(kws.some(function(kw){ return kw.length > 3 && text.indexOf(kw) !== -1; })){
+            picks.push(p);
+          }
+        });
+      });
+    }
 
     if(!picks.length) return;
     recEl.style.display = 'block';
     recEl.innerHTML = '<div class="pod-recommended">'
       +'<div class="pod-rec-hdr">Recommended for '+esc(denom)+' listeners</div>'
       +'<div class="pod-grid">'
-      + picks.map(function(item){ return buildCard(item.podcast); }).join('')
+      + picks.map(function(p){ return buildCard(p); }).join('')
       +'</div></div>';
   }
 

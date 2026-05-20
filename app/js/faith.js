@@ -9198,7 +9198,13 @@ function renderFJProfile(){
     +'<button onclick="openFaithProfileModal()" style="margin-left:auto;font-size:.72rem;font-weight:700;padding:.25rem .65rem;border-radius:99px;border:1px solid rgba(167,139,250,.35);background:rgba(167,139,250,.1);color:var(--accent,#a78bfa);cursor:pointer;">'+(hasData?'Edit':'Set Up')+'</button>'
     +'</div>'
     + (hasData
-      ? '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.35rem;">'
+      ? (p.saved_date && _fjWalkingYears(p.saved_date)
+          ? '<div style="text-align:center;background:linear-gradient(135deg,rgba(167,139,250,.15),rgba(59,130,246,.1));border-radius:8px;padding:.5rem .75rem;margin-bottom:.5rem;">'
+            +'<div style="font-size:.66rem;color:#a78bfa;font-weight:800;text-transform:uppercase;letter-spacing:.09em;margin-bottom:.15rem;">Walking with Jesus</div>'
+            +'<div style="font-size:1.05rem;font-weight:900;color:var(--tx);">'+_jEsc(_fjWalkingYears(p.saved_date))+'</div>'
+            +'</div>'
+          : '')
+        +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.35rem;">'
         + (p.church_name ? _fjProfileRow('⛪','Church', p.church_name) : '')
         + (p.pastor_name ? _fjProfileRow('👤','Pastor', p.pastor_name) : '')
         + (p.denomination ? _fjProfileRow('📖','Tradition', p.denomination) : '')
@@ -9222,6 +9228,21 @@ function _fjProfileRow(icon, label, value){
     +'<div style="font-size:.66rem;color:var(--tx2);">'+icon+' '+label+'</div>'
     +'<div style="font-size:.77rem;font-weight:700;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+_jEsc(value)+'</div>'
     +'</div>';
+}
+
+function _fjWalkingYears(dateStr){
+  if(!dateStr) return '';
+  var start = new Date(dateStr + 'T12:00:00');
+  var now = new Date();
+  if(isNaN(start.getTime()) || start > now) return '';
+  var years = now.getFullYear() - start.getFullYear();
+  var months = now.getMonth() - start.getMonth();
+  if(months < 0){ years--; months += 12; }
+  if(now.getDate() < start.getDate()){ months--; if(months < 0){ years--; months += 12; } }
+  var parts = [];
+  if(years > 0) parts.push(years + (years === 1 ? ' year' : ' years'));
+  if(months > 0 || years === 0) parts.push(months + (months === 1 ? ' month' : ' months'));
+  return parts.join(', ');
 }
 
 function openFaithProfileModal(){
