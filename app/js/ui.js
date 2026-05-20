@@ -986,7 +986,12 @@ const NAV_ITEMS = [
     {wellTab:'stories',       icon:'📖', label:'Story Mode',          key:'scripture'},
     {wellTab:'timeline',   icon:'🕰️', label:'Timeline',              key:'scripture'},
     {wellTab:'memorize',   icon:'✨', label:'Memorize',              key:'scripture'},
-    {wellTab:'journey',    icon:'🌟', label:'Journey',               key:'scripture'},
+    {wellTab:'journey',        icon:'🌟', label:'Journey',              key:'scripture'},
+    {wellTab:'jesus',          icon:'✝️', label:'Who Is Jesus',        key:'scripture'},
+    {wellTab:'denominations',  icon:'⛪', label:'Christian Traditions', key:'scripture'},
+    {wellTab:'studyTools',     icon:'🔍', label:'Study Tools',         key:'scripture'},
+    {href:'/app/podcasts.html',  icon:'🎧', label:'Podcasts'},
+    {href:'/app/calendar.html',  icon:'📅', label:'Faith Calendar'},
     {id:'s-worship',       icon:'🎵', label:'Worship',               key:'worship'},
     {id:'s-flashcards',    icon:'📇', label:'Flashcards',            key:'flashcards'},
   ]},
@@ -1281,6 +1286,13 @@ function buildSideNav(){
       // Collapsible group — Phase 2.2: default closed unless user explicitly opened.
       const isOpen = openGroups[n.label] === true;
       const childHTML = (n.children||[]).map(c=>{
+        // Href children: external or standalone-page links (e.g. podcasts, calendar).
+        if(c.href){
+          return `<button class="nav-item nav-child" onclick="window.location.href='${c.href}'" style="padding-left:2.2rem;font-size:.78rem;">
+            <span class="ni">${c.icon}</span>
+            <span>${c.label}</span>
+          </button>`;
+        }
         // Well-tab children: route through wellGoto(), use data-well-tab
         // for sidebar↔tab-bar active-state sync. They live inside
         // #s-scripture, so allow-list against that section id.
@@ -1763,7 +1775,7 @@ function showSection(id, fromMobile){
     // F9: Auto-show the user's last-visited Well sub-tab (or Home on first
     // visit). Replaces the old hardcoded "open Devotional first" branch.
     const lastTab = (typeof D !== 'undefined' && D && D.wellLastTab) ? D.wellLastTab : 'home';
-    const validTabs = ['home','bible','plans','devotional','prayer','academy','bibleworld','proofProphecy','stories','timeline','memorize','journey'];
+    const validTabs = ['home','bible','plans','devotional','prayer','academy','bibleworld','proofProphecy','timeline','memorize','journey','jesus','denominations','bibleStudy','studyTools'];
     const target = validTabs.indexOf(lastTab) >= 0 ? lastTab : 'home';
     if(typeof bfTab === 'function') bfTab(target);
   },80);

@@ -4636,6 +4636,11 @@
     <button class="tab" data-bf-tab="memorize" onclick="bfTab('memorize',this)">✨ Memorize</button>
     <button class="tab" data-bf-tab="journey" onclick="bfTab('journey',this)">🌟 Journey</button>
     <button class="tab" data-bf-tab="bibleStudy" onclick="bfTab('bibleStudy',this)">📚 Bible Study Hub</button>
+    <button class="tab" data-bf-tab="jesus" onclick="bfTab('jesus',this)">✝️ Who Is Jesus</button>
+    <button class="tab" data-bf-tab="denominations" onclick="bfTab('denominations',this)">⛪ Traditions</button>
+    <button class="tab" data-bf-tab="studyTools" onclick="bfTab('studyTools',this)">🔍 Study Tools</button>
+    <button class="tab" onclick="window.location.href='/app/podcasts.html'">🎧 Podcasts</button>
+    <button class="tab" onclick="window.location.href='/app/calendar.html'">📅 Faith Calendar</button>
     <button class="tab" onclick="wellGoto('worship')">🎵 Worship</button>
     <button class="tab" onclick="wellGoto('flashcards')">📇 Flashcards</button>
   </div>
@@ -7841,6 +7846,11 @@
     <button class="tab" data-bf-tab="memorize" onclick="bfTab('memorize',this)"><span class="scrtab-icon">✨</span><span>Memorize</span></button>
     <button class="tab" data-bf-tab="journey" onclick="bfTab('journey',this)"><span class="scrtab-icon">🌟</span><span>Journey</span></button>
     <button class="tab" data-bf-tab="bibleStudy" onclick="bfTab('bibleStudy',this)"><span class="scrtab-icon">📚</span><span>Study Hub</span></button>
+    <button class="tab" data-bf-tab="jesus" onclick="bfTab('jesus',this)"><span class="scrtab-icon">✝️</span><span>Jesus</span></button>
+    <button class="tab" data-bf-tab="denominations" onclick="bfTab('denominations',this)"><span class="scrtab-icon">⛪</span><span>Traditions</span></button>
+    <button class="tab" data-bf-tab="studyTools" onclick="bfTab('studyTools',this)"><span class="scrtab-icon">🔍</span><span>Study Tools</span></button>
+    <button class="tab" onclick="window.location.href='/app/podcasts.html'"><span class="scrtab-icon">🎧</span><span>Podcasts</span></button>
+    <button class="tab" onclick="window.location.href='/app/calendar.html'"><span class="scrtab-icon">📅</span><span>Calendar</span></button>
     <button class="tab" onclick="wellGoto('worship')"><span class="scrtab-icon">🎵</span><span>Worship</span></button>
     <button class="tab" onclick="wellGoto('flashcards')"><span class="scrtab-icon">📇</span><span>Flashcards</span></button>
   </div>
@@ -8168,6 +8178,8 @@
       #s-worship .wp-ctrl.wp-play{width:36px;height:36px;}
     }
   </style>
+
+  <button class="pp-back-btn" onclick="typeof wellGoto==='function'?wellGoto('home'):showSection('s-scripture')" aria-label="Back to Faith Home" style="margin:0 0 .5rem;">← Faith Home</button>
 
   <div class="bf-section-hdr">
     <div class="bf-eyebrow">WORSHIP · PRAYER · PRAISE</div>
