@@ -10857,16 +10857,54 @@ function completePrayerSession(sessionId){
 
 var _ttsUtterance = null;
 var _ttsSpeaking = false;
+var _ttsLastVoiceName = '';
+var _ttsLastError = '';
 
-function _ttsSelectVoice(){
-  if(!('speechSynthesis' in window)) return null;
+// Waits for voices to load (async on Chrome/Android) then calls cb(voices[]).
+// On iOS/Safari voices are synchronous; on Chrome they fire via onvoiceschanged.
+function _ttsWhenVoicesReady(cb){
+  if(!('speechSynthesis' in window)){ cb([]); return; }
+  var voices = window.speechSynthesis.getVoices();
+  if(voices && voices.length > 0){ cb(voices); return; }
+  console.log('[TTS] voices empty on first call — waiting for onvoiceschanged. UA:', navigator.userAgent);
+  var fired = false;
+  var timer = setTimeout(function(){
+    if(fired) return;
+    fired = true;
+    var v = window.speechSynthesis.getVoices() || [];
+    console.log('[TTS] timeout fallback — voices count:', v.length);
+    cb(v);
+  }, 1500);
+  window.speechSynthesis.onvoiceschanged = function(){
+    if(fired) return;
+    fired = true;
+    clearTimeout(timer);
+    var v = window.speechSynthesis.getVoices() || [];
+    console.log('[TTS] onvoiceschanged fired — voices count:', v.length, v.map(function(x){return x.name+'('+x.lang+')';}).join(', '));
+    cb(v);
+    // Also repopulate picker if it's open
+    _populateTtsVoicePicker();
+  };
+}
+
+function _ttsSelectVoice(voices){
+  // voices param: already-loaded array from _ttsWhenVoicesReady
+  var allVoices = voices || window.speechSynthesis.getVoices() || [];
   var stored = null;
   try{ if(typeof _ylccUserKey==='function') stored = localStorage.getItem(_ylccUserKey('tts_voice')); }catch(e){}
-  var voices = window.speechSynthesis.getVoices();
-  if(!voices || !voices.length) return null;
-  if(stored){
-    var pref = voices.find(function(v){ return v.name === stored; });
-    if(pref) return pref;
+  console.log('[TTS] _ttsSelectVoice: total voices='+allVoices.length+', stored pref="'+(stored||'none')+'"');
+  if(!allVoices.length){
+    console.warn('[TTS] voices array empty — browser will use default robotic voice');
+    _ttsLastError = 'voices empty';
+    return null;
+  }
+  if(stored && stored.length){
+    var pref = allVoices.find(function(v){ return v.name === stored; });
+    if(pref){
+      console.log('[TTS] using saved pref:', pref.name, pref.lang);
+      return pref;
+    }
+    console.warn('[TTS] saved voice "'+stored+'" not found in current voices list');
   }
   var p = [
     function(v){ return v.name === 'Samantha'; },
@@ -10882,14 +10920,26 @@ function _ttsSelectVoice(){
     function(v){ return v.lang && v.lang.indexOf('en') === 0; }
   ];
   for(var i=0; i<p.length; i++){
-    var v = voices.find(p[i]);
-    if(v) return v;
+    var found = allVoices.find(p[i]);
+    if(found){
+      console.log('[TTS] auto-selected voice (priority '+i+'):', found.name, found.lang);
+      return found;
+    }
   }
-  return null;
+  var fallback = allVoices[0] || null;
+  console.warn('[TTS] no matching voice — using first available:', fallback ? fallback.name : 'none');
+  return fallback;
 }
 
-function _ttsSpeakSentences(sentences, rate, onDone){
+function _ttsSpeakSentences(sentences, rate, voices, onDone){
   if(!sentences || !sentences.length){ if(onDone) onDone(); return; }
+  var voice = _ttsSelectVoice(voices);
+  _ttsLastVoiceName = voice ? voice.name : '(default)';
+  _ttsLastError = voice ? '' : 'no voice matched';
+  console.log('[TTS] speaking', sentences.length, 'sentence(s) at rate', rate, '— voice:', _ttsLastVoiceName);
+  // Update any open voice-in-use indicator
+  var ind = document.getElementById('ttsActiveVoiceLabel');
+  if(ind) ind.textContent = 'Voice: ' + _ttsLastVoiceName;
   var idx = 0;
   function next(){
     if(idx >= sentences.length){ if(onDone) onDone(); return; }
@@ -10897,10 +10947,13 @@ function _ttsSpeakSentences(sentences, rate, onDone){
     if(!s || !s.trim()){ next(); return; }
     var utt = new SpeechSynthesisUtterance(s.trim());
     utt.rate = rate || 0.85;
-    var voice = _ttsSelectVoice();
     if(voice) utt.voice = voice;
     utt.onend = function(){ setTimeout(next, 300); };
-    utt.onerror = function(){ setTimeout(next, 300); };
+    utt.onerror = function(e){
+      console.warn('[TTS] utterance error:', e && e.error);
+      _ttsLastError = e && e.error ? e.error : 'utterance error';
+      setTimeout(next, 300);
+    };
     window.speechSynthesis.speak(utt);
   }
   next();
@@ -10916,7 +10969,9 @@ function speakVerse(text, ref){
   _ttsSpeaking = true;
   var fullText = (ref ? ref + '. ' : '') + (text || '');
   var sentences = fullText.match(/[^.!?]+[.!?]*/g) || [fullText];
-  _ttsSpeakSentences(sentences, 0.85, function(){ _ttsSpeaking = false; });
+  _ttsWhenVoicesReady(function(voices){
+    _ttsSpeakSentences(sentences, 0.85, voices, function(){ _ttsSpeaking = false; });
+  });
 }
 
 function speakVotd(){
@@ -11109,45 +11164,103 @@ function renderAudioMeditationsCard(){
   }
   html += '<div style="margin-top:.85rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:.6rem .85rem;font-size:.7rem;color:var(--tx3);line-height:1.5;">💡 Headphones recommended. Each session uses your device\'s built-in voice and a calming music background.</div>';
   html += '<div style="margin-top:.65rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:.65rem .85rem;">';
-  html += '<div style="font-size:.62rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.09em;margin-bottom:.45rem;">🎙 Voice Settings</div>';
+  html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.45rem;">';
+  html += '<div style="font-size:.62rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.09em;">🎙 Voice Settings</div>';
+  html += '<button type="button" onclick="_ttsShowDebugPanel()" style="background:none;border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.3);border-radius:6px;padding:.15rem .45rem;font-size:.58rem;cursor:pointer;font-family:var(--fm);">🔍 Debug</button>';
+  html += '</div>';
   html += '<div style="display:flex;align-items:center;gap:.5rem;">';
   html += '<select id="ttsVoicePicker" onchange="saveTtsVoicePref(this.value)" style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--tx);border-radius:8px;padding:.35rem .5rem;font-size:.72rem;font-family:var(--fm);cursor:pointer;" aria-label="Reading voice"><option value="">Auto (recommended)</option></select>';
   html += '<button type="button" onclick="testTtsVoice()" style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:#a78bfa;border-radius:8px;padding:.35rem .7rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);" title="Preview selected voice">▶ Test</button>';
-  html += '</div></div>';
+  html += '</div>';
+  html += '<div id="ttsAutoVoiceHint" style="font-size:.6rem;color:var(--tx3);margin-top:.3rem;"></div>';
+  html += '<div id="ttsActiveVoiceLabel" style="font-size:.6rem;color:rgba(16,185,129,.7);margin-top:.15rem;min-height:.85rem;"></div>';
+  html += '</div>';
   html += '</div>';
   root.innerHTML = html;
-  setTimeout(_populateTtsVoicePicker, 80);
+  _populateTtsVoicePicker();
 }
 
 function _populateTtsVoicePicker(){
   var sel = document.getElementById('ttsVoicePicker');
   if(!sel || !('speechSynthesis' in window)) return;
-  var voices = window.speechSynthesis.getVoices();
-  if(!voices || !voices.length){
-    window.speechSynthesis.onvoiceschanged = _populateTtsVoicePicker;
-    return;
-  }
-  var stored = null;
-  try{ if(typeof _ylccUserKey==='function') stored = localStorage.getItem(_ylccUserKey('tts_voice')); }catch(e){}
-  var engVoices = voices.filter(function(v){ return v.lang && v.lang.indexOf('en') === 0; });
-  sel.innerHTML = '<option value="">Auto (recommended)</option>'
-    + engVoices.map(function(v){
-        return '<option value="'+escapeHtml(v.name)+'"'+(v.name===stored?' selected':'')+'>'+escapeHtml(v.name)+' ('+v.lang+')</option>';
-      }).join('');
+  _ttsWhenVoicesReady(function(voices){
+    var sel2 = document.getElementById('ttsVoicePicker'); // re-query after async
+    if(!sel2) return;
+    var stored = null;
+    try{ if(typeof _ylccUserKey==='function') stored = localStorage.getItem(_ylccUserKey('tts_voice')); }catch(e){}
+    var engVoices = voices.filter(function(v){ return v.lang && v.lang.indexOf('en') === 0; });
+    console.log('[TTS] picker: total voices='+voices.length+', en voices='+engVoices.length+', saved="'+(stored||'none')+'"');
+    sel2.innerHTML = '<option value="">Auto (recommended)</option>'
+      + engVoices.map(function(v){
+          return '<option value="'+escapeHtml(v.name)+'"'+(v.name===stored?' selected':'')+'>'+escapeHtml(v.name)+' ('+v.lang+')</option>';
+        }).join('');
+    // Show auto-selected voice so user sees what "Auto" means on their device
+    var autoVoice = _ttsSelectVoice(voices);
+    var hint = document.getElementById('ttsAutoVoiceHint');
+    if(hint) hint.textContent = 'Auto will use: ' + (autoVoice ? autoVoice.name : 'browser default');
+  });
 }
 
 function saveTtsVoicePref(name){
+  console.log('[TTS] saveTtsVoicePref:', name||'(cleared)');
   try{ if(typeof _ylccUserKey==='function') localStorage.setItem(_ylccUserKey('tts_voice'), name||''); }catch(e){}
+  if(typeof showToast==='function') showToast('Voice saved' + (name ? ': ' + name : ' (Auto)'));
 }
 
 function testTtsVoice(){
   if(!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
-  var utt = new SpeechSynthesisUtterance('The Lord is my shepherd. I shall not want. He restores my soul.');
-  utt.rate = 0.85;
-  var voice = _ttsSelectVoice();
-  if(voice) utt.voice = voice;
-  window.speechSynthesis.speak(utt);
+  _ttsWhenVoicesReady(function(voices){
+    var voice = _ttsSelectVoice(voices);
+    console.log('[TTS] testTtsVoice: using', voice ? voice.name : '(default browser voice)');
+    var utt = new SpeechSynthesisUtterance('The Lord is my shepherd. I shall not want. He restores my soul.');
+    utt.rate = 0.85;
+    if(voice) utt.voice = voice;
+    window.speechSynthesis.speak(utt);
+    var ind = document.getElementById('ttsActiveVoiceLabel');
+    if(ind) ind.textContent = 'Voice: ' + (voice ? voice.name : 'default');
+  });
+}
+
+function _ttsShowDebugPanel(){
+  if(!('speechSynthesis' in window)){
+    if(typeof showToast==='function') showToast('speechSynthesis not supported');
+    return;
+  }
+  var panel = document.getElementById('ttsDebugPanel');
+  if(panel){ panel.remove(); return; }
+  _ttsWhenVoicesReady(function(voices){
+    var stored = '';
+    try{ if(typeof _ylccUserKey==='function') stored = localStorage.getItem(_ylccUserKey('tts_voice'))||''; }catch(e){}
+    var selectedVoice = _ttsSelectVoice(voices);
+    var engVoices = voices.filter(function(v){ return v.lang && v.lang.indexOf('en') === 0; });
+    var html = '<div id="ttsDebugPanel" style="position:fixed;bottom:5rem;left:.75rem;right:.75rem;z-index:10000;background:#0a0d1a;border:1px solid rgba(56,189,248,.35);border-radius:12px;padding:.85rem 1rem;font-size:.65rem;color:var(--tx);max-height:55vh;overflow-y:auto;">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.55rem;">'
+      +'<span style="font-weight:900;color:#38bdf8;text-transform:uppercase;letter-spacing:.08em;">TTS Diagnostics</span>'
+      +'<button type="button" onclick="document.getElementById(\'ttsDebugPanel\').remove()" style="background:none;border:none;color:rgba(255,255,255,.4);font-size:.85rem;cursor:pointer;padding:0;">✕</button>'
+      +'</div>'
+      +'<div style="margin-bottom:.3rem;color:rgba(255,255,255,.5);font-size:.58rem;word-break:break-all;">UA: '+navigator.userAgent+'</div>'
+      +'<div style="margin-bottom:.25rem;"><span style="color:var(--tx2);">Total voices:</span> '+voices.length+'</div>'
+      +'<div style="margin-bottom:.25rem;"><span style="color:var(--tx2);">English voices:</span> '+engVoices.length+'</div>'
+      +'<div style="margin-bottom:.25rem;"><span style="color:var(--tx2);">Saved pref:</span> '+(stored||'none')+'</div>'
+      +'<div style="margin-bottom:.25rem;"><span style="color:var(--tx2);">Will use:</span> <span style="color:#10b981;font-weight:800;">'+(selectedVoice?selectedVoice.name+' ('+selectedVoice.lang+')':'browser default — no match')+'</span></div>'
+      +'<div style="margin-bottom:.25rem;"><span style="color:var(--tx2);">Last used:</span> '+(_ttsLastVoiceName||'none yet')+'</div>'
+      +'<div style="margin-bottom:.55rem;"><span style="color:var(--tx2);">Last error:</span> <span style="color:'+((_ttsLastError)?'#f87171':'#10b981')+';">'+((_ttsLastError)||'none')+'</span></div>'
+      +'<div style="font-weight:800;color:var(--tx2);margin-bottom:.3rem;">All English voices:</div>'
+      +'<div style="display:grid;gap:.15rem;">'
+      + engVoices.map(function(v){
+          var isSel = selectedVoice && v.name === selectedVoice.name;
+          return '<div style="padding:.2rem .4rem;border-radius:5px;background:'+(isSel?'rgba(16,185,129,.15)':'rgba(255,255,255,.03)')+';border:1px solid '+(isSel?'rgba(16,185,129,.3)':'rgba(255,255,255,.05)')+';">'
+            +(isSel?'<span style="color:#10b981;font-weight:900;">✓ </span>':'')
+            +escapeHtml(v.name)+' <span style="color:var(--tx3);">('+v.lang+')</span>'
+            +(v.default?' <span style="color:#fbbf24;">default</span>':'')
+            +'</div>';
+        }).join('')
+      +'</div></div>';
+    var el = document.createElement('div');
+    el.innerHTML = html;
+    document.body.appendChild(el.firstChild);
+  });
 }
 
 function startMeditation(medId){
@@ -11187,8 +11300,10 @@ function _medRenderPlayer(med){
     '<div style="padding:0 1.1rem .7rem;flex-shrink:0;">',
     '<div style="height:3px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden;margin-bottom:.35rem;">',
     '<div id="medProgressBar" style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,#a78bfa,#38bdf8);border-radius:99px;transition:width .6s;"></div></div>',
-    '<div style="display:flex;justify-content:space-between;font-size:.6rem;color:rgba(255,255,255,.3);">',
-    '<span id="medElapsedLbl">'+_medTotStr(_medElapsed)+'</span><span>'+_medTotStr(totalSec)+'</span></div></div>',
+    '<div style="display:flex;justify-content:space-between;align-items:center;font-size:.6rem;color:rgba(255,255,255,.3);">',
+    '<span id="medElapsedLbl">'+_medTotStr(_medElapsed)+'</span>',
+    '<span id="ttsActiveVoiceLabel" style="font-size:.55rem;color:rgba(16,185,129,.5);"></span>',
+    '<span>'+_medTotStr(totalSec)+'</span></div></div>',
     '<div style="flex:1;overflow-y:auto;display:flex;flex-direction:column;justify-content:center;padding:0 1.4rem;min-height:0;">',
     '<div style="text-align:center;max-width:520px;margin:0 auto;width:100%;">',
     '<div id="medSegLabel" style="font-size:.6rem;font-weight:900;letter-spacing:.22em;text-transform:uppercase;color:'+segColor+';margin-bottom:.9rem;">'+segLabel+'</div>',
@@ -11219,7 +11334,7 @@ function _medPlaySegment(med, segIdx){
     var medSentences = medText.match(/[^.!?]+[.!?]*/g) || [medText];
     var medDone = false;
     function _medTtsDone(){ if(!medDone){ medDone=true; _medAdvance(med); } }
-    _ttsSpeakSentences(medSentences, 0.85, _medTtsDone);
+    _ttsWhenVoicesReady(function(voices){ _ttsSpeakSentences(medSentences, 0.85, voices, _medTtsDone); });
   }
   _medSegTimer = setTimeout(function(){ if(!_medPaused) _medAdvance(med); }, seg.duration*1000);
 }
@@ -11408,25 +11523,26 @@ function _ssPlaySegment(story, idx){
     var idxRef = idx;
     var ssSentences = seg.match(/[^.!?]+[.!?]*/g) || [seg];
     var ssVol = Math.max(0.05, _ssTtsVol);
-    var ssOrigSpeak = window.speechSynthesis.speak.bind(window.speechSynthesis);
-    var ssIdx2 = 0;
-    function ssSpeakNext(){
-      if(ssIdx2 >= ssSentences.length){
-        _ssSegTimer = setTimeout(function(){ if(!_ssPaused) _ssPlaySegment(storyRef,idxRef+1); }, 3000);
-        return;
+    _ttsWhenVoicesReady(function(voices){
+      var ssVoice = _ttsSelectVoice(voices);
+      var ssIdx2 = 0;
+      function ssSpeakNext(){
+        if(ssIdx2 >= ssSentences.length){
+          _ssSegTimer = setTimeout(function(){ if(!_ssPaused) _ssPlaySegment(storyRef,idxRef+1); }, 3000);
+          return;
+        }
+        var s = ssSentences[ssIdx2++];
+        if(!s || !s.trim()){ ssSpeakNext(); return; }
+        var utt = new SpeechSynthesisUtterance(s.trim());
+        utt.rate = 0.75;
+        utt.volume = ssVol;
+        if(ssVoice) utt.voice = ssVoice;
+        utt.onend = function(){ setTimeout(ssSpeakNext, 300); };
+        utt.onerror = function(){ setTimeout(ssSpeakNext, 300); };
+        window.speechSynthesis.speak(utt);
       }
-      var s = ssSentences[ssIdx2++];
-      if(!s || !s.trim()){ ssSpeakNext(); return; }
-      var utt = new SpeechSynthesisUtterance(s.trim());
-      utt.rate = 0.75;
-      utt.volume = ssVol;
-      var voice = _ttsSelectVoice();
-      if(voice) utt.voice = voice;
-      utt.onend = function(){ setTimeout(ssSpeakNext, 300); };
-      utt.onerror = function(){ setTimeout(ssSpeakNext, 300); };
-      ssOrigSpeak(utt);
-    }
-    ssSpeakNext();
+      ssSpeakNext();
+    });
   }
 }
 
