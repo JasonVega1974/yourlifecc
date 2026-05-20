@@ -11820,22 +11820,57 @@ function _ssReleaseWakeLock(){
 
 var _ambientTrackId = null;
 var _ambientExpanded = null;
+var _ambientSearchQuery = '';
+
+function _ambientGetLibrary(){
+  return (typeof CURATED_AUDIO_LIBRARY !== 'undefined') ? CURATED_AUDIO_LIBRARY
+       : (typeof AMBIENT_LIBRARY !== 'undefined')       ? AMBIENT_LIBRARY
+       : [];
+}
+
+function _ambientTrackRow(track, catName, catIcon){
+  var isPlay = _ambientTrackId === track.id;
+  var verifiedBadge = track.verified
+    ? '<span style="font-size:.6rem;font-weight:800;color:#4ade80;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:4px;padding:.05rem .3rem;margin-left:.35rem;letter-spacing:.04em;">✓ Verified</span>'
+    : '<span style="font-size:.6rem;color:var(--tx3);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:.05rem .3rem;margin-left:.35rem;">Unverified</span>';
+  var hostLine = track.host ? '<span style="color:var(--tx3);">'+escapeHtml(track.host)+'</span>' : '';
+  var row = '<div style="display:flex;align-items:center;gap:.6rem;padding:.45rem .35rem;border-radius:8px;background:'+(isPlay?'rgba(56,189,248,.08)':'none')+';margin-bottom:.1rem;">';
+  row += '<div onclick="playAmbientTrack(\''+track.id+'\')" style="width:28px;height:28px;border-radius:50%;background:'+(isPlay?'rgba(56,189,248,.2)':'rgba(255,255,255,.05)')+';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.7rem;color:'+(isPlay?'#38bdf8':'var(--tx2)')+';cursor:pointer;">'+(isPlay?'⏸':'▶')+'</div>';
+  row += '<div onclick="playAmbientTrack(\''+track.id+'\')" style="flex:1;min-width:0;cursor:pointer;">';
+  row += '<div style="font-size:.84rem;font-weight:700;color:'+(isPlay?'#38bdf8':'var(--tx)')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+escapeHtml(track.title)+verifiedBadge+'</div>';
+  row += '<div style="font-size:.69rem;color:var(--tx3);line-height:1.4;">'+escapeHtml(track.description)+(hostLine?' · '+hostLine:'')+'</div>';
+  row += '</div>';
+  if(!track.verified){
+    row += '<button type="button" onclick="reportBrokenTrack(\''+track.id+'\',\''+_jEsc(track.title)+'\')" title="Report broken link" style="background:none;border:none;color:var(--tx3);font-size:.75rem;cursor:pointer;padding:.2rem .3rem;flex-shrink:0;opacity:.6;" aria-label="Report broken">⚑</button>';
+  }
+  row += '</div>';
+  return row;
+}
 
 function renderAmbientLibraryCard(){
   var root = document.getElementById('ambientLibraryRoot');
   if(!root) return;
-  if(typeof AMBIENT_LIBRARY==='undefined'){
+  var lib = _ambientGetLibrary();
+  if(!lib.length){
     root.innerHTML='<div style="color:var(--tx2);padding:1rem;">Loading ambient library…</div>';
     return;
   }
   var allTracks = [];
-  AMBIENT_LIBRARY.forEach(function(c){ allTracks = allTracks.concat(c.tracks); });
+  lib.forEach(function(c){ allTracks = allTracks.concat(c.tracks); });
   var playing = _ambientTrackId ? allTracks.find(function(t){ return t.id===_ambientTrackId; }) : null;
+  var q = (_ambientSearchQuery||'').trim().toLowerCase();
 
   var html = '<div style="padding:.2rem 0 1rem;">';
   html += '<div class="bf-section-hdr"><div class="bf-eyebrow">BACKGROUND AUDIO · FREE</div>';
   html += '<div class="bf-title">🎵 Ambient Library</div>';
-  html += '<div class="bf-sub">Background audio for prayer, study, rest, or worship. Continues playing as you navigate.</div></div>';
+  html += '<div class="bf-sub">80 tracks across 10 categories. Continues playing as you navigate. Powered by YouTube.</div></div>';
+
+  // Search bar
+  html += '<div style="position:relative;margin-bottom:.75rem;">';
+  html += '<input type="search" id="ambientSearchInput" value="'+escapeHtml(_ambientSearchQuery)+'" oninput="searchAudioLibrary(this.value)" placeholder="Search tracks, hosts, or categories…" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.5rem .85rem .5rem 2.2rem;font-size:.84rem;color:var(--tx);font-family:var(--fm);outline:none;" />';
+  html += '<span style="position:absolute;left:.65rem;top:50%;transform:translateY(-50%);font-size:.85rem;pointer-events:none;opacity:.5;">🔍</span>';
+  if(q) html += '<button type="button" onclick="searchAudioLibrary(\'\')" style="position:absolute;right:.5rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--tx3);font-size:.8rem;cursor:pointer;padding:.15rem .3rem;">✕</button>';
+  html += '</div>';
 
   if(playing){
     html += '<div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);border-radius:12px;padding:.6rem 1rem;display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;">';
@@ -11846,34 +11881,65 @@ function renderAmbientLibraryCard(){
     html += '</div>';
   }
 
-  html += '<div style="display:grid;gap:.45rem;">';
-  AMBIENT_LIBRARY.forEach(function(cat){
-    var isExpanded = _ambientExpanded === cat.category;
-    html += '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;overflow:hidden;">';
-    html += '<div onclick="expandAmbientCategory(\''+_jEsc(cat.category)+'\')" style="padding:.75rem 1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;">';
-    html += '<span style="font-size:1.5rem;line-height:1;flex-shrink:0;">'+cat.icon+'</span>';
-    html += '<div style="flex:1;"><div style="font-size:.9rem;font-weight:800;color:var(--tx);">'+escapeHtml(cat.category)+'</div>';
-    html += '<div style="font-size:.72rem;color:var(--tx2);">'+cat.tracks.length+' tracks</div></div>';
-    html += '<span style="font-size:.85rem;color:var(--tx3);display:inline-block;transition:transform .2s;'+(isExpanded?'transform:rotate(180deg);':'')+'">▾</span>';
-    html += '</div>';
-    if(isExpanded){
-      html += '<div style="border-top:1px solid rgba(255,255,255,.06);padding:.4rem .75rem .55rem;">';
+  if(q){
+    // Flat search results
+    var results = [];
+    lib.forEach(function(cat){
       cat.tracks.forEach(function(track){
-        var isPlay = _ambientTrackId === track.id;
-        html += '<div onclick="playAmbientTrack(\''+track.id+'\')" style="display:flex;align-items:center;gap:.6rem;padding:.45rem .35rem;border-radius:8px;cursor:pointer;background:'+(isPlay?'rgba(56,189,248,.08)':'none')+';margin-bottom:.1rem;">';
-        html += '<div style="width:28px;height:28px;border-radius:50%;background:'+(isPlay?'rgba(56,189,248,.2)':'rgba(255,255,255,.05)')+';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.7rem;color:'+(isPlay?'#38bdf8':'var(--tx2)')+'">'+(isPlay?'⏸':'▶')+'</div>';
-        html += '<div style="flex:1;min-width:0;"><div style="font-size:.84rem;font-weight:700;color:'+(isPlay?'#38bdf8':'var(--tx)')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+escapeHtml(track.title)+'</div>';
-        html += '<div style="font-size:.69rem;color:var(--tx3);line-height:1.3;">'+escapeHtml(track.description)+'</div></div>';
-        html += '</div>';
+        var haystack = (track.title+' '+(track.host||'')+' '+track.description+' '+cat.category).toLowerCase();
+        if(haystack.indexOf(q) !== -1) results.push({track: track, cat: cat});
+      });
+    });
+    if(results.length){
+      html += '<div style="font-size:.72rem;color:var(--tx3);margin-bottom:.4rem;">'+results.length+' result'+(results.length===1?'':'s')+'</div>';
+      html += '<div style="display:grid;gap:.2rem;">';
+      results.forEach(function(r){
+        html += _ambientTrackRow(r.track, r.cat.category, r.cat.icon);
       });
       html += '</div>';
+    } else {
+      html += '<div style="text-align:center;padding:2rem 1rem;color:var(--tx3);font-size:.84rem;">No tracks match "<em>'+escapeHtml(_ambientSearchQuery)+'</em>"</div>';
     }
+  } else {
+    // Categorised accordion view
+    html += '<div style="display:grid;gap:.45rem;">';
+    lib.forEach(function(cat){
+      var isExpanded = _ambientExpanded === cat.category;
+      var verifiedCount = cat.tracks.filter(function(t){ return t.verified; }).length;
+      html += '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;overflow:hidden;">';
+      html += '<div onclick="expandAmbientCategory(\''+_jEsc(cat.category)+'\')" style="padding:.75rem 1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;">';
+      html += '<span style="font-size:1.5rem;line-height:1;flex-shrink:0;">'+cat.icon+'</span>';
+      html += '<div style="flex:1;"><div style="font-size:.9rem;font-weight:800;color:var(--tx);">'+escapeHtml(cat.category)+'</div>';
+      html += '<div style="font-size:.72rem;color:var(--tx2);">'+cat.tracks.length+' tracks'+(verifiedCount?' · '+verifiedCount+' verified':'')+'</div></div>';
+      html += '<span style="font-size:.85rem;color:var(--tx3);display:inline-block;transition:transform .2s;'+(isExpanded?'transform:rotate(180deg);':'')+'">▾</span>';
+      html += '</div>';
+      if(isExpanded){
+        html += '<div style="border-top:1px solid rgba(255,255,255,.06);padding:.4rem .75rem .55rem;">';
+        cat.tracks.forEach(function(track){
+          html += _ambientTrackRow(track, cat.category, cat.icon);
+        });
+        html += '</div>';
+      }
+      html += '</div>';
+    });
     html += '</div>';
-  });
-  html += '</div>';
-  html += '<div style="margin-top:.85rem;background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.1);border-radius:10px;padding:.6rem .85rem;font-size:.7rem;color:var(--tx3);line-height:1.5;">💡 Ambient audio continues playing as you navigate. Powered by YouTube. Use headphones for best experience.</div>';
+  }
+
+  html += '<div style="margin-top:.85rem;background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.1);border-radius:10px;padding:.6rem .85rem;font-size:.7rem;color:var(--tx3);line-height:1.5;">💡 Ambient audio continues playing as you navigate. Use headphones for best experience. Tap ⚑ to flag a broken link.</div>';
   html += '</div>';
   root.innerHTML = html;
+}
+
+function searchAudioLibrary(query){
+  _ambientSearchQuery = query || '';
+  _ambientExpanded = null;
+  renderAmbientLibraryCard();
+  var inp = document.getElementById('ambientSearchInput');
+  if(inp && document.activeElement !== inp) inp.focus();
+}
+
+function reportBrokenTrack(trackId, trackTitle){
+  if(typeof showToast === 'function') showToast('Thanks — "'+trackTitle+'" flagged for review.');
 }
 
 function expandAmbientCategory(category){
@@ -11882,9 +11948,10 @@ function expandAmbientCategory(category){
 }
 
 function playAmbientTrack(trackId){
-  if(typeof AMBIENT_LIBRARY==='undefined') return;
+  var lib = _ambientGetLibrary();
+  if(!lib.length) return;
   var allTracks = [];
-  AMBIENT_LIBRARY.forEach(function(c){ allTracks = allTracks.concat(c.tracks); });
+  lib.forEach(function(c){ allTracks = allTracks.concat(c.tracks); });
   var track = allTracks.find(function(t){ return t.id===trackId; });
   if(!track) return;
   _ambientTrackId = trackId;

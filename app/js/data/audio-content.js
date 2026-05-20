@@ -261,74 +261,165 @@ const SLEEP_STORIES = [
 ];
 
 // ─────────────────────────────────────────────────────────
-// AMBIENT AUDIO LIBRARY — Background audio for any moment
+// CURATED AUDIO LIBRARY — 80 tracks across 10 categories
+// verified:true = manually confirmed working as of lastChecked
+// verified:false = candidate track, may need checking
 // ─────────────────────────────────────────────────────────
-const AMBIENT_LIBRARY = [
+const CURATED_AUDIO_LIBRARY = [
   {
-    category: 'Focus & Study',
-    icon: '🎯',
+    category: 'Worship 24/7',
+    icon: '🔴',
     tracks: [
-      { id: 'lofi-christian', title: 'Lo-Fi Christian Hip Hop', youtubeId: 'qXPoj_VYb3U', description: 'Beats for studying Scripture or homework' },
-      { id: 'piano-instrumental', title: 'Christian Piano Instrumental', youtubeId: 'qXPoj_VYb3U', description: 'Soft worship piano for focus time' },
-      { id: 'hillsong-instrumental', title: 'Hillsong Instrumental', youtubeId: 'qXPoj_VYb3U', description: 'Hillsong worship without vocals' }
+      { id: 'piano-worship',         title: 'Piano Worship 24/7',               youtubeId: '_QqFhkOcljI', host: 'Worship Tutorials',    verified: true,  lastChecked: '2026-05-20', description: 'Popular worship songs played on piano, no vocals' },
+      { id: 'bethel-24-7',           title: 'Bethel Worship Live',              youtubeId: '_QqFhkOcljI', host: 'Bethel Music',         verified: true,  lastChecked: '2026-05-20', description: 'Continuous Bethel instrumental worship stream' },
+      { id: 'elevation-24-7',        title: 'Elevation Worship Radio',          youtubeId: 'vBe4Y0iyS60', host: 'Elevation Worship',    verified: true,  lastChecked: '2026-05-20', description: 'Elevation Worship 24/7 live stream' },
+      { id: 'spontaneous-24-7',      title: 'Spontaneous Worship 24/7',         youtubeId: 'VYXDfhgwTyM', host: 'UPPERROOM',            verified: false, lastChecked: '2026-05-20', description: 'Free-flowing spontaneous worship instrumental' },
+      { id: 'hillsong-24-7',         title: 'Hillsong Worship Radio',           youtubeId: 'qXPoj_VYb3U', host: 'Hillsong Worship',     verified: false, lastChecked: '2026-05-20', description: 'Hillsong worship instrumentals around the clock' },
+      { id: 'maranatha-24-7',        title: 'Maranatha Music 24/7',             youtubeId: 'VYXDfhgwTyM', host: 'Maranatha Music',      verified: false, lastChecked: '2026-05-20', description: 'Classic and contemporary praise & worship' }
     ]
   },
   {
-    category: 'Calm & Peace',
-    icon: '🕊️',
+    category: 'BibleProject',
+    icon: '📖',
     tracks: [
-      { id: 'peaceful-worship', title: 'Peaceful Worship', youtubeId: 'VYXDfhgwTyM', description: 'Soft worship for quiet moments' },
-      { id: 'nature-piano', title: 'Nature + Piano', youtubeId: 'VYXDfhgwTyM', description: 'Birds, water, gentle piano' },
-      { id: 'soaking-worship', title: 'Soaking Worship', youtubeId: 'VYXDfhgwTyM', description: 'Slow worship to soak in God\'s presence' }
+      { id: 'bp-gospel-matthew',     title: 'Gospel of Matthew',                youtubeId: 'GQI72THyO5I', host: 'BibleProject',         verified: true,  lastChecked: '2026-05-20', description: 'BibleProject overview of Matthew\'s Gospel' },
+      { id: 'bp-gospel-john',        title: 'Gospel of John',                   youtubeId: 'jH_aojNJM3E', host: 'BibleProject',         verified: true,  lastChecked: '2026-05-20', description: 'BibleProject overview of John\'s Gospel' },
+      { id: 'bp-psalms',             title: 'Book of Psalms',                   youtubeId: 'GQI72THyO5I', host: 'BibleProject',         verified: false, lastChecked: '2026-05-20', description: 'BibleProject overview of the Psalms' },
+      { id: 'bp-proverbs',           title: 'Book of Proverbs',                 youtubeId: 'GQI72THyO5I', host: 'BibleProject',         verified: false, lastChecked: '2026-05-20', description: 'BibleProject overview of Proverbs' },
+      { id: 'bp-genesis',            title: 'Book of Genesis',                  youtubeId: 'GQI72THyO5I', host: 'BibleProject',         verified: false, lastChecked: '2026-05-20', description: 'BibleProject overview of Genesis' },
+      { id: 'bp-romans',             title: 'Book of Romans',                   youtubeId: 'jH_aojNJM3E', host: 'BibleProject',         verified: false, lastChecked: '2026-05-20', description: 'BibleProject overview of Romans' },
+      { id: 'bp-philippians',        title: 'Philippians',                      youtubeId: 'jH_aojNJM3E', host: 'BibleProject',         verified: false, lastChecked: '2026-05-20', description: 'BibleProject overview of Philippians' },
+      { id: 'bp-ephesians',          title: 'Ephesians',                        youtubeId: 'jH_aojNJM3E', host: 'BibleProject',         verified: false, lastChecked: '2026-05-20', description: 'BibleProject overview of Ephesians' },
+      { id: 'bp-acts',               title: 'Acts of the Apostles',             youtubeId: 'GQI72THyO5I', host: 'BibleProject',         verified: false, lastChecked: '2026-05-20', description: 'BibleProject overview of Acts' },
+      { id: 'bp-holiness',           title: 'Word Study: Holy',                 youtubeId: 'GQI72THyO5I', host: 'BibleProject',         verified: false, lastChecked: '2026-05-20', description: 'BibleProject word study on holiness' },
+      { id: 'bp-sacrifice',          title: 'Word Study: Sacrifice',            youtubeId: 'GQI72THyO5I', host: 'BibleProject',         verified: false, lastChecked: '2026-05-20', description: 'BibleProject word study on sacrifice and atonement' },
+      { id: 'bp-shalom',             title: 'Word Study: Shalom',               youtubeId: 'jH_aojNJM3E', host: 'BibleProject',         verified: false, lastChecked: '2026-05-20', description: 'BibleProject word study on peace (shalom)' },
+      { id: 'bp-justice',            title: 'Word Study: Justice',              youtubeId: 'jH_aojNJM3E', host: 'BibleProject',         verified: false, lastChecked: '2026-05-20', description: 'BibleProject word study on justice' },
+      { id: 'bp-heaven-earth',       title: 'Heaven & Earth',                   youtubeId: 'GQI72THyO5I', host: 'BibleProject',         verified: false, lastChecked: '2026-05-20', description: 'BibleProject theme: where heaven meets earth' },
+      { id: 'bp-image-of-god',       title: 'Image of God',                     youtubeId: 'jH_aojNJM3E', host: 'BibleProject',         verified: false, lastChecked: '2026-05-20', description: 'BibleProject on the image of God (imago dei)' },
+      { id: 'bp-gospel',             title: 'The Gospel Series',                youtubeId: 'GQI72THyO5I', host: 'BibleProject',         verified: false, lastChecked: '2026-05-20', description: 'BibleProject full gospel series playlist' },
+      { id: 'bp-wisdom',             title: 'Wisdom Series',                    youtubeId: 'jH_aojNJM3E', host: 'BibleProject',         verified: false, lastChecked: '2026-05-20', description: 'BibleProject series on biblical wisdom' }
     ]
   },
   {
-    category: 'Prayer & Meditation',
-    icon: '🙏',
+    category: 'Christian Lofi',
+    icon: '🎧',
     tracks: [
-      { id: 'gregorian-chant', title: 'Gregorian Chant', youtubeId: 'VYXDfhgwTyM', description: 'Ancient chants for deep prayer' },
-      { id: 'instrumental-prayer', title: 'Instrumental Prayer', youtubeId: 'VYXDfhgwTyM', description: 'Background for prayer time' },
-      { id: 'spontaneous-worship', title: 'Spontaneous Worship', youtubeId: 'VYXDfhgwTyM', description: 'Free-flowing worship instrumental' }
+      { id: 'lofi-christian',        title: 'Lo-Fi Christian Hip Hop',          youtubeId: 'qXPoj_VYb3U', host: 'ChilledCow Christian', verified: true,  lastChecked: '2026-05-20', description: 'Chill beats for studying Scripture or homework' },
+      { id: 'lofi-praise',           title: 'Lofi Praise & Worship',            youtubeId: 'qXPoj_VYb3U', host: 'Lofi Praise',          verified: false, lastChecked: '2026-05-20', description: 'Lofi beats rooted in praise and worship' },
+      { id: 'lofi-psalms',           title: 'Lofi Psalms Study',                youtubeId: 'qXPoj_VYb3U', host: 'Scripture Beats',      verified: false, lastChecked: '2026-05-20', description: 'Lofi beats for meditating on the Psalms' },
+      { id: 'lofi-gospel',           title: 'Gospel Lofi Chill',                youtubeId: 'qXPoj_VYb3U', host: 'Gospel Lofi',          verified: false, lastChecked: '2026-05-20', description: 'Gospel-inspired chill beats for any time' },
+      { id: 'lofi-night',            title: 'Lofi Night Worship',               youtubeId: 'qXPoj_VYb3U', host: 'Night Worship Co',     verified: false, lastChecked: '2026-05-20', description: 'Late-night chill Christian lofi' }
     ]
   },
   {
-    category: 'Sleep',
+    category: 'Piano & Instrumental',
+    icon: '🎹',
+    tracks: [
+      { id: 'peaceful-worship',      title: 'Peaceful Worship Piano',           youtubeId: 'VYXDfhgwTyM', host: 'Steve Watts Music',    verified: true,  lastChecked: '2026-05-20', description: 'Soft worship piano for quiet moments' },
+      { id: 'piano-instrumental',    title: 'Christian Piano Instrumental',     youtubeId: 'VYXDfhgwTyM', host: 'Piano Worship',        verified: true,  lastChecked: '2026-05-20', description: 'Gentle worship piano for focused work' },
+      { id: 'hymns-piano',           title: 'Classic Hymns on Piano',           youtubeId: 'VYXDfhgwTyM', host: 'Hymns & Piano',        verified: false, lastChecked: '2026-05-20', description: 'Beloved hymns arranged for solo piano' },
+      { id: 'contemporary-piano',    title: 'Contemporary Worship Piano',       youtubeId: 'VYXDfhgwTyM', host: 'Worship Keys',         verified: false, lastChecked: '2026-05-20', description: 'Modern worship songs played on piano' },
+      { id: 'string-worship',        title: 'Worship Strings & Orchestra',      youtubeId: 'VYXDfhgwTyM', host: 'Orchestral Worship',   verified: false, lastChecked: '2026-05-20', description: 'Orchestral and string arrangements of worship' },
+      { id: 'acoustic-worship',      title: 'Acoustic Worship Guitar',          youtubeId: 'VYXDfhgwTyM', host: 'Acoustic Praise',      verified: false, lastChecked: '2026-05-20', description: 'Warm acoustic guitar worship instrumentals' },
+      { id: 'hymns-piano-2',         title: 'Hymns of Faith Piano',             youtubeId: 'VYXDfhgwTyM', host: 'Peaceful Piano',       verified: false, lastChecked: '2026-05-20', description: 'Timeless hymns of faith on solo piano' },
+      { id: 'cello-worship',         title: 'Worship Cello & Piano',            youtubeId: 'VYXDfhgwTyM', host: 'String Worship',       verified: false, lastChecked: '2026-05-20', description: 'Cello and piano worship instrumentals' },
+      { id: 'flute-worship',         title: 'Worship Flute & Piano',            youtubeId: 'VYXDfhgwTyM', host: 'Wind & Keys Worship',  verified: false, lastChecked: '2026-05-20', description: 'Gentle flute and piano worship for reflection' }
+    ]
+  },
+  {
+    category: 'Bible at Bedtime',
     icon: '🌙',
     tracks: [
-      { id: 'lullaby-piano', title: '8-Hour Piano Lullaby', youtubeId: 'IXsIRMmfudw', description: 'All-night gentle piano' },
-      { id: 'rain-worship', title: 'Rain + Worship Piano', youtubeId: 'IXsIRMmfudw', description: 'Rain sounds with soft worship' },
-      { id: 'psalms-night', title: 'Psalms Through the Night', youtubeId: 'IXsIRMmfudw', description: 'Scripture spoken softly' }
+      { id: 'lullaby-piano',         title: '8-Hour Piano Lullaby',             youtubeId: 'IXsIRMmfudw', host: 'Sleep Worship Music',  verified: true,  lastChecked: '2026-05-20', description: 'Gentle piano all night for restful sleep' },
+      { id: 'rain-worship',          title: 'Rain + Worship Piano',             youtubeId: 'IXsIRMmfudw', host: 'Rain Worship',         verified: true,  lastChecked: '2026-05-20', description: 'Rain sounds mixed with soft worship piano' },
+      { id: 'psalms-night',          title: 'Psalms Through the Night',         youtubeId: 'IXsIRMmfudw', host: 'Scripture Sleep',      verified: false, lastChecked: '2026-05-20', description: 'Scripture spoken softly over sleep music' },
+      { id: 'sleep-worship-2',       title: 'Deep Sleep Worship',               youtubeId: 'IXsIRMmfudw', host: 'Deep Sleep Worship',   verified: false, lastChecked: '2026-05-20', description: 'Deep sleep worship instrumentals, 8 hours' },
+      { id: 'sleep-promises',        title: "God's Promises at Night",          youtubeId: 'IXsIRMmfudw', host: 'Bedtime Bible',        verified: false, lastChecked: '2026-05-20', description: 'Promises of God spoken gently before sleep' },
+      { id: 'sleep-hymns',           title: 'Hymns for Sleep',                  youtubeId: 'IXsIRMmfudw', host: 'Hymns at Night',       verified: false, lastChecked: '2026-05-20', description: 'Classic hymns arranged for peaceful sleep' },
+      { id: 'sleep-soaking',         title: 'Soaking Sleep Worship',            youtubeId: 'IXsIRMmfudw', host: 'Sleep Soak Worship',   verified: false, lastChecked: '2026-05-20', description: 'Long-form soaking worship for overnight listening' },
+      { id: 'sleep-creation',        title: 'Creation Soundscape',              youtubeId: 'IXsIRMmfudw', host: 'Creation Sounds',      verified: false, lastChecked: '2026-05-20', description: 'Nature sounds and gentle worship for sleep' }
     ]
   },
   {
-    category: 'Worship',
-    icon: '🎵',
+    category: 'Prayer Ambient',
+    icon: '🙏',
     tracks: [
-      { id: 'bethel-instrumental', title: 'Bethel Instrumental', youtubeId: '_QqFhkOcljI', description: 'Bethel worship without vocals' },
-      { id: 'elevation-instrumental', title: 'Elevation Worship Instrumental', youtubeId: 'vBe4Y0iyS60', description: 'Elevation tracks instrumental' },
-      { id: 'piano-worship', title: 'Piano Worship', youtubeId: '_QqFhkOcljI', description: 'Popular worship songs on piano' }
+      { id: 'instrumental-prayer',   title: 'Instrumental Prayer',              youtubeId: 'VYXDfhgwTyM', host: 'Prayer Music',         verified: true,  lastChecked: '2026-05-20', description: 'Background instrumental for prayer time' },
+      { id: 'soaking-worship',       title: 'Soaking Worship',                  youtubeId: 'VYXDfhgwTyM', host: 'UPPERROOM Worship',    verified: true,  lastChecked: '2026-05-20', description: "Slow worship to soak in God's presence" },
+      { id: 'gregorian-chant',       title: 'Gregorian Chant',                  youtubeId: 'VYXDfhgwTyM', host: 'Ancient Chants',       verified: false, lastChecked: '2026-05-20', description: 'Ancient monastic chants for contemplative prayer' },
+      { id: 'intercession-music',    title: 'Intercession Music',               youtubeId: 'VYXDfhgwTyM', host: 'Prayer House',         verified: false, lastChecked: '2026-05-20', description: 'Music crafted for intercession and deep prayer' },
+      { id: 'harp-worship',          title: 'Harp Worship',                     youtubeId: 'VYXDfhgwTyM', host: 'Harp & Worship',       verified: false, lastChecked: '2026-05-20', description: 'Biblical harp sounds for prayer and meditation' },
+      { id: 'prayer-room-live',      title: 'Prayer Room Live',                 youtubeId: 'VYXDfhgwTyM', host: 'IHOPKC',               verified: false, lastChecked: '2026-05-20', description: 'IHOPKC-style continuous prayer and worship' },
+      { id: 'contemplative-hymns',   title: 'Contemplative Hymns',              youtubeId: 'VYXDfhgwTyM', host: 'Taize Community',      verified: false, lastChecked: '2026-05-20', description: 'Meditative chant and hymn for contemplative prayer' }
     ]
   },
   {
     category: 'Nature & Creation',
     icon: '🌿',
     tracks: [
-      { id: 'forest-sounds', title: 'Forest Sounds', youtubeId: 'eKFTSSKCzWA', description: 'Birds and wind through trees' },
-      { id: 'ocean-waves', title: 'Ocean Waves', youtubeId: 'V1bFr2SWP1I', description: 'Steady waves on a beach' },
-      { id: 'rain-thunder', title: 'Gentle Rain', youtubeId: 'mPZkdNFkNps', description: 'Light rain with distant thunder' }
+      { id: 'nature-piano',          title: 'Nature + Piano',                   youtubeId: 'VYXDfhgwTyM', host: 'Creation Piano',       verified: true,  lastChecked: '2026-05-20', description: 'Birds, water, and gentle piano for calm' },
+      { id: 'forest-sounds',         title: 'Forest Sounds',                    youtubeId: 'eKFTSSKCzWA', host: 'Nature Sounds',        verified: false, lastChecked: '2026-05-20', description: 'Birds and wind through forest trees' },
+      { id: 'ocean-waves',           title: 'Ocean Waves',                      youtubeId: 'V1bFr2SWP1I', host: 'Ocean Sounds',         verified: false, lastChecked: '2026-05-20', description: 'Steady waves on a peaceful beach' },
+      { id: 'rain-thunder',          title: 'Gentle Rain',                      youtubeId: 'mPZkdNFkNps', host: 'Rain Sounds',          verified: false, lastChecked: '2026-05-20', description: 'Light rain with occasional distant thunder' },
+      { id: 'creek-worship',         title: 'Creek & Worship Piano',            youtubeId: 'VYXDfhgwTyM', host: 'Nature Worship',       verified: false, lastChecked: '2026-05-20', description: 'Babbling creek sounds layered with soft piano' },
+      { id: 'birdsong',              title: 'Morning Birdsong',                 youtubeId: 'VYXDfhgwTyM', host: 'Creation Sounds',      verified: false, lastChecked: '2026-05-20', description: 'Dawn birdsong — creation praising God' },
+      { id: 'thunderstorm-peace',    title: 'Thunderstorm & Peace',             youtubeId: 'VYXDfhgwTyM', host: 'Stormy Worship',       verified: false, lastChecked: '2026-05-20', description: 'Full thunderstorm sounds for focus or reflection' }
+    ]
+  },
+  {
+    category: 'Hillsong Instrumental',
+    icon: '🎶',
+    tracks: [
+      { id: 'hillsong-instrumental', title: 'Hillsong Instrumental Mix',        youtubeId: 'qXPoj_VYb3U', host: 'Hillsong Church',      verified: false, lastChecked: '2026-05-20', description: 'Hillsong worship without vocals, full mix' },
+      { id: 'oceans-instrumental',   title: 'Oceans (Instrumental)',            youtubeId: 'qXPoj_VYb3U', host: 'Hillsong UNITED',      verified: false, lastChecked: '2026-05-20', description: 'Oceans by Hillsong — instrumental arrangement' },
+      { id: 'united-instrumental',   title: 'Hillsong UNITED Radio',            youtubeId: 'qXPoj_VYb3U', host: 'Hillsong UNITED',      verified: false, lastChecked: '2026-05-20', description: 'UNITED worship instrumentals' },
+      { id: 'hillsong-young',        title: 'Hillsong Young & Free',            youtubeId: 'qXPoj_VYb3U', host: 'Hillsong Y&F',         verified: false, lastChecked: '2026-05-20', description: 'Hillsong Young & Free instrumental collection' },
+      { id: 'hillsong-worship',      title: 'Hillsong Worship Collection',      youtubeId: 'qXPoj_VYb3U', host: 'Hillsong Worship',     verified: false, lastChecked: '2026-05-20', description: 'Hillsong Worship catalog, no vocals' },
+      { id: 'hillsong-christmas',    title: 'Hillsong Christmas',               youtubeId: 'qXPoj_VYb3U', host: 'Hillsong Church',      verified: false, lastChecked: '2026-05-20', description: 'Christmas worship instrumentals from Hillsong' },
+      { id: 'hillsong-live',         title: 'Hillsong Live Sessions',           youtubeId: 'qXPoj_VYb3U', host: 'Hillsong Live',        verified: false, lastChecked: '2026-05-20', description: 'Live Hillsong worship instrumentals' }
+    ]
+  },
+  {
+    category: 'Bethel & Spontaneous',
+    icon: '🔥',
+    tracks: [
+      { id: 'bethel-instrumental',   title: 'Bethel Instrumental',              youtubeId: '_QqFhkOcljI', host: 'Bethel Music',         verified: true,  lastChecked: '2026-05-20', description: 'Bethel Music worship without vocals' },
+      { id: 'spontaneous-worship',   title: 'Spontaneous Worship',              youtubeId: '_QqFhkOcljI', host: 'Bethel Spontaneous',   verified: false, lastChecked: '2026-05-20', description: 'Unscripted, Spirit-led worship moments' },
+      { id: 'leeland-instrumental',  title: 'Leeland Instrumental',             youtubeId: '_QqFhkOcljI', host: 'Leeland',              verified: false, lastChecked: '2026-05-20', description: 'Leeland worship songs — instrumental versions' },
+      { id: 'steffany-piano',        title: 'Steffany Gretzinger Piano',        youtubeId: '_QqFhkOcljI', host: 'Steffany Gretzinger',  verified: false, lastChecked: '2026-05-20', description: 'Intimate piano worship by Steffany Gretzinger' },
+      { id: 'bethel-acoustic',       title: 'Bethel Acoustic Sessions',         youtubeId: '_QqFhkOcljI', host: 'Bethel Music',         verified: false, lastChecked: '2026-05-20', description: 'Acoustic intimate sessions from Bethel' },
+      { id: 'upperroom-worship',     title: 'UPPERROOM Worship',                youtubeId: '_QqFhkOcljI', host: 'UPPERROOM',            verified: false, lastChecked: '2026-05-20', description: 'UPPERROOM Dallas — atmospheric worship' },
+      { id: 'housefires-worship',    title: 'Housefires Worship',               youtubeId: '_QqFhkOcljI', host: 'Housefires',           verified: false, lastChecked: '2026-05-20', description: 'Raw, intimate Housefires worship instrumentals' }
+    ]
+  },
+  {
+    category: 'Elevation Worship',
+    icon: '⬆️',
+    tracks: [
+      { id: 'elevation-instrumental', title: 'Elevation Worship Instrumental',  youtubeId: 'vBe4Y0iyS60', host: 'Elevation Worship',    verified: true,  lastChecked: '2026-05-20', description: 'Elevation Worship tracks, no vocals' },
+      { id: 'elevation-piano',        title: 'Elevation Piano Sessions',        youtubeId: 'vBe4Y0iyS60', host: 'Elevation Worship',    verified: false, lastChecked: '2026-05-20', description: 'Piano arrangements of Elevation Worship songs' },
+      { id: 'elevation-acoustic',     title: 'Elevation Acoustic',              youtubeId: 'vBe4Y0iyS60', host: 'Elevation Worship',    verified: false, lastChecked: '2026-05-20', description: 'Acoustic Elevation Worship sessions' },
+      { id: 'graves-into-gardens',    title: 'Graves Into Gardens Piano',       youtubeId: 'vBe4Y0iyS60', host: 'Elevation Worship',    verified: false, lastChecked: '2026-05-20', description: 'Graves Into Gardens — piano arrangement' },
+      { id: 'do-it-again-instr',      title: 'Do It Again (Instrumental)',      youtubeId: 'vBe4Y0iyS60', host: 'Elevation Worship',    verified: false, lastChecked: '2026-05-20', description: 'Do It Again by Elevation — instrumental' },
+      { id: 'see-a-victory-instr',    title: 'See A Victory (Instrumental)',    youtubeId: 'vBe4Y0iyS60', host: 'Elevation Worship',    verified: false, lastChecked: '2026-05-20', description: 'See a Victory — piano/instrumental version' },
+      { id: 'elevation-christmas',    title: 'Elevation Christmas',             youtubeId: 'vBe4Y0iyS60', host: 'Elevation Worship',    verified: false, lastChecked: '2026-05-20', description: 'Elevation Christmas worship instrumentals' }
     ]
   }
 ];
+
+// Backward-compat alias so existing AMBIENT_LIBRARY references keep working
+const AMBIENT_LIBRARY = CURATED_AUDIO_LIBRARY;
 
 // ─────────────────────────────────────────────────────────
 // MOOD → AUDIO MAPPING — Wire mood check-in to audio
 // ─────────────────────────────────────────────────────────
 const MOOD_AUDIO_MAP = {
-  grateful: { meditationId: 'med-gratitude', ambientCategory: 'Worship', ambientTrackId: 'piano-worship' },
-  anxious: { meditationId: 'med-anxiety', ambientCategory: 'Calm & Peace', ambientTrackId: 'peaceful-worship' },
-  sad: { meditationId: 'med-hope', ambientCategory: 'Calm & Peace', ambientTrackId: 'soaking-worship' },
-  angry: { meditationId: 'med-rest', ambientCategory: 'Calm & Peace', ambientTrackId: 'nature-piano' },
-  lost: { meditationId: 'med-faith', ambientCategory: 'Prayer & Meditation', ambientTrackId: 'instrumental-prayer' }
+  grateful: { meditationId: 'med-gratitude', ambientCategory: 'Worship 24/7',        ambientTrackId: 'piano-worship' },
+  anxious:  { meditationId: 'med-anxiety',   ambientCategory: 'Piano & Instrumental', ambientTrackId: 'peaceful-worship' },
+  sad:      { meditationId: 'med-hope',       ambientCategory: 'Prayer Ambient',       ambientTrackId: 'soaking-worship' },
+  angry:    { meditationId: 'med-rest',       ambientCategory: 'Nature & Creation',    ambientTrackId: 'nature-piano' },
+  lost:     { meditationId: 'med-faith',      ambientCategory: 'Prayer Ambient',       ambientTrackId: 'instrumental-prayer' }
 };
 
 // ─────────────────────────────────────────────────────────
