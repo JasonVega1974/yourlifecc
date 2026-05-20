@@ -1555,6 +1555,10 @@ if (typeof window !== 'undefined' && !window.ACADEMY_PHOTO_OVERRIDES){
 if (typeof window !== 'undefined' && !window.PROOF_PHOTO_OVERRIDES){
   window.PROOF_PHOTO_OVERRIDES = {};
 }
+// Reading plan hero photos. Admin row id is 'rp-' + plan.id.
+if (typeof window !== 'undefined' && !window.RP_PHOTO_OVERRIDES){
+  window.RP_PHOTO_OVERRIDES = {};
+}
 
 async function loadCardPhotoOverrides(){
   try {
@@ -1566,6 +1570,7 @@ async function loadCardPhotoOverrides(){
     let appliedSk  = 0;
     let appliedAc  = 0;
     let appliedPp  = 0;
+    let appliedRp  = 0;
     Object.keys(overrides).forEach(cardId => {
       const url = overrides[cardId];
       if(!url) return;
@@ -1604,6 +1609,15 @@ async function loadCardPhotoOverrides(){
           appliedPp++;
         }
       }
+      // Reading Plans: per-plan hero photo, keyed by plan.id. Admin row
+      // id is 'rp-' + plan.id. Read by renderReadingPlansCard() in faith.js.
+      if(cardId.indexOf('rp-') === 0 && typeof window !== 'undefined'){
+        const planId = cardId.slice('rp-'.length);
+        if(window.RP_PHOTO_OVERRIDES[planId] !== url){
+          window.RP_PHOTO_OVERRIDES[planId] = url;
+          appliedRp++;
+        }
+      }
     });
     // If any skills overrides changed, re-render the grid (cheap, idempotent).
     if(appliedSk > 0 && typeof buildSkillsGrid === 'function'){
@@ -1618,6 +1632,10 @@ async function loadCardPhotoOverrides(){
     // arrived after first paint.
     if(appliedPp > 0 && typeof ppRenderGrid === 'function'){
       try { ppRenderGrid(); } catch(e){}
+    }
+    // Reading Plans — re-render the card list if any plan photo overrides arrived.
+    if(appliedRp > 0 && typeof renderReadingPlansCard === 'function'){
+      try { renderReadingPlansCard(); } catch(e){}
     }
   } catch(e){
     // Fail silently — overrides are non-essential. The base photo set

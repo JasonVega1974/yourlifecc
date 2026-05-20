@@ -4640,6 +4640,10 @@
     <button class="tab" data-bf-tab="denominations" onclick="bfTab('denominations',this)">⛪ Traditions</button>
     <button class="tab" data-bf-tab="studyTools" onclick="bfTab('studyTools',this)">🔍 Study Tools</button>
     <button class="tab" data-bf-tab="readingPlans" onclick="bfTab('readingPlans',this)">📚 Reading Plans</button>
+    <button class="tab" data-bf-tab="audioBible" onclick="bfTab('audioBible',this)">🔊 Audio Bible</button>
+    <button class="tab" data-bf-tab="audioMeditations" onclick="bfTab('audioMeditations',this)">🧘 Meditations</button>
+    <button class="tab" data-bf-tab="sleepStories" onclick="bfTab('sleepStories',this)">🌙 Sleep Stories</button>
+    <button class="tab" data-bf-tab="ambientLibrary" onclick="bfTab('ambientLibrary',this)">🎵 Ambient</button>
     <button class="tab" onclick="window.location.href='/app/podcasts.html'">🎧 Podcasts</button>
     <button class="tab" onclick="window.location.href='/app/calendar.html'">📅 Faith Calendar</button>
     <button class="tab" onclick="wellGoto('worship')">🎵 Worship</button>
@@ -4691,6 +4695,7 @@
         <button onclick="_votdCopyVerse()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:var(--tx2);border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">📋 Copy</button>
         <button onclick="_votdSaveToJourney()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:var(--tx2);border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🔖 Journey</button>
         <button onclick="checkShowMoodPrompt(true)" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.25);color:#a78bfa;border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">😊 How I feel</button>
+        <button onclick="speakVotd()" style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.22);color:#fde68a;border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🔊 Listen</button>
       </div>
     </div>
     <div class="well-welcome">Welcome to The Well. Everything you need to grow in faith — stories, plans, prayer, and Scripture — is here.</div>
@@ -4883,6 +4888,26 @@
         <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(251,191,36,.22));"><img class="topic-card-hero" data-card-id="bf-stories" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/3/3f/The_Wise_Men.jpg" alt="Story Mode"></div>
         <div class="topic-card-title">Story Mode</div>
         <div class="topic-card-desc">Illustrated, narrated Bible stories</div>
+      </div>
+      <div class="topic-card accent-cyan" onclick="bfTab('audioBible')">
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(14,165,233,.12));"><img class="topic-card-hero" data-card-id="bf-audioBible" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Psalms_of_David.jpg/1280px-Psalms_of_David.jpg" alt="Audio Bible"></div>
+        <div class="topic-card-title">Audio Bible</div>
+        <div class="topic-card-desc">Listen to any chapter · 66 books</div>
+      </div>
+      <div class="topic-card accent-violet" onclick="bfTab('audioMeditations')">
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(167,139,250,.22),rgba(109,40,217,.12));"><img class="topic-card-hero" data-card-id="bf-audioMeditations" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/The_Praying_Hands.jpg/1280px-The_Praying_Hands.jpg" alt="Audio Meditations"></div>
+        <div class="topic-card-title">Audio Meditations</div>
+        <div class="topic-card-desc">7 guided sessions · Scripture-led</div>
+      </div>
+      <div class="topic-card" style="--accent-light:rgba(167,139,250,.15)" onclick="bfTab('sleepStories')">
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(30,20,80,.5),rgba(167,139,250,.15));"><img class="topic-card-hero" data-card-id="bf-sleepStories" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1280px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg" alt="Sleep Stories"></div>
+        <div class="topic-card-title">Sleep Stories</div>
+        <div class="topic-card-desc">7 bedtime Scripture stories · fades out</div>
+      </div>
+      <div class="topic-card accent-cyan" onclick="bfTab('ambientLibrary')">
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(14,165,233,.12));"><img class="topic-card-hero" data-card-id="bf-ambientLibrary" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Headphones_on_a_yellow_background.jpg/1280px-Headphones_on_a_yellow_background.jpg" alt="Ambient Library"></div>
+        <div class="topic-card-title">Ambient Library</div>
+        <div class="topic-card-desc">6 categories · background audio</div>
       </div>
     </div>
 
@@ -7837,6 +7862,26 @@
     <div id="readingPlansRoot"></div>
   </div>
 
+  <!-- ════ Audio Bible (Audio Layer Worker 1) ════ -->
+  <div id="bf-audioBible" style="display:none;">
+    <div id="audioBibleRoot"></div>
+  </div>
+
+  <!-- ════ Audio Meditations (Audio Layer Worker 2) ════ -->
+  <div id="bf-audioMeditations" style="display:none;">
+    <div id="audioMeditationsRoot"></div>
+  </div>
+
+  <!-- ════ Sleep Stories (Audio Layer Worker 2) ════ -->
+  <div id="bf-sleepStories" style="display:none;">
+    <div id="sleepStoriesRoot"></div>
+  </div>
+
+  <!-- ════ Ambient Library (Audio Layer Worker 3) ════ -->
+  <div id="bf-ambientLibrary" style="display:none;">
+    <div id="ambientLibraryRoot"></div>
+  </div>
+
   <!-- ════ THE WELL — bottom nav (mirrors top .scrTabs; bfTab keeps both in sync) ════ -->
   <style>
     #s-scripture .scrTabs-bottom{
@@ -7888,6 +7933,10 @@
     <button class="tab" data-bf-tab="denominations" onclick="bfTab('denominations',this)"><span class="scrtab-icon">⛪</span><span>Traditions</span></button>
     <button class="tab" data-bf-tab="studyTools" onclick="bfTab('studyTools',this)"><span class="scrtab-icon">🔍</span><span>Study Tools</span></button>
     <button class="tab" data-bf-tab="readingPlans" onclick="bfTab('readingPlans',this)"><span class="scrtab-icon">📚</span><span>Read Plans</span></button>
+    <button class="tab" data-bf-tab="audioBible" onclick="bfTab('audioBible',this)"><span class="scrtab-icon">🔊</span><span>Audio Bible</span></button>
+    <button class="tab" data-bf-tab="audioMeditations" onclick="bfTab('audioMeditations',this)"><span class="scrtab-icon">🧘</span><span>Meditations</span></button>
+    <button class="tab" data-bf-tab="sleepStories" onclick="bfTab('sleepStories',this)"><span class="scrtab-icon">🌙</span><span>Sleep Stories</span></button>
+    <button class="tab" data-bf-tab="ambientLibrary" onclick="bfTab('ambientLibrary',this)"><span class="scrtab-icon">🎵</span><span>Ambient</span></button>
     <button class="tab" onclick="window.location.href='/app/podcasts.html'"><span class="scrtab-icon">🎧</span><span>Podcasts</span></button>
     <button class="tab" onclick="window.location.href='/app/calendar.html'"><span class="scrtab-icon">📅</span><span>Calendar</span></button>
     <button class="tab" onclick="wellGoto('worship')"><span class="scrtab-icon">🎵</span><span>Worship</span></button>
@@ -11732,7 +11781,7 @@
   <div style="width:min(480px,100%);background:linear-gradient(180deg,#1a1233 0%,#0a0d1a 100%);border-radius:18px;overflow:hidden;box-shadow:0 0 40px rgba(251,191,36,.20), 0 30px 80px rgba(0,0,0,.55);position:relative;border:1px solid rgba(251,191,36,.45);">
     <!-- Header -->
     <div id="ddmHeader" style="background:radial-gradient(ellipse at top, rgba(251,191,36,.18), transparent 60%);padding:1.5rem 1.5rem 1.2rem;text-align:center;border-bottom:1px solid rgba(251,191,36,.22);">
-      <button onclick="closeDailyDevModal()" aria-label="Close" style="position:absolute;top:.7rem;right:.7rem;width:44px;height:44px;border-radius:50%;background:rgba(10,13,26,.7);border:1px solid rgba(251,191,36,.4);color:#fef3c7;font-size:.95rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);font-family:var(--fm);">✕</button>
+      <button type="button" onclick="closeDailyDevModal()" aria-label="Close" style="position:absolute;top:.7rem;right:.7rem;width:44px;height:44px;border-radius:50%;background:rgba(10,13,26,.7);border:1px solid rgba(251,191,36,.4);color:#fef3c7;font-size:.95rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);font-family:var(--fm);">✕</button>
       <div style="font-family:var(--fm);font-size:.62rem;text-transform:uppercase;letter-spacing:.22em;color:#fbbf24;font-weight:700;opacity:.85;margin-bottom:.45rem;">✝️ TODAY'S DEVOTIONAL</div>
       <div id="ddmTitle" style="font-family:'Bebas Neue',var(--fm);font-size:1.55rem;letter-spacing:.04em;line-height:1.1;background:linear-gradient(135deg,#fef3c7 0%,#fbbf24 60%,#d97706 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#fbbf24;text-shadow:0 0 18px rgba(251,191,36,.6);"></div>
       <div id="ddmVerse" style="font-family:'Bebas Neue',var(--fm);font-size:.78rem;letter-spacing:.18em;color:#fbbf24;margin-top:.5rem;font-weight:700;opacity:.9;"></div>
@@ -12011,6 +12060,7 @@
 <script src="/app/js/data/denominations.js"></script>
 <script src="/app/js/data/podcasts.js"></script>
 <script src="/app/js/data/reading-plans.js"></script>
+<script src="/app/js/data/audio-content.js"></script>
 <!-- Leaflet (F3-B) — open-source map library, MIT-licensed. Only loads when used. -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>

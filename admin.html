@@ -1512,6 +1512,18 @@ const PM_INVENTORY = [
   {id:'bf-podcasts',        section:'Bible & Faith',   title:'Podcasts',              defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Shure_mikrofon_55S.jpg/1280px-Shure_mikrofon_55S.jpg'},
   {id:'bf-calendar',        section:'Bible & Faith',   title:'Faith Calendar',        defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Baptistery_wall_painting_Good_Shepherd_and_Adam_and_Eve.jpg/1280px-Baptistery_wall_painting_Good_Shepherd_and_Adam_and_Eve.jpg'},
   {id:'bf-studyTools',      section:'Bible & Faith',   title:'Study Tools',           defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Aleppo_Codex_%28Deut%29.jpg/1280px-Aleppo_Codex_%28Deut%29.jpg'},
+  {id:'bf-readingPlans',    section:'Bible & Faith',   title:'Reading Plans',         defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Open_Bible.jpg/1280px-Open_Bible.jpg'},
+  {id:'bf-audioBible',        section:'Bible & Faith',   title:'Audio Bible',           defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Psalms_of_David.jpg/1280px-Psalms_of_David.jpg'},
+  {id:'bf-audioMeditations',  section:'Bible & Faith',   title:'Audio Meditations',     defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/The_Praying_Hands.jpg/1280px-The_Praying_Hands.jpg'},
+  {id:'bf-sleepStories',      section:'Bible & Faith',   title:'Sleep Stories',         defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1280px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg'},
+  {id:'bf-ambientLibrary',   section:'Bible & Faith',   title:'Ambient Library',       defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Headphones_on_a_yellow_background.jpg/1280px-Headphones_on_a_yellow_background.jpg'},
+
+  // ── Reading Plans (5) ──
+  {id:'rp-start-fresh',       section:'Reading Plans', title:'Starting Fresh (3-day)',    defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Open_Bible.jpg/1280px-Open_Bible.jpg'},
+  {id:'rp-foundations',       section:'Reading Plans', title:'Foundations (7-day)',       defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Open_Bible.jpg/1280px-Open_Bible.jpg'},
+  {id:'rp-deeper',            section:'Reading Plans', title:'Deeper (30-day)',           defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Open_Bible.jpg/1280px-Open_Bible.jpg'},
+  {id:'rp-through-the-story', section:'Reading Plans', title:'Through the Story (90-day)',defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Open_Bible.jpg/1280px-Open_Bible.jpg'},
+  {id:'rp-whole-word',        section:'Reading Plans', title:'The Whole Word (365-day)',  defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Open_Bible.jpg/1280px-Open_Bible.jpg'},
 
   // ── School (5) ──
   {id:'school-classes',     section:'School',          title:'My Classes',            defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Elementary_classroom_in_Alaska.jpg/1280px-Elementary_classroom_in_Alaska.jpg'},
@@ -1648,7 +1660,7 @@ if (typeof PROOF_PROPHECY_DATA !== 'undefined' && Array.isArray(PROOF_PROPHECY_D
 }
 
 // Section display order — add new sections here to control their position.
-const PM_SECTION_ORDER = ['Bible & Faith','Proof & Prophecy','Faith Academy','Life Skills','School','Money Manager','Health & Wellness','Driving','Sports','Resume / Jobs'];
+const PM_SECTION_ORDER = ['Bible & Faith','Reading Plans','Proof & Prophecy','Faith Academy','Life Skills','School','Money Manager','Health & Wellness','Driving','Sports','Resume / Jobs'];
 
 let PM_OVERRIDES = {};
 let PM_INITED    = false;

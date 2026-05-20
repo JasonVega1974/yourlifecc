@@ -439,7 +439,7 @@ function initScripture(){
 // the original 6 tabs. New tabs without renderers are stubs awaiting later phases.
 // btn is optional — when bfTab() is called programmatically (e.g., from a Quick
 // Tile or stub-panel CTA), the matching button is found via [data-bf-tab].
-const BF_TABS = ['home','devotional','jesus','denominations','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy','studyTools','readingPlans'];
+const BF_TABS = ['home','devotional','jesus','denominations','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy','studyTools','readingPlans','audioBible','audioMeditations','sleepStories','ambientLibrary'];
 
 // Phase 5.8 v3 — Home-grid restorer. Defensive against any prior code
 // that may have set .topic-card-grid display:none inside #bf-home. The
@@ -686,6 +686,10 @@ function bfTab(tab, btn){
   if(tab==='bibleStudy') initBibleStudyTab();
   if(tab==='studyTools') renderBibleStudyCard();
   if(tab==='readingPlans') renderReadingPlansCard();
+  if(tab==='audioBible') renderAudioBibleCard();
+  if(tab==='audioMeditations') renderAudioMeditationsCard();
+  if(tab==='sleepStories') renderSleepStoriesCard();
+  if(tab==='ambientLibrary') renderAmbientLibraryCard();
 }
 
 // ── FAITH HOME (F2-A) ────────────────────────────────────────
@@ -1617,7 +1621,10 @@ function _planDayHtml(p, d, prog, completedArchive, todayDay){
   const keyVerseHtml = (d.keyVerse && d.keyVerse.text)
     ? '<div style="background:' + brand.soft + '0.08);border-left:3px solid ' + brand.color + ';border-radius:0 10px 10px 0;padding:.75rem .95rem;margin-bottom:.85rem;">'
         + '<div style="font-family:Georgia,serif;font-style:italic;font-size:.92rem;color:var(--tx);line-height:1.6;">' + _planEsc(d.keyVerse.text) + '</div>'
-        + '<div style="margin-top:.4rem;font-family:\'Bebas Neue\',var(--fm);font-size:.7rem;font-weight:800;letter-spacing:.14em;color:' + brand.color + ';">— ' + _planEsc(d.keyVerse.ref || '') + '</div>'
+        + '<div style="margin-top:.4rem;display:flex;align-items:center;gap:.4rem;">'
+        + '<span style="font-family:\'Bebas Neue\',var(--fm);font-size:.7rem;font-weight:800;letter-spacing:.14em;color:' + brand.color + ';flex:1;">— ' + _planEsc(d.keyVerse.ref || '') + '</span>'
+        + '<button onclick="_pdSpeakVerse(this)" style="background:none;border:1px solid rgba(255,255,255,.15);border-radius:4px;padding:.1rem .35rem;font-size:.65rem;color:var(--tx2);cursor:pointer;">🔊</button>'
+        + '</div>'
       + '</div>'
     : '';
 
@@ -5373,6 +5380,7 @@ function renderSermonNotes(){
   el.innerHTML = Object.keys(groups).sort().reverse().map(k => {
     const cards = groups[k].map(s => {
       const ref = [s.church, s.speaker].filter(Boolean).join(' · ');
+      const podcast = s.speaker ? findPodcastForPastor(s.speaker) : null;
       return `<div onclick="openSermonNote(${s.id})" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-left:4px solid #38bdf8;border-radius:10px;padding:.65rem .8rem;margin-bottom:.4rem;cursor:pointer;">
         <div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;font-size:.6rem;color:var(--tx2);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.25rem;">
           <span>${s.date || ''}</span>
@@ -5383,6 +5391,7 @@ function renderSermonNotes(){
         <div style="font-size:.85rem;line-height:1.5;color:var(--tx);font-weight:600;margin-bottom:${s.scriptures||s.actionStep?'.3rem':'0'};">⭐ ${escapeHtml(s.takeaway || '')}</div>
         ${s.scriptures ? '<div style="font-size:.7rem;color:#a78bfa;font-weight:700;margin-bottom:.2rem;">📖 '+escapeHtml(s.scriptures)+'</div>' : ''}
         ${s.actionStep ? '<div style="font-size:.7rem;color:#10b981;font-weight:700;">🎯 '+escapeHtml(s.actionStep)+'</div>' : ''}
+        ${podcast ? '<div style="margin-top:.3rem;padding-top:.3rem;border-top:1px solid rgba(255,255,255,.06);"><a href="'+escapeHtml(podcast.listenLink)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:.7rem;color:#38bdf8;text-decoration:none;font-weight:700;">🎧 Listen → '+escapeHtml(podcast.name)+'</a></div>' : ''}
       </div>`;
     }).join('');
     return `<div style="font-size:.66rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.16em;margin:.5rem 0 .35rem;">${monthLabel(k)}</div>${cards}`;
@@ -5613,9 +5622,12 @@ function _lmRenderLesson(lesson){
     html += '</div>';
   });
   if(lesson.keyVerse && lesson.keyVerse.text){
-    html += '<div class="lm-keyverse">'
-         +    '<div class="lm-keyverse-text">' + _acEsc('“' + lesson.keyVerse.text + '”') + '</div>'
-         +    '<div class="lm-keyverse-ref">— ' + _acEsc(lesson.keyVerse.ref || '') + '</div>'
+    html += '<div class=”lm-keyverse”>'
+         +    '<div class=”lm-keyverse-text”>' + _acEsc('”' + lesson.keyVerse.text + '”') + '</div>'
+         +    '<div style=”display:flex;align-items:center;gap:.4rem;”>'
+         +    '<div class=”lm-keyverse-ref” style=”flex:1;”>— ' + _acEsc(lesson.keyVerse.ref || '') + '</div>'
+         +    '<button onclick=”_acSpeakVerse(this)” style=”background:none;border:1px solid rgba(255,255,255,.15);border-radius:4px;padding:.1rem .35rem;font-size:.65rem;color:var(--tx2);cursor:pointer;”>🔊</button>'
+         +    '</div>'
          +  '</div>';
   }
   if(lesson.whatThisMeans){
@@ -8910,6 +8922,7 @@ function _buildJesusWordsTab(redLetterWords){
         +'<div style="font-size:.7rem;color:#c0392b;font-weight:700;margin-bottom:.25rem;">'+_jEsc(v.ref)+'</div>'
         +'<div style="font-size:.83rem;color:#c0392b;line-height:1.6;font-style:italic;margin-bottom:.25rem;">"'+_jEsc(v.words)+'"</div>'
         +(strHtml ? '<div style="margin-top:.25rem;">'+strHtml+'</div>' : '')
+        +'<button onclick="speakVerse(this.getAttribute(\'data-words\'),this.getAttribute(\'data-ref\'))" data-ref="'+_jEsc(v.ref)+'" data-words="'+_jEsc(v.words)+'" style="margin-top:.35rem;margin-right:.35rem;font-size:.68rem;background:none;border:1px solid rgba(192,57,43,.3);border-radius:4px;padding:.1rem .4rem;color:#c0392b;cursor:pointer;">🔊</button>'
         +'<button onclick="jesusVerseCopy(this)" data-ref="'+_jEsc(v.ref)+'" data-words="'+_jEsc(v.words)+'" style="margin-top:.35rem;font-size:.68rem;background:none;border:1px solid rgba(192,57,43,.3);border-radius:4px;padding:.1rem .4rem;color:#c0392b;cursor:pointer;">Copy</button>'
         +'</div>';
     }).join('');
@@ -9094,7 +9107,7 @@ function openDenomModal(denomId){
   var modal = document.createElement('div');
   modal.id = 'denomModal';
   modal.style.cssText = 'position:fixed;inset:0;z-index:9998;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;';
-  modal.innerHTML = '<div style="max-width:680px;margin:0 auto;padding:1rem 1rem 3rem;">'
+  modal.innerHTML = '<div style="max-width:680px;margin:0 auto;padding:max(env(safe-area-inset-top),1rem) 1rem 3rem;">'
     +'<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1rem;padding-top:.4rem;">'
     +'<button type="button" onclick="closeDenomModal()" style="background:rgba(5,150,105,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
     +'<div><span style="font-size:1.4rem;margin-right:.3rem;">'+_jEsc(d.icon||'✝️')+'</span><span style="font-size:1.05rem;font-weight:800;color:var(--tx);">'+_jEsc(d.name)+'</span></div>'
@@ -9315,7 +9328,7 @@ function openFaithProfileModal(){
   var modal = document.createElement('div');
   modal.id = 'fjProfileModal';
   modal.style.cssText = 'position:fixed;inset:0;z-index:9500;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;';
-  modal.innerHTML = '<div style="max-width:640px;margin:0 auto;padding:1rem 1rem 3rem;">'
+  modal.innerHTML = '<div style="max-width:640px;margin:0 auto;padding:max(env(safe-area-inset-top),1rem) 1rem 3rem;">'
     +'<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.2rem;padding-top:.4rem;">'
     +'<button type="button" onclick="closeFaithProfileModal()" style="background:rgba(167,139,250,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
     +'<span style="font-size:1rem;font-weight:800;color:var(--tx);">My Faith Profile</span>'
@@ -9479,7 +9492,7 @@ function openMilestoneModal(editId){
   var modal = document.createElement('div');
   modal.id = 'fjMilestoneModal';
   modal.style.cssText = 'position:fixed;inset:0;z-index:9500;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;';
-  modal.innerHTML = '<div style="max-width:640px;margin:0 auto;padding:1rem 1rem 3rem;">'
+  modal.innerHTML = '<div style="max-width:640px;margin:0 auto;padding:max(env(safe-area-inset-top),1rem) 1rem 3rem;">'
     +'<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.2rem;padding-top:.4rem;">'
     +'<button type="button" onclick="closeMilestoneModal()" style="background:rgba(167,139,250,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
     +'<span style="font-size:1rem;font-weight:800;color:var(--tx);">'+(editId?'Edit':'Add')+' Milestone</span>'
@@ -9581,7 +9594,7 @@ function _fjMilestoneDetail(id){
   var modal = document.createElement('div');
   modal.id = 'fjMilestoneDetail';
   modal.style.cssText = 'position:fixed;inset:0;z-index:9500;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;';
-  modal.innerHTML = '<div style="max-width:640px;margin:0 auto;padding:1rem 1rem 3rem;">'
+  modal.innerHTML = '<div style="max-width:640px;margin:0 auto;padding:max(env(safe-area-inset-top),1rem) 1rem 3rem;">'
     +'<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.2rem;padding-top:.4rem;">'
     +'<button type="button" onclick="closeMilestoneDetail()" style="background:rgba(167,139,250,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
     +'<button type="button" onclick="closeMilestoneDetail();openMilestoneModal(\''+_jEsc(id)+'\')" style="margin-left:auto;background:rgba(167,139,250,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--accent,#a78bfa);font-size:.75rem;">Edit</button>'
@@ -9683,7 +9696,7 @@ function openDonationModal(){
   var modal = document.createElement('div');
   modal.id = 'fjDonationModal';
   modal.style.cssText = 'position:fixed;inset:0;z-index:9500;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;';
-  modal.innerHTML = '<div style="max-width:560px;margin:0 auto;padding:1rem 1rem 3rem;">'
+  modal.innerHTML = '<div style="max-width:560px;margin:0 auto;padding:max(env(safe-area-inset-top),1rem) 1rem 3rem;">'
     +'<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.2rem;padding-top:.4rem;">'
     +'<button type="button" onclick="closeDonationModal()" style="background:rgba(34,197,94,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
     +'<span style="font-size:1rem;font-weight:800;color:var(--tx);">Record a Gift</span>'
@@ -10137,7 +10150,10 @@ function _stShowPassage(data, origRef){
   var vHtml = verses.map(function(v){
     return '<div class="st-verse-box">'
       +'<div class="st-verse-text">'+_jEsc((v.text||'').trim())+'</div>'
-      +'<div class="st-verse-ref-lbl">'+_jEsc(v.book_name||'')+' '+_jEsc(String(v.chapter||''))+':'+_jEsc(String(v.verse||''))+'</div>'
+      +'<div style="display:flex;align-items:center;gap:.4rem;">'
+      +'<div class="st-verse-ref-lbl" style="flex:1;">'+_jEsc(v.book_name||'')+' '+_jEsc(String(v.chapter||''))+':'+_jEsc(String(v.verse||''))+'</div>'
+      +'<button onclick="_stSpeakVerse(this)" style="background:none;border:1px solid rgba(56,189,248,.2);border-radius:4px;padding:.1rem .35rem;font-size:.65rem;color:#38bdf8;cursor:pointer;">🔊</button>'
+      +'</div>'
       +'</div>';
   }).join('');
   var yvLink = 'https://www.bible.com/search/bible?q='+encodeURIComponent(origRef)+'&version_id=111';
@@ -10360,15 +10376,18 @@ function renderReadingPlansCard(){
     var prog = _rpGetProgress(p.id);
     var isActive = prog && !prog.completed;
     var isDone = prog && prog.completed;
-    html += '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;" onclick="_rpStartOrContinue(\'' + p.id + '\')">';
-    html += '<span style="font-size:2rem;line-height:1;flex-shrink:0;">' + p.icon + '</span>';
+    var rpPhoto = (typeof window !== 'undefined' && window.RP_PHOTO_OVERRIDES) ? window.RP_PHOTO_OVERRIDES[p.id] : null;
+    html += '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;cursor:pointer;" onclick="_rpStartOrContinue(\'' + p.id + '\')">';
+    if(rpPhoto) html += '<div style="height:84px;overflow:hidden;"><img src="' + rpPhoto + '" alt="' + p.title + '" loading="lazy" style="width:100%;height:100%;object-fit:cover;"></div>';
+    html += '<div style="padding:1rem;display:flex;align-items:center;gap:.75rem;">';
+    if(!rpPhoto) html += '<span style="font-size:2rem;line-height:1;flex-shrink:0;">' + p.icon + '</span>';
     html += '<div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;margin-bottom:.18rem;">';
     html += '<span style="font-size:.88rem;font-weight:800;color:var(--tx);">' + p.title + '</span>';
     if(isDone) html += '<span style="font-size:.6rem;font-weight:800;background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3);border-radius:99px;padding:.08rem .4rem;">✓ Done</span>';
     else if(isActive) html += '<span style="font-size:.6rem;font-weight:800;background:rgba(56,189,248,.15);color:#38bdf8;border:1px solid rgba(56,189,248,.3);border-radius:99px;padding:.08rem .4rem;">In Progress</span>';
     html += '</div><div style="font-size:.75rem;color:var(--tx2);line-height:1.4;margin-bottom:.28rem;">' + p.subtitle + '</div>';
     html += '<div style="display:flex;align-items:center;gap:.4rem;"><span style="font-size:.6rem;font-weight:700;color:' + (DIFF_COLORS[p.difficulty]||'#a78bfa') + ';">' + (DIFF_LABELS[p.difficulty]||p.difficulty) + '</span><span style="font-size:.6rem;color:var(--tx3);">·</span><span style="font-size:.6rem;color:var(--tx3);font-weight:600;">' + p.days + ' days</span></div>';
-    html += '</div><span style="font-size:1.1rem;color:var(--tx3);flex-shrink:0;">' + (isActive ? '▶' : isDone ? '↺' : '+') + '</span></div>';
+    html += '</div><span style="font-size:1.1rem;color:var(--tx3);flex-shrink:0;">' + (isActive ? '▶' : isDone ? '↺' : '+') + '</span></div></div>';
   });
   html += '</div></div>';
   root.innerHTML = html;
@@ -10631,9 +10650,21 @@ function renderMoodScripture(moodId){
   var versesHtml = (moodData.verses || []).map(function(v){
     return '<div style="background:rgba(255,255,255,.04);border-left:3px solid rgba(167,139,250,.45);border-radius:0 10px 10px 0;padding:.65rem .85rem;margin-bottom:.5rem;">' +
       '<div style="font-size:.8rem;font-style:italic;line-height:1.55;color:var(--tx);margin-bottom:.25rem;">"' + escapeHtml(v.text) + '"</div>' +
-      '<div style="font-size:.65rem;font-weight:800;color:#a78bfa;letter-spacing:.06em;">' + escapeHtml(v.ref) + '</div>' +
+      '<div style="display:flex;align-items:center;gap:.4rem;">' +
+      '<div style="font-size:.65rem;font-weight:800;color:#a78bfa;letter-spacing:.06em;flex:1;">' + escapeHtml(v.ref) + '</div>' +
+      '<button onclick="_msSpeakVerse(this)" style="background:none;border:1px solid rgba(167,139,250,.3);border-radius:4px;padding:.1rem .35rem;font-size:.65rem;color:#a78bfa;cursor:pointer;">🔊</button>' +
+      '</div>' +
       '</div>';
   }).join('');
+  var _moodAudioMap = (typeof MOOD_AUDIO_MAP !== 'undefined') ? MOOD_AUDIO_MAP[moodId] : null;
+  var _moodDeeperHtml = _moodAudioMap ? (
+    '<div style="margin-top:.75rem;border-top:1px solid rgba(255,255,255,.08);padding-top:.75rem;">' +
+    '<div style="font-size:.68rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem;">Want to go deeper?</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">' +
+    '<button type="button" onclick="_moodClose();startMeditation(\'' + _moodAudioMap.meditationId + '\')" style="background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.28);color:#a78bfa;border-radius:10px;padding:.55rem .4rem;font-size:.74rem;font-weight:800;cursor:pointer;font-family:var(--fm);line-height:1.3;">🧘 Meditate<br><span style="font-size:.65rem;opacity:.7;font-weight:500;">on this</span></button>' +
+    '<button type="button" onclick="_moodClose();playAmbientTrack(\'' + _moodAudioMap.ambientTrackId + '\')" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);color:#38bdf8;border-radius:10px;padding:.55rem .4rem;font-size:.74rem;font-weight:800;cursor:pointer;font-family:var(--fm);line-height:1.3;">🎵 Just listen<br><span style="font-size:.65rem;opacity:.7;font-weight:500;">ambient audio</span></button>' +
+    '</div></div>'
+  ) : '';
   overlay.innerHTML = '<div style="position:absolute;bottom:0;left:0;right:0;background:var(--bg2,#1a1233);border-top:1px solid rgba(255,255,255,.12);border-radius:20px 20px 0 0;padding:1.1rem 1rem 2rem;animation:slideUp .22s ease-out;max-width:520px;margin:0 auto;max-height:80vh;overflow-y:auto;">' +
     '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.85rem;">' +
     '<button onclick="_moodClose()" style="background:none;border:none;color:var(--tx2);font-size:.95rem;cursor:pointer;padding:.2rem .3rem;font-family:var(--fm);">← Back</button>' +
@@ -10643,6 +10674,7 @@ function renderMoodScripture(moodId){
     versesHtml +
     '<div style="margin-top:.75rem;"><button onclick="if(typeof startPrayerSession===\'function\')startPrayerSession(\'' + prayerSessionId + '\');else bfTab(\'prayer\');_moodClose();" ' +
     'style="width:100%;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.35);color:#a78bfa;border-radius:12px;padding:.6rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🙏 Pray about this</button></div>' +
+    _moodDeeperHtml +
     '</div>';
   overlay.style.display = 'block';
 }
@@ -10817,4 +10849,672 @@ function completePrayerSession(sessionId){
   }catch(e){}
   if(typeof showToast === 'function') showToast('Prayer session complete! 🙏');
   renderGuidedPrayerPane();
+}
+
+// ── TTS + AUDIO BIBLE — Audio Layer Worker 1 ─────────────────────────────────
+// speakVerse(): free Web Speech API for per-verse TTS.
+// renderAudioBibleCard(): 66-book dropdown that opens Bible.is for full chapters.
+
+var _ttsUtterance = null;
+var _ttsSpeaking = false;
+
+function speakVerse(text, ref){
+  if(!('speechSynthesis' in window)){
+    if(typeof showToast==='function') showToast('Text-to-speech not supported in this browser.');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  if(_ttsSpeaking){ _ttsSpeaking = false; return; }
+  var rate = (typeof TTS_CONFIG !== 'undefined' && TTS_CONFIG.freeTier) ? (TTS_CONFIG.freeTier.rate || 0.9) : 0.9;
+  _ttsUtterance = new SpeechSynthesisUtterance((ref ? ref + '. ' : '') + (text || ''));
+  _ttsUtterance.rate = rate;
+  _ttsUtterance.onstart = function(){ _ttsSpeaking = true; };
+  _ttsUtterance.onend = function(){ _ttsSpeaking = false; };
+  _ttsUtterance.onerror = function(){ _ttsSpeaking = false; };
+  window.speechSynthesis.speak(_ttsUtterance);
+}
+
+function speakVotd(){
+  var textEl = document.getElementById('fhVotdText');
+  var refEl = document.getElementById('fhVotdRef');
+  var text = textEl ? textEl.textContent.replace(/^[“"]/,'').replace(/[”"]$/,'').trim() : '';
+  var ref = refEl ? refEl.textContent.replace(/^—\s*/,'').trim() : '';
+  if(!text) return;
+  speakVerse(text, ref);
+}
+
+function updateAllSpeakButtons(speaking){
+  if(!speaking && 'speechSynthesis' in window){
+    // Don't cancel while a meditation or sleep story player is active
+    if(!_medId && !_ssId) window.speechSynthesis.cancel();
+  }
+}
+
+function _stSpeakVerse(btn){
+  var box = btn.closest ? btn.closest('.st-verse-box') : btn.parentNode.parentNode;
+  var textEl = box && box.querySelector('.st-verse-text');
+  var refEl = box && box.querySelector('.st-verse-ref-lbl');
+  speakVerse(textEl ? textEl.textContent.trim() : '', refEl ? refEl.textContent.trim() : '');
+}
+
+function _msSpeakVerse(btn){
+  var card = btn.closest ? btn.closest('div[style*="border-left"]') : btn.parentNode.parentNode;
+  if(!card) return;
+  var italicDiv = card.querySelector('div[style*="italic"]');
+  var refDiv = card.querySelector('div[style*="a78bfa"]');
+  var text = italicDiv ? italicDiv.textContent.replace(/^["“]|["”]$/g,'').trim() : '';
+  var ref = refDiv ? refDiv.textContent.trim() : '';
+  speakVerse(text, ref);
+}
+
+function _pdSpeakVerse(btn){
+  var card = btn.closest ? btn.closest('div[style*="border-left"]') : btn.parentNode.parentNode;
+  if(!card) return;
+  var italicDiv = card.querySelector('div[style*="italic"]');
+  var text = italicDiv ? italicDiv.textContent.trim() : '';
+  var refSpan = card.querySelector('span[style*="letter-spacing"]');
+  var ref = refSpan ? refSpan.textContent.replace(/^—\s*/,'').trim() : '';
+  speakVerse(text, ref);
+}
+
+function _acSpeakVerse(btn){
+  var card = btn.closest ? btn.closest('.lm-keyverse') : btn.parentNode.parentNode;
+  if(!card) return;
+  var textDiv = card.querySelector('.lm-keyverse-text');
+  var refDiv = card.querySelector('.lm-keyverse-ref');
+  var text = textDiv ? textDiv.textContent.replace(/^["“]|["”]$/g,'').trim() : '';
+  var ref = refDiv ? refDiv.textContent.replace(/^—\s*/,'').trim() : '';
+  speakVerse(text, ref);
+}
+
+// ── AUDIO BIBLE CARD (Worker 1) — book/chapter selector → Bible.is link-out ──
+
+var _abBooks = [
+  ['GEN','Genesis',50],['EXO','Exodus',40],['LEV','Leviticus',27],['NUM','Numbers',36],
+  ['DEU','Deuteronomy',34],['JOS','Joshua',24],['JDG','Judges',21],['RUT','Ruth',4],
+  ['1SA','1 Samuel',31],['2SA','2 Samuel',24],['1KI','1 Kings',22],['2KI','2 Kings',25],
+  ['1CH','1 Chronicles',29],['2CH','2 Chronicles',36],['EZR','Ezra',10],['NEH','Nehemiah',13],
+  ['EST','Esther',10],['JOB','Job',42],['PSA','Psalms',150],['PRO','Proverbs',31],
+  ['ECC','Ecclesiastes',12],['SOS','Song of Songs',8],['ISA','Isaiah',66],['JER','Jeremiah',52],
+  ['LAM','Lamentations',5],['EZK','Ezekiel',48],['DAN','Daniel',12],['HOS','Hosea',14],
+  ['JOL','Joel',3],['AMO','Amos',9],['OBA','Obadiah',1],['JON','Jonah',4],
+  ['MIC','Micah',7],['NAH','Nahum',3],['HAB','Habakkuk',3],['ZEP','Zephaniah',3],
+  ['HAG','Haggai',2],['ZEC','Zechariah',14],['MAL','Malachi',4],
+  ['MAT','Matthew',28],['MRK','Mark',16],['LUK','Luke',24],['JHN','John',21],
+  ['ACT','Acts',28],['ROM','Romans',16],['1CO','1 Corinthians',16],['2CO','2 Corinthians',13],
+  ['GAL','Galatians',6],['EPH','Ephesians',6],['PHP','Philippians',4],['COL','Colossians',4],
+  ['1TH','1 Thessalonians',5],['2TH','2 Thessalonians',3],['1TI','1 Timothy',6],
+  ['2TI','2 Timothy',4],['TIT','Titus',3],['PHM','Philemon',1],['HEB','Hebrews',13],
+  ['JAS','James',5],['1PE','1 Peter',5],['2PE','2 Peter',3],['1JO','1 John',5],
+  ['2JO','2 John',1],['3JO','3 John',1],['JUD','Jude',1],['REV','Revelation',22]
+];
+
+function renderAudioBibleCard(){
+  var root = document.getElementById('audioBibleRoot');
+  if(!root) return;
+  var baseUrl = (typeof BIBLE_IS_CONFIG !== 'undefined') ? BIBLE_IS_CONFIG.webBaseUrl : 'https://live.bible.is/bible/ENGNIV/';
+  var bookOpts = _abBooks.map(function(b){
+    return '<option value="'+b[0]+'" data-ch="'+b[2]+'">'+b[1]+'</option>';
+  }).join('');
+  root.innerHTML = [
+    '<div style="padding:.25rem 0 1.1rem;">',
+    '<div style="font-size:1.15rem;font-weight:900;color:var(--tx);margin-bottom:.25rem;">🔊 Audio Bible</div>',
+    '<div style="font-size:.78rem;color:var(--tx2);margin-bottom:1rem;line-height:1.55;">Listen to any chapter of the Bible — free, no app required. Powered by <a href="https://live.bible.is" target="_blank" rel="noopener" style="color:#38bdf8;text-decoration:none;">Bible.is</a>.</div>',
+    '<div style="background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.18);border-radius:14px;padding:.9rem 1rem;margin-bottom:.85rem;">',
+    '<div style="margin-bottom:.65rem;">',
+    '<label style="font-size:.67rem;font-weight:800;color:#38bdf8;text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:.3rem;">Book</label>',
+    '<select id="abBookSel" onchange="_abUpdateChMax()" style="width:100%;padding:.45rem .6rem;border-radius:9px;border:1px solid rgba(56,189,248,.22);background:var(--bg);color:var(--tx);font-size:.84rem;font-family:var(--fm);">'+bookOpts+'</select>',
+    '</div>',
+    '<div style="margin-bottom:.75rem;">',
+    '<label style="font-size:.67rem;font-weight:800;color:#38bdf8;text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:.3rem;">Chapter</label>',
+    '<div style="display:flex;align-items:center;gap:.5rem;">',
+    '<input id="abChInput" type="number" min="1" max="50" value="1" style="width:80px;padding:.45rem .6rem;border-radius:9px;border:1px solid rgba(56,189,248,.22);background:var(--bg);color:var(--tx);font-size:.9rem;font-family:var(--fm);">',
+    '<span id="abChMax" style="font-size:.7rem;color:var(--tx3);">of 50</span>',
+    '</div>',
+    '</div>',
+    '<button onclick="_abListen()" style="width:100%;padding:.6rem .9rem;border-radius:10px;background:linear-gradient(135deg,#38bdf8,#0ea5e9);border:none;color:#fff;font-size:.84rem;font-weight:900;cursor:pointer;font-family:var(--fm);letter-spacing:.02em;">▶ Listen on Bible.is</button>',
+    '</div>',
+    '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:.75rem .9rem;margin-bottom:.75rem;">',
+    '<div style="font-size:.72rem;font-weight:800;color:var(--tx2);margin-bottom:.4rem;">🎙 Per-verse listening</div>',
+    '<div style="font-size:.74rem;color:var(--tx3);line-height:1.55;">Tap the <strong style="color:var(--tx2);">🔊</strong> button on any verse in the app — Jesus words, devotionals, reading plans, and more — to hear it read aloud using your device\'s text-to-speech.</div>',
+    '</div>',
+    '<div style="text-align:center;font-size:.63rem;color:var(--tx3);line-height:1.5;">Free audio Bible by <a href="https://live.bible.is" target="_blank" rel="noopener" style="color:var(--tx2);text-decoration:none;">Faith Comes By Hearing</a> · English NIV</div>',
+    '</div>'
+  ].join('');
+  _abUpdateChMax();
+}
+
+function _abUpdateChMax(){
+  var sel = document.getElementById('abBookSel');
+  var inp = document.getElementById('abChInput');
+  var lbl = document.getElementById('abChMax');
+  if(!sel || !inp || !lbl) return;
+  var opt = sel.options[sel.selectedIndex];
+  var max = opt ? parseInt(opt.getAttribute('data-ch') || '1', 10) : 1;
+  inp.max = max;
+  lbl.textContent = 'of ' + max;
+  if(parseInt(inp.value,10) > max) inp.value = 1;
+}
+
+function _abListen(){
+  var sel = document.getElementById('abBookSel');
+  var inp = document.getElementById('abChInput');
+  if(!sel || !inp) return;
+  var code = sel.value;
+  var ch = Math.max(1, parseInt(inp.value,10) || 1);
+  var base = (typeof BIBLE_IS_CONFIG !== 'undefined') ? BIBLE_IS_CONFIG.webBaseUrl : 'https://live.bible.is/bible/ENGNIV/';
+  window.open(base + code + '/' + ch, '_blank', 'noopener');
+}
+
+// ── AUDIO MEDITATIONS + SLEEP STORIES — Audio Layer Worker 2 ─────────────────
+// AUDIO_MEDITATIONS (7) and SLEEP_STORIES (7) from app/js/data/audio-content.js.
+// Meditation player: full-screen overlay, segment TTS, YouTube ambient, auto-advance.
+// Sleep player: very dark full-screen overlay, slow TTS (0.75), fade-out, Wake Lock.
+
+var _medId = null;
+var _medSegIdx = 0;
+var _medSegTimer = null;
+var _medPaused = false;
+var _medElapsed = 0;
+var _medAdvancePending = false;
+
+var _ssId = null;
+var _ssIdx = 0;
+var _ssSegments = [];
+var _ssSegTimer = null;
+var _ssFadeTimer = null;
+var _ssPaused = false;
+var _ssTtsVol = 1.0;
+var _ssWakeLock = null;
+
+var _MED_TYPE_COLOR = {scripture:'#38bdf8',reflection:'#a78bfa',prayer:'#10b981',opening:'#fde68a',close:'#fde68a',breath:'#38bdf8',silence:'#a78bfa',declaration:'#10b981',practice:'#a78bfa',cast:'#38bdf8'};
+var _MED_TYPE_LABEL = {scripture:'SCRIPTURE',reflection:'REFLECTION',prayer:'PRAYER',opening:'TO BEGIN',close:'CLOSING',breath:'BREATHE',silence:'SILENCE',declaration:'DECLARE',practice:'PRACTICE',cast:'ACTION'};
+
+function _medTotStr(sec){
+  var m = Math.floor(sec/60), s = sec%60;
+  return m+':'+(s<10?'0':'')+s;
+}
+
+function renderAudioMeditationsCard(){
+  var root = document.getElementById('audioMeditationsRoot');
+  if(!root) return;
+  if(typeof AUDIO_MEDITATIONS==='undefined'){
+    root.innerHTML='<div style="color:var(--tx2);padding:1rem;">Loading meditations…</div>';
+    return;
+  }
+  var lastPlayed = null;
+  try { lastPlayed = JSON.parse(localStorage.getItem('ylcc_med_last')||'null'); } catch(e){}
+  var html = '<div style="padding:.2rem 0 1rem;">';
+  html += '<div class="bf-section-hdr"><div class="bf-eyebrow">SCRIPTURE · BREATH · REST</div>';
+  html += '<div class="bf-title">🧘 Audio Meditations</div>';
+  html += '<div class="bf-sub">Scripture-led guided sessions. Each one speaks verses, reflection, and prayer — through your headphones.</div></div>';
+  html += '<div style="display:grid;gap:.55rem;">';
+  AUDIO_MEDITATIONS.forEach(function(m){
+    html += '<div style="background:rgba(167,139,250,.04);border:1px solid rgba(167,139,250,.1);border-radius:14px;padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;" onclick="startMeditation(\''+m.id+'\')">';
+    html += '<span style="font-size:1.6rem;line-height:1;flex-shrink:0;">'+m.icon+'</span>';
+    html += '<div style="flex:1;min-width:0;"><div style="font-size:.88rem;font-weight:800;color:var(--tx);margin-bottom:.1rem;">'+escapeHtml(m.title)+'</div>';
+    html += '<div style="font-size:.73rem;color:var(--tx2);line-height:1.35;">'+escapeHtml(m.theme)+'</div></div>';
+    html += '<div style="text-align:right;flex-shrink:0;"><div style="font-size:.68rem;font-weight:800;color:var(--tx3);">'+m.duration+' min</div>';
+    html += '<div style="margin-top:.2rem;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:#a78bfa;border-radius:8px;padding:.18rem .5rem;font-size:.7rem;font-weight:800;">▶</div></div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  if(lastPlayed && lastPlayed.title){
+    html += '<div style="text-align:center;margin-top:.85rem;font-size:.64rem;color:var(--tx3);">Last: '+escapeHtml(lastPlayed.title)+' · '+escapeHtml(lastPlayed.date||'')+'</div>';
+  }
+  html += '<div style="margin-top:.85rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:.6rem .85rem;font-size:.7rem;color:var(--tx3);line-height:1.5;">💡 Headphones recommended. Each session uses your device\'s built-in voice and a calming music background.</div>';
+  html += '</div>';
+  root.innerHTML = html;
+}
+
+function startMeditation(medId){
+  if(typeof AUDIO_MEDITATIONS==='undefined') return;
+  var med = AUDIO_MEDITATIONS.find(function(m){ return m.id===medId; });
+  if(!med) return;
+  _medClose();
+  _medId = medId; _medSegIdx = 0; _medPaused = false; _medElapsed = 0; _medAdvancePending = false;
+  var overlay = document.createElement('div');
+  overlay.id = 'meditationOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9500;background:#0b0b1a;display:flex;flex-direction:column;overflow:hidden;';
+  document.body.appendChild(overlay);
+  document.body.style.overflow = 'hidden';
+  _medRenderPlayer(med);
+  _medPlaySegment(med, 0);
+}
+
+function _medRenderPlayer(med){
+  var overlay = document.getElementById('meditationOverlay');
+  if(!overlay) return;
+  var seg = med.segments[_medSegIdx]||{};
+  var totalSec = med.segments.reduce(function(a,s){ return a+s.duration; },0);
+  var pct = Math.round((_medElapsed/Math.max(1,totalSec))*100);
+  var segColor = _MED_TYPE_COLOR[seg.type]||'#a78bfa';
+  var segLabel = _MED_TYPE_LABEL[seg.type]||(seg.type||'').toUpperCase();
+  var dots = med.segments.map(function(s,i){
+    var bg = i<_medSegIdx?'rgba(167,139,250,.45)':(i===_medSegIdx?'#a78bfa':'rgba(255,255,255,.12)');
+    return '<div style="width:7px;height:7px;border-radius:99px;background:'+bg+';display:inline-block;margin:0 2px;transition:background .3s;"></div>';
+  }).join('');
+  overlay.innerHTML = [
+    '<div style="display:flex;align-items:center;justify-content:space-between;padding:max(env(safe-area-inset-top),1rem) 1.1rem .5rem;flex-shrink:0;">',
+    '<button type="button" onclick="_medClose()" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);border-radius:8px;padding:.3rem .7rem;font-size:.76rem;cursor:pointer;font-family:var(--fm);">✕ Close</button>',
+    '<div style="text-align:center;flex:1;padding:0 .5rem;"><div style="font-size:1.25rem;">'+med.icon+'</div>',
+    '<div style="font-size:.76rem;font-weight:800;color:rgba(255,255,255,.8);margin-top:.1rem;">'+escapeHtml(med.title)+'</div></div>',
+    '<button type="button" onclick="_medSkip()" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);border-radius:8px;padding:.3rem .7rem;font-size:.76rem;cursor:pointer;font-family:var(--fm);">⏭ Skip</button>',
+    '</div>',
+    '<div style="padding:0 1.1rem .7rem;flex-shrink:0;">',
+    '<div style="height:3px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden;margin-bottom:.35rem;">',
+    '<div id="medProgressBar" style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,#a78bfa,#38bdf8);border-radius:99px;transition:width .6s;"></div></div>',
+    '<div style="display:flex;justify-content:space-between;font-size:.6rem;color:rgba(255,255,255,.3);">',
+    '<span id="medElapsedLbl">'+_medTotStr(_medElapsed)+'</span><span>'+_medTotStr(totalSec)+'</span></div></div>',
+    '<div style="flex:1;overflow-y:auto;display:flex;flex-direction:column;justify-content:center;padding:0 1.4rem;min-height:0;">',
+    '<div style="text-align:center;max-width:520px;margin:0 auto;width:100%;">',
+    '<div id="medSegLabel" style="font-size:.6rem;font-weight:900;letter-spacing:.22em;text-transform:uppercase;color:'+segColor+';margin-bottom:.9rem;">'+segLabel+'</div>',
+    '<div id="medSegText" style="font-family:Georgia,serif;font-size:1.05rem;line-height:1.8;color:rgba(255,255,255,.88);font-style:italic;margin-bottom:.75rem;">“'+escapeHtml(seg.text||'')+'”</div>',
+    '<div id="medSegVerse" style="font-size:.72rem;font-weight:700;color:'+segColor+';letter-spacing:.06em;">'+escapeHtml(seg.verse||'')+'</div>',
+    '</div></div>',
+    '<div style="padding:0 1.1rem .45rem;flex-shrink:0;text-align:center;" id="medSegDots">'+dots+'</div>',
+    '<div style="padding:.45rem 1.1rem;flex-shrink:0;display:flex;justify-content:center;gap:.55rem;">',
+    '<button type="button" id="medPauseBtn" onclick="_medTogglePause()" style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.35);color:#a78bfa;border-radius:12px;padding:.6rem 1.4rem;font-size:.84rem;font-weight:800;cursor:pointer;font-family:var(--fm);">⏸ Pause</button>',
+    '<button type="button" onclick="_medSkip()" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.45);border-radius:12px;padding:.6rem 1.4rem;font-size:.84rem;cursor:pointer;font-family:var(--fm);">⏭ Skip</button>',
+    '</div>',
+    '<div style="padding:.3rem 1.1rem 1rem;flex-shrink:0;border-top:1px solid rgba(255,255,255,.05);">',
+    '<div style="font-size:.55rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:.3rem;">🎵 Ambient</div>',
+    '<iframe src="https://www.youtube-nocookie.com/embed/'+med.ambientYouTube+'?autoplay=1&loop=1&playlist='+med.ambientYouTube+'&controls=1&modestbranding=1" frameborder="0" allow="autoplay;encrypted-media" style="width:100%;height:58px;border:none;border-radius:8px;display:block;"></iframe>',
+    '</div>'
+  ].join('');
+}
+
+function _medPlaySegment(med, segIdx){
+  if(!med || segIdx>=med.segments.length){ _medComplete(med); return; }
+  _medSegIdx = segIdx; _medAdvancePending = false;
+  var seg = med.segments[segIdx];
+  _medUpdateSegmentUI(med, segIdx);
+  if(_medSegTimer){ clearTimeout(_medSegTimer); _medSegTimer = null; }
+  if(!_medPaused && 'speechSynthesis' in window){
+    window.speechSynthesis.cancel();
+    var utt = new SpeechSynthesisUtterance((seg.text||'')+(seg.verse?' — '+seg.verse:''));
+    utt.rate = (typeof TTS_CONFIG!=='undefined'&&TTS_CONFIG.freeTier)?TTS_CONFIG.freeTier.rate:0.9;
+    utt.onend = function(){ _medAdvance(med); };
+    utt.onerror = function(){ _medAdvance(med); };
+    window.speechSynthesis.speak(utt);
+  }
+  _medSegTimer = setTimeout(function(){ if(!_medPaused) _medAdvance(med); }, seg.duration*1000);
+}
+
+function _medAdvance(med){
+  if(_medAdvancePending) return;
+  _medAdvancePending = true;
+  if(_medSegTimer){ clearTimeout(_medSegTimer); _medSegTimer = null; }
+  _medElapsed += (med.segments[_medSegIdx]||{}).duration||0;
+  _medPlaySegment(med, _medSegIdx+1);
+}
+
+function _medUpdateSegmentUI(med, segIdx){
+  var seg = med.segments[segIdx]||{};
+  var totalSec = med.segments.reduce(function(a,s){ return a+s.duration; },0);
+  var pct = Math.round((_medElapsed/Math.max(1,totalSec))*100);
+  var pb = document.getElementById('medProgressBar');
+  if(pb) pb.style.width = pct+'%';
+  var el = document.getElementById('medElapsedLbl');
+  if(el) el.textContent = _medTotStr(_medElapsed);
+  var segColor = _MED_TYPE_COLOR[seg.type]||'#a78bfa';
+  var lbl = document.getElementById('medSegLabel');
+  if(lbl){ lbl.textContent = _MED_TYPE_LABEL[seg.type]||(seg.type||'').toUpperCase(); lbl.style.color = segColor; }
+  var txt = document.getElementById('medSegText');
+  if(txt) txt.innerHTML = '“'+escapeHtml(seg.text||'')+'”';
+  var vrs = document.getElementById('medSegVerse');
+  if(vrs){ vrs.textContent = seg.verse||''; vrs.style.color = segColor; }
+  var dotsEl = document.getElementById('medSegDots');
+  if(dotsEl){
+    var kids = dotsEl.children;
+    for(var i=0;i<kids.length;i++){
+      kids[i].style.background = i<segIdx?'rgba(167,139,250,.45)':(i===segIdx?'#a78bfa':'rgba(255,255,255,.12)');
+    }
+  }
+}
+
+function _medTogglePause(){
+  if(_medPaused){
+    _medPaused = false;
+    var med = (typeof AUDIO_MEDITATIONS!=='undefined')?AUDIO_MEDITATIONS.find(function(m){return m.id===_medId;}):null;
+    if(med) _medPlaySegment(med, _medSegIdx);
+    var btn = document.getElementById('medPauseBtn');
+    if(btn) btn.innerHTML = '⏸ Pause';
+  } else {
+    _medPaused = true;
+    if(_medSegTimer){ clearTimeout(_medSegTimer); _medSegTimer = null; }
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
+    var btn2 = document.getElementById('medPauseBtn');
+    if(btn2) btn2.innerHTML = '▶ Resume';
+  }
+}
+
+function _medSkip(){
+  var med = (typeof AUDIO_MEDITATIONS!=='undefined')?AUDIO_MEDITATIONS.find(function(m){return m.id===_medId;}):null;
+  if(!med) return;
+  if(_medSegTimer){ clearTimeout(_medSegTimer); _medSegTimer = null; }
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  _medElapsed += (med.segments[_medSegIdx]||{}).duration||0;
+  _medAdvancePending = false;
+  _medPlaySegment(med, _medSegIdx+1);
+}
+
+function _medClose(){
+  if(_medSegTimer){ clearTimeout(_medSegTimer); _medSegTimer = null; }
+  if('speechSynthesis' in window && !_ssId) window.speechSynthesis.cancel();
+  var overlay = document.getElementById('meditationOverlay');
+  if(overlay) overlay.remove();
+  document.body.style.overflow = '';
+  _medId = null; _medSegIdx = 0; _medPaused = false; _medElapsed = 0; _medAdvancePending = false;
+}
+
+function _medComplete(med){
+  if(_medSegTimer){ clearTimeout(_medSegTimer); _medSegTimer = null; }
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  try {
+    var today = new Date().toISOString().slice(0,10);
+    localStorage.setItem('ylcc_med_last', JSON.stringify({id:_medId,title:med?med.title:_medId,date:today}));
+    var hist = JSON.parse(localStorage.getItem('ylcc_med_history')||'[]');
+    hist.unshift({id:_medId,title:med?med.title:_medId,date:today,completed:true});
+    localStorage.setItem('ylcc_med_history', JSON.stringify(hist.slice(0,90)));
+  } catch(e){}
+  if(typeof showToast==='function') showToast((med?med.icon:'')+' Meditation complete.');
+  _medClose();
+  renderAudioMeditationsCard();
+}
+
+// --- SLEEP STORIES ---
+
+function renderSleepStoriesCard(){
+  var root = document.getElementById('sleepStoriesRoot');
+  if(!root) return;
+  if(typeof SLEEP_STORIES==='undefined'){
+    root.innerHTML='<div style="color:var(--tx2);padding:1rem;">Loading sleep stories…</div>';
+    return;
+  }
+  var html = '<div style="padding:.2rem 0 1rem;">';
+  html += '<div class="bf-section-hdr"><div class="bf-eyebrow">SCRIPTURE · PEACE · SLEEP</div>';
+  html += '<div class="bf-title">🌙 Sleep Stories</div>';
+  html += '<div class="bf-sub">Drift to sleep with Scripture spoken gently over calming music. Audio fades out automatically.</div></div>';
+  html += '<div style="display:grid;gap:.55rem;">';
+  SLEEP_STORIES.forEach(function(s){
+    html += '<div style="background:rgba(15,10,40,.5);border:1px solid rgba(167,139,250,.1);border-radius:14px;padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;" onclick="startSleepStory(\''+s.id+'\')">';
+    html += '<span style="font-size:1.6rem;line-height:1;flex-shrink:0;">'+s.icon+'</span>';
+    html += '<div style="flex:1;min-width:0;"><div style="font-size:.88rem;font-weight:800;color:var(--tx);margin-bottom:.1rem;">'+escapeHtml(s.title)+'</div>';
+    html += '<div style="font-size:.73rem;color:var(--tx2);line-height:1.35;">'+escapeHtml(s.description)+'</div></div>';
+    html += '<div style="text-align:right;flex-shrink:0;"><div style="font-size:.68rem;font-weight:800;color:var(--tx3);">'+s.duration+' min</div>';
+    html += '<div style="margin-top:.2rem;background:rgba(30,20,80,.6);border:1px solid rgba(167,139,250,.2);color:#a78bfa;border-radius:8px;padding:.18rem .5rem;font-size:.7rem;font-weight:800;">▶</div></div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  html += '<div style="margin-top:.85rem;background:rgba(15,10,40,.4);border:1px solid rgba(167,139,250,.08);border-radius:10px;padding:.6rem .85rem;font-size:.7rem;color:var(--tx3);line-height:1.5;">💡 Use headphones at bedtime. Audio fades out at the end — no need to stop it. Screen stays on.</div>';
+  html += '</div>';
+  root.innerHTML = html;
+}
+
+function startSleepStory(storyId){
+  if(typeof SLEEP_STORIES==='undefined') return;
+  var story = SLEEP_STORIES.find(function(s){ return s.id===storyId; });
+  if(!story) return;
+  _ssClose();
+  _ssId = storyId; _ssIdx = 0; _ssPaused = false; _ssTtsVol = 1.0;
+  if(story.verses && story.verses.length){
+    _ssSegments = story.verses.slice();
+  } else if(story.content){
+    _ssSegments = story.content.split('...').map(function(t){ return t.trim(); }).filter(Boolean);
+  } else {
+    _ssSegments = [story.title];
+  }
+  _ssRequestWakeLock();
+  var overlay = document.createElement('div');
+  overlay.id = 'sleepStoryOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9600;background:#020209;display:flex;flex-direction:column;overflow:hidden;';
+  document.body.appendChild(overlay);
+  document.body.style.overflow = 'hidden';
+  _ssRenderPlayer(story);
+  _ssPlaySegment(story, 0);
+  var fadeMs = (story.fadeOutAt||story.duration)*60000;
+  _ssFadeTimer = setTimeout(function(){ _ssFadeOut(story); }, fadeMs);
+}
+
+function _ssRenderPlayer(story){
+  var overlay = document.getElementById('sleepStoryOverlay');
+  if(!overlay) return;
+  var seg = _ssSegments[_ssIdx]||'';
+  overlay.innerHTML = [
+    '<div style="display:flex;align-items:center;justify-content:space-between;padding:max(env(safe-area-inset-top),.85rem) 1.1rem .4rem;flex-shrink:0;opacity:.3;">',
+    '<button type="button" onclick="_ssClose()" style="background:none;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.4);border-radius:8px;padding:.28rem .65rem;font-size:.7rem;cursor:pointer;font-family:var(--fm);">✕</button>',
+    '<span style="font-size:.7rem;color:rgba(255,255,255,.3);font-weight:600;">'+escapeHtml(story.title)+'</span>',
+    '<span style="font-size:.62rem;color:rgba(255,255,255,.2);">'+story.duration+' min</span>',
+    '</div>',
+    '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:1rem 1.5rem;overflow:hidden;">',
+    '<div style="font-size:2.4rem;margin-bottom:1rem;opacity:.3;">'+story.icon+'</div>',
+    '<div id="ssVerseText" style="font-family:Georgia,serif;font-size:1.05rem;line-height:1.9;color:rgba(255,255,255,.58);text-align:center;font-style:italic;max-width:440px;transition:opacity .8s;opacity:1;">'+escapeHtml(seg)+'</div>',
+    '<div id="ssVerseNum" style="margin-top:1.1rem;font-size:.6rem;color:rgba(255,255,255,.16);letter-spacing:.1em;">'+(_ssIdx+1)+' / '+_ssSegments.length+'</div>',
+    '</div>',
+    '<div style="padding:.35rem 1.1rem .4rem;flex-shrink:0;opacity:.22;">',
+    '<div style="font-size:.52rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:.28rem;">🎵 Ambient</div>',
+    '<iframe src="https://www.youtube-nocookie.com/embed/'+story.ambientYouTube+'?autoplay=1&loop=1&playlist='+story.ambientYouTube+'&controls=1&modestbranding=1" frameborder="0" allow="autoplay;encrypted-media" style="width:100%;height:48px;border:none;border-radius:6px;display:block;"></iframe>',
+    '</div>',
+    '<div style="padding:.35rem 1.1rem 1rem;flex-shrink:0;display:flex;justify-content:center;gap:.55rem;opacity:.22;">',
+    '<button type="button" id="ssPauseBtn" onclick="_ssTogglePause()" style="background:none;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.45);border-radius:10px;padding:.45rem 1.1rem;font-size:.78rem;cursor:pointer;font-family:var(--fm);">⏸</button>',
+    '<button type="button" onclick="_ssClose()" style="background:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.35);border-radius:10px;padding:.45rem 1.1rem;font-size:.78rem;cursor:pointer;font-family:var(--fm);">✕ Stop</button>',
+    '</div>',
+    '<div style="padding:0 1rem .55rem;text-align:center;font-size:.58rem;color:rgba(255,255,255,.1);">Fades out at '+story.duration+' min</div>'
+  ].join('');
+}
+
+function _ssPlaySegment(story, idx){
+  if(!_ssSegments || idx>=_ssSegments.length){
+    if(story.repeatCount && story.repeatCount>1){ _ssPlaySegment(story,0); return; }
+    _ssClose(); return;
+  }
+  _ssIdx = idx;
+  var seg = _ssSegments[idx];
+  var textEl = document.getElementById('ssVerseText');
+  if(textEl) textEl.style.opacity = '0';
+  setTimeout(function(){
+    var el = document.getElementById('ssVerseText');
+    if(el){ el.textContent = seg; el.style.opacity = '1'; }
+    var numEl = document.getElementById('ssVerseNum');
+    if(numEl) numEl.textContent = (idx+1)+' / '+_ssSegments.length;
+  }, 600);
+  if('speechSynthesis' in window && !_ssPaused){
+    window.speechSynthesis.cancel();
+    var utt = new SpeechSynthesisUtterance(seg);
+    utt.rate = 0.75;
+    utt.volume = Math.max(0.05, _ssTtsVol);
+    var storyRef = story;
+    var idxRef = idx;
+    utt.onend = function(){
+      _ssSegTimer = setTimeout(function(){ if(!_ssPaused) _ssPlaySegment(storyRef,idxRef+1); }, 3000);
+    };
+    utt.onerror = function(){
+      _ssSegTimer = setTimeout(function(){ if(!_ssPaused) _ssPlaySegment(storyRef,idxRef+1); }, 3000);
+    };
+    window.speechSynthesis.speak(utt);
+  }
+}
+
+function _ssTogglePause(){
+  if(_ssPaused){
+    _ssPaused = false;
+    if('speechSynthesis' in window) window.speechSynthesis.resume();
+    var btn = document.getElementById('ssPauseBtn');
+    if(btn) btn.innerHTML = '⏸';
+    var story = (typeof SLEEP_STORIES!=='undefined')?SLEEP_STORIES.find(function(s){return s.id===_ssId;}):null;
+    if(story) _ssPlaySegment(story, _ssIdx);
+  } else {
+    _ssPaused = true;
+    if(_ssSegTimer){ clearTimeout(_ssSegTimer); _ssSegTimer = null; }
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
+    var btn2 = document.getElementById('ssPauseBtn');
+    if(btn2) btn2.innerHTML = '▶';
+  }
+}
+
+function _ssClose(){
+  if(_ssSegTimer){ clearTimeout(_ssSegTimer); _ssSegTimer = null; }
+  if(_ssFadeTimer){ clearTimeout(_ssFadeTimer); _ssFadeTimer = null; }
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  _ssReleaseWakeLock();
+  var overlay = document.getElementById('sleepStoryOverlay');
+  if(overlay) overlay.remove();
+  document.body.style.overflow = '';
+  _ssId = null; _ssIdx = 0; _ssPaused = false; _ssTtsVol = 1.0; _ssSegments = [];
+}
+
+function _ssFadeOut(story){
+  var steps = 10, i = 0;
+  var iv = setInterval(function(){
+    i++;
+    _ssTtsVol = Math.max(0, 1.0-(i/steps));
+    if(i>=steps){ clearInterval(iv); _ssClose(); }
+  }, 3000);
+}
+
+async function _ssRequestWakeLock(){
+  try { if('wakeLock' in navigator){ _ssWakeLock = await navigator.wakeLock.request('screen'); } } catch(e){}
+}
+
+function _ssReleaseWakeLock(){
+  try { if(_ssWakeLock){ _ssWakeLock.release(); _ssWakeLock = null; } } catch(e){}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AUDIO LAYER — WORKER 3: Ambient Audio Library + Sermon Podcast Linking
+// ═══════════════════════════════════════════════════════════════
+
+var _ambientTrackId = null;
+var _ambientExpanded = null;
+
+function renderAmbientLibraryCard(){
+  var root = document.getElementById('ambientLibraryRoot');
+  if(!root) return;
+  if(typeof AMBIENT_LIBRARY==='undefined'){
+    root.innerHTML='<div style="color:var(--tx2);padding:1rem;">Loading ambient library…</div>';
+    return;
+  }
+  var allTracks = [];
+  AMBIENT_LIBRARY.forEach(function(c){ allTracks = allTracks.concat(c.tracks); });
+  var playing = _ambientTrackId ? allTracks.find(function(t){ return t.id===_ambientTrackId; }) : null;
+
+  var html = '<div style="padding:.2rem 0 1rem;">';
+  html += '<div class="bf-section-hdr"><div class="bf-eyebrow">BACKGROUND AUDIO · FREE</div>';
+  html += '<div class="bf-title">🎵 Ambient Library</div>';
+  html += '<div class="bf-sub">Background audio for prayer, study, rest, or worship. Continues playing as you navigate.</div></div>';
+
+  if(playing){
+    html += '<div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);border-radius:12px;padding:.6rem 1rem;display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;">';
+    html += '<span style="font-size:.9rem;">🎵</span>';
+    html += '<div style="flex:1;min-width:0;"><div style="font-size:.65rem;font-weight:800;color:#38bdf8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.05rem;">Now Playing</div>';
+    html += '<div style="font-size:.84rem;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+escapeHtml(playing.title)+'</div></div>';
+    html += '<button type="button" onclick="stopAmbient()" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.28);color:#ef4444;border-radius:8px;padding:.3rem .7rem;font-size:.76rem;cursor:pointer;font-family:var(--fm);">✕ Stop</button>';
+    html += '</div>';
+  }
+
+  html += '<div style="display:grid;gap:.45rem;">';
+  AMBIENT_LIBRARY.forEach(function(cat){
+    var isExpanded = _ambientExpanded === cat.category;
+    html += '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;overflow:hidden;">';
+    html += '<div onclick="expandAmbientCategory(\''+_jEsc(cat.category)+'\')" style="padding:.75rem 1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;">';
+    html += '<span style="font-size:1.5rem;line-height:1;flex-shrink:0;">'+cat.icon+'</span>';
+    html += '<div style="flex:1;"><div style="font-size:.9rem;font-weight:800;color:var(--tx);">'+escapeHtml(cat.category)+'</div>';
+    html += '<div style="font-size:.72rem;color:var(--tx2);">'+cat.tracks.length+' tracks</div></div>';
+    html += '<span style="font-size:.85rem;color:var(--tx3);display:inline-block;transition:transform .2s;'+(isExpanded?'transform:rotate(180deg);':'')+'">▾</span>';
+    html += '</div>';
+    if(isExpanded){
+      html += '<div style="border-top:1px solid rgba(255,255,255,.06);padding:.4rem .75rem .55rem;">';
+      cat.tracks.forEach(function(track){
+        var isPlay = _ambientTrackId === track.id;
+        html += '<div onclick="playAmbientTrack(\''+track.id+'\')" style="display:flex;align-items:center;gap:.6rem;padding:.45rem .35rem;border-radius:8px;cursor:pointer;background:'+(isPlay?'rgba(56,189,248,.08)':'none')+';margin-bottom:.1rem;">';
+        html += '<div style="width:28px;height:28px;border-radius:50%;background:'+(isPlay?'rgba(56,189,248,.2)':'rgba(255,255,255,.05)')+';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.7rem;color:'+(isPlay?'#38bdf8':'var(--tx2)')+'">'+(isPlay?'⏸':'▶')+'</div>';
+        html += '<div style="flex:1;min-width:0;"><div style="font-size:.84rem;font-weight:700;color:'+(isPlay?'#38bdf8':'var(--tx)')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+escapeHtml(track.title)+'</div>';
+        html += '<div style="font-size:.69rem;color:var(--tx3);line-height:1.3;">'+escapeHtml(track.description)+'</div></div>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    html += '</div>';
+  });
+  html += '</div>';
+  html += '<div style="margin-top:.85rem;background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.1);border-radius:10px;padding:.6rem .85rem;font-size:.7rem;color:var(--tx3);line-height:1.5;">💡 Ambient audio continues playing as you navigate. Powered by YouTube. Use headphones for best experience.</div>';
+  html += '</div>';
+  root.innerHTML = html;
+}
+
+function expandAmbientCategory(category){
+  _ambientExpanded = (_ambientExpanded === category) ? null : category;
+  renderAmbientLibraryCard();
+}
+
+function playAmbientTrack(trackId){
+  if(typeof AMBIENT_LIBRARY==='undefined') return;
+  var allTracks = [];
+  AMBIENT_LIBRARY.forEach(function(c){ allTracks = allTracks.concat(c.tracks); });
+  var track = allTracks.find(function(t){ return t.id===trackId; });
+  if(!track) return;
+  _ambientTrackId = trackId;
+  ensureAmbientMiniPlayer(track);
+  renderAmbientLibraryCard();
+}
+
+function stopAmbient(){
+  _ambientTrackId = null;
+  var mp = document.getElementById('ambientMiniPlayer');
+  if(mp) mp.style.display = 'none';
+  var iframe = document.getElementById('ambientIframe');
+  if(iframe) iframe.src = '';
+  renderAmbientLibraryCard();
+}
+
+function ensureAmbientMiniPlayer(track){
+  var mp = document.getElementById('ambientMiniPlayer');
+  if(!mp){
+    mp = document.createElement('div');
+    mp.id = 'ambientMiniPlayer';
+    mp.style.cssText = 'position:fixed;bottom:calc(4rem + env(safe-area-inset-bottom));left:0;right:0;z-index:9000;background:rgba(10,13,26,.96);border-top:1px solid rgba(56,189,248,.18);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);';
+    document.body.appendChild(mp);
+  }
+  mp.style.display = 'block';
+  var iframeSrc = 'https://www.youtube-nocookie.com/embed/'+track.youtubeId+'?autoplay=1&loop=1&playlist='+track.youtubeId+'&controls=0&modestbranding=1';
+  mp.innerHTML = '<div style="display:flex;align-items:center;gap:.65rem;padding:.45rem 1rem;">'
+    +'<span style="font-size:.95rem;flex-shrink:0;">🎵</span>'
+    +'<div style="flex:1;min-width:0;">'
+    +'<div style="font-size:.6rem;font-weight:800;color:#38bdf8;text-transform:uppercase;letter-spacing:.06em;">Now Playing</div>'
+    +'<div style="font-size:.82rem;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+escapeHtml(track.title)+'</div>'
+    +'</div>'
+    +'<button type="button" onclick="stopAmbient()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);border-radius:8px;padding:.28rem .6rem;font-size:.72rem;cursor:pointer;font-family:var(--fm);">✕ Stop</button>'
+    +'</div>'
+    +'<iframe id="ambientIframe" src="'+iframeSrc+'" frameborder="0" allow="autoplay;encrypted-media" style="width:100%;height:36px;border:none;display:block;opacity:.28;" title="Ambient audio"></iframe>';
+}
+
+// ── Sermon Podcast Linking ─────────────────────────────────────
+
+function findPodcastForPastor(pastorName){
+  if(!pastorName || typeof CHRISTIAN_PODCASTS==='undefined') return null;
+  var lower = pastorName.toLowerCase();
+  for(var ci=0;ci<CHRISTIAN_PODCASTS.length;ci++){
+    var cat = CHRISTIAN_PODCASTS[ci];
+    for(var pi=0;pi<cat.podcasts.length;pi++){
+      var pod = cat.podcasts[pi];
+      var host = (pod.host||'').toLowerCase();
+      if(host.indexOf(lower)!==-1 || lower.indexOf(host)!==-1) return pod;
+    }
+  }
+  return null;
+}
+
+// ── Premium TTS client wrapper ────────────────────────────────
+// Scaffolded for future ElevenLabs upgrade. Returns free-tier Web Speech
+// config now; when user.tier === 'premium' exists, fetches from /api/audio-tts.
+
+function getOptimalTTS(){
+  var userTier = (typeof D !== 'undefined' && D && D.user && D.user.tier) ? D.user.tier : 'free';
+  if(userTier === 'premium'){
+    // Future: call /api/audio-tts, get audio buffer, play with AudioContext.
+    // Falls through to free tier until ElevenLabs is configured.
+  }
+  if(typeof TTS_CONFIG !== 'undefined' && TTS_CONFIG.freeTier) return TTS_CONFIG.freeTier;
+  return { provider:'web-speech-api', rate:0.9, pitch:1.0, volume:1.0 };
 }
