@@ -8943,9 +8943,6 @@ function renderDenominationsCard(){
     +_renderDenomCards(data)
     +'</div>'
     +'</div>'
-    +'</div>'
-    +'<div id="denomModal" style="display:none;position:fixed;inset:0;z-index:9998;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;">'
-    +'<div id="denomModalInner" style="max-width:680px;margin:0 auto;padding:1rem 1rem 3rem;"></div>'
     +'</div>';
 
   el.dataset.rendered = '1';
@@ -9040,10 +9037,15 @@ function openDenomModal(denomId){
     +(Array.isArray(mc) ? '<ul style="margin:0;padding-left:1.1rem;">'+mc.map(function(m){ return '<li style="margin-bottom:.2rem;">'+_jEsc(m)+'</li>'; }).join('')+'</ul>' : _jEsc(mc))
     +'</div></details>' : '';
 
-  var inner = document.getElementById('denomModalInner');
-  if(!inner) return;
-  inner.innerHTML = '<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1rem;padding-top:.4rem;">'
-    +'<button onclick="closeDenomModal()" style="background:rgba(5,150,105,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
+  var existing = document.getElementById('denomModal');
+  if(existing) existing.remove();
+
+  var modal = document.createElement('div');
+  modal.id = 'denomModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9998;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;';
+  modal.innerHTML = '<div style="max-width:680px;margin:0 auto;padding:1rem 1rem 3rem;">'
+    +'<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1rem;padding-top:.4rem;">'
+    +'<button type="button" onclick="closeDenomModal()" style="background:rgba(5,150,105,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
     +'<div><span style="font-size:1.4rem;margin-right:.3rem;">'+_jEsc(d.icon||'✝️')+'</span><span style="font-size:1.05rem;font-weight:800;color:var(--tx);">'+_jEsc(d.name)+'</span></div>'
     +'</div>'
     +stats
@@ -9057,16 +9059,16 @@ function openDenomModal(denomId){
     +keyBranches
     +famousLeaders
     +keyVerses
-    +misconceptions;
+    +misconceptions
+    +'</div>';
 
-  var modal = document.getElementById('denomModal');
-  if(modal){ modal.style.display = 'block'; modal.scrollTop = 0; }
+  document.body.appendChild(modal);
   document.body.style.overflow = 'hidden';
 }
 
 function closeDenomModal(){
   var modal = document.getElementById('denomModal');
-  if(modal) modal.style.display = 'none';
+  if(modal) modal.remove();
   document.body.style.overflow = '';
 }
 
@@ -9198,7 +9200,13 @@ function renderFJProfile(){
     +'<button onclick="openFaithProfileModal()" style="margin-left:auto;font-size:.72rem;font-weight:700;padding:.25rem .65rem;border-radius:99px;border:1px solid rgba(167,139,250,.35);background:rgba(167,139,250,.1);color:var(--accent,#a78bfa);cursor:pointer;">'+(hasData?'Edit':'Set Up')+'</button>'
     +'</div>'
     + (hasData
-      ? '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.35rem;">'
+      ? (p.saved_date && _fjWalkingYears(p.saved_date)
+          ? '<div style="text-align:center;background:linear-gradient(135deg,rgba(167,139,250,.15),rgba(59,130,246,.1));border-radius:8px;padding:.5rem .75rem;margin-bottom:.5rem;">'
+            +'<div style="font-size:.66rem;color:#a78bfa;font-weight:800;text-transform:uppercase;letter-spacing:.09em;margin-bottom:.15rem;">Walking with Jesus</div>'
+            +'<div style="font-size:1.05rem;font-weight:900;color:var(--tx);">'+_jEsc(_fjWalkingYears(p.saved_date))+'</div>'
+            +'</div>'
+          : '')
+        +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.35rem;">'
         + (p.church_name ? _fjProfileRow('⛪','Church', p.church_name) : '')
         + (p.pastor_name ? _fjProfileRow('👤','Pastor', p.pastor_name) : '')
         + (p.denomination ? _fjProfileRow('📖','Tradition', p.denomination) : '')
@@ -9224,6 +9232,21 @@ function _fjProfileRow(icon, label, value){
     +'</div>';
 }
 
+function _fjWalkingYears(dateStr){
+  if(!dateStr) return '';
+  var start = new Date(dateStr + 'T12:00:00');
+  var now = new Date();
+  if(isNaN(start.getTime()) || start > now) return '';
+  var years = now.getFullYear() - start.getFullYear();
+  var months = now.getMonth() - start.getMonth();
+  if(months < 0){ years--; months += 12; }
+  if(now.getDate() < start.getDate()){ months--; if(months < 0){ years--; months += 12; } }
+  var parts = [];
+  if(years > 0) parts.push(years + (years === 1 ? ' year' : ' years'));
+  if(months > 0 || years === 0) parts.push(months + (months === 1 ? ' month' : ' months'));
+  return parts.join(', ');
+}
+
 function openFaithProfileModal(){
   var existing = document.getElementById('fjProfileModal');
   if(existing) existing.remove();
@@ -9243,7 +9266,7 @@ function openFaithProfileModal(){
   modal.style.cssText = 'position:fixed;inset:0;z-index:9500;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;';
   modal.innerHTML = '<div style="max-width:640px;margin:0 auto;padding:1rem 1rem 3rem;">'
     +'<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.2rem;padding-top:.4rem;">'
-    +'<button onclick="closeFaithProfileModal()" style="background:rgba(167,139,250,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
+    +'<button type="button" onclick="closeFaithProfileModal()" style="background:rgba(167,139,250,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
     +'<span style="font-size:1rem;font-weight:800;color:var(--tx);">My Faith Profile</span>'
     +'</div>'
 
@@ -9407,9 +9430,9 @@ function openMilestoneModal(editId){
   modal.style.cssText = 'position:fixed;inset:0;z-index:9500;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;';
   modal.innerHTML = '<div style="max-width:640px;margin:0 auto;padding:1rem 1rem 3rem;">'
     +'<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.2rem;padding-top:.4rem;">'
-    +'<button onclick="closeMilestoneModal()" style="background:rgba(167,139,250,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
-    +'<span style="font-size:1rem;font-weight:800;color:var(--tx);">'+(editId?'Edit':'Add')+'Milestone</span>'
-    +(editId ? '<button onclick="deleteMilestone(\''+_jEsc(editId)+'\')" style="margin-left:auto;background:rgba(239,68,68,.1);border:none;border-radius:8px;padding:.3rem .6rem;cursor:pointer;color:#ef4444;font-size:.75rem;">Delete</button>' : '')
+    +'<button type="button" onclick="closeMilestoneModal()" style="background:rgba(167,139,250,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
+    +'<span style="font-size:1rem;font-weight:800;color:var(--tx);">'+(editId?'Edit':'Add')+' Milestone</span>'
+    +(editId ? '<button type="button" onclick="deleteMilestone(\''+_jEsc(editId)+'\')" style="margin-left:auto;background:rgba(239,68,68,.1);border:none;border-radius:8px;padding:.3rem .6rem;cursor:pointer;color:#ef4444;font-size:.75rem;">Delete</button>' : '')
     +'</div>'
     +'<input id="fjmEditId" type="hidden" value="'+_jEsc(editId||'')+'">'
 
@@ -9480,6 +9503,12 @@ function closeMilestoneModal(){
   document.body.style.overflow = '';
 }
 
+function closeMilestoneDetail(){
+  var modal = document.getElementById('fjMilestoneDetail');
+  if(modal) modal.remove();
+  document.body.style.overflow = '';
+}
+
 function deleteMilestone(id){
   if(!confirm('Delete this milestone?')) return;
   var milestones = _fjGetMilestones().filter(function(m){ return m.id !== id; });
@@ -9503,8 +9532,8 @@ function _fjMilestoneDetail(id){
   modal.style.cssText = 'position:fixed;inset:0;z-index:9500;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;';
   modal.innerHTML = '<div style="max-width:640px;margin:0 auto;padding:1rem 1rem 3rem;">'
     +'<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.2rem;padding-top:.4rem;">'
-    +'<button onclick="document.getElementById(\'fjMilestoneDetail\').remove();document.body.style.overflow=\'\';" style="background:rgba(167,139,250,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
-    +'<button onclick="document.getElementById(\'fjMilestoneDetail\').remove();document.body.style.overflow=\'\';openMilestoneModal(\''+_jEsc(id)+'\')" style="margin-left:auto;background:rgba(167,139,250,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--accent,#a78bfa);font-size:.75rem;">Edit</button>'
+    +'<button type="button" onclick="closeMilestoneDetail()" style="background:rgba(167,139,250,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
+    +'<button type="button" onclick="closeMilestoneDetail();openMilestoneModal(\''+_jEsc(id)+'\')" style="margin-left:auto;background:rgba(167,139,250,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--accent,#a78bfa);font-size:.75rem;">Edit</button>'
     +'</div>'
     +'<div style="text-align:center;margin-bottom:1.2rem;">'
     +'<div style="font-size:3rem;margin-bottom:.4rem;">'+typeInfo.icon+'</div>'
@@ -9605,7 +9634,7 @@ function openDonationModal(){
   modal.style.cssText = 'position:fixed;inset:0;z-index:9500;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;';
   modal.innerHTML = '<div style="max-width:560px;margin:0 auto;padding:1rem 1rem 3rem;">'
     +'<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.2rem;padding-top:.4rem;">'
-    +'<button onclick="closeDonationModal()" style="background:rgba(34,197,94,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
+    +'<button type="button" onclick="closeDonationModal()" style="background:rgba(34,197,94,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
     +'<span style="font-size:1rem;font-weight:800;color:var(--tx);">Record a Gift</span>'
     +'</div>'
 

@@ -408,7 +408,11 @@
         var shown = dayEvts.slice(0,5);
         shown.forEach(function(e){
           var col = (TYPE_MAP[e.type]||TYPE_MAP['other']).color;
-          html += '<div class="cal-dot" style="background:'+col+'"></div>';
+          if(e.isMilestone){
+            html += '<span style="font-size:.65rem;color:'+col+';line-height:1;" title="Faith Milestone">&#9733;</span>';
+          } else {
+            html += '<div class="cal-dot" style="background:'+col+'"></div>';
+          }
         });
         if(dayEvts.length > 5) html += '<span class="cal-day-overflow">+' + (dayEvts.length-5) + '</span>';
         html += '</div>';
@@ -436,9 +440,10 @@
     if(dayEvts.length){
       dayEvts.forEach(function(ev){
         var t = TYPE_MAP[ev.type]||TYPE_MAP['other'];
+        var popStar = ev.isMilestone ? '<span style="color:#dc2626;font-size:.65rem;margin-right:.1rem;">&#9733;</span>' : '';
         evtsHtml += '<div class="cal-day-popup-event" onclick="calEditFromPopup(\''+esc(ev.id)+'\')">'
           +'<div class="cal-day-popup-dot" style="background:'+t.color+'"></div>'
-          +'<span class="cal-day-popup-name">'+esc(ev.name)+'</span>'
+          +'<span class="cal-day-popup-name">'+popStar+esc(ev.name)+'</span>'
           +(ev.startTime?'<span class="cal-day-popup-time">'+esc(ev.startTime)+'</span>':'')
           +'</div>';
       });
@@ -523,11 +528,12 @@
       +'<button class="cal-list-del-btn" onclick="calDeleteEvent(\''+esc(ev.id)+'\')">✕</button>'
       +'</div>';
 
+    var mileStar = ev.isMilestone ? '<span style="color:#dc2626;margin-right:.2rem;" title="Faith Milestone">&#9733;</span>' : '';
     return '<div class="cal-list-item" style="--type-color:'+t.color+'"'+readOnlyAttrs+'>'
       +'<div class="cal-list-date"><div class="cal-list-date-month">'+monthAbbr+'</div>'
       +'<div class="cal-list-date-day">'+dayNum+'</div></div>'
       +'<div class="cal-list-body">'
-      +'<div class="cal-list-name">'+esc(ev.name||'')+'</div>'
+      +'<div class="cal-list-name">'+mileStar+esc(ev.name||'')+'</div>'
       +'<div class="cal-list-type">'+t.icon+' '+esc(t.label)+recurBadge+'</div>'
       +(meta?'<div class="cal-list-meta">'+esc(meta)+'</div>':'')
       +(ev.notes?'<div class="cal-list-meta" style="color:var(--tx2);font-style:italic">'+esc(ev.notes.slice(0,80))+'</div>':'')
