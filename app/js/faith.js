@@ -3899,11 +3899,12 @@ function prSubTab(sub, btn){
     btn.classList.add('active');
     btn.setAttribute('aria-selected', 'true');
   }
-  ['mine','wall','howto','examples','who'].forEach(s => {
+  ['mine','guided','wall','howto','examples','who'].forEach(s => {
     const pane = document.getElementById('pr-pane-' + s);
     if(pane) pane.style.display = (s === sub) ? '' : 'none';
   });
   if(sub === 'mine')         renderMyPrayersPane();
+  else if(sub === 'guided')  { if(typeof renderGuidedPrayerPane === 'function') renderGuidedPrayerPane(); }
   else if(sub === 'wall')    renderPrayerWallPane();
   else if(sub === 'howto')   renderHowToPrayPane();
   else if(sub === 'examples') renderPrayerExamplesPane();
@@ -10618,4 +10619,167 @@ function saveMoodLog(moodId){
     log.unshift({ date: new Date().toISOString().slice(0,10), mood: moodId });
     localStorage.setItem(key, JSON.stringify(log.slice(0,365)));
   }catch(e){}
+}
+
+// ── GUIDED PRAYER SESSIONS — Engagement Loop Worker 3 ────────────────────────
+// Data: PRAYER_SESSIONS from app/js/data/reading-plans.js
+// Timer runs via setInterval stored in _psTimerInterval.
+// Ambient audio: YouTube no-cookie embed inside session view.
+
+var _psTimerInterval = null;
+var _psCurrentSession = null;
+var _psCurrentStep = 0;
+var _psRemainingTime = 0;
+
+function _psKey(suffix){
+  var uid = (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.id) ? _supaUser.id : 'anon';
+  return 'ylcc_ps_' + uid + '_' + suffix;
+}
+
+function _psClearTimer(){
+  if(_psTimerInterval){ clearInterval(_psTimerInterval); _psTimerInterval = null; }
+}
+
+function _psFormatTime(seconds){
+  var m = Math.floor(seconds / 60);
+  var s = seconds % 60;
+  return m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function renderGuidedPrayerPane(){
+  _psClearTimer();
+  var root = document.getElementById('pr-pane-guided');
+  if(!root) return;
+  if(typeof PRAYER_SESSIONS === 'undefined'){
+    root.innerHTML = '<div style="color:var(--tx2);font-size:.82rem;padding:.5rem 0;">Prayer sessions loading…</div>';
+    return;
+  }
+  var lastEntry = null;
+  try{ var h = JSON.parse(localStorage.getItem(_psKey('history')) || '[]'); lastEntry = h[0] || null; }catch(e){}
+  var rows = PRAYER_SESSIONS.map(function(s){
+    return '<button onclick="_psOpenSession(\'' + s.id + '\',0)" style="width:100%;display:flex;align-items:center;gap:.85rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:.85rem 1rem;margin-bottom:.5rem;cursor:pointer;font-family:var(--fm);text-align:left;transition:background .15s,border-color .15s;" onmouseover="this.style.background=\'rgba(255,255,255,.07)\';this.style.borderColor=\'rgba(251,191,36,.25)\'" onmouseout="this.style.background=\'rgba(255,255,255,.03)\';this.style.borderColor=\'rgba(255,255,255,.08)\'">' +
+      '<span style="font-size:1.5rem;">' + s.icon + '</span>' +
+      '<div style="flex:1;min-width:0;">' +
+      '<div style="font-size:.85rem;font-weight:800;color:var(--tx);">' + escapeHtml(s.title) + '</div>' +
+      '<div style="font-size:.7rem;color:var(--tx2);margin-top:.1rem;">' + s.duration + ' min · ' + s.steps.length + ' steps</div>' +
+      '</div>' +
+      '<span style="font-size:.75rem;font-weight:800;color:var(--tx3);">▶</span>' +
+      '</button>';
+  }).join('');
+  var lastHtml = lastEntry
+    ? '<div style="margin-top:.4rem;font-size:.68rem;color:var(--tx3);">Last: ' + escapeHtml(lastEntry.title || lastEntry.sessionId) + ' · ' + escapeHtml(lastEntry.date) + '</div>'
+    : '';
+  root.innerHTML = '<div style="font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);margin-bottom:.7rem;">Choose a Session</div>' +
+    rows + lastHtml;
+}
+
+// startPrayerSession — public entry point (called from mood scripture "Pray about this" and any external link).
+// Routes to prayer tab + guided subtab, then opens the session.
+function startPrayerSession(sessionId){
+  if(typeof _moodClose === 'function') _moodClose();
+  if(typeof bfTab === 'function') bfTab('prayer');
+  setTimeout(function(){
+    var guidedBtn = document.querySelector('#bf-prayer .pr-subtab[data-pr-sub="guided"]');
+    if(typeof prSubTab === 'function') prSubTab('guided', guidedBtn);
+    setTimeout(function(){ _psOpenSession(sessionId, 0); }, 60);
+  }, 80);
+}
+
+function _psOpenSession(sessionId, stepIndex){
+  if(typeof PRAYER_SESSIONS === 'undefined') return;
+  var session = PRAYER_SESSIONS.find(function(s){ return s.id === sessionId; });
+  if(!session) return;
+  _psClearTimer();
+  _psCurrentSession = session;
+  _psCurrentStep = stepIndex;
+  _psRemainingTime = session.steps[stepIndex] ? session.steps[stepIndex].time : 60;
+  renderPrayerSessionView(session, stepIndex);
+}
+
+function renderPrayerSessionView(session, stepIndex){
+  var root = document.getElementById('pr-pane-guided');
+  if(!root) return;
+  var step = session.steps[stepIndex];
+  var totalSteps = session.steps.length;
+  var stepPct = Math.round((stepIndex / totalSteps) * 100);
+  var stepLabel = step.type.charAt(0).toUpperCase() + step.type.slice(1);
+  var isLast = (stepIndex === totalSteps - 1);
+  var nextLabel = isLast ? 'Finish' : 'Next Step →';
+  root.innerHTML =
+    '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;">' +
+    '<button onclick="renderGuidedPrayerPane()" style="background:none;border:none;color:var(--tx2);font-size:.95rem;cursor:pointer;padding:.2rem .3rem;font-family:var(--fm);">✕</button>' +
+    '<span style="font-size:1.1rem;">' + session.icon + '</span>' +
+    '<div style="flex:1;font-size:.82rem;font-weight:800;color:var(--tx);">' + escapeHtml(session.title) + '</div>' +
+    '</div>' +
+    '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:1.1rem;">' +
+    '<div style="flex:1;height:4px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;"><div style="height:100%;width:' + stepPct + '%;background:linear-gradient(90deg,#fbbf24,#f59e0b);border-radius:99px;transition:width .4s;"></div></div>' +
+    '<div style="font-size:.62rem;font-weight:800;color:var(--tx3);white-space:nowrap;">Step ' + (stepIndex+1) + ' / ' + totalSteps + '</div>' +
+    '</div>' +
+    '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.2rem 1.1rem;margin-bottom:1rem;">' +
+    '<div style="font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#fbbf24;margin-bottom:.5rem;">' + escapeHtml(stepLabel) + '</div>' +
+    '<div style="font-size:.88rem;line-height:1.65;color:var(--tx);">' + escapeHtml(step.instruction) + '</div>' +
+    '</div>' +
+    '<div style="text-align:center;margin-bottom:1rem;">' +
+    '<div style="font-size:2.4rem;font-weight:900;color:var(--tx);font-family:var(--fh,var(--fm));line-height:1;" id="psTimerCount">' + _psFormatTime(_psRemainingTime) + '</div>' +
+    '<div style="height:5px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin:.55rem 0;"><div id="psTimerBar" style="height:100%;width:100%;background:linear-gradient(90deg,#a78bfa,#7c3aed);border-radius:99px;transition:width 1s linear;"></div></div>' +
+    '<div style="display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-top:.6rem;">' +
+    '<button id="psTimerStartBtn" onclick="_psStartTimer()" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0b1220;border:none;border-radius:10px;padding:.55rem 1.2rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">▶ Start Timer</button>' +
+    '<button onclick="_psSkipStep()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx2);border-radius:10px;padding:.55rem .9rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">' + nextLabel + '</button>' +
+    '</div>' +
+    '</div>' +
+    '<div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;overflow:hidden;">' +
+    '<div style="font-size:.56rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);padding:.4rem .7rem .2rem;">🎵 Ambient Audio</div>' +
+    '<iframe src="https://www.youtube-nocookie.com/embed/' + session.ambientYouTube + '?autoplay=1&loop=1&playlist=' + session.ambientYouTube + '&controls=1&modestbranding=1" frameborder="0" allow="autoplay;encrypted-media" allowfullscreen style="width:100%;height:80px;border:none;display:block;"></iframe>' +
+    '</div>';
+}
+
+function _psStartTimer(){
+  var btn = document.getElementById('psTimerStartBtn');
+  if(btn){ btn.textContent = '⏸ Pause'; btn.onclick = function(){ _psPauseTimer(); }; }
+  _psClearTimer();
+  _psTimerInterval = setInterval(function(){
+    _psRemainingTime = Math.max(0, _psRemainingTime - 1);
+    var countEl = document.getElementById('psTimerCount');
+    if(countEl) countEl.textContent = _psFormatTime(_psRemainingTime);
+    if(_psCurrentSession){
+      var totalTime = _psCurrentSession.steps[_psCurrentStep] ? _psCurrentSession.steps[_psCurrentStep].time : 60;
+      var pct = Math.round((_psRemainingTime / totalTime) * 100);
+      var bar = document.getElementById('psTimerBar');
+      if(bar) bar.style.width = pct + '%';
+    }
+    if(_psRemainingTime <= 0){ _psClearTimer(); _psSkipStep(); }
+  }, 1000);
+}
+
+function _psPauseTimer(){
+  _psClearTimer();
+  var btn = document.getElementById('psTimerStartBtn');
+  if(btn){ btn.textContent = '▶ Resume'; btn.onclick = function(){ _psStartTimer(); }; }
+}
+
+function _psSkipStep(){
+  _psClearTimer();
+  var session = _psCurrentSession;
+  if(!session) return;
+  var isLast = (_psCurrentStep >= session.steps.length - 1);
+  if(isLast){
+    completePrayerSession(session.id);
+  } else {
+    _psCurrentStep++;
+    _psRemainingTime = session.steps[_psCurrentStep].time;
+    renderPrayerSessionView(session, _psCurrentStep);
+  }
+}
+
+function completePrayerSession(sessionId){
+  _psClearTimer();
+  var session = (typeof PRAYER_SESSIONS !== 'undefined') ? PRAYER_SESSIONS.find(function(s){ return s.id === sessionId; }) : null;
+  try{
+    var key = _psKey('history');
+    var hist = JSON.parse(localStorage.getItem(key) || '[]');
+    hist.unshift({ sessionId: sessionId, title: session ? session.title : sessionId, date: new Date().toISOString().slice(0,10), completed: true });
+    localStorage.setItem(key, JSON.stringify(hist.slice(0,90)));
+  }catch(e){}
+  if(typeof showToast === 'function') showToast('Prayer session complete! 🙏');
+  renderGuidedPrayerPane();
 }

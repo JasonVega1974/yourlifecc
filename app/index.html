@@ -5787,6 +5787,7 @@
     <!-- Sub-tab navigation -->
     <div class="pr-subtabs" role="tablist" aria-label="Prayer sub-sections">
       <button class="pr-subtab active" role="tab" aria-selected="true"  data-pr-sub="mine"     onclick="prSubTab('mine',this)">🙏 My Prayers</button>
+      <button class="pr-subtab"        role="tab" aria-selected="false" data-pr-sub="guided"   onclick="prSubTab('guided',this)">⏱ Guided Sessions</button>
       <button class="pr-subtab"        role="tab" aria-selected="false" data-pr-sub="wall"     onclick="prSubTab('wall',this)">🌍 Prayer Wall</button>
       <button class="pr-subtab"        role="tab" aria-selected="false" data-pr-sub="howto"    onclick="prSubTab('howto',this)">📖 How to Pray</button>
       <button class="pr-subtab"        role="tab" aria-selected="false" data-pr-sub="examples" onclick="prSubTab('examples',this)">📜 Examples</button>
@@ -5856,6 +5857,9 @@
       <div class="pr-daily-prompt" id="prDailyPrompt"></div>
       <div id="prWhoGrid" class="pr-who-grid"></div>
     </div>
+
+    <!-- Pane: Guided Prayer Sessions (Worker 3) -->
+    <div id="pr-pane-guided" class="pr-pane" style="display:none;"></div>
   </div>
 
   <!-- ════ SERMON NOTE EDITOR MODAL (F2-H) ════ -->
