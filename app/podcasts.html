@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>Christian Podcasts — YourLife CC</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/app/css/app.css">
+<meta name="theme-color" content="#0a1f5e">
+<script>
+(function(){
+  try {
+    var raw = localStorage.getItem('ylcc_boot_palette_v1');
+    if(!raw) return;
+    var p = JSON.parse(raw);
+    if(!p || typeof p !== 'object') return;
+    var root = document.documentElement;
+    if(p.light) root.classList.add('light');
+    var keys = ['bg','s1','s2','s3','s4','c','p','gr','g','tx','tx2','mt'];
+    keys.forEach(function(k){ if(p[k]) root.style.setProperty('--'+k, p[k]); });
+  } catch(e){}
+})();
+</script>
+<style>
+  body { background: var(--bg); color: var(--tx); font-family: var(--fm); min-height: 100vh; }
+  .pod-wrap { max-width: 900px; margin: 0 auto; padding: 0 1rem 3rem; }
+
+  /* Header */
+  .pod-header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg); border-bottom: 1px solid rgba(255,255,255,.07);
+    padding: .75rem 1rem; display: flex; align-items: center; gap: .75rem;
+    backdrop-filter: blur(10px);
+  }
+  .pod-back { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+    color: var(--tx); border-radius: 8px; padding: .3rem .65rem; font-size: .78rem;
+    font-weight: 700; cursor: pointer; text-decoration: none; white-space: nowrap; }
+  .pod-header-title { font-family: var(--fh,'Bebas Neue',sans-serif); font-size: 1.3rem;
+    letter-spacing: .06em; color: var(--tx); }
+  .pod-header-sub { font-size: .72rem; color: var(--tx2); display: none; }
+  @media(min-width:600px){ .pod-header-sub { display: block; } }
+
+  /* Hero */
+  .pod-hero { background: linear-gradient(135deg, #1e1b4b, #4c1d95, #0c4a6e);
+    padding: 1.5rem 1rem 1.2rem; text-align: center; margin-bottom: 1.2rem; }
+  .pod-hero-icon { font-size: 2.5rem; margin-bottom: .4rem; }
+  .pod-hero-title { font-family: var(--fh,'Bebas Neue',sans-serif); font-size: 1.8rem;
+    letter-spacing: .08em; color: #fff; margin-bottom: .25rem; }
+  .pod-hero-sub { font-size: .82rem; color: rgba(255,255,255,.75); }
+
+  /* Search */
+  .pod-search-wrap { padding: .7rem 0 .4rem; }
+  .pod-search { width: 100%; font-size: .85rem; padding: .5rem .75rem .5rem 2.2rem;
+    border-radius: 10px; border: 1px solid rgba(255,255,255,.12);
+    background: var(--s1); color: var(--tx); box-sizing: border-box;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: .6rem center; background-size: 1rem; }
+  .pod-search::placeholder { color: var(--tx3); }
+
+  /* Filter pills */
+  .pod-filters { display: flex; gap: .35rem; overflow-x: auto; padding: .4rem 0 .7rem;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .pod-filters::-webkit-scrollbar { display: none; }
+  .pod-pill { flex-shrink: 0; font-size: .73rem; font-weight: 700; padding: .28rem .7rem;
+    border-radius: 99px; border: 1px solid rgba(255,255,255,.14);
+    background: none; color: var(--tx2); cursor: pointer; transition: all .14s; white-space: nowrap; }
+  .pod-pill.active { background: linear-gradient(135deg,#6d28d9,#7c3aed);
+    color: #fff; border-color: transparent; }
+  .pod-pill:hover:not(.active) { background: rgba(255,255,255,.06); color: var(--tx); }
+
+  /* Recommended */
+  .pod-recommended { background: rgba(167,139,250,.07); border: 1px solid rgba(167,139,250,.2);
+    border-radius: 12px; padding: .75rem 1rem; margin-bottom: 1.2rem; }
+  .pod-rec-hdr { font-size: .75rem; font-weight: 800; color: #a78bfa; margin-bottom: .5rem;
+    text-transform: uppercase; letter-spacing: .06em; }
+
+  /* Category section */
+  .pod-cat-hdr { display: flex; align-items: center; gap: .5rem; margin: 1.1rem 0 .6rem;
+    font-size: .78rem; font-weight: 800; color: var(--tx3); text-transform: uppercase;
+    letter-spacing: .1em; }
+  .pod-cat-icon { font-size: 1.1rem; }
+  .pod-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px,1fr)); gap: .7rem; }
+
+  /* Podcast card */
+  .pod-card { background: var(--s1); border: 1px solid rgba(255,255,255,.08);
+    border-radius: 14px; padding: .85rem 1rem; display: flex; flex-direction: column;
+    gap: .4rem; transition: border-color .15s, transform .15s; }
+  .pod-card:hover { border-color: rgba(167,139,250,.35); transform: translateY(-1px); }
+  .pod-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: .5rem; }
+  .pod-card-name { font-size: .88rem; font-weight: 800; color: var(--tx); line-height: 1.3; }
+  .pod-card-host { font-size: .73rem; color: var(--tx2); margin-top: .15rem; }
+  .pod-fav-btn { background: none; border: none; cursor: pointer; font-size: 1.1rem;
+    padding: .1rem; line-height: 1; flex-shrink: 0; transition: transform .15s; }
+  .pod-fav-btn:hover { transform: scale(1.25); }
+  .pod-tags { display: flex; flex-wrap: wrap; gap: .2rem; }
+  .pod-tag { font-size: .66rem; background: rgba(167,139,250,.1); color: #a78bfa;
+    border-radius: 4px; padding: .1rem .3rem; }
+  .pod-desc { font-size: .77rem; color: var(--tx2); line-height: 1.55;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .pod-meta { display: flex; align-items: center; gap: .4rem; margin-top: .1rem; }
+  .pod-stars { font-size: .75rem; color: #fbbf24; letter-spacing: -.05em; }
+  .pod-freq { font-size: .68rem; color: var(--tx3); font-weight: 600; }
+  .pod-links { display: flex; gap: .35rem; flex-wrap: wrap; margin-top: .25rem; }
+  .pod-link { font-size: .7rem; font-weight: 700; padding: .22rem .55rem; border-radius: 7px;
+    border: 1px solid rgba(255,255,255,.12); color: var(--tx2); text-decoration: none;
+    transition: background .12s, color .12s; background: rgba(255,255,255,.04); }
+  .pod-link:hover { background: rgba(255,255,255,.12); color: var(--tx); }
+  .pod-link.spotify { border-color: rgba(30,215,96,.3); color: #1ed760; }
+  .pod-link.spotify:hover { background: rgba(30,215,96,.1); }
+  .pod-link.apple { border-color: rgba(250,142,142,.3); color: #fa8e8e; }
+  .pod-link.apple:hover { background: rgba(250,142,142,.1); }
+  .pod-link.web { border-color: rgba(56,189,248,.3); color: #38bdf8; }
+  .pod-link.web:hover { background: rgba(56,189,248,.1); }
+
+  .pod-empty { text-align: center; padding: 2rem; color: var(--tx2); font-size: .85rem; }
+  .pod-no-results { grid-column: 1/-1; text-align: center; padding: 1.5rem; color: var(--tx2); font-size: .82rem; }
+</style>
+</head>
+<body>
+
+<div class="pod-header">
+  <a href="/app/" class="pod-back">← The Well</a>
+  <span class="pod-header-title">Podcasts</span>
+  <span class="pod-header-sub">Grow your faith through the best voices in the church</span>
+</div>
+
+<div class="pod-hero">
+  <div class="pod-hero-icon">🎧</div>
+  <div class="pod-hero-title">Christian Podcasts</div>
+  <div class="pod-hero-sub">Grow your faith through the best voices in the church</div>
+</div>
+
+<div class="pod-wrap">
+
+  <div id="podRecommended" style="display:none;"></div>
+
+  <div class="pod-search-wrap">
+    <input type="search" class="pod-search" id="podSearch" placeholder="Search by name, host, or tag…" oninput="podFilter()">
+  </div>
+
+  <div class="pod-filters" id="podPills"></div>
+
+  <div id="podContent"></div>
+
+</div>
+
+<script src="/app/js/data/podcasts.js"></script>
+<script>
+(function(){
+  'use strict';
+
+  // ── User ID for localStorage scoping ──
+  function _podUserId(){
+    try {
+      var keys = Object.keys(localStorage);
+      for(var i=0;i<keys.length;i++){
+        if(keys[i].startsWith('sb-') && keys[i].endsWith('-auth-token')){
+          var d = JSON.parse(localStorage.getItem(keys[i]));
+          if(d && d.user && d.user.id) return d.user.id;
+        }
+      }
+    } catch(e){}
+    return 'local';
+  }
+
+  var _uid = _podUserId();
+  var FAV_KEY = 'ylcc_podFavs_' + _uid;
+
+  function getFavs(){ try{ var r=localStorage.getItem(FAV_KEY); return r?JSON.parse(r):[]; }catch(e){return[];} }
+  function setFavs(favs){ try{ localStorage.setItem(FAV_KEY, JSON.stringify(favs)); }catch(e){} }
+  function isFav(id){ return getFavs().indexOf(id) !== -1; }
+  function toggleFav(id){
+    var favs = getFavs();
+    var idx = favs.indexOf(id);
+    if(idx === -1) favs.push(id); else favs.splice(idx,1);
+    setFavs(favs);
+    renderAll();
+  }
+
+  window.podToggleFav = toggleFav;
+
+  // ── Category short labels for pills ──
+  var CAT_LABELS = {
+    'Bible Study & Theology':      'Bible Study',
+    'Preaching & Sermons':          'Preaching',
+    'Faith for Teens & Young Adults': 'Teens',
+    'Prayer & Spiritual Life':      'Prayer',
+    'Apologetics & Faith & Science': 'Apologetics',
+    'Worship & Music':              'Worship',
+    'Recovery & Wholeness':         'Recovery'
+  };
+
+  var _activeFilter = 'all';
+
+  // ── Build pills ──
+  function buildPills(){
+    var data = (typeof CHRISTIAN_PODCASTS !== 'undefined') ? CHRISTIAN_PODCASTS : [];
+    var el = document.getElementById('podPills');
+    var html = '<button class="pod-pill active" data-cat="all" onclick="podSetFilter(\'all\')">All</button>';
+    data.forEach(function(cat){
+      var short = CAT_LABELS[cat.category] || cat.category;
+      html += '<button class="pod-pill" data-cat="'+esc(cat.category)+'" onclick="podSetFilter(\''+esc(cat.category)+'\')">'+esc(cat.icon)+' '+esc(short)+'</button>';
+    });
+    el.innerHTML = html;
+  }
+
+  window.podSetFilter = function(cat){
+    _activeFilter = cat;
+    document.querySelectorAll('.pod-pill').forEach(function(btn){
+      btn.classList.toggle('active', btn.getAttribute('data-cat') === cat);
+    });
+    renderAll();
+  };
+
+  window.podFilter = function(){ renderAll(); };
+
+  // ── Recommended based on faith profile ──
+  function buildRecommended(){
+    var recEl = document.getElementById('podRecommended');
+    if(!recEl) return;
+    // Read denomination from faith profile
+    var denom = '';
+    try {
+      var keys = Object.keys(localStorage);
+      for(var i=0;i<keys.length;i++){
+        if(keys[i].startsWith('ylcc_fj_profile_')){
+          var p = JSON.parse(localStorage.getItem(keys[i]));
+          if(p && p.denomination){ denom = p.denomination; break; }
+        }
+      }
+    } catch(e){}
+    if(!denom) return;
+
+    var data = (typeof CHRISTIAN_PODCASTS !== 'undefined') ? CHRISTIAN_PODCASTS : [];
+    var picks = [];
+    var keywords = denom.toLowerCase().split(/[\s\/,]+/);
+    data.forEach(function(cat){
+      cat.podcasts.forEach(function(p){
+        if(picks.length >= 3) return;
+        var text = (p.name+' '+p.description+' '+(p.tags||[]).join(' ')).toLowerCase();
+        if(keywords.some(function(kw){ return kw.length > 3 && text.indexOf(kw) !== -1; })){
+          picks.push({cat:cat.category, podcast:p});
+        }
+      });
+    });
+
+    if(!picks.length) return;
+    recEl.style.display = 'block';
+    recEl.innerHTML = '<div class="pod-recommended">'
+      +'<div class="pod-rec-hdr">Recommended for '+esc(denom)+' listeners</div>'
+      +'<div class="pod-grid">'
+      + picks.map(function(item){ return buildCard(item.podcast); }).join('')
+      +'</div></div>';
+  }
+
+  // ── Render all ──
+  function renderAll(){
+    var data = (typeof CHRISTIAN_PODCASTS !== 'undefined') ? CHRISTIAN_PODCASTS : [];
+    var q = (document.getElementById('podSearch').value||'').toLowerCase().trim();
+    var content = document.getElementById('podContent');
+    var html = '';
+    var totalShown = 0;
+
+    data.forEach(function(cat){
+      if(_activeFilter !== 'all' && cat.category !== _activeFilter) return;
+      var filtered = cat.podcasts.filter(function(p){
+        if(!q) return true;
+        return (p.name+' '+p.host+' '+(p.tags||[]).join(' ')).toLowerCase().indexOf(q) !== -1;
+      });
+      if(!filtered.length) return;
+      totalShown += filtered.length;
+      html += '<div class="pod-cat-hdr"><span class="pod-cat-icon">'+cat.icon+'</span>'+esc(cat.category)+'</div>';
+      html += '<div class="pod-grid">';
+      filtered.forEach(function(p){ html += buildCard(p); });
+      html += '</div>';
+    });
+
+    if(!totalShown){
+      html = '<div class="pod-empty">No podcasts match your search.</div>';
+    }
+    content.innerHTML = html;
+  }
+
+  // ── Build a single podcast card ──
+  function buildCard(p){
+    var fav = isFav(p.id);
+    var stars = '';
+    var r = p.rating||0;
+    for(var i=0;i<5;i++) stars += i < r ? '★' : '☆';
+    var tags = (p.tags||[]).slice(0,4).map(function(t){ return '<span class="pod-tag">'+esc(t)+'</span>'; }).join('');
+    var links = '';
+    if(p.spotifyLink) links += '<a class="pod-link spotify" href="'+esc(p.spotifyLink)+'" target="_blank" rel="noopener">🎵 Spotify</a>';
+    if(p.appleLink)   links += '<a class="pod-link apple"   href="'+esc(p.appleLink)+'" target="_blank" rel="noopener">🍎 Apple</a>';
+    if(p.listenLink)  links += '<a class="pod-link web"     href="'+esc(p.listenLink)+'" target="_blank" rel="noopener">🌐 Website</a>';
+
+    return '<div class="pod-card">'
+      +'<div class="pod-card-top">'
+      +'<div><div class="pod-card-name">'+esc(p.name)+'</div><div class="pod-card-host">'+esc(p.host||'')+'</div></div>'
+      +'<button class="pod-fav-btn" onclick="podToggleFav(\''+esc(p.id)+'\')" title="'+(fav?'Remove bookmark':'Bookmark')+'">'+(fav?'🔖':'🏷️')+'</button>'
+      +'</div>'
+      +(tags?'<div class="pod-tags">'+tags+'</div>':'')
+      +'<div class="pod-desc">'+esc(p.description||'')+'</div>'
+      +'<div class="pod-meta"><span class="pod-stars">'+stars+'</span><span class="pod-freq">'+esc(p.frequency||'')+'</span></div>'
+      +(links?'<div class="pod-links">'+links+'</div>':'')
+      +'</div>';
+  }
+
+  // ── Escape HTML ──
+  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  // ── Init ──
+  if(typeof CHRISTIAN_PODCASTS !== 'undefined'){
+    buildPills();
+    buildRecommended();
+    renderAll();
+  } else {
+    document.getElementById('podContent').innerHTML = '<div class="pod-empty">Podcast data not available.</div>';
+  }
+
+})();
+</script>
+</body>
+</html>
