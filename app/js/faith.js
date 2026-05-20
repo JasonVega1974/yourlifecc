@@ -439,7 +439,7 @@ function initScripture(){
 // the original 6 tabs. New tabs without renderers are stubs awaiting later phases.
 // btn is optional — when bfTab() is called programmatically (e.g., from a Quick
 // Tile or stub-panel CTA), the matching button is found via [data-bf-tab].
-const BF_TABS = ['home','devotional','jesus','denominations','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy','studyTools','readingPlans','audioBible','audioMeditations','sleepStories'];
+const BF_TABS = ['home','devotional','jesus','denominations','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy','studyTools','readingPlans','audioBible','audioMeditations','sleepStories','ambientLibrary'];
 
 // Phase 5.8 v3 — Home-grid restorer. Defensive against any prior code
 // that may have set .topic-card-grid display:none inside #bf-home. The
@@ -689,6 +689,7 @@ function bfTab(tab, btn){
   if(tab==='audioBible') renderAudioBibleCard();
   if(tab==='audioMeditations') renderAudioMeditationsCard();
   if(tab==='sleepStories') renderSleepStoriesCard();
+  if(tab==='ambientLibrary') renderAmbientLibraryCard();
 }
 
 // ── FAITH HOME (F2-A) ────────────────────────────────────────
@@ -5379,6 +5380,7 @@ function renderSermonNotes(){
   el.innerHTML = Object.keys(groups).sort().reverse().map(k => {
     const cards = groups[k].map(s => {
       const ref = [s.church, s.speaker].filter(Boolean).join(' · ');
+      const podcast = s.speaker ? findPodcastForPastor(s.speaker) : null;
       return `<div onclick="openSermonNote(${s.id})" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-left:4px solid #38bdf8;border-radius:10px;padding:.65rem .8rem;margin-bottom:.4rem;cursor:pointer;">
         <div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;font-size:.6rem;color:var(--tx2);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.25rem;">
           <span>${s.date || ''}</span>
@@ -5389,6 +5391,7 @@ function renderSermonNotes(){
         <div style="font-size:.85rem;line-height:1.5;color:var(--tx);font-weight:600;margin-bottom:${s.scriptures||s.actionStep?'.3rem':'0'};">⭐ ${escapeHtml(s.takeaway || '')}</div>
         ${s.scriptures ? '<div style="font-size:.7rem;color:#a78bfa;font-weight:700;margin-bottom:.2rem;">📖 '+escapeHtml(s.scriptures)+'</div>' : ''}
         ${s.actionStep ? '<div style="font-size:.7rem;color:#10b981;font-weight:700;">🎯 '+escapeHtml(s.actionStep)+'</div>' : ''}
+        ${podcast ? '<div style="margin-top:.3rem;padding-top:.3rem;border-top:1px solid rgba(255,255,255,.06);"><a href="'+escapeHtml(podcast.listenLink)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:.7rem;color:#38bdf8;text-decoration:none;font-weight:700;">🎧 Listen → '+escapeHtml(podcast.name)+'</a></div>' : ''}
       </div>`;
     }).join('');
     return `<div style="font-size:.66rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.16em;margin:.5rem 0 .35rem;">${monthLabel(k)}</div>${cards}`;
@@ -11366,4 +11369,128 @@ async function _ssRequestWakeLock(){
 
 function _ssReleaseWakeLock(){
   try { if(_ssWakeLock){ _ssWakeLock.release(); _ssWakeLock = null; } } catch(e){}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AUDIO LAYER — WORKER 3: Ambient Audio Library + Sermon Podcast Linking
+// ═══════════════════════════════════════════════════════════════
+
+var _ambientTrackId = null;
+var _ambientExpanded = null;
+
+function renderAmbientLibraryCard(){
+  var root = document.getElementById('ambientLibraryRoot');
+  if(!root) return;
+  if(typeof AMBIENT_LIBRARY==='undefined'){
+    root.innerHTML='<div style="color:var(--tx2);padding:1rem;">Loading ambient library…</div>';
+    return;
+  }
+  var allTracks = [];
+  AMBIENT_LIBRARY.forEach(function(c){ allTracks = allTracks.concat(c.tracks); });
+  var playing = _ambientTrackId ? allTracks.find(function(t){ return t.id===_ambientTrackId; }) : null;
+
+  var html = '<div style="padding:.2rem 0 1rem;">';
+  html += '<div class="bf-section-hdr"><div class="bf-eyebrow">BACKGROUND AUDIO · FREE</div>';
+  html += '<div class="bf-title">🎵 Ambient Library</div>';
+  html += '<div class="bf-sub">Background audio for prayer, study, rest, or worship. Continues playing as you navigate.</div></div>';
+
+  if(playing){
+    html += '<div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);border-radius:12px;padding:.6rem 1rem;display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;">';
+    html += '<span style="font-size:.9rem;">🎵</span>';
+    html += '<div style="flex:1;min-width:0;"><div style="font-size:.65rem;font-weight:800;color:#38bdf8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.05rem;">Now Playing</div>';
+    html += '<div style="font-size:.84rem;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+escapeHtml(playing.title)+'</div></div>';
+    html += '<button type="button" onclick="stopAmbient()" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.28);color:#ef4444;border-radius:8px;padding:.3rem .7rem;font-size:.76rem;cursor:pointer;font-family:var(--fm);">✕ Stop</button>';
+    html += '</div>';
+  }
+
+  html += '<div style="display:grid;gap:.45rem;">';
+  AMBIENT_LIBRARY.forEach(function(cat){
+    var isExpanded = _ambientExpanded === cat.category;
+    html += '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;overflow:hidden;">';
+    html += '<div onclick="expandAmbientCategory(\''+_jEsc(cat.category)+'\')" style="padding:.75rem 1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;">';
+    html += '<span style="font-size:1.5rem;line-height:1;flex-shrink:0;">'+cat.icon+'</span>';
+    html += '<div style="flex:1;"><div style="font-size:.9rem;font-weight:800;color:var(--tx);">'+escapeHtml(cat.category)+'</div>';
+    html += '<div style="font-size:.72rem;color:var(--tx2);">'+cat.tracks.length+' tracks</div></div>';
+    html += '<span style="font-size:.85rem;color:var(--tx3);display:inline-block;transition:transform .2s;'+(isExpanded?'transform:rotate(180deg);':'')+'">▾</span>';
+    html += '</div>';
+    if(isExpanded){
+      html += '<div style="border-top:1px solid rgba(255,255,255,.06);padding:.4rem .75rem .55rem;">';
+      cat.tracks.forEach(function(track){
+        var isPlay = _ambientTrackId === track.id;
+        html += '<div onclick="playAmbientTrack(\''+track.id+'\')" style="display:flex;align-items:center;gap:.6rem;padding:.45rem .35rem;border-radius:8px;cursor:pointer;background:'+(isPlay?'rgba(56,189,248,.08)':'none')+';margin-bottom:.1rem;">';
+        html += '<div style="width:28px;height:28px;border-radius:50%;background:'+(isPlay?'rgba(56,189,248,.2)':'rgba(255,255,255,.05)')+';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.7rem;color:'+(isPlay?'#38bdf8':'var(--tx2)')+'">'+(isPlay?'⏸':'▶')+'</div>';
+        html += '<div style="flex:1;min-width:0;"><div style="font-size:.84rem;font-weight:700;color:'+(isPlay?'#38bdf8':'var(--tx)')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+escapeHtml(track.title)+'</div>';
+        html += '<div style="font-size:.69rem;color:var(--tx3);line-height:1.3;">'+escapeHtml(track.description)+'</div></div>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    html += '</div>';
+  });
+  html += '</div>';
+  html += '<div style="margin-top:.85rem;background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.1);border-radius:10px;padding:.6rem .85rem;font-size:.7rem;color:var(--tx3);line-height:1.5;">💡 Ambient audio continues playing as you navigate. Powered by YouTube. Use headphones for best experience.</div>';
+  html += '</div>';
+  root.innerHTML = html;
+}
+
+function expandAmbientCategory(category){
+  _ambientExpanded = (_ambientExpanded === category) ? null : category;
+  renderAmbientLibraryCard();
+}
+
+function playAmbientTrack(trackId){
+  if(typeof AMBIENT_LIBRARY==='undefined') return;
+  var allTracks = [];
+  AMBIENT_LIBRARY.forEach(function(c){ allTracks = allTracks.concat(c.tracks); });
+  var track = allTracks.find(function(t){ return t.id===trackId; });
+  if(!track) return;
+  _ambientTrackId = trackId;
+  ensureAmbientMiniPlayer(track);
+  renderAmbientLibraryCard();
+}
+
+function stopAmbient(){
+  _ambientTrackId = null;
+  var mp = document.getElementById('ambientMiniPlayer');
+  if(mp) mp.style.display = 'none';
+  var iframe = document.getElementById('ambientIframe');
+  if(iframe) iframe.src = '';
+  renderAmbientLibraryCard();
+}
+
+function ensureAmbientMiniPlayer(track){
+  var mp = document.getElementById('ambientMiniPlayer');
+  if(!mp){
+    mp = document.createElement('div');
+    mp.id = 'ambientMiniPlayer';
+    mp.style.cssText = 'position:fixed;bottom:calc(4rem + env(safe-area-inset-bottom));left:0;right:0;z-index:9000;background:rgba(10,13,26,.96);border-top:1px solid rgba(56,189,248,.18);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);';
+    document.body.appendChild(mp);
+  }
+  mp.style.display = 'block';
+  var iframeSrc = 'https://www.youtube-nocookie.com/embed/'+track.youtubeId+'?autoplay=1&loop=1&playlist='+track.youtubeId+'&controls=0&modestbranding=1';
+  mp.innerHTML = '<div style="display:flex;align-items:center;gap:.65rem;padding:.45rem 1rem;">'
+    +'<span style="font-size:.95rem;flex-shrink:0;">🎵</span>'
+    +'<div style="flex:1;min-width:0;">'
+    +'<div style="font-size:.6rem;font-weight:800;color:#38bdf8;text-transform:uppercase;letter-spacing:.06em;">Now Playing</div>'
+    +'<div style="font-size:.82rem;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+escapeHtml(track.title)+'</div>'
+    +'</div>'
+    +'<button type="button" onclick="stopAmbient()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);border-radius:8px;padding:.28rem .6rem;font-size:.72rem;cursor:pointer;font-family:var(--fm);">✕ Stop</button>'
+    +'</div>'
+    +'<iframe id="ambientIframe" src="'+iframeSrc+'" frameborder="0" allow="autoplay;encrypted-media" style="width:100%;height:36px;border:none;display:block;opacity:.28;" title="Ambient audio"></iframe>';
+}
+
+// ── Sermon Podcast Linking ─────────────────────────────────────
+
+function findPodcastForPastor(pastorName){
+  if(!pastorName || typeof CHRISTIAN_PODCASTS==='undefined') return null;
+  var lower = pastorName.toLowerCase();
+  for(var ci=0;ci<CHRISTIAN_PODCASTS.length;ci++){
+    var cat = CHRISTIAN_PODCASTS[ci];
+    for(var pi=0;pi<cat.podcasts.length;pi++){
+      var pod = cat.podcasts[pi];
+      var host = (pod.host||'').toLowerCase();
+      if(host.indexOf(lower)!==-1 || lower.indexOf(host)!==-1) return pod;
+    }
+  }
+  return null;
 }

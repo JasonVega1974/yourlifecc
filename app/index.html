@@ -4643,6 +4643,7 @@
     <button class="tab" data-bf-tab="audioBible" onclick="bfTab('audioBible',this)">🔊 Audio Bible</button>
     <button class="tab" data-bf-tab="audioMeditations" onclick="bfTab('audioMeditations',this)">🧘 Meditations</button>
     <button class="tab" data-bf-tab="sleepStories" onclick="bfTab('sleepStories',this)">🌙 Sleep Stories</button>
+    <button class="tab" data-bf-tab="ambientLibrary" onclick="bfTab('ambientLibrary',this)">🎵 Ambient</button>
     <button class="tab" onclick="window.location.href='/app/podcasts.html'">🎧 Podcasts</button>
     <button class="tab" onclick="window.location.href='/app/calendar.html'">📅 Faith Calendar</button>
     <button class="tab" onclick="wellGoto('worship')">🎵 Worship</button>
@@ -4902,6 +4903,11 @@
         <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(30,20,80,.5),rgba(167,139,250,.15));"><img class="topic-card-hero" data-card-id="bf-sleepStories" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1280px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg" alt="Sleep Stories"></div>
         <div class="topic-card-title">Sleep Stories</div>
         <div class="topic-card-desc">7 bedtime Scripture stories · fades out</div>
+      </div>
+      <div class="topic-card accent-cyan" onclick="bfTab('ambientLibrary')">
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(14,165,233,.12));"><img class="topic-card-hero" data-card-id="bf-ambientLibrary" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Headphones_on_a_yellow_background.jpg/1280px-Headphones_on_a_yellow_background.jpg" alt="Ambient Library"></div>
+        <div class="topic-card-title">Ambient Library</div>
+        <div class="topic-card-desc">6 categories · background audio</div>
       </div>
     </div>
 
@@ -7871,6 +7877,11 @@
     <div id="sleepStoriesRoot"></div>
   </div>
 
+  <!-- ════ Ambient Library (Audio Layer Worker 3) ════ -->
+  <div id="bf-ambientLibrary" style="display:none;">
+    <div id="ambientLibraryRoot"></div>
+  </div>
+
   <!-- ════ THE WELL — bottom nav (mirrors top .scrTabs; bfTab keeps both in sync) ════ -->
   <style>
     #s-scripture .scrTabs-bottom{
@@ -7925,6 +7936,7 @@
     <button class="tab" data-bf-tab="audioBible" onclick="bfTab('audioBible',this)"><span class="scrtab-icon">🔊</span><span>Audio Bible</span></button>
     <button class="tab" data-bf-tab="audioMeditations" onclick="bfTab('audioMeditations',this)"><span class="scrtab-icon">🧘</span><span>Meditations</span></button>
     <button class="tab" data-bf-tab="sleepStories" onclick="bfTab('sleepStories',this)"><span class="scrtab-icon">🌙</span><span>Sleep Stories</span></button>
+    <button class="tab" data-bf-tab="ambientLibrary" onclick="bfTab('ambientLibrary',this)"><span class="scrtab-icon">🎵</span><span>Ambient</span></button>
     <button class="tab" onclick="window.location.href='/app/podcasts.html'"><span class="scrtab-icon">🎧</span><span>Podcasts</span></button>
     <button class="tab" onclick="window.location.href='/app/calendar.html'"><span class="scrtab-icon">📅</span><span>Calendar</span></button>
     <button class="tab" onclick="wellGoto('worship')"><span class="scrtab-icon">🎵</span><span>Worship</span></button>
