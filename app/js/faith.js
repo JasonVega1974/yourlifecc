@@ -10656,6 +10656,15 @@ function renderMoodScripture(moodId){
       '</div>' +
       '</div>';
   }).join('');
+  var _moodAudioMap = (typeof MOOD_AUDIO_MAP !== 'undefined') ? MOOD_AUDIO_MAP[moodId] : null;
+  var _moodDeeperHtml = _moodAudioMap ? (
+    '<div style="margin-top:.75rem;border-top:1px solid rgba(255,255,255,.08);padding-top:.75rem;">' +
+    '<div style="font-size:.68rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem;">Want to go deeper?</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">' +
+    '<button type="button" onclick="_moodClose();startMeditation(\'' + _moodAudioMap.meditationId + '\')" style="background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.28);color:#a78bfa;border-radius:10px;padding:.55rem .4rem;font-size:.74rem;font-weight:800;cursor:pointer;font-family:var(--fm);line-height:1.3;">🧘 Meditate<br><span style="font-size:.65rem;opacity:.7;font-weight:500;">on this</span></button>' +
+    '<button type="button" onclick="_moodClose();playAmbientTrack(\'' + _moodAudioMap.ambientTrackId + '\')" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);color:#38bdf8;border-radius:10px;padding:.55rem .4rem;font-size:.74rem;font-weight:800;cursor:pointer;font-family:var(--fm);line-height:1.3;">🎵 Just listen<br><span style="font-size:.65rem;opacity:.7;font-weight:500;">ambient audio</span></button>' +
+    '</div></div>'
+  ) : '';
   overlay.innerHTML = '<div style="position:absolute;bottom:0;left:0;right:0;background:var(--bg2,#1a1233);border-top:1px solid rgba(255,255,255,.12);border-radius:20px 20px 0 0;padding:1.1rem 1rem 2rem;animation:slideUp .22s ease-out;max-width:520px;margin:0 auto;max-height:80vh;overflow-y:auto;">' +
     '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.85rem;">' +
     '<button onclick="_moodClose()" style="background:none;border:none;color:var(--tx2);font-size:.95rem;cursor:pointer;padding:.2rem .3rem;font-family:var(--fm);">← Back</button>' +
@@ -10665,6 +10674,7 @@ function renderMoodScripture(moodId){
     versesHtml +
     '<div style="margin-top:.75rem;"><button onclick="if(typeof startPrayerSession===\'function\')startPrayerSession(\'' + prayerSessionId + '\');else bfTab(\'prayer\');_moodClose();" ' +
     'style="width:100%;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.35);color:#a78bfa;border-radius:12px;padding:.6rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🙏 Pray about this</button></div>' +
+    _moodDeeperHtml +
     '</div>';
   overlay.style.display = 'block';
 }
@@ -11493,4 +11503,18 @@ function findPodcastForPastor(pastorName){
     }
   }
   return null;
+}
+
+// ── Premium TTS client wrapper ────────────────────────────────
+// Scaffolded for future ElevenLabs upgrade. Returns free-tier Web Speech
+// config now; when user.tier === 'premium' exists, fetches from /api/audio-tts.
+
+function getOptimalTTS(){
+  var userTier = (typeof D !== 'undefined' && D && D.user && D.user.tier) ? D.user.tier : 'free';
+  if(userTier === 'premium'){
+    // Future: call /api/audio-tts, get audio buffer, play with AudioContext.
+    // Falls through to free tier until ElevenLabs is configured.
+  }
+  if(typeof TTS_CONFIG !== 'undefined' && TTS_CONFIG.freeTier) return TTS_CONFIG.freeTier;
+  return { provider:'web-speech-api', rate:0.9, pitch:1.0, volume:1.0 };
 }

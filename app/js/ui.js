@@ -1570,6 +1570,7 @@ async function loadCardPhotoOverrides(){
     let appliedSk  = 0;
     let appliedAc  = 0;
     let appliedPp  = 0;
+    let appliedRp  = 0;
     Object.keys(overrides).forEach(cardId => {
       const url = overrides[cardId];
       if(!url) return;
@@ -1614,7 +1615,7 @@ async function loadCardPhotoOverrides(){
         const planId = cardId.slice('rp-'.length);
         if(window.RP_PHOTO_OVERRIDES[planId] !== url){
           window.RP_PHOTO_OVERRIDES[planId] = url;
-          appliedRp = (appliedRp || 0) + 1;
+          appliedRp++;
         }
       }
     });
