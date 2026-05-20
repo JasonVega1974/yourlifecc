@@ -11229,6 +11229,7 @@ var _ssFadeTimer = null;
 var _ssPaused = false;
 var _ssTtsVol = 1.0;
 var _ssPushedState = false;
+var _ssEscHandler = null;
 
 // Intercept system back button while either full-screen overlay is open
 window.addEventListener('popstate', function(){
@@ -11967,8 +11968,11 @@ function startSleepStory(storyId){
   var overlay = document.createElement('div');
   overlay.id = 'sleepStoryOverlay';
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9600;background:#020209;display:flex;flex-direction:column;overflow:hidden;';
+  overlay.addEventListener('click', function(e){ if(e.target === overlay) _ssClose(); });
   document.body.appendChild(overlay);
   document.body.style.overflow = 'hidden';
+  _ssEscHandler = function(e){ if(e.key === 'Escape') _ssClose(); };
+  document.addEventListener('keydown', _ssEscHandler);
   _ssRenderPlayer(story);
   _ssPlaySegment(story, 0);
   var fadeMs = (story.fadeOutAt||story.duration)*60000;
@@ -11979,27 +11983,49 @@ function _ssRenderPlayer(story){
   var overlay = document.getElementById('sleepStoryOverlay');
   if(!overlay) return;
   var seg = _ssSegments[_ssIdx]||'';
+  var ssAmbientSrc = 'https://www.youtube-nocookie.com/embed/'+story.ambientYouTube
+    + '?autoplay=1&mute=1&loop=1&playlist='+story.ambientYouTube
+    + '&controls=0&modestbranding=1&playsinline=1&rel=0&enablejsapi=1&origin='+encodeURIComponent(location.origin);
   overlay.innerHTML = [
-    '<div style="display:flex;align-items:center;justify-content:space-between;padding:max(env(safe-area-inset-top),.85rem) 1.1rem .4rem;flex-shrink:0;opacity:.3;">',
-    '<button type="button" onclick="_ssClose()" style="background:none;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.4);border-radius:8px;padding:.28rem .65rem;font-size:.7rem;cursor:pointer;font-family:var(--fm);">✕</button>',
-    '<span style="font-size:.7rem;color:rgba(255,255,255,.3);font-weight:600;">'+escapeHtml(story.title)+'</span>',
-    '<span style="font-size:.62rem;color:rgba(255,255,255,.2);">'+story.duration+' min</span>',
+    '<div style="display:flex;align-items:center;justify-content:space-between;padding:max(env(safe-area-inset-top),.85rem) 1.1rem .4rem;flex-shrink:0;">',
+    '<button type="button" onclick="_ssClose()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);border-radius:8px;padding:.38rem .85rem;font-size:.78rem;cursor:pointer;font-family:var(--fm);min-width:44px;min-height:44px;">✕</button>',
+    '<span style="font-size:.7rem;color:rgba(255,255,255,.4);font-weight:600;">'+escapeHtml(story.title)+'</span>',
+    '<span style="font-size:.62rem;color:rgba(255,255,255,.25);">'+story.duration+' min</span>',
     '</div>',
     '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:1rem 1.5rem;overflow:hidden;">',
     '<div style="font-size:2.4rem;margin-bottom:1rem;opacity:.3;">'+story.icon+'</div>',
     '<div id="ssVerseText" style="font-family:Georgia,serif;font-size:1.05rem;line-height:1.9;color:rgba(255,255,255,.58);text-align:center;font-style:italic;max-width:440px;transition:opacity .8s;opacity:1;">'+escapeHtml(seg)+'</div>',
     '<div id="ssVerseNum" style="margin-top:1.1rem;font-size:.6rem;color:rgba(255,255,255,.16);letter-spacing:.1em;">'+(_ssIdx+1)+' / '+_ssSegments.length+'</div>',
     '</div>',
-    '<div style="padding:.35rem 1.1rem .4rem;flex-shrink:0;opacity:.22;">',
-    '<div style="font-size:.52rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:.28rem;">🎵 Ambient</div>',
-    '<iframe src="https://www.youtube-nocookie.com/embed/'+story.ambientYouTube+'?autoplay=1&loop=1&playlist='+story.ambientYouTube+'&controls=1&modestbranding=1&playsinline=1&rel=0" frameborder="0" allow="autoplay;encrypted-media" style="width:100%;height:48px;border:none;border-radius:6px;display:block;" onerror="this.src=\'https://www.youtube-nocookie.com/embed/IXsIRMmfudw?autoplay=1&loop=1&playlist=IXsIRMmfudw&controls=1&modestbranding=1&playsinline=1&rel=0\';if(typeof showToast===\'function\')showToast(\'Track unavailable — playing fallback\');"></iframe>',
+    '<div style="padding:.35rem 1.1rem .5rem;flex-shrink:0;">',
+    '<div style="display:flex;align-items:center;gap:.5rem;">',
+    '<span style="font-size:.52rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);flex:1;">🎵 Ambient music</span>',
+    '<button type="button" id="ssAmbientMuteBtn" onclick="_ssMuteToggle()" style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);color:#fbbf24;border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🔇 Tap for audio</button>',
     '</div>',
-    '<div style="padding:.35rem 1.1rem 1rem;flex-shrink:0;display:flex;justify-content:center;gap:.55rem;opacity:.22;">',
-    '<button type="button" id="ssPauseBtn" onclick="_ssTogglePause()" style="background:none;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.45);border-radius:10px;padding:.45rem 1.1rem;font-size:.78rem;cursor:pointer;font-family:var(--fm);">⏸</button>',
-    '<button type="button" onclick="_ssClose()" style="background:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.35);border-radius:10px;padding:.45rem 1.1rem;font-size:.78rem;cursor:pointer;font-family:var(--fm);">✕ Stop</button>',
+    '<iframe id="ssAmbientIframe" src="'+ssAmbientSrc+'" frameborder="0" allow="autoplay;encrypted-media" style="width:0;height:0;position:absolute;border:none;pointer-events:none;top:0;left:0;" title="Ambient audio"></iframe>',
     '</div>',
-    '<div style="padding:0 1rem .55rem;text-align:center;font-size:.58rem;color:rgba(255,255,255,.1);">Fades out at '+story.duration+' min</div>'
+    '<div style="padding:.35rem 1.1rem 1rem;flex-shrink:0;display:flex;justify-content:center;gap:.55rem;">',
+    '<button type="button" id="ssPauseBtn" onclick="_ssTogglePause()" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.65);border-radius:10px;padding:.5rem 1.2rem;font-size:.82rem;cursor:pointer;font-family:var(--fm);min-width:44px;min-height:44px;">⏸</button>',
+    '<button type="button" onclick="_ssClose()" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.65);border-radius:10px;padding:.5rem 1.2rem;font-size:.82rem;cursor:pointer;font-family:var(--fm);min-width:44px;min-height:44px;">✕ Stop</button>',
+    '</div>',
+    '<div style="padding:0 1rem .55rem;text-align:center;font-size:.58rem;color:rgba(255,255,255,.12);">Fades out at '+story.duration+' min · Tap anywhere outside content to close</div>'
   ].join('');
+}
+
+function _ssMuteToggle(){
+  var iframe = document.getElementById('ssAmbientIframe');
+  var btn = document.getElementById('ssAmbientMuteBtn');
+  if(!iframe || !btn) return;
+  var muted = iframe.src.includes('&mute=1');
+  var newSrc = muted
+    ? iframe.src.replace('&mute=1', '&mute=0')
+    : iframe.src.replace('&mute=0', '&mute=1');
+  if(newSrc === iframe.src) newSrc += (muted ? '&mute=0' : '&mute=1');
+  iframe.src = newSrc;
+  btn.textContent = muted ? '🔊 Audio on' : '🔇 Audio off';
+  btn.style.background = muted ? 'rgba(56,189,248,.12)' : 'rgba(255,255,255,.06)';
+  btn.style.border = '1px solid ' + (muted ? 'rgba(56,189,248,.3)' : 'rgba(255,255,255,.12)');
+  btn.style.color = muted ? '#38bdf8' : 'rgba(255,255,255,.4)';
 }
 
 function _ssPlaySegment(story, idx){
@@ -12068,11 +12094,15 @@ function _ssClose(){
   if(_ssFadeTimer){ clearTimeout(_ssFadeTimer); _ssFadeTimer = null; }
   if('speechSynthesis' in window) window.speechSynthesis.cancel();
   _ssReleaseWakeLock();
+  if(_ssEscHandler){ document.removeEventListener('keydown', _ssEscHandler); _ssEscHandler = null; }
   var overlay = document.getElementById('sleepStoryOverlay');
   if(overlay) overlay.remove();
   document.body.style.overflow = '';
   _ssId = null; _ssIdx = 0; _ssPaused = false; _ssTtsVol = 1.0; _ssSegments = [];
-  if(_ssPushedState){ _ssPushedState = false; try{ history.back(); }catch(e){} }
+  if(_ssPushedState){
+    _ssPushedState = false;
+    try{ if(window.history.state && window.history.state.ylccSS) history.back(); }catch(e){}
+  }
 }
 
 function _ssFadeOut(story){
@@ -12295,11 +12325,16 @@ function toggleAmbientMute(){
   var btn = document.getElementById('ambientUnmuteBtn');
   if(!iframe) return;
   _ambientMuted = !_ambientMuted;
+  // Src swap is the reliable cross-browser approach (including iOS Safari);
+  // the user tap provides the required gesture activation for unmuted autoplay.
+  var newSrc = _ambientMuted
+    ? iframe.src.replace('&mute=0', '&mute=1')
+    : iframe.src.replace('&mute=1', '&mute=0');
+  if(newSrc === iframe.src) newSrc += (_ambientMuted ? '&mute=1' : '&mute=0');
+  iframe.src = newSrc;
   try {
-    iframe.contentWindow.postMessage(
-      JSON.stringify({event:'command', func: _ambientMuted ? 'mute' : 'unMute', args:''}),
-      'https://www.youtube-nocookie.com'
-    );
+    var key = typeof _ylccUserKey==='function' ? _ylccUserKey('ambient_muted') : 'ylcc_ambient_muted';
+    localStorage.setItem(key, _ambientMuted ? '1' : '0');
   } catch(e){}
   if(btn){
     btn.textContent = _ambientMuted ? '🔇 Unmute' : '🔊 Mute';
