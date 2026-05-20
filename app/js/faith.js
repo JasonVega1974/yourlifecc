@@ -439,7 +439,7 @@ function initScripture(){
 // the original 6 tabs. New tabs without renderers are stubs awaiting later phases.
 // btn is optional — when bfTab() is called programmatically (e.g., from a Quick
 // Tile or stub-panel CTA), the matching button is found via [data-bf-tab].
-const BF_TABS = ['home','devotional','jesus','denominations','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy','studyTools'];
+const BF_TABS = ['home','devotional','jesus','denominations','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy','studyTools','readingPlans'];
 
 // Phase 5.8 v3 — Home-grid restorer. Defensive against any prior code
 // that may have set .topic-card-grid display:none inside #bf-home. The
@@ -685,6 +685,7 @@ function bfTab(tab, btn){
   if(tab==='proofProphecy') renderProofProphecy();
   if(tab==='bibleStudy') initBibleStudyTab();
   if(tab==='studyTools') renderBibleStudyCard();
+  if(tab==='readingPlans') renderReadingPlansCard();
 }
 
 // ── FAITH HOME (F2-A) ────────────────────────────────────────
@@ -697,9 +698,11 @@ function renderFaithHome(){
   try {
     const s = getTodayScripture();
     const dEl = document.getElementById('fhVotdDay'); if(dEl) dEl.textContent = s.day;
-    const tEl = document.getElementById('fhVotdText'); if(tEl) tEl.textContent = '“' + s.text + '”';
+    const tEl = document.getElementById('fhVotdText'); if(tEl) tEl.textContent = '”' + s.text + '”';
     const rEl = document.getElementById('fhVotdRef'); if(rEl) rEl.textContent = '— ' + s.ref;
   } catch(e){ /* DAILY_SCRIPTURES not loaded — leave placeholder */ }
+  // Worker 2 — AI reflection below VOTD (cached per user per day)
+  if(typeof renderVotdAiReflection === 'function') renderVotdAiReflection();
 
   // Card 2 — Today's Devotional preview
   try {
@@ -836,6 +839,12 @@ function renderFaithHome(){
 
   // Phase 4A: Featured content card (admin-scheduled, today's entry)
   renderFeaturedContentCard();
+
+  // Engagement Loop — reading plan streak banner above topic grid
+  if(typeof renderRpStreakBanner === 'function') renderRpStreakBanner();
+
+  // Worker 2 — Mood check-in (once per day, internal gate in checkShowMoodPrompt)
+  if(typeof checkShowMoodPrompt === 'function') checkShowMoodPrompt();
 
   // F2-H: Family Verse of the Week (only when family profiles exist).
   const fvEl = document.getElementById('fhFamilyVerseCard');
@@ -1667,6 +1676,11 @@ function _planDayHtml(p, d, prog, completedArchive, todayDay){
 }
 
 function openPlanDetail(planId){
+  if(typeof READING_PLANS !== 'undefined' && READING_PLANS.some(function(p){return p.id===planId;})){
+    bfTab('readingPlans');
+    setTimeout(function(){ _rpOpenDay(planId); }, 60);
+    return;
+  }
   const p = planById(planId);
   if(!p){ showToast('Plan not found'); return; }
   const store = planStore();
@@ -3885,11 +3899,12 @@ function prSubTab(sub, btn){
     btn.classList.add('active');
     btn.setAttribute('aria-selected', 'true');
   }
-  ['mine','wall','howto','examples','who'].forEach(s => {
+  ['mine','guided','wall','howto','examples','who'].forEach(s => {
     const pane = document.getElementById('pr-pane-' + s);
     if(pane) pane.style.display = (s === sub) ? '' : 'none';
   });
   if(sub === 'mine')         renderMyPrayersPane();
+  else if(sub === 'guided')  { if(typeof renderGuidedPrayerPane === 'function') renderGuidedPrayerPane(); }
   else if(sub === 'wall')    renderPrayerWallPane();
   else if(sub === 'howto')   renderHowToPrayPane();
   else if(sub === 'examples') renderPrayerExamplesPane();
@@ -5281,6 +5296,7 @@ function saveSermonNote(){
     D.scrPoints = (D.scrPoints || 0) + 5;
   }
   save();
+  _snSyncToCloud(Object.assign({}, _sermonEditingId ? D.sermonNotes.find(s => s && s.id === _sermonEditingId) : payload, {id: _sermonEditingId || payload.id}));
   if(typeof logActivity === 'function') logActivity('faith', 'Sermon: ' + (payload.title || takeaway).slice(0, 80));
   closeSermonNote();
   renderSermonNotes();
@@ -5296,6 +5312,39 @@ function deleteSermonNote(){
   closeSermonNote();
   renderSermonNotes();
   showToast('Sermon deleted');
+}
+
+function _snSyncToCloud(note){
+  try{
+    var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
+    var uid = (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.id) ? _supaUser.id : null;
+    if(!sb || !uid || !note) return;
+    sb.from('sermon_notes').upsert({
+      user_id: uid, note_date: note.date || new Date().toISOString().slice(0,10),
+      church_name: note.church || null, pastor_name: note.speaker || null,
+      sermon_title: note.title || null, scripture_ref: note.scriptures || null,
+      notes: note.notes || null, key_verse: note.takeaway || null,
+      action_this_week: note.actionStep || null,
+      updated_at: new Date().toISOString()
+    }, {onConflict: 'user_id,note_date'}).then(function(){});
+  }catch(e){}
+}
+
+function exportSermonNote(id){
+  const note = (D.sermonNotes || []).find(s => s && s.id === id);
+  if(!note) return;
+  const parts = [
+    note.date ? '📅 ' + note.date : '',
+    note.church ? '⛪ ' + note.church : '',
+    note.speaker ? '👤 ' + note.speaker : '',
+    note.title ? '"' + note.title + '"' : '',
+    note.scriptures ? '📖 ' + note.scriptures : '',
+    note.takeaway ? '\n⭐ Takeaway: ' + note.takeaway : '',
+    note.notes ? '\n📝 Notes: ' + note.notes : '',
+    note.actionStep ? '\n🎯 This week: ' + note.actionStep : '',
+  ].filter(Boolean);
+  const text = parts.join(' · ').replace(' · \n', '\n');
+  if(navigator.clipboard){ navigator.clipboard.writeText(text).then(function(){ showToast('Copied to clipboard!'); }); }
 }
 
 function renderSermonNotes(){
@@ -5329,6 +5378,7 @@ function renderSermonNotes(){
           <span>${s.date || ''}</span>
           ${ref ? '<span>·</span><span>'+escapeHtml(ref)+'</span>' : ''}
           ${s.title ? '<span>·</span><span style="color:var(--tx);text-transform:none;letter-spacing:0;font-weight:600;">'+escapeHtml(s.title)+'</span>' : ''}
+          <span onclick="event.stopPropagation();exportSermonNote(${s.id})" style="margin-left:auto;cursor:pointer;opacity:.6;font-size:.7rem;" title="Copy to clipboard">📋</span>
         </div>
         <div style="font-size:.85rem;line-height:1.5;color:var(--tx);font-weight:600;margin-bottom:${s.scriptures||s.actionStep?'.3rem':'0'};">⭐ ${escapeHtml(s.takeaway || '')}</div>
         ${s.scriptures ? '<div style="font-size:.7rem;color:#a78bfa;font-weight:700;margin-bottom:.2rem;">📖 '+escapeHtml(s.scriptures)+'</div>' : ''}
@@ -10173,4 +10223,598 @@ function _stNoteFromPassage(ref){
     var ta = document.getElementById('stNoteText');
     if(ta) ta.focus();
   }, 60);
+}
+
+// ── READING PLANS — Engagement Loop Worker 1 ─────────────────────────────────
+// Data: READING_PLANS, MOOD_SCRIPTURE, PRAYER_SESSIONS from app/js/data/reading-plans.js
+// Storage: per-user localStorage keys via _rpKey() — survives cloudLoad overwrites.
+// Supabase sync: fire-and-forget on markComplete (migration in docs/migrations/engagement-loop.sql).
+
+function _rpKey(suffix){
+  var uid = (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.id) ? _supaUser.id : 'anon';
+  return 'ylcc_rp_' + uid + '_' + suffix;
+}
+
+function _rpGetProgress(planId){
+  try { var r = localStorage.getItem(_rpKey('prog_' + planId)); return r ? JSON.parse(r) : null; } catch(e){ return null; }
+}
+
+function _rpSaveProgress(planId, prog){
+  try { localStorage.setItem(_rpKey('prog_' + planId), JSON.stringify(prog)); } catch(e){}
+  // Fire-and-forget Supabase sync (non-blocking)
+  _rpSyncToCloud(planId, prog);
+}
+
+function _rpSyncToCloud(planId, prog){
+  try {
+    var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
+    var uid = (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.id) ? _supaUser.id : null;
+    if(!sb || !uid) return;
+    sb.from('reading_plan_progress').upsert({
+      user_id: uid, plan_id: planId,
+      current_day: prog.currentDay || 1,
+      started_date: prog.startedDate || new Date().toISOString().slice(0,10),
+      last_read_date: prog.lastReadDate || null,
+      completed_days: prog.completedDays || [],
+      streak: prog.streak || 0,
+      longest_streak: prog.longestStreak || 0,
+      completed: prog.completed || false,
+      updated_at: new Date().toISOString()
+    }, {onConflict: 'user_id,plan_id'}).then(function(){});
+  } catch(e){}
+}
+
+function _rpCalculateStreak(completedDays, lastReadDate){
+  if(!completedDays || !completedDays.length || !lastReadDate) return 0;
+  var today = new Date().toISOString().slice(0,10);
+  var yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+  if(lastReadDate !== today && lastReadDate !== yesterday) return 0;
+  var sorted = completedDays.slice().sort(function(a,b){ return b - a; });
+  var streak = 1;
+  for(var i = 1; i < sorted.length; i++){
+    if(sorted[i] === sorted[i-1] - 1) streak++;
+    else break;
+  }
+  return streak;
+}
+
+function _rpBestStreak(){
+  if(typeof READING_PLANS === 'undefined') return 0;
+  var best = 0;
+  READING_PLANS.forEach(function(p){
+    var prog = _rpGetProgress(p.id);
+    if(!prog) return;
+    var s = _rpCalculateStreak(prog.completedDays || [], prog.lastReadDate || '');
+    if(s > best) best = s;
+  });
+  return best;
+}
+
+function renderRpStreakBanner(){
+  var banner = document.getElementById('rpStreakBanner');
+  if(!banner) return;
+  var streak = _rpBestStreak();
+  if(streak < 1){ banner.style.display = 'none'; return; }
+  banner.style.display = 'flex';
+  var txt = document.getElementById('rpStreakBannerText');
+  if(txt) txt.textContent = streak + (streak === 1 ? ' day' : ' days') + ' reading streak — keep it going!';
+}
+
+// Returns active plan data shaped for renderFaithHome Card 3 fhPlanBody
+function fhActivePlan(){
+  if(typeof READING_PLANS === 'undefined') return null;
+  var best = null, bestDate = '';
+  READING_PLANS.forEach(function(p){
+    var prog = _rpGetProgress(p.id);
+    if(!prog || prog.completed) return;
+    if(!best || (prog.lastReadDate || '') >= bestDate){
+      best = {plan: p, prog: prog};
+      bestDate = prog.lastReadDate || '';
+    }
+  });
+  if(!best) return null;
+  var p = best.plan, prog = best.prog;
+  return {
+    plan: { id: p.id, title: p.title, badgeIcon: p.icon, brandColor: '#10b981', daysData: [] },
+    prog: { currentDay: Math.min(prog.currentDay || 1, p.days), totalDays: p.days }
+  };
+}
+
+function renderReadingPlansCard(){
+  var root = document.getElementById('readingPlansRoot');
+  if(!root) return;
+  if(typeof READING_PLANS === 'undefined'){
+    root.innerHTML = '<div style="color:var(--tx2);padding:1rem;">Reading plans loading…</div>';
+    return;
+  }
+  var DIFF_LABELS = {beginner:'✦ Beginner', intermediate:'✦✦ Intermediate', advanced:'✦✦✦ Advanced'};
+  var DIFF_COLORS = {beginner:'#10b981', intermediate:'#38bdf8', advanced:'#a78bfa'};
+
+  var activePlans = [];
+  READING_PLANS.forEach(function(p){
+    var prog = _rpGetProgress(p.id);
+    if(prog && !prog.completed) activePlans.push({plan:p, prog:prog});
+  });
+
+  var html = '<div style="padding:.2rem 0 1rem;">';
+  html += '<div class="bf-section-hdr"><div class="bf-eyebrow">SCRIPTURE · GROWTH · CONSISTENCY</div><div class="bf-title">Reading Plans</div><div class="bf-sub">Choose a plan and read through Scripture day by day. Track your streak.</div></div>';
+
+  if(activePlans.length){
+    html += '<div style="margin-bottom:1.2rem;"><div style="font-size:.63rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#38bdf8;margin-bottom:.6rem;">ACTIVE PLANS</div>';
+    activePlans.forEach(function(item){
+      var p = item.plan, prog = item.prog;
+      var pct = Math.round(((prog.currentDay - 1) / p.days) * 100);
+      var streak = _rpCalculateStreak(prog.completedDays || [], prog.lastReadDate || '');
+      html += '<div style="background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.2);border-radius:14px;padding:1rem;margin-bottom:.65rem;cursor:pointer;" onclick="_rpOpenDay(\'' + p.id + '\')">';
+      html += '<div style="display:flex;align-items:center;gap:.55rem;margin-bottom:.5rem;"><span style="font-size:1.5rem;">' + p.icon + '</span><div style="flex:1;min-width:0;"><div style="font-size:.9rem;font-weight:800;color:var(--tx);">' + p.title + '</div><div style="font-size:.67rem;color:var(--tx3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Day ' + prog.currentDay + ' of ' + p.days + (streak > 0 ? ' · 🔥 ' + streak + ' day streak' : '') + '</div></div><div style="font-size:.78rem;font-weight:800;color:#38bdf8;">' + pct + '%</div></div>';
+      html += '<div style="height:5px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-bottom:.65rem;"><div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#38bdf8,#10b981);border-radius:99px;"></div></div>';
+      html += '<button class="rp-btn" onclick="event.stopPropagation();_rpOpenDay(\'' + p.id + '\')">📖 Read Day ' + prog.currentDay + '</button>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  html += '<div style="font-size:.63rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--tx3);margin-bottom:.6rem;">' + (activePlans.length ? 'ALL PLANS' : 'CHOOSE A PLAN') + '</div>';
+  html += '<div style="display:grid;gap:.6rem;">';
+  READING_PLANS.forEach(function(p){
+    var prog = _rpGetProgress(p.id);
+    var isActive = prog && !prog.completed;
+    var isDone = prog && prog.completed;
+    html += '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;" onclick="_rpStartOrContinue(\'' + p.id + '\')">';
+    html += '<span style="font-size:2rem;line-height:1;flex-shrink:0;">' + p.icon + '</span>';
+    html += '<div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;margin-bottom:.18rem;">';
+    html += '<span style="font-size:.88rem;font-weight:800;color:var(--tx);">' + p.title + '</span>';
+    if(isDone) html += '<span style="font-size:.6rem;font-weight:800;background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3);border-radius:99px;padding:.08rem .4rem;">✓ Done</span>';
+    else if(isActive) html += '<span style="font-size:.6rem;font-weight:800;background:rgba(56,189,248,.15);color:#38bdf8;border:1px solid rgba(56,189,248,.3);border-radius:99px;padding:.08rem .4rem;">In Progress</span>';
+    html += '</div><div style="font-size:.75rem;color:var(--tx2);line-height:1.4;margin-bottom:.28rem;">' + p.subtitle + '</div>';
+    html += '<div style="display:flex;align-items:center;gap:.4rem;"><span style="font-size:.6rem;font-weight:700;color:' + (DIFF_COLORS[p.difficulty]||'#a78bfa') + ';">' + (DIFF_LABELS[p.difficulty]||p.difficulty) + '</span><span style="font-size:.6rem;color:var(--tx3);">·</span><span style="font-size:.6rem;color:var(--tx3);font-weight:600;">' + p.days + ' days</span></div>';
+    html += '</div><span style="font-size:1.1rem;color:var(--tx3);flex-shrink:0;">' + (isActive ? '▶' : isDone ? '↺' : '+') + '</span></div>';
+  });
+  html += '</div></div>';
+  root.innerHTML = html;
+}
+
+function _rpStartOrContinue(planId){
+  var prog = _rpGetProgress(planId);
+  if(prog && !prog.completed){ _rpOpenDay(planId); return; }
+  var today = new Date().toISOString().slice(0,10);
+  _rpSaveProgress(planId, {planId:planId, currentDay:1, startedDate:today, lastReadDate:null, completedDays:[], streak:0, longestStreak:0, completed:false});
+  _rpOpenDay(planId);
+}
+
+function _rpOpenDay(planId){
+  var plan = (typeof READING_PLANS !== 'undefined') ? READING_PLANS.find(function(p){ return p.id === planId; }) : null;
+  if(!plan) return;
+  var prog = _rpGetProgress(planId);
+  if(!prog){ _rpStartOrContinue(planId); return; }
+
+  var root = document.getElementById('readingPlansRoot');
+  if(!root) return;
+  var dayNum = Math.min(prog.currentDay || 1, plan.days);
+  var dayData = plan.days_content[dayNum - 1];
+  if(!dayData) return;
+
+  var streak = _rpCalculateStreak(prog.completedDays || [], prog.lastReadDate || '');
+  var today = new Date().toISOString().slice(0,10);
+  var markedToday = (prog.completedDays || []).indexOf(dayNum) >= 0 && prog.lastReadDate === today;
+  var pct = Math.round(((dayNum - 1) / plan.days) * 100);
+
+  var html = '<div style="padding:.2rem 0 1rem;">';
+  html += '<button class="pp-back-btn" onclick="renderReadingPlansCard()" aria-label="Back to Plans" style="margin-bottom:.7rem;">← Plans</button>';
+  html += '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.9rem;"><span style="font-size:1.4rem;">' + plan.icon + '</span><div style="flex:1;"><div style="font-size:.78rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em;">' + plan.title + '</div><div style="font-size:.67rem;color:var(--tx3);">Day ' + dayNum + ' of ' + plan.days + (streak > 0 ? ' · 🔥 ' + streak + ' day streak' : '') + '</div></div></div>';
+  html += '<div style="height:6px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-bottom:1.1rem;"><div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#38bdf8,#10b981);border-radius:99px;"></div></div>';
+
+  html += '<div style="background:var(--cd-banner);border-radius:16px;padding:1.15rem;margin-bottom:.9rem;box-shadow:var(--cd-banner-shadow);">';
+  html += '<div style="font-size:.6rem;font-weight:800;letter-spacing:.2em;text-transform:uppercase;opacity:.75;margin-bottom:.3rem;">Day ' + dayNum + ' · ' + (dayData.theme||'') + '</div>';
+  html += '<div style="font-family:var(--fh,var(--fm));font-size:1.12rem;font-weight:700;line-height:1.4;">' + (dayData.title||'') + '</div>';
+  html += '</div>';
+
+  if(dayData.readings && dayData.readings.length){
+    html += '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:1rem;margin-bottom:.85rem;">';
+    html += '<div style="font-size:.62rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:#38bdf8;margin-bottom:.5rem;">📖 Today\'s Readings</div>';
+    dayData.readings.forEach(function(ref){ html += '<div style="font-size:.84rem;color:var(--tx);font-weight:600;padding:.18rem 0;">• ' + ref + '</div>'; });
+    html += '</div>';
+  }
+
+  if(dayData.keyVerse){
+    html += '<div style="background:rgba(251,191,36,.06);border-left:3px solid #fbbf24;border-radius:0 12px 12px 0;padding:.8rem 1rem;margin-bottom:.85rem;">';
+    html += '<div style="font-size:.6rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:#fbbf24;margin-bottom:.3rem;">✨ Key Verse</div>';
+    html += '<div style="font-size:.88rem;font-weight:700;color:var(--tx);">' + dayData.keyVerse + '</div>';
+    html += '</div>';
+  }
+
+  if(dayData.reflection){
+    html += '<div style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.18);border-radius:14px;padding:1rem;margin-bottom:.85rem;">';
+    html += '<div style="font-size:.6rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:#a78bfa;margin-bottom:.4rem;">💭 Reflection</div>';
+    html += '<div style="font-size:.87rem;color:var(--tx2);line-height:1.65;font-style:italic;">' + dayData.reflection + '</div>';
+    html += '</div>';
+  }
+
+  if(dayData.prayer){
+    html += '<div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2);border-radius:14px;padding:1rem;margin-bottom:1.1rem;">';
+    html += '<div style="font-size:.6rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:#10b981;margin-bottom:.4rem;">🙏 Prayer</div>';
+    html += '<div style="font-size:.87rem;color:var(--tx2);line-height:1.65;font-style:italic;">' + dayData.prayer + '</div>';
+    html += '</div>';
+  }
+
+  if(!markedToday){
+    html += '<button style="width:100%;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:14px;padding:.95rem;font-size:.9rem;font-weight:900;cursor:pointer;font-family:var(--fm);letter-spacing:.02em;" onclick="_rpMarkComplete(\'' + planId + '\',' + dayNum + ')">✅ Mark Day ' + dayNum + ' Complete</button>';
+  } else {
+    html += '<div style="text-align:center;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-radius:14px;padding:.85rem;font-size:.87rem;font-weight:800;color:#6ee7b7;">✅ Day ' + dayNum + ' complete — see you tomorrow!</div>';
+    if(dayNum < plan.days){
+      html += '<button style="width:100%;margin-top:.55rem;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.22);color:#38bdf8;border-radius:14px;padding:.65rem;font-size:.82rem;font-weight:800;cursor:pointer;font-family:var(--fm);" onclick="_rpPreviewNext(\'' + planId + '\',' + dayNum + ')">→ Preview Day ' + (dayNum+1) + '</button>';
+    }
+  }
+  html += '</div>';
+  root.innerHTML = html;
+}
+
+function _rpMarkComplete(planId, dayNum){
+  var plan = (typeof READING_PLANS !== 'undefined') ? READING_PLANS.find(function(p){ return p.id === planId; }) : null;
+  if(!plan) return;
+  var today = new Date().toISOString().slice(0,10);
+  var prog = _rpGetProgress(planId) || {planId:planId, currentDay:1, startedDate:today, lastReadDate:null, completedDays:[], streak:0, longestStreak:0, completed:false};
+
+  if((prog.completedDays||[]).indexOf(dayNum) < 0) prog.completedDays = (prog.completedDays||[]).concat([dayNum]);
+  prog.lastReadDate = today;
+  if(dayNum >= (prog.currentDay||1)) prog.currentDay = Math.min(dayNum + 1, plan.days + 1);
+  prog.streak = _rpCalculateStreak(prog.completedDays, prog.lastReadDate);
+  prog.longestStreak = Math.max(prog.longestStreak || 0, prog.streak);
+  if(prog.currentDay > plan.days) prog.completed = true;
+
+  _rpSaveProgress(planId, prog);
+  if(typeof renderRpStreakBanner === 'function') renderRpStreakBanner();
+  if(typeof renderFaithHome === 'function') renderFaithHome();
+
+  if(prog.streak >= 2 && typeof showToast === 'function') showToast('🔥 ' + prog.streak + ' day streak!');
+  _rpOpenDay(planId);
+}
+
+function _rpPreviewNext(planId, currentDay){
+  var plan = (typeof READING_PLANS !== 'undefined') ? READING_PLANS.find(function(p){ return p.id === planId; }) : null;
+  if(!plan) return;
+  var prog = _rpGetProgress(planId);
+  if(!prog) return;
+  prog.currentDay = Math.min(currentDay + 1, plan.days);
+  _rpSaveProgress(planId, prog);
+  _rpOpenDay(planId);
+}
+
+// ── VOTD AI REFLECTION + MOOD CHECK-IN — Engagement Loop Worker 2 ─────────────
+// VOTD: fetches a 2-sentence Claude reflection for today's verse once per day,
+// caches in localStorage, renders into #votdAiBlock in the well-votd strip.
+// Mood: once-per-day bottom sheet → scripture view keyed to MOOD_SCRIPTURE data.
+
+function renderVotdAiReflection(){
+  var block = document.getElementById('votdAiBlock');
+  if(!block) return;
+  var cacheKey = _ylccUserKey('ylcc_votd_' + new Date().toDateString());
+  var cached = null;
+  try{ var r = localStorage.getItem(cacheKey); cached = r ? JSON.parse(r) : null; }catch(e){}
+  if(cached && cached.text){ _votdShowReflection(cached.text, block); return; }
+  var s = null;
+  try{ s = getTodayScripture(); }catch(e){}
+  if(!s || !s.text) return;
+  var streak = (typeof _rpBestStreak === 'function') ? _rpBestStreak() : 0;
+  block.style.display = '';
+  block.innerHTML = '<div style="font-size:.68rem;color:rgba(255,255,255,.38);font-style:italic;padding:.1rem 0;">Getting reflection…</div>';
+  fetch('/api/ai-summary', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      mode: 'votd-reflection',
+      prompt: 'Verse: ' + s.ref + ' — "' + s.text + '"\nStreak: ' + streak + ' days reading'
+    })
+  }).then(function(r){ return r.json(); }).then(function(data){
+    var text = (data && data.text) ? data.text.trim() : '';
+    if(text){
+      try{ localStorage.setItem(cacheKey, JSON.stringify({text: text})); }catch(e){}
+      _votdShowReflection(text, block);
+    } else {
+      block.style.display = 'none';
+    }
+  }).catch(function(){ block.style.display = 'none'; });
+}
+
+function _votdShowReflection(text, block){
+  if(!block) block = document.getElementById('votdAiBlock');
+  if(!block) return;
+  block.style.display = '';
+  block.innerHTML = '<div style="font-size:.56rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-bottom:.25rem;">✦ Reflection</div>' +
+    '<div style="font-size:.78rem;line-height:1.6;opacity:.82;">' + escapeHtml(text) + '</div>';
+}
+
+function _votdCopyVerse(){
+  var s = null;
+  try{ s = getTodayScripture(); }catch(e){}
+  if(!s) return;
+  var txt = '"' + s.text + '" — ' + s.ref;
+  if(navigator.clipboard){ navigator.clipboard.writeText(txt).then(function(){ if(typeof showToast==='function') showToast('Verse copied!'); }); }
+}
+
+function _votdSaveToJourney(){
+  var s = null;
+  try{ s = getTodayScripture(); }catch(e){}
+  if(!s) return;
+  var key = (typeof _ylccUserKey === 'function') ? _ylccUserKey('ylcc_fj_manual') : 'ylcc_fj_manual_local';
+  try{
+    var notes = JSON.parse(localStorage.getItem(key) || '[]');
+    notes.unshift({ id: Date.now(), date: new Date().toISOString().slice(0,10), type:'verse', ref: s.ref, text: s.text, source:'votd' });
+    localStorage.setItem(key, JSON.stringify(notes.slice(0,200)));
+    if(typeof showToast==='function') showToast('Saved to Faith Journey!');
+  }catch(e){}
+}
+
+// ── MOOD CHECK-IN ─────────────────────────────────────────────────────────────
+
+var MOOD_TO_PRAYER = { grateful:'gratitude', anxious:'anxiety', sad:'anxiety', angry:'morning', lost:'fasting' };
+
+function _moodKey(suffix){
+  var uid = (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.id) ? _supaUser.id : 'anon';
+  return 'ylcc_mood_' + uid + '_' + suffix;
+}
+
+// checkShowMoodPrompt(force) — pass force=true from the "How I feel" button to always show.
+// Without force: gates on once-per-day + skip count <= 3 logic.
+function checkShowMoodPrompt(force){
+  if(force){ renderMoodPicker(); return; }
+  var today = new Date().toDateString();
+  try{
+    if(localStorage.getItem(_moodKey('last_shown')) === today) return;
+    var skipCount = parseInt(localStorage.getItem(_moodKey('skip_count')) || '0', 10);
+    if(skipCount >= 3){
+      var skipDate = localStorage.getItem(_moodKey('skip_date'));
+      if(skipDate){
+        var daysSince = Math.floor((Date.now() - new Date(skipDate).getTime()) / 86400000);
+        if(daysSince < 7) return;
+        localStorage.removeItem(_moodKey('skip_count'));
+        localStorage.removeItem(_moodKey('skip_date'));
+      }
+    }
+  }catch(e){ return; }
+  setTimeout(function(){ renderMoodPicker(); }, 900);
+}
+
+function renderMoodPicker(){
+  var overlay = document.getElementById('moodCheckInOverlay');
+  if(!overlay) return;
+  var btns = ['grateful','anxious','sad','angry','lost'].map(function(id){
+    var map = {grateful:{e:'😊',l:'Grateful'},anxious:{e:'😟',l:'Anxious'},sad:{e:'😔',l:'Sad'},angry:{e:'😤',l:'Frustrated'},lost:{e:'😶',l:'Lost'}};
+    var m = map[id];
+    return '<button onclick="selectMood(\'' + id + '\')" style="background:none;border:2px solid rgba(255,255,255,.1);border-radius:14px;padding:.5rem .55rem;cursor:pointer;font-family:var(--fm);display:flex;flex-direction:column;align-items:center;gap:.25rem;min-width:3rem;transition:border-color .15s;" ' +
+      'onmouseover="this.style.borderColor=\'rgba(167,139,250,.5)\'" onmouseout="this.style.borderColor=\'rgba(255,255,255,.1)\'">' +
+      '<span style="font-size:1.8rem;">' + m.e + '</span>' +
+      '<span style="font-size:.6rem;font-weight:700;color:var(--tx2);">' + m.l + '</span>' +
+      '</button>';
+  }).join('');
+  overlay.innerHTML = '<div style="position:absolute;bottom:0;left:0;right:0;background:var(--bg2,#1a1233);border-top:1px solid rgba(255,255,255,.12);border-radius:20px 20px 0 0;padding:1.1rem 1rem 2rem;animation:slideUp .22s ease-out;max-width:520px;margin:0 auto;">' +
+    '<div style="width:36px;height:4px;background:rgba(255,255,255,.18);border-radius:2px;margin:0 auto .9rem;"></div>' +
+    '<div style="font-size:.85rem;font-weight:800;color:var(--tx);margin-bottom:.85rem;text-align:center;">How are you feeling today?</div>' +
+    '<div style="display:flex;justify-content:center;gap:.7rem;margin-bottom:1rem;flex-wrap:wrap;">' + btns + '</div>' +
+    '<div style="text-align:center;"><button onclick="_moodSkip()" style="background:none;border:none;color:var(--tx2);font-size:.72rem;cursor:pointer;font-family:var(--fm);padding:.3rem .6rem;">Skip for today</button></div>' +
+    '</div>';
+  overlay.style.display = 'block';
+}
+
+function selectMood(moodId){
+  saveMoodLog(moodId);
+  try{
+    localStorage.setItem(_moodKey('last_shown'), new Date().toDateString());
+    localStorage.removeItem(_moodKey('skip_count'));
+    localStorage.removeItem(_moodKey('skip_date'));
+  }catch(e){}
+  renderMoodScripture(moodId);
+}
+
+function _moodSkip(){
+  try{
+    localStorage.setItem(_moodKey('last_shown'), new Date().toDateString());
+    var count = parseInt(localStorage.getItem(_moodKey('skip_count')) || '0', 10) + 1;
+    localStorage.setItem(_moodKey('skip_count'), String(count));
+    if(count === 1) localStorage.setItem(_moodKey('skip_date'), new Date().toDateString());
+  }catch(e){}
+  _moodClose();
+}
+
+function _moodClose(){
+  var overlay = document.getElementById('moodCheckInOverlay');
+  if(overlay){ overlay.style.display = 'none'; overlay.innerHTML = ''; }
+}
+
+function renderMoodScripture(moodId){
+  if(typeof MOOD_SCRIPTURE === 'undefined'){ _moodClose(); return; }
+  var moodData = MOOD_SCRIPTURE[moodId];
+  if(!moodData){ _moodClose(); return; }
+  var overlay = document.getElementById('moodCheckInOverlay');
+  if(!overlay) return;
+  var prayerSessionId = (MOOD_TO_PRAYER[moodId] || 'morning');
+  var versesHtml = (moodData.verses || []).map(function(v){
+    return '<div style="background:rgba(255,255,255,.04);border-left:3px solid rgba(167,139,250,.45);border-radius:0 10px 10px 0;padding:.65rem .85rem;margin-bottom:.5rem;">' +
+      '<div style="font-size:.8rem;font-style:italic;line-height:1.55;color:var(--tx);margin-bottom:.25rem;">"' + escapeHtml(v.text) + '"</div>' +
+      '<div style="font-size:.65rem;font-weight:800;color:#a78bfa;letter-spacing:.06em;">' + escapeHtml(v.ref) + '</div>' +
+      '</div>';
+  }).join('');
+  overlay.innerHTML = '<div style="position:absolute;bottom:0;left:0;right:0;background:var(--bg2,#1a1233);border-top:1px solid rgba(255,255,255,.12);border-radius:20px 20px 0 0;padding:1.1rem 1rem 2rem;animation:slideUp .22s ease-out;max-width:520px;margin:0 auto;max-height:80vh;overflow-y:auto;">' +
+    '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.85rem;">' +
+    '<button onclick="_moodClose()" style="background:none;border:none;color:var(--tx2);font-size:.95rem;cursor:pointer;padding:.2rem .3rem;font-family:var(--fm);">← Back</button>' +
+    '<div style="flex:1;font-size:.82rem;font-weight:800;color:var(--tx);">You\'re feeling <span style="color:#a78bfa;">' + escapeHtml(moodData.label || moodId) + '</span> today</div>' +
+    '</div>' +
+    '<div style="font-size:.7rem;color:var(--tx2);font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.55rem;">Here\'s what God says:</div>' +
+    versesHtml +
+    '<div style="margin-top:.75rem;"><button onclick="if(typeof startPrayerSession===\'function\')startPrayerSession(\'' + prayerSessionId + '\');else bfTab(\'prayer\');_moodClose();" ' +
+    'style="width:100%;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.35);color:#a78bfa;border-radius:12px;padding:.6rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🙏 Pray about this</button></div>' +
+    '</div>';
+  overlay.style.display = 'block';
+}
+
+function saveMoodLog(moodId){
+  try{
+    var key = _moodKey('log');
+    var log = JSON.parse(localStorage.getItem(key) || '[]');
+    log.unshift({ date: new Date().toISOString().slice(0,10), mood: moodId });
+    localStorage.setItem(key, JSON.stringify(log.slice(0,365)));
+  }catch(e){}
+}
+
+// ── GUIDED PRAYER SESSIONS — Engagement Loop Worker 3 ────────────────────────
+// Data: PRAYER_SESSIONS from app/js/data/reading-plans.js
+// Timer runs via setInterval stored in _psTimerInterval.
+// Ambient audio: YouTube no-cookie embed inside session view.
+
+var _psTimerInterval = null;
+var _psCurrentSession = null;
+var _psCurrentStep = 0;
+var _psRemainingTime = 0;
+
+function _psKey(suffix){
+  var uid = (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.id) ? _supaUser.id : 'anon';
+  return 'ylcc_ps_' + uid + '_' + suffix;
+}
+
+function _psClearTimer(){
+  if(_psTimerInterval){ clearInterval(_psTimerInterval); _psTimerInterval = null; }
+}
+
+function _psFormatTime(seconds){
+  var m = Math.floor(seconds / 60);
+  var s = seconds % 60;
+  return m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function renderGuidedPrayerPane(){
+  _psClearTimer();
+  var root = document.getElementById('pr-pane-guided');
+  if(!root) return;
+  if(typeof PRAYER_SESSIONS === 'undefined'){
+    root.innerHTML = '<div style="color:var(--tx2);font-size:.82rem;padding:.5rem 0;">Prayer sessions loading…</div>';
+    return;
+  }
+  var lastEntry = null;
+  try{ var h = JSON.parse(localStorage.getItem(_psKey('history')) || '[]'); lastEntry = h[0] || null; }catch(e){}
+  var rows = PRAYER_SESSIONS.map(function(s){
+    return '<button onclick="_psOpenSession(\'' + s.id + '\',0)" style="width:100%;display:flex;align-items:center;gap:.85rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:.85rem 1rem;margin-bottom:.5rem;cursor:pointer;font-family:var(--fm);text-align:left;transition:background .15s,border-color .15s;" onmouseover="this.style.background=\'rgba(255,255,255,.07)\';this.style.borderColor=\'rgba(251,191,36,.25)\'" onmouseout="this.style.background=\'rgba(255,255,255,.03)\';this.style.borderColor=\'rgba(255,255,255,.08)\'">' +
+      '<span style="font-size:1.5rem;">' + s.icon + '</span>' +
+      '<div style="flex:1;min-width:0;">' +
+      '<div style="font-size:.85rem;font-weight:800;color:var(--tx);">' + escapeHtml(s.title) + '</div>' +
+      '<div style="font-size:.7rem;color:var(--tx2);margin-top:.1rem;">' + s.duration + ' min · ' + s.steps.length + ' steps</div>' +
+      '</div>' +
+      '<span style="font-size:.75rem;font-weight:800;color:var(--tx3);">▶</span>' +
+      '</button>';
+  }).join('');
+  var lastHtml = lastEntry
+    ? '<div style="margin-top:.4rem;font-size:.68rem;color:var(--tx3);">Last: ' + escapeHtml(lastEntry.title || lastEntry.sessionId) + ' · ' + escapeHtml(lastEntry.date) + '</div>'
+    : '';
+  root.innerHTML = '<div style="font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);margin-bottom:.7rem;">Choose a Session</div>' +
+    rows + lastHtml;
+}
+
+// startPrayerSession — public entry point (called from mood scripture "Pray about this" and any external link).
+// Routes to prayer tab + guided subtab, then opens the session.
+function startPrayerSession(sessionId){
+  if(typeof _moodClose === 'function') _moodClose();
+  if(typeof bfTab === 'function') bfTab('prayer');
+  setTimeout(function(){
+    var guidedBtn = document.querySelector('#bf-prayer .pr-subtab[data-pr-sub="guided"]');
+    if(typeof prSubTab === 'function') prSubTab('guided', guidedBtn);
+    setTimeout(function(){ _psOpenSession(sessionId, 0); }, 60);
+  }, 80);
+}
+
+function _psOpenSession(sessionId, stepIndex){
+  if(typeof PRAYER_SESSIONS === 'undefined') return;
+  var session = PRAYER_SESSIONS.find(function(s){ return s.id === sessionId; });
+  if(!session) return;
+  _psClearTimer();
+  _psCurrentSession = session;
+  _psCurrentStep = stepIndex;
+  _psRemainingTime = session.steps[stepIndex] ? session.steps[stepIndex].time : 60;
+  renderPrayerSessionView(session, stepIndex);
+}
+
+function renderPrayerSessionView(session, stepIndex){
+  var root = document.getElementById('pr-pane-guided');
+  if(!root) return;
+  var step = session.steps[stepIndex];
+  var totalSteps = session.steps.length;
+  var stepPct = Math.round((stepIndex / totalSteps) * 100);
+  var stepLabel = step.type.charAt(0).toUpperCase() + step.type.slice(1);
+  var isLast = (stepIndex === totalSteps - 1);
+  var nextLabel = isLast ? 'Finish' : 'Next Step →';
+  root.innerHTML =
+    '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;">' +
+    '<button onclick="renderGuidedPrayerPane()" style="background:none;border:none;color:var(--tx2);font-size:.95rem;cursor:pointer;padding:.2rem .3rem;font-family:var(--fm);">✕</button>' +
+    '<span style="font-size:1.1rem;">' + session.icon + '</span>' +
+    '<div style="flex:1;font-size:.82rem;font-weight:800;color:var(--tx);">' + escapeHtml(session.title) + '</div>' +
+    '</div>' +
+    '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:1.1rem;">' +
+    '<div style="flex:1;height:4px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;"><div style="height:100%;width:' + stepPct + '%;background:linear-gradient(90deg,#fbbf24,#f59e0b);border-radius:99px;transition:width .4s;"></div></div>' +
+    '<div style="font-size:.62rem;font-weight:800;color:var(--tx3);white-space:nowrap;">Step ' + (stepIndex+1) + ' / ' + totalSteps + '</div>' +
+    '</div>' +
+    '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.2rem 1.1rem;margin-bottom:1rem;">' +
+    '<div style="font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#fbbf24;margin-bottom:.5rem;">' + escapeHtml(stepLabel) + '</div>' +
+    '<div style="font-size:.88rem;line-height:1.65;color:var(--tx);">' + escapeHtml(step.instruction) + '</div>' +
+    '</div>' +
+    '<div style="text-align:center;margin-bottom:1rem;">' +
+    '<div style="font-size:2.4rem;font-weight:900;color:var(--tx);font-family:var(--fh,var(--fm));line-height:1;" id="psTimerCount">' + _psFormatTime(_psRemainingTime) + '</div>' +
+    '<div style="height:5px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin:.55rem 0;"><div id="psTimerBar" style="height:100%;width:100%;background:linear-gradient(90deg,#a78bfa,#7c3aed);border-radius:99px;transition:width 1s linear;"></div></div>' +
+    '<div style="display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-top:.6rem;">' +
+    '<button id="psTimerStartBtn" onclick="_psStartTimer()" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0b1220;border:none;border-radius:10px;padding:.55rem 1.2rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">▶ Start Timer</button>' +
+    '<button onclick="_psSkipStep()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx2);border-radius:10px;padding:.55rem .9rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">' + nextLabel + '</button>' +
+    '</div>' +
+    '</div>' +
+    '<div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;overflow:hidden;">' +
+    '<div style="font-size:.56rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);padding:.4rem .7rem .2rem;">🎵 Ambient Audio</div>' +
+    '<iframe src="https://www.youtube-nocookie.com/embed/' + session.ambientYouTube + '?autoplay=1&loop=1&playlist=' + session.ambientYouTube + '&controls=1&modestbranding=1" frameborder="0" allow="autoplay;encrypted-media" allowfullscreen style="width:100%;height:80px;border:none;display:block;"></iframe>' +
+    '</div>';
+}
+
+function _psStartTimer(){
+  var btn = document.getElementById('psTimerStartBtn');
+  if(btn){ btn.textContent = '⏸ Pause'; btn.onclick = function(){ _psPauseTimer(); }; }
+  _psClearTimer();
+  _psTimerInterval = setInterval(function(){
+    _psRemainingTime = Math.max(0, _psRemainingTime - 1);
+    var countEl = document.getElementById('psTimerCount');
+    if(countEl) countEl.textContent = _psFormatTime(_psRemainingTime);
+    if(_psCurrentSession){
+      var totalTime = _psCurrentSession.steps[_psCurrentStep] ? _psCurrentSession.steps[_psCurrentStep].time : 60;
+      var pct = Math.round((_psRemainingTime / totalTime) * 100);
+      var bar = document.getElementById('psTimerBar');
+      if(bar) bar.style.width = pct + '%';
+    }
+    if(_psRemainingTime <= 0){ _psClearTimer(); _psSkipStep(); }
+  }, 1000);
+}
+
+function _psPauseTimer(){
+  _psClearTimer();
+  var btn = document.getElementById('psTimerStartBtn');
+  if(btn){ btn.textContent = '▶ Resume'; btn.onclick = function(){ _psStartTimer(); }; }
+}
+
+function _psSkipStep(){
+  _psClearTimer();
+  var session = _psCurrentSession;
+  if(!session) return;
+  var isLast = (_psCurrentStep >= session.steps.length - 1);
+  if(isLast){
+    completePrayerSession(session.id);
+  } else {
+    _psCurrentStep++;
+    _psRemainingTime = session.steps[_psCurrentStep].time;
+    renderPrayerSessionView(session, _psCurrentStep);
+  }
+}
+
+function completePrayerSession(sessionId){
+  _psClearTimer();
+  var session = (typeof PRAYER_SESSIONS !== 'undefined') ? PRAYER_SESSIONS.find(function(s){ return s.id === sessionId; }) : null;
+  try{
+    var key = _psKey('history');
+    var hist = JSON.parse(localStorage.getItem(key) || '[]');
+    hist.unshift({ sessionId: sessionId, title: session ? session.title : sessionId, date: new Date().toISOString().slice(0,10), completed: true });
+    localStorage.setItem(key, JSON.stringify(hist.slice(0,90)));
+  }catch(e){}
+  if(typeof showToast === 'function') showToast('Prayer session complete! 🙏');
+  renderGuidedPrayerPane();
 }

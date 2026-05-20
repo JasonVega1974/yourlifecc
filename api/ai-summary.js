@@ -75,6 +75,13 @@ const GOAL_SUGGEST_SYSTEM = SAFETY_PREAMBLE + '\n\n' + [
   'Use "type":"short" for goals achievable in weeks/months, "type":"long" for goals 1+ years out.'
 ].join('\n');
 
+const VOTD_REFLECTION_SYSTEM = SAFETY_PREAMBLE + '\n\n' + [
+  'You are a warm faith companion for a young person. Given a Bible verse, write exactly 2 sentences.',
+  '1. A personal reflection connecting this verse to where they might be at their age.',
+  '2. One specific, practical way to apply this truth today.',
+  'Under 60 words total. No clichés. Warm and real — like a trusted older friend, not a preacher.'
+].join('\n');
+
 module.exports = async function handler(req, res) {
   // Only allow POST
   if (req.method !== 'POST') {
@@ -90,6 +97,7 @@ module.exports = async function handler(req, res) {
   const isDailyReflection = mode === 'daily-reflection';
   const isStudyPartner    = mode === 'study-partner';
   const isGoalSuggest     = mode === 'goal-suggest';
+  const isVotdReflection  = mode === 'votd-reflection';
 
   // Per-mode prompt cap (tight to control cost + abuse). default summary
   // keeps its longer 4000-char allowance.
@@ -97,6 +105,7 @@ module.exports = async function handler(req, res) {
             : isDailyReflection ? 600
             : isStudyPartner    ? 1200
             : isGoalSuggest     ? 800
+            : isVotdReflection  ? 600
             : 4000;
   const safePrompt = String(prompt).slice(0, cap);
 
@@ -139,6 +148,13 @@ module.exports = async function handler(req, res) {
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 500,
         system: [{ type: 'text', text: GOAL_SUGGEST_SYSTEM, cache_control: { type: 'ephemeral' } }],
+        messages: [{ role: 'user', content: safePrompt }],
+      };
+    } else if (isVotdReflection) {
+      body = {
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 150,
+        system: [{ type: 'text', text: VOTD_REFLECTION_SYSTEM, cache_control: { type: 'ephemeral' } }],
         messages: [{ role: 'user', content: safePrompt }],
       };
     } else {

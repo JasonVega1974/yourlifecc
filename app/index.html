@@ -4639,6 +4639,7 @@
     <button class="tab" data-bf-tab="jesus" onclick="bfTab('jesus',this)">✝️ Who Is Jesus</button>
     <button class="tab" data-bf-tab="denominations" onclick="bfTab('denominations',this)">⛪ Traditions</button>
     <button class="tab" data-bf-tab="studyTools" onclick="bfTab('studyTools',this)">🔍 Study Tools</button>
+    <button class="tab" data-bf-tab="readingPlans" onclick="bfTab('readingPlans',this)">📚 Reading Plans</button>
     <button class="tab" onclick="window.location.href='/app/podcasts.html'">🎧 Podcasts</button>
     <button class="tab" onclick="window.location.href='/app/calendar.html'">📅 Faith Calendar</button>
     <button class="tab" onclick="wellGoto('worship')">🎵 Worship</button>
@@ -4685,6 +4686,12 @@
       <div class="well-votd-eye">Verse of the Day · Day <span id="fhVotdDay">—</span></div>
       <div class="well-votd-text" id="fhVotdText">Loading today's verse…</div>
       <div class="well-votd-ref" id="fhVotdRef">— …</div>
+      <div id="votdAiBlock" style="display:none;margin-top:.45rem;border-top:1px solid rgba(255,255,255,.1);padding-top:.4rem;"></div>
+      <div style="display:flex;gap:.35rem;margin-top:.5rem;flex-wrap:wrap;">
+        <button onclick="_votdCopyVerse()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:var(--tx2);border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">📋 Copy</button>
+        <button onclick="_votdSaveToJourney()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:var(--tx2);border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🔖 Journey</button>
+        <button onclick="checkShowMoodPrompt(true)" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.25);color:#a78bfa;border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">😊 How I feel</button>
+      </div>
     </div>
     <div class="well-welcome">Welcome to The Well. Everything you need to grow in faith — stories, plans, prayer, and Scripture — is here.</div>
 
@@ -4756,10 +4763,23 @@
       <div id="fhFamilyVerseRef" style="font-family:'Bebas Neue',var(--fm);font-size:.78rem;letter-spacing:.16em;font-weight:700;color:rgba(251,191,36,.75);">— …</div>
     </div>
 
+    <!-- Reading Plans streak banner — shown/hidden by renderRpStreakBanner() -->
+    <div id="rpStreakBanner" style="display:none;background:linear-gradient(135deg,rgba(16,185,129,.18),rgba(5,150,105,.10));border:1px solid rgba(16,185,129,.3);border-radius:12px;padding:.75rem 1rem;margin-bottom:.85rem;cursor:pointer;align-items:center;gap:.55rem;" onclick="bfTab('readingPlans')">
+      <span style="font-size:1.3rem;">🔥</span>
+      <span id="rpStreakBannerText" style="font-size:.85rem;font-weight:800;color:#6ee7b7;flex:1;"></span>
+      <span style="font-size:.8rem;color:rgba(110,231,183,.6);">→</span>
+    </div>
+
     <!-- Quick-access bar: Podcasts + Calendar external pages -->
     <div style="display:flex;gap:.5rem;margin-bottom:.85rem;">
       <a href="/app/podcasts.html" style="flex:1;display:flex;align-items:center;justify-content:center;gap:.35rem;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);border-radius:10px;padding:.48rem .7rem;text-decoration:none;color:var(--tx);font-size:.8rem;font-weight:800;transition:background .12s;" onmouseover="this.style.background='rgba(56,189,248,.15)'" onmouseout="this.style.background='rgba(56,189,248,.08)'">🎧 <span>Podcasts</span></a>
       <a href="/app/calendar.html" style="flex:1;display:flex;align-items:center;justify-content:center;gap:.35rem;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:.48rem .7rem;text-decoration:none;color:var(--tx);font-size:.8rem;font-weight:800;transition:background .12s;" onmouseover="this.style.background='rgba(16,185,129,.15)'" onmouseout="this.style.background='rgba(16,185,129,.08)'">📅 <span>Faith Calendar</span></a>
+    </div>
+
+    <!-- Active Reading Plan card — populated by renderFaithHome() via fhActivePlan() -->
+    <div id="fhPlanCard" class="fh-card" style="margin-bottom:.85rem;">
+      <div class="fh-card-hdr"><span>📚</span> Active Reading Plan <span class="fh-card-sub" onclick="bfTab('readingPlans')" style="cursor:pointer;">Browse →</span></div>
+      <div id="fhPlanBody"><div class="fh-plan-empty">No plan started yet. Choose from 5 reading plans.</div><button class="fh-btn" onclick="bfTab('readingPlans')">Browse Plans →</button></div>
     </div>
 
     <!-- Phase 5.8 — Card-grid navigation. Every The Well sub-section
@@ -4843,6 +4863,11 @@
         <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(14,165,233,.12));"><img class="topic-card-hero" data-card-id="bf-studyTools" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Aleppo_Codex_%28Deut%29.jpg/1280px-Aleppo_Codex_%28Deut%29.jpg" alt="Study Tools"></div>
         <div class="topic-card-title">Study Tools</div>
         <div class="topic-card-desc">Strong's · cross refs · passage · notes</div>
+      </div>
+      <div class="topic-card accent-green" onclick="bfTab('readingPlans')">
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(16,185,129,.22),rgba(5,150,105,.12));"><img class="topic-card-hero" data-card-id="bf-readingPlans" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Biblio2.jpg/1280px-Biblio2.jpg" alt="Bible Reading Plans"></div>
+        <div class="topic-card-title">Reading Plans</div>
+        <div class="topic-card-desc">3-day · 7-day · 30-day · 90-day · 365-day</div>
       </div>
       <div class="topic-card" style="--accent-light:rgba(56,189,248,.22)" onclick="window.location.href='/app/podcasts.html'">
         <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(99,102,241,.15));"><img class="topic-card-hero" data-card-id="bf-podcasts" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Shure_mikrofon_55S.jpg/1280px-Shure_mikrofon_55S.jpg" alt="Podcasts"></div>
@@ -5762,6 +5787,7 @@
     <!-- Sub-tab navigation -->
     <div class="pr-subtabs" role="tablist" aria-label="Prayer sub-sections">
       <button class="pr-subtab active" role="tab" aria-selected="true"  data-pr-sub="mine"     onclick="prSubTab('mine',this)">🙏 My Prayers</button>
+      <button class="pr-subtab"        role="tab" aria-selected="false" data-pr-sub="guided"   onclick="prSubTab('guided',this)">⏱ Guided Sessions</button>
       <button class="pr-subtab"        role="tab" aria-selected="false" data-pr-sub="wall"     onclick="prSubTab('wall',this)">🌍 Prayer Wall</button>
       <button class="pr-subtab"        role="tab" aria-selected="false" data-pr-sub="howto"    onclick="prSubTab('howto',this)">📖 How to Pray</button>
       <button class="pr-subtab"        role="tab" aria-selected="false" data-pr-sub="examples" onclick="prSubTab('examples',this)">📜 Examples</button>
@@ -5831,6 +5857,9 @@
       <div class="pr-daily-prompt" id="prDailyPrompt"></div>
       <div id="prWhoGrid" class="pr-who-grid"></div>
     </div>
+
+    <!-- Pane: Guided Prayer Sessions (Worker 3) -->
+    <div id="pr-pane-guided" class="pr-pane" style="display:none;"></div>
   </div>
 
   <!-- ════ SERMON NOTE EDITOR MODAL (F2-H) ════ -->
@@ -7799,6 +7828,15 @@
     <div id="studyToolsRoot"></div>
   </div>
 
+  <!-- ════ Reading Plans (Engagement Loop Worker 1) ════ -->
+  <div id="bf-readingPlans" style="display:none;">
+    <style>
+      .rp-btn{background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.55rem .95rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);}
+      .rp-btn:hover{filter:brightness(1.1);}
+    </style>
+    <div id="readingPlansRoot"></div>
+  </div>
+
   <!-- ════ THE WELL — bottom nav (mirrors top .scrTabs; bfTab keeps both in sync) ════ -->
   <style>
     #s-scripture .scrTabs-bottom{
@@ -7849,11 +7887,16 @@
     <button class="tab" data-bf-tab="jesus" onclick="bfTab('jesus',this)"><span class="scrtab-icon">✝️</span><span>Jesus</span></button>
     <button class="tab" data-bf-tab="denominations" onclick="bfTab('denominations',this)"><span class="scrtab-icon">⛪</span><span>Traditions</span></button>
     <button class="tab" data-bf-tab="studyTools" onclick="bfTab('studyTools',this)"><span class="scrtab-icon">🔍</span><span>Study Tools</span></button>
+    <button class="tab" data-bf-tab="readingPlans" onclick="bfTab('readingPlans',this)"><span class="scrtab-icon">📚</span><span>Read Plans</span></button>
     <button class="tab" onclick="window.location.href='/app/podcasts.html'"><span class="scrtab-icon">🎧</span><span>Podcasts</span></button>
     <button class="tab" onclick="window.location.href='/app/calendar.html'"><span class="scrtab-icon">📅</span><span>Calendar</span></button>
     <button class="tab" onclick="wellGoto('worship')"><span class="scrtab-icon">🎵</span><span>Worship</span></button>
     <button class="tab" onclick="wellGoto('flashcards')"><span class="scrtab-icon">📇</span><span>Flashcards</span></button>
   </div>
+
+  <!-- Mood check-in bottom sheet overlay (Worker 2) -->
+  <style>@keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}</style>
+  <div id="moodCheckInOverlay" style="display:none;position:fixed;inset:0;z-index:9090;background:rgba(0,0,0,.45);" onclick="if(event.target===this)_moodClose()"></div>
 </section>
 
 <!-- ════ WORSHIP PLAYLIST (F1.0) ════ -->
@@ -11967,6 +12010,7 @@
 <script src="/app/js/data/jesus-data.js"></script>
 <script src="/app/js/data/denominations.js"></script>
 <script src="/app/js/data/podcasts.js"></script>
+<script src="/app/js/data/reading-plans.js"></script>
 <!-- Leaflet (F3-B) — open-source map library, MIT-licensed. Only loads when used. -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
