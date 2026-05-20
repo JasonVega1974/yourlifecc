@@ -438,5 +438,12 @@ async function initiateDonation(){
 }
 </script>
 
+<!-- PWA install prompt for Enter the Well.
+     Post-registration trigger lives in register-faith.html — find the
+     Supabase signUp success callback and add:
+       if (window.wellPWA) window.wellPWA.triggerPostRegistration();
+     at the point where the confirmation UI is shown to the user. -->
+<script src="/js/well-pwa.js"></script>
+
 </body>
 </html>
