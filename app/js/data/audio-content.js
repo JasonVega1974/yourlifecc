@@ -17,14 +17,14 @@ const AUDIO_MEDITATIONS = [
     ambientYouTube: 'VYXDfhgwTyM', // 24/7 peaceful worship piano
     scriptureFocus: 'Lamentations 3:22-23',
     segments: [
-      { duration: 30, type: 'opening', text: 'Take three slow breaths. Let your body settle. God is already here with you.' },
-      { duration: 60, type: 'scripture', text: 'The steadfast love of the Lord never ceases. His mercies never come to an end. They are new every morning. Great is His faithfulness.', verse: 'Lamentations 3:22-23' },
-      { duration: 60, type: 'reflection', text: 'New mercies. Today. Not yesterday\'s mercies for today\'s troubles — fresh ones, made for this exact day.' },
-      { duration: 60, type: 'silence', text: 'Sit with that truth in silence for a moment.' },
-      { duration: 90, type: 'scripture', text: 'This is the day that the Lord has made. We will rejoice and be glad in it.', verse: 'Psalm 118:24' },
-      { duration: 60, type: 'reflection', text: 'Whatever today holds — it was made. Made by a God who never improvises, never panics, never abandons. Made for you.' },
-      { duration: 60, type: 'prayer', text: 'Father, I receive Your mercies for today. Help me walk in them. Help me notice You as I go.' },
-      { duration: 30, type: 'close', text: 'Open your eyes. Step into the day God has made for you.' }
+      { duration: 30, type: 'opening', text: 'Take three slow breaths. Let your body settle. God is already here with you.', audioUrl: '/audio/med-morning_seg0.mp3' },
+      { duration: 60, type: 'scripture', text: 'The steadfast love of the Lord never ceases. His mercies never come to an end. They are new every morning. Great is His faithfulness.', verse: 'Lamentations 3:22-23', audioUrl: '/audio/med-morning_seg1.mp3' },
+      { duration: 60, type: 'reflection', text: 'New mercies. Today. Not yesterday\'s mercies for today\'s troubles — fresh ones, made for this exact day.', audioUrl: '/audio/med-morning_seg2.mp3' },
+      { duration: 60, type: 'silence', text: 'Sit with that truth in silence for a moment.', audioUrl: '/audio/med-morning_seg3.mp3' },
+      { duration: 90, type: 'scripture', text: 'This is the day that the Lord has made. We will rejoice and be glad in it.', verse: 'Psalm 118:24', audioUrl: '/audio/med-morning_seg4.mp3' },
+      { duration: 60, type: 'reflection', text: 'Whatever today holds — it was made. Made by a God who never improvises, never panics, never abandons. Made for you.', audioUrl: '/audio/med-morning_seg5.mp3' },
+      { duration: 60, type: 'prayer', text: 'Father, I receive Your mercies for today. Help me walk in them. Help me notice You as I go.', audioUrl: '/audio/med-morning_seg6.mp3' },
+      { duration: 30, type: 'close', text: 'Open your eyes. Step into the day God has made for you.', audioUrl: '/audio/med-morning_seg7.mp3' }
     ]
   },
   {
@@ -37,16 +37,16 @@ const AUDIO_MEDITATIONS = [
     ambientYouTube: 'VYXDfhgwTyM', // 24/7 peaceful worship piano
     scriptureFocus: 'Philippians 4:6-7',
     segments: [
-      { duration: 60, type: 'opening', text: 'Wherever you are right now, you are safe in this moment. Take a slow breath. Hold it. Release it.' },
-      { duration: 30, type: 'breath', text: 'Breathe in for four counts. Hold for four. Out for four. Again.' },
-      { duration: 60, type: 'scripture', text: 'Do not be anxious about anything. But in every situation, by prayer and petition, with thanksgiving, present your requests to God.', verse: 'Philippians 4:6' },
-      { duration: 60, type: 'reflection', text: 'You don\'t have to fix the anxiety first. You bring it as it is. God can handle the messy version of your prayer.' },
-      { duration: 60, type: 'scripture', text: 'And the peace of God, which transcends all understanding, will guard your hearts and your minds in Christ Jesus.', verse: 'Philippians 4:7' },
-      { duration: 90, type: 'reflection', text: 'Notice the word guard. Peace becomes a sentinel around your mind. It doesn\'t depend on understanding the situation — it depends on Christ.' },
-      { duration: 60, type: 'cast', text: 'Now physically open your hands. Imagine placing your worry in them. Picture handing it to Jesus. He takes it. He carries it.' },
-      { duration: 90, type: 'scripture', text: 'Cast all your anxiety on Him because He cares for you.', verse: '1 Peter 5:7' },
-      { duration: 60, type: 'prayer', text: 'Lord, I cast this onto You. I don\'t pick it back up. Your peace, which transcends all understanding, guard my heart.' },
-      { duration: 30, type: 'close', text: 'When you\'re ready, open your eyes. You are not alone in this.' }
+      { duration: 60, type: 'opening', text: 'Wherever you are right now, you are safe in this moment. Take a slow breath. Hold it. Release it.', audioUrl: '/audio/med-anxiety_seg0.mp3' },
+      { duration: 30, type: 'breath', text: 'Breathe in for four counts. Hold for four. Out for four. Again.', audioUrl: '/audio/med-anxiety_seg1.mp3' },
+      { duration: 60, type: 'scripture', text: 'Do not be anxious about anything. But in every situation, by prayer and petition, with thanksgiving, present your requests to God.', verse: 'Philippians 4:6', audioUrl: '/audio/med-anxiety_seg2.mp3' },
+      { duration: 60, type: 'reflection', text: 'You don\'t have to fix the anxiety first. You bring it as it is. God can handle the messy version of your prayer.', audioUrl: '/audio/med-anxiety_seg3.mp3' },
+      { duration: 60, type: 'scripture', text: 'And the peace of God, which transcends all understanding, will guard your hearts and your minds in Christ Jesus.', verse: 'Philippians 4:7', audioUrl: '/audio/med-anxiety_seg4.mp3' },
+      { duration: 90, type: 'reflection', text: 'Notice the word guard. Peace becomes a sentinel around your mind. It doesn\'t depend on understanding the situation — it depends on Christ.', audioUrl: '/audio/med-anxiety_seg5.mp3' },
+      { duration: 60, type: 'cast', text: 'Now physically open your hands. Imagine placing your worry in them. Picture handing it to Jesus. He takes it. He carries it.', audioUrl: '/audio/med-anxiety_seg6.mp3' },
+      { duration: 90, type: 'scripture', text: 'Cast all your anxiety on Him because He cares for you.', verse: '1 Peter 5:7', audioUrl: '/audio/med-anxiety_seg7.mp3' },
+      { duration: 60, type: 'prayer', text: 'Lord, I cast this onto You. I don\'t pick it back up. Your peace, which transcends all understanding, guard my heart.', audioUrl: '/audio/med-anxiety_seg8.mp3' },
+      { duration: 30, type: 'close', text: 'When you\'re ready, open your eyes. You are not alone in this.', audioUrl: '/audio/med-anxiety_seg9.mp3' }
     ]
   },
   {
@@ -59,13 +59,13 @@ const AUDIO_MEDITATIONS = [
     ambientYouTube: 'VYXDfhgwTyM', // 24/7 peaceful worship piano
     scriptureFocus: 'Psalm 100',
     segments: [
-      { duration: 30, type: 'opening', text: 'Settle into stillness. Notice your breath. Notice your heartbeat. Both are gifts you didn\'t earn.' },
-      { duration: 60, type: 'scripture', text: 'Make a joyful noise to the Lord, all the earth. Serve the Lord with gladness. Come into His presence with singing.', verse: 'Psalm 100:1-2' },
-      { duration: 90, type: 'reflection', text: 'Gratitude is not pretending things are perfect. It\'s noticing where God has been good — even in imperfect days. Think back over the last 24 hours. What\'s one small kindness you noticed?' },
-      { duration: 60, type: 'silence', text: 'Hold that moment. Let yourself feel the goodness of it.' },
-      { duration: 90, type: 'scripture', text: 'Enter His gates with thanksgiving and His courts with praise. Give thanks to Him. Bless His name.', verse: 'Psalm 100:4' },
-      { duration: 60, type: 'practice', text: 'Name three things aloud right now that you are thankful for. Speak them. Hear them.' },
-      { duration: 30, type: 'close', text: 'Carry that thankful posture into your day. Watch how it changes what you see.' }
+      { duration: 30, type: 'opening', text: 'Settle into stillness. Notice your breath. Notice your heartbeat. Both are gifts you didn\'t earn.', audioUrl: '/audio/med-gratitude_seg0.mp3' },
+      { duration: 60, type: 'scripture', text: 'Make a joyful noise to the Lord, all the earth. Serve the Lord with gladness. Come into His presence with singing.', verse: 'Psalm 100:1-2', audioUrl: '/audio/med-gratitude_seg1.mp3' },
+      { duration: 90, type: 'reflection', text: 'Gratitude is not pretending things are perfect. It\'s noticing where God has been good — even in imperfect days. Think back over the last 24 hours. What\'s one small kindness you noticed?', audioUrl: '/audio/med-gratitude_seg2.mp3' },
+      { duration: 60, type: 'silence', text: 'Hold that moment. Let yourself feel the goodness of it.', audioUrl: '/audio/med-gratitude_seg3.mp3' },
+      { duration: 90, type: 'scripture', text: 'Enter His gates with thanksgiving and His courts with praise. Give thanks to Him. Bless His name.', verse: 'Psalm 100:4', audioUrl: '/audio/med-gratitude_seg4.mp3' },
+      { duration: 60, type: 'practice', text: 'Name three things aloud right now that you are thankful for. Speak them. Hear them.', audioUrl: '/audio/med-gratitude_seg5.mp3' },
+      { duration: 30, type: 'close', text: 'Carry that thankful posture into your day. Watch how it changes what you see.', audioUrl: '/audio/med-gratitude_seg6.mp3' }
     ]
   },
   {
@@ -78,15 +78,15 @@ const AUDIO_MEDITATIONS = [
     ambientYouTube: 'VYXDfhgwTyM', // 24/7 peaceful worship piano
     scriptureFocus: 'Ephesians 1:3-14',
     segments: [
-      { duration: 30, type: 'opening', text: 'Sit comfortably. Let your shoulders drop. The world has been telling you things about yourself today. Time to hear the truth.' },
-      { duration: 90, type: 'declaration', text: 'I am loved by God. Before I did anything, before I failed at anything, I was loved.', verse: 'Ephesians 1:4' },
-      { duration: 60, type: 'silence', text: 'Let that land. Don\'t move past it too quickly.' },
-      { duration: 90, type: 'declaration', text: 'I am chosen. Not an accident. Not a backup plan. Chosen by name.', verse: 'Ephesians 1:4-5' },
-      { duration: 90, type: 'declaration', text: 'I am forgiven. The blood of Jesus has cleansed every sin — past, present, and future.', verse: 'Ephesians 1:7' },
-      { duration: 90, type: 'declaration', text: 'I am sealed by the Holy Spirit. God Himself lives in me. I belong to Him.', verse: 'Ephesians 1:13' },
-      { duration: 60, type: 'reflection', text: 'These are not feelings. These are facts. You can stand on them when feelings betray you.' },
-      { duration: 60, type: 'prayer', text: 'God, plant these truths so deep in me that nothing can shake them out. I receive who You say I am.' },
-      { duration: 30, type: 'close', text: 'You are loved. Chosen. Forgiven. Sealed. Go walk in that.' }
+      { duration: 30, type: 'opening', text: 'Sit comfortably. Let your shoulders drop. The world has been telling you things about yourself today. Time to hear the truth.', audioUrl: '/audio/med-identity_seg0.mp3' },
+      { duration: 90, type: 'declaration', text: 'I am loved by God. Before I did anything, before I failed at anything, I was loved.', verse: 'Ephesians 1:4', audioUrl: '/audio/med-identity_seg1.mp3' },
+      { duration: 60, type: 'silence', text: 'Let that land. Don\'t move past it too quickly.', audioUrl: '/audio/med-identity_seg2.mp3' },
+      { duration: 90, type: 'declaration', text: 'I am chosen. Not an accident. Not a backup plan. Chosen by name.', verse: 'Ephesians 1:4-5', audioUrl: '/audio/med-identity_seg3.mp3' },
+      { duration: 90, type: 'declaration', text: 'I am forgiven. The blood of Jesus has cleansed every sin — past, present, and future.', verse: 'Ephesians 1:7', audioUrl: '/audio/med-identity_seg4.mp3' },
+      { duration: 90, type: 'declaration', text: 'I am sealed by the Holy Spirit. God Himself lives in me. I belong to Him.', verse: 'Ephesians 1:13', audioUrl: '/audio/med-identity_seg5.mp3' },
+      { duration: 60, type: 'reflection', text: 'These are not feelings. These are facts. You can stand on them when feelings betray you.', audioUrl: '/audio/med-identity_seg6.mp3' },
+      { duration: 60, type: 'prayer', text: 'God, plant these truths so deep in me that nothing can shake them out. I receive who You say I am.', audioUrl: '/audio/med-identity_seg7.mp3' },
+      { duration: 30, type: 'close', text: 'You are loved. Chosen. Forgiven. Sealed. Go walk in that.', audioUrl: '/audio/med-identity_seg8.mp3' }
     ]
   },
   {
@@ -99,16 +99,16 @@ const AUDIO_MEDITATIONS = [
     ambientYouTube: 'VYXDfhgwTyM', // 24/7 peaceful worship piano
     scriptureFocus: 'Matthew 11:28-30',
     segments: [
-      { duration: 60, type: 'opening', text: 'You are not behind. You are not too much. Wherever you are right now is where God wants to meet you.' },
-      { duration: 60, type: 'breath', text: 'Long, slow breath in. Long, slow breath out. Do that three times.' },
-      { duration: 90, type: 'scripture', text: 'Come to Me, all you who are weary and burdened, and I will give you rest.', verse: 'Matthew 11:28' },
-      { duration: 120, type: 'reflection', text: 'Notice — Jesus doesn\'t ask you to deserve the rest. He doesn\'t ask you to earn it. He just says come. Tired, messy, behind. Come anyway.' },
-      { duration: 90, type: 'scripture', text: 'Take My yoke upon you and learn from Me. For I am gentle and humble in heart. You will find rest for your souls.', verse: 'Matthew 11:29' },
-      { duration: 120, type: 'reflection', text: 'A yoke ties two animals together so the stronger one carries the weight. Jesus is the stronger one. You are not pulling alone.' },
-      { duration: 90, type: 'silence', text: 'Sit in the silence. Don\'t produce anything. Don\'t fix anything. Just be.' },
-      { duration: 90, type: 'scripture', text: 'For My yoke is easy and My burden is light.', verse: 'Matthew 11:30' },
-      { duration: 60, type: 'prayer', text: 'Jesus, I am tired. I receive Your rest. I lay down what I was never meant to carry.' },
-      { duration: 30, type: 'close', text: 'You can rest in Him. The world will keep spinning. He has not let go.' }
+      { duration: 60, type: 'opening', text: 'You are not behind. You are not too much. Wherever you are right now is where God wants to meet you.', audioUrl: '/audio/med-rest_seg0.mp3' },
+      { duration: 60, type: 'breath', text: 'Long, slow breath in. Long, slow breath out. Do that three times.', audioUrl: '/audio/med-rest_seg1.mp3' },
+      { duration: 90, type: 'scripture', text: 'Come to Me, all you who are weary and burdened, and I will give you rest.', verse: 'Matthew 11:28', audioUrl: '/audio/med-rest_seg2.mp3' },
+      { duration: 120, type: 'reflection', text: 'Notice — Jesus doesn\'t ask you to deserve the rest. He doesn\'t ask you to earn it. He just says come. Tired, messy, behind. Come anyway.', audioUrl: '/audio/med-rest_seg3.mp3' },
+      { duration: 90, type: 'scripture', text: 'Take My yoke upon you and learn from Me. For I am gentle and humble in heart. You will find rest for your souls.', verse: 'Matthew 11:29', audioUrl: '/audio/med-rest_seg4.mp3' },
+      { duration: 120, type: 'reflection', text: 'A yoke ties two animals together so the stronger one carries the weight. Jesus is the stronger one. You are not pulling alone.', audioUrl: '/audio/med-rest_seg5.mp3' },
+      { duration: 90, type: 'silence', text: 'Sit in the silence. Don\'t produce anything. Don\'t fix anything. Just be.', audioUrl: '/audio/med-rest_seg6.mp3' },
+      { duration: 90, type: 'scripture', text: 'For My yoke is easy and My burden is light.', verse: 'Matthew 11:30', audioUrl: '/audio/med-rest_seg7.mp3' },
+      { duration: 60, type: 'prayer', text: 'Jesus, I am tired. I receive Your rest. I lay down what I was never meant to carry.', audioUrl: '/audio/med-rest_seg8.mp3' },
+      { duration: 30, type: 'close', text: 'You can rest in Him. The world will keep spinning. He has not let go.', audioUrl: '/audio/med-rest_seg9.mp3' }
     ]
   },
   {
@@ -121,14 +121,14 @@ const AUDIO_MEDITATIONS = [
     ambientYouTube: 'VYXDfhgwTyM', // 24/7 peaceful worship piano
     scriptureFocus: 'Romans 8:18-28',
     segments: [
-      { duration: 30, type: 'opening', text: 'Wherever you are in this season — God sees it. He hasn\'t looked away.' },
-      { duration: 90, type: 'scripture', text: 'I consider that our present sufferings are not worth comparing with the glory that will be revealed in us.', verse: 'Romans 8:18' },
-      { duration: 90, type: 'reflection', text: 'This is not minimizing your pain. Paul wrote this from prison. It is saying — what is coming is more weight than what is here. Both are real.' },
-      { duration: 90, type: 'scripture', text: 'And we know that in all things God works for the good of those who love Him.', verse: 'Romans 8:28' },
-      { duration: 120, type: 'reflection', text: 'In ALL things. Not just the good ones. He weaves even this into something good. You may not see it yet. Trust the weaver.' },
-      { duration: 60, type: 'silence', text: 'Sit in the not-yet. God is still working.' },
-      { duration: 90, type: 'prayer', text: 'Father, I don\'t see how this becomes good yet. But I trust You. Plant hope in me that doesn\'t depend on what I can see.' },
-      { duration: 30, type: 'close', text: 'Hope is not pretending the wait isn\'t hard. It\'s knowing the wait is not the end.' }
+      { duration: 30, type: 'opening', text: 'Wherever you are in this season — God sees it. He hasn\'t looked away.', audioUrl: '/audio/med-hope_seg0.mp3' },
+      { duration: 90, type: 'scripture', text: 'I consider that our present sufferings are not worth comparing with the glory that will be revealed in us.', verse: 'Romans 8:18', audioUrl: '/audio/med-hope_seg1.mp3' },
+      { duration: 90, type: 'reflection', text: 'This is not minimizing your pain. Paul wrote this from prison. It is saying — what is coming is more weight than what is here. Both are real.', audioUrl: '/audio/med-hope_seg2.mp3' },
+      { duration: 90, type: 'scripture', text: 'And we know that in all things God works for the good of those who love Him.', verse: 'Romans 8:28', audioUrl: '/audio/med-hope_seg3.mp3' },
+      { duration: 120, type: 'reflection', text: 'In ALL things. Not just the good ones. He weaves even this into something good. You may not see it yet. Trust the weaver.', audioUrl: '/audio/med-hope_seg4.mp3' },
+      { duration: 60, type: 'silence', text: 'Sit in the not-yet. God is still working.', audioUrl: '/audio/med-hope_seg5.mp3' },
+      { duration: 90, type: 'prayer', text: 'Father, I don\'t see how this becomes good yet. But I trust You. Plant hope in me that doesn\'t depend on what I can see.', audioUrl: '/audio/med-hope_seg6.mp3' },
+      { duration: 30, type: 'close', text: 'Hope is not pretending the wait isn\'t hard. It\'s knowing the wait is not the end.', audioUrl: '/audio/med-hope_seg7.mp3' }
     ]
   },
   {
@@ -141,14 +141,14 @@ const AUDIO_MEDITATIONS = [
     ambientYouTube: 'VYXDfhgwTyM', // 24/7 peaceful worship piano
     scriptureFocus: 'Hebrews 11:1',
     segments: [
-      { duration: 30, type: 'opening', text: 'Faith doesn\'t mean you have no doubts. It means you choose trust in spite of them.' },
-      { duration: 90, type: 'scripture', text: 'Now faith is the substance of things hoped for, the evidence of things not seen.', verse: 'Hebrews 11:1' },
-      { duration: 90, type: 'reflection', text: 'Substance. Faith has weight even when the answer is invisible. It\'s not empty hoping — it\'s solid trust in a real God.' },
-      { duration: 90, type: 'scripture', text: 'Trust in the Lord with all your heart and lean not on your own understanding. In all your ways acknowledge Him, and He will make your paths straight.', verse: 'Proverbs 3:5-6' },
-      { duration: 90, type: 'reflection', text: 'You don\'t need to understand the path. You need to trust the One who knows it. What\'s one decision you\'re trying to figure out alone?' },
-      { duration: 60, type: 'silence', text: 'Hand that decision to God right now. Not with words. Just in your heart.' },
-      { duration: 60, type: 'prayer', text: 'Lord, I lean not on my own understanding. I acknowledge You in this. Make my path straight.' },
-      { duration: 30, type: 'close', text: 'Trust Him with the next step. He\'ll show you the one after that.' }
+      { duration: 30, type: 'opening', text: 'Faith doesn\'t mean you have no doubts. It means you choose trust in spite of them.', audioUrl: '/audio/med-faith_seg0.mp3' },
+      { duration: 90, type: 'scripture', text: 'Now faith is the substance of things hoped for, the evidence of things not seen.', verse: 'Hebrews 11:1', audioUrl: '/audio/med-faith_seg1.mp3' },
+      { duration: 90, type: 'reflection', text: 'Substance. Faith has weight even when the answer is invisible. It\'s not empty hoping — it\'s solid trust in a real God.', audioUrl: '/audio/med-faith_seg2.mp3' },
+      { duration: 90, type: 'scripture', text: 'Trust in the Lord with all your heart and lean not on your own understanding. In all your ways acknowledge Him, and He will make your paths straight.', verse: 'Proverbs 3:5-6', audioUrl: '/audio/med-faith_seg3.mp3' },
+      { duration: 90, type: 'reflection', text: 'You don\'t need to understand the path. You need to trust the One who knows it. What\'s one decision you\'re trying to figure out alone?', audioUrl: '/audio/med-faith_seg4.mp3' },
+      { duration: 60, type: 'silence', text: 'Hand that decision to God right now. Not with words. Just in your heart.', audioUrl: '/audio/med-faith_seg5.mp3' },
+      { duration: 60, type: 'prayer', text: 'Lord, I lean not on my own understanding. I acknowledge You in this. Make my path straight.', audioUrl: '/audio/med-faith_seg6.mp3' },
+      { duration: 30, type: 'close', text: 'Trust Him with the next step. He\'ll show you the one after that.', audioUrl: '/audio/med-faith_seg7.mp3' }
     ]
   }
 ];
@@ -166,7 +166,8 @@ const SLEEP_STORIES = [
     ambientYouTube: 'IXsIRMmfudw', // 24/7 sleep worship music
     fadeOutAt: 15,
     content: `The Lord is my shepherd... I shall not want. He makes me lie down in green pastures... He leads me beside still waters... He restores my soul. He leads me in paths of righteousness... for His name's sake. Even though I walk through the valley of the shadow of death... I will fear no evil... for You are with me. Your rod and Your staff... they comfort me. You prepare a table before me in the presence of my enemies. You anoint my head with oil... my cup overflows. Surely goodness and mercy shall follow me... all the days of my life. And I will dwell in the house of the Lord... forever.`,
-    repeatCount: 3
+    repeatCount: 3,
+    segmentAudioUrls: ['/audio/sleep-psalm23_verse0.mp3', '/audio/sleep-psalm23_verse1.mp3', '/audio/sleep-psalm23_verse2.mp3', '/audio/sleep-psalm23_verse3.mp3', '/audio/sleep-psalm23_verse4.mp3', '/audio/sleep-psalm23_verse5.mp3', '/audio/sleep-psalm23_verse6.mp3', '/audio/sleep-psalm23_verse7.mp3', '/audio/sleep-psalm23_verse8.mp3', '/audio/sleep-psalm23_verse9.mp3', '/audio/sleep-psalm23_verse10.mp3']
   },
   {
     id: 'sleep-peace',
@@ -183,7 +184,8 @@ const SLEEP_STORIES = [
       'Come to Me, all who labor and are heavy laden, and I will give you rest. — Matthew 11:28',
       'And the peace of God, which surpasses all understanding, will guard your hearts and your minds in Christ Jesus. — Philippians 4:7',
       'I have said these things to you, that in Me you may have peace. In the world you will have tribulation. But take heart; I have overcome the world. — John 16:33'
-    ]
+    ],
+    segmentAudioUrls: ['/audio/sleep-peace_verse0.mp3', '/audio/sleep-peace_verse1.mp3', '/audio/sleep-peace_verse2.mp3', '/audio/sleep-peace_verse3.mp3', '/audio/sleep-peace_verse4.mp3', '/audio/sleep-peace_verse5.mp3']
   },
   {
     id: 'sleep-promises',
@@ -202,7 +204,8 @@ const SLEEP_STORIES = [
       'Trust in the Lord with all your heart, and do not lean on your own understanding. — Proverbs 3:5',
       'The Lord is my light and my salvation; whom shall I fear? — Psalm 27:1',
       'Cast all your anxieties on Him, because He cares for you. — 1 Peter 5:7'
-    ]
+    ],
+    segmentAudioUrls: ['/audio/sleep-promises_verse0.mp3', '/audio/sleep-promises_verse1.mp3', '/audio/sleep-promises_verse2.mp3', '/audio/sleep-promises_verse3.mp3', '/audio/sleep-promises_verse4.mp3', '/audio/sleep-promises_verse5.mp3', '/audio/sleep-promises_verse6.mp3', '/audio/sleep-promises_verse7.mp3']
   },
   {
     id: 'sleep-creation',
@@ -213,7 +216,8 @@ const SLEEP_STORIES = [
     ambientYouTube: 'IXsIRMmfudw', // 24/7 sleep worship music
     fadeOutAt: 20,
     content: `In the beginning, God created the heavens and the earth. The earth was without form and void, and darkness was over the face of the deep. And the Spirit of God was hovering over the face of the waters. And God said, Let there be light, and there was light. And God saw that the light was good. And God separated the light from the darkness. God called the light Day, and the darkness He called Night. And there was evening and there was morning, the first day...`,
-    fullPassage: 'Genesis 1:1-31'
+    fullPassage: 'Genesis 1:1-31',
+    segmentAudioUrls: ['/audio/sleep-creation_verse0.mp3']
   },
   {
     id: 'sleep-loved',
@@ -229,7 +233,8 @@ const SLEEP_STORIES = [
       'Nothing in all creation will be able to separate us from the love of God in Christ Jesus our Lord. — Romans 8:39',
       'The Lord your God is in your midst, a mighty one who will save; He will rejoice over you with gladness; He will quiet you by His love; He will exult over you with loud singing. — Zephaniah 3:17',
       'I have loved you with an everlasting love; therefore I have continued My faithfulness to you. — Jeremiah 31:3'
-    ]
+    ],
+    segmentAudioUrls: ['/audio/sleep-loved_verse0.mp3', '/audio/sleep-loved_verse1.mp3', '/audio/sleep-loved_verse2.mp3', '/audio/sleep-loved_verse3.mp3', '/audio/sleep-loved_verse4.mp3']
   },
   {
     id: 'sleep-hands',
@@ -245,7 +250,8 @@ const SLEEP_STORIES = [
       'Behold, I have engraved you on the palms of My hands. — Isaiah 49:16',
       'No one will snatch them out of My hand. — John 10:28',
       'The eternal God is your dwelling place, and underneath are the everlasting arms. — Deuteronomy 33:27'
-    ]
+    ],
+    segmentAudioUrls: ['/audio/sleep-hands_verse0.mp3', '/audio/sleep-hands_verse1.mp3', '/audio/sleep-hands_verse2.mp3', '/audio/sleep-hands_verse3.mp3', '/audio/sleep-hands_verse4.mp3']
   },
   {
     id: 'sleep-shepherd',
@@ -256,7 +262,8 @@ const SLEEP_STORIES = [
     ambientYouTube: 'IXsIRMmfudw', // 24/7 sleep worship music
     fadeOutAt: 16,
     content: `I am the good shepherd. The good shepherd lays down His life for the sheep. I am the good shepherd. I know My own and My own know Me. My sheep hear My voice, and I know them, and they follow Me. I give them eternal life, and they will never perish, and no one will snatch them out of My hand. My Father, who has given them to Me, is greater than all, and no one is able to snatch them out of the Father's hand.`,
-    fullPassage: 'John 10:11-29'
+    fullPassage: 'John 10:11-29',
+    segmentAudioUrls: ['/audio/sleep-shepherd_verse0.mp3']
   }
 ];
 
