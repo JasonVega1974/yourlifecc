@@ -11910,6 +11910,7 @@ function _medRenderPlayer(med){
     '<div id="medSegLabel" style="font-size:.6rem;font-weight:900;letter-spacing:.22em;text-transform:uppercase;color:'+segColor+';margin-bottom:.9rem;">'+segLabel+'</div>',
     '<div id="medSegText" style="font-family:Georgia,serif;font-size:1.05rem;line-height:1.8;color:rgba(255,255,255,.88);font-style:italic;margin-bottom:.75rem;">“'+escapeHtml(seg.text||'')+'”</div>',
     '<div id="medSegVerse" style="font-size:.72rem;font-weight:700;color:'+segColor+';letter-spacing:.06em;">'+escapeHtml(seg.verse||'')+'</div>',
+    '<div id="medGenIndicator" style="display:none;margin-top:.85rem;font-size:.65rem;font-weight:700;color:rgba(167,139,250,.7);letter-spacing:.1em;text-transform:uppercase;">⋯ Generating audio</div>',
     '</div></div>',
     '<div style="padding:0 1.1rem .45rem;flex-shrink:0;text-align:center;" id="medSegDots">'+dots+'</div>',
     '<div style="padding:.45rem 1.1rem;flex-shrink:0;display:flex;justify-content:center;gap:.55rem;">',
@@ -11931,12 +11932,24 @@ function _medPlaySegment(med, segIdx){
   if(_medSegTimer){ clearTimeout(_medSegTimer); _medSegTimer = null; }
   if(!_medPaused){
     var segText = (seg.text||'')+(seg.verse?' — '+seg.verse:'');
+    // AI-generated meditations have no pre-rendered audioUrl. Route them through
+    // /api/tts-render so playback uses OpenAI Nova voice instead of the robotic
+    // Web Speech fallback. The endpoint caps text at 4096 chars and caches the
+    // resulting MP3 in Supabase tts-cache (so segment N replays are instant).
+    var needsApi = !seg.audioUrl;
+    var indicator = needsApi ? document.getElementById('medGenIndicator') : null;
+    if(indicator) indicator.style.display = '';
     YlccAudio.play({
       source: 'meditation-'+med.id+'-'+segIdx,
       _internal: true,
       mp3Url: seg.audioUrl || null,
+      ttsApiBody: { text: segText.slice(0,4000), cacheKey: 'med_'+med.id+'_seg'+segIdx },
       text: segText,
       rate: 0.85,
+      onPlay: function(){
+        var ind = document.getElementById('medGenIndicator');
+        if(ind) ind.style.display = 'none';
+      },
       onEnd: function(){ _medAdvance(med); }
     });
   }
