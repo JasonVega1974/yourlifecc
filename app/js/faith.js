@@ -12032,7 +12032,11 @@ function _medTogglePause(){
   } else {
     _medPaused = true;
     if(_medSegTimer){ clearTimeout(_medSegTimer); _medSegTimer = null; }
-    if('speechSynthesis' in window) window.speechSynthesis.cancel();
+    // Pause = full playback stop. Resume re-runs _medPlaySegment from the same
+    // segIdx, which restarts the segment from the top (matches prior behavior).
+    // Without this, the MP3 from /api/tts-render kept playing while the user
+    // thought playback was paused.
+    _ylccStopPlayback();
     var btn2 = document.getElementById('medPauseBtn');
     if(btn2) btn2.innerHTML = '▶ Resume';
   }
@@ -12050,7 +12054,12 @@ function _medSkip(){
 
 function _medClose(){
   if(_medSegTimer){ clearTimeout(_medSegTimer); _medSegTimer = null; }
-  if('speechSynthesis' in window && !_ssId) window.speechSynthesis.cancel();
+  // Kill any active MP3/speech before tearing down the overlay. Without this,
+  // tapping ✕ on the meditation player closed the overlay but left the
+  // YlccAudio MP3 (from /api/tts-render) playing in the background. Use
+  // _ylccStopPlayback rather than stopAllAudio so we don't recurse via the
+  // stopAllAudio → _medClose branch.
+  _ylccStopPlayback();
   var overlay = document.getElementById('meditationOverlay');
   if(overlay) overlay.remove();
   document.body.style.overflow = '';
@@ -12569,23 +12578,30 @@ window.YlccAudio = {
 
 function _ylccPlayTts(opts, src, finalize){
   if(!opts.ttsApiBody){ _ylccPlayWebSpeech(opts, src, finalize); return; }
+  console.log('[YlccAudio] Attempting MP3 from API for source:', src, 'textLen:', (opts.ttsApiBody.text||'').length);
   fetch('/api/tts-render', {
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body: JSON.stringify(opts.ttsApiBody)
   }).then(function(r){
+    console.log('[YlccAudio] API response status:', r.status, 'for', src);
     if(!r.ok) throw new Error('API '+r.status);
     return r.blob();
   }).then(function(blob){
-    if(_audioState.activeSource !== src) return;
+    console.log('[YlccAudio] API success, got MP3 blob:', blob.size, 'bytes for', src);
+    if(_audioState.activeSource !== src){
+      console.log('[YlccAudio] activeSource changed before playback — dropping result for', src);
+      return;
+    }
     var url = URL.createObjectURL(blob);
     var au = new Audio(url);
     _audioState.activeAudio = au;
     au.onended = function(){ URL.revokeObjectURL(url); finalize(); };
-    au.onerror = function(){ URL.revokeObjectURL(url); if(_audioState.activeSource===src) _ylccPlayWebSpeech(opts, src, finalize); };
+    au.onerror = function(){ console.warn('[YlccAudio] MP3 playback error, falling back to Web Speech for', src); URL.revokeObjectURL(url); if(_audioState.activeSource===src) _ylccPlayWebSpeech(opts, src, finalize); };
     au.onplay  = function(){ if(typeof opts.onPlay === 'function'){ try { opts.onPlay(); } catch(e){} } };
-    au.play().catch(function(){ URL.revokeObjectURL(url); if(_audioState.activeSource===src) _ylccPlayWebSpeech(opts, src, finalize); });
-  }).catch(function(){
+    au.play().catch(function(e){ console.warn('[YlccAudio] MP3 play() rejected:', e && e.message || e, '— falling back to Web Speech for', src); URL.revokeObjectURL(url); if(_audioState.activeSource===src) _ylccPlayWebSpeech(opts, src, finalize); });
+  }).catch(function(err){
+    console.warn('[YlccAudio] API failed, falling back to Web Speech. err:', err && err.message || err, 'src:', src);
     if(_audioState.activeSource===src) _ylccPlayWebSpeech(opts, src, finalize);
   });
 }

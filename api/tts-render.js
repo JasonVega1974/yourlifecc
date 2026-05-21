@@ -27,6 +27,17 @@ const MODEL       = 'tts-1';
 const MAX_CHARS   = 4096;
 
 module.exports = async function handler(req, res) {
+  // CORS — production currently 307-redirects yourlifecc.com → www.yourlifecc.com.
+  // The redirect target is a different origin from a browser's CORS perspective,
+  // so without these headers a fetch initiated from a non-www-loaded page (e.g.
+  // a service-worker-cached page) silently fails CORS and the client falls back
+  // to robotic Web Speech. Open ACAO is safe — this endpoint reads no cookies
+  // and accepts no user-identifying input.
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if(req.method === 'OPTIONS') return res.status(204).end();
+
   if(req.method !== 'POST') return res.status(405).json({error:'Method not allowed'});
 
   const { text, cacheKey } = req.body || {};
