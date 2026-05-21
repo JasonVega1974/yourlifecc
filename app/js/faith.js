@@ -10611,7 +10611,10 @@ function _rpOpenDay(planId){
 
   if(dayData.keyVerse){
     html += '<div style="background:rgba(251,191,36,.06);border-left:3px solid #fbbf24;border-radius:0 12px 12px 0;padding:.8rem 1rem;margin-bottom:.85rem;">';
-    html += '<div style="font-size:.6rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:#fbbf24;margin-bottom:.3rem;">✨ Key Verse</div>';
+    html += '<div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem;">';
+    html += '<div style="font-size:.6rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:#fbbf24;flex:1;">✨ Key Verse</div>';
+    html += '<button onclick="speakVerse(\''+_jEsc(dayData.keyVerse)+'\',\'\',this)" style="background:none;border:1px solid rgba(251,191,36,.3);border-radius:4px;padding:.1rem .35rem;font-size:.65rem;color:#fbbf24;cursor:pointer;">🔊</button>';
+    html += '</div>';
     html += '<div style="font-size:.88rem;font-weight:700;color:var(--tx);">' + dayData.keyVerse + '</div>';
     html += '</div>';
   }
