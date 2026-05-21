@@ -4657,6 +4657,7 @@
     <button class="tab" data-bf-tab="sleepStories" onclick="bfTab('sleepStories',this)">🌙 Sleep Stories</button>
     <button class="tab" data-bf-tab="ambientLibrary" onclick="bfTab('ambientLibrary',this)">🎵 Ambient</button>
     <button class="tab" data-bf-tab="createMeditation" onclick="bfTab('createMeditation',this)">✨ Create Meditation</button>
+    <button class="tab" data-bf-tab="dailyDevotional" onclick="bfTab('dailyDevotional',this)">📖 Daily Devotional</button>
     <button class="tab" onclick="window.location.href='/app/podcasts.html'">🎧 Podcasts</button>
     <button class="tab" onclick="window.location.href='/app/calendar.html'">📅 Faith Calendar</button>
     <button class="tab" onclick="wellGoto('worship')">🎵 Worship</button>
@@ -4708,7 +4709,7 @@
         <button onclick="_votdCopyVerse()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:var(--tx2);border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">📋 Copy</button>
         <button onclick="_votdSaveToJourney()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:var(--tx2);border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🔖 Journey</button>
         <button onclick="checkShowMoodPrompt(true)" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.25);color:#a78bfa;border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">😊 How I feel</button>
-        <button onclick="speakVotd()" style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.22);color:#fde68a;border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🔊 Listen</button>
+        <button id="votdListenBtn" onclick="speakVotd()" style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.22);color:#fde68a;border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🔊 Listen</button>
       </div>
     </div>
     <div class="well-welcome">Welcome to The Well. Everything you need to grow in faith — stories, plans, prayer, and Scripture — is here.</div>
@@ -7969,6 +7970,7 @@
     <button class="tab" data-bf-tab="sleepStories" onclick="bfTab('sleepStories',this)"><span class="scrtab-icon">🌙</span><span>Sleep Stories</span></button>
     <button class="tab" data-bf-tab="ambientLibrary" onclick="bfTab('ambientLibrary',this)"><span class="scrtab-icon">🎵</span><span>Ambient</span></button>
     <button class="tab" data-bf-tab="createMeditation" onclick="bfTab('createMeditation',this)"><span class="scrtab-icon">✨</span><span>Create</span></button>
+    <button class="tab" data-bf-tab="dailyDevotional" onclick="bfTab('dailyDevotional',this)"><span class="scrtab-icon">📖</span><span>Daily Devo</span></button>
     <button class="tab" onclick="window.location.href='/app/podcasts.html'"><span class="scrtab-icon">🎧</span><span>Podcasts</span></button>
     <button class="tab" onclick="window.location.href='/app/calendar.html'"><span class="scrtab-icon">📅</span><span>Calendar</span></button>
     <button class="tab" onclick="wellGoto('worship')"><span class="scrtab-icon">🎵</span><span>Worship</span></button>

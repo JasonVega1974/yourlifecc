@@ -11104,11 +11104,21 @@ function speakVerse(text, ref){
 
 function speakVotd(){
   var textEl = document.getElementById('fhVotdText');
-  var refEl = document.getElementById('fhVotdRef');
-  var text = textEl ? textEl.textContent.replace(/^[“"]/,'').replace(/[”"]$/,'').trim() : '';
-  var ref = refEl ? refEl.textContent.replace(/^—\s*/,'').trim() : '';
+  var refEl  = document.getElementById('fhVotdRef');
+  var btn    = document.getElementById('votdListenBtn');
+  var text   = textEl ? textEl.textContent.replace(/^[“”]/,'').replace(/[“”]$/,'').trim() : '';
+  var ref    = refEl  ? refEl.textContent.replace(/^—\s*/,'').trim() : '';
   if(!text) return;
-  speakVerse(text, ref);
+  function _votdReset(){ _ttsSpeaking=false; if(btn){ btn.textContent='🔊 Listen'; btn.style.background='rgba(251,191,36,.08)'; btn.style.border='1px solid rgba(251,191,36,.22)'; } _checkAudioStopBtn(); }
+  if(_ttsSpeaking){ window.speechSynthesis.cancel(); _votdReset(); return; }
+  if(!('speechSynthesis' in window)){ if(typeof showToast==='function') showToast('Text-to-speech not supported.'); return; }
+  window.speechSynthesis.cancel();
+  _ttsSpeaking = true;
+  if(btn){ btn.textContent='⏸ Stop'; btn.style.background='rgba(251,191,36,.22)'; btn.style.border='1px solid rgba(251,191,36,.5)'; }
+  _checkAudioStopBtn();
+  var fullText = (ref?ref+'. ':'')+text;
+  var sentences = fullText.match(/[^.!?]+[.!?]*/g)||[fullText];
+  _ttsWhenVoicesReady(function(voices){ _ttsSpeakSentences(sentences,0.85,voices,function(){ _votdReset(); }); });
 }
 
 function updateAllSpeakButtons(speaking){
@@ -11801,6 +11811,7 @@ function startMeditation(medId){
   document.body.style.overflow = 'hidden';
   _medRenderPlayer(med);
   _medPlaySegment(med, 0);
+  _checkAudioStopBtn();
 }
 
 function _medRenderPlayer(med){
@@ -11855,12 +11866,22 @@ function _medPlaySegment(med, segIdx){
   if(_medSegTimer){ clearTimeout(_medSegTimer); _medSegTimer = null; }
   if(!_medPaused){
     if(seg.audioUrl){
-      // Pre-rendered OpenAI TTS MP3 — play directly, fall back to timer on error
+      console.log('[AUDIO] Playing MP3:', seg.audioUrl);
       var _medAu = new Audio(seg.audioUrl);
       _medAu.onended = function(){ _medAdvance(med); };
-      _medAu.onerror = function(){ _medAdvance(med); };
-      _medAu.play().catch(function(){ /* timer will advance */ });
+      _medAu.onerror = function(e){
+        console.warn('[AUDIO] MP3 error for', seg.audioUrl, '— falling back to Web Speech');
+        if('speechSynthesis' in window){
+          window.speechSynthesis.cancel();
+          var fbText = (seg.text||'')+(seg.verse?' — '+seg.verse:'');
+          var fbSents = fbText.match(/[^.!?]+[.!?]*/g)||[fbText];
+          var fbDone = false;
+          _ttsWhenVoicesReady(function(v){ _ttsSpeakSentences(fbSents, 0.85, v, function(){ if(!fbDone){ fbDone=true; _medAdvance(med); } }); });
+        } else { _medAdvance(med); }
+      };
+      _medAu.play().catch(function(e){ console.warn('[AUDIO] play() rejected:', e&&e.message||e, '— timer will advance'); });
     } else if('speechSynthesis' in window){
+      console.log('[AUDIO] No audioUrl — Web Speech for seg', segIdx);
       window.speechSynthesis.cancel();
       var medText = (seg.text||'')+(seg.verse?' — '+seg.verse:'');
       var medSentences = medText.match(/[^.!?]+[.!?]*/g) || [medText];
@@ -11938,6 +11959,7 @@ function _medClose(){
   document.body.style.overflow = '';
   _medId = null; _medCurrentObj = null; _medSegIdx = 0; _medPaused = false; _medElapsed = 0; _medAdvancePending = false;
   if(_medPushedState){ _medPushedState = false; try{ history.back(); }catch(e){} }
+  _checkAudioStopBtn();
 }
 
 function _medComplete(med){
@@ -12010,6 +12032,7 @@ function startSleepStory(storyId){
   document.addEventListener('keydown', _ssEscHandler);
   _ssRenderPlayer(story);
   _ssPlaySegment(story, 0);
+  _checkAudioStopBtn();
   var fadeMs = (story.fadeOutAt||story.duration)*60000;
   _ssFadeTimer = setTimeout(function(){ _ssFadeOut(story); }, fadeMs);
 }
@@ -12084,10 +12107,26 @@ function _ssPlaySegment(story, idx){
     var ssAudioUrl = story.segmentAudioUrls && story.segmentAudioUrls[idx];
     if(ssAudioUrl){
       // Pre-rendered OpenAI TTS MP3
+      console.log('[AUDIO] Sleep story MP3:', ssAudioUrl);
       var _ssAu = new Audio(ssAudioUrl);
       _ssAu.onended = function(){ _ssSegTimer = setTimeout(function(){ if(!_ssPaused) _ssPlaySegment(storyRef,idxRef+1); }, 800); };
-      _ssAu.onerror = function(){ _ssSegTimer = setTimeout(function(){ if(!_ssPaused) _ssPlaySegment(storyRef,idxRef+1); }, 800); };
-      _ssAu.play().catch(function(){ /* timer will advance */ });
+      _ssAu.onerror = function(e){
+        console.warn('[AUDIO] Sleep MP3 error for', ssAudioUrl, '— falling back to Web Speech');
+        if('speechSynthesis' in window){
+          window.speechSynthesis.cancel();
+          var ssFbSents = seg.match(/[^.!?]+[.!?]*/g)||[seg];
+          var ssFbDone = false;
+          function ssFbNext(i){
+            if(i>=ssFbSents.length){ if(!ssFbDone){ ssFbDone=true; _ssSegTimer=setTimeout(function(){ if(!_ssPaused) _ssPlaySegment(storyRef,idxRef+1); },800); } return; }
+            var u = new SpeechSynthesisUtterance(ssFbSents[i].trim()); u.rate=0.75;
+            u.onend=function(){ setTimeout(function(){ ssFbNext(i+1); },300); };
+            u.onerror=function(){ setTimeout(function(){ ssFbNext(i+1); },300); };
+            window.speechSynthesis.speak(u);
+          }
+          ssFbNext(0);
+        } else { _ssSegTimer=setTimeout(function(){ if(!_ssPaused) _ssPlaySegment(storyRef,idxRef+1); },800); }
+      };
+      _ssAu.play().catch(function(e){ console.warn('[AUDIO] sleep play() rejected:', e&&e.message||e); });
     } else if('speechSynthesis' in window){
       window.speechSynthesis.cancel();
       var ssSentences = seg.match(/[^.!?]+[.!?]*/g) || [seg];
@@ -12147,6 +12186,7 @@ function _ssClose(){
     _ssPushedState = false;
     try{ if(window.history.state && window.history.state.ylccSS) history.back(); }catch(e){}
   }
+  _checkAudioStopBtn();
 }
 
 function _ssFadeOut(story){
@@ -12314,6 +12354,7 @@ function playAmbientTrack(trackId){
   _ambientTrackId = trackId;
   ensureAmbientMiniPlayer(track);
   renderAmbientLibraryCard();
+  _checkAudioStopBtn();
 }
 
 function stopAmbient(){
@@ -12324,6 +12365,42 @@ function stopAmbient(){
   var iframe = document.getElementById('ambientIframe');
   if(iframe) iframe.src = '';
   renderAmbientLibraryCard();
+  _checkAudioStopBtn();
+}
+
+// ── Universal audio stop control ──────────────────────────────────────────────
+
+function _checkAudioStopBtn(){
+  var active = _ttsSpeaking || !!_medId || !!_ssId || !!_ambientTrackId;
+  var btn = document.getElementById('globalAudioStopBtn');
+  if(active){
+    if(!btn){
+      btn = document.createElement('button');
+      btn.id = 'globalAudioStopBtn';
+      btn.type = 'button';
+      btn.setAttribute('aria-label', 'Stop all audio');
+      btn.title = 'Stop all audio';
+      btn.style.cssText = 'position:fixed;bottom:calc(7.5rem + env(safe-area-inset-bottom));right:1rem;z-index:9100;background:rgba(239,68,68,.88);border:1px solid rgba(239,68,68,.5);border-radius:50%;width:44px;height:44px;color:#fff;font-size:1.1rem;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:0;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);';
+      btn.onclick = stopAllAudio;
+      btn.innerHTML = '⏹';
+      document.body.appendChild(btn);
+    } else {
+      btn.style.display = 'flex';
+    }
+  } else {
+    if(btn) btn.style.display = 'none';
+  }
+}
+
+function stopAllAudio(){
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  _ttsSpeaking = false;
+  var votdBtn = document.getElementById('votdListenBtn');
+  if(votdBtn){ votdBtn.textContent='🔊 Listen'; votdBtn.style.background='rgba(251,191,36,.08)'; votdBtn.style.border='1px solid rgba(251,191,36,.22)'; }
+  if(_medId) _medClose();
+  if(_ssId) _ssClose();
+  if(_ambientTrackId) stopAmbient();
+  _checkAudioStopBtn();
 }
 
 function ensureAmbientMiniPlayer(track){
@@ -12360,6 +12437,9 @@ function ensureAmbientMiniPlayer(track){
     + '?autoplay=1&mute=0&loop=1&playlist='+track.youtubeId
     + '&controls=0&modestbranding=1&playsinline=1&rel=0&enablejsapi=1'
     + '&origin='+encodeURIComponent(location.origin);
+  iframe.addEventListener('load', function(){
+    try { iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*'); } catch(e){}
+  });
   mp.appendChild(iframe);
 }
 
