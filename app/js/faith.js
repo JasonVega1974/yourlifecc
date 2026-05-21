@@ -654,42 +654,14 @@ function _dailyDevSpeak(){
   try { dev = JSON.parse(localStorage.getItem(lsKey)||'null'); } catch(e) {}
   if(!dev) return;
   var btn = document.getElementById('dailyDevListenBtn');
-  if(_audioState.activeSource === 'devotional'){ stopAllAudio(); return; }
-  stopAllAudio();
-  _audioState.activeSource = 'devotional';
-  _audioState.activeBtn = btn;
-  _audioState.activeBtnOrigText = '🔊 Listen';
-  if(btn){ btn.textContent='⏸ Stop'; btn.style.background='rgba(251,191,36,.22)'; btn.style.border='1px solid rgba(251,191,36,.5)'; }
   var fullText = (dev.scripture||'')+'. '+(dev.devotional||'')+'. '+(dev.prayer||'');
-  fetch('/api/tts-render', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({text:fullText.slice(0,4000), cacheKey:'daily_dev_'+today})
-  }).then(function(r){
-    if(!r.ok) throw new Error('API '+r.status);
-    return r.blob();
-  }).then(function(blob){
-    if(_audioState.activeSource !== 'devotional') return;
-    var url = URL.createObjectURL(blob);
-    var au = new Audio(url);
-    _audioState.activeAudio = au;
-    au.onended = function(){ URL.revokeObjectURL(url); if(_audioState.activeSource==='devotional') stopAllAudio(); };
-    au.onerror = function(){ URL.revokeObjectURL(url); if(_audioState.activeSource==='devotional') _fallbackDevWebSpeech(fullText); };
-    au.play().catch(function(){ URL.revokeObjectURL(url); if(_audioState.activeSource==='devotional') _fallbackDevWebSpeech(fullText); });
-  }).catch(function(){
-    if(_audioState.activeSource === 'devotional') _fallbackDevWebSpeech(fullText);
-  });
-}
-function _fallbackDevWebSpeech(text){
-  if(_audioState.activeSource !== 'devotional') return;
-  if(!('speechSynthesis' in window)){ stopAllAudio(); return; }
-  window.speechSynthesis.cancel();
-  var sentences = text.match(/[^.!?]+[.!?]*/g)||[text];
-  _ttsWhenVoicesReady(function(voices){
-    if(_audioState.activeSource !== 'devotional') return;
-    _ttsSpeakSentences(sentences, 0.85, voices, function(){
-      if(_audioState.activeSource === 'devotional') stopAllAudio();
-    });
+  YlccAudio.play({
+    source: 'devotional',
+    btn: btn,
+    btnStopText: '⏸ Stop',
+    btnStopStyle: { background: 'rgba(251,191,36,.22)', border: '1px solid rgba(251,191,36,.5)' },
+    ttsApiBody: { text: fullText.slice(0,4000), cacheKey: 'daily_dev_'+today },
+    text: fullText
   });
 }
 
@@ -11184,20 +11156,11 @@ function speakVerse(text, ref, btn){
     if(typeof showToast==='function') showToast('Text-to-speech not supported in this browser.');
     return;
   }
-  var src = 'verse-'+(ref||'unknown');
-  if(_audioState.activeSource === src){ stopAllAudio(); return; }
-  stopAllAudio();
-  _audioState.activeSource = src;
-  _audioState.activeBtn = btn||null;
-  _audioState.activeBtnOrigText = btn ? btn.textContent : null;
-  if(btn){ btn.textContent = '⏸'; }
-  var fullText = (ref ? ref+'. ' : '')+(text||'');
-  var sentences = fullText.match(/[^.!?]+[.!?]*/g)||[fullText];
-  _ttsWhenVoicesReady(function(voices){
-    if(_audioState.activeSource !== src) return;
-    _ttsSpeakSentences(sentences, 0.85, voices, function(){
-      if(_audioState.activeSource === src) stopAllAudio();
-    });
+  YlccAudio.play({
+    source: 'verse-'+(ref||'unknown'),
+    text: (ref ? ref+'. ' : '')+(text||''),
+    btn: btn,
+    btnStopText: '⏸'
   });
 }
 
@@ -11208,55 +11171,16 @@ function speakVotd(){
   var text   = textEl ? textEl.textContent.replace(/^[“”]/,'').replace(/[“”]$/,'').trim() : '';
   var ref    = refEl  ? refEl.textContent.replace(/^—\s*/,'').trim() : '';
   if(!text) return;
-  if(_audioState.activeSource === 'votd'){ stopAllAudio(); return; }
-  stopAllAudio();
-  _audioState.activeSource = 'votd';
-  _audioState.activeBtn = btn;
-  _audioState.activeBtnOrigText = '🔊 Listen';
-  if(btn){ btn.textContent='⏸ Stop'; btn.style.background='rgba(251,191,36,.22)'; btn.style.border='1px solid rgba(251,191,36,.5)'; }
   var fullText = (ref?ref+'. ':'')+text;
   var votd = (typeof getVotdForDay==='function') ? getVotdForDay() : null;
-  if(votd && votd.idx != null){
-    var au = new Audio('/app/audio/votd/votd_'+votd.idx+'.mp3');
-    _audioState.activeAudio = au;
-    au.onended = function(){ if(_audioState.activeSource==='votd') stopAllAudio(); };
-    au.onerror = function(){ if(_audioState.activeSource==='votd') _tryVotdOnDemandTts(fullText); };
-    au.play().catch(function(){ if(_audioState.activeSource==='votd') _tryVotdOnDemandTts(fullText); });
-    return;
-  }
-  _tryVotdOnDemandTts(fullText);
-}
-function _tryVotdOnDemandTts(fullText){
-  var cacheKey = 'votd_'+fullText.substring(0,40).replace(/\W/g,'_');
-  fetch('/api/tts-render', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({text:fullText.slice(0,600), cacheKey:cacheKey})
-  }).then(function(r){
-    if(!r.ok) throw new Error('API '+r.status);
-    return r.blob();
-  }).then(function(blob){
-    if(_audioState.activeSource !== 'votd') return;
-    var url = URL.createObjectURL(blob);
-    var au = new Audio(url);
-    _audioState.activeAudio = au;
-    au.onended = function(){ URL.revokeObjectURL(url); if(_audioState.activeSource==='votd') stopAllAudio(); };
-    au.onerror = function(){ URL.revokeObjectURL(url); if(_audioState.activeSource==='votd') _fallbackVotdWebSpeech(fullText); };
-    au.play().catch(function(){ URL.revokeObjectURL(url); if(_audioState.activeSource==='votd') _fallbackVotdWebSpeech(fullText); });
-  }).catch(function(){
-    if(_audioState.activeSource === 'votd') _fallbackVotdWebSpeech(fullText);
-  });
-}
-function _fallbackVotdWebSpeech(fullText){
-  if(_audioState.activeSource !== 'votd') return;
-  if(!('speechSynthesis' in window)){ stopAllAudio(); return; }
-  window.speechSynthesis.cancel();
-  var sentences = fullText.match(/[^.!?]+[.!?]*/g)||[fullText];
-  _ttsWhenVoicesReady(function(voices){
-    if(_audioState.activeSource !== 'votd') return;
-    _ttsSpeakSentences(sentences, 0.85, voices, function(){
-      if(_audioState.activeSource==='votd') stopAllAudio();
-    });
+  YlccAudio.play({
+    source: 'votd',
+    btn: btn,
+    btnStopText: '⏸ Stop',
+    btnStopStyle: { background: 'rgba(251,191,36,.22)', border: '1px solid rgba(251,191,36,.5)' },
+    mp3Url: (votd && votd.idx != null) ? '/app/audio/votd/votd_'+votd.idx+'.mp3' : null,
+    ttsApiBody: { text: fullText.slice(0,600), cacheKey: 'votd_'+fullText.substring(0,40).replace(/\W/g,'_') },
+    text: fullText
   });
 }
 
@@ -11924,6 +11848,7 @@ function startCustomMeditation(med){
   // Ensure med has ambientYouTube field the player expects
   if(!med.ambientYouTube) med.ambientYouTube = _ambientForSuggestion(med.ambientSuggestion);
   _medClose();
+  if(typeof stopAllAudio === 'function') stopAllAudio();
   _medId = med.id;
   _medCurrentObj = med;
   _medSegIdx = 0; _medPaused = false; _medElapsed = 0; _medAdvancePending = false;
@@ -11941,6 +11866,7 @@ function startMeditation(medId){
   var med = AUDIO_MEDITATIONS.find(function(m){ return m.id===medId; });
   if(!med) return;
   _medClose();
+  if(typeof stopAllAudio === 'function') stopAllAudio();
   if('pushState' in history){ history.pushState({ylccMed:true},''); _medPushedState = true; }
   _medId = medId; _medCurrentObj = med; _medSegIdx = 0; _medPaused = false; _medElapsed = 0; _medAdvancePending = false;
   var overlay = document.createElement('div');
@@ -12004,34 +11930,15 @@ function _medPlaySegment(med, segIdx){
   _medUpdateSegmentUI(med, segIdx);
   if(_medSegTimer){ clearTimeout(_medSegTimer); _medSegTimer = null; }
   if(!_medPaused){
-    if(seg.audioUrl){
-      console.log('[AUDIO] Playing MP3:', seg.audioUrl);
-      var _medAu = new Audio(seg.audioUrl);
-      _medAu.onended = function(){ _medAdvance(med); };
-      _medAu.onerror = function(e){
-        console.warn('[AUDIO] MP3 error for', seg.audioUrl, '— falling back to Web Speech');
-        if('speechSynthesis' in window){
-          window.speechSynthesis.cancel();
-          var fbText = (seg.text||'')+(seg.verse?' — '+seg.verse:'');
-          var fbSents = fbText.match(/[^.!?]+[.!?]*/g)||[fbText];
-          var fbDone = false;
-          _ttsWhenVoicesReady(function(v){ _ttsSpeakSentences(fbSents, 0.85, v, function(){ if(!fbDone){ fbDone=true; _medAdvance(med); } }); });
-        } else { _medAdvance(med); }
-      };
-      _medAu.play().catch(function(e){ console.warn('[AUDIO] play() rejected:', e&&e.message||e, '— timer will advance'); });
-    } else if('speechSynthesis' in window){
-      console.log('[AUDIO] No audioUrl — Web Speech for seg', segIdx);
-      window.speechSynthesis.cancel();
-      var medText = (seg.text||'')+(seg.verse?' — '+seg.verse:'');
-      if(medText.length > 4000){
-        console.warn('[TTS] Meditation segment exceeds 4000 chars ('+medText.length+') — truncating to 4000');
-        medText = medText.slice(0, 4000);
-      }
-      var medSentences = medText.match(/[^.!?]+[.!?]*/g) || [medText];
-      var medDone = false;
-      function _medTtsDone(){ if(!medDone){ medDone=true; _medAdvance(med); } }
-      _ttsWhenVoicesReady(function(voices){ _ttsSpeakSentences(medSentences, 0.85, voices, _medTtsDone); });
-    }
+    var segText = (seg.text||'')+(seg.verse?' — '+seg.verse:'');
+    YlccAudio.play({
+      source: 'meditation-'+med.id+'-'+segIdx,
+      _internal: true,
+      mp3Url: seg.audioUrl || null,
+      text: segText,
+      rate: 0.85,
+      onEnd: function(){ _medAdvance(med); }
+    });
   }
   _medSegTimer = setTimeout(function(){ if(!_medPaused) _medAdvance(med); }, seg.duration*1000);
 }
@@ -12522,7 +12429,12 @@ function _checkAudioStopBtn(){
   if(old && old.parentNode) old.parentNode.removeChild(old);
 }
 
-function stopAllAudio(){
+// _ylccStopPlayback — kills the current TTS/MP3 playback and resets the active
+// button, but LEAVES overlays (meditation/sleep) and ambient iframe intact.
+// Used internally by YlccAudio when swapping from one segment source to another
+// within the same player (e.g., meditation seg 0 → seg 1). stopAllAudio() below
+// is the user-facing "stop everything" entry point.
+function _ylccStopPlayback(){
   if('speechSynthesis' in window) window.speechSynthesis.cancel();
   _ttsSpeaking = false;
   if(_audioState.activeAudio){
@@ -12543,9 +12455,103 @@ function stopAllAudio(){
   }
   _audioState.activeBtnOrigText = null;
   _audioState.activeSource = null;
+}
+
+function stopAllAudio(){
+  _ylccStopPlayback();
   if(_medId) _medClose();
   if(_ssId) _ssClose();
   if(_ambientTrackId) stopAmbient();
+}
+
+// YlccAudio — unified play/stop API. Every audio button should route through
+// this rather than calling speechSynthesis, new Audio(), or fetch('/api/tts-render')
+// directly. Resolution chain per call, falling through on error:
+//   1. opts.mp3Url    — pre-rendered/static MP3
+//   2. opts.ttsApiBody — POST to /api/tts-render (OpenAI Nova voice)
+//   3. opts.text      — Web Speech API (last resort, robotic voice)
+// _internal:true uses a soft stop so meditation/sleep segments can chain.
+window.YlccAudio = {
+  play: function(opts){
+    if(!opts || !opts.source) return;
+    var src = opts.source;
+    if(_audioState.activeSource === src){ stopAllAudio(); return; }
+    if(opts._internal) _ylccStopPlayback();
+    else stopAllAudio();
+    _audioState.activeSource = src;
+    _audioState.activeBtn = opts.btn || null;
+    _audioState.activeBtnOrigText = opts.btn ? opts.btn.textContent : null;
+    if(opts.btn){
+      if(opts.btnStopText) opts.btn.textContent = opts.btnStopText;
+      if(opts.btnStopStyle){
+        if(opts.btnStopStyle.background) opts.btn.style.background = opts.btnStopStyle.background;
+        if(opts.btnStopStyle.border) opts.btn.style.border = opts.btnStopStyle.border;
+      }
+    }
+    if(opts.ttsApiBody && opts.ttsApiBody.text && opts.ttsApiBody.text.length > 4000){
+      console.warn('[YlccAudio] TTS text exceeds 4000 chars ('+opts.ttsApiBody.text.length+') — will be truncated server-side. Source:', src);
+    }
+    var didFinish = false;
+    var finalize = function(){
+      if(didFinish) return;
+      didFinish = true;
+      if(_audioState.activeSource !== src) return;
+      if(typeof opts.onEnd === 'function'){
+        try { opts.onEnd(); } catch(e){ console.warn('[YlccAudio] onEnd error:', e); }
+        if(_audioState.activeSource === src) stopAllAudio();
+      } else {
+        stopAllAudio();
+      }
+    };
+    if(opts.mp3Url){
+      var au = new Audio(opts.mp3Url);
+      _audioState.activeAudio = au;
+      au.onended = finalize;
+      au.onerror = function(){ if(_audioState.activeSource===src) _ylccPlayTts(opts, src, finalize); };
+      au.onplay  = function(){ if(typeof opts.onPlay === 'function'){ try { opts.onPlay(); } catch(e){} } };
+      au.play().catch(function(){ if(_audioState.activeSource===src) _ylccPlayTts(opts, src, finalize); });
+      return;
+    }
+    _ylccPlayTts(opts, src, finalize);
+  },
+  stop: function(){ stopAllAudio(); },
+  isPlaying: function(src){ return _audioState.activeSource === src; }
+};
+
+function _ylccPlayTts(opts, src, finalize){
+  if(!opts.ttsApiBody){ _ylccPlayWebSpeech(opts, src, finalize); return; }
+  fetch('/api/tts-render', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(opts.ttsApiBody)
+  }).then(function(r){
+    if(!r.ok) throw new Error('API '+r.status);
+    return r.blob();
+  }).then(function(blob){
+    if(_audioState.activeSource !== src) return;
+    var url = URL.createObjectURL(blob);
+    var au = new Audio(url);
+    _audioState.activeAudio = au;
+    au.onended = function(){ URL.revokeObjectURL(url); finalize(); };
+    au.onerror = function(){ URL.revokeObjectURL(url); if(_audioState.activeSource===src) _ylccPlayWebSpeech(opts, src, finalize); };
+    au.onplay  = function(){ if(typeof opts.onPlay === 'function'){ try { opts.onPlay(); } catch(e){} } };
+    au.play().catch(function(){ URL.revokeObjectURL(url); if(_audioState.activeSource===src) _ylccPlayWebSpeech(opts, src, finalize); });
+  }).catch(function(){
+    if(_audioState.activeSource===src) _ylccPlayWebSpeech(opts, src, finalize);
+  });
+}
+
+function _ylccPlayWebSpeech(opts, src, finalize){
+  if(!('speechSynthesis' in window) || !opts.text){ finalize(); return; }
+  window.speechSynthesis.cancel();
+  var sentences = opts.text.match(/[^.!?]+[.!?]*/g) || [opts.text];
+  _ttsWhenVoicesReady(function(voices){
+    if(_audioState.activeSource !== src) return;
+    if(typeof opts.onPlay === 'function'){ try { opts.onPlay(); } catch(e){} }
+    _ttsSpeakSentences(sentences, opts.rate || 0.85, voices, function(){
+      if(_audioState.activeSource === src) finalize();
+    });
+  });
 }
 
 function ensureAmbientMiniPlayer(track){
