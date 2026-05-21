@@ -439,7 +439,7 @@ function initScripture(){
 // the original 6 tabs. New tabs without renderers are stubs awaiting later phases.
 // btn is optional — when bfTab() is called programmatically (e.g., from a Quick
 // Tile or stub-panel CTA), the matching button is found via [data-bf-tab].
-const BF_TABS = ['home','devotional','jesus','denominations','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy','studyTools','readingPlans','audioBible','audioMeditations','sleepStories','ambientLibrary','createMeditation'];
+const BF_TABS = ['home','devotional','jesus','denominations','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy','studyTools','readingPlans','audioBible','audioMeditations','sleepStories','ambientLibrary','createMeditation','dailyDevotional'];
 
 // Phase 5.8 v3 — Home-grid restorer. Defensive against any prior code
 // that may have set .topic-card-grid display:none inside #bf-home. The
@@ -554,7 +554,7 @@ function renderDailyAiDevotional(){
   var cacheKey = (typeof _ylccUserKey === 'function') ? _ylccUserKey('daily_ai_dev_' + today) : 'ylcc_daily_ai_dev_' + today;
   var cached = null;
   try { cached = JSON.parse(localStorage.getItem(cacheKey)||'null'); } catch(e) {}
-  if(cached && cached.title){ _renderDailyDevContent(root, cached); return; }
+  if(cached && cached.title){ _renderDailyDevPreview(root, cached); return; }
 
   // Shimmer skeleton — inject keyframe once
   if(!document.getElementById('_devSkelStyle')){
@@ -589,12 +589,38 @@ function renderDailyAiDevotional(){
   .then(function(data){
     if(data && data.ok && data.title){
       try { localStorage.setItem(cacheKey, JSON.stringify(data)); } catch(e) {}
-      _renderDailyDevContent(root, data);
+      _renderDailyDevPreview(root, data);
     } else {
       root.innerHTML = '';
     }
   })
   .catch(function(){ root.innerHTML = ''; });
+}
+
+function _renderDailyDevPreview(root, dev){
+  var dateLabel = new Date().toLocaleDateString('en-US', {month:'long', day:'numeric'});
+  var sentences = (dev.devotional||'').match(/[^.!?]+[.!?]+/g) || [(dev.devotional||'')];
+  var preview = sentences.slice(0,3).join(' ').trim();
+  var html = '<div style="background:rgba(67,56,202,.04);border:1px solid rgba(67,56,202,.12);border-radius:14px;padding:.85rem 1rem;">';
+  html += '<div style="font-size:.6875rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#4338ca;opacity:.85;margin-bottom:.25rem;">✨ DAILY DEVOTIONAL · '+escapeHtml(dateLabel)+'</div>';
+  html += '<div style="font-size:.95rem;font-weight:900;color:var(--tx);margin-bottom:.4rem;line-height:1.3;">'+(dev.icon||'✨')+' '+escapeHtml(dev.title||'')+'</div>';
+  html += '<div style="font-family:Georgia,serif;font-style:italic;font-size:.84rem;line-height:1.55;color:var(--tx);margin-bottom:.18rem;">"'+escapeHtml(dev.scripture||'')+'"</div>';
+  html += '<div style="font-size:.7rem;font-weight:800;color:#4338ca;margin-bottom:.5rem;">— '+escapeHtml(dev.scriptureRef||'')+'</div>';
+  html += '<div style="font-size:.8rem;color:var(--tx2);line-height:1.65;margin-bottom:.55rem;">'+escapeHtml(preview)+'</div>';
+  html += '<button type="button" onclick="bfTab(\'dailyDevotional\')" style="background:rgba(67,56,202,.1);border:1px solid rgba(67,56,202,.25);color:#4338ca;border-radius:8px;padding:.3rem .7rem;font-size:.75rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Read more →</button>';
+  html += '</div>';
+  root.innerHTML = html;
+}
+
+function renderDailyDevFull(){
+  var root = document.getElementById('dailyDevRoot');
+  if(!root) return;
+  var today = new Date().toISOString().slice(0,10);
+  var cacheKey = (typeof _ylccUserKey === 'function') ? _ylccUserKey('daily_ai_dev_' + today) : 'ylcc_daily_ai_dev_' + today;
+  var dev = null;
+  try { dev = JSON.parse(localStorage.getItem(cacheKey)||'null'); } catch(e) {}
+  if(dev && dev.title){ _renderDailyDevContent(root, dev); return; }
+  root.innerHTML = '<div style="padding:1.5rem 1rem;text-align:center;color:var(--tx2);font-size:.84rem;">Open Home to load today\'s devotional first.</div>';
 }
 
 function _renderDailyDevContent(root, dev){
@@ -788,6 +814,7 @@ function bfTab(tab, btn){
   if(tab==='sleepStories') renderSleepStoriesCard();
   if(tab==='ambientLibrary') renderAmbientLibraryCard();
   if(tab==='createMeditation') renderCreateMeditationCard();
+  if(tab==='dailyDevotional') renderDailyDevFull();
 }
 
 // ── FAITH HOME (F2-A) ────────────────────────────────────────
@@ -11826,13 +11853,21 @@ function _medPlaySegment(med, segIdx){
   var seg = med.segments[segIdx];
   _medUpdateSegmentUI(med, segIdx);
   if(_medSegTimer){ clearTimeout(_medSegTimer); _medSegTimer = null; }
-  if(!_medPaused && 'speechSynthesis' in window){
-    window.speechSynthesis.cancel();
-    var medText = (seg.text||'')+(seg.verse?' — '+seg.verse:'');
-    var medSentences = medText.match(/[^.!?]+[.!?]*/g) || [medText];
-    var medDone = false;
-    function _medTtsDone(){ if(!medDone){ medDone=true; _medAdvance(med); } }
-    _ttsWhenVoicesReady(function(voices){ _ttsSpeakSentences(medSentences, 0.85, voices, _medTtsDone); });
+  if(!_medPaused){
+    if(seg.audioUrl){
+      // Pre-rendered OpenAI TTS MP3 — play directly, fall back to timer on error
+      var _medAu = new Audio(seg.audioUrl);
+      _medAu.onended = function(){ _medAdvance(med); };
+      _medAu.onerror = function(){ _medAdvance(med); };
+      _medAu.play().catch(function(){ /* timer will advance */ });
+    } else if('speechSynthesis' in window){
+      window.speechSynthesis.cancel();
+      var medText = (seg.text||'')+(seg.verse?' — '+seg.verse:'');
+      var medSentences = medText.match(/[^.!?]+[.!?]*/g) || [medText];
+      var medDone = false;
+      function _medTtsDone(){ if(!medDone){ medDone=true; _medAdvance(med); } }
+      _ttsWhenVoicesReady(function(voices){ _ttsSpeakSentences(medSentences, 0.85, voices, _medTtsDone); });
+    }
   }
   _medSegTimer = setTimeout(function(){ if(!_medPaused) _medAdvance(med); }, seg.duration*1000);
 }
@@ -11984,7 +12019,7 @@ function _ssRenderPlayer(story){
   if(!overlay) return;
   var seg = _ssSegments[_ssIdx]||'';
   var ssAmbientSrc = 'https://www.youtube-nocookie.com/embed/'+story.ambientYouTube
-    + '?autoplay=1&mute=1&loop=1&playlist='+story.ambientYouTube
+    + '?autoplay=1&mute=0&loop=1&playlist='+story.ambientYouTube
     + '&controls=0&modestbranding=1&playsinline=1&rel=0&enablejsapi=1&origin='+encodeURIComponent(location.origin);
   overlay.innerHTML = [
     '<div style="display:flex;align-items:center;justify-content:space-between;padding:max(env(safe-area-inset-top),.85rem) 1.1rem .4rem;flex-shrink:0;">',
@@ -12000,7 +12035,7 @@ function _ssRenderPlayer(story){
     '<div style="padding:.35rem 1.1rem .5rem;flex-shrink:0;">',
     '<div style="display:flex;align-items:center;gap:.5rem;">',
     '<span style="font-size:.52rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);flex:1;">🎵 Ambient music</span>',
-    '<button type="button" id="ssAmbientMuteBtn" onclick="_ssMuteToggle()" style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);color:#fbbf24;border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🔇 Tap for audio</button>',
+    '<button type="button" id="ssAmbientMuteBtn" onclick="_ssMuteToggle()" style="background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.3);color:#38bdf8;border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🔊 Audio on</button>',
     '</div>',
     '<iframe id="ssAmbientIframe" src="'+ssAmbientSrc+'" frameborder="0" allow="autoplay;encrypted-media" style="width:0;height:0;position:absolute;border:none;pointer-events:none;top:0;left:0;" title="Ambient audio"></iframe>',
     '</div>',
@@ -12043,33 +12078,42 @@ function _ssPlaySegment(story, idx){
     var numEl = document.getElementById('ssVerseNum');
     if(numEl) numEl.textContent = (idx+1)+' / '+_ssSegments.length;
   }, 600);
-  if('speechSynthesis' in window && !_ssPaused){
-    window.speechSynthesis.cancel();
+  if(!_ssPaused){
     var storyRef = story;
     var idxRef = idx;
-    var ssSentences = seg.match(/[^.!?]+[.!?]*/g) || [seg];
-    var ssVol = Math.max(0.05, _ssTtsVol);
-    _ttsWhenVoicesReady(function(voices){
-      var ssVoice = _ttsSelectVoice(voices);
-      var ssIdx2 = 0;
-      function ssSpeakNext(){
-        if(ssIdx2 >= ssSentences.length){
-          _ssSegTimer = setTimeout(function(){ if(!_ssPaused) _ssPlaySegment(storyRef,idxRef+1); }, 3000);
-          return;
+    var ssAudioUrl = story.segmentAudioUrls && story.segmentAudioUrls[idx];
+    if(ssAudioUrl){
+      // Pre-rendered OpenAI TTS MP3
+      var _ssAu = new Audio(ssAudioUrl);
+      _ssAu.onended = function(){ _ssSegTimer = setTimeout(function(){ if(!_ssPaused) _ssPlaySegment(storyRef,idxRef+1); }, 800); };
+      _ssAu.onerror = function(){ _ssSegTimer = setTimeout(function(){ if(!_ssPaused) _ssPlaySegment(storyRef,idxRef+1); }, 800); };
+      _ssAu.play().catch(function(){ /* timer will advance */ });
+    } else if('speechSynthesis' in window){
+      window.speechSynthesis.cancel();
+      var ssSentences = seg.match(/[^.!?]+[.!?]*/g) || [seg];
+      var ssVol = Math.max(0.05, _ssTtsVol);
+      _ttsWhenVoicesReady(function(voices){
+        var ssVoice = _ttsSelectVoice(voices);
+        var ssIdx2 = 0;
+        function ssSpeakNext(){
+          if(ssIdx2 >= ssSentences.length){
+            _ssSegTimer = setTimeout(function(){ if(!_ssPaused) _ssPlaySegment(storyRef,idxRef+1); }, 3000);
+            return;
+          }
+          var s = ssSentences[ssIdx2++];
+          if(!s || !s.trim()){ ssSpeakNext(); return; }
+          var utt = new SpeechSynthesisUtterance(s.trim());
+          utt.rate = 0.75;
+          utt.volume = ssVol;
+          if(ssVoice) utt.voice = ssVoice;
+          utt.onend = function(){ setTimeout(ssSpeakNext, 300); };
+          utt.onerror = function(){ setTimeout(ssSpeakNext, 300); };
+          window.speechSynthesis.speak(utt);
         }
-        var s = ssSentences[ssIdx2++];
-        if(!s || !s.trim()){ ssSpeakNext(); return; }
-        var utt = new SpeechSynthesisUtterance(s.trim());
-        utt.rate = 0.75;
-        utt.volume = ssVol;
-        if(ssVoice) utt.voice = ssVoice;
-        utt.onend = function(){ setTimeout(ssSpeakNext, 300); };
-        utt.onerror = function(){ setTimeout(ssSpeakNext, 300); };
-        window.speechSynthesis.speak(utt);
-      }
-      ssSpeakNext();
-    });
-  }
+        ssSpeakNext();
+      });
+    } // end else if speechSynthesis
+  } // end if !_ssPaused
 }
 
 function _ssTogglePause(){
@@ -12291,7 +12335,7 @@ function ensureAmbientMiniPlayer(track){
     document.body.appendChild(mp);
   }
   mp.style.display = 'block';
-  _ambientMuted = true;
+  _ambientMuted = false;
 
   // Build UI row first — no iframe in innerHTML so the element ref stays clean
   mp.innerHTML = '<div style="display:flex;align-items:center;gap:.65rem;padding:.45rem 1rem;">'
@@ -12300,13 +12344,12 @@ function ensureAmbientMiniPlayer(track){
     +'<div style="font-size:.6rem;font-weight:800;color:#38bdf8;text-transform:uppercase;letter-spacing:.06em;">Now Playing</div>'
     +'<div style="font-size:.82rem;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+escapeHtml(track.title)+'</div>'
     +'</div>'
-    +'<button type="button" id="ambientUnmuteBtn" onclick="toggleAmbientMute()" style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);color:#fbbf24;border-radius:8px;padding:.28rem .55rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);margin-right:.3rem;">🔇 Unmute</button>'
+    +'<button type="button" id="ambientUnmuteBtn" onclick="toggleAmbientMute()" style="background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.3);color:#38bdf8;border-radius:8px;padding:.28rem .55rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);margin-right:.3rem;">🔊 Mute</button>'
     +'<button type="button" onclick="stopAmbient()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);border-radius:8px;padding:.28rem .6rem;font-size:.72rem;cursor:pointer;font-family:var(--fm);">✕ Stop</button>'
     +'</div>';
 
   // Create iframe via DOM API — preserves user-gesture activation that innerHTML loses.
-  // mute=1 guarantees autoplay in all modern browsers (unmuted autoplay is blocked
-  // in cross-origin iframes by Chrome/Safari autoplay policy regardless of allow attr).
+  // mute=0 plays with audio on: the user's tap on the track row IS the gesture activation.
   var iframe = document.createElement('iframe');
   iframe.id = 'ambientIframe';
   iframe.allow = 'autoplay; encrypted-media; accelerometer; gyroscope; picture-in-picture';
@@ -12314,7 +12357,7 @@ function ensureAmbientMiniPlayer(track){
   iframe.title = 'Ambient audio: ' + track.title;
   iframe.style.cssText = 'width:0;height:0;position:absolute;border:none;pointer-events:none;top:0;left:0;';
   iframe.src = 'https://www.youtube-nocookie.com/embed/'+track.youtubeId
-    + '?autoplay=1&mute=1&loop=1&playlist='+track.youtubeId
+    + '?autoplay=1&mute=0&loop=1&playlist='+track.youtubeId
     + '&controls=0&modestbranding=1&playsinline=1&rel=0&enablejsapi=1'
     + '&origin='+encodeURIComponent(location.origin);
   mp.appendChild(iframe);
