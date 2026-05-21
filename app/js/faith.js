@@ -11273,7 +11273,18 @@ function renderAudioBibleCard(){
     '<span id="abChMax" style="font-size:.7rem;color:var(--tx3);">of 50</span>',
     '</div>',
     '</div>',
-    '<button onclick="_abListen()" style="width:100%;padding:.6rem .9rem;border-radius:10px;background:linear-gradient(135deg,#38bdf8,#0ea5e9);border:none;color:#fff;font-size:.84rem;font-weight:900;cursor:pointer;font-family:var(--fm);letter-spacing:.02em;">▶ Listen on Bible.is</button>',
+    '<button id="abListenBtn" onclick="_abListen()" style="width:100%;padding:.6rem .9rem;border-radius:10px;background:linear-gradient(135deg,#38bdf8,#0ea5e9);border:none;color:#fff;font-size:.84rem;font-weight:900;cursor:pointer;font-family:var(--fm);letter-spacing:.02em;">▶ Listen</button>',
+    '</div>',
+    // Inline Bible.is iframe — appears below the form after the user taps Listen.
+    // Bible.is sends no X-Frame-Options or frame-ancestors CSP as of 2026-05-21,
+    // so iframe embedding works. If they ever block it, this slot shows their
+    // "refused to connect" page and users can click the pop-out link.
+    '<div id="abPlayerWrap" style="display:none;background:rgba(0,0,0,.35);border:1px solid rgba(56,189,248,.18);border-radius:12px;overflow:hidden;margin-bottom:.75rem;">',
+    '<iframe id="abPlayerFrame" src="about:blank" title="Audio Bible" loading="lazy" allow="autoplay; encrypted-media" style="width:100%;height:540px;border:none;display:block;background:#0b0b1a;"></iframe>',
+    '<div style="padding:.45rem .7rem;display:flex;justify-content:space-between;align-items:center;gap:.5rem;font-size:.65rem;color:var(--tx3);">',
+    '<span id="abPlayerRef" style="font-weight:700;color:var(--tx2);"></span>',
+    '<a id="abPopOut" href="#" target="_blank" rel="noopener" style="color:#38bdf8;text-decoration:none;font-weight:700;">↗ Open in Bible.is</a>',
+    '</div>',
     '</div>',
     '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:.75rem .9rem;margin-bottom:.75rem;">',
     '<div style="font-size:.72rem;font-weight:800;color:var(--tx2);margin-bottom:.4rem;">🎙 Per-verse listening</div>',
@@ -11297,14 +11308,37 @@ function _abUpdateChMax(){
   if(parseInt(inp.value,10) > max) inp.value = 1;
 }
 
+var _abActiveUrl = null;
+
 function _abListen(){
   var sel = document.getElementById('abBookSel');
   var inp = document.getElementById('abChInput');
   if(!sel || !inp) return;
   var code = sel.value;
+  var label = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : code;
   var ch = Math.max(1, parseInt(inp.value,10) || 1);
   var base = (typeof BIBLE_IS_CONFIG !== 'undefined') ? BIBLE_IS_CONFIG.webBaseUrl : 'https://live.bible.is/bible/ENGNIV/';
-  window.open(base + code + '/' + ch, '_blank', 'noopener');
+  var url = base + code + '/' + ch;
+  if(typeof stopAllAudio === 'function') stopAllAudio();
+  var wrap = document.getElementById('abPlayerWrap');
+  var frame = document.getElementById('abPlayerFrame');
+  var refLbl = document.getElementById('abPlayerRef');
+  var popOut = document.getElementById('abPopOut');
+  if(!wrap || !frame) return;
+  wrap.style.display = '';
+  frame.src = url;
+  if(refLbl) refLbl.textContent = label + ' ' + ch;
+  if(popOut) popOut.href = url;
+  _abActiveUrl = url;
+  try { frame.scrollIntoView({behavior:'smooth', block:'center'}); } catch(_){}
+}
+
+function stopAudioBible(){
+  var frame = document.getElementById('abPlayerFrame');
+  var wrap = document.getElementById('abPlayerWrap');
+  if(frame){ try { frame.src = 'about:blank'; } catch(_){} }
+  if(wrap) wrap.style.display = 'none';
+  _abActiveUrl = null;
 }
 
 // ── AUDIO MEDITATIONS + SLEEP STORIES — Audio Layer Worker 2 ─────────────────
@@ -12476,6 +12510,7 @@ function stopAllAudio(){
   if(_medId) _medClose();
   if(_ssId) _ssClose();
   if(_ambientTrackId) stopAmbient();
+  if(_abActiveUrl) stopAudioBible();
 }
 
 // YlccAudio — unified play/stop API. Every audio button should route through
