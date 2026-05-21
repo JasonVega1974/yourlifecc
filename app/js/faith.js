@@ -654,21 +654,13 @@ function _dailyDevSpeak(){
   try { dev = JSON.parse(localStorage.getItem(lsKey)||'null'); } catch(e) {}
   if(!dev) return;
   var btn = document.getElementById('dailyDevListenBtn');
-  function _devBtnReset(){
-    _ttsSpeaking = false;
-    if(_activeAudioEl){ try{ _activeAudioEl.pause(); _activeAudioEl.src=''; }catch(e){} _activeAudioEl=null; }
-    if(btn){ btn.textContent='🔊 Listen'; btn.style.background='rgba(251,191,36,.08)'; btn.style.border='1px solid rgba(251,191,36,.22)'; }
-    var votdBtn = document.getElementById('votdListenBtn');
-    if(votdBtn){ votdBtn.textContent='🔊 Listen'; votdBtn.style.background='rgba(251,191,36,.08)'; votdBtn.style.border='1px solid rgba(251,191,36,.22)'; }
-  }
-  if(_ttsSpeaking){
-    if('speechSynthesis' in window) window.speechSynthesis.cancel();
-    _devBtnReset();
-    return;
-  }
-  _ttsSpeaking = true;
+  if(_audioState.activeSource === 'devotional'){ stopAllAudio(); return; }
+  stopAllAudio();
+  _audioState.activeSource = 'devotional';
+  _audioState.activeBtn = btn;
+  _audioState.activeBtnOrigText = '🔊 Listen';
   if(btn){ btn.textContent='⏸ Stop'; btn.style.background='rgba(251,191,36,.22)'; btn.style.border='1px solid rgba(251,191,36,.5)'; }
-  var fullText = (dev.scripture||'') + '. ' + (dev.devotional||'') + '. ' + (dev.prayer||'');
+  var fullText = (dev.scripture||'')+'. '+(dev.devotional||'')+'. '+(dev.prayer||'');
   fetch('/api/tts-render', {
     method:'POST',
     headers:{'Content-Type':'application/json'},
@@ -677,21 +669,28 @@ function _dailyDevSpeak(){
     if(!r.ok) throw new Error('API '+r.status);
     return r.blob();
   }).then(function(blob){
+    if(_audioState.activeSource !== 'devotional') return;
     var url = URL.createObjectURL(blob);
     var au = new Audio(url);
-    au.onended = function(){ URL.revokeObjectURL(url); _devBtnReset(); };
-    au.onerror = function(){ URL.revokeObjectURL(url); _fallbackDevWebSpeech(fullText, _devBtnReset); };
-    _activeAudioEl = au;
-    au.play().catch(function(){ _fallbackDevWebSpeech(fullText, _devBtnReset); });
+    _audioState.activeAudio = au;
+    au.onended = function(){ URL.revokeObjectURL(url); if(_audioState.activeSource==='devotional') stopAllAudio(); };
+    au.onerror = function(){ URL.revokeObjectURL(url); if(_audioState.activeSource==='devotional') _fallbackDevWebSpeech(fullText); };
+    au.play().catch(function(){ URL.revokeObjectURL(url); if(_audioState.activeSource==='devotional') _fallbackDevWebSpeech(fullText); });
   }).catch(function(){
-    _fallbackDevWebSpeech(fullText, _devBtnReset);
+    if(_audioState.activeSource === 'devotional') _fallbackDevWebSpeech(fullText);
   });
 }
-function _fallbackDevWebSpeech(text, onDone){
-  if(!('speechSynthesis' in window)){ onDone(); return; }
+function _fallbackDevWebSpeech(text){
+  if(_audioState.activeSource !== 'devotional') return;
+  if(!('speechSynthesis' in window)){ stopAllAudio(); return; }
   window.speechSynthesis.cancel();
-  var sentences = text.match(/[^.!?]+[.!?]*/g) || [text];
-  _ttsWhenVoicesReady(function(voices){ _ttsSpeakSentences(sentences, 0.85, voices, onDone); });
+  var sentences = text.match(/[^.!?]+[.!?]*/g)||[text];
+  _ttsWhenVoicesReady(function(voices){
+    if(_audioState.activeSource !== 'devotional') return;
+    _ttsSpeakSentences(sentences, 0.85, voices, function(){
+      if(_audioState.activeSource === 'devotional') stopAllAudio();
+    });
+  });
 }
 
 function _dailyDevSave(){
@@ -799,7 +798,7 @@ function bfInjectBackPill(panelId){
 }
 
 function bfTab(tab, btn){
-  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  if(typeof stopAllAudio === 'function') stopAllAudio();
   BF_TABS.forEach(t=>{
     const el = document.getElementById('bf-'+t);
     if(el) el.style.display = t===tab ? 'block' : 'none';
@@ -9084,7 +9083,7 @@ function _buildJesusWordsTab(redLetterWords){
         +'<div style="font-size:.7rem;color:#c0392b;font-weight:700;margin-bottom:.25rem;">'+_jEsc(v.ref)+'</div>'
         +'<div style="font-size:.83rem;color:#c0392b;line-height:1.6;font-style:italic;margin-bottom:.25rem;">"'+_jEsc(v.words)+'"</div>'
         +(strHtml ? '<div style="margin-top:.25rem;">'+strHtml+'</div>' : '')
-        +'<button onclick="speakVerse(this.getAttribute(\'data-words\'),this.getAttribute(\'data-ref\'))" data-ref="'+_jEsc(v.ref)+'" data-words="'+_jEsc(v.words)+'" style="margin-top:.35rem;margin-right:.35rem;font-size:.68rem;background:none;border:1px solid rgba(192,57,43,.3);border-radius:4px;padding:.1rem .4rem;color:#c0392b;cursor:pointer;">🔊</button>'
+        +'<button onclick="speakVerse(this.getAttribute(\'data-words\'),this.getAttribute(\'data-ref\'),this)" data-ref="'+_jEsc(v.ref)+'" data-words="'+_jEsc(v.words)+'" style="margin-top:.35rem;margin-right:.35rem;font-size:.68rem;background:none;border:1px solid rgba(192,57,43,.3);border-radius:4px;padding:.1rem .4rem;color:#c0392b;cursor:pointer;">🔊</button>'
         +'<button onclick="jesusVerseCopy(this)" data-ref="'+_jEsc(v.ref)+'" data-words="'+_jEsc(v.words)+'" style="margin-top:.35rem;font-size:.68rem;background:none;border:1px solid rgba(192,57,43,.3);border-radius:4px;padding:.1rem .4rem;color:#c0392b;cursor:pointer;">Copy</button>'
         +'</div>';
     }).join('');
@@ -11019,7 +11018,13 @@ function completePrayerSession(sessionId){
 
 var _ttsUtterance = null;
 var _ttsSpeaking = false;
-var _activeAudioEl = null; // tracks VOTD/devotional Audio() for stop/toggle
+var _activeAudioEl = null;
+var _audioState = {
+  activeSource: null,      // 'votd' | 'devotional' | 'verse-{ref}' | null
+  activeBtn: null,
+  activeBtnOrigText: null,
+  activeAudio: null
+};
 var _ttsLastVoiceName = '';
 var _ttsLastError = '';
 
@@ -11122,18 +11127,25 @@ function _ttsSpeakSentences(sentences, rate, voices, onDone){
   next();
 }
 
-function speakVerse(text, ref){
+function speakVerse(text, ref, btn){
   if(!('speechSynthesis' in window)){
     if(typeof showToast==='function') showToast('Text-to-speech not supported in this browser.');
     return;
   }
-  window.speechSynthesis.cancel();
-  if(_ttsSpeaking){ _ttsSpeaking = false; return; }
-  _ttsSpeaking = true;
-  var fullText = (ref ? ref + '. ' : '') + (text || '');
-  var sentences = fullText.match(/[^.!?]+[.!?]*/g) || [fullText];
+  var src = 'verse-'+(ref||'unknown');
+  if(_audioState.activeSource === src){ stopAllAudio(); return; }
+  stopAllAudio();
+  _audioState.activeSource = src;
+  _audioState.activeBtn = btn||null;
+  _audioState.activeBtnOrigText = btn ? btn.textContent : null;
+  if(btn){ btn.textContent = '⏸'; }
+  var fullText = (ref ? ref+'. ' : '')+(text||'');
+  var sentences = fullText.match(/[^.!?]+[.!?]*/g)||[fullText];
   _ttsWhenVoicesReady(function(voices){
-    _ttsSpeakSentences(sentences, 0.85, voices, function(){ _ttsSpeaking = false; });
+    if(_audioState.activeSource !== src) return;
+    _ttsSpeakSentences(sentences, 0.85, voices, function(){
+      if(_audioState.activeSource === src) stopAllAudio();
+    });
   });
 }
 
@@ -11144,34 +11156,25 @@ function speakVotd(){
   var text   = textEl ? textEl.textContent.replace(/^[“”]/,'').replace(/[“”]$/,'').trim() : '';
   var ref    = refEl  ? refEl.textContent.replace(/^—\s*/,'').trim() : '';
   if(!text) return;
-  function _votdReset(){
-    _ttsSpeaking=false;
-    if(_activeAudioEl){ try{ _activeAudioEl.pause(); _activeAudioEl.src=''; }catch(e){} _activeAudioEl=null; }
-    if(btn){ btn.textContent='🔊 Listen'; btn.style.background='rgba(251,191,36,.08)'; btn.style.border='1px solid rgba(251,191,36,.22)'; }
-    var devBtn = document.getElementById('dailyDevListenBtn');
-    if(devBtn){ devBtn.textContent='🔊 Listen'; devBtn.style.background='rgba(251,191,36,.08)'; devBtn.style.border='1px solid rgba(251,191,36,.22)'; }
-  }
-  if(_ttsSpeaking){
-    if('speechSynthesis' in window) window.speechSynthesis.cancel();
-    _votdReset();
-    return;
-  }
-  _ttsSpeaking = true;
+  if(_audioState.activeSource === 'votd'){ stopAllAudio(); return; }
+  stopAllAudio();
+  _audioState.activeSource = 'votd';
+  _audioState.activeBtn = btn;
+  _audioState.activeBtnOrigText = '🔊 Listen';
   if(btn){ btn.textContent='⏸ Stop'; btn.style.background='rgba(251,191,36,.22)'; btn.style.border='1px solid rgba(251,191,36,.5)'; }
   var fullText = (ref?ref+'. ':'')+text;
-  // Try pre-rendered VOTD MP3 first
   var votd = (typeof getVotdForDay==='function') ? getVotdForDay() : null;
   if(votd && votd.idx != null){
     var au = new Audio('/app/audio/votd/votd_'+votd.idx+'.mp3');
-    au.onended = function(){ _votdReset(); };
-    au.onerror = function(){ _tryVotdOnDemandTts(fullText, _votdReset); };
-    _activeAudioEl = au;
-    au.play().catch(function(){ _tryVotdOnDemandTts(fullText, _votdReset); });
+    _audioState.activeAudio = au;
+    au.onended = function(){ if(_audioState.activeSource==='votd') stopAllAudio(); };
+    au.onerror = function(){ if(_audioState.activeSource==='votd') _tryVotdOnDemandTts(fullText); };
+    au.play().catch(function(){ if(_audioState.activeSource==='votd') _tryVotdOnDemandTts(fullText); });
     return;
   }
-  _tryVotdOnDemandTts(fullText, _votdReset);
+  _tryVotdOnDemandTts(fullText);
 }
-function _tryVotdOnDemandTts(fullText, onDone){
+function _tryVotdOnDemandTts(fullText){
   var cacheKey = 'votd_'+fullText.substring(0,40).replace(/\W/g,'_');
   fetch('/api/tts-render', {
     method:'POST',
@@ -11181,21 +11184,28 @@ function _tryVotdOnDemandTts(fullText, onDone){
     if(!r.ok) throw new Error('API '+r.status);
     return r.blob();
   }).then(function(blob){
+    if(_audioState.activeSource !== 'votd') return;
     var url = URL.createObjectURL(blob);
     var au = new Audio(url);
-    au.onended = function(){ URL.revokeObjectURL(url); onDone(); };
-    au.onerror = function(){ URL.revokeObjectURL(url); _fallbackVotdWebSpeech(fullText, onDone); };
-    _activeAudioEl = au;
-    au.play().catch(function(){ _fallbackVotdWebSpeech(fullText, onDone); });
+    _audioState.activeAudio = au;
+    au.onended = function(){ URL.revokeObjectURL(url); if(_audioState.activeSource==='votd') stopAllAudio(); };
+    au.onerror = function(){ URL.revokeObjectURL(url); if(_audioState.activeSource==='votd') _fallbackVotdWebSpeech(fullText); };
+    au.play().catch(function(){ URL.revokeObjectURL(url); if(_audioState.activeSource==='votd') _fallbackVotdWebSpeech(fullText); });
   }).catch(function(){
-    _fallbackVotdWebSpeech(fullText, onDone);
+    if(_audioState.activeSource === 'votd') _fallbackVotdWebSpeech(fullText);
   });
 }
-function _fallbackVotdWebSpeech(fullText, onDone){
-  if(!('speechSynthesis' in window)){ onDone(); return; }
+function _fallbackVotdWebSpeech(fullText){
+  if(_audioState.activeSource !== 'votd') return;
+  if(!('speechSynthesis' in window)){ stopAllAudio(); return; }
   window.speechSynthesis.cancel();
   var sentences = fullText.match(/[^.!?]+[.!?]*/g)||[fullText];
-  _ttsWhenVoicesReady(function(voices){ _ttsSpeakSentences(sentences,0.85,voices,onDone); });
+  _ttsWhenVoicesReady(function(voices){
+    if(_audioState.activeSource !== 'votd') return;
+    _ttsSpeakSentences(sentences, 0.85, voices, function(){
+      if(_audioState.activeSource==='votd') stopAllAudio();
+    });
+  });
 }
 
 function updateAllSpeakButtons(speaking){
@@ -11209,27 +11219,27 @@ function _stSpeakVerse(btn){
   var box = btn.closest ? btn.closest('.st-verse-box') : btn.parentNode.parentNode;
   var textEl = box && box.querySelector('.st-verse-text');
   var refEl = box && box.querySelector('.st-verse-ref-lbl');
-  speakVerse(textEl ? textEl.textContent.trim() : '', refEl ? refEl.textContent.trim() : '');
+  speakVerse(textEl ? textEl.textContent.trim() : '', refEl ? refEl.textContent.trim() : '', btn);
 }
 
 function _msSpeakVerse(btn){
-  var card = btn.closest ? btn.closest('div[style*="border-left"]') : btn.parentNode.parentNode;
+  var card = btn.closest ? btn.closest('div[style*=”border-left”]') : btn.parentNode.parentNode;
   if(!card) return;
-  var italicDiv = card.querySelector('div[style*="italic"]');
-  var refDiv = card.querySelector('div[style*="a78bfa"]');
-  var text = italicDiv ? italicDiv.textContent.replace(/^["“]|["”]$/g,'').trim() : '';
+  var italicDiv = card.querySelector('div[style*=”italic”]');
+  var refDiv = card.querySelector('div[style*=”a78bfa”]');
+  var text = italicDiv ? italicDiv.textContent.replace(/^[“”]|[“”]$/g,'').trim() : '';
   var ref = refDiv ? refDiv.textContent.trim() : '';
-  speakVerse(text, ref);
+  speakVerse(text, ref, btn);
 }
 
 function _pdSpeakVerse(btn){
-  var card = btn.closest ? btn.closest('div[style*="border-left"]') : btn.parentNode.parentNode;
+  var card = btn.closest ? btn.closest('div[style*=”border-left”]') : btn.parentNode.parentNode;
   if(!card) return;
-  var italicDiv = card.querySelector('div[style*="italic"]');
+  var italicDiv = card.querySelector('div[style*=”italic”]');
   var text = italicDiv ? italicDiv.textContent.trim() : '';
-  var refSpan = card.querySelector('span[style*="letter-spacing"]');
+  var refSpan = card.querySelector('span[style*=”letter-spacing”]');
   var ref = refSpan ? refSpan.textContent.replace(/^—\s*/,'').trim() : '';
-  speakVerse(text, ref);
+  speakVerse(text, ref, btn);
 }
 
 function _acSpeakVerse(btn){
@@ -11237,9 +11247,9 @@ function _acSpeakVerse(btn){
   if(!card) return;
   var textDiv = card.querySelector('.lm-keyverse-text');
   var refDiv = card.querySelector('.lm-keyverse-ref');
-  var text = textDiv ? textDiv.textContent.replace(/^["“]|["”]$/g,'').trim() : '';
+  var text = textDiv ? textDiv.textContent.replace(/^[“”]|[“”]$/g,'').trim() : '';
   var ref = refDiv ? refDiv.textContent.replace(/^—\s*/,'').trim() : '';
-  speakVerse(text, ref);
+  speakVerse(text, ref, btn);
 }
 
 // ── AUDIO BIBLE CARD (Worker 1) — book/chapter selector → Bible.is link-out ──
@@ -12457,11 +12467,24 @@ function _checkAudioStopBtn(){
 function stopAllAudio(){
   if('speechSynthesis' in window) window.speechSynthesis.cancel();
   _ttsSpeaking = false;
-  if(_activeAudioEl){ try{ _activeAudioEl.pause(); _activeAudioEl.src=''; }catch(e){} _activeAudioEl=null; }
-  var votdBtn = document.getElementById('votdListenBtn');
-  if(votdBtn){ votdBtn.textContent='🔊 Listen'; votdBtn.style.background='rgba(251,191,36,.08)'; votdBtn.style.border='1px solid rgba(251,191,36,.22)'; }
-  var devBtn = document.getElementById('dailyDevListenBtn');
-  if(devBtn){ devBtn.textContent='🔊 Listen'; devBtn.style.background='rgba(251,191,36,.08)'; devBtn.style.border='1px solid rgba(251,191,36,.22)'; }
+  if(_audioState.activeAudio){
+    try{ _audioState.activeAudio.pause(); _audioState.activeAudio.src=''; }catch(e){}
+    _audioState.activeAudio = null;
+  }
+  if(_activeAudioEl){
+    try{ _activeAudioEl.pause(); _activeAudioEl.src=''; }catch(e){}
+    _activeAudioEl = null;
+  }
+  if(_audioState.activeBtn){
+    _audioState.activeBtn.textContent = _audioState.activeBtnOrigText || '🔊 Listen';
+    if(_audioState.activeSource === 'votd' || _audioState.activeSource === 'devotional'){
+      _audioState.activeBtn.style.background = 'rgba(251,191,36,.08)';
+      _audioState.activeBtn.style.border = '1px solid rgba(251,191,36,.22)';
+    }
+    _audioState.activeBtn = null;
+  }
+  _audioState.activeBtnOrigText = null;
+  _audioState.activeSource = null;
   if(_medId) _medClose();
   if(_ssId) _ssClose();
   if(_ambientTrackId) stopAmbient();
