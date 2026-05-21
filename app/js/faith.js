@@ -9325,7 +9325,10 @@ function _fjCloudLoadProfile(){
   if(typeof _supaUser === 'undefined' || !_supaUser) return;
   var supa = (typeof getSupabase === 'function') ? getSupabase() : null;
   if(!supa) return;
-  supa.from('faith_profile').select('*').eq('user_id', _supaUser.id).single().then(function(res){
+  // maybeSingle() returns 200 + null when no row exists, instead of single()'s
+  // 406 Not Acceptable that previously littered the console for users who hadn't
+  // saved their faith profile yet.
+  supa.from('faith_profile').select('*').eq('user_id', _supaUser.id).maybeSingle().then(function(res){
     if(res.error || !res.data) return;
     var d = res.data;
     var profile = {
@@ -11866,7 +11869,7 @@ function _genMedSupaIncrementPlayCount(id){
     .select('play_count')
     .eq('user_id', _supaUser.id)
     .eq('local_id', id)
-    .single()
+    .maybeSingle()
     .then(function(res){
       if(res.error || !res.data) return;
       supa.from('custom_meditations')
@@ -11987,7 +11990,13 @@ function _medPlaySegment(med, segIdx){
       onEnd: function(){ _medAdvance(med); }
     });
   }
-  _medSegTimer = setTimeout(function(){ if(!_medPaused) _medAdvance(med); }, seg.duration*1000);
+  // No parallel duration timer here. The previous setTimeout(seg.duration*1000)
+  // raced YlccAudio's onEnd callback: when the MP3 took longer than the
+  // predicted segment duration the timer fired first, started the next segment
+  // — which called _ylccStopPlayback on the still-playing seg N audio, which in
+  // turn fired its onerror and logged "MP3 playback error". Trust onEnd from
+  // YlccAudio in all paths. Web Speech path has its own safety timeout inside
+  // _ylccPlayWebSpeech in case utterance.onend fails to fire (iOS Safari).
 }
 
 function _medAdvance(med){
@@ -12610,10 +12619,26 @@ function _ylccPlayWebSpeech(opts, src, finalize){
   if(!('speechSynthesis' in window) || !opts.text){ finalize(); return; }
   window.speechSynthesis.cancel();
   var sentences = opts.text.match(/[^.!?]+[.!?]*/g) || [opts.text];
+  var rate = opts.rate || 0.85;
+  // Safety timeout — iOS Safari and some Android browsers occasionally fail
+  // to fire utterance.onend for long or multi-sentence speech, which would
+  // strand the caller (e.g. a meditation segment) waiting on finalize
+  // forever now that we no longer have a parallel duration timer in the
+  // caller. Estimate ~80ms/char at rate 1.0, plus 1s per sentence, scaled
+  // by rate. Minimum 30s. finalize() is idempotent via didFinish so a
+  // late onend completing after this timeout is a harmless no-op.
+  var estimatedMs = Math.max(30000, Math.ceil((opts.text.length * 80 / rate) + (sentences.length * 1000)));
+  var safetyTimer = setTimeout(function(){
+    if(_audioState.activeSource === src){
+      console.warn('[YlccAudio] Web Speech safety timeout fired for', src, 'after', estimatedMs, 'ms — forcing finalize');
+      finalize();
+    }
+  }, estimatedMs);
   _ttsWhenVoicesReady(function(voices){
-    if(_audioState.activeSource !== src) return;
+    if(_audioState.activeSource !== src){ clearTimeout(safetyTimer); return; }
     if(typeof opts.onPlay === 'function'){ try { opts.onPlay(); } catch(e){} }
-    _ttsSpeakSentences(sentences, opts.rate || 0.85, voices, function(){
+    _ttsSpeakSentences(sentences, rate, voices, function(){
+      clearTimeout(safetyTimer);
       if(_audioState.activeSource === src) finalize();
     });
   });
