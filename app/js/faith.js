@@ -12075,6 +12075,7 @@ function startSleepStory(storyId){
   var story = SLEEP_STORIES.find(function(s){ return s.id===storyId; });
   if(!story) return;
   _ssClose();
+  if(typeof stopAllAudio === 'function') stopAllAudio();
   if('pushState' in history){ history.pushState({ylccSS:true},''); _ssPushedState = true; }
   _ssId = storyId; _ssIdx = 0; _ssPaused = false; _ssTtsVol = 1.0;
   if(story.verses && story.verses.length){
