@@ -1804,7 +1804,7 @@ function showSection(id, fromMobile){
     // F9: Auto-show the user's last-visited Well sub-tab (or Home on first
     // visit). Replaces the old hardcoded "open Devotional first" branch.
     const lastTab = (typeof D !== 'undefined' && D && D.wellLastTab) ? D.wellLastTab : 'home';
-    const validTabs = ['home','bible','plans','devotional','prayer','academy','bibleworld','proofProphecy','timeline','memorize','journey','jesus','denominations','bibleStudy','studyTools'];
+    const validTabs = ['home','bible','plans','devotional','prayer','academy','bibleworld','proofProphecy','timeline','memorize','journey','jesus','denominations','bibleStudy','studyTools','readingPlans','stories','audioBible','audioMeditations','sleepStories','ambientLibrary','createMeditation','dailyDevotional','learnBible'];
     const target = validTabs.indexOf(lastTab) >= 0 ? lastTab : 'home';
     if(typeof bfTab === 'function') bfTab(target);
   },80);

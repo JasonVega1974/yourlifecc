@@ -640,7 +640,7 @@ function _renderDailyDevContent(root, dev){
   html += '<div style="font-family:Georgia,serif;font-style:italic;font-size:.8rem;color:var(--tx2);line-height:1.55;">'+escapeHtml(dev.prayer||'')+'</div>';
   html += '</div>';
   html += '<div style="display:flex;gap:.4rem;flex-wrap:wrap;">';
-  html += '<button type="button" onclick="_dailyDevSpeak()" style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.22);color:#fde68a;border-radius:8px;padding:.3rem .7rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🔊 Listen</button>';
+  html += '<button type="button" id="dailyDevListenBtn" onclick="_dailyDevSpeak()" style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.22);color:#fde68a;border-radius:8px;padding:.3rem .7rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🔊 Listen</button>';
   html += '<button type="button" onclick="_dailyDevSave()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx2);border-radius:8px;padding:.3rem .7rem;font-size:.7rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🔖 Save</button>';
   html += '</div>';
   html += '</div>';
@@ -649,16 +649,49 @@ function _renderDailyDevContent(root, dev){
 
 function _dailyDevSpeak(){
   var today = new Date().toISOString().slice(0,10);
-  var cacheKey = (typeof _ylccUserKey === 'function') ? _ylccUserKey('daily_ai_dev_' + today) : 'ylcc_daily_ai_dev_' + today;
+  var lsKey = (typeof _ylccUserKey === 'function') ? _ylccUserKey('daily_ai_dev_' + today) : 'ylcc_daily_ai_dev_' + today;
   var dev = null;
-  try { dev = JSON.parse(localStorage.getItem(cacheKey)||'null'); } catch(e) {}
+  try { dev = JSON.parse(localStorage.getItem(lsKey)||'null'); } catch(e) {}
   if(!dev) return;
-  if('speechSynthesis' in window) window.speechSynthesis.cancel();
-  var text = (dev.scripture||'') + '. ' + (dev.devotional||'') + '. ' + (dev.question||'') + '. ' + (dev.prayer||'');
-  var sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
-  _ttsWhenVoicesReady(function(voices){
-    _ttsSpeakSentences(sentences, 0.85, voices, function(){});
+  var btn = document.getElementById('dailyDevListenBtn');
+  function _devBtnReset(){
+    _ttsSpeaking = false;
+    if(_activeAudioEl){ try{ _activeAudioEl.pause(); _activeAudioEl.src=''; }catch(e){} _activeAudioEl=null; }
+    if(btn){ btn.textContent='🔊 Listen'; btn.style.background='rgba(251,191,36,.08)'; btn.style.border='1px solid rgba(251,191,36,.22)'; }
+    var votdBtn = document.getElementById('votdListenBtn');
+    if(votdBtn){ votdBtn.textContent='🔊 Listen'; votdBtn.style.background='rgba(251,191,36,.08)'; votdBtn.style.border='1px solid rgba(251,191,36,.22)'; }
+  }
+  if(_ttsSpeaking){
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
+    _devBtnReset();
+    return;
+  }
+  _ttsSpeaking = true;
+  if(btn){ btn.textContent='⏸ Stop'; btn.style.background='rgba(251,191,36,.22)'; btn.style.border='1px solid rgba(251,191,36,.5)'; }
+  var fullText = (dev.scripture||'') + '. ' + (dev.devotional||'') + '. ' + (dev.prayer||'');
+  fetch('/api/tts-render', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({text:fullText.slice(0,4000), cacheKey:'daily_dev_'+today})
+  }).then(function(r){
+    if(!r.ok) throw new Error('API '+r.status);
+    return r.blob();
+  }).then(function(blob){
+    var url = URL.createObjectURL(blob);
+    var au = new Audio(url);
+    au.onended = function(){ URL.revokeObjectURL(url); _devBtnReset(); };
+    au.onerror = function(){ URL.revokeObjectURL(url); _fallbackDevWebSpeech(fullText, _devBtnReset); };
+    _activeAudioEl = au;
+    au.play().catch(function(){ _fallbackDevWebSpeech(fullText, _devBtnReset); });
+  }).catch(function(){
+    _fallbackDevWebSpeech(fullText, _devBtnReset);
   });
+}
+function _fallbackDevWebSpeech(text, onDone){
+  if(!('speechSynthesis' in window)){ onDone(); return; }
+  window.speechSynthesis.cancel();
+  var sentences = text.match(/[^.!?]+[.!?]*/g) || [text];
+  _ttsWhenVoicesReady(function(voices){ _ttsSpeakSentences(sentences, 0.85, voices, onDone); });
 }
 
 function _dailyDevSave(){
@@ -747,6 +780,7 @@ function wellGoto(target){
     if(typeof save === 'function') save();
   }
   if(typeof showSection === 'function') showSection('s-scripture');
+  setTimeout(function(){ if(typeof bfTab==='function') bfTab(target); }, 100);
 }
 
 function bfRemoveAllBackPills(){
@@ -10985,6 +11019,7 @@ function completePrayerSession(sessionId){
 
 var _ttsUtterance = null;
 var _ttsSpeaking = false;
+var _activeAudioEl = null; // tracks VOTD/devotional Audio() for stop/toggle
 var _ttsLastVoiceName = '';
 var _ttsLastError = '';
 
@@ -11109,16 +11144,58 @@ function speakVotd(){
   var text   = textEl ? textEl.textContent.replace(/^[“”]/,'').replace(/[“”]$/,'').trim() : '';
   var ref    = refEl  ? refEl.textContent.replace(/^—\s*/,'').trim() : '';
   if(!text) return;
-  function _votdReset(){ _ttsSpeaking=false; if(btn){ btn.textContent='🔊 Listen'; btn.style.background='rgba(251,191,36,.08)'; btn.style.border='1px solid rgba(251,191,36,.22)'; } _checkAudioStopBtn(); }
-  if(_ttsSpeaking){ window.speechSynthesis.cancel(); _votdReset(); return; }
-  if(!('speechSynthesis' in window)){ if(typeof showToast==='function') showToast('Text-to-speech not supported.'); return; }
-  window.speechSynthesis.cancel();
+  function _votdReset(){
+    _ttsSpeaking=false;
+    if(_activeAudioEl){ try{ _activeAudioEl.pause(); _activeAudioEl.src=''; }catch(e){} _activeAudioEl=null; }
+    if(btn){ btn.textContent='🔊 Listen'; btn.style.background='rgba(251,191,36,.08)'; btn.style.border='1px solid rgba(251,191,36,.22)'; }
+    var devBtn = document.getElementById('dailyDevListenBtn');
+    if(devBtn){ devBtn.textContent='🔊 Listen'; devBtn.style.background='rgba(251,191,36,.08)'; devBtn.style.border='1px solid rgba(251,191,36,.22)'; }
+  }
+  if(_ttsSpeaking){
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
+    _votdReset();
+    return;
+  }
   _ttsSpeaking = true;
   if(btn){ btn.textContent='⏸ Stop'; btn.style.background='rgba(251,191,36,.22)'; btn.style.border='1px solid rgba(251,191,36,.5)'; }
-  _checkAudioStopBtn();
   var fullText = (ref?ref+'. ':'')+text;
+  // Try pre-rendered VOTD MP3 first
+  var votd = (typeof getVotdForDay==='function') ? getVotdForDay() : null;
+  if(votd && votd.idx != null){
+    var au = new Audio('/app/audio/votd/votd_'+votd.idx+'.mp3');
+    au.onended = function(){ _votdReset(); };
+    au.onerror = function(){ _tryVotdOnDemandTts(fullText, _votdReset); };
+    _activeAudioEl = au;
+    au.play().catch(function(){ _tryVotdOnDemandTts(fullText, _votdReset); });
+    return;
+  }
+  _tryVotdOnDemandTts(fullText, _votdReset);
+}
+function _tryVotdOnDemandTts(fullText, onDone){
+  var cacheKey = 'votd_'+fullText.substring(0,40).replace(/\W/g,'_');
+  fetch('/api/tts-render', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({text:fullText.slice(0,600), cacheKey:cacheKey})
+  }).then(function(r){
+    if(!r.ok) throw new Error('API '+r.status);
+    return r.blob();
+  }).then(function(blob){
+    var url = URL.createObjectURL(blob);
+    var au = new Audio(url);
+    au.onended = function(){ URL.revokeObjectURL(url); onDone(); };
+    au.onerror = function(){ URL.revokeObjectURL(url); _fallbackVotdWebSpeech(fullText, onDone); };
+    _activeAudioEl = au;
+    au.play().catch(function(){ _fallbackVotdWebSpeech(fullText, onDone); });
+  }).catch(function(){
+    _fallbackVotdWebSpeech(fullText, onDone);
+  });
+}
+function _fallbackVotdWebSpeech(fullText, onDone){
+  if(!('speechSynthesis' in window)){ onDone(); return; }
+  window.speechSynthesis.cancel();
   var sentences = fullText.match(/[^.!?]+[.!?]*/g)||[fullText];
-  _ttsWhenVoicesReady(function(voices){ _ttsSpeakSentences(sentences,0.85,voices,function(){ _votdReset(); }); });
+  _ttsWhenVoicesReady(function(voices){ _ttsSpeakSentences(sentences,0.85,voices,onDone); });
 }
 
 function updateAllSpeakButtons(speaking){
@@ -12371,36 +12448,23 @@ function stopAmbient(){
 // ── Universal audio stop control ──────────────────────────────────────────────
 
 function _checkAudioStopBtn(){
-  var active = _ttsSpeaking || !!_medId || !!_ssId || !!_ambientTrackId;
-  var btn = document.getElementById('globalAudioStopBtn');
-  if(active){
-    if(!btn){
-      btn = document.createElement('button');
-      btn.id = 'globalAudioStopBtn';
-      btn.type = 'button';
-      btn.setAttribute('aria-label', 'Stop all audio');
-      btn.title = 'Stop all audio';
-      btn.style.cssText = 'position:fixed;bottom:calc(7.5rem + env(safe-area-inset-bottom));right:1rem;z-index:9100;background:rgba(239,68,68,.88);border:1px solid rgba(239,68,68,.5);border-radius:50%;width:44px;height:44px;color:#fff;font-size:1.1rem;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:0;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);';
-      btn.onclick = stopAllAudio;
-      btn.innerHTML = '⏹';
-      document.body.appendChild(btn);
-    } else {
-      btn.style.display = 'flex';
-    }
-  } else {
-    if(btn) btn.style.display = 'none';
-  }
+  // Floating stop button removed — each play button toggles stop directly.
+  // Clean up any lingering button from a prior deploy.
+  var old = document.getElementById('globalAudioStopBtn');
+  if(old && old.parentNode) old.parentNode.removeChild(old);
 }
 
 function stopAllAudio(){
   if('speechSynthesis' in window) window.speechSynthesis.cancel();
   _ttsSpeaking = false;
+  if(_activeAudioEl){ try{ _activeAudioEl.pause(); _activeAudioEl.src=''; }catch(e){} _activeAudioEl=null; }
   var votdBtn = document.getElementById('votdListenBtn');
   if(votdBtn){ votdBtn.textContent='🔊 Listen'; votdBtn.style.background='rgba(251,191,36,.08)'; votdBtn.style.border='1px solid rgba(251,191,36,.22)'; }
+  var devBtn = document.getElementById('dailyDevListenBtn');
+  if(devBtn){ devBtn.textContent='🔊 Listen'; devBtn.style.background='rgba(251,191,36,.08)'; devBtn.style.border='1px solid rgba(251,191,36,.22)'; }
   if(_medId) _medClose();
   if(_ssId) _ssClose();
   if(_ambientTrackId) stopAmbient();
-  _checkAudioStopBtn();
 }
 
 function ensureAmbientMiniPlayer(track){

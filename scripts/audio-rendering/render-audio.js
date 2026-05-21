@@ -18,14 +18,16 @@ const API_KEY = process.env.OPENAI_API_KEY;
 const DRY_RUN = process.env.DRY_RUN === '1';
 const VOICE   = process.env.TTS_VOICE || 'nova';   // nova = warm female, shimmer/echo/alloy also work
 const MODEL   = 'tts-1';
-const OUT_DIR = path.join(__dirname, 'output');
+const OUT_DIR      = path.join(__dirname, 'output');
+const VOTD_OUT_DIR = path.join(__dirname, 'output', 'votd');
 
 if(!API_KEY && !DRY_RUN){
   console.error('ERROR: Set OPENAI_API_KEY env var before running.');
   process.exit(1);
 }
 
-if(!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR, { recursive: true });
+if(!fs.existsSync(OUT_DIR))      fs.mkdirSync(OUT_DIR,      { recursive: true });
+if(!fs.existsSync(VOTD_OUT_DIR)) fs.mkdirSync(VOTD_OUT_DIR, { recursive: true });
 
 // ── Load data ────────────────────────────────────────────────────────────────
 // The data file uses const declarations — wrap in a function scope via eval.
@@ -66,14 +68,56 @@ const jobs = [];
   });
 });
 
+// ── VOTD (DAILY_SCRIPTURES) — extracted from faith.js ────────────────────────
+// Bracket-count parser: avoids eval-ing 12,500 lines of faith.js.
+// Output: output/votd/votd_{idx}.mp3 — copy to app/audio/votd/ after render.
+var DAILY_SCRIPTURES = [];
+try {
+  var faithPath = path.join(__dirname, '../../app/js/faith.js');
+  var faithCode = fs.readFileSync(faithPath, 'utf8');
+  var dsStart = faithCode.indexOf('const DAILY_SCRIPTURES = [');
+  if(dsStart >= 0){
+    var arrStart = dsStart + 'const DAILY_SCRIPTURES = '.length;
+    var depth = 0, i = arrStart;
+    for(; i < faithCode.length; i++){
+      if(faithCode[i]==='[') depth++;
+      else if(faithCode[i]===']'){ depth--; if(depth===0){ i++; break; } }
+    }
+    var arrStr = faithCode.slice(arrStart, i);
+    DAILY_SCRIPTURES = eval(arrStr); // eslint-disable-line no-eval
+    console.log('VOTD: Extracted', DAILY_SCRIPTURES.length, 'verses from faith.js');
+  } else {
+    console.warn('VOTD: DAILY_SCRIPTURES not found in faith.js — skipping');
+  }
+} catch(e){
+  console.warn('VOTD: Could not parse faith.js:', e.message, '— skipping VOTD render');
+}
+
+// Add VOTD jobs — each file name encodes the index so speakVotd() can load
+// /app/audio/votd/votd_{idx}.mp3 directly by day index from getVotdForDay().
+var votdJobs = [];
+(DAILY_SCRIPTURES || []).forEach(function(entry, idx){
+  var verse = Array.isArray(entry) ? entry[0] : '';
+  var ref   = Array.isArray(entry) ? entry[1] : '';
+  if(!verse || !verse.trim()) return;
+  var text = (ref ? ref + '. ' : '') + verse;
+  votdJobs.push({
+    file:   'votd_' + idx + '.mp3',
+    text:   text.trim(),
+    source: 'votd idx ' + idx,
+    outDir: VOTD_OUT_DIR
+  });
+});
+
 // ── Stats ─────────────────────────────────────────────────────────────────────
-const totalChars = jobs.reduce(function(a,j){ return a + j.text.length; }, 0);
-const costUSD    = (totalChars / 1_000_000) * 15; // tts-1: $15 / 1M chars
-console.log('Jobs:', jobs.length, '| Characters:', totalChars.toLocaleString(), '| Est. cost: $' + costUSD.toFixed(2));
+var allJobs = jobs.concat(votdJobs);
+var totalChars = allJobs.reduce(function(a,j){ return a + j.text.length; }, 0);
+var costUSD    = (totalChars / 1_000_000) * 15; // tts-1: $15 / 1M chars
+console.log('Jobs:', allJobs.length, '('+jobs.length+' med/story + '+votdJobs.length+' VOTD) | Characters:', totalChars.toLocaleString(), '| Est. cost: $' + costUSD.toFixed(2));
 
 if(DRY_RUN){
   console.log('DRY_RUN=1 — no API calls made.');
-  jobs.forEach(function(j){ console.log(' ', j.file, '(' + j.text.length + ' chars)'); });
+  allJobs.forEach(function(j){ console.log(' ', j.file, '(' + j.text.length + ' chars)'); });
   process.exit(0);
 }
 
@@ -119,8 +163,9 @@ function ttsToFile(text, outFile){
 // ── Sequential run (avoid rate-limit bursts) ──────────────────────────────────
 (async function run(){
   var ok = 0, skip = 0, fail = 0;
-  for(var j of jobs){
-    var outFile = path.join(OUT_DIR, j.file);
+  for(var j of allJobs){
+    var dir = j.outDir || OUT_DIR;
+    var outFile = path.join(dir, j.file);
     try {
       if(fs.existsSync(outFile)){ skip++; continue; }
       await ttsToFile(j.text, outFile);
@@ -132,5 +177,7 @@ function ttsToFile(text, outFile){
     }
   }
   console.log('\nDone. Generated:', ok, '| Skipped:', skip, '| Failed:', fail);
-  console.log('Output directory:', OUT_DIR);
+  console.log('Meditation/story output:', OUT_DIR);
+  console.log('VOTD output:', VOTD_OUT_DIR);
+  console.log('After render: copy output/votd/*.mp3 → app/audio/votd/');
 })();
