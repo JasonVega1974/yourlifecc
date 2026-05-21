@@ -798,6 +798,20 @@ function bfInjectBackPill(panelId){
 }
 
 function bfTab(tab, btn){
+  // Alias routing — redirect removed tabs to unified cards with pre-selected sub-tab
+  if(tab === 'audioBible'){ _bibleSubTab = 'listen'; tab = 'bible'; }
+  else if(tab === 'readingPlans'){ _plansSubTab = 'reading'; tab = 'plans'; }
+  else {
+    // Restore persisted sub-tab choice when navigating directly to the unified card
+    if(tab === 'bible' && typeof _ylccUserKey === 'function'){
+      var saved = localStorage.getItem(_ylccUserKey('bible_active_subtab'));
+      if(saved) _bibleSubTab = saved;
+    }
+    if(tab === 'plans' && typeof _ylccUserKey === 'function'){
+      var saved = localStorage.getItem(_ylccUserKey('plans_active_subtab'));
+      if(saved) _plansSubTab = saved;
+    }
+  }
   if(typeof stopAllAudio === 'function') stopAllAudio();
   BF_TABS.forEach(t=>{
     const el = document.getElementById('bf-'+t);
@@ -826,12 +840,12 @@ function bfTab(tab, btn){
   if(tab==='home') renderFaithHome();
   if(tab==='devotional') renderDevotionals();
   if(tab==='reading'){ populateBibleBooks(); renderBibleReadings(); }
-  if(tab==='bible') initEsvBible();
+  if(tab==='bible'){ initEsvBible(); _bfBibleSubTab(_bibleSubTab); }
   if(tab==='journey') renderFaithJourney();
   if(tab==='jesus') renderJesusCard();
   if(tab==='denominations') renderDenominationsCard();
   if(tab==='learnBible') renderLearnBibleGrid();
-  if(tab==='plans') renderPlanCatalog();
+  if(tab==='plans') _bfPlansSubTab(_plansSubTab);
   if(tab==='prayer') renderPrayerPanel();
   if(tab==='memorize') renderMemorizePanel();
   if(tab==='academy') renderAcademyPanel();
@@ -841,8 +855,6 @@ function bfTab(tab, btn){
   if(tab==='proofProphecy') renderProofProphecy();
   if(tab==='bibleStudy') initBibleStudyTab();
   if(tab==='studyTools') renderBibleStudyCard();
-  if(tab==='readingPlans') renderReadingPlansCard();
-  if(tab==='audioBible') renderAudioBibleCard();
   if(tab==='audioMeditations') renderAudioMeditationsCard();
   if(tab==='sleepStories') renderSleepStoriesCard();
   if(tab==='ambientLibrary') renderAmbientLibraryCard();
@@ -1845,7 +1857,8 @@ function _planDayHtml(p, d, prog, completedArchive, todayDay){
 
 function openPlanDetail(planId){
   if(typeof READING_PLANS !== 'undefined' && READING_PLANS.some(function(p){return p.id===planId;})){
-    bfTab('readingPlans');
+    _plansSubTab = 'reading';
+    bfTab('plans');
     setTimeout(function(){ _rpOpenDay(planId); }, 60);
     return;
   }
@@ -11027,6 +11040,42 @@ var _audioState = {
 };
 var _ttsLastVoiceName = '';
 var _ttsLastError = '';
+
+// Bible card sub-tab state ('read' | 'listen' | 'study')
+var _bibleSubTab = 'read';
+// Plans card sub-tab state ('topical' | 'reading')
+var _plansSubTab = 'reading';
+
+function _bfBibleSubTab(tab){
+  _bibleSubTab = tab;
+  if(typeof _ylccUserKey === 'function') localStorage.setItem(_ylccUserKey('bible_active_subtab'), tab);
+  ['read','listen','study'].forEach(function(t){
+    var el = document.getElementById('bibleSubTab_'+t);
+    if(el) el.style.display = t===tab ? '' : 'none';
+    var btn = document.querySelector('[data-bible-sub="'+t+'"]');
+    if(btn){
+      btn.style.background = t===tab ? 'var(--cd-banner)' : 'transparent';
+      btn.style.color = t===tab ? 'var(--cd-banner-text)' : 'var(--tx2)';
+    }
+  });
+  if(tab === 'listen') renderAudioBibleCard();
+}
+
+function _bfPlansSubTab(tab){
+  _plansSubTab = tab;
+  if(typeof _ylccUserKey === 'function') localStorage.setItem(_ylccUserKey('plans_active_subtab'), tab);
+  ['topical','reading'].forEach(function(t){
+    var el = document.getElementById('plansSubTab_'+t);
+    if(el) el.style.display = t===tab ? '' : 'none';
+    var btn = document.querySelector('[data-plans-sub="'+t+'"]');
+    if(btn){
+      btn.style.background = t===tab ? 'var(--cd-banner)' : 'transparent';
+      btn.style.color = t===tab ? 'var(--cd-banner-text)' : 'var(--tx2)';
+    }
+  });
+  if(tab === 'topical') renderPlanCatalog();
+  if(tab === 'reading') renderReadingPlansCard();
+}
 
 // Waits for voices to load (async on Chrome/Android) then calls cb(voices[]).
 // On iOS/Safari voices are synchronous; on Chrome they fire via onvoiceschanged.

@@ -991,8 +991,6 @@ const NAV_ITEMS = [
     {wellTab:'jesus',          icon:'✝️', label:'Who Is Jesus',        key:'scripture'},
     {wellTab:'denominations',  icon:'⛪', label:'Christian Traditions', key:'scripture'},
     {wellTab:'studyTools',     icon:'🔍', label:'Study Tools',         key:'scripture'},
-    {wellTab:'readingPlans',   icon:'📚', label:'Reading Plans',       key:'scripture'},
-    {wellTab:'audioBible',     icon:'🔊', label:'Audio Bible',         key:'scripture'},
     {wellTab:'bibleStudy',     icon:'📚', label:'Bible Study Hub',     key:'scripture'},
     {wellTab:'audioMeditations',icon:'🧘',label:'Meditations',         key:'scripture'},
     {wellTab:'sleepStories',   icon:'🌙', label:'Sleep Stories',       key:'scripture'},
