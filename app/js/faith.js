@@ -12023,6 +12023,10 @@ function _medPlaySegment(med, segIdx){
       console.log('[AUDIO] No audioUrl — Web Speech for seg', segIdx);
       window.speechSynthesis.cancel();
       var medText = (seg.text||'')+(seg.verse?' — '+seg.verse:'');
+      if(medText.length > 4000){
+        console.warn('[TTS] Meditation segment exceeds 4000 chars ('+medText.length+') — truncating to 4000');
+        medText = medText.slice(0, 4000);
+      }
       var medSentences = medText.match(/[^.!?]+[.!?]*/g) || [medText];
       var medDone = false;
       function _medTtsDone(){ if(!medDone){ medDone=true; _medAdvance(med); } }
@@ -12253,7 +12257,8 @@ function _ssPlaySegment(story, idx){
         console.warn('[AUDIO] Sleep MP3 error for', ssAudioUrl, '— falling back to Web Speech');
         if('speechSynthesis' in window){
           window.speechSynthesis.cancel();
-          var ssFbSents = seg.match(/[^.!?]+[.!?]*/g)||[seg];
+          var ssFbText = seg.length > 4000 ? (console.warn('[TTS] Sleep story segment exceeds 4000 chars ('+seg.length+') — truncating'), seg.slice(0,4000)) : seg;
+          var ssFbSents = ssFbText.match(/[^.!?]+[.!?]*/g)||[ssFbText];
           var ssFbDone = false;
           function ssFbNext(i){
             if(i>=ssFbSents.length){ if(!ssFbDone){ ssFbDone=true; _ssSegTimer=setTimeout(function(){ if(!_ssPaused) _ssPlaySegment(storyRef,idxRef+1); },800); } return; }
@@ -12268,7 +12273,8 @@ function _ssPlaySegment(story, idx){
       _ssAu.play().catch(function(e){ console.warn('[AUDIO] sleep play() rejected:', e&&e.message||e); });
     } else if('speechSynthesis' in window){
       window.speechSynthesis.cancel();
-      var ssSentences = seg.match(/[^.!?]+[.!?]*/g) || [seg];
+      var ssSeg = seg.length > 4000 ? (console.warn('[TTS] Sleep story segment exceeds 4000 chars ('+seg.length+') — truncating'), seg.slice(0,4000)) : seg;
+      var ssSentences = ssSeg.match(/[^.!?]+[.!?]*/g) || [ssSeg];
       var ssVol = Math.max(0.05, _ssTtsVol);
       _ttsWhenVoicesReady(function(voices){
         var ssVoice = _ttsSelectVoice(voices);
