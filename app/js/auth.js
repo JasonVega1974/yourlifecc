@@ -457,6 +457,13 @@ async function authComplete(isReturningUser){
   setTimeout(function(){ if(_supaUser) cloudSync(); }, 2000);
   // Setup contest free user UI if applicable
   setTimeout(setupContestFreeUser, 500);
+  // First-time signups (not isReturningUser) that skipped onboard.html get a
+  // gentle nudge to enable notifications + install the app. Returning users
+  // already saw these on prior sessions (state lives in localStorage).
+  if(!isReturningUser){
+    if(typeof showPushPromptAfterSignup === 'function') showPushPromptAfterSignup();
+    if(typeof showPwaInstallPrompt === 'function') setTimeout(showPwaInstallPrompt, 4500);
+  }
 }
 
 function authContinueLocal(){

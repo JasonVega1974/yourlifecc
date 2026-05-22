@@ -53,6 +53,11 @@ const WORSHIP_EMBED_BASE = 'https://www.youtube-nocookie.com/embed/';
 
 // Idempotent — showSection() calls this every time s-worship becomes active.
 function worshipInit() {
+  // Push a synthetic history entry every time worship opens so the system
+  // back button maps to closing this view (not stacking on subsequent opens
+  // since worshipPushHistoryEntry is a no-op when the entry already exists).
+  worshipPushHistoryEntry();
+  worshipWireNav();
   if (_worshipInitDone) return;
   worshipRenderPlaylist();
   worshipSetupEventListeners();
@@ -313,3 +318,67 @@ function worshipSetupEventListeners() {
   if (play)    play.addEventListener('click', worshipTogglePlayPause);
   if (shuffle) shuffle.addEventListener('click', worshipToggleShuffle);
 }
+
+// Close/back handler — stops YouTube playback before navigating away, then
+// routes back to faith home. Bound to the back pill, the ESC key, and
+// browser back via history.pushState. Without this, hiding #s-worship via
+// showSection() leaves the iframe playing in the background.
+function worshipClose() {
+  try { worshipSendPlayerCommand('pauseVideo'); } catch(e){}
+  const iframe = document.getElementById('worship-youtubePlayer');
+  if (iframe) iframe.src = '';
+  const mini = document.getElementById('wpMini');
+  if (mini) mini.classList.add('hidden');
+  const stage = document.getElementById('wpStage');
+  if (stage) stage.classList.remove('wp-stage-on');
+  _worshipPlayerState = -1;
+  worshipUpdatePlayPauseIcon();
+  // Pop the synthetic history entry we pushed when worship opened so a
+  // browser back press doesn't have to be hit twice.
+  if (window.history.state && window.history.state.ylccWorship) {
+    try { window.history.back(); return; } catch(e){}
+  }
+  if (typeof wellGoto === 'function') wellGoto('home');
+  else if (typeof showSection === 'function') showSection('s-scripture');
+}
+
+// ESC + popstate wiring. Idempotent so worshipInit() can call us repeatedly
+// without stacking listeners.
+let _worshipNavWired = false;
+function worshipWireNav() {
+  if (_worshipNavWired) return;
+  _worshipNavWired = true;
+  document.addEventListener('keydown', function(e){
+    if (e.key !== 'Escape') return;
+    const sec = document.getElementById('s-worship');
+    if (sec && sec.classList.contains('active')) worshipClose();
+  });
+  window.addEventListener('popstate', function(e){
+    const sec = document.getElementById('s-worship');
+    if (sec && sec.classList.contains('active')) {
+      // The browser-back already popped our synthetic state; just clean up
+      // playback and route to the faith home.
+      try { worshipSendPlayerCommand('pauseVideo'); } catch(err){}
+      const iframe = document.getElementById('worship-youtubePlayer');
+      if (iframe) iframe.src = '';
+      const mini = document.getElementById('wpMini');
+      if (mini) mini.classList.add('hidden');
+      if (typeof wellGoto === 'function') wellGoto('home');
+    }
+  });
+}
+
+// Push a synthetic history entry so the system back button on Android /
+// the mouse-back gesture maps cleanly to closing the worship view.
+function worshipPushHistoryEntry() {
+  try {
+    if (!window.history.state || !window.history.state.ylccWorship) {
+      window.history.pushState({ ylccWorship: true }, '');
+    }
+  } catch(e){}
+}
+
+// Expose globally so the back pill (onclick) and ui.js section router can call.
+window.worshipClose = worshipClose;
+window.worshipWireNav = worshipWireNav;
+window.worshipPushHistoryEntry = worshipPushHistoryEntry;

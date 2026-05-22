@@ -602,6 +602,13 @@
     </div>
   </div>
 
+  <!-- INSTALL AS APP -->
+  <div style="margin-top:1.1rem;padding-top:.9rem;border-top:1px solid rgba(255,255,255,.06);">
+    <div style="font-family:var(--fh);font-size:.73rem;letter-spacing:1px;color:#c8d4e8;margin-bottom:.55rem;">📱 INSTALL AS APP</div>
+    <div style="font-size:.73rem;color:var(--tx2);margin-bottom:.5rem;">Add YourLife CC to your home screen for faster launch and a full-screen, offline-capable experience.</div>
+    <button class="btn bs" style="width:100%;background:rgba(56,189,248,.08);color:#38bdf8;border:1px solid rgba(56,189,248,.2);" onclick="if(typeof showPwaInstallPrompt==='function')showPwaInstallPrompt({fromSettings:true})">📲 Install as App</button>
+  </div>
+
   <!-- DATA MANAGEMENT -->
   <div style="margin-top:1.1rem;padding-top:.9rem;border-top:1px solid rgba(255,255,255,.06);">
     <div style="font-family:var(--fh);font-size:.73rem;letter-spacing:1px;color:#c8d4e8;margin-bottom:.55rem;">💾 DATA MANAGEMENT</div>
@@ -8338,9 +8345,9 @@
     }
   </style>
 
-  <button class="pp-back-btn" onclick="typeof wellGoto==='function'?wellGoto('home'):showSection('s-scripture')" aria-label="Back to Faith Home" style="margin:0 0 .5rem;">← Faith Home</button>
+  <button class="pp-back-btn worship-close-btn" onclick="typeof worshipClose==='function'?worshipClose():(typeof wellGoto==='function'?wellGoto('home'):showSection('s-scripture'))" aria-label="Close worship" style="position:fixed;top:max(.7rem,env(safe-area-inset-top));left:max(.85rem,env(safe-area-inset-left));z-index:9000;min-width:44px;min-height:44px;background:rgba(10,13,26,.92);">← Close</button>
 
-  <div class="bf-section-hdr">
+  <div class="bf-section-hdr" style="padding-top:3.5rem;">
     <div class="bf-eyebrow">WORSHIP · PRAYER · PRAISE</div>
     <div class="bf-title">Worship Playlist</div>
     <div class="bf-sub">Click any song to begin. Let the music draw you into His presence — and stay there.</div>

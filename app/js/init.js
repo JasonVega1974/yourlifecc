@@ -486,8 +486,10 @@ function finishInit(cloudReady){
   // Phase 1A — Streaks Engine
   if(typeof initStreaks === 'function') initStreaks();
 
-  // Phase 1B — Push Notifications
-  if(!IS_DEMO) setTimeout(_initPushPrompt, 3000);
+  // Phase 1B — Push Notifications. Modal-style prompt now lives in
+  // _initPushPrompt; per-user storage key so subsequent users on the same
+  // browser also see it. "Maybe Later" auto re-prompts on the next day.
+  if(!IS_DEMO) setTimeout(function(){ _initPushPrompt(); }, 3000);
 }
 
 
@@ -1673,58 +1675,105 @@ async function _pushSubscribeAndSave() {
   }
 }
 
-function _initPushPrompt() {
+// Friendly toast shown after the user grants notification permission.
+function _pushToast(msg) {
+  var toast = document.createElement('div');
+  toast.style.cssText = [
+    'position:fixed','bottom:1.5rem','left:50%','transform:translateX(-50%)',
+    'z-index:9999','background:#10b981','color:#fff','padding:.85rem 1.3rem',
+    'border-radius:12px','font-family:var(--fm,sans-serif)','font-weight:600',
+    'font-size:.85rem','box-shadow:0 12px 40px rgba(16,185,129,.4)',
+    'max-width:90vw','text-align:center'
+  ].join(';');
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(function(){
+    toast.style.transition = 'opacity .4s';
+    toast.style.opacity = '0';
+    setTimeout(function(){ if (toast.parentNode) toast.parentNode.removeChild(toast); }, 450);
+  }, 3200);
+}
+
+// Show the notification permission prompt as a richer modal explaining why
+// we're asking. Storage:
+//   _ylccUserKey('notif_prompt_seen') — 'granted' | 'denied' | 'later:<date>'
+//   For 'later:<date>' we re-prompt on a later date (next session = next day).
+function _initPushPrompt(opts) {
+  opts = opts || {};
   if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
-  if (localStorage.getItem('ylcc_push_prompted')) return;
+  if (document.getElementById('pushPromptModal')) return;
+
+  var seenKey = _ylccUserKey('notif_prompt_seen');
+  var seenVal = localStorage.getItem(seenKey);
+
   if (Notification.permission === 'granted') {
-    // Already granted (e.g. reinstall) — just subscribe silently
-    localStorage.setItem('ylcc_push_prompted', 'granted');
+    localStorage.setItem(seenKey, 'granted');
     _pushSubscribeAndSave();
     return;
   }
   if (Notification.permission === 'denied') {
-    localStorage.setItem('ylcc_push_prompted', 'denied');
+    localStorage.setItem(seenKey, 'denied');
     return;
   }
-
-  // Build soft prompt banner
-  var banner = document.createElement('div');
-  banner.id = 'pushPromptBanner';
-  banner.style.cssText = [
-    'position:fixed','bottom:1.2rem','left:50%','transform:translateX(-50%)',
-    'z-index:8000','background:#0d1424','border:1px solid rgba(245,166,35,.35)',
-    'border-radius:14px','padding:.9rem 1.2rem','display:flex','align-items:center',
-    'gap:.85rem','box-shadow:0 8px 32px rgba(0,0,0,.55)','max-width:420px',
-    'width:calc(100% - 2.4rem)','font-family:var(--fn,sans-serif)',
-  ].join(';');
-
-  banner.innerHTML =
-    '<span style="font-size:1.4rem;flex-shrink:0;">🔔</span>' +
-    '<div style="flex:1;min-width:0;">' +
-      '<div style="font-size:.82rem;font-weight:700;color:#f1f5f9;line-height:1.3;">Get daily verses and reminders?</div>' +
-      '<div style="font-size:.72rem;color:#94a3b8;margin-top:.15rem;">Stay connected to your faith journey</div>' +
-    '</div>' +
-    '<button id="pushAllowBtn" style="background:linear-gradient(135deg,#f5a623,#f97316);color:#1a0e02;border:none;border-radius:8px;padding:.45rem .85rem;font-size:.75rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">Allow</button>' +
-    '<button id="pushDenyBtn"  style="background:none;border:1px solid rgba(255,255,255,.12);color:#94a3b8;border-radius:8px;padding:.45rem .75rem;font-size:.75rem;cursor:pointer;flex-shrink:0;">Not Now</button>';
-
-  document.body.appendChild(banner);
-
-  function _dismiss() {
-    if (banner.parentNode) banner.parentNode.removeChild(banner);
+  // Honor "Maybe Later" until the next calendar day. opts.force=true bypasses
+  // (used by the post-signup hook so a fresh user always sees it once).
+  if (!opts.force && seenVal) {
+    if (seenVal === 'granted' || seenVal === 'denied') return;
+    if (seenVal.indexOf('later:') === 0) {
+      var savedDay = seenVal.slice(6);
+      var today = new Date().toISOString().slice(0,10);
+      if (savedDay >= today) return; // same day — wait
+    }
   }
 
-  document.getElementById('pushDenyBtn').addEventListener('click', function() {
-    localStorage.setItem('ylcc_push_prompted', 'denied');
+  var overlay = document.createElement('div');
+  overlay.id = 'pushPromptModal';
+  overlay.style.cssText = [
+    'position:fixed','inset:0','z-index:9800','background:rgba(0,0,0,.6)',
+    'display:flex','align-items:center','justify-content:center','padding:1.2rem'
+  ].join(';');
+
+  overlay.innerHTML =
+    '<div role="dialog" aria-labelledby="pushPromptTitle" style="max-width:380px;width:100%;background:#0d1424;border:1px solid rgba(245,166,35,.35);border-radius:18px;padding:1.6rem 1.4rem 1.3rem;box-shadow:0 24px 60px rgba(0,0,0,.6);font-family:var(--fm,sans-serif);">' +
+      '<div style="font-size:2.4rem;text-align:center;margin-bottom:.7rem;">🔔</div>' +
+      '<h2 id="pushPromptTitle" style="margin:0 0 .55rem;font-size:1.1rem;font-weight:800;color:#f1f5f9;text-align:center;line-height:1.3;">Stay in step with your faith</h2>' +
+      '<p style="margin:0 0 1.3rem;font-size:.85rem;color:#cbd5e1;line-height:1.5;text-align:center;">Get gentle reminders for your daily devotional, prayer time, and reading plan streaks. <strong style="color:#f5a623;">We\'ll never spam you</strong> — just a nudge when it matters.</p>' +
+      '<button id="pushAllowBtn" style="width:100%;background:linear-gradient(135deg,#f5a623,#f97316);color:#1a0e02;border:none;border-radius:10px;padding:.85rem;font-size:.9rem;font-weight:800;cursor:pointer;margin-bottom:.55rem;">Enable Reminders</button>' +
+      '<button id="pushDenyBtn" style="width:100%;background:transparent;border:1px solid rgba(255,255,255,.18);color:#94a3b8;border-radius:10px;padding:.7rem;font-size:.82rem;font-weight:600;cursor:pointer;">Maybe Later</button>' +
+    '</div>';
+
+  document.body.appendChild(overlay);
+
+  function _dismiss(){
+    if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+  }
+
+  document.getElementById('pushDenyBtn').addEventListener('click', function(){
+    localStorage.setItem(seenKey, 'later:' + new Date().toISOString().slice(0,10));
     _dismiss();
   });
 
-  document.getElementById('pushAllowBtn').addEventListener('click', async function() {
+  document.getElementById('pushAllowBtn').addEventListener('click', async function(){
     _dismiss();
-    var perm = await Notification.requestPermission();
-    localStorage.setItem('ylcc_push_prompted', perm);
-    if (perm === 'granted') _pushSubscribeAndSave();
+    try {
+      var perm = await Notification.requestPermission();
+      localStorage.setItem(seenKey, perm);
+      if (perm === 'granted') {
+        _pushSubscribeAndSave();
+        _pushToast('✓ Notifications enabled — you\'ll get gentle reminders');
+      }
+    } catch(e){ console.warn('[push] requestPermission failed:', e); }
   });
 }
+
+// Public hook called after signup completion (auth.js) and on faith section
+// entry (faith.js). Wraps _initPushPrompt with a small delay so the UI
+// finishes settling before the modal pops.
+function showPushPromptAfterSignup() {
+  setTimeout(function(){ _initPushPrompt({ force: true }); }, 1500);
+}
+window.showPushPromptAfterSignup = showPushPromptAfterSignup;
+window._initPushPrompt = _initPushPrompt;
 
 // ── PHASE 2A — THE WELL ONBOARDING ───────────────────────────
 // Full-screen 3-screen intro overlay shown once to first-time

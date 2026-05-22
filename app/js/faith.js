@@ -734,6 +734,13 @@ function renderWellDonationPrompt(){
 function wellGoto(target){
   // Unlock scroll when user enters The Well from the hero home screen
   document.body.classList.remove('ff-hero-active');
+  // First-time entry into The Well — surface the notification permission
+  // prompt if the user hasn't seen it yet. Skipped silently if already
+  // granted/denied/seen-today.
+  if(typeof _initPushPrompt === 'function' && !window._wellPushPromptShown){
+    window._wellPushPromptShown = true;
+    setTimeout(function(){ _initPushPrompt(); }, 1200);
+  }
   if(target === 'worship'){
     if(typeof showSection === 'function') showSection('s-worship');
     return;
