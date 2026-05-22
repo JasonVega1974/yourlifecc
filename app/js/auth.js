@@ -458,11 +458,17 @@ async function authComplete(isReturningUser){
   // Setup contest free user UI if applicable
   setTimeout(setupContestFreeUser, 500);
   // First-time signups (not isReturningUser) that skipped onboard.html get a
-  // gentle nudge to enable notifications + install the app. Returning users
-  // already saw these on prior sessions (state lives in localStorage).
+  // platform-appropriate nudge. On iOS-non-standalone, showPushPromptAfterSignup
+  // → _initPushPrompt redirects to the Add-to-Home-Screen modal automatically;
+  // we then skip the second showPwaInstallPrompt call to avoid stacking the
+  // same iOS modal twice. Android / desktop sees notif modal first, then the
+  // install modal 12 s later (enough time for the notif modal to be answered).
   if(!isReturningUser){
     if(typeof showPushPromptAfterSignup === 'function') showPushPromptAfterSignup();
-    if(typeof showPwaInstallPrompt === 'function') setTimeout(showPwaInstallPrompt, 4500);
+    var _isIOSSignup = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    if(!_isIOSSignup && typeof showPwaInstallPrompt === 'function'){
+      setTimeout(showPwaInstallPrompt, 12000);
+    }
   }
 }
 

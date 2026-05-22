@@ -486,10 +486,21 @@ function finishInit(cloudReady){
   // Phase 1A — Streaks Engine
   if(typeof initStreaks === 'function') initStreaks();
 
-  // Phase 1B — Push Notifications. Modal-style prompt now lives in
-  // _initPushPrompt; per-user storage key so subsequent users on the same
-  // browser also see it. "Maybe Later" auto re-prompts on the next day.
-  if(!IS_DEMO) setTimeout(function(){ _initPushPrompt(); }, 3000);
+  // Phase 1B — Notification + PWA install prompts. Wait 30 s after
+  // sign-in (engagement window) before surfacing either prompt; iOS Safari
+  // is routed to install-instructions first by _initPushPrompt itself,
+  // since web push only works from an installed PWA on iOS. pwa.js carries
+  // its own 30 s engagement timer for the install banner; this hook is
+  // belt-and-suspenders + sequencing on top of it.
+  if(!IS_DEMO) setTimeout(function(){
+    if(typeof _initPushPrompt === 'function') _initPushPrompt();
+    // Give the notif modal time to be answered before stacking install on
+    // top. On iOS the install modal was already opened by _initPushPrompt
+    // routing, so this is a no-op there (30-day cool-down keys throttle).
+    setTimeout(function(){
+      if(typeof showPwaInstallPrompt === 'function') showPwaInstallPrompt();
+    }, 10000);
+  }, 30000);
 }
 
 
@@ -1694,52 +1705,76 @@ function _pushToast(msg) {
   }, 3200);
 }
 
-// Show the notification permission prompt as a richer modal explaining why
-// we're asking. Storage:
-//   _ylccUserKey('notif_prompt_seen') — 'granted' | 'denied' | 'later:<date>'
-//   For 'later:<date>' we re-prompt on a later date (next session = next day).
+// Notification permission prompt — modal explaining why we're asking.
+// Storage (per-user via _ylccUserKey):
+//   notif_prompt_seen        — 'granted' | 'denied' | 'later:YYYY-MM-DD'
+//   notif_permission_granted — 'true' | 'false'
+// 30-day cool-down on "Maybe Later" (bypassed by opts.force).
+//
+// iOS Safari can't deliver web push from a browser tab — only from a PWA
+// installed to the home screen. So on iOS-non-standalone we redirect to the
+// Add-to-Home-Screen flow instead; the notification prompt fires on the
+// next launch when the user opens us from the home-screen icon.
 function _initPushPrompt(opts) {
   opts = opts || {};
   if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
   if (document.getElementById('pushPromptModal')) return;
 
-  var seenKey = _ylccUserKey('notif_prompt_seen');
-  var seenVal = localStorage.getItem(seenKey);
+  var isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  var isStandaloneMode = window.navigator.standalone === true ||
+                         window.matchMedia('(display-mode: standalone)').matches;
+
+  // iOS in a Safari tab — defer notifications, show install instructions.
+  if (isIOSDevice && !isStandaloneMode) {
+    if (typeof showIosInstallPrompt === 'function') showIosInstallPrompt(opts);
+    return;
+  }
+
+  var seenKey    = _ylccUserKey('notif_prompt_seen');
+  var grantedKey = _ylccUserKey('notif_permission_granted');
+  var seenVal    = localStorage.getItem(seenKey);
 
   if (Notification.permission === 'granted') {
     localStorage.setItem(seenKey, 'granted');
+    localStorage.setItem(grantedKey, 'true');
     _pushSubscribeAndSave();
     return;
   }
   if (Notification.permission === 'denied') {
     localStorage.setItem(seenKey, 'denied');
+    localStorage.setItem(grantedKey, 'false');
     return;
   }
-  // Honor "Maybe Later" until the next calendar day. opts.force=true bypasses
-  // (used by the post-signup hook so a fresh user always sees it once).
+  // 30-day cool-down on prior dismissals.
   if (!opts.force && seenVal) {
     if (seenVal === 'granted' || seenVal === 'denied') return;
     if (seenVal.indexOf('later:') === 0) {
       var savedDay = seenVal.slice(6);
-      var today = new Date().toISOString().slice(0,10);
-      if (savedDay >= today) return; // same day — wait
+      var ageMs = Date.now() - Date.parse(savedDay);
+      if (ageMs < 30 * 86400000) return;
     }
   }
 
   var overlay = document.createElement('div');
   overlay.id = 'pushPromptModal';
   overlay.style.cssText = [
-    'position:fixed','inset:0','z-index:9800','background:rgba(0,0,0,.6)',
+    'position:fixed','inset:0','z-index:9800','background:rgba(0,0,0,.65)',
     'display:flex','align-items:center','justify-content:center','padding:1.2rem'
   ].join(';');
 
   overlay.innerHTML =
-    '<div role="dialog" aria-labelledby="pushPromptTitle" style="max-width:380px;width:100%;background:#0d1424;border:1px solid rgba(245,166,35,.35);border-radius:18px;padding:1.6rem 1.4rem 1.3rem;box-shadow:0 24px 60px rgba(0,0,0,.6);font-family:var(--fm,sans-serif);">' +
-      '<div style="font-size:2.4rem;text-align:center;margin-bottom:.7rem;">🔔</div>' +
-      '<h2 id="pushPromptTitle" style="margin:0 0 .55rem;font-size:1.1rem;font-weight:800;color:#f1f5f9;text-align:center;line-height:1.3;">Stay in step with your faith</h2>' +
-      '<p style="margin:0 0 1.3rem;font-size:.85rem;color:#cbd5e1;line-height:1.5;text-align:center;">Get gentle reminders for your daily devotional, prayer time, and reading plan streaks. <strong style="color:#f5a623;">We\'ll never spam you</strong> — just a nudge when it matters.</p>' +
-      '<button id="pushAllowBtn" style="width:100%;background:linear-gradient(135deg,#f5a623,#f97316);color:#1a0e02;border:none;border-radius:10px;padding:.85rem;font-size:.9rem;font-weight:800;cursor:pointer;margin-bottom:.55rem;">Enable Reminders</button>' +
-      '<button id="pushDenyBtn" style="width:100%;background:transparent;border:1px solid rgba(255,255,255,.18);color:#94a3b8;border-radius:10px;padding:.7rem;font-size:.82rem;font-weight:600;cursor:pointer;">Maybe Later</button>' +
+    '<div role="dialog" aria-labelledby="pushPromptTitle" style="max-width:380px;width:100%;background:#0d1424;border:1px solid rgba(245,166,35,.35);border-radius:18px;padding:1.7rem 1.5rem 1.4rem;box-shadow:0 24px 60px rgba(0,0,0,.6);font-family:var(--fm,sans-serif);color:#f1f5f9;">' +
+      '<div style="font-size:2.4rem;text-align:center;margin-bottom:.65rem;">🔔</div>' +
+      '<h2 id="pushPromptTitle" style="margin:0 0 .8rem;font-size:1.1rem;font-weight:800;text-align:center;line-height:1.3;">Stay connected with God</h2>' +
+      '<p style="margin:0 0 .65rem;font-size:.85rem;color:#cbd5e1;line-height:1.5;text-align:center;">Get gentle reminders for:</p>' +
+      '<ul style="margin:0 0 1rem;padding-left:1.5rem;font-size:.83rem;color:#e2e8f0;line-height:1.75;">' +
+        '<li>Your daily devotional</li>' +
+        '<li>Reading plan streaks</li>' +
+        '<li>Prayer reflection time</li>' +
+      '</ul>' +
+      '<p style="margin:0 0 1.3rem;font-size:.8rem;color:#f5a623;text-align:center;font-weight:600;">We\'ll never spam you.</p>' +
+      '<button id="pushAllowBtn" style="width:100%;background:linear-gradient(135deg,#f5a623,#f97316);color:#1a0e02;border:none;border-radius:10px;padding:.85rem;font-size:.9rem;font-weight:800;cursor:pointer;margin-bottom:.55rem;min-height:44px;font-family:inherit;">Enable Reminders</button>' +
+      '<button id="pushDenyBtn" style="width:100%;background:transparent;border:1px solid rgba(255,255,255,.18);color:#94a3b8;border-radius:10px;padding:.7rem;font-size:.82rem;font-weight:600;cursor:pointer;min-height:44px;font-family:inherit;">Maybe Later</button>' +
     '</div>';
 
   document.body.appendChild(overlay);
@@ -1758,6 +1793,7 @@ function _initPushPrompt(opts) {
     try {
       var perm = await Notification.requestPermission();
       localStorage.setItem(seenKey, perm);
+      localStorage.setItem(grantedKey, perm === 'granted' ? 'true' : 'false');
       if (perm === 'granted') {
         _pushSubscribeAndSave();
         _pushToast('✓ Notifications enabled — you\'ll get gentle reminders');
@@ -1766,9 +1802,8 @@ function _initPushPrompt(opts) {
   });
 }
 
-// Public hook called after signup completion (auth.js) and on faith section
-// entry (faith.js). Wraps _initPushPrompt with a small delay so the UI
-// finishes settling before the modal pops.
+// Public hooks. Signup uses force:true so a fresh user always sees the
+// platform-appropriate prompt once, regardless of the 30-day cool-down.
 function showPushPromptAfterSignup() {
   setTimeout(function(){ _initPushPrompt({ force: true }); }, 1500);
 }

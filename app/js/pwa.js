@@ -1,250 +1,223 @@
-// PWA install prompt handler.
-// Storage keys (all unscoped — install state is browser-wide, not per-user):
-//   ylcc_pwa_dismissed     — epoch ms before which we won't auto-show
-//   ylcc_pwa_never         — '1' means user explicitly opted out
-//   ylcc_ios_prompt_shown  — '1' after iOS instructions have been shown once
-//   ylcc_visit_count       — visit counter (drives first-visit delay)
+// PWA install handler — modal-based, platform-aware.
 //
-// Exposes window.showPwaInstallPrompt() so the post-signup flow and a
-// Settings entry can re-trigger the banner on demand.
+// iOS Safari can't fire beforeinstallprompt and can't deliver web push from a
+// browser tab — so iOS users see Add-to-Home-Screen instructions first.
+// Notification permission is then prompted on the next launch from the
+// home-screen icon (standalone mode). Android / desktop Chrome get the native
+// install flow via beforeinstallprompt.
+//
+// State keys (per-user via _ylccUserKey when available):
+//   ios_install_prompt_seen     — 'later:YYYY-MM-DD' | 'installed' | 'declined'
+//   android_install_prompt_seen — 'later:YYYY-MM-DD' | 'installed' | 'declined'
+//
+// Public entry points:
+//   showPwaInstallPrompt({force, fromSettings}) — auto-routes by platform
+//   showIosInstallPrompt({force})               — iOS-only
+//   showAndroidInstallPrompt({force})           — Android-only
 (function () {
-  var BANNER_ID         = 'pwa-install-banner';
-  var DISMISS_KEY       = 'ylcc_pwa_dismissed';
-  var NEVER_KEY         = 'ylcc_pwa_never';
-  var IOS_SHOWN_KEY     = 'ylcc_ios_prompt_shown';
-  var VISIT_KEY         = 'ylcc_visit_count';
-  var SHOW_DELAY_FIRST  = 30000; // 30 s on first visit — Google penalizes earlier
-  var SHOW_DELAY_RETURN = 3000;  // 3 s on return visits
-  var SUPPRESS_DAYS     = 7;     // default re-prompt window
-  var NEVER_DAYS        = 365;   // "Don't show again" window
+  var IOS_KEY_BASE     = 'ios_install_prompt_seen';
+  var ANDROID_KEY_BASE = 'android_install_prompt_seen';
+  var COOLDOWN_DAYS    = 30;
 
   var deferredPrompt = null;
-  var bannerShown    = false;
+
+  // Lazy — _ylccUserKey may not exist when pwa.js first runs; the user may
+  // also sign in after this IIFE. Computing on call picks up the right uid.
+  function userKey(base) {
+    return (typeof _ylccUserKey === 'function')
+      ? _ylccUserKey(base)
+      : 'ylcc_' + base + '_local';
+  }
 
   function isIOS() {
-    return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  }
+
+  function isAndroid() {
+    return /android/i.test(navigator.userAgent);
   }
 
   function isStandalone() {
-    return window.matchMedia('(display-mode: standalone)').matches ||
-           navigator.standalone === true;
+    return window.navigator.standalone === true ||
+           window.matchMedia('(display-mode: standalone)').matches;
   }
 
-  function isDismissed() {
-    if (localStorage.getItem(NEVER_KEY) === '1') return true;
-    var val = localStorage.getItem(DISMISS_KEY);
+  // True if the user has seen this prompt within the cool-down window or has
+  // permanently dismissed it. Bypassed by opts.force at the call site.
+  function wasSeenRecently(key) {
+    var val = localStorage.getItem(key);
     if (!val) return false;
-    return Date.now() < parseInt(val, 10);
+    if (val === 'installed' || val === 'declined') return true;
+    if (val.indexOf('later:') === 0) {
+      var dateStr = val.slice(6);
+      var age = Date.now() - Date.parse(dateStr);
+      return age < COOLDOWN_DAYS * 86400000;
+    }
+    return false;
   }
 
-  function suppressForDays(days) {
-    localStorage.setItem(DISMISS_KEY, String(Date.now() + days * 864e5));
+  function markLater(base) {
+    localStorage.setItem(userKey(base), 'later:' + new Date().toISOString().slice(0, 10));
   }
 
-  function getVisits() {
-    var n = parseInt(localStorage.getItem(VISIT_KEY) || '0', 10) + 1;
-    localStorage.setItem(VISIT_KEY, String(n));
-    return n;
+  function markInstalled(base) {
+    localStorage.setItem(userKey(base), 'installed');
   }
 
-  function createBanner(ios) {
-    var banner = document.createElement('div');
-    banner.id = BANNER_ID;
-    banner.setAttribute('role', 'dialog');
-    banner.setAttribute('aria-label', 'Install YourLife CC');
-    banner.style.cssText = [
-      'position:fixed',
-      'bottom:0',
-      'left:0',
-      'right:0',
-      'z-index:9500',
-      'background:#0a1f5e',
-      'color:#fff',
-      'border-top:2px solid rgba(255,255,255,0.12)',
-      'padding:14px 16px calc(14px + env(safe-area-inset-bottom))',
-      'display:flex',
-      'flex-wrap:wrap',
-      'align-items:center',
-      'gap:12px',
+  // Brief toast — used when the user clicks "Install as App" in Settings but
+  // the browser hasn't surfaced an install option yet.
+  function toast(msg) {
+    var t = document.createElement('div');
+    t.style.cssText = [
+      'position:fixed', 'bottom:1.5rem', 'left:50%', 'transform:translateX(-50%)',
+      'z-index:9999', 'background:#0d1424', 'color:#fff',
+      'border:1px solid rgba(255,255,255,.18)', 'border-radius:10px',
+      'padding:.75rem 1.1rem', 'font-size:.82rem',
       'font-family:Inter,system-ui,sans-serif',
-      'font-size:14px',
-      'box-shadow:0 -4px 24px rgba(0,0,0,0.35)'
+      'box-shadow:0 12px 32px rgba(0,0,0,.4)',
+      'max-width:90vw', 'text-align:center'
     ].join(';');
-
-    var icon = document.createElement('img');
-    icon.src = '/app/icons/icon-192.png';
-    icon.alt = '';
-    icon.width = 44;
-    icon.height = 44;
-    icon.style.cssText = 'border-radius:9px;flex-shrink:0';
-
-    var msg = document.createElement('div');
-    msg.style.cssText = 'flex:1 1 60%;line-height:1.4;min-width:200px';
-    if (ios) {
-      msg.innerHTML =
-        '<div style="font-weight:700;margin-bottom:4px;">Install YourLife CC</div>' +
-        '<div style="font-size:12.5px;opacity:.85;">Tap <span aria-hidden="true">⬆️</span> <strong>Share</strong> at the bottom of Safari, then <strong>Add to Home Screen</strong>.</div>';
-    } else {
-      msg.innerHTML =
-        '<div style="font-weight:700;margin-bottom:4px;">Add YourLife CC to your home screen</div>' +
-        '<div style="font-size:12.5px;opacity:.85;">Faster launch, full-screen, works offline.</div>';
-    }
-
-    var actions = document.createElement('div');
-    actions.style.cssText = 'display:flex;gap:8px;align-items:center;flex-shrink:0;margin-left:auto;';
-
-    if (!ios) {
-      var addBtn = document.createElement('button');
-      addBtn.textContent = 'Add';
-      addBtn.setAttribute('aria-label', 'Install YourLife CC');
-      addBtn.style.cssText = [
-        'background:#fff',
-        'color:#0a1f5e',
-        'border:none',
-        'border-radius:8px',
-        'padding:10px 16px',
-        'font-weight:800',
-        'font-size:13px',
-        'cursor:pointer',
-        'min-height:44px',
-        'font-family:inherit'
-      ].join(';');
-      addBtn.onclick = function () {
-        var el = document.getElementById(BANNER_ID);
-        if (el) el.remove();
-        if (deferredPrompt) {
-          deferredPrompt.prompt();
-          deferredPrompt.userChoice.then(function (choice) {
-            if (choice && choice.outcome === 'accepted') {
-              localStorage.setItem(NEVER_KEY, '1');
-            }
-            deferredPrompt = null;
-          });
-        }
-      };
-      actions.appendChild(addBtn);
-    }
-
-    var laterBtn = document.createElement('button');
-    laterBtn.textContent = 'Later';
-    laterBtn.setAttribute('aria-label', 'Dismiss for now');
-    laterBtn.style.cssText = [
-      'background:rgba(255,255,255,0.08)',
-      'color:rgba(255,255,255,0.85)',
-      'border:1px solid rgba(255,255,255,0.18)',
-      'border-radius:8px',
-      'padding:10px 12px',
-      'font-size:12.5px',
-      'cursor:pointer',
-      'min-height:44px',
-      'font-family:inherit'
-    ].join(';');
-    laterBtn.onclick = function () {
-      var el = document.getElementById(BANNER_ID);
-      if (el) el.remove();
-      suppressForDays(SUPPRESS_DAYS);
-    };
-    actions.appendChild(laterBtn);
-
-    var neverBtn = document.createElement('button');
-    neverBtn.setAttribute('aria-label', "Don't show again");
-    neverBtn.textContent = '×';
-    neverBtn.style.cssText = [
-      'background:none',
-      'border:none',
-      'color:rgba(255,255,255,0.55)',
-      'font-size:22px',
-      'line-height:1',
-      'cursor:pointer',
-      'padding:6px 8px',
-      'min-width:44px',
-      'min-height:44px',
-      'font-family:inherit'
-    ].join(';');
-    neverBtn.title = "Don't show again";
-    neverBtn.onclick = function () {
-      var el = document.getElementById(BANNER_ID);
-      if (el) el.remove();
-      localStorage.setItem(NEVER_KEY, '1');
-      suppressForDays(NEVER_DAYS);
-    };
-    actions.appendChild(neverBtn);
-
-    banner.appendChild(icon);
-    banner.appendChild(msg);
-    banner.appendChild(actions);
-    return banner;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 4000);
   }
 
-  function showBanner(ios) {
-    if (bannerShown || document.getElementById(BANNER_ID)) return;
+  // ── iOS install instructions modal ──────────────────────────────────────
+  function showIosInstallPrompt(opts) {
+    opts = opts || {};
     if (isStandalone()) return;
-    bannerShown = true;
-    document.body.appendChild(createBanner(ios));
-  }
+    var key = userKey(IOS_KEY_BASE);
+    if (!opts.force && wasSeenRecently(key)) return;
+    if (document.getElementById('pwaIosModal')) return;
 
-  // Public — invoked from Settings ("Install as App") and after signup.
-  // Bypasses isDismissed() so a fresh user always sees it once.
+    var overlay = document.createElement('div');
+    overlay.id = 'pwaIosModal';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9700;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;padding:1.2rem;';
+    overlay.innerHTML =
+      '<div role="dialog" aria-labelledby="iosInstallTitle" style="max-width:380px;width:100%;background:#0d1424;border:1px solid rgba(56,189,248,.35);border-radius:18px;padding:1.7rem 1.5rem 1.4rem;box-shadow:0 24px 60px rgba(0,0,0,.6);font-family:var(--fm,sans-serif);color:#f1f5f9;">' +
+        '<div style="font-size:2.4rem;text-align:center;margin-bottom:.65rem;">📱</div>' +
+        '<h2 id="iosInstallTitle" style="margin:0 0 .9rem;font-size:1.1rem;font-weight:800;text-align:center;line-height:1.3;">Install YourLife on iPhone</h2>' +
+        '<p style="margin:0 0 1rem;font-size:.85rem;color:#cbd5e1;line-height:1.5;text-align:center;">For the best experience, add this app to your home screen:</p>' +
+        '<ol style="margin:0 0 1.3rem;padding-left:1.4rem;font-size:.83rem;color:#e2e8f0;line-height:1.7;">' +
+          '<li style="margin-bottom:.4rem;">Tap the share icon <span aria-hidden="true" style="display:inline-block;background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.4);border-radius:5px;padding:1px 7px;font-weight:700;color:#38bdf8;margin:0 2px;">⎙</span> at the bottom of Safari</li>' +
+          '<li style="margin-bottom:.4rem;">Scroll and tap <strong style="color:#fff;">"Add to Home Screen"</strong></li>' +
+          '<li>Open the app from your home screen — get reminders and a real app experience</li>' +
+        '</ol>' +
+        '<button id="iosInstallOk" style="width:100%;background:linear-gradient(135deg,#38bdf8,#0ea5e9);color:#06141e;border:none;border-radius:10px;padding:.85rem;font-size:.9rem;font-weight:800;cursor:pointer;min-height:44px;font-family:inherit;">Got it, will do</button>' +
+      '</div>';
+    document.body.appendChild(overlay);
+
+    document.getElementById('iosInstallOk').addEventListener('click', function () {
+      markLater(IOS_KEY_BASE);
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    });
+    // Tap outside the dialog to dismiss (treated as Later).
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) {
+        markLater(IOS_KEY_BASE);
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      }
+    });
+  }
+  window.showIosInstallPrompt = showIosInstallPrompt;
+
+  // ── Android install modal (after beforeinstallprompt) ───────────────────
+  function showAndroidInstallPrompt(opts) {
+    opts = opts || {};
+    if (isStandalone()) return;
+    if (!deferredPrompt) return;
+    var key = userKey(ANDROID_KEY_BASE);
+    if (!opts.force && wasSeenRecently(key)) return;
+    if (document.getElementById('pwaAndroidModal')) return;
+
+    var overlay = document.createElement('div');
+    overlay.id = 'pwaAndroidModal';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9700;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;padding:1.2rem;';
+    overlay.innerHTML =
+      '<div role="dialog" aria-labelledby="androidInstallTitle" style="max-width:380px;width:100%;background:#0d1424;border:1px solid rgba(56,189,248,.35);border-radius:18px;padding:1.7rem 1.5rem 1.4rem;box-shadow:0 24px 60px rgba(0,0,0,.6);font-family:var(--fm,sans-serif);color:#f1f5f9;">' +
+        '<div style="font-size:2.4rem;text-align:center;margin-bottom:.65rem;">📱</div>' +
+        '<h2 id="androidInstallTitle" style="margin:0 0 .65rem;font-size:1.1rem;font-weight:800;text-align:center;line-height:1.3;">Install YourLife as an app</h2>' +
+        '<p style="margin:0 0 1.3rem;font-size:.85rem;color:#cbd5e1;line-height:1.5;text-align:center;">Get a real app icon on your home screen. Works offline. Faster launch.</p>' +
+        '<button id="androidInstallYes" style="width:100%;background:linear-gradient(135deg,#38bdf8,#0ea5e9);color:#06141e;border:none;border-radius:10px;padding:.85rem;font-size:.9rem;font-weight:800;cursor:pointer;margin-bottom:.55rem;min-height:44px;font-family:inherit;">Install</button>' +
+        '<button id="androidInstallLater" style="width:100%;background:transparent;border:1px solid rgba(255,255,255,.18);color:#94a3b8;border-radius:10px;padding:.7rem;font-size:.82rem;font-weight:600;cursor:pointer;min-height:44px;font-family:inherit;">Maybe Later</button>' +
+      '</div>';
+    document.body.appendChild(overlay);
+
+    function dismiss() { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }
+
+    document.getElementById('androidInstallYes').addEventListener('click', async function () {
+      dismiss();
+      if (!deferredPrompt) return;
+      try {
+        deferredPrompt.prompt();
+        var choice = await deferredPrompt.userChoice;
+        if (choice && choice.outcome === 'accepted') markInstalled(ANDROID_KEY_BASE);
+        else markLater(ANDROID_KEY_BASE);
+      } catch (e) { console.warn('[pwa] install failed:', e); }
+      deferredPrompt = null;
+    });
+
+    document.getElementById('androidInstallLater').addEventListener('click', function () {
+      markLater(ANDROID_KEY_BASE);
+      dismiss();
+    });
+  }
+  window.showAndroidInstallPrompt = showAndroidInstallPrompt;
+
+  // ── Unified entry: routes by platform ────────────────────────────────────
   function showPwaInstallPrompt(opts) {
     opts = opts || {};
     if (isStandalone()) return;
-    // Reset transient flags so a manual trigger re-shows the banner.
-    bannerShown = false;
-    var existing = document.getElementById(BANNER_ID);
-    if (existing) existing.remove();
-    if (isIOS()) {
-      showBanner(true);
-      return;
-    }
-    if (deferredPrompt) {
-      showBanner(false);
-      return;
-    }
-    // Native prompt hasn't fired yet — flash a brief "install isn't ready"
-    // toast only when the user manually invoked from Settings; silent when
-    // called from the signup hook (signup will retry once the event fires).
+    if (isIOS()) { showIosInstallPrompt(opts); return; }
+    if (deferredPrompt) { showAndroidInstallPrompt(opts); return; }
     if (opts.fromSettings) {
-      var t = document.createElement('div');
-      t.style.cssText = 'position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);z-index:9999;background:#0d1424;color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:.75rem 1.1rem;font-size:.82rem;font-family:Inter,system-ui,sans-serif;box-shadow:0 12px 32px rgba(0,0,0,.4);';
-      t.textContent = "Your browser hasn't offered an install option yet — try again after using the app for a bit.";
-      document.body.appendChild(t);
-      setTimeout(function(){ if (t.parentNode) t.parentNode.removeChild(t); }, 4000);
+      toast("Your browser hasn't offered an install option yet — try again after using the app for a bit.");
     }
   }
   window.showPwaInstallPrompt = showPwaInstallPrompt;
 
-  // Already installed — nothing to do.
-  if (isStandalone()) {
-    localStorage.setItem(NEVER_KEY, '1');
-    return;
+  // ── Auto-fire after 30 s if the user has engaged ─────────────────────────
+  // Engagement = scroll, tap, key, touch. If still idle after 30 s, poll
+  // every 15 s up to 3 more times before giving up (don't pester an idle tab).
+  if (isStandalone()) return;
+
+  var engaged = false;
+  ['scroll', 'pointerdown', 'keydown', 'touchstart'].forEach(function (evt) {
+    window.addEventListener(evt, function onEngage() {
+      engaged = true;
+      window.removeEventListener(evt, onEngage);
+    }, { passive: true });
+  });
+
+  function attemptAutoShow() {
+    if (isStandalone()) return;
+    if (isIOS()) { showIosInstallPrompt(); return; }
+    if (deferredPrompt) { showAndroidInstallPrompt(); return; }
+    // Android-without-event yet: wait for beforeinstallprompt to trigger.
   }
 
-  var visits = getVisits();
-  var delay  = visits >= 2 ? SHOW_DELAY_RETURN : SHOW_DELAY_FIRST;
-
-  if (isIOS()) {
-    // iOS Safari can't fire beforeinstallprompt — show our instructions once
-    // automatically, then expose the manual trigger via Settings forever.
-    if (!localStorage.getItem(IOS_SHOWN_KEY) && !isDismissed()) {
-      localStorage.setItem(IOS_SHOWN_KEY, '1');
-      setTimeout(function () { showBanner(true); }, delay);
-    }
-    return;
+  var pollCount = 0;
+  function scheduleAttempt() {
+    setTimeout(function () {
+      if (engaged) { attemptAutoShow(); return; }
+      if (++pollCount < 3) scheduleAttempt();
+    }, pollCount === 0 ? 30000 : 15000);
   }
+  scheduleAttempt();
 
-  // Android / Chrome / Edge — wait for the native install event.
+  // Android / Chrome / Edge — capture the install event.
   window.addEventListener('beforeinstallprompt', function (e) {
     e.preventDefault();
     deferredPrompt = e;
-    if (!isDismissed()) {
-      setTimeout(function () { showBanner(false); }, delay);
-    }
+    // If we already passed the engagement gate, show now.
+    if (engaged) showAndroidInstallPrompt();
   });
 
-  // If the user installs via the browser UI directly, lock our banner out.
+  // User installed via browser UI directly — lock our modal out.
   window.addEventListener('appinstalled', function () {
-    localStorage.setItem(NEVER_KEY, '1');
-    var el = document.getElementById(BANNER_ID);
+    markInstalled(ANDROID_KEY_BASE);
+    var el = document.getElementById('pwaAndroidModal');
     if (el) el.remove();
+    deferredPrompt = null;
   });
 })();
