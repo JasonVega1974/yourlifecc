@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>YourLife CC Faith — 100% Free Christian App. Forever. No Credit Card.</title>
-<meta name="description" content="A completely free Christian app. Bible, audio meditations, sleep stories, AI daily devotionals, guided prayer, Strong's concordance, and more. No subscription. No credit card. Never. Built for the Faith Community.">
+<title>YourLife CC Faith — Free Christian App. All-in-One. Forever.</title>
+<meta name="description" content="A completely free Christian app. Bible, audio meditations, AI devotionals, guided prayer, Strong's concordance, faith journey tracker, and 18 features — all in one place. Compare to Hallow ($70/yr), Glorify ($60/yr), Abide ($40/yr). Ours is free. Forever.">
 
 <!-- SEO -->
 <link rel="canonical" href="https://yourlifecc.com/faith.html">
@@ -14,15 +14,15 @@
 <!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://yourlifecc.com/faith.html">
-<meta property="og:title" content="YourLife CC Faith — 100% Free Christian App. Forever.">
-<meta property="og:description" content="Bible, audio meditations, AI devotionals, guided prayer, deep study tools — completely free. No subscription. No credit card. Ever.">
+<meta property="og:title" content="YourLife CC Faith — Free Christian App. All-in-One. Forever.">
+<meta property="og:description" content="Everything you need to grow in Christ — Bible, prayer, meditation, study, journey — all in one app. Completely free. No subscription. Ever.">
 <meta property="og:image" content="https://yourlifecc.com/app/icons/icon-512.png">
 <meta property="og:site_name" content="YourLifeCC">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="YourLife CC Faith — 100% Free Christian App">
-<meta name="twitter:description" content="Bible, audio meditations, AI devotionals, deep study — completely free. No subscription. No credit card. Ever.">
+<meta name="twitter:title" content="YourLife CC Faith — Free Christian App. All-in-One.">
+<meta name="twitter:description" content="Bible, meditations, devotionals, prayer, study — all in one free Christian app. No subscription. Ever.">
 <meta name="twitter:image" content="https://yourlifecc.com/app/icons/icon-512.png">
 
 <link rel="manifest" href="/well-manifest.json">
@@ -60,24 +60,17 @@ a{color:var(--blue);text-decoration:none;}
 .nav-links a:hover{color:var(--tx);}
 .nav-links a.active{color:var(--tx);}
 .nav-cta{background:var(--grad);color:#fff!important;padding:9px 20px;border-radius:10px;font-weight:700!important;text-transform:uppercase;letter-spacing:.05em;}
-
 .nav-ham{display:none;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:9px;padding:.45rem .6rem;cursor:pointer;flex-direction:column;gap:4px;flex-shrink:0;}
 .nav-ham span{display:block;width:20px;height:2px;background:var(--tx);border-radius:2px;transition:all .25s;}
 .nav-ham.open span:nth-child(1){transform:translateY(6px) rotate(45deg);}
 .nav-ham.open span:nth-child(2){opacity:0;}
 .nav-ham.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
-
 .nav-drawer{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:200;background:rgba(6,9,15,.98);backdrop-filter:blur(20px);padding:80px 24px 40px;flex-direction:column;gap:0;overflow-y:auto;}
 .nav-drawer.open{display:flex;}
 .nav-drawer a{color:var(--tx2);font-size:1.1rem;font-weight:600;padding:1rem 0;border-bottom:1px solid rgba(255,255,255,.05);display:block;}
 .nav-drawer a:hover{color:var(--tx);}
 .nav-drawer .nav-cta-mob{margin-top:1.2rem;background:var(--grad);color:#fff!important;padding:1rem;border-radius:13px;text-align:center;font-weight:700;font-size:1rem;border:none;}
-
-@media(max-width:860px){
-  .nav-links{display:none;}
-  .nav-ham{display:flex;}
-  .nav .wrap{padding:0 4px;}
-}
+@media(max-width:860px){.nav-links{display:none;}.nav-ham{display:flex;}.nav .wrap{padding:0 4px;}}
 
 /* HERO */
 .hero{padding:160px 0 60px;text-align:center;position:relative;overflow:hidden;}
@@ -93,14 +86,28 @@ a{color:var(--blue);text-decoration:none;}
 .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(245,166,35,.35);}
 .btn-ghost{background:rgba(255,255,255,.06);color:var(--tx);border:1px solid rgba(255,255,255,.1);}
 .btn-ghost:hover{background:rgba(255,255,255,.1);}
-
-/* TRUST BAR */
 .trust-bar{display:flex;flex-wrap:wrap;gap:.8rem;justify-content:center;margin-top:1rem;max-width:680px;margin-left:auto;margin-right:auto;}
 .trust-chip{display:inline-flex;align-items:center;gap:.4rem;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.22);color:#86efac;font-size:.78rem;font-weight:700;padding:.45rem .9rem;border-radius:100px;}
 .trust-chip-icon{font-size:.9rem;}
 
-/* FREE PROMISE */
-.promise{background:linear-gradient(180deg,var(--bg),var(--bg2));padding:60px 0;}
+/* THREE PILLARS */
+.pillars{background:linear-gradient(180deg,var(--bg),var(--bg2));padding:80px 0;}
+.pillars-eyebrow{font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--cyan);text-align:center;margin-bottom:.6rem;}
+.pillars h2{font-family:var(--fh);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;text-align:center;margin-bottom:.6rem;letter-spacing:-.02em;}
+.pillars-sub{text-align:center;color:var(--tx2);font-size:1rem;max-width:640px;margin:0 auto 3rem;line-height:1.7;}
+.pillars-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;}
+.pillar{background:var(--bg);border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:2rem 1.6rem;text-align:left;transition:all .25s;}
+.pillar:hover{border-color:rgba(6,214,160,.3);transform:translateY(-3px);}
+.pillar-icon{font-size:2.4rem;margin-bottom:1rem;display:inline-block;background:linear-gradient(135deg,rgba(6,214,160,.18),rgba(79,143,255,.12));border-radius:14px;padding:.7rem;width:60px;height:60px;display:flex;align-items:center;justify-content:center;}
+.pillar h3{font-family:var(--fh);font-size:1.3rem;font-weight:800;margin-bottom:.6rem;color:var(--tx);}
+.pillar p{font-size:.92rem;color:var(--tx2);line-height:1.7;margin-bottom:.8rem;}
+.pillar-items{list-style:none;padding:0;}
+.pillar-items li{font-size:.85rem;color:var(--tx);padding:.25rem 0 .25rem 1.3rem;position:relative;}
+.pillar-items li::before{content:'→';position:absolute;left:0;color:var(--cyan);font-weight:900;}
+@media(max-width:760px){.pillars-grid{grid-template-columns:1fr;}}
+
+/* PROMISE */
+.promise{background:var(--bg2);padding:60px 0;}
 .promise .wrap{max-width:800px;text-align:center;}
 .promise-eyebrow{font-family:var(--fh);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:var(--green);margin-bottom:.8rem;}
 .promise h2{font-family:var(--fh);font-size:clamp(1.6rem,3.6vw,2.4rem);font-weight:900;margin-bottom:1.2rem;letter-spacing:-.02em;}
@@ -111,26 +118,35 @@ a{color:var(--blue);text-decoration:none;}
 .promise-item::before{content:'✓';color:#22c55e;font-weight:900;font-size:1.1rem;line-height:1.5;}
 @media(max-width:560px){.promise-list{grid-template-columns:1fr;}}
 
-/* THREE BETS */
-.bets{background:var(--bg2);padding:80px 0;}
-.bets-eyebrow{font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--gold);text-align:center;margin-bottom:.6rem;}
-.bets h2{font-family:var(--fh);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;text-align:center;margin-bottom:.6rem;letter-spacing:-.02em;}
-.bets-sub{text-align:center;color:var(--tx2);font-size:1rem;max-width:580px;margin:0 auto 3rem;line-height:1.7;}
-.bets-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;}
-.bet{background:var(--bg);border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:2rem 1.6rem;text-align:left;transition:border-color .25s,transform .25s;}
-.bet:hover{border-color:rgba(245,166,35,.25);transform:translateY(-2px);}
-.bet-num{font-family:var(--fh);font-size:.7rem;font-weight:800;letter-spacing:.14em;color:var(--gold);margin-bottom:.6rem;}
-.bet h3{font-family:var(--fh);font-size:1.3rem;font-weight:800;margin-bottom:.6rem;color:var(--tx);}
-.bet p{font-size:.92rem;color:var(--tx2);line-height:1.7;}
-@media(max-width:760px){.bets-grid{grid-template-columns:1fr;}}
+/* COMPARISON TABLE */
+.compare{padding:88px 0;}
+.compare-eyebrow{font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--gold);text-align:center;margin-bottom:.6rem;}
+.compare h2{font-family:var(--fh);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;text-align:center;margin-bottom:.6rem;letter-spacing:-.02em;}
+.compare-sub{text-align:center;color:var(--tx2);font-size:1rem;max-width:620px;margin:0 auto 3rem;line-height:1.7;}
+.compare-table-wrap{overflow-x:auto;border-radius:16px;border:1px solid rgba(255,255,255,.08);background:var(--bg2);}
+.compare-table{width:100%;border-collapse:collapse;min-width:640px;}
+.compare-table th,.compare-table td{padding:1rem 1.1rem;text-align:left;font-size:.9rem;border-bottom:1px solid rgba(255,255,255,.04);}
+.compare-table thead th{font-family:var(--fh);font-weight:800;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--tx);background:rgba(255,255,255,.03);padding-top:1.2rem;padding-bottom:1.2rem;}
+.compare-table thead th.ylcc{background:linear-gradient(180deg,rgba(245,166,35,.12),rgba(245,166,35,.04));color:var(--gold);border-bottom:1px solid rgba(245,166,35,.2);}
+.compare-table tbody tr:last-child td{border-bottom:none;}
+.compare-table tbody tr:hover{background:rgba(255,255,255,.02);}
+.compare-table td.feat-name{font-weight:700;color:var(--tx);}
+.compare-table td.ylcc{background:rgba(245,166,35,.04);color:var(--tx);}
+.cmp-yes{color:#22c55e;font-weight:900;font-size:1.1rem;}
+.cmp-no{color:var(--tx3);font-weight:700;}
+.cmp-partial{color:var(--gold);font-weight:700;font-size:.85rem;}
+.cmp-price{font-family:var(--fh);font-weight:900;font-size:1rem;}
+.cmp-price.free{color:#22c55e;}
+.cmp-price.paid{color:var(--red);}
+.compare-note{text-align:center;margin-top:1.4rem;font-size:.82rem;color:var(--tx3);font-style:italic;}
 
-/* FEATURE GRID */
-.features{padding:88px 0;}
+/* FEATURES */
+.features{padding:88px 0;background:var(--bg2);}
 .features-eyebrow{font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--cyan);text-align:center;margin-bottom:.6rem;}
 .features h2{font-family:var(--fh);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;text-align:center;margin-bottom:.6rem;letter-spacing:-.02em;}
 .features-sub{text-align:center;color:var(--tx2);font-size:1rem;max-width:620px;margin:0 auto 3rem;line-height:1.7;}
 .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;}
-.feat{background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:1.6rem 1.4rem;transition:border-color .25s;}
+.feat{background:var(--bg);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:1.6rem 1.4rem;transition:border-color .25s;}
 .feat:hover{border-color:rgba(79,143,255,.25);}
 .feat-icon{font-size:1.9rem;margin-bottom:.7rem;display:block;}
 .feat h3{font-family:var(--fh);font-size:1.05rem;font-weight:800;margin-bottom:.4rem;color:var(--tx);}
@@ -149,7 +165,7 @@ a{color:var(--blue);text-decoration:none;}
 .why-text p:last-child{margin-bottom:0;}
 .why-quote{font-family:var(--fh);font-style:italic;color:var(--gold);font-size:1.1rem;margin:1.8rem auto;padding:1.2rem;border-left:3px solid var(--gold);max-width:520px;text-align:left;background:rgba(245,166,35,.04);border-radius:0 12px 12px 0;}
 
-/* SOCIAL PROOF */
+/* PROOF */
 .proof{background:var(--bg2);padding:80px 0;border-top:1px solid rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.03);}
 .proof-eyebrow{font-family:var(--fh);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--gold);text-align:center;margin-bottom:.8rem;}
 .proof h2{font-family:var(--fh);font-size:clamp(1.6rem,3.6vw,2.4rem);font-weight:900;text-align:center;margin-bottom:.4rem;letter-spacing:-.02em;}
@@ -185,7 +201,7 @@ a{color:var(--blue);text-decoration:none;}
 .donate-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none;}
 .donate-disclaimer{margin-top:1.4rem;font-size:.78rem;color:var(--tx3);max-width:520px;margin-left:auto;margin-right:auto;line-height:1.65;font-style:italic;}
 
-/* SIGNUP CTA */
+/* SIGNUP */
 .signup-cta{padding:96px 0;text-align:center;background:linear-gradient(180deg,var(--bg2),var(--bg));position:relative;overflow:hidden;}
 .signup-cta::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(245,166,35,.07) 0%,transparent 70%);pointer-events:none;}
 .signup-cta .wrap{position:relative;}
@@ -223,13 +239,9 @@ footer{background:var(--bg);padding:60px 0 30px;border-top:1px solid rgba(255,25
       <a href="/app/index.html">Sign In</a>
       <a href="/register-faith.html" class="nav-cta">Open the App →</a>
     </div>
-    <button class="nav-ham" id="navHam" onclick="toggleMobNav()" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
+    <button class="nav-ham" id="navHam" onclick="toggleMobNav()" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
 </div>
-
-<!-- MOBILE DRAWER -->
 <div class="nav-drawer" id="navDrawer">
   <a href="/#features" onclick="closeMobNav()">⚡ Features</a>
   <a href="/#pricing" onclick="closeMobNav()">💳 Pricing</a>
@@ -243,12 +255,12 @@ footer{background:var(--bg);padding:60px 0 30px;border-top:1px solid rgba(255,25
 <section class="hero">
   <div class="wrap">
     <div class="hero-eyebrow">✝️ 100% Free Forever · No Catch · Built for the Kingdom</div>
-    <h1>A Complete Christian App.<br><em>Free Forever. Truly.</em></h1>
-    <p class="lead">Bible reading, audio meditations, AI daily devotionals, guided prayer, deep Bible study, and your personal faith journey — all in one app. <strong>No subscription. No credit card. Never will be.</strong></p>
-    <p class="sub">Built by a Christian dad in Idaho for anyone seeking to walk closer with Jesus. Not freemium. Not a free trial. Not "free for 30 days." Just free.</p>
+    <h1>Your Entire Faith Walk.<br><em>In One Free App.</em></h1>
+    <p class="lead">Bible, audio meditations, AI daily devotionals, guided prayer, Strong's concordance, sermon notes, faith journey tracker — <strong>all in one place. No subscription. No credit card. Never will be.</strong></p>
+    <p class="sub">Built by a Christian dad in Idaho for anyone seeking to walk closer with Jesus. The same features cost $40-70/year in other apps. Here they're free, forever.</p>
     <div class="hero-btns">
       <a href="/register-faith.html" class="btn btn-primary">Open the App →</a>
-      <a href="#features" class="btn btn-ghost">See What's Inside</a>
+      <a href="#compare" class="btn btn-ghost">Compare to Other Apps</a>
     </div>
     <div class="trust-bar">
       <span class="trust-chip"><span class="trust-chip-icon">✓</span>No credit card needed</span>
@@ -259,7 +271,58 @@ footer{background:var(--bg);padding:60px 0 30px;border-top:1px solid rgba(255,25
   </div>
 </section>
 
-<!-- FREE PROMISE -->
+<!-- THREE PILLARS -->
+<section class="pillars">
+  <div class="wrap">
+    <div class="pillars-eyebrow">🎯 Three Things In One Place</div>
+    <h2>Organize. Educate. Motivate.</h2>
+    <p class="pillars-sub">Most Christian apps do one thing well. We built all three — and tied them together so your faith walk lives in one place instead of scattered across five apps.</p>
+    <div class="pillars-grid">
+
+      <div class="pillar">
+        <span class="pillar-icon">📋</span>
+        <h3>Organize</h3>
+        <p>All of your faith life in one place, not scattered across notebooks, apps, and sticky notes.</p>
+        <ul class="pillar-items">
+          <li>Faith Journey timeline of every milestone</li>
+          <li>Sermon notes with church + pastor + date</li>
+          <li>Faith calendar — services, studies, retreats</li>
+          <li>Prayer journal with answered prayers</li>
+          <li>Personal study notes saved across devices</li>
+        </ul>
+      </div>
+
+      <div class="pillar">
+        <span class="pillar-icon">📚</span>
+        <h3>Educate</h3>
+        <p>Real Bible literacy — not pop devotionals. Deep tools that turn casual reading into actual understanding.</p>
+        <ul class="pillar-items">
+          <li>Strong's concordance on every verse</li>
+          <li>15 Christian denominations explained</li>
+          <li>100+ apologetics proofs across 6 categories</li>
+          <li>"Who Is Jesus" deep-dive with red-letter words</li>
+          <li>Bible Timeline + Bible Lands explorer</li>
+        </ul>
+      </div>
+
+      <div class="pillar">
+        <span class="pillar-icon">🔥</span>
+        <h3>Motivate</h3>
+        <p>Daily rhythm that becomes the anchor of your day. Built to keep you coming back without nagging.</p>
+        <ul class="pillar-items">
+          <li>Fresh AI devotional every morning</li>
+          <li>Reading plan streaks (3-day to 365-day)</li>
+          <li>Audio meditations with natural voice</li>
+          <li>Verse of the Day with audio narration</li>
+          <li>Guided prayer sessions for every mood</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PROMISE -->
 <section class="promise">
   <div class="wrap">
     <div class="promise-eyebrow">💚 The Promise</div>
@@ -276,148 +339,162 @@ footer{background:var(--bg);padding:60px 0 30px;border-top:1px solid rgba(255,25
   </div>
 </section>
 
-<!-- THREE BETS -->
-<section class="bets">
+<!-- COMPARISON TABLE -->
+<section class="compare" id="compare">
   <div class="wrap">
-    <div class="bets-eyebrow">⭐ The Heart of It</div>
-    <h2>Built for real spiritual growth.</h2>
-    <p class="bets-sub">Most faith apps pick one thing — a Bible reader, devotionals, or meditation. We built everything you need for your walk with Christ, all in one place.</p>
-    <div class="bets-grid">
-      <div class="bet">
-        <div class="bet-num">01 / SCRIPTURE</div>
-        <h3>Deep Bible Engagement</h3>
-        <p>Full Bible reader, audio narration of every chapter via Bible.is embedded, Strong's concordance lookup, cross references, study notes, and the complete red-letter words of Jesus organized by topic.</p>
-      </div>
-      <div class="bet">
-        <div class="bet-num">02 / RHYTHM</div>
-        <h3>Daily Devotional Habit</h3>
-        <p>A new AI-personalized devotional every morning. Reading plans from 3 days to a full year with streak tracking. Verse of the Day with natural voice audio. Built to become the quiet anchor of your day.</p>
-      </div>
-      <div class="bet">
-        <div class="bet-num">03 / PRESENCE</div>
-        <h3>Prayer &amp; Meditation</h3>
-        <p>Guided prayer sessions, audio meditations with natural voice narration, Scripture sleep stories, and the ability to create your own AI-generated meditations from any theme, mood, or verse.</p>
-      </div>
+    <div class="compare-eyebrow">⚖️ The Honest Comparison</div>
+    <h2>How we stack up.</h2>
+    <p class="compare-sub">We respect Hallow, Glorify, and Abide — they make real tools. But their core features sit behind paywalls. Here's the side-by-side.</p>
+    <div class="compare-table-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th class="ylcc">YourLife CC</th>
+            <th>Hallow</th>
+            <th>Glorify</th>
+            <th>Abide</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="feat-name">Price</td>
+            <td class="ylcc"><span class="cmp-price free">FREE</span></td>
+            <td><span class="cmp-price paid">$69.99/yr</span></td>
+            <td><span class="cmp-price paid">$59.99/yr</span></td>
+            <td><span class="cmp-price paid">$39.99/yr</span></td>
+          </tr>
+          <tr>
+            <td class="feat-name">Credit card required</td>
+            <td class="ylcc"><span class="cmp-no">No</span></td>
+            <td><span class="cmp-yes">Yes</span></td>
+            <td><span class="cmp-yes">Yes</span></td>
+            <td><span class="cmp-yes">Yes</span></td>
+          </tr>
+          <tr>
+            <td class="feat-name">Bible reading plans</td>
+            <td class="ylcc"><span class="cmp-yes">✓</span></td>
+            <td><span class="cmp-partial">Premium</span></td>
+            <td><span class="cmp-yes">✓</span></td>
+            <td><span class="cmp-partial">Limited</span></td>
+          </tr>
+          <tr>
+            <td class="feat-name">Audio meditations</td>
+            <td class="ylcc"><span class="cmp-yes">✓</span></td>
+            <td><span class="cmp-yes">✓</span></td>
+            <td><span class="cmp-yes">✓</span></td>
+            <td><span class="cmp-yes">✓</span></td>
+          </tr>
+          <tr>
+            <td class="feat-name">Sleep stories from Scripture</td>
+            <td class="ylcc"><span class="cmp-yes">✓</span></td>
+            <td><span class="cmp-yes">✓</span></td>
+            <td><span class="cmp-yes">✓</span></td>
+            <td><span class="cmp-no">—</span></td>
+          </tr>
+          <tr>
+            <td class="feat-name">AI-personalized daily devotional</td>
+            <td class="ylcc"><span class="cmp-yes">✓</span></td>
+            <td><span class="cmp-no">—</span></td>
+            <td><span class="cmp-no">—</span></td>
+            <td><span class="cmp-no">—</span></td>
+          </tr>
+          <tr>
+            <td class="feat-name">AI custom meditation generator</td>
+            <td class="ylcc"><span class="cmp-yes">✓</span></td>
+            <td><span class="cmp-no">—</span></td>
+            <td><span class="cmp-no">—</span></td>
+            <td><span class="cmp-no">—</span></td>
+          </tr>
+          <tr>
+            <td class="feat-name">Guided prayer sessions</td>
+            <td class="ylcc"><span class="cmp-yes">✓</span></td>
+            <td><span class="cmp-yes">✓</span></td>
+            <td><span class="cmp-yes">✓</span></td>
+            <td><span class="cmp-partial">Limited</span></td>
+          </tr>
+          <tr>
+            <td class="feat-name">Strong's concordance lookup</td>
+            <td class="ylcc"><span class="cmp-yes">✓</span></td>
+            <td><span class="cmp-no">—</span></td>
+            <td><span class="cmp-no">—</span></td>
+            <td><span class="cmp-no">—</span></td>
+          </tr>
+          <tr>
+            <td class="feat-name">100+ apologetics proofs</td>
+            <td class="ylcc"><span class="cmp-yes">✓</span></td>
+            <td><span class="cmp-no">—</span></td>
+            <td><span class="cmp-no">—</span></td>
+            <td><span class="cmp-no">—</span></td>
+          </tr>
+          <tr>
+            <td class="feat-name">15 denominations explained</td>
+            <td class="ylcc"><span class="cmp-yes">✓</span></td>
+            <td><span class="cmp-no">—</span></td>
+            <td><span class="cmp-no">—</span></td>
+            <td><span class="cmp-no">—</span></td>
+          </tr>
+          <tr>
+            <td class="feat-name">Faith journey + milestone tracker</td>
+            <td class="ylcc"><span class="cmp-yes">✓</span></td>
+            <td><span class="cmp-no">—</span></td>
+            <td><span class="cmp-no">—</span></td>
+            <td><span class="cmp-no">—</span></td>
+          </tr>
+          <tr>
+            <td class="feat-name">Sermon notes + church calendar</td>
+            <td class="ylcc"><span class="cmp-yes">✓</span></td>
+            <td><span class="cmp-no">—</span></td>
+            <td><span class="cmp-no">—</span></td>
+            <td><span class="cmp-no">—</span></td>
+          </tr>
+          <tr>
+            <td class="feat-name">Christian podcast library</td>
+            <td class="ylcc"><span class="cmp-yes">✓</span></td>
+            <td><span class="cmp-no">—</span></td>
+            <td><span class="cmp-no">—</span></td>
+            <td><span class="cmp-no">—</span></td>
+          </tr>
+          <tr>
+            <td class="feat-name">Ad-free</td>
+            <td class="ylcc"><span class="cmp-yes">✓</span></td>
+            <td><span class="cmp-yes">✓</span></td>
+            <td><span class="cmp-yes">✓</span></td>
+            <td><span class="cmp-yes">✓</span></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    <p class="bets-sub" style="margin-top:2.4rem;margin-bottom:0;"><strong style="color:var(--gold);">No other Christian app combines all three this deeply.</strong></p>
+    <p class="compare-note">Pricing as of 2026. All competitor data verified from public sources. ✓ = included in standard plan · Premium/Limited = paywall or restricted.</p>
   </div>
 </section>
 
-<!-- FEATURE GRID -->
+<!-- FEATURES -->
 <section class="features" id="features">
   <div class="wrap">
     <div class="features-eyebrow">📖 What's Inside</div>
-    <h2>Everything you need for your faith walk.</h2>
-    <p class="features-sub">Eighteen features and growing — all completely free. Most of these require $40-70/year subscriptions in other apps.</p>
+    <h2>Eighteen features. All free.</h2>
+    <p class="features-sub">Everything you need for your faith walk. Most require $40-70/year subscriptions in other apps.</p>
     <div class="feat-grid">
 
-      <div class="feat">
-        <span class="feat-icon">✝️</span>
-        <h3>Who Is Jesus</h3>
-        <p>His life, the cross, His teachings, all His recorded words (red-letter Bible) organized by 10 categories, with Strong's concordance lookup on every word.</p>
-      </div>
-
-      <div class="feat">
-        <span class="feat-icon">⛪</span>
-        <h3>Christian Traditions</h3>
-        <p>15 denominations explained in depth — Baptist, Catholic, Orthodox, Pentecostal, Methodist, Lutheran, Presbyterian, Anglican, Non-Denominational, and more.</p>
-      </div>
-
-      <div class="feat">
-        <span class="feat-icon">🔥</span>
-        <h3>Proof &amp; Prophecy</h3>
-        <p>100+ apologetics proofs across 6 categories with a "Convince Me" learning deck, bookmarks, and search. Real answers to hard faith questions.</p>
-      </div>
-
-      <div class="feat">
-        <span class="feat-icon">📖</span>
-        <h3>Bible Study Tools</h3>
-        <p>Strong's concordance lookup, cross references, passage viewer with verse context, and personal study notes saved across all your devices.</p>
-      </div>
-
-      <div class="feat">
-        <span class="feat-icon">📚</span>
-        <h3>Reading Plans</h3>
-        <p>Five plans from a 3-day "Starting Fresh" intro to the full Bible in 365 days, with streak tracking and daily reminders.</p>
-      </div>
-
-      <div class="feat">
-        <span class="feat-icon">✨</span>
-        <h3>Daily AI Devotional</h3>
-        <p>A fresh personalized devotional every morning with scripture, 200-word reflection, application question, and prayer. Listen with natural voice.<span class="feat-tag">AI-Powered</span></p>
-      </div>
-
-      <div class="feat">
-        <span class="feat-icon">🧘</span>
-        <h3>Create Meditation</h3>
-        <p>Generate your own guided meditation by theme, mood, scripture, or feeling. Saved to your library, replay anytime.<span class="feat-tag">AI-Powered</span></p>
-      </div>
-
-      <div class="feat">
-        <span class="feat-icon">🎧</span>
-        <h3>Audio Meditations</h3>
-        <p>7 guided sessions with natural human voice: Morning Light, Peace in the Storm, Gratitude, Identity in Christ, Sabbath Rest, Hope, Faith That Moves.</p>
-      </div>
-
-      <div class="feat">
-        <span class="feat-icon">🌙</span>
-        <h3>Sleep Stories</h3>
-        <p>7 Scripture-based bedtime experiences with calm narration: Psalm 23, God's Promises, Creation Story, The Good Shepherd, You Are Loved, and more.</p>
-      </div>
-
-      <div class="feat">
-        <span class="feat-icon">🙏</span>
-        <h3>Guided Prayer</h3>
-        <p>6 sessions with step-by-step prompts and worship backgrounds: Morning, Evening, Fasting, Peace in the Storm, Gratitude, Intercessory.</p>
-      </div>
-
-      <div class="feat">
-        <span class="feat-icon">🎙️</span>
-        <h3>Audio Bible</h3>
-        <p>Listen to every chapter of the Bible right inside the app via Bible.is embedded player. Tap-to-listen on any verse anywhere in the app.</p>
-      </div>
-
-      <div class="feat">
-        <span class="feat-icon">📿</span>
-        <h3>Faith Journey</h3>
-        <p>Track your spiritual milestones: salvation, baptism, first communion, catechism, retreats, mission trips, and any moment that shaped your walk.</p>
-      </div>
-
-      <div class="feat">
-        <span class="feat-icon">📅</span>
-        <h3>Faith Calendar</h3>
-        <p>Track church services, Bible studies, small groups, retreats, mission trips, fasting days, and personal spiritual commitments.</p>
-      </div>
-
-      <div class="feat">
-        <span class="feat-icon">📝</span>
-        <h3>Sermon Notes</h3>
-        <p>Capture Sunday's message with date, church, pastor, key verse, and what God showed you. Auto-links to relevant Christian podcasts.</p>
-      </div>
-
-      <div class="feat">
-        <span class="feat-icon">🎧</span>
-        <h3>Christian Podcasts</h3>
-        <p>Curated library of 25+ top Christian voices across 7 categories: Bible Study, Preaching, Young Adults, Prayer, Apologetics, Worship, Recovery.</p>
-      </div>
-
-      <div class="feat">
-        <span class="feat-icon">💧</span>
-        <h3>Story Mode Bible</h3>
-        <p>The whole biblical narrative as connected stories with natural voice narration — illustrated, contextual, and read like one unified story.</p>
-      </div>
-
-      <div class="feat">
-        <span class="feat-icon">🕰️</span>
-        <h3>Bible Timeline</h3>
-        <p>From Creation to Christ's Return on a single visual timeline. See how prophets, kings, exiles, gospels, and Acts fit together at a glance.</p>
-      </div>
-
-      <div class="feat">
-        <span class="feat-icon">🗺️</span>
-        <h3>Bible Lands</h3>
-        <p>Geographic explorer of the lands of Scripture. Walk through Jericho, Capernaum, the Pool of Bethesda — and see where the Bible meets the earth.</p>
-      </div>
+      <div class="feat"><span class="feat-icon">✝️</span><h3>Who Is Jesus</h3><p>His life, the cross, His teachings, all His recorded words (red-letter Bible) organized by 10 categories with Strong's lookup on every word.</p></div>
+      <div class="feat"><span class="feat-icon">⛪</span><h3>Christian Traditions</h3><p>15 denominations explained in depth — Baptist, Catholic, Orthodox, Pentecostal, Methodist, Lutheran, Presbyterian, Anglican, and more.</p></div>
+      <div class="feat"><span class="feat-icon">🔥</span><h3>Proof &amp; Prophecy</h3><p>100+ apologetics proofs across 6 categories with a "Convince Me" learning deck, bookmarks, and search. Real answers to hard faith questions.</p></div>
+      <div class="feat"><span class="feat-icon">📖</span><h3>Bible Study Tools</h3><p>Strong's concordance lookup, cross references, passage viewer with verse context, and personal study notes saved across all your devices.</p></div>
+      <div class="feat"><span class="feat-icon">📚</span><h3>Reading Plans</h3><p>Five plans from a 3-day "Starting Fresh" intro to the full Bible in 365 days, with streak tracking and daily reminders.</p></div>
+      <div class="feat"><span class="feat-icon">✨</span><h3>Daily AI Devotional</h3><p>A fresh personalized devotional every morning with scripture, 200-word reflection, application question, and prayer.<span class="feat-tag">AI-Powered</span></p></div>
+      <div class="feat"><span class="feat-icon">🧘</span><h3>Create Meditation</h3><p>Generate your own guided meditation by theme, mood, scripture, or feeling. Saved to your library, replay anytime.<span class="feat-tag">AI-Powered</span></p></div>
+      <div class="feat"><span class="feat-icon">🎧</span><h3>Audio Meditations</h3><p>7 guided sessions with natural human voice: Morning Light, Peace in the Storm, Gratitude, Identity in Christ, Sabbath Rest, Hope, Faith.</p></div>
+      <div class="feat"><span class="feat-icon">🌙</span><h3>Sleep Stories</h3><p>7 Scripture-based bedtime experiences with calm narration: Psalm 23, God's Promises, Creation Story, The Good Shepherd, and more.</p></div>
+      <div class="feat"><span class="feat-icon">🙏</span><h3>Guided Prayer</h3><p>6 sessions with step-by-step prompts and worship backgrounds: Morning, Evening, Fasting, Peace in the Storm, Gratitude, Intercessory.</p></div>
+      <div class="feat"><span class="feat-icon">🎙️</span><h3>Audio Bible</h3><p>Listen to every chapter of the Bible right inside the app via Bible.is. Tap-to-listen on any verse anywhere in the app.</p></div>
+      <div class="feat"><span class="feat-icon">📿</span><h3>Faith Journey</h3><p>Track your spiritual milestones: salvation, baptism, first communion, catechism, retreats, mission trips, and any moment that shaped your walk.</p></div>
+      <div class="feat"><span class="feat-icon">📅</span><h3>Faith Calendar</h3><p>Track church services, Bible studies, small groups, retreats, mission trips, fasting days, and personal spiritual commitments.</p></div>
+      <div class="feat"><span class="feat-icon">📝</span><h3>Sermon Notes</h3><p>Capture Sunday's message with date, church, pastor, key verse, and what God showed you. Auto-links to relevant Christian podcasts.</p></div>
+      <div class="feat"><span class="feat-icon">🎧</span><h3>Christian Podcasts</h3><p>Curated library of 25+ top Christian voices across 7 categories: Bible Study, Preaching, Young Adults, Prayer, Apologetics, Worship, Recovery.</p></div>
+      <div class="feat"><span class="feat-icon">💧</span><h3>Story Mode Bible</h3><p>The whole biblical narrative as connected stories with natural voice narration — illustrated, contextual, read like one unified story.</p></div>
+      <div class="feat"><span class="feat-icon">🕰️</span><h3>Bible Timeline</h3><p>From Creation to Christ's Return on a single visual timeline. See how prophets, kings, exiles, gospels, and Acts fit together at a glance.</p></div>
+      <div class="feat"><span class="feat-icon">🗺️</span><h3>Bible Lands</h3><p>Geographic explorer of the lands of Scripture. Walk through Jericho, Capernaum, the Pool of Bethesda — where Bible meets earth.</p></div>
 
     </div>
   </div>
@@ -437,7 +514,7 @@ footer{background:var(--bg);padding:60px 0 30px;border-top:1px solid rgba(255,25
   </div>
 </section>
 
-<!-- SOCIAL PROOF -->
+<!-- PROOF -->
 <section class="proof">
   <div class="wrap">
     <div class="proof-eyebrow">⭐ Early Voices</div>
@@ -459,13 +536,11 @@ footer{background:var(--bg);padding:60px 0 30px;border-top:1px solid rgba(255,25
     <h2>Support the Mission (Optional)</h2>
     <p class="donate-lead">The app is and always will be 100% free. If it has blessed you and you want to help keep it free for others, a one-time gift is welcomed but never expected.</p>
     <div class="donate-clarify">✓ You don't need to donate to use the app · You can close this section</div>
-
     <div class="donate-amounts" id="donateAmounts">
       <button type="button" class="amt-btn" data-amount="500"  onclick="selectDonationAmount(500,this)">$5</button>
       <button type="button" class="amt-btn" data-amount="1000" onclick="selectDonationAmount(1000,this)">$10</button>
       <button type="button" class="amt-btn" data-amount="2500" onclick="selectDonationAmount(2500,this)">$25</button>
     </div>
-
     <div class="donate-custom-wrap show" id="donateCustomWrap">
       <label class="donate-custom-label" for="donateCustom">Custom amount (USD)</label>
       <div class="donate-custom-input-wrap">
@@ -473,7 +548,6 @@ footer{background:var(--bg);padding:60px 0 30px;border-top:1px solid rgba(255,25
         <input type="number" id="donateCustom" min="1" max="1000" step="1" placeholder="Other amount" oninput="onCustomDonationInput(this)" inputmode="numeric">
       </div>
     </div>
-
     <div id="donateError" class="donate-err"></div>
     <button type="button" class="donate-btn" id="donateBtn" onclick="initiateDonation()" disabled>Give Now →</button>
     <div class="donate-disclaimer">Donations to Kingdom Creatives LLC are not tax-deductible. Kingdom Creatives LLC is not a registered 501(c)(3) charitable organization.</div>
@@ -509,16 +583,9 @@ footer{background:var(--bg);padding:60px 0 30px;border-top:1px solid rgba(255,25
 </footer>
 
 <script>
-function toggleMobNav(){
-  document.getElementById('navHam').classList.toggle('open');
-  document.getElementById('navDrawer').classList.toggle('open');
-}
-function closeMobNav(){
-  document.getElementById('navHam').classList.remove('open');
-  document.getElementById('navDrawer').classList.remove('open');
-}
+function toggleMobNav(){document.getElementById('navHam').classList.toggle('open');document.getElementById('navDrawer').classList.toggle('open');}
+function closeMobNav(){document.getElementById('navHam').classList.remove('open');document.getElementById('navDrawer').classList.remove('open');}
 
-/* ── DONATE ─────────────────────────────────────────────────── */
 let _donationAmount = 0;
 function selectDonationAmount(amt, btn){
   _donationAmount = amt;
@@ -531,26 +598,14 @@ function selectDonationAmount(amt, btn){
 function onCustomDonationInput(input){
   const val = parseInt(input.value,10);
   document.querySelectorAll('.amt-btn').forEach(b=>b.classList.remove('sel'));
-  if(!val || val<1){
-    _donationAmount=0;
-    document.getElementById('donateBtn').disabled = true;
-    return;
-  }
-  if(val>1000){
-    document.getElementById('donateError').textContent='Max donation is $1000.';
-    _donationAmount=0;
-    document.getElementById('donateBtn').disabled = true;
-    return;
-  }
+  if(!val || val<1){_donationAmount=0;document.getElementById('donateBtn').disabled = true;return;}
+  if(val>1000){document.getElementById('donateError').textContent='Max donation is $1000.';_donationAmount=0;document.getElementById('donateBtn').disabled = true;return;}
   document.getElementById('donateError').textContent='';
   _donationAmount = val*100;
   document.getElementById('donateBtn').disabled = false;
 }
 function initiateDonation(){
-  if(!_donationAmount){
-    document.getElementById('donateError').textContent='Please pick or enter an amount.';
-    return;
-  }
+  if(!_donationAmount){document.getElementById('donateError').textContent='Please pick or enter an amount.';return;}
   document.getElementById('donateBtn').textContent='Opening checkout...';
   document.getElementById('donateBtn').disabled=true;
   fetch('/api/create-donation-checkout',{
