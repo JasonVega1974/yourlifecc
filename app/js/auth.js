@@ -503,6 +503,21 @@ async function authComplete(isReturningUser){
     } else {
       console.warn('[AUTH] showPwaInstallPrompt not loaded — pwa.js may not have run yet');
     }
+    // Fire-and-forget notification to Jason. Never blocks UX or surfaces an
+    // error to the user — failures land in the console only.
+    try {
+      var _src = (window.location.pathname || '').indexOf('faith') > -1 ? 'faith-path' : 'main-app';
+      fetch('/api/notify-signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id:      _supaUser.id,
+          email:        _supaUser.email,
+          source:       _src,
+          signed_up_at: _supaUser.created_at
+        })
+      }).catch(function(e){ console.warn('[signup-notify] failed silently:', e); });
+    } catch(e){ /* never block signup on notification failure */ }
   } else {
     console.log('[AUTH] returning user — no signup prompts triggered');
   }

@@ -271,8 +271,8 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
     </div>
     <div class="section-grid">
       <div class="card">
-        <div class="card-header"><span class="card-title">Recent Signups</span><span class="card-badge" id="recentBadge">Last 10</span></div>
-        <table class="data-table"><thead><tr><th>Email</th><th>Plan</th><th>Signed Up</th><th>Last Login</th><th>Activity</th></tr></thead><tbody id="recentSignups"><tr class="loading-row"><td colspan="5">LOADING...</td></tr></tbody></table>
+        <div class="card-header"><span class="card-title">Recent Signups</span><span class="card-badge" id="recentBadge">Last 50</span></div>
+        <table class="data-table"><thead><tr><th>Email</th><th>Plan</th><th>Source</th><th>Signed Up</th><th>Last Login</th><th>Activity</th></tr></thead><tbody id="recentSignups"><tr class="loading-row"><td colspan="6">LOADING...</td></tr></tbody></table>
       </div>
       <div class="card">
         <div class="card-header"><span class="card-title">Plan Breakdown</span><span class="card-badge">All Users</span></div>
@@ -845,9 +845,12 @@ async function loadAll(){
     document.getElementById('kActive7').textContent=active7.length;
     document.getElementById('kAtRisk').textContent=atRisk.length;
 
-    const recent=all.slice(0,10);
+    const recent=all.slice(0,50);
     document.getElementById('recentBadge').textContent=`Last ${recent.length}`;
-    document.getElementById('recentSignups').innerHTML=recent.length===0?'<tr class="loading-row"><td colspan="5">NO SIGNUPS YET</td></tr>':recent.map(u=>`<tr><td class="email-cell">${u.email||'—'}</td><td>${planBadge(u.plan,u.plan_status)}</td><td>${fmtDate(u.created_at)}</td><td style="font-family:var(--fm);font-size:.7rem;color:var(--tx2)">${u.last_sign_in_at?fmtAgo(u.last_sign_in_at):'<span style="color:var(--tx3)">Never</span>'}</td><td>${activityBadge(u.updated_at)}</td></tr>`).join('');
+    document.getElementById('recentSignups').innerHTML=recent.length===0?'<tr class="loading-row"><td colspan="6">NO SIGNUPS YET</td></tr>':recent.map(u=>{
+      const src=u.signup_source||(u.user_metadata&&u.user_metadata.signup_source)||'—';
+      return `<tr><td class="email-cell">${u.email||'—'}</td><td>${planBadge(u.plan,u.plan_status)}</td><td style="font-family:var(--fm);font-size:.7rem;color:var(--tx2)">${src}</td><td>${fmtDate(u.created_at)}</td><td style="font-family:var(--fm);font-size:.7rem;color:var(--tx2)">${u.last_sign_in_at?fmtAgo(u.last_sign_in_at):'<span style="color:var(--tx3)">Never</span>'}</td><td>${activityBadge(u.updated_at)}</td></tr>`;
+    }).join('');
 
     const planCounts={};
     all.forEach(u=>{const p=(u.plan||u.plan_status||'unknown').toLowerCase();planCounts[p]=(planCounts[p]||0)+1;});
