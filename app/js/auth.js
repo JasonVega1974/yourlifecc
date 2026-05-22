@@ -402,6 +402,21 @@ async function authComplete(isReturningUser){
     if(blocked) return; // blocked screen is shown, stop here
   }
 
+  // Override the passed-in flag using user.created_at. The signin entry path
+  // always passes true, but a brand-new account whose first action is
+  // signinWithPassword (after email confirmation + set-password.html) is
+  // semantically a fresh signup — relying on the boolean alone misdetects
+  // these as "returning" and skips the post-signup prompt nudges. created_at
+  // within the last 5 minutes = fresh, regardless of which entry path ran.
+  var _userCreatedAt = (_supaUser && _supaUser.created_at) ? new Date(_supaUser.created_at).getTime() : 0;
+  var _minutesSinceCreation = _userCreatedAt > 0 ? (Date.now() - _userCreatedAt) / 60000 : Infinity;
+  var _wasReturningBefore = isReturningUser;
+  isReturningUser = !(_userCreatedAt > 0 && _minutesSinceCreation < 5);
+  console.log('[AUTH] user.created_at:', _supaUser && _supaUser.created_at,
+              'minutesSinceCreation:', _minutesSinceCreation.toFixed(2),
+              'isReturningUser:', isReturningUser,
+              'callerPassedReturning:', _wasReturningBefore);
+
   // For new users, wipe any stale localStorage so previous account data doesn't bleed in
   if(!isReturningUser){
     const keysToKeep = ['lifeos_last_sync', 'lifeos_remember_email'];
