@@ -47,11 +47,16 @@
   function wasSeenRecently(key) {
     var val = localStorage.getItem(key);
     if (!val) return false;
-    if (val === 'installed' || val === 'declined') return true;
+    if (val === 'installed' || val === 'declined') {
+      console.log('[PWA] suppressed by key:', key, 'value:', val);
+      return true;
+    }
     if (val.indexOf('later:') === 0) {
       var dateStr = val.slice(6);
       var age = Date.now() - Date.parse(dateStr);
-      return age < COOLDOWN_DAYS * 86400000;
+      var recent = age < COOLDOWN_DAYS * 86400000;
+      if (recent) console.log('[PWA] suppressed by key:', key, 'value:', val, 'ageDays:', (age / 86400000).toFixed(1));
+      return recent;
     }
     return false;
   }
@@ -85,10 +90,12 @@
   // ── iOS install instructions modal ──────────────────────────────────────
   function showIosInstallPrompt(opts) {
     opts = opts || {};
-    if (isStandalone()) return;
+    console.log('[PWA] showIosInstallPrompt called, force:', !!opts.force, 'isStandalone:', isStandalone());
+    if (isStandalone()) { console.log('[PWA] already standalone — skip iOS modal'); return; }
     var key = userKey(IOS_KEY_BASE);
     if (!opts.force && wasSeenRecently(key)) return;
-    if (document.getElementById('pwaIosModal')) return;
+    if (document.getElementById('pwaIosModal')) { console.log('[PWA] iOS modal already in DOM — skip'); return; }
+    console.log('[PWA] showing iOS modal');
 
     var overlay = document.createElement('div');
     overlay.id = 'pwaIosModal';
@@ -124,11 +131,13 @@
   // ── Android install modal (after beforeinstallprompt) ───────────────────
   function showAndroidInstallPrompt(opts) {
     opts = opts || {};
-    if (isStandalone()) return;
-    if (!deferredPrompt) return;
+    console.log('[PWA] showAndroidInstallPrompt called, force:', !!opts.force, 'isStandalone:', isStandalone(), 'hasDeferredPrompt:', !!deferredPrompt);
+    if (isStandalone()) { console.log('[PWA] already standalone — skip Android modal'); return; }
+    if (!deferredPrompt) { console.log('[PWA] no deferredPrompt yet — skip Android modal'); return; }
     var key = userKey(ANDROID_KEY_BASE);
     if (!opts.force && wasSeenRecently(key)) return;
-    if (document.getElementById('pwaAndroidModal')) return;
+    if (document.getElementById('pwaAndroidModal')) { console.log('[PWA] Android modal already in DOM — skip'); return; }
+    console.log('[PWA] showing Android modal');
 
     var overlay = document.createElement('div');
     overlay.id = 'pwaAndroidModal';
@@ -167,29 +176,70 @@
   // ── Unified entry: routes by platform ────────────────────────────────────
   function showPwaInstallPrompt(opts) {
     opts = opts || {};
+    console.log('[PWA] showPwaInstallPrompt called, force:', !!opts.force, 'fromSettings:', !!opts.fromSettings, 'isIOS:', isIOS(), 'isStandalone:', isStandalone(), 'hasDeferredPrompt:', !!deferredPrompt);
     if (isStandalone()) return;
     if (isIOS()) { showIosInstallPrompt(opts); return; }
     if (deferredPrompt) { showAndroidInstallPrompt(opts); return; }
     if (opts.fromSettings) {
       toast("Your browser hasn't offered an install option yet — try again after using the app for a bit.");
     }
+    console.log('[PWA] no install path available right now (Android without beforeinstallprompt fired)');
   }
   window.showPwaInstallPrompt = showPwaInstallPrompt;
+
+  // ── Debug helpers (exposed on window for console use) ────────────────────
+  window._ylccDebugClearPrompts = function () {
+    Object.keys(localStorage).forEach(function (k) {
+      if (k.indexOf('notif_prompt') > -1 ||
+          k.indexOf('ios_install') > -1 ||
+          k.indexOf('android_install') > -1 ||
+          k.indexOf('ylcc_pwa') > -1 ||
+          k.indexOf('notif_permission') > -1 ||
+          k.indexOf('ylcc_push_prompted') > -1) {
+        console.log('[DEBUG] clearing:', k);
+        localStorage.removeItem(k);
+      }
+    });
+    console.log('[DEBUG] prompt state cleared — refresh page to retest');
+  };
+
+  window._ylccTriggerInstallNow = function () {
+    if (typeof showPwaInstallPrompt === 'function') {
+      showPwaInstallPrompt({ force: true, fromSettings: true });
+    } else {
+      console.warn('[DEBUG] showPwaInstallPrompt not loaded');
+    }
+  };
+
+  window._ylccTriggerNotifNow = function () {
+    if (typeof _initPushPrompt === 'function') {
+      _initPushPrompt({ force: true });
+    } else {
+      console.warn('[DEBUG] _initPushPrompt not loaded');
+    }
+  };
+
+  console.log('[PWA] script loaded, isStandalone:', isStandalone(), 'isIOS:', isIOS(), 'isAndroid:', isAndroid(), 'ua:', navigator.userAgent.slice(0, 80));
 
   // ── Auto-fire after 30 s if the user has engaged ─────────────────────────
   // Engagement = scroll, tap, key, touch. If still idle after 30 s, poll
   // every 15 s up to 3 more times before giving up (don't pester an idle tab).
-  if (isStandalone()) return;
+  if (isStandalone()) {
+    console.log('[PWA] in standalone mode — auto-fire disabled');
+    return;
+  }
 
   var engaged = false;
   ['scroll', 'pointerdown', 'keydown', 'touchstart'].forEach(function (evt) {
     window.addEventListener(evt, function onEngage() {
       engaged = true;
+      console.log('[PWA] engagement detected via:', evt);
       window.removeEventListener(evt, onEngage);
     }, { passive: true });
   });
 
   function attemptAutoShow() {
+    console.log('[PWA] attemptAutoShow, engaged:', engaged, 'pollCount:', pollCount, 'hasDeferredPrompt:', !!deferredPrompt, 'isIOS:', isIOS());
     if (isStandalone()) return;
     if (isIOS()) { showIosInstallPrompt(); return; }
     if (deferredPrompt) { showAndroidInstallPrompt(); return; }
@@ -198,10 +248,13 @@
 
   var pollCount = 0;
   function scheduleAttempt() {
+    var delay = pollCount === 0 ? 30000 : 15000;
+    console.log('[PWA] scheduleAttempt, pollCount:', pollCount, 'delay:', delay);
     setTimeout(function () {
       if (engaged) { attemptAutoShow(); return; }
       if (++pollCount < 3) scheduleAttempt();
-    }, pollCount === 0 ? 30000 : 15000);
+      else console.log('[PWA] giving up — no engagement after polling');
+    }, delay);
   }
   scheduleAttempt();
 
@@ -209,12 +262,14 @@
   window.addEventListener('beforeinstallprompt', function (e) {
     e.preventDefault();
     deferredPrompt = e;
+    console.log('[PWA] beforeinstallprompt captured');
     // If we already passed the engagement gate, show now.
     if (engaged) showAndroidInstallPrompt();
   });
 
   // User installed via browser UI directly — lock our modal out.
   window.addEventListener('appinstalled', function () {
+    console.log('[PWA] appinstalled fired');
     markInstalled(ANDROID_KEY_BASE);
     var el = document.getElementById('pwaAndroidModal');
     if (el) el.remove();

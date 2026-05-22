@@ -1717,16 +1717,25 @@ function _pushToast(msg) {
 // next launch when the user opens us from the home-screen icon.
 function _initPushPrompt(opts) {
   opts = opts || {};
-  if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
-  if (document.getElementById('pushPromptModal')) return;
-
   var isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent);
   var isStandaloneMode = window.navigator.standalone === true ||
                          window.matchMedia('(display-mode: standalone)').matches;
+  console.log('[NOTIF] _initPushPrompt called, force:', !!opts.force, 'isIOS:', isIOSDevice, 'isStandalone:', isStandaloneMode, 'hasNotification:', ('Notification' in window), 'hasSW:', ('serviceWorker' in navigator));
+
+  if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+    console.log('[NOTIF] Notification or ServiceWorker API not available — skip');
+    return;
+  }
+  if (document.getElementById('pushPromptModal')) {
+    console.log('[NOTIF] modal already exists');
+    return;
+  }
 
   // iOS in a Safari tab — defer notifications, show install instructions.
   if (isIOSDevice && !isStandaloneMode) {
+    console.log('[NOTIF] iOS non-standalone → routing to install prompt');
     if (typeof showIosInstallPrompt === 'function') showIosInstallPrompt(opts);
+    else console.warn('[NOTIF] showIosInstallPrompt undefined — pwa.js not loaded?');
     return;
   }
 
@@ -1735,25 +1744,34 @@ function _initPushPrompt(opts) {
   var seenVal    = localStorage.getItem(seenKey);
 
   if (Notification.permission === 'granted') {
+    console.log('[NOTIF] permission already: granted — subscribing silently');
     localStorage.setItem(seenKey, 'granted');
     localStorage.setItem(grantedKey, 'true');
     _pushSubscribeAndSave();
     return;
   }
   if (Notification.permission === 'denied') {
+    console.log('[NOTIF] permission already: denied — cannot prompt');
     localStorage.setItem(seenKey, 'denied');
     localStorage.setItem(grantedKey, 'false');
     return;
   }
   // 30-day cool-down on prior dismissals.
   if (!opts.force && seenVal) {
-    if (seenVal === 'granted' || seenVal === 'denied') return;
+    if (seenVal === 'granted' || seenVal === 'denied') {
+      console.log('[NOTIF] suppressed by cooldown, seenVal:', seenVal);
+      return;
+    }
     if (seenVal.indexOf('later:') === 0) {
       var savedDay = seenVal.slice(6);
       var ageMs = Date.now() - Date.parse(savedDay);
-      if (ageMs < 30 * 86400000) return;
+      if (ageMs < 30 * 86400000) {
+        console.log('[NOTIF] suppressed by cooldown, seenVal:', seenVal, 'ageDays:', (ageMs / 86400000).toFixed(1));
+        return;
+      }
     }
   }
+  console.log('[NOTIF] showing notification modal');
 
   var overlay = document.createElement('div');
   overlay.id = 'pushPromptModal';

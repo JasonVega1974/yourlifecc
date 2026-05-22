@@ -463,12 +463,33 @@ async function authComplete(isReturningUser){
   // we then skip the second showPwaInstallPrompt call to avoid stacking the
   // same iOS modal twice. Android / desktop sees notif modal first, then the
   // install modal 12 s later (enough time for the notif modal to be answered).
+  console.log('[AUTH] post-signup hook, isReturningUser:', isReturningUser,
+              'showPushPromptAfterSignup type:', typeof showPushPromptAfterSignup,
+              'showPwaInstallPrompt type:', typeof showPwaInstallPrompt);
   if(!isReturningUser){
-    if(typeof showPushPromptAfterSignup === 'function') showPushPromptAfterSignup();
+    console.log('[AUTH] checking signup hooks — isReturningUser:', isReturningUser,
+                'showPushPromptAfterSignup type:', typeof showPushPromptAfterSignup,
+                'showPwaInstallPrompt type:', typeof showPwaInstallPrompt);
+    if(typeof showPushPromptAfterSignup === 'function'){
+      console.log('[AUTH] calling showPushPromptAfterSignup');
+      showPushPromptAfterSignup();
+    } else {
+      console.warn('[AUTH] showPushPromptAfterSignup not loaded — init.js may not have run yet');
+    }
     var _isIOSSignup = /iPad|iPhone|iPod/.test(navigator.userAgent);
     if(!_isIOSSignup && typeof showPwaInstallPrompt === 'function'){
-      setTimeout(showPwaInstallPrompt, 12000);
+      console.log('[AUTH] scheduling showPwaInstallPrompt +12 s (Android/desktop only)');
+      setTimeout(function(){
+        console.log('[AUTH] firing scheduled showPwaInstallPrompt');
+        showPwaInstallPrompt();
+      }, 12000);
+    } else if(_isIOSSignup){
+      console.log('[AUTH] iOS signup — install prompt handled via _initPushPrompt routing');
+    } else {
+      console.warn('[AUTH] showPwaInstallPrompt not loaded — pwa.js may not have run yet');
     }
+  } else {
+    console.log('[AUTH] returning user — no signup prompts triggered');
   }
 }
 
