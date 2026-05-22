@@ -82,7 +82,16 @@ function worshipCreateVideoCard(video, index) {
       <div class="wp-info-artist">${video.artist || 'Worship Music'}</div>
       <span class="wp-info-meta">${video.duration || '—'}</span>
     </div>`;
-  card.addEventListener('click', () => worshipPlayVideo(index));
+  // Tapping the active card toggles play/pause via the YouTube iframe API
+  // (don't reload src — that would restart the song). Tapping any other card
+  // loads + plays that song.
+  card.addEventListener('click', () => {
+    if (index === _worshipCurrentIndex) {
+      worshipTogglePlayPause();
+    } else {
+      worshipPlayVideo(index);
+    }
+  });
   return card;
 }
 
@@ -95,8 +104,14 @@ function worshipPlayVideo(index) {
     _worshipPlayedSongs.push(index);
   }
 
+  // Reveal the iframe stage once a song is selected so the user sees visual
+  // confirmation that playback started. Without this, the iframe stays
+  // display:none and mobile autoplay was unreliable behind the curtain.
+  const stage = document.getElementById('wpStage');
+  if (stage) stage.classList.add('wp-stage-on');
+
   const player = document.getElementById('worship-youtubePlayer');
-  if (player) player.src = WORSHIP_EMBED_BASE + video.id + '?autoplay=1&rel=0&enablejsapi=1&origin=' + encodeURIComponent(window.location.origin);
+  if (player) player.src = WORSHIP_EMBED_BASE + video.id + '?autoplay=1&rel=0&enablejsapi=1&playsinline=1&origin=' + encodeURIComponent(window.location.origin);
 
   const titleEl = document.getElementById('worship-nowPlayingTitle');
   const artistEl = document.getElementById('worship-nowPlayingArtist');
@@ -142,9 +157,12 @@ function worshipSendPlayerCommand(func, args){
 
 function worshipUpdatePlayPauseIcon(){
   const btn = document.getElementById('worship-playPauseBtn');
-  if(!btn) return;
-  // 1 = playing → show pause glyph. Anything else (paused/ended/buffering/unstarted) → show play glyph.
-  btn.textContent = (_worshipPlayerState === 1) ? '❚❚' : '▶';
+  if(btn){
+    // 1 = playing → show pause glyph. Anything else → show play glyph.
+    btn.textContent = (_worshipPlayerState === 1) ? '❚❚' : '▶';
+  }
+  // Keep the active card's ▶/❚❚ overlay in sync with the real player state.
+  worshipUpdateActiveCard();
 }
 
 // Approximate progress bar — drives the thin gold strip across the top of
@@ -236,7 +254,11 @@ function worshipSetupAutoplayListener() {
 function worshipUpdateActiveCard() {
   const cards = document.querySelectorAll('#s-worship .wp-card');
   cards.forEach((card, idx) => {
-    card.classList.toggle('active', idx === _worshipCurrentIndex);
+    const isActive = idx === _worshipCurrentIndex;
+    card.classList.toggle('active', isActive);
+    // Paused = anything other than state 1 (playing). Drives the ▶/❚❚ glyph
+    // on the active card so the tap-to-toggle action is visually obvious.
+    card.classList.toggle('paused', isActive && _worshipPlayerState !== 1);
   });
 }
 

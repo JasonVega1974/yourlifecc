@@ -827,7 +827,7 @@ function setDefaultView(value){
   } catch(e){}
 }
 
-function openSettings(){
+function openSettings(anchorId){
   // Reflect current default-view preference in the radio group.
   try {
     const cur = localStorage.getItem('ylcc_default_view') === 'child' ? 'child' : 'parent';
@@ -854,6 +854,15 @@ function openSettings(){
   if(typeof _populateTtsVoicePicker === 'function') _populateTtsVoicePicker();
   document.getElementById('sp').classList.add('open');
   document.getElementById('so').classList.add('open');
+  // Scroll to a requested section after the panel finishes its open transition.
+  if(anchorId){
+    setTimeout(function(){
+      var el = document.getElementById(anchorId);
+      if(el && typeof el.scrollIntoView === 'function'){
+        el.scrollIntoView({ behavior:'smooth', block:'start' });
+      }
+    }, 200);
+  }
   var _spProf=(_profiles||[]).find(function(p){return p.id===_activeProfileId;});
   // Only show child-view when EXPLICITLY a child (isParent===false)
   // Default to parent/full view for any ambiguous state
@@ -994,7 +1003,6 @@ const NAV_ITEMS = [
     {wellTab:'bibleStudy',     icon:'📚', label:'Bible Study Hub',     key:'scripture'},
     {wellTab:'audioMeditations',icon:'🧘',label:'Meditations',         key:'scripture'},
     {wellTab:'sleepStories',   icon:'🌙', label:'Sleep Stories',       key:'scripture'},
-    {wellTab:'ambientLibrary', icon:'🎵', label:'Ambient Library',     key:'scripture'},
     {wellTab:'createMeditation',icon:'✨',label:'Create Meditation',   key:'scripture'},
     {wellTab:'dailyDevotional',icon:'📖', label:'Daily Devotional',    key:'scripture'},
     {href:'/app/podcasts.html',  icon:'🎧', label:'Podcasts'},
@@ -1803,7 +1811,7 @@ function showSection(id, fromMobile){
     // F9: Auto-show the user's last-visited Well sub-tab (or Home on first
     // visit). Replaces the old hardcoded "open Devotional first" branch.
     const lastTab = (typeof D !== 'undefined' && D && D.wellLastTab) ? D.wellLastTab : 'home';
-    const validTabs = ['home','bible','plans','devotional','prayer','academy','bibleworld','proofProphecy','timeline','memorize','journey','jesus','denominations','bibleStudy','studyTools','readingPlans','stories','audioBible','audioMeditations','sleepStories','ambientLibrary','createMeditation','dailyDevotional','learnBible'];
+    const validTabs = ['home','bible','plans','devotional','prayer','academy','bibleworld','proofProphecy','timeline','memorize','journey','jesus','denominations','bibleStudy','studyTools','readingPlans','stories','audioBible','audioMeditations','sleepStories','createMeditation','dailyDevotional','learnBible'];
     const target = validTabs.indexOf(lastTab) >= 0 ? lastTab : 'home';
     if(typeof bfTab === 'function') bfTab(target);
   },80);

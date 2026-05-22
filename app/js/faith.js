@@ -439,7 +439,7 @@ function initScripture(){
 // the original 6 tabs. New tabs without renderers are stubs awaiting later phases.
 // btn is optional — when bfTab() is called programmatically (e.g., from a Quick
 // Tile or stub-panel CTA), the matching button is found via [data-bf-tab].
-const BF_TABS = ['home','devotional','jesus','denominations','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy','studyTools','readingPlans','audioBible','audioMeditations','sleepStories','ambientLibrary','createMeditation','dailyDevotional'];
+const BF_TABS = ['home','devotional','jesus','denominations','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy','studyTools','readingPlans','audioBible','audioMeditations','sleepStories','createMeditation','dailyDevotional'];
 
 // Phase 5.8 v3 — Home-grid restorer. Defensive against any prior code
 // that may have set .topic-card-grid display:none inside #bf-home. The
@@ -773,6 +773,10 @@ function bfTab(tab, btn){
   // Alias routing — redirect removed tabs to unified cards with pre-selected sub-tab
   if(tab === 'audioBible'){ _bibleSubTab = 'listen'; tab = 'bible'; }
   else if(tab === 'readingPlans'){ _plansSubTab = 'reading'; tab = 'plans'; }
+  // Ambient Library was retired from user-facing UI. Bounce any persisted
+  // deep links back to the Well home grid so the user sees something
+  // instead of a blank panel.
+  else if(tab === 'ambientLibrary'){ tab = 'home'; }
   else {
     // Restore persisted sub-tab choice when navigating directly to the unified card
     if(tab === 'bible' && typeof _ylccUserKey === 'function'){
@@ -829,7 +833,6 @@ function bfTab(tab, btn){
   if(tab==='studyTools') renderBibleStudyCard();
   if(tab==='audioMeditations') renderAudioMeditationsCard();
   if(tab==='sleepStories') renderSleepStoriesCard();
-  if(tab==='ambientLibrary') renderAmbientLibraryCard();
   if(tab==='createMeditation') renderCreateMeditationCard();
   if(tab==='dailyDevotional') renderDailyDevFull();
 }
@@ -8081,21 +8084,36 @@ function storyToggleNarrate(){
 }
 
 function _storySpeak(text){
-  if(!('speechSynthesis' in window)) return;
   if(!text) return;
-  try {
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.rate = 0.92; u.pitch = 1.0; u.volume = 1.0;
-    const voices = window.speechSynthesis.getVoices() || [];
-    const pref = voices.find(function(v){ return /en-(US|GB)/i.test(v.lang) && /female|samantha|karen|moira|google/i.test(v.name); })
-              || voices.find(function(v){ return /^en/i.test(v.lang); });
-    if(pref) u.voice = pref;
-    window.speechSynthesis.speak(u);
-  } catch(_){}
+  // Route through YlccAudio so playback uses /api/tts-render (OpenAI Nova voice)
+  // with Supabase MP3 caching by segment. Web Speech is the fallback when the
+  // API call fails or the browser doesn't support audio playback. Cache key
+  // is story-scoped so the same scene replays instantly.
+  const storyId = _storyState && _storyState.storyId ? _storyState.storyId : 'story';
+  const segIdx = (_storyState && typeof _storyState.sceneIdx === 'number') ? _storyState.sceneIdx : 0;
+  if(typeof YlccAudio === 'undefined' || !YlccAudio.play){
+    if(!('speechSynthesis' in window)) return;
+    try {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.92;
+      window.speechSynthesis.speak(u);
+    } catch(_){}
+    return;
+  }
+  YlccAudio.play({
+    source: 'story-'+storyId+'-'+segIdx,
+    _internal: true,
+    ttsApiBody: { text: text.slice(0,4000), cacheKey: 'story_'+storyId+'_'+segIdx },
+    text: text,
+    rate: 0.92
+  });
 }
 
 function _storyStopNarration(){
+  if(typeof _ylccStopPlayback === 'function'){
+    try { _ylccStopPlayback(); } catch(_){}
+  }
   if('speechSynthesis' in window){
     try { window.speechSynthesis.cancel(); } catch(_){}
   }
@@ -11417,7 +11435,7 @@ function renderAudioMeditationsCard(){
   html += '<div style="flex:1;font-size:.72rem;color:var(--tx3);line-height:1.4;">Voice settings in <strong style="color:var(--tx2);">⚙ Settings</strong>'
     + (localStorage.getItem('ylcc_dev')==='1' ? ' · <button type="button" onclick="_ttsShowDebugPanel()" style="background:none;border:none;color:rgba(56,189,248,.7);font-size:.68rem;cursor:pointer;font-family:var(--fm);padding:0;">Diagnostics</button>' : '')
     + '</div>';
-  html += '<button type="button" onclick="openSettings()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--tx2);border-radius:8px;padding:.26rem .55rem;font-size:.68rem;cursor:pointer;font-family:var(--fm);flex-shrink:0;">Open →</button>';
+  html += '<button type="button" onclick="openSettings(\'sp-voice-section\')" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--tx2);border-radius:8px;padding:.26rem .55rem;font-size:.68rem;cursor:pointer;font-family:var(--fm);flex-shrink:0;">Open →</button>';
   html += '</div>';
   html += '</div>';
   root.innerHTML = html;

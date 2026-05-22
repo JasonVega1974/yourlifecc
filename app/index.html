@@ -473,7 +473,7 @@
   </div>
 
   <!-- 🎙 VOICE FOR AUDIO -->
-  <div style="margin-top:1.1rem;padding-top:.9rem;border-top:1px solid rgba(255,255,255,.06);">
+  <div id="sp-voice-section" style="margin-top:1.1rem;padding-top:.9rem;border-top:1px solid rgba(255,255,255,.06);scroll-margin-top:1rem;">
     <div style="font-family:var(--fh);font-size:.73rem;letter-spacing:1px;color:var(--tx2);margin-bottom:.55rem;">🎙 VOICE FOR AUDIO</div>
     <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;">
       <select id="spTtsVoicePicker" onchange="saveTtsVoicePref(this.value)" style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:var(--tx);font-size:.72rem;padding:.4rem .6rem;outline:none;cursor:pointer;"><option value="">Auto (recommended)</option></select>
@@ -4654,7 +4654,6 @@
     <button class="tab" data-bf-tab="studyTools" onclick="bfTab('studyTools',this)">🔍 Study Tools</button>
     <button class="tab" data-bf-tab="audioMeditations" onclick="bfTab('audioMeditations',this)">🧘 Meditations</button>
     <button class="tab" data-bf-tab="sleepStories" onclick="bfTab('sleepStories',this)">🌙 Sleep Stories</button>
-    <button class="tab" data-bf-tab="ambientLibrary" onclick="bfTab('ambientLibrary',this)">🎵 Ambient</button>
     <button class="tab" data-bf-tab="createMeditation" onclick="bfTab('createMeditation',this)">✨ Create Meditation</button>
     <button class="tab" data-bf-tab="dailyDevotional" onclick="bfTab('dailyDevotional',this)">📖 Daily Devotional</button>
     <button class="tab" onclick="window.location.href='/app/podcasts.html'">🎧 Podcasts</button>
@@ -4919,11 +4918,6 @@
         <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(30,20,80,.5),rgba(167,139,250,.15));"><img class="topic-card-hero" data-card-id="bf-sleepStories" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1280px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg" alt="Sleep Stories" onerror="this.style.display='none'"></div>
         <div class="topic-card-title">Sleep Stories</div>
         <div class="topic-card-desc">7 bedtime Scripture stories · fades out</div>
-      </div>
-      <div class="topic-card accent-cyan" onclick="bfTab('ambientLibrary')">
-        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(14,165,233,.12));"><img class="topic-card-hero" data-card-id="bf-ambientLibrary" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Claude_Monet_-_Water_Lilies_-_1906%2C_Ryerson.jpg/1200px-Claude_Monet_-_Water_Lilies_-_1906%2C_Ryerson.jpg" alt="Ambient Library" onerror="this.style.display='none'"></div>
-        <div class="topic-card-title">Ambient Library</div>
-        <div class="topic-card-desc">6 categories · background audio</div>
       </div>
       <div class="topic-card accent-violet" onclick="bfTab('createMeditation')">
         <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(167,139,250,.28),rgba(109,40,217,.18));"><img class="topic-card-hero" data-card-id="bf-createMeditation" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/The_Praying_Hands.jpg/1280px-The_Praying_Hands.jpg" alt="Create Meditation" onerror="this.style.display='none'"></div>
@@ -6798,14 +6792,18 @@
       body.modal-open #mBar,
       body.modal-open #mqRow { display:none !important; }
 
-      /* Shared back-pill button styling — reused by every Well modal. */
+      /* Shared back-pill button styling — reused by every Well modal.
+         Safe-area-inset-top keeps it below the iPhone notch on mobile.
+         44px min-height meets WCAG tap-target guidance. */
       .pp-back-btn{
-        position:absolute; top:.7rem; left:.85rem; z-index:5;
+        position:absolute;
+        top:max(.7rem, env(safe-area-inset-top)); left:.85rem; z-index:5;
         background:rgba(10,13,26,.7); border:1px solid rgba(255,255,255,.2);
         color:#fff; cursor:pointer;
-        padding:.4rem .8rem; border-radius:999px;
-        font-family:var(--fm); font-size:.7rem; font-weight:800;
+        padding:.65rem 1rem; border-radius:999px;
+        font-family:var(--fm); font-size:.78rem; font-weight:800;
         letter-spacing:.06em; backdrop-filter:blur(8px);
+        min-height:44px; min-width:44px;
         display:inline-flex; align-items:center; gap:.3rem;
         transition:background .15s, transform .15s;
       }
@@ -7934,11 +7932,6 @@
     <div id="sleepStoriesRoot"></div>
   </div>
 
-  <!-- ════ Ambient Library (Audio Layer Worker 3) ════ -->
-  <div id="bf-ambientLibrary" style="display:none;">
-    <div id="ambientLibraryRoot"></div>
-  </div>
-
   <!-- ════ Create Meditation (AI Content Worker 1) ════ -->
   <div id="bf-createMeditation" style="display:none;">
     <div id="createMeditationRoot"></div>
@@ -8001,7 +7994,6 @@
     <button class="tab" data-bf-tab="studyTools" onclick="bfTab('studyTools',this)"><span class="scrtab-icon">🔍</span><span>Study Tools</span></button>
     <button class="tab" data-bf-tab="audioMeditations" onclick="bfTab('audioMeditations',this)"><span class="scrtab-icon">🧘</span><span>Meditations</span></button>
     <button class="tab" data-bf-tab="sleepStories" onclick="bfTab('sleepStories',this)"><span class="scrtab-icon">🌙</span><span>Sleep Stories</span></button>
-    <button class="tab" data-bf-tab="ambientLibrary" onclick="bfTab('ambientLibrary',this)"><span class="scrtab-icon">🎵</span><span>Ambient</span></button>
     <button class="tab" data-bf-tab="createMeditation" onclick="bfTab('createMeditation',this)"><span class="scrtab-icon">✨</span><span>Create</span></button>
     <button class="tab" data-bf-tab="dailyDevotional" onclick="bfTab('dailyDevotional',this)"><span class="scrtab-icon">📖</span><span>Daily Devo</span></button>
     <button class="tab" onclick="window.location.href='/app/podcasts.html'"><span class="scrtab-icon">🎧</span><span>Podcasts</span></button>
@@ -8254,6 +8246,8 @@
       box-shadow:0 4px 14px rgba(251,191,36,.5);
     }
     #s-worship .wp-card.active .wp-thumb::after{content:"❚❚";}
+    /* When the active card is paused, restore the play glyph so the tap action is obvious. */
+    #s-worship .wp-card.active.paused .wp-thumb::after{content:"▶";}
     #s-worship .wp-info{padding:.7rem .85rem .85rem;}
     #s-worship .wp-info-title{
       font-size:.85rem;font-weight:600;color:var(--tx);line-height:1.35;
@@ -8328,6 +8322,12 @@
       border:1px solid rgba(251,191,36,.32);box-shadow:0 14px 50px rgba(0,0,0,.5);
     }
     #s-worship .wp-stage{display:none;}
+    /* Stage becomes visible after first card tap so users see playback. */
+    #s-worship .wp-stage.wp-stage-on{
+      display:block;width:100%;max-width:600px;margin:0 auto 1rem;
+      aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;
+      border:1px solid rgba(251,191,36,.32);box-shadow:0 8px 28px rgba(0,0,0,.4);
+    }
     #s-worship .wp-stage iframe{width:100%;height:100%;border:0;display:block;}
 
     /* Mobile */
