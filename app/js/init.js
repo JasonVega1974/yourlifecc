@@ -486,6 +486,11 @@ function finishInit(cloudReady){
   // Phase 1A — Streaks Engine
   if(typeof initStreaks === 'function') initStreaks();
 
+  // Engagement: increment total_sessions if last_active was >30 min ago.
+  // This treats a returning user after a half-hour gap as a new "session"
+  // even if their localStorage / Supabase row persists. Silent on errors.
+  trackNewSession();
+
   // Phase 1B — Notification + PWA install prompts. Wait 30 s after
   // sign-in (engagement window) before surfacing either prompt; iOS Safari
   // is routed to install-instructions first by _initPushPrompt itself,
@@ -1984,3 +1989,35 @@ function initOfflineIndicator() {
   if(!navigator.onLine) banner.style.display = 'block';
 }
 initOfflineIndicator();
+
+// ── ENGAGEMENT: SESSION COUNTER ──────────────────────────────
+// Increments profiles.total_sessions if last_active was >30 min ago. Called
+// from finishInit. Silent on errors — analytics never breaks the app.
+function trackNewSession(){
+  if(typeof IS_DEMO !== 'undefined' && IS_DEMO) return;
+  if(typeof _supaUser === 'undefined' || !_supaUser) return;
+  var supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+  if(!supa) return;
+  var uid = _supaUser.id;
+  supa.from('profiles')
+    .select('last_active, total_sessions')
+    .eq('user_id', uid)
+    .maybeSingle()
+    .then(function(res){
+      if(!res || res.error) return;
+      var row = res.data || {};
+      var lastActive = row.last_active ? new Date(row.last_active).getTime() : 0;
+      var minutesAgo = lastActive > 0 ? (Date.now() - lastActive) / 60000 : Infinity;
+      if(minutesAgo > 30){
+        supa.from('profiles').update({
+          total_sessions: (row.total_sessions || 0) + 1,
+          last_active:    new Date().toISOString()
+        }).eq('user_id', uid).then(function(r){
+          if(r && r.error) console.warn('[engagement] session bump failed:', r.error.message);
+        });
+      }
+    }, function(err){
+      console.warn('[engagement] session read failed:', err && err.message);
+    });
+}
+window.trackNewSession = trackNewSession;

@@ -289,6 +289,10 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
         <div id="churnList"><div class="empty-state">LOADING...</div></div>
       </div>
     </div>
+    <div class="card card-full" id="tierSummaryCard">
+      <div class="card-header"><span class="card-title">Engagement Tiers</span><span class="card-badge" id="tierSummaryBadge">—</span></div>
+      <div id="tierSummary" style="display:flex;flex-wrap:wrap;gap:.6rem;padding:.4rem 0 .2rem;font-size:.78rem;">LOADING...</div>
+    </div>
     <div class="card card-full">
       <div class="card-header"><span class="card-title">All Users</span><span class="card-badge" id="allUsersBadge">—</span></div>
       <div class="user-search-wrap">
@@ -299,13 +303,13 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
       <table class="data-table"><thead><tr>
         <th class="sortable" onclick="sortUsers('email',this)">Email</th>
         <th class="sortable" onclick="sortUsers('plan',this)">Plan</th>
-        <th class="sortable" onclick="sortUsers('plan_status',this)">Status</th>
         <th class="sortable" onclick="sortUsers('created_at',this)">Signed Up</th>
-        <th class="sortable" onclick="sortUsers('last_sign_in_at',this)">Last Login</th>
-        <th class="sortable" onclick="sortUsers('updated_at',this)">Last Sync</th>
-        <th class="sortable" onclick="sortUsers('last_section',this)">Last Section</th>
-        <th class="sortable" onclick="sortUsers('sessions_30d',this)">Engagement</th>
-        <th>Activity</th>
+        <th class="sortable" onclick="sortUsers('last_active',this)">Last Active</th>
+        <th class="sortable" onclick="sortUsers('sections_visited',this)">Sections</th>
+        <th class="sortable" onclick="sortUsers('section_visit_count',this)">Visits</th>
+        <th class="sortable" onclick="sortUsers('total_sessions',this)">Sessions</th>
+        <th class="sortable sort-desc" onclick="sortUsers('engagement_score',this)">Score</th>
+        <th>Tier</th>
       </tr></thead><tbody id="allUsers"><tr class="loading-row"><td colspan="9">LOADING...</td></tr></tbody></table>
     </div>
     </div><!-- end tab-users -->
@@ -743,6 +747,69 @@ function engagementScore(sessions){
   return'<span class="badge badge-silent">Lurking</span>';
 }
 
+// New 6-tier classification based on real engagement aggregates written
+// from the client to profiles (see docs/migrations/engagement-tracking.sql).
+// Falls back to sessions_30d / updated_at gracefully if the edge function
+// hasn't yet been updated to expose the new columns.
+function classifyEngagement(user){
+  var visited = Array.isArray(user.sections_visited) ? user.sections_visited.length : 0;
+  var visits  = user.section_visit_count || 0;
+  // Fall back to legacy sessions_30d if last_active is missing.
+  var lastActiveSrc = user.last_active || user.updated_at || null;
+  var lastActiveMs  = lastActiveSrc ? new Date(lastActiveSrc).getTime() : 0;
+  var hoursSince    = lastActiveMs > 0 ? (Date.now() - lastActiveMs) / 3600000 : 9999;
+  var isToday       = hoursSince < 24;
+  var isWeek        = hoursSince < 168;
+  if(visited >= 10 && isToday) return { tier:'POWER',     color:'#f59e0b', label:'🔥 Power User' };
+  if(visited >= 5  && isWeek)  return { tier:'ACTIVE',    color:'#10b981', label:'✅ Active' };
+  if(visited >= 2  && isWeek)  return { tier:'ENGAGED',   color:'#3b82f6', label:'📊 Engaged' };
+  if(visits  >  0  && isWeek)  return { tier:'EXPLORING', color:'#8b5cf6', label:'👀 Exploring' };
+  if(lastActiveMs > 0 && !isWeek) return { tier:'DORMANT',color:'#6b7280', label:'💤 Dormant' };
+  return { tier:'COLD', color:'#9ca3af', label:'❄️ Cold' };
+}
+function tierBadge(user){
+  var t = classifyEngagement(user);
+  return '<span class="badge" style="background:'+t.color+'22;color:'+t.color+';border:1px solid '+t.color+'66">'+t.label+'</span>';
+}
+
+// Tier roll-up shown above the All Users table. Includes the average
+// unique sections visited as a top-line health metric.
+function renderTierSummary(all){
+  var counts = { POWER:0, ACTIVE:0, ENGAGED:0, EXPLORING:0, DORMANT:0, COLD:0 };
+  var totalSections = 0;
+  var withSections = 0;
+  all.forEach(function(u){
+    counts[classifyEngagement(u).tier]++;
+    if(Array.isArray(u.sections_visited) && u.sections_visited.length){
+      totalSections += u.sections_visited.length;
+      withSections++;
+    }
+  });
+  var avg = withSections > 0 ? (totalSections / withSections).toFixed(1) : '0';
+  var tiers = [
+    { key:'POWER',     color:'#f59e0b', label:'🔥 Power' },
+    { key:'ACTIVE',    color:'#10b981', label:'✅ Active' },
+    { key:'ENGAGED',   color:'#3b82f6', label:'📊 Engaged' },
+    { key:'EXPLORING', color:'#8b5cf6', label:'👀 Exploring' },
+    { key:'DORMANT',   color:'#6b7280', label:'💤 Dormant' },
+    { key:'COLD',      color:'#9ca3af', label:'❄️ Cold' }
+  ];
+  var html = tiers.map(function(t){
+    return '<div style="display:flex;align-items:center;gap:.45rem;padding:.5rem .8rem;background:'+t.color+'18;border:1px solid '+t.color+'55;border-radius:8px;">'+
+             '<span style="color:'+t.color+';font-weight:700">'+t.label+'</span>'+
+             '<span style="color:var(--tx);font-weight:800;font-size:.95rem;">'+counts[t.key]+'</span>'+
+           '</div>';
+  }).join('');
+  html += '<div style="display:flex;align-items:center;gap:.45rem;padding:.5rem .8rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;margin-left:auto;">'+
+            '<span style="color:var(--tx2);font-weight:600">Avg sections / engaged user</span>'+
+            '<span style="color:var(--tx);font-weight:800;font-size:.95rem;">'+avg+'</span>'+
+          '</div>';
+  var el = document.getElementById('tierSummary');
+  if(el) el.innerHTML = html;
+  var b = document.getElementById('tierSummaryBadge');
+  if(b) b.textContent = all.length + ' users';
+}
+
 // ── ALL USERS — SORT & SEARCH ───────────────────────────────
 let _allUsers = [];
 let _sortCol = 'created_at';
@@ -786,6 +853,13 @@ function _getVal(u, col){
   if(col==='updated_at') return u.updated_at ? new Date(u.updated_at).getTime() : 0;
   if(col==='last_section') return (u.last_section||'').toLowerCase();
   if(col==='sessions_30d') return u.sessions_30d||0;
+  // New engagement columns (require docs/migrations/engagement-tracking.sql
+  // + admin-data edge function update to be exposed).
+  if(col==='last_active')        return (u.last_active||u.updated_at) ? new Date(u.last_active||u.updated_at).getTime() : 0;
+  if(col==='sections_visited')   return Array.isArray(u.sections_visited) ? u.sections_visited.length : 0;
+  if(col==='section_visit_count')return u.section_visit_count || 0;
+  if(col==='total_sessions')     return u.total_sessions || 0;
+  if(col==='engagement_score')   return u.engagement_score || 0;
   return '';
 }
 
@@ -810,17 +884,22 @@ function renderUsers(){
 
   document.getElementById('allUsers').innerHTML = users.length===0
     ? `<tr class="loading-row"><td colspan="9">${q?'NO MATCHES':'NO USERS YET'}</td></tr>`
-    : users.map(u=>`<tr>
-        <td class="email-cell">${u.email||'—'}${u.is_admin?' <span class="badge badge-synced">Admin</span>':''}</td>
-        <td>${planBadge(u.plan,u.plan_status)}</td>
-        <td><span class="badge ${['active','lifetime'].includes((u.plan_status||'').toLowerCase())?'badge-active':'badge-silent'}">${u.plan_status||'—'}</span></td>
-        <td style="font-size:.72rem;color:var(--tx3)">${fmtDate(u.created_at)}</td>
-        <td style="font-family:var(--fm);font-size:.7rem;color:var(--tx2)">${u.last_sign_in_at?fmtAgo(u.last_sign_in_at):'<span style="color:var(--tx3)">Never</span>'}</td>
-        <td style="font-family:var(--fm);font-size:.7rem">${u.updated_at?fmtAgo(u.updated_at):'—'}</td>
-        <td style="font-family:var(--fm);font-size:.7rem;color:var(--tx2)">${u.last_section||'<span style="color:var(--tx3)">—</span>'}</td>
-        <td>${engagementScore(u.sessions_30d||0)}</td>
-        <td>${activityBadge(u.updated_at)}</td>
-      </tr>`).join('');
+    : users.map(u=>{
+        var visitedArr = Array.isArray(u.sections_visited) ? u.sections_visited : [];
+        var visitedTip = visitedArr.length ? visitedArr.join(', ') : 'none yet';
+        var lastActiveSrc = u.last_active || u.updated_at;
+        return `<tr>
+          <td class="email-cell">${u.email||'—'}${u.is_admin?' <span class="badge badge-synced">Admin</span>':''}</td>
+          <td>${planBadge(u.plan,u.plan_status)}</td>
+          <td style="font-size:.72rem;color:var(--tx3)">${fmtDate(u.created_at)}</td>
+          <td style="font-family:var(--fm);font-size:.7rem;color:var(--tx2)">${lastActiveSrc?fmtAgo(lastActiveSrc):'<span style="color:var(--tx3)">Never</span>'}</td>
+          <td style="font-family:var(--fm);font-size:.72rem;color:var(--tx)" title="${visitedTip.replace(/"/g,'&quot;')}">${visitedArr.length||0}</td>
+          <td style="font-family:var(--fm);font-size:.72rem;color:var(--tx)">${u.section_visit_count||0}</td>
+          <td style="font-family:var(--fm);font-size:.72rem;color:var(--tx)">${u.total_sessions||0}</td>
+          <td style="font-family:var(--fm);font-size:.72rem;color:var(--tx);font-weight:700">${u.engagement_score||0}</td>
+          <td>${tierBadge(u)}</td>
+        </tr>`;
+      }).join('');
 }
 
 async function loadAll(){
@@ -865,8 +944,9 @@ async function loadAll(){
 
     document.getElementById('allUsersBadge').textContent=`${all.length} total`;
     _allUsers = all;
-    _sortCol = 'created_at'; _sortDir = -1;
+    _sortCol = 'engagement_score'; _sortDir = -1;
     renderUsers();
+    renderTierSummary(all);
 
     document.getElementById('lastRefresh').textContent='Updated '+new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
   }catch(e){console.error(e);document.getElementById('lastRefresh').textContent='Error: '+e.message;}

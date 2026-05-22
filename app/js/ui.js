@@ -1713,6 +1713,8 @@ function showSection(id, fromMobile){
   const target = document.getElementById(id);
   if(target){ target.style.display = ''; target.classList.add('active'); }
   _activeSection = id;
+  // Engagement aggregate write to profiles (debounced inside the helper).
+  if(typeof trackSectionVisit === 'function') trackSectionVisit(id);
 
   // Phase B-Lite session 2: sync bottom tab bar active state to the
   // tab that owns this section.
@@ -1975,6 +1977,68 @@ function applyLightModeTextFix(){
     }
   });
 }
+
+// trackSectionVisit — writes engagement aggregates to profiles. Debounced
+// 2 s so rapid section flips coalesce into one write. Reads the existing
+// row, adds the section to the unique-visited set, bumps visit count,
+// recomputes engagement_score = unique_sections * 5 + total_visits. Silent
+// on errors (analytics never breaks UX).
+//
+// Storage layout (profiles columns added by docs/migrations/engagement-tracking.sql):
+//   sections_visited     JSONB[]  — unique section ids ever seen
+//   section_visit_count  INT      — total navigation events
+//   last_section         TEXT     — most recent section id (with s- prefix stripped)
+//   last_active          TSTZ     — most recent navigation timestamp
+//   engagement_score     INT      — derived (unique * 5 + visits)
+var _trackSectionTimer = null;
+var _trackSectionPending = null;
+function trackSectionVisit(sectionId){
+  if(!sectionId) return;
+  if(typeof IS_DEMO !== 'undefined' && IS_DEMO) return;
+  if(typeof _supaUser === 'undefined' || !_supaUser) return;
+  // Strip leading "s-" so admin dashboard reads human-friendly slugs.
+  var slug = String(sectionId).replace(/^s-/, '');
+  if(slug === 'hero' || slug === 'dashboard') return; // skip the default landing
+  _trackSectionPending = slug;
+  if(_trackSectionTimer) clearTimeout(_trackSectionTimer);
+  _trackSectionTimer = setTimeout(function(){
+    var slugToWrite = _trackSectionPending;
+    _trackSectionPending = null;
+    _trackSectionTimer = null;
+    _flushSectionVisit(slugToWrite);
+  }, 2000);
+}
+
+function _flushSectionVisit(slug){
+  var supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+  if(!supa || typeof _supaUser === 'undefined' || !_supaUser) return;
+  var uid = _supaUser.id;
+  supa.from('profiles')
+    .select('sections_visited, section_visit_count, total_sessions, engagement_score')
+    .eq('user_id', uid)
+    .maybeSingle()
+    .then(function(res){
+      if(!res || res.error) return;
+      var row = res.data || {};
+      var visited = Array.isArray(row.sections_visited) ? row.sections_visited.slice() : [];
+      if(visited.indexOf(slug) === -1) visited.push(slug);
+      var visitCount = (row.section_visit_count || 0) + 1;
+      var newScore = (visited.length * 5) + visitCount;
+      supa.from('profiles').update({
+        sections_visited:    visited,
+        section_visit_count: visitCount,
+        last_section:        slug,
+        last_active:         new Date().toISOString(),
+        engagement_score:    newScore
+      }).eq('user_id', uid).then(function(r){
+        if(r && r.error) console.warn('[engagement] update failed:', r.error.message);
+      });
+    }, function(err){
+      // .maybeSingle() rejection — log + bail.
+      console.warn('[engagement] read failed:', err && err.message);
+    });
+}
+window.trackSectionVisit = trackSectionVisit;
 
 // Wire a debounced MutationObserver on #mainWrap so JS-rendered
 // sections get fixed automatically whenever the DOM changes.
