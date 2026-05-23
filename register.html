@@ -254,7 +254,7 @@ select option{background:#0c1220;}
       <div class="step-panel" id="s4" style="text-align:center;">
         <div style="font-size:3.5rem;margin-bottom:1rem;">📧</div>
         <div class="form-title" style="margin-bottom:.5rem;">Check your email</div>
-        <div class="form-sub" style="margin-bottom:1.5rem;">We sent a confirmation link to <strong id="checkEmailAddr" style="color:var(--c1);font-weight:700;"></strong>. Click the link to set your password and finish setup.</div>
+        <div class="form-sub" style="margin-bottom:1.5rem;">We sent a confirmation link to <strong id="checkEmailAddr" style="color:var(--c1);font-weight:700;"></strong>. Click the link to set your password and finish setup.<br><br>If you don't receive the email within 5 minutes, check your spam folder. During our beta period, email delivery may take a few minutes.</div>
         <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem;font-size:.8rem;color:var(--tx2);margin-bottom:1.2rem;line-height:1.7;text-align:left;">
           <div style="color:var(--tx);font-weight:700;margin-bottom:.4rem;">Next steps:</div>
           1. Open the email from YourLife CC<br>
@@ -563,17 +563,40 @@ async function createAccount(){
     });
     if(authError) throw new Error(authError.message);
 
-    // Supabase returns {user:null, session:null} with no error when email
-    // confirmation is enabled AND the email already exists — silent
-    // anti-enumeration behaviour. Without this guard the next line throws
-    // "Cannot read properties of null (reading 'id')" and the user sees a
-    // crash instead of a real explanation.
-    if(!authData || !authData.user){
-      throw new Error('An account with this email may already exist. Please check your email for a confirmation link, or try signing in instead.');
+    // Debug logging during the beta — surfaces exactly what Supabase
+    // returned (user id or null + any error). Remove once delivery is
+    // confirmed stable.
+    console.log('[register] Supabase signUp result:', JSON.stringify({
+      user: authData?.user?.id || null,
+      error: authError?.message || null,
+    }));
+
+    // isPaid declared early so the null-user branch below can route
+    // free signups to the success screen while paid signups error out
+    // (paid flow needs a userId immediately for the Stripe customer
+    // creation step).
+    const isPaid = (plan!=='free' && plan!=='sponsored');
+
+    // Supabase returns {user:null, session:null} with NO error on
+    // successful signup when email confirmation is required — this is
+    // intentional anti-enumeration behaviour (also masks already-exists
+    // collisions). For free signups this is a success path: the
+    // confirmation email is on its way and we should show the
+    // check-your-email screen instead of throwing. For paid signups
+    // we can't continue without a userId for Stripe metadata.
+    if(!authData?.user && !isPaid){
+      // Free / sponsored — server accepted the signup, confirmation email
+      // is sending. Skip the Stripe + register-family steps and jump
+      // straight to "check your email".
+      document.getElementById('checkEmailAddr').textContent = email;
+      goStep(4);
+      return;
+    }
+    if(!authData?.user && isPaid){
+      throw new Error('Account setup incomplete. Please wait 60 seconds and try again, or contact support at info@kingdom-creatives.com');
     }
 
     const userId = authData.user.id;
-    const isPaid = (plan!=='free' && plan!=='sponsored');
     // Paid flow needs familyId BEFORE create-payment-intent (it's sealed into
     // Stripe metadata for stripe-webhook to correlate later). Free/sponsored
     // flows let register-family generate the id server-side.
