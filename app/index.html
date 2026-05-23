@@ -2760,34 +2760,35 @@
     <div id="habitsBadges"></div>
   </div>
 
-  <!-- ANALYTICS (Commit 2) -->
+  <!-- ANALYTICS -->
   <div id="hb-analytics" class="hb-panel" style="display:none;">
-    <div class="hb-stub">
-      <div class="hb-stub-icon">📊</div>
-      <div class="hb-stub-label">ANALYTICS</div>
-      Weekly completion trends, best day of week, and time-of-day success
-      rate charts ship in the next deploy. Chart.js is now loaded and ready.
+    <div id="habitsKpi"></div>
+    <div id="habitsAnalyticsEmpty" style="display:none;"></div>
+    <div id="habitsChartsWrap" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:.8rem;">
+      <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:.9rem;height:240px;">
+        <canvas id="hbChartWeekly"></canvas>
+      </div>
+      <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:.9rem;height:240px;">
+        <canvas id="hbChartBestDay"></canvas>
+      </div>
+      <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:.9rem;height:240px;">
+        <canvas id="hbChartTimeOfDay"></canvas>
+      </div>
     </div>
   </div>
 
-  <!-- HABIT STACK (Commit 2) -->
+  <!-- HABIT STACK -->
   <div id="hb-stack" class="hb-panel" style="display:none;">
-    <div class="hb-stub">
-      <div class="hb-stub-icon">🔗</div>
-      <div class="hb-stub-label">HABIT STACK</div>
-      Build "After I [cue], I will [habit]" routines that anchor new habits
-      to existing ones. Drag-to-reorder builder ships in the next deploy.
+    <div style="font-size:.78rem;color:var(--tx2);margin-bottom:.8rem;line-height:1.55;">
+      Habit stacking links a new habit to one you already do. The cue
+      becomes <i>"After I ___, I will ___"</i>. Order habits inside a chain with the ↑↓ buttons.
     </div>
+    <div id="habitsStackBody"></div>
   </div>
 
-  <!-- LIBRARY (Commit 2) -->
+  <!-- LIBRARY -->
   <div id="hb-library" class="hb-panel" style="display:none;">
-    <div class="hb-stub">
-      <div class="hb-stub-icon">📚</div>
-      <div class="hb-stub-label">LIBRARY</div>
-      60+ curated habits across Health, Mind, Faith, Productivity, Social,
-      and Financial categories. One-tap "Add to My Habits". Ships next deploy.
-    </div>
+    <div id="habitsLibraryBody"></div>
   </div>
 
   <!-- SCIENCE (Commit 3) -->

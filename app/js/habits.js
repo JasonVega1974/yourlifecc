@@ -251,8 +251,11 @@ function habitsTab(name, btn){
   const target = document.getElementById('hb-' + name);
   if(target) target.style.display = '';
   if(btn){ btn.classList.add('active'); btn.setAttribute('aria-selected','true'); }
-  if(name === 'today')        renderHabitsToday();
-  else if(name === 'streaks') renderHabitsStreaks();
+  if(name === 'today')          renderHabitsToday();
+  else if(name === 'streaks')   renderHabitsStreaks();
+  else if(name === 'analytics') renderHabitsAnalytics();
+  else if(name === 'stack')     renderHabitsStack();
+  else if(name === 'library')   renderHabitsLibrary();
 }
 
 // ── HERO ─────────────────────────────────────────────────────
@@ -588,11 +591,555 @@ function buildHabitsHeatmap(habits, weeks){
   `;
 }
 
+// ── ANALYTICS PANEL ──────────────────────────────────────────
+// Chart instances are kept on a single window-scoped registry so the next
+// renderHabitsAnalytics() call can destroy them before re-creating —
+// otherwise Chart.js leaks canvases and ghost-redraws on hover.
+const HB_CHARTS = {};
+
+function destroyHbChart(key){
+  if(HB_CHARTS[key] && typeof HB_CHARTS[key].destroy === 'function'){
+    try { HB_CHARTS[key].destroy(); } catch(_) {}
+  }
+  HB_CHARTS[key] = null;
+}
+
+function renderHabitsAnalytics(){
+  initHabitsData();
+  const habits = D.habitsV2 || [];
+
+  // ── KPI strip ──
+  const kpi = document.getElementById('habitsKpi');
+  if(kpi){
+    const wkThis = getWeekRange(0);
+    const wkLast = getWeekRange(7);
+    const pctThis = completionPctInRange(habits, wkThis.start, wkThis.end);
+    const pctLast = completionPctInRange(habits, wkLast.start, wkLast.end);
+    const longest = habits.reduce((m,h)=>Math.max(m, getHabitLongestStreak(h)), 0);
+    const total   = habits.reduce((s,h)=>s + getHabitTotalCompletions(h), 0);
+    const delta   = pctThis - pctLast;
+    const deltaStr = delta === 0 ? '—' : (delta > 0 ? '↑ ' + delta + '%' : '↓ ' + Math.abs(delta) + '%');
+    const deltaColor = delta > 0 ? '#22c55e' : (delta < 0 ? '#f87171' : 'var(--tx3)');
+
+    kpi.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.6rem;margin-bottom:1rem;">
+        ${kpiCard('This Week', pctThis + '%', deltaStr, deltaColor, '📈')}
+        ${kpiCard('Last Week', pctLast + '%', '', 'var(--tx3)', '📅')}
+        ${kpiCard('Longest Streak', longest + ' days', '', '#fb923c', '🔥')}
+        ${kpiCard('Total Done', String(total), 'all time', 'var(--tx3)', '✅')}
+      </div>
+    `;
+  }
+
+  if(!habits.length){
+    const empty = document.getElementById('habitsAnalyticsEmpty');
+    if(empty){
+      empty.style.display = '';
+      empty.innerHTML = '<div class="hb-stub">Add habits in the Today tab to unlock analytics.</div>';
+    }
+    return;
+  }
+  const empty = document.getElementById('habitsAnalyticsEmpty');
+  if(empty) empty.style.display = 'none';
+
+  if(typeof Chart === 'undefined'){
+    const wrap = document.getElementById('habitsChartsWrap');
+    if(wrap) wrap.innerHTML = '<div class="hb-stub">Chart library failed to load. Refresh the page and try again.</div>';
+    return;
+  }
+
+  // ── Weekly completion (7 bars: Mon–Sun of current ISO-ish week) ──
+  const cvWeek = document.getElementById('hbChartWeekly');
+  if(cvWeek){
+    destroyHbChart('weekly');
+    const labels = [];
+    const data = [];
+    const wkThis = getWeekRange(0);
+    const dt = new Date(wkThis.start);
+    for(let i = 0; i < 7; i++){
+      const key = localDateString(dt);
+      labels.push(dt.toLocaleDateString(undefined, {weekday:'short'}));
+      const tot = habits.length;
+      const done = habits.filter(h => (h.completions||{})[key]).length;
+      data.push(tot > 0 ? Math.round((done/tot)*100) : 0);
+      dt.setDate(dt.getDate() + 1);
+    }
+    HB_CHARTS.weekly = new Chart(cvWeek, {
+      type:'bar',
+      data:{labels, datasets:[{
+        label:'% complete',
+        data,
+        backgroundColor:'rgba(52,211,153,.6)',
+        borderColor:'#34d399',
+        borderWidth:1,
+        borderRadius:6,
+      }]},
+      options:hbChartOpts('% of habits completed this week'),
+    });
+  }
+
+  // ── Best day of week (averaged over last 12 weeks) ──
+  const cvBest = document.getElementById('hbChartBestDay');
+  if(cvBest){
+    destroyHbChart('bestDay');
+    const sums = [0,0,0,0,0,0,0];
+    const counts = [0,0,0,0,0,0,0];
+    const today = new Date();
+    for(let i = 0; i < 84; i++){
+      const d = new Date(today); d.setDate(d.getDate() - i);
+      const key = localDateString(d);
+      const dow = d.getDay();
+      const tot = habits.length;
+      const done = habits.filter(h => (h.completions||{})[key]).length;
+      sums[dow]   += tot > 0 ? (done/tot)*100 : 0;
+      counts[dow] += 1;
+    }
+    const labels = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const data = sums.map((s,i)=> counts[i] ? Math.round(s/counts[i]) : 0);
+    HB_CHARTS.bestDay = new Chart(cvBest, {
+      type:'bar',
+      data:{labels, datasets:[{
+        label:'Avg %',
+        data,
+        backgroundColor:'rgba(56,189,248,.6)',
+        borderColor:'#38bdf8',
+        borderWidth:1,
+        borderRadius:6,
+      }]},
+      options:hbChartOpts('Average completion rate by day of week (12-week avg)'),
+    });
+  }
+
+  // ── Time-of-day success rate ──
+  const cvTOD = document.getElementById('hbChartTimeOfDay');
+  if(cvTOD){
+    destroyHbChart('timeOfDay');
+    const labels = ['Morning','Afternoon','Evening','Anytime'];
+    const keys   = ['morning','afternoon','evening','anytime'];
+    const data = keys.map(k => {
+      const group = habits.filter(h => (h.timeOfDay||'anytime') === k);
+      if(!group.length) return 0;
+      const last30 = lastNDayKeys(30);
+      let done = 0, possible = group.length * last30.length;
+      group.forEach(h => {
+        last30.forEach(dk => { if((h.completions||{})[dk]) done++; });
+      });
+      return possible > 0 ? Math.round((done/possible)*100) : 0;
+    });
+    HB_CHARTS.timeOfDay = new Chart(cvTOD, {
+      type:'doughnut',
+      data:{labels, datasets:[{
+        data,
+        backgroundColor:['#fbbf24','#f59e0b','#a78bfa','#34d399'],
+        borderColor:'rgba(0,0,0,.2)',
+        borderWidth:2,
+      }]},
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{
+          legend:{position:'bottom', labels:{color:getCss('--tx2','#bcbedb'), font:{family:'inherit', size:11}}},
+          title:{display:true, text:'30-day completion % by time-of-day', color:getCss('--tx2','#bcbedb'), font:{size:11, weight:'normal'}},
+          tooltip:{callbacks:{label:(ctx)=>` ${ctx.label}: ${ctx.parsed}%`}},
+        },
+      },
+    });
+  }
+}
+
+function kpiCard(label, value, sub, subColor, icon){
+  return `
+    <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);
+                border-radius:12px;padding:.7rem .8rem;">
+      <div style="display:flex;align-items:center;gap:.35rem;font-size:.58rem;
+                  letter-spacing:1.2px;font-weight:800;color:var(--tx3);margin-bottom:.25rem;">
+        <span style="font-size:.85rem;">${icon}</span>${escapeHtml(label).toUpperCase()}
+      </div>
+      <div style="font-size:1.2rem;font-weight:800;color:var(--tx);font-family:var(--fn);">${escapeHtml(value)}</div>
+      ${sub ? `<div style="font-size:.62rem;color:${subColor};font-weight:700;margin-top:.15rem;">${escapeHtml(sub)}</div>` : ''}
+    </div>
+  `;
+}
+
+function hbChartOpts(titleText){
+  const tx2 = getCss('--tx2','#bcbedb');
+  const tx3 = getCss('--tx3','#7c809f');
+  return {
+    responsive:true,
+    maintainAspectRatio:false,
+    plugins:{
+      legend:{display:false},
+      title:{display:true, text:titleText, color:tx2, font:{size:11, weight:'normal'}},
+      tooltip:{callbacks:{label:(ctx)=>` ${ctx.parsed.y}%`}},
+    },
+    scales:{
+      x:{ticks:{color:tx3, font:{size:10}}, grid:{display:false}},
+      y:{ticks:{color:tx3, font:{size:10}, callback:(v)=>v+'%'}, grid:{color:'rgba(255,255,255,.05)'}, beginAtZero:true, max:100},
+    },
+  };
+}
+
+// Helper: read a CSS variable from :root, fall back to a default.
+function getCss(varName, fallback){
+  try {
+    const v = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+    return v || fallback;
+  } catch(_) { return fallback; }
+}
+
+// Week range starting Monday. offsetDays = 0 → this week, 7 → last week.
+function getWeekRange(offsetDays){
+  const d = new Date();
+  d.setDate(d.getDate() - offsetDays);
+  const dow = d.getDay() || 7;  // make Sunday = 7
+  const monday = new Date(d);
+  monday.setDate(monday.getDate() - (dow - 1));
+  monday.setHours(0,0,0,0);
+  const sunday = new Date(monday);
+  sunday.setDate(sunday.getDate() + 6);
+  return {start: monday, end: sunday};
+}
+
+function lastNDayKeys(n){
+  const out = [];
+  const d = new Date();
+  for(let i = 0; i < n; i++){ out.push(localDateString(d)); d.setDate(d.getDate() - 1); }
+  return out;
+}
+
+function completionPctInRange(habits, startDate, endDate){
+  if(!habits.length) return 0;
+  let total = 0, done = 0;
+  const cursor = new Date(startDate);
+  while(cursor <= endDate){
+    const key = localDateString(cursor);
+    habits.forEach(h => {
+      total++;
+      if((h.completions||{})[key]) done++;
+    });
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return total > 0 ? Math.round((done/total)*100) : 0;
+}
+
+// ── HABIT STACK PANEL ────────────────────────────────────────
+// D.habitStacks = [{id, name, cue, habitIds:[...], createdAt}]
+function initStackData(){
+  if(!Array.isArray(D.habitStacks)) D.habitStacks = [];
+}
+
+function addHabitStack(){
+  initHabitsData();
+  initStackData();
+  if(!D.habitsV2.length){
+    if(typeof showToast === 'function') showToast('Add at least one habit first');
+    return;
+  }
+  const name = prompt('Stack name (e.g. "Morning routine"):');
+  if(!name || !name.trim()) return;
+  const cue = prompt('Cue — the trigger event (e.g. "After I brush my teeth"):', 'After I wake up');
+  if(cue === null) return;
+  const id = 'stk_' + Date.now().toString(36);
+  D.habitStacks.push({
+    id, name: name.trim().slice(0,60), cue: (cue||'').trim().slice(0,80),
+    habitIds: [], createdAt: Date.now(),
+  });
+  save();
+  renderHabitsStack();
+}
+
+function removeHabitStack(id){
+  initStackData();
+  if(!confirm('Remove this stack? Your habits stay; only the chain is removed.')) return;
+  D.habitStacks = D.habitStacks.filter(s => s.id !== id);
+  save();
+  renderHabitsStack();
+}
+
+function addHabitToStack(stackId, habitId){
+  initStackData();
+  const s = D.habitStacks.find(x => x.id === stackId);
+  if(!s || !habitId) return;
+  if(s.habitIds.indexOf(habitId) >= 0) return;  // already in chain
+  s.habitIds.push(habitId);
+  save();
+  renderHabitsStack();
+}
+
+function removeHabitFromStack(stackId, habitId){
+  initStackData();
+  const s = D.habitStacks.find(x => x.id === stackId);
+  if(!s) return;
+  s.habitIds = s.habitIds.filter(h => h !== habitId);
+  save();
+  renderHabitsStack();
+}
+
+// Up/down reorder — simpler than HTML5 drag-and-drop and works on mobile.
+function moveStackHabit(stackId, habitId, direction){
+  initStackData();
+  const s = D.habitStacks.find(x => x.id === stackId);
+  if(!s) return;
+  const idx = s.habitIds.indexOf(habitId);
+  if(idx < 0) return;
+  const newIdx = idx + (direction === 'up' ? -1 : 1);
+  if(newIdx < 0 || newIdx >= s.habitIds.length) return;
+  const tmp = s.habitIds[idx];
+  s.habitIds[idx] = s.habitIds[newIdx];
+  s.habitIds[newIdx] = tmp;
+  save();
+  renderHabitsStack();
+}
+
+function renderHabitsStack(){
+  initHabitsData();
+  initStackData();
+  const wrap = document.getElementById('habitsStackBody');
+  if(!wrap) return;
+  const habits = D.habitsV2 || [];
+  const stacks = D.habitStacks || [];
+
+  if(!stacks.length){
+    wrap.innerHTML = `
+      <div class="hb-stub">
+        <div class="hb-stub-icon">🔗</div>
+        <div class="hb-stub-label">NO STACKS YET</div>
+        <div style="font-size:.78rem;line-height:1.6;max-width:440px;margin:.4rem auto 1rem;">
+          Habit stacking links a new habit to one you already do. The cue
+          becomes "After I [existing thing], I will [new habit]." Build one
+          chain and order your habits inside it.
+        </div>
+        <button class="btn bp" onclick="addHabitStack()"
+                style="font-size:.75rem;padding:.55rem 1.4rem;border-radius:10px;">
+          + Build your first stack
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  const habitMap = {};
+  habits.forEach(h => { habitMap[h.id] = h; });
+
+  wrap.innerHTML = stacks.map(s => {
+    const chain = s.habitIds.map((hid, i) => {
+      const h = habitMap[hid];
+      if(!h) return '';
+      const isFirst = i === 0;
+      const isLast  = i === s.habitIds.length - 1;
+      return `
+        <div style="display:flex;align-items:center;gap:.55rem;padding:.55rem .7rem;
+                    background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);
+                    border-radius:10px;margin-top:.4rem;">
+          <span style="font-size:.62rem;font-weight:800;color:var(--tx3);font-family:var(--fn);">${i + 1}</span>
+          <span style="font-size:1rem;">${escapeHtml(h.emoji||'✅')}</span>
+          <span style="flex:1;font-size:.8rem;color:var(--tx);">${escapeHtml(h.name)}</span>
+          <button onclick="moveStackHabit('${escapeHtml(s.id)}','${escapeHtml(h.id)}','up')"
+                  ${isFirst ? 'disabled' : ''}
+                  style="background:none;border:none;color:var(--tx2);cursor:pointer;font-size:.85rem;padding:.1rem .25rem;opacity:${isFirst?.3:.85};"
+                  title="Move up">↑</button>
+          <button onclick="moveStackHabit('${escapeHtml(s.id)}','${escapeHtml(h.id)}','down')"
+                  ${isLast ? 'disabled' : ''}
+                  style="background:none;border:none;color:var(--tx2);cursor:pointer;font-size:.85rem;padding:.1rem .25rem;opacity:${isLast?.3:.85};"
+                  title="Move down">↓</button>
+          <button onclick="removeHabitFromStack('${escapeHtml(s.id)}','${escapeHtml(h.id)}')"
+                  style="background:none;border:none;color:#f87171;cursor:pointer;font-size:.85rem;padding:.1rem .25rem;opacity:.7;"
+                  title="Remove from chain">×</button>
+        </div>
+      `;
+    }).join('');
+
+    // Picker of habits not already in this stack
+    const avail = habits.filter(h => s.habitIds.indexOf(h.id) < 0);
+
+    return `
+      <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);
+                  border-radius:14px;padding:1rem;margin-bottom:1rem;">
+        <div style="display:flex;align-items:flex-start;gap:.6rem;margin-bottom:.6rem;">
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:var(--fh);font-size:.95rem;font-weight:800;color:var(--tx);">
+              🔗 ${escapeHtml(s.name)}
+            </div>
+            <div style="font-size:.7rem;color:var(--tx2);margin-top:.2rem;font-style:italic;">
+              ${escapeHtml(s.cue || 'After I ___')}, I will…
+            </div>
+          </div>
+          <button onclick="removeHabitStack('${escapeHtml(s.id)}')"
+                  style="background:none;border:none;color:#f87171;font-size:.85rem;
+                         cursor:pointer;padding:.2rem .3rem;opacity:.7;"
+                  title="Remove stack">×</button>
+        </div>
+        ${chain || '<div style="font-size:.72rem;color:var(--tx3);padding:.3rem 0;">No habits in this chain yet. Pick one below to start.</div>'}
+        ${avail.length ? `
+          <div style="margin-top:.7rem;display:flex;gap:.4rem;align-items:center;">
+            <select id="stkPick_${escapeHtml(s.id)}"
+                    style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
+                           color:var(--tx);padding:.4rem .55rem;border-radius:8px;font-size:.75rem;
+                           font-family:var(--fn);">
+              <option value="">+ Add habit to this chain…</option>
+              ${avail.map(h => `<option value="${escapeHtml(h.id)}">${escapeHtml(h.emoji||'✅')} ${escapeHtml(h.name)}</option>`).join('')}
+            </select>
+            <button onclick="addHabitToStack('${escapeHtml(s.id)}', document.getElementById('stkPick_${escapeHtml(s.id)}').value)"
+                    class="btn bp" style="font-size:.7rem;padding:.4rem .8rem;border-radius:8px;">Add</button>
+          </div>
+        ` : '<div style="font-size:.65rem;color:var(--tx3);margin-top:.5rem;">Every habit is already in this chain.</div>'}
+      </div>
+    `;
+  }).join('') + `
+    <div style="display:flex;justify-content:center;margin-top:.5rem;">
+      <button class="btn bp" onclick="addHabitStack()"
+              style="font-size:.72rem;padding:.5rem 1.2rem;border-radius:10px;">
+        + New stack
+      </button>
+    </div>
+  `;
+}
+
+// ── LIBRARY PANEL ────────────────────────────────────────────
+// 60 curated habits across 6 categories. Each entry has emoji, name,
+// recommended time of day, and a category. One-tap add creates a habit
+// in D.habitsV2 using these defaults.
+const HABIT_LIBRARY = {
+  Health: [
+    {e:'💧', n:'Drink 8 glasses of water',           t:'morning'},
+    {e:'😴', n:'Sleep 8 hours',                       t:'evening'},
+    {e:'🚶', n:'Walk 10,000 steps',                   t:'anytime'},
+    {e:'🧘', n:'Stretch for 5 minutes',               t:'morning'},
+    {e:'📵', n:'No phone for 60 min before bed',      t:'evening'},
+    {e:'🍎', n:'Eat a piece of fruit',                t:'anytime'},
+    {e:'☀️', n:'Get 10 minutes of sunlight',          t:'morning'},
+    {e:'🪥', n:'Floss',                               t:'evening'},
+    {e:'💪', n:'10 push-ups (any variation)',         t:'afternoon'},
+    {e:'🥬', n:'Eat one serving of vegetables',       t:'anytime'},
+    {e:'🚰', n:'Glass of water on waking',            t:'morning'},
+    {e:'🧴', n:'Sunscreen on face',                   t:'morning'},
+    {e:'🛏️', n:'Make the bed',                        t:'morning'},
+    {e:'🏃', n:'15-minute walk after dinner',         t:'evening'},
+    {e:'🦷', n:'Brush teeth 2 minutes',               t:'evening'},
+  ],
+  Mind: [
+    {e:'📖', n:'Read 20 minutes',                      t:'evening'},
+    {e:'✍️', n:'Journal one paragraph',                t:'evening'},
+    {e:'🧘', n:'Meditate 5 minutes',                   t:'morning'},
+    {e:'🙏', n:'Gratitude — list 3 things',            t:'evening'},
+    {e:'🧠', n:'Learn one new thing',                  t:'anytime'},
+    {e:'🎧', n:'Listen to a podcast episode',          t:'anytime'},
+    {e:'🎯', n:'Review goals for 2 minutes',           t:'morning'},
+    {e:'📝', n:'Write the day in three sentences',     t:'evening'},
+    {e:'💭', n:'Pause and breathe 4-7-8 once',         t:'anytime'},
+    {e:'📚', n:'Read non-fiction 10 minutes',          t:'morning'},
+  ],
+  Faith: [
+    {e:'🙏', n:'Pray for 5 minutes',                   t:'morning'},
+    {e:'📖', n:'Read one Bible chapter',               t:'morning'},
+    {e:'✝️', n:'Daily devotional',                     t:'morning'},
+    {e:'✨', n:'Memorize one verse',                   t:'anytime'},
+    {e:'❤️', n:'Serve someone (small act)',            t:'anytime'},
+    {e:'💝', n:'Tithe / give',                         t:'anytime'},
+    {e:'⛪', n:'Worship music for 10 min',             t:'anytime'},
+    {e:'📔', n:'Spiritual journaling',                 t:'evening'},
+    {e:'🕯️', n:'Examen (review the day with God)',    t:'evening'},
+    {e:'🤝', n:'Encourage someone',                    t:'anytime'},
+  ],
+  Productivity: [
+    {e:'📅', n:'Plan tomorrow tonight',                t:'evening'},
+    {e:'🎯', n:'Review weekly goals',                  t:'morning'},
+    {e:'1️⃣', n:'Single-task for 25 minutes',          t:'afternoon'},
+    {e:'📥', n:'Inbox to zero (or under 10)',          t:'morning'},
+    {e:'🗒️', n:'Pick top 3 priorities for the day',   t:'morning'},
+    {e:'⏰', n:'Wake up at the same time',             t:'morning'},
+    {e:'🧹', n:'5-minute desk reset',                  t:'evening'},
+    {e:'🚫', n:'No social media before noon',          t:'morning'},
+    {e:'📑', n:'Review yesterday before starting',     t:'morning'},
+    {e:'🎓', n:'Study without phone in room',          t:'afternoon'},
+  ],
+  Social: [
+    {e:'📞', n:'Call a friend or family member',       t:'anytime'},
+    {e:'💌', n:'Send one thoughtful message',          t:'anytime'},
+    {e:'🤗', n:'Random act of kindness',               t:'anytime'},
+    {e:'🍽️', n:'Family dinner — no phones',           t:'evening'},
+    {e:'❤️', n:'Tell someone what you appreciate',     t:'anytime'},
+    {e:'🤝', n:'Make plans with a friend',             t:'anytime'},
+    {e:'👋', n:'Greet someone new',                    t:'anytime'},
+    {e:'🎉', n:'Celebrate someone\'s win',             t:'anytime'},
+  ],
+  Financial: [
+    {e:'💰', n:'Track spending for the day',           t:'evening'},
+    {e:'🛑', n:'No impulse buys today',                t:'anytime'},
+    {e:'💵', n:'Save $X today',                        t:'anytime'},
+    {e:'📊', n:'Review budget for 2 minutes',          t:'evening'},
+    {e:'🏦', n:'Check bank balance (intentionally)',   t:'morning'},
+    {e:'📈', n:'Read one finance article',             t:'anytime'},
+    {e:'🛒', n:'Make a grocery list before shopping',  t:'anytime'},
+  ],
+};
+
+function renderHabitsLibrary(){
+  initHabitsData();
+  const wrap = document.getElementById('habitsLibraryBody');
+  if(!wrap) return;
+  const existingNames = new Set((D.habitsV2 || []).map(h => h.name.toLowerCase()));
+
+  const cats = Object.keys(HABIT_LIBRARY);
+  wrap.innerHTML = `
+    <div style="font-size:.78rem;color:var(--tx2);margin-bottom:1rem;line-height:1.55;">
+      One-tap add. Each card lands in your habits with a recommended
+      time-of-day pre-set. ${Object.values(HABIT_LIBRARY).reduce((s,a)=>s+a.length,0)} curated habits across ${cats.length} categories.
+    </div>
+    ${cats.map(cat => `
+      <div style="margin-bottom:1.2rem;">
+        <div style="font-family:var(--fh);font-size:.74rem;letter-spacing:1.5px;
+                    font-weight:800;color:var(--tx);margin-bottom:.45rem;">
+          ${escapeHtml(cat).toUpperCase()} <span style="font-weight:400;color:var(--tx3);letter-spacing:0;font-family:var(--f);">(${HABIT_LIBRARY[cat].length})</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.5rem;">
+          ${HABIT_LIBRARY[cat].map((h,i) => {
+            const added = existingNames.has(h.n.toLowerCase());
+            return `
+              <button onclick="libraryAdd('${escapeHtml(cat)}', ${i}, this)"
+                      ${added ? 'disabled' : ''}
+                      style="text-align:left;padding:.55rem .7rem;border-radius:10px;
+                             background:${added?'rgba(52,211,153,.10)':'rgba(255,255,255,.03)'};
+                             border:1px solid ${added?'rgba(52,211,153,.35)':'rgba(255,255,255,.07)'};
+                             color:var(--tx);cursor:${added?'default':'pointer'};
+                             display:flex;align-items:center;gap:.5rem;
+                             font-family:inherit;font-size:.78rem;transition:all .18s;
+                             ${added?'opacity:.78;':''}">
+                <span style="font-size:1.1rem;flex-shrink:0;">${escapeHtml(h.e)}</span>
+                <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;
+                             white-space:nowrap;">${escapeHtml(h.n)}</span>
+                <span style="font-size:.55rem;letter-spacing:.5px;color:var(--tx3);font-weight:700;flex-shrink:0;">
+                  ${added ? '✓ ADDED' : h.t.toUpperCase()}
+                </span>
+              </button>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `).join('')}
+  `;
+}
+
+function libraryAdd(cat, idx, btnEl){
+  const h = (HABIT_LIBRARY[cat] || [])[idx];
+  if(!h) return;
+  addHabitV2(h.n, h.e, h.t, cat, '');
+  if(btnEl){
+    btnEl.disabled = true;
+    btnEl.style.background = 'rgba(52,211,153,.10)';
+    btnEl.style.borderColor = 'rgba(52,211,153,.35)';
+    btnEl.style.opacity = '.78';
+    btnEl.style.cursor = 'default';
+    const tag = btnEl.querySelector('span:last-child');
+    if(tag) tag.textContent = '✓ ADDED';
+  }
+}
+
 // ── ENTRY POINTS ─────────────────────────────────────────────
 function renderHabitsAll(){
   renderHabitsHero();
   renderHabitsToday();
-  // Re-render Streaks lazily on tab switch.
+  // Re-render Streaks/Analytics/Stack/Library lazily on tab switch.
 }
 
 function initHabits(){
@@ -602,12 +1149,21 @@ function initHabits(){
 }
 
 // Expose globals (vanilla-JS, no modules).
-window.initHabits           = initHabits;
-window.habitsTab            = habitsTab;
-window.toggleHabitV2Today   = toggleHabitV2Today;
-window.addHabitV2           = addHabitV2;
-window.removeHabitV2        = removeHabitV2;
-window.openAddHabit         = openAddHabit;
-window.renderHabitsHero     = renderHabitsHero;
-window.renderHabitsToday    = renderHabitsToday;
-window.renderHabitsStreaks  = renderHabitsStreaks;
+window.initHabits             = initHabits;
+window.habitsTab              = habitsTab;
+window.toggleHabitV2Today     = toggleHabitV2Today;
+window.addHabitV2             = addHabitV2;
+window.removeHabitV2          = removeHabitV2;
+window.openAddHabit           = openAddHabit;
+window.renderHabitsHero       = renderHabitsHero;
+window.renderHabitsToday      = renderHabitsToday;
+window.renderHabitsStreaks    = renderHabitsStreaks;
+window.renderHabitsAnalytics  = renderHabitsAnalytics;
+window.renderHabitsStack      = renderHabitsStack;
+window.renderHabitsLibrary    = renderHabitsLibrary;
+window.addHabitStack          = addHabitStack;
+window.removeHabitStack       = removeHabitStack;
+window.addHabitToStack        = addHabitToStack;
+window.removeHabitFromStack   = removeHabitFromStack;
+window.moveStackHabit         = moveStackHabit;
+window.libraryAdd             = libraryAdd;
