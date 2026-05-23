@@ -571,32 +571,21 @@ async function createAccount(){
       error: authError?.message || null,
     }));
 
-    // isPaid declared early so the null-user branch below can route
-    // free signups to the success screen while paid signups error out
-    // (paid flow needs a userId immediately for the Stripe customer
-    // creation step).
-    const isPaid = (plan!=='free' && plan!=='sponsored');
-
-    // Supabase returns {user:null, session:null} with NO error on
-    // successful signup when email confirmation is required — this is
-    // intentional anti-enumeration behaviour (also masks already-exists
-    // collisions). For free signups this is a success path: the
-    // confirmation email is on its way and we should show the
-    // check-your-email screen instead of throwing. For paid signups
-    // we can't continue without a userId for Stripe metadata.
-    if(!authData?.user && !isPaid){
-      // Free / sponsored — server accepted the signup, confirmation email
-      // is sending. Skip the Stripe + register-family steps and jump
-      // straight to "check your email".
-      document.getElementById('checkEmailAddr').textContent = email;
-      goStep(4);
-      return;
-    }
-    if(!authData?.user && isPaid){
-      throw new Error('Account setup incomplete. Please wait 60 seconds and try again, or contact support at info@kingdom-creatives.com');
+    // Supabase returns {user:null, session:null} with no error in ONE
+    // scenario: email confirmation is enabled AND the email already
+    // exists (anti-enumeration). A fresh signup with email-confirm on
+    // returns user populated, session null. So user:null here means
+    // "this email is already registered" for BOTH free and paid plans —
+    // either way the right action is to direct them to sign in / check
+    // their existing confirmation email, not to silently proceed
+    // (which would skip register-family — the only callsite for free
+    // profile creation in the repo, verified via grep).
+    if(!authData?.user){
+      throw new Error('This email already has an account. Check your inbox for the confirmation link, or sign in instead.');
     }
 
     const userId = authData.user.id;
+    const isPaid = (plan!=='free' && plan!=='sponsored');
     // Paid flow needs familyId BEFORE create-payment-intent (it's sealed into
     // Stripe metadata for stripe-webhook to correlate later). Free/sponsored
     // flows let register-family generate the id server-side.
