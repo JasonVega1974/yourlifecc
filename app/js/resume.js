@@ -592,7 +592,7 @@ function addJobApp() {
     company,
     role,
     board:   (document.getElementById('jaBoard')||{}).value || '',
-    date:    (document.getElementById('jaDate')||{}).value || new Date().toISOString().split('T')[0],
+    date:    (document.getElementById('jaDate')||{}).value || localDateString(),
     salary:  (document.getElementById('jaSalary')||{}).value?.trim() || '',
     url:     (document.getElementById('jaUrl')||{}).value?.trim() || '',
     notes:   (document.getElementById('jaNotes')||{}).value?.trim() || '',

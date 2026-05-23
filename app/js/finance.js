@@ -83,7 +83,7 @@ function addTx(){
   const amt=parseFloat(document.getElementById('txAmt').value);
   const type=document.getElementById('txType').value;
   const cat=document.getElementById('txCat').value;
-  const date=document.getElementById('txDate').value||new Date().toISOString().split('T')[0];
+  const date=document.getElementById('txDate').value||localDateString();
   if(!name||isNaN(amt)||amt<=0){showToast('Enter description and amount');return;}
   if(!D.transactions) D.transactions=[];
   D.transactions.unshift({id:Date.now(),name,amt,type,cat,date});

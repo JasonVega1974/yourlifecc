@@ -654,7 +654,7 @@ function delEvCf(id){ const ev=(D.events||[]).find(e=>e.id===id); if(!ev) return
 
 function renderUpcoming(){
   const el=document.getElementById('upcomingEvs'); if(!el) return;
-  const today=new Date().toISOString().split('T')[0];
+  const today=localDateString();
   const up=(D.events||[]).filter(ev=>ev.date>=today).slice(0,15);
   if(!up.length){el.innerHTML='<div style="color:#c8d4e8;text-align:center;padding:1.5rem;font-size:.84rem;">No upcoming events — click a day to add one!</div>';return;}
   el.innerHTML=up.map(ev=>{

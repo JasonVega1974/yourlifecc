@@ -82,8 +82,8 @@ function loadDemoData(){
     {id:1,text:'Read 12 books this year',done:false},
     {id:2,text:'Get into a 4-year university',done:false},
     {id:3,text:'Save $5,000 for a car',done:false},
-    {id:4,text:'Run a 5K',done:true,achievedDate:'March 10, 2026'},
-    {id:5,text:'Learn to cook 5 new meals',done:true,achievedDate:'February 28, 2026'},
+    {id:4,text:'Run a 5K',done:true,completedDate:'March 10, 2026'},
+    {id:5,text:'Learn to cook 5 new meals',done:true,completedDate:'February 28, 2026'},
   ];
   D.journal = [
     {id:1,title:'Why I want to study medicine',body:'Today in biology we talked about how the immune system works and I just realized this is exactly what I want to do with my life...',cat:'goal',date:new Date().toLocaleDateString(),time:'8:42 PM'},
@@ -470,7 +470,7 @@ function finishInit(cloudReady){
   ['goalCal','goalPro','goalCarb','goalFat'].forEach((id,i)=>{ const e=document.getElementById(id); const keys=['cal','pro','carb','fat']; if(e&&g[keys[i]]) e.value=g[keys[i]]; });
 
   // Today's date defaults
-  const today=new Date().toISOString().split('T')[0];
+  const today=localDateString();
   ['txDate','asgDue','evDate','wDate'].forEach(id=>{ const e=document.getElementById(id); if(e&&!e.value) e.value=today; });
 
   // Pre-fill budget if saved

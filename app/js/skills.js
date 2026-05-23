@@ -3429,13 +3429,6 @@ career:[
   {q:'What should you do within 24 hours of a job interview?',opts:['Call to check the status of the job','Send a thank-you email referencing something specific from the conversation','Wait for them to contact you','Follow up weekly until you hear back'],ans:1,explain:'A thank-you email within 24 hours is sent by fewer than 30% of candidates. It shows professionalism, reinforces your interest, and keeps you top of mind.'},
   {q:'What does 401k employer matching mean?',opts:['The employer manages your retirement investments for you','The employer contributes money to your 401k based on how much you contribute','Your 401k doubles every 4 years guaranteed','You pay no taxes on 401k withdrawals'],ans:1,explain:'Employer matching is free money — if your employer matches 3% and you contribute 3%, they add an additional 3%. Not contributing enough to get the full match is leaving compensation on the table.'},
 ],
-cooking:[
-  {q:'What internal temperature must chicken reach to be safe to eat?',opts:['145°F','155°F','165°F','180°F'],ans:2,explain:'Chicken must reach 165°F internally. Always verify with a meat thermometer — visual cues alone are unreliable.'},
-  {q:'How long can cooked food safely sit at room temperature?',opts:['30 min','1 hour','2 hours','4 hours'],ans:2,explain:'Bacteria multiply rapidly between 40–140°F. After 2 hours in this danger zone, food should be discarded.'},
-  {q:'What is the safest method to thaw frozen meat?',opts:['Counter overnight','Under hot water','In the refrigerator','Microwave then refreeze'],ans:2,explain:'Refrigerator thawing keeps food safe throughout. Counter thawing lets the exterior reach unsafe temps while the interior stays frozen.'},
-  {q:'"Best By" on a food label means:',opts:['Dangerous after this date','Peak quality date — often safe after','Store must remove it by this date','Legal safety requirement'],ans:1,explain:'"Best By" is a quality indicator, not a safety cutoff. Trust your senses. "Use By" is the date to strictly follow.'},
-  {q:'Why is a dull knife more dangerous than a sharp one?',opts:['Cuts at odd angles','You press harder and it slips','Heats up during use','Sharp knives are actually more dangerous'],ans:1,explain:'A dull knife requires more force, increasing the chance it will slip off food unpredictably. Sharp knives cut with control.'},
-],
 mental:[
   {q:'What is the 4-7-8 breathing technique used for?',opts:['Increasing energy before exercise','Activating the parasympathetic nervous system to reduce anxiety','Improving lung capacity over time','Falling asleep faster only'],ans:1,explain:'4-7-8 breathing (inhale 4 sec, hold 7, exhale 8) activates the parasympathetic (rest-and-digest) nervous system, countering the fight-or-flight stress response within minutes.'},
   {q:'Depression is best described as:',opts:['Just feeling sad for a few days','Persistent low mood for 2+ weeks that interferes with daily life, a treatable medical condition','A character flaw or weakness','Only affecting people who have had trauma'],ans:1,explain:'Depression is a medical condition — not weakness. It involves persistent symptoms for 2+ weeks. It is highly treatable with therapy, medication, or both.'},
@@ -4162,7 +4155,7 @@ function printCert(key){
 
 
 // ── CRAFT ─────────────────────────────────────────────────────
-function buildCraftSection(){ const t=document.getElementById('craftTitle'); if(t&&D.craftName) t.textContent=D.craftName; const gd=document.getElementById('gigDate'); if(gd&&!gd.value) gd.value=new Date().toISOString().split('T')[0]; renderPlaylist(); renderGigLog(); }
+function buildCraftSection(){ const t=document.getElementById('craftTitle'); if(t&&D.craftName) t.textContent=D.craftName; const gd=document.getElementById('gigDate'); if(gd&&!gd.value) gd.value=localDateString(); renderPlaylist(); renderGigLog(); }
 function renameCraft(el){ const old=el.textContent; const inp=document.createElement('input'); inp.value=D.craftName||old; inp.style.cssText='background:transparent;border:none;border-bottom:2px solid var(--c);color:#fff;font-family:var(--fh);font-size:1.7rem;letter-spacing:2px;width:200px;outline:none;'; el.replaceWith(inp); inp.focus(); inp.select(); inp.onblur=()=>{ const v=inp.value.trim()||old; D.craftName=v; save(); inp.replaceWith(el); el.textContent=v; }; inp.onkeydown=e=>{ if(e.key==='Enter') inp.blur(); }; }
 function loadAudio(input){ const files=Array.from(input.files); files.forEach(f=>{ const url=URL.createObjectURL(f); _tracks.push({url,name:f.name.replace(/\.[^/.]+$/,''),artist:'My Music'}); }); if(_tracks.length===1) loadTrack(0); else renderPlaylist(); showToast(_tracks.length+' track(s) loaded 🎵'); }
 function loadTrack(idx){ if(idx<0||idx>=_tracks.length) return; _trackIdx=idx; const t=_tracks[idx]; _audio.src=t.url; const tn=document.getElementById('trackName'),ta=document.getElementById('trackArtist'); if(tn) tn.textContent=t.name; if(ta) ta.textContent=t.artist; renderPlaylist(); if(_playing){_audio.play();spinVinyl(true);} }
@@ -4976,13 +4969,13 @@ function calcTax(){
   if(!income || income <= 0){ if(res) res.style.display='none'; return; }
   if(res) res.style.display='block';
 
-  // 2024 Federal brackets
+  // 2025 Federal brackets (IRS Rev. Proc. 2024-40, TY2025).
   const brackets = {
-    single: [[11600,.10],[47150,.12],[100525,.22],[191950,.24],[243725,.32],[609350,.35],[Infinity,.37]],
-    mfj:    [[23200,.10],[94300,.12],[201050,.22],[383900,.24],[487450,.32],[731200,.35],[Infinity,.37]],
-    hoh:    [[16550,.10],[63100,.12],[100500,.22],[191950,.24],[243700,.32],[609350,.35],[Infinity,.37]],
+    single: [[11925,.10],[48475,.12],[103350,.22],[197300,.24],[250525,.32],[626350,.35],[Infinity,.37]],
+    mfj:    [[23850,.10],[96950,.12],[206700,.22],[394600,.24],[501050,.32],[751600,.35],[Infinity,.37]],
+    hoh:    [[17000,.10],[64850,.12],[103350,.22],[197300,.24],[250500,.32],[626350,.35],[Infinity,.37]],
   };
-  const stdDed = {single:14600, mfj:29200, hoh:21900};
+  const stdDed = {single:15000, mfj:30000, hoh:22500};
 
   // Self-employed: deduct half of SE tax first
   let seAmt = 0;

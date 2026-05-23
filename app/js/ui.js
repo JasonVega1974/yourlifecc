@@ -568,7 +568,7 @@ function updateHeroDashboard(){
   // ── UPCOMING EVENTS + BILLS ──
   const upEl=document.getElementById('heroUpcoming');
   if(upEl){
-    const today=new Date().toISOString().split('T')[0];
+    const today=localDateString();
     const events=(D.events||[]).filter(ev=>ev.date>=today).slice(0,4);
     const upBills=(D.bills||[]).filter(b=>b.due&&b.due>=today).sort((a,b)=>a.due.localeCompare(b.due)).slice(0,2);
     let items=[];
@@ -1703,6 +1703,13 @@ function showSection(id, fromMobile){
   // Stop all audio (TTS, MP3, ambient) when navigating between sections
   if(typeof stopAllAudio === 'function') stopAllAudio();
   else if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  // Parent-hub drill-down: restore D if the user is navigating away from the
+  // parent hub while drilled-down. Without this, the home dashboard and every
+  // other section would render against the drilled child's D instead of the
+  // signed-in parent's data.
+  if(id !== 's-parent' && typeof window.parentDrillExit === 'function'){
+    parentDrillExit();
+  }
   // faith_free fail-closed: redirect to home if the requested section is
   // outside the allow-list. Silent redirect — some callers fire from
   // setTimeout chains where a throw would surface as an unhandled rejection.

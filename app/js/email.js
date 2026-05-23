@@ -288,9 +288,9 @@ function renderManageUsers(){
 
     return `<div style="padding:.65rem .4rem;border-bottom:1px solid rgba(255,255,255,.05);">
       <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:${isP?'0':'.5rem'};">
-        <div style="width:32px;height:32px;border-radius:50%;background:${c}22;border:2px solid ${c};display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;color:${c};flex-shrink:0;">${p.name.charAt(0).toUpperCase()}</div>
+        <div style="width:32px;height:32px;border-radius:50%;background:${c}22;border:2px solid ${c};display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;color:${c};flex-shrink:0;">${escapeHtml(String(p.name||'').charAt(0).toUpperCase())}</div>
         <div style="flex:1;">
-          <div style="font-size:.8rem;font-weight:700;color:#e0e0e0;">${p.name}${isP?' <span style="font-size:.58rem;background:rgba(139,92,246,.2);color:#a78bfa;border-radius:4px;padding:1px 5px;margin-left:3px;">PARENT</span>':''}</div>
+          <div style="font-size:.8rem;font-weight:700;color:#e0e0e0;">${escapeHtml(p.name)}${isP?' <span style="font-size:.58rem;background:rgba(139,92,246,.2);color:#a78bfa;border-radius:4px;padding:1px 5px;margin-left:3px;">PARENT</span>':''}</div>
           <div style="font-size:.65rem;color:var(--tx3);">${isP?'6-digit PIN (managed above)':'4-digit PIN: <span style="font-family:monospace;letter-spacing:.15rem;color:var(--tx3);">••••</span>'}</div>
         </div>
         <div style="display:flex;gap:.3rem;">
@@ -572,7 +572,7 @@ function renderParentBucks(){
           <div style="font-size:1rem;">${it.emoji||'🎁'}</div>
           <div style="font-size:.65rem;font-weight:700;margin:.15rem 0;">${escapeHtml(it.name)}</div>
           <div style="font-size:.75rem;font-weight:800;color:#fbbf24;">${it.cost} PB</div>
-          <button class="btn bp bs" onclick="spendPB(${it.cost},'${it.name.replace(/'/g,"\\'")}')" style="font-size:.5rem;margin-top:.2rem;padding:.15rem .4rem;${D.pb.balance>=it.cost?'':'opacity:.4;pointer-events:none;'}">Redeem</button>
+          <button class="btn bp bs" onclick="spendPB(${it.cost},'${escJsAttr(it.name)}')" style="font-size:.5rem;margin-top:.2rem;padding:.15rem .4rem;${D.pb.balance>=it.cost?'':'opacity:.4;pointer-events:none;'}">Redeem</button>
         </div>
       `).join('');
     }
@@ -1531,7 +1531,7 @@ function renderPhStoreList(){
   el.innerHTML = items.map(it=>`
     <div style="display:flex;align-items:center;gap:.5rem;padding:.35rem .5rem;background:rgba(255,255,255,.03);border-radius:8px;margin-bottom:.25rem;">
       <span style="font-size:1rem;">${it.emoji||'🎁'}</span>
-      <span style="flex:1;font-size:.75rem;">${it.name}</span>
+      <span style="flex:1;font-size:.75rem;">${escapeHtml(it.name)}</span>
       <span style="font-size:.75rem;font-weight:700;color:#fbbf24;">${it.cost} PB</span>
       <button onclick="phRemoveStoreItem(${it.id})" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:.8rem;padding:0 .2rem;">✕</button>
     </div>

@@ -92,7 +92,7 @@ const DEF = {
   // mood
   moods:[],
   // goals / milestones
-  goals:[], milestones:[], selectedCareers:[], timeline:[],
+  goals:[], milestones:[], selectedCareers:[], timeline:{},
   // journal / quotes
   journal:[], quotes:[],
   // reading
@@ -109,7 +109,7 @@ const DEF = {
   // driving
   driverChecklist:{},
   // chores / rewards
-  choreList:[], choreLog:[], chores:{}, selfChores:[], chorePoints:0, chorePin:'',
+  choreList:[], choreLog:[], chores:{}, selfChores:[], chorePoints:{total:0,spent:0}, chorePin:'',
   rewards:[], incentives:[], behaviorLog:[], parentNotes:[],
   parentPIN:'', parentPinDisabled:false, parentWizardDone:false,
   parentGrowth:[], childAvatar:'', childAvatarPhoto:'',

@@ -23,8 +23,8 @@ function initChoreData(){
   if(!Array.isArray(D.chores)) D.chores=[];
   if(!D.rewards) D.rewards=[];
   if(!D.choreLog) D.choreLog=[];
-  // Handle legacy where chorePoints was stored as a number instead of {total,spent}
-  if(!D.chorePoints || typeof D.chorePoints !== 'object'){
+  // Handle legacy where chorePoints was stored as a number or array instead of {total,spent}
+  if(!D.chorePoints || typeof D.chorePoints !== 'object' || Array.isArray(D.chorePoints)){
     const legacy = typeof D.chorePoints === 'number' ? D.chorePoints : 0;
     D.chorePoints = {total: legacy, spent: 0};
   }

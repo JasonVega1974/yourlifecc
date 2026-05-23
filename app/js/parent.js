@@ -58,6 +58,16 @@ function escapeHtml(s){
   });
 }
 
+// Escape a user-supplied string for use as a JS string literal inside a
+// double-quoted HTML attribute (e.g. onclick="foo('${escJsAttr(name)}')").
+// HTML-decoding happens before JS parsing, so escape for JS first, then HTML.
+function escJsAttr(s){
+  s = String(s==null?'':s)
+    .replace(/\\/g,'\\\\').replace(/'/g,"\\'")
+    .replace(/\n/g,'\\n').replace(/\r/g,'\\r').replace(/</g,'\\u003c');
+  return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+}
+
 function unlockParentDash(){
   initChoreData();
   if(D.parentPinDisabled){ _doUnlockParent(); return; }
@@ -73,6 +83,12 @@ function unlockParentDash(){
 }
 
 function lockParentDash(){
+  // Restore D from any active drill-down before locking — locking the hub
+  // does not by itself revert the D swap, and the next save() would corrupt
+  // the parent row with child data.
+  if(typeof _parentDrillActive !== 'undefined' && _parentDrillActive){
+    parentDrillExit();
+  }
   _parentUnlockExpiresAt = 0;
   _parentUnlockHardCap = 0;
   _pgBuffer = ''; _pgUpdateDots();
@@ -287,7 +303,7 @@ function renderWeeklyReportCard(){
   const moodsLogged = (D.moods||[]).filter(m=>m.date>=ws).length;
   const studySessions = (D.studyLog||[]).filter(s=>s.date && s.date>=ws.replace(/-/g,'/')).length;
   const journalEntries = (Array.isArray(D.journal)?D.journal:[]).filter(j=>j.date>=ws).length;
-  const goalsCompleted = (Array.isArray(D.goals)?D.goals:[]).filter(g=>g.done && g.doneDate && g.doneDate>=ws).length;
+  const goalsCompleted = (Array.isArray(D.goals)?D.goals:[]).filter(g=>{ const d=g.completedDate||g.doneDate||g.achievedDate; return g.done && d && d>=ws; }).length;
   const booksProgress = (Array.isArray(D.books)?D.books:[]).filter(b=>b.status==='reading').length;
   const positiveBeh = (Array.isArray(D.behaviorLog)?D.behaviorLog:[]).filter(b=>b.date>=ws && b.type==='positive').length;
   const negativeBeh = (Array.isArray(D.behaviorLog)?D.behaviorLog:[]).filter(b=>b.date>=ws && b.type==='negative').length;
@@ -755,7 +771,7 @@ function renderParentActivityFeed(){
   (Array.isArray(D.journal)?D.journal:[]).slice(-5).forEach(j=>feed.push({date:j.date,time:'',icon:'✍️',text:'Journal entry',color:'#f472b6'}));
 
   // Goals completed
-  (Array.isArray(D.goals)?D.goals:[]).filter(g=>g.done).slice(-5).forEach(g=>feed.push({date:g.doneDate||'',time:'',icon:'🎯',text:`Goal completed: ${g.text}`,color:'#60a5fa'}));
+  (Array.isArray(D.goals)?D.goals:[]).filter(g=>g.done).slice(-5).forEach(g=>feed.push({date:g.completedDate||g.doneDate||g.achievedDate||'',time:'',icon:'🎯',text:`Goal completed: ${g.text}`,color:'#60a5fa'}));
 
   // Milestones
   (D.milestones||[]).slice(-5).forEach(m=>feed.push({date:m.date,time:'',icon:m.emoji,text:`Milestone: ${m.title}`,color:'#a78bfa'}));
@@ -1368,7 +1384,7 @@ function renderMonthlyChallenge(){
   el.innerHTML = `
     <div style="background:linear-gradient(135deg,rgba(245,166,35,.04),rgba(239,68,68,.03));border:1px solid rgba(245,166,35,.12);border-radius:14px;padding:.9rem 1.1rem;margin-bottom:.8rem;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem;">
-        <div><span style="font-size:.9rem;">${ch.icon}</span> <span style="font-family:var(--fh);font-size:.72rem;letter-spacing:1px;color:var(--g);font-weight:700;">${ch.name.toUpperCase()}</span></div>
+        <div><span style="font-size:.9rem;">${escapeHtml(ch.icon)}</span> <span style="font-family:var(--fh);font-size:.72rem;letter-spacing:1px;color:var(--g);font-weight:700;">${escapeHtml(String(ch.name||'').toUpperCase())}</span></div>
         <span style="font-size:.65rem;font-weight:700;color:${pct>=100?'#22c55e':'var(--g)'};">${done}/${results.length}${pct>=100?' 🏆':''}</span>
       </div>
       <div style="font-size:.68rem;color:var(--tx2);margin-bottom:.5rem;">${ch.desc}</div>
@@ -2048,6 +2064,9 @@ function unlockProfile(id){
 }
 
 function switchToProfile(id){
+  // Restore drill-down BEFORE snapshotting current profile data, otherwise we
+  // would write the drilled child's D into the previous profile's slot.
+  if(_parentDrillActive) parentDrillExit();
   // Save current profile data
   if(_activeProfileId && _activeProfileId !== id){
     const cur = _profiles.find(p=>p.id===_activeProfileId);
@@ -2183,7 +2202,7 @@ function renderProfileSwitcher(){
     // longer the PIN; for unmigrated children it would leak the PIN. Show a
     // protected-state hint instead.
     const hint = p.isParent ? 'Parent' : (p.pinHash ? 'PIN protected' : 'Tap to switch');
-    return `<button onclick="${active?`alert('${p.name}\\n\\nUse Parent Hub → Manage Users to reset this PIN.')`:`unlockProfile('${p.id}')`}" style="display:flex;align-items:center;gap:.3rem;padding:.35rem .7rem;border-radius:8px;border:1.5px solid ${active?c:'rgba(255,255,255,.08)'};background:${active?c+'15':'rgba(255,255,255,.02)'};cursor:pointer;transition:all .15s;font-family:var(--fn);" title="${active?'Active profile':'Enter PIN to switch'}">
+    return `<button onclick="${active?`alert('Already on this profile. Use Parent Hub → Manage Users to reset this PIN.')`:`unlockProfile('${p.id}')`}" style="display:flex;align-items:center;gap:.3rem;padding:.35rem .7rem;border-radius:8px;border:1.5px solid ${active?c:'rgba(255,255,255,.08)'};background:${active?c+'15':'rgba(255,255,255,.02)'};cursor:pointer;transition:all .15s;font-family:var(--fn);" title="${active?'Active profile':'Enter PIN to switch'}">
       <div style="width:24px;height:24px;border-radius:50%;background:${c};display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:800;color:#fff;">${escapeHtml(p.name.charAt(0).toUpperCase())}</div>
       <div style="text-align:left;"><div style="font-size:.65rem;font-weight:${active?'700':'500'};color:${active?c:'var(--tx2)'};">${escapeHtml(p.name)}</div><div style="font-size:.42rem;color:var(--tx3);">${hint}</div></div>
       ${active?'<span style="font-size:.45rem;color:'+c+';">●</span>':'<span style="font-size:.45rem;color:var(--tx3);">🔒</span>'}
@@ -2406,12 +2425,25 @@ function renderParentMultiChild(){
   `;
 }
 
+// ── Parent-hub drill-down state ─────────────────────────────
+// While drilled-down, D holds the drilled child's data — NOT the parent's.
+// save()/cloudSync() must be blocked until parentDrillExit() runs, otherwise
+// the child's data is written under the parent's user_id and silently
+// corrupts the parent profile row.
+let _parentDrillSnapshot = null;
+let _parentDrillActive = false;
+// Expose a probe so sync.js save() can short-circuit during drill.
+window._isParentDrillActive = function(){ return _parentDrillActive; };
+
 function parentDrillChild(id){
-  // Switch to that child's profile to show their data in the parent hub
+  // If already drilled into another child, restore first so we don't stack.
+  if(_parentDrillActive) parentDrillExit();
   const profile = _profiles.find(p=>p.id===id);
   if(!profile) return;
-  // Temporarily load their data into D for the parent view
-  const saved = JSON.parse(JSON.stringify(D));
+  // Deep-copy snapshot of the live parent D for later restore.
+  _parentDrillSnapshot = JSON.parse(JSON.stringify(D));
+  _parentDrillActive = true;
+  // Swap to the child's data
   for(const key in D){ if(D.hasOwnProperty(key)) delete D[key]; }
   Object.assign(D, profile.data||{});
   // Re-render parent sections with this child's data
@@ -2421,10 +2453,29 @@ function parentDrillChild(id){
   renderBehaviorLog();
   renderGradeMonitor();
   renderParentActivityFeed();
-  showToast('Viewing '+profile.name+'\'s data');
-  // Restore original data after render
-  // Actually keep it showing until they switch back
+  showToast('Viewing '+profile.name+'\'s data — navigate away to return');
 }
+
+// Restore D to the parent's pre-drill snapshot. Idempotent — safe to call
+// from multiple exit paths (nav, profile switch, lock, beforeunload).
+function parentDrillExit(){
+  if(!_parentDrillActive || !_parentDrillSnapshot) return;
+  const snap = _parentDrillSnapshot;
+  _parentDrillSnapshot = null;
+  _parentDrillActive = false;
+  for(const key in D){ if(D.hasOwnProperty(key)) delete D[key]; }
+  Object.assign(D, snap);
+  if(typeof renderParentScore === 'function') renderParentScore();
+  if(typeof renderParentOverview === 'function') renderParentOverview();
+}
+window.parentDrillExit = parentDrillExit;
+
+// Safety net: a tab close or page refresh while drilled would leave the next
+// session reading stale localStorage. Restore synchronously here so the final
+// save() (if any caller fires one) carries the parent's data, not the child's.
+window.addEventListener('beforeunload', function(){
+  if(_parentDrillActive) parentDrillExit();
+});
 
 const DRIVER_CHECKLIST = [
   { id:'permit',      cat:'📋 Before You Drive',        label:'Got my learner\'s permit' },
@@ -3047,9 +3098,15 @@ function approveSelfChore(id, points){
   if(!chore) return;
   chore.status = 'approved';
   chore.pointsAwarded = points;
-  // Add to chore points
-  if(!D.chorePoints) D.chorePoints = 0;
-  D.chorePoints += points;
+  // Add to chore points — canonical shape is {total,spent}; defensive init
+  // protects against legacy number/array shapes that may exist in older blobs.
+  if(!D.chorePoints || typeof D.chorePoints !== 'object' || Array.isArray(D.chorePoints)){
+    const legacy = typeof D.chorePoints === 'number' ? D.chorePoints : 0;
+    D.chorePoints = {total: legacy, spent: 0};
+  }
+  if(typeof D.chorePoints.total !== 'number') D.chorePoints.total = 0;
+  if(typeof D.chorePoints.spent !== 'number') D.chorePoints.spent = 0;
+  D.chorePoints.total += points;
   // Also add PB
   earnPB(Math.round(points/2), 'Self-initiated: ' + chore.text);
   save();
@@ -4892,7 +4949,7 @@ function _collectChildStats(d, weeksAgo){
   const moodAvg       = (()=>{ const ms=(d.moods||[]).filter(m=>m.date>=ws&&m.date<=we); return ms.length?Math.round(ms.reduce((s,m)=>s+m.level,0)/ms.length*10)/10:null; })();
   const studySessions = (d.studyLog||[]).filter(s=>s.date&&s.date.replace(/\//g,'-')>=ws&&s.date.replace(/\//g,'-')<=we).length;
   const journalEntries= (Array.isArray(d.journal)?d.journal:[]).filter(j=>j.date>=ws&&j.date<=we).length;
-  const goalsCompleted= (Array.isArray(d.goals)?d.goals:[]).filter(g=>g.done&&g.doneDate&&g.doneDate>=ws&&g.doneDate<=we).length;
+  const goalsCompleted= (Array.isArray(d.goals)?d.goals:[]).filter(g=>{ const cd=g.completedDate||g.doneDate||g.achievedDate; return g.done && cd && cd>=ws && cd<=we; }).length;
   const positiveBeh   = (Array.isArray(d.behaviorLog)?d.behaviorLog:[]).filter(b=>b.date>=ws&&b.date<=we&&b.type==='positive').length;
   const negativeBeh   = (Array.isArray(d.behaviorLog)?d.behaviorLog:[]).filter(b=>b.date>=ws&&b.date<=we&&b.type==='negative').length;
   const classes       = d.classes||[];
@@ -4930,7 +4987,7 @@ async function generateWeeklySummary(childId, sendEmail){
 
   outEl.style.display = 'block';
   outEl.innerHTML = `<div style="padding:1rem;text-align:center;color:var(--tx2);font-size:.78rem;">
-    <div style="font-size:1.4rem;margin-bottom:.4rem;">⏳</div>Generating ${child.name}'s report with AI analysis…</div>`;
+    <div style="font-size:1.4rem;margin-bottom:.4rem;">⏳</div>Generating ${escapeHtml(child.name)}'s report with AI analysis…</div>`;
 
   const d    = child.data||{};
   const curr = _collectChildStats(d, 0);

@@ -29,7 +29,7 @@ function saveGoal(){
   const mEl = document.getElementById('gMotivation'); if(mEl) mEl.value = '';
   save(); renderGoals(); closeModal('goalAddModal'); showToast('Goal added! 🎯');
 }
-function toggleGoal(id){ const g=(Array.isArray(D.goals)?D.goals:[]).find(g=>g.id===id); if(g){g.done=!g.done;if(g.done)g.achievedDate=new Date().toLocaleDateString();save();renderGoals();showToast(g.done?'🏆 Goal achieved!':'Unchecked');} }
+function toggleGoal(id){ const g=(Array.isArray(D.goals)?D.goals:[]).find(g=>g.id===id); if(g){g.done=!g.done;if(g.done)g.completedDate=new Date().toLocaleDateString();save();renderGoals();showToast(g.done?'🏆 Goal achieved!':'Unchecked');} }
 function editGoal(id){ const g=(Array.isArray(D.goals)?D.goals:[]).find(g=>g.id===id); if(!g) return; const n=prompt('Edit:',g.text); if(!n) return; g.text=n.trim(); save(); renderGoals(); }
 function gFilter(f,btn){ _gFilter=f; document.querySelectorAll('.goalTabs .tab').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); renderGoals(); }
 
@@ -45,6 +45,15 @@ function goalProgressPct(g){
 function renderGoals(){
   const el = document.getElementById('goalsList'); if(!el) return;
   let goals = D.goals || [];
+
+  // One-time migration of legacy completion-stamp field names. Older blobs
+  // may carry `doneDate` (writer path) or `achievedDate` (toggleGoal path);
+  // canonicalize to `completedDate` so reads downstream are uniform.
+  goals.forEach(g=>{
+    if(!g.completedDate && (g.doneDate || g.achievedDate)){
+      g.completedDate = g.doneDate || g.achievedDate;
+    }
+  });
 
   // Stats (unchanged)
   const statsEl = document.getElementById('gvStats');
@@ -112,7 +121,7 @@ function renderGoalCard(g){
 
   // Completion stamp shown only when done.
   const doneStamp = g.done
-    ? `<div style="margin-top:.55rem;padding:.4rem .8rem;background:rgba(249,115,22,.08);border-radius:8px;font-size:.78rem;color:var(--section-goals);font-weight:600;">🎉 Completed ${g.doneDate||''}</div>`
+    ? `<div style="margin-top:.55rem;padding:.4rem .8rem;background:rgba(249,115,22,.08);border-radius:8px;font-size:.78rem;color:var(--section-goals);font-weight:600;">🎉 Completed ${g.completedDate||''}</div>`
     : '';
 
   return `
@@ -121,7 +130,7 @@ function renderGoalCard(g){
         <div class="gv-goal-check" onclick="completeGoal(${g.id})" style="${g.done?'background:var(--section-goals);border-color:var(--section-goals);color:#fff;':''}">${g.done?'✓':''}</div>
         <div class="gv-goal-body" style="flex:1;min-width:0;">
           <div class="gv-goal-text">${escapeHtml(g.text)}</div>
-          <div class="gv-goal-meta">${typeTag}<span class="gv-goal-cat">${g.cat||''}</span><span class="gv-goal-date">${g.doneDate||g.date||''}</span></div>
+          <div class="gv-goal-meta">${typeTag}<span class="gv-goal-cat">${g.cat||''}</span><span class="gv-goal-date">${g.completedDate||g.date||''}</span></div>
           ${motHtml}
         </div>
         ${ringHtml ? `<div style="flex-shrink:0;align-self:flex-start;">${ringHtml}</div>` : ''}
@@ -243,7 +252,7 @@ function checkGoalAutoComplete(gid){
   const allDone = g.milestones.every(m => m.done);
   if(allDone && !g.done){
     g.done = true;
-    g.doneDate = new Date().toLocaleDateString();
+    g.completedDate = new Date().toLocaleDateString();
     save();
     const pbAmt = g.type === 'long' ? 25 : 10;
     if(typeof earnPB === 'function') earnPB(pbAmt, 'Goal completed: '+g.text);
@@ -265,7 +274,7 @@ function showGoalCompletionCard(g){
   card.innerHTML = '<div style="font-size:1.9rem;line-height:1;margin-bottom:.4rem;">🎉</div>'
     + '<div style="font-family:var(--fh);font-size:1.35rem;letter-spacing:.04em;margin-bottom:.3rem;">You did it!</div>'
     + '<div style="font-size:.94rem;font-weight:600;line-height:1.4;">'+escapeHtml(g.text)+'</div>'
-    + '<div style="font-size:.74rem;opacity:.85;margin-top:.4rem;">Completed '+(g.doneDate||new Date().toLocaleDateString())+'</div>';
+    + '<div style="font-size:.74rem;opacity:.85;margin-top:.4rem;">Completed '+(g.completedDate||new Date().toLocaleDateString())+'</div>';
   document.body.appendChild(card);
   requestAnimationFrame(() => {
     card.style.opacity = '1';
@@ -374,7 +383,7 @@ function completeGoal(id){
   const g = D.goals.find(g=>g.id===id); if(!g) return;
   const wasDone = g.done;
   g.done = !g.done;
-  g.doneDate = g.done ? new Date().toLocaleDateString() : null;
+  g.completedDate = g.done ? new Date().toLocaleDateString() : null;
   save(); renderGoals();
   if(g.done && !wasDone){
     const pbAmt = g.type==='long' ? 25 : 10;
@@ -438,7 +447,15 @@ function openTlEdit(yr){
 }
 
 function saveTl(){
-  if(!D.timeline) D.timeline={};
+  // Canonical shape is object keyed by year (1/3/5/10). DEF was [] in older
+  // builds and writing to D.timeline[yr] on an array produces a sparse array.
+  // Coerce here so any old user data is normalized on first write.
+  if(!D.timeline || Array.isArray(D.timeline) || typeof D.timeline !== 'object'){
+    const legacy = (D.timeline && Array.isArray(D.timeline)) ? D.timeline : null;
+    D.timeline = {};
+    // Preserve any indices that happen to map to {1,3,5,10}.
+    if(legacy){ [1,3,5,10].forEach(yr=>{ if(legacy[yr]) D.timeline[yr] = legacy[yr]; }); }
+  }
   D.timeline[_tlEditYear] = document.getElementById('tlEditArea').value.trim();
   save(); renderTimeline(); closeModal('tlEditModal');
   showToast(`${_tlEditYear}-year vision saved!`);

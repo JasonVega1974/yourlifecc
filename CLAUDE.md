@@ -128,12 +128,12 @@ If the guardian returns `FAIL`, restore the tail before any further edits — do
 ## index.html Tail Integrity (Non-Negotiable)
 
 After any edit to `/app/index.html`, the index-html-guardian agent must verify the tail is intact:
-- `function tick()` exists (currently ~line 6343)
-- `setInterval(tick` exists (currently ~line 6358)
-- Google Translate script tag present before `</body>` (currently ~line 6551)
-- File should be ~6829 lines
+- `function tick()` exists (currently ~line 11900)
+- `setInterval(tick` exists (currently ~line 11915)
+- Google Translate script tag present before `</body>` (currently ~line 12163)
+- File should be ~13145 lines
 
-These line numbers shift with edits — the agent verifies presence, not exact position.
+These line numbers shift with edits — the agent verifies presence, not exact position. Baseline refreshed 2026-05-23.
 
 ## Roadmap & Current Phase
 

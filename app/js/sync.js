@@ -5,6 +5,18 @@
 // ── STORAGE ─────────────────────────────────────────────────
 const LS='lifeos_v2', CU='lifeos_cu', CK='lifeos_ck';
 
+// ── DATE HELPER ─────────────────────────────────────────────
+// new Date().toISOString().split('T')[0] returns the UTC date — for users
+// west of UTC after ~16:00 local, that string is already "tomorrow" relative
+// to the user's clock, which breaks "today's events" matching. This helper
+// returns the local-clock YYYY-MM-DD string instead. Pass a Date or omit.
+function localDateString(d){
+  d = d || new Date();
+  return d.getFullYear() + '-' +
+    String(d.getMonth()+1).padStart(2,'0') + '-' +
+    String(d.getDate()).padStart(2,'0');
+}
+
 // ── DEVICE-OWNER GUARD ─────────────────────────────────────
 // Every signed-in user "claims" this device by stamping their user_id into
 // localStorage. On the next sign-in, if the stamp doesn't match the current
@@ -55,6 +67,10 @@ function _ylccEnforceOwner(userId){
 }
 
 function save(){
+  // Parent-hub drill-down guard: while D holds a drilled child's data,
+  // save()/cloudSync() would write the child's data under the parent's
+  // user_id and corrupt the parent profile row. Block until parentDrillExit().
+  if(typeof window._isParentDrillActive === 'function' && window._isParentDrillActive()) return;
   // Sync resume fields to D before saving
   const rFields=['rName','rTitle','rEmail','rPhone','rLocation','rLinkedin','rWebsite','rSummary','rSkills','rCerts','rLangs'];
   if(document.getElementById('rName')){
