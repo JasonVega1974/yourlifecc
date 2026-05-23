@@ -581,7 +581,7 @@ async function createAccount(){
     // (which would skip register-family — the only callsite for free
     // profile creation in the repo, verified via grep).
     if(!authData?.user){
-      throw new Error('This email already has an account. Check your inbox for the confirmation link, or sign in instead.');
+      throw new Error('An account with this email may already exist. Check your inbox for a confirmation link from YourLife CC, or try signing in. Need help? Contact info@kingdom-creatives.com');
     }
 
     const userId = authData.user.id;
@@ -660,8 +660,15 @@ async function createAccount(){
 
   } catch(err){
     showErr(err.message || 'Something went wrong. Please try again.');
-    btn.disabled=false;
-    btn.innerHTML='🚀 Create My Family Account';
+  } finally {
+    // Always re-enable the launch button, on success AND failure. The
+    // success path has already moved to step 4 so the now-enabled
+    // button is hidden and the reset is invisible. The failure path
+    // surfaces the toast and leaves a usable button so the user can
+    // correct the form and retry — no stuck-disabled state regardless
+    // of how the function exits.
+    btn.disabled = false;
+    btn.innerHTML = '🚀 Create My Family Account';
   }
 }
 
