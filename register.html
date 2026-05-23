@@ -580,6 +580,11 @@ async function createAccount(){
         body: JSON.stringify({
           userId, name, email, plan, familyId,
           couponCode: appliedCoupon ? appliedCoupon.id : null,
+          // Pass-through to Stripe metadata.referred_by — the webhook's
+          // checkout.session.completed branch reads this to credit the
+          // referrer with contest entries. Without it, paid signups via
+          // a referral code earn the new user nothing.
+          referredBy: referredBy || null,
         })
       });
       const csData = await csResp.json();

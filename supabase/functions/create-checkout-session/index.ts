@@ -22,11 +22,14 @@
 // Set verify_jwt = true in the function config (anon JWT required as a
 // baseline DDoS deterrent, same as register-family).
 //
-// Stripe webhook must handle `checkout.session.completed` to create the
-// families row using metadata.{familyId, plan, userId, name}. If the
-// existing stripe-webhook function only listens for
-// `customer.subscription.created` / `invoice.paid`, add the
-// checkout.session.completed branch before deploying this.
+// Stripe webhook contract (verified against the deployed stripe-webhook
+// function, May 2026): the checkout.session.completed branch reads
+//   - session.customer_details.email / session.customer_email  (primary key)
+//   - session.metadata.plan          (falls back to 'monthly')
+//   - session.metadata.referred_by   (for the referrer-bonus contest entries)
+// It calls provisionUser() which generates its own server-side family id
+// via email lookup and ignores the metadata.familyId/userId/name fields
+// we set below. Those three are forwarded for future-compat / audit only.
 //
 // Called from: register.html createAccount() — paid plans only.
 
@@ -88,6 +91,7 @@ Deno.serve(async (req: Request) => {
     plan,
     familyId,
     couponCode = null,
+    referredBy = null,
   } = body || {};
 
   // ── Validate inputs ────────────────────────────────────────
@@ -132,8 +136,11 @@ Deno.serve(async (req: Request) => {
     success_url:    SUCCESS_URL,
     cancel_url:     CANCEL_URL,
     metadata: {
-      familyId,
+      // Read by the webhook today: plan, referred_by.
+      // Forwarded for future-compat / audit only: familyId, userId, name.
       plan,
+      referred_by: (typeof referredBy === 'string' && referredBy.trim()) ? referredBy.trim() : '',
+      familyId,
       userId,
       name: name || '',
     },
@@ -145,7 +152,12 @@ Deno.serve(async (req: Request) => {
   if (isSubscription) {
     sessionConfig.subscription_data = {
       trial_period_days: 3,
-      metadata: { familyId, plan, userId },
+      metadata: {
+        familyId,
+        plan,
+        userId,
+        referred_by: (typeof referredBy === 'string' && referredBy.trim()) ? referredBy.trim() : '',
+      },
     };
   }
 

@@ -26,6 +26,17 @@
   <p>Please wait, do not close this tab.</p>
 </div>
 
+<!-- ── POST-STRIPE-CHECKOUT STATE (?session_id=...) ── -->
+<!-- Shown when the user returns from Stripe Checkout, before email is confirmed. -->
+<div class="msg" id="checkoutState" style="display:none;">
+  <div style="font-size:2.6rem;margin-bottom:.5rem;">✅</div>
+  <div style="font-size:1.1rem;font-weight:700;color:#fff;">Payment received</div>
+  <p>Thanks — Stripe has your payment details. <strong style="color:#e2e8f0;">One more step:</strong> open the confirmation email from YourLife CC (check spam too) and click the link to verify your email and finish setup.</p>
+  <p class="small" id="checkoutEmailHint" style="margin-top:.8rem;"></p>
+  <p class="small">Didn't get the email? <a href="#" id="checkoutResendLink" style="color:#38bdf8;text-decoration:underline;">Resend activation link</a></p>
+  <p class="small">Need help? Email <a href="mailto:info@kingdom-creatives.com" style="color:#38bdf8;">info@kingdom-creatives.com</a></p>
+</div>
+
 <!-- ── ERROR / EXPIRED STATE ── -->
 <div class="msg" id="errorState" style="display:none;">
   <div style="font-size:2.4rem;margin-bottom:.5rem;">⏱️</div>
@@ -107,7 +118,46 @@
     btn.disabled = false; btn.textContent = 'Resend activation email';
   }
 
+  // ── Stripe-Checkout return branch ──
+  // success_url from create-checkout-session is .../activate.html?session_id=...
+  // That redirect happens BEFORE the user clicks the email confirmation link,
+  // so there is no Supabase token in the hash and the normal polling path
+  // would time out and show the wrong error. Show a payment-received panel
+  // instead and tell the user to open their email.
+  function showCheckoutState(){
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('checkoutState').style.display = 'block';
+    let last = null;
+    try { last = localStorage.getItem('ylcc_last_signup_email'); } catch(e) {}
+    if(last){
+      document.getElementById('checkoutEmailHint').innerHTML =
+        'Sent to <strong style="color:#e2e8f0;">' + last.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) + '</strong>';
+    }
+    const resend = document.getElementById('checkoutResendLink');
+    if(resend){
+      resend.addEventListener('click', function(e){
+        e.preventDefault();
+        // Reuse the existing error-state resend form by toggling visibility.
+        document.getElementById('checkoutState').style.display = 'none';
+        document.getElementById('errorState').style.display = 'block';
+        document.getElementById('errorDetail').textContent =
+          'Enter your email below and we\'ll send a fresh activation link.';
+        try {
+          const e2 = localStorage.getItem('ylcc_last_signup_email');
+          if(e2) document.getElementById('resendEmail').value = e2;
+        } catch(_) {}
+      });
+    }
+  }
+
   async function activate() {
+    // 0. Stripe Checkout return — short-circuit before any auth polling.
+    const sessionId = new URLSearchParams(window.location.search).get('session_id');
+    if(sessionId){
+      showCheckoutState();
+      return;
+    }
+
     // 1. If the hash carries an error from Supabase, show the error UI and stop.
     const hashParams = parseHash();
     if(hashParams.error || hashParams.error_code){
