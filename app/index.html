@@ -2675,6 +2675,134 @@
   </div>
 </section>
 
+<!-- ════════════ HABITS (first-class tab — Commit 1: Today + Streaks fully built) ════════════ -->
+<section id="s-habits" class="sec">
+
+  <!-- Scoped styles -->
+  <style>
+    #s-habits .habits-tabs{
+      display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .8rem;
+      scrollbar-width:none;-ms-overflow-style:none;
+      margin-bottom:.4rem;
+    }
+    #s-habits .habits-tabs::-webkit-scrollbar{display:none;}
+    #s-habits .hb-tab{
+      flex-shrink:0;padding:.5rem .9rem;border-radius:999px;
+      background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+      color:var(--tx2);font-size:.72rem;font-weight:700;font-family:var(--fn);
+      letter-spacing:.5px;cursor:pointer;transition:all .18s;white-space:nowrap;
+    }
+    #s-habits .hb-tab:hover{background:rgba(255,255,255,.08);color:var(--tx);}
+    #s-habits .hb-tab.active{
+      background:linear-gradient(135deg,#34d399,#22d3ee);
+      color:#0a1f5e;border-color:transparent;
+      box-shadow:0 4px 14px rgba(52,211,153,.28);
+    }
+    :root.light #s-habits .hb-tab{
+      background:rgba(15,23,42,.04)!important;
+      border-color:rgba(15,23,42,.10)!important;
+      color:#4a4b52!important;
+    }
+    :root.light #s-habits .hb-tab.active{
+      background:linear-gradient(135deg,#34d399,#22d3ee)!important;
+      color:#0a1f5e!important;
+    }
+    #s-habits .hb-tile:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.18);}
+    #s-habits .hb-stub{
+      padding:2.5rem 1.5rem;text-align:center;
+      background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.12);
+      border-radius:14px;color:var(--tx2);font-size:.82rem;line-height:1.6;
+    }
+    #s-habits .hb-stub-icon{font-size:2.4rem;margin-bottom:.4rem;}
+    #s-habits .hb-stub-label{
+      font-family:var(--fh);font-size:.78rem;font-weight:800;letter-spacing:1.5px;
+      color:var(--tx);margin-bottom:.3rem;
+    }
+  </style>
+
+  <!-- Section header -->
+  <div class="sh">
+    <div class="si">⚡</div>
+    <div class="st">Habits</div>
+    <span class="tip-wrap">
+      <span class="tip-btn">?</span>
+      <span class="tip-box tip-right">
+        <span class="tip-title">HOW TO USE</span><br>
+        Build daily habits across Morning / Afternoon / Evening. Tap to check off. Streaks build over time. Tap "Library" for ideas (next deploy) and "Science" to learn the why.
+      </span>
+    </span>
+    <div class="sl"></div>
+  </div>
+
+  <!-- Hero: rotating tagline + completion ring -->
+  <div id="habitsHero"></div>
+
+  <!-- Sub-tab pills -->
+  <div class="habits-tabs" role="tablist" aria-label="Habits sub-sections">
+    <button class="hb-tab active" role="tab" aria-selected="true"  data-hb-sub="today"     onclick="habitsTab('today',this)">🌅 Today</button>
+    <button class="hb-tab"        role="tab" aria-selected="false" data-hb-sub="streaks"   onclick="habitsTab('streaks',this)">🔥 Streaks</button>
+    <button class="hb-tab"        role="tab" aria-selected="false" data-hb-sub="analytics" onclick="habitsTab('analytics',this)">📊 Analytics</button>
+    <button class="hb-tab"        role="tab" aria-selected="false" data-hb-sub="stack"     onclick="habitsTab('stack',this)">🔗 Stack</button>
+    <button class="hb-tab"        role="tab" aria-selected="false" data-hb-sub="library"   onclick="habitsTab('library',this)">📚 Library</button>
+    <button class="hb-tab"        role="tab" aria-selected="false" data-hb-sub="science"   onclick="habitsTab('science',this)">🧪 Science</button>
+  </div>
+
+  <!-- TODAY -->
+  <div id="hb-today" class="hb-panel">
+    <div id="habitsTodayByTime"></div>
+  </div>
+
+  <!-- STREAKS -->
+  <div id="hb-streaks" class="hb-panel" style="display:none;">
+    <div id="habitsStreakSummary"></div>
+    <div id="habits66Tracker"></div>
+    <div id="habitsHeatmap"></div>
+    <div id="habitsBadges"></div>
+  </div>
+
+  <!-- ANALYTICS (Commit 2) -->
+  <div id="hb-analytics" class="hb-panel" style="display:none;">
+    <div class="hb-stub">
+      <div class="hb-stub-icon">📊</div>
+      <div class="hb-stub-label">ANALYTICS</div>
+      Weekly completion trends, best day of week, and time-of-day success
+      rate charts ship in the next deploy. Chart.js is now loaded and ready.
+    </div>
+  </div>
+
+  <!-- HABIT STACK (Commit 2) -->
+  <div id="hb-stack" class="hb-panel" style="display:none;">
+    <div class="hb-stub">
+      <div class="hb-stub-icon">🔗</div>
+      <div class="hb-stub-label">HABIT STACK</div>
+      Build "After I [cue], I will [habit]" routines that anchor new habits
+      to existing ones. Drag-to-reorder builder ships in the next deploy.
+    </div>
+  </div>
+
+  <!-- LIBRARY (Commit 2) -->
+  <div id="hb-library" class="hb-panel" style="display:none;">
+    <div class="hb-stub">
+      <div class="hb-stub-icon">📚</div>
+      <div class="hb-stub-label">LIBRARY</div>
+      60+ curated habits across Health, Mind, Faith, Productivity, Social,
+      and Financial categories. One-tap "Add to My Habits". Ships next deploy.
+    </div>
+  </div>
+
+  <!-- SCIENCE (Commit 3) -->
+  <div id="hb-science" class="hb-panel" style="display:none;">
+    <div class="hb-stub">
+      <div class="hb-stub-icon">🧪</div>
+      <div class="hb-stub-label">SCIENCE</div>
+      Six cards on the 3R loop, the 66-day myth, implementation intentions,
+      habit stacking, environment design, and the 2-minute rule.
+      Ships in the final habits deploy.
+    </div>
+  </div>
+
+</section>
+
 <!-- ════════════ GOALS ════════════════════════════════════════ -->
 <section id="s-goals" class="sec">
 
@@ -12119,6 +12247,7 @@
 <script src="/app/js/skills.js"></script>
 <script src="/app/js/chores.js"></script>
 <script src="/app/js/sports.js"></script>
+<script src="/app/js/habits.js"></script>
 <script src="/app/js/data/plans.js"></script>
 <script src="/app/js/data/memory-verses.js"></script>
 <script src="/app/js/data/academy.js"></script>

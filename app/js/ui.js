@@ -1025,6 +1025,7 @@ const NAV_ITEMS = [
   ]},
   {id:'_group_wellness', icon:'💚', label:'Wellness', isGroup:true, children:[
     {id:'s-health',    icon:'💪', label:'Health',         key:'health'},
+    {id:'s-habits',    icon:'⚡', label:'Habits',         key:'habits'},
     {id:'s-journal',   icon:'✍️', icon:'✍️',label:'Journal',        key:'journal'},
     {id:'s-mood',      icon:'😊', label:'Mood Tracker',   key:'mood'},
     {id:'s-motivation',icon:'🔥', label:'Fuel Wall',      key:'motivation'},
@@ -1807,6 +1808,7 @@ function showSection(id, fromMobile){
   if(id==='s-sports')     setTimeout(()=>{ typeof renderSports==='function'&&renderSports(); },60);
   if(id==='s-growing')    setTimeout(()=>{ typeof buildGrowingGrid==='function'&&buildGrowingGrid(); },60);
   if(id==='s-skills')     setTimeout(()=>{ typeof initSkillsGrid==='function'&&initSkillsGrid(); },60);
+  if(id==='s-habits')     setTimeout(()=>{ typeof initHabits==='function'&&initHabits(); },60);
   if(id==='s-motivation') setTimeout(()=>{ typeof renderMotivation==='function'&&renderMotivation(); },60);
   if(id==='s-mentors')    setTimeout(()=>{ typeof renderMentors==='function'&&renderMentors(); },60);
 
