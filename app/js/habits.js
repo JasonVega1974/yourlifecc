@@ -256,6 +256,7 @@ function habitsTab(name, btn){
   else if(name === 'analytics') renderHabitsAnalytics();
   else if(name === 'stack')     renderHabitsStack();
   else if(name === 'library')   renderHabitsLibrary();
+  else if(name === 'science')   renderHabitsScience();
 }
 
 // ── HERO ─────────────────────────────────────────────────────
@@ -1135,11 +1136,246 @@ function libraryAdd(cat, idx, btnEl){
   }
 }
 
+// ── SCIENCE PANEL ────────────────────────────────────────────
+// Six cards on the behavioural science behind habit formation. Same
+// substance level as the Faith-tab Proof & Prophecy cards: a clear
+// headline, two short body paragraphs, a "try this today" practical
+// takeaway, and a research/source anchor. Carousel with prev/next +
+// dot indicators; no touch-swipe (extra complexity, not in scope).
+const HABIT_SCIENCE_CARDS = [
+  {
+    icon:    '🔁',
+    title:   'The 3R Loop',
+    subtitle:'Cue → Routine → Reward',
+    body: [
+      "Every habit your brain has ever formed runs the same three-step loop. A CUE triggers a craving (the smell of coffee, the phone buzz, the 3 PM crash). The ROUTINE is the behaviour you perform in response (pour the coffee, open Instagram, grab a snack). The REWARD is what your brain logs as worth repeating (caffeine hit, dopamine, sugar).",
+      "Once the brain has the loop, the cue alone is enough to start the routine — automatically, without you deciding. That's why willpower fails: by the time you notice you're scrolling, the cue already fired. The way out is not more willpower. It's redesigning the loop."
+    ],
+    tryThis: "Pick one habit you want to stop. Write down its three R's — what cue triggers it? what routine runs? what reward does your brain expect? Just naming the loop weakens it.",
+    source:  "Charles Duhigg, The Power of Habit (2012)",
+  },
+  {
+    icon:    '📅',
+    title:   '66 Days, Not 21',
+    subtitle:'The myth of the 21-day habit',
+    body: [
+      "The \"21 days makes a habit\" claim comes from a 1960 plastic-surgery book where Dr. Maltz observed his patients took roughly 21 days to adjust to their new faces. It was an observation about acceptance — not a study of habit formation.",
+      "The actual research (Lally, van Jaarsveld, Potts & Wardle, European Journal of Social Psychology, 2010) tracked 96 people forming new habits over 12 weeks. The average time for a behaviour to become automatic was 66 days. The range was 18 to 254 days depending on the habit's difficulty. Simple habits (drinking water at breakfast) formed faster; harder ones (50 sit-ups before lunch) much slower."
+    ],
+    tryThis: "If you're past day 21 and the habit still feels effortful, you're not broken. You're on day 21. Keep going. The science says the line you're looking for is closer to day 66 — and longer for harder behaviours.",
+    source:  "Lally et al., 'How are habits formed' (2010), Eur. J. of Social Psych.",
+  },
+  {
+    icon:    '🎯',
+    title:   'Implementation Intentions',
+    subtitle:'When X happens, I will do Y',
+    body: [
+      "Goals are vague (\"I'll exercise more\"). Implementation intentions are specific (\"When my alarm goes off at 6:30 AM, I will put on the running shoes I left by my bed\"). The format is rigid for a reason: it pre-decides the moment, the location, and the action so the brain doesn't have to deliberate when the cue fires.",
+      "A meta-analysis of 94 studies (Gollwitzer & Sheeran, 2006) found people who wrote implementation intentions were 2–3× more likely to follow through than people with the same goal but no plan. The difference is not motivation — it's removing the decision from the moment of action."
+    ],
+    tryThis: "Pick one habit on your list. Fill in the blanks out loud: \"When ___ happens, in ___, I will ___.\" Write it down. Put it where you'll see it before the cue fires.",
+    source:  "Gollwitzer & Sheeran, 'Implementation intentions and goal achievement' (2006)",
+  },
+  {
+    icon:    '🔗',
+    title:   'Habit Stacking',
+    subtitle:'Anchor the new to the already-automatic',
+    body: [
+      "Starting a habit from scratch means manufacturing a cue. Stacking means using a cue you already have. The format: \"After I [current habit], I will [new habit].\" After I pour my morning coffee, I will read one page. After I brush my teeth, I will do ten push-ups. After I sit down for dinner, I will say one thing I'm grateful for.",
+      "The current habit is already automatic — it doesn't need willpower. By piggybacking the new behaviour onto the old one, you inherit the existing cue for free. James Clear calls this the most reliable shortcut he knows for building new habits."
+    ],
+    tryThis: "Open the Habit Stack sub-tab. Build one chain. The first habit in the chain should be something you already do without thinking (brush teeth, pour coffee, sit down at your desk). Everything else hangs off that anchor.",
+    source:  "James Clear, Atomic Habits (2018), ch. 5",
+  },
+  {
+    icon:    '🏠',
+    title:   'Environment Design',
+    subtitle:'Make good obvious, bad invisible',
+    body: [
+      "You are not a person with infinite self-control fighting your environment all day. You are a body that responds to whatever your environment makes obvious, attractive, easy, and rewarding. Most of what looks like willpower is actually environment.",
+      "The intervention is simple: increase friction on the bad habit (phone in another room, junk food in the back of the pantry, social media apps deleted from the home screen) and decrease friction on the good one (water bottle on the desk, book on the pillow, gym clothes laid out the night before). Studies of habit change repeatedly find environment changes outperform motivation interventions by a wide margin."
+    ],
+    tryThis: "Walk through one room you spend a lot of time in. Find one thing you can move, hide, or place in plain sight to nudge a habit in the right direction. Do that thing right now, before you keep reading.",
+    source:  "BJ Fogg, Tiny Habits (2019); James Clear, Atomic Habits (2018), ch. 6–8",
+  },
+  {
+    icon:    '⏱️',
+    title:   'The 2-Minute Rule',
+    subtitle:'Start ridiculously small',
+    body: [
+      "The biggest reason habits fail is starting too big. \"I'll run 30 minutes every morning\" lasts three days. \"I'll put on my running shoes every morning\" lasts months — and somewhere in those months the running shoes turn into a real run.",
+      "The 2-Minute Rule: take any habit you want to build and shrink the entry point until you can do it in two minutes or less. Read for 20 minutes → open the book. Meditate for 10 minutes → sit on the cushion and breathe once. Workout daily → walk to the gym. The point isn't the two minutes. The point is establishing the identity — the kind of person who shows up — without burning out before the loop forms."
+    ],
+    tryThis: "Pick the hardest habit on your list. Shrink it. What's the 2-minute version? Add THAT to your Today tab. The bigger version will follow once the entry-point habit is automatic.",
+    source:  "James Clear, Atomic Habits (2018), ch. 13",
+  },
+];
+
+let _habitsScienceIdx = 0;
+
+function renderHabitsScience(){
+  const wrap = document.getElementById('habitsScienceBody');
+  if(!wrap) return;
+  const total = HABIT_SCIENCE_CARDS.length;
+  const i = ((_habitsScienceIdx % total) + total) % total;  // normalize negatives
+  const c = HABIT_SCIENCE_CARDS[i];
+
+  const dots = HABIT_SCIENCE_CARDS.map((_, idx) => `
+    <button onclick="habitsScienceGo(${idx})" aria-label="Card ${idx+1}"
+            style="width:8px;height:8px;border-radius:50%;
+                   background:${idx === i ? '#22d3ee' : 'rgba(255,255,255,.18)'};
+                   border:none;padding:0;cursor:pointer;transition:all .2s;
+                   margin:0 3px;"></button>
+  `).join('');
+
+  wrap.innerHTML = `
+    <div style="background:linear-gradient(135deg,rgba(34,211,238,.08),rgba(167,139,250,.04));
+                border:1px solid rgba(34,211,238,.22);border-radius:16px;
+                padding:1.3rem 1.4rem;margin-bottom:.8rem;min-height:380px;
+                display:flex;flex-direction:column;">
+      <div style="display:flex;align-items:center;gap:.7rem;margin-bottom:.7rem;">
+        <div style="font-size:2.2rem;">${escapeHtml(c.icon)}</div>
+        <div>
+          <div style="font-size:.6rem;letter-spacing:1.5px;font-weight:800;color:#22d3ee;
+                      font-family:var(--fh);">CARD ${i + 1} OF ${total}</div>
+          <div style="font-family:var(--fh);font-size:1.15rem;font-weight:800;
+                      color:var(--tx);letter-spacing:.5px;margin-top:.1rem;">${escapeHtml(c.title)}</div>
+          <div style="font-size:.78rem;color:var(--tx2);font-style:italic;margin-top:.15rem;">${escapeHtml(c.subtitle)}</div>
+        </div>
+      </div>
+
+      <div style="flex:1;">
+        ${c.body.map(p => `
+          <p style="font-size:.85rem;color:var(--tx2);line-height:1.7;margin:0 0 .8rem;">
+            ${escapeHtml(p)}
+          </p>
+        `).join('')}
+
+        <div style="background:rgba(34,211,238,.06);border-left:3px solid #22d3ee;
+                    border-radius:0 8px 8px 0;padding:.7rem .9rem;margin:.9rem 0 .7rem;">
+          <div style="font-size:.6rem;letter-spacing:1.2px;font-weight:800;color:#22d3ee;
+                      margin-bottom:.25rem;">TRY THIS TODAY</div>
+          <div style="font-size:.82rem;color:var(--tx);line-height:1.65;">${escapeHtml(c.tryThis)}</div>
+        </div>
+
+        <div style="font-size:.66rem;color:var(--tx3);font-style:italic;margin-top:.6rem;">
+          ${escapeHtml(c.source)}
+        </div>
+      </div>
+    </div>
+
+    <!-- Carousel controls -->
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin-top:.5rem;">
+      <button onclick="habitsSciencePrev()"
+              style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+                     color:var(--tx);padding:.5rem .9rem;border-radius:10px;cursor:pointer;
+                     font-family:var(--fn);font-size:.72rem;font-weight:700;">← Prev</button>
+      <div style="display:flex;align-items:center;">${dots}</div>
+      <button onclick="habitsScienceNext()"
+              style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+                     color:var(--tx);padding:.5rem .9rem;border-radius:10px;cursor:pointer;
+                     font-family:var(--fn);font-size:.72rem;font-weight:700;">Next →</button>
+    </div>
+  `;
+}
+
+function habitsScienceNext(){ _habitsScienceIdx++; renderHabitsScience(); }
+function habitsSciencePrev(){ _habitsScienceIdx--; renderHabitsScience(); }
+function habitsScienceGo(i){ _habitsScienceIdx = i; renderHabitsScience(); }
+
+// ── SUPABASE MIGRATION HELPER ────────────────────────────────
+// Copies D.habitsV2 (the JSONB blob source-of-truth) into the dedicated
+// `habits` + `habit_completions` tables after docs/migrations/habits-schema.sql
+// has been applied. Idempotent — re-running is safe (upserts by habit id,
+// completions UNIQUE on habit_id+date). Silently no-ops if tables don't
+// exist yet, so calling before the SQL is applied is harmless.
+//
+// Manual invocation only: window.migrateHabitsToSupabase() from the
+// console while signed in. Not auto-fired from initHabits() — the SQL
+// migration is OPTIONAL until family leaderboards land (mirrors the
+// F2-F memory_verses opt-in pattern).
+async function migrateHabitsToSupabase(){
+  if(typeof getSupabase !== 'function'){
+    console.warn('[habits] getSupabase() not available — cannot migrate.');
+    return { ok:false, reason:'no-supabase-client' };
+  }
+  const sb = getSupabase();
+  if(!sb){ console.warn('[habits] Supabase client null.'); return { ok:false, reason:'no-supabase-client' }; }
+
+  const { data: { user } = {} } = (await sb.auth.getUser()) || {};
+  if(!user || !user.id){
+    console.warn('[habits] Not signed in.');
+    return { ok:false, reason:'no-session' };
+  }
+
+  initHabitsData();
+  const habits = Array.isArray(D.habitsV2) ? D.habitsV2 : [];
+  if(!habits.length){
+    console.log('[habits] No habits to migrate.');
+    return { ok:true, habitsMigrated:0, completionsMigrated:0 };
+  }
+
+  // Upsert habits. Insert completions in a second pass so habit_id FKs resolve.
+  const habitRows = habits.map(h => ({
+    id:             h.id,
+    user_id:        user.id,
+    name:           String(h.name || '').slice(0, 200),
+    emoji:          h.emoji || '✅',
+    category:       h.category || null,
+    time_of_day:    (['morning','afternoon','evening','anytime'].indexOf(h.timeOfDay) >= 0)
+                      ? h.timeOfDay : 'anytime',
+    cue:            h.cue || null,
+    stack_after:    h.stackAfter || null,
+    streak:         typeof h.streak === 'number' ? h.streak : getHabitCurrentStreak(h),
+    longest_streak: typeof h.longestStreak === 'number' ? h.longestStreak : getHabitLongestStreak(h),
+    created_at:     h.createdAt ? new Date(h.createdAt).toISOString() : new Date().toISOString(),
+    updated_at:     new Date().toISOString(),
+  }));
+
+  const { error: hErr } = await sb.from('habits').upsert(habitRows, { onConflict: 'id' });
+  if(hErr){
+    // Most likely cause: SQL migration hasn't been applied yet (table missing).
+    console.warn('[habits] habits upsert failed — has habits-schema.sql been applied?', hErr.message);
+    return { ok:false, reason:'habits-upsert-failed', error: hErr.message };
+  }
+
+  const completionRows = [];
+  habits.forEach(h => {
+    const comps = h.completions || {};
+    Object.keys(comps).forEach(dateKey => {
+      if(comps[dateKey]){
+        completionRows.push({
+          habit_id:       h.id,
+          user_id:        user.id,
+          completed_date: dateKey,
+        });
+      }
+    });
+  });
+
+  let completionsMigrated = 0;
+  if(completionRows.length){
+    // upsert with ignoreDuplicates so a re-run doesn't error on the
+    // UNIQUE(habit_id, completed_date) constraint.
+    const { error: cErr } = await sb
+      .from('habit_completions')
+      .upsert(completionRows, { onConflict: 'habit_id,completed_date', ignoreDuplicates: true });
+    if(cErr){
+      console.warn('[habits] completions upsert had errors:', cErr.message);
+      return { ok:false, reason:'completions-upsert-failed', error: cErr.message };
+    }
+    completionsMigrated = completionRows.length;
+  }
+
+  console.log(`[habits] Migrated ${habitRows.length} habits + ${completionsMigrated} completions to Supabase.`);
+  return { ok:true, habitsMigrated: habitRows.length, completionsMigrated };
+}
+
 // ── ENTRY POINTS ─────────────────────────────────────────────
 function renderHabitsAll(){
   renderHabitsHero();
   renderHabitsToday();
-  // Re-render Streaks/Analytics/Stack/Library lazily on tab switch.
+  // Re-render Streaks/Analytics/Stack/Library/Science lazily on tab switch.
 }
 
 function initHabits(){
@@ -1167,3 +1403,8 @@ window.addHabitToStack        = addHabitToStack;
 window.removeHabitFromStack   = removeHabitFromStack;
 window.moveStackHabit         = moveStackHabit;
 window.libraryAdd             = libraryAdd;
+window.renderHabitsScience    = renderHabitsScience;
+window.habitsScienceNext      = habitsScienceNext;
+window.habitsSciencePrev      = habitsSciencePrev;
+window.habitsScienceGo        = habitsScienceGo;
+window.migrateHabitsToSupabase= migrateHabitsToSupabase;
