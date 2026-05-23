@@ -325,6 +325,44 @@ if(urlPlan && PLAN_INFO[urlPlan]) setTimeout(()=>selectPlan(urlPlan), 100);
 const urlPath = new URLSearchParams(location.search).get('path');
 const _signupSource = (urlPath === 'solo') ? 'solo' : 'register';
 
+// ── Resume paid-checkout flow ────────────────────────────────────
+// When set-password.html sees ylcc_pending_plan = monthly/yearly/lifetime
+// it redirects here with ?resume_plan=... The user already has a confirmed
+// session at that point. createAccount() must NOT call signUp again (the
+// email is registered, signUp would return user:null and we'd loop back
+// to "Almost there"). _resumingPaid tells createAccount to skip signUp
+// and reuse the existing session.user.id directly.
+let _resumingPaid = false;
+let _resumeUserId = null;
+
+(async function checkResumePaidFlow(){
+  const resumePlan = new URLSearchParams(location.search).get('resume_plan');
+  if(!resumePlan || ['monthly','yearly','lifetime'].indexOf(resumePlan) < 0) return;
+  let session = null;
+  try {
+    const { data } = await _sb.auth.getSession();
+    session = data && data.session;
+  } catch(e) {
+    console.warn('[register] resume getSession failed:', e);
+  }
+  if(!session || !session.user){
+    // No session (timed out / different browser). Drop the resume_plan
+    // silently and let the normal signup flow run.
+    return;
+  }
+  _resumingPaid = true;
+  _resumeUserId = session.user.id;
+  const resumeEmail = session.user.email || '';
+  const resumeName  = (session.user.user_metadata && session.user.user_metadata.full_name) || '';
+  const regName  = document.getElementById('regName');
+  const regEmail = document.getElementById('regEmail');
+  if(regName  && resumeName)  regName.value  = resumeName;
+  if(regEmail && resumeEmail) regEmail.value = resumeEmail;
+  selectedPlan = resumePlan;
+  goStep(3);
+  setupStep3();
+})();
+
 function showErr(msg){ const el=document.getElementById('errMsg'); el.textContent=msg; el.style.display='block'; document.getElementById('okMsg').style.display='none'; }
 function showOk(msg){ const el=document.getElementById('okMsg'); el.textContent=msg; el.style.display='block'; document.getElementById('errMsg').style.display='none'; }
 function hideMessages(){ document.getElementById('errMsg').style.display='none'; document.getElementById('okMsg').style.display='none'; }
@@ -523,26 +561,38 @@ async function createAccount(){
   ) + '!A9z';
 
   try {
-    // 1. Create Supabase auth user (no session yet — email confirmation gates it)
-    const {data:authData, error:authError} = await _sb.auth.signUp({
-      email,
-      password: tempPass,
-      options: {
-        emailRedirectTo: 'https://yourlifecc.com/activate.html',
-        // signup_source goes into user_metadata so it survives cross-device
-        // (desktop signup → mobile email click). localStorage isn't enough.
-        data: { full_name: name, signup_source: _signupSource }
-      }
-    });
-    if(authError) throw new Error(authError.message);
+    let userId;
+    let authData = null;
+    if(_resumingPaid && _resumeUserId){
+      // Resume path — we already have a confirmed session from the prior
+      // signup attempt. Skip signUp entirely (it would return user:null
+      // because the email is already registered and we'd loop back to
+      // "Almost there"). Reuse the session.user.id directly.
+      userId = _resumeUserId;
+      console.log('[register] Resume paid checkout — reusing existing userId:', userId);
+    } else {
+      // 1. Create Supabase auth user (no session yet — email confirmation gates it)
+      const sign = await _sb.auth.signUp({
+        email,
+        password: tempPass,
+        options: {
+          emailRedirectTo: 'https://yourlifecc.com/activate.html',
+          // signup_source goes into user_metadata so it survives cross-device
+          // (desktop signup → mobile email click). localStorage isn't enough.
+          data: { full_name: name, signup_source: _signupSource }
+        }
+      });
+      const authError = sign.error;
+      authData = sign.data;
+      if(authError) throw new Error(authError.message);
 
-    // Debug logging during the beta — surfaces exactly what Supabase
-    // returned (user id or null + any error). Remove once delivery is
-    // confirmed stable.
-    console.log('[register] Supabase signUp result:', JSON.stringify({
-      user: authData?.user?.id || null,
-      error: authError?.message || null,
-    }));
+      // Debug logging during the beta — surfaces exactly what Supabase
+      // returned (user id or null + any error). Remove once delivery is
+      // confirmed stable.
+      console.log('[register] Supabase signUp result:', JSON.stringify({
+        user: authData?.user?.id || null,
+        error: authError?.message || null,
+      }));
 
     // Supabase returns {user:null, session:null} with no error on EVERY
     // successful signup when email confirmation is enabled — not only on
@@ -559,6 +609,11 @@ async function createAccount(){
       // confirm email first, then return here to complete payment.
       const _planIsPaid = (plan!=='free' && plan!=='sponsored');
       if(_planIsPaid){
+        // Stash the selected paid plan so set-password.html can redirect
+        // back here with ?resume_plan=... once the user has confirmed and
+        // we have a session. The resume flow above (checkResumePaidFlow)
+        // picks it up and skips signUp.
+        try { localStorage.setItem('ylcc_pending_plan', plan); } catch(e) {}
         const _escHtml = s => String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         const titleEl = document.querySelector('#s4 .form-title');
         const subEl   = document.querySelector('#s4 .form-sub');
@@ -582,7 +637,8 @@ async function createAccount(){
       return;
     }
 
-    const userId = authData.user.id;
+      userId = authData.user.id;
+    }
     const isPaid = (plan!=='free' && plan!=='sponsored');
 
     // Paid flow: redirect to Stripe Checkout for hosted payment + trial UI.
