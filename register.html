@@ -11,7 +11,10 @@
 <!-- Supabase JS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- Stripe JS -->
-<script src="https://js.stripe.com/v3/"></script>
+<!-- Stripe.js no longer needed client-side — the paid flow redirects to
+     Stripe Checkout (hosted page) so no Elements, no card tokenization,
+     no SCA challenges to manage here. -->
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{--bg:#060a12;--bg2:#0c1220;--c1:#38bdf8;--c2:#818cf8;--c3:#34d399;--tx:#f0f6ff;--tx2:#8fa3bf;--tx3:#4a6080;--border:rgba(255,255,255,.07);--card:rgba(255,255,255,.04);--err:#f87171;--ok:#34d399;}
@@ -212,24 +215,22 @@ select option{background:#0c1220;}
         <div class="form-sub" id="s3Sub">Creating your family's account.</div>
 
         <div id="paymentSection" style="display:none;">
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1.1rem;">
-            <div style="font-size:.75rem;color:var(--tx3);margin-bottom:.5rem;">PAYMENT DETAILS</div>
-            <div id="cardElement" style="padding:.5rem 0;"></div>
-            <div id="cardErrors" style="font-size:.75rem;color:var(--err);margin-top:.4rem;"></div>
-          </div>
-          <!-- COUPON CODE -->
+          <!-- COUPON CODE — passed through to Stripe Checkout for application there -->
           <div style="margin-bottom:1rem;">
             <div style="display:flex;gap:.5rem;">
               <input type="text" id="couponInput" placeholder="Coupon code (optional)" style="flex:1;text-transform:uppercase;letter-spacing:1px;">
               <button onclick="applyCoupon()" style="background:var(--card);border:1px solid var(--border);border-radius:9px;padding:.65rem 1rem;color:var(--tx);font-family:inherit;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap;">Apply</button>
             </div>
             <div id="couponMsg" style="font-size:.75rem;margin-top:.3rem;display:none;"></div>
-            <div style="font-size:.68rem;color:var(--tx2);margin-top:.35rem;opacity:.75;">Coupons are validated at checkout. Invalid or expired codes are ignored.</div>
+            <div style="font-size:.68rem;color:var(--tx2);margin-top:.35rem;opacity:.75;">Code is validated and applied on the Stripe checkout page. Invalid codes can be retyped there.</div>
           </div>
           <div id="orderSummary" style="background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.12);border-radius:10px;padding:.9rem;margin-bottom:1.1rem;font-size:.82rem;">
             <div style="display:flex;justify-content:space-between;margin-bottom:.3rem;"><span>Plan</span><span id="osPlan" style="font-weight:700;"></span></div>
-            <div id="discountRow" style="display:none;justify-content:space-between;margin-bottom:.3rem;color:var(--ok);"><span>Discount</span><span id="discountAmt"></span></div>
-            <div style="display:flex;justify-content:space-between;"><span>Total today</span><span id="osPrice" style="color:var(--c1);font-weight:700;"></span></div>
+            <div id="osTrialNote" style="font-size:.72rem;color:var(--ok);margin-bottom:.4rem;display:none;">✓ 3-day free trial · $0.00 due today</div>
+            <div style="display:flex;justify-content:space-between;"><span id="osPriceLabel">After trial</span><span id="osPrice" style="color:var(--c1);font-weight:700;"></span></div>
+          </div>
+          <div style="background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.12);border-radius:10px;padding:.8rem;margin-bottom:1.1rem;font-size:.74rem;color:var(--tx2);line-height:1.55;">
+            🔒 You'll be sent to <strong style="color:var(--tx);">Stripe's secure checkout</strong> to enter payment details. Your free trial and any coupon will be applied there. You can review the full amount before confirming.
           </div>
         </div>
 
@@ -292,14 +293,10 @@ select option{background:#0c1220;}
 // ═══════════════════════════════════════════════
 const SUPABASE_URL = 'https://hrohgwcbfgywkpnvqxhk.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhyb2hnd2NiZmd5d2twbnZxeGhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MjcxNDYsImV4cCI6MjA4ODQwMzE0Nn0.PuWtBpiMw2DiCLp26ZP_Rd9BwzFvWT0sNZrDUNdULyo';
-const STRIPE_PK = 'pk_live_51T8Sqi5KkDVrunQt8krQPr8spkmx7zYjHbcdE0pbliCqNuxJD8rUZXjJ1b3dLYNZKsSNfDY3BDHNhfYcs85bTJGy00KFAdAWUS';
 
-// Price IDs from your Stripe dashboard
-const STRIPE_PRICES = {
-  monthly:  'price_1T8TBg5KkDVrunQtqfmRyiSu',
-  yearly:   'price_1T8TCE5KkDVrunQteJAl9fgx',
-  lifetime: 'price_1T8TCY5KkDVrunQtBejbeCT2',
-};
+// STRIPE_PK and STRIPE_PRICES are no longer needed client-side. The paid
+// flow redirects to Stripe Checkout via the create-checkout-session Edge
+// Function; the function owns the price catalogue and Stripe Secret key.
 
 const PLAN_INFO = {
   free:     {name:'Free',        price:'$0',      desc:'Get started with core features — Dashboard, School tracker, basic Money tools, Journal, and Goals. Upgrade anytime.'},
@@ -310,26 +307,7 @@ const PLAN_INFO = {
 
 // ═══════════════════════════════════════════════
 const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-let stripe = null;
-let elements = null;
-function initStripe(){
-  if(stripe) return;
-  // Stripe.js loads via <script> in <head>. If the CDN is slow/blocked the
-  // global won't be ready when setupStep3() fires. Fail soft — the
-  // cardElement guard below will retry on the next tab visit, and the user
-  // sees a readable error rather than a ReferenceError in the console.
-  if(typeof Stripe !== 'function'){
-    console.warn('[register] Stripe.js not loaded yet; payment setup deferred.');
-    return;
-  }
-  try {
-    stripe = Stripe(STRIPE_PK);
-    elements = stripe.elements();
-  } catch(e){
-    console.error('[register] Stripe init failed:', e);
-  }
-}
-let cardElement;
+// Stripe Elements removed — paid plans redirect to Stripe Checkout.
 let currentStep = 1;
 let selectedPlan = 'free';
 let sponsorData = null;
@@ -421,13 +399,12 @@ async function applyCoupon(){
   const code = document.getElementById('couponInput').value.trim().toUpperCase();
   const msg = document.getElementById('couponMsg');
   if(!code){ msg.style.display='none'; appliedCoupon=null; updateOrderSummary(); return; }
-  // Accept any code optimistically; Stripe validates + applies at checkout.
-  // We do NOT preview the discount client-side — the percent shown would only
-  // ever be a hardcoded guess (the source of the TEST99-90%-vs-100% bug).
-  // The user sees the real discounted total on the Stripe checkout page. If
-  // the code is archived/invalid (e.g. TEST99 after the cleanup sprint), the
-  // create-payment-intent Edge Function returns its error message and the
-  // try/catch in createAccount() surfaces it via showErr().
+  // Accept any code optimistically; Stripe validates + applies on the
+  // hosted checkout page. We do NOT preview the discount client-side — the
+  // percent shown would only ever be a hardcoded guess (the source of the
+  // TEST99-90%-vs-100% bug). If the code is archived/invalid the
+  // create-checkout-session Edge Function falls back to
+  // allow_promotion_codes:true so the user can retype it on Stripe's page.
   appliedCoupon = {id: code, percent_off: null};
   msg.style.display='block';
   msg.style.color='var(--ok)';
@@ -487,7 +464,6 @@ function step2Next(){
 }
 
 function setupStep3(){
-  initStripe();
   const plan=sponsorData?'sponsored':selectedPlan;
 
   if(sponsorData){
@@ -510,24 +486,21 @@ function setupStep3(){
     document.getElementById('sponsorConfirm').style.display='none';
     document.getElementById('osPlan').textContent=PLAN_INFO[plan].name;
     document.getElementById('osPrice').textContent=PLAN_INFO[plan].price;
-    document.getElementById('s3Sub').textContent='Secure payment via Stripe.';
-    if(!cardElement && elements){
-      // Defensive: mount target must exist in the DOM (it lives inside
-      // #paymentSection which we just set to display:block above, but
-      // belt-and-suspenders in case the markup shifts).
-      const mountTarget = document.getElementById('cardElement');
-      if(!mountTarget){
-        console.warn('[register] #cardElement mount target missing; skipping card init.');
-      } else {
-        try {
-          cardElement = elements.create('card',{style:{base:{color:'#f0f6ff',fontFamily:'DM Sans, sans-serif',fontSize:'15px','::placeholder':{color:'#4a6080'}},invalid:{color:'#f87171'}}});
-          cardElement.mount('#cardElement');
-          cardElement.on('change',e=>{ document.getElementById('cardErrors').textContent=e.error?e.error.message:''; });
-        } catch(e){
-          console.error('[register] Stripe card element create/mount failed:', e);
-        }
-      }
-    }
+    // Monthly + yearly include the 3-day free trial — surface it honestly so
+    // the user sees $0.00 due today and the recurring price as "after trial",
+    // not the confusing "9.99 today" the old inline-Elements UI showed.
+    const trialEligible = (plan === 'monthly' || plan === 'yearly');
+    const trialNote = document.getElementById('osTrialNote');
+    const priceLbl = document.getElementById('osPriceLabel');
+    if(trialNote) trialNote.style.display = trialEligible ? 'block' : 'none';
+    if(priceLbl)  priceLbl.textContent   = trialEligible ? 'After trial' : 'Total';
+    document.getElementById('s3Sub').textContent='You\'ll review and pay on the next page.';
+    // Update the launch button copy so the user knows they're being sent
+    // off-site. The catch/finally in createAccount() resets to the default
+    // ("🚀 Create My Family Account") on error, so we'll re-set this on
+    // every setupStep3 entry to handle the back-and-forth case.
+    const launchBtn = document.getElementById('launchBtn');
+    if(launchBtn) launchBtn.innerHTML = '→ Continue to Secure Checkout';
   }
 }
 
@@ -586,45 +559,43 @@ async function createAccount(){
 
     const userId = authData.user.id;
     const isPaid = (plan!=='free' && plan!=='sponsored');
-    // Paid flow needs familyId BEFORE create-payment-intent (it's sealed into
-    // Stripe metadata for stripe-webhook to correlate later). Free/sponsored
-    // flows let register-family generate the id server-side.
-    let familyId = isPaid ? generateFamilyId() : null;
 
-    // 2. Handle payment (if needed)
-    let stripeCustomerId = null;
-    let stripeSubId = null;
-
+    // Paid flow: redirect to Stripe Checkout for hosted payment + trial UI.
+    // The Stripe webhook (checkout.session.completed) is responsible for
+    // creating the families row using the metadata sealed into the session.
     if(isPaid){
-      btn.innerHTML='<span class="spinner"></span>Processing payment...';
-      const piResp = await fetch(SUPABASE_URL+'/functions/v1/create-payment-intent', {
+      const familyId = generateFamilyId();
+      // Stash for activate.html ?session_id=... to read once the user
+      // returns from Stripe. Signup source is in user_metadata.signup_source
+      // (set above) — that survives cross-device; localStorage doesn't.
+      try {
+        localStorage.setItem('ylcc_pending_family_id', familyId);
+        localStorage.setItem('ylcc_last_signup_email', email);
+      } catch(e) {}
+
+      btn.innerHTML='<span class="spinner"></span>Redirecting to secure checkout...';
+      const csResp = await fetch(SUPABASE_URL+'/functions/v1/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer '+SUPABASE_ANON_KEY },
-        body: JSON.stringify({plan, email, name, familyId, couponCode: appliedCoupon ? appliedCoupon.id : null})
+        body: JSON.stringify({
+          userId, name, email, plan, familyId,
+          couponCode: appliedCoupon ? appliedCoupon.id : null,
+        })
       });
-      const piData = await piResp.json();
-      if(!piResp.ok || piData.error) throw new Error(piData.error || 'Payment setup failed. Please try again.');
-
-      if(piData.free){
-        // 100% coupon — no card confirmation needed
-        stripeCustomerId = piData.customerId;
-        stripeSubId      = piData.subscriptionId;
-      } else {
-        // Both lifetime + subscription paths use confirmCardPayment identically;
-        // only difference is whether a subscription id comes back.
-        const {error:pmError} = await stripe.confirmCardPayment(piData.clientSecret, {
-          payment_method:{card:cardElement, billing_details:{name, email}}
-        });
-        if(pmError) throw new Error(pmError.message);
-        stripeCustomerId = piData.customerId;
-        stripeSubId      = piData.subscriptionId || null;
+      const csData = await csResp.json();
+      if(!csResp.ok || csData.error || !csData.url){
+        throw new Error(csData.error || 'Checkout setup failed. Please try again.');
       }
+      // Leave the app — the browser navigates to Stripe's hosted page.
+      // No further code in this function runs after the assignment.
+      window.location.href = csData.url;
+      return;
     }
 
+    // Free / sponsored flow: no Stripe step. Register the family row now
+    // and show the check-your-email screen.
+    let familyId = null;
     btn.innerHTML='<span class="spinner"></span>Setting up your account...';
-
-    // 3. Register family via Edge Function (service-role bypasses RLS for
-    //    unconfirmed user; idempotent on retry; atomic sponsor-code decrement)
     const regResp = await fetch(SUPABASE_URL+'/functions/v1/register-family', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer '+SUPABASE_ANON_KEY },
@@ -634,8 +605,8 @@ async function createAccount(){
         email,
         plan,
         familyId,                            // null for free/sponsored → server generates
-        stripeCustomerId,
-        stripeSubscriptionId: stripeSubId,
+        stripeCustomerId: null,
+        stripeSubscriptionId: null,
         sponsorCodeId: sponsorData?.id || null,
         referredBy: referredBy || null,
       })
@@ -644,17 +615,12 @@ async function createAccount(){
     if(!regResp.ok || regData.error) throw new Error(regData.error || 'Account creation failed.');
     familyId = regData.familyId;             // server returns the canonical id
 
-    // 4. Stash familyId so activate.html → set-password.html can route back
-    //    to /app/?id=... after the user confirms email + sets password.
-    //    Signup source is in user_metadata.signup_source (set above) — that
-    //    survives cross-device; localStorage doesn't.
     try {
       localStorage.setItem('ylcc_pending_family_id', familyId);
       localStorage.setItem('ylcc_last_signup_email', email);
     } catch(e) {}
     createdFamilyId = familyId;
 
-    // 5. Show check-your-email screen
     document.getElementById('checkEmailAddr').textContent = email;
     goStep(4);
 
@@ -662,13 +628,19 @@ async function createAccount(){
     showErr(err.message || 'Something went wrong. Please try again.');
   } finally {
     // Always re-enable the launch button, on success AND failure. The
-    // success path has already moved to step 4 so the now-enabled
-    // button is hidden and the reset is invisible. The failure path
+    // success path has already moved to step 4 (free/sponsored) or
+    // redirected away to Stripe (paid) so the now-enabled button is
+    // hidden or off-screen and the reset is invisible. The failure path
     // surfaces the toast and leaves a usable button so the user can
     // correct the form and retry — no stuck-disabled state regardless
     // of how the function exits.
     btn.disabled = false;
-    btn.innerHTML = '🚀 Create My Family Account';
+    // Match the button copy to the current plan context so a paid-flow
+    // error doesn't leave the button reading "Create My Family Account"
+    // when the next click should still send them to checkout.
+    const _curPlan = sponsorData ? 'sponsored' : selectedPlan;
+    const _isPaid = (_curPlan !== 'free' && _curPlan !== 'sponsored');
+    btn.innerHTML = _isPaid ? '→ Continue to Secure Checkout' : '🚀 Create My Family Account';
   }
 }
 
