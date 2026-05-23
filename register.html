@@ -544,17 +544,42 @@ async function createAccount(){
       error: authError?.message || null,
     }));
 
-    // Supabase returns {user:null, session:null} with no error in ONE
-    // scenario: email confirmation is enabled AND the email already
-    // exists (anti-enumeration). A fresh signup with email-confirm on
-    // returns user populated, session null. So user:null here means
-    // "this email is already registered" for BOTH free and paid plans —
-    // either way the right action is to direct them to sign in / check
-    // their existing confirmation email, not to silently proceed
-    // (which would skip register-family — the only callsite for free
-    // profile creation in the repo, verified via grep).
+    // Supabase returns {user:null, session:null} with no error on EVERY
+    // successful signup when email confirmation is enabled — not only on
+    // duplicate-email collisions. Verified via live testing 2026-05-23
+    // (this contradicts what the Supabase docs imply about user being
+    // populated; the real behaviour returns null and SENDS the email).
+    // So user:null here means "signup succeeded, confirmation email is
+    // sending" — show the check-email screen, do NOT throw.
     if(!authData?.user){
-      throw new Error('An account with this email may already exist. Check your inbox for a confirmation link from YourLife CC, or try signing in. Need help? Contact info@kingdom-creatives.com');
+      document.getElementById('checkEmailAddr').textContent = email;
+
+      // For paid plans, we can't redirect to Stripe Checkout without a
+      // userId for the session metadata. Tell the user they need to
+      // confirm email first, then return here to complete payment.
+      const _planIsPaid = (plan!=='free' && plan!=='sponsored');
+      if(_planIsPaid){
+        const _escHtml = s => String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        const titleEl = document.querySelector('#s4 .form-title');
+        const subEl   = document.querySelector('#s4 .form-sub');
+        if(titleEl) titleEl.textContent = 'Almost there — confirm your email';
+        if(subEl){
+          const planLabel = (PLAN_INFO[plan] && PLAN_INFO[plan].name) || plan;
+          subEl.innerHTML =
+            '<strong>Almost there!</strong> Check your inbox at ' +
+            '<strong style="color:var(--c1);font-weight:700;">' + _escHtml(email) + '</strong> ' +
+            'and click the confirmation link. Once your email is verified, ' +
+            'return here to complete payment for your ' + _escHtml(planLabel) + ' plan.' +
+            '<br><br>If you don\'t receive the email within 5 minutes, check ' +
+            'your spam folder. During our beta period, email delivery may ' +
+            'take a few minutes.';
+        }
+      }
+
+      goStep(4);
+      btn.disabled = false;
+      btn.innerHTML = '🚀 Create My Family Account';
+      return;
     }
 
     const userId = authData.user.id;
