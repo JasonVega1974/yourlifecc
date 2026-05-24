@@ -1168,90 +1168,84 @@
         linear-gradient(180deg,rgba(1,3,10,.18) 0%,transparent 32%,transparent 68%,rgba(1,3,10,.42) 100%);
     }
 
-    /* ── 2026-05-28 v5 — Well cross 3D (CSS, replaces every canvas
-       attempt). Sits at z-index 2 between the canvas-painted scene
-       (z=0) and the scrim (z=4). #faithOnlyHero is already
-       position:relative, so the wrap's absolute layout anchors
-       cleanly to the hero. Hardware-accelerated rotateY + glow
-       filter. ── */
+    /* ── 2026-05-28 v6 — Well cross 3D, solid 12-face box.
+       Both bars (vertical + crossbeam) get all 6 faces each so the
+       cross reads as a real gold object at every rotation angle —
+       front/back have the bright cream-gold gradient, sides show
+       the darker depth-gold, top/bot caps round the ends.
+
+       Position: small 80×100 wrap centred horizontally at top:18% of
+       the hero, so the cross floats in the SKY above the well graphic
+       (which sits in the lower ~35% of the canvas). The wrap owns
+       the perspective; the inner #wellCross3d does the rotation. ── */
     #wellCrossWrap{
       position:absolute;
-      inset:0;
+      top:18%;
+      left:50%;
+      transform:translateX(-50%);
       pointer-events:none;
-      display:flex;
-      align-items:flex-end;
-      justify-content:center;
-      padding-bottom:42%;
-      perspective:400px;
+      perspective:600px;
       z-index:2;
+      width:80px;
+      height:100px;
     }
     #wellCross3d{
       position:relative;
-      width:50px;
-      height:80px;
+      width:46px;
+      height:70px;
+      margin:0 auto;
       transform-style:preserve-3d;
       will-change:transform, filter;
-      animation: crossSpin 8s linear infinite,
-                 crossGlow 2s ease-in-out infinite;
+      animation: crossSpin 9s linear infinite,
+                 crossPulse 2.5s ease-in-out infinite;
     }
     @keyframes crossSpin{
       from{ transform: rotateY(0deg); }
       to  { transform: rotateY(360deg); }
     }
-    @keyframes crossGlow{
-      0%, 100%{ filter: drop-shadow(0 0 8px  #ffd700) drop-shadow(0 0 20px #ffd700); }
-      50%     { filter: drop-shadow(0 0 18px #ffd700) drop-shadow(0 0 40px #ffd700) drop-shadow(0 0 6px #fff); }
+    @keyframes crossPulse{
+      0%,100%{ filter: drop-shadow(0 0 6px  #ffd700) drop-shadow(0 0 14px #ffa500); }
+      50%   { filter: drop-shadow(0 0 16px #ffd700) drop-shadow(0 0 32px #ffa500)
+                      drop-shadow(0 0 48px rgba(255,180,0,0.4)); }
     }
-    .cross-face{
-      position:absolute;
-      width:100%;
-      height:100%;
-      backface-visibility:visible;
-      -webkit-backface-visibility:visible;
-    }
-    .cross-face .cross-v{
-      position:absolute;
-      width:10px;
-      height:100%;
-      background:linear-gradient(to bottom, #fffde7, #ffd700, #fffde7);
-      left:50%;
-      transform:translateX(-50%);
-      border-radius:3px;
-    }
-    .cross-face .cross-h{
-      position:absolute;
-      width:100%;
-      height:10px;
-      background:linear-gradient(to right, #ffd700, #fffde7, #ffd700);
-      top:28%;
-      border-radius:3px;
-    }
-    .cross-back{ transform: translateZ(-10px); }
-    .cross-back .cross-v,
-    .cross-back .cross-h{
-      background:#b8860b;
-      opacity:.7;
-    }
-    .cross-side{
-      position:absolute;
-      width:10px;
-      height:100%;
-      border-radius:2px;
-    }
-    .cross-side-left{
-      background:linear-gradient(to right, #8B6914, #c8960c);
-      left:calc(50% - 5px);
-      transform:rotateY(90deg) translateZ(5px);
-      transform-origin:left center;
-    }
-    .cross-side-right{
-      background:linear-gradient(to left, #8B6914, #c8960c);
-      right:calc(50% - 5px);
-      transform:rotateY(-90deg) translateZ(5px);
-      transform-origin:right center;
-    }
+
+    /* Proportions (matches Christian cross):
+         Vertical bar: 8px wide × 70px tall × 8px deep
+         Crossbeam:   46px wide ×  8px tall × 8px deep
+         Beam sits 20px from top (upper third → 20 : 50 ratio) */
+    .cx-face{ position:absolute; background:#ffd700; }
+
+    /* ── VERTICAL BAR ── */
+    .cx-vbar-front{ width:8px;  height:70px; top:0;      left:19px; transform:translateZ(4px);
+                    background:linear-gradient(180deg,#fff5a0,#ffd700,#ffaa00,#ffd700); }
+    .cx-vbar-back { width:8px;  height:70px; top:0;      left:19px; transform:translateZ(-4px) rotateY(180deg);
+                    background:#b8860b; }
+    .cx-vbar-left { width:8px;  height:70px; top:0;      left:19px; transform:rotateY(-90deg) translateZ(4px);
+                    background:linear-gradient(180deg,#c8960c,#8B6914); }
+    .cx-vbar-right{ width:8px;  height:70px; top:0;      left:19px; transform:rotateY(90deg)  translateZ(4px);
+                    background:linear-gradient(180deg,#c8960c,#8B6914); }
+    .cx-vbar-top  { width:8px;  height:8px;  top:0;      left:19px; transform:rotateX(90deg)  translateZ(0);
+                    background:#ffe066; }
+    .cx-vbar-bot  { width:8px;  height:8px;  bottom:0;   left:19px; transform:rotateX(-90deg) translateZ(0);
+                    background:#8B6914; }
+
+    /* ── HORIZONTAL CROSSBEAM (sits 20px from top of vertical bar) ── */
+    .cx-hbar-front{ width:46px; height:8px;  top:20px;   left:0;    transform:translateZ(4px);
+                    background:linear-gradient(90deg,#ffaa00,#fff5a0,#ffd700,#fff5a0,#ffaa00); }
+    .cx-hbar-back { width:46px; height:8px;  top:20px;   left:0;    transform:translateZ(-4px) rotateY(180deg);
+                    background:#b8860b; }
+    .cx-hbar-left { width:8px;  height:8px;  top:20px;   left:0;    transform:rotateY(-90deg) translateZ(4px);
+                    background:#8B6914; }
+    .cx-hbar-right{ width:8px;  height:8px;  top:20px;   left:38px; transform:rotateY(90deg)  translateZ(4px);
+                    background:#8B6914; }
+    .cx-hbar-top  { width:46px; height:8px;  top:20px;   left:0;    transform:rotateX(90deg)  translateZ(4px);
+                    background:#ffe066; }
+    .cx-hbar-bot  { width:46px; height:8px;  top:20px;   left:0;    transform:rotateX(-90deg) translateZ(0);
+                    background:#c8960c; }
+
     @media (prefers-reduced-motion: reduce){
-      #wellCross3d{ animation: crossGlow 2s ease-in-out infinite; }
+      /* Keep the breathing glow; drop the rotation. */
+      #wellCross3d{ animation: crossPulse 2.5s ease-in-out infinite; }
     }
 
     /* ── 2026-05-25 — SVG landscape (replaces the canvas-painted scene).
@@ -1592,13 +1586,11 @@
       background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);
       animation:foShimmer 3s 3s ease-in-out infinite;z-index:1;
     }
-    /* ── Rising sparkles (gold particles from well opening) ── */
-    .fo-sparkle{
-      position:fixed;pointer-events:none;z-index:9999;
-      width:12px;height:12px;border-radius:50%;
-      background:radial-gradient(circle,#fffce0 0%,#fbbf24 40%,rgba(251,191,36,0) 70%);
-      animation:foSparkleRise var(--dur,1400ms) ease-out both;
-    }
+    /* 2026-05-28 v6 — Rising-sparkle "bubbles" removed (the gold
+       circles that continuously floated up from the well opening
+       read as bubbles, not as sparkles). The canvas dSparks
+       fireflies near the well base stay — those wander on a sine
+       wave, which reads correctly as fireflies. */
     /* ── Keyframes ── */
     @keyframes foFadeIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
     @keyframes foFadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
@@ -1610,11 +1602,6 @@
     @keyframes foCtaPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.035);}}
     @keyframes foShimmer{0%,55%{left:-80%;}100%{left:130%;}}
     @keyframes foSparkSpin{0%,100%{transform:rotate(0deg);}50%{transform:rotate(180deg);}}
-    @keyframes foSparkleRise{
-      0%{opacity:1;transform:translate(0,0) scale(1);}
-      60%{opacity:.88;}
-      100%{opacity:0;transform:translate(var(--dx,0px),var(--dy,-150px)) scale(.22);}
-    }
     @media(max-width:560px){
       .fo-hero{min-height:calc(100vh - 60px);max-height:calc(100dvh - 60px);}
       .fo-hero-content{padding:5vh 1.4rem 0;}
@@ -1623,7 +1610,7 @@
     }
     @media(prefers-reduced-motion:reduce){
       .fo-hero,.fo-gl,.fo-title-1,.fo-title-2,.fo-hero-sub,.fo-hero-cta,
-      .fo-sparkle,.fo-cta-shimmer,.fo-cta-spark,.fo-star,.fo-moon,
+      .fo-cta-shimmer,.fo-cta-spark,.fo-star,.fo-moon,
       .fo-shooting-star,.fo-svg-scene > g{animation:none !important;transition:none !important;}
       .fo-gl,.fo-title-1,.fo-title-2,.fo-hero-sub,.fo-hero-cta{opacity:1 !important;}
     }

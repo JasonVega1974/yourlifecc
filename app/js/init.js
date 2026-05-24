@@ -690,43 +690,12 @@ function _foGoldRise() {
   return out;
 }
 
-function launchFaithSparkles(count) {
-  const hero = document.querySelector('.fo-hero');
-  if (!hero) return;
-  const rect = hero.getBoundingClientRect();
-  const n = count || 40;
-  // Origin = well opening (~50% horizontal, ~72% vertical of hero)
-  const wellX = rect.left + rect.width * 0.5;
-  const wellY = rect.top + rect.height * 0.72;
-  for (let i = 0; i < n; i++) {
-    setTimeout(() => {
-      const sp = document.createElement('div');
-      sp.className = 'fo-sparkle';
-      const cx = wellX + (-30 + Math.random() * 60);
-      const cy = wellY + (-8 + Math.random() * 16);
-      const dx = Math.round(-90 + Math.random() * 180);
-      const dy = Math.round(-200 + Math.random() * -60);
-      const size = Math.round(8 + Math.random() * 12);
-      const dur = Math.round(1200 + Math.random() * 1600);
-      sp.style.cssText = `left:${cx}px;top:${cy}px;width:${size}px;height:${size}px;--dx:${dx}px;--dy:${dy}px;--dur:${dur}ms;`;
-      document.body.appendChild(sp);
-      setTimeout(() => sp.remove(), dur + 100);
-    }, i * 30);
-  }
-}
-
-let _foSparkleIntervalId = null;
-function startFaithSparkleLoop() {
-  if (_foSparkleIntervalId) return;
-  _foSparkleIntervalId = setInterval(() => {
-    if (!document.querySelector('.fo-hero')) {
-      clearInterval(_foSparkleIntervalId);
-      _foSparkleIntervalId = null;
-      return;
-    }
-    launchFaithSparkles(20);
-  }, 5000);
-}
+// 2026-05-28 v6 — Rising "bubble" sparkles removed. The DOM-injected
+// .fo-sparkle particles that continuously rose from the well opening
+// read as bubbles, not as gold sparkles. The canvas dSparks fireflies
+// near the well base stay (they wander on a sine wave — correct
+// firefly behavior). launchFaithSparkles + startFaithSparkleLoop are
+// deleted; their .fo-sparkle CSS + keyframes are removed in index.html.
 
 let _foParallaxRAF = null;
 let _foParallaxLastE = null;
@@ -1473,22 +1442,28 @@ function renderFaithOnlyHero() {
     hero.innerHTML =
       '<div class="fo-hero" id="faithOnlyHero">' +
         '<canvas id="fo-canvas-scene" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;"></canvas>' +
-        // 2026-05-28 v5 — CSS-3D cross overlay (replaces every prior
-        // canvas-painted cross attempt). Pure HTML + CSS keyframes;
-        // rotation + glow are hardware-accelerated and never touch
-        // the canvas render loop. Styled in the .fo-* block below.
+        // 2026-05-28 v6 — CSS-3D solid 12-face gold cross. Both bars
+        // have all six faces (front/back/left/right/top/bottom) so
+        // the cross reads as a real gold box from every rotation
+        // angle instead of a flipping piece of paper. Positioned by
+        // #wellCrossWrap in the .fo-* style block — sits in the sky
+        // above the well graphic.
         '<div id="wellCrossWrap" aria-hidden="true">' +
           '<div id="wellCross3d">' +
-            '<div class="cross-face cross-front">' +
-              '<div class="cross-v"></div>' +
-              '<div class="cross-h"></div>' +
-            '</div>' +
-            '<div class="cross-face cross-back">' +
-              '<div class="cross-v"></div>' +
-              '<div class="cross-h"></div>' +
-            '</div>' +
-            '<div class="cross-side cross-side-left"></div>' +
-            '<div class="cross-side cross-side-right"></div>' +
+            // Vertical bar — 6 faces
+            '<div class="cx-face cx-vbar-front"></div>' +
+            '<div class="cx-face cx-vbar-back"></div>' +
+            '<div class="cx-face cx-vbar-left"></div>' +
+            '<div class="cx-face cx-vbar-right"></div>' +
+            '<div class="cx-face cx-vbar-top"></div>' +
+            '<div class="cx-face cx-vbar-bot"></div>' +
+            // Horizontal crossbeam — 6 faces
+            '<div class="cx-face cx-hbar-front"></div>' +
+            '<div class="cx-face cx-hbar-back"></div>' +
+            '<div class="cx-face cx-hbar-left"></div>' +
+            '<div class="cx-face cx-hbar-right"></div>' +
+            '<div class="cx-face cx-hbar-top"></div>' +
+            '<div class="cx-face cx-hbar-bot"></div>' +
           '</div>' +
         '</div>' +
         '<div class="fo-hero-scrim"></div>' +
@@ -1536,8 +1511,7 @@ function renderFaithOnlyHero() {
   // ── Entry cards & today's verse intentionally NOT rendered. ──
   // After clicking "Enter The Well", wellGoto('home') takes them inside where
   // they choose Bible Stories / Reading Plans / Faith Academy / Prayer.
-  setTimeout(() => launchFaithSparkles(40), 1800);
-  setTimeout(startFaithSparkleLoop, 5500);
+  // (2026-05-28 v6 — sparkle "bubble" loop calls removed.)
   attachFaithParallax();
   // Phase 2A — show onboarding overlay for first-time visitors
   _checkWellOnboarding();
