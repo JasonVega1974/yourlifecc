@@ -1189,32 +1189,60 @@ function _foStartCanvasScene() {
     ctx.strokeStyle='#4a3510'; ctx.lineWidth=1.8; ctx.stroke();
     ctx.beginPath(); ctx.rect(rx-6,rb,11,9); ctx.fillStyle='#3a2a10'; ctx.fill(); ctx.strokeStyle='#5a3c10'; ctx.lineWidth=0.8; ctx.stroke();
   }
-  // 2026-05-27 — Pulsating glowing cross above the well. Draws 3 outer
-  // glow layers at increasing size + decreasing opacity for the bloom,
-  // then a solid cream/gold cross center. Pulse alpha is sine-driven
-  // and clamped to a safe [0.30, 0.80] range so the cross never fully
-  // disappears or burns out white.
-  function drawWellCross(ctx, x, y, alpha){
-    var w = 4, h = 35, beam = 14, beamY = 12;
-    // Outer glow layers — three concentric, softest on the outside
-    for (var i = 3; i >= 1; i--){
+  // 2026-05-27 — Pulsating glowing cross above the well.
+  // 2026-05-28 — Christian cross proportions (crossbeam in upper third,
+  //              not center), slow 20s rotation, bigger size, rounded
+  //              corners. Pulse alpha sine-driven, clamped to a safe
+  //              [0.30, 0.80] range.
+  //
+  // Proportions (matches the traditional Christian cross):
+  //   totalH      = 70  full vertical height
+  //   beamW       = 44  horizontal crossbeam width
+  //   crossW      =  8  bar thickness (both vertical + crossbeam)
+  //   beamFromTop = 22  crossbeam top edge sits at 22px from the top of
+  //                     the vertical bar. Splits vertical 22 : 40 (head
+  //                     vs body+leg) → ~1 : 1.8 ratio.
+  function _wcRect(ctx, x, y, w, h, r){
+    if (typeof ctx.roundRect === 'function'){
+      ctx.beginPath(); ctx.roundRect(x, y, w, h, r); ctx.fill();
+    } else {
+      // Fallback for older webviews — square corners, still readable.
+      ctx.fillRect(x, y, w, h);
+    }
+  }
+  function drawWellCross(ctx, x, y, alpha, angle){
+    var totalH = 70, crossW = 8, beamW = 44, beamFromTop = 22;
+    var topY = -totalH / 2;                     // top of vertical bar
+    var beamTopY = topY + beamFromTop;          // top of crossbeam
+    ctx.save();
+    ctx.translate(x, y);
+    if (angle) ctx.rotate(angle);
+    // ── Outer glow layers — 4 concentric, softest on the outside ──
+    for (var i = 4; i >= 1; i--){
       ctx.save();
-      ctx.globalAlpha = (alpha * 0.15) / i;
+      ctx.globalAlpha = (alpha * 0.12) / i;
       ctx.fillStyle = '#ffd700';
       ctx.shadowColor = '#ffd700';
-      ctx.shadowBlur = 20 * i;
-      ctx.fillRect(x - (w * i) / 2,    y - h / 2,         w * i, h);
-      ctx.fillRect(x - (beam * i) / 2, y - h / 2 + beamY, beam * i, w * i);
+      ctx.shadowBlur = 25 * i;
+      // Vertical bar glow — width grows with i, height grows slightly
+      var vW = crossW * i * 0.6;
+      var vH = totalH * (1 + i * 0.05);
+      _wcRect(ctx, -vW / 2, -vH / 2, vW, vH, 2);
+      // Horizontal crossbeam glow — width grows with i, height grows
+      var hW = beamW * (1 + i * 0.1);
+      var hH = crossW * i * 0.5;
+      _wcRect(ctx, -hW / 2, beamTopY - (hH - crossW) / 2, hW, hH, 2);
       ctx.restore();
     }
-    // Solid cross center — cream over gold shadow
+    // ── Solid cross — bright cream center over gold shadow ──
     ctx.save();
     ctx.globalAlpha = alpha;
     ctx.fillStyle = '#fffde7';
     ctx.shadowColor = '#ffd700';
-    ctx.shadowBlur = 15;
-    ctx.fillRect(x - w / 2,    y - h / 2,         w,    h);
-    ctx.fillRect(x - beam / 2, y - h / 2 + beamY, beam, w);
+    ctx.shadowBlur = 18;
+    _wcRect(ctx, -crossW / 2, topY,     crossW, totalH, 2);
+    _wcRect(ctx, -beamW / 2,  beamTopY, beamW,  crossW, 2);
+    ctx.restore();
     ctx.restore();
   }
   function dFG(W,H){
@@ -1268,10 +1296,18 @@ function _foStartCanvasScene() {
       // function kept as dead code in case of revert.
       dClouds(W,H,t,ts); dFarMtns(W,H,t); dMidMtns(W,H,t); dNearMtns(W,H,t); dMist(W,H,t);
       dBirds(W,H,t,ts); dWell(W,H,sky.top,ts);
-      // Cross above the well — pulse alpha in [0.30, 0.80] so the
-      // glow breathes without ever blacking out or going pure white.
-      var _wcA = 0.55 + Math.sin(ts / 1500) * 0.25;
-      drawWellCross(ctx, W * 0.50, H * 0.51, _wcA);
+      // Cross above the well. Position math mirrors dWell:
+      //   wcy = H*.74, wh = H*.12, roof apex ≈ H*.556.
+      // Center the cross 80px above the roof apex (cross half-height
+      // 35, so the cross bottom clears the roof by ~45px). On tiny
+      // canvases (rare) the Math.max floor keeps it on-screen.
+      // Pulse alpha clamped to [0.30, 0.80] so the glow breathes
+      // without ever blacking out or burning to pure white.
+      // Rotation: one revolution per 20 seconds — gentle and reverent.
+      var _wcA   = 0.55 + Math.sin(ts / 1500) * 0.25;
+      var _wcAng = (ts / 20000) * Math.PI * 2;
+      var _wcY   = Math.max(40, H * 0.556 - 80);
+      drawWellCross(ctx, W * 0.50, _wcY, _wcA, _wcAng);
       dFG(W,H); dSparks(W,H,t,ts); dScrim(W,H);
       window._foCanvasRaf = requestAnimationFrame(tick);
     } catch(e) {
