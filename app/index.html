@@ -4980,42 +4980,77 @@
        ════════════════════════════════════════════════════════════ -->
   <style>
     /* Shared zone wrapper polish */
+    /* ── Zone-scoped token aliases ─────────────────────────────
+       Every Zone 1/2/3 surface threads through these. Light + dark
+       modes track automatically because the underlying tokens
+       (--card-bg, --tx, --g, --p, --gr, --c) are redefined per-mode
+       in app.css. The tint helpers use color-mix so we never bake
+       a brand hex into a tint that can't follow the theme. */
+    #s-scripture{
+      --fz-accent:        var(--g);                   /* faith gold */
+      --fz-purple:        var(--p);                   /* secondary  */
+      --fz-ok:            var(--gr);                  /* success    */
+      --fz-c:             var(--c);                   /* app primary*/
+      --fz-card-bg:       var(--card-bg);
+      --fz-card-border:   var(--card-border);
+      --fz-divider:       var(--card-border);
+      --fz-accent-soft:   color-mix(in srgb, var(--g) 10%, transparent);
+      --fz-accent-mid:    color-mix(in srgb, var(--g) 30%, transparent);
+      --fz-accent-bd:     color-mix(in srgb, var(--g) 38%, transparent);
+      --fz-purple-soft:   color-mix(in srgb, var(--p) 10%, transparent);
+      --fz-purple-mid:    color-mix(in srgb, var(--p) 30%, transparent);
+      --fz-purple-bd:     color-mix(in srgb, var(--p) 40%, transparent);
+      --fz-ok-soft:       color-mix(in srgb, var(--gr) 12%, transparent);
+      --fz-ok-bd:         color-mix(in srgb, var(--gr) 42%, transparent);
+      --fz-surface-soft:  color-mix(in srgb, var(--tx) 6%, transparent);
+      --fz-surface-mid:   color-mix(in srgb, var(--tx) 12%, transparent);
+    }
+
     #fzZone1, #fzZone2 { margin-bottom:1.1rem; }
 
-    /* ── ZONE 1 — Convince Me card flip ────────────────────────── */
+    /* ── ZONE 1 — Convince Me card flip ──────────────────────────
+       Grid-stack layout: both faces occupy the same grid cell so the
+       container takes the MAX of (front, back) height. Fixes mobile
+       clipping where the back face's 3 action buttons fell outside
+       the absolutely-positioned 280px container and became un-tappable. */
     .cm-card-container{
       position:relative; width:100%;
-      min-height:280px;
       perspective:1400px;
       margin-bottom:.85rem;
     }
     .cm-card-inner{
       position:relative; width:100%;
+      display:grid;
+      grid-template-columns:1fr;
+      grid-template-rows:1fr;
       min-height:280px;
       transition:transform .4s ease-in-out;
       transform-style:preserve-3d;
     }
     .cm-card-container.flipped .cm-card-inner{ transform:rotateY(180deg); }
     .cm-card-face{
-      position:absolute; inset:0;
+      grid-area:1 / 1;
+      position:relative;
       width:100%; min-height:280px;
       padding:1.35rem 1.4rem 1.15rem;
-      background:linear-gradient(160deg,rgba(15,23,42,.94) 0%,rgba(30,17,71,.86) 100%);
+      background:linear-gradient(160deg, var(--s1) 0%, var(--s2) 100%);
       border-radius:22px;
-      box-shadow:0 18px 48px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.04);
+      box-shadow:var(--card-shadow), inset 0 1px 0 var(--fz-surface-soft);
       backface-visibility:hidden;
       -webkit-backface-visibility:hidden;
       display:flex; flex-direction:column;
       color:var(--tx);
       overflow:hidden;
     }
-    /* Animated gradient border — gold accent that sweeps slowly */
+    /* Animated gradient border — gold-purple-cyan sweep at 45% alpha */
     .cm-card-face::before{
       content:''; position:absolute; inset:-1px; border-radius:22px;
-      background:linear-gradient(135deg,rgba(251,191,36,.55),rgba(167,139,250,.35),rgba(56,189,248,.35),rgba(251,191,36,.55));
+      background:linear-gradient(135deg,
+        var(--fz-accent), var(--fz-purple), var(--fz-c), var(--fz-accent));
       background-size:200% 200%;
       animation:cmBorderShift 6s ease-in-out infinite;
       z-index:-1;
+      opacity:.45;
       filter:blur(.5px);
     }
     @keyframes cmBorderShift{
@@ -5029,9 +5064,9 @@
       align-self:flex-start;
       font-family:var(--fm); font-size:.62rem; letter-spacing:.18em;
       text-transform:uppercase; font-weight:800;
-      color:#fbbf24;
-      background:rgba(251,191,36,.10);
-      border:1px solid rgba(251,191,36,.35);
+      color:var(--fz-accent);
+      background:var(--fz-accent-soft);
+      border:1px solid var(--fz-accent-bd);
       padding:.35rem .65rem; border-radius:99px;
       margin-bottom:.95rem;
     }
@@ -5039,7 +5074,7 @@
       font-family:var(--fh,var(--fm));
       font-size:1.35rem; line-height:1.32;
       letter-spacing:.005em;
-      color:#fef3c7;
+      color:var(--tx);
       font-weight:600;
       flex:1;
       display:flex; align-items:center;
@@ -5050,16 +5085,16 @@
       display:block; width:100%;
       margin-top:1rem;
       padding:1rem 1.2rem;
-      background:linear-gradient(135deg,#fbbf24,#f97316);
+      background:var(--fz-accent);
       border:none; border-radius:14px;
-      color:#0a0d1a;
+      color:var(--bg);
       font-family:var(--fm); font-size:1rem; font-weight:800;
       letter-spacing:.04em;
       cursor:pointer;
-      box-shadow:0 10px 26px rgba(251,191,36,.32);
-      transition:transform .15s ease, box-shadow .2s ease;
+      box-shadow:0 10px 26px var(--fz-accent-mid);
+      transition:transform .15s ease, box-shadow .2s ease, filter .15s ease;
     }
-    .cm-cta:hover{ transform:translateY(-2px); box-shadow:0 14px 32px rgba(251,191,36,.42); }
+    .cm-cta:hover{ filter:brightness(1.06); transform:translateY(-2px); box-shadow:0 14px 32px var(--fz-accent-mid); }
     .cm-cta:active{ transform:translateY(0); }
 
     .cm-foot{ margin-top:.85rem; }
@@ -5069,10 +5104,10 @@
     }
     .cm-dot{
       width:7px; height:7px; border-radius:50%;
-      background:rgba(255,255,255,.18);
+      background:var(--fz-surface-mid);
       transition:background .2s ease, transform .2s ease;
     }
-    .cm-dot.active{ background:#fbbf24; transform:scale(1.25); }
+    .cm-dot.active{ background:var(--fz-accent); transform:scale(1.25); }
     .cm-foot-row{
       display:flex; align-items:center; justify-content:space-between;
       font-family:var(--fm); font-size:.72rem;
@@ -5081,23 +5116,24 @@
     .cm-pos{ letter-spacing:.04em; }
     .cm-skip{
       background:none; border:none;
-      color:rgba(167,139,250,.85);
+      color:var(--fz-purple);
+      opacity:.85;
       font-family:var(--fm); font-size:.78rem; font-weight:700;
       cursor:pointer;
       padding:.3rem .35rem;
     }
-    .cm-skip:hover{ color:#a78bfa; }
+    .cm-skip:hover{ opacity:1; }
     .cm-streak{
       display:block; text-align:center;
       margin-top:.55rem;
       font-family:var(--fm); font-size:.72rem;
-      color:#fbbf24; letter-spacing:.04em;
+      color:var(--fz-accent); letter-spacing:.04em;
     }
     .cm-swipe-hint{
       position:absolute; left:0; right:0; bottom:.45rem;
       text-align:center;
       font-family:var(--fm); font-size:.62rem;
-      color:rgba(167,139,250,.35);
+      color:var(--tx3);
       letter-spacing:.32em;
       pointer-events:none;
       animation:cmSwipeHint 3.5s ease-in-out infinite;
@@ -5117,7 +5153,7 @@
       font-family:var(--fh,var(--fm));
       font-size:1.1rem; line-height:1.4;
       text-align:center;
-      color:#fef3c7;
+      color:var(--tx);
       font-weight:700;
       margin-bottom:.85rem;
     }
@@ -5129,54 +5165,60 @@
       position:relative;
       padding:.45rem 0 .45rem 1.2rem;
       font-family:var(--fm); font-size:.85rem; line-height:1.5;
-      color:#dbe2ed;
-      border-bottom:1px solid rgba(255,255,255,.05);
+      color:var(--tx2);
+      border-bottom:1px solid var(--fz-divider);
     }
     .cm-back-bullets li:last-child{ border-bottom:none; }
     .cm-back-bullets li::before{
       content:'•';
       position:absolute; left:.35rem; top:.4rem;
-      color:#fbbf24; font-weight:800;
+      color:var(--fz-accent); font-weight:800;
     }
     .cm-back-closer{
       font-family:Georgia,'Times New Roman',serif;
       font-style:italic; font-size:.95rem; line-height:1.5;
       text-align:center;
-      color:#fbbf24;
+      color:var(--fz-accent);
       padding:.7rem .25rem;
-      border-top:1px solid rgba(251,191,36,.2);
+      border-top:1px solid var(--fz-accent-bd);
       margin-bottom:.75rem;
     }
     .cm-back-actions{
       display:grid; grid-template-columns:1fr 1fr 1fr;
       gap:.4rem;
     }
+    /* Mobile (≤480px) — stack the 3 back-face actions vertically so
+       labels stay readable and tap targets clear 44px. */
+    @media (max-width:480px){
+      .cm-back-actions{ grid-template-columns:1fr; gap:.5rem; }
+      .cm-back-btn{ padding:.85rem 1rem; font-size:.82rem; }
+    }
     .cm-back-btn{
       padding:.65rem .35rem;
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.14);
+      background:var(--fz-surface-soft);
+      border:1px solid var(--fz-card-border);
       color:var(--tx);
       font-family:var(--fm); font-size:.72rem; font-weight:700;
       border-radius:10px; cursor:pointer;
       letter-spacing:.02em;
       transition:background .15s ease, transform .15s ease;
     }
-    .cm-back-btn:hover{ background:rgba(255,255,255,.12); transform:translateY(-1px); }
+    .cm-back-btn:hover{ background:var(--fz-surface-mid); transform:translateY(-1px); }
     .cm-back-btn.cm-dig{
-      background:rgba(167,139,250,.12);
-      border-color:rgba(167,139,250,.32);
-      color:#a78bfa;
+      background:var(--fz-purple-soft);
+      border-color:var(--fz-purple-bd);
+      color:var(--fz-purple);
     }
     .cm-back-btn.cm-next{
-      background:linear-gradient(135deg,#fbbf24,#f97316);
-      border:none; color:#0a0d1a; font-weight:800;
+      background:var(--fz-accent);
+      border:none; color:var(--bg); font-weight:800;
     }
 
     /* Dig Deeper drawer */
     .cm-dig-drawer{
       margin-top:.65rem;
-      background:rgba(15,23,42,.85);
-      border:1px solid rgba(167,139,250,.22);
+      background:var(--fz-card-bg);
+      border:1px solid var(--fz-purple-bd);
       border-radius:14px;
       padding:1rem 1.1rem;
       animation:cmDrawerIn .3s ease both;
@@ -5188,21 +5230,21 @@
     .cm-dig-eyebrow{
       font-family:var(--fm); font-size:.6rem; letter-spacing:.2em;
       text-transform:uppercase; font-weight:800;
-      color:#a78bfa; margin-bottom:.45rem;
+      color:var(--fz-purple); margin-bottom:.45rem;
     }
     .cm-dig-title{
       font-family:var(--fh,var(--fm)); font-size:1.15rem;
       color:var(--tx); margin-bottom:.7rem; line-height:1.25;
     }
-    .cm-dig-detail{ font-family:Georgia,serif; font-size:.88rem; line-height:1.65; color:#dbe2ed; }
+    .cm-dig-detail{ font-family:Georgia,serif; font-size:.88rem; line-height:1.65; color:var(--tx2); }
     .cm-dig-detail p{ margin:0 0 .65rem; }
     .cm-dig-scripture, .cm-dig-source{
       font-family:var(--fm); font-size:.78rem;
       color:var(--tx2); margin-top:.5rem;
-      padding-top:.5rem; border-top:1px solid rgba(255,255,255,.06);
+      padding-top:.5rem; border-top:1px solid var(--fz-divider);
     }
     .cm-dig-scripture span, .cm-dig-source span{
-      color:#fbbf24; font-weight:700;
+      color:var(--fz-accent); font-weight:700;
     }
     .cm-dig-actions{
       display:flex; gap:.4rem; margin-top:.85rem; flex-wrap:wrap;
@@ -5230,20 +5272,20 @@
     }
     .fz-today-hdr::after{
       content:''; flex:1; height:1px;
-      background:linear-gradient(90deg,rgba(255,255,255,.18),transparent);
+      background:linear-gradient(90deg, var(--fz-divider), transparent);
     }
     .fz-today-card{
-      background:linear-gradient(160deg,rgba(15,23,42,.85),rgba(30,17,71,.7));
-      border:1px solid rgba(255,255,255,.08);
+      background:var(--fz-card-bg);
+      border:1px solid var(--fz-card-border);
       border-radius:16px;
       padding:1.05rem 1.15rem;
       margin-bottom:.7rem;
-      box-shadow:0 8px 22px rgba(0,0,0,.2);
+      box-shadow:var(--card-shadow);
     }
     .fz-card-hdr{
       font-family:var(--fm); font-size:.6rem;
       letter-spacing:.2em; text-transform:uppercase;
-      color:#fbbf24; font-weight:800;
+      color:var(--fz-accent); font-weight:800;
       margin-bottom:.55rem;
     }
     /* Card A — Daily Challenge */
@@ -5260,33 +5302,33 @@
     .fz-ch-btn{
       width:100%;
       padding:.75rem 1rem;
-      background:rgba(34,197,94,.1);
-      border:1px solid rgba(34,197,94,.35);
-      color:#22c55e;
+      background:var(--fz-ok-soft);
+      border:1px solid var(--fz-ok-bd);
+      color:var(--fz-ok);
       font-family:var(--fm); font-size:.85rem; font-weight:700;
       border-radius:11px; cursor:pointer;
-      transition:background .15s ease, transform .15s ease;
+      transition:background .15s ease, transform .15s ease, filter .15s ease;
     }
     .fz-ch-btn:hover:not(:disabled){
-      background:rgba(34,197,94,.18);
+      filter:brightness(1.1);
       transform:translateY(-1px);
     }
     .fz-ch-btn:disabled{
       cursor:default;
-      background:rgba(34,197,94,.22);
-      color:#0a0d1a;
+      background:var(--fz-ok);
+      color:var(--bg);
     }
     .fz-today-card.fz-done{
-      border-color:rgba(34,197,94,.45);
-      background:linear-gradient(160deg,rgba(34,197,94,.10),rgba(34,197,94,.04));
+      border-color:var(--fz-ok-bd);
+      background:var(--fz-ok-soft);
     }
     /* Card B — Quick Prayer */
     .fz-prayer-card{ cursor:pointer; transition:transform .15s ease, border-color .2s ease; }
-    .fz-prayer-card:hover{ transform:translateY(-2px); border-color:rgba(167,139,250,.45); }
+    .fz-prayer-card:hover{ transform:translateY(-2px); border-color:var(--fz-purple-bd); }
     .fz-pr-prompt{
       font-family:Georgia,serif; font-style:italic;
       font-size:1rem; line-height:1.5;
-      color:#fef3c7;
+      color:var(--tx);
       margin-bottom:.45rem;
     }
     .fz-pr-meta{
@@ -5300,18 +5342,19 @@
     }
     .fz-mood-btn{
       flex:1; padding:.6rem .3rem;
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.10);
+      background:var(--fz-surface-soft);
+      border:1px solid var(--fz-card-border);
       border-radius:11px;
       font-size:1.4rem; line-height:1;
       cursor:pointer;
+      color:var(--tx);
       transition:background .15s ease, border-color .15s ease, transform .15s ease;
     }
-    .fz-mood-btn:hover{ background:rgba(255,255,255,.08); transform:translateY(-1px); }
+    .fz-mood-btn:hover{ background:var(--fz-surface-mid); transform:translateY(-1px); }
     .fz-mood-btn.active{
-      background:rgba(251,191,36,.18);
-      border-color:rgba(251,191,36,.55);
-      box-shadow:0 0 0 2px rgba(251,191,36,.18);
+      background:var(--fz-accent-soft);
+      border-color:var(--fz-accent-bd);
+      box-shadow:0 0 0 2px var(--fz-accent-soft);
     }
     .fz-sound-row{
       display:flex; gap:.4rem; flex-wrap:wrap;
@@ -5319,19 +5362,19 @@
     .fz-sound-pill{
       flex:1 1 auto;
       padding:.55rem .7rem;
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.10);
+      background:var(--fz-surface-soft);
+      border:1px solid var(--fz-card-border);
       color:var(--tx);
       font-family:var(--fm); font-size:.78rem; font-weight:600;
       border-radius:99px; cursor:pointer;
-      transition:background .15s ease, border-color .15s ease, box-shadow .2s ease;
+      transition:background .15s ease, border-color .15s ease, box-shadow .2s ease, color .15s ease;
     }
-    .fz-sound-pill:hover{ background:rgba(255,255,255,.08); }
+    .fz-sound-pill:hover{ background:var(--fz-surface-mid); }
     .fz-sound-pill.active{
-      background:rgba(167,139,250,.18);
-      border-color:rgba(167,139,250,.55);
-      color:#a78bfa;
-      box-shadow:0 0 18px rgba(167,139,250,.25);
+      background:var(--fz-purple-soft);
+      border-color:var(--fz-purple-bd);
+      color:var(--fz-purple);
+      box-shadow:0 0 18px var(--fz-purple-mid);
     }
 
     /* ── ZONE 3 — Explore toggle ──────────────────────────────── */
@@ -5339,17 +5382,17 @@
       display:block; width:100%;
       margin:1rem 0 .7rem;
       padding:.85rem 1rem;
-      background:rgba(167,139,250,.06);
-      border:1px dashed rgba(167,139,250,.35);
-      color:#a78bfa;
+      background:var(--fz-purple-soft);
+      border:1px dashed var(--fz-purple-bd);
+      color:var(--fz-purple);
       font-family:var(--fm); font-size:.82rem; font-weight:700;
       letter-spacing:.08em;
       border-radius:12px; cursor:pointer;
       transition:background .15s ease, border-color .15s ease;
     }
     .fz-explore-toggle:hover{
-      background:rgba(167,139,250,.12);
-      border-color:rgba(167,139,250,.5);
+      background:var(--fz-purple-mid);
+      border-color:var(--fz-purple);
     }
 
     /* Empty/placeholder during data-load */
@@ -5359,23 +5402,6 @@
       font-family:Georgia,serif; font-style:italic;
       color:var(--tx2);
     }
-
-    /* Light-mode polish */
-    :root.light .cm-card-face{
-      background:linear-gradient(160deg,#ffffff 0%,#fafaf9 100%);
-      box-shadow:0 18px 36px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.5);
-      color:#1a1233;
-    }
-    :root.light .cm-question{ color:#1a1233; }
-    :root.light .cm-back-headline{ color:#1a1233; }
-    :root.light .cm-back-bullets li{ color:#374151; border-bottom-color:rgba(15,23,42,.06); }
-    :root.light .cm-back-closer{ color:#b45309; border-top-color:rgba(251,191,36,.4); }
-    :root.light .fz-today-card{
-      background:linear-gradient(160deg,#ffffff,#fafaf9);
-      border-color:rgba(15,23,42,.08);
-      color:#1a1233;
-    }
-    :root.light .fz-ch-text, :root.light .fz-pr-prompt{ color:#1a1233; }
 
     @media (prefers-reduced-motion: reduce){
       .cm-card-inner, .cm-card-face::before, .cm-swipe-hint{

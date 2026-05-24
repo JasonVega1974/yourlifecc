@@ -289,6 +289,10 @@ function _fzOnTouchEnd(e){
   if (dt > 600) return;
   if (Math.abs(dy) > Math.abs(dx)) return;
   if (Math.abs(dx) < 50) return;
+  // When the card's back face is showing, a right-swipe acts as the
+  // "close gesture" — flip back to the question instead of routing to
+  // the previous card. Left-swipe always advances regardless of face.
+  if (_fzFlipped && dx > 0) { cmFlipBack(); return; }
   if (dx < 0) cmNext(); else cmPrev();
 }
 
