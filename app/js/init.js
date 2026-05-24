@@ -1211,49 +1211,116 @@ function _foStartCanvasScene() {
     }
   }
   function drawWellCross(ctx, x, y, alpha, angle){
-    // 2026-05-28 v2 — Y-axis "billboard" rotation. ctx.rotate(angle)
-    // spins the cross around its Z axis like a wheel, taking it
-    // upside-down through the cycle. Real Christian crosses don't
-    // flip — they revolve like a coin on a table. scaleX = cos(angle)
-    // simulates that 3D Y-axis spin on a 2D canvas:
-    //   1 → 0 → -1 → 0 → 1  (face → edge → back → edge → face)
-    // The cross is never upside down; it just narrows to an edge and
-    // widens again, with the back face being the mirror of the front.
-    var scaleX = Math.cos(angle || 0);
-
+    // 2026-05-28 v3 — True 3D gold cross simulation. v2's scaleX trick
+    // gave the right Y-axis billboard motion but had two problems:
+    // (1) at scaleX ≈ 0 the cross was just a 0-width line, effectively
+    // invisible for one frame each edge-on pass, and (2) the front-face
+    // alpha pulse could dip to 0 leaving nothing on screen.
+    //
+    // Fix: layer FIVE passes per frame, all keyed off cos(angle) but
+    // each contributing something even at the edge:
+    //   1. Drop shadow / back face — dark gold offset behind, suggests
+    //      the cross has a back side catching less light.
+    //   2. Side / depth fill — mid gold drawn slightly wider than the
+    //      front; only visible when |scaleX| < 0.7 (rotation in
+    //      progress). This is what makes it read as a solid object.
+    //   3. Outer glow — 3 concentric gold halos with shadowBlur (the
+    //      "always on" glow that breathes with alpha).
+    //   4. Front face — bright cream over gold shadow + a center
+    //      highlight at the bar intersection.
+    //   5. Corona halo — radial-gradient circle behind the cross
+    //      intersection, NEVER scaled or rotated, so the cross is
+    //      always anchored by a soft gold halo from every angle.
+    //
+    // effectiveScale clamps the X-scale so the cross never narrows
+    // past its physical depth (12px) — the moment it would otherwise
+    // vanish into nothing, it instead reads as the cross seen edge-on.
     var totalH = 70, crossW = 8, beamW = 44, beamFromTop = 22;
-    var topY = -totalH / 2;                     // top of vertical bar
-    var beamTopY = topY + beamFromTop;          // top of crossbeam
+    var depth = 12;
+    var topY = -totalH / 2;
+    var beamTopY = topY + beamFromTop;
+    var intersectionY = beamTopY + crossW / 2;
+
+    var scaleX  = Math.cos(angle || 0);
+    var absSx   = Math.abs(scaleX);
+    var minScale = depth / beamW;
+    var effSx = (scaleX >= 0)
+      ? Math.max(scaleX, minScale)
+      : Math.min(scaleX, -minScale);
+    var shadowOffset = (1 - absSx) * 6;
 
     ctx.save();
     ctx.translate(x, y);
-    ctx.scale(scaleX, 1);
 
-    // ── Outer glow layers — 4 concentric, softest on the outside.
-    //    Outer rects are wider (i*0.5, i*0.4); the shadowBlur does
-    //    the actual halo work, so the rect size mostly controls how
-    //    "hot" the centre of each layer is. ──
-    for (var i = 4; i >= 1; i--){
+    // ── LAYER 1 — Drop shadow / back face ──
+    ctx.save();
+    ctx.translate(shadowOffset, 3);
+    ctx.scale(effSx, 1);
+    ctx.globalAlpha = alpha * 0.4;
+    ctx.fillStyle = '#8b6914';
+    ctx.shadowColor = 'transparent';
+    _wcRect(ctx, -crossW / 2, topY,     crossW, totalH, 1);
+    _wcRect(ctx, -beamW / 2,  beamTopY, beamW,  crossW, 1);
+    ctx.restore();
+
+    // ── LAYER 2 — Side / depth fill (visible mid-rotation) ──
+    if (absSx < 0.7){
+      var sideAlpha = (0.7 - absSx) / 0.7;
       ctx.save();
-      ctx.globalAlpha = (alpha * 0.12) / i;
-      ctx.fillStyle = '#ffd700';
+      ctx.translate(shadowOffset * 0.5, 1.5);
+      ctx.scale(effSx * 1.3, 1.02);
+      ctx.globalAlpha = alpha * sideAlpha * 0.7;
+      ctx.fillStyle = '#c8960c';
       ctx.shadowColor = '#ffd700';
-      ctx.shadowBlur = 25 * i;
-      // Vertical bar glow
-      _wcRect(ctx, (-crossW / 2) * i * 0.5, topY, crossW * i * 0.5, totalH, 2);
-      // Horizontal crossbeam glow
-      _wcRect(ctx, (-beamW / 2) * i * 0.4, beamTopY, beamW * i * 0.4, crossW, 2);
+      ctx.shadowBlur = 8;
+      _wcRect(ctx, -crossW / 2, topY,     crossW, totalH, 1);
+      _wcRect(ctx, -beamW / 2,  beamTopY, beamW,  crossW, 1);
       ctx.restore();
     }
 
-    // ── Solid cross — bright cream centre over gold shadow ──
+    // ── LAYER 3 — Outer glow (3 concentric halos) ──
     ctx.save();
+    ctx.scale(effSx, 1);
+    for (var i = 3; i >= 1; i--){
+      ctx.globalAlpha = (alpha * 0.2) / i;
+      ctx.fillStyle = '#ffd700';
+      ctx.shadowColor = '#ffd700';
+      ctx.shadowBlur = 30 * i;
+      _wcRect(ctx, -(crossW * i * 0.4), topY, crossW * i * 0.8, totalH, 3);
+      _wcRect(ctx, -beamW / 2, beamTopY - crossW * 0.3 * i,
+                   beamW, crossW * (1 + i * 0.3), 3);
+    }
+    ctx.restore();
+
+    // ── LAYER 4 — Front face (bright cream + center highlight) ──
+    ctx.save();
+    ctx.scale(effSx, 1);
     ctx.globalAlpha = alpha;
     ctx.fillStyle = '#fffde7';
     ctx.shadowColor = '#ffd700';
-    ctx.shadowBlur = 18;
+    ctx.shadowBlur = 20;
     _wcRect(ctx, -crossW / 2, topY,     crossW, totalH, 2);
     _wcRect(ctx, -beamW / 2,  beamTopY, beamW,  crossW, 2);
+    // Bright spot at the bar intersection
+    ctx.fillStyle = '#ffffff';
+    ctx.globalAlpha = alpha * 0.8;
+    ctx.shadowBlur = 10;
+    _wcRect(ctx, -crossW / 2, beamTopY, crossW, crossW, 1);
+    ctx.restore();
+
+    // ── LAYER 5 — Corona halo (NEVER scaled — always visible) ──
+    // Anchors the cross from any rotation angle; even fully edge-on
+    // the user still sees a soft gold disc holding the position.
+    ctx.save();
+    ctx.globalAlpha = alpha * 0.15;
+    ctx.shadowColor = 'transparent';
+    var corona = ctx.createRadialGradient(0, intersectionY, 0, 0, intersectionY, 32);
+    corona.addColorStop(0, '#ffd700');
+    corona.addColorStop(1, 'transparent');
+    ctx.fillStyle = corona;
+    ctx.beginPath();
+    ctx.arc(0, intersectionY, 32, 0, Math.PI * 2);
+    ctx.fill();
     ctx.restore();
 
     ctx.restore();
@@ -1315,19 +1382,16 @@ function _foStartCanvasScene() {
       // 35, so the cross bottom clears the roof by ~45px). On tiny
       // canvases (rare) the Math.max floor keeps it on-screen.
       //
-      // 2026-05-28 v2 — Y-axis (billboard) rotation instead of Z-axis
-      // spin. Period 8s for the full revolution. Edge-on (|scaleX|
-      // small) gets a 40% glow boost so the moment the cross
-      // catches the light reads as a brief shimmer rather than a
-      // disappearance.
-      // Pulse: 0.3 + sin(t/1500)*0.5  → wider [-0.2, 0.8] range per
-      // spec; canvas clamps negative alpha to 0 so the cross briefly
-      // fades to invisible at the bottom of each breath cycle.
-      var _wcAng  = (ts / 8000) * Math.PI * 2;
-      var _wcSx   = Math.cos(_wcAng);
-      var _wcEdge = (Math.abs(_wcSx) < 0.2) ? 1.4 : 1.0;
-      var _wcA    = (0.3 + Math.sin(ts / 1500) * 0.5) * _wcEdge;
-      var _wcY    = Math.max(40, H * 0.556 - 80);
+      // 2026-05-28 v3 — drawWellCross now does its own 5-layer 3D
+      // simulation (drop shadow + depth fill + glow + bright front +
+      // corona halo). The edge-on glow boost from v2 is gone — the
+      // depth fill + ever-visible corona keep the cross legible at
+      // every angle. Pulse range widened to [0.30, 1.00] so the
+      // breath cycle never dims the cross below 30% — it stays
+      // visibly gold from any phase of the rotation.
+      var _wcAng = (ts / 8000) * Math.PI * 2;
+      var _wcA   = 0.65 + Math.sin(ts / 1500) * 0.35;
+      var _wcY   = Math.max(40, H * 0.556 - 80);
       drawWellCross(ctx, W * 0.50, _wcY, _wcA, _wcAng);
       dFG(W,H); dSparks(W,H,t,ts); dScrim(W,H);
       window._foCanvasRaf = requestAnimationFrame(tick);
