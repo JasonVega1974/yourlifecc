@@ -1252,9 +1252,89 @@ function renderFaithOnlyHero() {
   const hero = document.getElementById('faithHeroCinematic');
   if (hero) {
     hero.style.display = '';
+    // ── 2026-05-25 — replaced the day-night Canvas painting
+    //    (_foStartCanvasScene, init.js:761) with a clean layered SVG
+    //    landscape per the redesign spec. Four mountain layers + star
+    //    field + moonrise glow + shooting star + a minimal SVG well in
+    //    the foreground. All colors thread through CSS variables so
+    //    light/dark mode tracks. The legacy canvas function is left in
+    //    place untouched as dead code (easy revert).
+    var svgMountains =
+      '<svg class="fo-mtn-svg" viewBox="0 0 800 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true">' +
+        '<defs>' +
+          // Soft moonrise glow behind tallest peak (mid layer)
+          '<radialGradient id="foGlow" cx="36%" cy="64%" r="38%">' +
+            '<stop offset="0%"  stop-color="var(--p)" stop-opacity=".42"/>' +
+            '<stop offset="55%" stop-color="var(--p)" stop-opacity=".10"/>' +
+            '<stop offset="100%" stop-color="var(--p)" stop-opacity="0"/>' +
+          '</radialGradient>' +
+        '</defs>' +
+
+        // Sky glow halo behind the tallest peak
+        '<rect class="fo-sky-glow" x="0" y="0" width="800" height="300" fill="url(#foGlow)"/>' +
+
+        // Stars — 11 scattered dots in the upper sky
+        '<g class="fo-stars">' +
+          '<circle cx="60"  cy="40"  r="1.1" />' +
+          '<circle cx="115" cy="78"  r="0.9" />' +
+          '<circle cx="178" cy="32"  r="1.4" />' +
+          '<circle cx="232" cy="60"  r="0.8" />' +
+          '<circle cx="296" cy="22"  r="1.2" />' +
+          '<circle cx="355" cy="74"  r="1.0" />' +
+          '<circle cx="430" cy="36"  r="1.5" />' +
+          '<circle cx="510" cy="68"  r="0.9" />' +
+          '<circle cx="588" cy="44"  r="1.3" />' +
+          '<circle cx="652" cy="20"  r="0.8" />' +
+          '<circle cx="730" cy="58"  r="1.1" />' +
+        '</g>' +
+
+        // North star — slightly larger with a soft cross-glow
+        '<g class="fo-north-star">' +
+          '<circle cx="290" cy="46" r="2.4" />' +
+          '<line x1="282" y1="46" x2="298" y2="46" stroke-width="0.6" />' +
+          '<line x1="290" y1="38" x2="290" y2="54" stroke-width="0.6" />' +
+        '</g>' +
+
+        // Shooting star — single thin diagonal line, animated via CSS
+        '<line class="fo-shoot" x1="0" y1="0" x2="40" y2="14" stroke-width="1.4" />' +
+
+        // Layer 1 — gentle rolling hills (lightest, background)
+        '<path class="fo-mtn-1" d="M0,200 C100,180 200,160 300,170 C400,180 500,155 600,165 C700,175 750,170 800,165 L800,300 L0,300 Z"/>' +
+
+        // Layer 2 — tall central peak slightly off-center
+        '<path class="fo-mtn-2" d="M0,220 C70,200 140,185 200,195 C250,200 280,170 320,140 C360,170 400,200 460,205 C540,210 620,180 700,195 C740,200 770,195 800,200 L800,300 L0,300 Z"/>' +
+
+        // Layer 3 — bolder range with 3 distinct peaks
+        '<path class="fo-mtn-3" d="M0,240 C50,225 110,215 160,225 C200,232 230,205 270,215 C310,225 340,180 380,180 C420,180 450,215 490,225 C530,230 580,205 620,210 C680,218 740,225 800,225 L800,300 L0,300 Z"/>' +
+
+        // Layer 4 — rolling foreground hills (darkest)
+        '<path class="fo-mtn-4" d="M0,265 C90,255 180,248 270,260 C360,270 450,248 540,258 C620,265 700,258 800,262 L800,300 L0,300 Z"/>' +
+
+        // Foreground SVG well — small silhouette, centered, anchored
+        // to the very bottom. Keeps the "Enter The Well" branding
+        // anchored in the visual.
+        '<g class="fo-well" transform="translate(380 252)">' +
+          // Soft ground shadow under the well
+          '<ellipse cx="20" cy="48" rx="36" ry="3.5" fill="rgba(0,0,0,.35)"/>' +
+          // Roof triangle
+          '<path d="M20,2 L0,18 L40,18 Z" />' +
+          // Cross-beam under the roof
+          '<rect x="-2" y="17" width="44" height="2.4" rx="0.6" />' +
+          // Two posts (legs supporting the roof)
+          '<rect x="2"  y="19" width="2"  height="20" rx="0.5" />' +
+          '<rect x="36" y="19" width="2"  height="20" rx="0.5" />' +
+          // Stone body of the well
+          '<rect x="6"  y="32" width="28" height="14" rx="1.5" />' +
+          // Top rim of the well
+          '<ellipse cx="20" cy="32" rx="14" ry="2.6" />' +
+          // Water surface (cool highlight)
+          '<ellipse class="fo-well-water" cx="20" cy="32.3" rx="10" ry="1.6"/>' +
+        '</g>' +
+      '</svg>';
+
     hero.innerHTML =
       '<div class="fo-hero" id="faithOnlyHero">' +
-        '<canvas id="fo-canvas-scene" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;"></canvas>' +
+        svgMountains +
         '<div class="fo-hero-scrim"></div>' +
         '<div class="fo-hero-content">' +
           '<div class="fo-hero-greeting">' + greetingHtml + '</div>' +
@@ -1292,8 +1372,9 @@ function renderFaithOnlyHero() {
   })();
   var ctaBtn = document.querySelector('.fo-hero-cta') || document.querySelector('.fo-enter-btn');
   if (ctaBtn) ctaBtn.style.marginBottom = 'max(32px, env(safe-area-inset-bottom, 32px))';
-  // 150ms gives Android Chrome time to finish layout before canvas reads dimensions.
-  setTimeout(_foStartCanvasScene, 150);
+  // 2026-05-25 — canvas-painted scene retired; the new SVG landscape is
+  // declarative and animates via CSS keyframes. _foStartCanvasScene is
+  // left in place as dead code in case we ever revert.
 
   // ── Entry cards & today's verse intentionally NOT rendered. ──
   // After clicking "Enter The Well", wellGoto('home') takes them inside where

@@ -145,9 +145,34 @@ function renderConvinceMeHero(){
         '</div>' +
       '</div>' +
     '</div>' +
+    // Scroll cue — gentle downward chevron telling the user there's more
+    // below the card (Today zone). Hidden after first scroll (see
+    // _fzAttachScrollCueHide).
+    '<div class="cm-scroll-cue" id="cmScrollCue" aria-hidden="true">⌄</div>' +
     '<div class="cm-dig-drawer" id="cmDigDrawer" style="display:none;"></div>';
 
   _fzAttachSwipe();
+  _fzAttachScrollCueHide();
+}
+
+// One-shot scroll listener — fades the chevron the moment the user
+// scrolls so the cue doesn't compete with content they've already seen.
+// Reset on every render so the cue can re-appear if the section is
+// re-mounted with the page at the top.
+var _fzScrollCueAttached = false;
+function _fzAttachScrollCueHide(){
+  if (_fzScrollCueAttached) return;
+  _fzScrollCueAttached = true;
+  function hideCue(){
+    var cue = document.getElementById('cmScrollCue');
+    if (cue) cue.classList.add('cm-cue-hide');
+    window.removeEventListener('scroll', onScroll, true);
+  }
+  function onScroll(){
+    if (window.scrollY > 40 || window.pageYOffset > 40) hideCue();
+  }
+  // Capture so the listener fires regardless of which scroller moved.
+  window.addEventListener('scroll', onScroll, { passive:true, capture:true });
 }
 
 function _fzRenderDots(){

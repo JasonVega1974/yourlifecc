@@ -1167,6 +1167,96 @@
         radial-gradient(ellipse 70% 30% at 50% 22%,rgba(1,3,10,.28) 0%,transparent 80%),
         linear-gradient(180deg,rgba(1,3,10,.18) 0%,transparent 32%,transparent 68%,rgba(1,3,10,.42) 100%);
     }
+
+    /* ── 2026-05-25 — SVG landscape (replaces the canvas-painted scene).
+       Four mountain layers + star field + moonrise glow + shooting star
+       + a small SVG well silhouette. All colors thread through CSS
+       variables + color-mix so dark/light mode tracks. Each layer
+       drifts at a different cadence for parallax breath. ── */
+    .fo-mtn-svg{
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      z-index:2;
+      pointer-events:none;
+      display:block;
+    }
+    .fo-sky-glow{ opacity:.9; }
+    .fo-stars circle{
+      fill:var(--tx);
+      opacity:.78;
+      animation:foStarTwinkle 4.5s ease-in-out infinite;
+    }
+    .fo-stars circle:nth-child(2n){  animation-duration:5.8s; animation-delay:.7s; }
+    .fo-stars circle:nth-child(3n){  animation-duration:3.4s; animation-delay:1.4s; opacity:.55; }
+    .fo-stars circle:nth-child(5n){  animation-duration:6.2s; animation-delay:2.1s; }
+    @keyframes foStarTwinkle{
+      0%,100%{ opacity:.78; transform:scale(1); }
+      50%   { opacity:.32; transform:scale(.6); }
+    }
+    .fo-north-star circle{ fill:var(--g); }
+    .fo-north-star line{ stroke:var(--g); opacity:.65; }
+    .fo-shoot{
+      stroke:var(--tx);
+      opacity:0;
+      filter:drop-shadow(0 0 4px color-mix(in srgb, var(--tx) 80%, transparent));
+      animation:foShoot 14s linear infinite;
+      animation-delay:6s;
+    }
+    @keyframes foShoot{
+      0%, 92%{ opacity:0; transform:translate(0,0); }
+      93%   { opacity:.85; }
+      99%   { opacity:.85; transform:translate(160px,68px); }
+      100%  { opacity:0;   transform:translate(160px,68px); }
+    }
+
+    /* Mountain layers — back to front, each progressively darker. The
+       gradient uses color-mix so light mode gets a soft purple-grey
+       fade instead of inverting to a too-light wash. */
+    .fo-mtn-1{ fill:color-mix(in srgb, var(--bg) 62%, var(--p) 38%);
+      animation:foMtnDrift1 60s ease-in-out infinite; transform-origin:center bottom; }
+    .fo-mtn-2{ fill:color-mix(in srgb, var(--bg) 44%, var(--p) 56%);
+      animation:foMtnDrift2 45s ease-in-out infinite; transform-origin:center bottom; }
+    .fo-mtn-3{ fill:color-mix(in srgb, var(--bg) 26%, var(--p) 74%);
+      animation:foMtnDrift3 30s ease-in-out infinite; transform-origin:center bottom; }
+    .fo-mtn-4{ fill:color-mix(in srgb, var(--bg) 8%,  var(--p) 92%);
+      animation:foMtnDrift4 20s ease-in-out infinite; transform-origin:center bottom; }
+    @keyframes foMtnDrift1{ 0%,100%{ transform:translateX(-4px); } 50%{ transform:translateX(4px); } }
+    @keyframes foMtnDrift2{ 0%,100%{ transform:translateX(-2.5px); } 50%{ transform:translateX(2.5px); } }
+    @keyframes foMtnDrift3{ 0%,100%{ transform:translateX(-1.5px); } 50%{ transform:translateX(1.5px); } }
+    @keyframes foMtnDrift4{ 0%,100%{ transform:translateX(-1px); } 50%{ transform:translateX(1px); } }
+
+    /* Foreground SVG well silhouette — anchored bottom-center, sits on
+       top of mountain layer 4. Dark-mode well reads as moonlit wood;
+       light mode picks up the same purple-tinted dark. */
+    .fo-well > path,
+    .fo-well > rect{
+      fill:color-mix(in srgb, var(--bg) 5%, var(--p) 95%);
+      stroke:color-mix(in srgb, var(--bg) 30%, var(--p) 70%);
+      stroke-width:.4;
+    }
+    .fo-well > ellipse{
+      fill:color-mix(in srgb, var(--bg) 10%, var(--p) 90%);
+      stroke:color-mix(in srgb, var(--bg) 35%, var(--p) 65%);
+      stroke-width:.4;
+    }
+    .fo-well-water{
+      fill:var(--c) !important;
+      opacity:.7;
+      stroke:none !important;
+      animation:foWellShimmer 3.8s ease-in-out infinite;
+    }
+    @keyframes foWellShimmer{
+      0%,100%{ opacity:.45; transform:scaleX(1); transform-origin:center; }
+      50%   { opacity:.78; transform:scaleX(1.06); transform-origin:center; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .fo-mtn-1, .fo-mtn-2, .fo-mtn-3, .fo-mtn-4,
+      .fo-stars circle, .fo-shoot, .fo-well-water{
+        animation:none !important;
+      }
+      .fo-shoot{ opacity:0 !important; }
+    }
     /* ── Top content (greeting / title / subtitle) ── */
     .fo-hero-content{
       position:relative;z-index:5;
@@ -5020,11 +5110,16 @@
        Grid-stack layout: both faces occupy the same grid cell so the
        container takes the MAX of (front, back) height. Fixes mobile
        clipping where the back face's 3 action buttons fell outside
-       the absolutely-positioned 280px container and became un-tappable. */
+       the absolutely-positioned 280px container and became un-tappable.
+
+       Mobile-only: cap max-height when NOT flipped so the front face
+       feels like an invitation, not a billboard — Zone 2 peeks below
+       and creates curiosity to scroll. The cap LIFTS on .flipped so
+       the back face still grows freely (preserves the earlier fix). */
     .cm-card-container{
       position:relative; width:100%;
       perspective:1400px;
-      margin-bottom:.85rem;
+      margin-bottom:.55rem;
     }
     .cm-card-inner{
       position:relative; width:100%;
@@ -5049,6 +5144,43 @@
       display:flex; flex-direction:column;
       color:var(--tx);
       overflow:hidden;
+    }
+    /* Mobile compaction — front-face only. Back-face cap is lifted by
+       `.flipped` rules below so the previous clip fix stands. */
+    @media (max-width: 768px){
+      .cm-card-container{ min-height:200px; max-height:240px; }
+      .cm-card-inner{ min-height:200px; }
+      .cm-card-face{ min-height:200px; padding:1.2rem; }
+      .cm-card-container.flipped{ max-height:none; }
+    }
+    @media (min-width: 769px){
+      .cm-card-container{ max-height:300px; }
+      .cm-card-container.flipped{ max-height:none; }
+    }
+
+    /* ── Scroll cue below the card — invites Zone 2 below the fold.
+       Hidden after first scroll (handled by faith-zones.js). Pure CSS
+       bounce, fades to nothing under reduced-motion. */
+    .cm-scroll-cue{
+      display:flex; align-items:center; justify-content:center;
+      width:100%;
+      height:28px;
+      margin-bottom:.55rem;
+      color:var(--tx3);
+      font-size:1.45rem; line-height:1;
+      font-family:var(--fm);
+      opacity:.55;
+      pointer-events:none;
+      animation:cmScrollCue 2.1s ease-in-out infinite;
+      transition:opacity .35s ease;
+    }
+    .cm-scroll-cue.cm-cue-hide{ opacity:0; }
+    @keyframes cmScrollCue{
+      0%,100%{ transform:translateY(0); opacity:.55; }
+      50%   { transform:translateY(4px); opacity:.9; }
+    }
+    @media (prefers-reduced-motion: reduce){
+      .cm-scroll-cue{ animation:none !important; }
     }
     /* Animated gradient border — gold-purple-cyan sweep at 45% alpha */
     .cm-card-face::before{
