@@ -1172,20 +1172,115 @@
        Four mountain layers + star field + moonrise glow + shooting star
        + a small SVG well silhouette. All colors thread through CSS
        variables + color-mix so dark/light mode tracks. Each layer
-       drifts at a different cadence for parallax breath. ── */
+       drifts at a different cadence for parallax breath.
+       2026-05-26 — restored day/night cycle. _foStartDayNightCycle()
+       in init.js sets these CSS vars on .fo-mtn-svg each frame:
+         --fo-sky-top, --fo-sky-bot     sky gradient stops
+         --fo-sun-op, --fo-sun-color    sun visibility + color
+         --fo-moon-op, --fo-night-op    moon + star + halo dim
+         --fo-cloud-op, --fo-bird-op    cloud + bird visibility
+         --fo-cross-glow                cross intensity (always > 0)
+       Sun position is set as a transform attribute by JS (cx/cy as
+       CSS isn't reliable cross-browser). ── */
     .fo-mtn-svg{
       position:absolute; inset:0;
       width:100%; height:100%;
       z-index:2;
       pointer-events:none;
       display:block;
+      /* Defaults applied before JS lands the first frame — night state */
+      --fo-sky-top:    #0a0520;
+      --fo-sky-bot:    #1a0a3e;
+      --fo-sun-op:     0;
+      --fo-sun-color:  #ff8c00;
+      --fo-moon-op:    1;
+      --fo-night-op:   1;
+      --fo-cloud-op:   0.15;
+      --fo-bird-op:    0;
+      --fo-cross-glow: 1;
     }
-    .fo-sky-glow{ opacity:.9; }
+    /* SVG gradient stops driven by the JS-set custom properties */
+    .fo-sky-stop-top{ stop-color:var(--fo-sky-top); }
+    .fo-sky-stop-bot{ stop-color:var(--fo-sky-bot); }
+
+    .fo-sky-glow{ opacity:var(--fo-night-op, 1); transition:opacity .4s linear; }
+
+    /* ── Moon ────────────────────────────────────────────────── */
+    .fo-day-moon{ opacity:var(--fo-moon-op, 1); transition:opacity .4s linear; }
+    .fo-moon-glow{
+      fill:#cfd7ff;
+      opacity:.20;
+      filter:blur(2px);
+    }
+    .fo-moon-body{
+      fill:#e8ecf7;
+      filter:drop-shadow(0 0 6px rgba(200,220,255,.55));
+    }
+    .fo-moon-crescent{ fill:var(--fo-sky-top, #0a0520); transition:fill .4s linear; }
+
+    /* ── Sun ─────────────────────────────────────────────────── */
+    .fo-day-sun{ opacity:var(--fo-sun-op, 0); transition:opacity .4s linear; }
+    .fo-sun-halo{
+      fill:var(--fo-sun-color, #ff8c00);
+      opacity:.32;
+      filter:blur(8px);
+    }
+    .fo-sun-body{
+      fill:var(--fo-sun-color, #ffe066);
+      filter:drop-shadow(0 0 14px var(--fo-sun-color, #ffe066));
+    }
+
+    /* ── Clouds — soft white ellipse groups, drift L → R via CSS ── */
+    .fo-cloud{
+      fill:#f5f6fa;
+      opacity:calc(var(--fo-cloud-op, 0.15) * 0.75);
+    }
+    .fo-cloud-1{ animation:foCloudDrift1 80s linear infinite; }
+    .fo-cloud-2{ animation:foCloudDrift2 120s linear infinite; }
+    .fo-cloud-3{ animation:foCloudDrift3 100s linear infinite; }
+    @keyframes foCloudDrift1{
+      0%   { transform:translate(-100px, 110px); }
+      100% { transform:translate(900px,  110px); }
+    }
+    @keyframes foCloudDrift2{
+      0%   { transform:translate(300px, 78px); }
+      100% { transform:translate(1300px, 78px); }
+    }
+    @keyframes foCloudDrift3{
+      0%   { transform:translate(820px, 140px); }
+      100% { transform:translate(1820px, 140px); }
+    }
+
+    /* ── Birds — small M-curves flying L ←, opacity by phase ── */
+    .fo-bird{
+      fill:#1c2333;
+      opacity:var(--fo-bird-op, 0);
+      transition:opacity .4s linear;
+    }
+    .fo-bird-1{ animation:foBirdFlight1 18s linear infinite; transform-origin:center; }
+    .fo-bird-2{ animation:foBirdFlight2 25s linear infinite; animation-delay:4s; }
+    .fo-bird-3{ animation:foBirdFlight3 32s linear infinite; animation-delay:9s; }
+    @keyframes foBirdFlight1{
+      0%   { transform:translate(820px, 40px) scale(.6); }
+      100% { transform:translate(-50px, 28px) scale(.6); }
+    }
+    @keyframes foBirdFlight2{
+      0%   { transform:translate(820px, 70px) scale(.55); }
+      100% { transform:translate(-50px, 62px) scale(.55); }
+    }
+    @keyframes foBirdFlight3{
+      0%   { transform:translate(820px, 95px) scale(.5); }
+      100% { transform:translate(-50px, 80px) scale(.5); }
+    }
+
+    /* Stars + north star fade with the night opacity so they recede
+       gracefully into the day sky instead of staying as black dots. */
     .fo-stars circle{
       fill:var(--tx);
-      opacity:.78;
+      opacity:calc(.78 * var(--fo-night-op, 1));
       animation:foStarTwinkle 4.5s ease-in-out infinite;
     }
+    .fo-north-star{ opacity:var(--fo-night-op, 1); transition:opacity .4s linear; }
     .fo-stars circle:nth-child(2n){  animation-duration:5.8s; animation-delay:.7s; }
     .fo-stars circle:nth-child(3n){  animation-duration:3.4s; animation-delay:1.4s; opacity:.55; }
     .fo-stars circle:nth-child(5n){  animation-duration:6.2s; animation-delay:2.1s; }
@@ -1249,13 +1344,72 @@
       0%,100%{ opacity:.45; transform:scaleX(1); transform-origin:center; }
       50%   { opacity:.78; transform:scaleX(1.06); transform-origin:center; }
     }
+    /* Rope + bucket + water highlight — small details that signal the
+       well is in use, not abandoned. */
+    .fo-well-rope{
+      stroke:color-mix(in srgb, var(--bg) 35%, var(--p) 65%);
+      opacity:.85;
+    }
+    .fo-well-bucket{
+      fill:color-mix(in srgb, var(--bg) 18%, var(--p) 82%) !important;
+      stroke:color-mix(in srgb, var(--bg) 38%, var(--p) 62%) !important;
+      stroke-width:.4 !important;
+    }
+    .fo-well-water-hl{
+      fill:#ffffff !important;
+      opacity:.42;
+      stroke:none !important;
+      animation:foWellHl 3.8s ease-in-out infinite;
+    }
+    @keyframes foWellHl{
+      0%,100%{ opacity:.22; transform:scaleX(1); transform-origin:center; }
+      50%   { opacity:.55; transform:scaleX(1.12); transform-origin:center; }
+    }
+
+    /* ── Glowing cross — spiritual centerpiece. Opacity tracks the
+       day/night phase via --fo-cross-glow; an independent breathing
+       glow filter keeps the cross from ever feeling static. ── */
+    .fo-cross > rect{
+      fill:var(--g);
+      opacity:calc(.55 + var(--fo-cross-glow, .8) * .45);
+    }
+    .fo-cross{
+      filter:drop-shadow(0 0 4px var(--g)) drop-shadow(0 0 11px var(--g));
+      animation:foCrossBreath 4s ease-in-out infinite;
+    }
+    @keyframes foCrossBreath{
+      0%,100%{ filter:drop-shadow(0 0 3px var(--g)) drop-shadow(0 0  9px var(--g)); }
+      50%   { filter:drop-shadow(0 0 7px var(--g)) drop-shadow(0 0 18px var(--g)); }
+    }
+
+    /* ── Fireflies — staggered pulse cycles near the well ── */
+    .fo-fly{
+      fill:var(--g);
+      opacity:0;
+      filter:drop-shadow(0 0 4px var(--g));
+    }
+    .fo-fly-1{ animation:foFlyPulse 3s ease-in-out infinite;             }
+    .fo-fly-2{ animation:foFlyPulse 5s ease-in-out .6s infinite;          }
+    .fo-fly-3{ animation:foFlyPulse 7s ease-in-out 1.4s infinite;         }
+    .fo-fly-4{ animation:foFlyPulse 4s ease-in-out 2.3s infinite;         }
+    .fo-fly-5{ animation:foFlyPulse 6s ease-in-out 3.1s infinite;         }
+    @keyframes foFlyPulse{
+      0%, 100%{ opacity:0;   transform:translateY(0); }
+      45%    { opacity:.85;  transform:translateY(-3px); }
+      55%    { opacity:.85;  transform:translateY(-3px); }
+    }
 
     @media (prefers-reduced-motion: reduce){
       .fo-mtn-1, .fo-mtn-2, .fo-mtn-3, .fo-mtn-4,
-      .fo-stars circle, .fo-shoot, .fo-well-water{
+      .fo-stars circle, .fo-shoot, .fo-well-water, .fo-well-water-hl,
+      .fo-cloud-1, .fo-cloud-2, .fo-cloud-3,
+      .fo-bird-1, .fo-bird-2, .fo-bird-3,
+      .fo-cross, .fo-fly-1, .fo-fly-2, .fo-fly-3, .fo-fly-4, .fo-fly-5{
         animation:none !important;
       }
       .fo-shoot{ opacity:0 !important; }
+      .fo-fly{  opacity:.6 !important; }
+      .fo-cross{ filter:drop-shadow(0 0 6px var(--g)) drop-shadow(0 0 14px var(--g)) !important; }
     }
     /* ── Top content (greeting / title / subtitle) ── */
     .fo-hero-content{

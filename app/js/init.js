@@ -758,6 +758,131 @@ function attachFaithParallax() {
   _foParallaxAttached = true;
 }
 
+// ─── 2026-05-26 — Day/night cycle driver for the SVG hero scene ──
+// 120s full cycle: night → dawn → day → dusk → night. One RAF loop
+// writes 7 CSS custom properties on the .fo-mtn-svg root each frame;
+// CSS rules consume those vars to set sky stop colors, sun/moon/cloud/
+// bird opacity, and cross glow intensity. Sun position is set as a
+// direct transform attribute because SVG cx/cy as CSS properties has
+// inconsistent cross-browser support.
+//
+// The cycle:
+//   t = 0.00 → 0.25  night → dawn
+//   t = 0.25 → 0.50  dawn  → day
+//   t = 0.50 → 0.75  day   → dusk
+//   t = 0.75 → 1.00  dusk  → night
+// Loop. Each phase blends linearly into the next.
+function _foStartDayNightCycle() {
+  if (window._foDnRaf) { cancelAnimationFrame(window._foDnRaf); window._foDnRaf = null; }
+  var svg = document.querySelector('.fo-mtn-svg');
+  var sun = document.getElementById('foDaySun');
+  if (!svg) { setTimeout(_foStartDayNightCycle, 120); return; }
+
+  // Respect reduced-motion: pin to night and skip the loop.
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    svg.style.setProperty('--fo-sky-top',    '#0a0520');
+    svg.style.setProperty('--fo-sky-bot',    '#1a0a3e');
+    svg.style.setProperty('--fo-sun-op',     '0');
+    svg.style.setProperty('--fo-moon-op',    '1');
+    svg.style.setProperty('--fo-night-op',   '1');
+    svg.style.setProperty('--fo-cloud-op',   '0.15');
+    svg.style.setProperty('--fo-bird-op',    '0');
+    svg.style.setProperty('--fo-cross-glow', '1');
+    return;
+  }
+
+  // Phase keyframes — t, sky-top, sky-bot, sun-op, sun-cx, sun-cy,
+  // sun-color, moon-op, night-op (stars+moonrise halo),
+  // cloud-op, bird-op, cross-glow
+  var P = [
+    [0.000, '#0a0520','#1a0a3e', 0.00, 700,240, '#ff8c00', 1.00, 1.00, 0.15, 0.00, 1.00],
+    [0.250, '#1a0a3e','#ff8c42', 0.55, 620,200, '#ff8c00', 0.40, 0.45, 0.55, 0.35, 0.85],
+    [0.500, '#1a6eb5','#87ceeb', 1.00, 400, 70, '#ffe066', 0.00, 0.00, 0.85, 1.00, 0.45],
+    [0.750, '#2d1b69','#e05c2e', 0.55, 180,200, '#e05c2e', 0.40, 0.45, 0.55, 0.35, 0.85],
+    [1.000, '#0a0520','#1a0a3e', 0.00, 100,240, '#e05c2e', 1.00, 1.00, 0.15, 0.00, 1.00]
+  ];
+
+  function hexToRgb(h){
+    var n = parseInt(h.slice(1), 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+  function lerp(a, b, f){ return a + (b - a) * f; }
+  function lerpColor(c1, c2, f){
+    var r1 = hexToRgb(c1), r2 = hexToRgb(c2);
+    return 'rgb(' +
+      Math.round(lerp(r1[0], r2[0], f)) + ',' +
+      Math.round(lerp(r1[1], r2[1], f)) + ',' +
+      Math.round(lerp(r1[2], r2[2], f)) + ')';
+  }
+  function phaseAt(t){
+    var p0 = P[0], p1 = P[1];
+    for (var i = 0; i < P.length - 1; i++){
+      if (t >= P[i][0] && t < P[i + 1][0]) { p0 = P[i]; p1 = P[i + 1]; break; }
+    }
+    var f = (p1[0] === p0[0]) ? 0 : (t - p0[0]) / (p1[0] - p0[0]);
+    return {
+      skyTop:    lerpColor(p0[1],  p1[1],  f),
+      skyBot:    lerpColor(p0[2],  p1[2],  f),
+      sunOp:     lerp(p0[3], p1[3], f),
+      sunCx:     lerp(p0[4], p1[4], f),
+      sunCy:     lerp(p0[5], p1[5], f),
+      sunColor:  lerpColor(p0[6],  p1[6],  f),
+      moonOp:    lerp(p0[7], p1[7], f),
+      nightOp:   lerp(p0[8], p1[8], f),
+      cloudOp:   lerp(p0[9], p1[9], f),
+      birdOp:    lerp(p0[10], p1[10], f),
+      crossGlow: lerp(p0[11], p1[11], f)
+    };
+  }
+
+  var CYCLE = 120000;
+  var startTs = 0;
+
+  function frame(ts){
+    if (!startTs) startTs = ts;
+    if (!svg.isConnected) { window._foDnRaf = null; return; }
+    if (document.hidden) {
+      // Don't burn battery while the tab is hidden — wait for
+      // visibilitychange to kick us back into the loop.
+      window._foDnRaf = null;
+      return;
+    }
+    var t = (((ts - startTs) % CYCLE) / CYCLE);
+    var p = phaseAt(t);
+
+    svg.style.setProperty('--fo-sky-top',    p.skyTop);
+    svg.style.setProperty('--fo-sky-bot',    p.skyBot);
+    svg.style.setProperty('--fo-sun-op',     p.sunOp.toFixed(3));
+    svg.style.setProperty('--fo-sun-color',  p.sunColor);
+    svg.style.setProperty('--fo-moon-op',    p.moonOp.toFixed(3));
+    svg.style.setProperty('--fo-night-op',   p.nightOp.toFixed(3));
+    svg.style.setProperty('--fo-cloud-op',   p.cloudOp.toFixed(3));
+    svg.style.setProperty('--fo-bird-op',    p.birdOp.toFixed(3));
+    svg.style.setProperty('--fo-cross-glow', p.crossGlow.toFixed(3));
+
+    if (sun) sun.setAttribute('transform',
+      'translate(' + p.sunCx.toFixed(1) + ' ' + p.sunCy.toFixed(1) + ')');
+
+    window._foDnRaf = requestAnimationFrame(frame);
+  }
+
+  // Resume the loop after the tab becomes visible again.
+  if (!window._foDnVisAttached) {
+    window._foDnVisAttached = true;
+    document.addEventListener('visibilitychange', function(){
+      if (!document.hidden) {
+        var liveSvg = document.querySelector('.fo-mtn-svg');
+        if (liveSvg && !window._foDnRaf) {
+          startTs = 0;
+          window._foDnRaf = requestAnimationFrame(frame);
+        }
+      }
+    });
+  }
+
+  window._foDnRaf = requestAnimationFrame(frame);
+}
+
 function _foStartCanvasScene() {
   if (window._foCanvasRaf) { cancelAnimationFrame(window._foCanvasRaf); window._foCanvasRaf = null; }
   var cv = document.getElementById('fo-canvas-scene');
@@ -1268,12 +1393,54 @@ function renderFaithOnlyHero() {
             '<stop offset="55%" stop-color="var(--p)" stop-opacity=".10"/>' +
             '<stop offset="100%" stop-color="var(--p)" stop-opacity="0"/>' +
           '</radialGradient>' +
+          // Sky gradient — top + bottom stops driven by --fo-sky-top /
+          // --fo-sky-bot CSS vars set by _foStartDayNightCycle() each
+          // frame. SVG presentation attrs don't reliably accept var(),
+          // so we attach classes and write stop-color via the CSS rule.
+          '<linearGradient id="foSky" x1="0" y1="0" x2="0" y2="1">' +
+            '<stop class="fo-sky-stop-top" offset="0"/>' +
+            '<stop class="fo-sky-stop-bot" offset="1"/>' +
+          '</linearGradient>' +
         '</defs>' +
 
-        // Sky glow halo behind the tallest peak
+        // ── Sky (back of stack, ZD reorder fills entire viewBox) ──
+        '<rect class="fo-sky" x="0" y="0" width="800" height="300" fill="url(#foSky)"/>' +
+
+        // Moonrise halo behind tallest peak — dims with the moon op
         '<rect class="fo-sky-glow" x="0" y="0" width="800" height="300" fill="url(#foGlow)"/>' +
 
-        // Stars — 11 scattered dots in the upper sky
+        // ── Moon — body + offset crescent shadow to suggest phase ──
+        '<g class="fo-day-moon">' +
+          '<circle class="fo-moon-glow"     cx="120" cy="50" r="22"/>' +
+          '<circle class="fo-moon-body"     cx="120" cy="50" r="14"/>' +
+          '<circle class="fo-moon-crescent" cx="125" cy="48" r="12"/>' +
+        '</g>' +
+
+        // ── Sun — base at (0,0), positioned each frame via transform ──
+        '<g class="fo-day-sun" id="foDaySun" transform="translate(620 200)">' +
+          '<circle class="fo-sun-halo"  cx="0" cy="0" r="44"/>' +
+          '<circle class="fo-sun-body"  cx="0" cy="0" r="20"/>' +
+        '</g>' +
+
+        // ── Clouds — 3 soft cloud groups, drift via CSS keyframes ──
+        '<g class="fo-cloud fo-cloud-1">' +
+          '<ellipse cx="0"  cy="0" rx="34" ry="13"/>' +
+          '<ellipse cx="-22" cy="6" rx="18" ry="10"/>' +
+          '<ellipse cx="24" cy="5" rx="22" ry="10"/>' +
+        '</g>' +
+        '<g class="fo-cloud fo-cloud-2">' +
+          '<ellipse cx="0"  cy="0" rx="40" ry="14"/>' +
+          '<ellipse cx="-26" cy="7" rx="20" ry="11"/>' +
+          '<ellipse cx="28" cy="6" rx="24" ry="11"/>' +
+        '</g>' +
+        '<g class="fo-cloud fo-cloud-3">' +
+          '<ellipse cx="0"  cy="0" rx="30" ry="11"/>' +
+          '<ellipse cx="-18" cy="5" rx="16" ry="9"/>' +
+          '<ellipse cx="20" cy="4" rx="20" ry="9"/>' +
+        '</g>' +
+
+        // Stars — 11 scattered dots in the upper sky (fade in/out
+        // with --fo-night-op so they recede during day)
         '<g class="fo-stars">' +
           '<circle cx="60"  cy="40"  r="1.1" />' +
           '<circle cx="115" cy="78"  r="0.9" />' +
@@ -1298,6 +1465,11 @@ function renderFaithOnlyHero() {
         // Shooting star — single thin diagonal line, animated via CSS
         '<line class="fo-shoot" x1="0" y1="0" x2="40" y2="14" stroke-width="1.4" />' +
 
+        // ── Birds — 3 small silhouettes, drift via CSS keyframes ──
+        '<g class="fo-bird fo-bird-1"><path d="M0,0 C-5,-4 -10,-2 -14,0 C-10,2 -5,0 0,0 C5,-4 10,-2 14,0 C10,2 5,0 0,0"/></g>' +
+        '<g class="fo-bird fo-bird-2"><path d="M0,0 C-5,-4 -10,-2 -14,0 C-10,2 -5,0 0,0 C5,-4 10,-2 14,0 C10,2 5,0 0,0"/></g>' +
+        '<g class="fo-bird fo-bird-3"><path d="M0,0 C-5,-4 -10,-2 -14,0 C-10,2 -5,0 0,0 C5,-4 10,-2 14,0 C10,2 5,0 0,0"/></g>' +
+
         // Layer 1 — gentle rolling hills (lightest, background)
         '<path class="fo-mtn-1" d="M0,200 C100,180 200,160 300,170 C400,180 500,155 600,165 C700,175 750,170 800,165 L800,300 L0,300 Z"/>' +
 
@@ -1309,6 +1481,21 @@ function renderFaithOnlyHero() {
 
         // Layer 4 — rolling foreground hills (darkest)
         '<path class="fo-mtn-4" d="M0,265 C90,255 180,248 270,260 C360,270 450,248 540,258 C620,265 700,258 800,262 L800,300 L0,300 Z"/>' +
+
+        // ── Glowing cross — spiritual centerpiece, above the well.
+        // Opacity tracks --fo-cross-glow; the breathing glow filter
+        // animates independently so the cross never feels static. ──
+        '<g class="fo-cross" transform="translate(400 130)">' +
+          '<rect x="-3" y="-30" width="6" height="60" rx="2"/>' +
+          '<rect x="-20" y="-10" width="40" height="6" rx="2"/>' +
+        '</g>' +
+
+        // ── Fireflies near the well — staggered pulse cycles ──
+        '<circle class="fo-fly fo-fly-1" cx="355" cy="285" r="1.6"/>' +
+        '<circle class="fo-fly fo-fly-2" cx="378" cy="296" r="1.4"/>' +
+        '<circle class="fo-fly fo-fly-3" cx="418" cy="282" r="1.5"/>' +
+        '<circle class="fo-fly fo-fly-4" cx="441" cy="290" r="1.3"/>' +
+        '<circle class="fo-fly fo-fly-5" cx="396" cy="298" r="1.7"/>' +
 
         // Foreground SVG well — small silhouette, centered, anchored
         // to the very bottom. Keeps the "Enter The Well" branding
@@ -1327,8 +1514,14 @@ function renderFaithOnlyHero() {
           '<rect x="6"  y="32" width="28" height="14" rx="1.5" />' +
           // Top rim of the well
           '<ellipse cx="20" cy="32" rx="14" ry="2.6" />' +
+          // Rope from beam to water (subtle thin line)
+          '<line class="fo-well-rope" x1="20" y1="18" x2="20" y2="31" stroke-width="0.6"/>' +
+          // Bucket at the bottom of the rope (tiny rect)
+          '<rect class="fo-well-bucket" x="17.4" y="29.2" width="5.2" height="3.2" rx="0.5"/>' +
           // Water surface (cool highlight)
           '<ellipse class="fo-well-water" cx="20" cy="32.3" rx="10" ry="1.6"/>' +
+          // Water reflection — thin white sliver on top of water
+          '<ellipse class="fo-well-water-hl" cx="20" cy="31.7" rx="6" ry="0.5"/>' +
         '</g>' +
       '</svg>';
 
@@ -1372,9 +1565,14 @@ function renderFaithOnlyHero() {
   })();
   var ctaBtn = document.querySelector('.fo-hero-cta') || document.querySelector('.fo-enter-btn');
   if (ctaBtn) ctaBtn.style.marginBottom = 'max(32px, env(safe-area-inset-bottom, 32px))';
-  // 2026-05-25 — canvas-painted scene retired; the new SVG landscape is
-  // declarative and animates via CSS keyframes. _foStartCanvasScene is
-  // left in place as dead code in case we ever revert.
+  // 2026-05-25 — canvas-painted scene retired; the SVG landscape is
+  // declarative + CSS-animated. _foStartCanvasScene is left in place
+  // as dead code in case we ever revert.
+  // 2026-05-26 — restored the day/night cycle (sun + moon + clouds +
+  // birds + cross glow) via a single RAF loop that writes CSS custom
+  // properties on the SVG root each frame. Cleaner than the canvas
+  // painter, ~1/8 the LOC, animations live in CSS keyframes.
+  setTimeout(_foStartDayNightCycle, 80);
 
   // ── Entry cards & today's verse intentionally NOT rendered. ──
   // After clicking "Enter The Well", wellGoto('home') takes them inside where
