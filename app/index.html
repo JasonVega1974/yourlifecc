@@ -5393,10 +5393,22 @@
     /* Mobile compaction — front-face only. Back-face cap is lifted by
        `.flipped` rules below so the previous clip fix stands. */
     @media (max-width: 768px){
-      .cm-card-container{ min-height:200px; max-height:240px; }
-      .cm-card-inner{ min-height:200px; }
-      .cm-card-face{ min-height:200px; padding:1.2rem; }
-      .cm-card-container.flipped{ max-height:none; }
+      /* 2026-05-28 v9 — tighten the front-face cap from 240→210 and
+         floor from 200→180 so the card feels like an invitation, not
+         a wall. Zone 2 below now peeks under it, creating natural
+         scroll curiosity. The .flipped state still grows freely (and
+         floors at 320 so the back-face content has room). */
+      #fzZone1{ margin-bottom:.5rem; }
+      .cm-card-container{ min-height:180px !important; max-height:210px !important; }
+      .cm-card-inner{ min-height:180px; }
+      .cm-card-face{ min-height:180px; padding:1rem 1.1rem; }
+      .cm-card-container.flipped{ max-height:none !important; min-height:320px !important; }
+      /* Map spec's class names to the actual ones used in
+         faith-zones.js: cm-question / cm-pill / cm-cta / cm-pos. */
+      .cm-question{ font-size:1.05rem !important; line-height:1.4 !important; }
+      .cm-pill{ font-size:.7rem; padding:.2rem .5rem; }
+      .cm-cta{ padding:.55rem 1.2rem; font-size:.9rem; }
+      .cm-pos{ font-size:.7rem; }
     }
     @media (min-width: 769px){
       .cm-card-container{ max-height:300px; }
@@ -5888,6 +5900,38 @@
     .fz-nr-entry:hover{ background:var(--fz-surface-soft); }
     .fz-nr-preview{ font-style:italic; }
     .fz-nr-expanded .fz-nr-preview{ font-style:normal; }
+
+    /* ── SESSION 3 — Identity Traits widget (inside Zone 2) ─── */
+    .trait-bar-row{
+      display:flex; align-items:center; gap:.6rem;
+      margin:.5rem 0;
+    }
+    .trait-bar-emoji{
+      font-size:1.3rem; width:24px; text-align:center; flex-shrink:0;
+    }
+    .trait-bar-info{ flex:1; min-width:0; }
+    .trait-bar-name{
+      font-family:var(--fm); font-size:.78rem;
+      color:var(--tx); margin-bottom:.2rem;
+    }
+    .trait-level-name{ color:var(--tx2); font-weight:400; }
+    .trait-bar-track{
+      height:6px;
+      background:var(--fz-card-border);
+      border-radius:3px; overflow:hidden;
+    }
+    .trait-bar-fill{
+      height:100%;
+      background:linear-gradient(90deg, var(--p), var(--c));
+      border-radius:3px;
+      transition:width .6s ease;
+    }
+    .trait-see-all{
+      font-size:.75rem; color:var(--tx2);
+      text-align:right; margin-top:.5rem;
+      cursor:pointer; font-family:var(--fm);
+    }
+    .trait-see-all:hover{ color:var(--p); }
   </style>
 
   <!-- ZONE 1 — Convince Me hero -->
@@ -5896,9 +5940,13 @@
   <!-- ZONE 2 — Today -->
   <div id="fzZone2" class="fz-zone fz-zone-2" aria-label="Today">
     <div class="fz-today-hdr">TODAY</div>
-    <div id="fzChallengeCard" class="fz-today-card"></div>
-    <div id="fzPrayerCard"    class="fz-today-card fz-prayer-card" role="button" tabindex="0"></div>
-    <div id="fzMoodCard"      class="fz-today-card"></div>
+    <div id="fzChallengeCard"  class="fz-today-card"></div>
+    <div id="fzPrayerCard"     class="fz-today-card fz-prayer-card" role="button" tabindex="0"></div>
+    <div id="fzMoodCard"       class="fz-today-card"></div>
+    <!-- V1 Rebuild · Session 3 — Growth widget. Top 3 most-active
+         traits with progress bars. Rendered by renderGrowthCompact()
+         in traits.js (called from renderTodayZone in faith-zones.js). -->
+    <div id="fzGrowthCompact"  class="fz-today-card"></div>
   </div>
 
   <!-- ZONE 3 — Explore toggle. Tap to expand the legacy Ask Scripture
@@ -9455,6 +9503,81 @@
   :root.light #quickPrayerText{
     background:#fafaf9; color:#1a1233;
     border-color:rgba(15,23,42,.12);
+  }
+
+  /* ─── SESSION 3 · Identity Traits — body-level overlays ───
+     Toast slides up from bottom-right (2.5s); level-up card
+     bounces in from bottom-center (4s). Both live outside any
+     section so they show on every page. */
+  .trait-toast{
+    position:fixed;
+    bottom:80px; right:1rem;
+    background:var(--card-bg);
+    border:1px solid var(--card-border);
+    border-left:3px solid var(--p);
+    padding:.5rem .9rem;
+    border-radius:8px;
+    font-size:.85rem;
+    color:var(--tx);
+    z-index:9998;
+    transform:translateY(20px);
+    opacity:0;
+    transition:all .35s ease;
+    pointer-events:none;
+    box-shadow:0 4px 16px rgba(0,0,0,.3);
+    font-family:var(--fm);
+    white-space:nowrap;
+    max-width:calc(100vw - 2rem);
+  }
+  .trait-toast-show{ transform:translateY(0); opacity:1; }
+  .trait-toast span{ font-weight:600; color:var(--tx); }
+
+  .trait-levelup{
+    position:fixed;
+    bottom:80px; left:50%;
+    transform:translateX(-50%) translateY(40px);
+    opacity:0;
+    background:var(--card-bg);
+    border:1px solid var(--p);
+    border-radius:16px;
+    padding:1.4rem 2rem;
+    text-align:center;
+    z-index:9999;
+    min-width:260px;
+    max-width:calc(100vw - 2rem);
+    box-shadow:0 8px 40px rgba(0,0,0,.5);
+    transition:all .45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events:none;
+    font-family:var(--fm);
+  }
+  .tlu-show{ transform:translateX(-50%) translateY(0); opacity:1; }
+  .tlu-emoji{
+    font-size:2.8rem; margin-bottom:.4rem; line-height:1;
+    animation:tluPop .5s cubic-bezier(0.34, 1.56, 0.64, 1) .1s both;
+  }
+  @keyframes tluPop{
+    from{ transform:scale(.3); opacity:0; }
+    to  { transform:scale(1);   opacity:1; }
+  }
+  .tlu-title{
+    font-size:.9rem; color:var(--tx2);
+    margin-bottom:.2rem;
+    letter-spacing:.04em;
+  }
+  .tlu-level{
+    font-size:1.15rem; font-weight:700; color:var(--tx);
+    margin-bottom:.5rem; line-height:1.3;
+  }
+  .tlu-level strong{ color:var(--p); }
+  .tlu-msg{
+    font-size:.82rem; color:var(--tx2);
+    line-height:1.5; font-style:italic;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .trait-toast, .trait-levelup, .tlu-emoji{
+      transition:opacity .2s ease !important;
+      animation:none !important;
+    }
   }
 </style>
 <div id="quickPrayerOverlay" onclick="if(event.target===this)closeQuickPrayer()" role="dialog" aria-modal="true" aria-labelledby="quickPrayerHdr">
@@ -13989,6 +14112,10 @@
      Both load after faith.js since faith-zones.js cross-references
      PROOF_PROPHECY_DATA, ppOpenModal, bfTab, showToast. -->
 <script src="/app/js/data/faith-zones-data.js"></script>
+<!-- V1 Rebuild · Session 3 — Identity Traits engine. Must load
+     BEFORE faith-zones.js so awardTrait + renderGrowthCompact are
+     defined when the zone renderers call them. -->
+<script src="/app/js/traits.js"></script>
 <script src="/app/js/faith-zones.js"></script>
 
 <!-- App bootstrap: must load last -->

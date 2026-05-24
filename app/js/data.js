@@ -84,6 +84,11 @@ const DEF = {
   // so the cloud-synced blob stays lean. Surfaced in the Prayer sub-tab
   // history strip and used by Session 3 traits to award Wisdom + Gratitude.
   nightReflections:[],
+  // V1 Rebuild · Session 3 — Identity Traits. 7 keys: courage,
+  // discipline, compassion, wisdom, integrity, gratitude, faith.
+  // Stored as accumulated XP points; getTraitLevel() in traits.js
+  // derives the [0..4] level using TRAIT_THRESHOLDS = [0,50,150,350,700].
+  traits:{},
   // streak / checkin
   streak:0, lastCheckin:null, checkin:{}, customHabits:[], dailyChecks:{},
   // V1 Rebuild — Session 1 (Daily Briefing). Keyed by YYYY-MM-DD; per-day

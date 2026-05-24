@@ -194,11 +194,20 @@ function cmFlip(){
     _fzFlipped = true;
     // Mark this id as seen + tick the curiosity streak the first time
     // the user actually engages a card today.
-    if (D && Array.isArray(D.convinceMeSeen) && D.convinceMeSeen.indexOf(card.id) === -1){
+    var firstFlip = !!(D && Array.isArray(D.convinceMeSeen) && D.convinceMeSeen.indexOf(card.id) === -1);
+    if (firstFlip){
       D.convinceMeSeen.push(card.id);
     }
     _fzCuriosityCredit();
     _fzSave();
+    // V1 Rebuild · Session 3 — trait award: curiosity engagement
+    // builds Courage (asking the hard question) + Faith (sitting
+    // with the answer). Only on FIRST flip of a given card so
+    // re-flipping doesn't farm points.
+    if (firstFlip && typeof awardTrait === 'function'){
+      awardTrait('courage', 3);
+      awardTrait('faith',   2);
+    }
   }
   var container = document.getElementById('cmCardContainer');
   if (container) container.classList.add('flipped');
@@ -343,6 +352,10 @@ function renderTodayZone(){
   renderDailyChallengeCard();
   renderQuickPrayerCard();
   renderMoodSoundscapeCard();
+  // V1 Rebuild · Session 3 — Growth widget (top 3 traits). Module
+  // is loaded BEFORE faith-zones.js so the function is defined,
+  // but guard anyway for safety.
+  if (typeof renderGrowthCompact === 'function') renderGrowthCompact();
 }
 
 function renderDailyChallengeCard(){
@@ -375,7 +388,18 @@ function markChallengeComplete(){
   _fzSave();
   renderDailyChallengeCard();
   var ch = _fzChallengeForToday();
-  if (typeof showToast === 'function'){
+  // V1 Rebuild · Session 3 — trait awards. Daily challenge always
+  // builds Faith (showing up) + Discipline (doing the thing). If
+  // the challenge config carries a trait hint, award a bonus there
+  // too (gratitude/compassion/integrity/etc). awardTrait fires its
+  // own toast, so we no longer need the standalone showToast.
+  if (typeof awardTrait === 'function'){
+    awardTrait('faith',      3);
+    awardTrait('discipline', 2);
+    if (ch && ch.trait && TRAITS && TRAITS[ch.trait]){
+      awardTrait(ch.trait, 1);
+    }
+  } else if (typeof showToast === 'function'){
     showToast('+1 toward ' + (ch && ch.trait ? ch.trait : 'growth'));
   }
 }
@@ -434,13 +458,26 @@ function submitQuickPrayer(){
   }
   if (!D) return;
   if (!Array.isArray(D.quickPrayers)) D.quickPrayers = [];
-  D.quickPrayers.push({ text:text.slice(0, 600), date:_fzToday() });
+  var cleanText = text.slice(0, 600);
+  D.quickPrayers.push({ text:cleanText, date:_fzToday() });
   // Cap to the most recent 50 entries to keep the cloud blob lean.
   if (D.quickPrayers.length > 50){
     D.quickPrayers = D.quickPrayers.slice(-50);
   }
   _fzSave();
   _fzFloatDove(document.getElementById('quickPrayerSubmit'));
+  // V1 Rebuild · Session 3 — trait awards. Every prayer builds
+  // Faith. If the user named someone else in the prayer (very
+  // rough heuristic: mentions "for them/him/her/my X" or "pray
+  // for") it also builds Compassion. Otherwise Compassion still
+  // gets a small +1 — the act of pausing for prayer is itself
+  // an outward turn.
+  if (typeof awardTrait === 'function'){
+    awardTrait('faith', 2);
+    var lc = cleanText.toLowerCase();
+    var aboutOthers = /\b(for|pray for|help)\b.{0,40}\b(them|him|her|my|friend|mom|dad|sister|brother|son|daughter|family|teacher|class)\b/.test(lc);
+    awardTrait('compassion', aboutOthers ? 3 : 1);
+  }
   setTimeout(function(){
     closeQuickPrayer();
     renderQuickPrayerCard();
@@ -815,11 +852,13 @@ function _nrSaveReflection(prayed){
     D.scrReadDays = {};
   }
   D.scrReadDays[_fzToday()] = true;
-  // Award trait points — Session 3 owns the rendering; the data sits
-  // here until the trait engine reads it (+2 Wisdom, +2 Gratitude).
-  if (D.traits && typeof D.traits === 'object'){
-    D.traits.wisdom    = (+D.traits.wisdom    || 0) + 2;
-    D.traits.gratitude = (+D.traits.gratitude || 0) + 2;
+  // V1 Rebuild · Session 3 — trait awards now go through awardTrait
+  // (which fires the toast + handles level-ups + persists). The
+  // previous direct D.traits writes were a Session-2 placeholder
+  // that bypassed the toast/level-up affordance.
+  if (typeof awardTrait === 'function'){
+    awardTrait('wisdom',    2);
+    awardTrait('gratitude', 2);
   }
   _fzSave();
   // Re-render any open faith surfaces that depend on the new state.
