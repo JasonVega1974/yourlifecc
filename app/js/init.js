@@ -331,6 +331,10 @@ function finishInit(cloudReady){
   buildSideNav();
   if(typeof renderBottomTabBar === 'function') renderBottomTabBar();
   if(typeof renderAllTabLandings === 'function') renderAllTabLandings();
+  // V1 Rebuild · Session 1 — Daily Briefing renders once at boot. The
+  // module itself re-renders on visibility-change so the time-of-day
+  // greeting and post-7pm Night Reflection prompt stay accurate.
+  if(typeof renderDailyBriefing === 'function') renderDailyBriefing();
   if(typeof _lastRenderedProfileId !== 'undefined'){
     _lastRenderedProfileId = (typeof _activeProfileId !== 'undefined') ? _activeProfileId : null;
   }

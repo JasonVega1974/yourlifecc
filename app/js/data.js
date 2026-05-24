@@ -62,6 +62,10 @@ const DEF = {
   savedProofs:[],
   // streak / checkin
   streak:0, lastCheckin:null, checkin:{}, customHabits:[], dailyChecks:{},
+  // V1 Rebuild — Session 1 (Daily Briefing). Keyed by YYYY-MM-DD; per-day
+  // shape { faith:bool, growth:bool, realWin:bool }. The Daily 3 tiles on
+  // the new home card flip these flags; all-three-true triggers confetti.
+  dailyThree:{},
   // money
   bank:0, bankLabel:'', bankSavAcct:0, bankSavAcctLabel:'', bankHistory:[],
   bills:[], transactions:[], earnings:0, allowance:0,

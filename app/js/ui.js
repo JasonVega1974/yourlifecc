@@ -1057,40 +1057,19 @@ const NAV_ITEMS = [
 //   wellTab:   route via wellGoto(tab) into s-scripture's tab system
 //   action:    JS handler ('settings' → quickSettings(), 'sign-out' →
 //              signOut(), etc.) wired in session 2
+// V1 Rebuild · Session 1 — IA flipped to the spec's five tabs:
+//   🏠 Home · ✝️ Faith · ⚡ Life · 👨‍👩‍👧 Family · 👤 Me
+// "Learn" was retired from the mobile nav (still reachable via desktop
+// sidebar). Skills moved into the Life group. Parent Hub gets its own
+// Family tab. Life primary[] now leads with Habits (s-health) to match
+// the spec's group definition "Habits, Chores, Goals, Money, Schedule,
+// Skills". The orphan `<div data-tab="learn">` host stays in the DOM
+// inside s-learn for desktop callers; renderTabLanding('learn') is a
+// no-op when no matching TAB_IA entry exists.
 const TAB_IA = [
   {id:'home',  label:'Home',  icon:'🏠', accent:'var(--c)',
     primary:[
       {sectionId:'s-hero', label:'Home', icon:'🏠'}
-    ]
-  },
-  {id:'learn', label:'Learn', icon:'📚', accent:'var(--c)',
-    primary:[
-      {sectionId:'s-school',    label:'School',           icon:'🎓', accent:'var(--section-school)'},
-      {sectionId:'s-skills',    label:'Life Skills',      icon:'🧠', accent:'var(--section-life-skills)'},
-      {sectionId:'s-cbt',       label:'Tech Skills',      icon:'💻', accent:'var(--section-life-skills)'},
-      {sectionId:'s-sports',    label:'Sports',           icon:'⚽', accent:'var(--section-sports)'},
-      {wellTab:'academy',       label:'Faith Academy',    icon:'🎓', accent:'var(--accent,#4338ca)'},
-      {sectionId:'s-resume',    label:'Jobs / Resume',    icon:'💼', accent:'var(--section-school)'},
-      {sectionId:'s-resources', label:'School Resources', icon:'📦', accent:'var(--section-school)'},
-      {sectionId:'s-growing',   label:'Growing Up',       icon:'🌱', accent:'var(--section-daily-life)'},
-      {sectionId:'s-driving',   label:'Driving',          icon:'🚗', accent:'var(--section-life-skills)'},
-      {sectionId:'s-craft',     label:'Music & Practice', icon:'🎵', accent:'var(--section-life-skills)'}
-    ]
-  },
-  {id:'life',  label:'Life',  icon:'🌱', accent:'var(--c)',
-    primary:[
-      {sectionId:'s-chores',     label:'Chores',       icon:'✅', accent:'var(--section-daily-life)'},
-      {sectionId:'s-goals',      label:'Goals',        icon:'🎯', accent:'var(--section-goals)'},
-      {sectionId:'s-health',     label:'Health',       icon:'💪', accent:'var(--section-health)'},
-      {sectionId:'s-finance',    label:'Finance',      icon:'💰', accent:'var(--section-finance)'},
-      {sectionId:'s-journal',    label:'Journal',      icon:'✍️', accent:'var(--section-journal)'},
-      {sectionId:'s-mood',       label:'Mood',         icon:'😊', accent:'var(--section-journal)'},
-      {sectionId:'s-schedule',   label:'Schedule',     icon:'📝', accent:'var(--section-daily-life)'},
-      {sectionId:'s-calendar',   label:'Calendar',     icon:'📅', accent:'var(--section-daily-life)'},
-      {sectionId:'s-rewards',    label:'Rewards',      icon:'🎰', accent:'var(--section-daily-life)'},
-      {sectionId:'s-contests',   label:'Challenges',   icon:'🏆', accent:'var(--section-goals)'},
-      {sectionId:'s-motivation', label:'Fuel Wall',    icon:'🔥', accent:'var(--section-goals)'},
-      {sectionId:'s-reading',    label:'Reading List', icon:'📖', accent:'var(--section-journal)'}
     ]
   },
   {id:'faith', label:'Faith', icon:'✝️', accent:'var(--accent,#4338ca)',
@@ -1104,6 +1083,28 @@ const TAB_IA = [
       {wellTab:'stories',        label:'Stories',    icon:'📖'},
       {sectionId:'s-worship',    label:'Worship',    icon:'🎵'},
       {sectionId:'s-flashcards', label:'Flashcards', icon:'📇'}
+    ]
+  },
+  {id:'life',  label:'Life',  icon:'⚡', accent:'var(--c)',
+    primary:[
+      {sectionId:'s-health',     label:'Habits',       icon:'💪', accent:'var(--section-health)'},
+      {sectionId:'s-chores',     label:'Chores',       icon:'✅', accent:'var(--section-daily-life)'},
+      {sectionId:'s-goals',      label:'Goals',        icon:'🎯', accent:'var(--section-goals)'},
+      {sectionId:'s-finance',    label:'Money',        icon:'💰', accent:'var(--section-finance)'},
+      {sectionId:'s-schedule',   label:'Schedule',     icon:'📝', accent:'var(--section-daily-life)'},
+      {sectionId:'s-skills',     label:'Life Skills',  icon:'🧠', accent:'var(--section-life-skills)'},
+      {sectionId:'s-calendar',   label:'Calendar',     icon:'📅', accent:'var(--section-daily-life)'},
+      {sectionId:'s-journal',    label:'Journal',      icon:'✍️', accent:'var(--section-journal)'},
+      {sectionId:'s-mood',       label:'Mood',         icon:'😊', accent:'var(--section-journal)'},
+      {sectionId:'s-rewards',    label:'Rewards',      icon:'🎰', accent:'var(--section-daily-life)'},
+      {sectionId:'s-contests',   label:'Challenges',   icon:'🏆', accent:'var(--section-goals)'},
+      {sectionId:'s-motivation', label:'Fuel Wall',    icon:'🔥', accent:'var(--section-goals)'},
+      {sectionId:'s-reading',    label:'Reading List', icon:'📖', accent:'var(--section-journal)'}
+    ]
+  },
+  {id:'family', label:'Family', icon:'👨‍👩‍👧', accent:'var(--c)',
+    primary:[
+      {sectionId:'s-parent', label:'Parent Hub', icon:'👨‍👩‍👧'}
     ]
   },
   {id:'me',    label:'Me',    icon:'👤', accent:'var(--c)',
@@ -1202,13 +1203,17 @@ function setActiveBottomTab(tabId){
 }
 
 // Reverse lookup: which tab owns this section?
-// Returns 'home' | 'learn' | 'life' | 'faith' | 'me' | null.
+// Returns 'home' | 'faith' | 'life' | 'family' | 'me' | null.
+// V1 Rebuild · Session 1 — 'learn' retired from the tab bar. Sections
+// formerly under Learn (s-school, s-cbt, s-resume, s-resources,
+// s-growing, s-driving, s-craft, s-sports) now return null and leave
+// no tab highlighted; they remain reachable via the desktop sidebar.
 function _tabForSection(sectionId){
   if(!sectionId) return null;
-  if(sectionId === 's-hero')  return 'home';
-  if(sectionId === 's-learn') return 'learn';
-  if(sectionId === 's-life')  return 'life';
-  if(sectionId === 's-me')    return 'me';
+  if(sectionId === 's-hero')   return 'home';
+  if(sectionId === 's-life')   return 'life';
+  if(sectionId === 's-me')     return 'me';
+  if(sectionId === 's-parent') return 'family';
   if(sectionId === 's-scripture' || sectionId === 's-worship' ||
      sectionId === 's-flashcards' || sectionId === 's-christian-living'){
     return 'faith';
@@ -1224,8 +1229,11 @@ function _tabForSection(sectionId){
 
 function handleTabBarTap(tabId){
   // Tab bar buttons route to the tab's primary section.
-  const dest = {home:'s-hero', learn:'s-learn', life:'s-life',
-                faith:'s-scripture', me:'s-me'}[tabId];
+  // V1 Rebuild · Session 1 — 'family' routes straight to Parent Hub (which
+  // has its own gate). 'learn' kept as a defensive alias so any legacy
+  // caller that still hands us 'learn' lands on a real section.
+  const dest = {home:'s-hero', life:'s-life', faith:'s-scripture',
+                family:'s-parent', me:'s-me', learn:'s-learn'}[tabId];
   if(dest) showSection(dest);
 }
 
@@ -1756,6 +1764,13 @@ function showSection(id, fromMobile){
     if(gate) gate.style.display='none';
     if(content) content.style.display='block';
     setTimeout(()=>{ typeof renderParentDash==='function'&&renderParentDash(); typeof updateIncConditions==='function'&&updateIncConditions(); },50);
+  }
+
+  // V1 Rebuild · Session 1 — refresh the Daily Briefing whenever the user
+  // returns to the home screen so completed Daily 3 tiles (and the post-7pm
+  // Night Reflection prompt) reflect the latest state.
+  if(id==='s-hero' && typeof renderDailyBriefing === 'function'){
+    setTimeout(renderDailyBriefing, 30);
   }
 
   // Trigger renders that need visible DOM
