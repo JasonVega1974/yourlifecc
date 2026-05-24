@@ -1037,123 +1037,45 @@ function _foStartCanvasScene() {
       });
     });
   }
+  // 2026-05-27 — sharp mountain bezier paths replaced with gentle
+  // rolling-hill curves. Same parallax depth (3 layers), same colors,
+  // same atmospheric bands. Snowcap glints + ridge strokes dropped
+  // (those only made sense on jagged peaks). The hills sit lower on
+  // the canvas so the well in the foreground stands clear against
+  // them, and the cross above the well has open sky to breathe in.
   function dFarMtns(W,H,t){
-    var pkS = Math.max(0.010, 11/W);
-    function pathL1(){
-      ctx.beginPath(); ctx.moveTo(0,H*.68);
-      ctx.bezierCurveTo(W*.02,H*.67,W*.04,H*.65,W*.06,H*.63);
-      ctx.bezierCurveTo(W*.07,H*.62,W*.09,H*.60,W*.11,H*.59);
-      ctx.bezierCurveTo(W*.12,H*.58,W*.14,H*.57,W*.16,H*.57);
-      ctx.bezierCurveTo(W*.17,H*.56,W*.19,H*.55,W*.21,H*.54);
-      ctx.bezierCurveTo(W*.22,H*.53,W*.23,H*.52,W*.25,H*.53);
-      ctx.bezierCurveTo(W*.26,H*.54,W*.28,H*.57,W*.30,H*.58);
-      ctx.bezierCurveTo(W*.32,H*.59,W*.35,H*.61,W*.38,H*.61);
-      ctx.bezierCurveTo(W*.40,H*.60,W*.42,H*.59,W*.43,H*.57);
-      ctx.bezierCurveTo(W*.44,H*.55,W*.45,H*.54,W*.47,H*.53);
-      ctx.bezierCurveTo(W*.49,H*.54,W*.51,H*.57,W*.54,H*.59);
-      ctx.bezierCurveTo(W*.56,H*.61,W*.59,H*.62,W*.62,H*.61);
-      ctx.bezierCurveTo(W*.63,H*.60,W*.65,H*.58,W*.67,H*.56);
-      ctx.bezierCurveTo(W*.68,H*.55,W*.70,H*.54,W*.71,H*.55);
-      ctx.bezierCurveTo(W*.73,H*.57,W*.75,H*.60,W*.78,H*.62);
-      ctx.bezierCurveTo(W*.80,H*.63,W*.83,H*.63,W*.86,H*.63);
-      ctx.bezierCurveTo(W*.88,H*.63,W*.91,H*.64,W*.93,H*.65);
-      ctx.bezierCurveTo(W*.95,H*.66,W*.98,H*.67,W,H*.68);
-      ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
-    }
-    function pathL2(){
-      ctx.beginPath(); ctx.moveTo(0,H*.63);
-      ctx.bezierCurveTo(W*.02,H*.61,W*.04,H*.59,W*.06,H*.57);
-      ctx.bezierCurveTo(W*.08,H*.55,W*.10,H*.52,W*.12,H*.50);
-      ctx.bezierCurveTo(W*.12,H*.49,W*.15,H*.47,W*.17,H*.47);
-      ctx.bezierCurveTo(W*.19,H*.48,W*.21,H*.51,W*.23,H*.53);
-      ctx.bezierCurveTo(W*.25,H*.55,W*.27,H*.54,W*.29,H*.51);
-      ctx.bezierCurveTo(W*.30,H*.49,W*.32,H*.46,W*.34,H*.44);
-      ctx.bezierCurveTo(W*.35,H*.42,W*.37,H*.39,W*.38,H*.38);
-      ctx.bezierCurveTo(W*.39,H*.37,W*(0.41-pkS),H*.34,W*.41,H*.34);
-      ctx.bezierCurveTo(W*(0.41+pkS),H*.34,W*.43,H*.35,W*.44,H*.37);
-      ctx.bezierCurveTo(W*.45,H*.39,W*.46,H*.40,W*.47,H*.39);
-      ctx.bezierCurveTo(W*.47,H*.40,W*(0.50-pkS),H*.38,W*.50,H*.38);
-      ctx.bezierCurveTo(W*(0.50+pkS),H*.385,W*.52,H*.43,W*.54,H*.47);
-      ctx.bezierCurveTo(W*.55,H*.49,W*.57,H*.51,W*.59,H*.49);
-      ctx.bezierCurveTo(W*.60,H*.48,W*.61,H*.46,W*.63,H*.44);
-      ctx.bezierCurveTo(W*.64,H*.43,W*.65,H*.44,W*.67,H*.47);
-      ctx.bezierCurveTo(W*.68,H*.49,W*.70,H*.52,W*.72,H*.51);
-      ctx.bezierCurveTo(W*.73,H*.50,W*.75,H*.48,W*.77,H*.50);
-      ctx.bezierCurveTo(W*.78,H*.52,W*.80,H*.55,W*.82,H*.54);
-      ctx.bezierCurveTo(W*.83,H*.53,W*.85,H*.55,W*.87,H*.57);
-      ctx.bezierCurveTo(W*.89,H*.58,W*.91,H*.59,W*.93,H*.59);
-      ctx.bezierCurveTo(W*.95,H*.60,W*.97,H*.61,W*.99,H*.62);
-      ctx.bezierCurveTo(W*.995,H*.62,W,H*.63,W,H*.63);
-      ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
-    }
-    pathL1(); ctx.fillStyle='#030508'; ctx.fill();
-    pathL2(); ctx.fillStyle='#060c1a'; ctx.fill();
-    ctx.save(); ctx.translate(0,H*0.006);
-    pathL2(); ctx.fillStyle='rgba(18,30,55,0.45)'; ctx.fill();
-    ctx.restore();
-    [[W*.41,H*.34,W*.038,H*.012],[W*.50,H*.38,W*.030,H*.010],[W*.63,H*.44,W*.022,H*.007]].forEach(function(pk){
-      var sg=ctx.createRadialGradient(pk[0],pk[1],0,pk[0],pk[1],pk[2]);
-      sg.addColorStop(0,'rgba(200,210,225,0.15)'); sg.addColorStop(1,'rgba(200,210,225,0)');
-      ctx.beginPath(); ctx.ellipse(pk[0],pk[1],pk[2],pk[3],0,0,PI2); ctx.fillStyle=sg; ctx.fill();
-    });
+    // Far layer — deepest hills, baseline H*.66, gentle waves
+    ctx.beginPath(); ctx.moveTo(0,H*.66);
+    ctx.bezierCurveTo(W*.12,H*.63, W*.22,H*.615, W*.34,H*.645);
+    ctx.bezierCurveTo(W*.44,H*.665, W*.54,H*.64,  W*.66,H*.625);
+    ctx.bezierCurveTo(W*.76,H*.615, W*.86,H*.635, W*.94,H*.655);
+    ctx.bezierCurveTo(W*.98,H*.66,  W,   H*.66,   W,   H*.66);
+    ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
+    ctx.fillStyle='#060c1a'; ctx.fill();
+    // Subtle atmospheric mist band on top of the far layer
     ctx.fillStyle='rgba(20,40,80,0.18)';
-    ctx.fillRect(0,H*0.60,W,H*0.015);
+    ctx.fillRect(0,H*0.625,W,H*0.012);
   }
   function dMidMtns(W,H,t){
-    var pkS = Math.max(0.010, 11/W);
-    function pathM(){
-      ctx.beginPath(); ctx.moveTo(0,H*.76);
-      ctx.bezierCurveTo(W*.02,H*.74,W*.04,H*.72,W*.06,H*.70);
-      ctx.bezierCurveTo(W*.08,H*.68,W*.10,H*.66,W*.12,H*.67);
-      ctx.bezierCurveTo(W*.14,H*.68,W*.17,H*.65,W*.20,H*.62);
-      ctx.bezierCurveTo(W*.22,H*.60,W*.24,H*.58,W*.26,H*.59);
-      ctx.bezierCurveTo(W*.27,H*.60,W*.29,H*.62,W*.31,H*.63);
-      ctx.bezierCurveTo(W*.33,H*.62,W*.35,H*.59,W*.37,H*.56);
-      ctx.bezierCurveTo(W*.37,H*.56,W*(0.42-pkS),H*.52,W*.42,H*.52);
-      ctx.bezierCurveTo(W*(0.42+pkS),H*.52,W*.44,H*.54,W*.46,H*.55);
-      ctx.bezierCurveTo(W*.47,H*.56,W*.48,H*.59,W*.50,H*.61);
-      ctx.bezierCurveTo(W*.52,H*.63,W*.54,H*.62,W*.56,H*.59);
-      ctx.bezierCurveTo(W*.56,H*.58,W*(0.60-pkS),H*.56,W*.60,H*.56);
-      ctx.bezierCurveTo(W*.62,H*.57,W*.63,H*.60,W*.65,H*.63);
-      ctx.bezierCurveTo(W*.66,H*.64,W*.68,H*.65,W*.70,H*.63);
-      ctx.bezierCurveTo(W*.71,H*.62,W*.73,H*.60,W*.75,H*.62);
-      ctx.bezierCurveTo(W*.76,H*.63,W*.78,H*.65,W*.80,H*.67);
-      ctx.bezierCurveTo(W*.82,H*.68,W*.84,H*.66,W*.86,H*.68);
-      ctx.bezierCurveTo(W*.87,H*.69,W*.89,H*.70,W*.91,H*.70);
-      ctx.bezierCurveTo(W*.93,H*.70,W*.95,H*.71,W*.97,H*.72);
-      ctx.bezierCurveTo(W*.98,H*.725,W*.99,H*.73,W,H*.73);
-      ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
-    }
-    pathM(); ctx.fillStyle='#0a1422'; ctx.fill();
-    ctx.strokeStyle='rgba(20,38,65,0.50)'; ctx.lineWidth=1.2;
-    [[W*.06,H*.71,W*.25,H*.61,W*.44,H*.63],[W*.22,H*.66,W*.42,H*.57,W*.62,H*.61],[W*.44,H*.61,W*.62,H*.58,W*.80,H*.67],[W*.62,H*.65,W*.78,H*.68,W*.96,H*.72]].forEach(function(r){
-      ctx.beginPath(); ctx.moveTo(r[0],r[1]); ctx.quadraticCurveTo(r[2],r[3],r[4],r[5]); ctx.stroke();
-    });
+    // Mid layer — slightly closer, baseline H*.72
+    ctx.beginPath(); ctx.moveTo(0,H*.72);
+    ctx.bezierCurveTo(W*.14,H*.69, W*.27,H*.67,  W*.40,H*.705);
+    ctx.bezierCurveTo(W*.52,H*.735, W*.62,H*.705, W*.74,H*.685);
+    ctx.bezierCurveTo(W*.85,H*.705, W*.95,H*.72,  W,   H*.715);
+    ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
+    ctx.fillStyle='#0a1422'; ctx.fill();
+    // Atmospheric band
     ctx.fillStyle='rgba(15,30,60,0.22)';
-    ctx.fillRect(0,H*0.70,W,H*0.015);
+    ctx.fillRect(0,H*0.69,W,H*0.012);
   }
   function dNearMtns(W,H,t){
-    ctx.beginPath(); ctx.moveTo(0,H*.82);
-    ctx.bezierCurveTo(W*.02,H*.80,W*.05,H*.77,W*.08,H*.74);
-    ctx.bezierCurveTo(W*.10,H*.72,W*.12,H*.70,W*.14,H*.71);
-    ctx.bezierCurveTo(W*.16,H*.72,W*.18,H*.74,W*.20,H*.73);
-    ctx.bezierCurveTo(W*.22,H*.71,W*.24,H*.68,W*.26,H*.67);
-    ctx.bezierCurveTo(W*.28,H*.67,W*.30,H*.69,W*.32,H*.71);
-    ctx.bezierCurveTo(W*.33,H*.72,W*.35,H*.71,W*.37,H*.69);
-    ctx.bezierCurveTo(W*.38,H*.67,W*.40,H*.65,W*.42,H*.66);
-    ctx.bezierCurveTo(W*.43,H*.67,W*.45,H*.70,W*.47,H*.72);
-    ctx.bezierCurveTo(W*.49,H*.73,W*.51,H*.72,W*.53,H*.69);
-    ctx.bezierCurveTo(W*.55,H*.67,W*.57,H*.65,W*.59,H*.66);
-    ctx.bezierCurveTo(W*.60,H*.67,W*.62,H*.70,W*.64,H*.72);
-    ctx.bezierCurveTo(W*.65,H*.73,W*.67,H*.72,W*.69,H*.70);
-    ctx.bezierCurveTo(W*.71,H*.69,W*.72,H*.70,W*.74,H*.72);
-    ctx.bezierCurveTo(W*.75,H*.74,W*.77,H*.75,W*.79,H*.74);
-    ctx.bezierCurveTo(W*.81,H*.73,W*.83,H*.74,W*.85,H*.75);
-    ctx.bezierCurveTo(W*.87,H*.76,W*.90,H*.77,W*.93,H*.77);
-    ctx.bezierCurveTo(W*.95,H*.77,W*.97,H*.78,W*.99,H*.79);
-    ctx.bezierCurveTo(W*.995,H*.795,W,H*.80,W,H*.80);
+    // Near layer — front-most hills, baseline H*.79; well sits on this
+    ctx.beginPath(); ctx.moveTo(0,H*.79);
+    ctx.bezierCurveTo(W*.18,H*.77, W*.36,H*.785, W*.50,H*.80);
+    ctx.bezierCurveTo(W*.64,H*.81, W*.82,H*.785, W,   H*.78);
     ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
     ctx.fillStyle='#0e1a2e'; ctx.fill();
+    // Warm dawn/dusk wash on the hill faces (preserved from original)
     var dawnF=fade(t,.18,.25,.29,.36), duskF=fade(t,.60,.66,.71,.76);
     var tA=Math.max(dawnF,duskF)*0.08;
     if(tA>0.005){
@@ -1267,6 +1189,34 @@ function _foStartCanvasScene() {
     ctx.strokeStyle='#4a3510'; ctx.lineWidth=1.8; ctx.stroke();
     ctx.beginPath(); ctx.rect(rx-6,rb,11,9); ctx.fillStyle='#3a2a10'; ctx.fill(); ctx.strokeStyle='#5a3c10'; ctx.lineWidth=0.8; ctx.stroke();
   }
+  // 2026-05-27 — Pulsating glowing cross above the well. Draws 3 outer
+  // glow layers at increasing size + decreasing opacity for the bloom,
+  // then a solid cream/gold cross center. Pulse alpha is sine-driven
+  // and clamped to a safe [0.30, 0.80] range so the cross never fully
+  // disappears or burns out white.
+  function drawWellCross(ctx, x, y, alpha){
+    var w = 4, h = 35, beam = 14, beamY = 12;
+    // Outer glow layers — three concentric, softest on the outside
+    for (var i = 3; i >= 1; i--){
+      ctx.save();
+      ctx.globalAlpha = (alpha * 0.15) / i;
+      ctx.fillStyle = '#ffd700';
+      ctx.shadowColor = '#ffd700';
+      ctx.shadowBlur = 20 * i;
+      ctx.fillRect(x - (w * i) / 2,    y - h / 2,         w * i, h);
+      ctx.fillRect(x - (beam * i) / 2, y - h / 2 + beamY, beam * i, w * i);
+      ctx.restore();
+    }
+    // Solid cross center — cream over gold shadow
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = '#fffde7';
+    ctx.shadowColor = '#ffd700';
+    ctx.shadowBlur = 15;
+    ctx.fillRect(x - w / 2,    y - h / 2,         w,    h);
+    ctx.fillRect(x - beam / 2, y - h / 2 + beamY, beam, w);
+    ctx.restore();
+  }
   function dFG(W,H){
     ctx.beginPath(); ctx.moveTo(0,H*.845);
     ctx.bezierCurveTo(W*.14,H*.825, W*.32,H*.852, W*.50,H*.836);
@@ -1313,8 +1263,16 @@ function _foStartCanvasScene() {
       var t = _t;
       var W = cv.width, H = cv.height, sky = getSky(t), na = nightA(t);
       dSky(W,H,sky); dStars(W,H,ts,na); dMoon(W,H,na); dHorizonGlow(W,H,t); dSun(W,H,t);
-      dClouds(W,H,t,ts); dFarMtns(W,H,t); dMidMtns(W,H,t); dNearMtns(W,H,t); dCross(W,H,t,ts); dMist(W,H,t);
-      dBirds(W,H,t,ts); dWell(W,H,sky.top,ts); dFG(W,H); dSparks(W,H,t,ts); dScrim(W,H);
+      // 2026-05-27 — old sky-positioned dCross retired in favour of
+      // drawWellCross (centred above the well, sine-pulsed). dCross
+      // function kept as dead code in case of revert.
+      dClouds(W,H,t,ts); dFarMtns(W,H,t); dMidMtns(W,H,t); dNearMtns(W,H,t); dMist(W,H,t);
+      dBirds(W,H,t,ts); dWell(W,H,sky.top,ts);
+      // Cross above the well — pulse alpha in [0.30, 0.80] so the
+      // glow breathes without ever blacking out or going pure white.
+      var _wcA = 0.55 + Math.sin(ts / 1500) * 0.25;
+      drawWellCross(ctx, W * 0.50, H * 0.51, _wcA);
+      dFG(W,H); dSparks(W,H,t,ts); dScrim(W,H);
       window._foCanvasRaf = requestAnimationFrame(tick);
     } catch(e) {
       console.warn('[Well] canvas error:', e);
@@ -1525,9 +1483,13 @@ function renderFaithOnlyHero() {
         '</g>' +
       '</svg>';
 
+    // 2026-05-27 — reverted to the original canvas-painted scene from
+    // before commit 70ae415. The SVG landscape (svgMountains above) and
+    // its day/night cycle driver (_foStartDayNightCycle) are left in
+    // place as dead code in case we ever revert again.
     hero.innerHTML =
       '<div class="fo-hero" id="faithOnlyHero">' +
-        svgMountains +
+        '<canvas id="fo-canvas-scene" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;"></canvas>' +
         '<div class="fo-hero-scrim"></div>' +
         '<div class="fo-hero-content">' +
           '<div class="fo-hero-greeting">' + greetingHtml + '</div>' +
@@ -1565,14 +1527,10 @@ function renderFaithOnlyHero() {
   })();
   var ctaBtn = document.querySelector('.fo-hero-cta') || document.querySelector('.fo-enter-btn');
   if (ctaBtn) ctaBtn.style.marginBottom = 'max(32px, env(safe-area-inset-bottom, 32px))';
-  // 2026-05-25 — canvas-painted scene retired; the SVG landscape is
-  // declarative + CSS-animated. _foStartCanvasScene is left in place
-  // as dead code in case we ever revert.
-  // 2026-05-26 — restored the day/night cycle (sun + moon + clouds +
-  // birds + cross glow) via a single RAF loop that writes CSS custom
-  // properties on the SVG root each frame. Cleaner than the canvas
-  // painter, ~1/8 the LOC, animations live in CSS keyframes.
-  setTimeout(_foStartDayNightCycle, 80);
+  // 2026-05-27 — canvas restored. The SVG-based _foStartDayNightCycle
+  // is left in place as dead code; switch the setTimeout target above
+  // to revert to the SVG path if needed.
+  setTimeout(_foStartCanvasScene, 150);
 
   // ── Entry cards & today's verse intentionally NOT rendered. ──
   // After clicking "Enter The Well", wellGoto('home') takes them inside where
