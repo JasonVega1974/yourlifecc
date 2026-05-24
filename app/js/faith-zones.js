@@ -1152,9 +1152,87 @@ function fzOpenDest(dest){
   } else if (dest === 'reallife'){
     titleEl.textContent = "Real Life Win";
     bodyEl.innerHTML = renderRealLifeWinDestination();
+  } else if (dest === 'reflect'){
+    titleEl.textContent = "Night Reflection";
+    // The "Start Reflection →" button opens the existing 3-step
+    // overlay (openNightReflect lives in this file). Past
+    // reflections render below into #fzReflectionsHistory — the
+    // same host that the bf-prayer panel uses, so the renderer
+    // works unchanged.
+    bodyEl.innerHTML =
+      '<div class="fz-reflect-intro">' +
+        '<div class="fz-reflect-intro-emoji" aria-hidden="true">🌙</div>' +
+        '<div class="fz-reflect-intro-body">Take 2 minutes to reflect on your day with God.</div>' +
+      '</div>' +
+      '<button class="fz-rlw-btn" onclick="openNightReflect()" style="display:block;margin:1.5rem auto 0;">' +
+        'Start Reflection →' +
+      '</button>' +
+      '<div id="fzReflectionsHistory" style="margin-top:2rem;"></div>';
+    if (typeof renderReflectionsHistory === 'function') renderReflectionsHistory();
+  } else if (dest === 'growth'){
+    titleEl.textContent = "Growth Profile";
+    bodyEl.innerHTML =
+      '<div class="fz-growth-intro">' +
+        'Seven traits that shape who you are.<br>Every action grows them.' +
+      '</div>' +
+      '<div id="fzGrowthFull"></div>';
+    renderGrowthFull();
   }
 
   setTimeout(function(){ destEl.scrollIntoView({ behavior:'smooth', block:'start' }); }, 60);
+}
+
+// 2026-05-29 — Growth Profile destination renderer. All 7 traits as
+// cards with name + level + description + progress bar + next-level
+// label. Reads the same TRAITS map + getTraitLevel from traits.js
+// that renderGrowthCompact uses, just shows the full set instead
+// of the top 3.
+function renderGrowthFull(){
+  if (typeof document === 'undefined') return;
+  var el = document.getElementById('fzGrowthFull');
+  if (!el) return;
+  if (typeof TRAITS === 'undefined'){
+    el.innerHTML = '<div style="color:var(--tx2);text-align:center;padding:2rem;">Growth engine loading…</div>';
+    return;
+  }
+  var thresholds = (typeof TRAIT_THRESHOLDS !== 'undefined') ? TRAIT_THRESHOLDS : [0,50,150,350,700];
+  var keys = Object.keys(TRAITS);
+  var html = '';
+  for (var i = 0; i < keys.length; i++){
+    var key = keys[i];
+    var t = TRAITS[key];
+    if (!t) continue;
+    var pts = +((D && D.traits && D.traits[key]) || 0);
+    var lvl = (typeof getTraitLevel === 'function') ? getTraitLevel(key, pts) : 0;
+    var currentThreshold = thresholds[lvl] || 0;
+    var nextIdx = Math.min(lvl + 1, thresholds.length - 1);
+    var nextThreshold = thresholds[nextIdx] || 1;
+    var inLevel = Math.max(0, pts - currentThreshold);
+    var range = Math.max(1, nextThreshold - currentThreshold);
+    var atMax = lvl >= thresholds.length - 1;
+    var pct = atMax ? 100 : Math.min(100, Math.round((inLevel / range) * 100));
+    var levelName = t.levels[lvl] || t.levels[t.levels.length - 1];
+    var nextLevelName = atMax ? null : (t.levels[lvl + 1] || 'Max');
+    var nextLabel = atMax
+      ? 'Max level reached ✨'
+      : 'Next: ' + _fzEsc(nextLevelName) + ' (' + pts + '/' + nextThreshold + ')';
+    html += ''
+      + '<div class="fz-growth-card">'
+      +   '<div class="fz-growth-card-header">'
+      +     '<span class="fz-growth-emoji" aria-hidden="true">' + _fzEsc(t.emoji) + '</span>'
+      +     '<div class="fz-growth-info">'
+      +       '<div class="fz-growth-name">' + _fzEsc(t.name) + '</div>'
+      +       '<div class="fz-growth-level">' + _fzEsc(levelName) + '</div>'
+      +     '</div>'
+      +   '</div>'
+      +   '<div class="fz-growth-desc">' + _fzEsc(t.desc || '') + '</div>'
+      +   '<div class="fz-growth-track" aria-hidden="true">'
+      +     '<div class="fz-growth-fill" style="width:' + pct + '%"></div>'
+      +   '</div>'
+      +   '<div class="fz-growth-next">' + nextLabel + '</div>'
+      + '</div>';
+  }
+  el.innerHTML = html;
 }
 
 function fzGoHome(){
@@ -1259,6 +1337,7 @@ if (typeof window !== 'undefined'){
   window.fzGoHome          = fzGoHome;
   window.fzCompleteRLW     = fzCompleteRLW;
   window.renderFzGreeting  = renderFzGreeting;
+  window.renderGrowthFull  = renderGrowthFull;
 }
 
 if (typeof document !== 'undefined'){
