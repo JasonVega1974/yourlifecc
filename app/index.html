@@ -1180,7 +1180,12 @@
        the perspective; the inner #wellCross3d does the rotation. ── */
     #wellCrossWrap{
       position:absolute;
-      top:48%;
+      /* top:38% — visual midpoint between the verse subtitle ending
+         around H*0.32 and the well roof apex at H*0.556. The 100px
+         wrap contains a 70px cross centred at wrap_top + ~6%, so a
+         wrap_top of 38% lands the cross centre at roughly H*0.44 —
+         evenly between scripture text above and the well below. */
+      top:38%;
       left:50%;
       transform:translateX(-50%);
       pointer-events:none;
@@ -1188,6 +1193,15 @@
       z-index:2;
       width:80px;
       height:100px;
+      /* 2026-05-28 v8 — crossPulse (filter animation) lives HERE on the
+         wrap, NOT on #wellCross3d. Why: CSS spec says `filter` on the
+         same element as `transform-style: preserve-3d` forces flat
+         rendering, collapsing the 12 cube faces of the cross into a
+         paper-thin silhouette. The wrap doesn't need preserve-3d
+         (perspective alone establishes the 3D viewing frustum for
+         children) so it's safe to apply the filter here. */
+      animation: crossPulse 2.5s ease-in-out infinite;
+      will-change: filter;
     }
     #wellCross3d{
       position:relative;
@@ -1195,9 +1209,11 @@
       height:70px;
       margin:0 auto;
       transform-style:preserve-3d;
-      will-change:transform, filter;
-      animation: crossSpin 9s linear infinite,
-                 crossPulse 2.5s ease-in-out infinite;
+      /* will-change:filter is ALSO a preserve-3d killer (eagerly
+         promotes the element to a stacking context that flattens
+         3D children). Only transform here. */
+      will-change:transform;
+      animation: crossSpin 9s linear infinite;
     }
     @keyframes crossSpin{
       from{ transform: rotateY(0deg); }
@@ -1244,8 +1260,10 @@
                     background:#c8960c; }
 
     @media (prefers-reduced-motion: reduce){
-      /* Keep the breathing glow; drop the rotation. */
-      #wellCross3d{ animation: crossPulse 2.5s ease-in-out infinite; }
+      /* Keep the breathing glow on the wrap; drop the rotation
+         on the inner element. The wrap's pulse animation already
+         plays here independently of the spin. */
+      #wellCross3d{ animation: none; }
     }
 
     /* ── 2026-05-25 — SVG landscape (replaces the canvas-painted scene).
