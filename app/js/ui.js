@@ -1772,6 +1772,12 @@ function showSection(id, fromMobile){
   if(id==='s-hero' && typeof renderDailyBriefing === 'function'){
     setTimeout(renderDailyBriefing, 30);
   }
+  // V1 Rebuild · Faith Tab redesign — refresh the 3 zones whenever the
+  // user enters the Well so today's challenge / mood / curiosity streak
+  // are current.
+  if(id==='s-scripture' && typeof renderFaithZones === 'function'){
+    setTimeout(renderFaithZones, 30);
+  }
 
   // Trigger renders that need visible DOM
   if(id==='s-schedule') setTimeout(buildSchedule,60);

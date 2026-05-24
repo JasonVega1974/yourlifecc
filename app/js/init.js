@@ -335,6 +335,10 @@ function finishInit(cloudReady){
   // module itself re-renders on visibility-change so the time-of-day
   // greeting and post-7pm Night Reflection prompt stay accurate.
   if(typeof renderDailyBriefing === 'function') renderDailyBriefing();
+  // V1 Rebuild · Faith Tab redesign — Zone 1/2/3 render. Zone 2's mood
+  // + challenge cards auto-refresh on visibility-change inside the
+  // module so returning users see today's state, not yesterday's.
+  if(typeof renderFaithZones === 'function') renderFaithZones();
   if(typeof _lastRenderedProfileId !== 'undefined'){
     _lastRenderedProfileId = (typeof _activeProfileId !== 'undefined') ? _activeProfileId : null;
   }

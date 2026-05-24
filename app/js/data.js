@@ -60,6 +60,24 @@ const DEF = {
   // through cloudSync. Tab is read-only otherwise (D.savedProofs is the only
   // proof-prophecy field that mutates).
   savedProofs:[],
+  // V1 Rebuild · Faith Tab Redesign — Zone 1 (Convince Me hero) state.
+  // convinceMeSeen[] is the list of card ids the user has flipped; the
+  // deck reshuffles + resets when every id is in the list. Curiosity
+  // streak increments once per local day the user engages at least one
+  // card; faithCuriosityLastDate is the YYYY-MM-DD of the last credit.
+  convinceMeSeen:[],
+  faithCuriosityStreak:0,
+  faithCuriosityLastDate:'',
+  // V1 Rebuild · Faith Tab Redesign — Zone 2 (Today). faithChallenges
+  // keyed by YYYY-MM-DD → true when completed. faithMood keyed by
+  // YYYY-MM-DD → one of '😞 😐 🙂 😊 🔥'. quickPrayers is an append-only
+  // log (capped to 50 in faith-zones.js) — each { text, date }.
+  faithChallenges:{},
+  faithMood:{},
+  quickPrayers:[],
+  // V1 Rebuild · Faith Tab Redesign — Zone 3 toggle state. true means
+  // the Explore section is expanded; persists across sessions.
+  faithExploreOpen:false,
   // streak / checkin
   streak:0, lastCheckin:null, checkin:{}, customHabits:[], dailyChecks:{},
   // V1 Rebuild — Session 1 (Daily Briefing). Keyed by YYYY-MM-DD; per-day

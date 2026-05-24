@@ -796,6 +796,10 @@ function bfTab(tab, btn){
     }
   }
   if(typeof stopAllAudio === 'function') stopAllAudio();
+  // V1 Rebuild · Faith Tab redesign — when the user lands on any sub-tab
+  // other than 'home' (deep link from sidebar, Daily Briefing tile, etc.)
+  // auto-expand Zone 3 so the target panel is actually visible.
+  if(typeof ensureFaithExploreOpenForTab === 'function') ensureFaithExploreOpenForTab(tab);
   BF_TABS.forEach(t=>{
     const el = document.getElementById('bf-'+t);
     if(el) el.style.display = t===tab ? 'block' : 'none';
