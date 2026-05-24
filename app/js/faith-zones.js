@@ -373,14 +373,20 @@ function renderQuickPrayerCard(){
   host.onclick = openQuickPrayer;
 }
 
-function openQuickPrayer(){
+function openQuickPrayer(seedText){
   var overlay = document.getElementById('quickPrayerOverlay');
   if (!overlay) return;
   overlay.classList.add('open');
   document.body.classList.add('modal-open');
+  var seed = (typeof seedText === 'string') ? seedText : '';
   setTimeout(function(){
     var ta = document.getElementById('quickPrayerText');
-    if (ta){ ta.value = ''; ta.focus(); }
+    if (ta){
+      ta.value = seed;
+      ta.focus();
+      // Place caret at end so the user can keep typing past the seed.
+      if (seed) ta.setSelectionRange(seed.length, seed.length);
+    }
   }, 80);
 }
 
@@ -534,6 +540,371 @@ function ensureFaithExploreOpenForTab(tab){
 }
 
 // ════════════════════════════════════════════════════════════
+// SESSION 2 — Quick Prayer journal
+// Builds automatically from D.quickPrayers (cap 50 in submit handler);
+// renders into the #fzQuickPrayerJournal host placed at the bottom of
+// the bf-prayer panel. Each entry can be marked Answered, which flips
+// D.quickPrayers[i].answered and tints the card.
+// ════════════════════════════════════════════════════════════
+
+// Friendly date label: "Today", "Yesterday", or "May 22"
+function _fzFriendlyDate(dateStr){
+  if (!dateStr) return '';
+  var today = _fzToday();
+  if (dateStr === today) return 'Today';
+  var d = new Date(dateStr + 'T00:00:00');
+  var y = new Date(); y.setDate(y.getDate() - 1);
+  if (dateStr === y.toISOString().slice(0,10)) return 'Yesterday';
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return months[d.getMonth()] + ' ' + d.getDate();
+}
+
+function renderQuickPrayerJournal(){
+  var host = document.getElementById('fzQuickPrayerJournal');
+  if (!host) return;
+  if (!D || !Array.isArray(D.quickPrayers)) {
+    if (D) D.quickPrayers = [];
+    else return;
+  }
+  var entries = D.quickPrayers.slice().reverse().slice(0, 30);
+  var answeredCount = 0;
+  for (var i = 0; i < D.quickPrayers.length; i++){
+    if (D.quickPrayers[i] && D.quickPrayers[i].answered) answeredCount++;
+  }
+  var hdrSuffix = answeredCount > 0
+    ? ' <span class="fz-jr-hdr-count">(' + answeredCount + ' answered 🙏)</span>'
+    : '';
+
+  if (!entries.length){
+    host.innerHTML =
+      '<div class="fz-jr-section">' +
+        '<div class="fz-jr-hdr">My Prayers 📓</div>' +
+        '<div class="fz-jr-empty">Your prayers will appear here. Tap Quick Prayer to start.</div>' +
+      '</div>';
+    return;
+  }
+
+  // Reverse-chronological ids → original-index map (so toggle handlers
+  // know which item to flip without recalculating).
+  var html = '<div class="fz-jr-section">' +
+    '<div class="fz-jr-hdr">My Prayers 📓' + hdrSuffix + '</div>' +
+    '<div class="fz-jr-list">';
+
+  for (var k = 0; k < entries.length; k++){
+    var p = entries[k];
+    if (!p) continue;
+    // Original index inside D.quickPrayers (so the toggle knows the row).
+    var origIdx = D.quickPrayers.length - 1 - k;
+    var answered = !!p.answered;
+    var text = String(p.text || '').slice(0, 600);
+    html +=
+      '<div class="fz-jr-entry' + (answered ? ' fz-jr-answered' : '') + '" data-idx="' + origIdx + '">' +
+        '<div class="fz-jr-row">' +
+          '<span class="fz-jr-dove" aria-hidden="true">🕊️</span>' +
+          '<div class="fz-jr-body">' +
+            '<div class="fz-jr-meta">' +
+              '<span class="fz-jr-date">' + _fzEsc(_fzFriendlyDate(p.date || '')) + '</span>' +
+              (answered ? ' <span class="fz-jr-badge">🙏 Answered</span>' : '') +
+            '</div>' +
+            '<div class="fz-jr-text">' + _fzEsc(text) + '</div>' +
+            '<button type="button" class="fz-jr-ans" onclick="toggleQuickPrayerAnswered(' + origIdx + ')">' +
+              (answered ? 'Unmark answered' : 'Mark as answered ✓') +
+            '</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+  }
+  html += '</div></div>';
+  host.innerHTML = html;
+}
+
+function toggleQuickPrayerAnswered(idx){
+  if (!D || !Array.isArray(D.quickPrayers)) return;
+  var entry = D.quickPrayers[idx];
+  if (!entry) return;
+  entry.answered = !entry.answered;
+  if (entry.answered) entry.answered_at = new Date().toISOString();
+  else delete entry.answered_at;
+  _fzSave();
+  renderQuickPrayerJournal();
+}
+
+// ════════════════════════════════════════════════════════════
+// SESSION 2 — Night Reflection
+//
+// Three-step overlay rendered as a horizontal-slide track:
+//   Step 1 (mood)     → Step 2 (rotating question + text)
+//   Step 2            → Step 3 (pray-or-goodnight)
+// Step 3 completes the reflection, fires the stars finale, saves to
+// D.nightReflections (cap 60). "Yes, quick prayer" opens the Quick
+// Prayer overlay with a 30-char seed from the reflection text.
+// ════════════════════════════════════════════════════════════
+
+var _nrState = { mood:null, moodLabel:null, text:'', step:1 };
+
+// Rotation: 7 weekday questions (Mon-Sun) keyed by getDay(); the bonus
+// is shown on the 1st of any month so it appears ~once/month without
+// disrupting the weekday rhythm.
+var _NR_QUESTIONS = {
+  weekday: [
+    "What was the best moment of your week?",                              // 0 Sun
+    "What's one thing you're grateful for today?",                         // 1 Mon
+    "What challenged you today?",                                          // 2 Tue
+    "Where did you see God today — even slightly?",                        // 3 Wed
+    "What do you wish you'd done differently?",                            // 4 Thu
+    "Who made your day better?",                                           // 5 Fri
+    "What are you carrying that you need to put down?"                     // 6 Sat
+  ],
+  bonus: "What's one thing you're worried about right now?"
+};
+
+function _nrQuestionForToday(){
+  var d = new Date();
+  if (d.getDate() === 1) return _NR_QUESTIONS.bonus;
+  return _NR_QUESTIONS.weekday[d.getDay()];
+}
+
+function _nrFirstName(){
+  if (D && D.name) return String(D.name).split(' ')[0];
+  if (typeof _supaUser !== 'undefined' && _supaUser){
+    var meta = _supaUser.user_metadata || {};
+    if (meta.first_name) return meta.first_name;
+    if (_supaUser.email) return _supaUser.email.split('@')[0];
+  }
+  return 'friend';
+}
+
+function openNightReflect(){
+  var overlay = document.getElementById('nightReflectOverlay');
+  if (!overlay) return;
+  _nrState = { mood:null, moodLabel:null, text:'', step:1 };
+
+  var nm = document.getElementById('nrName');
+  if (nm) nm.textContent = _nrFirstName();
+  var q = document.getElementById('nrQuestion');
+  if (q) q.textContent = _nrQuestionForToday();
+  var ta = document.getElementById('nrText');
+  if (ta) ta.value = '';
+
+  // Clear any previously-active mood + step states.
+  var moods = overlay.querySelectorAll('.nr-mood-btn');
+  for (var i = 0; i < moods.length; i++) moods[i].classList.remove('active');
+
+  _nrSetStep(1);
+
+  // Hide the finale pane if it was left visible from a previous run.
+  var finale = document.getElementById('nrFinale');
+  if (finale) finale.style.display = 'none';
+
+  overlay.classList.add('open');
+  document.body.classList.add('modal-open');
+}
+
+function closeNightReflect(){
+  var overlay = document.getElementById('nightReflectOverlay');
+  if (!overlay) return;
+  overlay.classList.remove('open');
+  if (!document.querySelector('.mo.open, #ppModal.open, #ppConvinceModal.open, #quickPrayerOverlay.open')){
+    document.body.classList.remove('modal-open');
+  }
+}
+
+function _nrSetStep(step){
+  _nrState.step = step;
+  var track = document.getElementById('nrTrack');
+  if (track) track.setAttribute('data-step', String(step));
+  // Step indicator dots
+  var dots = document.querySelectorAll('#nrSteps .nr-step');
+  for (var i = 0; i < dots.length; i++){
+    dots[i].classList.toggle('active', i === (step - 1));
+  }
+  // Auto-focus the textarea when arriving on Step 2.
+  if (step === 2){
+    setTimeout(function(){
+      var ta = document.getElementById('nrText');
+      if (ta) ta.focus();
+    }, 380);
+  }
+}
+
+function nrPickMood(emoji, label){
+  _nrState.mood = emoji;
+  _nrState.moodLabel = label;
+  var btns = document.querySelectorAll('#nightReflectOverlay .nr-mood-btn');
+  for (var i = 0; i < btns.length; i++){
+    btns[i].classList.toggle('active', btns[i].getAttribute('data-mood') === emoji);
+  }
+  setTimeout(function(){ _nrSetStep(2); }, 220);
+}
+
+function nrContinue(){
+  var ta = document.getElementById('nrText');
+  _nrState.text = ta ? String(ta.value || '').trim() : '';
+  _nrSetStep(3);
+}
+
+function nrSkip(){
+  _nrState.text = '';
+  _nrSetStep(3);
+}
+
+function nrBack(toStep){
+  _nrSetStep(toStep);
+}
+
+function nrCompleteWithPrayer(){
+  _nrSaveReflection(true);
+  // Brief stars-only flash (no "sleep well" message — keeps momentum
+  // into the prayer overlay).
+  _nrShowFinale(false, function(){
+    closeNightReflect();
+    var seed = 'God, about what I wrote tonight — ' +
+               (String(_nrState.text || '').slice(0, 30));
+    setTimeout(function(){ openQuickPrayer(seed); }, 200);
+  });
+}
+
+function nrCompleteGoodnight(){
+  _nrSaveReflection(false);
+  _nrShowFinale(true, function(){ closeNightReflect(); });
+}
+
+function _nrSaveReflection(prayed){
+  if (!D) return;
+  if (!Array.isArray(D.nightReflections)) D.nightReflections = [];
+  D.nightReflections.push({
+    date:   _fzToday(),
+    mood:   _nrState.mood || '',
+    text:   String(_nrState.text || '').slice(0, 800),
+    prayed: !!prayed,
+    ts:     new Date().toISOString()
+  });
+  // Cap to most recent 60 entries.
+  if (D.nightReflections.length > 60){
+    D.nightReflections = D.nightReflections.slice(-60);
+  }
+  // Mark today as a "scripture day" for streak math — Night Reflection
+  // counts as showing up for faith today. scrReadDays is the canonical
+  // streak store and is shared with the existing getScriptureStreak().
+  if (!D.scrReadDays || typeof D.scrReadDays !== 'object' || Array.isArray(D.scrReadDays)){
+    D.scrReadDays = {};
+  }
+  D.scrReadDays[_fzToday()] = true;
+  // Award trait points — Session 3 owns the rendering; the data sits
+  // here until the trait engine reads it (+2 Wisdom, +2 Gratitude).
+  if (D.traits && typeof D.traits === 'object'){
+    D.traits.wisdom    = (+D.traits.wisdom    || 0) + 2;
+    D.traits.gratitude = (+D.traits.gratitude || 0) + 2;
+  }
+  _fzSave();
+  // Re-render any open faith surfaces that depend on the new state.
+  if (typeof renderReflectionsHistory === 'function') renderReflectionsHistory();
+  if (typeof renderDailyBriefing === 'function') renderDailyBriefing();
+}
+
+function _nrShowFinale(withMessage, done){
+  var finale = document.getElementById('nrFinale');
+  if (!finale){ if (done) done(); return; }
+  // Inject N stars at random offsets so each finale feels a bit different.
+  var stars = document.getElementById('nrStars');
+  if (stars){
+    stars.innerHTML = '';
+    if (!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)){
+      for (var i = 0; i < 6; i++){
+        var s = document.createElement('span');
+        s.className = 'nr-star';
+        s.style.left = (10 + Math.random()*80) + '%';
+        s.style.top  = (20 + Math.random()*40) + '%';
+        s.style.animationDelay = (Math.floor(Math.random()*220)) + 'ms';
+        s.style.animationDuration = (1100 + Math.floor(Math.random()*500)) + 'ms';
+        stars.appendChild(s);
+      }
+    }
+  }
+  var msg = document.getElementById('nrFinaleMsg');
+  if (msg) msg.style.display = withMessage ? '' : 'none';
+  finale.style.display = '';
+  var dwell = withMessage ? 2000 : 800;
+  setTimeout(function(){
+    finale.style.display = 'none';
+    if (done) done();
+  }, dwell);
+}
+
+// ── Reflection history (in bf-prayer panel, below My Prayers) ────
+function renderReflectionsHistory(){
+  var host = document.getElementById('fzReflectionsHistory');
+  if (!host) return;
+  if (!D || !Array.isArray(D.nightReflections)) {
+    if (D) D.nightReflections = [];
+    else return;
+  }
+  var entries = D.nightReflections.slice().reverse().slice(0, 14);
+  if (!entries.length){
+    host.innerHTML =
+      '<div class="fz-jr-section">' +
+        '<div class="fz-jr-hdr">My Reflections 🌙</div>' +
+        '<div class="fz-jr-empty">Your reflections will appear here each night.</div>' +
+      '</div>';
+    return;
+  }
+  var html = '<div class="fz-jr-section">' +
+    '<div class="fz-jr-hdr">My Reflections 🌙</div>' +
+    '<div class="fz-jr-list">';
+  for (var k = 0; k < entries.length; k++){
+    var r = entries[k];
+    if (!r) continue;
+    var text = String(r.text || '');
+    var preview = text.length > 60 ? text.slice(0, 60) + '…' : text;
+    var origIdx = D.nightReflections.length - 1 - k;
+    html +=
+      '<div class="fz-jr-entry fz-nr-entry" data-idx="' + origIdx + '" onclick="toggleReflectionExpanded(' + origIdx + ')">' +
+        '<div class="fz-jr-row">' +
+          '<span class="fz-nr-mood" aria-hidden="true">' + _fzEsc(r.mood || '🌙') + '</span>' +
+          '<div class="fz-jr-body">' +
+            '<div class="fz-jr-meta">' +
+              '<span class="fz-jr-date">' + _fzEsc(_fzFriendlyDate(r.date || '')) + '</span>' +
+              (r.prayed ? ' <span class="fz-jr-badge fz-nr-prayed">🙏 Prayed</span>' : '') +
+            '</div>' +
+            '<div class="fz-jr-text fz-nr-preview" data-full="' + _fzEsc(text) + '">' +
+              (text ? _fzEsc(preview) : '<em>(no text — just a mood check-in)</em>') +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+  }
+  html += '</div></div>';
+  host.innerHTML = html;
+}
+
+function toggleReflectionExpanded(idx){
+  var entry = document.querySelector('.fz-nr-entry[data-idx="' + idx + '"]');
+  if (!entry) return;
+  var preview = entry.querySelector('.fz-nr-preview');
+  if (!preview) return;
+  var full = preview.getAttribute('data-full') || '';
+  if (!full) return;
+  var isExpanded = entry.classList.toggle('fz-nr-expanded');
+  if (isExpanded){
+    preview.textContent = full;
+  } else {
+    preview.textContent = full.length > 60 ? full.slice(0,60) + '…' : full;
+  }
+}
+
+// ── Floating "🌙 Reflect" button on the faith hub after 7pm ──────
+function updateReflectFloatVisibility(){
+  var btn = document.getElementById('fzReflectFloat');
+  if (!btn) return;
+  var active = (typeof _activeSection !== 'undefined') ? _activeSection : '';
+  var h = new Date().getHours();
+  var show = (active === 's-scripture') && (h >= 19);
+  btn.style.display = show ? '' : 'none';
+  // Pulse animation after 8pm to draw attention.
+  btn.classList.toggle('fz-pulse', show && h >= 20);
+}
+
+// ════════════════════════════════════════════════════════════
 // Boot — single entry point
 // ════════════════════════════════════════════════════════════
 
@@ -547,18 +918,22 @@ function renderFaithZones(){
   if (!D.faithMood || typeof D.faithMood !== 'object' || Array.isArray(D.faithMood)) D.faithMood = {};
   if (!Array.isArray(D.quickPrayers)) D.quickPrayers = [];
   if (typeof D.faithExploreOpen !== 'boolean') D.faithExploreOpen = false;
+  if (!Array.isArray(D.nightReflections)) D.nightReflections = [];
 
   renderConvinceMeHero();
   renderTodayZone();
   renderFaithExploreToggle();
+  updateReflectFloatVisibility();
 }
 
 if (typeof document !== 'undefined'){
   document.addEventListener('visibilitychange', function(){
     if (!document.hidden){
       // Re-render Zone 2 only — the time-sensitive bits (mood today,
-      // challenge-of-day) update when the user returns mid-day.
+      // challenge-of-day, post-7pm reflect button) update when the user
+      // returns mid-day.
       renderTodayZone();
+      updateReflectFloatVisibility();
     }
   });
 }

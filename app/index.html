@@ -947,15 +947,23 @@
 
   .db-reflect{
     display:block; width:100%; margin-top:.7rem;
-    background:rgba(167,139,250,.08);
-    border:1px solid rgba(167,139,250,.22);
-    color:#a78bfa;
+    background:color-mix(in srgb, var(--p) 8%, transparent);
+    border:1px solid color-mix(in srgb, var(--p) 22%, transparent);
+    color:var(--p);
     font-family:var(--fm); font-size:.85rem; font-weight:600;
     padding:.75rem 1rem; border-radius:12px; cursor:pointer;
     text-align:center;
-    transition:background .15s ease, transform .15s ease;
+    transition:background .15s ease, transform .15s ease, box-shadow .25s ease;
   }
-  .db-reflect:hover{ background:rgba(167,139,250,.16); transform:translateY(-1px); }
+  .db-reflect:hover{ background:color-mix(in srgb, var(--p) 16%, transparent); transform:translateY(-1px); }
+  /* V1 Rebuild · Session 2 — gentle pulse after 8pm to nudge the user
+     toward the Night Reflection without yelling. */
+  .db-reflect.db-reflect-pulse{ animation:dbReflectPulse 2.6s ease-in-out infinite; }
+  @keyframes dbReflectPulse{
+    0%,100%{ box-shadow:0 0 0 0 color-mix(in srgb, var(--p) 28%, transparent); }
+    50%   { box-shadow:0 0 0 6px color-mix(in srgb, var(--p)  0%, transparent); }
+  }
+  @media (prefers-reduced-motion: reduce){ .db-reflect.db-reflect-pulse{ animation:none !important; } }
 
   .db-complete{
     margin-top:.7rem;
@@ -5409,6 +5417,100 @@
         animation:none !important;
       }
     }
+
+    /* ── SESSION 2 — Quick Prayer journal + Reflections history ──
+       Lives at the bottom of the bf-prayer panel. Pure list rendering;
+       all colors thread through the #s-scripture token aliases. */
+    .fz-jr-section{
+      margin-top:1.4rem;
+      background:var(--fz-card-bg);
+      border:1px solid var(--fz-card-border);
+      border-radius:16px;
+      padding:1rem 1.1rem 1.15rem;
+    }
+    .fz-jr-hdr{
+      font-family:var(--fh,var(--fm));
+      font-size:1.1rem; letter-spacing:.03em;
+      color:var(--tx); font-weight:700;
+      margin-bottom:.85rem;
+      display:flex; align-items:center; gap:.4rem; flex-wrap:wrap;
+    }
+    .fz-jr-hdr-count{
+      font-family:var(--fm); font-size:.75rem;
+      font-weight:600; color:var(--fz-ok);
+      letter-spacing:.04em;
+    }
+    .fz-jr-empty{
+      padding:1.1rem .25rem;
+      text-align:center;
+      font-family:Georgia,serif; font-style:italic;
+      color:var(--tx2);
+    }
+    .fz-jr-list{ display:flex; flex-direction:column; gap:0; }
+    .fz-jr-entry{
+      padding:.85rem .15rem;
+      border-bottom:1px solid var(--fz-divider);
+      transition:background .15s ease, border-color .2s ease;
+    }
+    .fz-jr-entry:last-child{ border-bottom:none; }
+    .fz-jr-row{
+      display:flex; align-items:flex-start; gap:.7rem;
+    }
+    .fz-jr-dove, .fz-nr-mood{
+      font-size:1.1rem; line-height:1.2; flex-shrink:0;
+      width:24px; text-align:center;
+      margin-top:.1rem;
+    }
+    .fz-jr-body{ flex:1; min-width:0; }
+    .fz-jr-meta{
+      display:flex; align-items:center; gap:.5rem; flex-wrap:wrap;
+      margin-bottom:.3rem;
+    }
+    .fz-jr-date{
+      font-family:var(--fm); font-size:.7rem;
+      font-weight:700; letter-spacing:.04em;
+      color:var(--tx2);
+    }
+    .fz-jr-badge{
+      font-family:var(--fm); font-size:.65rem;
+      font-weight:700; letter-spacing:.04em;
+      color:var(--fz-ok);
+      background:var(--fz-ok-soft);
+      border:1px solid var(--fz-ok-bd);
+      padding:.15rem .5rem; border-radius:99px;
+    }
+    .fz-jr-badge.fz-nr-prayed{
+      color:var(--fz-purple);
+      background:var(--fz-purple-soft);
+      border-color:var(--fz-purple-bd);
+    }
+    .fz-jr-text{
+      font-family:Georgia,'Times New Roman',serif;
+      font-size:.92rem; line-height:1.55;
+      color:var(--tx);
+      margin-bottom:.45rem;
+      word-wrap:break-word;
+      overflow-wrap:break-word;
+    }
+    .fz-jr-ans{
+      background:none; border:none;
+      color:var(--fz-ok); opacity:.85;
+      font-family:var(--fm); font-size:.72rem; font-weight:700;
+      cursor:pointer; padding:.2rem 0;
+      letter-spacing:.02em;
+    }
+    .fz-jr-ans:hover{ opacity:1; }
+    .fz-jr-answered{
+      background:var(--fz-ok-soft);
+      border-radius:10px;
+      padding-left:.7rem; padding-right:.7rem;
+      margin:.25rem -.25rem;
+    }
+    .fz-jr-answered .fz-jr-text{ opacity:.78; }
+    .fz-nr-entry{ cursor:pointer; }
+    .fz-nr-entry:hover{ background:var(--fz-surface-soft); }
+    .fz-nr-preview{ font-style:italic; }
+    .fz-nr-expanded .fz-nr-preview{ font-style:normal; }
   </style>
 
   <!-- ZONE 1 — Convince Me hero -->
@@ -6778,6 +6880,14 @@
 
     <!-- Pane: Guided Prayer Sessions (Worker 3) -->
     <div id="pr-pane-guided" class="pr-pane" style="display:none;"></div>
+
+    <!-- V1 Rebuild · Session 2 — Quick Prayer journal + Reflections
+         history hosts. Rendered by faith-zones.js
+         (renderQuickPrayerJournal + renderReflectionsHistory) when
+         bfTab('prayer') fires. Both sections gracefully render their
+         own empty state, so it's safe to mount them unconditionally. -->
+    <div id="fzQuickPrayerJournal"></div>
+    <div id="fzReflectionsHistory"></div>
   </div>
 
   <!-- ════ SERMON NOTE EDITOR MODAL (F2-H) ════ -->
@@ -8979,6 +9089,377 @@
     <button type="button" id="quickPrayerSubmit" class="qp-submit" onclick="submitQuickPrayer()">Send it up 🙏</button>
   </div>
 </div>
+
+<!-- ════════════════════════════════════════════════════════════
+     V1 REBUILD · SESSION 2 — Night Reflection overlay + floating
+     "🌙 Reflect" button. Both live OUTSIDE #s-scripture so the
+     overlay backdrop covers the whole app and the floating button
+     can render fixed-position even when Zone 3 is collapsed.
+     Wired in app/js/faith-zones.js (openNightReflect, nrPickMood,
+     nrContinue, nrBack, nrCompleteWithPrayer, nrCompleteGoodnight,
+     updateReflectFloatVisibility).
+     ════════════════════════════════════════════════════════════ -->
+<style>
+  /* Calm-dark overlay — same backdrop language as the Quick Prayer
+     overlay but tuned cooler for the evening feel. All colors thread
+     through the app's variable system; tints use color-mix so the
+     overlay tracks light/dark mode automatically. */
+  #nightReflectOverlay{
+    display:none; position:fixed; inset:0; z-index:100040;
+    background:color-mix(in srgb, var(--bg) 92%, #000);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    align-items:center; justify-content:center;
+    padding:1.2rem;
+    animation:nrFadeIn .28s ease both;
+  }
+  #nightReflectOverlay.open{ display:flex; }
+  @keyframes nrFadeIn{ from{ opacity:0; } to{ opacity:1; } }
+
+  .nr-wrap{
+    width:100%; max-width:520px;
+    background:linear-gradient(180deg, var(--s1) 0%, var(--s2) 100%);
+    border:1px solid color-mix(in srgb, var(--p) 28%, transparent);
+    border-radius:24px;
+    position:relative;
+    overflow:hidden;
+    box-shadow:0 30px 80px rgba(0,0,0,.55);
+    animation:nrWrapIn .42s ease both;
+  }
+  @keyframes nrWrapIn{
+    from{ opacity:0; transform:translateY(16px) scale(.97); }
+    to  { opacity:1; transform:none; }
+  }
+
+  .nr-close{
+    position:absolute; top:.7rem; right:.7rem;
+    width:44px; height:44px;
+    background:color-mix(in srgb, var(--tx) 6%, transparent);
+    border:1px solid var(--card-border);
+    border-radius:50%; color:var(--tx);
+    font-size:1.05rem; font-weight:800; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    z-index:5;
+  }
+  .nr-close:hover{ background:color-mix(in srgb, var(--tx) 12%, transparent); }
+
+  .nr-steps{
+    position:relative; z-index:3;
+    display:flex; justify-content:center; gap:.5rem;
+    padding:1.2rem 1.2rem .4rem;
+  }
+  .nr-step{
+    width:30px; height:3px;
+    border-radius:99px;
+    background:color-mix(in srgb, var(--tx) 12%, transparent);
+    transition:background .25s ease, width .25s ease;
+  }
+  .nr-step.active{
+    background:color-mix(in srgb, var(--p) 70%, transparent);
+    width:42px;
+  }
+
+  /* Slide track — 3 panes side-by-side, container clips to one pane width */
+  .nr-viewport{
+    position:relative; overflow:hidden;
+  }
+  .nr-track{
+    display:flex;
+    width:300%;
+    transition:transform .35s ease;
+    will-change:transform;
+  }
+  .nr-track[data-step="1"]{ transform:translateX(0); }
+  .nr-track[data-step="2"]{ transform:translateX(-33.3333%); }
+  .nr-track[data-step="3"]{ transform:translateX(-66.6666%); }
+  .nr-pane{
+    flex:0 0 33.3333%;
+    padding:1.4rem 1.6rem 1.7rem;
+    min-height:380px;
+    display:flex; flex-direction:column;
+  }
+
+  .nr-back{
+    align-self:flex-start;
+    background:none; border:none;
+    color:var(--tx2);
+    font-family:var(--fm); font-size:.78rem; font-weight:700;
+    cursor:pointer; padding:.25rem .15rem;
+    margin-bottom:.7rem;
+    letter-spacing:.02em;
+  }
+  .nr-back:hover{ color:var(--tx); }
+
+  .nr-h{
+    font-family:var(--fh,var(--fm));
+    font-size:1.55rem; line-height:1.25;
+    color:var(--tx); font-weight:600;
+    margin-bottom:.4rem;
+    letter-spacing:.005em;
+  }
+  .nr-sub{
+    font-family:Georgia,serif; font-style:italic;
+    font-size:.95rem; line-height:1.5;
+    color:var(--tx2);
+    margin-bottom:1.4rem;
+  }
+
+  /* Step 1 — mood buttons */
+  .nr-moods{
+    display:grid; grid-template-columns:repeat(4, 1fr);
+    gap:.55rem;
+    margin-top:auto;
+  }
+  .nr-mood-btn{
+    display:flex; flex-direction:column; align-items:center;
+    gap:.4rem;
+    padding:1rem .35rem;
+    background:color-mix(in srgb, var(--tx) 5%, transparent);
+    border:1px solid var(--card-border);
+    border-radius:14px;
+    cursor:pointer;
+    color:var(--tx);
+    font-family:var(--fm); font-size:.7rem; font-weight:600;
+    letter-spacing:.04em;
+    transition:background .15s ease, border-color .15s ease, transform .15s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .nr-mood-btn:hover{
+    background:color-mix(in srgb, var(--tx) 10%, transparent);
+    transform:translateY(-2px);
+  }
+  .nr-mood-btn.active{
+    background:color-mix(in srgb, var(--p) 14%, transparent);
+    border-color:color-mix(in srgb, var(--p) 50%, transparent);
+    box-shadow:0 0 0 2px color-mix(in srgb, var(--p) 18%, transparent);
+  }
+  .nr-mood-btn span{
+    font-size:.65rem;
+    color:var(--tx2);
+    text-transform:uppercase; letter-spacing:.08em;
+  }
+  .nr-mood-emoji{ font-size:2.2rem !important; line-height:1; }
+
+  /* Step 2 — question + textarea */
+  #nrText{
+    width:100%; min-height:160px;
+    padding:.95rem 1rem;
+    background:color-mix(in srgb, var(--tx) 5%, transparent);
+    border:1px solid var(--card-border);
+    border-radius:14px;
+    color:var(--tx);
+    font-family:Georgia,serif; font-size:1.02rem; line-height:1.55;
+    resize:vertical;
+    outline:none;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  #nrText:focus{
+    border-color:color-mix(in srgb, var(--p) 55%, transparent);
+    background:color-mix(in srgb, var(--tx) 8%, transparent);
+  }
+  .nr-skip{
+    background:none; border:none;
+    color:var(--tx3);
+    font-family:var(--fm); font-size:.78rem; font-weight:600;
+    cursor:pointer; padding:.55rem 0;
+    margin-top:.55rem;
+    align-self:flex-start;
+  }
+  .nr-skip:hover{ color:var(--tx2); }
+  .nr-continue{
+    display:block; width:100%;
+    margin-top:.7rem;
+    padding:.95rem 1.1rem;
+    background:var(--p);
+    border:none; border-radius:14px;
+    color:var(--bg);
+    font-family:var(--fm); font-size:1rem; font-weight:800;
+    letter-spacing:.04em;
+    cursor:pointer;
+    transition:filter .15s ease, transform .15s ease;
+  }
+  .nr-continue:hover{ filter:brightness(1.08); transform:translateY(-1px); }
+
+  /* Step 3 — pray vs goodnight */
+  .nr-prayer-actions{
+    display:flex; flex-direction:column; gap:.6rem;
+    margin-top:.5rem;
+  }
+  .nr-pray-yes, .nr-pray-no{
+    display:block; width:100%;
+    padding:1.05rem 1rem;
+    border-radius:14px;
+    font-family:var(--fm); font-size:1rem; font-weight:700;
+    letter-spacing:.02em;
+    cursor:pointer;
+    transition:filter .15s ease, transform .15s ease;
+  }
+  .nr-pray-yes{
+    background:var(--p);
+    border:none;
+    color:var(--bg);
+    font-weight:800;
+  }
+  .nr-pray-no{
+    background:color-mix(in srgb, var(--tx) 5%, transparent);
+    border:1px solid var(--card-border);
+    color:var(--tx);
+  }
+  .nr-pray-yes:hover, .nr-pray-no:hover{ filter:brightness(1.08); transform:translateY(-1px); }
+
+  /* Finale — stars drift up, optional "Sleep well" message */
+  .nr-finale{
+    position:absolute; inset:0;
+    background:color-mix(in srgb, var(--bg) 88%, #000);
+    display:flex; align-items:center; justify-content:center;
+    z-index:6;
+    animation:nrFadeIn .25s ease both;
+  }
+  .nr-finale-msg{
+    font-family:var(--fh,var(--fm));
+    font-size:1.25rem; letter-spacing:.04em;
+    color:var(--tx);
+    text-align:center;
+    padding:0 1.5rem;
+  }
+  .nr-stars{
+    position:absolute; inset:0;
+    pointer-events:none;
+  }
+  .nr-star{
+    position:absolute;
+    width:6px; height:6px; border-radius:50%;
+    background:var(--g);
+    box-shadow:0 0 8px color-mix(in srgb, var(--g) 70%, transparent);
+    opacity:0;
+    animation:nrStar 1.4s ease-out forwards;
+  }
+  @keyframes nrStar{
+    0%   { opacity:0; transform:translateY(0)   scale(.4); }
+    30%  { opacity:1; transform:translateY(-12px) scale(1); }
+    100% { opacity:0; transform:translateY(-60px) scale(.7); }
+  }
+
+  /* Mobile tightening */
+  @media (max-width:520px){
+    .nr-pane{ padding:1.2rem 1.2rem 1.5rem; min-height:340px; }
+    .nr-h{ font-size:1.35rem; }
+    .nr-mood-btn{ padding:.85rem .25rem; }
+    .nr-mood-emoji{ font-size:1.9rem !important; }
+    .nr-mood-btn span{ font-size:.6rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    #nightReflectOverlay, .nr-wrap, .nr-finale,
+    .nr-track, .nr-step, .nr-star{
+      animation:none !important;
+      transition:none !important;
+    }
+  }
+
+  /* ── Floating Reflect button (faith hub, after 7pm) ────────── */
+  #fzReflectFloat{
+    display:none;
+    position:fixed;
+    right:max(1rem, env(safe-area-inset-right));
+    bottom:calc(78px + max(env(safe-area-inset-bottom, 0px), .8rem));
+    z-index:9050;
+    padding:.75rem 1.15rem;
+    background:var(--p);
+    border:none; border-radius:99px;
+    color:var(--bg);
+    font-family:var(--fm); font-size:.88rem; font-weight:800;
+    letter-spacing:.04em;
+    cursor:pointer;
+    box-shadow:0 10px 28px color-mix(in srgb, var(--p) 35%, transparent),
+               0 0 0 1px color-mix(in srgb, var(--p) 60%, transparent) inset;
+    transition:transform .15s ease, filter .15s ease;
+  }
+  #fzReflectFloat:hover{ filter:brightness(1.08); transform:translateY(-2px); }
+  #fzReflectFloat.fz-pulse{ animation:fzReflectFloatPulse 2.4s ease-in-out infinite; }
+  @keyframes fzReflectFloatPulse{
+    0%,100%{ box-shadow:0 10px 28px color-mix(in srgb, var(--p) 35%, transparent),
+                       0 0 0 0   color-mix(in srgb, var(--p) 45%, transparent); }
+    50%   { box-shadow:0 10px 28px color-mix(in srgb, var(--p) 45%, transparent),
+                       0 0 0 10px color-mix(in srgb, var(--p)  0%, transparent); }
+  }
+  @media (max-width:768px){
+    #fzReflectFloat{ bottom:calc(86px + max(env(safe-area-inset-bottom, 0px), .8rem)); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    #fzReflectFloat.fz-pulse{ animation:none !important; }
+  }
+</style>
+
+<div id="nightReflectOverlay" onclick="if(event.target===this)closeNightReflect()" role="dialog" aria-modal="true" aria-labelledby="nrHdr1">
+  <div class="nr-wrap">
+    <button type="button" class="nr-close" onclick="closeNightReflect()" aria-label="Close">✕</button>
+    <div class="nr-steps" id="nrSteps" aria-hidden="true">
+      <span class="nr-step active"></span>
+      <span class="nr-step"></span>
+      <span class="nr-step"></span>
+    </div>
+    <div class="nr-viewport">
+      <div class="nr-track" id="nrTrack" data-step="1">
+
+        <!-- Step 1 — mood check -->
+        <div class="nr-pane" data-step="1">
+          <div class="nr-h" id="nrHdr1">How was today, <span id="nrName">friend</span>?</div>
+          <div class="nr-sub">No filter needed.</div>
+          <div class="nr-moods">
+            <button type="button" class="nr-mood-btn" data-mood="😞" onclick="nrPickMood('😞','Hard')">
+              <span class="nr-mood-emoji" aria-hidden="true">😞</span><span>Hard</span>
+            </button>
+            <button type="button" class="nr-mood-btn" data-mood="😐" onclick="nrPickMood('😐','Okay')">
+              <span class="nr-mood-emoji" aria-hidden="true">😐</span><span>Okay</span>
+            </button>
+            <button type="button" class="nr-mood-btn" data-mood="🙂" onclick="nrPickMood('🙂','Good')">
+              <span class="nr-mood-emoji" aria-hidden="true">🙂</span><span>Good</span>
+            </button>
+            <button type="button" class="nr-mood-btn" data-mood="🔥" onclick="nrPickMood('🔥','Amazing')">
+              <span class="nr-mood-emoji" aria-hidden="true">🔥</span><span>Amazing</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2 — one question + textarea -->
+        <div class="nr-pane" data-step="2">
+          <button type="button" class="nr-back" onclick="nrBack(1)">← Back</button>
+          <div class="nr-h" id="nrQuestion">What's one thing you're grateful for today?</div>
+          <textarea id="nrText" placeholder="Just be honest..." rows="6"></textarea>
+          <button type="button" class="nr-skip" onclick="nrSkip()">Skip tonight →</button>
+          <button type="button" class="nr-continue" onclick="nrContinue()">Continue →</button>
+        </div>
+
+        <!-- Step 3 — pray or goodnight -->
+        <div class="nr-pane" data-step="3">
+          <button type="button" class="nr-back" onclick="nrBack(2)">← Back</button>
+          <div class="nr-h">Want to pray about it?</div>
+          <div class="nr-sub">No pressure either way. The reflection is already saved.</div>
+          <div class="nr-prayer-actions">
+            <button type="button" class="nr-pray-yes" onclick="nrCompleteWithPrayer()">Yes, quick prayer →</button>
+            <button type="button" class="nr-pray-no"  onclick="nrCompleteGoodnight()">I'm good, goodnight 🙏</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Finale layer — stars + optional sleep-well message -->
+    <div class="nr-finale" id="nrFinale" style="display:none;">
+      <div class="nr-stars" id="nrStars" aria-hidden="true"></div>
+      <div class="nr-finale-msg" id="nrFinaleMsg">Sleep well. See you tomorrow 🌙</div>
+    </div>
+  </div>
+</div>
+
+<!-- Floating "🌙 Reflect" entry point. Visible only when the user is
+     on the faith hub (s-scripture) after 7pm; gets a gentle pulse
+     after 8pm. Show/hide governed by updateReflectFloatVisibility()
+     in faith-zones.js (called from showSection + visibilitychange). -->
+<button type="button" id="fzReflectFloat" onclick="openNightReflect()" aria-label="Open Night Reflection">
+  🌙 Reflect
+</button>
 
 <!-- ════ WORSHIP PLAYLIST (F1.0) ════ -->
 <section id="s-worship" class="sec">

@@ -833,7 +833,13 @@ function bfTab(tab, btn){
   if(tab==='denominations') renderDenominationsCard();
   if(tab==='learnBible') renderLearnBibleGrid();
   if(tab==='plans') _bfPlansSubTab(_plansSubTab);
-  if(tab==='prayer') renderPrayerPanel();
+  if(tab==='prayer'){
+    renderPrayerPanel();
+    // V1 Rebuild · Session 2 — also refresh the Quick Prayer journal +
+    // Reflections history sections appended to the bottom of bf-prayer.
+    if(typeof renderQuickPrayerJournal === 'function') renderQuickPrayerJournal();
+    if(typeof renderReflectionsHistory  === 'function') renderReflectionsHistory();
+  }
   if(tab==='memorize') renderMemorizePanel();
   if(tab==='academy') renderAcademyPanel();
   if(tab==='bibleworld') renderBibleWorld();

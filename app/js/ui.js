@@ -1778,6 +1778,13 @@ function showSection(id, fromMobile){
   if(id==='s-scripture' && typeof renderFaithZones === 'function'){
     setTimeout(renderFaithZones, 30);
   }
+  // V1 Rebuild · Session 2 — the floating "🌙 Reflect" button is
+  // visible only on the faith hub after 7pm. Re-evaluate on every
+  // section change so the button hides when leaving the Well and
+  // appears when entering after dark.
+  if(typeof updateReflectFloatVisibility === 'function'){
+    setTimeout(updateReflectFloatVisibility, 30);
+  }
 
   // Trigger renders that need visible DOM
   if(id==='s-schedule') setTimeout(buildSchedule,60);

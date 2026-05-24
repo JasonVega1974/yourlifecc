@@ -78,6 +78,12 @@ const DEF = {
   // V1 Rebuild · Faith Tab Redesign — Zone 3 toggle state. true means
   // the Explore section is expanded; persists across sessions.
   faithExploreOpen:false,
+  // V1 Rebuild · Session 2 — Night Reflection log. Each entry shape:
+  // { date:'YYYY-MM-DD', mood:'😞|😐|🙂|🔥', text:string, prayed:bool, ts:isoString }
+  // Capped client-side to the most recent 60 entries by faith-zones.js
+  // so the cloud-synced blob stays lean. Surfaced in the Prayer sub-tab
+  // history strip and used by Session 3 traits to award Wisdom + Gratitude.
+  nightReflections:[],
   // streak / checkin
   streak:0, lastCheckin:null, checkin:{}, customHabits:[], dailyChecks:{},
   // V1 Rebuild — Session 1 (Daily Briefing). Keyed by YYYY-MM-DD; per-day

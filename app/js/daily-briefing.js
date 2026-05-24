@@ -141,7 +141,13 @@ function renderDailyBriefing() {
 
   var h = new Date().getHours();
   var ref = document.getElementById('dbReflect');
-  if (ref) ref.style.display = h >= 19 ? '' : 'none';
+  if (ref) {
+    ref.style.display = h >= 19 ? '' : 'none';
+    // V1 Rebuild · Session 2 — gentle pulse after 8pm to draw attention
+    // to the Night Reflection entry point without nagging earlier in the
+    // evening when the user might still be active.
+    ref.classList.toggle('db-reflect-pulse', h >= 20);
+  }
 }
 
 // First tap navigates AND credits the tile. The spec is explicit: tap →
@@ -201,13 +207,16 @@ function _dbConfettiBurst() {
   }, 2200);
 }
 
-// Session 2 will replace this with the real Night Reflection overlay
-// (mood check → rotating question → optional prayer). For Session 1 the
-// prompt is visible after 7pm and shows a placeholder toast on tap so the
-// surface is wired end-to-end.
+// V1 Rebuild · Session 2 — routes the Daily Briefing prompt into the
+// real Night Reflection overlay (mood → rotating question → optional
+// prayer). Falls back to a toast if the faith-zones module isn't loaded.
 function dbOpenNightReflect() {
+  if (typeof openNightReflect === 'function') {
+    openNightReflect();
+    return;
+  }
   if (typeof showToast === 'function') {
-    showToast('Night Reflection lands in Session 2');
+    showToast('Night Reflection unavailable — reload the app');
   }
 }
 
