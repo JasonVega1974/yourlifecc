@@ -922,6 +922,16 @@ function _foStartCanvasScene() {
              dir:Math.random()>0.5?1:-1 };
   });
   var PUFFS = [[-.52,.20,.95,.52],[0,0,1.28,.62],[.52,.18,.95,.52],[.04,-.32,.65,.42]];
+  // 2026-05-28 v7 — shooting stars. Three independent slots, each with
+  // its own timer + random next-launch interval. Once a slot fires, it
+  // tracks position/velocity for the duration of one streak, then
+  // resets and waits for its next interval. Each slot stays gated to
+  // night-phase only via the night-alpha multiplier in drawShootingStars.
+  var SHOOTING_STARS = [
+    { timer:0, interval: 7000 + Math.random()*5000, active:false, x:0, y:0, dx:0, dy:0, life:0, maxLife:0 },
+    { timer:0, interval:10000 + Math.random()*7000, active:false, x:0, y:0, dx:0, dy:0, life:0, maxLife:0 },
+    { timer:0, interval:14000 + Math.random()*8000, active:false, x:0, y:0, dx:0, dy:0, life:0, maxLife:0 }
+  ];
 
 
   // Sky phases [t, topRGB, botRGB]
@@ -959,6 +969,85 @@ function _foStartCanvasScene() {
       var a=s.op*tw*na; if(a<0.02)continue;
       ctx.beginPath(); ctx.arc(s.x*W,s.y*H,s.r,0,PI2);
       ctx.fillStyle='rgba(255,255,255,'+a.toFixed(2)+')'; ctx.fill();
+    }
+  }
+  // 2026-05-28 v7 — drawShootingStars. Gated to night phase via the
+  // outer `na` (night alpha) multiplier — shooting stars only appear
+  // in the dark sky, never against daylight blue. Each slot in
+  // SHOOTING_STARS accumulates its own ms timer; when the timer hits
+  // the per-slot interval, the slot launches one streak (random
+  // start position in the upper-25% sky, downward-right angle 25-55°,
+  // 180-320 px/sec) then resets with a fresh random interval.
+  function drawShootingStars(W, H, dt, na){
+    if (na < 0.02) {
+      // Daylight: skip the draw but still advance timers so launches
+      // queue up for the night side of the cycle.
+      for (var k=0;k<SHOOTING_STARS.length;k++){
+        SHOOTING_STARS[k].timer += dt;
+        SHOOTING_STARS[k].active = false;
+      }
+      return;
+    }
+    for (var i = 0; i < SHOOTING_STARS.length; i++){
+      var s = SHOOTING_STARS[i];
+      s.timer += dt;
+      if (!s.active && s.timer >= s.interval){
+        s.active   = true;
+        s.timer    = 0;
+        s.interval = s.interval * 0.7 + Math.random() * s.interval * 0.6;
+        s.x        = W * (0.10 + Math.random() * 0.70);
+        s.y        = H * (0.05 + Math.random() * 0.25);
+        var ang    = (25 + Math.random() * 30) * Math.PI / 180;
+        var spd    = 180 + Math.random() * 140;
+        s.dx       = Math.cos(ang) * spd;
+        s.dy       = Math.sin(ang) * spd;
+        s.maxLife  = 0.55 + Math.random() * 0.3;
+        s.life     = 0;
+      }
+      if (!s.active) continue;
+      s.life += dt / 1000;
+      if (s.life >= s.maxLife){ s.active = false; continue; }
+      var prog = s.life / s.maxLife;
+      // Fade in over first 20%, hold, fade out over last 30%.
+      var alpha = 1;
+      if (prog < 0.2)      alpha = prog / 0.2;
+      else if (prog > 0.7) alpha = (1 - prog) / 0.3;
+      alpha *= na;
+      if (alpha < 0.02) continue;
+      // Head position
+      var x2 = s.x + s.dx * s.life;
+      var y2 = s.y + s.dy * s.life;
+      // Trail follows the actual velocity direction (the user-spec
+      // formula used a fixed 40° angle which broke for off-axis
+      // launches). Tail = head minus unit-velocity * trailLen.
+      var trailLen = 55 + Math.random() * 30;
+      var spd2 = Math.sqrt(s.dx * s.dx + s.dy * s.dy) || 1;
+      var nx = s.dx / spd2, ny = s.dy / spd2;
+      var tailX = x2 - nx * trailLen;
+      var tailY = y2 - ny * trailLen;
+      // Bright-to-transparent linear gradient for the streak body.
+      var grad = ctx.createLinearGradient(tailX, tailY, x2, y2);
+      grad.addColorStop(0,   'rgba(255,255,255,0)');
+      grad.addColorStop(0.6, 'rgba(200,220,255,' + (alpha * 0.5).toFixed(3) + ')');
+      grad.addColorStop(1,   'rgba(255,255,255,' + alpha.toFixed(3) + ')');
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(tailX, tailY);
+      ctx.lineTo(x2, y2);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 1.5;
+      ctx.lineCap = 'round';
+      ctx.shadowColor = '#ffffff';
+      ctx.shadowBlur = 4;
+      ctx.globalAlpha = alpha;
+      ctx.stroke();
+      // Bright head dot
+      ctx.beginPath();
+      ctx.arc(x2, y2, 2, 0, PI2);
+      ctx.fillStyle = 'rgba(255,255,255,' + alpha.toFixed(3) + ')';
+      ctx.shadowBlur = 8;
+      ctx.fill();
+      ctx.restore();
     }
   }
   function dMoon(W,H,na){
@@ -1209,11 +1298,14 @@ function _foStartCanvasScene() {
       // Advance t. _lastTs=0 on first frame so this branch is skipped → t stays at
       // midnight for tick 1. Cap dt to 50ms so a background tab wake-up doesn't
       // jump the sky forward by minutes.
-      if (_lastTs) { _t = (_t + Math.min(ts - _lastTs, 50) / CYCLE) % 1; }
+      // 2026-05-28 v7 — capture dt before updating _lastTs so shooting
+      // stars get an accurate per-frame delta for their timers.
+      var _dt = _lastTs ? Math.min(ts - _lastTs, 50) : 16;
+      if (_lastTs) { _t = (_t + _dt / CYCLE) % 1; }
       _lastTs = ts;
       var t = _t;
       var W = cv.width, H = cv.height, sky = getSky(t), na = nightA(t);
-      dSky(W,H,sky); dStars(W,H,ts,na); dMoon(W,H,na); dHorizonGlow(W,H,t); dSun(W,H,t);
+      dSky(W,H,sky); dStars(W,H,ts,na); drawShootingStars(W,H,_dt,na); dMoon(W,H,na); dHorizonGlow(W,H,t); dSun(W,H,t);
       // 2026-05-27 — old sky-positioned dCross retired in favour of
       // drawWellCross (centred above the well, sine-pulsed). dCross
       // function kept as dead code in case of revert.
