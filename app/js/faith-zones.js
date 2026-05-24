@@ -1057,8 +1057,27 @@ function renderFaithZones(){
   // (renderConvinceMeHero / renderQuickPrayerCard / renderMoodSoundscapeCard
   // / renderDailyChallengeCard / renderGrowthCompact / renderQuickPrayerJournal),
   // which all gracefully no-op when their target div isn't in the DOM.
+  //
+  // 2026-05-30 — force Zone 3 closed on every home entry. Past
+  // sessions could persist D.faithExploreOpen = true (set by the
+  // deep-link auto-open in ensureFaithExploreOpenForTab), which made
+  // returning users see Ask Scripture + the legacy sub-tab pills
+  // hanging below the new 6-button menu. The Explore button in the
+  // menu (fzOpenDest('explore')) is the only sanctioned path to
+  // show Zone 3 now.
+  D.faithExploreOpen = false;
   renderFzGreeting();
   renderFaithExploreToggle();
+  // Belt + suspenders — directly hide the wrap in case render didn't.
+  var _z3 = document.getElementById('fzZone3Wrap');
+  if (_z3) _z3.style.display = 'none';
+  // Make sure the home is the visible view (returning from any
+  // destination should land on home).
+  var _home = document.getElementById('fzHome');
+  var _dest = document.getElementById('fzDest');
+  if (_home) _home.style.display = '';
+  if (_dest) _dest.style.display = 'none';
+  _fzCurrentDest = null;
   updateReflectFloatVisibility();
 }
 
@@ -1244,6 +1263,12 @@ function fzGoHome(){
   if (dest) dest.style.display = 'none';
   if (home) home.style.display = '';
   if (body) body.innerHTML = '';
+  // 2026-05-30 — re-collapse Zone 3 when returning home so the
+  // Ask Scripture card + legacy sub-tab pills don't hang around
+  // below the menu (only the Explore button should reveal them).
+  var z3 = document.getElementById('fzZone3Wrap');
+  if (z3) z3.style.display = 'none';
+  if (D) D.faithExploreOpen = false;
   renderFzGreeting();
   var sec = document.getElementById('s-scripture');
   if (sec) setTimeout(function(){ sec.scrollIntoView({ behavior:'smooth', block:'start' }); }, 40);

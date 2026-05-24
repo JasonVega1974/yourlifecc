@@ -5956,14 +5956,39 @@
       font-family:var(--fm);
     }
     #fzMenu{ display:flex; flex-direction:column; gap:.75rem; }
-    /* 2026-05-29 — 6 buttons → 2-column grid on wide screens so the
-       page doesn't feel half-empty. Mobile stays single-column. */
-    @media (min-width:600px){
+    /* 2026-05-29 — 6 buttons in a responsive grid. Mobile stays a
+       single-column stack. Tablet gets 2 columns. Desktop (≥1024px)
+       gets 3 columns × 2 rows with larger cards so the layout fills
+       the page properly. */
+    @media (min-width:600px) and (max-width:1023px){
       #fzMenu{
         display:grid;
         grid-template-columns:1fr 1fr;
-        gap:.75rem;
+        gap:1rem;
       }
+    }
+    /* 2026-05-30 — Desktop 3×2 grid with larger cards. */
+    @media (min-width:1024px){
+      #fzHome{ max-width:1100px; }
+      .fz-greet-row{ padding:0 1rem 2rem; }
+      .fz-greet-hi{ font-size:1.7rem; }
+      .fz-greet-sub{ font-size:1rem; }
+      #fzMenu{
+        display:grid;
+        grid-template-columns:repeat(3, 1fr);
+        gap:1.25rem;
+        max-width:1100px;
+        margin:0 auto;
+      }
+      .fz-menu-btn{
+        padding:1.75rem 1.5rem;
+        min-height:130px;
+        gap:1.25rem;
+      }
+      .fz-mb-icon{  font-size:2.8rem; }
+      .fz-mb-title{ font-size:1.25rem; }
+      .fz-mb-sub{   font-size:.9rem; }
+      .fz-mb-arrow{ font-size:1.6rem; }
     }
     .fz-menu-btn{
       display:flex; align-items:center; gap:1rem; width:100%;
