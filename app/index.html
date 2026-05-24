@@ -6963,7 +6963,22 @@
         #ppConvinceModal .modal-close-btn{
           top:.5rem !important; right:.5rem !important;
         }
+
+        /* Universal modal mobile fix — hide the auto-injected fullscreen toggle.
+           _ensureFullscreenToggle (ui.js) pins a 30×30 [data-modal-fs] button at
+           top:10px / right:68px on every .md. On mobile that floats over the
+           title in modals with tight header padding (Biblical Archaeology
+           Discovery card, etc.). Mobile modals already fill ~98% of viewport,
+           so the toggle is unnecessary; Story Player has its own immersive
+           layout. Hide it on phones across the entire app. */
+        .mo .md [data-modal-fs]{ display:none !important; }
       }
+
+      /* Biblical Archaeology Discovery header — reserve right padding for
+         the absolute-positioned close X (44×44 forced by app.css:4116).
+         bwSiteHeader already does this with 3.4rem; matching here so the
+         Bebas Neue title cannot slide under the close button on long names. */
+      #bwDiscoveryModal #bwDiscHeader{ padding-right:3.4rem !important; }
 
       #bf-proofProphecy{ --pp-gold:#fbbf24; --pp-gold-deep:#d97706; --pp-cream:#fef3c7; --pp-navy:#0a0d1a; }
       #bf-proofProphecy .pp-hero{
