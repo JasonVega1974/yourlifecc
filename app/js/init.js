@@ -1211,30 +1211,42 @@ function _foStartCanvasScene() {
     }
   }
   function drawWellCross(ctx, x, y, alpha, angle){
+    // 2026-05-28 v2 — Y-axis "billboard" rotation. ctx.rotate(angle)
+    // spins the cross around its Z axis like a wheel, taking it
+    // upside-down through the cycle. Real Christian crosses don't
+    // flip — they revolve like a coin on a table. scaleX = cos(angle)
+    // simulates that 3D Y-axis spin on a 2D canvas:
+    //   1 → 0 → -1 → 0 → 1  (face → edge → back → edge → face)
+    // The cross is never upside down; it just narrows to an edge and
+    // widens again, with the back face being the mirror of the front.
+    var scaleX = Math.cos(angle || 0);
+
     var totalH = 70, crossW = 8, beamW = 44, beamFromTop = 22;
     var topY = -totalH / 2;                     // top of vertical bar
     var beamTopY = topY + beamFromTop;          // top of crossbeam
+
     ctx.save();
     ctx.translate(x, y);
-    if (angle) ctx.rotate(angle);
-    // ── Outer glow layers — 4 concentric, softest on the outside ──
+    ctx.scale(scaleX, 1);
+
+    // ── Outer glow layers — 4 concentric, softest on the outside.
+    //    Outer rects are wider (i*0.5, i*0.4); the shadowBlur does
+    //    the actual halo work, so the rect size mostly controls how
+    //    "hot" the centre of each layer is. ──
     for (var i = 4; i >= 1; i--){
       ctx.save();
       ctx.globalAlpha = (alpha * 0.12) / i;
       ctx.fillStyle = '#ffd700';
       ctx.shadowColor = '#ffd700';
       ctx.shadowBlur = 25 * i;
-      // Vertical bar glow — width grows with i, height grows slightly
-      var vW = crossW * i * 0.6;
-      var vH = totalH * (1 + i * 0.05);
-      _wcRect(ctx, -vW / 2, -vH / 2, vW, vH, 2);
-      // Horizontal crossbeam glow — width grows with i, height grows
-      var hW = beamW * (1 + i * 0.1);
-      var hH = crossW * i * 0.5;
-      _wcRect(ctx, -hW / 2, beamTopY - (hH - crossW) / 2, hW, hH, 2);
+      // Vertical bar glow
+      _wcRect(ctx, (-crossW / 2) * i * 0.5, topY, crossW * i * 0.5, totalH, 2);
+      // Horizontal crossbeam glow
+      _wcRect(ctx, (-beamW / 2) * i * 0.4, beamTopY, beamW * i * 0.4, crossW, 2);
       ctx.restore();
     }
-    // ── Solid cross — bright cream center over gold shadow ──
+
+    // ── Solid cross — bright cream centre over gold shadow ──
     ctx.save();
     ctx.globalAlpha = alpha;
     ctx.fillStyle = '#fffde7';
@@ -1243,6 +1255,7 @@ function _foStartCanvasScene() {
     _wcRect(ctx, -crossW / 2, topY,     crossW, totalH, 2);
     _wcRect(ctx, -beamW / 2,  beamTopY, beamW,  crossW, 2);
     ctx.restore();
+
     ctx.restore();
   }
   function dFG(W,H){
@@ -1301,12 +1314,20 @@ function _foStartCanvasScene() {
       // Center the cross 80px above the roof apex (cross half-height
       // 35, so the cross bottom clears the roof by ~45px). On tiny
       // canvases (rare) the Math.max floor keeps it on-screen.
-      // Pulse alpha clamped to [0.30, 0.80] so the glow breathes
-      // without ever blacking out or burning to pure white.
-      // Rotation: one revolution per 20 seconds — gentle and reverent.
-      var _wcA   = 0.55 + Math.sin(ts / 1500) * 0.25;
-      var _wcAng = (ts / 20000) * Math.PI * 2;
-      var _wcY   = Math.max(40, H * 0.556 - 80);
+      //
+      // 2026-05-28 v2 — Y-axis (billboard) rotation instead of Z-axis
+      // spin. Period 8s for the full revolution. Edge-on (|scaleX|
+      // small) gets a 40% glow boost so the moment the cross
+      // catches the light reads as a brief shimmer rather than a
+      // disappearance.
+      // Pulse: 0.3 + sin(t/1500)*0.5  → wider [-0.2, 0.8] range per
+      // spec; canvas clamps negative alpha to 0 so the cross briefly
+      // fades to invisible at the bottom of each breath cycle.
+      var _wcAng  = (ts / 8000) * Math.PI * 2;
+      var _wcSx   = Math.cos(_wcAng);
+      var _wcEdge = (Math.abs(_wcSx) < 0.2) ? 1.4 : 1.0;
+      var _wcA    = (0.3 + Math.sin(ts / 1500) * 0.5) * _wcEdge;
+      var _wcY    = Math.max(40, H * 0.556 - 80);
       drawWellCross(ctx, W * 0.50, _wcY, _wcA, _wcAng);
       dFG(W,H); dSparks(W,H,t,ts); dScrim(W,H);
       window._foCanvasRaf = requestAnimationFrame(tick);
