@@ -1891,7 +1891,10 @@ function _ensureFullscreenToggle(modalEl){
   btn.setAttribute('aria-label','Toggle fullscreen');
   btn.title = 'Fullscreen (Esc to exit)';
   btn.innerHTML = '⛶';
-  btn.style.cssText = 'position:absolute;top:10px;right:46px;z-index:10;width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(15,23,42,.35);color:var(--cd-banner-text,#fff);cursor:pointer;font-size:1rem;font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);transition:background .15s,transform .15s;font-family:var(--fm);';
+  // right:68px clears the modal close button (forced to 44x44 by app.css :4116,
+  // anchored at ~right:.7rem/.85rem across faith modals) with a ~13px gap that
+  // satisfies the 0.75rem minimum spacing — at right:46px the buttons overlapped.
+  btn.style.cssText = 'position:absolute;top:10px;right:68px;z-index:10;width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(15,23,42,.35);color:var(--cd-banner-text,#fff);cursor:pointer;font-size:1rem;font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);transition:background .15s,transform .15s;font-family:var(--fm);';
   btn.addEventListener('mouseenter',function(){ this.style.background='rgba(15,23,42,.55)'; this.style.transform='scale(1.05)'; });
   btn.addEventListener('mouseleave',function(){ this.style.background='rgba(15,23,42,.35)'; this.style.transform=''; });
   btn.addEventListener('click', function(ev){

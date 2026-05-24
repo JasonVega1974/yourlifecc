@@ -6930,11 +6930,14 @@
       body.modal-open #mqRow { display:none !important; }
 
       /* Shared back-pill button styling — reused by every Well modal.
-         Safe-area-inset-top keeps it below the iPhone notch on mobile.
+         Anchored to its positioned ancestor (modal header). env(safe-area-inset-top)
+         is intentionally NOT used here — it only applies to viewport-edge elements,
+         and inside a modal it would push the pill down to overlap the title.
+         The worship-close-btn variant uses inline position:fixed to override.
          44px min-height meets WCAG tap-target guidance. */
       .pp-back-btn{
         position:absolute;
-        top:max(.7rem, env(safe-area-inset-top)); left:.85rem; z-index:5;
+        top:.7rem; left:.85rem; z-index:5;
         background:rgba(10,13,26,.7); border:1px solid rgba(255,255,255,.2);
         color:#fff; cursor:pointer;
         padding:.65rem 1rem; border-radius:999px;
@@ -6945,6 +6948,22 @@
         transition:background .15s, transform .15s;
       }
       .pp-back-btn:hover{background:rgba(10,13,26,.88); transform:translateX(-2px);}
+
+      /* Mobile fix — Convince modal's back/close buttons live at top:-3rem /
+         top:-2.2rem (ABOVE the wrap) so they visually crown the deck on desktop.
+         On phones the wrap nearly fills the viewport, so negative offsets push
+         the buttons off-screen — they appear pinned to the top of the device.
+         Move them INSIDE the wrap and reserve padding-top so they don't
+         overlap the progress label or card art. */
+      @media (max-width: 768px){
+        #ppConvinceModal .pp-conv-wrap{ padding-top: 3.2rem; }
+        #ppConvinceModal .pp-back-btn.pp-conv-back{
+          top:.5rem !important; left:.5rem !important;
+        }
+        #ppConvinceModal .modal-close-btn{
+          top:.5rem !important; right:.5rem !important;
+        }
+      }
 
       #bf-proofProphecy{ --pp-gold:#fbbf24; --pp-gold-deep:#d97706; --pp-cream:#fef3c7; --pp-navy:#0a0d1a; }
       #bf-proofProphecy .pp-hero{
