@@ -613,11 +613,19 @@ function toggleSoundscape(id){
 // ════════════════════════════════════════════════════════════
 
 function renderFaithExploreToggle(){
-  var btn = document.getElementById('fzExploreToggle');
-  if (!btn) return;
+  // 2026-05-29 — the legacy dashed #fzExploreToggle button was
+  // removed when the 4-button Faith Home menu replaced it. The
+  // function used to early-return on missing btn — which silently
+  // killed the wrap-visibility toggle and left Zone 3 stuck at
+  // display:none, so the new "Explore Faith" menu button did
+  // nothing. Now the btn-update lines are optional; the
+  // wrap-visibility toggle ALWAYS runs.
   var open = !!(D && D.faithExploreOpen);
-  btn.textContent = open ? '✦ Hide Explore  ↑' : '✦ Explore Faith  ↓';
-  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  var btn = document.getElementById('fzExploreToggle');
+  if (btn){
+    btn.textContent = open ? '✦ Hide Explore  ↑' : '✦ Explore Faith  ↓';
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
   var wrap = document.getElementById('fzZone3Wrap');
   if (wrap){
     wrap.style.display = open ? '' : 'none';
