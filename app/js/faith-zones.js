@@ -1042,20 +1042,232 @@ function renderFaithZones(){
   if (typeof D.faithExploreOpen !== 'boolean') D.faithExploreOpen = false;
   if (!Array.isArray(D.nightReflections)) D.nightReflections = [];
 
-  renderConvinceMeHero();
-  renderTodayZone();
+  // 2026-05-29 — Simplified Faith Home. The wall of cards (Convince
+  // Me hero + 3-4 Today cards + Growth widget) is gone; the home is
+  // now a greeting + 4 menu buttons. Each individual surface still
+  // lives behind its destination and reuses the existing renderers
+  // (renderConvinceMeHero / renderQuickPrayerCard / renderMoodSoundscapeCard
+  // / renderDailyChallengeCard / renderGrowthCompact / renderQuickPrayerJournal),
+  // which all gracefully no-op when their target div isn't in the DOM.
+  renderFzGreeting();
   renderFaithExploreToggle();
   updateReflectFloatVisibility();
+}
+
+// 2026-05-29 — Faith Home greeting card. Renders into #fzGreeting:
+// time-aware welcome + first name + streak chip (if any).
+function renderFzGreeting(){
+  if (typeof document === 'undefined') return;
+  var el = document.getElementById('fzGreeting');
+  if (!el) return;
+  var h = new Date().getHours();
+  var part = h < 12 ? 'morning' : h < 18 ? 'afternoon' : 'evening';
+  // Streak source: faith curiosity streak (the one the rest of the
+  // faith UI uses) — fall back to general daily streak if zero.
+  var streak = 0;
+  if (D){
+    streak = (typeof D.faithCuriosityStreak === 'number' && D.faithCuriosityStreak > 0)
+      ? D.faithCuriosityStreak
+      : ((typeof getScriptureStreak === 'function')
+          ? (getScriptureStreak() || 0)
+          : ((typeof D.streak === 'number') ? D.streak : 0));
+  }
+  // First name — same resolution chain as the Daily Briefing.
+  var name = 'friend';
+  if (D && D.name) name = String(D.name).split(' ')[0];
+  else if (typeof _supaUser !== 'undefined' && _supaUser){
+    var meta = _supaUser.user_metadata || {};
+    if (meta.first_name) name = meta.first_name;
+    else if (meta.full_name) name = String(meta.full_name).split(' ')[0];
+    else if (_supaUser.email) name = _supaUser.email.split('@')[0];
+  }
+  var streakBadge = streak > 0
+    ? '<span class="fz-streak">🔥 ' + streak + ' day' + (streak === 1 ? '' : 's') + '</span>'
+    : '';
+  el.innerHTML =
+    '<div class="fz-greet-row">' +
+      '<div class="fz-greet-text">' +
+        '<div class="fz-greet-hi">Good ' + part + ', ' + _fzEsc(name) + ' 👋</div>' +
+        '<div class="fz-greet-sub">What do you want to do?</div>' +
+      '</div>' +
+      streakBadge +
+    '</div>';
+}
+
+// ════════════════════════════════════════════════════════════
+// 2026-05-29 — Destination router
+// Four menu buttons in #fzHome route here. Each destination
+// renders into #fzDestBody; #fzHome hides while #fzDest is open.
+// fzGoHome() reverses (back button + swipe-right gesture).
+// ════════════════════════════════════════════════════════════
+var _fzCurrentDest = null;
+
+function fzOpenDest(dest){
+  if (typeof document === 'undefined') return;
+  var home   = document.getElementById('fzHome');
+  var destEl = document.getElementById('fzDest');
+  var titleEl= document.getElementById('fzDestTitle');
+  var bodyEl = document.getElementById('fzDestBody');
+  if (!home || !destEl || !titleEl || !bodyEl) return;
+
+  // Explore is special — no destination takeover. The legacy Zone 3
+  // wrap holds ~1700 lines of bf-* panels with IDs + handlers that
+  // can't be safely cloned or moved. Just toggle the existing
+  // collapse, scroll to it, and stay on the home view.
+  if (dest === 'explore'){
+    if (typeof toggleFaithExplore === 'function') toggleFaithExplore(true);
+    setTimeout(function(){
+      var wrap = document.getElementById('fzZone3Wrap');
+      if (wrap) wrap.scrollIntoView({ behavior:'smooth', block:'start' });
+    }, 80);
+    return;
+  }
+
+  _fzCurrentDest = dest;
+  home.style.display = 'none';
+  destEl.style.display = '';
+  bodyEl.innerHTML = '';
+
+  if (dest === 'mystery'){
+    titleEl.textContent = "Today's Mystery";
+    // Recreate the host div the existing renderer expects.
+    bodyEl.innerHTML = '<div id="fzZone1" class="fz-zone fz-zone-1" aria-label="Convince Me hero"></div>';
+    if (typeof renderConvinceMeHero === 'function') renderConvinceMeHero();
+  } else if (dest === 'prayer'){
+    titleEl.textContent = "Quick Prayer";
+    bodyEl.innerHTML =
+      '<div class="fz-dest-intro">What\'s on your heart right now?</div>' +
+      '<div id="fzPrayerCard" class="fz-today-card fz-prayer-card" role="button" tabindex="0"></div>' +
+      '<div id="fzQuickPrayerJournal" style="margin-top:1.5rem;"></div>';
+    if (typeof renderQuickPrayerCard      === 'function') renderQuickPrayerCard();
+    if (typeof renderQuickPrayerJournal   === 'function') renderQuickPrayerJournal();
+  } else if (dest === 'reallife'){
+    titleEl.textContent = "Real Life Win";
+    bodyEl.innerHTML = renderRealLifeWinDestination();
+  }
+
+  setTimeout(function(){ destEl.scrollIntoView({ behavior:'smooth', block:'start' }); }, 60);
+}
+
+function fzGoHome(){
+  if (typeof document === 'undefined') return;
+  _fzCurrentDest = null;
+  var dest = document.getElementById('fzDest');
+  var home = document.getElementById('fzHome');
+  var body = document.getElementById('fzDestBody');
+  if (dest) dest.style.display = 'none';
+  if (home) home.style.display = '';
+  if (body) body.innerHTML = '';
+  renderFzGreeting();
+  var sec = document.getElementById('s-scripture');
+  if (sec) setTimeout(function(){ sec.scrollIntoView({ behavior:'smooth', block:'start' }); }, 40);
+}
+
+// 2026-05-29 — Real Life Win destination. Big card, single CTA.
+// Today's win comes from REAL_LIFE_WINS (faith-zones-data.js),
+// indexed by day so the same win shows globally on a given day.
+// Completion fires the full Session 4 celebration stack +
+// awardTrait + persists to D.dailyThree[today].realWin.
+function renderRealLifeWinDestination(){
+  if (typeof REAL_LIFE_WINS === 'undefined' || !REAL_LIFE_WINS.length){
+    return '<div class="fz-empty">Real Life Wins are loading…</div>';
+  }
+  var dayIndex = Math.floor(Date.now() / 86400000) % REAL_LIFE_WINS.length;
+  var win = REAL_LIFE_WINS[dayIndex];
+  var todayKey = _fzToday();
+  var done = !!(D && D.dailyThree && D.dailyThree[todayKey] && D.dailyThree[todayKey].realWin);
+  var btn = done
+    ? '<div class="fz-rlw-done">✓ You did this today. That counts.</div>'
+    : '<button class="fz-rlw-btn" onclick="fzCompleteRLW(\'' + _fzEsc(win.id) +
+        '\',\'' + _fzEsc(win.trait) + '\',' + (+win.pts || 0) + ')">I did it ✓</button>';
+  return ''
+    + '<div class="fz-rlw-card">'
+    +   '<div class="fz-rlw-emoji">' + _fzEsc(win.emoji) + '</div>'
+    +   '<div class="fz-rlw-cat">' + _fzEsc(win.cat) + '</div>'
+    +   '<div class="fz-rlw-text">' + _fzEsc(win.text) + '</div>'
+    +   btn
+    + '</div>';
+}
+
+function fzCompleteRLW(winId, trait, pts){
+  if (!D) return;
+  if (!D.dailyThree || typeof D.dailyThree !== 'object' || Array.isArray(D.dailyThree)){
+    D.dailyThree = {};
+  }
+  var today = _fzToday();
+  if (!D.dailyThree[today]) D.dailyThree[today] = { faith:false, growth:false, realWin:false };
+  if (D.dailyThree[today].realWin) return; // already done — guard double-credit
+  D.dailyThree[today].realWin   = true;
+  D.dailyThree[today].realWinId = winId;
+  _fzSave();
+
+  if (typeof realLifeWinCelebration === 'function') realLifeWinCelebration();
+  if (typeof traitExplosion === 'function' && typeof TRAITS !== 'undefined' && TRAITS[trait]){
+    setTimeout(function(){ traitExplosion(TRAITS[trait].emoji, TRAITS[trait].name); }, 600);
+  }
+  if (typeof awardTrait === 'function' && trait && pts){
+    awardTrait(trait, pts);
+  }
+  // Re-render the destination so the button → "done" state swaps in.
+  setTimeout(function(){
+    if (_fzCurrentDest === 'reallife') fzOpenDest('reallife');
+  }, 1600);
+}
+
+// ────────────────────────────────────────────────────────────
+// Swipe-right gesture → fzGoHome. Attached to document so the
+// listener catches taps anywhere inside #fzDest regardless of
+// when the destination markup is mounted (the body re-renders
+// per dest). Only acts when a destination is currently open.
+// ────────────────────────────────────────────────────────────
+var _fzDestSwipe = null;
+if (typeof document !== 'undefined'){
+  document.addEventListener('touchstart', function(e){
+    if (!_fzCurrentDest) return;
+    var dest = document.getElementById('fzDest');
+    if (!dest || dest.style.display === 'none') return;
+    // Only fire if the touch started inside the destination.
+    if (!dest.contains(e.target)) return;
+    if (!e.touches || !e.touches.length) return;
+    _fzDestSwipe = { x:e.touches[0].clientX, y:e.touches[0].clientY, t:Date.now() };
+  }, { passive:true });
+  document.addEventListener('touchend', function(e){
+    if (!_fzDestSwipe) return;
+    var t = e.changedTouches && e.changedTouches[0];
+    var s = _fzDestSwipe;
+    _fzDestSwipe = null;
+    if (!t) return;
+    var dx = t.clientX - s.x;
+    var dy = t.clientY - s.y;
+    var dt = Date.now() - s.t;
+    // Right swipe: 80px+ horizontal, <50px vertical, <500ms.
+    if (dx > 80 && Math.abs(dy) < 50 && dt < 500) fzGoHome();
+  }, { passive:true });
+}
+
+// Expose for non-module callers (init.js, ui.js, faith.js, onclick attrs).
+if (typeof window !== 'undefined'){
+  window.fzOpenDest        = fzOpenDest;
+  window.fzGoHome          = fzGoHome;
+  window.fzCompleteRLW     = fzCompleteRLW;
+  window.renderFzGreeting  = renderFzGreeting;
 }
 
 if (typeof document !== 'undefined'){
   document.addEventListener('visibilitychange', function(){
     if (!document.hidden){
-      // Re-render Zone 2 only — the time-sensitive bits (mood today,
-      // challenge-of-day, post-7pm reflect button) update when the user
-      // returns mid-day.
-      renderTodayZone();
+      // Refresh the greeting (time-of-day might've changed) +
+      // the floating reflect button. Re-render the current
+      // destination if one is open so its time-sensitive bits
+      // (mood today, challenge today) stay current.
+      renderFzGreeting();
       updateReflectFloatVisibility();
+      if (_fzCurrentDest) {
+        // Re-open the same destination to refresh its body.
+        var d = _fzCurrentDest;
+        _fzCurrentDest = null;
+        fzOpenDest(d);
+      }
     }
   });
 }

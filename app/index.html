@@ -5932,33 +5932,225 @@
       cursor:pointer; font-family:var(--fm);
     }
     .trait-see-all:hover{ color:var(--p); }
+
+    /* ── 2026-05-29 — Simplified Faith Home (greeting + 4 buttons)
+       and destination view shell (back button + body). All colors
+       thread through CSS variables; touch targets ≥ 44px. */
+    #fzHome{ padding:1rem 0; max-width:480px; margin:0 auto; }
+    .fz-greet-row{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 .5rem 1.4rem; gap:1rem;
+    }
+    .fz-greet-text{ flex:1; min-width:0; }
+    .fz-greet-hi{
+      font-family:var(--fh,var(--fm));
+      font-size:1.4rem; font-weight:700; color:var(--tx); line-height:1.2;
+    }
+    .fz-greet-sub{ font-size:.85rem; color:var(--tx2); margin-top:.25rem; }
+    .fz-streak{
+      font-size:.85rem; font-weight:700;
+      color:#ff7a3d;
+      background:color-mix(in srgb, #ff7a3d 12%, transparent);
+      padding:.35rem .65rem; border-radius:20px;
+      white-space:nowrap; flex-shrink:0;
+      font-family:var(--fm);
+    }
+    #fzMenu{ display:flex; flex-direction:column; gap:.75rem; }
+    .fz-menu-btn{
+      display:flex; align-items:center; gap:1rem; width:100%;
+      background:var(--card-bg);
+      border:1px solid var(--card-border);
+      border-radius:14px;
+      padding:1rem 1.1rem;
+      cursor:pointer;
+      font-family:var(--fm); text-align:left;
+      transition:all .2s ease;
+      position:relative; overflow:hidden;
+      min-height:64px;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .fz-menu-btn:hover, .fz-menu-btn:focus-visible{
+      border-color:var(--p);
+      transform:translateY(-1px);
+      box-shadow:0 4px 16px color-mix(in srgb, var(--p) 15%, transparent);
+      outline:none;
+    }
+    .fz-menu-btn:active{ transform:translateY(0) scale(.99); }
+    .fz-mb-icon{
+      font-size:2rem; flex-shrink:0; line-height:1;
+      filter:drop-shadow(0 0 8px rgba(255,255,255,0.1));
+    }
+    .fz-mb-text{ flex:1; display:flex; flex-direction:column; min-width:0; }
+    .fz-mb-title{
+      font-size:1.05rem; font-weight:700;
+      color:var(--tx); line-height:1.2;
+    }
+    .fz-mb-sub{ font-size:.8rem; color:var(--tx2); margin-top:.2rem; }
+    .fz-mb-arrow{
+      font-size:1.3rem; color:var(--p); flex-shrink:0;
+      transition:transform .2s ease;
+    }
+    .fz-menu-btn:hover .fz-mb-arrow{ transform:translateX(4px); }
+
+    /* Destination view shell */
+    #fzDest{ padding-top:.25rem; }
+    .fz-dest-header{
+      display:flex; align-items:center; gap:.75rem;
+      padding:.5rem .5rem 1rem;
+      border-bottom:1px solid var(--card-border);
+      margin-bottom:1rem;
+    }
+    .fz-back-btn{
+      display:inline-flex; align-items:center; gap:.35rem;
+      background:transparent;
+      border:1px solid var(--card-border);
+      border-radius:20px;
+      padding:.4rem .9rem .4rem .7rem;
+      color:var(--tx); cursor:pointer;
+      font-family:var(--fm); font-size:.85rem;
+      transition:all .2s ease;
+      min-height:36px;
+    }
+    .fz-back-btn:hover{
+      border-color:var(--p);
+      background:color-mix(in srgb, var(--p) 8%, transparent);
+      transform:translateX(-2px);
+    }
+    .fz-back-arrow{ font-size:1.1rem; line-height:1; }
+    .fz-dest-title{
+      font-size:1.1rem; font-weight:700;
+      color:var(--tx);
+      font-family:var(--fh,var(--fm));
+    }
+    .fz-dest-intro{
+      font-size:1rem; color:var(--tx2);
+      margin-bottom:1rem; text-align:center;
+      font-family:Georgia,serif; font-style:italic;
+    }
+
+    /* Real Life Win destination card */
+    .fz-rlw-card{
+      background:var(--card-bg);
+      border:1px solid var(--card-border);
+      border-radius:16px;
+      padding:2rem 1.5rem; text-align:center;
+    }
+    .fz-rlw-emoji{
+      font-size:4rem; margin-bottom:1rem; line-height:1;
+      filter:drop-shadow(0 0 16px rgba(255,255,255,0.2));
+    }
+    .fz-rlw-cat{
+      font-size:.7rem; font-weight:700;
+      color:var(--p);
+      letter-spacing:.1em; text-transform:uppercase;
+      margin-bottom:.7rem;
+    }
+    .fz-rlw-text{
+      font-size:1.1rem; font-weight:600;
+      color:var(--tx); line-height:1.5;
+      margin-bottom:1.5rem;
+    }
+    .fz-rlw-btn{
+      background:linear-gradient(135deg, var(--p), var(--c));
+      color:#fff; border:none; border-radius:12px;
+      padding:.9rem 2rem;
+      font-size:1rem; font-weight:700;
+      cursor:pointer; font-family:var(--fm);
+      transition:all .2s ease;
+      box-shadow:0 4px 16px color-mix(in srgb, var(--p) 30%, transparent);
+      min-height:44px;
+    }
+    .fz-rlw-btn:hover{
+      transform:translateY(-2px);
+      box-shadow:0 6px 24px color-mix(in srgb, var(--p) 50%, transparent);
+    }
+    .fz-rlw-done{
+      color:var(--gr); font-weight:700; font-size:1rem; padding:1rem;
+    }
+
+    @media (max-width:480px){
+      .fz-greet-hi{ font-size:1.2rem; }
+      .fz-mb-icon{ font-size:1.7rem; }
+      .fz-mb-title{ font-size:1rem; }
+      .fz-mb-sub{ font-size:.75rem; }
+    }
+    @media (prefers-reduced-motion: reduce){
+      .fz-menu-btn, .fz-back-btn, .fz-mb-arrow, .fz-rlw-btn{
+        transition:none !important;
+      }
+    }
   </style>
 
-  <!-- ZONE 1 — Convince Me hero -->
-  <div id="fzZone1" class="fz-zone fz-zone-1" aria-label="Convince Me hero"></div>
-
-  <!-- ZONE 2 — Today -->
-  <div id="fzZone2" class="fz-zone fz-zone-2" aria-label="Today">
-    <div class="fz-today-hdr">TODAY</div>
-    <div id="fzChallengeCard"  class="fz-today-card"></div>
-    <div id="fzPrayerCard"     class="fz-today-card fz-prayer-card" role="button" tabindex="0"></div>
-    <div id="fzMoodCard"       class="fz-today-card"></div>
-    <!-- V1 Rebuild · Session 3 — Growth widget. Top 3 most-active
-         traits with progress bars. Rendered by renderGrowthCompact()
-         in traits.js (called from renderTodayZone in faith-zones.js). -->
-    <div id="fzGrowthCompact"  class="fz-today-card"></div>
+  <!-- 2026-05-29 — Simplified Faith Home.
+       Replaces the previous Zone 1 (Convince Me hero) + Zone 2 (Today
+       cards) wall with a clean greeting + 4 big destination buttons.
+       Each button opens a focused single-purpose view in #fzDest with
+       a universal back button + swipe-right gesture. Explore Faith
+       (the 4th button) expands the legacy Zone 3 collapse below
+       instead of taking over the view — the bf-* panels are far too
+       heavy to clone or move.
+       Rendered/wired by app/js/faith-zones.js:
+         renderFzGreeting()        — greeting + streak chip
+         fzOpenDest(dest)          — router (mystery / prayer / reallife / explore)
+         fzGoHome()                — back button + swipe target
+         renderRealLifeWinDestination() / fzCompleteRLW()
+                                   — RLW destination + completion
+  -->
+  <div id="fzHome">
+    <div id="fzGreeting"></div>
+    <div id="fzMenu">
+      <button class="fz-menu-btn" data-dest="mystery" onclick="fzOpenDest('mystery')">
+        <span class="fz-mb-icon" aria-hidden="true">✝️</span>
+        <span class="fz-mb-text">
+          <span class="fz-mb-title">Today's Mystery</span>
+          <span class="fz-mb-sub">A question that pulls you in</span>
+        </span>
+        <span class="fz-mb-arrow" aria-hidden="true">→</span>
+      </button>
+      <button class="fz-menu-btn" data-dest="prayer" onclick="fzOpenDest('prayer')">
+        <span class="fz-mb-icon" aria-hidden="true">🙏</span>
+        <span class="fz-mb-text">
+          <span class="fz-mb-title">Quick Prayer</span>
+          <span class="fz-mb-sub">Talk to God in one breath</span>
+        </span>
+        <span class="fz-mb-arrow" aria-hidden="true">→</span>
+      </button>
+      <button class="fz-menu-btn" data-dest="reallife" onclick="fzOpenDest('reallife')">
+        <span class="fz-mb-icon" aria-hidden="true">🌍</span>
+        <span class="fz-mb-text">
+          <span class="fz-mb-title">Real Life Win</span>
+          <span class="fz-mb-sub">Do something off your phone</span>
+        </span>
+        <span class="fz-mb-arrow" aria-hidden="true">→</span>
+      </button>
+      <button class="fz-menu-btn" data-dest="explore" onclick="fzOpenDest('explore')">
+        <span class="fz-mb-icon" aria-hidden="true">📖</span>
+        <span class="fz-mb-text">
+          <span class="fz-mb-title">Explore Faith</span>
+          <span class="fz-mb-sub">Bible, prayer wall, study tools</span>
+        </span>
+        <span class="fz-mb-arrow" aria-hidden="true">→</span>
+      </button>
+    </div>
   </div>
 
-  <!-- ZONE 3 — Explore toggle. Tap to expand the legacy Ask Scripture
-       CTA + sub-tab pills + all bf-* panels. Auto-expands when bfTab
-       routes to anything other than 'home' (see faith.js hook). -->
-  <button type="button"
-          id="fzExploreToggle"
-          class="fz-explore-toggle"
-          onclick="toggleFaithExplore()"
-          aria-expanded="false"
-          aria-controls="fzZone3Wrap">✦ Explore Faith ↓</button>
+  <!-- Destination view — shown when fzOpenDest() routes here. The
+       universal back button + swipe-right gesture return to #fzHome. -->
+  <div id="fzDest" style="display:none;">
+    <div class="fz-dest-header">
+      <button class="fz-back-btn" onclick="fzGoHome()" aria-label="Back to faith home">
+        <span class="fz-back-arrow" aria-hidden="true">←</span>
+        <span class="fz-back-label">Home</span>
+      </button>
+      <div class="fz-dest-title" id="fzDestTitle"></div>
+    </div>
+    <div id="fzDestBody"></div>
+  </div>
 
+  <!-- ZONE 3 — Explore collapse. Tap "Explore Faith" in the menu
+       above to expand. Wraps the legacy Ask Scripture CTA + sub-tab
+       pills + all bf-* panels. Auto-expanded when bfTab routes to
+       anything other than 'home' (see faith.js hook). -->
   <div id="fzZone3Wrap" style="display:none;" aria-hidden="true">
 
   <!-- Phase F — Faith chat prominent entry. The 'ask-bible' AI mode
