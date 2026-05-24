@@ -187,9 +187,17 @@ function _fzRenderDots(){
   return dots;
 }
 
+// V1 Rebuild · Session 4 — per-category flip glow color for the
+// convinceMeFlipEffect celebration. Keyed by card.cat.
+var _CM_CAT_COLORS = {
+  'Mystery':'#7b68ee', 'Evidence':'#4ecdc4', 'Science':'#45b7d1',
+  'Prophecy':'#ffd700', 'Philosophy':'#a29bfe', 'Challenge':'#ff6b6b'
+};
+
 function cmFlip(){
   var card = _fzCurrentCard();
   if (!card) return;
+  var firstFlipForFx = false;
   if (!_fzFlipped){
     _fzFlipped = true;
     // Mark this id as seen + tick the curiosity streak the first time
@@ -208,9 +216,39 @@ function cmFlip(){
       awardTrait('courage', 3);
       awardTrait('faith',   2);
     }
+    // V1 Rebuild · Session 4 — celebration FX on first flip only
+    // (spam-protected so re-flips don't re-fire). Pre-flip glow
+    // fires BEFORE the .flipped class so the glow leads the flip.
+    if (firstFlip && typeof convinceMeFlipEffect === 'function'){
+      var glowColor = _CM_CAT_COLORS[card.cat] || '#7b68ee';
+      convinceMeFlipEffect(glowColor);
+    }
+    firstFlipForFx = firstFlip;
   }
   var container = document.getElementById('cmCardContainer');
   if (container) container.classList.add('flipped');
+  // V1 Rebuild · Session 4 — post-flip celebrations: sequential
+  // bullet reveal once the flip transition has played out, plus
+  // an optional Did-You-Know overlay and the curiosity-streak
+  // milestone banner (session-flagged so each milestone only
+  // surfaces once per page-load).
+  if (firstFlipForFx){
+    setTimeout(function(){
+      if (typeof revealBulletsSequentially === 'function'){
+        revealBulletsSequentially(document.querySelector('.cm-back-face') || document.querySelector('.cm-card-back'));
+      }
+    }, 450);
+    if (typeof maybeShowDidYouKnow === 'function') maybeShowDidYouKnow(card.cat);
+    if (typeof curiosityStreakMilestone === 'function' && D && D.faithCuriosityStreak){
+      if ([3, 5, 7, 14, 30].indexOf(D.faithCuriosityStreak) !== -1){
+        if (!window._cmStreakSeen) window._cmStreakSeen = {};
+        if (!window._cmStreakSeen[D.faithCuriosityStreak]){
+          window._cmStreakSeen[D.faithCuriosityStreak] = true;
+          curiosityStreakMilestone(D.faithCuriosityStreak);
+        }
+      }
+    }
+  }
 }
 
 function cmFlipBack(){
@@ -402,6 +440,14 @@ function markChallengeComplete(){
   } else if (typeof showToast === 'function'){
     showToast('+1 toward ' + (ch && ch.trait ? ch.trait : 'growth'));
   }
+  // V1 Rebuild · Session 4 — celebration FX. Flash + confetti fire
+  // immediately; the trait explosion is delayed so it lands as the
+  // confetti starts to fall, drawing the eye to the trait gain.
+  if (typeof screenFlash === 'function') screenFlash('#00d4aa', 200);
+  if (typeof megaConfetti === 'function') megaConfetti();
+  setTimeout(function(){
+    if (typeof traitExplosion === 'function') traitExplosion('✝️', 'Faith');
+  }, 200);
 }
 
 function renderQuickPrayerCard(){
@@ -465,7 +511,14 @@ function submitQuickPrayer(){
     D.quickPrayers = D.quickPrayers.slice(-50);
   }
   _fzSave();
-  _fzFloatDove(document.getElementById('quickPrayerSubmit'));
+  // V1 Rebuild · Session 4 — prefer the celebrations.js prayerDove
+  // (richer animation, accessibility hooks). Fall back to the
+  // original _fzFloatDove if celebrations.js hasn't loaded yet.
+  if (typeof prayerDove === 'function') {
+    prayerDove(document.getElementById('quickPrayerSubmit'));
+  } else {
+    _fzFloatDove(document.getElementById('quickPrayerSubmit'));
+  }
   // V1 Rebuild · Session 3 — trait awards. Every prayer builds
   // Faith. If the user named someone else in the prayer (very
   // rough heuristic: mentions "for them/him/her/my X" or "pray
@@ -859,6 +912,11 @@ function _nrSaveReflection(prayed){
   if (typeof awardTrait === 'function'){
     awardTrait('wisdom',    2);
     awardTrait('gratitude', 2);
+  }
+  // V1 Rebuild · Session 4 — visual trait explosion fires right as
+  // the reflection saves so the user sees the Wisdom gain land.
+  if (typeof traitExplosion === 'function'){
+    setTimeout(function(){ traitExplosion('📖', 'Wisdom'); }, 300);
   }
   _fzSave();
   // Re-render any open faith surfaces that depend on the new state.

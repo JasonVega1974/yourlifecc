@@ -322,8 +322,51 @@ const FAITH_CHALLENGES = [
   { id:'ch30', cat:'Discipline',  emoji:'🌙', text:'Go to sleep 30 minutes earlier tonight.', trait:'discipline' }
 ];
 
+// ── ZONE 3 · REAL LIFE WINS ───────────────────────────────────
+// 30 offline actions surfaced by the Daily Briefing's Tile 3
+// ("Real Win"). Rotated by day-index so every user sees the same
+// win on the same day. Each entry maps to one of the seven traits
+// in traits.js so the celebration stack (realLifeWinCelebration +
+// traitExplosion + awardTrait) lights up the right meter.
+//   { id, emoji, cat, trait, pts, text }
+// Categories: Relational, Courage, Discipline, Faith, Presence.
+const REAL_LIFE_WINS = [
+  { id:'rlw1',  emoji:'💬', cat:'Relational',  trait:'compassion', pts:3, text:'Text one person right now: "Hey, I was thinking about you"' },
+  { id:'rlw2',  emoji:'👁️', cat:'Relational',  trait:'integrity',  pts:3, text:'Look your parent in the eyes and say thank you for something specific' },
+  { id:'rlw3',  emoji:'🤝', cat:'Relational',  trait:'compassion', pts:4, text:'Find someone sitting alone today and sit with them' },
+  { id:'rlw4',  emoji:'📝', cat:'Relational',  trait:'compassion', pts:3, text:'Write a note on physical paper and leave it for someone to find' },
+  { id:'rlw5',  emoji:'📞', cat:'Relational',  trait:'compassion', pts:3, text:'Call someone instead of texting them today' },
+  { id:'rlw6',  emoji:'💛', cat:'Relational',  trait:'compassion', pts:4, text:'Tell a friend one specific thing you appreciate about them out loud' },
+  { id:'rlw7',  emoji:'🧓', cat:'Relational',  trait:'wisdom',     pts:4, text:'Ask someone older than you: what\'s the best advice you ever got?' },
+  { id:'rlw8',  emoji:'🤲', cat:'Relational',  trait:'compassion', pts:3, text:'Do something for your sibling they didn\'t ask for' },
+  { id:'rlw9',  emoji:'🚪', cat:'Relational',  trait:'integrity',  pts:2, text:'Let someone go first — in line, in conversation, anywhere' },
+  { id:'rlw10', emoji:'💌', cat:'Relational',  trait:'compassion', pts:3, text:'Check in on someone you haven\'t talked to in a while' },
+  { id:'rlw11', emoji:'👋', cat:'Courage',     trait:'courage',    pts:5, text:'Introduce yourself to one person you\'ve never talked to' },
+  { id:'rlw12', emoji:'🙏', cat:'Courage',     trait:'integrity',  pts:5, text:'Apologize to someone you\'ve been meaning to for a while' },
+  { id:'rlw13', emoji:'🔓', cat:'Courage',     trait:'courage',    pts:4, text:'Share one honest thing about yourself you don\'t usually share' },
+  { id:'rlw14', emoji:'❓', cat:'Courage',     trait:'faith',      pts:4, text:'Ask God one question you\'ve been afraid to ask' },
+  { id:'rlw15', emoji:'⚡', cat:'Courage',     trait:'courage',    pts:5, text:'Do one thing today that scares you a little' },
+  { id:'rlw16', emoji:'📵', cat:'Discipline',  trait:'discipline', pts:4, text:'Put your phone in another room for 2 hours. No exceptions.' },
+  { id:'rlw17', emoji:'⏰', cat:'Discipline',  trait:'discipline', pts:4, text:'Wake up 30 minutes earlier tomorrow. Set the alarm right now.' },
+  { id:'rlw18', emoji:'🧹', cat:'Discipline',  trait:'discipline', pts:3, text:'Clean or organize one space without being asked' },
+  { id:'rlw19', emoji:'⏭️', cat:'Discipline',  trait:'integrity',  pts:3, text:'Skip one thing you enjoy today. Offer it up.' },
+  { id:'rlw20', emoji:'📋', cat:'Discipline',  trait:'discipline', pts:3, text:'Write tomorrow\'s plan tonight before you sleep' },
+  { id:'rlw21', emoji:'🎁', cat:'Faith',       trait:'compassion', pts:5, text:'Do one anonymous act of kindness. Tell absolutely no one.' },
+  { id:'rlw22', emoji:'💰', cat:'Faith',       trait:'compassion', pts:4, text:'Give something away today — money, time, or something you own' },
+  { id:'rlw23', emoji:'🙏', cat:'Faith',       trait:'faith',      pts:4, text:'Pray for someone you find difficult. Out loud.' },
+  { id:'rlw24', emoji:'🚶', cat:'Faith',       trait:'faith',      pts:4, text:'Take a 10-minute walk with no phone. Just talk to God.' },
+  { id:'rlw25', emoji:'👀', cat:'Faith',       trait:'integrity',  pts:4, text:'Find one way to serve today that no one will notice' },
+  { id:'rlw26', emoji:'🌅', cat:'Presence',    trait:'gratitude',  pts:3, text:'Watch a sunset or the sky for 5 minutes. No phone.' },
+  { id:'rlw27', emoji:'🍽️', cat:'Presence',    trait:'gratitude',  pts:3, text:'Eat one meal with no screens. Just be present.' },
+  { id:'rlw28', emoji:'📓', cat:'Presence',    trait:'gratitude',  pts:3, text:'Write 3 specific things you\'re genuinely grateful for right now' },
+  { id:'rlw29', emoji:'❤️', cat:'Presence',    trait:'faith',      pts:3, text:'Tell God what you\'re actually feeling. No filter.' },
+  { id:'rlw30', emoji:'🌙', cat:'Presence',    trait:'discipline', pts:3, text:'Go to sleep 30 minutes earlier tonight' }
+];
+if (typeof window !== 'undefined') window.REAL_LIFE_WINS = REAL_LIFE_WINS;
+
 // Expose for non-module scripts that load after this one.
 if (typeof window !== 'undefined') {
   window.CONVINCE_ME_DECK = CONVINCE_ME_DECK;
   window.FAITH_CHALLENGES = FAITH_CHALLENGES;
+  window.REAL_LIFE_WINS = REAL_LIFE_WINS;
 }

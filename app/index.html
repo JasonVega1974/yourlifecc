@@ -14112,6 +14112,14 @@
      Both load after faith.js since faith-zones.js cross-references
      PROOF_PROPHECY_DATA, ppOpenModal, bfTab, showToast. -->
 <script src="/app/js/data/faith-zones-data.js"></script>
+<!-- V1 Rebuild · Session 4 — Pure fun engine. 10 celebration helpers
+     exposed on window (megaConfetti / screenFlash / traitExplosion /
+     realLifeWinCelebration / convinceMeFlipEffect /
+     revealBulletsSequentially / curiosityStreakMilestone /
+     maybeShowDidYouKnow / dailyThreeComplete / streakMilestoneBanner
+     / prayerDove). Loads BEFORE traits.js + faith-zones.js +
+     daily-briefing.js — all three consume celebration globals. -->
+<script src="/app/js/celebrations.js"></script>
 <!-- V1 Rebuild · Session 3 — Identity Traits engine. Must load
      BEFORE faith-zones.js so awardTrait + renderGrowthCompact are
      defined when the zone renderers call them. -->

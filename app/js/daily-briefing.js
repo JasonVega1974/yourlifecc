@@ -91,6 +91,16 @@ function _dbCurrentTrait() {
   return { name:'Discipline', emoji:'💪', pct:14 };
 }
 
+// V1 Rebuild · Session 4 — Tile 3 surfaces one of 30 Real Life Wins.
+// Rotated by day-index so the same win shows globally on a given day.
+// Returns null when the data module hasn't loaded yet (defensive — the
+// renderer guards against null before painting).
+function _dbTodaysRealLifeWin() {
+  if (typeof REAL_LIFE_WINS === 'undefined' || !REAL_LIFE_WINS.length) return null;
+  var idx = Math.floor(Date.now() / 86400000) % REAL_LIFE_WINS.length;
+  return REAL_LIFE_WINS[idx];
+}
+
 function renderDailyBriefing() {
   var card = document.getElementById('dailyBriefingCard');
   if (!card) return;
@@ -129,6 +139,21 @@ function renderDailyBriefing() {
     tile.classList.toggle('db-tile-done', done);
     tile.setAttribute('aria-pressed', done ? 'true' : 'false');
   });
+  // V1 Rebuild · Session 4 — overwrite Tile 3's emoji + label with the
+  // rotating Real Life Win for today. The static markup in index.html
+  // ships with a generic "🌍 / Today's real-life action" placeholder;
+  // this paints over it after every render so the visible text always
+  // matches what dbTileTap('realWin') will celebrate.
+  var rlw = _dbTodaysRealLifeWin();
+  if (rlw) {
+    var rlwTile = card.querySelector('.db-tile[data-slot="realWin"]');
+    if (rlwTile) {
+      var emojiEl = rlwTile.querySelector('.db-tile-emoji');
+      var labelEl = rlwTile.querySelector('.db-tile-label');
+      if (emojiEl) emojiEl.textContent = rlw.emoji;
+      if (labelEl) labelEl.textContent = rlw.text;
+    }
+  }
   var done = _dbAllDone(state);
   var completeEl = document.getElementById('dbComplete');
   if (completeEl) completeEl.style.display = done ? '' : 'none';
@@ -147,6 +172,21 @@ function renderDailyBriefing() {
     // to the Night Reflection entry point without nagging earlier in the
     // evening when the user might still be active.
     ref.classList.toggle('db-reflect-pulse', h >= 20);
+  }
+
+  // V1 Rebuild · Session 4 — fire the streak milestone banner the
+  // first time the user sees a milestone-day streak. Guard with a
+  // session flag so it only fires once per page-life, not on every
+  // render.
+  if (typeof streakMilestoneBanner === 'function') {
+    var s = days; // `days` already in scope from _dbStreakDays() above
+    if ([3, 7, 14, 30, 50, 100].indexOf(s) !== -1) {
+      if (!window._dbStreakSeen) window._dbStreakSeen = {};
+      if (!window._dbStreakSeen[s]) {
+        window._dbStreakSeen[s] = true;
+        setTimeout(function(){ streakMilestoneBanner(s); }, 800);
+      }
+    }
   }
 }
 
@@ -168,7 +208,21 @@ function dbTileTap(slot) {
     } else if (slot === 'growth') {
       if (typeof showSection === 'function') showSection('s-health');
     } else if (slot === 'realWin') {
-      if (typeof showSection === 'function') showSection('s-contests');
+      // Real Life Win — the BIG celebration. No navigation; the user did
+      // the thing IRL, this is just confirming it.
+      var rlw = _dbTodaysRealLifeWin();
+      if (!wasDone) {
+        if (typeof realLifeWinCelebration === 'function') {
+          realLifeWinCelebration(rlw ? rlw.text : '');
+        }
+        if (rlw && typeof awardTrait === 'function' && typeof TRAITS !== 'undefined' && TRAITS[rlw.trait]) {
+          // Trait explosion uses the trait's own emoji + name for context
+          if (typeof traitExplosion === 'function') {
+            setTimeout(function(){ traitExplosion(TRAITS[rlw.trait].emoji, TRAITS[rlw.trait].name); }, 400);
+          }
+          awardTrait(rlw.trait, rlw.pts);
+        }
+      }
     }
   } catch (e) { /* navigation failure shouldn't block credit */ }
 
@@ -180,7 +234,16 @@ function dbTileTap(slot) {
   setTimeout(renderDailyBriefing, 50);
 
   if (!wasDone && _dbAllDone(state)) {
-    setTimeout(_dbConfettiBurst, 280);
+    // V1 Rebuild · Session 4 — defer to celebrations.js when present so
+    // the all-three-done moment uses the full mega-confetti + golden
+    // popup stack. 600ms delay lets the realLifeWinCelebration overlay
+    // come up first when Tile 3 is the trigger. The local confetti is
+    // kept as a fallback when celebrations.js hasn't loaded yet.
+    if (typeof dailyThreeComplete === 'function') {
+      setTimeout(dailyThreeComplete, 600);
+    } else {
+      setTimeout(_dbConfettiBurst, 280);
+    }
     if (typeof showToast === 'function') showToast('Day complete! 🎉');
   }
 }
