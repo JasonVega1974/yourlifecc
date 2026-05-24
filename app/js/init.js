@@ -883,145 +883,14 @@ function _foStartDayNightCycle() {
   window._foDnRaf = requestAnimationFrame(frame);
 }
 
-// ─── 2026-05-28 v4 — Pre-rendered cross sprite sheet ────────────────
-// The v1-v3 drawWellCross attempts (rotate / scaleX billboard / 5-layer
-// depth simulation) all looked wrong at edge-on: the scaleX trick
-// collapsed to a 0-width line, the depth-fill version stretched odd.
-// v4 trades runtime cleverness for a one-time setup cost: 36 offscreen
-// canvases, each holding the cross drawn with REAL 3D-projection math
-// at a fixed angle. The runtime just stamps the right frame per tick.
-//
-// initCrossFrames() is idempotent and called once from
-// _foStartCanvasScene's setup block; the sprite sheet survives across
-// canvas-scene restarts (e.g. visibilitychange resume) so we never pay
-// the ~3-5ms render-36-frames cost twice in one session.
-var _crossFrames = null;
-
-function initCrossFrames(){
-  if (_crossFrames) return;
-  _crossFrames = [];
-  var frames = 36;
-  // Sprite canvas: 120×120 with the cross centred at (60, 60). 120 is
-  // generous enough to swallow the 22px shadowBlur + side-face offset
-  // at any rotation angle without clipping.
-  for (var f = 0; f < frames; f++){
-    var angle = (f / frames) * Math.PI * 2;
-    var oc = document.createElement('canvas');
-    oc.width = 120; oc.height = 120;
-    var oc2 = oc.getContext('2d');
-
-    // Cross dimensions — slightly punched up from the v3 numbers so
-    // the front face still reads well after the sprite is rasterised.
-    var cx = 60, cy = 60;
-    var totalH = 70;
-    var crossW = 9;
-    var beamW = 46;
-    var beamFromTop = 22;
-    var depth = 10;
-
-    var cosA = Math.cos(angle);
-    var sinA = Math.sin(angle);
-    // Orthographic Y-axis rotation: 3D point (x, y, z) projects to
-    //   screen_x = cx + x*cos(a) - z*sin(a)
-    //   screen_y = y    (unchanged — rotation is around Y)
-    var pX = function(x3d, z3d){ return cx + x3d * cosA - z3d * sinA; };
-
-    // Cross corner coords in cross-local space (z=0 is the front face,
-    // z=-depth is the back face)
-    var vLeft = -crossW / 2,  vRight = crossW / 2;
-    var bLeft = -beamW / 2,   bRight = beamW / 2;
-    var topY  = cy - totalH / 2;
-    var botY  = cy + totalH / 2;
-    var beamTop = topY + beamFromTop;
-    var beamBot = beamTop + crossW;
-
-    var sideColor  = '#b8860b';
-    var frontColor = '#fffde7';
-    var glowColor  = '#ffd700';
-
-    // ── Side faces (the 3D thickness): four quads, one per bar edge.
-    //    These remain a valid closed path regardless of cos/sin sign,
-    //    so no orientation handling needed. ──
-    oc2.fillStyle = sideColor;
-    function _sideQuad(xLocal, y0, y1){
-      oc2.beginPath();
-      oc2.moveTo(pX(xLocal, 0),      y0);
-      oc2.lineTo(pX(xLocal, -depth), y0);
-      oc2.lineTo(pX(xLocal, -depth), y1);
-      oc2.lineTo(pX(xLocal, 0),      y1);
-      oc2.closePath();
-      oc2.fill();
-    }
-    _sideQuad(vLeft,  topY,    botY);     // vertical bar — left edge
-    _sideQuad(vRight, topY,    botY);     // vertical bar — right edge
-    _sideQuad(bLeft,  beamTop, beamBot);  // crossbeam     — left edge
-    _sideQuad(bRight, beamTop, beamBot);  // crossbeam     — right edge
-
-    // Which face is currently catching the viewer? When cosA flips
-    // negative (past 90°) the original back becomes our visual front.
-    var frontFacing = cosA >= 0;
-    var frontZ = frontFacing ? 0 : -depth;
-    var backZ  = frontFacing ? -depth : 0;
-
-    // ── Back face — semi-transparent dark gold, sits behind ──
-    // Helper: draw a rect from two arbitrary x-projections + a y/h pair.
-    // Uses min+abs so the rect renders correctly even when cos<0 flips
-    // the projected left/right edges (fillRect with negative width
-    // works for position but the user-spec formula misplaces it).
-    function _faceRect(xLeftProj, xRightProj, y, h, minW){
-      var x = Math.min(xLeftProj, xRightProj);
-      var w = Math.abs(xRightProj - xLeftProj);
-      if (minW){
-        // Clamp to a minimum visible width, centred on the midpoint so
-        // the cross stays anchored as it goes edge-on.
-        if (w < minW){
-          var mid = (xLeftProj + xRightProj) / 2;
-          x = mid - minW / 2; w = minW;
-        }
-      }
-      oc2.fillRect(x, y, w, h);
-    }
-
-    oc2.globalAlpha = 0.5;
-    oc2.fillStyle = '#b8860b';
-    _faceRect(pX(vLeft, backZ), pX(vRight, backZ), topY,    totalH, 0);
-    _faceRect(pX(bLeft, backZ), pX(bRight, backZ), beamTop, crossW, 0);
-    oc2.globalAlpha = 1.0;
-
-    // ── Outer glow — gold halo blooming around the front face ──
-    oc2.save();
-    oc2.shadowColor = glowColor;
-    oc2.shadowBlur  = 22;
-    oc2.fillStyle   = glowColor;
-    oc2.globalAlpha = 0.6;
-    var fvL = pX(vLeft, frontZ),  fvR = pX(vRight, frontZ);
-    var fbL = pX(bLeft, frontZ),  fbR = pX(bRight, frontZ);
-    _faceRect(fvL - 2, fvR + 2, topY - 2,    totalH + 4, 0);
-    _faceRect(fbL - 2, fbR + 2, beamTop - 2, crossW + 4, 0);
-    oc2.restore();
-
-    // ── Front face — bright cream over gold shadow, the cross itself ──
-    oc2.fillStyle   = frontColor;
-    oc2.shadowColor = glowColor;
-    oc2.shadowBlur  = 12;
-    oc2.globalAlpha = 1.0;
-    _faceRect(fvL, fvR, topY,    totalH, 4);
-    _faceRect(fbL, fbR, beamTop, crossW, 4);
-
-    // ── Centre highlight — bright spot where the bars meet ──
-    oc2.fillStyle   = '#ffffff';
-    oc2.globalAlpha = 0.9;
-    oc2.shadowBlur  = 8;
-    _faceRect(fvL, fvR, beamTop, crossW, 4);
-
-    _crossFrames.push(oc);
-  }
-}
+// 2026-05-28 v5 — canvas cross sprite-sheet removed entirely. The
+// well cross is now a CSS-3D overlay (#wellCrossWrap) injected as
+// a sibling of the canvas in renderFaithOnlyHero. Hardware-accelerated
+// rotateY animation + drop-shadow glow filter live in app/index.html.
+// _foStartCanvasScene no longer needs an init step for the cross.
 
 function _foStartCanvasScene() {
   if (window._foCanvasRaf) { cancelAnimationFrame(window._foCanvasRaf); window._foCanvasRaf = null; }
-  // Pre-render the 36 cross sprite frames once per session. Idempotent.
-  if (!_crossFrames) initCrossFrames();
   var cv = document.getElementById('fo-canvas-scene');
   if (!cv) return;
   // Retry until the hero has real layout dimensions — Android Chrome often
@@ -1326,41 +1195,10 @@ function _foStartCanvasScene() {
     ctx.strokeStyle='#4a3510'; ctx.lineWidth=1.8; ctx.stroke();
     ctx.beginPath(); ctx.rect(rx-6,rb,11,9); ctx.fillStyle='#3a2a10'; ctx.fill(); ctx.strokeStyle='#5a3c10'; ctx.lineWidth=0.8; ctx.stroke();
   }
-  // 2026-05-28 v4 — Sprite-sheet stamp. All the 3D + glow work is
-  // pre-baked into _crossFrames (see initCrossFrames at file scope);
-  // per-frame cost here is just one drawImage + one corona arc.
-  // glowAlpha drives both the cross opacity AND the corona; the
-  // rotation timing is global (Date.now()-based) so the cross keeps
-  // animating even if drawWellCross is called from elsewhere.
-  function drawWellCross(ctx, x, y, glowAlpha){
-    if (!_crossFrames || !_crossFrames.length) return;
-
-    // 36 frames over 8 seconds → ~4.5 frames per second of rotation.
-    // Date.now() (not RAF ts) so the cycle is wall-clock consistent.
-    var frameIndex = Math.floor((Date.now() / 8000) * 36) % 36;
-    var frame = _crossFrames[frameIndex];
-    if (!frame) return;
-
-    // ── Corona halo: always visible, never rotates. Sits at (x, y),
-    // soft 45px gold disc that anchors the cross from any angle. ──
-    ctx.save();
-    ctx.globalAlpha = glowAlpha * 0.2;
-    var grad = ctx.createRadialGradient(x, y, 0, x, y, 45);
-    grad.addColorStop(0,   '#ffd700');
-    grad.addColorStop(0.5, 'rgba(255,215,0,0.3)');
-    grad.addColorStop(1,   'transparent');
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.arc(x, y, 45, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-
-    // ── Stamp the pre-rendered frame at the requested centre. ──
-    ctx.save();
-    ctx.globalAlpha = glowAlpha;
-    ctx.drawImage(frame, x - 60, y - 60);
-    ctx.restore();
-  }
+  // 2026-05-28 v5 — drawWellCross removed. The well cross is now a
+  // CSS-3D overlay (#wellCrossWrap) injected by renderFaithOnlyHero
+  // as a sibling of the canvas — see the .fo-* style block in
+  // app/index.html for the rotateY animation + glow filter.
   function dFG(W,H){
     ctx.beginPath(); ctx.moveTo(0,H*.845);
     ctx.bezierCurveTo(W*.14,H*.825, W*.32,H*.852, W*.50,H*.836);
@@ -1412,20 +1250,11 @@ function _foStartCanvasScene() {
       // function kept as dead code in case of revert.
       dClouds(W,H,t,ts); dFarMtns(W,H,t); dMidMtns(W,H,t); dNearMtns(W,H,t); dMist(W,H,t);
       dBirds(W,H,t,ts); dWell(W,H,sky.top,ts);
-      // Cross above the well. Position math mirrors dWell:
-      //   wcy = H*.74, wh = H*.12, roof apex ≈ H*.556.
-      // Center the cross 80px above the roof apex (cross half-height
-      // 35, so the cross bottom clears the roof by ~45px). On tiny
-      // canvases (rare) the Math.max floor keeps it on-screen.
-      //
-      // 2026-05-28 v4 — drawWellCross is now a sprite-stamp from a
-      // pre-rendered 36-frame sheet (see initCrossFrames). It owns
-      // its own rotation timing internally; the call site just
-      // provides the position + breath alpha. Pulse range
-      // [0.20, 1.00] — never dims to invisible.
-      var _wcA = 0.6 + Math.sin(ts / 1500) * 0.4;
-      var _wcY = Math.max(40, H * 0.556 - 80);
-      drawWellCross(ctx, W * 0.50, _wcY, _wcA);
+      // 2026-05-28 v5 — canvas cross removed entirely. Replaced by a
+      // CSS-3D overlay (#wellCrossWrap) injected as a sibling of this
+      // canvas in renderFaithOnlyHero; rotation + glow live in CSS
+      // keyframes (hardware-accelerated) and never touch the canvas
+      // render path.
       dFG(W,H); dSparks(W,H,t,ts); dScrim(W,H);
       window._foCanvasRaf = requestAnimationFrame(tick);
     } catch(e) {
@@ -1644,6 +1473,24 @@ function renderFaithOnlyHero() {
     hero.innerHTML =
       '<div class="fo-hero" id="faithOnlyHero">' +
         '<canvas id="fo-canvas-scene" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;"></canvas>' +
+        // 2026-05-28 v5 — CSS-3D cross overlay (replaces every prior
+        // canvas-painted cross attempt). Pure HTML + CSS keyframes;
+        // rotation + glow are hardware-accelerated and never touch
+        // the canvas render loop. Styled in the .fo-* block below.
+        '<div id="wellCrossWrap" aria-hidden="true">' +
+          '<div id="wellCross3d">' +
+            '<div class="cross-face cross-front">' +
+              '<div class="cross-v"></div>' +
+              '<div class="cross-h"></div>' +
+            '</div>' +
+            '<div class="cross-face cross-back">' +
+              '<div class="cross-v"></div>' +
+              '<div class="cross-h"></div>' +
+            '</div>' +
+            '<div class="cross-side cross-side-left"></div>' +
+            '<div class="cross-side cross-side-right"></div>' +
+          '</div>' +
+        '</div>' +
         '<div class="fo-hero-scrim"></div>' +
         '<div class="fo-hero-content">' +
           '<div class="fo-hero-greeting">' + greetingHtml + '</div>' +
