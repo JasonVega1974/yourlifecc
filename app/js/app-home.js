@@ -29,6 +29,13 @@
   'use strict';
 
   function _ahFirstName(){
+    // Delegate to the faith greeting's helper when it's loaded — keeps
+    // every greeting in the app aligned on one chain. The local fallback
+    // below covers the race where this module renders before
+    // faith-zones.js attaches the global.
+    if (typeof window !== 'undefined' && typeof window._fzFirstName === 'function'){
+      try { return window._fzFirstName(); } catch(_){}
+    }
     if (typeof D !== 'undefined' && D && D.name){
       return String(D.name).split(' ')[0];
     }
@@ -120,11 +127,30 @@
     renderAppGreeting();
   }
 
+  // Closes a race: the initial DOMContentLoaded render fires BEFORE
+  // cloudLoad() populates D.name (cloudLoad is async, runs during
+  // auth init). Without these deferred re-renders the greeting can
+  // stick on the _supaUser.user_metadata.full_name fallback (e.g.
+  // "Good evening, Jason 👋" from the dev's "Jason Vega" metadata)
+  // even after D.name eventually arrives. showSection('s-hero') in
+  // ui.js also triggers maybeRenderAppHome, but only when the user
+  // explicitly navigates — these timers cover the first-paint case.
+  function _ahScheduleRerenders(){
+    if (typeof setTimeout !== 'function') return;
+    setTimeout(maybeRenderAppHome,  600);
+    setTimeout(maybeRenderAppHome, 1800);
+    setTimeout(maybeRenderAppHome, 4000);
+  }
+
   if (typeof document !== 'undefined'){
     if (document.readyState === 'loading'){
-      document.addEventListener('DOMContentLoaded', maybeRenderAppHome);
+      document.addEventListener('DOMContentLoaded', function(){
+        maybeRenderAppHome();
+        _ahScheduleRerenders();
+      });
     } else {
       maybeRenderAppHome();
+      _ahScheduleRerenders();
     }
     document.addEventListener('visibilitychange', function(){
       if (!document.hidden) maybeRenderAppHome();

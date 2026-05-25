@@ -1538,6 +1538,10 @@ function _fzFirstName(){
   }
   return 'friend';
 }
+// Single source of truth for first-name resolution across the app.
+// app-home.js and any future greeting code should call this rather
+// than re-implementing the chain. Keeps fixes in one place.
+if (typeof window !== 'undefined') window._fzFirstName = _fzFirstName;
 
 function renderWelcomeGreeting(){
   if (typeof document === 'undefined') return;
