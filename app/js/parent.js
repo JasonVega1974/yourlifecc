@@ -2150,6 +2150,11 @@ function switchToProfile(id){
   if(typeof renderDailyPrompt==='function') renderDailyPrompt();
   // Navigate home — this also triggers the showSection render chain
   showSection('s-hero');
+  // Belt-and-suspenders: force the app-home greeting to repaint with
+  // the new profile's name. showSection already schedules this via
+  // ui.js, but calling directly here closes the race in case the user
+  // was already on s-hero (no nav change → no showSection re-render).
+  if(typeof maybeRenderAppHome === 'function') maybeRenderAppHome();
   // ────────────────────────────────────────────────────────────
 
   showToast('Welcome, '+profile.name+'! 👋');

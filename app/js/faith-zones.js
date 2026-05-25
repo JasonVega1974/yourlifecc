@@ -1122,15 +1122,10 @@ function renderFzGreeting(){
           ? (getScriptureStreak() || 0)
           : ((typeof D.streak === 'number') ? D.streak : 0));
   }
-  // First name — same resolution chain as the Daily Briefing.
-  var name = 'friend';
-  if (D && D.name) name = String(D.name).split(' ')[0];
-  else if (typeof _supaUser !== 'undefined' && _supaUser){
-    var meta = _supaUser.user_metadata || {};
-    if (meta.first_name) name = meta.first_name;
-    else if (meta.full_name) name = String(meta.full_name).split(' ')[0];
-    else if (_supaUser.email) name = _supaUser.email.split('@')[0];
-  }
+  // First name — delegate to _fzFirstName so faith greeting + app-home
+  // greeting can never diverge. _fzFirstName prefers the active
+  // profile's name (multi-profile / child-switch aware).
+  var name = (typeof _fzFirstName === 'function') ? _fzFirstName() : 'friend';
   var streakBadge = streak > 0
     ? '<span class="fz-streak">🔥 ' + streak + ' day' + (streak === 1 ? '' : 's') + '</span>'
     : '';
@@ -1529,6 +1524,19 @@ function showWelcomeBack(){
 }
 
 function _fzFirstName(){
+  // Multi-profile FIRST: when a child profile is active, its .name is
+  // authoritative — it's set the instant switchToProfile() reassigns
+  // _activeProfileId, BEFORE D.name catches up. Without this, the
+  // greeting was reading the parent's D.name (e.g. "Jason") even
+  // after a child ("Amanda") was switched in. See parent.js:2066
+  // (switchToProfile) for the swap sequence.
+  try {
+    if (typeof _profiles !== 'undefined' && Array.isArray(_profiles)
+        && typeof _activeProfileId !== 'undefined' && _activeProfileId){
+      var _ap = _profiles.find(function(p){ return p && p.id === _activeProfileId; });
+      if (_ap && _ap.name) return String(_ap.name).split(' ')[0];
+    }
+  } catch(_){}
   if (D && D.name) return String(D.name).split(' ')[0];
   if (typeof _supaUser !== 'undefined' && _supaUser){
     var meta = _supaUser.user_metadata || {};
@@ -1539,8 +1547,8 @@ function _fzFirstName(){
   return 'friend';
 }
 // Single source of truth for first-name resolution across the app.
-// app-home.js and any future greeting code should call this rather
-// than re-implementing the chain. Keeps fixes in one place.
+// app-home.js, renderFzGreeting, and any future greeting code call this
+// rather than re-implementing the chain. Keeps fixes in one place.
 if (typeof window !== 'undefined') window._fzFirstName = _fzFirstName;
 
 function renderWelcomeGreeting(){
