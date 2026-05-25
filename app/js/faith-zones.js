@@ -1229,9 +1229,124 @@ function fzOpenDest(dest){
       '</div>' +
       '<div id="fzGrowthFull"></div>';
     renderGrowthFull();
+  } else if (dest === 'heart'){
+    titleEl.textContent = "Heart Check";
+    bodyEl.innerHTML = renderHeartCheckPicker();
   }
 
   setTimeout(function(){ destEl.scrollIntoView({ behavior:'smooth', block:'start' }); }, 60);
+}
+
+// ════════════════════════════════════════════════════════════
+// 2026-05-30 — Heart Check
+// 12 emotional states (HEART_CHECK in data/heart-check-data.js).
+// Picker → response flow: tap an emotion → see verse + prayer +
+// action. Each response has two CTAs ("I prayed this" → faith +2;
+// "I'll do this" → trait+3 keyed off the entry's `.trait` field).
+// Usage logged to D.heartChecks (cap 100). Lives entirely inside
+// #fzDestBody — no new top-level markup beyond the menu button.
+// ════════════════════════════════════════════════════════════
+function renderHeartCheckPicker(){
+  if (typeof HEART_CHECK === 'undefined'){
+    return '<div class="fz-empty">Heart Check is loading…</div>';
+  }
+  var keys = Object.keys(HEART_CHECK);
+  var cells = keys.map(function(key){
+    var item = HEART_CHECK[key];
+    return '<button class="hc-emotion" onclick="openHeartCheck(\'' + _fzEsc(key) + '\')" aria-label="' + _fzEsc(item.label) + '">' +
+             '<span class="hc-emoji" aria-hidden="true">' + _fzEsc(item.emoji) + '</span>' +
+             '<span class="hc-label">' + _fzEsc(item.label) + '</span>' +
+           '</button>';
+  }).join('');
+  return ''
+    + '<div class="hc-intro">'
+    +   '<div class="hc-intro-emoji" aria-hidden="true">💙</div>'
+    +   '<div class="hc-intro-text">How are you really feeling right now?</div>'
+    +   '<div class="hc-intro-sub">No filter. Pick what\'s closest.</div>'
+    + '</div>'
+    + '<div class="hc-grid">' + cells + '</div>';
+}
+
+function openHeartCheck(key){
+  if (typeof document === 'undefined') return;
+  if (typeof HEART_CHECK === 'undefined') return;
+  var item = HEART_CHECK[key];
+  if (!item) return;
+  var bodyEl = document.getElementById('fzDestBody');
+  if (!bodyEl) return;
+
+  bodyEl.innerHTML =
+    '<button class="hc-back-to-picker" onclick="backToHeartPicker()">← Different feeling</button>' +
+    '<div class="hc-response">' +
+      '<div class="hc-emoji-large" aria-hidden="true">' + _fzEsc(item.emoji) + '</div>' +
+      '<div class="hc-headline">' + _fzEsc(item.headline) + '</div>' +
+      '<div class="hc-section hc-verse-section">' +
+        '<div class="hc-section-label">A VERSE FOR THIS</div>' +
+        '<blockquote class="hc-verse">' + _fzEsc(item.verse) + '</blockquote>' +
+        '<div class="hc-verse-ref">— ' + _fzEsc(item.verseRef) + '</div>' +
+      '</div>' +
+      '<div class="hc-section hc-prayer-section">' +
+        '<div class="hc-section-label">PRAYER FOR RIGHT NOW</div>' +
+        '<div class="hc-prayer">' + _fzEsc(item.prayer) + '</div>' +
+        '<button class="hc-pray-btn" onclick="hcPrayWithThis(\'' + _fzEsc(key) + '\', this)">I prayed this 🙏</button>' +
+      '</div>' +
+      '<div class="hc-section hc-action-section">' +
+        '<div class="hc-section-label">ONE THING TO DO</div>' +
+        '<div class="hc-action">' + _fzEsc(item.action) + '</div>' +
+        '<button class="hc-action-btn" onclick="hcDidAction(\'' + _fzEsc(key) + '\', this)">I\'ll do this →</button>' +
+      '</div>' +
+      '<div class="hc-footer">' +
+        '<button class="hc-more-btn" onclick="backToHeartPicker()">Try a different feeling</button>' +
+      '</div>' +
+    '</div>';
+
+  // Track usage. Cap to most recent 100 entries to keep the cloud
+  // blob lean. Recorded the moment the user opens an emotion —
+  // even if they don't tap any CTA — so the log reflects what
+  // they were looking for, not just what they completed.
+  if (D){
+    if (!Array.isArray(D.heartChecks)) D.heartChecks = [];
+    D.heartChecks.push({ key:key, date:new Date().toISOString() });
+    if (D.heartChecks.length > 100){
+      D.heartChecks = D.heartChecks.slice(-100);
+    }
+    _fzSave();
+  }
+}
+
+function backToHeartPicker(){
+  if (typeof document === 'undefined') return;
+  var bodyEl = document.getElementById('fzDestBody');
+  if (bodyEl) bodyEl.innerHTML = renderHeartCheckPicker();
+}
+
+// btn arg passed from the inline onclick so we don't rely on the
+// (now-deprecated, Safari-flaky) `event` global.
+function hcPrayWithThis(key, btn){
+  if (typeof prayerDove === 'function' && btn) prayerDove(btn);
+  if (typeof awardTrait === 'function') awardTrait('faith', 2);
+  if (btn){
+    btn.textContent = 'Amen 🙏';
+    btn.disabled = true;
+  }
+}
+
+function hcDidAction(key, btn){
+  if (typeof HEART_CHECK === 'undefined') return;
+  var item = HEART_CHECK[key];
+  if (!item) return;
+  if (typeof traitExplosion === 'function' && typeof TRAITS !== 'undefined' && item.trait && TRAITS[item.trait]){
+    var t = TRAITS[item.trait];
+    traitExplosion(t.emoji, t.name);
+  }
+  if (typeof awardTrait === 'function' && item.trait){
+    awardTrait(item.trait, 3);
+  }
+  if (typeof screenFlash === 'function') screenFlash('#7b68ee', 200);
+  if (btn){
+    btn.textContent = "You're doing it ✓";
+    btn.disabled = true;
+  }
 }
 
 // 2026-05-29 — Growth Profile destination renderer. All 7 traits as
@@ -1510,18 +1625,21 @@ function renderTimeAwarePaths(){
       { emoji:'🙏', title:'Quick prayer',               sub:"What's on your heart?",      dest:'prayer'   }
     ];
   } else if (h >= 17 && h < 21){
-    // EVENING — pause and connect
+    // EVENING — pause and connect. Heart Check replaces the growth
+    // tile here since evening is when emotional weight is highest.
     paths = [
       { emoji:'🙏', title:'Quick prayer',               sub:'Talk to God',                dest:'prayer'   },
       { emoji:'✝️', title:'A mystery to ponder',        sub:"Tonight's question",         dest:'mystery'  },
-      { emoji:'✦',  title:'See your growth',            sub:"Who you're becoming",        dest:'growth'   }
+      { emoji:'💙', title:'Heart Check',                sub:'How are you really feeling?', dest:'heart'   }
     ];
   } else {
-    // NIGHT (21:00 - 04:59) — wind down
+    // NIGHT (21:00 - 04:59) — wind down. Reflection + prayer +
+    // Heart Check — the late-night user is most often the one
+    // who needs Heart Check most.
     paths = [
       { emoji:'🌙', title:'Night reflection',           sub:'How was today?',             dest:'reflect'  },
       { emoji:'🙏', title:'Quick prayer before bed',    sub:'Hand it over',               dest:'prayer'   },
-      { emoji:'✝️', title:'A quiet mystery',            sub:'Sit with one thought',       dest:'mystery'  }
+      { emoji:'💙', title:'How are you feeling?',       sub:'Heart Check',                dest:'heart'    }
     ];
   }
   el.innerHTML = paths.map(function(p){
@@ -1572,6 +1690,11 @@ if (typeof window !== 'undefined'){
   window.fzWelcomePath     = fzWelcomePath;
   window.fzWelcomeBrowse   = fzWelcomeBrowse;
   window.showWelcomeBack   = showWelcomeBack;
+  // 2026-05-30 — Heart Check public surface.
+  window.openHeartCheck    = openHeartCheck;
+  window.backToHeartPicker = backToHeartPicker;
+  window.hcPrayWithThis    = hcPrayWithThis;
+  window.hcDidAction       = hcDidAction;
   // Dev aid — call testWelcome() in DevTools to force-show the
   // welcome screen without waiting 24 hours for the gate to trip.
   // Spoofs faithLastVisit to 25h ago + faithLastDest to mystery.

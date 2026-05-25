@@ -6348,6 +6348,179 @@
         transition:none !important;
       }
     }
+
+    /* ── 2026-05-30 — Heart Check (7th destination) ──
+       Emphasized purple-tinted button on the home; on desktop the
+       button spans the full third row beneath the 6-button grid.
+       Destination has two states: emotion picker (12-square grid)
+       and emotion response (verse + prayer + action sections). */
+    .fz-menu-btn-heart{
+      background:linear-gradient(135deg, var(--card-bg), color-mix(in srgb, var(--p) 8%, transparent));
+      border-color:color-mix(in srgb, var(--p) 30%, transparent);
+    }
+    @media (min-width:1024px){
+      /* 6 regular buttons in 2 rows + Heart Check spanning the
+         full third row, centered, with its label inline. */
+      .fz-menu-btn-heart{
+        grid-column:1 / -1;
+        flex-direction:row;
+        justify-content:center;
+        text-align:center;
+      }
+    }
+
+    /* Heart Check destination — emotion picker grid */
+    .hc-intro{ text-align:center; padding:1rem 0 1.5rem; }
+    .hc-intro-emoji{ font-size:2.5rem; margin-bottom:.5rem; line-height:1; }
+    .hc-intro-text{
+      font-size:1.15rem; font-weight:700; color:var(--tx);
+      margin-bottom:.3rem;
+      font-family:var(--fh,var(--fm));
+    }
+    .hc-intro-sub{
+      font-size:.85rem; color:var(--tx2);
+      font-family:Georgia,serif; font-style:italic;
+    }
+    .hc-grid{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:.6rem;
+    }
+    @media (min-width:600px){
+      .hc-grid{ grid-template-columns:repeat(4, 1fr); }
+    }
+    @media (min-width:1024px){
+      .hc-grid{ grid-template-columns:repeat(6, 1fr); }
+    }
+    .hc-emotion{
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      gap:.3rem;
+      padding:1rem .5rem;
+      background:var(--card-bg);
+      border:1px solid var(--card-border);
+      border-radius:12px;
+      cursor:pointer;
+      font-family:var(--fm);
+      transition:transform .2s ease, border-color .2s ease, background .2s ease;
+      min-height:80px;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .hc-emotion:hover, .hc-emotion:focus-visible{
+      border-color:var(--p);
+      transform:translateY(-2px);
+      background:color-mix(in srgb, var(--p) 6%, transparent);
+      outline:none;
+    }
+    .hc-emoji{ font-size:1.8rem; line-height:1; }
+    .hc-label{
+      font-size:.75rem; font-weight:600; color:var(--tx);
+      line-height:1.2; text-align:center;
+    }
+
+    /* Heart Check destination — emotion response */
+    .hc-back-to-picker{
+      background:transparent;
+      border:1px solid var(--card-border);
+      border-radius:20px;
+      padding:.4rem .9rem;
+      color:var(--tx2);
+      cursor:pointer;
+      font-family:var(--fm); font-size:.8rem;
+      margin-bottom:1rem;
+      min-height:36px;
+      transition:border-color .2s ease, color .2s ease;
+    }
+    .hc-back-to-picker:hover{ border-color:var(--p); color:var(--tx); }
+    .hc-response{ max-width:540px; margin:0 auto; }
+    .hc-emoji-large{
+      font-size:4rem; text-align:center; line-height:1;
+      margin-bottom:.5rem;
+      filter:drop-shadow(0 0 16px color-mix(in srgb, var(--p) 30%, transparent));
+    }
+    .hc-headline{
+      font-family:var(--fm);
+      font-size:.85rem; font-weight:700;
+      letter-spacing:.08em;
+      color:var(--p);
+      text-align:center;
+      margin-bottom:1.5rem;
+    }
+    .hc-section{
+      background:var(--card-bg);
+      border:1px solid var(--card-border);
+      border-radius:14px;
+      padding:1.25rem;
+      margin-bottom:1rem;
+    }
+    .hc-section-label{
+      font-family:var(--fm);
+      font-size:.7rem; font-weight:700;
+      letter-spacing:.12em;
+      color:var(--tx2);
+      margin-bottom:.7rem;
+    }
+    .hc-verse{
+      font-family:Georgia,'Times New Roman',serif;
+      font-size:1.05rem; line-height:1.6;
+      color:var(--tx); font-style:italic;
+      margin:0 0 .5rem; padding:0; border:none;
+    }
+    .hc-verse-ref{
+      font-family:var(--fm);
+      font-size:.8rem; color:var(--tx2);
+      text-align:right; letter-spacing:.02em;
+    }
+    .hc-prayer{
+      font-family:Georgia,'Times New Roman',serif;
+      font-size:.95rem; line-height:1.6;
+      color:var(--tx);
+      margin-bottom:1rem;
+      font-style:italic;
+    }
+    .hc-action{
+      font-size:.95rem; line-height:1.55;
+      color:var(--tx);
+      margin-bottom:1rem;
+      font-family:var(--fm);
+    }
+    .hc-pray-btn, .hc-action-btn{
+      width:100%;
+      background:linear-gradient(135deg, var(--p), var(--c));
+      color:#fff; border:none; border-radius:10px;
+      padding:.7rem;
+      font-family:var(--fm); font-weight:700;
+      cursor:pointer; font-size:.9rem;
+      min-height:44px;
+      transition:transform .2s ease, box-shadow .2s ease;
+    }
+    .hc-pray-btn:hover:not(:disabled),
+    .hc-action-btn:hover:not(:disabled){
+      transform:translateY(-1px);
+      box-shadow:0 4px 16px color-mix(in srgb, var(--p) 30%, transparent);
+    }
+    .hc-pray-btn:disabled, .hc-action-btn:disabled{
+      cursor:default;
+      opacity:.7;
+    }
+    .hc-footer{ text-align:center; margin-top:1.5rem; }
+    .hc-more-btn{
+      background:transparent;
+      border:1px dashed var(--card-border);
+      color:var(--tx2);
+      border-radius:10px;
+      padding:.6rem 1rem;
+      font-family:var(--fm); font-size:.85rem;
+      cursor:pointer;
+      transition:border-color .2s ease, color .2s ease;
+    }
+    .hc-more-btn:hover{ border-color:var(--p); color:var(--tx); }
+    @media (prefers-reduced-motion: reduce){
+      .hc-emotion, .hc-pray-btn, .hc-action-btn,
+      .hc-back-to-picker, .hc-more-btn{
+        transition:none !important;
+      }
+    }
   </style>
 
   <!-- 2026-05-30 — Smart Welcome Back screen.
@@ -6446,6 +6619,19 @@
         <span class="fz-mb-text">
           <span class="fz-mb-title">Growth Profile</span>
           <span class="fz-mb-sub">See who you're becoming</span>
+        </span>
+        <span class="fz-mb-arrow" aria-hidden="true">→</span>
+      </button>
+      <!-- 2026-05-30 — 7th destination · Heart Check. Slightly
+           emphasized (purple-tinted gradient) since it's the
+           most emotionally heavy entry point and the one a teen
+           at 11pm might actually need most. On desktop it
+           spans the full row beneath the 6-button grid. -->
+      <button class="fz-menu-btn fz-menu-btn-heart" data-dest="heart" onclick="fzOpenDest('heart')">
+        <span class="fz-mb-icon" aria-hidden="true">💙</span>
+        <span class="fz-mb-text">
+          <span class="fz-mb-title">Heart Check</span>
+          <span class="fz-mb-sub">How are you really feeling?</span>
         </span>
         <span class="fz-mb-arrow" aria-hidden="true">→</span>
       </button>
@@ -14621,6 +14807,9 @@
      Data file must load before faith-zones.js (consumes the globals).
      Both load after faith.js since faith-zones.js cross-references
      PROOF_PROPHECY_DATA, ppOpenModal, bfTab, showToast. -->
+<!-- V1 Rebuild · Heart Check (2026-05-30) — 12 emotion entries with
+     verse + prayer + action. Pure data; read by faith-zones.js. -->
+<script src="/app/js/data/heart-check-data.js"></script>
 <script src="/app/js/data/faith-zones-data.js"></script>
 <!-- V1 Rebuild · Session 4 — Pure fun engine. 10 celebration helpers
      exposed on window (megaConfetti / screenFlash / traitExplosion /

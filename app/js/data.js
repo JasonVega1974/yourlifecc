@@ -97,6 +97,11 @@ const DEF = {
   // surface "Continue where you left off" on the welcome screen.
   faithLastVisit:0,
   faithLastDest:null,
+  // 2026-05-30 — Heart Check usage log. Each entry { key, date }
+  // where key is one of the 12 HEART_CHECK ids. Capped to the
+  // most recent 100 in faith-zones.js. Used for trait awards on
+  // prayer/action completion + future personalization.
+  heartChecks:[],
   // streak / checkin
   streak:0, lastCheckin:null, checkin:{}, customHabits:[], dailyChecks:{},
   // V1 Rebuild — Session 1 (Daily Briefing). Keyed by YYYY-MM-DD; per-day
