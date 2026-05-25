@@ -1348,10 +1348,14 @@ function renderFaithOnlyHero() {
 
   const hr = new Date().getHours();
   const greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
-  // Auth metadata is always the current user — check it before D.name which
-  // can hold a stale value from localStorage if cloudLoad hasn't finished yet.
+  // Delegate to the single source of truth (_fzFirstName) so this
+  // cinematic greeting and the Well/home greetings never diverge.
+  // _fzFirstName prefers active child profile → auth metadata → D.name.
   let name = '';
-  if (typeof _supaUser !== 'undefined' && _supaUser) {
+  if (typeof window !== 'undefined' && typeof window._fzFirstName === 'function') {
+    try { name = window._fzFirstName() || ''; } catch(_){ name = ''; }
+  }
+  if (!name && typeof _supaUser !== 'undefined' && _supaUser) {
     const meta = _supaUser.user_metadata || {};
     name = (meta.first_name || (meta.name||'').split(/\s+/)[0] ||
             (meta.full_name||'').split(/\s+/)[0] || '').trim();

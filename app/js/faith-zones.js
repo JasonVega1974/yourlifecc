@@ -1524,12 +1524,23 @@ function showWelcomeBack(){
 }
 
 function _fzFirstName(){
-  // Multi-profile FIRST: when a child profile is active, its .name is
-  // authoritative — it's set the instant switchToProfile() reassigns
-  // _activeProfileId, BEFORE D.name catches up. Without this, the
-  // greeting was reading the parent's D.name (e.g. "Jason") even
-  // after a child ("Amanda") was switched in. See parent.js:2066
-  // (switchToProfile) for the swap sequence.
+  // Resolution chain — ONE source of truth for every greeting in the app.
+  //
+  // 1. Multi-profile active child: when a child profile is active, its
+  //    .name is authoritative (set the instant switchToProfile reassigns
+  //    _activeProfileId, BEFORE D.name catches up). See parent.js:2066.
+  //
+  // 2. Current auth metadata: this is always the CURRENT signed-in user's
+  //    name from the signup form. We check it BEFORE D.name because the
+  //    cloud-synced D.name can be a stale value from a previous device or
+  //    a prior testing session — that's what caused the home greeting to
+  //    show "Jason" (the dev's name baked into D.name from cloud) while
+  //    the Enter-The-Well cinematic correctly showed "USER" from metadata.
+  //
+  // 3. D.name as a fallback (only if metadata is empty — true for
+  //    legacy accounts created before signup captured full_name).
+  //
+  // 4. Email local-part as a last resort, then 'friend'.
   try {
     if (typeof _profiles !== 'undefined' && Array.isArray(_profiles)
         && typeof _activeProfileId !== 'undefined' && _activeProfileId){
@@ -1537,12 +1548,14 @@ function _fzFirstName(){
       if (_ap && _ap.name) return String(_ap.name).split(' ')[0];
     }
   } catch(_){}
-  if (D && D.name) return String(D.name).split(' ')[0];
   if (typeof _supaUser !== 'undefined' && _supaUser){
     var meta = _supaUser.user_metadata || {};
     if (meta.first_name) return meta.first_name;
     if (meta.full_name)  return String(meta.full_name).split(' ')[0];
-    if (_supaUser.email) return _supaUser.email.split('@')[0];
+  }
+  if (D && D.name) return String(D.name).split(' ')[0];
+  if (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.email){
+    return _supaUser.email.split('@')[0];
   }
   return 'friend';
 }
