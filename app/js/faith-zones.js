@@ -1049,6 +1049,8 @@ function renderFaithZones(){
   if (!Array.isArray(D.quickPrayers)) D.quickPrayers = [];
   if (typeof D.faithExploreOpen !== 'boolean') D.faithExploreOpen = false;
   if (!Array.isArray(D.nightReflections)) D.nightReflections = [];
+  if (typeof D.faithLastVisit !== 'number') D.faithLastVisit = 0;
+  if (D.faithLastDest !== null && typeof D.faithLastDest !== 'string') D.faithLastDest = null;
 
   // 2026-05-29 — Simplified Faith Home. The wall of cards (Convince
   // Me hero + 3-4 Today cards + Growth widget) is gone; the home is
@@ -1066,6 +1068,27 @@ function renderFaithZones(){
   // menu (fzOpenDest('explore')) is the only sanctioned path to
   // show Zone 3 now.
   D.faithExploreOpen = false;
+
+  // 2026-05-30 — Smart Welcome gate. If the user is returning after
+  // a 24h+ gap, route them through the welcome screen with
+  // time-aware paths + "continue where you left off" CTA. Otherwise
+  // show the regular home view. Either way, stamp lastVisit so the
+  // next session's gate is computed from THIS visit.
+  var _nowMs = Date.now();
+  var _last  = +D.faithLastVisit || 0;
+  var _hoursAway = _last > 0 ? (_nowMs - _last) / (1000 * 60 * 60) : 0;
+  var _isReturner = _last > 0 && _hoursAway >= 24;
+  D.faithLastVisit = _nowMs;
+  if (typeof save === 'function') save();
+  if (_isReturner){
+    showWelcomeBack();
+    renderFaithExploreToggle();
+    var _z3w = document.getElementById('fzZone3Wrap');
+    if (_z3w) _z3w.style.display = 'none';
+    updateReflectFloatVisibility();
+    return;
+  }
+
   renderFzGreeting();
   renderFaithExploreToggle();
   // Belt + suspenders — directly hide the wrap in case render didn't.
@@ -1142,6 +1165,10 @@ function fzOpenDest(dest){
   // can't be safely cloned or moved. Just toggle the existing
   // collapse, scroll to it, and stay on the home view.
   if (dest === 'explore'){
+    if (D){
+      D.faithLastDest = 'explore';
+      if (typeof save === 'function') save();
+    }
     if (typeof toggleFaithExplore === 'function') toggleFaithExplore(true);
     setTimeout(function(){
       var wrap = document.getElementById('fzZone3Wrap');
@@ -1151,6 +1178,12 @@ function fzOpenDest(dest){
   }
 
   _fzCurrentDest = dest;
+  // 2026-05-30 — track lastDest so the next 24h+ welcome screen
+  // can offer "Continue where you left off".
+  if (D){
+    D.faithLastDest = dest;
+    if (typeof save === 'function') save();
+  }
   home.style.display = 'none';
   destEl.style.display = '';
   bodyEl.innerHTML = '';
@@ -1356,6 +1389,178 @@ if (typeof document !== 'undefined'){
   }, { passive:true });
 }
 
+// ════════════════════════════════════════════════════════════
+// 2026-05-30 — Smart Welcome Back (24h+ returners)
+// renderFaithZones() gates here when (Date.now() - faithLastVisit)
+// crosses 24 hours. Surfaces a time-aware greeting, an optional
+// "Continue {lastDest}" CTA, 3 paths tuned to the current hour,
+// and a "Just browsing" escape that drops to the regular home.
+// ════════════════════════════════════════════════════════════
+
+function showWelcomeBack(){
+  if (typeof document === 'undefined') return;
+  var home = document.getElementById('fzHome');
+  var dest = document.getElementById('fzDest');
+  var z3   = document.getElementById('fzZone3Wrap');
+  var welc = document.getElementById('fzWelcome');
+  if (home) home.style.display = 'none';
+  if (dest) dest.style.display = 'none';
+  if (z3)   z3.style.display   = 'none';
+  if (!welc) return;
+  welc.style.display = 'block';
+  renderWelcomeGreeting();
+  renderContinueOption();
+  renderTimeAwarePaths();
+}
+
+function _fzFirstName(){
+  if (D && D.name) return String(D.name).split(' ')[0];
+  if (typeof _supaUser !== 'undefined' && _supaUser){
+    var meta = _supaUser.user_metadata || {};
+    if (meta.first_name) return meta.first_name;
+    if (meta.full_name)  return String(meta.full_name).split(' ')[0];
+    if (_supaUser.email) return _supaUser.email.split('@')[0];
+  }
+  return 'friend';
+}
+
+function renderWelcomeGreeting(){
+  if (typeof document === 'undefined') return;
+  var el = document.getElementById('fzWelcomeGreeting');
+  if (!el) return;
+  var h = new Date().getHours();
+  var part = (h < 5)  ? 'late night'
+           : (h < 12) ? 'morning'
+           : (h < 17) ? 'afternoon'
+           : (h < 21) ? 'evening'
+           : 'night';
+  var name = _fzFirstName();
+  var streak = 0;
+  if (D){
+    streak = (typeof D.faithCuriosityStreak === 'number' && D.faithCuriosityStreak > 0)
+      ? D.faithCuriosityStreak
+      : ((typeof getScriptureStreak === 'function')
+          ? (getScriptureStreak() || 0)
+          : ((typeof D.streak === 'number') ? D.streak : 0));
+  }
+  var last = (D && +D.faithLastVisit) || 0;
+  var daysAway = last ? Math.floor((Date.now() - last) / (24 * 60 * 60 * 1000)) : 0;
+  var comeback;
+  if (daysAway <= 1)      comeback = "Glad you're back.";
+  else if (daysAway <= 3) comeback = "Good to see you again.";
+  else if (daysAway <= 7) comeback = "Welcome back. We missed you.";
+  else                    comeback = "Welcome back — it's been a while.";
+  var streakLine = streak > 0
+    ? '<div class="fz-welcome-streak">🔥 ' + streak + ' day streak</div>'
+    : '';
+  el.innerHTML =
+    '<div class="fz-welcome-greeting">Good ' + part + ', ' + _fzEsc(name) + ' 👋</div>' +
+    '<div class="fz-welcome-sub">' + _fzEsc(comeback) + '</div>' +
+    streakLine;
+}
+
+var _FZ_CONTINUE_LABELS = {
+  mystery:  { emoji:'✝️',  text:"Continue Today's Mystery"  },
+  prayer:   { emoji:'🙏',  text:"Continue your prayers"     },
+  reallife: { emoji:'🌍',  text:"Continue your Real Life Win"},
+  reflect:  { emoji:'🌙',  text:"Continue Night Reflection" },
+  growth:   { emoji:'✦',   text:"Check your Growth"         },
+  explore:  { emoji:'📖',  text:"Continue exploring"        }
+};
+
+function renderContinueOption(){
+  if (typeof document === 'undefined') return;
+  var wrap = document.getElementById('fzWelcomeContinue');
+  var txt  = document.getElementById('fzContinueText');
+  if (!wrap || !txt) return;
+  var lastDest = D && D.faithLastDest;
+  if (lastDest && _FZ_CONTINUE_LABELS[lastDest]){
+    var d = _FZ_CONTINUE_LABELS[lastDest];
+    txt.innerHTML = '<span class="fz-continue-emoji">' + _fzEsc(d.emoji) +
+                    '</span>' + _fzEsc(d.text);
+    wrap.style.display = 'block';
+    wrap.dataset.dest = lastDest;
+  } else {
+    wrap.style.display = 'none';
+    delete wrap.dataset.dest;
+  }
+}
+
+// 4 time bands tuned to natural rhythms of the day. Each band
+// surfaces 3 paths that fit the moment. Edge cases (e.g. user
+// hits the page at 04:59) are absorbed into the night band.
+function renderTimeAwarePaths(){
+  if (typeof document === 'undefined') return;
+  var el = document.getElementById('fzWelcomePaths');
+  if (!el) return;
+  var h = new Date().getHours();
+  var paths;
+  if (h >= 5 && h < 11){
+    // MORNING — start the day with God
+    paths = [
+      { emoji:'✝️', title:"Start with today's mystery", sub:'A question to think on',    dest:'mystery'  },
+      { emoji:'📖', title:'Open the Bible',             sub:'Daily reading or devotional', dest:'explore'  },
+      { emoji:'🙏', title:'Pray over your day',         sub:'One breath of prayer',      dest:'prayer'   }
+    ];
+  } else if (h >= 11 && h < 17){
+    // MIDDAY — keep momentum
+    paths = [
+      { emoji:'🌍', title:'Do a Real Life Win',         sub:'One action, off your phone', dest:'reallife' },
+      { emoji:'✝️', title:"Today's mystery",            sub:'Quick curiosity hit',        dest:'mystery'  },
+      { emoji:'🙏', title:'Quick prayer',               sub:"What's on your heart?",      dest:'prayer'   }
+    ];
+  } else if (h >= 17 && h < 21){
+    // EVENING — pause and connect
+    paths = [
+      { emoji:'🙏', title:'Quick prayer',               sub:'Talk to God',                dest:'prayer'   },
+      { emoji:'✝️', title:'A mystery to ponder',        sub:"Tonight's question",         dest:'mystery'  },
+      { emoji:'✦',  title:'See your growth',            sub:"Who you're becoming",        dest:'growth'   }
+    ];
+  } else {
+    // NIGHT (21:00 - 04:59) — wind down
+    paths = [
+      { emoji:'🌙', title:'Night reflection',           sub:'How was today?',             dest:'reflect'  },
+      { emoji:'🙏', title:'Quick prayer before bed',    sub:'Hand it over',               dest:'prayer'   },
+      { emoji:'✝️', title:'A quiet mystery',            sub:'Sit with one thought',       dest:'mystery'  }
+    ];
+  }
+  el.innerHTML = paths.map(function(p){
+    return '<button class="fz-welcome-path" onclick="fzWelcomePath(\'' + p.dest + '\')">' +
+             '<span class="fz-welcome-path-emoji" aria-hidden="true">' + _fzEsc(p.emoji) + '</span>' +
+             '<span class="fz-welcome-path-text">' +
+               '<span class="fz-welcome-path-title">' + _fzEsc(p.title) + '</span>' +
+               '<span class="fz-welcome-path-sub">' + _fzEsc(p.sub) + '</span>' +
+             '</span>' +
+             '<span class="fz-welcome-path-arrow" aria-hidden="true">→</span>' +
+           '</button>';
+  }).join('');
+}
+
+function fzWelcomeContinue(){
+  var wrap = document.getElementById('fzWelcomeContinue');
+  var dest = wrap && wrap.dataset && wrap.dataset.dest;
+  if (!dest) return;
+  _fzHideWelcomeShowHome();
+  setTimeout(function(){ fzOpenDest(dest); }, 100);
+}
+
+function fzWelcomePath(dest){
+  _fzHideWelcomeShowHome();
+  setTimeout(function(){ fzOpenDest(dest); }, 100);
+}
+
+function fzWelcomeBrowse(){
+  _fzHideWelcomeShowHome();
+  renderFzGreeting();
+}
+
+function _fzHideWelcomeShowHome(){
+  var w = document.getElementById('fzWelcome');
+  var h = document.getElementById('fzHome');
+  if (w) w.style.display = 'none';
+  if (h) h.style.display = '';
+}
+
 // Expose for non-module callers (init.js, ui.js, faith.js, onclick attrs).
 if (typeof window !== 'undefined'){
   window.fzOpenDest        = fzOpenDest;
@@ -1363,6 +1568,20 @@ if (typeof window !== 'undefined'){
   window.fzCompleteRLW     = fzCompleteRLW;
   window.renderFzGreeting  = renderFzGreeting;
   window.renderGrowthFull  = renderGrowthFull;
+  window.fzWelcomeContinue = fzWelcomeContinue;
+  window.fzWelcomePath     = fzWelcomePath;
+  window.fzWelcomeBrowse   = fzWelcomeBrowse;
+  window.showWelcomeBack   = showWelcomeBack;
+  // Dev aid — call testWelcome() in DevTools to force-show the
+  // welcome screen without waiting 24 hours for the gate to trip.
+  // Spoofs faithLastVisit to 25h ago + faithLastDest to mystery.
+  window.testWelcome = function(){
+    if (typeof D === 'undefined' || !D) return;
+    D.faithLastVisit = Date.now() - (25 * 60 * 60 * 1000);
+    D.faithLastDest  = D.faithLastDest || 'mystery';
+    if (typeof save === 'function') save();
+    showWelcomeBack();
+  };
 }
 
 if (typeof document !== 'undefined'){

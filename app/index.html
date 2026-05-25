@@ -6192,7 +6192,196 @@
     @media (prefers-reduced-motion: reduce){
       .fz-growth-fill{ transition:none !important; }
     }
+
+    /* ── 2026-05-30 — Smart Welcome Back screen ──
+       Shown only for 24h+ returners. Time-aware greeting + optional
+       "continue where you left off" + 3 contextual paths + browse
+       escape hatch. All colors thread through theme tokens. */
+    #fzWelcome{
+      padding:1rem 0;
+      max-width:480px;
+      margin:0 auto;
+      animation:welcomeFadeIn .5s ease;
+    }
+    @keyframes welcomeFadeIn{
+      from{ opacity:0; transform:translateY(10px); }
+      to  { opacity:1; transform:translateY(0); }
+    }
+    .fz-welcome-greeting{
+      font-family:var(--fh,var(--fm));
+      font-size:1.5rem; font-weight:700;
+      color:var(--tx); text-align:center;
+      margin-bottom:.3rem; line-height:1.2;
+    }
+    .fz-welcome-sub{
+      font-size:.95rem; color:var(--tx2);
+      text-align:center; margin-bottom:1rem;
+      font-family:var(--fm);
+    }
+    .fz-welcome-streak{
+      display:block; width:max-content;
+      margin:0 auto 1.5rem;
+      font-family:var(--fm);
+      font-size:.85rem; font-weight:700;
+      color:#ff7a3d;
+      background:color-mix(in srgb, #ff7a3d 12%, transparent);
+      padding:.35rem .7rem; border-radius:20px;
+    }
+    .fz-welcome-label{
+      font-family:var(--fm);
+      font-size:.7rem; font-weight:700;
+      letter-spacing:.12em;
+      color:var(--tx2);
+      margin:.5rem 0 .6rem; text-align:center;
+    }
+    .fz-welcome-continue{
+      display:flex; align-items:center; justify-content:space-between;
+      width:100%;
+      background:linear-gradient(135deg, var(--p), var(--c));
+      color:#fff; border:none; border-radius:14px;
+      padding:1.1rem 1.2rem;
+      font-family:var(--fm); font-size:1.05rem; font-weight:700;
+      cursor:pointer;
+      margin-bottom:1.5rem; min-height:48px;
+      box-shadow:0 4px 16px color-mix(in srgb, var(--p) 30%, transparent);
+      transition:transform .2s ease, box-shadow .2s ease;
+    }
+    .fz-welcome-continue:hover{
+      transform:translateY(-2px);
+      box-shadow:0 8px 24px color-mix(in srgb, var(--p) 50%, transparent);
+    }
+    .fz-welcome-continue:active{ transform:translateY(0); }
+    .fz-continue-emoji{ font-size:1.3rem; margin-right:.5rem; }
+    .fz-welcome-continue-arrow{ font-size:1.3rem; opacity:.8; }
+    .fz-welcome-or{
+      font-family:var(--fm);
+      font-size:.7rem; font-weight:700;
+      letter-spacing:.12em;
+      color:var(--tx2);
+      text-align:center;
+      margin:.5rem 0 .8rem;
+      position:relative;
+    }
+    .fz-welcome-or::before,
+    .fz-welcome-or::after{
+      content:''; position:absolute; top:50%;
+      width:30%; height:1px;
+      background:var(--card-border);
+    }
+    .fz-welcome-or::before{ left:0; }
+    .fz-welcome-or::after { right:0; }
+    #fzWelcomePaths{
+      display:flex; flex-direction:column; gap:.6rem;
+      margin-bottom:1.5rem;
+    }
+    .fz-welcome-path{
+      display:flex; align-items:center; gap:.85rem;
+      width:100%;
+      background:var(--card-bg);
+      border:1px solid var(--card-border);
+      border-radius:12px;
+      padding:.9rem 1rem;
+      font-family:var(--fm);
+      text-align:left; cursor:pointer;
+      min-height:60px;
+      transition:transform .2s ease, border-color .2s ease, background .2s ease;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .fz-welcome-path:hover, .fz-welcome-path:focus-visible{
+      border-color:var(--p);
+      transform:translateX(2px);
+      background:color-mix(in srgb, var(--p) 6%, transparent);
+      outline:none;
+    }
+    .fz-welcome-path-emoji{
+      font-size:1.6rem; flex-shrink:0; line-height:1;
+    }
+    .fz-welcome-path-text{
+      flex:1; display:flex; flex-direction:column; min-width:0;
+    }
+    .fz-welcome-path-title{
+      font-size:.95rem; font-weight:700; color:var(--tx);
+    }
+    .fz-welcome-path-sub{
+      font-size:.75rem; color:var(--tx2); margin-top:.15rem;
+    }
+    .fz-welcome-path-arrow{
+      color:var(--p); font-size:1.1rem; flex-shrink:0;
+    }
+    .fz-welcome-browse{
+      display:block; width:100%;
+      background:transparent;
+      border:1px dashed var(--card-border);
+      color:var(--tx2);
+      border-radius:10px;
+      padding:.75rem;
+      font-family:var(--fm); font-size:.85rem;
+      cursor:pointer;
+      transition:border-color .2s ease, color .2s ease;
+      margin-top:.5rem;
+    }
+    .fz-welcome-browse:hover{ border-color:var(--p); color:var(--tx); }
+
+    /* Desktop welcome layout — wider container + 3-column paths grid. */
+    @media (min-width:1024px){
+      #fzWelcome{ max-width:900px; }
+      .fz-welcome-greeting{ font-size:2rem; }
+      .fz-welcome-sub{ font-size:1.1rem; }
+      #fzWelcomePaths{
+        display:grid;
+        grid-template-columns:repeat(3, 1fr);
+        gap:1rem;
+      }
+      .fz-welcome-path{
+        padding:1.2rem 1.1rem;
+        flex-direction:column;
+        align-items:flex-start;
+        text-align:left;
+      }
+      .fz-welcome-path-arrow{ align-self:flex-end; margin-top:-1.2rem; }
+      .fz-welcome-path-emoji{ font-size:2rem; }
+      .fz-welcome-path-title{ font-size:1rem; }
+    }
+    @media (prefers-reduced-motion: reduce){
+      #fzWelcome{ animation:none; }
+      .fz-welcome-continue, .fz-welcome-path, .fz-welcome-browse{
+        transition:none !important;
+      }
+    }
   </style>
+
+  <!-- 2026-05-30 — Smart Welcome Back screen.
+       Shown only when the user enters the faith section after a
+       24h+ gap (D.faithLastVisit). Surfaces:
+         • Time-aware greeting + back-after-N-days copy + streak chip
+         • "Continue where you left off" (if D.faithLastDest set)
+         • 3 time-of-day-appropriate paths (morning/midday/evening/night)
+         • "Just browsing" escape hatch that drops them on the
+           regular 6-button home.
+       For < 24h returners renderFaithZones() skips this and goes
+       straight to #fzHome. Rendered/wired by faith-zones.js
+       (showWelcomeBack + renderWelcomeGreeting + renderContinueOption
+       + renderTimeAwarePaths + fzWelcomeContinue/Path/Browse).
+  -->
+  <div id="fzWelcome" style="display:none;">
+    <div id="fzWelcomeGreeting"></div>
+
+    <div id="fzWelcomeContinue" style="display:none;">
+      <div class="fz-welcome-label">PICK UP WHERE YOU LEFT OFF</div>
+      <button class="fz-welcome-continue" onclick="fzWelcomeContinue()">
+        <span id="fzContinueText"></span>
+        <span class="fz-welcome-continue-arrow" aria-hidden="true">→</span>
+      </button>
+    </div>
+
+    <div class="fz-welcome-or" id="fzWelcomeOr">OR START SOMETHING NEW</div>
+
+    <div id="fzWelcomePaths"></div>
+
+    <button class="fz-welcome-browse" onclick="fzWelcomeBrowse()">
+      🧭 Just browsing — show me everything
+    </button>
+  </div>
 
   <!-- 2026-05-29 — Simplified Faith Home.
        Replaces the previous Zone 1 (Convince Me hero) + Zone 2 (Today

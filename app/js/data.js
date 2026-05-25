@@ -89,6 +89,14 @@ const DEF = {
   // Stored as accumulated XP points; getTraitLevel() in traits.js
   // derives the [0..4] level using TRAIT_THRESHOLDS = [0,50,150,350,700].
   traits:{},
+  // 2026-05-30 — Smart Welcome state. faithLastVisit is the ms
+  // timestamp of the last time the user entered the faith section;
+  // renderFaithZones uses it to decide whether to show the
+  // welcome-back overlay (24h+ gap) or the regular home view.
+  // faithLastDest is the last destination they opened, used to
+  // surface "Continue where you left off" on the welcome screen.
+  faithLastVisit:0,
+  faithLastDest:null,
   // streak / checkin
   streak:0, lastCheckin:null, checkin:{}, customHabits:[], dailyChecks:{},
   // V1 Rebuild — Session 1 (Daily Briefing). Keyed by YYYY-MM-DD; per-day
