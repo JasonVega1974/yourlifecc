@@ -1526,26 +1526,28 @@ function showWelcomeBack(){
 function _fzFirstName(){
   // Resolution chain — ONE source of truth for every greeting in the app.
   //
-  // 1. Multi-profile active child: when a child profile is active, its
-  //    .name is authoritative (set the instant switchToProfile reassigns
-  //    _activeProfileId, BEFORE D.name catches up). See parent.js:2066.
+  // 1. Active CHILD profile: when a kid is using a child slot on the
+  //    family parent's account, their child profile name is what we
+  //    want to greet (e.g. "Amanda") — NOT the parent's auth metadata
+  //    ("Jason Vega"). We explicitly check isParent === false; an
+  //    active PARENT profile falls through to auth metadata below.
   //
-  // 2. Current auth metadata: this is always the CURRENT signed-in user's
-  //    name from the signup form. We check it BEFORE D.name because the
-  //    cloud-synced D.name can be a stale value from a previous device or
-  //    a prior testing session — that's what caused the home greeting to
-  //    show "Jason" (the dev's name baked into D.name from cloud) while
-  //    the Enter-The-Well cinematic correctly showed "USER" from metadata.
+  // 2. Current auth metadata: the live signed-in user's name from the
+  //    signup form. Always preferred over D.name because D.name can be
+  //    a stale cloud-synced value from a prior testing session (this
+  //    is what was making the home greeting show "Jason" for a user
+  //    whose signup name was different).
   //
-  // 3. D.name as a fallback (only if metadata is empty — true for
-  //    legacy accounts created before signup captured full_name).
+  // 3. D.name (fallback for legacy accounts where metadata is empty).
   //
-  // 4. Email local-part as a last resort, then 'friend'.
+  // 4. Email local-part, then 'friend'.
   try {
     if (typeof _profiles !== 'undefined' && Array.isArray(_profiles)
         && typeof _activeProfileId !== 'undefined' && _activeProfileId){
       var _ap = _profiles.find(function(p){ return p && p.id === _activeProfileId; });
-      if (_ap && _ap.name) return String(_ap.name).split(' ')[0];
+      if (_ap && _ap.isParent === false && _ap.name){
+        return String(_ap.name).split(' ')[0];
+      }
     }
   } catch(_){}
   if (typeof _supaUser !== 'undefined' && _supaUser){
