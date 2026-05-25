@@ -1000,17 +1000,75 @@
   :root.light .db-tile:hover{ background:#fff; }
   :root.light .db-tile-check{ border-color:rgba(15,23,42,.22); }
   :root.light .db-trait{ border-top-color:rgba(15,23,42,.08); }
+
+  /* 2026-05-30 — Main App Home shell. Reuses the faith home's
+     .fz-menu-btn / .fz-greet-* / .fz-streak classes (those are
+     document-scoped from the #s-scripture style block so they
+     apply globally). Only adds the #appHome container, the
+     menu label, and the desktop grid breakpoints. */
+  #appHome{
+    padding:1rem 0;
+    max-width:480px;
+    margin:0 auto;
+  }
+  #appDailyBriefingWrap{ margin-bottom:.5rem; }
+  .app-menu-label{
+    font-family:var(--fm);
+    font-size:.75rem; font-weight:700;
+    letter-spacing:.12em;
+    color:var(--tx2);
+    margin:1.5rem 0 .7rem;
+    text-align:center;
+  }
+  #appMenu{ display:flex; flex-direction:column; gap:.75rem; }
+  @media (min-width:600px) and (max-width:1023px){
+    #appMenu{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  }
+  @media (min-width:1024px){
+    #appHome{ max-width:1100px; }
+    #appMenu{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:1.25rem;
+      max-width:1100px;
+      margin:0 auto;
+    }
+    /* The Well button (.fz-menu-btn-heart) takes the full third
+       row on desktop — same emphasis pattern as faith home. */
+    #appMenu .fz-menu-btn-heart{
+      grid-column:1 / -1;
+      flex-direction:row;
+      justify-content:center;
+      text-align:center;
+    }
+  }
 </style>
 
 <!-- ════════════ HERO ════════════════════════════════════════ -->
 <section id="s-hero" class="sec active">
 
+  <!-- ════════════════════════════════════════════════════════════
+       2026-05-30 — Main App Home simplification.
+       Mirrors the simplified Faith Home pattern (#fzHome): greeting
+       chip + the existing Daily Briefing card + 6 destination
+       buttons that route to the existing top-level sections via
+       showSection(). The 958 lines of legacy hero content (legacy
+       greeting / quick actions / quick stats / 15-tile dashboard
+       behind "See full stats") are PRESERVED IN PLACE but wrapped
+       in a hidden #appLegacyHero div below, so init.js / chores.js
+       / faith.js writes that target legacy IDs (heroQsStreak,
+       heroAlertsStrip, heroFullStats, etc.) still resolve cleanly.
+       Rendered/wired by app/js/app-home.js (renderAppGreeting +
+       appOpenDest router).
+       ════════════════════════════════════════════════════════════ -->
+  <div id="appHome">
+    <div id="appGreeting"></div>
+    <div id="appDailyBriefingWrap">
+
   <!-- V1 REBUILD · Session 1 — Daily Briefing card. Top of home, above
        every other hero block. Rendered + wired in app/js/daily-briefing.js.
        Hidden for parent-view and faith-free flows (the module bails out
-       on either). Legacy #heroGreeting / #heroQuickStats stay below per
-       the spec's "this is additive, not a replacement" instruction —
-       Session 5 (progressive disclosure) will reconcile the duplication. -->
+       on either). -->
   <div id="dailyBriefingCard" style="display:none;">
     <div class="db-greeting">
       <span id="dbGreetTime">Good morning</span>,
@@ -1058,6 +1116,75 @@
     <div class="db-complete" id="dbComplete" style="display:none;">Day complete! 🎉</div>
   </div>
 
+    </div><!-- /#appDailyBriefingWrap -->
+
+    <div class="app-menu-label">WHAT DO YOU WANT TO DO?</div>
+
+    <div id="appMenu">
+      <button class="fz-menu-btn" data-dest="habits" onclick="appOpenDest('habits')">
+        <span class="fz-mb-icon" aria-hidden="true">⚡</span>
+        <span class="fz-mb-text">
+          <span class="fz-mb-title">Habits</span>
+          <span class="fz-mb-sub">Build the small daily wins</span>
+        </span>
+        <span class="fz-mb-arrow" aria-hidden="true">→</span>
+      </button>
+      <button class="fz-menu-btn" data-dest="chores" onclick="appOpenDest('chores')">
+        <span class="fz-mb-icon" aria-hidden="true">📋</span>
+        <span class="fz-mb-text">
+          <span class="fz-mb-title">Chores</span>
+          <span class="fz-mb-sub">Today's tasks and family duties</span>
+        </span>
+        <span class="fz-mb-arrow" aria-hidden="true">→</span>
+      </button>
+      <button class="fz-menu-btn" data-dest="goals" onclick="appOpenDest('goals')">
+        <span class="fz-mb-icon" aria-hidden="true">🎯</span>
+        <span class="fz-mb-text">
+          <span class="fz-mb-title">Goals</span>
+          <span class="fz-mb-sub">What you're building toward</span>
+        </span>
+        <span class="fz-mb-arrow" aria-hidden="true">→</span>
+      </button>
+      <button class="fz-menu-btn" data-dest="money" onclick="appOpenDest('money')">
+        <span class="fz-mb-icon" aria-hidden="true">💰</span>
+        <span class="fz-mb-text">
+          <span class="fz-mb-title">Money</span>
+          <span class="fz-mb-sub">Track, save, and grow</span>
+        </span>
+        <span class="fz-mb-arrow" aria-hidden="true">→</span>
+      </button>
+      <button class="fz-menu-btn" data-dest="skills" onclick="appOpenDest('skills')">
+        <span class="fz-mb-icon" aria-hidden="true">🧠</span>
+        <span class="fz-mb-text">
+          <span class="fz-mb-title">Skills</span>
+          <span class="fz-mb-sub">Learn one new thing</span>
+        </span>
+        <span class="fz-mb-arrow" aria-hidden="true">→</span>
+      </button>
+      <button class="fz-menu-btn fz-menu-btn-heart" data-dest="faith" onclick="appOpenDest('faith')">
+        <span class="fz-mb-icon" aria-hidden="true">✝️</span>
+        <span class="fz-mb-text">
+          <span class="fz-mb-title">The Well</span>
+          <span class="fz-mb-sub">Faith, prayer, and growth</span>
+        </span>
+        <span class="fz-mb-arrow" aria-hidden="true">→</span>
+      </button>
+    </div>
+  </div><!-- /#appHome -->
+
+  <!-- ════════════════════════════════════════════════════════════
+       2026-05-30 — Legacy hero content wrapper.
+       Everything that USED to fill s-hero before the new home
+       (#heroGreeting / #heroQuickActions / #heroQuickStats /
+       #childDashContent → #heroAlertsStrip / #heroHeadline /
+       #heroMicroStats / #heroFullStats / #heroParentNotes ...) is
+       hidden inside this wrapper. The markup stays in the DOM so
+       init.js, chores.js, faith.js, and parent.js writes that
+       target these IDs still find their targets and no-op silently
+       instead of erroring. One-line revert: remove the wrap div
+       and the legacy content is back.
+       ════════════════════════════════════════════════════════════ -->
+  <div id="appLegacyHero" style="display:none;" aria-hidden="true">
 
   <!-- Phase B-Lite session 2: parentWelcomeCard + parentHomeContent removed.
        Parent accounts route directly to s-parent (init.js:328-343, Greenlight
@@ -1957,6 +2084,8 @@
   <span id="heroSavingsGoals" style="display:none;"></span>
 
   </div><!-- /childDashContent -->
+
+  </div><!-- /#appLegacyHero -->
 </section>
 
 
@@ -14802,6 +14931,12 @@
      after streaks.js (uses getScriptureStreak) and before init.js (which
      calls renderDailyBriefing during finishInit). -->
 <script src="/app/js/daily-briefing.js"></script>
+
+<!-- 2026-05-30 — Main App Home simplification. Greeting + 6 destination
+     buttons. Routes via showSection() to the existing top-level sections
+     (s-habits / s-chores / s-goals / s-finance / s-skills / s-scripture).
+     Loads after daily-briefing.js so its DOM target is in place. -->
+<script src="/app/js/app-home.js"></script>
 
 <!-- V1 Rebuild · Faith Tab redesign — Zone 1/2/3 data + render module.
      Data file must load before faith-zones.js (consumes the globals).

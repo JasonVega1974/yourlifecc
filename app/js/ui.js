@@ -1772,6 +1772,12 @@ function showSection(id, fromMobile){
   if(id==='s-hero' && typeof renderDailyBriefing === 'function'){
     setTimeout(renderDailyBriefing, 30);
   }
+  // 2026-05-30 — Main App Home simplification. Refresh the greeting
+  // + parent/faith-free visibility every time the user lands on
+  // s-hero so the streak/time-of-day stay current.
+  if(id==='s-hero' && typeof maybeRenderAppHome === 'function'){
+    setTimeout(maybeRenderAppHome, 30);
+  }
   // V1 Rebuild · Faith Tab redesign — refresh the 3 zones whenever the
   // user enters the Well so today's challenge / mood / curiosity streak
   // are current.
