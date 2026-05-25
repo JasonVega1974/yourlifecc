@@ -1047,6 +1047,17 @@
 <!-- ════════════ HERO ════════════════════════════════════════ -->
 <section id="s-hero" class="sec active">
 
+  <!-- 2026-05-30 — Faith-only "Enter The Well" cinematic hero.
+       MOVED to the top of #s-hero (outside the new home + outside the
+       legacy hero wrap) so faith-free users see it. renderFaithOnlyHero()
+       in init.js populates this when window._faithFree is true; it stays
+       display:none for every other flow. The 600-line .fo-hero style
+       block lives further down inside #appLegacyHero — that's fine,
+       CSS in <style> tags applies document-wide regardless of where it
+       sits. The fix was just the element itself, which had been
+       wrapped in display:none. -->
+  <div id="faithHeroCinematic" style="display:none;"></div>
+
   <!-- ════════════════════════════════════════════════════════════
        2026-05-30 — Main App Home simplification.
        Mirrors the simplified Faith Home pattern (#fzHome): greeting
@@ -1760,7 +1771,14 @@
       .fo-gl,.fo-title-1,.fo-title-2,.fo-hero-sub,.fo-hero-cta{opacity:1 !important;}
     }
   </style>
-  <div id="faithHeroCinematic" style="display:none;"></div>
+  <!-- 2026-05-30 — #faithHeroCinematic was MOVED OUT of this position
+       up to be a sibling of #appHome (just inside <section id="s-hero">).
+       Reason: the legacy hero wrap (display:none) was a hidden ancestor
+       of this element, so renderFaithOnlyHero() in init.js wrote the
+       Enter The Well scene into a node nobody could see → faith-free
+       users had a totally blank home. The CSS in the <style> block
+       above is document-scoped so it keeps working regardless of where
+       the element sits. -->
 
   <!-- Greeting card — time-of-day + first name resolved in init.js
        renderHeroGreeting() from D.name → _supaUser metadata → email
