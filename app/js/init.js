@@ -1668,15 +1668,25 @@ function renderHeroGreeting(){
   if(!tEl || !nEl) return;
   const hr = new Date().getHours();
   tEl.textContent = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
-  let name = (typeof D !== 'undefined' && D && D.name) ? String(D.name).trim() : '';
-  if(!name && typeof _supaUser !== 'undefined' && _supaUser){
-    const meta = _supaUser.user_metadata || {};
-    name = (meta.first_name
-         || (meta.name || '').split(/\s+/)[0]
-         || (meta.full_name || '').split(/\s+/)[0]
-         || '').trim();
-    if(!name && _supaUser.email){
-      name = String(_supaUser.email).split('@')[0].split(/[.+_-]/)[0];
+  // Delegate to the single source of truth in faith-zones.js so every
+  // greeting in the app — Daily Briefing, app-home, faith, and this
+  // legacy hero — resolves to the SAME name (active profile first,
+  // then D.name, then auth metadata).
+  let name = '';
+  if (typeof window !== 'undefined' && typeof window._fzFirstName === 'function') {
+    try { name = window._fzFirstName() || ''; } catch(_){ name = ''; }
+  }
+  if(!name){
+    name = (typeof D !== 'undefined' && D && D.name) ? String(D.name).trim() : '';
+    if(!name && typeof _supaUser !== 'undefined' && _supaUser){
+      const meta = _supaUser.user_metadata || {};
+      name = (meta.first_name
+           || (meta.name || '').split(/\s+/)[0]
+           || (meta.full_name || '').split(/\s+/)[0]
+           || '').trim();
+      if(!name && _supaUser.email){
+        name = String(_supaUser.email).split('@')[0].split(/[.+_-]/)[0];
+      }
     }
   }
   if(!name) name = 'friend';

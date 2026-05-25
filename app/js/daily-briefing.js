@@ -31,6 +31,16 @@ function _dbTimeOfDay() {
 }
 
 function _dbFirstName() {
+  // Delegate to the single source of truth (_fzFirstName in faith-zones.js)
+  // so the Daily Briefing greeting, the app-home greeting, and the faith
+  // greeting all resolve to the SAME name. _fzFirstName checks the active
+  // child profile first — without that, this card was showing the parent
+  // account name ("Jason") while the faith greeting correctly showed the
+  // active child ("Amanda"). Local fallback covers the early-boot window
+  // before faith-zones.js attaches the global.
+  if (typeof window !== 'undefined' && typeof window._fzFirstName === 'function') {
+    try { return window._fzFirstName(); } catch(_){}
+  }
   if (typeof D !== 'undefined' && D && D.name) {
     return String(D.name).split(' ')[0];
   }
