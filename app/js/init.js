@@ -304,7 +304,7 @@ function applyAgeBracketSections(bracket){
   });
 }
 
-function finishInit(cloudReady){
+async function finishInit(cloudReady){
   if(_appInitialized) return;
   _appInitialized = true;
   if(D.sections){
@@ -371,7 +371,11 @@ function finishInit(cloudReady){
   applyChildAvatar();
   renderVerse();
   startVerseAutoRotation();
-  if(typeof maybeShowOnboarding === 'function') maybeShowOnboarding();
+  // Awaited so the wizard never flashes for a returning user — the
+  // ~100-300ms Supabase read is cheaper than the trust cost of showing
+  // the overlay to someone who already finished it
+  // (see feedback_ux_trust_over_perf.md).
+  if(typeof maybeShowOnboarding === 'function') await maybeShowOnboarding();
   if(typeof startSessionTimer === 'function') startSessionTimer();
   setTimeout(function(){ if(_supaUser) cloudSync(); }, 1500);
   buildCheckins();
@@ -1802,6 +1806,19 @@ let _onbInterests = [];
 let _onbFaith = 'yes';
 let _onbReminder = 'on';
 
+// Wizard step 2 collects an age BRACKET string ('12_14' / '15_17' /
+// '18_22' / 'parent'). The new profiles.age column is INTEGER. We map
+// brackets to a representative integer for the column; 'parent' maps
+// to null since a parent shouldn't get a teen's int. The full bracket
+// string still goes into profiles.age_bracket (existing TEXT column
+// still read by api/faith-register.js).
+const AGE_BRACKET_TO_INT = {
+  '12_14': 13,
+  '15_17': 16,
+  '18_22': 20,
+  'parent': null,
+};
+
 // Supabase-first onboarding gate. The wizard must NEVER flash for a user
 // who has already completed it — see feedback_ux_trust_over_perf.md for
 // why we eat ~100-300ms of boot delay rather than race a timeout.
@@ -1827,18 +1844,22 @@ async function maybeShowOnboarding(){
   }
 
   // 2. Block on Supabase. The wizard overlay stays display:none until we
-  //    know for sure whether to render it.
+  //    know for sure whether to render it. Pulls first_name + age too so
+  //    we can mirror them to D for offline consistency (Safari localStorage
+  //    wipe scenario — Supabase becomes the source of truth on next boot).
   let supabaseSaysCompleted = null; // null = unknown (read failed)
+  let supabaseProfile = null;
   try {
     const supa = (typeof getSupabase === 'function') ? getSupabase() : null;
     if(supa && typeof _supaUser !== 'undefined' && _supaUser){
       const { data, error } = await supa.from('profiles')
-        .select('onboarding_completed')
+        .select('onboarding_completed, first_name, age')
         .eq('user_id', _supaUser.id)
         .maybeSingle();
       if(error){
         console.warn('[onboarding] Supabase read error — fall back to D:', error.message);
       } else {
+        supabaseProfile = data || null;
         supabaseSaysCompleted = !!(data && data.onboarding_completed);
         console.log('[onboarding] Supabase onboarding_completed =', supabaseSaysCompleted);
       }
@@ -1850,10 +1871,46 @@ async function maybeShowOnboarding(){
   if(supabaseSaysCompleted === true){
     // Promote D so future fast-path checks short-circuit without a query.
     D.onboardingDone = true;
+    if(supabaseProfile){
+      if(supabaseProfile.first_name && !D.name) D.name = supabaseProfile.first_name;
+      if(typeof supabaseProfile.age === 'number' && !D.age) D.age = supabaseProfile.age;
+    }
     if(typeof save === 'function') save();
     console.log('[onboarding] Promoted D.onboardingDone from Supabase column');
     return;
   }
+
+  // BACKFILL — existing user completed the wizard before the dedicated
+  // columns shipped: D.onboardingDone=true (from cloudLoad blob) but
+  // profiles.onboarding_completed=false (default). Write the completion
+  // now so future boots take the Supabase fast-path and Safari users
+  // who lose localStorage don't re-see the wizard.
+  if(supabaseSaysCompleted === false && D.onboardingDone){
+    console.log('[onboarding] backfilling existing user → Supabase columns…');
+    try {
+      const supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+      if(supa && _supaUser){
+        const ageInt = (typeof D.age === 'number')
+          ? D.age
+          : (AGE_BRACKET_TO_INT[D.ageBracket] !== undefined ? AGE_BRACKET_TO_INT[D.ageBracket] : null);
+        const { error } = await supa.from('profiles').update({
+          first_name:              D.name || null,
+          age:                     ageInt,
+          onboarding_completed:    true,
+          onboarding_completed_at: D.onboardingCompletedAt || new Date().toISOString(),
+        }).eq('user_id', _supaUser.id);
+        if(error){
+          console.warn('[onboarding] backfill write failed (non-blocking):', error.message);
+        } else {
+          console.log('[onboarding] backfill complete — wizard skipped');
+        }
+      }
+    } catch(e){
+      console.warn('[onboarding] backfill threw (non-blocking):', e && e.message);
+    }
+    return;
+  }
+
   // 3. Offline fallback — only trust D.onboardingDone if the read FAILED.
   //    A successful read with onboarding_completed=false (or missing row)
   //    means we genuinely need to run the wizard.
@@ -1945,6 +2002,55 @@ function onbSetReminder(val, btn){
   if(btn) btn.classList.add('active');
 }
 
+// Atomic onboarding-completion writer.
+//
+// Spec called for `_completeOnboarding(name, age)` writing 4 columns
+// (first_name, age, onboarding_completed, onboarding_completed_at).
+// Extended to a 3-arg form so we can also write age_bracket (TEXT) in
+// the SAME update — age_bracket is still read by api/faith-register.js
+// and existed before this session's migration, so writing both in one
+// round-trip is correct + avoids a second Supabase call.
+//
+// Always mirrors to D and saves locally first so the offline path
+// works regardless of Supabase reachability. Returns {ok, fallback, error}.
+async function _completeOnboarding(name, age, ageBracket){
+  console.log('[onboarding] completing — writing to Supabase…');
+
+  const now = new Date().toISOString();
+  // Local mirror first — guarantees offline behaviour stays sane even
+  // if the network call below throws.
+  if(name) D.name = name;
+  if(typeof age === 'number') D.age = age;
+  D.onboardingDone = true;
+  D.onboardingCompletedAt = now;
+  if(typeof save === 'function') save();
+
+  const supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+  if(!supa || typeof _supaUser === 'undefined' || !_supaUser){
+    console.warn('[onboarding] no Supabase session — falling back to localStorage only');
+    return { ok: true, fallback: true };
+  }
+  try {
+    const payload = {
+      onboarding_completed:    true,
+      onboarding_completed_at: now,
+    };
+    if(name)                     payload.first_name  = name;
+    if(typeof age === 'number')  payload.age         = age;
+    if(ageBracket)               payload.age_bracket = ageBracket;
+    const { error } = await supa.from('profiles').update(payload).eq('user_id', _supaUser.id);
+    if(error){
+      console.error('[onboarding] Supabase write failed:', error);
+      return { ok: false, error: error.message, fallback: true };
+    }
+    console.log('[onboarding] complete ✓ Supabase + local updated:', payload);
+    return { ok: true };
+  } catch(e){
+    console.error('[onboarding] unexpected error:', e);
+    return { ok: false, error: String(e), fallback: true };
+  }
+}
+
 // Async — awaits a direct write to dedicated profiles columns before
 // closing the wizard. The debounced cloudSync() inside save() is NOT
 // reliable for completion state: a fast tab-close beats the 2-second
@@ -1962,44 +2068,26 @@ async function onbComplete(){
   D.settings.faithMode = (_onbFaith === 'yes');
   D.faithMode = D.settings.faithMode;
   D.dailyReminderOn = (_onbReminder === 'on');
+
   const ni = document.getElementById('onbName');
   const nameVal = ni ? ni.value.trim() : '';
-  if(nameVal) D.name = nameVal;
-  D.onboardingDone = true;
-  // Mirror the completion timestamp inside D too so the backfill SQL
-  // can find the right value on legacy rows that never reach the column.
-  D.onboardingCompletedAt = new Date().toISOString();
-  if(typeof save === 'function') save();
+  const ageInt  = (AGE_BRACKET_TO_INT[_onbSelectedAge] !== undefined)
+    ? AGE_BRACKET_TO_INT[_onbSelectedAge]
+    : null;
 
-  // Synchronous Supabase write to dedicated columns. We await this BEFORE
-  // closing the wizard so a fast tab-close cannot drop the completion
-  // flag. On error we still close the overlay (user shouldn't be trapped
-  // offline) — D.onboardingDone + the debounced cloudSync are the
-  // fallback, and next boot's Supabase fast-path will be the safety net.
-  try {
-    const supa = (typeof getSupabase === 'function') ? getSupabase() : null;
-    if(supa && typeof _supaUser !== 'undefined' && _supaUser){
-      const payload = {
-        onboarding_completed: true,
-        onboarding_completed_at: D.onboardingCompletedAt,
-      };
-      if(nameVal) payload.first_name = nameVal;
-      if(_onbSelectedAge) payload.age_bracket = _onbSelectedAge;
-      const { error } = await supa.from('profiles')
-        .update(payload)
-        .eq('user_id', _supaUser.id);
-      if(error){
-        console.warn('[onboarding] direct column write failed — debounced cloudSync will retry the blob:', error.message);
-        if(typeof showToast === 'function') showToast('Saved locally — we\'ll sync when you reconnect');
-      } else {
-        console.log('[onboarding] columns written:', payload);
-      }
+  // Atomic 5-column write (first_name + age + age_bracket +
+  // onboarding_completed + onboarding_completed_at). Awaited so the
+  // overlay only closes after the flag is durably set — fast tab-close
+  // can no longer drop the completion state.
+  const result = await _completeOnboarding(nameVal, ageInt, _onbSelectedAge || null);
+  if(result && result.fallback === true && typeof showToast === 'function'){
+    if(typeof navigator !== 'undefined' && navigator.onLine === false){
+      // Truly offline — quieter copy.
+      showToast('Saved locally — will sync when reconnected');
     } else {
-      console.log('[onboarding] no Supabase client/user — completion stored locally only');
+      // Online but write errored — surface so user knows something went wrong.
+      showToast('Saved locally — we\'ll retry sync shortly');
     }
-  } catch(e){
-    console.warn('[onboarding] direct column write threw:', e && e.message);
-    if(typeof showToast === 'function') showToast('Saved locally — we\'ll sync when you reconnect');
   }
 
   if(typeof applyName === 'function') applyName();
