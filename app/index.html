@@ -15699,6 +15699,9 @@ if (_origRefresh) {
   #onboardingOverlay .onb-card .onb-label{ font-family:var(--fh); font-size:1.15rem; letter-spacing:.04em; color:#f1f5f9; }
   #onboardingOverlay .onb-card .onb-cap{ font-size:.78rem; font-style:italic; color:rgba(255,255,255,.55); }
   #onboardingOverlay .onb-primary{ width:100%; padding:.95rem 1rem; background:linear-gradient(135deg,#fbbf24,#fb923c); border:none; color:#0b1020; border-radius:14px; font-family:var(--fm); font-size:1rem; font-weight:800; cursor:pointer; box-shadow:0 10px 30px rgba(251,191,36,.25); margin-top:1.4rem; -webkit-tap-highlight-color:transparent; }
+  /* Escape hatch on Step 1 — subtle "I already did this" skip link. */
+  #onboardingOverlay .onb-already-done{ background:transparent; border:none; color:var(--tx2); font-size:.75rem; text-decoration:underline; cursor:pointer; margin-top:1rem; opacity:.7; font-family:var(--fm); padding:.4rem .8rem; -webkit-tap-highlight-color:transparent; }
+  #onboardingOverlay .onb-already-done:hover, #onboardingOverlay .onb-already-done:focus-visible{ opacity:1; color:var(--tx); outline:none; }
   #onboardingOverlay .onb-primary:disabled{ opacity:.4; cursor:not-allowed; box-shadow:none; }
   #onboardingOverlay .onb-tile{ display:flex; align-items:center; gap:.7rem; padding:1rem 1rem; background:rgba(255,255,255,.04); border:1.5px solid rgba(255,255,255,.1); border-radius:14px; cursor:pointer; transition:background .2s ease, border-color .2s ease; -webkit-tap-highlight-color:transparent; }
   #onboardingOverlay .onb-tile.selected{ border-color:var(--tile-accent, #fbbf24); background:var(--tile-bg, rgba(251,191,36,.08)); }
@@ -15729,6 +15732,10 @@ if (_origRefresh) {
     <div style="font-family:Georgia,serif;font-style:italic;font-size:1.2rem;color:#fbbf24;line-height:1.45;margin-bottom:.55rem;">Your life. Your journey. Your app.</div>
     <div style="font-family:var(--fm);font-size:.92rem;color:rgba(255,255,255,.55);line-height:1.55;margin-bottom:2rem;">Built for teens and young adults who want to grow.</div>
     <button class="onb-primary" onclick="onbGoToStep(2)">Let's get started →</button>
+    <!-- Escape hatch — for users who genuinely already completed
+         onboarding but still see this overlay (stale cache + Supabase
+         column missed). Confirms before writing the durable flag. -->
+    <div><button class="onb-already-done" type="button" onclick="onbDismissAlreadyDone()">I already did this — skip</button></div>
   </div>
 
   <!-- Step 2 — Who are you? -->

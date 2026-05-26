@@ -1919,6 +1919,41 @@ async function maybeShowOnboarding(){
     return;
   }
 
+  await _showOnboardingWizard();
+}
+
+// Wizard render — extracted so the self-heal check at the top can run
+// every time the overlay is about to mount, not just from the boot
+// gate. maybeShowOnboarding decides "should we even consider showing
+// it"; this function decides "is it actually safe to render right now"
+// (final line of defence against stale local state).
+async function _showOnboardingWizard(){
+  // SELF-HEAL — last-chance Supabase check. If the column says completed
+  // we don't render the wizard, we promote the local flag and bail.
+  // Catches the scenarios maybeShowOnboarding's earlier reads missed:
+  //   - boot-time Supabase fetch returned a transient error → null
+  //     came back as supabaseSaysCompleted but the column is actually
+  //     true; this read happens later so the network may now be healthy
+  //   - manual call to _showOnboardingWizard from a debug path
+  //   - stale-cache load that brought back an out-of-date D blob
+  try {
+    const supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+    if(supa && typeof _supaUser !== 'undefined' && _supaUser){
+      const { data } = await supa.from('profiles')
+        .select('onboarding_completed')
+        .eq('user_id', _supaUser.id)
+        .maybeSingle();
+      if(data && data.onboarding_completed === true){
+        console.log('[onboarding] self-heal — Supabase says done, aborting wizard render');
+        D.onboardingDone = true;
+        if(typeof save === 'function') save();
+        return;
+      }
+    }
+  } catch(e){
+    console.warn('[onboarding] self-heal check failed, continuing with wizard:', e && e.message);
+  }
+
   const overlay = document.getElementById('onboardingOverlay');
   if(!overlay) return;
   _onbCurrentStep = 1;
@@ -1939,6 +1974,47 @@ async function maybeShowOnboarding(){
     if(n){ ni.value = n.charAt(0).toUpperCase() + n.slice(1).toLowerCase(); }
   }
   _onbShowStep(1);
+}
+
+// Escape hatch for users convinced they've already done onboarding but
+// still see the wizard (e.g. stale cache + Supabase column not set
+// because the original completion predated the column migration).
+// Confirms, writes the durable flag to BOTH Supabase and local D,
+// then closes the overlay. Fire-and-forget on the Supabase write —
+// the local flag closes the loop even if the network call fails.
+function onbDismissAlreadyDone(){
+  if(typeof confirm !== 'function') return;
+  if(!confirm('Skip onboarding? You can update your name in Settings later.')) return;
+  try {
+    const supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+    if(supa && typeof _supaUser !== 'undefined' && _supaUser){
+      supa.from('profiles')
+        .update({
+          onboarding_completed: true,
+          onboarding_completed_at: new Date().toISOString()
+        })
+        .eq('user_id', _supaUser.id)
+        .then(function(res){
+          if(res && res.error) console.warn('[onboarding] dismiss write failed:', res.error.message);
+          else console.log('[onboarding] dismiss-already-done flag written to Supabase');
+        });
+    }
+  } catch(e){
+    console.warn('[onboarding] dismiss-already-done threw:', e && e.message);
+  }
+  D.onboardingDone = true;
+  D.onboardingCompletedAt = new Date().toISOString();
+  if(typeof save === 'function') save();
+  const overlay = document.getElementById('onboardingOverlay');
+  if(overlay){
+    overlay.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  if(typeof showToast === 'function') showToast('Onboarding skipped — you can update your profile in Settings');
+}
+if(typeof window !== 'undefined'){
+  window._showOnboardingWizard = _showOnboardingWizard;
+  window.onbDismissAlreadyDone = onbDismissAlreadyDone;
 }
 
 function _onbShowStep(n){
