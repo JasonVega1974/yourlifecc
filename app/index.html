@@ -13984,12 +13984,50 @@
   </div>
 </div>
 
+<!-- Event add/edit modal — see school.js (saveEvent, editEvent, closeEvModal).
+     Mobile UX: .md has overflow-y:auto and the .ma action row uses
+     position:sticky inside the modal body so the Save / Cancel / Delete
+     buttons stay tappable no matter how long the Notes field grows. -->
+<style>
+  #evModal .ev-datetime-grid{display:grid;grid-template-columns:1fr;gap:.55rem;}
+  @media(min-width:520px){
+    #evModal .ev-datetime-grid{grid-template-columns:1fr 1fr;}
+  }
+  #evModal .ev-datetime-grid label{display:block;font-size:.66rem;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.25rem;}
+  #evModal .ma{
+    position:sticky;
+    bottom:-1.8rem;
+    background:linear-gradient(180deg,transparent 0%,var(--bg,#0a1428) 22%);
+    margin:1.1rem -1.8rem -1.8rem;
+    padding:1rem 1.4rem 1.4rem;
+    border-top:1px solid rgba(255,255,255,.08);
+    z-index:2;
+  }
+  :root.light #evModal .ma{background:linear-gradient(180deg,transparent 0%,#f2f3f5 22%);border-top-color:rgba(0,0,0,.08);}
+  #evModal .md{padding-bottom:1rem;}
+</style>
 <div class="mo" id="evModal">
   <div class="md">
-    <div class="mdt">📅 ADD EVENT</div>
+    <div class="mdt" id="evModalTitle">📅 ADD EVENT</div>
     <label>Title</label><input type="text" id="evTitle" placeholder="DJ Gig, BJJ Tournament, Church Retreat">
-    <label>Date</label><input type="date" id="evDate">
-    <label>Time</label><input type="time" id="evTime">
+    <div class="ev-datetime-grid" style="margin-bottom:.6rem;">
+      <div>
+        <label for="evStartDate">Start Date</label>
+        <input type="date" id="evStartDate" style="width:100%;">
+      </div>
+      <div>
+        <label for="evStartTime">Start Time</label>
+        <input type="time" id="evStartTime" style="width:100%;">
+      </div>
+      <div>
+        <label for="evEndDate">End Date</label>
+        <input type="date" id="evEndDate" style="width:100%;">
+      </div>
+      <div>
+        <label for="evEndTime">End Time</label>
+        <input type="time" id="evEndTime" style="width:100%;">
+      </div>
+    </div>
     <label>Category</label>
     <select id="evCat">
       <option value="dj">🎧 DJ / Gig</option>
@@ -13999,10 +14037,11 @@
       <option value="sc">📚 School</option>
       <option value="ot">📌 Other</option>
     </select>
-    <label>Notes</label><textarea id="evNotes" rows="2" placeholder="Details..."></textarea>
+    <label>Notes</label><textarea id="evNotes" rows="3" placeholder="Details..."></textarea>
     <div class="ma">
-      <button class="btn bgh" onclick="closeModal('evModal')">Cancel</button>
-      <button class="btn bp" onclick="saveEvent()">Add Event</button>
+      <button class="btn bgh" id="evDeleteBtn" onclick="evDeleteCurrent()" style="display:none;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.35);color:#ef4444;">Delete</button>
+      <button class="btn bgh" onclick="closeEvModal()">Cancel</button>
+      <button class="btn bp" id="evSaveBtn" onclick="saveEvent()">Add Event</button>
     </div>
   </div>
 </div>

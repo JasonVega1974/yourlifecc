@@ -392,7 +392,10 @@ function finishInit(cloudReady){
   // Schedule
   buildSchedule();
 
-  // Calendar
+  // Calendar — one-shot migration of legacy {date,time} events into the
+  // new {startDate,endDate,startTime,endTime} shape. Idempotent; only
+  // writes when a field is missing. See school.js:migrateEventsToRange.
+  if(typeof migrateEventsToRange === 'function') migrateEventsToRange();
   renderCalendar(); renderUpcoming();
 
   // Health

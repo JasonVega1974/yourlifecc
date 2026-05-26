@@ -1784,6 +1784,16 @@ function showSection(id, fromMobile){
   if(id==='s-scripture' && typeof renderFaithZones === 'function'){
     setTimeout(renderFaithZones, 30);
   }
+  // Beta bug 1 — palette / theme drift on returning to the Well. Some
+  // sub-sections inside The Well used to set inline CSS-variable
+  // overrides without restoring them on exit, so users perceived their
+  // palette as "reverted" after navigating in and out. Re-apply the
+  // saved theme + palette on every entry — cheap (just CSS var writes)
+  // and safe (no save() side-effects).
+  if(id==='s-scripture'){
+    if(typeof applyTheme   === 'function') applyTheme();
+    if(typeof applyPalette === 'function') applyPalette();
+  }
   // V1 Rebuild · Session 2 — the floating "🌙 Reflect" button is
   // visible only on the faith hub after 7pm. Re-evaluate on every
   // section change so the button hides when leaving the Well and

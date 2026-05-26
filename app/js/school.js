@@ -624,8 +624,190 @@ function clearSched(){
 const ECLS={dj:'edj',bjj:'ebjj',wk:'ewk',ch:'ech',sc:'esc',ot:'eot'};
 const ENAMES={dj:'🎧 DJ/Gig',bjj:'🥋 Sports',wk:'💼 Work',ch:'⛪ Church',sc:'📚 School',ot:'📌 Other'};
 
-function saveEvent(){ const title=(document.getElementById('evTitle').value||'').trim(),date=document.getElementById('evDate').value; if(!title||!date){showToast('Enter title and date');return;} if(!D.events) D.events=[]; D.events.push({id:Date.now(),title,date,time:document.getElementById('evTime').value,cat:document.getElementById('evCat').value,notes:(document.getElementById('evNotes').value||'').trim()}); D.events.sort((a,b)=>a.date.localeCompare(b.date)); ['evTitle','evTime','evNotes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';}); save(); renderCalendar(); renderUpcoming(); updateHeroDashboard(); closeModal('evModal'); showToast('Event added! 📅'); }
-function deleteEvent(id){ D.events=(D.events||[]).filter(e=>e.id!==id); save(); renderCalendar(); renderUpcoming(); updateHeroDashboard(); }
+// Edit-mode tracker. null = creating a new event; otherwise the id of the
+// event being edited. Set by editEvent(), cleared by saveEvent() on success
+// and by closeEvModal() on cancel.
+let _editingEventId = null;
+
+function _evReadForm(){
+  // Pull the four datetime fields with a graceful fallback to the legacy
+  // single-field ids — keeps the form usable if a deploy mid-flights the
+  // markup before this JS rolls out.
+  const startDate = (document.getElementById('evStartDate')||document.getElementById('evDate')||{}).value || '';
+  const endDate   = (document.getElementById('evEndDate')  ||{}).value || startDate;
+  const startTime = (document.getElementById('evStartTime')||document.getElementById('evTime')||{}).value || '';
+  const endTime   = (document.getElementById('evEndTime')  ||{}).value || startTime;
+  return {
+    title: ((document.getElementById('evTitle')||{}).value || '').trim(),
+    startDate, endDate, startTime, endTime,
+    cat:   (document.getElementById('evCat')||{}).value || 'ot',
+    notes: ((document.getElementById('evNotes')||{}).value || '').trim(),
+  };
+}
+
+function _evValidate(f){
+  if(!f.title || !f.startDate){ return 'Enter a title and start date'; }
+  if(f.endDate && f.endDate < f.startDate){ return 'End date must be on or after the start date'; }
+  if(f.startDate === f.endDate && f.startTime && f.endTime && f.endTime < f.startTime){
+    return 'End time must be after start time on the same day';
+  }
+  return '';
+}
+
+function saveEvent(){
+  const f = _evReadForm();
+  const err = _evValidate(f);
+  if(err){ showToast(err); return; }
+  if(!D.events) D.events = [];
+
+  if(_editingEventId){
+    // Update existing in place — preserve id + createdAt if present.
+    const idx = D.events.findIndex(e => e && e.id === _editingEventId);
+    if(idx >= 0){
+      const cur = D.events[idx];
+      D.events[idx] = Object.assign({}, cur, {
+        title:     f.title,
+        startDate: f.startDate,
+        endDate:   f.endDate,
+        startTime: f.startTime,
+        endTime:   f.endTime,
+        cat:       f.cat,
+        notes:     f.notes,
+        // Legacy mirrors so old code paths that still read e.date / e.time
+        // keep showing the right value until they migrate.
+        date:      f.startDate,
+        time:      f.startTime,
+        updatedAt: new Date().toISOString(),
+      });
+    }
+  } else {
+    D.events.push({
+      id: Date.now(),
+      title:     f.title,
+      startDate: f.startDate,
+      endDate:   f.endDate,
+      startTime: f.startTime,
+      endTime:   f.endTime,
+      cat:       f.cat,
+      notes:     f.notes,
+      // Legacy mirrors for any reader that hasn't migrated yet.
+      date:      f.startDate,
+      time:      f.startTime,
+      createdAt: new Date().toISOString(),
+    });
+  }
+  D.events.sort((a,b)=> String(a.startDate||a.date||'').localeCompare(String(b.startDate||b.date||'')));
+  save();
+  renderCalendar(); renderUpcoming();
+  if(typeof updateHeroDashboard === 'function') updateHeroDashboard();
+  const wasEdit = !!_editingEventId;
+  closeEvModal();
+  showToast(wasEdit ? 'Event updated 📅' : 'Event added! 📅');
+}
+
+function deleteEvent(id){
+  D.events = (D.events||[]).filter(e => e && e.id !== id);
+  save(); renderCalendar(); renderUpcoming();
+  if(typeof updateHeroDashboard === 'function') updateHeroDashboard();
+}
+
+// Open the modal in edit mode: pre-populate every field from the existing
+// event and flip the modal title + primary-action label so users see they
+// are editing, not adding.
+function editEvent(id){
+  const ev = (D.events||[]).find(e => e && e.id === id);
+  if(!ev){ showToast('Event not found'); return; }
+  _editingEventId = id;
+  const set = (k,v) => { const el = document.getElementById(k); if(el) el.value = v == null ? '' : v; };
+  set('evTitle', ev.title || '');
+  set('evStartDate', ev.startDate || ev.date || '');
+  set('evEndDate',   ev.endDate   || ev.date || '');
+  set('evStartTime', ev.startTime || ev.time || '');
+  set('evEndTime',   ev.endTime   || ev.time || '');
+  set('evCat',   ev.cat   || 'ot');
+  set('evNotes', ev.notes || '');
+  const title = document.getElementById('evModalTitle');
+  if(title) title.textContent = '📅 EDIT EVENT';
+  const btn = document.getElementById('evSaveBtn');
+  if(btn) btn.textContent = 'Save Changes';
+  const delBtn = document.getElementById('evDeleteBtn');
+  if(delBtn) delBtn.style.display = '';
+  if(typeof openModal === 'function') openModal('evModal');
+}
+
+// Close + reset modal state so the next "Add" doesn't carry edit-mode UI.
+function closeEvModal(){
+  _editingEventId = null;
+  ['evTitle','evStartDate','evEndDate','evStartTime','evEndTime','evNotes'].forEach(id => {
+    const e = document.getElementById(id); if(e) e.value = '';
+  });
+  const cat = document.getElementById('evCat'); if(cat) cat.value = 'dj';
+  const title = document.getElementById('evModalTitle');
+  if(title) title.textContent = '📅 ADD EVENT';
+  const btn = document.getElementById('evSaveBtn');
+  if(btn) btn.textContent = 'Add Event';
+  const delBtn = document.getElementById('evDeleteBtn');
+  if(delBtn) delBtn.style.display = 'none';
+  if(typeof closeModal === 'function') closeModal('evModal');
+}
+
+// Delete the currently-edited event from inside the modal.
+function evDeleteCurrent(){
+  if(!_editingEventId) return;
+  const ev = (D.events||[]).find(e => e && e.id === _editingEventId);
+  if(!ev) return;
+  if(!confirm('Delete "' + ev.title + '"?')) return;
+  const id = _editingEventId;
+  closeEvModal();
+  deleteEvent(id);
+  showToast('Event deleted');
+}
+
+// One-shot migration: copy each event's legacy date/time into the new
+// start/end fields. Idempotent — runs every boot, only writes when the
+// new fields are missing. Saves once at the end if anything changed.
+function migrateEventsToRange(){
+  if(!Array.isArray(D.events) || !D.events.length) return;
+  let touched = false;
+  D.events.forEach(e => {
+    if(!e) return;
+    if(!e.startDate && e.date){ e.startDate = e.date; touched = true; }
+    if(!e.endDate){ e.endDate = e.startDate || e.date || ''; touched = true; }
+    if(!e.startTime && e.time){ e.startTime = e.time; touched = true; }
+    if(!e.endTime){ e.endTime = e.startTime || e.time || ''; touched = true; }
+  });
+  if(touched && typeof save === 'function') save();
+}
+
+// Format a date+time range for the upcoming-events list. Handles same-day
+// (one date with a time range) and multi-day (two dates).
+function _evFormatRange(ev){
+  const sd = ev.startDate || ev.date || '';
+  const ed = ev.endDate   || sd;
+  const st = ev.startTime || ev.time || '';
+  const et = ev.endTime   || '';
+  if(!sd) return '';
+  const fmtD = (iso) => {
+    if(!iso) return '';
+    const d = new Date(iso + 'T00:00:00');
+    return d.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+  };
+  const fmtT = (t) => {
+    if(!t) return '';
+    const [h,m] = t.split(':');
+    const H = parseInt(h,10);
+    const suffix = H >= 12 ? 'PM' : 'AM';
+    const hr = ((H + 11) % 12) + 1;
+    return hr + ':' + m + ' ' + suffix;
+  };
+  if(sd === ed){
+    if(st && et && st !== et) return fmtD(sd) + ' · ' + fmtT(st) + ' – ' + fmtT(et);
+    if(st)                    return fmtD(sd) + ' · ' + fmtT(st);
+    return fmtD(sd);
+  }
+  // Multi-day
+  return fmtD(sd) + (st ? ' ' + fmtT(st) : '') + ' → ' + fmtD(ed) + (et ? ' ' + fmtT(et) : '');
+}
 function prevMonth(){ _calM--; if(_calM<0){_calM=11;_calY--;} renderCalendar(); }
 function nextMonth(){ _calM++; if(_calM>11){_calM=0;_calY++;} renderCalendar(); }
 
@@ -634,35 +816,78 @@ function renderCalendar(){
   const MONTHS=['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
   lbl.textContent=MONTHS[_calM]+' '+_calY;
   const today=new Date(),first=new Date(_calY,_calM,1).getDay(),dim=new Date(_calY,_calM+1,0).getDate(),dPrev=new Date(_calY,_calM,0).getDate();
+  // Multi-day index: an event with startDate=2026-05-26 and endDate=2026-05-28
+  // appears in evMap['2026-05-26'], '...05-27', and '...05-28'. Falls back to
+  // legacy single-date events (ev.date) so unmigrated rows still render.
   const evMap={};
-  (D.events||[]).forEach(ev=>{if(!evMap[ev.date])evMap[ev.date]=[];evMap[ev.date].push(ev);});
+  (D.events||[]).forEach(ev => {
+    if(!ev) return;
+    const start = ev.startDate || ev.date;
+    if(!start) return;
+    const end = ev.endDate || start;
+    let cur = start;
+    let safety = 366;
+    while(cur && cur <= end && safety-- > 0){
+      if(!evMap[cur]) evMap[cur] = [];
+      evMap[cur].push(ev);
+      // Advance one day in YYYY-MM-DD space without timezone surprises.
+      const dt = new Date(cur + 'T00:00:00');
+      dt.setDate(dt.getDate() + 1);
+      cur = dt.toISOString().slice(0,10);
+    }
+  });
   let html='';
   for(let i=first-1;i>=0;i--) html+=`<div class="cd om"><span class="cdn">${dPrev-i}</span></div>`;
   for(let d=1;d<=dim;d++){
     const ds=_calY+'-'+String(_calM+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
     const isT=today.getDate()===d&&today.getMonth()===_calM&&today.getFullYear()===_calY;
     const evs=(evMap[ds]||[]).slice(0,3);
-    html+=`<div class="cd${isT?' td':''}" onclick="calClick('${ds}')"><span class="cdn">${d}</span>${evs.map(ev=>`<span class="cep ${ECLS[ev.cat]||'eot'}" onclick="event.stopPropagation();delEvCf(${ev.id})">${escapeHtml(ev.title)}</span>`).join('')}</div>`;
+    html+=`<div class="cd${isT?' td':''}" onclick="calClick('${ds}')"><span class="cdn">${d}</span>${evs.map(ev=>`<span class="cep ${ECLS[ev.cat]||'eot'}" onclick="event.stopPropagation();editEvent(${ev.id})">${escapeHtml(ev.title)}</span>`).join('')}</div>`;
   }
   const total=Math.ceil((first+dim)/7)*7;
   for(let d=1;d<=total-first-dim;d++) html+=`<div class="cd om"><span class="cdn">${d}</span></div>`;
   grid.innerHTML=html;
 }
 
-function calClick(ds){ const e=document.getElementById('evDate'); if(e) e.value=ds; openModal('evModal'); }
-function delEvCf(id){ const ev=(D.events||[]).find(e=>e.id===id); if(!ev) return; if(confirm(ev.title+'\n'+ev.date+'\n\nDelete?')) deleteEvent(id); }
+function calClick(ds){
+  // Open the modal in ADD mode pre-seeded with the day the user clicked.
+  // Reset any lingering edit state first.
+  closeEvModal();
+  const sd = document.getElementById('evStartDate') || document.getElementById('evDate');
+  if(sd) sd.value = ds;
+  const ed = document.getElementById('evEndDate');
+  if(ed) ed.value = ds;
+  if(typeof openModal === 'function') openModal('evModal');
+}
+function delEvCf(id){
+  // Legacy path — kept so old onclick handlers don't break. New chips call
+  // editEvent() instead, and the modal exposes a Delete button.
+  const ev=(D.events||[]).find(e=>e.id===id); if(!ev) return;
+  const when = ev.startDate || ev.date || '';
+  if(confirm(ev.title + (when ? '\n' + when : '') + '\n\nDelete?')) deleteEvent(id);
+}
 
 function renderUpcoming(){
   const el=document.getElementById('upcomingEvs'); if(!el) return;
   const today=localDateString();
-  const up=(D.events||[]).filter(ev=>ev.date>=today).slice(0,15);
+  // An event is "upcoming" if it ends on or after today (so multi-day events
+  // in progress still surface).
+  const up=(D.events||[])
+    .filter(ev => ev && ((ev.endDate || ev.startDate || ev.date || '') >= today))
+    .slice(0,15);
   if(!up.length){el.innerHTML='<div style="color:#c8d4e8;text-align:center;padding:1.5rem;font-size:.84rem;">No upcoming events — click a day to add one!</div>';return;}
   el.innerHTML=up.map(ev=>{
-    const d=new Date(ev.date+'T00:00:00');
-    return`<div style="display:flex;align-items:center;gap:.65rem;padding:.52rem .7rem;background:rgba(255,255,255,.1);border-radius:9px;margin-bottom:.32rem;">
+    const sd = ev.startDate || ev.date || '';
+    const d  = new Date(sd + 'T00:00:00');
+    const rangeLabel = _evFormatRange(ev);
+    return `<div style="display:flex;align-items:center;gap:.65rem;padding:.52rem .7rem;background:rgba(255,255,255,.1);border-radius:9px;margin-bottom:.32rem;">
       <div style="text-align:center;min-width:32px;"><div style="font-size:1rem;font-weight:900;color:var(--c);">${d.getDate()}</div><div style="font-size:.54rem;color:#c8d4e8;">${d.toLocaleDateString('en-US',{month:'short'}).toUpperCase()}</div></div>
-      <div style="flex:1;"><div style="font-weight:700;font-size:.86rem;">${escapeHtml(ev.title)}</div><div style="font-size:.68rem;color:#c8d4e8;">${ENAMES[ev.cat]||''}${ev.time?' · '+ev.time:''}</div></div>
-      <button class="db" onclick="deleteEvent(${ev.id})">✕</button>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:.86rem;">${escapeHtml(ev.title)}</div>
+        <div style="font-size:.68rem;color:#c8d4e8;">${ENAMES[ev.cat]||''}${rangeLabel?' · '+escapeHtml(rangeLabel):''}</div>
+      </div>
+      <button class="db" onclick="editEvent(${ev.id})" title="Edit" style="background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.35);color:#38bdf8;padding:.28rem .52rem;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;">✏️</button>
+      <button class="db" onclick="deleteEvent(${ev.id})" title="Delete">✕</button>
     </div>`;
   }).join('');
 }
