@@ -1219,8 +1219,15 @@ function fzOpenDest(dest){
   } else if (dest === 'growth'){
     titleEl.textContent = "Growth Profile";
     bodyEl.innerHTML =
-      '<div class="fz-growth-intro">' +
-        'Seven traits that shape who you are.<br>Every action grows them.' +
+      '<div class="fz-growth-explainer">' +
+        '<div class="fzg-explain-emoji" aria-hidden="true">✦</div>' +
+        '<h3 class="fzg-explain-title">Seven traits. One you.</h3>' +
+        '<p class="fzg-explain-text">' +
+          'Every action in the app grows the traits that match it. ' +
+          'Pray for someone → Compassion grows. Face a hard question → ' +
+          'Courage grows. Show up daily → Discipline grows.' +
+        '</p>' +
+        '<p class="fzg-explain-text-sub">Tap any trait to see what builds it.</p>' +
       '</div>' +
       '<div id="fzGrowthFull"></div>';
     renderGrowthFull();
@@ -1344,11 +1351,11 @@ function hcDidAction(key, btn){
   }
 }
 
-// 2026-05-29 — Growth Profile destination renderer. All 7 traits as
-// cards with name + level + description + progress bar + next-level
-// label. Reads the same TRAITS map + getTraitLevel from traits.js
-// that renderGrowthCompact uses, just shows the full set instead
-// of the top 3.
+// 2026-05-29 (rev. 2026-05-26) — Growth Profile destination renderer.
+// All 7 traits as cards with collapsed header → tap-to-expand inline
+// detail (what-it-means, how-to-grow-it, your-journey through the 5
+// levels). Reads the same TRAITS map + getTraitLevel from traits.js
+// that renderGrowthCompact uses, just shows the full set + expansion.
 function renderGrowthFull(){
   if (typeof document === 'undefined') return;
   var el = document.getElementById('fzGrowthFull');
@@ -1375,26 +1382,160 @@ function renderGrowthFull(){
     var pct = atMax ? 100 : Math.min(100, Math.round((inLevel / range) * 100));
     var levelName = t.levels[lvl] || t.levels[t.levels.length - 1];
     var nextLevelName = atMax ? null : (t.levels[lvl + 1] || 'Max');
-    var nextLabel = atMax
-      ? 'Max level reached ✨'
-      : 'Next: ' + _fzEsc(nextLevelName) + ' (' + pts + '/' + nextThreshold + ')';
+    var pointsToNext = atMax ? 0 : (nextThreshold - pts);
+
+    // Clearer progress label per spec PART 4:
+    //   max level → "✨ Max level reached"
+    //   no progress yet in this level (pointsToNext === full range) →
+    //                  "Tap actions to grow this trait"
+    //   otherwise → "23 more to Brave"
+    var nextLabel;
+    if (atMax){
+      nextLabel = '✨ Max level reached';
+    } else if (pointsToNext === range){
+      nextLabel = 'Tap actions to grow this trait';
+    } else {
+      nextLabel = pointsToNext + ' more to ' + _fzEsc(nextLevelName);
+    }
+
+    // Per-trait "how to grow it" list. Defined below; falls back to a
+    // generic line if the key is unknown.
+    var actions = getActionsForTrait(key);
+    var actionsHtml = '';
+    for (var a = 0; a < actions.length; a++){
+      actionsHtml += '<li>' + _fzEsc(actions[a]) + '</li>';
+    }
+
+    // The 5-level journey rail. Reached levels get a checkmark + filled
+    // dot; the current level is bordered; future levels are faded.
+    var levelsHtml = '';
+    for (var li = 0; li < t.levels.length; li++){
+      var cls = 'fzg-level-item';
+      if (li <= lvl) cls += ' fzg-level-reached';
+      if (li === lvl) cls += ' fzg-level-current';
+      var dot = (li <= lvl) ? '✓' : String(li + 1);
+      var thresholdPts = thresholds[li] != null ? thresholds[li] : 0;
+      levelsHtml += ''
+        + '<div class="' + cls + '">'
+        +   '<span class="fzg-level-dot">' + dot + '</span>'
+        +   '<span class="fzg-level-name">' + _fzEsc(t.levels[li]) + '</span>'
+        +   '<span class="fzg-level-pts">' + thresholdPts + ' pts</span>'
+        + '</div>';
+    }
+
+    var keyEsc = _fzEsc(key);
     html += ''
-      + '<div class="fz-growth-card">'
+      + '<div class="fz-growth-card" data-trait="' + keyEsc + '" '
+      +      'onclick="toggleTraitDetail(\'' + keyEsc + '\')" '
+      +      'role="button" tabindex="0">'
       +   '<div class="fz-growth-card-header">'
       +     '<span class="fz-growth-emoji" aria-hidden="true">' + _fzEsc(t.emoji) + '</span>'
       +     '<div class="fz-growth-info">'
       +       '<div class="fz-growth-name">' + _fzEsc(t.name) + '</div>'
-      +       '<div class="fz-growth-level">' + _fzEsc(levelName) + '</div>'
+      +       '<div class="fz-growth-level">Level ' + (lvl + 1) + ': ' + _fzEsc(levelName) + '</div>'
       +     '</div>'
+      +     '<span class="fz-growth-expand" id="exp-' + keyEsc + '" aria-hidden="true">▼</span>'
       +   '</div>'
-      +   '<div class="fz-growth-desc">' + _fzEsc(t.desc || '') + '</div>'
       +   '<div class="fz-growth-track" aria-hidden="true">'
       +     '<div class="fz-growth-fill" style="width:' + pct + '%"></div>'
       +   '</div>'
       +   '<div class="fz-growth-next">' + nextLabel + '</div>'
+      +   '<div class="fz-growth-detail" id="detail-' + keyEsc + '" style="display:none;">'
+      +     '<div class="fzg-detail-section">'
+      +       '<div class="fzg-detail-label">WHAT IT MEANS</div>'
+      +       '<div class="fzg-detail-text">' + _fzEsc(t.desc || '') + '</div>'
+      +     '</div>'
+      +     '<div class="fzg-detail-section">'
+      +       '<div class="fzg-detail-label">HOW TO GROW IT</div>'
+      +       '<ul class="fzg-grow-list">' + actionsHtml + '</ul>'
+      +     '</div>'
+      +     '<div class="fzg-detail-section">'
+      +       '<div class="fzg-detail-label">YOUR JOURNEY</div>'
+      +       '<div class="fzg-levels-list">' + levelsHtml + '</div>'
+      +     '</div>'
+      +   '</div>'
       + '</div>';
   }
   el.innerHTML = html;
+}
+
+// Returns the human-readable action list for "HOW TO GROW IT". Each
+// entry is a one-line cue describing a real in-app interaction that
+// awards points to the trait via awardTrait() (see traits.js callsites).
+function getActionsForTrait(traitKey){
+  var actionsByTrait = {
+    courage: [
+      'Tap "I’m Curious" on Today’s Mystery (+3)',
+      'Pick "Doubting" or "Tempted" on Heart Check (+3)',
+      'Complete a Real Life Win in the Courage category (+5)'
+    ],
+    discipline: [
+      'Complete daily habits (+3 each)',
+      'Finish chores (+2 each)',
+      'Complete the Daily Faith Challenge (+2)',
+      'Hit goal milestones (+2)'
+    ],
+    compassion: [
+      'Submit a Quick Prayer mentioning someone (+3)',
+      'Complete relational Real Life Wins (+3 to +5)',
+      'Pick "Lonely" or "Heartbroken" on Heart Check (+2)'
+    ],
+    wisdom: [
+      'Complete a Night Reflection (+2)',
+      'Read your daily devotional (+3)',
+      'Add a memory verse (+1)',
+      'Bible reading plan progress (+3)'
+    ],
+    integrity: [
+      'Anonymous acts of kindness Real Life Wins (+5)',
+      'Pick "Angry" or "Tempted" on Heart Check (+3)',
+      'Complete chores without reminders (+1)'
+    ],
+    gratitude: [
+      'Complete a Night Reflection (+2)',
+      'Pick "Grateful" or "Joyful" on Heart Check (+3)',
+      'Presence-category Real Life Wins (+3)'
+    ],
+    faith: [
+      'Submit any Quick Prayer (+2)',
+      'Engage with Convince Me cards (+2 each new card)',
+      'Complete the Daily Faith Challenge (+3)',
+      'Read your daily devotional (+2)'
+    ]
+  };
+  return actionsByTrait[traitKey] || ['Take actions across the app to grow this trait'];
+}
+
+// Single-open accordion — tapping a card opens its detail and closes
+// any other open card. Tapping the same card again collapses it.
+// Smooth-scrolls the now-expanded card into the viewport so the user
+// can see the new content without manual scrolling.
+function toggleTraitDetail(key){
+  if (typeof document === 'undefined') return;
+  var detail = document.getElementById('detail-' + key);
+  var expand = document.getElementById('exp-' + key);
+  if (!detail) return;
+  var isOpen = detail.style.display !== 'none';
+  // Close every open detail first so we behave as a single-open accordion.
+  var allDetails = document.querySelectorAll('.fz-growth-detail');
+  for (var i = 0; i < allDetails.length; i++) allDetails[i].style.display = 'none';
+  var allExpand = document.querySelectorAll('.fz-growth-expand');
+  for (var j = 0; j < allExpand.length; j++) allExpand[j].textContent = '▼';
+  // Also drop the "expanded" modifier from every card so the
+  // grid-column override (full-width on tablets+) clears.
+  var allCards = document.querySelectorAll('.fz-growth-card');
+  for (var k = 0; k < allCards.length; k++) allCards[k].classList.remove('fz-growth-card-expanded');
+  if (!isOpen){
+    detail.style.display = 'block';
+    if (expand) expand.textContent = '▲';
+    var card = detail.closest('.fz-growth-card');
+    if (card){
+      card.classList.add('fz-growth-card-expanded');
+      setTimeout(function(){
+        try { card.scrollIntoView({ behavior:'smooth', block:'nearest' }); } catch (_e) {}
+      }, 100);
+    }
+  }
 }
 
 function fzGoHome(){
@@ -1713,6 +1854,8 @@ if (typeof window !== 'undefined'){
   window.fzCompleteRLW     = fzCompleteRLW;
   window.renderFzGreeting  = renderFzGreeting;
   window.renderGrowthFull  = renderGrowthFull;
+  window.toggleTraitDetail = toggleTraitDetail;
+  window.getActionsForTrait= getActionsForTrait;
   window.fzWelcomeContinue = fzWelcomeContinue;
   window.fzWelcomePath     = fzWelcomePath;
   window.fzWelcomeBrowse   = fzWelcomeBrowse;

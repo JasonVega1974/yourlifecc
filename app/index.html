@@ -6338,6 +6338,147 @@
     }
     @media (prefers-reduced-motion: reduce){
       .fz-growth-fill{ transition:none !important; }
+      .fz-growth-detail{ animation:none !important; }
+      .fz-growth-card{ transition:none !important; }
+    }
+
+    /* ── 2026-05-26 — Growth Profile explainer + expandable cards ──
+       Top-of-page block teaches what the 7-trait grid is. Each card
+       becomes tappable; tapping reveals what-it-means / how-to-grow /
+       your-journey-through-the-5-levels inline. Single-open accordion
+       implemented in faith-zones.js. */
+    .fz-growth-explainer{
+      background:var(--card-bg);
+      border:1px solid var(--card-border);
+      border-radius:16px;
+      padding:1.5rem 1.25rem;
+      text-align:center;
+      margin-bottom:1.25rem;
+    }
+    .fzg-explain-emoji{
+      font-size:2.2rem;
+      margin-bottom:.4rem;
+      filter:drop-shadow(0 0 12px rgba(123,104,238,0.4));
+    }
+    .fzg-explain-title{
+      font-size:1.15rem;
+      font-weight:700;
+      color:var(--tx);
+      margin:0 0 .6rem;
+    }
+    .fzg-explain-text{
+      font-size:.88rem;
+      line-height:1.5;
+      color:var(--tx2);
+      margin:0 0 .5rem;
+    }
+    .fzg-explain-text-sub{
+      font-size:.78rem;
+      color:var(--p);
+      font-weight:600;
+      margin:.75rem 0 0;
+    }
+
+    /* Make whole card tappable. Hover (desktop) hints at the affordance. */
+    .fz-growth-card{
+      cursor:pointer;
+      transition:border-color .18s ease, transform .18s ease;
+    }
+    .fz-growth-card:hover{
+      border-color:var(--p);
+    }
+    .fz-growth-card:focus-visible{
+      outline:2px solid var(--p);
+      outline-offset:2px;
+    }
+    .fz-growth-expand{
+      margin-left:auto;
+      color:var(--tx2);
+      font-size:.8rem;
+      transition:transform .2s ease;
+    }
+
+    /* On tablets+ the grid is 2-col. When a card is expanded, it
+       spans the full row so the inline detail doesn't squash into
+       half-width. Achieved via the .fz-growth-card-expanded modifier
+       toggled in toggleTraitDetail. */
+    @media (min-width:600px){
+      .fz-growth-card-expanded{ grid-column:1 / -1; }
+    }
+
+    .fz-growth-detail{
+      margin-top:1rem;
+      padding-top:1rem;
+      border-top:1px solid var(--card-border);
+      animation:fzgDetailIn .3s ease;
+    }
+    @keyframes fzgDetailIn{
+      from{ opacity:0; transform:translateY(-6px); }
+      to  { opacity:1; transform:translateY(0); }
+    }
+
+    .fzg-detail-section{ margin-bottom:1rem; }
+    .fzg-detail-section:last-child{ margin-bottom:0; }
+    .fzg-detail-label{
+      font-size:.7rem; font-weight:700;
+      letter-spacing:.1em;
+      color:var(--tx2);
+      margin-bottom:.5rem;
+    }
+    .fzg-detail-text{
+      font-size:.88rem; line-height:1.5; color:var(--tx);
+    }
+    .fzg-grow-list{ list-style:none; padding:0; margin:0; }
+    .fzg-grow-list li{
+      font-size:.82rem;
+      color:var(--tx);
+      padding:.4rem 0;
+      border-bottom:1px dashed var(--card-border);
+      line-height:1.4;
+    }
+    .fzg-grow-list li:last-child{ border-bottom:none; }
+    .fzg-grow-list li::before{
+      content:'→ ';
+      color:var(--p);
+      font-weight:700;
+    }
+
+    .fzg-levels-list{ display:flex; flex-direction:column; gap:.4rem; }
+    .fzg-level-item{
+      display:flex; align-items:center; gap:.7rem;
+      padding:.5rem .7rem;
+      background:var(--card-border);
+      border-radius:8px;
+      opacity:.5;
+      transition:all .2s ease;
+    }
+    .fzg-level-reached{
+      opacity:1;
+      background:color-mix(in srgb, var(--p) 12%, transparent);
+    }
+    .fzg-level-current{
+      background:color-mix(in srgb, var(--p) 22%, transparent);
+      border:1px solid var(--p);
+      font-weight:700;
+    }
+    .fzg-level-dot{
+      width:22px; height:22px;
+      border-radius:50%;
+      background:var(--card-bg);
+      display:flex; align-items:center; justify-content:center;
+      font-size:.7rem; font-weight:700;
+      color:var(--tx);
+      flex-shrink:0;
+    }
+    .fzg-level-reached .fzg-level-dot{
+      background:var(--p);
+      color:#fff;
+    }
+    .fzg-level-name{
+      font-size:.85rem; color:var(--tx); flex:1;
+    }
+    .fzg-level-pts{
+      font-size:.7rem; color:var(--tx2); font-weight:600;
     }
 
     /* ── 2026-05-30 — Smart Welcome Back screen ──
