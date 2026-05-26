@@ -1802,11 +1802,66 @@ let _onbInterests = [];
 let _onbFaith = 'yes';
 let _onbReminder = 'on';
 
-function maybeShowOnboarding(){
+// Supabase-first onboarding gate. The wizard must NEVER flash for a user
+// who has already completed it — see feedback_ux_trust_over_perf.md for
+// why we eat ~100-300ms of boot delay rather than race a timeout.
+//
+// Order of truth:
+//   1. D.onboardingDone === true       → trust, skip (no network call).
+//      This flag only ever flips false → true, so a positive value is
+//      always reliable. The bug we're fixing is the FALSE case.
+//   2. profiles.onboarding_completed   → authoritative; survives Safari
+//      localStorage wipes and the 2-second debounced cloudSync race
+//      that used to drop the flag when the user closed the tab fast.
+//   3. D.onboardingDone === false      → only trusted as a fallback when
+//      the Supabase read errors (true offline scenario).
+async function maybeShowOnboarding(){
   if(typeof D === 'undefined' || !D) return;
-  if(D.onboardingDone) return;
   if(typeof IS_DEMO !== 'undefined' && IS_DEMO) return;
   if(typeof window !== 'undefined' && window._faithFree) return;
+
+  // 1. Fast path — no network call for the common returning-user case.
+  if(D.onboardingDone){
+    console.log('[onboarding] D.onboardingDone=true — skip wizard');
+    return;
+  }
+
+  // 2. Block on Supabase. The wizard overlay stays display:none until we
+  //    know for sure whether to render it.
+  let supabaseSaysCompleted = null; // null = unknown (read failed)
+  try {
+    const supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+    if(supa && typeof _supaUser !== 'undefined' && _supaUser){
+      const { data, error } = await supa.from('profiles')
+        .select('onboarding_completed')
+        .eq('user_id', _supaUser.id)
+        .maybeSingle();
+      if(error){
+        console.warn('[onboarding] Supabase read error — fall back to D:', error.message);
+      } else {
+        supabaseSaysCompleted = !!(data && data.onboarding_completed);
+        console.log('[onboarding] Supabase onboarding_completed =', supabaseSaysCompleted);
+      }
+    }
+  } catch(e){
+    console.warn('[onboarding] Supabase read threw — fall back to D:', e && e.message);
+  }
+
+  if(supabaseSaysCompleted === true){
+    // Promote D so future fast-path checks short-circuit without a query.
+    D.onboardingDone = true;
+    if(typeof save === 'function') save();
+    console.log('[onboarding] Promoted D.onboardingDone from Supabase column');
+    return;
+  }
+  // 3. Offline fallback — only trust D.onboardingDone if the read FAILED.
+  //    A successful read with onboarding_completed=false (or missing row)
+  //    means we genuinely need to run the wizard.
+  if(supabaseSaysCompleted === null && D.onboardingDone){
+    console.log('[onboarding] Supabase unreachable, D says done — skip wizard');
+    return;
+  }
+
   const overlay = document.getElementById('onboardingOverlay');
   if(!overlay) return;
   _onbCurrentStep = 1;
@@ -1890,7 +1945,13 @@ function onbSetReminder(val, btn){
   if(btn) btn.classList.add('active');
 }
 
-function onbComplete(){
+// Async — awaits a direct write to dedicated profiles columns before
+// closing the wizard. The debounced cloudSync() inside save() is NOT
+// reliable for completion state: a fast tab-close beats the 2-second
+// debounce, and Safari's aggressive localStorage clearing leaves the
+// returning user with no D.onboardingDone either. The dedicated columns
+// (run docs/migrations/onboarding-flag.sql first) survive both.
+async function onbComplete(){
   if(_onbSelectedAge && _onbSelectedAge !== 'parent') D.ageBracket = _onbSelectedAge;
   if(_onbSelectedAge === 'parent'){
     if(!D.profile) D.profile = {};
@@ -1905,7 +1966,41 @@ function onbComplete(){
   const nameVal = ni ? ni.value.trim() : '';
   if(nameVal) D.name = nameVal;
   D.onboardingDone = true;
+  // Mirror the completion timestamp inside D too so the backfill SQL
+  // can find the right value on legacy rows that never reach the column.
+  D.onboardingCompletedAt = new Date().toISOString();
   if(typeof save === 'function') save();
+
+  // Synchronous Supabase write to dedicated columns. We await this BEFORE
+  // closing the wizard so a fast tab-close cannot drop the completion
+  // flag. On error we still close the overlay (user shouldn't be trapped
+  // offline) — D.onboardingDone + the debounced cloudSync are the
+  // fallback, and next boot's Supabase fast-path will be the safety net.
+  try {
+    const supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+    if(supa && typeof _supaUser !== 'undefined' && _supaUser){
+      const payload = {
+        onboarding_completed: true,
+        onboarding_completed_at: D.onboardingCompletedAt,
+      };
+      if(nameVal) payload.first_name = nameVal;
+      if(_onbSelectedAge) payload.age_bracket = _onbSelectedAge;
+      const { error } = await supa.from('profiles')
+        .update(payload)
+        .eq('user_id', _supaUser.id);
+      if(error){
+        console.warn('[onboarding] direct column write failed — debounced cloudSync will retry the blob:', error.message);
+        if(typeof showToast === 'function') showToast('Saved locally — we\'ll sync when you reconnect');
+      } else {
+        console.log('[onboarding] columns written:', payload);
+      }
+    } else {
+      console.log('[onboarding] no Supabase client/user — completion stored locally only');
+    }
+  } catch(e){
+    console.warn('[onboarding] direct column write threw:', e && e.message);
+    if(typeof showToast === 'function') showToast('Saved locally — we\'ll sync when you reconnect');
+  }
 
   if(typeof applyName === 'function') applyName();
   if(typeof renderHeroGreeting === 'function') renderHeroGreeting();
