@@ -89,6 +89,12 @@ const DEF = {
   // Stored as accumulated XP points; getTraitLevel() in traits.js
   // derives the [0..4] level using TRAIT_THRESHOLDS = [0,50,150,350,700].
   traits:{},
+  // 2026-05-26 — Per-day trait gains, used by the "TODAY'S GROWTH"
+  // home-screen card. Shape: { 'YYYY-MM-DD': { courage:3, faith:2, … } }.
+  // Pruned to last 30 days by _pruneDailyTraits() in traits.js so the
+  // JSONB blob doesn't bloat. The lifetime totals in D.traits are still
+  // the source of truth for levels — this is purely a daily-feedback view.
+  traitsDaily:{},
   // 2026-05-30 — Smart Welcome state. faithLastVisit is the ms
   // timestamp of the last time the user entered the faith section;
   // renderFaithZones uses it to decide whether to show the

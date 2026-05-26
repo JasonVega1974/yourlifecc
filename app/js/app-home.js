@@ -125,6 +125,12 @@
     }
     home.style.display = '';
     renderAppGreeting();
+    // 2026-05-26 — daily growth snapshot. Renders into any
+    // .today-growth-card (this surface has one between the Daily
+    // Briefing wrap and the destination menu).
+    if (typeof renderDailyGrowth === 'function'){
+      try { renderDailyGrowth(); } catch (e) {}
+    }
   }
 
   // Closes a race: the initial DOMContentLoaded render fires BEFORE

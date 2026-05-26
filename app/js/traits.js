@@ -70,6 +70,51 @@ function getTraitLevel(key, points){
   return level;
 }
 
+// Today's key for the daily-gains map. Local time (not UTC) so the
+// streak rolls over at the user's midnight, not Greenwich's.
+function _traitTodayKey(){
+  var d = new Date();
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+
+// Cap the daily map at the last 30 days so it doesn't grow unbounded
+// inside the profiles.data JSONB blob. The lifetime totals in D.traits
+// stay forever — only the per-day decomposition is bounded.
+function _pruneDailyTraits(){
+  if (!D || !D.traitsDaily) return;
+  var keys = Object.keys(D.traitsDaily).sort();
+  if (keys.length <= 30) return;
+  var toRemove = keys.slice(0, keys.length - 30);
+  for (var i = 0; i < toRemove.length; i++) delete D.traitsDaily[toRemove[i]];
+}
+
+// Consecutive days (ending today) where the user awarded ≥1 trait point.
+// Returns 0 if today has no growth — the streak chip is only meaningful
+// when today is part of it.
+function _getGrowthStreak(){
+  if (!D || !D.traitsDaily) return 0;
+  var streak = 0;
+  var cursor = new Date();
+  for (var i = 0; i < 30; i++){
+    var key = cursor.getFullYear() + '-' +
+      String(cursor.getMonth() + 1).padStart(2, '0') + '-' +
+      String(cursor.getDate()).padStart(2, '0');
+    var day = D.traitsDaily[key];
+    var hadGrowth = !!(day && Object.keys(day).some(function(k){ return (+day[k] || 0) > 0; }));
+    if (hadGrowth){
+      streak++;
+    } else {
+      // Today (i===0) with no growth → streak is 0.
+      // Earlier day with no growth → streak ends.
+      break;
+    }
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  return streak;
+}
+
 function awardTrait(traitKey, amount){
   if (!_tEnsure()) return;
   if (!TRAITS[traitKey]) return;
@@ -77,14 +122,117 @@ function awardTrait(traitKey, amount){
   var prev = +D.traits[traitKey] || 0;
   var next = prev + amount;
   D.traits[traitKey] = next;
+
+  // Track today's growth alongside the lifetime total. Lifetime drives
+  // levels; daily drives the "TODAY'S GROWTH" home-screen card.
+  if (!D.traitsDaily || typeof D.traitsDaily !== 'object' || Array.isArray(D.traitsDaily)){
+    D.traitsDaily = {};
+  }
+  var today = _traitTodayKey();
+  if (!D.traitsDaily[today]) D.traitsDaily[today] = {};
+  D.traitsDaily[today][traitKey] = (+D.traitsDaily[today][traitKey] || 0) + amount;
+  _pruneDailyTraits();
+
   var oldLevel = getTraitLevel(traitKey, prev);
   var newLevel = getTraitLevel(traitKey, next);
   showTraitToast(traitKey, amount);
   if (newLevel > oldLevel) showTraitLevelUp(traitKey, newLevel);
   if (typeof save === 'function') save();
-  // Re-render the compact widget if it's mounted (zone 2 of faith).
-  if (typeof renderGrowthCompact === 'function') {
+
+  // Re-render any mounted growth widgets so the user sees the bump live.
+  if (typeof renderGrowthCompact === 'function'){
     try { renderGrowthCompact(); } catch (e) {}
+  }
+  if (typeof renderDailyGrowth === 'function'){
+    try { renderDailyGrowth(); } catch (e) {}
+  }
+}
+
+// "TODAY'S GROWTH" home-screen card. Renders into every matching
+// element (both #appHome and #fzHome carry one — addressed by class
+// instead of id to avoid the duplicate-id hazard the spec implied).
+// Always renders (with an empty-state body when nothing earned today),
+// so users always see what the card is for.
+function renderDailyGrowth(){
+  if (typeof document === 'undefined') return;
+  var cards = document.querySelectorAll('.today-growth-card');
+  if (!cards || !cards.length) return;
+  _tEnsure();
+  var today = _traitTodayKey();
+  var todayData = (D && D.traitsDaily && D.traitsDaily[today]) || {};
+
+  // Materialize + sort entries (highest gain first). Inline rather than
+  // Object.entries so we keep parity with the file's ES5-flavoured style.
+  var keys = Object.keys(todayData);
+  var entries = [];
+  for (var i = 0; i < keys.length; i++){
+    var k = keys[i];
+    var v = +todayData[k] || 0;
+    if (v > 0) entries.push([k, v]);
+  }
+  entries.sort(function(a, b){ return b[1] - a[1]; });
+
+  var totalGrowth = 0;
+  for (var e = 0; e < entries.length; e++) totalGrowth += entries[e][1];
+  var streak = _getGrowthStreak();
+  var streakChip = (totalGrowth > 0 && streak > 1)
+    ? '<span class="tg-streak">🔥 ' + streak + 'd</span>'
+    : '';
+
+  var html;
+  if (entries.length === 0){
+    html =
+      '<div class="tg-header">'
+    +   '<span class="tg-icon" aria-hidden="true">✨</span>'
+    +   '<span class="tg-title">TODAY\'S GROWTH</span>'
+    + '</div>'
+    + '<div class="tg-empty">'
+    +   'No growth yet today. Take an action — any trait will grow.'
+    + '</div>';
+  } else {
+    var pills = '';
+    for (var p = 0; p < entries.length; p++){
+      var key = entries[p][0];
+      var amount = entries[p][1];
+      var t = TRAITS[key];
+      if (!t) continue;
+      pills += ''
+        + '<div class="tg-pill" title="' + _tEsc(t.desc || '') + '">'
+        +   '<span class="tg-pill-emoji" aria-hidden="true">' + _tEsc(t.emoji) + '</span>'
+        +   '<span class="tg-pill-name">' + _tEsc(t.name) + '</span>'
+        +   '<span class="tg-pill-amount">+' + amount + '</span>'
+        + '</div>';
+    }
+    html =
+      '<div class="tg-header">'
+    +   '<span class="tg-icon" aria-hidden="true">✨</span>'
+    +   '<span class="tg-title">TODAY\'S GROWTH</span>'
+    +   streakChip
+    +   '<span class="tg-total">+' + totalGrowth + '</span>'
+    + '</div>'
+    + '<div class="tg-pills">' + pills + '</div>'
+    + '<div class="tg-footer">Tap a trait to see your journey →</div>';
+  }
+
+  // Write the same content into every mounted card and wire the tap-to-
+  // open-Growth-Profile handler. The handler decides which surface is
+  // active (fzHome vs appHome) before navigating.
+  for (var c = 0; c < cards.length; c++){
+    var card = cards[c];
+    card.innerHTML = html;
+    card.style.cursor = 'pointer';
+    card.onclick = function(){
+      var fzHome = document.getElementById('fzHome');
+      var fzVisible = !!(fzHome && fzHome.offsetParent !== null && fzHome.style.display !== 'none');
+      if (fzVisible && typeof fzOpenDest === 'function'){
+        fzOpenDest('growth');
+      } else if (typeof showSection === 'function'){
+        showSection('s-scripture');
+        setTimeout(function(){
+          if (typeof fzOpenDest === 'function') fzOpenDest('growth');
+        }, 200);
+      }
+    };
   }
 }
 
@@ -197,4 +345,6 @@ if (typeof window !== 'undefined'){
   window.showTraitLevelUp    = showTraitLevelUp;
   window.renderGrowthCompact = renderGrowthCompact;
   window.openGrowthProfile   = openGrowthProfile;
+  window.renderDailyGrowth   = renderDailyGrowth;
+  window._traitTodayKey      = _traitTodayKey;
 }

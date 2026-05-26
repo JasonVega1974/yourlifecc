@@ -1129,6 +1129,13 @@
 
     </div><!-- /#appDailyBriefingWrap -->
 
+    <!-- 2026-05-26 — Today's growth snapshot. Sister card lives in
+         #fzHome; renderDailyGrowth in traits.js targets BOTH via the
+         shared .today-growth-card class (class-only addressing avoids
+         the duplicate-id hazard). Always rendered — shows an empty
+         state when nothing earned today. -->
+    <div class="today-growth-card" aria-label="Today's growth"></div>
+
     <div class="app-menu-label">WHAT DO YOU WANT TO DO?</div>
 
     <div id="appMenu">
@@ -6481,6 +6488,97 @@
       font-size:.7rem; color:var(--tx2); font-weight:600;
     }
 
+    /* ── 2026-05-26 — TODAY'S GROWTH snapshot card ──
+       Lives inside both #appHome (after the Daily Briefing) and #fzHome
+       (between greeting and menu). Same class on both so
+       renderDailyGrowth() in traits.js can target via class without
+       creating duplicate IDs. Tappable → opens the Growth Profile. */
+    .today-growth-card{
+      background:linear-gradient(135deg,
+        color-mix(in srgb, var(--p) 8%, var(--card-bg)),
+        color-mix(in srgb, var(--c) 8%, var(--card-bg)));
+      border:1px solid color-mix(in srgb, var(--p) 25%, var(--card-border));
+      border-radius:14px;
+      padding:.9rem 1rem;
+      margin:.5rem 0 1rem;
+      cursor:pointer;
+      transition:border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+    }
+    .today-growth-card:hover{
+      border-color:var(--p);
+      transform:translateY(-1px);
+      box-shadow:0 4px 16px rgba(123,104,238,0.15);
+    }
+    .tg-header{
+      display:flex; align-items:center; gap:.5rem;
+      margin-bottom:.7rem;
+    }
+    .tg-icon{
+      font-size:1.1rem;
+      filter:drop-shadow(0 0 6px rgba(255,215,0,0.4));
+    }
+    .tg-title{
+      font-size:.7rem;
+      font-weight:700;
+      letter-spacing:.12em;
+      color:var(--tx2);
+      flex:1;
+    }
+    .tg-streak{
+      font-size:.7rem;
+      font-weight:700;
+      color:#ff7a3d;
+      background:rgba(255,122,61,0.12);
+      padding:.2rem .5rem;
+      border-radius:12px;
+      margin-right:.4rem;
+    }
+    .tg-total{
+      font-size:.95rem;
+      font-weight:700;
+      color:var(--p);
+    }
+    .tg-empty{
+      font-size:.82rem;
+      color:var(--tx2);
+      line-height:1.4;
+      text-align:center;
+      padding:.4rem 0;
+    }
+    .tg-pills{
+      display:flex;
+      flex-wrap:wrap;
+      gap:.4rem;
+      margin-bottom:.6rem;
+    }
+    .tg-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:.3rem;
+      background:var(--card-bg);
+      border:1px solid var(--card-border);
+      border-radius:16px;
+      padding:.3rem .6rem;
+      font-size:.78rem;
+      animation:tgPillIn .4s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    @keyframes tgPillIn{
+      from{ opacity:0; transform:scale(0.7); }
+      to  { opacity:1; transform:scale(1); }
+    }
+    .tg-pill-emoji{ font-size:.95rem; }
+    .tg-pill-name{ color:var(--tx); font-weight:600; }
+    .tg-pill-amount{ color:var(--p); font-weight:700; }
+    .tg-footer{
+      font-size:.7rem;
+      color:var(--tx2);
+      text-align:right;
+    }
+    @media (prefers-reduced-motion: reduce){
+      .today-growth-card{ transition:none; }
+      .tg-pill{ animation:none; }
+    }
+
     /* ── 2026-05-30 — Smart Welcome Back screen ──
        Shown only for 24h+ returners. Time-aware greeting + optional
        "continue where you left off" + 3 contextual paths + browse
@@ -6861,6 +6959,10 @@
   -->
   <div id="fzHome">
     <div id="fzGreeting"></div>
+    <!-- 2026-05-26 — Today's growth snapshot, sister card to the one
+         inside #appHome. renderDailyGrowth() targets both via the
+         shared .today-growth-card class. -->
+    <div class="today-growth-card" aria-label="Today's growth"></div>
     <div id="fzMenu">
       <button class="fz-menu-btn" data-dest="mystery" onclick="fzOpenDest('mystery')">
         <span class="fz-mb-icon" aria-hidden="true">✝️</span>

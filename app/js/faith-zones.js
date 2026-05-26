@@ -1137,6 +1137,13 @@ function renderFzGreeting(){
       '</div>' +
       streakBadge +
     '</div>';
+  // 2026-05-26 — daily growth snapshot. Lives inside #fzHome between
+  // the greeting and the menu (markup in index.html). Rendered here
+  // so the card refreshes alongside the greeting every time the user
+  // lands back on the faith home.
+  if (typeof renderDailyGrowth === 'function'){
+    try { renderDailyGrowth(); } catch (e) {}
+  }
 }
 
 // ════════════════════════════════════════════════════════════
