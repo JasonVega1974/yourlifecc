@@ -85,3 +85,11 @@ create index if not exists profiles_faith_only_idx
 -- row operation (verified clean in Phase 1.1 hardening, see
 -- /docs/F0-followups.md). New columns inherit those policies — no
 -- policy changes needed in this migration.
+
+-- ── Oct 30 2026 compliance note (added 2026-05-27) ──
+-- This migration only adds COLUMNS to the existing `profiles` table —
+-- no new tables are created. Data API exposure grants on `profiles`
+-- already exist from its original migration; ALTER TABLE inherits
+-- them. No GRANT statements are required here. See
+-- docs/migrations/template.sql for the canonical pattern when a new
+-- CREATE TABLE migration is needed.

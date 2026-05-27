@@ -20,3 +20,9 @@ alter table admin_card_photos enable row level security;
 -- All access goes through the /api/admin-card-photo Vercel function.
 create policy "Service role only" on admin_card_photos
   using (auth.role() = 'service_role');
+
+-- ── Data API exposure grants (added 2026-05-27, Oct 30 2026 compliance) ──
+-- Tables created after Oct 30, 2026 require explicit GRANTs for the
+-- Data API to see them; RLS still gates per-row access. Idempotent.
+grant select, insert, update, delete on admin_card_photos to authenticated;
+grant all on admin_card_photos to service_role;

@@ -115,6 +115,7 @@ If the guardian returns `FAIL`, restore the tail before any further edits — do
 - `docs/F0-followups.md` — deferred items + the faith_free/Stripe production-block writeup.
 - `docs/F1-spec.md` — phase-1 faith content build-out.
 - `docs/migrations/*.sql` — Supabase schema for memory verses, prayer requests, faith plans (RLS policies included).
+- `docs/migrations/template.sql` — canonical template for new Supabase migrations. **All new Supabase migrations must include explicit GRANT statements after Oct 30, 2026** — tables created after that date no longer auto-grant Data API access to `authenticated` / `service_role`, so PostgREST returns 401/403 without them. Copy the template and fill in the placeholders. RLS still gates per-row access on top.
 - `docs/superpowers/specs/` and `docs/superpowers/plans/` — UX redesign work for the mom-of-teen persona.
 
 ## Standing Rules — Non-Negotiable

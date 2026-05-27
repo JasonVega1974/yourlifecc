@@ -66,3 +66,9 @@ create policy "memory_verses_delete_own"
 -- whose auth.uid() does NOT match user_id):
 --   select count(*) from memory_verses
 --   where user_id != auth.uid();
+
+-- ── Data API exposure grants (added 2026-05-27, Oct 30 2026 compliance) ──
+-- Tables created after Oct 30, 2026 require explicit GRANTs for the
+-- Data API to see them; RLS still gates per-row access. Idempotent.
+grant select, insert, update, delete on public.memory_verses to authenticated;
+grant all on public.memory_verses to service_role;

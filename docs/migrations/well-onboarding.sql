@@ -13,3 +13,11 @@
 
 alter table profiles
   add column if not exists well_onboarded boolean default false;
+
+-- ── Oct 30 2026 compliance note (added 2026-05-27) ──
+-- This migration only adds COLUMNS to the existing `profiles` table —
+-- no new tables are created. Data API exposure grants on `profiles`
+-- already exist from its original migration; ALTER TABLE inherits
+-- them. No GRANT statements are required here. See
+-- docs/migrations/template.sql for the canonical pattern when a new
+-- CREATE TABLE migration is needed.

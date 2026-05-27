@@ -69,3 +69,9 @@ create policy "faith_plan_progress_delete_own"
 -- whose auth.uid() does NOT match user_id):
 --   select count(*) from faith_plan_progress
 --   where user_id != auth.uid();
+
+-- ── Data API exposure grants (added 2026-05-27, Oct 30 2026 compliance) ──
+-- Tables created after Oct 30, 2026 require explicit GRANTs for the
+-- Data API to see them; RLS still gates per-row access. Idempotent.
+grant select, insert, update, delete on public.faith_plan_progress to authenticated;
+grant all on public.faith_plan_progress to service_role;

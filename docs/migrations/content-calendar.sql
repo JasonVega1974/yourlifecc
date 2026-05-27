@@ -88,3 +88,9 @@ drop trigger if exists featured_content_updated_at on public.featured_content;
 create trigger featured_content_updated_at
   before update on public.featured_content
   for each row execute function public.set_updated_at();
+
+-- ── Data API exposure grants (added 2026-05-27, Oct 30 2026 compliance) ──
+-- Tables created after Oct 30, 2026 require explicit GRANTs for the
+-- Data API to see them; RLS still gates per-row access. Idempotent.
+grant select, insert, update, delete on public.featured_content to authenticated;
+grant all on public.featured_content to service_role;

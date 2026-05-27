@@ -194,3 +194,14 @@ create policy "ministry_highlights_select_active"
   );
 
 -- No INSERT / UPDATE / DELETE policies. Admin pushes via service role.
+
+-- ── Data API exposure grants (added 2026-05-27, Oct 30 2026 compliance) ──
+-- Tables created after Oct 30, 2026 require explicit GRANTs for the
+-- Data API to see them; RLS still gates per-row access. Idempotent.
+-- donations: service-role only (no end-user reads).
+grant all on public.donations to service_role;
+-- announcements + ministry_highlights: authenticated read; writes are service-role.
+grant select on public.announcements to authenticated;
+grant all on public.announcements to service_role;
+grant select on public.ministry_highlights to authenticated;
+grant all on public.ministry_highlights to service_role;

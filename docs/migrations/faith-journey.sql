@@ -69,3 +69,11 @@ create policy "Users see own profile"
   on public.faith_profile
   for all
   using (auth.uid() = user_id);
+
+-- ── Data API exposure grants (added 2026-05-27, Oct 30 2026 compliance) ──
+-- Tables created after Oct 30, 2026 require explicit GRANTs for the
+-- Data API to see them; RLS still gates per-row access. Idempotent.
+grant select, insert, update, delete on public.faith_journey_entries to authenticated;
+grant all on public.faith_journey_entries to service_role;
+grant select, insert, update, delete on public.faith_profile to authenticated;
+grant all on public.faith_profile to service_role;

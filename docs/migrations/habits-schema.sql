@@ -116,3 +116,11 @@ drop policy if exists "habit_completions_delete_own" on public.habit_completions
 create policy "habit_completions_delete_own"
   on public.habit_completions for delete
   using (auth.uid() = user_id);
+
+-- ── Data API exposure grants (added 2026-05-27, Oct 30 2026 compliance) ──
+-- Tables created after Oct 30, 2026 require explicit GRANTs for the
+-- Data API to see them; RLS still gates per-row access. Idempotent.
+grant select, insert, update, delete on public.habits to authenticated;
+grant all on public.habits to service_role;
+grant select, insert, update, delete on public.habit_completions to authenticated;
+grant all on public.habit_completions to service_role;

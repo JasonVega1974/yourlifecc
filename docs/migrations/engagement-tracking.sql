@@ -24,3 +24,11 @@ CREATE INDEX IF NOT EXISTS idx_profiles_engagement   ON profiles (engagement_sco
 -- Existing RLS policies on `profiles` already gate read/update by user_id
 -- ownership; no policy changes needed. The new columns inherit the same
 -- row-level access (own row read/write only) automatically.
+
+-- ── Oct 30 2026 compliance note (added 2026-05-27) ──
+-- This migration only adds COLUMNS to the existing `profiles` table —
+-- no new tables are created. Data API exposure grants on `profiles`
+-- already exist from its original migration; ALTER TABLE inherits
+-- them. No GRANT statements are required here. See
+-- docs/migrations/template.sql for the canonical pattern when a new
+-- CREATE TABLE migration is needed.

@@ -66,3 +66,9 @@ create index if not exists faith_activity_log_user_date_idx
 -- Per-child summaries: "prayer activity for profile 1234 this week"
 create index if not exists faith_activity_log_profile_type_idx
   on public.faith_activity_log (user_id, profile_id, activity_type, activity_date desc);
+
+-- ── Data API exposure grants (added 2026-05-27, Oct 30 2026 compliance) ──
+-- Tables created after Oct 30, 2026 require explicit GRANTs for the
+-- Data API to see them; RLS still gates per-row access. Idempotent.
+grant select, insert, update, delete on public.faith_activity_log to authenticated;
+grant all on public.faith_activity_log to service_role;

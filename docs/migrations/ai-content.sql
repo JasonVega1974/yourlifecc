@@ -39,3 +39,9 @@ CREATE POLICY "custom_meditations_delete" ON custom_meditations
 -- Fast per-user lookups ordered by newest first
 CREATE INDEX IF NOT EXISTS custom_meditations_user_created_idx
   ON custom_meditations (user_id, created_at DESC);
+
+-- ── Data API exposure grants (added 2026-05-27, Oct 30 2026 compliance) ──
+-- Tables created after Oct 30, 2026 require explicit GRANTs for the
+-- Data API to see them; RLS still gates per-row access. Idempotent.
+GRANT SELECT, INSERT, UPDATE, DELETE ON custom_meditations TO authenticated;
+GRANT ALL ON custom_meditations TO service_role;

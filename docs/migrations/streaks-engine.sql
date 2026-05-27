@@ -34,3 +34,9 @@ create policy "Users manage own streaks"
   on public.user_streaks for all
   using  (auth.uid() = user_id)
   with check (auth.uid() = user_id);
+
+-- ── Data API exposure grants (added 2026-05-27, Oct 30 2026 compliance) ──
+-- Tables created after Oct 30, 2026 require explicit GRANTs for the
+-- Data API to see them; RLS still gates per-row access. Idempotent.
+grant select, insert, update, delete on public.user_streaks to authenticated;
+grant all on public.user_streaks to service_role;

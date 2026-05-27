@@ -53,3 +53,11 @@ ALTER TABLE sermon_notes ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users see own sermon notes"
   ON sermon_notes FOR ALL
   USING (auth.uid() = user_id);
+
+-- ── Data API exposure grants (added 2026-05-27, Oct 30 2026 compliance) ──
+-- Tables created after Oct 30, 2026 require explicit GRANTs for the
+-- Data API to see them; RLS still gates per-row access. Idempotent.
+GRANT SELECT, INSERT, UPDATE, DELETE ON reading_plan_progress TO authenticated;
+GRANT ALL ON reading_plan_progress TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON sermon_notes TO authenticated;
+GRANT ALL ON sermon_notes TO service_role;
