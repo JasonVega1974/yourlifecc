@@ -115,7 +115,7 @@ If the guardian returns `FAIL`, restore the tail before any further edits — do
 - `docs/F0-followups.md` — deferred items + the faith_free/Stripe production-block writeup.
 - `docs/F1-spec.md` — phase-1 faith content build-out.
 - `docs/migrations/*.sql` — Supabase schema for memory verses, prayer requests, faith plans (RLS policies included).
-- `docs/migrations/template.sql` — canonical template for new Supabase migrations. **All new Supabase migrations must include explicit GRANT statements after Oct 30, 2026** — tables created after that date no longer auto-grant Data API access to `authenticated` / `service_role`, so PostgREST returns 401/403 without them. Copy the template and fill in the placeholders. RLS still gates per-row access on top.
+- `docs/migrations/_TEMPLATE.sql` — canonical template for new Supabase migrations. **All new Supabase migrations must include explicit GRANT statements after Oct 30, 2026** — tables created after that date no longer auto-grant Data API access to `authenticated` / `service_role`, so PostgREST returns 401/403 without them. Copy the template and fill in the placeholders. RLS still gates per-row access on top. See the "Supabase Table Creation Rules" section below for the full checklist.
 - `docs/superpowers/specs/` and `docs/superpowers/plans/` — UX redesign work for the mom-of-teen persona.
 
 ## Standing Rules — Non-Negotiable
@@ -125,6 +125,26 @@ If the guardian returns `FAIL`, restore the tail before any further edits — do
 - Deployment: Use git commit and git push from Claude Code bash. Stage only the specific files changed in the current phase using targeted git add. Never use git push --force except as authorized one-time exception. GitHub web UI uploads are retired.
 - JS validation: run `node --check` before any JS module is uploaded
 - Single-file architecture: `/app/index.html` plus modules in `/app/js/` (init.js, ui.js, sync.js, faith.js, data.js, auth.js, parent.js, skills.js)
+
+## Supabase Table Creation Rules
+
+ALWAYS when creating a new Supabase table, use the template at `docs/migrations/_TEMPLATE.sql` as the starting point.
+
+Every CREATE TABLE migration MUST include:
+1. `ALTER TABLE ... ENABLE ROW LEVEL SECURITY`
+2. At least one RLS policy (user-scoped or service-only)
+3. EXPLICIT Data API `GRANT` statements at the bottom (required for Oct 30, 2026 Supabase changes)
+
+The 4 grant patterns (pick one based on table purpose):
+
+- **User data:** `GRANT SELECT, INSERT, UPDATE, DELETE ON <table> TO authenticated; GRANT ALL ON <table> TO service_role;`
+- **Public form** (waitlist, contact, application): add `GRANT INSERT ON <table> TO anon;` to the user-data pattern
+- **CMS content** (everyone reads, service manages): `GRANT SELECT ON <table> TO authenticated; GRANT SELECT ON <table> TO anon; GRANT ALL ON <table> TO service_role;`
+- **Service only** (admin logs, webhooks): `GRANT ALL ON <table> TO service_role;`
+
+**NEVER create a table without explicit grants.** The Supabase Oct 30, 2026 change will silently break unsecured new tables — PostgREST returns 401/403 even with permissive RLS in place.
+
+Run `bash scripts/check-migrations.sh` before committing any migration change. It fails (exit 1) if any `docs/migrations/*.sql` contains `CREATE TABLE` without a corresponding `GRANT`.
 
 ## index.html Tail Integrity (Non-Negotiable)
 
