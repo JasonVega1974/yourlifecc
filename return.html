@@ -8,7 +8,7 @@
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,500&family=Spline+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <!-- Supabase + QR -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -16,22 +16,24 @@
 
 <style>
   :root{
-    --bg:#13150f;
-    --bg2:#191b13;
-    --surface:#21241a;
-    --surface2:#2a2d20;
-    --line:#3a3d2d;
-    --line-soft:#2f3224;
-    --ink:#ece6d3;
-    --ink-soft:#b3ad97;
-    --ink-mute:#807b66;
-    --brass:#d4a24c;
-    --brass-deep:#b07f2e;
-    --pine:#7d9b6a;
-    --rust:#cd6b40;
-    --rust-soft:#3a261c;
-    --good:#7d9b6a;
-    --good-soft:#23301d;
+    /* YourLife CC dark theme — matches /app */
+    --bg:#0d1117;
+    --bg2:#161b27;
+    --surface:#1c2333;
+    --surface2:#232d42;
+    --line:#2a3652;
+    --line-soft:#1f2940;
+    --ink:#f1f5f9;
+    --ink-soft:#94a3b8;
+    --ink-mute:#64748b;
+    --brass:#38bdf8;       /* primary accent — cyan */
+    --brass-deep:#0ea5e9;  /* hover */
+    --pine:#34d399;        /* mint — success / packed */
+    --rust:#fbbf24;        /* amber — low stock / reorder */
+    --rust-soft:rgba(251,191,36,.13);
+    --good:#34d399;
+    --good-soft:rgba(52,211,153,.13);
+    --danger:#f43f5e;      /* rose — destructive (delete, errors) */
     --shadow:0 14px 40px -18px rgba(0,0,0,.7);
     --radius:14px;
   }
@@ -39,11 +41,11 @@
   html,body{margin:0;padding:0}
   body{
     background:
-      radial-gradient(1200px 700px at 85% -10%, rgba(212,162,76,.10), transparent 60%),
-      radial-gradient(900px 600px at -10% 110%, rgba(125,155,106,.10), transparent 55%),
+      radial-gradient(1200px 700px at 85% -10%, rgba(56,189,248,.10), transparent 60%),
+      radial-gradient(900px 600px at -10% 110%, rgba(52,211,153,.10), transparent 55%),
       var(--bg);
     color:var(--ink);
-    font-family:"Spline Sans",-apple-system,sans-serif;
+    font-family:"Inter",-apple-system,sans-serif;
     font-size:15px;line-height:1.5;
     -webkit-font-smoothing:antialiased;
     min-height:100vh;
@@ -60,7 +62,7 @@
   .topbar{
     position:sticky;top:0;z-index:30;
     backdrop-filter:blur(10px);
-    background:linear-gradient(180deg, rgba(19,21,15,.92), rgba(19,21,15,.78));
+    background:linear-gradient(180deg, rgba(13,17,23,.92), rgba(13,17,23,.78));
     border-bottom:1px solid var(--line-soft);
   }
   .topbar-inner{max-width:1180px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
@@ -68,11 +70,11 @@
   .crest{
     width:44px;height:44px;border-radius:11px;flex:none;
     background:linear-gradient(145deg,var(--brass),var(--brass-deep));
-    display:grid;place-items:center;color:#1a160c;
-    font-family:"Fraunces";font-weight:900;font-size:22px;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.4), 0 6px 16px -8px rgba(212,162,76,.7);
+    display:grid;place-items:center;color:#0b1220;
+    font-family:"Bebas Neue";font-weight:900;font-size:22px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4), 0 6px 16px -8px rgba(56,189,248,.5);
   }
-  .brand h1{font-family:"Fraunces";font-weight:900;font-size:22px;margin:0;letter-spacing:.2px;line-height:1}
+  .brand h1{font-family:"Bebas Neue";font-weight:900;font-size:22px;margin:0;letter-spacing:.2px;line-height:1}
   .brand .sub{font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-mute);margin-top:3px}
   nav.tabs{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
   nav.tabs button{
@@ -81,10 +83,10 @@
     transition:.16s;
   }
   nav.tabs button:hover{color:var(--ink);background:var(--surface)}
-  nav.tabs button.active{color:#1a160c;background:var(--brass);border-color:var(--brass)}
+  nav.tabs button.active{color:#0b1220;background:var(--brass);border-color:var(--brass)}
   .badge-alert{
     display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;margin-left:6px;
-    background:var(--rust);color:#fff;border-radius:9px;font-size:11px;font-weight:700;font-family:"Spline Sans Mono"
+    background:var(--rust);color:#fff;border-radius:9px;font-size:11px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace
   }
 
   main{max-width:1180px;margin:0 auto;padding:26px 20px 80px;position:relative;z-index:1}
@@ -93,15 +95,15 @@
   @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
   /* ---------- Generic ---------- */
-  h2.section{font-family:"Fraunces";font-weight:600;font-size:27px;margin:0 0 4px}
+  h2.section{font-family:"Bebas Neue";font-weight:600;font-size:27px;margin:0 0 4px}
   .section-sub{color:var(--ink-mute);font-size:14px;margin:0 0 22px}
-  .kicker{font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--brass);font-weight:600;font-family:"Spline Sans Mono"}
+  .kicker{font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--brass);font-weight:600;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
   .card{background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--radius);box-shadow:var(--shadow)}
   .pad{padding:20px}
   .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
   .grow{flex:1;min-width:0}
   .muted{color:var(--ink-mute)}
-  .mono{font-family:"Spline Sans Mono"}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 
   label.field{display:block;margin-bottom:14px}
   label.field > span{display:block;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;font-weight:600}
@@ -109,26 +111,26 @@
     width:100%;background:var(--bg2);border:1px solid var(--line);color:var(--ink);
     padding:10px 12px;border-radius:9px;font-size:14.5px;outline:none;transition:.15s;
   }
-  input:focus,select:focus,textarea:focus{border-color:var(--brass);box-shadow:0 0 0 3px rgba(212,162,76,.16)}
-  textarea{resize:vertical;min-height:120px;font-family:"Spline Sans Mono";font-size:13px;line-height:1.5}
+  input:focus,select:focus,textarea:focus{border-color:var(--brass);box-shadow:0 0 0 3px rgba(56,189,248,.18)}
+  textarea{resize:vertical;min-height:120px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;line-height:1.5}
 
   .btn{
     display:inline-flex;align-items:center;gap:8px;justify-content:center;
-    background:var(--brass);color:#1a160c;border:1px solid var(--brass);
+    background:var(--brass);color:#0b1220;border:1px solid var(--brass);
     padding:10px 18px;border-radius:9px;font-weight:700;font-size:14px;transition:.15s;
   }
-  .btn:hover{background:var(--brass-deep);border-color:var(--brass-deep);color:#fff}
+  .btn:hover{background:var(--brass-deep);border-color:var(--brass-deep);color:#0b1220}
   .btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
   .btn.ghost:hover{background:var(--surface2);color:var(--ink)}
-  .btn.danger{background:transparent;color:var(--rust);border-color:var(--rust)}
-  .btn.danger:hover{background:var(--rust);color:#fff}
+  .btn.danger{background:transparent;color:var(--danger);border-color:var(--danger)}
+  .btn.danger:hover{background:var(--danger);color:#fff}
   .btn.sm{padding:7px 12px;font-size:13px}
   .btn:disabled{opacity:.45;cursor:not-allowed}
 
   /* ---------- Dashboard stats ---------- */
   .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px}
   .stat{padding:18px 18px 16px}
-  .stat .n{font-family:"Fraunces";font-weight:900;font-size:34px;line-height:1}
+  .stat .n{font-family:"Bebas Neue";font-weight:900;font-size:34px;line-height:1}
   .stat .l{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-mute);margin-top:8px}
   .stat.alert .n{color:var(--rust)}
   @media(max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}}
@@ -138,8 +140,8 @@
   .tote-card{padding:16px;display:flex;flex-direction:column;gap:12px;cursor:pointer;transition:.16s;position:relative;overflow:hidden}
   .tote-card:hover{transform:translateY(-3px);border-color:var(--brass)}
   .tote-card .topline{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-  .tote-no{font-family:"Spline Sans Mono";font-size:12px;color:var(--brass);font-weight:600;letter-spacing:.08em}
-  .tote-card h3{font-family:"Fraunces";font-weight:600;font-size:19px;margin:2px 0 0;line-height:1.15}
+  .tote-no{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;color:var(--brass);font-weight:600;letter-spacing:.08em}
+  .tote-card h3{font-family:"Bebas Neue";font-weight:600;font-size:19px;margin:2px 0 0;line-height:1.15}
   .qr-mini{width:60px;height:60px;background:#fff;border-radius:8px;padding:5px;flex:none}
   .qr-mini img,.qr-mini canvas{width:100%!important;height:100%!important;display:block}
   .tote-meta{display:flex;gap:14px;font-size:12.5px;color:var(--ink-soft);margin-top:auto}
@@ -154,13 +156,13 @@
   th{text-align:left;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-mute);font-weight:600;padding:10px 12px;border-bottom:1px solid var(--line)}
   td{padding:9px 12px;border-bottom:1px solid var(--line-soft);vertical-align:middle}
   tr:last-child td{border-bottom:none}
-  .num{font-family:"Spline Sans Mono"}
+  .num{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
   td input{padding:6px 8px;font-size:13.5px}
   td input.qty{width:74px;text-align:center}
-  .row-low{background:rgba(205,107,64,.07)}
-  .tag-low{display:inline-block;background:var(--rust-soft);color:var(--rust);border:1px solid rgba(205,107,64,.4);
+  .row-low{background:rgba(251,191,36,.07)}
+  .tag-low{display:inline-block;background:var(--rust-soft);color:var(--rust);border:1px solid rgba(251,191,36,.4);
     font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.04em}
-  .tag-ok{display:inline-block;background:var(--good-soft);color:var(--good);border:1px solid rgba(125,155,106,.4);
+  .tag-ok{display:inline-block;background:var(--good-soft);color:var(--good);border:1px solid rgba(52,211,153,.4);
     font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px}
 
   /* ---------- Detail / scan ---------- */
@@ -172,42 +174,42 @@
   .scan-wrap{max-width:640px;margin:0 auto}
   .scan-hero{text-align:center;padding:30px 20px 10px}
   .scan-hero .crest{margin:0 auto 14px;width:54px;height:54px;font-size:27px}
-  .scan-hero h1{font-family:"Fraunces";font-weight:900;font-size:30px;margin:0}
-  .scan-hero .tote-label{color:var(--brass);font-family:"Spline Sans Mono";letter-spacing:.12em;text-transform:uppercase;font-size:13px;margin-top:8px}
+  .scan-hero h1{font-family:"Bebas Neue";font-weight:900;font-size:30px;margin:0}
+  .scan-hero .tote-label{color:var(--brass);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;font-size:13px;margin-top:8px}
   .checklist{list-style:none;margin:18px 0 0;padding:0}
   .checklist li{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid var(--line-soft);
     border-radius:12px;margin-bottom:10px;background:var(--surface)}
-  .checklist li.low{border-color:rgba(205,107,64,.45)}
+  .checklist li.low{border-color:rgba(251,191,36,.45)}
   .check-box{width:24px;height:24px;border:2px solid var(--line);border-radius:7px;flex:none;display:grid;place-items:center;cursor:pointer;transition:.15s}
   .check-box.on{background:var(--pine);border-color:var(--pine)}
-  .check-box.on::after{content:"✓";color:#1a160c;font-weight:900;font-size:15px}
+  .check-box.on::after{content:"✓";color:#0b1220;font-weight:900;font-size:15px}
   .ci-name{font-weight:600;font-size:16px}
   .ci-sub{font-size:12.5px;color:var(--ink-mute);margin-top:2px}
-  .ci-qty{margin-left:auto;font-family:"Spline Sans Mono";font-weight:600;font-size:17px;color:var(--brass);white-space:nowrap}
+  .ci-qty{margin-left:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-weight:600;font-size:17px;color:var(--brass);white-space:nowrap}
 
   /* ---------- Misc ---------- */
   .empty{text-align:center;padding:60px 20px;color:var(--ink-mute)}
-  .empty .big{font-family:"Fraunces";font-size:22px;color:var(--ink-soft);margin-bottom:8px}
+  .empty .big{font-family:"Bebas Neue";font-size:22px;color:var(--ink-soft);margin-bottom:8px}
   .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);z-index:60;
     background:var(--surface2);border:1px solid var(--line);color:var(--ink);padding:12px 20px;border-radius:11px;
     box-shadow:var(--shadow);opacity:0;transition:.25s;font-size:14px;font-weight:500;max-width:90vw}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  .toast.err{border-color:var(--rust);color:#f4c2ac}
+  .toast.err{border-color:var(--danger);color:#fecdd3}
   .divider{height:1px;background:var(--line-soft);margin:22px 0}
   details.help{margin-top:14px;border:1px solid var(--line-soft);border-radius:10px;overflow:hidden}
   details.help summary{padding:12px 16px;cursor:pointer;font-weight:600;color:var(--ink-soft);background:var(--bg2)}
   details.help .body{padding:4px 16px 16px}
-  code{font-family:"Spline Sans Mono";background:var(--bg2);padding:2px 6px;border-radius:5px;font-size:12.5px;color:var(--brass)}
-  pre{background:var(--bg2);border:1px solid var(--line-soft);border-radius:10px;padding:14px;overflow:auto;font-family:"Spline Sans Mono";font-size:12px;line-height:1.55;color:var(--ink-soft)}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--bg2);padding:2px 6px;border-radius:5px;font-size:12.5px;color:var(--brass)}
+  pre{background:var(--bg2);border:1px solid var(--line-soft);border-radius:10px;padding:14px;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.55;color:var(--ink-soft)}
   .pill-row{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
 
   /* ---------- Print labels ---------- */
   .labels-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-  .label-card{background:#fff;color:#1a160c;border-radius:12px;padding:16px;text-align:center;border:1px solid #ddd}
+  .label-card{background:#fff;color:#0b1220;border-radius:12px;padding:16px;text-align:center;border:1px solid #ddd}
   .label-card .qbox{width:150px;height:150px;margin:0 auto 10px}
   .label-card .qbox img,.label-card .qbox canvas{width:100%!important;height:100%!important}
-  .label-card .ln{font-family:"Spline Sans Mono";font-weight:600;font-size:12px;color:#b07f2e;letter-spacing:.1em}
-  .label-card .lt{font-family:"Fraunces";font-weight:900;font-size:18px;margin-top:2px}
+  .label-card .ln{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-weight:600;font-size:12px;color:#0284c7;letter-spacing:.1em}
+  .label-card .lt{font-family:"Bebas Neue";font-weight:900;font-size:18px;margin-top:2px}
   .label-card .le{font-size:11px;color:#666;letter-spacing:.16em;text-transform:uppercase;margin-top:4px}
   @media print{
     body{background:#fff!important}
@@ -298,7 +300,7 @@
     </div>
 
     <div class="row" style="justify-content:space-between;margin-bottom:14px">
-      <h3 style="font-family:'Fraunces';font-weight:600;font-size:20px;margin:0">All totes</h3>
+      <h3 style="font-family:'Bebas Neue';font-weight:600;font-size:20px;margin:0">All totes</h3>
       <button class="btn ghost sm" data-view="totes">Manage totes →</button>
     </div>
     <div class="tote-grid" id="dashGrid"></div>
@@ -319,7 +321,7 @@
         <div class="qr-big" id="detailQr"></div>
         <div class="grow">
           <div class="tote-no mono" id="detailNo"></div>
-          <h2 class="section" style="margin:2px 0 6px"><input type="text" id="detailLabel" placeholder="Tote label (e.g. First Aid)" style="font-family:'Fraunces';font-size:26px;font-weight:600;background:transparent;border:none;border-bottom:1px dashed var(--line);padding:0 0 4px;border-radius:0"></h2>
+          <h2 class="section" style="margin:2px 0 6px"><input type="text" id="detailLabel" placeholder="Tote label (e.g. First Aid)" style="font-family:'Bebas Neue';font-size:26px;font-weight:600;background:transparent;border:none;border-bottom:1px dashed var(--line);padding:0 0 4px;border-radius:0"></h2>
           <div class="row">
             <input type="text" id="detailCat" placeholder="Category" style="max-width:200px">
             <input type="text" id="detailLoc" placeholder="Storage location" style="max-width:220px">
@@ -332,7 +334,7 @@
       <div class="card">
         <div class="pad" style="padding-bottom:0">
           <div class="row" style="justify-content:space-between">
-            <h3 style="font-family:'Fraunces';font-weight:600;font-size:19px;margin:0">Supplies in this tote</h3>
+            <h3 style="font-family:'Bebas Neue';font-weight:600;font-size:19px;margin:0">Supplies in this tote</h3>
             <button class="btn sm" id="addItem">+ Add item</button>
           </div>
         </div>
@@ -493,7 +495,7 @@ function toteUrl(id){ return baseUrl() + '?tote=' + id; }
 function makeQR(el, text, size){
   el.innerHTML = '';
   new QRCode(el, { text, width:size, height:size, correctLevel: QRCode.CorrectLevel.M,
-    colorDark:'#1a160c', colorLight:'#ffffff' });
+    colorDark:'#0b1220', colorLight:'#ffffff' });
 }
 
 /* ---------- SQL block ---------- */
