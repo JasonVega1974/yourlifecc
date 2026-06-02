@@ -203,6 +203,50 @@
   pre{background:var(--bg2);border:1px solid var(--line-soft);border-radius:10px;padding:14px;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.55;color:var(--ink-soft)}
   .pill-row{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
 
+  /* ---------- Auth pill in top bar ---------- */
+  .auth-slot{display:flex;align-items:center}
+  .auth-signin{
+    display:inline-flex;align-items:center;gap:6px;
+    background:transparent;border:1px solid var(--line);color:var(--ink-soft);
+    padding:7px 12px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;transition:.15s;
+    font-family:inherit;
+  }
+  .auth-signin:hover{color:var(--ink);border-color:var(--brass);background:var(--surface)}
+  .auth-pill{
+    display:inline-flex;align-items:center;gap:10px;
+    background:var(--surface);border:1px solid var(--line);
+    padding:6px 12px;border-radius:9px;font-size:13px;color:var(--ink-soft);
+  }
+  .auth-pill .who{color:var(--ink);font-weight:600;line-height:1.15}
+  .auth-pill .who small{display:block;font-size:10px;color:var(--brass);letter-spacing:.1em;text-transform:uppercase;margin-top:2px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  .auth-pill button{
+    background:transparent;border:none;color:var(--ink-soft);font-size:12px;font-weight:600;cursor:pointer;padding:2px 4px;font-family:inherit;
+  }
+  .auth-pill button:hover{color:var(--danger)}
+
+  /* ---------- Modal overlay (PIN login) ---------- */
+  .modal-overlay{
+    position:fixed;inset:0;z-index:80;
+    background:rgba(13,17,23,.78);
+    -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+    display:grid;place-items:center;padding:20px;
+    animation:fade .2s ease both;
+  }
+  .modal-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:14px;
+    box-shadow:var(--shadow);max-width:380px;width:100%;padding:26px;
+  }
+  .modal-head{text-align:center;margin-bottom:18px}
+  .modal-head .crest{margin:0 auto 12px}
+  .modal-head h2{font-family:"Bebas Neue";font-weight:900;font-size:26px;margin:0 0 6px;letter-spacing:.02em}
+  .modal-head p{margin:0;font-size:13.5px;line-height:1.45}
+  #pinInput{
+    width:100%;background:var(--bg2);border:1px solid var(--line);color:var(--ink);
+    padding:14px;border-radius:9px;font-size:24px;letter-spacing:.4em;text-align:center;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;outline:none;transition:.15s;
+  }
+  #pinInput:focus{border-color:var(--brass);box-shadow:0 0 0 3px rgba(56,189,248,.18)}
+
   /* ---------- Print labels ---------- */
   .labels-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
   .label-card{background:#fff;color:#0b1220;border-radius:12px;padding:16px;text-align:center;border:1px solid #ddd}
@@ -247,6 +291,7 @@
       <button data-view="labels">Labels</button>
       <button data-view="settings">Settings</button>
     </nav>
+    <div class="auth-slot" id="authSlot"></div>
   </div>
 </header>
 
@@ -443,6 +488,23 @@
 
 </main>
 
+<!-- ============ PIN LOGIN MODAL ============ -->
+<div class="modal-overlay" id="authOverlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="crest">R</div>
+      <h2 id="authTitle">Sign in</h2>
+      <p class="muted">Enter your 6-digit PIN to make changes. Reads (dashboard, scan view) stay open to everyone.</p>
+    </div>
+    <input type="password" id="pinInput" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="off" placeholder="• • • • • •" aria-label="PIN">
+    <div class="row" style="gap:10px;margin-top:14px">
+      <button class="btn ghost grow" id="pinCancel" type="button">Cancel</button>
+      <button class="btn grow" id="pinSubmit" type="button">Sign in</button>
+    </div>
+    <div id="pinError" style="margin-top:10px;font-size:13px;color:var(--danger);min-height:18px;text-align:center"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -452,9 +514,10 @@
    ================================================================= */
 
 const LS = {
-  url:  'tr_sb_url',
-  key:  'tr_sb_key',
-  base: 'tr_base_url'
+  url:     'tr_sb_url',
+  key:     'tr_sb_key',
+  base:    'tr_base_url',
+  session: 'tr_session',   // sessionStorage key for the signed admin token
 };
 
 // Connection defaults — reuse the existing YourLife CC Supabase project.
@@ -470,6 +533,8 @@ const T = { totes: 'return_totes', items: 'return_supply_items' };  // prefixed 
 let sb = null;            // supabase client
 let state = { totes: [], items: [] };
 let currentToteId = null;
+let currentAdmin = null;  // { id, name, role } when signed in, else null
+let _pendingAction = null;// closure retried after a successful PIN login
 
 /* ---------- tiny helpers ---------- */
 const $  = s => document.querySelector(s);
@@ -817,56 +882,200 @@ async function renderScan(id){
 }
 
 /* =================================================================
-   Mutations
+   Auth — PIN-gated session for write ops (/api/return-admin)
+   ================================================================= */
+
+// Raw POST to /api/return-admin. Caller injects sessionToken or pin.
+async function adminPost(op, payload){
+  let res, data;
+  try {
+    res = await fetch('/api/return-admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(Object.assign({ op }, payload || {})),
+    });
+    data = await res.json().catch(()=>({}));
+  } catch(e){
+    throw new Error('Network error');
+  }
+  return { ok: res.ok, status: res.status, data };
+}
+
+// Authenticated call: auto-injects sessionToken from sessionStorage.
+async function callAuthed(op, payload){
+  const token = sessionStorage.getItem(LS.session) || '';
+  const merged = Object.assign({ sessionToken: token }, payload || {});
+  const r = await adminPost(op, merged);
+  if (r.status === 401){
+    sessionStorage.removeItem(LS.session);
+    currentAdmin = null;
+    updateAuthUI();
+    const e = new Error(r.data.error || 'Sign in required');
+    e.needsLogin = true;
+    throw e;
+  }
+  if (!r.ok) throw new Error(r.data.error || 'Request failed');
+  return r.data;
+}
+
+// Authenticated call with auto-prompt on 401. If not logged in, queues the
+// caller and pops the PIN modal; on successful login the caller is retried.
+function adminFetch(op, payload){
+  return new Promise((resolve, reject) => {
+    callAuthed(op, payload).then(resolve).catch(e => {
+      if (e.needsLogin){
+        _pendingAction = () => callAuthed(op, payload).then(resolve, reject);
+        showLoginModal();
+      } else {
+        toast(e.message || 'Failed', true);
+        reject(e);
+      }
+    });
+  });
+}
+
+async function login(pin){
+  const r = await adminPost('auth.login', { pin });
+  if (!r.ok) return { ok:false, error: r.data.error || 'Login failed' };
+  sessionStorage.setItem(LS.session, r.data.sessionToken);
+  currentAdmin = r.data.admin;
+  updateAuthUI();
+  return { ok:true, admin: r.data.admin, bootstrapped: !!r.data.bootstrapped };
+}
+
+function logout(){
+  sessionStorage.removeItem(LS.session);
+  currentAdmin = null;
+  updateAuthUI();
+  toast('Signed out');
+}
+
+// Re-hydrate session on page load.
+async function verifySession(){
+  const token = sessionStorage.getItem(LS.session);
+  if (!token) return;
+  const r = await adminPost('auth.verify', { sessionToken: token });
+  if (r.ok){ currentAdmin = r.data.admin; }
+  else     { sessionStorage.removeItem(LS.session); currentAdmin = null; }
+  updateAuthUI();
+}
+
+function showLoginModal(){
+  $('#authOverlay').style.display = 'grid';
+  $('#pinError').textContent = '';
+  $('#pinInput').value = '';
+  setTimeout(()=> $('#pinInput').focus(), 30);
+}
+
+function hideLoginModal(){
+  $('#authOverlay').style.display = 'none';
+  _pendingAction = null;
+}
+
+function updateAuthUI(){
+  const slot = $('#authSlot'); if (!slot) return;
+  if (currentAdmin){
+    slot.innerHTML =
+      '<div class="auth-pill"><div class="who">' + esc(currentAdmin.name) +
+      '<small>' + esc(currentAdmin.role) + '</small></div>' +
+      '<button id="signOutBtn" type="button">Sign out</button></div>';
+    const b = document.getElementById('signOutBtn');
+    if (b) b.onclick = logout;
+  } else {
+    slot.innerHTML = '<button class="auth-signin" id="signInBtn" type="button">🔒 Sign in</button>';
+    const b = document.getElementById('signInBtn');
+    if (b) b.onclick = showLoginModal;
+  }
+}
+
+async function submitPin(){
+  const pin = String($('#pinInput').value || '').trim();
+  if (!/^\d{6,8}$/.test(pin)){
+    $('#pinError').textContent = 'PIN must be 6–8 digits';
+    return;
+  }
+  $('#pinSubmit').disabled = true;
+  $('#pinError').textContent = '';
+  const r = await login(pin);
+  $('#pinSubmit').disabled = false;
+  if (!r.ok){
+    $('#pinError').textContent = r.error;
+    return;
+  }
+  hideLoginModal();
+  toast(r.bootstrapped
+    ? `Owner account created. Signed in as ${r.admin.name}.`
+    : `Signed in as ${r.admin.name}.`);
+  const pending = _pendingAction;
+  _pendingAction = null;
+  if (pending){
+    try { await pending(); } catch(e){ /* errors already toasted by adminFetch */ }
+  }
+}
+
+/* =================================================================
+   Mutations  (all writes go through /api/return-admin behind a PIN)
    ================================================================= */
 async function seedTotes(){
-  if(!sb){ toast('Connect Supabase first', true); return; }
-  const have = new Set(state.totes.map(t=>t.id));
-  const rows = [];
-  for(let i=1;i<=TOTE_COUNT;i++) if(!have.has(i)) rows.push({id:i,label:''});
-  if(!rows.length){ toast('All 25 totes already exist'); return; }
-  const {error} = await sb.from(T.totes).insert(rows);
-  if(error){ toast(error.message, true); return; }
-  await loadData(); renderAll();
-  toast(`Created ${rows.length} tote(s)`);
+  try {
+    const r = await adminFetch('inventory.seedTotes');
+    if (r.inserted === 0){ toast('All 25 totes already exist'); return; }
+    await loadData(); renderAll();
+    toast(`Created ${r.inserted} tote(s)`);
+  } catch(e){ /* toasted */ }
 }
 
 async function saveToteMeta(){
-  if(!sb) return;
-  const patch = { label:$('#detailLabel').value.trim(), category:$('#detailCat').value.trim(), location:$('#detailLoc').value.trim() };
-  const {error} = await sb.from(T.totes).update(patch).eq('id', currentToteId);
-  if(error){ toast(error.message, true); return; }
-  Object.assign(toteById(currentToteId), patch);
-  toast('Tote saved'); renderToteGrid();
+  const patch = {
+    toteId:  currentToteId,
+    label:   $('#detailLabel').value.trim(),
+    category:$('#detailCat').value.trim(),
+    location:$('#detailLoc').value.trim(),
+  };
+  try {
+    await adminFetch('inventory.saveToteMeta', patch);
+    Object.assign(toteById(currentToteId), {
+      label: patch.label, category: patch.category, location: patch.location
+    });
+    toast('Tote saved'); renderToteGrid();
+  } catch(e){ /* toasted */ }
 }
 
 async function addItem(){
-  if(!sb) return;
-  const {data,error} = await sb.from(T.items)
-    .insert({tote_id:currentToteId, item_name:'New item', unit:'ea'}).select().single();
-  if(error){ toast(error.message, true); return; }
-  state.items.push(data); renderItems(); updateBadge();
+  try {
+    const r = await adminFetch('inventory.addItem',
+      { toteId: currentToteId, item_name: 'New item', unit: 'ea' });
+    state.items.push(r.item); renderItems(); updateBadge();
+  } catch(e){ /* toasted */ }
 }
 
 async function saveItemField(id, field, value){
-  if(!sb) return;
   const item = state.items.find(x=>x.id===id); if(!item) return;
-  const val = ['item_name','unit','notes'].includes(field) ? value : n(value);
+  const isText = ['item_name','item_number','category','unit','notes'].includes(field);
+  const val = isText ? value : n(value);
+  // Optimistic update so UI doesn't flicker
+  const prev = item[field];
   item[field] = val;
-  const {error} = await sb.from(T.items).update({[field]:val, updated_at:new Date().toISOString()}).eq('id', id);
-  if(error){ toast(error.message, true); return; }
-  // refresh status pill for that row
-  const row = document.querySelector(`#itemsBody tr[data-id="${id}"]`);
-  if(row){ row.classList.toggle('row-low', isLow(item)); const s=row.querySelector('[data-status]'); if(s) s.innerHTML=statusCell(item); }
-  updateBadge();
+  try {
+    await adminFetch('inventory.updateItem', { itemId: id, field, value: val });
+    const row = document.querySelector(`#itemsBody tr[data-id="${id}"]`);
+    if(row){
+      row.classList.toggle('row-low', isLow(item));
+      const s = row.querySelector('[data-status]');
+      if(s) s.innerHTML = statusCell(item);
+    }
+    updateBadge();
+  } catch(e){
+    item[field] = prev;  // roll back local state if the server refused
+  }
 }
 
 async function deleteItem(id){
-  if(!sb) return;
-  const {error} = await sb.from(T.items).delete().eq('id', id);
-  if(error){ toast(error.message, true); return; }
-  state.items = state.items.filter(x=>x.id!==id);
-  renderItems(); updateBadge();
+  try {
+    await adminFetch('inventory.deleteItem', { itemId: id });
+    state.items = state.items.filter(x=>x.id!==id);
+    renderItems(); updateBadge();
+  } catch(e){ /* toasted */ }
 }
 
 /* =================================================================
@@ -937,28 +1146,20 @@ function showImportPreview(parsed){
 }
 
 async function doImport(rows, totes, missing){
-  if(!sb){ toast('Connect Supabase first', true); return; }
   const btn=$('#confirmImport'); btn.disabled=true; btn.textContent='Importing…';
   try{
-    if(missing.length){
-      const {error} = await sb.from(T.totes).insert(missing.map(id=>({id,label:''})));
-      if(error) throw error;
-    }
-    if($('#replaceTote').checked){
-      const {error} = await sb.from(T.items).delete().in('tote_id', totes);
-      if(error) throw error;
-    }
-    // chunked insert
-    for(let i=0;i<rows.length;i+=200){
-      const {error} = await sb.from(T.items).insert(rows.slice(i,i+200));
-      if(error) throw error;
-    }
+    // The edge function self-heals missing totes server-side, so we only
+    // forward rows + the replace flag.
+    const r = await adminFetch('inventory.importItems', {
+      rows: rows,
+      replaceTotes: $('#replaceTote').checked,
+    });
     await loadData(); renderAll();
     $('#importPreview').style.display='none';
     $('#importText').value='';
-    toast(`Imported ${rows.length} items`);
+    toast(`Imported ${r.inserted} items`);
     switchView('dashboard');
-  }catch(e){ toast('Import failed: '+(e.message||e), true); }
+  }catch(e){ /* toasted */ }
   finally{ btn.disabled=false; btn.textContent='Confirm import →'; }
 }
 
@@ -1062,6 +1263,17 @@ function bind(){
   // reorder
   $('#exportReorder').onclick = exportReorderCSV;
   $('#printReorder').onclick = ()=>window.print();
+
+  // PIN login modal
+  $('#pinSubmit').onclick = submitPin;
+  $('#pinCancel').onclick = hideLoginModal;
+  $('#pinInput').addEventListener('keydown', e => { if (e.key === 'Enter') submitPin(); });
+  $('#authOverlay').addEventListener('click', e => {
+    if (e.target === $('#authOverlay')) hideLoginModal();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && $('#authOverlay').style.display !== 'none') hideLoginModal();
+  });
 }
 
 /* =================================================================
@@ -1073,15 +1285,20 @@ async function boot(){
   const toteParam = params.get('tote');
   connect();
   $('#scanFullLink').href = baseUrl();
+  updateAuthUI();   // paint the sign-in button immediately
 
   if(toteParam){ renderScan(n(toteParam)); return; }
 
-  if(sb && await loadData()){
+  // Re-hydrate any prior session and load data in parallel.
+  const [loaded] = await Promise.all([
+    sb ? loadData() : Promise.resolve(false),
+    verifySession(),
+  ]);
+
+  if(loaded){
     $('#cfgStatus').textContent = '✓ Connected';
     renderAll();
-  }
-  else {
-    // not configured → land on settings
+  } else {
     switchView('settings');
     $('#cfgStatus').textContent = 'Not connected yet';
     renderAll();
