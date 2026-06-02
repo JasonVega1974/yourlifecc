@@ -5,7 +5,8 @@
     { "source": "/app/calendar.html", "destination": "/app/calendar.html" },
     { "source": "/app/(.*)", "destination": "/app/index.html" },
     { "source": "/faq", "destination": "/faq.html" },
-    { "source": "/faith", "destination": "/faith.html" }
+    { "source": "/faith", "destination": "/faith.html" },
+    { "source": "/return", "destination": "/return.html" }
   ],
   "headers": [
     {
