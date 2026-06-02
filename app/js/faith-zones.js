@@ -787,23 +787,13 @@ function _nrQuestionForToday(){
   return _NR_QUESTIONS.weekday[d.getDay()];
 }
 
-function _nrFirstName(){
-  if (D && D.name) return String(D.name).split(' ')[0];
-  if (typeof _supaUser !== 'undefined' && _supaUser){
-    var meta = _supaUser.user_metadata || {};
-    if (meta.first_name) return meta.first_name;
-    if (_supaUser.email) return _supaUser.email.split('@')[0];
-  }
-  return 'friend';
-}
-
 function openNightReflect(){
   var overlay = document.getElementById('nightReflectOverlay');
   if (!overlay) return;
   _nrState = { mood:null, moodLabel:null, text:'', step:1 };
 
   var nm = document.getElementById('nrName');
-  if (nm) nm.textContent = _nrFirstName();
+  if (nm) nm.textContent = _fzFirstName();
   var q = document.getElementById('nrQuestion');
   if (q) q.textContent = _nrQuestionForToday();
   var ta = document.getElementById('nrText');
