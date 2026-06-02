@@ -499,7 +499,13 @@ function makeQR(el, text, size){
 }
 
 /* ---------- SQL block ---------- */
-const SQL = `-- The Return · Tote Inventory schema
+// Fresh-install schema. For upgrading an existing /return install, see
+// docs/migrations/return-phase1.sql in the repo (it has IF EXISTS guards
+// for safe re-runs).
+const SQL = `-- The Return · Tote Inventory schema (Phase 1 — locked down)
+-- Public reads via anon. All writes flow through /api/return-admin
+-- behind a PIN-gated session.
+
 create table if not exists return_totes (
   id integer primary key,
   label text not null default '',
@@ -512,6 +518,8 @@ create table if not exists return_supply_items (
   id uuid primary key default gen_random_uuid(),
   tote_id integer not null references return_totes(id) on delete cascade,
   item_name text not null,
+  item_number text not null default '',
+  category text not null default '',
   quantity_target integer default 0,
   on_hand integer default 0,
   reorder_threshold integer default 0,
@@ -522,12 +530,71 @@ create table if not exists return_supply_items (
 );
 create index if not exists idx_return_supply_tote on return_supply_items(tote_id);
 
--- Internal tool: open access via the anon key.
--- Lock this down (add auth) before any public exposure.
-alter table return_totes enable row level security;
-alter table return_supply_items enable row level security;
-create policy "anon all return_totes" on return_totes for all using (true) with check (true);
-create policy "anon all return_supplies" on return_supply_items for all using (true) with check (true);`;
+create table if not exists return_events (
+  id uuid primary key default gen_random_uuid(),
+  label text not null unique,
+  is_active boolean not null default false,
+  created_at timestamptz not null default now()
+);
+create unique index if not exists one_active_return_event
+  on return_events ((is_active)) where is_active = true;
+
+create table if not exists return_admins (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  pin_hash text not null,
+  role text not null check (role in ('owner','operator')),
+  active boolean not null default true,
+  created_by_admin_id uuid references return_admins(id),
+  created_at timestamptz not null default now(),
+  revoked_at timestamptz
+);
+
+create table if not exists return_audits (
+  id uuid primary key default gen_random_uuid(),
+  item_id uuid not null references return_supply_items(id) on delete cascade,
+  event_id uuid not null references return_events(id),
+  on_hand_count integer not null,
+  prev_count integer,
+  counted_by_admin_id uuid not null references return_admins(id),
+  counted_at timestamptz not null default now(),
+  notes text not null default ''
+);
+create index if not exists idx_return_audits_item on return_audits(item_id, counted_at desc);
+
+create table if not exists return_pin_attempts (
+  ip text primary key,
+  failed_count integer not null default 0,
+  locked_until timestamptz,
+  last_attempt_at timestamptz not null default now()
+);
+
+-- RLS: anon reads only on totes/items/events. Everything else service-only.
+alter table return_totes          enable row level security;
+alter table return_supply_items   enable row level security;
+alter table return_events         enable row level security;
+alter table return_admins         enable row level security;
+alter table return_audits         enable row level security;
+alter table return_pin_attempts   enable row level security;
+
+create policy "anon read return_totes"  on return_totes        for select to anon using (true);
+create policy "anon read return_items"  on return_supply_items for select to anon using (true);
+create policy "anon read return_events" on return_events       for select to anon using (true);
+create policy "service all return_totes"        on return_totes        for all to service_role using (true) with check (true);
+create policy "service all return_items"        on return_supply_items for all to service_role using (true) with check (true);
+create policy "service all return_events"       on return_events       for all to service_role using (true) with check (true);
+create policy "service all return_admins"       on return_admins       for all to service_role using (true) with check (true);
+create policy "service all return_audits"       on return_audits       for all to service_role using (true) with check (true);
+create policy "service all return_pin_attempts" on return_pin_attempts for all to service_role using (true) with check (true);
+
+-- Explicit Data API grants (Oct 30 2026 Supabase requirement)
+grant select on return_totes, return_supply_items, return_events to anon;
+grant select on return_totes, return_supply_items, return_events to authenticated;
+grant all    on return_totes, return_supply_items, return_events, return_admins, return_audits, return_pin_attempts to service_role;
+
+-- Seed first event
+insert into return_events (label, is_active) values ('Return - Spring 2026', true)
+on conflict (label) do nothing;`;
 
 /* =================================================================
    Supabase connection
