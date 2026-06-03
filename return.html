@@ -247,6 +247,73 @@
   }
   #pinInput:focus{border-color:var(--brass);box-shadow:0 0 0 3px rgba(56,189,248,.18)}
 
+  /* ---------- Event sub-bar ---------- */
+  .event-bar{
+    background:linear-gradient(180deg, rgba(13,17,23,.55), rgba(13,17,23,.30));
+    border-bottom:1px solid var(--line-soft);
+    position:sticky;top:73px;z-index:25;
+    backdrop-filter:blur(8px);
+  }
+  .event-bar-inner{max-width:1180px;margin:0 auto;padding:9px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .event-pill{
+    position:relative;display:inline-flex;align-items:center;gap:9px;
+    padding:7px 13px;border:1px solid var(--line);border-radius:9px;background:var(--surface);
+    font-size:13px;color:var(--ink-soft);cursor:pointer;transition:.14s;user-select:none;
+  }
+  .event-pill:hover{border-color:var(--brass);color:var(--ink)}
+  .event-pill .event-pill-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-mute);font-weight:600}
+  .event-pill .event-pill-name{color:var(--ink);font-weight:600;font-family:"Bebas Neue";font-size:16px;letter-spacing:.02em}
+  .event-pill .event-pill-caret{color:var(--ink-mute);font-size:12px;margin-left:2px}
+  .event-pill.open .event-pill-caret{transform:rotate(180deg)}
+  .event-menu{
+    position:absolute;top:calc(100% + 6px);left:0;min-width:280px;max-width:380px;
+    background:var(--surface);border:1px solid var(--line);border-radius:11px;box-shadow:var(--shadow);
+    padding:7px;z-index:30;animation:fade .15s ease both;
+  }
+  .event-menu-row{
+    display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:7px;cursor:default;font-size:13.5px;
+  }
+  .event-menu-row.active{background:rgba(56,189,248,.10);color:var(--ink)}
+  .event-menu-row .ev-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .event-menu-row .ev-tick{width:14px;color:var(--brass);font-weight:900}
+  .event-menu-row button.activate{
+    background:transparent;border:1px solid var(--line);color:var(--ink-soft);
+    padding:4px 9px;border-radius:6px;font-size:12px;cursor:pointer;font-family:inherit;
+  }
+  .event-menu-row button.activate:hover{border-color:var(--brass);color:var(--brass)}
+  .event-menu-new{
+    border-top:1px solid var(--line-soft);margin-top:6px;padding:10px;display:flex;gap:6px;
+  }
+  .event-menu-new input{flex:1;padding:7px 10px;font-size:13px}
+  .event-menu-new .btn{padding:7px 12px;font-size:13px}
+
+  /* ---------- Gate cards (login required prompts) ---------- */
+  .gate-card{text-align:center;padding:34px 24px;max-width:520px;margin:30px auto}
+  .gate-card .gate-icon{font-size:34px;margin-bottom:10px;color:var(--ink-mute)}
+  .gate-card h3{font-family:"Bebas Neue";font-size:24px;margin:0 0 8px;color:var(--ink)}
+  .gate-card p{color:var(--ink-soft);margin:0 0 18px;font-size:14px}
+
+  /* ---------- Master list ---------- */
+  #masterTable td.expand-cell{width:30px;padding:0 0 0 12px;cursor:pointer;user-select:none}
+  .expand-arrow{display:inline-block;color:var(--ink-mute);font-size:11px;transition:.18s;line-height:1}
+  tr.expanded .expand-arrow{transform:rotate(90deg);color:var(--brass)}
+  tr.audit-row td{padding:0;background:var(--bg2);border-bottom:1px solid var(--line-soft)}
+  tr.audit-row .audit-wrap{padding:14px 18px;border-left:3px solid var(--brass)}
+  tr.audit-row h4{font-family:"Bebas Neue";font-weight:600;font-size:15px;margin:0 0 10px;color:var(--ink-soft);letter-spacing:.04em;text-transform:uppercase}
+  tr.audit-row table{font-size:13px}
+  tr.audit-row th{font-size:10px;padding:6px 10px}
+  tr.audit-row td{padding:7px 10px;background:transparent;border-bottom:1px solid var(--line-soft)}
+  tr.audit-row td.audit-empty{padding:18px;color:var(--ink-mute);text-align:center;font-style:italic}
+  td.cell-muted{color:var(--ink-mute)}
+  .role-chip{
+    display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:6px;
+    letter-spacing:.08em;text-transform:uppercase;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  .role-chip.owner{background:rgba(56,189,248,.13);color:var(--brass);border:1px solid rgba(56,189,248,.3)}
+  .role-chip.operator{background:rgba(148,163,184,.13);color:var(--ink-soft);border:1px solid var(--line)}
+  .status-active{color:var(--good);font-weight:600;font-size:12.5px}
+  .status-revoked{color:var(--ink-mute);font-style:italic;font-size:12.5px}
+
   /* ---------- Print labels ---------- */
   .labels-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
   .label-card{background:#fff;color:#0b1220;border-radius:12px;padding:16px;text-align:center;border:1px solid #ddd}
@@ -286,14 +353,29 @@
     <nav class="tabs" id="tabs">
       <button data-view="dashboard" class="active">Dashboard</button>
       <button data-view="totes">Totes</button>
+      <button data-view="master">Master List</button>
       <button data-view="reorder">Reorder<span class="badge-alert" id="reorderBadge" style="display:none">0</span></button>
       <button data-view="import">Import</button>
       <button data-view="labels">Labels</button>
+      <button data-view="admin" id="adminTabBtn" style="display:none">Admin</button>
       <button data-view="settings">Settings</button>
     </nav>
     <div class="auth-slot" id="authSlot"></div>
   </div>
 </header>
+
+<!-- ============ EVENT SUB-BAR ============ -->
+<div class="event-bar">
+  <div class="event-bar-inner">
+    <div class="event-pill" id="eventPill" tabindex="0" role="button" aria-haspopup="true" aria-expanded="false">
+      <span class="event-pill-label">Active event</span>
+      <span class="event-pill-name" id="eventCurrentName">—</span>
+      <span class="event-pill-caret">▾</span>
+      <div class="event-menu" id="eventMenu" style="display:none"></div>
+    </div>
+    <div class="muted" style="font-size:12px;margin-left:auto" id="eventHint"></div>
+  </div>
+</div>
 
 <main>
 
@@ -469,6 +551,101 @@
       </div>
     </div>
     <div class="labels-grid" id="labelsGrid"></div>
+  </section>
+
+  <!-- ============ MASTER LIST ============ -->
+  <section id="view-master" class="view">
+    <div class="kicker">Master inventory</div>
+    <h2 class="section">Master list</h2>
+    <p class="section-sub">Every item across every tote, with the latest audit for the active event. Click any row to expand its full chain of custody.</p>
+
+    <div id="masterGate" class="card gate-card" style="display:none">
+      <div class="gate-icon">🔒</div>
+      <h3>Sign in to view the master list</h3>
+      <p>The audit columns (counted by, count history) are restricted to admins. Enter your PIN to continue.</p>
+      <button class="btn" id="masterGateBtn" type="button">Sign in</button>
+    </div>
+
+    <div id="masterBody" style="display:none">
+      <div class="row" style="margin-bottom:14px">
+        <input type="text" id="masterFilter" placeholder="Filter by item, tote, category…" style="max-width:340px">
+        <button class="btn ghost sm" id="masterRefresh" type="button">↻ Refresh</button>
+        <span class="muted" id="masterCount" style="margin-left:auto;font-size:13px"></span>
+      </div>
+      <div class="card">
+        <div style="overflow-x:auto">
+          <table id="masterTable">
+            <thead><tr>
+              <th></th>
+              <th>Item</th><th>Item #</th><th>Tote #</th><th>Tote label</th>
+              <th>On hand</th><th>Category</th><th>Tote location</th>
+              <th>Audit count</th><th>Counted by</th><th>Counted date</th>
+            </tr></thead>
+            <tbody id="masterTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ADMIN ============ -->
+  <section id="view-admin" class="view">
+    <div class="kicker">Access control</div>
+    <h2 class="section">Admins &amp; PINs</h2>
+    <p class="section-sub">Owners can issue, revoke, and reset PINs for anyone who needs to write to the inventory.</p>
+
+    <div id="adminGate" class="card gate-card" style="display:none">
+      <div class="gate-icon">🛡️</div>
+      <h3 id="adminGateTitle">Owners only</h3>
+      <p id="adminGateMsg">Sign in with an owner PIN to manage admins.</p>
+      <button class="btn" id="adminGateBtn" type="button">Sign in</button>
+    </div>
+
+    <div id="adminBody" style="display:none">
+
+      <!-- Issue new PIN -->
+      <div class="card pad" style="max-width:740px;margin-bottom:18px">
+        <h3 style="font-family:'Bebas Neue';font-weight:600;font-size:19px;margin:0 0 14px">Issue a new PIN</h3>
+        <div class="row" style="align-items:flex-end">
+          <label class="field grow" style="margin:0;min-width:180px">
+            <span>Name</span>
+            <input type="text" id="newAdminName" placeholder="e.g. Sarah Patel" maxlength="80" autocomplete="off">
+          </label>
+          <label class="field" style="margin:0;width:170px">
+            <span>Role</span>
+            <select id="newAdminRole">
+              <option value="operator">Operator</option>
+              <option value="owner">Owner</option>
+            </select>
+          </label>
+          <button class="btn" id="issuePinBtn" type="button">Issue PIN →</button>
+        </div>
+        <div id="newPinDisplay" class="card pad" style="display:none;background:var(--good-soft);border-color:rgba(52,211,153,.35);margin-top:16px">
+          <div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.12em;font-weight:700">New PIN for <span id="newPinName" style="color:var(--ink)"></span></div>
+          <div class="mono" style="font-size:32px;font-weight:700;letter-spacing:.18em;margin:8px 0;color:var(--good)" id="newPinValue">······</div>
+          <p class="muted" style="font-size:13px;margin:0 0 10px">Copy and share this PIN now — it will not be shown again.</p>
+          <div class="row" style="gap:8px">
+            <button class="btn ghost sm" id="copyPinBtn" type="button">📋 Copy PIN</button>
+            <button class="btn ghost sm" id="dismissPinBtn" type="button">Dismiss</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin list -->
+      <div class="card">
+        <div class="pad" style="padding-bottom:0">
+          <h3 style="font-family:'Bebas Neue';font-weight:600;font-size:19px;margin:0">All admins</h3>
+        </div>
+        <div style="overflow-x:auto">
+          <table id="adminTable">
+            <thead><tr>
+              <th>Name</th><th>Role</th><th>Status</th><th>Created</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="adminTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- ============ PUBLIC SCAN VIEW ============ -->
@@ -986,6 +1163,16 @@ function updateAuthUI(){
     const b = document.getElementById('signInBtn');
     if (b) b.onclick = showLoginModal;
   }
+  // Admin tab visibility — owner only
+  const adminBtn = $('#adminTabBtn');
+  if (adminBtn){
+    adminBtn.style.display = (currentAdmin && currentAdmin.role === 'owner') ? '' : 'none';
+  }
+  // If the active view depends on auth state, refresh it
+  if ($('#view-master')   && $('#view-master').classList.contains('active'))   loadMaster();
+  if ($('#view-admin')    && $('#view-admin').classList.contains('active'))    loadAdminTab();
+  // Re-render event menu (owner controls)
+  if ($('#eventMenu') && $('#eventMenu').style.display !== 'none') renderEventMenu();
 }
 
 async function submitPin(){
@@ -1194,6 +1381,351 @@ const SAMPLE = `tote_id,item_name,quantity_target,on_hand,reorder_threshold,reor
 4,Disposable cups,200,120,100,500,ea,`;
 
 /* =================================================================
+   Phase 1c — Master list, Admin tab, Event selector
+   ================================================================= */
+
+let _events = [];           // [{id,label,is_active,created_at}]
+let _activeEvent = null;    // shortcut to the active event
+let _master = [];           // master.list rows (cached)
+let _masterFilter = '';
+
+/* ---------- Date helpers ---------- */
+function fmtDate(iso){
+  if (!iso) return '—';
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' });
+  } catch(e){ return iso; }
+}
+function fmtDateTime(iso){
+  if (!iso) return '—';
+  try {
+    const d = new Date(iso);
+    return d.toLocaleString(undefined, { year:'numeric', month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
+  } catch(e){ return iso; }
+}
+
+/* ---------- Events ---------- */
+async function loadEvents(){
+  // Anon can SELECT return_events directly — no auth required for read.
+  if (!sb) return;
+  try {
+    const { data, error } = await sb.from('return_events')
+      .select('id,label,is_active,created_at')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    _events = data || [];
+    _activeEvent = _events.find(e => e.is_active) || null;
+    renderEventPill();
+  } catch(e){
+    _events = []; _activeEvent = null;
+    renderEventPill();
+  }
+}
+
+function renderEventPill(){
+  const nameEl = $('#eventCurrentName');
+  if (nameEl) nameEl.textContent = _activeEvent ? _activeEvent.label : 'No active event';
+  // If menu is open, re-render its body
+  const menu = $('#eventMenu');
+  if (menu && menu.style.display !== 'none') renderEventMenu();
+}
+
+function renderEventMenu(){
+  const menu = $('#eventMenu');
+  const isOwner = currentAdmin && currentAdmin.role === 'owner';
+  let html = '';
+  if (!_events.length){
+    html += '<div class="muted" style="padding:10px;text-align:center;font-size:13px">No events yet.</div>';
+  } else {
+    for (const ev of _events){
+      const active = !!ev.is_active;
+      const activateBtn = (!active && isOwner)
+        ? `<button class="activate" data-activate="${esc(ev.id)}" type="button">Make active</button>`
+        : '';
+      html += `
+        <div class="event-menu-row ${active?'active':''}">
+          <span class="ev-tick">${active?'✓':''}</span>
+          <span class="ev-name" title="${esc(ev.label)}">${esc(ev.label)}</span>
+          ${activateBtn}
+        </div>`;
+    }
+  }
+  if (isOwner){
+    html += `
+      <div class="event-menu-new">
+        <input type="text" id="eventNewLabel" placeholder="New event label" maxlength="80" autocomplete="off">
+        <button class="btn sm" id="eventNewBtn" type="button">+ Add</button>
+      </div>`;
+  } else if (!_events.length){
+    html += '<div class="muted" style="padding:8px 10px;font-size:12px;text-align:center">Sign in as an owner to add events.</div>';
+  }
+  menu.innerHTML = html;
+}
+
+function toggleEventMenu(forceClose){
+  const pill = $('#eventPill');
+  const menu = $('#eventMenu');
+  if (!pill || !menu) return;
+  const open = menu.style.display !== 'none';
+  if (forceClose || open){
+    menu.style.display = 'none';
+    pill.classList.remove('open');
+    pill.setAttribute('aria-expanded','false');
+  } else {
+    renderEventMenu();
+    menu.style.display = 'block';
+    pill.classList.add('open');
+    pill.setAttribute('aria-expanded','true');
+  }
+}
+
+async function activateEvent(eventId){
+  try {
+    await adminFetch('events.setActive', { eventId });
+    await loadEvents();
+    toast('Event activated');
+    // Master view depends on the active event — refresh if visible
+    if ($('#view-master').classList.contains('active')) loadMaster();
+  } catch(e){ /* toasted */ }
+}
+
+async function createEvent(){
+  const label = String($('#eventNewLabel').value || '').trim();
+  if (!label){ toast('Enter a label', true); return; }
+  try {
+    await adminFetch('events.create', { label });
+    await loadEvents();
+    toast('Event added');
+    renderEventMenu();
+    $('#eventNewLabel').value = '';
+  } catch(e){ /* toasted */ }
+}
+
+/* ---------- Master list ---------- */
+async function loadMaster(){
+  // Gate by login state (operator+)
+  if (!currentAdmin){
+    $('#masterGate').style.display = 'block';
+    $('#masterBody').style.display = 'none';
+    _master = [];
+    $('#masterTbody').innerHTML = '';
+    return;
+  }
+  $('#masterGate').style.display = 'none';
+  $('#masterBody').style.display = 'block';
+  try {
+    const r = await adminFetch('master.list');
+    _master = r.items || [];
+    renderMaster();
+  } catch(e){
+    _master = []; renderMaster();
+  }
+}
+
+function masterMatches(row, q){
+  if (!q) return true;
+  const hay = [
+    row.item_name, row.item_number, row.tote_label, row.category,
+    row.tote_location, String(row.tote_id), row.last_counted_by,
+  ].filter(Boolean).join(' ').toLowerCase();
+  return hay.includes(q);
+}
+
+function renderMaster(){
+  const tbody = $('#masterTbody');
+  const q = (_masterFilter || '').trim().toLowerCase();
+  const rows = _master.filter(r => masterMatches(r, q));
+  $('#masterCount').textContent = rows.length === _master.length
+    ? `${_master.length} item${_master.length===1?'':'s'}`
+    : `${rows.length} of ${_master.length} item${_master.length===1?'':'s'}`;
+  if (!rows.length){
+    tbody.innerHTML = `<tr><td colspan="11" class="cell-muted" style="text-align:center;padding:32px">No items match.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(r => {
+    const cnt = r.last_audit_count === null ? '<span class="cell-muted">—</span>' : r.last_audit_count;
+    const by  = r.last_counted_by  || '<span class="cell-muted">Never counted</span>';
+    const dt  = r.last_counted_at  ? fmtDate(r.last_counted_at) : '<span class="cell-muted">—</span>';
+    return `
+      <tr data-item="${esc(r.id)}" class="master-row">
+        <td class="expand-cell" data-expand="${esc(r.id)}"><span class="expand-arrow">▶</span></td>
+        <td><b>${esc(r.item_name)}</b></td>
+        <td class="mono">${esc(r.item_number) || '<span class="cell-muted">—</span>'}</td>
+        <td class="mono">${r.tote_id}</td>
+        <td>${esc(r.tote_label) || '<span class="cell-muted">—</span>'}</td>
+        <td class="num"><b>${n(r.on_hand)}</b></td>
+        <td>${esc(r.category) || '<span class="cell-muted">—</span>'}</td>
+        <td>${esc(r.tote_location) || '<span class="cell-muted">—</span>'}</td>
+        <td class="num">${cnt}</td>
+        <td>${typeof by === 'string' ? esc(by) : by}</td>
+        <td>${dt}</td>
+      </tr>`;
+  }).join('');
+}
+
+async function toggleAuditRow(itemId, expandTd){
+  const tr = expandTd.closest('tr');
+  // Already expanded? collapse.
+  const next = tr.nextElementSibling;
+  if (next && next.classList.contains('audit-row') && next.dataset.for === itemId){
+    next.remove();
+    tr.classList.remove('expanded');
+    return;
+  }
+  // Insert loading row
+  const loading = document.createElement('tr');
+  loading.className = 'audit-row';
+  loading.dataset.for = itemId;
+  loading.innerHTML = `<td colspan="11"><div class="audit-wrap"><span class="muted">Loading audit history…</span></div></td>`;
+  tr.after(loading);
+  tr.classList.add('expanded');
+  try {
+    const r = await adminFetch('audit.listForItem', { itemId });
+    const audits = r.audits || [];
+    if (!audits.length){
+      loading.querySelector('.audit-wrap').innerHTML =
+        `<h4>Chain of custody</h4>
+         <div class="audit-empty">No audits recorded for this item yet.</div>`;
+      return;
+    }
+    const rowsHtml = audits.map(a => {
+      const delta = (a.prev_count != null) ? (a.on_hand_count - a.prev_count) : null;
+      const deltaCell = delta === null ? '<span class="cell-muted">—</span>'
+        : (delta === 0 ? '0' :
+           (delta > 0 ? `<span style="color:var(--good)">+${delta}</span>` :
+                       `<span style="color:var(--rust)">${delta}</span>`));
+      return `<tr>
+        <td>${fmtDateTime(a.counted_at)}</td>
+        <td>${esc(a.event_label)}</td>
+        <td>${esc(a.counted_by_name)}</td>
+        <td class="num">${a.prev_count == null ? '—' : a.prev_count}</td>
+        <td class="num"><b>${a.on_hand_count}</b></td>
+        <td class="num">${deltaCell}</td>
+        <td>${esc(a.notes) || '<span class="cell-muted">—</span>'}</td>
+      </tr>`;
+    }).join('');
+    loading.querySelector('.audit-wrap').innerHTML =
+      `<h4>Chain of custody · ${audits.length} count${audits.length===1?'':'s'}</h4>
+       <table>
+         <thead><tr>
+           <th>When</th><th>Event</th><th>By</th><th>Prev</th><th>Count</th><th>Δ</th><th>Notes</th>
+         </tr></thead>
+         <tbody>${rowsHtml}</tbody>
+       </table>`;
+  } catch(e){
+    loading.querySelector('.audit-wrap').innerHTML =
+      `<div class="audit-empty">Could not load audits.</div>`;
+  }
+}
+
+/* ---------- Admin tab ---------- */
+async function loadAdminTab(){
+  const gate = $('#adminGate'), body = $('#adminBody');
+  if (!currentAdmin){
+    gate.style.display = 'block'; body.style.display = 'none';
+    $('#adminGateTitle').textContent = 'Owners only';
+    $('#adminGateMsg').textContent = 'Sign in with an owner PIN to manage admins.';
+    return;
+  }
+  if (currentAdmin.role !== 'owner'){
+    gate.style.display = 'block'; body.style.display = 'none';
+    $('#adminGateTitle').textContent = 'Owner access required';
+    $('#adminGateMsg').textContent = `You are signed in as ${currentAdmin.name} (${currentAdmin.role}). Only owners can manage PINs.`;
+    $('#adminTbody').innerHTML = '';
+    return;
+  }
+  gate.style.display = 'none'; body.style.display = 'block';
+  try {
+    const r = await adminFetch('admin.list');
+    renderAdminTable(r.admins || []);
+  } catch(e){
+    renderAdminTable([]);
+  }
+}
+
+function renderAdminTable(admins){
+  const tbody = $('#adminTbody');
+  if (!admins.length){
+    tbody.innerHTML = `<tr><td colspan="5" class="cell-muted" style="text-align:center;padding:24px">No admins yet.</td></tr>`;
+    return;
+  }
+  const meId = currentAdmin && currentAdmin.id;
+  tbody.innerHTML = admins.map(a => {
+    const active = a.active && !a.revoked_at;
+    const isMe = a.id === meId;
+    const roleChip = `<span class="role-chip ${a.role}">${esc(a.role)}</span>`;
+    const status = active
+      ? `<span class="status-active">● Active${isMe?' · you':''}</span>`
+      : `<span class="status-revoked">Revoked ${a.revoked_at ? fmtDate(a.revoked_at) : ''}</span>`;
+    let actions = '';
+    if (active){
+      actions += `<button class="btn ghost sm" data-changepin="${esc(a.id)}" data-name="${esc(a.name)}" type="button">Change PIN</button>`;
+      if (!isMe){
+        actions += ` <button class="btn danger sm" data-revoke="${esc(a.id)}" data-name="${esc(a.name)}" type="button">Revoke</button>`;
+      }
+    } else {
+      actions = '<span class="cell-muted">—</span>';
+    }
+    return `
+      <tr>
+        <td><b>${esc(a.name)}</b></td>
+        <td>${roleChip}</td>
+        <td>${status}</td>
+        <td>${fmtDate(a.created_at)}</td>
+        <td>${actions}</td>
+      </tr>`;
+  }).join('');
+}
+
+async function issuePin(){
+  const name = String($('#newAdminName').value || '').trim();
+  const role = $('#newAdminRole').value;
+  if (!name){ toast('Enter a name', true); return; }
+  const btn = $('#issuePinBtn');
+  btn.disabled = true;
+  try {
+    const r = await adminFetch('admin.issue', { name, role });
+    $('#newPinName').textContent = name + (role === 'owner' ? ' (owner)' : '');
+    $('#newPinValue').textContent = r.pin;
+    $('#newPinDisplay').style.display = 'block';
+    $('#newAdminName').value = '';
+    $('#newAdminRole').value = 'operator';
+    await loadAdminTab();
+  } catch(e){ /* toasted */ }
+  finally { btn.disabled = false; }
+}
+
+function copyNewPin(){
+  const pin = $('#newPinValue').textContent;
+  if (!pin) return;
+  navigator.clipboard.writeText(pin).then(
+    ()=> toast('PIN copied'),
+    ()=> toast('Copy failed — please write it down', true)
+  );
+}
+
+async function changeAdminPin(adminId, name){
+  const newPin = prompt(`Enter a new 6–8 digit PIN for ${name}:`);
+  if (newPin == null) return;
+  const trimmed = String(newPin).trim();
+  if (!/^\d{6,8}$/.test(trimmed)){ toast('PIN must be 6–8 digits', true); return; }
+  try {
+    await adminFetch('admin.changePin', { adminId, newPin: trimmed });
+    toast(`PIN changed for ${name}`);
+  } catch(e){ /* toasted */ }
+}
+
+async function revokeAdmin(adminId, name){
+  if (!confirm(`Revoke ${name}? Their PIN will stop working immediately.`)) return;
+  try {
+    await adminFetch('admin.revoke', { adminId });
+    toast(`${name} revoked`);
+    await loadAdminTab();
+  } catch(e){ /* toasted */ }
+}
+
+/* =================================================================
    View routing
    ================================================================= */
 function showView(name, scanMode){
@@ -1206,6 +1738,8 @@ function showView(name, scanMode){
 function switchView(name){
   showView(name);
   if(name==='totes'){ $('#toteListWrap').style.display='block'; $('#toteDetailWrap').style.display='none'; }
+  if(name==='master'){ loadMaster(); }
+  if(name==='admin'){ loadAdminTab(); }
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -1274,6 +1808,55 @@ function bind(){
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && $('#authOverlay').style.display !== 'none') hideLoginModal();
   });
+
+  // ----- Event selector -----
+  $('#eventPill').addEventListener('click', e => {
+    // Ignore clicks coming from inside the menu (button clicks etc.)
+    if (e.target.closest('#eventMenu')) return;
+    toggleEventMenu();
+  });
+  $('#eventPill').addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggleEventMenu(); }
+  });
+  $('#eventMenu').addEventListener('click', e => {
+    const act = e.target.closest('[data-activate]');
+    if (act){ activateEvent(act.dataset.activate); return; }
+    if (e.target.id === 'eventNewBtn'){ createEvent(); return; }
+  });
+  $('#eventMenu').addEventListener('keydown', e => {
+    if (e.target.id === 'eventNewLabel' && e.key === 'Enter'){
+      e.preventDefault(); createEvent();
+    }
+  });
+  document.addEventListener('click', e => {
+    if (!e.target.closest('#eventPill')) toggleEventMenu(true);
+  });
+
+  // ----- Master list -----
+  $('#masterGateBtn').onclick = showLoginModal;
+  $('#masterRefresh').onclick = loadMaster;
+  $('#masterFilter').addEventListener('input', e => {
+    _masterFilter = e.target.value; renderMaster();
+  });
+  $('#masterTbody').addEventListener('click', e => {
+    const x = e.target.closest('[data-expand]');
+    if (x) toggleAuditRow(x.dataset.expand, x);
+  });
+
+  // ----- Admin tab -----
+  $('#adminGateBtn').onclick = showLoginModal;
+  $('#issuePinBtn').onclick = issuePin;
+  $('#copyPinBtn').onclick = copyNewPin;
+  $('#dismissPinBtn').onclick = () => { $('#newPinDisplay').style.display = 'none'; };
+  $('#newAdminName').addEventListener('keydown', e => {
+    if (e.key === 'Enter'){ e.preventDefault(); issuePin(); }
+  });
+  $('#adminTbody').addEventListener('click', e => {
+    const cp = e.target.closest('[data-changepin]');
+    if (cp){ changeAdminPin(cp.dataset.changepin, cp.dataset.name); return; }
+    const rv = e.target.closest('[data-revoke]');
+    if (rv){ revokeAdmin(rv.dataset.revoke, rv.dataset.name); return; }
+  });
 }
 
 /* =================================================================
@@ -1293,6 +1876,7 @@ async function boot(){
   const [loaded] = await Promise.all([
     sb ? loadData() : Promise.resolve(false),
     verifySession(),
+    sb ? loadEvents() : Promise.resolve(),
   ]);
 
   if(loaded){
