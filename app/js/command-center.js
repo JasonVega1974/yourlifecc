@@ -1,0 +1,453 @@
+/* =============================================================
+   command-center.js — Full-app home for non-faith-free accounts.
+   Paints into #appCommandCenter (sibling of #appHome inside #s-hero).
+   Concept: Constellation — six domain nodes around a focus center,
+   amber/coral streak hero, 7-tile destination grid with Faith
+   de-emphasized.
+
+   Pure module. No DOMContentLoaded handler. The chooser lives in
+   app-home.js:maybeRenderAppHome() and calls renderCommandCenter()
+   when the account qualifies. #appHome stays in the DOM as a
+   one-flag rollback (window._ccDisabled = true).
+
+   Faith Well experience is NOT touched here — that path runs through
+   init.js:renderFaithOnlyHero() gated by window._faithFree.
+============================================================= */
+
+(function(){
+  'use strict';
+
+  // ── helpers ──────────────────────────────────────────────────
+  function _ccEsc(s){
+    if (s == null) return '';
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  function _ccFirstName(){
+    // Single source of truth: same chain app-home.js / faith-zones.js use
+    if (typeof window !== 'undefined' && typeof window._fzFirstName === 'function'){
+      try { return window._fzFirstName(); } catch(_){}
+    }
+    if (typeof D !== 'undefined' && D && D.name){
+      return String(D.name).split(' ')[0];
+    }
+    if (typeof _supaUser !== 'undefined' && _supaUser){
+      var meta = _supaUser.user_metadata || {};
+      if (meta.first_name) return meta.first_name;
+      if (meta.full_name)  return String(meta.full_name).split(' ')[0];
+      if (_supaUser.email) return _supaUser.email.split('@')[0];
+    }
+    return 'friend';
+  }
+
+  function _ccTimeOfDay(h){
+    if (h < 12) return 'morning';
+    if (h < 18) return 'afternoon';
+    return 'evening';
+  }
+
+  function _ccFmtTime(d){
+    var h = d.getHours(), m = d.getMinutes();
+    var ampm = h >= 12 ? 'PM' : 'AM';
+    var h12 = h % 12; if (h12 === 0) h12 = 12;
+    return h12 + ':' + (m < 10 ? '0' + m : m) + ' ' + ampm;
+  }
+
+  function _ccTodayISO(){
+    var d = new Date();
+    var y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+    return y + '-' + m + '-' + day;
+  }
+
+  // ── live data: streak / tasks / points ───────────────────────
+  function _ccStreak(){
+    // v1 canonical: D.streak (aggregate Daily W's). Broader rollup deferred.
+    if (typeof D !== 'undefined' && D && typeof D.streak === 'number' && D.streak >= 0) return D.streak;
+    return 0;
+  }
+
+  function _ccTasksToday(){
+    var n = 0;
+    if (typeof D === 'undefined' || !D) return 0;
+    // Chores: count entries that are not marked completed
+    if (Array.isArray(D.chores)){
+      n += D.chores.filter(function(c){ return c && !c.completed && !c.done; }).length;
+    } else if (Array.isArray(D.choreList)){
+      n += D.choreList.filter(function(c){ return c && !c.completed && !c.done; }).length;
+    }
+    // Habits: count habitsV2 not yet checked today
+    if (Array.isArray(D.habitsV2)){
+      var todayIso = _ccTodayISO();
+      n += D.habitsV2.filter(function(h){
+        if (!h) return false;
+        var c = h.completions || {};
+        return !c[todayIso];
+      }).length;
+    }
+    // Events today
+    if (Array.isArray(D.events)){
+      var todayIso2 = _ccTodayISO();
+      n += D.events.filter(function(e){
+        if (!e) return false;
+        var dt = e.startDate || e.date;
+        return dt === todayIso2;
+      }).length;
+    }
+    return n;
+  }
+
+  function _ccPoints(){
+    if (typeof D === 'undefined' || !D || !D.chorePoints) return 0;
+    var t = +(D.chorePoints.total || 0);
+    var s = +(D.chorePoints.spent || 0);
+    return Math.max(0, t - s);
+  }
+
+  // ── per-tile meta strings ────────────────────────────────────
+  function _ccTileMeta(){
+    var meta = {
+      habits: 'Build a habit',
+      chores: 'All clear',
+      goals:  'Set a goal',
+      money:  '$0 saved',
+      skills: 'Start learning',
+      health: 'Check in',
+      faith:  'optional'
+    };
+    if (typeof D === 'undefined' || !D) return meta;
+    try {
+      // Habits — X/Y today
+      var todayIso = _ccTodayISO();
+      if (Array.isArray(D.habitsV2) && D.habitsV2.length){
+        var hT = D.habitsV2.length;
+        var hD = D.habitsV2.filter(function(h){ return h && h.completions && h.completions[todayIso]; }).length;
+        meta.habits = hD + '/' + hT + ' today';
+      }
+      // Chores — # incomplete
+      var choreCount = 0;
+      if (Array.isArray(D.chores)){
+        choreCount = D.chores.filter(function(c){ return c && !c.completed && !c.done; }).length;
+      } else if (Array.isArray(D.choreList)){
+        choreCount = D.choreList.filter(function(c){ return c && !c.completed && !c.done; }).length;
+      }
+      if (choreCount > 0) meta.chores = choreCount + ' to do';
+      // Goals — # active
+      if (Array.isArray(D.goals)){
+        var active = D.goals.filter(function(g){
+          return g && !g.done && !g.doneDate && !g.achievedDate && !g.completedDate;
+        }).length;
+        if (active > 0) meta.goals = active + ' active';
+      }
+      // Money — bank + savings + earnings jar
+      var bal = 0;
+      bal += +(D.bank || 0);
+      bal += +(D.bankSavAcct || 0);
+      if (D.earnings && typeof D.earnings.balance === 'number') bal += +D.earnings.balance;
+      bal = Math.round(bal);
+      if (bal > 0) meta.money = '$' + bal.toLocaleString() + ' saved';
+      // Skills — certs earned
+      if (D.skillCerts){
+        var certs = Object.values(D.skillCerts).filter(Boolean).length;
+        if (certs > 0) meta.skills = certs + ' cert' + (certs===1?'':'s');
+      }
+      // Health — last weight log entry count
+      if (Array.isArray(D.weightLog) && D.weightLog.length) meta.health = 'Today';
+    } catch(_){}
+    return meta;
+  }
+
+  // ── today's focus computation ────────────────────────────────
+  // Per user direction (Phase 3 confirmation):
+  // - First try most-overdue domain
+  // - If nothing overdue, render as POSITIVE (streak / win), NOT a "behind" fallback
+  function _ccComputeFocus(){
+    if (typeof D === 'undefined' || !D){
+      return { kind:'momentum', domain:'habits', caption:'Open your day' };
+    }
+    var nowMs = Date.now();
+    var todayIso = _ccTodayISO();
+
+    // 1) Chores past due
+    var overdueChores = [];
+    if (Array.isArray(D.chores)){
+      overdueChores = D.chores.filter(function(c){
+        if (!c || c.completed || c.done) return false;
+        if (!c.due_date && !c.due) return false;
+        var dt = new Date(c.due_date || c.due).getTime();
+        return !isNaN(dt) && dt < nowMs;
+      });
+    }
+    if (overdueChores.length){
+      return { kind:'overdue', domain:'chores',
+               caption: overdueChores.length + ' chore' + (overdueChores.length>1?'s':'') + ' overdue' };
+    }
+
+    // 2) Goals past deadline
+    var overdueGoals = [];
+    if (Array.isArray(D.goals)){
+      overdueGoals = D.goals.filter(function(g){
+        if (!g || g.done || g.doneDate || g.achievedDate || g.completedDate) return false;
+        if (!g.deadline && !g.dueDate) return false;
+        var dt = new Date(g.deadline || g.dueDate).getTime();
+        return !isNaN(dt) && dt < nowMs;
+      });
+    }
+    if (overdueGoals.length){
+      return { kind:'overdue', domain:'goals',
+               caption: overdueGoals.length + ' goal' + (overdueGoals.length>1?'s':'') + ' past deadline' };
+    }
+
+    // 3) Habits not done today (only counts if any habit exists)
+    var habitsTotal = Array.isArray(D.habitsV2) ? D.habitsV2.length : 0;
+    var habitsLeft = 0;
+    if (habitsTotal){
+      habitsLeft = D.habitsV2.filter(function(h){
+        return h && (!h.completions || !h.completions[todayIso]);
+      }).length;
+    }
+    if (habitsLeft > 0){
+      return { kind:'overdue', domain:'habits',
+               caption: habitsLeft + ' habit' + (habitsLeft>1?'s':'') + ' to do' };
+    }
+
+    // POSITIVE FALLBACK — nothing overdue. Frame as a win, not a "fallback".
+    var streak = _ccStreak();
+    if (streak >= 7){
+      return { kind:'momentum', domain:'habits',
+               caption: 'Day ' + streak + ' streak — keep going' };
+    }
+    if (streak >= 1){
+      return { kind:'momentum', domain:'habits',
+               caption: 'Day ' + streak + ' streak going' };
+    }
+    // No streak yet — first-day-positive
+    return { kind:'momentum', domain:'habits', caption: 'A fresh start today' };
+  }
+
+  // ── tile config (canonical dictionary; Faith always last + de-emphasized) ─
+  // The constellation SVG below addresses these by key, so the index
+  // here is just the canonical drift-animation ordering — not the
+  // visible tile order, which is stage-aware (see _CC_STAGE_ORDER).
+  var _CC_TILES = [
+    { key:'habits', section:'s-habits',   icon:'⚡', label:'Habits', accent:'#F5A623' },
+    { key:'chores', section:'s-chores',   icon:'📋', label:'Chores', accent:'#6AA7FF' },
+    { key:'goals',  section:'s-goals',    icon:'🎯', label:'Goals',  accent:'#7EC19A' },
+    { key:'money',  section:'s-finance',  icon:'💰', label:'Money',  accent:'#F47B5A' },
+    { key:'skills', section:'s-skills',   icon:'🧠', label:'Skills', accent:'#D4A04C' },
+    { key:'health', section:'s-health',   icon:'💪', label:'Health', accent:'#4A9082' }
+  ];
+  var _CC_FAITH = { key:'faith', section:'s-scripture', icon:'✝️', label:'Faith' };
+
+  // ── stage-aware tile order ────────────────────────────────────
+  // STAGE_CONFIG.sections in ui.js is a sidebar-visibility filter,
+  // not a tile-order primitive (and s-habits isn't in any stage's
+  // sections list — a naive filter would silently drop it). The
+  // Command Center owns its own per-stage order here. Semantics:
+  // younger → Chores first; older → Goals first. Faith always
+  // renders last + de-emphasized regardless of stage.
+  //
+  // Stage keys mirror STAGE_CONFIG in ui.js:118.
+  var _CC_STAGE_ORDER = {
+    middle:  ['chores','habits','health','money','goals','skills'],
+    fresh:   ['chores','habits','goals','money','skills','health'],
+    mid_hs:  ['goals','habits','skills','money','chores','health'],
+    senior:  ['goals','skills','money','habits','chores','health'],
+    college: ['goals','skills','money','habits','health','chores'],
+    adult:   ['goals','money','skills','habits','health','chores']
+  };
+  // mid_hs is ui.js applyStageFilter()'s fallback, so we match it.
+  // 'high' (init.js DEF default) and any other unrecognised mode
+  // fall through here.
+  var _CC_DEFAULT_ORDER = _CC_STAGE_ORDER.mid_hs;
+
+  function _ccOrderedTiles(){
+    var mode = (typeof D !== 'undefined' && D && D.mode) ? D.mode : null;
+    var order = (mode && _CC_STAGE_ORDER[mode]) ? _CC_STAGE_ORDER[mode] : _CC_DEFAULT_ORDER;
+    // Map keys → tile objects; drop any unknown keys defensively.
+    return order.map(function(k){
+      return _CC_TILES.find(function(t){ return t.key === k; });
+    }).filter(Boolean);
+  }
+
+  // ── constellation node positions (matches scratch/constellation preview) ─
+  // Habits is the visual center because it's the daily-cadence anchor; the
+  // focus halo can move to a different node when computeFocus says so.
+  var _CC_NODES = {
+    habits: { cx:200, cy:150, r:11, coreR:5.5, labelY:125, subY:180, isCenter:true },
+    chores: { cx:90,  cy:80,  r:8,  coreR:3.5, labelY:62  },
+    goals:  { cx:310, cy:80,  r:8,  coreR:3.5, labelY:62  },
+    money:  { cx:60,  cy:200, r:8,  coreR:3.5, labelY:222 },
+    skills: { cx:340, cy:200, r:8,  coreR:3.5, labelY:222 },
+    health: { cx:140, cy:255, r:8,  coreR:3.5, labelY:278 }
+  };
+
+  // SVG link segments (center + a few ring connectors for shape)
+  var _CC_LINKS = [
+    ['habits','chores'], ['habits','goals'], ['habits','money'],
+    ['habits','skills'], ['habits','health'],
+    ['chores','money'], ['goals','skills'],
+    ['money','health'], ['skills','health']
+  ];
+
+  // ── render ───────────────────────────────────────────────────
+  function renderCommandCenter(){
+    if (typeof document === 'undefined') return;
+    var root = document.getElementById('appCommandCenter');
+    if (!root) return;
+
+    // Guarded rollback flag — `window._ccDisabled = true;` in the console
+    // hides Command Center and lets app-home.js fall back to #appHome.
+    if (window._ccDisabled){
+      root.style.display = 'none';
+      return;
+    }
+    root.style.display = '';
+
+    var now = new Date();
+    var name   = _ccFirstName();
+    var greet  = _ccTimeOfDay(now.getHours());
+    var streak = _ccStreak();
+    var tasks  = _ccTasksToday();
+    var points = _ccPoints();
+    var meta   = _ccTileMeta();
+    var focus  = _ccComputeFocus();
+    var focusTile = _CC_TILES.find(function(t){ return t.key === focus.domain; }) || _CC_TILES[0];
+
+    // Build constellation SVG
+    var svgLinks = _CC_LINKS.map(function(pair){
+      var a = _CC_NODES[pair[0]], b = _CC_NODES[pair[1]];
+      return '<line class="cc-link" x1="'+a.cx+'" y1="'+a.cy+'" x2="'+b.cx+'" y2="'+b.cy+'"/>';
+    }).join('');
+
+    var svgNodes = _CC_TILES.map(function(tile, i){
+      var n = _CC_NODES[tile.key];
+      if (!n) return '';
+      var halo = (tile.key === focus.domain)
+        ? '<circle class="cc-halo" cx="'+n.cx+'" cy="'+n.cy+'" r="28" fill="url(#cc-halo-grad)"/>'
+        : '';
+      var subLine = (n.isCenter && tile.key === 'habits' && meta.habits)
+        ? '<text class="cc-node__label cc-node__label--sub" x="'+n.cx+'" y="'+n.subY+'" text-anchor="middle">'+_ccEsc(meta.habits)+'</text>'
+        : '';
+      return ''
+        + '<g class="cc-drift cc-drift--'+(i+1)+'">'
+        +   '<g class="cc-node cc-node--'+(i+1)+'" style="color:'+tile.accent+';">'
+        +     halo
+        +     '<circle cx="'+n.cx+'" cy="'+n.cy+'" r="'+n.r+'" fill="'+tile.accent+'" fill-opacity="0.18" stroke="'+tile.accent+'" stroke-width="'+(n.isCenter?1.2:1)+'"/>'
+        +     '<circle class="cc-node__core" cx="'+n.cx+'" cy="'+n.cy+'" r="'+n.coreR+'" fill="'+tile.accent+'"/>'
+        +     '<text class="cc-node__label" x="'+n.cx+'" y="'+n.labelY+'" text-anchor="middle">'+_ccEsc(tile.label)+'</text>'
+        +     subLine
+        +   '</g>'
+        + '</g>';
+    }).join('');
+
+    // Tile grid order is stage-aware (D.mode → _CC_STAGE_ORDER).
+    // The SVG constellation above uses _CC_TILES canonical order so
+    // drift animations stay tied to each domain regardless of stage.
+    var tilesHtml = _ccOrderedTiles().map(function(tile){
+      return ''
+        + '<button class="cc-tile" type="button" data-dest="'+tile.key+'" '
+        +   'aria-label="'+_ccEsc(tile.label)+' — '+_ccEsc(meta[tile.key])+'" '
+        +   'style="--accent:'+tile.accent+';">'
+        +   '<span class="cc-tile__icon" aria-hidden="true">'+tile.icon+'</span>'
+        +   '<span class="cc-tile__title">'+_ccEsc(tile.label)+'</span>'
+        +   '<span class="cc-tile__meta">'+_ccEsc(meta[tile.key])+'</span>'
+        + '</button>';
+    }).join('');
+
+    var faithHtml = ''
+      + '<button class="cc-tile cc-tile--faith" type="button" data-dest="faith" '
+      +   'aria-label="Faith — optional">'
+      +   '<span class="cc-tile__icon" aria-hidden="true">'+_CC_FAITH.icon+'</span>'
+      +   '<span class="cc-tile__title">'+_ccEsc(_CC_FAITH.label)+'</span>'
+      +   '<span class="cc-tile__meta">'+_ccEsc(meta.faith)+'</span>'
+      + '</button>';
+
+    root.innerHTML = ''
+      + '<main class="cc-shell" role="main">'
+      +   '<header class="cc-greeting" aria-label="Greeting">'
+      +     '<h1 class="cc-greeting__hello" id="ccHello">Good '+_ccEsc(greet)+', '+_ccEsc(name)+' 👋</h1>'
+      +     '<p class="cc-greeting__sub">'
+      +       'Here\'s your day.'
+      +       '<span class="cc-time" id="ccTime" aria-label="Current time">'+_ccFmtTime(now)+'</span>'
+      +     '</p>'
+      +   '</header>'
+
+      +   '<section class="cc-stats" aria-label="Today\'s progress">'
+      +     '<div class="cc-streak" role="group" aria-label="Day '+streak+' streak">'
+      +       '<div class="cc-streak__icon" aria-hidden="true">🔥</div>'
+      +       '<div class="cc-streak__body">'
+      +         '<div class="cc-streak__num"><span aria-hidden="true">Day&nbsp;</span>'+streak+'</div>'
+      +         '<div class="cc-streak__label">day streak</div>'
+      +       '</div>'
+      +     '</div>'
+      +     '<div class="cc-chip" role="group" aria-label="'+tasks+' tasks today">'
+      +       '<div class="cc-chip__num">'+tasks+'</div>'
+      +       '<div class="cc-chip__label">tasks today</div>'
+      +     '</div>'
+      +     '<div class="cc-chip" role="group" aria-label="'+points+' points">'
+      +       '<div class="cc-chip__num">'+points+'</div>'
+      +       '<div class="cc-chip__label">points</div>'
+      +     '</div>'
+      +   '</section>'
+
+      +   '<section class="cc-constellation" aria-label="Life constellation">'
+      +     '<div class="cc-constellation__caption">Today\'s focus &middot; <span style="color:'+focusTile.accent+';">'+_ccEsc(focus.caption)+'</span></div>'
+      +     '<svg class="cc-constellation__svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Animated graph of six life domains">'
+      +       '<defs>'
+      +         '<radialGradient id="cc-halo-grad" cx="50%" cy="50%" r="50%">'
+      +           '<stop offset="0%" stop-color="'+focusTile.accent+'" stop-opacity="0.55"/>'
+      +           '<stop offset="60%" stop-color="'+focusTile.accent+'" stop-opacity="0.12"/>'
+      +           '<stop offset="100%" stop-color="'+focusTile.accent+'" stop-opacity="0"/>'
+      +         '</radialGradient>'
+      +       '</defs>'
+      +       svgLinks
+      +       svgNodes
+      +     '</svg>'
+      +   '</section>'
+
+      +   '<section aria-label="Destinations">'
+      +     '<h2 class="cc-section-label">Jump in</h2>'
+      +     '<div class="cc-tiles">'
+      +       tilesHtml
+      +       faithHtml
+      +     '</div>'
+      +   '</section>'
+      + '</main>';
+
+    // Wire tile clicks (event delegation — single listener)
+    if (!root.__ccWired){
+      root.__ccWired = true;
+      root.addEventListener('click', function(e){
+        var btn = e.target.closest && e.target.closest('[data-dest]');
+        if (!btn) return;
+        var dest = btn.getAttribute('data-dest');
+        if (typeof window.ccOpenDest === 'function') window.ccOpenDest(dest);
+      });
+    }
+  }
+
+  // ── tile click router ────────────────────────────────────────
+  var _CC_SECTION_MAP = {
+    habits:  's-habits',
+    chores:  's-chores',
+    goals:   's-goals',
+    money:   's-finance',
+    skills:  's-skills',
+    health:  's-health',
+    faith:   's-scripture'
+  };
+
+  function ccOpenDest(dest){
+    var target = _CC_SECTION_MAP[dest];
+    if (!target){ try { console.warn('[ccOpenDest] no section for', dest); } catch(_){} return; }
+    if (typeof showSection === 'function') showSection(target);
+  }
+
+  // ── exports ──────────────────────────────────────────────────
+  if (typeof window !== 'undefined'){
+    window.renderCommandCenter = renderCommandCenter;
+    window.ccOpenDest          = ccOpenDest;
+  }
+})();
