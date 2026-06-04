@@ -33,6 +33,19 @@ function initChoreData(){
   if(!D.chorePin) D.chorePin='';
 }
 
+// Sub-tab nav for #s-chores (Tab 1 Increment 1). Mirrors the
+// habits hb-tab / hb-panel pattern. Targets: ch-mychores, ch-store,
+// ch-leaderboard, ch-history, ch-streaks.
+function cTab(tab, btn){
+  const panels = document.querySelectorAll('#s-chores .ch-panel');
+  panels.forEach(p => p.style.display = 'none');
+  const tabs = document.querySelectorAll('#s-chores .ch-tab');
+  tabs.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+  const target = document.getElementById('ch-' + tab);
+  if(target) target.style.display = 'block';
+  if(btn){ btn.classList.add('active'); btn.setAttribute('aria-selected','true'); }
+}
+
 
 function addChore(){
   initChoreData();
@@ -163,6 +176,7 @@ function renderChores(){
   const ae = document.getElementById('chorePointsAvail'); if(ae) ae.textContent = avail;
   const te = document.getElementById('chorePointsTotal'); if(te) te.textContent = D.chorePoints.total;
   const se = document.getElementById('choreStreak'); if(se) se.textContent = streak;
+  const sd = document.getElementById('choreStreakDetail'); if(sd) sd.textContent = streak;
 
   // Level calc
   const lvl = CHORE_LEVELS.find(l=>D.chorePoints.total >= l.min && D.chorePoints.total < l.max) || CHORE_LEVELS[CHORE_LEVELS.length-1];
