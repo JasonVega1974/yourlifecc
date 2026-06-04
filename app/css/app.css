@@ -4566,6 +4566,13 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
   color:var(--tx);
   line-height:1.1;
 }
+.tab-landing-card .tlc-sub{
+  font-family:var(--fm);
+  font-size:.78rem;
+  line-height:1.4;
+  color:var(--tx2);
+  margin-top:2px;
+}
 
 /* ════════════════════════════════════════════════════════════
    Phase B-Lite session 3 — Reduced-motion accessibility
