@@ -503,6 +503,90 @@ async function opAuditRecord(body) {
 }
 
 // ─────────────────────────────────────────────────────────────────────
+// Master list + audit history (operator+)
+// ─────────────────────────────────────────────────────────────────────
+
+async function opMasterList(body) {
+  const s = await requireSession(body, false); if (s.err) return s.err;
+
+  const ev = await supaSelect('return_events', 'is_active=eq.true&select=id');
+  const eventId = (ev && ev[0] && ev[0].id) || null;
+
+  const items = await supaSelect('return_supply_items',
+    'select=id,item_name,item_number,tote_id,on_hand,category,' +
+    'return_totes(label,location)' +
+    '&order=tote_id.asc,item_name.asc');
+
+  let audits = [];
+  if (eventId) {
+    audits = await supaSelect('return_audits',
+      'event_id=eq.' + eventId +
+      '&select=item_id,on_hand_count,counted_at,return_admins(name)' +
+      '&order=counted_at.desc');
+  }
+
+  const lastByItem = {};
+  for (const a of (audits || [])) {
+    if (!lastByItem[a.item_id]) lastByItem[a.item_id] = a;
+  }
+
+  const rows = (items || []).map(i => {
+    const t = i.return_totes || {};
+    const a = lastByItem[i.id] || null;
+    return {
+      id: i.id,
+      item_name: i.item_name,
+      item_number: i.item_number || '',
+      tote_id: i.tote_id,
+      tote_label: t.label || '',
+      tote_location: t.location || '',
+      on_hand: i.on_hand,
+      category: i.category || '',
+      last_audit_count: a ? a.on_hand_count : null,
+      last_counted_by: a && a.return_admins ? a.return_admins.name : null,
+      last_counted_at: a ? a.counted_at : null,
+    };
+  });
+  return ok({ items: rows, eventId: eventId });
+}
+
+async function opAuditListForItem(body) {
+  const s = await requireSession(body, false); if (s.err) return s.err;
+  const itemId = String(body.itemId || '');
+  if (!itemId) return err(400, 'itemId required');
+
+  const rows = await supaSelect('return_audits',
+    'item_id=eq.' + itemId +
+    '&select=id,on_hand_count,prev_count,counted_at,notes,' +
+    'return_admins(name),return_events(label)' +
+    '&order=counted_at.desc');
+
+  const out = (rows || []).map(a => ({
+    id: a.id,
+    on_hand_count: a.on_hand_count,
+    prev_count: a.prev_count,
+    counted_at: a.counted_at,
+    notes: a.notes || '',
+    counted_by_name: a.return_admins ? a.return_admins.name : '—',
+    event_label: a.return_events ? a.return_events.label : '—',
+  }));
+  return ok({ audits: out });
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// Events list (anon can read return_events directly, but this lets the
+// admin tab fetch the full list including inactive events through one
+// authenticated call alongside admin.list)
+// ─────────────────────────────────────────────────────────────────────
+
+async function opEventsList(body) {
+  const s = await requireSession(body, false); if (s.err) return s.err;
+  const rows = await supaSelect('return_events',
+    'select=id,label,is_active,created_at&order=created_at.desc');
+  return ok({ events: rows || [] });
+}
+
+// ─────────────────────────────────────────────────────────────────────
 // Dispatch
 // ─────────────────────────────────────────────────────────────────────
 
@@ -513,6 +597,7 @@ const OPS = {
   'admin.issue':           opAdminIssue,
   'admin.changePin':       opAdminChangePin,
   'admin.revoke':          opAdminRevoke,
+  'events.list':           opEventsList,
   'events.create':         opEventsCreate,
   'events.setActive':      opEventsSetActive,
   'inventory.seedTotes':   opInvSeed,
@@ -522,6 +607,8 @@ const OPS = {
   'inventory.deleteItem':  opInvDeleteItem,
   'inventory.importItems': opInvImportItems,
   'audit.record':          opAuditRecord,
+  'master.list':           opMasterList,
+  'audit.listForItem':     opAuditListForItem,
 };
 
 module.exports = async (req, res) => {
