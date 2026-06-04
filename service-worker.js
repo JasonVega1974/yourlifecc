@@ -1,12 +1,11 @@
 // YourLifeCC Service Worker
 // Version bump this string whenever you deploy a major update
 // to force old caches to clear.
-const CACHE_NAME = 'yourlifecc-v229';
+const CACHE_NAME = 'yourlifecc-v230';
 
 // Core assets to pre-cache on install — the app shell + key Well modules
 // + the shared modal/save/share + prayer focus + Quick Prayer library
-// modules so installed PWA users on poor networks still get the new
-// prayer features the moment the SW activates.
+// modules + the canonical prayer dataset (now JSON, shared with /api).
 const PRECACHE_ASSETS = [
   '/app/',
   '/app/index.html',
@@ -21,7 +20,8 @@ const PRECACHE_ASSETS = [
   '/app/js/modal-actions.js',
   '/app/js/prayer-focus.js',
   '/app/js/quick-prayers.js',
-  '/app/js/data/quick-prayers.js'
+  '/app/js/data/quick-prayers.js',
+  '/app/js/data/quick-prayers.json'
 ];
 
 // ─── Install ───────────────────────────────────────────────────────────────

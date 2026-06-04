@@ -4,6 +4,7 @@
   "private": true,
   "description": "YourLife CC — Kingdom Creatives LLC",
   "dependencies": {
+    "@vercel/og": "^0.6.4",
     "web-push": "^3.6.7"
   },
   "engines": {

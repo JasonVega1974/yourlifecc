@@ -121,6 +121,18 @@
       + '</article>';
   }
 
+  // Returns the first sentence of `text`, trimmed to at most `maxLen`
+  // characters (with an ellipsis when truncated). Used to build the
+  // share blurb hook + matches the OG image's hook line so the unfurl
+  // preview and the share text feel like a single thought.
+  function _firstSentence(text, maxLen) {
+    if (!text) return '';
+    var m = String(text).match(/^[^.!?]+[.!?]/);
+    var s = (m ? m[0] : String(text)).trim();
+    if (maxLen && s.length > maxLen) s = s.slice(0, maxLen - 1).trim() + '…';
+    return s;
+  }
+
   function _bindCardActions() {
     _data().forEach(function (prayer) {
       var prayBtn  = document.getElementById('prayer-pray-'  + prayer.id);
@@ -154,10 +166,20 @@
         shareBtn.addEventListener('click', function (e) {
           e.preventDefault();
           e.stopPropagation();
+          // Share the per-prayer landing page so Facebook, Slack,
+          // iMessage, etc. unfurl the dynamic OG card instead of the
+          // generic homepage preview. Marketing-style blurb keeps the
+          // text tight, not spammy — title, topic, one-sentence hook,
+          // and the share URL with a soft CTA.
+          var shareUrl = 'https://yourlifecc.com/prayer/' + encodeURIComponent(prayer.id);
+          var hook = _firstSentence(prayer.text, 140);
+          var blurb = '🙏 "' + prayer.title + '" — a prayer for ' + prayer.topic + '.\n\n'
+                    + hook + '\n\n'
+                    + 'Find this and 30+ more, free in The Well 👉';
           root.YLM.share({
             title: prayer.title,
-            text:  prayer.text + ' — ' + prayer.verse,
-            url:   'https://yourlifecc.com'
+            text:  blurb,
+            url:   shareUrl
           });
         });
       }
@@ -379,6 +401,15 @@
   if (typeof document !== 'undefined') {
     document.addEventListener('ylm:save-changed', function (e) {
       if (!e || !e.detail || e.detail.kind !== 'prayer') return;
+      var host = _qpHostId && document.getElementById(_qpHostId);
+      if (host) _renderInto(host);
+    });
+
+    // When data/quick-prayers.js finishes fetching the canonical JSON,
+    // refresh the mounted library so users who opened the destination
+    // before the dataset resolved see the full catalogue without a
+    // manual reload.
+    document.addEventListener('quick-prayers:loaded', function () {
       var host = _qpHostId && document.getElementById(_qpHostId);
       if (host) _renderInto(host);
     });
