@@ -109,16 +109,16 @@ const SK_DATA={taxes:[
 
 <p><strong>The U.S. uses a progressive tax system</strong>, which means the more you earn, the higher the percentage you pay — but only on the income above each threshold. This is the most misunderstood concept in personal finance. You do not pay your highest tax rate on all your income. You pay each rate only on the slice of income that falls within that bracket.</p>
 
-<p><strong>Here's how it actually works with real numbers (2024, single filer):</strong></p>
+<p><strong>Here's how it actually works with real numbers (2025, single filer):</strong></p>
 <ul>
-  <li>First $11,600 → taxed at <strong>10%</strong> = $1,160</li>
-  <li>$11,601–$47,150 → taxed at <strong>12%</strong> = $4,266</li>
-  <li>$47,151–$100,525 → taxed at <strong>22%</strong></li>
-  <li>$100,526–$191,950 → taxed at <strong>24%</strong></li>
+  <li>First $11,925 → taxed at <strong>10%</strong> = $1,193</li>
+  <li>$11,926–$48,475 → taxed at <strong>12%</strong> = $4,386</li>
+  <li>$48,476–$103,350 → taxed at <strong>22%</strong></li>
+  <li>$103,351–$197,300 → taxed at <strong>24%</strong></li>
   <li>Above that → 32%, 35%, 37%</li>
 </ul>
 
-<p>If you earn $60,000, you don't pay 22% on all $60,000. You pay 10% on the first slice, 12% on the middle, and 22% only on the dollars above $47,150. Your actual total federal tax bill at $60,000 is roughly $8,000 — an effective rate of about 13.3%, not 22%.</p>
+<p>If you earn $60,000, you don't pay 22% on all $60,000. You pay 10% on the first slice, 12% on the middle, and 22% only on the dollars above $48,475. Your actual total federal tax bill at $60,000 is roughly $8,100 — an effective rate of about 13.5%, not 22%.</p>
 
 <p><strong>Marginal rate vs. effective rate:</strong> Your marginal rate is the highest bracket you're in. Your effective rate is your actual average rate across all income. The effective rate is always meaningfully lower. Understanding this eliminates the common mistake of turning down a raise because "it'll push me into a higher bracket." More income always means more money in your pocket — always.</p>
 
@@ -184,7 +184,7 @@ const SK_DATA={taxes:[
 <p><strong>The Standard Deduction vs. Itemizing</strong></p>
 <p>The IRS lets you take one of two approaches:</p>
 <ul>
-  <li><strong>Standard deduction (2024):</strong> $14,600 single | $29,200 married filing jointly | $21,900 head of household. Take this if your itemized deductions don't exceed these amounts — about 90% of Americans do.</li>
+  <li><strong>Standard deduction (2025):</strong> $15,000 single | $30,000 married filing jointly | $22,500 head of household. Take this if your itemized deductions don't exceed these amounts — about 90% of Americans do.</li>
   <li><strong>Itemizing:</strong> Add up specific deductible expenses and deduct the total if it exceeds the standard deduction. Worth calculating if you have a mortgage, significant medical expenses, or large charitable gifts.</li>
 </ul>
 
