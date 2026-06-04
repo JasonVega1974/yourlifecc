@@ -188,20 +188,42 @@ async function cloudSync(){
 // D.choreLog into public.chore_completions (UNIQUE chore_id+completed_date).
 // JSONB blob remains canonical until later increments swap reads over.
 //
+// Multi-profile safety (revised post-Increment-1):
+//   parent.js maintains _profiles[] + _activeProfileId so one auth
+//   account can host multiple kids. D.chores flips to the active
+//   profile's chore set on every switchToProfile(). Without
+//   profile_id, Kid A's chores and Kid B's chores would intermingle
+//   under user_id=mom.id with no way to filter them apart.
+//
+//   We solve this two ways belt-and-suspenders:
+//     1) profile_id column on both tables (sourced from
+//        _activeProfileId, '_solo' sentinel when undefined). RLS
+//        still isolates by user_id; app reads filter by profile_id.
+//     2) Chore ID is namespaced with profile id —
+//        'ch_<profileId>_<numericId>' — so sibling profiles cannot
+//        collide on the text PK even in theory.
+//
 // Defensive by design — if chores-schema.sql hasn't been applied,
-// PostgREST returns 404/42P01 and we silently bail. Never throws.
-// Numeric D.chores ids (Date.now()) are coerced to 'ch_<n>' strings to
-// match the text PK in the schema without mutating in-memory state.
+// PostgREST returns 42P01 and we silently bail. Never throws.
 async function _mirrorChoresToCloud(supa, userId){
   try {
     const chores = Array.isArray(D.chores) ? D.chores : [];
     const log    = Array.isArray(D.choreLog) ? D.choreLog : [];
     if(!chores.length && !log.length) return;
 
+    // Resolve the active profile id. Multi-profile mode is opt-in via
+    // parent.js; for solo accounts _activeProfileId is empty/undefined
+    // and the '_solo' sentinel keeps the column NOT NULL.
+    const activeProfile =
+      (typeof _activeProfileId !== 'undefined' && _activeProfileId)
+        ? String(_activeProfileId)
+        : '_solo';
+
     const choreId = (v) => {
       if(v === null || v === undefined) return null;
       const s = String(v);
-      return s.startsWith('ch_') ? s : 'ch_' + s;
+      if(s.startsWith('ch_')) return s;
+      return 'ch_' + activeProfile + '_' + s;
     };
     const VALID_FREQ = new Set(['daily','weekly','monthly','once']);
     const VALID_DIFF = new Set(['easy','medium','hard']);
@@ -211,6 +233,7 @@ async function _mirrorChoresToCloud(supa, userId){
     const choreRows = chores.map((c, idx) => ({
       id:         choreId(c.id),
       user_id:    userId,
+      profile_id: activeProfile,
       name:       String(c.name || ''),
       emoji:      c.emoji || '📌',
       category:   c.cat || null,
@@ -238,6 +261,7 @@ async function _mirrorChoresToCloud(supa, userId){
       .map(l => ({
         chore_id:       choreId(l.choreId),
         user_id:        userId,
+        profile_id:     activeProfile,
         completed_date: l.date,
         status:         l.status,
         points_awarded: (l.status === 'verified' && Number.isFinite(+l.pts)) ? +l.pts : 0
