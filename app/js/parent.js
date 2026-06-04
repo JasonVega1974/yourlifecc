@@ -3142,6 +3142,14 @@ function addChoreFromParent(){
   const pts = parseInt((document.getElementById('newChorePoints')||{}).value)||10;
   const freq = (document.getElementById('newChoreFreq')||{}).value||'daily';
   const day = (document.getElementById('newChoreDay')||{}).value||'';
+  // Tab 1 Increment 2 — difficulty tier + optional due date.
+  // Default 'easy' (1.0×) so the entered points value is awarded
+  // verbatim unless the parent deliberately marks medium/hard.
+  const diffRaw = (document.getElementById('newChoreDifficulty')||{}).value||'easy';
+  const difficulty = (diffRaw === 'easy' || diffRaw === 'medium' || diffRaw === 'hard') ? diffRaw : 'easy';
+  const dueDateRaw = (document.getElementById('newChoreDue')||{}).value||'';
+  // Accept only YYYY-MM-DD from the <input type="date">; reject anything else.
+  const dueDate = /^\d{4}-\d{2}-\d{2}$/.test(dueDateRaw) ? dueDateRaw : null;
   if(!name){ showToast('Enter a chore name'); return; }
   if(!D.chores) D.chores = [];
   // Map freq+day to match D.chores structure
@@ -3154,10 +3162,13 @@ function addChoreFromParent(){
     day: day||'',
     cat: 'other',
     emoji: '📌',
-    active: true
+    active: true,
+    difficulty: difficulty,
+    dueDate: dueDate
   });
   save();
   if(document.getElementById('newChoreName')) document.getElementById('newChoreName').value = '';
+  if(document.getElementById('newChoreDue'))  document.getElementById('newChoreDue').value  = '';
   renderParentChoreList();
   renderChores();
   updateHeroDashboard();
@@ -3174,9 +3185,24 @@ function renderParentChoreList(){
   }
   el.innerHTML = chores.map(c=>{
     const freqLabel = c.freq==='daily'?'Daily':c.freq==='weekly'?'Weekly'+(c.day?' ('+c.day+')':''):'One-time';
-    return `<div style="display:flex;align-items:center;gap:.4rem;padding:.3rem .4rem;border-bottom:1px solid rgba(255,255,255,.03);font-size:.72rem;">
+    // Tab 1 Increment 2 — surface difficulty + due-date chips so the
+    // parent can see what they've configured. Legacy chores without
+    // these fields render the same as before.
+    const diff = c.difficulty || '';
+    const diffColor = diff==='hard' ? '#ef4444' : diff==='medium' ? '#fbbf24' : diff==='easy' ? '#22c55e' : '';
+    const diffPill = diff
+      ? `<span style="font-size:.5rem;color:${diffColor};font-weight:700;text-transform:uppercase;letter-spacing:.5px;background:rgba(255,255,255,.04);padding:.08rem .3rem;border-radius:4px;">${diff}</span>`
+      : '';
+    const today = new Date().toISOString().slice(0,10);
+    const isOverdue = c.dueDate && c.dueDate < today;
+    const dueChip = c.dueDate
+      ? `<span style="font-size:.5rem;background:${isOverdue?'rgba(239,68,68,.15)':'rgba(255,255,255,.04)'};color:${isOverdue?'#ef4444':'var(--tx3)'};padding:.08rem .3rem;border-radius:4px;">${isOverdue?'⚠':'📅'}${c.dueDate.slice(5)}</span>`
+      : '';
+    return `<div style="display:flex;align-items:center;gap:.35rem;padding:.3rem .4rem;border-bottom:1px solid rgba(255,255,255,.03);font-size:.72rem;flex-wrap:wrap;">
       <span style="font-size:.9rem;">${c.emoji||'📌'}</span>
-      <span style="flex:1;">${escapeHtml(c.name)}</span>
+      <span style="flex:1;min-width:60%;">${escapeHtml(c.name)}</span>
+      ${diffPill}
+      ${dueChip}
       <span style="font-size:.55rem;color:var(--tx3);">${freqLabel}</span>
       <span style="font-size:.6rem;color:#22c55e;font-weight:700;">${c.pts||c.points||10} pts</span>
       <button onclick="editChorePoints(${c.id})" style="font-size:.45rem;background:rgba(56,189,248,.1);color:#38bdf8;border:1px solid rgba(56,189,248,.15);border-radius:4px;padding:.1rem .25rem;cursor:pointer;">Edit</button>
