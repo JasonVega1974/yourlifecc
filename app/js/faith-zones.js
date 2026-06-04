@@ -1190,9 +1190,11 @@ function fzOpenDest(dest){
     bodyEl.innerHTML =
       '<div class="fz-dest-intro">What\'s on your heart right now?</div>' +
       '<div id="fzPrayerCard" class="fz-today-card fz-prayer-card" role="button" tabindex="0"></div>' +
-      '<div id="fzQuickPrayerJournal" style="margin-top:1.5rem;"></div>';
-    if (typeof renderQuickPrayerCard      === 'function') renderQuickPrayerCard();
-    if (typeof renderQuickPrayerJournal   === 'function') renderQuickPrayerJournal();
+      '<div id="quickPrayerLibrary" style="margin-top:1.75rem;"></div>' +
+      '<div id="fzQuickPrayerJournal" style="margin-top:1.75rem;"></div>';
+    if (typeof renderQuickPrayerCard       === 'function') renderQuickPrayerCard();
+    if (typeof renderQuickPrayerLibrary    === 'function') renderQuickPrayerLibrary('quickPrayerLibrary');
+    if (typeof renderQuickPrayerJournal    === 'function') renderQuickPrayerJournal();
   } else if (dest === 'reallife'){
     titleEl.textContent = "Real Life Win";
     bodyEl.innerHTML = renderRealLifeWinDestination();
