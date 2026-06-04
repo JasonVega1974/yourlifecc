@@ -1377,6 +1377,12 @@ function getCurrentChallenge(){
 function renderMonthlyChallenge(){
   const el = document.getElementById('heroMonthlyChallenge'); if(!el) return;
   const ch = getCurrentChallenge();
+  // MONTHLY_CHALLENGES is currently an empty array, so getCurrentChallenge()
+  // returns undefined. Without this guard the function throws on ch.tasks.map,
+  // aborting the rest of the s-hero render chain in ui.js:showSection (the
+  // five trailing calls renderDailyPrompt / renderBadges / updateDashCards /
+  // renderHeroScreenTime / renderDevMap never run).
+  if(!ch || !Array.isArray(ch.tasks)){ el.innerHTML = ''; return; }
   const results = ch.tasks.map(t=>({...t, done:t.check()}));
   const done = results.filter(r=>r.done).length;
   const pct = Math.round((done/results.length)*100);
