@@ -112,17 +112,56 @@
 
   // Hide the appHome when the parent surface is active OR the user
   // is on a faith-free plan (their cinematic Enter The Well hero
-  // takes the whole screen). Otherwise show it.
+  // takes the whole screen). Otherwise: prefer the Command Center
+  // (constellation hero); fall back to the legacy #appHome shell.
+  //
+  // 2026-06-04 — Phase 3 chooser. command-center.js loads BEFORE this
+  // module so window.renderCommandCenter is available by the time the
+  // first DOMContentLoaded handler fires. Rollback path: set
+  // window._ccDisabled = true in the console — the Command Center
+  // bails (hides itself) and #appHome takes over.
   function maybeRenderAppHome(){
     if (typeof document === 'undefined') return;
     var home = document.getElementById('appHome');
-    if (!home) return;
-    var hideForParent = document.body && document.body.classList.contains('parent-view');
+    var cc   = document.getElementById('appCommandCenter');
+    var hideForParent    = document.body && document.body.classList.contains('parent-view');
     var hideForFaithFree = !!window._faithFree;
+
+    // Faith Well and Parent Hub own the screen on those flows — bail
+    // both surfaces. The Well code path (init.js:1649) handles its own
+    // paint into #faithHeroCinematic; we just stay out of its way.
     if (hideForParent || hideForFaithFree){
-      home.style.display = 'none';
+      if (home) home.style.display = 'none';
+      if (cc)   cc.style.display   = 'none';
       return;
     }
+
+    // Prefer Command Center when the module is loaded and the
+    // container exists. Hide the legacy #appHome.
+    if (cc && typeof window.renderCommandCenter === 'function' && !window._ccDisabled){
+      if (home) home.style.display = 'none';
+      try { window.renderCommandCenter(); } catch (e) {
+        // Defensive: if Command Center throws, fall back to #appHome
+        // rather than leaving the user on a blank surface. The console
+        // error surfaces the bug without blanking the screen.
+        try { console.warn('[appHome] Command Center render failed, falling back', e); } catch(_){}
+        cc.style.display = 'none';
+        if (home){
+          home.style.display = '';
+          renderAppGreeting();
+          if (typeof renderDailyGrowth === 'function'){
+            try { renderDailyGrowth(); } catch (e2) {}
+          }
+        }
+      }
+      return;
+    }
+
+    // Legacy fallback — original behaviour preserved. Also hide CC in
+    // case the user just flipped window._ccDisabled = true mid-session,
+    // so both surfaces don't stack.
+    if (cc) cc.style.display = 'none';
+    if (!home) return;
     home.style.display = '';
     renderAppGreeting();
     // 2026-05-26 — daily growth snapshot. Renders into any
