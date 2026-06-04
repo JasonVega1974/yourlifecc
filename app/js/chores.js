@@ -67,6 +67,16 @@ function toggleChoreActive(id){
   if(chore){ chore.active = !chore.active; save(); renderChores(); }
 }
 
+// Difficulty multiplier helper (Tab 1 Increment 2). Legacy chores
+// without an explicit difficulty fall through to 1.0× — no behavior
+// change for chores created before this increment.
+function _choreMultiplier(diff){
+  if(diff === 'hard')   return 2.0;
+  if(diff === 'medium') return 1.5;
+  if(diff === 'easy')   return 1.0;
+  return 1.0;
+}
+
 function markChoreDone(id){
   initChoreData();
   const chore = (Array.isArray(D.chores)?D.chores:[]).find(c=>c.id===id);
@@ -75,10 +85,20 @@ function markChoreDone(id){
   // Check if already done today
   const already = D.choreLog.find(l=>l.choreId===id && l.date===today && (l.status==='done'||l.status==='pending'));
   if(already){ showToast('Already submitted today'); return; }
+  // Tab 1 Increment 2 — apply difficulty multiplier at submit-time so the
+  // pending log row already reflects what the kid will earn on verify.
+  // Verify-time math is unchanged: it just awards entry.pts.
+  const mult = _choreMultiplier(chore.difficulty);
+  const basePts = Number.isFinite(+chore.pts) ? +chore.pts : 0;
+  const earnedPts = Math.round(basePts * mult);
   D.choreLog.push({
-    id:Date.now(), choreId:id, choreName:chore.name, pts:chore.pts,
+    id:Date.now(), choreId:id, choreName:chore.name, pts:earnedPts,
     date:today, time:new Date().toLocaleTimeString('en',{hour:'numeric',minute:'2-digit'}),
-    status:'pending', emoji:chore.emoji
+    status:'pending', emoji:chore.emoji,
+    // Snapshot the base + multiplier for transparency in History — also
+    // protects against the chore's difficulty being changed between
+    // submit and verify.
+    basePts: basePts, mult: mult
   });
   save(); renderChores();
   showToast('Submitted for verification ✓');
@@ -185,8 +205,13 @@ function renderChores(){
   const lp = document.getElementById('choreLevelPts'); if(lp) lp.textContent = `${D.chorePoints.total} / ${lvl.max} pts`;
   const lb = document.getElementById('choreLevelBar'); if(lb) lb.style.width = Math.min(100, ((D.chorePoints.total-lvl.min)/(lvl.max-lvl.min))*100)+'%';
 
-  // Today's chores
+  // Today's chores — kanban (Tab 1 Increment 2). Three columns:
+  // Todo / Pending / Verified, bucketed by today's log status. Rejected
+  // chores fall back into Todo so the kid can resubmit. Each card shows
+  // difficulty pill + due-date chip + effective points (base × mult).
+  // Overdue badge state is computed below for the My Chores tab nav.
   const todayEl = document.getElementById('choreTodayList');
+  let hasOverdueToday = false;
   if(todayEl){
     const activeChores = (Array.isArray(D.chores)?D.chores:[]).filter(c=>{
       if(!c.active) return false;
@@ -199,28 +224,63 @@ function renderChores(){
       return true;
     });
 
+    const buckets = {todo:[], pending:[], verified:[]};
+    activeChores.forEach(c => {
+      const log = D.choreLog.find(l=>l.choreId===c.id && l.date===today);
+      const st = log ? log.status : 'todo';
+      const bucket = st === 'verified' ? 'verified' : st === 'pending' ? 'pending' : 'todo';
+      buckets[bucket].push({c, log});
+      if(c.dueDate && c.dueDate < today && st !== 'verified') hasOverdueToday = true;
+    });
+
     if(!activeChores.length){
       todayEl.innerHTML = `<div style="text-align:center;padding:1.5rem;color:var(--tx2);font-size:.8rem;">${D.chores.length?'All caught up for today! 🎉':'No chores set up yet. Ask a parent to add some in Parent Hub.'}</div>`;
     } else {
-      todayEl.innerHTML = activeChores.map(c=>{
-        const todayLog = D.choreLog.find(l=>l.choreId===c.id && l.date===today);
-        const status = todayLog ? todayLog.status : 'todo';
-        const statusBadge = {
-          todo:`<button class="btn bp bs" onclick="markChoreDone(${c.id})" style="font-size:.65rem;white-space:nowrap;">✓ Done</button>`,
-          pending:'<span style="font-size:.6rem;background:rgba(251,191,36,.15);color:#fbbf24;padding:.2rem .5rem;border-radius:6px;">⏳ Pending</span>',
-          verified:'<span style="font-size:.6rem;background:rgba(34,197,94,.15);color:#22c55e;padding:.2rem .5rem;border-radius:6px;">✅ Verified</span>',
-          rejected:'<span style="font-size:.6rem;background:rgba(239,68,68,.15);color:#ef4444;padding:.2rem .5rem;border-radius:6px;">❌ Redo</span>'
-        };
-        return `<div style="display:flex;align-items:center;gap:.6rem;padding:.55rem .7rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:.3rem;${status==='verified'?'opacity:.6;':''}">
-          <span style="font-size:1rem;">${c.emoji}</span>
-          <div style="flex:1;">
-            <div style="font-size:.78rem;font-weight:600;color:var(--tx);${status==='verified'?'text-decoration:line-through;':''}">${escapeHtml(c.name)}</div>
-            <div style="font-size:.58rem;color:var(--tx2);">${c.pts} pts · ${c.freq}</div>
+      const renderCard = ({c, log}) => {
+        const mult = _choreMultiplier(c.difficulty);
+        const basePts = Number.isFinite(+c.pts) ? +c.pts : 0;
+        const effective = Math.round(basePts * mult);
+        const diff = c.difficulty || '';
+        const diffColor = diff==='hard' ? '#ef4444' : diff==='medium' ? '#fbbf24' : diff==='easy' ? '#22c55e' : 'var(--tx2)';
+        const isOverdue = c.dueDate && c.dueDate < today && (!log || log.status !== 'verified');
+        const diffPill = diff ? `<span style="font-size:.55rem;background:rgba(255,255,255,.05);color:${diffColor};padding:.1rem .35rem;border-radius:5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">${diff}</span>` : '';
+        const dueChip = c.dueDate
+          ? `<span style="font-size:.55rem;background:${isOverdue?'rgba(239,68,68,.15)':'rgba(255,255,255,.05)'};color:${isOverdue?'#ef4444':'var(--tx2)'};padding:.1rem .35rem;border-radius:5px;font-weight:600;">${isOverdue?'⚠ ':'📅 '}${c.dueDate.slice(5)}</span>`
+          : '';
+        const ptsLabel = (mult !== 1.0 && diff)
+          ? `<span style="font-size:.58rem;color:var(--tx2);">${basePts}×${mult.toFixed(1)}=<b style="color:var(--c);">${effective}</b>pts</span>`
+          : `<span style="font-size:.58rem;color:var(--tx2);">${effective} pts</span>`;
+        const st = log ? log.status : 'todo';
+        const action = (st === 'todo' || st === 'rejected')
+          ? `<button class="btn bp bs" onclick="markChoreDone(${c.id})" style="font-size:.6rem;white-space:nowrap;padding:.3rem .55rem;">${st==='rejected'?'↻ Redo':'✓ Done'}</button>`
+          : st === 'pending'
+            ? `<span style="font-size:.58rem;color:#fbbf24;font-weight:700;">⏳ Pending</span>`
+            : `<span style="font-size:.58rem;color:#22c55e;font-weight:700;">✅ Verified</span>`;
+        return `<div class="ch-card" style="${st==='verified'?'opacity:.55;':''}">
+          <div style="display:flex;align-items:flex-start;gap:.4rem;">
+            <span style="font-size:1.05rem;line-height:1.1;">${c.emoji||'📌'}</span>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:.72rem;font-weight:600;color:var(--tx);${st==='verified'?'text-decoration:line-through;':''}word-wrap:break-word;line-height:1.25;">${escapeHtml(c.name)}</div>
+              <div style="display:flex;gap:.25rem;align-items:center;margin-top:.25rem;flex-wrap:wrap;">${diffPill}${dueChip}${ptsLabel}</div>
+            </div>
           </div>
-          ${statusBadge[status]||statusBadge.todo}
+          <div style="margin-top:.4rem;text-align:right;">${action}</div>
         </div>`;
-      }).join('');
+      };
+      const renderCol = (key, label, dotColor, emptyMsg) => `
+        <div class="ch-col">
+          <div class="ch-col-h"><span class="ch-col-dot" style="background:${dotColor};"></span>${label}<span class="ch-col-n">${buckets[key].length}</span></div>
+          ${buckets[key].length ? buckets[key].map(renderCard).join('') : `<div class="ch-col-empty">${emptyMsg}</div>`}
+        </div>`;
+      todayEl.innerHTML = `<div class="ch-kanban">
+        ${renderCol('todo',     'Todo',     '#fbbf24', 'Nothing to do')}
+        ${renderCol('pending',  'Pending',  '#a78bfa', 'None pending')}
+        ${renderCol('verified', 'Verified', '#22c55e', 'None yet')}
+      </div>`;
     }
+    // Overdue badge on the My Chores sub-tab nav
+    const odEl = document.getElementById('chOverdueDot');
+    if(odEl) odEl.style.display = hasOverdueToday ? 'inline-block' : 'none';
   }
 
   // Parent mode lists
