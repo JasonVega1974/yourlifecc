@@ -118,7 +118,7 @@ const SK_DATA={taxes:[
   <li>Above that → 32%, 35%, 37%</li>
 </ul>
 
-<p>If you earn $60,000, you don't pay 22% on all $60,000. You pay 10% on the first slice, 12% on the middle, and 22% only on the dollars above $48,475. Your actual total federal tax bill at $60,000 is roughly $8,100 — an effective rate of about 13.5%, not 22%.</p>
+<p>If you earn $60,000, the IRS first lets you subtract the standard deduction ($15,750 for single filers), leaving $44,250 of taxable income. You pay 10% on the first $11,925 ($1,193) plus 12% on the remaining $32,325 ($3,879). Your actual federal tax bill is about $5,070 — an effective rate of 8.5%.</p>
 
 <p><strong>Marginal rate vs. effective rate:</strong> Your marginal rate is the highest bracket you're in. Your effective rate is your actual average rate across all income. The effective rate is always meaningfully lower. Understanding this eliminates the common mistake of turning down a raise because "it'll push me into a higher bracket." More income always means more money in your pocket — always.</p>
 
@@ -161,7 +161,7 @@ const SK_DATA={taxes:[
 
 <p><strong>Step 2: Choose your filing method</strong></p>
 <ul>
-  <li><strong>IRS Free File</strong> (irs.gov/freefile): Free federal filing if your income is under $79,000. Partners include TurboTax and H&R Block free versions.</li>
+  <li><strong>IRS Free File</strong> (irs.gov/freefile): Free federal filing if your income is under $89,000. Partners include TurboTax and H&R Block free versions.</li>
   <li><strong>FreeTaxUSA</strong> (freetaxusa.com): Always free federal, $15 state. Excellent for straightforward to moderately complex returns.</li>
   <li><strong>TurboTax / H&R Block:</strong> Most user-friendly, best support — but cost money for anything beyond simple returns.</li>
   <li><strong>CPA or tax professional:</strong> Worth it if you're self-employed, have significant investment income, own rental property, or have a life change (marriage, divorce, inherited assets).</li>
@@ -184,7 +184,7 @@ const SK_DATA={taxes:[
 <p><strong>The Standard Deduction vs. Itemizing</strong></p>
 <p>The IRS lets you take one of two approaches:</p>
 <ul>
-  <li><strong>Standard deduction (2025):</strong> $15,000 single | $30,000 married filing jointly | $22,500 head of household. Take this if your itemized deductions don't exceed these amounts — about 90% of Americans do.</li>
+  <li><strong>Standard deduction (2025):</strong> $15,750 single | $31,500 married filing jointly | $23,625 head of household. Take this if your itemized deductions don't exceed these amounts — about 90% of Americans do.</li>
   <li><strong>Itemizing:</strong> Add up specific deductible expenses and deduct the total if it exceeds the standard deduction. Worth calculating if you have a mortgage, significant medical expenses, or large charitable gifts.</li>
 </ul>
 
@@ -198,9 +198,9 @@ const SK_DATA={taxes:[
 
 <p><strong>Above-the-line deductions</strong> (these reduce your income even if you take the standard deduction — extremely valuable):</p>
 <ul>
-  <li><strong>Traditional IRA contributions:</strong> Up to $7,000 (2024), $8,000 if 50+</li>
+  <li><strong>Traditional IRA contributions:</strong> Up to $7,000 (2025), $8,000 if 50+</li>
   <li><strong>Student loan interest:</strong> Up to $2,500 (phases out at higher incomes)</li>
-  <li><strong>HSA contributions:</strong> Up to $4,150 individual, $8,300 family</li>
+  <li><strong>HSA contributions:</strong> Up to $4,300 individual, $8,550 family</li>
   <li><strong>Half of self-employment tax</strong></li>
   <li><strong>Self-employed health insurance premiums</strong></li>
   <li><strong>Alimony paid</strong> (for agreements before 2019)</li>
@@ -212,7 +212,7 @@ const SK_DATA={taxes:[
   <li>Business portion of your phone and internet</li>
   <li>Equipment, tools, and supplies</li>
   <li>Software and subscriptions</li>
-  <li>Mileage (67 cents/mile in 2024 for business driving)</li>
+  <li>Mileage (70 cents/mile in 2025 for business driving)</li>
   <li>Home office (dedicated space used exclusively for business)</li>
   <li>Professional development, books, courses, conferences</li>
   <li>Marketing and advertising</li>
@@ -235,7 +235,7 @@ const SK_DATA={taxes:[
 <p><strong>The most valuable credits to know:</strong></p>
 
 <p><strong>Earned Income Tax Credit (EITC)</strong> — Refundable<br>
-Designed for low-to-moderate income workers. Maximum credit (2024): $7,830 (with 3+ children), $632 (no children). One of the largest anti-poverty programs in the country — and frequently unclaimed because people don't know they qualify. Use the IRS EITC assistant at irs.gov to check eligibility.</p>
+Designed for low-to-moderate income workers. Maximum credit (2025): $8,046 (with 3+ children), $649 (no children). One of the largest anti-poverty programs in the country — and frequently unclaimed because people don't know they qualify. Use the IRS EITC assistant at irs.gov to check eligibility.</p>
 
 <p><strong>Child Tax Credit</strong> — Partially refundable<br>
 $2,000 per qualifying child under 17. Up to $1,700 refundable (Additional Child Tax Credit). Phases out at higher income levels.</p>
@@ -252,7 +252,7 @@ Up to $1,000 ($2,000 married) for contributions to a 401k, IRA, or other retirem
 <p><strong>Child and Dependent Care Credit</strong> — Non-refundable<br>
 Up to $3,000 for one dependent, $6,000 for two+. For childcare expenses incurred so you can work or look for work.</p>
 
-<p><strong>Electric Vehicle Credit</strong> — Partially refundable (as of 2024)<br>
+<p><strong>Electric Vehicle Credit</strong> — Partially refundable<br>
 Up to $7,500 for eligible new electric vehicles. Vehicle and income requirements apply. Point-of-sale credit now available.</p>`,
     tip:'Run your numbers through quality tax software or a CPA even if you think your situation is simple. Studies consistently find that many eligible filers miss credits — especially EITC — because they didn\'t know they qualified. The software prompts you for every credit automatically.'
   },
@@ -265,7 +265,7 @@ Up to $7,500 for eligible new electric vehicles. Vehicle and income requirements
 
 <p><strong>2. Maximize tax-advantaged accounts before anything else</strong></p>
 <ul>
-  <li><strong>401(k):</strong> $23,000/year limit (2024). Contributions reduce taxable income dollar-for-dollar at your marginal rate.</li>
+  <li><strong>401(k):</strong> $23,500/year limit (2025). Contributions reduce taxable income dollar-for-dollar at your marginal rate.</li>
   <li><strong>Traditional IRA:</strong> $7,000/year. Also pre-tax (with income limits for deductibility).</li>
   <li><strong>HSA:</strong> Triple tax advantage — contributions pre-tax, growth tax-free, withdrawals for medical expenses tax-free. The most tax-efficient savings vehicle that exists.</li>
   <li><strong>Roth IRA:</strong> After-tax contributions grow tax-free. No required minimum distributions. Best when you expect to be in a higher bracket in retirement.</li>
@@ -608,9 +608,9 @@ New cars lose approximately 20–25% of their value in the first year. A $35,000
 <p><strong>Deductible:</strong> The amount you pay out-of-pocket before insurance starts paying its share. A $1,500 deductible means you cover the first $1,500 in medical costs each year.</p>
 <p><strong>Copay:</strong> A fixed fee for specific services — $25 for a primary care visit, $50 for a specialist, $15 for a generic prescription. Some plans have copays even before the deductible is met.</p>
 <p><strong>Coinsurance:</strong> After meeting your deductible, you still pay a percentage — often 20% while insurance pays 80%. This continues until you hit your out-of-pocket maximum.</p>
-<p><strong>Out-of-pocket maximum:</strong> The absolute annual ceiling on what you pay for covered services. After hitting it, insurance pays 100%. 2024 limits: $9,450 individual, $18,900 family.</p>
+<p><strong>Out-of-pocket maximum:</strong> The absolute annual ceiling on what you pay for covered services. After hitting it, insurance pays 100%. 2025 limits: $9,200 individual, $18,400 family.</p>
 <p><strong>In-network vs. out-of-network:</strong> In-network providers have negotiated discounted rates with your insurer — dramatically cheaper. Out-of-network can mean you pay full, undiscounted rates. Always verify in-network status before any non-emergency appointment.</p>
-<p><strong>HSA (Health Savings Account):</strong> Triple tax advantage — contributions pre-tax, growth tax-free, withdrawals for medical expenses tax-free. Available with high-deductible health plans. The most tax-efficient savings vehicle that exists. 2024: $4,150 individual, $8,300 family.</p>
+<p><strong>HSA (Health Savings Account):</strong> Triple tax advantage — contributions pre-tax, growth tax-free, withdrawals for medical expenses tax-free. Available with high-deductible health plans. The most tax-efficient savings vehicle that exists. 2025: $4,300 individual, $8,550 family.</p>
 <p><strong>FSA:</strong> Pre-tax medical spending account — but most funds expire December 31. Use it or lose it.</p>
 <p><strong>Key rules:</strong> Stay on a parent's plan until age 26 — almost always much cheaper than independent coverage. Always use in-network providers. Review your Explanation of Benefits (EOB) after every claim — billing errors are extremely common. Request an itemized bill for any hospital visit and audit every charge.</p>`,
     tip:'If you get a medical bill you can\'t afford, call the billing department before paying or ignoring it. Hospitals must offer financial assistance for qualifying patients, and most will negotiate payment plans. Ignoring a medical bill sends it to collections — always engage.'
@@ -1053,12 +1053,12 @@ career:[
 <ul>
   <li><strong>Federal income tax:</strong> Based on your W-4 elections and income. Withheld throughout the year and reconciled when you file.</li>
   <li><strong>State income tax:</strong> Varies by state. 9 states have no income tax.</li>
-  <li><strong>Social Security:</strong> 6.2% of gross wages, up to the annual wage cap ($160,200 in 2024).</li>
+  <li><strong>Social Security:</strong> 6.2% of gross wages, up to the annual wage cap ($176,100 in 2025).</li>
   <li><strong>Medicare:</strong> 1.45% of all wages with no cap. Additional 0.9% on income above $200,000.</li>
 </ul>
 <p><strong>Post-tax deductions:</strong> Roth 401(k) contributions, Roth IRA (if auto-contributed), some life insurance, garnishments.</p>
 <p><strong>Net pay:</strong> What hits your bank. This is the number your budget should be built around — not gross.</p>
-<p><strong>Year-to-date (YTD) columns:</strong> Shows your running totals for the year. Useful for tracking against annual limits (401k: $23,000/year) and for understanding your annual income when budgeting.</p>`,
+<p><strong>Year-to-date (YTD) columns:</strong> Shows your running totals for the year. Useful for tracking against annual limits (401k: $23,500/year) and for understanding your annual income when budgeting.</p>`,
     tip:'Review every paycheck, at least for the first few months. Payroll errors happen — incorrect deductions, missing raises, wrong tax withholding. It\'s your responsibility to catch them. Keep your last few pay stubs — you\'ll need them for apartment applications, loans, and tax filing.'
   },
   {
@@ -1073,7 +1073,7 @@ career:[
   <li><strong>Starting 10 years earlier = $630,000 more</strong> from the same monthly contribution</li>
 </ul>
 <p><strong>Investment choices inside the 401(k):</strong> Most plans offer target-date funds (e.g., "Target Date 2060 Fund" — automatically adjusts allocation as you approach retirement) or index funds. For most people, a low-cost S&P 500 index fund or target-date fund is the right choice. Avoid actively managed funds with high expense ratios (over 0.5%) — fees compound just like returns, only they compound against you.</p>
-<p><strong>2024 limits:</strong> $23,000 employee contribution maximum. Contribute at minimum up to the employer match. Increase 1% per year until you're at 10–15% of income.</p>`,
+<p><strong>2025 limits:</strong> $23,500 employee contribution maximum. Contribute at minimum up to the employer match. Increase 1% per year until you're at 10–15% of income.</p>`,
     tip:'When you start a new job, set up your 401(k) in the first week — many plans have a waiting period and you don\'t want to delay the clock. Set contributions to at least capture the full employer match on day one. Increase your contribution rate by 1% every January until you reach 15% — you won\'t notice the gradual increase.'
   },
   {
@@ -2408,12 +2408,12 @@ investing:[
 <ul>
   <li>Contributions come out of your paycheck before taxes — lowers your taxable income now</li>
   <li><strong>Employer match is a guaranteed 100% return:</strong> If your employer matches 50% of contributions up to 6% of salary, contributing 6% of your $60K salary means they add $1,800 free. Never leave this uncollected.</li>
-  <li>2024 contribution limit: $23,000 per year</li>
+  <li>2025 contribution limit: $23,500 per year</li>
 </ul>
 <p><strong>Roth IRA — Best account for young people:</strong></p>
 <ul>
   <li>Contribute after-tax money now. All growth is completely tax-free forever.</li>
-  <li>$7,000/year contribution limit (2024)</li>
+  <li>$7,000/year contribution limit (2025)</li>
   <li>$7,000 at age 18, growing at 8% for 47 years = approximately $243,000 — all tax-free</li>
   <li>Because you\'re young, your tax rate is likely the lowest it\'ll ever be. Paying taxes now and never again is a great deal.</li>
 </ul>
@@ -2429,7 +2429,7 @@ investing:[
       {q:'What makes a Roth IRA especially valuable for young people?',a:['Higher contribution limits than 401(k)','Employer matching contributions','Growth and withdrawals in retirement are completely tax-free, and your tax rate is low now','Government-guaranteed returns'],c:2,e:'Roth accounts are funded with after-tax money. Since young people are usually in lower tax brackets, paying taxes now and never paying again on decades of growth is an excellent deal.'},
       {q:'What is the correct contribution priority order for retirement accounts?',a:['Roth IRA first, then 401(k)','401(k) to employer match → Roth IRA → more 401(k)','Max both simultaneously','Savings account first, then retirement accounts'],c:1,e:'Always capture free employer match money first (guaranteed return), then max the Roth IRA (tax-free growth), then return to 401(k). This order maximizes every dollar.'},
       {q:'Traditional 401(k) contributions reduce your taxes because:',a:['The government subsidizes them','They come out pre-tax, lowering your taxable income in the current year','You can deduct them at any age','Employers pay the taxes for you'],c:1,e:'Pre-tax 401(k) contributions reduce your taxable income in the year you contribute. If you\'re in the 22% bracket and contribute $5,000, you save $1,100 in taxes that year.'},
-      {q:'The 2024 annual contribution limit for a Roth IRA is approximately:',a:['$3,000','$7,000','$15,000','$23,000'],c:1,e:'The 2024 Roth IRA limit is $7,000 per year ($8,000 if you\'re 50+). The 401(k) limit is $23,000. Both have income eligibility requirements for the Roth.'}
+      {q:'The 2025 annual contribution limit for a Roth IRA is approximately:',a:['$3,000','$7,000','$15,000','$23,500'],c:1,e:'The 2025 Roth IRA limit is $7,000 per year ($8,000 if you\'re 50+). The 401(k) limit is $23,500. Both have income eligibility requirements for the Roth.'}
     ]
   },
   {
@@ -4970,12 +4970,15 @@ function calcTax(){
   if(res) res.style.display='block';
 
   // 2025 Federal brackets (IRS Rev. Proc. 2024-40, TY2025).
+  // Standard deduction reflects OBBBA-adjusted TY2025 values
+  // ($15,750 / $31,500 / $23,625), which superseded the
+  // Rev. Proc. 2024-40 projections ($15,000 / $30,000 / $22,500).
   const brackets = {
     single: [[11925,.10],[48475,.12],[103350,.22],[197300,.24],[250525,.32],[626350,.35],[Infinity,.37]],
     mfj:    [[23850,.10],[96950,.12],[206700,.22],[394600,.24],[501050,.32],[751600,.35],[Infinity,.37]],
     hoh:    [[17000,.10],[64850,.12],[103350,.22],[197300,.24],[250500,.32],[626350,.35],[Infinity,.37]],
   };
-  const stdDed = {single:15000, mfj:30000, hoh:22500};
+  const stdDed = {single:15750, mfj:31500, hoh:23625};
 
   // Self-employed: deduct half of SE tax first
   let seAmt = 0;
