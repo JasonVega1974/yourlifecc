@@ -82,6 +82,7 @@
   }
 
   function _cardHtml(prayer) {
+    var prayId  = 'prayer-pray-'  + prayer.id;
     var saveId  = 'prayer-save-'  + prayer.id;
     var shareId = 'prayer-share-' + prayer.id;
     return ''
@@ -92,6 +93,7 @@
       +     '<div class="qp-lib-verse">' + _esc(prayer.verse) + '</div>'
       +   '</header>'
       +   '<p class="qp-lib-text">' + _esc(prayer.text) + '</p>'
+      +   '<button type="button" id="' + prayId + '" class="qp-lib-btn-pray">🙏 Pray this</button>'
       +   '<div class="qp-lib-actions">'
       +     '<button type="button" id="' + saveId  + '" class="qp-lib-btn qp-lib-btn-save"  aria-pressed="false"></button>'
       +     '<button type="button" id="' + shareId + '" class="qp-lib-btn qp-lib-btn-share">📤 Share</button>'
@@ -100,10 +102,28 @@
   }
 
   function _bindCardActions() {
-    if (typeof root.YLM === 'undefined') return;
     _data().forEach(function (prayer) {
+      var prayBtn  = document.getElementById('prayer-pray-'  + prayer.id);
       var saveBtn  = document.getElementById('prayer-save-'  + prayer.id);
       var shareBtn = document.getElementById('prayer-share-' + prayer.id);
+      if (prayBtn) {
+        prayBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (typeof root.openPrayerFocus === 'function') {
+            root.openPrayerFocus({
+              title: prayer.title,
+              text:  prayer.text,
+              verse: prayer.verse,
+              trait: 'faith',
+              traitAmount: 3
+            });
+          } else if (typeof showToast === 'function') {
+            showToast('Prayer focus unavailable — reload the app');
+          }
+        });
+      }
+      if (typeof root.YLM === 'undefined') return;
       if (saveBtn) {
         root.YLM.bindSaveButton(saveBtn, 'prayer', prayer.id, {
           savedLabel:   '★ Saved',
@@ -153,9 +173,12 @@
       + '.qp-lib-title{font-family:var(--fh,var(--fm));font-size:1.05rem;font-weight:700;color:var(--tx);margin:0;line-height:1.25;}'
       + '.qp-lib-verse{font-family:var(--fm);font-size:.7rem;font-weight:800;letter-spacing:.04em;color:#fbbf24;}'
       + '.qp-lib-text{font-family:Georgia,"Times New Roman",serif;font-size:.92rem;line-height:1.65;color:var(--tx);margin:0;}'
-      + '.qp-lib-actions{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.2rem;}'
-      + '.qp-lib-btn{flex:1;min-width:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.55rem .8rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);transition:background .15s,border-color .15s;}'
-      + '.qp-lib-btn:hover{background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.32);}'
+      + '.qp-lib-btn-pray{display:block;width:100%;margin-top:.4rem;background:linear-gradient(135deg,#a78bfa,#7c3aed);border:none;color:#fff;border-radius:12px;padding:.78rem 1rem;font-family:var(--fh,var(--fm));font-size:.92rem;font-weight:900;letter-spacing:.06em;cursor:pointer;box-shadow:0 8px 22px rgba(124,58,237,.32);transition:transform .15s,box-shadow .2s;}'
+      + '.qp-lib-btn-pray:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(124,58,237,.44);}'
+      + '.qp-lib-btn-pray:focus-visible{outline:2px solid #fbbf24;outline-offset:2px;}'
+      + '.qp-lib-actions{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;}'
+      + '.qp-lib-btn{flex:1;min-width:0;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--tx2);border-radius:10px;padding:.45rem .7rem;font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fm);transition:background .15s,border-color .15s,color .15s;}'
+      + '.qp-lib-btn:hover{background:rgba(167,139,250,.1);border-color:rgba(167,139,250,.28);color:var(--tx);}'
       + '.qp-lib-btn-save.ylm-saved{background:#fbbf24;border-color:#fbbf24;color:#0b1220;}'
       + '.qp-lib-empty{padding:1.2rem;text-align:center;background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.15);border-radius:12px;color:var(--tx2);font-size:.85rem;}'
       + ':root.light .qp-lib-card{background:#fafaf9;border-color:rgba(124,58,237,.25);color:#1a1233;box-shadow:0 4px 14px rgba(15,23,42,.06);}'
