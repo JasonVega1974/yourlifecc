@@ -343,6 +343,24 @@ async function finishInit(cloudReady){
     _lastRenderedProfileId = (typeof _activeProfileId !== 'undefined') ? _activeProfileId : null;
   }
   let _defaultLanding = 's-hero'; // faith-free hero rendered via renderFaithOnlyHero(); session restore skips login, not the hero
+  // Parent accounts with child profiles configured, no child currently active,
+  // and not faith-free → land on Parent Hub. Without this branch they hit
+  // s-hero, which #appHome hides for parent-view users (legacy hero is wrapped
+  // in a hidden div), leaving the screen blank. Active child profiles + solo
+  // mode + fresh accounts (no children yet) continue to land on s-hero.
+  try {
+    var _hasChildren = (typeof _profiles !== 'undefined' && Array.isArray(_profiles))
+      && _profiles.some(function(p){ return p && p.isParent === false; });
+    var _activeIsChild = false;
+    if (typeof _profiles !== 'undefined' && Array.isArray(_profiles) && typeof _activeProfileId !== 'undefined' && _activeProfileId) {
+      var _ap = _profiles.find(function(p){ return p && p.id === _activeProfileId; });
+      _activeIsChild = !!(_ap && _ap.isParent === false);
+    }
+    var _isSoloBoot = !!(typeof D !== 'undefined' && D && D.soloMode);
+    if (_hasChildren && !_activeIsChild && !_isSoloBoot && !window._faithFree) {
+      _defaultLanding = 's-parent';
+    }
+  } catch(_e){}
   showSection(_defaultLanding);
   document.documentElement.removeAttribute('data-app-loading');
   if(!window._faithFree){
