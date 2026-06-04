@@ -45,6 +45,17 @@
     return out;
   }
 
+  // Stable slug for anchor IDs. Strips ampersands, lowercases, and
+  // collapses anything non-alphanumeric into hyphens. Used to build
+  // qp-topic-<slug> ids that the pill chips scroll to.
+  function _topicSlug(t) {
+    return String(t || '')
+      .toLowerCase()
+      .replace(/&/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
   function _savedCount() {
     if (typeof root.YLM === 'undefined') return 0;
     var saved = root.YLM.list('prayer');
@@ -55,28 +66,28 @@
     return n;
   }
 
-  function _filteredList() {
-    var list = _data().slice();
-    if (_qpFilter === 'all') return list;
-    if (_qpFilter === 'saved') {
-      if (typeof root.YLM === 'undefined') return [];
-      var savedIds = {};
-      root.YLM.list('prayer').forEach(function (id) { savedIds[String(id)] = true; });
-      return list.filter(function (p) { return savedIds[String(p.id)]; });
-    }
-    return list.filter(function (p) { return p.topic === _qpFilter; });
+  // Returns just the saved prayers (used by saved-mode rendering).
+  function _savedList() {
+    if (typeof root.YLM === 'undefined') return [];
+    var savedIds = {};
+    root.YLM.list('prayer').forEach(function (id) { savedIds[String(id)] = true; });
+    return _data().filter(function (p) { return savedIds[String(p.id)]; });
   }
 
   function _pillsHtml() {
     var topics = _topics();
     var savedCount = _savedCount();
     var html = '';
-    var active = function (key) { return _qpFilter === key ? ' qp-pill-active' : ''; };
-    html += '<button type="button" class="qp-pill' + active('all') + '" onclick="qpSetFilter(\'all\')">All <span class="qp-pill-count">' + _data().length + '</span></button>';
-    html += '<button type="button" class="qp-pill qp-pill-saved' + active('saved') + '" onclick="qpSetFilter(\'saved\')">★ Saved <span class="qp-pill-count">' + savedCount + '</span></button>';
+    // Only All and ★ Saved carry an "active" state. Topic chips are
+    // navigation, not filters — clicking one scrolls to that section
+    // without changing the active mode.
+    var allActive   = (_qpFilter !== 'saved');
+    var savedActive = (_qpFilter === 'saved');
+    html += '<button type="button" class="qp-pill' + (allActive ? ' qp-pill-active' : '') + '" onclick="qpSetFilter(\'all\')">All <span class="qp-pill-count">' + _data().length + '</span></button>';
+    html += '<button type="button" class="qp-pill qp-pill-saved' + (savedActive ? ' qp-pill-active' : '') + '" onclick="qpSetFilter(\'saved\')">★ Saved <span class="qp-pill-count">' + savedCount + '</span></button>';
     topics.forEach(function (t) {
       var count = _data().filter(function (p) { return p.topic === t; }).length;
-      html += '<button type="button" class="qp-pill' + active(t) + '" onclick="qpSetFilter(' + JSON.stringify(t) + ')">' + _esc(t) + ' <span class="qp-pill-count">' + count + '</span></button>';
+      html += '<button type="button" class="qp-pill qp-pill-topic" onclick="qpSetFilter(' + JSON.stringify(t) + ')">' + _esc(t) + ' <span class="qp-pill-count">' + count + '</span></button>';
     });
     return html;
   }
@@ -165,6 +176,15 @@
       + '.qp-pill-saved.qp-pill-active{background:#fbbf24;color:#0b1220;border-color:#fbbf24;}'
       + '.qp-pill-count{opacity:.7;margin-left:.2rem;font-weight:800;}'
       + '.qp-pill-active .qp-pill-count{opacity:.85;}'
+      + '.qp-lib-body{display:flex;flex-direction:column;gap:1.4rem;}'
+      // Topic section + header. scroll-margin-top reserves room above
+      // the header for any sticky chrome (or just breathing space when
+      // there is none) so chip jumps land cleanly.
+      + '.qp-topic-group{display:flex;flex-direction:column;gap:.7rem;scroll-margin-top:1.5rem;}'
+      + '.qp-topic-h{display:flex;align-items:center;gap:.6rem;margin:0;font-family:var(--fh,var(--fm));font-size:1.05rem;font-weight:800;color:var(--tx);letter-spacing:.01em;}'
+      + '.qp-topic-h::before{content:"";display:inline-block;width:3px;height:1.1rem;background:linear-gradient(180deg,#a78bfa,#7c3aed);border-radius:2px;}'
+      + '.qp-topic-h-label{flex:1;min-width:0;}'
+      + '.qp-topic-h-count{font-family:var(--fm);font-size:.62rem;font-weight:800;letter-spacing:.14em;color:var(--tx3);opacity:.7;}'
       + '.qp-lib-grid{display:grid;gap:.85rem;}'
       + '@media (min-width:720px){.qp-lib-grid{grid-template-columns:1fr 1fr;}}'
       + '.qp-lib-card{background:linear-gradient(180deg,rgba(167,139,250,.06),rgba(15,18,40,.4));border:1px solid rgba(167,139,250,.22);border-radius:16px;padding:1.1rem 1.1rem 1rem;display:flex;flex-direction:column;gap:.7rem;box-shadow:0 6px 20px rgba(0,0,0,.18);}'
@@ -197,7 +217,7 @@
 
   function _wrapHtml(opts) {
     var heading = (opts && opts.heading) || 'Pray with the right words';
-    var sub = (opts && opts.subtitle) || 'Borrow a prayer when you don\'t have your own. Filter by what you\'re carrying today.';
+    var sub = (opts && opts.subtitle) || 'Borrow a prayer when you don\'t have your own. Tap a topic to jump straight to its prayers.';
     return ''
       + '<div class="qp-lib-wrap" id="qpLibInner">'
       +   '<div class="qp-lib-header">'
@@ -206,30 +226,52 @@
       +     '<div class="qp-lib-subtitle">' + _esc(sub) + '</div>'
       +   '</div>'
       +   '<div class="qp-lib-pills" id="qpLibPills"></div>'
-      +   '<div class="qp-lib-grid" id="qpLibGrid"></div>'
+      +   '<div class="qp-lib-body" id="qpLibBody"></div>'
       + '</div>';
+  }
+
+  // Browse mode — every topic gets a section header with an id
+  // ("qp-topic-<slug>") that the pill chips smooth-scroll into view.
+  // scroll-margin-top on .qp-topic-group reserves visual room so the
+  // header doesn't slam against the top of the viewport (and accounts
+  // for any sticky chrome above the library).
+  function _browseHtml() {
+    var topics = _topics();
+    return topics.map(function (t) {
+      var slug = _topicSlug(t);
+      var list = _data().filter(function (p) { return p.topic === t; });
+      var cards = list.map(_cardHtml).join('');
+      return ''
+        + '<section class="qp-topic-group" id="qp-topic-' + slug + '">'
+        +   '<h4 class="qp-topic-h">'
+        +     '<span class="qp-topic-h-label">' + _esc(t) + '</span>'
+        +     '<span class="qp-topic-h-count">' + list.length + '</span>'
+        +   '</h4>'
+        +   '<div class="qp-lib-grid">' + cards + '</div>'
+        + '</section>';
+    }).join('');
+  }
+
+  function _savedBodyHtml() {
+    var list = _savedList();
+    if (!list.length) {
+      return '<div class="qp-lib-empty">No saved prayers yet. Tap ☆ Save on any prayer to keep it here.</div>';
+    }
+    return '<div class="qp-lib-grid">' + list.map(_cardHtml).join('') + '</div>';
   }
 
   function _renderInto(host) {
     if (!host) return;
     var pills = host.querySelector('#qpLibPills');
-    var grid  = host.querySelector('#qpLibGrid');
-    if (!pills || !grid) {
+    var body  = host.querySelector('#qpLibBody');
+    if (!pills || !body) {
       host.innerHTML = _wrapHtml();
       pills = host.querySelector('#qpLibPills');
-      grid  = host.querySelector('#qpLibGrid');
+      body  = host.querySelector('#qpLibBody');
     }
-    if (!pills || !grid) return;
+    if (!pills || !body) return;
     pills.innerHTML = _pillsHtml();
-    var list = _filteredList();
-    if (!list.length) {
-      var msg = (_qpFilter === 'saved')
-        ? 'No saved prayers yet. Tap ☆ Save on any prayer to keep it here.'
-        : 'No prayers in this topic yet.';
-      grid.innerHTML = '<div class="qp-lib-empty">' + msg + '</div>';
-      return;
-    }
-    grid.innerHTML = list.map(_cardHtml).join('');
+    body.innerHTML = (_qpFilter === 'saved') ? _savedBodyHtml() : _browseHtml();
     _bindCardActions();
   }
 
@@ -242,10 +284,40 @@
     _renderInto(host);
   }
 
+  // The pill row is both a filter ("All" / "★ Saved") and a jump menu
+  // (topic chips). Routing:
+  //   'all'    → ensure browse mode, scroll to the library top
+  //   'saved'  → switch to saved-only mode (no jump)
+  //   <topic>  → ensure browse mode is rendered, scroll to that
+  //              topic's section anchor (qp-topic-<slug>)
   function qpSetFilter(topic) {
-    _qpFilter = topic || 'all';
     var host = _qpHostId && document.getElementById(_qpHostId);
-    if (host) _renderInto(host);
+    if (!host) return;
+
+    if (topic === 'saved') {
+      if (_qpFilter !== 'saved') {
+        _qpFilter = 'saved';
+        _renderInto(host);
+      }
+      return;
+    }
+
+    // Either 'all' or a specific topic — both mean browse mode.
+    var wasSaved = (_qpFilter === 'saved');
+    _qpFilter = 'all';
+    if (wasSaved) _renderInto(host);
+
+    var target;
+    if (topic === 'all' || !topic) {
+      target = host.querySelector('#qpLibBody') || host;
+    } else {
+      target = host.querySelector('#qp-topic-' + _topicSlug(topic));
+      // Topic missing (data drift) — fall back to library top.
+      if (!target) target = host.querySelector('#qpLibBody') || host;
+    }
+    if (target && target.scrollIntoView) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   // Helper used by the Explore Faith pathway card — routes from
