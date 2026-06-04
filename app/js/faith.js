@@ -2655,19 +2655,25 @@ function vtmShare(){
   }
 }
 
-// Plain-text clipboard copy for the selected verse.
+// Plain-text share for the selected verse — routed through the
+// shared YLM.share path so iOS gets the native share sheet and
+// desktop falls back to clipboard automatically.
 function vtmCopy(){
   if(!_esvSelectedVerse) return;
   const verseEl = document.querySelector('.esv-v[data-verse="'+_esvSelectedVerse+'"]');
   const verseText = verseEl ? verseEl.textContent.replace(/^\s*🔖?\[\d+\]\s*/, '').replace(/📝/g,'').trim() : '';
   const ref = _esvCurrentBook + ' ' + _esvCurrentChapter + ':' + _esvSelectedVerse;
-  const out = '"' + verseText + '" — ' + ref + '\n\nyourlifecc.com';
+  const out = '"' + verseText + '" — ' + ref;
+  closeVerseMenu();
+  if(typeof YLM !== 'undefined' && YLM.share){
+    YLM.share({ title: ref, text: out, url: 'https://yourlifecc.com' });
+    return;
+  }
   if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(out).then(function(){ showToast('Verse copied ✓'); });
+    navigator.clipboard.writeText(out + '\n\nyourlifecc.com').then(function(){ showToast('Verse copied ✓'); });
   } else {
     showToast('Clipboard not supported');
   }
-  closeVerseMenu();
 }
 
 // AI explain — opens the F2-G Ask the Bible modal pre-filled with the
@@ -4594,19 +4600,15 @@ function prCopyExample(){
   const ex = examples.find(x => x && x.id === _prExampleOpenId);
   if(!ex) return;
   const txt = ex.fullPrayer + '\n— ' + (ex.scriptureAnchor || '');
-  try {
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(txt);
+  if(typeof YLM !== 'undefined' && YLM.share){
+    YLM.share({ title: ex.title || 'Prayer', text: txt });
+    return;
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(function(){
       if(typeof showToast === 'function') showToast('Prayer copied 📋');
-      return;
-    }
-  } catch(_){}
-  // Fallback
-  const ta = document.createElement('textarea');
-  ta.value = txt; document.body.appendChild(ta);
-  ta.select(); try { document.execCommand('copy'); } catch(_){}
-  document.body.removeChild(ta);
-  if(typeof showToast === 'function') showToast('Prayer copied 📋');
+    });
+  }
 }
 
 function prMakeMyPrayer(){
@@ -5517,6 +5519,10 @@ function exportSermonNote(id){
     note.actionStep ? '\n🎯 This week: ' + note.actionStep : '',
   ].filter(Boolean);
   const text = parts.join(' · ').replace(' · \n', '\n');
+  if(typeof YLM !== 'undefined' && YLM.share){
+    YLM.share({ title: note.title || 'Sermon notes', text: text });
+    return;
+  }
   if(navigator.clipboard){ navigator.clipboard.writeText(text).then(function(){ showToast('Copied to clipboard!'); }); }
 }
 
@@ -8240,30 +8246,54 @@ function ppStarsHtml(score){
   return '<span class="pp-stars" aria-label="Impact '+filled+' of 10">'+ ppStarsInner(score) +'</span>';
 }
 
+// One-time migration from the legacy D.savedProofs cloud field into
+// the YLM 'proof' store. Runs once on first read; idempotent.
+let _ppSavedMigrated = false;
+function _ppMigrateLegacySaves(){
+  if(_ppSavedMigrated) return;
+  _ppSavedMigrated = true;
+  try {
+    if(typeof YLM === 'undefined') return;
+    if(typeof D === 'undefined' || !D) return;
+    if(!Array.isArray(D.savedProofs) || !D.savedProofs.length) return;
+    D.savedProofs.forEach(function(id){
+      if(id != null && !YLM.isSaved('proof', id)){
+        // Use _write directly so we don't toast/dispatch during boot.
+        var arr = YLM._read('proof');
+        arr.push(String(id));
+        YLM._write('proof', arr);
+      }
+    });
+  } catch(_){}
+}
+
 function ppIsSaved(id){
+  _ppMigrateLegacySaves();
+  if(typeof YLM !== 'undefined') return YLM.isSaved('proof', id);
   return !!(typeof D !== 'undefined' && D && Array.isArray(D.savedProofs) && D.savedProofs.indexOf(id) !== -1);
 }
 
+// Toggle bookmark from a card star (not the modal). The modal Save
+// button uses YLM.bindSaveButton in ppOpenModal directly.
 function ppToggleBookmark(id, btnEl){
-  if(typeof D === 'undefined' || !D) return;
-  if(!Array.isArray(D.savedProofs)) D.savedProofs = [];
-  const idx = D.savedProofs.indexOf(id);
-  if(idx === -1) D.savedProofs.push(id);
-  else D.savedProofs.splice(idx,1);
-  if(typeof save === 'function') save();
-  // Refresh the specific card icon if provided
+  if(typeof YLM === 'undefined') return;
+  YLM.toggleSave('proof', id);
   if(btnEl){
     const saved = ppIsSaved(id);
     btnEl.classList.toggle('saved', saved);
     btnEl.textContent = saved ? '★' : '☆';
+    btnEl.style.color = saved ? '#f59e0b' : 'var(--tx3)';
   }
-  // Also refresh the modal bookmark button if the same proof is open
+  // Keep grid + subtabs (Saved count) in sync.
+  if(typeof ppRenderGrid === 'function') ppRenderGrid();
+  if(typeof ppRenderSubtabs === 'function') ppRenderSubtabs();
+  // If the modal is open on this proof, refresh its footer.
   if(_ppCurrentProofId === id){
     const mb = document.getElementById('ppModalBookmark');
     if(mb){
       const saved = ppIsSaved(id);
-      mb.classList.toggle('saved', saved);
-      mb.textContent = saved ? '★' : '☆';
+      mb.textContent = saved ? '★ Saved' : '☆ Save';
+      mb.classList.toggle('ylm-saved', saved);
     }
   }
 }
@@ -8319,7 +8349,12 @@ function ppRenderSubtabs(){
   const total = PROOF_PROPHECY_DATA.length;
   const counts = {all: total};
   PROOF_PROPHECY_DATA.forEach(p => { counts[p.category] = (counts[p.category]||0) + 1; });
+  // Saved count comes from YLM (per-user localStorage). Falls back to 0
+  // when YLM isn't loaded — subtab still renders so the UI shape is stable.
+  const savedIds = (typeof YLM !== 'undefined') ? YLM.list('proof') : [];
+  const savedCount = savedIds.filter(function(id){ return !!ppProofById(id); }).length;
   let html = '<button class="pp-subtab'+(_ppActiveCategory==='all'?' active':'')+'" onclick="ppSetCategory(\'all\')">All<span class="pp-subtab-count">('+ counts.all +')</span></button>';
+  html += '<button class="pp-subtab'+(_ppActiveCategory==='saved'?' active':'')+'" onclick="ppSetCategory(\'saved\')" style="'+(_ppActiveCategory==='saved'?'border-left:3px solid #f59e0b;':'')+'">★ Saved<span class="pp-subtab-count">('+ savedCount +')</span></button>';
   PROOF_PROPHECY_CATEGORIES.forEach(cat => {
     const active = _ppActiveCategory === cat.key;
     html += '<button class="pp-subtab'+(active?' active':'')+'" onclick="ppSetCategory(\''+ cat.key +'\')" style="'+(active?'border-left:3px solid '+cat.accent+';':'')+'">'
@@ -8342,7 +8377,14 @@ function ppRenderGrid(){
   const searchEl = document.getElementById('ppSearch');
   const q = (searchEl && searchEl.value || '').trim().toLowerCase();
   let list = PROOF_PROPHECY_DATA.slice();
-  if(_ppActiveCategory !== 'all') list = list.filter(p => p.category === _ppActiveCategory);
+  if(_ppActiveCategory === 'saved'){
+    const savedIds = (typeof YLM !== 'undefined') ? YLM.list('proof') : [];
+    const set = {};
+    savedIds.forEach(function(id){ set[String(id)] = true; });
+    list = list.filter(function(p){ return set[String(p.id)]; });
+  } else if(_ppActiveCategory !== 'all'){
+    list = list.filter(p => p.category === _ppActiveCategory);
+  }
   if(q){
     list = list.filter(p =>
       (p.title||'').toLowerCase().indexOf(q) !== -1 ||
@@ -8355,7 +8397,10 @@ function ppRenderGrid(){
   // Sort by impactScore desc, stable
   list.sort((a,b) => (b.impactScore||0) - (a.impactScore||0));
   if(!list.length){
-    grid.innerHTML = '<div class="pp-empty" style="grid-column:1/-1;">No proofs match your search. Try a different term.</div>';
+    const empty = (_ppActiveCategory === 'saved')
+      ? 'No saved proofs yet. Tap ☆ Save on any proof to keep it here.'
+      : 'No proofs match your search. Try a different term.';
+    grid.innerHTML = '<div class="pp-empty" style="grid-column:1/-1;">' + empty + '</div>';
     return;
   }
   grid.innerHTML = list.map(ppCardHtml).join('');
@@ -8448,15 +8493,36 @@ function ppOpenModal(id){
           : '');
   }
 
-  // Footer — Bookmark · Share · Ask the Bible · Close, in the same pill
-  // style Plans uses.
+  // Footer — Bookmark · Share · Ask the Bible. Buttons get stable IDs
+  // so YLM.bindSaveButton can refresh visual state after each toggle;
+  // the previous render put no id on the bookmark, which is why the
+  // Save button looked dead on click. Share + Ask listeners are wired
+  // imperatively (no inline onclick) so the gesture window is preserved.
   const footer = document.getElementById('ppModalFooter');
   if(footer){
-    const saved = ppIsSaved(id);
+    const savedStyle   = 'background:' + accent + ';border:1px solid ' + accent + ';color:#0b1220;border-radius:10px;padding:.55rem .9rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);';
+    const unsavedStyle = 'background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.55rem .9rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);';
     footer.innerHTML = ''
-      + '<button onclick="ppToggleBookmarkCurrent()" style="background:' + (saved ? accent : 'rgba(255,255,255,.06)') + ';border:1px solid ' + (saved ? accent : 'rgba(255,255,255,.12)') + ';color:' + (saved ? '#0b1220' : 'var(--tx)') + ';border-radius:10px;padding:.55rem .9rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">' + (saved ? '★ Saved' : '☆ Save') + '</button>'
-      + '<button onclick="ppShareCurrent()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.55rem .9rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">📋 Share</button>'
-      + '<button onclick="ppAskBibleFromProof()" style="background:linear-gradient(135deg,' + accent + ',#fef3c7);color:#0b1220;border:none;border-radius:10px;padding:.55rem .9rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">💬 Ask the Bible →</button>';
+      + '<button id="ppModalBookmark" type="button" aria-pressed="false"></button>'
+      + '<button id="ppModalShare" type="button" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.55rem .9rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">📋 Share</button>'
+      + '<button id="ppModalAsk" type="button" style="background:linear-gradient(135deg,' + accent + ',#fef3c7);color:#0b1220;border:none;border-radius:10px;padding:.55rem .9rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">💬 Ask the Bible →</button>';
+
+    if(typeof YLM !== 'undefined'){
+      YLM.bindSaveButton(document.getElementById('ppModalBookmark'), 'proof', proof.id, {
+        savedLabel: '★ Saved',
+        unsavedLabel: '☆ Save',
+        savedStyle: savedStyle,
+        unsavedStyle: unsavedStyle,
+        onChange: function(){
+          if(typeof ppRenderGrid === 'function') ppRenderGrid();
+          if(typeof ppRenderSubtabs === 'function') ppRenderSubtabs();
+        }
+      });
+    }
+    const shareBtn = document.getElementById('ppModalShare');
+    if(shareBtn) shareBtn.addEventListener('click', ppShareCurrent);
+    const askBtn = document.getElementById('ppModalAsk');
+    if(askBtn) askBtn.addEventListener('click', ppAskBibleFromProof);
   }
 
   if(typeof openModal === 'function') openModal('ppModal');
@@ -8478,15 +8544,21 @@ function ppCloseModal(){
 function ppShareCurrent(){
   const proof = ppProofById(_ppCurrentProofId);
   if(!proof) return;
-  const text = proof.title + ' — ' + (proof.eyebrow||'') + '\n\n' + (proof.summary||'') + '\n\nScripture: ' + (proof.scripture||'') + '\n\nMore: yourlifecc.com/app/#proof-prophecy\n— Shared from YourLife CC';
+  const text = proof.title
+    + (proof.eyebrow  ? ' — ' + proof.eyebrow : '')
+    + '\n\n' + (proof.summary || '')
+    + (proof.scripture ? '\n\nScripture: ' + proof.scripture : '')
+    + '\n\n— Shared from YourLife CC';
+  const url = 'https://yourlifecc.com/app/index.html#proof:' + encodeURIComponent(proof.id);
+  if(typeof YLM !== 'undefined' && YLM.share){
+    YLM.share({ title: proof.title || 'Proof from YourLife CC', text: text, url: url });
+    return;
+  }
+  // Defensive fallback if modal-actions.js failed to load.
   if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(()=>{
-      if(typeof showToast === 'function') showToast('Copied to clipboard');
-    }).catch(()=>{
-      if(typeof showToast === 'function') showToast('Copy failed — long-press to copy manually');
+    navigator.clipboard.writeText(text + '\n\n' + url).then(function(){
+      if(typeof showToast === 'function') showToast('Copied to clipboard ✓');
     });
-  } else {
-    if(typeof showToast === 'function') showToast('Clipboard not available');
   }
 }
 
@@ -8938,6 +9010,10 @@ function jesusVerseCopy(btn){
   var ref = btn.getAttribute('data-ref') || '';
   var words = btn.getAttribute('data-words') || '';
   var text = ref + ' — ' + words;
+  if(typeof YLM !== 'undefined' && YLM.share){
+    YLM.share({ title: ref || 'The Words of Jesus', text: text, url: 'https://yourlifecc.com' });
+    return;
+  }
   if(navigator.clipboard && navigator.clipboard.writeText){
     navigator.clipboard.writeText(text).then(function(){
       if(typeof showToast === 'function') showToast('Verse copied!');
@@ -10735,6 +10811,10 @@ function _votdCopyVerse(){
   try{ s = getTodayScripture(); }catch(e){}
   if(!s) return;
   var txt = '"' + s.text + '" — ' + s.ref;
+  if(typeof YLM !== 'undefined' && YLM.share){
+    YLM.share({ title: 'Verse of the Day', text: txt, url: 'https://yourlifecc.com' });
+    return;
+  }
   if(navigator.clipboard){ navigator.clipboard.writeText(txt).then(function(){ if(typeof showToast==='function') showToast('Verse copied!'); }); }
 }
 
