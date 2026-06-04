@@ -13179,8 +13179,8 @@
 
     <!-- BACK + LOCK ROW -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem;gap:.5rem;">
-      <button onclick="showSection('s-hero')" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--tx2);padding:.35rem .8rem;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:var(--fn);display:flex;align-items:center;gap:.35rem;">← Dashboard</button>
-      <button id="phLockHubBtn" onclick="lockParentDash();showSection('s-hero');" style="display:none;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);color:#f87171;padding:.35rem .8rem;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:var(--fn);align-items:center;gap:.35rem;">🔒 Lock Hub</button>
+      <button onclick="phNav('home')" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--tx2);padding:.35rem .8rem;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:var(--fn);display:flex;align-items:center;gap:.35rem;">← Dashboard</button>
+      <button id="phLockHubBtn" onclick="lockParentDash();showSection('s-parent');" style="display:none;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);color:#f87171;padding:.35rem .8rem;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:var(--fn);align-items:center;gap:.35rem;">🔒 Lock Hub</button>
     </div>
 
     <!-- CHILD SELECTOR (always visible at top) -->
@@ -15507,9 +15507,16 @@ function applyHeroViewMode() {
   // isSolo = single-user mode (no parent/child split). Solo users get neither
   // class — parent welcome card and parent-only chrome stay hidden.
   var isSolo = !!(typeof D !== 'undefined' && D && D.soloMode);
+  // hasChildren = at least one child profile is configured. Without this gate,
+  // fresh signups (no profiles yet) inherit parent-view by default, which
+  // hides #appHome and leaves s-hero blank (the legacy hero wrap is hidden
+  // permanently). parent-view is now reserved for genuine parent accounts
+  // that have actually added a child.
+  var hasChildren = (typeof _profiles !== 'undefined' && Array.isArray(_profiles))
+    && _profiles.some(function(p){ return p && p.isParent === false; });
 
   document.body.classList.toggle('child-view',  isChild);
-  document.body.classList.toggle('parent-view', !isChild && !isSolo);
+  document.body.classList.toggle('parent-view', !isChild && !isSolo && hasChildren);
 
   // Phase B-Lite session 4: teen-tabs visibility gate. Default ON for all
   // users; showSection() turns it off when entering s-parent and back on
