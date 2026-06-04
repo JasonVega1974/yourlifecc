@@ -5507,7 +5507,7 @@
     </div>
   </div>
 
-  <!-- ── Sub-tab pills (Tab 1 Increment 1 — scoped to #s-chores) ─── -->
+  <!-- ── Sub-tab pills + kanban (Tab 1 Inc 1+2 — scoped to #s-chores) ─── -->
   <style>
     #s-chores .chores-tabs{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .8rem;scrollbar-width:none;-ms-overflow-style:none;margin-bottom:.4rem;}
     #s-chores .chores-tabs::-webkit-scrollbar{display:none;}
@@ -5517,9 +5517,22 @@
     :root.light #s-chores .ch-tab{background:rgba(15,23,42,.04)!important;border-color:rgba(15,23,42,.10)!important;color:#4a4b52!important;}
     :root.light #s-chores .ch-tab.active{background:linear-gradient(135deg,#22c55e,#a78bfa)!important;color:#0a1f5e!important;}
     #s-chores .ch-panel-stub{padding:1.4rem 1rem;text-align:center;color:var(--tx2);font-size:.8rem;line-height:1.5;background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.08);border-radius:12px;}
+    /* Kanban (Increment 2) — stacked on mobile, 3-column on tablet+ */
+    #s-chores .ch-kanban{display:grid;grid-template-columns:1fr;gap:.6rem;}
+    @media (min-width:768px){#s-chores .ch-kanban{grid-template-columns:1fr 1fr 1fr;}}
+    #s-chores .ch-col{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:.6rem .55rem;}
+    #s-chores .ch-col-h{display:flex;align-items:center;gap:.35rem;font-family:var(--fh);font-size:.62rem;letter-spacing:1.5px;color:var(--tx2);margin-bottom:.5rem;text-transform:uppercase;}
+    #s-chores .ch-col-dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+    #s-chores .ch-col-n{margin-left:auto;font-family:var(--fn);font-size:.58rem;background:rgba(255,255,255,.06);padding:.1rem .35rem;border-radius:5px;color:var(--tx);font-weight:700;letter-spacing:0;}
+    #s-chores .ch-col-empty{font-size:.62rem;color:var(--tx3);text-align:center;padding:.5rem;font-style:italic;}
+    #s-chores .ch-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:.5rem .55rem;margin-bottom:.4rem;}
+    /* Overdue dot lives inside the My Chores tab label; hidden by default */
+    #s-chores #chOverdueDot{display:none;width:8px;height:8px;border-radius:50%;background:#ef4444;margin-left:.3rem;vertical-align:middle;box-shadow:0 0 6px rgba(239,68,68,.6);}
+    :root.light #s-chores .ch-col{background:rgba(15,23,42,.03)!important;border-color:rgba(15,23,42,.08)!important;}
+    :root.light #s-chores .ch-card{background:#fff!important;border-color:rgba(15,23,42,.08)!important;}
   </style>
   <div class="chores-tabs" role="tablist" aria-label="Chores sub-sections">
-    <button class="ch-tab active" role="tab" aria-selected="true"  onclick="cTab('mychores',this)">✅ My Chores</button>
+    <button class="ch-tab active" role="tab" aria-selected="true"  onclick="cTab('mychores',this)">✅ My Chores<span id="chOverdueDot" aria-label="Overdue chore"></span></button>
     <button class="ch-tab"        role="tab" aria-selected="false" onclick="cTab('store',this)">🎁 Store</button>
     <button class="ch-tab"        role="tab" aria-selected="false" onclick="cTab('leaderboard',this)">🏅 Leaderboard</button>
     <button class="ch-tab"        role="tab" aria-selected="false" onclick="cTab('history',this)">📜 History</button>
@@ -13805,6 +13818,15 @@
                     <option value="Sat">Saturday</option>
                     <option value="Sun">Sunday</option>
                   </select>
+                </div>
+                <!-- Tab 1 Increment 2 — difficulty multiplier (×1.0 / ×1.5 / ×2.0) + optional due date -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.3rem;margin-bottom:.3rem;">
+                  <select id="newChoreDifficulty" title="Difficulty multiplier — applied at submit-time">
+                    <option value="easy" selected>⭐ Easy (×1.0)</option>
+                    <option value="medium">⭐⭐ Medium (×1.5)</option>
+                    <option value="hard">⭐⭐⭐ Hard (×2.0)</option>
+                  </select>
+                  <input type="date" id="newChoreDue" title="Optional due date — overdue chip appears when this date passes without verification">
                 </div>
                 <button class="btn bp" onclick="addChoreFromParent()" style="width:100%;font-size:.72rem;">+ Add Chore</button>
               </div>
