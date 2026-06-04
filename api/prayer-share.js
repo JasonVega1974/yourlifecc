@@ -21,8 +21,34 @@
 
 const PRAYERS = require('../app/js/data/quick-prayers.json');
 
-const SITE_URL = 'https://yourlifecc.com';
-const CTA_URL  = SITE_URL + '/faith';
+// The production canonical. Used only when neither SITE_URL nor the
+// request-derived origin is available — i.e. as a last-resort guard.
+const PROD_URL = 'https://yourlifecc.com';
+
+// Derive the canonical site URL for this request. Order:
+//   1. SITE_URL env var (explicit override for production)
+//   2. VERCEL_URL env var (preview deploys — Vercel provides host only)
+//   3. The request's x-forwarded-host (Vercel proxies set this) /
+//      host header, with x-forwarded-proto for the scheme
+//   4. PROD_URL fallback
+// Returning a request-derived origin on preview deploys means og:url,
+// og:image, canonical, and twitter:image all point at the actual
+// preview host, so the Facebook Sharing Debugger / opengraph.xyz can
+// fetch them without having to publish to production first.
+function baseUrlFor(req) {
+  if (process.env.SITE_URL) return String(process.env.SITE_URL).replace(/\/+$/, '');
+  if (process.env.VERCEL_URL) {
+    return 'https://' + String(process.env.VERCEL_URL)
+      .replace(/^https?:\/\//, '').replace(/\/+$/, '');
+  }
+  try {
+    var h = req && req.headers ? req.headers : {};
+    var host  = h['x-forwarded-host'] || h.host;
+    var proto = h['x-forwarded-proto'] || 'https';
+    if (host) return proto + '://' + String(host).replace(/\/+$/, '');
+  } catch (_) {}
+  return PROD_URL;
+}
 
 const FALLBACK = {
   id:    '',
@@ -51,8 +77,10 @@ function firstSentence(text, maxLen) {
 
 function renderHtml(p, opts) {
   var isValid = !!opts.isValid;
-  var canonical = isValid ? SITE_URL + '/prayer/' + p.id : SITE_URL + '/faith';
-  var ogImage   = SITE_URL + '/api/og' + (isValid ? '?id=' + encodeURIComponent(p.id) : '');
+  var baseUrl = String(opts.baseUrl || PROD_URL).replace(/\/+$/, '');
+  var ctaUrl  = baseUrl + '/faith';
+  var canonical = isValid ? baseUrl + '/prayer/' + encodeURIComponent(p.id) : ctaUrl;
+  var ogImage   = baseUrl + '/api/og' + (isValid ? '?id=' + encodeURIComponent(p.id) : '');
   var ogDesc    = isValid
     ? firstSentence(p.text, 200)
     : "Borrow a prayer when you don't have your own — 30+ real prayers, free in The Well.";
@@ -151,11 +179,11 @@ function renderHtml(p, opts) {
     + '    <div class="brand">YourLife · The Well</div>\n'
     + '    ' + bodyContent + '\n'
     + '    <div class="cta-wrap">\n'
-    + '      <a class="cta" href="' + esc(CTA_URL) + '">🙏 Start free — Enter the Well</a>\n'
+    + '      <a class="cta" href="' + esc(ctaUrl) + '">🙏 Start free — Enter the Well</a>\n'
     + '      <div class="cta-sub">30+ prayers for real life, free in The Well.</div>\n'
     + '    </div>\n'
     + '    <div class="footer">\n'
-    + '      <a href="' + esc(SITE_URL) + '">yourlifecc.com</a> · A YourLife CC project\n'
+    + '      <a href="' + esc(baseUrl) + '">' + esc(baseUrl.replace(/^https?:\/\//, '')) + '</a> · A YourLife CC project\n'
     + '    </div>\n'
     + '  </main>\n'
     + '</body>\n'
@@ -163,11 +191,13 @@ function renderHtml(p, opts) {
 }
 
 module.exports = function handler(req, res) {
+  var baseUrl = baseUrlFor(req);
+
   var id = '';
   try {
     if (req.query && typeof req.query.id === 'string') id = req.query.id;
     else if (req.url) {
-      var u = new URL(req.url, SITE_URL);
+      var u = new URL(req.url, baseUrl);
       id = u.searchParams.get('id') || '';
     }
   } catch (_) {}
@@ -175,7 +205,7 @@ module.exports = function handler(req, res) {
   var prayer = id ? PRAYERS.find(function (p) { return p && p.id === id; }) : null;
   var isValid = !!prayer;
   var data = prayer || FALLBACK;
-  var html = renderHtml(data, { isValid: isValid });
+  var html = renderHtml(data, { isValid: isValid, baseUrl: baseUrl });
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=300, stale-while-revalidate=86400');

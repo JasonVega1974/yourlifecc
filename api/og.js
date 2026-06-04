@@ -7,15 +7,21 @@
 //
 // Reads the canonical dataset at /app/js/data/quick-prayers.json so
 // the OG card can never drift from the live prayer text.
+//
+// Why a runtime fetch and not an `import ... assert { type: 'json' }`?
+//   - JSON import attributes (assert / with) are inconsistent across
+//     Vercel Edge runtime versions and caused this function to fail on
+//     the preview deploy. A plain HTTP fetch against the same-origin
+//     static file is well-supported on every Edge runtime release.
+//   - The fetched JSON is cached in module scope, so the cost is one
+//     extra request per cold start per Edge instance.
 
 import { ImageResponse } from '@vercel/og';
-import PRAYERS from '../app/js/data/quick-prayers.json' assert { type: 'json' };
 
 export const config = { runtime: 'edge' };
 
 const WIDTH  = 1200;
 const HEIGHT = 630;
-const SITE_URL = 'https://yourlifecc.com';
 
 // Fallback OG card when no id or an unknown id is requested.
 const FALLBACK = {
@@ -25,6 +31,8 @@ const FALLBACK = {
   verse: ''
 };
 
+// ── helpers ──────────────────────────────────────────────────────
+
 function firstSentence(text, maxLen) {
   if (!text) return '';
   const m = String(text).match(/^[^.!?]+[.!?]/);
@@ -33,53 +41,170 @@ function firstSentence(text, maxLen) {
   return s;
 }
 
-// Load a Google Font weight via the standard /css2 dance: fetch the
-// CSS, extract the woff2 URL inside, fetch the binary. Vercel's own
-// @vercel/og examples use this pattern; works on the Edge runtime.
-async function loadFont(family, weight) {
-  const cssUrl = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:wght@${weight}&display=swap`;
-  const css = await fetch(cssUrl, {
+// Derive the canonical site URL for this request. Order:
+//   1. SITE_URL env var (explicit override for production)
+//   2. VERCEL_URL env var (preview deploys — Vercel provides host only)
+//   3. The request's own origin (works on any preview, even when env
+//      vars aren't injected into the Edge runtime)
+function baseUrlFor(req) {
+  try {
+    const explicit =
+      (typeof process !== 'undefined' && process.env && process.env.SITE_URL) || '';
+    if (explicit) return explicit.replace(/\/+$/, '');
+  } catch (_) {}
+  try {
+    const vercel =
+      (typeof process !== 'undefined' && process.env && process.env.VERCEL_URL) || '';
+    if (vercel) return 'https://' + vercel.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+  } catch (_) {}
+  try {
+    const u = new URL(req.url);
+    return u.origin;
+  } catch (_) {}
+  return 'https://yourlifecc.com';
+}
+
+// Runtime fetch of the canonical JSON. Cached at module scope so the
+// dataset is fetched at most once per Edge instance cold start. On
+// transient failure the cache is cleared so the next request can retry.
+let _prayersPromise = null;
+function loadPrayers(origin) {
+  if (_prayersPromise) return _prayersPromise;
+  const url = origin + '/app/js/data/quick-prayers.json';
+  _prayersPromise = fetch(url, { cache: 'force-cache' })
+    .then(r => {
+      if (!r.ok) throw new Error('prayers fetch ' + r.status + ' from ' + url);
+      return r.json();
+    })
+    .then(arr => Array.isArray(arr) ? arr : [])
+    .catch(err => {
+      _prayersPromise = null;
+      console.warn('[api/og] prayers load failed:', err && err.message || err);
+      return [];
+    });
+  return _prayersPromise;
+}
+
+// Hardened Google Fonts loader. The previous one would throw "Font URL
+// not found" when Google Fonts returned a CSS shape that didn't match
+// the rigid `src: url(...) format('woff2')` regex — multi-subset
+// responses, single-line CSS, or any shape change cause the regex to
+// miss. This version:
+//   • Sends a modern desktop UA so Google returns woff2 (not woff).
+//   • Globally scans every woff2 URL in the CSS regardless of how the
+//     `format()` suffix is written.
+//   • Tries each candidate URL until one returns 200, instead of
+//     committing to the first match.
+//   • Surfaces the real cause when every attempt fails.
+async function loadGoogleFont(family, weight) {
+  const cssUrl =
+    'https://fonts.googleapis.com/css2?family=' +
+    encodeURIComponent(family) + ':wght@' + weight + '&display=swap';
+  const res = await fetch(cssUrl, {
     headers: {
-      // Sending a modern UA gets us the woff2 source; without it
-      // Google Fonts may serve a different format.
       'User-Agent':
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 ' +
         '(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     }
-  }).then(r => r.text());
-  const match = css.match(/src:\s*url\(([^)]+)\)\s*format\(['"]woff2['"]\)/);
-  if (!match) throw new Error(`Font URL not found for ${family} ${weight}`);
-  const fontUrl = match[1].replace(/^['"]|['"]$/g, '');
-  return fetch(fontUrl).then(r => r.arrayBuffer());
+  });
+  if (!res.ok) {
+    throw new Error('Google Fonts CSS HTTP ' + res.status + ' for ' + family + '@' + weight);
+  }
+  const css = await res.text();
+  const urls = [];
+  const re = /url\((https:\/\/[^)]+\.woff2)\)/g;
+  let m;
+  while ((m = re.exec(css))) urls.push(m[1]);
+  if (!urls.length) {
+    throw new Error(
+      'No woff2 URL in Google Fonts CSS for ' + family + '@' + weight +
+      ' (head: ' + css.slice(0, 120).replace(/\s+/g, ' ') + ')'
+    );
+  }
+  const errors = [];
+  for (const u of urls) {
+    try {
+      const r = await fetch(u);
+      if (r.ok) return await r.arrayBuffer();
+      errors.push(u + ' -> ' + r.status);
+    } catch (e) {
+      errors.push(u + ' -> ' + (e && e.message || e));
+    }
+  }
+  throw new Error(
+    'Every woff2 fetch failed for ' + family + '@' + weight +
+    ': ' + errors.join('; ')
+  );
 }
 
+// ── handler ──────────────────────────────────────────────────────
+
 export default async function handler(req) {
+  const origin = baseUrlFor(req);
+
   let id = '';
   try {
     id = (new URL(req.url)).searchParams.get('id') || '';
   } catch (_) {}
 
-  const prayer = id ? PRAYERS.find(p => p && p.id === id) : null;
-  const data = prayer
-    ? {
-        topic: prayer.topic || 'The Well',
-        title: prayer.title,
-        hook:  firstSentence(prayer.text, 120),
-        verse: prayer.verse || ''
+  // Body of work wrapped so any failure (font, JSON, render) lands in
+  // a single catch and returns a graceful fallback PNG instead of 500.
+  try {
+    const PRAYERS = await loadPrayers(origin);
+    const prayer = id ? PRAYERS.find(p => p && p.id === id) : null;
+    const data = prayer
+      ? {
+          topic: prayer.topic || 'The Well',
+          title: prayer.title,
+          hook:  firstSentence(prayer.text, 120),
+          verse: prayer.verse || ''
+        }
+      : FALLBACK;
+
+    const [interBold, interMedium] = await Promise.all([
+      loadGoogleFont('Inter', 800),
+      loadGoogleFont('Inter', 500)
+    ]);
+
+    return new ImageResponse(buildTree(data), {
+      width: WIDTH,
+      height: HEIGHT,
+      fonts: [
+        { name: 'Inter', data: interBold,   weight: 800, style: 'normal' },
+        { name: 'Inter', data: interMedium, weight: 500, style: 'normal' }
+      ],
+      headers: {
+        'Cache-Control':
+          'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400'
       }
-    : FALLBACK;
+    });
+  } catch (err) {
+    console.error('[api/og] render failed:', err && err.message || err);
+    // Try a minimal text-only fallback so crawlers still get a PNG.
+    // If even the fallback font fails, surface a real 500 so the error
+    // is visible in logs (we don't want to swallow it silently).
+    try {
+      const fontData = await loadGoogleFont('Inter', 800);
+      return new ImageResponse(buildFallbackTree(), {
+        width: WIDTH,
+        height: HEIGHT,
+        fonts: [{ name: 'Inter', data: fontData, weight: 800, style: 'normal' }],
+        headers: { 'Cache-Control': 'public, max-age=60, s-maxage=60' }
+      });
+    } catch (fontErr) {
+      console.error('[api/og] fallback font failed:', fontErr && fontErr.message || fontErr);
+      return new Response('og render failed: ' + (err && err.message || 'unknown'), {
+        status: 500,
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+      });
+    }
+  }
+}
 
-  // Two weights of Inter = clean hierarchy without a second font
-  // fetch. Italic emphasis on the hook line is done via Satori's
-  // fontStyle: 'italic' even though the file is Roman; Satori
-  // simulates italic by slanting glyphs, which reads acceptably for
-  // a serif-style hook at this size.
-  const [interBold, interMedium] = await Promise.all([
-    loadFont('Inter', 800),
-    loadFont('Inter', 500)
-  ]);
+// ── visual tree ──────────────────────────────────────────────────
 
-  const tree = {
+function buildTree(data) {
+  return {
     type: 'div',
     props: {
       style: {
@@ -96,8 +221,6 @@ export default async function handler(req) {
         fontFamily: 'Inter'
       },
       children: [
-        // Faint diagonal light shaft over the gradient — a soft
-        // "Enter the Well" cue without the heavy canvas animation.
         {
           type: 'div',
           props: {
@@ -110,23 +233,18 @@ export default async function handler(req) {
             }
           }
         },
-        // Wordmark (top)
         {
           type: 'div',
           props: {
             style: {
               display: 'flex',
-              fontSize: 22,
-              fontWeight: 800,
-              letterSpacing: '0.32em',
-              textTransform: 'uppercase',
-              color: '#cdb9ff',
-              opacity: 0.85
+              fontSize: 22, fontWeight: 800,
+              letterSpacing: '0.32em', textTransform: 'uppercase',
+              color: '#cdb9ff', opacity: 0.85
             },
             children: 'YourLife · The Well'
           }
         },
-        // Topic chip
         {
           type: 'div',
           props: {
@@ -139,15 +257,12 @@ export default async function handler(req) {
               background: 'rgba(167,139,250,0.18)',
               border: '1px solid rgba(167,139,250,0.5)',
               color: '#e9defe',
-              fontSize: 22,
-              fontWeight: 800,
-              letterSpacing: '0.24em',
-              textTransform: 'uppercase'
+              fontSize: 22, fontWeight: 800,
+              letterSpacing: '0.24em', textTransform: 'uppercase'
             },
             children: data.topic
           }
         },
-        // Title — the headline read
         {
           type: 'div',
           props: {
@@ -164,16 +279,13 @@ export default async function handler(req) {
             children: data.title
           }
         },
-        // Hook — supportive first sentence
         {
           type: 'div',
           props: {
             style: {
               display: 'flex',
               marginTop: 28,
-              fontSize: 30,
-              fontWeight: 500,
-              lineHeight: 1.45,
+              fontSize: 30, fontWeight: 500, lineHeight: 1.45,
               fontStyle: 'italic',
               color: '#cdb9ff',
               maxWidth: 1040
@@ -181,34 +293,21 @@ export default async function handler(req) {
             children: data.hook
           }
         },
-        // Spacer so verse + CTA sit at the bottom
-        {
-          type: 'div',
-          props: {
-            style: {
-              display: 'flex',
-              flex: 1
-            }
-          }
-        },
-        // Verse reference — gold, bold
+        { type: 'div', props: { style: { display: 'flex', flex: 1 } } },
         data.verse
           ? {
               type: 'div',
               props: {
                 style: {
                   display: 'flex',
-                  fontSize: 38,
-                  fontWeight: 800,
-                  letterSpacing: '0.16em',
-                  textTransform: 'uppercase',
+                  fontSize: 38, fontWeight: 800,
+                  letterSpacing: '0.16em', textTransform: 'uppercase',
                   color: '#fbbf24'
                 },
                 children: data.verse
               }
             }
           : { type: 'div', props: { style: { display: 'flex' } } },
-        // CTA bar — full-width pill at the bottom
         {
           type: 'div',
           props: {
@@ -221,8 +320,7 @@ export default async function handler(req) {
                 'linear-gradient(135deg, rgba(167,139,250,0.22) 0%, rgba(124,58,237,0.18) 100%)',
               border: '1px solid rgba(167,139,250,0.45)',
               color: '#f5f3ff',
-              fontSize: 30,
-              fontWeight: 800,
+              fontSize: 30, fontWeight: 800,
               letterSpacing: '0.01em'
             },
             children: '🙏  Enter the Well — free at yourlifecc.com/faith'
@@ -231,21 +329,44 @@ export default async function handler(req) {
       ]
     }
   };
-
-  return new ImageResponse(tree, {
-    width: WIDTH,
-    height: HEIGHT,
-    fonts: [
-      { name: 'Inter', data: interBold,   weight: 800, style: 'normal' },
-      { name: 'Inter', data: interMedium, weight: 500, style: 'normal' }
-    ],
-    headers: {
-      // 1 hour at the edge, served stale up to 1 day while
-      // revalidating. OG crawlers respect these.
-      'Cache-Control': 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400'
-    }
-  });
 }
 
-// Silences any lint that wants the helper used elsewhere too.
-export { firstSentence, SITE_URL };
+function buildFallbackTree() {
+  return {
+    type: 'div',
+    props: {
+      style: {
+        width: '1200px', height: '630px',
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        padding: '80px',
+        background: 'linear-gradient(135deg, #0b1024, #1a1240)',
+        color: '#f5f3ff', fontFamily: 'Inter', textAlign: 'center'
+      },
+      children: [
+        {
+          type: 'div',
+          props: {
+            style: {
+              display: 'flex',
+              fontSize: 64, fontWeight: 800, marginBottom: 24
+            },
+            children: 'YourLife · The Well'
+          }
+        },
+        {
+          type: 'div',
+          props: {
+            style: {
+              display: 'flex',
+              fontSize: 32, color: '#cdb9ff'
+            },
+            children: 'Prayers for real life — free at yourlifecc.com/faith'
+          }
+        }
+      ]
+    }
+  };
+}
+
+export { firstSentence, baseUrlFor };
