@@ -81,13 +81,22 @@
     // Only All and ★ Saved carry an "active" state. Topic chips are
     // navigation, not filters — clicking one scrolls to that section
     // without changing the active mode.
+    //
+    // Chips are rendered with data-qp-action / data-qp-topic and wired
+    // through a single delegated listener (see below). The previous
+    // inline `onclick="qpSetFilter(' + JSON.stringify(t) + ')"` broke
+    // for every topic because JSON.stringify wraps the value in double
+    // quotes, which terminate the double-quoted onclick attribute and
+    // leave the handler as the incomplete expression `qpSetFilter(`.
     var allActive   = (_qpFilter !== 'saved');
     var savedActive = (_qpFilter === 'saved');
-    html += '<button type="button" class="qp-pill' + (allActive ? ' qp-pill-active' : '') + '" onclick="qpSetFilter(\'all\')">All <span class="qp-pill-count">' + _data().length + '</span></button>';
-    html += '<button type="button" class="qp-pill qp-pill-saved' + (savedActive ? ' qp-pill-active' : '') + '" onclick="qpSetFilter(\'saved\')">★ Saved <span class="qp-pill-count">' + savedCount + '</span></button>';
+    html += '<button type="button" class="qp-pill' + (allActive ? ' qp-pill-active' : '') + '" data-qp-action="all">All <span class="qp-pill-count">' + _data().length + '</span></button>';
+    html += '<button type="button" class="qp-pill qp-pill-saved' + (savedActive ? ' qp-pill-active' : '') + '" data-qp-action="saved">★ Saved <span class="qp-pill-count">' + savedCount + '</span></button>';
     topics.forEach(function (t) {
       var count = _data().filter(function (p) { return p.topic === t; }).length;
-      html += '<button type="button" class="qp-pill qp-pill-topic" onclick="qpSetFilter(' + JSON.stringify(t) + ')">' + _esc(t) + ' <span class="qp-pill-count">' + count + '</span></button>';
+      // _esc handles & " < > ' so the attribute survives all 31 topic
+      // names ("Comparison & Jealousy", "Self-Worth", etc.).
+      html += '<button type="button" class="qp-pill qp-pill-topic" data-qp-action="topic" data-qp-topic="' + _esc(t) + '">' + _esc(t) + ' <span class="qp-pill-count">' + count + '</span></button>';
     });
     return html;
   }
@@ -290,6 +299,11 @@
   //   'saved'  → switch to saved-only mode (no jump)
   //   <topic>  → ensure browse mode is rendered, scroll to that
   //              topic's section anchor (qp-topic-<slug>)
+  //
+  // _topicSlug is the single source of truth used by both
+  // _browseHtml (to build the section id) AND this function (to look
+  // it up) — so a chip click can never miss because of a slug
+  // mismatch.
   function qpSetFilter(topic) {
     var host = _qpHostId && document.getElementById(_qpHostId);
     if (!host) return;
@@ -307,17 +321,38 @@
     _qpFilter = 'all';
     if (wasSaved) _renderInto(host);
 
-    var target;
-    if (topic === 'all' || !topic) {
-      target = host.querySelector('#qpLibBody') || host;
-    } else {
-      target = host.querySelector('#qp-topic-' + _topicSlug(topic));
-      // Topic missing (data drift) — fall back to library top.
-      if (!target) target = host.querySelector('#qpLibBody') || host;
-    }
-    if (target && target.scrollIntoView) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    // Double rAF: wait for style recalc (first frame) AND layout
+    // commit (second frame) before measuring. If we re-rendered
+    // browse mode above, the new section anchor isn't actually
+    // laid out yet when the synchronous code returns — measuring
+    // here would scroll to a stale rect.
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        var target;
+        if (topic === 'all' || !topic) {
+          target = host.querySelector('#qpLibBody') || host;
+        } else {
+          var slug = _topicSlug(topic);
+          target = host.querySelector('#qp-topic-' + slug);
+          if (!target) {
+            // No band-aid silent fallback — surface the miss so future
+            // data drift or slug-fn changes get caught in dev.
+            try {
+              console.warn('[quick-prayers] topic section not found',
+                { topic: topic, slug: slug, lookedFor: '#qp-topic-' + slug });
+            } catch (_) {}
+            target = host.querySelector('#qpLibBody') || host;
+          }
+        }
+        if (target && target.scrollIntoView) {
+          // scrollIntoView walks every scrolling ancestor (overflow:auto
+          // panels, the document) and respects the
+          // scroll-margin-top:1.5rem on .qp-topic-group, so we don't
+          // need to assume the document is the only scroller.
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
   }
 
   // Helper used by the Explore Faith pathway card — routes from
@@ -346,6 +381,26 @@
       if (!e || !e.detail || e.detail.kind !== 'prayer') return;
       var host = _qpHostId && document.getElementById(_qpHostId);
       if (host) _renderInto(host);
+    });
+
+    // Single delegated click listener for every pill chip. Attached
+    // once at module load so it survives every re-render of
+    // #qpLibPills (innerHTML rebuilds destroy the chip nodes but the
+    // document never goes away). Replaces the previous inline
+    // onclick="qpSetFilter(' + JSON.stringify(t) + ')" pattern, which
+    // was broken for every topic because JSON.stringify wraps the
+    // value in double quotes that terminate the onclick="..."
+    // attribute mid-handler.
+    document.addEventListener('click', function (e) {
+      var btn = e.target && e.target.closest && e.target.closest('[data-qp-action]');
+      if (!btn) return;
+      e.preventDefault();
+      var action = btn.getAttribute('data-qp-action');
+      if (action === 'all' || action === 'saved') {
+        qpSetFilter(action);
+      } else if (action === 'topic') {
+        qpSetFilter(btn.getAttribute('data-qp-topic'));
+      }
     });
   }
 
