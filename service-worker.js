@@ -1,9 +1,12 @@
 // YourLifeCC Service Worker
 // Version bump this string whenever you deploy a major update
 // to force old caches to clear.
-const CACHE_NAME = 'yourlifecc-v225';
+const CACHE_NAME = 'yourlifecc-v226';
 
 // Core assets to pre-cache on install — the app shell + key Well modules
+// + the shared modal/save/share + prayer focus + Quick Prayer library
+// modules so installed PWA users on poor networks still get the new
+// prayer features the moment the SW activates.
 const PRECACHE_ASSETS = [
   '/app/',
   '/app/index.html',
@@ -14,7 +17,11 @@ const PRECACHE_ASSETS = [
   '/app/js/bible-study-data.js',
   '/app/js/ui.js',
   '/app/js/sync.js',
-  '/app/js/streaks.js'
+  '/app/js/streaks.js',
+  '/app/js/modal-actions.js',
+  '/app/js/prayer-focus.js',
+  '/app/js/quick-prayers.js',
+  '/app/js/data/quick-prayers.js'
 ];
 
 // ─── Install ───────────────────────────────────────────────────────────────
@@ -28,6 +35,18 @@ self.addEventListener('install', event => {
       });
     }).then(() => self.skipWaiting())
   );
+});
+
+// ─── Message ───────────────────────────────────────────────────────────────
+// The page-side registration (app/index.html ~line 15661) postMessages
+// {type:'SKIP_WAITING'} when a new SW is installed and waiting. Honor it.
+// The install handler also calls skipWaiting() unconditionally, so this is
+// belt-and-suspenders for any browser path where the install-time call
+// no-ops (e.g. when an old controller is mid-fetch).
+self.addEventListener('message', event => {
+  if (event && event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 // ─── Activate ──────────────────────────────────────────────────────────────
