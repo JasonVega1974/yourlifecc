@@ -24,10 +24,25 @@
 -- Schema follows the habits-schema canonical pattern:
 --   - text PK to match the runtime-generated 'ch_…' ids (see sync.js
 --     dual-write helper — numeric Date.now() ids are coerced to
---     'ch_<n>' on upsert so existing rows in D.chores keep working)
+--     'ch_<profileId>_<n>' on upsert so sibling profiles never collide)
 --   - FK to auth.users(id) on delete cascade (NOT public.profiles)
 --   - RLS enabled + per-operation policies keyed on auth.uid() = user_id
 --   - Lower-case identifiers, snake_case columns
+--
+-- ── Multi-profile separation (added in this revision) ─────────
+-- YourLife CC is multi-profile under one auth account: parent.js
+-- maintains _profiles[] (4-digit PIN strings as ids) and _activeProfileId.
+-- When Mom switches between Kid A and Kid B in Parent Hub, D.chores
+-- flips to that kid's chore set and the next cloudSync writes those
+-- rows under Mom's user_id. Without profile_id every kid's chores
+-- would intermingle in the same user_id partition, indistinguishable
+-- on read.
+--
+-- profile_id is added to BOTH tables as a non-PK column. The value is
+-- supplied by sync.js from _activeProfileId, defaulting to the sentinel
+-- '_solo' for accounts that have never entered multi-profile mode.
+-- RLS still gates cross-account on auth.uid() = user_id; per-profile
+-- separation is filter-side and enforced by app reads.
 --
 -- Note vs YOURLIFECC_APP_UPGRADE_MASTERPLAN.md: the masterplan proposed
 -- ALTER TABLE chores ADD COLUMN difficulty/due_date/recurring/photo_proof_url
@@ -35,13 +50,34 @@
 -- with those columns built in, sized for Increments 2-3 to use without
 -- another schema change.
 --
+-- ── REQUIRED BEFORE ANY CLOUD-PREFER-READ PATH SHIPS ──────────
+-- Solo→multi-profile transition: when a solo account creates its
+-- first real _profiles[] entry, the parent's pre-transition chores
+-- were mirrored with profile_id='_solo' but the new parent profile
+-- gets a 4-digit PIN. Any cloud read that filters by the new
+-- profile_id will under-fetch those rows (they orphan as '_solo').
+--
+-- While Increment 1 reads stay on the JSONB blob this is silent,
+-- harmless backlog. But the moment any future increment switches a
+-- read from D.* to a Supabase query, we MUST first ship a one-time
+-- per-user migration that rewrites:
+--    update public.chores            set profile_id = :newId where user_id = :u and profile_id = '_solo';
+--    update public.chore_completions set profile_id = :newId where user_id = :u and profile_id = '_solo';
+--    update public.chores            set id = replace(id, 'ch__solo_', 'ch_' || :newId || '_') where user_id = :u and id like 'ch__solo_%';
+--    update public.chore_completions set chore_id = replace(chore_id, 'ch__solo_', 'ch_' || :newId || '_') where user_id = :u and chore_id like 'ch__solo_%';
+-- gated on a per-user "solo_migrated_at" flag (storage TBD —
+-- profiles.data flag or a new admin_migrations row). Until that
+-- helper exists, do not enable cloud-prefer reads. Tracked here so
+-- the next code reviewer sees it before flipping the read path.
+--
 -- Project ref: hrohgwcbfgywkpnvqxhk
 -- ═══════════════════════════════════════════════════════════════
 
 -- ── chores ─────────────────────────────────────────────────────
 create table if not exists public.chores (
-  id              text primary key,                       -- 'ch_…' from sync.js dual-write coercion
+  id              text primary key,                       -- 'ch_<profileId>_<n>' from sync.js dual-write coercion
   user_id         uuid references auth.users(id) on delete cascade not null,
+  profile_id      text not null default '_solo',          -- 4-digit PIN from parent.js _profiles, or '_solo'
   name            text not null,
   emoji           text not null default '📌',
   category        text,                                   -- matches CHORE_CAT_EMOJI keys in chores.js
@@ -58,14 +94,18 @@ create table if not exists public.chores (
   updated_at      timestamptz not null default now()
 );
 
-create index if not exists chores_user_idx
-  on public.chores (user_id, active, sort_order);
+-- Composite index: every app read filters by user_id + profile_id.
+-- active + sort_order trail so the "show me this kid's active chores
+-- in display order" query is index-only.
+create index if not exists chores_user_profile_idx
+  on public.chores (user_id, profile_id, active, sort_order);
 
 -- ── chore_completions ──────────────────────────────────────────
 create table if not exists public.chore_completions (
   id              uuid primary key default gen_random_uuid(),
   chore_id        text references public.chores(id) on delete cascade not null,
   user_id         uuid references auth.users(id) on delete cascade not null,
+  profile_id      text not null default '_solo',          -- denormalized for filter-side scoping; matches chores.profile_id
   completed_date  date not null,
   status          text not null default 'pending'
                   check (status in ('pending','verified','rejected','redeemed')),
@@ -74,11 +114,13 @@ create table if not exists public.chore_completions (
   verified_by     uuid references auth.users(id),
   verified_at     timestamptz,
   created_at      timestamptz not null default now(),
-  unique (chore_id, completed_date)                       -- matches chores.js:63 "already submitted today" guard
+  unique (chore_id, completed_date)                       -- chore_id already namespaces by profile_id, so this remains sufficient
 );
 
-create index if not exists chore_completions_user_date_idx
-  on public.chore_completions (user_id, completed_date desc);
+-- Composite index: history sub-tab + leaderboard both filter by
+-- (user_id, profile_id) and sort by completed_date desc.
+create index if not exists chore_completions_user_profile_date_idx
+  on public.chore_completions (user_id, profile_id, completed_date desc);
 
 create index if not exists chore_completions_chore_idx
   on public.chore_completions (chore_id, completed_date desc);
