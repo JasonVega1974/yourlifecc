@@ -1078,28 +1078,105 @@
   .cc-chip__label{font-size:.74rem;color:#9AA0B4;letter-spacing:.04em;}
   @media (min-width:720px){ .cc-stats{grid-template-columns:1.4fr 1fr 1fr;} .cc-streak{grid-column:auto;} .cc-streak__num{font-size:4rem;} }
 
-  /* constellation */
-  .cc-constellation{position:relative;width:100%;height:300px;margin:.4rem 0 1.6rem;border-radius:22px;overflow:hidden;background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(106,167,255,.07),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,.01));border:1px solid rgba(255,255,255,.06);}
-  .cc-constellation__svg{width:100%;height:100%;display:block;}
-  .cc-constellation__caption{position:absolute;left:1rem;top:.85rem;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:#9AA0B4;opacity:.85;pointer-events:none;}
-  .cc-constellation__caption span{font-weight:600;}
-  @media (min-width:720px){ .cc-constellation{height:360px;} }
+  /* ── constellation: living space scene ─────────────────────
+     A layered backdrop (deep sky + 2 nebula washes + starfield)
+     sits behind the SVG node graph. The SVG itself drifts on a
+     slow float (transform-only). All motion is GPU-friendly. */
+  .cc-constellation{
+    position:relative;width:100%;height:320px;margin:.4rem 0 1.6rem;
+    border-radius:22px;overflow:hidden;
+    background:
+      radial-gradient(ellipse 80% 55% at 30% 25%, rgba(245,166,35,.10), transparent 60%),
+      radial-gradient(ellipse 90% 65% at 70% 75%, rgba(106,167,255,.10), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 50% 50%, rgba(244,123,90,.06), transparent 70%),
+      linear-gradient(165deg, #11142a 0%, #0a0d1f 55%, #060912 100%);
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow:inset 0 0 80px rgba(0,0,0,.4);
+  }
+  /* Nebula wash 1 — amber/coral, slow drift */
+  .cc-constellation::before{
+    content:'';position:absolute;inset:-20% -10%;
+    background:radial-gradient(ellipse 50% 35% at 30% 45%, rgba(245,166,35,.20), transparent 65%);
+    filter:blur(36px);opacity:.65;pointer-events:none;
+    animation:cc-nebula-1 32s ease-in-out infinite;
+    will-change:transform;
+  }
+  /* Nebula wash 2 — blue, drift opposite */
+  .cc-constellation::after{
+    content:'';position:absolute;inset:-15% -15%;
+    background:radial-gradient(ellipse 55% 35% at 70% 60%, rgba(106,167,255,.18), transparent 65%);
+    filter:blur(44px);opacity:.55;pointer-events:none;
+    animation:cc-nebula-2 40s ease-in-out infinite;
+    will-change:transform;
+  }
+  @keyframes cc-nebula-1{ 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(7%,-3%) scale(1.05);} }
+  @keyframes cc-nebula-2{ 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-5%,4%) scale(1.04);} }
 
-  /* SVG line + node behavior */
-  .cc-link{stroke:rgba(241,233,213,.18);stroke-width:1;fill:none;stroke-linecap:round;stroke-dasharray:300;stroke-dashoffset:300;animation:cc-draw 1.4s ease-out forwards,cc-link-pulse 4s ease-in-out infinite 1.6s;}
+  .cc-constellation__svg{
+    width:100%;height:100%;display:block;position:relative;z-index:1;
+    animation:cc-float 9s ease-in-out infinite;
+    will-change:transform;
+  }
+  @keyframes cc-float{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-4px);} }
+
+  .cc-constellation__caption{
+    position:absolute;left:1rem;top:.85rem;z-index:2;
+    font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;
+    color:#9AA0B4;opacity:.9;pointer-events:none;
+  }
+  .cc-constellation__caption span{font-weight:600;}
+  @media (min-width:720px){ .cc-constellation{height:380px;} }
+
+  /* ── starfield ──────────────────────────────────────────── */
+  .cc-star{
+    fill:#F1E9D5;opacity:0;
+    animation:cc-twinkle var(--td,3s) ease-in-out infinite;
+    animation-delay:var(--dl,0s);
+  }
+  @keyframes cc-twinkle{ 0%,100%{opacity:.18;} 50%{opacity:.85;} }
+
+  /* ── connection links ───────────────────────────────────────
+     Quiet base lines draw in. Lines with one end at the focus
+     node become "active": fade in and run a continuous dashed
+     flow that points TOWARD the focus (focus end is x1,y1, so
+     stroke-dashoffset → 0 makes dashes travel toward focus). */
+  .cc-link{
+    stroke:rgba(241,233,213,.18);stroke-width:1;fill:none;stroke-linecap:round;
+    stroke-dasharray:300;stroke-dashoffset:300;
+    animation:cc-draw 1.4s ease-out forwards;
+  }
   @keyframes cc-draw{ to{stroke-dashoffset:0;} }
-  @keyframes cc-link-pulse{ 0%,100%{opacity:.55;} 50%{opacity:.9;} }
-  .cc-node{transform-origin:center;transform-box:fill-box;opacity:0;animation:cc-node-in .4s ease-out forwards;}
-  @keyframes cc-node-in{ from{opacity:0;transform:scale(.85);} to{opacity:1;transform:scale(1);} }
-  .cc-node__core{filter:drop-shadow(0 0 4px currentColor);}
-  .cc-node__label{font-family:inherit;font-size:11px;font-weight:500;fill:#F1E9D5;letter-spacing:.04em;}
-  .cc-node__label--sub{fill:#9AA0B4;font-size:9px;}
+  .cc-link--active{
+    stroke-width:1.4;stroke-opacity:.55;
+    stroke-dasharray:5 11;stroke-dashoffset:0;
+    opacity:0;
+    animation:cc-link-fade 1.4s ease-out forwards, cc-flow 1.8s linear 1.4s infinite;
+  }
+  @keyframes cc-link-fade{ to{opacity:.7;} }
+  @keyframes cc-flow{ from{stroke-dashoffset:16;} to{stroke-dashoffset:0;} }
+  .cc-link:nth-of-type(1){animation-delay:0s;}
+  .cc-link:nth-of-type(2){animation-delay:.12s;}
+  .cc-link:nth-of-type(3){animation-delay:.24s;}
+  .cc-link:nth-of-type(4){animation-delay:.36s;}
+  .cc-link:nth-of-type(5){animation-delay:.48s;}
+  .cc-link:nth-of-type(6){animation-delay:.60s;}
+  .cc-link:nth-of-type(7){animation-delay:.72s;}
+  .cc-link:nth-of-type(8){animation-delay:.84s;}
+  .cc-link:nth-of-type(9){animation-delay:.96s;}
+
+  /* ── nodes: layered breathing orbs ──────────────────────────
+     Three concentric circles per node:
+       .cc-orb__halo  outer translucent breath (scale + opacity)
+       .cc-orb__ring  middle ring with stroke
+       .cc-orb__core  bright centre point with drop-shadow glow
+     Brightness modifiers (--bright / --dim) and focus modifier
+     drive glow intensity. Pulses only render on focus. */
   .cc-drift{transform-origin:center;transform-box:fill-box;}
-  .cc-drift--1{animation:cc-drift-1 9s ease-in-out infinite;}
-  .cc-drift--2{animation:cc-drift-2 11s ease-in-out infinite;}
-  .cc-drift--3{animation:cc-drift-3 8s ease-in-out infinite;}
-  .cc-drift--4{animation:cc-drift-4 12s ease-in-out infinite;}
-  .cc-drift--5{animation:cc-drift-5 10s ease-in-out infinite;}
+  .cc-drift--1{animation:cc-drift-1 9s   ease-in-out infinite;}
+  .cc-drift--2{animation:cc-drift-2 11s  ease-in-out infinite;}
+  .cc-drift--3{animation:cc-drift-3 8s   ease-in-out infinite;}
+  .cc-drift--4{animation:cc-drift-4 12s  ease-in-out infinite;}
+  .cc-drift--5{animation:cc-drift-5 10s  ease-in-out infinite;}
   .cc-drift--6{animation:cc-drift-6 9.5s ease-in-out infinite;}
   @keyframes cc-drift-1{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(4px,-5px);} }
   @keyframes cc-drift-2{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(-5px,3px);} }
@@ -1107,23 +1184,59 @@
   @keyframes cc-drift-4{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(-4px,-4px);} }
   @keyframes cc-drift-5{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(5px,2px);} }
   @keyframes cc-drift-6{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(-3px,-6px);} }
-  .cc-halo{transform-origin:center;transform-box:fill-box;animation:cc-halo-pulse 3.2s ease-in-out infinite;}
-  @keyframes cc-halo-pulse{ 0%,100%{opacity:.35;transform:scale(1);} 50%{opacity:.75;transform:scale(1.18);} }
-  .cc-link:nth-of-type(1){animation-delay:0s,1.6s;}
-  .cc-link:nth-of-type(2){animation-delay:.12s,1.7s;}
-  .cc-link:nth-of-type(3){animation-delay:.24s,1.8s;}
-  .cc-link:nth-of-type(4){animation-delay:.36s,1.9s;}
-  .cc-link:nth-of-type(5){animation-delay:.48s,2.0s;}
-  .cc-link:nth-of-type(6){animation-delay:.60s,2.1s;}
-  .cc-link:nth-of-type(7){animation-delay:.72s,2.2s;}
-  .cc-link:nth-of-type(8){animation-delay:.84s,2.3s;}
-  .cc-link:nth-of-type(9){animation-delay:.96s,2.4s;}
-  .cc-node--1{animation-delay:1.2s;}
-  .cc-node--2{animation-delay:1.35s;}
-  .cc-node--3{animation-delay:1.5s;}
-  .cc-node--4{animation-delay:1.65s;}
-  .cc-node--5{animation-delay:1.8s;}
-  .cc-node--6{animation-delay:1.95s;}
+
+  .cc-orb{transform-origin:center;transform-box:fill-box;opacity:0;animation:cc-orb-in .5s ease-out forwards;}
+  @keyframes cc-orb-in{ from{opacity:0;transform:scale(.85);} to{opacity:1;transform:scale(1);} }
+  .cc-orb--1{animation-delay:1.2s;}
+  .cc-orb--2{animation-delay:1.35s;}
+  .cc-orb--3{animation-delay:1.5s;}
+  .cc-orb--4{animation-delay:1.65s;}
+  .cc-orb--5{animation-delay:1.8s;}
+  .cc-orb--6{animation-delay:1.95s;}
+
+  .cc-orb__halo{
+    transform-origin:center;transform-box:fill-box;
+    fill-opacity:.18;
+    animation:cc-orb-breath 4.2s ease-in-out infinite;
+    will-change:transform,opacity;
+  }
+  .cc-orb__ring{fill-opacity:.18;stroke-opacity:.55;}
+  .cc-orb__core{filter:drop-shadow(0 0 4px currentColor);}
+  @keyframes cc-orb-breath{
+    0%,100%{transform:scale(1);    opacity:.7;}
+    50%    {transform:scale(1.22); opacity:1;}
+  }
+
+  /* Brightness — nodes with real data glow stronger */
+  .cc-orb--bright .cc-orb__halo{ fill-opacity:.24; }
+  .cc-orb--bright .cc-orb__core{ filter:drop-shadow(0 0 6px currentColor) drop-shadow(0 0 10px currentColor); }
+  .cc-orb--dim    .cc-orb__halo{ fill-opacity:.10; animation-duration:6s; opacity:.55; }
+  .cc-orb--dim    .cc-orb__ring{ fill-opacity:.10; stroke-opacity:.30; }
+  .cc-orb--dim    .cc-orb__core{ filter:drop-shadow(0 0 2px currentColor); opacity:.75; }
+
+  /* Focus orb — strongest glow, regardless of data state */
+  .cc-orb--focus .cc-orb__halo{ fill-opacity:.34; animation-duration:3.2s; opacity:1; }
+  .cc-orb--focus .cc-orb__ring{ fill-opacity:.30; stroke-opacity:.85; stroke-width:1.4; }
+  .cc-orb--focus .cc-orb__core{ filter:drop-shadow(0 0 8px currentColor) drop-shadow(0 0 14px currentColor); }
+
+  /* ── pulse rings — only on focus orb ────────────────────── */
+  .cc-pulse{
+    fill:none;stroke:currentColor;stroke-width:1.4;
+    opacity:0;
+    transform-origin:center;transform-box:fill-box;
+    animation:cc-pulse 2.6s ease-out infinite;
+    will-change:transform,opacity;
+  }
+  .cc-pulse--2{ animation-delay:1.3s; }
+  @keyframes cc-pulse{
+    0%   {transform:scale(1);   opacity:.75;}
+    80%  {opacity:.05;}
+    100% {transform:scale(3.2); opacity:0;}
+  }
+
+  /* Labels */
+  .cc-node__label{font-family:inherit;font-size:11px;font-weight:500;fill:#F1E9D5;letter-spacing:.04em;pointer-events:none;}
+  .cc-node__label--sub{fill:#9AA0B4;font-size:9px;}
 
   /* tiles */
   .cc-section-label{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:#9AA0B4;margin:0 0 .8rem .3rem;font-weight:600;}
@@ -1146,16 +1259,25 @@
   .cc-tile--faith .cc-tile__meta{margin:0 0 0 auto;color:#6B6B80;}
   .cc-tile--faith:hover{background:#1F2440;border-color:rgba(255,255,255,.08);transform:none;}
 
-  /* reduced motion */
+  /* ── reduced motion ─────────────────────────────────────────
+     Freeze to a polished still frame. The hero stays fully
+     legible (orbs visible, focus glow on, active link drawn)
+     but nothing breathes, drifts, twinkles, or flows. */
   @media (prefers-reduced-motion: reduce){
     #appCommandCenter *, #appCommandCenter *::before, #appCommandCenter *::after{
       animation-duration:.001ms !important;
       animation-iteration-count:1 !important;
       transition-duration:.001ms !important;
     }
+    #appCommandCenter .cc-constellation::before{opacity:.7 !important;}
+    #appCommandCenter .cc-constellation::after{opacity:.55 !important;}
+    #appCommandCenter .cc-constellation__svg{transform:none !important;}
+    #appCommandCenter .cc-star{opacity:.45 !important;}
     #appCommandCenter .cc-link{stroke-dashoffset:0 !important;opacity:.7 !important;}
-    #appCommandCenter .cc-node{opacity:1 !important;transform:none !important;}
-    #appCommandCenter .cc-halo{opacity:.5 !important;transform:none !important;}
+    #appCommandCenter .cc-link--active{opacity:.7 !important;stroke-dasharray:5 11 !important;stroke-dashoffset:0 !important;}
+    #appCommandCenter .cc-orb{opacity:1 !important;transform:none !important;}
+    #appCommandCenter .cc-orb__halo{transform:scale(1.12) !important;opacity:.85 !important;}
+    #appCommandCenter .cc-pulse{opacity:.25 !important;transform:scale(1.6) !important;}
   }
 </style>
 
