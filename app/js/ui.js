@@ -1190,8 +1190,42 @@ function renderTabLanding(tabId){
   }).join('');
 }
 
+// Dedicated fallback renderer for #s-learn. The 'learn' tab was retired
+// from TAB_IA (V1 Rebuild · Session 1) but the section is still
+// reachable via the desktop sidebar (NAV_ITEMS ~line 967) and the hero
+// quick-jump card (index.html ~line 2092). Without this, renderTabLanding('learn')
+// no-ops and the section renders only its header. TAB_IA stays untouched;
+// this populates the same .tab-landing[data-tab="learn"] host with a
+// hub of links to the sections that used to live under Learn.
+function renderLearnLanding(){
+  const host = document.querySelector('.tab-landing[data-tab="learn"]');
+  if(!host) return;
+  const LEARN_CARDS = [
+    {id:'s-school',    icon:'📚', label:'School',           sub:'Classes, assignments, GPA, study timer'},
+    {id:'s-cbt',       icon:'💻', label:'Tech Skills',      sub:'Typing, Windows, Linux, coding, internet safety'},
+    {id:'s-resume',    icon:'📄', label:'Jobs / Resume',    sub:'Build a resume, track applications, prep interviews'},
+    {id:'s-resources', icon:'📐', label:'School Resources', sub:'Math, science, writing, calculators'},
+    {id:'s-growing',   icon:'🌱', label:'Growing Up',       sub:'Life skills for becoming an adult'},
+    {id:'s-driving',   icon:'🚗', label:'Driving',          sub:'Permit, license, road safety, car care'},
+    {id:'s-craft',     icon:'🎵', label:'Music & Practice', sub:'Practice timer, instrument guides, track upload'},
+    {id:'s-sports',    icon:'🏆', label:'Sports',           sub:'Explore sports across school levels'}
+  ];
+  host.innerHTML = LEARN_CARDS
+    .filter(c => document.getElementById(c.id))
+    .map(c =>
+      '<button type="button" class="tab-landing-card"'
+        + ' onclick="showSection(\'' + c.id + '\')"'
+        + ' aria-label="' + c.label + '">'
+        + '<span class="tlc-icon" aria-hidden="true">' + c.icon + '</span>'
+        + '<span class="tlc-label">' + c.label + '</span>'
+        + '<span class="tlc-sub">' + c.sub + '</span>'
+      + '</button>'
+    ).join('');
+}
+
 function renderAllTabLandings(){
   renderTabLanding('learn');
+  renderLearnLanding();
   renderTabLanding('life');
   renderTabLanding('me');
 }
@@ -1783,6 +1817,13 @@ function showSection(id, fromMobile){
   // are current.
   if(id==='s-scripture' && typeof renderFaithZones === 'function'){
     setTimeout(renderFaithZones, 30);
+  }
+  // Belt-and-suspenders refresh for the s-learn landing hub. The cards
+  // are populated at boot via renderAllTabLandings(), but re-rendering
+  // on entry guards against any case where the host div is empty when
+  // the user lands here (boot order, late inserts, etc).
+  if(id==='s-learn' && typeof renderLearnLanding === 'function'){
+    setTimeout(renderLearnLanding, 30);
   }
   // Beta bug 1 — palette / theme drift on returning to the Well. Some
   // sub-sections inside The Well used to set inline CSS-variable
