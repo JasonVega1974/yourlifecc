@@ -169,10 +169,90 @@ async function cloudSync(){
     }, { onConflict: 'user_id' }).select();
     setSyncSt(error ? 'local' : 'cloud');
     if(error) console.error('[LifeOS Sync] upsert failed');
-    if(!error) localStorage.setItem('lifeos_last_sync', Date.now());
+    if(!error){
+      localStorage.setItem('lifeos_last_sync', Date.now());
+      // Tab 1 Increment 1 — fire-and-forget mirror of D.chores +
+      // D.choreLog into public.chores / public.chore_completions.
+      // No-ops silently if chores-schema.sql hasn't been applied yet.
+      _mirrorChoresToCloud(supa, _supaUser.id);
+    }
   } catch(e){
     console.error('[LifeOS Sync] Exception:', e);
     setSyncSt('local');
+  }
+}
+
+// Tab 1 Increment 1 — dual-write helper.
+//
+// Mirrors D.chores into public.chores (idempotent upsert on id) and
+// D.choreLog into public.chore_completions (UNIQUE chore_id+completed_date).
+// JSONB blob remains canonical until later increments swap reads over.
+//
+// Defensive by design — if chores-schema.sql hasn't been applied,
+// PostgREST returns 404/42P01 and we silently bail. Never throws.
+// Numeric D.chores ids (Date.now()) are coerced to 'ch_<n>' strings to
+// match the text PK in the schema without mutating in-memory state.
+async function _mirrorChoresToCloud(supa, userId){
+  try {
+    const chores = Array.isArray(D.chores) ? D.chores : [];
+    const log    = Array.isArray(D.choreLog) ? D.choreLog : [];
+    if(!chores.length && !log.length) return;
+
+    const choreId = (v) => {
+      if(v === null || v === undefined) return null;
+      const s = String(v);
+      return s.startsWith('ch_') ? s : 'ch_' + s;
+    };
+    const VALID_FREQ = new Set(['daily','weekly','monthly','once']);
+    const VALID_DIFF = new Set(['easy','medium','hard']);
+    const VALID_STATUS = new Set(['pending','verified','rejected','redeemed']);
+
+    // chores rows
+    const choreRows = chores.map((c, idx) => ({
+      id:         choreId(c.id),
+      user_id:    userId,
+      name:       String(c.name || ''),
+      emoji:      c.emoji || '📌',
+      category:   c.cat || null,
+      points:     Number.isFinite(+c.pts) ? +c.pts : 10,
+      difficulty: VALID_DIFF.has(c.difficulty) ? c.difficulty : 'medium',
+      frequency:  VALID_FREQ.has(c.freq) ? c.freq : 'daily',
+      active:     c.active !== false,
+      sort_order: idx,
+      updated_at: new Date().toISOString()
+    })).filter(r => r.id && r.name);
+
+    if(choreRows.length){
+      const { error } = await supa.from('chores').upsert(choreRows, { onConflict: 'id' });
+      // 42P01 = relation does not exist (migration not applied yet) → silent bail
+      if(error && error.code !== '42P01'){
+        console.debug('[chores mirror] upsert chores skipped:', error.message);
+      }
+      if(error) return; // bail before touching chore_completions
+    }
+
+    // chore_completions rows — skip redemptions (choreId null) and entries whose
+    // parent chore no longer exists (FK would fail).
+    const existingIds = new Set(choreRows.map(r => r.id));
+    const completions = log.filter(l => l.choreId && l.date && VALID_STATUS.has(l.status))
+      .map(l => ({
+        chore_id:       choreId(l.choreId),
+        user_id:        userId,
+        completed_date: l.date,
+        status:         l.status,
+        points_awarded: (l.status === 'verified' && Number.isFinite(+l.pts)) ? +l.pts : 0
+      }))
+      .filter(r => existingIds.has(r.chore_id));
+
+    if(completions.length){
+      const { error } = await supa.from('chore_completions').upsert(completions, { onConflict: 'chore_id,completed_date' });
+      if(error && error.code !== '42P01'){
+        console.debug('[chores mirror] upsert completions skipped:', error.message);
+      }
+    }
+  } catch(e){
+    // Never let dual-write break the main save flow
+    console.debug('[chores mirror] exception:', e && e.message);
   }
 }
 
