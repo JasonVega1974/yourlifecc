@@ -5507,55 +5507,95 @@
     </div>
   </div>
 
-  <!-- Today's Chores -->
-  <div style="font-family:var(--fh);font-size:.7rem;letter-spacing:1.5px;color:var(--c);margin-bottom:.6rem;">TODAY'S CHORES</div>
-  <div id="choreTodayList" style="margin-bottom:1rem;"></div>
+  <!-- ── Sub-tab pills (Tab 1 Increment 1 — scoped to #s-chores) ─── -->
+  <style>
+    #s-chores .chores-tabs{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .8rem;scrollbar-width:none;-ms-overflow-style:none;margin-bottom:.4rem;}
+    #s-chores .chores-tabs::-webkit-scrollbar{display:none;}
+    #s-chores .ch-tab{flex-shrink:0;padding:.5rem .9rem;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--tx2);font-size:.72rem;font-weight:700;font-family:var(--fn);letter-spacing:.5px;cursor:pointer;transition:all .18s;white-space:nowrap;}
+    #s-chores .ch-tab:hover{background:rgba(255,255,255,.08);color:var(--tx);}
+    #s-chores .ch-tab.active{background:linear-gradient(135deg,#22c55e,#a78bfa);color:#0a1f5e;border-color:transparent;box-shadow:0 4px 14px rgba(34,197,94,.28);}
+    :root.light #s-chores .ch-tab{background:rgba(15,23,42,.04)!important;border-color:rgba(15,23,42,.10)!important;color:#4a4b52!important;}
+    :root.light #s-chores .ch-tab.active{background:linear-gradient(135deg,#22c55e,#a78bfa)!important;color:#0a1f5e!important;}
+    #s-chores .ch-panel-stub{padding:1.4rem 1rem;text-align:center;color:var(--tx2);font-size:.8rem;line-height:1.5;background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.08);border-radius:12px;}
+  </style>
+  <div class="chores-tabs" role="tablist" aria-label="Chores sub-sections">
+    <button class="ch-tab active" role="tab" aria-selected="true"  onclick="cTab('mychores',this)">✅ My Chores</button>
+    <button class="ch-tab"        role="tab" aria-selected="false" onclick="cTab('store',this)">🎁 Store</button>
+    <button class="ch-tab"        role="tab" aria-selected="false" onclick="cTab('leaderboard',this)">🏅 Leaderboard</button>
+    <button class="ch-tab"        role="tab" aria-selected="false" onclick="cTab('history',this)">📜 History</button>
+    <button class="ch-tab"        role="tab" aria-selected="false" onclick="cTab('streaks',this)">🔥 Streaks</button>
+  </div>
 
-  <!-- Self-Initiated Chores -->
-  <div style="background:linear-gradient(135deg,rgba(34,197,94,.04),rgba(56,189,248,.03));border:1px solid rgba(34,197,94,.12);border-radius:14px;padding:.8rem 1rem;margin-bottom:1rem;">
-    <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.4rem;">
-      <span style="font-size:1.1rem;">🌟</span>
-      <div>
-        <div style="font-size:.85rem;font-weight:800;">I Did Something Helpful!</div>
-        <div style="font-size:.65rem;color:var(--tx2);">Did something without being asked? Log it here for parent approval & bonus points!</div>
+  <!-- ── PANEL: My Chores (default active) ─────────────────────── -->
+  <div id="ch-mychores" class="ch-panel">
+    <!-- Today's Chores -->
+    <div style="font-family:var(--fh);font-size:.7rem;letter-spacing:1.5px;color:var(--c);margin-bottom:.6rem;">TODAY'S CHORES</div>
+    <div id="choreTodayList" style="margin-bottom:1rem;"></div>
+
+    <!-- Self-Initiated Chores -->
+    <div style="background:linear-gradient(135deg,rgba(34,197,94,.04),rgba(56,189,248,.03));border:1px solid rgba(34,197,94,.12);border-radius:14px;padding:.8rem 1rem;margin-bottom:1rem;">
+      <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.4rem;">
+        <span style="font-size:1.1rem;">🌟</span>
+        <div>
+          <div style="font-size:.85rem;font-weight:800;">I Did Something Helpful!</div>
+          <div style="font-size:.65rem;color:var(--tx2);">Did something without being asked? Log it here for parent approval & bonus points!</div>
+        </div>
       </div>
-    </div>
 
-    <!-- Quick Select Common Tasks -->
-    <div style="display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:.4rem;">
-      <button onclick="selectHelpful('Cleaned my room')" class="btn bgh bs" style="font-size:.6rem;padding:.2rem .5rem;border-radius:15px;">🧹 Cleaned Room</button>
-      <button onclick="selectHelpful('Helped a sibling')" class="btn bgh bs" style="font-size:.6rem;padding:.2rem .5rem;border-radius:15px;">🤝 Helped Sibling</button>
-      <button onclick="selectHelpful('Did the dishes')" class="btn bgh bs" style="font-size:.6rem;padding:.2rem .5rem;border-radius:15px;">🍽️ Did Dishes</button>
-      <button onclick="selectHelpful('Took out trash')" class="btn bgh bs" style="font-size:.6rem;padding:.2rem .5rem;border-radius:15px;">🗑️ Took Out Trash</button>
-      <button onclick="selectHelpful('Helped with laundry')" class="btn bgh bs" style="font-size:.6rem;padding:.2rem .5rem;border-radius:15px;">👕 Laundry Help</button>
-      <button onclick="selectHelpful('Helped cook a meal')" class="btn bgh bs" style="font-size:.6rem;padding:.2rem .5rem;border-radius:15px;">🍳 Helped Cook</button>
-      <button onclick="selectHelpful('Helped a neighbor')" class="btn bgh bs" style="font-size:.6rem;padding:.2rem .5rem;border-radius:15px;">🏘️ Helped Neighbor</button>
-      <button onclick="selectHelpful('Organized something')" class="btn bgh bs" style="font-size:.6rem;padding:.2rem .5rem;border-radius:15px;">📦 Organized</button>
-    </div>
+      <!-- Quick Select Common Tasks -->
+      <div style="display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:.4rem;">
+        <button onclick="selectHelpful('Cleaned my room')" class="btn bgh bs" style="font-size:.6rem;padding:.2rem .5rem;border-radius:15px;">🧹 Cleaned Room</button>
+        <button onclick="selectHelpful('Helped a sibling')" class="btn bgh bs" style="font-size:.6rem;padding:.2rem .5rem;border-radius:15px;">🤝 Helped Sibling</button>
+        <button onclick="selectHelpful('Did the dishes')" class="btn bgh bs" style="font-size:.6rem;padding:.2rem .5rem;border-radius:15px;">🍽️ Did Dishes</button>
+        <button onclick="selectHelpful('Took out trash')" class="btn bgh bs" style="font-size:.6rem;padding:.2rem .5rem;border-radius:15px;">🗑️ Took Out Trash</button>
+        <button onclick="selectHelpful('Helped with laundry')" class="btn bgh bs" style="font-size:.6rem;padding:.2rem .5rem;border-radius:15px;">👕 Laundry Help</button>
+        <button onclick="selectHelpful('Helped cook a meal')" class="btn bgh bs" style="font-size:.6rem;padding:.2rem .5rem;border-radius:15px;">🍳 Helped Cook</button>
+        <button onclick="selectHelpful('Helped a neighbor')" class="btn bgh bs" style="font-size:.6rem;padding:.2rem .5rem;border-radius:15px;">🏘️ Helped Neighbor</button>
+        <button onclick="selectHelpful('Organized something')" class="btn bgh bs" style="font-size:.6rem;padding:.2rem .5rem;border-radius:15px;">📦 Organized</button>
+      </div>
 
-    <!-- Custom Input -->
-    <div style="display:flex;gap:.3rem;">
-      <input type="text" id="helpfulChoreInput" placeholder="Or type what you did..." style="flex:1;">
-      <button class="btn bp bs" onclick="submitHelpfulChore()" style="font-size:.7rem;white-space:nowrap;">🌟 Submit</button>
-    </div>
+      <!-- Custom Input -->
+      <div style="display:flex;gap:.3rem;">
+        <input type="text" id="helpfulChoreInput" placeholder="Or type what you did..." style="flex:1;">
+        <button class="btn bp bs" onclick="submitHelpfulChore()" style="font-size:.7rem;white-space:nowrap;">🌟 Submit</button>
+      </div>
 
-    <!-- Pending & History -->
-    <div id="helpfulChoresList" style="margin-top:.5rem;max-height:200px;overflow-y:auto;"></div>
+      <!-- Pending & History -->
+      <div id="helpfulChoresList" style="margin-top:.5rem;max-height:200px;overflow-y:auto;"></div>
+    </div>
   </div>
 
-  
-
-  <!-- Kid View: Rewards Shop -->
-  <div id="choreRewardsShop">
-    <div style="font-family:var(--fh);font-size:.7rem;letter-spacing:1.5px;color:#fbbf24;margin-bottom:.6rem;">🎁 REWARDS SHOP</div>
-    <div id="rewardShopList" style="margin-bottom:1rem;"></div>
+  <!-- ── PANEL: Chore Store ────────────────────────────────────── -->
+  <div id="ch-store" class="ch-panel" style="display:none;">
+    <div id="choreRewardsShop">
+      <div style="font-family:var(--fh);font-size:.7rem;letter-spacing:1.5px;color:#fbbf24;margin-bottom:.6rem;">🎁 REWARDS SHOP</div>
+      <div id="rewardShopList" style="margin-bottom:1rem;"></div>
+    </div>
+    <div class="ch-panel-stub" style="margin-top:.8rem;">Parent Bucks store consolidation lands in the next update. For now this view shows the kid-points reward shop. Visit <button class="btn bgh bs" onclick="showSection('s-rewards')" style="font-size:.65rem;padding:.2rem .55rem;">🪙 Parent Bucks Store</button> for the spinner, scratch tickets, and PB items.</div>
   </div>
 
-  <!-- History -->
-  <div style="font-family:var(--fh);font-size:.7rem;letter-spacing:1.5px;color:var(--tx2);margin-bottom:.6rem;">RECENT ACTIVITY</div>
-  <div id="choreHistory" style="max-height:250px;overflow-y:auto;"></div>
+  <!-- ── PANEL: Leaderboard (Increment 4 will populate) ────────── -->
+  <div id="ch-leaderboard" class="ch-panel" style="display:none;">
+    <div class="ch-panel-stub">
+      🏅 Family leaderboard arrives in the next update.<br>
+      <button class="btn bgh bs" onclick="showSection('s-contests')" style="margin-top:.6rem;font-size:.7rem;">View today's leaderboard in Contests &amp; Challenges →</button>
+    </div>
+  </div>
 
-  
+  <!-- ── PANEL: History ────────────────────────────────────────── -->
+  <div id="ch-history" class="ch-panel" style="display:none;">
+    <div style="font-family:var(--fh);font-size:.7rem;letter-spacing:1.5px;color:var(--tx2);margin-bottom:.6rem;">RECENT ACTIVITY</div>
+    <div id="choreHistory" style="max-height:480px;overflow-y:auto;"></div>
+  </div>
+
+  <!-- ── PANEL: Streaks (Increment 4 will populate) ────────────── -->
+  <div id="ch-streaks" class="ch-panel" style="display:none;">
+    <div class="ch-panel-stub">
+      🔥 Streak heatmap, longest-streak banner, and badge tiers arrive in the next update.<br>
+      Current streak: <b id="choreStreakDetail" style="color:#fbbf24;">0</b> day(s)
+    </div>
+  </div>
+
 </section>
 
 <!-- ════ CONTESTS & CHALLENGES ════ -->
