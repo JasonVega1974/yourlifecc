@@ -172,7 +172,7 @@
       + '.qp-lib-chip{align-self:flex-start;background:rgba(167,139,250,.16);border:1px solid rgba(167,139,250,.32);color:#cdb9ff;font-family:var(--fm);font-size:.62rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;padding:.22rem .6rem;border-radius:99px;}'
       + '.qp-lib-title{font-family:var(--fh,var(--fm));font-size:1.05rem;font-weight:700;color:var(--tx);margin:0;line-height:1.25;}'
       + '.qp-lib-verse{font-family:var(--fm);font-size:.7rem;font-weight:800;letter-spacing:.04em;color:#fbbf24;}'
-      + '.qp-lib-text{font-family:Georgia,"Times New Roman",serif;font-size:.92rem;line-height:1.65;color:var(--tx);margin:0;}'
+      + '.qp-lib-text{font-family:Georgia,"Times New Roman",serif;font-size:.92rem;line-height:1.65;color:var(--tx);margin:0;display:-webkit-box;-webkit-line-clamp:3;line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}'
       + '.qp-lib-btn-pray{display:block;width:100%;margin-top:.4rem;background:linear-gradient(135deg,#a78bfa,#7c3aed);border:none;color:#fff;border-radius:12px;padding:.78rem 1rem;font-family:var(--fh,var(--fm));font-size:.92rem;font-weight:900;letter-spacing:.06em;cursor:pointer;box-shadow:0 8px 22px rgba(124,58,237,.32);transition:transform .15s,box-shadow .2s;}'
       + '.qp-lib-btn-pray:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(124,58,237,.44);}'
       + '.qp-lib-btn-pray:focus-visible{outline:2px solid #fbbf24;outline-offset:2px;}'

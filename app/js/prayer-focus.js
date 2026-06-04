@@ -101,7 +101,17 @@
       +   'display:flex;flex-direction:column;align-items:center;text-align:center;'
       +   'color:#f5f3ff;'
       +   'animation:pfTextIn .9s cubic-bezier(.2,.7,.2,1) both;'
+      // Longer prayers must scroll inside the overlay on small phones
+      // rather than spill behind the close button or the swipe hint.
+      // The 3.2rem top / 2.6rem bottom padding reserves visual room
+      // for the close X (top-right) and the dismiss hint (bottom).
+      +   'max-height:calc(100vh - 2.4rem);overflow-y:auto;'
+      +   'padding:3.2rem 1rem 2.6rem;'
+      +   '-webkit-overflow-scrolling:touch;'
+      +   'scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent;'
       + '}'
+      + '.pf-card::-webkit-scrollbar{width:6px;}'
+      + '.pf-card::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:3px;}'
       + '@keyframes pfTextIn{'
       +   'from{opacity:0;transform:translateY(14px) scale(.985);}'
       +   'to  {opacity:1;transform:none;}'
