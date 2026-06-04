@@ -106,14 +106,17 @@
   }
 
   // ── per-tile meta strings ────────────────────────────────────
+  // Empty state defaults are deliberately inviting ("Add your first",
+  // "Begin tracking") rather than blank ("$0 saved", "All clear") so
+  // a fresh account reads as potential, not emptiness.
   function _ccTileMeta(){
     var meta = {
       habits: 'Build a habit',
-      chores: 'All clear',
+      chores: 'Add your first',
       goals:  'Set a goal',
-      money:  '$0 saved',
+      money:  'Begin tracking',
       skills: 'Start learning',
-      health: 'Check in',
+      health: 'Check in today',
       faith:  'optional'
     };
     if (typeof D === 'undefined' || !D) return meta;
@@ -125,20 +128,19 @@
         var hD = D.habitsV2.filter(function(h){ return h && h.completions && h.completions[todayIso]; }).length;
         meta.habits = hD + '/' + hT + ' today';
       }
-      // Chores — # incomplete
-      var choreCount = 0;
-      if (Array.isArray(D.chores)){
-        choreCount = D.chores.filter(function(c){ return c && !c.completed && !c.done; }).length;
-      } else if (Array.isArray(D.choreList)){
-        choreCount = D.choreList.filter(function(c){ return c && !c.completed && !c.done; }).length;
+      // Chores — # incomplete (separate "no chores configured" from "all done")
+      var choresArr = Array.isArray(D.chores) ? D.chores
+                    : (Array.isArray(D.choreList) ? D.choreList : []);
+      if (choresArr.length){
+        var choreCount = choresArr.filter(function(c){ return c && !c.completed && !c.done; }).length;
+        meta.chores = choreCount > 0 ? (choreCount + ' to do') : 'All clear ✓';
       }
-      if (choreCount > 0) meta.chores = choreCount + ' to do';
       // Goals — # active
-      if (Array.isArray(D.goals)){
+      if (Array.isArray(D.goals) && D.goals.length){
         var active = D.goals.filter(function(g){
           return g && !g.done && !g.doneDate && !g.achievedDate && !g.completedDate;
         }).length;
-        if (active > 0) meta.goals = active + ' active';
+        meta.goals = active > 0 ? (active + ' active') : 'All done ✓';
       }
       // Money — bank + savings + earnings jar
       var bal = 0;
@@ -153,9 +155,50 @@
         if (certs > 0) meta.skills = certs + ' cert' + (certs===1?'':'s');
       }
       // Health — last weight log entry count
-      if (Array.isArray(D.weightLog) && D.weightLog.length) meta.health = 'Today';
+      if (Array.isArray(D.weightLog) && D.weightLog.length) meta.health = 'Logged today';
     } catch(_){}
     return meta;
+  }
+
+  // ── per-node "has real data" — drives bright vs dim orb glow ─
+  function _ccNodeBrightness(key){
+    if (typeof D === 'undefined' || !D) return false;
+    try {
+      if (key === 'habits') return Array.isArray(D.habitsV2) && D.habitsV2.length > 0;
+      if (key === 'chores'){
+        var arr = Array.isArray(D.chores) ? D.chores
+                : (Array.isArray(D.choreList) ? D.choreList : []);
+        return arr.length > 0;
+      }
+      if (key === 'goals')  return Array.isArray(D.goals) && D.goals.length > 0;
+      if (key === 'money')  return (+(D.bank||0) + +(D.bankSavAcct||0) + +((D.earnings||{}).balance||0)) > 0;
+      if (key === 'skills') return !!(D.skillCerts && Object.values(D.skillCerts).filter(Boolean).length);
+      if (key === 'health') return (Array.isArray(D.weightLog) && D.weightLog.length > 0)
+                                || (Array.isArray(D.foodLog) && D.foodLog.length > 0);
+    } catch(_){}
+    return false;
+  }
+
+  // ── starfield (deterministic, capped for perf) ──────────────
+  // Seeded pseudo-random via sin() so the same N stars render across
+  // re-renders. Count caps at 36 — empirically smooth on mid-range
+  // Android Chrome and Safari iOS 14+.
+  function _ccStarfield(count){
+    count = Math.min(count || 32, 36);
+    var stars = [];
+    for (var i = 0; i < count; i++){
+      var r1 = Math.abs(Math.sin(i * 12.9898) * 43758.5453 % 1);
+      var r2 = Math.abs(Math.sin(i * 78.233)  * 43758.5453 % 1);
+      var r3 = Math.abs(Math.sin(i * 37.719)  * 43758.5453 % 1);
+      stars.push({
+        cx: (10 + r1 * 380).toFixed(1),
+        cy: (8  + r2 * 284).toFixed(1),
+        r:  (0.5 + r3 * 1.1).toFixed(2),
+        dl: (r1 * 4).toFixed(2),
+        td: (2.5 + r2 * 3.5).toFixed(2)
+      });
+    }
+    return stars;
   }
 
   // ── today's focus computation ────────────────────────────────
@@ -212,7 +255,7 @@
                caption: habitsLeft + ' habit' + (habitsLeft>1?'s':'') + ' to do' };
     }
 
-    // POSITIVE FALLBACK — nothing overdue. Frame as a win, not a "fallback".
+    // POSITIVE FALLBACK — nothing overdue. Frame as a win or invitation.
     var streak = _ccStreak();
     if (streak >= 7){
       return { kind:'momentum', domain:'habits',
@@ -222,8 +265,26 @@
       return { kind:'momentum', domain:'habits',
                caption: 'Day ' + streak + ' streak going' };
     }
-    // No streak yet — first-day-positive
-    return { kind:'momentum', domain:'habits', caption: 'A fresh start today' };
+
+    // streak === 0. Separate "I'm new" from "I missed a day".
+    // If literally no data exists anywhere → INVITE (first move).
+    // If data exists but no streak yet → momentum-positive ("fresh start").
+    var anyData = false;
+    try {
+      anyData = !!(
+        (Array.isArray(D.habitsV2) && D.habitsV2.length) ||
+        (Array.isArray(D.chores)   && D.chores.length)   ||
+        (Array.isArray(D.choreList)&& D.choreList.length)||
+        (Array.isArray(D.goals)    && D.goals.length)    ||
+        (+(D.bank||0) + +(D.bankSavAcct||0) > 0)         ||
+        (D.skillCerts && Object.keys(D.skillCerts).length)
+      );
+    } catch(_){}
+    if (anyData){
+      return { kind:'momentum', domain:'habits', caption: 'A fresh start today' };
+    }
+    // Truly empty — focus node prompts the first action.
+    return { kind:'invite', domain:'habits', caption: 'Begin with a small habit' };
   }
 
   // ── tile config (canonical dictionary; Faith always last + de-emphasized) ─
@@ -314,28 +375,72 @@
     var meta   = _ccTileMeta();
     var focus  = _ccComputeFocus();
     var focusTile = _CC_TILES.find(function(t){ return t.key === focus.domain; }) || _CC_TILES[0];
+    var focusKey  = focusTile.key;
 
-    // Build constellation SVG
-    var svgLinks = _CC_LINKS.map(function(pair){
-      var a = _CC_NODES[pair[0]], b = _CC_NODES[pair[1]];
-      return '<line class="cc-link" x1="'+a.cx+'" y1="'+a.cy+'" x2="'+b.cx+'" y2="'+b.cy+'"/>';
+    // Per-domain brightness — drives bright vs dim orb glow in the SVG.
+    var brightness = {};
+    _CC_TILES.forEach(function(t){ brightness[t.key] = _ccNodeBrightness(t.key); });
+
+    // Starfield — 32 deterministic stars across the constellation viewBox.
+    var starsHtml = _ccStarfield(32).map(function(s){
+      return '<circle class="cc-star" cx="'+s.cx+'" cy="'+s.cy+'" r="'+s.r
+           + '" fill="#F1E9D5" style="--dl:'+s.dl+'s;--td:'+s.td+'s;"/>';
     }).join('');
 
+    // Links — when one endpoint is the focus node, the line is "active"
+    // (flowing dashed energy toward the focus). When neither end is focus,
+    // it stays as a quiet draw-in line. Lines with focus at endpoint b
+    // are swapped so the focus is at (x1,y1) — that way stroke-dashoffset
+    // animation always flows TOWARD focus regardless of endpoint order.
+    var svgLinks = _CC_LINKS.map(function(pair){
+      var a = pair[0], b = pair[1];
+      var na = _CC_NODES[a], nb = _CC_NODES[b];
+      if (!na || !nb) return '';
+      var isActive = (a === focusKey || b === focusKey);
+      var x1, y1, x2, y2;
+      if (b === focusKey){ x1 = nb.cx; y1 = nb.cy; x2 = na.cx; y2 = na.cy; }
+      else                { x1 = na.cx; y1 = na.cy; x2 = nb.cx; y2 = nb.cy; }
+      var cls = isActive ? 'cc-link cc-link--active' : 'cc-link';
+      var strokeAttr = isActive ? ' stroke="'+focusTile.accent+'"' : '';
+      return '<line class="'+cls+'"'+strokeAttr
+           + ' x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'"/>';
+    }).join('');
+
+    // Nodes — layered luminous orbs (outer halo + ring + core).
+    // Brightness class drives glow intensity; focus class adds the
+    // expanding pulse rings and the strongest core glow.
     var svgNodes = _CC_TILES.map(function(tile, i){
       var n = _CC_NODES[tile.key];
       if (!n) return '';
-      var halo = (tile.key === focus.domain)
-        ? '<circle class="cc-halo" cx="'+n.cx+'" cy="'+n.cy+'" r="28" fill="url(#cc-halo-grad)"/>'
-        : '';
+      var isFocus = (tile.key === focusKey);
+      var hasData = !!brightness[tile.key];
+      var classes = 'cc-orb cc-orb--' + (i+1);
+      if (isFocus) classes += ' cc-orb--focus';
+      classes += hasData ? ' cc-orb--bright' : ' cc-orb--dim';
+
+      // Pulse rings — only on the focus orb. Two staggered rings give
+      // the "energy radiating" feel without spamming the GPU.
+      var pulses = isFocus ? (
+          '<circle class="cc-pulse cc-pulse--1" cx="'+n.cx+'" cy="'+n.cy+'" r="'+(n.r+2)+'"/>'
+        + '<circle class="cc-pulse cc-pulse--2" cx="'+n.cx+'" cy="'+n.cy+'" r="'+(n.r+2)+'"/>'
+      ) : '';
+
+      var haloR = (n.r * 2.6).toFixed(1);
+      var halo = '<circle class="cc-orb__halo" cx="'+n.cx+'" cy="'+n.cy+'" r="'+haloR+'" fill="'+tile.accent+'"/>';
+      var ring = '<circle class="cc-orb__ring" cx="'+n.cx+'" cy="'+n.cy+'" r="'+n.r+'" fill="'+tile.accent+'" stroke="'+tile.accent+'" stroke-width="'+(n.isCenter?1.2:1)+'"/>';
+      var core = '<circle class="cc-orb__core" cx="'+n.cx+'" cy="'+n.cy+'" r="'+n.coreR+'" fill="'+tile.accent+'"/>';
+
       var subLine = (n.isCenter && tile.key === 'habits' && meta.habits)
         ? '<text class="cc-node__label cc-node__label--sub" x="'+n.cx+'" y="'+n.subY+'" text-anchor="middle">'+_ccEsc(meta.habits)+'</text>'
         : '';
+
       return ''
         + '<g class="cc-drift cc-drift--'+(i+1)+'">'
-        +   '<g class="cc-node cc-node--'+(i+1)+'" style="color:'+tile.accent+';">'
+        +   '<g class="'+classes+'" data-key="'+tile.key+'" style="color:'+tile.accent+';">'
+        +     pulses
         +     halo
-        +     '<circle cx="'+n.cx+'" cy="'+n.cy+'" r="'+n.r+'" fill="'+tile.accent+'" fill-opacity="0.18" stroke="'+tile.accent+'" stroke-width="'+(n.isCenter?1.2:1)+'"/>'
-        +     '<circle class="cc-node__core" cx="'+n.cx+'" cy="'+n.cy+'" r="'+n.coreR+'" fill="'+tile.accent+'"/>'
+        +     ring
+        +     core
         +     '<text class="cc-node__label" x="'+n.cx+'" y="'+n.labelY+'" text-anchor="middle">'+_ccEsc(tile.label)+'</text>'
         +     subLine
         +   '</g>'
@@ -364,22 +469,31 @@
       +   '<span class="cc-tile__meta">'+_ccEsc(meta.faith)+'</span>'
       + '</button>';
 
+    // Empty-state-aware hero copy:
+    // - streak === 0  → "Day 1 / starts now" + invite subline. Reads as
+    //                   potential, not "Day 0".
+    // - streak >= 1   → "Day N / day streak" + neutral subline.
+    var streakDisp  = streak === 0 ? 1     : streak;
+    var streakLabel = streak === 0 ? 'starts now' : 'day streak';
+    var sublineText = streak === 0 ? 'Your first day starts here.' : 'Here\'s your day.';
+    var streakAria  = streak === 0 ? 'Day 1 — starts now' : ('Day ' + streak + ' streak');
+
     root.innerHTML = ''
       + '<main class="cc-shell" role="main">'
       +   '<header class="cc-greeting" aria-label="Greeting">'
       +     '<h1 class="cc-greeting__hello" id="ccHello">Good '+_ccEsc(greet)+', '+_ccEsc(name)+' 👋</h1>'
       +     '<p class="cc-greeting__sub">'
-      +       'Here\'s your day.'
+      +       _ccEsc(sublineText)
       +       '<span class="cc-time" id="ccTime" aria-label="Current time">'+_ccFmtTime(now)+'</span>'
       +     '</p>'
       +   '</header>'
 
       +   '<section class="cc-stats" aria-label="Today\'s progress">'
-      +     '<div class="cc-streak" role="group" aria-label="Day '+streak+' streak">'
+      +     '<div class="cc-streak" role="group" aria-label="'+_ccEsc(streakAria)+'">'
       +       '<div class="cc-streak__icon" aria-hidden="true">🔥</div>'
       +       '<div class="cc-streak__body">'
-      +         '<div class="cc-streak__num"><span aria-hidden="true">Day&nbsp;</span>'+streak+'</div>'
-      +         '<div class="cc-streak__label">day streak</div>'
+      +         '<div class="cc-streak__num"><span aria-hidden="true">Day&nbsp;</span>'+streakDisp+'</div>'
+      +         '<div class="cc-streak__label">'+_ccEsc(streakLabel)+'</div>'
       +       '</div>'
       +     '</div>'
       +     '<div class="cc-chip" role="group" aria-label="'+tasks+' tasks today">'
@@ -395,15 +509,9 @@
       +   '<section class="cc-constellation" aria-label="Life constellation">'
       +     '<div class="cc-constellation__caption">Today\'s focus &middot; <span style="color:'+focusTile.accent+';">'+_ccEsc(focus.caption)+'</span></div>'
       +     '<svg class="cc-constellation__svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Animated graph of six life domains">'
-      +       '<defs>'
-      +         '<radialGradient id="cc-halo-grad" cx="50%" cy="50%" r="50%">'
-      +           '<stop offset="0%" stop-color="'+focusTile.accent+'" stop-opacity="0.55"/>'
-      +           '<stop offset="60%" stop-color="'+focusTile.accent+'" stop-opacity="0.12"/>'
-      +           '<stop offset="100%" stop-color="'+focusTile.accent+'" stop-opacity="0"/>'
-      +         '</radialGradient>'
-      +       '</defs>'
-      +       svgLinks
-      +       svgNodes
+      +       '<g class="cc-stars" aria-hidden="true">'+starsHtml+'</g>'
+      +       '<g class="cc-links">'+svgLinks+'</g>'
+      +       '<g class="cc-nodes">'+svgNodes+'</g>'
       +     '</svg>'
       +   '</section>'
 
