@@ -1044,6 +1044,121 @@
   }
 </style>
 
+<!-- 2026-06-04 — Command Center home (Constellation concept).
+     Lives in #appCommandCenter as a sibling of #appHome inside
+     #s-hero. Rendered by app/js/command-center.js, gated by the
+     chooser inside app-home.js:maybeRenderAppHome(). The faith
+     Well experience (#faithHeroCinematic) is unchanged. -->
+<style>
+  /* shell */
+  #appCommandCenter{padding:1.2rem 0 2rem;max-width:480px;margin:0 auto;}
+  @media (min-width:720px){ #appCommandCenter{max-width:760px;padding:2rem 0 2.5rem;} }
+  @media (min-width:1024px){ #appCommandCenter{max-width:1040px;} }
+  .cc-shell{padding:0 1.2rem;}
+  @media (min-width:720px){ .cc-shell{padding:0 2rem;} }
+
+  /* greeting */
+  .cc-greeting{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1.5rem;}
+  .cc-greeting__hello{font-size:1.7rem;font-weight:600;letter-spacing:-.01em;color:#F1E9D5;margin:0;line-height:1.18;}
+  .cc-greeting__sub{display:flex;align-items:center;gap:.6rem;color:#9AA0B4;font-size:.95rem;margin:0;}
+  .cc-greeting__sub::before{content:'';width:6px;height:6px;border-radius:50%;background:#F5A623;box-shadow:0 0 8px rgba(245,166,35,.6);flex-shrink:0;}
+  .cc-time{font-family:ui-monospace,'JetBrains Mono',Menlo,Consolas,monospace;font-feature-settings:"tnum";color:#9AA0B4;font-size:.85rem;margin-left:auto;letter-spacing:.02em;}
+  @media (min-width:720px){ .cc-greeting__hello{font-size:2.2rem;} .cc-greeting__sub{font-size:1rem;} }
+
+  /* stats */
+  .cc-stats{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;align-items:stretch;margin-bottom:1.4rem;}
+  .cc-streak{grid-column:1 / -1;display:flex;align-items:center;gap:1rem;padding:1.1rem 1.2rem;background:linear-gradient(135deg,rgba(245,166,35,.10),rgba(244,123,90,.06));border:1px solid rgba(245,166,35,.22);border-radius:18px;position:relative;overflow:hidden;}
+  .cc-streak::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 0% 50%,rgba(245,166,35,.18),transparent 55%);pointer-events:none;}
+  .cc-streak__icon{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#F5A623,#F47B5A);display:grid;place-items:center;font-size:1.7rem;flex-shrink:0;box-shadow:0 6px 20px rgba(244,123,90,.35);position:relative;z-index:1;}
+  .cc-streak__body{display:flex;flex-direction:column;gap:.1rem;position:relative;z-index:1;}
+  .cc-streak__num{font-family:ui-monospace,'JetBrains Mono',monospace;font-feature-settings:"tnum";font-weight:700;font-size:3rem;line-height:1;background:linear-gradient(135deg,#F5A623 0%,#F47B5A 100%);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:-.02em;}
+  .cc-streak__label{font-size:.78rem;color:#9AA0B4;letter-spacing:.06em;text-transform:uppercase;}
+  .cc-chip{display:flex;flex-direction:column;justify-content:center;gap:.2rem;padding:.9rem 1rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;}
+  .cc-chip__num{font-family:ui-monospace,'JetBrains Mono',monospace;font-feature-settings:"tnum";font-weight:700;font-size:1.35rem;color:#F1E9D5;letter-spacing:-.01em;line-height:1.1;}
+  .cc-chip__label{font-size:.74rem;color:#9AA0B4;letter-spacing:.04em;}
+  @media (min-width:720px){ .cc-stats{grid-template-columns:1.4fr 1fr 1fr;} .cc-streak{grid-column:auto;} .cc-streak__num{font-size:4rem;} }
+
+  /* constellation */
+  .cc-constellation{position:relative;width:100%;height:300px;margin:.4rem 0 1.6rem;border-radius:22px;overflow:hidden;background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(106,167,255,.07),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,.01));border:1px solid rgba(255,255,255,.06);}
+  .cc-constellation__svg{width:100%;height:100%;display:block;}
+  .cc-constellation__caption{position:absolute;left:1rem;top:.85rem;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:#9AA0B4;opacity:.85;pointer-events:none;}
+  .cc-constellation__caption span{font-weight:600;}
+  @media (min-width:720px){ .cc-constellation{height:360px;} }
+
+  /* SVG line + node behavior */
+  .cc-link{stroke:rgba(241,233,213,.18);stroke-width:1;fill:none;stroke-linecap:round;stroke-dasharray:300;stroke-dashoffset:300;animation:cc-draw 1.4s ease-out forwards,cc-link-pulse 4s ease-in-out infinite 1.6s;}
+  @keyframes cc-draw{ to{stroke-dashoffset:0;} }
+  @keyframes cc-link-pulse{ 0%,100%{opacity:.55;} 50%{opacity:.9;} }
+  .cc-node{transform-origin:center;transform-box:fill-box;opacity:0;animation:cc-node-in .4s ease-out forwards;}
+  @keyframes cc-node-in{ from{opacity:0;transform:scale(.85);} to{opacity:1;transform:scale(1);} }
+  .cc-node__core{filter:drop-shadow(0 0 4px currentColor);}
+  .cc-node__label{font-family:inherit;font-size:11px;font-weight:500;fill:#F1E9D5;letter-spacing:.04em;}
+  .cc-node__label--sub{fill:#9AA0B4;font-size:9px;}
+  .cc-drift{transform-origin:center;transform-box:fill-box;}
+  .cc-drift--1{animation:cc-drift-1 9s ease-in-out infinite;}
+  .cc-drift--2{animation:cc-drift-2 11s ease-in-out infinite;}
+  .cc-drift--3{animation:cc-drift-3 8s ease-in-out infinite;}
+  .cc-drift--4{animation:cc-drift-4 12s ease-in-out infinite;}
+  .cc-drift--5{animation:cc-drift-5 10s ease-in-out infinite;}
+  .cc-drift--6{animation:cc-drift-6 9.5s ease-in-out infinite;}
+  @keyframes cc-drift-1{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(4px,-5px);} }
+  @keyframes cc-drift-2{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(-5px,3px);} }
+  @keyframes cc-drift-3{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(3px,6px);} }
+  @keyframes cc-drift-4{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(-4px,-4px);} }
+  @keyframes cc-drift-5{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(5px,2px);} }
+  @keyframes cc-drift-6{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(-3px,-6px);} }
+  .cc-halo{transform-origin:center;transform-box:fill-box;animation:cc-halo-pulse 3.2s ease-in-out infinite;}
+  @keyframes cc-halo-pulse{ 0%,100%{opacity:.35;transform:scale(1);} 50%{opacity:.75;transform:scale(1.18);} }
+  .cc-link:nth-of-type(1){animation-delay:0s,1.6s;}
+  .cc-link:nth-of-type(2){animation-delay:.12s,1.7s;}
+  .cc-link:nth-of-type(3){animation-delay:.24s,1.8s;}
+  .cc-link:nth-of-type(4){animation-delay:.36s,1.9s;}
+  .cc-link:nth-of-type(5){animation-delay:.48s,2.0s;}
+  .cc-link:nth-of-type(6){animation-delay:.60s,2.1s;}
+  .cc-link:nth-of-type(7){animation-delay:.72s,2.2s;}
+  .cc-link:nth-of-type(8){animation-delay:.84s,2.3s;}
+  .cc-link:nth-of-type(9){animation-delay:.96s,2.4s;}
+  .cc-node--1{animation-delay:1.2s;}
+  .cc-node--2{animation-delay:1.35s;}
+  .cc-node--3{animation-delay:1.5s;}
+  .cc-node--4{animation-delay:1.65s;}
+  .cc-node--5{animation-delay:1.8s;}
+  .cc-node--6{animation-delay:1.95s;}
+
+  /* tiles */
+  .cc-section-label{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:#9AA0B4;margin:0 0 .8rem .3rem;font-weight:600;}
+  .cc-tiles{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+  @media (min-width:720px){ .cc-tiles{grid-template-columns:repeat(3,1fr);gap:1rem;} }
+  .cc-tile{--accent:#6AA7FF;position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:.65rem;padding:1.1rem 1rem;min-height:116px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:18px;color:#F1E9D5;text-align:left;cursor:pointer;font-family:inherit;transition:transform 200ms ease,background 200ms ease,border-color 200ms ease;overflow:hidden;}
+  .cc-tile::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--accent) 18%,transparent),transparent 55%);opacity:.9;pointer-events:none;}
+  .cc-tile__icon{width:36px;height:36px;border-radius:10px;background:color-mix(in srgb,var(--accent) 18%,transparent);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);display:grid;place-items:center;font-size:1.15rem;position:relative;z-index:1;}
+  .cc-tile__title{font-size:1rem;font-weight:600;letter-spacing:-.01em;color:#F1E9D5;position:relative;z-index:1;}
+  .cc-tile__meta{font-family:ui-monospace,'JetBrains Mono',monospace;font-feature-settings:"tnum";font-size:.78rem;color:#9AA0B4;margin-top:auto;position:relative;z-index:1;}
+  .cc-tile:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 45%,rgba(255,255,255,.07));background:rgba(255,255,255,.06);}
+  .cc-tile:active{transform:scale(.97);background:color-mix(in srgb,var(--accent) 14%,rgba(255,255,255,.04));}
+  .cc-tile:focus-visible{outline:2px solid #F5A623;outline-offset:3px;}
+
+  /* faith — de-emphasized, full-row */
+  .cc-tile--faith{grid-column:1 / -1;flex-direction:row;align-items:center;gap:.9rem;min-height:64px;padding:.9rem 1.1rem;background:#1A1F33;border:1px solid rgba(255,255,255,.05);color:#6B6B80;}
+  .cc-tile--faith::before{display:none;}
+  .cc-tile--faith .cc-tile__icon{width:32px;height:32px;background:rgba(107,107,128,.12);border-color:rgba(107,107,128,.25);font-size:1rem;}
+  .cc-tile--faith .cc-tile__title{color:#9AA0B4;font-size:.95rem;font-weight:500;}
+  .cc-tile--faith .cc-tile__meta{margin:0 0 0 auto;color:#6B6B80;}
+  .cc-tile--faith:hover{background:#1F2440;border-color:rgba(255,255,255,.08);transform:none;}
+
+  /* reduced motion */
+  @media (prefers-reduced-motion: reduce){
+    #appCommandCenter *, #appCommandCenter *::before, #appCommandCenter *::after{
+      animation-duration:.001ms !important;
+      animation-iteration-count:1 !important;
+      transition-duration:.001ms !important;
+    }
+    #appCommandCenter .cc-link{stroke-dashoffset:0 !important;opacity:.7 !important;}
+    #appCommandCenter .cc-node{opacity:1 !important;transform:none !important;}
+    #appCommandCenter .cc-halo{opacity:.5 !important;transform:none !important;}
+  }
+</style>
+
 <!-- ════════════ HERO ════════════════════════════════════════ -->
 <section id="s-hero" class="sec active">
 
@@ -1057,6 +1172,14 @@
        sits. The fix was just the element itself, which had been
        wrapped in display:none. -->
   <div id="faithHeroCinematic" style="display:none;"></div>
+
+  <!-- 2026-06-04 — Command Center home (Constellation concept).
+       Sibling of #appHome. Populated by command-center.js when
+       app-home.js:maybeRenderAppHome() decides this surface
+       qualifies (not faith-free, not parent-with-kids). Starts
+       empty + display:none so first paint has no flash; the
+       chooser flips display when ready. Faith Well unchanged. -->
+  <div id="appCommandCenter" style="display:none;"></div>
 
   <!-- ════════════════════════════════════════════════════════════
        2026-05-30 — Main App Home simplification.
@@ -15242,10 +15365,19 @@
      calls renderDailyBriefing during finishInit). -->
 <script src="/app/js/daily-briefing.js"></script>
 
+<!-- 2026-06-04 — Command Center home (Constellation concept).
+     Renders into #appCommandCenter for non-faith-free, non-parent-view
+     accounts. Loaded BEFORE app-home.js so the chooser inside
+     maybeRenderAppHome() can detect window.renderCommandCenter and
+     route to it. Faith Well experience untouched. -->
+<script src="/app/js/command-center.js"></script>
+
 <!-- 2026-05-30 — Main App Home simplification. Greeting + 6 destination
      buttons. Routes via showSection() to the existing top-level sections
      (s-habits / s-chores / s-goals / s-finance / s-skills / s-scripture).
-     Loads after daily-briefing.js so its DOM target is in place. -->
+     Loads after daily-briefing.js so its DOM target is in place.
+     2026-06-04 — Chooser now routes to Command Center first; this
+     surface stays as fallback (window._ccDisabled rollback). -->
 <script src="/app/js/app-home.js"></script>
 
 <!-- V1 Rebuild · Faith Tab redesign — Zone 1/2/3 data + render module.
