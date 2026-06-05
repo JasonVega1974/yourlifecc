@@ -13,6 +13,92 @@ function _ylccUserKey(base){
   return base + '_' + uid;
 }
 
+// ── Show-once flag persistence (clobber-resistant + auth-gated) ──
+// cloudLoad() overwrites D[*] with the cloud blob's values every load,
+// and cloudSync is debounced 2s, so a flag set just before refresh can
+// be clobbered before its cloud write fires. Fix:
+//   1) Always dual-write to D[*] AND a per-user localStorage key
+//      (ylcc_<name>_<uid>). The LS key survives cloudLoad.
+//   2) Always read the LS key first; D is the fallback.
+//   3) Defer gate-show decisions until auth has DEFINITIVELY resolved
+//      (getSession returned, or the no-supabase path was taken).
+//      A logged-in user's flag lives under _<uid>; reading before uid
+//      is known silently falls to _local and then to the clobbered D,
+//      both of which can be wrong → gate re-shows.
+//   4) Pending promotions: if _ylccSetFlag is called pre-resolution
+//      (e.g. before sign-up completes), the value lands at _local.
+//      On resolution we copy it to _<uid> so flags survive the
+//      logged-out → logged-in transition.
+let _ylccAuthResolved = false;
+let _ylccPendingFlagPromotions = [];
+let _ylccAuthResolveWaiters = [];
+
+function _ylccSetFlag(name, value){
+  if (typeof D !== 'undefined') D[name] = value;
+  try { localStorage.setItem(_ylccUserKey('ylcc_' + name), JSON.stringify(value)); } catch (e) {}
+  // If we wrote while signed-out, queue a promotion so the value can be
+  // copied to the real _<uid> key after sign-in. Same call also lands
+  // the bytes at ylcc_<name>_local right now via the line above (since
+  // _ylccUserKey returns _local when _supaUser is unset).
+  if (typeof _supaUser === 'undefined' || !_supaUser) {
+    _ylccPendingFlagPromotions.push([name, value]);
+  }
+}
+
+function _ylccGetFlag(name, defaultVal){
+  // Primary: per-user LS key — survives cloudLoad overwrites.
+  try {
+    var raw = localStorage.getItem(_ylccUserKey('ylcc_' + name));
+    if (raw !== null) {
+      try { return JSON.parse(raw); } catch (_) { return raw; }
+    }
+  } catch (e) {}
+  // Pre-resolution-only fallback: a logged-out write would have landed
+  // at _local. Trust it ONLY before auth has resolved; once we know the
+  // uid, the authoritative scope is _<uid> and a missing key means
+  // "really unset for this user."
+  if (!_ylccAuthResolved) {
+    try {
+      var lraw = localStorage.getItem('ylcc_' + name + '_local');
+      if (lraw !== null) {
+        try { return JSON.parse(lraw); } catch (_) { return lraw; }
+      }
+    } catch (e) {}
+  }
+  // Final fallback: D field (clobber-prone, but covers first-load + pre-
+  // migration users whose flag was set before this helper existed).
+  if (typeof D !== 'undefined' && D[name] !== undefined && D[name] !== '' && D[name] !== false) {
+    return D[name];
+  }
+  return defaultVal;
+}
+
+// Marks auth as DEFINITIVELY resolved — getSession() returned (with or
+// without a user) OR the offline / no-supabase path was taken. Drains
+// pending promotions and runs any queued waiters. Idempotent.
+function _ylccMarkAuthResolved(){
+  if (_ylccAuthResolved) return;
+  _ylccAuthResolved = true;
+  if (typeof _supaUser !== 'undefined' && _supaUser && _ylccPendingFlagPromotions.length){
+    _ylccPendingFlagPromotions.forEach(function(pair){
+      try { localStorage.setItem(_ylccUserKey('ylcc_' + pair[0]), JSON.stringify(pair[1])); } catch (e) {}
+    });
+  }
+  _ylccPendingFlagPromotions.length = 0;
+  var waiters = _ylccAuthResolveWaiters.slice();
+  _ylccAuthResolveWaiters.length = 0;
+  waiters.forEach(function(cb){ try { cb(); } catch (e) {} });
+}
+
+// Defer a callback until auth has DEFINITIVELY resolved. Runs
+// immediately if already resolved; otherwise queues until
+// _ylccMarkAuthResolved fires.
+function _ylccOnAuthResolved(cb){
+  if (typeof cb !== 'function') return;
+  if (_ylccAuthResolved) cb();
+  else _ylccAuthResolveWaiters.push(cb);
+}
+
 // Prevents finishInit() running twice on the same page load (e.g. onAuthStateChange
 // SIGNED_IN fires and then authComplete() also calls finishInit). Reset on sign-out
 // so the user can sign back in on the same page.
@@ -186,6 +272,9 @@ async function init(){
           // prevents a second init.
           var _authEl = document.getElementById('authScreen');
           if(_authEl && _authEl.style.display === 'flex'){
+            // _supaUser was set above; mark auth resolved so any deferred
+            // gates targeting this fresh sign-in see the right uid scope.
+            _ylccMarkAuthResolved();
             checkPlanStatus().then(function(blocked){
               if(blocked) return;
               cloudLoad().then(function(loaded){
@@ -210,8 +299,11 @@ async function init(){
     let _gsResult;
     try { _gsResult = await supa.auth.getSession(); } catch(_e){ console.warn('[LifeOS] getSession failed:', _e); }
     const session = _gsResult && _gsResult.data && _gsResult.data.session;
+    if(session && session.user) _supaUser = session.user;
+    // Auth has now definitively resolved (with or without a user). Any
+    // _ylccGetFlag reads from this point forward see the right scope.
+    _ylccMarkAuthResolved();
     if(session && session.user){
-      _supaUser = session.user;
 
       const blocked = await checkPlanStatus();
       if(blocked) return;
@@ -219,7 +311,10 @@ async function init(){
       const loaded = await cloudLoad();
       if(!loaded){ loadData(); setTimeout(cloudSync, 1500); }
       setSyncSt(loaded ? 'cloud' : 'cloud');
-      if(!D.ageBracket && !IS_DEMO && !window._faithFree && _isChildProfileActive()){
+      // Read via _ylccGetFlag — survives cloudLoad's D overwrite (the
+      // per-user LS key is the authoritative source once auth has
+      // resolved, which it has by this point).
+      if(!_ylccGetFlag('ageBracket', '') && !IS_DEMO && !window._faithFree && _isChildProfileActive()){
         showAgePickerModal(function(){
           if(!D.parentPinHash && !D.chorePin && !D.parentPIN){ showFirstTimeGate(); return; }
           finishInit(true);
@@ -233,9 +328,11 @@ async function init(){
       return;
     }
   } else {
+    // No Supabase client — auth is resolved as "no user" immediately.
+    _ylccMarkAuthResolved();
     loadData();
     setSyncSt('local');
-    if(!D.ageBracket && !IS_DEMO && !window._faithFree && _isChildProfileActive()){
+    if(!_ylccGetFlag('ageBracket', '') && !IS_DEMO && !window._faithFree && _isChildProfileActive()){
       showAgePickerModal(function(){
         if(!D.parentPinHash && !D.chorePin && !D.parentPIN){ showFirstTimeGate(); return; }
         finishInit();
@@ -280,7 +377,10 @@ function showAgePickerModal(callback){
 function selectAgeBracket(bracket){
   if(!['12_14','15_17','18_22'].includes(bracket)) return;
   if(typeof D === 'undefined' || !D) return;
-  D.ageBracket = bracket;
+  // Dual-write through _ylccSetFlag — D[name] AND the per-user LS key.
+  // The LS key is what survives cloudLoad's D overwrite when the
+  // user refreshes before the 2s-debounced cloudSync fires.
+  _ylccSetFlag('ageBracket', bracket);
   applyAgeBracketSections(bracket);
   if(typeof save === 'function') save();
   const m = document.getElementById('agePickerModal');
@@ -371,17 +471,20 @@ async function finishInit(cloudReady){
   if(typeof trackSection === 'function') trackSection(_defaultLanding);
   const popupDelay = cloudReady ? 800 : 3500;
   setTimeout(function(){
-    const today = new Date().toISOString().slice(0,10);
-    const faithOn = !(D.settings && D.settings.faithMode===false);
-    const wizardOpen = (document.getElementById('parentOnboard')||{}).classList&&document.getElementById('parentOnboard').classList.contains('open');
-    const kidWizOpen = (document.getElementById('kidOnboard')||{}).classList&&document.getElementById('kidOnboard').classList.contains('open');
-    const alreadyRead = D.scrReadDays && D.scrReadDays[today];
-    const alreadySeen = localStorage.getItem(_ylccUserKey('ylcc_devPopupSeen')) === today || (D.devPopupSeen && D.devPopupSeen === today);
-    if(!IS_DEMO && !window._faithFree && faithOn && !alreadyRead && !alreadySeen && !wizardOpen && !kidWizOpen){
-      showDailyDevModal();
-      try{ localStorage.setItem(_ylccUserKey('ylcc_devPopupSeen'), today); }catch(e){}
-      D.devPopupSeen = today;
-    }
+    // Defer the actual show-decision until auth has resolved — otherwise
+    // _ylccGetFlag's per-user LS read could fall to _local and re-show.
+    _ylccOnAuthResolved(function(){
+      const today = new Date().toISOString().slice(0,10);
+      const faithOn = !(D.settings && D.settings.faithMode===false);
+      const wizardOpen = (document.getElementById('parentOnboard')||{}).classList&&document.getElementById('parentOnboard').classList.contains('open');
+      const kidWizOpen = (document.getElementById('kidOnboard')||{}).classList&&document.getElementById('kidOnboard').classList.contains('open');
+      const alreadyRead = D.scrReadDays && D.scrReadDays[today];
+      const alreadySeen = _ylccGetFlag('devPopupSeen', '') === today;
+      if(!IS_DEMO && !window._faithFree && faithOn && !alreadyRead && !alreadySeen && !wizardOpen && !kidWizOpen){
+        showDailyDevModal();
+        _ylccSetFlag('devPopupSeen', today);
+      }
+    });
   }, popupDelay);
 
   startClock();
