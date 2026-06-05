@@ -30,6 +30,12 @@
 <!-- App stylesheet -->
 <link rel="stylesheet" href="/app/css/app.css">
 
+<!-- Canonical app URL (no www, no /index.html). Marketing pages have
+     their own canonicals; the app shell canonicalizes to /app. -->
+<link rel="canonical" href="https://yourlifecc.com/app">
+<meta property="og:url" content="https://yourlifecc.com/app">
+<meta name="twitter:url" content="https://yourlifecc.com/app">
+
 <!-- PWA manifest -->
 <link rel="manifest" href="/manifest.json">
 
@@ -1082,16 +1088,21 @@
      A layered backdrop (deep sky + 2 nebula washes + starfield)
      sits behind the SVG node graph. The SVG itself drifts on a
      slow float (transform-only). All motion is GPU-friendly. */
+  /* Base fill = page bg so an unpainted constellation never reads as
+     "a darker / black rectangle" sitting on the page. The nebula radial
+     overlays still add the warm + cool space tint on top. The previous
+     linear-gradient ended at #060912 (near-black) which was darker than
+     --bg and caused the load flash. */
   .cc-constellation{
     position:relative;width:100%;height:320px;margin:.4rem 0 1.6rem;
     border-radius:22px;overflow:hidden;
-    background:
+    background-color:var(--bg,#0d1117);
+    background-image:
       radial-gradient(ellipse 80% 55% at 30% 25%, rgba(245,166,35,.10), transparent 60%),
       radial-gradient(ellipse 90% 65% at 70% 75%, rgba(106,167,255,.10), transparent 60%),
-      radial-gradient(ellipse 60% 50% at 50% 50%, rgba(244,123,90,.06), transparent 70%),
-      linear-gradient(165deg, #11142a 0%, #0a0d1f 55%, #060912 100%);
+      radial-gradient(ellipse 60% 50% at 50% 50%, rgba(244,123,90,.06), transparent 70%);
     border:1px solid rgba(255,255,255,.08);
-    box-shadow:inset 0 0 80px rgba(0,0,0,.4);
+    box-shadow:inset 0 0 60px rgba(0,0,0,.25);
   }
   /* Nebula wash 1 — amber/coral, slow drift */
   .cc-constellation::before{
@@ -1127,42 +1138,33 @@
   .cc-constellation__caption span{font-weight:600;}
   @media (min-width:720px){ .cc-constellation{height:380px;} }
 
-  /* ── starfield ──────────────────────────────────────────── */
+  /* ── starfield ──────────────────────────────────────────────
+     Base opacity matches the twinkle keyframe's 0% value so the
+     first paint is the same brightness the animation cycles
+     through — no flash from invisible to visible. */
   .cc-star{
-    fill:#F1E9D5;opacity:0;
+    fill:#F1E9D5;opacity:.18;
     animation:cc-twinkle var(--td,3s) ease-in-out infinite;
     animation-delay:var(--dl,0s);
   }
   @keyframes cc-twinkle{ 0%,100%{opacity:.18;} 50%{opacity:.85;} }
 
   /* ── connection links ───────────────────────────────────────
-     Quiet base lines draw in. Lines with one end at the focus
-     node become "active": fade in and run a continuous dashed
-     flow that points TOWARD the focus (focus end is x1,y1, so
-     stroke-dashoffset → 0 makes dashes travel toward focus). */
+     Lines paint fully drawn from frame 0 (stroke-dashoffset:0).
+     Active links — those touching the focus node — are visible
+     from frame 0 and run a continuous dashed flow toward focus
+     (focus end is x1,y1, so stroke-dashoffset → 0 = inward). */
   .cc-link{
     stroke:rgba(241,233,213,.18);stroke-width:1;fill:none;stroke-linecap:round;
-    stroke-dasharray:300;stroke-dashoffset:300;
-    animation:cc-draw 1.4s ease-out forwards;
+    stroke-dasharray:300;stroke-dashoffset:0;
   }
-  @keyframes cc-draw{ to{stroke-dashoffset:0;} }
   .cc-link--active{
     stroke-width:1.4;stroke-opacity:.55;
     stroke-dasharray:5 11;stroke-dashoffset:0;
-    opacity:0;
-    animation:cc-link-fade 1.4s ease-out forwards, cc-flow 1.8s linear 1.4s infinite;
+    opacity:.7;
+    animation:cc-flow 1.8s linear infinite;
   }
-  @keyframes cc-link-fade{ to{opacity:.7;} }
   @keyframes cc-flow{ from{stroke-dashoffset:16;} to{stroke-dashoffset:0;} }
-  .cc-link:nth-of-type(1){animation-delay:0s;}
-  .cc-link:nth-of-type(2){animation-delay:.12s;}
-  .cc-link:nth-of-type(3){animation-delay:.24s;}
-  .cc-link:nth-of-type(4){animation-delay:.36s;}
-  .cc-link:nth-of-type(5){animation-delay:.48s;}
-  .cc-link:nth-of-type(6){animation-delay:.60s;}
-  .cc-link:nth-of-type(7){animation-delay:.72s;}
-  .cc-link:nth-of-type(8){animation-delay:.84s;}
-  .cc-link:nth-of-type(9){animation-delay:.96s;}
 
   /* ── nodes: layered breathing orbs ──────────────────────────
      Three concentric circles per node:
@@ -1185,14 +1187,10 @@
   @keyframes cc-drift-5{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(5px,2px);} }
   @keyframes cc-drift-6{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(-3px,-6px);} }
 
-  .cc-orb{transform-origin:center;transform-box:fill-box;opacity:0;animation:cc-orb-in .5s ease-out forwards;}
-  @keyframes cc-orb-in{ from{opacity:0;transform:scale(.85);} to{opacity:1;transform:scale(1);} }
-  .cc-orb--1{animation-delay:1.2s;}
-  .cc-orb--2{animation-delay:1.35s;}
-  .cc-orb--3{animation-delay:1.5s;}
-  .cc-orb--4{animation-delay:1.65s;}
-  .cc-orb--5{animation-delay:1.8s;}
-  .cc-orb--6{animation-delay:1.95s;}
+  /* Orbs are fully visible on the first frame — the resting state.
+     Ambient life comes from .cc-orb__halo (cc-orb-breath) and the
+     parent .cc-drift wrapper, layered on top of the static orb. */
+  .cc-orb{transform-origin:center;transform-box:fill-box;opacity:1;}
 
   .cc-orb__halo{
     transform-origin:center;transform-box:fill-box;
