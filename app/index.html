@@ -5578,14 +5578,23 @@
     </div>
   </div>
 
-  <!-- ── PANEL: Chore Store ────────────────────────────────────── -->
+  <!-- ── PANEL: Chore Store — unified Parent Bucks store (Tab 1 Inc 3) -->
   <div id="ch-store" class="ch-panel" style="display:none;">
-    <div id="choreRewardsShop">
-      <div style="font-family:var(--fh);font-size:.7rem;letter-spacing:1.5px;color:#fbbf24;margin-bottom:.6rem;">🎁 REWARDS SHOP</div>
-      <div id="rewardShopList" style="margin-bottom:1rem;"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.6rem;flex-wrap:wrap;">
+      <div style="font-family:var(--fh);font-size:.7rem;letter-spacing:1.5px;color:#fbbf24;">🪙 PARENT BUCKS STORE</div>
+      <button class="btn bgh bs" onclick="showSection('s-rewards')" style="font-size:.6rem;padding:.2rem .5rem;" title="Spinner + scratch tickets + full PB log">Rewards Hub →</button>
     </div>
-    <div class="ch-panel-stub" style="margin-top:.8rem;">Parent Bucks store consolidation lands in the next update. For now this view shows the kid-points reward shop. Visit <button class="btn bgh bs" onclick="showSection('s-rewards')" style="font-size:.65rem;padding:.2rem .55rem;">🪙 Parent Bucks Store</button> for the spinner, scratch tickets, and PB items.</div>
+    <!-- Populated by renderParentBucks() in email.js — also the source
+         of truth for #pbStoreItems in s-rewards (same item markup). -->
+    <div id="choreStoreItems" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.4rem;"></div>
   </div>
+
+  <!-- Hidden file picker for chore photo proof (Tab 1 Inc 3). Routed
+       from chorePhotoPick(id) which stashes the pending chore id, then
+       chorePhotoOnChange(input) reads the selected file and routes to
+       markChoreDone(id, file). capture=environment prefers rear camera
+       on mobile but allows gallery selection too. -->
+  <input type="file" id="chorePhotoInput" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" capture="environment" style="display:none;" onchange="chorePhotoOnChange(this)">
 
   <!-- ── PANEL: Leaderboard (Increment 4 will populate) ────────── -->
   <div id="ch-leaderboard" class="ch-panel" style="display:none;">
