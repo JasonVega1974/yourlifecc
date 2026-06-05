@@ -264,7 +264,10 @@ async function _mirrorChoresToCloud(supa, userId){
         profile_id:     activeProfile,
         completed_date: l.date,
         status:         l.status,
-        points_awarded: (l.status === 'verified' && Number.isFinite(+l.pts)) ? +l.pts : 0
+        points_awarded: (l.status === 'verified' && Number.isFinite(+l.pts)) ? +l.pts : 0,
+        // Tab 1 Inc 3 — storage path under chore-proofs bucket. Null
+        // when no photo was attached; never a public URL.
+        photo_url:      l.photoPath || null
       }))
       .filter(r => existingIds.has(r.chore_id));
 
