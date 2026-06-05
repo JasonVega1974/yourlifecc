@@ -1412,6 +1412,22 @@ function renderMonthlyChallenge(){
 let _profiles = [];
 let _activeProfileId = null;
 
+// Phase 2 IA — Parent Hub 7-card model. Active sub-tab per multi-panel
+// card. Defaults match the "first sub-panel" mental model for each:
+// Activity opens to Schedule (forward planning), Reports opens to
+// Summary (the overview), Family opens to Profiles (who's here).
+let _activePhSub = { activity: 'schedule', reports: 'summary', family: 'profiles' };
+
+// Phase 2 IA — Legacy 4-tab bar (Activity / Rewards / Controls /
+// Reports) is hidden by default. Flip via
+// `window._ylccHubLegacyTabs = true; phNav('home');` from devtools
+// to expose the old top-bar surface for rollback / parallel testing.
+// The buttons stay in DOM either way so any deep code calling
+// phNav('activity') etc. still routes via TAB_ALIASES.
+if (typeof window !== 'undefined' && typeof window._ylccHubLegacyTabs === 'undefined'){
+  window._ylccHubLegacyTabs = false;
+}
+
 function initProfiles(){
   try {
     _profiles = JSON.parse(localStorage.getItem('ylcc_profiles')||'[]');
@@ -2680,40 +2696,151 @@ function renderParentHubHome(){
       }).join('');
     }
   }
+
+  // Phase 2 IA — 7-card grid (replaces the 4 fixed Quick Action tiles).
+  if(typeof renderPhCardGrid === 'function') renderPhCardGrid();
 }
 
 
 function phNav(tab){
-  // Phase 2.4 — 4-tab pivot. Legacy panel names alias to the 4 new tabs.
-  // home + referral are reachable but don't surface as tab buttons.
+  // Phase 2 IA — 7-card model. Legacy panel ids alias to the 7 card
+  // slots (chores / rewards / contests / activity / reports / family /
+  // controls). Old 4-tab keys (activity / rewards / controls / reports)
+  // are kept as valid slot names so any deep code calling them still
+  // routes; the actual 4-button visible bar is hidden by default
+  // behind window._ylccHubLegacyTabs.
   const TAB_ALIASES = {
-    home:'home', activity:'activity', rewards:'rewards', controls:'controls', reports:'reports', referral:'referral',
-    // legacy → new tab
-    users:'controls', learning:'controls', growth:'controls',
-    overview:'reports', quizzes:'reports', progress:'reports',
-    chores:'rewards', contests:'rewards',
-    behavior:'activity', schedule:'activity',
+    home:'home',
+    // 7 cards (direct routes)
+    chores:'chores', rewards:'rewards', contests:'contests',
+    activity:'activity', reports:'reports', family:'family', controls:'controls',
+    // legacy panel ids → card slot
+    users:'family', referral:'family', learning:'family', growth:'family',
+    overview:'reports', quizzes:'reports', progress:'reports', 'faith-report':'reports',
+    schedule:'activity', behavior:'activity',
+  };
+  // If a legacy id maps to a multi-panel card, remember which
+  // sub-panel to land on so phNav('overview') still lands on the
+  // Summary sub-tab even after the routing collapses to 'reports'.
+  const SUB_ALIASES = {
+    overview:'summary', quizzes:'quizzes', progress:'progress', 'faith-report':'faith',
+    schedule:'schedule', behavior:'behavior',
+    users:'profiles', referral:'referral', learning:'learning', growth:'growth',
   };
   const t = TAB_ALIASES[tab] || tab;
+  if(SUB_ALIASES[tab] && _activePhSub[t] !== undefined){
+    _activePhSub[t] = SUB_ALIASES[tab];
+  }
 
   // Show every panel whose data-ph-tab matches t; hide the rest.
   document.querySelectorAll('[data-ph-tab]').forEach(el => {
     el.style.display = (el.getAttribute('data-ph-tab') === t) ? 'block' : 'none';
   });
 
-  // Update tab bar active state (only the 4 real tabs have visible buttons).
+  // Multi-panel card sub-tab handling: keep only the active sub-panel
+  // visible inside this card; the sub-nav stays visible alongside.
+  if(_activePhSub[t] !== undefined){
+    const sub = _activePhSub[t];
+    document.querySelectorAll('[data-ph-tab="' + t + '"][data-ph-sub]').forEach(el => {
+      el.style.display = (el.getAttribute('data-ph-sub') === sub) ? 'block' : 'none';
+    });
+    const navEl = document.getElementById('phSubNav_' + t);
+    if(navEl){
+      navEl.querySelectorAll('.ph-subtab').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-sub') === sub);
+      });
+    }
+  }
+
+  // Legacy 4-tab bar visibility — kept wired for rollback. Hidden by
+  // default. Active-state still toggled in case a parent enables the
+  // flag mid-session.
+  const legacyBar = document.getElementById('phLegacyTabsBar');
+  if(legacyBar) legacyBar.style.display = window._ylccHubLegacyTabs ? '' : 'none';
   ['activity','rewards','controls','reports'].forEach(name => {
     const btn = document.getElementById('phn-' + name);
     if(btn) btn.classList.toggle('active', name === t);
   });
 
-  // Fire renders for the resolved tab. Consolidates the legacy 15-case switch.
+  // Fire renders for the resolved card. One render set per card so
+  // hidden panels don't get their renderers fired needlessly.
   if(t === 'home')     { renderParentHubHome(); }
-  if(t === 'activity') { renderParentActivityAudit(); renderParentActivityFeed(); renderBehaviorLog(); renderGradeMonitor(); renderParentNotes(); initPhSchedPanel(); }
-  if(t === 'rewards')  { renderPhRewards(); renderParentChoreList(); renderParentSelfChores(); renderParentDeeds(); renderPhPendingChores(); renderParentLeaderboard(); renderParentContests(); renderParentFamilyRewards(); }
-  if(t === 'controls') { renderManageUsers(); renderParentScreenControls(); renderParentEarningsControls(); renderParentBucksControls(); renderIncentives(); renderParentChoreList(); if(typeof updateIncConditions==='function') updateIncConditions(); renderParentLessons(); if(typeof renderParentGrowth==='function') renderParentGrowth(); if(typeof renderParentGrowthHistory==='function') renderParentGrowthHistory(); }
+  if(t === 'chores')   { renderPhPendingChores(); renderParentChoreList(); renderParentSelfChores(); renderParentDeeds(); }
+  if(t === 'rewards')  { renderPhRewards(); }
+  if(t === 'contests') { renderParentLeaderboard(); renderParentContests(); renderParentFamilyRewards(); }
+  if(t === 'activity') { initPhSchedPanel(); renderParentActivityAudit(); renderParentActivityFeed(); renderBehaviorLog(); renderGradeMonitor(); renderParentNotes(); }
   if(t === 'reports')  { renderParentGettingStarted(); renderParentMultiChild(); renderParentScore(); renderParentOverview(); renderWeeklyReportCard(); renderCompletionSummary(); renderSentQuizzes(); renderProgressReportsTab(); renderParentFaithReport(); }
-  if(t === 'referral') { renderPhReferral(); }
+  if(t === 'family')   { renderManageUsers(); renderParentLessons(); if(typeof renderParentGrowth==='function') renderParentGrowth(); if(typeof renderParentGrowthHistory==='function') renderParentGrowthHistory(); renderPhReferral(); }
+  if(t === 'controls') { renderParentScreenControls(); renderParentEarningsControls(); renderParentBucksControls(); renderIncentives(); if(typeof updateIncConditions==='function') updateIncConditions(); }
+}
+
+// Phase 2 IA — switch sub-tab within a multi-panel card. Updates the
+// active-sub map, hides/shows the right sub-panel, and updates the
+// sub-nav button active state. Used by the Activity / Reports /
+// Family card sub-nav bars.
+function phSubNav(card, sub){
+  if(_activePhSub[card] === undefined) return;
+  _activePhSub[card] = sub;
+  document.querySelectorAll('[data-ph-tab="' + card + '"][data-ph-sub]').forEach(el => {
+    el.style.display = (el.getAttribute('data-ph-sub') === sub) ? 'block' : 'none';
+  });
+  const navEl = document.getElementById('phSubNav_' + card);
+  if(navEl){
+    navEl.querySelectorAll('.ph-subtab').forEach(b => {
+      b.classList.toggle('active', b.getAttribute('data-sub') === sub);
+    });
+  }
+}
+
+// Phase 2 IA — Parent Hub landing card grid. Paints the 7 top-level
+// cards inside #phCardGrid with live badges sourced from existing
+// D.* arrays. Render-only — does not write any state, does not fire
+// any API. Reports & Family cards intentionally carry no auto-firing
+// AI summaries.
+function renderPhCardGrid(){
+  const grid = document.getElementById('phCardGrid');
+  if(!grid) return;
+
+  // Cross-profile pending approval count — same source the
+  // approval strip uses, so the chip number matches.
+  const pendChore = (typeof _phPendingApprovalCount === 'function') ? _phPendingApprovalCount() : 0;
+  const pendSelf  = (Array.isArray(D.selfChores)   ? D.selfChores   : []).filter(c => c && c.status === 'pending').length;
+  const pendDeed  = (Array.isArray(D.helpfulDeeds) ? D.helpfulDeeds : []).filter(d => d && d.status === 'pending').length;
+  const pendTotal = pendChore + pendSelf + pendDeed;
+
+  const pbBal = (D.pb && typeof D.pb.balance === 'number') ? D.pb.balance : 0;
+
+  const contestsActive = (Array.isArray(D.customContests) ? D.customContests : [])
+    .filter(c => c && !c.endedAt && (!c.deadline || c.deadline >= new Date().toISOString().slice(0,10)))
+    .length;
+
+  const todayISO = new Date().toISOString().slice(0,10);
+  const activityToday =
+    (Array.isArray(D.choreLog)     ? D.choreLog     : []).filter(l => l && (l.date||'') === todayISO).length +
+    (Array.isArray(D.behaviorLog)  ? D.behaviorLog  : []).filter(l => l && (l.date||'').slice(0,10) === todayISO).length;
+
+  const childCount = (Array.isArray(_profiles) ? _profiles : []).filter(p => p && !p.isParent).length;
+
+  const cards = [
+    {slot:'chores',   icon:'✅',     label:'Chores & Approvals',     sub:'Verify · assign · history',         badge: pendTotal       > 0 ? pendTotal + ' pending'       : ''},
+    {slot:'rewards',  icon:'🪙',     label:'Rewards Store & Bucks',  sub:'Award · deduct · store',            badge: pbBal           > 0 ? pbBal + ' PB balance'        : ''},
+    {slot:'contests', icon:'🏆',     label:'Contests & Family Goals',sub:'Leaderboard · MVP · contests',      badge: contestsActive  > 0 ? contestsActive + ' active'   : ''},
+    {slot:'activity', icon:'📅',     label:'Activity & Schedule',    sub:'Schedule · log · behavior',         badge: activityToday   > 0 ? activityToday + ' today'     : ''},
+    {slot:'reports',  icon:'📈',     label:'Reports & Progress',     sub:'AI summaries · quizzes · faith',    badge: ''},
+    {slot:'family',   icon:'👨‍👩‍👧',label:'Family & Profiles',      sub:'Kids · learning · refer',           badge: childCount      > 0 ? childCount + ' kid' + (childCount>1?'s':'') : ''},
+    {slot:'controls', icon:'⚙️',    label:'Controls & Limits',      sub:'Screen · earnings · access',        badge: ''}
+  ];
+
+  const esc = (typeof _phEscape === 'function') ? _phEscape : function(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); };
+
+  grid.innerHTML = cards.map(c =>
+    '<button type="button" class="phHomeAction ph-card" data-ph-card="' + c.slot + '" onclick="phNav(\'' + c.slot + '\')">' +
+      '<div class="phaIc ph-card-icon">' + c.icon + '</div>' +
+      '<div class="phaLb ph-card-label">' + esc(c.label) + '</div>' +
+      '<div class="phaSb ph-card-sub">'  + esc(c.sub)   + '</div>' +
+      (c.badge ? '<div class="ph-card-badge">' + esc(c.badge) + '</div>' : '') +
+    '</button>'
+  ).join('');
 }
 
 // ── PARENT HUB TABS ──────────────────────────────────────────
