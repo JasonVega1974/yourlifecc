@@ -258,7 +258,24 @@ function verifyChore(logId, approved){
     } else {
       showToast(`+${entry.pts} PB verified ✓ 🪙`);
     }
-    if(typeof launchSideConfetti === 'function') launchSideConfetti();
+    // Tab 1 design pass — faith-style multi-layer celebration. screenFlash
+    // first (always — sub-200ms; reduced-motion guarded internally), then
+    // the bigger confetti burst on the every-3rd-verify spin-earn moment
+    // and a streak banner when the chore streak crosses a 3/7/14/30/50/100
+    // day milestone. No logic change — chore points / PB / spin tickets
+    // are all awarded by the path above; this is presentation only.
+    if(typeof screenFlash === 'function') screenFlash('#22c55e', 220);
+    if(totalVerified % 3 === 0 && typeof launchBigConfetti === 'function'){
+      launchBigConfetti();
+    } else if(typeof launchSideConfetti === 'function'){
+      launchSideConfetti();
+    }
+    if(typeof getChoreStreak === 'function' && typeof streakMilestoneBanner === 'function'){
+      const newStreak = getChoreStreak();
+      if([3,7,14,30,50,100].indexOf(newStreak) !== -1){
+        setTimeout(()=>streakMilestoneBanner(newStreak), 350);
+      }
+    }
   } else {
     entry.status='rejected';
     showToast('Chore rejected');
@@ -409,7 +426,7 @@ function renderChores(){
         </div>`;
       };
       const renderCol = (key, label, dotColor, emptyMsg) => `
-        <div class="ch-col">
+        <div class="ch-col ch-col-${key}">
           <div class="ch-col-h"><span class="ch-col-dot" style="background:${dotColor};"></span>${label}<span class="ch-col-n">${buckets[key].length}</span></div>
           ${buckets[key].length ? buckets[key].map(renderCard).join('') : `<div class="ch-col-empty">${emptyMsg}</div>`}
         </div>`;
