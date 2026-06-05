@@ -3137,6 +3137,22 @@ function rejectSelfChore(id){
 }
 
 // ── PARENT CHORE MANAGER ─────────────────────────────────────
+// Tab 1 design pass — progressive disclosure for the Add Chore form.
+// Opener button reveals; Done button collapses. Stays open across
+// multiple sequential adds so the parent can add several chores
+// in a row without re-tapping the opener each time.
+function phChoreFormToggle(open){
+  const area = document.getElementById('choreSetupArea');
+  const btn  = document.getElementById('phChoreAddBtn');
+  if(!area || !btn) return;
+  area.style.display = open ? 'block' : 'none';
+  btn.style.display  = open ? 'none'  : 'inline-block';
+  if(open){
+    const nameInput = document.getElementById('newChoreName');
+    if(nameInput) setTimeout(()=>nameInput.focus(), 50);
+  }
+}
+
 function addChoreFromParent(){
   const name = (document.getElementById('newChoreName')||{}).value.trim();
   const pts = parseInt((document.getElementById('newChorePoints')||{}).value)||10;
