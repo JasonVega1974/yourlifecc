@@ -13708,9 +13708,12 @@
         <a href="javascript:void(0)" onclick="phNav('home')" id="phn-home-link">🏡 ← Hub Home</a>
       </div>
 
-      <!-- Phase 2.4 — 4-tab bar. Home is default landing (no tab button).
-           Referral is reachable via direct phNav('referral') only (no UI surface). -->
-      <div class="ph-tab-bar">
+      <!-- Phase 2 IA — Legacy 4-tab bar hidden by default. Kept in
+           DOM as a rollback path; flip `window._ylccHubLegacyTabs =
+           true; phNav('home');` from devtools to surface it again.
+           parent.js phNav still toggles active class on these buttons
+           in case the flag is on. -->
+      <div class="ph-tab-bar" id="phLegacyTabsBar" style="display:none;">
         <button onclick="phNav('activity')" class="ph-tab" id="phn-activity">📊 Activity</button>
         <button onclick="phNav('rewards')" class="ph-tab" id="phn-rewards">🪙 Rewards <span id="phChoreNavBadge" style="display:none;background:#fbbf24;color:#1a1a2e;font-size:.55rem;font-weight:900;padding:.1rem .35rem;border-radius:8px;margin-left:.2rem;"></span></button>
         <button onclick="phNav('controls')" class="ph-tab" id="phn-controls">⚙️ Controls</button>
@@ -13735,18 +13738,61 @@
           <!-- Per-kid summary cards -->
           <div id="phKidCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-bottom:16px;"></div>
 
-          <!-- Quick actions — 4 buckets that cover the daily 80% -->
-          <div style="font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:#64748b;margin-bottom:8px;font-weight:800;">Quick actions</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;">
-            <div onclick="phNav('chores')" class="phHomeAction"><div class="phaIc">✅</div><div class="phaLb">Chores &amp; deeds</div><div class="phaSb">Assign · approve · history</div></div>
-            <div onclick="phNav('rewards')" class="phHomeAction"><div class="phaIc">🪙</div><div class="phaLb">Rewards</div><div class="phaSb">Bucks · shop · spins</div></div>
-            <div onclick="phNav('schedule')" class="phHomeAction"><div class="phaIc">📅</div><div class="phaLb">Schedule</div><div class="phaSb">This week · contests · quizzes</div></div>
-            <div onclick="phNav('progress')" class="phHomeAction"><div class="phaIc">📈</div><div class="phaLb">Reports</div><div class="phaSb">Behavior · grades · activity</div></div>
-          </div>
+          <!-- Phase 2 IA — 7-card grid (replaces the 4 fixed Quick
+               Action tiles). Painted by renderPhCardGrid() in parent.js
+               with live badges sourced from existing D.* arrays.
+               Reuses .phHomeAction base styling; .ph-card extends for
+               badges + slightly richer typography. -->
+          <div style="font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:#64748b;margin-bottom:8px;font-weight:800;">Hub</div>
+          <div id="phCardGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;"></div>
+        </div>
+
+        <!-- Phase 2 IA — Sub-tab nav for multi-panel cards. Only the
+             active card's sub-nav shows (via data-ph-tab match). All
+             three live here as siblings so they appear at the top of
+             their respective focused views. -->
+        <style>
+          /* Card grid badges + sub-nav styling — scoped to #s-parent */
+          #s-parent .ph-card{position:relative;text-align:left;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px 16px;cursor:pointer;font-family:var(--fn);color:var(--tx);transition:transform .15s, border-color .15s, box-shadow .15s;-webkit-tap-highlight-color:transparent;}
+          #s-parent .ph-card:hover{transform:translateY(-2px);border-color:rgba(56,189,248,.4);box-shadow:0 8px 20px rgba(56,189,248,.10);}
+          #s-parent .ph-card .ph-card-icon{font-size:1.3rem;margin-bottom:6px;line-height:1;}
+          #s-parent .ph-card .ph-card-label{font-size:.86rem;font-weight:800;letter-spacing:.01em;}
+          #s-parent .ph-card .ph-card-sub{font-size:.68rem;color:var(--tx2);margin-top:3px;font-weight:600;}
+          #s-parent .ph-card-badge{position:absolute;top:10px;right:10px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a1233;font-size:.58rem;font-weight:900;letter-spacing:.4px;padding:.18rem .45rem;border-radius:999px;box-shadow:0 4px 10px rgba(245,158,11,.25);}
+          :root.light #s-parent .ph-card{background:#ffffff;border-color:rgba(15,23,42,.08);}
+          :root.light #s-parent .ph-card:hover{border-color:rgba(56,189,248,.45);box-shadow:0 6px 16px rgba(15,23,42,.08);}
+          /* Sub-nav bar inside multi-panel cards */
+          #s-parent .ph-subnav{display:flex;flex-wrap:wrap;gap:.35rem;padding:.55rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;margin-bottom:.9rem;}
+          #s-parent .ph-subtab{flex:0 1 auto;background:transparent;border:1px solid rgba(255,255,255,.08);color:var(--tx2);font-size:.7rem;font-weight:700;font-family:var(--fn);letter-spacing:.4px;padding:.4rem .8rem;border-radius:999px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+          #s-parent .ph-subtab:hover{background:rgba(255,255,255,.05);color:var(--tx);}
+          #s-parent .ph-subtab.active{background:linear-gradient(135deg,#22c55e,#a78bfa);color:#0a1f5e;border-color:transparent;box-shadow:0 4px 12px rgba(34,197,94,.22);}
+          :root.light #s-parent .ph-subnav{background:#f8fafc;border-color:rgba(15,23,42,.08);}
+          :root.light #s-parent .ph-subtab{background:#ffffff;border-color:rgba(15,23,42,.10);color:#4a4b52;}
+          :root.light #s-parent .ph-subtab.active{background:linear-gradient(135deg,#22c55e,#a78bfa);color:#0a1f5e;}
+          @media (prefers-reduced-motion: reduce){
+            #s-parent .ph-card, #s-parent .ph-subtab{transition:none!important;}
+          }
+        </style>
+        <div class="ph-subnav" id="phSubNav_activity" data-ph-tab="activity" style="display:none;" role="tablist" aria-label="Activity sub-tabs">
+          <button type="button" class="ph-subtab active" data-sub="schedule" onclick="phSubNav('activity','schedule')">📅 Schedule</button>
+          <button type="button" class="ph-subtab" data-sub="audit" onclick="phSubNav('activity','audit')">📊 Activity log</button>
+          <button type="button" class="ph-subtab" data-sub="behavior" onclick="phSubNav('activity','behavior')">📋 Behavior &amp; grades</button>
+        </div>
+        <div class="ph-subnav" id="phSubNav_reports" data-ph-tab="reports" style="display:none;" role="tablist" aria-label="Reports sub-tabs">
+          <button type="button" class="ph-subtab active" data-sub="summary" onclick="phSubNav('reports','summary')">📋 Summary</button>
+          <button type="button" class="ph-subtab" data-sub="quizzes" onclick="phSubNav('reports','quizzes')">📝 Quizzes</button>
+          <button type="button" class="ph-subtab" data-sub="progress" onclick="phSubNav('reports','progress')">📈 AI progress</button>
+          <button type="button" class="ph-subtab" data-sub="faith" onclick="phSubNav('reports','faith')">✝️ Faith</button>
+        </div>
+        <div class="ph-subnav" id="phSubNav_family" data-ph-tab="family" style="display:none;" role="tablist" aria-label="Family sub-tabs">
+          <button type="button" class="ph-subtab active" data-sub="profiles" onclick="phSubNav('family','profiles')">👥 Profiles</button>
+          <button type="button" class="ph-subtab" data-sub="growth" onclick="phSubNav('family','growth')">🌱 My growth</button>
+          <button type="button" class="ph-subtab" data-sub="learning" onclick="phSubNav('family','learning')">📚 Learning</button>
+          <button type="button" class="ph-subtab" data-sub="referral" onclick="phSubNav('family','referral')">🎁 Refer</button>
         </div>
 
         <!-- MANAGE USERS -->
-        <div id="ph-users" data-ph-tab="controls" style="display:none;">
+        <div id="ph-users" data-ph-tab="family" data-ph-sub="profiles" style="display:none;">
           <div style="font-size:.85rem;font-weight:800;color:#e0e0e0;margin-bottom:.8rem;display:flex;align-items:center;gap:.4rem;">👥 Manage Users</div>
 
           <!-- CURRENT USERS LIST -->
@@ -13805,7 +13851,7 @@
         </div>
 
         <!-- OVERVIEW -->
-        <div id="ph-overview" data-ph-tab="reports" style="display:none;">
+        <div id="ph-overview" data-ph-tab="reports" data-ph-sub="summary" style="display:none;">
           <div id="parentGettingStarted"></div>
           <div id="parentMultiChildView" style="margin-bottom:.8rem;"></div>
           <!-- LIFE SCORE -->
@@ -13988,7 +14034,7 @@
         </div><!-- end ph-rewards -->
 
         <!-- CHORES & DEEDS -->
-        <div id="ph-chores" data-ph-tab="rewards" style="display:none;">
+        <div id="ph-chores" data-ph-tab="chores" style="display:none;">
 
           <!-- Tab 1 design pass — chores hub header. Anchors the section
                so the parent immediately knows this surface is for chore
@@ -14137,7 +14183,7 @@
         </div>
 
         <!-- SCHEDULE -->
-        <div id="ph-schedule" data-ph-tab="activity" style="display:none;">
+        <div id="ph-schedule" data-ph-tab="activity" data-ph-sub="schedule" style="display:none;">
           <div style="font-size:.85rem;font-weight:800;color:#e0e0e0;margin-bottom:.8rem;display:flex;align-items:center;gap:.4rem;">📅 Schedule Planner</div>
 
           <!-- Child selector for schedule -->
@@ -14166,7 +14212,7 @@
         </div>
 
         <!-- CONTESTS -->
-        <div id="ph-contests" data-ph-tab="rewards" style="display:none;">
+        <div id="ph-contests" data-ph-tab="contests" style="display:none;">
           <div style="background:rgba(251,191,36,.03);border:1px solid rgba(251,191,36,.1);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
             <div style="font-size:.85rem;font-weight:700;margin-bottom:.2rem;">🏆 Contests & Competition</div>
             <div style="font-size:.7rem;color:var(--tx2);margin-bottom:.6rem;">Create custom contests, set targets, and see who's winning.</div>
@@ -14209,7 +14255,7 @@
         </div>
 
         <!-- QUIZZES -->
-        <div id="ph-quizzes" data-ph-tab="reports" style="display:none;">
+        <div id="ph-quizzes" data-ph-tab="reports" data-ph-sub="quizzes" style="display:none;">
           <div style="background:rgba(139,92,246,.03);border:1px solid rgba(139,92,246,.1);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
             <div style="font-size:.85rem;font-weight:700;margin-bottom:.4rem;">📝 Send Quiz to Your Child</div>
             <div id="pqCompletionSummary" style="margin-bottom:.5rem;"></div>
@@ -14283,7 +14329,7 @@
         </div>
 
         <!-- BEHAVIOR & GRADES -->
-        <div id="ph-behavior" data-ph-tab="activity" style="display:none;">
+        <div id="ph-behavior" data-ph-tab="activity" data-ph-sub="behavior" style="display:none;">
           <!-- Behavior Log -->
           <div style="background:rgba(239,68,68,.03);border:1px solid rgba(239,68,68,.1);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
             <div style="font-size:.85rem;font-weight:700;margin-bottom:.3rem;">📋 Behavior Log</div>
@@ -14313,7 +14359,7 @@
         </div>
 
         <!-- ACTIVITY LOG -->
-        <div id="ph-activity" data-ph-tab="activity" style="display:none;">
+        <div id="ph-activity" data-ph-tab="activity" data-ph-sub="audit" style="display:none;">
           <div style="font-size:.85rem;font-weight:700;margin-bottom:.5rem;">📊 Activity Audit Trail</div>
           <div id="parentActivityAudit" style="max-height:300px;overflow-y:auto;margin-bottom:1rem;"></div>
           <div style="font-size:.85rem;font-weight:700;margin-bottom:.5rem;">📊 Detailed Activity Feed</div>
@@ -14321,7 +14367,7 @@
         </div>
 
         <!-- PARENT LEARNING -->
-        <div id="ph-learning" data-ph-tab="controls" style="display:none;">
+        <div id="ph-learning" data-ph-tab="family" data-ph-sub="learning" style="display:none;">
           <div style="background:linear-gradient(135deg,rgba(96,165,250,.06),rgba(167,139,250,.04));border:1px solid rgba(96,165,250,.12);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
             <div style="font-size:1rem;font-weight:700;margin-bottom:.3rem;">📚 You're Learning Too</div>
             <div style="font-size:.8rem;color:var(--tx2);line-height:1.7;">Great parenting isn't something you're born with — it's something you build. Read one lesson a week and watch how your home transforms.</div>
@@ -14333,7 +14379,7 @@
         </div>
 
         <!-- MY GROWTH -->
-        <div id="ph-growth" data-ph-tab="controls" style="display:none;">
+        <div id="ph-growth" data-ph-tab="family" data-ph-sub="growth" style="display:none;">
           <div style="background:linear-gradient(135deg,rgba(34,197,94,.06),rgba(56,189,248,.04));border:1px solid rgba(34,197,94,.12);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
             <div style="font-size:1rem;font-weight:700;margin-bottom:.3rem;">🌱 How Am I Doing This Week?</div>
             <div style="font-size:.75rem;color:var(--tx2);margin-bottom:.6rem;">Rate yourself honestly on each area (1-5). Track your growth over time.</div>
@@ -14346,7 +14392,7 @@
         </div>
 
         <!-- PROGRESS REPORTS -->
-        <div id="ph-progress" data-ph-tab="reports" style="display:none;">
+        <div id="ph-progress" data-ph-tab="reports" data-ph-sub="progress" style="display:none;">
           <div style="background:linear-gradient(135deg,rgba(56,189,248,.07),rgba(167,139,250,.05));border:1px solid rgba(56,189,248,.15);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem;margin-bottom:.5rem;">
               <div>
@@ -14369,7 +14415,7 @@
         </div>
 
         <!-- FAITH REPORT (Phase 3B) -->
-        <div id="ph-faith-report" data-ph-tab="reports" style="display:none;">
+        <div id="ph-faith-report" data-ph-tab="reports" data-ph-sub="faith" style="display:none;">
           <div style="background:linear-gradient(135deg,rgba(251,191,36,.07),rgba(167,139,250,.05));border:1px solid rgba(251,191,36,.15);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem;margin-bottom:.5rem;">
               <div>
@@ -14385,7 +14431,7 @@
         </div>
 
         <!-- REFER & EARN -->
-        <div id="ph-referral" data-ph-tab="referral" style="display:none;">
+        <div id="ph-referral" data-ph-tab="family" data-ph-sub="referral" style="display:none;">
           <div id="phReferralInner"></div>
         </div>
 
