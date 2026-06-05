@@ -68,6 +68,15 @@ function _ylccGetFlag(name, defaultVal){
   // Final fallback: D field (clobber-prone, but covers first-load + pre-
   // migration users whose flag was set before this helper existed).
   if (typeof D !== 'undefined' && D[name] !== undefined && D[name] !== '' && D[name] !== false) {
+    // Lazy backfill — pre-v243 users have D[name] but no LS key, so
+    // the next cloudLoad-D-clobber would lose the flag again. Write
+    // the LS key now using the same _ylccUserKey scope as fresh sets.
+    // Auth-gated so we only land under _<uid> (not _local) for
+    // logged-in users; genuine-value gated by the surrounding if so
+    // we never backfill an empty/false/undefined.
+    if (_ylccAuthResolved) {
+      try { localStorage.setItem(_ylccUserKey('ylcc_' + name), JSON.stringify(D[name])); } catch (e) {}
+    }
     return D[name];
   }
   return defaultVal;
