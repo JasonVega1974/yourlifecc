@@ -560,14 +560,13 @@ function renderParentBucks(){
   const dcPB = document.getElementById('dcPBStatus');
   if(dcPB){ dcPB.style.background = bal > 0 ? '#22c55e' : 'rgba(255,255,255,.1)'; }
 
-  // Store items
-  const store = document.getElementById('pbStoreItems'); 
-  if(store){
-    const items = D.pb.storeItems||[];
-    if(!items.length){
-      store.innerHTML = '<div style="font-size:.65rem;color:var(--tx3);grid-column:1/-1;text-align:center;padding:.5rem;">Parent adds store items in Parent Hub</div>';
-    } else {
-      store.innerHTML = items.map(it=>`
+  // Store items — render into both #pbStoreItems (s-rewards) and
+  // #choreStoreItems (Tab 1 Inc 3 — #ch-store now points at the
+  // unified Parent Bucks store). Same item markup, two mount points.
+  const items = D.pb.storeItems||[];
+  const itemsHtml = !items.length
+    ? '<div style="font-size:.65rem;color:var(--tx3);grid-column:1/-1;text-align:center;padding:.5rem;">Parent adds store items in Parent Hub</div>'
+    : items.map(it=>`
         <div style="background:rgba(255,255,255,.03);border:1px solid rgba(251,191,36,.1);border-radius:8px;padding:.5rem;text-align:center;">
           <div style="font-size:1rem;">${it.emoji||'🎁'}</div>
           <div style="font-size:.65rem;font-weight:700;margin:.15rem 0;">${escapeHtml(it.name)}</div>
@@ -575,8 +574,10 @@ function renderParentBucks(){
           <button class="btn bp bs" onclick="spendPB(${it.cost},'${escJsAttr(it.name)}')" style="font-size:.5rem;margin-top:.2rem;padding:.15rem .4rem;${D.pb.balance>=it.cost?'':'opacity:.4;pointer-events:none;'}">Redeem</button>
         </div>
       `).join('');
-    }
-  }
+  const pbStore  = document.getElementById('pbStoreItems');
+  if(pbStore)  pbStore.innerHTML  = itemsHtml;
+  const chStore  = document.getElementById('choreStoreItems');
+  if(chStore)  chStore.innerHTML  = itemsHtml;
 
   // History
   const hist = document.getElementById('pbHistory');
@@ -1567,11 +1568,12 @@ function renderPhPendingChores(){
     return;
   }
   el.innerHTML = pending.map(p=>`
-    <div style="display:flex;align-items:center;gap:.5rem;padding:.55rem .7rem;background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.12);border-radius:10px;margin-bottom:.35rem;">
+    <div style="display:flex;align-items:flex-start;gap:.5rem;padding:.55rem .7rem;background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.12);border-radius:10px;margin-bottom:.35rem;">
       <span style="font-size:1.1rem;">${p.emoji||'📌'}</span>
-      <div style="flex:1;">
-        <div style="font-size:.78rem;font-weight:700;color:var(--tx);">${escapeHtml(p.choreName)}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:.78rem;font-weight:700;color:var(--tx);">${escapeHtml(p.choreName)}${p.photoPath?' <span title="Includes photo proof" style="font-size:.7rem;">📸</span>':''}</div>
         <div style="font-size:.6rem;color:var(--tx2);">${p.date} at ${p.time} · <span style="color:#fbbf24;font-weight:700;">${p.pts} pts</span> · <span style="color:#22c55e;">+${p.pts} PB if verified</span></div>
+        ${p.photoPath ? `<div id="phChorePhoto_${p.id}" style="margin-top:.4rem;"><div style="font-size:.55rem;color:var(--tx3);padding:.2rem;">Loading photo…</div></div>` : ''}
       </div>
       <div style="display:flex;gap:.3rem;flex-shrink:0;">
         <button onclick="phVerifyChore(${p.id},true)" style="background:#22c55e;border:none;color:#fff;font-weight:800;font-size:.68rem;padding:.35rem .65rem;border-radius:7px;cursor:pointer;">✓ Verify</button>
@@ -1579,6 +1581,33 @@ function renderPhPendingChores(){
       </div>
     </div>
   `).join('');
+
+  // Tab 1 Inc 3 — async-load signed URLs for any pending entries
+  // that carry photoPath. Done after innerHTML so we have stable
+  // mount points (#phChorePhoto_<logId>). Failures degrade
+  // gracefully to a "Photo unavailable" placeholder.
+  pending.forEach(p => {
+    if(!p.photoPath) return;
+    const mount = document.getElementById('phChorePhoto_' + p.id);
+    if(!mount) return;
+    const supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+    if(!supa){ mount.innerHTML = '<div style="font-size:.55rem;color:var(--tx3);padding:.2rem;">Photo unavailable</div>'; return; }
+    // 1 hour signed URL — long enough for the parent to verify but
+    // not long enough to be a meaningful leakage risk if logged.
+    supa.storage.from('chore-proofs').createSignedUrl(p.photoPath, 3600)
+      .then(({ data, error }) => {
+        if(error || !data || !data.signedUrl){
+          mount.innerHTML = '<div style="font-size:.55rem;color:var(--tx3);padding:.2rem;">Photo unavailable</div>';
+          return;
+        }
+        mount.innerHTML = '<a href="' + data.signedUrl + '" target="_blank" rel="noopener" title="Open full size">' +
+          '<img src="' + data.signedUrl + '" alt="Chore photo proof" style="max-width:140px;max-height:140px;border-radius:8px;border:1px solid rgba(255,255,255,.08);object-fit:cover;display:block;">' +
+        '</a>';
+      })
+      .catch(() => {
+        mount.innerHTML = '<div style="font-size:.55rem;color:var(--tx3);padding:.2rem;">Photo unavailable</div>';
+      });
+  });
 }
 
 function phVerifyChore(logId, approved){
