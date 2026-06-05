@@ -2766,8 +2766,8 @@ function phNav(tab){
   // hidden panels don't get their renderers fired needlessly.
   if(t === 'home')     { renderParentHubHome(); }
   if(t === 'chores')   { renderPhPendingChores(); renderParentChoreList(); renderParentSelfChores(); renderParentDeeds(); }
-  if(t === 'rewards')  { renderPhRewards(); }
-  if(t === 'contests') { renderParentLeaderboard(); renderParentContests(); renderParentFamilyRewards(); }
+  if(t === 'rewards')  { renderPhRewards(); if(typeof renderPhRewardsHeroChips === 'function') renderPhRewardsHeroChips(); }
+  if(t === 'contests') { renderParentLeaderboard(); renderParentContests(); renderParentFamilyRewards(); if(typeof renderPhContestsHeroChips === 'function') renderPhContestsHeroChips(); }
   if(t === 'activity') { initPhSchedPanel(); renderParentActivityAudit(); renderParentActivityFeed(); renderBehaviorLog(); renderGradeMonitor(); renderParentNotes(); }
   if(t === 'reports')  { renderParentGettingStarted(); renderParentMultiChild(); renderParentScore(); renderParentOverview(); renderWeeklyReportCard(); renderCompletionSummary(); renderSentQuizzes(); renderProgressReportsTab(); renderParentFaithReport(); }
   if(t === 'family')   { renderManageUsers(); renderParentLessons(); if(typeof renderParentGrowth==='function') renderParentGrowth(); if(typeof renderParentGrowthHistory==='function') renderParentGrowthHistory(); renderPhReferral(); }
@@ -3341,6 +3341,36 @@ function renderPhChoreHeroChips(){
   if(activeEl) activeEl.textContent = activeCt;
 }
 
+// Phase 2 Batch 1 — Hero chip renderers for the other single-panel
+// cards. Render-only, no state writes. Same defensive guards as the
+// chores chip renderer above. Called by phNav on entry to each card.
+function renderPhRewardsHeroChips(){
+  const pbEl      = document.getElementById('phRewardsChipPB');
+  const spinsEl   = document.getElementById('phRewardsChipSpins');
+  const scratchEl = document.getElementById('phRewardsChipScratch');
+  if(!pbEl && !spinsEl && !scratchEl) return;
+  const pb       = (D.pb && typeof D.pb.balance      === 'number') ? D.pb.balance      : 0;
+  const spins    = (D.pb && typeof D.pb.spinTickets  === 'number') ? D.pb.spinTickets  : 0;
+  const scratch  = (D.pb && typeof D.pb.scratchTickets === 'number') ? D.pb.scratchTickets : 0;
+  if(pbEl)      pbEl.textContent      = pb;
+  if(spinsEl)   spinsEl.textContent   = spins;
+  if(scratchEl) scratchEl.textContent = scratch;
+}
+
+function renderPhContestsHeroChips(){
+  const activeEl  = document.getElementById('phContestsChipActive');
+  const rewardsEl = document.getElementById('phContestsChipRewards');
+  if(!activeEl && !rewardsEl) return;
+  const todayISO = new Date().toISOString().slice(0,10);
+  const activeCt = (Array.isArray(D.customContests) ? D.customContests : [])
+    .filter(c => c && !c.endedAt && (!c.deadline || c.deadline >= todayISO))
+    .length;
+  const rewardCt = (Array.isArray(D.customFamilyRewards) ? D.customFamilyRewards : [])
+    .filter(r => r).length;
+  if(activeEl)  activeEl.textContent  = activeCt;
+  if(rewardsEl) rewardsEl.textContent = rewardCt;
+}
+
 function addChoreFromParent(){
   const name = (document.getElementById('newChoreName')||{}).value.trim();
   const pts = parseInt((document.getElementById('newChorePoints')||{}).value)||10;
@@ -3547,7 +3577,10 @@ function createCustomContest(){
 function renderParentContests(){
   const el = document.getElementById('parentContestList'); if(!el) return;
   const contests = (Array.isArray(D.customContests)?D.customContests:[]).slice().reverse();
-  if(!contests.length){ el.innerHTML='<div style="font-size:.68rem;color:var(--tx3);">No contests yet. Create one above!</div>'; return; }
+  // Phase 2 Batch 1 — keep the hero chip live regardless of the
+  // render path below.
+  if(typeof renderPhContestsHeroChips === 'function') renderPhContestsHeroChips();
+  if(!contests.length){ el.innerHTML='<div class="ph-block-empty">No contests yet. Create one above!</div>'; return; }
   const today = new Date().toISOString().slice(0,10);
   el.innerHTML = contests.map(c=>{
     const isActive = c.status==='active' && c.endDate >= today;
