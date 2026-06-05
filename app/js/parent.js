@@ -3213,22 +3213,33 @@ function renderParentSelfChores(){
   const el = document.getElementById('parentSelfChoresList'); if(!el) return;
   const pending = (D.selfChores||[]).filter(c=>c.status==='pending').reverse();
   if(!pending.length){
-    el.innerHTML = '<div style="font-size:.68rem;color:var(--tx3);">No pending submissions. When your child does something helpful, it appears here.</div>';
+    el.innerHTML = '';
+    if(typeof renderPhChoreHeroChips === 'function') renderPhChoreHeroChips();
     return;
   }
-  el.innerHTML = pending.map(c=>`
-    <div style="display:flex;align-items:center;gap:.4rem;padding:.35rem .4rem;border-bottom:1px solid rgba(255,255,255,.03);font-size:.72rem;">
-      <span>⏳</span>
-      <span style="flex:1;color:var(--tx2);">${escapeHtml(c.text)}</span>
-      <span style="font-size:.55rem;color:var(--tx3);">${c.date.slice(5)}</span>
-      <div style="display:flex;gap:.2rem;">
-        <button class="btn bp bs" onclick="approveSelfChore(${c.id}, 10)" style="font-size:.5rem;padding:.15rem .3rem;">+10</button>
-        <button class="btn bp bs" onclick="approveSelfChore(${c.id}, 25)" style="font-size:.5rem;padding:.15rem .3rem;">+25</button>
-        <button class="btn bp bs" onclick="approveSelfChore(${c.id}, 50)" style="font-size:.5rem;padding:.15rem .3rem;">+50</button>
-        <button class="btn bs" onclick="rejectSelfChore(${c.id})" style="font-size:.5rem;padding:.15rem .3rem;background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.15);">✕</button>
-      </div>
-    </div>
-  `).join('');
+  // Mockup approval card with quick-award point pills (+10 / +25 / +50)
+  // and a small ghost ✕ to dismiss without award. Avatar is the 🌟 self-
+  // initiated glyph in a violet gradient circle.
+  el.innerHTML = pending.map(function(c){
+    return ''
+      + '<div class="ph-ch-card" id="ph-self-' + c.id + '">'
+        + '<div class="ph-ch-approw">'
+          + '<div class="ph-ch-ava ph-ch-ava-violet">🌟</div>'
+          + '<div class="ph-ch-apmeta">'
+            + '<div class="ph-ch-who">Did something helpful</div>'
+            + '<div class="ph-ch-what">&ldquo;' + escapeHtml(c.text) + '&rdquo;</div>'
+            + '<div class="ph-ch-tags"><span class="ph-ch-tag ph-ch-tag-pts">submitted ' + escapeHtml(c.date) + '</span></div>'
+          + '</div>'
+          + '<div class="ph-ch-ptpills">'
+            + '<button type="button" class="ph-ch-ptpill" onclick="approveSelfChore(' + c.id + ', 10)">+10</button>'
+            + '<button type="button" class="ph-ch-ptpill" onclick="approveSelfChore(' + c.id + ', 25)">+25</button>'
+            + '<button type="button" class="ph-ch-ptpill" onclick="approveSelfChore(' + c.id + ', 50)">+50</button>'
+          + '</div>'
+          + '<button type="button" class="ph-ch-btn ph-ch-btn-ghost ph-ch-btn-x" onclick="rejectSelfChore(' + c.id + ')" title="Dismiss without awarding">✕</button>'
+        + '</div>'
+      + '</div>';
+  }).join('');
+  if(typeof renderPhChoreHeroChips === 'function') renderPhChoreHeroChips();
 }
 
 function approveSelfChore(id, points){
@@ -3264,20 +3275,70 @@ function rejectSelfChore(id){
 }
 
 // ── PARENT CHORE MANAGER ─────────────────────────────────────
-// Tab 1 design pass — progressive disclosure for the Add Chore form.
-// Opener button reveals; Done button collapses. Stays open across
-// multiple sequential adds so the parent can add several chores
-// in a row without re-tapping the opener each time.
+// Tab 1 design pass — legacy progressive-disclosure helper. After the
+// Parent Hub chores view was reorganized to put the Add a Chore form
+// at the BOTTOM (Mockup pass), the form is always visible. The
+// opener button + collapsed state no longer exist in the rebuilt
+// markup, so this helper now no-ops on missing elements but is
+// preserved in case any deep code calls it.
 function phChoreFormToggle(open){
   const area = document.getElementById('choreSetupArea');
   const btn  = document.getElementById('phChoreAddBtn');
-  if(!area || !btn) return;
-  area.style.display = open ? 'block' : 'none';
-  btn.style.display  = open ? 'none'  : 'inline-block';
+  if(area && btn){
+    area.style.display = open ? 'block' : 'none';
+    btn.style.display  = open ? 'none'  : 'inline-block';
+  }
   if(open){
     const nameInput = document.getElementById('newChoreName');
     if(nameInput) setTimeout(()=>nameInput.focus(), 50);
   }
+}
+
+// Mockup pass — segmented pill click → hidden <select>.value update.
+// The pills are presentation; the hidden <select> remains the source
+// of truth for addChoreFromParent. This keeps the read path
+// byte-identical with what shipped in Tab 1 Increment 2.
+function phChoreSegPill(btn, selectId, val){
+  if(!btn || !selectId) return;
+  const seg = btn.parentNode;
+  if(seg){
+    seg.querySelectorAll('.ph-ch-segbtn').forEach(b => b.classList.remove('on'));
+  }
+  btn.classList.add('on');
+  const sel = document.getElementById(selectId);
+  if(sel){
+    sel.value = val;
+    try { sel.dispatchEvent(new Event('change', {bubbles:true})); } catch(e){}
+  }
+}
+
+// Mockup pass — "+ Add a chore" dashed tile in the Active chores grid
+// scrolls to the form section and focuses the name input. Stays
+// idempotent so multiple taps don't compound the scroll.
+function phChoreFocusForm(){
+  const name = document.getElementById('newChoreName');
+  const form = document.getElementById('choreSetupArea');
+  const target = form || name;
+  if(target && typeof target.scrollIntoView === 'function'){
+    try { target.scrollIntoView({behavior:'smooth', block:'center'}); } catch(e){}
+  }
+  if(name) setTimeout(() => { try { name.focus(); } catch(e){} }, 250);
+}
+
+// Mockup pass — hero chip counts in #ph-chores's header. Reads the
+// same arrays the renderers already iterate; never writes state.
+// Safe to call repeatedly; cheap, render-only.
+function renderPhChoreHeroChips(){
+  const pendEl   = document.getElementById('phChoreChipPending');
+  const activeEl = document.getElementById('phChoreChipActive');
+  if(!pendEl && !activeEl) return;
+  const pendChore = (Array.isArray(D.choreLog)     ? D.choreLog     : []).filter(l => l && l.status === 'pending').length;
+  const pendSelf  = (Array.isArray(D.selfChores)   ? D.selfChores   : []).filter(c => c && c.status === 'pending').length;
+  const pendDeed  = (Array.isArray(D.helpfulDeeds) ? D.helpfulDeeds : []).filter(d => d && !d.approved).length;
+  const pendTotal = pendChore + pendSelf + pendDeed;
+  const activeCt  = (Array.isArray(D.chores)       ? D.chores       : []).filter(c => c && c.active !== false).length;
+  if(pendEl)   pendEl.textContent   = pendTotal;
+  if(activeEl) activeEl.textContent = activeCt;
 }
 
 function addChoreFromParent(){
@@ -3322,36 +3383,48 @@ function renderParentChoreList(){
   const el = document.getElementById('parentChoreList'); if(!el) return;
   // Use D.chores — the same source the child sees
   const chores = (Array.isArray(D.chores)?D.chores:[]).filter(c=>c.active!==false);
-  if(!chores.length){
-    el.innerHTML = '<div style="font-size:.68rem;color:var(--tx3);padding:.3rem;">No chores set up yet. Add one above!</div>';
-    return;
-  }
-  el.innerHTML = chores.map(c=>{
-    const freqLabel = c.freq==='daily'?'Daily':c.freq==='weekly'?'Weekly'+(c.day?' ('+c.day+')':''):'One-time';
-    // Tab 1 Increment 2 — surface difficulty + due-date chips so the
-    // parent can see what they've configured. Legacy chores without
-    // these fields render the same as before.
+  const today = new Date().toISOString().slice(0,10);
+  // Mockup blueprint, faith paint. Render each active chore as a
+  // friendly tile; append a dashed "+ Add a chore" tile that focuses
+  // the form. Empty state renders as a single-tile prompt instead of
+  // a separate empty-state block so the grid still scans.
+  const tiles = chores.map(function(c){
+    const freqRaw = c.freq;
+    const freqLabel = freqRaw === 'daily' ? 'Daily'
+                    : freqRaw === 'weekly' ? ('Weekly' + (c.day ? ' (' + c.day + ')' : ''))
+                    : 'One-time';
     const diff = c.difficulty || '';
-    const diffColor = diff==='hard' ? '#ef4444' : diff==='medium' ? '#fbbf24' : diff==='easy' ? '#22c55e' : '';
-    const diffPill = diff
-      ? `<span style="font-size:.5rem;color:${diffColor};font-weight:700;text-transform:uppercase;letter-spacing:.5px;background:rgba(255,255,255,.04);padding:.08rem .3rem;border-radius:4px;">${diff}</span>`
-      : '';
-    const today = new Date().toISOString().slice(0,10);
+    const diffLabelMap = {easy:'Easy ×1', medium:'Medium ×1.5', hard:'Hard ×2'};
+    const diffLabel = diffLabelMap[diff] || '';
+    const diffClass = diff ? 'ph-ch-mini-' + diff : '';
     const isOverdue = c.dueDate && c.dueDate < today;
     const dueChip = c.dueDate
-      ? `<span style="font-size:.5rem;background:${isOverdue?'rgba(239,68,68,.15)':'rgba(255,255,255,.04)'};color:${isOverdue?'#ef4444':'var(--tx3)'};padding:.08rem .3rem;border-radius:4px;">${isOverdue?'⚠':'📅'}${c.dueDate.slice(5)}</span>`
+      ? '<span class="ph-ch-mini ' + (isOverdue ? 'ph-ch-mini-overdue' : 'ph-ch-mini-freq') + '">' + (isOverdue ? '⚠ ' : '📅 ') + escapeHtml(c.dueDate.slice(5)) + '</span>'
       : '';
-    return `<div style="display:flex;align-items:center;gap:.35rem;padding:.3rem .4rem;border-bottom:1px solid rgba(255,255,255,.03);font-size:.72rem;flex-wrap:wrap;">
-      <span style="font-size:.9rem;">${c.emoji||'📌'}</span>
-      <span style="flex:1;min-width:60%;">${escapeHtml(c.name)}</span>
-      ${diffPill}
-      ${dueChip}
-      <span style="font-size:.55rem;color:var(--tx3);">${freqLabel}</span>
-      <span style="font-size:.6rem;color:#22c55e;font-weight:700;">${c.pts||c.points||10} pts</span>
-      <button onclick="editChorePoints(${c.id})" style="font-size:.45rem;background:rgba(56,189,248,.1);color:#38bdf8;border:1px solid rgba(56,189,248,.15);border-radius:4px;padding:.1rem .25rem;cursor:pointer;">Edit</button>
-      <button onclick="removeChore(${c.id})" style="font-size:.45rem;background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.15);border-radius:4px;padding:.1rem .25rem;cursor:pointer;">✕</button>
-    </div>`;
+    const diffPill = diff
+      ? '<span class="ph-ch-mini ' + diffClass + '">' + diffLabel + '</span>'
+      : '';
+    return ''
+      + '<div class="ph-ch-chore" id="ph-chore-' + c.id + '">'
+        + '<div class="ph-ch-cn"><span class="ph-ch-pin">' + (c.emoji || '📌') + '</span>' + escapeHtml(c.name) + '</div>'
+        + '<div class="ph-ch-cmeta">'
+          + diffPill
+          + '<span class="ph-ch-mini ph-ch-mini-freq">' + escapeHtml(freqLabel) + '</span>'
+          + dueChip
+          + '<span class="ph-ch-mini ph-ch-mini-pts">' + (c.pts || c.points || 10) + ' pts</span>'
+        + '</div>'
+        + '<div class="ph-ch-chore-actions">'
+          + '<button type="button" onclick="editChorePoints(' + c.id + ')">Edit</button>'
+          + '<button type="button" class="ph-ch-del" onclick="removeChore(' + c.id + ')">Remove</button>'
+        + '</div>'
+      + '</div>';
   }).join('');
+  // Append the dashed "+ Add a chore" tile. Tapping it scrolls + focuses
+  // the form at the bottom of the panel so the parent doesn't have to
+  // hunt for the input field.
+  const addTile = '<div class="ph-ch-addtile" role="button" tabindex="0" onclick="phChoreFocusForm()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();phChoreFocusForm();}">+ Add a chore</div>';
+  el.innerHTML = tiles + addTile;
+  if(typeof renderPhChoreHeroChips === 'function') renderPhChoreHeroChips();
 }
 
 function editChorePoints(id){
@@ -3565,18 +3638,55 @@ function renderParentDeeds(){
   const deeds = (Array.isArray(D.helpfulDeeds)?D.helpfulDeeds:[]).slice().reverse();
   const pending = deeds.filter(d=>!d.approved);
   if(!pending.length){
-    el.innerHTML = '<div style="font-size:.68rem;color:var(--tx3);">No pending deeds. When your child logs helpful actions, they appear here.</div>';
+    el.innerHTML = '';
+    // If after this render NOTHING is pending in any approval list, show
+    // an empty state. Use renderPhChoreHeroChips to do the join check.
+    if(typeof renderPhChoreHeroChips === 'function') renderPhChoreHeroChips();
+    _phMaybeShowApprovalEmpty();
     return;
   }
-  el.innerHTML = pending.map(d=>`
-    <div style="display:flex;align-items:center;gap:.4rem;padding:.35rem .4rem;border-bottom:1px solid rgba(255,255,255,.03);font-size:.72rem;">
-      <span>⏳</span>
-      <span style="flex:1;color:var(--tx2);">${escapeHtml(d.text)}</span>
-      <span style="font-size:.55rem;color:var(--tx3);">${d.date}</span>
-      <button class="btn bp bs" onclick="approveDeed(${d.id})" style="font-size:.5rem;padding:.15rem .4rem;">✅ +10 PB</button>
-      <button class="btn bs" onclick="rejectDeed(${d.id})" style="font-size:.5rem;padding:.15rem .3rem;background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.15);">✕</button>
-    </div>
-  `).join('');
+  el.innerHTML = pending.map(function(d){
+    return ''
+      + '<div class="ph-ch-card" id="ph-deed-' + d.id + '">'
+        + '<div class="ph-ch-approw">'
+          + '<div class="ph-ch-ava ph-ch-ava-green">💛</div>'
+          + '<div class="ph-ch-apmeta">'
+            + '<div class="ph-ch-who">Helpful deed</div>'
+            + '<div class="ph-ch-what">&ldquo;' + escapeHtml(d.text) + '&rdquo;</div>'
+            + '<div class="ph-ch-tags"><span class="ph-ch-tag ph-ch-tag-pts">logged ' + escapeHtml(d.date) + '</span></div>'
+          + '</div>'
+          + '<div class="ph-ch-apactions">'
+            + '<button type="button" class="ph-ch-btn ph-ch-btn-approve" onclick="approveDeed(' + d.id + ')">+10 PB</button>'
+            + '<button type="button" class="ph-ch-btn ph-ch-btn-ghost ph-ch-btn-x" onclick="rejectDeed(' + d.id + ')" title="Dismiss">✕</button>'
+          + '</div>'
+        + '</div>'
+      + '</div>';
+  }).join('');
+  if(typeof renderPhChoreHeroChips === 'function') renderPhChoreHeroChips();
+  _phMaybeShowApprovalEmpty();
+}
+
+// If after a renderer runs and zero approval cards exist across the
+// pending / self-initiated / deeds lists, paint a single empty-state
+// card. Lives at the bottom of #phPendingList so it always sits at the
+// top of the section.
+function _phMaybeShowApprovalEmpty(){
+  const pendEl = document.getElementById('phPendingList');
+  const selfEl = document.getElementById('parentSelfChoresList');
+  const deedEl = document.getElementById('parentDeedsList');
+  if(!pendEl) return;
+  const anyContent =
+    ((pendEl.children.length||0) > 0 && !pendEl.dataset.empty) ||
+    ((selfEl && selfEl.children.length > 0)) ||
+    ((deedEl && deedEl.children.length > 0));
+  if(anyContent){
+    if(pendEl.dataset.empty){ pendEl.innerHTML = ''; delete pendEl.dataset.empty; }
+    return;
+  }
+  if(!pendEl.dataset.empty){
+    pendEl.innerHTML = '<div class="ph-ch-card-empty">No pending approvals — all caught up. ✨</div>';
+    pendEl.dataset.empty = '1';
+  }
 }
 
 function approveDeed(id){
