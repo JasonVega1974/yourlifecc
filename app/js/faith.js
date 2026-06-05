@@ -3667,10 +3667,11 @@ function markDevotionalRead(){
 function showDailyDevModal(){
   if(window._faithFree) return;
   // Don't show if already read today OR already dismissed today.
-  // Per-user localStorage flag is authoritative — it survives cloudLoad() overwrites.
+  // _ylccGetFlag does the dual-read (per-user LS key first, D fallback)
+  // — survives cloudLoad's D overwrite AND respects the auth-resolution
+  // guard so a pre-resolved read doesn't fall to _local and re-show.
   const today = new Date().toISOString().slice(0,10);
-  if(typeof _ylccUserKey === 'function' && localStorage.getItem(_ylccUserKey('ylcc_devPopupSeen')) === today) return;
-  if(D.devPopupSeen === today) return;
+  if(typeof _ylccGetFlag === 'function' && _ylccGetFlag('devPopupSeen', '') === today) return;
   if(D.scrReadDays && D.scrReadDays[today]) return;
   const idx = getDailyDevotionalIdx();
   const d = DEVOTIONALS[idx]; if(!d) return;
