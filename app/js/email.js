@@ -591,6 +591,10 @@ function renderParentBucks(){
       </div>`).join('');
     }
   }
+
+  // Phase 2 Batch 1 — Parent Hub Rewards hero chips track the same PB
+  // state. Cheap pass-through; render-only.
+  if(typeof renderPhRewardsHeroChips === 'function') renderPhRewardsHeroChips();
 }
 
 function renderGameTickets(){
