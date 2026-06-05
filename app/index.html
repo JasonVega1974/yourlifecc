@@ -5447,89 +5447,293 @@
     
   </div>
 
-  <!-- Points Summary Bar -->
-  <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:.6rem;">
-    <div style="flex:1;min-width:120px;background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(34,197,94,.04));border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:.7rem .9rem;text-align:center;">
-      <div style="font-size:1.8rem;font-weight:900;color:#22c55e;" id="chorePointsAvail">0</div>
-      <div style="font-size:.6rem;color:var(--tx2);text-transform:uppercase;letter-spacing:1px;">Available Points</div>
-    </div>
-    <div style="flex:1;min-width:120px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:.7rem .9rem;text-align:center;">
-      <div style="font-size:1.8rem;font-weight:900;color:var(--c);" id="chorePointsTotal">0</div>
-      <div style="font-size:.6rem;color:var(--tx2);text-transform:uppercase;letter-spacing:1px;">Total Earned</div>
-    </div>
-    <div style="flex:1;min-width:120px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:.7rem .9rem;text-align:center;">
-      <div style="font-size:1.8rem;font-weight:900;color:#fbbf24;" id="choreStreak">0</div>
-      <div style="font-size:.6rem;color:var(--tx2);text-transform:uppercase;letter-spacing:1px;">Day Streak 🔥</div>
-    </div>
-    <div style="flex:1;min-width:120px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:.7rem .9rem;text-align:center;">
-      <div style="font-size:1.8rem;font-weight:900;color:#a78bfa;" id="choreLevel">1</div>
-      <div style="font-size:.6rem;color:var(--tx2);text-transform:uppercase;letter-spacing:1px;">Level</div>
-    </div>
-  </div>
-
-  <!-- Parent Bucks + Games Bar -->
-  <div style="display:flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(167,139,250,.06));border:1px solid rgba(251,191,36,.2);border-radius:12px;padding:.6rem .9rem;margin-bottom:1rem;flex-wrap:wrap;">
-    <div style="display:flex;align-items:center;gap:.4rem;flex:1;min-width:130px;">
-      <span style="font-size:1.3rem;">🪙</span>
-      <div>
-        <div style="font-size:.58rem;color:#fbbf24;font-weight:700;letter-spacing:.5px;">Parent Bucks</div>
-        <div style="display:flex;align-items:baseline;gap:.2rem;">
-          <span style="font-size:1.4rem;font-weight:900;color:#fbbf24;" id="choresPBBalance">0</span>
-          <span style="font-size:.6rem;color:var(--tx2);">PB</span>
+  <!-- ── UNIFIED HERO (Tab 1 design pass — faith-style consolidation)
+       Replaces the 3 stacked stat surfaces (KPI cards + PB bar +
+       Level bar) with one cohesive card mirroring the faith hero
+       pattern. Every DOM ID below (chorePointsAvail, chorePointsTotal,
+       choreStreak, choreLevel, choreLevelLabel, choreLevelPts,
+       choreLevelBar, choresPBBalance, choreSpinCount, choresScratchCount)
+       is preserved verbatim so chores.js / email.js renderers continue
+       to populate the surface with zero logic change. ──────────────── -->
+  <div class="ch-hero">
+    <div class="ch-hero-row">
+      <div class="ch-hero-stats">
+        <div class="ch-hero-eyebrow">TODAY'S WORK</div>
+        <div class="ch-hero-title">
+          <span id="chorePointsAvail">0</span><span class="ch-hero-suffix">PTS</span>
+        </div>
+        <div class="ch-hero-sub"><b id="chorePointsTotal">0</b> earned all-time · keep going</div>
+      </div>
+      <div class="ch-hero-chips">
+        <div class="ch-chip ch-chip-streak" title="Consecutive days with verified chores">
+          <span class="ch-chip-icon">🔥</span>
+          <span class="ch-chip-num" id="choreStreak">0</span>
+          <span class="ch-chip-lbl">day streak</span>
+        </div>
+        <div class="ch-chip ch-chip-level" title="Chore level — earn more points to advance">
+          <span class="ch-chip-icon">⭐</span>
+          <span class="ch-chip-num" id="choreLevel">1</span>
+          <span class="ch-chip-lbl" id="choreLevelLabel">Level 1 — Beginner</span>
+        </div>
+        <button type="button" class="ch-chip ch-chip-pb ch-chip-btn" onclick="showSection('s-rewards')" title="Open Parent Bucks store, spinner, scratch">
+          <span class="ch-chip-icon">🪙</span>
+          <span class="ch-chip-num" id="choresPBBalance">0</span>
+          <span class="ch-chip-lbl">PB · store →</span>
+        </button>
+        <div class="ch-mini-games" role="group" aria-label="Game tickets">
+          <button type="button" class="ch-mini" onclick="openSpinner()" title="Spin tickets — tap to play">🎰 <b id="choreSpinCount">0</b></button>
+          <button type="button" class="ch-mini" onclick="openScratch()" title="Scratch tickets — tap to play">🎫 <b id="choresScratchCount">0</b></button>
         </div>
       </div>
     </div>
-    <div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;">
-      <div style="text-align:center;">
-        <div style="font-size:.55rem;color:var(--tx3);margin-bottom:.1rem;">SPINS</div>
-        <button onclick="openSpinner()" style="background:linear-gradient(135deg,rgba(253,230,138,.15),rgba(245,158,11,.1));border:1px solid rgba(253,230,138,.3);color:#fde68a;padding:.4rem .7rem;border-radius:8px;font-size:.72rem;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:.3rem;">
-          🎰 <span id="choreSpinCount">0</span>
-        </button>
-      </div>
-      <div style="text-align:center;">
-        <div style="font-size:.55rem;color:var(--tx3);margin-bottom:.1rem;">SCRATCH</div>
-        <button onclick="openScratch()" style="background:linear-gradient(135deg,rgba(244,114,182,.12),rgba(236,72,153,.08));border:1px solid rgba(244,114,182,.25);color:#f472b6;padding:.4rem .7rem;border-radius:8px;font-size:.72rem;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:.3rem;">
-          🎫 <span id="choresScratchCount">0</span>
-        </button>
-      </div>
-      <button onclick="showSection('s-rewards')" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);color:#a78bfa;padding:.4rem .7rem;border-radius:8px;font-size:.65rem;font-weight:700;cursor:pointer;">🏪 Store</button>
+    <div class="ch-hero-progress">
+      <div class="ch-hero-progress-track"><div id="choreLevelBar" class="ch-hero-progress-fill"></div></div>
+      <div class="ch-hero-progress-meta"><span id="choreLevelPts">0 / 100 pts</span> to next level</div>
     </div>
   </div>
 
-  <!-- Level progress bar -->
-  <div style="margin-bottom:1.2rem;">
-    <div style="display:flex;justify-content:space-between;font-size:.6rem;color:var(--tx2);margin-bottom:.25rem;">
-      <span id="choreLevelLabel">Level 1 — Beginner</span>
-      <span id="choreLevelPts">0 / 100 pts</span>
-    </div>
-    <div style="height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;">
-      <div id="choreLevelBar" style="height:100%;background:linear-gradient(90deg,#a78bfa,#7c3aed);border-radius:4px;width:0%;transition:width .4s;"></div>
-    </div>
-  </div>
-
-  <!-- ── Sub-tab pills + kanban (Tab 1 Inc 1+2 — scoped to #s-chores) ─── -->
+  <!-- ── Chores design system (Tab 1 design pass — scoped to #s-chores)
+       Mirrors faith's --fz-* token + .bf-* pattern in chores-scoped
+       --cz-* tokens + .ch-* classes. Visual/IA only — does not change
+       any DOM ids, JS calls, or chore logic. ──────────────────────── -->
   <style>
+    /* ─── Tokens ─── */
+    #s-chores{
+      --cz-accent:        #22c55e;                                            /* chores green */
+      --cz-accent-soft:   color-mix(in srgb, #22c55e 12%, transparent);
+      --cz-accent-mid:    color-mix(in srgb, #22c55e 30%, transparent);
+      --cz-accent-bd:     color-mix(in srgb, #22c55e 42%, transparent);
+      --cz-purple:        #a78bfa;
+      --cz-purple-soft:   color-mix(in srgb, #a78bfa 14%, transparent);
+      --cz-purple-bd:     color-mix(in srgb, #a78bfa 38%, transparent);
+      --cz-gold:          #fbbf24;
+      --cz-gold-soft:     color-mix(in srgb, #fbbf24 12%, transparent);
+      --cz-gold-bd:       color-mix(in srgb, #fbbf24 38%, transparent);
+      --cz-surface-soft:  color-mix(in srgb, var(--tx) 6%, transparent);
+      --cz-surface-mid:   color-mix(in srgb, var(--tx) 12%, transparent);
+      --cz-card-bg:       var(--card-bg);
+      --cz-card-border:   var(--card-border);
+    }
+
+    /* ─── Unified hero ─── */
+    #s-chores .ch-hero{
+      position:relative;
+      background:linear-gradient(160deg, var(--s1) 0%, var(--s2) 100%);
+      border:1px solid var(--cz-accent-bd);
+      border-radius:22px;
+      padding:1.15rem 1.25rem 1rem;
+      margin-bottom:1.1rem;
+      box-shadow:var(--card-shadow), inset 0 1px 0 var(--cz-surface-soft);
+      overflow:hidden;
+    }
+    #s-chores .ch-hero::before{
+      content:'';
+      position:absolute;inset:0;
+      background:radial-gradient(ellipse at top right, var(--cz-accent-soft) 0%, transparent 55%);
+      pointer-events:none;
+    }
+    #s-chores .ch-hero-row{
+      position:relative;
+      display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;
+      flex-wrap:wrap;
+    }
+    #s-chores .ch-hero-stats{flex:1 1 180px;min-width:160px;}
+    #s-chores .ch-hero-eyebrow{
+      font-family:var(--fm);
+      font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;
+      color:var(--cz-accent);opacity:.9;
+      margin-bottom:.35rem;
+    }
+    #s-chores .ch-hero-title{
+      font-family:'Bebas Neue', var(--fm);
+      font-size:2.6rem;line-height:1;letter-spacing:.03em;
+      background:linear-gradient(135deg, #f0fdf4 0%, #86efac 55%, #16a34a 100%);
+      -webkit-background-clip:text;background-clip:text;
+      -webkit-text-fill-color:transparent;
+      color:var(--cz-accent); /* fallback */
+      display:inline-flex;align-items:baseline;gap:.35rem;
+      margin-bottom:.35rem;
+    }
+    #s-chores .ch-hero-suffix{
+      font-family:var(--fn);font-size:.85rem;letter-spacing:.18em;
+      color:var(--cz-accent);opacity:.75;
+      -webkit-text-fill-color:initial;
+    }
+    #s-chores .ch-hero-sub{
+      font-family:Georgia, 'Times New Roman', serif;font-style:italic;
+      font-size:.86rem;line-height:1.5;color:var(--tx2);
+    }
+    #s-chores .ch-hero-sub b{color:var(--tx);font-style:normal;font-family:var(--fn);}
+    #s-chores .ch-hero-chips{
+      display:flex;align-items:center;gap:.45rem;
+      flex-wrap:wrap;
+    }
+    #s-chores .ch-chip{
+      display:flex;align-items:center;gap:.4rem;
+      padding:.5rem .7rem;
+      background:var(--cz-surface-soft);
+      border:1px solid var(--cz-card-border);
+      border-radius:14px;
+      font-family:var(--fn);font-size:.62rem;
+      color:var(--tx2);
+      cursor:default;
+      transition:transform .18s, border-color .18s, box-shadow .18s;
+    }
+    #s-chores .ch-chip-btn{cursor:pointer;background:transparent;}
+    #s-chores .ch-chip-btn:hover{transform:translateY(-1px);border-color:var(--cz-purple-bd);box-shadow:0 6px 18px var(--cz-purple-soft);}
+    #s-chores .ch-chip-icon{font-size:1rem;line-height:1;}
+    #s-chores .ch-chip-num{
+      font-family:'Bebas Neue', var(--fn);
+      font-size:1.4rem;letter-spacing:.02em;line-height:1;
+      color:var(--tx);
+    }
+    #s-chores .ch-chip-lbl{font-size:.58rem;letter-spacing:.5px;color:var(--tx2);max-width:120px;line-height:1.15;}
+    #s-chores .ch-chip-streak{border-color:var(--cz-gold-bd);background:var(--cz-gold-soft);}
+    #s-chores .ch-chip-streak .ch-chip-num{color:var(--cz-gold);}
+    #s-chores .ch-chip-level{border-color:var(--cz-purple-bd);background:var(--cz-purple-soft);}
+    #s-chores .ch-chip-level .ch-chip-num{color:var(--cz-purple);}
+    #s-chores .ch-chip-pb{border-color:var(--cz-gold-bd);background:transparent;}
+    #s-chores .ch-chip-pb .ch-chip-num{color:var(--cz-gold);}
+    #s-chores .ch-mini-games{display:flex;gap:.3rem;}
+    #s-chores .ch-mini{
+      background:var(--cz-surface-soft);
+      border:1px solid var(--cz-card-border);
+      color:var(--tx);
+      font-family:var(--fn);font-size:.68rem;
+      padding:.35rem .55rem;border-radius:10px;
+      cursor:pointer;transition:transform .18s, border-color .18s;
+    }
+    #s-chores .ch-mini:hover{transform:translateY(-1px);border-color:var(--cz-gold-bd);}
+    #s-chores .ch-mini b{color:var(--cz-gold);}
+    #s-chores .ch-hero-progress{
+      position:relative;
+      margin-top:.85rem;
+      padding-top:.65rem;
+      border-top:1px solid var(--cz-card-border);
+    }
+    #s-chores .ch-hero-progress-track{
+      height:6px;background:var(--cz-surface-soft);
+      border-radius:6px;overflow:hidden;margin-bottom:.3rem;
+    }
+    #s-chores .ch-hero-progress-fill{
+      height:100%;
+      background:linear-gradient(90deg, var(--cz-accent), var(--cz-purple));
+      border-radius:6px;width:0%;
+      transition:width .45s cubic-bezier(.34,1.56,.64,1);
+    }
+    #s-chores .ch-hero-progress-meta{font-size:.6rem;color:var(--tx2);letter-spacing:.5px;}
+    #s-chores .ch-hero-progress-meta span{color:var(--tx);font-weight:700;font-family:var(--fn);}
+
+    /* Light-mode hero softening — fallback colors keep the title legible
+       when the background-clip gradient can't transparent-fill text. */
+    :root.light #s-chores .ch-hero{
+      background:#ffffff;
+      border-color:#bbf7d0;
+      box-shadow:0 1px 4px rgba(15,23,42,.08), inset 0 1px 0 rgba(15,23,42,.03);
+    }
+    :root.light #s-chores .ch-hero-title{
+      background:linear-gradient(135deg,#166534 0%,#15803d 55%,#14532d 100%);
+      -webkit-background-clip:text;background-clip:text;
+      -webkit-text-fill-color:transparent;
+      color:#166534;
+    }
+    :root.light #s-chores .ch-hero-suffix{color:#166534;}
+    :root.light #s-chores .ch-chip{background:#f8fafc;border-color:rgba(15,23,42,.08);}
+
+    /* Mobile compaction */
+    @media (max-width: 540px){
+      #s-chores .ch-hero{padding:.95rem 1rem .85rem;border-radius:18px;}
+      #s-chores .ch-hero-title{font-size:2.1rem;}
+      #s-chores .ch-hero-chips{gap:.35rem;width:100%;}
+      #s-chores .ch-chip{padding:.35rem .55rem;}
+      #s-chores .ch-chip-num{font-size:1.15rem;}
+      #s-chores .ch-chip-lbl{font-size:.54rem;max-width:90px;}
+    }
+
+    /* ─── Sub-tab nav (re-skin: tighter, faith-style pill) ─── */
     #s-chores .chores-tabs{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .8rem;scrollbar-width:none;-ms-overflow-style:none;margin-bottom:.4rem;}
     #s-chores .chores-tabs::-webkit-scrollbar{display:none;}
-    #s-chores .ch-tab{flex-shrink:0;padding:.5rem .9rem;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--tx2);font-size:.72rem;font-weight:700;font-family:var(--fn);letter-spacing:.5px;cursor:pointer;transition:all .18s;white-space:nowrap;}
-    #s-chores .ch-tab:hover{background:rgba(255,255,255,.08);color:var(--tx);}
-    #s-chores .ch-tab.active{background:linear-gradient(135deg,#22c55e,#a78bfa);color:#0a1f5e;border-color:transparent;box-shadow:0 4px 14px rgba(34,197,94,.28);}
-    :root.light #s-chores .ch-tab{background:rgba(15,23,42,.04)!important;border-color:rgba(15,23,42,.10)!important;color:#4a4b52!important;}
-    :root.light #s-chores .ch-tab.active{background:linear-gradient(135deg,#22c55e,#a78bfa)!important;color:#0a1f5e!important;}
-    #s-chores .ch-panel-stub{padding:1.4rem 1rem;text-align:center;color:var(--tx2);font-size:.8rem;line-height:1.5;background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.08);border-radius:12px;}
-    /* Kanban (Increment 2) — stacked on mobile, 3-column on tablet+ */
-    #s-chores .ch-kanban{display:grid;grid-template-columns:1fr;gap:.6rem;}
-    @media (min-width:768px){#s-chores .ch-kanban{grid-template-columns:1fr 1fr 1fr;}}
-    #s-chores .ch-col{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:.6rem .55rem;}
-    #s-chores .ch-col-h{display:flex;align-items:center;gap:.35rem;font-family:var(--fh);font-size:.62rem;letter-spacing:1.5px;color:var(--tx2);margin-bottom:.5rem;text-transform:uppercase;}
-    #s-chores .ch-col-dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
-    #s-chores .ch-col-n{margin-left:auto;font-family:var(--fn);font-size:.58rem;background:rgba(255,255,255,.06);padding:.1rem .35rem;border-radius:5px;color:var(--tx);font-weight:700;letter-spacing:0;}
-    #s-chores .ch-col-empty{font-size:.62rem;color:var(--tx3);text-align:center;padding:.5rem;font-style:italic;}
-    #s-chores .ch-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:.5rem .55rem;margin-bottom:.4rem;}
+    #s-chores .ch-tab{
+      flex-shrink:0;
+      padding:.45rem .9rem;
+      border-radius:999px;
+      background:var(--cz-surface-soft);
+      border:1px solid var(--cz-card-border);
+      color:var(--tx2);
+      font-size:.7rem;font-weight:700;font-family:var(--fn);letter-spacing:.6px;
+      cursor:pointer;
+      transition:all .18s;
+      white-space:nowrap;
+    }
+    #s-chores .ch-tab:hover{background:var(--cz-surface-mid);color:var(--tx);}
+    #s-chores .ch-tab.active{
+      background:linear-gradient(135deg, var(--cz-accent), var(--cz-purple));
+      color:#0a1f5e;
+      border-color:transparent;
+      box-shadow:0 6px 18px var(--cz-accent-soft);
+    }
+    :root.light #s-chores .ch-tab{background:#f8fafc!important;border-color:rgba(15,23,42,.10)!important;color:#4a4b52!important;}
+    :root.light #s-chores .ch-tab.active{background:linear-gradient(135deg,var(--cz-accent),var(--cz-purple))!important;color:#0a1f5e!important;}
+
+    #s-chores .ch-panel-stub{padding:1.4rem 1rem;text-align:center;color:var(--tx2);font-size:.8rem;line-height:1.5;background:var(--cz-surface-soft);border:1px dashed var(--cz-card-border);border-radius:12px;}
+
+    /* ─── Kanban (re-skin: faith-style well-card with column accent) ─── */
+    #s-chores .ch-kanban{display:grid;grid-template-columns:1fr;gap:.65rem;}
+    @media (min-width:768px){#s-chores .ch-kanban{grid-template-columns:1fr 1fr 1fr;gap:.8rem;}}
+    #s-chores .ch-col{
+      background:linear-gradient(165deg, var(--s1) 0%, var(--s2) 100%);
+      border:1px solid var(--cz-card-border);
+      border-top:3px solid var(--cz-col-accent, var(--cz-accent));
+      border-radius:14px;
+      padding:.7rem .6rem .55rem;
+      box-shadow:var(--card-shadow), inset 0 1px 0 var(--cz-surface-soft);
+    }
+    #s-chores .ch-col-todo{--cz-col-accent:var(--cz-gold);}
+    #s-chores .ch-col-pending{--cz-col-accent:var(--cz-purple);}
+    #s-chores .ch-col-verified{--cz-col-accent:var(--cz-accent);}
+    #s-chores .ch-col-h{
+      display:flex;align-items:center;gap:.35rem;
+      font-family:var(--fh);font-size:.62rem;letter-spacing:1.6px;
+      color:var(--tx2);text-transform:uppercase;
+      margin-bottom:.55rem;
+    }
+    #s-chores .ch-col-dot{width:8px;height:8px;border-radius:50%;display:inline-block;box-shadow:0 0 8px var(--cz-col-accent, var(--cz-accent));}
+    #s-chores .ch-col-n{
+      margin-left:auto;font-family:var(--fn);font-size:.58rem;
+      background:var(--cz-surface-soft);
+      padding:.1rem .4rem;border-radius:6px;
+      color:var(--tx);font-weight:700;letter-spacing:0;
+    }
+    #s-chores .ch-col-empty{font-size:.62rem;color:var(--tx3);text-align:center;padding:.55rem;font-style:italic;}
+    #s-chores .ch-card{
+      background:var(--cz-card-bg);
+      border:1px solid var(--cz-card-border);
+      border-radius:10px;
+      padding:.55rem .6rem;
+      margin-bottom:.45rem;
+      box-shadow:inset 0 1px 0 var(--cz-surface-soft);
+      transition:transform .18s, box-shadow .18s, border-color .18s;
+    }
+    #s-chores .ch-card:hover{
+      transform:translateY(-2px);
+      box-shadow:0 8px 20px var(--cz-accent-soft), inset 0 1px 0 var(--cz-surface-soft);
+      border-color:var(--cz-accent-bd);
+    }
+    :root.light #s-chores .ch-col{background:#ffffff!important;border-color:rgba(15,23,42,.08)!important;}
+    :root.light #s-chores .ch-card{background:#f8fafc!important;border-color:rgba(15,23,42,.08)!important;}
+
     /* Overdue dot lives inside the My Chores tab label; hidden by default */
     #s-chores #chOverdueDot{display:none;width:8px;height:8px;border-radius:50%;background:#ef4444;margin-left:.3rem;vertical-align:middle;box-shadow:0 0 6px rgba(239,68,68,.6);}
-    :root.light #s-chores .ch-col{background:rgba(15,23,42,.03)!important;border-color:rgba(15,23,42,.08)!important;}
-    :root.light #s-chores .ch-card{background:#fff!important;border-color:rgba(15,23,42,.08)!important;}
+
+    /* Reduced-motion respect */
+    @media (prefers-reduced-motion: reduce){
+      #s-chores .ch-hero-progress-fill,
+      #s-chores .ch-chip,
+      #s-chores .ch-chip-btn,
+      #s-chores .ch-mini,
+      #s-chores .ch-tab,
+      #s-chores .ch-card{transition:none!important;}
+    }
   </style>
   <div class="chores-tabs" role="tablist" aria-label="Chores sub-sections">
     <button class="ch-tab active" role="tab" aria-selected="true"  onclick="cTab('mychores',this)">✅ My Chores<span id="chOverdueDot" aria-label="Overdue chore"></span></button>
@@ -13786,6 +13990,65 @@
         <!-- CHORES & DEEDS -->
         <div id="ph-chores" data-ph-tab="rewards" style="display:none;">
 
+          <!-- Tab 1 design pass — chores hub header. Anchors the section
+               so the parent immediately knows this surface is for chore
+               management. Mirrors the faith hub header pattern. -->
+          <style>
+            #ph-chores .ph-ch-hdr{
+              position:relative;
+              background:linear-gradient(160deg, var(--s1) 0%, var(--s2) 100%);
+              border:1px solid color-mix(in srgb, #22c55e 30%, transparent);
+              border-radius:18px;
+              padding:1rem 1.2rem;
+              margin-bottom:1rem;
+              box-shadow:var(--card-shadow), inset 0 1px 0 color-mix(in srgb, var(--tx) 6%, transparent);
+              overflow:hidden;
+            }
+            #ph-chores .ph-ch-hdr::before{
+              content:'';position:absolute;inset:0;
+              background:radial-gradient(ellipse at top right, color-mix(in srgb, #22c55e 10%, transparent) 0%, transparent 60%);
+              pointer-events:none;
+            }
+            #ph-chores .ph-ch-eyebrow{
+              position:relative;
+              font-family:var(--fm);font-size:.62rem;letter-spacing:.22em;
+              text-transform:uppercase;color:#22c55e;opacity:.9;
+              margin-bottom:.25rem;
+            }
+            #ph-chores .ph-ch-title{
+              position:relative;
+              font-family:'Bebas Neue', var(--fm);
+              font-size:1.7rem;line-height:1;letter-spacing:.03em;
+              background:linear-gradient(135deg,#f0fdf4 0%,#86efac 55%,#16a34a 100%);
+              -webkit-background-clip:text;background-clip:text;
+              -webkit-text-fill-color:transparent;
+              color:#16a34a;
+              margin-bottom:.35rem;
+            }
+            #ph-chores .ph-ch-sub{
+              position:relative;
+              font-family:Georgia, 'Times New Roman', serif;font-style:italic;
+              font-size:.85rem;line-height:1.45;
+              color:var(--tx2);
+            }
+            :root.light #ph-chores .ph-ch-hdr{
+              background:#ffffff;
+              border-color:#bbf7d0;
+              box-shadow:0 1px 4px rgba(15,23,42,.08), inset 0 1px 0 rgba(15,23,42,.03);
+            }
+            :root.light #ph-chores .ph-ch-title{
+              background:linear-gradient(135deg,#166534 0%,#15803d 55%,#14532d 100%);
+              -webkit-background-clip:text;background-clip:text;
+              -webkit-text-fill-color:transparent;
+              color:#166534;
+            }
+          </style>
+          <div class="ph-ch-hdr">
+            <div class="ph-ch-eyebrow">PARENT HUB · CHORES</div>
+            <div class="ph-ch-title">✅ Chores &amp; Approvals</div>
+            <div class="ph-ch-sub">Verify what your child completed, manage chore templates, and reward kind acts — everything flows through here.</div>
+          </div>
+
           <!-- PENDING VERIFICATION -->
           <div style="background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(251,146,60,.05));border:1px solid rgba(251,191,36,.25);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
             <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
@@ -13801,11 +14064,22 @@
             </div>
           </div>
 
-          <!-- Chore Manager -->
+          <!-- Chore Manager — Tab 1 design pass: progressive disclosure
+               (Add Chore button reveals the form). Default state collapsed
+               so the parent's first impression of this surface is "what's
+               already set up", not "fill out this form". -->
           <div style="background:rgba(34,197,94,.03);border:1px solid rgba(34,197,94,.1);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
-            <div style="font-size:.85rem;font-weight:700;margin-bottom:.3rem;">✅ Manage Chores</div>
-            <div style="font-size:.7rem;color:var(--tx2);margin-bottom:.4rem;">Create and manage daily chores for your child.</div>
-            <div id="choreSetupArea" style="display:block;">
+            <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
+              <div style="flex:1;">
+                <div style="font-size:.85rem;font-weight:700;">✅ Manage Chores</div>
+                <div style="font-size:.7rem;color:var(--tx2);">Create and manage daily chores for your child.</div>
+              </div>
+              <!-- Opener — visible only when the form is collapsed -->
+              <button class="btn bp bs" id="phChoreAddBtn" onclick="phChoreFormToggle(true)" style="font-size:.7rem;padding:.4rem .8rem;white-space:nowrap;">+ Add chore</button>
+            </div>
+
+            <!-- The form is collapsed by default — phChoreFormToggle expands -->
+            <div id="choreSetupArea" style="display:none;">
               <div style="background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.15);border-radius:12px;padding:.8rem;margin-bottom:.5rem;">
                 <div style="display:grid;grid-template-columns:1fr 70px;gap:.3rem;margin-bottom:.3rem;">
                   <input type="text" id="newChoreName" placeholder="Chore name (e.g. Clean room)">
@@ -13837,11 +14111,15 @@
                   </select>
                   <input type="date" id="newChoreDue" title="Optional due date — overdue chip appears when this date passes without verification">
                 </div>
-                <button class="btn bp" onclick="addChoreFromParent()" style="width:100%;font-size:.72rem;">+ Add Chore</button>
+                <div style="display:grid;grid-template-columns:1fr auto;gap:.3rem;">
+                  <button class="btn bp" onclick="addChoreFromParent()" style="font-size:.72rem;">+ Add Chore</button>
+                  <button class="btn bgh" onclick="phChoreFormToggle(false)" style="font-size:.7rem;padding:.4rem .8rem;">Done</button>
+                </div>
               </div>
-              <div style="font-size:.72rem;font-weight:700;color:var(--tx2);margin-bottom:.3rem;">Current Chores</div>
-              <div id="parentChoreList"></div>
             </div>
+
+            <div style="font-size:.72rem;font-weight:700;color:var(--tx2);margin-bottom:.3rem;">Current Chores</div>
+            <div id="parentChoreList"></div>
           </div>
           
           <!-- Self-Initiated Chores -->
