@@ -1559,55 +1559,86 @@ function renderPhPendingChores(){
   const badge = document.getElementById('phPendingBadge');
   if(!el) return;
   const pending = (D.choreLog||[]).filter(l=>l.status==='pending').sort((a,b)=>b.id-a.id);
-  if(badge){ badge.textContent = pending.length; badge.style.display = pending.length ? 'inline-block' : 'none'; }
-  // Also update the nav item badge
+  if(badge){ badge.textContent = pending.length; }
+  // Legacy hub-nav chip — only update if it still exists in DOM.
   const navBadge = document.getElementById('phChoreNavBadge');
   if(navBadge){ navBadge.textContent = pending.length; navBadge.style.display = pending.length ? 'inline-block' : 'none'; }
+
+  // Mockup blueprint, faith paint. The empty state only renders when
+  // none of the three approval lists (pending / selfChores / deeds)
+  // have anything — let _phMaybeShowApprovalEmpty (parent.js) handle
+  // that join. Same helper runs on the populated path so the empty
+  // placeholder card is removed once anything starts existing.
   if(!pending.length){
-    el.innerHTML = '<div style="font-size:.72rem;color:var(--tx3);padding:.4rem 0;">No pending chores — all caught up! ✅</div>';
+    el.innerHTML = '';
+    if(typeof renderPhChoreHeroChips === 'function') renderPhChoreHeroChips();
+    if(typeof _phMaybeShowApprovalEmpty === 'function') _phMaybeShowApprovalEmpty();
     return;
   }
-  el.innerHTML = pending.map(p=>`
-    <div style="display:flex;align-items:flex-start;gap:.5rem;padding:.55rem .7rem;background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.12);border-radius:10px;margin-bottom:.35rem;">
-      <span style="font-size:1.1rem;">${p.emoji||'📌'}</span>
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:.78rem;font-weight:700;color:var(--tx);">${escapeHtml(p.choreName)}${p.photoPath?' <span title="Includes photo proof" style="font-size:.7rem;">📸</span>':''}</div>
-        <div style="font-size:.6rem;color:var(--tx2);">${p.date} at ${p.time} · <span style="color:#fbbf24;font-weight:700;">${p.pts} pts</span> · <span style="color:#22c55e;">+${p.pts} PB if verified</span></div>
-        ${p.photoPath ? `<div id="phChorePhoto_${p.id}" style="margin-top:.4rem;"><div style="font-size:.55rem;color:var(--tx3);padding:.2rem;">Loading photo…</div></div>` : ''}
-      </div>
-      <div style="display:flex;gap:.3rem;flex-shrink:0;">
-        <button onclick="phVerifyChore(${p.id},true)" style="background:#22c55e;border:none;color:#fff;font-weight:800;font-size:.68rem;padding:.35rem .65rem;border-radius:7px;cursor:pointer;">✓ Verify</button>
-        <button onclick="phVerifyChore(${p.id},false)" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.25);color:#f87171;font-weight:700;font-size:.68rem;padding:.35rem .65rem;border-radius:7px;cursor:pointer;">✕ Reject</button>
-      </div>
-    </div>
-  `).join('');
 
-  // Tab 1 Inc 3 — async-load signed URLs for any pending entries
-  // that carry photoPath. Done after innerHTML so we have stable
-  // mount points (#phChorePhoto_<logId>). Failures degrade
-  // gracefully to a "Photo unavailable" placeholder.
-  pending.forEach(p => {
+  // .ph-ch-card + .ph-ch-approw approval card. First card glows amber
+  // (the mockup's eye-catching pattern). Avatar uses the chore emoji
+  // because the log row doesn't currently carry the kid id; difficulty
+  // tag + base pts tag (or rolled-up earned pts) sit under the meta.
+  // Photo proof, when present, becomes a small square next to actions
+  // and an async signed URL fills it after innerHTML.
+  el.innerHTML = pending.map(function(p, idx){
+    var glow = idx === 0 ? ' ph-ch-card-glow' : '';
+    var diffKey = (p.mult === 2.0) ? 'hard' : (p.mult === 1.5) ? 'medium' : 'easy';
+    var diffLabel = diffKey.charAt(0).toUpperCase() + diffKey.slice(1);
+    var ptsBase = (typeof p.basePts === 'number' && p.basePts > 0) ? p.basePts : p.pts;
+    var ptsTag  = (p.mult && p.mult !== 1.0)
+      ? '<span class="ph-ch-tag ph-ch-tag-pts">' + ptsBase + ' × ' + p.mult + ' = ' + p.pts + ' pts</span>'
+      : '<span class="ph-ch-tag ph-ch-tag-pts">+' + p.pts + ' pts</span>';
+    var proofBlock = p.photoPath
+      ? '<div class="ph-ch-proof" id="phChorePhoto_' + p.id + '" title="Photo proof attached">📸</div>'
+      : '';
+    return ''
+      + '<div class="ph-ch-card' + glow + '" id="ph-ap-' + p.id + '">'
+        + '<div class="ph-ch-approw">'
+          + '<div class="ph-ch-ava">' + (p.emoji || '📌') + '</div>'
+          + '<div class="ph-ch-apmeta">'
+            + '<div class="ph-ch-who">' + escapeHtml(p.choreName) + '</div>'
+            + '<div class="ph-ch-what">submitted ' + escapeHtml(p.date) + ' at ' + escapeHtml(p.time) + '</div>'
+            + '<div class="ph-ch-tags">'
+              + '<span class="ph-ch-tag ph-ch-tag-' + diffKey + '">★ ' + diffLabel + '</span>'
+              + ptsTag
+            + '</div>'
+          + '</div>'
+          + proofBlock
+          + '<div class="ph-ch-apactions">'
+            + '<button class="ph-ch-btn ph-ch-btn-approve" onclick="phVerifyChore(' + p.id + ',true)">Approve</button>'
+            + '<button class="ph-ch-btn ph-ch-btn-ghost" onclick="phVerifyChore(' + p.id + ',false)">Not yet</button>'
+          + '</div>'
+        + '</div>'
+      + '</div>';
+  }).join('');
+
+  // Async-load signed URLs for any pending entries that carry photoPath.
+  // Same fallback behavior as Tab 1 Inc 3.
+  pending.forEach(function(p){
     if(!p.photoPath) return;
-    const mount = document.getElementById('phChorePhoto_' + p.id);
+    var mount = document.getElementById('phChorePhoto_' + p.id);
     if(!mount) return;
-    const supa = (typeof getSupabase === 'function') ? getSupabase() : null;
-    if(!supa){ mount.innerHTML = '<div style="font-size:.55rem;color:var(--tx3);padding:.2rem;">Photo unavailable</div>'; return; }
-    // 1 hour signed URL — long enough for the parent to verify but
-    // not long enough to be a meaningful leakage risk if logged.
+    var supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+    if(!supa){ mount.innerHTML = '<span style="font-size:.6rem;color:var(--tx3);">?</span>'; return; }
     supa.storage.from('chore-proofs').createSignedUrl(p.photoPath, 3600)
-      .then(({ data, error }) => {
-        if(error || !data || !data.signedUrl){
-          mount.innerHTML = '<div style="font-size:.55rem;color:var(--tx3);padding:.2rem;">Photo unavailable</div>';
-          return;
+      .then(function(r){
+        if(r && r.data && r.data.signedUrl){
+          mount.innerHTML = '<a href="' + r.data.signedUrl + '" target="_blank" rel="noopener" title="Open full size" style="display:block;width:100%;height:100%;">'
+            + '<img src="' + r.data.signedUrl + '" alt="Chore photo proof">'
+          + '</a>';
+        } else {
+          mount.innerHTML = '<span style="font-size:.6rem;color:var(--tx3);">?</span>';
         }
-        mount.innerHTML = '<a href="' + data.signedUrl + '" target="_blank" rel="noopener" title="Open full size">' +
-          '<img src="' + data.signedUrl + '" alt="Chore photo proof" style="max-width:140px;max-height:140px;border-radius:8px;border:1px solid rgba(255,255,255,.08);object-fit:cover;display:block;">' +
-        '</a>';
       })
-      .catch(() => {
-        mount.innerHTML = '<div style="font-size:.55rem;color:var(--tx3);padding:.2rem;">Photo unavailable</div>';
+      .catch(function(){
+        mount.innerHTML = '<span style="font-size:.6rem;color:var(--tx3);">?</span>';
       });
   });
+
+  if(typeof renderPhChoreHeroChips === 'function') renderPhChoreHeroChips();
+  if(typeof _phMaybeShowApprovalEmpty === 'function') _phMaybeShowApprovalEmpty();
 }
 
 function phVerifyChore(logId, approved){
