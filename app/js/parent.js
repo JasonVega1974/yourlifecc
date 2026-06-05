@@ -2185,9 +2185,19 @@ function switchToProfile(id){
   // bracket is unset) followed by the kid onboarding tutorial. Age picker
   // never fires for parent profiles (parent-account init suppresses it).
   if(!profile.isParent){
-    const needAgePicker = !D.ageBracket && !window._faithFree
+    // ageBracket via _ylccGetFlag so this survives cloudLoad's D overwrite.
+    // Per the diagnosis: the LS key is account-scoped (mom_uid), so a
+    // multi-kid family's second kid will inherit the first kid's bracket
+    // by default. That's a milder regression than the documented gate-
+    // re-show bug and matches the user-approved fix shape; a follow-up
+    // can add profile-scoped variants if multi-kid hits this.
+    const needAgePicker = !_ylccGetFlag('ageBracket', '') && !window._faithFree
                        && (typeof IS_DEMO === 'undefined' || !IS_DEMO)
                        && typeof showAgePickerModal === 'function';
+    // kidOnboardDone stays per-kid via D — switchToProfile has just
+    // swapped D to the kid's profile.data, so D.kidOnboardDone is the
+    // right (per-kid) source. Account-scoped LS here would suppress the
+    // onboarding tour for the second+ kid in multi-kid families.
     const needKidOnboard = !D.kidOnboardDone;
     if(needAgePicker){
       setTimeout(function(){
