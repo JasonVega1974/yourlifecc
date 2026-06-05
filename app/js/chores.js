@@ -31,6 +31,100 @@ function initChoreData(){
   if(D.chorePoints.total === undefined) D.chorePoints.total = 0;
   if(D.chorePoints.spent === undefined) D.chorePoints.spent = 0;
   if(!D.chorePin) D.chorePin='';
+
+  // ── Tab 1 Increment 3 — one-time store consolidation ────────
+  // D.rewards was the kid-points reward shop inside #s-chores.
+  // D.pb.storeItems is the Parent Bucks store inside #s-rewards
+  // (and now also inside #ch-store). Now both flow through PB.
+  // Migration rule: copy any D.rewards entry whose name doesn't
+  // already exist in D.pb.storeItems (case-insensitive, trimmed).
+  // Sets D.rewardsLegacyMigrated=true on first run so the copy
+  // never repeats — guards against double-merging after a future
+  // resave. D.rewards is left intact (read-only fallback in case
+  // the migration produced a surprise; visible in cloud blob only).
+  if(!D.rewardsLegacyMigrated && Array.isArray(D.rewards) && D.rewards.length){
+    if(!D.pb && typeof initParentBucks === 'function') initParentBucks();
+    if(!D.pb) D.pb = {balance:0, log:[], storeItems:[], spinTickets:0, scratchTickets:0};
+    if(!Array.isArray(D.pb.storeItems)) D.pb.storeItems = [];
+    const seen = new Set(D.pb.storeItems.map(it => String(it && it.name || '').trim().toLowerCase()).filter(Boolean));
+    let copied = 0;
+    D.rewards.forEach(r => {
+      const key = String(r && r.name || '').trim().toLowerCase();
+      if(!key)        return; // skip blank-name legacy rows
+      if(seen.has(key)) return; // skip name match — dedup is by name only, regardless of cost
+      D.pb.storeItems.push({
+        id:     Date.now() + copied,            // ensure unique ids across the batch
+        emoji:  '🎁',
+        name:   r.name,
+        cost:   Number.isFinite(+r.pts) ? +r.pts : 50,
+        active: r.active !== false
+      });
+      seen.add(key);
+      copied++;
+    });
+    D.rewardsLegacyMigrated = true;
+    if(copied > 0) console.debug('[chores migration] copied', copied, 'D.rewards entry(ies) into D.pb.storeItems');
+  }
+}
+
+// ── Tab 1 Increment 3 — photo proof helpers ─────────────────
+// Allow-list mirrors the chore-proofs bucket's allowed_mime_types
+// (see docs/migrations/chore-proofs-bucket.sql). 5 MB cap mirrors
+// the bucket's file_size_limit. Both gates here so the user gets a
+// friendly toast rather than a 413 from PostgREST.
+const CHORE_PHOTO_MAX_BYTES = 5 * 1024 * 1024;
+const CHORE_PHOTO_MIME = {
+  'image/jpeg':'jpg', 'image/png':'png', 'image/webp':'webp',
+  'image/heic':'heic', 'image/heif':'heif'
+};
+let _chorePhotoPendingId = null;
+
+// Opens the hidden file input scoped to the current chore. The
+// onchange handler in index.html routes the selected file back to
+// markChoreDone(_chorePhotoPendingId, file). Falls back gracefully
+// if the input isn't in the DOM (e.g., legacy single-file shells).
+function chorePhotoPick(choreId){
+  const input = document.getElementById('chorePhotoInput');
+  if(!input){ showToast('Photo upload unavailable'); return; }
+  _chorePhotoPendingId = choreId;
+  input.value = ''; // allow re-select of the same file
+  input.click();
+}
+
+// Wired from index.html onchange. Resolves the pending chore id,
+// then delegates to markChoreDone with the selected file. Defensive
+// against a stray click without a pending chore id.
+function chorePhotoOnChange(input){
+  const file = input && input.files && input.files[0];
+  const id = _chorePhotoPendingId;
+  _chorePhotoPendingId = null;
+  if(!file || id === null || id === undefined) return;
+  markChoreDone(id, file);
+}
+
+// Upload to chore-proofs under <user_id>/<profile_id>/<chore_id>/<ts>.<ext>.
+// Returns { ok:true, path } on success, { ok:false, reason } on failure.
+// Never throws — caller decides whether to proceed without a photo.
+async function _uploadChoreProof(supa, userId, choreId, file){
+  if(!supa || !userId) return { ok:false, reason:'not signed in' };
+  // Path: profile is namespaced into chore_id already, but include it
+  // explicitly as the second segment so future cleanup queries
+  // (delete from storage.objects where name like ...) are tractable.
+  const activeProfile =
+    (typeof _activeProfileId !== 'undefined' && _activeProfileId)
+      ? String(_activeProfileId)
+      : '_solo';
+  const ext = CHORE_PHOTO_MIME[file.type] || 'bin';
+  const stamp = Date.now();
+  const path = userId + '/' + activeProfile + '/' + String(choreId) + '/' + stamp + '.' + ext;
+  try {
+    const { error } = await supa.storage.from('chore-proofs')
+      .upload(path, file, { contentType: file.type, upsert: false });
+    if(error) return { ok:false, reason: error.message || 'upload failed' };
+    return { ok:true, path: path };
+  } catch(e){
+    return { ok:false, reason: (e && e.message) || 'upload exception' };
+  }
 }
 
 // Sub-tab nav for #s-chores (Tab 1 Increment 1). Mirrors the
@@ -44,6 +138,11 @@ function cTab(tab, btn){
   const target = document.getElementById('ch-' + tab);
   if(target) target.style.display = 'block';
   if(btn){ btn.classList.add('active'); btn.setAttribute('aria-selected','true'); }
+  // Tab 1 Inc 3 — when the Store tab is opened, ensure the unified
+  // Parent Bucks store is freshly populated. renderParentBucks() is
+  // the same renderer used by s-rewards' #pbStoreItems; it now also
+  // fills #choreStoreItems (see email.js).
+  if(tab === 'store' && typeof renderParentBucks === 'function') renderParentBucks();
 }
 
 
@@ -77,7 +176,7 @@ function _choreMultiplier(diff){
   return 1.0;
 }
 
-function markChoreDone(id){
+async function markChoreDone(id, file){
   initChoreData();
   const chore = (Array.isArray(D.chores)?D.chores:[]).find(c=>c.id===id);
   if(!chore) return;
@@ -85,6 +184,38 @@ function markChoreDone(id){
   // Check if already done today
   const already = D.choreLog.find(l=>l.choreId===id && l.date===today && (l.status==='done'||l.status==='pending'));
   if(already){ showToast('Already submitted today'); return; }
+
+  // Tab 1 Increment 3 — optional photo proof. Validate client-side
+  // first so a rejection surfaces as a toast, not a 413 from
+  // PostgREST. Then upload; on success attach the storage path to
+  // the log entry, on failure prompt the kid to decide.
+  let photoPath = null;
+  if(file){
+    if(!CHORE_PHOTO_MIME[file.type]){
+      showToast('Photos only — JPEG / PNG / WebP / HEIC');
+      return;
+    }
+    if(file.size > CHORE_PHOTO_MAX_BYTES){
+      showToast('Photo too large — max 5 MB');
+      return;
+    }
+    const supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+    const uid  = (typeof _supaUser !== 'undefined' && _supaUser) ? _supaUser.id : null;
+    if(!supa || !uid){
+      showToast('Sign in to add a photo — submitting without it');
+      // fall through; submit text-only
+    } else {
+      showToast('Uploading photo…');
+      const r = await _uploadChoreProof(supa, uid, id, file);
+      if(r.ok){
+        photoPath = r.path;
+      } else {
+        showToast('Photo upload failed — submitting without it');
+        // Don't block the chore submission; behave the same as no-photo path.
+      }
+    }
+  }
+
   // Tab 1 Increment 2 — apply difficulty multiplier at submit-time so the
   // pending log row already reflects what the kid will earn on verify.
   // Verify-time math is unchanged: it just awards entry.pts.
@@ -98,10 +229,14 @@ function markChoreDone(id){
     // Snapshot the base + multiplier for transparency in History — also
     // protects against the chore's difficulty being changed between
     // submit and verify.
-    basePts: basePts, mult: mult
+    basePts: basePts, mult: mult,
+    // Tab 1 Inc 3 — storage path (NOT a URL). Parent verification
+    // signs short-lived URLs from this path on demand. null when no
+    // photo was attached.
+    photoPath: photoPath
   });
   save(); renderChores();
-  showToast('Submitted for verification ✓');
+  showToast(photoPath ? 'Submitted with photo ✓' : 'Submitted for verification ✓');
 }
 
 function verifyChore(logId, approved){
@@ -251,11 +386,17 @@ function renderChores(){
           ? `<span style="font-size:.58rem;color:var(--tx2);">${basePts}×${mult.toFixed(1)}=<b style="color:var(--c);">${effective}</b>pts</span>`
           : `<span style="font-size:.58rem;color:var(--tx2);">${effective} pts</span>`;
         const st = log ? log.status : 'todo';
+        // Tab 1 Inc 3 — the 📸 button opens a hidden file picker
+        // scoped to this chore; on selection we route through
+        // markChoreDone(id, file) which uploads + attaches photoPath.
+        const photoBtn = (st === 'todo' || st === 'rejected')
+          ? `<button onclick="chorePhotoPick(${c.id})" title="Submit with photo proof" style="background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.22);color:#a78bfa;font-size:.62rem;padding:.3rem .45rem;border-radius:6px;cursor:pointer;margin-right:.25rem;">📸</button>`
+          : '';
         const action = (st === 'todo' || st === 'rejected')
           ? `<button class="btn bp bs" onclick="markChoreDone(${c.id})" style="font-size:.6rem;white-space:nowrap;padding:.3rem .55rem;">${st==='rejected'?'↻ Redo':'✓ Done'}</button>`
           : st === 'pending'
-            ? `<span style="font-size:.58rem;color:#fbbf24;font-weight:700;">⏳ Pending</span>`
-            : `<span style="font-size:.58rem;color:#22c55e;font-weight:700;">✅ Verified</span>`;
+            ? `<span style="font-size:.58rem;color:#fbbf24;font-weight:700;">⏳ Pending${log && log.photoPath ? ' 📸' : ''}</span>`
+            : `<span style="font-size:.58rem;color:#22c55e;font-weight:700;">✅ Verified${log && log.photoPath ? ' 📸' : ''}</span>`;
         return `<div class="ch-card" style="${st==='verified'?'opacity:.55;':''}">
           <div style="display:flex;align-items:flex-start;gap:.4rem;">
             <span style="font-size:1.05rem;line-height:1.1;">${c.emoji||'📌'}</span>
@@ -264,7 +405,7 @@ function renderChores(){
               <div style="display:flex;gap:.25rem;align-items:center;margin-top:.25rem;flex-wrap:wrap;">${diffPill}${dueChip}${ptsLabel}</div>
             </div>
           </div>
-          <div style="margin-top:.4rem;text-align:right;">${action}</div>
+          <div style="margin-top:.4rem;text-align:right;">${photoBtn}${action}</div>
         </div>`;
       };
       const renderCol = (key, label, dotColor, emptyMsg) => `
