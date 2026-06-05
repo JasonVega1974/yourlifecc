@@ -5236,10 +5236,17 @@ function closeKidOnboard(){
 // ══════════════════════════════════════════════════════════
 function updateStartHereBtn(){
   const btn = document.getElementById('startHereBtn'); if(!btn) return;
-  // Hide when child profile is active OR wizard already done
+  // Hide when child profile is active OR wizard already done.
+  // _ylccGetFlag reads the per-user LS key first, surviving cloudLoad's
+  // D overwrite. Falls back to D.parentWizardDone for users whose LS
+  // key was never written (the value would still be in D from a prior
+  // session's cloud blob in that case).
   const profile = _profiles && _activeProfileId ? _profiles.find(p=>p.id===_activeProfileId) : null;
   const isChild = profile && !profile.isParent;
-  if(isChild || D.parentWizardDone){ btn.classList.add('sh-hidden'); }
+  const wizardDone = (typeof _ylccGetFlag === 'function')
+    ? _ylccGetFlag('parentWizardDone', false)
+    : D.parentWizardDone;
+  if(isChild || wizardDone){ btn.classList.add('sh-hidden'); }
   else { btn.classList.remove('sh-hidden'); }
 }
 
