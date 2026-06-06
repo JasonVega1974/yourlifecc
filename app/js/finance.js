@@ -34,7 +34,7 @@ function mTab(tab,btn){
   if(tab==='dashboard') renderSpendingDonut();
   if(tab==='tx')        renderTx();
   if(tab==='budget')    calcBudget();
-  if(tab==='goals')   { renderSavingsTab(); renderSavGoalCards(); }
+  if(tab==='goals')   { renderSavingsTab(); renderSavGoalCards(); if(typeof _runWhatIf === 'function') setTimeout(_runWhatIf, 0); }
   if(tab==='bills')     renderBills();
   if(tab==='paycheck')  calcPaycheckSim();
   if(tab==='allowance' && typeof renderAllowance === 'function') renderAllowance();
@@ -332,24 +332,80 @@ function addToGoal(id){
     showToast('+$' + a + ' added! 💚');
   }
 }
-function editSavGoal(id){ const g=(D.savingsGoals||[]).find(g=>g.id===id); if(!g) return; const n=prompt('Goal name:',g.name); if(!n) return; const t=parseFloat(prompt('Target ($):',g.target)); if(!isNaN(t)) g.target=t; g.name=n.trim(); save(); renderSavingsTab(); renderSavGoalCards(); }
+// editSavGoal — replaced by the Inc 5 modal-reuse version at the
+// bottom of this file. The new one repurposes goalModal in edit
+// mode instead of chaining native prompt() dialogs.
 function delSavGoal(id){ if(!confirm('Delete this goal?')) return; D.savingsGoals=(D.savingsGoals||[]).filter(g=>g.id!==id); save(); renderSavingsTab(); renderSavGoalCards(); updateFinSum(); }
 
+// Tab 2 Inc 5 — renderSavGoalCards extended:
+//   - Sanitizes D.savingsGoals (adds optional fields defensively)
+//   - Renders the inline "+ Add" expanding row when
+//     _quickAddOpenId === g.id (replaces the prompt-based addToGoal)
+//   - Renders the hero photo when g.photoPath is set
+//     (signed URL hydrated async via _hydrateGoalPhotos)
+//   - Renders countdown chip when g.targetDate is set
+//   - Renders completed badge when g.completedAt is set
+//   - Edit / delete actions unchanged (editSavGoal now opens
+//     goalModal in edit mode rather than chained prompts)
 function renderSavGoalCards(){
-  // Phase C-Finance: SVG progress rings replace the linear bars. Card layout
-  // stays the same so the existing edit/delete actions are unchanged.
+  if(typeof _sanitizeSavingsGoals === 'function') _sanitizeSavingsGoals();
   const el = document.getElementById('savGoalCards');
   if(!el) return;
+  const today = new Date().toISOString().slice(0,10);
   el.innerHTML = (D.savingsGoals||[]).map(g => {
     const pct = Math.min(100, ((g.current||0) / g.target) * 100);
     const done = pct >= 100;
     const ringColor = done ? 'var(--gr)' : 'var(--section-finance)';
+    const hasPhoto = !!g.photoPath;
+    // Hero: photo block when set, emoji otherwise. The photo div
+    // gets data-goal-id so _hydrateGoalPhotos can attach the
+    // signed URL after the sync paint.
+    const heroHtml = hasPhoto
+      ? '<div class="mz-goal-photo" data-goal-id="' + g.id + '" style="width:48px;height:48px;border-radius:10px;background:rgba(255,255,255,.05) center/cover no-repeat;flex-shrink:0;"></div>'
+      : '<span style="font-size:1.5rem;flex-shrink:0;">' + g.emoji + '</span>';
+    // Countdown chip — months remaining when targetDate set.
+    let countdownHtml = '';
+    if(g.targetDate && !done){
+      const t = new Date(g.targetDate + 'T00:00:00');
+      const n = new Date(today + 'T00:00:00');
+      const daysLeft = Math.round((t - n) / 86400000);
+      if(daysLeft < 0){
+        countdownHtml = '<span class="mz-goal-chip mz-goal-chip--warn" style="font-size:.55rem;font-weight:800;background:rgba(251,113,133,.14);color:#fb7185;padding:.12rem .4rem;border-radius:5px;letter-spacing:.4px;">PAST DUE</span>';
+      } else if(daysLeft < 60){
+        countdownHtml = '<span class="mz-goal-chip" style="font-size:.55rem;font-weight:800;background:rgba(99,102,241,.14);color:#6366f1;padding:.12rem .4rem;border-radius:5px;letter-spacing:.4px;">' + daysLeft + ' DAYS LEFT</span>';
+      } else {
+        const monthsLeft = Math.round(daysLeft / 30);
+        countdownHtml = '<span class="mz-goal-chip" style="font-size:.55rem;font-weight:800;background:rgba(99,102,241,.14);color:#6366f1;padding:.12rem .4rem;border-radius:5px;letter-spacing:.4px;">' + monthsLeft + ' MO LEFT</span>';
+      }
+    } else if(g.completedAt){
+      countdownHtml = '<span class="mz-goal-chip" style="font-size:.55rem;font-weight:800;background:rgba(16,185,129,.16);color:#10b981;padding:.12rem .4rem;border-radius:5px;letter-spacing:.4px;">✓ ' + escapeHtml(g.completedAt.slice(0,7)) + '</span>';
+    }
+    // Action row — inline add form when this card is being edited,
+    // standard buttons otherwise. The inline form keeps the user in
+    // the same visual context and replaces the prompt() that lived
+    // in addToGoal before Inc 5.
+    let actionsHtml;
+    if(_quickAddOpenId === g.id){
+      actionsHtml = ''
+        + '<div style="display:flex;gap:.32rem;align-items:center;">'
+        +   '<input type="number" id="mzQuickAddInput_' + g.id + '" placeholder="$" step=".01" min=".01" style="flex:1;font-family:var(--fn);font-size:.85rem;padding:.45rem .65rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;color:var(--tx);" onkeydown="if(event.key===\'Enter\'){event.preventDefault();_quickAddSave(' + g.id + ');}else if(event.key===\'Escape\'){_quickAddCancel();}">'
+        +   '<button class="btn bgr bs" onclick="_quickAddSave(' + g.id + ')">Save</button>'
+        +   '<button class="btn bgh bs" onclick="_quickAddCancel()">Cancel</button>'
+        + '</div>';
+    } else {
+      actionsHtml = ''
+        + '<div style="display:flex;gap:.32rem;">'
+        +   '<button class="btn bgr bs" style="flex:1;" onclick="addToGoal(' + g.id + ')">+ Add</button>'
+        +   '<button class="btn bgh bs" onclick="editSavGoal(' + g.id + ')">✎</button>'
+        +   '<button class="btn bda bs" onclick="delSavGoal(' + g.id + ')">✕</button>'
+        + '</div>';
+    }
     return '<div class="card" style="border-top:3px solid var(--section-finance);">'
       + '<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:.7rem;">'
-      +   '<span style="font-size:1.5rem;flex-shrink:0;">'+g.emoji+'</span>'
+      +   heroHtml
       +   '<div style="flex:1;min-width:0;">'
-      +     '<div style="font-weight:700;font-size:.95rem;line-height:1.2;">'+escapeHtml(g.name)+'</div>'
-      +     '<div style="font-size:.74rem;color:var(--tx2);margin-top:.15rem;font-family:var(--fn);">$'+(g.current||0).toLocaleString()+' / $'+g.target.toLocaleString()+'</div>'
+      +     '<div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;"><span style="font-weight:700;font-size:.95rem;line-height:1.2;">' + escapeHtml(g.name) + '</span>' + countdownHtml + '</div>'
+      +     '<div style="font-size:.74rem;color:var(--tx2);margin-top:.15rem;font-family:var(--fn);">$' + (g.current||0).toLocaleString() + ' / $' + g.target.toLocaleString() + '</div>'
       +   '</div>'
       + '</div>'
       + '<div style="display:flex;justify-content:center;margin-bottom:.7rem;">'
@@ -357,14 +413,14 @@ function renderSavGoalCards(){
       + '</div>'
       + (done
           ? '<div style="text-align:center;font-size:.78rem;color:var(--gr);font-weight:700;margin-bottom:.6rem;">🎉 Goal reached!</div>'
-          : '<div style="text-align:center;font-size:.72rem;color:var(--tx2);margin-bottom:.6rem;">$'+Math.max(0, g.target-(g.current||0)).toLocaleString()+' to go</div>')
-      + '<div style="display:flex;gap:.32rem;">'
-      +   '<button class="btn bgr bs" style="flex:1;" onclick="addToGoal('+g.id+')">+ Add</button>'
-      +   '<button class="btn bgh bs" onclick="editSavGoal('+g.id+')">✎</button>'
-      +   '<button class="btn bda bs" onclick="delSavGoal('+g.id+')">✕</button>'
-      + '</div>'
+          : '<div style="text-align:center;font-size:.72rem;color:var(--tx2);margin-bottom:.6rem;">$' + Math.max(0, g.target - (g.current||0)).toLocaleString() + ' to go</div>')
+      + actionsHtml
       + '</div>';
   }).join('');
+  // Hydrate hero photos asynchronously — the sync paint above writes
+  // empty backgrounds for cards with photoPath; this fills them in
+  // as createSignedUrl resolves.
+  if(typeof _hydrateGoalPhotos === 'function') _hydrateGoalPhotos();
 }
 
 // SVG progress ring helper — Phase C-Finance. Renders a single ring with
@@ -1631,5 +1687,526 @@ function _learnComplete(n){
   save();
   // Re-render to flip the button label + update the grid counter.
   renderLearn();
+}
+
+// ════════════════════════════════════════════════════════════════
+// Tab 2 Increment 5 — Goals polish + What-If + receipt/goal photos
+// ════════════════════════════════════════════════════════════════
+//
+// This block lands:
+//   1. Math helpers — _calcCompoundFV, _calcLoanPayoff,
+//      _calcSavingsToGoal, _calcMonthlyForGoal. All four use
+//      MONTHLY compounding (consumer-calc standard).
+//   2. _renderWhatIf — 3-mode simulator (Compound / Loan / Goal),
+//      one Chart.js canvas, dataset swap per mode.
+//   3. addToGoal inline expand — replaces the prompt() that lived
+//      here. Tap "+ Add" → row reveals input + Save/Cancel.
+//   4. editSavGoal modal-reuse — repurpose goalModal in edit mode
+//      via _savEditingId. saveSavingsGoal branches on the flag.
+//   5. Goal field sanitize — D.savingsGoals gets optional
+//      targetDate / photoPath / createdAt / completedAt fields.
+//   6. Photo upload helpers — _uploadGoalPhoto, _uploadReceipt port
+//      the chore-proofs upload pattern to the new money-images +
+//      money-receipts buckets.
+//
+// Math consistency: the formulas reproduce the EXACT numbers quoted
+// in Lessons 7 and 8 (corrected in the lesson-fix commit just
+// before this one). Verified before commit.
+
+const MONEY_PHOTO_MAX_BYTES = 5 * 1024 * 1024;
+const MONEY_PHOTO_MIME = {
+  'image/jpeg':'jpg', 'image/png':'png', 'image/webp':'webp',
+  'image/heic':'heic', 'image/heif':'heif'
+};
+
+// ─── Math: compound interest (monthly compounded) ────────────────
+function _calcCompoundFV(monthlyContrib, annualRatePct, contribYears, growYears){
+  const r = (annualRatePct / 100) / 12;
+  const m1 = Math.max(0, contribYears) * 12;
+  const m2 = Math.max(0, growYears)    * 12;
+  let phase1 = 0;
+  if(m1 > 0){
+    if(r === 0) phase1 = monthlyContrib * m1;
+    else        phase1 = monthlyContrib * (Math.pow(1+r, m1) - 1) / r;
+  }
+  const finalValue       = phase1 * Math.pow(1+r, m2);
+  const totalContributed = monthlyContrib * m1;
+  return {
+    finalValue,
+    totalContributed,
+    growthEarned: finalValue - totalContributed
+  };
+}
+
+// ─── Math: loan payoff (standard amortization) ────────────────────
+function _calcLoanPayoff(balance, aprPct, monthlyPayment){
+  const r = (aprPct / 100) / 12;
+  if(monthlyPayment <= balance * r){
+    return { months: Infinity, totalInterest: Infinity, totalPaid: Infinity, neverPaysOff: true };
+  }
+  if(r === 0){
+    const months = Math.ceil(balance / monthlyPayment);
+    return { months, totalInterest: 0, totalPaid: balance };
+  }
+  const nAnalytical = -Math.log(1 - r * balance / monthlyPayment) / Math.log(1 + r);
+  const months = Math.round(nAnalytical);
+  let remaining = balance, totalPaid = 0;
+  for(let i = 0; i < months; i++){
+    const interest = remaining * r;
+    const pay = Math.min(monthlyPayment, remaining + interest);
+    remaining = remaining + interest - pay;
+    totalPaid += pay;
+    if(remaining <= 0.005) break;
+  }
+  if(remaining > 0.005){
+    const interest = remaining * r;
+    totalPaid += remaining + interest;
+  }
+  return {
+    months: months,
+    totalInterest: totalPaid - balance,
+    totalPaid: totalPaid
+  };
+}
+
+// ─── Math: savings to goal ───────────────────────────────────────
+function _calcSavingsToGoal(currentBalance, target, monthlyContrib, annualRatePct){
+  if(currentBalance >= target) return { months: 0, finalAmount: currentBalance };
+  if(monthlyContrib <= 0) return { months: Infinity, finalAmount: currentBalance, neverReaches: true };
+  const r = (annualRatePct / 100) / 12;
+  if(r === 0){
+    const needed = target - currentBalance;
+    return { months: Math.ceil(needed / monthlyContrib), finalAmount: target };
+  }
+  const num = target + monthlyContrib / r;
+  const den = currentBalance + monthlyContrib / r;
+  if(den <= 0 || num <= 0) return { months: Infinity, finalAmount: currentBalance, neverReaches: true };
+  const n = Math.log(num / den) / Math.log(1 + r);
+  if(!isFinite(n) || n < 0) return { months: Infinity, finalAmount: currentBalance, neverReaches: true };
+  return { months: Math.ceil(n), finalAmount: target };
+}
+
+// ─── Math: monthly contribution needed to hit goal in N months ───
+function _calcMonthlyForGoal(currentBalance, target, months, annualRatePct){
+  if(currentBalance >= target) return { monthly: 0, alreadyMet: true };
+  if(months <= 0) return { monthly: Infinity, impossible: true };
+  const r = (annualRatePct / 100) / 12;
+  if(r === 0){
+    return { monthly: (target - currentBalance) / months };
+  }
+  const factor = Math.pow(1+r, months);
+  const monthly = (target - currentBalance * factor) * r / (factor - 1);
+  return { monthly: Math.max(0, monthly) };
+}
+
+// ─── Chart series builders ────────────────────────────────────────
+function _whatIfCompoundSeries(monthly, ratePct, contribYears, growYears){
+  const r = (ratePct / 100) / 12;
+  const totalMonths = (contribYears + growYears) * 12;
+  const contribMonths = contribYears * 12;
+  const step = Math.max(1, Math.floor(totalMonths / 60));
+  const out = [];
+  let balance = 0;
+  for(let m = 0; m <= totalMonths; m++){
+    if(m > 0){
+      balance = balance * (1 + r);
+      if(m <= contribMonths) balance += monthly;
+    }
+    if(m % step === 0 || m === totalMonths){
+      out.push({ month: m, balance });
+    }
+  }
+  return out;
+}
+
+function _whatIfLoanSeries(balance, aprPct, monthlyPayment){
+  const r = (aprPct / 100) / 12;
+  if(monthlyPayment <= balance * r) return [];
+  const points = [{ month: 0, balance: balance }];
+  let rem = balance, m = 0;
+  while(rem > 0.005 && m < 600){
+    rem = rem * (1 + r) - monthlyPayment;
+    if(rem < 0) rem = 0;
+    m++;
+    points.push({ month: m, balance: rem });
+  }
+  return points;
+}
+
+function _whatIfGoalSeries(current, target, monthly, annualRatePct){
+  const r = (annualRatePct / 100) / 12;
+  const points = [{ month: 0, balance: current }];
+  let bal = current, m = 0;
+  while(bal < target && m < 600){
+    bal = bal * (1 + r) + monthly;
+    m++;
+    points.push({ month: m, balance: bal });
+  }
+  return points;
+}
+
+// ─── What-If renderer ────────────────────────────────────────────
+let _whatIfMode  = 'compound';
+let _whatIfChart = null;
+
+function _setWhatIfMode(mode){
+  if(['compound','loan','goal'].indexOf(mode) === -1) return;
+  _whatIfMode = mode;
+  document.querySelectorAll('.mz-whatif-chip').forEach(b => b.classList.remove('active'));
+  const active = document.querySelector('.mz-whatif-chip[data-mode="' + mode + '"]');
+  if(active) active.classList.add('active');
+  document.querySelectorAll('.mz-whatif-panel').forEach(p => p.style.display = 'none');
+  const panel = document.getElementById('mzWhatIfPanel_' + mode);
+  if(panel) panel.style.display = '';
+  _runWhatIf();
+}
+
+function _readWhatIfInput(id){
+  const el = document.getElementById(id);
+  if(!el) return 0;
+  const v = parseFloat(el.value);
+  return isFinite(v) ? v : 0;
+}
+
+function _runWhatIf(){
+  if(_whatIfMode === 'compound'){
+    const monthly = _readWhatIfInput('whatIfCmpMonthly');
+    const rate    = _readWhatIfInput('whatIfCmpRate');
+    const cYears  = _readWhatIfInput('whatIfCmpContribY');
+    const gYears  = _readWhatIfInput('whatIfCmpGrowY');
+    const res = _calcCompoundFV(monthly, rate, cYears, gYears);
+    const outEl = document.getElementById('mzWhatIfOut_compound');
+    if(outEl){
+      outEl.innerHTML = ''
+        + '<div class="mz-whatif-out__main">$' + Math.round(res.finalValue).toLocaleString() + '</div>'
+        + '<div class="mz-whatif-out__row"><span>Total contributed</span><span>$' + Math.round(res.totalContributed).toLocaleString() + '</span></div>'
+        + '<div class="mz-whatif-out__row"><span>Growth earned</span><span class="mz-whatif-out__row--accent">$' + Math.round(res.growthEarned).toLocaleString() + '</span></div>';
+    }
+    _drawWhatIfChart(_whatIfCompoundSeries(monthly, rate, cYears, gYears), 'Compound balance', '#10b981');
+    return;
+  }
+  if(_whatIfMode === 'loan'){
+    const balance = _readWhatIfInput('whatIfLoanBalance');
+    const apr     = _readWhatIfInput('whatIfLoanApr');
+    const payment = _readWhatIfInput('whatIfLoanPayment');
+    const res = _calcLoanPayoff(balance, apr, payment);
+    const outEl = document.getElementById('mzWhatIfOut_loan');
+    if(outEl){
+      if(res.neverPaysOff){
+        const need = Math.ceil(balance * (apr/1200));
+        outEl.innerHTML = '<div class="mz-whatif-out__warn">⚠ Payment doesn\'t cover monthly interest — this loan never pays off. Increase the payment above $' + need.toLocaleString() + '/month.</div>';
+      } else {
+        const years = (res.months / 12).toFixed(1);
+        outEl.innerHTML = ''
+          + '<div class="mz-whatif-out__main">' + res.months + ' months</div>'
+          + '<div class="mz-whatif-out__row"><span>That\'s</span><span>' + years + ' years</span></div>'
+          + '<div class="mz-whatif-out__row"><span>Total interest</span><span class="mz-whatif-out__row--warn">$' + Math.round(res.totalInterest).toLocaleString() + '</span></div>'
+          + '<div class="mz-whatif-out__row"><span>Total paid</span><span>$' + Math.round(res.totalPaid).toLocaleString() + '</span></div>';
+      }
+    }
+    _drawWhatIfChart(_whatIfLoanSeries(balance, apr, payment), 'Loan balance', '#fb7185');
+    return;
+  }
+  if(_whatIfMode === 'goal'){
+    const current = _readWhatIfInput('whatIfGoalCurrent');
+    const target  = _readWhatIfInput('whatIfGoalTarget');
+    const monthly = _readWhatIfInput('whatIfGoalMonthly');
+    const rate    = _readWhatIfInput('whatIfGoalRate');
+    const res = _calcSavingsToGoal(current, target, monthly, rate);
+    const outEl = document.getElementById('mzWhatIfOut_goal');
+    if(outEl){
+      if(res.neverReaches){
+        outEl.innerHTML = '<div class="mz-whatif-out__warn">⚠ At this rate you won\'t reach the goal. Increase the monthly contribution.</div>';
+      } else if(res.months === 0){
+        outEl.innerHTML = '<div class="mz-whatif-out__main">Already there 🎉</div>';
+      } else {
+        const years = (res.months / 12).toFixed(1);
+        const targetDate = new Date();
+        targetDate.setMonth(targetDate.getMonth() + res.months);
+        const monthLabel = targetDate.toLocaleDateString('en', { month:'long', year:'numeric' });
+        outEl.innerHTML = ''
+          + '<div class="mz-whatif-out__main">' + res.months + ' months</div>'
+          + '<div class="mz-whatif-out__row"><span>That\'s</span><span>' + years + ' years (around ' + monthLabel + ')</span></div>'
+          + '<div class="mz-whatif-out__row"><span>Monthly contribution</span><span>$' + monthly.toFixed(0) + '</span></div>';
+      }
+    }
+    _drawWhatIfChart(_whatIfGoalSeries(current, target, monthly, rate), 'Balance toward goal', '#10b981');
+    return;
+  }
+}
+
+function _drawWhatIfChart(series, label, color){
+  if(typeof Chart === 'undefined') return;
+  const canvas = document.getElementById('mzWhatIfChart');
+  if(!canvas || !series || !series.length) return;
+  const labels = series.map(p => p.month);
+  const values = series.map(p => Math.round(p.balance));
+  if(_whatIfChart){
+    _whatIfChart.data.labels = labels;
+    _whatIfChart.data.datasets[0].label = label;
+    _whatIfChart.data.datasets[0].data = values;
+    _whatIfChart.data.datasets[0].borderColor = color;
+    _whatIfChart.data.datasets[0].backgroundColor = color + '22';
+    _whatIfChart.update('none');
+    return;
+  }
+  _whatIfChart = new Chart(canvas.getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: label,
+        data: values,
+        borderColor: color,
+        backgroundColor: color + '22',
+        fill: true,
+        tension: 0.25,
+        pointRadius: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { title: { display: true, text: 'Months', color: 'rgba(255,255,255,.5)' }, ticks: { color: 'rgba(255,255,255,.5)' }, grid: { color: 'rgba(255,255,255,.05)' } },
+        y: { ticks: { color: 'rgba(255,255,255,.5)', callback: v => '$' + Number(v).toLocaleString() }, grid: { color: 'rgba(255,255,255,.05)' } }
+      }
+    }
+  });
+}
+
+// ─── Goal field sanitize ─────────────────────────────────────────
+function _sanitizeSavingsGoals(){
+  if(!Array.isArray(D.savingsGoals)) D.savingsGoals = [];
+  D.savingsGoals.forEach(g => {
+    if(!g || typeof g !== 'object') return;
+    if(typeof g.targetDate   !== 'string') g.targetDate   = '';
+    if(typeof g.photoPath    !== 'string') g.photoPath    = '';
+    if(typeof g.createdAt    !== 'string') g.createdAt    = '';
+    if(typeof g.completedAt  !== 'string') g.completedAt  = '';
+    if(g.current >= g.target && !g.completedAt){
+      g.completedAt = new Date().toISOString().slice(0,10);
+    }
+  });
+}
+
+// ─── addToGoal — inline expanding row (no more prompt()) ─────────
+let _quickAddOpenId = null;
+
+function addToGoal(id){
+  _quickAddOpenId = id;
+  if(typeof renderSavGoalCards === 'function') renderSavGoalCards();
+  setTimeout(function(){
+    const inp = document.getElementById('mzQuickAddInput_' + id);
+    if(inp) { try { inp.focus(); inp.select(); } catch(_) {} }
+  }, 60);
+}
+
+function _quickAddSave(id){
+  _sanitizeSavingsGoals();
+  const inp = document.getElementById('mzQuickAddInput_' + id);
+  const amt = inp ? parseFloat(inp.value) : NaN;
+  if(!isFinite(amt) || amt <= 0){ showToast('Enter an amount'); return; }
+  const g = D.savingsGoals.find(g => g && g.id === id);
+  if(!g) return;
+  const wasIncomplete = (g.current || 0) < g.target;
+  g.current = (g.current || 0) + amt;
+  if(g.current >= g.target && !g.completedAt){
+    g.completedAt = new Date().toISOString().slice(0,10);
+  }
+  _quickAddOpenId = null;
+  save();
+  if(typeof renderSavingsTab    === 'function') renderSavingsTab();
+  if(typeof renderSavGoalCards  === 'function') renderSavGoalCards();
+  if(typeof updateFinSum        === 'function') updateFinSum();
+  if(wasIncomplete && g.current >= g.target){
+    showToast('🎉 Goal complete! ' + (g.emoji||'🎯') + ' ' + g.name);
+    if(typeof launchSideConfetti === 'function') launchSideConfetti();
+  } else {
+    showToast('+$' + amt.toFixed(2) + ' added to ' + (g.emoji||'🎯') + ' ' + g.name);
+  }
+}
+
+function _quickAddCancel(){
+  _quickAddOpenId = null;
+  if(typeof renderSavGoalCards === 'function') renderSavGoalCards();
+}
+
+// ─── editSavGoal — modal reuse (no more prompt() chain) ──────────
+let _savEditingId = null;
+
+function editSavGoal(id){
+  _sanitizeSavingsGoals();
+  const g = D.savingsGoals.find(g => g && g.id === id);
+  if(!g){ showToast('Goal not found'); return; }
+  _savEditingId = id;
+  const nameEl    = document.getElementById('sgName');       if(nameEl)    nameEl.value    = g.name    || '';
+  const emojiEl   = document.getElementById('sgEmoji');      if(emojiEl)   emojiEl.value   = g.emoji   || '🎯';
+  const targetEl  = document.getElementById('sgTarget');     if(targetEl)  targetEl.value  = g.target  || '';
+  const currentEl = document.getElementById('sgCurrent');    if(currentEl) currentEl.value = g.current || '';
+  const dateEl    = document.getElementById('sgTargetDate'); if(dateEl)    dateEl.value    = g.targetDate || '';
+  const submitEl = document.getElementById('sgSubmitBtn'); if(submitEl) submitEl.textContent = 'Save Changes';
+  const titleEl  = document.getElementById('sgModalTitle'); if(titleEl) titleEl.textContent = 'Edit savings goal';
+  if(typeof openModal === 'function') openModal('goalModal');
+}
+
+// ─── saveSavingsGoal rewrite — new + edit branches ────────────────
+function saveSavingsGoal(){
+  _sanitizeSavingsGoals();
+  const name       = (document.getElementById('sgName').value     || '').trim();
+  const emoji      = (document.getElementById('sgEmoji').value    || '🎯').trim();
+  const target     = parseFloat(document.getElementById('sgTarget').value);
+  const current    = parseFloat(document.getElementById('sgCurrent').value) || 0;
+  const targetDate = ((document.getElementById('sgTargetDate')||{}).value || '').trim();
+  if(!name || isNaN(target)){ showToast('Fill in goal details'); return; }
+  let goalId = null;
+  if(_savEditingId !== null){
+    const g = D.savingsGoals.find(g => g && g.id === _savEditingId);
+    if(g){
+      g.name       = name;
+      g.emoji      = emoji;
+      g.target     = target;
+      g.current    = current;
+      g.targetDate = targetDate;
+      if(g.current >= g.target && !g.completedAt){
+        g.completedAt = new Date().toISOString().slice(0,10);
+      } else if(g.current < g.target){
+        g.completedAt = '';
+      }
+      goalId = g.id;
+      _savEditingId = null;
+    }
+  } else {
+    if(!D.savingsGoals) D.savingsGoals = [];
+    const newGoal = {
+      id: Date.now(),
+      name, emoji, target, current,
+      targetDate: targetDate,
+      photoPath: '',
+      createdAt: new Date().toISOString().slice(0,10),
+      completedAt: current >= target ? new Date().toISOString().slice(0,10) : ''
+    };
+    D.savingsGoals.push(newGoal);
+    goalId = newGoal.id;
+  }
+  ['sgName','sgEmoji','sgTarget','sgCurrent','sgTargetDate'].forEach(id => { const e = document.getElementById(id); if(e) e.value = ''; });
+  const submitEl = document.getElementById('sgSubmitBtn'); if(submitEl) submitEl.textContent = 'Create goal';
+  const titleEl  = document.getElementById('sgModalTitle'); if(titleEl) titleEl.textContent = 'New savings goal';
+  save();
+  if(typeof renderSavingsTab   === 'function') renderSavingsTab();
+  if(typeof renderSavGoalCards === 'function') renderSavGoalCards();
+  if(typeof closeModal         === 'function') closeModal('goalModal');
+  showToast(_savEditingId === null ? 'Goal saved ✓' : 'Goal created! 🎯');
+  // Photo upload (async, fire-and-forget) — runs AFTER the goal row
+  // exists so the storage path can reference goalId.
+  if(_pendingGoalPhotoFile && goalId !== null){
+    _maybeUploadPendingGoalPhoto(goalId);
+  }
+}
+
+// ─── Photo upload helpers ────────────────────────────────────────
+function _moneyProfileKey(){
+  if(typeof _profiles !== 'undefined' && _profiles
+     && typeof _activeProfileId !== 'undefined' && _activeProfileId){
+    const active = _profiles.find(p => p && p.id === _activeProfileId);
+    if(active){
+      const k = (typeof _pidOf === 'function') ? _pidOf(active) : (active.stableId || active.id);
+      if(k) return String(k);
+    }
+  }
+  return '_solo';
+}
+
+async function _uploadGoalPhoto(supa, userId, goalId, file){
+  if(!supa || !userId) return { ok:false, reason:'not signed in' };
+  if(!file) return { ok:false, reason:'no file' };
+  if(!MONEY_PHOTO_MIME[file.type]) return { ok:false, reason:'unsupported type' };
+  if(file.size > MONEY_PHOTO_MAX_BYTES) return { ok:false, reason:'too large' };
+  const ext = MONEY_PHOTO_MIME[file.type];
+  const profileKey = _moneyProfileKey();
+  const path = userId + '/' + profileKey + '/' + String(goalId) + '/' + Date.now() + '.' + ext;
+  try {
+    const { error } = await supa.storage.from('money-images')
+      .upload(path, file, { contentType: file.type, upsert: false });
+    if(error) return { ok:false, reason: error.message || 'upload failed' };
+    return { ok:true, path };
+  } catch(e){
+    return { ok:false, reason: (e && e.message) || 'upload exception' };
+  }
+}
+
+async function _uploadReceipt(supa, userId, txId, file){
+  if(!supa || !userId) return { ok:false, reason:'not signed in' };
+  if(!file) return { ok:false, reason:'no file' };
+  if(!MONEY_PHOTO_MIME[file.type]) return { ok:false, reason:'unsupported type' };
+  if(file.size > MONEY_PHOTO_MAX_BYTES) return { ok:false, reason:'too large' };
+  const ext = MONEY_PHOTO_MIME[file.type];
+  const profileKey = _moneyProfileKey();
+  const path = userId + '/' + profileKey + '/' + String(txId) + '/' + Date.now() + '.' + ext;
+  try {
+    const { error } = await supa.storage.from('money-receipts')
+      .upload(path, file, { contentType: file.type, upsert: false });
+    if(error) return { ok:false, reason: error.message || 'upload failed' };
+    return { ok:true, path };
+  } catch(e){
+    return { ok:false, reason: (e && e.message) || 'upload exception' };
+  }
+}
+
+async function _signMoneyPhotoUrl(bucket, path){
+  if(!path) return null;
+  const supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+  if(!supa) return null;
+  try {
+    const { data, error } = await supa.storage.from(bucket).createSignedUrl(path, 60);
+    if(error) return null;
+    return (data && data.signedUrl) || null;
+  } catch(_) { return null; }
+}
+
+function _hydrateGoalPhotos(){
+  if(!Array.isArray(D.savingsGoals)) return;
+  D.savingsGoals.forEach(g => {
+    if(!g || !g.photoPath) return;
+    _signMoneyPhotoUrl('money-images', g.photoPath).then(url => {
+      if(!url) return;
+      const el = document.querySelector('.mz-goal-photo[data-goal-id="' + g.id + '"]');
+      if(el) el.style.backgroundImage = 'url("' + url + '")';
+    });
+  });
+}
+
+let _pendingGoalPhotoFile = null;
+
+function _onGoalPhotoChange(inp){
+  if(!inp || !inp.files || !inp.files[0]) { _pendingGoalPhotoFile = null; return; }
+  const f = inp.files[0];
+  if(!MONEY_PHOTO_MIME[f.type]){ showToast('Photos only — JPEG / PNG / WebP / HEIC'); inp.value=''; return; }
+  if(f.size > MONEY_PHOTO_MAX_BYTES){ showToast('Photo too large — max 5 MB'); inp.value=''; return; }
+  _pendingGoalPhotoFile = f;
+  const preview = document.getElementById('sgPhotoPreviewLabel');
+  if(preview) preview.textContent = '✓ ' + f.name;
+}
+
+async function _maybeUploadPendingGoalPhoto(goalId){
+  if(!_pendingGoalPhotoFile) return;
+  const supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+  const uid  = (typeof _supaUser !== 'undefined' && _supaUser) ? _supaUser.id : null;
+  if(!supa || !uid){ showToast('Sign in to attach photos'); _pendingGoalPhotoFile = null; return; }
+  showToast('Uploading photo…');
+  const r = await _uploadGoalPhoto(supa, uid, goalId, _pendingGoalPhotoFile);
+  _pendingGoalPhotoFile = null;
+  const inp = document.getElementById('sgPhoto'); if(inp) inp.value = '';
+  const preview = document.getElementById('sgPhotoPreviewLabel'); if(preview) preview.textContent = '';
+  if(r.ok){
+    const g = D.savingsGoals.find(g => g && g.id === goalId);
+    if(g){ g.photoPath = r.path; save(); }
+    showToast('Photo attached ✓');
+    if(typeof renderSavGoalCards === 'function') renderSavGoalCards();
+  } else {
+    showToast('Photo upload failed — goal saved without it');
+  }
 }
 
