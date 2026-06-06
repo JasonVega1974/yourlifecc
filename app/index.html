@@ -5732,6 +5732,211 @@
       #s-chores .ch-tab,
       #s-chores .ch-card{transition:none!important;}
     }
+
+    /* ──────────────────────────────────────────────────────────
+       Tab 1 Increment 4 — Streaks / Leaderboard / History sub-tabs
+       Reuses the --cz-* token system declared at the top of this
+       block. cz-section-title is the shared Bebas Neue cap-label
+       used by all three sub-tabs.
+       ────────────────────────────────────────────────────────── */
+    #s-chores .cz-section-title{
+      font-family:var(--fh);font-size:.72rem;letter-spacing:1.8px;
+      color:var(--tx2);font-weight:800;margin:.3rem 0 .8rem;
+    }
+
+    /* Streak hero — three stat cards, the first wider for current */
+    #s-chores .cz-streak-hero{
+      display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:.55rem;margin-bottom:1rem;
+    }
+    #s-chores .cz-streak-stat{
+      background:var(--cz-surface-soft);border:1px solid var(--cz-card-border);
+      border-radius:14px;padding:.85rem .7rem;text-align:center;
+    }
+    #s-chores .cz-streak-stat--main{
+      background:linear-gradient(135deg,var(--cz-accent-soft),transparent 70%);
+      border-color:var(--cz-accent-bd);
+    }
+    #s-chores .cz-streak-num{
+      font-family:var(--fh);font-size:2.2rem;line-height:1;color:var(--cz-accent);
+      font-weight:800;letter-spacing:-.5px;
+    }
+    #s-chores .cz-streak-num--alt{color:var(--tx);font-size:1.6rem;}
+    #s-chores .cz-streak-label{
+      font-size:.55rem;letter-spacing:1.4px;color:var(--tx3);font-weight:700;
+      margin-top:.25rem;text-transform:uppercase;
+    }
+
+    /* Heatmap card */
+    #s-chores .cz-heatmap-card{
+      background:var(--cz-surface-soft);border:1px solid var(--cz-card-border);
+      border-radius:14px;padding:.9rem 1rem;margin-bottom:1.1rem;
+    }
+    #s-chores .cz-heatmap-caption{
+      font-size:.6rem;color:var(--tx3);margin-top:.4rem;line-height:1.4;
+    }
+
+    /* Milestone badge grid — 3 cols mobile, 6 cols at >= 520px */
+    #s-chores .cz-milestones{
+      display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;
+    }
+    @media (min-width:520px){
+      #s-chores .cz-milestones{grid-template-columns:repeat(6,1fr);}
+    }
+    #s-chores .cz-milestone{
+      position:relative;background:rgba(255,255,255,.025);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:12px;padding:.7rem .4rem;text-align:center;
+      opacity:.42;transition:opacity .25s,background .25s,border-color .25s;
+    }
+    #s-chores .cz-milestone.lit{
+      background:color-mix(in srgb,var(--mc,var(--cz-accent)) 14%,transparent);
+      border-color:var(--mb,var(--cz-accent-bd));opacity:1;
+    }
+    #s-chores .cz-milestone__icon{
+      font-size:1.55rem;line-height:1;filter:grayscale(1);transition:filter .25s;
+    }
+    #s-chores .cz-milestone.lit .cz-milestone__icon{filter:none;}
+    #s-chores .cz-milestone__label{
+      font-size:.58rem;font-weight:800;color:var(--tx3);
+      margin-top:.25rem;letter-spacing:.4px;
+    }
+    #s-chores .cz-milestone.lit .cz-milestone__label{color:var(--mc,var(--cz-accent));}
+    #s-chores .cz-milestone__check{
+      position:absolute;top:.25rem;right:.35rem;
+      font-size:.55rem;font-weight:800;color:var(--mc,var(--cz-accent));
+    }
+
+    /* Leaderboard rows */
+    #s-chores .cz-rank-list{display:flex;flex-direction:column;gap:.4rem;}
+    #s-chores .cz-rank-row{
+      display:grid;grid-template-columns:34px 1fr auto auto;gap:.6rem;align-items:center;
+      padding:.65rem .8rem;border-radius:12px;
+      background:var(--cz-surface-soft);border:1px solid var(--cz-card-border);
+    }
+    #s-chores .cz-rank-row--top{
+      background:linear-gradient(135deg,var(--cz-gold-soft),transparent 60%);
+      border-color:var(--cz-gold-bd);
+    }
+    #s-chores .cz-rank-medal{
+      font-size:1.1rem;text-align:center;font-weight:800;color:var(--tx2);
+    }
+    #s-chores .cz-rank-name{font-size:.85rem;font-weight:700;color:var(--tx);}
+    #s-chores .cz-rank-row--top .cz-rank-name{color:var(--cz-gold);}
+    #s-chores .cz-rank-chips{display:flex;gap:.3rem;flex-wrap:wrap;}
+    #s-chores .cz-rank-chip{
+      font-size:.55rem;font-weight:700;color:var(--tx3);
+      background:rgba(255,255,255,.05);
+      padding:.18rem .4rem;border-radius:6px;letter-spacing:.3px;
+    }
+    #s-chores .cz-rank-pts{
+      font-family:var(--fh);font-size:1.15rem;font-weight:800;color:var(--cz-accent);
+      line-height:1;text-align:right;
+    }
+    #s-chores .cz-rank-pts span{
+      font-size:.55rem;color:var(--tx3);margin-left:.2rem;font-weight:600;letter-spacing:.5px;
+    }
+    #s-chores .cz-rank-caption{
+      font-size:.6rem;color:var(--tx3);margin-top:.7rem;text-align:center;line-height:1.4;
+    }
+
+    /* History — chip filter bar */
+    #s-chores .cz-hist-chipbar{
+      display:flex;gap:.35rem;overflow-x:auto;padding-bottom:.4rem;margin-bottom:.5rem;
+      scrollbar-width:none;
+    }
+    #s-chores .cz-hist-chipbar::-webkit-scrollbar{display:none;}
+    #s-chores .cz-hist-chip{
+      background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+      color:var(--tx2);font-size:.65rem;font-weight:700;
+      border-radius:18px;padding:.32rem .7rem;white-space:nowrap;cursor:pointer;
+      display:flex;align-items:center;gap:.35rem;font-family:var(--fn);
+      transition:background .18s,border-color .18s,color .18s;
+    }
+    #s-chores .cz-hist-chip:hover{background:rgba(255,255,255,.07);}
+    #s-chores .cz-hist-chip--on{
+      background:var(--cz-accent-soft);border-color:var(--cz-accent-bd);color:var(--cz-accent);
+    }
+    #s-chores .cz-hist-chip__n{
+      font-size:.55rem;background:rgba(255,255,255,.06);
+      padding:.05rem .35rem;border-radius:8px;color:var(--tx3);font-weight:800;
+    }
+    #s-chores .cz-hist-chip--on .cz-hist-chip__n{
+      background:rgba(34,197,94,.18);color:var(--cz-accent);
+    }
+
+    /* History — search input */
+    #s-chores .cz-hist-search{margin-bottom:.5rem;}
+    #s-chores .cz-hist-search input{
+      width:100%;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);
+      border-radius:10px;padding:.5rem .8rem;color:var(--tx);font-size:.78rem;
+      font-family:var(--fn);
+    }
+    #s-chores .cz-hist-search input:focus{outline:none;border-color:var(--cz-accent-bd);}
+
+    /* History — month group + rows */
+    #s-chores .cz-hist-list{
+      max-height:480px;overflow-y:auto;display:flex;flex-direction:column;gap:.7rem;
+    }
+    #s-chores .cz-hist-month{
+      background:var(--cz-surface-soft);border:1px solid var(--cz-card-border);
+      border-radius:14px;padding:.65rem .8rem;
+    }
+    #s-chores .cz-hist-month__title{
+      font-family:var(--fh);font-size:.62rem;letter-spacing:1.6px;color:var(--tx2);
+      font-weight:800;margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem;
+    }
+    #s-chores .cz-hist-month__n{
+      font-size:.55rem;background:rgba(255,255,255,.06);
+      padding:.05rem .4rem;border-radius:8px;color:var(--tx3);font-weight:800;letter-spacing:0;
+    }
+    #s-chores .cz-hist-row{
+      display:grid;grid-template-columns:32px 1fr auto;gap:.6rem;align-items:center;
+      padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.04);
+    }
+    #s-chores .cz-hist-row:last-child{border-bottom:none;}
+    #s-chores .cz-hist-emoji{font-size:1.1rem;text-align:center;}
+    #s-chores .cz-hist-name{font-size:.78rem;font-weight:700;color:var(--tx);line-height:1.2;}
+    #s-chores .cz-hist-meta{
+      display:flex;gap:.35rem;align-items:center;flex-wrap:wrap;margin-top:.18rem;
+    }
+    #s-chores .cz-hist-date{font-size:.6rem;color:var(--tx3);}
+    #s-chores .cz-hist-pts{
+      font-family:var(--fh);font-size:1rem;font-weight:800;color:var(--cz-accent);
+    }
+    #s-chores .cz-hist-pts--neg{color:var(--cz-purple);}
+
+    /* Difficulty + status pills (history rows) */
+    #s-chores .cz-diff-pill,
+    #s-chores .cz-status-pill{
+      font-size:.5rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;
+      padding:.08rem .35rem;border-radius:5px;
+    }
+    #s-chores .cz-diff-pill--easy{background:var(--cz-accent-soft);color:var(--cz-accent);}
+    #s-chores .cz-diff-pill--medium{background:var(--cz-gold-soft);color:var(--cz-gold);}
+    #s-chores .cz-diff-pill--hard{background:var(--cz-purple-soft);color:var(--cz-purple);}
+    #s-chores .cz-status-pill{background:rgba(255,255,255,.04);color:var(--tx3);}
+    #s-chores .cz-status-pill--verified{background:rgba(34,197,94,.14);color:var(--cz-accent);}
+    #s-chores .cz-status-pill--pending{background:rgba(251,191,36,.14);color:var(--cz-gold);}
+    #s-chores .cz-status-pill--rejected{background:rgba(239,68,68,.14);color:#ef4444;}
+    #s-chores .cz-status-pill--redeemed{background:rgba(167,139,250,.14);color:var(--cz-purple);}
+
+    /* Empty states (leaderboard solo, history no-match) */
+    #s-chores .cz-empty{
+      text-align:center;padding:1.4rem 1rem;background:var(--cz-surface-soft);
+      border:1px dashed var(--cz-card-border);border-radius:14px;
+    }
+    #s-chores .cz-empty__icon{font-size:1.8rem;margin-bottom:.35rem;}
+    #s-chores .cz-empty__title{
+      font-family:var(--fh);font-size:.78rem;letter-spacing:1.5px;
+      font-weight:800;color:var(--tx);margin-bottom:.3rem;
+    }
+    #s-chores .cz-empty__body{
+      font-size:.7rem;color:var(--tx2);line-height:1.45;max-width:30ch;margin:0 auto;
+    }
+    #s-chores .cz-empty--inline{
+      padding:1rem;font-size:.7rem;color:var(--tx3);text-align:center;
+      background:transparent;border:1px dashed rgba(255,255,255,.06);
+    }
   </style>
   <div class="chores-tabs" role="tablist" aria-label="Chores sub-sections">
     <button class="ch-tab active" role="tab" aria-selected="true"  onclick="cTab('mychores',this)">✅ My Chores<span id="chOverdueDot" aria-label="Overdue chore"></span></button>
@@ -5798,27 +6003,23 @@
        on mobile but allows gallery selection too. -->
   <input type="file" id="chorePhotoInput" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" capture="environment" style="display:none;" onchange="chorePhotoOnChange(this)">
 
-  <!-- ── PANEL: Leaderboard (Increment 4 will populate) ────────── -->
-  <div id="ch-leaderboard" class="ch-panel" style="display:none;">
-    <div class="ch-panel-stub">
-      🏅 Family leaderboard arrives in the next update.<br>
-      <button class="btn bgh bs" onclick="showSection('s-contests')" style="margin-top:.6rem;font-size:.7rem;">View today's leaderboard in Contests &amp; Challenges →</button>
-    </div>
-  </div>
+  <!-- ── PANEL: Leaderboard (Tab 1 Inc 4) ──────────────────────── -->
+  <!-- Populated by renderChoreLeaderboard() in chores.js on cTab
+       activation. Defensive _chHydrateAllProfiles() runs first so
+       inactive siblings' data is pulled from their per-profile LS
+       key — otherwise they'd render as zero across every metric. -->
+  <div id="ch-leaderboard" class="ch-panel" style="display:none;"></div>
 
-  <!-- ── PANEL: History ────────────────────────────────────────── -->
-  <div id="ch-history" class="ch-panel" style="display:none;">
-    <div style="font-family:var(--fh);font-size:.7rem;letter-spacing:1.5px;color:var(--tx2);margin-bottom:.6rem;">RECENT ACTIVITY</div>
-    <div id="choreHistory" style="max-height:480px;overflow-y:auto;"></div>
-  </div>
+  <!-- ── PANEL: History (Tab 1 Inc 4) ──────────────────────────── -->
+  <!-- Populated by renderChoreHistory() in chores.js on cTab
+       activation. Filter chips + search input + month-grouped list. -->
+  <div id="ch-history" class="ch-panel" style="display:none;"></div>
 
-  <!-- ── PANEL: Streaks (Increment 4 will populate) ────────────── -->
-  <div id="ch-streaks" class="ch-panel" style="display:none;">
-    <div class="ch-panel-stub">
-      🔥 Streak heatmap, longest-streak banner, and badge tiers arrive in the next update.<br>
-      Current streak: <b id="choreStreakDetail" style="color:#fbbf24;">0</b> day(s)
-    </div>
-  </div>
+  <!-- ── PANEL: Streaks (Tab 1 Inc 4) ──────────────────────────── -->
+  <!-- Populated by renderChoreStreaks() in chores.js on cTab
+       activation. Hero card (current/longest/total) + 12-week SVG
+       heatmap + milestone badges. -->
+  <div id="ch-streaks" class="ch-panel" style="display:none;"></div>
 
 </section>
 
