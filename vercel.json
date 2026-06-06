@@ -1,8 +1,4 @@
 {
-  "trailingSlash": false,
-  "redirects": [
-    { "source": "/app/index.html", "destination": "/app", "permanent": true }
-  ],
   "rewrites": [
     { "source": "/app", "destination": "/app/index.html" },
     { "source": "/app/podcasts.html", "destination": "/app/podcasts.html" },
