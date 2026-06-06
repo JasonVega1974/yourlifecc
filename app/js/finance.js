@@ -1477,17 +1477,35 @@ function _renderLearnGrid(){
     return '<button type="button" class="' + cls + '" title="' + escapeHtml(titleAttr) + '" onclick="_learnOpen(' + l.num + ')">' + l.num + '</button>';
   }).join('');
 
+  // UX reviewer fix — surface the lowest-numbered incomplete lesson
+  // as "Continue" so a returning user has a clear focal point. The
+  // grid was reading as a flat syllabus; now it reads as a living
+  // progress tracker with a single entry hint.
+  const nextNum = (function(){
+    for(let i = 0; i < lessons.length; i++){
+      const l = lessons[i];
+      if(l && !p.completed[l.num]) return l.num;
+    }
+    return null;  // all 8 complete
+  })();
+
   // 8 cards.
   const cards = lessons.map(l => {
     const done   = !!p.completed[l.num];
     const opened = !!p.opened[l.num];
+    const isNext = !done && l.num === nextNum;
     const stateChip = done
       ? '<span class="mz-learn-card__chip mz-learn-card__chip--done">✓ Complete</span>'
-      : opened
-        ? '<span class="mz-learn-card__chip mz-learn-card__chip--opened">In progress</span>'
-        : '<span class="mz-learn-card__chip">New</span>';
+      : isNext
+        ? '<span class="mz-learn-card__chip mz-learn-card__chip--next">' + (opened ? 'Continue' : 'Start here') + '</span>'
+        : opened
+          ? '<span class="mz-learn-card__chip mz-learn-card__chip--opened">In progress</span>'
+          : '<span class="mz-learn-card__chip">New</span>';
+    let cls = 'mz-learn-card';
+    if(done)        cls += ' mz-learn-card--done';
+    else if(isNext) cls += ' mz-learn-card--next';
     return ''
-      + '<button type="button" class="mz-learn-card' + (done ? ' mz-learn-card--done' : '') + '" onclick="_learnOpen(' + l.num + ')">'
+      + '<button type="button" class="' + cls + '" onclick="_learnOpen(' + l.num + ')">'
       +   '<div class="mz-learn-card__head">'
       +     '<span class="mz-learn-card__num">LESSON ' + l.num + '</span>'
       +     stateChip
