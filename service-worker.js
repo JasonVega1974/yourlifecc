@@ -1,15 +1,20 @@
 // YourLifeCC Service Worker
 // Version bump this string whenever you deploy a major update
 // to force old caches to clear.
-const CACHE_NAME = 'yourlifecc-v247';
+const CACHE_NAME = 'yourlifecc-v248';
 
 // Core assets to pre-cache on install — the app shell + key Well modules
 // + the shared modal/save/share + prayer focus + Quick Prayer library
 // modules + the canonical prayer dataset (now JSON, shared with /api)
 // + the Command Center home (Constellation hero for full-app users).
+// IMPORTANT: list only canonical, non-redirecting URLs here.
+// Vercel's `/app -> /app/index.html` is an INTERNAL rewrite (no HTTP
+// redirect), so `/app` is safe. Do NOT list `/app/` or `/app/index.html`
+// here — if either becomes a server-side redirect (trailingSlash:false
+// or a permanent redirect rule), the cached response gets
+// `redirected:true` and the SW would strand navigation handlers.
 const PRECACHE_ASSETS = [
-  '/app/',
-  '/app/index.html',
+  '/app',
   '/manifest.json',
   '/app/css/app.css',
   '/app/js/init.js',
@@ -27,15 +32,22 @@ const PRECACHE_ASSETS = [
 ];
 
 // ─── Install ───────────────────────────────────────────────────────────────
-// Pre-cache the app shell so it loads instantly on repeat visits
+// Pre-cache the app shell so it loads instantly on repeat visits.
+// Uses Promise.allSettled + per-URL cache.add (NOT cache.addAll) so that a
+// single failure (404, redirect, network blip) doesn't void the whole
+// precache — addAll is all-or-nothing, which previously left the cache
+// empty whenever one URL went bad.
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(PRECACHE_ASSETS).catch(err => {
-        // Non-fatal: some assets may not exist yet during first deploy
-        console.warn('[SW] Pre-cache partial failure:', err);
-      });
-    }).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then(cache =>
+      Promise.allSettled(PRECACHE_ASSETS.map(u => cache.add(u))).then(results => {
+        results.forEach((r, i) => {
+          if (r.status === 'rejected') {
+            console.warn('[SW] Precache miss:', PRECACHE_ASSETS[i], r.reason);
+          }
+        });
+      })
+    ).then(() => self.skipWaiting())
   );
 });
 
@@ -105,20 +117,39 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // For navigation (HTML page loads) — network first, fallback to shell
+  // For navigation (HTML page loads) — network first, fallback to shell.
+  //
+  // CRITICAL: per the Service Worker spec, a navigation response MUST NOT
+  // have `redirected:true`. If we let `fetch(...)` follow a server redirect
+  // and hand the resulting Response straight to event.respondWith(), the
+  // browser aborts the navigation with NetworkError — that's how the brief
+  // /app/index.html -> /app redirect stranded SW-controlled clients.
+  //
+  // When we detect a followed redirect, rebuild the Response from the
+  // decoded body. Only Content-Type is carried over — copying the original
+  // headers would propagate content-encoding / content-length values that
+  // describe the ENCODED payload, which would corrupt the decoded blob.
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request)
         .then(response => {
+          if (response.redirected) {
+            return response.blob().then(body => new Response(body, {
+              status: response.status,
+              statusText: response.statusText,
+              headers: { 'Content-Type': response.headers.get('content-type') || 'text/html' }
+            }));
+          }
           // Clone and cache a fresh copy
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
           return response;
         })
-        .catch(() => {
-          // Offline fallback — serve cached app shell
-          return caches.match('/app/index.html') || caches.match('/app/');
-        })
+        .catch(() =>
+          // Offline fallback — serve cached app shell. caches.match returns
+          // a Promise (always truthy), so chain via .then() rather than ||.
+          caches.match('/app').then(r => r || caches.match('/app/index.html'))
+        )
     );
     return;
   }
