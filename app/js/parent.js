@@ -2840,7 +2840,7 @@ function phNav(tab){
   // entirely; render fired into a hidden element nobody navigated to).
   if(t === 'allowance'){ if(typeof renderPhAllowance === 'function') renderPhAllowance(); }
   if(t === 'contests') { renderParentLeaderboard(); renderParentContests(); renderParentFamilyRewards(); if(typeof renderPhContestsHeroChips === 'function') renderPhContestsHeroChips(); }
-  if(t === 'activity') { initPhSchedPanel(); renderParentActivityAudit(); renderParentActivityFeed(); renderBehaviorLog(); renderGradeMonitor(); renderParentNotes(); }
+  if(t === 'activity') { initPhSchedPanel(); renderParentActivityAudit(); renderParentActivityFeed(); renderBehaviorLog(); renderGradeMonitor(); renderParentNotes(); if(typeof renderPhActivityHeroChips === 'function') renderPhActivityHeroChips(); }
   if(t === 'reports')  { renderParentGettingStarted(); renderParentMultiChild(); renderParentScore(); renderParentOverview(); renderWeeklyReportCard(); renderCompletionSummary(); renderSentQuizzes(); renderProgressReportsTab(); renderParentFaithReport(); }
   if(t === 'family')   { renderManageUsers(); renderParentLessons(); if(typeof renderParentGrowth==='function') renderParentGrowth(); if(typeof renderParentGrowthHistory==='function') renderParentGrowthHistory(); renderPhReferral(); }
   if(t === 'controls') { renderParentScreenControls(); renderParentEarningsControls(); renderParentBucksControls(); renderIncentives(); if(typeof updateIncConditions==='function') updateIncConditions(); }
@@ -3459,6 +3459,30 @@ function renderPhContestsHeroChips(){
     .filter(r => r).length;
   if(activeEl)  activeEl.textContent  = activeCt;
   if(rewardsEl) rewardsEl.textContent = rewardCt;
+}
+
+// Activity & Schedule hero chips (Parent Hub design pass).
+// READ-ONLY count function — no state writes. Defensive guards on
+// every D.* shape so a stray field type can't break the hero. Three
+// counts:
+//   • scheduled today    — D.scheduleBlocks where date is today
+//   • events today       — D.activityAudit entries from today
+//   • behavior notes     — total D.behaviorLog entries (not just today;
+//                           the surface treats this as a running log)
+function renderPhActivityHeroChips(){
+  const schedEl  = document.getElementById('phActChipSched');
+  const eventsEl = document.getElementById('phActChipEvents');
+  const notesEl  = document.getElementById('phActChipNotes');
+  if(!schedEl && !eventsEl && !notesEl) return;
+  const todayISO = new Date().toISOString().slice(0,10);
+  const schedCt = (Array.isArray(D.scheduleBlocks) ? D.scheduleBlocks : [])
+    .filter(b => b && (b.date || '').slice(0,10) === todayISO).length;
+  const eventsCt = (Array.isArray(D.activityAudit) ? D.activityAudit : [])
+    .filter(a => a && (a.date || a.timestamp || '').slice(0,10) === todayISO).length;
+  const notesCt = (Array.isArray(D.behaviorLog) ? D.behaviorLog : []).length;
+  if(schedEl)  schedEl.textContent  = schedCt;
+  if(eventsEl) eventsEl.textContent = eventsCt;
+  if(notesEl)  notesEl.textContent  = notesCt;
 }
 
 function addChoreFromParent(){
