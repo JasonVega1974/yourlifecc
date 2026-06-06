@@ -1447,7 +1447,17 @@ function initProfiles(){
         } catch(e){ /* ignore — profile will hydrate next save */ }
       }
     });
-    console.log('[YLCC profile] initProfiles loaded _profiles=', _profiles.map(p=>({id:p.id,name:p.name,isParent:p.isParent})));
+    // Phase 1 of the PIN → stable-id rework — assign a stableId to every
+    // profile that lacks one. The slim mapping in saveProfiles() (extended
+    // in this same phase) persists these into ylcc_profiles + D._profiles
+    // + the cloud blob. Phase 2 will flip _pidOf() to prefer stableId;
+    // until then nothing reads this field. Backfill is idempotent: legacy
+    // profiles get a stableId on first read, then every subsequent read
+    // sees it already populated.
+    _profiles.forEach(function(p){
+      if(p && !p.stableId) p.stableId = generateStableProfileId();
+    });
+    console.log('[YLCC profile] initProfiles loaded _profiles=', _profiles.map(p=>({id:p.id,name:p.name,isParent:p.isParent,stableId:p.stableId})));
     // Migration: profiles created before isParent existed default the FIRST one to parent.
     // This is only safe when isParent is *undefined* — never overwrite an explicit false.
     if(_profiles.length > 0 && _profiles[0].isParent === undefined){
@@ -1529,8 +1539,12 @@ function saveProfiles(){
   // Order matters: SHRINK the bloated keys first (frees quota space) before
   // writing per-profile keys. Users hitting quota on the legacy bloated layout
   // would fail on the first per-profile setItem if we wrote those first.
+  // stableId joins the slim shape so Phase 1's PIN → stable-id backfill
+  // survives reloads + cross-device sync. Without it the initProfiles
+  // backfill would mint a fresh stableId every page load and never settle.
+  // pinHash is intentionally NOT slimmed (lives on p.data instead).
   var slim = (_profiles||[]).map(function(p){
-    return { id:p.id, name:p.name, isParent:p.isParent };
+    return { id:p.id, name:p.name, isParent:p.isParent, stableId:p.stableId };
   });
   D._profiles = JSON.parse(JSON.stringify(slim));
   D._activeProfileId = _activeProfileId||'';
@@ -1589,6 +1603,31 @@ function generateProfileId(){
   do { pin=String(Math.floor(1000+Math.random()*9000)); }
   while(_profiles.find(p=>p.id===pin));
   return pin;
+}
+
+// ── Phase 1: PIN → stable-id rework ───────────────────────────
+// generateStableProfileId — immutable data-key for a profile, decoupled
+// from the PIN credential. Format: 'p_' + 8 lowercase hex chars (~4.3B
+// namespace per account — collision inside a single user's profile list
+// is negligible). Synchronous + side-effect-free so it can be called in
+// initProfiles's backfill loop without async churn.
+function generateStableProfileId(){
+  var buf = new Uint8Array(4);
+  crypto.getRandomValues(buf);
+  var hex = '';
+  for(var i=0;i<4;i++) hex += (buf[i] < 16 ? '0' : '') + buf[i].toString(16);
+  return 'p_' + hex;
+}
+
+// _pidOf — resolves a profile's DATA key. Phase 1 falls through to the
+// PIN (profile.id) when no stableId is present, preserving today's
+// behavior end-to-end. Phase 2 will flip this to PREFER stableId once
+// the server migration has rewritten DB rows + storage paths; legacy
+// PIN-keyed reads stop at that point. Nothing calls _pidOf() in Phase 1
+// — it's introduced ahead of Phase 2 so the cutover diff is one helper.
+function _pidOf(profile){
+  if(!profile) return null;
+  return profile.stableId || profile.id || null;
 }
 
 // ── PARENT GATE PIN PAD ───────────────────────────────────────

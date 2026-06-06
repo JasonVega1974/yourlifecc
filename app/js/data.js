@@ -185,6 +185,14 @@ const DEF = {
   // personalization, and future home-screen curation.
   onboardingDone:false, onboardingInterests:[],
   bannerMode:'scroll',
+  // Phase 1 of the PIN → stable-id rework (Phase 2 cuts over). Phase 2
+  // will populate `mappings` (pin → stableId) and POST to a server
+  // migration route, then set `status` to 'complete'. In Phase 1 we
+  // only ensure every profile has a stableId in memory + persistence;
+  // nothing reads this flag yet. Status flow:
+  //   'idle' → 'in_progress' → 'complete'   (or 'failed' on retry).
+  // Kept distinct from D.pinMigration which tracks the PIN-hash rollout.
+  profileIdMigration:{ status:'idle', mappings:{}, startedAt:null, completedAt:null },
 };
 
 let D = JSON.parse(JSON.stringify(DEF));

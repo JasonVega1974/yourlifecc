@@ -70,6 +70,54 @@
 -- helper exists, do not enable cloud-prefer reads. Tracked here so
 -- the next code reviewer sees it before flipping the read path.
 --
+-- ── Phase 2 PIN → stable-id rework — FK timing (NOT YET LIVE) ─
+-- Phase 2 will swap the PIN segment of public.chores.id for the new
+-- stable profile id (parent.js _pidOf — see Phase 1 commit), then
+-- mirror the rewrite into public.chore_completions.chore_id. The FK
+-- created below (chore_id REFERENCES public.chores(id) ON DELETE
+-- CASCADE) is declared WITHOUT a DEFERRABLE clause, so Postgres
+-- defaults to NOT DEFERRABLE + INITIALLY IMMEDIATE — meaning
+-- `SET CONSTRAINTS ALL DEFERRED` inside the migration transaction is
+-- a no-op against it and either UPDATE order will violate the FK
+-- mid-transaction (rewriting chores.id first orphans completions;
+-- rewriting completions.chore_id first points at non-existent
+-- chores).
+--
+-- Two viable approaches before Phase 2 ships:
+--
+--   (A) PREP MIGRATION (recommended) — one-shot ALTER to make the FK
+--       deferrable, then per-user Phase 2 transactions can defer it:
+--         ALTER TABLE public.chore_completions
+--           DROP CONSTRAINT chore_completions_chore_id_fkey,
+--           ADD  CONSTRAINT chore_completions_chore_id_fkey
+--             FOREIGN KEY (chore_id) REFERENCES public.chores(id)
+--             ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;
+--       Then each user-scoped migration runs:
+--         BEGIN;
+--           SET CONSTRAINTS chore_completions_chore_id_fkey DEFERRED;
+--           UPDATE public.chores            SET id      = … WHERE …;
+--           UPDATE public.chore_completions SET chore_id = … WHERE …;
+--         COMMIT;
+--
+--   (B) IN-TXN DROP / ADD — heavier lock, no schema prep:
+--         BEGIN;
+--           ALTER TABLE public.chore_completions
+--             DROP CONSTRAINT chore_completions_chore_id_fkey;
+--           UPDATE public.chores            SET id      = … WHERE …;
+--           UPDATE public.chore_completions SET chore_id = … WHERE …;
+--           ALTER TABLE public.chore_completions
+--             ADD CONSTRAINT chore_completions_chore_id_fkey
+--               FOREIGN KEY (chore_id) REFERENCES public.chores(id)
+--               ON DELETE CASCADE;
+--         COMMIT;
+--       Takes ACCESS EXCLUSIVE on chore_completions for the ADD — fine
+--       for a per-user scoped run, painful if ever batched.
+--
+-- Recommendation: ship (A) as a small prep migration before the Phase
+-- 2 cutover. Must be addressed BEFORE Phase 2 — without it the cutover
+-- transaction will fail on the first user with both chores and
+-- chore_completions rows.
+--
 -- Project ref: hrohgwcbfgywkpnvqxhk
 -- ═══════════════════════════════════════════════════════════════
 
