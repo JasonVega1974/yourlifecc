@@ -175,6 +175,13 @@ async function cloudSync(){
       // D.choreLog into public.chores / public.chore_completions.
       // No-ops silently if chores-schema.sql hasn't been applied yet.
       _mirrorChoresToCloud(supa, _supaUser.id);
+      // Tab 2 Increment 2 — same discipline for D.transactions ->
+      // public.money_transactions. Silent bail on 42P01 (table not
+      // applied yet) so the JSONB-first path keeps working in the
+      // pre-migration window.
+      if(typeof _mirrorMoneyToCloud === 'function'){
+        _mirrorMoneyToCloud(supa, _supaUser.id);
+      }
     }
   } catch(e){
     console.error('[LifeOS Sync] Exception:', e);
@@ -280,6 +287,86 @@ async function _mirrorChoresToCloud(supa, userId){
   } catch(e){
     // Never let dual-write break the main save flow
     console.debug('[chores mirror] exception:', e && e.message);
+  }
+}
+
+// Tab 2 Increment 2 — D.transactions -> public.money_transactions
+// fire-and-forget mirror. Same discipline as the chores mirror:
+//   - JSONB blob (D.transactions) stays canonical
+//   - Silent bail on 42P01 (table not applied yet)
+//   - Never throws — wrapped in try/catch so save() never breaks
+//   - Idempotent upsert on text PK so re-runs are safe
+//
+// Per Phase 1 of the PIN -> stable-id decouple (v249), profile_id
+// uses _pidOf(activeProfile) — the stable id. New rows have NO
+// PIN debt and require no Phase 2 remap.
+//
+// id coercion: legacy D.transactions entries have numeric Date.now()
+// ids. We coerce to 'tx_<profile>_<n>' so sibling profiles can't
+// collide on the text PK (matches the chores 'ch_<profile>_<n>'
+// pattern). Already-text ids that begin with 'tx_' pass through
+// unchanged so the coercion is idempotent across syncs.
+async function _mirrorMoneyToCloud(supa, userId){
+  try {
+    const transactions = Array.isArray(D.transactions) ? D.transactions : [];
+    if(!transactions.length) return;
+
+    // Resolve active profile via _pidOf (Phase 1 stable id) with
+    // graceful fallbacks. Solo accounts continue to use '_solo'
+    // matching the chores / chore_completions mirror sentinel.
+    let activeProfile = '_solo';
+    if(typeof _profiles !== 'undefined' && _profiles
+       && typeof _activeProfileId !== 'undefined' && _activeProfileId){
+      const active = _profiles.find(p => p && p.id === _activeProfileId);
+      if(active){
+        const k = (typeof _pidOf === 'function')
+          ? _pidOf(active)
+          : (active.stableId || active.id);
+        if(k) activeProfile = String(k);
+      }
+    }
+
+    const txId = (v) => {
+      if(v === null || v === undefined) return null;
+      const s = String(v);
+      if(s.startsWith('tx_')) return s;
+      return 'tx_' + activeProfile + '_' + s;
+    };
+
+    const VALID_TYPE = new Set(['income','expense','savings','transfer']);
+    const today = new Date().toISOString().slice(0,10);
+
+    const rows = transactions.map(t => {
+      if(!t) return null;
+      const id     = txId(t.id);
+      const amount = Number.isFinite(+t.amt) ? +t.amt : null;
+      if(id === null || amount === null) return null;
+      // type 'expense' is the safest fallback for legacy entries
+      // missing the field — UI surfaces them as expenses (red)
+      // rather than silently dropping them or miscounting as income.
+      const type = VALID_TYPE.has(t.type) ? t.type : 'expense';
+      return {
+        id:          id,
+        user_id:     userId,
+        profile_id:  activeProfile,
+        amount:      amount,
+        type:        type,
+        category:    t.cat || null,
+        description: String(t.name || ''),
+        date:        t.date || today,
+        updated_at:  new Date().toISOString()
+      };
+    }).filter(Boolean);
+
+    if(!rows.length) return;
+
+    const { error } = await supa.from('money_transactions').upsert(rows, { onConflict: 'id' });
+    if(error && error.code !== '42P01'){
+      console.debug('[money mirror] upsert transactions skipped:', error.message);
+    }
+  } catch(e){
+    // Never let dual-write break the main save flow
+    console.debug('[money mirror] exception:', e && e.message);
   }
 }
 
