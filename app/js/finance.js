@@ -38,10 +38,14 @@ function mTab(tab,btn){
   if(tab==='bills')     renderBills();
   if(tab==='paycheck')  calcPaycheckSim();
   if(tab==='allowance' && typeof renderAllowance === 'function') renderAllowance();
-  // Learn panel currently embeds the Tax Ed lesson content; calcTax is
-  // defined in skills.js (loaded after finance.js) so the typeof guard
-  // tolerates the dev path where finance.js loads alone.
-  if(tab==='learn' && typeof calcTax === 'function') calcTax();
+  // Learn panel — Inc 4 renderer routes to the lesson grid or to a
+  // specific lesson based on _learnView state. Lesson 5 (Taxes) keeps
+  // its static HTML which embeds the calcTax form, so we still fire
+  // calcTax on activation when lesson 5 is visible.
+  if(tab==='learn'){
+    if(typeof renderLearn === 'function') renderLearn();
+    if(typeof calcTax === 'function') calcTax();
+  }
 }
 
 function saveBal(){
@@ -1343,5 +1347,271 @@ function _moneyTxCancelEdit(){
   if(submit) submit.textContent = 'Log It';
   const cancel = document.getElementById('mzTxCancelBtn');
   if(cancel) cancel.style.display = 'none';
+}
+
+// ════════════════════════════════════════════════════════════════
+// Tab 2 Increment 4 — Learn sub-tab (8 financial-literacy lessons)
+// ════════════════════════════════════════════════════════════════
+//
+// State machine inside #mt-learn:
+//
+//   _learnView === 'grid'        -> #mzLearnGrid visible (default)
+//   _learnView === 'lesson:5'    -> #mzLearnLesson5Static visible
+//                                   (carries the existing TY2025
+//                                   Tax Ed markup + calcTax form)
+//   _learnView === 'lesson:N'    -> #mzLearnLesson visible, content
+//                                   rendered from MONEY_LESSONS[N-1]
+//
+// Lesson 5's static branch is the only special case — every other
+// lesson goes through the template renderer fed by money-lessons.js.
+//
+// Progress tracking is JSONB only — D.moneyLessonsProgress. No
+// new table (per the plan). Two maps:
+//   opened     { N: true }   any lesson the user has tapped open
+//   completed  { N: true }   lessons they've explicitly marked done
+// + timestamp mirrors for analytics.
+
+let _learnView = 'grid';
+
+function _learnInitProgress(){
+  if(!D.moneyLessonsProgress || typeof D.moneyLessonsProgress !== 'object' || Array.isArray(D.moneyLessonsProgress)){
+    D.moneyLessonsProgress = { opened:{}, completed:{}, openedAt:{}, completedAt:{} };
+  }
+  const p = D.moneyLessonsProgress;
+  if(!p.opened     || typeof p.opened     !== 'object' || Array.isArray(p.opened))     p.opened     = {};
+  if(!p.completed  || typeof p.completed  !== 'object' || Array.isArray(p.completed))  p.completed  = {};
+  if(!p.openedAt   || typeof p.openedAt   !== 'object' || Array.isArray(p.openedAt))   p.openedAt   = {};
+  if(!p.completedAt|| typeof p.completedAt!== 'object' || Array.isArray(p.completedAt))p.completedAt= {};
+  return p;
+}
+
+function _learnLessonByNum(n){
+  if(typeof MONEY_LESSONS === 'undefined') return null;
+  return MONEY_LESSONS.find(l => l && l.num === n) || null;
+}
+
+// All 8 lessons in display order — used for the landing grid + the
+// 8-dot progress row. Lesson 5 is the only static one; everything
+// else comes from MONEY_LESSONS. We synthesize a tiny header for
+// lesson 5 here so the grid card has the same shape.
+const _LEARN_LESSON_5_META = {
+  num: 5,
+  title: 'Taxes (TY2025)',
+  icon: '🧾',
+  readMinutes: 5,
+  hook: 'The biggest paycheck shock you can prepare for. Brackets, withholding, deductions, credits — and a built-in calculator with the actual TY2025 numbers.'
+};
+
+function _learnAllLessons(){
+  // Build the 8-lesson list in num order, blending lesson 5's
+  // static meta with the MONEY_LESSONS array entries.
+  const out = [];
+  for(let n = 1; n <= 8; n++){
+    if(n === 5){
+      out.push(_LEARN_LESSON_5_META);
+    } else {
+      const l = _learnLessonByNum(n);
+      if(l) out.push(l);
+    }
+  }
+  return out;
+}
+
+// Public — fires on mTab('learn'). Reads state, shows the right
+// container, populates content.
+function renderLearn(){
+  _learnInitProgress();
+
+  const grid = document.getElementById('mzLearnGrid');
+  const less = document.getElementById('mzLearnLesson');
+  const l5   = document.getElementById('mzLearnLesson5Static');
+
+  if(_learnView === 'grid'){
+    if(grid) grid.style.display = '';
+    if(less) less.style.display = 'none';
+    if(l5)   l5.style.display   = 'none';
+    _renderLearnGrid();
+    return;
+  }
+
+  if(_learnView === 'lesson:5'){
+    if(grid) grid.style.display = 'none';
+    if(less) less.style.display = 'none';
+    if(l5)   l5.style.display   = '';
+    return;
+  }
+
+  // Numbered lesson (not 5) — render the template into #mzLearnLesson.
+  const m = /^lesson:(\d+)$/.exec(_learnView);
+  const n = m ? parseInt(m[1], 10) : null;
+  if(n && n >= 1 && n <= 8 && n !== 5){
+    if(grid) grid.style.display = 'none';
+    if(less) less.style.display = '';
+    if(l5)   l5.style.display   = 'none';
+    _renderLearnLessonPage(n);
+    return;
+  }
+
+  // Anything unexpected falls back to the grid.
+  _learnView = 'grid';
+  renderLearn();
+}
+
+// ─── Grid renderer ───────────────────────────────────────────────
+
+function _renderLearnGrid(){
+  const root = document.getElementById('mzLearnGrid');
+  if(!root) return;
+  const p = _learnInitProgress();
+  const lessons = _learnAllLessons();
+  const completedCount = lessons.filter(l => l && p.completed[l.num]).length;
+
+  // 8-dot progress row.
+  const dots = lessons.map(l => {
+    const done   = !!p.completed[l.num];
+    const opened = !!p.opened[l.num];
+    let cls = 'mz-learn-dot';
+    if(done) cls += ' mz-learn-dot--done';
+    else if(opened) cls += ' mz-learn-dot--opened';
+    const titleAttr = 'Lesson ' + l.num + ' — ' + l.title + (done ? ' (complete)' : opened ? ' (opened)' : '');
+    return '<button type="button" class="' + cls + '" title="' + escapeHtml(titleAttr) + '" onclick="_learnOpen(' + l.num + ')">' + l.num + '</button>';
+  }).join('');
+
+  // 8 cards.
+  const cards = lessons.map(l => {
+    const done   = !!p.completed[l.num];
+    const opened = !!p.opened[l.num];
+    const stateChip = done
+      ? '<span class="mz-learn-card__chip mz-learn-card__chip--done">✓ Complete</span>'
+      : opened
+        ? '<span class="mz-learn-card__chip mz-learn-card__chip--opened">In progress</span>'
+        : '<span class="mz-learn-card__chip">New</span>';
+    return ''
+      + '<button type="button" class="mz-learn-card' + (done ? ' mz-learn-card--done' : '') + '" onclick="_learnOpen(' + l.num + ')">'
+      +   '<div class="mz-learn-card__head">'
+      +     '<span class="mz-learn-card__num">LESSON ' + l.num + '</span>'
+      +     stateChip
+      +   '</div>'
+      +   '<div class="mz-learn-card__icon">' + l.icon + '</div>'
+      +   '<div class="mz-learn-card__title">' + escapeHtml(l.title) + '</div>'
+      +   '<div class="mz-learn-card__meta">' + l.readMinutes + ' min read</div>'
+      + '</button>';
+  }).join('');
+
+  root.innerHTML = ''
+    + '<div class="mz-learn-frame">'
+    +   '<div class="mz-learn-frame__title">📚 FINANCIAL LITERACY · 8-LESSON SERIES</div>'
+    +   '<div class="mz-learn-frame__body">Eight short lessons that compound. Tap any card to open. Mark complete when you finish — your progress lives on this device and follows you across the rest of the Money tab.</div>'
+    +   '<div class="mz-learn-frame__dots" aria-label="Lesson progress">' + dots + '</div>'
+    +   '<div class="mz-learn-frame__counter">' + completedCount + ' of 8 complete</div>'
+    + '</div>'
+    + '<div class="mz-learn-grid">' + cards + '</div>';
+}
+
+// ─── Lesson page renderer (lessons 1, 2, 3, 4, 6, 7, 8) ──────────
+
+function _renderLearnLessonPage(n){
+  const root = document.getElementById('mzLearnLesson');
+  if(!root) return;
+  const l = _learnLessonByNum(n);
+  if(!l){
+    root.innerHTML = '<div class="mz-tx-empty">Lesson not found. <button onclick="_learnBackToGrid()" style="color:var(--mz-indigo);background:none;border:none;cursor:pointer;text-decoration:underline;">Back to all lessons</button></div>';
+    return;
+  }
+
+  const p = _learnInitProgress();
+  const isDone = !!p.completed[n];
+
+  const faithBlock = l.faithFrame
+    ? '<div class="mz-lesson-faith">' +
+        '<div class="mz-lesson-faith__label">FAITH FRAMING</div>' +
+        '<div class="mz-lesson-faith__body">' + l.faithFrame + '</div>' +
+      '</div>'
+    : '';
+
+  const tryBlock = l.tryThis
+    ? '<div class="mz-lesson-try">' +
+        '<div class="mz-lesson-try__label">TRY THIS</div>' +
+        '<div class="mz-lesson-try__body">' + l.tryThis + '</div>' +
+      '</div>'
+    : '';
+
+  root.innerHTML = ''
+    + '<button type="button" class="mz-lesson-back" onclick="_learnBackToGrid()">← All lessons</button>'
+    + '<div class="mz-lesson-page">'
+    +   '<div class="mz-lesson-chip">LESSON ' + l.num + ' · ' + l.readMinutes + ' MIN READ</div>'
+    +   '<h2 class="mz-lesson-title">' + l.icon + ' ' + escapeHtml(l.title) + '</h2>'
+    +   '<div class="mz-lesson-hook">' + escapeHtml(l.hook) + '</div>'
+    +   '<div class="mz-lesson-concept">' + l.conceptHtml + '</div>'
+    +   '<div class="mz-lesson-example">'
+    +     '<div class="mz-lesson-example__label">WORKED EXAMPLE</div>'
+    +     '<div class="mz-lesson-example__body">' + l.exampleHtml + '</div>'
+    +   '</div>'
+    +   '<div class="mz-lesson-takeaway">'
+    +     '<div class="mz-lesson-takeaway__label">KEY TAKEAWAY</div>'
+    +     '<div class="mz-lesson-takeaway__body">' + escapeHtml(l.takeaway) + '</div>'
+    +   '</div>'
+    +   tryBlock
+    +   faithBlock
+    +   '<div class="mz-lesson-footer">'
+    +     '<button type="button" class="mz-lesson-complete' + (isDone ? ' mz-lesson-complete--done' : '') + '" onclick="_learnComplete(' + n + ')">'
+    +       (isDone ? '✓ Marked complete' : 'Mark complete')
+    +     '</button>'
+    +   '</div>'
+    + '</div>';
+
+  // Scroll back to top of the panel when opening a new lesson —
+  // long lessons that used to scroll on the grid would land
+  // mid-page otherwise.
+  if(typeof root.scrollIntoView === 'function'){
+    try { root.scrollIntoView({ behavior:'smooth', block:'start' }); } catch(_) {}
+  }
+}
+
+// ─── State handlers (exposed globally for onclick handlers) ──────
+
+function _learnOpen(n){
+  const p = _learnInitProgress();
+  const today = (typeof localDateString === 'function')
+    ? localDateString()
+    : new Date().toISOString().slice(0,10);
+  if(!p.opened[n]){
+    p.opened[n]   = true;
+    p.openedAt[n] = today;
+    save();
+  }
+  _learnView = 'lesson:' + n;
+  renderLearn();
+}
+
+function _learnBackToGrid(){
+  _learnView = 'grid';
+  renderLearn();
+}
+
+function _learnComplete(n){
+  const p = _learnInitProgress();
+  const today = (typeof localDateString === 'function')
+    ? localDateString()
+    : new Date().toISOString().slice(0,10);
+  // Toggle — tapping a completed lesson un-completes (lets the
+  // user correct a mis-tap without diving into devtools).
+  if(p.completed[n]){
+    delete p.completed[n];
+    delete p.completedAt[n];
+    showToast('Marked back to in-progress');
+  } else {
+    p.completed[n]   = true;
+    p.completedAt[n] = today;
+    // Also mark opened in case they jumped straight from the grid.
+    if(!p.opened[n]){
+      p.opened[n]   = true;
+      p.openedAt[n] = today;
+    }
+    showToast('Lesson ' + n + ' complete ✓');
+  }
+  save();
+  // Re-render to flip the button label + update the grid counter.
+  renderLearn();
 }
 
