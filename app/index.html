@@ -2818,7 +2818,15 @@
       <div class="mz-tx-catgrid" id="txCatGrid" role="radiogroup" aria-label="Category"></div>
       <input type="hidden" id="txCat" value="Other">
 
-      <button class="btn bp" style="width:100%;margin-top:.7rem;" onclick="addTx()">Log It</button>
+      <!-- Tab 2 Inc 3 — submit button id'd so edit-mode can flip its
+           label ("Log It" -> "Save Changes"). Cancel button is hidden
+           by default; _moneyTxBeginEdit reveals it. -->
+      <div style="display:flex;gap:.5rem;margin-top:.7rem;">
+        <button id="mzTxSubmitBtn" class="btn bp" style="flex:1;" onclick="addTx()">Log It</button>
+        <button id="mzTxCancelBtn" type="button"
+                style="display:none;font-family:var(--fn);font-size:.7rem;font-weight:700;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--tx2);border-radius:10px;padding:.55rem .9rem;cursor:pointer;"
+                onclick="_moneyTxCancelEdit()">Cancel</button>
+      </div>
     </div>
 
     <!-- ── List ───────────────────────────────────────────────── -->
@@ -2909,18 +2917,207 @@
     <div class="ga" id="savGoalCards"></div>
   </div>
 
-  <!-- Tab 2 Inc 1 — Allowance sub-tab stub. Empty-state card promises
-       recurring allowance + auto-credit in Inc 4. The route key
-       'allowance' is wired through mTab() with a no-op renderer guard
-       so the panel just displays this static card today. -->
-  <div id="mt-allowance" style="display:none;">
-    <div class="mz-stub">
-      <div class="mz-stub__icon">💰</div>
-      <div class="mz-stub__title">ALLOWANCE</div>
-      <div class="mz-stub__body">Recurring allowance with auto-credit on schedule — set the amount and frequency once, and the app inserts the income row on the right day every week / two weeks / month. Parent toggle for which child gets what.</div>
-      <div class="mz-stub__chip">Coming in Increment 4</div>
-    </div>
-  </div>
+  <!-- ════════════════════════════════════════════════════════════
+       Tab 2 Inc 3 — Allowance sub-tab.
+       Kid sees read-only: schedule pill + countdown + month chip +
+       recent credits + hint to Parent Hub. renderAllowance() in
+       finance.js populates this panel and auto-credits BEFORE
+       rendering (so today's credit appears immediately if today is
+       a due date). The config UI lives in Parent Hub > Rewards
+       (#parentAllowanceArea, also populated by finance.js).
+       ════════════════════════════════════════════════════════════ -->
+  <style>
+    /* ── Kid-side hero ─────────────────────────────────────── */
+    #s-finance .mz-allow-hero{
+      background:linear-gradient(135deg,var(--mz-amber-soft),transparent 75%);
+      border:1px solid var(--mz-amber-bd);
+      border-radius:16px;
+      padding:1.15rem 1.3rem;
+      margin-bottom:.8rem;
+    }
+    #s-finance .mz-allow-hero--off{
+      background:var(--mz-surface-soft);
+      border:1px dashed var(--mz-card-border);
+      text-align:center;
+      padding:1.5rem 1.3rem;
+    }
+    #s-finance .mz-allow-hero__icon{ font-size:2rem;line-height:1;margin-bottom:.4rem; }
+    #s-finance .mz-allow-hero__title{
+      font-family:var(--fh);font-size:.95rem;letter-spacing:1.5px;
+      font-weight:800;color:var(--tx);margin-bottom:.45rem;
+    }
+    #s-finance .mz-allow-hero__body{
+      font-size:.78rem;color:var(--tx2);line-height:1.5;max-width:40ch;margin:0 auto;
+    }
+    #s-finance .mz-allow-hero__row{
+      display:flex;align-items:baseline;gap:.7rem;flex-wrap:wrap;
+      margin-bottom:.6rem;
+    }
+    #s-finance .mz-allow-hero__amt{
+      font-family:var(--fh);font-size:2.15rem;font-weight:800;color:var(--mz-amber);
+      line-height:1;letter-spacing:-.5px;
+    }
+    #s-finance .mz-allow-hero__cadence{
+      font-family:var(--fn);font-size:.85rem;font-weight:600;color:var(--tx2);
+      letter-spacing:.05em;
+    }
+    #s-finance .mz-allow-hero__next{
+      display:flex;align-items:center;gap:.6rem;
+      padding-top:.55rem;border-top:1px solid color-mix(in srgb,var(--mz-amber) 18%,transparent);
+      font-size:.78rem;
+    }
+    /* UX reviewer fix — bumped from .6rem (~9.6px, below the WCAG
+       1.4.4 floor) to .65rem (~10.4px) so the all-caps micro-label
+       stays readable when system font-size scales down. */
+    #s-finance .mz-allow-hero__next-label{
+      font-size:.65rem;font-weight:800;letter-spacing:1.4px;
+      color:var(--tx3);text-transform:uppercase;
+    }
+    #s-finance .mz-allow-hero__next-val{
+      color:var(--mz-amber);font-weight:700;
+    }
+
+    /* ── Month total chip ─────────────────────────────────── */
+    #s-finance .mz-allow-monthchip{
+      display:inline-flex;align-items:center;gap:.45rem;
+      background:var(--mz-accent-soft);border:1px solid var(--mz-accent-bd);
+      color:var(--mz-accent);
+      font-family:var(--fn);font-size:.7rem;font-weight:700;
+      padding:.38rem .75rem;border-radius:99px;margin-bottom:1rem;
+    }
+
+    /* ── Recent credits list ──────────────────────────────── */
+    #s-finance .mz-allow-list{
+      display:flex;flex-direction:column;gap:.45rem;margin-bottom:1.1rem;
+    }
+    #s-finance .mz-allow-row{
+      display:grid;grid-template-columns:32px 1fr auto;gap:.6rem;align-items:center;
+      background:var(--mz-surface-soft);border:1px solid var(--mz-card-border);
+      border-radius:12px;padding:.55rem .85rem;
+    }
+    #s-finance .mz-allow-row__emoji{ font-size:1.1rem;text-align:center; }
+    #s-finance .mz-allow-row__name{
+      font-family:var(--fn);font-size:.82rem;font-weight:700;color:var(--tx);
+    }
+    #s-finance .mz-allow-row__date{
+      font-size:.62rem;color:var(--tx3);margin-top:.1rem;
+    }
+    /* UX reviewer fix — amount uses --mz-amber (not --mz-accent) so
+       the credit history closes the loop with the amber hero card.
+       The whole Allowance concept stays in the amber color story; it
+       only switches to emerald in the "received this month" chip,
+       which is intentionally the cross-period summary. */
+    #s-finance .mz-allow-row__amt{
+      font-family:var(--fh);font-size:1.05rem;font-weight:800;
+      color:var(--mz-amber);
+    }
+    #s-finance .mz-allow-empty{
+      padding:1rem;font-size:.7rem;color:var(--tx3);text-align:center;
+      background:var(--mz-surface-soft);border:1px dashed var(--mz-card-border);
+      border-radius:14px;
+    }
+    #s-finance .mz-allow-hint{
+      font-size:.65rem;color:var(--tx3);text-align:center;
+      padding:.7rem;line-height:1.5;
+    }
+
+    /* ── Parent-Hub config card (in #ph-rewards) ──────────── */
+    /* Parent Hub uses a different scope (#s-parent) so we redeclare
+       the amber palette as a hex fallback. The plan is to centralize
+       --mz-* tokens at :root once a follow-up sweep retires the
+       section-scoped declarations. */
+    #s-parent{
+      --mz-amber:        #f59e0b;
+      --mz-amber-soft:   color-mix(in srgb, #f59e0b 12%, transparent);
+      --mz-amber-bd:     color-mix(in srgb, #f59e0b 38%, transparent);
+    }
+    #s-parent .mz-allow-ph{
+      background:linear-gradient(135deg,var(--mz-amber-soft),transparent 70%);
+      border:1px solid var(--mz-amber-bd);
+      border-radius:16px;
+      padding:1rem 1.15rem;margin-top:1rem;
+    }
+    #s-parent .mz-allow-ph__title{
+      font-family:var(--fh,'Bebas Neue',sans-serif);font-size:.85rem;
+      letter-spacing:1.6px;font-weight:800;color:var(--mz-amber);margin-bottom:.3rem;
+    }
+    #s-parent .mz-allow-ph__sub{
+      font-size:.7rem;color:var(--tx2);line-height:1.5;margin-bottom:.7rem;
+    }
+    #s-parent .mz-allow-card{
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.07);
+      border-radius:12px;padding:.7rem .85rem;margin-bottom:.55rem;
+    }
+    #s-parent .mz-allow-card:last-child{ margin-bottom:0; }
+    #s-parent .mz-allow-card__head{
+      display:flex;align-items:center;justify-content:space-between;
+      margin-bottom:.55rem;
+    }
+    #s-parent .mz-allow-card__name{
+      font-family:var(--fn);font-size:.85rem;font-weight:800;color:var(--tx);
+    }
+    /* UX reviewer fix — the toggle now ships with a small dot
+       affordance + role="switch" + aria-pressed in the markup. The
+       dot is rendered via a ::before pseudo-element so the markup
+       stays light and the dot inherits the active color. */
+    #s-parent .mz-allow-card__toggle{
+      font-family:var(--fn);font-size:.62rem;font-weight:800;
+      letter-spacing:1.5px;
+      padding:.32rem .8rem .32rem .65rem;border-radius:99px;cursor:pointer;
+      border:1px solid transparent;
+      display:inline-flex;align-items:center;gap:.4rem;
+    }
+    #s-parent .mz-allow-card__toggle::before{
+      content:'';width:8px;height:8px;border-radius:50%;
+      display:inline-block;flex-shrink:0;
+      background:currentColor;opacity:.85;
+    }
+    #s-parent .mz-allow-card__toggle.on{
+      background:rgba(34,197,94,.16);border-color:rgba(34,197,94,.4);color:#22c55e;
+    }
+    #s-parent .mz-allow-card__toggle.off{
+      background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.10);color:var(--tx3);
+    }
+    #s-parent .mz-allow-card__toggle.off::before{ opacity:.4; }
+    /* Bumped focus-ring opacity from .45 to .85 for WCAG 2.4.11 (AA in 2.2). */
+    #s-parent .mz-allow-card__grid input:focus,
+    #s-parent .mz-allow-card__grid select:focus{
+      outline:none;border-color:rgba(245,158,11,.85);
+    }
+    #s-parent .mz-allow-card__grid{
+      display:grid;grid-template-columns:1fr 1fr;gap:.5rem;
+    }
+    @media (min-width:520px){
+      #s-parent .mz-allow-card__grid{ grid-template-columns:repeat(3,1fr); }
+    }
+    #s-parent .mz-allow-card__grid label{
+      display:flex;flex-direction:column;gap:.25rem;
+      font-size:.6rem;color:var(--tx3);font-weight:700;letter-spacing:.4px;
+      text-transform:uppercase;
+    }
+    #s-parent .mz-allow-card__grid input,
+    #s-parent .mz-allow-card__grid select{
+      background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+      border-radius:8px;padding:.4rem .55rem;
+      color:var(--tx);font-family:var(--fn);font-size:.78rem;
+      width:100%;box-sizing:border-box;
+    }
+    /* This rule was originally at .45 opacity (insufficient WCAG
+       contrast); the override above at .85 is canonical now. Leaving
+       this declaration as a no-op rather than deleting so a future
+       audit shows the contrast bump was intentional. */
+    #s-parent .mz-allow-card__grid input:focus,
+    #s-parent .mz-allow-card__grid select:focus{
+      outline:none;border-color:rgba(245,158,11,.85);
+    }
+  </style>
+
+  <!-- Placeholder div populated by renderAllowance() in finance.js.
+       Auto-credit fires inside renderAllowance() BEFORE the markup is
+       written, so today's credit shows up in the same render pass if
+       today is a due date. -->
+  <div id="mt-allowance" style="display:none;"></div>
 
   <div id="mt-budget" style="display:none;">
     <div class="g2">
@@ -15646,6 +15843,12 @@
             </div>
             <div class="ph-block">
               <div id="parentEarningsControls"></div>
+              <!-- Tab 2 Inc 3 — Allowance config card mount. Populated
+                   by renderPhAllowance() in finance.js whenever
+                   phNav('rewards') activates. Solo mode shows one
+                   editable form; multi-kid shows one card per
+                   non-parent profile. -->
+              <div id="parentAllowanceArea"></div>
             </div>
           </section>
 
