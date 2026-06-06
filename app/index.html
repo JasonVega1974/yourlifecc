@@ -15843,12 +15843,13 @@
             </div>
             <div class="ph-block">
               <div id="parentEarningsControls"></div>
-              <!-- Tab 2 Inc 3 — Allowance config card mount. Populated
-                   by renderPhAllowance() in finance.js whenever
-                   phNav('rewards') activates. Solo mode shows one
-                   editable form; multi-kid shows one card per
-                   non-parent profile. -->
-              <div id="parentAllowanceArea"></div>
+              <!-- Tab 2 Inc 3 — #parentAllowanceArea was originally
+                   mounted here, but Allowance has been promoted to its
+                   own Parent Hub card + panel (see #ph-allowance below
+                   in this file). This frees Controls > Earnings to be
+                   PB-only and gives Allowance dedicated visibility on
+                   the hub launcher. The renderPhAllowance call moved
+                   from phNav('rewards') to phNav('allowance'). -->
             </div>
           </section>
 
@@ -15937,6 +15938,39 @@
             </div>
           </section>
 
+        </div>
+
+        <!-- ════════════════════════════════════════════════════════
+             Tab 2 Inc 3 (fix) — dedicated Allowance card + panel.
+             The 8th hub-launcher card lives in parent.js
+             renderPhCardGrid(); this panel hosts the
+             #parentAllowanceArea mount that renderPhAllowance()
+             writes into when phNav('allowance') fires.
+             Visual treatment matches the existing 7 Parent Hub
+             panels: .ph-hero / .ph-eyebrow / .ph-title / .ph-sub
+             / .ph-chips at the top, content beneath.
+             ════════════════════════════════════════════════════════ -->
+        <div id="ph-allowance" data-ph-tab="allowance" style="display:none;">
+          <div class="ph-hero">
+            <div class="ph-eyebrow">PARENT HUB · ALLOWANCE</div>
+            <div class="ph-title">💵 Allowance</div>
+            <div class="ph-sub">Set a recurring credit per kid. The app drops the income row into each child's ledger automatically on pay day — weekly, biweekly, or monthly.</div>
+            <div class="ph-chips">
+              <span class="ph-chip ph-chip-amber">per-kid schedules</span>
+              <span class="ph-chip ph-chip-cyan">auto-credit on pay day</span>
+            </div>
+          </div>
+
+          <section class="ph-sec">
+            <div class="ph-seclabel">
+              <span class="ph-ic ph-ic-amber">💵</span>
+              <h2 class="ph-h2">Recurring schedule</h2>
+              <span class="ph-hint">populated per child profile</span>
+            </div>
+            <div class="ph-block">
+              <div id="parentAllowanceArea"></div>
+            </div>
+          </section>
         </div>
 
         <!-- BEHAVIOR & GRADES -->
