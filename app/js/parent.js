@@ -2833,7 +2833,12 @@ function phNav(tab){
   // hidden panels don't get their renderers fired needlessly.
   if(t === 'home')     { renderParentHubHome(); }
   if(t === 'chores')   { renderPhPendingChores(); renderParentChoreList(); renderParentSelfChores(); renderParentDeeds(); }
-  if(t === 'rewards')  { renderPhRewards(); if(typeof renderPhRewardsHeroChips === 'function') renderPhRewardsHeroChips(); if(typeof renderPhAllowance === 'function') renderPhAllowance(); }
+  if(t === 'rewards')  { renderPhRewards(); if(typeof renderPhRewardsHeroChips === 'function') renderPhRewardsHeroChips(); }
+  // Tab 2 Inc 3 (fix) — Allowance promoted to its own card + panel.
+  // Was previously appended to the 'rewards' handler (where the
+  // #parentAllowanceArea mount lived in #ph-controls — wrong panel
+  // entirely; render fired into a hidden element nobody navigated to).
+  if(t === 'allowance'){ if(typeof renderPhAllowance === 'function') renderPhAllowance(); }
   if(t === 'contests') { renderParentLeaderboard(); renderParentContests(); renderParentFamilyRewards(); if(typeof renderPhContestsHeroChips === 'function') renderPhContestsHeroChips(); }
   if(t === 'activity') { initPhSchedPanel(); renderParentActivityAudit(); renderParentActivityFeed(); renderBehaviorLog(); renderGradeMonitor(); renderParentNotes(); }
   if(t === 'reports')  { renderParentGettingStarted(); renderParentMultiChild(); renderParentScore(); renderParentOverview(); renderWeeklyReportCard(); renderCompletionSummary(); renderSentQuizzes(); renderProgressReportsTab(); renderParentFaithReport(); }
@@ -2888,14 +2893,32 @@ function renderPhCardGrid(){
 
   const childCount = (Array.isArray(_profiles) ? _profiles : []).filter(p => p && !p.isParent).length;
 
+  // Tab 2 Inc 3 (fix) — Allowance card badge counts kids with an
+  // active, non-zero schedule. Solo mode reads D.allowanceConfig
+  // directly; multi-kid scans p.data.allowanceConfig per child.
+  // Renders blank when nothing is set up (matches Reports / Controls
+  // — no shouty zeroes on the launcher).
+  const allowanceActive = (function(){
+    const profs = Array.isArray(_profiles) ? _profiles : [];
+    const isActive = cfg => cfg && cfg.enabled === true && Number(cfg.amount) > 0;
+    if(profs.length === 0){
+      return isActive(D.allowanceConfig) ? 1 : 0;
+    }
+    return profs.filter(p =>
+      p && p.isParent === false
+        && p.data && isActive(p.data.allowanceConfig)
+    ).length;
+  })();
+
   const cards = [
-    {slot:'chores',   icon:'✅',     label:'Chores & Approvals',     sub:'Verify · assign · history',         badge: pendTotal       > 0 ? pendTotal + ' pending'       : ''},
-    {slot:'rewards',  icon:'🪙',     label:'Rewards Store & Bucks',  sub:'Award · deduct · store',            badge: pbBal           > 0 ? pbBal + ' PB balance'        : ''},
-    {slot:'contests', icon:'🏆',     label:'Contests & Family Goals',sub:'Leaderboard · MVP · contests',      badge: contestsActive  > 0 ? contestsActive + ' active'   : ''},
-    {slot:'activity', icon:'📅',     label:'Activity & Schedule',    sub:'Schedule · log · behavior',         badge: activityToday   > 0 ? activityToday + ' today'     : ''},
-    {slot:'reports',  icon:'📈',     label:'Reports & Progress',     sub:'AI summaries · quizzes · faith',    badge: ''},
-    {slot:'family',   icon:'👨‍👩‍👧',label:'Family & Profiles',      sub:'Kids · learning · refer',           badge: childCount      > 0 ? childCount + ' kid' + (childCount>1?'s':'') : ''},
-    {slot:'controls', icon:'⚙️',    label:'Controls & Limits',      sub:'Screen · earnings · access',        badge: ''}
+    {slot:'chores',    icon:'✅',     label:'Chores & Approvals',     sub:'Verify · assign · history',         badge: pendTotal       > 0 ? pendTotal + ' pending'       : ''},
+    {slot:'rewards',   icon:'🪙',     label:'Rewards Store & Bucks',  sub:'Award · deduct · store',            badge: pbBal           > 0 ? pbBal + ' PB balance'        : ''},
+    {slot:'allowance', icon:'💵',     label:'Allowance',              sub:'Recurring credit · per kid',        badge: allowanceActive > 0 ? allowanceActive + ' active'   : ''},
+    {slot:'contests',  icon:'🏆',     label:'Contests & Family Goals',sub:'Leaderboard · MVP · contests',      badge: contestsActive  > 0 ? contestsActive + ' active'   : ''},
+    {slot:'activity',  icon:'📅',     label:'Activity & Schedule',    sub:'Schedule · log · behavior',         badge: activityToday   > 0 ? activityToday + ' today'     : ''},
+    {slot:'reports',   icon:'📈',     label:'Reports & Progress',     sub:'AI summaries · quizzes · faith',    badge: ''},
+    {slot:'family',    icon:'👨‍👩‍👧',label:'Family & Profiles',      sub:'Kids · learning · refer',           badge: childCount      > 0 ? childCount + ' kid' + (childCount>1?'s':'') : ''},
+    {slot:'controls',  icon:'⚙️',    label:'Controls & Limits',      sub:'Screen · earnings · access',        badge: ''}
   ];
 
   const esc = (typeof _phEscape === 'function') ? _phEscape : function(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); };
