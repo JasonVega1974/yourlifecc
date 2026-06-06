@@ -127,7 +127,14 @@ function addTx(){
   save();
   renderTx();
   updateFinSum();
-  showToast((type === 'income' ? '+$' : '-$') + amt.toFixed(2) + ' logged ✓');
+  // Subject-forward toast — the user just logged a real-money flow;
+  // celebrate the action, not the database write. UX reviewer call.
+  const amtStr = '$' + amt.toFixed(2);
+  showToast(
+    type === 'income'
+      ? '💚 ' + amtStr + ' income logged'
+      : '🪙 ' + amtStr + ' spent on ' + cat
+  );
 }
 
 function filterTx(type,btn){ _txFilter=type; document.querySelectorAll('.txf').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); renderTx(); }
@@ -580,8 +587,18 @@ function _moneyTxSetType(t, btn){
   _moneyTxActiveType = t;
   const hidden = document.getElementById('txType');
   if(hidden) hidden.value = t;
-  document.querySelectorAll('.mz-tx-toggle__btn').forEach(b => b.classList.remove('active'));
-  if(btn) btn.classList.add('active');
+  // Sync the segmented toggle state + ARIA so screen readers
+  // report the right selection (the UX reviewer flagged this —
+  // aria-selected was previously only set on the initial markup
+  // and never updated as the user clicked between options).
+  document.querySelectorAll('.mz-tx-toggle__btn').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-selected', 'false');
+  });
+  if(btn){
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected', 'true');
+  }
 }
 
 function _moneyTxSetCat(c, btn){
