@@ -3151,29 +3151,278 @@
        of it." The calcTax form inputs further down still resolve
        via skills.js — finance.js's mTab('learn') fires calcTax()
        on activation so the values populate. -->
+  <!-- ════════════════════════════════════════════════════════════
+       Tab 2 Inc 4 — Learn sub-tab rebuild.
+       State machine inside #mt-learn (see finance.js):
+         _learnView 'grid'      -> #mzLearnGrid visible (default)
+         _learnView 'lesson:5'  -> #mzLearnLesson5Static visible
+                                    (the Inc-1 TY2025 Tax Ed markup,
+                                    preserved VERBATIM. Carries the
+                                    calcTax interactive widget so it
+                                    cannot become a template-driven
+                                    lesson without losing function.)
+         _learnView 'lesson:N'  -> #mzLearnLesson visible, content
+                                    rendered from MONEY_LESSONS in
+                                    app/js/data/money-lessons.js.
+       Scoped CSS for the lesson page primitives lives in a
+       sibling <style> block below.
+       ════════════════════════════════════════════════════════════ -->
+  <style>
+    /* ─── Landing: grid + 8-dot progress row ─────────────────── */
+    #s-finance .mz-learn-frame__counter{
+      font-size:.62rem;color:var(--tx3);font-family:var(--fn);
+      font-weight:700;letter-spacing:1.4px;text-transform:uppercase;
+      margin-top:.6rem;text-align:center;
+    }
+    /* UX reviewer fix — dots are 30px visible, padded to ~44px tap
+       target for WCAG 2.5.5 AAA / mobile guidelines. The padding
+       widens the click area without changing the visible chip. */
+    #s-finance .mz-learn-dot{
+      min-width:30px;min-height:30px;padding:7px;
+      border-radius:50%;background-clip:content-box;
+      background-color:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      color:var(--tx3);font-family:var(--fn);font-size:.7rem;font-weight:800;
+      cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
+      transition:background-color .15s,border-color .15s,color .15s,transform .15s;
+    }
+    #s-finance .mz-learn-dot:hover{
+      background:rgba(255,255,255,.07);transform:translateY(-1px);
+    }
+    #s-finance .mz-learn-dot--opened{
+      background:var(--mz-indigo-soft);border-color:var(--mz-indigo-bd);color:var(--mz-indigo);
+    }
+    #s-finance .mz-learn-dot--done{
+      background:var(--mz-accent-soft);border-color:var(--mz-accent-bd);color:var(--mz-accent);
+    }
+    #s-finance .mz-learn-grid{
+      display:grid;grid-template-columns:1fr;gap:.65rem;margin-top:1.1rem;
+    }
+    @media (min-width:560px){
+      #s-finance .mz-learn-grid{grid-template-columns:1fr 1fr;}
+    }
+    #s-finance .mz-learn-card{
+      background:var(--mz-surface-soft);
+      border:1px solid var(--mz-card-border);
+      border-radius:16px;padding:1rem 1.1rem;
+      cursor:pointer;text-align:left;font-family:var(--fn);
+      display:flex;flex-direction:column;gap:.45rem;
+      transition:background .18s,border-color .18s,transform .15s;
+    }
+    #s-finance .mz-learn-card:hover{
+      background:rgba(255,255,255,.06);transform:translateY(-1px);
+      border-color:rgba(255,255,255,.14);
+    }
+    #s-finance .mz-learn-card--done{
+      border-color:var(--mz-accent-bd);
+      background:linear-gradient(135deg,var(--mz-accent-soft),transparent 65%);
+    }
+    /* UX reviewer fix — the lowest-numbered incomplete lesson gets a
+       distinct "Start here / Continue" treatment so a returning user
+       has a clear focal point. Indigo border + subtle glow signals
+       "you are here." Card visibility is enhanced WITHOUT a size
+       change so the grid layout stays clean. */
+    #s-finance .mz-learn-card--next{
+      border-color:var(--mz-indigo-bd);
+      background:linear-gradient(135deg,var(--mz-indigo-soft),transparent 65%);
+      box-shadow:0 0 0 1px var(--mz-indigo-bd), 0 0 16px rgba(99,102,241,.18);
+    }
+    #s-finance .mz-learn-card--next:hover{
+      border-color:var(--mz-indigo);
+    }
+    #s-finance .mz-learn-card__head{
+      display:flex;align-items:center;justify-content:space-between;gap:.4rem;
+    }
+    #s-finance .mz-learn-card__num{
+      font-family:var(--fh);font-size:.62rem;letter-spacing:1.6px;
+      color:var(--tx3);font-weight:800;
+    }
+    #s-finance .mz-learn-card__chip{
+      font-size:.55rem;font-weight:800;letter-spacing:.5px;text-transform:uppercase;
+      padding:.18rem .5rem;border-radius:6px;
+      background:rgba(255,255,255,.05);color:var(--tx3);
+    }
+    #s-finance .mz-learn-card__chip--opened{
+      background:var(--mz-indigo-soft);color:var(--mz-indigo);
+    }
+    #s-finance .mz-learn-card__chip--done{
+      background:var(--mz-accent-soft);color:var(--mz-accent);
+    }
+    /* "Start here" / "Continue" chip — indigo to match the next-card
+       container treatment above. */
+    #s-finance .mz-learn-card__chip--next{
+      background:var(--mz-indigo);color:#0a0e1a;
+      font-weight:800;
+    }
+    #s-finance .mz-learn-card__icon{ font-size:1.85rem;line-height:1;margin-top:.1rem; }
+    #s-finance .mz-learn-card__title{
+      font-size:.95rem;font-weight:700;color:var(--tx);line-height:1.25;
+    }
+    #s-finance .mz-learn-card__meta{
+      font-size:.62rem;color:var(--tx3);font-weight:600;letter-spacing:.5px;
+    }
+
+    /* ─── Lesson page ────────────────────────────────────────── */
+    #s-finance .mz-lesson-back{
+      background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+      color:var(--tx2);font-family:var(--fn);font-size:.7rem;font-weight:700;
+      padding:.55rem .95rem;border-radius:10px;cursor:pointer;
+      margin-bottom:.95rem;letter-spacing:.04em;
+      transition:background .15s,border-color .15s,color .15s,outline-color .15s;
+    }
+    #s-finance .mz-lesson-back:hover{
+      background:rgba(255,255,255,.08);color:var(--tx);
+    }
+    /* UX reviewer fix — explicit focus-visible state for keyboard /
+       switch-access. Outline rather than border so the click target
+       size doesn't shift on focus. */
+    #s-finance .mz-lesson-back:focus-visible{
+      outline:2px solid var(--mz-indigo);outline-offset:2px;
+      color:var(--tx);
+    }
+    #s-finance .mz-lesson-page{
+      background:var(--mz-surface-soft);
+      border:1px solid var(--mz-card-border);
+      border-radius:18px;
+      padding:1.4rem 1.5rem;
+    }
+    #s-finance .mz-lesson-chip{
+      display:inline-block;font-family:var(--fh);font-size:.62rem;
+      letter-spacing:1.8px;font-weight:800;color:var(--mz-indigo);
+      background:var(--mz-indigo-soft);
+      border:1px solid var(--mz-indigo-bd);
+      padding:.25rem .65rem;border-radius:8px;margin-bottom:.85rem;
+    }
+    #s-finance .mz-lesson-title{
+      font-family:var(--fh);font-size:1.65rem;letter-spacing:.04em;
+      font-weight:400;line-height:1.15;color:var(--tx);margin:0 0 .85rem;
+    }
+    #s-finance .mz-lesson-hook{
+      font-size:.95rem;color:var(--tx);line-height:1.55;
+      font-style:italic;
+      padding:.7rem 1rem;
+      border-left:3px solid var(--mz-amber);
+      background:var(--mz-amber-soft);
+      border-radius:0 10px 10px 0;
+      margin-bottom:1.2rem;
+    }
+    #s-finance .mz-lesson-concept{
+      font-size:.88rem;color:var(--tx);line-height:1.65;
+    }
+    #s-finance .mz-lesson-concept p{ margin:0 0 .85rem; }
+    #s-finance .mz-lesson-concept ul,
+    #s-finance .mz-lesson-concept ol{
+      padding-left:1.25rem;margin:0 0 .85rem;
+    }
+    #s-finance .mz-lesson-concept li{ margin-bottom:.4rem; }
+    #s-finance .mz-lesson-concept b{ color:var(--tx); }
+    #s-finance .mz-lesson-example{
+      background:rgba(255,255,255,.025);
+      border:1px solid rgba(255,255,255,.07);
+      border-left:3px solid var(--mz-accent);
+      border-radius:0 12px 12px 0;
+      padding:.9rem 1.1rem;margin:1.2rem 0;
+    }
+    #s-finance .mz-lesson-example__label{
+      font-family:var(--fh);font-size:.62rem;letter-spacing:1.6px;
+      font-weight:800;color:var(--mz-accent);margin-bottom:.4rem;
+    }
+    #s-finance .mz-lesson-example__body{
+      font-size:.85rem;color:var(--tx);line-height:1.6;
+    }
+    #s-finance .mz-lesson-example__body p{ margin:0 0 .55rem; }
+    #s-finance .mz-lesson-example__body ul{ padding-left:1.25rem;margin:0 0 .55rem; }
+    #s-finance .mz-lesson-example__body li{ margin-bottom:.35rem; }
+    #s-finance .mz-lesson-example__body b{ color:var(--mz-accent); }
+    #s-finance .mz-lesson-takeaway{
+      background:linear-gradient(135deg,var(--mz-amber-soft),transparent 70%);
+      border:1px solid var(--mz-amber-bd);
+      border-radius:14px;
+      padding:.95rem 1.15rem;margin:1.2rem 0;
+    }
+    #s-finance .mz-lesson-takeaway__label{
+      font-family:var(--fh);font-size:.62rem;letter-spacing:1.6px;
+      font-weight:800;color:var(--mz-amber);margin-bottom:.4rem;
+    }
+    #s-finance .mz-lesson-takeaway__body{
+      font-size:.95rem;font-weight:600;color:var(--tx);line-height:1.5;
+    }
+    #s-finance .mz-lesson-try,
+    #s-finance .mz-lesson-faith{
+      border-radius:12px;padding:.85rem 1.05rem;margin-top:1rem;
+    }
+    #s-finance .mz-lesson-try{
+      background:rgba(255,255,255,.025);
+      border:1px solid rgba(255,255,255,.07);
+    }
+    /* UX reviewer fix — faith framing gets a distinct warm-temperature
+       surface so it reads as a different register from the utility
+       "Try this" card. Gold tint + left border, never the same shape
+       as the neutral Try-this card. */
+    #s-finance .mz-lesson-faith{
+      background:linear-gradient(135deg, rgba(245,200,66,.08), transparent 70%);
+      border:1px solid rgba(245,200,66,.22);
+      border-left:3px solid #f5c842;
+      border-radius:0 12px 12px 0;
+    }
+    #s-finance .mz-lesson-try__label,
+    #s-finance .mz-lesson-faith__label{
+      font-family:var(--fh);font-size:.62rem;letter-spacing:1.6px;
+      font-weight:800;margin-bottom:.35rem;
+    }
+    #s-finance .mz-lesson-try__label{ color:var(--mz-indigo); }
+    /* Literal hex for the faith label color — --g is faith-stack scoped
+       and may not resolve inside #s-finance. */
+    #s-finance .mz-lesson-faith__label{ color:#f5c842; }
+    #s-finance .mz-lesson-try__body,
+    #s-finance .mz-lesson-faith__body{
+      font-size:.82rem;color:var(--tx);line-height:1.55;
+    }
+    #s-finance .mz-lesson-footer{
+      display:flex;justify-content:flex-end;margin-top:1.3rem;
+    }
+    #s-finance .mz-lesson-complete{
+      font-family:var(--fn);font-size:.78rem;font-weight:800;
+      letter-spacing:.06em;
+      padding:.7rem 1.4rem;border-radius:99px;cursor:pointer;
+      background:var(--mz-accent-soft);
+      border:1px solid var(--mz-accent-bd);
+      color:var(--mz-accent);
+      transition:background .15s,box-shadow .15s;
+    }
+    #s-finance .mz-lesson-complete:hover{
+      background:color-mix(in srgb, var(--mz-accent) 22%, transparent);
+      box-shadow:0 0 14px rgba(16,185,129,.2);
+    }
+    #s-finance .mz-lesson-complete--done{
+      background:var(--mz-accent);color:#0a0e1a;
+    }
+    #s-finance .mz-lesson-complete--done:hover{
+      background:color-mix(in srgb, var(--mz-accent) 88%, transparent);
+    }
+  </style>
+
   <div id="mt-learn" style="display:none;">
 
-    <!-- Series framing -->
-    <div class="mz-learn-frame">
-      <div class="mz-learn-frame__title">📚 FINANCIAL LITERACY · 8-LESSON SERIES</div>
-      <div class="mz-learn-frame__body">Eight short lessons that compound. Lesson 5 (Taxes) is below, fully built with the TY2025 brackets and the simulator. The other seven — budgeting, saving, credit, investing, wants vs needs, emergency funds, compound interest — land in Increment 5.</div>
-      <div class="mz-learn-frame__dots" aria-label="Lesson progress">
-        <span class="mz-learn-frame__dot" title="Lesson 1 — Budgeting">1</span>
-        <span class="mz-learn-frame__dot" title="Lesson 2 — Saving">2</span>
-        <span class="mz-learn-frame__dot" title="Lesson 3 — Credit">3</span>
-        <span class="mz-learn-frame__dot" title="Lesson 4 — Investing">4</span>
-        <span class="mz-learn-frame__dot mz-learn-frame__dot--on" title="Lesson 5 — Taxes (available below)">5</span>
-        <span class="mz-learn-frame__dot" title="Lesson 6 — Wants vs Needs">6</span>
-        <span class="mz-learn-frame__dot" title="Lesson 7 — Emergency Funds">7</span>
-        <span class="mz-learn-frame__dot" title="Lesson 8 — Compound Interest">8</span>
-      </div>
-    </div>
+    <!-- Grid view (default state of _learnView). Populated by
+         _renderLearnGrid() in finance.js — 8-dot progress row +
+         8 lesson cards. -->
+    <div id="mzLearnGrid"></div>
 
-    <!-- ─────────────────── Lesson 5 — Taxes (TY2025) ────────────
-         All markup below is the original Tax Ed content, preserved
-         intact. Inc 5 will refactor this into a per-lesson template
-         when the other 7 lessons land. -->
-    <div class="mz-section-title mz-section-title--amber" style="margin-bottom:1rem;">🧾 LESSON 5 · TAXES (TY2025)</div>
+    <!-- Lesson page view for lessons 1, 2, 3, 4, 6, 7, 8. Populated
+         by _renderLearnLessonPage(n) when the user opens a card. -->
+    <div id="mzLearnLesson" style="display:none;"></div>
+
+    <!-- Lesson 5 — Taxes (TY2025). Static markup, preserved verbatim
+         from Inc 1. The renderer routes here when _learnView ===
+         'lesson:5' so this content remains the single source of
+         truth for tax education. calcTax() (defined in skills.js)
+         binds to inputs inside this block. -->
+    <div id="mzLearnLesson5Static" style="display:none;">
+
+      <button type="button" class="mz-lesson-back" onclick="_learnBackToGrid()">← All lessons</button>
+
+      <div class="mz-section-title mz-section-title--amber" style="margin-bottom:1rem;">🧾 LESSON 5 · TAXES (TY2025)</div>
 
     <!-- Hero banner -->
     <div style="background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(251,146,60,.08));border:1px solid rgba(251,191,36,.2);border-radius:14px;padding:1.2rem 1.4rem;margin-bottom:1rem;display:flex;align-items:center;gap:1rem;">
@@ -3396,7 +3645,9 @@
       </div>
     </div>
 
-  </div><!-- /mt-learn (Lesson 5 — Taxes) -->
+    </div><!-- /mzLearnLesson5Static -->
+
+  </div><!-- /mt-learn (Inc 4 — grid + 7 templated lessons + 1 static) -->
 
 </section>
 
@@ -17485,6 +17736,12 @@
 <script src="/app/js/habits.js"></script>
 <script src="/app/js/data/plans.js"></script>
 <script src="/app/js/data/memory-verses.js"></script>
+<!-- Tab 2 Inc 4 — Money / Learn lesson content. Loads with the
+     other data/*.js entries (group 7 per the script-load order in
+     CLAUDE.md). finance.js's renderer only references MONEY_LESSONS
+     inside function bodies that fire on user interaction, so the
+     "data loads after feature modules" ordering is safe. -->
+<script src="/app/js/data/money-lessons.js"></script>
 <script src="/app/js/data/academy.js"></script>
 <script src="/app/js/data/academy-lessons.js"></script>
 <script src="/app/js/data/biblical-sites.js"></script>
