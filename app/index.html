@@ -2603,37 +2603,258 @@
     </div>
   </div>
 
+  <!-- ════════════════════════════════════════════════════════════
+       Tab 2 Inc 2 — Transactions sub-tab rebuild.
+       JSONB-first reads from D.transactions; dual-write to
+       public.money_transactions via _mirrorMoneyToCloud(sync.js).
+       Visual layer uses the --mz-* token system established in
+       Inc 1. Renderer lives in finance.js (_moneyRenderTransactions).
+       ════════════════════════════════════════════════════════════ -->
+  <style>
+    /* ── Add-form: segmented income/expense toggle ────────────── */
+    #s-finance .mz-tx-toggle{
+      display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.9rem;
+    }
+    #s-finance .mz-tx-toggle__btn{
+      font-family:var(--fn);font-size:.78rem;font-weight:800;
+      letter-spacing:.06em;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      color:var(--tx2);
+      border-radius:12px;padding:.65rem .8rem;cursor:pointer;
+      transition:background .18s,border-color .18s,color .18s,transform .15s;
+    }
+    #s-finance .mz-tx-toggle__btn:hover{ background:rgba(255,255,255,.07); }
+    #s-finance .mz-tx-toggle__btn.active.mz-tx-toggle__btn--income{
+      background:var(--mz-accent-soft);border-color:var(--mz-accent-bd);color:var(--mz-accent);
+    }
+    #s-finance .mz-tx-toggle__btn.active.mz-tx-toggle__btn--expense{
+      background:var(--mz-coral-soft);border-color:var(--mz-coral-bd);color:var(--mz-coral);
+    }
+
+    /* ── Add-form: category emoji chip picker ─────────────────── */
+    #s-finance .mz-tx-catgrid{
+      display:grid;grid-template-columns:repeat(auto-fill, minmax(86px, 1fr));
+      gap:.4rem;margin-bottom:.5rem;
+    }
+    #s-finance .mz-tx-catchip{
+      display:flex;flex-direction:column;align-items:center;gap:.2rem;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.07);
+      border-radius:12px;
+      padding:.55rem .4rem;cursor:pointer;
+      font-family:var(--fn);
+      transition:background .18s,border-color .18s,transform .15s;
+    }
+    #s-finance .mz-tx-catchip:hover{ background:rgba(255,255,255,.07); }
+    #s-finance .mz-tx-catchip.active{
+      background:var(--mz-amber-soft);border-color:var(--mz-amber-bd);
+    }
+    #s-finance .mz-tx-catchip__emoji{ font-size:1.15rem;line-height:1; }
+    #s-finance .mz-tx-catchip__label{
+      font-size:.55rem;font-weight:700;color:var(--tx2);
+      text-align:center;letter-spacing:.4px;
+    }
+    #s-finance .mz-tx-catchip.active .mz-tx-catchip__label{ color:var(--mz-amber); }
+
+    /* ── List toolbar: filter chips + CSV export ─────────────── */
+    #s-finance .mz-tx-toolbar{
+      display:flex;align-items:center;gap:.5rem;margin-bottom:.55rem;
+    }
+    #s-finance .mz-tx-chips{
+      display:flex;gap:.35rem;flex:1;overflow-x:auto;
+      scrollbar-width:none;
+    }
+    #s-finance .mz-tx-chips::-webkit-scrollbar{ display:none; }
+    #s-finance .mz-tx-chip{
+      background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+      color:var(--tx2);font-family:var(--fn);font-size:.65rem;font-weight:700;
+      border-radius:18px;padding:.32rem .7rem;white-space:nowrap;cursor:pointer;
+      display:inline-flex;align-items:center;gap:.35rem;
+      transition:background .18s,border-color .18s,color .18s;
+    }
+    #s-finance .mz-tx-chip:hover{ background:rgba(255,255,255,.07); }
+    #s-finance .mz-tx-chip.active{
+      background:var(--mz-accent-soft);border-color:var(--mz-accent-bd);color:var(--mz-accent);
+    }
+    #s-finance .mz-tx-chip__n{
+      font-size:.55rem;background:rgba(255,255,255,.06);
+      padding:.05rem .35rem;border-radius:8px;color:var(--tx3);font-weight:800;
+    }
+    #s-finance .mz-tx-chip.active .mz-tx-chip__n{
+      background:rgba(16,185,129,.18);color:var(--mz-accent);
+    }
+    #s-finance .mz-tx-export{
+      flex-shrink:0;background:var(--mz-indigo-soft);border:1px solid var(--mz-indigo-bd);
+      color:var(--mz-indigo);font-family:var(--fn);font-size:.65rem;font-weight:800;
+      border-radius:10px;padding:.4rem .7rem;cursor:pointer;
+      letter-spacing:.06em;white-space:nowrap;
+      transition:background .18s,box-shadow .18s;
+    }
+    #s-finance .mz-tx-export:hover{
+      background:color-mix(in srgb, var(--mz-indigo) 22%, transparent);
+      box-shadow:0 0 12px rgba(99,102,241,.22);
+    }
+
+    /* ── List search input ─────────────────────────────────── */
+    #s-finance .mz-tx-search{ margin-bottom:.55rem; }
+    #s-finance .mz-tx-search input{
+      width:100%;background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.06);border-radius:10px;
+      padding:.5rem .8rem;color:var(--tx);font-family:var(--fn);font-size:.78rem;
+    }
+    #s-finance .mz-tx-search input:focus{ outline:none;border-color:var(--mz-accent-bd); }
+
+    /* ── List: month groups + rows ─────────────────────────── */
+    #s-finance .mz-tx-list{
+      max-height:520px;overflow-y:auto;
+      display:flex;flex-direction:column;gap:.7rem;
+    }
+    #s-finance .mz-tx-month{
+      background:var(--mz-surface-soft);border:1px solid var(--mz-card-border);
+      border-radius:14px;padding:.65rem .8rem;
+    }
+    #s-finance .mz-tx-month__title{
+      font-family:var(--fh);font-size:.62rem;letter-spacing:1.6px;color:var(--tx2);
+      font-weight:800;margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem;
+    }
+    #s-finance .mz-tx-month__n{
+      font-size:.55rem;background:rgba(255,255,255,.06);
+      padding:.05rem .4rem;border-radius:8px;color:var(--tx3);font-weight:800;letter-spacing:0;
+    }
+    #s-finance .mz-tx-row{
+      display:grid;grid-template-columns:32px 1fr auto auto;gap:.6rem;
+      align-items:center;
+      padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.04);
+    }
+    #s-finance .mz-tx-row:last-child{ border-bottom:none; }
+    #s-finance .mz-tx-row__emoji{ font-size:1.1rem;text-align:center; }
+    #s-finance .mz-tx-row__name{
+      font-size:.82rem;font-weight:700;color:var(--tx);line-height:1.2;
+    }
+    #s-finance .mz-tx-row__meta{
+      display:flex;gap:.45rem;align-items:center;flex-wrap:wrap;margin-top:.18rem;
+    }
+    #s-finance .mz-tx-row__date{ font-size:.6rem;color:var(--tx3); }
+    #s-finance .mz-tx-row__cat{
+      font-size:.55rem;background:rgba(255,255,255,.04);color:var(--tx3);
+      padding:.08rem .35rem;border-radius:5px;font-weight:700;letter-spacing:.3px;
+    }
+    #s-finance .mz-tx-row__amt{
+      font-family:var(--fh);font-size:1.05rem;font-weight:800;line-height:1;
+      text-align:right;
+    }
+    #s-finance .mz-tx-row__amt--inc    { color:var(--mz-accent); }
+    #s-finance .mz-tx-row__amt--exp    { color:var(--mz-coral);  }
+    #s-finance .mz-tx-row__amt--neutral{ color:var(--tx2);       }
+    #s-finance .mz-tx-row__actions{
+      display:flex;gap:.35rem;align-items:center;
+    }
+    /* Tap target floor — UX reviewer flagged the original 24x24 as
+       below the 44px guideline. We use 36px visible + 8px padding
+       on each side via box-sizing for the effective ~44px hit zone
+       without ballooning the row visual weight. The button itself
+       stays the same icon size; only the click area grows. */
+    #s-finance .mz-tx-row__act{
+      min-width:36px;min-height:36px;border-radius:8px;
+      background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+      color:var(--tx2);font-size:.78rem;cursor:pointer;
+      display:inline-flex;align-items:center;justify-content:center;
+      padding:.3rem;
+      transition:background .15s,color .15s,border-color .15s;
+    }
+    #s-finance .mz-tx-row__act:hover{
+      background:rgba(255,255,255,.08);color:var(--tx);
+    }
+    #s-finance .mz-tx-row__act--del:hover{
+      background:var(--mz-coral-soft);border-color:var(--mz-coral-bd);color:var(--mz-coral);
+    }
+
+    /* ── Empty state ───────────────────────────────────────── */
+    #s-finance .mz-tx-empty{
+      padding:1rem;font-size:.7rem;color:var(--tx3);text-align:center;
+      background:var(--mz-surface-soft);border:1px dashed var(--mz-card-border);
+      border-radius:14px;
+    }
+  </style>
+
   <div id="mt-tx" style="display:none;">
-    <div class="g2">
-      <div class="card"><div class="ct">➕ Log Transaction</div>
-        <label>Description</label><input type="text" id="txName" placeholder="DJ Gig, Groceries, Paycheck">
-        <label>Amount ($)</label><input type="number" id="txAmt" placeholder="0.00" step=".01">
-        <label>Type</label>
-        <select id="txType">
-          <option value="income">💚 Income</option>
-          <option value="expense">🔴 Expense</option>
-          <option value="savings">💙 Savings Transfer</option>
-        </select>
-        <label>Category</label>
-        <select id="txCat">
-          <option>DJ / Music</option><option>Job / Work</option><option>Rent</option>
-          <option>Food / Groceries</option><option>Gas</option><option>Car</option>
-          <option>School</option><option>Entertainment</option><option>Health</option>
-          <option>Clothing</option><option>Savings</option><option>Tithe</option><option>Other</option>
-        </select>
-        <label>Date</label><input type="date" id="txDate">
-        <button class="btn bp" style="width:100%;margin-top:.7rem;" onclick="addTx()">Log It</button>
+
+    <!-- ── Add Transaction form ───────────────────────────────── -->
+    <div class="mz-section-title mz-section-title--accent">➕ LOG TRANSACTION</div>
+    <div class="card" style="margin-bottom:1.1rem;">
+
+      <!-- Type toggle (segmented; expense is the default) -->
+      <div class="mz-tx-toggle" role="tablist" aria-label="Transaction type">
+        <button type="button" class="mz-tx-toggle__btn mz-tx-toggle__btn--income"
+                onclick="_moneyTxSetType('income', this)" role="tab">
+          + Income
+        </button>
+        <button type="button" class="mz-tx-toggle__btn mz-tx-toggle__btn--expense active"
+                onclick="_moneyTxSetType('expense', this)" role="tab" aria-selected="true">
+          − Expense
+        </button>
       </div>
-      <div class="card"><div class="ct">📋 Transactions</div>
-        <div style="display:flex;gap:.28rem;margin-bottom:.55rem;flex-wrap:wrap;">
-          <button class="btn bo bs txf active" style="color:var(--c);border-color:var(--c);" onclick="filterTx('all',this)">All</button>
-          <button class="btn bo bs txf" style="color:var(--c);border-color:var(--c);" onclick="filterTx('income',this)">Income</button>
-          <button class="btn bo bs txf" style="color:var(--pk);border-color:var(--pk);" onclick="filterTx('expense',this)">Expenses</button>
-          <button class="btn bo bs txf" style="color:var(--gr);border-color:var(--gr);" onclick="filterTx('savings',this)">Savings</button>
+      <input type="hidden" id="txType" value="expense">
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:.5rem;">
+        <div>
+          <label style="margin-top:0;">Amount ($)</label>
+          <input type="number" id="txAmt" placeholder="0.00" step=".01">
         </div>
-        <div id="txList" style="max-height:420px;overflow-y:auto;"></div>
+        <div>
+          <label style="margin-top:0;">Date</label>
+          <input type="date" id="txDate">
+        </div>
       </div>
+
+      <label>Description</label>
+      <input type="text" id="txName" placeholder="DJ Gig, Groceries, Paycheck">
+
+      <label>Category</label>
+      <!-- Chip grid populated by _moneyRenderCatPicker() on every
+           tab activation. Hidden input below mirrors the active
+           chip's value so addTx() reads it like a normal form. -->
+      <div class="mz-tx-catgrid" id="txCatGrid" role="radiogroup" aria-label="Category"></div>
+      <input type="hidden" id="txCat" value="Other">
+
+      <button class="btn bp" style="width:100%;margin-top:.7rem;" onclick="addTx()">Log It</button>
     </div>
+
+    <!-- ── List ───────────────────────────────────────────────── -->
+    <!-- ACTIVITY title is left UN-tinted on purpose — the section is
+         neutral (mix of income + expense). UX reviewer flagged the
+         original mz-section-title--accent here as a soft violation of
+         the token story (emerald reserved for income-positive moments). -->
+    <div class="mz-section-title">📋 ACTIVITY</div>
+
+    <div class="mz-tx-toolbar">
+      <div class="mz-tx-chips">
+        <button type="button" class="mz-tx-chip active"
+                onclick="_moneyTxSetFilter('all', this)">
+          All <span class="mz-tx-chip__n" id="mzTxChipN_all">0</span>
+        </button>
+        <button type="button" class="mz-tx-chip"
+                onclick="_moneyTxSetFilter('income', this)">
+          Income <span class="mz-tx-chip__n" id="mzTxChipN_income">0</span>
+        </button>
+        <button type="button" class="mz-tx-chip"
+                onclick="_moneyTxSetFilter('expense', this)">
+          Expense <span class="mz-tx-chip__n" id="mzTxChipN_expense">0</span>
+        </button>
+      </div>
+      <button type="button" class="mz-tx-export"
+              onclick="_moneyTxExportCsv()" title="Download all transactions as CSV">
+        📥 CSV
+      </button>
+    </div>
+
+    <div class="mz-tx-search">
+      <input type="text" placeholder="Search description or category…"
+             oninput="_moneyTxSetSearch(this)">
+    </div>
+
+    <div class="mz-tx-list" id="mzTxList"></div>
   </div>
 
   <!-- Tab 2 Inc 1 — #mt-savings + #mt-savgoals collapsed into a single
