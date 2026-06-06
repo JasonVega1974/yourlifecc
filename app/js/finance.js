@@ -4,20 +4,44 @@
 ============================================================= */
 
 // ── FINANCE ──────────────────────────────────────────────────
+// Tab 2 Inc 1 (2026-06-05) — sub-tab IA reshuffled to 8 routes:
+//   dashboard  (was 'overview')
+//   tx
+//   budget
+//   goals      (NEW — merges old 'savings' + 'savgoals' panels)
+//   bills
+//   paycheck
+//   allowance  (NEW — empty stub until Inc 4 ships)
+//   learn      (NEW — absorbs the old 'taxed' Tax Ed content as
+//              Lesson 5 of an upcoming 8-lesson series, Inc 5)
+//
+// The route keys 'overview', 'savings', 'savgoals', 'taxed' are
+// retired. Any external caller still passing them will land on a
+// hidden panel (no matching #mt-{key} div) — harmless but logs a
+// deprecation note in dev to surface the stale call site.
 function mTab(tab,btn){
   document.querySelectorAll('[id^="mt-"]').forEach(t=>t.style.display='none');
   document.querySelectorAll('.moneyTabs .tab').forEach(b=>b.classList.remove('active'));
   const te=document.getElementById('mt-'+tab); if(te) te.style.display='block';
   if(btn) btn.classList.add('active');
-  if(tab==='savings') renderSavingsTab();
-  if(tab==='savgoals') renderSavGoalCards();
-  if(tab==='budget') calcBudget();
-  if(tab==='bills') renderBills();
-  if(tab==='tx') renderTx();
-  if(tab==='taxed') calcTax();
-  // Phase C-Finance additions
-  if(tab==='overview') renderSpendingDonut();
-  if(tab==='paycheck') calcPaycheckSim();
+  // Legacy route keys flagged on call. Won't throw — just routes to no
+  // panel — but the warn line surfaces upgrade-misses in dev consoles.
+  if(tab==='overview' || tab==='savings' || tab==='savgoals' || tab==='taxed'){
+    console.warn('[mTab] deprecated route', tab, '— mapped to:',
+      tab==='overview'?'dashboard':(tab==='savings'||tab==='savgoals')?'goals':'learn');
+  }
+  // Active-renderer dispatch (post-Inc-1).
+  if(tab==='dashboard') renderSpendingDonut();
+  if(tab==='tx')        renderTx();
+  if(tab==='budget')    calcBudget();
+  if(tab==='goals')   { renderSavingsTab(); renderSavGoalCards(); }
+  if(tab==='bills')     renderBills();
+  if(tab==='paycheck')  calcPaycheckSim();
+  if(tab==='allowance' && typeof renderAllowance === 'function') renderAllowance();
+  // Learn panel currently embeds the Tax Ed lesson content; calcTax is
+  // defined in skills.js (loaded after finance.js) so the typeof guard
+  // tolerates the dev path where finance.js loads alone.
+  if(tab==='learn' && typeof calcTax === 'function') calcTax();
 }
 
 function saveBal(){
@@ -157,11 +181,12 @@ function renderMonthSnap(inc,exp,bills){
 }
 
 function renderFinanceDash(){
-  // Show overview tab by default, render stats
+  // Show the Dashboard sub-tab by default, render stats.
+  // (Renamed 2026-06-05 from 'overview' → 'dashboard' per Inc 1 IA.)
   document.querySelectorAll('[id^="mt-"]').forEach(t=>t.style.display='none');
-  const ov = document.getElementById('mt-overview');
-  if(ov) ov.style.display='block';
-  // Set overview tab as active
+  const dash = document.getElementById('mt-dashboard');
+  if(dash) dash.style.display='block';
+  // Set the first tab (Dashboard) as active.
   document.querySelectorAll('.moneyTabs .tab').forEach(b=>b.classList.remove('active'));
   const firstTab = document.querySelector('.moneyTabs .tab');
   if(firstTab) firstTab.classList.add('active');
