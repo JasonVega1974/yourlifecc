@@ -1855,9 +1855,15 @@ function _setWhatIfMode(mode){
   document.querySelectorAll('.mz-whatif-chip').forEach(b => b.classList.remove('active'));
   const active = document.querySelector('.mz-whatif-chip[data-mode="' + mode + '"]');
   if(active) active.classList.add('active');
+  // Toggle input panels.
   document.querySelectorAll('.mz-whatif-panel').forEach(p => p.style.display = 'none');
   const panel = document.getElementById('mzWhatIfPanel_' + mode);
   if(panel) panel.style.display = '';
+  // Toggle output cards — only one renders at a time.
+  ['compound','loan','goal'].forEach(m => {
+    const out = document.getElementById('mzWhatIfOut_' + m);
+    if(out) out.style.display = (m === mode) ? '' : 'none';
+  });
   _runWhatIf();
 }
 
