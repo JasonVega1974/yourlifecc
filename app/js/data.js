@@ -118,6 +118,30 @@ const DEF = {
   bank:0, bankLabel:'', bankSavAcct:0, bankSavAcctLabel:'', bankHistory:[],
   bills:[], transactions:[], earnings:0, allowance:0,
   budgetIncome:0, budgetSavings:0,
+  // Tab 2 Inc 3 (Allowance, 2026-06-05) — recurring auto-credit
+  // config. Parent sets in Parent Hub > Rewards; kid sees a
+  // read-only schedule pill + history in #mt-allowance.
+  // _maybeCreditAllowance() in finance.js inserts an income row
+  // into D.transactions on every due date the schedule reaches,
+  // double-guarded against re-crediting:
+  //   1) lastCreditedOn (cheap path)
+  //   2) per-date scan of D.transactions (survives LS clear / new
+  //      device / config drift)
+  // Schedule shape:
+  //   amount         decimal USD per credit
+  //   frequency      'weekly' | 'biweekly' | 'monthly'
+  //   dayOfWeek      0..6 (Sun=0) for weekly + biweekly
+  //   dayOfMonth     1..31 for monthly
+  //   anchorDate     YYYY-MM-DD reference for biweekly cadence
+  //                  (defines which Friday in the 14-day cycle)
+  //   lastCreditedOn YYYY-MM-DD of the most recent successful credit
+  //   enabled        true to allow auto-credit; false freezes everything
+  // Catch-up is capped at 4 credits in one wake to prevent a long
+  // app-absence from auto-granting months of allowance at once.
+  // Distinct from the legacy D.allowance wallet object (parent.js
+  // _renderLegacyAllowanceWallet) which is dead UI; D.allowance
+  // retirement is tracked under TAB2_MONEY_BUILD_PLAN §11.3.
+  allowanceConfig:{ amount:0, frequency:'weekly', dayOfWeek:5, dayOfMonth:1, anchorDate:'', lastCreditedOn:null, enabled:false },
   savingsGoals:[
     {id:1, name:'Emergency Fund', emoji:'🛡️', target:1000, current:0},
     {id:2, name:'New Car', emoji:'🚗', target:5000, current:0},
