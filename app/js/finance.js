@@ -1049,11 +1049,14 @@ function renderAllowance(){
   // Hero copy
   let heroHtml;
   if(!cfg.enabled || cfg.amount <= 0){
+    // UX reviewer fix — kid-forward copy. The original phrasing
+    // positioned the kid as waiting for a parent action; the
+    // reframe names the upcoming benefit + invites them to ask.
     heroHtml = `
       <div class="mz-allow-hero mz-allow-hero--off">
         <div class="mz-allow-hero__icon">💵</div>
-        <div class="mz-allow-hero__title">No allowance set</div>
-        <div class="mz-allow-hero__body">Your parent can set up a recurring allowance in Parent Hub → Rewards. It'll appear here automatically each pay day.</div>
+        <div class="mz-allow-hero__title">Your allowance starts here</div>
+        <div class="mz-allow-hero__body">Once your parent activates a schedule in Parent Hub, credits land automatically every pay day. Ask them to switch it on — your future self will thank you.</div>
       </div>`;
   } else {
     const dayName = cfg.frequency === 'monthly'
@@ -1187,7 +1190,11 @@ function _allowancePhCardHtml(profile, cfg){
     <div class="mz-allow-card">
       <div class="mz-allow-card__head">
         <div class="mz-allow-card__name">${escapeHtml(label)}</div>
-        <button type="button" class="mz-allow-card__toggle ${cfg.enabled ? 'on' : 'off'}"
+        <button type="button"
+                role="switch"
+                aria-checked="${cfg.enabled ? 'true' : 'false'}"
+                aria-label="Allowance ${cfg.enabled ? 'enabled' : 'disabled'} for ${escapeHtml(label)}"
+                class="mz-allow-card__toggle ${cfg.enabled ? 'on' : 'off'}"
                 onclick="_allowanceFormToggle('${pid}')">${enabledTxt}</button>
       </div>
       <div class="mz-allow-card__grid">
