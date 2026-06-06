@@ -1463,21 +1463,12 @@ const _TG_CONFIG = {
       prep: 'st-prep',
     },
   },
-  's-finance': {
-    gridId: 'financeTopicGrid',
-    tabBar: '.moneyTabs',
-    tabFn: 'mTab',
-    extraHide: [],
-    panels: {
-      overview: 'mt-overview',
-      bills: 'mt-bills',
-      tx: 'mt-tx',
-      savings: 'mt-savings',
-      savgoals: 'mt-savgoals',
-      budget: 'mt-budget',
-      taxed: 'mt-taxed',
-    },
-  },
+  // 's-finance' removed 2026-06-05 (Tab 2 Inc 1) — the #financeTopicGrid
+  // grid + its tgOpenTopic onclicks were dropped per TAB2_MONEY_BUILD_PLAN
+  // §2. The new sub-tab IA (Dashboard / Tx / Budget / Goals / Bills /
+  // Paycheck / Allowance / Learn) is navigated entirely via the
+  // .moneyTabs button row + mTab(). If a topic-card surface is ever
+  // reintroduced, restore this config with the new panel map.
   's-health': {
     gridId: 'healthTopicGrid',
     tabBar: '.healthTabs',
