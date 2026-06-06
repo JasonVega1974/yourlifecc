@@ -102,29 +102,58 @@ function toggleBill(id){ const b=(D.bills||[]).find(b=>b.id===id); if(b){b.paid=
 function editBill(id){ const b=(D.bills||[]).find(b=>b.id===id); if(!b) return; const n=prompt('Bill name:',b.name); if(!n) return; const a=parseFloat(prompt('Amount:',b.amt)); if(!isNaN(a)) b.amt=a; b.name=n.trim(); save(); renderBills(); updateFinSum(); }
 function deleteBill(id){ D.bills=(D.bills||[]).filter(b=>b.id!==id); save(); renderBills(); updateFinSum(); }
 
+// Tab 2 Inc 2 — addTx unchanged in shape (D.transactions canonical
+// {id, name, amt, type, cat, date}) but the form reads from the new
+// hidden #txType + #txCat fields that the segmented toggle + chip
+// picker mutate on tap. Re-renders the new month-grouped list and
+// resets the form inputs.
 function addTx(){
-  const name=(document.getElementById('txName').value||'').trim();
-  const amt=parseFloat(document.getElementById('txAmt').value);
-  const type=document.getElementById('txType').value;
-  const cat=document.getElementById('txCat').value;
-  const date=document.getElementById('txDate').value||localDateString();
-  if(!name||isNaN(amt)||amt<=0){showToast('Enter description and amount');return;}
-  if(!D.transactions) D.transactions=[];
-  D.transactions.unshift({id:Date.now(),name,amt,type,cat,date});
-  document.getElementById('txName').value=''; document.getElementById('txAmt').value='';
-  save(); renderTx(); updateFinSum(); showToast('Logged!');
+  const name = (document.getElementById('txName').value || '').trim();
+  const amt  = parseFloat(document.getElementById('txAmt').value);
+  // Fall back to the module-scoped defaults if the hidden fields
+  // are missing (e.g. partial deploy or another caller path).
+  const typeEl = document.getElementById('txType');
+  const catEl  = document.getElementById('txCat');
+  const type = (typeEl && typeEl.value) || (typeof _moneyTxActiveType !== 'undefined' ? _moneyTxActiveType : 'expense');
+  const cat  = (catEl  && catEl.value)  || (typeof _moneyTxActiveCat  !== 'undefined' ? _moneyTxActiveCat  : 'Other');
+  const dateRaw = (document.getElementById('txDate') || {}).value;
+  const date = dateRaw || (typeof localDateString === 'function' ? localDateString() : new Date().toISOString().slice(0,10));
+  if(!name){ showToast('Add a description'); return; }
+  if(isNaN(amt) || amt <= 0){ showToast('Enter an amount'); return; }
+  if(!D.transactions) D.transactions = [];
+  D.transactions.unshift({ id:Date.now(), name, amt, type, cat, date });
+  document.getElementById('txName').value = '';
+  document.getElementById('txAmt').value  = '';
+  save();
+  renderTx();
+  updateFinSum();
+  showToast((type === 'income' ? '+$' : '-$') + amt.toFixed(2) + ' logged ✓');
 }
 
 function filterTx(type,btn){ _txFilter=type; document.querySelectorAll('.txf').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); renderTx(); }
 function editTx(id){ const t=(D.transactions||[]).find(t=>t.id===id); if(!t) return; const n=prompt('Description:',t.name); if(!n) return; const a=parseFloat(prompt('Amount:',t.amt)); if(!isNaN(a)) t.amt=a; t.name=n.trim(); save(); renderTx(); updateFinSum(); }
 function deleteTx(id){ D.transactions=(D.transactions||[]).filter(t=>t.id!==id); save(); renderTx(); updateFinSum(); }
 
+// Tab 2 Inc 2 — renderTx is a thin shim that delegates to the new
+// month-grouped, --mz-* styled renderer. Legacy flat-list fallback
+// retained in case a deploy ships finance.js with the new mTab
+// dispatch but the index.html panel still has the OLD #txList
+// container (mid-rollout safety).
 function renderTx(){
-  const el=document.getElementById('txList'); if(!el) return;
-  const list=(D.transactions||[]).filter(t=>_txFilter==='all'||t.type===_txFilter);
-  if(!list.length){el.innerHTML='<div style="font-size:.82rem;color:#c8d4e8;text-align:center;padding:1rem;">No transactions yet</div>';return;}
-  const cols={income:'var(--c)',expense:'var(--pk)',savings:'var(--gr)'};
-  el.innerHTML=list.slice(0,80).map(t=>`
+  if(typeof _moneyRenderTransactions === 'function'
+     && document.getElementById('mzTxList')){
+    _moneyRenderTransactions();
+    return;
+  }
+  // ─── Legacy flat-list fallback ───────────────────────────────
+  const el = document.getElementById('txList'); if(!el) return;
+  const list = (D.transactions||[]).filter(t => _txFilter === 'all' || t.type === _txFilter);
+  if(!list.length){
+    el.innerHTML = '<div style="font-size:.82rem;color:#c8d4e8;text-align:center;padding:1rem;">No transactions yet</div>';
+    return;
+  }
+  const cols = { income:'var(--c)', expense:'var(--pk)', savings:'var(--gr)' };
+  el.innerHTML = list.slice(0,80).map(t => `
     <div style="display:flex;align-items:center;gap:.55rem;padding:.5rem .75rem;background:rgba(255,255,255,.1);border-radius:9px;margin-bottom:.28rem;border-left:3px solid ${cols[t.type]||'var(--mt)'};">
       <div style="flex:1;"><div style="font-weight:700;font-size:.85rem;">${escapeHtml(t.name)}</div>
       <div style="font-size:.68rem;color:#c8d4e8;">${t.cat} · ${t.date}</div></div>
@@ -499,5 +528,232 @@ function calcPaycheckSim(){
     +   '(Social Security + Medicare, ~7.65%), and might have health insurance or 401(k) contributions deducted on top. The take-home above is roughly right for a teen earning under ~$45k a year. '
     +   '<b style="color:var(--tx);">Always plan on net, never gross.</b>'
     + '</div>';
+}
+
+// ════════════════════════════════════════════════════════════════
+// Tab 2 Increment 2 — Transactions sub-tab build-out
+// ════════════════════════════════════════════════════════════════
+//
+// Visual + interaction layer for #mt-tx. JSONB-first reads from
+// D.transactions; dual-write to public.money_transactions via the
+// _mirrorMoneyToCloud helper in sync.js (fires on every cloudSync,
+// 2s debounced). Per Phase 1 of the PIN -> stable-id decouple
+// (v249), profile_id in the mirror uses _pidOf(activeProfile).
+//
+// Adds:
+//   - MONEY_CAT_EMOJI single source of truth for category emoji
+//   - segmented income / expense toggle that drives a hidden #txType
+//   - emoji-chip category picker that drives a hidden #txCat
+//   - month-grouped renderer with --mz-accent / --mz-coral amounts
+//   - filter chips (All / Income / Expense) with live counts
+//   - debounced search across description + category
+//   - CSV export (date, description, category, type, amount)
+
+const MONEY_CAT_EMOJI = {
+  'Food':           '🍔',
+  'Groceries':      '🛒',
+  'Entertainment':  '🎮',
+  'School':         '📚',
+  'Clothes':        '👕',
+  'Transport':      '🚗',
+  'Health':         '🏥',
+  'Gifts':          '🎁',
+  'Savings':        '💚',
+  'Tithe':          '⛪',
+  'Job':            '💼',
+  'Side Hustle':    '🎵',
+  'Family':         '👪',
+  'Other':          '📌'
+};
+const MONEY_CATEGORIES = Object.keys(MONEY_CAT_EMOJI);
+
+// Module-scoped UI state. _txFilter is the legacy var (data.js) and
+// is reused so filterTx() stays back-compat. _moneyTxSearch is new.
+let _moneyTxSearch     = '';
+let _moneyTxActiveType = 'expense';
+let _moneyTxActiveCat  = 'Other';
+
+// ─── add-form interactions ────────────────────────────────────────
+
+function _moneyTxSetType(t, btn){
+  if(t !== 'income' && t !== 'expense') return;
+  _moneyTxActiveType = t;
+  const hidden = document.getElementById('txType');
+  if(hidden) hidden.value = t;
+  document.querySelectorAll('.mz-tx-toggle__btn').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
+function _moneyTxSetCat(c, btn){
+  if(!MONEY_CAT_EMOJI[c]) return;
+  _moneyTxActiveCat = c;
+  const hidden = document.getElementById('txCat');
+  if(hidden) hidden.value = c;
+  document.querySelectorAll('.mz-tx-catchip').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
+function _moneyRenderCatPicker(){
+  const el = document.getElementById('txCatGrid');
+  if(!el) return;
+  el.innerHTML = MONEY_CATEGORIES.map(c => `
+    <button type="button"
+            class="mz-tx-catchip${c === _moneyTxActiveCat ? ' active' : ''}"
+            onclick="_moneyTxSetCat('${c}', this)"
+            aria-pressed="${c === _moneyTxActiveCat ? 'true' : 'false'}">
+      <span class="mz-tx-catchip__emoji" aria-hidden="true">${MONEY_CAT_EMOJI[c]}</span>
+      <span class="mz-tx-catchip__label">${escapeHtml(c)}</span>
+    </button>`).join('');
+}
+
+// ─── list filter + search ────────────────────────────────────────
+
+const _MONEY_TX_FILTERS = [
+  { id:'all',     label:'All',     match: t => true },
+  { id:'income',  label:'Income',  match: t => t.type === 'income' },
+  { id:'expense', label:'Expense', match: t => t.type === 'expense' }
+];
+
+function _moneyTxSetFilter(id, btn){
+  _txFilter = id;
+  document.querySelectorAll('.mz-tx-chip').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  _moneyRenderTransactions();
+}
+
+function _moneyTxSetSearch(input){
+  _moneyTxSearch = String((input && input.value) || '').trim().toLowerCase();
+  _moneyRenderTransactions();
+}
+
+// ─── month-grouped renderer ──────────────────────────────────────
+
+function _moneyRenderTransactions(){
+  const root = document.getElementById('mzTxList');
+  if(!root) return;
+  _moneyRenderCatPicker();
+
+  const list = (D.transactions || []).slice();
+
+  // Filter chip count badges — computed from the FULL list so
+  // counts represent the dataset, not the current filtered view.
+  _MONEY_TX_FILTERS.forEach(f => {
+    const el = document.getElementById('mzTxChipN_' + f.id);
+    if(el) el.textContent = list.filter(t => t && f.match(t)).length;
+  });
+
+  // Apply chip filter. Legacy 'savings' / 'transfer' entries
+  // (pre-Inc-1) appear under 'all' but not under income/expense —
+  // accurate to the data, no silent reclassification.
+  const activeFilter = _MONEY_TX_FILTERS.find(f => f.id === _txFilter) || _MONEY_TX_FILTERS[0];
+  let rows = list.filter(t => t && activeFilter.match(t));
+
+  // Free-text search across description + category.
+  if(_moneyTxSearch){
+    rows = rows.filter(t =>
+      (t.name || '').toLowerCase().includes(_moneyTxSearch)
+      || (t.cat || '').toLowerCase().includes(_moneyTxSearch)
+    );
+  }
+
+  // Newest-first sort. Ties broken by Date.now() id.
+  rows.sort((a,b) =>
+    (b.date || '').localeCompare(a.date || '')
+    || (b.id || 0) - (a.id || 0)
+  );
+
+  if(!rows.length){
+    root.innerHTML = '<div class="mz-tx-empty">No transactions match. Log one above to start your ledger.</div>';
+    return;
+  }
+
+  // Group by YYYY-MM (newest month first).
+  const groups = {};
+  rows.forEach(t => {
+    const ym = (t.date || '0000-00').slice(0,7);
+    if(!groups[ym]) groups[ym] = [];
+    groups[ym].push(t);
+  });
+  const ymKeys = Object.keys(groups).sort().reverse();
+
+  const monthLabel = ym => {
+    if(ym === '0000-00') return 'Unknown date';
+    const [y, m] = ym.split('-');
+    const dt = new Date(+y, +m - 1, 1);
+    return dt.toLocaleDateString('en', { month:'long', year:'numeric' });
+  };
+
+  root.innerHTML = ymKeys.map(ym => {
+    const items = groups[ym].map(t => {
+      const emoji = MONEY_CAT_EMOJI[t.cat] || '📌';
+      const amt   = Number.isFinite(+t.amt) ? +t.amt : 0;
+      const sign  = t.type === 'income' ? '+' : '-';
+      const amtClass = t.type === 'income'  ? 'mz-tx-row__amt mz-tx-row__amt--inc'
+                    : t.type === 'expense' ? 'mz-tx-row__amt mz-tx-row__amt--exp'
+                    : 'mz-tx-row__amt mz-tx-row__amt--neutral';
+      return `
+        <div class="mz-tx-row">
+          <div class="mz-tx-row__emoji">${emoji}</div>
+          <div class="mz-tx-row__main">
+            <div class="mz-tx-row__name">${escapeHtml(t.name || 'Transaction')}</div>
+            <div class="mz-tx-row__meta">
+              <span class="mz-tx-row__date">${escapeHtml(t.date || '')}</span>
+              <span class="mz-tx-row__cat">${escapeHtml(t.cat || 'Other')}</span>
+            </div>
+          </div>
+          <div class="${amtClass}">${sign}$${amt.toFixed(2)}</div>
+          <div class="mz-tx-row__actions">
+            <button class="mz-tx-row__act" onclick="editTx(${t.id})" aria-label="Edit">✎</button>
+            <button class="mz-tx-row__act mz-tx-row__act--del" onclick="deleteTx(${t.id})" aria-label="Delete">✕</button>
+          </div>
+        </div>`;
+    }).join('');
+    return `
+      <div class="mz-tx-month">
+        <div class="mz-tx-month__title">${monthLabel(ym)} <span class="mz-tx-month__n">${groups[ym].length}</span></div>
+        ${items}
+      </div>`;
+  }).join('');
+}
+
+// ─── CSV export ──────────────────────────────────────────────────
+//
+// RFC 4180 escaping: wrap any value containing comma / quote /
+// newline in double quotes and double any internal quotes. Output
+// uses \r\n line endings (Excel + Numbers + Sheets all accept).
+
+function _moneyTxExportCsv(){
+  const list = (D.transactions || []).slice();
+  if(!list.length){ showToast('No transactions to export'); return; }
+  list.sort((a,b) =>
+    (b.date || '').localeCompare(a.date || '')
+    || (b.id || 0) - (a.id || 0)
+  );
+  const esc = v => {
+    if(v === null || v === undefined) return '';
+    const s = String(v);
+    if(/[",\r\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  };
+  const header = 'date,description,category,type,amount';
+  const rows = list.map(t => [
+    t.date || '',
+    t.name || '',
+    t.cat  || '',
+    t.type || '',
+    Number.isFinite(+t.amt) ? (+t.amt).toFixed(2) : ''
+  ].map(esc).join(','));
+  const csv = [header].concat(rows).join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  const stamp = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = 'transactions_' + stamp + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showToast('Exported ' + list.length + ' transactions ✓');
 }
 
