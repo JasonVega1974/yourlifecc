@@ -15650,6 +15650,108 @@
           <button type="button" class="ph-subtab" data-sub="progress" onclick="phSubNav('reports','progress')">📈 AI progress</button>
           <button type="button" class="ph-subtab" data-sub="faith" onclick="phSubNav('reports','faith')">✝️ Faith</button>
         </div>
+        <!-- ════════════════════════════════════════════════════════
+             Family & Profiles design pass (2026-06-05) — final hub
+             card to get the treatment.  Rose-accented so it's
+             visually distinct from Chores green / Activity cyan /
+             Reports violet / Rewards & Contests gold. The
+             --pc-rose / --pc-rose-soft / --pc-rose-bd tokens are
+             already declared in #s-parent scope (line ~15334 +
+             15394). No new tokens, no faith-stack tokens touched.
+             ════════════════════════════════════════════════════════ -->
+        <style>
+          #s-parent .ph-fam-hdr{
+            position:relative;
+            background:linear-gradient(160deg, var(--s1) 0%, var(--s2) 100%);
+            border:1px solid color-mix(in srgb, #fb7185 30%, transparent);
+            border-radius:18px;
+            padding:1rem 1.2rem;
+            margin-bottom:1rem;
+            box-shadow:var(--card-shadow), inset 0 1px 0 color-mix(in srgb, var(--tx) 6%, transparent);
+            overflow:hidden;
+          }
+          #s-parent .ph-fam-hdr::before{
+            content:'';position:absolute;inset:0;
+            background:radial-gradient(ellipse at top right, color-mix(in srgb, #fb7185 10%, transparent) 0%, transparent 60%);
+            pointer-events:none;
+          }
+          #s-parent .ph-fam-eyebrow{
+            position:relative;
+            font-family:var(--fm);font-size:.62rem;letter-spacing:.22em;
+            text-transform:uppercase;color:#fb7185;opacity:.9;
+            margin-bottom:.25rem;
+          }
+          #s-parent .ph-fam-title{
+            position:relative;
+            font-family:'Bebas Neue', var(--fm);
+            font-size:1.7rem;line-height:1;letter-spacing:.03em;
+            background:linear-gradient(135deg,#fff1f2 0%,#fda4af 55%,#be123c 100%);
+            -webkit-background-clip:text;background-clip:text;
+            -webkit-text-fill-color:transparent;
+            color:#be123c;
+            margin-bottom:.35rem;
+          }
+          #s-parent .ph-fam-sub{
+            position:relative;
+            font-family:Georgia, 'Times New Roman', serif;font-style:italic;
+            font-size:.85rem;line-height:1.45;
+            color:var(--tx2);
+          }
+          :root.light #s-parent .ph-fam-hdr{
+            background:#ffffff;
+            border-color:#fecdd3;
+            box-shadow:0 1px 4px rgba(15,23,42,.08), inset 0 1px 0 rgba(15,23,42,.03);
+          }
+          :root.light #s-parent .ph-fam-title{
+            background:linear-gradient(135deg,#881337 0%,#9f1239 55%,#4c0519 100%);
+            -webkit-background-clip:text;background-clip:text;
+            -webkit-text-fill-color:transparent;
+            color:#881337;
+          }
+          #s-parent .ph-fam-chips{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem;position:relative;}
+          #s-parent .ph-fam-chip{
+            display:inline-flex;align-items:center;gap:.4rem;
+            font-family:var(--fn);font-size:.74rem;font-weight:700;
+            padding:.4rem .8rem;border-radius:999px;
+            border:1px solid;letter-spacing:.02em;
+          }
+          #s-parent .ph-fam-chip-rose{
+            color:var(--pc-rose);background:var(--pc-rose-soft);
+            border-color:var(--pc-rose-bd);
+          }
+          #s-parent .ph-fam-chip-cyan{
+            color:#38bdf8;background:color-mix(in srgb, #38bdf8 12%, transparent);
+            border-color:color-mix(in srgb, #38bdf8 32%, transparent);
+          }
+          #s-parent .ph-fam-chip-gold{
+            color:var(--pc-gold);background:var(--pc-gold-soft);
+            border-color:var(--pc-gold-bd);
+          }
+          #s-parent .ph-fam-chip-dot{
+            width:7px;height:7px;border-radius:50%;
+            background:currentColor;box-shadow:0 0 8px currentColor;
+            animation:phFamChipPulse 2.4s ease-in-out infinite;
+          }
+          @keyframes phFamChipPulse{0%,100%{opacity:.55}50%{opacity:1}}
+          @media (prefers-reduced-motion: reduce){
+            #s-parent .ph-fam-chip-dot{ animation:none; opacity:.85; }
+          }
+        </style>
+        <!-- HERO — rose-accented Family & Profiles header. Chip
+             counts populate from existing D state via
+             renderPhFamilyHeroChips (parent.js) on phNav('family').
+             Pure read — no AI, no writes. -->
+        <div class="ph-fam-hdr" data-ph-tab="family" style="display:none;">
+          <div class="ph-fam-eyebrow">PARENT HUB · FAMILY</div>
+          <div class="ph-fam-title">👨‍👩‍👧 Family &amp; Profiles</div>
+          <div class="ph-fam-sub">The people and the relationships — manage your family, invest in yourself.</div>
+          <div class="ph-fam-chips" id="phFamilyHeroChips">
+            <span class="ph-fam-chip ph-fam-chip-rose"><span class="ph-fam-chip-dot"></span><b id="phFamChipKids" style="font-weight:800;">0</b>&nbsp;kids on this account</span>
+            <span class="ph-fam-chip ph-fam-chip-cyan"><b id="phFamChipReferrals" style="font-weight:800;">0</b>&nbsp;referrals sent</span>
+            <span class="ph-fam-chip ph-fam-chip-gold"><b id="phFamChipGrowth" style="font-weight:800;">0</b>&nbsp;growth check-ins</span>
+          </div>
+        </div>
+
         <div class="ph-subnav" id="phSubNav_family" data-ph-tab="family" style="display:none;" role="tablist" aria-label="Family sub-tabs">
           <button type="button" class="ph-subtab active" data-sub="profiles" onclick="phSubNav('family','profiles')">👥 Profiles</button>
           <button type="button" class="ph-subtab" data-sub="growth" onclick="phSubNav('family','growth')">🌱 My growth</button>
@@ -15657,63 +15759,82 @@
           <button type="button" class="ph-subtab" data-sub="referral" onclick="phSubNav('family','referral')">🎁 Refer</button>
         </div>
 
-        <!-- MANAGE USERS -->
+        <!-- KID PROFILES — design pass converts the three flat
+             colored cards (white / cyan / violet bg tints) into
+             three .ph-sec blocks with .ph-seclabel + .ph-block.
+             Render target preserved: manageUsersList. Onclick
+             handlers unchanged: addChildFromHub /
+             toggleParentPinRequired / changeParentPin. -->
         <div id="ph-users" data-ph-tab="family" data-ph-sub="profiles" style="display:none;">
-          <div style="font-size:.85rem;font-weight:800;color:#e0e0e0;margin-bottom:.8rem;display:flex;align-items:center;gap:.4rem;">👥 Manage Users</div>
 
-          <!-- CURRENT USERS LIST -->
-          <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:1rem 1.2rem;margin-bottom:.8rem;">
-            <div style="font-size:.75rem;font-weight:700;color:var(--tx2);margin-bottom:.6rem;text-transform:uppercase;letter-spacing:1px;">Current Users</div>
-            <div id="manageUsersList"></div>
-          </div>
-
-          <!-- ADD CHILD -->
-          <div style="background:rgba(56,189,248,.03);border:1px solid rgba(56,189,248,.1);border-radius:14px;padding:1rem 1.2rem;margin-bottom:.8rem;">
-            <div style="font-size:.75rem;font-weight:700;color:#38bdf8;margin-bottom:.5rem;text-transform:uppercase;letter-spacing:1px;">➕ Add New Child</div>
-            <div style="display:flex;gap:.4rem;align-items:flex-end;">
-              <div style="flex:1;">
-                <label style="font-size:.65rem;color:var(--tx2);display:block;margin-bottom:.2rem;">Child's Name</label>
-                <input type="text" id="newChildName" placeholder="e.g. Emma" style="width:100%;font-size:.8rem;">
-              </div>
-              <div>
-                <label style="font-size:.65rem;color:var(--tx2);display:block;margin-bottom:.2rem;">4-Digit PIN</label>
-                <input type="text" id="newChildPin" placeholder="auto" maxlength="4" style="width:80px;font-size:.8rem;text-align:center;letter-spacing:.2rem;">
-              </div>
-              <button class="btn bp bs" onclick="addChildFromHub()" style="font-size:.72rem;white-space:nowrap;">👶 Add Child</button>
+          <section class="ph-sec">
+            <div class="ph-seclabel">
+              <span class="ph-ic ph-ic-rose">👥</span>
+              <h2 class="ph-h2">Current users</h2>
+              <span class="ph-hint">tap a profile to manage</span>
             </div>
-            <div style="font-size:.62rem;color:var(--tx3);margin-top:.35rem;">Leave PIN blank to auto-generate. Child uses this 4-digit PIN to log in.</div>
-          </div>
-
-          <!-- PARENT PIN -->
-          <div style="background:rgba(139,92,246,.03);border:1px solid rgba(139,92,246,.1);border-radius:14px;padding:1rem 1.2rem;">
-            <div style="font-size:.75rem;font-weight:700;color:#a78bfa;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:1px;">🔒 Parent PIN Settings</div>
-
-            <!-- PIN REQUIRED TOGGLE -->
-            <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:.6rem .8rem;margin-bottom:.7rem;">
-              <div>
-                <div style="font-size:.78rem;font-weight:700;">Require PIN to access Parent Hub</div>
-                <div style="font-size:.65rem;color:var(--tx2);margin-top:.1rem;">Turn off to enter without a PIN</div>
-              </div>
-              <div onclick="toggleParentPinRequired()" id="parentPinToggle" style="width:38px;height:22px;border-radius:11px;background:#22c55e;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;">
-                <div id="parentPinToggleKnob" style="position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:all .2s;"></div>
-              </div>
+            <div class="ph-block">
+              <div id="manageUsersList"></div>
             </div>
+          </section>
 
-            <div id="parentPinChangeSection">
-              <div style="font-size:.7rem;color:var(--tx2);margin-bottom:.5rem;">Change your 6-digit PIN:</div>
-              <div style="display:flex;gap:.4rem;align-items:flex-end;flex-wrap:wrap;">
-                <div>
-                  <label style="font-size:.62rem;color:var(--tx2);display:block;margin-bottom:.2rem;">New PIN</label>
-                  <input type="password" id="newParentPin" placeholder="••••••" maxlength="6" style="width:110px;font-size:.9rem;text-align:center;letter-spacing:.3rem;">
+          <section class="ph-sec">
+            <div class="ph-seclabel">
+              <span class="ph-ic ph-ic-cyan">➕</span>
+              <h2 class="ph-h2">Add a new child</h2>
+              <span class="ph-hint">name + PIN</span>
+            </div>
+            <div class="ph-block">
+              <div class="ph-row-2-130" style="align-items:end;">
+                <div class="ph-field">
+                  <label class="ph-flabel">Child's name</label>
+                  <input type="text" class="ph-input" id="newChildName" placeholder="e.g. Emma">
                 </div>
-                <div>
-                  <label style="font-size:.62rem;color:var(--tx2);display:block;margin-bottom:.2rem;">Confirm</label>
-                  <input type="password" id="confirmParentPin" placeholder="••••••" maxlength="6" style="width:110px;font-size:.9rem;text-align:center;letter-spacing:.3rem;">
+                <div class="ph-field">
+                  <label class="ph-flabel">4-digit PIN</label>
+                  <input type="text" class="ph-input" id="newChildPin" placeholder="auto" maxlength="4" style="text-align:center;letter-spacing:.2rem;">
                 </div>
-                <button class="btn bs" onclick="changeParentPin()" style="font-size:.72rem;background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.25);color:#a78bfa;">🔑 Update PIN</button>
+              </div>
+              <button class="ph-btn ph-btn-primary" onclick="addChildFromHub()" style="width:100%;">👶 Add child</button>
+              <div style="font-size:.66rem;color:var(--tx3);margin-top:.55rem;line-height:1.5;">Leave PIN blank to auto-generate. Child uses this 4-digit PIN to log in.</div>
+            </div>
+          </section>
+
+          <section class="ph-sec">
+            <div class="ph-seclabel">
+              <span class="ph-ic ph-ic-violet">🔒</span>
+              <h2 class="ph-h2">Parent PIN</h2>
+              <span class="ph-hint">access control · 6-digit</span>
+            </div>
+            <div class="ph-block">
+              <!-- PIN REQUIRED TOGGLE -->
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:.7rem;padding:.7rem .85rem;background:color-mix(in srgb, var(--tx) 4%, transparent);border:1px solid var(--pc-line);border-radius:11px;margin-bottom:.85rem;">
+                <div>
+                  <div style="font-size:.84rem;font-weight:700;color:var(--tx);">Require PIN to access Parent Hub</div>
+                  <div style="font-size:.7rem;color:var(--tx2);margin-top:.15rem;">Turn off to enter without a PIN</div>
+                </div>
+                <div onclick="toggleParentPinRequired()" id="parentPinToggle" style="width:38px;height:22px;border-radius:11px;background:#22c55e;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;">
+                  <div id="parentPinToggleKnob" style="position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:all .2s;"></div>
+                </div>
+              </div>
+
+              <div id="parentPinChangeSection">
+                <div style="font-size:.66rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--tx3);margin-bottom:.5rem;">Change PIN</div>
+                <div class="ph-row2" style="align-items:end;">
+                  <div class="ph-field">
+                    <label class="ph-flabel">New PIN</label>
+                    <input type="password" class="ph-input" id="newParentPin" placeholder="••••••" maxlength="6" style="text-align:center;letter-spacing:.3rem;">
+                  </div>
+                  <div class="ph-field">
+                    <label class="ph-flabel">Confirm</label>
+                    <input type="password" class="ph-input" id="confirmParentPin" placeholder="••••••" maxlength="6" style="text-align:center;letter-spacing:.3rem;">
+                  </div>
+                </div>
+                <button class="ph-btn" onclick="changeParentPin()" style="background:var(--pc-violet-soft);border-color:var(--pc-violet-bd);color:var(--pc-violet);width:100%;">🔑 Update PIN</button>
               </div>
             </div>
-          </div>
+          </section>
+
         </div>
 
         <!-- OVERVIEW — design pass wraps each content block in
@@ -16766,28 +16887,78 @@
         </div>
 
         <!-- PARENT LEARNING -->
+        <!-- PARENT LEARNING — design pass. The flat cyan/violet
+             intro card becomes a quiet italic intro at the top of
+             the first .ph-block. Each lesson grid (Fundamentals /
+             Developmental stages) gets its own .ph-sec with proper
+             header. Renderer targets unchanged: parentFundamentals /
+             parentStages. -->
         <div id="ph-learning" data-ph-tab="family" data-ph-sub="learning" style="display:none;">
-          <div style="background:linear-gradient(135deg,rgba(96,165,250,.06),rgba(167,139,250,.04));border:1px solid rgba(96,165,250,.12);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
-            <div style="font-size:1rem;font-weight:700;margin-bottom:.3rem;">📚 You're Learning Too</div>
-            <div style="font-size:.8rem;color:var(--tx2);line-height:1.7;">Great parenting isn't something you're born with — it's something you build. Read one lesson a week and watch how your home transforms.</div>
-          </div>
-          <div style="font-size:.8rem;font-weight:700;margin-bottom:.5rem;">🧠 Parenting Fundamentals</div>
-          <div id="parentFundamentals" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.6rem;margin-bottom:1.2rem;"></div>
-          <div style="font-size:.8rem;font-weight:700;margin-bottom:.5rem;">📈 Understanding Developmental Stages</div>
-          <div id="parentStages" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.6rem;margin-bottom:1rem;"></div>
+
+          <section class="ph-sec">
+            <div class="ph-seclabel">
+              <span class="ph-ic ph-ic-cyan">🧠</span>
+              <h2 class="ph-h2">Parenting fundamentals</h2>
+              <span class="ph-hint">core ideas to build on</span>
+            </div>
+            <div class="ph-block">
+              <div style="font-style:italic;font-family:Georgia, 'Times New Roman', serif;font-size:.86rem;line-height:1.55;color:var(--tx2);margin-bottom:.95rem;padding-left:.7rem;border-left:3px solid var(--pc-rose-bd);">
+                Great parenting isn't something you're born with — it's something you build. Read one lesson a week and watch how your home transforms.
+              </div>
+              <div id="parentFundamentals" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.6rem;"></div>
+            </div>
+          </section>
+
+          <section class="ph-sec">
+            <div class="ph-seclabel">
+              <span class="ph-ic ph-ic-violet">📈</span>
+              <h2 class="ph-h2">Developmental stages</h2>
+              <span class="ph-hint">what to expect when</span>
+            </div>
+            <div class="ph-block">
+              <div id="parentStages" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.6rem;"></div>
+            </div>
+          </section>
+
         </div>
 
-        <!-- MY GROWTH -->
+        <!-- PARENT GROWTH — design pass. Two .ph-sec blocks: weekly
+             self-check (rate yourself + optional note + save) and
+             growth history (timeline of past weeks). Renderer targets
+             unchanged: parentSelfCheck / parentGrowthNote2 /
+             parentGrowthHistory. Handler unchanged: saveParentGrowth. -->
         <div id="ph-growth" data-ph-tab="family" data-ph-sub="growth" style="display:none;">
-          <div style="background:linear-gradient(135deg,rgba(34,197,94,.06),rgba(56,189,248,.04));border:1px solid rgba(34,197,94,.12);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
-            <div style="font-size:1rem;font-weight:700;margin-bottom:.3rem;">🌱 How Am I Doing This Week?</div>
-            <div style="font-size:.75rem;color:var(--tx2);margin-bottom:.6rem;">Rate yourself honestly on each area (1-5). Track your growth over time.</div>
-            <div id="parentSelfCheck"></div>
-            <textarea id="parentGrowthNote2" rows="2" placeholder="Optional: What went well? What do I want to improve?" style="margin-top:.4rem;margin-bottom:.4rem;"></textarea>
-            <button class="btn bp" onclick="saveParentGrowth()" style="width:100%;">💾 Save This Week</button>
-          </div>
-          <div style="font-size:.85rem;font-weight:700;margin-bottom:.4rem;">📈 Growth History</div>
-          <div id="parentGrowthHistory"></div>
+
+          <section class="ph-sec">
+            <div class="ph-seclabel">
+              <span class="ph-ic ph-ic-green">🌱</span>
+              <h2 class="ph-h2">This week's check-in</h2>
+              <span class="ph-hint">honest beats heroic</span>
+            </div>
+            <div class="ph-block">
+              <div style="font-style:italic;font-family:Georgia, 'Times New Roman', serif;font-size:.86rem;line-height:1.55;color:var(--tx2);margin-bottom:.85rem;padding-left:.7rem;border-left:3px solid var(--pc-green-bd);">
+                Rate yourself honestly on each area (1–5). Track your growth over time — the pattern matters more than any single week.
+              </div>
+              <div id="parentSelfCheck"></div>
+              <div class="ph-field" style="margin-top:.8rem;">
+                <label class="ph-flabel">Optional note</label>
+                <textarea class="ph-input" id="parentGrowthNote2" rows="2" placeholder="What went well? What do I want to improve?"></textarea>
+              </div>
+              <button class="ph-btn ph-btn-primary" onclick="saveParentGrowth()" style="width:100%;">💾 Save this week</button>
+            </div>
+          </section>
+
+          <section class="ph-sec">
+            <div class="ph-seclabel">
+              <span class="ph-ic ph-ic-amber">📈</span>
+              <h2 class="ph-h2">Growth history</h2>
+              <span class="ph-hint">past weeks</span>
+            </div>
+            <div class="ph-block">
+              <div id="parentGrowthHistory"></div>
+            </div>
+          </section>
+
         </div>
 
         <!-- PROGRESS REPORTS — design pass. The "Generate All" button
@@ -16866,9 +17037,24 @@
 
         </div>
 
-        <!-- REFER & EARN -->
+        <!-- REFER & EARN — design pass wraps the existing
+             #phReferralInner mount (filled dynamically by
+             renderPhReferral in parent.js, which clones the
+             #s-referral content into here) in a single .ph-sec
+             block. No renderer or handler changes. -->
         <div id="ph-referral" data-ph-tab="family" data-ph-sub="referral" style="display:none;">
-          <div id="phReferralInner"></div>
+
+          <section class="ph-sec">
+            <div class="ph-seclabel">
+              <span class="ph-ic ph-ic-rose">🎁</span>
+              <h2 class="ph-h2">Refer a friend</h2>
+              <span class="ph-hint">earn $10 · they save $10</span>
+            </div>
+            <div class="ph-block">
+              <div id="phReferralInner"></div>
+            </div>
+          </section>
+
         </div>
 
       </div><!-- /right content -->
