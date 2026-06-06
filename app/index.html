@@ -2871,7 +2871,174 @@
        #savGoalTot, #savNeed, #savPct, #savBigBar, #qaGoal, #qaAmt,
        #savDetailCards, #savGoalCards) so finance.js logic is preserved
        byte-for-byte. mTab('goals') invokes both renderers. -->
+  <!-- ════════════════════════════════════════════════════════════
+       Tab 2 Inc 5 — What-If simulator scoped CSS.
+       3-mode toggle (Compound / Loan / Savings goal). Single Chart.js
+       canvas; the renderer in finance.js swaps datasets per mode.
+       --mz-* token system; same warm card surface family as the
+       other Money sub-tabs.
+       ════════════════════════════════════════════════════════════ -->
+  <style>
+    #s-finance .mz-whatif{
+      background:linear-gradient(135deg, var(--mz-indigo-soft), transparent 75%);
+      border:1px solid var(--mz-indigo-bd);
+      border-radius:16px;
+      padding:1.05rem 1.2rem;
+      margin-bottom:1.2rem;
+    }
+    #s-finance .mz-whatif__head{
+      display:flex;align-items:baseline;justify-content:space-between;gap:.5rem;
+      margin-bottom:.55rem;flex-wrap:wrap;
+    }
+    #s-finance .mz-whatif__title{
+      font-family:var(--fh);font-size:.78rem;letter-spacing:1.8px;
+      font-weight:800;color:var(--mz-indigo);
+    }
+    #s-finance .mz-whatif__disclaimer{
+      font-size:.58rem;color:var(--tx3);font-style:italic;
+    }
+    #s-finance .mz-whatif__chips{
+      display:flex;gap:.4rem;margin-bottom:.85rem;flex-wrap:wrap;
+    }
+    #s-finance .mz-whatif-chip{
+      font-family:var(--fn);font-size:.7rem;font-weight:700;
+      background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+      color:var(--tx2);border-radius:10px;padding:.42rem .85rem;
+      cursor:pointer;
+      transition:background .15s,border-color .15s,color .15s;
+    }
+    #s-finance .mz-whatif-chip:hover{ background:rgba(255,255,255,.07); }
+    #s-finance .mz-whatif-chip.active{
+      background:var(--mz-indigo-soft);border-color:var(--mz-indigo-bd);color:var(--mz-indigo);
+    }
+    #s-finance .mz-whatif-panel{
+      display:grid;grid-template-columns:1fr;gap:.55rem;
+      margin-bottom:.85rem;
+    }
+    @media (min-width:560px){
+      #s-finance .mz-whatif-panel{ grid-template-columns:1fr 1fr; }
+    }
+    #s-finance .mz-whatif-panel label{
+      display:flex;flex-direction:column;gap:.2rem;
+      font-size:.6rem;letter-spacing:.4px;text-transform:uppercase;
+      color:var(--tx3);font-weight:700;
+    }
+    #s-finance .mz-whatif-panel input{
+      background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);
+      border-radius:8px;padding:.45rem .65rem;color:var(--tx);
+      font-family:var(--fn);font-size:.82rem;
+    }
+    #s-finance .mz-whatif-panel input:focus{
+      outline:none;border-color:rgba(99,102,241,.6);
+    }
+    #s-finance .mz-whatif-out{
+      background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);
+      border-radius:12px;padding:.85rem 1.05rem;margin-bottom:.85rem;
+    }
+    #s-finance .mz-whatif-out__main{
+      font-family:var(--fh);font-size:1.85rem;letter-spacing:-.5px;
+      color:var(--mz-accent);font-weight:800;line-height:1;
+      margin-bottom:.45rem;
+    }
+    #s-finance .mz-whatif-out__row{
+      display:flex;justify-content:space-between;align-items:baseline;
+      font-size:.78rem;color:var(--tx2);
+      padding:.25rem 0;border-top:1px solid rgba(255,255,255,.04);
+    }
+    #s-finance .mz-whatif-out__row span:last-child{
+      font-family:var(--fn);font-weight:700;color:var(--tx);
+    }
+    #s-finance .mz-whatif-out__row--accent span:last-child{ color:var(--mz-accent); }
+    #s-finance .mz-whatif-out__row--warn span:last-child{ color:var(--mz-coral); }
+    #s-finance .mz-whatif-out__warn{
+      font-size:.78rem;color:var(--mz-coral);
+      background:var(--mz-coral-soft);border:1px solid var(--mz-coral-bd);
+      border-radius:10px;padding:.65rem .85rem;line-height:1.5;
+    }
+    #s-finance .mz-whatif-chart{
+      background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);
+      border-radius:12px;padding:.7rem;height:200px;
+    }
+    #s-finance .mz-whatif-chart canvas{ width:100% !important;height:100% !important; }
+  </style>
+
   <div id="mt-goals" style="display:none;">
+
+    <!-- ── What-If simulator (Tab 2 Inc 5) ──────────────────────
+         3 modes, one Chart.js canvas. Math helpers + renderer live
+         in finance.js. Defaults populate Person A from Lesson 8 —
+         user opens the tab and sees the killer compound example
+         already rendered. -->
+    <div class="mz-whatif">
+      <div class="mz-whatif__head">
+        <div class="mz-whatif__title">🔮 WHAT-IF SIMULATOR</div>
+        <div class="mz-whatif__disclaimer">For learning only — not financial advice.</div>
+      </div>
+
+      <div class="mz-whatif__chips" role="tablist" aria-label="Simulator mode">
+        <button type="button" class="mz-whatif-chip active" data-mode="compound" role="tab"
+                onclick="_setWhatIfMode('compound')">📈 Compound</button>
+        <button type="button" class="mz-whatif-chip" data-mode="loan" role="tab"
+                onclick="_setWhatIfMode('loan')">💳 Loan payoff</button>
+        <button type="button" class="mz-whatif-chip" data-mode="goal" role="tab"
+                onclick="_setWhatIfMode('goal')">🎯 Savings goal</button>
+      </div>
+
+      <!-- Compound mode (default) -->
+      <div class="mz-whatif-panel" id="mzWhatIfPanel_compound">
+        <label>Monthly contribution ($)
+          <input type="number" id="whatIfCmpMonthly" value="200" step="25" min="0" oninput="_runWhatIf()">
+        </label>
+        <label>Annual rate (%)
+          <input type="number" id="whatIfCmpRate" value="10" step=".5" min="0" oninput="_runWhatIf()">
+        </label>
+        <label>Years contributing
+          <input type="number" id="whatIfCmpContribY" value="10" step="1" min="0" oninput="_runWhatIf()">
+        </label>
+        <label>Years growing (untouched after)
+          <input type="number" id="whatIfCmpGrowY" value="39" step="1" min="0" oninput="_runWhatIf()">
+        </label>
+      </div>
+
+      <!-- Loan mode -->
+      <div class="mz-whatif-panel" id="mzWhatIfPanel_loan" style="display:none;">
+        <label>Balance ($)
+          <input type="number" id="whatIfLoanBalance" value="1200" step="50" min="0" oninput="_runWhatIf()">
+        </label>
+        <label>APR (%)
+          <input type="number" id="whatIfLoanApr" value="24" step=".25" min="0" oninput="_runWhatIf()">
+        </label>
+        <label>Monthly payment ($)
+          <input type="number" id="whatIfLoanPayment" value="50" step="10" min="0" oninput="_runWhatIf()">
+        </label>
+      </div>
+
+      <!-- Goal mode -->
+      <div class="mz-whatif-panel" id="mzWhatIfPanel_goal" style="display:none;">
+        <label>Current balance ($)
+          <input type="number" id="whatIfGoalCurrent" value="0" step="10" min="0" oninput="_runWhatIf()">
+        </label>
+        <label>Target ($)
+          <input type="number" id="whatIfGoalTarget" value="600" step="50" min="0" oninput="_runWhatIf()">
+        </label>
+        <label>Monthly contribution ($)
+          <input type="number" id="whatIfGoalMonthly" value="100" step="10" min="0" oninput="_runWhatIf()">
+        </label>
+        <label>Annual rate (%)
+          <input type="number" id="whatIfGoalRate" value="4.5" step=".25" min="0" oninput="_runWhatIf()">
+        </label>
+      </div>
+
+      <!-- Per-mode output card. Only one is visible at a time per
+           the chip toggle; the renderer writes into the matching id. -->
+      <div class="mz-whatif-out" id="mzWhatIfOut_compound"></div>
+      <div class="mz-whatif-out" id="mzWhatIfOut_loan" style="display:none;"></div>
+      <div class="mz-whatif-out" id="mzWhatIfOut_goal" style="display:none;"></div>
+
+      <div class="mz-whatif-chart">
+        <canvas id="mzWhatIfChart"></canvas>
+      </div>
+    </div>
 
     <!-- Section 1: Quick Add (was #mt-savings) -->
     <div class="mz-section-title mz-section-title--accent">💚 QUICK ADD TO GOAL</div>
@@ -16733,16 +16900,32 @@
 
 
 
+<!-- Tab 2 Inc 5 — goalModal extended with:
+       sgTargetDate    optional target date (drives countdown chip)
+       sgPhoto         optional photo input (uploads to money-images
+                       bucket after save — gated by sign-in)
+       sgSubmitBtn     id'd so editSavGoal can flip label to
+                       "Save Changes" in edit mode
+       sgModalTitle    id'd so editSavGoal can flip title to
+                       "Edit savings goal" in edit mode
+       The prompt() chain that lived in editSavGoal is gone — the
+       modal handles both create + edit via _savEditingId state in
+       finance.js. -->
 <div class="mo" id="goalModal">
   <div class="md">
-    <div class="mdt">💚 SAVINGS GOAL</div>
+    <div class="mdt" id="sgModalTitle">💚 SAVINGS GOAL</div>
     <label>Goal Name</label><input type="text" id="sgName" placeholder="New Car, College, Travel, Emergency Fund">
     <label>Emoji</label><input type="text" id="sgEmoji" placeholder="🎯" maxlength="2" style="width:70px;">
     <label>Target ($)</label><input type="number" id="sgTarget" placeholder="5000" step=".01">
     <label>Already Saved ($)</label><input type="number" id="sgCurrent" placeholder="0" step=".01">
+    <label>Target Date <span style="font-weight:500;color:var(--tx3);font-size:.7rem;">(optional)</span></label>
+    <input type="date" id="sgTargetDate">
+    <label>Photo <span style="font-weight:500;color:var(--tx3);font-size:.7rem;">(optional — uploads after save)</span></label>
+    <input type="file" id="sgPhoto" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" onchange="_onGoalPhotoChange(this)">
+    <div id="sgPhotoPreviewLabel" style="font-size:.7rem;color:var(--tx3);margin-top:.2rem;"></div>
     <div class="ma">
       <button class="btn bgh" onclick="closeModal('goalModal')">Cancel</button>
-      <button class="btn bp" onclick="saveSavingsGoal()">Create Goal</button>
+      <button class="btn bp" id="sgSubmitBtn" onclick="saveSavingsGoal()">Create Goal</button>
     </div>
   </div>
 </div>
