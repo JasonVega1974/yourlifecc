@@ -2359,7 +2359,131 @@
 
 <!-- ════════════ MONEY ═══════════════════════════════════════ -->
 <section id="s-finance" class="sec">
-  <div class="sh"><div class="si">💰</div><div class="st">Money Manager</div><span class="tip-wrap"><span class="tip-btn">?</span><span class="tip-box tip-right"><span class="tip-title">HOW TO USE</span><br>6 tabs: <b>Overview</b> updates balances · <b>Bills</b> tracks recurring bills · <b>Transactions</b> logs income &amp; expenses · <b>Goal Savings</b> quick-adds to goals · <b>Sav. Goals</b> creates goals · <b>Budget</b> runs 50/30/20 math.</span></span><div class="sl"></div></div>
+
+  <!-- ──────────────────────────────────────────────────────────
+       Tab 2 Increment 1 — Money design system (--mz-* tokens)
+       Distinct from Chores' --cz-* palette by HUE (emerald is bluer
+       than chores' #22c55e) AND by secondary palette (chores has no
+       indigo or coral). The four-color story:
+         --mz-accent  emerald  — primary brand / balances / income
+         --mz-indigo           — education / Learn lessons
+         --mz-amber            — savings / allowance highlights
+         --mz-coral            — expense / over-budget warnings
+       Same faith-quality bar as Chores: Bebas Neue cap labels,
+       warm glass surfaces, no flat dashboard look.
+       ────────────────────────────────────────────────────────── -->
+  <style>
+    #s-finance{
+      --mz-accent:       #10b981;
+      --mz-accent-soft:  color-mix(in srgb, #10b981 12%, transparent);
+      --mz-accent-mid:   color-mix(in srgb, #10b981 30%, transparent);
+      --mz-accent-bd:    color-mix(in srgb, #10b981 42%, transparent);
+      --mz-indigo:       #6366f1;
+      --mz-indigo-soft:  color-mix(in srgb, #6366f1 12%, transparent);
+      --mz-indigo-bd:    color-mix(in srgb, #6366f1 38%, transparent);
+      --mz-amber:        #f59e0b;
+      --mz-amber-soft:   color-mix(in srgb, #f59e0b 12%, transparent);
+      --mz-amber-bd:     color-mix(in srgb, #f59e0b 38%, transparent);
+      --mz-coral:        #fb7185;
+      --mz-coral-soft:   color-mix(in srgb, #fb7185 14%, transparent);
+      --mz-coral-bd:     color-mix(in srgb, #fb7185 40%, transparent);
+      --mz-surface-soft: color-mix(in srgb, var(--tx) 6%, transparent);
+      --mz-surface-mid:  color-mix(in srgb, var(--tx) 12%, transparent);
+      --mz-card-bg:      var(--card-bg);
+      --mz-card-border:  var(--card-border);
+    }
+
+    /* Shared Bebas Neue cap label for every Money sub-tab section. */
+    #s-finance .mz-section-title{
+      font-family:var(--fh);font-size:.72rem;letter-spacing:1.8px;
+      color:var(--tx2);font-weight:800;margin:.3rem 0 .8rem;
+    }
+    #s-finance .mz-section-title--accent{ color:var(--mz-accent); }
+    #s-finance .mz-section-title--indigo{ color:var(--mz-indigo); }
+    #s-finance .mz-section-title--amber{  color:var(--mz-amber);  }
+
+    /* Money sub-tab nav — restyled .moneyTabs .tab row with the new
+       palette. Keeps the existing .tab class so the JS dispatch in
+       finance.js's mTab() continues to find the right buttons. */
+    #s-finance .moneyTabs{
+      display:flex;gap:.35rem;overflow-x:auto;padding-bottom:.5rem;
+      margin-bottom:1rem;scrollbar-width:none;
+    }
+    #s-finance .moneyTabs::-webkit-scrollbar{ display:none; }
+    #s-finance .moneyTabs .tab{
+      background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+      color:var(--tx2);font-family:var(--fn);font-size:.72rem;font-weight:700;
+      border-radius:18px;padding:.4rem .85rem;white-space:nowrap;cursor:pointer;
+      display:inline-flex;align-items:center;gap:.35rem;
+      transition:background .18s,border-color .18s,color .18s,transform .15s;
+    }
+    #s-finance .moneyTabs .tab:hover{ background:rgba(255,255,255,.07); }
+    #s-finance .moneyTabs .tab.active{
+      background:var(--mz-accent-soft);border-color:var(--mz-accent-bd);
+      color:var(--mz-accent);
+    }
+
+    /* Empty-state container shared by Allowance + future stubs. */
+    #s-finance .mz-stub{
+      text-align:center;padding:2.2rem 1.2rem;
+      background:linear-gradient(135deg, var(--mz-accent-soft), transparent 70%);
+      border:1px dashed var(--mz-accent-bd);border-radius:18px;
+    }
+    #s-finance .mz-stub__icon{ font-size:2.6rem;margin-bottom:.4rem;line-height:1; }
+    #s-finance .mz-stub__title{
+      font-family:var(--fh);font-size:.95rem;letter-spacing:1.8px;
+      color:var(--tx);font-weight:800;margin-bottom:.4rem;
+    }
+    #s-finance .mz-stub__body{
+      font-size:.78rem;color:var(--tx2);line-height:1.55;max-width:42ch;margin:0 auto;
+    }
+    #s-finance .mz-stub__chip{
+      display:inline-block;margin-top:.85rem;font-size:.6rem;font-weight:800;
+      letter-spacing:1.3px;text-transform:uppercase;
+      padding:.3rem .7rem;border-radius:10px;
+      background:var(--mz-indigo-soft);border:1px solid var(--mz-indigo-bd);
+      color:var(--mz-indigo);
+    }
+
+    /* Learn-tab framing — sits above the absorbed Tax Ed content so
+       the user understands they're inside Lesson 5 of an 8-lesson
+       series (Inc 5 will fill in the other 7). */
+    #s-finance .mz-learn-frame{
+      background:linear-gradient(135deg, var(--mz-indigo-soft), transparent 70%);
+      border:1px solid var(--mz-indigo-bd);border-radius:18px;
+      padding:1.1rem 1.3rem;margin-bottom:1.1rem;
+      display:flex;flex-direction:column;gap:.55rem;
+    }
+    #s-finance .mz-learn-frame__title{
+      font-family:var(--fh);font-size:1rem;letter-spacing:1.8px;
+      color:var(--mz-indigo);font-weight:800;
+    }
+    #s-finance .mz-learn-frame__body{
+      font-size:.78rem;color:var(--tx2);line-height:1.55;
+    }
+    #s-finance .mz-learn-frame__dots{
+      display:flex;gap:.4rem;margin-top:.3rem;
+    }
+    #s-finance .mz-learn-frame__dot{
+      width:18px;height:18px;border-radius:50%;font-size:.6rem;font-weight:800;
+      display:grid;place-items:center;
+      background:rgba(255,255,255,.05);color:var(--tx3);
+      border:1px solid rgba(255,255,255,.08);
+    }
+    #s-finance .mz-learn-frame__dot--on{
+      background:var(--mz-indigo-soft);color:var(--mz-indigo);
+      border-color:var(--mz-indigo-bd);
+    }
+
+    /* Goals merge divider — separates the Quick Add section from the
+       full goal-cards grid inside #mt-goals. */
+    #s-finance .mz-goals-rule{
+      height:1px;background:linear-gradient(90deg, transparent, var(--mz-card-border), transparent);
+      margin:1.4rem 0 1rem;
+    }
+  </style>
+
+  <div class="sh"><div class="si">💰</div><div class="st">Money Manager</div><span class="tip-wrap"><span class="tip-btn">?</span><span class="tip-box tip-right"><span class="tip-title">HOW TO USE</span><br>8 tabs: <b>Dashboard</b> for the snapshot · <b>Transactions</b> logs income &amp; expenses · <b>Budget</b> runs the 50/30/20 math · <b>Goals</b> tracks savings targets · <b>Bills</b> tracks recurring bills · <b>Paycheck</b> simulator · <b>Allowance</b> (coming soon) · <b>Learn</b> is your 8-lesson financial literacy series.</span></span><div class="sl"></div></div>
       <button class="tut-go-btn" onclick="tutGoTo('s-goals')">👉 Go to Goals</button>
 
   <!-- Phase C-Finance: warm 3-number summary opener replaces the legacy
@@ -2384,57 +2508,32 @@
     </div>
   </div>
 
-  <!-- Phase 5.8 Pass D — topic card grid (default view) -->
-  <div class="topic-card-grid" id="financeTopicGrid">
-    <div class="topic-card accent-cyan" onclick="tgOpenTopic('s-finance','overview')">
-      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(56,189,248,.22);"><img class="topic-card-hero" data-card-id="finance-overview" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/USDnotesNew.png/1280px-USDnotesNew.png" alt="Overview"></div>
-      <div class="topic-card-title" style="padding-top:.75rem;">Overview</div>
-      <div class="topic-card-desc">Balances &amp; month snapshot</div>
-    </div>
-    <div class="topic-card accent-pink" onclick="tgOpenTopic('s-finance','bills')">
-      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(244,114,182,.22);"><img class="topic-card-hero" data-card-id="finance-bills" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/US-BEP-Receipt_for_currency_%2823_July_1915%29.jpg/1280px-US-BEP-Receipt_for_currency_%2823_July_1915%29.jpg" alt="Bills"></div>
-      <div class="topic-card-title" style="padding-top:.75rem;">Bills</div>
-      <div class="topic-card-desc">Recurring bills tracker</div>
-    </div>
-    <div class="topic-card accent-violet" onclick="tgOpenTopic('s-finance','tx')">
-      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(167,139,250,.22);"><img class="topic-card-hero" data-card-id="finance-tx" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Contactless_Payment_Card_opened_to_show_RF_antenna.jpg/1280px-Contactless_Payment_Card_opened_to_show_RF_antenna.jpg" alt="Transactions"></div>
-      <div class="topic-card-title" style="padding-top:.75rem;">Transactions</div>
-      <div class="topic-card-desc">Log income &amp; expenses</div>
-    </div>
-    <div class="topic-card accent-green" onclick="tgOpenTopic('s-finance','savings')">
-      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(52,211,153,.22);"><img class="topic-card-hero" data-card-id="finance-savings" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/e/e2/Sparschwein_Haspa02.jpg" alt="Goal Savings"></div>
-      <div class="topic-card-title" style="padding-top:.75rem;">Goal Savings</div>
-      <div class="topic-card-desc">Quick add to savings goals</div>
-    </div>
-    <div class="topic-card accent-gold" onclick="tgOpenTopic('s-finance','savgoals')">
-      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(251,191,36,.22);"><img class="topic-card-hero" data-card-id="finance-savgoals" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/PreservedFood1.jpg/1280px-PreservedFood1.jpg" alt="Sav. Goals"></div>
-      <div class="topic-card-title" style="padding-top:.75rem;">Sav. Goals</div>
-      <div class="topic-card-desc">Create savings targets</div>
-    </div>
-    <div class="topic-card accent-orange" onclick="tgOpenTopic('s-finance','budget')">
-      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(251,146,60,.22);"><img class="topic-card-hero" data-card-id="finance-budget" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Casio_calculator_JS-20WK_in_201901_002.jpg/1280px-Casio_calculator_JS-20WK_in_201901_002.jpg" alt="Budget"></div>
-      <div class="topic-card-title" style="padding-top:.75rem;">Budget</div>
-      <div class="topic-card-desc">50/30/20 math</div>
-    </div>
-    <div class="topic-card accent-cyan" onclick="tgOpenTopic('s-finance','taxed')">
-      <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(56,189,248,.22);"><img class="topic-card-hero" data-card-id="finance-taxed" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Mantelb%C3%B6gen.JPG/1280px-Mantelb%C3%B6gen.JPG" alt="Tax Ed"></div>
-      <div class="topic-card-title" style="padding-top:.75rem;">Tax Ed</div>
-      <div class="topic-card-desc">Tax basics &amp; how-tos</div>
-    </div>
+  <!-- Tab 2 Inc 1 — #financeTopicGrid removed. The grid was a parallel
+       navigation surface duplicating the .moneyTabs button row above
+       and confusing the IA. See TAB2_MONEY_BUILD_PLAN.md §2 for the
+       decision rationale. scripts/inject_card_photos.py still has
+       stale finance-* card config but is content-injection tooling,
+       not runtime code — file as a follow-up cleanup. -->
+
+  <!-- Sub-tab nav — 8 tabs in the new IA order:
+       Dashboard / Transactions / Budget / Goals / Bills / Paycheck /
+       Allowance / Learn. mTab() in finance.js (post-Inc-1 rewrite)
+       routes each key to its renderer. -->
+  <div class="tabs moneyTabs" role="tablist" aria-label="Money sub-sections">
+    <button class="tab active" role="tab" aria-selected="true"  onclick="mTab('dashboard',this)">📊 Dashboard</button>
+    <button class="tab"        role="tab" aria-selected="false" onclick="mTab('tx',this)">💳 Transactions</button>
+    <button class="tab"        role="tab" aria-selected="false" onclick="mTab('budget',this)">📋 Budget</button>
+    <button class="tab"        role="tab" aria-selected="false" onclick="mTab('goals',this)">🎯 Goals</button>
+    <button class="tab"        role="tab" aria-selected="false" onclick="mTab('bills',this)">🧾 Bills</button>
+    <button class="tab"        role="tab" aria-selected="false" onclick="mTab('paycheck',this)">💵 Paycheck</button>
+    <button class="tab"        role="tab" aria-selected="false" onclick="mTab('allowance',this)">💰 Allowance</button>
+    <button class="tab"        role="tab" aria-selected="false" onclick="mTab('learn',this)">📚 Learn</button>
   </div>
 
-  <div class="tabs moneyTabs">
-    <button class="tab active" onclick="mTab('overview',this)">📊 Overview</button>
-    <button class="tab" onclick="mTab('bills',this)">🧾 Bills</button>
-    <button class="tab" onclick="mTab('tx',this)">💳 Transactions</button>
-    <button class="tab" onclick="mTab('savings',this)">💚 Goal Savings</button>
-    <button class="tab" onclick="mTab('savgoals',this)">🎯 Sav. Goals</button>
-    <button class="tab" onclick="mTab('budget',this)">📋 Budget</button>
-    <button class="tab" onclick="mTab('paycheck',this)">💵 Paycheck</button>
-    <button class="tab" onclick="mTab('taxed',this)">🧾 Tax Ed</button>
-  </div>
-
-  <div id="mt-overview">
+  <!-- Tab 2 Inc 1: renamed from #mt-overview. Content unchanged this
+       pass — Dashboard polish (Chart.js donut, monthly bar chart, net
+       worth card) is deferred to Inc 6 once schema + dual-write land. -->
+  <div id="mt-dashboard">
     <div class="g2">
       <div class="card">
         <div class="ct">🏦 Update Balances</div>
@@ -2537,10 +2636,19 @@
     </div>
   </div>
 
-  <div id="mt-savings" style="display:none;">
+  <!-- Tab 2 Inc 1 — #mt-savings + #mt-savgoals collapsed into a single
+       #mt-goals panel. Both legacy renderers (renderSavingsTab,
+       renderSavGoalCards) still write to the same child IDs (#savTot,
+       #savGoalTot, #savNeed, #savPct, #savBigBar, #qaGoal, #qaAmt,
+       #savDetailCards, #savGoalCards) so finance.js logic is preserved
+       byte-for-byte. mTab('goals') invokes both renderers. -->
+  <div id="mt-goals" style="display:none;">
+
+    <!-- Section 1: Quick Add (was #mt-savings) -->
+    <div class="mz-section-title mz-section-title--accent">💚 QUICK ADD TO GOAL</div>
     <div class="card" style="margin-bottom:1rem;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem;">
-        <div class="ct" style="margin:0;">💚 Savings Goals Overview</div>
+        <div class="ct" style="margin:0;">Savings Goals Overview</div>
         <button class="btn bg_ bs" onclick="openModal('goalModal')">+ New Goal</button>
       </div>
       <div class="g3" style="margin-bottom:.85rem;">
@@ -2569,13 +2677,28 @@
       <div id="qaMsg" style="font-size:.75rem;color:var(--gr);margin-top:.35rem;min-height:.9rem;"></div>
     </div>
     <div id="savDetailCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:.85rem;"></div>
-  </div>
 
-  <div id="mt-savgoals" style="display:none;">
+    <div class="mz-goals-rule"></div>
+
+    <!-- Section 2: Manage Goals (was #mt-savgoals) -->
+    <div class="mz-section-title mz-section-title--amber">🎯 MANAGE YOUR GOALS</div>
     <div style="display:flex;justify-content:flex-end;margin-bottom:.7rem;">
       <button class="btn bg_" onclick="openModal('goalModal')">+ New Savings Goal</button>
     </div>
     <div class="ga" id="savGoalCards"></div>
+  </div>
+
+  <!-- Tab 2 Inc 1 — Allowance sub-tab stub. Empty-state card promises
+       recurring allowance + auto-credit in Inc 4. The route key
+       'allowance' is wired through mTab() with a no-op renderer guard
+       so the panel just displays this static card today. -->
+  <div id="mt-allowance" style="display:none;">
+    <div class="mz-stub">
+      <div class="mz-stub__icon">💰</div>
+      <div class="mz-stub__title">ALLOWANCE</div>
+      <div class="mz-stub__body">Recurring allowance with auto-credit on schedule — set the amount and frequency once, and the app inserts the income row on the right day every week / two weeks / month. Parent toggle for which child gets what.</div>
+      <div class="mz-stub__chip">Coming in Increment 4</div>
+    </div>
   </div>
 
   <div id="mt-budget" style="display:none;">
@@ -2600,8 +2723,39 @@
     </div>
   </div>
 
-  <!-- ─────────────────── TAX EDUCATION ─────────────────────── -->
-  <div id="mt-taxed" style="display:none;">
+  <!-- ─────────────────── LEARN — Financial Literacy ─────────────
+       Tab 2 Inc 1 — renamed from #mt-taxed. The existing Tax Ed
+       content is preserved VERBATIM as the visible body of this
+       panel; it represents Lesson 5 (Taxes) of an upcoming 8-lesson
+       series authored in Inc 5. The mz-learn-frame card at the top
+       frames the user's mental model: "you're inside an evolving
+       series, and the Tax Ed content you're seeing is one lesson
+       of it." The calcTax form inputs further down still resolve
+       via skills.js — finance.js's mTab('learn') fires calcTax()
+       on activation so the values populate. -->
+  <div id="mt-learn" style="display:none;">
+
+    <!-- Series framing -->
+    <div class="mz-learn-frame">
+      <div class="mz-learn-frame__title">📚 FINANCIAL LITERACY · 8-LESSON SERIES</div>
+      <div class="mz-learn-frame__body">Eight short lessons that compound. Lesson 5 (Taxes) is below, fully built with the TY2025 brackets and the simulator. The other seven — budgeting, saving, credit, investing, wants vs needs, emergency funds, compound interest — land in Increment 5.</div>
+      <div class="mz-learn-frame__dots" aria-label="Lesson progress">
+        <span class="mz-learn-frame__dot" title="Lesson 1 — Budgeting">1</span>
+        <span class="mz-learn-frame__dot" title="Lesson 2 — Saving">2</span>
+        <span class="mz-learn-frame__dot" title="Lesson 3 — Credit">3</span>
+        <span class="mz-learn-frame__dot" title="Lesson 4 — Investing">4</span>
+        <span class="mz-learn-frame__dot mz-learn-frame__dot--on" title="Lesson 5 — Taxes (available below)">5</span>
+        <span class="mz-learn-frame__dot" title="Lesson 6 — Wants vs Needs">6</span>
+        <span class="mz-learn-frame__dot" title="Lesson 7 — Emergency Funds">7</span>
+        <span class="mz-learn-frame__dot" title="Lesson 8 — Compound Interest">8</span>
+      </div>
+    </div>
+
+    <!-- ─────────────────── Lesson 5 — Taxes (TY2025) ────────────
+         All markup below is the original Tax Ed content, preserved
+         intact. Inc 5 will refactor this into a per-lesson template
+         when the other 7 lessons land. -->
+    <div class="mz-section-title mz-section-title--amber" style="margin-bottom:1rem;">🧾 LESSON 5 · TAXES (TY2025)</div>
 
     <!-- Hero banner -->
     <div style="background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(251,146,60,.08));border:1px solid rgba(251,191,36,.2);border-radius:14px;padding:1.2rem 1.4rem;margin-bottom:1rem;display:flex;align-items:center;gap:1rem;">
@@ -2824,7 +2978,7 @@
       </div>
     </div>
 
-  </div><!-- /mt-taxed -->
+  </div><!-- /mt-learn (Lesson 5 — Taxes) -->
 
 </section>
 
