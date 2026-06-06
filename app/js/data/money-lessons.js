@@ -204,10 +204,10 @@ const MONEY_LESSONS = [
     exampleHtml:
       '<p>$1,200 spring break trip. Two ways to pay:</p>' +
       '<ul>' +
-        '<li><b>Option A — Credit card.</b> Pay $50/month at 24% APR. Total time to pay off: <b>32 months</b>. Total interest: <b>~$363</b>. You pay $1,563 for a $1,200 trip.</li>' +
+        '<li><b>Option A — Credit card.</b> Pay $50/month at 24% APR. Total time to pay off: <b>33 months</b>. Total interest: <b>~$451</b>. You pay $1,651 for a $1,200 trip.</li>' +
         '<li><b>Option B — Save first.</b> $300/month for 4 months → cash, $0 interest, $1,200 trip costs $1,200.</li>' +
       '</ul>' +
-      '<p>Same trip. Option A costs $363 more <em>for nothing</em> except the privilege of having it 4 months sooner.</p>',
+      '<p>Same trip. Option A costs $451 more <em>for nothing</em> except the privilege of having it 4 months sooner. (Open the What-If simulator in the Goals sub-tab to confirm the math.)</p>',
     takeaway: 'When you eventually get a credit card (for credit-score reasons), use it only for things you\'d buy in cash. Pay it OFF every month. The card is a tool, not a loan.',
     tryThis: 'Money tab → Transactions sub-tab → if you ever pay credit card interest, log it as an expense category. Watching the dollars accumulate is the cure.',
     faithFrame: null
@@ -237,12 +237,13 @@ const MONEY_LESSONS = [
         '<li><b>Person A</b>: Invests $200/month for just 10 years (age 16 → 26), then STOPS forever. Total invested: <b>$24,000</b>.</li>' +
         '<li><b>Person B</b>: Invests $200/month for 39 years (age 26 → 65). Total invested: <b>$93,600</b>.</li>' +
       '</ul>' +
-      '<p>At a 10% average annual return (S&amp;P 500 historical), at age 65:</p>' +
+      '<p>At a 10% average annual return (S&amp;P 500 historical, compounded monthly), at age 65:</p>' +
       '<ul>' +
-        '<li>Person A ends with <b>~$1.7M</b></li>' +
-        '<li>Person B ends with <b>~$1.1M</b></li>' +
+        '<li>Person A ends with <b>~$2.0M</b></li>' +
+        '<li>Person B ends with <b>~$1.14M</b></li>' +
       '</ul>' +
-      '<p>Person A invested <em>less than a third</em> of what Person B did and ended with more money — because Person A had <b>50 years of compounding</b> and Person B only had 39. Time, not the dollar amount, did most of the work.</p>',
+      '<p>Person A invested <em>about a quarter</em> of what Person B did and ended with NEARLY DOUBLE the money — because Person A had <b>50 years of compounding</b> and Person B only had 39. Time, not the dollar amount, did most of the work.</p>' +
+      '<p>(Open the What-If simulator in the Goals sub-tab and punch in $200/month, 10% rate, 10 years contributing, 39 years growing — it produces these exact numbers.)</p>',
     takeaway: 'The dollars you invest at 14-18 are worth 5-10x what the same dollars are worth at 30. The most valuable thing you own right now is not money — it is runway.',
     tryThis:
       '<b>1.</b> Ask a parent to help you open a custodial Roth IRA at Fidelity, Schwab, or Vanguard. Free, online, ~30 minutes.<br>' +
