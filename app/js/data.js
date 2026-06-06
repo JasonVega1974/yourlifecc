@@ -142,6 +142,12 @@ const DEF = {
   // _renderLegacyAllowanceWallet) which is dead UI; D.allowance
   // retirement is tracked under TAB2_MONEY_BUILD_PLAN §11.3.
   allowanceConfig:{ amount:0, frequency:'weekly', dayOfWeek:5, dayOfMonth:1, anchorDate:'', lastCreditedOn:null, enabled:false },
+  // Tab 2 Inc 5.5 — Money tab milestone log. Keyed by milestone id
+  // (e.g. 'first_tx', 'first_50_saved', 'lessons_3'), value is the
+  // ISO date the milestone first fired. _checkMoneyMilestones in
+  // finance.js skips any key already present, so each milestone is a
+  // single one-shot celebration. JSONB only — no new table.
+  moneyMilestones:{},
   savingsGoals:[
     {id:1, name:'Emergency Fund', emoji:'🛡️', target:1000, current:0},
     {id:2, name:'New Car', emoji:'🚗', target:5000, current:0},
