@@ -2841,7 +2841,7 @@ function phNav(tab){
   if(t === 'allowance'){ if(typeof renderPhAllowance === 'function') renderPhAllowance(); }
   if(t === 'contests') { renderParentLeaderboard(); renderParentContests(); renderParentFamilyRewards(); if(typeof renderPhContestsHeroChips === 'function') renderPhContestsHeroChips(); }
   if(t === 'activity') { initPhSchedPanel(); renderParentActivityAudit(); renderParentActivityFeed(); renderBehaviorLog(); renderGradeMonitor(); renderParentNotes(); if(typeof renderPhActivityHeroChips === 'function') renderPhActivityHeroChips(); }
-  if(t === 'reports')  { renderParentGettingStarted(); renderParentMultiChild(); renderParentScore(); renderParentOverview(); renderWeeklyReportCard(); renderCompletionSummary(); renderSentQuizzes(); renderProgressReportsTab(); renderParentFaithReport(); }
+  if(t === 'reports')  { renderParentGettingStarted(); renderParentMultiChild(); renderParentScore(); renderParentOverview(); renderWeeklyReportCard(); renderCompletionSummary(); renderSentQuizzes(); renderProgressReportsTab(); renderParentFaithReport(); if(typeof renderPhReportsHeroChips === 'function') renderPhReportsHeroChips(); }
   if(t === 'family')   { renderManageUsers(); renderParentLessons(); if(typeof renderParentGrowth==='function') renderParentGrowth(); if(typeof renderParentGrowthHistory==='function') renderParentGrowthHistory(); renderPhReferral(); }
   if(t === 'controls') { renderParentScreenControls(); renderParentEarningsControls(); renderParentBucksControls(); renderIncentives(); if(typeof updateIncConditions==='function') updateIncConditions(); }
 }
@@ -3459,6 +3459,42 @@ function renderPhContestsHeroChips(){
     .filter(r => r).length;
   if(activeEl)  activeEl.textContent  = activeCt;
   if(rewardsEl) rewardsEl.textContent = rewardCt;
+}
+
+// Reports & Progress hero chips (Parent Hub design pass).
+// READ-ONLY count function. Same discipline as the other hero-chip
+// renderers — Array.isArray guards on every D.* lookup and falls
+// through to zero counts when fields are missing. Does NOT trigger
+// any AI call (the "Generate All" and "Refresh" buttons inside the
+// Reports panels stay manual-click only, per the parent-controls-
+// AI-cost rule). Three chips:
+//   • quizzes sent       D.parentQuizzes count
+//   • weekly reports     D.weeklyReports count (or saved-reports
+//                          object keyed by week)
+//   • parent lessons     D.parentLessonsRead keys count
+function renderPhReportsHeroChips(){
+  const qzEl  = document.getElementById('phRepChipQuizzes');
+  const wrEl  = document.getElementById('phRepChipReports');
+  const lsnEl = document.getElementById('phRepChipLessons');
+  if(!qzEl && !wrEl && !lsnEl) return;
+  const quizzesCt = Array.isArray(D.parentQuizzes) ? D.parentQuizzes.length : 0;
+  let reportsCt = 0;
+  if(Array.isArray(D.weeklyReports)){
+    reportsCt = D.weeklyReports.length;
+  } else if(D.weeklyReports && typeof D.weeklyReports === 'object'){
+    reportsCt = Object.keys(D.weeklyReports).length;
+  } else if(D.savedWeeklyReports && typeof D.savedWeeklyReports === 'object'){
+    reportsCt = Object.keys(D.savedWeeklyReports).length;
+  }
+  let lessonsCt = 0;
+  if(D.parentLessonsRead && typeof D.parentLessonsRead === 'object'){
+    lessonsCt = Object.keys(D.parentLessonsRead).length;
+  } else if(Array.isArray(D.parentLessonsRead)){
+    lessonsCt = D.parentLessonsRead.length;
+  }
+  if(qzEl)  qzEl.textContent  = quizzesCt;
+  if(wrEl)  wrEl.textContent  = reportsCt;
+  if(lsnEl) lsnEl.textContent = lessonsCt;
 }
 
 // Activity & Schedule hero chips (Parent Hub design pass).
