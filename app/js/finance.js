@@ -153,6 +153,7 @@ function addTx(){
   D.transactions.unshift({ id:Date.now(), name, amt, type, cat, date });
   document.getElementById('txName').value = '';
   document.getElementById('txAmt').value  = '';
+  if(typeof _checkMoneyMilestones === 'function') _checkMoneyMilestones();
   save();
   renderTx();
   updateFinSum();
@@ -1329,6 +1330,7 @@ function _allowanceFormChange(pidStr, field, value){
 function _allowanceFormToggle(pidStr){
   const cfg = _allowanceResolveConfig(pidStr);
   if(!cfg) return;
+  const wasOff = !cfg.enabled;
   if(!cfg.enabled){
     // Enabling — set lastCreditedOn so today's date is the floor
     // for catch-up. Prevents instant backfill of historical due
@@ -1337,6 +1339,12 @@ function _allowanceFormToggle(pidStr){
     cfg.enabled = true;
   } else {
     cfg.enabled = false;
+  }
+  // Allowance-setup milestone — fires the first time enabled flips
+  // to true AND an amount is configured. _checkMoneyMilestones is
+  // idempotent so re-toggling won't re-fire.
+  if(wasOff && cfg.enabled && (+cfg.amount || 0) > 0 && typeof _checkMoneyMilestones === 'function'){
+    _checkMoneyMilestones();
   }
   if(!pidStr || (typeof _activeProfileId !== 'undefined' && pidStr === String(_activeProfileId))){
     save();
@@ -1683,6 +1691,10 @@ function _learnComplete(n){
       p.openedAt[n] = today;
     }
     showToast('Lesson ' + n + ' complete ✓');
+    // Lesson-count milestones fire from here (first_lesson / lessons_3
+    // / lessons_all). The toast above lands first; the milestone
+    // celebration follows ~420ms later so the two beats don't blur.
+    if(typeof _checkMoneyMilestones === 'function') _checkMoneyMilestones();
   }
   save();
   // Re-render to flip the button label + update the grid counter.
@@ -2023,6 +2035,10 @@ function _quickAddSave(id){
     g.completedAt = new Date().toISOString().slice(0,10);
   }
   _quickAddOpenId = null;
+  // Quick-add can push g.current past 50 or 100 — the milestone
+  // celebrations fire here so a single contribution that crosses
+  // both thresholds at once is detected.
+  if(typeof _checkMoneyMilestones === 'function') _checkMoneyMilestones();
   save();
   if(typeof renderSavingsTab    === 'function') renderSavingsTab();
   if(typeof renderSavGoalCards  === 'function') renderSavGoalCards();
@@ -2100,6 +2116,7 @@ function saveSavingsGoal(){
   ['sgName','sgEmoji','sgTarget','sgCurrent','sgTargetDate'].forEach(id => { const e = document.getElementById(id); if(e) e.value = ''; });
   const submitEl = document.getElementById('sgSubmitBtn'); if(submitEl) submitEl.textContent = 'Create goal';
   const titleEl  = document.getElementById('sgModalTitle'); if(titleEl) titleEl.textContent = 'New savings goal';
+  if(typeof _checkMoneyMilestones === 'function') _checkMoneyMilestones();
   save();
   if(typeof renderSavingsTab   === 'function') renderSavingsTab();
   if(typeof renderSavGoalCards === 'function') renderSavGoalCards();
@@ -2216,3 +2233,62 @@ async function _maybeUploadPendingGoalPhoto(goalId){
   }
 }
 
+// ════════════════════════════════════════════════════════════════
+// Tab 2 Increment 5.5 — Money milestone celebrations
+// ════════════════════════════════════════════════════════════════
+//
+// _checkMoneyMilestones() walks the milestone list, fires the
+// celebration for any newly-crossed entry, and stamps
+// D.moneyMilestones[key] so each milestone is one-shot. Reuses the
+// existing Chores celebration engine: screenFlash + launchSideConfetti
+// + showToast. JSONB only — no new table.
+//
+// Callers (addTx / saveSavingsGoal / _quickAddSave / _learnComplete
+// / _allowanceFormToggle) invoke this BEFORE their save() so the
+// new milestone state is persisted by the caller's save in the same
+// flush. UI side-effects (flash + confetti + toast) are staggered via
+// setTimeout when multiple fire in one pass (e.g. a single goal
+// deposit pushes you over both $50 and $100 — both fire, ~420ms
+// apart, so the bursts don't blur into one indistinct cheer).
+
+function _milestoneLessonsCompleted(){
+  const p = D.moneyLessonsProgress;
+  if(!p || typeof p.completed !== 'object' || Array.isArray(p.completed)) return 0;
+  return Object.keys(p.completed).length;
+}
+
+const MONEY_MILESTONES = [
+  { key: 'first_tx',         msg: 'First transaction logged 💰',  test: () => Array.isArray(D.transactions)  && D.transactions.length  > 0 },
+  { key: 'first_goal',       msg: 'First savings goal created 🎯', test: () => Array.isArray(D.savingsGoals) && D.savingsGoals.length > 0 },
+  { key: 'first_50_saved',   msg: 'First $50 saved! 💚',           test: () => (D.savingsGoals||[]).some(g => g && (g.current||0) >=  50) },
+  { key: 'first_100_saved',  msg: 'First $100 saved! 💵',          test: () => (D.savingsGoals||[]).some(g => g && (g.current||0) >= 100) },
+  { key: 'first_lesson',     msg: 'First lesson completed 📚',     test: () => _milestoneLessonsCompleted() >= 1 },
+  { key: 'lessons_3',        msg: '3 lessons down 🔥',              test: () => _milestoneLessonsCompleted() >= 3 },
+  { key: 'lessons_all',      msg: 'All 8 lessons complete 🏆',     test: () => _milestoneLessonsCompleted() >= 8 },
+  { key: 'allowance_setup',  msg: 'Allowance is live 🪙',           test: () => D.allowanceConfig && D.allowanceConfig.enabled === true && (+D.allowanceConfig.amount || 0) > 0 }
+];
+
+function _checkMoneyMilestones(){
+  if(!D.moneyMilestones || typeof D.moneyMilestones !== 'object' || Array.isArray(D.moneyMilestones)){
+    D.moneyMilestones = {};
+  }
+  const today = new Date().toISOString().slice(0,10);
+  let fireIdx = 0;
+  MONEY_MILESTONES.forEach(m => {
+    if(D.moneyMilestones[m.key]) return;            // already fired — one-shot
+    try {
+      if(!m.test()) return;
+      D.moneyMilestones[m.key] = today;
+      // Stagger so back-to-back celebrations don't blur into one burst.
+      const delay = fireIdx * 420;
+      fireIdx++;
+      setTimeout(() => {
+        if(typeof screenFlash         === 'function') screenFlash('#10b981', 220);
+        if(typeof launchSideConfetti  === 'function') launchSideConfetti();
+        if(typeof showToast           === 'function') showToast(m.msg);
+      }, delay);
+    } catch(_) {
+      // Don't let one milestone breakage block subsequent ones.
+    }
+  });
+}
