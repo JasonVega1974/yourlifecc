@@ -15424,6 +15424,117 @@
             #s-parent .ph-card, #s-parent .ph-subtab{transition:none!important;}
           }
         </style>
+        <!-- ════════════════════════════════════════════════════════
+             Activity & Schedule design pass (2026-06-05).
+             Mirrors the Chores & Approvals hero pattern
+             (#ph-chores .ph-ch-hdr above line 15941) but in CYAN
+             instead of green — Activity is the "calendar / time"
+             surface in this hub. Token vocabulary stays scoped to
+             #s-parent (--pc-cyan family already declared at line
+             15323 / 15333 / 15356); we don't redeclare or shadow.
+             Hero data-ph-tab="activity" so phNav's [data-ph-tab]
+             sweep auto-toggles its visibility alongside the
+             sub-nav + sub-panels.
+             ════════════════════════════════════════════════════════ -->
+        <style>
+          /* Hero card — cyan-accented, mirrors .ph-ch-hdr shape */
+          #s-parent .ph-act-hdr{
+            position:relative;
+            background:linear-gradient(160deg, var(--s1) 0%, var(--s2) 100%);
+            border:1px solid color-mix(in srgb, #38bdf8 30%, transparent);
+            border-radius:18px;
+            padding:1rem 1.2rem;
+            margin-bottom:1rem;
+            box-shadow:var(--card-shadow), inset 0 1px 0 color-mix(in srgb, var(--tx) 6%, transparent);
+            overflow:hidden;
+          }
+          #s-parent .ph-act-hdr::before{
+            content:'';position:absolute;inset:0;
+            background:radial-gradient(ellipse at top right, color-mix(in srgb, #38bdf8 10%, transparent) 0%, transparent 60%);
+            pointer-events:none;
+          }
+          #s-parent .ph-act-eyebrow{
+            position:relative;
+            font-family:var(--fm);font-size:.62rem;letter-spacing:.22em;
+            text-transform:uppercase;color:#38bdf8;opacity:.9;
+            margin-bottom:.25rem;
+          }
+          #s-parent .ph-act-title{
+            position:relative;
+            font-family:'Bebas Neue', var(--fm);
+            font-size:1.7rem;line-height:1;letter-spacing:.03em;
+            background:linear-gradient(135deg,#ecfeff 0%,#7dd3fc 55%,#0891b2 100%);
+            -webkit-background-clip:text;background-clip:text;
+            -webkit-text-fill-color:transparent;
+            color:#0891b2;
+            margin-bottom:.35rem;
+          }
+          #s-parent .ph-act-sub{
+            position:relative;
+            font-family:Georgia, 'Times New Roman', serif;font-style:italic;
+            font-size:.85rem;line-height:1.45;
+            color:var(--tx2);
+          }
+          :root.light #s-parent .ph-act-hdr{
+            background:#ffffff;
+            border-color:#bae6fd;
+            box-shadow:0 1px 4px rgba(15,23,42,.08), inset 0 1px 0 rgba(15,23,42,.03);
+          }
+          :root.light #s-parent .ph-act-title{
+            background:linear-gradient(135deg,#075985 0%,#0e7490 55%,#164e63 100%);
+            -webkit-background-clip:text;background-clip:text;
+            -webkit-text-fill-color:transparent;
+            color:#075985;
+          }
+          /* Hero chip row + per-color variants. The cyan / violet /
+             rose split signals: cyan = scheduled, violet = audit,
+             rose = behavior. Mirrors the chip semantics chores uses
+             for amber=pending / violet=active. */
+          #s-parent .ph-act-chips{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem;position:relative;}
+          #s-parent .ph-act-chip{
+            display:inline-flex;align-items:center;gap:.4rem;
+            font-family:var(--fn);font-size:.74rem;font-weight:700;
+            padding:.4rem .8rem;border-radius:999px;
+            border:1px solid;letter-spacing:.02em;
+          }
+          #s-parent .ph-act-chip-cyan{
+            color:#38bdf8;background:color-mix(in srgb, #38bdf8 12%, transparent);
+            border-color:color-mix(in srgb, #38bdf8 32%, transparent);
+          }
+          #s-parent .ph-act-chip-violet{
+            color:var(--pc-violet);background:var(--pc-violet-soft);
+            border-color:var(--pc-violet-bd);
+          }
+          #s-parent .ph-act-chip-rose{
+            color:var(--pc-rose);background:var(--pc-rose-soft);
+            border-color:var(--pc-rose-bd);
+          }
+          #s-parent .ph-act-chip-dot{
+            width:7px;height:7px;border-radius:50%;
+            background:currentColor;box-shadow:0 0 8px currentColor;
+            animation:phActChipPulse 2.4s ease-in-out infinite;
+          }
+          @keyframes phActChipPulse{0%,100%{opacity:.55}50%{opacity:1}}
+          @media (prefers-reduced-motion: reduce){
+            #s-parent .ph-act-chip-dot{ animation:none; opacity:.85; }
+          }
+        </style>
+        <!-- HERO — cyan-accented header for the Activity & Schedule
+             card. data-ph-tab="activity" hooks into phNav's visibility
+             sweep so the hero appears/disappears alongside the sub-nav
+             and sub-panels. Chip counts populated by
+             renderPhActivityHeroChips (parent.js) on phNav('activity'). -->
+        <div class="ph-act-hdr" data-ph-tab="activity" style="display:none;">
+          <div class="ph-act-eyebrow">PARENT HUB · ACTIVITY</div>
+          <div class="ph-act-title">📅 Activity &amp; Schedule</div>
+          <div class="ph-act-sub">Where the day lives — what's coming, what happened, who showed up.</div>
+          <div class="ph-act-chips" id="phActivityHeroChips">
+            <span class="ph-act-chip ph-act-chip-cyan"><span class="ph-act-chip-dot"></span><b id="phActChipSched" style="font-weight:800;">0</b>&nbsp;scheduled today</span>
+            <span class="ph-act-chip ph-act-chip-violet"><b id="phActChipEvents" style="font-weight:800;">0</b>&nbsp;events today</span>
+            <span class="ph-act-chip ph-act-chip-rose"><b id="phActChipNotes" style="font-weight:800;">0</b>&nbsp;behavior notes</span>
+          </div>
+        </div>
+
         <div class="ph-subnav" id="phSubNav_activity" data-ph-tab="activity" style="display:none;" role="tablist" aria-label="Activity sub-tabs">
           <button type="button" class="ph-subtab active" data-sub="schedule" onclick="phSubNav('activity','schedule')">📅 Schedule</button>
           <button type="button" class="ph-subtab" data-sub="audit" onclick="phSubNav('activity','audit')">📊 Activity log</button>
@@ -16044,9 +16155,17 @@
           </section>
         </div>
 
-        <!-- SCHEDULE -->
+        <!-- SCHEDULE — design pass swaps the flat heading for the
+             canonical .ph-seclabel pattern (icon + h2 + hint). The
+             rest of the panel (child selector, day/week/month tabs,
+             nav row, schedule list) is left as-is — internal polish
+             is a separate concern from the design-system header. -->
         <div id="ph-schedule" data-ph-tab="activity" data-ph-sub="schedule" style="display:none;">
-          <div style="font-size:.85rem;font-weight:800;color:#e0e0e0;margin-bottom:.8rem;display:flex;align-items:center;gap:.4rem;">📅 Schedule Planner</div>
+          <div class="ph-seclabel">
+            <span class="ph-ic ph-ic-cyan">📅</span>
+            <h2 class="ph-h2">Schedule planner</h2>
+            <span class="ph-hint">day · week · month</span>
+          </div>
 
           <!-- Child selector for schedule -->
           <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.8rem;">
@@ -16392,41 +16511,89 @@
         </div>
 
         <!-- BEHAVIOR & GRADES -->
+        <!-- BEHAVIOR & GRADES — design pass replaces the three flat
+             colored cards (red/blue/violet bg tints) with the
+             canonical .ph-seclabel + .ph-block pattern. Same three
+             surfaces (Behavior Log / Grade Monitor / Parent Notes)
+             but each gets a proper icon + h2 + hint trio so they
+             read as distinct sections instead of stacking into one
+             mini-scroll. Internal renderers (behScoreCards,
+             behaviorLogList, gradeMonitorList, parentNotesList) are
+             unchanged. -->
         <div id="ph-behavior" data-ph-tab="activity" data-ph-sub="behavior" style="display:none;">
-          <!-- Behavior Log -->
-          <div style="background:rgba(239,68,68,.03);border:1px solid rgba(239,68,68,.1);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
-            <div style="font-size:.85rem;font-weight:700;margin-bottom:.3rem;">📋 Behavior Log</div>
-            <div style="font-size:.7rem;color:var(--tx2);margin-bottom:.4rem;">Track behavior patterns and scores.</div>
-            <div id="behScoreCards" style="margin-bottom:.5rem;"></div>
-            <div id="behaviorLogList"></div>
-          </div>
-          <!-- Grade Monitor -->
-          <div style="background:rgba(96,165,250,.03);border:1px solid rgba(96,165,250,.1);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
-            <div style="font-size:.85rem;font-weight:700;margin-bottom:.3rem;">📊 Grade Monitor</div>
-            <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.4rem;">
-              <label style="font-size:.7rem;">GPA Target:</label>
-              <input type="number" id="gpaTargetInput" step="0.1" min="0" max="4" value="3.0" style="width:70px;" onchange="saveGpaTarget(this.value)">
-              <span style="font-size:.7rem;color:var(--tx2);">Current: <span id="gpaCurrentDisplay">—</span></span>
+
+          <section class="ph-sec">
+            <div class="ph-seclabel">
+              <span class="ph-ic ph-ic-rose">📋</span>
+              <h2 class="ph-h2">Behavior log</h2>
+              <span class="ph-hint">patterns &amp; scores</span>
             </div>
-            <div id="gradeMonitorList"></div>
-          </div>
-          <!-- Parent Notes -->
-          <div style="background:rgba(167,139,250,.03);border:1px solid rgba(167,139,250,.1);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;">
-            <div style="font-size:.85rem;font-weight:700;margin-bottom:.3rem;">📝 Parent Notes</div>
-            <div style="display:flex;gap:.3rem;margin-bottom:.4rem;">
-              <input type="text" id="parentNoteText" placeholder="Add a note about your child..." style="flex:1;">
-              <button class="btn bp bs" onclick="addParentNote()" style="font-size:.7rem;">+ Add</button>
+            <div class="ph-block">
+              <div id="behScoreCards" style="margin-bottom:.5rem;"></div>
+              <div id="behaviorLogList"></div>
             </div>
-            <div id="parentNotesList"></div>
-          </div>
+          </section>
+
+          <section class="ph-sec">
+            <div class="ph-seclabel">
+              <span class="ph-ic ph-ic-cyan">📊</span>
+              <h2 class="ph-h2">Grade monitor</h2>
+              <span class="ph-hint">target vs current GPA</span>
+            </div>
+            <div class="ph-block">
+              <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.6rem;">
+                <label class="ph-flabel" style="margin:0;">GPA target</label>
+                <input type="number" class="ph-input" id="gpaTargetInput" step="0.1" min="0" max="4" value="3.0" style="width:90px;" onchange="saveGpaTarget(this.value)">
+                <span style="font-size:.74rem;color:var(--tx2);">Current: <span id="gpaCurrentDisplay" style="font-weight:700;color:var(--tx);">—</span></span>
+              </div>
+              <div id="gradeMonitorList"></div>
+            </div>
+          </section>
+
+          <section class="ph-sec">
+            <div class="ph-seclabel">
+              <span class="ph-ic ph-ic-violet">📝</span>
+              <h2 class="ph-h2">Parent notes</h2>
+              <span class="ph-hint">private to you</span>
+            </div>
+            <div class="ph-block">
+              <div style="display:flex;gap:.4rem;margin-bottom:.55rem;">
+                <input type="text" class="ph-input" id="parentNoteText" placeholder="Add a note about your child…" style="flex:1;">
+                <button class="ph-btn ph-btn-primary" onclick="addParentNote()">+ Add</button>
+              </div>
+              <div id="parentNotesList"></div>
+            </div>
+          </section>
+
         </div>
 
-        <!-- ACTIVITY LOG -->
+        <!-- ACTIVITY LOG — design pass swaps the two flat headings
+             for canonical .ph-seclabel pairs (Audit trail / Activity
+             feed) and wraps each list in a .ph-block. Render targets
+             (#parentActivityAudit / #parentActivityFeed) unchanged. -->
         <div id="ph-activity" data-ph-tab="activity" data-ph-sub="audit" style="display:none;">
-          <div style="font-size:.85rem;font-weight:700;margin-bottom:.5rem;">📊 Activity Audit Trail</div>
-          <div id="parentActivityAudit" style="max-height:300px;overflow-y:auto;margin-bottom:1rem;"></div>
-          <div style="font-size:.85rem;font-weight:700;margin-bottom:.5rem;">📊 Detailed Activity Feed</div>
-          <div id="parentActivityFeed" style="max-height:400px;overflow-y:auto;"></div>
+
+          <section class="ph-sec">
+            <div class="ph-seclabel">
+              <span class="ph-ic ph-ic-violet">📊</span>
+              <h2 class="ph-h2">Audit trail</h2>
+              <span class="ph-hint">what happened, when</span>
+            </div>
+            <div class="ph-block">
+              <div id="parentActivityAudit" style="max-height:300px;overflow-y:auto;"></div>
+            </div>
+          </section>
+
+          <section class="ph-sec">
+            <div class="ph-seclabel">
+              <span class="ph-ic ph-ic-cyan">📈</span>
+              <h2 class="ph-h2">Activity feed</h2>
+              <span class="ph-hint">detailed by-event</span>
+            </div>
+            <div class="ph-block">
+              <div id="parentActivityFeed" style="max-height:400px;overflow-y:auto;"></div>
+            </div>
+          </section>
         </div>
 
         <!-- PARENT LEARNING -->
