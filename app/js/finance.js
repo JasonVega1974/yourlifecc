@@ -102,11 +102,11 @@ function toggleBill(id){ const b=(D.bills||[]).find(b=>b.id===id); if(b){b.paid=
 function editBill(id){ const b=(D.bills||[]).find(b=>b.id===id); if(!b) return; const n=prompt('Bill name:',b.name); if(!n) return; const a=parseFloat(prompt('Amount:',b.amt)); if(!isNaN(a)) b.amt=a; b.name=n.trim(); save(); renderBills(); updateFinSum(); }
 function deleteBill(id){ D.bills=(D.bills||[]).filter(b=>b.id!==id); save(); renderBills(); updateFinSum(); }
 
-// Tab 2 Inc 2 — addTx unchanged in shape (D.transactions canonical
-// {id, name, amt, type, cat, date}) but the form reads from the new
-// hidden #txType + #txCat fields that the segmented toggle + chip
-// picker mutate on tap. Re-renders the new month-grouped list and
-// resets the form inputs.
+// Tab 2 Inc 2 (+ Inc 3 edit-mode) — addTx handles BOTH new entries
+// and in-place edits. When _moneyTxEditingId is set, the function
+// finds that entry in D.transactions and updates it; otherwise it
+// unshifts a new entry. Edit mode is set by editTx() (Inc 3 swap
+// from prompt() to inline form-population per UX review scope E).
 function addTx(){
   const name = (document.getElementById('txName').value || '').trim();
   const amt  = parseFloat(document.getElementById('txAmt').value);
@@ -121,6 +121,31 @@ function addTx(){
   if(!name){ showToast('Add a description'); return; }
   if(isNaN(amt) || amt <= 0){ showToast('Enter an amount'); return; }
   if(!D.transactions) D.transactions = [];
+
+  // Inc 3 — edit-mode path. Mutate the existing entry in place so
+  // the row stays at its original position in history (the natural
+  // expectation when correcting a typo on a 3-day-old transaction).
+  if(typeof _moneyTxEditingId !== 'undefined' && _moneyTxEditingId !== null){
+    const entry = D.transactions.find(t => t && t.id === _moneyTxEditingId);
+    if(entry){
+      entry.name = name;
+      entry.amt  = amt;
+      entry.type = type;
+      entry.cat  = cat;
+      entry.date = date;
+      _moneyTxCancelEdit();
+      save();
+      renderTx();
+      updateFinSum();
+      showToast('Transaction updated ✓');
+      return;
+    }
+    // Fall through to insert if the id vanished (e.g. profile swap
+    // mid-edit). The leftover edit mode is cleared.
+    _moneyTxCancelEdit();
+  }
+
+  // Default path — insert a new entry.
   D.transactions.unshift({ id:Date.now(), name, amt, type, cat, date });
   document.getElementById('txName').value = '';
   document.getElementById('txAmt').value  = '';
@@ -138,7 +163,19 @@ function addTx(){
 }
 
 function filterTx(type,btn){ _txFilter=type; document.querySelectorAll('.txf').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); renderTx(); }
-function editTx(id){ const t=(D.transactions||[]).find(t=>t.id===id); if(!t) return; const n=prompt('Description:',t.name); if(!n) return; const a=parseFloat(prompt('Amount:',t.amt)); if(!isNaN(a)) t.amt=a; t.name=n.trim(); save(); renderTx(); updateFinSum(); }
+// Tab 2 Inc 3 — editTx replaced the native prompt() flow with an
+// inline edit-mode that populates the existing add-form with the
+// row's values. UX reviewer flagged the prompt() as the loudest
+// design-system violation on the surface. _moneyTxBeginEdit lives
+// in the Inc 3 block at the bottom of this file.
+function editTx(id){
+  if(typeof _moneyTxBeginEdit === 'function'){ _moneyTxBeginEdit(id); return; }
+  // Defensive fallback only — should never hit in production.
+  const t=(D.transactions||[]).find(t=>t.id===id); if(!t) return;
+  const n=prompt('Description:',t.name); if(!n) return;
+  const a=parseFloat(prompt('Amount:',t.amt)); if(!isNaN(a)) t.amt=a;
+  t.name=n.trim(); save(); renderTx(); updateFinSum();
+}
 function deleteTx(id){ D.transactions=(D.transactions||[]).filter(t=>t.id!==id); save(); renderTx(); updateFinSum(); }
 
 // Tab 2 Inc 2 — renderTx is a thin shim that delegates to the new
@@ -772,5 +809,532 @@ function _moneyTxExportCsv(){
   document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 1000);
   showToast('Exported ' + list.length + ' transactions ✓');
+}
+
+// ════════════════════════════════════════════════════════════════
+// Tab 2 Increment 3 — Allowance sub-tab + edit-mode for Tx
+// ════════════════════════════════════════════════════════════════
+//
+// Allowance is a parent-set recurring credit that flows into
+// D.transactions as a regular income row with category='Allowance'.
+// No new table — credits live in money_transactions alongside
+// every other income row (plan decision D2).
+//
+// Auto-credit fires ONLY from mTab('allowance') — never from
+// DOMContentLoaded (that path runs before cloudLoad completes and
+// would credit stale D, then get clobbered by the cloud restore).
+// Two-layer idempotency guard:
+//   1) D.allowanceConfig.lastCreditedOn (cheap fast path)
+//   2) per-date scan of D.transactions for an existing
+//      category='Allowance' entry on the candidate date (survives
+//      LS clear / fresh device / config drift)
+//
+// Catch-up cap = ALLOWANCE_MAX_CATCHUP. A kid returning from a
+// long absence gets at most this many backfilled credits, not the
+// full backlog.
+//
+// Edit-mode (scope E from the UX review) replaces the prompt()
+// path in editTx with form-population + a "Save Changes" button.
+// State lives in _moneyTxEditingId; addTx() above branches on it.
+
+const ALLOWANCE_CATEGORY     = 'Allowance';
+const ALLOWANCE_MAX_CATCHUP  = 4;
+const ALLOWANCE_FREQUENCIES  = ['weekly','biweekly','monthly'];
+const ALLOWANCE_DAY_NAMES    = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const ALLOWANCE_DAY_SHORT    = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+// Module state — toast fires at most once per page load on the
+// first credit (subsequent visits this session stay quiet).
+let _allowanceToastSeen = false;
+
+// Tx edit-mode — null when not editing, id of the entry under edit
+// otherwise. addTx() branches on this; editTx() sets it via
+// _moneyTxBeginEdit.
+let _moneyTxEditingId = null;
+
+// ─── Local date helpers ──────────────────────────────────────────
+// LOCAL time — credit days must align with the kid's calendar
+// (toISOString silently shifts to UTC).
+function _mzDateStr(d){
+  const y  = d.getFullYear();
+  const m  = String(d.getMonth()+1).padStart(2,'0');
+  const da = String(d.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+da;
+}
+function _mzToday(){ return _mzDateStr(new Date()); }
+function _mzDateFromStr(s){
+  // Parse YYYY-MM-DD as local midnight (NOT UTC).
+  if(!s || typeof s !== 'string') return null;
+  const parts = s.split('-');
+  if(parts.length !== 3) return null;
+  return new Date(+parts[0], (+parts[1]) - 1, +parts[2]);
+}
+function _mzAddDays(s, n){
+  const d = _mzDateFromStr(s); if(!d) return s;
+  d.setDate(d.getDate() + n);
+  return _mzDateStr(d);
+}
+function _mzDaysBetween(aStr, bStr){
+  const a = _mzDateFromStr(aStr); const b = _mzDateFromStr(bStr);
+  if(!a || !b) return 0;
+  return Math.round((b - a) / 86400000);
+}
+
+// ─── Config sanitize / accessors ─────────────────────────────────
+function _allowanceConfig(){
+  if(!D.allowanceConfig || typeof D.allowanceConfig !== 'object' || Array.isArray(D.allowanceConfig)){
+    D.allowanceConfig = { amount:0, frequency:'weekly', dayOfWeek:5, dayOfMonth:1, anchorDate:'', lastCreditedOn:null, enabled:false };
+  }
+  const c = D.allowanceConfig;
+  if(typeof c.amount !== 'number' || !isFinite(c.amount) || c.amount < 0) c.amount = 0;
+  if(ALLOWANCE_FREQUENCIES.indexOf(c.frequency) === -1) c.frequency = 'weekly';
+  if(typeof c.dayOfWeek !== 'number' || c.dayOfWeek < 0 || c.dayOfWeek > 6) c.dayOfWeek = 5;
+  if(typeof c.dayOfMonth !== 'number' || c.dayOfMonth < 1 || c.dayOfMonth > 31) c.dayOfMonth = 1;
+  if(typeof c.anchorDate !== 'string') c.anchorDate = '';
+  if(typeof c.lastCreditedOn !== 'string' && c.lastCreditedOn !== null) c.lastCreditedOn = null;
+  if(typeof c.enabled !== 'boolean') c.enabled = false;
+  return c;
+}
+
+// True if a given YYYY-MM-DD is a "due date" under the config.
+function _allowanceIsDueDate(cfg, dateStr){
+  const d = _mzDateFromStr(dateStr); if(!d) return false;
+  if(cfg.frequency === 'weekly'){
+    return d.getDay() === cfg.dayOfWeek;
+  }
+  if(cfg.frequency === 'biweekly'){
+    if(d.getDay() !== cfg.dayOfWeek) return false;
+    // anchorDate-relative — only every other matching dayOfWeek
+    // counts. If anchorDate is empty, fall through to weekly.
+    if(!cfg.anchorDate) return true;
+    const diff = _mzDaysBetween(cfg.anchorDate, dateStr);
+    if(diff < 0) return false;
+    return (diff % 14) === 0;
+  }
+  if(cfg.frequency === 'monthly'){
+    return d.getDate() === cfg.dayOfMonth;
+  }
+  return false;
+}
+
+// Returns sorted array of YYYY-MM-DD strings: every due date >
+// lastCreditedOn AND <= today. Capped at ALLOWANCE_MAX_CATCHUP so
+// a long app-absence can't grant months of allowance in one wake.
+function _allowanceDueDatesUpTo(cfg, todayStr){
+  if(!cfg.enabled || cfg.amount <= 0) return [];
+  const today = todayStr || _mzToday();
+  // Start the walk one day after the last credit. If no last
+  // credit exists yet, treat "yesterday" as the floor so today is
+  // included if today is a due date — first-ever credit lands
+  // promptly without backfilling history.
+  let cursor = cfg.lastCreditedOn ? _mzAddDays(cfg.lastCreditedOn, 1) : _mzAddDays(today, -1);
+  const out = [];
+  // Walk forward day by day. Guard against runaway loops by
+  // capping the scan at MAX_CATCHUP * 31 days (more than enough
+  // for monthly cadence with full catch-up).
+  let safety = ALLOWANCE_MAX_CATCHUP * 31 + 7;
+  while(safety-- > 0 && cursor <= today){
+    if(_allowanceIsDueDate(cfg, cursor)){
+      out.push(cursor);
+      if(out.length >= ALLOWANCE_MAX_CATCHUP) break;
+    }
+    cursor = _mzAddDays(cursor, 1);
+  }
+  return out;
+}
+
+// Compute the next due date strictly AFTER the given date. Used by
+// the renderer to show "next credit: in N days".
+function _allowanceNextAfter(cfg, fromStr){
+  if(!cfg.enabled || cfg.amount <= 0) return null;
+  const from = fromStr || _mzToday();
+  let cursor = _mzAddDays(from, 1);
+  let safety = 366;
+  while(safety-- > 0){
+    if(_allowanceIsDueDate(cfg, cursor)) return cursor;
+    cursor = _mzAddDays(cursor, 1);
+  }
+  return null;
+}
+
+// Double-guard: even if cfg.lastCreditedOn drifted (LS clear /
+// fresh device / hand-edit), refuse to insert a credit on a date
+// that already has a Allowance/income row in D.transactions.
+function _allowanceAlreadyOnDate(dateStr){
+  const log = Array.isArray(D.transactions) ? D.transactions : [];
+  return log.some(t => t
+    && t.cat === ALLOWANCE_CATEGORY
+    && t.type === 'income'
+    && t.date === dateStr);
+}
+
+// Core auto-credit. Fires only from mTab('allowance') (which runs
+// AFTER cloudLoad has resolved and D is settled). Idempotent.
+function _maybeCreditAllowance(){
+  const cfg = _allowanceConfig();
+  if(!cfg.enabled || cfg.amount <= 0) return;
+
+  const dueDates = _allowanceDueDatesUpTo(cfg, _mzToday());
+  if(!dueDates.length) return;
+
+  if(!D.transactions) D.transactions = [];
+
+  let credited = 0;
+  let advanceLastTo = cfg.lastCreditedOn;
+  const amt = +(+cfg.amount).toFixed(2);
+
+  for(let i=0;i<dueDates.length;i++){
+    const d = dueDates[i];
+    if(_allowanceAlreadyOnDate(d)){
+      // Already credited via a different path (cloud restore, hand
+      // edit, manual entry). Advance lastCreditedOn so the cheap
+      // fast-path catches it next time but DON'T insert again.
+      advanceLastTo = d;
+      continue;
+    }
+    D.transactions.unshift({
+      id:   Date.now() + i,    // unique-ish per credit in the batch
+      name: 'Allowance',
+      amt:  amt,
+      type: 'income',
+      cat:  ALLOWANCE_CATEGORY,
+      date: d
+    });
+    advanceLastTo = d;
+    credited++;
+  }
+
+  cfg.lastCreditedOn = advanceLastTo;
+  save();
+
+  if(credited > 0 && !_allowanceToastSeen){
+    _allowanceToastSeen = true;
+    const total = credited * amt;
+    showToast(credited === 1
+      ? '+$' + amt.toFixed(2) + ' allowance landed 💵'
+      : credited + ' allowance credits — +$' + total.toFixed(2) + ' 💵');
+  }
+}
+
+// ─── Kid-side renderer for #mt-allowance ─────────────────────────
+//
+// Read-only schedule pill + countdown + recent credits + this-
+// month total. Config UI lives in Parent Hub > Rewards
+// (renderPhAllowance below) — never editable from this surface.
+function renderAllowance(){
+  // Auto-credit first so the history immediately reflects today's
+  // credit if today happens to be a due date.
+  _maybeCreditAllowance();
+
+  const root = document.getElementById('mt-allowance');
+  if(!root) return;
+  const cfg = _allowanceConfig();
+
+  // Recent credits (last 8) from D.transactions filtered by
+  // category=Allowance, newest first.
+  const allowanceLog = (D.transactions || [])
+    .filter(t => t && t.cat === ALLOWANCE_CATEGORY && t.type === 'income')
+    .slice()
+    .sort((a,b) => (b.date || '').localeCompare(a.date || '') || (b.id || 0) - (a.id || 0));
+
+  const recent = allowanceLog.slice(0, 8);
+
+  // This-month total (sum of credits where date starts with current YYYY-MM).
+  const today = _mzToday();
+  const ym = today.slice(0, 7);
+  const monthTotal = allowanceLog
+    .filter(t => (t.date || '').startsWith(ym))
+    .reduce((sum, t) => sum + (Number.isFinite(+t.amt) ? +t.amt : 0), 0);
+
+  // Hero copy
+  let heroHtml;
+  if(!cfg.enabled || cfg.amount <= 0){
+    heroHtml = `
+      <div class="mz-allow-hero mz-allow-hero--off">
+        <div class="mz-allow-hero__icon">💵</div>
+        <div class="mz-allow-hero__title">No allowance set</div>
+        <div class="mz-allow-hero__body">Your parent can set up a recurring allowance in Parent Hub → Rewards. It'll appear here automatically each pay day.</div>
+      </div>`;
+  } else {
+    const dayName = cfg.frequency === 'monthly'
+      ? 'the ' + cfg.dayOfMonth + (function(n){ var s=['th','st','nd','rd'],v=n%100; return s[(v-20)%10]||s[v]||s[0]; })(cfg.dayOfMonth) + ' of each month'
+      : (cfg.frequency === 'biweekly' ? 'every other ' : 'every ') + ALLOWANCE_DAY_NAMES[cfg.dayOfWeek];
+    const next = _allowanceNextAfter(cfg, today);
+    const nextLabel = next
+      ? (function(){
+          const days = _mzDaysBetween(today, next);
+          if(days === 0) return 'today';
+          if(days === 1) return 'tomorrow';
+          if(days < 7)   return 'in ' + days + ' days';
+          const d = _mzDateFromStr(next);
+          return 'on ' + d.toLocaleDateString('en', { month:'short', day:'numeric' });
+        })()
+      : '—';
+    heroHtml = `
+      <div class="mz-allow-hero">
+        <div class="mz-allow-hero__row">
+          <div class="mz-allow-hero__amt">$${(+cfg.amount).toFixed(2)}</div>
+          <div class="mz-allow-hero__cadence">${escapeHtml(dayName)}</div>
+        </div>
+        <div class="mz-allow-hero__next">
+          <span class="mz-allow-hero__next-label">Next credit</span>
+          <span class="mz-allow-hero__next-val">${escapeHtml(nextLabel)}</span>
+        </div>
+      </div>`;
+  }
+
+  // This-month chip
+  const monthChipHtml = monthTotal > 0
+    ? `<div class="mz-allow-monthchip">📅 $${monthTotal.toFixed(2)} received this ${(_mzDateFromStr(today)||new Date()).toLocaleDateString('en',{month:'long'})}</div>`
+    : '';
+
+  // History list
+  let historyHtml;
+  if(!recent.length){
+    historyHtml = '<div class="mz-allow-empty">No allowance credits yet. The first one lands on the next scheduled day.</div>';
+  } else {
+    historyHtml = recent.map(t => {
+      const dt = _mzDateFromStr(t.date);
+      const dateLabel = dt
+        ? dt.toLocaleDateString('en', { month:'short', day:'numeric', year:'numeric' })
+        : (t.date || '');
+      return `
+        <div class="mz-allow-row">
+          <div class="mz-allow-row__emoji">💵</div>
+          <div class="mz-allow-row__main">
+            <div class="mz-allow-row__name">Allowance</div>
+            <div class="mz-allow-row__date">${escapeHtml(dateLabel)}</div>
+          </div>
+          <div class="mz-allow-row__amt">+$${(+t.amt || 0).toFixed(2)}</div>
+        </div>`;
+    }).join('');
+  }
+
+  root.innerHTML = `
+    <div class="mz-section-title mz-section-title--amber">💰 ALLOWANCE</div>
+    ${heroHtml}
+    ${monthChipHtml}
+    <div class="mz-section-title" style="margin-top:1.1rem;">RECENT CREDITS</div>
+    <div class="mz-allow-list">${historyHtml}</div>
+    <div class="mz-allow-hint">⚙️ Allowance is set by a parent in <b>Parent Hub → Rewards</b>.</div>
+  `;
+}
+
+// ─── Parent-Hub config card — #parentAllowanceArea ───────────────
+//
+// Solo mode: one editable form for D.allowanceConfig.
+// Multi-kid: one card per non-parent profile, each editing
+// p.data.allowanceConfig and persisted via saveProfiles().
+function renderPhAllowance(){
+  const root = document.getElementById('parentAllowanceArea');
+  if(!root) return;
+
+  const profiles = (typeof _profiles !== 'undefined' && Array.isArray(_profiles)) ? _profiles : [];
+  const kids = profiles.filter(p => p && p.isParent === false);
+
+  let cardsHtml;
+  if(kids.length === 0){
+    // Solo mode (or pre-multi-profile state) — edit D.allowanceConfig directly.
+    cardsHtml = _allowancePhCardHtml(null, _allowanceConfig());
+  } else {
+    cardsHtml = kids.map(kid => {
+      // Each kid's config lives on their per-profile data blob. If
+      // the active profile IS the kid, D.allowanceConfig is the
+      // canonical copy; otherwise p.data.allowanceConfig is.
+      let cfg;
+      if(typeof _activeProfileId !== 'undefined' && kid.id === _activeProfileId){
+        cfg = _allowanceConfig();
+      } else {
+        const pd = (kid.data && typeof kid.data === 'object') ? kid.data : (kid.data = {});
+        if(!pd.allowanceConfig || typeof pd.allowanceConfig !== 'object' || Array.isArray(pd.allowanceConfig)){
+          pd.allowanceConfig = { amount:0, frequency:'weekly', dayOfWeek:5, dayOfMonth:1, anchorDate:'', lastCreditedOn:null, enabled:false };
+        }
+        cfg = pd.allowanceConfig;
+      }
+      return _allowancePhCardHtml(kid, cfg);
+    }).join('');
+  }
+
+  root.innerHTML = `
+    <div class="mz-allow-ph">
+      <div class="mz-allow-ph__title">💵 ALLOWANCE</div>
+      <div class="mz-allow-ph__sub">Set a recurring credit per child. The app auto-inserts the income row on each pay day.</div>
+      ${cardsHtml}
+    </div>
+  `;
+}
+
+// Builds the editable card HTML for one profile (or solo). profile
+// is null in solo mode. Inputs carry data-attributes so the change
+// handlers can scope writes to the right profile.
+function _allowancePhCardHtml(profile, cfg){
+  const pid = profile ? String(profile.id) : '';
+  const label = profile ? (profile.name || 'Child') : 'You';
+  const enabledTxt = cfg.enabled ? 'ON' : 'OFF';
+  const wkOpts = ALLOWANCE_DAY_NAMES.map((n,i) =>
+    `<option value="${i}"${i === cfg.dayOfWeek ? ' selected' : ''}>${n}</option>`).join('');
+  const monthOpts = (function(){
+    let out = '';
+    for(let i=1;i<=31;i++) out += `<option value="${i}"${i === cfg.dayOfMonth ? ' selected' : ''}>${i}</option>`;
+    return out;
+  })();
+  const dayPickerHtml =
+    (cfg.frequency === 'monthly')
+      ? `<label>Day of month <select onchange="_allowanceFormChange('${pid}','dayOfMonth',this.value)">${monthOpts}</select></label>`
+      : `<label>Day of week <select onchange="_allowanceFormChange('${pid}','dayOfWeek',this.value)">${wkOpts}</select></label>`;
+
+  return `
+    <div class="mz-allow-card">
+      <div class="mz-allow-card__head">
+        <div class="mz-allow-card__name">${escapeHtml(label)}</div>
+        <button type="button" class="mz-allow-card__toggle ${cfg.enabled ? 'on' : 'off'}"
+                onclick="_allowanceFormToggle('${pid}')">${enabledTxt}</button>
+      </div>
+      <div class="mz-allow-card__grid">
+        <label>Amount ($)
+          <input type="number" min="0" step="0.25" value="${cfg.amount || ''}"
+                 oninput="_allowanceFormChange('${pid}','amount',this.value)">
+        </label>
+        <label>Frequency
+          <select onchange="_allowanceFormChange('${pid}','frequency',this.value)">
+            <option value="weekly"${cfg.frequency === 'weekly' ? ' selected' : ''}>Weekly</option>
+            <option value="biweekly"${cfg.frequency === 'biweekly' ? ' selected' : ''}>Every 2 weeks</option>
+            <option value="monthly"${cfg.frequency === 'monthly' ? ' selected' : ''}>Monthly</option>
+          </select>
+        </label>
+        ${dayPickerHtml}
+      </div>
+    </div>
+  `;
+}
+
+// Mutates the right config blob (solo D.* vs kid p.data.*), saves,
+// and re-renders both the Parent Hub card AND the kid's #mt-allowance
+// if it happens to be visible. pidStr is '' for solo mode.
+function _allowanceResolveConfig(pidStr){
+  if(!pidStr){
+    return _allowanceConfig();
+  }
+  // Multi-kid path — find the profile and return its config.
+  if(typeof _profiles === 'undefined' || !Array.isArray(_profiles)) return null;
+  const kid = _profiles.find(p => p && String(p.id) === pidStr);
+  if(!kid) return null;
+  if(typeof _activeProfileId !== 'undefined' && kid.id === _activeProfileId){
+    return _allowanceConfig();
+  }
+  const pd = (kid.data && typeof kid.data === 'object') ? kid.data : (kid.data = {});
+  if(!pd.allowanceConfig || typeof pd.allowanceConfig !== 'object' || Array.isArray(pd.allowanceConfig)){
+    pd.allowanceConfig = { amount:0, frequency:'weekly', dayOfWeek:5, dayOfMonth:1, anchorDate:'', lastCreditedOn:null, enabled:false };
+  }
+  return pd.allowanceConfig;
+}
+
+function _allowanceFormChange(pidStr, field, value){
+  const cfg = _allowanceResolveConfig(pidStr);
+  if(!cfg) return;
+  if(field === 'amount'){
+    const v = parseFloat(value);
+    cfg.amount = (isFinite(v) && v >= 0) ? v : 0;
+  } else if(field === 'frequency'){
+    if(ALLOWANCE_FREQUENCIES.indexOf(value) !== -1) cfg.frequency = value;
+  } else if(field === 'dayOfWeek'){
+    const n = parseInt(value, 10);
+    if(!isNaN(n) && n >= 0 && n <= 6) cfg.dayOfWeek = n;
+  } else if(field === 'dayOfMonth'){
+    const n = parseInt(value, 10);
+    if(!isNaN(n) && n >= 1 && n <= 31) cfg.dayOfMonth = n;
+  } else {
+    return;
+  }
+  // Persist through whichever path the config lives on.
+  if(!pidStr || (typeof _activeProfileId !== 'undefined' && pidStr === String(_activeProfileId))){
+    save();
+  } else if(typeof saveProfiles === 'function'){
+    saveProfiles();
+  } else {
+    save();
+  }
+  // Re-render the parent card (frequency change swaps the day
+  // picker between week / month variants).
+  renderPhAllowance();
+}
+
+function _allowanceFormToggle(pidStr){
+  const cfg = _allowanceResolveConfig(pidStr);
+  if(!cfg) return;
+  if(!cfg.enabled){
+    // Enabling — set lastCreditedOn so today's date is the floor
+    // for catch-up. Prevents instant backfill of historical due
+    // dates that pre-date the configuration moment.
+    cfg.lastCreditedOn = _mzAddDays(_mzToday(), -1);
+    cfg.enabled = true;
+  } else {
+    cfg.enabled = false;
+  }
+  if(!pidStr || (typeof _activeProfileId !== 'undefined' && pidStr === String(_activeProfileId))){
+    save();
+  } else if(typeof saveProfiles === 'function'){
+    saveProfiles();
+  } else {
+    save();
+  }
+  renderPhAllowance();
+  // Refresh the kid view if it's mounted (active profile matches).
+  if(document.getElementById('mt-allowance')) renderAllowance();
+}
+
+// ─── Tx edit-mode plumbing (scope E from UX review) ──────────────
+
+function _moneyTxBeginEdit(id){
+  const entry = (D.transactions || []).find(t => t && t.id === id);
+  if(!entry){ showToast('Entry not found'); return; }
+  _moneyTxEditingId = id;
+
+  // Populate form fields. Type toggle + chip picker need the matched
+  // button-click sequence so their visual state stays in sync.
+  const nameEl = document.getElementById('txName'); if(nameEl) nameEl.value = entry.name || '';
+  const amtEl  = document.getElementById('txAmt');  if(amtEl)  amtEl.value  = entry.amt || '';
+  const dateEl = document.getElementById('txDate'); if(dateEl) dateEl.value = entry.date || '';
+
+  if(entry.type === 'income' || entry.type === 'expense'){
+    const btnEl = document.querySelector('.mz-tx-toggle__btn--' + entry.type);
+    if(btnEl) _moneyTxSetType(entry.type, btnEl);
+  }
+  if(entry.cat){
+    // Re-render the picker so we can find the chip element for the
+    // entry's category, then click it through the same handler the
+    // user would.
+    _moneyRenderCatPicker();
+    const chips = document.querySelectorAll('.mz-tx-catchip');
+    chips.forEach(chip => {
+      const label = chip.querySelector('.mz-tx-catchip__label');
+      if(label && label.textContent === entry.cat){
+        _moneyTxSetCat(entry.cat, chip);
+      }
+    });
+  }
+
+  // Swap the submit button label + reveal cancel.
+  const submit = document.getElementById('mzTxSubmitBtn');
+  if(submit) submit.textContent = 'Save Changes';
+  const cancel = document.getElementById('mzTxCancelBtn');
+  if(cancel) cancel.style.display = '';
+
+  // Scroll the form into view so the edit moment feels intentional.
+  const form = document.querySelector('#mt-tx .card');
+  if(form && typeof form.scrollIntoView === 'function'){
+    try { form.scrollIntoView({ behavior:'smooth', block:'start' }); } catch(_) {}
+  }
+}
+
+function _moneyTxCancelEdit(){
+  _moneyTxEditingId = null;
+  const nameEl = document.getElementById('txName'); if(nameEl) nameEl.value = '';
+  const amtEl  = document.getElementById('txAmt');  if(amtEl)  amtEl.value  = '';
+  // Date stays as user set it — that's fine for "log another".
+  const submit = document.getElementById('mzTxSubmitBtn');
+  if(submit) submit.textContent = 'Log It';
+  const cancel = document.getElementById('mzTxCancelBtn');
+  if(cancel) cancel.style.display = 'none';
 }
 
