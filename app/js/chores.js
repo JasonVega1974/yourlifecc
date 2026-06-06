@@ -143,6 +143,13 @@ function cTab(tab, btn){
   // the same renderer used by s-rewards' #pbStoreItems; it now also
   // fills #choreStoreItems (see email.js).
   if(tab === 'store' && typeof renderParentBucks === 'function') renderParentBucks();
+  // Tab 1 Inc 4 — three read-only sub-tabs render on activation, not
+  // on every renderChores() pass (each scans D.choreLog and walks
+  // _profiles, so deferring to activation keeps the My Chores tab
+  // snappy on every save).
+  if(tab === 'streaks'     && typeof renderChoreStreaks      === 'function') renderChoreStreaks();
+  if(tab === 'leaderboard' && typeof renderChoreLeaderboard  === 'function') renderChoreLeaderboard();
+  if(tab === 'history'     && typeof renderChoreHistory      === 'function') renderChoreHistory();
 }
 
 
@@ -276,6 +283,11 @@ function verifyChore(logId, approved){
         setTimeout(()=>streakMilestoneBanner(newStreak), 350);
       }
     }
+    // Tab 1 Inc 4 — refresh D.choreStreak cache and mirror to
+    // public.chore_streaks. profile_id uses _pidOf(activeProfile)
+    // (Phase 1 of the PIN -> stable-id decouple, v249) so the new
+    // table is keyed by the stable id from day 1.
+    if(typeof updateChoreStreak === 'function') updateChoreStreak();
   } else {
     entry.status='rejected';
     showToast('Chore rejected');
@@ -348,7 +360,8 @@ function renderChores(){
   const ae = document.getElementById('chorePointsAvail'); if(ae) ae.textContent = avail;
   const te = document.getElementById('chorePointsTotal'); if(te) te.textContent = D.chorePoints.total;
   const se = document.getElementById('choreStreak'); if(se) se.textContent = streak;
-  const sd = document.getElementById('choreStreakDetail'); if(sd) sd.textContent = streak;
+  // Tab 1 Inc 4 removed #choreStreakDetail — the Streaks sub-tab now
+  // renders its own current/longest/total hero card via renderChoreStreaks.
 
   // Level calc
   const lvl = CHORE_LEVELS.find(l=>D.chorePoints.total >= l.min && D.chorePoints.total < l.max) || CHORE_LEVELS[CHORE_LEVELS.length-1];
@@ -1014,3 +1027,430 @@ function setSavingsGoal(){
   showToast('Savings goal set ✓');
 }
 
+// ════════════════════════════════════════════════════════════════
+// Tab 1 Increment 4 — Streaks / Leaderboard / History sub-tabs
+// ════════════════════════════════════════════════════════════════
+//
+// Three read-only sub-tabs surfacing existing data:
+//   • Streaks      — current/longest streak hero + 12-week heatmap
+//                    + milestone badges (3/7/14/30/50/100 days)
+//   • Leaderboard  — family points ranking across _profiles (multi-kid).
+//                    Per the locked plan: ranked by total chore points,
+//                    streak + verified count shown as chips.
+//   • History      — full D.choreLog, filterable by status, searchable
+//                    by chore name, grouped by month (newest first).
+//
+// Dual-write target: public.chore_streaks (see
+// docs/migrations/chore-streaks-schema.sql). updateChoreStreak() fires
+// from verifyChore on every approval. profile_id is _pidOf(activeProfile)
+// — Phase 1 of the PIN -> stable-id decouple (v249) backfilled
+// stableId for every profile, so the new table has no PIN debt.
+
+// ── Date helpers (LOCAL time, not UTC) ─────────────────────────
+// Heatmap cells must align with the kid's calendar day, which is local
+// time. toISOString().slice(0,10) silently shifts to UTC and can drop
+// or duplicate days across timezones — never use it for streak math.
+function _chDateStr(d){
+  const y  = d.getFullYear();
+  const m  = String(d.getMonth()+1).padStart(2,'0');
+  const da = String(d.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+da;
+}
+function _chToday(){ return _chDateStr(new Date()); }
+
+// Resolve the active profile's DATA key. Uses Phase 1's _pidOf() so
+// new chore_streaks rows are written under the stable id, not the
+// PIN. Solo accounts (no _profiles or no active) fall through to the
+// '_solo' sentinel matching the chores / chore_completions mirrors.
+function _chProfileKey(){
+  if(typeof _profiles !== 'undefined' && _profiles
+     && typeof _activeProfileId !== 'undefined' && _activeProfileId){
+    const active = _profiles.find(p => p && p.id === _activeProfileId);
+    if(active){
+      const k = (typeof _pidOf === 'function') ? _pidOf(active) : (active.stableId || active.id);
+      if(k) return String(k);
+    }
+  }
+  return '_solo';
+}
+
+// Defensive sibling-data hydration for the leaderboard.
+// _profiles[i].data is only guaranteed loaded for the active profile;
+// inactive siblings' data lives in their per-profile LS key
+// (lifeos_profile_<id>) and may not be in memory. Without hydrating,
+// inactive siblings render as zero across all metrics — making the
+// ranking misleading. Mirrors the existing initProfiles pattern at
+// parent.js:1442.
+function _chHydrateAllProfiles(){
+  if(typeof _profiles === 'undefined' || !Array.isArray(_profiles)) return;
+  if(typeof _ylccProfileDataKey !== 'function') return;
+  _profiles.forEach(function(p){
+    if(p && p.id && (!p.data || (typeof p.data === 'object' && Object.keys(p.data).length === 0))){
+      try {
+        const raw = localStorage.getItem(_ylccProfileDataKey(p.id));
+        if(raw) p.data = JSON.parse(raw);
+      } catch(e){ /* per-profile failure is non-fatal; row just shows zero */ }
+    }
+  });
+}
+
+// Computes { current, longest, total, last } from D.choreLog. Reused
+// by the Streaks renderer and updateChoreStreak's cloud-mirror so a
+// single source of truth defines streak semantics.
+//   current — consecutive days up to today w/ >= 1 verified chore
+//   longest — longest run anywhere in history
+//   last    — most recent date with >= 1 verified chore (YYYY-MM-DD)
+//   total   — distinct days lifetime with >= 1 verified chore
+function _choreStreakStats(){
+  initChoreData();
+  const verified = (D.choreLog||[]).filter(l => l && l.status === 'verified' && l.date);
+  if(!verified.length) return { current:0, longest:0, total:0, last:null };
+  const dates = [...new Set(verified.map(l => l.date))].sort();
+  const last  = dates[dates.length-1];
+
+  // Longest: walk sorted dates, count consecutive runs.
+  let longest = 0, run = 0, prev = null;
+  dates.forEach(d => {
+    if(!prev){ run = 1; }
+    else {
+      const pd = new Date(prev); pd.setDate(pd.getDate()+1);
+      const exp = _chDateStr(pd);
+      run = (exp === d) ? run+1 : 1;
+    }
+    if(run > longest) longest = run;
+    prev = d;
+  });
+
+  // Current: walk backwards from today. A gap immediately breaks.
+  const dateSet = new Set(dates);
+  let current = 0;
+  const cursor = new Date();
+  while(dateSet.has(_chDateStr(cursor))){
+    current++;
+    cursor.setDate(cursor.getDate()-1);
+  }
+  return { current, longest, total: dates.length, last };
+}
+
+// Heatmap intensity buckets (per the locked plan decision):
+//   0 -> faint  /  1 -> light  /  2 -> medium  /  3-4 -> strong  /  5+ -> peak
+function _chHeatmapColor(count){
+  if(count <= 0)  return 'rgba(255,255,255,.04)';
+  if(count === 1) return 'rgba(34,197,94,.22)';
+  if(count === 2) return 'rgba(34,197,94,.45)';
+  if(count <= 4)  return 'rgba(34,197,94,.7)';
+  return '#22c55e';
+}
+
+// 12-week SVG heatmap — pattern adapted from habits.js:buildHabitsHeatmap.
+// One cell per day, columns = weeks (oldest left), rows = day-of-week.
+function _chBuildHeatmap(weeks){
+  initChoreData();
+  const totalDays = weeks * 7;
+  const today = new Date();
+
+  // Bucket verified chores by date.
+  const dayCount = {};
+  (D.choreLog||[]).forEach(l => {
+    if(l && l.status === 'verified' && l.date){
+      dayCount[l.date] = (dayCount[l.date]||0) + 1;
+    }
+  });
+
+  const cell = 14, gap = 3, padX = 8, padY = 22;
+  const cols = weeks, rows = 7;
+  const W = padX*2 + cols*(cell+gap) - gap;
+  const H = padY + padX + rows*(cell+gap) - gap;
+
+  const cells = [];
+  for(let i = totalDays - 1; i >= 0; i--){
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const key = _chDateStr(d);
+    cells.push({ date:key, count: dayCount[key] || 0 });
+  }
+
+  const svg = [
+    `<svg width="100%" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="max-width:520px;">`,
+    `<text x="${padX}" y="14" fill="var(--tx2)" font-size="9" font-weight="700" font-family="var(--fn)" letter-spacing="1.2">${weeks}-WEEK CHORE HEATMAP</text>`
+  ];
+  cells.forEach((c, idx) => {
+    const col = Math.floor(idx / 7);
+    const row = idx % 7;
+    const x = padX + col * (cell + gap);
+    const y = padY + row * (cell + gap);
+    svg.push(`<rect x="${x}" y="${y}" width="${cell}" height="${cell}" rx="3" fill="${_chHeatmapColor(c.count)}"><title>${c.date}: ${c.count} verified</title></rect>`);
+  });
+  // Legend
+  const legendY = H - 4;
+  svg.push(`<text x="${padX}" y="${legendY}" fill="var(--tx3)" font-size="7.5" font-family="var(--fn)">less</text>`);
+  ['rgba(255,255,255,.04)','rgba(34,197,94,.22)','rgba(34,197,94,.45)','rgba(34,197,94,.7)','#22c55e'].forEach((c,i)=>{
+    svg.push(`<rect x="${padX + 22 + i*9}" y="${legendY-7}" width="7" height="7" rx="1.5" fill="${c}"/>`);
+  });
+  svg.push(`<text x="${padX + 22 + 5*9 + 3}" y="${legendY}" fill="var(--tx3)" font-size="7.5" font-family="var(--fn)">more</text>`);
+  svg.push('</svg>');
+  return svg.join('');
+}
+
+const CHORE_MILESTONES = [
+  { days: 3,   tier:'green',  icon:'🌱', label:'3 days' },
+  { days: 7,   tier:'green',  icon:'🔥', label:'7 days' },
+  { days: 14,  tier:'gold',   icon:'⚡', label:'14 days' },
+  { days: 30,  tier:'gold',   icon:'🏆', label:'30 days' },
+  { days: 50,  tier:'purple', icon:'💎', label:'50 days' },
+  { days: 100, tier:'purple', icon:'👑', label:'100 days' }
+];
+
+function renderChoreStreaks(){
+  const root = document.getElementById('ch-streaks'); if(!root) return;
+  const s = _choreStreakStats();
+  const heatmap = _chBuildHeatmap(12);
+
+  const milestones = CHORE_MILESTONES.map(m => {
+    const lit = s.longest >= m.days;
+    // Map the tier name to the matching --cz-* token pair so the badge
+    // borrows the chores design system's color story instead of hardcoding.
+    const tierColor = m.tier === 'gold'   ? 'var(--cz-gold)'
+                    : m.tier === 'purple' ? 'var(--cz-purple)'
+                    : 'var(--cz-accent)';
+    const tierBd    = m.tier === 'gold'   ? 'var(--cz-gold-bd)'
+                    : m.tier === 'purple' ? 'var(--cz-purple-bd)'
+                    : 'var(--cz-accent-bd)';
+    return `
+      <div class="cz-milestone${lit?' lit':''}" style="--mc:${tierColor};--mb:${tierBd};">
+        <div class="cz-milestone__icon">${m.icon}</div>
+        <div class="cz-milestone__label">${m.label}</div>
+        ${lit?'<div class="cz-milestone__check">✓</div>':''}
+      </div>`;
+  }).join('');
+
+  root.innerHTML = `
+    <div class="cz-streak-hero">
+      <div class="cz-streak-stat cz-streak-stat--main">
+        <div class="cz-streak-num">${s.current}</div>
+        <div class="cz-streak-label">CURRENT</div>
+      </div>
+      <div class="cz-streak-stat">
+        <div class="cz-streak-num cz-streak-num--alt">${s.longest}</div>
+        <div class="cz-streak-label">LONGEST</div>
+      </div>
+      <div class="cz-streak-stat">
+        <div class="cz-streak-num cz-streak-num--alt">${s.total}</div>
+        <div class="cz-streak-label">TOTAL DAYS</div>
+      </div>
+    </div>
+
+    <div class="cz-heatmap-card">
+      ${heatmap}
+      <div class="cz-heatmap-caption">Each cell is one day across the last 12 weeks. Greener = more verified chores that day.</div>
+    </div>
+
+    <div class="cz-section-title">🏅 MILESTONES</div>
+    <div class="cz-milestones">${milestones}</div>
+  `;
+}
+
+function renderChoreLeaderboard(){
+  const root = document.getElementById('ch-leaderboard'); if(!root) return;
+
+  // Sibling-data hydration first — inactive profiles' .data may live
+  // only in their per-profile LS key. Without this they render as 0
+  // across every metric, making the ranking misleading.
+  _chHydrateAllProfiles();
+
+  const profs = (typeof _profiles !== 'undefined' && Array.isArray(_profiles))
+    ? _profiles.filter(p => p && p.isParent !== true)
+    : [];
+
+  if(profs.length < 2){
+    root.innerHTML = `
+      <div class="cz-empty">
+        <div class="cz-empty__icon">🏅</div>
+        <div class="cz-empty__title">FAMILY LEADERBOARD</div>
+        <div class="cz-empty__body">Add a sibling profile to start the family ranking. Each kid's points, streak, and verified chores will be compared here.</div>
+        <button class="btn bp bs" onclick="showSection('s-parent')" style="font-size:.72rem;margin-top:.85rem;">Open Parent Hub →</button>
+      </div>`;
+    return;
+  }
+
+  // Per the locked plan: rank by total chore points; streak + verified
+  // count are informational chips. Solo profiles without a chorePoints
+  // field render as 0 — accurate "no data" rather than a crash.
+  const entries = profs.map(p => {
+    const pd = (p.data && typeof p.data === 'object') ? p.data : {};
+    const cp = (pd.chorePoints && typeof pd.chorePoints === 'object') ? pd.chorePoints : { total:0 };
+    const log = Array.isArray(pd.choreLog) ? pd.choreLog : [];
+    const verified = log.filter(l => l && l.status === 'verified').length;
+    const st  = pd.choreStreak;
+    const cur = (st && typeof st === 'object') ? (+st.current || 0)
+              : (Number.isFinite(+st) ? +st : 0);
+    return {
+      id: p.id,
+      name: p.name || 'Profile',
+      pts: +cp.total || 0,
+      verified: verified,
+      streak: cur
+    };
+  }).sort((a,b) => b.pts - a.pts);
+
+  const medals = ['🥇','🥈','🥉'];
+  const rows = entries.map((e,i) => `
+    <div class="cz-rank-row${i===0?' cz-rank-row--top':''}">
+      <div class="cz-rank-medal">${medals[i] || '#'+(i+1)}</div>
+      <div class="cz-rank-name">${escapeHtml(e.name)}</div>
+      <div class="cz-rank-chips">
+        <span class="cz-rank-chip">🔥 ${e.streak}d</span>
+        <span class="cz-rank-chip">✅ ${e.verified}</span>
+      </div>
+      <div class="cz-rank-pts">${e.pts}<span>pts</span></div>
+    </div>
+  `).join('');
+
+  root.innerHTML = `
+    <div class="cz-section-title">🏅 FAMILY LEADERBOARD</div>
+    <div class="cz-rank-list">${rows}</div>
+    <div class="cz-rank-caption">Ranked by total chore points. Streak + verified count shown for context.</div>
+  `;
+}
+
+// History sub-tab — filter chips + search input + month-grouped list.
+// Module-scoped UI state (not D.* — these don't need cloud sync).
+let _choreHistFilter = 'all';
+let _choreHistSearch = '';
+
+function _choreHistorySetFilter(f){ _choreHistFilter = f; renderChoreHistory(); }
+function _choreHistorySetSearch(input){
+  _choreHistSearch = String((input && input.value) || '').trim().toLowerCase();
+  renderChoreHistory();
+}
+
+const _CHORE_HIST_FILTERS = [
+  { id:'all',      label:'All',      match: l => true },
+  { id:'verified', label:'Verified', match: l => l.status === 'verified' },
+  { id:'pending',  label:'Pending',  match: l => l.status === 'pending' },
+  { id:'rejected', label:'Rejected', match: l => l.status === 'rejected' },
+  { id:'redeemed', label:'Redeemed', match: l => l.status === 'redeemed' }
+];
+
+function renderChoreHistory(){
+  const root = document.getElementById('ch-history'); if(!root) return;
+  initChoreData();
+  const log = Array.isArray(D.choreLog) ? D.choreLog.slice() : [];
+  // Newest first, ties broken by id (Date.now() at submit-time).
+  log.sort((a,b) => (b.date||'').localeCompare(a.date||'') || (b.id||0) - (a.id||0));
+
+  const counts = {};
+  _CHORE_HIST_FILTERS.forEach(f => {
+    counts[f.id] = log.filter(l => l && f.match(l)).length;
+  });
+
+  const filterChips = _CHORE_HIST_FILTERS.map(f => `
+    <button class="cz-hist-chip${_choreHistFilter===f.id?' cz-hist-chip--on':''}"
+            onclick="_choreHistorySetFilter('${f.id}')">
+      ${f.label} <span class="cz-hist-chip__n">${counts[f.id]||0}</span>
+    </button>`).join('');
+
+  const activeFilter = _CHORE_HIST_FILTERS.find(f => f.id === _choreHistFilter) || _CHORE_HIST_FILTERS[0];
+  let rows = log.filter(l => l && activeFilter.match(l));
+  if(_choreHistSearch){
+    rows = rows.filter(l => (l.choreName||'').toLowerCase().includes(_choreHistSearch));
+  }
+
+  let listHtml = '';
+  if(!rows.length){
+    listHtml = `<div class="cz-empty cz-empty--inline">No entries match. Verified chores will appear here as you finish them.</div>`;
+  } else {
+    // Month groups, newest first. Empty/unknown dates bucket as 0000-00.
+    const groups = {};
+    rows.forEach(l => {
+      const ym = (l.date || '0000-00').slice(0,7);
+      if(!groups[ym]) groups[ym] = [];
+      groups[ym].push(l);
+    });
+    const ymKeys = Object.keys(groups).sort().reverse();
+    const monthLabel = ym => {
+      if(ym === '0000-00') return 'Unknown date';
+      const [y,m] = ym.split('-');
+      const dt = new Date(+y, +m - 1, 1);
+      return dt.toLocaleDateString('en', { month:'long', year:'numeric' });
+    };
+
+    listHtml = ymKeys.map(ym => {
+      const items = groups[ym].map(l => {
+        // Difficulty comes from the log entry if snapshotted at submit,
+        // else falls back to the parent chore (may have changed since).
+        const choreObj = (D.chores||[]).find(c => c && c.id === l.choreId);
+        const diff = String(l.difficulty || (choreObj && choreObj.difficulty) || '');
+        const diffPill = diff
+          ? `<span class="cz-diff-pill cz-diff-pill--${diff}">${diff}</span>`
+          : '';
+        const statusPill = `<span class="cz-status-pill cz-status-pill--${l.status||'pending'}">${escapeHtml(l.status||'—')}</span>`;
+        // Redemptions carry negative pts (- spent on a reward). Show
+        // them in the purple --cz-purple to distinguish from earnings.
+        const ptsRaw = (l.pts == null) ? null : (+l.pts || 0);
+        const ptsText = (ptsRaw == null) ? '' : (ptsRaw > 0 ? '+'+ptsRaw : String(ptsRaw));
+        const ptsClass = (ptsRaw != null && ptsRaw < 0) ? 'cz-hist-pts cz-hist-pts--neg' : 'cz-hist-pts';
+        return `
+          <div class="cz-hist-row">
+            <div class="cz-hist-emoji">${escapeHtml(l.emoji || '📌')}</div>
+            <div class="cz-hist-main">
+              <div class="cz-hist-name">${escapeHtml(l.choreName || 'Chore')}</div>
+              <div class="cz-hist-meta">
+                <span class="cz-hist-date">${escapeHtml(l.date || '')}</span>
+                ${diffPill}
+                ${statusPill}
+              </div>
+            </div>
+            <div class="${ptsClass}">${ptsText}</div>
+          </div>`;
+      }).join('');
+      return `
+        <div class="cz-hist-month">
+          <div class="cz-hist-month__title">${monthLabel(ym)} <span class="cz-hist-month__n">${groups[ym].length}</span></div>
+          ${items}
+        </div>`;
+    }).join('');
+  }
+
+  root.innerHTML = `
+    <div class="cz-section-title">📜 ACTIVITY HISTORY</div>
+    <div class="cz-hist-chipbar">${filterChips}</div>
+    <div class="cz-hist-search">
+      <input type="text" placeholder="Search chore name…"
+             value="${escapeHtml(_choreHistSearch)}"
+             oninput="_choreHistorySetSearch(this)">
+    </div>
+    <div class="cz-hist-list">${listHtml}</div>
+  `;
+}
+
+// Dual-write: refresh D.choreStreak cache AND mirror to
+// public.chore_streaks. Fired from verifyChore on every approval.
+// Silent bail on 42P01 (table not applied yet) — matches the existing
+// _mirrorChoresToCloud discipline. Never throws.
+async function updateChoreStreak(){
+  initChoreData();
+  const s = _choreStreakStats();
+  D.choreStreak = { current:s.current, longest:s.longest, total:s.total, last:s.last };
+
+  const supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+  const uid  = (typeof _supaUser  !== 'undefined' && _supaUser) ? _supaUser.id : null;
+  if(!supa || !uid) return;
+
+  try {
+    const { error } = await supa.from('chore_streaks').upsert({
+      user_id:        uid,
+      profile_id:     _chProfileKey(),  // _pidOf(activeProfile) — Phase 1 stable id
+      current_streak: s.current,
+      longest_streak: s.longest,
+      last_completed: s.last,
+      total_verified: s.total,
+      updated_at:     new Date().toISOString()
+    }, { onConflict: 'user_id,profile_id' });
+    if(error && error.code !== '42P01'){
+      console.debug('[chore_streaks mirror] upsert skipped:', error.message);
+    }
+  } catch(e){
+    console.debug('[chore_streaks mirror] exception:', e && e.message);
+  }
+}
