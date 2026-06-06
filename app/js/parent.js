@@ -921,7 +921,25 @@ function renderExams(){
   }).join('');
 }
 
-// ── ALLOWANCE & EARNINGS ─────────────────────────────────────
+// ── ALLOWANCE & EARNINGS (legacy wallet system) ──────────────
+//
+// Tab 2 Inc 3 (2026-06-05) — renamed renderAllowance ->
+// _renderLegacyAllowanceWallet. The DOM targets this function wrote
+// to (#allowWallet, #allowAddAmt, #allowHistory, #allowSavings,
+// #allowSavingsGoalArea, #allowGoalName, #allowGoalAmt) no longer
+// exist anywhere in index.html — the UI was removed at some point
+// without cleaning up the JS. The write paths (addAllowanceIncome,
+// addAllowanceSpend, updateAllowSavingsGoal) similarly bind to dead
+// DOM ids and never fire in production today.
+//
+// The new finance.js renderAllowance() (Inc 3) owns the canonical
+// name for the new schedule-based allowance system. Ceding the
+// name here prevents finance.js's definition from being clobbered
+// by this one (parent.js loads later in script order — last
+// definition wins).
+//
+// Full retirement of D.allowance + these dead write paths is filed
+// under TAB2_MONEY_BUILD_PLAN.md §11.3.
 function initAllowance(){ if(!D.allowance) D.allowance={wallet:0,savings:0,totalEarned:0,goalName:'',goalAmt:0,log:[]}; }
 
 function addAllowanceIncome(){
@@ -970,7 +988,7 @@ function updateAllowSavingsGoal(){
   save();
 }
 
-function renderAllowance(){
+function _renderLegacyAllowanceWallet(){
   initAllowance();
   const a = D.allowance;
 
@@ -2815,7 +2833,7 @@ function phNav(tab){
   // hidden panels don't get their renderers fired needlessly.
   if(t === 'home')     { renderParentHubHome(); }
   if(t === 'chores')   { renderPhPendingChores(); renderParentChoreList(); renderParentSelfChores(); renderParentDeeds(); }
-  if(t === 'rewards')  { renderPhRewards(); if(typeof renderPhRewardsHeroChips === 'function') renderPhRewardsHeroChips(); }
+  if(t === 'rewards')  { renderPhRewards(); if(typeof renderPhRewardsHeroChips === 'function') renderPhRewardsHeroChips(); if(typeof renderPhAllowance === 'function') renderPhAllowance(); }
   if(t === 'contests') { renderParentLeaderboard(); renderParentContests(); renderParentFamilyRewards(); if(typeof renderPhContestsHeroChips === 'function') renderPhContestsHeroChips(); }
   if(t === 'activity') { initPhSchedPanel(); renderParentActivityAudit(); renderParentActivityFeed(); renderBehaviorLog(); renderGradeMonitor(); renderParentNotes(); }
   if(t === 'reports')  { renderParentGettingStarted(); renderParentMultiChild(); renderParentScore(); renderParentOverview(); renderWeeklyReportCard(); renderCompletionSummary(); renderSentQuizzes(); renderProgressReportsTab(); renderParentFaithReport(); }
