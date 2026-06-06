@@ -2842,7 +2842,7 @@ function phNav(tab){
   if(t === 'contests') { renderParentLeaderboard(); renderParentContests(); renderParentFamilyRewards(); if(typeof renderPhContestsHeroChips === 'function') renderPhContestsHeroChips(); }
   if(t === 'activity') { initPhSchedPanel(); renderParentActivityAudit(); renderParentActivityFeed(); renderBehaviorLog(); renderGradeMonitor(); renderParentNotes(); if(typeof renderPhActivityHeroChips === 'function') renderPhActivityHeroChips(); }
   if(t === 'reports')  { renderParentGettingStarted(); renderParentMultiChild(); renderParentScore(); renderParentOverview(); renderWeeklyReportCard(); renderCompletionSummary(); renderSentQuizzes(); renderProgressReportsTab(); renderParentFaithReport(); if(typeof renderPhReportsHeroChips === 'function') renderPhReportsHeroChips(); }
-  if(t === 'family')   { renderManageUsers(); renderParentLessons(); if(typeof renderParentGrowth==='function') renderParentGrowth(); if(typeof renderParentGrowthHistory==='function') renderParentGrowthHistory(); renderPhReferral(); }
+  if(t === 'family')   { renderManageUsers(); renderParentLessons(); if(typeof renderParentGrowth==='function') renderParentGrowth(); if(typeof renderParentGrowthHistory==='function') renderParentGrowthHistory(); renderPhReferral(); if(typeof renderPhFamilyHeroChips === 'function') renderPhFamilyHeroChips(); }
   if(t === 'controls') { renderParentScreenControls(); renderParentEarningsControls(); renderParentBucksControls(); renderIncentives(); if(typeof updateIncConditions==='function') updateIncConditions(); }
 }
 
@@ -3459,6 +3459,49 @@ function renderPhContestsHeroChips(){
     .filter(r => r).length;
   if(activeEl)  activeEl.textContent  = activeCt;
   if(rewardsEl) rewardsEl.textContent = rewardCt;
+}
+
+// Family & Profiles hero chips (Parent Hub design pass).
+// READ-ONLY count function. Three chips communicate the surface:
+//   • kids on this account  _profiles array, filtered by !isParent
+//   • referrals sent        D.referrals (array) or D.referralLog
+//   • growth check-ins      D.parentGrowthHistory length
+// Defensive guards on every D.* shape so a stray field type can't
+// break the hero. Same discipline as the other hero-chip renderers.
+function renderPhFamilyHeroChips(){
+  const kidsEl = document.getElementById('phFamChipKids');
+  const refEl  = document.getElementById('phFamChipReferrals');
+  const grEl   = document.getElementById('phFamChipGrowth');
+  if(!kidsEl && !refEl && !grEl) return;
+  // Kids — count from _profiles (the runtime profile array). Falls
+  // back to D._profiles (the cloud-mirrored slim copy) when the
+  // runtime array is unavailable.
+  let kidsCt = 0;
+  if(typeof _profiles !== 'undefined' && Array.isArray(_profiles)){
+    kidsCt = _profiles.filter(p => p && p.isParent === false).length;
+  } else if(Array.isArray(D._profiles)){
+    kidsCt = D._profiles.filter(p => p && p.isParent === false).length;
+  }
+  // Referrals — accept either an array (D.referrals / D.referralLog)
+  // or an object mapping referral id -> entry.
+  let refCt = 0;
+  if(Array.isArray(D.referrals)){
+    refCt = D.referrals.length;
+  } else if(Array.isArray(D.referralLog)){
+    refCt = D.referralLog.length;
+  } else if(D.referrals && typeof D.referrals === 'object'){
+    refCt = Object.keys(D.referrals).length;
+  }
+  // Growth check-ins — D.parentGrowthHistory is the canonical log.
+  let grCt = 0;
+  if(Array.isArray(D.parentGrowthHistory)){
+    grCt = D.parentGrowthHistory.length;
+  } else if(D.parentGrowthHistory && typeof D.parentGrowthHistory === 'object'){
+    grCt = Object.keys(D.parentGrowthHistory).length;
+  }
+  if(kidsEl) kidsEl.textContent = kidsCt;
+  if(refEl)  refEl.textContent  = refCt;
+  if(grEl)   grEl.textContent   = grCt;
 }
 
 // Reports & Progress hero chips (Parent Hub design pass).
