@@ -19077,6 +19077,21 @@ if (_origRefresh) {
   <span aria-hidden="true">←</span><span>Home</span>
 </button>
 
+<!-- ════ PRIMARY ACTION FAB (2026-06-06) ════
+     Site-wide floating "+ Add" pill that brings each section's
+     primary add/create CTA to thumb reach without forcing the user
+     to scroll. Bottom-LEFT so it doesn't collide with ← Home at
+     bottom-RIGHT. Visibility, label, and onclick are owned by
+     _updatePrimaryFab() in ui.js via PRIMARY_FAB_CONFIG[_activeSection].
+     Hidden by default — JS flips display when the active section
+     has a config entry AND the user is on mobile or in standalone
+     PWA mode. -->
+<button id="primaryFab" type="button" aria-label="Primary action"
+        onclick="(typeof _primaryFabClick==='function')&&_primaryFabClick()"
+        style="display:none;">
+  <span id="primaryFabLabel">+ Add</span>
+</button>
+
 <!-- ════════════════════════════════════════════════════════════
      Phase E — ONBOARDING OVERLAY (2026-05-15)
      4-step warm welcome flow, runs once on first launch when
