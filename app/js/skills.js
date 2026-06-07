@@ -4016,7 +4016,7 @@ function openSkillCategory(key){
   // Populate lessons tab
   const body = document.getElementById('skillModalBody');
   if(body){
-    body.innerHTML = lessons.length===0 ? '<div style="text-align:center;padding:2rem;color:var(--tx3);">Lessons coming soon!</div>' :
+    body.innerHTML = lessons.length===0 ? '<div style="text-align:center;padding:2rem;color:var(--tx3);">No lessons in this category yet — try the quiz to test what you already know.</div>' :
       lessons.map((l,i)=>`
         <div style="border-bottom:1px solid rgba(255,255,255,.04);padding:.8rem 0;">
           <div style="display:flex;align-items:center;gap:.4rem;cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
