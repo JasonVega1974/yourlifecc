@@ -7,6 +7,7 @@
 //   'daily-reflection'       — Phase F: one reflection question on a verse, Haiku, 300 tokens
 //   'study-partner'          — Phase F: explain/quiz/write tutor, Haiku, 300-500 tokens
 //   'goal-suggest'           — Phase F: 3 age-bracket goal suggestions, Haiku, 500 tokens JSON
+//   'chore-coach'            — Tab 1 Inc 5 Step C: weekly kid-voice chore coach, Haiku, 350 tokens JSON
 //
 // The /api/ai-summary endpoint is the single Anthropic ingress for the app.
 // Add new modes here rather than spinning up parallel endpoints.
@@ -75,6 +76,22 @@ const GOAL_SUGGEST_SYSTEM = SAFETY_PREAMBLE + '\n\n' + [
   'Use "type":"short" for goals achievable in weeks/months, "type":"long" for goals 1+ years out.'
 ].join('\n');
 
+// Tab 1 Inc 5 Step C — Chore Coach. Kid voice, second-person, motivational
+// but specific. Reads structured stats; writes a short praise summary + one
+// concrete next-week focus. Strict JSON so the chores.js renderer doesn't
+// have to do prose parsing.
+const CHORE_COACH_SYSTEM = SAFETY_PREAMBLE + '\n\n' + [
+  'You are the kid\'s weekly chore coach. Voice: warm, specific, motivational — like an older sibling who actually noticed what they did. Use "you" (never "we" or "the user"). Avoid generic praise like "great job" — name the actual thing they did.',
+  'Read the stats. Praise something concrete from the past week. Suggest ONE small, specific focus for next week — not a lecture, just a nudge.',
+  'Tone rules: never preachy, never condescending, never compare to siblings or other kids. If a week is light (0-1 verified chores), be encouraging without minimizing — "this week was a soft start, here\'s how to build from it" — never shame.',
+  'Length: summary 2-3 sentences MAX (~40 words). focus 1 sentence MAX (~20 words).',
+  'Return ONLY valid JSON in this exact shape (no prose before or after):',
+  '{',
+  '  "summary": "<2-3 second-person sentences naming specific wins from this week>",',
+  '  "focus":   "<1 sentence specific suggestion for next week>"',
+  '}'
+].join('\n');
+
 const VOTD_REFLECTION_SYSTEM = SAFETY_PREAMBLE + '\n\n' + [
   'You are a warm faith companion for a young person. Given a Bible verse, write exactly 2 sentences.',
   '1. A personal reflection connecting this verse to where they might be at their age.',
@@ -101,6 +118,7 @@ module.exports = async function handler(req, res) {
   const isVotdReflection      = mode === 'votd-reflection';
   const isMeditationGenerator = mode === 'meditation-generator';
   const isDailyDevotional     = mode === 'daily-devotional';
+  const isChoreCoach         = mode === 'chore-coach';
 
   // Per-mode prompt cap (tight to control cost + abuse). default summary
   // keeps its longer 4000-char allowance.
@@ -111,6 +129,7 @@ module.exports = async function handler(req, res) {
             : isVotdReflection       ? 600
             : isMeditationGenerator  ? 200  // theme/mood short input only
             : isDailyDevotional      ? 40   // date string (YYYY-MM-DD) only
+            : isChoreCoach           ? 1000 // structured stats blob — bounded
             : 4000;
   const safePrompt = String(prompt || '').slice(0, cap);
 
@@ -160,6 +179,13 @@ module.exports = async function handler(req, res) {
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 150,
         system: [{ type: 'text', text: VOTD_REFLECTION_SYSTEM, cache_control: { type: 'ephemeral' } }],
+        messages: [{ role: 'user', content: safePrompt }],
+      };
+    } else if (isChoreCoach) {
+      body = {
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 350,
+        system: [{ type: 'text', text: CHORE_COACH_SYSTEM, cache_control: { type: 'ephemeral' } }],
         messages: [{ role: 'user', content: safePrompt }],
       };
     } else if (isMeditationGenerator) {
@@ -274,6 +300,7 @@ Return ONLY valid JSON in this exact shape (no prose before or after):
                    || isGoalSuggest
                    || isMeditationGenerator
                    || isDailyDevotional
+                   || isChoreCoach
                    || (isStudyPartner && submode === 'quiz');
     if (wantsJson) {
       const cleaned = String(text).replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
