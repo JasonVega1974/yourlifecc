@@ -2696,6 +2696,8 @@ function _phChildSummary(child){
 function _phPendingApprovalCount(){
   // Pending submissions across all children. Tries each child's data blob;
   // for the active child also checks live D.
+  // Tab 2 Inc 7 Step B — also counts pending purchase requests so the
+  // Parent Hub home strip flags money asks alongside chore approvals.
   let total = 0;
   const profiles = (typeof _profiles !== 'undefined' && Array.isArray(_profiles)) ? _profiles : [];
   profiles.filter(p => p.isParent === false).forEach(c => {
@@ -2703,6 +2705,7 @@ function _phPendingApprovalCount(){
       ? D
       : c.data || {};
     total += (data.choreLog||[]).filter(l => l.status === 'pending').length;
+    total += (data.purchaseRequests||[]).filter(r => r && r.status === 'pending').length;
   });
   return total;
 }
@@ -2833,7 +2836,13 @@ function phNav(tab){
   // hidden panels don't get their renderers fired needlessly.
   if(t === 'home')     { renderParentHubHome(); }
   if(t === 'chores')   { renderPhPendingChores(); renderParentChoreList(); renderParentChorePacks(); renderParentSelfChores(); renderParentDeeds(); }
-  if(t === 'rewards')  { renderPhRewards(); if(typeof renderPhRewardsHeroChips === 'function') renderPhRewardsHeroChips(); }
+  if(t === 'rewards')  {
+    renderPhRewards();
+    if(typeof renderPhRewardsHeroChips  === 'function') renderPhRewardsHeroChips();
+    // Tab 2 Inc 7 Step B — purchase approvals queue lives under the
+    // Rewards Store & Bucks card (Option A per the build plan).
+    if(typeof renderPurchaseRequests    === 'function') renderPurchaseRequests();
+  }
   // Tab 2 Inc 3 (fix) — Allowance promoted to its own card + panel.
   // Was previously appended to the 'rewards' handler (where the
   // #parentAllowanceArea mount lived in #ph-controls — wrong panel
@@ -5852,3 +5861,156 @@ setInterval(function(){
     if(last) setSyncSt('cloud');
   }
 }, 60000);
+
+// ════════════════════════════════════════════════════════════
+// Tab 2 Inc 7 Step B — Parent purchase approvals.
+//
+// Surfaces the cross-kid purchase request queue inside the Parent
+// Hub Rewards Store & Bucks card (#ph-purchases sub-section). The
+// kid initiates via _submitPurchaseRequest() in finance.js when an
+// expense crosses D.purchaseApprovalThreshold; this side renders
+// the queue and provides approve / deny actions.
+//
+// Approve promotes the request into a real transaction in the kid's
+// D.transactions and stamps the request 'approved' (kept for audit).
+// Deny stamps 'denied' with an optional reviewerNote and keeps the
+// row visible to the kid so they understand the outcome.
+//
+// Cross-profile traversal: walks _profiles[] so the parent sees
+// requests from every kid in one place. Per-kid data writes go
+// through _withProfileData() (already used by the existing chore
+// approval flow) so the active profile context doesn't matter.
+// ════════════════════════════════════════════════════════════
+function _phCollectPurchaseRequests(){
+  // Returns [{ kid, kidName, req }] sorted newest-first across all kids.
+  var out = [];
+  var profiles = (typeof _profiles !== 'undefined' && Array.isArray(_profiles)) ? _profiles : [];
+  profiles.filter(function(p){ return p && p.isParent === false; }).forEach(function(c){
+    var isActive = (c.id === (typeof _activeProfileId !== 'undefined' ? _activeProfileId : null));
+    var data = (isActive && typeof D === 'object') ? D : (c.data || {});
+    var reqs = Array.isArray(data.purchaseRequests) ? data.purchaseRequests : [];
+    reqs.forEach(function(r){
+      if(!r) return;
+      out.push({ kid:c, kidName:(c.name || 'Kid'), req:r });
+    });
+  });
+  out.sort(function(a,b){
+    var ad = a.req.requestedAt || '';
+    var bd = b.req.requestedAt || '';
+    return bd.localeCompare(ad);
+  });
+  return out;
+}
+
+function _phReqAgeStr(iso){
+  var ms = Date.now() - new Date(iso || 0).getTime();
+  var min = Math.max(1, Math.round(ms / 60000));
+  if(min >= 1440) return Math.round(min/1440) + 'd ago';
+  if(min >= 60)   return Math.round(min/60)   + 'h ago';
+  return min + 'm ago';
+}
+
+function renderPurchaseRequests(){
+  var host = document.getElementById('phPurchaseList');
+  if(!host) return;
+  var rows = _phCollectPurchaseRequests();
+  if(!rows.length){
+    host.innerHTML = '<div class="ph-block-empty">No purchase requests right now. Kids get gated when an expense is over their $' + (Number(D.purchaseApprovalThreshold)||25).toFixed(0) + ' limit.</div>';
+    return;
+  }
+  var esc = (typeof _phEscape === 'function') ? _phEscape : function(s){ return String(s||''); };
+  host.innerHTML = rows.map(function(row){
+    var r = row.req;
+    var pending  = r.status === 'pending';
+    var approved = r.status === 'approved';
+    var denied   = r.status === 'denied';
+    var statusPill = pending  ? '<span class="ph-pur-pill ph-pur-pill--wait">' + _phReqAgeStr(r.requestedAt) + '</span>'
+                   : approved ? '<span class="ph-pur-pill ph-pur-pill--ok">approved</span>'
+                              : '<span class="ph-pur-pill ph-pur-pill--no">denied</span>';
+    var actions  = pending
+      ? ('<div class="ph-pur-actions">'
+        +   '<button type="button" class="ph-pur-btn ph-pur-btn--ok" onclick="approvePurchase(' + JSON.stringify(row.kid.id) + ',\'' + esc(r.id) + '\')">✓ Approve</button>'
+        +   '<button type="button" class="ph-pur-btn ph-pur-btn--no" onclick="denyPurchase('   + JSON.stringify(row.kid.id) + ',\'' + esc(r.id) + '\')">✕ Deny</button>'
+        + '</div>')
+      : '';
+    return '<div class="ph-pur-row' + (denied ? ' ph-pur-row--deny' : approved ? ' ph-pur-row--ok' : '') + '">'
+      +   '<div class="ph-pur-row__head">'
+      +     '<div class="ph-pur-row__kid">' + esc(row.kidName) + '</div>'
+      +     statusPill
+      +   '</div>'
+      +   '<div class="ph-pur-row__body">'
+      +     '<div class="ph-pur-row__name">' + esc(r.name) + '</div>'
+      +     '<div class="ph-pur-row__meta">' + esc(r.cat || 'Other') + ' · ' + (r.requestedAt ? esc(r.requestedAt.slice(0,10)) : '') + '</div>'
+      +   '</div>'
+      +   '<div class="ph-pur-row__amt">$' + Number(r.amount || 0).toFixed(2) + '</div>'
+      +   actions
+      + '</div>';
+  }).join('');
+}
+
+// Helper: mutate a kid's data blob and persist. Updates either live D
+// (when the kid is the active profile) or the profile's stored data
+// + saveProfiles(). Matches the existing chore approval pattern.
+function _phUpdateKidData(kidId, mutator){
+  var profiles = (typeof _profiles !== 'undefined' && Array.isArray(_profiles)) ? _profiles : [];
+  var kid = profiles.find(function(p){ return p && p.id === kidId; });
+  if(!kid) return false;
+  var isActive = (kid.id === (typeof _activeProfileId !== 'undefined' ? _activeProfileId : null));
+  if(isActive && typeof D === 'object'){
+    mutator(D);
+    if(typeof save === 'function') save();
+  } else {
+    if(!kid.data) kid.data = {};
+    mutator(kid.data);
+    if(typeof saveProfiles === 'function') saveProfiles();
+    if(typeof cloudSync === 'function') cloudSync();
+  }
+  return true;
+}
+
+function approvePurchase(kidId, reqId){
+  var ok = _phUpdateKidData(kidId, function(data){
+    if(!Array.isArray(data.purchaseRequests)) data.purchaseRequests = [];
+    var r = data.purchaseRequests.find(function(x){ return x && x.id === reqId; });
+    if(!r || r.status !== 'pending') return;
+    // Promote to a real transaction in the kid's ledger.
+    if(!Array.isArray(data.transactions)) data.transactions = [];
+    var txId = Date.now();
+    data.transactions.unshift({
+      id:   txId,
+      name: r.name,
+      amt:  Number(r.amount) || 0,
+      type: 'expense',
+      cat:  r.cat || 'Other',
+      date: (r.requestedAt || new Date().toISOString()).slice(0,10)
+    });
+    r.status       = 'approved';
+    r.reviewedAt   = new Date().toISOString();
+    r.txId         = txId;
+  });
+  if(!ok) return;
+  if(typeof renderPurchaseRequests === 'function') renderPurchaseRequests();
+  if(typeof renderParentHubHome   === 'function') renderParentHubHome();
+  if(typeof renderTx              === 'function') renderTx();
+  if(typeof updateFinSum          === 'function') updateFinSum();
+  if(typeof showToast             === 'function') showToast('✅ Approved — transaction posted to the kid\'s ledger');
+}
+
+function denyPurchase(kidId, reqId){
+  var note = '';
+  try {
+    note = prompt('Optional note for the kid (e.g. "ask me again next week")', '') || '';
+  } catch(_){}
+  var ok = _phUpdateKidData(kidId, function(data){
+    if(!Array.isArray(data.purchaseRequests)) data.purchaseRequests = [];
+    var r = data.purchaseRequests.find(function(x){ return x && x.id === reqId; });
+    if(!r || r.status !== 'pending') return;
+    r.status       = 'denied';
+    r.reviewedAt   = new Date().toISOString();
+    r.reviewerNote = String(note).slice(0, 200);
+  });
+  if(!ok) return;
+  if(typeof renderPurchaseRequests === 'function') renderPurchaseRequests();
+  if(typeof renderParentHubHome   === 'function') renderParentHubHome();
+  if(typeof showToast             === 'function') showToast('Denied — the kid will see the result in their tx list');
+}
