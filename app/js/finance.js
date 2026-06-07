@@ -31,7 +31,14 @@ function mTab(tab,btn){
       tab==='overview'?'dashboard':(tab==='savings'||tab==='savgoals')?'goals':'learn');
   }
   // Active-renderer dispatch (post-Inc-1).
-  if(tab==='dashboard') renderSpendingDonut();
+  if(tab==='dashboard'){
+    renderSpendingDonut();
+    // Tab 2 Inc 7 Step A — paint cached coach + auto-fetch when the
+    // ISO week has rolled over and there's enough activity to coach
+    // about. Manual refresh button always works via the ↻ control.
+    if(typeof renderMoneyCoach         === 'function') renderMoneyCoach();
+    if(typeof _maybeAutoFetchMoneyCoach === 'function') _maybeAutoFetchMoneyCoach();
+  }
   if(tab==='tx')        renderTx();
   if(tab==='budget')    calcBudget();
   if(tab==='goals')   { renderSavingsTab(); renderSavGoalCards(); if(typeof _runWhatIf === 'function') setTimeout(_runWhatIf, 0); }
@@ -2291,4 +2298,213 @@ function _checkMoneyMilestones(){
       // Don't let one milestone breakage block subsequent ones.
     }
   });
+}
+
+// ════════════════════════════════════════════════════════════
+// Tab 2 Inc 7 Step A — AI Money Coach.
+//
+// Weekly kid-voice second-person coaching card on #mt-dashboard.
+// Same architectural pattern as the chore coach (chores.js):
+//   - ISO-week cached in D.financeCoachLastWeek
+//   - Stats packaged from a 30-day window of D.transactions
+//   - Strict-JSON response via /api/ai-summary mode='money-coach'
+//   - Auto-fetch on mTab('dashboard') when stale + has activity
+//   - Manual ↻ refresh throttled to once per 6h
+//
+// Guardrails (mirrored from MONEY_COACH_SYSTEM in api/ai-summary.js):
+//   - never prescriptive financial advice
+//   - never specific dollar prescriptions
+//   - never compare to peers / averages
+//   - never project the future ("at this rate…")
+//   - empty weeks: encouraging, never shaming
+// ════════════════════════════════════════════════════════════
+function _finCoachIsoWeek(d){
+  d = (d instanceof Date) ? d : new Date();
+  var t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  t.setUTCDate(t.getUTCDate() + 4 - (t.getUTCDay() || 7));
+  var yearStart = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+  var week = Math.ceil(((t - yearStart) / 86400000 + 1) / 7);
+  return t.getUTCFullYear() + '-W' + String(week).padStart(2, '0');
+}
+
+function _finCoachStats30d(){
+  var now = new Date();
+  var floor = new Date(now.getTime() - 30 * 86400000);
+  var floorISO = floor.toISOString().slice(0,10);
+  var tx = Array.isArray(D.transactions) ? D.transactions : [];
+
+  // 30-day window. Strip `note` so PII text never leaves the device.
+  // The coach reads category + amount + type + date only.
+  var inWindow = tx.filter(function(t){ return t && (t.date || '') >= floorISO; });
+  var income  = inWindow.filter(function(t){ return t.type === 'income';  }).reduce(function(s,t){ return s + (Number(t.amount)||Number(t.amt)||0); }, 0);
+  var expense = inWindow.filter(function(t){ return t.type === 'expense'; }).reduce(function(s,t){ return s + (Number(t.amount)||Number(t.amt)||0); }, 0);
+
+  // Top expense categories (top 3 by total $)
+  var catTotals = {};
+  inWindow.forEach(function(t){
+    if(t.type !== 'expense') return;
+    var c = t.cat || 'other';
+    catTotals[c] = (catTotals[c] || 0) + (Number(t.amount)||Number(t.amt)||0);
+  });
+  var topCats = Object.keys(catTotals)
+    .sort(function(a,b){ return catTotals[b] - catTotals[a]; })
+    .slice(0,3)
+    .map(function(c){ return { cat:c, total:Math.round(catTotals[c]) }; });
+
+  // Savings goal traction — % of each goal
+  var goals = (Array.isArray(D.savingsGoals) ? D.savingsGoals : []).map(function(g){
+    var pct = (g.target > 0) ? Math.min(100, Math.round((g.current / g.target) * 100)) : 0;
+    return { name:String(g.name || '').slice(0,40), pct:pct };
+  });
+
+  // Allowance shape — amount + cadence label only
+  var allowance = null;
+  if(D.allowanceConfig && D.allowanceConfig.enabled && Number(D.allowanceConfig.amount) > 0){
+    allowance = {
+      amount:    Number(D.allowanceConfig.amount),
+      frequency: String(D.allowanceConfig.frequency || 'weekly')
+    };
+  }
+
+  // Lessons — count completed of 8 (Inc 5 / D.moneyLessonsProgress)
+  var lessonsCompleted = 0;
+  if(D.moneyLessonsProgress && D.moneyLessonsProgress.completed){
+    lessonsCompleted = Object.keys(D.moneyLessonsProgress.completed).length;
+  }
+
+  // Milestones earned in window (last 30d)
+  var milestonesRecent = 0;
+  if(D.moneyMilestones){
+    milestonesRecent = Object.keys(D.moneyMilestones).filter(function(k){
+      return D.moneyMilestones[k] >= floorISO;
+    }).length;
+  }
+
+  var name = (D.name || (D.profile && D.profile.parentName) || 'friend').toString().slice(0,40);
+  return {
+    name:             name,
+    days:             30,
+    txCount:          inWindow.length,
+    income:           Math.round(income),
+    expense:          Math.round(expense),
+    net:              Math.round(income - expense),
+    topExpenseCats:   topCats,
+    savingsGoals:     goals,
+    allowance:        allowance,
+    lessonsCompleted: lessonsCompleted,
+    lessonsTotal:     8,
+    milestonesRecent: milestonesRecent,
+    bankBalance:      Math.round(Number(D.bank)||0),
+    savingsBalance:   Math.round(Number(D.bankSavAcct)||0)
+  };
+}
+
+async function fetchMoneyCoach(){
+  if(!D.financeCoachLastWeek || typeof D.financeCoachLastWeek !== 'object'){
+    D.financeCoachLastWeek = { weekKey:'', summary:'', focus:'', fetchedAt:0 };
+  }
+  var SIX_HOURS = 6 * 60 * 60 * 1000;
+  var now = Date.now();
+  if(D.financeCoachLastWeek.fetchedAt && (now - D.financeCoachLastWeek.fetchedAt) < SIX_HOURS){
+    if(typeof showToast === 'function') showToast('Coach refreshed recently — try again later.');
+    return;
+  }
+  var stats = _finCoachStats30d();
+  if(stats.txCount === 0 && stats.lessonsCompleted === 0){
+    // Don't burn an API call on an empty profile.
+    D.financeCoachLastWeek = {
+      weekKey:   _finCoachIsoWeek(),
+      summary:   'No money activity yet — that\'s a clean slate. The first $1 saved is the hardest.',
+      focus:     'Log one transaction this week. Even a tiny one. Start the pattern.',
+      fetchedAt: now
+    };
+    save();
+    if(typeof renderMoneyCoach === 'function') renderMoneyCoach();
+    return;
+  }
+  var host = document.getElementById('moneyCoachCard');
+  if(host){
+    var body = host.querySelector('.mn-coach__body');
+    if(body) body.innerHTML = '<div class="mn-coach__loading">Coach is reading the numbers…</div>';
+  }
+  try {
+    var prompt = JSON.stringify(stats);
+    var resp = await fetch('/api/ai-summary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'money-coach', prompt: prompt })
+    });
+    var json = await resp.json();
+    if(!json || !json.ok || !json.summary){
+      throw new Error('Empty or malformed response');
+    }
+    D.financeCoachLastWeek = {
+      weekKey:   _finCoachIsoWeek(),
+      summary:   String(json.summary || '').slice(0, 500),
+      focus:     String(json.focus   || '').slice(0, 200),
+      fetchedAt: now
+    };
+    save();
+    if(typeof renderMoneyCoach === 'function') renderMoneyCoach();
+  } catch(e){
+    console.debug('[money-coach] fetch failed:', e && e.message);
+    if(host){
+      var body2 = host.querySelector('.mn-coach__body');
+      if(body2) body2.innerHTML = '<div class="mn-coach__err">Coach is offline right now. Try refresh in a minute.</div>';
+    }
+  }
+}
+
+function renderMoneyCoach(){
+  var host = document.getElementById('moneyCoachCard');
+  if(!host) return;
+  if(!D.financeCoachLastWeek || typeof D.financeCoachLastWeek !== 'object'){
+    D.financeCoachLastWeek = { weekKey:'', summary:'', focus:'', fetchedAt:0 };
+  }
+  var esc = function(s){
+    return String(s || '').replace(/[&<>"']/g, function(c){
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+    });
+  };
+  var stale = D.financeCoachLastWeek.weekKey !== _finCoachIsoWeek();
+  var hasContent = !!(D.financeCoachLastWeek.summary);
+
+  if(hasContent){
+    host.innerHTML = ''
+      + '<div class="mn-coach">'
+      +   '<div class="mn-coach__head">'
+      +     '<div class="mn-coach__title">💸 Your Money Coach</div>'
+      +     '<button type="button" class="mn-coach__refresh" onclick="fetchMoneyCoach()" title="Refresh coach (max once per 6h)">↻</button>'
+      +   '</div>'
+      +   '<div class="mn-coach__body">'
+      +     '<p class="mn-coach__summary">' + esc(D.financeCoachLastWeek.summary) + '</p>'
+      +     (D.financeCoachLastWeek.focus
+        ? '<p class="mn-coach__focus"><span class="mn-coach__focus-label">This week:</span> ' + esc(D.financeCoachLastWeek.focus) + '</p>'
+        : '')
+      +   '</div>'
+      +   (stale ? '<div class="mn-coach__stale">New week — tap ↻ for a fresh read</div>' : '')
+      + '</div>';
+  } else {
+    host.innerHTML = ''
+      + '<div class="mn-coach mn-coach--empty">'
+      +   '<div class="mn-coach__head">'
+      +     '<div class="mn-coach__title">💸 Your Money Coach</div>'
+      +     '<button type="button" class="mn-coach__refresh" onclick="fetchMoneyCoach()" title="Get my first coaching">↻</button>'
+      +   '</div>'
+      +   '<div class="mn-coach__body">'
+      +     '<p class="mn-coach__summary">No coaching yet. Tap ↻ once you\'ve logged a few transactions and I\'ll show you the pattern.</p>'
+      +   '</div>'
+      + '</div>';
+  }
+}
+
+function _maybeAutoFetchMoneyCoach(){
+  if(!D.financeCoachLastWeek || typeof D.financeCoachLastWeek !== 'object') return;
+  var stale = D.financeCoachLastWeek.weekKey !== _finCoachIsoWeek();
+  if(!stale) return;
+  var s = _finCoachStats30d();
+  // Auto-fetch only when there's meaningful activity to coach about —
+  // empty profiles get the friendly stub via the manual ↻ path instead.
+  if(s.txCount < 2 && s.lessonsCompleted < 1) return;
+  fetchMoneyCoach();
 }
