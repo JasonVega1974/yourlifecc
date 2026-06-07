@@ -676,12 +676,6 @@ function showFirstTimeGate(){
   finishInit();
 }
 
-function hideFirstTimeGate(){
-  const el = document.getElementById('firstTimeGate');
-  if(el) el.style.display = 'none';
-}
-
-
 // ── PIN HASHING & MIGRATION (Phase 1.1 add-on) ────────────────
 // Salt is the Supabase user id when present (different per family) and a
 // constant 'local' for local-only users. The salt is not a secret — it just
