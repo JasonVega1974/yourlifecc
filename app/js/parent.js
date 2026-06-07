@@ -98,10 +98,6 @@ function lockParentDash(){
   // Mom-persona: locking the hub also burns the post-login grace window so
   // anyone re-entering Parent Hub after Lock has to enter the PIN normally.
   try { localStorage.removeItem('ylcc_post_login'); } catch(e){}
-  // Cleanup of any stale flags from the previous deploy (storage-cache model).
-  // Safe to remove this block in a future deploy once known users have rotated.
-  try { sessionStorage.removeItem('parentUnlocked'); } catch(e){}
-  try { localStorage.removeItem('lifeos_parent_unlocked'); } catch(e){}
   const gate=document.getElementById('parentGate');
   const content=document.getElementById('parentDashContent');
   const err=document.getElementById('parentGateError');
@@ -1002,7 +998,7 @@ function _renderLegacyAllowanceWallet(){
   if(goalEl && a.goalName && a.goalAmt > 0){
     const pct = Math.min(100, (a.savings/a.goalAmt)*100);
     goalEl.innerHTML = `<div style="background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.15);border-radius:10px;padding:.6rem .8rem;">
-      <div style="display:flex;justify-content:space-between;font-size:.7rem;margin-bottom:.25rem;"><span style="color:#60a5fa;font-weight:700;">🎯 ${a.goalName}</span><span style="color:var(--tx2);">$${a.savings.toFixed(2)} / $${a.goalAmt.toFixed(2)}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:.7rem;margin-bottom:.25rem;"><span style="color:#60a5fa;font-weight:700;">🎯 ${escapeHtml(a.goalName)}</span><span style="color:var(--tx2);">$${a.savings.toFixed(2)} / $${a.goalAmt.toFixed(2)}</span></div>
       <div style="height:8px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#60a5fa,#22c55e);border-radius:4px;transition:width .4s;"></div></div>
       <div style="font-size:.55rem;color:var(--tx2);margin-top:.2rem;text-align:right;">${Math.round(pct)}% ${pct>=100?'— GOAL REACHED! 🎉':''}</div>
     </div>`;
@@ -1020,7 +1016,7 @@ function _renderLegacyAllowanceWallet(){
     <div style="display:flex;align-items:center;gap:.4rem;padding:.35rem .4rem;border-bottom:1px solid rgba(255,255,255,.04);">
       <span style="font-size:.7rem;">${l.type==='income'?'💰':l.type==='transfer'?'💙':'🛒'}</span>
       <div style="flex:1;">
-        <div style="font-size:.68rem;color:var(--tx);">${l.label}${l.note?' — '+l.note:''}</div>
+        <div style="font-size:.68rem;color:var(--tx);">${escapeHtml(l.label)}${l.note?' — '+escapeHtml(l.note):''}</div>
       </div>
       <span style="font-size:.72rem;font-weight:700;color:${l.type==='income'?'#22c55e':l.type==='transfer'?'#60a5fa':'#fb923c'};">${l.type==='income'?'+':l.type==='transfer'?'→':'-'}$${l.amt.toFixed(2)}</span>
       <span style="font-size:.48rem;color:var(--tx2);">${l.date.slice(5)}</span>
@@ -1159,9 +1155,9 @@ function renderMockInterviews(){
   const stars = n => '⭐'.repeat(n)+'☆'.repeat(5-n);
   el.innerHTML = mocks.slice(0,10).map(m=>`
     <div style="padding:.4rem .5rem;border-bottom:1px solid rgba(255,255,255,.04);">
-      <div style="display:flex;justify-content:space-between;"><span style="font-size:.7rem;font-weight:600;color:var(--tx);">${m.partner||'Solo practice'}</span><span style="font-size:.55rem;color:var(--tx2);">${m.date}</span></div>
+      <div style="display:flex;justify-content:space-between;"><span style="font-size:.7rem;font-weight:600;color:var(--tx);">${escapeHtml(m.partner||'Solo practice')}</span><span style="font-size:.55rem;color:var(--tx2);">${m.date}</span></div>
       <div style="font-size:.55rem;color:#fbbf24;">${stars(m.rating)}</div>
-      ${m.notes?`<div style="font-size:.6rem;color:var(--tx2);margin-top:.15rem;">${m.notes}</div>`:''}
+      ${m.notes?`<div style="font-size:.6rem;color:var(--tx2);margin-top:.15rem;">${escapeHtml(m.notes)}</div>`:''}
     </div>
   `).join('');
 }
@@ -3252,7 +3248,7 @@ function renderParentGrowthHistory(){
           return `<span style="font-size:.58rem;background:rgba(255,255,255,.04);border-radius:4px;padding:.15rem .3rem;">${area?area.label.split(' ')[0]:k} ${v}/5</span>`;
         }).join('')}
       </div>
-      ${h.note?`<div style="font-size:.72rem;color:var(--tx2);line-height:1.5;margin-top:.2rem;">${h.note}</div>`:''}
+      ${h.note?`<div style="font-size:.72rem;color:var(--tx2);line-height:1.5;margin-top:.2rem;">${escapeHtml(h.note)}</div>`:''}
     </div>
   `).join('');
 }
@@ -3890,10 +3886,10 @@ function renderParentContests(){
     const daysLeft = Math.max(0, Math.ceil((new Date(c.endDate)-new Date())/86400000));
     return `<div style="background:rgba(255,255,255,.02);border:1px solid ${isActive?'rgba(251,191,36,.12)':'rgba(255,255,255,.04)'};border-radius:8px;padding:.5rem .6rem;margin-bottom:.3rem;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.2rem;">
-        <span style="font-size:.75rem;font-weight:700;">${isActive?'🟢':'⚫'} ${c.title}</span>
+        <span style="font-size:.75rem;font-weight:700;">${isActive?'🟢':'⚫'} ${escapeHtml(c.title)}</span>
         <span style="font-size:.55rem;color:var(--tx3);">${isActive?daysLeft+' days left':'Ended'}</span>
       </div>
-      ${c.desc?`<div style="font-size:.65rem;color:var(--tx2);margin-bottom:.2rem;">${c.desc}</div>`:''}
+      ${c.desc?`<div style="font-size:.65rem;color:var(--tx2);margin-bottom:.2rem;">${escapeHtml(c.desc)}</div>`:''}
       <div style="display:flex;gap:.5rem;font-size:.6rem;color:var(--tx3);">
         <span>🏆 ${c.prize} PB</span>
         <span>${c.type==='group'?'👨‍👩‍👧‍👦 Family':'👤 Individual'}</span>
@@ -4231,7 +4227,7 @@ function renderSentQuizzes(){
   el.innerHTML = quizzes.slice(0,10).map(q=>`
     <div style="display:flex;align-items:center;gap:.4rem;padding:.3rem .4rem;border-bottom:1px solid rgba(255,255,255,.03);font-size:.65rem;">
       <span style="color:${q.status==='pending'?'#fbbf24':q.status==='passed'?'#22c55e':'#ef4444'};">${q.status==='pending'?'⏳':q.status==='passed'?'✅':'❌'}</span>
-      <span style="flex:1;">${q.title} (${q.questions.length}q)</span>
+      <span style="flex:1;">${escapeHtml(q.title)} (${q.questions.length}q)</span>
       <span style="font-size:.55rem;color:var(--tx3);">${q.sentDate}</span>
       ${q.score!==undefined?`<span style="font-weight:700;color:${q.score>=70?'#22c55e':'#ef4444'};">${q.score}%</span>`:''}
       ${q.status==='pending'?`<button onclick="cancelQuiz(${q.id})" style="font-size:.4rem;color:var(--tx3);background:none;border:none;cursor:pointer;">✕</button>`:''}
@@ -4594,8 +4590,8 @@ function renderChallenges(){
         <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem;">
           <span style="font-size:1.3rem;">🏆</span>
           <div style="flex:1;">
-            <div style="font-size:.85rem;font-weight:800;color:#fbbf24;">${c.title}</div>
-            <div style="font-size:.62rem;color:var(--tx2);">${c.desc||'Custom contest from parent'}</div>
+            <div style="font-size:.85rem;font-weight:800;color:#fbbf24;">${escapeHtml(c.title)}</div>
+            <div style="font-size:.62rem;color:var(--tx2);">${escapeHtml(c.desc||'Custom contest from parent')}</div>
           </div>
         </div>
         <div style="font-size:.6rem;color:var(--tx3);">🏆 Prize: ${c.prize} PB · ${c.type==='group'?'👨‍👩‍👧‍👦 Family':'👤 Individual'} · Ends: ${c.endDate}</div>
@@ -4663,7 +4659,7 @@ function renderHelpfulDeeds(){
   el.innerHTML = deeds.map(d=>`
     <div style="display:flex;align-items:center;gap:.3rem;padding:.2rem 0;font-size:.65rem;border-bottom:1px solid rgba(255,255,255,.03);">
       <span>${d.approved?'✅':'⏳'}</span>
-      <span style="flex:1;color:var(--tx2);">${d.text}</span>
+      <span style="flex:1;color:var(--tx2);">${escapeHtml(d.text)}</span>
       <span style="font-size:.5rem;color:var(--tx3);">${d.date.slice(5)}</span>
     </div>
   `).join('');
@@ -5126,7 +5122,7 @@ function renderGrowthTracker(){
       <span style="color:var(--tx3);font-size:.62rem;min-width:55px;">${r.date}</span>
       ${r.height?`<span style="color:#38bdf8;font-weight:600;">📏 ${Math.floor(r.height/12)}'${r.height%12}"</span>`:''}
       ${r.weight?`<span style="color:#22c55e;font-weight:600;">⚖️ ${r.weight} lbs</span>`:''}
-      ${r.note?`<span style="color:var(--tx2);font-style:italic;flex:1;">${r.note}</span>`:''}
+      ${r.note?`<span style="color:var(--tx2);font-style:italic;flex:1;">${escapeHtml(r.note)}</span>`:''}
       <button onclick="D.growthLog=(D.growthLog||[]).filter(x=>x.id!==${r.id});save();renderGrowthTracker();" style="font-size:.4rem;color:var(--tx3);background:none;border:none;cursor:pointer;">🗑</button>
     </div>
   `).join('');
