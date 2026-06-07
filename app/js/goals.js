@@ -1171,5 +1171,20 @@ function openCareerModal(id){
   openModal('careerModal');
 }
 
-function addCustomCareer(){ const v=(document.getElementById('customCareer').value||'').trim(); if(!v) return; const el=document.getElementById('careerGrid'); if(!el) return; const div=document.createElement('div'); div.setAttribute('onclick',`toggleCareer(this,'${v}')`); div.style.cssText='padding:.65rem;background:rgba(255,255,255,.1);border-radius:9px;cursor:pointer;border:1px solid transparent;transition:all .14s;'; div.innerHTML=`<div style="font-size:1.4rem;">💡</div><div style="font-weight:700;font-size:.8rem;margin:.22rem 0;">${v}</div><div style="font-size:.68rem;color:#c8d4e8;">Your idea</div>`; el.appendChild(div); document.getElementById('customCareer').value=''; showToast('Career added!'); }
+function addCustomCareer(){
+  const v = (document.getElementById('customCareer').value||'').trim();
+  if(!v) return;
+  const el = document.getElementById('careerGrid');
+  if(!el) return;
+  const div = document.createElement('div');
+  // Phase 1 XSS hardening — wire click via addEventListener (closes over
+  // the trimmed value) instead of an interpolated onclick attribute, and
+  // escapeHtml the user-typed name before inner-HTML interpolation.
+  div.addEventListener('click', function(){ toggleCareer(div, v); });
+  div.style.cssText = 'padding:.65rem;background:rgba(255,255,255,.1);border-radius:9px;cursor:pointer;border:1px solid transparent;transition:all .14s;';
+  div.innerHTML = `<div style="font-size:1.4rem;">💡</div><div style="font-weight:700;font-size:.8rem;margin:.22rem 0;">${escapeHtml(v)}</div><div style="font-size:.68rem;color:#c8d4e8;">Your idea</div>`;
+  el.appendChild(div);
+  document.getElementById('customCareer').value = '';
+  showToast('Career added!');
+}
 
