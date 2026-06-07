@@ -200,6 +200,16 @@ const DEF = {
   // Catalog (10 badges) lives in chores.js → CHORE_BADGES. Award path:
   // _checkChoreBadges() runs after every verifyChore + approveSelfChore.
   choreBadges:{},
+  // 2026-06-06 — Tab 1 Increment 5 Step C. Weekly AI Coach cache.
+  //   weekKey   — ISO 'YYYY-Www' of the week the response was generated
+  //   summary   — 2-3 second-person sentences praising specific wins
+  //   focus     — 1 sentence specific suggestion for next week
+  //   fetchedAt — ms epoch of last fetch (used for client-side throttle)
+  // The /api/ai-summary 'chore-coach' mode is the only writer.
+  // renderChoreCoach() in chores.js reads weekKey vs current ISO week to
+  // decide whether to auto-fetch. Manual refresh button respects a 6h
+  // floor between fetches to keep API spend down on impatient kids.
+  choreCoachLastWeek:{ weekKey:'', summary:'', focus:'', fetchedAt:0 },
   rewards:[], incentives:[], behaviorLog:[], parentNotes:[],
   parentPIN:'', parentPinDisabled:false, parentWizardDone:false,
   parentGrowth:[], childAvatar:'', childAvatarPhoto:'',
