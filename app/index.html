@@ -6980,6 +6980,30 @@
       <!-- Pending & History -->
       <div id="helpfulChoresList" style="margin-top:.5rem;max-height:200px;overflow-y:auto;"></div>
     </div>
+
+    <!-- ─── Tab 1 Inc 5 Step B — Chore Badges (parallel surface) ───
+         Painted by renderChoreBadges() in chores.js from CHORE_BADGES
+         + D.choreBadges. Visible only on the kid's #ch-mychores tab.
+         Scoped CSS for .cb-grid / .cb-badge lives in the inline style
+         block below — keeps the surface self-contained to #s-chores. -->
+    <style>
+      #s-chores .cb-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;flex-wrap:wrap;margin-bottom:.55rem;}
+      #s-chores .cb-head__title{font-family:var(--fh);font-size:.7rem;letter-spacing:1.5px;color:#fbbf24;}
+      #s-chores .cb-head__count{font-size:.7rem;color:var(--tx2);font-weight:800;letter-spacing:.04em;}
+      #s-chores .cb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.55rem;}
+      #s-chores .cb-badge{position:relative;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:.7rem .55rem;text-align:center;font-family:var(--fn);cursor:default;-webkit-tap-highlight-color:transparent;overflow:hidden;}
+      #s-chores .cb-badge::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%, var(--cb-accent, #fbbf24) 0%, transparent 65%);opacity:0;transition:opacity .2s;pointer-events:none;}
+      #s-chores .cb-badge--earned{border-color:color-mix(in srgb, var(--cb-accent, #fbbf24) 40%, transparent);background:linear-gradient(180deg,color-mix(in srgb,var(--cb-accent,#fbbf24) 10%, rgba(255,255,255,.03)),rgba(255,255,255,.02));box-shadow:0 4px 14px color-mix(in srgb, var(--cb-accent, #fbbf24) 18%, transparent);}
+      #s-chores .cb-badge--earned::before{opacity:.15;}
+      #s-chores .cb-badge--locked{filter:grayscale(.85);opacity:.55;}
+      #s-chores .cb-badge__icon{font-size:1.8rem;line-height:1;margin-bottom:.25rem;position:relative;}
+      #s-chores .cb-badge--locked .cb-badge__icon{filter:blur(.4px);}
+      #s-chores .cb-badge__label{font-size:.72rem;font-weight:800;color:var(--tx);letter-spacing:.01em;line-height:1.15;margin-bottom:.15rem;position:relative;}
+      #s-chores .cb-badge__sub{font-size:.58rem;color:var(--tx2);line-height:1.3;font-weight:600;position:relative;}
+      :root.light #s-chores .cb-badge{background:#ffffff;border-color:rgba(15,23,42,.08);}
+      :root.light #s-chores .cb-badge--locked{background:#f8fafc;}
+    </style>
+    <div id="choreBadgesGrid" style="margin-top:1rem;"></div>
   </div>
 
   <!-- ── PANEL: Chore Store — unified Parent Bucks store (Tab 1 Inc 3) -->
