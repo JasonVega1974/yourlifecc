@@ -2810,6 +2810,43 @@
       background:var(--mz-surface-soft);border:1px dashed var(--mz-card-border);
       border-radius:14px;
     }
+    /* ── Tab 2 Inc 7 Step B — pending purchase request strip ── */
+    #s-finance .mz-tx-pending{
+      background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(251,191,36,.05));
+      border:1px solid rgba(167,139,250,.22);
+      border-radius:14px;padding:.7rem .85rem;margin-bottom:.9rem;
+    }
+    #s-finance .mz-tx-pending__title{
+      font-family:var(--fh);font-size:.66rem;letter-spacing:1.2px;
+      color:#c4b5fd;margin-bottom:.55rem;
+    }
+    #s-finance .mz-tx-pending__row{
+      display:grid;grid-template-columns:auto 1fr auto;gap:.55rem;
+      align-items:center;padding:.45rem .55rem;border-radius:9px;
+      background:rgba(255,255,255,.03);margin-bottom:.3rem;
+    }
+    #s-finance .mz-tx-pending__row:last-child{ margin-bottom:0; }
+    #s-finance .mz-tx-pending__row--deny{ opacity:.55; }
+    #s-finance .mz-tx-pending__emoji{ font-size:1.15rem; line-height:1; }
+    #s-finance .mz-tx-pending__name{
+      font-size:.85rem;font-weight:700;color:var(--tx);line-height:1.2;
+    }
+    #s-finance .mz-tx-pending__meta{
+      font-size:.62rem;color:var(--tx2);margin-top:.15rem;
+    }
+    #s-finance .mz-tx-pending__pill{
+      font-size:.56rem;font-weight:800;padding:.14rem .42rem;border-radius:999px;
+      letter-spacing:.04em;text-transform:uppercase;
+    }
+    #s-finance .mz-tx-pending__pill--wait{ background:rgba(251,191,36,.18); color:#fbbf24; }
+    #s-finance .mz-tx-pending__pill--deny{ background:rgba(239,68,68,.15); color:#f87171; }
+    #s-finance .mz-tx-pending__amt{
+      font-family:var(--fh);font-size:1.05rem;color:#fbbf24;line-height:1;
+    }
+    #s-finance .mz-tx-pending__row--deny .mz-tx-pending__amt{
+      color:#f87171;text-decoration:line-through;
+    }
+    :root.light #s-finance .mz-tx-pending{ background:#fff; }
   </style>
 
   <div id="mt-tx" style="display:none;">
@@ -16195,6 +16232,47 @@
             </div>
             <div class="ph-block">
               <div id="phPBHistory" style="max-height:240px;overflow-y:auto;"></div>
+            </div>
+          </section>
+
+          <!-- ── Section 7 · PURCHASE APPROVALS (Tab 2 Inc 7 Step B) ─
+               Populated by renderPurchaseRequests() in parent.js from
+               D.purchaseRequests across every kid profile. Approve
+               promotes the request into D.transactions (real expense
+               row); Deny stamps the row with status='denied' and an
+               optional note. No TTL — old requests stay visible with
+               an age tag so the parent sees how long they've waited. -->
+          <style>
+            #ph-rewards #ph-purchases .ph-pur-row{display:grid;grid-template-columns:1fr auto;gap:.4rem .8rem;align-items:center;padding:.7rem .85rem;background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.16);border-radius:12px;margin-bottom:.55rem;}
+            #ph-rewards #ph-purchases .ph-pur-row--ok{background:rgba(34,197,94,.05);border-color:rgba(34,197,94,.18);opacity:.7;}
+            #ph-rewards #ph-purchases .ph-pur-row--deny{background:rgba(239,68,68,.04);border-color:rgba(239,68,68,.14);opacity:.7;}
+            #ph-rewards #ph-purchases .ph-pur-row__head{grid-column:1 / 2;display:flex;align-items:center;gap:.5rem;}
+            #ph-rewards #ph-purchases .ph-pur-row__kid{font-family:var(--fh);font-size:.66rem;letter-spacing:.1em;color:var(--tx2);text-transform:uppercase;}
+            #ph-rewards #ph-purchases .ph-pur-row__body{grid-column:1 / 2;}
+            #ph-rewards #ph-purchases .ph-pur-row__name{font-size:.92rem;font-weight:800;color:var(--tx);line-height:1.25;}
+            #ph-rewards #ph-purchases .ph-pur-row__meta{font-size:.66rem;color:var(--tx3);margin-top:.1rem;}
+            #ph-rewards #ph-purchases .ph-pur-row__amt{grid-column:2 / 3;grid-row:1 / 4;font-family:var(--fh);font-size:1.6rem;line-height:1;color:#fbbf24;align-self:center;text-align:right;}
+            #ph-rewards #ph-purchases .ph-pur-row--ok .ph-pur-row__amt{color:#34d399;}
+            #ph-rewards #ph-purchases .ph-pur-row--deny .ph-pur-row__amt{color:#f87171;text-decoration:line-through;}
+            #ph-rewards #ph-purchases .ph-pur-pill{font-size:.58rem;font-weight:800;padding:.18rem .5rem;border-radius:999px;letter-spacing:.04em;text-transform:uppercase;}
+            #ph-rewards #ph-purchases .ph-pur-pill--wait{background:rgba(251,191,36,.15);color:#fbbf24;}
+            #ph-rewards #ph-purchases .ph-pur-pill--ok{background:rgba(34,197,94,.15);color:#34d399;}
+            #ph-rewards #ph-purchases .ph-pur-pill--no{background:rgba(239,68,68,.15);color:#f87171;}
+            #ph-rewards #ph-purchases .ph-pur-actions{grid-column:1 / 3;display:flex;gap:.4rem;margin-top:.3rem;}
+            #ph-rewards #ph-purchases .ph-pur-btn{flex:1;font-family:var(--fn);font-size:.78rem;font-weight:800;padding:.5rem .8rem;border-radius:9px;cursor:pointer;border:1px solid transparent;-webkit-tap-highlight-color:transparent;transition:filter .15s;}
+            #ph-rewards #ph-purchases .ph-pur-btn--ok{background:linear-gradient(135deg,#22c55e,#16a34a);color:#0a1f0d;}
+            #ph-rewards #ph-purchases .ph-pur-btn--no{background:rgba(239,68,68,.08);color:#f87171;border-color:rgba(239,68,68,.3);}
+            #ph-rewards #ph-purchases .ph-pur-btn:active{filter:brightness(.92);}
+            :root.light #ph-rewards #ph-purchases .ph-pur-row{background:#fff;border-color:rgba(15,23,42,.08);}
+          </style>
+          <section class="ph-sec" id="ph-purchases">
+            <div class="ph-seclabel">
+              <span class="ph-ic ph-ic-violet">💳</span>
+              <h2 class="ph-h2">Purchase approvals</h2>
+              <span class="ph-hint">kids' expense requests over $<span id="phPurchaseThresholdLabel">25</span></span>
+            </div>
+            <div class="ph-block">
+              <div id="phPurchaseList"></div>
             </div>
           </section>
 
