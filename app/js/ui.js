@@ -1261,9 +1261,78 @@ function _updateMobileHomeBack(){
   var isHome = (_activeSection === 's-hero') || !_activeSection;
   btn.style.display = ((standalone || narrow) && !isHome) ? 'inline-flex' : 'none';
 }
+
+// ════════════════════════════════════════════════════════════
+// 2026-06-06 — Primary action FAB (#primaryFab in app/index.html).
+//
+// Site-wide bottom-left floating pill that brings each section's
+// primary add/create CTA to thumb reach. Defeats the iOS scroll-
+// momentum-makes-the-button-hard-to-tap problem by giving the user
+// a stable, viewport-anchored target.
+//
+// Per-section config map. Each entry: { label, action } where action
+// is one of:
+//   { type:'focus', selector }  — scrollIntoView + focus the field
+//   { type:'click', selector }  — synthetic .click() on the element
+//   { type:'fn',    fn, args }  — call window[fn](...args)
+//
+// Sections not in this map get no FAB (button hidden). Same mobile-
+// or-standalone gate as ← Home.
+// ════════════════════════════════════════════════════════════
+const PRIMARY_FAB_CONFIG = {
+  's-chores':  { label:'+ Log helpful', action:{ type:'focus', selector:'#helpfulChoreInput' } },
+  's-finance': { label:'+ Add',         action:{ type:'focus', selector:'#txName' } },
+  's-goals':   { label:'+ New goal',    action:{ type:'fn',    fn:'openModal', args:['goalAddModal'] } },
+  's-health':  { label:'+ Add habit',   action:{ type:'click', selector:'#s-health button[onclick="addHabit()"]' } },
+  's-mood':    { label:'+ Log mood',    action:{ type:'focus', selector:'.mood-btn' } }
+};
+
+function _primaryFabClick(){
+  var cfg = PRIMARY_FAB_CONFIG[_activeSection];
+  if(!cfg || !cfg.action) return;
+  var a = cfg.action;
+  if(a.type === 'focus'){
+    var el = document.querySelector(a.selector);
+    if(!el) return;
+    if(typeof el.scrollIntoView === 'function'){
+      el.scrollIntoView({ behavior:'smooth', block:'center' });
+    }
+    // Defer focus so it lands after the smooth-scroll settles.
+    // iOS Safari otherwise jumps the keyboard up mid-scroll.
+    setTimeout(function(){
+      if(typeof el.focus === 'function') el.focus();
+    }, 320);
+  } else if(a.type === 'click'){
+    var btn = document.querySelector(a.selector);
+    if(btn && typeof btn.click === 'function') btn.click();
+  } else if(a.type === 'fn'){
+    var fn = window[a.fn];
+    if(typeof fn === 'function') fn.apply(null, a.args || []);
+  }
+}
+
+function _updatePrimaryFab(){
+  var btn = document.getElementById('primaryFab');
+  if(!btn) return;
+  var standalone = (window.navigator && window.navigator.standalone === true) ||
+                   (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+  var narrow = (window.innerWidth || document.documentElement.clientWidth || 0) <= 860;
+  var cfg = PRIMARY_FAB_CONFIG[_activeSection];
+  var shouldShow = (standalone || narrow) && !!cfg;
+  if(shouldShow){
+    var lbl = document.getElementById('primaryFabLabel');
+    if(lbl) lbl.textContent = cfg.label;
+    btn.style.display = 'inline-flex';
+  } else {
+    btn.style.display = 'none';
+  }
+}
+
 if(typeof window !== 'undefined'){
   window.addEventListener('resize',           _updateMobileHomeBack);
   window.addEventListener('orientationchange', _updateMobileHomeBack);
+  window.addEventListener('resize',            _updatePrimaryFab);
+  window.addEventListener('orientationchange', _updatePrimaryFab);
 }
 
 // Reverse lookup: which tab owns this section?
@@ -1805,6 +1874,10 @@ function showSection(id, fromMobile){
   // (b) we're not already on the home section. Owned entirely by
   // JS so standalone-PWA users on wide viewports still see it.
   if(typeof _updateMobileHomeBack === 'function') _updateMobileHomeBack();
+  // 2026-06-06 — Primary action FAB. Bottom-left floating pill that
+  // brings each section's add CTA to thumb reach. Hidden when the
+  // section isn't in PRIMARY_FAB_CONFIG OR the viewport is desktop.
+  if(typeof _updatePrimaryFab === 'function') _updatePrimaryFab();
 
   // Update nav highlights
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
