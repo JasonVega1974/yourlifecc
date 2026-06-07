@@ -18562,6 +18562,13 @@
      inside function bodies that fire on user interaction, so the
      "data loads after feature modules" ordering is safe. -->
 <script src="/app/js/data/money-lessons.js"></script>
+<!-- Tab 1 Chores / Inc 5 Step A-2 — Seasonal chore-pack catalog.
+     Same load group as money-lessons.js: feature-tab data modules
+     that loader-side renderers reference inside event handlers, so
+     it's safe for the data file to follow the feature module
+     (chores.js) in the script order. Read by addChorePack() in
+     chores.js + the Parent Hub pack renderer in parent.js. -->
+<script src="/app/js/data/chore-packs.js"></script>
 <script src="/app/js/data/academy.js"></script>
 <script src="/app/js/data/academy-lessons.js"></script>
 <script src="/app/js/data/biblical-sites.js"></script>
