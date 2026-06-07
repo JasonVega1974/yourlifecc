@@ -302,10 +302,10 @@ function showSubBlockedScreen(reason){
       ctaEl.onclick = null;
     }
   } else if(reason === 'cancelled'){
-    if(msgEl) msgEl.textContent = 'Your subscription has been cancelled. Reactivate anytime to pick up right where you left off — your data is saved.';
+    if(msgEl) msgEl.textContent = 'Your subscription has been cancelled. Reach out to reactivate — your data is saved.';
     if(ctaEl){
-      ctaEl.textContent = 'Reactivate Subscription';
-      ctaEl.href = 'https://yourlifecc.com/#pricing';
+      ctaEl.textContent = 'Contact us to reactivate';
+      ctaEl.href = 'mailto:info@kingdom-creatives.com?subject=YourLife%20CC%20-%20Reactivate%20subscription';
       ctaEl.onclick = null;
     }
   } else {
@@ -560,7 +560,7 @@ function setupContestFreeUser(){
         </div>
         <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
           <button onclick="navigator.clipboard&&navigator.clipboard.writeText('${refLink}').then(()=>{this.textContent='✓ Copied!';setTimeout(()=>this.textContent='Copy Link',2000)})" style="background:#f5c842;color:#000;font-weight:800;font-size:.72rem;padding:.35rem .85rem;border:none;border-radius:6px;cursor:pointer;">Copy Link</button>
-          <a href="https://yourlifecc.com/index.html#pricing" style="background:rgba(56,189,248,.15);color:#38bdf8;font-size:.72rem;font-weight:700;padding:.35rem .85rem;border-radius:6px;border:1px solid rgba(56,189,248,.3);text-decoration:none;white-space:nowrap;">Upgrade →</a>
+          <a href="mailto:info@kingdom-creatives.com?subject=YourLife%20CC%20-%20Full%20access%20request" style="background:rgba(56,189,248,.15);color:#38bdf8;font-size:.72rem;font-weight:700;padding:.35rem .85rem;border-radius:6px;border:1px solid rgba(56,189,248,.3);text-decoration:none;white-space:nowrap;">Contact us →</a>
         </div>
       </div>
       <div style="font-size:.65rem;color:rgba(245,200,66,.6);margin-bottom:.4rem;">📎 Your link: <span style="background:#1a1a00;padding:1px 6px;border-radius:3px;font-family:monospace;">${refLink}</span></div>
@@ -641,8 +641,8 @@ function showContestUpgradePrompt(){
     <div style="max-width:360px;width:90%;background:#0a0e1a;border:1.5px solid #f5c842;border-radius:20px;padding:2rem 1.75rem;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.8);">
       <div style="font-size:2rem;margin-bottom:.6rem;">🔒</div>
       <div style="font-size:1rem;font-weight:800;color:#fff;margin-bottom:.4rem;">This section is locked</div>
-      <div style="font-size:.8rem;color:rgba(255,255,255,.5);margin-bottom:1.5rem;line-height:1.5;">Your contest account gives you access to the Dashboard and Refer & Earn sections. Upgrade to unlock everything.</div>
-      <a href="https://yourlifecc.com/index.html#pricing" style="display:block;background:linear-gradient(135deg,#f5c842,#f59e0b);color:#000;font-weight:800;font-size:.9rem;padding:.85rem;border-radius:12px;text-decoration:none;margin-bottom:.75rem;">Upgrade to Full Access →</a>
+      <div style="font-size:.8rem;color:rgba(255,255,255,.5);margin-bottom:1.5rem;line-height:1.5;">Your contest account gives you access to the Dashboard and Refer & Earn sections. Reach out to unlock everything.</div>
+      <a href="mailto:info@kingdom-creatives.com?subject=YourLife%20CC%20-%20Full%20access%20request" style="display:block;background:linear-gradient(135deg,#f5c842,#f59e0b);color:#000;font-weight:800;font-size:.9rem;padding:.85rem;border-radius:12px;text-decoration:none;margin-bottom:.75rem;">Contact us for full access →</a>
       <button onclick="document.getElementById('contestUpgradePrompt').remove()" style="background:none;border:none;color:rgba(255,255,255,.35);font-size:.78rem;cursor:pointer;">Stay on Contest Account</button>
     </div>
   `;
