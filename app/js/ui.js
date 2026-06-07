@@ -1279,8 +1279,31 @@ function _updateMobileHomeBack(){
 // Sections not in this map get no FAB (button hidden). Same mobile-
 // or-standalone gate as ← Home.
 // ════════════════════════════════════════════════════════════
+// Chores FAB helper — the real "Add a chore" form lives inside the
+// Parent Hub #ph-chores panel (#newChoreName + addChoreFromParent),
+// not in the kid-side #s-chores. Route to Parent Hub, switch to the
+// chores panel, then focus the name input. PIN gate (if locked)
+// handles auth naturally; this fires regardless and the input only
+// gets focus once the gate clears.
+function _chFabGoToAddChore(){
+  if(typeof showSection === 'function') showSection('s-parent');
+  // Defer phNav + focus until showSection finishes the section swap.
+  setTimeout(function(){
+    if(typeof phNav === 'function') phNav('chores');
+    setTimeout(function(){
+      var el = document.getElementById('newChoreName');
+      if(el){
+        if(typeof el.scrollIntoView === 'function'){
+          el.scrollIntoView({ behavior:'smooth', block:'center' });
+        }
+        setTimeout(function(){ if(typeof el.focus === 'function') el.focus(); }, 320);
+      }
+    }, 80);
+  }, 80);
+}
+
 const PRIMARY_FAB_CONFIG = {
-  's-chores':  { label:'+ Log helpful', action:{ type:'focus', selector:'#helpfulChoreInput' } },
+  's-chores':  { label:'+ Add chore',   action:{ type:'fn',    fn:'_chFabGoToAddChore', args:[] } },
   's-finance': { label:'+ Add',         action:{ type:'focus', selector:'#txName' } },
   's-goals':   { label:'+ New goal',    action:{ type:'fn',    fn:'openModal', args:['goalAddModal'] } },
   's-health':  { label:'+ Add habit',   action:{ type:'click', selector:'#s-health button[onclick="addHabit()"]' } },
