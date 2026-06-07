@@ -150,6 +150,13 @@ function cTab(tab, btn){
   if(tab === 'streaks'     && typeof renderChoreStreaks      === 'function') renderChoreStreaks();
   if(tab === 'leaderboard' && typeof renderChoreLeaderboard  === 'function') renderChoreLeaderboard();
   if(tab === 'history'     && typeof renderChoreHistory      === 'function') renderChoreHistory();
+  // Tab 1 Inc 5 Step C — paint the coach card on My Chores activation
+  // and kick off an auto-fetch when the cached week is stale + the kid
+  // has verified chores worth coaching about.
+  if(tab === 'mychores'){
+    if(typeof renderChoreCoach === 'function')         renderChoreCoach();
+    if(typeof _maybeAutoFetchChoreCoach === 'function') _maybeAutoFetchChoreCoach();
+  }
 }
 
 
@@ -359,6 +366,10 @@ function renderChores(){
   // chores refresh is fine. Skips gracefully if the host element isn't
   // mounted (e.g. partial DOM during boot).
   if(typeof renderChoreBadges === 'function') renderChoreBadges();
+  // Tab 1 Inc 5 Step C — paint the AI Coach card. Renders the cached
+  // copy only — fetching is driven by cTab('mychores') + the manual
+  // refresh button to keep this hot path off the network.
+  if(typeof renderChoreCoach === 'function') renderChoreCoach();
   const today = new Date().toISOString().slice(0,10);
   const dayOfWeek = new Date().getDay();
   const avail = D.chorePoints.total - D.chorePoints.spent;
@@ -1573,6 +1584,180 @@ function _checkChoreBadges(){
       showToast('🏆 Badge earned: ' + firstNew.label + more);
     }
   }
+}
+
+// ════════════════════════════════════════════════════════════
+// Tab 1 Increment 5 Step C — AI Chore Coach.
+//
+// One-paragraph weekly summary + one-sentence next-week focus,
+// kid voice, second-person. Cached per-week in
+// D.choreCoachLastWeek so the kid can re-open the tab without
+// re-paying for the same week's response.
+//
+// Auto-fetch: on first paint when D.choreCoachLastWeek.weekKey
+// !== current ISO week AND there is at least 1 verified chore
+// in the last 7 days (no point coaching an empty week).
+//
+// Manual refresh: button on the card. Throttled to once per 6h
+// to keep API costs sane.
+// ════════════════════════════════════════════════════════════
+function _chCoachIsoWeek(d){
+  d = (d instanceof Date) ? d : new Date();
+  // Copy + jump to nearest Thursday (ISO week numbering).
+  var t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  t.setUTCDate(t.getUTCDate() + 4 - (t.getUTCDay() || 7));
+  var yearStart = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+  var week = Math.ceil(((t - yearStart) / 86400000 + 1) / 7);
+  return t.getUTCFullYear() + '-W' + String(week).padStart(2, '0');
+}
+
+function _chCoachStats7d(){
+  var now = new Date();
+  var floor = new Date(now.getTime() - 7 * 86400000);
+  var floorISO = floor.toISOString().slice(0,10);
+  var log = Array.isArray(D.choreLog) ? D.choreLog : [];
+  var chores = Array.isArray(D.chores) ? D.chores : [];
+  var verified = log.filter(function(l){
+    return l && l.status === 'verified' && (l.date || '') >= floorISO;
+  });
+  var pts = verified.reduce(function(s, l){ return s + (Number(l.pts) || 0); }, 0);
+  var catCounts = {};
+  verified.forEach(function(l){
+    var c = chores.find(function(x){ return x.id === l.choreId; });
+    var cat = (c && c.cat) || l.cat || 'other';
+    catCounts[cat] = (catCounts[cat] || 0) + 1;
+  });
+  var topCats = Object.keys(catCounts)
+    .sort(function(a,b){ return catCounts[b] - catCounts[a]; })
+    .slice(0,3);
+  var streak = (typeof getChoreStreak === 'function') ? getChoreStreak() : 0;
+  var name = (D.name || (D.profile && D.profile.parentName) || 'friend').slice(0,40);
+  return {
+    name:           name,
+    verifiedCount:  verified.length,
+    pointsEarned:   pts,
+    currentStreak:  streak,
+    topCategories:  topCats,
+    badgesEarned:   Object.keys(D.choreBadges || {}).length
+  };
+}
+
+async function fetchChoreCoach(){
+  if(!D.choreCoachLastWeek || typeof D.choreCoachLastWeek !== 'object'){
+    D.choreCoachLastWeek = { weekKey:'', summary:'', focus:'', fetchedAt:0 };
+  }
+  // 6-hour client-side throttle on manual refresh — server-side rate
+  // limiting belongs to the platform layer, this is just "don't let
+  // an impatient kid spam the API".
+  var SIX_HOURS = 6 * 60 * 60 * 1000;
+  var now = Date.now();
+  if(D.choreCoachLastWeek.fetchedAt && (now - D.choreCoachLastWeek.fetchedAt) < SIX_HOURS){
+    if(typeof showToast === 'function') showToast('Coach refreshed recently — try again later.');
+    return;
+  }
+  var stats = _chCoachStats7d();
+  if(stats.verifiedCount === 0){
+    // Don't burn an API call on a kid with nothing to coach about.
+    // Show a fallback friendly stub instead.
+    D.choreCoachLastWeek = {
+      weekKey: _chCoachIsoWeek(),
+      summary: 'No verified chores this week yet — that\'s OK. The first one always feels the heaviest.',
+      focus:   'Pick one easy chore today. Get the streak started.',
+      fetchedAt: now
+    };
+    save();
+    if(typeof renderChoreCoach === 'function') renderChoreCoach();
+    return;
+  }
+  var host = document.getElementById('choreCoachCard');
+  if(host){
+    var body = host.querySelector('.cc-coach__body');
+    if(body) body.innerHTML = '<div class="cc-coach__loading">Coach is thinking…</div>';
+  }
+  try {
+    var prompt = JSON.stringify(stats);
+    var resp = await fetch('/api/ai-summary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'chore-coach', prompt: prompt })
+    });
+    var json = await resp.json();
+    // /api/ai-summary spreads parsed JSON onto the top-level response
+    // for JSON modes: { ok:true, summary, focus }. Read direct.
+    if(!json || !json.ok || !json.summary){
+      throw new Error('Empty or malformed response');
+    }
+    D.choreCoachLastWeek = {
+      weekKey:   _chCoachIsoWeek(),
+      summary:   String(json.summary || '').slice(0, 500),
+      focus:     String(json.focus   || '').slice(0, 200),
+      fetchedAt: now
+    };
+    save();
+    if(typeof renderChoreCoach === 'function') renderChoreCoach();
+  } catch(e){
+    console.debug('[chore-coach] fetch failed:', e && e.message);
+    if(host){
+      var body2 = host.querySelector('.cc-coach__body');
+      if(body2) body2.innerHTML = '<div class="cc-coach__err">Coach is offline right now. Try refresh in a minute.</div>';
+    }
+  }
+}
+
+function renderChoreCoach(){
+  var host = document.getElementById('choreCoachCard');
+  if(!host) return;
+  if(!D.choreCoachLastWeek || typeof D.choreCoachLastWeek !== 'object'){
+    D.choreCoachLastWeek = { weekKey:'', summary:'', focus:'', fetchedAt:0 };
+  }
+  var esc = function(s){
+    return String(s || '').replace(/[&<>"']/g, function(c){
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+    });
+  };
+  var stale = D.choreCoachLastWeek.weekKey !== _chCoachIsoWeek();
+  var hasContent = !!(D.choreCoachLastWeek.summary);
+
+  if(hasContent){
+    host.innerHTML = ''
+      + '<div class="cc-coach">'
+      +   '<div class="cc-coach__head">'
+      +     '<div class="cc-coach__title">💬 Your Weekly Coach</div>'
+      +     '<button type="button" class="cc-coach__refresh" onclick="fetchChoreCoach()" title="Refresh coach (max once per 6h)">↻</button>'
+      +   '</div>'
+      +   '<div class="cc-coach__body">'
+      +     '<p class="cc-coach__summary">' + esc(D.choreCoachLastWeek.summary) + '</p>'
+      +     (D.choreCoachLastWeek.focus
+        ? '<p class="cc-coach__focus"><span class="cc-coach__focus-label">This week:</span> ' + esc(D.choreCoachLastWeek.focus) + '</p>'
+        : '')
+      +   '</div>'
+      +   (stale ? '<div class="cc-coach__stale">New week — tap ↻ for a fresh read</div>' : '')
+      + '</div>';
+  } else {
+    host.innerHTML = ''
+      + '<div class="cc-coach cc-coach--empty">'
+      +   '<div class="cc-coach__head">'
+      +     '<div class="cc-coach__title">💬 Your Weekly Coach</div>'
+      +     '<button type="button" class="cc-coach__refresh" onclick="fetchChoreCoach()" title="Get my first coaching">↻</button>'
+      +   '</div>'
+      +   '<div class="cc-coach__body">'
+      +     '<p class="cc-coach__summary">No coaching yet. Tap ↻ once you\'ve verified a few chores and I\'ll tell you how it went.</p>'
+      +   '</div>'
+      + '</div>';
+  }
+}
+
+// First-paint auto-fetch hook — fires on cTab('mychores') activation
+// when (a) the cached weekKey is stale AND (b) the kid has activity
+// worth coaching about. Manual button always works regardless.
+function _maybeAutoFetchChoreCoach(){
+  if(!D.choreCoachLastWeek || typeof D.choreCoachLastWeek !== 'object') return;
+  var stale = D.choreCoachLastWeek.weekKey !== _chCoachIsoWeek();
+  if(!stale) return;
+  var s = _chCoachStats7d();
+  if(s.verifiedCount < 1) return;
+  // Stale + has activity → fire-and-forget.
+  fetchChoreCoach();
 }
 
 function renderChoreBadges(){
