@@ -156,6 +156,16 @@ function addTx(){
     _moneyTxCancelEdit();
   }
 
+  // Tab 2 Inc 7 Step B — Parent purchase approval gate. For EXPENSE
+  // entries at or above the per-user threshold, divert into the
+  // purchaseRequests queue instead of inserting a real transaction.
+  // Income is never gated (a kid logging income they earned shouldn't
+  // require parent sign-off). The threshold default is $25 (data.js).
+  const threshold = Number(D.purchaseApprovalThreshold);
+  if(type === 'expense' && Number.isFinite(threshold) && threshold > 0 && amt >= threshold){
+    return _submitPurchaseRequest({ name, amt, cat, date });
+  }
+
   // Default path — insert a new entry.
   D.transactions.unshift({ id:Date.now(), name, amt, type, cat, date });
   document.getElementById('txName').value = '';
@@ -172,6 +182,79 @@ function addTx(){
       ? '💚 ' + amtStr + ' income logged'
       : '🪙 ' + amtStr + ' spent on ' + cat
   );
+}
+
+// Tab 2 Inc 7 Step B — Purchase request submission path. Called from
+// addTx() when an expense crosses the approval threshold. Pushes a
+// pending row into D.purchaseRequests and fires the parent email
+// notify (best-effort — failure doesn't block the request).
+function _submitPurchaseRequest(entry){
+  if(!Array.isArray(D.purchaseRequests)) D.purchaseRequests = [];
+  // Active profile id powers the parent's cross-kid review.
+  // _pidOf(activeProfile) is the canonical stable id post-v249;
+  // _solo is the per-user fallback for single-profile accounts.
+  var pid = (typeof _pidOf === 'function' && typeof _activeProfileId !== 'undefined' && _activeProfileId)
+    ? _pidOf(_activeProfileId)
+    : '_solo';
+  var req = {
+    id:            'pr_' + Date.now(),
+    kidProfileId:  pid,
+    name:          String(entry.name || '').slice(0, 80),
+    amount:        Number(entry.amt) || 0,
+    cat:           String(entry.cat  || 'Other').slice(0, 32),
+    requestedAt:   new Date().toISOString(),
+    status:        'pending',
+    reviewedAt:    null,
+    reviewerNote:  '',
+    txId:          null
+  };
+  D.purchaseRequests.unshift(req);
+  // Clear the form so the kid doesn't accidentally re-submit.
+  var nEl = document.getElementById('txName'); if(nEl) nEl.value = '';
+  var aEl = document.getElementById('txAmt');  if(aEl) aEl.value = '';
+  save();
+  if(typeof renderTx === 'function') renderTx();
+  if(typeof updateFinSum === 'function') updateFinSum();
+  if(typeof showToast === 'function'){
+    showToast('🔒 $' + req.amount.toFixed(2) + ' over your $' + Number(D.purchaseApprovalThreshold).toFixed(0) + ' limit — sent to Mom for approval');
+  }
+  // Best-effort email notify. Wrapped in setTimeout so the request
+  // hits the queue + UI before the network call resolves.
+  setTimeout(function(){
+    try {
+      if(typeof _notifyParentOfPurchaseRequest === 'function'){
+        _notifyParentOfPurchaseRequest(req);
+      }
+    } catch(_){}
+  }, 100);
+}
+
+// Best-effort Brevo email to the signed-in parent (the auth user IS
+// the parent — kids use profiles under the parent's account). Reads
+// the auth user's email from _supaUser (set in auth.js) and posts to
+// /api/notify-parent-purchase. Silent failure on network / no email.
+async function _notifyParentOfPurchaseRequest(req){
+  if(!req) return;
+  var email = (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.email) ? _supaUser.email : '';
+  if(!email) return;
+  var kidName = (D.name || 'Your kid').toString().slice(0, 60);
+  var body = {
+    to:          email,
+    kidName:     kidName,
+    name:        req.name,
+    amount:      req.amount,
+    cat:         req.cat,
+    requestedAt: req.requestedAt
+  };
+  try {
+    await fetch('/api/notify-parent-purchase', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(body)
+    });
+  } catch(e){
+    console.debug('[purchase-notify] failed:', e && e.message);
+  }
 }
 
 function filterTx(type,btn){ _txFilter=type; document.querySelectorAll('.txf').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); renderTx(); }
@@ -784,8 +867,41 @@ function _moneyRenderTransactions(){
     || (b.id || 0) - (a.id || 0)
   );
 
+  // Tab 2 Inc 7 Step B — Pending purchase requests strip. Shown at the
+  // TOP of the transaction list so the kid sees what's waiting on
+  // parent review. Denied requests stay visible too (so they don't
+  // re-ask for the same thing in a confused way) but with a lighter
+  // visual weight.
+  var pendingReqs = (Array.isArray(D.purchaseRequests) ? D.purchaseRequests : [])
+    .filter(function(r){ return r && (r.status === 'pending' || r.status === 'denied'); });
+  var pendingStripHtml = '';
+  if(pendingReqs.length){
+    pendingStripHtml = '<div class="mz-tx-pending">'
+      + '<div class="mz-tx-pending__title">⏳ Waiting for Parent</div>'
+      + pendingReqs.map(function(r){
+          var ageMs = Date.now() - new Date(r.requestedAt || 0).getTime();
+          var ageMin = Math.max(1, Math.round(ageMs / 60000));
+          var ageStr = ageMin >= 1440 ? (Math.round(ageMin/1440) + 'd')
+                    : ageMin >= 60   ? (Math.round(ageMin/60)   + 'h')
+                    :                  (ageMin                  + 'm');
+          var statusPill = r.status === 'pending'
+            ? '<span class="mz-tx-pending__pill mz-tx-pending__pill--wait">' + ageStr + ' waiting</span>'
+            : '<span class="mz-tx-pending__pill mz-tx-pending__pill--deny">denied</span>';
+          var emoji = MONEY_CAT_EMOJI[r.cat] || '📌';
+          return '<div class="mz-tx-pending__row' + (r.status === 'denied' ? ' mz-tx-pending__row--deny' : '') + '">'
+            + '<div class="mz-tx-pending__emoji">' + emoji + '</div>'
+            + '<div class="mz-tx-pending__main">'
+            +   '<div class="mz-tx-pending__name">' + escapeHtml(r.name) + '</div>'
+            +   '<div class="mz-tx-pending__meta">' + statusPill + (r.reviewerNote ? ' · <em>' + escapeHtml(r.reviewerNote) + '</em>' : '') + '</div>'
+            + '</div>'
+            + '<div class="mz-tx-pending__amt">$' + Number(r.amount || 0).toFixed(2) + '</div>'
+          + '</div>';
+        }).join('')
+      + '</div>';
+  }
+
   if(!rows.length){
-    root.innerHTML = '<div class="mz-tx-empty">No transactions match. Log one above to start your ledger.</div>';
+    root.innerHTML = pendingStripHtml + '<div class="mz-tx-empty">No transactions match. Log one above to start your ledger.</div>';
     return;
   }
 
@@ -805,7 +921,7 @@ function _moneyRenderTransactions(){
     return dt.toLocaleDateString('en', { month:'long', year:'numeric' });
   };
 
-  root.innerHTML = ymKeys.map(ym => {
+  root.innerHTML = pendingStripHtml + ymKeys.map(ym => {
     const items = groups[ym].map(t => {
       const emoji = MONEY_CAT_EMOJI[t.cat] || '📌';
       const amt   = Number.isFinite(+t.amt) ? +t.amt : 0;
