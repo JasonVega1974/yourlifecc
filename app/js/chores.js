@@ -446,7 +446,11 @@ function renderChores(){
           : st === 'pending'
             ? `<span style="font-size:.58rem;color:#fbbf24;font-weight:700;">⏳ Pending${log && log.photoPath ? ' 📸' : ''}</span>`
             : `<span style="font-size:.58rem;color:#22c55e;font-weight:700;">✅ Verified${log && log.photoPath ? ' 📸' : ''}</span>`;
-        return `<div class="ch-card" style="${st==='verified'?'opacity:.55;':''}">
+        // Tab 1 Inc 5 Step D — data-chore-id is the key SortableJS uses
+        // to compute the new order in _persistChoreOrder. Verified +
+        // pending cards keep the attribute but aren't draggable (Sortable
+        // is only instantiated on the Todo column).
+        return `<div class="ch-card" data-chore-id="${c.id}" style="${st==='verified'?'opacity:.55;':''}">
           <div style="display:flex;align-items:flex-start;gap:.4rem;">
             <span style="font-size:1.05rem;line-height:1.1;">${c.emoji||'📌'}</span>
             <div style="flex:1;min-width:0;">
@@ -467,6 +471,30 @@ function renderChores(){
         ${renderCol('pending',  'Pending',  '#a78bfa', 'None pending')}
         ${renderCol('verified', 'Verified', '#22c55e', 'None yet')}
       </div>`;
+      // Tab 1 Inc 5 Step D — instantiate SortableJS on the Todo column
+      // so the kid can reorder their priorities. Guarded on the global
+      // so a CDN miss degrades to a static kanban (no error). Only the
+      // Todo column is draggable: Pending = parent review queue,
+      // Verified = done, neither benefits from manual reordering.
+      if(typeof Sortable !== 'undefined'){
+        var todoCol = todayEl.querySelector('.ch-col-todo');
+        if(todoCol && !todoCol.__choreSortableWired){
+          todoCol.__choreSortableWired = true;
+          Sortable.create(todoCol, {
+            animation:    150,
+            draggable:    '.ch-card',
+            ghostClass:   'ch-card--ghost',
+            chosenClass:  'ch-card--chosen',
+            dragClass:    'ch-card--drag',
+            // forceFallback uses Sortable's pointer-based fallback
+            // engine — required for reliable iOS / Android PWA touch
+            // support. Native HTML5 DnD is unreliable on touch.
+            forceFallback:    true,
+            fallbackTolerance: 5,
+            onEnd: function(){ _persistChoreOrder(todoCol); }
+          });
+        }
+      }
     }
     // Overdue badge on the My Chores sub-tab nav
     const odEl = document.getElementById('chOverdueDot');
@@ -1584,6 +1612,49 @@ function _checkChoreBadges(){
       showToast('🏆 Badge earned: ' + firstNew.label + more);
     }
   }
+}
+
+// ════════════════════════════════════════════════════════════
+// Tab 1 Increment 5 Step D — Kanban drag-drop persistence.
+//
+// SortableJS instantiated in renderChores fires onEnd → this
+// helper. Reads the new DOM order of .ch-card[data-chore-id] in
+// the Todo column, and reorders D.chores in place so the chore
+// the kid just moved sticks at its new position. Verified +
+// pending chores are untouched (their order is derived from log
+// dates, not the chore array). save() debounce-pushes to cloud.
+//
+// No re-render after drop — SortableJS already moved the DOM,
+// and the next renderChores (verify, complete, save, etc.) will
+// paint from the new array order. That keeps the drop visually
+// snappy and avoids the post-drop flash.
+// ════════════════════════════════════════════════════════════
+function _persistChoreOrder(colEl){
+  if(!colEl || !Array.isArray(D.chores)) return;
+  var newIds = Array.prototype.map.call(
+    colEl.querySelectorAll('.ch-card[data-chore-id]'),
+    function(el){ return Number(el.getAttribute('data-chore-id')); }
+  ).filter(function(n){ return Number.isFinite(n); });
+  if(!newIds.length) return;
+  // Build a fast lookup of the new order rank — chores not in the
+  // dragged column (pending / verified / inactive) keep their existing
+  // relative position by mapping to Infinity (i.e. sorted to the end
+  // of the dragged set but still in their original order via a stable
+  // sort).
+  var rank = {};
+  newIds.forEach(function(id, i){ rank[id] = i; });
+  var dragged = D.chores.filter(function(c){ return rank[c.id] !== undefined; });
+  var rest    = D.chores.filter(function(c){ return rank[c.id] === undefined; });
+  dragged.sort(function(a, b){ return rank[a.id] - rank[b.id]; });
+  // Splice strategy: insert the reordered dragged group at the index
+  // of the first dragged item's original position so the rest of the
+  // chore list stays anchored.
+  var firstDraggedOrigIdx = D.chores.findIndex(function(c){ return rank[c.id] !== undefined; });
+  if(firstDraggedOrigIdx < 0) firstDraggedOrigIdx = 0;
+  var merged = rest.slice();
+  merged.splice(firstDraggedOrigIdx, 0, ...dragged);
+  D.chores = merged;
+  save();
 }
 
 // ════════════════════════════════════════════════════════════
