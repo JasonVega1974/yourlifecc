@@ -148,6 +148,18 @@ const DEF = {
   // finance.js skips any key already present, so each milestone is a
   // single one-shot celebration. JSONB only — no new table.
   moneyMilestones:{},
+  // Tab 2 Inc 7 Step A (2026-06-06) — Weekly AI Money Coach cache.
+  //   weekKey   — ISO 'YYYY-Www' of the week the response was generated
+  //   summary   — 2-3 second-person sentences naming concrete patterns
+  //               from the last 30 days (cash in/out, top categories,
+  //               savings goal traction)
+  //   focus     — 1 sentence specific next-week nudge
+  //   fetchedAt — ms epoch of last fetch (used for client-side throttle)
+  // /api/ai-summary 'money-coach' mode is the only writer. Strictly
+  // observational + suggestive — NEVER prescriptive financial advice
+  // (no investment, debt, credit-product recommendations). See the
+  // MONEY_COACH_SYSTEM prompt in api/ai-summary.js for the rules.
+  financeCoachLastWeek:{ weekKey:'', summary:'', focus:'', fetchedAt:0 },
   savingsGoals:[
     {id:1, name:'Emergency Fund', emoji:'🛡️', target:1000, current:0},
     {id:2, name:'New Car', emoji:'🚗', target:5000, current:0},
