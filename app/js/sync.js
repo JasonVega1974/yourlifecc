@@ -31,7 +31,6 @@ function _ylccEnforceOwner(userId){
   try {
     var prev = localStorage.getItem('lifeos_owner_user_id');
     if(prev && prev !== userId){
-      console.log('[LifeOS] Owner mismatch — wiping local state. prev=', prev, 'new=', userId);
       var rememberEmail = null;
       try { rememberEmail = localStorage.getItem('lifeos_remember_email'); } catch(_){}
       // Sweep YLCC + LifeOS keys (and any legacy keys we know about)
@@ -63,7 +62,7 @@ function _ylccEnforceOwner(userId){
       } catch(_){}
     }
     localStorage.setItem('lifeos_owner_user_id', userId);
-  } catch(e){ console.warn('[LifeOS] _ylccEnforceOwner error:', e); }
+  } catch(_){}
 }
 
 function save(){
@@ -168,7 +167,6 @@ async function cloudSync(){
       updated_at: new Date().toISOString()
     }, { onConflict: 'user_id' }).select();
     setSyncSt(error ? 'local' : 'cloud');
-    if(error) console.error('[LifeOS Sync] upsert failed');
     if(!error){
       localStorage.setItem('lifeos_last_sync', Date.now());
       // Tab 1 Increment 1 — fire-and-forget mirror of D.chores +
@@ -183,8 +181,7 @@ async function cloudSync(){
         _mirrorMoneyToCloud(supa, _supaUser.id);
       }
     }
-  } catch(e){
-    console.error('[LifeOS Sync] Exception:', e);
+  } catch(_){
     setSyncSt('local');
   }
 }
@@ -409,9 +406,7 @@ async function cloudLoad(){
     if(saved._profiles && saved._profiles.length > 0){
       _profiles = JSON.parse(JSON.stringify(saved._profiles));
       _activeProfileId = saved._activeProfileId || null;
-      try { saveProfiles(); }
-      catch(e){ console.warn('[YLCC profile] cloudLoad saveProfiles failed:', e.message); }
-      console.log('[YLCC profile] cloudLoad restored profiles:', _profiles.map(p=>({id:p.id,name:p.name,isParent:p.isParent})), 'active=', _activeProfileId);
+      try { saveProfiles(); } catch(_){}
     }
     // Re-save cleaned data back to Supabase immediately so bad values don't persist
     try {
