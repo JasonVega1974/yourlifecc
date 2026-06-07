@@ -8,6 +8,7 @@
 //   'study-partner'          — Phase F: explain/quiz/write tutor, Haiku, 300-500 tokens
 //   'goal-suggest'           — Phase F: 3 age-bracket goal suggestions, Haiku, 500 tokens JSON
 //   'chore-coach'            — Tab 1 Inc 5 Step C: weekly kid-voice chore coach, Haiku, 350 tokens JSON
+//   'money-coach'            — Tab 2 Inc 7 Step A: weekly kid-voice money coach, Haiku, 350 tokens JSON
 //
 // The /api/ai-summary endpoint is the single Anthropic ingress for the app.
 // Add new modes here rather than spinning up parallel endpoints.
@@ -76,6 +77,33 @@ const GOAL_SUGGEST_SYSTEM = SAFETY_PREAMBLE + '\n\n' + [
   'Use "type":"short" for goals achievable in weeks/months, "type":"long" for goals 1+ years out.'
 ].join('\n');
 
+// Tab 2 Inc 7 Step A — Money Coach. Same kid-voice, second-person shape
+// as chore-coach, but with stricter guardrails because money advice is
+// higher-stakes than chore coaching. The system prompt explicitly rules
+// out investment, debt, credit, and product recommendations — coach
+// stays observational ("you spent more on food this week than last")
+// + suggestive ("consider trying one no-spend day"), never prescriptive
+// ("you should invest in...", "open a credit card"). Plan §8 #7.
+const MONEY_COACH_SYSTEM = SAFETY_PREAMBLE + '\n\n' + [
+  'You are the kid\'s weekly money coach. Voice: warm, specific, encouraging — like an older sibling who actually looked at the numbers. Use "you" (never "we" or "the user"). Avoid generic praise like "great job saving" — name the actual pattern you observed.',
+  'Read the stats. Name ONE concrete pattern from the last 30 days. Suggest ONE small, specific focus for next week.',
+  'HARD RULES — never break:',
+  '- NEVER recommend specific investments, stocks, crypto, or financial products.',
+  '- NEVER recommend taking on debt, opening credit cards, or borrowing.',
+  '- NEVER prescribe a specific dollar amount the kid "should" save or spend.',
+  '- NEVER compare to siblings, peers, national averages, or other kids.',
+  '- NEVER shame light weeks ("only $5 saved?"). If the data is sparse, encourage starting small.',
+  '- NEVER predict the future ("at this rate you\'ll have $X by..."). Compound projections live in the What-If simulator, not the coach.',
+  '- Stay observational + suggestive. Patterns + nudges only.',
+  'If a week is essentially empty (0-1 transactions, no goal progress), be warm without minimizing — "this week was light on activity; one tiny step gets you started" — never shame.',
+  'Length: summary 2-3 sentences MAX (~40 words). focus 1 sentence MAX (~20 words).',
+  'Return ONLY valid JSON in this exact shape (no prose before or after):',
+  '{',
+  '  "summary": "<2-3 second-person sentences naming concrete patterns from the last 30 days>",',
+  '  "focus":   "<1 sentence specific suggestion for next week>"',
+  '}'
+].join('\n');
+
 // Tab 1 Inc 5 Step C — Chore Coach. Kid voice, second-person, motivational
 // but specific. Reads structured stats; writes a short praise summary + one
 // concrete next-week focus. Strict JSON so the chores.js renderer doesn't
@@ -119,6 +147,7 @@ module.exports = async function handler(req, res) {
   const isMeditationGenerator = mode === 'meditation-generator';
   const isDailyDevotional     = mode === 'daily-devotional';
   const isChoreCoach         = mode === 'chore-coach';
+  const isMoneyCoach         = mode === 'money-coach';
 
   // Per-mode prompt cap (tight to control cost + abuse). default summary
   // keeps its longer 4000-char allowance.
@@ -130,6 +159,7 @@ module.exports = async function handler(req, res) {
             : isMeditationGenerator  ? 200  // theme/mood short input only
             : isDailyDevotional      ? 40   // date string (YYYY-MM-DD) only
             : isChoreCoach           ? 1000 // structured stats blob — bounded
+            : isMoneyCoach           ? 1500 // 30-day tx blob — bigger than chores
             : 4000;
   const safePrompt = String(prompt || '').slice(0, cap);
 
@@ -186,6 +216,13 @@ module.exports = async function handler(req, res) {
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 350,
         system: [{ type: 'text', text: CHORE_COACH_SYSTEM, cache_control: { type: 'ephemeral' } }],
+        messages: [{ role: 'user', content: safePrompt }],
+      };
+    } else if (isMoneyCoach) {
+      body = {
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 350,
+        system: [{ type: 'text', text: MONEY_COACH_SYSTEM, cache_control: { type: 'ephemeral' } }],
         messages: [{ role: 'user', content: safePrompt }],
       };
     } else if (isMeditationGenerator) {
@@ -301,6 +338,7 @@ Return ONLY valid JSON in this exact shape (no prose before or after):
                    || isMeditationGenerator
                    || isDailyDevotional
                    || isChoreCoach
+                   || isMoneyCoach
                    || (isStudyPartner && submode === 'quiz');
     if (wantsJson) {
       const cleaned = String(text).replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
