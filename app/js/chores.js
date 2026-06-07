@@ -174,6 +174,95 @@ function addChore(){
   showToast('Chore added ✓');
 }
 
+// ════════════════════════════════════════════════════════════
+// Tab 1 Increment 5 Step A-2 — Bulk-add seasonal chore packs.
+//
+// Looks up a pack by id in window.CHORE_PACKS (data module at
+// app/js/data/chore-packs.js), then pushes each chore into
+// D.chores unless a chore with the same name (case-insensitive,
+// trimmed) already exists. Dedupe is "skip-copy on collision"
+// per Inc 5 Step A decision #4 — idempotent re-apply, no
+// duplicates, no "force re-add" affordance in v1.
+//
+// Side effects on successful add: save() + renderChores() to
+// repaint the kid view + _checkChoreBadges() so a parent setup
+// that pushes the kid over 5 categories awards Renaissance Kid
+// immediately (Inc 5 Step A decision #7).
+//
+// Return shape lets the caller (Parent Hub UI in 5A-3) describe
+// what just happened: { added, skipped, pack }.
+// ════════════════════════════════════════════════════════════
+function addChorePack(packId){
+  initChoreData();
+  var packs = (typeof window !== 'undefined' && Array.isArray(window.CHORE_PACKS))
+    ? window.CHORE_PACKS : [];
+  var pack = packs.find(function(p){ return p && p.id === packId; });
+  if(!pack){
+    if(typeof showToast === 'function') showToast('Pack not found');
+    return { added: 0, skipped: 0, pack: null };
+  }
+  if(!Array.isArray(D.chores)) D.chores = [];
+
+  // Case-insensitive trimmed name index of the kid's current
+  // active+inactive chores. We dedupe across ALL chores, not just
+  // active ones, so a re-apply doesn't resurrect a chore the
+  // parent deliberately deactivated.
+  var existingNames = {};
+  D.chores.forEach(function(c){
+    var key = String((c && c.name) || '').trim().toLowerCase();
+    if(key) existingNames[key] = true;
+  });
+
+  var added = 0, skipped = 0;
+  var rows = Array.isArray(pack.chores) ? pack.chores : [];
+  rows.forEach(function(row, i){
+    var key = String((row && row.name) || '').trim().toLowerCase();
+    if(!key){ skipped++; return; }
+    if(existingNames[key]){ skipped++; return; }
+    // Fallback chain for emoji: explicit row.emoji > category
+    // default from CHORE_CAT_EMOJI > generic 📌.
+    var emoji = (row && row.emoji)
+      || (typeof CHORE_CAT_EMOJI !== 'undefined' ? CHORE_CAT_EMOJI[row.cat] : '')
+      || '📌';
+    // id scheme matches addChore() — Date.now() with a per-row
+    // offset so a batch doesn't collide if the loop runs faster
+    // than Date.now()'s millisecond resolution.
+    D.chores.push({
+      id:         Date.now() + i,
+      name:       row.name,
+      pts:        Number.isFinite(+row.pts) ? +row.pts : 10,
+      freq:       row.freq || 'daily',
+      cat:        row.cat  || 'other',
+      emoji:      emoji,
+      difficulty: row.difficulty || 'easy',
+      active:     true
+    });
+    existingNames[key] = true;
+    added++;
+  });
+
+  if(added > 0){
+    save();
+    if(typeof renderChores === 'function') renderChores();
+    // Trigger badge check — Renaissance Kid awards on 5+ verified
+    // categories, and Helper Heart / streaks won't move on a pack
+    // apply, but a future badge tied to "library size" would fire
+    // here. Cheap to run; safe to skip on no-op (added===0).
+    if(typeof _checkChoreBadges === 'function') _checkChoreBadges();
+  }
+
+  if(typeof showToast === 'function'){
+    if(added === 0){
+      showToast('All ' + skipped + ' chores already on your list');
+    } else if(skipped === 0){
+      showToast('Added ' + added + ' chores from "' + pack.name + '" ✓');
+    } else {
+      showToast('Added ' + added + ' · skipped ' + skipped + ' (already on list)');
+    }
+  }
+  return { added: added, skipped: skipped, pack: pack };
+}
+
 
 function toggleChoreActive(id){
   const chore = (Array.isArray(D.chores)?D.chores:[]).find(c=>c.id===id);
