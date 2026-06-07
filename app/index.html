@@ -1064,12 +1064,19 @@
   @media (min-width:720px){ .cc-shell{padding:0 2rem;} }
 
   /* greeting */
-  .cc-greeting{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1.5rem;}
+  .cc-greeting{display:flex;flex-direction:column;gap:.55rem;margin-bottom:1.5rem;}
   .cc-greeting__hello{font-size:1.7rem;font-weight:600;letter-spacing:-.01em;color:#F1E9D5;margin:0;line-height:1.18;}
   .cc-greeting__sub{display:flex;align-items:center;gap:.6rem;color:#9AA0B4;font-size:.95rem;margin:0;}
   .cc-greeting__sub::before{content:'';width:6px;height:6px;border-radius:50%;background:#F5A623;box-shadow:0 0 8px rgba(245,166,35,.6);flex-shrink:0;}
   .cc-time{font-family:ui-monospace,'JetBrains Mono',Menlo,Consolas,monospace;font-feature-settings:"tnum";color:#9AA0B4;font-size:.85rem;margin-left:auto;letter-spacing:.02em;}
-  @media (min-width:720px){ .cc-greeting__hello{font-size:2.2rem;} .cc-greeting__sub{font-size:1rem;} }
+  /* daystamp — Bebas Neue day-of-week + italic rotating sub. Replaces
+     the prior "Day 1 starts now" engagement nudge on the streak tile.
+     Sits directly under the greeting; renders every day, all stages. */
+  .cc-daystamp{display:flex;flex-direction:column;gap:.3rem;margin-top:.15rem;}
+  .cc-daystamp__date{font-family:var(--fh,'Bebas Neue',var(--fm));font-size:1.55rem;letter-spacing:.13em;font-weight:400;color:#F1E9D5;line-height:1;}
+  .cc-daystamp__sub{display:flex;align-items:center;gap:.6rem;color:#9AA0B4;font-size:.9rem;}
+  .cc-daystamp__quote{font-family:Georgia,'Times New Roman',serif;font-style:italic;}
+  @media (min-width:720px){ .cc-greeting__hello{font-size:2.2rem;} .cc-greeting__sub{font-size:1rem;} .cc-daystamp__date{font-size:2rem;letter-spacing:.15em;} .cc-daystamp__sub{font-size:1rem;} }
 
   /* stats */
   .cc-stats{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;align-items:stretch;margin-bottom:1.4rem;}
@@ -1082,7 +1089,7 @@
   .cc-chip{display:flex;flex-direction:column;justify-content:center;gap:.2rem;padding:.9rem 1rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;}
   .cc-chip__num{font-family:ui-monospace,'JetBrains Mono',monospace;font-feature-settings:"tnum";font-weight:700;font-size:1.35rem;color:#F1E9D5;letter-spacing:-.01em;line-height:1.1;}
   .cc-chip__label{font-size:.74rem;color:#9AA0B4;letter-spacing:.04em;}
-  @media (min-width:720px){ .cc-stats{grid-template-columns:1.4fr 1fr 1fr;} .cc-streak{grid-column:auto;} .cc-streak__num{font-size:4rem;} }
+  @media (min-width:720px){ .cc-stats{grid-template-columns:1.4fr 1fr 1fr;} .cc-streak{grid-column:auto;} .cc-streak__num{font-size:4rem;} .cc-stats.cc-stats--no-streak{grid-template-columns:1fr 1fr;} }
 
   /* ── constellation: living space scene ─────────────────────
      A layered backdrop (deep sky + 2 nebula washes + starfield)
@@ -15159,7 +15166,10 @@
   </div>
 
   <!-- PIN GATE -->
-  <div id="parentGate" style="text-align:center;padding:2rem 0 1rem;">
+  <!-- Layout (position:fixed + inset:0 + flex center) lives in
+       app.css under "#parentGate" so the PIN always centers in the
+       viewport regardless of section scroll position. -->
+  <div id="parentGate">
     <!-- Avatar circle — shows parent initial, rendered by updateParentPinToggleUI -->
     <div id="pgAvatarCircle" style="width:64px;height:64px;border-radius:50%;background:var(--c);display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:900;color:#fff;margin:0 auto .8rem;box-shadow:0 4px 20px rgba(56,189,248,.3);">👨‍👩‍👧</div>
     <div style="font-size:1.3rem;font-weight:900;color:var(--tx);margin-bottom:.25rem;">Parent Hub</div>
@@ -18986,6 +18996,18 @@ if (_origRefresh) {
      Buttons populated by renderBottomTabBar() in ui.js from TAB_IA.
      safe-area-inset-bottom handled in app.css. -->
 <nav id="bottomTabBar" role="navigation" aria-label="Primary tabs"></nav>
+
+<!-- ════ MOBILE HOME BACK BUTTON (2026-06-06) ════
+     Floating "← Home" pill that appears on mobile (innerWidth ≤ 860px)
+     OR when the app is running in standalone PWA mode, and only when
+     the user is on a non-home section. Visibility wired by
+     _updateMobileHomeBack() in ui.js (called from showSection and on
+     resize). Hidden on desktop. Hidden on s-hero / Command Center. -->
+<button id="mobileHomeBack" type="button" aria-label="Back to Home"
+        onclick="(typeof showSection==='function')&&showSection('s-hero')"
+        style="display:none;">
+  <span aria-hidden="true">←</span><span>Home</span>
+</button>
 
 <!-- ════════════════════════════════════════════════════════════
      Phase E — ONBOARDING OVERLAY (2026-05-15)
