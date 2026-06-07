@@ -469,33 +469,58 @@
       +   '<span class="cc-tile__meta">'+_ccEsc(meta.faith)+'</span>'
       + '</button>';
 
-    // Empty-state-aware hero copy:
-    // - streak === 0  → "Day 1 / starts now" + invite subline. Reads as
-    //                   potential, not "Day 0".
-    // - streak >= 1   → "Day N / day streak" + neutral subline.
+    // Daily greeting — day-of-week + date in Bebas Neue, with an italic
+    // sub-line that rotates by weekday (7 phrases, faith-adjacent +
+    // welcome-back tones). Replaces the prior "Day 1 starts now"
+    // streak-counter treatment which read as engagement-metric rather
+    // than a warm greeting.
+    var _CC_DAYS   = ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+    var _CC_MONTHS = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+    var _CC_SUBS   = [
+      'Good to see you back.',         // Sun
+      'A fresh start — make it count.',// Mon
+      'Steady steps, real progress.',  // Tue
+      'Halfway in. Keep going.',       // Wed
+      'Small wins compound.',          // Thu
+      'You showed up. That matters.',  // Fri
+      'Rest well — you earned it.'     // Sat
+    ];
+    var dayIdx     = now.getDay();
+    var dateLine   = _CC_DAYS[dayIdx] + ' · ' + _CC_MONTHS[now.getMonth()] + ' ' + now.getDate();
+    var sublineText = _CC_SUBS[dayIdx] || 'Good to see you back.';
     var streakDisp  = streak === 0 ? 1     : streak;
     var streakLabel = streak === 0 ? 'starts now' : 'day streak';
-    var sublineText = streak === 0 ? 'Your first day starts here.' : 'Here\'s your day.';
     var streakAria  = streak === 0 ? 'Day 1 — starts now' : ('Day ' + streak + ' streak');
+
+    // Streak chip is only meaningful at >=1 day; "Day 1 starts now" was
+    // an engagement nudge that read like a fake metric. On a fresh day-0
+    // we drop the streak tile entirely — the Bebas day-of-week stamp
+    // above carries the "today" message instead.
+    var streakHtml = streak >= 1
+      ? ( '<div class="cc-streak" role="group" aria-label="'+_ccEsc(streakAria)+'">'
+        +   '<div class="cc-streak__icon" aria-hidden="true">🔥</div>'
+        +   '<div class="cc-streak__body">'
+        +     '<div class="cc-streak__num"><span aria-hidden="true">Day&nbsp;</span>'+streakDisp+'</div>'
+        +     '<div class="cc-streak__label">'+_ccEsc(streakLabel)+'</div>'
+        +   '</div>'
+        + '</div>' )
+      : '';
 
     root.innerHTML = ''
       + '<main class="cc-shell" role="main">'
       +   '<header class="cc-greeting" aria-label="Greeting">'
       +     '<h1 class="cc-greeting__hello" id="ccHello">Good '+_ccEsc(greet)+', '+_ccEsc(name)+' 👋</h1>'
-      +     '<p class="cc-greeting__sub">'
-      +       _ccEsc(sublineText)
-      +       '<span class="cc-time" id="ccTime" aria-label="Current time">'+_ccFmtTime(now)+'</span>'
-      +     '</p>'
-      +   '</header>'
-
-      +   '<section class="cc-stats" aria-label="Today\'s progress">'
-      +     '<div class="cc-streak" role="group" aria-label="'+_ccEsc(streakAria)+'">'
-      +       '<div class="cc-streak__icon" aria-hidden="true">🔥</div>'
-      +       '<div class="cc-streak__body">'
-      +         '<div class="cc-streak__num"><span aria-hidden="true">Day&nbsp;</span>'+streakDisp+'</div>'
-      +         '<div class="cc-streak__label">'+_ccEsc(streakLabel)+'</div>'
+      +     '<div class="cc-daystamp" aria-label="'+_ccEsc(dateLine)+'">'
+      +       '<div class="cc-daystamp__date">'+_ccEsc(dateLine)+'</div>'
+      +       '<div class="cc-daystamp__sub">'
+      +         '<span class="cc-daystamp__quote">'+_ccEsc(sublineText)+'</span>'
+      +         '<span class="cc-time" id="ccTime" aria-label="Current time">'+_ccFmtTime(now)+'</span>'
       +       '</div>'
       +     '</div>'
+      +   '</header>'
+
+      +   '<section class="cc-stats'+(streak>=1?'':' cc-stats--no-streak')+'" aria-label="Today\'s progress">'
+      +     streakHtml
       +     '<div class="cc-chip" role="group" aria-label="'+tasks+' tasks today">'
       +       '<div class="cc-chip__num">'+tasks+'</div>'
       +       '<div class="cc-chip__label">tasks today</div>'
