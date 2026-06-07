@@ -1102,7 +1102,17 @@ const TAB_IA = [
       {sectionId:'s-reading',    label:'Reading List', icon:'📖', accent:'var(--section-journal)'}
     ]
   },
-  {id:'family', label:'Family', icon:'👨‍👩‍👧', accent:'var(--c)',
+  // 2026-06-06 — Family → Parent. The compound emoji 👨‍👩‍👧 renders as a
+  // monochrome silhouette on Windows + older Android and ignores CSS
+  // color, so the tab read flat-grey against every other (colorful)
+  // glyph in the bar. Swapped to an inline SVG that takes currentColor
+  // — picks up the active tab-accent and the muted inactive --tx2.
+  {id:'family', label:'Parent',
+    icon:'<svg class="tab-icon-svg" viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true">'
+       + '<path d="M9 12c2.21 0 4-1.79 4-4S11.21 4 9 4 5 5.79 5 8s1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>'
+       + '<path d="M16.5 12c1.93 0 3.5-1.57 3.5-3.5S18.43 5 16.5 5c-.55 0-1.07.13-1.54.35.66.95 1.04 2.11 1.04 3.15s-.38 2.2-1.04 3.15c.47.22.99.35 1.54.35zm.5 2c-.66 0-1.42.05-2.21.16C16.5 15.27 17 16.55 17 18v2h6v-2c0-2.66-5.33-4-6-4z"/>'
+       + '</svg>',
+    accent:'var(--c)',
     primary:[
       {sectionId:'s-parent', label:'Parent Hub', icon:'👨‍👩‍👧'}
     ]
@@ -1234,6 +1244,26 @@ function setActiveBottomTab(tabId){
   document.querySelectorAll('#bottomTabBar .tab-btn').forEach(b => {
     b.classList.toggle('active', b.getAttribute('data-tab') === tabId);
   });
+}
+
+// 2026-06-06 — Floating "← Home" back button (#mobileHomeBack in
+// app/index.html). Shown when we're on a non-home section AND we're
+// either in a standalone PWA or on a narrow viewport (≤860px). Hidden
+// on desktop browsers and always hidden on the home Command Center.
+// Called from showSection on every navigation and from a resize/
+// orientationchange listener installed at bottom of this file.
+function _updateMobileHomeBack(){
+  var btn = document.getElementById('mobileHomeBack');
+  if(!btn) return;
+  var standalone = (window.navigator && window.navigator.standalone === true) ||
+                   (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+  var narrow = (window.innerWidth || document.documentElement.clientWidth || 0) <= 860;
+  var isHome = (_activeSection === 's-hero') || !_activeSection;
+  btn.style.display = ((standalone || narrow) && !isHome) ? 'inline-flex' : 'none';
+}
+if(typeof window !== 'undefined'){
+  window.addEventListener('resize',           _updateMobileHomeBack);
+  window.addEventListener('orientationchange', _updateMobileHomeBack);
 }
 
 // Reverse lookup: which tab owns this section?
@@ -1769,6 +1799,12 @@ function showSection(id, fromMobile){
   // removed so the slide-in sidebar pattern is restored (Greenlight
   // dual-surface model).
   document.body.classList.toggle('teen-tabs', id !== 's-parent');
+
+  // 2026-06-06 — Floating "← Home" mobile back button. Visibility
+  // depends on (a) mobile narrow viewport OR standalone PWA, AND
+  // (b) we're not already on the home section. Owned entirely by
+  // JS so standalone-PWA users on wide viewports still see it.
+  if(typeof _updateMobileHomeBack === 'function') _updateMobileHomeBack();
 
   // Update nav highlights
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
