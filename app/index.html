@@ -6717,6 +6717,18 @@
     :root.light #s-chores .ch-col{background:#ffffff!important;border-color:rgba(15,23,42,.08)!important;}
     :root.light #s-chores .ch-card{background:#f8fafc!important;border-color:rgba(15,23,42,.08)!important;}
 
+    /* Tab 1 Inc 5 Step D — SortableJS drag states. ghostClass paints
+       the empty placeholder slot, chosenClass styles the picked-up
+       card, dragClass styles the floating "fallback" clone during
+       a touch drag. Grab cursor on the static card hints at drag
+       affordance on desktop; touch-action:none kills the iOS scroll-
+       interception on touch-and-hold so the long-press picks up the
+       card instead of starting a page scroll. */
+    #s-chores .ch-col-todo .ch-card{cursor:grab;touch-action:none;}
+    #s-chores .ch-card--ghost{opacity:.25;background:rgba(251,191,36,.08)!important;border-style:dashed!important;border-color:rgba(251,191,36,.4)!important;}
+    #s-chores .ch-card--chosen{cursor:grabbing;}
+    #s-chores .ch-card--drag{cursor:grabbing!important;opacity:.92;box-shadow:0 12px 30px rgba(0,0,0,.45),0 0 0 1px rgba(251,191,36,.3);transform:rotate(-1.5deg);}
+
     /* Overdue dot lives inside the My Chores tab label; hidden by default */
     #s-chores #chOverdueDot{display:none;width:8px;height:8px;border-radius:50%;background:#ef4444;margin-left:.3rem;vertical-align:middle;box-shadow:0 0 6px rgba(239,68,68,.6);}
 
@@ -18532,6 +18544,13 @@
 <script src="/app/js/health.js"></script>
 <script src="/app/js/goals.js"></script>
 <script src="/app/js/skills.js"></script>
+<!-- Tab 1 Inc 5 Step D — SortableJS for chore kanban drag-drop.
+     Defer keeps the parser flowing; chores.js checks `typeof Sortable`
+     before instantiating so the kanban degrades to a static list if
+     this CDN ever fails to load. forceFallback:true (set in chores.js)
+     activates the pointer-based fallback so touch works on iOS/Android
+     PWA — HTML5 native DnD is unreliable on touch. -->
+<script defer src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
 <script src="/app/js/chores.js"></script>
 <script src="/app/js/sports.js"></script>
 <script src="/app/js/habits.js"></script>
