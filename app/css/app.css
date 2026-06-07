@@ -4456,6 +4456,12 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
   filter:grayscale(.3); opacity:.75;
   transition:filter .15s ease, opacity .15s ease, transform .15s ease;
 }
+/* SVG glyph (used by the Parent tab) inherits currentColor so the
+   active state's color:var(--tab-accent) tints it. display:block
+   removes inline-baseline whitespace under the svg box. */
+#bottomTabBar .tab-btn .tab-icon-svg{
+  display:block;
+}
 #bottomTabBar .tab-btn .tab-label{
   font-size:.66rem;
   letter-spacing:.02em;
@@ -5853,3 +5859,96 @@ html[data-faith-free="1"] body.ff-hero-active #faithHeroCinematic .fo-hero{
 html[data-faith-free="1"] body.ff-hero-active #faithHeroCinematic .fo-hero-content{
   padding-top:calc(54px + max(env(safe-area-inset-top),8px)) !important;
 }
+
+/* ════════════════════════════════════════════════════════════
+   2026-06-06 — Parent Hub PIN gate (#parentGate) viewport-fixed.
+   Previously rendered as a normal block inside #s-parent with
+   text-align:center. On mobile, if the user landed on Parent
+   Hub mid-scroll (e.g. via the bottom Parent tab while #s-parent
+   was scrolled), the PIN panel sat at the section's scroll
+   offset rather than the viewport center, leaving the keypad
+   clipped or off-screen. position:fixed + inset:0 + flex
+   centering guarantees the gate always lands in the visible
+   viewport. parent.js still toggles inline display:'none' on
+   unlock and display:'' on lock — display:flex is the default
+   so the empty string falls back to centered.
+   ════════════════════════════════════════════════════════════ */
+#parentGate{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  position:fixed;
+  inset:0;
+  z-index:60;
+  padding:max(env(safe-area-inset-top), 1rem) 1rem max(env(safe-area-inset-bottom), 1rem);
+  background:rgba(13, 17, 23, .92);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  overflow-y:auto;
+  text-align:center;
+}
+#parentGate > *{
+  width:100%;
+  max-width:340px;
+}
+#parentGate #pgAvatarCircle{
+  margin-bottom:.8rem !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   2026-06-06 — Mobile "← Home" floating back button.
+   Visibility is controlled by _updateMobileHomeBack() in ui.js
+   which sets inline display:'inline-flex' when (mobile narrow
+   viewport OR PWA standalone) AND the current section is not
+   the home (#s-hero / Command Center). The CSS here only sizes,
+   colors, and positions; JS owns the show/hide gate. Sits above
+   the bottom tab bar on screens where the bar is visible.
+   ════════════════════════════════════════════════════════════ */
+#mobileHomeBack{
+  position:fixed;
+  right:14px;
+  bottom:calc(72px + env(safe-area-inset-bottom, 0) + 14px);
+  z-index:945;
+  align-items:center;
+  gap:.35rem;
+  padding:.55rem .95rem;
+  border:1px solid rgba(255, 255, 255, .12);
+  border-radius:999px;
+  background:rgba(13, 17, 23, .85);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  color:#F1E9D5;
+  font-family:var(--fm);
+  font-size:.82rem;
+  font-weight:700;
+  letter-spacing:.02em;
+  cursor:pointer;
+  box-shadow:0 6px 18px rgba(0, 0, 0, .45), 0 0 0 1px rgba(255, 255, 255, .04);
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .15s ease, background .15s ease, border-color .15s ease;
+}
+#mobileHomeBack:hover,
+#mobileHomeBack:focus-visible{
+  background:rgba(13, 17, 23, .95);
+  border-color:rgba(255, 255, 255, .22);
+  transform:translateY(-1px);
+}
+#mobileHomeBack:active{
+  transform:translateY(0);
+}
+#mobileHomeBack span:first-child{
+  font-size:1rem;
+  line-height:1;
+}
+/* When the bottom tab bar is hidden (e.g. Parent Hub on mobile, where
+   body.teen-tabs is removed) the floating button drops to the standard
+   safe-area-inset bottom so it doesn't hover over empty space. */
+body:not(.teen-tabs) #mobileHomeBack{
+  bottom:calc(env(safe-area-inset-bottom, 0) + 14px);
+}
+/* JS owns the show/hide gate (mobile width OR standalone PWA AND not
+   on home). The inline display:none on the markup hides the button
+   until JS flips it to inline-flex, so we don't need a CSS media gate
+   here — adding one with !important would lock out standalone-PWA
+   users on wide viewports. */
