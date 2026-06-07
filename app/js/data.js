@@ -148,6 +148,26 @@ const DEF = {
   // finance.js skips any key already present, so each milestone is a
   // single one-shot celebration. JSONB only — no new table.
   moneyMilestones:{},
+  // Tab 2 Inc 7 Step B (2026-06-06) — Parent purchase approvals.
+  // When a kid logs an EXPENSE in #mt-tx whose amount >= the per-kid
+  // threshold, addTx() diverts the entry into D.purchaseRequests
+  // instead of D.transactions. The parent reviews the queue inside
+  // #ph-rewards → "Purchase approvals" section, then approves (which
+  // promotes the request into a real transaction) or denies (which
+  // marks it denied but keeps it visible so the kid doesn't re-ask).
+  //
+  // Request shape:
+  //   { id, kidProfileId, name, amount, cat, requestedAt (iso),
+  //     status:'pending'|'approved'|'denied',
+  //     reviewedAt, reviewerNote, txId (set when approved → promoted) }
+  //
+  // No TTL / auto-expire in v1 — old requests stay visible with an
+  // age tag so the parent can see how long they've been waiting.
+  // Brevo email notify on submit via /api/notify-parent-purchase.
+  purchaseRequests:[],
+  // Per-user $ floor that triggers the approval gate. Editable from
+  // Parent Hub in a future polish pass; for v1 it's the DEF default.
+  purchaseApprovalThreshold:25,
   // Tab 2 Inc 7 Step A (2026-06-06) — Weekly AI Money Coach cache.
   //   weekKey   — ISO 'YYYY-Www' of the week the response was generated
   //   summary   — 2-3 second-person sentences naming concrete patterns
