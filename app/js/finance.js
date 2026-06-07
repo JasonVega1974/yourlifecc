@@ -38,6 +38,9 @@ function mTab(tab,btn){
     // about. Manual refresh button always works via the ↻ control.
     if(typeof renderMoneyCoach         === 'function') renderMoneyCoach();
     if(typeof _maybeAutoFetchMoneyCoach === 'function') _maybeAutoFetchMoneyCoach();
+    // Tab 2 Inc 7 Step C — paint the virtual card. Pure cosmetic;
+    // cheap to re-render on every dashboard activation.
+    if(typeof renderVirtualCard        === 'function') renderVirtualCard();
   }
   if(tab==='tx')        renderTx();
   if(tab==='budget')    calcBudget();
@@ -326,6 +329,10 @@ function updateFinSum(){
   set('finSumBalance', '$'+(D.bank||0).toLocaleString());
   set('finSumMonthSpend', '$'+exp.toFixed(2));
   set('finSumSavPct', savPct.toFixed(0)+'%');
+  // Tab 2 Inc 7 Step C — keep the virtual card balance in sync. The
+  // host renders empty until the dashboard tab is opened, so this is
+  // a cheap re-paint when the host exists.
+  if(typeof renderVirtualCard === 'function') renderVirtualCard();
   // The donut chart re-renders on overview-tab activation; refresh here
   // too so it stays current when transactions change while overview is open.
   if(typeof renderSpendingDonut === 'function'){
@@ -2623,4 +2630,103 @@ function _maybeAutoFetchMoneyCoach(){
   // empty profiles get the friendly stub via the manual ↻ path instead.
   if(s.txCount < 2 && s.lessonsCompleted < 1) return;
   fetchMoneyCoach();
+}
+
+// ════════════════════════════════════════════════════════════
+// Tab 2 Inc 7 Step C — Virtual debit card (cosmetic / educational).
+//
+// Pure visual — no real card issuing, no real money movement. Lives
+// on #mt-dashboard above the balance form. Front shows a stable
+// "card number" with a deterministic last-4 derived from the kid's
+// stable profile id (so the number doesn't change every render but
+// is explicitly NOT a real PAN). Tapping the card flips it to the
+// back which shows the educational disclaimer.
+//
+// Reduced-motion guard lives in the CSS (#virtualCard.is-flipped
+// transition disabled under @media (prefers-reduced-motion: reduce)).
+// ════════════════════════════════════════════════════════════
+function _finVcLast4(){
+  // Stable per-profile pseudo-PAN last-4. Hash _pidOf(activeProfile)
+  // if available, else fall back to a hash of D.name. Result mod 10000.
+  var src = '_solo';
+  if(typeof _pidOf === 'function' && typeof _activeProfileId !== 'undefined' && _activeProfileId){
+    src = _pidOf(_activeProfileId) || '_solo';
+  } else if(D && D.name){
+    src = String(D.name);
+  }
+  var h = 0;
+  for(var i = 0; i < src.length; i++){
+    h = ((h << 5) - h + src.charCodeAt(i)) | 0;
+  }
+  var n = Math.abs(h) % 10000;
+  return String(n).padStart(4, '0');
+}
+
+function _finVcEmoji(){
+  // Picks a stable emoji per-profile from a small palette. Same hash
+  // source as last-4 so the card 'identity' stays consistent.
+  var src = '_solo';
+  if(typeof _pidOf === 'function' && typeof _activeProfileId !== 'undefined' && _activeProfileId){
+    src = _pidOf(_activeProfileId) || '_solo';
+  } else if(D && D.name){
+    src = String(D.name);
+  }
+  var EMOJIS = ['💎','🚀','🌟','⚡','🔥','🎯','🌊','🎵'];
+  var h = 0;
+  for(var i = 0; i < src.length; i++){ h = ((h << 5) - h + src.charCodeAt(i)) | 0; }
+  return EMOJIS[Math.abs(h) % EMOJIS.length];
+}
+
+function flipVirtualCard(){
+  var card = document.getElementById('virtualCard');
+  if(!card) return;
+  card.classList.toggle('is-flipped');
+}
+
+function renderVirtualCard(){
+  var host = document.getElementById('virtualCard');
+  if(!host) return;
+  var esc = function(s){
+    return String(s || '').replace(/[&<>"']/g, function(c){
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+    });
+  };
+  var name = String(D.name || 'Member').toUpperCase().slice(0, 22);
+  var bal  = Math.round(Number(D.bank) || 0);
+  var last4 = _finVcLast4();
+  var emoji = _finVcEmoji();
+  var year  = new Date().getFullYear();
+  host.innerHTML = ''
+    + '<button type="button" class="mn-vc__face mn-vc__face--front" onclick="flipVirtualCard()" aria-label="Show card back">'
+    +   '<div class="mn-vc__brand">'
+    +     '<span class="mn-vc__issuer">YOURLIFE CC</span>'
+    +     '<span class="mn-vc__emoji" aria-hidden="true">' + emoji + '</span>'
+    +   '</div>'
+    +   '<div class="mn-vc__chip" aria-hidden="true">'
+    +     '<span></span><span></span><span></span><span></span>'
+    +   '</div>'
+    +   '<div class="mn-vc__num"><span aria-hidden="true">••••&nbsp;••••&nbsp;••••&nbsp;</span>' + last4 + '</div>'
+    +   '<div class="mn-vc__row">'
+    +     '<div>'
+    +       '<div class="mn-vc__lbl">Cardholder</div>'
+    +       '<div class="mn-vc__name">' + esc(name) + '</div>'
+    +     '</div>'
+    +     '<div>'
+    +       '<div class="mn-vc__lbl">Balance</div>'
+    +       '<div class="mn-vc__bal">$' + bal.toLocaleString() + '</div>'
+    +     '</div>'
+    +   '</div>'
+    +   '<div class="mn-vc__hint">Tap to flip</div>'
+    + '</button>'
+    + '<button type="button" class="mn-vc__face mn-vc__face--back" onclick="flipVirtualCard()" aria-label="Show card front">'
+    +   '<div class="mn-vc__stripe" aria-hidden="true"></div>'
+    +   '<div class="mn-vc__sig">'
+    +     '<span class="mn-vc__sig-lbl">Authorized signature</span>'
+    +     '<span class="mn-vc__sig-name">' + esc(name) + '</span>'
+    +   '</div>'
+    +   '<div class="mn-vc__disclaimer">'
+    +     '<strong>Educational only — not a real card.</strong> No money moves through this number. Use it to picture what your balance and goals could look like.'
+    +   '</div>'
+    +   '<div class="mn-vc__footer">Powered by YourLife CC Learn · ' + year + '</div>'
+    + '</button>';
 }
