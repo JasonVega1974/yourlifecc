@@ -75,7 +75,7 @@ function renderBankHist(){
   const el=document.getElementById('bankHist'); if(!el) return;
   el.innerHTML=(D.bankHistory||[]).map(h=>`
     <div style="display:flex;justify-content:space-between;padding:.35rem 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:.78rem;">
-      <span style="color:#c8d4e8;">${h.date} · ${h.label||''}</span>
+      <span style="color:#c8d4e8;">${h.date} · ${escapeHtml(h.label||'')}</span>
       <span style="color:#c4b5fd;font-weight:700;">$${(h.bank||0).toLocaleString()}</span>
       ${h.savAcct!==undefined?`<span style="color:var(--gr);font-weight:700;">+$${(h.savAcct||0).toLocaleString()}</span>`:''}
     </div>`).join('');
@@ -460,7 +460,7 @@ function renderSavGoalCards(){
     // signed URL after the sync paint.
     const heroHtml = hasPhoto
       ? '<div class="mz-goal-photo" data-goal-id="' + g.id + '" style="width:48px;height:48px;border-radius:10px;background:rgba(255,255,255,.05) center/cover no-repeat;flex-shrink:0;"></div>'
-      : '<span style="font-size:1.5rem;flex-shrink:0;">' + g.emoji + '</span>';
+      : '<span style="font-size:1.5rem;flex-shrink:0;">' + escapeHtml(g.emoji) + '</span>';
     // Countdown chip — months remaining when targetDate set.
     let countdownHtml = '';
     if(g.targetDate && !done){
@@ -553,7 +553,7 @@ function renderSavingsTab(){
     const col=p>=75?'var(--gr)':p>=40?'var(--c)':'var(--g)';
     return`<div class="card" style="border-top:3px solid ${col};">
       <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem;">
-        <span style="font-size:1.35rem;">${g.emoji}</span>
+        <span style="font-size:1.35rem;">${escapeHtml(g.emoji)}</span>
         <div style="flex:1;"><div style="font-weight:800;font-size:.9rem;">${escapeHtml(g.name)}</div>
         <div style="font-size:.68rem;color:#c8d4e8;">$${Math.max(0,g.target-(g.current||0)).toLocaleString()} to go</div></div>
         <div style="font-family:var(--fn);font-size:.95rem;font-weight:700;color:${col};">${p.toFixed(0)}%</div>
