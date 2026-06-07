@@ -6945,6 +6945,31 @@
 
   <!-- ── PANEL: My Chores (default active) ─────────────────────── -->
   <div id="ch-mychores" class="ch-panel">
+    <!-- ─── Tab 1 Inc 5 Step C — AI Chore Coach card ───
+         Painted by renderChoreCoach() in chores.js. Sits at the top of
+         the panel so the kid sees the weekly read before scrolling to
+         today's tasks. Fetches lazily on cTab('mychores') activation
+         when the cached week is stale + there's activity to coach. -->
+    <style>
+      #s-chores .cc-coach{position:relative;background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(34,197,94,.05));border:1px solid rgba(167,139,250,.22);border-radius:14px;padding:.85rem 1rem;margin-bottom:1rem;overflow:hidden;}
+      #s-chores .cc-coach::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 100% 0%, rgba(167,139,250,.18), transparent 55%);pointer-events:none;}
+      #s-chores .cc-coach__head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.5rem;position:relative;}
+      #s-chores .cc-coach__title{font-family:var(--fh);font-size:.7rem;letter-spacing:1.5px;color:#a78bfa;}
+      #s-chores .cc-coach__refresh{background:rgba(255,255,255,.08);border:1px solid rgba(167,139,250,.25);color:#c4b5fd;width:32px;height:32px;border-radius:50%;font-size:1rem;font-weight:900;cursor:pointer;transition:transform .2s,background .2s;-webkit-tap-highlight-color:transparent;display:grid;place-items:center;line-height:1;}
+      #s-chores .cc-coach__refresh:hover{background:rgba(167,139,250,.18);transform:rotate(60deg);}
+      #s-chores .cc-coach__refresh:active{transform:rotate(180deg);}
+      #s-chores .cc-coach__body{position:relative;}
+      #s-chores .cc-coach__summary{font-size:.92rem;line-height:1.45;color:var(--tx);margin:0 0 .55rem;font-weight:600;}
+      #s-chores .cc-coach__focus{font-size:.82rem;line-height:1.45;color:var(--tx2);margin:0;padding:.5rem .75rem;background:rgba(255,255,255,.04);border-radius:10px;border-left:3px solid #a78bfa;}
+      #s-chores .cc-coach__focus-label{font-weight:800;color:#c4b5fd;letter-spacing:.04em;text-transform:uppercase;font-size:.62rem;margin-right:.35rem;}
+      #s-chores .cc-coach__stale{font-size:.65rem;color:#fbbf24;font-weight:700;margin-top:.5rem;letter-spacing:.02em;}
+      #s-chores .cc-coach__loading{font-size:.85rem;color:var(--tx2);font-style:italic;padding:.4rem 0;}
+      #s-chores .cc-coach__err{font-size:.8rem;color:#fca5a5;}
+      #s-chores .cc-coach--empty .cc-coach__summary{color:var(--tx2);font-weight:500;}
+      :root.light #s-chores .cc-coach{background:#ffffff;border-color:rgba(167,139,250,.3);}
+    </style>
+    <div id="choreCoachCard" style="margin-bottom:1rem;"></div>
+
     <!-- Today's Chores -->
     <div style="font-family:var(--fh);font-size:.7rem;letter-spacing:1.5px;color:var(--c);margin-bottom:.6rem;">TODAY'S CHORES</div>
     <div id="choreTodayList" style="margin-bottom:1rem;"></div>
