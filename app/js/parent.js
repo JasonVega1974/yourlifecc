@@ -3351,6 +3351,10 @@ function approveSelfChore(id, points){
   save();
   renderParentSelfChores();
   renderHelpfulChores();
+  // Tab 1 Inc 5 Step B — Helper Heart badge depends on approved
+  // self-chores. Recompute after every approval so the badge
+  // surfaces on the kid's #ch-mychores grid without a refresh.
+  if(typeof _checkChoreBadges === 'function') _checkChoreBadges();
   logActivity('helpful', 'Parent approved: ' + chore.text + ' (+' + points + ' pts)');
   showToast('✅ Approved! +' + points + ' chore pts & +' + Math.round(points/2) + ' PB');
 }
