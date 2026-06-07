@@ -5954,6 +5954,83 @@ body:not(.teen-tabs) #mobileHomeBack{
    users on wide viewports. */
 
 /* ════════════════════════════════════════════════════════════
+   2026-06-06 — Primary action FAB.
+   Site-wide floating "+" pill that surfaces the section's primary
+   add/create action without forcing the user to scroll up to the
+   in-flow form. Sits at bottom-LEFT so it doesn't collide with the
+   ← Home pill at bottom-RIGHT. Visibility + label + onclick are
+   owned by _updatePrimaryFab() in ui.js, driven by the
+   PRIMARY_FAB_CONFIG map keyed on _activeSection. Same mobile-only
+   gate as ← Home (innerWidth ≤ 860px OR standalone PWA). Inline
+   display:none on the markup hides it until JS flips it on.
+   ════════════════════════════════════════════════════════════ */
+#primaryFab{
+  position:fixed;
+  left:14px;
+  bottom:calc(72px + env(safe-area-inset-bottom, 0) + 14px);
+  z-index:945;
+  align-items:center;
+  gap:.4rem;
+  padding:.7rem 1.15rem;
+  border:1px solid color-mix(in srgb, var(--c, #38bdf8) 30%, transparent);
+  border-radius:999px;
+  background:linear-gradient(135deg, var(--c, #38bdf8), color-mix(in srgb, var(--c, #38bdf8) 70%, #0ea5e9));
+  color:#0b1020;
+  font-family:var(--fm);
+  font-size:.9rem;
+  font-weight:800;
+  letter-spacing:.02em;
+  cursor:pointer;
+  box-shadow:0 8px 24px color-mix(in srgb, var(--c, #38bdf8) 35%, transparent), 0 0 0 1px rgba(255, 255, 255, .08);
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+  white-space:nowrap;
+  max-width:calc(100vw - 28px);
+}
+#primaryFab:hover,
+#primaryFab:focus-visible{
+  transform:translateY(-2px);
+  box-shadow:0 12px 28px color-mix(in srgb, var(--c, #38bdf8) 45%, transparent), 0 0 0 1px rgba(255, 255, 255, .14);
+}
+#primaryFab:active{
+  transform:translateY(0);
+}
+#primaryFab #primaryFabLabel{
+  line-height:1;
+}
+/* When the bottom tab bar is hidden (e.g. inside Parent Hub where
+   body.teen-tabs is off) the FAB drops to the standard safe-area
+   inset — same pattern as #mobileHomeBack. */
+body:not(.teen-tabs) #primaryFab{
+  bottom:calc(env(safe-area-inset-bottom, 0) + 14px);
+}
+
+/* ════════════════════════════════════════════════════════════
+   2026-06-06 — Parent Hub mobile top-space reduction.
+   The base .sec rule applies padding:2.2rem 0 .5rem and .sh applies
+   margin-bottom:1.5rem app-wide. Inside #s-parent that compounds with
+   the back/lock row + child selector + ph-home-crumb to push the
+   dashboard content well past the comfortable thumb zone — the user
+   sees a thick band of empty space between the mBar header and the
+   first piece of real content.
+   This mobile-only override tightens the three biggest spacers
+   (section padding-top, header bottom margin, ph-hero panel padding)
+   while leaving the desktop layout untouched.
+   ════════════════════════════════════════════════════════════ */
+@media (max-width: 860px){
+  #s-parent.sec{
+    padding-top:.7rem;
+  }
+  #s-parent .sh{
+    margin-bottom:.6rem;
+  }
+  #s-parent .ph-hero{
+    padding:.8rem 1rem;
+    margin-bottom:.85rem;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
    2026-06-06 — Parent Hub launcher grid bottom clearance.
    The 8-card grid (#phCardGrid) lives at the bottom of #ph-home.
    On mobile (≤860px), with teen-tabs OFF inside Parent Hub the
