@@ -5952,3 +5952,29 @@ body:not(.teen-tabs) #mobileHomeBack{
    until JS flips it to inline-flex, so we don't need a CSS media gate
    here — adding one with !important would lock out standalone-PWA
    users on wide viewports. */
+
+/* ════════════════════════════════════════════════════════════
+   2026-06-06 — Parent Hub launcher grid bottom clearance.
+   The 8-card grid (#phCardGrid) lives at the bottom of #ph-home.
+   On mobile (≤860px), with teen-tabs OFF inside Parent Hub the
+   bottom tab bar is hidden — but the new floating "← Home" pill
+   still occupies the bottom-right of the viewport. Without
+   dedicated bottom padding on the grid the last row (Family &
+   Profiles + Controls & Limits) is obscured by the pill and the
+   iOS safe-area inset, making those two cards untappable.
+   The overflow:visible / max-height:none locks are defensive —
+   nothing in the chain currently caps height, but this guards
+   against future style additions silently clipping the grid.
+   ════════════════════════════════════════════════════════════ */
+@media (max-width: 860px){
+  #s-parent,
+  #s-parent #parentDashContent,
+  #s-parent #phLayout,
+  #s-parent #ph-home{
+    overflow:visible !important;
+    max-height:none !important;
+  }
+  #s-parent #phCardGrid{
+    padding-bottom:calc(env(safe-area-inset-bottom, 0) + 5rem) !important;
+  }
+}
