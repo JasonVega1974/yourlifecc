@@ -288,6 +288,9 @@ function verifyChore(logId, approved){
     // (Phase 1 of the PIN -> stable-id decouple, v249) so the new
     // table is keyed by the stable id from day 1.
     if(typeof updateChoreStreak === 'function') updateChoreStreak();
+    // Tab 1 Inc 5 Step B — re-check chore badges after every approval.
+    // Helper toasts on first-earn and triggers a re-render of the grid.
+    if(typeof _checkChoreBadges === 'function') _checkChoreBadges();
   } else {
     entry.status='rejected';
     showToast('Chore rejected');
@@ -351,6 +354,11 @@ function renderChores(){
   if(typeof renderPhPendingChores === 'function') renderPhPendingChores();
   // Always sync the home dashboard chore card
   if(typeof updateDashCards === 'function') updateDashCards();
+  // Tab 1 Inc 5 Step B — paint the chore-specific badge grid in the
+  // #ch-mychores panel. Cheap (10 fixed entries) so re-render on every
+  // chores refresh is fine. Skips gracefully if the host element isn't
+  // mounted (e.g. partial DOM during boot).
+  if(typeof renderChoreBadges === 'function') renderChoreBadges();
   const today = new Date().toISOString().slice(0,10);
   const dayOfWeek = new Date().getDay();
   const avail = D.chorePoints.total - D.chorePoints.spent;
@@ -1453,4 +1461,151 @@ async function updateChoreStreak(){
   } catch(e){
     console.debug('[chore_streaks mirror] exception:', e && e.message);
   }
+}
+
+// ════════════════════════════════════════════════════════════
+// Tab 1 Increment 5 Step B — Chore badges (parallel surface,
+// separate from traits.js Steward XP).
+//
+// Ten kid-facing achievements scoped to the chore loop. Storage
+// in D.choreBadges keyed by badge id → ISO award date. Test
+// functions read live D shape; defensive ?? falls so a legacy
+// blob without the supporting array can't throw. Award path
+// runs from verifyChore (parent approval) and approveSelfChore
+// (helpful-deed approval); render path runs from renderChores
+// + cTab('mychores') for the initial paint.
+// ════════════════════════════════════════════════════════════
+const CHORE_BADGES = [
+  { id:'first_step',     label:'First Step',      sub:'Verified your first chore',
+    icon:'🌱', accent:'#22c55e',
+    test:function(D){
+      return (Array.isArray(D.choreLog)?D.choreLog:[])
+        .some(l => l && l.status === 'verified');
+    }
+  },
+  { id:'three_in_a_row', label:'On a Roll',       sub:'3-day chore streak',
+    icon:'⚡', accent:'#f59e0b',
+    test:function(D){
+      var s = (typeof getChoreStreak === 'function') ? getChoreStreak() :
+              (D.choreStreak && D.choreStreak.current) || 0;
+      return s >= 3;
+    }
+  },
+  { id:'week_strong',    label:'Week Strong',     sub:'7-day chore streak',
+    icon:'🔥', accent:'#ef4444',
+    test:function(D){
+      var s = (typeof getChoreStreak === 'function') ? getChoreStreak() :
+              (D.choreStreak && D.choreStreak.current) || 0;
+      return s >= 7;
+    }
+  },
+  { id:'month_master',   label:'Month Master',    sub:'30-day chore streak',
+    icon:'👑', accent:'#fbbf24',
+    test:function(D){
+      var s = (typeof getChoreStreak === 'function') ? getChoreStreak() :
+              (D.choreStreak && D.choreStreak.current) || 0;
+      return s >= 30;
+    }
+  },
+  { id:'century_club',   label:'Century Club',    sub:'100 points earned',
+    icon:'💯', accent:'#06b6d4',
+    test:function(D){ return D.chorePoints && D.chorePoints.total >= 100; }
+  },
+  { id:'high_roller',    label:'High Roller',     sub:'500 points earned',
+    icon:'🚀', accent:'#a78bfa',
+    test:function(D){ return D.chorePoints && D.chorePoints.total >= 500; }
+  },
+  { id:'big_spender',    label:'Big Spender',     sub:'1000 points earned',
+    icon:'💎', accent:'#38bdf8',
+    test:function(D){ return D.chorePoints && D.chorePoints.total >= 1000; }
+  },
+  { id:'proof_it',       label:'Proof It',        sub:'5 chores verified with a photo',
+    icon:'📸', accent:'#ec4899',
+    test:function(D){
+      return (Array.isArray(D.choreLog)?D.choreLog:[])
+        .filter(l => l && l.status === 'verified' && l.photoPath).length >= 5;
+    }
+  },
+  { id:'helper_heart',   label:'Helper Heart',    sub:'3 helpful deeds approved',
+    icon:'💛', accent:'#fcd34d',
+    test:function(D){
+      return (Array.isArray(D.selfChores)?D.selfChores:[])
+        .filter(c => c && (c.status === 'approved' || c.status === 'verified')).length >= 3;
+    }
+  },
+  { id:'all_categories', label:'Renaissance Kid', sub:'Verified chores in 5+ categories',
+    icon:'🌈', accent:'#34d399',
+    test:function(D){
+      var cats = {};
+      var log = Array.isArray(D.choreLog) ? D.choreLog : [];
+      var chores = Array.isArray(D.chores) ? D.chores : [];
+      log.forEach(function(l){
+        if(!l || l.status !== 'verified') return;
+        var c = chores.find(function(x){ return x.id === l.choreId; });
+        var cat = (c && c.cat) || l.cat;
+        if(cat) cats[cat] = true;
+      });
+      return Object.keys(cats).length >= 5;
+    }
+  }
+];
+
+function _checkChoreBadges(){
+  if(!D.choreBadges || typeof D.choreBadges !== 'object') D.choreBadges = {};
+  var today = new Date().toISOString().slice(0,10);
+  var newCount = 0;
+  var firstNew = null;
+  CHORE_BADGES.forEach(function(b){
+    if(D.choreBadges[b.id]) return;
+    try {
+      if(b.test(D)){
+        D.choreBadges[b.id] = today;
+        newCount++;
+        if(!firstNew) firstNew = b;
+      }
+    } catch(e){}
+  });
+  if(newCount > 0){
+    save();
+    if(typeof renderChoreBadges === 'function') renderChoreBadges();
+    if(typeof showToast === 'function' && firstNew){
+      var more = newCount > 1 ? ' (+' + (newCount - 1) + ' more)' : '';
+      showToast('🏆 Badge earned: ' + firstNew.label + more);
+    }
+  }
+}
+
+function renderChoreBadges(){
+  var host = document.getElementById('choreBadgesGrid');
+  if(!host) return;
+  if(!D.choreBadges || typeof D.choreBadges !== 'object') D.choreBadges = {};
+  var esc = function(s){
+    return String(s || '').replace(/[&<>"']/g, function(c){
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+    });
+  };
+  var earnedCount = CHORE_BADGES.filter(function(b){ return !!D.choreBadges[b.id]; }).length;
+  var total = CHORE_BADGES.length;
+
+  var header = ''
+    + '<div class="cb-head">'
+    +   '<div class="cb-head__title">🏆 BADGES</div>'
+    +   '<div class="cb-head__count">' + earnedCount + ' / ' + total + '</div>'
+    + '</div>';
+
+  var grid = CHORE_BADGES.map(function(b){
+    var got = !!D.choreBadges[b.id];
+    var date = got ? D.choreBadges[b.id] : '';
+    var titleAttr = esc(b.sub) + (got ? ' · earned ' + date : '');
+    return ''
+      + '<div class="cb-badge' + (got ? ' cb-badge--earned' : ' cb-badge--locked') + '"'
+      +   ' style="--cb-accent:' + esc(b.accent) + ';"'
+      +   ' title="' + titleAttr + '">'
+      +   '<div class="cb-badge__icon" aria-hidden="true">' + b.icon + '</div>'
+      +   '<div class="cb-badge__label">' + esc(b.label) + '</div>'
+      +   '<div class="cb-badge__sub">'   + esc(b.sub)   + '</div>'
+      + '</div>';
+  }).join('');
+
+  host.innerHTML = header + '<div class="cb-grid">' + grid + '</div>';
 }
