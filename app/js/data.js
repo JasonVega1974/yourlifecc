@@ -192,6 +192,14 @@ const DEF = {
   driverChecklist:{},
   // chores / rewards
   choreList:[], choreLog:[], chores:{}, selfChores:[], chorePoints:{total:0,spent:0}, chorePin:'',
+  // 2026-06-06 — Tab 1 Increment 5 Step B. Parallel badge surface for
+  // chores — intentionally separate from the global traits.js Steward
+  // XP so a kid can see their chore-specific achievements without the
+  // wider trait-system context bleeding in. Shape:
+  //   { '<badgeId>': 'YYYY-MM-DD'   ← ISO date awarded }
+  // Catalog (10 badges) lives in chores.js → CHORE_BADGES. Award path:
+  // _checkChoreBadges() runs after every verifyChore + approveSelfChore.
+  choreBadges:{},
   rewards:[], incentives:[], behaviorLog:[], parentNotes:[],
   parentPIN:'', parentPinDisabled:false, parentWizardDone:false,
   parentGrowth:[], childAvatar:'', childAvatarPhoto:'',
