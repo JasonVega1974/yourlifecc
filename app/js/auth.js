@@ -657,12 +657,12 @@ async function signOut(){
   _supaUser = null;
   D = JSON.parse(JSON.stringify(DEF));
   localStorage.removeItem(LS);
-  // Clear parent unlock state on sign out (in-memory + stale storage flags
-  // from the pre-Phase-1.1 storage-cache model).
+  // Clear parent unlock state on sign out — in-memory only since
+  // Phase 1.1. Legacy lifeos_parent_unlocked / parentUnlocked flags
+  // were retired in the Phase 1 sweep; the pre-Phase-1.1 storage-
+  // cache cleanup calls have been removed.
   if(typeof lockParentDash === 'function'){ try { lockParentDash(); } catch(e){} }
-  localStorage.removeItem('lifeos_parent_unlocked');
   localStorage.removeItem('lifeos_pin_set');
-  sessionStorage.removeItem('parentUnlocked');
   document.getElementById('subBlockedScreen').style.display = 'none';
   document.getElementById('authScreen').style.display = 'flex';
   setSyncSt('local');
