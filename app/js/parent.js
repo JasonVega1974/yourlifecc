@@ -2832,7 +2832,7 @@ function phNav(tab){
   // Fire renders for the resolved card. One render set per card so
   // hidden panels don't get their renderers fired needlessly.
   if(t === 'home')     { renderParentHubHome(); }
-  if(t === 'chores')   { renderPhPendingChores(); renderParentChoreList(); renderParentSelfChores(); renderParentDeeds(); }
+  if(t === 'chores')   { renderPhPendingChores(); renderParentChoreList(); renderParentChorePacks(); renderParentSelfChores(); renderParentDeeds(); }
   if(t === 'rewards')  { renderPhRewards(); if(typeof renderPhRewardsHeroChips === 'function') renderPhRewardsHeroChips(); }
   // Tab 2 Inc 3 (fix) — Allowance promoted to its own card + panel.
   // Was previously appended to the 'rewards' handler (where the
@@ -3652,6 +3652,103 @@ function renderParentChoreList(){
   const addTile = '<div class="ph-ch-addtile" role="button" tabindex="0" onclick="phChoreFocusForm()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();phChoreFocusForm();}">+ Add a chore</div>';
   el.innerHTML = tiles + addTile;
   if(typeof renderPhChoreHeroChips === 'function') renderPhChoreHeroChips();
+}
+
+// ════════════════════════════════════════════════════════════
+// Tab 1 Increment 5 Step A-3 — Parent Hub starter-pack picker.
+//
+// Renders one card per entry in window.CHORE_PACKS (loaded from
+// /app/js/data/chore-packs.js). Each card surfaces the pack's
+// emoji, name, description, chore count, and base-points total.
+// Tap → addPackFromParent → addChorePack pushes the chores into
+// D.chores (skip-copy dedupe), then we repaint the Active chores
+// tile grid so the parent sees the new entries land in place.
+//
+// Empty / failed-load states fall through to a quiet message in
+// the host div — never throws, never blocks the rest of the
+// Chores tab from rendering.
+// ════════════════════════════════════════════════════════════
+function renderParentChorePacks(){
+  const el = document.getElementById('parentChorePacks');
+  if(!el) return;
+
+  const packs = (typeof window !== 'undefined' && Array.isArray(window.CHORE_PACKS))
+    ? window.CHORE_PACKS : [];
+
+  if(!packs.length){
+    el.innerHTML = '<div class="ph-ch-pack-empty">Pack catalog is loading… reload the page if this sticks.</div>';
+    return;
+  }
+
+  // Sort by sortOrder (low first → Daily Reset surfaces at the
+  // top). Falls back to natural order for any pack missing the
+  // field. Frontmatter `months` / `ageRange` are intentionally
+  // not read in v1 — every pack is shown to every parent per
+  // Inc 5 Step A decision #6.
+  const sorted = packs.slice().sort(function(a, b){
+    const ao = Number.isFinite(+a.sortOrder) ? +a.sortOrder : 999;
+    const bo = Number.isFinite(+b.sortOrder) ? +b.sortOrder : 999;
+    return ao - bo;
+  });
+
+  const esc = function(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+    });
+  };
+
+  el.innerHTML = sorted.map(function(p){
+    const rows = Array.isArray(p.chores) ? p.chores : [];
+    const choreCount = rows.length;
+    const ptsTotal = rows.reduce(function(s, r){
+      return s + (Number.isFinite(+r.pts) ? +r.pts : 0);
+    }, 0);
+    // Count how many are recurring vs one-shot so the parent can
+    // see at a glance "this pack mostly seeds daily habits" vs
+    // "this is a one-weekend project."
+    const recurring = rows.filter(function(r){
+      return r && (r.freq === 'daily' || r.freq === 'weekly');
+    }).length;
+    const oneShot = choreCount - recurring;
+    const mixLabel = recurring && oneShot
+      ? recurring + ' recurring · ' + oneShot + ' one-shot'
+      : recurring
+        ? recurring + ' recurring'
+        : oneShot + ' one-shot';
+
+    return ''
+      + '<div class="ph-ch-pack" data-pack-id="' + esc(p.id) + '">'
+      +   '<div class="ph-ch-pack-hdr">'
+      +     '<span class="ph-ch-pack-emoji">' + esc(p.emoji || '📦') + '</span>'
+      +     '<div class="ph-ch-pack-titles">'
+      +       '<div class="ph-ch-pack-name">' + esc(p.name || p.id) + '</div>'
+      +       '<div class="ph-ch-pack-meta">'
+      +         '<span class="ph-ch-mini ph-ch-mini-freq">' + choreCount + ' chores</span>'
+      +         '<span class="ph-ch-mini ph-ch-mini-pts">' + ptsTotal + ' base pts</span>'
+      +         '<span class="ph-ch-pack-mix">' + esc(mixLabel) + '</span>'
+      +       '</div>'
+      +     '</div>'
+      +   '</div>'
+      +   '<div class="ph-ch-pack-desc">' + esc(p.description || '') + '</div>'
+      +   '<button type="button" class="ph-ch-pack-cta" onclick="addPackFromParent(\'' + esc(p.id) + '\')">+ Add pack</button>'
+      + '</div>';
+  }).join('');
+}
+
+// Thin wrapper around addChorePack so the Parent Hub UI can also
+// repaint the Active chores tile grid + the hero chip counts in
+// the same flow. addChorePack itself already toasts + repaints
+// the kid view + runs the badge check.
+function addPackFromParent(packId){
+  if(typeof addChorePack !== 'function'){
+    if(typeof showToast === 'function') showToast('Pack feature loading — try again in a sec');
+    return;
+  }
+  const result = addChorePack(packId);
+  if(result && result.added > 0){
+    if(typeof renderParentChoreList === 'function') renderParentChoreList();
+    if(typeof updateHeroDashboard === 'function') updateHeroDashboard();
+  }
 }
 
 function editChorePoints(id){
