@@ -16320,6 +16320,25 @@
             #ph-chores .ph-ch-chore-actions .ph-ch-del:hover{color:#fb7185;border-color:#fb7185;}
             #ph-chores .ph-ch-addtile{border:1.5px dashed var(--pc-line-2);background:transparent;border-radius:15px;display:grid;place-items:center;color:var(--tx2);font-family:var(--fn);font-weight:700;font-size:.86rem;cursor:pointer;min-height:96px;transition:.2s;}
             #ph-chores .ph-ch-addtile:hover{color:var(--pc-gold);border-color:var(--pc-gold-bd);background:var(--pc-gold-soft);}
+            /* ─── Inc 5 Step A-3 — Starter packs picker
+                  One card per entry in window.CHORE_PACKS. Same scoped
+                  vocabulary as the chore tile grid above (mini chips,
+                  surface gradient, pc-* color vars) so the section
+                  visually belongs in #ph-chores. */
+            #ph-chores .ph-ch-pack-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.8rem;}
+            #ph-chores .ph-ch-pack-empty{font-family:var(--fn);font-size:.78rem;color:var(--tx3);padding:1rem;border:1px dashed var(--pc-line);border-radius:14px;text-align:center;}
+            #ph-chores .ph-ch-pack{background:linear-gradient(150deg,var(--pc-surface-1),var(--pc-surface-2));border:1px solid var(--pc-line);border-radius:15px;padding:1rem 1.1rem;display:flex;flex-direction:column;gap:.7rem;transition:.2s;}
+            #ph-chores .ph-ch-pack:hover{border-color:var(--pc-violet-bd);transform:translateY(-1px);box-shadow:0 4px 14px -8px var(--pc-violet-soft);}
+            #ph-chores .ph-ch-pack-hdr{display:flex;align-items:flex-start;gap:.7rem;}
+            #ph-chores .ph-ch-pack-emoji{font-size:1.9rem;line-height:1;flex-shrink:0;}
+            #ph-chores .ph-ch-pack-titles{flex:1;min-width:0;display:flex;flex-direction:column;gap:.3rem;}
+            #ph-chores .ph-ch-pack-name{font-family:var(--fn);font-size:.98rem;font-weight:800;color:var(--tx);letter-spacing:.005em;}
+            #ph-chores .ph-ch-pack-meta{display:flex;gap:.35rem;flex-wrap:wrap;align-items:center;}
+            #ph-chores .ph-ch-pack-mix{font-family:var(--fm);font-size:.68rem;color:var(--tx3);font-weight:600;letter-spacing:.01em;}
+            #ph-chores .ph-ch-pack-desc{font-family:var(--fm);font-size:.78rem;color:var(--tx2);line-height:1.45;}
+            #ph-chores .ph-ch-pack-cta{align-self:flex-start;font-family:var(--fn);font-size:.82rem;font-weight:700;color:var(--pc-violet);background:var(--pc-violet-soft);border:1px solid var(--pc-violet-bd);border-radius:10px;padding:.5rem 1rem;cursor:pointer;transition:.18s;letter-spacing:.01em;}
+            #ph-chores .ph-ch-pack-cta:hover{background:color-mix(in srgb, var(--pc-violet) 22%, transparent);color:var(--tx);}
+            #ph-chores .ph-ch-pack-cta:active{transform:translateY(1px);}
             /* ─── Add chore form */
             #ph-chores .ph-ch-form{position:relative;background:linear-gradient(150deg,var(--pc-surface-1),var(--pc-surface-2));border:1px solid var(--pc-line);border-radius:18px;padding:1.2rem;overflow:hidden;}
             #ph-chores .ph-ch-form::before{content:"";position:absolute;inset:0 0 auto 0;height:1px;background:linear-gradient(90deg,transparent,color-mix(in srgb, var(--tx) 18%, transparent),transparent);}
@@ -16419,7 +16438,24 @@
             </div>
           </section>
 
-          <!-- ── Section 3 · ADD A CHORE (BOTTOM, SEGMENTED PILLS) ─── -->
+          <!-- ── Section 3 · STARTER PACKS (Inc 5 Step A-3) ───
+               Bulk-add curated seasonal chore packs. Renderer
+               lives in parent.js (renderParentChorePacks) and
+               fires on phNav('chores') activation. Cards read
+               from window.CHORE_PACKS exposed by
+               /app/js/data/chore-packs.js. -->
+          <section class="ph-ch-sec">
+            <div class="ph-ch-seclabel">
+              <span class="ph-ch-ic ph-ch-ic-violet">📦</span>
+              <h2 class="ph-ch-h2">Starter packs</h2>
+              <span class="ph-ch-hint">tap a card to bulk-add — duplicates skip automatically</span>
+            </div>
+            <div id="parentChorePacks" class="ph-ch-pack-grid">
+              <!-- renderParentChorePacks paints one card per pack here -->
+            </div>
+          </section>
+
+          <!-- ── Section 4 · ADD A CHORE (BOTTOM, SEGMENTED PILLS) ─── -->
           <section class="ph-ch-sec">
             <div class="ph-ch-seclabel">
               <span class="ph-ch-ic ph-ch-ic-violet">✨</span>
