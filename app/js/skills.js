@@ -4854,8 +4854,114 @@ function deletePhoto(id){ D.photos=(D.photos||[]).filter(p=>p.id!==id); save(); 
 // ── JOURNAL ───────────────────────────────────────────────────
 const JCOLS={reflection:'var(--p)',gratitude:'var(--gr)',prayer:'var(--c)',idea:'var(--g)',win:'var(--or)',lesson:'var(--pk)'};
 const JICONS={reflection:'🪞',gratitude:'🙌',prayer:'🙏',idea:'💡',win:'🏆',lesson:'📖'};
+
+// ════════════════════════════════════════════════════════════
+// 2026-06-07 — Phase 3 B3 Inc B: Journal feature strip.
+//
+// 3-card Power Card strip (Total / Week / Top Category) above the
+// existing entries list. Each card carries a circular SVG progress
+// ring matching the Skills/Health/Goals/Schedule strip family.
+//
+// Journal dates are locale strings ("6/7/2026") from toLocaleDateString.
+// Window filter parses via Date constructor + epoch ms compare to
+// survive locale variance.
+// ════════════════════════════════════════════════════════════
+function _countJournalInWindow(days){
+  const j = (D && Array.isArray(D.journal)) ? D.journal : [];
+  if(!j.length) return 0;
+  const floor = Date.now() - days * 86400000;
+  return j.filter(function(e){
+    if(!e || !e.date) return false;
+    const t = new Date(e.date).getTime();
+    if(isNaN(t)) return false;
+    return t >= floor;
+  }).length;
+}
+
+function _topJournalCategory(){
+  const j = (D && Array.isArray(D.journal)) ? D.journal : [];
+  if(!j.length) return null;
+  const counts = {};
+  j.forEach(function(e){
+    if(!e || !e.cat) return;
+    counts[e.cat] = (counts[e.cat] || 0) + 1;
+  });
+  let top = null, best = 0;
+  for(const k in counts){
+    if(counts[k] > best){ best = counts[k]; top = k; }
+  }
+  return top ? { cat: top, count: best, icon: JICONS[top] || '✍️' } : null;
+}
+
+function renderJournalFeatureStrip(){
+  const host = document.getElementById('journalFeatureStrip');
+  if(!host) return;
+  const total = (D && Array.isArray(D.journal)) ? D.journal.length : 0;
+  const weekCt = _countJournalInWindow(7);
+  const top = _topJournalCategory();
+
+  const cards = [
+    { key:'total',  icon:'📓', name:'Total',     accent:'var(--p)',  value: total,   ringTotal: Math.max(10, total),   display: total + ' entr' + (total === 1 ? 'y' : 'ies') },
+    { key:'week',   icon:'📊', name:'This Week', accent:'var(--c)',  value: weekCt,  ringTotal: 7,                     display: weekCt + ' of 7 days' },
+    top
+      ? { key:'top', icon: top.icon, name:'Top Theme', accent: JCOLS[top.cat] || 'var(--gr)', value: top.count, ringTotal: Math.max(1, total), display: (top.cat.charAt(0).toUpperCase() + top.cat.slice(1)) + ' · ' + top.count }
+      : { key:'top', icon:'💡', name:'Top Theme', accent:'var(--gr)', value: 0, ringTotal: 1, display: '—' }
+  ];
+
+  host.innerHTML = cards.map(function(c){
+    const pct = Math.min(1, c.value / Math.max(1, c.ringTotal));
+    const offset = (125.66 * (1 - pct)).toFixed(2);
+    const mastered = (c.value >= c.ringTotal && c.ringTotal > 0);
+    return '<div class="jp-card' + (mastered ? ' is-mastered' : '') + '"'
+      + ' style="--jp-accent:' + c.accent + ';"'
+      + ' aria-label="' + c.name + ': ' + c.display + '">'
+      + '<span class="jp-ring" aria-hidden="true">'
+        + '<svg viewBox="0 0 48 48">'
+          + '<circle class="jp-ring-track" cx="24" cy="24" r="20"></circle>'
+          + '<circle class="jp-ring-fill"  cx="24" cy="24" r="20"'
+            + ' stroke-dasharray="125.66"'
+            + ' stroke-dashoffset="' + offset + '"></circle>'
+        + '</svg>'
+        + '<span class="jp-icon">' + c.icon + '</span>'
+      + '</span>'
+      + '<span class="jp-label">' + c.name + '</span>'
+      + '<span class="jp-value">' + c.display + '</span>'
+    + '</div>';
+  }).join('');
+}
+
 function saveJournal(){ const title=(document.getElementById('jTitle').value||'').trim(),body=(document.getElementById('jBody').value||'').trim(),cat=document.getElementById('jCat').value; if(!title||!body){showToast('Add title and entry');return;} if(!D.journal) D.journal=[]; D.journal.unshift({id:Date.now(),title,body,cat,date:new Date().toLocaleDateString(),time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}); document.getElementById('jTitle').value=''; document.getElementById('jBody').value=''; save(); renderJournal(); earnPB(2,'Journal entry'); logActivity('habit','Journal entry'); showToast('Entry saved! ✍️ +2 PB'); }
-function renderJournal(){ const el=document.getElementById('journalList'); if(!el) return; if(!(Array.isArray(D.journal)?D.journal:[]).length){el.innerHTML='<div style="font-size:.82rem;color:#c8d4e8;text-align:center;padding:1.5rem;">No entries yet — start writing!</div>';return;} el.innerHTML=D.journal.map(j=>`<div style="padding:.72rem .9rem;background:rgba(255,255,255,.1);border-radius:10px;margin-bottom:.38rem;border-left:3px solid ${JCOLS[j.cat]||'var(--mt)'};cursor:pointer;" onclick="viewJournal(${j.id})"><div style="display:flex;align-items:center;gap:.45rem;margin-bottom:.2rem;"><span style="font-size:.88rem;">${JICONS[j.cat]||'✍️'}</span><span style="font-weight:700;font-size:.89rem;flex:1;">${j.title}</span><button class="db" onclick="event.stopPropagation();deleteJournal(${j.id})">✕</button></div><div style="font-size:.68rem;color:#c8d4e8;">${j.date} · ${j.time}</div><div style="font-size:.78rem;color:#8090b0;margin-top:.28rem;line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${j.body}</div></div>`).join(''); }
+
+function renderJournal(){
+  const el = document.getElementById('journalList');
+  if(!el) return;
+  // 2026-06-07 — Phase 3 B3-B: refresh the feature strip alongside the
+  // list so totals + top-cat track every save/delete.
+  if(typeof renderJournalFeatureStrip === 'function') renderJournalFeatureStrip();
+
+  const list = Array.isArray(D.journal) ? D.journal : [];
+  if(!list.length){
+    el.innerHTML = '<div class="jp-empty">No entries yet — start writing!</div>';
+    return;
+  }
+  // 2026-06-07 — Phase 3 B3-B: row markup uses CSS classes instead of
+  // inline color:#c8d4e8 / color:#8090b0 / background:rgba(255,255,255,.1)
+  // hardcodes. .jp-row gets the left-accent border via CSS var --jp-accent.
+  el.innerHTML = list.map(function(j){
+    const catAccent = JCOLS[j.cat] || 'var(--mt)';
+    const catIcon = JICONS[j.cat] || '✍️';
+    return '<div class="jp-row" style="--jp-accent:' + catAccent + ';" onclick="viewJournal(' + j.id + ')">'
+      + '<div class="jp-row-head">'
+        + '<span class="jp-row-icon">' + catIcon + '</span>'
+        + '<span class="jp-row-title">' + escapeHtml(j.title) + '</span>'
+        + '<button class="db" onclick="event.stopPropagation();deleteJournal(' + j.id + ')">✕</button>'
+      + '</div>'
+      + '<div class="jp-row-meta">' + j.date + ' · ' + j.time + '</div>'
+      + '<div class="jp-row-body">' + escapeHtml(j.body) + '</div>'
+    + '</div>';
+  }).join('');
+}
+
 function viewJournal(id){ const j=(Array.isArray(D.journal)?D.journal:[]).find(j=>j.id===id); if(!j) return; const te=document.getElementById('jViewTitle'),me=document.getElementById('jViewMeta'),be=document.getElementById('jViewBody'),de=document.getElementById('jViewDel'); if(te){te.textContent=(JICONS[j.cat]||'✍️')+' '+j.title;te.style.color=JCOLS[j.cat]||'var(--c)';} if(me) me.textContent=j.date+' at '+j.time; if(be) be.textContent=j.body; if(de) de.onclick=()=>{deleteJournal(id);closeModal('jViewModal');}; openModal('jViewModal'); }
 function deleteJournal(id){ D.journal=(Array.isArray(D.journal)?D.journal:[]).filter(j=>j.id!==id); save(); renderJournal(); }
 
