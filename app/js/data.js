@@ -243,6 +243,13 @@ const DEF = {
   // Wired through the Movement sub-tab + the Inc 1 domain strip
   // (the existing _hDomainMovement helper reads D.workoutLog).
   workoutLog:[], workoutGoal:150, prRecords:{},
+  // 2026-06-07 — Health Inc 5: milestone badges. Permanent ratchet —
+  // {[id]: 'YYYY-MM-DD'} — once earned, never un-earns. Health badges
+  // gate on this field (one-way: HEALTH_MILESTONES check fires only
+  // on first earn, then writes the date). Mirrors the Skills cert
+  // pattern (D.skillCerts) plus enables the canvas-rendered badge
+  // PNG share artifact in shareBadgeImage(id).
+  healthMilestones:{},
   // mood
   moods:[],
   // goals / milestones
