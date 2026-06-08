@@ -4524,19 +4524,30 @@
         <div style="font-family:var(--fh);font-size:.95rem;letter-spacing:2px;color:var(--c);" id="calLbl"></div>
         <button class="btn bgh bs" onclick="nextMonth()">Next ›</button>
       </div>
+      <!-- 2026-06-07 — Phase 3 B3-C: day-of-week headers — color:#c8d4e8
+           hardcode (legacy muted blue-gray) swapped for .cal-dow class
+           which uses var(--tx2) and survives the brand-palette light
+           mode fix from Bundle 2. -->
       <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px;">
-        <div style="text-align:center;font-size:.6rem;font-weight:700;color:#c8d4e8;padding:3px;" id="dow0">SUN</div>
-        <div style="text-align:center;font-size:.6rem;font-weight:700;color:#c8d4e8;padding:3px;">MON</div>
-        <div style="text-align:center;font-size:.6rem;font-weight:700;color:#c8d4e8;padding:3px;">TUE</div>
-        <div style="text-align:center;font-size:.6rem;font-weight:700;color:#c8d4e8;padding:3px;">WED</div>
-        <div style="text-align:center;font-size:.6rem;font-weight:700;color:#c8d4e8;padding:3px;">THU</div>
-        <div style="text-align:center;font-size:.6rem;font-weight:700;color:#c8d4e8;padding:3px;">FRI</div>
-        <div style="text-align:center;font-size:.6rem;font-weight:700;color:#c8d4e8;padding:3px;">SAT</div>
+        <div class="cal-dow" id="dow0">SUN</div>
+        <div class="cal-dow">MON</div>
+        <div class="cal-dow">TUE</div>
+        <div class="cal-dow">WED</div>
+        <div class="cal-dow">THU</div>
+        <div class="cal-dow">FRI</div>
+        <div class="cal-dow">SAT</div>
       </div>
       <div id="cg"></div>
     </div>
     <div class="card"><div class="ct">📌 Upcoming Events</div><div id="upcomingEvs"></div></div>
   </div>
+
+  <!-- 2026-06-07 — Phase 3 B3-C: faith micro-line. Eph 5:16 fits the
+       calendar / time-stewardship theme — making the most of every
+       opportunity. (Distinct from Ps 90:12 used in the Schedule
+       section so each surface gets its own scripture.) -->
+  <div class="phase3-faith-divider" aria-hidden="true"></div>
+  <div class="phase3-faith-line">Making the most of every opportunity, because the days are evil. — Eph 5:16</div>
 </section>
 
 <!-- ════════════ HEALTH ═══════════════════════════════════════ -->
@@ -5415,6 +5426,13 @@
     <button class="btn bg_ bs" onclick="openModal('quoteModal')">+ Add Quote</button>
   </div>
   <div id="motivationWall" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.85rem;"></div>
+
+  <!-- 2026-06-07 — Phase 3 B3-C: faith micro-line. Isaiah 40:31 fits
+       the Fuel Wall theme — "those who hope in the Lord will renew
+       their strength." Same tonal treatment as Mood / Journal / Goals
+       / Schedule faith lines. -->
+  <div class="phase3-faith-divider" aria-hidden="true"></div>
+  <div class="phase3-faith-line">Those who hope in the Lord will renew their strength. They will soar on wings like eagles. — Isaiah 40:31</div>
 </section>
 
 <style>
@@ -6096,6 +6114,12 @@
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.5rem;" id="recBooks">
     </div>
   </div>
+
+  <!-- 2026-06-07 — Phase 3 B3-C: faith micro-line. Joshua 1:8 fits
+       the reading / meditation theme — meditating on the word day
+       and night. -->
+  <div class="phase3-faith-divider" aria-hidden="true"></div>
+  <div class="phase3-faith-line">Meditate on it day and night so that you may be careful to do everything written in it. — Joshua 1:8</div>
 </section>
 
 <!-- ════ MENTORS & KEY CONTACTS ════ -->
@@ -7402,7 +7426,7 @@
   <div id="challengeCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:.6rem;margin-bottom:1rem;"></div>
 
   <!-- I Did Something Helpful -->
-  <div style="background:linear-gradient(135deg,rgba(34,197,94,.05),rgba(56,189,248,.04));border:1px solid rgba(34,197,94,.12);border-radius:12px;padding:.8rem 1rem;margin-bottom:1rem;">
+  <div class="contests-deed-card">
     <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;">
       <span style="font-size:1.2rem;">🌟</span>
       <div>
@@ -7424,11 +7448,16 @@
   </div>
 
   <!-- Family Rewards -->
-  <div style="background:rgba(167,139,250,.03);border:1px solid rgba(167,139,250,.1);border-radius:14px;padding:1rem 1.2rem;">
+  <div class="contests-family-card">
     <div style="font-size:.85rem;font-weight:700;margin-bottom:.3rem;">👨‍👩‍👧‍👦 Family Rewards</div>
     <div style="font-size:.7rem;color:var(--tx2);margin-bottom:.5rem;">When the whole family hits milestones together, everyone earns a group reward!</div>
     <div id="familyRewards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.5rem;"></div>
   </div>
+
+  <!-- 2026-06-07 — Phase 3 B3-C: faith micro-line. Phil 3:14 fits the
+       Contests / Challenges theme — pressing on toward the goal. -->
+  <div class="phase3-faith-divider" aria-hidden="true"></div>
+  <div class="phase3-faith-line">I press on toward the goal to win the prize for which God has called me heavenward. — Phil 3:14</div>
 </section>
 
 
