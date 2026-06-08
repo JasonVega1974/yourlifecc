@@ -171,6 +171,10 @@ function addChore(){
   document.getElementById('choreNewName').value='';
   document.getElementById('choreNewPts').value='';
   save(); renderChores();
+  // FAF Inc 2 — family activity feed event.
+  if(typeof logFamilyActivity === 'function'){
+    logFamilyActivity('chore', 'created', 'Added chore: ' + name);
+  }
   showToast('Chore added ✓');
 }
 
@@ -339,6 +343,10 @@ async function markChoreDone(id, file){
     photoPath: photoPath
   });
   save(); renderChores();
+  // FAF Inc 2 — kid submitted a chore for verification.
+  if(typeof logFamilyActivity === 'function'){
+    logFamilyActivity('chore', 'completed', 'Completed: ' + chore.name + ' (+' + earnedPts + ' pts)');
+  }
   showToast(photoPath ? 'Submitted with photo ✓' : 'Submitted for verification ✓');
 }
 
@@ -387,8 +395,18 @@ function verifyChore(logId, approved){
     // Tab 1 Inc 5 Step B — re-check chore badges after every approval.
     // Helper toasts on first-earn and triggers a re-render of the grid.
     if(typeof _checkChoreBadges === 'function') _checkChoreBadges();
+    // FAF Inc 2 — parent verified a chore. Auto-tagged with the kid's
+    // profileId via _activeProfileId (parent acts inside the active
+    // child profile context).
+    if(typeof logFamilyActivity === 'function'){
+      logFamilyActivity('chore', 'verified', 'Verified: ' + entry.choreName + ' (+' + entry.pts + ' pts)');
+    }
   } else {
     entry.status='rejected';
+    // FAF Inc 2 — parent declined a chore submission.
+    if(typeof logFamilyActivity === 'function'){
+      logFamilyActivity('chore', 'declined', 'Declined: ' + entry.choreName);
+    }
     showToast('Chore rejected');
   }
   save(); renderChores(); updateHeroDashboard(); updateDashCards();
@@ -1690,6 +1708,12 @@ function _checkChoreBadges(){
         D.choreBadges[b.id] = today;
         newCount++;
         if(!firstNew) firstNew = b;
+        // FAF Inc 2 — every first-earn fires its own feed entry so
+        // multi-badge moments each get a line (parent wants to see
+        // each badge by name, not "+2 more" in the title).
+        if(typeof logFamilyActivity === 'function'){
+          logFamilyActivity('chore', 'badge_earned', 'Badge earned: ' + (b.label || b.id));
+        }
       }
     } catch(e){}
   });
