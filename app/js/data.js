@@ -361,6 +361,11 @@ const DEF = {
     engagementOptIn:       false,
     crossoverOptOut:       false,   // INVERTED — see comment above
     allOptOut:             false,
+    // Reserved opt-in for general Kingdom Creatives product updates
+    // (newsletter-style emails). Surfaced by the signup card's 3rd
+    // checkbox; no cron writes to it yet — reserved for a future
+    // broader-comms track. Default false (explicit opt-in).
+    updatesOptIn:          false,
     recipientEmail:        '',      // defaults to _supaUser.email at first save
     timezoneOffsetMin:     null,    // captured from Intl at first save (Track 1 anchors local-7pm)
     lastDigestSent:        null,    // ISO date
@@ -370,7 +375,14 @@ const DEF = {
     engagementSentInWeek:  0,       // reset by cron at week boundary
     crossoverSendCount:    0,       // permanent — hard cap at 4
     lastReleaseNoteVersion:0,       // Track 2 "what's new" trigger
-    upgradedAt:            null     // set when plan_status flips faith_free → active
+    upgradedAt:            null,    // set when plan_status flips faith_free → active
+    // 2026-06-08 — signup-flow opt-in card + crossover awareness
+    // banner shown-once flags. Both are set to true at app load
+    // for users who already have activity history (existing users
+    // shouldn't see a "just signed up" card on the first post-
+    // deploy load).
+    signupPromptShown:     false,   // Part 1 signup email-prefs modal
+    crossoverBannerShown:  false    // Part 2 faith-free awareness banner
   },
   // ── Family Activity Feed (FAF Inc 1, 2026-06-08) ────────────
   // Unified, append-only event stream powering the Parent Hub
