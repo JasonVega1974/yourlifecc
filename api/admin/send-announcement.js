@@ -201,6 +201,7 @@ function _renderFaithVariant({ unsubUrl }){
     +     '<p style="font-size:15px;color:#0b1020;margin:0 0 12px;line-height:1.7;">Skills quizzes can now time your kids on rapid-fire questions and celebrate their streak when they finish.</p>'
     +     '<p style="font-size:15px;color:#0b1020;margin:0;line-height:1.7;">New weekly check-ins for Health, Goals, and Money &mdash; gentle observations, never advice or pressure.</p>'
     +   '</div>'
+    +   '<p style="font-size:15px;color:#0b1020;margin:0 0 20px;line-height:1.7;">If YourLife CC is a blessing to your family, share it with another family who could use it too &mdash; every share helps this little family project grow.</p>'
     +   '<p style="font-size:15px;color:#0b1020;margin:0 0 18px;">Whenever you\'re ready, the full app is here for you:</p>'
     +   '<div style="text-align:center;margin:0 0 28px;">'
     +     '<a href="https://yourlifecc.com/?from=announcement" style="display:inline-block;background:#7c3aed;color:#ffffff;font-weight:800;padding:13px 26px;border-radius:10px;text-decoration:none;font-size:15px;font-family:system-ui,-apple-system,Segoe UI,sans-serif;">See what\'s in YourLife CC &rarr;</a>'
@@ -235,6 +236,8 @@ function _renderFaithVariant({ unsubUrl }){
     'Skills quizzes can now time your kids on rapid-fire questions and celebrate their streak when they finish.',
     '',
     'New weekly check-ins for Health, Goals, and Money — gentle observations, never advice or pressure.',
+    '',
+    'If YourLife CC is a blessing to your family, share it with another family who could use it too — every share helps this little family project grow.',
     '',
     'Whenever you\'re ready, the full app is here for you:',
     'See what\'s in YourLife CC: https://yourlifecc.com/?from=announcement',
