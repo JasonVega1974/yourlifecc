@@ -4003,6 +4003,207 @@ body.solo-mode .sp-family-only { display: none !important; }
 :root.light #ht-movement .mv-faith{ color:#64748b !important; }
 /* ════════════════════════════════════════════════════════════ */
 
+/* ════════════════════════════════════════════════════════════
+   2026-06-07 — Health Inc 5: Milestone badges grid visuals.
+
+   Scoped to #ht-badges. 8 badge cards in a 2-col / 4-col grid.
+   Earned cards: gradient ring border with accent color, holographic
+   shimmer sweep (same conic-gradient pattern as Skills cert pill),
+   "Tap to share" cue. Locked cards: muted grayscale glyph, criterion
+   description, 🔒 lock cue. Progress pill + bar at top tracks
+   "X/8 earned".
+
+   Idle motion auto-suppressed by the global reduced-motion rule.
+   ════════════════════════════════════════════════════════════ */
+
+/* ─── Progress pill + track ──────────────────────────────────── */
+#ht-badges .hb-progress-pill{
+  flex-shrink:0;
+  font-family:var(--fn);
+  font-size:.8rem;
+  font-weight:800;
+  padding:.3rem .75rem;
+  border-radius:999px;
+  background:linear-gradient(135deg, #fde68a, #fbbf24);
+  color:#3f2200;
+  white-space:nowrap;
+  box-shadow:0 0 14px rgba(251,191,36,.32);
+}
+#ht-badges .hb-progress-total{ opacity:.7; font-weight:700; }
+#ht-badges .hb-progress-track{
+  height:6px;
+  border-radius:999px;
+  background:rgba(255,255,255,.08);
+  overflow:hidden;
+}
+#ht-badges .hb-progress-fill{
+  height:100%;
+  background:linear-gradient(90deg, var(--section-health, #34d399), #fbbf24);
+  border-radius:999px;
+  transition:width .55s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 0 10px rgba(251,191,36,.35);
+}
+
+/* ─── Badge grid ─────────────────────────────────────────────── */
+#ht-badges .hb-grid{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:10px;
+  margin-top:.8rem;
+}
+@media (min-width:520px){ #ht-badges .hb-grid{ grid-template-columns:repeat(3, 1fr); } }
+@media (min-width:861px){ #ht-badges .hb-grid{ grid-template-columns:repeat(4, 1fr); } }
+
+#ht-badges .hb-card{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  padding:18px 12px 14px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:16px;
+  background:rgba(255,255,255,.04);
+  cursor:pointer;
+  font-family:var(--fm);
+  color:var(--tx);
+  text-align:center;
+  transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  -webkit-tap-highlight-color:transparent;
+  min-height:140px;
+}
+#ht-badges .hb-card:active{ transform:translateY(0) scale(.98); }
+#ht-badges .hb-card > *{ position:relative; z-index:1; }
+
+/* Earned state — gradient border + holographic shine sweep */
+#ht-badges .hb-card.is-earned{
+  background:
+    radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--badge-accent, #fbbf24) 22%, transparent) 0%, transparent 70%),
+    linear-gradient(160deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  border-color:transparent;
+  cursor:pointer;
+}
+#ht-badges .hb-card.is-earned::before{
+  content:'';
+  position:absolute; inset:0;
+  border-radius:16px;
+  padding:1.5px;
+  background:linear-gradient(135deg,
+    var(--badge-accent, #fbbf24),
+    color-mix(in srgb, var(--badge-accent, #fbbf24) 55%, #fde68a));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask-composite:exclude;
+  opacity:.75;
+  pointer-events:none;
+  z-index:0;
+}
+#ht-badges .hb-card.is-earned:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 28px color-mix(in srgb, var(--badge-accent, #fbbf24) 30%, transparent);
+}
+#ht-badges .hb-card.is-earned:hover::before{ opacity:1; }
+
+/* Holographic shimmer (only on earned) — conic gradient rotates 4s */
+#ht-badges .hb-card .hb-shine{
+  position:absolute;
+  inset:-60%;
+  background:conic-gradient(from 0deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,.20) 18%,
+    rgba(255,255,255,0) 38%,
+    rgba(255,255,255,0) 100%);
+  animation:hbShine 5s linear infinite;
+  pointer-events:none;
+  z-index:0;
+  opacity:.55;
+  mix-blend-mode:screen;
+}
+@keyframes hbShine{
+  0%   { transform:rotate(0deg); }
+  100% { transform:rotate(360deg); }
+}
+
+/* Locked state — muted, grayscale glyph */
+#ht-badges .hb-card.is-locked{
+  background:rgba(255,255,255,.02);
+  border:1px dashed rgba(255,255,255,.12);
+  opacity:.78;
+}
+#ht-badges .hb-card.is-locked:hover{
+  background:rgba(255,255,255,.04);
+  opacity:1;
+}
+#ht-badges .hb-card.is-locked .hb-glyph{
+  filter:grayscale(.85) brightness(.7);
+}
+
+/* Common children */
+#ht-badges .hb-glyph{
+  font-size:2.4rem;
+  line-height:1;
+  margin-bottom:4px;
+  filter:drop-shadow(0 0 12px color-mix(in srgb, var(--badge-accent, #fbbf24) 50%, transparent));
+}
+#ht-badges .hb-card.is-locked .hb-glyph{
+  filter:grayscale(.85) brightness(.7) !important;
+}
+#ht-badges .hb-name{
+  font-family:var(--fh);
+  font-size:.88rem;
+  font-weight:800;
+  letter-spacing:.06em;
+  color:var(--tx);
+  line-height:1;
+}
+#ht-badges .hb-date,
+#ht-badges .hb-criteria{
+  font-family:var(--fm);
+  font-size:.66rem;
+  color:var(--tx2);
+  line-height:1.35;
+  margin-top:2px;
+}
+#ht-badges .hb-criteria{ font-style:italic; }
+#ht-badges .hb-share-cue,
+#ht-badges .hb-lock-cue{
+  font-family:var(--fm);
+  font-size:.62rem;
+  font-weight:700;
+  letter-spacing:.05em;
+  margin-top:6px;
+}
+#ht-badges .hb-share-cue{
+  color:var(--badge-accent, #fbbf24);
+  text-shadow:0 0 8px color-mix(in srgb, var(--badge-accent, #fbbf24) 40%, transparent);
+}
+#ht-badges .hb-lock-cue{
+  color:var(--tx3);
+}
+
+/* ─── Light theme overrides ──────────────────────────────────── */
+:root.light #ht-badges .hb-progress-track{ background:rgba(0,0,0,.08); }
+:root.light #ht-badges .hb-card{
+  background:#fff !important;
+  border-color:rgba(0,0,0,.08) !important;
+}
+:root.light #ht-badges .hb-card.is-locked{
+  background:rgba(0,0,0,.02) !important;
+  border:1px dashed rgba(0,0,0,.14) !important;
+}
+:root.light #ht-badges .hb-card.is-earned{
+  background:
+    radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--badge-accent, #fbbf24) 14%, #fff) 0%, transparent 70%),
+    #fff !important;
+}
+:root.light #ht-badges .hb-card.is-earned .hb-shine{ opacity:.32; mix-blend-mode:overlay; }
+:root.light #ht-badges .hb-name{ color:#0f172a !important; }
+:root.light #ht-badges .hb-date,
+:root.light #ht-badges .hb-criteria{ color:#475569 !important; }
+/* ════════════════════════════════════════════════════════════ */
+
 /* Inline modal mode — skillsModal lives inside #s-skills after relocation */
 #s-skills > #skillsModal {
   position: static !important;
