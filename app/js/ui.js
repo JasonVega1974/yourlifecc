@@ -2122,6 +2122,33 @@ function showSection(id, fromMobile){
   // outside the allow-list. Silent redirect — some callers fire from
   // setTimeout chains where a throw would surface as an unhandled rejection.
   if(!isSectionAllowed(id)) id = 's-hero';
+  // 2026-06-08 — Option 1 redirect: parent taps "Home" in sidebar → land
+  // on Parent Hub, not the (parent-blank) kid hero. Mirrors the init.js
+  // Option C landing predicate so first-paint and runtime navigation
+  // agree on where a parent belongs.
+  //   active profile is a kid          → stay on s-hero (kid mode)
+  //   active profile is the parent     → redirect to s-parent
+  //   _activeProfileId null/unset      → redirect to s-parent (parent default)
+  //   solo mode / faith-free / no kids → stay on s-hero (unchanged)
+  // The Option A recovery card inside s-hero remains the safety net if
+  // this predicate ever misses an edge case.
+  if(id === 's-hero'){
+    try {
+      var _hasKids = (typeof _profiles !== 'undefined' && Array.isArray(_profiles))
+        && _profiles.some(function(p){ return p && p.isParent === false; });
+      var _isSoloNow = !!(typeof D !== 'undefined' && D && D.soloMode);
+      var _isFaithFreeNow = !!window._faithFree;
+      var _activeKind = null;
+      var _activeSet = (typeof _activeProfileId !== 'undefined') && _activeProfileId != null && _activeProfileId !== '';
+      if(_activeSet && typeof _profiles !== 'undefined' && Array.isArray(_profiles)){
+        var _ap = _profiles.find(function(p){ return p && p.id === _activeProfileId; });
+        if(_ap) _activeKind = (_ap.isParent === false) ? 'kid' : 'parent';
+      }
+      if(_hasKids && !_isSoloNow && !_isFaithFreeNow && _activeKind !== 'kid'){
+        id = 's-parent';
+      }
+    } catch(_e){}
+  }
   if(id==='s-referral') setTimeout(initReferralTab,50);
   // Hide all, show target
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
