@@ -2224,6 +2224,9 @@ function showSection(id, fromMobile){
     // Phase C-Health: mood opener renders on every section entry so the
     // greeting is fresh (today's existing mood reflected if already logged).
     if(typeof renderHealthMoodCheckin === 'function') renderHealthMoodCheckin();
+    // 2026-06-07 — Health Inc 1: refresh the 6-domain Power Cards strip so
+    // ring fills reflect the latest sleep / mood / meal / weight / habits.
+    if(typeof renderHealthDomainStrip === 'function') renderHealthDomainStrip();
   },80);
   if(id==='s-school'){ renderSchool&&renderSchool(); setTimeout(()=>{ renderStudyPlan&&renderStudyPlan(); renderExams&&renderExams(); },100); }
   if(id==='s-resources') setTimeout(()=>{
