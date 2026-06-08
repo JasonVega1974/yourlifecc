@@ -63,6 +63,232 @@ function renderGoalDomainStrip(){
   }).join('');
 }
 
+// ════════════════════════════════════════════════════════════
+// 2026-06-07 — Goals Inc 3: AI Goals Coach (Haiku, weekly cadence).
+//
+// _goalCoachStats14d aggregates the last 14 days of goal activity into
+// a structured stats blob (counts per category + recent completions +
+// vision/timeline state + badge count) for the AI safety prompt
+// GOAL_COACH_SYSTEM in api/ai-summary.js to read.
+//
+// Cache shape mirrors Money/Health Coach but with a WEEKLY key —
+// goal momentum is slower than money/health momentum:
+//   D.goalCoachCache = { weekKey, summary, focus, scripture, fetchedAt }
+//
+// Manual refresh rate-limited to 6h. Auto-fetch runs once per local
+// week when the user has 2+ goals (don't burn an API call on empty
+// profiles — show the friendly stub instead).
+// ════════════════════════════════════════════════════════════
+function _goalCoachIsoWeek(d){
+  d = (d instanceof Date) ? d : new Date();
+  const tmp = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  tmp.setUTCDate(tmp.getUTCDate() + 4 - (tmp.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(tmp.getUTCFullYear(), 0, 1));
+  const w = Math.ceil(((tmp - yearStart) / 86400000 + 1) / 7);
+  return tmp.getUTCFullYear() + '-W' + String(w).padStart(2,'0');
+}
+
+function _goalCoachStats14d(){
+  const now = new Date();
+  const floor = new Date(now.getTime() - 14 * 86400000);
+  const floorISO = floor.toISOString().slice(0,10);
+  const goals = (D && Array.isArray(D.goals)) ? D.goals : [];
+
+  // Per-category counts (open vs done) — uses the exact `cat` strings
+  // from the Add-Goal modal dropdown, so it lines up with GOAL_DOMAINS.
+  const catStats = {};
+  goals.forEach(function(g){
+    if(!g) return;
+    const c = g.cat || 'Other';
+    if(!catStats[c]) catStats[c] = { open:0, done:0 };
+    if(g.done) catStats[c].done++; else catStats[c].open++;
+  });
+  // Top 3 most-populated categories by total (done + open)
+  const topCats = Object.keys(catStats)
+    .map(function(c){ return { cat:c, total:catStats[c].open + catStats[c].done, open:catStats[c].open, done:catStats[c].done }; })
+    .sort(function(a,b){ return b.total - a.total; })
+    .slice(0, 3);
+
+  // Recent completions in window (count + first 5 titles, stripped to length cap)
+  function _safeDate(s){
+    if(!s) return null;
+    const d = new Date(s);
+    if(isNaN(d.getTime())) return null;
+    return d.toISOString().slice(0,10);
+  }
+  const recent = goals
+    .filter(function(g){
+      if(!g || !g.done) return false;
+      const ds = _safeDate(g.completedDate);
+      return ds && ds >= floorISO;
+    })
+    .map(function(g){ return String(g.text || '').slice(0, 50); })
+    .slice(0, 5);
+
+  // In-progress goals (count + first 5 titles)
+  const inProgress = goals
+    .filter(function(g){ return g && !g.done; })
+    .map(function(g){
+      const ms = Array.isArray(g.milestones) ? g.milestones : [];
+      const done = ms.filter(function(x){ return x && x.done; }).length;
+      return {
+        text: String(g.text || '').slice(0, 50),
+        type: g.type || 'short',
+        cat: g.cat || 'Other',
+        milestonesDone: done,
+        milestonesTotal: ms.length
+      };
+    })
+    .slice(0, 5);
+
+  // Vision + timeline state — let the model decide scripture gating.
+  const vision = (D && D.vision) ? String(D.vision).slice(0, 200) : '';
+  const timeline = (D && D.timeline && typeof D.timeline === 'object') ? D.timeline : {};
+  const timelineFilled = [1,3,5,10].reduce(function(n, yr){
+    return n + (timeline[yr] && String(timeline[yr]).trim().length > 0 ? 1 : 0);
+  }, 0);
+
+  // Goal-system badges earned (count + recent earn dates)
+  const mEarned = (D && D.goalMilestones && typeof D.goalMilestones === 'object') ? D.goalMilestones : {};
+  const badgesEarnedCount = Object.keys(mEarned).length;
+
+  const name = (D && D.name) ? String(D.name).slice(0, 40) : 'friend';
+  return {
+    name:               name,
+    days:               14,
+    totalGoals:         goals.length,
+    openGoals:          goals.filter(function(g){ return g && !g.done; }).length,
+    doneGoals:          goals.filter(function(g){ return g && g.done; }).length,
+    topCategories:      topCats,
+    recentCompletions:  recent,
+    inProgressSample:   inProgress,
+    visionPresent:      vision.length > 0,
+    visionSnippet:      vision, // truncated above — used by model to detect faith language
+    timelineFilled:     timelineFilled,
+    timelineTotal:      4,
+    badgesEarnedCount:  badgesEarnedCount
+  };
+}
+
+async function fetchGoalCoach(){
+  if(!D.goalCoachCache || typeof D.goalCoachCache !== 'object'){
+    D.goalCoachCache = { weekKey:'', summary:'', focus:'', scripture:'', fetchedAt:0 };
+  }
+  // Rate-limit manual refreshes: max once per 6 hours (matches the
+  // other Haiku coaches even though the auto-fetch cadence is weekly).
+  const SIX_HOURS = 6 * 60 * 60 * 1000;
+  const now = Date.now();
+  if(D.goalCoachCache.fetchedAt && (now - D.goalCoachCache.fetchedAt) < SIX_HOURS){
+    if(typeof showToast === 'function') showToast('Coach refreshed recently — try again later.');
+    return;
+  }
+  const stats = _goalCoachStats14d();
+  if(stats.totalGoals < 2){
+    // Empty profile — friendly stub, no API call burned.
+    D.goalCoachCache = {
+      weekKey:   _goalCoachIsoWeek(),
+      summary:   'Your list is still empty or just starting. The first goal is the hardest — set one this week, even a small one, and the rest follows.',
+      focus:     'Add one goal this week. Anything counts.',
+      scripture: '',
+      fetchedAt: now
+    };
+    save();
+    if(typeof renderGoalCoach === 'function') renderGoalCoach();
+    return;
+  }
+
+  const host = document.getElementById('goalCoachCard');
+  if(host){
+    const body = host.querySelector('.g-coach__body');
+    if(body) body.innerHTML = '<div class="g-coach__loading">Coach is reading the list…</div>';
+  }
+
+  try {
+    const resp = await fetch('/api/ai-summary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'goal-coach', prompt: JSON.stringify(stats) })
+    });
+    const json = await resp.json();
+    if(!json || !json.ok || !json.summary){
+      throw new Error('Empty or malformed response');
+    }
+    D.goalCoachCache = {
+      weekKey:   _goalCoachIsoWeek(),
+      summary:   String(json.summary   || '').slice(0, 500),
+      focus:     String(json.focus     || '').slice(0, 200),
+      scripture: String(json.scripture || '').slice(0, 200),
+      fetchedAt: now
+    };
+    save();
+    if(typeof renderGoalCoach === 'function') renderGoalCoach();
+  } catch(e){
+    console.debug('[goal-coach] fetch failed:', e && e.message);
+    if(host){
+      const body2 = host.querySelector('.g-coach__body');
+      if(body2) body2.innerHTML = '<div class="g-coach__err">Coach is offline right now. Try refresh in a minute.</div>';
+    }
+  }
+}
+
+function renderGoalCoach(){
+  const host = document.getElementById('goalCoachCard');
+  if(!host) return;
+  if(!D.goalCoachCache || typeof D.goalCoachCache !== 'object'){
+    D.goalCoachCache = { weekKey:'', summary:'', focus:'', scripture:'', fetchedAt:0 };
+  }
+  const thisWeek = _goalCoachIsoWeek();
+  const esc = function(s){
+    return String(s || '').replace(/[&<>"']/g, function(c){
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+    });
+  };
+  const stale = D.goalCoachCache.weekKey !== thisWeek;
+  const hasContent = !!(D.goalCoachCache.summary);
+
+  if(hasContent){
+    host.innerHTML = ''
+      + '<div class="g-coach">'
+      +   '<div class="g-coach__head">'
+      +     '<div class="g-coach__title">🎯 Your Goals Coach</div>'
+      +     '<button type="button" class="g-coach__refresh" onclick="fetchGoalCoach()" title="Refresh coach (max once per 6h)" aria-label="Refresh coach">↻</button>'
+      +   '</div>'
+      +   '<div class="g-coach__body">'
+      +     '<p class="g-coach__summary">' + esc(D.goalCoachCache.summary) + '</p>'
+      +     (D.goalCoachCache.focus
+        ? '<p class="g-coach__focus"><span class="g-coach__focus-label">This week:</span> ' + esc(D.goalCoachCache.focus) + '</p>'
+        : '')
+      +     (D.goalCoachCache.scripture
+        ? '<p class="g-coach__scripture">' + esc(D.goalCoachCache.scripture) + '</p>'
+        : '')
+      +   '</div>'
+      +   (stale ? '<div class="g-coach__stale">New week — tap ↻ for a fresh read</div>' : '')
+      + '</div>';
+  } else {
+    host.innerHTML = ''
+      + '<div class="g-coach g-coach--empty">'
+      +   '<div class="g-coach__head">'
+      +     '<div class="g-coach__title">🎯 Your Goals Coach</div>'
+      +     '<button type="button" class="g-coach__refresh" onclick="fetchGoalCoach()" title="Get my first coaching" aria-label="Get my first coaching">↻</button>'
+      +   '</div>'
+      +   '<div class="g-coach__body">'
+      +     '<p class="g-coach__summary">No coaching yet. Tap ↻ once you\'ve added a couple of goals and I\'ll read the patterns.</p>'
+      +   '</div>'
+      + '</div>';
+  }
+}
+
+function _maybeAutoFetchGoalCoach(){
+  if(!D.goalCoachCache || typeof D.goalCoachCache !== 'object') return;
+  const thisWeek = _goalCoachIsoWeek();
+  if(D.goalCoachCache.weekKey === thisWeek) return; // already fetched this week
+  const s = _goalCoachStats14d();
+  // Auto-fetch only when there's meaningful pattern data — empty
+  // profiles get the friendly stub via the manual ↻ path instead.
+  if(s.totalGoals < 2) return;
+  fetchGoalCoach();
+}
+
 // Domain-card tap — smooth-scroll to goals list. Filter logic stays
 // off the table for Inc 1 (visual layer only); Inc 4 would add it.
 function _goalDomainOpen(){
