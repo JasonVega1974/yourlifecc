@@ -170,33 +170,70 @@ function _renderActiveVariant({ unsubUrl, manageUrl }){
   return { subject, html, text };
 }
 
+// ── Faith variant scripture pool ─────────────────────────────
+// 8-verse rotation curated from MEMORY_VERSE_LIBRARY in
+// app/js/data/memory-verses.js, selected for warm devotional tone
+// fit for the announcement context. Each verse pairs with a 1-2
+// sentence reflection that ties the scripture to family life —
+// warm, real, no preaching, no platitudes.
+//
+// Rotation: hash(userId) % pool.length so each recipient gets a
+// scripture deterministically picked from their account id. Test
+// recipients without a registered userId fall back to entry 0.
+const FAITH_SCRIPTURE_POOL = [
+  { ref: 'Psalm 46:10',
+    text: 'Be still, and know that I am God.',
+    reflection: 'Some weeks the noise of parenting can drown out the still small voice. The good moments — the chores done without being asked, the prayer at bedtime, the quiet wins — those are worth pausing for too.' },
+  { ref: 'Matthew 11:28',
+    text: 'Come to me, all you who are weary and burdened, and I will give you rest.',
+    reflection: 'Parenting is tiring work. Some days the wins are small and the laundry is enormous. Rest comes from showing up, not from having it all figured out.' },
+  { ref: 'Philippians 4:8',
+    text: 'Whatever is true, whatever is honorable, whatever is just, whatever is pure — think about these things.',
+    reflection: 'Most days, the honorable things in your home aren\'t loud. A kind word, a chore finished, an honest answer — those are worth noticing on purpose.' },
+  { ref: 'Proverbs 22:6',
+    text: 'Train up a child in the way he should go; even when he is old he will not depart from it.',
+    reflection: 'The small daily things — the chore done without prompting, the honest answer, the prayer before bed — those add up to something real over time.' },
+  { ref: 'Ecclesiastes 3:1',
+    text: 'For everything there is a season, and a time for every matter under heaven.',
+    reflection: 'There\'s a season for everything in a family — the loud years, the quiet years, the years that feel like both. Each one is shaping something.' },
+  { ref: 'Psalm 127:3',
+    text: 'Behold, children are a heritage from the LORD, the fruit of the womb a reward.',
+    reflection: 'Your kids are a gift, even on the days when it doesn\'t feel that way. Especially on those days.' },
+  { ref: 'James 1:17',
+    text: 'Every good gift and every perfect gift is from above.',
+    reflection: 'The good things happening in your home — the kindness, the growth, the small reconciliations — they didn\'t come from nowhere. They were given.' },
+  { ref: 'Romans 12:2',
+    text: 'Be transformed by the renewal of your mind.',
+    reflection: 'Renewal is rarely loud. It\'s the small daily choices — to listen, to be patient, to start again tomorrow — that change a family from the inside out.' }
+];
+function _pickFaithScripture(userId){
+  if(!userId) return FAITH_SCRIPTURE_POOL[0];
+  const h = crypto.createHash('sha256').update(String(userId)).digest();
+  return FAITH_SCRIPTURE_POOL[h[0] % FAITH_SCRIPTURE_POOL.length];
+}
+
 // ── Variant B — faith_free ───────────────────────────────────
-// Cream serif theme, scripture box, soft invitation. Inline scripture
-// from MEMORY_VERSE_LIBRARY (app/js/data/memory-verses.js) — Psalm 46:10
-// chosen for the warm-invitation tone matching this audience.
-function _renderFaithVariant({ unsubUrl }){
+// Cream serif theme. Scripture rotates per-user via the pool above.
+// Layout is intentionally devotional: opening note → scripture box →
+// reflection tying the verse to family life → recently-added
+// highlights → share-invitation → CTA → sign-off → quiet cadence
+// note above the footer.
+function _renderFaithVariant({ unsubUrl, userId }){
   const subject = 'A quiet note from Kingdom Creatives';
-  const scripture = {
-    ref:  'Psalm 46:10',
-    text: 'Be still, and know that I am God.'
-  };
+  const scripture = _pickFaithScripture(userId);
 
   const html = ''
     + '<div style="font-family:Georgia,Times New Roman,serif;color:#1a1a2e;max-width:560px;margin:0 auto;padding:28px 24px;background:#fbf8f1;line-height:1.7;">'
     +   '<p style="font-size:15px;color:#0b1020;margin:0 0 14px;">Hey,</p>'
     +   '<p style="font-size:15px;color:#0b1020;margin:0 0 14px;">Jason here from Kingdom Creatives.</p>'
-    +   '<p style="font-size:15px;color:#0b1020;margin:0 0 20px;">I wanted to send a quick note to let you know I\'ll occasionally send a faith-friendly update &mdash; a scripture, a glimpse of what\'s new in YourLife CC, and an open invitation to try the full app if it would bless your family. About once every 6 weeks, and you can opt out anytime with one tap.</p>'
-    +   '<div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:14px 18px;margin:0 0 22px;font-family:system-ui,-apple-system,Segoe UI,sans-serif;font-size:14px;color:#475569;line-height:1.85;">'
-    +     '<div style="margin-bottom:6px;"><strong style="color:#0b1020;">How often:</strong> about once every 6 weeks</div>'
-    +     '<div style="margin-bottom:6px;"><strong style="color:#0b1020;">Sender:</strong> Jason at Kingdom Creatives</div>'
-    +     '<div><strong style="color:#0b1020;">Opt out anytime:</strong> tap unsubscribe in any email</div>'
-    +   '</div>'
-    +   '<div style="border-left:3px solid #fbbf24;padding:14px 18px;margin:0 0 24px;background:rgba(251,191,36,.06);border-radius:0 8px 8px 0;">'
+    +   '<p style="font-size:15px;color:#0b1020;margin:0 0 22px;">I wanted to send a quick note to let you know I\'ll occasionally send a faith-friendly update &mdash; a scripture, a glimpse of what\'s new in YourLife CC, and an open invitation to try the full app if it would bless your family.</p>'
+    +   '<div style="border-left:3px solid #fbbf24;padding:14px 18px;margin:0 0 18px;background:rgba(251,191,36,.06);border-radius:0 8px 8px 0;">'
     +     '<div style="font-style:italic;font-size:17px;color:#0b1020;line-height:1.55;margin:0 0 8px;">' + _esc(scripture.text) + '</div>'
     +     '<div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;font-size:12px;color:#a16207;font-weight:700;letter-spacing:.06em;">&mdash; ' + _esc(scripture.ref) + '</div>'
     +   '</div>'
+    +   '<p style="font-size:15px;color:#0b1020;margin:0 0 26px;line-height:1.75;">' + _esc(scripture.reflection) + '</p>'
     +   '<div style="margin:0 0 24px;">'
-    +     '<div style="font-style:italic;font-size:13px;color:#a16207;font-weight:700;letter-spacing:.04em;margin:0 0 14px;">A glimpse of what\'s new in YourLife CC</div>'
+    +     '<div style="font-style:italic;font-size:13px;color:#a16207;font-weight:700;letter-spacing:.04em;margin:0 0 14px;">Recently added to YourLife CC</div>'
     +     '<p style="font-size:15px;color:#0b1020;margin:0 0 12px;line-height:1.7;">The Family Activity Feed now shows everything your kids did across every part of the app, in one warm view.</p>'
     +     '<p style="font-size:15px;color:#0b1020;margin:0 0 12px;line-height:1.7;">Skills quizzes can now time your kids on rapid-fire questions and celebrate their streak when they finish.</p>'
     +     '<p style="font-size:15px;color:#0b1020;margin:0;line-height:1.7;">New weekly check-ins for Health, Goals, and Money &mdash; gentle observations, never advice or pressure.</p>'
@@ -208,7 +245,8 @@ function _renderFaithVariant({ unsubUrl }){
     +   '</div>'
     +   '<p style="font-size:15px;color:#0b1020;margin:0 0 12px;">Grateful for you,</p>'
     +   '<p style="font-size:15px;color:#0b1020;margin:0 0 4px;font-style:italic;">&mdash; Jason &amp; the Kingdom Creatives family</p>'
-    +   '<p style="font-size:13px;color:#64748b;margin:0 0 28px;font-family:system-ui,-apple-system,Segoe UI,sans-serif;"><a href="mailto:info@kingdom-creatives.com" style="color:#7c3aed;text-decoration:none;">info@kingdom-creatives.com</a></p>'
+    +   '<p style="font-size:13px;color:#64748b;margin:0 0 22px;font-family:system-ui,-apple-system,Segoe UI,sans-serif;"><a href="mailto:info@kingdom-creatives.com" style="color:#7c3aed;text-decoration:none;">info@kingdom-creatives.com</a></p>'
+    +   '<p style="font-size:12px;color:#94a3b8;margin:0 0 18px;font-style:italic;font-family:system-ui,-apple-system,Segoe UI,sans-serif;">I send these about once every 6 weeks &mdash; opt out anytime.</p>'
     +   '<div style="border-top:1px solid #e2e8f0;padding-top:14px;font-size:11px;color:#94a3b8;text-align:center;line-height:1.7;font-family:system-ui,-apple-system,Segoe UI,sans-serif;">'
     +     '<a href="' + _esc(unsubUrl) + '" style="color:#94a3b8;text-decoration:underline;">Unsubscribe</a><br>'
     +     'Kingdom Creatives LLC &middot; <a href="https://yourlifecc.com" style="color:#94a3b8;text-decoration:underline;">yourlifecc.com</a>'
@@ -220,16 +258,14 @@ function _renderFaithVariant({ unsubUrl }){
     '',
     'Jason here from Kingdom Creatives.',
     '',
-    'I wanted to send a quick note to let you know I\'ll occasionally send a faith-friendly update — a scripture, a glimpse of what\'s new in YourLife CC, and an open invitation to try the full app if it would bless your family. About once every 6 weeks, and you can opt out anytime with one tap.',
-    '',
-    'How often:        about once every 6 weeks',
-    'Sender:           Jason at Kingdom Creatives',
-    'Opt out anytime:  tap unsubscribe in any email',
+    'I wanted to send a quick note to let you know I\'ll occasionally send a faith-friendly update — a scripture, a glimpse of what\'s new in YourLife CC, and an open invitation to try the full app if it would bless your family.',
     '',
     '"' + scripture.text + '"',
     '  — ' + scripture.ref,
     '',
-    'A glimpse of what\'s new in YourLife CC',
+    scripture.reflection,
+    '',
+    'Recently added to YourLife CC',
     '',
     'The Family Activity Feed now shows everything your kids did across every part of the app, in one warm view.',
     '',
@@ -246,6 +282,8 @@ function _renderFaithVariant({ unsubUrl }){
     '',
     '— Jason & the Kingdom Creatives family',
     'info@kingdom-creatives.com',
+    '',
+    'I send these about once every 6 weeks — opt out anytime.',
     '',
     'Unsubscribe: ' + unsubUrl,
     'Kingdom Creatives LLC · yourlifecc.com'
@@ -383,7 +421,7 @@ module.exports = async function handler(req, res){
 
     const unsub = _unsubUrl(userId || 'preview-no-account', 'all', unsubSecret);
     const manage = 'https://yourlifecc.com/app';
-    const rendered = _renderForVariant(variant, { unsubUrl: unsub, manageUrl: manage });
+    const rendered = _renderForVariant(variant, { unsubUrl: unsub, manageUrl: manage, userId: userId || '' });
     const unsubMailto = 'mailto:info@kingdom-creatives.com?subject=Unsubscribe';
 
     try {
@@ -500,7 +538,7 @@ module.exports = async function handler(req, res){
     // Real send
     const unsub  = _unsubUrl(row.user_id, 'all', unsubSecret);
     const manage = 'https://yourlifecc.com/app';
-    const rendered = _renderForVariant(variant, { unsubUrl: unsub, manageUrl: manage });
+    const rendered = _renderForVariant(variant, { unsubUrl: unsub, manageUrl: manage, userId: row.user_id });
     const unsubMailto = 'mailto:info@kingdom-creatives.com?subject=Unsubscribe';
 
     try {
