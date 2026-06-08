@@ -4535,6 +4535,13 @@
 <!-- ════════════ HEALTH ═══════════════════════════════════════ -->
 <section id="s-health" class="sec">
   <div class="sh"><div class="si">💪</div><div class="st">Health &amp; Fitness</div><span class="tip-wrap"><span class="tip-btn">?</span><span class="tip-box tip-right"><span class="tip-title">HOW TO USE</span><br><b>Weight:</b> Log weight + goal → see progress chart with dots labeled by date. <b>Nutrition:</b> Log meals → daily macro totals update live. <b>Habits:</b> Same as dashboard check-ins — synced.</span></span><div class="sl"></div></div>
+
+  <!-- 2026-06-07 — Health Inc 1: Power Cards domain strip. Populated by
+       renderHealthDomainStrip() in health.js from HEALTH_DOMAINS. Each
+       card carries a 7-day completion ring; tapping routes to the
+       matching sub-tab via _hDomainOpen(). -->
+  <div id="healthDomainStrip" aria-label="Health domain progress"></div>
+
   <!-- Phase 5.8 Pass D — topic card grid (default view) -->
   <div class="topic-card-grid" id="healthTopicGrid">
     <div class="topic-card accent-cyan" onclick="tgOpenTopic('s-health','weight')">
