@@ -852,6 +852,9 @@ function openSettings(anchorId){
   // 2026-06-07 — Faith tab swap dropdown.
   const _tsEl=document.getElementById('settingsTabSwap');
   if(_tsEl) _tsEl.value = (D.tabSwap && TAB_SWAP_OPTIONS[D.tabSwap]) ? D.tabSwap : '';
+  // 2026-06-07 — Skills Step 3: sound-effects opt-in toggle.
+  const _ssEl=document.getElementById('tg-skillsSound');
+  if(_ssEl) _ssEl.classList.toggle('on', !!D.skillsSound);
   // Verse speed
   const vs=document.getElementById('verseSpeed');
   if(vs) vs.value=D.verseSpeed||60000;
