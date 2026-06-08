@@ -210,7 +210,7 @@ const DEF = {
   // health
   weightLog:[], weightGoal:null,
   foodLog:[], macroGoals:{cal:2000,pro:150,carb:200,fat:65},
-  growthLog:[], activityLog:[], customActivities:[], hiddenActivities:[],
+  growthLog:[], customActivities:[], hiddenActivities:[],
   screenTime:{}, sessionLog:[],
   // Phase C-Health: sleep (D.sleepLog[]), weekly PHQ-2 mind check-ins
   // (D.phq2Log[]), and simple breakfast/lunch/dinner/snack meal log
@@ -329,6 +329,34 @@ const DEF = {
   // personalization, and future home-screen curation.
   onboardingDone:false, onboardingInterests:[],
   bannerMode:'scroll',
+  // ── Family Activity Feed (FAF Inc 1, 2026-06-08) ────────────
+  // Unified, append-only event stream powering the Parent Hub
+  // home strip (FAF Inc 4) and the full Activity tab feed (FAF
+  // Inc 3). One writer — logFamilyActivity() in activity-log.js
+  // — for every new call site; the legacy logActivity(type,
+  // detail) two-arg form is preserved as a back-compat shim so
+  // the 63 existing call sites across faith/parent/habits/skills/
+  // misc keep working until Inc 2 migrates them. Entry shape:
+  //   { id, ts (ms), date ('YYYY-MM-DD'), profileId,
+  //     domain  — 'chore'|'money'|'school'|'health'|'goal'|
+  //               'skill'|'habit'|'mood'|'journal'|'book'|
+  //               'faith'|'parent'|'auth'|'misc',
+  //     event   — per-domain string, e.g. 'completed'|'earned'|
+  //               'logged'|'submitted'|'milestone'|'badge',
+  //     title   — human one-liner (what the parent sees),
+  //     meta?   — optional domain-specific payload }
+  // Legacy entries from before Inc 1 carry { type, detail, time,
+  // ts } and are read transparently via dual-shape accessors in
+  // activity-log.js — no on-load rewrite required.
+  // Capped client-side at 500 entries / 90 days by
+  // _pruneActivityLog() on every write. Cloud-synced via the
+  // normal profiles.data JSONB blob (NO separate Supabase table
+  // — multi-profile is one auth user with many profileIds, so
+  // the existing blob already syncs cross-device).
+  // Was previously declared inside the health block, which read
+  // as if D.activityLog belonged to the activity-scheduler
+  // subsystem; moved here for clarity.
+  activityLog:[],
   // Phase 1 of the PIN → stable-id rework (Phase 2 cuts over). Phase 2
   // will populate `mappings` (pin → stableId) and POST to a server
   // migration route, then set `status` to 'complete'. In Phase 1 we
