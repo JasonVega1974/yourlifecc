@@ -679,7 +679,7 @@ const BADGES = [
   {id:'b-streak90',name:'Unstoppable',icon:'💎',desc:'90-day check-in streak',check:()=>(D.streak||0)>=90},
   {id:'b-1cert',name:'Scholar',icon:'📜',desc:'Earned first certificate',check:()=>Object.values(D.skillCerts||{}).filter(Boolean).length>=1},
   {id:'b-5cert',name:'Knowledge Seeker',icon:'🎓',desc:'Earned 5 certificates',check:()=>Object.values(D.skillCerts||{}).filter(Boolean).length>=5},
-  {id:'b-allcert',name:'Academy Master',icon:'🏅',desc:'All 18 certificates earned',check:()=>Object.values(D.skillCerts||{}).filter(Boolean).length>=18},
+  {id:'b-allcert',name:'Academy Master',icon:'🏅',desc:'All 42 certificates earned',check:()=>Object.values(D.skillCerts||{}).filter(Boolean).length>=42},
   {id:'b-1goal',name:'Goal Getter',icon:'🎯',desc:'Completed first goal',check:()=>(Array.isArray(D.goals)?D.goals:[]).filter(g=>g.done).length>=1},
   {id:'b-10goal',name:'Dream Crusher',icon:'💪',desc:'Completed 10 goals',check:()=>(Array.isArray(D.goals)?D.goals:[]).filter(g=>g.done).length>=10},
   {id:'b-1book',name:'Bookworm',icon:'📖',desc:'Finished first book',check:()=>(Array.isArray(D.books)?D.books:[]).filter(b=>b.status==='done').length>=1},
