@@ -131,6 +131,10 @@ function hTab(tab,btn){
   if(tab==='movement') renderMovementTracker();
   // 2026-06-07 — Health Inc 5: badges grid
   if(tab==='badges') renderBadgesGrid();
+  // 2026-06-08 — Health Inc 6: body literacy. Defensive typeof
+  // because body-literacy.js loads after health.js; on a cold cache
+  // first render the global may briefly be undefined.
+  if(tab==='body' && typeof renderBodyLiteracy === 'function') renderBodyLiteracy();
 }
 
 // ════════════════════════════════════════════════════════════
