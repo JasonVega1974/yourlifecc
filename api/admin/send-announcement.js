@@ -182,11 +182,11 @@ function _renderFaithVariant({ unsubUrl }){
     + '<div style="font-family:Georgia,Times New Roman,serif;color:#1a1a2e;max-width:560px;margin:0 auto;padding:28px 24px;background:#fbf8f1;line-height:1.7;">'
     +   '<p style="font-size:15px;color:#0b1020;margin:0 0 14px;">Hey,</p>'
     +   '<p style="font-size:15px;color:#0b1020;margin:0 0 14px;">Jason here from Kingdom Creatives.</p>'
-    +   '<p style="font-size:15px;color:#0b1020;margin:0 0 20px;">I wanted to send a quick note to let you know I\'ll occasionally send a faith-friendly update &mdash; a scripture, a glimpse of what\'s new in YourLife CC, and an open invitation to try the full app if it would bless your family.</p>'
+    +   '<p style="font-size:15px;color:#0b1020;margin:0 0 20px;">I wanted to send a quick note to let you know I\'ll occasionally send a faith-friendly update &mdash; a scripture, a glimpse of what\'s new in YourLife CC, and an open invitation to try the full app if it would bless your family. About once every 6 weeks, and you can opt out anytime with one tap.</p>'
     +   '<div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:14px 18px;margin:0 0 22px;font-family:system-ui,-apple-system,Segoe UI,sans-serif;font-size:14px;color:#475569;line-height:1.85;">'
-    +     '<div><strong style="color:#0b1020;">How often:</strong> about once every 6 weeks</div>'
-    +     '<div><strong style="color:#0b1020;">How many total:</strong> no more than 4 emails ever</div>'
-    +     '<div><strong style="color:#0b1020;">How to opt out:</strong> tap unsubscribe in any email &mdash; including this one</div>'
+    +     '<div style="margin-bottom:6px;"><strong style="color:#0b1020;">How often:</strong> about once every 6 weeks</div>'
+    +     '<div style="margin-bottom:6px;"><strong style="color:#0b1020;">Sender:</strong> Jason at Kingdom Creatives</div>'
+    +     '<div><strong style="color:#0b1020;">Opt out anytime:</strong> tap unsubscribe in any email</div>'
     +   '</div>'
     +   '<div style="border-left:3px solid #fbbf24;padding:14px 18px;margin:0 0 24px;background:rgba(251,191,36,.06);border-radius:0 8px 8px 0;">'
     +     '<div style="font-style:italic;font-size:17px;color:#0b1020;line-height:1.55;margin:0 0 8px;">' + _esc(scripture.text) + '</div>'
@@ -210,11 +210,11 @@ function _renderFaithVariant({ unsubUrl }){
     '',
     'Jason here from Kingdom Creatives.',
     '',
-    'I wanted to send a quick note to let you know I\'ll occasionally send a faith-friendly update — a scripture, a glimpse of what\'s new in YourLife CC, and an open invitation to try the full app if it would bless your family.',
+    'I wanted to send a quick note to let you know I\'ll occasionally send a faith-friendly update — a scripture, a glimpse of what\'s new in YourLife CC, and an open invitation to try the full app if it would bless your family. About once every 6 weeks, and you can opt out anytime with one tap.',
     '',
-    'How often:       about once every 6 weeks',
-    'How many total:  no more than 4 emails ever',
-    'How to opt out:  tap unsubscribe in any email — including this one',
+    'How often:        about once every 6 weeks',
+    'Sender:           Jason at Kingdom Creatives',
+    'Opt out anytime:  tap unsubscribe in any email',
     '',
     '"' + scripture.text + '"',
     '  — ' + scripture.ref,
