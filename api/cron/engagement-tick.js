@@ -242,6 +242,15 @@ function _evalStreakAtRisk(ctx){
 }
 
 function _evalReleaseNotes(ctx){
+  // PAUSED 2026-06-08 — release_notes trigger temporarily disabled
+  // while the user-facing copy in /docs/release-notes.js is rewritten
+  // away from developer language (the first send used "shipped" and
+  // similar dev terms in the body).
+  // Re-enable once release-notes copy is reviewed: set
+  // RELEASE_NOTES_ENABLED=1 in Vercel env vars. No code change
+  // needed to lift the pause — toggle the env var and redeploy.
+  if(process.env.RELEASE_NOTES_ENABLED !== '1') return null;
+
   // Pick entries with version > user's lastReleaseNoteVersion AND
   // user.plan_status in the entry's audience.
   const lastSeen = Number(ctx.prefs.lastReleaseNoteVersion) || 0;
