@@ -217,6 +217,13 @@ const DEF = {
   // (D.foodMeals[]) — distinct from D.foodLog above which is the macro
   // tracker. Capped client-side: sleep 90d, phq2 52 entries, meals 500.
   sleepLog:[], phq2Log:[], foodMeals:[],
+  // 2026-06-07 — Health Inc 2: hydration tracker. waterLog is one
+  // entry per local day, [{date:'YYYY-MM-DD', cups:N}]. Cups bumped
+  // via logWater(±1) in health.js — midnight reset happens naturally
+  // because logWater finds-or-creates the entry for today's date.
+  // waterGoal is configurable (default 8 cups); the Power Card ring
+  // and streak helper both gate against it. Cap 365 entries.
+  waterLog:[], waterGoal:8,
   // mood
   moods:[],
   // goals / milestones
