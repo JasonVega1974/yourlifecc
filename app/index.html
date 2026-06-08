@@ -4727,7 +4727,6 @@
     <button class="tab" onclick="hTab('meals',this)">🍽 Meals</button>
     <button class="tab" onclick="hTab('water',this)">💧 Water</button>
     <button class="tab" onclick="hTab('movement',this)">🏃 Movement</button>
-    <button class="tab" onclick="hTab('body',this)">🌱 Body</button>
     <button class="tab active" onclick="hTab('weight',this)">⚖️ Weight</button>
     <button class="tab" onclick="hTab('food',this)">🥗 Macros</button>
     <button class="tab" onclick="hTab('nutEd',this)">📚 Learn</button>
@@ -5014,41 +5013,6 @@
        Web Share API with files / download fallback. Backed by
        D.healthMilestones{} (permanent ratchet). -->
   <div id="ht-badges" style="display:none;"></div>
-
-  <style>
-    /* Health Inc 6 — body literacy modal feedback buttons. */
-    .bl-fb-btn{
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.10);
-      color:var(--tx);
-      font-size:1.3rem;
-      width:54px;height:42px;
-      border-radius:10px;
-      cursor:pointer;
-      transition:background .15s, border-color .15s, transform .15s;
-      font-family:inherit;
-    }
-    .bl-fb-btn:hover{
-      background:rgba(255,255,255,.08);
-      border-color:rgba(255,255,255,.18);
-    }
-    .bl-fb-btn.bl-fb-selected{
-      background:rgba(34,197,94,.15);
-      border-color:rgba(34,197,94,.4);
-      transform:scale(1.05);
-    }
-    @media (prefers-reduced-motion: reduce){
-      .bl-fb-btn,.bl-fb-btn.bl-fb-selected{ transition:none; transform:none; }
-    }
-  </style>
-
-  <!-- Health Inc 6 (2026-06-08) — Body literacy sub-tab. Populated
-       by renderBodyLiteracy() in body-literacy.js. Content includes
-       puberty basics, anatomy primer, "is this normal?" FAQ, when
-       to talk to a parent or doctor, sleep + body, and nutrition +
-       body. Sex-adaptive sub-sections via D.profile.sex. Inc 7's
-       opt-in period tracker will mount inside this same sub-tab. -->
-  <div id="ht-body" style="display:none;"></div>
 </section>
 
 <!-- ════════════ HABITS (first-class tab — Commit 1: Today + Streaks fully built) ════════════ -->
@@ -19408,10 +19372,6 @@
 <script src="/app/js/finance.js"></script>
 <script src="/app/js/school.js"></script>
 <script src="/app/js/health.js"></script>
-<!-- Health Inc 6 — Body literacy content + renderer. Must load after
-     health.js (hTab dispatch lives there) and after activity-log.js
-     (logFamilyActivity dependency). -->
-<script src="/app/js/body-literacy.js"></script>
 <script src="/app/js/goals.js"></script>
 <script src="/app/js/skills.js"></script>
 <!-- Tab 1 Inc 5 Step D — SortableJS for chore kanban drag-drop.
