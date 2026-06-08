@@ -5532,6 +5532,203 @@ function saveProgressEmailPref(){
   save();
 }
 
+// ══════════════════════════════════════════════════════════════
+// Email Bundle (2026-06-08) — Settings → email preferences handlers.
+// All five toggles + the signup modal + the crossover banner share
+// this section. Persistence is D.emailPrefs + save(); the cron
+// handlers in /api/cron/* read these flags out of profiles.data.
+// ══════════════════════════════════════════════════════════════
+
+function _emailPrefsEnsure(){
+  if(typeof D === 'undefined' || !D) return null;
+  if(!D.emailPrefs || typeof D.emailPrefs !== 'object') D.emailPrefs = {};
+  return D.emailPrefs;
+}
+
+function _emailPrefsCaptureTzAndRecipient(){
+  const p = _emailPrefsEnsure();
+  if(!p) return;
+  p.timezoneOffsetMin = new Date().getTimezoneOffset();
+  if(!p.recipientEmail
+     && typeof _supaUser !== 'undefined' && _supaUser && _supaUser.email){
+    p.recipientEmail = String(_supaUser.email).trim();
+  }
+}
+
+// ── Toggle handlers (one per stream) ────────────────────────
+function setDigestOptIn(btn){
+  const p = _emailPrefsEnsure(); if(!p) return;
+  // No-op on faith-free (Track 1 doesn't fire for them); UI also
+  // hides the toggle but defend in depth.
+  if(window._faithFree === true){ if(btn) btn.classList.remove('on'); return; }
+  p.digestOptIn = !p.digestOptIn;
+  _emailPrefsCaptureTzAndRecipient();
+  if(btn) btn.classList.toggle('on', !!p.digestOptIn);
+  if(typeof save === 'function') save();
+  if(typeof showToast === 'function'){
+    showToast(p.digestOptIn ? 'Weekly digest ON 📧' : 'Weekly digest OFF');
+  }
+}
+
+// setCrossoverOptIn is the UI-friendly name for the inverted
+// crossoverOptOut flag. Toggle ON means "send me crossovers"
+// (crossoverOptOut=false); toggle OFF means "stop crossovers"
+// (crossoverOptOut=true). Faith-free users see the toggle; others
+// see a status badge instead.
+function setCrossoverOptIn(btn){
+  const p = _emailPrefsEnsure(); if(!p) return;
+  if(window._faithFree !== true){ if(btn) btn.classList.remove('on'); return; }
+  // Flip the stored opt-OUT flag. Toggle UI shows the opt-IN view,
+  // so the .on class tracks the inverse of crossoverOptOut.
+  p.crossoverOptOut = (p.crossoverOptOut === true) ? false : true;
+  if(btn) btn.classList.toggle('on', p.crossoverOptOut !== true);
+  if(typeof save === 'function') save();
+  if(typeof showToast === 'function'){
+    showToast(p.crossoverOptOut === true
+      ? 'Crossover emails OFF'
+      : 'Crossover emails ON 🌅');
+  }
+}
+
+function setAllOptOut(btn){
+  const p = _emailPrefsEnsure(); if(!p) return;
+  p.allOptOut = !p.allOptOut;
+  if(btn) btn.classList.toggle('on', !!p.allOptOut);
+  if(typeof save === 'function') save();
+  if(typeof showToast === 'function'){
+    showToast(p.allOptOut
+      ? '🚫 All emails OFF (master kill)'
+      : '✅ Master kill removed — individual streams resume');
+  }
+}
+
+// ── Settings → email prefs hydration (called from openSettings) ──
+// Populates per-tier visibility for each row. The labels live in
+// index.html with empty status spans (#ep-{stream}-status); this
+// function writes the per-tier inline text.
+function _hydrateEmailPrefsSettings(){
+  const p = (D && D.emailPrefs && typeof D.emailPrefs === 'object') ? D.emailPrefs : {};
+  const isFaithFree = window._faithFree === true;
+  const setBadge = function(id, text, color){
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.textContent = text ? '· ' + text : '';
+    if(text){ el.style.color = color || 'var(--tx3)'; }
+  };
+  const setDisabled = function(togId, disabled){
+    const t = document.getElementById(togId);
+    if(!t) return;
+    if(disabled){
+      t.classList.add('tg-disabled');
+      t.style.opacity = '0.45';
+      t.style.pointerEvents = 'none';
+    } else {
+      t.classList.remove('tg-disabled');
+      t.style.opacity = '';
+      t.style.pointerEvents = '';
+    }
+  };
+
+  // Digest — paid/contest only
+  if(isFaithFree){
+    setBadge('ep-digest-status', 'Requires the full app', '#94a3b8');
+    setDisabled('tg-digestOptIn', true);
+    const dEl = document.getElementById('tg-digestOptIn');
+    if(dEl) dEl.classList.remove('on');
+  } else {
+    setBadge('ep-digest-status', '', null);
+    setDisabled('tg-digestOptIn', false);
+    const dEl = document.getElementById('tg-digestOptIn');
+    if(dEl) dEl.classList.toggle('on', p.digestOptIn === true);
+  }
+
+  // Engagement — paid/contest only
+  if(isFaithFree){
+    setBadge('ep-engagement-status', 'Requires the full app', '#94a3b8');
+    setDisabled('tg-engagementOptIn', true);
+    const eEl = document.getElementById('tg-engagementOptIn');
+    if(eEl) eEl.classList.remove('on');
+  } else {
+    setBadge('ep-engagement-status', '', null);
+    setDisabled('tg-engagementOptIn', false);
+    const eEl = document.getElementById('tg-engagementOptIn');
+    if(eEl) eEl.classList.toggle('on', p.engagementOptIn === true);
+  }
+
+  // Crossover — faith-free only
+  if(isFaithFree){
+    setBadge('ep-crossover-status', '', null);
+    setDisabled('tg-crossoverOptIn', false);
+    const cEl = document.getElementById('tg-crossoverOptIn');
+    // UI shows opt-IN view; ON = crossoverOptOut is NOT true
+    if(cEl) cEl.classList.toggle('on', p.crossoverOptOut !== true);
+  } else {
+    setBadge('ep-crossover-status', 'Faith Hub stream — not for your tier', '#94a3b8');
+    setDisabled('tg-crossoverOptIn', true);
+    const cEl = document.getElementById('tg-crossoverOptIn');
+    if(cEl) cEl.classList.remove('on');
+  }
+
+  // Master kill — visible to all
+  const aEl = document.getElementById('tg-allOptOut');
+  if(aEl) aEl.classList.toggle('on', p.allOptOut === true);
+}
+
+// ── Signup email-prefs card handlers (Part 1) ───────────────
+function _saveSignupEmailPrefs(){
+  const p = _emailPrefsEnsure(); if(!p) return;
+  const dig = (document.getElementById('sep-digest')     || {}).checked === true;
+  const eng = (document.getElementById('sep-engagement') || {}).checked === true;
+  const upd = (document.getElementById('sep-updates')    || {}).checked === true;
+  p.digestOptIn      = dig;
+  p.engagementOptIn  = eng;
+  p.updatesOptIn     = upd;
+  p.signupPromptShown = true;
+  _emailPrefsCaptureTzAndRecipient();
+  const m = document.getElementById('signupEmailPrefs');
+  if(m) m.style.display = 'none';
+  if(typeof save === 'function') save();
+  if(typeof showToast === 'function'){
+    showToast('Saved ✓ — change anytime in Settings');
+  }
+}
+
+// Skip / X-out — per the directive, the default checked state IS
+// the consent. So skipping treats all three as on (matches the
+// pre-clicked defaults).
+function _skipSignupEmailPrefs(){
+  const p = _emailPrefsEnsure(); if(!p) return;
+  p.digestOptIn       = true;
+  p.engagementOptIn   = true;
+  p.updatesOptIn      = true;
+  p.signupPromptShown = true;
+  _emailPrefsCaptureTzAndRecipient();
+  const m = document.getElementById('signupEmailPrefs');
+  if(m) m.style.display = 'none';
+  if(typeof save === 'function') save();
+}
+
+// ── Crossover awareness banner handlers (Part 2) ────────────
+function _dismissCrossoverBanner(){
+  const p = _emailPrefsEnsure(); if(!p) return;
+  p.crossoverBannerShown = true;
+  const m = document.getElementById('crossoverAwarenessBanner');
+  if(m) m.style.display = 'none';
+  if(typeof save === 'function') save();
+}
+
+function _openSettingsToEmailPrefs(){
+  // Mark the banner as shown so it doesn't re-appear later.
+  const p = _emailPrefsEnsure();
+  if(p){ p.crossoverBannerShown = true; if(typeof save === 'function') save(); }
+  const m = document.getElementById('crossoverAwarenessBanner');
+  if(m) m.style.display = 'none';
+  // Open Settings + scroll to #emailPrefsSection
+  if(typeof openSettings === 'function'){
+    openSettings('emailPrefsSection');
+  }
+}
+
 // Email Bundle Track 2 (2026-06-08) — Engagement opt-in toggle handler.
 // Wired from the Me → Settings panel toggle (#tg-engagementOptIn).
 // Flips D.emailPrefs.engagementOptIn; captures timezoneOffsetMin and
