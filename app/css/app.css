@@ -6132,55 +6132,57 @@ html[data-faith-free="1"] body.ff-hero-active #faithHeroCinematic .fo-hero-conte
 }
 
 /* ════════════════════════════════════════════════════════════
-   2026-06-06 — Mobile "← Home" floating back button.
-   Visibility is controlled by _updateMobileHomeBack() in ui.js
-   which sets inline display:'inline-flex' when (mobile narrow
-   viewport OR PWA standalone) AND the current section is not
-   the home (#s-hero / Command Center). The CSS here only sizes,
-   colors, and positions; JS owns the show/hide gate. Sits above
-   the bottom tab bar on screens where the bar is visible.
+   2026-06-07 — Mobile "← Back" sticky button (relocated from
+   bottom-right to top-left per native iOS/Android pattern).
+   Sits just below #mBar (54px + safe-area-inset-top). Visibility
+   is still owned by _updateMobileHomeBack() in ui.js — JS toggles
+   inline display, CSS owns position + style. The reciprocal .sh
+   left padding (added under "Mobile top-space reduction" block
+   below) keeps the section header text clear of the pill.
    ════════════════════════════════════════════════════════════ */
 #mobileHomeBack{
   position:fixed;
-  right:14px;
-  bottom:calc(72px + env(safe-area-inset-bottom, 0) + 14px);
+  left:10px;
+  top:calc(max(env(safe-area-inset-top), 8px) + 54px + 8px);
   z-index:945;
   align-items:center;
-  gap:.35rem;
-  padding:.55rem .95rem;
-  border:1px solid rgba(255, 255, 255, .12);
+  gap:.3rem;
+  padding:.4rem .85rem .4rem .65rem;
+  border:1px solid rgba(255, 255, 255, .14);
   border-radius:999px;
-  background:rgba(13, 17, 23, .85);
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
+  background:rgba(13, 17, 23, .82);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
   color:#F1E9D5;
   font-family:var(--fm);
-  font-size:.82rem;
+  font-size:.8rem;
   font-weight:700;
   letter-spacing:.02em;
   cursor:pointer;
-  box-shadow:0 6px 18px rgba(0, 0, 0, .45), 0 0 0 1px rgba(255, 255, 255, .04);
+  box-shadow:0 4px 14px rgba(0, 0, 0, .4), 0 0 0 1px rgba(255, 255, 255, .04);
   -webkit-tap-highlight-color:transparent;
   transition:transform .15s ease, background .15s ease, border-color .15s ease;
 }
 #mobileHomeBack:hover,
 #mobileHomeBack:focus-visible{
   background:rgba(13, 17, 23, .95);
-  border-color:rgba(255, 255, 255, .22);
-  transform:translateY(-1px);
+  border-color:rgba(255, 255, 255, .24);
+  transform:translateX(-2px);
 }
 #mobileHomeBack:active{
-  transform:translateY(0);
+  transform:translateX(0);
 }
 #mobileHomeBack span:first-child{
-  font-size:1rem;
+  font-size:1.05rem;
   line-height:1;
 }
-/* When the bottom tab bar is hidden (e.g. Parent Hub on mobile, where
-   body.teen-tabs is removed) the floating button drops to the standard
-   safe-area-inset bottom so it doesn't hover over empty space. */
-body:not(.teen-tabs) #mobileHomeBack{
-  bottom:calc(env(safe-area-inset-bottom, 0) + 14px);
+/* Light theme — pill goes light-on-dark-text for legibility on the
+   pale chrome background. */
+:root.light #mobileHomeBack{
+  background:rgba(255, 255, 255, .92) !important;
+  color:#0f172a !important;
+  border-color:rgba(0, 0, 0, .1) !important;
+  box-shadow:0 4px 14px rgba(0, 0, 0, .12), 0 0 0 1px rgba(0, 0, 0, .04);
 }
 /* JS owns the show/hide gate (mobile width OR standalone PWA AND not
    on home). The inline display:none on the markup hides the button
@@ -6241,16 +6243,42 @@ body:not(.teen-tabs) #primaryFab{
 }
 
 /* ════════════════════════════════════════════════════════════
-   2026-06-06 — Parent Hub mobile top-space reduction.
-   The base .sec rule applies padding:2.2rem 0 .5rem and .sh applies
-   margin-bottom:1.5rem app-wide. Inside #s-parent that compounds with
-   the back/lock row + child selector + ph-home-crumb to push the
-   dashboard content well past the comfortable thumb zone — the user
-   sees a thick band of empty space between the mBar header and the
-   first piece of real content.
-   This mobile-only override tightens the three biggest spacers
-   (section padding-top, header bottom margin, ph-hero panel padding)
-   while leaving the desktop layout untouched.
+   2026-06-07 — Site-wide mobile top + bottom space fixes.
+
+   #1 TOP: base .sec is padding:2.2rem 0 .5rem and .sh is
+       margin-bottom:1.5rem — fine on desktop, far too much vertical
+       slack between mBar and section content on mobile. Tighten both.
+   #2 BOTTOM: every section gets safe-area + 5rem clearance so content
+       doesn't tuck under the bottom tab bar or iOS home indicator.
+       This supersedes the v263 #phCardGrid scoped fix below (kept
+       only as a redundant safety net inside Parent Hub).
+   #3 BACK-BUTTON CLEARANCE: with #mobileHomeBack now at top-left
+       (10px from viewport edge, ~80px wide), the .sh row needs
+       padding-left to keep the header icon+title from sitting under
+       the pill on non-home, non-Well sections.
+
+   The Well surface (#s-scripture) is excluded per the standing rule.
+   Parent Hub keeps its own tighter overrides via higher specificity
+   (#s-parent.sec beats .sec).
+   ════════════════════════════════════════════════════════════ */
+@media (max-width: 860px){
+  .sec:not(#s-scripture){
+    padding-top: 1rem;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0) + 5rem);
+  }
+  .sec:not(#s-scripture) .sh{
+    margin-bottom: .85rem;
+  }
+  /* Reciprocal indent so the section header doesn't collide with the
+     top-left #mobileHomeBack pill. Home (#s-hero) has no back button. */
+  .sec:not(#s-hero):not(#s-scripture) .sh{
+    padding-left: 5rem;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   2026-06-06 — Parent Hub mobile top-space reduction (tighter
+   than the global rule above; relies on #s-parent.sec specificity).
    ════════════════════════════════════════════════════════════ */
 @media (max-width: 860px){
   #s-parent.sec{
@@ -6266,17 +6294,11 @@ body:not(.teen-tabs) #primaryFab{
 }
 
 /* ════════════════════════════════════════════════════════════
-   2026-06-06 — Parent Hub launcher grid bottom clearance.
-   The 8-card grid (#phCardGrid) lives at the bottom of #ph-home.
-   On mobile (≤860px), with teen-tabs OFF inside Parent Hub the
-   bottom tab bar is hidden — but the new floating "← Home" pill
-   still occupies the bottom-right of the viewport. Without
-   dedicated bottom padding on the grid the last row (Family &
-   Profiles + Controls & Limits) is obscured by the pill and the
-   iOS safe-area inset, making those two cards untappable.
-   The overflow:visible / max-height:none locks are defensive —
-   nothing in the chain currently caps height, but this guards
-   against future style additions silently clipping the grid.
+   2026-06-06 — Parent Hub launcher grid layout guards.
+   Bottom clearance previously lived here; superseded 2026-06-07 by
+   the global .sec padding-bottom rule above. The overflow:visible /
+   max-height:none locks remain as defensive guards against future
+   style additions silently clipping #phCardGrid.
    ════════════════════════════════════════════════════════════ */
 @media (max-width: 860px){
   #s-parent,
@@ -6285,8 +6307,5 @@ body:not(.teen-tabs) #primaryFab{
   #s-parent #ph-home{
     overflow:visible !important;
     max-height:none !important;
-  }
-  #s-parent #phCardGrid{
-    padding-bottom:calc(env(safe-area-inset-bottom, 0) + 5rem) !important;
   }
 }
