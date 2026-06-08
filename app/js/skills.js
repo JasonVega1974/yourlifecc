@@ -4497,9 +4497,10 @@ function renderCertPanel(key){
   }
 
   el.innerHTML=`
-    <div style="text-align:center;margin-bottom:.85rem;display:flex;gap:.5rem;justify-content:center;">
+    <div style="text-align:center;margin-bottom:.85rem;display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;">
       <button class="btn bgh bs" onclick="printCert('${key}')">🖨 Print / Save PDF</button>
-      <button class="btn bgh bs" onclick="shareCert('${key}')">📤 Share</button>
+      <button class="btn bgh bs" onclick="shareCert('${key}')">📤 Share text</button>
+      <button class="btn bgh bs" onclick="shareCertImage('${key}')">📸 Share image</button>
     </div>
     <div id="cert-${key}" class="sk-cert">
       <div class="sk-cert-outer">
@@ -4550,6 +4551,265 @@ function shareCert(key){
   const text = `I just earned my ${cat?.name} certificate on YourLife Academy with a score of ${score}%! 🏆 #LifeSkills`;
   if(navigator.share) navigator.share({title:'My Certificate',text});
   else { navigator.clipboard?.writeText(text); showToast('Certificate text copied to clipboard! 📋'); }
+}
+
+// ════════════════════════════════════════════════════════════
+// 2026-06-07 — Skills Step 4: PNG cert share.
+//
+// shareCertImage(key) renders a 1200x900 canvas portrait of the
+// earned cert (name + subject + score + date + branding), exports
+// it as a PNG blob, and tries the Web Share API with files. If the
+// browser lacks navigator.canShare({files}), falls back to a click-
+// to-download anchor — the user still gets the artifact.
+//
+// All drawing uses platform fonts (Segoe UI / system-ui) so the
+// PNG looks consistent without web-font loading. Emoji rendering
+// falls through Segoe UI Emoji → Apple Color Emoji → Noto Color
+// Emoji depending on the host OS.
+//
+// Wired into renderCertPanel's button row alongside Print and
+// Share text — the existing flows are untouched, this is additive.
+// ════════════════════════════════════════════════════════════
+async function shareCertImage(key){
+  const cat = SK_CATS.find(c => c.key === key);
+  if(!cat) return;
+  const score = (D.skillQuizScores||{})[key];
+  const certDate = (D.skillCerts||{})[key];
+  if(!certDate || typeof score !== 'number' || score < 80){
+    if(typeof showToast === 'function') showToast('Earn the cert first 🏆');
+    return;
+  }
+  const userName = (D.name || 'Champion').toUpperCase();
+  const accent = cat.color || '#fbbf24';
+
+  const W = 1200, H = 900;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  if(!ctx){
+    if(typeof showToast === 'function') showToast('Canvas not supported in this browser');
+    return;
+  }
+
+  // Background slate gradient with corner radial glow
+  const bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, '#0d1117');
+  bg.addColorStop(0.5, '#1e293b');
+  bg.addColorStop(1, '#0d1117');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Accent radial halo top-center
+  const halo = ctx.createRadialGradient(W/2, 0, 0, W/2, 0, W*0.55);
+  halo.addColorStop(0, _skHexAlpha(accent, 0.18));
+  halo.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = halo;
+  ctx.fillRect(0, 0, W, H);
+
+  // Outer accent border + thin inner border
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 6;
+  ctx.strokeRect(40, 40, W - 80, H - 80);
+  ctx.strokeStyle = _skHexAlpha(accent, 0.35);
+  ctx.lineWidth = 1;
+  ctx.strokeRect(58, 58, W - 116, H - 116);
+
+  // 4 corner brackets
+  const cornerSize = 56;
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 4;
+  function corner(x, y, dx, dy){
+    ctx.beginPath();
+    ctx.moveTo(x + dx*cornerSize, y);
+    ctx.lineTo(x, y);
+    ctx.lineTo(x, y + dy*cornerSize);
+    ctx.stroke();
+  }
+  corner(58, 58, 1, 1);
+  corner(W-58, 58, -1, 1);
+  corner(58, H-58, 1, -1);
+  corner(W-58, H-58, -1, -1);
+
+  // Academy header
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = accent;
+  ctx.font = '800 30px "Segoe UI", system-ui, -apple-system, sans-serif';
+  ctx.fillText('✦  YOURLIFE  ACADEMY  ✦', W/2, 140);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.font = '600 16px "Segoe UI", system-ui, -apple-system, sans-serif';
+  ctx.fillText('C E R T I F I C A T E   O F   A C H I E V E M E N T', W/2, 175);
+
+  // Big icon
+  ctx.font = '110px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", system-ui, sans-serif';
+  ctx.fillText(cat.icon || '🎓', W/2, 300);
+
+  // "This certifies that"
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.font = 'italic 500 20px "Segoe UI", system-ui, -apple-system, sans-serif';
+  ctx.fillText('This certifies that', W/2, 360);
+
+  // User name — big
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '900 60px "Segoe UI", system-ui, -apple-system, sans-serif';
+  ctx.fillText(userName, W/2, 425);
+
+  // Divider line under name
+  ctx.strokeStyle = _skHexAlpha(accent, 0.4);
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(W/2 - 220, 445);
+  ctx.lineTo(W/2 + 220, 445);
+  ctx.stroke();
+
+  // "has successfully completed"
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.font = 'italic 500 20px "Segoe UI", system-ui, -apple-system, sans-serif';
+  ctx.fillText('has successfully completed', W/2, 480);
+
+  // Subject — big, accent
+  ctx.fillStyle = accent;
+  ctx.font = '900 44px "Segoe UI", system-ui, -apple-system, sans-serif';
+  ctx.fillText((cat.name || key).toUpperCase(), W/2, 535);
+
+  // Stars
+  ctx.font = '36px "Segoe UI Symbol", "Apple Symbols", system-ui, sans-serif';
+  ctx.fillStyle = accent;
+  ctx.fillText('★  ★  ★  ★  ★', W/2, 585);
+
+  // Score box — rounded rect (fallback to plain rect if roundRect missing)
+  const boxW = 280, boxH = 120;
+  const boxX = (W - boxW)/2, boxY = 620;
+  ctx.fillStyle = _skHexAlpha(accent, 0.10);
+  ctx.strokeStyle = _skHexAlpha(accent, 0.45);
+  ctx.lineWidth = 2;
+  if(typeof ctx.roundRect === 'function'){
+    ctx.beginPath();
+    ctx.roundRect(boxX, boxY, boxW, boxH, 14);
+    ctx.fill();
+    ctx.stroke();
+  } else {
+    ctx.fillRect(boxX, boxY, boxW, boxH);
+    ctx.strokeRect(boxX, boxY, boxW, boxH);
+  }
+
+  ctx.fillStyle = 'rgba(255,255,255,0.45)';
+  ctx.font = '700 12px "Segoe UI", system-ui, sans-serif';
+  ctx.fillText('SCORE  ACHIEVED', W/2, boxY + 28);
+  ctx.fillStyle = accent;
+  ctx.font = '900 64px "Segoe UI", system-ui, sans-serif';
+  ctx.fillText(score + '%', W/2, boxY + 90);
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.font = '500 11px "Segoe UI", system-ui, sans-serif';
+  ctx.fillText('Passing  ·  80%', W/2, boxY + 110);
+
+  // Footer row
+  const footerY = H - 110;
+
+  // Left: ISSUED + date
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.font = '700 11px "Segoe UI", system-ui, sans-serif';
+  ctx.fillText('ISSUED', W * 0.22, footerY);
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.font = '500 14px "Segoe UI", system-ui, sans-serif';
+  ctx.fillText(certDate, W * 0.22, footerY + 22);
+
+  // Center: VERIFIED seal — rounded rect
+  const sealW = 130, sealH = 42;
+  const sealX = (W - sealW)/2, sealY = footerY - 8;
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 2;
+  if(typeof ctx.roundRect === 'function'){
+    ctx.beginPath();
+    ctx.roundRect(sealX, sealY, sealW, sealH, 21);
+    ctx.stroke();
+  } else {
+    ctx.strokeRect(sealX, sealY, sealW, sealH);
+  }
+  ctx.fillStyle = accent;
+  ctx.font = '900 13px "Segoe UI", system-ui, sans-serif';
+  ctx.fillText('VERIFIED', W/2, footerY + 9);
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.font = '500 9px "Segoe UI", system-ui, sans-serif';
+  ctx.fillText('YourLife Academy', W/2, footerY + 24);
+
+  // Right: CREDENTIAL ID
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.font = '700 11px "Segoe UI", system-ui, sans-serif';
+  ctx.fillText('CREDENTIAL  ID', W * 0.78, footerY);
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.font = '500 13px "Segoe UI", system-ui, monospace';
+  ctx.fillText(key.toUpperCase() + '-' + score + '-' + new Date().getFullYear(), W * 0.78, footerY + 22);
+
+  // Brand footer
+  ctx.fillStyle = accent;
+  ctx.font = '700 15px "Segoe UI", system-ui, sans-serif';
+  ctx.fillText('yourlifecc.com', W/2, H - 55);
+
+  // Export to PNG blob
+  let blob;
+  try {
+    blob = await new Promise(function(resolve){
+      canvas.toBlob(resolve, 'image/png', 0.95);
+    });
+  } catch(e){
+    if(typeof showToast === 'function') showToast('Could not render image');
+    return;
+  }
+  if(!blob){
+    if(typeof showToast === 'function') showToast('Could not render image');
+    return;
+  }
+
+  const filename = 'yourlifecc-' + key + '-cert.png';
+  const shareText = 'Earned my ' + (cat.name || key) + ' cert on YourLife CC! 🏆 ' + score + '% — yourlifecc.com';
+
+  // Try Web Share API with files
+  try {
+    if(navigator.canShare && navigator.share && typeof File === 'function'){
+      const file = new File([blob], filename, { type: 'image/png' });
+      if(navigator.canShare({ files: [file] })){
+        try {
+          await navigator.share({
+            files: [file],
+            title: 'YourLife CC certificate',
+            text: shareText
+          });
+          return; // success
+        } catch(shareErr){
+          // User cancelled — don't fall through to download
+          if(shareErr && shareErr.name === 'AbortError') return;
+          // Other share error — fall through to download
+        }
+      }
+    }
+  } catch(_){ /* fall through */ }
+
+  // Fallback: trigger download
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 5000);
+  if(typeof showToast === 'function') showToast('Cert image saved 📥');
+}
+
+// Helper: convert a 3- or 6-digit hex color to rgba() at the given
+// alpha. Tolerates already-rgb() / hsl() inputs by passing through.
+function _skHexAlpha(color, alpha){
+  if(!color) return 'rgba(255,255,255,' + alpha + ')';
+  if(color.charAt(0) !== '#') return color;
+  let h = color.slice(1);
+  if(h.length === 3) h = h.split('').map(function(c){ return c + c; }).join('');
+  if(h.length !== 6) return color;
+  const r = parseInt(h.slice(0,2), 16);
+  const g = parseInt(h.slice(2,4), 16);
+  const b = parseInt(h.slice(4,6), 16);
+  return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
 }
 
 
