@@ -707,6 +707,19 @@ const BADGES = [
   {id:'h-phq6',       name:'Check-in Champion', icon:'🧠', desc:'6 weekly mind check-ins logged',      check:()=>!!(D.healthMilestones&&D.healthMilestones['phq6'])},
   {id:'h-weeklyMin',  name:'Goal Crusher',      icon:'🎯', desc:'Hit your weekly active-minutes goal', check:()=>!!(D.healthMilestones&&D.healthMilestones['weeklyMin'])},
   {id:'h-mood7',      name:'In Tune',           icon:'💚', desc:'7-day mood log streak',               check:()=>!!(D.healthMilestones&&D.healthMilestones['mood7'])},
+  // 2026-06-07 — Goals Inc 2: milestone badges. All eight gate on
+  // D.goalMilestones[id], written by _checkGoalMilestones() in
+  // goals.js when the underlying goal-system criterion first fires.
+  // Same one-way-ratchet pattern as the health badges above — no
+  // false un-earns even if a goal is deleted later.
+  {id:'g-firstGoal',     name:'Goal Setter',     icon:'🎯', desc:'Set your first goal',                check:()=>!!(D.goalMilestones&&D.goalMilestones['firstGoal'])},
+  {id:'g-vision',        name:'Visionary',       icon:'✦', desc:'Wrote your life vision statement',   check:()=>!!(D.goalMilestones&&D.goalMilestones['vision'])},
+  {id:'g-firstAchieved', name:'First Win',       icon:'🏆', desc:'Completed your first goal',          check:()=>!!(D.goalMilestones&&D.goalMilestones['firstAchieved'])},
+  {id:'g-5goals',        name:'High Five',       icon:'🚀', desc:'Completed 5 goals',                  check:()=>!!(D.goalMilestones&&D.goalMilestones['5goals'])},
+  {id:'g-longGoal',      name:'Mountain Climber',icon:'🏔', desc:'Completed your first long-term goal',check:()=>!!(D.goalMilestones&&D.goalMilestones['longGoal'])},
+  {id:'g-timeline',      name:'Future Self',     icon:'🗺️', desc:'Filled all 4 timeline visions',     check:()=>!!(D.goalMilestones&&D.goalMilestones['timeline'])},
+  {id:'g-breakdown',     name:'Strategist',      icon:'🔍', desc:'Added milestones + actions to 3 goals',check:()=>!!(D.goalMilestones&&D.goalMilestones['breakdown'])},
+  {id:'g-streak3w',      name:'On a Roll',       icon:'🔥', desc:'Completed a goal 3 weeks in a row',  check:()=>!!(D.goalMilestones&&D.goalMilestones['streak3w'])},
 ];
 
 function renderBadges(){
