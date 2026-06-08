@@ -174,6 +174,17 @@ function addTx(){
   document.getElementById('txName').value = '';
   document.getElementById('txAmt').value  = '';
   if(typeof _checkMoneyMilestones === 'function') _checkMoneyMilestones();
+  // FAF Inc 2 — family-feed event for the user-entered transaction.
+  // Allowance auto-credits go through _maybeCreditAllowance() and are
+  // logged separately as 'allowance_credited' (not here).
+  if(typeof logFamilyActivity === 'function'){
+    const _amtStr = '$' + amt.toFixed(2);
+    if(type === 'income'){
+      logFamilyActivity('money', 'tx_income',  'Earned: ' + name + ' +' + _amtStr);
+    } else if(type === 'expense'){
+      logFamilyActivity('money', 'tx_expense', 'Spent: '  + name + ' -' + _amtStr);
+    }
+  }
   save();
   renderTx();
   updateFinSum();
@@ -215,6 +226,13 @@ function _submitPurchaseRequest(entry){
   // Clear the form so the kid doesn't accidentally re-submit.
   var nEl = document.getElementById('txName'); if(nEl) nEl.value = '';
   var aEl = document.getElementById('txAmt');  if(aEl) aEl.value = '';
+  // FAF Inc 2 — over-threshold expense was diverted to the approval
+  // queue; surface that as a feed event so the parent sees the request
+  // appear in the same stream they review purchases from.
+  if(typeof logFamilyActivity === 'function'){
+    logFamilyActivity('money', 'purchase_request_submitted',
+      'Purchase request: ' + req.name + ' $' + req.amount.toFixed(2));
+  }
   save();
   if(typeof renderTx === 'function') renderTx();
   if(typeof updateFinSum === 'function') updateFinSum();
@@ -1191,6 +1209,13 @@ function _maybeCreditAllowance(){
       cat:  ALLOWANCE_CATEGORY,
       date: d
     });
+    // FAF Inc 2 — emit one allowance event per credited due date so
+    // catch-up batches show every credit as its own line on the feed
+    // (parents want to see each one even if 3 fired in the same wake).
+    if(typeof logFamilyActivity === 'function'){
+      logFamilyActivity('money', 'allowance_credited',
+        'Allowance credited: +$' + amt.toFixed(2) + ' (' + d + ')');
+    }
     advanceLastTo = d;
     credited++;
   }
@@ -2179,6 +2204,12 @@ function _quickAddSave(id){
   } else {
     showToast('+$' + amt.toFixed(2) + ' added to ' + (g.emoji||'🎯') + ' ' + g.name);
   }
+  // FAF Inc 2 — savings-goal contribution. One event per quick-add;
+  // captures the goal name + new total / target for parent context.
+  if(typeof logFamilyActivity === 'function'){
+    logFamilyActivity('money', 'savings_goal_progress',
+      'Goal progress: ' + g.name + ' (+$' + amt.toFixed(2) + ' → $' + (g.current||0).toFixed(2) + ' / $' + (g.target||0).toFixed(2) + ')');
+  }
 }
 
 function _quickAddCancel(){
@@ -2409,6 +2440,12 @@ function _checkMoneyMilestones(){
     try {
       if(!m.test()) return;
       D.moneyMilestones[m.key] = today;
+      // FAF Inc 2 — log the milestone earn on the same tick as the
+      // stamp so the feed line lands alongside the toast (parent sees
+      // both in the same moment, not later).
+      if(typeof logFamilyActivity === 'function'){
+        logFamilyActivity('money', 'milestone', 'Money milestone: ' + m.msg);
+      }
       // Stagger so back-to-back celebrations don't blur into one burst.
       const delay = fireIdx * 420;
       fireIdx++;
