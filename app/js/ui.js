@@ -2270,6 +2270,11 @@ function showSection(id, fromMobile){
     // 2026-06-07 — Goals Inc 1: refresh the 10-domain Power Cards strip
     // on every entry so the rings reflect the latest goal state.
     typeof renderGoalDomainStrip==='function'&&renderGoalDomainStrip();
+    // 2026-06-07 — Goals Inc 3: AI Goals Coach. Render the cached card
+    // immediately + auto-fetch when the weekKey is stale + user has
+    // 2+ goals (weekly cadence — slower than money/health).
+    typeof renderGoalCoach==='function'&&renderGoalCoach();
+    typeof _maybeAutoFetchGoalCoach==='function'&&_maybeAutoFetchGoalCoach();
   },60);
   if(id==='s-journal')    setTimeout(()=>{ typeof renderJournal==='function'&&renderJournal(); },60);
   if(id==='s-chores')     setTimeout(()=>{ typeof renderChores==='function'&&renderChores(); },60);
