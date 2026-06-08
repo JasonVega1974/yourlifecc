@@ -224,6 +224,14 @@ const DEF = {
   // waterGoal is configurable (default 8 cups); the Power Card ring
   // and streak helper both gate against it. Cap 365 entries.
   waterLog:[], waterGoal:8,
+  // 2026-06-07 — Health Inc 3: AI Health Coach. Cache mirrors the
+  // Money Coach pattern (financeCoachLastWeek) but with a daily key
+  // instead of weekly. dayKey:'YYYY-MM-DD' last fetch day; summary +
+  // focus are the JSON-shaped response from /api/ai-summary mode
+  // 'health-coach'; fetchedAt rate-limits manual refresh (6h floor).
+  // Auto-fetched on s-health entry when dayKey != today AND user has
+  // 3+ recent logs across sleep/meals/water/mood.
+  healthCoachCache:{ dayKey:'', summary:'', focus:'', fetchedAt:0 },
   // mood
   moods:[],
   // goals / milestones
