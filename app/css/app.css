@@ -4581,6 +4581,220 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 }
 
 /* ════════════════════════════════════════════════════════════
+   2026-06-07 — Life tab "Superpowers" upgrade
+
+   Scoped to #s-life only — leaves Me + Learn landings on the
+   original .tab-landing-card style. Two child grids inside the
+   .tab-landing[data-tab="life"] host:
+     .tab-landing-hero — 6 large Power Cards (gradient border,
+       theme palette, idle shimmer, streak pulse, live stat,
+       optional scripture micro-line).
+     .tab-landing-more — 7 compact mini-cards.
+   Idle motion (shimmer, streak pulse) is auto-suppressed by the
+   global @media (prefers-reduced-motion: reduce) rule below.
+   ════════════════════════════════════════════════════════════ */
+#s-life .tab-landing{
+  display:block;
+  padding:8px 0 24px;
+}
+.tab-landing-hero{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:14px;
+}
+@media (max-width:520px){
+  .tab-landing-hero{ grid-template-columns:1fr; gap:12px; }
+}
+@media (min-width:861px){
+  .tab-landing-hero{ grid-template-columns:repeat(3, 1fr); gap:18px; }
+}
+.tab-landing-more-label{
+  font-family:var(--fh);
+  font-size:.7rem;
+  letter-spacing:.22em;
+  color:var(--tx2);
+  opacity:.55;
+  margin:24px 2px 10px;
+}
+.tab-landing-more{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:10px;
+}
+@media (min-width:861px){
+  .tab-landing-more{ grid-template-columns:repeat(4, 1fr); gap:12px; }
+}
+
+/* ─── Power Card — Life tab hero tiles ───────────────────────── */
+#s-life .tab-landing-card.tlc-power{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  border:1px solid var(--card-border, rgba(255,255,255,.08));
+  border-left:1px solid var(--card-border, rgba(255,255,255,.08));
+  border-radius:18px;
+  background:
+    linear-gradient(140deg,
+      color-mix(in srgb, var(--card-accent, var(--c)) 18%, transparent) 0%,
+      color-mix(in srgb, var(--card-accent, var(--c)) 4%, transparent) 50%,
+      transparent 100%),
+    var(--card-bg, rgba(255,255,255,.04));
+  padding:18px 18px 16px;
+  min-height:128px;
+}
+#s-life .tab-landing-card.tlc-power::before{
+  content:'';
+  position:absolute; inset:0;
+  border-radius:18px;
+  padding:1.5px;
+  background:linear-gradient(135deg,
+    var(--tlc-grad-a, var(--card-accent, var(--c))),
+    var(--tlc-grad-b, var(--card-accent, var(--c))));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask-composite:exclude;
+  opacity:.85;
+  pointer-events:none;
+  z-index:0;
+}
+#s-life .tab-landing-card.tlc-power:hover,
+#s-life .tab-landing-card.tlc-power:focus-visible{
+  transform:translateY(-3px);
+  box-shadow:
+    0 14px 36px color-mix(in srgb, var(--tlc-grad-a, var(--card-accent, var(--c))) 30%, transparent),
+    0 2px 8px rgba(0,0,0,.4);
+  outline:none;
+}
+#s-life .tab-landing-card.tlc-power:active{
+  transform:translateY(-1px) scale(.99);
+}
+
+/* Theme palettes — vivid 2-stop gradients per section */
+#s-life .tlc-power[data-theme="lightning"]{ --tlc-grad-a:#38bdf8; --tlc-grad-b:#818cf8; }
+#s-life .tlc-power[data-theme="forge"]    { --tlc-grad-a:#fb923c; --tlc-grad-b:#ef4444; }
+#s-life .tlc-power[data-theme="hunter"]   { --tlc-grad-a:#34d399; --tlc-grad-b:#14b8a6; }
+#s-life .tlc-power[data-theme="treasury"] { --tlc-grad-a:#fbbf24; --tlc-grad-b:#16a34a; }
+#s-life .tlc-power[data-theme="time"]     { --tlc-grad-a:#818cf8; --tlc-grad-b:#a78bfa; }
+#s-life .tlc-power[data-theme="mind"]     { --tlc-grad-a:#ec4899; --tlc-grad-b:#f472b6; }
+
+/* Idle shimmer sweep. Auto-suppressed by global reduced-motion rule. */
+#s-life .tlc-power .tlc-shimmer{
+  position:absolute; inset:0;
+  border-radius:18px;
+  background:linear-gradient(110deg,
+    transparent 30%,
+    color-mix(in srgb, var(--tlc-grad-a, #fff) 22%, transparent) 50%,
+    transparent 70%);
+  transform:translateX(-110%);
+  animation:tlcShimmer 7s ease-in-out infinite;
+  animation-delay:var(--tlc-shimmer-delay, 0s);
+  pointer-events:none;
+  z-index:0;
+  opacity:.6;
+  mix-blend-mode:screen;
+}
+#s-life .tlc-power[data-theme="forge"]    .tlc-shimmer{ --tlc-shimmer-delay: .8s; }
+#s-life .tlc-power[data-theme="hunter"]   .tlc-shimmer{ --tlc-shimmer-delay:1.6s; }
+#s-life .tlc-power[data-theme="treasury"] .tlc-shimmer{ --tlc-shimmer-delay:2.4s; }
+#s-life .tlc-power[data-theme="time"]     .tlc-shimmer{ --tlc-shimmer-delay:3.2s; }
+#s-life .tlc-power[data-theme="mind"]     .tlc-shimmer{ --tlc-shimmer-delay:4.0s; }
+@keyframes tlcShimmer{
+  0%   { transform:translateX(-110%); }
+  55%  { transform:translateX(110%); }
+  100% { transform:translateX(110%); }
+}
+
+/* Inner layout — keep content above the shimmer/border layers */
+#s-life .tlc-power > *{ position:relative; z-index:1; }
+#s-life .tlc-power .tlc-row-top{
+  display:flex; align-items:center; gap:10px;
+  margin-bottom:6px;
+}
+#s-life .tlc-power .tlc-icon{
+  font-size:1.85rem; line-height:1;
+  filter:drop-shadow(0 0 10px color-mix(in srgb, var(--tlc-grad-a, var(--card-accent, var(--c))) 60%, transparent));
+}
+#s-life .tlc-power .tlc-label{
+  flex:1;
+  font-family:var(--fh);
+  font-size:1.2rem;
+  letter-spacing:.06em;
+  line-height:1;
+  color:var(--tx);
+}
+#s-life .tlc-power .tlc-streak{
+  display:inline-flex; align-items:center; gap:3px;
+  font-family:var(--fm);
+  font-size:.72rem; font-weight:700;
+  letter-spacing:.02em;
+  padding:3px 8px 3px 7px;
+  border-radius:999px;
+  background:linear-gradient(135deg,
+    color-mix(in srgb, #f97316 75%, transparent),
+    color-mix(in srgb, #ef4444 75%, transparent));
+  color:#fff;
+  box-shadow:0 0 14px color-mix(in srgb, #f97316 38%, transparent);
+  animation:tlcStreakPulse 1.6s ease-in-out infinite alternate;
+}
+@keyframes tlcStreakPulse{
+  from { transform:scale(1);    box-shadow:0 0 10px color-mix(in srgb, #f97316 30%, transparent); }
+  to   { transform:scale(1.05); box-shadow:0 0 20px color-mix(in srgb, #f97316 55%, transparent); }
+}
+#s-life .tlc-power .tlc-sub{
+  font-family:var(--fm);
+  font-size:.8rem;
+  line-height:1.4;
+  color:var(--tx2);
+}
+#s-life .tlc-power .tlc-power-divider{
+  display:block;
+  height:1px;
+  background:linear-gradient(90deg,
+    transparent,
+    color-mix(in srgb, var(--tlc-grad-a, var(--card-accent, var(--c))) 55%, transparent),
+    transparent);
+  margin:10px 0 8px;
+}
+#s-life .tlc-power .tlc-stat{
+  font-family:var(--fm);
+  font-size:.86rem;
+  font-weight:600;
+  color:var(--tx);
+}
+#s-life .tlc-power .tlc-faith-line{
+  display:block;
+  margin-top:6px;
+  font-family:var(--fh);
+  font-size:.68rem;
+  letter-spacing:.04em;
+  font-style:italic;
+  color:color-mix(in srgb, var(--tx2) 80%, transparent);
+  opacity:.72;
+  line-height:1.35;
+}
+
+/* ─── Mini card — Life tab "More" tiles ──────────────────────── */
+#s-life .tab-landing-card.tlc-mini{
+  border-radius:14px;
+  min-height:74px;
+  padding:12px 8px 10px;
+  align-items:center;
+  text-align:center;
+  gap:6px;
+  border-left:3px solid var(--card-accent, var(--c));
+  background:var(--card-bg, rgba(255,255,255,.04));
+}
+#s-life .tab-landing-card.tlc-mini .tlc-icon{
+  font-size:1.4rem; margin-bottom:2px;
+}
+#s-life .tab-landing-card.tlc-mini .tlc-label{
+  font-family:var(--fm);
+  font-size:.78rem;
+  letter-spacing:.02em;
+  font-weight:600;
+}
+
+/* ════════════════════════════════════════════════════════════
    Phase B-Lite session 3 — Reduced-motion accessibility
    Per docs/design-system.md §5: collapse all motion to near-zero
    when prefers-reduced-motion is set. Cross-fades stay perceptible
@@ -4680,6 +4894,27 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
   color:#0f172a !important;
 }
 :root.light .tab-landing-card .tlc-label{ color:#0f172a !important; }
+
+/* 2026-06-07 — Life Power Cards in light mode. The generic light rule
+   above clobbers the gradient with #fff !important, so we re-paint
+   here with higher specificity + !important. Shimmer flips to multiply
+   so it darkens softly on light bg instead of going invisible. */
+:root.light #s-life .tab-landing-card.tlc-power{
+  background:
+    linear-gradient(140deg,
+      color-mix(in srgb, var(--card-accent, var(--c)) 14%, #fff) 0%,
+      #fff 60%) !important;
+  border-color:rgba(0,0,0,.06) !important;
+  box-shadow:0 4px 18px rgba(0,0,0,.06);
+}
+:root.light #s-life .tlc-power .tlc-sub       { color:#475569 !important; }
+:root.light #s-life .tlc-power .tlc-stat      { color:#0f172a !important; }
+:root.light #s-life .tlc-power .tlc-faith-line{ color:#64748b !important; }
+:root.light #s-life .tlc-power .tlc-shimmer   { opacity:.28; mix-blend-mode:multiply; }
+:root.light #s-life .tab-landing-more-label   { color:#64748b !important; }
+:root.light #s-life .tab-landing-card.tlc-mini{
+  background:#fff !important;
+}
 
 /* mBar globe + avatar buttons (Phase C mobile-header fix) */
 :root.light #mBarLangBtn{
