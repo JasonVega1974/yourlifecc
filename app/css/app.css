@@ -3485,6 +3485,135 @@ body.solo-mode .sp-family-only { display: none !important; }
 :root.light #ht-water .water-bar-empty{ background:rgba(0,0,0,.06) !important; }
 /* ════════════════════════════════════════════════════════════ */
 
+/* ════════════════════════════════════════════════════════════
+   2026-06-07 — Health Inc 3: AI Health Coach visuals.
+
+   Scoped to #healthCoachCard. Sits at the very top of #s-health
+   above the domain strip. Aurora-gradient panel with a subtle
+   inset border, AI title + refresh pill, summary paragraph + a
+   smaller "Today:" focus line.
+
+   Mirrors the Money Coach card pattern visually for consistency
+   across coach surfaces.
+   ════════════════════════════════════════════════════════════ */
+#healthCoachCard{ margin:0 0 12px; }
+.h-coach{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  border:1px solid color-mix(in srgb, var(--section-health, #34d399) 22%, transparent);
+  border-radius:16px;
+  padding:14px 16px 12px;
+  background:
+    radial-gradient(110% 80% at 20% 0%,  color-mix(in srgb, var(--section-health, #34d399) 18%, transparent) 0%, transparent 65%),
+    radial-gradient(120% 80% at 100% 100%, color-mix(in srgb, #818cf8 14%, transparent) 0%, transparent 70%),
+    linear-gradient(135deg, rgba(52,211,153,.07), rgba(34,197,94,.04));
+  font-family:var(--fm);
+  color:var(--tx);
+}
+.h-coach::before{
+  content:'';
+  position:absolute; inset:0;
+  border-radius:16px;
+  padding:1px;
+  background:linear-gradient(135deg, var(--section-health, #34d399), #22d3ee);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask-composite:exclude;
+  opacity:.35;
+  pointer-events:none;
+  z-index:0;
+}
+.h-coach > *{ position:relative; z-index:1; }
+.h-coach__head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.6rem;
+  margin-bottom:.55rem;
+}
+.h-coach__title{
+  font-family:var(--fh);
+  font-size:.9rem;
+  font-weight:800;
+  letter-spacing:.08em;
+  color:var(--tx);
+}
+.h-coach__refresh{
+  flex-shrink:0;
+  background:rgba(52,211,153,.14);
+  border:1px solid color-mix(in srgb, var(--section-health, #34d399) 38%, transparent);
+  color:var(--section-health, #34d399);
+  width:32px; height:32px;
+  border-radius:50%;
+  cursor:pointer;
+  font-size:1rem;
+  font-weight:800;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  transition:background .15s ease, transform .15s ease, box-shadow .15s ease;
+}
+.h-coach__refresh:hover{
+  background:rgba(52,211,153,.22);
+  box-shadow:0 0 0 4px color-mix(in srgb, var(--section-health, #34d399) 14%, transparent);
+  transform:rotate(60deg);
+}
+.h-coach__refresh:active{ transform:rotate(120deg) scale(.95); }
+.h-coach__body{ margin:0; }
+.h-coach__summary{
+  margin:0 0 .5rem;
+  font-size:.86rem;
+  line-height:1.55;
+  color:var(--tx);
+}
+.h-coach__focus{
+  margin:0;
+  font-size:.78rem;
+  line-height:1.5;
+  color:var(--tx2);
+  padding:.45rem .7rem;
+  border-radius:8px;
+  background:rgba(52,211,153,.08);
+  border-left:3px solid var(--section-health, #34d399);
+}
+.h-coach__focus-label{
+  font-weight:800;
+  letter-spacing:.04em;
+  color:var(--section-health, #34d399);
+  margin-right:.3rem;
+}
+.h-coach__stale{
+  margin-top:.55rem;
+  font-size:.66rem;
+  color:var(--tx3);
+  font-style:italic;
+}
+.h-coach__loading,
+.h-coach__err{
+  font-size:.8rem;
+  color:var(--tx2);
+  padding:.3rem 0;
+}
+.h-coach__err{ color:#f87171; }
+.h-coach--empty .h-coach__summary{ color:var(--tx2); }
+
+/* Light theme */
+:root.light .h-coach{
+  background:
+    radial-gradient(110% 80% at 20% 0%,  color-mix(in srgb, var(--section-health, #34d399) 14%, #fff) 0%, transparent 65%),
+    radial-gradient(120% 80% at 100% 100%, color-mix(in srgb, #818cf8 10%, #fff) 0%, transparent 70%),
+    #fff !important;
+  border-color:rgba(0,0,0,.08) !important;
+  box-shadow:0 2px 12px rgba(0,0,0,.05);
+}
+:root.light .h-coach__summary{ color:#0f172a !important; }
+:root.light .h-coach__focus{
+  background:rgba(52,211,153,.08) !important;
+  color:#0f172a !important;
+}
+/* ════════════════════════════════════════════════════════════ */
+
 /* Inline modal mode — skillsModal lives inside #s-skills after relocation */
 #s-skills > #skillsModal {
   position: static !important;
