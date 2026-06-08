@@ -3554,7 +3554,10 @@ function renderPhReportsHeroChips(){
 // every D.* shape so a stray field type can't break the hero. Three
 // counts:
 //   • scheduled today    — D.scheduleBlocks where date is today
-//   • events today       — D.activityAudit entries from today
+//   • events today       — D.activityLog entries dated today
+//                          (FAF Inc 1: was reading the phantom field
+//                           D.activityAudit which has no writer
+//                           anywhere — chip was always 0)
 //   • behavior notes     — total D.behaviorLog entries (not just today;
 //                           the surface treats this as a running log)
 function renderPhActivityHeroChips(){
@@ -3565,8 +3568,16 @@ function renderPhActivityHeroChips(){
   const todayISO = new Date().toISOString().slice(0,10);
   const schedCt = (Array.isArray(D.scheduleBlocks) ? D.scheduleBlocks : [])
     .filter(b => b && (b.date || '').slice(0,10) === todayISO).length;
-  const eventsCt = (Array.isArray(D.activityAudit) ? D.activityAudit : [])
-    .filter(a => a && (a.date || a.timestamp || '').slice(0,10) === todayISO).length;
+  // FAF Inc 1: count real D.activityLog entries in today's local-date
+  // bucket. Uses activityDate() so legacy {type,detail,time} entries
+  // count alongside new-shape ones.
+  const eventsCt = (Array.isArray(D.activityLog) ? D.activityLog : [])
+    .filter(a => {
+      if (!a) return false;
+      if (a.date === todayISO) return true;
+      if (typeof activityDate === 'function') return activityDate(a) === todayISO;
+      return (a.time || '').slice(0, 10) === todayISO;
+    }).length;
   const notesCt = (Array.isArray(D.behaviorLog) ? D.behaviorLog : []).length;
   if(schedEl)  schedEl.textContent  = schedCt;
   if(eventsEl) eventsEl.textContent = eventsCt;
@@ -5209,20 +5220,36 @@ const SOCIAL_LESSONS = [
 ];
 
 // ── PARENT ACTIVITY AUDIT ────────────────────────────────────
+// FAF Inc 1: was reading the WRONG element (#parentActivityFeed)
+// which is the synthetic-feed container — so the audit slot
+// (#parentActivityAudit) was always empty AND the feed container
+// got overwritten by whichever renderer ran last. Now targets
+// the right slot and reads new + legacy entries uniformly via
+// activity-log.js dual-shape accessors.
 function renderParentActivityAudit(){
-  const el = document.getElementById('parentActivityFeed'); if(!el) return;
+  const el = document.getElementById('parentActivityAudit'); if(!el) return;
   const log = (Array.isArray(D.activityLog)?D.activityLog:[]).slice().reverse().slice(0,30);
   if(!log.length){
     el.innerHTML = '<div style="font-size:.7rem;color:var(--tx3);padding:.5rem;">No activity logged yet.</div>';
     return;
   }
+  // Domain → icon (new-shape entries). Legacy entries fall through
+  // via activityDomain() which maps old `type` via LEGACY_TYPE_MAP.
+  const domainIcons = {
+    faith:'✝️', habit:'⚡', chore:'✅', skill:'🧠', goal:'🎯', mood:'😊',
+    journal:'✍️', health:'💪', money:'💰', school:'📚', book:'📖',
+    parent:'👤', auth:'🔐', misc:'📌'
+  };
   el.innerHTML = log.map(l=>{
-    const d = new Date(l.time);
+    const ts  = (typeof activityTs    === 'function') ? activityTs(l)    : (l.ts || Date.parse(l.time || '') || Date.now());
+    const dom = (typeof activityDomain=== 'function') ? activityDomain(l): (l.domain || l.type || 'misc');
+    const ttl = (typeof activityTitle === 'function') ? activityTitle(l) : (l.title  || l.detail || '');
+    const d = new Date(ts || Date.now());
     const timeStr = d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    const icons = {scripture:'✝️',habit:'⚡',chore:'✅',lesson:'🧠',quiz:'📝',goal:'🎯',journal:'✍️',mood:'😊',badge:'🏅',login:'👤'};
+    const icon = domainIcons[dom] || '📌';
     return `<div style="display:flex;align-items:center;gap:.4rem;padding:.3rem .4rem;border-bottom:1px solid rgba(255,255,255,.03);font-size:.65rem;">
-      <span>${icons[l.type]||'📌'}</span>
-      <span style="flex:1;color:var(--tx2);">${escapeHtml(l.detail)}</span>
+      <span>${icon}</span>
+      <span style="flex:1;color:var(--tx2);">${escapeHtml(ttl)}</span>
       <span style="font-size:.55rem;color:var(--tx3);white-space:nowrap;">${timeStr}</span>
     </div>`;
   }).join('');
