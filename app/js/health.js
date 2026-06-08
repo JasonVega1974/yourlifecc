@@ -129,6 +129,325 @@ function hTab(tab,btn){
   if(tab==='water') renderWaterTracker();
   // 2026-06-07 — Health Inc 4: movement / workout tracker
   if(tab==='movement') renderMovementTracker();
+  // 2026-06-07 — Health Inc 5: badges grid
+  if(tab==='badges') renderBadgesGrid();
+}
+
+// ════════════════════════════════════════════════════════════
+// 2026-06-07 — Health Inc 5: Milestone badges + PNG share.
+//
+// HEALTH_MILESTONES is the central config. Each entry carries the
+// id (shared with misc.js BADGES via 'h-<id>' prefix), display name,
+// glyph, color theme (used by the gradient ring + share PNG accent),
+// short criterion description, and a check() function. _checkHealth-
+// Milestones runs every check after each log action; first earn is
+// written to D.healthMilestones[id] = YYYY-MM-DD and fires celebration.
+//
+// The misc.js BADGES system checks D.healthMilestones[id] presence —
+// one-way ratchet, no false un-earns.
+//
+// shareBadgeImage(id) renders a 1080x1080 canvas portrait (glyph +
+// name + earner name + date + brand) and tries Web Share files API,
+// falling back to download.
+// ════════════════════════════════════════════════════════════
+const HEALTH_MILESTONES = [
+  { id:'water7',       name:'Hydrated',          icon:'🌊', color:'#22d3ee',
+    desc:'Hit your water goal 7 days in a row.',
+    check: function(){ return (typeof calcWaterStreak === 'function') && calcWaterStreak() >= 7; } },
+  { id:'sleep30',      name:'Sleep Scholar',     icon:'💤', color:'#818cf8',
+    desc:'Log 30 nights of sleep.',
+    check: function(){ return ((D && Array.isArray(D.sleepLog)) ? D.sleepLog.length : 0) >= 30; } },
+  { id:'water100',     name:'Centurion',         icon:'💧', color:'#38bdf8',
+    desc:'100 cups of water logged.',
+    check: function(){
+      const log = (D && Array.isArray(D.waterLog)) ? D.waterLog : [];
+      return log.reduce(function(s, e){ return s + (Number(e.cups)||0); }, 0) >= 100;
+    } },
+  { id:'firstWorkout', name:'First Rep',         icon:'💪', color:'#f97316',
+    desc:'Log your first workout.',
+    check: function(){ return ((D && Array.isArray(D.workoutLog)) ? D.workoutLog.length : 0) >= 1; } },
+  { id:'meals7',       name:'Consistent',        icon:'🍽️', color:'#fbbf24',
+    desc:'Log a meal 7 days in a row.',
+    check: function(){ return (typeof calcMealStreak === 'function') && calcMealStreak() >= 7; } },
+  { id:'phq6',         name:'Check-in Champion', icon:'🧠', color:'#a78bfa',
+    desc:'Complete 6 weekly mind check-ins.',
+    check: function(){ return ((D && Array.isArray(D.phq2Log)) ? D.phq2Log.length : 0) >= 6; } },
+  { id:'weeklyMin',    name:'Goal Crusher',      icon:'🎯', color:'#34d399',
+    desc:'Hit your weekly active-minutes goal.',
+    check: function(){
+      const goal = (D && Number(D.workoutGoal)) || 150;
+      return (typeof _calcActiveMinutesLast7 === 'function') && _calcActiveMinutesLast7() >= goal;
+    } },
+  { id:'mood7',        name:'In Tune',           icon:'💚', color:'#34d399',
+    desc:'Log your mood 7 days in a row.',
+    check: function(){ return _calcMoodStreak() >= 7; } }
+];
+
+// 7-day consecutive mood-log streak (matches calcMealStreak pattern).
+function _calcMoodStreak(){
+  const log = (D && Array.isArray(D.moods)) ? D.moods : [];
+  if(!log.length) return 0;
+  let streak = 0;
+  const today = new Date();
+  for(let i = 0; i < 90; i++){
+    const d = new Date(today); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().slice(0,10);
+    if(log.some(function(m){ return m && m.date === ds; })) streak++;
+    else break;
+  }
+  return streak;
+}
+
+function _checkHealthMilestones(){
+  if(!D.healthMilestones || typeof D.healthMilestones !== 'object') D.healthMilestones = {};
+  let anyNew = false;
+  HEALTH_MILESTONES.forEach(function(m){
+    if(D.healthMilestones[m.id]) return; // already earned — one-way ratchet
+    let earned = false;
+    try { earned = !!m.check(); } catch(e){ earned = false; }
+    if(earned){
+      D.healthMilestones[m.id] = new Date().toISOString().slice(0,10);
+      anyNew = true;
+      // Stagger celebrations so multiple-at-once still feel distinct.
+      setTimeout(function(){ _celebrateHealthMilestone(m); }, 100);
+    }
+  });
+  if(anyNew && typeof save === 'function') save();
+}
+
+function _celebrateHealthMilestone(m){
+  if(!m) return;
+  if(typeof launchBigConfetti === 'function') launchBigConfetti();
+  if(typeof showToast === 'function'){
+    showToast('🏆 Badge earned: ' + m.name + ' ' + m.icon);
+  }
+  // Refresh the badges grid live if the user happens to be viewing it.
+  const bg = document.getElementById('ht-badges');
+  if(bg && bg.style.display !== 'none' && typeof renderBadgesGrid === 'function'){
+    renderBadgesGrid();
+  }
+}
+
+function renderBadgesGrid(){
+  const el = document.getElementById('ht-badges');
+  if(!el) return;
+  // Run a check first so freshly-earnable milestones land in
+  // D.healthMilestones before the grid renders the earned state.
+  _checkHealthMilestones();
+  const earned = (D && D.healthMilestones && typeof D.healthMilestones === 'object') ? D.healthMilestones : {};
+  const earnedCount = HEALTH_MILESTONES.filter(function(m){ return !!earned[m.id]; }).length;
+  const total = HEALTH_MILESTONES.length;
+  const pct = Math.round((earnedCount / total) * 100);
+
+  el.innerHTML =
+      '<div class="card" style="border-left:4px solid var(--section-health);">'
+    +   '<div class="ct">🏆 Health Badges</div>'
+    +   '<div style="display:flex;justify-content:space-between;align-items:center;gap:.8rem;margin-bottom:.6rem;flex-wrap:wrap;">'
+    +     '<div style="font-size:.78rem;color:var(--tx2);line-height:1.55;flex:1;min-width:180px;">Earn a badge by hitting a streak or milestone. Tap any earned badge to share a card you can post.</div>'
+    +     '<div class="hb-progress-pill"><span>' + earnedCount + '</span>/<span class="hb-progress-total">' + total + '</span> earned</div>'
+    +   '</div>'
+    +   '<div class="hb-progress-track"><div class="hb-progress-fill" style="width:' + pct + '%;"></div></div>'
+    + '</div>'
+    + '<div class="hb-grid">'
+    +   HEALTH_MILESTONES.map(function(m){
+        const isEarned = !!earned[m.id];
+        const date = isEarned ? earned[m.id] : '';
+        return '<button type="button" class="hb-card' + (isEarned ? ' is-earned' : ' is-locked') + '"'
+          + ' style="--badge-accent:' + m.color + ';"'
+          + ' onclick="' + (isEarned ? 'shareBadgeImage(\'' + m.id + '\')' : 'showBadgeCriteria(\'' + m.id + '\')') + '"'
+          + ' aria-label="' + m.name + (isEarned ? ', earned ' + date + ', tap to share' : ', locked, ' + m.desc) + '">'
+          + (isEarned ? '<span class="hb-shine" aria-hidden="true"></span>' : '')
+          + '<span class="hb-glyph" aria-hidden="true">' + m.icon + '</span>'
+          + '<span class="hb-name">' + m.name + '</span>'
+          + (isEarned
+              ? '<span class="hb-date">Earned ' + date + '</span><span class="hb-share-cue">Tap to share</span>'
+              : '<span class="hb-criteria">' + m.desc + '</span><span class="hb-lock-cue">🔒 Locked</span>')
+        + '</button>';
+      }).join('')
+    + '</div>';
+}
+
+function showBadgeCriteria(id){
+  const m = HEALTH_MILESTONES.find(function(x){ return x.id === id; });
+  if(!m) return;
+  if(typeof showToast === 'function') showToast(m.icon + ' ' + m.name + ' — ' + m.desc);
+}
+
+// Helper: hex → rgba() for canvas gradient stops.
+function _hbHexAlpha(hex, alpha){
+  if(!hex || hex.charAt(0) !== '#') return 'rgba(255,255,255,' + alpha + ')';
+  let h = hex.slice(1);
+  if(h.length === 3) h = h.split('').map(function(c){ return c + c; }).join('');
+  if(h.length !== 6) return hex;
+  const r = parseInt(h.slice(0,2), 16);
+  const g = parseInt(h.slice(2,4), 16);
+  const b = parseInt(h.slice(4,6), 16);
+  return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+}
+
+async function shareBadgeImage(id){
+  const m = HEALTH_MILESTONES.find(function(x){ return x.id === id; });
+  if(!m) return;
+  const earned = (D && D.healthMilestones && typeof D.healthMilestones === 'object') ? D.healthMilestones : {};
+  const date = earned[m.id];
+  if(!date){
+    if(typeof showToast === 'function') showToast('Earn this badge first 🏆');
+    return;
+  }
+  const userName = (D && D.name) ? String(D.name).toUpperCase() : 'CHAMPION';
+  const accent = m.color || '#fbbf24';
+
+  // 1080x1080 square — IG-feed friendly badge artifact
+  const W = 1080, H = 1080;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  if(!ctx){
+    if(typeof showToast === 'function') showToast('Canvas not supported');
+    return;
+  }
+
+  // Background slate gradient + accent halo
+  const bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, '#0d1117');
+  bg.addColorStop(0.5, '#1e293b');
+  bg.addColorStop(1, '#0d1117');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  const halo = ctx.createRadialGradient(W/2, H/2 - 60, 0, W/2, H/2 - 60, W*0.55);
+  halo.addColorStop(0, _hbHexAlpha(accent, 0.25));
+  halo.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = halo;
+  ctx.fillRect(0, 0, W, H);
+
+  // Outer + inner border
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 6;
+  ctx.strokeRect(50, 50, W - 100, H - 100);
+  ctx.strokeStyle = _hbHexAlpha(accent, 0.35);
+  ctx.lineWidth = 1;
+  ctx.strokeRect(72, 72, W - 144, H - 144);
+
+  // 4 corner brackets
+  const cornerSize = 64;
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 4;
+  function corner(x, y, dx, dy){
+    ctx.beginPath();
+    ctx.moveTo(x + dx*cornerSize, y);
+    ctx.lineTo(x, y);
+    ctx.lineTo(x, y + dy*cornerSize);
+    ctx.stroke();
+  }
+  corner(72, 72, 1, 1);
+  corner(W - 72, 72, -1, 1);
+  corner(72, H - 72, 1, -1);
+  corner(W - 72, H - 72, -1, -1);
+
+  // Brand top
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = accent;
+  ctx.font = '800 32px "Segoe UI", system-ui, -apple-system, sans-serif';
+  ctx.fillText('✦  YOURLIFE  BADGE  ✦', W/2, 180);
+
+  // Big glyph in a colored ring
+  const ringR = 150;
+  const ringX = W/2, ringY = 430;
+  // Subtle outer glow
+  const glow = ctx.createRadialGradient(ringX, ringY, ringR * 0.6, ringX, ringY, ringR * 1.6);
+  glow.addColorStop(0, _hbHexAlpha(accent, 0.35));
+  glow.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = glow;
+  ctx.beginPath();
+  ctx.arc(ringX, ringY, ringR * 1.6, 0, Math.PI * 2);
+  ctx.fill();
+  // Ring stroke
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 6;
+  ctx.beginPath();
+  ctx.arc(ringX, ringY, ringR, 0, Math.PI * 2);
+  ctx.stroke();
+  // Inner thin ring
+  ctx.strokeStyle = _hbHexAlpha(accent, 0.4);
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.arc(ringX, ringY, ringR - 16, 0, Math.PI * 2);
+  ctx.stroke();
+  // Glyph (emoji)
+  ctx.font = '180px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", system-ui, sans-serif';
+  ctx.fillText(m.icon, ringX, ringY + 64);
+
+  // Badge name
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '900 64px "Segoe UI", system-ui, -apple-system, sans-serif';
+  ctx.fillText((m.name || '').toUpperCase(), W/2, 700);
+
+  // Star row
+  ctx.fillStyle = accent;
+  ctx.font = '34px "Segoe UI Symbol", "Apple Symbols", system-ui, sans-serif';
+  ctx.fillText('★  ★  ★  ★  ★', W/2, 760);
+
+  // Description
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.font = 'italic 500 22px "Segoe UI", system-ui, -apple-system, sans-serif';
+  ctx.fillText(m.desc, W/2, 815);
+
+  // Earner name + date row
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.font = '700 12px "Segoe UI", system-ui, sans-serif';
+  ctx.fillText('EARNED  BY', W/2, 880);
+  ctx.fillStyle = accent;
+  ctx.font = '900 36px "Segoe UI", system-ui, -apple-system, sans-serif';
+  ctx.fillText(userName, W/2, 920);
+  ctx.fillStyle = 'rgba(255,255,255,0.45)';
+  ctx.font = '500 18px "Segoe UI", system-ui, sans-serif';
+  ctx.fillText('on ' + date, W/2, 955);
+
+  // Footer brand line
+  ctx.fillStyle = accent;
+  ctx.font = '700 16px "Segoe UI", system-ui, sans-serif';
+  ctx.fillText('yourlifecc.com', W/2, H - 90);
+
+  // Export to PNG blob
+  let blob;
+  try {
+    blob = await new Promise(function(resolve){ canvas.toBlob(resolve, 'image/png', 0.95); });
+  } catch(e){ blob = null; }
+  if(!blob){
+    if(typeof showToast === 'function') showToast('Could not render image');
+    return;
+  }
+
+  const filename = 'yourlifecc-badge-' + m.id + '.png';
+  const shareText = 'Earned the ' + m.name + ' badge on YourLife CC! 🏆 — yourlifecc.com';
+
+  // Web Share API with files
+  try {
+    if(navigator.canShare && navigator.share && typeof File === 'function'){
+      const file = new File([blob], filename, { type: 'image/png' });
+      if(navigator.canShare({ files: [file] })){
+        try {
+          await navigator.share({ files: [file], title: 'YourLife CC badge', text: shareText });
+          return; // success
+        } catch(shareErr){
+          if(shareErr && shareErr.name === 'AbortError') return;
+        }
+      }
+    }
+  } catch(_){}
+
+  // Download fallback
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 5000);
+  if(typeof showToast === 'function') showToast('Badge image saved 📥');
 }
 
 // ════════════════════════════════════════════════════════════
@@ -233,6 +552,8 @@ function logWorkout(){
     if(typeof launchSideConfetti === 'function') launchSideConfetti();
     if(typeof showToast === 'function') showToast('Weekly active-minutes goal hit! 🎯');
   }
+  // 2026-06-07 — Health Inc 5: milestone check (firstWorkout + weeklyMin).
+  if(typeof _checkHealthMilestones === 'function') _checkHealthMilestones();
 }
 
 function deleteWorkout(id){
@@ -719,6 +1040,8 @@ function logWater(delta){
     if(typeof launchSideConfetti === 'function') launchSideConfetti();
     if(typeof showToast === 'function') showToast('Daily water goal hit! 💧');
   }
+  // 2026-06-07 — Health Inc 5: milestone check (water7 + water100).
+  if(typeof _checkHealthMilestones === 'function') _checkHealthMilestones();
 }
 
 function setWaterGoal(value){
@@ -1013,6 +1336,8 @@ function logHealthMood(level){
   save();
   renderHealthMoodCheckin();
   if(typeof showToast === 'function') showToast('Logged ✓');
+  // 2026-06-07 — Health Inc 5: milestone check (mood7).
+  if(typeof _checkHealthMilestones === 'function') _checkHealthMilestones();
 }
 
 // ── 2. SLEEP TRACKER ───────────────────────────────────────────────
@@ -1036,6 +1361,8 @@ function logSleep(){
   renderSleepBars();
   renderSleepList();
   showToast('Sleep logged 💤');
+  // 2026-06-07 — Health Inc 5: milestone check (sleep30).
+  if(typeof _checkHealthMilestones === 'function') _checkHealthMilestones();
 }
 
 function renderSleepBars(){
@@ -1196,6 +1523,8 @@ function submitPhq2(){
     showToast('Check-in logged. 💚');
   }
   renderPhq2();
+  // 2026-06-07 — Health Inc 5: milestone check (phq6).
+  if(typeof _checkHealthMilestones === 'function') _checkHealthMilestones();
 }
 
 // ── 4. NUTRITION MEAL LOG ──────────────────────────────────────────
@@ -1260,6 +1589,8 @@ function promptMeal(type){
   save();
   renderMealLog();
   showToast('Logged 🍽️');
+  // 2026-06-07 — Health Inc 5: milestone check (meals7).
+  if(typeof _checkHealthMilestones === 'function') _checkHealthMilestones();
 }
 
 function deleteMeal(id){
