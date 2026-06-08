@@ -4204,6 +4204,389 @@ body.solo-mode .sp-family-only { display: none !important; }
 :root.light #ht-badges .hb-criteria{ color:#475569 !important; }
 /* ════════════════════════════════════════════════════════════ */
 
+/* ════════════════════════════════════════════════════════════
+   2026-06-07 — Goals Inc 1: Power Cards visual upgrade.
+
+   Scoped to #s-goals only. Seven visual layers:
+     1. #goalDomainStrip       10-card category strip with rings
+     2. .gv-goal-card          gradient ring border + lift + glow
+     3. .gv-tl-card            timeline cards w/ gradient ring
+     4. .gv-vision-card        subtle conic shimmer inside the existing
+                               purple/cyan gradient panel
+     5. .gv-stat               stat tiles get Power Card lift
+     6. .goalTabs .tab         pill style mirroring #s-habits .hb-tab
+     7. .g-completed-stamp     holographic gold pill (replaces flat bar)
+     +  .gv-faith-divider / .gv-faith-line  scripture micro-line
+
+   SVG progress ring on goal cards gets a fill-up keyframe so each
+   render animates from empty to current — same dopamine moment as
+   the Health hydration ring on tab entry.
+
+   All idle motion auto-suppressed by the global reduced-motion rule.
+   ════════════════════════════════════════════════════════════ */
+
+/* ─── Domain strip (10 categories) ───────────────────────────── */
+#goalDomainStrip{
+  display:grid;
+  grid-template-columns:repeat(5, 1fr);
+  gap:10px;
+  margin:0 0 14px;
+}
+@media (max-width:520px){ #goalDomainStrip{ grid-template-columns:repeat(2, 1fr); } }
+@media (min-width:861px){ #goalDomainStrip{ grid-template-columns:repeat(10, 1fr); gap:12px; } }
+
+.g-domain-card{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  padding:12px 6px 10px;
+  border:1px solid var(--card-border, rgba(255,255,255,.08));
+  border-radius:14px;
+  background:
+    linear-gradient(160deg,
+      color-mix(in srgb, var(--dom-accent, var(--c)) 16%, transparent) 0%,
+      transparent 72%),
+    var(--card-bg, rgba(255,255,255,.04));
+  cursor:pointer;
+  font-family:var(--fm);
+  color:var(--tx);
+  transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.g-domain-card::before{
+  content:'';
+  position:absolute; inset:0;
+  border-radius:14px;
+  padding:1.5px;
+  background:linear-gradient(135deg,
+    var(--dom-accent, var(--c)),
+    color-mix(in srgb, var(--dom-accent, var(--c)) 55%, var(--section-goals, #f97316)));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask-composite:exclude;
+  opacity:.38;
+  pointer-events:none;
+  z-index:0;
+  transition:opacity .15s ease;
+}
+.g-domain-card:hover,
+.g-domain-card:focus-visible{
+  transform:translateY(-2px);
+  box-shadow:0 8px 20px color-mix(in srgb, var(--dom-accent, var(--c)) 26%, transparent);
+  outline:none;
+}
+.g-domain-card:hover::before,
+.g-domain-card:focus-visible::before{ opacity:.8; }
+.g-domain-card:active{ transform:translateY(0) scale(.98); }
+.g-domain-card.is-mastered{ --dom-accent:#fbbf24; }
+.g-domain-card.is-mastered .g-dom-icon{
+  filter:drop-shadow(0 0 6px rgba(251,191,36,.7));
+}
+.g-domain-card > *{ position:relative; z-index:1; }
+
+.g-dom-ring{
+  position:relative;
+  width:42px; height:42px;
+  display:grid; place-items:center;
+}
+.g-dom-ring svg{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  transform:rotate(-90deg);
+}
+.g-dom-ring-track{ fill:none; stroke:rgba(255,255,255,.08); stroke-width:3; }
+.g-dom-ring-fill{
+  fill:none;
+  stroke:var(--dom-accent, var(--c));
+  stroke-width:3;
+  stroke-linecap:round;
+  transition:stroke-dashoffset .6s cubic-bezier(.4,0,.2,1);
+}
+.g-dom-icon{
+  font-size:1.2rem; line-height:1;
+  z-index:1;
+  filter:drop-shadow(0 0 6px color-mix(in srgb, var(--dom-accent, var(--c)) 38%, transparent));
+}
+.g-dom-label{
+  font-family:var(--fh);
+  font-size:.72rem;
+  letter-spacing:.06em;
+  color:var(--tx);
+  line-height:1;
+  margin-top:2px;
+}
+.g-dom-progress{
+  font-family:var(--fm);
+  font-size:.6rem;
+  color:var(--tx2);
+  line-height:1;
+}
+
+/* ─── Goal card Power Card border ─────────────────────────────── */
+#s-goals .gv-goal-card{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+#s-goals .gv-goal-card::after{
+  content:'';
+  position:absolute; inset:0;
+  border-radius:12px;
+  padding:1.5px;
+  background:linear-gradient(135deg,
+    var(--section-goals, #f97316),
+    color-mix(in srgb, var(--section-goals, #f97316) 55%, #fbbf24));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask-composite:exclude;
+  opacity:.45;
+  pointer-events:none;
+  z-index:0;
+  transition:opacity .2s ease;
+}
+#s-goals .gv-goal-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 28px color-mix(in srgb, var(--section-goals, #f97316) 26%, transparent);
+}
+#s-goals .gv-goal-card:hover::after{ opacity:.85; }
+#s-goals .gv-goal-card.done::after{ opacity:.25; }
+#s-goals .gv-goal-card > *{ position:relative; z-index:1; }
+
+/* SVG progress ring on each goal card — fill-up keyframe so each
+   render animates from empty to the inline stroke-dasharray value.
+   The svgProgressRing helper uses a two-value dasharray ("dash gap"
+   pattern), so we animate dasharray itself from "0 999" to the
+   inline value. `both` keeps the final state. Auto-suppressed by
+   the global reduced-motion rule. */
+#s-goals .gv-goal-card svg circle:nth-of-type(2){
+  animation:gvRingFill .7s cubic-bezier(.4,0,.2,1) both;
+}
+@keyframes gvRingFill{
+  from{ stroke-dasharray:0 999; }
+}
+
+/* ─── Timeline cards (1/3/5/10 year) ──────────────────────────── */
+#s-goals .gv-tl-card{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+#s-goals .gv-tl-card::after{
+  content:'';
+  position:absolute; inset:0;
+  border-radius:12px;
+  padding:1.5px;
+  background:linear-gradient(135deg, var(--section-goals, #f97316), #38bdf8);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask-composite:exclude;
+  opacity:.35;
+  pointer-events:none;
+  z-index:0;
+  transition:opacity .2s ease;
+}
+#s-goals .gv-tl-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 22px color-mix(in srgb, var(--section-goals, #f97316) 22%, transparent);
+}
+#s-goals .gv-tl-card:hover::after{ opacity:.75; }
+#s-goals .gv-tl-card.has-content::after{ opacity:.65; }
+#s-goals .gv-tl-card > *{ position:relative; z-index:1; }
+
+/* ─── Vision card — subtle conic shimmer ──────────────────────── */
+#s-goals .gv-vision-card{
+  position:relative;
+  isolation:isolate;
+}
+/* ::before is already used by the existing radial halo (around line
+   1222), so the slow shimmer rides on ::after. inset:-40% keeps the
+   conic rotation seamless; mix-blend-mode:screen layers light on the
+   existing purple/cyan gradient without washing it out. */
+#s-goals .gv-vision-card::after{
+  content:'';
+  position:absolute;
+  inset:-40%;
+  background:conic-gradient(from 0deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,.10) 20%,
+    rgba(255,255,255,0) 38%,
+    rgba(255,255,255,0) 100%);
+  animation:gvVisionShine 16s linear infinite;
+  pointer-events:none;
+  z-index:0;
+  opacity:.5;
+  mix-blend-mode:screen;
+}
+#s-goals .gv-vision-card > *{ position:relative; z-index:1; }
+@keyframes gvVisionShine{
+  0%   { transform:rotate(0deg); }
+  100% { transform:rotate(360deg); }
+}
+
+/* ─── Faith micro-line under Vision card ─────────────────────── */
+.gv-faith-divider{
+  height:1px;
+  margin:14px 0 8px;
+  background:linear-gradient(90deg,
+    transparent,
+    color-mix(in srgb, var(--section-goals, #f97316) 50%, transparent),
+    transparent);
+}
+.gv-faith-line{
+  text-align:center;
+  font-family:var(--fh);
+  font-style:italic;
+  font-size:.7rem;
+  letter-spacing:.04em;
+  color:color-mix(in srgb, var(--tx2) 80%, transparent);
+  opacity:.75;
+  line-height:1.35;
+}
+
+/* ─── Stat tile Power Card lift ───────────────────────────────── */
+#s-goals .gv-stat{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+#s-goals .gv-stat::after{
+  content:'';
+  position:absolute; inset:0;
+  border-radius:11px;
+  padding:1px;
+  background:linear-gradient(135deg, var(--section-goals, #f97316), color-mix(in srgb, var(--section-goals, #f97316) 55%, #38bdf8));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask-composite:exclude;
+  opacity:.3;
+  pointer-events:none;
+  z-index:0;
+}
+#s-goals .gv-stat:hover{
+  transform:translateY(-1px);
+  box-shadow:0 6px 18px color-mix(in srgb, var(--section-goals, #f97316) 20%, transparent);
+}
+#s-goals .gv-stat > *{ position:relative; z-index:1; }
+
+/* ─── Filter tabs → pill style (mirrors #s-habits .hb-tab) ───── */
+#s-goals .goalTabs{
+  display:flex;
+  gap:.4rem;
+  overflow-x:auto;
+  padding:.2rem 0 .8rem;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+  margin-bottom:.4rem;
+  flex-wrap:nowrap;
+}
+#s-goals .goalTabs::-webkit-scrollbar{ display:none; }
+#s-goals .goalTabs .tab{
+  flex-shrink:0;
+  padding:.5rem .9rem;
+  border-radius:999px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  color:var(--tx2);
+  font-size:.72rem;
+  font-weight:700;
+  font-family:var(--fn);
+  letter-spacing:.5px;
+  cursor:pointer;
+  transition:all .18s;
+  white-space:nowrap;
+}
+#s-goals .goalTabs .tab:hover{
+  background:rgba(255,255,255,.08);
+  color:var(--tx);
+}
+#s-goals .goalTabs .tab.active{
+  background:linear-gradient(135deg, var(--section-goals, #f97316), #fb923c);
+  color:#0a1f5e;
+  border-color:transparent;
+  box-shadow:0 4px 14px color-mix(in srgb, var(--section-goals, #f97316) 30%, transparent);
+}
+
+/* ─── Holographic completion stamp ───────────────────────────── */
+.g-completed-stamp{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-top:.6rem;
+  padding:.45rem 1rem;
+  border-radius:999px;
+  color:#3f2200;
+  border:1px solid rgba(255,255,255,.4);
+  background:linear-gradient(135deg, #fde68a 0%, #fbbf24 50%, #f59e0b 100%);
+  box-shadow:
+    0 0 0 1px rgba(251,191,36,.35),
+    0 4px 14px rgba(245,158,11,.4),
+    inset 0 1px 0 rgba(255,255,255,.5);
+  font-size:.78rem;
+  font-weight:800;
+  letter-spacing:.04em;
+}
+.g-completed-stamp::before{
+  content:'';
+  position:absolute;
+  inset:-60%;
+  background:conic-gradient(from 0deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,.55) 20%,
+    rgba(255,255,255,0) 40%,
+    rgba(255,255,255,0) 100%);
+  animation:gvStampShine 4s linear infinite;
+  pointer-events:none;
+  z-index:0;
+  mix-blend-mode:screen;
+}
+.g-completed-stamp .g-completed-text{
+  position:relative;
+  z-index:1;
+}
+@keyframes gvStampShine{
+  0%   { transform:rotate(0deg); }
+  100% { transform:rotate(360deg); }
+}
+
+/* ─── Light theme overrides ──────────────────────────────────── */
+:root.light #goalDomainStrip .g-domain-card{
+  background:
+    linear-gradient(160deg,
+      color-mix(in srgb, var(--dom-accent, var(--c)) 12%, #fff) 0%,
+      #fff 72%) !important;
+  border-color:rgba(0,0,0,.08) !important;
+  box-shadow:0 2px 10px rgba(0,0,0,.06);
+}
+:root.light #goalDomainStrip .g-dom-ring-track{ stroke:rgba(0,0,0,.1); }
+:root.light #goalDomainStrip .g-dom-label{ color:#0f172a !important; }
+:root.light #goalDomainStrip .g-dom-progress{ color:#475569 !important; }
+:root.light #s-goals .gv-vision-card::after{
+  opacity:.28; mix-blend-mode:overlay;
+}
+:root.light .gv-faith-line{ color:#64748b !important; }
+:root.light .g-completed-stamp{
+  color:#3f2200 !important;
+  border-color:rgba(0,0,0,.12) !important;
+}
+:root.light .g-completed-stamp::before{ opacity:.55; mix-blend-mode:overlay; }
+:root.light #s-goals .goalTabs .tab{
+  background:rgba(15,23,42,.04) !important;
+  border-color:rgba(15,23,42,.1) !important;
+  color:#4a4b52 !important;
+}
+:root.light #s-goals .goalTabs .tab.active{ color:#0a1f5e !important; }
+/* ════════════════════════════════════════════════════════════ */
+
 /* Inline modal mode — skillsModal lives inside #s-skills after relocation */
 #s-skills > #skillsModal {
   position: static !important;
