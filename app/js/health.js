@@ -127,6 +127,367 @@ function hTab(tab,btn){
   if(tab==='meals') renderMealLog();
   // 2026-06-07 — Health Inc 2: hydration tracker
   if(tab==='water') renderWaterTracker();
+  // 2026-06-07 — Health Inc 4: movement / workout tracker
+  if(tab==='movement') renderMovementTracker();
+}
+
+// ════════════════════════════════════════════════════════════
+// 2026-06-07 — Health Inc 4: Movement / workout log + active min.
+//
+// D.workoutLog is [{id, date, type, duration, intensity, note}].
+// Each workout type carries an emoji + color used by the heatmap
+// bars and the recent-sessions list. Intensity is 1 (easy) / 2
+// (moderate) / 3 (hard) and shown as a dot row.
+//
+// Weekly active-minutes target lives in D.workoutGoal (default 150
+// per the CDC). The big SVG ring fills to (last-7-days sum / goal),
+// snapping to the gold "goal hit" gradient at 100%+.
+//
+// PR records live in D.prRecords as {[lowercaseKey]:{exercise, value,
+// unit, date}}. addPR upserts by key so users can update an existing
+// record without juggling list IDs.
+//
+// 1 Tim 4:8 faith line ("Train yourself for godliness") sits at the
+// very bottom of the panel — same tonal treatment as the mood opener
+// and Life-tab Goals card.
+// ════════════════════════════════════════════════════════════
+const WORKOUT_TYPES = [
+  { key:'cardio',   icon:'🏃', label:'Cardio',   color:'#ef4444' },
+  { key:'strength', icon:'💪', label:'Strength', color:'#f97316' },
+  { key:'sport',    icon:'⚽', label:'Sport',    color:'#22d3ee' },
+  { key:'mobility', icon:'🧘', label:'Mobility', color:'#a78bfa' }
+];
+const INTENSITY_LEVELS = [
+  { v:1, label:'Easy',     color:'#22c55e' },
+  { v:2, label:'Moderate', color:'#fbbf24' },
+  { v:3, label:'Hard',     color:'#ef4444' }
+];
+const PR_UNITS = ['reps','sec','min','lbs','kg','miles','km'];
+
+let _movementDraft = { type:'cardio', intensity:2 };
+
+function _workoutTypeMeta(key){
+  return WORKOUT_TYPES.find(function(t){ return t.key === key; }) || WORKOUT_TYPES[0];
+}
+function _intensityMeta(v){
+  return INTENSITY_LEVELS.find(function(i){ return i.v === v; }) || INTENSITY_LEVELS[1];
+}
+
+function _calcActiveMinutesLast7(){
+  const log = (D && Array.isArray(D.workoutLog)) ? D.workoutLog : [];
+  const today = new Date(); today.setHours(0,0,0,0);
+  const floor = new Date(today); floor.setDate(today.getDate() - 6);
+  const floorISO = floor.toISOString().slice(0,10);
+  return log
+    .filter(function(w){ return w && (w.date || '') >= floorISO; })
+    .reduce(function(s, w){ return s + (Number(w.duration)||0); }, 0);
+}
+
+function _setMovementDraftType(type){
+  _movementDraft.type = type;
+  // Repaint only the type pill row + intensity dot row (avoid clobbering
+  // typed values in the duration/note inputs).
+  document.querySelectorAll('#movementForm .mv-type-pill').forEach(function(p){
+    p.classList.toggle('is-active', p.getAttribute('data-type') === type);
+  });
+}
+
+function _setMovementDraftIntensity(v){
+  _movementDraft.intensity = v;
+  document.querySelectorAll('#movementForm .mv-int-dot').forEach(function(d){
+    d.classList.toggle('is-active', parseInt(d.getAttribute('data-int'),10) === v);
+  });
+}
+
+function logWorkout(){
+  const durEl  = document.getElementById('mvDuration');
+  const noteEl = document.getElementById('mvNote');
+  const duration = parseInt(durEl ? durEl.value : '0', 10);
+  if(!duration || duration < 1 || duration > 600){
+    if(typeof showToast === 'function') showToast('Enter duration 1-600 min');
+    return;
+  }
+  const type = _movementDraft.type || 'cardio';
+  const intensity = parseInt(_movementDraft.intensity || 2, 10);
+  const note = (noteEl ? String(noteEl.value || '') : '').trim().slice(0, 120);
+  if(!Array.isArray(D.workoutLog)) D.workoutLog = [];
+  const today = new Date().toISOString().slice(0,10);
+  D.workoutLog.unshift({
+    id: Date.now(),
+    date: today,
+    type: type,
+    duration: duration,
+    intensity: intensity,
+    note: note
+  });
+  if(D.workoutLog.length > 500) D.workoutLog = D.workoutLog.slice(0, 500);
+  save();
+  renderMovementTracker();
+  if(typeof renderHealthDomainStrip === 'function') renderHealthDomainStrip();
+  if(typeof showToast === 'function') showToast('Workout logged 🏃 +' + duration + ' min');
+  // Goal-hit celebration: did this entry cross 150 min for the week?
+  const goal = Number(D.workoutGoal) || 150;
+  const totalAfter = _calcActiveMinutesLast7();
+  const totalBefore = totalAfter - duration;
+  if(totalBefore < goal && totalAfter >= goal){
+    if(typeof launchSideConfetti === 'function') launchSideConfetti();
+    if(typeof showToast === 'function') showToast('Weekly active-minutes goal hit! 🎯');
+  }
+}
+
+function deleteWorkout(id){
+  D.workoutLog = (Array.isArray(D.workoutLog) ? D.workoutLog : []).filter(function(w){ return w && w.id !== id; });
+  save();
+  renderMovementTracker();
+  if(typeof renderHealthDomainStrip === 'function') renderHealthDomainStrip();
+}
+
+function setWorkoutGoal(value){
+  const n = parseInt(value, 10);
+  if(isNaN(n) || n < 15 || n > 2000) return;
+  D.workoutGoal = n;
+  save();
+  renderMovementTracker();
+  if(typeof showToast === 'function') showToast('Weekly goal: ' + n + ' min');
+}
+
+function addPR(){
+  const exEl   = document.getElementById('mvPrExercise');
+  const valEl  = document.getElementById('mvPrValue');
+  const unitEl = document.getElementById('mvPrUnit');
+  const exercise = (exEl ? String(exEl.value || '') : '').trim().slice(0, 40);
+  const value    = parseFloat(valEl ? valEl.value : '');
+  const unit     = unitEl ? String(unitEl.value || 'reps') : 'reps';
+  if(!exercise){
+    if(typeof showToast === 'function') showToast('Enter exercise name');
+    return;
+  }
+  if(isNaN(value) || value <= 0 || value > 100000){
+    if(typeof showToast === 'function') showToast('Enter a valid value');
+    return;
+  }
+  if(PR_UNITS.indexOf(unit) === -1){
+    if(typeof showToast === 'function') showToast('Pick a valid unit');
+    return;
+  }
+  if(!D.prRecords || typeof D.prRecords !== 'object') D.prRecords = {};
+  const key = exercise.toLowerCase();
+  const prev = D.prRecords[key];
+  D.prRecords[key] = {
+    exercise: exercise,
+    value:    value,
+    unit:     unit,
+    date:     new Date().toISOString().slice(0,10)
+  };
+  save();
+  if(exEl)  exEl.value = '';
+  if(valEl) valEl.value = '';
+  renderMovementTracker();
+  // Beat-your-PR moment: prev existed AND value > prev.value
+  if(prev && value > Number(prev.value || 0)){
+    if(typeof launchSideConfetti === 'function') launchSideConfetti();
+    if(typeof showToast === 'function') showToast('🎉 New PR — beat ' + prev.value + ' ' + prev.unit);
+  } else if(typeof showToast === 'function'){
+    showToast(prev ? 'PR updated' : 'PR logged 🏆');
+  }
+}
+
+function deletePR(key){
+  if(!D.prRecords || typeof D.prRecords !== 'object') return;
+  delete D.prRecords[key];
+  save();
+  renderMovementTracker();
+}
+
+function renderMovementTracker(){
+  const el = document.getElementById('ht-movement');
+  if(!el) return;
+
+  // ── Weekly active-minutes ring ─────────────────────────────
+  const goal = Number(D.workoutGoal) || 150;
+  const total = _calcActiveMinutesLast7();
+  const fillFrac = Math.min(1, total / Math.max(1, goal));
+  const pct = Math.round(fillFrac * 100);
+  const r = 70;
+  const C = 2 * Math.PI * r;
+  const offset = C * (1 - fillFrac);
+  const hitGoal = total >= goal;
+  const ringClass = hitGoal ? ' is-hit' : '';
+
+  // ── 7-day heatmap data ─────────────────────────────────────
+  const today = new Date(); today.setHours(0,0,0,0);
+  const log = Array.isArray(D.workoutLog) ? D.workoutLog : [];
+  const days = [];
+  let maxDayMin = 1;
+  for(let i = 6; i >= 0; i--){
+    const d = new Date(today); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().slice(0,10);
+    const dayLog = log.filter(function(w){ return w && w.date === ds; });
+    const mins = dayLog.reduce(function(s,w){ return s + (Number(w.duration)||0); }, 0);
+    if(mins > maxDayMin) maxDayMin = mins;
+    // Dominant type by minutes — drives the bar color
+    let dom = '';
+    const byType = {};
+    dayLog.forEach(function(w){ byType[w.type] = (byType[w.type]||0) + (Number(w.duration)||0); });
+    let best = 0;
+    for(const t in byType){ if(byType[t] > best){ best = byType[t]; dom = t; } }
+    days.push({
+      ds: ds,
+      mins: mins,
+      dom: dom,
+      dl: d.toLocaleDateString('en-US',{weekday:'short'})
+    });
+  }
+  const heatmapMax = Math.max(maxDayMin, 30);
+
+  // ── Recent sessions list (last 8) ──────────────────────────
+  const recent = log.slice(0, 8);
+
+  // ── PR records (sorted by date desc) ───────────────────────
+  const prMap = (D.prRecords && typeof D.prRecords === 'object') ? D.prRecords : {};
+  const prList = Object.keys(prMap)
+    .map(function(k){ return Object.assign({ key:k }, prMap[k]); })
+    .sort(function(a,b){ return String(b.date||'').localeCompare(String(a.date||'')); });
+
+  // Draft pills — make sure the active state survives re-renders
+  const draftType = _movementDraft.type || 'cardio';
+  const draftInt = _movementDraft.intensity || 2;
+
+  el.innerHTML =
+      '<div class="card" style="border-left:4px solid var(--section-health);text-align:center;">'
+    +   '<div class="ct" style="justify-content:center;">🏃 This Week — Active Minutes</div>'
+    +   '<div style="font-size:.78rem;color:var(--tx2);margin-bottom:.85rem;line-height:1.55;">CDC recommends 150 min moderate / week. Build it however you want — runs, lifting, ball, stretching.</div>'
+    +   '<div class="mv-ring-wrap' + ringClass + '">'
+    +     '<svg viewBox="0 0 200 200" class="mv-ring-svg" aria-hidden="true">'
+    +       '<defs>'
+    +         '<linearGradient id="mvRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">'
+    +           '<stop offset="0%"   stop-color="' + (hitGoal ? '#fde68a' : '#34d399') + '"/>'
+    +           '<stop offset="100%" stop-color="' + (hitGoal ? '#f59e0b' : '#22d3ee') + '"/>'
+    +         '</linearGradient>'
+    +       '</defs>'
+    +       '<circle class="mv-ring-track" cx="100" cy="100" r="' + r + '"></circle>'
+    +       '<circle class="mv-ring-fill"  cx="100" cy="100" r="' + r + '"'
+    +         ' stroke-dasharray="'  + C.toFixed(2) + '"'
+    +         ' stroke-dashoffset="' + offset.toFixed(2) + '"></circle>'
+    +     '</svg>'
+    +     '<div class="mv-ring-center">'
+    +       '<div class="mv-ring-min">' + total + '<span class="mv-ring-unit">/' + goal + '</span></div>'
+    +       '<div class="mv-ring-label">min · ' + pct + '%</div>'
+    +     '</div>'
+    +   '</div>'
+    +   (hitGoal
+        ? '<div class="mv-streak-pill">🎯 Weekly goal hit</div>'
+        : '<div class="mv-streak-hint">' + Math.max(0, goal - total) + ' min to your weekly goal.</div>')
+    +   '<div class="mv-goal-row">'
+    +     '<label for="mvGoalInput">Weekly goal</label>'
+    +     '<input type="number" id="mvGoalInput" min="15" max="2000" value="' + goal + '" onchange="setWorkoutGoal(this.value)">'
+    +     '<span>min</span>'
+    +   '</div>'
+    + '</div>'
+
+    + '<div class="card" style="margin-top:.8rem;">'
+    +   '<div class="ct">📊 Last 7 Days</div>'
+    +   '<div class="mv-heatmap">'
+    +     days.map(function(d){
+            const h = d.mins > 0 ? Math.max(8, (d.mins / heatmapMax) * 100) : 0;
+            const typeMeta = d.dom ? _workoutTypeMeta(d.dom) : null;
+            const col = !d.mins ? 'rgba(255,255,255,.06)'
+                      : 'linear-gradient(180deg, ' + (typeMeta ? typeMeta.color : '#22d3ee') + ', ' + (typeMeta ? typeMeta.color + '88' : '#22d3ee88') + ')';
+            return '<div class="mv-bar-col">'
+              + '<div class="mv-bar-stack">'
+              + (d.mins > 0
+                  ? '<div class="mv-bar-fill" style="height:' + h + '%;background:' + col + ';"></div>'
+                  : '<div class="mv-bar-empty"></div>')
+              + '</div>'
+              + '<div class="mv-bar-label">' + d.dl + '</div>'
+              + '<div class="mv-bar-val">' + (d.mins > 0 ? d.mins : '—') + '</div>'
+              + '</div>';
+          }).join('')
+    +   '</div>'
+    +   '<div class="mv-legend">'
+    +     WORKOUT_TYPES.map(function(t){
+            return '<span><span class="mv-legend-dot" style="background:' + t.color + ';"></span>' + t.icon + ' ' + t.label + '</span>';
+          }).join('')
+    +   '</div>'
+    + '</div>'
+
+    + '<div class="card" id="movementForm" style="margin-top:.8rem;">'
+    +   '<div class="ct">➕ Log a Session</div>'
+    +   '<label style="margin-top:.2rem;">Type</label>'
+    +   '<div class="mv-type-row">'
+    +     WORKOUT_TYPES.map(function(t){
+            return '<button type="button" class="mv-type-pill' + (t.key === draftType ? ' is-active' : '') + '"'
+              + ' data-type="' + t.key + '"'
+              + ' style="--type-accent:' + t.color + ';"'
+              + ' onclick="_setMovementDraftType(\'' + t.key + '\')"'
+              + '><span class="mv-type-emoji">' + t.icon + '</span><span>' + t.label + '</span></button>';
+          }).join('')
+    +   '</div>'
+    +   '<label>Duration (minutes)</label>'
+    +   '<input type="number" id="mvDuration" min="1" max="600" placeholder="30">'
+    +   '<label>Intensity</label>'
+    +   '<div class="mv-int-row">'
+    +     INTENSITY_LEVELS.map(function(i){
+            return '<button type="button" class="mv-int-dot' + (i.v === draftInt ? ' is-active' : '') + '"'
+              + ' data-int="' + i.v + '"'
+              + ' style="--int-accent:' + i.color + ';"'
+              + ' onclick="_setMovementDraftIntensity(' + i.v + ')"'
+              + '><span class="mv-int-bullet"></span><span>' + i.label + '</span></button>';
+          }).join('')
+    +   '</div>'
+    +   '<label>Note (optional)</label>'
+    +   '<input type="text" id="mvNote" placeholder="Hill sprints with the dog" maxlength="120">'
+    +   '<button class="btn bp" style="width:100%;margin-top:.7rem;background:var(--section-health);border-color:var(--section-health);color:#0b1020;" onclick="logWorkout()">Log workout</button>'
+    + '</div>'
+
+    + '<div class="card" style="margin-top:.8rem;">'
+    +   '<div class="ct">📋 Recent Sessions</div>'
+    +   (recent.length
+        ? '<div class="mv-recent">'
+          + recent.map(function(w){
+              const tm = _workoutTypeMeta(w.type);
+              const im = _intensityMeta(w.intensity);
+              return '<div class="mv-recent-row">'
+                + '<span class="mv-recent-icon" style="background:' + tm.color + '22;color:' + tm.color + ';">' + tm.icon + '</span>'
+                + '<div class="mv-recent-body">'
+                +   '<div class="mv-recent-line">' + tm.label + ' · ' + w.duration + ' min · <span style="color:' + im.color + ';">' + im.label + '</span></div>'
+                +   '<div class="mv-recent-sub">' + (w.date) + (w.note ? ' · ' + escapeHtml(w.note) : '') + '</div>'
+                + '</div>'
+                + '<button class="db" onclick="deleteWorkout(' + w.id + ')">✕</button>'
+                + '</div>';
+            }).join('')
+          + '</div>'
+        : '<div class="mv-empty">No sessions logged yet — your first 10 min counts.</div>')
+    + '</div>'
+
+    + '<div class="card" style="margin-top:.8rem;">'
+    +   '<div class="ct">🏆 Personal Records</div>'
+    +   '<div style="font-size:.75rem;color:var(--tx2);margin-bottom:.7rem;">Track your best — max reps, longest plank, fastest mile, heaviest lift. Beat them.</div>'
+    +   (prList.length
+        ? '<div class="mv-pr-list">'
+          + prList.map(function(pr){
+              return '<div class="mv-pr-row">'
+                + '<div class="mv-pr-body">'
+                +   '<div class="mv-pr-name">' + escapeHtml(pr.exercise) + '</div>'
+                +   '<div class="mv-pr-sub">Set ' + pr.date + '</div>'
+                + '</div>'
+                + '<div class="mv-pr-value">' + escapeHtml(String(pr.value)) + '<span class="mv-pr-unit"> ' + escapeHtml(pr.unit) + '</span></div>'
+                + '<button class="db" onclick="deletePR(\'' + pr.key.replace(/'/g,"\\'") + '\')">✕</button>'
+                + '</div>';
+            }).join('')
+          + '</div>'
+        : '<div class="mv-empty">No PRs yet — log your first below.</div>')
+    +   '<div class="mv-pr-form">'
+    +     '<input type="text" id="mvPrExercise" placeholder="Exercise (e.g. Push-ups)" maxlength="40">'
+    +     '<input type="number" id="mvPrValue" placeholder="Value" step="0.1" min="0">'
+    +     '<select id="mvPrUnit">'
+    +       PR_UNITS.map(function(u){ return '<option value="' + u + '">' + u + '</option>'; }).join('')
+    +     '</select>'
+    +     '<button class="btn bp" onclick="addPR()">+ Add PR</button>'
+    +   '</div>'
+    +   '<div class="mv-faith-divider" aria-hidden="true"></div>'
+    +   '<div class="mv-faith">Train yourself for godliness. — 1 Tim 4:8</div>'
+    + '</div>';
 }
 
 // ════════════════════════════════════════════════════════════
