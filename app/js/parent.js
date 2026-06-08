@@ -182,7 +182,6 @@ function renderParentDash(){
   renderParentEarningsControls();
   renderParentBucksControls();
   renderGradeMonitor();
-  renderParentActivityAudit();
   renderSentQuizzes();
   renderCompletionSummary();
   renderParentDeeds();
@@ -190,7 +189,10 @@ function renderParentDash(){
   renderParentLeaderboard();
   renderParentContests();
   renderParentFamilyRewards();
-  renderParentActivityFeed();
+  // FAF Inc 3 — single canonical render call; the two old wrappers
+  // (renderParentActivityAudit / renderParentActivityFeed) now both
+  // delegate to this kernel so the back-to-back double-call is gone.
+  if(typeof renderFamilyActivityFeed === 'function') renderFamilyActivityFeed();
   if(typeof renderPhPendingChores==='function') renderPhPendingChores();
   renderParentFaithReport();
   // Render session log in parent hub
@@ -758,45 +760,16 @@ function renderGradeMonitor(){
 }
 
 // ── PARENT ACTIVITY FEED ─────────────────────────────────────
+// FAF Inc 3: thin delegate to the unified renderFamilyActivityFeed
+// kernel in family-feed.js. The legacy synthesizer that walked
+// D.choreLog / D.moods / D.journal / D.goals / D.milestones /
+// D.books / D.behaviorLog directly is retired — every event source
+// now writes to D.activityLog via logFamilyActivity() (Inc 2), and
+// the kernel reads from that one stream. Function preserved so
+// every legacy call site (renderParent(), _parentDrill swap-back,
+// phRoute('activity')) keeps working.
 function renderParentActivityFeed(){
-  const el = document.getElementById('parentActivityFeed'); if(!el) return;
-  const feed = [];
-  const today = new Date();
-  const format = d => { const dt=new Date(d+'T12:00:00'); return dt.toLocaleDateString('en',{month:'short',day:'numeric'}); };
-
-  // Chore logs
-  (D.choreLog||[]).slice(-10).forEach(l=>feed.push({date:l.date,time:l.time,icon:l.emoji,text:`${l.choreName} — ${l.status}`,color:l.status==='verified'?'#22c55e':l.status==='pending'?'#fbbf24':'#ef4444'}));
-
-  // Mood entries
-  const moodEmojis = {5:'😄',4:'🙂',3:'😐',2:'😔',1:'😢'};
-  (D.moods||[]).slice(-5).forEach(m=>feed.push({date:m.date,time:m.time||'',icon:moodEmojis[m.level],text:`Mood: ${m.note||['','Rough','Not great','Okay','Good','Great'][m.level]}`,color:'#22d3ee'}));
-
-  // Journal entries
-  (Array.isArray(D.journal)?D.journal:[]).slice(-5).forEach(j=>feed.push({date:j.date,time:'',icon:'✍️',text:'Journal entry',color:'#f472b6'}));
-
-  // Goals completed
-  (Array.isArray(D.goals)?D.goals:[]).filter(g=>g.done).slice(-5).forEach(g=>feed.push({date:g.completedDate||g.doneDate||g.achievedDate||'',time:'',icon:'🎯',text:`Goal completed: ${g.text}`,color:'#60a5fa'}));
-
-  // Milestones
-  (D.milestones||[]).slice(-5).forEach(m=>feed.push({date:m.date,time:'',icon:m.emoji,text:`Milestone: ${m.title}`,color:'#a78bfa'}));
-
-  // Books finished
-  (Array.isArray(D.books)?D.books:[]).filter(b=>b.status==='done').slice(-3).forEach(b=>feed.push({date:b.finished||b.added,time:'',icon:'📖',text:`Finished: ${b.title}`,color:'#fb923c'}));
-
-  // Behavior logs
-  (Array.isArray(D.behaviorLog)?D.behaviorLog:[]).slice(-5).forEach(b=>feed.push({date:b.date,time:b.time,icon:b.type==='positive'?'👍':'👎',text:b.note,color:b.type==='positive'?'#22c55e':'#ef4444'}));
-
-  feed.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-
-  if(!feed.length){ el.innerHTML='<div style="color:var(--tx2);font-size:.72rem;padding:1rem;text-align:center;">No activity recorded yet.</div>'; return; }
-
-  el.innerHTML = feed.slice(0,30).map(f=>`
-    <div style="display:flex;align-items:center;gap:.5rem;padding:.35rem .4rem;border-bottom:1px solid rgba(255,255,255,.04);">
-      <span style="font-size:.85rem;">${f.icon}</span>
-      <div style="flex:1;font-size:.68rem;color:var(--tx);">${escapeHtml(f.text)}</div>
-      <span style="font-size:.5rem;color:var(--tx2);white-space:nowrap;">${f.date?format(f.date):''} ${f.time||''}</span>
-    </div>
-  `).join('');
+  if(typeof renderFamilyActivityFeed === 'function') renderFamilyActivityFeed();
 }
 
 // ── STUDY PLANNER ────────────────────────────────────────────
@@ -2853,7 +2826,7 @@ function phNav(tab){
   // entirely; render fired into a hidden element nobody navigated to).
   if(t === 'allowance'){ if(typeof renderPhAllowance === 'function') renderPhAllowance(); }
   if(t === 'contests') { renderParentLeaderboard(); renderParentContests(); renderParentFamilyRewards(); if(typeof renderPhContestsHeroChips === 'function') renderPhContestsHeroChips(); }
-  if(t === 'activity') { initPhSchedPanel(); renderParentActivityAudit(); renderParentActivityFeed(); renderBehaviorLog(); renderGradeMonitor(); renderParentNotes(); if(typeof renderPhActivityHeroChips === 'function') renderPhActivityHeroChips(); }
+  if(t === 'activity') { initPhSchedPanel(); if(typeof renderFamilyActivityFeed === 'function') renderFamilyActivityFeed(); renderBehaviorLog(); renderGradeMonitor(); renderParentNotes(); if(typeof renderPhActivityHeroChips === 'function') renderPhActivityHeroChips(); }
   if(t === 'reports')  { renderParentGettingStarted(); renderParentMultiChild(); renderParentScore(); renderParentOverview(); renderWeeklyReportCard(); renderCompletionSummary(); renderSentQuizzes(); renderProgressReportsTab(); renderParentFaithReport(); if(typeof renderPhReportsHeroChips === 'function') renderPhReportsHeroChips(); }
   if(t === 'family')   { renderManageUsers(); renderParentLessons(); if(typeof renderParentGrowth==='function') renderParentGrowth(); if(typeof renderParentGrowthHistory==='function') renderParentGrowthHistory(); renderPhReferral(); if(typeof renderPhFamilyHeroChips === 'function') renderPhFamilyHeroChips(); }
   if(t === 'controls') { renderParentScreenControls(); renderParentEarningsControls(); renderParentBucksControls(); renderIncentives(); if(typeof updateIncConditions==='function') updateIncConditions(); }
@@ -5234,39 +5207,14 @@ const SOCIAL_LESSONS = [
 ];
 
 // ── PARENT ACTIVITY AUDIT ────────────────────────────────────
-// FAF Inc 1: was reading the WRONG element (#parentActivityFeed)
-// which is the synthetic-feed container — so the audit slot
-// (#parentActivityAudit) was always empty AND the feed container
-// got overwritten by whichever renderer ran last. Now targets
-// the right slot and reads new + legacy entries uniformly via
-// activity-log.js dual-shape accessors.
+// FAF Inc 3: the "Audit trail" vs "Activity feed" distinction is
+// gone — both folded into the single renderFamilyActivityFeed
+// kernel. This wrapper stays so the existing renderParent() +
+// phRoute('activity') call sites continue working. The Inc 1
+// fixes (right selector + dual-shape accessors) move into the
+// kernel; this delegate is now a 1-line shim.
 function renderParentActivityAudit(){
-  const el = document.getElementById('parentActivityAudit'); if(!el) return;
-  const log = (Array.isArray(D.activityLog)?D.activityLog:[]).slice().reverse().slice(0,30);
-  if(!log.length){
-    el.innerHTML = '<div style="font-size:.7rem;color:var(--tx3);padding:.5rem;">No activity logged yet.</div>';
-    return;
-  }
-  // Domain → icon (new-shape entries). Legacy entries fall through
-  // via activityDomain() which maps old `type` via LEGACY_TYPE_MAP.
-  const domainIcons = {
-    faith:'✝️', habit:'⚡', chore:'✅', skill:'🧠', goal:'🎯', mood:'😊',
-    journal:'✍️', health:'💪', money:'💰', school:'📚', book:'📖',
-    parent:'👤', auth:'🔐', misc:'📌'
-  };
-  el.innerHTML = log.map(l=>{
-    const ts  = (typeof activityTs    === 'function') ? activityTs(l)    : (l.ts || Date.parse(l.time || '') || Date.now());
-    const dom = (typeof activityDomain=== 'function') ? activityDomain(l): (l.domain || l.type || 'misc');
-    const ttl = (typeof activityTitle === 'function') ? activityTitle(l) : (l.title  || l.detail || '');
-    const d = new Date(ts || Date.now());
-    const timeStr = d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    const icon = domainIcons[dom] || '📌';
-    return `<div style="display:flex;align-items:center;gap:.4rem;padding:.3rem .4rem;border-bottom:1px solid rgba(255,255,255,.03);font-size:.65rem;">
-      <span>${icon}</span>
-      <span style="flex:1;color:var(--tx2);">${escapeHtml(ttl)}</span>
-      <span style="font-size:.55rem;color:var(--tx3);white-space:nowrap;">${timeStr}</span>
-    </div>`;
-  }).join('');
+  if(typeof renderFamilyActivityFeed === 'function') renderFamilyActivityFeed();
 }
 
 // ── PIN MODAL ENGINE ─────────────────────────────────────────
