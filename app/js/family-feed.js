@@ -112,15 +112,18 @@
 
   // _profiles + _activeProfileId live in parent.js (loaded after
   // this file). Always read defensively at call time.
-  function _profileName(profileId){
+  function _profile(profileId){
     try {
       if(profileId == null) return null;
       if(typeof _profiles !== 'undefined' && Array.isArray(_profiles)){
-        const p = _profiles.find(function(x){ return x && String(x.id) === String(profileId); });
-        if(p) return p.name || null;
+        return _profiles.find(function(x){ return x && String(x.id) === String(profileId); }) || null;
       }
     } catch(e){}
     return null;
+  }
+  function _profileName(profileId){
+    const p = _profile(profileId);
+    return (p && p.name) ? p.name : null;
   }
   function _kidProfiles(){
     try {
@@ -129,6 +132,24 @@
       }
     } catch(e){}
     return [];
+  }
+
+  // Stable per-kid color (Inc 4 strip dot). Reads p.color when the
+  // profile carries one; otherwise hashes the profile id into the
+  // KID_COLORS palette so the same kid gets the same dot every
+  // render without needing to backfill profile data.
+  const KID_COLORS = [
+    '#38bdf8', '#f472b6', '#fbbf24', '#a78bfa',
+    '#22c55e', '#fb7185', '#fb923c', '#22d3ee'
+  ];
+  function _kidColor(profileId){
+    const p = _profile(profileId);
+    if(p && p.color) return p.color;
+    if(profileId == null) return '#94a3b8'; // parent-action / unknown
+    let h = 0;
+    const s = String(profileId);
+    for(let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+    return KID_COLORS[h % KID_COLORS.length];
   }
 
   // Dual-shape accessors live in activity-log.js (loaded earlier in
@@ -157,6 +178,19 @@
   function fafLoadOlder(){
     _fafLimit += 50;
     renderFamilyActivityFeed();
+  }
+
+  // FAF Inc 4 — strip-card tap handler. Opens the Parent Hub
+  // Activity tab and pre-filters by the tapped domain so the parent
+  // lands in the full feed with the right events isolated. Home
+  // strip stays a quick glance; Activity tab stays the deep dive.
+  // domain='misc' (and falsy) clears the filter — generic "show me
+  // the full feed" behavior.
+  function fafNavigateTo(domain){
+    if(typeof phNav === 'function') phNav('activity');
+    if(domain && domain !== 'misc' && typeof fafSetDomain === 'function'){
+      fafSetDomain(domain);
+    }
   }
 
   // ── Pill row renderers ───────────────────────────────────────
@@ -303,9 +337,12 @@
       + '</div>';
   }
 
-  // Inc 4 layout — compact horizontal card. Inc 3 doesn't render
-  // this directly, but the kernel supports it so Inc 4 just calls
-  // renderFamilyActivityFeed({ layout:'strip', ... }).
+  // Inc 4 layout — compact horizontal tap-target. Adds:
+  //   • profile-color dot (stable per-kid color, parent-action gets
+  //     a neutral slate dot)
+  //   • role=button + tabindex=0 + onclick + onkeydown so the card
+  //     is reachable by keyboard and screen readers, not just touch
+  //   • aria-label combining domain + kid + title
   function _renderStrip(entries, acc){
     return entries.map(function(e){
       const dom = acc.domain(e);
@@ -313,10 +350,18 @@
       const title = acc.title(e);
       const ts = acc.ts(e);
       const kidName = _profileName(e.profileId);
+      const kidColor = _kidColor(e.profileId);
+      const aria = (kidName ? kidName + ' · ' : '') + meta.label + ' · ' + title;
+      const domAttr = _esc(dom);
       return ''
-        + '<div class="faf-strip-card faf-domain-' + _esc(dom) + '"'
-        +    ' style="--faf-accent:' + meta.color + ';--faf-accent-soft:' + meta.soft + ';--faf-accent-bd:' + meta.bd + ';">'
-        +   '<div class="faf-strip-icon">' + meta.icon + '</div>'
+        + '<div class="faf-strip-card faf-domain-' + domAttr + '"'
+        +    ' role="button" tabindex="0"'
+        +    ' aria-label="' + _esc(aria) + '"'
+        +    ' onclick="fafNavigateTo(\'' + domAttr + '\')"'
+        +    ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();fafNavigateTo(\'' + domAttr + '\');}"'
+        +    ' style="--faf-accent:' + meta.color + ';--faf-accent-soft:' + meta.soft + ';--faf-accent-bd:' + meta.bd + ';--faf-kid:' + kidColor + ';">'
+        +   '<span class="faf-strip-dot" aria-hidden="true"></span>'
+        +   '<div class="faf-strip-icon" aria-hidden="true">' + meta.icon + '</div>'
         +   '<div class="faf-strip-body">'
         +     (kidName ? '<div class="faf-strip-kid">' + _esc(kidName) + '</div>' : '')
         +     '<div class="faf-strip-title">' + _esc(title) + '</div>'
@@ -331,6 +376,7 @@
   window.fafSetProfile             = fafSetProfile;
   window.fafSetDomain              = fafSetDomain;
   window.fafLoadOlder              = fafLoadOlder;
+  window.fafNavigateTo             = fafNavigateTo;
   // Exposed for Inc 4 strip and any future surface that wants the
   // canonical icon/color for a domain without re-deriving.
   window.fafDomainMeta             = DOMAIN_META;
