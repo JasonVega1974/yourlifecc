@@ -5532,6 +5532,31 @@ function saveProgressEmailPref(){
   save();
 }
 
+// Email Bundle Track 2 (2026-06-08) — Engagement opt-in toggle handler.
+// Wired from the Me → Settings panel toggle (#tg-engagementOptIn).
+// Flips D.emailPrefs.engagementOptIn; captures timezoneOffsetMin and
+// recipientEmail on opt-in so future Track 2 sends have everything
+// they need without a second save. Default false (explicit opt-in).
+function setEngagementOptIn(btn){
+  if(typeof D === 'undefined' || !D) return;
+  if(!D.emailPrefs || typeof D.emailPrefs !== 'object') D.emailPrefs = {};
+  D.emailPrefs.engagementOptIn = !D.emailPrefs.engagementOptIn;
+  // Capture timezone on every flip so DST + relocations pick up.
+  D.emailPrefs.timezoneOffsetMin = new Date().getTimezoneOffset();
+  // Default recipient to the signed-in auth email if no override yet.
+  if(!D.emailPrefs.recipientEmail
+     && typeof _supaUser !== 'undefined' && _supaUser && _supaUser.email){
+    D.emailPrefs.recipientEmail = String(_supaUser.email).trim();
+  }
+  if(btn) btn.classList.toggle('on', !!D.emailPrefs.engagementOptIn);
+  if(typeof save === 'function') save();
+  if(typeof showToast === 'function'){
+    showToast(D.emailPrefs.engagementOptIn
+      ? 'Engagement emails ON ✉️'
+      : 'Engagement emails OFF');
+  }
+}
+
 // Email Bundle Track 1 — "Send me a test digest now" button click.
 // POSTs to /api/cron/weekly-digest?testUser=<userId> with the user's
 // Supabase JWT. Server validates the JWT, processes only that one
