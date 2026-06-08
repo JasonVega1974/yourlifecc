@@ -208,6 +208,11 @@ function _checkHealthMilestones(){
     if(earned){
       D.healthMilestones[m.id] = new Date().toISOString().slice(0,10);
       anyNew = true;
+      // FAF Inc 2 — one feed event per first-earn so multi-badge
+      // moments render line by line on the Activity tab.
+      if(typeof logFamilyActivity === 'function'){
+        logFamilyActivity('health', 'badge_earned', 'Health badge: ' + (m.name || m.id));
+      }
       // Stagger celebrations so multiple-at-once still feel distinct.
       setTimeout(function(){ _celebrateHealthMilestone(m); }, 100);
     }
@@ -543,6 +548,10 @@ function logWorkout(){
   save();
   renderMovementTracker();
   if(typeof renderHealthDomainStrip === 'function') renderHealthDomainStrip();
+  // FAF Inc 2 — workout logged.
+  if(typeof logFamilyActivity === 'function'){
+    logFamilyActivity('health', 'workout_logged', 'Workout: ' + type + ' ' + duration + 'min');
+  }
   if(typeof showToast === 'function') showToast('Workout logged 🏃 +' + duration + ' min');
   // Goal-hit celebration: did this entry cross 150 min for the week?
   const goal = Number(D.workoutGoal) || 150;
@@ -604,6 +613,16 @@ function addPR(){
   if(exEl)  exEl.value = '';
   if(valEl) valEl.value = '';
   renderMovementTracker();
+  // FAF Inc 2 — PR set / updated. Logs both the first-record and the
+  // "beat-your-PR" moments; we only fire when prev was missing OR the
+  // new value beats prev, so an unchanged re-entry doesn't spam the
+  // feed.
+  if(typeof logFamilyActivity === 'function'){
+    const beatPrev = prev && value > Number(prev.value || 0);
+    if(!prev || beatPrev){
+      logFamilyActivity('health', 'pr_set', 'New PR: ' + exercise + ' ' + value + unit);
+    }
+  }
   // Beat-your-PR moment: prev existed AND value > prev.value
   if(prev && value > Number(prev.value || 0)){
     if(typeof launchSideConfetti === 'function') launchSideConfetti();
@@ -1039,6 +1058,11 @@ function logWater(delta){
   if(delta > 0 && prev < goal && entry.cups >= goal){
     if(typeof launchSideConfetti === 'function') launchSideConfetti();
     if(typeof showToast === 'function') showToast('Daily water goal hit! 💧');
+    // FAF Inc 2 — emit only on the cup that crosses the goal so the
+    // feed gets one event per day, not one per cup.
+    if(typeof logFamilyActivity === 'function'){
+      logFamilyActivity('health', 'water_goal_hit', 'Daily water goal hit! 💧');
+    }
   }
   // 2026-06-07 — Health Inc 5: milestone check (water7 + water100).
   if(typeof _checkHealthMilestones === 'function') _checkHealthMilestones();
@@ -1335,6 +1359,12 @@ function logHealthMood(level){
   if(D.moods.length > 365) D.moods = D.moods.slice(-365);
   save();
   renderHealthMoodCheckin();
+  // FAF Inc 2 — mood logged. Same-day re-pick replaces the day's
+  // entry, so we still log it (the parent might want to know the
+  // kid revised the rating).
+  if(typeof logFamilyActivity === 'function'){
+    logFamilyActivity('health', 'mood_logged', 'Mood logged: ' + level + '/5');
+  }
   if(typeof showToast === 'function') showToast('Logged ✓');
   // 2026-06-07 — Health Inc 5: milestone check (mood7).
   if(typeof _checkHealthMilestones === 'function') _checkHealthMilestones();
@@ -1360,6 +1390,10 @@ function logSleep(){
   const wI = document.getElementById('sleepWaketime'); if(wI) wI.value = '';
   renderSleepBars();
   renderSleepList();
+  // FAF Inc 2 — sleep logged.
+  if(typeof logFamilyActivity === 'function'){
+    logFamilyActivity('health', 'sleep_logged', 'Sleep logged: ' + hours + 'h');
+  }
   showToast('Sleep logged 💤');
   // 2026-06-07 — Health Inc 5: milestone check (sleep30).
   if(typeof _checkHealthMilestones === 'function') _checkHealthMilestones();
