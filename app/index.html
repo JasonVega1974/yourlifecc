@@ -18954,6 +18954,10 @@
 <script src="/app/js/config.js"></script>
 <script src="/app/js/data.js"></script>
 <script src="/app/js/sync.js"></script>
+<!-- FAF Inc 1 — unified activity-log writer + back-compat shim for
+     logActivity(). Must load after sync.js (needs save()) and before
+     any module that calls logActivity()/logFamilyActivity(). -->
+<script src="/app/js/activity-log.js"></script>
 <script src="/app/js/auth.js"></script>
 
 <!-- UI & Navigation -->
