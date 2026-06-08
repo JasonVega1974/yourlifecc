@@ -3,6 +3,75 @@
               mood tracker extended, mentors
 ============================================================= */
 
+// ════════════════════════════════════════════════════════════
+// 2026-06-07 — Goals Inc 1: Power Cards visual upgrade.
+//
+// GOAL_DOMAINS groups the 10 goal categories (the exact strings
+// shipped in the Add-Goal modal dropdown) into thematic Power Cards
+// that render above the goal stats. Each domain has icon + accent +
+// match-string (the literal `cat` value stored on the goal).
+//
+// renderGoalDomainStrip computes done/total per category from
+// D.goals and emits the 10-card strip with circular SVG progress
+// rings. Mastery state (100% complete in category, with at least
+// 1 goal) flips the accent to gold + glyph glow.
+//
+// Tapping a domain card smooth-scrolls to the goals list (filter
+// logic is a future Inc 4 polish; Inc 1 stays visual-only).
+// ════════════════════════════════════════════════════════════
+const GOAL_DOMAINS = [
+  {key:'faith',         icon:'⛪',  name:'Faith',       accent:'#c084fc', match:'Faith / Spiritual'},
+  {key:'fitness',       icon:'💪', name:'Fitness',     accent:'#34d399', match:'Fitness / Health'},
+  {key:'money',         icon:'💰', name:'Money',       accent:'#16a34a', match:'Money / Financial'},
+  {key:'school',        icon:'📚', name:'School',      accent:'#38bdf8', match:'School / Education'},
+  {key:'career',        icon:'💼', name:'Career',      accent:'#818cf8', match:'Career / Work'},
+  {key:'relationships', icon:'🤝', name:'People',      accent:'#f472b6', match:'Relationships'},
+  {key:'music',         icon:'🎵', name:'Music',       accent:'#a78bfa', match:'DJ / Music'},
+  {key:'sports',        icon:'🥋', name:'Sports',      accent:'#ef4444', match:'Sports / Martial Arts'},
+  {key:'growth',        icon:'🌱', name:'Growth',      accent:'#fbbf24', match:'Personal Growth'},
+  {key:'other',         icon:'🗂️', name:'Other',       accent:'#94a3b8', match:'Other'}
+];
+
+function renderGoalDomainStrip(){
+  const host = document.getElementById('goalDomainStrip');
+  if(!host) return;
+  const goals = Array.isArray(D.goals) ? D.goals : [];
+  host.innerHTML = GOAL_DOMAINS.map(function(dom){
+    const inCat = goals.filter(function(g){ return g && g.cat === dom.match; });
+    const total = inCat.length;
+    const done  = inCat.filter(function(g){ return g.done; }).length;
+    const pct = total ? (done / total) : 0;
+    const offset = 125.66 * (1 - pct);
+    const mastered = (total > 0 && done === total);
+    return '<button type="button" class="g-domain-card' + (mastered ? ' is-mastered' : '') + '"'
+      + ' data-domain="' + dom.key + '"'
+      + ' style="--dom-accent:' + dom.accent + ';"'
+      + ' onclick="_goalDomainOpen()"'
+      + ' aria-label="' + dom.name + ' goals' + (total ? ', ' + done + ' of ' + total + ' complete' : ', empty') + '">'
+      + '<span class="g-dom-ring" aria-hidden="true">'
+        + '<svg viewBox="0 0 48 48">'
+          + '<circle class="g-dom-ring-track" cx="24" cy="24" r="20"></circle>'
+          + '<circle class="g-dom-ring-fill"  cx="24" cy="24" r="20"'
+            + ' stroke-dasharray="125.66"'
+            + ' stroke-dashoffset="' + offset + '"></circle>'
+        + '</svg>'
+        + '<span class="g-dom-icon">' + dom.icon + '</span>'
+      + '</span>'
+      + '<span class="g-dom-label">' + dom.name + '</span>'
+      + '<span class="g-dom-progress">' + (total ? done + ' of ' + total : 'Empty') + '</span>'
+    + '</button>';
+  }).join('');
+}
+
+// Domain-card tap — smooth-scroll to goals list. Filter logic stays
+// off the table for Inc 1 (visual layer only); Inc 4 would add it.
+function _goalDomainOpen(){
+  const el = document.getElementById('goalsList');
+  if(el && typeof el.scrollIntoView === 'function'){
+    el.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+}
+
 // ── GOALS ─────────────────────────────────────────────────────
 // Phase C-Goals (2026-05-15) — additions:
 //   • motivation field on the goal ("What would completing this make possible?")
@@ -82,6 +151,10 @@ function renderGoals(){
   }
 
   el.innerHTML = goals.map(g => renderGoalCard(g)).join('');
+
+  // 2026-06-07 — Goals Inc 1: refresh the 10-domain Power Cards strip
+  // so completion rings track the latest D.goals state without a reload.
+  if(typeof renderGoalDomainStrip === 'function') renderGoalDomainStrip();
 }
 
 function renderGoalCard(g){
@@ -119,9 +192,12 @@ function renderGoalCard(g){
     ? `<button type="button" onclick="addMilestone(${g.id})" style="background:rgba(249,115,22,.04);border:1px dashed rgba(249,115,22,.35);color:var(--section-goals);padding:.4rem .8rem;border-radius:8px;cursor:pointer;font-size:.72rem;font-weight:600;font-family:var(--fm);margin-top:.45rem;width:100%;">+ Add milestone (${ms.length}/5)</button>`
     : '';
 
-  // Completion stamp shown only when done.
+  // 2026-06-07 — Goals Inc 1: holographic completion stamp (replaces
+  // the previous flat rgba bar). Conic-gradient shimmer scoped via
+  // .g-completed-stamp in app.css — matches the Skills cert pill +
+  // Health earned-badge family.
   const doneStamp = g.done
-    ? `<div style="margin-top:.55rem;padding:.4rem .8rem;background:rgba(249,115,22,.08);border-radius:8px;font-size:.78rem;color:var(--section-goals);font-weight:600;">🎉 Completed ${g.completedDate||''}</div>`
+    ? `<div class="g-completed-stamp"><span class="g-completed-text">🎉 Completed ${escapeHtml(g.completedDate||'')}</span></div>`
     : '';
 
   return `
