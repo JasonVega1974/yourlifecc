@@ -329,6 +329,48 @@ const DEF = {
   // personalization, and future home-screen curation.
   onboardingDone:false, onboardingInterests:[],
   bannerMode:'scroll',
+  // ── Email Engagement Bundle (PR 0, 2026-06-08) ──────────────
+  // Per-user opt-ins, send-stamps, and counters for three email
+  // streams powered by Vercel Cron:
+  //
+  //   • DIGEST    — Sunday 7pm local weekly family summary.
+  //                 Opt-IN (default false). Single-recipient.
+  //                 /api/cron/weekly-digest (Track 1).
+  //   • ENGAGEMENT— Inactivity / streak-at-risk / new-features /
+  //                 refer-a-friend / onboarding-incomplete triggers.
+  //                 Opt-IN (default false). Max 1 per user per week.
+  //                 /api/cron/engagement-tick (Track 2). Excludes
+  //                 plan_status='faith_free' (Track 3 owns them).
+  //   • CROSSOVER — Faith-only-to-full-app soft invitations every
+  //                 6 weeks, hard-capped 4 lifetime sends per user.
+  //                 Opt-OUT (default included — faith_free users
+  //                 signed up expecting communication; the 4-send
+  //                 cap + unsubscribe link bound it).
+  //                 /api/cron/crossover-tick (Track 3).
+  //
+  // allOptOut is the master kill — true overrides every other
+  // stream's per-list flag.
+  //
+  // Unsubscribe path: /unsubscribe?token=&list=&action= renders the
+  // static page; /api/email-prefs validates the signed JWT and
+  // mutates this object via Supabase service-role.
+  // Suppression list also lands in public.email_suppressions so it
+  // survives account deletion (privacy.html promise).
+  emailPrefs:{
+    digestOptIn:           false,
+    engagementOptIn:       false,
+    crossoverOptOut:       false,   // INVERTED — see comment above
+    allOptOut:             false,
+    recipientEmail:        '',      // defaults to _supaUser.email at first save
+    timezoneOffsetMin:     null,    // captured from Intl at first save (Track 1 anchors local-7pm)
+    lastDigestSent:        null,    // ISO date
+    lastEngagementSent:    null,    // ISO date
+    lastCrossoverSent:     null,    // ISO date
+    engagementSentInWeek:  0,       // reset by cron at week boundary
+    crossoverSendCount:    0,       // permanent — hard cap at 4
+    lastReleaseNoteVersion:0,       // Track 2 "what's new" trigger
+    upgradedAt:            null     // set when plan_status flips faith_free → active
+  },
   // ── Family Activity Feed (FAF Inc 1, 2026-06-08) ────────────
   // Unified, append-only event stream powering the Parent Hub
   // home strip (FAF Inc 4) and the full Activity tab feed (FAF
