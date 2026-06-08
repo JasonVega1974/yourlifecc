@@ -1085,14 +1085,33 @@ const TAB_IA = [
       {sectionId:'s-flashcards', label:'Flashcards', icon:'📇'}
     ]
   },
+  // 2026-06-07 — Life tab "Superpowers" upgrade. Six hero cards get
+  // tier:'hero' + a theme + a stat resolver key (see LIFE_STATS below).
+  // Seven secondary cards stay flat (tier:'more') and render in the
+  // compact micro-grid under the heroes. Habits + Goals carry a faint
+  // scripture micro-line under the divider per product direction.
   {id:'life',  label:'Life',  icon:'⚡', accent:'var(--c)',
     primary:[
-      {sectionId:'s-health',     label:'Habits',       icon:'💪', accent:'var(--section-health)'},
-      {sectionId:'s-chores',     label:'Chores',       icon:'✅', accent:'var(--section-daily-life)'},
-      {sectionId:'s-goals',      label:'Goals',        icon:'🎯', accent:'var(--section-goals)'},
-      {sectionId:'s-finance',    label:'Money',        icon:'💰', accent:'var(--section-finance)'},
-      {sectionId:'s-schedule',   label:'Schedule',     icon:'📝', accent:'var(--section-daily-life)'},
-      {sectionId:'s-skills',     label:'Life Skills',  icon:'🧠', accent:'var(--section-life-skills)'},
+      {sectionId:'s-health',     label:'Habits',       icon:'⚡', accent:'var(--section-health)',
+        tier:'hero', theme:'lightning', stat:'habits',
+        sub:'Build the small daily wins',
+        faith:'Discipline is the bridge to accomplishment.'},
+      {sectionId:'s-chores',     label:'Chores',       icon:'🛠️', accent:'var(--section-daily-life)',
+        tier:'hero', theme:'forge', stat:'chores',
+        sub:'Today’s tasks and family duties'},
+      {sectionId:'s-goals',      label:'Goals',        icon:'🎯', accent:'var(--section-goals)',
+        tier:'hero', theme:'hunter', stat:'goals',
+        sub:'What you’re building toward',
+        faith:'Commit your work to the Lord. — Prov 16:3'},
+      {sectionId:'s-finance',    label:'Money',        icon:'💰', accent:'var(--section-finance)',
+        tier:'hero', theme:'treasury', stat:'money',
+        sub:'Track, save, and grow'},
+      {sectionId:'s-schedule',   label:'Schedule',     icon:'📝', accent:'var(--section-daily-life)',
+        tier:'hero', theme:'time', stat:'schedule',
+        sub:'What’s coming up'},
+      {sectionId:'s-skills',     label:'Life Skills',  icon:'🧠', accent:'var(--section-life-skills)',
+        tier:'hero', theme:'mind', stat:'skills',
+        sub:'Learn one new thing'},
       {sectionId:'s-calendar',   label:'Calendar',     icon:'📅', accent:'var(--section-daily-life)'},
       {sectionId:'s-journal',    label:'Journal',      icon:'✍️', accent:'var(--section-journal)'},
       {sectionId:'s-mood',       label:'Mood',         icon:'😊', accent:'var(--section-journal)'},
@@ -1233,10 +1252,173 @@ function renderLearnLanding(){
     ).join('');
 }
 
+// ════════════════════════════════════════════════════════════
+// 2026-06-07 — Life tab "Superpowers" upgrade.
+//
+// renderLifeLanding() replaces the generic renderTabLanding('life')
+// path. It reads TAB_IA.life.primary[], splits into hero (tier:'hero')
+// and more (everything else), and renders two grids inside the same
+// .tab-landing[data-tab="life"] host:
+//
+//   .tab-landing-hero  — 6 large Power Cards: glyph + label + sub +
+//                        streak pill + live stat from LIFE_STATS +
+//                        optional faith micro-line.
+//   .tab-landing-more  — 7 small mini-cards: glyph + label only.
+//
+// LIFE_STATS reads real D.* fields (verified 2026-06-07 against
+// data.js, chores.js, finance.js, school.js). Each resolver returns
+// {stat:'...', streakDays?:N}. If a section has no data yet, the
+// stat falls back to an inviting empty-state string ("Start today",
+// "Calendar is clear", etc.) rather than a numeric zero.
+//
+// Motion (idle shimmer, streak pulse) is implemented in CSS, gated
+// by @media (prefers-reduced-motion: no-preference). All escaping
+// goes through escapeHtml() (parent.js) for any string written into
+// innerHTML.
+// ════════════════════════════════════════════════════════════
+const LIFE_STATS = {
+  habits: function(){
+    var streakDays = (typeof D !== 'undefined' && D && typeof D.streak === 'number') ? D.streak : 0;
+    var today = new Date().toISOString().slice(0,10);
+    var checked = 0;
+    if(D && D.dailyChecks && D.dailyChecks[today]){
+      var bucket = D.dailyChecks[today];
+      for(var k in bucket){ if(bucket[k]) checked++; }
+    }
+    return { stat: checked > 0 ? (checked + ' habit' + (checked===1?'':'s') + ' today') : 'Start today', streakDays: streakDays };
+  },
+  chores: function(){
+    var today = new Date().toISOString().slice(0,10);
+    var log = (D && Array.isArray(D.choreLog)) ? D.choreLog : [];
+    var doneToday = log.filter(function(l){ return l && l.date === today && (l.status==='done'||l.status==='verified'); }).length;
+    var active = (D && Array.isArray(D.chores)) ? D.chores.filter(function(c){ return c && c.active; }).length : 0;
+    if(active === 0) return { stat: 'No chores yet' };
+    return { stat: doneToday + ' / ' + active + ' done today' };
+  },
+  goals: function(){
+    var goals = (D && Array.isArray(D.goals)) ? D.goals : [];
+    if(!goals.length) return { stat: 'Set your first goal' };
+    var done = goals.filter(function(g){ return g && g.done; }).length;
+    return { stat: done + ' of ' + goals.length + ' done' };
+  },
+  money: function(){
+    var tx = (D && Array.isArray(D.transactions)) ? D.transactions : [];
+    if(!tx.length) return { stat: 'Log your first tx' };
+    var d = new Date(); d.setDate(d.getDate() - 6);
+    var ws = d.toISOString().slice(0,10);
+    var inc = 0, exp = 0;
+    tx.forEach(function(t){
+      if(!t || !t.date || t.date < ws) return;
+      var amt = Number(t.amt) || 0;
+      if(t.type === 'income') inc += amt;
+      else if(t.type === 'expense') exp += amt;
+    });
+    var net = inc - exp;
+    var sign = net >= 0 ? '+' : '−';
+    return { stat: sign + '$' + Math.abs(net).toFixed(0) + ' this week' };
+  },
+  schedule: function(){
+    var today = new Date().toISOString().slice(0,10);
+    var events = (D && Array.isArray(D.events)) ? D.events : [];
+    if(!events.length) return { stat: 'Calendar is clear' };
+    var todayCt = events.filter(function(e){
+      if(!e) return false;
+      var d = e.date || e.startDate || '';
+      return String(d) === today;
+    }).length;
+    if(todayCt > 0) return { stat: todayCt + ' event' + (todayCt===1?'':'s') + ' today' };
+    var upcoming = events.filter(function(e){
+      if(!e) return false;
+      var d = String(e.date || e.startDate || '');
+      return d >= today;
+    }).length;
+    return { stat: upcoming > 0 ? (upcoming + ' upcoming') : 'Calendar is clear' };
+  },
+  skills: function(){
+    var certs = (D && D.skillCerts) ? Object.keys(D.skillCerts).length : 0;
+    var total = (typeof SK_CATS !== 'undefined' && Array.isArray(SK_CATS)) ? SK_CATS.length : 16;
+    return { stat: certs + ' of ' + total + ' certs' };
+  }
+};
+
+function _lifeResolveStat(key){
+  try{
+    var fn = LIFE_STATS[key];
+    if(typeof fn !== 'function') return null;
+    var res = fn();
+    return (res && typeof res === 'object') ? res : null;
+  } catch(_){ return null; }
+}
+
+function _lifeEscape(s){
+  return (typeof escapeHtml === 'function') ? escapeHtml(String(s == null ? '' : s)) : String(s == null ? '' : s);
+}
+
+function renderLifeLanding(){
+  var tab = TAB_IA.find(function(t){ return t.id === 'life'; });
+  if(!tab) return;
+  var host = document.querySelector('.tab-landing[data-tab="life"]');
+  if(!host) return;
+
+  var heroes = tab.primary.filter(function(c){ return c.tier === 'hero'; });
+  var more   = tab.primary.filter(function(c){ return c.tier !== 'hero'; });
+
+  var heroHtml = heroes.map(function(card){
+    var accent  = card.accent || tab.accent || 'var(--c)';
+    var theme   = card.theme || 'default';
+    var stat    = card.stat ? _lifeResolveStat(card.stat) : null;
+    var streak  = (stat && typeof stat.streakDays === 'number' && stat.streakDays > 0) ? stat.streakDays : 0;
+    var statTxt = (stat && stat.stat) ? stat.stat : '';
+    var subTxt  = card.sub  ? _lifeEscape(card.sub) : '';
+    var faithTxt = card.faith ? _lifeEscape(card.faith) : '';
+    var onclick = card.sectionId ? ("showSection('" + card.sectionId + "')") : '';
+    return '<button type="button" class="tab-landing-card tlc-power"'
+      + ' data-theme="' + _lifeEscape(theme) + '"'
+      + ' style="--card-accent:' + accent + ';"'
+      + ' onclick="' + onclick + '"'
+      + ' aria-label="' + _lifeEscape(card.label) + '">'
+      + '<span class="tlc-shimmer" aria-hidden="true"></span>'
+      + '<span class="tlc-row-top">'
+        + '<span class="tlc-icon" aria-hidden="true">' + (card.icon || '•') + '</span>'
+        + '<span class="tlc-label">' + _lifeEscape(card.label) + '</span>'
+        + (streak > 0
+            ? '<span class="tlc-streak" aria-label="' + streak + '-day streak">🔥 ' + streak + 'd</span>'
+            : '')
+      + '</span>'
+      + (subTxt   ? '<span class="tlc-sub">' + subTxt + '</span>' : '')
+      + '<span class="tlc-power-divider" aria-hidden="true"></span>'
+      + (statTxt  ? '<span class="tlc-stat">' + _lifeEscape(statTxt) + '</span>' : '')
+      + (faithTxt ? '<span class="tlc-faith-line">' + faithTxt + '</span>' : '')
+    + '</button>';
+  }).join('');
+
+  var moreHtml = more.map(function(card){
+    var accent  = card.accent || tab.accent || 'var(--c)';
+    var onclick = '';
+    if(card.sectionId)      onclick = "showSection('" + card.sectionId + "')";
+    else if(card.wellTab)   onclick = "(typeof wellGoto==='function')&&wellGoto('" + card.wellTab + "')";
+    else if(card.action)    onclick = "handleTabAction('" + card.action + "')";
+    return '<button type="button" class="tab-landing-card tlc-mini"'
+      + ' style="--card-accent:' + accent + ';"'
+      + ' onclick="' + onclick + '"'
+      + ' aria-label="' + _lifeEscape(card.label) + '">'
+      + '<span class="tlc-icon" aria-hidden="true">' + (card.icon || '•') + '</span>'
+      + '<span class="tlc-label">' + _lifeEscape(card.label) + '</span>'
+    + '</button>';
+  }).join('');
+
+  host.innerHTML =
+      '<div class="tab-landing-hero" role="list">' + heroHtml + '</div>'
+    + (more.length
+        ? '<div class="tab-landing-more-label">MORE</div>'
+        + '<div class="tab-landing-more" role="list">' + moreHtml + '</div>'
+        : '');
+}
+
 function renderAllTabLandings(){
   renderTabLanding('learn');
   renderLearnLanding();
-  renderTabLanding('life');
+  renderLifeLanding();
   renderTabLanding('me');
 }
 
@@ -1947,6 +2129,12 @@ function showSection(id, fromMobile){
   // the user lands here (boot order, late inserts, etc).
   if(id==='s-learn' && typeof renderLearnLanding === 'function'){
     setTimeout(renderLearnLanding, 30);
+  }
+  // 2026-06-07 — Life tab "Superpowers" upgrade. Re-render on entry so
+  // Power Card live stats (today's habit count, weekly money net, etc.)
+  // reflect the latest D.* state without a full reload.
+  if(id==='s-life' && typeof renderLifeLanding === 'function'){
+    setTimeout(renderLifeLanding, 30);
   }
   // Beta bug 1 — palette / theme drift on returning to the Well. Some
   // sub-sections inside The Well used to set inline CSS-variable
