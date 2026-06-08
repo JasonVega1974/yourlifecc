@@ -4590,6 +4590,7 @@
     <button class="tab" onclick="hTab('mind',this)">💚 Mind</button>
     <button class="tab" onclick="hTab('meals',this)">🍽 Meals</button>
     <button class="tab" onclick="hTab('water',this)">💧 Water</button>
+    <button class="tab" onclick="hTab('movement',this)">🏃 Movement</button>
     <button class="tab active" onclick="hTab('weight',this)">⚖️ Weight</button>
     <button class="tab" onclick="hTab('food',this)">🥗 Macros</button>
     <button class="tab" onclick="hTab('nutEd',this)">📚 Learn</button>
@@ -4860,6 +4861,14 @@
        bar chart. Midnight reset is natural: per-day {date, cups}
        entries in D.waterLog. -->
   <div id="ht-water" style="display:none;"></div>
+
+  <!-- 2026-06-07 — Health Inc 4: Movement / workout tracker. Populated
+       by renderMovementTracker() in health.js — weekly active-minutes
+       ring vs D.workoutGoal (default 150 per CDC), 7-day heatmap colored
+       by workout type, log-session form (type / duration / intensity /
+       note), recent sessions list, PR records tracker, faith micro-line
+       (1 Tim 4:8). Backed by D.workoutLog[] + D.workoutGoal + D.prRecords{}. -->
+  <div id="ht-movement" style="display:none;"></div>
 </section>
 
 <!-- ════════════ HABITS (first-class tab — Commit 1: Today + Streaks fully built) ════════════ -->
