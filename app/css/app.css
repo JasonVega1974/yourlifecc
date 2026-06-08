@@ -5660,6 +5660,247 @@ body.solo-mode .sp-family-only { display: none !important; }
 :root.light #s-mood .mp-log-note{ color:#475569 !important; }
 /* ════════════════════════════════════════════════════════════ */
 
+/* ════════════════════════════════════════════════════════════
+   2026-06-07 — Phase 3 B3 Inc C: Life "more" grid polish.
+
+   Sections covered: #s-rewards / #s-motivation / #s-contests /
+   #s-reading / #s-calendar. Light-touch visual upgrade — gradient
+   ring borders on card surfaces, hex-hardcode cleanup, and shared
+   .phase3-faith-* micro-line classes used by Fuel Wall, Reading,
+   Contests, and Calendar (Rewards skipped — parent-bucks surface
+   doesn't fit the scripture treatment).
+
+   Reduced-motion auto-suppressed globally. Light theme covered.
+   ════════════════════════════════════════════════════════════ */
+
+/* ─── Shared Phase 3 faith micro-line ────────────────────────── */
+.phase3-faith-divider{
+  height:1px;
+  margin:18px 0 10px;
+  background:linear-gradient(90deg,
+    transparent,
+    color-mix(in srgb, var(--c) 40%, transparent),
+    transparent);
+}
+.phase3-faith-line{
+  text-align:center;
+  font-family:var(--fh);
+  font-style:italic;
+  font-size:.72rem;
+  letter-spacing:.04em;
+  color:color-mix(in srgb, var(--tx2) 80%, transparent);
+  opacity:.75;
+  line-height:1.4;
+  padding:0 .5rem;
+}
+
+/* ─── Calendar day-of-week headers (replaces #c8d4e8 hex) ──── */
+.cal-dow{
+  text-align:center;
+  font-size:.6rem;
+  font-weight:700;
+  color:var(--tx2);
+  padding:3px;
+  letter-spacing:.04em;
+}
+
+/* ─── Motivation / Fuel Wall — card surface lift ─────────────── */
+#s-motivation #motivationWall > *{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+#s-motivation #motivationWall > *::after{
+  content:'';
+  position:absolute; inset:0;
+  border-radius:inherit;
+  padding:1px;
+  background:linear-gradient(135deg, var(--or, #fb923c), var(--g, #fbbf24));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask-composite:exclude;
+  opacity:.45;
+  pointer-events:none;
+  z-index:0;
+  transition:opacity .2s ease;
+}
+#s-motivation #motivationWall > *:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 22px color-mix(in srgb, var(--or, #fb923c) 22%, transparent);
+}
+#s-motivation #motivationWall > *:hover::after{ opacity:.85; }
+#s-motivation #motivationWall > * > *{ position:relative; z-index:1; }
+
+/* ─── Reading list — gradient ring on book entries + recs ──── */
+#s-reading .card,
+#s-reading > div:not(.sh):not(.phase3-faith-divider):not(.phase3-faith-line){
+  position:relative;
+  isolation:isolate;
+}
+#s-reading .card::after{
+  content:'';
+  position:absolute; inset:0;
+  border-radius:14px;
+  padding:1px;
+  background:linear-gradient(135deg, var(--c), var(--p));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask-composite:exclude;
+  opacity:.4;
+  pointer-events:none;
+  z-index:0;
+}
+#s-reading .card > *{ position:relative; z-index:1; }
+#s-reading .book-filter{ transition:background .15s ease, color .15s ease; }
+#s-reading .book-filter.active{
+  background:color-mix(in srgb, var(--c) 18%, transparent) !important;
+  border-color:var(--c) !important;
+  color:var(--c) !important;
+}
+
+/* ─── Calendar — gradient ring on the 2 g2 cards ─────────────── */
+#s-calendar .g2 > .card{
+  position:relative;
+  isolation:isolate;
+}
+#s-calendar .g2 > .card::after{
+  content:'';
+  position:absolute; inset:0;
+  border-radius:14px;
+  padding:1px;
+  background:linear-gradient(135deg, var(--c), var(--p));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask-composite:exclude;
+  opacity:.4;
+  pointer-events:none;
+  z-index:0;
+}
+#s-calendar .g2 > .card > *{ position:relative; z-index:1; }
+
+/* ─── Contests — class-driven cards replace inline gradients ── */
+#s-contests #challengeCards > *{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+#s-contests #challengeCards > *::after{
+  content:'';
+  position:absolute; inset:0;
+  border-radius:inherit;
+  padding:1px;
+  background:linear-gradient(135deg, var(--gr, #34d399), var(--c));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask-composite:exclude;
+  opacity:.45;
+  pointer-events:none;
+  z-index:0;
+}
+#s-contests #challengeCards > *:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 22px color-mix(in srgb, var(--gr, #34d399) 22%, transparent);
+}
+#s-contests #challengeCards > * > *{ position:relative; z-index:1; }
+
+#s-contests .contests-deed-card{
+  position:relative;
+  isolation:isolate;
+  background:linear-gradient(135deg,
+    color-mix(in srgb, var(--gr, #34d399) 6%, transparent),
+    color-mix(in srgb, var(--c) 4%, transparent));
+  border:1px solid color-mix(in srgb, var(--gr, #34d399) 22%, transparent);
+  border-radius:12px;
+  padding:.8rem 1rem;
+  margin-bottom:1rem;
+}
+#s-contests .contests-deed-card::after{
+  content:'';
+  position:absolute; inset:0;
+  border-radius:12px;
+  padding:1px;
+  background:linear-gradient(135deg, var(--gr, #34d399), var(--c));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask-composite:exclude;
+  opacity:.5;
+  pointer-events:none;
+  z-index:0;
+}
+#s-contests .contests-deed-card > *{ position:relative; z-index:1; }
+
+#s-contests .contests-family-card{
+  position:relative;
+  isolation:isolate;
+  background:color-mix(in srgb, var(--p) 5%, transparent);
+  border:1px solid color-mix(in srgb, var(--p) 18%, transparent);
+  border-radius:14px;
+  padding:1rem 1.2rem;
+}
+#s-contests .contests-family-card::after{
+  content:'';
+  position:absolute; inset:0;
+  border-radius:14px;
+  padding:1px;
+  background:linear-gradient(135deg, var(--p), var(--c));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask-composite:exclude;
+  opacity:.45;
+  pointer-events:none;
+  z-index:0;
+}
+#s-contests .contests-family-card > *{ position:relative; z-index:1; }
+
+/* ─── Rewards — gradient ring on the locked-msg + grids ──────── */
+#s-rewards #rewardsLockedMsg{
+  position:relative;
+  isolation:isolate;
+  border:1px solid var(--card-border, rgba(255,255,255,.08));
+  border-radius:16px;
+  background:
+    radial-gradient(110% 80% at 50% 0%, color-mix(in srgb, var(--g, #fbbf24) 12%, transparent) 0%, transparent 70%),
+    var(--card-bg, rgba(255,255,255,.04));
+}
+#s-rewards #rewardsLockedMsg::after{
+  content:'';
+  position:absolute; inset:0;
+  border-radius:16px;
+  padding:1.5px;
+  background:linear-gradient(135deg, var(--g, #fbbf24), var(--c));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask-composite:exclude;
+  opacity:.45;
+  pointer-events:none;
+  z-index:0;
+}
+#s-rewards #rewardsLockedMsg > *{ position:relative; z-index:1; }
+
+/* ─── Light theme overrides ──────────────────────────────────── */
+:root.light .cal-dow{ color:#4a4b52 !important; }
+:root.light .phase3-faith-line{ color:#64748b !important; }
+:root.light #s-contests .contests-deed-card{
+  background:linear-gradient(135deg,
+    color-mix(in srgb, var(--gr, #34d399) 8%, #fff),
+    color-mix(in srgb, var(--c) 5%, #fff)) !important;
+  border-color:color-mix(in srgb, var(--gr, #34d399) 30%, #fff) !important;
+}
+:root.light #s-contests .contests-family-card{
+  background:color-mix(in srgb, var(--p) 7%, #fff) !important;
+  border-color:color-mix(in srgb, var(--p) 26%, #fff) !important;
+}
+:root.light #s-rewards #rewardsLockedMsg{
+  background:
+    radial-gradient(110% 80% at 50% 0%, color-mix(in srgb, var(--g, #fbbf24) 10%, #fff) 0%, transparent 70%),
+    #fff !important;
+  border-color:rgba(0,0,0,.08) !important;
+  box-shadow:0 2px 12px rgba(0,0,0,.06);
+}
+/* ════════════════════════════════════════════════════════════ */
+
 /* Inline modal mode — skillsModal lives inside #s-skills after relocation */
 #s-skills > #skillsModal {
   position: static !important;
