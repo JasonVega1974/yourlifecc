@@ -119,6 +119,7 @@ function _renderActiveVariant({ unsubUrl, manageUrl }){
     +     '<p style="font-size:14px;color:#0b1020;margin:0;line-height:1.6;">You\'ll get a weekly family digest every Sunday at 7pm &mdash; a friendly summary of every chore done, goal reached, and badge earned that week. You can turn it off anytime in Settings or right from the email.</p>'
     +   '</div>'
     +   '<p style="font-size:14px;color:#475569;margin:0 0 22px;">Also new: optional friendly reminders (max 1 per week) if you opt in under <strong style="color:#0b1020;">Me &rarr; Settings &rarr; "Engagement emails."</strong></p>'
+    +   '<p style="font-size:14px;color:#475569;margin:0 0 22px;line-height:1.65;"><strong style="color:#0b1020;">One more thing:</strong> I\'m building YourLife CC actively &mdash; my own family uses it every day, and your feedback shapes what gets built next. If something feels off, you have an idea, or a feature you wish existed, just hit reply. I read every message.</p>'
     +   '<div style="text-align:center;margin:28px 0;">'
     +     '<a href="https://yourlifecc.com/app" style="display:inline-block;background:#10b981;color:#ffffff;font-weight:800;padding:14px 28px;border-radius:10px;text-decoration:none;font-size:15px;">Open YourLife CC &rarr;</a>'
     +   '</div>'
@@ -150,6 +151,8 @@ function _renderActiveVariant({ unsubUrl, manageUrl }){
     'You\'ll get a weekly family digest every Sunday at 7pm — a friendly summary of every chore done, goal reached, and badge earned that week. You can turn it off anytime in Settings or right from the email.',
     '',
     'Also new: optional friendly reminders (max 1 per week) if you opt in under Me → Settings → "Engagement emails."',
+    '',
+    'One more thing: I\'m building YourLife CC actively — my own family uses it every day, and your feedback shapes what gets built next. If something feels off, you have an idea, or a feature you wish existed, just hit reply. I read every message.',
     '',
     'Open YourLife CC: https://yourlifecc.com/app',
     '',
@@ -192,6 +195,7 @@ function _renderFaithVariant({ unsubUrl }){
     +     '<div style="font-style:italic;font-size:17px;color:#0b1020;line-height:1.55;margin:0 0 8px;">' + _esc(scripture.text) + '</div>'
     +     '<div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;font-size:12px;color:#a16207;font-weight:700;letter-spacing:.06em;">&mdash; ' + _esc(scripture.ref) + '</div>'
     +   '</div>'
+    +   '<p style="font-size:15px;color:#0b1020;margin:0 0 18px;line-height:1.75;">If you ever want to share what would bless your family, just hit reply &mdash; I read every message. This is a family project, and your voice helps shape it.</p>'
     +   '<p style="font-size:15px;color:#0b1020;margin:0 0 18px;">Whenever you\'re ready, the full app is here for you:</p>'
     +   '<div style="text-align:center;margin:0 0 28px;">'
     +     '<a href="https://yourlifecc.com/?from=announcement" style="display:inline-block;background:#7c3aed;color:#ffffff;font-weight:800;padding:13px 26px;border-radius:10px;text-decoration:none;font-size:15px;font-family:system-ui,-apple-system,Segoe UI,sans-serif;">See what\'s in YourLife CC &rarr;</a>'
@@ -218,6 +222,8 @@ function _renderFaithVariant({ unsubUrl }){
     '',
     '"' + scripture.text + '"',
     '  — ' + scripture.ref,
+    '',
+    'If you ever want to share what would bless your family, just hit reply — I read every message. This is a family project, and your voice helps shape it.',
     '',
     'Whenever you\'re ready, the full app is here for you:',
     'See what\'s in YourLife CC: https://yourlifecc.com/?from=announcement',
