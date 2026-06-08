@@ -9471,8 +9471,19 @@
   </div>
 
   <!-- ════ FAITH HOME (F2-A — default landing tab) ════ -->
-  <!-- Brand-palette discipline: cyan #38bdf8 + violet #a78bfa primary tokens only.
-       No #667eea / #764ba2 / Orbitron. Pulls from existing data — no new schema. -->
+  <!-- Brand palette notes:
+       • Non-faith chrome uses --c (cyan #38bdf8) + --p (violet #a78bfa)
+         as the primary token pair.
+       • Kingdom card theme (#667eea → #764ba2) is intentionally reserved
+         for Faith stack surfaces (Christian Life Guide, Worship Playlist,
+         Bible Lands). Default --cd-banner value in app.css:17.
+       • Orbitron is fully retired (Phase 3, 2026-06-07).
+       The Well home tab below uses brand cyan/violet for its own chrome
+       but lets nested Faith content render in Kingdom purple. -->
+  <!-- 2026-06-07 — Phase 3 brand-polish audit: prohibition comment
+       replaced with an accurate documenting comment. The old comment
+       contradicted the actual Kingdom-theme default shipping under
+       --cd-banner; this version documents the live brand state. -->
   <div id="bf-home">
     <style>
       /* The Well home — clean VOTD strip + welcome + card grid */
