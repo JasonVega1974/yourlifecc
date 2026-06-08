@@ -5110,6 +5110,13 @@
     <button type="button" onclick="openGoalSuggest()" style="background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.28);color:var(--section-goals);padding:.5rem 1rem;border-radius:9px;cursor:pointer;font-size:.8rem;font-weight:700;font-family:var(--fm);display:inline-flex;align-items:center;gap:.4rem;">✨ Need inspiration?</button>
   </div>
 
+  <!-- 2026-06-07 — Goals Inc 2: badge strip. Populated by
+       renderGoalBadgeStrip() in goals.js from GOAL_MILESTONES.
+       Earned badges shimmer + tap to share PNG; locked badges
+       show 🔒 + tap-toast criteria. Backed by D.goalMilestones{}
+       (permanent ratchet, one-way). -->
+  <div id="goalBadgeStrip" aria-label="Goal milestone badges"></div>
+
   <div id="goalsList" style="margin-bottom:1.2rem;"></div>
 
   <!-- ── Career Explorer ────────────────────────────────────────── -->
