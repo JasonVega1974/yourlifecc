@@ -72,6 +72,463 @@ function _goalDomainOpen(){
   }
 }
 
+// ════════════════════════════════════════════════════════════
+// 2026-06-07 — Goals Inc 2: Milestone badges + PNG share.
+//
+// GOAL_MILESTONES is the central config. Each entry carries the id
+// (shared with misc.js BADGES via 'g-<id>' prefix), display name,
+// glyph, color theme (used by the share PNG accent), short criterion
+// description, and a check() function reading D / runtime state.
+//
+// _checkGoalMilestones runs every check after each relevant save();
+// first earn is written to D.goalMilestones[id] = YYYY-MM-DD and
+// fires celebration. Same one-way-ratchet shape as Skills certs +
+// Health milestones (D.skillCerts, D.healthMilestones).
+//
+// shareGoalImage(goalId) renders a 1080x1080 canvas portrait of a
+// completed goal (header + goal text + category + earner name +
+// date + brand) and tries Web Share files API, falling back to
+// download. Same engine as shareCertImage + shareBadgeImage.
+// ════════════════════════════════════════════════════════════
+const GOAL_MILESTONES = [
+  { id:'firstGoal',     name:'Goal Setter',      icon:'🎯', color:'#f97316',
+    desc:'Set your first goal.',
+    check: function(){ return ((D && Array.isArray(D.goals)) ? D.goals.length : 0) >= 1; } },
+  { id:'vision',        name:'Visionary',        icon:'✦', color:'#a78bfa',
+    desc:'Write your life vision statement.',
+    check: function(){ return !!(D && D.vision && String(D.vision).trim().length > 0); } },
+  { id:'firstAchieved', name:'First Win',        icon:'🏆', color:'#fbbf24',
+    desc:'Complete your first goal.',
+    check: function(){
+      const g = (D && Array.isArray(D.goals)) ? D.goals : [];
+      return g.some(function(x){ return x && x.done; });
+    } },
+  { id:'5goals',        name:'High Five',        icon:'🚀', color:'#22d3ee',
+    desc:'Complete 5 goals.',
+    check: function(){
+      const g = (D && Array.isArray(D.goals)) ? D.goals : [];
+      return g.filter(function(x){ return x && x.done; }).length >= 5;
+    } },
+  { id:'longGoal',      name:'Mountain Climber', icon:'🏔', color:'#818cf8',
+    desc:'Complete your first long-term goal.',
+    check: function(){
+      const g = (D && Array.isArray(D.goals)) ? D.goals : [];
+      return g.some(function(x){ return x && x.done && x.type === 'long'; });
+    } },
+  { id:'timeline',      name:'Future Self',      icon:'🗺️', color:'#38bdf8',
+    desc:'Fill all 4 timeline year visions (1/3/5/10).',
+    check: function(){
+      const t = (D && D.timeline && typeof D.timeline === 'object') ? D.timeline : {};
+      return [1,3,5,10].every(function(yr){
+        return !!(t[yr] && String(t[yr]).trim().length > 0);
+      });
+    } },
+  { id:'breakdown',     name:'Strategist',       icon:'🔍', color:'#34d399',
+    desc:'Add milestones + actions to 3 goals.',
+    check: function(){
+      const g = (D && Array.isArray(D.goals)) ? D.goals : [];
+      // A "broken-down" goal: at least 1 milestone with at least 1 action.
+      const broken = g.filter(function(x){
+        if(!x || !Array.isArray(x.milestones) || !x.milestones.length) return false;
+        return x.milestones.some(function(m){
+          return m && Array.isArray(m.actions) && m.actions.length >= 1;
+        });
+      }).length;
+      return broken >= 3;
+    } },
+  { id:'streak3w',      name:'On a Roll',        icon:'🔥', color:'#ef4444',
+    desc:'Complete a goal 3 calendar weeks in a row.',
+    check: function(){
+      const g = (D && Array.isArray(D.goals)) ? D.goals : [];
+      const done = g.filter(function(x){ return x && x.done && x.completedDate; });
+      if(done.length < 3) return false;
+      // Bucket by ISO-ish week key (year + week-of-year). Walk back from
+      // the current week — if THIS week and the two before each have a
+      // completion, the streak is hit.
+      function weekKey(dateStr){
+        const d = new Date(dateStr);
+        if(isNaN(d.getTime())) return null;
+        const tmp = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+        tmp.setUTCDate(tmp.getUTCDate() + 4 - (tmp.getUTCDay() || 7));
+        const yearStart = new Date(Date.UTC(tmp.getUTCFullYear(), 0, 1));
+        const w = Math.ceil(((tmp - yearStart) / 86400000 + 1) / 7);
+        return tmp.getUTCFullYear() + '-W' + String(w).padStart(2,'0');
+      }
+      const weeks = new Set();
+      done.forEach(function(x){
+        const k = weekKey(x.completedDate);
+        if(k) weeks.add(k);
+      });
+      // Walk back 0/1/2 weeks from today — all three must be present.
+      const today = new Date();
+      for(let off = 0; off < 3; off++){
+        const d = new Date(today); d.setDate(today.getDate() - off * 7);
+        const k = weekKey(d.toISOString().slice(0,10));
+        if(!k || !weeks.has(k)) return false;
+      }
+      return true;
+    } }
+];
+
+function _checkGoalMilestones(){
+  if(!D.goalMilestones || typeof D.goalMilestones !== 'object') D.goalMilestones = {};
+  let anyNew = false;
+  GOAL_MILESTONES.forEach(function(m){
+    if(D.goalMilestones[m.id]) return; // already earned — one-way ratchet
+    let earned = false;
+    try { earned = !!m.check(); } catch(e){ earned = false; }
+    if(earned){
+      D.goalMilestones[m.id] = new Date().toISOString().slice(0,10);
+      anyNew = true;
+      // Stagger so multiple-at-once still feel distinct.
+      setTimeout(function(){ _celebrateGoalMilestone(m); }, 100);
+    }
+  });
+  if(anyNew){
+    if(typeof save === 'function') save();
+    // Re-paint the inline badge strip if it's on screen.
+    if(typeof renderGoalBadgeStrip === 'function') renderGoalBadgeStrip();
+  }
+}
+
+function _celebrateGoalMilestone(m){
+  if(!m) return;
+  if(typeof launchBigConfetti === 'function') launchBigConfetti();
+  if(typeof showToast === 'function'){
+    showToast('🏆 Badge earned: ' + m.name + ' ' + m.icon);
+  }
+}
+
+function renderGoalBadgeStrip(){
+  const host = document.getElementById('goalBadgeStrip');
+  if(!host) return;
+  // Defensive check first so freshly-earnable badges land before paint.
+  _checkGoalMilestones();
+  const earned = (D && D.goalMilestones && typeof D.goalMilestones === 'object') ? D.goalMilestones : {};
+  const earnedCount = GOAL_MILESTONES.filter(function(m){ return !!earned[m.id]; }).length;
+  const total = GOAL_MILESTONES.length;
+  const pct = Math.round((earnedCount / total) * 100);
+
+  host.innerHTML =
+      '<div class="g-bs-header">'
+    +   '<div class="g-bs-title">🏆 Goal Badges</div>'
+    +   '<div class="g-bs-progress-pill"><span>' + earnedCount + '</span>/<span class="g-bs-progress-total">' + total + '</span></div>'
+    + '</div>'
+    + '<div class="g-bs-track"><div class="g-bs-fill" style="width:' + pct + '%;"></div></div>'
+    + '<div class="g-bs-scroll">'
+    +   GOAL_MILESTONES.map(function(m){
+        const isEarned = !!earned[m.id];
+        const date = isEarned ? earned[m.id] : '';
+        return '<button type="button" class="g-bs-card' + (isEarned ? ' is-earned' : ' is-locked') + '"'
+          + ' style="--badge-accent:' + m.color + ';"'
+          + ' onclick="' + (isEarned ? '_shareEarnedBadge(\'' + m.id + '\')' : '_showGoalBadgeCriteria(\'' + m.id + '\')') + '"'
+          + ' aria-label="' + m.name + (isEarned ? ', earned ' + date : ', locked, ' + m.desc) + '">'
+          + (isEarned ? '<span class="g-bs-shine" aria-hidden="true"></span>' : '')
+          + '<span class="g-bs-glyph" aria-hidden="true">' + m.icon + '</span>'
+          + '<span class="g-bs-name">' + m.name + '</span>'
+          + (isEarned ? '<span class="g-bs-date">' + date + '</span>' : '<span class="g-bs-lock">🔒</span>')
+        + '</button>';
+      }).join('')
+    + '</div>';
+}
+
+function _showGoalBadgeCriteria(id){
+  const m = GOAL_MILESTONES.find(function(x){ return x.id === id; });
+  if(!m) return;
+  if(typeof showToast === 'function') showToast(m.icon + ' ' + m.name + ' — ' + m.desc);
+}
+
+// Goal-badge share routes to the existing milestone-style PNG render.
+// Reuses the shareBadgeImage engine pattern but with goal-themed copy.
+function _shareEarnedBadge(id){
+  const m = GOAL_MILESTONES.find(function(x){ return x.id === id; });
+  if(!m){ return; }
+  _shareGoalBadgePng(m);
+}
+
+// Hex → rgba helper for canvas gradient stops (shared with the
+// per-goal PNG renderer below).
+function _gHexAlpha(hex, alpha){
+  if(!hex || hex.charAt(0) !== '#') return 'rgba(255,255,255,' + alpha + ')';
+  let h = hex.slice(1);
+  if(h.length === 3) h = h.split('').map(function(c){ return c + c; }).join('');
+  if(h.length !== 6) return hex;
+  const r = parseInt(h.slice(0,2), 16);
+  const g = parseInt(h.slice(2,4), 16);
+  const b = parseInt(h.slice(4,6), 16);
+  return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+}
+
+async function _shareGoalBadgePng(m){
+  const earned = (D && D.goalMilestones && typeof D.goalMilestones === 'object') ? D.goalMilestones : {};
+  const date = earned[m.id];
+  if(!date){
+    if(typeof showToast === 'function') showToast('Earn this badge first 🏆');
+    return;
+  }
+  const userName = (D && D.name) ? String(D.name).toUpperCase() : 'CHAMPION';
+  const accent = m.color || '#f97316';
+  const W = 1080, H = 1080;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  if(!ctx){
+    if(typeof showToast === 'function') showToast('Canvas not supported');
+    return;
+  }
+
+  // Background + halo
+  const bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, '#0d1117'); bg.addColorStop(0.5, '#1e293b'); bg.addColorStop(1, '#0d1117');
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+  const halo = ctx.createRadialGradient(W/2, H/2 - 60, 0, W/2, H/2 - 60, W*0.55);
+  halo.addColorStop(0, _gHexAlpha(accent, 0.25)); halo.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = halo; ctx.fillRect(0, 0, W, H);
+
+  // Borders
+  ctx.strokeStyle = accent; ctx.lineWidth = 6; ctx.strokeRect(50, 50, W - 100, H - 100);
+  ctx.strokeStyle = _gHexAlpha(accent, 0.35); ctx.lineWidth = 1; ctx.strokeRect(72, 72, W - 144, H - 144);
+
+  // Corner brackets
+  const cornerSize = 64;
+  ctx.strokeStyle = accent; ctx.lineWidth = 4;
+  function corner(x, y, dx, dy){
+    ctx.beginPath();
+    ctx.moveTo(x + dx*cornerSize, y); ctx.lineTo(x, y); ctx.lineTo(x, y + dy*cornerSize);
+    ctx.stroke();
+  }
+  corner(72, 72, 1, 1); corner(W - 72, 72, -1, 1);
+  corner(72, H - 72, 1, -1); corner(W - 72, H - 72, -1, -1);
+
+  // Header
+  ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = accent;
+  ctx.font = '800 32px "Segoe UI", system-ui, -apple-system, sans-serif';
+  ctx.fillText('✦  YOURLIFE  BADGE  ✦', W/2, 180);
+
+  // Glyph in ring
+  const ringR = 150;
+  const ringX = W/2, ringY = 430;
+  const glow = ctx.createRadialGradient(ringX, ringY, ringR * 0.6, ringX, ringY, ringR * 1.6);
+  glow.addColorStop(0, _gHexAlpha(accent, 0.35)); glow.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = glow;
+  ctx.beginPath(); ctx.arc(ringX, ringY, ringR * 1.6, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = accent; ctx.lineWidth = 6;
+  ctx.beginPath(); ctx.arc(ringX, ringY, ringR, 0, Math.PI * 2); ctx.stroke();
+  ctx.strokeStyle = _gHexAlpha(accent, 0.4); ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.arc(ringX, ringY, ringR - 16, 0, Math.PI * 2); ctx.stroke();
+  ctx.font = '180px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", system-ui, sans-serif';
+  ctx.fillText(m.icon, ringX, ringY + 64);
+
+  // Name + stars + desc
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '900 64px "Segoe UI", system-ui, -apple-system, sans-serif';
+  ctx.fillText((m.name || '').toUpperCase(), W/2, 700);
+  ctx.fillStyle = accent;
+  ctx.font = '34px "Segoe UI Symbol", "Apple Symbols", system-ui, sans-serif';
+  ctx.fillText('★  ★  ★  ★  ★', W/2, 760);
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.font = 'italic 500 22px "Segoe UI", system-ui, -apple-system, sans-serif';
+  ctx.fillText(m.desc, W/2, 815);
+
+  // Earner row + footer
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.font = '700 12px "Segoe UI", system-ui, sans-serif';
+  ctx.fillText('EARNED  BY', W/2, 880);
+  ctx.fillStyle = accent;
+  ctx.font = '900 36px "Segoe UI", system-ui, -apple-system, sans-serif';
+  ctx.fillText(userName, W/2, 920);
+  ctx.fillStyle = 'rgba(255,255,255,0.45)';
+  ctx.font = '500 18px "Segoe UI", system-ui, sans-serif';
+  ctx.fillText('on ' + date, W/2, 955);
+  ctx.fillStyle = accent;
+  ctx.font = '700 16px "Segoe UI", system-ui, sans-serif';
+  ctx.fillText('yourlifecc.com', W/2, H - 90);
+
+  // Export + share/download
+  await _gExportAndShare(canvas, 'yourlifecc-goal-badge-' + m.id + '.png',
+    'Earned the ' + m.name + ' badge on YourLife CC! 🏆 — yourlifecc.com',
+    'YourLife CC badge');
+}
+
+// Per-goal PNG share — triggered from the completion slide-in card's
+// "Share win" button. Different layout from the badge PNG: emphasizes
+// the goal text + category emoji + optional motivation line.
+async function shareGoalImage(goalId){
+  const g = (D && Array.isArray(D.goals)) ? D.goals.find(function(x){ return x && x.id === goalId; }) : null;
+  if(!g || !g.done){
+    if(typeof showToast === 'function') showToast('Complete the goal first 🏆');
+    return;
+  }
+  // Resolve category accent + icon from GOAL_DOMAINS.
+  const dom = (typeof GOAL_DOMAINS !== 'undefined')
+    ? GOAL_DOMAINS.find(function(d){ return d.match === g.cat; })
+    : null;
+  const accent = (dom && dom.accent) || '#f97316';
+  const icon   = (dom && dom.icon)   || '🎯';
+  const catName = (g.cat || '').toUpperCase();
+  const userName = (D && D.name) ? String(D.name).toUpperCase() : 'CHAMPION';
+  const date = g.completedDate || new Date().toLocaleDateString();
+  const motivation = (g.motivation || '').trim().slice(0, 140);
+
+  const W = 1080, H = 1080;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  if(!ctx){
+    if(typeof showToast === 'function') showToast('Canvas not supported');
+    return;
+  }
+
+  // Background + halo
+  const bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, '#0d1117'); bg.addColorStop(0.5, '#1e293b'); bg.addColorStop(1, '#0d1117');
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+  const halo = ctx.createRadialGradient(W/2, H/2 - 80, 0, W/2, H/2 - 80, W*0.6);
+  halo.addColorStop(0, _gHexAlpha(accent, 0.28)); halo.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = halo; ctx.fillRect(0, 0, W, H);
+
+  // Borders + corners
+  ctx.strokeStyle = accent; ctx.lineWidth = 6; ctx.strokeRect(50, 50, W - 100, H - 100);
+  ctx.strokeStyle = _gHexAlpha(accent, 0.35); ctx.lineWidth = 1; ctx.strokeRect(72, 72, W - 144, H - 144);
+  const cornerSize = 64;
+  ctx.strokeStyle = accent; ctx.lineWidth = 4;
+  function corner(x, y, dx, dy){
+    ctx.beginPath();
+    ctx.moveTo(x + dx*cornerSize, y); ctx.lineTo(x, y); ctx.lineTo(x, y + dy*cornerSize);
+    ctx.stroke();
+  }
+  corner(72, 72, 1, 1); corner(W - 72, 72, -1, 1);
+  corner(72, H - 72, 1, -1); corner(W - 72, H - 72, -1, -1);
+
+  // Header
+  ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = accent;
+  ctx.font = '800 30px "Segoe UI", system-ui, -apple-system, sans-serif';
+  ctx.fillText('✦  GOAL  ACHIEVED  ✦', W/2, 160);
+
+  // Big category icon
+  ctx.font = '150px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", system-ui, sans-serif';
+  ctx.fillText(icon, W/2, 340);
+
+  // Category name pill (small)
+  if(catName){
+    ctx.fillStyle = _gHexAlpha(accent, 0.18);
+    const pillW = Math.min(W - 200, 360 + catName.length * 12);
+    const pillX = (W - pillW) / 2, pillY = 380, pillH = 36;
+    if(typeof ctx.roundRect === 'function'){
+      ctx.beginPath(); ctx.roundRect(pillX, pillY, pillW, pillH, 18); ctx.fill();
+    } else {
+      ctx.fillRect(pillX, pillY, pillW, pillH);
+    }
+    ctx.fillStyle = accent;
+    ctx.font = '800 16px "Segoe UI", system-ui, sans-serif';
+    ctx.fillText(catName, W/2, pillY + 23);
+  }
+
+  // Goal text — word-wrap into up to 4 lines
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '900 48px "Segoe UI", system-ui, -apple-system, sans-serif';
+  const goalLines = _gWrapText(ctx, g.text || '', W - 200, 4);
+  const lineY0 = 510;
+  goalLines.forEach(function(line, i){
+    ctx.fillText(line, W/2, lineY0 + i * 64);
+  });
+  const afterGoalY = lineY0 + goalLines.length * 64 + 10;
+
+  // Optional motivation line (italic)
+  if(motivation){
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.font = 'italic 500 22px "Segoe UI", system-ui, -apple-system, sans-serif';
+    const motLines = _gWrapText(ctx, '"' + motivation + '"', W - 240, 3);
+    motLines.forEach(function(line, i){
+      ctx.fillText(line, W/2, afterGoalY + i * 30);
+    });
+  }
+
+  // Earner row + footer
+  const earnerY = H - 220;
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.font = '700 12px "Segoe UI", system-ui, sans-serif';
+  ctx.fillText('ACHIEVED  BY', W/2, earnerY);
+  ctx.fillStyle = accent;
+  ctx.font = '900 36px "Segoe UI", system-ui, -apple-system, sans-serif';
+  ctx.fillText(userName, W/2, earnerY + 42);
+  ctx.fillStyle = 'rgba(255,255,255,0.45)';
+  ctx.font = '500 18px "Segoe UI", system-ui, sans-serif';
+  ctx.fillText('on ' + date, W/2, earnerY + 72);
+
+  // Brand footer
+  ctx.fillStyle = accent;
+  ctx.font = '700 16px "Segoe UI", system-ui, sans-serif';
+  ctx.fillText('yourlifecc.com', W/2, H - 90);
+
+  await _gExportAndShare(canvas, 'yourlifecc-goal-' + g.id + '.png',
+    'Just achieved my goal on YourLife CC: ' + (g.text || '').slice(0, 80) + ' 🏆 — yourlifecc.com',
+    'Goal achieved');
+}
+
+// Word-wrap helper for canvas. Greedy fill, max N lines, last line
+// truncated with ellipsis if more text remains.
+function _gWrapText(ctx, text, maxWidth, maxLines){
+  const words = String(text || '').split(/\s+/).filter(Boolean);
+  const lines = [];
+  let cur = '';
+  for(let i = 0; i < words.length; i++){
+    const test = cur ? cur + ' ' + words[i] : words[i];
+    if(ctx.measureText(test).width > maxWidth && cur){
+      lines.push(cur);
+      cur = words[i];
+      if(lines.length >= maxLines - 1){
+        // Last allowed line — pack the rest with ellipsis if too long.
+        let rest = cur;
+        for(let j = i + 1; j < words.length; j++){ rest = rest + ' ' + words[j]; }
+        while(rest && ctx.measureText(rest + '…').width > maxWidth){
+          rest = rest.slice(0, -1);
+        }
+        lines.push(rest + (words.length > i + 1 || rest !== cur ? '…' : ''));
+        return lines;
+      }
+    } else {
+      cur = test;
+    }
+  }
+  if(cur) lines.push(cur);
+  return lines;
+}
+
+// Shared blob → Web Share / download fallback.
+async function _gExportAndShare(canvas, filename, shareText, shareTitle){
+  let blob;
+  try {
+    blob = await new Promise(function(resolve){ canvas.toBlob(resolve, 'image/png', 0.95); });
+  } catch(e){ blob = null; }
+  if(!blob){
+    if(typeof showToast === 'function') showToast('Could not render image');
+    return;
+  }
+  try {
+    if(navigator.canShare && navigator.share && typeof File === 'function'){
+      const file = new File([blob], filename, { type: 'image/png' });
+      if(navigator.canShare({ files: [file] })){
+        try {
+          await navigator.share({ files: [file], title: shareTitle, text: shareText });
+          return;
+        } catch(shareErr){
+          if(shareErr && shareErr.name === 'AbortError') return;
+        }
+      }
+    }
+  } catch(_){}
+  // Download fallback
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 5000);
+  if(typeof showToast === 'function') showToast('Image saved 📥');
+}
+
 // ── GOALS ─────────────────────────────────────────────────────
 // Phase C-Goals (2026-05-15) — additions:
 //   • motivation field on the goal ("What would completing this make possible?")
@@ -97,6 +554,8 @@ function saveGoal(){
   document.getElementById('gText').value = '';
   const mEl = document.getElementById('gMotivation'); if(mEl) mEl.value = '';
   save(); renderGoals(); closeModal('goalAddModal'); showToast('Goal added! 🎯');
+  // 2026-06-07 — Goals Inc 2: milestone check (firstGoal).
+  if(typeof _checkGoalMilestones === 'function') _checkGoalMilestones();
 }
 function toggleGoal(id){ const g=(Array.isArray(D.goals)?D.goals:[]).find(g=>g.id===id); if(g){g.done=!g.done;if(g.done)g.completedDate=new Date().toLocaleDateString();save();renderGoals();showToast(g.done?'🏆 Goal achieved!':'Unchecked');} }
 function editGoal(id){ const g=(Array.isArray(D.goals)?D.goals:[]).find(g=>g.id===id); if(!g) return; const n=prompt('Edit:',g.text); if(!n) return; g.text=n.trim(); save(); renderGoals(); }
@@ -155,6 +614,9 @@ function renderGoals(){
   // 2026-06-07 — Goals Inc 1: refresh the 10-domain Power Cards strip
   // so completion rings track the latest D.goals state without a reload.
   if(typeof renderGoalDomainStrip === 'function') renderGoalDomainStrip();
+  // 2026-06-07 — Goals Inc 2: refresh the inline badge strip so newly-
+  // earnable milestones land + render after every list change.
+  if(typeof renderGoalBadgeStrip === 'function') renderGoalBadgeStrip();
 }
 
 function renderGoalCard(g){
@@ -265,6 +727,9 @@ function addMilestone(gid){
   if(!text || !text.trim()) return;
   g.milestones.push({id: Date.now(), text: text.trim(), done: false, actions: []});
   save(); renderGoals();
+  // 2026-06-07 — Goals Inc 2: milestone check (breakdown — 3 goals w/
+  // both milestones and at least one action; ms alone doesn't qualify).
+  if(typeof _checkGoalMilestones === 'function') _checkGoalMilestones();
 }
 
 function deleteMilestone(gid, mid){
@@ -297,6 +762,9 @@ function addAction(gid, mid){
   if(!text || !text.trim()) return;
   m.actions.push({id: Date.now() + Math.floor(Math.random()*1000), text: text.trim(), done: false});
   save(); renderGoals();
+  // 2026-06-07 — Goals Inc 2: milestone check (breakdown — adding the
+  // first action to a goal can unlock the badge).
+  if(typeof _checkGoalMilestones === 'function') _checkGoalMilestones();
 }
 
 function deleteAction(gid, mid, aid){
@@ -338,8 +806,10 @@ function checkGoalAutoComplete(gid){
 }
 
 function showGoalCompletionCard(g){
-  // Slide-in completion card. Auto-dismisses after 4s, dismissable on tap.
-  // Respects prefers-reduced-motion via opacity-only transition (no transform).
+  // Slide-in completion card. Auto-dismisses after 6s (longer than Phase
+  // C-Goals' 4s because there's now a Share win button worth tapping),
+  // dismissable on tap anywhere except the share button. Respects
+  // prefers-reduced-motion via opacity-only transition (no transform).
   const existing = document.getElementById('goalCompletionCard');
   if(existing) existing.remove();
   const reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -350,7 +820,13 @@ function showGoalCompletionCard(g){
   card.innerHTML = '<div style="font-size:1.9rem;line-height:1;margin-bottom:.4rem;">🎉</div>'
     + '<div style="font-family:var(--fh);font-size:1.35rem;letter-spacing:.04em;margin-bottom:.3rem;">You did it!</div>'
     + '<div style="font-size:.94rem;font-weight:600;line-height:1.4;">'+escapeHtml(g.text)+'</div>'
-    + '<div style="font-size:.74rem;opacity:.85;margin-top:.4rem;">Completed '+(g.completedDate||new Date().toLocaleDateString())+'</div>';
+    + '<div style="font-size:.74rem;opacity:.85;margin-top:.4rem;">Completed '+(g.completedDate||new Date().toLocaleDateString())+'</div>'
+    // 2026-06-07 — Goals Inc 2: Share win button. Calls shareGoalImage
+    // (canvas PNG + Web Share API + download fallback). stopPropagation
+    // on the inline onclick prevents the card-dismiss click from firing.
+    + '<button class="g-share-win-btn" onclick="event.stopPropagation();shareGoalImage('+g.id+');">'
+    +   '<span aria-hidden="true">📸</span> Share win'
+    + '</button>';
   document.body.appendChild(card);
   requestAnimationFrame(() => {
     card.style.opacity = '1';
@@ -362,7 +838,7 @@ function showGoalCompletionCard(g){
       if(!reduce) card.style.transform = 'translateX(-50%) translateY(-20px)';
       setTimeout(() => { try{ card.remove(); }catch(e){} }, 400);
     }
-  }, 4000);
+  }, 6000);
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -478,6 +954,9 @@ function completeGoal(id){
     }
     if(typeof launchSideConfetti === 'function') launchSideConfetti();
     showGoalCompletionCard(g);
+    // 2026-06-07 — Goals Inc 2: milestone check (firstAchieved / 5goals /
+    // longGoal / streak3w — all of these may fire on a completion).
+    if(typeof _checkGoalMilestones === 'function') _checkGoalMilestones();
   }
 }
 
@@ -497,6 +976,8 @@ function saveVision(){
   D.vision = document.getElementById('visionEditArea').value.trim();
   save(); renderVision(); closeModal('visionEditModal');
   showToast('Vision saved ✦');
+  // 2026-06-07 — Goals Inc 2: milestone check (vision).
+  if(typeof _checkGoalMilestones === 'function') _checkGoalMilestones();
 }
 
 function renderVision(){
@@ -535,6 +1016,8 @@ function saveTl(){
   D.timeline[_tlEditYear] = document.getElementById('tlEditArea').value.trim();
   save(); renderTimeline(); closeModal('tlEditModal');
   showToast(`${_tlEditYear}-year vision saved!`);
+  // 2026-06-07 — Goals Inc 2: milestone check (timeline — all 4 filled).
+  if(typeof _checkGoalMilestones === 'function') _checkGoalMilestones();
 }
 
 function renderTimeline(){
