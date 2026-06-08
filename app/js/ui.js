@@ -1504,7 +1504,16 @@ function _updateMobileHomeBack(){
                    (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
   var narrow = (window.innerWidth || document.documentElement.clientWidth || 0) <= 860;
   var isHome = (_activeSection === 's-hero') || !_activeSection;
-  btn.style.display = ((standalone || narrow) && !isHome) ? 'inline-flex' : 'none';
+  // 2026-06-08 — Honor the original design contract documented at
+  // index.html:19822 ("teen accounts only, hidden when body.parent-view"):
+  // hide the Back button for parents. The button onclick is hardcoded to
+  // showSection('s-hero'), which the Option 1 routing guard (commit
+  // e6cfd29) now redirects to s-parent for parents — so the button would
+  // appear non-responsive (parent stays on Parent Hub regardless of tap).
+  // Parents navigate inside Parent Hub via sub-tabs, not via a global
+  // Back button; the previous visibility logic missed this case.
+  var isParent = document.body && document.body.classList.contains('parent-view');
+  btn.style.display = ((standalone || narrow) && !isHome && !isParent) ? 'inline-flex' : 'none';
 }
 
 // ════════════════════════════════════════════════════════════
@@ -2192,14 +2201,26 @@ function showSection(id, fromMobile){
   // Scroll to top of main
   window.scrollTo(0,0);
 
-  // Auto-bypass Parent Hub gate if currently within the unlock window or PIN
-  // gate is disabled. Does NOT extend the unlock — must be active already.
-  if(id==='s-parent' && typeof D!=='undefined' && ((typeof isParentUnlocked==='function' && isParentUnlocked()) || D.parentPinDisabled)){
-    const gate = document.getElementById('parentGate');
-    const content = document.getElementById('parentDashContent');
-    if(gate) gate.style.display='none';
-    if(content) content.style.display='block';
-    setTimeout(()=>{ typeof renderParentDash==='function'&&renderParentDash(); typeof updateIncConditions==='function'&&updateIncConditions(); },50);
+  // 2026-06-08 — Delegate Parent Hub gate-bypass to unlockParentDash() so
+  // the full set of conditions is single-source-of-truth. unlockParentDash
+  // (parent.js:71) checks, in order:
+  //   1. D.parentPinDisabled       → unlock
+  //   2. localStorage.ylcc_post_login stamp within 5 min → unlock  ← the
+  //      grace path that auth.js:144 + init.js:317 set on fresh sign-in
+  //      and session restore respectively. This was the missing check —
+  //      the previous inline guard only saw isParentUnlocked() (in-memory,
+  //      resets to 0 every page load), so returning users hit the PIN
+  //      prompt on every reopen even though a valid stamp was in
+  //      localStorage.
+  //   3. no PIN set (parentPinHash + chorePin + parentPIN all empty)
+  //                                  → unlock
+  //   4. otherwise                   → leave the PIN gate visible
+  // When unlock fires it calls _doUnlockParent() which hides #parentGate,
+  // shows #parentDashContent, runs renderParentDash + updateIncConditions,
+  // and stamps body.parent-unlocked. So delegating here is a strict
+  // superset of the previous behavior.
+  if(id==='s-parent' && typeof unlockParentDash === 'function'){
+    unlockParentDash();
   }
 
   // V1 Rebuild · Session 1 — refresh the Daily Briefing whenever the user
