@@ -15936,6 +15936,148 @@
           @media (prefers-reduced-motion: reduce){
             #s-parent .ph-act-chip-dot{ animation:none; opacity:.85; }
           }
+
+          /* ════════════════════════════════════════════════════════
+             Family Activity Feed (FAF Inc 3) — unified feed surface
+             ─────────────────────────────────────────────────────────
+             Scoped to #s-parent #ph-activity so these tokens never
+             bleed outside the Parent Hub Activity tab. The Inc 4
+             home strip rules are appended after the entry styles.
+             ════════════════════════════════════════════════════════ */
+          #s-parent #ph-activity .faf-pills-row{
+            display:flex; gap:.4rem; flex-wrap:wrap; margin-bottom:.6rem;
+          }
+          #s-parent #ph-activity .faf-pills-row + .faf-pills-row{
+            margin-bottom:.8rem;
+          }
+          #s-parent #ph-activity .faf-pill{
+            font:600 .68rem/1 var(--fm); letter-spacing:.02em;
+            padding:.4rem .7rem; border-radius:999px;
+            background:rgba(255,255,255,.04); color:var(--tx2);
+            border:1px solid rgba(255,255,255,.08); cursor:pointer;
+            transition:background .15s, color .15s, border-color .15s;
+            white-space:nowrap;
+          }
+          #s-parent #ph-activity .faf-pill:hover{
+            background:rgba(255,255,255,.08); color:var(--tx);
+          }
+          #s-parent #ph-activity .faf-pill.is-active{
+            background:var(--pc-violet-soft); color:var(--pc-violet);
+            border-color:var(--pc-violet-bd); font-weight:800;
+          }
+          /* Domain pills tinted with their own accent when active. */
+          #s-parent #ph-activity .faf-pill-domain.is-active{
+            background:color-mix(in srgb, var(--faf-accent) 14%, transparent);
+            color:var(--faf-accent);
+            border-color:color-mix(in srgb, var(--faf-accent) 35%, transparent);
+          }
+          #s-parent #ph-activity .faf-divider{
+            height:1px; background:rgba(255,255,255,.06);
+            margin:.6rem 0 1rem;
+          }
+          #s-parent #ph-activity .faf-day-group{
+            margin-bottom:1.2rem;
+          }
+          #s-parent #ph-activity .faf-day-group:last-child{
+            margin-bottom:.4rem;
+          }
+          #s-parent #ph-activity .faf-day-label{
+            font:800 .58rem/1.4 var(--fn); letter-spacing:.18em;
+            text-transform:uppercase; color:var(--tx3);
+            margin-bottom:.5rem; padding:0 .15rem;
+          }
+          #s-parent #ph-activity .faf-entry{
+            display:flex; align-items:center; gap:.7rem;
+            padding:.55rem .7rem; border-radius:10px;
+            background:rgba(255,255,255,.025);
+            border:1px solid rgba(255,255,255,.04);
+            margin-bottom:.3rem;
+            transition:background .15s, border-color .15s;
+          }
+          #s-parent #ph-activity .faf-entry:hover{
+            background:rgba(255,255,255,.05);
+            border-color:var(--faf-accent-bd, rgba(255,255,255,.08));
+          }
+          #s-parent #ph-activity .faf-entry-icon{
+            width:32px; height:32px; flex-shrink:0;
+            display:grid; place-items:center;
+            border-radius:8px; font-size:.95rem; line-height:1;
+            background:var(--faf-accent-soft, rgba(255,255,255,.06));
+            border:1px solid var(--faf-accent-bd, rgba(255,255,255,.08));
+          }
+          #s-parent #ph-activity .faf-entry-body{
+            flex:1; min-width:0;
+          }
+          #s-parent #ph-activity .faf-entry-title{
+            font-size:.78rem; line-height:1.35; color:var(--tx);
+            display:block; overflow-wrap:break-word; word-break:break-word;
+          }
+          #s-parent #ph-activity .faf-entry-meta{
+            display:flex; align-items:center; gap:.5rem;
+            margin-top:.18rem; flex-wrap:wrap;
+          }
+          #s-parent #ph-activity .faf-entry-domain{
+            font-size:.55rem; font-weight:800; letter-spacing:.1em;
+            text-transform:uppercase; color:var(--faf-accent, var(--tx3));
+          }
+          #s-parent #ph-activity .faf-entry-kid{
+            font-size:.6rem; font-weight:700; color:var(--tx2);
+            padding:.06rem .35rem; border-radius:5px;
+            background:rgba(255,255,255,.05);
+          }
+          #s-parent #ph-activity .faf-entry-time{
+            font-size:.6rem; color:var(--tx3);
+            white-space:nowrap; flex-shrink:0; margin-left:auto;
+          }
+          #s-parent #ph-activity .faf-empty{
+            text-align:center; padding:1.8rem 1rem;
+            font-size:.82rem; color:var(--tx2); line-height:1.55;
+          }
+          #s-parent #ph-activity .faf-load-older{
+            width:100%; margin-top:.9rem;
+            background:rgba(255,255,255,.04); color:var(--tx2);
+            border:1px dashed rgba(255,255,255,.15);
+            border-radius:10px; padding:.55rem 1rem;
+            font:700 .72rem/1 var(--fm); letter-spacing:.04em;
+            cursor:pointer; transition:background .15s, color .15s;
+          }
+          #s-parent #ph-activity .faf-load-older:hover{
+            background:rgba(255,255,255,.08); color:var(--tx);
+          }
+
+          /* Light theme adjustments — bump contrast on subtle backgrounds. */
+          :root.light #s-parent #ph-activity .faf-pill{
+            background:rgba(0,0,0,.03); color:#2c3140;
+            border-color:rgba(0,0,0,.08);
+          }
+          :root.light #s-parent #ph-activity .faf-pill:hover{
+            background:rgba(0,0,0,.05);
+          }
+          :root.light #s-parent #ph-activity .faf-divider{
+            background:rgba(0,0,0,.08);
+          }
+          :root.light #s-parent #ph-activity .faf-entry{
+            background:rgba(0,0,0,.02);
+            border-color:rgba(0,0,0,.05);
+          }
+          :root.light #s-parent #ph-activity .faf-entry:hover{
+            background:rgba(0,0,0,.04);
+          }
+          :root.light #s-parent #ph-activity .faf-entry-kid{
+            background:rgba(0,0,0,.04); color:#475064;
+          }
+          :root.light #s-parent #ph-activity .faf-load-older{
+            background:rgba(0,0,0,.03); color:#475064;
+            border-color:rgba(0,0,0,.15);
+          }
+
+          @media (prefers-reduced-motion: reduce){
+            #s-parent #ph-activity .faf-pill,
+            #s-parent #ph-activity .faf-entry,
+            #s-parent #ph-activity .faf-load-older{
+              transition:none;
+            }
+          }
         </style>
         <!-- HERO — cyan-accented header for the Activity & Schedule
              card. data-ph-tab="activity" hooks into phNav's visibility
@@ -17352,31 +17494,26 @@
 
         </div>
 
-        <!-- ACTIVITY LOG — design pass swaps the two flat headings
-             for canonical .ph-seclabel pairs (Audit trail / Activity
-             feed) and wraps each list in a .ph-block. Render targets
-             (#parentActivityAudit / #parentActivityFeed) unchanged. -->
+        <!-- FAF Inc 3 — single unified Family Activity Feed.
+             Replaces the legacy Audit trail / Activity feed pair
+             (two cards rendering the same data with mismatched
+             selectors). Profile + domain pills + grouped reverse-
+             chronological list, with Load older pagination.
+             Render kernel lives in app/js/family-feed.js. -->
         <div id="ph-activity" data-ph-tab="activity" data-ph-sub="audit" style="display:none;">
 
           <section class="ph-sec">
             <div class="ph-seclabel">
-              <span class="ph-ic ph-ic-violet">📊</span>
-              <h2 class="ph-h2">Audit trail</h2>
-              <span class="ph-hint">what happened, when</span>
+              <span class="ph-ic ph-ic-violet">📜</span>
+              <h2 class="ph-h2">Family activity</h2>
+              <span class="ph-hint">live cross-tab feed</span>
             </div>
             <div class="ph-block">
-              <div id="parentActivityAudit" style="max-height:300px;overflow-y:auto;"></div>
-            </div>
-          </section>
-
-          <section class="ph-sec">
-            <div class="ph-seclabel">
-              <span class="ph-ic ph-ic-cyan">📈</span>
-              <h2 class="ph-h2">Activity feed</h2>
-              <span class="ph-hint">detailed by-event</span>
-            </div>
-            <div class="ph-block">
-              <div id="parentActivityFeed" style="max-height:400px;overflow-y:auto;"></div>
+              <div class="faf-pills-row" id="fafProfilePills" role="tablist" aria-label="Filter by child"></div>
+              <div class="faf-pills-row" id="fafDomainPills"  role="tablist" aria-label="Filter by domain"></div>
+              <div class="faf-divider" aria-hidden="true"></div>
+              <div id="familyActivityFeed" style="max-height:560px;overflow-y:auto;"></div>
+              <button type="button" class="faf-load-older" id="fafLoadOlder" onclick="fafLoadOlder()" style="display:none;">Load older</button>
             </div>
           </section>
         </div>
@@ -19019,6 +19156,11 @@
 <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script src="/app/js/bible-study-data.js"></script>
 <script src="/app/js/faith.js"></script>
+<!-- FAF Inc 3 — unified family activity feed kernel. Must load
+     BEFORE parent.js so the legacy renderParentActivityAudit /
+     renderParentActivityFeed wrappers can delegate directly to
+     renderFamilyActivityFeed without typeof checks. -->
+<script src="/app/js/family-feed.js"></script>
 <script src="/app/js/quick-prayers.js"></script>
 <script src="/app/js/worship.js"></script>
 <script src="/app/js/faith-resources.js"></script>
