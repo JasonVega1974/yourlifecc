@@ -2746,6 +2746,22 @@ function renderParentHubHome(){
 
   // Phase 2 IA — 7-card grid (replaces the 4 fixed Quick Action tiles).
   if(typeof renderPhCardGrid === 'function') renderPhCardGrid();
+
+  // FAF Inc 4 — "Today on YourLife" home strip. Renders into
+  // #fafHomeStrip (markup sits between #phKidCards and the launcher
+  // grid). Reuses the unified kernel with strip layout + today
+  // bucket + 6-entry cap. Pill state on the Activity tab is
+  // independent of this call because we pass explicit filter args.
+  if(typeof renderFamilyActivityFeed === 'function'){
+    renderFamilyActivityFeed({
+      layout:      'strip',
+      dateBucket:  'today',
+      limit:       6,
+      profileId:   'all',
+      domain:      'all',
+      containerId: 'fafHomeStrip'
+    });
+  }
 }
 
 
