@@ -19323,16 +19323,16 @@ if (_origRefresh) {
      safe-area-inset-bottom handled in app.css. -->
 <nav id="bottomTabBar" role="navigation" aria-label="Primary tabs"></nav>
 
-<!-- ════ MOBILE HOME BACK BUTTON (2026-06-06) ════
-     Floating "← Home" pill that appears on mobile (innerWidth ≤ 860px)
-     OR when the app is running in standalone PWA mode, and only when
-     the user is on a non-home section. Visibility wired by
-     _updateMobileHomeBack() in ui.js (called from showSection and on
-     resize). Hidden on desktop. Hidden on s-hero / Command Center. -->
-<button id="mobileHomeBack" type="button" aria-label="Back to Home"
+<!-- ════ MOBILE BACK BUTTON (2026-06-07) ════
+     Sticky "← Back" pill at top-left (relocated from bottom-right per
+     native iOS/Android pattern). Appears on mobile (innerWidth ≤ 860px)
+     OR standalone PWA, and only when the user is on a non-home section.
+     Visibility wired by _updateMobileHomeBack() in ui.js. Hidden on
+     desktop. Hidden on s-hero / Command Center. Routes back to home. -->
+<button id="mobileHomeBack" type="button" aria-label="Back"
         onclick="(typeof showSection==='function')&&showSection('s-hero')"
         style="display:none;">
-  <span aria-hidden="true">←</span><span>Home</span>
+  <span aria-hidden="true">←</span><span>Back</span>
 </button>
 
 <!-- ════ PRIMARY ACTION FAB (2026-06-06) ════
