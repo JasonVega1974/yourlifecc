@@ -410,6 +410,17 @@
     <div style="font-size:.6rem;color:var(--tx3);margin-top:.25rem;padding-left:.2rem;">Replaces the ✝️ Faith tab in the mobile bottom bar. The Well stays reachable from the sidebar.</div>
   </div>
 
+  <!-- 2026-06-07 — Skills Step 3: Quiz sound effects opt-in. Wired
+       to toggleSkillsSound() in skills.js; hydrated by openSettings()
+       in ui.js from D.skillsSound (default false). -->
+  <div style="margin-top:.7rem;padding-top:.6rem;border-top:1px solid rgba(255,255,255,.06);">
+    <div class="tr">
+      <span style="font-size:.84rem;">🔊 Skills sound effects</span>
+      <button class="tg" id="tg-skillsSound" onclick="toggleSkillsSound(this)"></button>
+    </div>
+    <div style="font-size:.6rem;color:var(--tx3);margin-top:.15rem;padding-left:.2rem;">Subtle ding on correct, thud on wrong, fanfare on quiz pass. OFF by default.</div>
+  </div>
+
   <!-- SCRIPTURE MANAGEMENT -->
   <div style="margin-top:1rem;padding-top:.9rem;border-top:1px solid rgba(255,255,255,.06);">
     <div style="font-family:var(--fh);font-size:.73rem;letter-spacing:1px;color:#c8d4e8;margin-bottom:.55rem;">✝️ SCRIPTURE ROTATION</div>
