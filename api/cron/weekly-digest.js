@@ -149,31 +149,99 @@ function _localSunday7pmUtc(userLocalNow, offsetMin){
 }
 
 // ── Per-user payload builder ─────────────────────────────────
-function _buildPayload(row, nowMs){
+// Returns one of:
+//   { skip: 'no_kids' | 'no_recent_activity' | 'no_kid_activity' | 'no_email', diag }
+//   { payload: {...rendered digest data...}, diag }
+// The diag packet is always populated and surfaced in the handler
+// response so test-mode callers can see exactly which gate fired
+// and why — no guessing.
+//
+// mode:
+//   'scheduled' — window anchored at the user's local Sunday 7pm
+//                 (cron only fires at that exact local hour, so the
+//                 window is "the just-completed week")
+//   'test'      — rolling 7d ending at now (preview what the digest
+//                 would look like with the data the user can see
+//                 RIGHT NOW; the scheduled window would otherwise
+//                 exclude today's events on any day except Sunday)
+function _buildPayload(row, nowMs, mode){
   const data = (row && row.data) || {};
   const prefs = data.emailPrefs || {};
 
   const offsetMin = (typeof prefs.timezoneOffsetMin === 'number')
     ? prefs.timezoneOffsetMin
     : 0;
-  const localNow = _userLocalNow(nowMs, offsetMin);
-  const sunday7pmUtc = _localSunday7pmUtc(localNow, offsetMin);
-  const weekStartUtc = new Date(sunday7pmUtc.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-  // Skip if there are no kids — the digest is family-scoped.
   const profiles = Array.isArray(data._profiles) ? data._profiles : [];
   const kids = profiles.filter(function(p){ return p && p.isParent === false; });
-  if(!kids.length) return null;
 
-  // Filter activity log to the week.
+  const diag = {
+    profilesCount:    profiles.length,
+    kidProfilesCount: kids.length,
+    kidIds:           kids.map(function(k){ return String(k.id); }),
+    activityTotal:    Array.isArray(data.activityLog) ? data.activityLog.length : 0,
+    activityInWeek:   0,
+    activityByKidId:  {},
+    activityByDomain: {},
+    windowMode:       mode || 'scheduled',
+    windowStartIso:   null,
+    windowEndIso:     null,
+    offsetMin:        offsetMin,
+    nowIso:           new Date(nowMs).toISOString()
+  };
+
+  if(!kids.length){
+    return { skip: 'no_kids', diag };
+  }
+
+  // Window math — test mode rolls back from now, scheduled mode
+  // anchors at local Sunday 7pm.
+  let weekStartUtc, windowEndUtc;
+  if(mode === 'test'){
+    windowEndUtc = new Date(nowMs);
+    weekStartUtc = new Date(nowMs - 7 * 24 * 60 * 60 * 1000);
+  } else {
+    const localNow = _userLocalNow(nowMs, offsetMin);
+    windowEndUtc = _localSunday7pmUtc(localNow, offsetMin);
+    weekStartUtc = new Date(windowEndUtc.getTime() - 7 * 24 * 60 * 60 * 1000);
+  }
+  diag.windowStartIso = weekStartUtc.toISOString();
+  diag.windowEndIso   = windowEndUtc.toISOString();
+
+  // Filter activity log to the window.
   const log = Array.isArray(data.activityLog) ? data.activityLog : [];
   const weekEvents = log.filter(function(e){
     const t = _evTs(e);
-    return t >= weekStartUtc.getTime() && t < sunday7pmUtc.getTime();
+    return t >= weekStartUtc.getTime() && t < windowEndUtc.getTime();
+  });
+  diag.activityInWeek = weekEvents.length;
+
+  // Populate per-kid + per-domain counters for diagnostics.
+  weekEvents.forEach(function(e){
+    if(!e) return;
+    if(e.profileId != null){
+      const pid = String(e.profileId);
+      diag.activityByKidId[pid] = (diag.activityByKidId[pid] || 0) + 1;
+    }
+    const dom = _evDomain(e);
+    diag.activityByDomain[dom] = (diag.activityByDomain[dom] || 0) + 1;
   });
 
-  // Skip empty weeks (anti-spam rule).
-  if(!weekEvents.length) return null;
+  if(!weekEvents.length){
+    return { skip: 'no_recent_activity', diag };
+  }
+
+  // Check if ANY event is tagged to a known kid profileId. If every
+  // event has profileId=null or a stranger id (e.g. orphan from a
+  // deleted profile), there's nothing to render per-kid.
+  const kidIdSet = {};
+  diag.kidIds.forEach(function(id){ kidIdSet[id] = true; });
+  const taggedToKid = weekEvents.some(function(e){
+    return e && e.profileId != null && kidIdSet[String(e.profileId)] === true;
+  });
+  if(!taggedToKid){
+    return { skip: 'no_kid_activity', diag };
+  }
 
   // Per-kid aggregation
   const kidsPayload = kids.map(function(k){
@@ -288,17 +356,20 @@ function _buildPayload(row, nowMs){
   const weekRangeLabel =
     _fmtLocal(new Date(weekStartUtc.getTime() + offsetMin * 60000))
     + ' – '
-    + _fmtLocal(new Date(sunday7pmUtc.getTime() + offsetMin * 60000));
+    + _fmtLocal(new Date(windowEndUtc.getTime() + offsetMin * 60000));
 
   return {
-    userId:          row.user_id,
-    recipientEmail:  prefs.recipientEmail || row.email || '',
-    parentFirstName: parentFirstName,
-    weekRangeLabel:  weekRangeLabel,
-    totalEvents:     weekEvents.length,
-    topKid:          topKidName,
-    familyRoll:      { chores: totalChores, goals: totalGoals, badges: totalBadges },
-    kids:            kidsPayload
+    diag,
+    payload: {
+      userId:          row.user_id,
+      recipientEmail:  prefs.recipientEmail || row.email || '',
+      parentFirstName: parentFirstName,
+      weekRangeLabel:  weekRangeLabel,
+      totalEvents:     weekEvents.length,
+      topKid:          topKidName,
+      familyRoll:      { chores: totalChores, goals: totalGoals, badges: totalBadges },
+      kids:            kidsPayload
+    }
   };
 }
 
@@ -499,38 +570,56 @@ module.exports = async function handler(req, res){
     const data = row.data || {};
     const prefs = data.emailPrefs || {};
 
+    // Skip-reason helper — keeps the gate code compact + uniform.
+    // Test mode always carries the full diag packet so the caller
+    // can see exactly what state the user is in.
+    function pushSkip(reason, extra){
+      results.skipped++;
+      const entry = { user_id: row.user_id, reason };
+      if(extra) Object.assign(entry, extra);
+      results.details.push(entry);
+    }
+
     // Test mode skips the opt-in / time-window gates entirely so the
     // user can preview their digest before opting in.
     if(mode === 'scheduled'){
-      if(!SCHEDULED_PLAN_STATUSES.has(row.plan_status || '')){ results.skipped++; continue; }
-      if(prefs.digestOptIn !== true){ results.skipped++; continue; }
-      if(prefs.allOptOut === true){   results.skipped++; continue; }
+      if(!SCHEDULED_PLAN_STATUSES.has(row.plan_status || '')){
+        pushSkip('wrong_plan_status', { plan_status: row.plan_status }); continue;
+      }
+      if(prefs.digestOptIn !== true){ pushSkip('not_opted_in'); continue; }
+      if(prefs.allOptOut === true){   pushSkip('all_opted_out'); continue; }
 
       const offsetMin = (typeof prefs.timezoneOffsetMin === 'number') ? prefs.timezoneOffsetMin : null;
-      if(offsetMin === null){ results.skipped++; continue; }
+      if(offsetMin === null){ pushSkip('no_timezone'); continue; }
 
       const localNow = _userLocalNow(now, offsetMin);
       const localDay = localNow.getUTCDay();
       const localHour = localNow.getUTCHours();
-      if(localDay !== 0 || localHour !== 19){ results.skipped++; continue; }
+      if(localDay !== 0 || localHour !== 19){
+        pushSkip('wrong_local_time', { localDay, localHour }); continue;
+      }
 
       // Once-per-week: lastDigestSent must be older than this week's Sunday-7pm.
       const sunday7pmUtc = _localSunday7pmUtc(localNow, offsetMin);
       const last = prefs.lastDigestSent ? Date.parse(prefs.lastDigestSent) : 0;
       if(last && last >= (sunday7pmUtc.getTime() - 3600000)){
-        results.skipped++; continue;
+        pushSkip('already_sent_this_week'); continue;
       }
     }
 
-    const payload = _buildPayload(row, now);
-    if(!payload){
-      results.skipped++;
-      results.details.push({ user_id: row.user_id, reason: 'no_kids_or_empty_week' });
+    const built = _buildPayload(row, now, mode);
+    if(built.skip){
+      // Test mode always surfaces diag; scheduled mode keeps the
+      // response lean (one log line per skip) but still names the
+      // reason so we can grep for it.
+      const extra = (mode === 'test') ? { diag: built.diag } : null;
+      pushSkip(built.skip, extra);
       continue;
     }
+    const payload = built.payload;
     if(!payload.recipientEmail){
-      results.skipped++;
-      results.details.push({ user_id: row.user_id, reason: 'no_email' });
+      const extra = (mode === 'test') ? { diag: built.diag } : null;
+      pushSkip('no_email', extra);
       continue;
     }
 
@@ -556,11 +645,13 @@ module.exports = async function handler(req, res){
         brevoKey:        brevoKey
       });
       results.sent++;
-      results.details.push({
+      const sentDetail = {
         user_id: row.user_id, to: payload.recipientEmail,
         events:  payload.totalEvents,
         topKid:  payload.topKid
-      });
+      };
+      if(mode === 'test') sentDetail.diag = built.diag;
+      results.details.push(sentDetail);
 
       // Only stamp lastDigestSent in scheduled mode — test sends
       // must not block the real Sunday-7pm fire.
