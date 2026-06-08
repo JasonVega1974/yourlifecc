@@ -2227,6 +2227,10 @@ function showSection(id, fromMobile){
     // 2026-06-07 — Health Inc 1: refresh the 6-domain Power Cards strip so
     // ring fills reflect the latest sleep / mood / meal / weight / habits.
     if(typeof renderHealthDomainStrip === 'function') renderHealthDomainStrip();
+    // 2026-06-07 — Health Inc 3: AI Health Coach. Render cached + auto-fetch
+    // when the dayKey is stale AND user has 3+ recent log entries.
+    if(typeof renderHealthCoach === 'function') renderHealthCoach();
+    if(typeof _maybeAutoFetchHealthCoach === 'function') _maybeAutoFetchHealthCoach();
   },80);
   if(id==='s-school'){ renderSchool&&renderSchool(); setTimeout(()=>{ renderStudyPlan&&renderStudyPlan(); renderExams&&renderExams(); },100); }
   if(id==='s-resources') setTimeout(()=>{
