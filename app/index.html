@@ -421,6 +421,20 @@
     <div style="font-size:.6rem;color:var(--tx3);margin-top:.15rem;padding-left:.2rem;">Subtle ding on correct, thud on wrong, fanfare on quiz pass. OFF by default.</div>
   </div>
 
+  <!-- Email Bundle Track 2 (2026-06-08) — engagement opt-in toggle.
+       Wired to setEngagementOptIn() in parent.js; hydrated by
+       openSettings() in ui.js from D.emailPrefs.engagementOptIn
+       (default false — explicit opt-in required). Track 1 digest
+       lives at Parent Hub → Reports → Progress and uses
+       D.emailPrefs.digestOptIn separately. -->
+  <div style="margin-top:.7rem;padding-top:.6rem;border-top:1px solid rgba(255,255,255,.06);">
+    <div class="tr">
+      <span style="font-size:.84rem;">✉️ Engagement emails</span>
+      <button class="tg" id="tg-engagementOptIn" onclick="setEngagementOptIn(this)"></button>
+    </div>
+    <div style="font-size:.6rem;color:var(--tx3);margin-top:.15rem;padding-left:.2rem;">We'll let you know when streaks are at risk, new features ship, or you've been away a while. Max 1 per week. Unsubscribe anytime.</div>
+  </div>
+
   <!-- SCRIPTURE MANAGEMENT -->
   <div style="margin-top:1rem;padding-top:.9rem;border-top:1px solid rgba(255,255,255,.06);">
     <div style="font-family:var(--fh);font-size:.73rem;letter-spacing:1px;color:#c8d4e8;margin-bottom:.55rem;">✝️ SCRIPTURE ROTATION</div>
