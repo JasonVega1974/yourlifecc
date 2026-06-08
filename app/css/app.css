@@ -4962,6 +4962,303 @@ body.solo-mode .sp-family-only { display: none !important; }
 :root.light .g-coach__scripture{ color:#64748b !important; }
 /* ════════════════════════════════════════════════════════════ */
 
+/* ════════════════════════════════════════════════════════════
+   2026-06-07 — Phase 3 Bundle 3 Inc A: Schedule tab Power Cards.
+
+   Scoped to #s-schedule. Five visual layers:
+     1. #scheduleViewStrip      3-card view picker (Day/Week/Month)
+                                with progress rings showing slots filled
+     2. .sched-card             Schedule wrap gets a gradient ring border
+     3. .sched-nav-row + pill   Cleaner nav bar — prev/today/next as pill
+        buttons + month/year     buttons; month-label as a clean
+        picker                   subtitled pill; picker as a Power Card
+                                 panel.
+     4. .sched-faith-line        Ps 90:12 micro-line at the bottom.
+     5. .sv-picker-cell          Month-jump picker cells (no inline hex
+                                 — class-driven via --c).
+
+   Replaces 5 inline color:#38bdf8 / rgba(56,189,248,*) hardcodes from
+   the previous era with proper var(--c) / var(--p) tokens.
+
+   Reduced-motion auto-suppressed by the global rule. Light theme covered.
+   ════════════════════════════════════════════════════════════ */
+
+/* ─── View strip (Day/Week/Month) ────────────────────────────── */
+#scheduleViewStrip{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:10px;
+  margin:0 0 14px;
+}
+@media (min-width:520px){ #scheduleViewStrip{ gap:12px; } }
+
+.sv-card{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  padding:14px 8px 12px;
+  border:1px solid var(--card-border, rgba(255,255,255,.08));
+  border-radius:14px;
+  background:
+    linear-gradient(160deg,
+      color-mix(in srgb, var(--sv-accent, var(--c)) 16%, transparent) 0%,
+      transparent 72%),
+    var(--card-bg, rgba(255,255,255,.04));
+  cursor:pointer;
+  font-family:var(--fm);
+  color:var(--tx);
+  transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.sv-card::before{
+  content:'';
+  position:absolute; inset:0;
+  border-radius:14px;
+  padding:1.5px;
+  background:linear-gradient(135deg,
+    var(--sv-accent, var(--c)),
+    color-mix(in srgb, var(--sv-accent, var(--c)) 55%, var(--p)));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask-composite:exclude;
+  opacity:.4;
+  pointer-events:none;
+  z-index:0;
+  transition:opacity .15s ease;
+}
+.sv-card:hover,
+.sv-card:focus-visible{
+  transform:translateY(-2px);
+  box-shadow:0 8px 22px color-mix(in srgb, var(--sv-accent, var(--c)) 26%, transparent);
+  outline:none;
+}
+.sv-card:hover::before,
+.sv-card:focus-visible::before{ opacity:.85; }
+.sv-card:active{ transform:translateY(0) scale(.98); }
+.sv-card.is-active{
+  border-color:transparent;
+  box-shadow:0 0 0 1px var(--sv-accent, var(--c)),
+             0 10px 28px color-mix(in srgb, var(--sv-accent, var(--c)) 30%, transparent);
+}
+.sv-card.is-active::before{ opacity:1; }
+.sv-card > *{ position:relative; z-index:1; }
+
+.sv-ring{
+  position:relative;
+  width:46px; height:46px;
+  display:grid; place-items:center;
+}
+.sv-ring svg{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  transform:rotate(-90deg);
+}
+.sv-ring-track{ fill:none; stroke:rgba(255,255,255,.08); stroke-width:3; }
+.sv-ring-fill{
+  fill:none;
+  stroke:var(--sv-accent, var(--c));
+  stroke-width:3;
+  stroke-linecap:round;
+  transition:stroke-dashoffset .6s cubic-bezier(.4,0,.2,1);
+}
+.sv-icon{
+  font-size:1.25rem;
+  line-height:1;
+  z-index:1;
+  filter:drop-shadow(0 0 6px color-mix(in srgb, var(--sv-accent, var(--c)) 40%, transparent));
+}
+.sv-label{
+  font-family:var(--fh);
+  font-size:.82rem;
+  letter-spacing:.06em;
+  color:var(--tx);
+  line-height:1;
+  margin-top:2px;
+}
+.sv-progress{
+  font-family:var(--fm);
+  font-size:.62rem;
+  color:var(--tx2);
+  line-height:1;
+}
+
+/* ─── Nav row (pill arrows + month label + Today) ────────────── */
+#s-schedule .sched-nav-row{
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  margin-bottom:.7rem;
+  flex-wrap:wrap;
+}
+#s-schedule .sched-nav-arrow{
+  font-size:1rem;
+  padding:.35rem .8rem;
+  flex-shrink:0;
+}
+#s-schedule .sched-nav-today{
+  font-size:.75rem;
+  flex-shrink:0;
+}
+#s-schedule .sched-nav-label-wrap{
+  position:relative;
+  flex:1;
+}
+#s-schedule .sched-nav-label{
+  font-family:var(--fh);
+  font-size:1.1rem;
+  letter-spacing:2px;
+  color:var(--c);
+  background:none;
+  border:1px solid transparent;
+  cursor:pointer;
+  padding:.2rem .5rem;
+  border-radius:8px;
+  transition:border-color .15s ease, background .15s ease;
+  white-space:nowrap;
+}
+#s-schedule .sched-nav-label:hover{
+  border-color:color-mix(in srgb, var(--c) 40%, transparent);
+  background:color-mix(in srgb, var(--c) 6%, transparent);
+}
+
+/* ─── Month/Year picker ─────────────────────────────────────── */
+#s-schedule .sched-picker{
+  display:none;
+  position:absolute;
+  top:calc(100% + 6px);
+  left:0;
+  z-index:500;
+  background:var(--s2);
+  border:1px solid color-mix(in srgb, var(--c) 25%, transparent);
+  border-radius:14px;
+  padding:1rem;
+  box-shadow:0 12px 40px rgba(0,0,0,.5);
+  min-width:280px;
+}
+/* JS toggles display:block via inline style — keep that working */
+#s-schedule .sched-picker[style*="display:block"]{ display:block !important; }
+#s-schedule .sched-picker-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:.8rem;
+}
+#s-schedule .sched-picker-year{
+  font-family:var(--fh);
+  font-size:1.1rem;
+  letter-spacing:2px;
+  color:var(--c);
+}
+#s-schedule .sched-picker-months{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:.35rem;
+}
+#s-schedule .sched-picker-today{
+  width:100%;
+  margin-top:.7rem;
+  font-size:.75rem;
+}
+
+/* Month picker cells (replaces the inline rgba hardcode) */
+.sv-picker-cell{
+  padding:.38rem .2rem;
+  border-radius:7px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.05);
+  color:var(--tx2);
+  font-size:.72rem;
+  font-weight:700;
+  cursor:pointer;
+  font-family:var(--fm);
+  transition:background .13s ease, border-color .13s ease, color .13s ease;
+}
+.sv-picker-cell:hover{
+  background:rgba(255,255,255,.08);
+  border-color:color-mix(in srgb, var(--c) 35%, transparent);
+  color:var(--tx);
+}
+.sv-picker-cell.is-active{
+  background:color-mix(in srgb, var(--c) 20%, transparent);
+  border-color:var(--c);
+  color:var(--c);
+}
+
+/* ─── Schedule card gradient ring ────────────────────────────── */
+#s-schedule .sched-card{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+}
+#s-schedule .sched-card::after{
+  content:'';
+  position:absolute; inset:0;
+  border-radius:14px;
+  padding:1.5px;
+  background:linear-gradient(135deg, var(--c), var(--p));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask-composite:exclude;
+  opacity:.4;
+  pointer-events:none;
+  z-index:0;
+  transition:opacity .2s ease;
+}
+#s-schedule .sched-card > *{ position:relative; z-index:1; }
+
+/* ─── Faith micro-line ───────────────────────────────────────── */
+.sched-faith-divider{
+  height:1px;
+  margin:18px 0 10px;
+  background:linear-gradient(90deg,
+    transparent,
+    color-mix(in srgb, var(--c) 40%, transparent),
+    transparent);
+}
+.sched-faith-line{
+  text-align:center;
+  font-family:var(--fh);
+  font-style:italic;
+  font-size:.72rem;
+  letter-spacing:.04em;
+  color:color-mix(in srgb, var(--tx2) 80%, transparent);
+  opacity:.75;
+  line-height:1.4;
+}
+
+/* ─── Light theme overrides ──────────────────────────────────── */
+:root.light #scheduleViewStrip .sv-card{
+  background:
+    linear-gradient(160deg,
+      color-mix(in srgb, var(--sv-accent, var(--c)) 12%, #fff) 0%,
+      #fff 72%) !important;
+  border-color:rgba(0,0,0,.08) !important;
+  box-shadow:0 2px 10px rgba(0,0,0,.06);
+}
+:root.light #scheduleViewStrip .sv-ring-track{ stroke:rgba(0,0,0,.1); }
+:root.light #scheduleViewStrip .sv-label{ color:#0f172a !important; }
+:root.light #scheduleViewStrip .sv-progress{ color:#475569 !important; }
+:root.light #s-schedule .sched-picker{
+  background:#fff !important;
+  border-color:rgba(0,0,0,.1) !important;
+  box-shadow:0 12px 40px rgba(0,0,0,.12);
+}
+:root.light .sv-picker-cell{
+  background:rgba(0,0,0,.03) !important;
+  border-color:rgba(0,0,0,.1) !important;
+  color:#4a4b52 !important;
+}
+:root.light .sv-picker-cell:hover{
+  background:rgba(0,0,0,.06) !important;
+  color:#0f172a !important;
+}
+:root.light .sched-faith-line{ color:#64748b !important; }
+/* ════════════════════════════════════════════════════════════ */
+
 /* Inline modal mode — skillsModal lives inside #s-skills after relocation */
 #s-skills > #skillsModal {
   position: static !important;
