@@ -11,8 +11,16 @@
 //   AND email IS NOT NULL
 //   AND data.emailPrefs.crossoverOptOut !== true
 //   AND data.emailPrefs.allOptOut !== true
-//   AND COALESCE(data.emailPrefs.crossoverSendCount, 0) < 4
+//   AND COALESCE(data.emailPrefs.crossoverSendCount, 0) < 100
 //   AND lastCrossoverSent IS NULL OR < 42 days ago
+//
+// LIFETIME CAP NOTE (raised 2026-06-08): originally 4. The 6-week
+// cadence + one-click unsubscribe are the real volume control —
+// users who want out can leave at any time. 100 is now a runaway-
+// code sanity ceiling, NOT a stated promise to users. The
+// crossoverSendCount counter is still incremented on every send
+// because it's useful for analytics (per-user lifetime engagement
+// curve, retention vs. count, etc.).
 //
 // Email shape (devotional, NEVER salesy):
 //   • Scripture pool — curated 8-verse subset of MEMORY_VERSE_LIBRARY
@@ -41,7 +49,11 @@ const SUPA_HOST  = 'hrohgwcbfgywkpnvqxhk.supabase.co';
 const BREVO_HOST = 'api.brevo.com';
 
 const COOLDOWN_MS    = 42 * 24 * 60 * 60 * 1000; // 6 weeks
-const LIFETIME_CAP   = 4;
+// Raised 2026-06-08 from 4 → 100. The 6-week cadence + one-click
+// unsubscribe are the real volume control. 100 is a sanity ceiling
+// only — not a promise we make to users. Counter still increments
+// every send for analytics.
+const LIFETIME_CAP   = 100;
 const HIGHLIGHTS_CAP = 3;
 
 // ── Scripture pool ───────────────────────────────────────────
