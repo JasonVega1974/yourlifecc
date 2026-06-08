@@ -130,6 +130,199 @@ function hTab(tab,btn){
 }
 
 // ════════════════════════════════════════════════════════════
+// 2026-06-07 — Health Inc 3: AI Health Coach (mirrors Money Coach).
+//
+// _healthCoachStats14d aggregates the last 14 days of sleep / meals /
+// water / mood / PHQ-2 / weight into a structured stats blob (no
+// free-text notes leave the device). fetchHealthCoach POSTs it to
+// /api/ai-summary with mode 'health-coach' which loads the strict
+// HEALTH_COACH_SYSTEM safety prompt (no diagnosis, no medication, no
+// body-image judgment, doctor/parent referral for sustained low
+// signals, 988 escalation language for elevated PHQ-2).
+//
+// Cache shape mirrors Money Coach (D.financeCoachLastWeek):
+//   D.healthCoachCache = { dayKey, summary, focus, fetchedAt }
+// Manual refresh rate-limited to 6h. Auto-fetch runs once per local
+// day when the user has 3+ recent logs across the trackers.
+// ════════════════════════════════════════════════════════════
+function _healthCoachStats14d(){
+  const now = new Date();
+  const floor = new Date(now.getTime() - 14 * 86400000);
+  const floorISO = floor.toISOString().slice(0,10);
+
+  // Sleep: nights logged, avg hours, low (<7h) nights
+  const sleep = (Array.isArray(D.sleepLog) ? D.sleepLog : []).filter(function(s){ return s && (s.date || '') >= floorISO; });
+  const sleepNights = sleep.length;
+  const sleepAvgRaw = sleepNights ? (sleep.reduce(function(t,e){ return t + (Number(e.hours)||0); }, 0) / sleepNights) : 0;
+  const sleepAvg = Math.round(sleepAvgRaw * 10) / 10;
+  const sleepLow = sleep.filter(function(s){ return (Number(s.hours)||0) < 7; }).length;
+
+  // Meals: distinct days with at least one meal logged
+  const meals = (Array.isArray(D.foodMeals) ? D.foodMeals : []).filter(function(m){ return m && (m.date || '') >= floorISO; });
+  const mealDaySet = {};
+  meals.forEach(function(m){ if(m.date) mealDaySet[m.date] = 1; });
+  const mealDays = Object.keys(mealDaySet).length;
+
+  // Water: days logged, days hit goal, avg cups, goal (Inc 2 field)
+  const goal = Number(D.waterGoal) || 8;
+  const water = (Array.isArray(D.waterLog) ? D.waterLog : []).filter(function(w){ return w && (w.date || '') >= floorISO; });
+  const waterDays = water.length;
+  const waterHitGoal = water.filter(function(w){ return (Number(w.cups)||0) >= goal; }).length;
+  const waterAvg = waterDays ? Math.round(water.reduce(function(t,e){ return t + (Number(e.cups)||0); }, 0) / waterDays) : 0;
+
+  // Mood: avg level (1-5), days logged, low-mood days (level ≤ 2)
+  const moods = (Array.isArray(D.moods) ? D.moods : []).filter(function(m){ return m && (m.date || '') >= floorISO; });
+  const moodDays = moods.length;
+  const moodAvgRaw = moodDays ? (moods.reduce(function(t,m){ return t + (Number(m.level)||0); }, 0) / moodDays) : 0;
+  const moodAvg = Math.round(moodAvgRaw * 10) / 10;
+  const moodLow = moods.filter(function(m){ return (Number(m.level)||0) <= 2; }).length;
+
+  // PHQ-2: latest score + elevated-run count (both q1 ≥ 2 AND q2 ≥ 2)
+  const phq = (Array.isArray(D.phq2Log) ? D.phq2Log : []).filter(function(p){ return p && (p.date || '') >= floorISO; });
+  const phqLast = phq[0] ? ((Number(phq[0].q1)||0) + (Number(phq[0].q2)||0)) : null;
+  const phqElevated = phq.filter(function(p){ return (Number(p.q1)||0) >= 2 && (Number(p.q2)||0) >= 2; }).length;
+
+  // Weight: 14-day start + latest + delta (lb)
+  const weights = (Array.isArray(D.weightLog) ? D.weightLog : [])
+    .filter(function(w){ return w && (w.date || '') >= floorISO; })
+    .slice()
+    .sort(function(a,b){ return new Date(a.date) - new Date(b.date); });
+  const weightStart  = weights.length ? Number(weights[0].weight)  || null : null;
+  const weightLatest = weights.length ? Number(weights[weights.length-1].weight) || null : null;
+  const weightDelta  = (weightStart != null && weightLatest != null)
+    ? Math.round((weightLatest - weightStart) * 10) / 10
+    : null;
+
+  const name = (D && D.name) ? String(D.name).slice(0,40) : 'friend';
+  return {
+    name:   name,
+    days:   14,
+    sleep:  { nightsLogged: sleepNights, avgHours: sleepAvg, lowNights: sleepLow },
+    meals:  { daysLogged:   mealDays },
+    water:  { daysLogged:   waterDays, daysHitGoal: waterHitGoal, avgCups: waterAvg, goal: goal },
+    mood:   { daysLogged:   moodDays, avgLevel: moodAvg, lowDays: moodLow },
+    phq2:   { latestScore: phqLast, elevatedRunsLast14d: phqElevated },
+    weight: { startLb: weightStart, latestLb: weightLatest, deltaLb: weightDelta }
+  };
+}
+
+async function fetchHealthCoach(){
+  if(!D.healthCoachCache || typeof D.healthCoachCache !== 'object'){
+    D.healthCoachCache = { dayKey:'', summary:'', focus:'', fetchedAt:0 };
+  }
+  // Rate-limit manual refreshes: max once per 6 hours (matches Money Coach).
+  const SIX_HOURS = 6 * 60 * 60 * 1000;
+  const now = Date.now();
+  if(D.healthCoachCache.fetchedAt && (now - D.healthCoachCache.fetchedAt) < SIX_HOURS){
+    if(typeof showToast === 'function') showToast('Coach refreshed recently — try again later.');
+    return;
+  }
+  const stats = _healthCoachStats14d();
+  const totalActivity = stats.sleep.nightsLogged + stats.meals.daysLogged + stats.water.daysLogged + stats.mood.daysLogged;
+
+  if(totalActivity < 2){
+    // Empty profile — friendly stub, no API call burned.
+    D.healthCoachCache = {
+      dayKey:    new Date().toISOString().slice(0,10),
+      summary:   'Tracking just started — the first week is always quiet. Pick one thing you want to feel better about (sleep, hydration, mood) and log it once today.',
+      focus:     'Log one thing today. One entry beats none.',
+      fetchedAt: now
+    };
+    save();
+    if(typeof renderHealthCoach === 'function') renderHealthCoach();
+    return;
+  }
+
+  const host = document.getElementById('healthCoachCard');
+  if(host){
+    const body = host.querySelector('.h-coach__body');
+    if(body) body.innerHTML = '<div class="h-coach__loading">Coach is reading the last two weeks…</div>';
+  }
+
+  try {
+    const resp = await fetch('/api/ai-summary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'health-coach', prompt: JSON.stringify(stats) })
+    });
+    const json = await resp.json();
+    if(!json || !json.ok || !json.summary){
+      throw new Error('Empty or malformed response');
+    }
+    D.healthCoachCache = {
+      dayKey:    new Date().toISOString().slice(0,10),
+      summary:   String(json.summary || '').slice(0, 500),
+      focus:     String(json.focus   || '').slice(0, 200),
+      fetchedAt: now
+    };
+    save();
+    if(typeof renderHealthCoach === 'function') renderHealthCoach();
+  } catch(e){
+    console.debug('[health-coach] fetch failed:', e && e.message);
+    if(host){
+      const body2 = host.querySelector('.h-coach__body');
+      if(body2) body2.innerHTML = '<div class="h-coach__err">Coach is offline right now. Try refresh in a minute.</div>';
+    }
+  }
+}
+
+function renderHealthCoach(){
+  const host = document.getElementById('healthCoachCard');
+  if(!host) return;
+  if(!D.healthCoachCache || typeof D.healthCoachCache !== 'object'){
+    D.healthCoachCache = { dayKey:'', summary:'', focus:'', fetchedAt:0 };
+  }
+  const today = new Date().toISOString().slice(0,10);
+  const esc = function(s){
+    return String(s || '').replace(/[&<>"']/g, function(c){
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+    });
+  };
+  const stale = D.healthCoachCache.dayKey !== today;
+  const hasContent = !!(D.healthCoachCache.summary);
+
+  if(hasContent){
+    host.innerHTML = ''
+      + '<div class="h-coach">'
+      +   '<div class="h-coach__head">'
+      +     '<div class="h-coach__title">💚 Your Health Coach</div>'
+      +     '<button type="button" class="h-coach__refresh" onclick="fetchHealthCoach()" title="Refresh coach (max once per 6h)" aria-label="Refresh coach">↻</button>'
+      +   '</div>'
+      +   '<div class="h-coach__body">'
+      +     '<p class="h-coach__summary">' + esc(D.healthCoachCache.summary) + '</p>'
+      +     (D.healthCoachCache.focus
+        ? '<p class="h-coach__focus"><span class="h-coach__focus-label">Today:</span> ' + esc(D.healthCoachCache.focus) + '</p>'
+        : '')
+      +   '</div>'
+      +   (stale ? '<div class="h-coach__stale">New day — tap ↻ for a fresh read</div>' : '')
+      + '</div>';
+  } else {
+    host.innerHTML = ''
+      + '<div class="h-coach h-coach--empty">'
+      +   '<div class="h-coach__head">'
+      +     '<div class="h-coach__title">💚 Your Health Coach</div>'
+      +     '<button type="button" class="h-coach__refresh" onclick="fetchHealthCoach()" title="Get my first coaching" aria-label="Get my first coaching">↻</button>'
+      +   '</div>'
+      +   '<div class="h-coach__body">'
+      +     '<p class="h-coach__summary">No coaching yet. Tap ↻ once you\'ve logged sleep, water, or mood for a few days and I\'ll show you the pattern.</p>'
+      +   '</div>'
+      + '</div>';
+  }
+}
+
+function _maybeAutoFetchHealthCoach(){
+  if(!D.healthCoachCache || typeof D.healthCoachCache !== 'object') return;
+  const today = new Date().toISOString().slice(0,10);
+  if(D.healthCoachCache.dayKey === today) return; // already fetched today
+  const s = _healthCoachStats14d();
+  const totalActivity = s.sleep.nightsLogged + s.meals.daysLogged + s.water.daysLogged + s.mood.daysLogged;
+  // Auto-fetch only when there's meaningful pattern data — empty
+  // profiles get the friendly stub via the manual ↻ path instead.
+  if(totalActivity < 3) return;
+  fetchHealthCoach();
+}
+
+// ════════════════════════════════════════════════════════════
 // 2026-06-07 — Health Inc 2: Hydration tracker.
 //
 // One entry per local day in D.waterLog ([{date, cups}]). logWater(±1)
