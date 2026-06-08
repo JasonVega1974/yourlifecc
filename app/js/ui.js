@@ -855,13 +855,13 @@ function openSettings(anchorId){
   // 2026-06-07 — Skills Step 3: sound-effects opt-in toggle.
   const _ssEl=document.getElementById('tg-skillsSound');
   if(_ssEl) _ssEl.classList.toggle('on', !!D.skillsSound);
-  // Email Bundle Track 2 (2026-06-08) — engagement opt-in toggle.
-  // Hydrates from D.emailPrefs.engagementOptIn (default false).
-  // Wired to setEngagementOptIn() in parent.js.
-  const _eoEl = document.getElementById('tg-engagementOptIn');
-  if(_eoEl){
-    const _ePrefs = (D.emailPrefs && typeof D.emailPrefs === 'object') ? D.emailPrefs : {};
-    _eoEl.classList.toggle('on', _ePrefs.engagementOptIn === true);
+  // Email Bundle (2026-06-08) — Email Preferences section hydration.
+  // Sets per-tier visibility for all 4 toggles + status badges via
+  // _hydrateEmailPrefsSettings() in parent.js. Replaces the previous
+  // single-toggle engagement hydration (which is now subsumed by the
+  // shared helper).
+  if(typeof _hydrateEmailPrefsSettings === 'function'){
+    _hydrateEmailPrefsSettings();
   }
   // Verse speed
   const vs=document.getElementById('verseSpeed');
