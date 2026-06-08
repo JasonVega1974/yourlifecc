@@ -243,6 +243,19 @@ const DEF = {
   // Wired through the Movement sub-tab + the Inc 1 domain strip
   // (the existing _hDomainMovement helper reads D.workoutLog).
   workoutLog:[], workoutGoal:150, prRecords:{},
+  // 2026-06-08 — Health Inc 6: body literacy engagement tracking.
+  //   bodyLiteracyViewed   — { '<topicId>': 'YYYY-MM-DD' } first-view
+  //                          stamp per topic. Used by Parent Hub to
+  //                          surface "Body literacy: N topics viewed"
+  //                          aggregate engagement (kid's reading is
+  //                          NOT exposed; only the count).
+  //   bodyLiteracyFeedback — { '<topicId>': 'up'|'down' } content-
+  //                          iteration signal. Kid-private.
+  // First-view side effect: logFamilyActivity('health',
+  // 'body_literacy_viewed', topicTitle, {topicId}) — single feed
+  // entry per topic per kid lifetime so parent feed stays uncluttered.
+  bodyLiteracyViewed:   {},
+  bodyLiteracyFeedback: {},
   // 2026-06-07 — Health Inc 5: milestone badges. Permanent ratchet —
   // {[id]: 'YYYY-MM-DD'} — once earned, never un-earns. Health badges
   // gate on this field (one-way: HEALTH_MILESTONES check fires only
