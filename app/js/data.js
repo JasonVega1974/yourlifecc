@@ -250,6 +250,13 @@ const DEF = {
   // pattern (D.skillCerts) plus enables the canvas-rendered badge
   // PNG share artifact in shareBadgeImage(id).
   healthMilestones:{},
+  // 2026-06-07 — Goals Inc 2: milestone badges. Same permanent-ratchet
+  // shape as healthMilestones — {[id]: 'YYYY-MM-DD'}. Earn-detection
+  // logic lives in _checkGoalMilestones() in goals.js, wired into
+  // saveGoal / completeGoal / saveVision / saveTl / addMilestone /
+  // addAction. misc.js BADGES (g-* prefix) check D.goalMilestones[id]
+  // presence — no false un-earns. Powers shareGoalImage(goalId) too.
+  goalMilestones:{},
   // mood
   moods:[],
   // goals / milestones
