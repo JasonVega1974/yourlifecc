@@ -15698,15 +15698,163 @@
             <button onclick="phNav('chores')" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;padding:6px 12px;border-radius:8px;font-size:.72rem;font-weight:700;cursor:pointer;">Review submissions →</button>
           </div>
 
-          <!-- Parent Celestial Home (Part B Phase 1, 2026-06-08).
-               Skeleton container. Phase 2 adds date header + family
-               stat cards + empty constellation SVG. Phase 3 wires
-               real family data. Phase 4 adds animations. Inserted
-               ABOVE phKidCards so the existing FAF strip and
-               launcher grid remain accessible during the build. -->
-          <div id="parentCelestialHome" style="background:linear-gradient(135deg,rgba(56,189,248,.04),rgba(167,139,250,.04));border:1px solid rgba(56,189,248,.15);border-radius:14px;padding:1.1rem 1.3rem;margin-bottom:16px;color:var(--tx2);font-size:.82rem;line-height:1.55;">
-            <div style="font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--c);font-weight:800;margin-bottom:.45rem;">Parent Celestial Home</div>
-            <div>Phase 1 skeleton in place. Real visual structure lands in Phase 2.</div>
+          <!-- Parent Celestial Home (Part B Phase 2, 2026-06-08).
+               Static visual structure. Mirrors the kid Command Center
+               (#appCommandCenter) layout: header (greeting + Bebas date
+               stamp + subline), 4 family stat tiles, empty constellation
+               SVG with twinkling background stars only, "Jump in"
+               section with 6 destination tiles, optional Faith card.
+               Phase 3 will wire real family data via a renderer in
+               parent.js. Phase 4 layers animations on top. -->
+          <div id="parentCelestialHome">
+
+            <style>
+              /* Scoped styles. Mirror the .cc-* kid Command Center but
+                 use a .pch-* namespace so the two surfaces can diverge
+                 cleanly later. Color tokens (#F1E9D5 cream text,
+                 #9AA0B4 slate sub, #F5A623 amber dot) intentionally
+                 match the kid home so the two feel like one family. */
+              #parentCelestialHome{padding:1.2rem 0 2rem;max-width:480px;margin:0 auto;}
+              @media (min-width:720px){ #parentCelestialHome{max-width:760px;padding:2rem 0 2.5rem;} }
+              @media (min-width:1024px){ #parentCelestialHome{max-width:1040px;} }
+              #parentCelestialHome .pch-shell{padding:0 1.2rem;}
+              @media (min-width:720px){ #parentCelestialHome .pch-shell{padding:0 2rem;} }
+
+              /* Header */
+              #parentCelestialHome .pch-header{display:flex;flex-direction:column;gap:.55rem;margin-bottom:1.5rem;}
+              #parentCelestialHome .pch-hello{font-size:1.7rem;font-weight:600;letter-spacing:-.01em;color:#F1E9D5;margin:0;line-height:1.18;}
+              #parentCelestialHome .pch-daystamp{display:flex;flex-direction:column;gap:.3rem;margin-top:.15rem;}
+              #parentCelestialHome .pch-daystamp__date{font-family:var(--fh,'Bebas Neue',var(--fm,sans-serif));font-size:1.55rem;letter-spacing:.13em;font-weight:400;color:#F1E9D5;line-height:1;}
+              #parentCelestialHome .pch-daystamp__sub{display:flex;align-items:center;gap:.6rem;color:#9AA0B4;font-size:.9rem;}
+              #parentCelestialHome .pch-daystamp__sub::before{content:'';width:6px;height:6px;border-radius:50%;background:#F5A623;box-shadow:0 0 8px rgba(245,166,35,.6);flex-shrink:0;}
+
+              /* Family stats */
+              #parentCelestialHome .pch-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:.7rem;margin-bottom:1.5rem;}
+              @media (min-width:720px){ #parentCelestialHome .pch-stats{grid-template-columns:repeat(4,1fr);} }
+              #parentCelestialHome .pch-stat{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:.9rem 1rem;}
+              #parentCelestialHome .pch-stat__num{font-family:var(--fh,'Bebas Neue',var(--fm,sans-serif));font-size:1.9rem;line-height:1;color:#F1E9D5;letter-spacing:.02em;}
+              #parentCelestialHome .pch-stat__label{font-size:.62rem;color:#9AA0B4;margin-top:.4rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700;}
+
+              /* Constellation */
+              #parentCelestialHome .pch-constellation{position:relative;margin-bottom:1.6rem;}
+              #parentCelestialHome .pch-constellation__caption{font-size:.82rem;color:#9AA0B4;margin-bottom:.6rem;}
+              #parentCelestialHome .pch-constellation__svg{width:100%;height:280px;display:block;}
+              @media (min-width:720px){ #parentCelestialHome .pch-constellation__svg{height:380px;} }
+              #parentCelestialHome .pch-stars circle{fill:#F1E9D5;}
+
+              /* Section label + tiles */
+              #parentCelestialHome .pch-section-label{font-family:var(--fh,'Bebas Neue',var(--fm,sans-serif));font-size:1.15rem;letter-spacing:.14em;color:#F1E9D5;margin:0 0 .85rem;text-transform:uppercase;}
+              #parentCelestialHome .pch-tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:.65rem;}
+              @media (min-width:720px){ #parentCelestialHome .pch-tiles{grid-template-columns:repeat(3,1fr);} }
+              #parentCelestialHome .pch-tile{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:.55rem;padding:1.1rem 1rem;min-height:112px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:18px;color:#F1E9D5;text-align:left;cursor:pointer;font-family:inherit;transition:transform 200ms ease,background 200ms ease,border-color 200ms ease;}
+              #parentCelestialHome .pch-tile:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.13);transform:translateY(-1px);}
+              #parentCelestialHome .pch-tile:focus-visible{outline:2px solid #6AA7FF;outline-offset:2px;}
+              #parentCelestialHome .pch-tile__icon{font-size:1.4rem;line-height:1;}
+              #parentCelestialHome .pch-tile__title{font-size:.92rem;font-weight:700;letter-spacing:-.01em;}
+              #parentCelestialHome .pch-tile__meta{font-size:.66rem;color:#9AA0B4;margin-top:auto;letter-spacing:.02em;}
+
+              /* Faith card */
+              #parentCelestialHome .pch-faith{background:linear-gradient(135deg,rgba(251,191,36,.06),rgba(245,158,11,.03));border:1px solid rgba(251,191,36,.25);border-left:4px solid #fbbf24;border-radius:14px;padding:1rem 1.2rem;margin-top:1.6rem;}
+              #parentCelestialHome .pch-faith__verse{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:.95rem;color:#F1E9D5;line-height:1.55;margin:0 0 .4rem;}
+              #parentCelestialHome .pch-faith__ref{font-size:.66rem;color:#fbbf24;letter-spacing:.12em;font-weight:800;text-transform:uppercase;}
+
+              @media (prefers-reduced-motion:reduce){
+                #parentCelestialHome .pch-tile{transition:none;}
+                #parentCelestialHome .pch-tile:hover{transform:none;}
+              }
+            </style>
+
+            <div class="pch-shell">
+
+              <!-- Header: greeting + Bebas date stamp + soft subline -->
+              <header class="pch-header" aria-label="Greeting">
+                <h1 class="pch-hello" id="pchHello">Your family today</h1>
+                <div class="pch-daystamp">
+                  <div class="pch-daystamp__date" id="pchDateLine">MONDAY &middot; JUNE 8</div>
+                  <div class="pch-daystamp__sub">
+                    <span id="pchSubline">Where today's family rhythm comes together.</span>
+                  </div>
+                </div>
+              </header>
+
+              <!-- Family stat tiles (Phase 3 fills the numbers) -->
+              <section class="pch-stats" aria-label="Family stats today">
+                <div class="pch-stat"><div class="pch-stat__num" id="pchStatChores">&mdash;</div><div class="pch-stat__label">Chores pending</div></div>
+                <div class="pch-stat"><div class="pch-stat__num" id="pchStatGoals">&mdash;</div><div class="pch-stat__label">Goals in progress</div></div>
+                <div class="pch-stat"><div class="pch-stat__num" id="pchStatBadges">&mdash;</div><div class="pch-stat__label">Badges today</div></div>
+                <div class="pch-stat"><div class="pch-stat__num" id="pchStatActivity">&mdash;</div><div class="pch-stat__label">Recent activities</div></div>
+              </section>
+
+              <!-- Constellation SVG. Background stars only in Phase 2; nodes
+                   + connecting links + pulse-on-action wire in Phase 3+4. -->
+              <section class="pch-constellation" aria-label="Family action constellation">
+                <div class="pch-constellation__caption" id="pchConstellationCaption">Tap a star to navigate</div>
+                <svg class="pch-constellation__svg" id="pchConstellationSvg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Family action constellation">
+                  <g class="pch-stars" aria-hidden="true">
+                    <circle cx="40"  cy="30"  r="1.2" opacity=".6"/>
+                    <circle cx="100" cy="60"  r="1.4" opacity=".5"/>
+                    <circle cx="180" cy="40"  r="1.0" opacity=".7"/>
+                    <circle cx="260" cy="70"  r="1.3" opacity=".55"/>
+                    <circle cx="340" cy="35"  r="1.1" opacity=".5"/>
+                    <circle cx="60"  cy="160" r="1.0" opacity=".5"/>
+                    <circle cx="200" cy="180" r="1.3" opacity=".6"/>
+                    <circle cx="340" cy="170" r="1.2" opacity=".55"/>
+                    <circle cx="120" cy="240" r="1.0" opacity=".5"/>
+                    <circle cx="280" cy="260" r="1.3" opacity=".6"/>
+                    <circle cx="220" cy="120" r="1.1" opacity=".55"/>
+                    <circle cx="80"  cy="220" r="1.2" opacity=".5"/>
+                  </g>
+                  <g class="pch-nodes" id="pchNodes"></g>
+                  <g class="pch-links" id="pchLinks"></g>
+                </svg>
+              </section>
+
+              <!-- Jump in destinations. Tiles are disabled placeholders in
+                   Phase 2; Phase 3 enables them and wires phNav() routing. -->
+              <section aria-label="Parent destinations">
+                <h2 class="pch-section-label">Jump in</h2>
+                <div class="pch-tiles" id="pchTiles">
+                  <button class="pch-tile" type="button" id="pchTileChores" disabled>
+                    <span class="pch-tile__icon" aria-hidden="true">📋</span>
+                    <span class="pch-tile__title">Chores oversight</span>
+                    <span class="pch-tile__meta">Wired in Phase 3</span>
+                  </button>
+                  <button class="pch-tile" type="button" id="pchTileRewards" disabled>
+                    <span class="pch-tile__icon" aria-hidden="true">🎁</span>
+                    <span class="pch-tile__title">Rewards &amp; contests</span>
+                    <span class="pch-tile__meta">Wired in Phase 3</span>
+                  </button>
+                  <button class="pch-tile" type="button" id="pchTileActivity" disabled>
+                    <span class="pch-tile__icon" aria-hidden="true">📊</span>
+                    <span class="pch-tile__title">Activity feed</span>
+                    <span class="pch-tile__meta">Wired in Phase 3</span>
+                  </button>
+                  <button class="pch-tile" type="button" id="pchTileReports" disabled>
+                    <span class="pch-tile__icon" aria-hidden="true">📈</span>
+                    <span class="pch-tile__title">Reports &amp; progress</span>
+                    <span class="pch-tile__meta">Wired in Phase 3</span>
+                  </button>
+                  <button class="pch-tile" type="button" id="pchTileFamily" disabled>
+                    <span class="pch-tile__icon" aria-hidden="true">👨‍👩‍👧</span>
+                    <span class="pch-tile__title">Family &amp; profiles</span>
+                    <span class="pch-tile__meta">Wired in Phase 3</span>
+                  </button>
+                  <button class="pch-tile" type="button" id="pchTileSettings" disabled>
+                    <span class="pch-tile__icon" aria-hidden="true">⚙️</span>
+                    <span class="pch-tile__title">Settings &amp; controls</span>
+                    <span class="pch-tile__meta">Wired in Phase 3</span>
+                  </button>
+                </div>
+              </section>
+
+              <!-- Faith card. Hidden by default; Phase 3 unhides when
+                   D.faithMode !== false. -->
+              <aside class="pch-faith" id="pchFaithCard" aria-label="Faith reflection" style="display:none;">
+                <p class="pch-faith__verse" id="pchFaithVerse">Train up a child in the way he should go; even when he is old he will not depart from it.</p>
+                <div class="pch-faith__ref" id="pchFaithRef">Proverbs 22:6</div>
+              </aside>
+
+            </div>
           </div>
 
           <!-- Per-kid summary cards -->
