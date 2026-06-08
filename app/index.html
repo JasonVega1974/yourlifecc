@@ -5375,6 +5375,12 @@
 <!-- ════════════ JOURNAL ══════════════════════════════════════ -->
 <section id="s-journal" class="sec">
   <div class="sh"><div class="si">✍️</div><div class="st">Journal</div><span class="tip-wrap"><span class="tip-btn">?</span><span class="tip-box tip-right"><span class="tip-title">HOW TO USE</span><br>Pick a category (Reflection, Gratitude, Prayer, Idea, Win, Lesson Learned), write your entry, and save. Entries are private to this device. Click any entry to read the full version.</span></span><div class="sl"></div></div>
+
+  <!-- 2026-06-07 — Phase 3 B3-B: feature strip (Total / This Week /
+       Top Theme). Populated by renderJournalFeatureStrip() in skills.js
+       — 3 Power Cards with rings + cat icon for the top theme. -->
+  <div id="journalFeatureStrip" aria-label="Journal progress"></div>
+
   <div class="g2">
     <div class="card">
       <div class="ct">✍️ New Entry</div>
@@ -5396,6 +5402,11 @@
       <div id="journalList" style="max-height:500px;overflow-y:auto;"></div>
     </div>
   </div>
+
+  <!-- 2026-06-07 — Phase 3 B3-B: faith micro-line. Ps 119:105 fits the
+       journal / reflection theme — the word as a lamp for the path. -->
+  <div class="jp-faith-divider" aria-hidden="true"></div>
+  <div class="jp-faith-line">Your word is a lamp for my feet, a light on my path. — Ps 119:105</div>
 </section>
 
 <!-- ════════════ MOTIVATION WALL ═════════════════════════════ -->
@@ -6137,6 +6148,11 @@
     <div class="sl"></div>
   </div>
 
+  <!-- 2026-06-07 — Phase 3 B3-B: feature strip (Streak / Week / Month).
+       Populated by renderMoodFeatureStrip() in misc.js — 3 Power Cards
+       with rings showing _calcMoodStreakDays + _countMoodsInWindow. -->
+  <div id="moodFeatureStrip" aria-label="Mood progress"></div>
+
   <div style="text-align:center;margin-bottom:1rem;">
     <div style="font-size:.72rem;color:var(--tx2);margin-bottom:.5rem;">How are you feeling today?</div>
     <div style="display:flex;justify-content:center;gap:.6rem;margin-bottom:.5rem;" id="moodPicker">
@@ -6160,6 +6176,12 @@
       <div id="moodLog" style="max-height:280px;overflow-y:auto;"></div>
     </div>
   </div>
+
+  <!-- 2026-06-07 — Phase 3 B3-B: faith micro-line. Phil 4:7 fits the
+       mood / mental health theme. Same tonal treatment as the Habits +
+       Goals + Mood opener faith lines (Goals tab, Health tab). -->
+  <div class="mp-faith-divider" aria-hidden="true"></div>
+  <div class="mp-faith-line">The peace of God, which transcends all understanding, will guard your hearts and your minds. — Phil 4:7</div>
 </section>
 
 <!-- ════ SCHOOL RESOURCES ════ -->
