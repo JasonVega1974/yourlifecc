@@ -4587,6 +4587,239 @@ body.solo-mode .sp-family-only { display: none !important; }
 :root.light #s-goals .goalTabs .tab.active{ color:#0a1f5e !important; }
 /* ════════════════════════════════════════════════════════════ */
 
+/* ════════════════════════════════════════════════════════════
+   2026-06-07 — Goals Inc 2: inline badge strip + Share-win button.
+
+   Scoped to #goalBadgeStrip + .g-share-win-btn.
+
+   Strip layout: title row (🏆 Goal Badges + earned-count pill) on
+   top, thin gradient progress bar, then a horizontally-scrollable
+   row of 8 compact badge cards. Earned cards: gold gradient ring
+   + holographic shimmer (reuse Skills cert pill conic). Locked:
+   muted with 🔒 corner.
+
+   Share-win button: gold pill appended to the slide-in completion
+   card. Wrapped inline so stopPropagation prevents card-dismiss.
+   ════════════════════════════════════════════════════════════ */
+
+/* ─── Strip outer ─────────────────────────────────────────────── */
+#goalBadgeStrip{
+  margin:0 0 14px;
+}
+#goalBadgeStrip .g-bs-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.6rem;
+  margin-bottom:.4rem;
+}
+#goalBadgeStrip .g-bs-title{
+  font-family:var(--fh);
+  font-size:.85rem;
+  font-weight:800;
+  letter-spacing:.08em;
+  color:var(--tx);
+}
+#goalBadgeStrip .g-bs-progress-pill{
+  flex-shrink:0;
+  font-family:var(--fn);
+  font-size:.74rem;
+  font-weight:800;
+  padding:.25rem .65rem;
+  border-radius:999px;
+  background:linear-gradient(135deg, #fde68a, #fbbf24);
+  color:#3f2200;
+  box-shadow:0 0 12px rgba(251,191,36,.32);
+}
+#goalBadgeStrip .g-bs-progress-total{ opacity:.7; font-weight:700; }
+#goalBadgeStrip .g-bs-track{
+  height:5px;
+  border-radius:999px;
+  background:rgba(255,255,255,.08);
+  overflow:hidden;
+  margin-bottom:.65rem;
+}
+#goalBadgeStrip .g-bs-fill{
+  height:100%;
+  background:linear-gradient(90deg, var(--section-goals, #f97316), #fbbf24);
+  border-radius:999px;
+  transition:width .55s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 0 10px rgba(251,191,36,.35);
+}
+
+/* ─── Horizontal scroll row of compact badge cards ───────────── */
+#goalBadgeStrip .g-bs-scroll{
+  display:flex;
+  gap:.5rem;
+  overflow-x:auto;
+  padding-bottom:.35rem;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+#goalBadgeStrip .g-bs-scroll::-webkit-scrollbar{ display:none; }
+
+#goalBadgeStrip .g-bs-card{
+  flex-shrink:0;
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  width:88px;
+  min-height:104px;
+  padding:10px 6px 8px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:14px;
+  background:rgba(255,255,255,.04);
+  cursor:pointer;
+  font-family:var(--fm);
+  color:var(--tx);
+  text-align:center;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+#goalBadgeStrip .g-bs-card:active{ transform:translateY(0) scale(.97); }
+#goalBadgeStrip .g-bs-card > *{ position:relative; z-index:1; }
+
+/* Earned state — accent gradient ring + holographic conic shine */
+#goalBadgeStrip .g-bs-card.is-earned{
+  background:
+    radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--badge-accent, #fbbf24) 22%, transparent) 0%, transparent 70%),
+    linear-gradient(160deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  border-color:transparent;
+}
+#goalBadgeStrip .g-bs-card.is-earned::before{
+  content:'';
+  position:absolute; inset:0;
+  border-radius:14px;
+  padding:1.5px;
+  background:linear-gradient(135deg,
+    var(--badge-accent, #fbbf24),
+    color-mix(in srgb, var(--badge-accent, #fbbf24) 55%, #fde68a));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask-composite:exclude;
+  opacity:.75;
+  pointer-events:none;
+  z-index:0;
+}
+#goalBadgeStrip .g-bs-card.is-earned:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 20px color-mix(in srgb, var(--badge-accent, #fbbf24) 28%, transparent);
+}
+#goalBadgeStrip .g-bs-card.is-earned:hover::before{ opacity:1; }
+#goalBadgeStrip .g-bs-card .g-bs-shine{
+  position:absolute;
+  inset:-60%;
+  background:conic-gradient(from 0deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,.20) 18%,
+    rgba(255,255,255,0) 38%,
+    rgba(255,255,255,0) 100%);
+  animation:gBsShine 5s linear infinite;
+  pointer-events:none;
+  z-index:0;
+  opacity:.55;
+  mix-blend-mode:screen;
+}
+@keyframes gBsShine{
+  0%   { transform:rotate(0deg); }
+  100% { transform:rotate(360deg); }
+}
+
+/* Locked state — muted, grayscale glyph */
+#goalBadgeStrip .g-bs-card.is-locked{
+  background:rgba(255,255,255,.02);
+  border:1px dashed rgba(255,255,255,.12);
+  opacity:.74;
+}
+#goalBadgeStrip .g-bs-card.is-locked:hover{
+  background:rgba(255,255,255,.04);
+  opacity:1;
+}
+#goalBadgeStrip .g-bs-card.is-locked .g-bs-glyph{
+  filter:grayscale(.85) brightness(.7);
+}
+
+/* Card inner bits */
+#goalBadgeStrip .g-bs-glyph{
+  font-size:1.6rem;
+  line-height:1;
+  filter:drop-shadow(0 0 8px color-mix(in srgb, var(--badge-accent, #fbbf24) 45%, transparent));
+}
+#goalBadgeStrip .g-bs-card.is-locked .g-bs-glyph{
+  filter:grayscale(.85) brightness(.7) !important;
+}
+#goalBadgeStrip .g-bs-name{
+  font-family:var(--fh);
+  font-size:.65rem;
+  font-weight:800;
+  letter-spacing:.04em;
+  color:var(--tx);
+  line-height:1.1;
+}
+#goalBadgeStrip .g-bs-date{
+  font-family:var(--fm);
+  font-size:.55rem;
+  color:var(--tx2);
+  line-height:1;
+}
+#goalBadgeStrip .g-bs-lock{
+  font-size:.7rem;
+  color:var(--tx3);
+  line-height:1;
+}
+
+/* ─── Share-win button (on slide-in completion card) ─────────── */
+.g-share-win-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:.45rem;
+  margin-top:.85rem;
+  padding:.5rem 1.1rem;
+  border-radius:999px;
+  font-family:var(--fm);
+  font-size:.82rem;
+  font-weight:800;
+  letter-spacing:.02em;
+  cursor:pointer;
+  background:rgba(255,255,255,.94);
+  color:#9a3412;
+  border:1px solid rgba(255,255,255,.7);
+  box-shadow:0 4px 14px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.5);
+  transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.g-share-win-btn:hover{
+  transform:translateY(-2px);
+  background:#fff;
+  box-shadow:0 8px 22px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.6);
+}
+.g-share-win-btn:active{ transform:translateY(0) scale(.97); }
+
+/* ─── Light theme overrides ──────────────────────────────────── */
+:root.light #goalBadgeStrip .g-bs-title{ color:#0f172a !important; }
+:root.light #goalBadgeStrip .g-bs-track{ background:rgba(0,0,0,.08); }
+:root.light #goalBadgeStrip .g-bs-card{
+  background:#fff !important;
+  border-color:rgba(0,0,0,.08) !important;
+}
+:root.light #goalBadgeStrip .g-bs-card.is-locked{
+  background:rgba(0,0,0,.02) !important;
+  border:1px dashed rgba(0,0,0,.14) !important;
+}
+:root.light #goalBadgeStrip .g-bs-card.is-earned{
+  background:
+    radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--badge-accent, #fbbf24) 14%, #fff) 0%, transparent 70%),
+    #fff !important;
+}
+:root.light #goalBadgeStrip .g-bs-card.is-earned .g-bs-shine{ opacity:.32; mix-blend-mode:overlay; }
+:root.light #goalBadgeStrip .g-bs-name{ color:#0f172a !important; }
+:root.light #goalBadgeStrip .g-bs-date{ color:#475569 !important; }
+/* ════════════════════════════════════════════════════════════ */
+
 /* Inline modal mode — skillsModal lives inside #s-skills after relocation */
 #s-skills > #skillsModal {
   position: static !important;
