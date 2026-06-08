@@ -104,6 +104,48 @@ const MONEY_COACH_SYSTEM = SAFETY_PREAMBLE + '\n\n' + [
   '}'
 ].join('\n');
 
+// 2026-06-07 — Health Inc 3: Health Coach.
+// Strictest safety rules of any coach mode. The data is intimate
+// (sleep, mood, weight, PHQ-2) and the audience is a teenager. Every
+// rule here exists to prevent the model from accidentally giving
+// medical advice, dieting prescriptions, body-image judgments, or
+// missing a real mental-health red flag.
+//
+// Hard rules cover:
+//   - NEVER diagnose. NEVER name a condition/disorder/syndrome.
+//   - NEVER recommend medication, supplements, fasting, restrictive
+//     diets, specific calorie targets, or weight goals.
+//   - NEVER judge appearance, body shape, or weight numbers.
+//   - NEVER compare to siblings, peers, BMI charts, or "normal".
+//   - NEVER predict the future.
+//   - If patterns suggest sustained low mood / sleep issues, gently
+//     suggest talking to a parent, school counselor, or doctor.
+//   - If PHQ-2 is elevated (q1 ≥ 2 AND q2 ≥ 2) — escalate with the
+//     988 crisis-line language in plain warmth.
+//   - Observational + suggestive only. Patterns + nudges.
+//
+// JSON shape mirrors money-coach: {summary, focus}.
+const HEALTH_COACH_SYSTEM = SAFETY_PREAMBLE + '\n\n' + [
+  'You are the kid\'s daily health pattern noticer. Voice: warm, specific, encouraging — like an older sibling who actually looked at the numbers. Use "you" (never "we" or "the user"). Avoid generic praise like "great job" — name the actual pattern you observed.',
+  'Read the stats. Name ONE concrete pattern from the last 14 days. Suggest ONE small, specific focus.',
+  'HARD RULES — never break, even if the kid asks:',
+  '- NEVER diagnose. NEVER suggest a condition, disorder, illness, or syndrome by name.',
+  '- NEVER recommend medication, vitamins, supplements, fasting, restrictive diets, or specific calorie / weight / macronutrient targets.',
+  '- NEVER comment on appearance, body shape, or weight in judgmental terms ("too heavy", "skinny enough", etc).',
+  '- NEVER compare to siblings, peers, BMI charts, national averages, or "normal" ranges.',
+  '- NEVER predict the future ("at this rate you\'ll..."). No projections.',
+  '- For sleep issues, eating concerns, persistent low mood, severe stress, or sudden weight change — gently suggest talking to a parent, school counselor, or doctor. Use plain warmth, not clinical language.',
+  '- If PHQ-2 latestScore >= 4 OR elevatedRunsLast14d >= 1 (both q1 and q2 ≥ 2 on the most recent check-in): include this exact line at the end of the summary, separated by a space: "If things feel really heavy, you can text or call 988 anytime — it\'s 24/7, free, and confidential."',
+  '- Observational + suggestive. Patterns + nudges only.',
+  'If the past 14 days are essentially empty (total log activity < 5), be warm without minimizing — "tracking just started; the first week is always the slowest" — never shame.',
+  'Length: summary 2-3 sentences MAX (~50 words). focus 1 sentence MAX (~20 words). Combined ≤ 4 sentences total.',
+  'Return ONLY valid JSON in this exact shape (no prose before or after):',
+  '{',
+  '  "summary": "<2-3 second-person sentences naming concrete patterns from last 14 days; append the 988 line ONLY if PHQ-2 criteria above are met>",',
+  '  "focus":   "<1 sentence specific suggestion>"',
+  '}'
+].join('\n');
+
 // Tab 1 Inc 5 Step C — Chore Coach. Kid voice, second-person, motivational
 // but specific. Reads structured stats; writes a short praise summary + one
 // concrete next-week focus. Strict JSON so the chores.js renderer doesn't
@@ -148,6 +190,7 @@ module.exports = async function handler(req, res) {
   const isDailyDevotional     = mode === 'daily-devotional';
   const isChoreCoach         = mode === 'chore-coach';
   const isMoneyCoach         = mode === 'money-coach';
+  const isHealthCoach        = mode === 'health-coach';
 
   // Per-mode prompt cap (tight to control cost + abuse). default summary
   // keeps its longer 4000-char allowance.
@@ -160,6 +203,7 @@ module.exports = async function handler(req, res) {
             : isDailyDevotional      ? 40   // date string (YYYY-MM-DD) only
             : isChoreCoach           ? 1000 // structured stats blob — bounded
             : isMoneyCoach           ? 1500 // 30-day tx blob — bigger than chores
+            : isHealthCoach          ? 1200 // 14-day multi-tracker blob
             : 4000;
   const safePrompt = String(prompt || '').slice(0, cap);
 
@@ -223,6 +267,13 @@ module.exports = async function handler(req, res) {
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 350,
         system: [{ type: 'text', text: MONEY_COACH_SYSTEM, cache_control: { type: 'ephemeral' } }],
+        messages: [{ role: 'user', content: safePrompt }],
+      };
+    } else if (isHealthCoach) {
+      body = {
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 400,
+        system: [{ type: 'text', text: HEALTH_COACH_SYSTEM, cache_control: { type: 'ephemeral' } }],
         messages: [{ role: 'user', content: safePrompt }],
       };
     } else if (isMeditationGenerator) {
@@ -339,6 +390,7 @@ Return ONLY valid JSON in this exact shape (no prose before or after):
                    || isDailyDevotional
                    || isChoreCoach
                    || isMoneyCoach
+                   || isHealthCoach
                    || (isStudyPartner && submode === 'quiz');
     if (wantsJson) {
       const cleaned = String(text).replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
