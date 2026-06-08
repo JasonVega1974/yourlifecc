@@ -2276,10 +2276,18 @@ function showSection(id, fromMobile){
     typeof renderGoalCoach==='function'&&renderGoalCoach();
     typeof _maybeAutoFetchGoalCoach==='function'&&_maybeAutoFetchGoalCoach();
   },60);
-  if(id==='s-journal')    setTimeout(()=>{ typeof renderJournal==='function'&&renderJournal(); },60);
+  if(id==='s-journal')    setTimeout(()=>{
+    typeof renderJournal==='function'&&renderJournal();
+    // 2026-06-07 — Phase 3 B3-B: refresh the 3-card feature strip.
+    typeof renderJournalFeatureStrip==='function'&&renderJournalFeatureStrip();
+  },60);
   if(id==='s-chores')     setTimeout(()=>{ typeof renderChores==='function'&&renderChores(); },60);
   if(id==='s-milestones') setTimeout(()=>{ typeof renderMilestones==='function'&&renderMilestones(); },60);
-  if(id==='s-mood')       setTimeout(()=>{ typeof renderMoodTracker==='function'&&renderMoodTracker(); },60);
+  if(id==='s-mood')       setTimeout(()=>{
+    typeof renderMoodTracker==='function'&&renderMoodTracker();
+    // 2026-06-07 — Phase 3 B3-B: refresh the 3-card feature strip.
+    typeof renderMoodFeatureStrip==='function'&&renderMoodFeatureStrip();
+  },60);
   if(id==='s-sports')     setTimeout(()=>{ typeof renderSports==='function'&&renderSports(); },60);
   if(id==='s-growing')    setTimeout(()=>{ typeof buildGrowingGrid==='function'&&buildGrowingGrid(); },60);
   if(id==='s-skills')     setTimeout(()=>{ typeof initSkillsGrid==='function'&&initSkillsGrid(); },60);
