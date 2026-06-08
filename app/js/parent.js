@@ -5499,20 +5499,107 @@ function celebrateIfNeeded(type, detail){
 
 // ── WEEKLY PROGRESS REPORTS ──────────────────────────────────
 
+// Email Bundle Track 1 (2026-06-08) — one-shot soft migration from
+// the legacy D.progressEmailPref {email,auto} object to the canonical
+// D.emailPrefs DEF shape. Safe to call multiple times; only fills
+// fields that are still empty so a user who edited emailPrefs
+// directly won't be clobbered.
+function _migrateLegacyProgressEmailPref(){
+  if(!D.emailPrefs || typeof D.emailPrefs !== 'object') D.emailPrefs = {};
+  const legacy = D.progressEmailPref;
+  if(!legacy || typeof legacy !== 'object') return;
+  if(!D.emailPrefs.recipientEmail && legacy.email){
+    D.emailPrefs.recipientEmail = String(legacy.email).trim();
+  }
+  if(D.emailPrefs.digestOptIn !== true && legacy.auto === true){
+    D.emailPrefs.digestOptIn = true;
+  }
+}
+
 function saveProgressEmailPref(){
   const email = (document.getElementById('progressEmailInput')||{}).value||'';
   const auto  = (document.getElementById('progressAutoEmailToggle')||{}).checked||false;
+  // Canonical write — D.emailPrefs is the source of truth for the
+  // Track 1 cron. timezoneOffsetMin captured on every save so DST
+  // transitions pick up automatically.
+  if(!D.emailPrefs || typeof D.emailPrefs !== 'object') D.emailPrefs = {};
+  D.emailPrefs.recipientEmail    = String(email).trim();
+  D.emailPrefs.digestOptIn       = !!auto;
+  D.emailPrefs.timezoneOffsetMin = new Date().getTimezoneOffset();
+  // Legacy field kept in sync during cutover so any unrewired reader
+  // still sees the user's last intent. Retired in a future sprint.
   D.progressEmailPref = {email, auto};
   save();
 }
 
+// Email Bundle Track 1 — "Send me a test digest now" button click.
+// POSTs to /api/cron/weekly-digest?testUser=<userId> with the user's
+// Supabase JWT. Server validates the JWT, processes only that one
+// user, does NOT stamp lastDigestSent. Used to preview the email
+// before opting in or before Sunday 7pm.
+async function sendTestDigestNow(){
+  const prefs = D.emailPrefs || {};
+  const email = (prefs.recipientEmail || '').trim();
+  if(!email){
+    if(typeof showToast === 'function') showToast('Add your email above first');
+    return;
+  }
+  if(typeof _supaUser === 'undefined' || !_supaUser || !_supaUser.id){
+    if(typeof showToast === 'function') showToast('Sign in to send a test');
+    return;
+  }
+  const btn = document.getElementById('digestTestBtn');
+  const origText = btn ? btn.textContent : '';
+  if(btn){ btn.disabled = true; btn.textContent = 'Sending test…'; }
+  try {
+    const supa = (typeof getSupabase === 'function') ? getSupabase() : null;
+    if(!supa){ throw new Error('Supabase not available'); }
+    const session = await supa.auth.getSession();
+    const jwt = session && session.data && session.data.session && session.data.session.access_token;
+    if(!jwt){ throw new Error('No access token'); }
+
+    const resp = await fetch('/api/cron/weekly-digest?testUser=' + encodeURIComponent(_supaUser.id), {
+      method:  'POST',
+      headers: {
+        'Authorization': 'Bearer ' + jwt,
+        'Content-Type':  'application/json'
+      }
+    });
+    const data = await resp.json().catch(function(){ return {}; });
+    if(resp.ok && data && data.ok){
+      const sentCount = data.sent || 0;
+      if(sentCount > 0){
+        if(typeof showToast === 'function') showToast('Test digest sent to ' + email + ' ✓');
+      } else {
+        // Sent=0 means the payload builder returned null (no kids OR
+        // empty week). Surface the actual reason if the server
+        // included one in details.
+        const why = (data.details && data.details[0] && data.details[0].reason) || 'nothing to digest';
+        if(typeof showToast === 'function') showToast('No digest sent — ' + why);
+      }
+    } else {
+      const errMsg = (data && data.error) || ('HTTP ' + resp.status);
+      throw new Error(errMsg);
+    }
+  } catch(e){
+    if(typeof showToast === 'function') showToast('Test failed: ' + (e && e.message ? e.message : 'unknown'));
+  } finally {
+    if(btn){ btn.disabled = false; btn.textContent = origText; }
+  }
+}
+
 function renderProgressReportsTab(){
-  // Restore email prefs
-  const pref = D.progressEmailPref||{};
+  // Migrate legacy field into D.emailPrefs before reading.
+  _migrateLegacyProgressEmailPref();
+
+  // Restore email prefs from the canonical D.emailPrefs (with
+  // legacy fallback for ultra-cold reads).
+  const prefs  = D.emailPrefs || {};
+  const legacy = D.progressEmailPref || {};
   const emailEl = document.getElementById('progressEmailInput');
   const autoEl  = document.getElementById('progressAutoEmailToggle');
-  if(emailEl) emailEl.value = pref.email||(_supaUser?_supaUser.email:'')||'';
-  if(autoEl)  autoEl.checked = !!pref.auto;
+  if(emailEl) emailEl.value = prefs.recipientEmail || legacy.email || (_supaUser ? _supaUser.email : '') || '';
+  if(autoEl)  autoEl.checked = (prefs.digestOptIn === true) || (legacy.auto === true);
 
   const container = document.getElementById('progressChildCards');
   if(!container) return;
