@@ -1459,6 +1459,27 @@
   </div><!-- /#appHome -->
 
   <!-- ════════════════════════════════════════════════════════════
+       2026-06-08 — Option A safety net: parent-view recovery card.
+       Restores #parentWelcomeCard inside #s-hero so the existing CSS
+       rule `body.parent-view #parentWelcomeCard { display: block
+       !important; }` has a target. When init.js routing fails to send
+       a parent to s-parent (or they tap "Home" in the sidebar after
+       boot), they land here with a clear tap-to-recover affordance
+       instead of the blank screen the Phase B-Lite removal caused.
+       Hidden by default (display:none); shown by the CSS rule when
+       body.parent-view is active. Faith-free, solo-mode, and kid-
+       view body classes all override back to display:none via
+       existing app.css rules.
+       ════════════════════════════════════════════════════════════ -->
+  <div id="parentWelcomeCard" style="display:none;text-align:center;padding:3rem 1.5rem 2.5rem;">
+    <div style="font-size:3rem;margin-bottom:.75rem;line-height:1;">🏠</div>
+    <h2 style="font-family:var(--fh);font-size:1.7rem;letter-spacing:.04em;color:var(--tx);margin:0 0 .55rem;">Looking for the Parent Hub?</h2>
+    <p style="font-size:.88rem;color:var(--tx2);line-height:1.6;margin:0 auto 1.6rem;max-width:340px;">Your parent surface — chores, rewards, reports, family settings — lives in the Parent Hub.</p>
+    <button onclick="showSection('s-parent')" style="background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#06101e;font-weight:800;padding:.95rem 1.8rem;border-radius:12px;border:0;font-size:.95rem;cursor:pointer;font-family:var(--fm);box-shadow:0 8px 24px rgba(56,189,248,.18);">Open Parent Hub →</button>
+    <div style="margin-top:1.4rem;font-size:.7rem;color:var(--tx3);">Or tap the gear icon in the sidebar to switch profiles.</div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════
        2026-05-30 — Legacy hero content wrapper.
        Everything that USED to fill s-hero before the new home
        (#heroGreeting / #heroQuickActions / #heroQuickStats /
