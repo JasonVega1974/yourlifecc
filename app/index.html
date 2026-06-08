@@ -394,6 +394,22 @@
   </div>
   <div style="font-size:.6rem;color:var(--tx3);margin-top:.15rem;margin-bottom:.3rem;padding-left:.2rem;">When OFF: Bible Study hides, daily scripture becomes Daily Reflection (non-religious)</div>
 
+  <!-- 2026-06-07 — Bottom tab #2 (Faith slot) swap. Lets the teen
+       replace the ✝️ Faith tab in the mobile bottom bar with one of
+       four alternatives. Persists to D.tabSwap via setTabSwap() in
+       ui.js. The Well remains reachable from the sidebar regardless. -->
+  <div style="margin-top:.7rem;padding-top:.6rem;border-top:1px solid rgba(255,255,255,.06);">
+    <div style="font-size:.78rem;font-weight:600;margin-bottom:.4rem;">Bottom tab #2</div>
+    <select id="settingsTabSwap" onchange="setTabSwap(this.value)" style="width:100%;">
+      <option value="">✝️ Faith (default)</option>
+      <option value="habits">💪 Habits</option>
+      <option value="goals">🎯 Goals</option>
+      <option value="money">💰 Money</option>
+      <option value="rewards">🎁 Rewards</option>
+    </select>
+    <div style="font-size:.6rem;color:var(--tx3);margin-top:.25rem;padding-left:.2rem;">Replaces the ✝️ Faith tab in the mobile bottom bar. The Well stays reachable from the sidebar.</div>
+  </div>
+
   <!-- SCRIPTURE MANAGEMENT -->
   <div style="margin-top:1rem;padding-top:.9rem;border-top:1px solid rgba(255,255,255,.06);">
     <div style="font-family:var(--fh);font-size:.73rem;letter-spacing:1px;color:#c8d4e8;margin-bottom:.55rem;">✝️ SCRIPTURE ROTATION</div>
