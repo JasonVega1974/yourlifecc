@@ -3416,6 +3416,188 @@ entrepreneur:[
 let _quizAnswered = false;
 let _quizShuffled = [];
 
+// ════════════════════════════════════════════════════════════
+// 2026-06-07 — Skills Step 3: Quiz Power Mode dopamine layer.
+//
+// New state (module scope):
+//   _quizStreak      — current correct-in-a-row count, resets on wrong
+//   _quizMaxStreak   — peak streak this run (shown in result panel)
+//   _quizPowerMode   — true when user picked the 60-second rapid-fire
+//                       intro option. Skips mid-quiz explanations and
+//                       auto-advances after each answer.
+//   _quizPowerTimerId — setInterval handle for the 100ms power tick
+//   _quizPowerStartMs — performance.now() at Power Mode start
+//   _quizPowerExpired — set true when timer hits 0; guards showQuestion
+//                       and answerQuestion from running after end
+//
+// Sound: D.skillsSound (default false in data.js DEF) gates all
+// quiz audio. Tones synthesized via Web Audio API — no asset files,
+// no fetches, no SW cache implications. Toggle lives in Me → Settings.
+// ════════════════════════════════════════════════════════════
+let _quizStreak = 0;
+let _quizMaxStreak = 0;
+let _quizPowerMode = false;
+let _quizPowerTimerId = 0;
+let _quizPowerStartMs = 0;
+let _quizPowerExpired = false;
+
+// ─── Sound (Web Audio API, opt-in via D.skillsSound) ─────────
+let _skAudioCtx = null;
+function _skGetAudioCtx(){
+  if(_skAudioCtx){
+    // iOS suspends contexts when the tab is backgrounded.
+    if(_skAudioCtx.state === 'suspended' && typeof _skAudioCtx.resume === 'function'){
+      try { _skAudioCtx.resume(); } catch(_){}
+    }
+    return _skAudioCtx;
+  }
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if(!AC) return null;
+  try { _skAudioCtx = new AC(); return _skAudioCtx; } catch(e){ return null; }
+}
+function _skPlayTone(freq, duration, type, gainPeak){
+  if(typeof D === 'undefined' || !D || !D.skillsSound) return;
+  const ctx = _skGetAudioCtx();
+  if(!ctx) return;
+  try {
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.value = freq;
+    const peak = (typeof gainPeak === 'number') ? gainPeak : 0.14;
+    gain.gain.setValueAtTime(peak, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + duration);
+  } catch(_){}
+}
+function _skPlayCorrect(){
+  _skPlayTone(880, 0.10, 'sine');
+  setTimeout(function(){ _skPlayTone(1320, 0.12, 'sine'); }, 70);
+}
+function _skPlayWrong(){
+  _skPlayTone(220, 0.18, 'triangle', 0.10);
+}
+function _skPlayPass(){
+  // C-E-G arpeggio
+  _skPlayTone(523, 0.16, 'triangle');
+  setTimeout(function(){ _skPlayTone(659, 0.16, 'triangle'); }, 120);
+  setTimeout(function(){ _skPlayTone(784, 0.26, 'triangle'); }, 240);
+}
+
+// Settings → 🔊 Skills sound effects toggle handler. Wired from
+// the .tg button in #sp; hydrated by openSettings() in ui.js.
+function toggleSkillsSound(btn){
+  if(typeof D === 'undefined' || !D) return;
+  D.skillsSound = !D.skillsSound;
+  if(btn) btn.classList.toggle('on', !!D.skillsSound);
+  if(typeof save === 'function') save();
+  if(D.skillsSound && typeof _skPlayCorrect === 'function') _skPlayCorrect();
+  if(typeof showToast === 'function'){
+    showToast(D.skillsSound ? 'Skills sound ON 🔊' : 'Skills sound OFF');
+  }
+}
+
+// ─── Combo escalation FX ─────────────────────────────────────
+// Fires at streak 3 / 5 / 7. Banner is body-appended, auto-removed
+// after the animation completes. Screen flash (streak 7) uses an
+// inset box-shadow pseudo on a full-viewport overlay.
+function _skTriggerCombo(streak){
+  const cat = SK_CATS.find(function(c){ return c.key === _quizKey; });
+  const col = (cat && cat.color) || '#38bdf8';
+  let label = '', emoji = '';
+  if(streak === 3){ label = 'TRIPLE'; emoji = '🔥'; }
+  else if(streak === 5){ label = 'LIGHTNING'; emoji = '⚡'; }
+  else if(streak >= 7){
+    label = 'INFERNO';
+    emoji = '🌟';
+    _skScreenFlash(col);
+  } else return;
+  const banner = document.createElement('div');
+  banner.className = 'sk-combo-banner';
+  banner.style.setProperty('--combo-accent', col);
+  banner.innerHTML =
+      '<span class="sk-combo-emoji">' + emoji + '</span>'
+    + '<span class="sk-combo-text">' + label + '!</span>';
+  document.body.appendChild(banner);
+  setTimeout(function(){ banner.remove(); }, 1200);
+  if(typeof launchSideConfetti === 'function') launchSideConfetti();
+}
+
+function _skScreenFlash(color){
+  const flash = document.createElement('div');
+  flash.className = 'sk-screen-flash';
+  flash.style.setProperty('--flash-color', color);
+  document.body.appendChild(flash);
+  setTimeout(function(){ flash.remove(); }, 700);
+}
+
+// ─── Score reveal animation ──────────────────────────────────
+// Ticks element textContent from 0 to finalPct over durationMs,
+// shifting color through red → orange → green → gold thresholds.
+// Snaps gold + adds .sk-score-gold class at 80%+ for the pulse FX.
+function _skColorForPct(pct){
+  if(pct >= 80) return '#fbbf24'; // gold
+  if(pct >= 60) return '#22c55e'; // green
+  if(pct >= 30) return '#fb923c'; // orange
+  return '#ef4444';               // red
+}
+function _skAnimateScore(el, finalPct, durationMs){
+  if(!el) return;
+  const start = performance.now();
+  const duration = durationMs || 1200;
+  function frame(t){
+    const elapsed = t - start;
+    const progress = Math.min(1, elapsed / duration);
+    // ease-out cubic
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(finalPct * eased);
+    el.textContent = current + '%';
+    el.style.color = _skColorForPct(current);
+    if(progress < 1) requestAnimationFrame(frame);
+    else if(finalPct >= 80){
+      el.classList.add('sk-score-gold');
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+// ─── Power Mode 60s timer tick ───────────────────────────────
+function _skPowerTick(){
+  if(!_quizPowerMode){ return; }
+  const elapsed = performance.now() - _quizPowerStartMs;
+  const remaining = Math.max(0, 60000 - elapsed);
+  const bar = document.getElementById('skPowerTimerBar');
+  if(bar){
+    const pct = (remaining / 60000) * 100;
+    bar.style.width = pct + '%';
+    if(remaining < 12000)      bar.style.background = '#ef4444';
+    else if(remaining < 30000) bar.style.background = '#fb923c';
+  }
+  const lbl = document.getElementById('skPowerTimerLabel');
+  if(lbl) lbl.textContent = Math.ceil(remaining/1000) + 's';
+  if(remaining <= 0 && !_quizPowerExpired){
+    _quizPowerExpired = true;
+    if(_quizPowerTimerId){ clearInterval(_quizPowerTimerId); _quizPowerTimerId = 0; }
+    finishSkillQuiz();
+  }
+}
+
+// Called from the intro screen's two start buttons (renderQuiz).
+function startSkillQuiz(powerMode){
+  _quizPowerMode = !!powerMode;
+  _quizStreak = 0;
+  _quizMaxStreak = 0;
+  _quizPowerExpired = false;
+  if(_quizPowerTimerId){ clearInterval(_quizPowerTimerId); _quizPowerTimerId = 0; }
+  if(_quizPowerMode){
+    _quizPowerStartMs = performance.now();
+    _quizPowerTimerId = setInterval(_skPowerTick, 100);
+  }
+  showQuestion(0);
+}
+
 SK_QUIZ = {
 taxes:[
   {q:'What is the federal tax filing deadline each year?',opts:['March 15','April 15','May 1','June 1'],ans:1,explain:'April 15 is the annual federal deadline. If it falls on a weekend, it shifts to the next business day.'},
@@ -3771,11 +3953,19 @@ function renderQuiz(key){
       <div style="font-family:var(--fh);font-size:1.1rem;letter-spacing:2px;color:${col};margin-bottom:.4rem;">${cat?.name||key} QUIZ</div>
       <div style="font-size:.84rem;color:var(--tx2);margin-bottom:.3rem;">${_quizShuffled.length} questions · Need <b style="color:var(--g);">80%</b> to earn your certificate</div>
       ${prevScore!=null?`<div style="font-size:.78rem;margin-bottom:.5rem;color:${prevScore>=80?'var(--gr)':'#f87171'};">Previous score: <b>${prevScore}%</b> ${prevScore>=80?'✅':'— try again!'}</div>`:''}
-      <button class="btn" style="background:${col};color:#000;font-weight:800;font-size:.9rem;margin-top:.75rem;" onclick="showQuestion(0)">Start Quiz →</button>
+      <div style="display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;margin-top:.85rem;">
+        <button class="btn" style="background:${col};color:#000;font-weight:800;font-size:.9rem;" onclick="startSkillQuiz(false)">Start Quiz →</button>
+        <button class="btn sk-power-btn" onclick="startSkillQuiz(true)">🔥 Power Mode · 60s</button>
+      </div>
+      <div style="font-size:.62rem;color:var(--tx3);margin-top:.55rem;">Power Mode = rapid-fire, no explanations, same 80% cert rule.</div>
     </div>`;
 }
 
 function showQuestion(idx){
+  // 2026-06-07 — Skills Step 3: Power Mode guard. If the 60-second
+  // timer fired finishSkillQuiz already, any in-flight setTimeout
+  // from a previous answer must bail before re-rendering.
+  if(_quizPowerExpired) return;
   const qs = _quizShuffled||[];
   if(idx >= qs.length){ finishSkillQuiz(); return; }
   _quizIdx = idx;
@@ -3786,11 +3976,27 @@ function showQuestion(idx){
   const el = document.getElementById('skQuizArea'); if(!el) return;
   const pct = Math.round((idx/qs.length)*100);
 
+  // 2026-06-07 — Streak pill (shown at 2+ in a row) + optional
+  // Power Mode timer bar above the question.
+  const streakChip = _quizStreak >= 2
+    ? '<span class="sk-streak-pill" data-streak="' + _quizStreak + '" style="--streak-accent:' + col + ';">🔥 ' + _quizStreak + ' streak</span>'
+    : '';
+  const powerTimer = _quizPowerMode
+    ? '<div class="sk-power-timer-wrap" aria-label="60 second Power Mode timer">'
+      + '<div class="sk-power-timer-bar" id="skPowerTimerBar" style="background:' + col + ';"></div>'
+      + '<span class="sk-power-timer-label" id="skPowerTimerLabel">60s</span>'
+      + '</div>'
+    : '';
+
   el.innerHTML = `
+    ${powerTimer}
     <div style="margin-bottom:1rem;">
-      <div style="display:flex;justify-content:space-between;font-size:.7rem;color:var(--tx2);margin-bottom:.35rem;">
-        <span>Question ${idx+1} of ${qs.length}</span>
-        <span style="color:var(--gr);">✅ ${_quizCorrect} correct so far</span>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;font-size:.7rem;color:var(--tx2);margin-bottom:.35rem;">
+        <span>Question ${idx+1} of ${qs.length}${_quizPowerMode?' · Rapid-fire':''}</span>
+        <span style="display:inline-flex;gap:.45rem;align-items:center;">
+          ${streakChip}
+          <span style="color:var(--gr);">✅ ${_quizCorrect} correct</span>
+        </span>
       </div>
       <div style="height:6px;background:rgba(255,255,255,.1);border-radius:100px;overflow:hidden;">
         <div style="height:100%;width:${pct}%;background:${col};border-radius:100px;transition:width .3s;"></div>
@@ -3817,6 +4023,7 @@ function showQuestion(idx){
 
 function answerQuestion(chosen){
   if(_quizAnswered) return;
+  if(_quizPowerExpired) return;
   _quizAnswered = true;
   const qs = _quizShuffled||[];
   const q = qs[_quizIdx];
@@ -3824,6 +4031,21 @@ function answerQuestion(chosen){
   const isCorrect = chosenText === q.correct;
   if(isCorrect) _quizCorrect++;
   _quizAnswers[_quizIdx] = chosenText;  // store text
+
+  // 2026-06-07 — Skills Step 3: streak tracking + combo escalation.
+  // Correct extends streak; wrong resets it. Combos at 3/5/7 fire
+  // the banner + side confetti; 7 also triggers the screen-edge flash.
+  if(isCorrect){
+    _quizStreak++;
+    if(_quizStreak > _quizMaxStreak) _quizMaxStreak = _quizStreak;
+    if(typeof _skPlayCorrect === 'function') _skPlayCorrect();
+    if(_quizStreak === 3 || _quizStreak === 5 || _quizStreak === 7){
+      _skTriggerCombo(_quizStreak);
+    }
+  } else {
+    _quizStreak = 0;
+    if(typeof _skPlayWrong === 'function') _skPlayWrong();
+  }
 
   const cat = SK_CATS.find(c=>c.key===_quizKey);
   const col = cat?.color||'var(--c)';
@@ -3842,6 +4064,19 @@ function answerQuestion(chosen){
     }
   });
 
+  // 2026-06-07 — Skills Step 3: Power Mode skips the explanation
+  // panel + auto-advances 550ms later. Normal mode keeps the
+  // explanation + side confetti + Next button as before.
+  if(_quizPowerMode){
+    const fb = document.getElementById('sqFeedback');
+    if(fb) fb.style.display = 'none';
+    setTimeout(function(){
+      if(_quizPowerExpired) return;
+      showQuestion(_quizIdx + 1);
+    }, 550);
+    return;
+  }
+
   const fb = document.getElementById('sqFeedback');
   if(fb){
     fb.style.display = 'block';
@@ -3858,6 +4093,16 @@ function answerQuestion(chosen){
 }
 
 function finishSkillQuiz(){
+  // 2026-06-07 — Skills Step 3: Power Mode cleanup. Idempotent guard
+  // so a manual finish (user answered last question) and the timer-
+  // expired finish can't race.
+  const wasPowerMode = _quizPowerMode;
+  const powerElapsedMs = wasPowerMode ? Math.min(60000, performance.now() - _quizPowerStartMs) : 0;
+  const finalMaxStreak = _quizMaxStreak;
+  if(_quizPowerTimerId){ clearInterval(_quizPowerTimerId); _quizPowerTimerId = 0; }
+  _quizPowerMode = false;
+  _quizPowerExpired = false;
+
   const qs = _quizShuffled||[];
   const pct = Math.round(_quizCorrect/qs.length*100);
   const passed = pct >= 80;
@@ -3880,12 +4125,24 @@ function finishSkillQuiz(){
     save(); renderGameTickets();
     // 🏆 Big confetti burst on quiz pass
     setTimeout(()=>{ if(typeof launchBigConfetti==='function') launchBigConfetti(); }, 300);
+    // 2026-06-07 — Skills Step 3: pass fanfare (gated by D.skillsSound).
+    if(typeof _skPlayPass === 'function') setTimeout(_skPlayPass, 200);
   }
   save(); renderParentBucks();
 
   const el = document.getElementById('skQuizArea'); if(!el) return;
 
+  // 2026-06-07 — Skills Step 3: Power Mode summary row. Shown only when
+  // the user just finished a Power Mode run. Sits above the result card.
+  const powerSummary = wasPowerMode
+    ? '<div class="sk-power-summary">'
+      + '⚡ <b>' + _quizCorrect + '</b> correct in ' + Math.round(powerElapsedMs/1000) + 's'
+      + ' · Max streak <b>' + finalMaxStreak + '</b>'
+      + '</div>'
+    : '';
+
   el.innerHTML = `
+    ${powerSummary}
     <div style="margin-bottom:1rem;">
       <div style="height:6px;background:rgba(255,255,255,.1);border-radius:100px;overflow:hidden;">
         <div style="height:100%;width:100%;background:${passed?'var(--gr)':'#f87171'};border-radius:100px;"></div>
@@ -3893,9 +4150,9 @@ function finishSkillQuiz(){
     </div>
     <div class="sk-result-card ${passed?'sk-result-pass':'sk-result-fail'}">
       <div class="sk-result-emoji">${passed?'🏆':'💪'}</div>
-      <div class="sk-result-pct" style="color:${passed?'var(--gr)':'#f87171'};">${pct}%</div>
+      <div class="sk-result-pct" id="skResultPct">0%</div>
       <div class="sk-result-msg">${passed?'<b style="color:var(--gr);">You passed!</b> Certificate unlocked.':'<b style="color:#f87171;">Keep going!</b> You need 80% to pass.'}</div>
-      <div class="sk-result-detail">${_quizCorrect} of ${qs.length} correct</div>
+      <div class="sk-result-detail">${_quizCorrect} of ${qs.length} correct${finalMaxStreak >= 3 ? ' · 🔥 Peak streak ' + finalMaxStreak : ''}</div>
       <div class="sk-result-breakdown">
         ${qs.map((_,i)=>`<div class="sk-result-dot ${_quizAnswers[i]===qs[i].correct?'sk-dot-pass':'sk-dot-fail'}" title="Q${i+1}: ${_quizAnswers[i]===qs[i].correct?'Correct':'Wrong'}"></div>`).join('')}
       </div>
@@ -3911,6 +4168,13 @@ function finishSkillQuiz(){
         <div id="skAnalysisText" style="font-size:.82rem;color:var(--tx);line-height:1.7;"></div>
       </div>
     </div>`;
+
+  // 2026-06-07 — Skills Step 3: animated score reveal. Ticks the
+  // #skResultPct element from 0% → final over 1.2s, shifting color
+  // through red → orange → green → gold and pulsing if 80%+.
+  if(typeof _skAnimateScore === 'function'){
+    _skAnimateScore(document.getElementById('skResultPct'), pct, 1200);
+  }
 
   // 2026-06-07 — Skills Step 2: refresh domain rings so newly-earned
   // certs reflect on the cluster cards above the grid without a reload.
