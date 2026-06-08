@@ -245,14 +245,12 @@ let _schedWeekOffset=0;
 function schedSetView(v){
   _schedView=v;
   _schedDayOffset=0; _schedWeekOffset=0;
-  ['Day','Week','Month'].forEach(n=>{
-    const b=document.getElementById('schedViewBtn'+n);
-    if(!b) return;
-    const active=v===n.toLowerCase();
-    b.style.background=active?'rgba(56,189,248,.15)':'';
-    b.style.borderColor=active?'rgba(56,189,248,.4)':'';
-    b.style.color=active?'#38bdf8':'';
-  });
+  // 2026-06-07 — Phase 3 B3-A: active state is now driven by the
+  // .is-active class on the .sv-card Power Cards in the view strip
+  // + the .hb-tab fallback buttons. renderScheduleViewStrip handles
+  // the visual sync; legacy inline hex (#38bdf8 / rgba(56,189,248,*))
+  // was removed.
+  if(typeof renderScheduleViewStrip === 'function') renderScheduleViewStrip();
   buildSchedule();
 }
 
@@ -296,9 +294,101 @@ function renderSchedPicker(){
   const mEl=document.getElementById('schedPickerMonths');
   if(yEl) yEl.textContent=_schedPickerY;
   if(!mEl) return;
+  // 2026-06-07 — Phase 3 B3-A: inline hex (rgba(56,189,248,.2)) for
+  // the active month cell removed; .sv-picker-cell handles styling
+  // via the .is-active class in app.css (gates on var(--c)).
   mEl.innerHTML=MONTH_SHORT.map((m,i)=>{
     const active=(i===_schedM&&_schedPickerY===_schedY);
-    return `<button onclick="schedJumpTo(${_schedPickerY},${i})" style="padding:.38rem .2rem;border-radius:7px;border:1px solid ${active?'var(--c)':'rgba(255,255,255,.12)'};background:${active?'rgba(56,189,248,.2)':'rgba(255,255,255,.05)'};color:${active?'var(--c)':'var(--tx2)'};font-size:.72rem;font-weight:700;cursor:pointer;font-family:var(--fm);transition:all .13s;">${m}</button>`;
+    return '<button class="sv-picker-cell' + (active?' is-active':'') + '"'
+      + ' onclick="schedJumpTo(' + _schedPickerY + ',' + i + ')">' + m + '</button>';
+  }).join('');
+}
+
+// 2026-06-07 — Phase 3 B3-A: Schedule Power Card view strip.
+//
+// Three cards (Day / Week / Month) replace the previous inline-styled
+// .btn.bgh button row. Each card carries a circular SVG progress ring
+// showing "scheduled slots / total slots" for that view's current
+// window. Tapping switches view AND zeros the offset (matches the
+// legacy button behavior). Mirrors the Skills/Health/Goals domain
+// strips — same .sv-card + .sv-ring pattern, scoped to #s-schedule.
+function _schedCountSlots(view){
+  const sched = (D && D.schedule) ? D.schedule : {};
+  function dKey(d, h){
+    return d.getFullYear() + '-'
+      + String(d.getMonth()+1).padStart(2,'0') + '-'
+      + String(d.getDate()).padStart(2,'0') + '_' + h;
+  }
+  const hours = (typeof TIMESLOTS !== 'undefined' && Array.isArray(TIMESLOTS))
+    ? TIMESLOTS.map(function(s){ return s.h; })
+    : [7,8,9,10,11,12,13,14,15,16,17,18,19,20,21];
+  let filled = 0, total = 0;
+  if(view === 'day'){
+    const base = new Date(); base.setHours(0,0,0,0);
+    base.setDate(base.getDate() + (typeof _schedDayOffset === 'number' ? _schedDayOffset : 0));
+    hours.forEach(function(h){
+      total++;
+      if(sched[dKey(base, h)]) filled++;
+    });
+  } else if(view === 'week'){
+    const base = new Date(); base.setHours(0,0,0,0);
+    base.setDate(base.getDate() - base.getDay() + ((typeof _schedWeekOffset === 'number' ? _schedWeekOffset : 0) * 7));
+    for(let i = 0; i < 7; i++){
+      const d = new Date(base); d.setDate(base.getDate() + i);
+      hours.forEach(function(h){
+        total++;
+        if(sched[dKey(d, h)]) filled++;
+      });
+    }
+  } else { // month
+    const y = (typeof _schedY === 'number') ? _schedY : new Date().getFullYear();
+    const m = (typeof _schedM === 'number') ? _schedM : new Date().getMonth();
+    const dim = new Date(y, m + 1, 0).getDate();
+    for(let d = 1; d <= dim; d++){
+      const dt = new Date(y, m, d);
+      hours.forEach(function(h){
+        total++;
+        if(sched[dKey(dt, h)]) filled++;
+      });
+    }
+  }
+  return { filled: filled, total: total };
+}
+
+const SCHED_VIEWS = [
+  { key:'day',   icon:'📅', name:'Day',   accent:'var(--c)' },
+  { key:'week',  icon:'📆', name:'Week',  accent:'var(--p)' },
+  { key:'month', icon:'🗓️', name:'Month', accent:'var(--section-daily-life, #f59e0b)' }
+];
+
+function renderScheduleViewStrip(){
+  const host = document.getElementById('scheduleViewStrip');
+  if(!host) return;
+  const cur = (typeof _schedView === 'string') ? _schedView : 'day';
+  host.innerHTML = SCHED_VIEWS.map(function(view){
+    const s = _schedCountSlots(view.key);
+    const total = s.total || 1;
+    const pct = Math.min(1, s.filled / total);
+    const offset = (125.66 * (1 - pct)).toFixed(2);
+    const isActive = (cur === view.key);
+    return '<button type="button" class="sv-card' + (isActive ? ' is-active' : '') + '"'
+      + ' data-view="' + view.key + '"'
+      + ' style="--sv-accent:' + view.accent + ';"'
+      + ' onclick="schedSetView(\'' + view.key + '\')"'
+      + ' aria-label="' + view.name + ' view, ' + s.filled + ' of ' + s.total + ' slots scheduled"'
+      + ' aria-pressed="' + (isActive ? 'true' : 'false') + '">'
+      + '<span class="sv-ring" aria-hidden="true">'
+        + '<svg viewBox="0 0 48 48">'
+          + '<circle class="sv-ring-track" cx="24" cy="24" r="20"></circle>'
+          + '<circle class="sv-ring-fill"  cx="24" cy="24" r="20"'
+            + ' stroke-dasharray="125.66"'
+            + ' stroke-dashoffset="' + offset + '"></circle>'
+        + '</svg>'
+        + '<span class="sv-icon">' + view.icon + '</span>'
+      + '</span>'
+      + '<span class="sv-label">' + view.name + '</span>'
+      + '<span class="sv-progress">' + s.filled + ' of ' + s.total + '</span>'
+    + '</button>';
   }).join('');
 }
 function schedJumpTo(y,m){
@@ -414,6 +504,10 @@ function buildSchedule(){
     html+='</tbody></table>';
     wrap.innerHTML=html;
   }
+  // 2026-06-07 — Phase 3 B3-A: refresh the view-strip rings so they
+  // track the current nav window (schedNav / schedGoToday / schedJumpTo
+  // all funnel back through buildSchedule).
+  if(typeof renderScheduleViewStrip === 'function') renderScheduleViewStrip();
 }
 
 function setCell(k,v,cell){
