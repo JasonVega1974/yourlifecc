@@ -257,6 +257,16 @@ const DEF = {
   // addAction. misc.js BADGES (g-* prefix) check D.goalMilestones[id]
   // presence — no false un-earns. Powers shareGoalImage(goalId) too.
   goalMilestones:{},
+  // 2026-06-07 — Goals Inc 3: AI Goals Coach. Cache mirrors the Money +
+  // Health Coach pattern but uses a WEEKLY key (not daily) — goal
+  // momentum is slower than money/health momentum. Shape:
+  //   { weekKey:'YYYY-Www', summary, focus, scripture, fetchedAt }
+  // scripture is OPT-IN by the model — only populated when the user's
+  // category mix or vision language signals receptivity (see strict
+  // safety prompt GOAL_COACH_SYSTEM in api/ai-summary.js). fetchedAt
+  // rate-limits manual refresh (6h floor); auto-fetch runs once per
+  // ISO-ish week when user has 2+ goals in the system.
+  goalCoachCache:{ weekKey:'', summary:'', focus:'', scripture:'', fetchedAt:0 },
   // mood
   moods:[],
   // goals / milestones
