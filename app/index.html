@@ -179,78 +179,6 @@
 </div>
 
 <!-- ── PLAN PICKER MODAL ─────────────────────────────────────── -->
-<!-- ════════════════════════════════════════════════════════════
-     Email Bundle Part 1 (2026-06-08) — Signup email-prefs card.
-     Shown by _showSignupEmailPrefsIfEligible() in init.js after
-     finishInit completes, ONLY for brand-new non-faith-free users
-     (D.emailPrefs.signupPromptShown !== true AND no activity yet).
-     All three checkboxes default CHECKED — clicking Save & continue
-     writes the current checkbox values; clicking Skip treats as
-     all-on (default consent). Sets D.emailPrefs.signupPromptShown
-     true so the card never re-shows.
-     ════════════════════════════════════════════════════════════ -->
-<div id="signupEmailPrefs" style="display:none;position:fixed;inset:0;z-index:10002;background:rgba(5,13,26,.95);align-items:center;justify-content:center;padding:1rem;">
-  <div style="max-width:440px;width:100%;background:rgba(15,23,42,1);border:1px solid rgba(56,189,248,.25);border-radius:20px;padding:1.9rem 1.55rem;box-shadow:0 32px 80px rgba(0,0,0,.6);">
-    <div style="font-size:.62rem;letter-spacing:.18em;color:var(--c);font-weight:800;text-transform:uppercase;margin-bottom:.45rem;">📨 ONE MORE THING</div>
-    <h2 style="font-family:var(--fh);font-size:1.7rem;color:var(--tx);margin:0 0 .55rem;letter-spacing:.04em;line-height:1.1;">Stay connected</h2>
-    <p style="font-size:.82rem;color:var(--tx2);line-height:1.55;margin:0 0 1.3rem;">A few quick ways we can keep in touch — all optional, change them anytime in Settings.</p>
-
-    <label for="sep-digest" style="display:flex;align-items:center;gap:.7rem;padding:.7rem .75rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;margin-bottom:.5rem;cursor:pointer;">
-      <input type="checkbox" id="sep-digest" checked style="width:18px;height:18px;accent-color:#22c55e;cursor:pointer;flex-shrink:0;">
-      <div style="flex:1;">
-        <div style="font-size:.84rem;font-weight:700;color:var(--tx);line-height:1.3;">Weekly family digest</div>
-        <div style="font-size:.64rem;color:var(--tx2);margin-top:.18rem;line-height:1.4;">Sunday 7pm — what your family accomplished</div>
-      </div>
-    </label>
-
-    <label for="sep-engagement" style="display:flex;align-items:center;gap:.7rem;padding:.7rem .75rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;margin-bottom:.5rem;cursor:pointer;">
-      <input type="checkbox" id="sep-engagement" checked style="width:18px;height:18px;accent-color:#22c55e;cursor:pointer;flex-shrink:0;">
-      <div style="flex:1;">
-        <div style="font-size:.84rem;font-weight:700;color:var(--tx);line-height:1.3;">Friendly nudges</div>
-        <div style="font-size:.64rem;color:var(--tx2);margin-top:.18rem;line-height:1.4;">Streak reminders, new features, max 1/week</div>
-      </div>
-    </label>
-
-    <label for="sep-updates" style="display:flex;align-items:center;gap:.7rem;padding:.7rem .75rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;margin-bottom:1.25rem;cursor:pointer;">
-      <input type="checkbox" id="sep-updates" checked style="width:18px;height:18px;accent-color:#22c55e;cursor:pointer;flex-shrink:0;">
-      <div style="flex:1;">
-        <div style="font-size:.84rem;font-weight:700;color:var(--tx);line-height:1.3;">Occasional updates from Kingdom Creatives</div>
-        <div style="font-size:.64rem;color:var(--tx2);margin-top:.18rem;line-height:1.4;">Big news only — never more than a couple per quarter</div>
-      </div>
-    </label>
-
-    <button onclick="_saveSignupEmailPrefs()" style="width:100%;background:#22c55e;color:#06101e;font-weight:800;padding:.85rem;border-radius:12px;border:0;font-size:.92rem;cursor:pointer;font-family:var(--fm);">Save &amp; continue →</button>
-    <button onclick="_skipSignupEmailPrefs()" style="width:100%;background:transparent;color:var(--tx3);font-weight:600;padding:.7rem;border-radius:12px;border:0;font-size:.74rem;cursor:pointer;margin-top:.3rem;font-family:var(--fm);">Skip — I'll set this up later</button>
-  </div>
-</div>
-
-<!-- ════════════════════════════════════════════════════════════
-     Email Bundle Part 2 (2026-06-08) — Crossover awareness banner.
-     Shown by _showCrossoverBannerIfEligible() in init.js, ONLY for
-     faith_free users on first eligible load
-     (D.emailPrefs.crossoverBannerShown !== true). Informational —
-     describes what the crossover stream is and how often it sends.
-     [Got it] sets the flag + dismisses. [Manage preferences] opens
-     Settings scrolled to #emailPrefsSection.
-     ════════════════════════════════════════════════════════════ -->
-<div id="crossoverAwarenessBanner" style="display:none;position:fixed;inset:0;z-index:10001;background:rgba(5,13,26,.92);align-items:center;justify-content:center;padding:1rem;">
-  <div style="max-width:420px;width:100%;background:linear-gradient(135deg,rgba(15,23,42,1),rgba(15,23,42,.95));border:1px solid rgba(251,191,36,.35);border-radius:20px;padding:1.7rem 1.45rem;box-shadow:0 32px 80px rgba(0,0,0,.6);">
-    <div style="font-size:1.9rem;text-align:center;margin-bottom:.3rem;">📬</div>
-    <h2 style="font-size:1.15rem;color:var(--tx);text-align:center;margin:0 0 .8rem;font-family:var(--fh);letter-spacing:.04em;">A note about emails</h2>
-    <p style="font-size:.82rem;color:var(--tx2);line-height:1.65;margin:0 0 1.3rem;text-align:center;">
-      We occasionally send faith-friendly updates from Kingdom Creatives — a scripture, what's new, and an invitation to explore the full YourLife&nbsp;CC.
-    </p>
-    <p style="font-size:.78rem;color:var(--tx);line-height:1.55;margin:0 0 1.4rem;text-align:center;font-weight:700;">
-      About every 6 weeks, max 4 total.<br>
-      <span style="font-weight:400;color:var(--tx2);font-size:.74rem;">Unsubscribe in any email.</span>
-    </p>
-    <div style="display:flex;gap:.5rem;">
-      <button onclick="_dismissCrossoverBanner()" style="flex:1;background:#fbbf24;color:#06101e;font-weight:800;padding:.75rem;border-radius:10px;border:0;font-size:.84rem;cursor:pointer;font-family:var(--fm);">Got it</button>
-      <button onclick="_openSettingsToEmailPrefs()" style="flex:1;background:rgba(255,255,255,.06);color:var(--tx);font-weight:700;padding:.75rem;border-radius:10px;border:1px solid rgba(255,255,255,.12);font-size:.84rem;cursor:pointer;font-family:var(--fm);">Manage preferences</button>
-    </div>
-  </div>
-</div>
-
 <!-- Private-beta CTA stance (2026-06-06 Phase 0 cleanup): explicit
      dollar amounts have been redacted from the in-app surface so
      no public pricing is displayed here. The Stripe checkout pages
@@ -493,50 +421,18 @@
     <div style="font-size:.6rem;color:var(--tx3);margin-top:.15rem;padding-left:.2rem;">Subtle ding on correct, thud on wrong, fanfare on quiz pass. OFF by default.</div>
   </div>
 
-  <!-- Email Bundle (2026-06-08) — Settings → email preferences card.
-       Surfaces all three email streams together so users can manage
-       everything in one place. Visibility per plan tier:
-         • Digest    — paid/contest users only (faith-free see grayed
-                       "Requires the full app" status)
-         • Engagement— same as digest
-         • Crossover — faith-free only (others see "Faith Hub stream")
-         • Master    — visible to all; overrides everything above
-       Each toggle hydrated by openSettings() in ui.js; handlers in
-       parent.js (setDigestOptIn / setEngagementOptIn /
-       setCrossoverOptOut / setAllOptOut). The label and inline-status
-       text are mutated per-tier in openSettings(). -->
-  <div id="emailPrefsSection" style="margin-top:.9rem;padding-top:.7rem;border-top:1px solid rgba(255,255,255,.06);">
-    <div style="font-family:var(--fh);font-size:.73rem;letter-spacing:1px;color:#c8d4e8;margin-bottom:.55rem;">✉️ EMAIL PREFERENCES</div>
-
-    <!-- Weekly digest -->
+  <!-- Email Bundle Track 2 (2026-06-08) — engagement opt-in toggle.
+       Wired to setEngagementOptIn() in parent.js; hydrated by
+       openSettings() in ui.js from D.emailPrefs.engagementOptIn
+       (default false — explicit opt-in required). Track 1 digest
+       lives at Parent Hub → Reports → Progress and uses
+       D.emailPrefs.digestOptIn separately. -->
+  <div style="margin-top:.7rem;padding-top:.6rem;border-top:1px solid rgba(255,255,255,.06);">
     <div class="tr">
-      <span style="font-size:.84rem;">📧 Weekly digest <span id="ep-digest-status" style="font-size:.55rem;color:var(--tx3);letter-spacing:.02em;"></span></span>
-      <button class="tg" id="tg-digestOptIn" onclick="setDigestOptIn(this)"></button>
-    </div>
-    <div style="font-size:.6rem;color:var(--tx3);margin-top:.15rem;padding-left:.2rem;">Sunday 7pm summary of your family's week.</div>
-
-    <!-- Friendly nudges (engagement) -->
-    <div class="tr" style="margin-top:.55rem;">
-      <span style="font-size:.84rem;">✨ Friendly nudges <span id="ep-engagement-status" style="font-size:.55rem;color:var(--tx3);letter-spacing:.02em;"></span></span>
+      <span style="font-size:.84rem;">✉️ Engagement emails</span>
       <button class="tg" id="tg-engagementOptIn" onclick="setEngagementOptIn(this)"></button>
     </div>
-    <div style="font-size:.6rem;color:var(--tx3);margin-top:.15rem;padding-left:.2rem;">Streak reminders, new features, max 1 per week.</div>
-
-    <!-- Crossover (faith-only stream) -->
-    <div class="tr" style="margin-top:.55rem;">
-      <span style="font-size:.84rem;">🌅 Kingdom Creatives updates <span id="ep-crossover-status" style="font-size:.55rem;color:var(--tx3);letter-spacing:.02em;"></span></span>
-      <button class="tg" id="tg-crossoverOptIn" onclick="setCrossoverOptIn(this)"></button>
-    </div>
-    <div style="font-size:.6rem;color:var(--tx3);margin-top:.15rem;padding-left:.2rem;">Faith-Hub crossover invitations. About every 6 weeks, max 4 in your lifetime.</div>
-
-    <!-- Master kill -->
-    <div style="margin-top:.7rem;padding-top:.5rem;border-top:1px dashed rgba(255,255,255,.08);">
-      <div class="tr">
-        <span style="font-size:.84rem;color:#f87171;">🚫 Unsubscribe from all</span>
-        <button class="tg" id="tg-allOptOut" onclick="setAllOptOut(this)"></button>
-      </div>
-      <div style="font-size:.6rem;color:var(--tx3);margin-top:.15rem;padding-left:.2rem;">Master kill — overrides everything above. Takes effect on the next cron tick.</div>
-    </div>
+    <div style="font-size:.6rem;color:var(--tx3);margin-top:.15rem;padding-left:.2rem;">We'll let you know when streaks are at risk, new features ship, or you've been away a while. Max 1 per week. Unsubscribe anytime.</div>
   </div>
 
   <!-- SCRIPTURE MANAGEMENT -->
