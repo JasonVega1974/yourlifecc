@@ -855,6 +855,14 @@ function openSettings(anchorId){
   // 2026-06-07 — Skills Step 3: sound-effects opt-in toggle.
   const _ssEl=document.getElementById('tg-skillsSound');
   if(_ssEl) _ssEl.classList.toggle('on', !!D.skillsSound);
+  // Email Bundle Track 2 (2026-06-08) — engagement opt-in toggle.
+  // Hydrates from D.emailPrefs.engagementOptIn (default false).
+  // Wired to setEngagementOptIn() in parent.js.
+  const _eoEl = document.getElementById('tg-engagementOptIn');
+  if(_eoEl){
+    const _ePrefs = (D.emailPrefs && typeof D.emailPrefs === 'object') ? D.emailPrefs : {};
+    _eoEl.classList.toggle('on', _ePrefs.engagementOptIn === true);
+  }
   // Verse speed
   const vs=document.getElementById('verseSpeed');
   if(vs) vs.value=D.verseSpeed||60000;
