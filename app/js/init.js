@@ -493,6 +493,14 @@ async function finishInit(cloudReady){
         showDailyDevModal();
         _ylccSetFlag('devPopupSeen', today);
       }
+      // Email Bundle (2026-06-08) — Parts 1 + 2 one-shot modals.
+      // Both gate on auth-resolved + IS_DEMO false so demo runs never
+      // trigger them. Each runs at most once per user, controlled by
+      // D.emailPrefs.{signupPromptShown,crossoverBannerShown}.
+      if(!IS_DEMO){
+        if(typeof _showSignupEmailPrefsIfEligible === 'function') _showSignupEmailPrefsIfEligible();
+        if(typeof _showCrossoverBannerIfEligible    === 'function') _showCrossoverBannerIfEligible();
+      }
     });
   }, popupDelay);
 

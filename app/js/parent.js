@@ -5729,6 +5729,54 @@ function _openSettingsToEmailPrefs(){
   }
 }
 
+// ── Eligibility checkers (called from init.js finishInit) ───
+// "Existing user" detection — don't surface a "just signed up" modal
+// to someone with real history. Returns true if the user has any of:
+//   • activityLog entries
+//   • kid profiles in _profiles
+//   • onboardingDone === true
+//   • any chore log entries
+function _emailPrefsLooksLikeExistingUser(){
+  if(!D) return false;
+  if(D.onboardingDone === true) return true;
+  if(Array.isArray(D.activityLog) && D.activityLog.length > 0) return true;
+  if(typeof _profiles !== 'undefined' && Array.isArray(_profiles)
+     && _profiles.some(function(p){ return p && p.isParent === false; })) return true;
+  if(Array.isArray(D.choreLog) && D.choreLog.length > 0) return true;
+  if(Array.isArray(D.transactions) && D.transactions.length > 0) return true;
+  return false;
+}
+
+function _showSignupEmailPrefsIfEligible(){
+  const p = _emailPrefsEnsure(); if(!p) return;
+  // Skip if already shown
+  if(p.signupPromptShown === true) return;
+  // Skip for faith-free — they get the awareness banner instead
+  if(window._faithFree === true) return;
+  // Existing users (post-deploy v303 cold reads) — mark the flag and
+  // skip showing the modal so we don't ambush them with a signup card.
+  if(_emailPrefsLooksLikeExistingUser()){
+    p.signupPromptShown = true;
+    if(typeof save === 'function') save();
+    return;
+  }
+  // Eligible — show the modal. signupPromptShown is set on
+  // _saveSignupEmailPrefs / _skipSignupEmailPrefs, not here, so a
+  // user who closes the tab without dismissing sees it next load.
+  const m = document.getElementById('signupEmailPrefs');
+  if(m) m.style.display = 'flex';
+}
+
+function _showCrossoverBannerIfEligible(){
+  const p = _emailPrefsEnsure(); if(!p) return;
+  if(p.crossoverBannerShown === true) return;
+  // Faith-free only — non-faith-free users will never see crossover
+  // emails, so the banner about them is irrelevant.
+  if(window._faithFree !== true) return;
+  const m = document.getElementById('crossoverAwarenessBanner');
+  if(m) m.style.display = 'flex';
+}
+
 // Email Bundle Track 2 (2026-06-08) — Engagement opt-in toggle handler.
 // Wired from the Me → Settings panel toggle (#tg-engagementOptIn).
 // Flips D.emailPrefs.engagementOptIn; captures timezoneOffsetMin and
