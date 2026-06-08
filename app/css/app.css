@@ -2726,6 +2726,205 @@ body.solo-mode .sp-family-only { display: none !important; }
 :root.light #s-skills .sk-cert-pill::before{ opacity:.55; mix-blend-mode:overlay; }
 /* ════════════════════════════════════════════════════════════ */
 
+/* ════════════════════════════════════════════════════════════
+   2026-06-07 — Skills Step 3: Quiz Power Mode dopamine layer.
+
+   Five visual elements, all CSS-only (driver state in skills.js):
+   1. .sk-streak-pill        — mid-quiz "🔥 N streak" pill, pulses
+   2. .sk-combo-banner       — fixed full-screen banner at 3/5/7
+   3. .sk-screen-flash       — fullscreen edge-glow at streak 7
+   4. .sk-power-btn          — Power Mode start CTA on intro
+   5. .sk-power-timer-wrap   — 60-second countdown bar above question
+   6. .sk-power-summary      — speed/streak summary row on result
+   7. .sk-result-pct.sk-score-gold — 80%+ snap pulse on score reveal
+
+   All idle motion auto-suppressed by the global
+   @media (prefers-reduced-motion: reduce) rule.
+   ════════════════════════════════════════════════════════════ */
+
+/* ─── Mid-quiz streak pill ───────────────────────────────── */
+.sk-streak-pill{
+  display:inline-flex; align-items:center; gap:3px;
+  font-family:var(--fm);
+  font-size:.66rem; font-weight:800;
+  letter-spacing:.02em;
+  padding:2px 8px 2px 6px;
+  border-radius:999px;
+  background:linear-gradient(135deg,
+    color-mix(in srgb, #f97316 75%, transparent),
+    color-mix(in srgb, #ef4444 75%, transparent));
+  color:#fff;
+  box-shadow:0 0 12px color-mix(in srgb, #f97316 38%, transparent);
+  animation:skStreakPulse 1.4s ease-in-out infinite alternate;
+}
+.sk-streak-pill[data-streak="5"],
+.sk-streak-pill[data-streak="6"]{
+  background:linear-gradient(135deg, #fbbf24, #f97316);
+  box-shadow:0 0 16px rgba(251,191,36,.5);
+}
+.sk-streak-pill[data-streak="7"],
+.sk-streak-pill[data-streak="8"],
+.sk-streak-pill[data-streak="9"]{
+  background:linear-gradient(135deg, #fde68a, #f59e0b, #ef4444);
+  box-shadow:0 0 22px rgba(245,158,11,.65);
+}
+@keyframes skStreakPulse{
+  from{ transform:scale(1);    box-shadow:0 0 10px color-mix(in srgb, #f97316 30%, transparent); }
+  to  { transform:scale(1.06); box-shadow:0 0 20px color-mix(in srgb, #f97316 55%, transparent); }
+}
+
+/* ─── Combo escalation banner ────────────────────────────── */
+.sk-combo-banner{
+  position:fixed;
+  top:35%; left:50%;
+  transform:translate(-50%, -50%);
+  z-index:9000;
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  pointer-events:none;
+  animation:skComboPop 1.2s cubic-bezier(.18,1.4,.32,1) forwards;
+}
+.sk-combo-emoji{
+  font-size:4rem; line-height:1;
+  filter:drop-shadow(0 0 22px var(--combo-accent, #38bdf8))
+         drop-shadow(0 4px 12px rgba(0,0,0,.55));
+}
+.sk-combo-text{
+  font-family:var(--fh);
+  font-size:2rem;
+  letter-spacing:.18em;
+  font-weight:900;
+  color:#fff;
+  text-shadow:
+    0 0 14px var(--combo-accent, #38bdf8),
+    0 0 28px var(--combo-accent, #38bdf8),
+    0 2px 6px rgba(0,0,0,.6);
+  white-space:nowrap;
+}
+@keyframes skComboPop{
+  0%   { opacity:0; transform:translate(-50%,-50%) scale(.3) rotate(-8deg); }
+  18%  { opacity:1; transform:translate(-50%,-50%) scale(1.2) rotate(2deg); }
+  35%  { transform:translate(-50%,-50%) scale(1) rotate(0deg); }
+  80%  { opacity:1; transform:translate(-50%,-50%) scale(1) translateY(0); }
+  100% { opacity:0; transform:translate(-50%,-50%) scale(.95) translateY(-30px); }
+}
+
+/* ─── Screen-edge flash (streak 7) ───────────────────────── */
+.sk-screen-flash{
+  position:fixed; inset:0;
+  z-index:8999;
+  pointer-events:none;
+  box-shadow:
+    inset 0 0 0 8px color-mix(in srgb, var(--flash-color, #f97316) 50%, transparent),
+    inset 0 0 90px 30px color-mix(in srgb, var(--flash-color, #f97316) 35%, transparent);
+  animation:skScreenFlash .7s ease-out forwards;
+}
+@keyframes skScreenFlash{
+  0%   { opacity:0; }
+  15%  { opacity:1; }
+  100% { opacity:0; }
+}
+
+/* ─── Power Mode intro button ─────────────────────────────── */
+.sk-power-btn{
+  background:linear-gradient(135deg, #f97316, #ef4444) !important;
+  color:#fff !important;
+  font-weight:800;
+  font-size:.9rem;
+  box-shadow:0 6px 18px rgba(249,115,22,.4);
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;
+}
+.sk-power-btn::before{
+  content:'';
+  position:absolute; inset:0;
+  background:linear-gradient(110deg,
+    transparent 30%,
+    rgba(255,255,255,.35) 50%,
+    transparent 70%);
+  transform:translateX(-100%);
+  animation:skPowerSheen 3s ease-in-out infinite;
+  pointer-events:none;
+  z-index:0;
+}
+.sk-power-btn > *{ position:relative; z-index:1; }
+@keyframes skPowerSheen{
+  0%   { transform:translateX(-110%); }
+  60%  { transform:translateX(110%); }
+  100% { transform:translateX(110%); }
+}
+
+/* ─── Power Mode 60s timer bar ────────────────────────────── */
+.sk-power-timer-wrap{
+  position:relative;
+  height:8px;
+  margin-bottom:.6rem;
+  border-radius:999px;
+  background:rgba(255,255,255,.08);
+  overflow:visible;
+}
+.sk-power-timer-bar{
+  position:absolute; left:0; top:0;
+  height:100%; width:100%;
+  border-radius:999px;
+  transition:width .1s linear, background .25s ease;
+  box-shadow:0 0 12px currentColor;
+}
+.sk-power-timer-label{
+  position:absolute;
+  right:0; top:-18px;
+  font-family:var(--fm);
+  font-size:.62rem; font-weight:800;
+  color:var(--tx);
+  letter-spacing:.05em;
+}
+
+/* ─── Power Mode summary on result screen ─────────────────── */
+.sk-power-summary{
+  display:block;
+  margin:0 0 12px;
+  padding:.55rem .85rem;
+  border-radius:10px;
+  background:linear-gradient(135deg, rgba(249,115,22,.12), rgba(239,68,68,.06));
+  border:1px solid rgba(249,115,22,.25);
+  color:#fde68a;
+  font-family:var(--fm);
+  font-size:.78rem;
+  font-weight:600;
+  text-align:center;
+}
+
+/* ─── Score reveal: gold snap at 80%+ ─────────────────────── */
+.sk-result-pct{
+  transition:color .2s ease, text-shadow .25s ease;
+}
+.sk-result-pct.sk-score-gold{
+  text-shadow:
+    0 0 18px rgba(251,191,36,.65),
+    0 0 36px rgba(251,191,36,.35);
+  animation:skScoreGold .8s ease-out 1;
+}
+@keyframes skScoreGold{
+  0%   { transform:scale(1); }
+  35%  { transform:scale(1.12); }
+  100% { transform:scale(1); }
+}
+
+/* ─── Light theme overrides ───────────────────────────────── */
+:root.light .sk-combo-text{
+  color:#0f172a;
+  text-shadow:
+    0 0 8px color-mix(in srgb, var(--combo-accent, #38bdf8) 60%, #fff),
+    0 0 16px var(--combo-accent, #38bdf8);
+}
+:root.light .sk-power-summary{
+  background:linear-gradient(135deg, rgba(249,115,22,.08), rgba(239,68,68,.04));
+  color:#92400e;
+  border-color:rgba(249,115,22,.3);
+}
+:root.light .sk-power-timer-label{ color:#0f172a !important; }
+/* ════════════════════════════════════════════════════════════ */
+
 /* Inline modal mode — skillsModal lives inside #s-skills after relocation */
 #s-skills > #skillsModal {
   position: static !important;
