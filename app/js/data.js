@@ -108,6 +108,14 @@ const DEF = {
   // most recent 100 in faith-zones.js. Used for trait awards on
   // prayer/action completion + future personalization.
   heartChecks:[],
+  // 2026-06-07 — Faith tab swap. When set, the bottom tab bar
+  // replaces the ✝️ Faith slot with the chosen alternative.
+  // Valid values: '' (default, keeps Faith) | 'habits' | 'goals'
+  // | 'money' | 'rewards'. See TAB_SWAP_OPTIONS + setTabSwap in
+  // ui.js. The Well stays reachable via the sidebar regardless.
+  // Faith-free users (window._faithFree) have no tab bar so this
+  // field is inert for them.
+  tabSwap:'',
   // streak / checkin
   streak:0, lastCheckin:null, checkin:{}, customHabits:[], dailyChecks:{},
   // V1 Rebuild — Session 1 (Daily Briefing). Keyed by YYYY-MM-DD; per-day
