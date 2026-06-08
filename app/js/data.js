@@ -364,7 +364,8 @@ const DEF = {
     recipientEmail:        '',      // defaults to _supaUser.email at first save
     timezoneOffsetMin:     null,    // captured from Intl at first save (Track 1 anchors local-7pm)
     lastDigestSent:        null,    // ISO date
-    lastEngagementSent:    null,    // ISO date
+    lastEngagementSent:    null,    // ISO date — Track 2 1-per-week cap
+    lastReferralNudge:     null,    // ISO date — Track 2 refer-a-friend 90d spacing
     lastCrossoverSent:     null,    // ISO date
     engagementSentInWeek:  0,       // reset by cron at week boundary
     crossoverSendCount:    0,       // permanent — hard cap at 4
