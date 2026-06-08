@@ -2265,7 +2265,12 @@ function showSection(id, fromMobile){
 
   // ── Group 2: render fns exist, just needed wiring ──────────────────
   if(id==='s-calendar')   setTimeout(()=>{ typeof renderCalendar==='function'&&renderCalendar(); },60);
-  if(id==='s-goals')      setTimeout(()=>{ typeof renderGoals==='function'&&renderGoals(); },60);
+  if(id==='s-goals')      setTimeout(()=>{
+    typeof renderGoals==='function'&&renderGoals();
+    // 2026-06-07 — Goals Inc 1: refresh the 10-domain Power Cards strip
+    // on every entry so the rings reflect the latest goal state.
+    typeof renderGoalDomainStrip==='function'&&renderGoalDomainStrip();
+  },60);
   if(id==='s-journal')    setTimeout(()=>{ typeof renderJournal==='function'&&renderJournal(); },60);
   if(id==='s-chores')     setTimeout(()=>{ typeof renderChores==='function'&&renderChores(); },60);
   if(id==='s-milestones') setTimeout(()=>{ typeof renderMilestones==='function'&&renderMilestones(); },60);
