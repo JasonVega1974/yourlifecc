@@ -41,7 +41,7 @@
   --section-goals:#f97316;
   --section-journal:#c084fc;
   --section-sports:#dc2626;
-  --section-life-skills:var(--c);
+  --section-life-skills:#8b5cf6;  /* 2026-06-07 — Phase 3 brand polish: own identity instead of var(--c). Violet-500 distinguishes Skills from the Life-tab Power Cards palette (emerald/orange/green/amber/cyan) and reads as "knowledge/wisdom" for the academy theme. */
 }
 
 /* ── LIGHT MODE ─────────────────────────────────── */
@@ -57,7 +57,7 @@
   --s2:#e4e5e8;            /* section headers */
   --s3:#d8d9de;            /* hover / inset */
   --s4:#cccdd4;            /* deeper accent */
-  --c:#5a5c6b;             /* generic accent → neutral slate (not sky-blue) */
+  --c:#0284c7;             /* brand sky-700 — preserves brand identity in light mode while staying readable on light surfaces */
   --tx:#1a1b1e;            /* near-black body text */
   --tx2:#4a4b52;           /* secondary text */
   --tx3:#7a7b85;           /* tertiary text */
