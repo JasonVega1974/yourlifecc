@@ -17748,14 +17748,30 @@
               </div>
               <button onclick="generateAllWeeklySummaries()" class="ph-btn ph-btn-primary" style="width:100%;">🚀 Generate all summaries</button>
               <div class="ph-divider"></div>
-              <div style="font-size:.66rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--tx3);margin-bottom:.5rem;">📧 Monday auto-email</div>
+              <!-- Email Bundle Track 1 (2026-06-08) — Weekly digest
+                   panel. Replaces the legacy "📧 Monday auto-email"
+                   block (which silently misrouted every send to
+                   info@kingdom-creatives.com; see retirement notes on
+                   emailWeeklySummary in parent.js). The real digest
+                   now fires server-side at Sunday 7pm local via
+                   /api/cron/weekly-digest. saveProgressEmailPref()
+                   writes D.emailPrefs.{recipientEmail, digestOptIn,
+                   timezoneOffsetMin}; the test button POSTs to the
+                   cron endpoint in single-user test mode. -->
+              <div style="font-size:.66rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--tx3);margin-bottom:.5rem;">📧 Weekly digest · Sunday 7pm local</div>
               <div style="display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;">
                 <input id="progressEmailInput" type="email" class="ph-input" placeholder="parent@email.com" style="flex:1;min-width:200px;" oninput="saveProgressEmailPref()">
                 <label style="display:flex;align-items:center;gap:.4rem;font-size:.74rem;color:var(--tx2);cursor:pointer;white-space:nowrap;font-family:var(--fm);">
                   <input type="checkbox" id="progressAutoEmailToggle" onchange="saveProgressEmailPref()" style="accent-color:var(--pc-violet);width:14px;height:14px;">
-                  Enable auto-send
+                  Send the family digest every Sunday
                 </label>
               </div>
+              <div style="font-size:.68rem;color:var(--tx3);line-height:1.55;margin-top:.55rem;">
+                Pulls every chore, goal, badge, and money milestone across the family. Skips weeks with no activity. One-click unsubscribe in every email.
+              </div>
+              <button id="digestTestBtn" type="button" onclick="sendTestDigestNow()" class="ph-btn" style="width:100%;margin-top:.7rem;background:rgba(167,139,250,.08);border:1px dashed rgba(167,139,250,.35);color:var(--pc-violet);font-weight:700;">
+                ✉️ Send me a test digest now
+              </button>
             </div>
           </section>
 
