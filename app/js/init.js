@@ -308,7 +308,14 @@ async function init(){
     let _gsResult;
     try { _gsResult = await supa.auth.getSession(); } catch(_e){ console.warn('[YourLifeCC] getSession failed:', _e); }
     const session = _gsResult && _gsResult.data && _gsResult.data.session;
-    if(session && session.user) _supaUser = session.user;
+    if(session && session.user){
+      _supaUser = session.user;
+      // 2026-06-08 fix — extend the 5-min PIN grace to session restores,
+      // not just fresh signInWithPassword. Otherwise returning users get
+      // the parent PIN prompt on every app open. Stamping here gives them
+      // the same grace window the fresh-login path sets at auth.js:144.
+      try { localStorage.setItem('ylcc_post_login', String(Date.now())); } catch(_){}
+    }
     // Auth has now definitively resolved (with or without a user). Any
     // _ylccGetFlag reads from this point forward see the right scope.
     _ylccMarkAuthResolved();
@@ -457,16 +464,43 @@ async function finishInit(cloudReady){
   // s-hero, which #appHome hides for parent-view users (legacy hero is wrapped
   // in a hidden div), leaving the screen blank. Active child profiles + solo
   // mode + fresh accounts (no children yet) continue to land on s-hero.
+  //
+  // 2026-06-08 — Option C fix. Restructured for explicit null-handling so the
+  // routing decision is provable in every state:
+  //   _activeProfileId set + maps to a kid          → s-hero  (kid mode)
+  //   _activeProfileId set + maps to the parent     → s-parent
+  //   _activeProfileId unset / null / missing      → s-parent  (parent default)
+  //   solo mode, faith-free, or no kids configured → s-hero  (unchanged)
+  // The previous code happened to do the right thing for the null case
+  // (because _activeIsChild defaults to false), but it relied on
+  // implicit fall-through. The new version is explicit.
   try {
     var _hasChildren = (typeof _profiles !== 'undefined' && Array.isArray(_profiles))
       && _profiles.some(function(p){ return p && p.isParent === false; });
-    var _activeIsChild = false;
-    if (typeof _profiles !== 'undefined' && Array.isArray(_profiles) && typeof _activeProfileId !== 'undefined' && _activeProfileId) {
-      var _ap = _profiles.find(function(p){ return p && p.id === _activeProfileId; });
-      _activeIsChild = !!(_ap && _ap.isParent === false);
-    }
     var _isSoloBoot = !!(typeof D !== 'undefined' && D && D.soloMode);
-    if (_hasChildren && !_activeIsChild && !_isSoloBoot && !window._faithFree) {
+    var _activeProfileSet = (typeof _activeProfileId !== 'undefined') && _activeProfileId != null && _activeProfileId !== '';
+
+    // Resolve who the active profile is. Three outcomes:
+    //   'kid'    — a child profile is active
+    //   'parent' — the parent profile is active
+    //   null     — no active profile (treat as parent for routing purposes)
+    var _activeKind = null;
+    if (_activeProfileSet && typeof _profiles !== 'undefined' && Array.isArray(_profiles)) {
+      var _ap = _profiles.find(function(p){ return p && p.id === _activeProfileId; });
+      if (_ap) {
+        _activeKind = (_ap.isParent === false) ? 'kid' : 'parent';
+      }
+    }
+
+    // The parent-hub branch fires for everyone who is NOT a kid AND has
+    // at least one kid profile to manage AND isn't faith-free or solo.
+    // 'parent' explicitly + null implicitly both route here.
+    var _routeToParentHub =
+         _hasChildren
+      && !_isSoloBoot
+      && !window._faithFree
+      && _activeKind !== 'kid';
+    if (_routeToParentHub) {
       _defaultLanding = 's-parent';
     }
   } catch(_e){}
