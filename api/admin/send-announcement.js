@@ -195,7 +195,12 @@ function _renderFaithVariant({ unsubUrl }){
     +     '<div style="font-style:italic;font-size:17px;color:#0b1020;line-height:1.55;margin:0 0 8px;">' + _esc(scripture.text) + '</div>'
     +     '<div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;font-size:12px;color:#a16207;font-weight:700;letter-spacing:.06em;">&mdash; ' + _esc(scripture.ref) + '</div>'
     +   '</div>'
-    +   '<p style="font-size:15px;color:#0b1020;margin:0 0 18px;line-height:1.75;">If you ever want to share what would bless your family, just hit reply &mdash; I read every message. This is a family project, and your voice helps shape it.</p>'
+    +   '<div style="margin:0 0 24px;">'
+    +     '<div style="font-style:italic;font-size:13px;color:#a16207;font-weight:700;letter-spacing:.04em;margin:0 0 14px;">A glimpse of what\'s new in YourLife CC</div>'
+    +     '<p style="font-size:15px;color:#0b1020;margin:0 0 12px;line-height:1.7;">The Family Activity Feed now shows everything your kids did across every part of the app, in one warm view.</p>'
+    +     '<p style="font-size:15px;color:#0b1020;margin:0 0 12px;line-height:1.7;">Skills quizzes can now time your kids on rapid-fire questions and celebrate their streak when they finish.</p>'
+    +     '<p style="font-size:15px;color:#0b1020;margin:0;line-height:1.7;">New weekly check-ins for Health, Goals, and Money &mdash; gentle observations, never advice or pressure.</p>'
+    +   '</div>'
     +   '<p style="font-size:15px;color:#0b1020;margin:0 0 18px;">Whenever you\'re ready, the full app is here for you:</p>'
     +   '<div style="text-align:center;margin:0 0 28px;">'
     +     '<a href="https://yourlifecc.com/?from=announcement" style="display:inline-block;background:#7c3aed;color:#ffffff;font-weight:800;padding:13px 26px;border-radius:10px;text-decoration:none;font-size:15px;font-family:system-ui,-apple-system,Segoe UI,sans-serif;">See what\'s in YourLife CC &rarr;</a>'
@@ -223,7 +228,13 @@ function _renderFaithVariant({ unsubUrl }){
     '"' + scripture.text + '"',
     '  — ' + scripture.ref,
     '',
-    'If you ever want to share what would bless your family, just hit reply — I read every message. This is a family project, and your voice helps shape it.',
+    'A glimpse of what\'s new in YourLife CC',
+    '',
+    'The Family Activity Feed now shows everything your kids did across every part of the app, in one warm view.',
+    '',
+    'Skills quizzes can now time your kids on rapid-fire questions and celebrate their streak when they finish.',
+    '',
+    'New weekly check-ins for Health, Goals, and Money — gentle observations, never advice or pressure.',
     '',
     'Whenever you\'re ready, the full app is here for you:',
     'See what\'s in YourLife CC: https://yourlifecc.com/?from=announcement',
