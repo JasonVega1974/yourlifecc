@@ -4473,36 +4473,43 @@
     <button class="btn bp bs" onclick="save();showToast('Saved! 📅')" style="font-size:.75rem;">Save</button>
   </div>
 
-  <!-- Day / Week / Month toggle -->
-  <div style="display:flex;gap:.35rem;margin-bottom:.7rem;">
-    <button id="schedViewBtnDay"   onclick="schedSetView('day')"   class="btn bgh bs" style="flex:1;font-size:.78rem;font-weight:800;background:rgba(56,189,248,.15);border-color:rgba(56,189,248,.4);color:#38bdf8;">Day</button>
-    <button id="schedViewBtnWeek"  onclick="schedSetView('week')"  class="btn bgh bs" style="flex:1;font-size:.78rem;font-weight:800;">Week</button>
-    <button id="schedViewBtnMonth" onclick="schedSetView('month')" class="btn bgh bs" style="flex:1;font-size:.78rem;font-weight:800;">Month</button>
-  </div>
+  <!-- 2026-06-07 — Phase 3 B3-A: Schedule Power Card view strip.
+       Populated by renderScheduleViewStrip() in school.js — 3 cards
+       (Day / Week / Month) with circular progress rings showing
+       scheduled slots / total slots for the current nav window. Taps
+       drive the view switch through schedSetView(), zeroing the
+       per-view offset to match legacy button behavior. -->
+  <div id="scheduleViewStrip" aria-label="Schedule view picker"></div>
 
   <!-- Nav bar (prev / label / next / today) -->
-  <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.7rem;flex-wrap:wrap;">
-    <button class="btn bgh bs" onclick="schedNav(-1)" style="font-size:1rem;padding:.35rem .8rem;">‹</button>
-    <div style="position:relative;flex:1;">
-      <button id="schedMonthLbl" onclick="toggleSchedPicker()" style="font-family:var(--fh);font-size:1.1rem;letter-spacing:2px;color:var(--c);background:none;border:none;cursor:pointer;padding:.2rem .5rem;border-radius:8px;border:1px solid transparent;transition:all .15s;white-space:nowrap;" onmouseover="this.style.borderColor='rgba(56,189,248,.4)'" onmouseout="this.style.borderColor='transparent'">LOADING…</button>
+  <div class="sched-nav-row">
+    <button class="btn bgh bs sched-nav-arrow" onclick="schedNav(-1)">‹</button>
+    <div class="sched-nav-label-wrap">
+      <button id="schedMonthLbl" class="sched-nav-label" onclick="toggleSchedPicker()">LOADING…</button>
       <!-- Month/Year quick-jump picker (month view only) -->
-      <div id="schedPicker" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:500;background:var(--s2);border:1px solid rgba(56,189,248,.25);border-radius:14px;padding:1rem;box-shadow:0 12px 40px rgba(0,0,0,.5);min-width:280px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;">
+      <div id="schedPicker" class="sched-picker">
+        <div class="sched-picker-head">
           <button class="btn bgh bs" onclick="schedPickerYear(-1)">‹</button>
-          <span id="schedPickerYear" style="font-family:var(--fh);font-size:1.1rem;letter-spacing:2px;color:var(--c);">2025</span>
+          <span id="schedPickerYear" class="sched-picker-year">2025</span>
           <button class="btn bgh bs" onclick="schedPickerYear(1)">›</button>
         </div>
-        <div id="schedPickerMonths" style="display:grid;grid-template-columns:repeat(4,1fr);gap:.35rem;"></div>
-        <button class="btn bgh bs" style="width:100%;margin-top:.7rem;font-size:.75rem;" onclick="jumpToToday()">↩ Today</button>
+        <div id="schedPickerMonths" class="sched-picker-months"></div>
+        <button class="btn bgh bs sched-picker-today" onclick="jumpToToday()">↩ Today</button>
       </div>
     </div>
-    <button class="btn bgh bs" onclick="schedNav(1)" style="font-size:1rem;padding:.35rem .8rem;">›</button>
-    <button class="btn bgh bs" onclick="schedGoToday()" style="font-size:.75rem;">Today</button>
+    <button class="btn bgh bs sched-nav-arrow" onclick="schedNav(1)">›</button>
+    <button class="btn bgh bs sched-nav-today" onclick="schedGoToday()">Today</button>
   </div>
 
-  <div class="card" style="padding:.6rem;">
+  <div class="card sched-card" style="padding:.6rem;">
     <div class="sched-wrap" id="schedWrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch;"></div>
   </div>
+
+  <!-- 2026-06-07 — Phase 3 B3-A: scripture micro-line. Same tonal
+       treatment as Habits + Goals + Mood opener. Ps 90:12 fits the
+       schedule / time-stewardship theme. -->
+  <div class="sched-faith-divider" aria-hidden="true"></div>
+  <div class="sched-faith-line">Teach us to number our days, that we may gain a heart of wisdom. — Ps 90:12</div>
 </section>
 
 <!-- ════════════ CALENDAR ════════════════════════════════════ -->
