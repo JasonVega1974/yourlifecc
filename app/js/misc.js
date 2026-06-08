@@ -527,13 +527,85 @@ function logMood(level, btn){
   showToast(labels[level]||'Mood logged ✓');
 }
 
+// ════════════════════════════════════════════════════════════
+// 2026-06-07 — Phase 3 B3 Inc B: Mood feature strip.
+//
+// 3-card Power Card strip (Streak / Week / Month) above the existing
+// 30-day grid + mood log. Each card carries a circular SVG progress
+// ring matching the Skills/Health/Goals/Schedule strip family.
+//
+// Mood entries use locale date strings (e.g. "6/7/2026"), so the
+// streak walk normalizes via toISOString date keys.
+// ════════════════════════════════════════════════════════════
+const MOOD_COLORS = {5:'#22c55e',4:'#86efac',3:'#fbbf24',2:'#fb923c',1:'#ef4444'};
+const MOOD_EMOJIS = {5:'😄',4:'🙂',3:'😐',2:'😔',1:'😢'};
+
+function _calcMoodStreakDays(){
+  const moods = (D && Array.isArray(D.moods)) ? D.moods : [];
+  if(!moods.length) return 0;
+  let streak = 0;
+  const today = new Date();
+  for(let i = 0; i < 365; i++){
+    const d = new Date(today); d.setDate(today.getDate() - i);
+    const ds = d.toISOString().slice(0,10);
+    if(moods.some(function(m){ return m && m.date === ds; })) streak++;
+    else break;
+  }
+  return streak;
+}
+
+function _countMoodsInWindow(days){
+  const moods = (D && Array.isArray(D.moods)) ? D.moods : [];
+  const floor = new Date(); floor.setDate(floor.getDate() - (days - 1));
+  const floorISO = floor.toISOString().slice(0,10);
+  return moods.filter(function(m){ return m && m.date && m.date >= floorISO; }).length;
+}
+
+const MOOD_FEATURES = [
+  { key:'streak', icon:'🔥', name:'Streak', accent:'#f97316', total:7,
+    valueFn: _calcMoodStreakDays },
+  { key:'week',   icon:'📊', name:'Week',   accent:'var(--c)', total:7,
+    valueFn: function(){ return _countMoodsInWindow(7); } },
+  { key:'month',  icon:'📅', name:'Month',  accent:'var(--p)', total:30,
+    valueFn: function(){ return _countMoodsInWindow(30); } }
+];
+
+function renderMoodFeatureStrip(){
+  const host = document.getElementById('moodFeatureStrip');
+  if(!host) return;
+  host.innerHTML = MOOD_FEATURES.map(function(f){
+    const val = f.valueFn();
+    const total = f.total;
+    const pct = Math.min(1, val / Math.max(1, total));
+    const offset = (125.66 * (1 - pct)).toFixed(2);
+    const mastered = (val >= total);
+    return '<div class="mp-card' + (mastered ? ' is-mastered' : '') + '"'
+      + ' style="--mp-accent:' + f.accent + ';"'
+      + ' aria-label="' + f.name + ': ' + val + ' of ' + total + '">'
+      + '<span class="mp-ring" aria-hidden="true">'
+        + '<svg viewBox="0 0 48 48">'
+          + '<circle class="mp-ring-track" cx="24" cy="24" r="20"></circle>'
+          + '<circle class="mp-ring-fill"  cx="24" cy="24" r="20"'
+            + ' stroke-dasharray="125.66"'
+            + ' stroke-dashoffset="' + offset + '"></circle>'
+        + '</svg>'
+        + '<span class="mp-icon">' + f.icon + '</span>'
+      + '</span>'
+      + '<span class="mp-label">' + f.name + '</span>'
+      + '<span class="mp-value">' + val + (f.key === 'streak' ? ' day' + (val === 1 ? '' : 's') : ' of ' + total) + '</span>'
+    + '</div>';
+  }).join('');
+}
+
 function renderMoodTracker(){
   const grid = document.getElementById('moodGrid');
   const log = document.getElementById('moodLog');
   if(!grid || !log) return;
   const moods = D.moods||[];
-  const moodColors = {5:'#22c55e',4:'#86efac',3:'#fbbf24',2:'#fb923c',1:'#ef4444'};
-  const moodEmojis = {5:'😄',4:'🙂',3:'😐',2:'😔',1:'😢'};
+
+  // 2026-06-07 — Phase 3 B3-B: refresh the feature strip alongside
+  // the grid + log so all three views stay in sync.
+  if(typeof renderMoodFeatureStrip === 'function') renderMoodFeatureStrip();
 
   // Grid - last 30 days
   const today = new Date();
@@ -542,10 +614,19 @@ function renderMoodTracker(){
     const d = new Date(today); d.setDate(d.getDate()-i);
     const ds = d.toISOString().slice(0,10);
     const entry = moods.find(m=>m.date===ds);
-    const color = entry ? moodColors[entry.level] : 'rgba(255,255,255,.06)';
-    const emoji = entry ? moodEmojis[entry.level] : '';
+    const color = entry ? MOOD_COLORS[entry.level] : 'rgba(255,255,255,.06)';
+    const emoji = entry ? MOOD_EMOJIS[entry.level] : '';
     const label = d.getDate();
-    gridHTML+=`<div style="aspect-ratio:1;background:${color};border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.5rem;" title="${ds}: ${emoji||'No entry'}">${emoji||`<span style='font-size:.45rem;color:var(--tx2);'>${label}</span>`}</div>`;
+    // 2026-06-07 — Phase 3 B3-B: empty-cell label color routes through
+    // var(--tx3) (was inline color:var(--tx2) before — slight tighter
+    // hierarchy now that the cell itself uses a tokenized fallback).
+    gridHTML += '<div class="mp-grid-cell"'
+      + ' style="background:' + color + ';"'
+      + ' title="' + ds + ': ' + (emoji || 'No entry') + '">'
+      + (emoji
+        ? emoji
+        : '<span class="mp-grid-day">' + label + '</span>')
+      + '</div>';
   }
   grid.innerHTML = gridHTML;
 
@@ -557,19 +638,24 @@ function renderMoodTracker(){
     btns.forEach((b,i)=>{ b.style.border = (5-i)===todayMood.level ? '2px solid var(--c)' : '2px solid transparent'; });
   }
 
-  // Log - recent entries
+  // Log - recent entries (refactored to use .mp-log-row class — removes
+  // the inline rgba(255,255,255,.04) border-bottom hardcode and the
+  // 5 inline color/size attributes per row).
   const recent = moods.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,15);
-  if(!recent.length){ log.innerHTML='<div style="color:var(--tx2);font-size:.72rem;padding:1rem;text-align:center;">Log your first mood above!</div>'; return; }
-  log.innerHTML = recent.map(m=>{
+  if(!recent.length){
+    log.innerHTML = '<div class="mp-log-empty">Log your first mood above!</div>';
+    return;
+  }
+  log.innerHTML = recent.map(function(m){
     const d = new Date(m.date+'T12:00:00');
-    return `<div style="display:flex;align-items:center;gap:.5rem;padding:.35rem .4rem;border-bottom:1px solid rgba(255,255,255,.04);">
-      <span style="font-size:1rem;">${moodEmojis[m.level]}</span>
-      <div style="flex:1;">
-        <div style="font-size:.68rem;color:var(--tx);">${d.toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'})}</div>
-        ${m.note?`<div style="font-size:.58rem;color:var(--tx2);">${escapeHtml(m.note)}</div>`:''}
-      </div>
-      <span style="font-size:.55rem;color:var(--tx2);">${m.time||''}</span>
-    </div>`;
+    return '<div class="mp-log-row">'
+      + '<span class="mp-log-emoji">' + MOOD_EMOJIS[m.level] + '</span>'
+      + '<div class="mp-log-body">'
+      +   '<div class="mp-log-date">' + d.toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'}) + '</div>'
+      +   (m.note ? '<div class="mp-log-note">' + escapeHtml(m.note) + '</div>' : '')
+      + '</div>'
+      + '<span class="mp-log-time">' + (m.time||'') + '</span>'
+    + '</div>';
   }).join('');
 }
 
