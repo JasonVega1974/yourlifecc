@@ -5566,16 +5566,37 @@ async function sendTestDigestNow(){
       }
     });
     const data = await resp.json().catch(function(){ return {}; });
+    // FAF Track 1 — always log the server's diagnostic packet to
+    // console so we can debug skip reasons (no_kids / no_recent_activity
+    // / no_kid_activity / no_email) without guessing.
+    const firstDetail = data && data.details && data.details[0];
+    if(firstDetail){
+      try { console.log('[digest-test] server response:', data); } catch(_){}
+      if(firstDetail.diag){
+        try { console.log('[digest-test] diagnostics:', firstDetail.diag); } catch(_){}
+      }
+    }
     if(resp.ok && data && data.ok){
       const sentCount = data.sent || 0;
       if(sentCount > 0){
         if(typeof showToast === 'function') showToast('Test digest sent to ' + email + ' ✓');
       } else {
-        // Sent=0 means the payload builder returned null (no kids OR
-        // empty week). Surface the actual reason if the server
-        // included one in details.
-        const why = (data.details && data.details[0] && data.details[0].reason) || 'nothing to digest';
-        if(typeof showToast === 'function') showToast('No digest sent — ' + why);
+        const reason = (firstDetail && firstDetail.reason) || 'nothing to digest';
+        // Surface a human-friendly explanation for each named reason.
+        const REASON_COPY = {
+          no_kids:               'Add a child profile first',
+          no_recent_activity:    'No activity in the last 7 days',
+          no_kid_activity:       'No activity is tagged to a kid yet',
+          no_email:              'No recipient email on file',
+          wrong_plan_status:     'Account plan does not receive the digest',
+          not_opted_in:          'Enable the digest toggle above first',
+          all_opted_out:         'You unsubscribed from all emails',
+          no_timezone:           'Re-save your email to capture your timezone',
+          wrong_local_time:      'Not Sunday 7pm yet (test mode should bypass — check console)',
+          already_sent_this_week:'Already sent this week (test mode should bypass — check console)'
+        };
+        const human = REASON_COPY[reason] || reason;
+        if(typeof showToast === 'function') showToast('No digest sent — ' + human);
       }
     } else {
       const errMsg = (data && data.error) || ('HTTP ' + resp.status);
