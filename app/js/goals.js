@@ -406,6 +406,11 @@ function _checkGoalMilestones(){
     if(earned){
       D.goalMilestones[m.id] = new Date().toISOString().slice(0,10);
       anyNew = true;
+      // FAF Inc 2 — one feed event per first-earn so multi-badge
+      // moments render line by line on the Activity tab.
+      if(typeof logFamilyActivity === 'function'){
+        logFamilyActivity('goal', 'milestone_earned', 'Goal badge: ' + (m.name || m.id));
+      }
       // Stagger so multiple-at-once still feel distinct.
       setTimeout(function(){ _celebrateGoalMilestone(m); }, 100);
     }
@@ -780,6 +785,10 @@ function saveGoal(){
   document.getElementById('gText').value = '';
   const mEl = document.getElementById('gMotivation'); if(mEl) mEl.value = '';
   save(); renderGoals(); closeModal('goalAddModal'); showToast('Goal added! 🎯');
+  // FAF Inc 2 — new goal created.
+  if(typeof logFamilyActivity === 'function'){
+    logFamilyActivity('goal', 'created', 'New goal: ' + text);
+  }
   // 2026-06-07 — Goals Inc 2: milestone check (firstGoal).
   if(typeof _checkGoalMilestones === 'function') _checkGoalMilestones();
 }
@@ -1166,6 +1175,11 @@ function completeGoal(id){
   if(g.done && !wasDone){
     const pbAmt = g.type==='long' ? 25 : 10;
     if(typeof earnPB === 'function') earnPB(pbAmt, 'Goal completed: '+g.text);
+    // FAF Inc 2 — goal achieved. Only on the wasDone → done transition
+    // so re-toggling done/undone doesn't double-log.
+    if(typeof logFamilyActivity === 'function'){
+      logFamilyActivity('goal', 'completed', 'Goal achieved: ' + g.text + ' 🎯');
+    }
     const totalDone = (Array.isArray(D.goals)?D.goals:[]).filter(x=>x.done).length;
     if(totalDone % 5 === 0){
       if(!D.pb && typeof initParentBucks === 'function') initParentBucks();
@@ -1202,6 +1216,10 @@ function saveVision(){
   D.vision = document.getElementById('visionEditArea').value.trim();
   save(); renderVision(); closeModal('visionEditModal');
   showToast('Vision saved ✦');
+  // FAF Inc 2 — life vision updated.
+  if(typeof logFamilyActivity === 'function'){
+    logFamilyActivity('goal', 'vision_saved', 'Life vision updated');
+  }
   // 2026-06-07 — Goals Inc 2: milestone check (vision).
   if(typeof _checkGoalMilestones === 'function') _checkGoalMilestones();
 }
