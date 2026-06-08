@@ -4596,6 +4596,7 @@
     <button class="tab" onclick="hTab('nutEd',this)">📚 Learn</button>
     <button class="tab" onclick="hTab('growth',this)">📏 Growth</button>
     <button class="tab" onclick="hTab('habits',this)">✅ Habits</button>
+    <button class="tab" onclick="hTab('badges',this)">🏆 Badges</button>
   </div>
 
   <!-- Phase C-Health: Sleep tracker (bedtime/waketime + 7-day bars). -->
@@ -4869,6 +4870,13 @@
        note), recent sessions list, PR records tracker, faith micro-line
        (1 Tim 4:8). Backed by D.workoutLog[] + D.workoutGoal + D.prRecords{}. -->
   <div id="ht-movement" style="display:none;"></div>
+
+  <!-- 2026-06-07 — Health Inc 5: milestone badges grid. Populated by
+       renderBadgesGrid() in health.js from HEALTH_MILESTONES (8 badges).
+       Tapping an earned badge fires shareBadgeImage(id) — canvas PNG +
+       Web Share API with files / download fallback. Backed by
+       D.healthMilestones{} (permanent ratchet). -->
+  <div id="ht-badges" style="display:none;"></div>
 </section>
 
 <!-- ════════════ HABITS (first-class tab — Commit 1: Today + Streaks fully built) ════════════ -->
