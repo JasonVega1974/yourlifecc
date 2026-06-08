@@ -232,6 +232,17 @@ const DEF = {
   // Auto-fetched on s-health entry when dayKey != today AND user has
   // 3+ recent logs across sleep/meals/water/mood.
   healthCoachCache:{ dayKey:'', summary:'', focus:'', fetchedAt:0 },
+  // 2026-06-07 — Health Inc 4: Movement / workout log.
+  //   workoutLog  — [{id, date, type, duration, intensity, note}]
+  //                 type ∈ 'cardio'|'strength'|'sport'|'mobility'
+  //                 intensity ∈ 1 (easy) | 2 (moderate) | 3 (hard)
+  //   workoutGoal — weekly active-minutes target (default 150 per CDC)
+  //   prRecords   — {[lowercaseExerciseKey]:{exercise, value, unit, date}}
+  //                 keyed by lowercase so addPR upserts naturally;
+  //                 preserves original case via the exercise field.
+  // Wired through the Movement sub-tab + the Inc 1 domain strip
+  // (the existing _hDomainMovement helper reads D.workoutLog).
+  workoutLog:[], workoutGoal:150, prRecords:{},
   // mood
   moods:[],
   // goals / milestones
