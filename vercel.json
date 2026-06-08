@@ -15,6 +15,11 @@
     { "path": "/api/cron/engagement-tick", "schedule": "0 * * * *" },
     { "path": "/api/cron/crossover-tick",  "schedule": "0 10 * * 3" }
   ],
+  "functions": {
+    "api/cron/crossover-tick.js": {
+      "includeFiles": "docs/crossover-highlights.md"
+    }
+  },
   "headers": [
     {
       "source": "/(.*)",
