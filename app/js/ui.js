@@ -827,6 +827,18 @@ function setDefaultView(value){
   } catch(e){}
 }
 
+// 2026-06-07 — Faith tab swap setter. Persists D.tabSwap via save()
+// (cloud sync follows automatically) and live-updates the bottom tab
+// bar so the user sees the swap reflected immediately. Empty string
+// or any unknown value resolves to '' (default Faith).
+function setTabSwap(value){
+  if(typeof D === 'undefined' || !D) return;
+  const v = (value && TAB_SWAP_OPTIONS[value]) ? value : '';
+  D.tabSwap = v;
+  if(typeof save === 'function') save();
+  if(typeof renderBottomTabBar === 'function') renderBottomTabBar();
+}
+
 function openSettings(anchorId){
   // Reflect current default-view preference in the radio group.
   try {
@@ -837,6 +849,9 @@ function openSettings(anchorId){
 
   const _snEl=document.getElementById('settingsName'); if(_snEl) _snEl.value=D.name||'';
   const _msEl=document.getElementById('modeSelect'); if(_msEl) _msEl.value=D.mode||'high';
+  // 2026-06-07 — Faith tab swap dropdown.
+  const _tsEl=document.getElementById('settingsTabSwap');
+  if(_tsEl) _tsEl.value = (D.tabSwap && TAB_SWAP_OPTIONS[D.tabSwap]) ? D.tabSwap : '';
   // Verse speed
   const vs=document.getElementById('verseSpeed');
   if(vs) vs.value=D.verseSpeed||60000;
@@ -1066,6 +1081,26 @@ const NAV_ITEMS = [
 // Skills". The orphan `<div data-tab="learn">` host stays in the DOM
 // inside s-learn for desktop callers; renderTabLanding('learn') is a
 // no-op when no matching TAB_IA entry exists.
+// ════════════════════════════════════════════════════════════
+// 2026-06-07 — Faith tab swap options.
+//
+// Bottom-tab slot #2 defaults to ✝️ Faith. When D.tabSwap is set to
+// one of these keys, renderBottomTabBar() renders this label/icon/
+// accent in the slot instead, handleTabBarTap() routes to sectionId,
+// and setActiveBottomTab() lights this slot when _activeSection
+// matches. The TAB_IA 'faith' tab id stays stable for stability of
+// callers (_tabForSection, handleTabBarTap fallback).
+//
+// Faith-free users (window._faithFree) skip the bottom tab bar in
+// renderBottomTabBar's early return, so this map is inert for them.
+// ════════════════════════════════════════════════════════════
+const TAB_SWAP_OPTIONS = {
+  habits:  { label:'Habits',  icon:'💪', sectionId:'s-health',  accent:'var(--section-health)'      },
+  goals:   { label:'Goals',   icon:'🎯', sectionId:'s-goals',   accent:'var(--section-goals)'       },
+  money:   { label:'Money',   icon:'💰', sectionId:'s-finance', accent:'var(--section-finance)'     },
+  rewards: { label:'Rewards', icon:'🎁', sectionId:'s-rewards', accent:'var(--section-daily-life)'  }
+};
+
 const TAB_IA = [
   {id:'home',  label:'Home',  icon:'🏠', accent:'var(--c)',
     primary:[
@@ -1182,15 +1217,24 @@ function renderBottomTabBar(){
   if(window._faithFree) return;
   const bar = document.getElementById('bottomTabBar');
   if(!bar) return;
-  bar.innerHTML = TAB_IA.map(tab =>
-    '<button type="button" class="tab-btn" data-tab="'+tab.id+'"'
-      + ' style="--tab-accent:'+tab.accent+';"'
+  // 2026-06-07 — Faith tab swap: when D.tabSwap names a known option,
+  // render that option's label/icon/accent in the Faith slot. tabId
+  // stays 'faith' for handleTabBarTap + _tabForSection stability.
+  const swapKey = (typeof D !== 'undefined' && D && D.tabSwap) ? D.tabSwap : '';
+  const swap    = TAB_SWAP_OPTIONS[swapKey] || null;
+  bar.innerHTML = TAB_IA.map(tab => {
+    const isSwap   = (tab.id === 'faith' && swap);
+    const label    = isSwap ? swap.label  : tab.label;
+    const icon     = isSwap ? swap.icon   : tab.icon;
+    const accent   = isSwap ? swap.accent : tab.accent;
+    return '<button type="button" class="tab-btn" data-tab="'+tab.id+'"'
+      + ' style="--tab-accent:'+accent+';"'
       + ' onclick="handleTabBarTap(\''+tab.id+'\')"'
-      + ' aria-label="'+tab.label+' tab">'
-      + '<span class="tab-icon" aria-hidden="true">'+tab.icon+'</span>'
-      + '<span class="tab-label">'+tab.label+'</span>'
-    + '</button>'
-  ).join('');
+      + ' aria-label="'+label+' tab">'
+      + '<span class="tab-icon" aria-hidden="true">'+icon+'</span>'
+      + '<span class="tab-label">'+label+'</span>'
+    + '</button>';
+  }).join('');
   setActiveBottomTab(_tabForSection(_activeSection) || 'home');
 }
 
@@ -1423,6 +1467,14 @@ function renderAllTabLandings(){
 }
 
 function setActiveBottomTab(tabId){
+  // 2026-06-07 — Faith tab swap: if the user is at the swap section,
+  // light the 'faith' slot regardless of which tab _tabForSection
+  // returned. Matches the user's mental model that the swap option
+  // IS their slot #2.
+  if(typeof D !== 'undefined' && D && D.tabSwap && TAB_SWAP_OPTIONS[D.tabSwap]
+     && TAB_SWAP_OPTIONS[D.tabSwap].sectionId === _activeSection){
+    tabId = 'faith';
+  }
   document.querySelectorAll('#bottomTabBar .tab-btn').forEach(b => {
     b.classList.toggle('active', b.getAttribute('data-tab') === tabId);
   });
@@ -1570,6 +1622,13 @@ function handleTabBarTap(tabId){
   // V1 Rebuild · Session 1 — 'family' routes straight to Parent Hub (which
   // has its own gate). 'learn' kept as a defensive alias so any legacy
   // caller that still hands us 'learn' lands on a real section.
+  // 2026-06-07 — Faith tab swap: when the Faith slot has been swapped
+  // out, route to the chosen section instead of s-scripture.
+  if(tabId === 'faith' && typeof D !== 'undefined' && D && D.tabSwap
+     && TAB_SWAP_OPTIONS[D.tabSwap]){
+    showSection(TAB_SWAP_OPTIONS[D.tabSwap].sectionId);
+    return;
+  }
   const dest = {home:'s-hero', life:'s-life', faith:'s-scripture',
                 family:'s-parent', me:'s-me', learn:'s-learn'}[tabId];
   if(dest) showSection(dest);
