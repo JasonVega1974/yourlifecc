@@ -695,9 +695,25 @@ module.exports = async function handler(req, res){
       );
     } else {
       // Plan-status pre-filter at the DB level; remaining gates done in JS.
-      // Faith_free is naturally excluded by the IN filter.
+      //
+      // Track 3 atomic audience routing — explicit double exclusion of
+      // faith_free at the DB layer in the SAME commit Track 3's
+      // crossover-tick activates. Belt + suspenders:
+      //   1) plan_status=in.(active,trialing,free_contest) excludes
+      //      faith_free by construction
+      //   2) plan_status=neq.faith_free is the explicit safety net
+      //      that fails the query if (1) ever regresses (e.g. someone
+      //      adds 'faith_free' to the IN list by mistake)
+      //   3) The per-user dispatch in _evaluateUser() also short-
+      //      circuits on plan_status==='faith_free' with reason
+      //      'faith_only_user_track3_handles'
+      // Three layers, so a faith-only user can NEVER receive a
+      // Track 2 engagement email — Track 3 owns that audience.
       rows = await _supaGet(
-        'profiles?select=user_id,email,plan_status,created_at,data&plan_status=in.(active,trialing,free_contest)&limit=2000',
+        'profiles?select=user_id,email,plan_status,created_at,data'
+        + '&plan_status=in.(active,trialing,free_contest)'
+        + '&plan_status=neq.faith_free'
+        + '&limit=2000',
         serviceKey
       );
     }
