@@ -5045,6 +5045,13 @@
       <span class="gv-vision-placeholder">Tap to write your life vision statement — who do you want to become?</span>
     </div>
     <button class="gv-vision-edit" onclick="openVisionEdit()">✏️ Edit Vision</button>
+    <!-- 2026-06-07 — Goals Inc 1: scripture micro-line. Same tonal
+         treatment as Habits + Goals card on the Life-tab Power Cards
+         and the Health mood opener. Italic Bebas, low opacity, divider
+         sweep above — speaks to the spiritual stewardship of life goals
+         without overriding the secular vision flow. -->
+    <div class="gv-faith-divider" aria-hidden="true"></div>
+    <div class="gv-faith-line">Commit your work to the Lord, and he will establish your plans. — Prov 16:3</div>
   </div>
 
   <!-- ── 1 / 3 / 5 / 10 Year Timeline ─────────────────────────── -->
@@ -5073,6 +5080,14 @@
       <div class="gv-tl-preview" id="tlPrev-10"><span class="gv-tl-add">+ Tap to set</span></div>
     </div>
   </div>
+
+  <!-- 2026-06-07 — Goals Inc 1: Power Cards domain strip. Populated
+       by renderGoalDomainStrip() in goals.js from GOAL_DOMAINS (10
+       categories matching the Add-Goal modal dropdown). Each card
+       carries a circular SVG progress ring (done / total in category);
+       tapping smooth-scrolls to the goals list below. Mastery state
+       (100% complete) flips the accent to gold. -->
+  <div id="goalDomainStrip" aria-label="Goal category progress"></div>
 
   <!-- ── Goal Stats ─────────────────────────────────────────────── -->
   <div class="gv-stats" id="gvStats"></div>
