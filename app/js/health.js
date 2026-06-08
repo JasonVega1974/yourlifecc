@@ -125,6 +125,177 @@ function hTab(tab,btn){
   if(tab==='sleep'){ renderSleepBars(); renderSleepList(); }
   if(tab==='mind') renderPhq2();
   if(tab==='meals') renderMealLog();
+  // 2026-06-07 — Health Inc 2: hydration tracker
+  if(tab==='water') renderWaterTracker();
+}
+
+// ════════════════════════════════════════════════════════════
+// 2026-06-07 — Health Inc 2: Hydration tracker.
+//
+// One entry per local day in D.waterLog ([{date, cups}]). logWater(±1)
+// bumps today's entry (finds-or-creates), capping at 0..30 cups and
+// the log itself at 365 entries. Midnight reset is automatic — a new
+// date string => a new entry on first tap of the new day.
+//
+// Streak: count consecutive days back from today where cups >= goal.
+// Today is excluded if it hasn't yet hit goal (preserves yesterday's
+// streak while the user is mid-day).
+//
+// Goal-hit celebration: side confetti + toast on the cup that crosses
+// the threshold. Single-fire per day (only when cups === goal exactly).
+// ════════════════════════════════════════════════════════════
+function logWater(delta){
+  if(!D.waterLog) D.waterLog = [];
+  const today = new Date().toISOString().slice(0,10);
+  let entry = D.waterLog.find(e => e && e.date === today);
+  if(!entry){
+    entry = { date: today, cups: 0 };
+    D.waterLog.unshift(entry);
+  }
+  const prev = entry.cups || 0;
+  entry.cups = Math.max(0, Math.min(30, prev + delta));
+  if(D.waterLog.length > 365) D.waterLog = D.waterLog.slice(0, 365);
+  save();
+  renderWaterTracker();
+  // Cross-tab freshness — the Health domain strip doesn't currently
+  // include a Hydration tile, but this keeps existing rings honest.
+  if(typeof renderHealthDomainStrip === 'function') renderHealthDomainStrip();
+  const goal = D.waterGoal || 8;
+  if(delta > 0 && prev < goal && entry.cups >= goal){
+    if(typeof launchSideConfetti === 'function') launchSideConfetti();
+    if(typeof showToast === 'function') showToast('Daily water goal hit! 💧');
+  }
+}
+
+function setWaterGoal(value){
+  const n = parseInt(value, 10);
+  if(isNaN(n) || n < 1 || n > 30) return;
+  D.waterGoal = n;
+  save();
+  renderWaterTracker();
+  if(typeof showToast === 'function') showToast('Goal set: ' + n + ' cups');
+}
+
+function calcWaterStreak(){
+  const log = D.waterLog || [];
+  const goal = D.waterGoal || 8;
+  if(!log.length) return 0;
+  let streak = 0;
+  const today = new Date().toISOString().slice(0,10);
+  const todayEntry = log.find(e => e && e.date === today);
+  // Today not yet hit goal → start counting from yesterday (don't
+  // break an existing streak just because the day is in progress).
+  let startOffset = 0;
+  if(!todayEntry || (todayEntry.cups||0) < goal) startOffset = 1;
+  for(let i = startOffset; i < 90; i++){
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().slice(0,10);
+    const entry = log.find(e => e && e.date === ds);
+    if(entry && (entry.cups||0) >= goal) streak++;
+    else break;
+  }
+  return streak;
+}
+
+function renderWaterTracker(){
+  const el = document.getElementById('ht-water');
+  if(!el) return;
+  const today = new Date().toISOString().slice(0,10);
+  const log = D.waterLog || [];
+  const goal = D.waterGoal || 8;
+  const todayEntry = log.find(e => e && e.date === today);
+  const cups = todayEntry ? (todayEntry.cups || 0) : 0;
+  const streak = calcWaterStreak();
+
+  // Big progress ring — r=70, viewBox 200x200, stroke 14
+  const r = 70;
+  const C = 2 * Math.PI * r;
+  const fillFrac = Math.min(1, cups / Math.max(1, goal));
+  const offset = C * (1 - fillFrac);
+  const pct = Math.round(fillFrac * 100);
+
+  el.innerHTML =
+      '<div class="card" style="border-left:4px solid var(--section-health);text-align:center;">'
+    +   '<div class="ct" style="justify-content:center;">💧 Today\'s Hydration</div>'
+    +   '<div style="font-size:.78rem;color:var(--tx2);margin-bottom:.85rem;line-height:1.55;">Tap to log each cup. Resets at midnight. 64 oz (8 cups) is the teen minimum.</div>'
+    +   '<div class="water-ring-wrap">'
+    +     '<svg viewBox="0 0 200 200" class="water-ring-svg" aria-hidden="true">'
+    +       '<defs>'
+    +         '<linearGradient id="waterRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">'
+    +           '<stop offset="0%"   stop-color="#38bdf8"/>'
+    +           '<stop offset="100%" stop-color="#22d3ee"/>'
+    +         '</linearGradient>'
+    +       '</defs>'
+    +       '<circle class="water-ring-track" cx="100" cy="100" r="' + r + '"></circle>'
+    +       '<circle class="water-ring-fill"  cx="100" cy="100" r="' + r + '"'
+    +         ' stroke-dasharray="'  + C.toFixed(2) + '"'
+    +         ' stroke-dashoffset="' + offset.toFixed(2) + '"></circle>'
+    +     '</svg>'
+    +     '<div class="water-ring-center">'
+    +       '<div class="water-ring-cups">' + cups + '<span class="water-ring-unit">/' + goal + '</span></div>'
+    +       '<div class="water-ring-label">cups · ' + pct + '%</div>'
+    +     '</div>'
+    +   '</div>'
+    +   '<div class="water-actions">'
+    +     '<button class="water-btn water-minus" onclick="logWater(-1)" aria-label="Remove a cup"' + (cups<=0?' disabled':'') + '>−</button>'
+    +     '<button class="water-btn water-plus"  onclick="logWater(1)"  aria-label="Add a cup">+ Cup</button>'
+    +   '</div>'
+    +   (streak > 0
+        ? '<div class="water-streak-pill">🔥 ' + streak + '-day streak</div>'
+        : '<div class="water-streak-hint">Hit the goal today to start a streak.</div>')
+    +   '<div class="water-goal-row">'
+    +     '<label for="waterGoalInput">Daily goal</label>'
+    +     '<input type="number" id="waterGoalInput" min="1" max="30" value="' + goal + '" onchange="setWaterGoal(this.value)">'
+    +     '<span>cups</span>'
+    +   '</div>'
+    + '</div>'
+    + '<div class="card" style="margin-top:.8rem;">'
+    +   '<div class="ct">📊 Last 7 Days</div>'
+    +   '<div id="waterWeekChart"></div>'
+    +   '<div class="water-tip">Pale yellow urine = hydrated. Dark yellow = drink more. Soda and juice don\'t count.</div>'
+    + '</div>';
+
+  _renderWaterDayChart();
+}
+
+function _renderWaterDayChart(){
+  const el = document.getElementById('waterWeekChart');
+  if(!el) return;
+  const log = D.waterLog || [];
+  const goal = D.waterGoal || 8;
+  const today = new Date();
+  const days = [];
+  for(let i = 6; i >= 0; i--){
+    const d = new Date(today); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().slice(0,10);
+    const entry = log.find(e => e && e.date === ds);
+    const cups = entry ? (entry.cups||0) : 0;
+    days.push({
+      ds: ds,
+      cups: cups,
+      hasData: !!entry,
+      dl: d.toLocaleDateString('en-US',{weekday:'short'}),
+      hit: cups >= goal
+    });
+  }
+  const maxC = Math.max(goal + 2, ...days.map(d => d.cups));
+  el.innerHTML = '<div class="water-bars">'
+    + days.map(d => {
+        const pct = d.cups > 0 ? Math.max(6, (d.cups / maxC) * 100) : 0;
+        const color = !d.cups ? 'rgba(255,255,255,.06)'
+                    : d.hit  ? 'linear-gradient(180deg, #22d3ee, #38bdf8)'
+                             : 'linear-gradient(180deg, #60a5fa, #3b82f6)';
+        return '<div class="water-bar-col">'
+          + '<div class="water-bar-stack">'
+          + (d.cups > 0
+              ? '<div class="water-bar-fill" style="height:' + pct + '%;background:' + color + ';"></div>'
+              : '<div class="water-bar-empty"></div>')
+          + '</div>'
+          + '<div class="water-bar-label">' + d.dl + '</div>'
+          + '<div class="water-bar-val">' + (d.cups > 0 ? d.cups : '—') + '</div>'
+          + '</div>';
+      }).join('')
+    + '</div>';
 }
 
 function logWeight(){ const w=parseFloat(document.getElementById('wInput').value); const goal=parseFloat(document.getElementById('wGoal').value); const date=document.getElementById('wDate').value||localDateString(); if(isNaN(w)||w<=0){showToast('Enter a valid weight');return;} if(!isNaN(goal)&&goal>0) D.weightGoal=goal; if(!D.weightLog) D.weightLog=[]; D.weightLog.unshift({id:Date.now(),weight:w,date}); if(D.weightLog.length>90) D.weightLog=D.weightLog.slice(0,90); document.getElementById('wInput').value=''; save(); renderWeightList(); renderWeightChart(); updateWeightStats(); showToast('Logged! ⚖️'); }
