@@ -1,5 +1,28 @@
 // Vercel Serverless Function
 // File location in repo: api/send-email.js
+//
+// ─── INTERNAL USE ONLY ────────────────────────────────────────
+// This endpoint hardcodes the recipient to info@kingdom-creatives.com.
+// It is for app-side feedback / internal notification ONLY. Any `to`
+// or `htmlContent` field passed in the request body is SILENTLY
+// IGNORED — the email always goes to Jason's inbox.
+//
+// 2026-06-08 (Email Bundle PR 0): the prior emailWeeklySummary() in
+// parent.js called this endpoint with a parent's `to` field thinking
+// it was honored. It was not. Every "weekly summary email" silently
+// landed in info@kingdom-creatives.com instead of the parent's inbox.
+// That call site is now retired.
+//
+// For EXTERNAL recipients (parent emails, kid-named-to-parent emails,
+// crossover invitations), build a dedicated endpoint modeled on
+// api/notify-parent-purchase.js — it validates `to` against
+// EMAIL_RE, CORS-gates to yourlifecc.com origins, and supports both
+// textContent + htmlContent. Tracks 1/2/3 of the email bundle add:
+//   • /api/cron/weekly-digest    — Track 1 (Sunday digest)
+//   • /api/cron/engagement-tick  — Track 2 (engagement triggers)
+//   • /api/cron/crossover-tick   — Track 3 (faith-only crossover)
+// Each builds and sends its own emails; none use this endpoint.
+// ─────────────────────────────────────────────────────────────
 
 const https = require('https');
 
