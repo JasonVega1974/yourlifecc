@@ -693,6 +693,20 @@ const BADGES = [
   {id:'b-chore100',name:'Chore Champion',icon:'🌟',desc:'100 chore points earned',check:()=>((D.chorePoints||{}).total||0)>=100},
   {id:'b-mood30',name:'Self-Aware',icon:'😊',desc:'30 days of mood logging',check:()=>(D.moods||[]).length>=30},
   {id:'b-mentor5',name:'Network Builder',icon:'🤝',desc:'5+ people in My People',check:()=>(D.mentors||[]).length>=5},
+  // 2026-06-07 — Health Inc 5: milestone badges. All eight gate on
+  // D.healthMilestones[id], written by _checkHealthMilestones() in
+  // health.js when the underlying log criterion is first met. The
+  // check function here only confirms the earn, never re-evaluates
+  // the underlying log shape, so it stays in lockstep with the
+  // permanent ratchet (no false un-earns).
+  {id:'h-water7',     name:'Hydrated',          icon:'🌊', desc:'7-day water streak',                  check:()=>!!(D.healthMilestones&&D.healthMilestones['water7'])},
+  {id:'h-sleep30',    name:'Sleep Scholar',     icon:'💤', desc:'30 sleep nights logged',              check:()=>!!(D.healthMilestones&&D.healthMilestones['sleep30'])},
+  {id:'h-water100',   name:'Centurion',         icon:'💧', desc:'100 cups of water tracked',           check:()=>!!(D.healthMilestones&&D.healthMilestones['water100'])},
+  {id:'h-firstWorkout',name:'First Rep',        icon:'💪', desc:'First workout logged',                check:()=>!!(D.healthMilestones&&D.healthMilestones['firstWorkout'])},
+  {id:'h-meals7',     name:'Consistent',        icon:'🍽️', desc:'7-day meal logging streak',          check:()=>!!(D.healthMilestones&&D.healthMilestones['meals7'])},
+  {id:'h-phq6',       name:'Check-in Champion', icon:'🧠', desc:'6 weekly mind check-ins logged',      check:()=>!!(D.healthMilestones&&D.healthMilestones['phq6'])},
+  {id:'h-weeklyMin',  name:'Goal Crusher',      icon:'🎯', desc:'Hit your weekly active-minutes goal', check:()=>!!(D.healthMilestones&&D.healthMilestones['weeklyMin'])},
+  {id:'h-mood7',      name:'In Tune',           icon:'💚', desc:'7-day mood log streak',               check:()=>!!(D.healthMilestones&&D.healthMilestones['mood7'])},
 ];
 
 function renderBadges(){
