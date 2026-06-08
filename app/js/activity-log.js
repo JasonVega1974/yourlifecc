@@ -134,20 +134,30 @@
   }
 
   // ── Primary writer ───────────────────────────────────────────
-  // Every Inc 2 module call site will land here. Returns the
-  // pushed entry (or null if deduped) so callers can chain a
-  // meta update or log a dev hint without re-walking the array.
-  function logFamilyActivity(domain, event, title, meta){
+  // Every Inc 2 module call site lands here. Returns the pushed
+  // entry (or null if deduped) so callers can chain a meta update
+  // without re-walking the array.
+  //
+  // profileIdOverride (5th arg, FAF Inc 2):
+  //   undefined → use _activeProfile() (default — kid-side calls)
+  //   null      → explicit null (parent-side actions; the kid view
+  //               filters domain='parent' out, the parent view sees
+  //               them all)
+  //   string    → pin to a specific profileId (rare)
+  function logFamilyActivity(domain, event, title, meta, profileIdOverride){
     try {
       if (typeof D === 'undefined' || !D) return null;
       if (!Array.isArray(D.activityLog)) D.activityLog = [];
 
       const ts = Date.now();
+      const profileId = (profileIdOverride === undefined)
+        ? _activeProfile()
+        : (profileIdOverride === null ? null : String(profileIdOverride));
       const entry = {
         id:        _genId(),
         ts:        ts,
         date:      _localDate(ts),
-        profileId: _activeProfile(),
+        profileId: profileId,
         domain:    String(domain || 'misc'),
         event:     String(event  || 'action'),
         title:     String(title  || '')
