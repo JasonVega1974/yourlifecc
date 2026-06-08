@@ -4536,6 +4536,14 @@
 <section id="s-health" class="sec">
   <div class="sh"><div class="si">💪</div><div class="st">Health &amp; Fitness</div><span class="tip-wrap"><span class="tip-btn">?</span><span class="tip-box tip-right"><span class="tip-title">HOW TO USE</span><br><b>Weight:</b> Log weight + goal → see progress chart with dots labeled by date. <b>Nutrition:</b> Log meals → daily macro totals update live. <b>Habits:</b> Same as dashboard check-ins — synced.</span></span><div class="sl"></div></div>
 
+  <!-- 2026-06-07 — Health Inc 3: AI Health Coach card. Populated by
+       renderHealthCoach() in health.js; auto-fetched on s-health entry
+       when dayKey is stale + user has 3+ recent logs. Mirrors the Money
+       Coach pattern, gated by HEALTH_COACH_SYSTEM safety prompt (no
+       diagnosis, no medication, 988 escalation language for elevated
+       PHQ-2 scores). -->
+  <div id="healthCoachCard" aria-label="Daily health coaching"></div>
+
   <!-- 2026-06-07 — Health Inc 1: Power Cards domain strip. Populated by
        renderHealthDomainStrip() in health.js from HEALTH_DOMAINS. Each
        card carries a 7-day completion ring; tapping routes to the
