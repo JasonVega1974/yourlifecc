@@ -2488,15 +2488,243 @@ body.solo-mode .sp-family-only { display: none !important; }
    open; restores them on close via a MutationObserver in skills.js. */
 #s-skills #skillsGrid.topic-card-grid { /* already styled by the global rule */ }
 .sk-topic-card { position: relative; }
-.sk-cert-pill {
-  position: absolute; top: .4rem; right: .4rem;
-  font-size: .55rem; font-weight: 800; letter-spacing: .06em;
-  background: rgba(34,197,94,.18); color: #22c55e;
-  border: 1px solid rgba(34,197,94,.3);
-  padding: .12rem .35rem; border-radius: 5px;
-  z-index: 1;
+
+/* ════════════════════════════════════════════════════════════
+   2026-06-07 — Skills Step 2: Power Cards visual upgrade.
+
+   Mirrors the Life tab Power Cards design system, scoped to
+   #s-skills only so the global .topic-card pattern (used by Faith
+   stack, Learn hub, etc.) stays untouched.
+
+   Three layers:
+   1. .sk-domain-card — domain cluster cards above the grid, each
+      with a circular SVG progress ring (certs in domain / total)
+      and a centered emoji glyph. Tap to filter the grid.
+   2. #s-skills .sk-topic-card — adds a 1.5px cat-color gradient
+      ring around each topic card (Power Card border treatment).
+   3. #s-skills .sk-cert-pill — holographic gold pill with conic
+      gradient shimmer for earned certs.
+
+   All idle motion is auto-suppressed by the global
+   @media (prefers-reduced-motion: reduce) rule.
+   ════════════════════════════════════════════════════════════ */
+
+/* ─── Domain strip ────────────────────────────────────────── */
+#skDomainStrip{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:10px;
+  margin:0 0 16px;
+  padding:0;
 }
-:root.light .sk-cert-pill { background: rgba(34,197,94,.14); color: #166534; }
+@media (min-width:520px){ #skDomainStrip{ grid-template-columns:repeat(5, 1fr); } }
+@media (min-width:861px){ #skDomainStrip{ grid-template-columns:repeat(9, 1fr); gap:12px; } }
+
+.sk-domain-card{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  padding:12px 6px 10px;
+  border:1px solid var(--card-border, rgba(255,255,255,.08));
+  border-radius:14px;
+  background:
+    linear-gradient(160deg,
+      color-mix(in srgb, var(--dom-accent, var(--c)) 14%, transparent) 0%,
+      transparent 70%),
+    var(--card-bg, rgba(255,255,255,.04));
+  cursor:pointer;
+  font-family:var(--fm);
+  color:var(--tx);
+  transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.sk-domain-card::before{
+  content:'';
+  position:absolute; inset:0;
+  border-radius:14px;
+  padding:1.5px;
+  background:linear-gradient(135deg,
+    var(--dom-accent, var(--c)),
+    color-mix(in srgb, var(--dom-accent, var(--c)) 60%, #818cf8));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask-composite:exclude;
+  opacity:.35;
+  pointer-events:none;
+  z-index:0;
+  transition:opacity .15s ease;
+}
+.sk-domain-card:hover,
+.sk-domain-card:focus-visible{
+  transform:translateY(-2px);
+  box-shadow:0 8px 20px color-mix(in srgb, var(--dom-accent, var(--c)) 24%, transparent);
+  outline:none;
+}
+.sk-domain-card:hover::before,
+.sk-domain-card:focus-visible::before{ opacity:.75; }
+.sk-domain-card:active{ transform:translateY(0) scale(.98); }
+.sk-domain-card.is-active{
+  border-color:transparent;
+  box-shadow:0 0 0 1px var(--dom-accent, var(--c)),
+             0 10px 28px color-mix(in srgb, var(--dom-accent, var(--c)) 35%, transparent);
+}
+.sk-domain-card.is-active::before{ opacity:1; }
+.sk-domain-card > *{ position:relative; z-index:1; }
+
+/* "All" card uses a neutral cyan/violet accent so it doesn't read
+   as one of the 8 themed domains. */
+.sk-domain-card.sk-dom-all{
+  --dom-accent: var(--c, #38bdf8);
+}
+
+/* Mastery — every cert in the domain earned. Ring turns gold,
+   glyph gets a glow halo, card pulses gently. */
+.sk-domain-card.is-mastered{
+  --dom-accent:#fbbf24;
+}
+.sk-domain-card.is-mastered .sk-dom-icon{
+  filter:drop-shadow(0 0 6px rgba(251,191,36,.7));
+}
+
+/* ─── Progress ring ──────────────────────────────────────── */
+.sk-dom-ring{
+  position:relative;
+  width:42px; height:42px;
+  display:grid; place-items:center;
+}
+.sk-dom-ring svg{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  transform:rotate(-90deg);
+}
+.sk-dom-ring-track{
+  fill:none;
+  stroke:rgba(255,255,255,.08);
+  stroke-width:3;
+}
+.sk-dom-ring-fill{
+  fill:none;
+  stroke:var(--dom-accent, var(--c));
+  stroke-width:3;
+  stroke-linecap:round;
+  transition:stroke-dashoffset .6s cubic-bezier(.4,0,.2,1);
+}
+.sk-dom-icon{
+  font-size:1.2rem; line-height:1;
+  z-index:1;
+  filter:drop-shadow(0 0 6px color-mix(in srgb, var(--dom-accent, var(--c)) 40%, transparent));
+}
+.sk-dom-label{
+  font-family:var(--fh);
+  font-size:.74rem;
+  letter-spacing:.06em;
+  color:var(--tx);
+  line-height:1;
+  margin-top:2px;
+}
+.sk-dom-progress{
+  font-family:var(--fm);
+  font-size:.62rem;
+  color:var(--tx2);
+  line-height:1;
+}
+.sk-domain-card.is-active .sk-dom-label,
+.sk-domain-card.is-active .sk-dom-progress{ color:#fff; }
+
+/* ─── Topic card Power Card border treatment ──────────────── */
+#s-skills .sk-topic-card{
+  isolation:isolate;
+  overflow:hidden;
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+#s-skills .sk-topic-card::after{
+  content:'';
+  position:absolute; inset:0;
+  border-radius:inherit;
+  padding:1.5px;
+  background:linear-gradient(135deg,
+    var(--sk-card-accent, var(--c)),
+    color-mix(in srgb, var(--sk-card-accent, var(--c)) 55%, #818cf8));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask-composite:exclude;
+  opacity:.55;
+  pointer-events:none;
+  z-index:2;
+  transition:opacity .2s ease;
+}
+#s-skills .sk-topic-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 12px 32px color-mix(in srgb, var(--sk-card-accent, var(--c)) 30%, transparent);
+}
+#s-skills .sk-topic-card:hover::after{ opacity:.95; }
+#s-skills .sk-topic-card .sk-cert-pill,
+#s-skills .sk-topic-card .topic-card-hero-wrap,
+#s-skills .sk-topic-card .topic-card-title,
+#s-skills .sk-topic-card .topic-card-desc{ position:relative; z-index:3; }
+
+/* ─── Holographic cert pill ──────────────────────────────── */
+#s-skills .sk-cert-pill{
+  position:absolute; top:.5rem; right:.5rem;
+  font-size:.58rem; font-weight:900; letter-spacing:.08em;
+  padding:.2rem .55rem;
+  border-radius:999px;
+  color:#1a1a2e;
+  border:1px solid rgba(255,255,255,.4);
+  background:
+    linear-gradient(135deg, #fde68a 0%, #fbbf24 50%, #f59e0b 100%);
+  box-shadow:
+    0 0 0 1px rgba(251,191,36,.35),
+    0 4px 14px color-mix(in srgb, #f59e0b 50%, transparent),
+    inset 0 1px 0 rgba(255,255,255,.5);
+  overflow:hidden;
+  z-index:4;
+  isolation:isolate;
+}
+#s-skills .sk-cert-pill::before{
+  content:'';
+  position:absolute; inset:-50%;
+  background:conic-gradient(from 0deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,.55) 20%,
+    rgba(255,255,255,0) 40%,
+    rgba(255,255,255,0) 100%);
+  animation:skCertShimmer 4s linear infinite;
+  pointer-events:none;
+  z-index:0;
+  mix-blend-mode:screen;
+}
+#s-skills .sk-cert-pill > *{ position:relative; z-index:1; }
+@keyframes skCertShimmer{
+  0%   { transform:rotate(0deg); }
+  100% { transform:rotate(360deg); }
+}
+
+/* Light theme — domain cards inverted background, cert pill keeps
+   the gold but tones the shimmer for legibility. */
+:root.light #skDomainStrip .sk-domain-card{
+  background:
+    linear-gradient(160deg,
+      color-mix(in srgb, var(--dom-accent, var(--c)) 10%, #fff) 0%,
+      #fff 70%) !important;
+  border-color:rgba(0,0,0,.08) !important;
+  box-shadow:0 2px 10px rgba(0,0,0,.06);
+}
+:root.light #skDomainStrip .sk-dom-ring-track{ stroke:rgba(0,0,0,.1); }
+:root.light #skDomainStrip .sk-dom-label{ color:#0f172a !important; }
+:root.light #skDomainStrip .sk-dom-progress{ color:#475569 !important; }
+:root.light #skDomainStrip .sk-domain-card.is-active .sk-dom-label,
+:root.light #skDomainStrip .sk-domain-card.is-active .sk-dom-progress{ color:#0f172a !important; }
+:root.light #s-skills .sk-cert-pill{
+  color:#1a1a2e !important;
+  border-color:rgba(0,0,0,.12) !important;
+}
+:root.light #s-skills .sk-cert-pill::before{ opacity:.55; mix-blend-mode:overlay; }
+/* ════════════════════════════════════════════════════════════ */
 
 /* Inline modal mode — skillsModal lives inside #s-skills after relocation */
 #s-skills > #skillsModal {
