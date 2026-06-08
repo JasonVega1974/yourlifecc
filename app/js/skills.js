@@ -4112,6 +4112,12 @@ function finishSkillQuiz(){
   if(!D.skillQuizScores) D.skillQuizScores = {};
   D.skillQuizScores[_quizKey] = pct;
 
+  // FAF Inc 2 — detect first-time cert vs retake so cert_earned only
+  // fires on the milestone moment (the existing assignment below
+  // overwrites D.skillCerts[_quizKey] on every pass).
+  const _hadCert = !!(D.skillCerts && D.skillCerts[_quizKey]);
+  const _subjectLabel = (cat && cat.label) ? cat.label : _quizKey;
+
   if(passed){
     if(!D.skillCerts) D.skillCerts = {};
     D.skillCerts[_quizKey] = new Date().toLocaleDateString();
@@ -4127,6 +4133,20 @@ function finishSkillQuiz(){
     setTimeout(()=>{ if(typeof launchBigConfetti==='function') launchBigConfetti(); }, 300);
     // 2026-06-07 — Skills Step 3: pass fanfare (gated by D.skillsSound).
     if(typeof _skPlayPass === 'function') setTimeout(_skPlayPass, 200);
+    // FAF Inc 2 — quiz_passed fires on every pass (incl. retakes);
+    // cert_earned fires only on the first-ever cert for this subject
+    // so the feed marks the milestone once but tracks every retake.
+    if(typeof logFamilyActivity === 'function'){
+      logFamilyActivity('skill', 'quiz_passed', 'Quiz passed: ' + _subjectLabel);
+      if(!_hadCert){
+        logFamilyActivity('skill', 'cert_earned', 'Certified: ' + _subjectLabel + ' (' + pct + '%)');
+      }
+    }
+  } else {
+    // FAF Inc 2 — quiz attempt (failed).
+    if(typeof logFamilyActivity === 'function'){
+      logFamilyActivity('skill', 'quiz_failed', 'Quiz attempt: ' + _subjectLabel + ' (' + pct + '%)');
+    }
   }
   save(); renderParentBucks();
 
