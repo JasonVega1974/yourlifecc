@@ -674,6 +674,14 @@ function addBehaviorLog(){
   });
   document.getElementById('behNote').value='';
   save(); renderBehaviorLog();
+  // FAF Inc 2 — parent-side event; profileId=null so the kid view
+  // filters it out (only the parent view sees parent actions). Kid
+  // name pulled from D.name (the active kid's profile name).
+  if(typeof logFamilyActivity === 'function'){
+    const kidName = (D && D.name) ? String(D.name) : 'kid';
+    logFamilyActivity('parent', 'behavior_note',
+      'Behavior note added for ' + kidName, null, null);
+  }
   showToast(type==='positive'?'Positive behavior logged 👍':'Behavior noted');
 }
 
@@ -3832,7 +3840,13 @@ function awardMVP(){
     D.pb = profile.data.pb;
     save(); renderParentBucks();
   }
-  logActivity('contest','MVP awarded to '+profile.name+' (+50 PB)');
+  // FAF Inc 2 — explicit parent-side event with profileId=null. Was
+  // previously logActivity('contest', ...) which mapped to parent.contest
+  // via the legacy shim but auto-tagged the active kid's profileId.
+  if(typeof logFamilyActivity === 'function'){
+    logFamilyActivity('parent', 'mvp_awarded',
+      'Bonus PB awarded to ' + profile.name + ': +50', null, null);
+  }
   showToast('🌟 '+profile.name+' is this week\'s MVP! +50 PB');
   renderParentLeaderboard();
 }
@@ -5992,10 +6006,14 @@ function _phUpdateKidData(kidId, mutator){
 }
 
 function approvePurchase(kidId, reqId){
+  // FAF Inc 2 — capture the item name from inside the mutator so we
+  // can log the feed event after the state mutation lands.
+  var capturedName = '';
   var ok = _phUpdateKidData(kidId, function(data){
     if(!Array.isArray(data.purchaseRequests)) data.purchaseRequests = [];
     var r = data.purchaseRequests.find(function(x){ return x && x.id === reqId; });
     if(!r || r.status !== 'pending') return;
+    capturedName = String(r.name || '');
     // Promote to a real transaction in the kid's ledger.
     if(!Array.isArray(data.transactions)) data.transactions = [];
     var txId = Date.now();
@@ -6012,6 +6030,13 @@ function approvePurchase(kidId, reqId){
     r.txId         = txId;
   });
   if(!ok) return;
+  // FAF Inc 2 — parent-side event (profileId=null). Logged after the
+  // mutator returns so we only fire when the approval actually landed
+  // (not on a stale/already-approved request).
+  if(capturedName && typeof logFamilyActivity === 'function'){
+    logFamilyActivity('parent', 'purchase_approved',
+      'Purchase approved: ' + capturedName, null, null);
+  }
   if(typeof renderPurchaseRequests === 'function') renderPurchaseRequests();
   if(typeof renderParentHubHome   === 'function') renderParentHubHome();
   if(typeof renderTx              === 'function') renderTx();
@@ -6024,15 +6049,23 @@ function denyPurchase(kidId, reqId){
   try {
     note = prompt('Optional note for the kid (e.g. "ask me again next week")', '') || '';
   } catch(_){}
+  // FAF Inc 2 — capture the item name from inside the mutator.
+  var capturedName = '';
   var ok = _phUpdateKidData(kidId, function(data){
     if(!Array.isArray(data.purchaseRequests)) data.purchaseRequests = [];
     var r = data.purchaseRequests.find(function(x){ return x && x.id === reqId; });
     if(!r || r.status !== 'pending') return;
+    capturedName = String(r.name || '');
     r.status       = 'denied';
     r.reviewedAt   = new Date().toISOString();
     r.reviewerNote = String(note).slice(0, 200);
   });
   if(!ok) return;
+  // FAF Inc 2 — parent-side event (profileId=null).
+  if(capturedName && typeof logFamilyActivity === 'function'){
+    logFamilyActivity('parent', 'purchase_denied',
+      'Purchase denied: ' + capturedName, null, null);
+  }
   if(typeof renderPurchaseRequests === 'function') renderPurchaseRequests();
   if(typeof renderParentHubHome   === 'function') renderParentHubHome();
   if(typeof showToast             === 'function') showToast('Denied — the kid will see the result in their tx list');
