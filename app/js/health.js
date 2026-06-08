@@ -2,6 +2,116 @@
    health.js — Mood tracker, weight log, nutrition, fitness habits
 ============================================================= */
 
+// ════════════════════════════════════════════════════════════
+// 2026-06-07 — Health Inc 1: Power Cards visual upgrade.
+//
+// HEALTH_DOMAINS groups the Health tab into 6 thematic clusters
+// that render as Power Cards above the topic grid. Each domain
+// has icon + accent + statFn (last-7-days completion). The strip
+// is purely informational in Inc 1 (no click filter — clicking a
+// domain card scrolls to / opens the corresponding sub-tab via
+// _hDomainOpen helper). Per-domain stat helpers count days in the
+// last 7 with at least one log entry.
+//
+// Movement domain returns 0/7 until Inc 4 ships the workout log;
+// that's intentional — visible negative space invites the user.
+// ════════════════════════════════════════════════════════════
+function _hDomainCountDays7(predicate){
+  let earned = 0;
+  for(let i = 0; i < 7; i++){
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().slice(0,10);
+    if(predicate(ds)) earned++;
+  }
+  return earned;
+}
+function _hDomainSleep(){
+  const log = (D && Array.isArray(D.sleepLog)) ? D.sleepLog : [];
+  return { earned: _hDomainCountDays7(function(ds){ return log.some(function(s){ return s && s.date === ds; }); }), total: 7 };
+}
+function _hDomainMind(){
+  const log = (D && Array.isArray(D.moods)) ? D.moods : [];
+  return { earned: _hDomainCountDays7(function(ds){ return log.some(function(m){ return m && m.date === ds; }); }), total: 7 };
+}
+function _hDomainMeals(){
+  const log = (D && Array.isArray(D.foodMeals)) ? D.foodMeals : [];
+  return { earned: _hDomainCountDays7(function(ds){ return log.some(function(m){ return m && m.date === ds; }); }), total: 7 };
+}
+function _hDomainMovement(){
+  const log = (D && Array.isArray(D.workoutLog)) ? D.workoutLog : [];
+  return { earned: _hDomainCountDays7(function(ds){ return log.some(function(w){ return w && w.date === ds; }); }), total: 7 };
+}
+function _hDomainBody(){
+  const log = (D && Array.isArray(D.weightLog)) ? D.weightLog : [];
+  return { earned: _hDomainCountDays7(function(ds){ return log.some(function(w){ return w && w.date === ds; }); }), total: 7 };
+}
+function _hDomainHabits(){
+  const checks = (D && D.dailyChecks) ? D.dailyChecks : {};
+  return { earned: _hDomainCountDays7(function(ds){
+    const bucket = checks[ds];
+    if(!bucket) return false;
+    for(const k in bucket){ if(bucket[k]) return true; }
+    return false;
+  }), total: 7 };
+}
+
+const HEALTH_DOMAINS = [
+  {key:'sleep',    icon:'💤', name:'Sleep',    accent:'#818cf8',                       sub:'sleep',    stat:_hDomainSleep},
+  {key:'mind',     icon:'💚', name:'Mind',     accent:'var(--section-health, #34d399)', sub:'mind',     stat:_hDomainMind},
+  {key:'meals',    icon:'🍽️', name:'Meals',    accent:'#fbbf24',                       sub:'meals',    stat:_hDomainMeals},
+  {key:'movement', icon:'🏃', name:'Movement', accent:'#f97316',                       sub:'habits',   stat:_hDomainMovement},
+  {key:'body',     icon:'⚖️', name:'Body',     accent:'#22d3ee',                       sub:'weight',   stat:_hDomainBody},
+  {key:'habits',   icon:'⚡', name:'Habits',   accent:'#a78bfa',                       sub:'habits',   stat:_hDomainHabits}
+];
+
+function renderHealthDomainStrip(){
+  const host = document.getElementById('healthDomainStrip');
+  if(!host) return;
+  host.innerHTML = HEALTH_DOMAINS.map(function(dom){
+    const s = dom.stat();
+    const total = s.total || 7;
+    const earned = s.earned || 0;
+    const pct = total ? (earned / total) : 0;
+    const offset = 125.66 * (1 - pct);
+    const mastered = (earned === total && total > 0);
+    return '<button type="button" class="h-domain-card'
+      + (mastered ? ' is-mastered' : '') + '"'
+      + ' data-domain="' + dom.key + '"'
+      + ' style="--dom-accent:' + dom.accent + ';"'
+      + ' onclick="_hDomainOpen(\'' + dom.sub + '\')"'
+      + ' aria-label="' + dom.name + ' domain, ' + earned + ' of ' + total + ' days this week">'
+      + '<span class="h-dom-ring" aria-hidden="true">'
+        + '<svg viewBox="0 0 48 48">'
+          + '<circle class="h-dom-ring-track" cx="24" cy="24" r="20"></circle>'
+          + '<circle class="h-dom-ring-fill"  cx="24" cy="24" r="20"'
+            + ' stroke-dasharray="125.66"'
+            + ' stroke-dashoffset="' + offset + '"></circle>'
+        + '</svg>'
+        + '<span class="h-dom-icon">' + dom.icon + '</span>'
+      + '</span>'
+      + '<span class="h-dom-label">' + dom.name + '</span>'
+      + '<span class="h-dom-progress">' + earned + ' of ' + total + '</span>'
+    + '</button>';
+  }).join('');
+}
+
+// Routes a domain card tap to its corresponding sub-tab. Clicks the
+// matching .healthTabs .tab button so existing hTab() logic runs
+// unchanged (render hooks, active class, deep-link compat).
+function _hDomainOpen(sub){
+  if(!sub) return;
+  const btn = document.querySelector('.healthTabs .tab[onclick*="hTab(\'' + sub + '\'"]');
+  if(btn && typeof btn.click === 'function') btn.click();
+  // Scroll the active sub-tab content into view so the user lands
+  // where they expect after the strip → tab transition.
+  setTimeout(function(){
+    const t = document.getElementById('ht-' + sub);
+    if(t && typeof t.scrollIntoView === 'function'){
+      t.scrollIntoView({ behavior:'smooth', block:'start' });
+    }
+  }, 60);
+}
+
 // ── HEALTH ────────────────────────────────────────────────────
 function hTab(tab,btn){
   document.querySelectorAll('[id^="ht-"]').forEach(t=>t.style.display='none');
@@ -150,15 +260,22 @@ function renderHealthMoodCheckin(){
   const ack = todayMood && opt
     ? '<div style="font-size:.85rem;color:var(--tx);margin-bottom:.5rem;line-height:1.5;"><span style="font-size:1.15rem;">'+opt.emoji+'</span> <b>'+opt.label+'</b> — '+(HEALTH_MOOD_RESPONSES[todayMood.level]||'')+'</div><div style="font-size:.73rem;color:var(--tx2);margin-bottom:.7rem;">Tap a face to change your check-in.</div>'
     : '<div style="font-size:.8rem;color:var(--tx2);margin-bottom:.7rem;">Pick what matches your day. There are no wrong answers.</div>';
-  const grid = '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">'
+  const grid = '<div class="health-mood-grid">'
     + HEALTH_MOOD_OPTIONS.map(o => {
         const active = todayMood && todayMood.level === o.level;
-        const bg = active ? 'rgba(52,211,153,.22)' : 'rgba(52,211,153,.06)';
-        const bd = active ? 'var(--section-health)' : 'rgba(52,211,153,.18)';
-        return '<button type="button" onclick="logHealthMood('+o.level+')" style="background:'+bg+';border:1px solid '+bd+';border-radius:14px;padding:14px 4px;cursor:pointer;font-family:var(--fm);color:var(--tx);transition:transform .12s ease;"><div style="font-size:1.7rem;line-height:1;margin-bottom:4px;">'+o.emoji+'</div><div style="font-size:.7rem;font-weight:600;">'+o.label+'</div></button>';
+        return '<button type="button" class="health-mood-btn'+(active?' is-active':'')+'" onclick="logHealthMood('+o.level+')">'
+          + '<span class="health-mood-emoji">'+o.emoji+'</span>'
+          + '<span class="health-mood-label">'+o.label+'</span>'
+        + '</button>';
       }).join('')
     + '</div>';
-  el.innerHTML = head + ack + grid;
+  // 2026-06-07 — Health Inc 1: scripture micro-line. Same tonal treatment
+  // as Habits + Goals on the Life-tab Power Cards — italic Bebas, low
+  // opacity, divider sweep above. Speaks to body stewardship without
+  // overriding the secular mood flow.
+  const faith = '<div class="health-mood-divider" aria-hidden="true"></div>'
+    + '<div class="health-mood-faith">Your body is a temple. — 1 Cor 6:19</div>';
+  el.innerHTML = head + ack + grid + faith;
 }
 
 function logHealthMood(level){
