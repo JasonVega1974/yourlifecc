@@ -306,7 +306,7 @@ async function init(){
     });
 
     let _gsResult;
-    try { _gsResult = await supa.auth.getSession(); } catch(_e){ console.warn('[LifeOS] getSession failed:', _e); }
+    try { _gsResult = await supa.auth.getSession(); } catch(_e){ console.warn('[YourLifeCC] getSession failed:', _e); }
     const session = _gsResult && _gsResult.data && _gsResult.data.session;
     if(session && session.user) _supaUser = session.user;
     // Auth has now definitively resolved (with or without a user). Any

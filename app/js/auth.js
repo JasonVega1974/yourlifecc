@@ -317,7 +317,7 @@ function showSubBlockedScreen(reason){
       ctaEl.onclick = function(e){ e.preventDefault(); location.reload(); };
     }
     if(reason !== 'check_failed'){
-      console.warn('[LifeOS] Unknown plan_status — blocking defensively:', reason);
+      console.warn('[YourLifeCC] Unknown plan_status — blocking defensively:', reason);
     }
   }
 
@@ -354,7 +354,7 @@ async function checkPlanStatus(){
 
     // Real query error — couldn't verify. Fail CLOSED with retry CTA.
     if(error && !isNoRowsError){
-      console.warn('[LifeOS] Plan status query failed — blocking:', error);
+      console.warn('[YourLifeCC] Plan status query failed — blocking:', error);
       showSubBlockedScreen('check_failed');
       return true;
     }
@@ -389,7 +389,7 @@ async function checkPlanStatus(){
 
     return false; // allowlist hit — proceed
   } catch(e){
-    console.warn('[LifeOS] Plan status check threw — blocking:', e);
+    console.warn('[YourLifeCC] Plan status check threw — blocking:', e);
     showSubBlockedScreen('check_failed');
     return true;
   }
