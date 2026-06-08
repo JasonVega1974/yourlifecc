@@ -1504,15 +1504,35 @@ function _updateMobileHomeBack(){
                    (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
   var narrow = (window.innerWidth || document.documentElement.clientWidth || 0) <= 860;
   var isHome = (_activeSection === 's-hero') || !_activeSection;
-  // 2026-06-08 — Honor the original design contract documented at
-  // index.html:19822 ("teen accounts only, hidden when body.parent-view"):
-  // hide the Back button for parents. The button onclick is hardcoded to
-  // showSection('s-hero'), which the Option 1 routing guard (commit
-  // e6cfd29) now redirects to s-parent for parents — so the button would
-  // appear non-responsive (parent stays on Parent Hub regardless of tap).
-  // Parents navigate inside Parent Hub via sub-tabs, not via a global
-  // Back button; the previous visibility logic missed this case.
-  var isParent = document.body && document.body.classList.contains('parent-view');
+
+  // 2026-06-08 — Parent gate. The previous version checked
+  // document.body.classList.contains('parent-view'), but applyHeroViewMode
+  // (the function that sets that class) is wired to applyName, DOMContentLoaded
+  // + 300ms setTimeout, and refreshDashForCurrentChild — NOT to showSection.
+  // So when init.js routes a parent to s-parent, showSection's
+  // _updateMobileHomeBack call (ui.js:2187) ran BEFORE body.parent-view was
+  // set, leaving the button briefly visible before the class arrived.
+  //
+  // Direct profile-state check below uses the same predicate as the Option C
+  // routing guard (init.js:475 + ui.js:2151), so visibility and routing
+  // agree without depending on the timing of applyHeroViewMode. Net effect:
+  // the Back button NEVER appears for parents under any circumstance.
+  var isParent = false;
+  try {
+    var _hasKids = (typeof _profiles !== 'undefined' && Array.isArray(_profiles))
+      && _profiles.some(function(p){ return p && p.isParent === false; });
+    var _isSolo  = !!(typeof D !== 'undefined' && D && D.soloMode);
+    var _isFF    = !!window._faithFree;
+    var _activeKind = null;
+    if (typeof _profiles !== 'undefined' && Array.isArray(_profiles)
+       && typeof _activeProfileId !== 'undefined' && _activeProfileId) {
+      var _ap = _profiles.find(function(p){ return p && p.id === _activeProfileId; });
+      if (_ap) _activeKind = (_ap.isParent === false) ? 'kid' : 'parent';
+    }
+    // Treat null active as parent for consistency with Option C routing.
+    isParent = _hasKids && !_isSolo && !_isFF && _activeKind !== 'kid';
+  } catch(_e){}
+
   btn.style.display = ((standalone || narrow) && !isHome && !isParent) ? 'inline-flex' : 'none';
 }
 
