@@ -116,6 +116,12 @@ const DEF = {
   // Faith-free users (window._faithFree) have no tab bar so this
   // field is inert for them.
   tabSwap:'',
+  // 2026-06-07 — Skills Step 3: opt-in sound effects for the
+  // Life Skills quiz. Subtle Web-Audio-synthesized tones —
+  // correct ding, wrong thud, pass fanfare. Default OFF (no
+  // sound until user toggles in Me → Settings). All quiz sound
+  // hooks gate on D.skillsSound === true.
+  skillsSound:false,
   // streak / checkin
   streak:0, lastCheckin:null, checkin:{}, customHabits:[], dailyChecks:{},
   // V1 Rebuild — Session 1 (Daily Briefing). Keyed by YYYY-MM-DD; per-day
