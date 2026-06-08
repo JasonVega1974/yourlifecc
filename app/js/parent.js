@@ -5912,6 +5912,14 @@ function renderProgressReportsTab(){
     const moods  = (d.moods||[]).filter(m=>m.date>=ws).length;
     const study  = (d.studyLog||[]).filter(s=>s.date&&s.date>=ws.replace(/-/g,'/')).length;
     const journal= (Array.isArray(d.journal)?d.journal:[]).filter(j=>j.date>=ws).length;
+    // Health Inc 6 — body literacy engagement count (lifetime, not
+    // weekly). Privacy-preserving: count of topic ids only, never
+    // the topic titles or feedback values themselves.
+    const bodyLitCount = (d.bodyLiteracyViewed && typeof d.bodyLiteracyViewed === 'object')
+      ? Object.keys(d.bodyLiteracyViewed).length : 0;
+    const bodyLitChip = bodyLitCount > 0
+      ? `<div style="font-size:.55rem;color:#f472b6;margin-top:.18rem;">Body literacy: ${bodyLitCount} topic${bodyLitCount===1?'':'s'} viewed</div>`
+      : '';
     return `<div style="background:rgba(255,255,255,.03);border:1px solid ${c}25;border-radius:14px;padding:.9rem 1rem;">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.75rem;">
         <div style="display:flex;align-items:center;gap:.6rem;">
@@ -5919,6 +5927,7 @@ function renderProgressReportsTab(){
           <div>
             <div style="font-weight:800;font-size:.9rem;">${name}</div>
             <div style="font-size:.55rem;color:var(--tx3);">This week: ${chores} chores · ${moods}/7 moods · ${study} study · ${journal} journal</div>
+            ${bodyLitChip}
           </div>
         </div>
         <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
