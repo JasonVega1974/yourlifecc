@@ -290,6 +290,32 @@ module.exports = async function handler(req, res){
        (adminSecret && token === adminSecret)
     || (cronSecret  && token === cronSecret);
   if(!validAuth){
+    // Optional diagnostic — only enabled when AUTH_DEBUG === '1'.
+    // Exposes first 8 chars of received + expected secrets so we can
+    // visually compare without leaking the full values. Turn this
+    // OFF in Vercel env vars once the mismatch is identified.
+    if(process.env.AUTH_DEBUG === '1'){
+      const head8 = function(s){ return s ? String(s).slice(0, 8) : ''; };
+      let comparison = 'no_match';
+      if(!adminSecret && !cronSecret) comparison = 'no_secrets_set';
+      else if(!token) comparison = 'no_token_received';
+      else if((adminSecret && token === adminSecret) || (cronSecret && token === cronSecret)) comparison = 'exact_match';
+      return res.status(401).json({
+        error: 'Unauthorized',
+        diag: {
+          received_header:     auth ? 'present' : 'missing',
+          received_prefix:     head8(token),
+          received_length:     token.length,
+          admin_secret_set:    !!adminSecret,
+          admin_secret_prefix: head8(adminSecret),
+          admin_secret_length: adminSecret.length,
+          cron_secret_set:     !!cronSecret,
+          cron_secret_prefix:  head8(cronSecret),
+          cron_secret_length:  cronSecret.length,
+          comparison:          comparison
+        }
+      });
+    }
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
