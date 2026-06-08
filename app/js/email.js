@@ -437,19 +437,10 @@ function checkCooldown(action, seconds){
   return true;
 }
 
-// Track time spent in sections for parent visibility
-function logActivity(type, detail){
-  if(!D.activityLog) D.activityLog = [];
-  D.activityLog.push({
-    type,
-    detail,
-    time: new Date().toISOString(),
-    ts: Date.now()
-  });
-  // Keep last 200 entries
-  if(D.activityLog.length > 200) D.activityLog = D.activityLog.slice(-200);
-  save();
-}
+// logActivity() moved to app/js/activity-log.js (FAF Inc 1, 2026-06-08).
+// It now wraps logFamilyActivity() with a back-compat shim — the 6
+// call sites in this file (scripture/habit/deduction events) continue
+// to call the global logActivity(type, detail) unchanged.
 
 // ── SCRIPTURE READING TIMER ──────────────────────────────────
 // Don't show "Mark as Read" for 30 seconds (must actually read it)
