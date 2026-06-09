@@ -1,33 +1,41 @@
 /* =============================================================
    parent-celestial.js
-   Part B Phase 3 — Parent Celestial Home renderer
-   2026-06-08
+   Part B Phase 3+4 — Parent Celestial Home renderer
+   2026-06-08 (Phase 4 cinematic polish)
 
    Hydrates the static visual structure built in Phase 2 inside
-   #parentCelestialHome (app/index.html ~line 15709) with real
-   family data:
+   #parentCelestialHome (app/index.html ~line 15709):
 
      - Live date stamp in #pchDateLine ("MONDAY · JUNE 8")
      - 4 family stat tiles (chores pending, goals in progress,
        badges today, recent activities — all aggregated across
        _profiles where isParent === false)
-     - Constellation SVG: 6 interactive star nodes inside
-       #pchNodes connected by subtle links inside #pchLinks.
-       Each node fires phNav() to the matching Parent Hub card.
-       The node with the highest pending count renders enlarged
-       + amber-tinted (the "subtle pulse" cue; Phase 4 adds the
-       actual keyframe animation).
-     - 6 Jump-In tiles: removes [disabled] + wires onclick to
-       phNav(); replaces the "Wired in Phase 3" meta with a
-       live count (or strips the meta entirely when zero).
-     - Faith card: unhide when D.faithMode !== false; rotate
-       verse from MEMORY_VERSE_LIBRARY by date hash so the
-       same verse holds all day and rotates next day.
+     - Constellation SVG: 6 asymmetric nodes inside #pchNodes
+       connected by quadratic-curve links inside #pchLinks.
+       Each node carries a destination color identity (chores
+       green, contests gold, activity cyan, reports violet,
+       family rose, controls teal) painted as a colored halo
+       around a cream inner star. Hovering a node brightens
+       the two adjacent links. The "hot" node (highest pending
+       count) carries an extra ripple ring + amplified pulse.
+     - 6 Jump-In tiles wired to phNav()
+     - Faith card with daily-hashed verse rotation
+     - Shooting-star scheduler — random streaks every 8–20s,
+       suspended when the parent home isn't visible and
+       short-circuited entirely under prefers-reduced-motion.
+
+   Mount strategy:
+     - First render builds the full SVG content (nodes + links)
+       with the `pch-node--reveal` + `pch-link--draw` classes so
+       the constellation reveals itself once.
+     - Subsequent renders only rebuild the SVG content when the
+       "visual key" (hot slot + chores-pending + recent-activity
+       counts) changes. Stat tiles, faith verse, and tile metas
+       update on every call — cheap, no animation restart.
 
    Hook: renderParentHubHome() in parent.js calls
-   renderParentCelestialHome() at the end of its body, so the
-   existing call sites (phNav('home'), refreshDashForCurrentChild,
-   etc.) already cover profile switch + save re-renders.
+   renderParentCelestialHome() at the end of its body, so
+   profile-switch and save-event re-renders already cover.
 
    Read-only of D + _profiles. Never writes state.
 ============================================================= */
@@ -45,25 +53,18 @@
   }
 
   // ── Cross-kid data resolver ───────────────────────────────
-  // Returns the data blob for a given kid profile. For the
-  // active kid, live D wins (active kid's snapshot may lag
-  // mid-session). For non-active kids, p.data is the source.
   function _pchKidData(p){
     if (!p) return null;
     const activeId = (typeof _activeProfileId !== 'undefined') ? _activeProfileId : null;
     if (p.id === activeId && typeof D === 'object' && D) return D;
     return p.data || {};
   }
-
   function _pchKidProfiles(){
     if (typeof _profiles === 'undefined' || !Array.isArray(_profiles)) return [];
     return _profiles.filter(function(p){ return p && p.isParent === false; });
   }
 
   // ── Family stat aggregation ───────────────────────────────
-  // All 4 stats walk kid profiles and aggregate. Solo mode
-  // (no kid profiles) falls back to live D so the surface still
-  // renders sensible numbers for a single-user setup.
   function _pchAggregateStats(){
     const kids = _pchKidProfiles();
     const sources = kids.length > 0
@@ -73,29 +74,19 @@
     const todayISO = new Date().toISOString().slice(0,10);
     const since24h = Date.now() - (24 * 60 * 60 * 1000);
 
-    let choresPending = 0;
-    let goalsInProgress = 0;
-    let badgesToday = 0;
-    let recentActivities = 0;
+    let choresPending = 0, goalsInProgress = 0, badgesToday = 0, recentActivities = 0;
 
     sources.forEach(function(data){
       if (!data || typeof data !== 'object') return;
 
-      // Chores pending — D.choreLog entries with status 'pending'
-      // (the same shape _phPendingApprovalCount() walks) plus
-      // pending purchase requests so the stat matches the strip.
       const cl = Array.isArray(data.choreLog) ? data.choreLog : [];
       choresPending += cl.filter(function(l){ return l && l.status === 'pending'; }).length;
       const pr = Array.isArray(data.purchaseRequests) ? data.purchaseRequests : [];
       choresPending += pr.filter(function(r){ return r && r.status === 'pending'; }).length;
 
-      // Goals in progress — D.goals where !g.done
       const gl = Array.isArray(data.goals) ? data.goals : [];
       goalsInProgress += gl.filter(function(g){ return g && !g.done; }).length;
 
-      // Badges today — D.activityLog entries dated today whose
-      // event is badge_earned (chore + health writers) OR
-      // milestone_earned (goals.js writes this for goal milestones)
       const al = Array.isArray(data.activityLog) ? data.activityLog : [];
       al.forEach(function(e){
         if (!e) return;
@@ -105,8 +96,6 @@
         const ev = String(e.event || '');
         if (ev === 'badge_earned' || ev === 'milestone_earned') badgesToday++;
       });
-
-      // Recent activities — D.activityLog entries within last 24h
       al.forEach(function(e){
         if (!e) return;
         const ts = (typeof e.ts === 'number') ? e.ts : (e.time ? Date.parse(e.time) : 0);
@@ -114,17 +103,11 @@
       });
     });
 
-    return {
-      choresPending: choresPending,
-      goalsInProgress: goalsInProgress,
-      badgesToday: badgesToday,
-      recentActivities: recentActivities
-    };
+    return { choresPending: choresPending, goalsInProgress: goalsInProgress,
+             badgesToday: badgesToday, recentActivities: recentActivities };
   }
 
   // ── Verse rotation ────────────────────────────────────────
-  // Pick a verse from MEMORY_VERSE_LIBRARY by hashing today's
-  // ISO date. Same verse all day; different verse next day.
   function _pchPickVerse(){
     const lib = (typeof MEMORY_VERSE_LIBRARY !== 'undefined' && Array.isArray(MEMORY_VERSE_LIBRARY))
       ? MEMORY_VERSE_LIBRARY
@@ -140,95 +123,259 @@
     for (let i = 0; i < todayISO.length; i++) {
       h = ((h << 5) - h + todayISO.charCodeAt(i)) | 0;
     }
-    const idx = Math.abs(h) % lib.length;
-    return lib[idx];
+    return lib[Math.abs(h) % lib.length];
   }
 
-  // ── Constellation node + link rendering ───────────────────
-  // Six nodes positioned around a hexagonal "family ring" in
-  // the 400x300 viewBox. The node with the highest pending
-  // count enlarges + tints amber as Phase 3's visual cue;
-  // Phase 4 wraps a keyframe pulse around it.
-  //
-  // Coordinates picked to avoid the 12 Phase 2 background
-  // stars and to keep labels off the SVG edges.
-  function _pchRenderConstellation(stats){
+  // ── Reduced-motion probe ──────────────────────────────────
+  function _pchReducedMotion(){
+    try {
+      return !!(window.matchMedia
+        && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    } catch(_e){ return false; }
+  }
+
+  // ── Constellation node table ──────────────────────────────
+  // Asymmetric positions — not a regular polygon. Nodes drift
+  // up-right across the upper half, then down-left across the
+  // lower half so the linked path traces an organic S-curve.
+  // Each node owns its destination color identity (used by the
+  // halo gradient id) and a per-node breathe-phase offset so
+  // the six don't pulse in unison.
+  function _pchBuildNodes(stats){
+    return [
+      { slot:'chores',   label:'Chores',   halo:'pchHaloChores',   color:'#22C55E',
+        x: 90, y: 80,  count: stats.choresPending,   phase: 0    },
+      { slot:'contests', label:'Contests', halo:'pchHaloContests', color:'#FBBF24',
+        x:180, y: 50,  count: 0,                     phase: 700  },
+      { slot:'activity', label:'Activity', halo:'pchHaloActivity', color:'#38BDF8',
+        x:320, y: 95,  count: stats.recentActivities,phase: 1400 },
+      { slot:'reports',  label:'Reports',  halo:'pchHaloReports',  color:'#A78BFA',
+        x:340, y:195,  count: 0,                     phase: 2100 },
+      { slot:'family',   label:'Family',   halo:'pchHaloFamily',   color:'#F472B6',
+        x:215, y:240,  count: 0,                     phase: 2800 },
+      { slot:'controls', label:'Controls', halo:'pchHaloControls', color:'#2DD4BF',
+        x: 75, y:195,  count: 0,                     phase: 3500 }
+    ];
+  }
+
+  // ── Curve helper ──────────────────────────────────────────
+  // Build the SVG path for a single quadratic-bezier link.
+  // The control point sits on the perpendicular bisector of
+  // the chord, offset by `bow` units. Sign of `bow` alternates
+  // per link so adjacent curves bend opposite directions — the
+  // resulting silhouette reads as a flowing constellation, not
+  // a fanned-out wheel.
+  function _pchCurvePath(a, b, bow){
+    const mx = (a.x + b.x) / 2;
+    const my = (a.y + b.y) / 2;
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const len = Math.sqrt(dx*dx + dy*dy) || 1;
+    // Perpendicular unit vector (rotate (dx,dy) 90° CCW).
+    const px = -dy / len;
+    const py =  dx / len;
+    const cx = mx + px * bow;
+    const cy = my + py * bow;
+    return 'M ' + a.x + ' ' + a.y + ' Q ' + cx.toFixed(1) + ' ' + cy.toFixed(1)
+         + ' ' + b.x + ' ' + b.y;
+  }
+
+  // ── Constellation SVG content ─────────────────────────────
+  // Rebuilds #pchLinks + #pchNodes from scratch. Called only on
+  // first mount and when the visual key changes (hot slot or
+  // count thresholds). Reveal/draw classes apply only on the
+  // first mount; subsequent rebuilds skip the one-shot
+  // animations so the surface doesn't pop on every save event.
+  function _pchRenderConstellation(stats, firstMount){
     const nodesG = document.getElementById('pchNodes');
     const linksG = document.getElementById('pchLinks');
     if (!nodesG || !linksG) return;
 
-    // slot, label, (x,y), badge count for the "hottest" rule.
-    // Second slot routes to 'contests' (not 'rewards') — the tile
-    // labeled "Rewards & contests" leads with Rewards in the
-    // copy but the parent intent is the Contests & Family Goals
-    // surface, which holds the contest leaderboard alongside
-    // family rewards. Constellation label matches the destination
-    // ("Contests") for routing clarity.
-    const NODES = [
-      { slot:'chores',   label:'Chores',   x: 75, y: 95,  count: stats.choresPending      },
-      { slot:'contests', label:'Contests', x:185, y: 55,  count: 0                         },
-      { slot:'activity', label:'Activity', x:320, y: 90,  count: stats.recentActivities    },
-      { slot:'reports',  label:'Reports',  x:310, y:205,  count: 0                         },
-      { slot:'family',   label:'Family',   x:200, y:240,  count: 0                         },
-      { slot:'controls', label:'Controls', x: 80, y:200,  count: 0                         }
-    ];
+    const NODES = _pchBuildNodes(stats);
 
-    // Hottest node — only counted when > 0. Ties resolve to
+    // Hottest node — only counts when > 0. Ties resolve to
     // first-in-order (chores wins over activity on equal count).
-    let hotIdx = -1;
-    let hotMax = 0;
+    let hotIdx = -1, hotMax = 0;
     NODES.forEach(function(n, i){
       if (n.count > hotMax) { hotMax = n.count; hotIdx = i; }
     });
 
-    // Links — hexagonal ring connecting node i to node i+1
-    // (and the last back to the first). Subtle cream strokes.
+    // ── Links: base solid + flowing bright overlay ──────────
+    // Six pairs (i → i+1 mod 6). bow alternates sign so curves
+    // bend organically. Draw-in classes only on first mount.
+    const bows = [-22, 18, -16, 24, -20, 18];
     let linksMarkup = '';
     for (let i = 0; i < NODES.length; i++) {
       const a = NODES[i];
       const b = NODES[(i + 1) % NODES.length];
-      linksMarkup += '<line x1="' + a.x + '" y1="' + a.y + '" x2="' + b.x + '" y2="' + b.y
-                  + '" stroke="#F1E9D5" stroke-width="0.6" stroke-opacity="0.18"/>';
+      const d = _pchCurvePath(a, b, bows[i]);
+      const dataAttr = ' data-from="' + a.slot + '" data-to="' + b.slot + '"';
+      const drawDelay = firstMount ? (1300 + i * 90) : 0;
+      const drawClass = firstMount ? ' pch-link--draw' : '';
+      const drawStyle = firstMount ? (' style="animation-delay:' + drawDelay + 'ms;"') : '';
+      // Base faint line (draws in on mount, stays solid after)
+      linksMarkup += '<path pathLength="1" class="pch-link' + drawClass + '"'
+                  +    dataAttr + drawStyle + ' d="' + d + '"/>';
+      // Bright comet overlay (continuous flow)
+      const flowDelay = (i * 1300) % 8000;
+      linksMarkup += '<path pathLength="1" class="pch-link--flow"'
+                  +    dataAttr
+                  +    ' style="animation-delay:-' + flowDelay + 'ms;"'
+                  +    ' d="' + d + '"/>';
     }
     linksG.innerHTML = linksMarkup;
 
-    // Nodes — outer halo + star circle + label. Wrapped in a
-    // <g> with onclick → phNav(); tabindex on the group keeps
-    // keyboard focus possible (Enter/Space handled by the
-    // adjacent tile buttons, which cover the same routes).
+    // ── Nodes ───────────────────────────────────────────────
+    // For each: halo (colored gradient, larger when hot), star
+    // (cream, larger when hot), label (Bebas cream below), and
+    // an invisible square hit area so taps still register at
+    // the edges of the label. The hot node also emits a ripple.
     let nodesMarkup = '';
     NODES.forEach(function(n, i){
       const hot = (i === hotIdx);
-      const r       = hot ? 9 : 6.5;
-      const haloR   = hot ? 22 : 16;
-      const fill    = hot ? '#FBBF24' : '#F1E9D5';
-      const haloFill= hot ? '#FBBF24' : '#F1E9D5';
-      const haloOp  = hot ? 0.22 : 0.10;
-      const stroke  = hot ? '#FCD34D' : 'rgba(255,255,255,0.25)';
-      const labelY  = n.y + 28;
+      const haloR = hot ? 26 : 20;
+      const starR = hot ? 4.5 : 3.6;
+      const labelY = n.y + 28;
       const onclick = 'phNav(\'' + n.slot + '\')';
-      const aria    = n.label + ' destination'
-                    + (n.count > 0 ? (' (' + n.count + ' pending)') : '');
-      nodesMarkup += '<g class="pch-node" tabindex="0" role="button"'
+      const ariaCt  = (n.count > 0) ? (' (' + n.count + ' pending)') : '';
+      const aria    = n.label + ' destination' + ariaCt;
+      const cls     = 'pch-node'
+                    + (hot ? ' pch-node--hot' : '')
+                    + (firstMount ? ' pch-node--reveal' : '');
+      // Stagger reveal + per-node breathe phase via animation-delay
+      const breatheDelay = '-' + n.phase + 'ms';
+      const styleParts = ['transform-origin:' + n.x + 'px ' + n.y + 'px'];
+      if (firstMount) {
+        // Reveal one-shot delay (compose with breathe delay below).
+        const revealDelay = (i * 100);
+        styleParts.push('animation-delay:' + revealDelay + 'ms,' + (revealDelay + 600) + 'ms'
+          + (hot ? ',0ms' : ''));
+      } else {
+        // No reveal — breathe phase only (and hot pulse, no delay).
+        styleParts.push('animation-delay:' + breatheDelay + (hot ? ',0ms' : ''));
+      }
+      const style = ' style="' + styleParts.join(';') + ';"';
+
+      let nodeInner = '';
+      // Halo (colored radial)
+      nodeInner += '<circle class="pch-node__halo" cx="' + n.x + '" cy="' + n.y
+                +     '" r="' + haloR + '" fill="url(#' + n.halo + ')"/>';
+      // Ripple ring on hot node — same color, expanding + fading
+      if (hot) {
+        nodeInner += '<circle class="pch-node__ripple" cx="' + n.x + '" cy="' + n.y
+                  +     '" r="' + (haloR - 4) + '" fill="none"'
+                  +     ' stroke="' + n.color + '" stroke-width="1.2" stroke-opacity=".55"/>';
+      }
+      // Inner star (cream center, soft stroke ring)
+      const starStroke = hot ? n.color : 'rgba(255,255,255,0.35)';
+      nodeInner += '<circle class="pch-node__star" cx="' + n.x + '" cy="' + n.y
+                +     '" r="' + starR + '" fill="#F1E9D5" stroke="' + starStroke
+                +     '" stroke-width="0.8"/>';
+      // Label
+      nodeInner += '<text class="pch-node__label" x="' + n.x + '" y="' + labelY
+                +     '">' + n.label.toUpperCase() + '</text>';
+      // Invisible hit area (taps near the label still count)
+      nodeInner += '<rect x="' + (n.x - 22) + '" y="' + (n.y - 22)
+                +     '" width="44" height="60" fill="transparent"/>';
+
+      nodesMarkup += '<g class="' + cls + '" tabindex="0" role="button"'
                   +    ' aria-label="' + aria + '"'
+                  +    ' data-slot="' + n.slot + '"'
                   +    ' onclick="' + onclick + '"'
-                  +    ' style="cursor:pointer;">'
-                  +    '<circle cx="' + n.x + '" cy="' + n.y + '" r="' + haloR + '" fill="' + haloFill + '" opacity="' + haloOp + '"/>'
-                  +    '<circle cx="' + n.x + '" cy="' + n.y + '" r="' + r + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="1"/>'
-                  +    '<text x="' + n.x + '" y="' + labelY + '"'
-                  +       ' fill="#F1E9D5" font-size="10" font-family="\'Bebas Neue\', sans-serif"'
-                  +       ' letter-spacing="0.08em" text-anchor="middle">' + n.label.toUpperCase() + '</text>'
-                  +  '</g>';
+                  +    style
+                  +    '>' + nodeInner + '</g>';
     });
     nodesG.innerHTML = nodesMarkup;
   }
 
+  // ── Hover bridge ──────────────────────────────────────────
+  // Delegated mouseover/mouseout on the host. When the cursor
+  // enters a node group, find both links touching that slot
+  // and add .pch-link--bright; remove on leave. Bound once per
+  // host to avoid stacking listeners on re-render.
+  function _pchAttachHoverBridge(host){
+    if (!host || host._pchHoverBridgeBound) return;
+    host._pchHoverBridgeBound = true;
+    host.addEventListener('mouseover', function(e){
+      const node = e.target && e.target.closest && e.target.closest('.pch-node');
+      if (!node) return;
+      const slot = node.getAttribute('data-slot');
+      if (!slot) return;
+      const links = document.querySelectorAll(
+        '#pchLinks [data-from="' + slot + '"], #pchLinks [data-to="' + slot + '"]'
+      );
+      for (let i = 0; i < links.length; i++) links[i].classList.add('pch-link--bright');
+    });
+    host.addEventListener('mouseout', function(e){
+      const node = e.target && e.target.closest && e.target.closest('.pch-node');
+      if (!node) return;
+      const links = document.querySelectorAll('#pchLinks .pch-link--bright');
+      for (let i = 0; i < links.length; i++) links[i].classList.remove('pch-link--bright');
+    });
+  }
+
+  // ── Shooting-star scheduler ───────────────────────────────
+  // Spawns short streaks across the SVG every 8–20s. Skipped
+  // entirely under reduced-motion. Suspends silently when the
+  // parent home isn't visible (offsetParent === null) so we
+  // don't burn cycles on kid-side sessions.
+  function _pchScheduleShootingStars(host){
+    if (!host || host._pchShootingScheduled) return;
+    if (_pchReducedMotion()) return;
+    host._pchShootingScheduled = true;
+
+    const NS = 'http://www.w3.org/2000/svg';
+
+    function spawn(){
+      const layer = document.getElementById('pchShootingStars');
+      if (!layer) return;
+      // Trajectory: start in the upper band, streak diagonally
+      // down-right or down-left. Distance scaled for viewBox.
+      const fromLeft = Math.random() < 0.55;
+      const startX = fromLeft ? (10 + Math.random() * 160) : (240 + Math.random() * 140);
+      const startY = -5 + Math.random() * 40;
+      const dxMag = 120 + Math.random() * 140;
+      const dyMag = 60  + Math.random() * 90;
+      const dx = fromLeft ? dxMag : -dxMag;
+      const dy = dyMag;
+      // Streak length oriented along trajectory
+      const len = 16;
+      const ang = Math.atan2(dy, dx);
+      const x2 = startX + len * Math.cos(ang);
+      const y2 = startY + len * Math.sin(ang);
+
+      const line = document.createElementNS(NS, 'line');
+      line.setAttribute('x1', startX.toFixed(1));
+      line.setAttribute('y1', startY.toFixed(1));
+      line.setAttribute('x2', x2.toFixed(1));
+      line.setAttribute('y2', y2.toFixed(1));
+      line.setAttribute('class', 'pch-shoot');
+      line.setAttribute('stroke', 'url(#pchShootGrad)');
+      // Trajectory delivered via custom properties consumed by the
+      // pch-shoot keyframes; px units relative to the SVG viewBox.
+      line.style.setProperty('--dx', dx.toFixed(0) + 'px');
+      line.style.setProperty('--dy', dy.toFixed(0) + 'px');
+      layer.appendChild(line);
+      setTimeout(function(){
+        if (line && line.parentNode) line.parentNode.removeChild(line);
+      }, 1500);
+    }
+
+    function tick(){
+      const delay = 8000 + Math.random() * 12000;
+      setTimeout(function(){
+        const home = document.getElementById('parentCelestialHome');
+        if (home && home.offsetParent !== null && !_pchReducedMotion()) {
+          spawn();
+        }
+        tick();
+      }, delay);
+    }
+    // Kick off after the mount reveal settles.
+    setTimeout(tick, 3500);
+  }
+
   // ── Tile wiring ───────────────────────────────────────────
-  // Removes [disabled] from each Jump-In tile, attaches the
-  // phNav() route, and updates the meta line:
-  //   • non-zero count → live count ("3 pending")
-  //   • zero count     → meta line removed entirely
-  // (matches existing card grid behavior — no shouty zeroes.)
   function _pchWireTile(id, slot, meta){
     const btn = document.getElementById(id);
     if (!btn) return;
@@ -245,6 +392,9 @@
       }
     }
   }
+
+  // ── Render state (mount once, rebuild only on visual change) ─
+  const _state = { mounted: false, lastKey: '' };
 
   // ── Main entry ────────────────────────────────────────────
   function renderParentCelestialHome(){
@@ -266,8 +416,27 @@
     set('pchStatBadges',   stats.badgesToday);
     set('pchStatActivity', stats.recentActivities);
 
-    // Constellation
-    _pchRenderConstellation(stats);
+    // Decide whether to rebuild the constellation. The visual
+    // key folds in the hot slot + the two counts that actually
+    // drive node visuals — so saves that don't change either
+    // skip the rebuild and the flow/breathe animations stay in
+    // mid-cycle instead of jumping back to t=0.
+    let hotSlot = '';
+    let hotMax = 0;
+    if (stats.choresPending    > hotMax) { hotMax = stats.choresPending;    hotSlot = 'chores';   }
+    if (stats.recentActivities > hotMax) { hotMax = stats.recentActivities; hotSlot = 'activity'; }
+    const visualKey = hotSlot + '|' + stats.choresPending + '|' + stats.recentActivities;
+    const firstMount = !_state.mounted;
+    if (firstMount || _state.lastKey !== visualKey) {
+      _pchRenderConstellation(stats, firstMount);
+      _state.lastKey = visualKey;
+      _state.mounted = true;
+    }
+
+    // Hover bridge + shooting-star scheduler (idempotent —
+    // both guard against double-binding via host flags).
+    _pchAttachHoverBridge(host);
+    _pchScheduleShootingStars(host);
 
     // Tile counts — mirror what renderPhCardGrid surfaces so
     // numbers don't disagree between the celestial home and
@@ -275,9 +444,6 @@
     const kidCount = _pchKidProfiles().length;
     const todayISO = new Date().toISOString().slice(0,10);
 
-    // Active contests count — matches renderPhCardGrid logic
-    // (D.customContests is single-source on the parent profile,
-    // not aggregated across kids).
     const contestsActive = (typeof D === 'object' && D && Array.isArray(D.customContests))
       ? D.customContests.filter(function(c){
           return c && !c.endedAt && (!c.deadline || c.deadline >= todayISO);
@@ -324,7 +490,6 @@
     }
   }
 
-  // Expose globals — same load pattern as the rest of the app.
   if (typeof window !== 'undefined') {
     window.renderParentCelestialHome = renderParentCelestialHome;
   }
