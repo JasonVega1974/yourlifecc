@@ -272,36 +272,55 @@ async function init(){
       if(session && session.user){
         _supaUser = session.user;
         if(event === 'TOKEN_REFRESHED'){
+          // Bug A v3 (2026-06-08) — TOKEN_REFRESHED is Supabase's
+          // "session was renewed, user is still here" signal. Refresh
+          // the PIN grace stamps so long sessions don't age past the
+          // 5-min idle window with a stale stamp from initial sign-in.
+          // Without this, sessions longer than 5 min + a refresh
+          // interval would auto-lock the parent even though Supabase
+          // had just confirmed the session is alive.
+          try {
+            localStorage.setItem('ylcc_post_login', String(Date.now()));
+            if(_supaUser && _supaUser.id) localStorage.setItem('ylcc_post_login_uid', String(_supaUser.id));
+          } catch(_){}
+          if(typeof _activeSection !== 'undefined' && _activeSection === 's-parent'
+             && typeof unlockParentDash === 'function'){
+            unlockParentDash();
+          }
           cloudSync();
         } else if(event === 'SIGNED_IN' && !_appInitialized){
           // Fires on explicit sign-in AND on deferred token restore (getSession returned
           // null because the access token was expired, but Supabase later refreshed it).
-          // Only route if the auth screen is currently visible; authComplete() will handle
-          // the explicit sign-in path ~600 ms later, and finishInit's _appInitialized guard
-          // prevents a second init.
+          //
+          // Bug A v3 (2026-06-08) — STAMPS + DISMISSAL HOISTED OUT of
+          // the auth-screen visibility guard. Previously a silent
+          // SIGNED_OUT → SIGNED_IN cycle (token-refresh hiccup) would
+          // clear the stamps via the SIGNED_OUT handler and then the
+          // follow-up SIGNED_IN here would skip the rewrite because
+          // the auth screen wasn't visible — leaving the dash
+          // unlocked but stampless, so the next idle auto-lock fired
+          // a "session timed out" PIN gate even though the user was
+          // actively authenticated. Writing the stamps unconditionally
+          // on every SIGNED_IN closes that hole.
+          //
+          // The visibility guard still wraps the cloudLoad / finishInit
+          // chain below — those side effects are tied to the explicit
+          // fresh-sign-in flow (authComplete handles the auth-screen
+          // dismissal ~600 ms later, finishInit's _appInitialized
+          // guard prevents a second init) and must NOT run on silent
+          // refresh.
+          try {
+            localStorage.setItem('ylcc_post_login', String(Date.now()));
+            if(_supaUser && _supaUser.id) localStorage.setItem('ylcc_post_login_uid', String(_supaUser.id));
+          } catch(_){}
+          if(typeof _activeSection !== 'undefined' && _activeSection === 's-parent'
+             && typeof unlockParentDash === 'function'){
+            unlockParentDash();
+          }
           var _authEl = document.getElementById('authScreen');
           if(_authEl && _authEl.style.display === 'flex'){
             // _supaUser was set above; mark auth resolved so any deferred
             // gates targeting this fresh sign-in see the right uid scope.
-            // Bug A fix (2026-06-08): mirror the getSession path — stamp
-            // ylcc_post_login + uid here too so deferred SIGNED_IN
-            // restores (Supabase silently refreshing an expired access
-            // token via the refresh token) also get the PIN grace
-            // instead of bouncing the parent through the gate.
-            try {
-              localStorage.setItem('ylcc_post_login', String(Date.now()));
-              if(_supaUser && _supaUser.id) localStorage.setItem('ylcc_post_login_uid', String(_supaUser.id));
-            } catch(_){}
-            // Bug A v2 (2026-06-08): if the parent is currently on
-            // s-parent (e.g. staring at a PIN gate that auto-locked
-            // BEFORE this fresh stamp was written), re-evaluate the
-            // grace and dismiss the gate. unlockParentDash sees the
-            // fresh stamp + uid, hits _doUnlockParent, and the dash
-            // returns without a PIN prompt.
-            if(typeof _activeSection !== 'undefined' && _activeSection === 's-parent'
-               && typeof unlockParentDash === 'function'){
-              unlockParentDash();
-            }
             _ylccMarkAuthResolved();
             checkPlanStatus().then(function(blocked){
               if(blocked) return;
