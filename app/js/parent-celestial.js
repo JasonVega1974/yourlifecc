@@ -401,6 +401,13 @@
     const host = document.getElementById('parentCelestialHome');
     if (!host) return;
 
+    // The Watch — W1 hook. parent-watch-scene.js mounts the canvas
+    // sky on first call and no-ops on subsequent calls (idempotent
+    // via its own _state.canvas guard). Wrapped in typeof check so
+    // a missing module fails soft — the Phase 4 widget still
+    // renders fine without the cinematic backdrop.
+    if (typeof renderParentWatchScene === 'function') renderParentWatchScene();
+
     // Date stamp
     const dateEl = document.getElementById('pchDateLine');
     if (dateEl) dateEl.textContent = _pchFormatDate(new Date());
