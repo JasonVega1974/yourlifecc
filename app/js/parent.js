@@ -72,10 +72,25 @@ function unlockParentDash(){
   initChoreData();
   if(D.parentPinDisabled){ _doUnlockParent(); return; }
   // Mom-persona: skip PIN within 5 min of a fresh sign-in. Stamp is set in
-  // auth.js on successful signInWithPassword. Cleared by lockParentDash().
+  // auth.js on successful signInWithPassword and in init.js on every
+  // session restore (getSession + deferred SIGNED_IN). Cleared by
+  // lockParentDash() and by the SIGNED_OUT listener.
+  //
+  // Bug A hardening (2026-06-08): the stamp alone is not enough. Two
+  // extra checks prevent a leftover stamp from authorizing access into
+  // a hub whose backing session is dead:
+  //   1. _supaUser must still be non-null — covers the case where the
+  //      session expired mid-app but the stamp lingers.
+  //   2. The stored ylcc_post_login_uid must equal _supaUser.id —
+  //      covers the case where a different account signed in on the
+  //      same device since the stamp was written.
   try {
     const stamp = parseInt(localStorage.getItem('ylcc_post_login') || '0', 10);
-    if(stamp && Date.now() - stamp < 5*60*1000){ _doUnlockParent(); return; }
+    const sessionAlive = (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.id);
+    let stampUid = '';
+    try { stampUid = localStorage.getItem('ylcc_post_login_uid') || ''; } catch(_){ stampUid = ''; }
+    const uidMatch = sessionAlive && stampUid && stampUid === String(_supaUser.id);
+    if(stamp && Date.now() - stamp < 5*60*1000 && uidMatch){ _doUnlockParent(); return; }
   } catch(e){ /* localStorage blocked — fall through to PIN gate */ }
   // If no PIN set yet (hashed or plaintext), let them straight in
   if(!D.parentPinHash && !D.chorePin && !D.parentPIN){ _doUnlockParent(); return; }
@@ -97,7 +112,13 @@ function lockParentDash(){
   document.body.classList.remove('parent-unlocked');
   // Mom-persona: locking the hub also burns the post-login grace window so
   // anyone re-entering Parent Hub after Lock has to enter the PIN normally.
-  try { localStorage.removeItem('ylcc_post_login'); } catch(e){}
+  // Bug A fix (2026-06-08): also clear the companion uid stamp so the
+  // pair stays consistent — the unlock check requires both to honor
+  // grace, but leaving a stale uid behind is just clutter.
+  try {
+    localStorage.removeItem('ylcc_post_login');
+    localStorage.removeItem('ylcc_post_login_uid');
+  } catch(e){}
   const gate=document.getElementById('parentGate');
   const content=document.getElementById('parentDashContent');
   const err=document.getElementById('parentGateError');
