@@ -2762,6 +2762,12 @@ function renderParentHubHome(){
       containerId: 'fafHomeStrip'
     });
   }
+
+  // Part B Phase 3 — Parent Celestial Home. Hydrates date stamp,
+  // family stats, constellation nodes, Jump-In tiles, and faith
+  // card inside #parentCelestialHome. Renderer lives in
+  // app/js/parent-celestial.js.
+  if(typeof renderParentCelestialHome === 'function') renderParentCelestialHome();
 }
 
 
