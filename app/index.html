@@ -15713,7 +15713,15 @@
                  use a .pch-* namespace so the two surfaces can diverge
                  cleanly later. Color tokens (#F1E9D5 cream text,
                  #9AA0B4 slate sub, #F5A623 amber dot) intentionally
-                 match the kid home so the two feel like one family. */
+                 match the kid home so the two feel like one family.
+
+                 Phase 4 (2026-06-08) — cinematic constellation polish.
+                 All animations live below and stay scoped to
+                 #parentCelestialHome so they cannot leak globally.
+                 Uses transform + opacity exclusively for perf;
+                 prefers-reduced-motion disables every continuous
+                 animation while preserving the static layout and
+                 the brief one-shot mount reveal. */
               #parentCelestialHome{padding:1.2rem 0 2rem;max-width:480px;margin:0 auto;}
               @media (min-width:720px){ #parentCelestialHome{max-width:760px;padding:2rem 0 2.5rem;} }
               @media (min-width:1024px){ #parentCelestialHome{max-width:1040px;} }
@@ -15738,16 +15746,56 @@
               /* Constellation */
               #parentCelestialHome .pch-constellation{position:relative;margin-bottom:1.6rem;}
               #parentCelestialHome .pch-constellation__caption{font-size:.82rem;color:#9AA0B4;margin-bottom:.6rem;}
-              #parentCelestialHome .pch-constellation__svg{width:100%;height:280px;display:block;}
+              #parentCelestialHome .pch-constellation__svg{width:100%;height:280px;display:block;overflow:visible;}
               @media (min-width:720px){ #parentCelestialHome .pch-constellation__svg{height:380px;} }
-              #parentCelestialHome .pch-stars circle{fill:#F1E9D5;}
+
+              /* Nebula layer — purely decorative. */
+              #parentCelestialHome .pch-nebula{pointer-events:none;}
+
+              /* Background star field — base fill cream, twinkle via
+                 three classes (slow / regular / fast) staggered by an
+                 inline animation-delay so they don't blink in sync. */
+              #parentCelestialHome .pch-stars circle{fill:#F1E9D5;transform-box:fill-box;transform-origin:center;}
+              #parentCelestialHome .pch-stars circle.pch-star--named{fill:#FBBF24;}
+              #parentCelestialHome .pch-stars .pch-star--twinkle      {animation:pch-twinkle 6s ease-in-out infinite;}
+              #parentCelestialHome .pch-stars .pch-star--twinkle-slow {animation:pch-twinkle 8s ease-in-out infinite;}
+              #parentCelestialHome .pch-stars .pch-star--twinkle-fast {animation:pch-twinkle 4s ease-in-out infinite;}
+
+              /* Connection links — base solid faint line + bright
+                 flowing comet overlay. Two paths per pair, both with
+                 pathLength="1" so dashoffset math is uniform across
+                 different geometric lengths. */
+              #parentCelestialHome .pch-link      {fill:none;stroke:#F1E9D5;stroke-opacity:.18;stroke-width:.7;transition:stroke-opacity 250ms ease,stroke-width 250ms ease;}
+              #parentCelestialHome .pch-link--draw{stroke-dasharray:1;stroke-dashoffset:1;animation:pch-link-draw 800ms ease-out forwards;}
+              #parentCelestialHome .pch-link--flow{fill:none;stroke:#FCD34D;stroke-opacity:.45;stroke-width:.9;stroke-linecap:round;stroke-dasharray:.08 1;stroke-dashoffset:0;animation:pch-link-flow 8s linear infinite;}
+              #parentCelestialHome .pch-link--bright{stroke-opacity:.6;stroke-width:1.1;}
+
+              /* Constellation nodes. Each node group carries an inline
+                 transform-origin (the node's own coordinates) so the
+                 scale animations breathe around the star, not (0,0). */
+              #parentCelestialHome .pch-node{cursor:pointer;animation:pch-node-breathe 4.2s ease-in-out infinite;}
+              #parentCelestialHome .pch-node--reveal{opacity:0;animation:pch-node-reveal 600ms ease-out forwards,pch-node-breathe 4.2s ease-in-out infinite 700ms;}
+              #parentCelestialHome .pch-node--hot   {animation:pch-node-hot 2s ease-in-out infinite;}
+              #parentCelestialHome .pch-node--hot.pch-node--reveal{animation:pch-node-reveal 600ms ease-out forwards,pch-node-hot 2s ease-in-out infinite 700ms;}
+              #parentCelestialHome .pch-node:hover,
+              #parentCelestialHome .pch-node:focus-visible{filter:brightness(1.18) saturate(1.15);outline:none;}
+              #parentCelestialHome .pch-node__star  {transition:r 200ms ease;}
+              #parentCelestialHome .pch-node__halo  {transition:opacity 250ms ease;}
+              #parentCelestialHome .pch-node__ripple{opacity:0;transform-box:fill-box;transform-origin:center;animation:pch-ripple 2.2s ease-out infinite;}
+              #parentCelestialHome .pch-node__label {pointer-events:none;font-family:'Bebas Neue',sans-serif;letter-spacing:.08em;font-size:10px;fill:#F1E9D5;text-anchor:middle;}
+
+              /* Shooting stars — short streaks injected by JS, removed
+                 after the animation completes. Trajectory length comes
+                 from --dx/--dy custom properties set per element. */
+              #parentCelestialHome .pch-shoot{fill:none;stroke:#F1E9D5;stroke-width:1.4;stroke-linecap:round;opacity:0;animation:pch-shoot 1.4s ease-out forwards;}
 
               /* Section label + tiles */
               #parentCelestialHome .pch-section-label{font-family:var(--fh,'Bebas Neue',var(--fm,sans-serif));font-size:1.15rem;letter-spacing:.14em;color:#F1E9D5;margin:0 0 .85rem;text-transform:uppercase;}
               #parentCelestialHome .pch-tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:.65rem;}
               @media (min-width:720px){ #parentCelestialHome .pch-tiles{grid-template-columns:repeat(3,1fr);} }
-              #parentCelestialHome .pch-tile{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:.55rem;padding:1.1rem 1rem;min-height:112px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:18px;color:#F1E9D5;text-align:left;cursor:pointer;font-family:inherit;transition:transform 200ms ease,background 200ms ease,border-color 200ms ease;}
+              #parentCelestialHome .pch-tile{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:.55rem;padding:1.1rem 1rem;min-height:112px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:18px;color:#F1E9D5;text-align:left;cursor:pointer;font-family:inherit;transition:transform 150ms ease,background 200ms ease,border-color 200ms ease,box-shadow 250ms ease;}
               #parentCelestialHome .pch-tile:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.13);transform:translateY(-1px);}
+              #parentCelestialHome .pch-tile:active{transform:scale(.98);box-shadow:0 0 0 2px rgba(252,211,77,.22) inset;}
               #parentCelestialHome .pch-tile:focus-visible{outline:2px solid #6AA7FF;outline-offset:2px;}
               #parentCelestialHome .pch-tile__icon{font-size:1.4rem;line-height:1;}
               #parentCelestialHome .pch-tile__title{font-size:.92rem;font-weight:700;letter-spacing:-.01em;}
@@ -15758,9 +15806,61 @@
               #parentCelestialHome .pch-faith__verse{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:.95rem;color:#F1E9D5;line-height:1.55;margin:0 0 .4rem;}
               #parentCelestialHome .pch-faith__ref{font-size:.66rem;color:#fbbf24;letter-spacing:.12em;font-weight:800;text-transform:uppercase;}
 
+              /* Keyframes — scoped by selector path above. Note: the
+                 names are global to the document, but only the rules
+                 inside #parentCelestialHome reference them. */
+              @keyframes pch-twinkle{
+                0%,100%{opacity:var(--pchOp,.5);}
+                50%    {opacity:1;}
+              }
+              @keyframes pch-node-breathe{
+                0%,100%{transform:scale(1);}
+                50%    {transform:scale(1.06);}
+              }
+              @keyframes pch-node-hot{
+                0%,100%{transform:scale(1);   filter:brightness(1)   saturate(1);}
+                50%    {transform:scale(1.15);filter:brightness(1.35) saturate(1.2);}
+              }
+              @keyframes pch-node-reveal{
+                0%  {opacity:0;transform:scale(.5);}
+                100%{opacity:1;transform:scale(1);}
+              }
+              @keyframes pch-ripple{
+                0%  {opacity:.6;transform:scale(1);}
+                100%{opacity:0; transform:scale(2.8);}
+              }
+              @keyframes pch-link-flow{
+                to{stroke-dashoffset:-1.08;}
+              }
+              @keyframes pch-link-draw{
+                to{stroke-dashoffset:0;}
+              }
+              @keyframes pch-shoot{
+                0%  {transform:translate(0,0);opacity:0;}
+                15% {opacity:1;}
+                100%{transform:translate(var(--dx,240px),var(--dy,140px));opacity:0;}
+              }
+
+              /* Reduced motion — disable continuous animations. The
+                 one-shot mount reveal stays (it's brief), tap feedback
+                 stays (instant). */
               @media (prefers-reduced-motion:reduce){
                 #parentCelestialHome .pch-tile{transition:none;}
                 #parentCelestialHome .pch-tile:hover{transform:none;}
+                #parentCelestialHome .pch-stars circle,
+                #parentCelestialHome .pch-node,
+                #parentCelestialHome .pch-node--hot,
+                #parentCelestialHome .pch-node__ripple,
+                #parentCelestialHome .pch-link--flow,
+                #parentCelestialHome .pch-shoot{animation:none !important;}
+                #parentCelestialHome .pch-node__ripple{opacity:0;}
+                #parentCelestialHome .pch-link--draw{animation:none;stroke-dashoffset:0;}
+              }
+
+              /* Narrow-viewport perf — drop the slowest twinkle bucket
+                 (about a third of the field) on small phones. */
+              @media (max-width:480px){
+                #parentCelestialHome .pch-stars .pch-star--twinkle-slow{animation:none;}
               }
             </style>
 
@@ -15785,27 +15885,127 @@
                 <div class="pch-stat"><div class="pch-stat__num" id="pchStatActivity">&mdash;</div><div class="pch-stat__label">Recent activities</div></div>
               </section>
 
-              <!-- Constellation SVG. Background stars only in Phase 2; nodes
-                   + connecting links + pulse-on-action wire in Phase 3+4. -->
+              <!-- Constellation SVG. Phase 4 layers nebula <defs>, an
+                   expanded 30-star background field with three twinkle
+                   buckets, plus three empty containers JS populates on
+                   first mount (links, nodes, shooting stars). -->
               <section class="pch-constellation" aria-label="Family action constellation">
                 <div class="pch-constellation__caption" id="pchConstellationCaption">Tap a star to navigate</div>
                 <svg class="pch-constellation__svg" id="pchConstellationSvg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Family action constellation">
-                  <g class="pch-stars" aria-hidden="true">
-                    <circle cx="40"  cy="30"  r="1.2" opacity=".6"/>
-                    <circle cx="100" cy="60"  r="1.4" opacity=".5"/>
-                    <circle cx="180" cy="40"  r="1.0" opacity=".7"/>
-                    <circle cx="260" cy="70"  r="1.3" opacity=".55"/>
-                    <circle cx="340" cy="35"  r="1.1" opacity=".5"/>
-                    <circle cx="60"  cy="160" r="1.0" opacity=".5"/>
-                    <circle cx="200" cy="180" r="1.3" opacity=".6"/>
-                    <circle cx="340" cy="170" r="1.2" opacity=".55"/>
-                    <circle cx="120" cy="240" r="1.0" opacity=".5"/>
-                    <circle cx="280" cy="260" r="1.3" opacity=".6"/>
-                    <circle cx="220" cy="120" r="1.1" opacity=".55"/>
-                    <circle cx="80"  cy="220" r="1.2" opacity=".5"/>
+                  <defs>
+                    <!-- Nebula gradients — three soft radial fields layered
+                         underneath the star field. Low opacity so the
+                         constellation reads on top without competition. -->
+                    <radialGradient id="pchNebViolet" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%"   stop-color="#7C3AED" stop-opacity=".15"/>
+                      <stop offset="100%" stop-color="#7C3AED" stop-opacity="0"/>
+                    </radialGradient>
+                    <radialGradient id="pchNebBlue" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%"   stop-color="#1D4ED8" stop-opacity=".12"/>
+                      <stop offset="100%" stop-color="#1D4ED8" stop-opacity="0"/>
+                    </radialGradient>
+                    <radialGradient id="pchNebCyan" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%"   stop-color="#06B6D4" stop-opacity=".09"/>
+                      <stop offset="100%" stop-color="#06B6D4" stop-opacity="0"/>
+                    </radialGradient>
+
+                    <!-- Per-node halo gradients — each destination gets a
+                         color identity (chores=green, contests=gold,
+                         activity=cyan, reports=violet, family=rose,
+                         controls=teal). Halo is colored; star is cream. -->
+                    <radialGradient id="pchHaloChores" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%"   stop-color="#22C55E" stop-opacity=".85"/>
+                      <stop offset="60%"  stop-color="#22C55E" stop-opacity=".18"/>
+                      <stop offset="100%" stop-color="#22C55E" stop-opacity="0"/>
+                    </radialGradient>
+                    <radialGradient id="pchHaloContests" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%"   stop-color="#FBBF24" stop-opacity=".85"/>
+                      <stop offset="60%"  stop-color="#FBBF24" stop-opacity=".2"/>
+                      <stop offset="100%" stop-color="#FBBF24" stop-opacity="0"/>
+                    </radialGradient>
+                    <radialGradient id="pchHaloActivity" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%"   stop-color="#38BDF8" stop-opacity=".85"/>
+                      <stop offset="60%"  stop-color="#38BDF8" stop-opacity=".18"/>
+                      <stop offset="100%" stop-color="#38BDF8" stop-opacity="0"/>
+                    </radialGradient>
+                    <radialGradient id="pchHaloReports" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%"   stop-color="#A78BFA" stop-opacity=".85"/>
+                      <stop offset="60%"  stop-color="#A78BFA" stop-opacity=".18"/>
+                      <stop offset="100%" stop-color="#A78BFA" stop-opacity="0"/>
+                    </radialGradient>
+                    <radialGradient id="pchHaloFamily" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%"   stop-color="#F472B6" stop-opacity=".85"/>
+                      <stop offset="60%"  stop-color="#F472B6" stop-opacity=".18"/>
+                      <stop offset="100%" stop-color="#F472B6" stop-opacity="0"/>
+                    </radialGradient>
+                    <radialGradient id="pchHaloControls" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%"   stop-color="#2DD4BF" stop-opacity=".85"/>
+                      <stop offset="60%"  stop-color="#2DD4BF" stop-opacity=".18"/>
+                      <stop offset="100%" stop-color="#2DD4BF" stop-opacity="0"/>
+                    </radialGradient>
+
+                    <!-- Shooting-star trail — bright cream center fading
+                         to transparent at both ends. -->
+                    <linearGradient id="pchShootGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%"   stop-color="#F1E9D5" stop-opacity="0"/>
+                      <stop offset="50%"  stop-color="#FFFFFF" stop-opacity="1"/>
+                      <stop offset="100%" stop-color="#F1E9D5" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+
+                  <!-- Nebula layer (decorative; never intercepts taps). -->
+                  <g class="pch-nebula" aria-hidden="true">
+                    <ellipse cx="100" cy="90"  rx="180" ry="120" fill="url(#pchNebViolet)"/>
+                    <ellipse cx="320" cy="140" rx="160" ry="140" fill="url(#pchNebBlue)"/>
+                    <ellipse cx="180" cy="240" rx="200" ry="100" fill="url(#pchNebCyan)"/>
                   </g>
-                  <g class="pch-nodes" id="pchNodes"></g>
+
+                  <!-- Background star field — 30 stars across three
+                       twinkle buckets (slow / regular / fast). Inline
+                       --pchOp = base opacity (twinkle keyframes ride
+                       between this and 1). Inline animation-delay
+                       staggers blinks so they don't sync. A few "named"
+                       stars carry pch-star--named (warm gold). -->
+                  <g class="pch-stars" aria-hidden="true">
+                    <circle cx="30"  cy="20"  r="1.0" class="pch-star--twinkle-slow" style="--pchOp:.45;opacity:.45;animation-delay:.0s"/>
+                    <circle cx="55"  cy="48"  r="1.4" class="pch-star--twinkle"      style="--pchOp:.6; opacity:.6; animation-delay:.6s"/>
+                    <circle cx="80"  cy="22"  r="1.2" class="pch-star--twinkle-fast" style="--pchOp:.55;opacity:.55;animation-delay:1.2s"/>
+                    <circle cx="120" cy="35"  r="1.0" class="pch-star--twinkle"      style="--pchOp:.5; opacity:.5; animation-delay:2.4s"/>
+                    <circle cx="150" cy="18"  r="2.0" class="pch-star--twinkle-slow pch-star--named" style="--pchOp:.8; opacity:.8; animation-delay:.8s"/>
+                    <circle cx="195" cy="32"  r="1.3" class="pch-star--twinkle"      style="--pchOp:.6; opacity:.6; animation-delay:3.1s"/>
+                    <circle cx="240" cy="22"  r="1.0" class="pch-star--twinkle-fast" style="--pchOp:.5; opacity:.5; animation-delay:.4s"/>
+                    <circle cx="280" cy="40"  r="1.4" class="pch-star--twinkle-slow" style="--pchOp:.55;opacity:.55;animation-delay:2.0s"/>
+                    <circle cx="310" cy="20"  r="1.0" class="pch-star--twinkle"      style="--pchOp:.45;opacity:.45;animation-delay:1.6s"/>
+                    <circle cx="355" cy="35"  r="1.6" class="pch-star--twinkle-fast" style="--pchOp:.65;opacity:.65;animation-delay:.2s"/>
+                    <circle cx="385" cy="55"  r="1.2" class="pch-star--twinkle-slow" style="--pchOp:.5; opacity:.5; animation-delay:3.5s"/>
+                    <circle cx="20"  cy="115" r="1.2" class="pch-star--twinkle"      style="--pchOp:.55;opacity:.55;animation-delay:1.0s"/>
+                    <circle cx="160" cy="130" r="2.2" class="pch-star--twinkle-slow pch-star--named" style="--pchOp:.85;opacity:.85;animation-delay:1.4s"/>
+                    <circle cx="270" cy="155" r="1.0" class="pch-star--twinkle-fast" style="--pchOp:.45;opacity:.45;animation-delay:2.8s"/>
+                    <circle cx="380" cy="125" r="1.3" class="pch-star--twinkle"      style="--pchOp:.55;opacity:.55;animation-delay:.5s"/>
+                    <circle cx="50"  cy="170" r="1.4" class="pch-star--twinkle"      style="--pchOp:.6; opacity:.6; animation-delay:2.2s"/>
+                    <circle cx="135" cy="180" r="1.0" class="pch-star--twinkle-slow" style="--pchOp:.5; opacity:.5; animation-delay:.0s"/>
+                    <circle cx="245" cy="195" r="1.7" class="pch-star--twinkle-fast pch-star--named" style="--pchOp:.7; opacity:.7; animation-delay:1.8s"/>
+                    <circle cx="300" cy="170" r="1.1" class="pch-star--twinkle"      style="--pchOp:.5; opacity:.5; animation-delay:3.2s"/>
+                    <circle cx="370" cy="180" r="1.3" class="pch-star--twinkle-slow" style="--pchOp:.55;opacity:.55;animation-delay:.9s"/>
+                    <circle cx="10"  cy="240" r="1.0" class="pch-star--twinkle"      style="--pchOp:.45;opacity:.45;animation-delay:1.7s"/>
+                    <circle cx="60"  cy="265" r="1.4" class="pch-star--twinkle-fast" style="--pchOp:.6; opacity:.6; animation-delay:.3s"/>
+                    <circle cx="105" cy="275" r="1.0" class="pch-star--twinkle"      style="--pchOp:.5; opacity:.5; animation-delay:2.5s"/>
+                    <circle cx="155" cy="255" r="1.2" class="pch-star--twinkle-slow" style="--pchOp:.55;opacity:.55;animation-delay:.7s"/>
+                    <circle cx="200" cy="285" r="1.0" class="pch-star--twinkle-fast" style="--pchOp:.45;opacity:.45;animation-delay:1.3s"/>
+                    <circle cx="260" cy="275" r="1.8" class="pch-star--twinkle-slow pch-star--named" style="--pchOp:.75;opacity:.75;animation-delay:2.6s"/>
+                    <circle cx="305" cy="255" r="1.2" class="pch-star--twinkle"      style="--pchOp:.55;opacity:.55;animation-delay:.1s"/>
+                    <circle cx="340" cy="280" r="1.0" class="pch-star--twinkle-fast" style="--pchOp:.5; opacity:.5; animation-delay:3.0s"/>
+                    <circle cx="385" cy="265" r="1.3" class="pch-star--twinkle"      style="--pchOp:.55;opacity:.55;animation-delay:1.5s"/>
+                    <circle cx="225" cy="115" r="1.0" class="pch-star--twinkle-slow" style="--pchOp:.45;opacity:.45;animation-delay:2.3s"/>
+                  </g>
+
+                  <!-- Three empty containers — JS populates on first
+                       mount and updates only when the visual key (hot
+                       slot + counts) changes. Links render BELOW nodes
+                       so node halos paint on top of intersecting paths. -->
                   <g class="pch-links" id="pchLinks"></g>
+                  <g class="pch-nodes" id="pchNodes"></g>
+                  <g class="pch-shoot-layer" id="pchShootingStars" aria-hidden="true"></g>
                 </svg>
               </section>
 
