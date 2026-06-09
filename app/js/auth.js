@@ -141,7 +141,14 @@ async function authSubmit(){
       _supaUser = result.data.user;
       // Mom-persona: stamp the moment of fresh login so Parent Hub can skip
       // PIN within a short grace window. Reset on Lock Hub or after 5 min.
-      try { localStorage.setItem('ylcc_post_login', String(Date.now())); } catch(e){}
+      // Bug A fix (2026-06-08): also stamp the auth uid so a leftover
+      // stamp from a different account on the same device can't be used
+      // to skip the PIN — unlockParentDash compares the stored uid
+      // against the current _supaUser.id before honoring the grace.
+      try {
+        localStorage.setItem('ylcc_post_login', String(Date.now()));
+        if(_supaUser && _supaUser.id) localStorage.setItem('ylcc_post_login_uid', String(_supaUser.id));
+      } catch(e){}
       authSetMsg('Signed in!', 'var(--gr)');
       setTimeout(() => authComplete(true), 600);
     }
