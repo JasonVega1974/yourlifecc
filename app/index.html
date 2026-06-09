@@ -15731,11 +15731,20 @@
                  prefers-reduced-motion disables every continuous
                  animation while preserving the static layout and
                  the brief one-shot mount reveal. */
-              #parentCelestialHome{padding:1.2rem 0 2rem;max-width:480px;margin:0 auto;position:relative;}
-              @media (min-width:720px){ #parentCelestialHome{max-width:760px;padding:2rem 0 2.5rem;} }
-              @media (min-width:1024px){ #parentCelestialHome{max-width:1040px;} }
-              #parentCelestialHome .pch-shell{padding:0 1.2rem;position:relative;z-index:1;}
-              @media (min-width:720px){ #parentCelestialHome .pch-shell{padding:0 2rem;} }
+              /* W2 layout fix #1 (2026-06-08). The container is
+                 now full-column-width (no max-width) so the canvas
+                 paints edge-to-edge of the parent-dash content
+                 area instead of looking like a widget in a frame.
+                 The max-width constraint moves to .pch-shell with
+                 margin:0 auto so all content (stat tiles, SVG,
+                 jump-in tiles, faith card) stays centered + bounded
+                 at the same readable widths as before — content
+                 width post-padding is identical. */
+              #parentCelestialHome{padding:1.2rem 0 2rem;margin:0 auto;position:relative;}
+              @media (min-width:720px){ #parentCelestialHome{padding:2rem 0 2.5rem;} }
+              #parentCelestialHome .pch-shell{padding:0 1.2rem;position:relative;z-index:1;max-width:480px;margin:0 auto;}
+              @media (min-width:720px){ #parentCelestialHome .pch-shell{padding:0 2rem;max-width:760px;} }
+              @media (min-width:1024px){ #parentCelestialHome .pch-shell{max-width:1040px;} }
 
               /* The Watch — W1 (2026-06-08). Canvas paints the clock-locked
                  sky behind every Phase 4 element. Stays opacity:0 until the
