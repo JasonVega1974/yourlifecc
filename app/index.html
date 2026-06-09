@@ -19506,6 +19506,13 @@
 <script src="/app/js/worship.js"></script>
 <script src="/app/js/faith-resources.js"></script>
 <script src="/app/js/parent.js"></script>
+<!-- Part B Phase 3 — Parent Celestial Home renderer. Defines
+     window.renderParentCelestialHome which renderParentHubHome()
+     in parent.js calls at the end of its body. Must load AFTER
+     parent.js (no hard dependency on it, but the hook lives there)
+     and AFTER data/memory-verses.js (read for verse rotation).
+     memory-verses.js loads earlier in the data block. -->
+<script src="/app/js/parent-celestial.js"></script>
 <script src="/app/js/email.js"></script>
 <script src="/app/js/misc.js"></script>
 <script src="/app/js/resume.js"></script>
