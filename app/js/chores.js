@@ -384,7 +384,13 @@ function verifyChore(logId, approved){
     if(typeof getChoreStreak === 'function' && typeof streakMilestoneBanner === 'function'){
       const newStreak = getChoreStreak();
       if([3,7,14,30,50,100].indexOf(newStreak) !== -1){
-        setTimeout(()=>streakMilestoneBanner(newStreak), 350);
+        // Suppress the streak banner on the Parent Hub — the kid earned
+        // the streak, not the parent verifying it. Same body.parent-view
+        // guard daily-briefing.js uses to keep its own banner off the
+        // parent surface. Kid-side chore completions still celebrate.
+        if(!(document.body && document.body.classList.contains('parent-view'))){
+          setTimeout(()=>streakMilestoneBanner(newStreak), 350);
+        }
       }
     }
     // Tab 1 Inc 4 — refresh D.choreStreak cache and mirror to
