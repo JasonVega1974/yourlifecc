@@ -43,6 +43,19 @@ function _attachParentIdleListeners(){
 }
 
 function _autoLockParentDash(){
+  // Bug A v2 (2026-06-08) — consult the PIN grace before firing.
+  // If grace is still valid (stamp present, < 5 min old, uid
+  // matches, _supaUser alive) then the user is recently
+  // authenticated. The in-memory idle window has run out but the
+  // actual auth state hasn't — don't kick them to the PIN gate.
+  // Refresh the idle window off the grace stamp so the next poll
+  // doesn't immediately re-attempt. Hard cap intentionally
+  // untouched so a truly walked-away device (no stamp refresh,
+  // grace ages past 5 min) still trips the lock via grace expiry.
+  if(_pinGraceStillValid()){
+    _parentUnlockExpiresAt = Date.now() + PARENT_IDLE_MS;
+    return;
+  }
   _parentUnlockExpiresAt = 0;
   _parentUnlockHardCap = 0;
   if(typeof _activeSection!=='undefined' && _activeSection==='s-parent'){
@@ -68,6 +81,33 @@ function escJsAttr(s){
   return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
 }
 
+// Bug A v2 (2026-06-08) — extracted predicate shared by
+// unlockParentDash (gate dismissal) and _autoLockParentDash (idle
+// timer override). True when ALL of these hold:
+//   • ylcc_post_login stamp present
+//   • stamp < 5 min old (PARENT_IDLE_MS window)
+//   • _supaUser is non-null (Supabase session is alive)
+//   • ylcc_post_login_uid matches String(_supaUser.id)
+// Wrapped in try/catch so a localStorage failure degrades to false,
+// preserving the existing "fall through to PIN gate" behavior.
+//
+// The two callers need the EXACT SAME predicate. Drift between them
+// is the Bug A v2 conflict in concentrated form: the in-memory idle
+// timer was firing the auto-lock while the grace stamp said the
+// user was authenticated; both must consult one source of truth.
+function _pinGraceStillValid(){
+  try {
+    const stamp = parseInt(localStorage.getItem('ylcc_post_login') || '0', 10);
+    if(!stamp) return false;
+    if(Date.now() - stamp >= 5*60*1000) return false;
+    const sessionAlive = (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.id);
+    if(!sessionAlive) return false;
+    let stampUid = '';
+    try { stampUid = localStorage.getItem('ylcc_post_login_uid') || ''; } catch(_){ stampUid = ''; }
+    return !!(stampUid && stampUid === String(_supaUser.id));
+  } catch(_e){ return false; }
+}
+
 function unlockParentDash(){
   initChoreData();
   if(D.parentPinDisabled){ _doUnlockParent(); return; }
@@ -76,22 +116,11 @@ function unlockParentDash(){
   // session restore (getSession + deferred SIGNED_IN). Cleared by
   // lockParentDash() and by the SIGNED_OUT listener.
   //
-  // Bug A hardening (2026-06-08): the stamp alone is not enough. Two
-  // extra checks prevent a leftover stamp from authorizing access into
-  // a hub whose backing session is dead:
-  //   1. _supaUser must still be non-null — covers the case where the
-  //      session expired mid-app but the stamp lingers.
-  //   2. The stored ylcc_post_login_uid must equal _supaUser.id —
-  //      covers the case where a different account signed in on the
-  //      same device since the stamp was written.
-  try {
-    const stamp = parseInt(localStorage.getItem('ylcc_post_login') || '0', 10);
-    const sessionAlive = (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.id);
-    let stampUid = '';
-    try { stampUid = localStorage.getItem('ylcc_post_login_uid') || ''; } catch(_){ stampUid = ''; }
-    const uidMatch = sessionAlive && stampUid && stampUid === String(_supaUser.id);
-    if(stamp && Date.now() - stamp < 5*60*1000 && uidMatch){ _doUnlockParent(); return; }
-  } catch(e){ /* localStorage blocked — fall through to PIN gate */ }
+  // Bug A v2 (2026-06-08): the grace predicate now lives in
+  // _pinGraceStillValid() so _autoLockParentDash uses the same
+  // check. See that helper for the full rationale on the four
+  // conditions (stamp present, < 5 min old, session alive, uid match).
+  if(_pinGraceStillValid()){ _doUnlockParent(); return; }
   // If no PIN set yet (hashed or plaintext), let them straight in
   if(!D.parentPinHash && !D.chorePin && !D.parentPIN){ _doUnlockParent(); return; }
   // Submission handled by pgPinKey / _pgSubmit
