@@ -15708,6 +15708,15 @@
                parent.js. Phase 4 layers animations on top. -->
           <div id="parentCelestialHome">
 
+            <!-- The Watch — W1 (2026-06-08). Cinematic sky canvas
+                 mounted as the first paint layer. Phase 4's existing
+                 .pch-shell wrapper below renders on top at z-index 1.
+                 Painted by app/js/parent-watch-scene.js — currently
+                 only the clock-locked sky cycle (W1 scope). Stars,
+                 comets, clouds, foreground porch / house / tree, and
+                 diegetic content layer in across W2-W6. -->
+            <canvas id="pchSceneCanvas" aria-hidden="true"></canvas>
+
             <style>
               /* Scoped styles. Mirror the .cc-* kid Command Center but
                  use a .pch-* namespace so the two surfaces can diverge
@@ -15722,11 +15731,23 @@
                  prefers-reduced-motion disables every continuous
                  animation while preserving the static layout and
                  the brief one-shot mount reveal. */
-              #parentCelestialHome{padding:1.2rem 0 2rem;max-width:480px;margin:0 auto;}
+              #parentCelestialHome{padding:1.2rem 0 2rem;max-width:480px;margin:0 auto;position:relative;}
               @media (min-width:720px){ #parentCelestialHome{max-width:760px;padding:2rem 0 2.5rem;} }
               @media (min-width:1024px){ #parentCelestialHome{max-width:1040px;} }
-              #parentCelestialHome .pch-shell{padding:0 1.2rem;}
+              #parentCelestialHome .pch-shell{padding:0 1.2rem;position:relative;z-index:1;}
               @media (min-width:720px){ #parentCelestialHome .pch-shell{padding:0 2rem;} }
+
+              /* The Watch — W1 (2026-06-08). Canvas paints the clock-locked
+                 sky behind every Phase 4 element. Stays opacity:0 until the
+                 scene module wakes up and adds .pch-canvas-on so a late
+                 mount fades in rather than popping. Pointer-events disabled
+                 so taps still reach the lanterns / tiles above. Z-index 0
+                 keeps it behind the .pch-shell wrapper (z-index:1). */
+              #parentCelestialHome #pchSceneCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0;pointer-events:none;opacity:0;transition:opacity 800ms ease;border-radius:inherit;}
+              #parentCelestialHome.pch-canvas-on #pchSceneCanvas{opacity:1;}
+              @media (prefers-reduced-motion:reduce){
+                #parentCelestialHome #pchSceneCanvas{transition:none;}
+              }
 
               /* Header */
               #parentCelestialHome .pch-header{display:flex;flex-direction:column;gap:.55rem;margin-bottom:1.5rem;}
@@ -19713,6 +19734,11 @@
      and AFTER data/memory-verses.js (read for verse rotation).
      memory-verses.js loads earlier in the data block. -->
 <script src="/app/js/parent-celestial.js"></script>
+<!-- The Watch — W1 (2026-06-08). Cinematic sky canvas painter
+     for #parentCelestialHome. Exposes window.renderParentWatchScene
+     which parent-celestial.js calls at the top of
+     renderParentCelestialHome(). Idempotent mount; no auto-start. -->
+<script src="/app/js/parent-watch-scene.js"></script>
 <script src="/app/js/email.js"></script>
 <script src="/app/js/misc.js"></script>
 <script src="/app/js/resume.js"></script>
