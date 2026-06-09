@@ -9680,6 +9680,19 @@ body:not(.teen-tabs) #primaryFab{
 }
 
 /* ════════════════════════════════════════════════════════════
+   2026-06-08 — Parent Hub desktop top-space reduction. The base
+   `.sec { padding: 2.2rem 0 .5rem; }` rule gives every section
+   ~35px of top padding above the .sh header. On Parent Hub
+   specifically the header doesn't need that much breathing room
+   — the topbar offset (#mainWrap padding-top) + #app padding
+   already add ~70px above it. Tighten to 1rem on desktop;
+   mobile gets its own .7rem rule below this one.
+   ════════════════════════════════════════════════════════════ */
+#s-parent.sec{
+  padding-top:1rem;
+}
+
+/* ════════════════════════════════════════════════════════════
    2026-06-06 — Parent Hub mobile top-space reduction (tighter
    than the global rule above; relies on #s-parent.sec specificity).
    ════════════════════════════════════════════════════════════ */
