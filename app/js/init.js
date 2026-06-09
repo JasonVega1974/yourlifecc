@@ -292,6 +292,16 @@ async function init(){
               localStorage.setItem('ylcc_post_login', String(Date.now()));
               if(_supaUser && _supaUser.id) localStorage.setItem('ylcc_post_login_uid', String(_supaUser.id));
             } catch(_){}
+            // Bug A v2 (2026-06-08): if the parent is currently on
+            // s-parent (e.g. staring at a PIN gate that auto-locked
+            // BEFORE this fresh stamp was written), re-evaluate the
+            // grace and dismiss the gate. unlockParentDash sees the
+            // fresh stamp + uid, hits _doUnlockParent, and the dash
+            // returns without a PIN prompt.
+            if(typeof _activeSection !== 'undefined' && _activeSection === 's-parent'
+               && typeof unlockParentDash === 'function'){
+              unlockParentDash();
+            }
             _ylccMarkAuthResolved();
             checkPlanStatus().then(function(blocked){
               if(blocked) return;
@@ -340,6 +350,16 @@ async function init(){
         localStorage.setItem('ylcc_post_login', String(Date.now()));
         if(_supaUser && _supaUser.id) localStorage.setItem('ylcc_post_login_uid', String(_supaUser.id));
       } catch(_){}
+      // Bug A v2 (2026-06-08): symmetric with the deferred SIGNED_IN
+      // handler above — if the parent is currently on s-parent,
+      // re-evaluate grace + dismiss the gate. At boot _activeSection
+      // is typically the default landing (not s-parent), so this is
+      // largely a no-op on the cold-load path but covers a hard
+      // refresh while sitting on the Parent Hub.
+      if(typeof _activeSection !== 'undefined' && _activeSection === 's-parent'
+         && typeof unlockParentDash === 'function'){
+        unlockParentDash();
+      }
     }
     // Auth has now definitively resolved (with or without a user). Any
     // _ylccGetFlag reads from this point forward see the right scope.
