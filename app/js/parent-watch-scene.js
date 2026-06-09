@@ -168,17 +168,6 @@
   function _pwsDayOpacity(hour){
     return 1 - _pwsNightOpacity(hour);
   }
-  // Aurora gate — only at deepest night, an hour inside the
-  // night window each side. Skips dawn/dusk shoulders so the
-  // aurora doesn't bloom over a brightening horizon.
-  function _pwsDeepNightOpacity(hour){
-    if (hour < 4.5)  return 1;
-    if (hour < 5.5)  return 1 - (hour - 4.5);
-    if (hour < 21.5) return 0;
-    if (hour < 22.5) return hour - 21.5;
-    return 1;
-  }
-
   // ── State (module-scoped singleton) ───────────────────────
   const _state = {
     canvas: null,
@@ -198,7 +187,12 @@
     // require re-randomization.
     stars: null,
     clouds: null,
-    shootingStars: null
+    shootingStars: null,
+    // W3 — foreground silhouette layer. Same xf/yf fraction
+    // pattern; shapes scale uniformly mobile -> desktop.
+    hills: null,
+    tree: null,
+    house: null
   };
 
   function _pwsSizeCanvas(){
@@ -303,46 +297,172 @@
     _state.shootingStars = slots;
   }
 
+  // ── W3 — foreground silhouette precompute ────────────────
+  // Two rolling hills layered for parallax. Far hill (yf top
+  // at 0.80, ±0.025 sine amp) peeks ABOVE the near hill (yf
+  // top at 0.84, ±0.020 sine amp) and reads as the distant
+  // horizon. Near hill is the anchor for the tree + house.
+  // waves = number of sine periods across canvas width — far
+  // hill has fewer waves (smoother distant ridge), near hill
+  // has more (closer detail).
+  function _pwsPrecomputeHills(){
+    if (_state.hills) return;
+    _state.hills = {
+      far: {
+        baseYf: 0.80,
+        ampYf: 0.025,
+        waves: 2.3,
+        phase: Math.random() * Math.PI * 2
+      },
+      near: {
+        baseYf: 0.84,
+        ampYf: 0.020,
+        waves: 3.1,
+        phase: Math.random() * Math.PI * 2
+      }
+    };
+  }
+
+  // Oak silhouette anchored on the near hill, left side. Trunk
+  // sits at xf=0.18 and tapers (wider at base). Canopy is a
+  // composite of ~30 overlapping circles drawn at offsets from
+  // the canopy center, two tiers:
+  //   • 18 larger circles ("body" of the canopy) — rf 0.018-0.042
+  //   • 12 smaller circles ("leaves" at the edges) — rf 0.006-0.016
+  // The two-tier approach gives the canopy a domed interior with
+  // a ragged outer outline, reading as an organic tree silhouette
+  // rather than a fluffy cloud.
+  //
+  // Branches are 5 lines emanating from the trunk top, angled
+  // mostly upward (-pi/2 ± pi*0.4), of varying length. Drawn
+  // INSIDE the post-translate frame so they sway with the canopy.
+  //
+  // swayPhase randomizes the start of the 12s sway cycle so a
+  // resize-driven re-mount doesn't jolt the sway.
+  function _pwsPrecomputeTree(){
+    if (_state.tree) return;
+    const trunkXf = 0.18;
+    const trunkBaseYf = 0.865;     // sits slightly INTO the near hill
+    const trunkTopYf  = 0.745;
+    const trunkWf     = 0.014;
+
+    // Canopy center (in canvas fractions) — above trunk top
+    const canopyCxf = trunkXf + 0.004;
+    const canopyCyf = 0.685;
+
+    const canopy = [];
+    // Tier 1 — larger body circles
+    for (let i = 0; i < 18; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = Math.random() * 0.058;
+      canopy.push({
+        dxf: Math.cos(angle) * dist,
+        dyf: Math.sin(angle) * dist * 0.75,
+        rf:  0.018 + Math.random() * 0.024
+      });
+    }
+    // Tier 2 — smaller edge leaves for ragged outline
+    for (let i = 0; i < 12; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 0.050 + Math.random() * 0.022;
+      canopy.push({
+        dxf: Math.cos(angle) * dist,
+        dyf: Math.sin(angle) * dist * 0.7,
+        rf:  0.006 + Math.random() * 0.010
+      });
+    }
+
+    const branches = [];
+    for (let i = 0; i < 5; i++) {
+      const angle = (-Math.PI / 2) + (Math.random() - 0.5) * Math.PI * 0.8;
+      branches.push({
+        angle: angle,
+        lenf:  0.040 + Math.random() * 0.025
+      });
+    }
+
+    _state.tree = {
+      trunkXf:    trunkXf,
+      trunkBaseYf: trunkBaseYf,
+      trunkTopYf:  trunkTopYf,
+      trunkWf:    trunkWf,
+      canopyCxf:  canopyCxf,
+      canopyCyf:  canopyCyf,
+      canopy:     canopy,
+      branches:   branches,
+      swayPhase:  Math.random() * Math.PI * 2
+    };
+  }
+
+  // Craftsman-style farmhouse, center-right of mid-foreground.
+  // Body is rectangular (wider than tall) for an unambiguous
+  // "house" read at glance. Peaked roof sits on top; single
+  // chimney offset to the right; small porch projection on the
+  // left tells the eye "this is a home, not a shed."
+  //
+  // 4 windows arranged in a 2x2 grid on the body. Each carries
+  // a random phase offset on a 6s pulse cycle so they breathe
+  // asynchronously — the home feels lived-in rather than wired.
+  //
+  // Stat numbers (W5) will paint into the dark bottom pane of
+  // each window; for W3 the panes paint blank dark.
+  function _pwsPrecomputeHouse(){
+    if (_state.house) return;
+    const xf     = 0.62;       // body horizontal center
+    const baseYf = 0.855;      // body base sits AT near hill top
+    const wf     = 0.20;
+    const bodyHf = 0.115;
+    const roofHf = 0.065;
+
+    // 4 windows in 2x2 grid centered on the body. Window dims
+    // chosen so the 2x2 + gaps fit within the body width with
+    // ~12% margins on each side.
+    const winWf = 0.030;
+    const winHf = 0.026;
+    const winGapXf = 0.018;
+    const winGapYf = 0.014;
+    const gridWf = 2 * winWf + winGapXf;
+    const gridStartXf = xf - gridWf / 2;
+    const gridStartYf = baseYf - bodyHf + 0.022;
+
+    const windows = [];
+    for (let row = 0; row < 2; row++) {
+      for (let col = 0; col < 2; col++) {
+        windows.push({
+          xf: gridStartXf + col * (winWf + winGapXf),
+          yf: gridStartYf + row * (winHf + winGapYf),
+          wf: winWf,
+          hf: winHf,
+          phase: Math.random() * Math.PI * 2
+        });
+      }
+    }
+
+    _state.house = {
+      xf:      xf,
+      baseYf:  baseYf,
+      wf:      wf,
+      bodyHf:  bodyHf,
+      roofHf:  roofHf,
+      // Chimney: small rect emerging from the right side of the roof
+      chimXf: xf + wf * 0.25,
+      chimYf: baseYf - bodyHf - roofHf * 0.6,
+      chimWf: 0.012,
+      chimHf: 0.042,
+      // Porch projection: short rect off the left side, bottom-aligned
+      porchXf: xf - wf / 2 - 0.038,
+      porchYf: baseYf - bodyHf * 0.42,
+      porchWf: 0.048,
+      porchHf: bodyHf * 0.42,
+      windows: windows
+    };
+  }
+
   // ── W2 layer painters ─────────────────────────────────────
   // Each takes ctx + canvas dims + nowMs + the relevant opacity
   // gate so the caller's reduced-motion + day/night gating
   // stays in _pwsPaint where it can be reasoned about as a
   // single render pipeline.
-
-  // Aurora — a gradient ribbon undulating across the upper
-  // sky, behind the stars. Wave phase drives both the top edge
-  // and (with a small offset) the bottom edge so the band
-  // breathes rather than translating.
-  function _pwsPaintAurora(ctx, w, h, nowMs, opacity){
-    const yCenter = h * 0.22;
-    const amplitude = 11;
-    const bandHeight = 34;
-    const wavePeriod = 12000;
-    const phase = (nowMs / wavePeriod) * Math.PI * 2;
-    const samples = 32;
-
-    ctx.beginPath();
-    for (let i = 0; i <= samples; i++) {
-      const x = (i / samples) * w;
-      const yTop = yCenter + amplitude * Math.sin(x / 60 + phase);
-      if (i === 0) ctx.moveTo(x, yTop);
-      else ctx.lineTo(x, yTop);
-    }
-    for (let i = samples; i >= 0; i--) {
-      const x = (i / samples) * w;
-      const yTop = yCenter + amplitude * Math.sin(x / 60 + phase);
-      const yBot = yTop + bandHeight + 4 * Math.sin(x / 50 + phase + 1.1);
-      ctx.lineTo(x, yBot);
-    }
-    ctx.closePath();
-
-    const grad = ctx.createLinearGradient(0, yCenter, 0, yCenter + bandHeight + 8);
-    grad.addColorStop(0,    'rgba( 16, 185, 129, ' + (opacity).toFixed(3) + ')');
-    grad.addColorStop(0.5,  'rgba(  6, 182, 212, ' + (opacity).toFixed(3) + ')');
-    grad.addColorStop(1,    'rgba(167, 139, 250, ' + (opacity * 0.8).toFixed(3) + ')');
-    ctx.fillStyle = grad;
-    ctx.fill();
-  }
 
   // Clouds — composite of 3 soft ellipses per cloud with a
   // radial gradient fill so the edges feather. Drift speed
@@ -478,6 +598,242 @@
     }
   }
 
+  // ── W3 layer painters ─────────────────────────────────────
+  // All foreground layers share a simple two-color lerp on the
+  // day/night gate. Hills/tree/house never animate away — they
+  // shift color with the time of day but always paint. Color
+  // helper kept inline (cheap) rather than adding another
+  // function to the surface.
+
+  // Two rolling hills sampled at 48 x-points, filled as closed
+  // polygons from their sine top edge to the canvas bottom.
+  // Far hill paints first (deeper indigo, fewer waves), near
+  // hill paints on top (slightly darker, more waves). The
+  // near hill is what occludes most of the far hill; the
+  // visible far-hill sliver between the two top edges reads
+  // as the distant horizon ridge.
+  function _pwsPaintHills(ctx, w, h, nowMs, hour, dayOp){
+    const hills = _state.hills;
+
+    // Spec colors:
+    //   • Far hill night #1A2240 = rgb(26, 34, 64)
+    //   • Near hill night #141B33 = rgb(20, 27, 51)
+    // Day variants chosen to keep silhouette legibility while
+    // shifting to a cooler blue-gray at midday. Sunrise/sunset
+    // warmth comes from the sky behind, not from the hills.
+    const lerp3 = function(n, d, t){
+      return [
+        n[0] + (d[0] - n[0]) * t,
+        n[1] + (d[1] - n[1]) * t,
+        n[2] + (d[2] - n[2]) * t
+      ];
+    };
+    const FAR_NIGHT  = [26, 34, 64];
+    const FAR_DAY    = [80, 100, 130];
+    const NEAR_NIGHT = [20, 27, 51];
+    const NEAR_DAY   = [62, 78, 105];
+    const farC  = lerp3(FAR_NIGHT,  FAR_DAY,  dayOp);
+    const nearC = lerp3(NEAR_NIGHT, NEAR_DAY, dayOp);
+
+    const drawHill = function(cfg, color){
+      const baseY = cfg.baseYf * h;
+      const amp   = cfg.ampYf  * h;
+      const periodX = w / cfg.waves;
+      ctx.beginPath();
+      ctx.moveTo(0, h);
+      const samples = 48;
+      for (let i = 0; i <= samples; i++) {
+        const x = (i / samples) * w;
+        const y = baseY + amp * Math.sin(x / periodX * Math.PI * 2 + cfg.phase);
+        if (i === 0) ctx.lineTo(0, y);
+        else         ctx.lineTo(x, y);
+      }
+      ctx.lineTo(w, h);
+      ctx.closePath();
+      ctx.fillStyle = 'rgb(' + (color[0]|0) + ',' + (color[1]|0) + ',' + (color[2]|0) + ')';
+      ctx.fill();
+    };
+
+    drawHill(hills.far,  farC);
+    drawHill(hills.near, nearC);
+  }
+
+  // Oak silhouette. Trunk is a tapered 4-point polygon (wider
+  // at base, narrower at top) drawn STATIC. Canopy + branches
+  // sway inside a save/translate/rotate frame anchored at the
+  // trunk top, so the trunk stays planted while the foliage
+  // breathes. Canopy clusters are composite filled circles —
+  // 18 larger body circles + 12 smaller edge leaves drawn from
+  // _state.tree.canopy, generated at precompute.
+  //
+  // Sway amplitude ±0.5° (0.0087 rad) on a 12s sine. Reduced
+  // motion freezes the sway at 0° but the tree still paints.
+  function _pwsPaintTree(ctx, w, h, nowMs, hour, dayOp, frozen){
+    const tree = _state.tree;
+
+    const NIGHT = [10, 15, 26];
+    const DAY   = [42, 34, 26];   // muted wood-brown
+    const r = NIGHT[0] + (DAY[0] - NIGHT[0]) * dayOp;
+    const g = NIGHT[1] + (DAY[1] - NIGHT[1]) * dayOp;
+    const b = NIGHT[2] + (DAY[2] - NIGHT[2]) * dayOp;
+    const fill = 'rgb(' + (r|0) + ',' + (g|0) + ',' + (b|0) + ')';
+    ctx.fillStyle = fill;
+    ctx.strokeStyle = fill;
+
+    const trunkX     = tree.trunkXf    * w;
+    const trunkBaseY = tree.trunkBaseYf * h;
+    const trunkTopY  = tree.trunkTopYf  * h;
+    const trunkW     = tree.trunkWf    * w;
+    const baseHalf = trunkW * 0.70;
+    const topHalf  = trunkW * 0.35;
+
+    // Tapered trunk (always static)
+    ctx.beginPath();
+    ctx.moveTo(trunkX - baseHalf, trunkBaseY);
+    ctx.lineTo(trunkX - topHalf,  trunkTopY);
+    ctx.lineTo(trunkX + topHalf,  trunkTopY);
+    ctx.lineTo(trunkX + baseHalf, trunkBaseY);
+    ctx.closePath();
+    ctx.fill();
+
+    // Sway computed once, applied to canopy + branches together
+    const swayPeriod = 12000;
+    const maxSwayRad = 0.0087;     // ~0.5°
+    const swayAngle = frozen
+      ? 0
+      : maxSwayRad * Math.sin(nowMs / swayPeriod * Math.PI * 2 + tree.swayPhase);
+
+    ctx.save();
+    ctx.translate(trunkX, trunkTopY);
+    ctx.rotate(swayAngle);
+
+    // Branches — thin lines fanning upward from trunk top into
+    // the canopy. Drawn FIRST so canopy circles paint on top.
+    ctx.lineCap = 'round';
+    ctx.lineWidth = trunkW * 0.5;
+    for (let i = 0; i < tree.branches.length; i++) {
+      const br = tree.branches[i];
+      const ex = Math.cos(br.angle) * br.lenf * w;
+      const ey = Math.sin(br.angle) * br.lenf * h;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(ex, ey);
+      ctx.stroke();
+    }
+
+    // Canopy clusters — relative to (canopyCxf - trunkXf, canopyCyf - trunkTopYf)
+    // after the translate above, since (0,0) is now at trunk top.
+    const canopyOffX = (tree.canopyCxf - tree.trunkXf) * w;
+    const canopyOffY = (tree.canopyCyf - tree.trunkTopYf) * h;
+    for (let i = 0; i < tree.canopy.length; i++) {
+      const c  = tree.canopy[i];
+      const cx = canopyOffX + c.dxf * w;
+      const cy = canopyOffY + c.dyf * h;
+      const cr = c.rf * w;
+      ctx.beginPath();
+      ctx.arc(cx, cy, cr, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
+
+  // House silhouette + chimney + porch. Pure dark fill at night,
+  // shifts to a subtle wood-brown by day so the house feels less
+  // ominous in afternoon light. Roof is a triangle peaked at
+  // body center; chimney emerges from the right slope; porch
+  // is a short rectangle off the left side, bottom-aligned with
+  // the house base so it sits on the same ground line.
+  function _pwsPaintHouse(ctx, w, h, nowMs, hour, dayOp){
+    const ho = _state.house;
+
+    const NIGHT = [10, 15, 26];
+    const DAY   = [44, 34, 24];
+    const r = NIGHT[0] + (DAY[0] - NIGHT[0]) * dayOp;
+    const g = NIGHT[1] + (DAY[1] - NIGHT[1]) * dayOp;
+    const b = NIGHT[2] + (DAY[2] - NIGHT[2]) * dayOp;
+    ctx.fillStyle = 'rgb(' + (r|0) + ',' + (g|0) + ',' + (b|0) + ')';
+
+    const bodyX    = (ho.xf - ho.wf / 2) * w;
+    const bodyW    = ho.wf * w;
+    const bodyTopY = (ho.baseYf - ho.bodyHf) * h;
+    const bodyH    = ho.bodyHf * h;
+
+    // Body
+    ctx.fillRect(bodyX, bodyTopY, bodyW, bodyH);
+
+    // Roof — slight eaves overhang (0.005w) so the silhouette
+    // doesn't read as a perfect triangle stacked on a box
+    const eaves = 0.005 * w;
+    const roofPeakY = (ho.baseYf - ho.bodyHf - ho.roofHf) * h;
+    const roofPeakX = ho.xf * w;
+    ctx.beginPath();
+    ctx.moveTo(bodyX - eaves,           bodyTopY);
+    ctx.lineTo(roofPeakX,               roofPeakY);
+    ctx.lineTo(bodyX + bodyW + eaves,   bodyTopY);
+    ctx.closePath();
+    ctx.fill();
+
+    // Chimney
+    ctx.fillRect(ho.chimXf * w, ho.chimYf * h, ho.chimWf * w, ho.chimHf * h);
+
+    // Porch projection — bottom-aligned with house base so it
+    // shares the ground line with the body
+    const porchTopY = (ho.baseYf - ho.porchHf) * h;
+    ctx.fillRect(ho.porchXf * w, porchTopY, ho.porchWf * w, ho.porchHf * h);
+  }
+
+  // Windows — 2x2 grid drawn on top of the house body. Each
+  // window has a two-pane treatment:
+  //   • Top half: warm amber linear gradient #FFC069 -> #E89348
+  //     with per-window pulse alpha (0.85-1.0 over 6s) — that's
+  //     the "lived-in" cue.
+  //   • Bottom half: solid dark #0D1422 — reserved as the data
+  //     surface for W5's stat numbers; for W3 paints blank.
+  // Thin amber border traces the full window outline; a thin
+  // mullion line divides the panes horizontally. Frozen window
+  // pulse under reduced-motion sits at 0.92 (midpoint).
+  function _pwsPaintHouseWindows(ctx, w, h, nowMs, hour, dayOp, frozen){
+    const windows = _state.house.windows;
+    const pulsePeriod = 6000;
+
+    for (let i = 0; i < windows.length; i++) {
+      const win = windows[i];
+      const x  = win.xf * w;
+      const y  = win.yf * h;
+      const ww = win.wf * w;
+      const hh = win.hf * h;
+      const halfH = hh * 0.5;
+
+      let pulseAlpha;
+      if (frozen) {
+        pulseAlpha = 0.92;
+      } else {
+        pulseAlpha = 0.85 + 0.15 * (0.5 + 0.5 * Math.sin(nowMs / pulsePeriod * Math.PI * 2 + win.phase));
+      }
+
+      // Warm top pane
+      const grad = ctx.createLinearGradient(x, y, x, y + halfH);
+      grad.addColorStop(0, 'rgba(255, 192, 105, ' + pulseAlpha.toFixed(3) + ')');
+      grad.addColorStop(1, 'rgba(232, 147, 72, '  + pulseAlpha.toFixed(3) + ')');
+      ctx.fillStyle = grad;
+      ctx.fillRect(x, y, ww, halfH);
+
+      // Dark bottom pane (W5 stat number surface)
+      ctx.fillStyle = 'rgb(13, 20, 34)';
+      ctx.fillRect(x, y + halfH, ww, halfH);
+
+      // Amber border + mullion
+      ctx.strokeStyle = 'rgba(232, 147, 72, ' + (pulseAlpha * 0.6).toFixed(3) + ')';
+      ctx.lineWidth = 0.6;
+      ctx.strokeRect(x + 0.3, y + 0.3, ww - 0.6, hh - 0.6);
+      ctx.beginPath();
+      ctx.moveTo(x, y + halfH);
+      ctx.lineTo(x + ww, y + halfH);
+      ctx.stroke();
+    }
+  }
+
   function _pwsPaint(){
     const ctx = _state.ctx;
     if (!ctx) return;
@@ -497,13 +853,10 @@
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, w, h);
 
-    // 2. Aurora — deep-night only, skip under reduced-motion
-    if (!_state.reducedMotion) {
-      const deepNight = _pwsDeepNightOpacity(hour);
-      if (deepNight > 0) {
-        _pwsPaintAurora(ctx, w, h, nowMs, 0.14 * deepNight);
-      }
-    }
+    // 2. Aurora — REMOVED 2026-06-08 per user feedback (the wavy blue
+    //    ribbon read as a distracting overlay, not atmospheric depth).
+    //    The _pwsPaintAurora function and _pwsDeepNightOpacity gate are
+    //    deleted below; if we want it back, restore the call here.
 
     // 3. Clouds — daytime gate; drift freezes under reduced-motion
     const dayOp = _pwsDayOpacity(hour);
@@ -520,6 +873,26 @@
     // 5. Shooting stars — night only, skip under reduced-motion
     if (!_state.reducedMotion && nightOp > 0.5 && _state.shootingStars) {
       _pwsPaintShootingStars(ctx, w, h, nowMs);
+    }
+
+    // 6. Hills — always painted; day/night color via dayOp lerp
+    if (_state.hills) {
+      _pwsPaintHills(ctx, w, h, nowMs, hour, dayOp);
+    }
+
+    // 7. Tree — always painted; canopy sway frozen under reduced-motion
+    if (_state.tree) {
+      _pwsPaintTree(ctx, w, h, nowMs, hour, dayOp, _state.reducedMotion);
+    }
+
+    // 8. House silhouette — always painted
+    if (_state.house) {
+      _pwsPaintHouse(ctx, w, h, nowMs, hour, dayOp);
+    }
+
+    // 9. House windows — always painted; pulse frozen under reduced-motion
+    if (_state.house && _state.house.windows) {
+      _pwsPaintHouseWindows(ctx, w, h, nowMs, hour, dayOp, _state.reducedMotion);
     }
   }
 
@@ -592,6 +965,11 @@
     _state.stars = null;
     _state.clouds = null;
     _state.shootingStars = null;
+    // W3 — drop foreground state too so a fresh mount randomizes
+    // tree canopy / hill phase / window pulse offsets again.
+    _state.hills = null;
+    _state.tree = null;
+    _state.house = null;
   }
 
   // ── Mount (idempotent — safe to call from every render) ───
@@ -645,6 +1023,11 @@
     _pwsPrecomputeStars();
     _pwsPrecomputeClouds();
     _pwsPrecomputeShootingStars();
+    // W3 — foreground silhouette layer (hills, tree, house).
+    // Same fraction-based positioning so resize is free.
+    _pwsPrecomputeHills();
+    _pwsPrecomputeTree();
+    _pwsPrecomputeHouse();
     host.classList.add('pch-canvas-on');
 
     // ResizeObserver on the host so the canvas re-fits whenever
