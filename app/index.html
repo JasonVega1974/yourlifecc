@@ -15749,6 +15749,18 @@
                 #parentCelestialHome #pchSceneCanvas{transition:none;}
               }
 
+              /* The Watch — W2 (2026-06-08). Canvas now paints its
+                 own star field (60-90 stars with per-star twinkle +
+                 night gate). Hide Phase 4's SVG <g class="pch-stars">
+                 so we don't render double — BUT only when the W2
+                 canvas is active. The :not(.pch-classic-mode) gate
+                 lets the escape hatch restore Phase 4 pixel-identical:
+                 parent-watch-scene.js adds .pch-classic-mode to the
+                 host whenever ?ylcc_classic_phc=1 or the localStorage
+                 flag is set, which deactivates this selector and the
+                 SVG star field reappears. Reversible at any time. */
+              #parentCelestialHome:not(.pch-classic-mode) svg.pch-constellation__svg .pch-stars{display:none;}
+
               /* Header */
               #parentCelestialHome .pch-header{display:flex;flex-direction:column;gap:.55rem;margin-bottom:1.5rem;}
               #parentCelestialHome .pch-hello{font-size:1.7rem;font-weight:600;letter-spacing:-.01em;color:#F1E9D5;margin:0;line-height:1.18;}
