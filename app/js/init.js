@@ -283,6 +283,15 @@ async function init(){
           if(_authEl && _authEl.style.display === 'flex'){
             // _supaUser was set above; mark auth resolved so any deferred
             // gates targeting this fresh sign-in see the right uid scope.
+            // Bug A fix (2026-06-08): mirror the getSession path — stamp
+            // ylcc_post_login + uid here too so deferred SIGNED_IN
+            // restores (Supabase silently refreshing an expired access
+            // token via the refresh token) also get the PIN grace
+            // instead of bouncing the parent through the gate.
+            try {
+              localStorage.setItem('ylcc_post_login', String(Date.now()));
+              if(_supaUser && _supaUser.id) localStorage.setItem('ylcc_post_login_uid', String(_supaUser.id));
+            } catch(_){}
             _ylccMarkAuthResolved();
             checkPlanStatus().then(function(blocked){
               if(blocked) return;
@@ -302,6 +311,16 @@ async function init(){
         _appInitialized = false;
         _supaUser = null;
         setSyncSt('local');
+        // Bug A fix (2026-06-08): burn the post-login grace stamp on a
+        // real Supabase sign-out so a leftover timestamp from a now-dead
+        // session cannot unlock the Parent Hub on the next visit before
+        // re-auth completes. lockParentDash() already clears these on
+        // explicit Lock Hub; this covers session-expiry sign-outs the
+        // parent never deliberately triggered.
+        try {
+          localStorage.removeItem('ylcc_post_login');
+          localStorage.removeItem('ylcc_post_login_uid');
+        } catch(_){}
       }
     });
 
@@ -314,7 +333,13 @@ async function init(){
       // not just fresh signInWithPassword. Otherwise returning users get
       // the parent PIN prompt on every app open. Stamping here gives them
       // the same grace window the fresh-login path sets at auth.js:144.
-      try { localStorage.setItem('ylcc_post_login', String(Date.now())); } catch(_){}
+      // Bug A fix (2026-06-08): also stamp the auth uid so a leftover
+      // stamp from a different account on the same device is rejected
+      // by unlockParentDash's uid-match check.
+      try {
+        localStorage.setItem('ylcc_post_login', String(Date.now()));
+        if(_supaUser && _supaUser.id) localStorage.setItem('ylcc_post_login_uid', String(_supaUser.id));
+      } catch(_){}
     }
     // Auth has now definitively resolved (with or without a user). Any
     // _ylccGetFlag reads from this point forward see the right scope.
