@@ -2285,9 +2285,15 @@ function switchToProfile(id){
     const needKidOnboard = !D.kidOnboardDone;
     if(needAgePicker){
       setTimeout(function(){
+        // Polish E follow-up (2026-06-09) -- pass viaKidActivation
+        // so the chokepoint guard in showAgePickerModal does NOT
+        // suppress here. This call site is the genuine kid-
+        // activation path: the parent is explicitly switching to
+        // a kid profile and the kid still needs their bracket set
+        // even on a family account.
         showAgePickerModal(function(){
           if(needKidOnboard) setTimeout(showKidOnboard, 200);
-        });
+        }, { viaKidActivation: true });
       }, 800);
     } else if(needKidOnboard){
       setTimeout(showKidOnboard, 800);

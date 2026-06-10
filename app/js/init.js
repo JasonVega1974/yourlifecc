@@ -448,8 +448,41 @@ function _isChildProfileActive(){
   return !!(ap && ap.isParent === false);
 }
 
-function showAgePickerModal(callback){
+function showAgePickerModal(callback, opts){
   _agePickerCallback = (typeof callback === 'function') ? callback : null;
+  // Polish E follow-up (2026-06-09) -- Narrowed chokepoint guard
+  // against the kid-onboarding age-range picker leaking onto the
+  // parent surface. The picker fired on parent-hub refresh when
+  // the "Viewing" dropdown was set to a kid: _isChildProfileActive()
+  // returns true regardless of who is operating the app, so the
+  // init boot paths treated parent-supervising-kid the same as
+  // an actual kid using the app.
+  //
+  // Reliable signal: _profiles contains a parent profile -> family
+  // account -> kid-onboarding does not apply at the account level.
+  // Skip the picker and fire the callback synchronously so
+  // downstream init logic continues without the modal step.
+  //
+  // BUT: switchToProfile -> kid is genuine kid activation on a
+  // family account and the kid still needs their bracket set.
+  // opts.viaKidActivation === true bypasses the suppression at
+  // that one explicit call site so kid onboarding stays intact.
+  //
+  // Option A (gate on a parent role in _supaUser.user_metadata)
+  // was investigated and rejected -- only signup_source='solo' is
+  // captured; no parallel 'parent' / 'family' field exists on
+  // existing accounts, so the _profiles check is the only
+  // reliable signal available.
+  const viaKidActivation = !!(opts && opts.viaKidActivation);
+  if (!viaKidActivation
+      && typeof _profiles !== 'undefined' && Array.isArray(_profiles)
+      && _profiles.some(function(p){ return p && p.isParent === true; })) {
+    if (_agePickerCallback) {
+      try { _agePickerCallback(); } catch(_){}
+      _agePickerCallback = null;
+    }
+    return;
+  }
   const m = document.getElementById('agePickerModal');
   if(m) m.style.display = 'flex';
 }
