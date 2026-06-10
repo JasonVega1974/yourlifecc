@@ -9818,7 +9818,7 @@ body:not(.teen-tabs) #primaryFab{
    is display:none -- removed. The #s-parent.sec padding-top:0
    rule stays so the hub sits flush at the 44px nav clearance
    (would still hold even if the #app rule were ever pulled). */
-body:has(#s-parent.sec.active) #app{
+body:has(#s-parent.sec.active #parentCelestialHome:not(.pch-entered):not(.pch-classic-mode)) #app{
   display:none !important;
 }
 #s-parent.sec:has(#parentCelestialHome:not(.pch-entered):not(.pch-classic-mode)){
