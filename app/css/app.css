@@ -9769,21 +9769,16 @@ body:not(.teen-tabs) #primaryFab{
   #phKidCards,
   .faf-home-wrap,
   .ph-hub-label,
+  .ph-view-row,
   #phCardGrid
 ){
   display:none !important;
 }
 
-/* Tighten the seam: .ph-view-row sits flush above the hero
-   and the hero ends exactly at the viewport bottom. Zeros
-   margin-bottom on the strip, #phLayout's flex gap, and
-   #parentCelestialHome's own padding/margin so the
-   --pch-hero-offset measurement (from getBoundingClientRect's
-   border-box top of #parentCelestialHome) aligns the photo
-   border-to-border with the visible viewport. */
-#s-parent:has(#parentCelestialHome:not(.pch-entered):not(.pch-classic-mode)) .ph-view-row{
-  margin-bottom:0 !important;
-}
+/* (.ph-view-row hidden on splash by the rule above (2026-06-10);
+   the "flush above the photo" margin-bottom:0 tightening is no
+   longer needed there. The row stays visible on the entered
+   dashboard, where parents switch which kid they're viewing.) */
 #s-parent:has(#parentCelestialHome:not(.pch-entered):not(.pch-classic-mode)) #phLayout{
   gap:0 !important;
 }
