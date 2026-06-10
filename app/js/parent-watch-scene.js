@@ -207,10 +207,14 @@
     _state.heroBox.classList.remove(otherCls);
     const img = document.getElementById('pchHeroImg');
     if (img) {
-      // Relative path resolves against /app/ (where index.html
-      // lives). watch-day.webp = golden meadow, watch-night.webp
-      // = moonlit farmhouse. Confirmed present 2026-06-09.
-      const src = isNight ? 'img/watch-night.webp' : 'img/watch-day.webp';
+      // Absolute path (2026-06-10). The app is served at /app
+      // (NO trailing slash), so a relative "img/..." resolves
+      // against the page URL's parent -- /img/... -- which 404s.
+      // Absolute /app/img/... is correct regardless of trailing-
+      // slash behavior or rewrite quirks. Same fix in the inline
+      // HTML src at index.html ~15722. watch-day.webp = golden
+      // meadow; watch-night.webp = moonlit farmhouse.
+      const src = isNight ? '/app/img/watch-night.webp' : '/app/img/watch-day.webp';
       if (img.getAttribute('src') !== src) {
         img.setAttribute('src', src);
       }
