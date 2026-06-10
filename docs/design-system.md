@@ -516,6 +516,30 @@ Faith CTA variant: primary button background `--accent` instead of `--primary`. 
 - Centered icon (40–56px) + heading (`--type-h3`) + body (`--type-body`, max-width 360px) + optional CTA button.
 - Tone: warm, never reproachful ("Nothing here yet — let's start your first plan").
 
+### Parent Portal CTA (amber variant)
+
+The Watch splash threshold (`#parentCelestialHome .pch-hero` -> `#pchHeroStep` "Step inside") uses an amber CTA that sits outside the documented `--primary` / `--secondary` / `--accent` palette by design. The splash is a cinematic threshold over a day/night photograph, and amber is the warmest, most legible call-to-action over both the bright golden meadow and the moonlit farmhouse — neither the cyan primary nor the indigo faith accent reads cleanly over both photos.
+
+| Property | Value | Notes |
+|----------|-------|-------|
+| Background | `#FBBF24` | Amber. Not a system token — scoped to this single CTA. |
+| Text | `#1A0F00` | Near-black for AA contrast on the amber fill. |
+| Border / radius | `none` / `999px` | Pill shape, no border. |
+| Hover | `filter: brightness(1.06)` | Subtle warm-up, no recolor. |
+| Focus-visible | `outline: 2px solid #FFFFFF; outline-offset: 3px` | White ring reads against both photos. |
+
+**Pulse animation** — the CTA carries a gentle breathing pulse named `pch-cta-pulse` (defined in the scoped `<style>` block inside `#parentCelestialHome`, `app/index.html`):
+
+- 2.6s `ease-in-out` infinite.
+- `transform: scale(1) <-> scale(1.04)` over the cycle.
+- `box-shadow` ring expands from `rgba(251,191,36,.45) 0 0 0 0` to `rgba(251,191,36,0) 0 0 0 10px`, plus a static 6–8px black drop shadow for legibility.
+
+The pulse is naturally splash-scoped: the hero is `display:none` once `.pch-entered` is set, so the animation never runs while the parent dashboard is in front of the user.
+
+**Reduced motion** — `@media (prefers-reduced-motion: reduce)` sets `animation: none` on `#parentCelestialHome .pch-hero-lockup__cta`. The CTA remains visible and clickable; only the breathing is removed. Required for accessibility compliance (matches §5 reduced-motion stance).
+
+This variant is intentionally NOT generalized to a `--cta-amber` token — it is a one-off for the Watch splash. Any other surface needing a warm CTA should still go through `--primary` or `--accent`.
+
 ---
 
 ## 10. Open questions for design system
