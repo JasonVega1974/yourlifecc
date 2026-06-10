@@ -134,6 +134,146 @@
     } catch(_e){ return false; }
   }
 
+  // ── Portal hero lockup helpers (2026-06-09) ───────────────
+  // The hero overlay above the canvas carries a kicker greeting
+  // ("Good evening, Jason"), a display title, an italic line, and
+  // a "Step inside" CTA that smooth-scrolls to the .pch-shell
+  // dashboard sibling below. The three helpers below hydrate the
+  // kicker text from the live clock + parent name, and wire the
+  // CTA once per host.
+
+  // Parent's first name -- fallback chain mirrors The Well's
+  // renderer (active parent profile -> D.name -> Supabase auth
+  // metadata -> email prefix -> "there"). Returns just the first
+  // word so the kicker stays compact ("Jason" not "Jason Vega").
+  function _pchParentFirstName(){
+    let name = '';
+    try {
+      if (typeof _profiles !== 'undefined' && Array.isArray(_profiles)) {
+        const p = _profiles.find(function(p){ return p && p.isParent === true; });
+        if (p && p.name) name = p.name;
+      }
+      if (!name && typeof D === 'object' && D && D.name) name = D.name;
+      if (!name && typeof _supaUser !== 'undefined' && _supaUser) {
+        const m = _supaUser.user_metadata || {};
+        name = m.first_name || m.firstName || m.full_name || m.name || '';
+        if (!name && _supaUser.email) name = String(_supaUser.email).split('@')[0];
+      }
+    } catch(_e){}
+    name = String(name || '').trim();
+    if (!name) return 'there';
+    const firstWord = name.split(/[\s.,]+/)[0];
+    return firstWord || 'there';
+  }
+
+  // Writes the time-aware kicker into #pchHeroKicker. Sources the
+  // phrase from window._pwsTimeKicker(window._pwsCurrentHour()) --
+  // both exposed by parent-watch-scene.js. Cheap enough to call on
+  // every render so the kicker stays accurate even if the user
+  // keeps the dash open across a clock-bucket boundary.
+  function _pchUpdateHeroKicker(){
+    const el = document.getElementById('pchHeroKicker');
+    if (!el) return;
+    let phrase = 'Good evening';
+    if (typeof window._pwsCurrentHour === 'function'
+        && typeof window._pwsTimeKicker  === 'function') {
+      try { phrase = window._pwsTimeKicker(window._pwsCurrentHour()); } catch(_e){}
+    }
+    el.textContent = phrase + ', ' + _pchParentFirstName();
+  }
+
+  // -- Watch gate (Polish E, 2026-06-09) ---------------------
+  // The Watch behaves as a hard gate once per session, matching
+  // The Well: splash by default, "Step inside" enters the
+  // dashboard as a separate view. The gate is persisted in
+  // sessionStorage scoped per Supabase user via _ylccUserKey()
+  // (key: "watch_entered"). Refresh or new tab returns to the
+  // splash; navigating within the session does not re-gate.
+  //
+  // The class .pch-entered on #parentCelestialHome is the single
+  // source of truth for the rendered state: CSS in index.html
+  // toggles .pch-hero and #pchContent visibility off that class.
+  // renderParentCelestialHome reads the session flag at the very
+  // top of every render and applies the class BEFORE the scene
+  // module mounts, so the splash never flashes when the gate has
+  // already been crossed.
+
+  function _pchWatchEnteredKey(){
+    const base = 'watch_entered';
+    return (typeof _ylccUserKey === 'function') ? _ylccUserKey(base) : (base + '_local');
+  }
+
+  function _pchHasEnteredWatch(){
+    try { return sessionStorage.getItem(_pchWatchEnteredKey()) === '1'; }
+    catch(_e){ return false; }
+  }
+
+  function _pchSetEnteredWatch(){
+    try { sessionStorage.setItem(_pchWatchEnteredKey(), '1'); } catch(_e){}
+  }
+
+  // Polish E follow-up (2026-06-09) -- Home control returns to The
+  // Watch splash. Mirrors the "Step inside" reverse: clear the
+  // session flag, remove .pch-entered, and re-render the parent
+  // home so the splash paints. parent-watch-scene.js sees no
+  // .pch-entered class on its next mount, resets _state.stopped to
+  // false on the not-entered path, takes the canvas fast path,
+  // and calls _pwsWake to reschedule the RAF loop -- scene resumes
+  // from frozen state without a teardown.
+  function _pchClearEnteredWatch(){
+    try { sessionStorage.removeItem(_pchWatchEnteredKey()); } catch(_e){}
+  }
+
+  function _pchReturnToSplash(){
+    _pchClearEnteredWatch();
+    const host = document.getElementById('parentCelestialHome');
+    if (host) host.classList.remove('pch-entered');
+    // phNav('home') is the standard parent-hub home route and re-
+    // fires renderParentHubHome which in turn calls
+    // renderParentCelestialHome -- that path re-mounts the scene
+    // (canvas fast path + _state.stopped reset + _pwsWake) so RAF
+    // resumes and the splash renders. Fallback to a direct render
+    // call if phNav is somehow unavailable.
+    if (typeof phNav === 'function') {
+      phNav('home');
+    } else if (typeof renderParentCelestialHome === 'function') {
+      renderParentCelestialHome();
+    }
+  }
+
+  // Wires #pchHeroStep to the enter-Watch toggle. Click sets the
+  // session flag, applies .pch-entered to the host (CSS handles
+  // the visibility flip), and stops the scene's RAF loop since
+  // the canvas is now display:none for the rest of the session.
+  // Idempotent via host._pchStepWired so render-on-save events
+  // do not stack duplicate handlers.
+  function _pchWireHeroStepInside(host){
+    if (!host || host._pchStepWired) return;
+    const btn = document.getElementById('pchHeroStep');
+    if (!btn) return;
+    host._pchStepWired = true;
+    btn.addEventListener('click', function(){
+      _pchSetEnteredWatch();
+      host.classList.add('pch-entered');
+      // Halt the scene RAF loop -- canvas is hidden for the
+      // remainder of the session, no point painting it.
+      if (typeof window.stopParentWatchScene === 'function') {
+        window.stopParentWatchScene();
+      }
+      // Move keyboard focus into the revealed dashboard so it
+      // doesn't drop to <body> when the hero disappears. Target
+      // #pchContent itself with tabindex=-1; setting the attribute
+      // here (rather than in markup) keeps this file self-contained
+      // and is idempotent on repeat clicks. focus() is instant in
+      // every browser -- no reduced-motion branch needed.
+      const dashTarget = document.getElementById('pchContent');
+      if (dashTarget) {
+        dashTarget.setAttribute('tabindex', '-1');
+        try { dashTarget.focus(); } catch(_e){}
+      }
+    });
+  }
+
   // ── Constellation node table ──────────────────────────────
   // Asymmetric positions — not a regular polygon. Nodes drift
   // up-right across the upper half, then down-left across the
@@ -142,18 +282,28 @@
   // halo gradient id) and a per-node breathe-phase offset so
   // the six don't pulse in unison.
   function _pchBuildNodes(stats){
+    // Step 5 (2026-06-09 portal skill-compliance pass) -- palette
+    // reduced from six destination hues to three: cyan + violet
+    // cycled by index for the cool/calm baseline (non-hot nodes),
+    // amber reserved as the hot/featured accent. Halo gradients
+    // (pchHaloChores etc.) in index.html <defs> are no longer
+    // referenced by this renderer; they remain in markup as unused
+    // defs pending a follow-up cleanup pass.
+    const CYAN   = '#38BDF8';
+    const VIOLET = '#A78BFA';
+    const cycle  = function(i){ return (i % 2 === 0) ? CYAN : VIOLET; };
     return [
-      { slot:'chores',   label:'Chores',   halo:'pchHaloChores',   color:'#22C55E',
+      { slot:'chores',   label:'Chores',   color: cycle(0),
         x: 90, y: 80,  count: stats.choresPending,   phase: 0    },
-      { slot:'contests', label:'Contests', halo:'pchHaloContests', color:'#FBBF24',
+      { slot:'contests', label:'Contests', color: cycle(1),
         x:180, y: 50,  count: 0,                     phase: 700  },
-      { slot:'activity', label:'Activity', halo:'pchHaloActivity', color:'#38BDF8',
+      { slot:'activity', label:'Activity', color: cycle(2),
         x:320, y: 95,  count: stats.recentActivities,phase: 1400 },
-      { slot:'reports',  label:'Reports',  halo:'pchHaloReports',  color:'#A78BFA',
+      { slot:'reports',  label:'Reports',  color: cycle(3),
         x:340, y:195,  count: 0,                     phase: 2100 },
-      { slot:'family',   label:'Family',   halo:'pchHaloFamily',   color:'#F472B6',
+      { slot:'family',   label:'Family',   color: cycle(4),
         x:215, y:240,  count: 0,                     phase: 2800 },
-      { slot:'controls', label:'Controls', halo:'pchHaloControls', color:'#2DD4BF',
+      { slot:'controls', label:'Controls', color: cycle(5),
         x: 75, y:195,  count: 0,                     phase: 3500 }
     ];
   }
@@ -257,23 +407,31 @@
       const style = ' style="' + styleParts.join(';') + ';"';
 
       let nodeInner = '';
-      // Halo (colored radial)
-      nodeInner += '<circle class="pch-node__halo" cx="' + n.x + '" cy="' + n.y
-                +     '" r="' + haloR + '" fill="url(#' + n.halo + ')"/>';
-      // Ripple ring on hot node — same color, expanding + fading
+      // Step 5 (portal skill-compliance pass, 2026-06-09) -- halos
+      // removed per the skill's no-glow-on-interface rule. The hot
+      // node emphasizes via the ripple animation only; non-hot
+      // nodes paint just the star + label.
       if (hot) {
+        // Ripple ring -- amber accent reserved for the hot node
         nodeInner += '<circle class="pch-node__ripple" cx="' + n.x + '" cy="' + n.y
                   +     '" r="' + (haloR - 4) + '" fill="none"'
-                  +     ' stroke="' + n.color + '" stroke-width="1.2" stroke-opacity=".55"/>';
+                  +     ' stroke="#FBBF24" stroke-width="1.2" stroke-opacity=".55"/>';
       }
-      // Inner star (cream center, soft stroke ring)
-      const starStroke = hot ? n.color : 'rgba(255,255,255,0.35)';
+      // Star -- cream center, stroke colored by category for
+      // non-hot (cyan/violet cycle), amber for hot
+      const starStroke = hot ? '#FBBF24' : n.color;
       nodeInner += '<circle class="pch-node__star" cx="' + n.x + '" cy="' + n.y
                 +     '" r="' + starR + '" fill="#F1E9D5" stroke="' + starStroke
                 +     '" stroke-width="0.8"/>';
-      // Label
+      // Label -- sentence case per the skill (no .toUpperCase).
+      // Note: the .pch-node__label CSS still uses Bebas Neue +
+      // letter-spacing in index.html; with most Bebas distributions
+      // (uppercase-only glyph set) this renders the letters as caps
+      // anyway. A follow-up CSS swap to Inter would complete the
+      // visual change; semantically the labels are now sentence
+      // case (screen readers, copy/paste, ARIA).
       nodeInner += '<text class="pch-node__label" x="' + n.x + '" y="' + labelY
-                +     '">' + n.label.toUpperCase() + '</text>';
+                +     '">' + n.label + '</text>';
       // Invisible hit area (taps near the label still count)
       nodeInner += '<rect x="' + (n.x - 22) + '" y="' + (n.y - 22)
                 +     '" width="44" height="60" fill="transparent"/>';
@@ -311,6 +469,40 @@
       if (!node) return;
       const links = document.querySelectorAll('#pchLinks .pch-link--bright');
       for (let i = 0; i < links.length; i++) links[i].classList.remove('pch-link--bright');
+    });
+  }
+
+  // -- Keyboard bridge (Polish C, 2026-06-09) ----------------
+  // The constellation nodes are rendered as <g tabindex="0"
+  // role="button" onclick="phNav('slot')"> with an inline onclick.
+  // Inline onclick on a non-button SVG element does NOT fire on
+  // Enter or Space when the node is keyboard-focused, so keyboard
+  // and screen reader users could focus the nodes but could not
+  // activate them (WCAG 2.1 Level A failure on 2.1.1 Keyboard).
+  //
+  // This delegated keydown listener fills the gap: when focus is
+  // on a node and the user presses Enter or Space, it fires
+  // phNav(slot) using the same data-slot attribute the hover
+  // bridge reads. Space gets preventDefault() so the page does
+  // not scroll on activation.
+  //
+  // Idempotent via host._pchKeyboardBridgeBound so re-renders do
+  // not stack handlers, matching the _pchAttachHoverBridge pattern.
+  function _pchAttachKeyboardBridge(host){
+    if (!host || host._pchKeyboardBridgeBound) return;
+    host._pchKeyboardBridgeBound = true;
+    host.addEventListener('keydown', function(e){
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const node = e.target && e.target.closest && e.target.closest('.pch-node');
+      if (!node) return;
+      const slot = node.getAttribute('data-slot');
+      if (!slot) return;
+      // Space would scroll the page by default; suppress before
+      // routing. Enter has no default scroll behavior but we
+      // preventDefault for symmetry and to avoid any other
+      // browser-specific activation (e.g. form submission).
+      e.preventDefault();
+      if (typeof phNav === 'function') phNav(slot);
     });
   }
 
@@ -401,12 +593,31 @@
     const host = document.getElementById('parentCelestialHome');
     if (!host) return;
 
+    // Polish E (2026-06-09) -- Watch gate. Apply .pch-entered to
+    // the host BEFORE any paint when the user has already stepped
+    // through during this session, so the splash never flashes.
+    // CSS rules in index.html flip .pch-hero and #pchContent
+    // visibility off this class. renderParentWatchScene checks
+    // for it inside its mount and bails out, skipping the scene
+    // setup entirely.
+    if (_pchHasEnteredWatch()) {
+      host.classList.add('pch-entered');
+    }
+
     // The Watch — W1 hook. parent-watch-scene.js mounts the canvas
     // sky on first call and no-ops on subsequent calls (idempotent
     // via its own _state.canvas guard). Wrapped in typeof check so
     // a missing module fails soft — the Phase 4 widget still
     // renders fine without the cinematic backdrop.
     if (typeof renderParentWatchScene === 'function') renderParentWatchScene();
+
+    // Portal restructure (2026-06-09) -- hydrate the hero lockup
+    // kicker with the time-aware greeting + parent's first name,
+    // and wire the "Step inside" CTA to smooth-scroll the dashboard
+    // (.pch-shell at #pchContent) into view. Both calls are safe
+    // when the hero markup is absent (early returns inside).
+    _pchUpdateHeroKicker();
+    _pchWireHeroStepInside(host);
 
     // Date stamp
     const dateEl = document.getElementById('pchDateLine');
@@ -443,6 +654,7 @@
     // Hover bridge + shooting-star scheduler (idempotent —
     // both guard against double-binding via host flags).
     _pchAttachHoverBridge(host);
+    _pchAttachKeyboardBridge(host);
     _pchScheduleShootingStars(host);
 
     // Tile counts — mirror what renderPhCardGrid surfaces so
@@ -489,7 +701,12 @@
       if (faithOn) {
         const v = _pchPickVerse();
         if (fv) fv.textContent = v.text || '';
-        if (fr) fr.textContent = (v.reference || '').toUpperCase();
+        // Step 5 (portal skill-compliance pass) -- removed
+        // .toUpperCase() so the reference renders as "Proverbs 22:6"
+        // (matching The Well's verse-attribution style). The
+        // .pch-faith__ref CSS rule lost its text-transform:uppercase
+        // in Step 4, so this aligns the JS with the CSS intent.
+        if (fr) fr.textContent = (v.reference || '');
         fc.style.display = '';
       } else {
         fc.style.display = 'none';
@@ -499,5 +716,10 @@
 
   if (typeof window !== 'undefined') {
     window.renderParentCelestialHome = renderParentCelestialHome;
+    // Polish E follow-up (2026-06-09) -- expose the Watch gate
+    // clear + return-to-splash helpers so the inline onclick on
+    // the parent-hub Home controls in index.html can drive them.
+    window._pchClearEnteredWatch = _pchClearEnteredWatch;
+    window._pchReturnToSplash    = _pchReturnToSplash;
   }
 })();

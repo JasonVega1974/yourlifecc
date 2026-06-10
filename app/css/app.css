@@ -9710,6 +9710,199 @@ body:not(.teen-tabs) #primaryFab{
 }
 
 /* ════════════════════════════════════════════════════════════
+   2026-06-09 -- The Watch splash takeover.
+   Drives "splash mode" purely off the existing .pch-entered
+   gate (set/cleared by parent-celestial.js in the Step-inside
+   handler and _pchReturnToSplash) using :has(). When
+   #parentCelestialHome carries neither .pch-entered nor
+   .pch-classic-mode, the entire Parent Hub above AND below
+   the hero collapses so the day/night photograph fills from
+   just under #topQuickBtns to the viewport bottom. The .ph-view-row
+   "Viewing" strip stays as a thin flush band immediately above
+   the photo, and the ← Dashboard button gets pinned over the
+   photo top-left with a legibility-safe pill.
+
+   :has() keys off the single source of truth (.pch-entered)
+   so there is zero risk of class drift across the three
+   setters (mount-with-flag, Step-inside handler,
+   _pchReturnToSplash). :not(.pch-classic-mode) keeps the
+   escape hatch intact -- classic mode bypasses the gate and
+   must show the original chrome layout.
+
+   !important is used throughout this block because:
+     - .ph-view-row, .ph-back-row, and #phLayout carry inline
+       style="display:flex; ...; gap:.7rem; ...; margin-*:..."
+       declarations that beat any non-!important selector.
+     - #phApprovalStrip's visibility is JS-toggled via inline
+       el.style.display = 'block', same precedence issue.
+     - These overrides are scoped to splash mode only via the
+       :has() guard, so they cannot bleed into the entered or
+       classic surfaces.
+
+   Hidden in splash (above the photo):
+     - .sh                "PARENT HUB" section header
+     - .ph-home-crumb     "Hub Home" back-link
+     - #phHomeGreeting    "Good evening" greeting
+     - #phHomeSummary     "Here's what's happening..." line
+     - #phApprovalStrip   Needs-approval card
+   Hidden in splash (below the photo -- siblings of
+   #parentCelestialHome inside #ph-home that the .pch-entered
+   gate alone never touched, see index.html:16326-16350):
+     - #phKidCards        per-kid status cards (DOMINIC card)
+     - .faf-home-wrap     "Today on YourLife" feed strip
+     - .ph-hub-label      "HUB" eyebrow label (anonymous div
+                          given this hook in the same commit)
+     - #phCardGrid        8-tile launcher grid (Chores &
+                          Approvals, Rewards Store, Allowance,
+                          Contests, Activity, Reports, Family
+                          & Profiles, Controls)
+   Kept visible:
+     - .ph-view-row       thin strip flush above the photo
+     - .ph-back-row       overlaid pill on the photo top-left
+   ════════════════════════════════════════════════════════════ */
+#s-parent:has(#parentCelestialHome:not(.pch-entered):not(.pch-classic-mode)) :is(
+  .sh,
+  .ph-home-crumb,
+  #phHomeGreeting,
+  #phHomeSummary,
+  #phApprovalStrip,
+  #phKidCards,
+  .faf-home-wrap,
+  .ph-hub-label,
+  #phCardGrid
+){
+  display:none !important;
+}
+
+/* Tighten the seam: .ph-view-row sits flush above the hero
+   and the hero ends exactly at the viewport bottom. Zeros
+   margin-bottom on the strip, #phLayout's flex gap, and
+   #parentCelestialHome's own padding/margin so the
+   --pch-hero-offset measurement (from getBoundingClientRect's
+   border-box top of #parentCelestialHome) aligns the photo
+   border-to-border with the visible viewport. */
+#s-parent:has(#parentCelestialHome:not(.pch-entered):not(.pch-classic-mode)) .ph-view-row{
+  margin-bottom:0 !important;
+}
+#s-parent:has(#parentCelestialHome:not(.pch-entered):not(.pch-classic-mode)) #phLayout{
+  gap:0 !important;
+}
+#s-parent:has(#parentCelestialHome:not(.pch-entered):not(.pch-classic-mode)) #parentCelestialHome{
+  padding:0 !important;
+  margin:0 !important;
+}
+
+/* Kill the dead band between the global nav and the Viewing
+   strip. Runtime DOM confirms #s-parent.parentElement is
+   #mainWrap (NOT #app) -- #s-parent sits as a SIBLING of
+   #app, not a descendant. With all .sec children of #app
+   set to display:none on the parent-hub view, #app reduces
+   to an empty box whose entire height is its own
+   padding-bottom:6rem (= 102px @ 17px root) -- the clearance
+   reserved for the mobile bottom tab bar. That 102px appears
+   as dead space ABOVE #s-parent because #app paints first in
+   #mainWrap's flow.
+
+   Fix: collapse #app entirely while #s-parent is the active
+   section. Covers BOTH splash and entered (the predicate is
+   just #s-parent.sec.active, no .pch-entered guard) so the
+   hub sits flush at #mainWrap padding-top in either state.
+   The moment the user navigates to any other tab, #s-parent
+   loses .active, the :has() stops matching, #app returns
+   with its full padding -- no regression to other sections.
+
+   Audited Parent Hub deps before this rule: the hub is
+   entirely self-contained in #s-parent; the only thing in
+   #app the user might notice losing is #mobileQuickRow
+   (secondary mobile button row), and #mBar at top of mobile
+   still provides the hamburger menu for cross-section
+   navigation.
+
+   The earlier #app padding-top:0 rule is redundant once #app
+   is display:none -- removed. The #s-parent.sec padding-top:0
+   rule stays so the hub sits flush at the 44px nav clearance
+   (would still hold even if the #app rule were ever pulled). */
+body:has(#s-parent.sec.active) #app{
+  display:none !important;
+}
+#s-parent.sec:has(#parentCelestialHome:not(.pch-entered):not(.pch-classic-mode)){
+  padding-top:0 !important;
+}
+
+/* Overlay the ← Dashboard pill on the photo top-left.
+   position:fixed pins to the viewport so we do not need a
+   relative ancestor or a DOM move. top offset (retuned
+   2026-06-09 after collapsing the sibling #app -- #s-parent
+   now sits at #mainWrap padding-top = nav clearance):
+     Desktop:  #mainWrap padding-top 44px
+             + breathing room        ~6px
+             = top: 50px
+     Mobile:   #mainWrap padding-top calc(54px + max(env(safe-area-inset-top), 8px))
+             + breathing room        ~6px
+             = top: calc(54px + max(env(safe-area-inset-top), 8px) + 6px)
+   z-index:1000 sits well below #topQuickBtns (z-index:99990)
+   so the pill can never cover the global menu.
+   Transparent row background + zeroed border/padding so only
+   the inner button reads as a control, not the flex row. */
+#s-parent:has(#parentCelestialHome:not(.pch-entered):not(.pch-classic-mode)) .ph-back-row{
+  position:fixed !important;
+  top:50px !important;
+  left:1rem !important;
+  right:auto !important;
+  width:auto !important;
+  margin:0 !important;
+  padding:0 !important;
+  background:transparent !important;
+  border:none !important;
+  z-index:1000 !important;
+}
+@media (max-width:860px){
+  #s-parent:has(#parentCelestialHome:not(.pch-entered):not(.pch-classic-mode)) .ph-back-row{
+    top:calc(54px + max(env(safe-area-inset-top), 8px) + 6px) !important;
+  }
+}
+/* The back button itself: legible over BOTH the bright day
+   meadow and the dark night farmhouse. Semi-opaque dark pill
+   with a hairline rim and white text -- works on either
+   image without changing color per variant. The inline style
+   on this <button> sets background / color / border, so each
+   override carries !important. backdrop-filter feathers the
+   busy area behind the pill on supporting browsers. */
+#s-parent:has(#parentCelestialHome:not(.pch-entered):not(.pch-classic-mode)) .ph-back-row > button:first-child{
+  background:rgba(0,0,0,.45) !important;
+  border:1px solid rgba(255,255,255,.22) !important;
+  color:#ffffff !important;
+  border-radius:999px !important;
+  padding:.4rem .9rem !important;
+  -webkit-backdrop-filter:blur(8px) !important;
+  backdrop-filter:blur(8px) !important;
+}
+#s-parent:has(#parentCelestialHome:not(.pch-entered):not(.pch-classic-mode)) .ph-back-row > button:first-child:hover{
+  background:rgba(0,0,0,.58) !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   2026-06-09 -- Parent Hub unified celestial surface wash.
+   Reuses the same three-color palette as the constellation
+   SVG's nebula radialGradients (#pchNebViolet/Blue/Cyan at
+   index.html:16115-16126) so the constellation widget reads
+   as a denser pocket inside a single continuous surface
+   instead of a colored hole punched into flat #0d1117.
+   Stops kept under 12% alpha so chrome text/buttons that
+   were styled for a dark background still meet contrast.
+   Light theme deliberately skipped -- the wash only helps
+   under the dark night-sky context. Reversible: delete this
+   block to return to the flat-body baseline.
+   ════════════════════════════════════════════════════════════ */
+#s-parent.sec{
+  background:
+    radial-gradient(ellipse 90% 55% at 25% 12%, rgba(124,58,237,.10) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 50% at 80% 28%, rgba(29,78,216,.08)  0%, transparent 60%),
+    radial-gradient(ellipse 110% 50% at 50% 95%, rgba(6,182,212,.07) 0%, transparent 60%);
+}
+:root.light #s-parent.sec{ background:none; }
+
+/* ════════════════════════════════════════════════════════════
    2026-06-06 — Parent Hub launcher grid layout guards.
    Bottom clearance previously lived here; superseded 2026-06-07 by
    the global .sec padding-bottom rule above. The overflow:visible /

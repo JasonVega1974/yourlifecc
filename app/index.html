@@ -15652,13 +15652,13 @@
   <div id="parentDashContent" style="display:none;">
 
     <!-- BACK + LOCK ROW -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem;gap:.5rem;">
+    <div class="ph-back-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem;gap:.5rem;">
       <button onclick="phNav('home')" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--tx2);padding:.35rem .8rem;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:var(--fn);display:flex;align-items:center;gap:.35rem;">← Dashboard</button>
       <button id="phLockHubBtn" onclick="lockParentDash();showSection('s-parent');" style="display:none;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);color:#f87171;padding:.35rem .8rem;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:var(--fn);align-items:center;gap:.35rem;">🔒 Lock Hub</button>
     </div>
 
     <!-- CHILD SELECTOR (always visible at top) -->
-    <div style="background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.1);border-radius:10px;padding:.5rem .8rem;margin-bottom:.7rem;display:flex;align-items:center;gap:.5rem;">
+    <div class="ph-view-row" style="background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.1);border-radius:10px;padding:.5rem .8rem;margin-bottom:.7rem;display:flex;align-items:center;gap:.5rem;">
       <span style="font-size:.75rem;font-weight:700;">👤 Viewing:</span>
       <select id="parentChildSelect" onchange="switchParentView(this.value)" style="flex:1;font-size:.8rem;font-weight:700;"></select>
     </div>
@@ -15668,7 +15668,7 @@
 
       <!-- Phase 2.4 — Hub Home back-link above the 4-tab bar -->
       <div class="ph-home-crumb">
-        <a href="javascript:void(0)" onclick="phNav('home')" id="phn-home-link">🏡 ← Hub Home</a>
+        <a href="javascript:void(0)" onclick="(typeof _pchReturnToSplash==='function')?_pchReturnToSplash():phNav('home')" id="phn-home-link">🏡 ← Hub Home</a>
       </div>
 
       <!-- Phase 2 IA — Legacy 4-tab bar hidden by default. Kept in
@@ -15708,14 +15708,29 @@
                parent.js. Phase 4 layers animations on top. -->
           <div id="parentCelestialHome">
 
-            <!-- The Watch — W1 (2026-06-08). Cinematic sky canvas
-                 mounted as the first paint layer. Phase 4's existing
-                 .pch-shell wrapper below renders on top at z-index 1.
-                 Painted by app/js/parent-watch-scene.js — currently
-                 only the clock-locked sky cycle (W1 scope). Stars,
-                 comets, clouds, foreground porch / house / tree, and
-                 diegetic content layer in across W2-W6. -->
-            <canvas id="pchSceneCanvas" aria-hidden="true"></canvas>
+            <!-- The Watch -- Portal restructure (2026-06-09).
+                 The canvas now lives inside .pch-hero (a viewport-fitted
+                 scene container) alongside .pch-hero-lockup (centered
+                 overlay with kicker greeting, display title, italic
+                 line, and "Step inside" primary CTA). The .pch-shell
+                 content section sits BELOW the hero as a sibling and
+                 is revealed on scroll via the Step inside button.
+                 Painted by app/js/parent-watch-scene.js -- sky cycle +
+                 W2 stars/clouds/shooting stars + W3 hills/tree/farmhouse
+                 with lit windows. Atmospheric scene unchanged. -->
+            <div class="pch-hero">
+              <img id="pchHeroImg" class="pch-hero-img" alt="" aria-hidden="true">
+              <canvas id="pchSceneCanvas" aria-hidden="true"></canvas>
+              <div class="pch-hero-scrim" aria-hidden="true"></div>
+              <div class="pch-hero-lockup">
+                <div class="pch-hero-lockup__center">
+                  <span class="pch-hero-lockup__kicker" id="pchHeroKicker">Good evening</span>
+                  <h1 class="pch-hero-lockup__title">THE WATCH</h1>
+                  <p class="pch-hero-lockup__line">The house is quiet. All is well.</p>
+                  <button class="pch-hero-lockup__cta" type="button" id="pchHeroStep">Step inside</button>
+                </div>
+              </div>
+            </div>
 
             <style>
               /* Scoped styles. Mirror the .cc-* kid Command Center but
@@ -15752,27 +15767,119 @@
                  mount fades in rather than popping. Pointer-events disabled
                  so taps still reach the lanterns / tiles above. Z-index 0
                  keeps it behind the .pch-shell wrapper (z-index:1). */
-              #parentCelestialHome #pchSceneCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0;pointer-events:none;opacity:0;transition:opacity 800ms ease;border-radius:inherit;}
+              #parentCelestialHome #pchSceneCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:2;pointer-events:none;opacity:0;transition:opacity 800ms ease;border-radius:inherit;}
               #parentCelestialHome.pch-canvas-on #pchSceneCanvas{opacity:1;}
               @media (prefers-reduced-motion:reduce){
                 #parentCelestialHome #pchSceneCanvas{transition:none;}
               }
 
-              /* The Watch — W2 (2026-06-08). Canvas now paints its
-                 own star field (60-90 stars with per-star twinkle +
-                 night gate). Hide Phase 4's SVG <g class="pch-stars">
-                 so we don't render double — BUT only when the W2
-                 canvas is active. The :not(.pch-classic-mode) gate
-                 lets the escape hatch restore Phase 4 pixel-identical:
-                 parent-watch-scene.js adds .pch-classic-mode to the
-                 host whenever ?ylcc_classic_phc=1 or the localStorage
-                 flag is set, which deactivates this selector and the
-                 SVG star field reappears. Reversible at any time. */
-              #parentCelestialHome:not(.pch-classic-mode) svg.pch-constellation__svg .pch-stars{display:none;}
+              /* Image-based Watch hero -- Step 1 (2026-06-09).
+                 The hero is now built up in four absolute layers
+                 inside .pch-hero, stacked back-to-front:
+                   0  .pch-hero-img    -- day or night photograph
+                   1  .pch-hero-scrim  -- localized radial fade
+                                          darkening the IMAGE behind
+                                          the lockup for legibility,
+                                          scaled per day/night
+                   2  #pchSceneCanvas  -- transparent motion overlay
+                                          (stars + shooting stars
+                                          on the night path; Step 2
+                                          adds leaf particles on day).
+                                          Sits ABOVE the scrim so
+                                          particles render at full
+                                          brightness, not dimmed
+                   3  .pch-hero-lockup -- kicker + title + line + CTA
+                 .pch-hero is isolated so these z-indices stay
+                 contained and cannot fight with #pchContent
+                 (.pch-shell z-index:1) at the sibling level.
+                 Variant is driven by .pch-hero-day / .pch-hero-night
+                 toggled from parent-watch-scene.js per
+                 _pwsCurrentHour. */
+              #parentCelestialHome .pch-hero-img{
+                position:absolute;
+                inset:0;
+                width:100%;
+                height:100%;
+                object-fit:cover;
+                display:block;
+                z-index:0;
+                pointer-events:none;
+                border-radius:inherit;
+              }
+              #parentCelestialHome .pch-hero.pch-hero-day  .pch-hero-img{ object-position:50% 35%; }
+              #parentCelestialHome .pch-hero.pch-hero-night .pch-hero-img{ object-position:70% 30%; }
+
+              /* Splash refinement (2026-06-09) -- shift the lockup
+                 LEFT on the night variant only, so "Step inside"
+                 clears the bottom-right farmhouse in the night
+                 photo. Day stays centered (the focal subject sits
+                 on the opposite side). transform doesn't reflow
+                 and doesn't widen the lockup, so THE WATCH and
+                 the italic line still fit between the moon
+                 (upper-left) and the tree (lower-left). Tune the
+                 -6% by eyeballing -- bump toward -8% if the pill
+                 still grazes the house on wide desktops, back off
+                 toward -4% if the title crowds the moon. */
+              #parentCelestialHome .pch-hero.pch-hero-night .pch-hero-lockup__center{
+                transform:translateX(-6%);
+              }
+              @media (prefers-reduced-motion: reduce){
+                /* transform is a static offset, not motion -- keep
+                   it under reduced-motion. Only the CTA pulse and
+                   image fade are gated above. */
+              }
+
+              /* Scrim -- soft localized darkening of the IMAGE
+                 behind the lockup so THE WATCH + Step inside stay
+                 legible. Sits BELOW the canvas (z-index:1 vs
+                 canvas z-index:2) so motion particles paint at
+                 full brightness over the scrim, not dimmed by it.
+                 Radial fade keeps the picture readable at the
+                 edges instead of a flat full-screen dark wash.
+                 Day image is brighter, so the scrim runs deeper;
+                 night image is already dark, so the scrim stays
+                 subtle. */
+              #parentCelestialHome .pch-hero-scrim{
+                position:absolute;
+                inset:0;
+                z-index:1;
+                pointer-events:none;
+                border-radius:inherit;
+              }
+              #parentCelestialHome .pch-hero.pch-hero-day .pch-hero-scrim{
+                background:radial-gradient(ellipse 62% 55% at 50% 50%,
+                  rgba(0,0,0,.55) 0%,
+                  rgba(0,0,0,.30) 45%,
+                  rgba(0,0,0,0)   82%);
+              }
+              #parentCelestialHome .pch-hero.pch-hero-night .pch-hero-scrim{
+                background:radial-gradient(ellipse 62% 55% at 50% 50%,
+                  rgba(0,0,0,.32) 0%,
+                  rgba(0,0,0,.16) 50%,
+                  rgba(0,0,0,0)   85%);
+              }
+
+              /* The Watch -- W2 hide rule REMOVED in Polish B (2026-06-09).
+                 The rule used to hide the SVG constellation's
+                 <g class="pch-stars"> background star field whenever
+                 the canvas was active, to avoid double-painting stars
+                 when canvas and SVG shared the same viewport (pre-
+                 portal layout). Post-portal restructure (Step 1) the
+                 canvas paints in .pch-hero at the TOP of the surface
+                 and the constellation SVG lives in .pch-shell BELOW
+                 the fold; they no longer share visual space, so the
+                 hide rule was leaving the constellation SVG with no
+                 background stars of its own -- nodes floated on
+                 near-empty nebula gradient. Removing the rule
+                 restores the SVG's decorative star field in the
+                 dashboard section without any risk of double-render
+                 (separate sections, separate scroll positions). The
+                 escape hatch (.pch-classic-mode) is unaffected -- the
+                 SVG stars paint either way now. */
 
               /* Header */
               #parentCelestialHome .pch-header{display:flex;flex-direction:column;gap:.55rem;margin-bottom:1.5rem;}
-              #parentCelestialHome .pch-hello{font-size:1.7rem;font-weight:600;letter-spacing:-.01em;color:#F1E9D5;margin:0;line-height:1.18;}
+              #parentCelestialHome .pch-hello{font-size:1.7rem;font-weight:500;letter-spacing:-.01em;color:#F1E9D5;margin:0;line-height:1.18;}
               #parentCelestialHome .pch-daystamp{display:flex;flex-direction:column;gap:.3rem;margin-top:.15rem;}
               #parentCelestialHome .pch-daystamp__date{font-family:var(--fh,'Bebas Neue',var(--fm,sans-serif));font-size:1.55rem;letter-spacing:.13em;font-weight:400;color:#F1E9D5;line-height:1;}
               #parentCelestialHome .pch-daystamp__sub{display:flex;align-items:center;gap:.6rem;color:#9AA0B4;font-size:.9rem;}
@@ -15783,7 +15890,7 @@
               @media (min-width:720px){ #parentCelestialHome .pch-stats{grid-template-columns:repeat(4,1fr);} }
               #parentCelestialHome .pch-stat{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:.9rem 1rem;}
               #parentCelestialHome .pch-stat__num{font-family:var(--fh,'Bebas Neue',var(--fm,sans-serif));font-size:1.9rem;line-height:1;color:#F1E9D5;letter-spacing:.02em;}
-              #parentCelestialHome .pch-stat__label{font-size:.62rem;color:#9AA0B4;margin-top:.4rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700;}
+              #parentCelestialHome .pch-stat__label{font-size:.72rem;color:#9AA0B4;margin-top:.4rem;font-weight:500;}
 
               /* Constellation */
               #parentCelestialHome .pch-constellation{position:relative;margin-bottom:1.6rem;}
@@ -15819,12 +15926,12 @@
               #parentCelestialHome .pch-node--reveal{opacity:0;animation:pch-node-reveal 600ms ease-out forwards,pch-node-breathe 4.2s ease-in-out infinite 700ms;}
               #parentCelestialHome .pch-node--hot   {animation:pch-node-hot 2s ease-in-out infinite;}
               #parentCelestialHome .pch-node--hot.pch-node--reveal{animation:pch-node-reveal 600ms ease-out forwards,pch-node-hot 2s ease-in-out infinite 700ms;}
-              #parentCelestialHome .pch-node:hover,
-              #parentCelestialHome .pch-node:focus-visible{filter:brightness(1.18) saturate(1.15);outline:none;}
+              #parentCelestialHome .pch-node:hover{filter:brightness(1.18) saturate(1.15);outline:none;}
+              #parentCelestialHome .pch-node:focus-visible{filter:brightness(1.18) saturate(1.15);outline:2px solid #6AA7FF;outline-offset:3px;}
               #parentCelestialHome .pch-node__star  {transition:r 200ms ease;}
               #parentCelestialHome .pch-node__halo  {transition:opacity 250ms ease;}
               #parentCelestialHome .pch-node__ripple{opacity:0;transform-box:fill-box;transform-origin:center;animation:pch-ripple 2.2s ease-out infinite;}
-              #parentCelestialHome .pch-node__label {pointer-events:none;font-family:'Bebas Neue',sans-serif;letter-spacing:.08em;font-size:10px;fill:#F1E9D5;text-anchor:middle;}
+              #parentCelestialHome .pch-node__label {pointer-events:none;font-family:inherit;letter-spacing:.02em;font-size:10px;fill:#F1E9D5;text-anchor:middle;}
 
               /* Shooting stars — short streaks injected by JS, removed
                  after the animation completes. Trajectory length comes
@@ -15832,21 +15939,21 @@
               #parentCelestialHome .pch-shoot{fill:none;stroke:#F1E9D5;stroke-width:1.4;stroke-linecap:round;opacity:0;animation:pch-shoot 1.4s ease-out forwards;}
 
               /* Section label + tiles */
-              #parentCelestialHome .pch-section-label{font-family:var(--fh,'Bebas Neue',var(--fm,sans-serif));font-size:1.15rem;letter-spacing:.14em;color:#F1E9D5;margin:0 0 .85rem;text-transform:uppercase;}
+              #parentCelestialHome .pch-section-label{font-size:1.05rem;font-weight:500;color:#F1E9D5;margin:0 0 .85rem;}
               #parentCelestialHome .pch-tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:.65rem;}
               @media (min-width:720px){ #parentCelestialHome .pch-tiles{grid-template-columns:repeat(3,1fr);} }
               #parentCelestialHome .pch-tile{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:.55rem;padding:1.1rem 1rem;min-height:112px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:18px;color:#F1E9D5;text-align:left;cursor:pointer;font-family:inherit;transition:transform 150ms ease,background 200ms ease,border-color 200ms ease,box-shadow 250ms ease;}
               #parentCelestialHome .pch-tile:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.13);transform:translateY(-1px);}
-              #parentCelestialHome .pch-tile:active{transform:scale(.98);box-shadow:0 0 0 2px rgba(252,211,77,.22) inset;}
+              #parentCelestialHome .pch-tile:active{transform:scale(.98);}
               #parentCelestialHome .pch-tile:focus-visible{outline:2px solid #6AA7FF;outline-offset:2px;}
               #parentCelestialHome .pch-tile__icon{font-size:1.4rem;line-height:1;}
-              #parentCelestialHome .pch-tile__title{font-size:.92rem;font-weight:700;letter-spacing:-.01em;}
+              #parentCelestialHome .pch-tile__title{font-size:.92rem;font-weight:500;letter-spacing:-.01em;}
               #parentCelestialHome .pch-tile__meta{font-size:.66rem;color:#9AA0B4;margin-top:auto;letter-spacing:.02em;}
 
               /* Faith card */
               #parentCelestialHome .pch-faith{background:linear-gradient(135deg,rgba(251,191,36,.06),rgba(245,158,11,.03));border:1px solid rgba(251,191,36,.25);border-left:4px solid #fbbf24;border-radius:14px;padding:1rem 1.2rem;margin-top:1.6rem;}
               #parentCelestialHome .pch-faith__verse{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:.95rem;color:#F1E9D5;line-height:1.55;margin:0 0 .4rem;}
-              #parentCelestialHome .pch-faith__ref{font-size:.66rem;color:#fbbf24;letter-spacing:.12em;font-weight:800;text-transform:uppercase;}
+              #parentCelestialHome .pch-faith__ref{font-size:.78rem;color:#fbbf24;font-weight:500;}
 
               /* Keyframes — scoped by selector path above. Note: the
                  names are global to the document, but only the rules
@@ -15883,6 +15990,187 @@
                 100%{transform:translate(var(--dx,240px),var(--dy,140px));opacity:0;}
               }
 
+              /* Portal restructure (2026-06-09) -- hero container.
+                 Sizes to the visible viewport minus the scrollable
+                 chrome above #parentCelestialHome (Parent Hub .sh
+                 header + back row + child selector + crumb + greeting
+                 lines) so the "Step inside" CTA sits at the bottom of
+                 the first visible screen. The fallback constants
+                 (325px desktop / 300px mobile + safe-area) are
+                 approximations of the chrome stack; Step 2 will
+                 install a JS-measured --pch-hero-offset that
+                 overrides those fallbacks with the exact distance
+                 measured at mount.
+
+                 Min-height floors keep the scene readable on short
+                 viewports (small phones, landscape iPhone). */
+              /* Polish E (2026-06-09) -- The Watch is a hard gate
+                 per session. Splash (.pch-hero) fills the viewport
+                 by default; dashboard (#pchContent) stays hidden
+                 until the user clicks "Step inside". JS in
+                 parent-celestial.js persists a sessionStorage flag
+                 (scoped per Supabase user via _ylccUserKey) and
+                 adds .pch-entered to the host; CSS below handles
+                 the visibility flip. The Polish A peek subtraction
+                 (--pch-hero-peek) was removed -- the splash is now
+                 full height, not a scroll tease. Classic mode
+                 (?ylcc_classic_phc=1 or localStorage flag) bypasses
+                 the gate entirely: the .pch-classic-mode rules hide
+                 the hero AND show the dashboard, matching pre-
+                 portal behavior. */
+              #parentCelestialHome .pch-hero{
+                position:relative;
+                width:100%;
+                height:calc(100dvh - var(--pch-hero-offset, 325px));
+                min-height:420px;
+                overflow:hidden;
+                /* Step 1 (2026-06-09) -- create a local stacking
+                   context so .pch-hero-img/canvas/scrim/lockup
+                   z-indices stay contained inside the hero and
+                   cannot collide with #pchContent (.pch-shell
+                   z-index:1) at the sibling level. */
+                isolation:isolate;
+              }
+              @media (max-width:860px){
+                #parentCelestialHome .pch-hero{
+                  height:calc(100dvh - var(--pch-hero-offset, 300px) - env(safe-area-inset-top, 0px));
+                  min-height:360px;
+                }
+              }
+              @media (max-width:520px){
+                #parentCelestialHome .pch-hero{
+                  min-height:320px;
+                }
+              }
+
+              /* Default state: dashboard hidden. Specificity (0,2,0,0).
+                 The .pch-entered and .pch-classic-mode rules below
+                 carry an extra class and override this for the
+                 gate-crossed and classic paths without !important. */
+              #parentCelestialHome #pchContent{display:none;}
+
+              /* Entered state: splash hidden, dashboard shown with a
+                 brief fade-in. Specificity (0,2,1,0) beats the
+                 default. Animation is suppressed under
+                 prefers-reduced-motion below. */
+              #parentCelestialHome.pch-entered .pch-hero{display:none;}
+              #parentCelestialHome.pch-entered #pchContent{
+                display:block;
+                animation:pch-enter-fade 280ms ease;
+              }
+
+              /* Classic mode: no gate. Hero hidden, dashboard shown,
+                 same effective surface as pre-portal production. */
+              #parentCelestialHome.pch-classic-mode .pch-hero{display:none;}
+              #parentCelestialHome.pch-classic-mode #pchContent{display:block;}
+
+              @keyframes pch-enter-fade{
+                from{opacity:0;}
+                to{opacity:1;}
+              }
+              @media (prefers-reduced-motion: reduce){
+                #parentCelestialHome.pch-entered #pchContent{animation:none;}
+              }
+
+              /* Lockup overlay -- centered greeting + display title +
+                 italic line, with "Step inside" CTA at the bottom of
+                 the hero. Pointer-events disabled on the wrapper so
+                 the canvas underneath is non-interactive; only the
+                 button accepts taps (pointer-events:auto). */
+              #parentCelestialHome .pch-hero-lockup{
+                position:absolute;
+                inset:0;
+                z-index:3;
+                display:flex;
+                flex-direction:column;
+                align-items:center;
+                padding:2.5rem 1.25rem 2rem;
+                text-align:center;
+                pointer-events:none;
+              }
+              #parentCelestialHome .pch-hero-lockup__center{
+                display:flex;
+                flex-direction:column;
+                align-items:center;
+                gap:1rem;
+                flex:1;
+                justify-content:center;
+              }
+              #parentCelestialHome .pch-hero-lockup__kicker{
+                font-size:.78rem;
+                text-transform:uppercase;
+                font-weight:400;
+                color:#F1E9D5;
+                opacity:.68;
+              }
+              #parentCelestialHome .pch-hero-lockup__title{
+                font-family:var(--fh,'Bebas Neue',sans-serif);
+                font-size:clamp(3.5rem,11vw,7rem);
+                letter-spacing:.12em;
+                font-weight:400;
+                color:#F1E9D5;
+                margin:0;
+                line-height:1;
+              }
+              #parentCelestialHome .pch-hero-lockup__line{
+                font-family:Georgia,'Times New Roman',serif;
+                font-style:italic;
+                font-size:1.05rem;
+                font-weight:400;
+                color:#F1E9D5;
+                opacity:.9;
+                margin:0;
+                max-width:26ch;
+              }
+              #parentCelestialHome .pch-hero-lockup__cta{
+                pointer-events:auto;
+                padding:.85rem 2rem;
+                font-family:var(--fn,system-ui,sans-serif);
+                font-size:.95rem;
+                font-weight:500;
+                letter-spacing:.04em;
+                color:#1A0F00;
+                background:#FBBF24;
+                border:none;
+                border-radius:999px;
+                cursor:pointer;
+                /* Splash refinement (2026-06-09) -- gentle breathing
+                   pulse to draw the eye toward the threshold without
+                   reading as jumpy. The CTA only renders inside the
+                   splash hero (.pch-hero is display:none once
+                   .pch-entered is set), so the animation is
+                   naturally splash-scoped -- no :has() guard needed. */
+                animation:pch-cta-pulse 2.6s ease-in-out infinite;
+              }
+              #parentCelestialHome .pch-hero-lockup__cta:hover{filter:brightness(1.06);}
+              #parentCelestialHome .pch-hero-lockup__cta:focus-visible{
+                outline:2px solid #FFFFFF;
+                outline-offset:3px;
+              }
+              @keyframes pch-cta-pulse{
+                0%, 100%{
+                  transform:scale(1);
+                  box-shadow:0 0 0 0 rgba(251,191,36,.45), 0 6px 16px rgba(0,0,0,.25);
+                }
+                50%{
+                  transform:scale(1.04);
+                  box-shadow:0 0 0 10px rgba(251,191,36,0), 0 8px 22px rgba(0,0,0,.32);
+                }
+              }
+              @media (prefers-reduced-motion: reduce){
+                #parentCelestialHome .pch-hero-lockup__cta{ animation:none; }
+              }
+              /* Polish B (2026-06-09) -- smooth-scroll target. Adds
+                 ~20px of breathing room above #pchContent so the
+                 "Your family today" header doesn't land flush to the
+                 viewport top edge when "Step inside" smooth-scrolls. */
+              #pchContent{scroll-margin-top:20px;}
+              @media (max-width:520px){
+                #parentCelestialHome .pch-hero-lockup{padding:1.5rem 1.25rem 1.5rem;}
+                #parentCelestialHome .pch-hero-lockup__kicker{font-size:.72rem;}
+                #parentCelestialHome .pch-hero-lockup__line{font-size:.95rem;}
+              }
+
               /* Reduced motion — disable continuous animations. The
                  one-shot mount reveal stays (it's brief), tap feedback
                  stays (instant). */
@@ -15906,7 +16194,7 @@
               }
             </style>
 
-            <div class="pch-shell">
+            <div class="pch-shell" id="pchContent">
 
               <!-- Header: greeting + Bebas date stamp + soft subline -->
               <header class="pch-header" aria-label="Greeting">
@@ -15951,42 +16239,17 @@
                       <stop offset="100%" stop-color="#06B6D4" stop-opacity="0"/>
                     </radialGradient>
 
-                    <!-- Per-node halo gradients — each destination gets a
-                         color identity (chores=green, contests=gold,
-                         activity=cyan, reports=violet, family=rose,
-                         controls=teal). Halo is colored; star is cream. -->
-                    <radialGradient id="pchHaloChores" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%"   stop-color="#22C55E" stop-opacity=".85"/>
-                      <stop offset="60%"  stop-color="#22C55E" stop-opacity=".18"/>
-                      <stop offset="100%" stop-color="#22C55E" stop-opacity="0"/>
-                    </radialGradient>
-                    <radialGradient id="pchHaloContests" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%"   stop-color="#FBBF24" stop-opacity=".85"/>
-                      <stop offset="60%"  stop-color="#FBBF24" stop-opacity=".2"/>
-                      <stop offset="100%" stop-color="#FBBF24" stop-opacity="0"/>
-                    </radialGradient>
-                    <radialGradient id="pchHaloActivity" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%"   stop-color="#38BDF8" stop-opacity=".85"/>
-                      <stop offset="60%"  stop-color="#38BDF8" stop-opacity=".18"/>
-                      <stop offset="100%" stop-color="#38BDF8" stop-opacity="0"/>
-                    </radialGradient>
-                    <radialGradient id="pchHaloReports" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%"   stop-color="#A78BFA" stop-opacity=".85"/>
-                      <stop offset="60%"  stop-color="#A78BFA" stop-opacity=".18"/>
-                      <stop offset="100%" stop-color="#A78BFA" stop-opacity="0"/>
-                    </radialGradient>
-                    <radialGradient id="pchHaloFamily" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%"   stop-color="#F472B6" stop-opacity=".85"/>
-                      <stop offset="60%"  stop-color="#F472B6" stop-opacity=".18"/>
-                      <stop offset="100%" stop-color="#F472B6" stop-opacity="0"/>
-                    </radialGradient>
-                    <radialGradient id="pchHaloControls" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%"   stop-color="#2DD4BF" stop-opacity=".85"/>
-                      <stop offset="60%"  stop-color="#2DD4BF" stop-opacity=".18"/>
-                      <stop offset="100%" stop-color="#2DD4BF" stop-opacity="0"/>
-                    </radialGradient>
+                    <!-- Per-node halo gradients REMOVED in Polish B
+                         (2026-06-09). The six pchHalo* radialGradients
+                         became dead code after Step 5 reduced the
+                         constellation palette to three colors and
+                         removed the halo paint entirely. Hot node
+                         emphasis now comes from the ripple animation
+                         and amber star stroke alone; non-hot nodes
+                         paint a cream star with a thin cyan/violet
+                         category stroke. No <defs> for halos needed. -->
 
-                    <!-- Shooting-star trail — bright cream center fading
+                    <!-- Shooting-star trail -- bright cream center fading
                          to transparent at both ends. -->
                     <linearGradient id="pchShootGrad" x1="0%" y1="0%" x2="100%" y2="0%">
                       <stop offset="0%"   stop-color="#F1E9D5" stop-opacity="0"/>
@@ -16059,32 +16322,32 @@
                   <button class="pch-tile" type="button" id="pchTileChores" disabled>
                     <span class="pch-tile__icon" aria-hidden="true">📋</span>
                     <span class="pch-tile__title">Chores oversight</span>
-                    <span class="pch-tile__meta">Wired in Phase 3</span>
+                    <span class="pch-tile__meta"></span>
                   </button>
                   <button class="pch-tile" type="button" id="pchTileRewards" disabled>
                     <span class="pch-tile__icon" aria-hidden="true">🎁</span>
                     <span class="pch-tile__title">Rewards &amp; contests</span>
-                    <span class="pch-tile__meta">Wired in Phase 3</span>
+                    <span class="pch-tile__meta"></span>
                   </button>
                   <button class="pch-tile" type="button" id="pchTileActivity" disabled>
                     <span class="pch-tile__icon" aria-hidden="true">📊</span>
                     <span class="pch-tile__title">Activity feed</span>
-                    <span class="pch-tile__meta">Wired in Phase 3</span>
+                    <span class="pch-tile__meta"></span>
                   </button>
                   <button class="pch-tile" type="button" id="pchTileReports" disabled>
                     <span class="pch-tile__icon" aria-hidden="true">📈</span>
                     <span class="pch-tile__title">Reports &amp; progress</span>
-                    <span class="pch-tile__meta">Wired in Phase 3</span>
+                    <span class="pch-tile__meta"></span>
                   </button>
                   <button class="pch-tile" type="button" id="pchTileFamily" disabled>
                     <span class="pch-tile__icon" aria-hidden="true">👨‍👩‍👧</span>
                     <span class="pch-tile__title">Family &amp; profiles</span>
-                    <span class="pch-tile__meta">Wired in Phase 3</span>
+                    <span class="pch-tile__meta"></span>
                   </button>
                   <button class="pch-tile" type="button" id="pchTileSettings" disabled>
                     <span class="pch-tile__icon" aria-hidden="true">⚙️</span>
                     <span class="pch-tile__title">Settings &amp; controls</span>
-                    <span class="pch-tile__meta">Wired in Phase 3</span>
+                    <span class="pch-tile__meta"></span>
                   </button>
                 </div>
               </section>
@@ -16123,7 +16386,7 @@
                with live badges sourced from existing D.* arrays.
                Reuses .phHomeAction base styling; .ph-card extends for
                badges + slightly richer typography. -->
-          <div style="font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:#64748b;margin-bottom:8px;font-weight:800;">Hub</div>
+          <div class="ph-hub-label" style="font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:#64748b;margin-bottom:8px;font-weight:800;">Hub</div>
           <div id="phCardGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;"></div>
         </div>
 

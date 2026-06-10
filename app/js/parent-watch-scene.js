@@ -100,6 +100,20 @@
     return d.getHours() + d.getMinutes()/60 + d.getSeconds()/3600;
   }
 
+  // Portal restructure (2026-06-09) -- hero lockup kicker greeting.
+  // Returns the time-of-day phrase keyed to the local clock. Step 3
+  // (parent-celestial.js) concatenates the parent's first name to
+  // produce the final lockup kicker text ("Good evening, Jason").
+  // Four buckets match social greeting convention; the overnight
+  // bucket (22-5) reads as "Good night" which is the standard form
+  // when a parent checks in late.
+  function _pwsTimeKicker(hour){
+    if (hour >= 5  && hour < 12) return 'Good morning';
+    if (hour >= 12 && hour < 17) return 'Good afternoon';
+    if (hour >= 17 && hour < 22) return 'Good evening';
+    return 'Good night';
+  }
+
   // Find bracketing keyframes for an hour value in [0, 24).
   // Wraps midnight: between hour 21.5 and 24.0 we lerp from the
   // last keyframe (21.5) toward the first keyframe (0.0) treated
@@ -168,11 +182,58 @@
   function _pwsDayOpacity(hour){
     return 1 - _pwsNightOpacity(hour);
   }
+
+  // ── Step 1 (2026-06-09) -- image-based hero variant ──────
+  // Picks day vs night photograph based on the same nightOp
+  // gate the (now-retired) atmospheric layers used, so the
+  // image swap aligns with the sky transition the user
+  // experienced before. Threshold is 0.5: day window runs
+  // ~06:30 through ~20:15, night otherwise. This puts the
+  // crossover inside the dawn (5.5-7.5) and dusk (19.0-21.5)
+  // bands so the image flips midway through the kicker's
+  // "Good morning" / "Good evening" buckets rather than at
+  // their edges.
+  //
+  // Idempotent via _state.lastVariant -- repeated paints in
+  // the same bucket touch the DOM zero times. Reset on
+  // teardown so a fresh mount re-applies unconditionally.
+  function _pwsApplyHeroVariant(hour){
+    if (!_state.heroBox) return;
+    const isNight = _pwsNightOpacity(hour) >= 0.5;
+    const cls      = isNight ? 'pch-hero-night' : 'pch-hero-day';
+    if (_state.lastVariant === cls) return;
+    const otherCls = isNight ? 'pch-hero-day'   : 'pch-hero-night';
+    _state.heroBox.classList.add(cls);
+    _state.heroBox.classList.remove(otherCls);
+    const img = document.getElementById('pchHeroImg');
+    if (img) {
+      // Relative path resolves against /app/ (where index.html
+      // lives). watch-day.webp = golden meadow, watch-night.webp
+      // = moonlit farmhouse. Confirmed present 2026-06-09.
+      const src = isNight ? 'img/watch-night.webp' : 'img/watch-day.webp';
+      if (img.getAttribute('src') !== src) {
+        img.setAttribute('src', src);
+      }
+    }
+    _state.lastVariant = cls;
+    // Step 2 (2026-06-09) -- re-seed the day-leaf pool on every
+    // variant switch. day->night clears so memory is freed for
+    // the time the night image is up; night->day clears so the
+    // next day frame's lazy init repopulates with fresh positions
+    // matching whatever the canvas dims are now.
+    _state.leaves = null;
+    _state.leavesLastT = null;
+  }
   // ── State (module-scoped singleton) ───────────────────────
   const _state = {
     canvas: null,
     ctx: null,
     host: null,
+    // Portal restructure (2026-06-09) -- the .pch-hero wrapper
+    // inside #parentCelestialHome. Canvas dims track THIS, not the
+    // host (which now extends past the hero to include the .pch-shell
+    // dashboard content below). Set in renderParentWatchScene mount.
+    heroBox: null,
     dpr: 1,
     w: 0, h: 0,
     raf: null,
@@ -192,14 +253,51 @@
     // pattern; shapes scale uniformly mobile -> desktop.
     hills: null,
     tree: null,
-    house: null
+    house: null,
+    // Polish D (2026-06-09) -- high-altitude cirrus wisps. 3 frozen
+    // elliptical shapes precomputed once, painted as a second
+    // daytime cloud register above the existing drifting cumulus
+    // for two altitude bands instead of one.
+    wisps: null,
+    // Polish E (2026-06-09) -- Watch gate stop flag. Set true by
+    // window.stopParentWatchScene when the user clicks "Step inside"
+    // and the splash is replaced by the dashboard. _pwsShouldRun
+    // returns false while this is true so IO/visibility wakeups
+    // don't restart the RAF loop on a hidden canvas. Reset to false
+    // on every not-entered renderParentWatchScene mount so a teardown
+    // + fresh mount can resume.
+    stopped: false,
+    // Step 1 (2026-06-09) -- image-based hero. Tracks which variant
+    // class is currently on the .pch-hero box so _pwsApplyHeroVariant
+    // can skip DOM writes when the bucket has not changed since the
+    // last paint. Reset to null on teardown so a fresh mount re-applies
+    // the variant unconditionally.
+    lastVariant: null,
+    // Step 2 (2026-06-09) -- day-leaf particle pool. Lazily
+    // initialized by the day-bucket branch in _pwsPaint (first day
+    // frame of a mount) and re-seeded on variant switch + on the
+    // return-to-splash re-measure so leaf positions always match
+    // current canvas dims. leavesLastT holds the last paint time
+    // in ms for dt-based motion integration.
+    leaves: null,
+    leavesLastT: null
   };
 
   function _pwsSizeCanvas(){
-    if (!_state.canvas || !_state.host) return;
+    if (!_state.canvas) return;
+    // Portal restructure (2026-06-09) -- prefer the .pch-hero box
+    // for sizing so the canvas fills exactly the hero viewport. The
+    // host (#parentCelestialHome) is now MUCH taller than the hero
+    // because the .pch-shell dashboard content sits below as a
+    // sibling; sizing to host would paint the canvas through the
+    // dashboard area too. Falls back to host when heroBox is null
+    // (defensive: stale cached index.html without the .pch-hero
+    // wrapper, or pre-portal classic mode).
+    const box = _state.heroBox || _state.host;
+    if (!box) return;
     const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
-    const w = _state.host.clientWidth  || 0;
-    const h = _state.host.clientHeight || 0;
+    const w = box.clientWidth  || 0;
+    const h = box.clientHeight || 0;
     if (w === 0 || h === 0) return;
     _state.dpr = dpr;
     _state.w = w;
@@ -211,6 +309,29 @@
     _state.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
+  // Portal restructure (2026-06-09) -- measure the distance from
+  // the top of the document to the top of #parentCelestialHome and
+  // write it to --pch-hero-offset on the host. The scoped CSS uses
+  // this variable to size .pch-hero to exactly the visible viewport
+  // minus the scrollable chrome above it (Parent Hub .sh header +
+  // back/lock row + child selector + ph-home-crumb + greeting +
+  // summary lines). When the variable is unset, the CSS falls back
+  // to approximated constants (325px desktop / 300px mobile).
+  //
+  // We measure rect.top + scrollY so the value is correct regardless
+  // of the user's current scroll position -- it's the offset from
+  // document origin to the hero's top edge, which equals the chrome
+  // height above the hero. Called at mount and on every resize.
+  function _pwsMeasureHeroOffset(){
+    if (!_state.host) return;
+    try {
+      const rect = _state.host.getBoundingClientRect();
+      const scrollY = window.scrollY || window.pageYOffset || 0;
+      const topAtDocOrigin = Math.max(0, Math.round(rect.top + scrollY));
+      _state.host.style.setProperty('--pch-hero-offset', topAtDocOrigin + 'px');
+    } catch(_e){}
+  }
+
   // ── W2 — precompute static layer positions once at mount ──
   // Each entry stores position as a fraction of canvas dims so
   // the layout survives any resize without re-randomization
@@ -220,28 +341,42 @@
   // after _pwsSizeCanvas. Teardown nulls all three so a fresh
   // mount gets a freshly randomized field.
 
-  // 75 stars across the upper 70% of canvas. 5 randomly chosen
-  // are "named" (slightly larger r=2.5, warm gold tint, plus a
-  // subtle glow when bright).
+  // Night star field tuning (Step 2, 2026-06-09) -- constants
+  // promoted so density / placement region / twinkle band can
+  // be retuned without hunting through paint code. The default
+  // STAR_REGION_Y of 0.50 keeps stars in the UPPER half of the
+  // canvas only (sky), so they don't paint over the dark hills
+  // / house silhouette in the lower half of the night photo.
+  // Twinkle band kept on the slower side of "gentle" -- 3-8s.
+  const STAR_COUNT          = 75;
+  const STAR_NAMED_COUNT    = 5;
+  const STAR_REGION_Y       = 0.50;   // upper bound for star yf (0=top, 1=bottom)
+  const STAR_BASE_OP_MIN    = 0.35;
+  const STAR_BASE_OP_MAX    = 0.80;
+  const STAR_TWINKLE_MIN_MS = 3000;
+  const STAR_TWINKLE_MAX_MS = 8000;
+
   function _pwsPrecomputeStars(){
     if (_state.stars) return;
     const stars = [];
     const namedIdxs = {};
     let picked = 0;
-    while (picked < 5) {
-      const i = Math.floor(Math.random() * 75);
+    while (picked < STAR_NAMED_COUNT) {
+      const i = Math.floor(Math.random() * STAR_COUNT);
       if (!namedIdxs[i]) { namedIdxs[i] = true; picked++; }
     }
-    for (let i = 0; i < 75; i++) {
+    const tpSpan = STAR_TWINKLE_MAX_MS - STAR_TWINKLE_MIN_MS;
+    const opSpan = STAR_BASE_OP_MAX - STAR_BASE_OP_MIN;
+    for (let i = 0; i < STAR_COUNT; i++) {
       const named = !!namedIdxs[i];
       const tier = Math.random();
       const r = named ? 2.5 : (tier < 0.5 ? 1.0 : tier < 0.85 ? 1.5 : 2.0);
       stars.push({
         xf: Math.random(),
-        yf: Math.random() * 0.70,        // upper 70% only
+        yf: Math.random() * STAR_REGION_Y,
         r: r,
-        baseOp: 0.35 + Math.random() * 0.45,
-        tp: 1800 + Math.random() * 5400, // 1.8s - 7.2s
+        baseOp: STAR_BASE_OP_MIN + Math.random() * opSpan,
+        tp: STAR_TWINKLE_MIN_MS + Math.random() * tpSpan,
         to: Math.random() * Math.PI * 2,
         named: named
       });
@@ -408,7 +543,14 @@
   // each window; for W3 the panes paint blank dark.
   function _pwsPrecomputeHouse(){
     if (_state.house) return;
-    const xf     = 0.62;       // body horizontal center
+    // 2026-06-09 -- shifted xf from 0.62 toward the lower-right
+    // corner so the house clears the centered hero lockup column
+    // (kicker / title / italic line / "Step inside" CTA) on common
+    // desktop widths. At xf 0.80 with wf 0.20 the house body spans
+    // 70-90% of canvas width, leaving the middle third for the
+    // lockup. Window warmth + house rim follow this xf automatically
+    // because their positions cascade from _state.house at paint time.
+    const xf     = 0.80;       // body horizontal center (lower-right)
     const baseYf = 0.855;      // body base sits AT near hill top
     const wf     = 0.20;
     const bodyHf = 0.115;
@@ -456,6 +598,28 @@
       porchHf: bodyHf * 0.42,
       windows: windows
     };
+  }
+
+  // -- Polish D precompute (2026-06-09) -- cirrus wisps -------
+  // 3 high-altitude elliptical shapes for the day-sky depth pass.
+  // Frozen (no drift) per the brief, so positions are stored as
+  // canvas fractions just like every other precomputed layer.
+  // yf range 0.10-0.16 (well above the cumulus cloud band at
+  // yf 0.16-0.34). rxRel/ryRel ranges give 80-120px wide x 8-12px
+  // tall wisps at a 1200x800 canvas; they scale with viewport.
+  function _pwsPrecomputeWisps(){
+    if (_state.wisps) return;
+    const wisps = [];
+    for (let i = 0; i < 3; i++) {
+      wisps.push({
+        baseXf: 0.15 + Math.random() * 0.7,
+        yf:     0.10 + Math.random() * 0.06,
+        rxRel:  0.075 + Math.random() * 0.040,  // ~90-135px on 1200w
+        ryRel:  0.014 + Math.random() * 0.010,  // ~11-19px on 800h
+        rot:    (Math.random() - 0.5) * 0.20    // +/-0.1 rad tilt
+      });
+    }
+    _state.wisps = wisps;
   }
 
   // ── W2 layer painters ─────────────────────────────────────
@@ -834,70 +998,397 @@
     }
   }
 
+  // -- Polish D layer painters (2026-06-09) -- scene-richness pass.
+  // ALL additive: every function below paints AFTER an existing
+  // layer and only deposits atmospheric warmth/depth on top -- the
+  // existing painters are untouched. Each is independently gated
+  // by dayOp or nightOp so the new passes appear only when their
+  // time-of-day window applies.
+
+  // Horizon haze -- a warm radial wash centered roughly where the
+  // horizon meets the lower atmosphere (yf 0.72). Soft amber-cream
+  // core that fades to transparent at canvas edge. Gives the day
+  // sky atmospheric perspective without adding any new gradient
+  // to the sky pass itself. Called BETWEEN sky and clouds.
+  function _pwsPaintHorizonHaze(ctx, w, h, dayOp){
+    if (dayOp <= 0) return;
+    const cx = w * 0.5;
+    const cy = h * 0.72;
+    const r  = w * 0.9;
+    const op = 0.12 * dayOp;
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+    grad.addColorStop(0, 'rgba(220, 200, 160, ' + op.toFixed(3) + ')');
+    grad.addColorStop(1, 'rgba(220, 200, 160, 0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+  }
+
+  // Cirrus wisps -- 3 high-altitude elliptical shapes drawn as
+  // soft radial gradients (transparent edges) at yf 0.10-0.16,
+  // well above the existing cumulus band. Static (no drift) per
+  // the brief, so they form a distinct altitude register that
+  // doesn't compete with the cumulus motion. Called AFTER clouds.
+  function _pwsPaintCirrusWisps(ctx, w, h, dayOp){
+    if (dayOp <= 0 || !_state.wisps) return;
+    const op = 0.18 * dayOp;
+    const wisps = _state.wisps;
+    for (let i = 0; i < wisps.length; i++) {
+      const wi = wisps[i];
+      const cx = wi.baseXf * w;
+      const cy = wi.yf * h;
+      const rx = wi.rxRel * w;
+      const ry = wi.ryRel * h;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(wi.rot);
+      const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, rx);
+      grad.addColorStop(0, 'rgba(255, 255, 255, ' + op.toFixed(3) + ')');
+      grad.addColorStop(0.6, 'rgba(255, 255, 255, ' + (op * 0.5).toFixed(3) + ')');
+      grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  // Tree rim REMOVED 2026-06-09 -- the offset-canopy-fill technique
+  // rendered as a near-solid white blob over the round canopy on
+  // verification. Tree stays as a clean dark silhouette; house rim
+  // and window warmth handle the night dimensional cues alone.
+
+  // Window warmth bleed -- a warm radial gradient around each lit
+  // window so the windows read as light spilling out into the
+  // surrounding dark facade, not flat amber rectangles. Painted
+  // BEFORE _pwsPaintHouseWindows so the bleed sits underneath:
+  // the window paints the bright amber center, the bleed shows
+  // only in the area outside the window rectangle but inside the
+  // bleed gradient radius. Gated by nightOp so windows look flat
+  // in daylight when there's no contrast to bleed against.
+  function _pwsPaintWindowWarmth(ctx, w, h, nightOp){
+    if (nightOp <= 0 || !_state.house || !_state.house.windows) return;
+    const windows = _state.house.windows;
+    const baseAlpha = 0.12 * nightOp;
+    for (let i = 0; i < windows.length; i++) {
+      const win = windows[i];
+      const x  = win.xf * w;
+      const y  = win.yf * h;
+      const ww = win.wf * w;
+      const hh = win.hf * h;
+      const cx = x + ww / 2;
+      const cy = y + hh / 2;
+      const r  = Math.max(ww, hh) * 2.4;
+      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      grad.addColorStop(0,   'rgba(255, 200, 120, ' + baseAlpha.toFixed(3) + ')');
+      grad.addColorStop(0.5, 'rgba(255, 200, 120, ' + (baseAlpha * 0.4).toFixed(3) + ')');
+      grad.addColorStop(1,   'rgba(255, 200, 120, 0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+    }
+  }
+
+  // House rim light -- a second ctx.stroke() pass on the roof
+  // and body top + left edges at very low white alpha, so the
+  // house silhouette reads as a 3D form catching moonlight from
+  // upper-left, not a flat dark cutout. Gated nightOp > 0.3.
+  // Called AFTER _pwsPaintHouseWindows so the rim is the topmost
+  // house-related layer.
+  function _pwsPaintHouseRim(ctx, w, h, nightOp){
+    if (nightOp <= 0.3 || !_state.house) return;
+    const ho = _state.house;
+    // Alpha ramps from 0.07 at the gate edge to 0.12 at full night
+    const alpha = 0.07 + 0.05 * Math.min(1, (nightOp - 0.3) / 0.7);
+    ctx.strokeStyle = 'rgba(255, 255, 255, ' + alpha.toFixed(3) + ')';
+    ctx.lineWidth = 0.8;
+    ctx.lineCap = 'round';
+
+    const bodyX     = (ho.xf - ho.wf / 2) * w;
+    const bodyW     = ho.wf * w;
+    const bodyTopY  = (ho.baseYf - ho.bodyHf) * h;
+    const bodyBaseY = ho.baseYf * h;
+    const eaves     = 0.005 * w;
+    const roofPeakY = (ho.baseYf - ho.bodyHf - ho.roofHf) * h;
+    const roofPeakX = ho.xf * w;
+
+    // Roof left slope: peak -> left eaves corner
+    ctx.beginPath();
+    ctx.moveTo(roofPeakX, roofPeakY);
+    ctx.lineTo(bodyX - eaves, bodyTopY);
+    ctx.stroke();
+
+    // Body top edge
+    ctx.beginPath();
+    ctx.moveTo(bodyX, bodyTopY);
+    ctx.lineTo(bodyX + bodyW, bodyTopY);
+    ctx.stroke();
+
+    // Body left edge
+    ctx.beginPath();
+    ctx.moveTo(bodyX, bodyTopY);
+    ctx.lineTo(bodyX, bodyBaseY);
+    ctx.stroke();
+  }
+
+  // ── Day leaves (Step 2, 2026-06-09) ──────────────────────
+  // Drifting-leaf particles for the DAY variant of The Watch
+  // splash. Painterly golden-morning-meadow mood: warm sunlit
+  // leaves on a gentle breeze, NOT a blizzard. Lazily initialized
+  // on the first day-bucket frame and re-seeded on variant switch
+  // or return-to-splash re-measure so positions match current
+  // canvas dims.
+  //
+  // Constants kept at the top of this block so density / motion
+  // / alpha can be retuned without hunting through paint code.
+
+  const LEAF_COUNT              = 16;    // 2026-06-09 tune -- bumped from 14
+  const LEAF_SIZE_MIN           = 16;    // px -- 2026-06-09 tune from 6 (too tiny on the bright meadow)
+  const LEAF_SIZE_MAX           = 34;    // px -- 2026-06-09 tune from 14
+  const LEAF_DRIFT_MIN          = 8;     // px/s rightward breeze (base)
+  const LEAF_DRIFT_MAX          = 22;    // px/s
+  const LEAF_FALL_MIN           = -2;    // px/s vertical -- negative = drift up slightly
+  const LEAF_FALL_MAX           = 6;     // px/s -- mostly slow float/settle
+  const LEAF_ALPHA_MIN          = 0.50;  // 2026-06-09 tune from 0.28 (more solid against bright field)
+  const LEAF_ALPHA_MAX          = 0.82;  // 2026-06-09 tune from 0.55
+  const LEAF_SPIN_MAX           = 0.6;   // rad/s tumble (signed; per-leaf direction)
+  const LEAF_SWAY_AMP_MIN       = 4;     // px horizontal wobble
+  const LEAF_SWAY_AMP_MAX       = 14;    // px
+  const LEAF_SWAY_PERIOD_MIN_MS = 3000;
+  const LEAF_SWAY_PERIOD_MAX_MS = 7000;
+  const GUST_PERIOD             = 10;    // s -- shared sine modulating all leaves' vx
+  const LOCKUP_KEEPOUT          = true;  // bias spawn toward lower 60% + side edges
+
+  // 2026-06-09 tune -- deeper, more saturated autumn tones that
+  // CONTRAST against the bright golden meadow rather than blend
+  // into it. The previous pale-gold / amber / sage palette read
+  // as washed-out fog against the field; these read as fallen
+  // autumn leaves catching the morning light.
+  const LEAF_COLORS = [
+    [176, 104, 48],    // deep amber / rust
+    [108, 128, 58],    // olive green
+    [150,  92, 52]     // warm sienna
+  ];
+
+  // Random spawn inside the canvas. When LOCKUP_KEEPOUT is true,
+  // bias toward the lower 60% of the canvas OR the left/right
+  // side gutters of the upper region so the centered "THE WATCH"
+  // title stays uncluttered. Not a hard mask -- a few leaves
+  // still pass through the upper-center band as they drift, which
+  // reads as natural variation rather than a wall.
+  function _pwsRandLeafSpawnXY(w, h){
+    if (LOCKUP_KEEPOUT){
+      if (Math.random() < 0.60){
+        return { x: Math.random() * w, y: h * 0.40 + Math.random() * h * 0.60 };
+      }
+      const y = Math.random() * h * 0.40;
+      const x = Math.random() < 0.5
+        ? Math.random() * w * 0.20
+        : w * 0.80 + Math.random() * w * 0.20;
+      return { x: x, y: y };
+    }
+    return { x: Math.random() * w, y: Math.random() * h };
+  }
+
+  // Factory for a single leaf at a given canvas size. initial=true
+  // scatters across the keepout-biased canvas (first-mount + reseed);
+  // initial=false respawns at the left/top edge (recycled when off
+  // the right/bottom edge).
+  function _pwsCreateLeaf(w, h, initial){
+    let x, y;
+    if (initial){
+      const xy = _pwsRandLeafSpawnXY(w, h);
+      x = xy.x; y = xy.y;
+    } else {
+      // Most leaves drift rightward, so the common respawn is off
+      // the left edge. The 15% top-edge variant covers the rare
+      // upward-vy leaf that exits through the top.
+      if (Math.random() < 0.85){
+        x = -20 - Math.random() * 40;
+        const xy = _pwsRandLeafSpawnXY(w, h);
+        y = xy.y;
+      } else {
+        x = Math.random() * w;
+        y = -20 - Math.random() * 40;
+      }
+    }
+    const size = LEAF_SIZE_MIN + Math.random() * (LEAF_SIZE_MAX - LEAF_SIZE_MIN);
+    const vx0  = LEAF_DRIFT_MIN + Math.random() * (LEAF_DRIFT_MAX - LEAF_DRIFT_MIN);
+    const vy   = LEAF_FALL_MIN  + Math.random() * (LEAF_FALL_MAX  - LEAF_FALL_MIN);
+    const swayAmp    = LEAF_SWAY_AMP_MIN + Math.random() * (LEAF_SWAY_AMP_MAX - LEAF_SWAY_AMP_MIN);
+    const swayPeriod = LEAF_SWAY_PERIOD_MIN_MS + Math.random() * (LEAF_SWAY_PERIOD_MAX_MS - LEAF_SWAY_PERIOD_MIN_MS);
+    const swayPhase  = Math.random() * Math.PI * 2;
+    const angle = Math.random() * Math.PI * 2;
+    const spin  = (Math.random() - 0.5) * 2 * LEAF_SPIN_MAX;
+    const alpha = LEAF_ALPHA_MIN + Math.random() * (LEAF_ALPHA_MAX - LEAF_ALPHA_MIN);
+    const color = LEAF_COLORS[Math.floor(Math.random() * LEAF_COLORS.length)];
+    return {
+      x: x, y: y, size: size,
+      vx0: vx0, vy: vy,
+      swayAmp: swayAmp, swayPeriod: swayPeriod, swayPhase: swayPhase,
+      angle: angle, spin: spin,
+      alpha: alpha, color: color
+    };
+  }
+
+  // Lazily populate _state.leaves on the first day-bucket frame.
+  // Idempotent: skips if already populated. Re-seed paths null
+  // _state.leaves first, then this re-populates on the next paint.
+  function _pwsPrecomputeLeaves(){
+    if (_state.leaves) return;
+    const w = _state.w, h = _state.h;
+    if (w === 0 || h === 0) return;
+    const leaves = [];
+    for (let i = 0; i < LEAF_COUNT; i++){
+      leaves.push(_pwsCreateLeaf(w, h, true));
+    }
+    _state.leaves = leaves;
+    _state.leavesLastT = 0;
+  }
+
+  // Update + draw the leaf pool. dt comes from the previous paint
+  // timestamp (clamped to 100ms so a tab-refocus after a long pause
+  // doesn't teleport leaves halfway across the canvas). When frozen
+  // (reduced motion), positions don't advance and angles don't
+  // spin -- matches how _pwsPaintStars handles the same flag (still
+  // painted, just static).
+  function _pwsPaintLeaves(ctx, w, h, nowMs, dayOp, frozen){
+    const leaves = _state.leaves;
+    if (!leaves) return;
+
+    const last = _state.leavesLastT || nowMs;
+    const dtMs = Math.min(Math.max(0, nowMs - last), 100);
+    _state.leavesLastT = nowMs;
+    const dt = frozen ? 0 : dtMs / 1000;
+
+    // Shared cohesive gust -- single sine across all leaves so a
+    // gust reads as one breeze, not 14 independent twitches. Factor
+    // stays in [0.5, 1.5] so leaves always drift rightward.
+    const gust = 1 + 0.5 * Math.sin(nowMs / (GUST_PERIOD * 1000) * Math.PI * 2);
+
+    for (let i = 0; i < leaves.length; i++){
+      const L = leaves[i];
+
+      if (dt > 0){
+        L.x += L.vx0 * gust * dt;
+        L.y += L.vy * dt;
+        L.angle += L.spin * dt;
+      }
+
+      // Visual position adds a small sway on top of the linear x.
+      const sway = L.swayAmp * Math.sin(nowMs / L.swayPeriod * Math.PI * 2 + L.swayPhase);
+      const dx = L.x + sway;
+      const dy = L.y;
+
+      // Recycle off the right OR bottom edges -- respawn at left/
+      // top with a fresh randomization (size, color, velocities).
+      if (dx > w + 30 || dy > h + 30){
+        const fresh = _pwsCreateLeaf(w, h, false);
+        L.x = fresh.x; L.y = fresh.y;
+        L.size = fresh.size;
+        L.vx0 = fresh.vx0; L.vy = fresh.vy;
+        L.swayAmp = fresh.swayAmp;
+        L.swayPeriod = fresh.swayPeriod;
+        L.swayPhase = fresh.swayPhase;
+        L.angle = fresh.angle; L.spin = fresh.spin;
+        L.alpha = fresh.alpha; L.color = fresh.color;
+        continue;
+      }
+
+      const alpha = L.alpha * dayOp;
+      if (alpha < 0.02) continue;
+      const r = L.color[0], g = L.color[1], b = L.color[2];
+
+      // Almond/lens silhouette via two quadratic curves to a point
+      // at each end. width:length ~ 0.5 reads as a leaf rather than
+      // a disc or seed.
+      const halfL = L.size * 0.5;
+      const halfW = L.size * 0.25;
+
+      ctx.save();
+      ctx.translate(dx, dy);
+      ctx.rotate(L.angle);
+      ctx.beginPath();
+      ctx.moveTo(-halfL, 0);
+      ctx.quadraticCurveTo(0, -halfW, halfL, 0);
+      ctx.quadraticCurveTo(0,  halfW, -halfL, 0);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + alpha.toFixed(3) + ')';
+      ctx.fill();
+
+      // Faint center vein -- darker tint of the same leaf color.
+      const vr = (r * 0.6) | 0;
+      const vg = (g * 0.6) | 0;
+      const vb = (b * 0.6) | 0;
+      ctx.beginPath();
+      ctx.moveTo(-halfL * 0.85, 0);
+      ctx.lineTo(halfL * 0.85, 0);
+      ctx.strokeStyle = 'rgba(' + vr + ',' + vg + ',' + vb + ',' + (alpha * 0.65).toFixed(3) + ')';
+      ctx.lineWidth = 0.6;
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
   function _pwsPaint(){
     const ctx = _state.ctx;
     if (!ctx) return;
     const w = _state.w, h = _state.h;
     if (w === 0 || h === 0) return;
-    const hour   = _pwsCurrentHour();
-    const nowMs  = Date.now();
-    const colors = _pwsSkyColors(hour);
-    const breath = _pwsBreath(nowMs);
-    const top = _pwsApplyBreath(colors.zenith,  breath);
-    const bot = _pwsApplyBreath(colors.horizon, breath);
+    const hour  = _pwsCurrentHour();
+    const nowMs = Date.now();
 
-    // 1. Sky (W1 base layer)
-    const grad = ctx.createLinearGradient(0, 0, 0, h);
-    grad.addColorStop(0, top);
-    grad.addColorStop(1, bot);
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, w, h);
+    // Step 1 (2026-06-09) -- pick day/night image variant before any
+    // canvas paint so the image layer beneath the canvas is in the
+    // correct bucket. Idempotent via _state.lastVariant -- repeated
+    // paints in the same bucket are no-ops.
+    _pwsApplyHeroVariant(hour);
 
-    // 2. Aurora — REMOVED 2026-06-08 per user feedback (the wavy blue
-    //    ribbon read as a distracting overlay, not atmospheric depth).
-    //    The _pwsPaintAurora function and _pwsDeepNightOpacity gate are
-    //    deleted below; if we want it back, restore the call here.
+    // Step 1 (2026-06-09) -- canvas is a TRANSPARENT motion overlay
+    // above the day/night photograph. The opaque procedural sky /
+    // cloud / hill / tree / house / window / rim painters are
+    // retired (the image carries those layers); their precompute
+    // calls are gated off in renderParentWatchScene. clearRect with
+    // no prior fill leaves an alpha:0 canvas.
+    ctx.clearRect(0, 0, w, h);
 
-    // 3. Clouds — daytime gate; drift freezes under reduced-motion
-    const dayOp = _pwsDayOpacity(hour);
-    if (dayOp > 0 && _state.clouds) {
-      _pwsPaintClouds(ctx, w, h, nowMs, hour, dayOp, _state.reducedMotion);
-    }
-
-    // 4. Stars — night gate; twinkle freezes under reduced-motion
     const nightOp = _pwsNightOpacity(hour);
-    if (nightOp > 0 && _state.stars) {
-      _pwsPaintStars(ctx, w, h, nowMs, nightOp, _state.reducedMotion);
-    }
 
-    // 5. Shooting stars — night only, skip under reduced-motion
-    if (!_state.reducedMotion && nightOp > 0.5 && _state.shootingStars) {
-      _pwsPaintShootingStars(ctx, w, h, nowMs);
-    }
-
-    // 6. Hills — always painted; day/night color via dayOp lerp
-    if (_state.hills) {
-      _pwsPaintHills(ctx, w, h, nowMs, hour, dayOp);
-    }
-
-    // 7. Tree — always painted; canopy sway frozen under reduced-motion
-    if (_state.tree) {
-      _pwsPaintTree(ctx, w, h, nowMs, hour, dayOp, _state.reducedMotion);
-    }
-
-    // 8. House silhouette — always painted
-    if (_state.house) {
-      _pwsPaintHouse(ctx, w, h, nowMs, hour, dayOp);
-    }
-
-    // 9. House windows — always painted; pulse frozen under reduced-motion
-    if (_state.house && _state.house.windows) {
-      _pwsPaintHouseWindows(ctx, w, h, nowMs, hour, dayOp, _state.reducedMotion);
+    // Step 2 (2026-06-09) -- branch on the same 0.5 threshold the
+    // image variant swap uses, so the motion overlay always matches
+    // the photo showing through. Single clean crossover -- no
+    // simultaneous stars + leaves (would read as noise).
+    if (nightOp >= 0.5) {
+      // NIGHT -- twinkling stars (gentle, biased to upper sky) +
+      // occasional shooting stars. Stars are precomputed at mount;
+      // leaves are not consumed on this branch.
+      if (_state.stars) {
+        _pwsPaintStars(ctx, w, h, nowMs, nightOp, _state.reducedMotion);
+      }
+      if (!_state.reducedMotion && _state.shootingStars) {
+        _pwsPaintShootingStars(ctx, w, h, nowMs);
+      }
+    } else {
+      // DAY -- drifting leaves on a gentle breeze. Lazy init the
+      // pool here so it picks up the current canvas dims (the
+      // mount path doesn't precompute leaves; variant switch and
+      // return-to-splash both null _state.leaves so the next day
+      // paint lazily repopulates against fresh dims).
+      if (!_state.leaves) {
+        _pwsPrecomputeLeaves();
+      }
+      if (_state.leaves) {
+        const dayOp = 1 - nightOp;
+        _pwsPaintLeaves(ctx, w, h, nowMs, dayOp, _state.reducedMotion);
+      }
     }
   }
 
   function _pwsShouldRun(){
-    return _state.hostVisible && _state.tabVisible && !_state.reducedMotion;
+    // Polish E (2026-06-09) -- !_state.stopped check ensures the
+    // loop stays dead after the user crosses the Watch gate, even
+    // if IO/visibility wakeups try to schedule a frame on the
+    // hidden canvas.
+    return _state.hostVisible && _state.tabVisible && !_state.reducedMotion && !_state.stopped;
   }
 
   function _pwsTick(){
@@ -941,6 +1432,12 @@
   function _pwsOnResize(){
     if (_state.resizeTimer) clearTimeout(_state.resizeTimer);
     _state.resizeTimer = setTimeout(function(){
+      // Portal restructure: measure offset BEFORE size so the CSS
+      // calc has the fresh --pch-hero-offset before the canvas reads
+      // .pch-hero clientHeight. Order matters: chrome above the hero
+      // can shift on viewport resize (font reflow, mobile address bar
+      // collapse, orientation change).
+      _pwsMeasureHeroOffset();
       _pwsSizeCanvas();
       _pwsPaint();
     }, 120);
@@ -960,6 +1457,10 @@
     _state.canvas = null;
     _state.ctx = null;
     _state.host = null;
+    // Portal restructure -- drop the heroBox reference so a fresh
+    // mount re-queries the .pch-hero element (in case the DOM was
+    // replaced, e.g. SPA navigation that swaps the parent home tree).
+    _state.heroBox = null;
     // W2 — drop layer state so the next mount precomputes fresh
     // (different canvas instance == different randomized field).
     _state.stars = null;
@@ -970,6 +1471,19 @@
     _state.hills = null;
     _state.tree = null;
     _state.house = null;
+    // Polish D -- drop the wisps precompute so the next mount
+    // re-randomizes the cirrus positions.
+    _state.wisps = null;
+    // Step 1 (2026-06-09) -- clear the variant stamp so a fresh
+    // mount re-applies the image + class regardless of which
+    // bucket the prior mount left the .pch-hero in.
+    _state.lastVariant = null;
+    // Step 2 (2026-06-09) -- drop the day-leaf pool so a fresh
+    // mount respawns leaves with current canvas dims and fresh
+    // randomization. Stars/shooting-stars are nulled above in the
+    // W2 block; same lifecycle here.
+    _state.leaves = null;
+    _state.leavesLastT = null;
   }
 
   // ── Mount (idempotent — safe to call from every render) ───
@@ -990,6 +1504,21 @@
     // off mid-tab; class would otherwise persist until reload).
     host.classList.remove('pch-classic-mode');
 
+    // Polish E (2026-06-09) -- Watch gate. If the user has already
+    // stepped through this session, parent-celestial.js applies
+    // .pch-entered to the host BEFORE this function runs. Bail
+    // before any allocation -- canvas is hidden via CSS and there
+    // is nothing to paint. The gate is one-way per session: once
+    // entered, refresh restarts the session and shows the splash
+    // again.
+    if (host.classList.contains('pch-entered')) {
+      return;
+    }
+    // Not entered -- reset the stop flag in case a prior mount on
+    // this module instance set it (defensive against teardown +
+    // fresh mount edge cases).
+    _state.stopped = false;
+
     const canvas = document.getElementById('pchSceneCanvas');
     if (!canvas) return;
 
@@ -997,8 +1526,25 @@
     // make sure the loop is awake and dims are current. Fast path
     // for the common case where renderParentCelestialHome fires
     // on every save event.
+    //
+    // Splash takeover follow-up (2026-06-09) -- also re-measure
+    // --pch-hero-offset here. _pchReturnToSplash hits this path
+    // (canvas is still cached from the original splash mount),
+    // and a prior resize that fired during entered mode could
+    // have written an inflated offset (chrome was visible then).
+    // The CSS :has() rule has already hidden the chrome by the
+    // time we measure, so this call captures the correct splash
+    // offset before _pwsSizeCanvas reads .pch-hero clientHeight.
     if (_state.canvas === canvas) {
+      _pwsMeasureHeroOffset();
       _pwsSizeCanvas();
+      // Step 2 (2026-06-09) -- re-seed the day-leaf pool. Canvas
+      // dims may have changed while on the entered dashboard;
+      // clearing here means the next day-paint's lazy init builds
+      // a fresh pool sized to the new .pch-hero. Stars are stored
+      // as fractions so they don't need reseeding.
+      _state.leaves = null;
+      _state.leavesLastT = null;
       _pwsWake();
       return;
     }
@@ -1011,23 +1557,35 @@
     _state.canvas = canvas;
     _state.ctx    = ctx;
     _state.host   = host;
+    // Portal restructure -- find the .pch-hero wrapper that contains
+    // the canvas. _pwsSizeCanvas reads its clientWidth/Height so the
+    // canvas fills exactly the hero viewport, not the full host (which
+    // extends past the hero into the .pch-shell dashboard below).
+    _state.heroBox = host.querySelector('.pch-hero');
     _state.reducedMotion = _pwsReducedMotion();
     _state.tabVisible    = (document.visibilityState === 'visible');
     _state.hostVisible   = (host.offsetParent !== null);
 
+    // Measure --pch-hero-offset BEFORE _pwsSizeCanvas so the CSS calc
+    // resolves to the correct .pch-hero height before we read its
+    // clientHeight for the canvas backing store.
+    _pwsMeasureHeroOffset();
     _pwsSizeCanvas();
-    // W2 — precompute static layer positions (stars, clouds,
-    // shooting-star slots) once per mount. Subsequent renders +
-    // resizes reuse them; coordinates are stored as fractions
-    // so resize doesn't relocate any element.
+    // Stars + shooting-star slots stay precomputed -- they paint
+    // as twinkle + streaks over the night image (Step 1 keeps
+    // these on the night path).
     _pwsPrecomputeStars();
-    _pwsPrecomputeClouds();
     _pwsPrecomputeShootingStars();
-    // W3 — foreground silhouette layer (hills, tree, house).
-    // Same fraction-based positioning so resize is free.
-    _pwsPrecomputeHills();
-    _pwsPrecomputeTree();
-    _pwsPrecomputeHouse();
+    // Step 1 (2026-06-09) -- clouds, hills, tree, house, and wisps
+    // precomputes are gated off. Their painters are retired (the
+    // image layer carries the sky/landscape/farmhouse), so the
+    // allocated arrays would never be consumed. Functions remain
+    // defined below in case Step 2+ revives any pass.
+    //   _pwsPrecomputeClouds();
+    //   _pwsPrecomputeHills();
+    //   _pwsPrecomputeTree();
+    //   _pwsPrecomputeHouse();
+    //   _pwsPrecomputeWisps();
     host.classList.add('pch-canvas-on');
 
     // ResizeObserver on the host so the canvas re-fits whenever
@@ -1062,5 +1620,24 @@
 
   if (typeof window !== 'undefined') {
     window.renderParentWatchScene = renderParentWatchScene;
+    // Portal restructure (2026-06-09) -- expose the time-of-day
+    // helpers so Step 3 (parent-celestial.js) can render the lockup
+    // kicker without duplicating the SKY_KEYFRAMES vocabulary.
+    window._pwsCurrentHour = _pwsCurrentHour;
+    window._pwsTimeKicker  = _pwsTimeKicker;
+    // Polish E (2026-06-09) -- Watch gate halt. Called by
+    // parent-celestial.js when the user clicks "Step inside" so
+    // the RAF loop stops painting to the hidden canvas. The
+    // _state.stopped flag prevents _pwsShouldRun from rescheduling
+    // on visibility / intersection wakeups for the rest of the
+    // session. No teardown -- state stays intact in case the user
+    // refreshes (page reload re-initializes the module).
+    window.stopParentWatchScene = function(){
+      _state.stopped = true;
+      if (_state.raf) {
+        cancelAnimationFrame(_state.raf);
+        _state.raf = null;
+      }
+    };
   }
 })();
