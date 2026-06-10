@@ -1,7 +1,7 @@
 // YourLifeCC Service Worker
 // Version bump this string whenever you deploy a major update
 // to force old caches to clear.
-const CACHE_NAME = 'yourlifecc-v332';
+const CACHE_NAME = 'yourlifecc-v333';
 
 // Core assets to pre-cache on install — the app shell + key Well modules
 // + the shared modal/save/share + prayer focus + Quick Prayer library
@@ -43,7 +43,16 @@ const PRECACHE_ASSETS = [
 // single failure (404, redirect, network blip) doesn't void the whole
 // precache — addAll is all-or-nothing, which previously left the cache
 // empty whenever one URL went bad.
+//
+// Self-activation (2026-06-10): skipWaiting() fires SYNCHRONOUSLY at the
+// top of the handler, NOT chained after precache. iOS standalone PWAs
+// fire updatefound unreliably and can't be counted on to send the page-
+// side SKIP_WAITING message; an eager skipWaiting also means we don't
+// stall in "waiting" state if precache hangs on a missing asset or a
+// network blip. The fetch handler is network-first for app code, so the
+// brief window before precache completes is safe.
 self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache =>
       Promise.allSettled(PRECACHE_ASSETS.map(u => cache.add(u))).then(results => {
@@ -53,7 +62,7 @@ self.addEventListener('install', event => {
           }
         });
       })
-    ).then(() => self.skipWaiting())
+    )
   );
 });
 
@@ -70,19 +79,26 @@ self.addEventListener('message', event => {
 });
 
 // ─── Activate ──────────────────────────────────────────────────────────────
-// Delete any old caches from previous SW versions
+// Self-activation (2026-06-10): clients.claim() fires FIRST so the new SW
+// takes control of any open page/PWA immediately. The page-side
+// controllerchange listener (in app/index.html) then auto-reloads onto
+// the fresh assets without waiting for the user to close + reopen.
+// Old-cache cleanup runs after, in the same waitUntil chain so the SW
+// stays alive until both finish.
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys
-          .filter(key => key !== CACHE_NAME)
-          .map(key => {
-            console.log('[SW] Deleting old cache:', key);
-            return caches.delete(key);
-          })
+    self.clients.claim().then(() =>
+      caches.keys().then(keys =>
+        Promise.all(
+          keys
+            .filter(key => key !== CACHE_NAME)
+            .map(key => {
+              console.log('[SW] Deleting old cache:', key);
+              return caches.delete(key);
+            })
+        )
       )
-    ).then(() => self.clients.claim())
+    )
   );
 });
 
