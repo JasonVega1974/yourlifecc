@@ -352,6 +352,33 @@
     ['money','health'], ['skills','health']
   ];
 
+  // ── Per-orb breathe periods (2026-06-12) ────────────────────
+  // Varied 4500-6500ms across the 6 orbs so each star pulses on
+  // its own clock. Habits (center, index 0) gets the slowest so
+  // the anchor feels steady; ring orbs spread across the rest of
+  // the band. Used by ckBuildStar via inline --starBreathePeriod.
+  var _CC_PERIODS = [6500, 4500, 5200, 5800, 4800, 6100];
+
+  // ── Radial microfield (2026-06-12) ──────────────────────────
+  // 12 hardcoded faint stars positioned for the 400x300 viewBox,
+  // hand-picked to clear every orb's bloom (max bloom is the
+  // habits center at 15 around 200,150; ring orbs at radii 11
+  // around their bloom regions). Four twinkle on slow periods.
+  var _CC_MICROFIELD = [
+    { x: 22,  y: 22,  r:0.7, fill:'#FFF7E0', op:.50 },
+    { x:140, y: 28,  r:0.8, fill:'#FBBF24', op:.55, twinkle:5600 },
+    { x:240, y: 22,  r:0.6, fill:'#FFF7E0', op:.40 },
+    { x:378, y: 25,  r:0.9, fill:'#FFF7E0', op:.55, twinkle:4400 },
+    { x: 28, y:130,  r:0.7, fill:'#FBBF24', op:.50 },
+    { x:200, y:104,  r:0.6, fill:'#FFF7E0', op:.45, twinkle:6100 },
+    { x:370, y:130,  r:0.7, fill:'#FFF7E0', op:.45 },
+    { x:200, y:200,  r:0.8, fill:'#FBBF24', op:.55 },
+    { x: 20, y:275,  r:0.6, fill:'#FFF7E0', op:.40, twinkle:3900 },
+    { x:240, y:285,  r:0.7, fill:'#FFF7E0', op:.50 },
+    { x:380, y:280,  r:0.6, fill:'#FFF7E0', op:.40 },
+    { x:110, y:288,  r:0.7, fill:'#FFF7E0', op:.45 }
+  ];
+
   // ── render ───────────────────────────────────────────────────
   function renderCommandCenter(){
     if (typeof document === 'undefined') return;
@@ -406,46 +433,72 @@
            + ' x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'"/>';
     }).join('');
 
-    // Nodes — layered luminous orbs (outer halo + ring + core).
-    // Brightness class drives glow intensity; focus class adds the
-    // expanding pulse rings and the strongest core glow.
+    // Nodes — kit-built stars (bloom + halo + core + spikes on
+    // habits center) with per-domain accents driving the bloom
+    // and halo hue, so each orb keeps its domain identity while
+    // speaking the shared brass-lantern language. Focus pulse
+    // rings remain on the recommended orb only -- the exclusive
+    // "look here" signal. Drift wrapper unchanged.
+    var ckStar = (typeof window !== 'undefined') ? window.ckBuildStar : null;
     var svgNodes = _CC_TILES.map(function(tile, i){
       var n = _CC_NODES[tile.key];
       if (!n) return '';
-      var isFocus = (tile.key === focusKey);
-      var hasData = !!brightness[tile.key];
-      var classes = 'cc-orb cc-orb--' + (i+1);
+      var isFocus  = (tile.key === focusKey);
+      var hasData  = !!brightness[tile.key];
+      var isHabits = (tile.key === 'habits');
+      var mag      = isHabits ? 'bright' : 'mid';
+
+      // Wrapper carries both .cc-orb (child-specific brightness +
+      // focus + label styling) AND .star-node (shared breathe +
+      // hover + flare). Drift wrapper stays as the outer parent.
+      var classes = 'cc-orb star-node cc-orb--' + (i+1);
       if (isFocus) classes += ' cc-orb--focus';
       classes += hasData ? ' cc-orb--bright' : ' cc-orb--dim';
 
-      // Pulse rings — only on the focus orb. Two staggered rings give
-      // the "energy radiating" feel without spamming the GPU.
+      // Pulse rings — only on the focus orb. Two staggered rings
+      // give the "energy radiating" feel without spamming the GPU.
       var pulses = isFocus ? (
           '<circle class="cc-pulse cc-pulse--1" cx="'+n.cx+'" cy="'+n.cy+'" r="'+(n.r+2)+'"/>'
         + '<circle class="cc-pulse cc-pulse--2" cx="'+n.cx+'" cy="'+n.cy+'" r="'+(n.r+2)+'"/>'
       ) : '';
 
-      var haloR = (n.r * 2.6).toFixed(1);
-      var halo = '<circle class="cc-orb__halo" cx="'+n.cx+'" cy="'+n.cy+'" r="'+haloR+'" fill="'+tile.accent+'"/>';
-      var ring = '<circle class="cc-orb__ring" cx="'+n.cx+'" cy="'+n.cy+'" r="'+n.r+'" fill="'+tile.accent+'" stroke="'+tile.accent+'" stroke-width="'+(n.isCenter?1.2:1)+'"/>';
-      var core = '<circle class="cc-orb__core" cx="'+n.cx+'" cy="'+n.cy+'" r="'+n.coreR+'" fill="'+tile.accent+'"/>';
+      // Star fragment via the kit. Per-domain accent overrides the
+      // brass default; the kit handles the bloom + halo + core +
+      // spike (habits only, bright tier) chain.
+      var starSvg = ckStar
+        ? ckStar({ x: n.cx, y: n.cy, mag: mag }, { accent: tile.accent })
+        : '';
 
       var subLine = (n.isCenter && tile.key === 'habits' && meta.habits)
         ? '<text class="cc-node__label cc-node__label--sub" x="'+n.cx+'" y="'+n.subY+'" text-anchor="middle">'+_ccEsc(meta.habits)+'</text>'
         : '';
 
+      // Per-orb inline style: color carries the domain accent
+      // (legacy hover/glow hooks read currentColor); transform-
+      // origin centers the breathe scale on the orb's position;
+      // --starBreathePeriod drives the shared breathe + halo
+      // pulse animations.
+      var period   = _CC_PERIODS[i % _CC_PERIODS.length];
+      var orbStyle = 'color:'+tile.accent+';transform-origin:'+n.cx+'px '+n.cy+'px;--starBreathePeriod:'+period+'ms;';
+
       return ''
         + '<g class="cc-drift cc-drift--'+(i+1)+'">'
-        +   '<g class="'+classes+'" data-key="'+tile.key+'" style="color:'+tile.accent+';">'
+        +   '<g class="'+classes+'" data-key="'+tile.key+'" style="'+orbStyle+'">'
         +     pulses
-        +     halo
-        +     ring
-        +     core
+        +     starSvg
         +     '<text class="cc-node__label" x="'+n.cx+'" y="'+n.labelY+'" text-anchor="middle">'+_ccEsc(tile.label)+'</text>'
         +     subLine
         +   '</g>'
         + '</g>';
     }).join('');
+
+    // Microfield prefix -- 12 faint background stars rendered
+    // beneath the orbs via the shared kit (2026-06-12). Hardcoded
+    // positions tuned for the radial layout (centered habits +
+    // 5-ring) at 400x300 viewBox.
+    var svgMicro = (typeof window !== 'undefined' && window.ckBuildMicrofield)
+      ? window.ckBuildMicrofield(_CC_MICROFIELD)
+      : '';
 
     // Tile grid order is stage-aware (D.mode → _CC_STAGE_ORDER).
     // The SVG constellation above uses _CC_TILES canonical order so
@@ -535,6 +588,7 @@
       +     '<div class="cc-constellation__caption">Today\'s focus &middot; <span style="color:'+focusTile.accent+';">'+_ccEsc(focus.caption)+'</span></div>'
       +     '<svg class="cc-constellation__svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Animated graph of six life domains">'
       +       '<g class="cc-stars" aria-hidden="true">'+starsHtml+'</g>'
+      +       '<g class="cc-microfield" aria-hidden="true">'+svgMicro+'</g>'
       +       '<g class="cc-links">'+svgLinks+'</g>'
       +       '<g class="cc-nodes">'+svgNodes+'</g>'
       +     '</svg>'

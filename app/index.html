@@ -15988,6 +15988,55 @@
               #parentCelestialHome .pch-constellation__svg{width:100%;height:280px;display:block;overflow:visible;}
               @media (min-width:720px){ #parentCelestialHome .pch-constellation__svg{height:380px;} }
 
+              /* ── Light-mode pass for the child Command Center
+                 (2026-06-12). Mirrors the parent's #s-parent light
+                 idiom: paper cards, dark heading ink, deepened amber
+                 accents. The .cc-constellation panel keeps its own
+                 radial-gradient atmosphere (already richly themed),
+                 but tile cards + greeting text + stat chips need
+                 paper treatment so light-mode users see contrast.
+                 Star primitives in the SVG (.star-bloom/.star-halo/
+                 .star-core) are designed for dark surfaces and the
+                 .cc-constellation panel still paints them on a dark
+                 backdrop in either theme, so they need no overrides. */
+              :root.light #appCommandCenter .cc-greeting__hello{color:#0f172a;}
+              :root.light #appCommandCenter .cc-daystamp__date{color:#1a1233;}
+              :root.light #appCommandCenter .cc-daystamp__sub,
+              :root.light #appCommandCenter .cc-daystamp__quote{color:#4a4b52;}
+              :root.light #appCommandCenter .cc-time{color:#4a4b52;}
+              :root.light #appCommandCenter .cc-section-label{color:#0f172a;}
+              :root.light #appCommandCenter .cc-chip{
+                background:#ffffff;
+                border-color:rgba(15,23,42,.08);
+                box-shadow:0 1px 4px rgba(15,23,42,.05);
+              }
+              :root.light #appCommandCenter .cc-chip__num{color:#0f172a;}
+              :root.light #appCommandCenter .cc-chip__label{color:#4a4b52;}
+              :root.light #appCommandCenter .cc-streak{
+                background:#ffffff;
+                border-color:rgba(146,64,14,.18);
+                box-shadow:0 1px 4px rgba(15,23,42,.05);
+              }
+              :root.light #appCommandCenter .cc-streak__num{color:#92400e;}
+              :root.light #appCommandCenter .cc-streak__label{color:#4a4b52;}
+              :root.light #appCommandCenter .cc-tile{
+                background:#ffffff;
+                border-color:rgba(15,23,42,.08);
+                color:#1a1233;
+                box-shadow:0 1px 4px rgba(15,23,42,.05);
+              }
+              :root.light #appCommandCenter .cc-tile:hover{
+                background:#f8fafc;
+                border-color:rgba(15,23,42,.14);
+              }
+              :root.light #appCommandCenter .cc-tile__title{color:#0f172a;}
+              :root.light #appCommandCenter .cc-tile__meta{color:#4a4b52;}
+              :root.light #appCommandCenter .cc-tile--faith{
+                background:#f8fafc;
+                border-color:rgba(15,23,42,.10);
+                color:#4a4b52;
+              }
+
               /* Nebula layer — purely decorative. */
               #parentCelestialHome .pch-nebula{pointer-events:none;}
 
@@ -16026,15 +16075,15 @@
                  !important so they win over the keyframes. Press flare
                  (.pch-node--flare) runs a 200ms scale(1.35) flash that
                  also wins via !important, then JS removes the class. */
-              #parentCelestialHome .pch-node{
-                cursor:pointer;
-                transition:transform .25s ease;
-                animation:pch-node-breathe var(--pchBreathePeriod, 4.5s) ease-in-out infinite;
-              }
+              /* 2026-06-12 -- shared kit migration. The wrapper-level
+                 breathe + hover + flare live on .star-node (unscoped,
+                 below). .pch-node keeps only the parent-specific state
+                 hooks (reveal, hot, hover scope of #parentCelestialHome
+                 for the focus-visible blue outline). */
               #parentCelestialHome .pch-node--reveal{
                 opacity:0;
                 animation:pch-node-reveal 600ms ease-out forwards,
-                          pch-node-breathe var(--pchBreathePeriod, 4.5s) ease-in-out infinite 700ms;
+                          star-node-breathe var(--starBreathePeriod, 4.5s) ease-in-out infinite 700ms;
               }
               #parentCelestialHome .pch-node--hot{
                 animation:pch-node-hot 2s ease-in-out infinite;
@@ -16043,64 +16092,10 @@
                 animation:pch-node-reveal 600ms ease-out forwards,
                           pch-node-hot 2s ease-in-out infinite 700ms;
               }
-              /* Hover + focus -- pause the breathe so transform:scale wins
-                 cleanly. transition handles the smooth scale-up; on
-                 unhover the breathe resumes from its current keyframe. */
-              #parentCelestialHome .pch-node:hover,
-              #parentCelestialHome .pch-node:focus-visible{
-                animation-play-state:paused;
-                transform:scale(1.25) !important;
-                filter:brightness(1.18) saturate(1.15);
-              }
+              /* Parent-only focus ring color (blue). Shared hover/focus
+                 transform + breathe pause live on .star-node below. */
               #parentCelestialHome .pch-node:hover{outline:none;}
               #parentCelestialHome .pch-node:focus-visible{outline:2px solid #6AA7FF;outline-offset:3px;}
-              /* Press flare -- JS adds the class for ~200ms before
-                 phNav fires. !important defeats the breathe transform. */
-              #parentCelestialHome .pch-node--flare{
-                animation:pch-node-flare 220ms ease-out !important;
-              }
-              /* Star sub-elements -- each circle is paint-only with
-                 its own opacity transition; the whole group's
-                 transform animation scales them together. */
-              #parentCelestialHome .pch-node__bloom{
-                transition:fill-opacity 250ms ease;
-                pointer-events:none;
-              }
-              #parentCelestialHome .pch-node__halo{
-                transition:fill-opacity 250ms ease;
-                animation:pch-halo-pulse var(--pchBreathePeriod, 4.5s) ease-in-out infinite;
-                pointer-events:none;
-              }
-              #parentCelestialHome .pch-node:hover .pch-node__halo,
-              #parentCelestialHome .pch-node:focus-visible .pch-node__halo{
-                animation-play-state:paused;
-              }
-              #parentCelestialHome .pch-node:hover .pch-node__bloom,
-              #parentCelestialHome .pch-node:focus-visible .pch-node__bloom{
-                fill-opacity:.20;
-              }
-              #parentCelestialHome .pch-node__core{
-                transition:r 200ms ease;
-                pointer-events:none;
-              }
-              #parentCelestialHome .pch-node__spike{
-                stroke:#FFF7E0;
-                stroke-opacity:.55;
-                stroke-width:.7;
-                stroke-linecap:round;
-                pointer-events:none;
-              }
-              #parentCelestialHome .pch-node__badge-bg{
-                pointer-events:none;
-              }
-              #parentCelestialHome .pch-node__badge-text{
-                pointer-events:none;
-                font-family:var(--fn,system-ui,sans-serif);
-                font-size:11px;
-                font-weight:500;
-                fill:#412402;
-                text-anchor:middle;
-              }
               #parentCelestialHome .pch-node__hit{
                 /* Invisible tap target. Pointer events stay default
                    so taps register here too. */
@@ -16127,14 +16122,69 @@
                 stroke-width:2.5;
                 stroke-linejoin:round;
               }
-              /* Microfield -- 22 tiny background stars rendered into
-                 #pchLinks before the chain. Six twinkle on individual
-                 slow periods via inline --pchTwinklePeriod. */
-              #parentCelestialHome .pch-microfield{
+              /* ── Shared kit primitives (2026-06-12) ─────────────
+                 Unscoped on purpose: applies to both the parent
+                 (#parentCelestialHome) and child (#appCommandCenter)
+                 constellation surfaces. .star-node carries the
+                 breathe + hover/focus + flare; .star-bloom/.star-halo/
+                 .star-core/.star-spike/.star-badge-* are the star
+                 sub-elements; .star-microfield* are the background
+                 dots. Surface-specific state classes (.pch-node--hot,
+                 .cc-orb--focus, etc.) stay parent/child scoped above. */
+              .star-node{
+                cursor:pointer;
+                transition:transform .25s ease;
+                animation:star-node-breathe var(--starBreathePeriod, 4.5s) ease-in-out infinite;
+              }
+              .star-node:hover,
+              .star-node:focus-visible{
+                animation-play-state:paused;
+                transform:scale(1.25) !important;
+                filter:brightness(1.18) saturate(1.15);
+              }
+              .star-node--flare{
+                animation:star-node-flare 220ms ease-out !important;
+              }
+              .star-bloom{
+                transition:fill-opacity 250ms ease;
                 pointer-events:none;
               }
-              #parentCelestialHome .pch-microfield--twinkle{
-                animation:pch-micro-twinkle var(--pchTwinklePeriod, 5s) ease-in-out infinite;
+              .star-halo{
+                transition:fill-opacity 250ms ease;
+                animation:star-halo-pulse var(--starBreathePeriod, 4.5s) ease-in-out infinite;
+                pointer-events:none;
+              }
+              .star-node:hover .star-halo,
+              .star-node:focus-visible .star-halo{
+                animation-play-state:paused;
+              }
+              .star-node:hover .star-bloom,
+              .star-node:focus-visible .star-bloom{
+                fill-opacity:.20;
+              }
+              .star-core{
+                transition:r 200ms ease;
+                pointer-events:none;
+              }
+              .star-spike{
+                stroke:#FFF7E0;
+                stroke-opacity:.55;
+                stroke-width:.7;
+                stroke-linecap:round;
+                pointer-events:none;
+              }
+              .star-badge-bg{ pointer-events:none; }
+              .star-badge-text{
+                pointer-events:none;
+                font-family:var(--fn,system-ui,sans-serif);
+                font-size:11px;
+                font-weight:500;
+                fill:#412402;
+                text-anchor:middle;
+              }
+              .star-microfield{ pointer-events:none; }
+              .star-microfield--twinkle{
+                animation:star-micro-twinkle var(--starTwinklePeriod, 5s) ease-in-out infinite;
               }
 
               /* Shooting stars — short streaks injected by JS, removed
@@ -16166,7 +16216,9 @@
                 0%,100%{opacity:var(--pchOp,.5);}
                 50%    {opacity:1;}
               }
-              @keyframes pch-node-breathe{
+              /* 2026-06-12: pch-node-breathe renamed to star-node-breathe
+                 below so both surfaces share the keyframe; same curve. */
+              @keyframes star-node-breathe{
                 0%,100%{transform:scale(1);   filter:brightness(1);}
                 50%    {transform:scale(1.18);filter:brightness(1.30);}
               }
@@ -16193,17 +16245,19 @@
                 15% {opacity:1;}
                 100%{transform:translate(var(--dx,240px),var(--dy,140px));opacity:0;}
               }
-              /* World-class rebuild (2026-06-11) -- new keyframes */
-              @keyframes pch-halo-pulse{
+              /* 2026-06-12: renamed pch-* to star-* so both
+                 #parentCelestialHome and #appCommandCenter share
+                 the keyframes via the .star-* classes. */
+              @keyframes star-halo-pulse{
                 0%,100%{fill-opacity:.45;}
                 50%    {fill-opacity:.20;}
               }
-              @keyframes pch-node-flare{
+              @keyframes star-node-flare{
                 0%  {transform:scale(1);  }
                 40% {transform:scale(1.35);}
                 100%{transform:scale(1);  }
               }
-              @keyframes pch-micro-twinkle{
+              @keyframes star-micro-twinkle{
                 0%,100%{opacity:.45;}
                 50%    {opacity:.85;}
               }
@@ -16398,12 +16452,14 @@
                 #parentCelestialHome .pch-stars circle,
                 #parentCelestialHome .pch-node,
                 #parentCelestialHome .pch-node--hot,
-                #parentCelestialHome .pch-node--flare,
                 #parentCelestialHome .pch-node__ripple,
-                #parentCelestialHome .pch-node__halo,
-                #parentCelestialHome .pch-microfield--twinkle,
                 #parentCelestialHome .pch-link--flow,
-                #parentCelestialHome .pch-shoot{animation:none !important;}
+                #parentCelestialHome .pch-shoot,
+                /* 2026-06-12 shared kit classes -- both surfaces */
+                .star-node,
+                .star-node--flare,
+                .star-halo,
+                .star-microfield--twinkle{animation:none !important;}
                 #parentCelestialHome .pch-node__ripple{opacity:0;}
                 #parentCelestialHome .pch-link--draw{animation:none;stroke-dashoffset:0;}
               }
@@ -20238,6 +20294,11 @@
      parent.js (no hard dependency on it, but the hook lives there)
      and AFTER data/memory-verses.js (read for verse rotation).
      memory-verses.js loads earlier in the data block. -->
+<!-- 2026-06-12 -- Shared constellation primitives. Must load BEFORE
+     parent-celestial.js and command-center.js so both surfaces see
+     window.ckBuildStar / ckCurvePath / ckBuildMicrofield / ckPressNode
+     / ckMagRadii. Pure helper module, no DOM coupling. -->
+<script src="/app/js/constellation-kit.js"></script>
 <script src="/app/js/parent-celestial.js"></script>
 <!-- The Watch — W1 (2026-06-08). Cinematic sky canvas painter
      for #parentCelestialHome. Exposes window.renderParentWatchScene

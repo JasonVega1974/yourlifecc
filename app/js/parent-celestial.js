@@ -306,22 +306,17 @@
     ];
   }
 
-  // ── Magnitude radii table (2026-06-11) ────────────────────
-  // Per-tier radii for the three stacked circles each star is
-  // built from: bloom (outermost amber wash), halo (mid-radius
-  // amber), core (warm-white inner). Bright tier additionally
-  // gets diffraction spikes drawn on top.
-  const MAG_RADII = {
-    bright: { core: 4,   halo: 7,   bloom: 15 },
-    mid:    { core: 3.2, halo: 5.5, bloom: 11 },
-    dim:    { core: 2.6, halo: 4.5, bloom:  9 }
-  };
+  // ── Magnitude radii table -- moved to constellation-kit.js
+  //    (2026-06-12). Parent reads window.ckMagRadii for the
+  //    one local need (hot ripple radius); star fragments
+  //    come from window.ckBuildStar so the kit owns the tier
+  //    values end-to-end.
 
   // ── Per-node breathe periods (2026-06-11) ─────────────────
   // Varied 4.5s-6.5s across the 8 nodes (derived from index so
   // the spread is stable on every render). Inline CSS variable
-  // --pchBreathePeriod on each node's <g> drives the .pch-node
-  // animation-duration, and the .pch-node__halo opacity pulse
+  // --starBreathePeriod on each node's <g> drives the .pch-node
+  // animation-duration, and the .star-halo opacity pulse
   // inherits the same var so each star's halo breathes with its
   // own core. Combined with the existing per-node phase delay,
   // the eight stars stagger visibly out of unison.
@@ -363,47 +358,15 @@
     { x:462, y:288,  r:0.6, fill:'#FFF7E0', op:.40 }
   ];
 
-  // ── Press flare bridge (2026-06-11) ───────────────────────
-  // Onclick on a node adds .pch-node--flare for ~200ms, then
-  // fires phNav. CSS @keyframes pch-node-flare drives a brief
-  // scale(1.35) flash that overrides the breathe animation via
-  // !important. The 120ms onclick -> phNav delay is short
-  // enough that the visual lands as "tap responds" rather than
-  // "tap stalls". Exposed on window so inline onclick can call
-  // it without a closure.
-  function _pchNodePress(el, slot){
-    if (!el) return;
-    try { el.classList.add('pch-node--flare'); } catch(_e){}
-    setTimeout(function(){
-      if (typeof phNav === 'function') phNav(slot);
-      setTimeout(function(){
-        try { el.classList.remove('pch-node--flare'); } catch(_e){}
-      }, 220);
-    }, 120);
-  }
-  if (typeof window !== 'undefined') window._pchNodePress = _pchNodePress;
+  // ── Press flare bridge -- moved to constellation-kit.js
+  //    (2026-06-12). Parent's onclick now calls
+  //    window.ckPressNode(this, function(){phNav('slot')}); the
+  //    kit adds .star-node--flare for ~200ms before firing the
+  //    route callback. Shared CSS owns the flare keyframe so
+  //    the parent and child surfaces flash identically.
 
-  // ── Curve helper ──────────────────────────────────────────
-  // Build the SVG path for a single quadratic-bezier link.
-  // The control point sits on the perpendicular bisector of
-  // the chord, offset by `bow` units. Sign of `bow` alternates
-  // per link so adjacent curves bend opposite directions — the
-  // resulting silhouette reads as a flowing constellation, not
-  // a fanned-out wheel.
-  function _pchCurvePath(a, b, bow){
-    const mx = (a.x + b.x) / 2;
-    const my = (a.y + b.y) / 2;
-    const dx = b.x - a.x;
-    const dy = b.y - a.y;
-    const len = Math.sqrt(dx*dx + dy*dy) || 1;
-    // Perpendicular unit vector (rotate (dx,dy) 90° CCW).
-    const px = -dy / len;
-    const py =  dx / len;
-    const cx = mx + px * bow;
-    const cy = my + py * bow;
-    return 'M ' + a.x + ' ' + a.y + ' Q ' + cx.toFixed(1) + ' ' + cy.toFixed(1)
-         + ' ' + b.x + ' ' + b.y;
-  }
+  // ── Curve helper -- moved to constellation-kit.js
+  //    (2026-06-12). Parent uses window.ckCurvePath(a, b, bow).
 
   // ── Constellation SVG content ─────────────────────────────
   // Rebuilds #pchLinks + #pchNodes from scratch. Called only on
@@ -429,19 +392,13 @@
     // 22 tiny background stars rendered BEFORE the chain links
     // so they paint under everything. The static six paint as
     // solid faint dots; the twinkle six get .pch-microfield--
-    // twinkle with their period as inline --pchTwinklePeriod
+    // twinkle with their period as inline --starTwinklePeriod
     // CSS var. Prepended into linksG so they share the natural
-    // SVG z-order with the chain (under .pch-nodes).
-    let microMarkup = '';
-    for (let m = 0; m < MICROFIELD.length; m++) {
-      const mi = MICROFIELD[m];
-      const tcls = mi.twinkle ? ' pch-microfield--twinkle' : '';
-      const tsty = mi.twinkle ? (' style="--pchTwinklePeriod:' + mi.twinkle + 'ms;"') : '';
-      microMarkup += '<circle class="pch-microfield' + tcls + '"'
-                  +    ' cx="' + mi.x + '" cy="' + mi.y + '" r="' + mi.r + '"'
-                  +    ' fill="' + mi.fill + '" fill-opacity="' + mi.op + '"'
-                  +    tsty + '/>';
-    }
+    // SVG z-order with the chain (under .pch-nodes). Rendered
+    // via shared kit (window.ckBuildMicrofield, 2026-06-12).
+    const microMarkup = (typeof window !== 'undefined' && window.ckBuildMicrofield)
+      ? window.ckBuildMicrofield(MICROFIELD)
+      : '';
 
     // ── Links: faint warm base + flowing comet overlay ──────
     // 2026-06-11 rebuild: OPEN chain (no wrap-around). With 8
@@ -453,7 +410,7 @@
     for (let i = 0; i < NODES.length - 1; i++) {
       const a = NODES[i];
       const b = NODES[i + 1];
-      const d = _pchCurvePath(a, b, bows[i]);
+      const d = (window.ckCurvePath || function(){return '';})(a, b, bows[i]);
       const dataAttr = ' data-from="' + a.slot + '" data-to="' + b.slot + '"';
       const drawDelay = firstMount ? (1300 + i * 90) : 0;
       const drawClass = firstMount ? ' pch-link--draw' : '';
@@ -476,24 +433,28 @@
     // CSS text-transform + paint-order stroke for legibility
     // over the busy microfield.
     let nodesMarkup = '';
+    const kitMag = (typeof window !== 'undefined' && window.ckMagRadii) || null;
     NODES.forEach(function(n, i){
       const hot   = (i === hotIdx);
-      const radii = MAG_RADII[n.mag] || MAG_RADII.mid;
+      const radii = (kitMag && kitMag[n.mag]) || (kitMag && kitMag.mid) || { halo: 5.5 };
       const labelY = n.labelAbove ? (n.y - 16) : (n.y + 26);
       const ariaCt = (n.count > 0) ? (' (' + n.count + ' pending)') : '';
       const aria   = n.label + ' destination' + ariaCt;
-      const cls    = 'pch-node pch-node--mag-' + n.mag
+      // Wrapper carries .pch-node (parent-specific state hooks)
+      // AND .star-node (shared breathe + hover + flare). Mag
+      // variant and reveal/hot states stay parent-scoped.
+      const cls    = 'pch-node star-node pch-node--mag-' + n.mag
                    + (hot ? ' pch-node--hot' : '')
                    + (firstMount ? ' pch-node--reveal' : '');
 
       // Per-node breathe period from PERIODS table + phase delay
-      // for stagger. CSS reads --pchBreathePeriod for both the
+      // for stagger. CSS reads --starBreathePeriod for both the
       // node breathe and the halo opacity pulse.
       const breathePeriod = PERIODS[i % PERIODS.length];
       const breatheDelay  = '-' + n.phase + 'ms';
       const styleParts = [
         'transform-origin:' + n.x + 'px ' + n.y + 'px',
-        '--pchBreathePeriod:' + breathePeriod + 'ms'
+        '--starBreathePeriod:' + breathePeriod + 'ms'
       ];
       if (firstMount) {
         const revealDelay = (i * 100);
@@ -506,49 +467,22 @@
 
       let nodeInner = '';
 
-      // Hot ripple (kept) -- emanating amber ring marks the
-      // attention-needed slot beyond the count badge alone.
+      // Hot ripple (kept) -- parent-only flourish marking the
+      // attention-needed slot beyond the count badge. Uses kit
+      // halo radius + 6 so the ring sits just outside the halo.
       if (hot) {
         nodeInner += '<circle class="pch-node__ripple" cx="' + n.x + '" cy="' + n.y
                   +     '" r="' + (radii.halo + 6) + '" fill="none"'
                   +     ' stroke="#FBBF24" stroke-width="1.2" stroke-opacity=".55"/>';
       }
 
-      // Outer bloom -- soft amber wash that reads as atmospheric
-      // glow around the star. Brighter on the hot node via CSS.
-      nodeInner += '<circle class="pch-node__bloom" cx="' + n.x + '" cy="' + n.y
-                +     '" r="' + radii.bloom + '" fill="#FBBF24" fill-opacity=".11"/>';
-
-      // Halo -- mid-radius amber. Its opacity pulses in sync with
-      // the node's breathe via the .pch-node__halo CSS animation.
-      nodeInner += '<circle class="pch-node__halo" cx="' + n.x + '" cy="' + n.y
-                +     '" r="' + radii.halo + '" fill="#FBBF24" fill-opacity=".45"/>';
-
-      // Core -- warm-white center. The actual "star" itself.
-      nodeInner += '<circle class="pch-node__core" cx="' + n.x + '" cy="' + n.y
-                +     '" r="' + radii.core + '" fill="#FFF7E0"/>';
-
-      // Diffraction spikes -- bright tier only. A horizontal +
-      // vertical line cross at +/-13 units, reading as the
-      // classic four-spike sparkle of the chart's brightest
-      // stars. Each line is styled by .pch-node__spike CSS.
-      if (n.mag === 'bright') {
-        nodeInner += '<line class="pch-node__spike" x1="' + n.x + '" y1="' + (n.y - 13)
-                  +     '" x2="' + n.x + '" y2="' + (n.y + 13) + '"/>';
-        nodeInner += '<line class="pch-node__spike" x1="' + (n.x - 13) + '" y1="' + n.y
-                  +     '" x2="' + (n.x + 13) + '" y2="' + n.y + '"/>';
-      }
-
-      // Companion count badge -- amber dot with the count, sits
-      // at upper-right of the star. Inside the same <g> so it
-      // inherits the tap target + aria. The +4 y-offset on the
-      // text centers vertically inside the r=8 circle without
-      // relying on dominant-baseline (Safari quirk).
-      if (n.count > 0) {
-        nodeInner += '<circle class="pch-node__badge-bg" cx="' + (n.x + 13)
-                  +     '" cy="' + (n.y - 13) + '" r="8" fill="#FBBF24"/>';
-        nodeInner += '<text class="pch-node__badge-text" x="' + (n.x + 13)
-                  +     '" y="' + (n.y - 13 + 4) + '">' + n.count + '</text>';
+      // Star primitive (bloom + halo + core + spikes if bright +
+      // badge if count > 0) via shared kit (2026-06-12). Parent
+      // omits accent so the brass default (#FBBF24) applies.
+      if (typeof window !== 'undefined' && window.ckBuildStar) {
+        nodeInner += window.ckBuildStar({
+          x: n.x, y: n.y, mag: n.mag, count: n.count
+        });
       }
 
       // Label -- uppercase + star-chart letter-spacing via CSS;
@@ -561,10 +495,9 @@
       nodeInner += '<rect class="pch-node__hit" x="' + (n.x - 24) + '" y="' + (n.y - 24)
                 +     '" width="48" height="64" fill="transparent"/>';
 
-      // Onclick goes through _pchNodePress so the press flare
-      // class lands ~120ms BEFORE phNav fires -- gives the
-      // visual response without stalling navigation.
-      const onclick = 'window._pchNodePress(this,\'' + n.slot + '\')';
+      // Onclick goes through window.ckPressNode so the press
+      // flare class lands ~120ms BEFORE phNav fires (2026-06-12).
+      const onclick = 'window.ckPressNode(this,function(){phNav(\'' + n.slot + '\')})';
 
       nodesMarkup += '<g class="' + cls + '" tabindex="0" role="button"'
                   +    ' aria-label="' + aria + '"'
