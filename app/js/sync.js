@@ -152,6 +152,19 @@ function setSyncSt(s){
 }
 
 
+// ── SPEC 8 stomp-guard state ─────────────────────────────────
+// _lastSeenUpdatedAt — server's updated_at as of our last successful
+//   load/sync. Captured from the server's response (not constructed
+//   locally) so cross-format string comparisons stay apples-to-apples.
+// _lastSyncedDBaseline — JSON clone of D at the moment of last sync.
+//   Used during a stomp-detected refetch to identify which keys THIS
+//   device modified locally vs. which keys are identical to the version
+//   we last synced. Only locally-modified keys overlay the fresh server
+//   data; the rest take the server's newer values, preserving the other
+//   device's writes for keys this device didn't touch.
+let _lastSeenUpdatedAt = null;
+let _lastSyncedDBaseline = null;
+
 // ── CLOUD SYNC (Supabase) ─────────────────────────────────────
 async function cloudSync(){
   const supa = getSupabase();
@@ -160,14 +173,75 @@ async function cloudSync(){
     return;
   }
   try {
-    const { error } = await supa.from('profiles').upsert({
+    // Stomp guard — if we have a baseline from a prior load/sync, check
+    // whether another device wrote since then before we overwrite their
+    // change with our blob. Spec: select failure → proceed with the
+    // write (availability > consistency, never block a save on a flaky
+    // read). First-write (no baseline) also proceeds directly.
+    if(_lastSeenUpdatedAt){
+      let serverUpdatedAt = null;
+      let selectOk = true;
+      try {
+        const { data: row, error: selErr } = await supa.from('profiles')
+          .select('updated_at')
+          .eq('user_id', _supaUser.id)
+          .single();
+        if(selErr) selectOk = false;
+        else if(row && row.updated_at) serverUpdatedAt = row.updated_at;
+      } catch(_){ selectOk = false; }
+      if(selectOk && serverUpdatedAt && serverUpdatedAt !== _lastSeenUpdatedAt){
+        console.warn('[sync] stomp averted — server updated_at ' + serverUpdatedAt +
+                     ' differs from our last-seen ' + _lastSeenUpdatedAt +
+                     '; per-key merge before write');
+        // Snapshot what THIS device intends to write; fetch the fresh
+        // server blob WITHOUT going through cloudLoad's re-save chain
+        // (we'll re-save once at the end of this cloudSync); per-key
+        // merge: keys this device locally modified win, the rest take
+        // the server's fresh values.
+        const myPending = JSON.parse(JSON.stringify(D));
+        try {
+          const { data: fresh, error: freshErr } = await supa.from('profiles')
+            .select('data, updated_at')
+            .eq('user_id', _supaUser.id)
+            .single();
+          if(!freshErr && fresh && fresh.data){
+            const serverD = fresh.data;
+            const baseline = _lastSyncedDBaseline || {};
+            // Iterate every key present in either myPending or serverD
+            // — covers DEF keys plus any non-DEF keys (pb, myInstruments)
+            // that the existing cloudLoad already restores.
+            const allKeys = new Set();
+            Object.keys(myPending || {}).forEach(k => allKeys.add(k));
+            Object.keys(serverD || {}).forEach(k => allKeys.add(k));
+            allKeys.forEach(k => {
+              if(k === 'undefined') return;
+              const localEdited = JSON.stringify(myPending[k]) !== JSON.stringify(baseline[k]);
+              if(localEdited){
+                D[k] = myPending[k];      // this device modified it — keep our value
+              } else if(k in serverD){
+                D[k] = serverD[k];        // server has a newer value — take it
+              }
+              // else: key only exists in baseline; leave D[k] alone (cloudLoad
+              // would also drop it under the current top-level shape).
+            });
+          }
+        } catch(_){ /* fresh-fetch failed → fall through and upsert our pending */ }
+      }
+    }
+
+    const writeStamp = new Date().toISOString();
+    const { data: writeRow, error } = await supa.from('profiles').upsert({
       user_id: _supaUser.id,
       email: _supaUser.email,
       data: D,
-      updated_at: new Date().toISOString()
-    }, { onConflict: 'user_id' }).select();
+      updated_at: writeStamp
+    }, { onConflict: 'user_id' }).select('updated_at').single();
     setSyncSt(error ? 'local' : 'cloud');
     if(!error){
+      // Use the SERVER's echoed updated_at as the new baseline timestamp
+      // (microsecond precision + tz format that future SELECTs return).
+      _lastSeenUpdatedAt = (writeRow && writeRow.updated_at) || writeStamp;
+      _lastSyncedDBaseline = JSON.parse(JSON.stringify(D));
       localStorage.setItem('lifeos_last_sync', Date.now());
       // Tab 1 Increment 1 — fire-and-forget mirror of D.chores +
       // D.choreLog into public.chores / public.chore_completions.
@@ -375,11 +449,15 @@ async function cloudLoad(){
   _ylccEnforceOwner(_supaUser.id);
   try {
     const { data, error } = await supa.from('profiles')
-      .select('data')
+      .select('data, updated_at')
       .eq('user_id', _supaUser.id)
       .single();
     if(error || !data?.data) return false;
     const saved = data.data;
+    // SPEC 8 — capture the server's updated_at immediately on load so
+    // subsequent cloudSync calls have a baseline to detect cross-device
+    // writes against. Refreshed below from the post-load re-save's echo.
+    if(data.updated_at) _lastSeenUpdatedAt = data.updated_at;
     for(const k of Object.keys(DEF)){ if(k in saved) D[k] = saved[k]; }
     // Also restore keys saved in D that aren't in DEF (pb, myInstruments, etc.)
     for(const k of Object.keys(saved)){ if(!(k in DEF) && k !== 'undefined') D[k] = saved[k]; }
@@ -410,13 +488,20 @@ async function cloudLoad(){
     }
     // Re-save cleaned data back to Supabase immediately so bad values don't persist
     try {
-      await supa.from('profiles').upsert({
+      const { data: writeRow } = await supa.from('profiles').upsert({
         user_id: _supaUser.id,
         email: _supaUser.email,
         data: D,
         updated_at: new Date().toISOString()
-      }, { onConflict: 'user_id' });
+      }, { onConflict: 'user_id' }).select('updated_at').single();
+      // SPEC 8 — bump the baseline to the value the server echoes back
+      // (matches the format of future SELECTs for clean comparison).
+      if(writeRow && writeRow.updated_at) _lastSeenUpdatedAt = writeRow.updated_at;
     } catch(e){}
+    // SPEC 8 — snapshot D as the per-key merge baseline. Subsequent
+    // local edits + cloudSync's stomp guard diff against this to decide
+    // which top-level keys this device actually modified.
+    _lastSyncedDBaseline = JSON.parse(JSON.stringify(D));
     return true;
   } catch(e){ return false; }
 }
