@@ -20208,7 +20208,9 @@
 <script defer src="/app/js/data/biblical-sites.js"></script>
 <script defer src="/app/js/data/biblical-discoveries.js"></script>
 <script defer src="/app/js/data/biblical-routes.js"></script>
-<script defer src="/app/js/data/bible-timeline.js"></script>
+<!-- bible-timeline.js is lazy-loaded by faith.js's _tlEnsureLoaded() on
+     first Bible Timeline tab open (SPEC 7 pilot). Do not add a <script>
+     tag back here — it would re-introduce ~195 KB to the initial payload. -->
 <script defer src="/app/js/data/biblical-infographics.js"></script>
 <script defer src="/app/js/data/bible-stories.js"></script>
 <script defer src="/app/js/data/bible-flashcards.js"></script>

@@ -7541,14 +7541,43 @@ const TL_ERA_PHOTOS = {
   'pauline-journeys': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Church_of_the_Holy_Sepulchre_by_Gerd_Eichmann_%28cropped%29.jpg/1280px-Church_of_the_Holy_Sepulchre_by_Gerd_Eichmann_%28cropped%29.jpg',
 };
 
+// SPEC 7 pilot — bible-timeline.js (~195 KB) is no longer in the initial
+// payload. The script tag was removed from index.html; this helper injects
+// it on first Bible Timeline tab open. Single in-flight promise prevents
+// duplicate requests; cached after first load by the service worker.
+let _tlLoadPromise = null;
+function _tlEnsureLoaded(){
+  if (typeof window !== 'undefined' && Array.isArray(window.BIBLE_TIMELINE_EVENTS)) {
+    return Promise.resolve();
+  }
+  if (_tlLoadPromise) return _tlLoadPromise;
+  _tlLoadPromise = new Promise(function(resolve, reject){
+    const s = document.createElement('script');
+    s.src = '/app/js/data/bible-timeline.js';
+    s.onload = function(){ resolve(); };
+    s.onerror = function(){ _tlLoadPromise = null; reject(new Error('bible-timeline load failed')); };
+    document.head.appendChild(s);
+  });
+  return _tlLoadPromise;
+}
+
 function _tlEvents(){ return (typeof window !== 'undefined' && window.BIBLE_TIMELINE_EVENTS) ? window.BIBLE_TIMELINE_EVENTS : []; }
 function _tlEventById(id){ return _tlEvents().find(e => e && e.id === id) || null; }
 function _tlEraById(id){ return TL_ERAS.find(e => e && e.id === id) || null; }
 
 function renderBibleTimeline(){
   const rail = document.getElementById('tlRail');
-  const legend = document.getElementById('tlLegend');
   if(!rail) return;
+  // Lazy-load gate — show transient loading state on first open, then
+  // re-enter this function once window.BIBLE_TIMELINE_EVENTS is populated.
+  if (typeof window === 'undefined' || !Array.isArray(window.BIBLE_TIMELINE_EVENTS)) {
+    rail.innerHTML = '<div style="padding:2rem;text-align:center;color:#64748b;font-size:.85rem;">Loading timeline…</div>';
+    _tlEnsureLoaded().then(renderBibleTimeline).catch(function(){
+      rail.innerHTML = '<div style="padding:2rem;text-align:center;color:#dc2626;font-size:.85rem;">Failed to load timeline. <button type="button" onclick="renderBibleTimeline()" style="margin-left:.5rem;color:#38bdf8;text-decoration:underline;background:none;border:none;cursor:pointer;font:inherit;">Retry</button></div>';
+    });
+    return;
+  }
+  const legend = document.getElementById('tlLegend');
   if(rail.dataset.tlBuilt){
     // Re-trigger reveal on revisit so it feels alive each time.
     rail.querySelectorAll('.tl-event').forEach(el => {
