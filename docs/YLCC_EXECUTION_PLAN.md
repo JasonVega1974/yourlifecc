@@ -216,3 +216,11 @@ is written.
 
 ## SPEC 1b — scripts UA-string email sweep (follow-up from SPEC 1) · 5 min · no SW bump
 Replace jasonvega1974@gmail.com with info@kingdom-creatives.com in the User-Agent strings of the 9 scripts/*.py files identified in SPEC 1's grep report (verify_failed_urls, pick_stragglers, pick_stragglers2, pass_e_replacements, pass_e_photos, fetch_card_photos_retry, fetch_card_photos, fetch_bible_lands_photos, curate_card_photos). No deploy path. Grep clean after.
+
+## SPEC 5b — proxy admin Brevo send server-side · ~2 hrs · no SW bump
+admin.html:1457/1541 sends directly to api.brevo.com with a runtime-prompted key (no key in
+source — confirmed 2026-06-13). Replace with POST to a new /api/admin/send-message.js using
+the BREVO_API_KEY env var + Bearer ADMIN_SECRET auth (mirror api/admin/send-announcement.js).
+Delete the prompt + window.BREVO_API_KEY. Then remove api.brevo.com from the CSP connect-src
+in vercel.json (same commit). Related read-only pre-check: inventory what an anonymous
+visitor can see/do on admin.html (it is gated by route obscurity only).
