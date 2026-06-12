@@ -19,9 +19,9 @@ There is **no build step, no bundler, no test runner, no `package.json`**. Every
 
 ### The single-file shell + module pattern
 
-`app/index.html` (~9,160 lines) is the entire app shell — every section, modal, screen, and inline `<style>` block lives in this one file. Behavior is split across vanilla JS modules in `app/js/` that all load globally onto `window`. There are no ES modules, no imports, no classes — files cooperate via global functions and the shared mutable `D` state object.
+`app/index.html` (currently ~21,388 lines — refresh per the standing rule below when it drifts >5%) is the entire app shell — every section, modal, screen, and inline `<style>` block lives in this one file. Behavior is split across vanilla JS modules in `app/js/` that all load globally onto `window`. There are no ES modules, no imports, no classes — files cooperate via global functions and the shared mutable `D` state object.
 
-**Script load order matters and is fixed in `app/index.html` (~lines 8804–8845):**
+**Script load order matters and is fixed in `app/index.html` — the contiguous `<script src="/app/js/...">` block sits immediately before the Google Translate `<script>` tag near EOF, in this order:**
 
 1. `config.js` — Supabase URL/anon key, lazy `getSupabase()`
 2. `data.js` — `DEF` (defaults schema) and `D` (live state)
@@ -30,7 +30,7 @@ There is **no build step, no bundler, no test runner, no `package.json`**. Every
 5. `ui.js` — `function tick()`, sidebar nav, section routing, `applyStageFilter()`
 6. Feature modules: `finance`, `school`, `health`, `goals`, `skills`, `chores`, `sports`
 7. `data/*.js` — large static datasets (memory verses, Bible timeline, biblical sites, plans, academy, etc.)
-8. Faith stack: `faith.js` (~6,100 lines), `worship.js`, `faith-resources.js`
+8. Faith stack: `faith.js` (currently ~12,855 lines), `worship.js`, `faith-resources.js`
 9. `parent.js` — parent hub, multi-profile, PIN gate, behavior log
 10. `email.js`, `misc.js`, `resume.js`
 11. `init.js` — bootstrap, `DOMContentLoaded`, demo data, first-load logic — **must load last**
@@ -77,7 +77,7 @@ The faith feature area is delivered in phased specs (`docs/F0-followups.md`, `do
 
 ### Service worker
 
-`/service-worker.js` (top-level) — cache-first for static, network-first for navigation, **network-only** for `supabase.co`, `stripe.com`, `api.brevo.com`, `googleapis.com`, `translate.googleapis.com`. The page-side registration in `app/index.html` (~line 8845) auto-applies new SW versions on `controllerchange` and reloads once.
+`/service-worker.js` (top-level) — cache-first for static, network-first for navigation, **network-only** for `supabase.co`, `stripe.com`, `api.brevo.com`, `googleapis.com`, `translate.googleapis.com`. The page-side registration in `app/index.html` — the IIFE that calls `navigator.serviceWorker.register('/service-worker.js', { updateViaCache: 'none' })` — sits inside the tail inline script block and auto-applies new SW versions on `controllerchange` then reloads once.
 
 ### Demo mode
 
@@ -85,12 +85,12 @@ The faith feature area is delivered in phased specs (`docs/F0-followups.md`, `do
 
 ## Critical: `/app/index.html` tail integrity
 
-This file has a known truncation failure mode around line 1751 — edits occasionally clip the file tail and break the live app silently. **After any edit to `/app/index.html`**, invoke the `index-html-guardian` agent (defined in `.claude/agents/`). It verifies that these tail tokens are still present:
+This file has a known truncation failure mode — edits occasionally clip the file tail and break the live app silently. (Earliest documented incident clipped at an early head position, approx., drifts.) **After any edit to `/app/index.html`**, invoke the `index-html-guardian` agent (defined in `.claude/agents/`). It verifies that these tail tokens are still present:
 
-- `function tick()` (in the file via `ui.js`, but the inline script must close cleanly)
-- `setInterval(tick`
-- `<script src="//translate.googleapis.com/translate_a/element.js?cb=googleTranslateElementInit">`
-- `</body>` and `</html>`
+- `function tick()` (in the file via `ui.js`, but the inline tail `<script>` block that calls it must close cleanly)
+- `setInterval(tick` (in the same tail block, immediately after `function tick()`)
+- `<script src="//translate.googleapis.com/translate_a/element.js?cb=googleTranslateElementInit">` (sits immediately before `</body>`)
+- `</body>` and `</html>` (close the file cleanly)
 
 If the guardian returns `FAIL`, restore the tail before any further edits — do not try to patch forward.
 
@@ -125,6 +125,8 @@ If the guardian returns `FAIL`, restore the tail before any further edits — do
 - Deployment: Use git commit and git push from Claude Code bash. Stage only the specific files changed in the current phase using targeted git add. Never use git push --force except as authorized one-time exception. GitHub web UI uploads are retired.
 - JS validation: run `node --check` before any JS module is uploaded
 - Single-file architecture: `/app/index.html` plus modules in `/app/js/` (init.js, ui.js, sync.js, faith.js, data.js, auth.js, parent.js, skills.js)
+- **index.html size figure refresh:** any session that grows `app/index.html` by >5% from the figure cited in this file must refresh that figure in the same commit. The architecture section's line count and the tail-integrity snapshot both age fast; keeping them honest is part of shipping the change that grew the file.
+- **Light-mode ships with the feature:** any new visual feature ships with its `:root.light` pass in the same commit. Light mode is not a follow-up — if a surface paints cream/amber-on-indigo in dark, it must paint dark-ink-on-paper in light before the commit lands.
 
 ## Supabase Table Creation Rules
 
@@ -148,13 +150,13 @@ Run `bash scripts/check-migrations.sh` before committing any migration change. I
 
 ## index.html Tail Integrity (Non-Negotiable)
 
-After any edit to `/app/index.html`, the index-html-guardian agent must verify the tail is intact:
-- `function tick()` exists (currently ~line 11900)
-- `setInterval(tick` exists (currently ~line 11915)
-- Google Translate script tag present before `</body>` (currently ~line 12163)
-- File should be ~13145 lines
+After any edit to `/app/index.html`, the index-html-guardian agent must verify the tail is intact — **presence, not position**:
+- `function tick()` exists inside a tail inline `<script>` block
+- `setInterval(tick` exists in the same block, immediately after `function tick()`
+- Google Translate `<script>` tag present immediately before `</body>`
+- `</body>` and `</html>` close the file cleanly
 
-These line numbers shift with edits — the agent verifies presence, not exact position. Baseline refreshed 2026-05-23.
+Line numbers drift with every edit; the agent verifies presence. (Snapshot for orientation, approx., drifts — refreshed 2026-06-12: file ~21,388 lines; the `function tick()` / `setInterval(tick` pair sits around line 20,000; Google Translate tag around line 20,366.)
 
 ## Roadmap & Current Phase
 
