@@ -15893,8 +15893,98 @@
               #parentCelestialHome .pch-stat__label{font-size:.72rem;color:#9AA0B4;margin-top:.4rem;font-weight:500;}
 
               /* Constellation */
-              #parentCelestialHome .pch-constellation{position:relative;margin-bottom:1.6rem;}
-              #parentCelestialHome .pch-constellation__caption{font-size:.82rem;color:#9AA0B4;margin-bottom:.6rem;}
+              /* World-class pass 2 (2026-06-11) -- sky panel.
+                 The constellation section is framed as a viewport
+                 onto a painted sky: brass-amber border, soft inset
+                 highlight, deep night-sky gradient (dark) or dawn-
+                 atmosphere gradient (light). The caption sits
+                 OUTSIDE the section (its own previous sibling) so
+                 the panel is pure sky. Stars/labels/links keep
+                 their existing values -- they read on a sky base. */
+              #parentCelestialHome .pch-constellation{
+                position:relative;
+                margin-bottom:1.6rem;
+                padding:1rem 0;
+                border-radius:18px;
+                overflow:hidden;
+                border:1.5px solid rgba(251,191,36,.4);
+                box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);
+                background:linear-gradient(180deg, #0a1226 0%, #0f2436 70%, #123040 100%);
+              }
+              :root.light #parentCelestialHome .pch-constellation{
+                background:linear-gradient(180deg, #2b3a6e 0%, #6d6aa0 45%, #e9a878 82%, #f3c98f 100%);
+              }
+
+              /* ── Light-mode pass for the entered hub dashboard
+                 (2026-06-11) ──
+                 The entered Parent Hub paints cream/amber-on-indigo
+                 by default. In light mode the dashboard sits on the
+                 warm parent-hub surface gradient, so headings, the
+                 date line, the stat cards, the "Jump in" tiles, and
+                 the faith card all need dark-ink + paper-card
+                 treatment with deepened amber accents to stay warm
+                 while passing AA contrast. Matches the established
+                 light palette used elsewhere in #s-parent (#ffffff
+                 cards, rgba(15,23,42,.08) borders, #0f172a/#1a1233
+                 headings, #4a4b52 muted body, #92400e amber). The
+                 constellation panel keeps its dawn-sky gradient
+                 (themed above); these overrides only touch the
+                 OUT-OF-PANEL text + the stat/tile cards. */
+              :root.light #parentCelestialHome .pch-hello{
+                color:#0f172a;
+              }
+              :root.light #parentCelestialHome .pch-daystamp__date{
+                color:#1a1233;
+              }
+              :root.light #parentCelestialHome .pch-daystamp__sub{
+                color:#4a4b52;
+              }
+              :root.light #parentCelestialHome .pch-daystamp__sub::before{
+                background:#92400e;
+                box-shadow:none;
+              }
+              :root.light #parentCelestialHome .pch-stat{
+                background:#ffffff;
+                border-color:rgba(15,23,42,.08);
+                box-shadow:0 1px 4px rgba(15,23,42,.05);
+              }
+              :root.light #parentCelestialHome .pch-stat__num{
+                color:#0f172a;
+              }
+              :root.light #parentCelestialHome .pch-stat__label{
+                color:#4a4b52;
+              }
+              :root.light #parentCelestialHome .pch-section-label{
+                color:#0f172a;
+              }
+              :root.light #parentCelestialHome .pch-tile{
+                background:#ffffff;
+                border-color:rgba(15,23,42,.08);
+                color:#1a1233;
+                box-shadow:0 1px 4px rgba(15,23,42,.05);
+              }
+              :root.light #parentCelestialHome .pch-tile:hover{
+                background:#f8fafc;
+                border-color:rgba(15,23,42,.14);
+              }
+              :root.light #parentCelestialHome .pch-tile__meta{
+                color:#4a4b52;
+              }
+              :root.light #parentCelestialHome .pch-faith{
+                background:linear-gradient(135deg, rgba(146,64,14,.06), rgba(146,64,14,.02));
+                border-color:rgba(146,64,14,.25);
+                border-left-color:#92400e;
+              }
+              :root.light #parentCelestialHome .pch-faith__verse{
+                color:#1a1233;
+              }
+              :root.light #parentCelestialHome .pch-faith__ref{
+                color:#92400e;
+              }
+
+              /* Caption sits ABOVE the panel; inherits the theme's
+                 secondary text color so it adapts dark<->light. */
+              #parentCelestialHome .pch-constellation__caption{font-size:.7rem;color:var(--tx2,#7A8094);margin-bottom:.6rem;text-transform:uppercase;letter-spacing:2.5px;font-weight:500;}
               #parentCelestialHome .pch-constellation__svg{width:100%;height:280px;display:block;overflow:visible;}
               @media (min-width:720px){ #parentCelestialHome .pch-constellation__svg{height:380px;} }
 
@@ -15914,24 +16004,138 @@
                  flowing comet overlay. Two paths per pair, both with
                  pathLength="1" so dashoffset math is uniform across
                  different geometric lengths. */
-              #parentCelestialHome .pch-link      {fill:none;stroke:#F1E9D5;stroke-opacity:.18;stroke-width:.7;transition:stroke-opacity 250ms ease,stroke-width 250ms ease;}
+              /* World-class rebuild (2026-06-11) -- stroke warmed from
+                 cool cream (#F1E9D5) to warm sand (#f5e6c8) so the
+                 link palette speaks the splash's brass-lantern
+                 language. Bright-on-hover stays subtle (.35) so the
+                 chain reads as connections, not highways. */
+              #parentCelestialHome .pch-link      {fill:none;stroke:#f5e6c8;stroke-opacity:.16;stroke-width:.7;transition:stroke-opacity 250ms ease,stroke-width 250ms ease;}
               #parentCelestialHome .pch-link--draw{stroke-dasharray:1;stroke-dashoffset:1;animation:pch-link-draw 800ms ease-out forwards;}
               #parentCelestialHome .pch-link--flow{fill:none;stroke:#FCD34D;stroke-opacity:.45;stroke-width:.9;stroke-linecap:round;stroke-dasharray:.08 1;stroke-dashoffset:0;animation:pch-link-flow 8s linear infinite;}
-              #parentCelestialHome .pch-link--bright{stroke-opacity:.6;stroke-width:1.1;}
+              #parentCelestialHome .pch-link--bright{stroke-opacity:.35;stroke-width:1;}
 
-              /* Constellation nodes. Each node group carries an inline
-                 transform-origin (the node's own coordinates) so the
-                 scale animations breathe around the star, not (0,0). */
-              #parentCelestialHome .pch-node{cursor:pointer;animation:pch-node-breathe 4.2s ease-in-out infinite;}
-              #parentCelestialHome .pch-node--reveal{opacity:0;animation:pch-node-reveal 600ms ease-out forwards,pch-node-breathe 4.2s ease-in-out infinite 700ms;}
-              #parentCelestialHome .pch-node--hot   {animation:pch-node-hot 2s ease-in-out infinite;}
-              #parentCelestialHome .pch-node--hot.pch-node--reveal{animation:pch-node-reveal 600ms ease-out forwards,pch-node-hot 2s ease-in-out infinite 700ms;}
-              #parentCelestialHome .pch-node:hover{filter:brightness(1.18) saturate(1.15);outline:none;}
-              #parentCelestialHome .pch-node:focus-visible{filter:brightness(1.18) saturate(1.15);outline:2px solid #6AA7FF;outline-offset:3px;}
-              #parentCelestialHome .pch-node__star  {transition:r 200ms ease;}
-              #parentCelestialHome .pch-node__halo  {transition:opacity 250ms ease;}
-              #parentCelestialHome .pch-node__ripple{opacity:0;transform-box:fill-box;transform-origin:center;animation:pch-ripple 2.2s ease-out infinite;}
-              #parentCelestialHome .pch-node__label {pointer-events:none;font-family:inherit;letter-spacing:.02em;font-size:10px;fill:#F1E9D5;text-anchor:middle;}
+              /* World-class rebuild (2026-06-11). Each star is now a
+                 stack of 3 circles (bloom, halo, core) plus an optional
+                 spike pair for bright tier and an optional count badge.
+                 Per-node breathe period comes from inline --pchBreathePeriod
+                 (4500-6500ms range from PERIODS in parent-celestial.js)
+                 so the eight stars visibly stagger out of unison. The
+                 halo opacity pulses on the same period via its own
+                 animation, which inherits the same CSS var. Hover /
+                 focus pause the breathe and scale to 1.25 via
+                 !important so they win over the keyframes. Press flare
+                 (.pch-node--flare) runs a 200ms scale(1.35) flash that
+                 also wins via !important, then JS removes the class. */
+              #parentCelestialHome .pch-node{
+                cursor:pointer;
+                transition:transform .25s ease;
+                animation:pch-node-breathe var(--pchBreathePeriod, 4.5s) ease-in-out infinite;
+              }
+              #parentCelestialHome .pch-node--reveal{
+                opacity:0;
+                animation:pch-node-reveal 600ms ease-out forwards,
+                          pch-node-breathe var(--pchBreathePeriod, 4.5s) ease-in-out infinite 700ms;
+              }
+              #parentCelestialHome .pch-node--hot{
+                animation:pch-node-hot 2s ease-in-out infinite;
+              }
+              #parentCelestialHome .pch-node--hot.pch-node--reveal{
+                animation:pch-node-reveal 600ms ease-out forwards,
+                          pch-node-hot 2s ease-in-out infinite 700ms;
+              }
+              /* Hover + focus -- pause the breathe so transform:scale wins
+                 cleanly. transition handles the smooth scale-up; on
+                 unhover the breathe resumes from its current keyframe. */
+              #parentCelestialHome .pch-node:hover,
+              #parentCelestialHome .pch-node:focus-visible{
+                animation-play-state:paused;
+                transform:scale(1.25) !important;
+                filter:brightness(1.18) saturate(1.15);
+              }
+              #parentCelestialHome .pch-node:hover{outline:none;}
+              #parentCelestialHome .pch-node:focus-visible{outline:2px solid #6AA7FF;outline-offset:3px;}
+              /* Press flare -- JS adds the class for ~200ms before
+                 phNav fires. !important defeats the breathe transform. */
+              #parentCelestialHome .pch-node--flare{
+                animation:pch-node-flare 220ms ease-out !important;
+              }
+              /* Star sub-elements -- each circle is paint-only with
+                 its own opacity transition; the whole group's
+                 transform animation scales them together. */
+              #parentCelestialHome .pch-node__bloom{
+                transition:fill-opacity 250ms ease;
+                pointer-events:none;
+              }
+              #parentCelestialHome .pch-node__halo{
+                transition:fill-opacity 250ms ease;
+                animation:pch-halo-pulse var(--pchBreathePeriod, 4.5s) ease-in-out infinite;
+                pointer-events:none;
+              }
+              #parentCelestialHome .pch-node:hover .pch-node__halo,
+              #parentCelestialHome .pch-node:focus-visible .pch-node__halo{
+                animation-play-state:paused;
+              }
+              #parentCelestialHome .pch-node:hover .pch-node__bloom,
+              #parentCelestialHome .pch-node:focus-visible .pch-node__bloom{
+                fill-opacity:.20;
+              }
+              #parentCelestialHome .pch-node__core{
+                transition:r 200ms ease;
+                pointer-events:none;
+              }
+              #parentCelestialHome .pch-node__spike{
+                stroke:#FFF7E0;
+                stroke-opacity:.55;
+                stroke-width:.7;
+                stroke-linecap:round;
+                pointer-events:none;
+              }
+              #parentCelestialHome .pch-node__badge-bg{
+                pointer-events:none;
+              }
+              #parentCelestialHome .pch-node__badge-text{
+                pointer-events:none;
+                font-family:var(--fn,system-ui,sans-serif);
+                font-size:11px;
+                font-weight:500;
+                fill:#412402;
+                text-anchor:middle;
+              }
+              #parentCelestialHome .pch-node__hit{
+                /* Invisible tap target. Pointer events stay default
+                   so taps register here too. */
+              }
+              #parentCelestialHome .pch-node__ripple{
+                opacity:0;
+                transform-box:fill-box;
+                transform-origin:center;
+                animation:pch-ripple 2.2s ease-out infinite;
+              }
+              /* Star-chart labels -- uppercase via text-transform, paint-
+                 order:stroke draws a dark stroke BEHIND the fill for
+                 legibility over the microfield + photo bleed. */
+              #parentCelestialHome .pch-node__label{
+                pointer-events:none;
+                font-family:inherit;
+                font-size:11px;
+                letter-spacing:2px;
+                fill:#F3EDD9;
+                text-anchor:middle;
+                text-transform:uppercase;
+                paint-order:stroke;
+                stroke:rgba(0,0,0,.7);
+                stroke-width:2.5;
+                stroke-linejoin:round;
+              }
+              /* Microfield -- 22 tiny background stars rendered into
+                 #pchLinks before the chain. Six twinkle on individual
+                 slow periods via inline --pchTwinklePeriod. */
+              #parentCelestialHome .pch-microfield{
+                pointer-events:none;
+              }
+              #parentCelestialHome .pch-microfield--twinkle{
+                animation:pch-micro-twinkle var(--pchTwinklePeriod, 5s) ease-in-out infinite;
+              }
 
               /* Shooting stars — short streaks injected by JS, removed
                  after the animation completes. Trajectory length comes
@@ -15963,12 +16167,12 @@
                 50%    {opacity:1;}
               }
               @keyframes pch-node-breathe{
-                0%,100%{transform:scale(1);}
-                50%    {transform:scale(1.06);}
+                0%,100%{transform:scale(1);   filter:brightness(1);}
+                50%    {transform:scale(1.18);filter:brightness(1.30);}
               }
               @keyframes pch-node-hot{
-                0%,100%{transform:scale(1);   filter:brightness(1)   saturate(1);}
-                50%    {transform:scale(1.15);filter:brightness(1.35) saturate(1.2);}
+                0%,100%{transform:scale(1);   filter:brightness(1)   saturate(1)   drop-shadow(0 0 0 rgba(251,191,36,0));}
+                50%    {transform:scale(1.35);filter:brightness(1.55) saturate(1.4) drop-shadow(0 0 6px rgba(251,191,36,.55));}
               }
               @keyframes pch-node-reveal{
                 0%  {opacity:0;transform:scale(.5);}
@@ -15988,6 +16192,20 @@
                 0%  {transform:translate(0,0);opacity:0;}
                 15% {opacity:1;}
                 100%{transform:translate(var(--dx,240px),var(--dy,140px));opacity:0;}
+              }
+              /* World-class rebuild (2026-06-11) -- new keyframes */
+              @keyframes pch-halo-pulse{
+                0%,100%{fill-opacity:.45;}
+                50%    {fill-opacity:.20;}
+              }
+              @keyframes pch-node-flare{
+                0%  {transform:scale(1);  }
+                40% {transform:scale(1.35);}
+                100%{transform:scale(1);  }
+              }
+              @keyframes pch-micro-twinkle{
+                0%,100%{opacity:.45;}
+                50%    {opacity:.85;}
               }
 
               /* Portal restructure (2026-06-09) -- hero container.
@@ -16180,7 +16398,10 @@
                 #parentCelestialHome .pch-stars circle,
                 #parentCelestialHome .pch-node,
                 #parentCelestialHome .pch-node--hot,
+                #parentCelestialHome .pch-node--flare,
                 #parentCelestialHome .pch-node__ripple,
+                #parentCelestialHome .pch-node__halo,
+                #parentCelestialHome .pch-microfield--twinkle,
                 #parentCelestialHome .pch-link--flow,
                 #parentCelestialHome .pch-shoot{animation:none !important;}
                 #parentCelestialHome .pch-node__ripple{opacity:0;}
@@ -16219,9 +16440,9 @@
                    expanded 30-star background field with three twinkle
                    buckets, plus three empty containers JS populates on
                    first mount (links, nodes, shooting stars). -->
+              <div class="pch-constellation__caption" id="pchConstellationCaption">Tap a star to navigate</div>
               <section class="pch-constellation" aria-label="Family action constellation">
-                <div class="pch-constellation__caption" id="pchConstellationCaption">Tap a star to navigate</div>
-                <svg class="pch-constellation__svg" id="pchConstellationSvg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Family action constellation">
+                <svg class="pch-constellation__svg" id="pchConstellationSvg" viewBox="0 0 480 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Family action constellation">
                   <defs>
                     <!-- Nebula gradients — three soft radial fields layered
                          underneath the star field. Low opacity so the

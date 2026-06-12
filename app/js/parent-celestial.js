@@ -275,38 +275,113 @@
   }
 
   // ── Constellation node table ──────────────────────────────
-  // Asymmetric positions — not a regular polygon. Nodes drift
-  // up-right across the upper half, then down-left across the
-  // lower half so the linked path traces an organic S-curve.
-  // Each node owns its destination color identity (used by the
-  // halo gradient id) and a per-node breathe-phase offset so
-  // the six don't pulse in unison.
+  // 2026-06-11 world-class rebuild: 8 stars arranged as an open
+  // chain along a low-profile horizon. Each star carries a
+  // magnitude tier (bright / mid / dim) that drives its radii
+  // table — bright stars get the largest bloom + diffraction
+  // spikes, mid stars are the body of the chain, dim stars sit
+  // between as connecting points of light. The cyan/violet
+  // category cycle is retired here: every star paints in the
+  // splash's brass-lantern palette (warm-white core + amber
+  // halo/bloom) so the constellation reads as one continuous
+  // language with the day/night hero photos overhead.
   function _pchBuildNodes(stats){
-    // Step 5 (2026-06-09 portal skill-compliance pass) -- palette
-    // reduced from six destination hues to three: cyan + violet
-    // cycled by index for the cool/calm baseline (non-hot nodes),
-    // amber reserved as the hot/featured accent. Halo gradients
-    // (pchHaloChores etc.) in index.html <defs> are no longer
-    // referenced by this renderer; they remain in markup as unused
-    // defs pending a follow-up cleanup pass.
-    const CYAN   = '#38BDF8';
-    const VIOLET = '#A78BFA';
-    const cycle  = function(i){ return (i % 2 === 0) ? CYAN : VIOLET; };
     return [
-      { slot:'chores',   label:'Chores',   color: cycle(0),
-        x: 90, y: 80,  count: stats.choresPending,   phase: 0    },
-      { slot:'contests', label:'Contests', color: cycle(1),
-        x:180, y: 50,  count: 0,                     phase: 700  },
-      { slot:'activity', label:'Activity', color: cycle(2),
-        x:320, y: 95,  count: stats.recentActivities,phase: 1400 },
-      { slot:'reports',  label:'Reports',  color: cycle(3),
-        x:340, y:195,  count: 0,                     phase: 2100 },
-      { slot:'family',   label:'Family',   color: cycle(4),
-        x:215, y:240,  count: 0,                     phase: 2800 },
-      { slot:'controls', label:'Controls', color: cycle(5),
-        x: 75, y:195,  count: 0,                     phase: 3500 }
+      { slot:'chores',    label:'Chores',    mag:'bright',
+        x: 34, y:140, count: stats.choresPending,     phase:    0, labelAbove:true  },
+      { slot:'contests',  label:'Contests',  mag:'dim',
+        x: 94, y:212, count: 0,                       phase:  525, labelAbove:false },
+      { slot:'activity',  label:'Activity',  mag:'mid',
+        x:164, y:234, count: stats.recentActivities,  phase: 1050, labelAbove:false },
+      { slot:'reports',   label:'Reports',   mag:'mid',
+        x:224, y:152, count: 0,                       phase: 1575, labelAbove:true  },
+      { slot:'family',    label:'Family',    mag:'bright',
+        x:284, y: 94, count: 0,                       phase: 2100, labelAbove:true  },
+      { slot:'controls',  label:'Controls',  mag:'dim',
+        x:344, y:164, count: 0,                       phase: 2625, labelAbove:false },
+      { slot:'allowance', label:'Allowance', mag:'dim',
+        x:404, y:120, count: 0,                       phase: 3150, labelAbove:true  },
+      { slot:'rewards',   label:'Rewards',   mag:'mid',
+        x:430, y:230, count: 0,                       phase: 3675, labelAbove:false }
     ];
   }
+
+  // ── Magnitude radii table (2026-06-11) ────────────────────
+  // Per-tier radii for the three stacked circles each star is
+  // built from: bloom (outermost amber wash), halo (mid-radius
+  // amber), core (warm-white inner). Bright tier additionally
+  // gets diffraction spikes drawn on top.
+  const MAG_RADII = {
+    bright: { core: 4,   halo: 7,   bloom: 15 },
+    mid:    { core: 3.2, halo: 5.5, bloom: 11 },
+    dim:    { core: 2.6, halo: 4.5, bloom:  9 }
+  };
+
+  // ── Per-node breathe periods (2026-06-11) ─────────────────
+  // Varied 4.5s-6.5s across the 8 nodes (derived from index so
+  // the spread is stable on every render). Inline CSS variable
+  // --pchBreathePeriod on each node's <g> drives the .pch-node
+  // animation-duration, and the .pch-node__halo opacity pulse
+  // inherits the same var so each star's halo breathes with its
+  // own core. Combined with the existing per-node phase delay,
+  // the eight stars stagger visibly out of unison.
+  const PERIODS = [4500, 6250, 5750, 5250, 4750, 6500, 6000, 5500];
+
+  // ── Micro-starfield (2026-06-11) ──────────────────────────
+  // 22 hardcoded faint stars scattered in the negative space
+  // around the chain. Six twinkle on individual slow periods so
+  // the field shimmers. Positions are picked manually to clear
+  // every node + label keepout box. Two color families (warm
+  // white + warm amber) so the field feels like the photo's
+  // brass-lantern atmosphere extends into the SVG widget.
+  // x-coords scaled by 1.2 (Pass 2, 2026-06-11) for the wider
+  // 480-unit viewBox. y-coords unchanged. Hand-verified to keep
+  // clear of every node bloom + label keepout box at the new
+  // node positions (chores 34,140 .. rewards 430,230).
+  const MICROFIELD = [
+    { x: 18, y: 12,  r:0.9, fill:'#FFF7E0', op:.50 },
+    { x: 78, y: 30,  r:0.7, fill:'#FFF7E0', op:.45, twinkle:5200 },
+    { x:130, y: 18,  r:1.0, fill:'#FBBF24', op:.60 },
+    { x:210, y: 25,  r:0.6, fill:'#FFF7E0', op:.40, twinkle:3500 },
+    { x:264, y: 45,  r:0.8, fill:'#FFF7E0', op:.55 },
+    { x:348, y: 15,  r:0.7, fill:'#FBBF24', op:.50 },
+    { x:408, y: 38,  r:0.9, fill:'#FFF7E0', op:.55, twinkle:6100 },
+    { x:462, y: 22,  r:0.6, fill:'#FFF7E0', op:.40 },
+    { x: 12, y: 70,  r:0.7, fill:'#FFF7E0', op:.40 },
+    { x: 90, y:108,  r:0.6, fill:'#FBBF24', op:.45 },
+    { x:156, y:170,  r:0.8, fill:'#FFF7E0', op:.50, twinkle:4400 },
+    { x:216, y:108,  r:0.7, fill:'#FFF7E0', op:.45 },
+    { x:466, y:170,  r:0.8, fill:'#FFF7E0', op:.55 },
+    { x: 22, y:230,  r:0.6, fill:'#FFF7E0', op:.40 },
+    { x:288, y:180,  r:0.7, fill:'#FFF7E0', op:.50 },
+    { x:396, y:218,  r:0.9, fill:'#FBBF24', op:.60, twinkle:5800 },
+    { x:468, y:195,  r:0.7, fill:'#FFF7E0', op:.45 },
+    { x: 42, y:285,  r:0.8, fill:'#FFF7E0', op:.50 },
+    { x:106, y:278,  r:0.6, fill:'#FFF7E0', op:.40, twinkle:4100 },
+    { x:258, y:288,  r:0.7, fill:'#FBBF24', op:.55 },
+    { x:378, y:285,  r:0.7, fill:'#FFF7E0', op:.45 },
+    { x:462, y:288,  r:0.6, fill:'#FFF7E0', op:.40 }
+  ];
+
+  // ── Press flare bridge (2026-06-11) ───────────────────────
+  // Onclick on a node adds .pch-node--flare for ~200ms, then
+  // fires phNav. CSS @keyframes pch-node-flare drives a brief
+  // scale(1.35) flash that overrides the breathe animation via
+  // !important. The 120ms onclick -> phNav delay is short
+  // enough that the visual lands as "tap responds" rather than
+  // "tap stalls". Exposed on window so inline onclick can call
+  // it without a closure.
+  function _pchNodePress(el, slot){
+    if (!el) return;
+    try { el.classList.add('pch-node--flare'); } catch(_e){}
+    setTimeout(function(){
+      if (typeof phNav === 'function') phNav(slot);
+      setTimeout(function(){
+        try { el.classList.remove('pch-node--flare'); } catch(_e){}
+      }, 220);
+    }, 120);
+  }
+  if (typeof window !== 'undefined') window._pchNodePress = _pchNodePress;
 
   // ── Curve helper ──────────────────────────────────────────
   // Build the SVG path for a single quadratic-bezier link.
@@ -350,91 +425,146 @@
       if (n.count > hotMax) { hotMax = n.count; hotIdx = i; }
     });
 
-    // ── Links: base solid + flowing bright overlay ──────────
-    // Six pairs (i → i+1 mod 6). bow alternates sign so curves
-    // bend organically. Draw-in classes only on first mount.
-    const bows = [-22, 18, -16, 24, -20, 18];
+    // ── Microfield prefix (2026-06-11) ──────────────────────
+    // 22 tiny background stars rendered BEFORE the chain links
+    // so they paint under everything. The static six paint as
+    // solid faint dots; the twinkle six get .pch-microfield--
+    // twinkle with their period as inline --pchTwinklePeriod
+    // CSS var. Prepended into linksG so they share the natural
+    // SVG z-order with the chain (under .pch-nodes).
+    let microMarkup = '';
+    for (let m = 0; m < MICROFIELD.length; m++) {
+      const mi = MICROFIELD[m];
+      const tcls = mi.twinkle ? ' pch-microfield--twinkle' : '';
+      const tsty = mi.twinkle ? (' style="--pchTwinklePeriod:' + mi.twinkle + 'ms;"') : '';
+      microMarkup += '<circle class="pch-microfield' + tcls + '"'
+                  +    ' cx="' + mi.x + '" cy="' + mi.y + '" r="' + mi.r + '"'
+                  +    ' fill="' + mi.fill + '" fill-opacity="' + mi.op + '"'
+                  +    tsty + '/>';
+    }
+
+    // ── Links: faint warm base + flowing comet overlay ──────
+    // 2026-06-11 rebuild: OPEN chain (no wrap-around). With 8
+    // nodes the loop produces 7 segments; bow alternates sign so
+    // adjacent curves bend opposite directions along the horizon.
+    // Draw-in classes apply only on first mount.
+    const bows = [-22, 18, -16, 24, -20, 18, -14];
     let linksMarkup = '';
-    for (let i = 0; i < NODES.length; i++) {
+    for (let i = 0; i < NODES.length - 1; i++) {
       const a = NODES[i];
-      const b = NODES[(i + 1) % NODES.length];
+      const b = NODES[i + 1];
       const d = _pchCurvePath(a, b, bows[i]);
       const dataAttr = ' data-from="' + a.slot + '" data-to="' + b.slot + '"';
       const drawDelay = firstMount ? (1300 + i * 90) : 0;
       const drawClass = firstMount ? ' pch-link--draw' : '';
       const drawStyle = firstMount ? (' style="animation-delay:' + drawDelay + 'ms;"') : '';
-      // Base faint line (draws in on mount, stays solid after)
       linksMarkup += '<path pathLength="1" class="pch-link' + drawClass + '"'
                   +    dataAttr + drawStyle + ' d="' + d + '"/>';
-      // Bright comet overlay (continuous flow)
       const flowDelay = (i * 1300) % 8000;
       linksMarkup += '<path pathLength="1" class="pch-link--flow"'
                   +    dataAttr
                   +    ' style="animation-delay:-' + flowDelay + 'ms;"'
                   +    ' d="' + d + '"/>';
     }
-    linksG.innerHTML = linksMarkup;
+    linksG.innerHTML = microMarkup + linksMarkup;
 
-    // ── Nodes ───────────────────────────────────────────────
-    // For each: halo (colored gradient, larger when hot), star
-    // (cream, larger when hot), label (Bebas cream below), and
-    // an invisible square hit area so taps still register at
-    // the edges of the label. The hot node also emits a ripple.
+    // ── Nodes (world-class rebuild, 2026-06-11) ─────────────
+    // Each star is built from 3 stacked circles (bloom, halo,
+    // core), per-tier radii from MAG_RADII, plus a diffraction
+    // spike pair for bright stars and a companion count badge
+    // when the slot has work pending. Labels are uppercase via
+    // CSS text-transform + paint-order stroke for legibility
+    // over the busy microfield.
     let nodesMarkup = '';
     NODES.forEach(function(n, i){
-      const hot = (i === hotIdx);
-      const haloR = hot ? 26 : 20;
-      const starR = hot ? 4.5 : 3.6;
-      const labelY = n.y + 28;
-      const onclick = 'phNav(\'' + n.slot + '\')';
-      const ariaCt  = (n.count > 0) ? (' (' + n.count + ' pending)') : '';
-      const aria    = n.label + ' destination' + ariaCt;
-      const cls     = 'pch-node'
-                    + (hot ? ' pch-node--hot' : '')
-                    + (firstMount ? ' pch-node--reveal' : '');
-      // Stagger reveal + per-node breathe phase via animation-delay
-      const breatheDelay = '-' + n.phase + 'ms';
-      const styleParts = ['transform-origin:' + n.x + 'px ' + n.y + 'px'];
+      const hot   = (i === hotIdx);
+      const radii = MAG_RADII[n.mag] || MAG_RADII.mid;
+      const labelY = n.labelAbove ? (n.y - 16) : (n.y + 26);
+      const ariaCt = (n.count > 0) ? (' (' + n.count + ' pending)') : '';
+      const aria   = n.label + ' destination' + ariaCt;
+      const cls    = 'pch-node pch-node--mag-' + n.mag
+                   + (hot ? ' pch-node--hot' : '')
+                   + (firstMount ? ' pch-node--reveal' : '');
+
+      // Per-node breathe period from PERIODS table + phase delay
+      // for stagger. CSS reads --pchBreathePeriod for both the
+      // node breathe and the halo opacity pulse.
+      const breathePeriod = PERIODS[i % PERIODS.length];
+      const breatheDelay  = '-' + n.phase + 'ms';
+      const styleParts = [
+        'transform-origin:' + n.x + 'px ' + n.y + 'px',
+        '--pchBreathePeriod:' + breathePeriod + 'ms'
+      ];
       if (firstMount) {
-        // Reveal one-shot delay (compose with breathe delay below).
         const revealDelay = (i * 100);
         styleParts.push('animation-delay:' + revealDelay + 'ms,' + (revealDelay + 600) + 'ms'
           + (hot ? ',0ms' : ''));
       } else {
-        // No reveal — breathe phase only (and hot pulse, no delay).
         styleParts.push('animation-delay:' + breatheDelay + (hot ? ',0ms' : ''));
       }
       const style = ' style="' + styleParts.join(';') + ';"';
 
       let nodeInner = '';
-      // Step 5 (portal skill-compliance pass, 2026-06-09) -- halos
-      // removed per the skill's no-glow-on-interface rule. The hot
-      // node emphasizes via the ripple animation only; non-hot
-      // nodes paint just the star + label.
+
+      // Hot ripple (kept) -- emanating amber ring marks the
+      // attention-needed slot beyond the count badge alone.
       if (hot) {
-        // Ripple ring -- amber accent reserved for the hot node
         nodeInner += '<circle class="pch-node__ripple" cx="' + n.x + '" cy="' + n.y
-                  +     '" r="' + (haloR - 4) + '" fill="none"'
+                  +     '" r="' + (radii.halo + 6) + '" fill="none"'
                   +     ' stroke="#FBBF24" stroke-width="1.2" stroke-opacity=".55"/>';
       }
-      // Star -- cream center, stroke colored by category for
-      // non-hot (cyan/violet cycle), amber for hot
-      const starStroke = hot ? '#FBBF24' : n.color;
-      nodeInner += '<circle class="pch-node__star" cx="' + n.x + '" cy="' + n.y
-                +     '" r="' + starR + '" fill="#F1E9D5" stroke="' + starStroke
-                +     '" stroke-width="0.8"/>';
-      // Label -- sentence case per the skill (no .toUpperCase).
-      // Note: the .pch-node__label CSS still uses Bebas Neue +
-      // letter-spacing in index.html; with most Bebas distributions
-      // (uppercase-only glyph set) this renders the letters as caps
-      // anyway. A follow-up CSS swap to Inter would complete the
-      // visual change; semantically the labels are now sentence
-      // case (screen readers, copy/paste, ARIA).
+
+      // Outer bloom -- soft amber wash that reads as atmospheric
+      // glow around the star. Brighter on the hot node via CSS.
+      nodeInner += '<circle class="pch-node__bloom" cx="' + n.x + '" cy="' + n.y
+                +     '" r="' + radii.bloom + '" fill="#FBBF24" fill-opacity=".11"/>';
+
+      // Halo -- mid-radius amber. Its opacity pulses in sync with
+      // the node's breathe via the .pch-node__halo CSS animation.
+      nodeInner += '<circle class="pch-node__halo" cx="' + n.x + '" cy="' + n.y
+                +     '" r="' + radii.halo + '" fill="#FBBF24" fill-opacity=".45"/>';
+
+      // Core -- warm-white center. The actual "star" itself.
+      nodeInner += '<circle class="pch-node__core" cx="' + n.x + '" cy="' + n.y
+                +     '" r="' + radii.core + '" fill="#FFF7E0"/>';
+
+      // Diffraction spikes -- bright tier only. A horizontal +
+      // vertical line cross at +/-13 units, reading as the
+      // classic four-spike sparkle of the chart's brightest
+      // stars. Each line is styled by .pch-node__spike CSS.
+      if (n.mag === 'bright') {
+        nodeInner += '<line class="pch-node__spike" x1="' + n.x + '" y1="' + (n.y - 13)
+                  +     '" x2="' + n.x + '" y2="' + (n.y + 13) + '"/>';
+        nodeInner += '<line class="pch-node__spike" x1="' + (n.x - 13) + '" y1="' + n.y
+                  +     '" x2="' + (n.x + 13) + '" y2="' + n.y + '"/>';
+      }
+
+      // Companion count badge -- amber dot with the count, sits
+      // at upper-right of the star. Inside the same <g> so it
+      // inherits the tap target + aria. The +4 y-offset on the
+      // text centers vertically inside the r=8 circle without
+      // relying on dominant-baseline (Safari quirk).
+      if (n.count > 0) {
+        nodeInner += '<circle class="pch-node__badge-bg" cx="' + (n.x + 13)
+                  +     '" cy="' + (n.y - 13) + '" r="8" fill="#FBBF24"/>';
+        nodeInner += '<text class="pch-node__badge-text" x="' + (n.x + 13)
+                  +     '" y="' + (n.y - 13 + 4) + '">' + n.count + '</text>';
+      }
+
+      // Label -- uppercase + star-chart letter-spacing via CSS;
+      // the rendered baseline sits at labelY (above or below).
       nodeInner += '<text class="pch-node__label" x="' + n.x + '" y="' + labelY
                 +     '">' + n.label + '</text>';
-      // Invisible hit area (taps near the label still count)
-      nodeInner += '<rect x="' + (n.x - 22) + '" y="' + (n.y - 22)
-                +     '" width="44" height="60" fill="transparent"/>';
+
+      // Invisible hit area -- generous enough that the label
+      // and badge both register as the same tap target.
+      nodeInner += '<rect class="pch-node__hit" x="' + (n.x - 24) + '" y="' + (n.y - 24)
+                +     '" width="48" height="64" fill="transparent"/>';
+
+      // Onclick goes through _pchNodePress so the press flare
+      // class lands ~120ms BEFORE phNav fires -- gives the
+      // visual response without stalling navigation.
+      const onclick = 'window._pchNodePress(this,\'' + n.slot + '\')';
 
       nodesMarkup += '<g class="' + cls + '" tabindex="0" role="button"'
                   +    ' aria-label="' + aria + '"'
