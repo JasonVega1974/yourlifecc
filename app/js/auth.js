@@ -704,6 +704,14 @@ async function hashPin(pin){
 // users keep working. The hash and the legacy plaintext can both live on D
 // or on any profile.data depending on which profile was active when set —
 // scan both. Returns boolean.
+//
+// SPEC 4 (2026-06-12) -- migrate-on-verify: when a candidate verifies
+// against a PLAINTEXT field, immediately hash it, write it to the same
+// record the plaintext came from, clear that record's chorePin/parentPIN,
+// and save(). Transparent, one-time, self-healing across the user base.
+// Failure of the migration write does not block authentication -- the
+// user is already verified, and the migration will retry on the next
+// verify against the same (still-plaintext) record.
 async function verifyParentPin(input){
   const v = String(input || '');
   // Collect candidate hashes from D and from every profile.data.
@@ -719,15 +727,42 @@ async function verifyParentPin(input){
     const h = await hashPin(v);
     return hashes.indexOf(h) !== -1;
   }
-  // Legacy plaintext fallback.
-  let plain = (typeof D !== 'undefined' && D) ? (D.chorePin || D.parentPIN) : '';
+  // Legacy plaintext fallback. Track the source record (D itself, or
+  // a profile's data slot) so the migration step below can write the
+  // new hash + clear the plaintext on the exact record the match
+  // came from.
+  let plain = '';
+  let source = null;
+  if(typeof D !== 'undefined' && D && (D.chorePin || D.parentPIN)){
+    plain = D.chorePin || D.parentPIN;
+    source = D;
+  }
   if(!plain && typeof _profiles !== 'undefined' && _profiles){
     for(let i=0;i<_profiles.length;i++){
       const pd = _profiles[i] && _profiles[i].data;
-      if(pd && (pd.chorePin || pd.parentPIN)){ plain = pd.chorePin || pd.parentPIN; break; }
+      if(pd && (pd.chorePin || pd.parentPIN)){
+        plain = pd.chorePin || pd.parentPIN;
+        source = pd;
+        break;
+      }
     }
   }
-  return !!plain && v === String(plain);
+  if(!plain) return false;
+  if(v !== String(plain)) return false;
+  // Migrate-on-verify: hash, write to source, clear plaintext, persist.
+  try {
+    const h = await hashPin(v);
+    if(source){
+      source.parentPinHash = h;
+      if(source.chorePin)  source.chorePin = '';
+      if(source.parentPIN) source.parentPIN = '';
+    }
+    if(typeof save === 'function') save();
+    // saveProfiles() (parent.js) covers the profile-slot persistence
+    // when source was another profile's data slot, not D itself.
+    if(typeof saveProfiles === 'function') saveProfiles();
+  } catch(_e){ /* migration retries on next verify */ }
+  return true;
 }
 
 // Verify a child profile's PIN. Hash-aware with id-as-PIN fallback for
