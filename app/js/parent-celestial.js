@@ -292,7 +292,7 @@
       { slot:'contests',  label:'Contests',  mag:'dim',
         x: 94, y:212, count: 0,                       phase:  525, labelAbove:false },
       { slot:'activity',  label:'Activity',  mag:'mid',
-        x:164, y:234, count: stats.recentActivities,  phase: 1050, labelAbove:false },
+        x:164, y:234, count: 0,                       phase: 1050, labelAbove:false },
       { slot:'reports',   label:'Reports',   mag:'mid',
         x:224, y:152, count: 0,                       phase: 1575, labelAbove:true  },
       { slot:'family',    label:'Family',    mag:'bright',
