@@ -176,3 +176,6 @@ Five custom agents in `.claude/agents/`:
 - `ux-visual-reviewer` — read-only visual critique vs. premium benchmarks
 - `content-author-faith` — drafts faith content to /content/faith-drafts/ only
 - `competitor-researcher` — web research, writes to /docs/ only
+
+## Visual & UI work
+Before designing, building, or restyling any UI, page, component, SVG, or cinematic scene, read .claude/skills/visual-design/SKILL.md in full and follow it. For any significant visual phase, run the ux-visual-reviewer agent before starting (capture its critique) and again after shipping (verify the work improved against its benchmarks).
