@@ -1198,19 +1198,13 @@
        .cc-orb__core  bright centre point with drop-shadow glow
      Brightness modifiers (--bright / --dim) and focus modifier
      drive glow intensity. Pulses only render on focus. */
+  /* .cc-drift wrapper kept for DOM structure (renderCommandCenter
+     still emits <g class="cc-drift cc-drift--N"> around each orb)
+     but the positional drift animation is RETIRED 2026-06-12 --
+     orbs became tap targets, and a translating tap target works
+     against muscle memory and accessibility. Breathe still lives
+     on the inner .cc-orb / .star-node wrapper. */
   .cc-drift{transform-origin:center;transform-box:fill-box;}
-  .cc-drift--1{animation:cc-drift-1 9s   ease-in-out infinite;}
-  .cc-drift--2{animation:cc-drift-2 11s  ease-in-out infinite;}
-  .cc-drift--3{animation:cc-drift-3 8s   ease-in-out infinite;}
-  .cc-drift--4{animation:cc-drift-4 12s  ease-in-out infinite;}
-  .cc-drift--5{animation:cc-drift-5 10s  ease-in-out infinite;}
-  .cc-drift--6{animation:cc-drift-6 9.5s ease-in-out infinite;}
-  @keyframes cc-drift-1{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(4px,-5px);} }
-  @keyframes cc-drift-2{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(-5px,3px);} }
-  @keyframes cc-drift-3{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(3px,6px);} }
-  @keyframes cc-drift-4{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(-4px,-4px);} }
-  @keyframes cc-drift-5{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(5px,2px);} }
-  @keyframes cc-drift-6{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(-3px,-6px);} }
 
   /* Orbs are fully visible on the first frame — the resting state.
      Ambient life comes from .cc-orb__halo (cc-orb-breath) and the
