@@ -12,7 +12,7 @@ import time
 import urllib.parse
 import urllib.request
 
-UA = "YourLifeCC/1.0 (Pass E photo resolver; jasonvega1974@gmail.com)"
+UA = "YourLifeCC/1.0 (Pass E photo resolver; info@kingdom-creatives.com)"
 API = "https://en.wikipedia.org/w/api.php"
 
 # Re-use the master BAD_TOKENS list. Keep in sync with curate_card_photos.py

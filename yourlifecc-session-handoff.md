@@ -16,7 +16,7 @@ YourLife CC (`https://yourlifecc.com`) — a faith-driven family life-skills app
 
 **Two account tiers (important for the home screen):**
 - `jason.vega07@yahoo.com` = the FULL app (`faith_only = false`).
-- `jasonvega1974@gmail.com` = FAITH-ONLY (`faith_only = true`).
+- (faith-only test account) = FAITH-ONLY (`faith_only = true`).
 
 ---
 

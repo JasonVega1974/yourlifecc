@@ -6,7 +6,7 @@ a clean 200."""
 import time
 import urllib.request
 
-UA = "YourLifeCC/1.0 (Phase 5.6 retry; jasonvega1974@gmail.com)"
+UA = "YourLifeCC/1.0 (Phase 5.6 retry; info@kingdom-creatives.com)"
 
 URLS = {
     "shechem":  "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Tell_Balata.jpg/1280px-Tell_Balata.jpg",

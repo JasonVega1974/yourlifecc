@@ -5,7 +5,7 @@ import time
 import urllib.parse
 import urllib.request
 
-UA = "YourLifeCC/1.0 (Phase 5.8 retry; jasonvega1974@gmail.com)"
+UA = "YourLifeCC/1.0 (Phase 5.8 retry; info@kingdom-creatives.com)"
 API = "https://en.wikipedia.org/w/api.php"
 
 # Better candidates for the cards that failed or had weak leads

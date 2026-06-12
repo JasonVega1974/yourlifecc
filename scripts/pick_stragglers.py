@@ -18,7 +18,7 @@ import time
 import urllib.parse
 import urllib.request
 
-UA = "YourLifeCC/1.0 (Phase 5.8 v2 straggler picker; jasonvega1974@gmail.com)"
+UA = "YourLifeCC/1.0 (Phase 5.8 v2 straggler picker; info@kingdom-creatives.com)"
 API = "https://en.wikipedia.org/w/api.php"
 
 # Re-use the master BAD_TOKENS list. Keep in sync with curate_card_photos.py

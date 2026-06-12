@@ -7,7 +7,7 @@
 
 ## CONTEXT
 
-The full YourLife app (`yourlifecc.com`, account `jason.vega07@yahoo.com`, tier `faith_only = false`) currently lands on the **Well** hero ("Enter the Well") when the app opens. That is the **faith-only** experience and is correct for faith-only accounts (e.g. `jasonvega1974@gmail.com`) — but it is **wrong as the home for the full app**.
+The full YourLife app (`yourlifecc.com`, account `jason.vega07@yahoo.com`, tier `faith_only = false`) currently lands on the **Well** hero ("Enter the Well") when the app opens. That is the **faith-only** experience and is correct for faith-only accounts (`faith_only = true`) — but it is **wrong as the home for the full app**.
 
 The full app needs its **own animated home: "YourLife Command Center"** — the same production quality and polish as the Well's animated hero, but a completely distinct, non-faith identity.
 

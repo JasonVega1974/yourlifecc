@@ -12,7 +12,7 @@ import time
 import urllib.parse
 import urllib.request
 
-UA = "YourLifeCC/1.0 (Pass E replacements; jasonvega1974@gmail.com)"
+UA = "YourLifeCC/1.0 (Pass E replacements; info@kingdom-creatives.com)"
 API = "https://en.wikipedia.org/w/api.php"
 
 BAD_TOKENS = [

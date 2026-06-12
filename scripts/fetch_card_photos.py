@@ -16,7 +16,7 @@ import time
 import urllib.parse
 import urllib.request
 
-UA = "YourLifeCC/1.0 (Phase 5.8 card-photo helper; jasonvega1974@gmail.com)"
+UA = "YourLifeCC/1.0 (Phase 5.8 card-photo helper; info@kingdom-creatives.com)"
 API = "https://en.wikipedia.org/w/api.php"
 
 # Each entry: (card_id, [candidate_titles])

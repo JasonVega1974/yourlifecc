@@ -56,7 +56,7 @@ SITES = [
     ("patmos",           "Patmos"),
 ]
 
-UA = "YourLifeCC/1.0 (Phase 5.6 site-photo helper; jasonvega1974@gmail.com)"
+UA = "YourLifeCC/1.0 (Phase 5.6 site-photo helper; info@kingdom-creatives.com)"
 API = "https://en.wikipedia.org/w/api.php"
 
 

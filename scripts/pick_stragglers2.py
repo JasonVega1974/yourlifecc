@@ -13,7 +13,7 @@ import time
 import urllib.parse
 import urllib.request
 
-UA = "YourLifeCC/1.0 (Phase 5.8 straggler picker v2; jasonvega1974@gmail.com)"
+UA = "YourLifeCC/1.0 (Phase 5.8 straggler picker v2; info@kingdom-creatives.com)"
 COMMONS_API = "https://commons.wikimedia.org/w/api.php"
 EN_API = "https://en.wikipedia.org/w/api.php"
 

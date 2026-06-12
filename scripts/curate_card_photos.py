@@ -39,7 +39,7 @@ import time
 import urllib.parse
 import urllib.request
 
-UA = "YourLifeCC/1.0 (Phase 5.8 v2 curated-photo helper; jasonvega1974@gmail.com)"
+UA = "YourLifeCC/1.0 (Phase 5.8 v2 curated-photo helper; info@kingdom-creatives.com)"
 API = "https://en.wikipedia.org/w/api.php"
 
 # Filename tokens that almost always mean "painting / drawing / map /
