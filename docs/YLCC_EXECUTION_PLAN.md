@@ -148,6 +148,15 @@ largest-first, 3–5 per commit.
 ```
 **Accept:** initial JS payload drops by the pilot file's size; section works identically.
 
+## SPEC 7b — lazy-data batch (follow-up from SPEC 7 pilot) · sessions of 3-5 files · [SW bump each]
+Pilot proven on bible-timeline.js (6c5e34e, v346). Batch the remaining data/*.js largest-first
+in difficulty tiers: TIER 1 (clean repeats — window.X export, single section-open consumer,
+zero boot readers; e.g. academy-lessons.js) — stamp the _EnsureLoaded gate pattern, 3-5 per
+commit. TIER 2 (needs refactor first, ONE file per session): proof-prophecy.js (bare-identifier
+consumers must move to window.X accessors), plans.js (boot-time caller must be deferred or
+that file stays eager). Every file gets the SPEC 7 grep gate: list ALL consumers before
+converting; any boot-time reader disqualifies until refactored.
+
 ## SPEC 8 — Sync stomp-guard (P2-1.1) · 1–2 days · **[SW bump]**
 ```
 File: app/js/sync.js (+ a lastLoadedAt stamp wherever cloudLoad stores state).
