@@ -481,11 +481,23 @@
       var period   = _CC_PERIODS[i % _CC_PERIODS.length];
       var orbStyle = 'color:'+tile.accent+';transform-origin:'+n.cx+'px '+n.cy+'px;--starBreathePeriod:'+period+'ms;';
 
+      // Invisible hit target -- 48x48 centered on the orb. Every
+      // star sub-element (bloom/halo/core/spike/badge/label) is
+      // pointer-events:none so without this rect the tap would
+      // pass through. data-dest on the wrapper hooks the same
+      // delegated [data-dest] listener that catches tiles, so
+      // orbs and tiles route through one code path. tabindex="-1"
+      // keeps the orb out of the Tab order (the tile button below
+      // is the keyboard-accessible target for the same destination);
+      // aria-hidden lets screen readers skip the duplicate.
+      var hit = '<rect class="cc-orb__hit" x="'+(n.cx-24)+'" y="'+(n.cy-24)+'" width="48" height="48" fill="transparent"/>';
+
       return ''
         + '<g class="cc-drift cc-drift--'+(i+1)+'">'
-        +   '<g class="'+classes+'" data-key="'+tile.key+'" style="'+orbStyle+'">'
+        +   '<g class="'+classes+'" data-key="'+tile.key+'" data-dest="'+tile.key+'" tabindex="-1" aria-hidden="true" style="'+orbStyle+'">'
         +     pulses
         +     starSvg
+        +     hit
         +     '<text class="cc-node__label" x="'+n.cx+'" y="'+n.labelY+'" text-anchor="middle">'+_ccEsc(tile.label)+'</text>'
         +     subLine
         +   '</g>'
@@ -603,14 +615,26 @@
       +   '</section>'
       + '</main>';
 
-    // Wire tile clicks (event delegation — single listener)
+    // Wire destination clicks (event delegation — single listener).
+    // Catches BOTH tile buttons in .cc-tiles AND orb wrappers in
+    // .cc-nodes (both carry data-dest since 2026-06-12). Each click
+    // routes through window.ckPressNode so the .star-node--flare
+    // class triggers a 220ms scale(1.35) flash before ccOpenDest
+    // fires -- the same press feedback the parent constellation
+    // uses, applied uniformly to all 7 child destinations.
     if (!root.__ccWired){
       root.__ccWired = true;
       root.addEventListener('click', function(e){
         var btn = e.target.closest && e.target.closest('[data-dest]');
         if (!btn) return;
         var dest = btn.getAttribute('data-dest');
-        if (typeof window.ccOpenDest === 'function') window.ccOpenDest(dest);
+        if (typeof window.ckPressNode === 'function') {
+          window.ckPressNode(btn, function(){
+            if (typeof window.ccOpenDest === 'function') window.ccOpenDest(dest);
+          });
+        } else if (typeof window.ccOpenDest === 'function') {
+          window.ccOpenDest(dest);
+        }
       });
     }
   }
