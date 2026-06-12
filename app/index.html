@@ -20205,27 +20205,27 @@
 
 
 <!-- Core: must load first -->
-<script src="/app/js/config.js"></script>
-<script src="/app/js/data.js"></script>
-<script src="/app/js/sync.js"></script>
+<script defer src="/app/js/config.js"></script>
+<script defer src="/app/js/data.js"></script>
+<script defer src="/app/js/sync.js"></script>
 <!-- FAF Inc 1 — unified activity-log writer + back-compat shim for
      logActivity(). Must load after sync.js (needs save()) and before
      any module that calls logActivity()/logFamilyActivity(). -->
-<script src="/app/js/activity-log.js"></script>
-<script src="/app/js/auth.js"></script>
+<script defer src="/app/js/activity-log.js"></script>
+<script defer src="/app/js/auth.js"></script>
 
 <!-- UI & Navigation -->
-<script src="/app/js/ui.js"></script>
+<script defer src="/app/js/ui.js"></script>
 
 <!-- Shared modal save/share helper (YLM) — used by Proof & Prophecy and any other modal with save/share buttons. Depends on showToast (ui.js); _ylccUserKey resolved lazily so it can load before init.js. -->
-<script src="/app/js/modal-actions.js"></script>
+<script defer src="/app/js/modal-actions.js"></script>
 
 <!-- Feature modules -->
-<script src="/app/js/finance.js"></script>
-<script src="/app/js/school.js"></script>
-<script src="/app/js/health.js"></script>
-<script src="/app/js/goals.js"></script>
-<script src="/app/js/skills.js"></script>
+<script defer src="/app/js/finance.js"></script>
+<script defer src="/app/js/school.js"></script>
+<script defer src="/app/js/health.js"></script>
+<script defer src="/app/js/goals.js"></script>
+<script defer src="/app/js/skills.js"></script>
 <!-- Tab 1 Inc 5 Step D — SortableJS for chore kanban drag-drop.
      Defer keeps the parser flowing; chores.js checks `typeof Sortable`
      before instantiating so the kanban degrades to a static list if
@@ -20233,55 +20233,55 @@
      activates the pointer-based fallback so touch works on iOS/Android
      PWA — HTML5 native DnD is unreliable on touch. -->
 <script defer src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
-<script src="/app/js/chores.js"></script>
-<script src="/app/js/sports.js"></script>
-<script src="/app/js/habits.js"></script>
-<script src="/app/js/data/plans.js"></script>
-<script src="/app/js/data/memory-verses.js"></script>
+<script defer src="/app/js/chores.js"></script>
+<script defer src="/app/js/sports.js"></script>
+<script defer src="/app/js/habits.js"></script>
+<script defer src="/app/js/data/plans.js"></script>
+<script defer src="/app/js/data/memory-verses.js"></script>
 <!-- Tab 2 Inc 4 — Money / Learn lesson content. Loads with the
      other data/*.js entries (group 7 per the script-load order in
      CLAUDE.md). finance.js's renderer only references MONEY_LESSONS
      inside function bodies that fire on user interaction, so the
      "data loads after feature modules" ordering is safe. -->
-<script src="/app/js/data/money-lessons.js"></script>
+<script defer src="/app/js/data/money-lessons.js"></script>
 <!-- Tab 1 Chores / Inc 5 Step A-2 — Seasonal chore-pack catalog.
      Same load group as money-lessons.js: feature-tab data modules
      that loader-side renderers reference inside event handlers, so
      it's safe for the data file to follow the feature module
      (chores.js) in the script order. Read by addChorePack() in
      chores.js + the Parent Hub pack renderer in parent.js. -->
-<script src="/app/js/data/chore-packs.js"></script>
-<script src="/app/js/data/academy.js"></script>
-<script src="/app/js/data/academy-lessons.js"></script>
-<script src="/app/js/data/biblical-sites.js"></script>
-<script src="/app/js/data/biblical-discoveries.js"></script>
-<script src="/app/js/data/biblical-routes.js"></script>
-<script src="/app/js/data/bible-timeline.js"></script>
-<script src="/app/js/data/biblical-infographics.js"></script>
-<script src="/app/js/data/bible-stories.js"></script>
-<script src="/app/js/data/bible-flashcards.js"></script>
-<script src="/app/js/data/prayer-content.js"></script>
-<script src="/app/js/data/quick-prayers.js"></script>
-<script src="/app/js/data/proof-prophecy.js"></script>
-<script src="/app/js/data/jesus-data.js"></script>
-<script src="/app/js/data/denominations.js"></script>
-<script src="/app/js/data/podcasts.js"></script>
-<script src="/app/js/data/reading-plans.js"></script>
-<script src="/app/js/data/audio-content.js"></script>
+<script defer src="/app/js/data/chore-packs.js"></script>
+<script defer src="/app/js/data/academy.js"></script>
+<script defer src="/app/js/data/academy-lessons.js"></script>
+<script defer src="/app/js/data/biblical-sites.js"></script>
+<script defer src="/app/js/data/biblical-discoveries.js"></script>
+<script defer src="/app/js/data/biblical-routes.js"></script>
+<script defer src="/app/js/data/bible-timeline.js"></script>
+<script defer src="/app/js/data/biblical-infographics.js"></script>
+<script defer src="/app/js/data/bible-stories.js"></script>
+<script defer src="/app/js/data/bible-flashcards.js"></script>
+<script defer src="/app/js/data/prayer-content.js"></script>
+<script defer src="/app/js/data/quick-prayers.js"></script>
+<script defer src="/app/js/data/proof-prophecy.js"></script>
+<script defer src="/app/js/data/jesus-data.js"></script>
+<script defer src="/app/js/data/denominations.js"></script>
+<script defer src="/app/js/data/podcasts.js"></script>
+<script defer src="/app/js/data/reading-plans.js"></script>
+<script defer src="/app/js/data/audio-content.js"></script>
 <!-- Leaflet (F3-B) — open-source map library, MIT-licensed. Only loads when used. -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script src="/app/js/bible-study-data.js"></script>
-<script src="/app/js/faith.js"></script>
+<script defer src="/app/js/bible-study-data.js"></script>
+<script defer src="/app/js/faith.js"></script>
 <!-- FAF Inc 3 — unified family activity feed kernel. Must load
      BEFORE parent.js so the legacy renderParentActivityAudit /
      renderParentActivityFeed wrappers can delegate directly to
      renderFamilyActivityFeed without typeof checks. -->
-<script src="/app/js/family-feed.js"></script>
-<script src="/app/js/quick-prayers.js"></script>
-<script src="/app/js/worship.js"></script>
-<script src="/app/js/faith-resources.js"></script>
-<script src="/app/js/parent.js"></script>
+<script defer src="/app/js/family-feed.js"></script>
+<script defer src="/app/js/quick-prayers.js"></script>
+<script defer src="/app/js/worship.js"></script>
+<script defer src="/app/js/faith-resources.js"></script>
+<script defer src="/app/js/parent.js"></script>
 <!-- Part B Phase 3 — Parent Celestial Home renderer. Defines
      window.renderParentCelestialHome which renderParentHubHome()
      in parent.js calls at the end of its body. Must load AFTER
@@ -20292,35 +20292,35 @@
      parent-celestial.js and command-center.js so both surfaces see
      window.ckBuildStar / ckCurvePath / ckBuildMicrofield / ckPressNode
      / ckMagRadii. Pure helper module, no DOM coupling. -->
-<script src="/app/js/constellation-kit.js"></script>
-<script src="/app/js/parent-celestial.js"></script>
+<script defer src="/app/js/constellation-kit.js"></script>
+<script defer src="/app/js/parent-celestial.js"></script>
 <!-- The Watch — W1 (2026-06-08). Cinematic sky canvas painter
      for #parentCelestialHome. Exposes window.renderParentWatchScene
      which parent-celestial.js calls at the top of
      renderParentCelestialHome(). Idempotent mount; no auto-start. -->
-<script src="/app/js/parent-watch-scene.js"></script>
-<script src="/app/js/email.js"></script>
-<script src="/app/js/misc.js"></script>
-<script src="/app/js/resume.js"></script>
+<script defer src="/app/js/parent-watch-scene.js"></script>
+<script defer src="/app/js/email.js"></script>
+<script defer src="/app/js/misc.js"></script>
+<script defer src="/app/js/resume.js"></script>
 
 <!-- F4-C — Global celebration overlay (fed by playFx() in faith.js).
      Pointer-events:none so it never blocks interactions. -->
 <div id="fxOverlay" aria-hidden="true"></div>
 
 <!-- Phase 1A — Streaks Engine (cloud-persisted, wraps faith completion fns) -->
-<script src="/app/js/streaks.js"></script>
+<script defer src="/app/js/streaks.js"></script>
 
 <!-- V1 Rebuild · Session 1 — Daily Briefing card render module. Must load
      after streaks.js (uses getScriptureStreak) and before init.js (which
      calls renderDailyBriefing during finishInit). -->
-<script src="/app/js/daily-briefing.js"></script>
+<script defer src="/app/js/daily-briefing.js"></script>
 
 <!-- 2026-06-04 — Command Center home (Constellation concept).
      Renders into #appCommandCenter for non-faith-free, non-parent-view
      accounts. Loaded BEFORE app-home.js so the chooser inside
      maybeRenderAppHome() can detect window.renderCommandCenter and
      route to it. Faith Well experience untouched. -->
-<script src="/app/js/command-center.js"></script>
+<script defer src="/app/js/command-center.js"></script>
 
 <!-- 2026-05-30 — Main App Home simplification. Greeting + 6 destination
      buttons. Routes via showSection() to the existing top-level sections
@@ -20328,7 +20328,7 @@
      Loads after daily-briefing.js so its DOM target is in place.
      2026-06-04 — Chooser now routes to Command Center first; this
      surface stays as fallback (window._ccDisabled rollback). -->
-<script src="/app/js/app-home.js"></script>
+<script defer src="/app/js/app-home.js"></script>
 
 <!-- V1 Rebuild · Faith Tab redesign — Zone 1/2/3 data + render module.
      Data file must load before faith-zones.js (consumes the globals).
@@ -20336,8 +20336,8 @@
      PROOF_PROPHECY_DATA, ppOpenModal, bfTab, showToast. -->
 <!-- V1 Rebuild · Heart Check (2026-05-30) — 12 emotion entries with
      verse + prayer + action. Pure data; read by faith-zones.js. -->
-<script src="/app/js/data/heart-check-data.js"></script>
-<script src="/app/js/data/faith-zones-data.js"></script>
+<script defer src="/app/js/data/heart-check-data.js"></script>
+<script defer src="/app/js/data/faith-zones-data.js"></script>
 <!-- V1 Rebuild · Session 4 — Pure fun engine. 10 celebration helpers
      exposed on window (megaConfetti / screenFlash / traitExplosion /
      realLifeWinCelebration / convinceMeFlipEffect /
@@ -20345,22 +20345,22 @@
      maybeShowDidYouKnow / dailyThreeComplete / streakMilestoneBanner
      / prayerDove). Loads BEFORE traits.js + faith-zones.js +
      daily-briefing.js — all three consume celebration globals. -->
-<script src="/app/js/celebrations.js"></script>
+<script defer src="/app/js/celebrations.js"></script>
 <!-- V1 Rebuild · Session 3 — Identity Traits engine. Must load
      BEFORE faith-zones.js so awardTrait + renderGrowthCompact are
      defined when the zone renderers call them. -->
-<script src="/app/js/traits.js"></script>
+<script defer src="/app/js/traits.js"></script>
 <!-- "Pray this" focus mode — shared full-screen overlay. Depends on
      prayerDove (celebrations.js) and awardTrait (traits.js) and is
      called by quick-prayers.js card actions; load after both. -->
-<script src="/app/js/prayer-focus.js"></script>
-<script src="/app/js/faith-zones.js"></script>
+<script defer src="/app/js/prayer-focus.js"></script>
+<script defer src="/app/js/faith-zones.js"></script>
 
 <!-- App bootstrap: must load last -->
-<script src="/app/js/init.js"></script>
+<script defer src="/app/js/init.js"></script>
 
 <!-- PWA install prompt — self-contained IIFE, safe after init -->
-<script src="/app/js/pwa.js"></script>
+<script defer src="/app/js/pwa.js"></script>
 
 <!-- Google Translate widget loader — required for language picker -->
 <script src="//translate.googleapis.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
@@ -20704,15 +20704,31 @@ function renderParentNotifications(){
   }).join('');
 }
 
-// Hook into applyName so it fires on every name/profile update
-var _origApplyName = typeof applyName === 'function' ? applyName : null;
-if (_origApplyName) {
-  applyName = function() {
-    _origApplyName();
-    applyHeroViewMode();
-    if(typeof applySoloMode === 'function') applySoloMode();
-  };
-}
+// Hook into applyName so it fires on every name/profile update.
+// 2026-06-12 (SPEC 3): wrapped in DOMContentLoaded so the module
+// globals (applyName, refreshDashForCurrentChild) exist by the time
+// these monkey-patches run -- module scripts are now deferred, so
+// this inline block executes at parse time BEFORE modules have run.
+// Without the wrap, _origApplyName and _origRefresh resolve to null
+// and the hooks never install.
+document.addEventListener('DOMContentLoaded', function() {
+  var _origApplyName = typeof applyName === 'function' ? applyName : null;
+  if (_origApplyName) {
+    applyName = function() {
+      _origApplyName();
+      applyHeroViewMode();
+      if(typeof applySoloMode === 'function') applySoloMode();
+    };
+  }
+
+  var _origRefresh = typeof refreshDashForCurrentChild === 'function' ? refreshDashForCurrentChild : null;
+  if (_origRefresh) {
+    refreshDashForCurrentChild = function() {
+      _origRefresh();
+      applyHeroViewMode();
+    };
+  }
+});
 
 // Also fire on load and after child login
 document.addEventListener('DOMContentLoaded', function() {
@@ -20721,15 +20737,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if(typeof applySoloMode === 'function') applySoloMode();
   }, 300);
 });
-
-// Hook into refreshDashForCurrentChild
-var _origRefresh = typeof refreshDashForCurrentChild === 'function' ? refreshDashForCurrentChild : null;
-if (_origRefresh) {
-  refreshDashForCurrentChild = function() {
-    _origRefresh();
-    applyHeroViewMode();
-  };
-}
 </script>
 
 <!-- Service Worker registration with auto-update on new deploy -->
