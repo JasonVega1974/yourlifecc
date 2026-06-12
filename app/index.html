@@ -16510,16 +16510,6 @@
                       <stop offset="100%" stop-color="#06B6D4" stop-opacity="0"/>
                     </radialGradient>
 
-                    <!-- Per-node halo gradients REMOVED in Polish B
-                         (2026-06-09). The six pchHalo* radialGradients
-                         became dead code after Step 5 reduced the
-                         constellation palette to three colors and
-                         removed the halo paint entirely. Hot node
-                         emphasis now comes from the ripple animation
-                         and amber star stroke alone; non-hot nodes
-                         paint a cream star with a thin cyan/violet
-                         category stroke. No <defs> for halos needed. -->
-
                     <!-- Shooting-star trail -- bright cream center fading
                          to transparent at both ends. -->
                     <linearGradient id="pchShootGrad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -16583,44 +16573,6 @@
                   <g class="pch-nodes" id="pchNodes"></g>
                   <g class="pch-shoot-layer" id="pchShootingStars" aria-hidden="true"></g>
                 </svg>
-              </section>
-
-              <!-- Jump in destinations. Tiles are disabled placeholders in
-                   Phase 2; Phase 3 enables them and wires phNav() routing. -->
-              <section aria-label="Parent destinations">
-                <h2 class="pch-section-label">Jump in</h2>
-                <div class="pch-tiles" id="pchTiles">
-                  <button class="pch-tile" type="button" id="pchTileChores" disabled>
-                    <span class="pch-tile__icon" aria-hidden="true">📋</span>
-                    <span class="pch-tile__title">Chores oversight</span>
-                    <span class="pch-tile__meta"></span>
-                  </button>
-                  <button class="pch-tile" type="button" id="pchTileRewards" disabled>
-                    <span class="pch-tile__icon" aria-hidden="true">🎁</span>
-                    <span class="pch-tile__title">Rewards &amp; contests</span>
-                    <span class="pch-tile__meta"></span>
-                  </button>
-                  <button class="pch-tile" type="button" id="pchTileActivity" disabled>
-                    <span class="pch-tile__icon" aria-hidden="true">📊</span>
-                    <span class="pch-tile__title">Activity feed</span>
-                    <span class="pch-tile__meta"></span>
-                  </button>
-                  <button class="pch-tile" type="button" id="pchTileReports" disabled>
-                    <span class="pch-tile__icon" aria-hidden="true">📈</span>
-                    <span class="pch-tile__title">Reports &amp; progress</span>
-                    <span class="pch-tile__meta"></span>
-                  </button>
-                  <button class="pch-tile" type="button" id="pchTileFamily" disabled>
-                    <span class="pch-tile__icon" aria-hidden="true">👨‍👩‍👧</span>
-                    <span class="pch-tile__title">Family &amp; profiles</span>
-                    <span class="pch-tile__meta"></span>
-                  </button>
-                  <button class="pch-tile" type="button" id="pchTileSettings" disabled>
-                    <span class="pch-tile__icon" aria-hidden="true">⚙️</span>
-                    <span class="pch-tile__title">Settings &amp; controls</span>
-                    <span class="pch-tile__meta"></span>
-                  </button>
-                </div>
               </section>
 
               <!-- Faith card. Hidden by default; Phase 3 unhides when

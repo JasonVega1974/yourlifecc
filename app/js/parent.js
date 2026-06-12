@@ -2975,14 +2975,14 @@ function renderPhCardGrid(){
   })();
 
   const cards = [
-    {slot:'chores',    icon:'✅',     label:'Chores & Approvals',     sub:'Verify · assign · history',         badge: pendTotal       > 0 ? pendTotal + ' pending'       : ''},
-    {slot:'rewards',   icon:'🪙',     label:'Rewards Store & Bucks',  sub:'Award · deduct · store',            badge: pbBal           > 0 ? pbBal + ' PB balance'        : ''},
+    {slot:'chores',    icon:'✅',     label:'Chores',                 sub:'Verify · assign · history',         badge: pendTotal       > 0 ? pendTotal + ' pending'       : ''},
+    {slot:'rewards',   icon:'🪙',     label:'Rewards',                sub:'Award · deduct · store',            badge: pbBal           > 0 ? pbBal + ' PB balance'        : ''},
     {slot:'allowance', icon:'💵',     label:'Allowance',              sub:'Recurring credit · per kid',        badge: allowanceActive > 0 ? allowanceActive + ' active'   : ''},
-    {slot:'contests',  icon:'🏆',     label:'Contests & Family Goals',sub:'Leaderboard · MVP · contests',      badge: contestsActive  > 0 ? contestsActive + ' active'   : ''},
-    {slot:'activity',  icon:'📅',     label:'Activity & Schedule',    sub:'Schedule · log · behavior',         badge: activityToday   > 0 ? activityToday + ' today'     : ''},
-    {slot:'reports',   icon:'📈',     label:'Reports & Progress',     sub:'AI summaries · quizzes · faith',    badge: ''},
-    {slot:'family',    icon:'👨‍👩‍👧',label:'Family & Profiles',      sub:'Kids · learning · refer',           badge: childCount      > 0 ? childCount + ' kid' + (childCount>1?'s':'') : ''},
-    {slot:'controls',  icon:'⚙️',    label:'Controls & Limits',      sub:'Screen · earnings · access',        badge: ''}
+    {slot:'contests',  icon:'🏆',     label:'Contests',               sub:'Leaderboard · MVP · contests',      badge: contestsActive  > 0 ? contestsActive + ' active'   : ''},
+    {slot:'activity',  icon:'📅',     label:'Activity',               sub:'Schedule · log · behavior',         badge: activityToday   > 0 ? activityToday + ' today'     : ''},
+    {slot:'reports',   icon:'📈',     label:'Reports',                sub:'AI summaries · quizzes · faith',    badge: ''},
+    {slot:'family',    icon:'👨‍👩‍👧',label:'Family',                 sub:'Kids · learning · refer',           badge: childCount      > 0 ? childCount + ' kid' + (childCount>1?'s':'') : ''},
+    {slot:'controls',  icon:'⚙️',    label:'Controls',               sub:'Screen · earnings · access',        badge: ''}
   ];
 
   const esc = (typeof _phEscape === 'function') ? _phEscape : function(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); };

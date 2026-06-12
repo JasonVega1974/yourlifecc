@@ -720,41 +720,6 @@
     _pchAttachKeyboardBridge(host);
     _pchScheduleShootingStars(host);
 
-    // Tile counts — mirror what renderPhCardGrid surfaces so
-    // numbers don't disagree between the celestial home and
-    // the launcher grid below it.
-    const kidCount = _pchKidProfiles().length;
-    const todayISO = new Date().toISOString().slice(0,10);
-
-    const contestsActive = (typeof D === 'object' && D && Array.isArray(D.customContests))
-      ? D.customContests.filter(function(c){
-          return c && !c.endedAt && (!c.deadline || c.deadline >= todayISO);
-        }).length
-      : 0;
-
-    let activityToday = 0;
-    const kidSources = kidCount > 0
-      ? _pchKidProfiles().map(_pchKidData)
-      : [(typeof D === 'object' && D) ? D : {}];
-    kidSources.forEach(function(data){
-      if (!data) return;
-      const cl = Array.isArray(data.choreLog)    ? data.choreLog    : [];
-      const bl = Array.isArray(data.behaviorLog) ? data.behaviorLog : [];
-      activityToday += cl.filter(function(l){ return l && (l.date||'') === todayISO; }).length;
-      activityToday += bl.filter(function(l){ return l && (l.date||'').slice(0,10) === todayISO; }).length;
-    });
-
-    _pchWireTile('pchTileChores',   'chores',
-                 stats.choresPending > 0 ? (stats.choresPending + ' pending') : '');
-    _pchWireTile('pchTileRewards',  'contests',
-                 contestsActive > 0 ? (contestsActive + ' active') : '');
-    _pchWireTile('pchTileActivity', 'activity',
-                 activityToday > 0 ? (activityToday + ' today') : '');
-    _pchWireTile('pchTileReports',  'reports', '');
-    _pchWireTile('pchTileFamily',   'family',
-                 kidCount > 0 ? (kidCount + ' kid' + (kidCount > 1 ? 's' : '')) : '');
-    _pchWireTile('pchTileSettings', 'controls', '');
-
     // Faith card
     const fc = document.getElementById('pchFaithCard');
     const fv = document.getElementById('pchFaithVerse');
