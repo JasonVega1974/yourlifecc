@@ -2190,6 +2190,26 @@ body{top:0!important;}
 :root.light #clChildName { color: #0f172a !important; }
 :root.light [style*="color:rgba(255,255,255,.45)"] { color: #64748b !important; }
 
+/* ── PIN pad legibility — light mode (v344) ─────────────────────────────
+   #pinModal/#childLoginScreen ship dark indigo gradients inline. Keypad
+   text was already darkened in light mode, but #pinModal's surface
+   override was missing -> dark digits on dark surface = invisible. Also
+   patches inline white text/dots not matched by existing selectors. */
+:root.light #pinModal{
+  background:linear-gradient(135deg,#f8fafc,#e2e8f0,#cbd5e1) !important;
+}
+:root.light .pin-dot{ border-color:rgba(15,23,42,.3) !important; }
+:root.light .pin-dot.filled{ background:#92400e !important; border-color:#92400e !important; }
+:root.light #pinModal button[onclick="_pinCancel()"]{
+  background:rgba(15,23,42,.06) !important;
+  border-color:rgba(15,23,42,.12) !important;
+  color:#4a4b52 !important;
+}
+/* childLoginScreen — inline white text the existing #childLoginModal
+   selector at the catch-all block silently misses (ID mismatch). */
+:root.light #childLoginScreen [style*="color:#fff"]:not(button){ color:#0f172a !important; }
+:root.light #childLoginScreen [style*="color:rgba(255,255,255,.3)"]{ color:#4a4b52 !important; }
+
 /* Toolbar buttons (resume editor) — white on white issue */
 :root.light .rtb {
   background: rgba(0,0,0,.05);
