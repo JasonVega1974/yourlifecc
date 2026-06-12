@@ -14,7 +14,6 @@ const ALLOWED_ORIGINS = new Set([
 ]);
 
 const RECIPIENTS = [
-  { email: 'jasonvega1974@gmail.com',     name: 'Jason Vega' },
   { email: 'info@kingdom-creatives.com',  name: 'Kingdom Creatives' }
 ];
 
