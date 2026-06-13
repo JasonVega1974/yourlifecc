@@ -107,6 +107,28 @@
              badgesToday: badgesToday, recentActivities: recentActivities };
   }
 
+  // ── WC-2b-i — family XP today (household pulse for the ring) ─
+  // Sum each kid's xpToday and dailyGoal across the same per-kid
+  // sources _pchAggregateStats uses. Rollover-correct: a kid's
+  // xpToday only counts if their xpDayKey is today, so an inactive
+  // kid whose data was last saved yesterday contributes 0 (not a
+  // stale figure). Degrades to a single-kid ring for one-child
+  // families (sources === [D]).
+  function _pchFamilyXp(){
+    const todayISO = new Date().toISOString().slice(0,10);
+    const kids = _pchKidProfiles();
+    const sources = kids.length > 0
+      ? kids.map(_pchKidData)
+      : [(typeof D === 'object' && D) ? D : {}];
+    let today = 0, goal = 0;
+    sources.forEach(function(data){
+      if (!data || typeof data !== 'object') return;
+      if (data.xpDayKey === todayISO) today += (+data.xpToday || 0);
+      goal += (+data.dailyGoal > 0) ? +data.dailyGoal : 25;
+    });
+    return { today: today, goal: goal };
+  }
+
   // ── Verse rotation ────────────────────────────────────────
   function _pchPickVerse(){
     const lib = (typeof MEMORY_VERSE_LIBRARY !== 'undefined' && Array.isArray(MEMORY_VERSE_LIBRARY))
@@ -696,6 +718,26 @@
     set('pchStatGoals',    stats.goalsInProgress);
     set('pchStatBadges',   stats.badgesToday);
     set('pchStatActivity', stats.recentActivities);
+
+    // WC-2b-i — family XP ring. Same geometry as the child ring
+    // (r=26 → circumference ~163.4; arc from 12 o'clock via the
+    // markup's -90deg rotation). Hydrate number, arc, met-state.
+    const fam = _pchFamilyXp();
+    const ringMet = fam.goal > 0 && fam.today >= fam.goal;
+    const ringPct = fam.goal > 0 ? Math.min(100, (fam.today / fam.goal) * 100) : 0;
+    set('pchXpRingNum', fam.today);
+    const ringFill = document.getElementById('pchXpRingFill');
+    if (ringFill) {
+      const C = 2 * Math.PI * 26;
+      ringFill.setAttribute('stroke-dashoffset', (C * (1 - ringPct / 100)).toFixed(1));
+    }
+    const ringWrap = document.getElementById('pchXpRing');
+    if (ringWrap) {
+      ringWrap.classList.toggle('pch-xpring--met', ringMet);
+      ringWrap.setAttribute('aria-label', fam.today + ' of ' + fam.goal + ' family XP today' + (ringMet ? ', goal met' : ''));
+    }
+    set('pchXpRingTitle', ringMet ? 'Family goal met' : 'Family XP today');
+    set('pchXpRingMeta',  ringMet ? ('+' + fam.today + ' XP today') : (fam.today + ' / ' + fam.goal + ' XP'));
 
     // Decide whether to rebuild the constellation. The visual
     // key folds in the hot slot + the two counts that actually
