@@ -15910,6 +15910,24 @@
               #parentCelestialHome .pch-stat__num{font-family:var(--fh,'Bebas Neue',var(--fm,sans-serif));font-size:1.9rem;line-height:1;color:#F1E9D5;letter-spacing:.02em;}
               #parentCelestialHome .pch-stat__label{font-size:.72rem;color:#9AA0B4;margin-top:.4rem;font-weight:500;}
 
+              /* WC-2b-i — family XP ring (full-width lead in pch-stats).
+                 Brass fill turns green at 100%. Dark by default; the
+                 :root.light pass below matches the pch- surface (which,
+                 unlike the child cc- chrome, is NOT theme-independent). */
+              #parentCelestialHome .pch-xpring{grid-column:1 / -1;display:flex;align-items:center;gap:.9rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:.85rem 1rem;}
+              #parentCelestialHome .pch-xpring__circle{position:relative;width:56px;height:56px;flex-shrink:0;}
+              #parentCelestialHome .pch-xpring__svg{width:56px;height:56px;display:block;}
+              #parentCelestialHome .pch-xpring__track{fill:none;stroke:rgba(255,255,255,.10);stroke-width:6;}
+              #parentCelestialHome .pch-xpring__fill{fill:none;stroke:#FBBF24;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .6s ease,stroke .4s ease;}
+              #parentCelestialHome .pch-xpring--met .pch-xpring__fill{stroke:#34D399;}
+              #parentCelestialHome .pch-xpring__num{position:absolute;inset:0;display:grid;place-items:center;font-family:ui-monospace,'JetBrains Mono',monospace;font-feature-settings:"tnum";font-weight:700;font-size:1.05rem;color:#F1E9D5;}
+              #parentCelestialHome .pch-xpring--met .pch-xpring__num{color:#34D399;}
+              #parentCelestialHome .pch-xpring__body{display:flex;flex-direction:column;gap:.15rem;min-width:0;}
+              #parentCelestialHome .pch-xpring__title{font-size:.9rem;color:#F1E9D5;font-weight:500;}
+              #parentCelestialHome .pch-xpring__meta{font-size:.72rem;color:#9AA0B4;font-feature-settings:"tnum";letter-spacing:.02em;}
+              #parentCelestialHome .pch-xpring--met .pch-xpring__meta{color:#34D399;}
+              @media (prefers-reduced-motion: reduce){ #parentCelestialHome .pch-xpring__fill{transition:none;} }
+
               /* Constellation */
               /* World-class pass 2 (2026-06-11) -- sky panel.
                  The constellation section is framed as a viewport
@@ -15973,6 +15991,21 @@
               :root.light #parentCelestialHome .pch-stat__label{
                 color:#4a4b52;
               }
+              /* WC-2b-i — family XP ring, light pass (paper card + dark ink +
+                 deepened amber/green so the fill stays AA-legible on white). */
+              :root.light #parentCelestialHome .pch-xpring{
+                background:#ffffff;
+                border-color:rgba(15,23,42,.08);
+                box-shadow:0 1px 4px rgba(15,23,42,.05);
+              }
+              :root.light #parentCelestialHome .pch-xpring__track{stroke:rgba(15,23,42,.10);}
+              :root.light #parentCelestialHome .pch-xpring__fill{stroke:#b45309;}
+              :root.light #parentCelestialHome .pch-xpring--met .pch-xpring__fill{stroke:#059669;}
+              :root.light #parentCelestialHome .pch-xpring__num{color:#0f172a;}
+              :root.light #parentCelestialHome .pch-xpring--met .pch-xpring__num{color:#059669;}
+              :root.light #parentCelestialHome .pch-xpring__title{color:#0f172a;}
+              :root.light #parentCelestialHome .pch-xpring__meta{color:#4a4b52;}
+              :root.light #parentCelestialHome .pch-xpring--met .pch-xpring__meta{color:#059669;}
               :root.light #parentCelestialHome .pch-section-label{
                 color:#0f172a;
               }
@@ -16538,6 +16571,21 @@
 
               <!-- Family stat tiles (Phase 3 fills the numbers) -->
               <section class="pch-stats" aria-label="Family stats today">
+                <!-- WC-2b-i — family XP ring (Σ kid xpToday / Σ kid dailyGoal,
+                     rollover-correct). Numbers hydrated by renderParentCelestialHome. -->
+                <div class="pch-xpring" id="pchXpRing" role="group" aria-label="Family XP today">
+                  <div class="pch-xpring__circle">
+                    <svg class="pch-xpring__svg" viewBox="0 0 64 64" aria-hidden="true">
+                      <circle class="pch-xpring__track" cx="32" cy="32" r="26"/>
+                      <circle class="pch-xpring__fill" id="pchXpRingFill" cx="32" cy="32" r="26" transform="rotate(-90 32 32)" stroke-dasharray="163.4" stroke-dashoffset="163.4"/>
+                    </svg>
+                    <div class="pch-xpring__num" id="pchXpRingNum" aria-hidden="true">0</div>
+                  </div>
+                  <div class="pch-xpring__body">
+                    <div class="pch-xpring__title" id="pchXpRingTitle">Family XP today</div>
+                    <div class="pch-xpring__meta" id="pchXpRingMeta">0 / 0 XP</div>
+                  </div>
+                </div>
                 <div class="pch-stat"><div class="pch-stat__num" id="pchStatChores">&mdash;</div><div class="pch-stat__label">Chores pending</div></div>
                 <div class="pch-stat"><div class="pch-stat__num" id="pchStatGoals">&mdash;</div><div class="pch-stat__label">Goals in progress</div></div>
                 <div class="pch-stat"><div class="pch-stat__num" id="pchStatBadges">&mdash;</div><div class="pch-stat__label">Badges today</div></div>
