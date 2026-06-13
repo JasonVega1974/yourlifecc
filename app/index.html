@@ -20237,16 +20237,19 @@
      (chores.js) in the script order. Read by addChorePack() in
      chores.js + the Parent Hub pack renderer in parent.js. -->
 <script defer src="/app/js/data/chore-packs.js"></script>
-<script defer src="/app/js/data/academy.js"></script>
-<script defer src="/app/js/data/academy-lessons.js"></script>
-<script defer src="/app/js/data/biblical-sites.js"></script>
+<!-- academy.js / academy-lessons.js / biblical-sites.js are lazy-loaded
+     by faith.js's _acCurriculumEnsureLoaded(), _acLessonsEnsureLoaded(),
+     and _bwSitesEnsureLoaded() on first Academy / Bible World tab open
+     (SPEC 7b TIER 1, v351). Do not add <script> tags back here. -->
 <script defer src="/app/js/data/biblical-discoveries.js"></script>
 <script defer src="/app/js/data/biblical-routes.js"></script>
 <!-- bible-timeline.js is lazy-loaded by faith.js's _tlEnsureLoaded() on
      first Bible Timeline tab open (SPEC 7 pilot). Do not add a <script>
      tag back here — it would re-introduce ~195 KB to the initial payload. -->
-<script defer src="/app/js/data/biblical-infographics.js"></script>
-<script defer src="/app/js/data/bible-stories.js"></script>
+<!-- biblical-infographics.js and bible-stories.js are lazy-loaded by
+     faith.js's _bwInfoEnsureLoaded() (Bible World tab) and
+     _bsEnsureLoaded() (Story Mode tab) respectively (SPEC 7b TIER 1,
+     v351). Do not add <script> tags back here. -->
 <script defer src="/app/js/data/bible-flashcards.js"></script>
 <script defer src="/app/js/data/prayer-content.js"></script>
 <script defer src="/app/js/data/quick-prayers.js"></script>

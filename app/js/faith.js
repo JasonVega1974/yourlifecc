@@ -1113,6 +1113,10 @@ async function faithSearch(q){
   }
 
   // ── 2. Academy lessons (client-side) ────────────────────────
+  // SPEC 7b — academy-lessons.js is lazy-loaded. Await its ensure-
+  // loader so search includes academy hits even before the user has
+  // opened the Academy tab. Silent skip on loader failure (catch).
+  try { await _acLessonsEnsureLoaded(); } catch(_){}
   const academyHits = [];
   const acLessons = (typeof window.ACADEMY_LESSONS !== 'undefined') ? window.ACADEMY_LESSONS : [];
   acLessons.forEach(function(l){
@@ -5603,6 +5607,46 @@ let _acExpandedCourse = {}; // courseId → bool
 let _acQuizState = null;    // { courseId, questions[], idx, answers[], correctCount }
 let _acCertId    = null;    // currently-displayed certificate id
 
+// SPEC 7b TIER 1 — academy.js (FAITH_ACADEMY_CURRICULUM ~110 KB) and
+// academy-lessons.js (ACADEMY_LESSONS/_CATEGORIES/_CATEGORY_SVGS ~198 KB)
+// are no longer in the initial payload. Helpers inject the scripts on
+// first Academy tab open (Promise.all in renderAcademyPanel). Single
+// in-flight promise per file prevents duplicate requests; cached after
+// first load by SW. _acLessonsEnsureLoaded() is also awaited inside
+// faithSearch() so Academy hits surface in global search before the
+// user has opened the Academy tab.
+let _acCurriculumLoadPromise = null;
+function _acCurriculumEnsureLoaded(){
+  if (typeof window !== 'undefined' && Array.isArray(window.FAITH_ACADEMY_CURRICULUM)) {
+    return Promise.resolve();
+  }
+  if (_acCurriculumLoadPromise) return _acCurriculumLoadPromise;
+  _acCurriculumLoadPromise = new Promise(function(resolve, reject){
+    const s = document.createElement('script');
+    s.src = '/app/js/data/academy.js';
+    s.onload = function(){ resolve(); };
+    s.onerror = function(){ _acCurriculumLoadPromise = null; reject(new Error('academy load failed')); };
+    document.head.appendChild(s);
+  });
+  return _acCurriculumLoadPromise;
+}
+
+let _acLessonsLoadPromise = null;
+function _acLessonsEnsureLoaded(){
+  if (typeof window !== 'undefined' && Array.isArray(window.ACADEMY_LESSONS)) {
+    return Promise.resolve();
+  }
+  if (_acLessonsLoadPromise) return _acLessonsLoadPromise;
+  _acLessonsLoadPromise = new Promise(function(resolve, reject){
+    const s = document.createElement('script');
+    s.src = '/app/js/data/academy-lessons.js';
+    s.onload = function(){ resolve(); };
+    s.onerror = function(){ _acLessonsLoadPromise = null; reject(new Error('academy-lessons load failed')); };
+    document.head.appendChild(s);
+  });
+  return _acLessonsLoadPromise;
+}
+
 function _acCurriculum(){
   return (typeof window !== 'undefined' && window.FAITH_ACADEMY_CURRICULUM) ? window.FAITH_ACADEMY_CURRICULUM : [];
 }
@@ -5957,6 +6001,22 @@ function _lmFinishQuiz(lesson){
 }
 
 function renderAcademyPanel(){
+  // Lazy-load gate — academy.js (FAITH_ACADEMY_CURRICULUM) and
+  // academy-lessons.js (ACADEMY_LESSONS/_CATEGORIES/_CATEGORY_SVGS)
+  // are both required for the panel. Promise.all gives a single
+  // loading state covering both. Re-enter on resolve.
+  if (typeof window === 'undefined'
+      || !Array.isArray(window.FAITH_ACADEMY_CURRICULUM)
+      || !Array.isArray(window.ACADEMY_LESSONS)) {
+    const acModules = document.getElementById('acModules');
+    if (acModules) acModules.innerHTML = '<div style="padding:2rem;text-align:center;color:#64748b;font-size:.85rem;">Loading Academy…</div>';
+    Promise.all([_acCurriculumEnsureLoaded(), _acLessonsEnsureLoaded()])
+      .then(renderAcademyPanel)
+      .catch(function(){
+        if (acModules) acModules.innerHTML = '<div style="padding:2rem;text-align:center;color:#dc2626;font-size:.85rem;">Failed to load Academy. <button type="button" onclick="renderAcademyPanel()" style="margin-left:.5rem;color:#38bdf8;text-decoration:underline;background:none;border:none;cursor:pointer;font:inherit;">Retry</button></div>';
+      });
+    return;
+  }
   // F8: render the featured grid first (15 new lessons), then the
   // legacy module browser below.
   renderFeaturedAcademy();
@@ -6498,14 +6558,67 @@ let _bwMap = null;
 let _bwMarkers = [];
 let _bwEra = 'all';
 
+// SPEC 7b TIER 1 — biblical-sites.js (BIBLICAL_SITES/_PERIODS ~30 KB)
+// and biblical-infographics.js (BIBLICAL_INFOGRAPHICS ~28 KB) are no
+// longer in the initial payload. Helpers inject the scripts on first
+// Bible World tab open (Promise.all in renderBibleWorld). renderInfographicFor
+// itself does not need a separate gate — by the time the user can tap
+// a site/discovery inside Bible World, both files have already loaded
+// from the tab's open path.
+let _bwSitesLoadPromise = null;
+function _bwSitesEnsureLoaded(){
+  if (typeof window !== 'undefined' && Array.isArray(window.BIBLICAL_SITES)) {
+    return Promise.resolve();
+  }
+  if (_bwSitesLoadPromise) return _bwSitesLoadPromise;
+  _bwSitesLoadPromise = new Promise(function(resolve, reject){
+    const s = document.createElement('script');
+    s.src = '/app/js/data/biblical-sites.js';
+    s.onload = function(){ resolve(); };
+    s.onerror = function(){ _bwSitesLoadPromise = null; reject(new Error('biblical-sites load failed')); };
+    document.head.appendChild(s);
+  });
+  return _bwSitesLoadPromise;
+}
+
+let _bwInfoLoadPromise = null;
+function _bwInfoEnsureLoaded(){
+  if (typeof window !== 'undefined' && window.BIBLICAL_INFOGRAPHICS && typeof window.BIBLICAL_INFOGRAPHICS === 'object') {
+    return Promise.resolve();
+  }
+  if (_bwInfoLoadPromise) return _bwInfoLoadPromise;
+  _bwInfoLoadPromise = new Promise(function(resolve, reject){
+    const s = document.createElement('script');
+    s.src = '/app/js/data/biblical-infographics.js';
+    s.onload = function(){ resolve(); };
+    s.onerror = function(){ _bwInfoLoadPromise = null; reject(new Error('biblical-infographics load failed')); };
+    document.head.appendChild(s);
+  });
+  return _bwInfoLoadPromise;
+}
+
 function _bwSites(){ return (typeof window !== 'undefined' && window.BIBLICAL_SITES) ? window.BIBLICAL_SITES : []; }
 function _bwPeriods(){ return (typeof window !== 'undefined' && window.BIBLICAL_PERIODS) ? window.BIBLICAL_PERIODS : []; }
 function _bwSiteById(id){ return _bwSites().find(s => s && s.id === id) || null; }
 function _bwPeriodById(id){ return _bwPeriods().find(p => p && p.id === id) || null; }
 
 function renderBibleWorld(){
-  // Build filter chips (idempotent — only build once).
   const filterWrap = document.getElementById('bwFilters');
+  // Lazy-load gate — biblical-sites.js drives the map markers, grid
+  // and filter chips; biblical-infographics.js fills the per-site
+  // detail modals. Promise.all gives one combined loading state.
+  if (typeof window === 'undefined'
+      || !Array.isArray(window.BIBLICAL_SITES)
+      || !window.BIBLICAL_INFOGRAPHICS) {
+    if (filterWrap) filterWrap.innerHTML = '<div style="padding:1.5rem;text-align:center;color:#64748b;font-size:.85rem;">Loading Bible Lands…</div>';
+    Promise.all([_bwSitesEnsureLoaded(), _bwInfoEnsureLoaded()])
+      .then(renderBibleWorld)
+      .catch(function(){
+        if (filterWrap) filterWrap.innerHTML = '<div style="padding:1.5rem;text-align:center;color:#dc2626;font-size:.85rem;">Failed to load Bible Lands. <button type="button" onclick="renderBibleWorld()" style="margin-left:.5rem;color:#38bdf8;text-decoration:underline;background:none;border:none;cursor:pointer;font:inherit;">Retry</button></div>';
+      });
+    return;
+  }
+  // Build filter chips (idempotent — only build once).
   if(filterWrap && !filterWrap.dataset.bwBuilt){
     const periods = _bwPeriods();
     let html = '<button class="bw-chip active" data-bw-era="all" onclick="bwFilter(\'all\',this)">All eras</button>';
@@ -7902,6 +8015,26 @@ function _mvApplySrUpdate(v, correct){
 
 let _storyState = { storyId:null, sceneIdx:0, narrating:false };
 
+// SPEC 7b TIER 1 — bible-stories.js (~1.23 MB) is no longer in the
+// initial payload. The script tag was removed from index.html; this
+// helper injects it on first Story Mode tab open. Single in-flight
+// promise prevents duplicate requests; cached after first load by SW.
+let _bsLoadPromise = null;
+function _bsEnsureLoaded(){
+  if (typeof window !== 'undefined' && Array.isArray(window.BIBLE_STORIES)) {
+    return Promise.resolve();
+  }
+  if (_bsLoadPromise) return _bsLoadPromise;
+  _bsLoadPromise = new Promise(function(resolve, reject){
+    const s = document.createElement('script');
+    s.src = '/app/js/data/bible-stories.js';
+    s.onload = function(){ resolve(); };
+    s.onerror = function(){ _bsLoadPromise = null; reject(new Error('bible-stories load failed')); };
+    document.head.appendChild(s);
+  });
+  return _bsLoadPromise;
+}
+
 function _getStories(){
   return (typeof window !== 'undefined' && Array.isArray(window.BIBLE_STORIES)) ? window.BIBLE_STORIES : [];
 }
@@ -7965,6 +8098,15 @@ function renderFaithHomeStories(){
 function renderStoriesTabDirect(){
   const grid = document.getElementById('bfStoriesGrid');
   if(!grid) return;
+  // Lazy-load gate — show transient loading state on first open, then
+  // re-enter this function once window.BIBLE_STORIES is populated.
+  if (typeof window === 'undefined' || !Array.isArray(window.BIBLE_STORIES)) {
+    grid.innerHTML = '<div style="padding:2rem;text-align:center;color:#64748b;font-size:.85rem;">Loading Story Mode…</div>';
+    _bsEnsureLoaded().then(renderStoriesTabDirect).catch(function(){
+      grid.innerHTML = '<div style="padding:2rem;text-align:center;color:#dc2626;font-size:.85rem;">Failed to load Story Mode. <button type="button" onclick="renderStoriesTabDirect()" style="margin-left:.5rem;color:#38bdf8;text-decoration:underline;background:none;border:none;cursor:pointer;font:inherit;">Retry</button></div>';
+    });
+    return;
+  }
   const stories = _getStories();
   if(!stories.length){
     grid.innerHTML = '<div style="font-size:.78rem;color:var(--tx3);font-family:Georgia,serif;font-style:italic;padding:.8rem .2rem;">More stories arriving in upcoming releases.</div>';
