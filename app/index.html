@@ -21206,6 +21206,15 @@ document.addEventListener('DOMContentLoaded', function() {
     var overlay = document.getElementById('ffSearchOverlay');
     if(!overlay) return;
     overlay.classList.add('open');
+    // WC-1b — proof-prophecy.js is lazy. Pre-warm it when search opens so
+    // proof results appear; re-run the active query on resolve. Fire-and-
+    // forget — never blocks typing, never awaits per keystroke.
+    if(typeof ylccEnsureData === 'function' && typeof window.PROOF_PROPHECY_DATA === 'undefined'){
+      ylccEnsureData('PROOF_PROPHECY_DATA', '/app/js/data/proof-prophecy.js').then(function(){
+        var box = document.getElementById('ffSearchInput');
+        if(box && box.value && box.value.trim()) ffDoSearch(box.value);
+      }).catch(function(){});
+    }
     setTimeout(function(){
       var inp = document.getElementById('ffSearchInput');
       if(inp) inp.focus();

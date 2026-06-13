@@ -284,6 +284,16 @@ function cmDigDeeper(){
   var drawer = document.getElementById('cmDigDrawer');
   if (!drawer) return;
 
+  // WC-1b — proof-prophecy.js is lazy-loaded. If this card points at a proof
+  // but the data isn't loaded yet (user hasn't opened Proof & Prophecy), fetch
+  // it via the shared helper, show a brief loading state, and re-enter so the
+  // real long-form proof renders instead of the "coming soon" stub.
+  if (card.proofId && typeof PROOF_PROPHECY_DATA === 'undefined' && typeof ylccEnsureData === 'function'){
+    drawer.innerHTML = '<div class="cm-dig-empty"><div class="cm-dig-empty-icon">📖</div><div class="cm-dig-empty-title">Loading…</div></div>';
+    ylccEnsureData('PROOF_PROPHECY_DATA', '/app/js/data/proof-prophecy.js').then(cmDigDeeper).catch(function(){});
+    return;
+  }
+
   var proof = null;
   if (card.proofId && typeof PROOF_PROPHECY_DATA !== 'undefined'){
     for (var i = 0; i < PROOF_PROPHECY_DATA.length; i++){
