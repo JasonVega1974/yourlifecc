@@ -1107,6 +1107,22 @@
   .cc-chip{display:flex;flex-direction:column;justify-content:center;gap:.2rem;padding:.9rem 1rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;}
   .cc-chip__num{font-family:ui-monospace,'JetBrains Mono',monospace;font-feature-settings:"tnum";font-weight:700;font-size:1.35rem;color:#F1E9D5;letter-spacing:-.01em;line-height:1.1;}
   .cc-chip__label{font-size:.74rem;color:#9AA0B4;letter-spacing:.04em;}
+  /* WC-2b-i — daily-goal XP ring. Full-width lead element in cc-stats; brass
+     fill turns green at 100%. Theme-independent (dark scene, matches the cc-
+     chrome — no :root.light pass), reduced-motion safe. */
+  .cc-ring{grid-column:1 / -1;display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:18px;}
+  .cc-ring__circle{position:relative;width:64px;height:64px;flex-shrink:0;}
+  .cc-ring__svg{width:64px;height:64px;display:block;}
+  .cc-ring__track{fill:none;stroke:rgba(255,255,255,.10);stroke-width:6;}
+  .cc-ring__fill{fill:none;stroke:#FBBF24;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .6s ease,stroke .4s ease;}
+  .cc-ring--met .cc-ring__fill{stroke:#34D399;}
+  .cc-ring__num{position:absolute;inset:0;display:grid;place-items:center;font-family:ui-monospace,'JetBrains Mono',monospace;font-feature-settings:"tnum";font-weight:700;font-size:1.15rem;color:#F1E9D5;letter-spacing:-.01em;}
+  .cc-ring--met .cc-ring__num{color:#34D399;}
+  .cc-ring__body{display:flex;flex-direction:column;gap:.15rem;min-width:0;}
+  .cc-ring__title{font-size:.92rem;color:#F1E9D5;font-weight:500;}
+  .cc-ring__meta{font-size:.74rem;color:#9AA0B4;font-feature-settings:"tnum";letter-spacing:.02em;}
+  .cc-ring--met .cc-ring__meta{color:#34D399;}
+  @media (prefers-reduced-motion: reduce){ .cc-ring__fill{transition:none;} }
   @media (min-width:720px){ .cc-stats{grid-template-columns:1.4fr 1fr 1fr;} .cc-streak{grid-column:auto;} .cc-streak__num{font-size:4rem;} .cc-stats.cc-stats--no-streak{grid-template-columns:1fr 1fr;} }
 
   /* ── constellation: living space scene ─────────────────────

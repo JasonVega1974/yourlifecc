@@ -582,6 +582,35 @@
         + '</div>' )
       : '';
 
+    // WC-2b-i — daily-goal XP ring. xpToday / dailyGoal, brass fill turning
+    // green at 100%. Readers come from xp.js (guarded). Geometry: r=26 →
+    // circumference ~163.4; the fill arc starts at 12 o'clock via the -90deg
+    // rotation + stroke-dashoffset. Theme-independent (dark scene, matches the
+    // cc- chrome — no light pass) and reduced-motion safe (CSS gates the fill
+    // transition). The flame repoint (streak) is WC-2b-ii.
+    var _xpGoal  = (typeof getDailyGoal === 'function') ? getDailyGoal() : 25;
+    var _xpToday = (typeof getXpToday === 'function') ? getXpToday() : 0;
+    var _xpPct   = (_xpGoal > 0) ? Math.min(100, Math.round((_xpToday / _xpGoal) * 100)) : 0;
+    var _xpMet   = _xpGoal > 0 && _xpToday >= _xpGoal;
+    var _xpC     = 2 * Math.PI * 26;
+    var _xpOff   = (_xpC * (1 - _xpPct / 100)).toFixed(1);
+    var _xpAria  = _xpToday + ' of ' + _xpGoal + ' daily XP' + (_xpMet ? ', goal met' : '');
+    var ringHtml = ''
+      + '<div class="cc-ring' + (_xpMet ? ' cc-ring--met' : '') + '" role="group" aria-label="' + _xpAria + '">'
+      +   '<div class="cc-ring__circle">'
+      +     '<svg class="cc-ring__svg" viewBox="0 0 64 64" aria-hidden="true">'
+      +       '<circle class="cc-ring__track" cx="32" cy="32" r="26"/>'
+      +       '<circle class="cc-ring__fill" cx="32" cy="32" r="26" transform="rotate(-90 32 32)" '
+      +         'stroke-dasharray="' + _xpC.toFixed(1) + '" stroke-dashoffset="' + _xpOff + '"/>'
+      +     '</svg>'
+      +     '<div class="cc-ring__num" aria-hidden="true">' + _xpToday + '</div>'
+      +   '</div>'
+      +   '<div class="cc-ring__body">'
+      +     '<div class="cc-ring__title">' + (_xpMet ? 'Daily goal met' : 'XP today') + '</div>'
+      +     '<div class="cc-ring__meta">' + (_xpMet ? ('+' + _xpToday + ' XP — nice work') : (_xpToday + ' / ' + _xpGoal + ' XP')) + '</div>'
+      +   '</div>'
+      + '</div>';
+
     root.innerHTML = ''
       + '<main class="cc-shell" role="main">'
       +   '<header class="cc-greeting" aria-label="Greeting">'
@@ -596,6 +625,7 @@
       +   '</header>'
 
       +   '<section class="cc-stats'+(streak>=1?'':' cc-stats--no-streak')+'" aria-label="Today\'s progress">'
+      +     ringHtml
       +     streakHtml
       +     '<div class="cc-chip" role="group" aria-label="'+tasks+' tasks today">'
       +       '<div class="cc-chip__num">'+tasks+'</div>'
