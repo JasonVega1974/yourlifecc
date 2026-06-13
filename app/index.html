@@ -1259,14 +1259,22 @@
   .cc-section-label{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:#9AA0B4;margin:0 0 .8rem .3rem;font-weight:600;}
   .cc-tiles{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
   @media (min-width:720px){ .cc-tiles{grid-template-columns:repeat(3,1fr);gap:1rem;} }
-  .cc-tile{--accent:#6AA7FF;position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:.65rem;padding:1.1rem 1rem;min-height:116px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:18px;color:#F1E9D5;text-align:left;cursor:pointer;font-family:inherit;transition:transform 200ms ease,background 200ms ease,border-color 200ms ease;overflow:hidden;}
-  .cc-tile::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--accent) 18%,transparent),transparent 55%);opacity:.9;pointer-events:none;}
-  .cc-tile__icon{width:36px;height:36px;border-radius:10px;background:color-mix(in srgb,var(--accent) 18%,transparent);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);display:grid;place-items:center;font-size:1.15rem;position:relative;z-index:1;}
+  /* WC-1c follow-up — tiles neutral by default; identity rides the icon
+     glyph + label (same as the stars). The surface's single accent
+     (--cc-accent, set inline to today's focusTile.accent) lands only on the
+     focus tile + the keyboard focus ring, so exactly one accent shows at a
+     time. The per-tile rainbow ::before wash is removed (interface layer is
+     flat — no decorative gradients). */
+  .cc-tile{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:.65rem;padding:1.1rem 1rem;min-height:116px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:18px;color:#F1E9D5;text-align:left;cursor:pointer;font-family:inherit;transition:transform 200ms ease,background 200ms ease,border-color 200ms ease;overflow:hidden;}
+  .cc-tile__icon{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);display:grid;place-items:center;font-size:1.15rem;position:relative;z-index:1;}
   .cc-tile__title{font-size:1rem;font-weight:600;letter-spacing:-.01em;color:#F1E9D5;position:relative;z-index:1;}
   .cc-tile__meta{font-family:ui-monospace,'JetBrains Mono',monospace;font-feature-settings:"tnum";font-size:.78rem;color:#9AA0B4;margin-top:auto;position:relative;z-index:1;}
-  .cc-tile:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 45%,rgba(255,255,255,.07));background:rgba(255,255,255,.06);}
-  .cc-tile:active{transform:scale(.97);background:color-mix(in srgb,var(--accent) 14%,rgba(255,255,255,.04));}
-  .cc-tile:focus-visible{outline:2px solid #F5A623;outline-offset:3px;}
+  .cc-tile:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.16);background:rgba(255,255,255,.06);}
+  .cc-tile:active{transform:scale(.97);background:rgba(255,255,255,.08);}
+  .cc-tile:focus-visible{outline:2px solid var(--cc-accent,#FBBF24);outline-offset:3px;}
+  /* Today's focus destination — the single accented tile, mirroring the lit star. */
+  .cc-tile--focus{border-color:color-mix(in srgb,var(--cc-accent) 45%,rgba(255,255,255,.07));}
+  .cc-tile--focus .cc-tile__icon{background:color-mix(in srgb,var(--cc-accent) 18%,transparent);border-color:color-mix(in srgb,var(--cc-accent) 35%,transparent);}
 
   /* faith — de-emphasized, full-row */
   .cc-tile--faith{grid-column:1 / -1;flex-direction:row;align-items:center;gap:.9rem;min-height:64px;padding:.9rem 1.1rem;background:#1A1F33;border:1px solid rgba(255,255,255,.05);color:#6B6B80;}

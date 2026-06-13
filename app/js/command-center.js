@@ -522,11 +522,15 @@
     // Tile grid order is stage-aware (D.mode → _CC_STAGE_ORDER).
     // The SVG constellation above uses _CC_TILES canonical order so
     // drift animations stay tied to each domain regardless of stage.
+    // WC-1c follow-up — tiles are neutral; domain identity rides the icon
+    // glyph + label (same as the stars). The single surface accent lands on
+    // exactly one tile: today's focus destination (cc-tile--focus). No
+    // per-tile --accent injection, so no rainbow on the grid.
     var tilesHtml = _ccOrderedTiles().map(function(tile){
+      var tileCls = 'cc-tile' + (tile.key === focusKey ? ' cc-tile--focus' : '');
       return ''
-        + '<button class="cc-tile" type="button" data-dest="'+tile.key+'" '
-        +   'aria-label="'+_ccEsc(tile.label)+' — '+_ccEsc(meta[tile.key])+'" '
-        +   'style="--accent:'+tile.accent+';">'
+        + '<button class="'+tileCls+'" type="button" data-dest="'+tile.key+'" '
+        +   'aria-label="'+_ccEsc(tile.label)+' — '+_ccEsc(meta[tile.key])+'">'
         +   '<span class="cc-tile__icon" aria-hidden="true">'+tile.icon+'</span>'
         +   '<span class="cc-tile__title">'+_ccEsc(tile.label)+'</span>'
         +   '<span class="cc-tile__meta">'+_ccEsc(meta[tile.key])+'</span>'
@@ -615,7 +619,7 @@
 
       +   '<section aria-label="Destinations">'
       +     '<h2 class="cc-section-label">Jump in</h2>'
-      +     '<div class="cc-tiles">'
+      +     '<div class="cc-tiles" style="--cc-accent:'+focusTile.accent+';">'
       +       tilesHtml
       +       faithHtml
       +     '</div>'
