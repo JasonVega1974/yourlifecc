@@ -189,6 +189,13 @@ fix(theme): light-mode contrast sweep across all sections
 ```
 **Accept:** no washed-out text anywhere in light mode; CLAUDE.md rule from SPEC 2 prevents recurrence.
 
+## SPEC 9b — light-mode warmth pass (design decision) · 1 session · [SW bump]
+Light mode currently reads clinically bright (flat near-white everywhere). Explore a faint
+warm tint to the global app background + card surfaces — barely-there cream/mocha instead of
+cold white — to soften the whole experience without losing contrast. Run ux-visual-reviewer
+on a proposed token shift BEFORE implementing; this touches every light-mode surface so it
+needs a careful before/after. Keep all the SPEC 9 contrast fixes intact.
+
 ## SPEC 10 — Inline style/script extraction (P1-2) · ongoing campaign · **[SW bump each batch]**
 ```
 RULES OF THE CAMPAIGN (one batch = one spec run = one commit):
