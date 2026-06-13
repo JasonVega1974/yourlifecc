@@ -20236,13 +20236,19 @@
      it's safe for the data file to follow the feature module
      (chores.js) in the script order. Read by addChorePack() in
      chores.js + the Parent Hub pack renderer in parent.js. -->
-<script defer src="/app/js/data/chore-packs.js"></script>
+<!-- chore-packs.js is lazy-loaded by parent.js's _cpEnsureLoaded() on
+     first Parent Hub chores sub-tab open (SPEC 7b TIER 1 batch 2,
+     v352). Stays in service-worker PRECACHE_ASSETS for offline support
+     — background fetch during SW install never executes at boot. -->
 <!-- academy.js / academy-lessons.js / biblical-sites.js are lazy-loaded
      by faith.js's _acCurriculumEnsureLoaded(), _acLessonsEnsureLoaded(),
      and _bwSitesEnsureLoaded() on first Academy / Bible World tab open
      (SPEC 7b TIER 1, v351). Do not add <script> tags back here. -->
-<script defer src="/app/js/data/biblical-discoveries.js"></script>
-<script defer src="/app/js/data/biblical-routes.js"></script>
+<!-- biblical-discoveries.js and biblical-routes.js are lazy-loaded by
+     faith.js's _bwDiscoveriesEnsureLoaded() and _bwRoutesEnsureLoaded()
+     on first Bible Lands tab open, folded into the existing 4-file
+     Promise.all gate in renderBibleWorld() (SPEC 7b TIER 1 batch 2,
+     v352). Do not add <script> tags back here. -->
 <!-- bible-timeline.js is lazy-loaded by faith.js's _tlEnsureLoaded() on
      first Bible Timeline tab open (SPEC 7 pilot). Do not add a <script>
      tag back here — it would re-introduce ~195 KB to the initial payload. -->
@@ -20251,7 +20257,9 @@
      _bsEnsureLoaded() (Story Mode tab) respectively (SPEC 7b TIER 1,
      v351). Do not add <script> tags back here. -->
 <script defer src="/app/js/data/bible-flashcards.js"></script>
-<script defer src="/app/js/data/prayer-content.js"></script>
+<!-- prayer-content.js is lazy-loaded by faith.js's _prEnsureLoaded()
+     on first Prayer tab open (SPEC 7b TIER 1 batch 2, v352). Do not
+     add a <script> tag back here. -->
 <script defer src="/app/js/data/quick-prayers.js"></script>
 <script defer src="/app/js/data/proof-prophecy.js"></script>
 <script defer src="/app/js/data/jesus-data.js"></script>

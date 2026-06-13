@@ -3743,9 +3743,41 @@ function renderParentChoreList(){
 // the host div — never throws, never blocks the rest of the
 // Chores tab from rendering.
 // ════════════════════════════════════════════════════════════
+// SPEC 7b TIER 1 batch 2 — chore-packs.js (~11 KB) is no longer in
+// the initial payload. Helper injects the script on first Parent Hub
+// chores sub-tab open (gated below). Single in-flight promise prevents
+// duplicate requests; cached after first load by SW (chore-packs.js
+// stays in PRECACHE_ASSETS for offline support — background pre-fetch
+// during SW install, never executed at boot).
+let _cpLoadPromise = null;
+function _cpEnsureLoaded(){
+  if (typeof window !== 'undefined' && Array.isArray(window.CHORE_PACKS)) {
+    return Promise.resolve();
+  }
+  if (_cpLoadPromise) return _cpLoadPromise;
+  _cpLoadPromise = new Promise(function(resolve, reject){
+    const s = document.createElement('script');
+    s.src = '/app/js/data/chore-packs.js';
+    s.onload = function(){ resolve(); };
+    s.onerror = function(){ _cpLoadPromise = null; reject(new Error('chore-packs load failed')); };
+    document.head.appendChild(s);
+  });
+  return _cpLoadPromise;
+}
+
 function renderParentChorePacks(){
   const el = document.getElementById('parentChorePacks');
   if(!el) return;
+
+  // Lazy-load gate — chore-packs.js drives this entire sub-pane.
+  // Show loading state, fetch, re-enter on resolve.
+  if (typeof window === 'undefined' || !Array.isArray(window.CHORE_PACKS)) {
+    el.innerHTML = '<div class="ph-ch-pack-empty" style="padding:1.5rem;text-align:center;color:#64748b;font-size:.85rem;">Loading chore packs…</div>';
+    _cpEnsureLoaded().then(renderParentChorePacks).catch(function(){
+      el.innerHTML = '<div class="ph-ch-pack-empty" style="padding:1.5rem;text-align:center;color:#dc2626;font-size:.85rem;">Failed to load chore packs. <button type="button" onclick="renderParentChorePacks()" style="margin-left:.5rem;color:#38bdf8;text-decoration:underline;background:none;border:none;cursor:pointer;font:inherit;">Retry</button></div>';
+    });
+    return;
+  }
 
   const packs = (typeof window !== 'undefined' && Array.isArray(window.CHORE_PACKS))
     ? window.CHORE_PACKS : [];

@@ -4096,7 +4096,48 @@ function prSubTab(sub, btn){
 }
 
 // Entry point — called by bfTab('prayer').
+// SPEC 7b TIER 1 batch 2 — prayer-content.js (~21 KB) is no longer in
+// the initial payload. Helper injects the script on first Prayer tab
+// open. Single in-flight promise prevents duplicate requests; cached
+// after first load by SW. Gates ALL 5 globals (PRAYER_EXAMPLES,
+// PRAY_FOR_CATEGORIES, ACTS_FRAMEWORK, LECTIO_DIVINA,
+// LECTIO_PRACTICE_VERSE) which load together from the same script;
+// checking 2 is sufficient as a proxy for the whole file.
+let _prLoadPromise = null;
+function _prEnsureLoaded(){
+  if (typeof window !== 'undefined'
+      && Array.isArray(window.PRAYER_EXAMPLES)
+      && Array.isArray(window.PRAY_FOR_CATEGORIES)) {
+    return Promise.resolve();
+  }
+  if (_prLoadPromise) return _prLoadPromise;
+  _prLoadPromise = new Promise(function(resolve, reject){
+    const s = document.createElement('script');
+    s.src = '/app/js/data/prayer-content.js';
+    s.onload = function(){ resolve(); };
+    s.onerror = function(){ _prLoadPromise = null; reject(new Error('prayer-content load failed')); };
+    document.head.appendChild(s);
+  });
+  return _prLoadPromise;
+}
+
 function renderPrayerPanel(){
+  // Lazy-load gate — prayer-content.js drives the daily "Today, pray
+  // for ..." prompt, the Examples grid, the How-to-pray ACTS + Lectio
+  // panes, and the Who-to-pray category list. Show loading state in
+  // the most prominent visible container, then re-render after load.
+  if (typeof window === 'undefined'
+      || !Array.isArray(window.PRAYER_EXAMPLES)
+      || !Array.isArray(window.PRAY_FOR_CATEGORIES)) {
+    const target = document.getElementById('prExamplesGrid')
+                || document.getElementById('prMineDailyBanner')
+                || document.getElementById('bf-prayer');
+    if (target) target.innerHTML = '<div style="padding:2rem;text-align:center;color:#64748b;font-size:.85rem;">Loading prayer content…</div>';
+    _prEnsureLoaded().then(renderPrayerPanel).catch(function(){
+      if (target) target.innerHTML = '<div style="padding:2rem;text-align:center;color:#dc2626;font-size:.85rem;">Failed to load prayer content. <button type="button" onclick="renderPrayerPanel()" style="margin-left:.5rem;color:#38bdf8;text-decoration:underline;background:none;border:none;cursor:pointer;font:inherit;">Retry</button></div>';
+    });
+    return;
+  }
   // Default: refresh My Prayers + stats.
   renderMyPrayersPane();
   // If user has been on a non-default sub before, re-render that too so
@@ -6597,6 +6638,46 @@ function _bwInfoEnsureLoaded(){
   return _bwInfoLoadPromise;
 }
 
+// SPEC 7b TIER 1 batch 2 — biblical-discoveries.js (~19 KB) and
+// biblical-routes.js (~5 KB) join the Bible World lazy-load chain.
+// Folded into the existing renderBibleWorld() Promise.all gate. Routes
+// also have an out-of-section consumer (plan-detail open at faith.js
+// :1878 reads window.BIBLICAL_ROUTES directly) — accepted graceful
+// degradation: route mini-map silently skips on plans WITH routeId
+// until Bible Lands is opened once, then self-heals for subsequent
+// plan-detail opens.
+let _bwDiscoveriesLoadPromise = null;
+function _bwDiscoveriesEnsureLoaded(){
+  if (typeof window !== 'undefined' && Array.isArray(window.BIBLICAL_DISCOVERIES)) {
+    return Promise.resolve();
+  }
+  if (_bwDiscoveriesLoadPromise) return _bwDiscoveriesLoadPromise;
+  _bwDiscoveriesLoadPromise = new Promise(function(resolve, reject){
+    const s = document.createElement('script');
+    s.src = '/app/js/data/biblical-discoveries.js';
+    s.onload = function(){ resolve(); };
+    s.onerror = function(){ _bwDiscoveriesLoadPromise = null; reject(new Error('biblical-discoveries load failed')); };
+    document.head.appendChild(s);
+  });
+  return _bwDiscoveriesLoadPromise;
+}
+
+let _bwRoutesLoadPromise = null;
+function _bwRoutesEnsureLoaded(){
+  if (typeof window !== 'undefined' && Array.isArray(window.BIBLICAL_ROUTES)) {
+    return Promise.resolve();
+  }
+  if (_bwRoutesLoadPromise) return _bwRoutesLoadPromise;
+  _bwRoutesLoadPromise = new Promise(function(resolve, reject){
+    const s = document.createElement('script');
+    s.src = '/app/js/data/biblical-routes.js';
+    s.onload = function(){ resolve(); };
+    s.onerror = function(){ _bwRoutesLoadPromise = null; reject(new Error('biblical-routes load failed')); };
+    document.head.appendChild(s);
+  });
+  return _bwRoutesLoadPromise;
+}
+
 function _bwSites(){ return (typeof window !== 'undefined' && window.BIBLICAL_SITES) ? window.BIBLICAL_SITES : []; }
 function _bwPeriods(){ return (typeof window !== 'undefined' && window.BIBLICAL_PERIODS) ? window.BIBLICAL_PERIODS : []; }
 function _bwSiteById(id){ return _bwSites().find(s => s && s.id === id) || null; }
@@ -6606,12 +6687,17 @@ function renderBibleWorld(){
   const filterWrap = document.getElementById('bwFilters');
   // Lazy-load gate — biblical-sites.js drives the map markers, grid
   // and filter chips; biblical-infographics.js fills the per-site
-  // detail modals. Promise.all gives one combined loading state.
+  // detail modals; biblical-discoveries.js drives the discoveries
+  // grid; biblical-routes.js drives the route polyline overlays
+  // (and plan-detail mini-maps in the Plans tab). Single Promise.all
+  // gate covers all four files.
   if (typeof window === 'undefined'
       || !Array.isArray(window.BIBLICAL_SITES)
-      || !window.BIBLICAL_INFOGRAPHICS) {
+      || !window.BIBLICAL_INFOGRAPHICS
+      || !Array.isArray(window.BIBLICAL_DISCOVERIES)
+      || !Array.isArray(window.BIBLICAL_ROUTES)) {
     if (filterWrap) filterWrap.innerHTML = '<div style="padding:1.5rem;text-align:center;color:#64748b;font-size:.85rem;">Loading Bible Lands…</div>';
-    Promise.all([_bwSitesEnsureLoaded(), _bwInfoEnsureLoaded()])
+    Promise.all([_bwSitesEnsureLoaded(), _bwInfoEnsureLoaded(), _bwDiscoveriesEnsureLoaded(), _bwRoutesEnsureLoaded()])
       .then(renderBibleWorld)
       .catch(function(){
         if (filterWrap) filterWrap.innerHTML = '<div style="padding:1.5rem;text-align:center;color:#dc2626;font-size:.85rem;">Failed to load Bible Lands. <button type="button" onclick="renderBibleWorld()" style="margin-left:.5rem;color:#38bdf8;text-decoration:underline;background:none;border:none;cursor:pointer;font:inherit;">Retry</button></div>';
