@@ -20326,6 +20326,11 @@
 <!-- Phase 1A — Streaks Engine (cloud-persisted, wraps faith completion fns) -->
 <script defer src="/app/js/streaks.js"></script>
 
+<!-- WC-2a — Unified XP currency. Wraps the audited completion globals (faith +
+     chores/goals/skills/health/habits) without editing those modules; loads
+     after them + faith.js so the targets exist. Composes with streaks.js. -->
+<script defer src="/app/js/xp.js"></script>
+
 <!-- V1 Rebuild · Session 1 — Daily Briefing card render module. Must load
      after streaks.js (uses getScriptureStreak) and before init.js (which
      calls renderDailyBriefing during finishInit). -->
