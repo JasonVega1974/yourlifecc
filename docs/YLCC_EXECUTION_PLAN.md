@@ -249,3 +249,10 @@ read-only confirm: do these two endpoints actually lack a caller-auth gate? If c
 Bearer ADMIN_SECRET auth mirroring send-announcement.js (or remove the endpoints if obsolete).
 LOWER PRIORITY companion: audit RLS on waitlist_applications / affiliate_applications /
 contest_entries for what the anon role can read/write via admin.html's SUPA_ANON reads.
+
+## Admin outreach — manual recipient entry (feature, not audit) · no SW bump
+The outreach picker only populates from Supabase contact tables (waitlist/affiliate/contest).
+When those are empty there's no way to send a one-off test/message to a typed address — the
+recipient box is display-only, no addRecipient() path exists. Add a small "add recipient"
+input that validates an email and pushes it into outContacts[] so Send works without a
+seeded contact. Low priority; pairs naturally with SPEC 5c admin work.
