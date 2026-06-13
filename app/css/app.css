@@ -52,23 +52,31 @@
    bg was the worst readability issue — handled by the override block
    at the bottom of this file. */
 :root.light{
-  --bg:#e8e9ec;            /* medium cool gray — macOS desktop feel */
-  --s1:#f2f3f5;            /* cards / surfaces */
-  --s2:#e4e5e8;            /* section headers */
-  --s3:#d8d9de;            /* hover / inset */
-  --s4:#cccdd4;            /* deeper accent */
-  --c:#0284c7;             /* brand sky-700 — preserves brand identity in light mode while staying readable on light surfaces */
-  --tx:#1a1b1e;            /* near-black body text */
-  --tx2:#4a4b52;           /* secondary text */
-  --tx3:#7a7b85;           /* tertiary text */
-  --mt:#7a7b85;            /* very muted */
+  /* SPEC 9b — warm-cream tilt (2026-06-13). Subtle hue shift on every
+     light-mode token toward warm cream / mocha. Brand sky-blue --c
+     stays cool for intentional warm/cool tension. --tx3/--mt darkened
+     from #7a7b85 to fix latent AA fail on body text below 18px on warm
+     cards (was ~4.0:1, now passes 4.5:1). Baked SPEC 9 #f5f1e9 and
+     #fff card/input overrides are swept to match in this same commit;
+     other baked-hex tokens (s2/s3/s4/borders) deferred to the queued
+     var() refactor cleanup. */
+  --bg:#ebe8e1;            /* barely-warm near-neutral page bg */
+  --s1:#f5f1e9;            /* warm cream card surface */
+  --s2:#e7e1d4;            /* warm beige section headers */
+  --s3:#d8d1c2;            /* warm sand hover / inset */
+  --s4:#cdc6b4;            /* warm khaki deeper accent */
+  --c:#0284c7;             /* brand sky-700 — stays cool for warm/cool tension */
+  --tx:#1f1810;            /* warm near-black body text (chocolate undertone) */
+  --tx2:#4e4538;           /* warm muted secondary text */
+  --tx3:#6e6558;           /* warm tertiary text — passes AA on warm cards */
+  --mt:#6e6558;            /* matches --tx3 */
   --br:rgba(0,0,0,0.15);
   --card-shadow:0 1px 4px rgba(0,0,0,.10);
-  --card-bg:#f2f3f5;
-  --card-border:#d0d1d6;
-  --input-bg:#ffffff;
-  --input-border:#c0c1c6;
-  --sel-bg:#eaebef;
+  --card-bg:#f5f1e9;
+  --card-border:#d4cdbf;
+  --input-bg:#fbf8f2;
+  --input-border:#bfb8a9;
+  --sel-bg:#ede7dc;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{font-size:17px;scroll-behavior:smooth;}
@@ -76,7 +84,7 @@ body{font-family:var(--fm);background:var(--bg);color:var(--tx);line-height:1.6;
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   background:radial-gradient(ellipse 60% 40% at 30% 10%,rgba(56,189,248,.05) 0%,transparent 60%),
   radial-gradient(ellipse 40% 50% at 80% 85%,rgba(167,139,250,.04) 0%,transparent 60%);}
-:root.light body::before{background:radial-gradient(ellipse 60% 40% at 30% 10%,rgba(56,189,248,.07) 0%,transparent 60%),radial-gradient(ellipse 40% 50% at 80% 85%,rgba(167,139,250,.05) 0%,transparent 60%);}
+:root.light body::before{background:radial-gradient(ellipse 60% 40% at 30% 10%,rgba(245,166,35,.06) 0%,transparent 60%),radial-gradient(ellipse 40% 50% at 80% 85%,rgba(244,123,90,.04) 0%,transparent 60%);}
 
 /* ─── SIDEBAR (fixed left) ─────────────────────── */
 #sidebar{
@@ -584,11 +592,11 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 :root.light #mobileQuickRow .mqb-lang{background:rgba(0,0,0,.06);}
 :root.light .mBar-title{color:#1a1b1e;}
 :root.light .hamb{border-color:rgba(0,0,0,.25);color:#4a4b52;}
-:root.light .card{background:#f2f3f5;border-color:#d0d1d6;box-shadow:0 1px 4px rgba(0,0,0,.10);}
+:root.light .card{background:#f5f1e9;border-color:#d0d1d6;box-shadow:0 1px 4px rgba(0,0,0,.10);}
 :root.light .card-dark{background:#e8e9ec;}
-:root.light input,:root.light textarea,:root.light select{background:#ffffff;border-color:#c0c1c6;color:#1a1b1e;}
-:root.light input:focus,:root.light textarea:focus,:root.light select:focus{background:#ffffff;border-color:#9a9ba6;}
-:root.light select option{background:#ffffff;color:#1a1b1e;}
+:root.light input,:root.light textarea,:root.light select{background:#fbf8f2;border-color:#c0c1c6;color:#1a1b1e;}
+:root.light input:focus,:root.light textarea:focus,:root.light select:focus{background:#fbf8f2;border-color:#9a9ba6;}
+:root.light select option{background:#fbf8f2;color:#1a1b1e;}
 :root.light .btn.bgh{background:rgba(0,0,0,.08);color:#4a4b52;border-color:rgba(0,0,0,.18);}
 :root.light .btn.bgh:hover{background:rgba(0,0,0,.13);color:#1a1b1e;}
 :root.light .tab{color:#4a4b52;}
@@ -599,43 +607,43 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 :root.light .chi.done{background:rgba(52,211,153,.12);border-color:rgba(52,211,153,.4);}
 :root.light .sb{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.12);}
 :root.light .qs{background:transparent;}
-:root.light .qsc{background:#f2f3f5;border:1px solid #d0d1d6;box-shadow:0 1px 6px rgba(0,0,0,.08);}
-:root.light .fst{background:#f2f3f5;border:1px solid #d0d1d6;}
+:root.light .qsc{background:#f5f1e9;border:1px solid #d0d1d6;box-shadow:0 1px 6px rgba(0,0,0,.08);}
+:root.light .fst{background:#f5f1e9;border:1px solid #d0d1d6;}
 :root.light .tip-btn{background:rgba(0,0,0,.08);border-color:rgba(0,0,0,.18);}
-:root.light .tip-box{background:#f2f3f5;border-color:#d0d1d6;box-shadow:0 8px 24px rgba(0,0,0,.15);color:#4a4b52;}
+:root.light .tip-box{background:#f5f1e9;border-color:#d0d1d6;box-shadow:0 8px 24px rgba(0,0,0,.15);color:#4a4b52;}
 :root.light .tip-title{color:#1a1b1e;}
 :root.light .tip-box b{color:#1a1b1e;}
-:root.light #sp{background:#f2f3f5;border-left-color:#c8c9ce;}
+:root.light #sp{background:#f5f1e9;border-left-color:#c8c9ce;}
 :root.light #sp label{color:#4a4b52;}
 :root.light .sched-table th{background:#d8d9de;color:#4a4b52;}
 :root.light .sched-table td.time-cell{background:#e4e5e8;color:#4a4b52;}
 :root.light .sched-table td{border-color:rgba(0,0,0,.08);}
 :root.light .act-cell{background:#edeef1;}
-:root.light .act-cell select{background:#ffffff;color:#1a1b1e;}
-:root.light .act-cell select option{background:#ffffff;color:#1a1b1e;}
-:root.light #schedPicker{background:#f2f3f5;border-color:#d0d1d6;}
+:root.light .act-cell select{background:#fbf8f2;color:#1a1b1e;}
+:root.light .act-cell select option{background:#fbf8f2;color:#1a1b1e;}
+:root.light #schedPicker{background:#f5f1e9;border-color:#d0d1d6;}
 :root.light .toast{background:#1a1b1e;color:#fff;}
 :root.light .bdg{color:#4a4b52;}
 :root.light .bdg.bp2{background:rgba(167,139,250,.15);color:var(--p);}
 :root.light .bdg.bg2{background:rgba(52,211,153,.15);color:var(--gr);}
 :root.light .ct{color:#5a5c6b;}
 :root.light label{color:#4a4b52;}
-:root.light .tut-body,:root.light #tutInner{background:#f2f3f5;}
+:root.light .tut-body,:root.light #tutInner{background:#f5f1e9;}
 :root.light .tut-header{background:rgba(0,0,0,.04);}
 :root.light .tut-nav,:root.light .tut-foot{background:#e8e9ec;}
 :root.light .tut-nb{background:rgba(0,0,0,.08);color:#4a4b52;}
 
 :root.light .tut-step p{color:#4a4b52;}
 :root.light .mo{background:rgba(0,0,0,.55);}
-:root.light .md{background:#f2f3f5;border-color:#d0d1d6;}
+:root.light .md{background:#f5f1e9;border-color:#d0d1d6;}
 :root.light #themeBtn{background:rgba(0,0,0,.08);border-color:rgba(0,0,0,.18);color:#4a4b52;}
 :root.light #themeBtnMob{background:rgba(0,0,0,.10);border-color:rgba(0,0,0,.20);color:#4a4b52;}
 /* ── Phase 3 light-mode contrast pass (bulk class rescue) ───── */
 :root.light .ai2{background:rgba(0,0,0,.05);color:#1a1b1e;}
 :root.light .ai2 .ck{border-color:rgba(0,0,0,.3);}
 :root.light .ai2 .pl{border-left-color:rgba(0,0,0,.18);}
-:root.light .cc{background:#f2f3f5;border-color:#d0d1d6;box-shadow:0 1px 6px rgba(0,0,0,.08);}
-:root.light .stat-tile{background:#f2f3f5;border-color:#d0d1d6;box-shadow:0 1px 6px rgba(0,0,0,.08);}
+:root.light .cc{background:#f5f1e9;border-color:#d0d1d6;box-shadow:0 1px 6px rgba(0,0,0,.08);}
+:root.light .stat-tile{background:#f5f1e9;border-color:#d0d1d6;box-shadow:0 1px 6px rgba(0,0,0,.08);}
 :root.light .qsl,
 :root.light .stat-lbl{color:#7a7b85;}
 :root.light .pin-btn,
@@ -715,7 +723,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .bq-item:hover{background:rgba(56,189,248,.08);color:var(--tx);border-left-color:var(--c);}
 
 /* Light mode overrides */
-:root.light .ja-card{background:#fff;border-color:rgba(0,0,0,.1);}
+:root.light .ja-card{background:#f5f1e9;border-color:rgba(0,0,0,.1);}
 :root.light .prep-tip-row{background:rgba(0,0,0,.03);color:#475569;}
 :root.light .prep-tip-row b{color:#0f172a;}
 :root.light .prep-gold{background:rgba(146,64,14,.07);}
@@ -1074,7 +1082,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .sk-dot-fail{background:#f87171;}
 
 :root.light .sk-q-card{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.1);}
-:root.light .sk-q-opt-btn{background:#fff;border-color:rgba(0,0,0,.1);color:#0f172a;}
+:root.light .sk-q-opt-btn{background:#f5f1e9;border-color:rgba(0,0,0,.1);color:#0f172a;}
 :root.light .sk-q-opt-btn:hover:not(:disabled){background:#f1f5f9;border-color:rgba(0,0,0,.2);}
 :root.light .sk-q-opt-letter{background:rgba(0,0,0,.08);}
 :root.light .sk-result-card{background:#f8fafc;}
@@ -1196,7 +1204,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .sk-ref-desc{font-size:.71rem;color:var(--tx2);margin-top:.08rem;}
 
 /* Light mode */
-:root.light .sk-acc-item{background:#fff;border-color:rgba(0,0,0,.09);}
+:root.light .sk-acc-item{background:#f5f1e9;border-color:rgba(0,0,0,.09);}
 :root.light .sk-acc-item.open{box-shadow:0 2px 16px rgba(0,0,0,.1);}
 :root.light .sk-acc-header:hover{background:rgba(0,0,0,.02);}
 :root.light .sk-acc-num{background:rgba(0,0,0,.06);color:#64748b;}
@@ -1362,10 +1370,10 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 
 /* Light mode */
 :root.light .gv-vision-card{background:linear-gradient(135deg,rgba(139,92,246,.1) 0%,rgba(56,189,248,.06) 100%);}
-:root.light .gv-tl-card{background:#fff;border-color:#e2e8f0;}
+:root.light .gv-tl-card{background:#f5f1e9;border-color:#e2e8f0;}
 :root.light .gv-tl-card.has-content{border-color:rgba(56,189,248,.4);background:rgba(56,189,248,.04);}
-:root.light .gv-goal-card{background:#fff;border-color:#e2e8f0;}
-:root.light .gv-stat{background:#fff;border-color:#e2e8f0;}
+:root.light .gv-goal-card{background:#f5f1e9;border-color:#e2e8f0;}
+:root.light .gv-stat{background:#f5f1e9;border-color:#e2e8f0;}
 
 
 /* ═══════════════════════════════════════
@@ -1478,7 +1486,7 @@ input[type=file]{font-size:.8rem;padding:.4rem;color:#c8d4e8;}
 .cm-faith-text{font-size:.83rem;color:var(--tx2);line-height:1.65;margin:0;font-style:italic;}
 
 /* Light mode */
-:root.light .cv-card{background:#fff;border-color:#e2e8f0;}
+:root.light .cv-card{background:#f5f1e9;border-color:#e2e8f0;}
 :root.light .cv-card:hover{background:#f8fafc;}
 :root.light .cv-card.starred{background:rgba(146,64,14,.06);}
 :root.light .cm-text,:root.light .cm-list li,:root.light .cm-faith-text{color:#475569;}
@@ -2126,7 +2134,7 @@ body{top:0!important;}
 :root.light .hero-card.no-photo .hero-date  { color: #475569; }
 
 /* Dashboard cards — white text on card backgrounds */
-:root.light .dcard { background: #fff; border-color: rgba(0,0,0,.1); }
+:root.light .dcard { background: #f5f1e9; border-color: rgba(0,0,0,.1); }
 :root.light .dcard-label { color: #64748b; }
 :root.light .dcard-value { color: #0f172a; }
 :root.light .dcard-sub   { color: #94a3b8; }
@@ -2231,7 +2239,7 @@ body{top:0!important;}
 :root.light [style*="color:rgba(255,255,255,.3)"] { color: #94a3b8 !important; }
 
 /* Fuel wall / quote cards */
-:root.light .fst { background: #fff; border-color: rgba(0,0,0,.1); }
+:root.light .fst { background: #f5f1e9; border-color: rgba(0,0,0,.1); }
 
 /* Nav banner (top strip) — white links */
 :root.light #topBanner a,
@@ -2439,12 +2447,12 @@ body.child-view:not(.parent-unlocked) #sideSignOutBtn                           
 /* Sidebar / global chrome */
 :root.light .sid-scroll::-webkit-scrollbar-thumb{ background:rgba(0,0,0,.18); }
 :root.light #sideExpandTab{ background:#dfe0e4; border-color:#c8c9ce; color:#4a4b52; }
-:root.light #mob_translate_element{ background:#fff; border-color:#c8c9ce; }
-:root.light #mob_translate_element select{ background:#fff; color:#1a1b1e; }
+:root.light #mob_translate_element{ background:#f5f1e9; border-color:#c8c9ce; }
+:root.light #mob_translate_element select{ background:#fbf8f2; color:#1a1b1e; }
 :root.light .sid-collapse-btn{ background:rgba(0,0,0,.05); border-color:rgba(0,0,0,.14); }
 
 /* Help tooltip (#hlpBox) */
-:root.light #hlpBox{ background:#fff; border-color:rgba(0,0,0,.15); color:#1a1b1e; box-shadow:0 6px 28px rgba(0,0,0,.15); }
+:root.light #hlpBox{ background:#f5f1e9; border-color:rgba(0,0,0,.15); color:#1a1b1e; box-shadow:0 6px 28px rgba(0,0,0,.15); }
 :root.light #hlpBox .hb-t{ color:#0284c7; }
 
 /* Global forms */
@@ -2473,15 +2481,15 @@ body.child-view:not(.parent-unlocked) #sideSignOutBtn                           
 :root.light .sched-table th.today-col{ color:#1a1b1e; }
 
 /* Avatar picker modal (#childAvatarModal) */
-:root.light .cam-inner{ background:#f2f3f5; border-color:#d0d1d6; box-shadow:0 32px 80px rgba(0,0,0,.18); }
+:root.light .cam-inner{ background:#f5f1e9; border-color:#d0d1d6; box-shadow:0 32px 80px rgba(0,0,0,.18); }
 :root.light .cam-section-label{ color:#7a7b85; }
 :root.light .cam-upload-zone{ border-color:rgba(0,0,0,.2); background:rgba(0,0,0,.02); }
 
 /* Parent Hub launcher + kid cards + PIN gate overlay */
-:root.light .phHomeAction{ background:#fff; border-color:rgba(0,0,0,.08); }
+:root.light .phHomeAction{ background:#f5f1e9; border-color:rgba(0,0,0,.08); }
 :root.light .phHomeAction .phaLb{ color:#0f172a; }
 :root.light .phHomeAction .phaSb{ color:#64748b; }
-:root.light .phKidCard{ background:#fff; border-color:rgba(0,0,0,.08); }
+:root.light .phKidCard{ background:#f5f1e9; border-color:rgba(0,0,0,.08); }
 :root.light .phKidCard .pkName{ color:#0f172a; }
 :root.light .phKidCard .pkStatus{ color:#64748b; }
 :root.light .phKidCard .pkPill{ background:rgba(0,0,0,.05); border-color:rgba(0,0,0,.1); }
@@ -2489,7 +2497,7 @@ body.child-view:not(.parent-unlocked) #sideSignOutBtn                           
 :root.light #parentGate{ background:rgba(248,250,252,.95); }
 
 /* Auth screen focus state */
-:root.light #authScreen input:focus{ background:#fff !important; border-color:#0284c7 !important; }
+:root.light #authScreen input:focus{ background:#fbf8f2 !important; border-color:#0284c7 !important; }
 
 /* Skills certificate */
 :root.light .sk-cert-score{ color:#0f766e; }
@@ -2503,12 +2511,12 @@ body.child-view:not(.parent-unlocked) #sideSignOutBtn                           
 :root.light #ht-movement .mv-goal-row input{ color:#0f766e; background:rgba(15,118,110,.08); border-color:rgba(15,118,110,.28); }
 
 /* Faith section — JS-injected dark inline surfaces */
-:root.light #abPlayerFrame{ background:#f2f3f5 !important; }
+:root.light #abPlayerFrame{ background:#f5f1e9 !important; }
 :root.light #planMiniMap{ background:#e2e8f0 !important; }
 :root.light [style*="background:#0a0d1a"]{ background:#e2e8f0 !important; }
 
 /* Faith-free path — profile sheet */
-:root.light #ffProfileSheet{ background:#f2f3f5; border-top-color:#c8c9ce; }
+:root.light #ffProfileSheet{ background:#f5f1e9; border-top-color:#c8c9ce; }
 :root.light .ff-sheet-title{ color:#0f172a; }
 :root.light .ff-sheet-close,
 :root.light .ff-theme-btn{ background:rgba(0,0,0,.06); color:#4a4b52; }
@@ -2517,7 +2525,7 @@ body.child-view:not(.parent-unlocked) #sideSignOutBtn                           
 :root.light .ff-sheet-divider{ background:rgba(0,0,0,.08); }
 
 /* Faith-free path — cookie modal */
-:root.light #ffCookieModal{ background:#f2f3f5; }
+:root.light #ffCookieModal{ background:#f5f1e9; }
 :root.light .ff-cookie-title{ color:#0f172a; }
 :root.light .ff-cookie-name{ color:#0f172a; }
 :root.light .ff-cookie-header{ border-bottom-color:rgba(0,0,0,.08); }
@@ -2525,8 +2533,8 @@ body.child-view:not(.parent-unlocked) #sideSignOutBtn                           
 
 /* Faith-free path — search overlay */
 :root.light .ff-search-header{ background:rgba(255,255,255,.97); border-top-color:rgba(0,0,0,.1); }
-:root.light .ff-search-body{ background:#f2f3f5; }
-:root.light .ff-search-input{ background:#fff; color:#0f172a; border-color:rgba(0,0,0,.15); }
+:root.light .ff-search-body{ background:#f5f1e9; }
+:root.light .ff-search-input{ background:#fbf8f2; color:#0f172a; border-color:rgba(0,0,0,.15); }
 :root.light .ff-search-title{ color:#0f172a; }
 :root.light .ff-search-item{ border-bottom-color:rgba(0,0,0,.06); }
 
@@ -7321,7 +7329,7 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   box-shadow:0 14px 36px rgba(251,191,36,.22);
   border-color:rgba(251,191,36,.5);
 }
-:root.light .well-card{background:#ffffff;border-color:#d0d1d6;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+:root.light .well-card{background:#f5f1e9;border-color:#d0d1d6;box-shadow:0 1px 3px rgba(0,0,0,.06);}
 
 /* ─── Plans tab: hero + plan-detail modal header + card glow → gold ─── */
 #bf-plans .pl-hero{
@@ -8476,15 +8484,15 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 }
 :root.light #healthMoodCheckin > div:first-child{ color:#0f172a !important; }
 :root.light #healthMoodCheckin > div:nth-child(2){ color:#4a4b52 !important; }
-:root.light #healthMoodCheckin button{ background:#fff !important; border-color:rgba(52,211,153,.35) !important; color:#0f172a !important; }
+:root.light #healthMoodCheckin button{ background:#f5f1e9 !important; border-color:rgba(52,211,153,.35) !important; color:#0f172a !important; }
 :root.light #ht-sleep .card,
 :root.light #ht-mind .card,
-:root.light #ht-meals .card{ background:#fff !important; border-color:rgba(0,0,0,.08) !important; }
+:root.light #ht-meals .card{ background:#f5f1e9 !important; border-color:rgba(0,0,0,.08) !important; }
 :root.light #ht-sleep #sleepList > div,
 :root.light #ht-meals .card > div[style*="background:rgba(255,255,255,.04)"]{
   background:rgba(0,0,0,.04) !important;
 }
-:root.light .phq2-opt{ background:#fff !important; border-color:rgba(52,211,153,.35) !important; color:#0f172a !important; }
+:root.light .phq2-opt{ background:#f5f1e9 !important; border-color:rgba(52,211,153,.35) !important; color:#0f172a !important; }
 
 /* Phase C-Finance — summary opener, donut card, paycheck sim */
 :root.light .finance-summary-opener{
@@ -8501,7 +8509,7 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 }
 
 /* Phase C-Goals — goal cards + milestones + motivation + completion stamp */
-:root.light .gv-goal-card{ background:#fff !important; }
+:root.light .gv-goal-card{ background:#f5f1e9 !important; }
 :root.light .gv-goal-card .gv-goal-text{ color:#0f172a !important; }
 :root.light .gv-goal-card svg text{ fill:#0f172a !important; }
 :root.light .gv-goal-card > div > div[style*="background:rgba(249,115,22,.04)"],
@@ -8510,17 +8518,17 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 }
 
 /* Phase F — AI Study Partner, Goal Suggest modal, Faith entry card */
-:root.light #st-aiTutor .card{ background:#fff !important; }
+:root.light #st-aiTutor .card{ background:#f5f1e9 !important; }
 :root.light #apOutput > div{
   background:#fff !important;
   border-color:rgba(0,0,0,.08) !important;
   color:#0f172a !important;
 }
-:root.light .ap-mode-btn{ background:#fff !important; border-color:rgba(56,189,248,.30) !important; color:#475569 !important; }
+:root.light .ap-mode-btn{ background:#f5f1e9 !important; border-color:rgba(56,189,248,.30) !important; color:#475569 !important; }
 :root.light .ap-mode-btn[style*="background:rgba(56,189,248,.18)"]{
   background:rgba(56,189,248,.18) !important; color:#0f172a !important;
 }
-:root.light #goalSuggestModal .md{ background:#fff !important; }
+:root.light #goalSuggestModal .md{ background:#f5f1e9 !important; }
 :root.light #gsList > div{
   background:#fff !important;
   border-color:rgba(249,115,22,.30) !important;
@@ -8534,7 +8542,7 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 }
 
 /* Phase E — onboarding overlay flips to light surface */
-:root.light #onboardingOverlay{ background:#ffffff !important; }
+:root.light #onboardingOverlay{ background:#f5f1e9 !important; }
 :root.light #onboardingOverlay h2{ color:#0f172a !important; }
 :root.light #onboardingOverlay .onb-sub{ color:#475569 !important; }
 :root.light #onboardingOverlay .onb-card{
@@ -8573,7 +8581,7 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 
 /* ════════════════════════════════════════════════════════════
    LIGHT-MODE GRAY SYSTEM — all surfaces gray, not white.
-   Body #e8e9ec · Cards #f2f3f5 · Chrome #dfe0e4 · Inputs white.
+   Body #e8e9ec · Cards #f5f1e9 · Chrome #dfe0e4 · Inputs white.
    Gold text → #8a5200. Generic blue → slate #5a5c6b.
    Flashcards always dark (override in flashcard section above).
    ════════════════════════════════════════════════════════════ */
@@ -8593,35 +8601,35 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 
 /* ── Cards everywhere ────────────────────────────────────── */
 :root.light .card{
-  background:#f2f3f5 !important;
+  background:#f5f1e9 !important;
   border-color:#d0d1d6 !important;
   box-shadow:0 1px 4px rgba(0,0,0,.10) !important;
 }
 :root.light .card:hover{ background:#edeef1 !important; }
 /* ── Hero opener ─────────────────────────────────────────── */
 :root.light #heroGreeting{
-  background:#f2f3f5 !important;
+  background:#f5f1e9 !important;
   border-color:#d0d1d6 !important;
   box-shadow:0 1px 4px rgba(0,0,0,.10);
 }
 :root.light #heroGreeting > div:first-child{ color:#1a1b1e !important; }
 :root.light #heroGreeting > div:last-child{ color:#4a4b52 !important; }
 :root.light #heroTodaysVerse{
-  background:#f2f3f5 !important;
+  background:#f5f1e9 !important;
   border:1px solid #d0d1d6 !important;
   border-left:3px solid #92400e !important;
   box-shadow:0 1px 4px rgba(0,0,0,.10);
 }
 :root.light #heroTodaysVerseText{ color:#4a4b52 !important; }
 :root.light #heroReflectCard{
-  background:#f2f3f5 !important;
+  background:#f5f1e9 !important;
   border-color:#d0d1d6 !important;
 }
 :root.light #heroReflectBtn{ color:#92400e !important; }
 :root.light #heroReflectQuestion{ background:#e4e5e8 !important; color:#4a4b52 !important; border-left-color:#92400e !important; }
-:root.light #heroReflectResponse{ background:#ffffff !important; border-color:#c0c1c6 !important; color:#1a1b1e !important; }
+:root.light #heroReflectResponse{ background:#fbf8f2 !important; border-color:#c0c1c6 !important; color:#1a1b1e !important; }
 :root.light #heroQuickActions button{
-  background:#f2f3f5 !important;
+  background:#f5f1e9 !important;
   border-color:#d0d1d6 !important;
   box-shadow:0 1px 4px rgba(0,0,0,.10);
   color:#1a1b1e !important;
@@ -8642,7 +8650,7 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 
 /* ── Tab landings (s-learn / s-life / s-me) ──────────────── */
 :root.light .tab-landing-card{
-  background:#f2f3f5 !important;
+  background:#f5f1e9 !important;
   border-color:#d0d1d6 !important;
   box-shadow:0 1px 4px rgba(0,0,0,.10);
   color:#1a1b1e !important;
@@ -8650,22 +8658,22 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 :root.light .tab-landing-card .tlc-label{ color:#1a1b1e !important; }
 
 /* ── Misc surfaces ───────────────────────────────────────── */
-:root.light .well-card{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; box-shadow:0 1px 4px rgba(0,0,0,.10) !important; }
-:root.light .ja-card{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; }
-:root.light .sk-q-opt-btn{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; color:#1a1b1e !important; }
-:root.light .gv-tl-card{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; }
-:root.light .cv-card{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; }
-:root.light .dcard{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; }
+:root.light .well-card{ background:#f5f1e9 !important; border-color:#d0d1d6 !important; box-shadow:0 1px 4px rgba(0,0,0,.10) !important; }
+:root.light .ja-card{ background:#f5f1e9 !important; border-color:#d0d1d6 !important; }
+:root.light .sk-q-opt-btn{ background:#f5f1e9 !important; border-color:#d0d1d6 !important; color:#1a1b1e !important; }
+:root.light .gv-tl-card{ background:#f5f1e9 !important; border-color:#d0d1d6 !important; }
+:root.light .cv-card{ background:#f5f1e9 !important; border-color:#d0d1d6 !important; }
+:root.light .dcard{ background:#f5f1e9 !important; border-color:#d0d1d6 !important; }
 
 /* ── Faith stack — amber readability ─────────────────────── */
 :root.light .bf-eyebrow{ color:#92400e !important; opacity:1 !important; }
 :root.light .bf-title{ color:#92400e !important; }
-:root.light .bf-card{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; box-shadow:0 1px 4px rgba(0,0,0,.10); }
+:root.light .bf-card{ background:#f5f1e9 !important; border-color:#d0d1d6 !important; box-shadow:0 1px 4px rgba(0,0,0,.10); }
 :root.light .scrTabs .tab.active,
 :root.light .scrTabs-bottom .tab.active{ color:#92400e !important; }
 :root.light #s-scripture .sh .st{ color:#92400e !important; }
 :root.light #s-scripture > div[onclick*="openAskBible"]{
-  background:#f2f3f5 !important;
+  background:#f5f1e9 !important;
   border-color:#d0d1d6 !important;
   box-shadow:0 1px 4px rgba(0,0,0,.10);
 }
@@ -8677,8 +8685,8 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 }
 :root.light #healthMoodCheckin > div:first-child{ color:#1a1b1e !important; }
 :root.light #healthMoodCheckin > div:nth-child(2){ color:#4a4b52 !important; }
-:root.light #healthMoodCheckin button{ background:#f2f3f5 !important; border-color:rgba(22,101,52,.25) !important; color:#1a1b1e !important; }
-:root.light .phq2-opt{ background:#f2f3f5 !important; border-color:rgba(22,101,52,.25) !important; color:#1a1b1e !important; }
+:root.light #healthMoodCheckin button{ background:#f5f1e9 !important; border-color:rgba(22,101,52,.25) !important; color:#1a1b1e !important; }
+:root.light .phq2-opt{ background:#f5f1e9 !important; border-color:rgba(22,101,52,.25) !important; color:#1a1b1e !important; }
 
 /* ── Phase C-Finance ─────────────────────────────────────── */
 :root.light .finance-summary-opener{
@@ -8690,11 +8698,11 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 :root.light #finSumSavPct{ color:#14532d !important; }
 :root.light #spendingDonut text[fill="var(--tx)"]{ fill:#1a1b1e !important; }
 :root.light #spendingDonut text[fill="var(--tx2)"]{ fill:#4a4b52 !important; }
-:root.light #paySimOutput > div{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; box-shadow:0 1px 4px rgba(0,0,0,.10); }
+:root.light #paySimOutput > div{ background:#f5f1e9 !important; border-color:#d0d1d6 !important; box-shadow:0 1px 4px rgba(0,0,0,.10); }
 
 /* ── Phase C-Goals ───────────────────────────────────────── */
 :root.light .gv-goal-card{
-  background:#f2f3f5 !important;
+  background:#f5f1e9 !important;
   border-color:#d0d1d6 !important;
   box-shadow:0 1px 4px rgba(0,0,0,.10);
 }
@@ -8702,14 +8710,14 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 :root.light .gv-goal-card svg text{ fill:#1a1b1e !important; }
 
 /* ── Phase F — AI surfaces ───────────────────────────────── */
-:root.light #st-aiTutor .card{ background:#f2f3f5 !important; }
-:root.light #apOutput > div{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; color:#1a1b1e !important; box-shadow:0 1px 4px rgba(0,0,0,.10); }
-:root.light .ap-mode-btn{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; color:#4a4b52 !important; }
+:root.light #st-aiTutor .card{ background:#f5f1e9 !important; }
+:root.light #apOutput > div{ background:#f5f1e9 !important; border-color:#d0d1d6 !important; color:#1a1b1e !important; box-shadow:0 1px 4px rgba(0,0,0,.10); }
+:root.light .ap-mode-btn{ background:#f5f1e9 !important; border-color:#d0d1d6 !important; color:#4a4b52 !important; }
 :root.light .ap-mode-btn[style*="background:rgba(56,189,248,.18)"]{
   background:rgba(90,92,107,.15) !important; border-color:#5a5c6b !important; color:#1a1b1e !important;
 }
-:root.light #goalSuggestModal .md{ background:#f2f3f5 !important; box-shadow:0 20px 60px rgba(0,0,0,.18) !important; }
-:root.light #gsList > div{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; box-shadow:0 1px 4px rgba(0,0,0,.10); }
+:root.light #goalSuggestModal .md{ background:#f5f1e9 !important; box-shadow:0 20px 60px rgba(0,0,0,.18) !important; }
+:root.light #gsList > div{ background:#f5f1e9 !important; border-color:#d0d1d6 !important; box-shadow:0 1px 4px rgba(0,0,0,.10); }
 
 /* ── Phase E — onboarding overlay ────────────────────────── */
 :root.light #onboardingOverlay{ background:#e8e9ec !important; }
@@ -8717,18 +8725,18 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 :root.light #onboardingOverlay .onb-sub{ color:#4a4b52 !important; }
 :root.light #onboardingOverlay .onb-step > div[style*="font-family:var(--fh)"]{ color:#1a1b1e !important; }
 :root.light #onboardingOverlay .onb-card{
-  background:#f2f3f5 !important; border-color:#d0d1d6 !important;
+  background:#f5f1e9 !important; border-color:#d0d1d6 !important;
   box-shadow:0 1px 4px rgba(0,0,0,.10);
 }
 :root.light #onboardingOverlay .onb-card .onb-label{ color:#1a1b1e !important; }
 :root.light #onboardingOverlay .onb-card .onb-cap{ color:#4a4b52 !important; }
 :root.light #onboardingOverlay .onb-card.selected{ box-shadow:0 6px 20px rgba(146,64,14,.18); border-color:#92400e !important; }
-:root.light #onboardingOverlay .onb-tile{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; }
+:root.light #onboardingOverlay .onb-tile{ background:#f5f1e9 !important; border-color:#d0d1d6 !important; }
 :root.light #onboardingOverlay .onb-tile .onb-tile-label{ color:#1a1b1e !important; }
-:root.light #onboardingOverlay .onb-toggle-row{ background:#f2f3f5 !important; border-color:#d0d1d6 !important; }
+:root.light #onboardingOverlay .onb-toggle-row{ background:#f5f1e9 !important; border-color:#d0d1d6 !important; }
 :root.light #onboardingOverlay .onb-toggle-row .onb-toggle-label{ color:#1a1b1e !important; }
 :root.light #onboardingOverlay .onb-toggle-row .onb-toggle-cap{ color:#7a7b85 !important; }
-:root.light #onboardingOverlay input[type=text]{ background:#ffffff !important; border-color:#c0c1c6 !important; color:#1a1b1e !important; }
+:root.light #onboardingOverlay input[type=text]{ background:#fbf8f2 !important; border-color:#c0c1c6 !important; color:#1a1b1e !important; }
 :root.light #onboardingOverlay .onb-yesno{ background:rgba(0,0,0,.08) !important; }
 :root.light #onboardingOverlay .onb-yesno button{ color:#4a4b52 !important; }
 :root.light #onboardingOverlay .onb-yesno button.active{ background:rgba(255,255,255,0.15) !important; color:#fff !important; }
@@ -8741,7 +8749,7 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 /* ── Modals (.mo / .md) ──────────────────────────────────── */
 :root.light .mo{ background:rgba(0,0,0,.55) !important; }
 :root.light .md{
-  background:#f2f3f5 !important;
+  background:#f5f1e9 !important;
   border-color:#d0d1d6 !important;
   box-shadow:0 20px 60px rgba(0,0,0,.18) !important;
 }
@@ -8758,7 +8766,7 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 
 /* ── GOLD-TEXT → DARK AMBER #8a5200 ─────────────────────────
    Inline gold on gray surfaces would be illegible. All gold/amber
-   text remapped to dark amber that reads on #f2f3f5 / #e8e9ec. */
+   text remapped to dark amber that reads on #f5f1e9 / #e8e9ec. */
 :root.light *[style*="color:#92400e"]:not(button):not(a):not([style*="background:#92400e"]):not([style*="background:linear-gradient"]){
   color:#92400e !important;
 }
@@ -8788,7 +8796,7 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 /* Generic text remap. */
 :root.light *[style*="color:var(--tx);"]:not(button):not(a){ color:#1a1b1e !important; }
 :root.light *[style*="color:var(--tx2)"]:not(button):not(a){ color:#4a4b52 !important; }
-:root.light *[style*="color:var(--tx3)"]:not(button):not(a){ color:#7a7b85 !important; }
+:root.light *[style*="color:var(--tx3)"]:not(button):not(a){ color:#6e6558 !important; }
 :root.light *[style*="color:#c8d4e8"]:not(button):not(a){ color:#4a4b52 !important; }
 :root.light *[style*="color:rgba(255,255,255"]:not(button):not(a){ color:#1a1b1e !important; }
 
@@ -8820,7 +8828,7 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
   text-shadow:none !important;
 }
 :root.light #tlEventModal .tlm-era{ color:#92400e !important; opacity:1 !important; }
-:root.light #tlEventModal .md{ background:#f2f3f5 !important; }
+:root.light #tlEventModal .md{ background:#f5f1e9 !important; }
 :root.light #tlEventModal .tlm-hdr{ border-bottom-color:#d0d1d6 !important; }
 :root.light #tlEventModal .tlm-subtitle{ color:#4a4b52 !important; }
 :root.light #tlEventModal .tlm-body,
@@ -8843,7 +8851,7 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
   color:#1a1b1e !important;
 }
 :root.light #tlEventModal .tlm-related-link{
-  background:#f2f3f5 !important;
+  background:#f5f1e9 !important;
   border-color:#d0d1d6 !important;
   color:#1a1b1e !important;
 }
@@ -8966,7 +8974,7 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 
 /* ── Faith Academy cards — light backgrounds ── */
 :root.light #bf-academy .ac-card{
-  background:#f2f3f5 !important;
+  background:#f5f1e9 !important;
   border-color:#d0d1d6 !important;
   box-shadow:0 1px 4px rgba(0,0,0,.10) !important;
 }
@@ -8983,7 +8991,7 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 
 /* ── Devotional — fix white scripture text and dark background ── */
 :root.light #bf-devotional > div[style*="linear-gradient"]{
-  background:#f2f3f5 !important;
+  background:#f5f1e9 !important;
   border-color:#d0d1d6 !important;
 }
 :root.light #devScripture{ color:#4a4b52 !important; }
@@ -8994,7 +9002,7 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 
 /* ── Faith Academy featured lesson modal light mode ─────────── */
 :root.light #lessonModal .md{
-  background:#f2f3f5 !important;
+  background:#f5f1e9 !important;
   border-color:#d0d1d6 !important;
 }
 :root.light #lessonModal .lm-svg::after{
