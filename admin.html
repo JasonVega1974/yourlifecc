@@ -1439,35 +1439,56 @@ async function sendOutreach(){
   }
 }
 
+// SPEC 5b — proxy admin Brevo sends through /api/admin/send-message
+// server-side. The Brevo API key now lives only in Vercel env vars;
+// the browser tab never sees it. Bearer-authenticated with the
+// operator's ADMIN_SECRET, held in this in-memory module variable
+// for the tab's lifetime (NOT sessionStorage / NOT localStorage —
+// clears on tab close, on 401, or when the operator reloads). On 401
+// we clear and re-prompt on the next send.
+let _adminSecret = '';
+
 async function sendViaBrevo(recipients, subject, body, fromName){
   const btn = document.getElementById('sendBtn');
   btn.disabled = true; btn.textContent = 'Sending…';
   showSendStatus('Sending via Brevo…', 'var(--tx3)');
 
-  const results = [];
-  const BREVO_URL = 'https://api.brevo.com/v3/smtp/email';
-
-  for(let i=0;i<recipients.length;i++){
-    const email = recipients[i];
-    try{
-      const res = await fetch(BREVO_URL, {
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'api-key': window.BREVO_API_KEY || prompt('Enter your Brevo API key (stored for session):') || ''
-        },
-        body: JSON.stringify({
-          sender:{ name: fromName, email:'info@kingdom-creatives.com' },
-          to:[{ email }],
-          subject,
-          htmlContent: body.replace(/\n/g,'<br>'),
-          textContent: body
-        })
-      });
-      results.push({email, ok:res.ok, status:res.status});
-    }catch(e){
-      results.push({email, ok:false, status:e.message});
+  if(!_adminSecret){
+    _adminSecret = prompt('Enter ADMIN_SECRET (held in tab memory only):') || '';
+    if(!_adminSecret){
+      showSendStatus('⚠️ Cancelled — no secret provided.', 'var(--amber)');
+      btn.disabled=false; btn.textContent='✈️ Send Message';
+      return;
     }
+  }
+
+  let results = [];
+  try{
+    const res = await fetch('/api/admin/send-message', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer ' + _adminSecret
+      },
+      body: JSON.stringify({ recipients, subject, body, fromName })
+    });
+    if(res.status === 401){
+      _adminSecret = '';
+      showSendStatus('❌ Auth failed — wrong ADMIN_SECRET. Try again.', 'var(--amber)');
+      btn.disabled=false; btn.textContent='✈️ Send Message';
+      return;
+    }
+    const data = await res.json().catch(function(){ return {}; });
+    if(!res.ok){
+      showSendStatus('❌ ' + (data.error || ('Send failed (' + res.status + ')')) + '.', 'var(--amber)');
+      btn.disabled=false; btn.textContent='✈️ Send Message';
+      return;
+    }
+    results = Array.isArray(data.results) ? data.results : [];
+  }catch(e){
+    showSendStatus('❌ Network error: ' + e.message, 'var(--amber)');
+    btn.disabled=false; btn.textContent='✈️ Send Message';
+    return;
   }
 
   const ok  = results.filter(r=>r.ok).length;
@@ -1538,7 +1559,9 @@ function logSend({channel, subject, total, ok, err, recipients, note, ts}){
     </div>`).join('');
 }
 
-window.BREVO_API_KEY = '';
+// SPEC 5b — window.BREVO_API_KEY removed. The master Brevo key now
+// lives only in Vercel env vars and is read server-side by
+// /api/admin/send-message (see sendViaBrevo above).
 
 async function approveWaitlist(id, btn){
   btn.disabled = true;
