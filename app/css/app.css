@@ -2428,6 +2428,124 @@ body.child-view:not(.parent-unlocked) #sideSignOutBtn                           
   color: var(--tx) !important;
 }
 
+/* ─── SPEC 9 — light-mode contrast sweep (audit 2026-06-12, v348) ──
+   Phase A audit identified ~50 surfaces with no :root.light coverage.
+   Phase B implements them here in one consolidated block, grouped by
+   section for revertability. Already-covered surfaces (PIN modal v344,
+   .sk-combo-text @ 2934, .ff-nav-label, Bible Timeline rail by intent,
+   audio/sleep meditation cinematics by intent, parent-bucks celebration
+   overlay always-dark by design) are NOT re-overridden here. */
+
+/* Sidebar / global chrome */
+:root.light .sid-scroll::-webkit-scrollbar-thumb{ background:rgba(0,0,0,.18); }
+:root.light #sideExpandTab{ background:#dfe0e4; border-color:#c8c9ce; color:#4a4b52; }
+:root.light #mob_translate_element{ background:#fff; border-color:#c8c9ce; }
+:root.light #mob_translate_element select{ background:#fff; color:#1a1b1e; }
+:root.light .sid-collapse-btn{ background:rgba(0,0,0,.05); border-color:rgba(0,0,0,.14); }
+
+/* Help tooltip (#hlpBox) */
+:root.light #hlpBox{ background:#fff; border-color:rgba(0,0,0,.15); color:#1a1b1e; box-shadow:0 6px 28px rgba(0,0,0,.15); }
+:root.light #hlpBox .hb-t{ color:#0284c7; }
+
+/* Global forms */
+:root.light input[type=file]{ color:#4a4b52; }
+
+/* Onboarding wizard (#parentOnboard / #kidOnboard) */
+:root.light .ob-box{ background:linear-gradient(145deg,#f8fafc,#f1f5f9); border-color:rgba(0,0,0,.1); box-shadow:0 40px 120px rgba(0,0,0,.15); }
+:root.light .ob-step-card .osc-title{ color:#0f172a; }
+:root.light .ob-checklist li{ background:rgba(0,0,0,.03); border-color:rgba(0,0,0,.05); }
+:root.light .ob-footer{ background:rgba(0,0,0,.04); border-top-color:rgba(0,0,0,.1); }
+:root.light .ob-nav-btn.ghost{ background:rgba(0,0,0,.06); border-color:rgba(0,0,0,.14); color:#4a4b52; }
+:root.light .ob-dot{ background:rgba(0,0,0,.18); }
+
+/* Tutorial modal (#tutModal) */
+:root.light .tut-important{ background:rgba(146,64,14,.06); border-color:rgba(146,64,14,.2); }
+:root.light .tut-important .tut-imp-text{ color:#92400e; }
+:root.light .tut-important .tut-imp-text b{ color:#0f172a; }
+:root.light .tut-visual .tv-path span{ background:rgba(0,0,0,.07); }
+
+/* Getting Started accordion */
+:root.light .gs-tip{ background:#f8fafc; border-color:rgba(139,92,246,.2); color:#475569; }
+:root.light .gs-step{ background:rgba(0,0,0,.02); border-color:rgba(0,0,0,.06); }
+
+/* School / Schedule */
+:root.light .sched-table td.act-cell.today-col{ background:rgba(56,189,248,.1); }
+:root.light .sched-table th.today-col{ color:#1a1b1e; }
+
+/* Avatar picker modal (#childAvatarModal) */
+:root.light .cam-inner{ background:#f2f3f5; border-color:#d0d1d6; box-shadow:0 32px 80px rgba(0,0,0,.18); }
+:root.light .cam-section-label{ color:#7a7b85; }
+:root.light .cam-upload-zone{ border-color:rgba(0,0,0,.2); background:rgba(0,0,0,.02); }
+
+/* Parent Hub launcher + kid cards + PIN gate overlay */
+:root.light .phHomeAction{ background:#fff; border-color:rgba(0,0,0,.08); }
+:root.light .phHomeAction .phaLb{ color:#0f172a; }
+:root.light .phHomeAction .phaSb{ color:#64748b; }
+:root.light .phKidCard{ background:#fff; border-color:rgba(0,0,0,.08); }
+:root.light .phKidCard .pkName{ color:#0f172a; }
+:root.light .phKidCard .pkStatus{ color:#64748b; }
+:root.light .phKidCard .pkPill{ background:rgba(0,0,0,.05); border-color:rgba(0,0,0,.1); }
+:root.light .ph-nav-item:hover{ background:rgba(0,0,0,.05); }
+:root.light #parentGate{ background:rgba(248,250,252,.95); }
+
+/* Auth screen focus state */
+:root.light #authScreen input:focus{ background:#fff !important; border-color:#0284c7 !important; }
+
+/* Skills certificate */
+:root.light .sk-cert-score{ color:#0f766e; }
+
+/* Hydration tracker */
+:root.light #ht-water .water-goal-row input{ color:#0891b2; background:rgba(8,145,178,.08); border-color:rgba(8,145,178,.25); }
+
+/* Movement tracker (PR records + goal inputs) */
+:root.light #ht-movement .mv-pr-value{ color:#92400e; }
+:root.light #ht-movement .mv-pr-unit{ color:rgba(146,64,14,.7); }
+:root.light #ht-movement .mv-goal-row input{ color:#0f766e; background:rgba(15,118,110,.08); border-color:rgba(15,118,110,.28); }
+
+/* Faith section — JS-injected dark inline surfaces */
+:root.light #abPlayerFrame{ background:#f2f3f5 !important; }
+:root.light #planMiniMap{ background:#e2e8f0 !important; }
+:root.light [style*="background:#0a0d1a"]{ background:#e2e8f0 !important; }
+
+/* Faith-free path — profile sheet */
+:root.light #ffProfileSheet{ background:#f2f3f5; border-top-color:#c8c9ce; }
+:root.light .ff-sheet-title{ color:#0f172a; }
+:root.light .ff-sheet-close,
+:root.light .ff-theme-btn{ background:rgba(0,0,0,.06); color:#4a4b52; }
+:root.light .ff-sheet-user{ color:#64748b; }
+:root.light .ff-sheet-row{ color:#0f172a; }
+:root.light .ff-sheet-divider{ background:rgba(0,0,0,.08); }
+
+/* Faith-free path — cookie modal */
+:root.light #ffCookieModal{ background:#f2f3f5; }
+:root.light .ff-cookie-title{ color:#0f172a; }
+:root.light .ff-cookie-name{ color:#0f172a; }
+:root.light .ff-cookie-header{ border-bottom-color:rgba(0,0,0,.08); }
+:root.light .ff-toggle-track{ background:#e2e8f0; border-color:rgba(0,0,0,.18); }
+
+/* Faith-free path — search overlay */
+:root.light .ff-search-header{ background:rgba(255,255,255,.97); border-top-color:rgba(0,0,0,.1); }
+:root.light .ff-search-body{ background:#f2f3f5; }
+:root.light .ff-search-input{ background:#fff; color:#0f172a; border-color:rgba(0,0,0,.15); }
+:root.light .ff-search-title{ color:#0f172a; }
+:root.light .ff-search-item{ border-bottom-color:rgba(0,0,0,.06); }
+
+/* Global modal close button */
+:root.light .modal-close-btn{ background:rgba(0,0,0,.07); color:#1a1b1e; }
+
+/* Skills polish (amber/gold on near-white) */
+:root.light .sk-lesson-tip{ color:#92400e; }
+:root.light .sk-acc-tip-text strong{ color:#92400e; }
+:root.light .prep-gold b{ color:#92400e; }
+:root.light .prep-red b{ color:#dc2626; }
+
+/* Goals (short-tag gold) */
+:root.light .gv-goal-tag.short{ color:#92400e; background:rgba(146,64,14,.1); }
+
+/* Finance / Tax callouts */
+:root.light .tax-callout b,
+:root.light .tax-pro-tip b{ color:#92400e; }
+
 /* ─── UNIFIED CARD / BANNER SYSTEM ─────────────────────────────
    Brand alternative — Settings → Card Style flips this on. */
 :root[data-card-theme="brand"]{
