@@ -1439,27 +1439,30 @@ async function sendOutreach(){
   }
 }
 
-// SPEC 5b — proxy admin Brevo sends through /api/admin/send-message
-// server-side. The Brevo API key now lives only in Vercel env vars;
-// the browser tab never sees it. Bearer-authenticated with the
-// operator's ADMIN_SECRET, held in this in-memory module variable
-// for the tab's lifetime (NOT sessionStorage / NOT localStorage —
-// clears on tab close, on 401, or when the operator reloads). On 401
-// we clear and re-prompt on the next send.
+// SPEC 5b/5c — admin operator's ADMIN_SECRET held in tab memory only
+// (NOT sessionStorage / NOT localStorage). Three callers share this:
+// sendViaBrevo (5b) and the two photo POSTs pmUploadPhoto + pmSavePhoto
+// (5c). Prompt once per tab; clear on 401 so the next call re-prompts.
 let _adminSecret = '';
+function getAdminSecret(){
+  if(_adminSecret) return _adminSecret;
+  const entered = prompt('Enter ADMIN_SECRET (held in tab memory only):') || '';
+  if(!entered) return '';                // cancelled or empty
+  _adminSecret = entered;
+  return _adminSecret;
+}
+function clearAdminSecret(){ _adminSecret = ''; }
 
 async function sendViaBrevo(recipients, subject, body, fromName){
   const btn = document.getElementById('sendBtn');
   btn.disabled = true; btn.textContent = 'Sending…';
   showSendStatus('Sending via Brevo…', 'var(--tx3)');
 
-  if(!_adminSecret){
-    _adminSecret = prompt('Enter ADMIN_SECRET (held in tab memory only):') || '';
-    if(!_adminSecret){
-      showSendStatus('⚠️ Cancelled — no secret provided.', 'var(--amber)');
-      btn.disabled=false; btn.textContent='✈️ Send Message';
-      return;
-    }
+  const secret = getAdminSecret();
+  if(!secret){
+    showSendStatus('⚠️ Cancelled — no secret provided.', 'var(--amber)');
+    btn.disabled=false; btn.textContent='✈️ Send Message';
+    return;
   }
 
   let results = [];
@@ -1468,12 +1471,12 @@ async function sendViaBrevo(recipients, subject, body, fromName){
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        'Authorization':'Bearer ' + _adminSecret
+        'Authorization':'Bearer ' + secret
       },
       body: JSON.stringify({ recipients, subject, body, fromName })
     });
     if(res.status === 401){
-      _adminSecret = '';
+      clearAdminSecret();
       showSendStatus('❌ Auth failed — wrong ADMIN_SECRET. Try again.', 'var(--amber)');
       btn.disabled=false; btn.textContent='✈️ Send Message';
       return;
@@ -2011,12 +2014,31 @@ async function pmUploadFile(cardId){
   if(btn) btn.disabled = true;
   try {
     const { fileData, mimeType } = await pmCompressImage(f);
+    // SPEC 5c — Bearer ADMIN_SECRET. Cancelled prompt degrades to a
+    // toast; no malformed request hits the endpoint.
+    const secret = getAdminSecret();
+    if(!secret){
+      if(msg){ msg.textContent = 'Cancelled — no ADMIN_SECRET provided.'; msg.className = 'pm-msg err'; }
+      pmToast('Cancelled — no ADMIN_SECRET', 'err');
+      if(btn) btn.disabled = false;
+      return;
+    }
     if(msg){ msg.textContent = 'uploading…'; msg.className = 'pm-msg'; }
     const resp = await fetch('/api/upload-card-photo', {
       method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': 'Bearer ' + secret
+      },
       body:    JSON.stringify({ card_id: cardId, fileData, fileName: f.name, mimeType }),
     });
+    if(resp.status === 401){
+      clearAdminSecret();
+      if(msg){ msg.textContent = 'Auth failed — wrong ADMIN_SECRET. Try again.'; msg.className = 'pm-msg err'; }
+      pmToast('Auth failed — wrong ADMIN_SECRET', 'err');
+      if(btn) btn.disabled = false;
+      return;
+    }
     const data = await resp.json().catch(() => ({}));
     if(!resp.ok || !data.ok){
       const errText = data && data.error
@@ -2065,14 +2087,33 @@ async function pmSavePhoto(cardId){
     msg.className = 'pm-msg err';
     return;
   }
+  // SPEC 5c — Bearer ADMIN_SECRET. Cancelled prompt degrades to a
+  // toast; no malformed request hits the endpoint.
+  const secret = getAdminSecret();
+  if(!secret){
+    msg.textContent = 'Cancelled — no ADMIN_SECRET provided.';
+    msg.className   = 'pm-msg err';
+    pmToast('Cancelled — no ADMIN_SECRET', 'err');
+    return;
+  }
   msg.textContent = 'saving…';
   msg.className   = 'pm-msg';
   try {
     const resp = await fetch('/api/admin-card-photo', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': 'Bearer ' + secret
+      },
       body: JSON.stringify({ card_id: cardId, photo_url: url }),
     });
+    if(resp.status === 401){
+      clearAdminSecret();
+      msg.textContent = 'Auth failed — wrong ADMIN_SECRET. Try again.';
+      msg.className   = 'pm-msg err';
+      pmToast('Auth failed — wrong ADMIN_SECRET', 'err');
+      return;
+    }
     const data = await resp.json().catch(() => ({}));
     if(!resp.ok){
       msg.textContent = 'Save failed — ' + (data && data.error ? data.error : resp.status);

@@ -15,10 +15,20 @@
 //
 // Environment variables required:
 //   SUPA_SERVICE_KEY      service-role key for the YourLife CC project
+//   ADMIN_SECRET          Bearer token gating POST (SPEC 5c, 2026-06-13)
 //
-// Note: HMAC + ADMIN_PHOTO_SECRET requirement removed 2026-05-14.
-// The Supabase service key on the server side is the real security
-// gate; the admin photo manager is the only client that POSTs here.
+// Auth history:
+//   2026-05-14  — HMAC + ADMIN_PHOTO_SECRET requirement removed,
+//                 citing "the Supabase service key on the server side
+//                 is the real security gate." That reasoning was
+//                 inverted: the service key is what BYPASSES RLS;
+//                 the access gate has to be the INBOUND request
+//                 check, which left POST open to the internet.
+//   2026-06-13  — SPEC 5c restores POST auth via Bearer ADMIN_SECRET
+//                 (preferred) or CRON_SECRET (fallback), mirroring
+//                 api/admin/send-message.js. GET stays public because
+//                 app/js/ui.js loadCardPhotoOverrides() depends on it
+//                 at boot.
 
 const https = require('https');
 
@@ -59,10 +69,12 @@ function supaRequest(method, path, body){
 }
 
 module.exports = async (req, res) => {
-  // CORS for browser usage from yourlifecc.com / localhost
+  // CORS — kept open for the public GET path (app boot reads via
+  // loadCardPhotoOverrides()). POST still gates on Bearer ADMIN_SECRET
+  // regardless of origin, so wildcard CORS does not expose writes.
   res.setHeader('Access-Control-Allow-Origin',  '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(204).end();
 
   if (req.method === 'GET'){
@@ -82,6 +94,21 @@ module.exports = async (req, res) => {
   }
 
   if (req.method === 'POST'){
+    // SPEC 5c — Bearer ADMIN_SECRET (preferred) or CRON_SECRET
+    // (fallback). Mirrors api/admin/send-message.js.
+    const adminSecret = process.env.ADMIN_SECRET || '';
+    const cronSecret  = process.env.CRON_SECRET  || '';
+    if(!adminSecret && !cronSecret){
+      console.error('admin-card-photo: no ADMIN_SECRET or CRON_SECRET set');
+      return res.status(500).json({ error: 'Server configuration error' });
+    }
+    const auth  = req.headers.authorization || '';
+    const token = auth.replace(/^Bearer\s+/i, '').trim();
+    const validAuth =
+         (adminSecret && token === adminSecret)
+      || (cronSecret  && token === cronSecret);
+    if(!validAuth) return res.status(401).json({ error: 'Unauthorized' });
+
     if (!process.env.SUPA_SERVICE_KEY){
       return res.status(500).json({ error: 'Server not configured' });
     }

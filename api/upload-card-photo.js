@@ -28,6 +28,13 @@ const MAX_BODY_BYTES   = 8 * 1024 * 1024;   // 8 MB raw JSON (base64 overhead ~3
 
 const ALLOWED_MIME = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 
+// SPEC 5c — strict CORS allowlist. admin.html is hosted on production
+// (yourlifecc.com); no public access expected.
+const ALLOWED_ORIGINS = new Set([
+  'https://yourlifecc.com',
+  'https://www.yourlifecc.com'
+]);
+
 const MIME_EXT = {
   'image/jpeg': 'jpg',
   'image/png':  'png',
@@ -117,11 +124,35 @@ function supaUpsertRow(row){
 }
 
 module.exports = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin',  '*');
+  // SPEC 5c — strict Origin allowlist (was wildcard `*` until 2026-06-13).
+  const origin = req.headers.origin || '';
+  const isAllowedOrigin = ALLOWED_ORIGINS.has(origin);
+  if(isAllowedOrigin){
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') return res.status(204).end();
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') return res.status(isAllowedOrigin ? 204 : 403).end();
   if (req.method !== 'POST')    return res.status(405).json({ error: 'Method not allowed' });
+  if (!isAllowedOrigin)         return res.status(403).json({ error: 'Origin not allowed' });
+
+  // SPEC 5c — Bearer ADMIN_SECRET (preferred) or CRON_SECRET (fallback).
+  // Mirrors api/admin/send-message.js and send-announcement.js. Inserted
+  // BEFORE the raw-body read so unauthenticated callers can't burn the
+  // 8 MB stream budget.
+  const adminSecret = process.env.ADMIN_SECRET || '';
+  const cronSecret  = process.env.CRON_SECRET  || '';
+  if(!adminSecret && !cronSecret){
+    console.error('upload-card-photo: no ADMIN_SECRET or CRON_SECRET set');
+    return res.status(500).json({ error: 'Server configuration error' });
+  }
+  const auth  = req.headers.authorization || '';
+  const token = auth.replace(/^Bearer\s+/i, '').trim();
+  const validAuth =
+       (adminSecret && token === adminSecret)
+    || (cronSecret  && token === cronSecret);
+  if(!validAuth) return res.status(401).json({ error: 'Unauthorized' });
 
   if (!process.env.SUPA_SERVICE_KEY){
     return res.status(500).json({ error: 'Server not configured' });
