@@ -240,3 +240,12 @@ the BREVO_API_KEY env var + Bearer ADMIN_SECRET auth (mirror api/admin/send-anno
 Delete the prompt + window.BREVO_API_KEY. Then remove api.brevo.com from the CSP connect-src
 in vercel.json (same commit). Related read-only pre-check: inventory what an anonymous
 visitor can see/do on admin.html (it is gated by route obscurity only).
+
+## SPEC 5c — audit un-Bearer'd admin endpoints (URGENT, from 5b pre-check) · no SW bump
+The 5b anonymous-visitor pre-check found /api/upload-card-photo and /api/admin-card-photo
+use SUPA_SERVICE_KEY (RLS-bypassing) for outbound writes with NO verifiable inbound Bearer
+auth — an anon visitor knowing the URLs could trigger service-role Supabase writes. FIRST a
+read-only confirm: do these two endpoints actually lack a caller-auth gate? If confirmed, add
+Bearer ADMIN_SECRET auth mirroring send-announcement.js (or remove the endpoints if obsolete).
+LOWER PRIORITY companion: audit RLS on waitlist_applications / affiliate_applications /
+contest_entries for what the anon role can read/write via admin.html's SUPA_ANON reads.
