@@ -13,7 +13,7 @@ There is **no build step, no bundler, no test runner, no `package.json`**. Every
 - **Local dev:** open files directly, or serve the repo root with any static server (`python -m http.server`, `npx serve`, etc.). The PWA service worker only registers when served over `https:` or `localhost`.
 - **Deploy:** push to the default branch — Vercel deploys from `vercel.json` (rewrites `/app/(.*)` → `/app/index.html`, sets cache headers, security headers).
 - **Syntax-check JS modules:** `node --check app/js/<file>.js` (the only "test" wired into `.claude/settings.json`'s allowlist). Use this after editing any JS module.
-- **Cache busting:** bump `CACHE_NAME` in `service-worker.js` on any deploy that ships new asset URLs, otherwise returning users hit the stale cached shell.
+- **Cache busting:** bump `CACHE_NAME` in `service-worker.js` whenever you change the content of any file listed in `PRECACHE_ASSETS`, or add a new precached asset. Precached files stay pinned until the SW reinstalls, which only happens when `service-worker.js`'s bytes change. HTML (network-first navigation) and non-precached `app/js/*` (network-first runtime) are served fresh without a bump.
 
 ## Architecture
 

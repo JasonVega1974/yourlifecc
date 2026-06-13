@@ -1048,7 +1048,18 @@ function addScreenTimeReward(key, mins){
 
 // ── EARNINGS & SAVINGS JAR ───────────────────────────────────
 function initEarnings(){
-  if(!D.earnings) D.earnings = {balance:0,totalEarned:0,goalName:'',goalAmount:0,saved:0,log:[]};
+  // D.earnings is the chores "earnings jar" object. A legacy/demo path can
+  // leave it as a bare number (demo seeds D.earnings = 320; DEF carries a
+  // vestigial finance earnings:0), which has no .balance — that made
+  // renderEarnings throw mid-finishInit and abort the rest of init. Coerce
+  // ANY non-object (number / null / array) to the object shape, carrying a
+  // stray number across as the starting balance so demo still reads sensibly.
+  // Safe: no code consumes D.earnings as a number (finance.js never touches it).
+  var cur = D.earnings;
+  if(!cur || typeof cur !== 'object' || Array.isArray(cur)){
+    var seed = (typeof cur === 'number' && isFinite(cur)) ? cur : 0;
+    D.earnings = {balance:seed,totalEarned:seed,goalName:'',goalAmount:0,saved:0,log:[]};
+  }
 }
 
 function addEarning(amount, reason){

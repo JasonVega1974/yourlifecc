@@ -48,9 +48,9 @@
 <!-- Theme color -->
 <meta name="theme-color" content="#0a1f5e">
 <!-- Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- Chart.js (Habits analytics + any future charting; loaded once at head) -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>@media(min-width:861px){#bottomTabBar{display:none!important;}}</style>
 <script>
 /* Prevent flash — hide mainWrap before first paint; revealed in finishInit */
@@ -1259,14 +1259,22 @@
   .cc-section-label{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:#9AA0B4;margin:0 0 .8rem .3rem;font-weight:600;}
   .cc-tiles{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
   @media (min-width:720px){ .cc-tiles{grid-template-columns:repeat(3,1fr);gap:1rem;} }
-  .cc-tile{--accent:#6AA7FF;position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:.65rem;padding:1.1rem 1rem;min-height:116px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:18px;color:#F1E9D5;text-align:left;cursor:pointer;font-family:inherit;transition:transform 200ms ease,background 200ms ease,border-color 200ms ease;overflow:hidden;}
-  .cc-tile::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--accent) 18%,transparent),transparent 55%);opacity:.9;pointer-events:none;}
-  .cc-tile__icon{width:36px;height:36px;border-radius:10px;background:color-mix(in srgb,var(--accent) 18%,transparent);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);display:grid;place-items:center;font-size:1.15rem;position:relative;z-index:1;}
+  /* WC-1c follow-up — tiles neutral by default; identity rides the icon
+     glyph + label (same as the stars). The surface's single accent
+     (--cc-accent, set inline to today's focusTile.accent) lands only on the
+     focus tile + the keyboard focus ring, so exactly one accent shows at a
+     time. The per-tile rainbow ::before wash is removed (interface layer is
+     flat — no decorative gradients). */
+  .cc-tile{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:.65rem;padding:1.1rem 1rem;min-height:116px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:18px;color:#F1E9D5;text-align:left;cursor:pointer;font-family:inherit;transition:transform 200ms ease,background 200ms ease,border-color 200ms ease;overflow:hidden;}
+  .cc-tile__icon{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);display:grid;place-items:center;font-size:1.15rem;position:relative;z-index:1;}
   .cc-tile__title{font-size:1rem;font-weight:600;letter-spacing:-.01em;color:#F1E9D5;position:relative;z-index:1;}
   .cc-tile__meta{font-family:ui-monospace,'JetBrains Mono',monospace;font-feature-settings:"tnum";font-size:.78rem;color:#9AA0B4;margin-top:auto;position:relative;z-index:1;}
-  .cc-tile:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 45%,rgba(255,255,255,.07));background:rgba(255,255,255,.06);}
-  .cc-tile:active{transform:scale(.97);background:color-mix(in srgb,var(--accent) 14%,rgba(255,255,255,.04));}
-  .cc-tile:focus-visible{outline:2px solid #F5A623;outline-offset:3px;}
+  .cc-tile:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.16);background:rgba(255,255,255,.06);}
+  .cc-tile:active{transform:scale(.97);background:rgba(255,255,255,.08);}
+  .cc-tile:focus-visible{outline:2px solid var(--cc-accent,#FBBF24);outline-offset:3px;}
+  /* Today's focus destination — the single accented tile, mirroring the lit star. */
+  .cc-tile--focus{border-color:color-mix(in srgb,var(--cc-accent) 45%,rgba(255,255,255,.07));}
+  .cc-tile--focus .cc-tile__icon{background:color-mix(in srgb,var(--cc-accent) 18%,transparent);border-color:color-mix(in srgb,var(--cc-accent) 35%,transparent);}
 
   /* faith — de-emphasized, full-row */
   .cc-tile--faith{grid-column:1 / -1;flex-direction:row;align-items:center;gap:.9rem;min-height:64px;padding:.9rem 1.1rem;background:#1A1F33;border:1px solid rgba(255,255,255,.05);color:#6B6B80;}
@@ -20222,7 +20230,10 @@
 <script defer src="/app/js/chores.js"></script>
 <script defer src="/app/js/sports.js"></script>
 <script defer src="/app/js/habits.js"></script>
-<script defer src="/app/js/data/plans.js"></script>
+<!-- plans.js is lazy-loaded by faith.js's _faithPlansEnsureLoaded() (via the
+     shared ylccEnsureData helper in lazy-data.js) on first Plans -> Topical
+     sub-tab open (WC-1b). Do not add a <script> tag back here — it would
+     re-introduce ~1.09 MB to the initial payload. -->
 <script defer src="/app/js/data/memory-verses.js"></script>
 <!-- Tab 2 Inc 4 — Money / Learn lesson content. Loads with the
      other data/*.js entries (group 7 per the script-load order in
@@ -20261,7 +20272,10 @@
      on first Prayer tab open (SPEC 7b TIER 1 batch 2, v352). Do not
      add a <script> tag back here. -->
 <script defer src="/app/js/data/quick-prayers.js"></script>
-<script defer src="/app/js/data/proof-prophecy.js"></script>
+<!-- proof-prophecy.js is lazy-loaded by faith.js's _proofProphecyEnsureLoaded()
+     (via ylccEnsureData in lazy-data.js) on first Proof & Prophecy tab open,
+     and awaited in faithSearch() so search still surfaces proof hits (WC-1b).
+     Do not add a <script> tag back here — it would re-introduce ~238 KB. -->
 <script defer src="/app/js/data/jesus-data.js"></script>
 <script defer src="/app/js/data/denominations.js"></script>
 <script defer src="/app/js/data/podcasts.js"></script>
@@ -20271,6 +20285,9 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script defer src="/app/js/bible-study-data.js"></script>
+<!-- Shared lazy data-module loader (WC-1b). Must load before faith.js so
+     window.ylccEnsureData exists for the plans / proof-prophecy lazy gates. -->
+<script defer src="/app/js/lazy-data.js"></script>
 <script defer src="/app/js/faith.js"></script>
 <!-- FAF Inc 3 — unified family activity feed kernel. Must load
      BEFORE parent.js so the legacy renderParentActivityAudit /
@@ -20308,6 +20325,11 @@
 
 <!-- Phase 1A — Streaks Engine (cloud-persisted, wraps faith completion fns) -->
 <script defer src="/app/js/streaks.js"></script>
+
+<!-- WC-2a — Unified XP currency. Wraps the audited completion globals (faith +
+     chores/goals/skills/health/habits) without editing those modules; loads
+     after them + faith.js so the targets exist. Composes with streaks.js. -->
+<script defer src="/app/js/xp.js"></script>
 
 <!-- V1 Rebuild · Session 1 — Daily Briefing card render module. Must load
      after streaks.js (uses getScriptureStreak) and before init.js (which
@@ -21197,6 +21219,15 @@ document.addEventListener('DOMContentLoaded', function() {
     var overlay = document.getElementById('ffSearchOverlay');
     if(!overlay) return;
     overlay.classList.add('open');
+    // WC-1b — proof-prophecy.js is lazy. Pre-warm it when search opens so
+    // proof results appear; re-run the active query on resolve. Fire-and-
+    // forget — never blocks typing, never awaits per keystroke.
+    if(typeof ylccEnsureData === 'function' && typeof window.PROOF_PROPHECY_DATA === 'undefined'){
+      ylccEnsureData('PROOF_PROPHECY_DATA', '/app/js/data/proof-prophecy.js').then(function(){
+        var box = document.getElementById('ffSearchInput');
+        if(box && box.value && box.value.trim()) ffDoSearch(box.value);
+      }).catch(function(){});
+    }
     setTimeout(function(){
       var inp = document.getElementById('ffSearchInput');
       if(inp) inp.focus();

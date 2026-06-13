@@ -716,7 +716,8 @@ async function finishInit(cloudReady){
     var homeTab=document.querySelector('.scrTabs .tab[data-bf-tab="home"]');
     if(homeTab) homeTab.classList.add("active");
     if(typeof renderFaithHome==="function") renderFaithHome();
-    if(typeof renderPlanCatalog==="function") renderPlanCatalog();
+    // WC-1b — renderPlanCatalog() is no longer pre-rendered at boot; plans.js
+    // (FAITH_PLANS ~1.09 MB) lazy-loads on first Topical sub-tab open instead.
   })();
   initParentBucks();
   renderParentBucks();
