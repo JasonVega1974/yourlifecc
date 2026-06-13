@@ -15906,7 +15906,8 @@
                 background:linear-gradient(180deg, #0a1226 0%, #0f2436 70%, #123040 100%);
               }
               :root.light #parentCelestialHome .pch-constellation{
-                background:linear-gradient(180deg, #2b3a6e 0%, #6d6aa0 45%, #e9a878 82%, #f3c98f 100%);
+                background:linear-gradient(180deg, #1a1226 0%, #2a1f33 50%, #3a2820 100%);
+                border-color:rgba(146,64,14,.65);
               }
 
               /* ── Light-mode pass for the entered hub dashboard
@@ -15983,20 +15984,53 @@
               @media (min-width:720px){ #parentCelestialHome .pch-constellation__svg{height:380px;} }
 
               /* ── Light-mode pass for the child Command Center
-                 (2026-06-12). Mirrors the parent's #s-parent light
-                 idiom: paper cards, dark heading ink, deepened amber
-                 accents. The .cc-constellation panel keeps its own
-                 radial-gradient atmosphere (already richly themed),
-                 but tile cards + greeting text + stat chips need
-                 paper treatment so light-mode users see contrast.
-                 Star primitives in the SVG (.star-bloom/.star-halo/
-                 .star-core) are designed for dark surfaces and the
-                 .cc-constellation panel still paints them on a dark
-                 backdrop in either theme, so they need no overrides. */
+                 (2026-06-12; constellation panel reworked 2026-06-13).
+                 Mirrors the parent's #s-parent light idiom: paper
+                 cards, dark heading ink, deepened amber accents.
+                 NOTE 2026-06-13: the initial light-mode pass assumed
+                 the .cc-constellation panel still painted stars on a
+                 dark backdrop in light mode. It did not -- the panel
+                 used background-color:var(--bg) which flips light, and
+                 the radial overlays (.06-.10 opacity) couldn't carry
+                 the contrast alone. Fixed below by giving both this
+                 panel AND the parent's .pch-constellation a deep
+                 aubergine-to-cocoa night-sky gradient framed with the
+                 #92400e amber accent. Star primitives pick up a subtle
+                 dark drop-shadow in light mode to stay crisp against
+                 the warm cocoa bottom band (per pre-impl visual review). */
               :root.light #appCommandCenter .cc-greeting__hello{color:#0f172a;}
               :root.light #appCommandCenter .cc-daystamp__date{color:#1a1233;}
               :root.light #appCommandCenter .cc-daystamp__sub,
               :root.light #appCommandCenter .cc-daystamp__quote{color:#4a4b52;}
+
+              /* Deep warm framed night-sky panel -- aubergine to cocoa,
+                 brass-amber #92400e frame at .65 opacity, two diagonal
+                 nebula washes (the third center ember radial was dropped
+                 per pre-impl review since it muddled warm-on-warm in
+                 the lower third). */
+              :root.light #appCommandCenter .cc-constellation{
+                background-color:#1a1226;
+                background-image:
+                  radial-gradient(ellipse 80% 55% at 30% 25%, rgba(245,166,35,.20), transparent 60%),
+                  radial-gradient(ellipse 90% 65% at 70% 75%, rgba(106,167,255,.14), transparent 60%),
+                  linear-gradient(180deg, #1a1226 0%, #2a1f33 50%, #3a2820 100%);
+                border:1.5px solid rgba(146,64,14,.65);
+                box-shadow:inset 0 0 0 1px rgba(255,255,255,.07),inset 0 0 60px rgba(0,0,0,.25);
+              }
+
+              /* Star primitive safety net for the warm bottom band --
+                 cream/brass node fills get a subtle dark drop-shadow so
+                 they stay crisp against the cocoa floor. Scoped to the
+                 two constellation panels only; other surfaces using the
+                 shared kit are unaffected. Dark mode untouched. */
+              :root.light #appCommandCenter .cc-constellation .star-core,
+              :root.light #appCommandCenter .cc-constellation .star-bloom,
+              :root.light #appCommandCenter .cc-constellation .star-halo,
+              :root.light #parentCelestialHome .pch-constellation .star-core,
+              :root.light #parentCelestialHome .pch-constellation .star-bloom,
+              :root.light #parentCelestialHome .pch-constellation .star-halo{
+                filter:drop-shadow(0 0 3px rgba(0,0,0,.45));
+              }
               :root.light #appCommandCenter .cc-time{color:#4a4b52;}
               :root.light #appCommandCenter .cc-section-label{color:#0f172a;}
               :root.light #appCommandCenter .cc-chip{
