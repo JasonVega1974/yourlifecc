@@ -20222,7 +20222,10 @@
 <script defer src="/app/js/chores.js"></script>
 <script defer src="/app/js/sports.js"></script>
 <script defer src="/app/js/habits.js"></script>
-<script defer src="/app/js/data/plans.js"></script>
+<!-- plans.js is lazy-loaded by faith.js's _faithPlansEnsureLoaded() (via the
+     shared ylccEnsureData helper in lazy-data.js) on first Plans -> Topical
+     sub-tab open (WC-1b). Do not add a <script> tag back here — it would
+     re-introduce ~1.09 MB to the initial payload. -->
 <script defer src="/app/js/data/memory-verses.js"></script>
 <!-- Tab 2 Inc 4 — Money / Learn lesson content. Loads with the
      other data/*.js entries (group 7 per the script-load order in
@@ -20261,7 +20264,10 @@
      on first Prayer tab open (SPEC 7b TIER 1 batch 2, v352). Do not
      add a <script> tag back here. -->
 <script defer src="/app/js/data/quick-prayers.js"></script>
-<script defer src="/app/js/data/proof-prophecy.js"></script>
+<!-- proof-prophecy.js is lazy-loaded by faith.js's _proofProphecyEnsureLoaded()
+     (via ylccEnsureData in lazy-data.js) on first Proof & Prophecy tab open,
+     and awaited in faithSearch() so search still surfaces proof hits (WC-1b).
+     Do not add a <script> tag back here — it would re-introduce ~238 KB. -->
 <script defer src="/app/js/data/jesus-data.js"></script>
 <script defer src="/app/js/data/denominations.js"></script>
 <script defer src="/app/js/data/podcasts.js"></script>
@@ -20271,6 +20277,9 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script defer src="/app/js/bible-study-data.js"></script>
+<!-- Shared lazy data-module loader (WC-1b). Must load before faith.js so
+     window.ylccEnsureData exists for the plans / proof-prophecy lazy gates. -->
+<script defer src="/app/js/lazy-data.js"></script>
 <script defer src="/app/js/faith.js"></script>
 <!-- FAF Inc 3 — unified family activity feed kernel. Must load
      BEFORE parent.js so the legacy renderParentActivityAudit /

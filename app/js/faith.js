@@ -1127,6 +1127,9 @@ async function faithSearch(q){
   });
 
   // ── 3. Proof & Prophecy (client-side) ────────────────────────
+  // WC-1b — proof-prophecy.js is lazy. Await its loader so search surfaces
+  // proof hits even before the user has opened the tab (mirrors academy).
+  try { await _proofProphecyEnsureLoaded(); } catch(_){}
   const proofHits = [];
   if(typeof PROOF_PROPHECY_DATA !== 'undefined' && Array.isArray(PROOF_PROPHECY_DATA)){
     PROOF_PROPHECY_DATA.forEach(function(p){
@@ -1660,7 +1663,25 @@ function _planRefBoxHtml(ref, text){
     + '</div>';
 }
 
+function _faithPlansEnsureLoaded(){
+  // WC-1b — plans.js (window.FAITH_PLANS ~1.09 MB) lazy-loads via the shared
+  // ylccEnsureData helper. Thin wrapper for call-site readability + parity
+  // with the existing _xxEnsureLoaded loaders.
+  if(typeof ylccEnsureData !== 'function') return Promise.reject(new Error('ylccEnsureData unavailable'));
+  return ylccEnsureData('FAITH_PLANS', '/app/js/data/plans.js');
+}
+
 function renderPlanCatalog(){
+  // WC-1b lazy gate — fetch plans.js on first Topical sub-tab open, show a
+  // skeleton, then re-enter. Mirrors renderAcademyPanel's Promise gate.
+  if(typeof window === 'undefined' || !Array.isArray(window.FAITH_PLANS)){
+    const _plEl = document.getElementById('plCatalog');
+    if(_plEl) _plEl.innerHTML = '<div class="pl-empty">Loading plans…</div>';
+    _faithPlansEnsureLoaded().then(renderPlanCatalog).catch(function(){
+      if(_plEl) _plEl.innerHTML = '<div class="pl-empty">Couldn\'t load plans. <button type="button" onclick="renderPlanCatalog()" style="margin-left:.4rem;color:#38bdf8;text-decoration:underline;background:none;border:none;cursor:pointer;font:inherit;">Retry</button></div>';
+    });
+    return;
+  }
   const all = (typeof window !== 'undefined' && window.FAITH_PLANS) ? window.FAITH_PLANS : [];
   const store = planStore();
 
@@ -8683,10 +8704,22 @@ function ppAnimateCounter(){
   requestAnimationFrame(tick);
 }
 
+function _proofProphecyEnsureLoaded(){
+  // WC-1b — proof-prophecy.js (window.PROOF_PROPHECY_DATA ~238 KB) lazy-loads
+  // via ylccEnsureData. Parity wrapper.
+  if(typeof ylccEnsureData !== 'function') return Promise.reject(new Error('ylccEnsureData unavailable'));
+  return ylccEnsureData('PROOF_PROPHECY_DATA', '/app/js/data/proof-prophecy.js');
+}
+
 function renderProofProphecy(){
+  // WC-1b lazy gate — fetch proof-prophecy.js on first tab open, show a
+  // skeleton, then re-enter. Mirrors renderAcademyPanel.
   if(typeof PROOF_PROPHECY_DATA === 'undefined'){
     const grid = document.getElementById('ppGrid');
-    if(grid) grid.innerHTML = '<div class="pp-empty" style="grid-column:1/-1;">Proof &amp; Prophecy data not loaded. Reload the page.</div>';
+    if(grid) grid.innerHTML = '<div class="pp-empty" style="grid-column:1/-1;">Loading Proof &amp; Prophecy…</div>';
+    _proofProphecyEnsureLoaded().then(renderProofProphecy).catch(function(){
+      if(grid) grid.innerHTML = '<div class="pp-empty" style="grid-column:1/-1;">Couldn\'t load Proof &amp; Prophecy. <button type="button" onclick="renderProofProphecy()" style="margin-left:.4rem;color:#38bdf8;text-decoration:underline;background:none;border:none;cursor:pointer;font:inherit;">Retry</button></div>';
+    });
     return;
   }
   ppRenderSubtabs();
