@@ -434,11 +434,13 @@
     }).join('');
 
     // Nodes — kit-built stars (bloom + halo + core + spikes on
-    // habits center) with per-domain accents driving the bloom
-    // and halo hue, so each orb keeps its domain identity while
-    // speaking the shared brass-lantern language. Focus pulse
-    // rings remain on the recommended orb only -- the exclusive
-    // "look here" signal. Drift wrapper unchanged.
+    // habits center). WC-1c single-accent rework: all six domain
+    // nodes speak the kit's default brass language; color is spent
+    // ONLY on today's focus node (single focus accent). Domain
+    // identity is carried by the icon + label, not by per-node hue
+    // -- color now encodes state (focus), not decoration. Focus
+    // pulse rings remain on the recommended orb only -- the
+    // exclusive "look here" signal. Drift wrapper unchanged.
     var ckStar = (typeof window !== 'undefined') ? window.ckBuildStar : null;
     var svgNodes = _CC_TILES.map(function(tile, i){
       var n = _CC_NODES[tile.key];
@@ -462,24 +464,29 @@
         + '<circle class="cc-pulse cc-pulse--2" cx="'+n.cx+'" cy="'+n.cy+'" r="'+(n.r+2)+'"/>'
       ) : '';
 
-      // Star fragment via the kit. Per-domain accent overrides the
-      // brass default; the kit handles the bloom + halo + core +
-      // spike (habits only, bright tier) chain.
+      // Star fragment via the kit. WC-1c — only the focus node passes
+      // an accent; the other five omit it so ckBuildStar falls through
+      // to its brass default (#FBBF24). The kit handles the bloom +
+      // halo + core + spike (habits only, bright tier) chain.
+      // constellation-kit.js is intentionally untouched.
+      var starAccent = isFocus ? focusTile.accent : null;
       var starSvg = ckStar
-        ? ckStar({ x: n.cx, y: n.cy, mag: mag }, { accent: tile.accent })
+        ? ckStar({ x: n.cx, y: n.cy, mag: mag }, starAccent ? { accent: starAccent } : {})
         : '';
 
       var subLine = (n.isCenter && tile.key === 'habits' && meta.habits)
         ? '<text class="cc-node__label cc-node__label--sub" x="'+n.cx+'" y="'+n.subY+'" text-anchor="middle">'+_ccEsc(meta.habits)+'</text>'
         : '';
 
-      // Per-orb inline style: color carries the domain accent
-      // (legacy hover/glow hooks read currentColor); transform-
+      // Per-orb inline style: currentColor hooks (core glow / hover)
+      // follow the same single-accent rule -- brass for the six domain
+      // nodes, the focus accent for the focus node only; transform-
       // origin centers the breathe scale on the orb's position;
       // --starBreathePeriod drives the shared breathe + halo
       // pulse animations.
       var period   = _CC_PERIODS[i % _CC_PERIODS.length];
-      var orbStyle = 'color:'+tile.accent+';transform-origin:'+n.cx+'px '+n.cy+'px;--starBreathePeriod:'+period+'ms;';
+      var orbColor = isFocus ? focusTile.accent : '#FBBF24';
+      var orbStyle = 'color:'+orbColor+';transform-origin:'+n.cx+'px '+n.cy+'px;--starBreathePeriod:'+period+'ms;';
 
       // Invisible hit target -- 48x48 centered on the orb. Every
       // star sub-element (bloom/halo/core/spike/badge/label) is
