@@ -17,6 +17,18 @@
 (function(){
   'use strict';
 
+  // ── WC-2c home-return reinforcement state ────────────────────
+  // Last-rendered ring pct + streak, so we can sweep the ring from its
+  // previous value and pulse the flame only when the streak grew since
+  // the last home render (XP is earned on feature tabs, so these fire on
+  // the next home paint, not at earn time — the toast covers that).
+  var _ccLastRingPct = null;
+  var _ccLastStreak  = null;
+  function _ccReducedMotion(){
+    try { return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
+    catch(_e){ return false; }
+  }
+
   // ── helpers ──────────────────────────────────────────────────
   function _ccEsc(s){
     if (s == null) return '';
@@ -662,6 +674,31 @@
       +     '</div>'
       +   '</section>'
       + '</main>';
+
+    // WC-2c — home-return reinforcements (compose with the existing render;
+    // the ring otherwise snaps). Sweep the fill from its previous pct, and
+    // pulse the flame if the streak ticked since the last render. Gated under
+    // reduced-motion (snap/no pulse). Wrapped defensively — never block render.
+    try {
+      var _reduced = _ccReducedMotion();
+      var _fill = root.querySelector('.cc-ring__fill');
+      if (_fill && !_reduced && _ccLastRingPct !== null && _ccLastRingPct !== _xpPct){
+        _fill.style.transition = 'none';
+        _fill.style.strokeDashoffset = (_xpC * (1 - _ccLastRingPct / 100)).toFixed(1);
+        void _fill.getBoundingClientRect();        // reflow so the old value paints first
+        _fill.style.transition = '';
+        requestAnimationFrame(function(){
+          _fill.style.strokeDashoffset = (_xpC * (1 - _xpPct / 100)).toFixed(1);
+        });
+      }
+      var _curStreak = (typeof getXpStreak === 'function') ? getXpStreak() : streak;
+      if (!_reduced && _ccLastStreak !== null && _curStreak > _ccLastStreak){
+        var _streakEl = root.querySelector('.cc-streak');
+        if (_streakEl) _streakEl.classList.add('cc-streak--pulse');
+      }
+      _ccLastRingPct = _xpPct;
+      _ccLastStreak  = _curStreak;
+    } catch(_e){}
 
     // Wire destination clicks (event delegation — single listener).
     // Catches BOTH tile buttons in .cc-tiles AND orb wrappers in

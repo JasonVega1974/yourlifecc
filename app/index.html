@@ -755,6 +755,8 @@
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
+<!-- WC-2c — XP juice toast (filled + shown by xp-juice.js on every awardXP) -->
+<div class="xpj-toast" id="xpJuiceToast" role="status" aria-live="polite" aria-hidden="true"></div>
 
 <!-- WELCOME MODAL (first time) -->
 <div id="welcomeModal" style="display:none;position:fixed;inset:0;background:rgba(4,6,16,.97);backdrop-filter:blur(16px);z-index:99998;align-items:center;justify-content:center;">
@@ -1124,6 +1126,33 @@
   .cc-ring--met .cc-ring__meta{color:#34D399;}
   @media (prefers-reduced-motion: reduce){ .cc-ring__fill{transition:none;} }
   @media (min-width:720px){ .cc-stats{grid-template-columns:1.4fr 1fr 1fr;} .cc-streak{grid-column:auto;} .cc-streak__num{font-size:4rem;} .cc-stats.cc-stats--no-streak{grid-template-columns:1fr 1fr;} }
+  /* WC-2c — flame pulse when the streak ticks (added on home render by
+     command-center.js; the chip's fire icon gives a single beat). */
+  .cc-streak--pulse .cc-streak__icon{animation:ccStreakPulse .6s ease;}
+  @keyframes ccStreakPulse{0%{transform:scale(1);}40%{transform:scale(1.14);}100%{transform:scale(1);}}
+
+  /* WC-2c — XP juice toast. Celebration overlay (theme-independent, like
+     #toast): flat dark surface + brass accent; the "lift" is motion, not
+     decoration. Slides in from the top, holds, clears. Reduced-motion strips
+     all motion (fade only, no flourish) while keeping the text/state. */
+  .xpj-toast{position:fixed;top:14px;left:50%;transform:translate(-50%,-160%);z-index:100000;display:flex;align-items:center;gap:.6rem;max-width:88vw;padding:.6rem .95rem;border-radius:14px;background:#13192b;border:1px solid rgba(251,191,36,.42);box-shadow:0 10px 34px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:transform .34s cubic-bezier(.2,.9,.3,1.2),opacity .3s ease;}
+  .xpj-toast.show{transform:translate(-50%,0);opacity:1;}
+  .xpj-toast__flame{width:22px;height:22px;flex-shrink:0;filter:drop-shadow(0 0 4px rgba(251,191,36,.5));}
+  .xpj-toast__body{display:flex;flex-direction:column;gap:.05rem;min-width:0;}
+  .xpj-toast__title{font-family:ui-monospace,'JetBrains Mono',monospace;font-feature-settings:"tnum";font-weight:700;font-size:1rem;color:#FBBF24;letter-spacing:-.01em;line-height:1.15;}
+  .xpj-toast__sub{font-size:.72rem;color:#F1E9D5;letter-spacing:.02em;}
+  .xpj-toast--goal{border-color:rgba(52,211,153,.5);}
+  .xpj-toast--goal .xpj-toast__title{color:#34D399;}
+  .xpj-toast--goal .xpj-toast__flame{filter:drop-shadow(0 0 6px rgba(52,211,153,.55));}
+  .xpj-toast--goal.show{animation:xpjFlourish .55s ease;}
+  @keyframes xpjFlourish{0%{transform:translate(-50%,0) scale(.92);}55%{transform:translate(-50%,0) scale(1.06);}100%{transform:translate(-50%,0) scale(1);}}
+  .xpj-toast--reduced{transition:opacity .15s ease;transform:translate(-50%,0);}
+  .xpj-toast--reduced.show{transform:translate(-50%,0);animation:none;}
+  @media (prefers-reduced-motion: reduce){
+    .cc-streak--pulse .cc-streak__icon{animation:none;}
+    .xpj-toast{transition:opacity .15s ease;transform:translate(-50%,0);}
+    .xpj-toast.show{transform:translate(-50%,0);animation:none;}
+  }
 
   /* ── constellation: living space scene ─────────────────────
      A layered backdrop (deep sky + 2 nebula washes + starfield)
@@ -20394,6 +20423,9 @@
      chores/goals/skills/health/habits) without editing those modules; loads
      after them + faith.js so the targets exist. Composes with streaks.js. -->
 <script defer src="/app/js/xp.js"></script>
+<!-- WC-2c — XP juice layer. Defines window.xpJuice (the +N toast); awardXP in
+     xp.js calls it guarded, so load order vs xp.js is not critical. -->
+<script defer src="/app/js/xp-juice.js"></script>
 
 <!-- V1 Rebuild · Session 1 — Daily Briefing card render module. Must load
      after streaks.js (uses getScriptureStreak) and before init.js (which
