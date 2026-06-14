@@ -216,7 +216,14 @@ function loadDemoData(){
 
   // Faith
   D.scrPoints = 45;
-  D.scrReadDays = {};
+  // Demo Emma carries a 14-day scripture streak so getScriptureStreak() — and
+  // the WC-2b-ii unified flame seeded from it — reflects her D.streak=14
+  // instead of resetting to ~1 on an empty scrReadDays. UTC keys match the app.
+  D.scrReadDays = (function(){
+    var o = {}, d = new Date();
+    for (var i = 0; i < 14; i++){ o[d.toISOString().slice(0, 10)] = true; d.setUTCDate(d.getUTCDate() - 1); }
+    return o;
+  })();
   D.prayers = [
     {id:1,text:'For my AP English grade to improve',date:'2026-03-20'},
     {id:2,text:'For my grandma health',date:'2026-03-18'},

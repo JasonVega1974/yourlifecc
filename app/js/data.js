@@ -27,6 +27,11 @@ const DEF = {
   // rolls over at the day boundary (xpDayKey). xpLog is an append-only ring
   // buffer capped ~365 of {ts,n,source}. dailyGoal feeds the WC-2b ring.
   xpTotal:0, xpToday:0, xpDayKey:null, xpLog:[], dailyGoal:25,
+  // WC-2b-ii — unified streak (the flame). count = consecutive "any-XP" days
+  // (Sabbath-bridged: an idle Sunday between two active days doesn't break it).
+  // Maintained only by awardXP; lastDayKey is the last counted UTC day. Seeded
+  // once from getScriptureStreak() so existing streaks don't reset to 1.
+  xpStreak:{ count:0, lastDayKey:null, longest:0 },
   // F2-B reading plans: active is keyed by planId (object so multiple plans
   // can run concurrently); completed is an append-only list of planId archives.
   faithPlans:{ active:{}, completed:[] },
