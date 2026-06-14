@@ -32,6 +32,10 @@ const DEF = {
   // Maintained only by awardXP; lastDayKey is the last counted UTC day. Seeded
   // once from getScriptureStreak() so existing streaks don't reset to 1.
   xpStreak:{ count:0, lastDayKey:null, longest:0 },
+  // WC-D1 — exercise engine anti-farm marker: { [setId]: 'YYYY-MM-DD' } last
+  // UTC day each practice set was cleared. awardPracticeSet (xp.js) awards XP
+  // only on the first clear of a set per day; replays award 0.
+  practiceClears:{},
   // F2-B reading plans: active is keyed by planId (object so multiple plans
   // can run concurrently); completed is an append-only list of planId archives.
   faithPlans:{ active:{}, completed:[] },

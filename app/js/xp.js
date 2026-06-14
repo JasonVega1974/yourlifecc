@@ -36,7 +36,8 @@
     chore:           8,   // markChoreDone (kid's submit action)
     goal:           20,   // toggleGoal / completeGoal / checkGoalAutoComplete
     skill_cert:     25,   // finishSkillQuiz, first cert only (rare, biggest)
-    health:          8    // first workout/sleep log of the day (wellbeing: never weight/food)
+    health:          8,   // first workout/sleep log of the day (wellbeing: never weight/food)
+    practice_set:    6    // WC-D1 exercise engine — first clear of a given set per day
   };
   var DEFAULT_DAILY_GOAL = 25;
   var XP_LOG_CAP = 365;
@@ -81,6 +82,21 @@
       goalMet:      (oldToday < goal && D.xpToday >= goal)
     };
     try { if (typeof window !== 'undefined' && typeof window.xpJuice === 'function') window.xpJuice(n, source, meta); } catch(_){}
+  }
+
+  // ── WC-D1 — practice-set award (anti-farm) ───────────────────
+  // Award practice_set XP on the FIRST clear of a given set per (UTC) day.
+  // Replays still let the kid practice but award 0. Mirrors the first-
+  // completion guards. Returns true iff XP was awarded this call. awardXP
+  // itself fires the juice toast + save(), so the marker persists.
+  function awardPracticeSet(setId){
+    if (typeof D === 'undefined' || !D || !setId) return false;
+    if (!D.practiceClears || typeof D.practiceClears !== 'object') D.practiceClears = {};
+    var today = _today();
+    if (D.practiceClears[setId] === today) return false;   // already cleared today -> no farm
+    D.practiceClears[setId] = today;
+    awardXP(_val('practice_set'), 'practice_set');
+    return true;
   }
 
   // ── readers ──────────────────────────────────────────────────
@@ -351,6 +367,7 @@
     window.getDailyGoal = getDailyGoal;
     window.getXpStreak  = getXpStreak;
     window.getXpStreakFromData = getXpStreakFromData;
+    window.awardPracticeSet = awardPracticeSet;
     window.XP_VALUES    = XP_VALUES;
   }
 })();
