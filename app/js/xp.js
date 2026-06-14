@@ -148,15 +148,25 @@
   // Reader: live truth without a cron. Returns count while the streak is
   // current (today / yesterday / Sabbath-bridged); 0 once broken (the reset to
   // 1 happens on the next awardXP, not on read).
-  function getXpStreak(){
-    _ensureXpStreak();
-    var s = (typeof D !== 'undefined' && D) ? D.xpStreak : null;
-    if (!s) return 0;
+  // Freshness-aware reader usable on ANY profile's data — the live active D or
+  // an inactive kid's p.data (parent-hub kid cards). Single source for the
+  // today/yesterday/Sabbath check, so a stale lastDayKey reads 0 rather than a
+  // falsely-live streak. PURE READ — does NOT seed; seeding belongs to the
+  // owning profile's own session (a kid unmigrated since WC-2b reads 0 here
+  // until their next login, by design — we don't fake it).
+  function getXpStreakFromData(data){
+    if (!data || typeof data !== 'object') return 0;
+    var s = data.xpStreak;
+    if (!s || typeof s !== 'object') return 0;
     var today = _today();
     if (s.lastDayKey === today) return (+s.count || 0);
     if (s.lastDayKey === _dayKeyOffset(-1)) return (+s.count || 0);
     if (_isSabbathBridge(s.lastDayKey, today)) return (+s.count || 0);
     return 0;
+  }
+  function getXpStreak(){
+    _ensureXpStreak();
+    return getXpStreakFromData(typeof D !== 'undefined' ? D : null);
   }
 
   // ── guard helpers (key-agnostic: count deltas beat date-key math) ─
@@ -324,6 +334,7 @@
     window.getXpTotal   = getXpTotal;
     window.getDailyGoal = getDailyGoal;
     window.getXpStreak  = getXpStreak;
+    window.getXpStreakFromData = getXpStreakFromData;
     window.XP_VALUES    = XP_VALUES;
   }
 })();
