@@ -118,12 +118,24 @@ function _earnedOnLocalDate(kidData, offsetMin, localDate){
 // (xpStreak.lastDayKey / xpDayKey) — the WC-2b-ii deferred limitation. This
 // makes the NUDGE local-correct; the engine's reset-at-UTC-midnight quirk is a
 // separate future change and is intentionally NOT touched here.
-function _atRiskKids(data, offsetMin, localDate){
+function _atRiskKids(data, offsetMin, localDate, todayUTC){
   return _kidList(data).map(function(k){
     const s = k.d && k.d.xpStreak;
     if(!s || typeof s !== 'object') return null;
     const count = +s.count || 0;
     if(count < MIN_STREAK) return null;
+    // Staleness gate: s.count is NOT freshness-checked — the in-app readers
+    // show 0 for a lapsed streak, but the stored count stays stale until the
+    // kid next earns. Coarse filter (UTC, like lastDayKey) so we never claim a
+    // streak the app would show as 0: if the last counted day is >2 days stale,
+    // the streak is dead. The <=2-day window absorbs a single Sabbath gap
+    // WITHOUT re-introducing precise-boundary logic — the trigger stays the
+    // local-day xpLog check below.
+    const dk = s.lastDayKey;
+    if(dk){
+      const age = Math.floor((Date.parse(todayUTC) - Date.parse(dk)) / 86400000);
+      if(age > 2) return null;
+    }
     if(_earnedOnLocalDate(k.d, offsetMin, localDate)) return null;   // earned today (local) -> safe
     return { name: k.name, streak: count };
   }).filter(Boolean);
@@ -266,7 +278,7 @@ module.exports = async function handler(req, res){
 
     // at-risk kids (forced plumbing test: send a representative sample if the
     // account isn't genuinely at-risk, so copy still renders).
-    let atRisk = _atRiskKids(data, effOffset, localDate);
+    let atRisk = _atRiskKids(data, effOffset, localDate, todayUTC);
     if(!atRisk.length){
       if(forced){
         const sampleName = (_kidList(data)[0] && _kidList(data)[0].name) || 'your kid';
