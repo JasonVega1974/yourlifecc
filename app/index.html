@@ -423,15 +423,16 @@
     <div style="font-size:.6rem;color:var(--tx3);margin-top:.25rem;padding-left:.2rem;">Replaces the ✝️ Faith tab in the mobile bottom bar. The Well stays reachable from the sidebar.</div>
   </div>
 
-  <!-- 2026-06-07 — Skills Step 3: Quiz sound effects opt-in. Wired
-       to toggleSkillsSound() in skills.js; hydrated by openSettings()
-       in ui.js from D.skillsSound (default false). -->
+  <!-- WC-D2 (2026-06-14): unified sound-effects opt-in (the ONE toggle —
+       absorbed the retired "Skills sound effects"). Wired to toggleSound()
+       in skills.js; hydrated by openSettings() in ui.js from D.soundEnabled
+       (default OFF). Gates window.sfx.* across the quiz AND practice. -->
   <div style="margin-top:.7rem;padding-top:.6rem;border-top:1px solid rgba(255,255,255,.06);">
     <div class="tr">
-      <span style="font-size:.84rem;">🔊 Skills sound effects</span>
-      <button class="tg" id="tg-skillsSound" onclick="toggleSkillsSound(this)"></button>
+      <span style="font-size:.84rem;">🔊 Sound effects</span>
+      <button class="tg" id="tg-soundEnabled" onclick="toggleSound(this)"></button>
     </div>
-    <div style="font-size:.6rem;color:var(--tx3);margin-top:.15rem;padding-left:.2rem;">Subtle ding on correct, thud on wrong, fanfare on quiz pass. OFF by default.</div>
+    <div style="font-size:.6rem;color:var(--tx3);margin-top:.15rem;padding-left:.2rem;">Subtle ding on a right answer, soft thud on a wrong one, fanfare on a perfect set. Off by default.</div>
   </div>
 
   <!-- Email Bundle Track 2 (2026-06-08) — engagement opt-in toggle.
@@ -20460,6 +20461,10 @@
 <!-- WC-2c — XP juice layer. Defines window.xpJuice (the +N toast); awardXP in
      xp.js calls it guarded, so load order vs xp.js is not critical. -->
 <script defer src="/app/js/xp-juice.js"></script>
+<!-- WC-D2 — unified sound-effects layer. Defines window.sfx (oscillator SFX),
+     gated by D.soundEnabled. The exercise engine + skills quiz call it guarded,
+     so load order vs them is loose; placed here before its consumers. -->
+<script defer src="/app/js/sfx.js"></script>
 <!-- WC-D1 — interactive exercise engine. Presents only; calls awardPracticeSet
      (xp.js) + megaConfetti (celebrations.js) at runtime, so load order is loose. -->
 <script defer src="/app/js/exercise-engine.js"></script>

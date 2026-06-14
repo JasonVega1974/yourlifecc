@@ -103,6 +103,14 @@ function loadData(){
       // Sanitize scrReadDays — must always be an object, never an array
       if(!D.scrReadDays || Array.isArray(D.scrReadDays)) D.scrReadDays = {};
       if(!D.devPopupSeen) D.devPopupSeen = '';
+      // WC-D2 (2026-06-14): one-time seed of the unified soundEnabled pref
+      // from the retired skillsSound. Keyed off the STORED blob — once
+      // soundEnabled has been persisted it's present here and we never
+      // re-seed (idempotent), so an explicit OFF can't be flipped back ON.
+      if(!('soundEnabled' in p)){
+        if('skillsSound' in p) D.soundEnabled = !!p.skillsSound;
+        // else: no prior sound pref at all — keep DEF default (false)
+      }
       // Never hide sections added after initial registration
       if(D.sections){
         const FORCE = ['cbt','resume','motivation','mentors','hero','parent','christianLiving','worship','scripture'];
@@ -465,6 +473,13 @@ async function cloudLoad(){
     if(!D.scrReadDays || Array.isArray(D.scrReadDays)) D.scrReadDays = {};
     // Ensure devPopupSeen exists
     if(!D.devPopupSeen) D.devPopupSeen = '';
+    // WC-D2 (2026-06-14): seed the unified soundEnabled pref from the
+    // retired skillsSound on the first cloud load that predates it. If the
+    // cloud row already carries soundEnabled the DEF-merge above restored
+    // it and this is skipped (idempotent) — the cloud value is authoritative.
+    if(!('soundEnabled' in saved)){
+      if('skillsSound' in saved) D.soundEnabled = !!saved.skillsSound;
+    }
     // Strip any sections that should never be hidden
     if(D.sections){
       const FORCE = ['cbt','resume','motivation','mentors','hero','parent','christianLiving','worship','scripture'];

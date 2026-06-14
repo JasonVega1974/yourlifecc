@@ -133,12 +133,21 @@ const DEF = {
   // Faith-free users (window._faithFree) have no tab bar so this
   // field is inert for them.
   tabSwap:'',
-  // 2026-06-07 — Skills Step 3: opt-in sound effects for the
-  // Life Skills quiz. Subtle Web-Audio-synthesized tones —
-  // correct ding, wrong thud, pass fanfare. Default OFF (no
-  // sound until user toggles in Me → Settings). All quiz sound
-  // hooks gate on D.skillsSound === true.
+  // 2026-06-07 — Skills Step 3: opt-in sound effects (original field).
+  // RETIRED 2026-06-14 (WC-D2): no longer read by any sound hook and no
+  // longer written by any toggle. Kept ONLY as the one-time migration seed
+  // for soundEnabled (see sync.js loadData/cloudLoad). Do not write it.
   skillsSound:false,
+  // 2026-06-14 — WC-D2: unified sound-effects preference. The SINGLE gate
+  // for window.sfx.* — both the exercise engine and the Life-Skills quiz
+  // route through it. Default OFF (faith/family app, shared/quiet spaces).
+  // Migrated once from the retired skillsSound so nobody's state flips;
+  // adoption is driven by a one-time opt-in nudge, not by flipping this on.
+  soundEnabled:false,
+  // 2026-06-14 — WC-D2: one-time guard for the "Add sound effects?" nudge
+  // shown after a first completed practice set. Set true the moment the
+  // nudge is shown (accept OR ignore), so it never re-nags.
+  soundNudgeSeen:false,
   // streak / checkin
   streak:0, lastCheckin:null, checkin:{}, customHabits:[], dailyChecks:{},
   // V1 Rebuild — Session 1 (Daily Briefing). Keyed by YYYY-MM-DD; per-day

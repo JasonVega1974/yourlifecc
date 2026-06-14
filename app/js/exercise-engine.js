@@ -182,8 +182,13 @@
     var host = _run.host, set = _run.set, perfect = !_run.wrong;
     var awarded = false;
     try { if(typeof window.awardPracticeSet === 'function') awarded = window.awardPracticeSet(set.id); } catch(_e){}
-    if(perfect && awarded && !_reduced()){
-      try { if(typeof window.megaConfetti === 'function') window.megaConfetti(); else if(typeof window.launchBigConfetti === 'function') window.launchBigConfetti(); } catch(_e){}
+    if(perfect && awarded){
+      // Fanfare rides the 🎉 + XP line (shown even under reduced motion).
+      // Sound is not motion, so it still plays when confetti is suppressed.
+      try { if(window.sfx) window.sfx.perfect(); } catch(_e){}
+      if(!_reduced()){
+        try { if(typeof window.megaConfetti === 'function') window.megaConfetti(); else if(typeof window.launchBigConfetti === 'function') window.launchBigConfetti(); } catch(_e){}
+      }
     }
     var line = awarded
       ? (perfect ? 'Perfect set! +' + _xpVal() + ' XP' : 'Set complete — +' + _xpVal() + ' XP')
@@ -197,8 +202,67 @@
       +   '<button class="ex-btn ex-btn--primary" type="button" data-ex="picker">Pick another set</button>'
       + '</div></div>';
     if(typeof _run.onDone === 'function'){ try { _run.onDone({ setId:set.id, perfect:perfect, awarded:awarded }); } catch(_e){} }
+    _maybeSoundNudge();
   }
   function _xpVal(){ try { return (window.XP_VALUES && window.XP_VALUES.practice_set) || 6; } catch(_e){ return 6; } }
+
+  // ── One-time "Add sound effects?" opt-in nudge (WC-D2) ───────
+  // Shown once, after a completed set, only when sound is OFF. Guards:
+  //   • truly one-time — soundNudgeSeen is set the MOMENT it shows (so an
+  //     ignored/auto-dismissed nudge can never re-nag), persisted via save();
+  //   • no preview — nothing plays until the user taps "Turn on"; that tap
+  //     is the gesture that unlocks audio on iOS and plays the first ding;
+  //   • skipped for anyone already on (incl. migrated-on users) and where
+  //     there's no Web Audio support at all.
+  function _maybeSoundNudge(){
+    try {
+      if(!window.D) return;
+      if(window.D.soundEnabled) return;     // already on — nothing to offer
+      if(window.D.soundNudgeSeen) return;   // already shown once
+      if(!window.sfx) return;               // no audio support — skip silently
+      if(document.querySelector('.ex-nudge')) return;
+      window.D.soundNudgeSeen = true;       // set on SHOW so it never re-nags
+      if(typeof window.save === 'function') window.save();
+      _showSoundNudge();
+    } catch(_e){}
+  }
+  function _showSoundNudge(){
+    var wrap = document.createElement('div');
+    wrap.className = 'ex-nudge';
+    wrap.setAttribute('role', 'dialog');
+    wrap.setAttribute('aria-label', 'Add sound effects');
+    var msg = document.createElement('div');
+    msg.className = 'ex-nudge__msg';
+    msg.innerHTML = '<span class="ex-nudge__emoji" aria-hidden="true">🔊</span>'
+      + '<span>Add sound effects? A little ding when you nail it.</span>';
+    var btns = document.createElement('div');
+    btns.className = 'ex-nudge__btns';
+    var no = document.createElement('button');
+    no.type = 'button'; no.className = 'ex-nudge__btn'; no.textContent = 'Not now';
+    var yes = document.createElement('button');
+    yes.type = 'button'; yes.className = 'ex-nudge__btn ex-nudge__btn--primary'; yes.textContent = 'Turn on';
+    var timer = 0;
+    function close(){ try { wrap.remove(); } catch(_e){} if(timer) clearTimeout(timer); }
+    no.addEventListener('click', close);
+    yes.addEventListener('click', function(){
+      try {
+        if(window.D) window.D.soundEnabled = true;
+        if(typeof window.save === 'function') window.save();
+        var tg = document.getElementById('tg-soundEnabled');
+        if(tg) tg.classList.add('on');
+        // first sound rides THIS gesture (also unlocks the iOS audio context)
+        if(window.sfx){ try { window.sfx.unlock(); } catch(_e){} window.sfx.correct(); }
+        if(typeof window.showToast === 'function') window.showToast('Sound effects on 🔊');
+      } catch(_e){}
+      close();
+    });
+    btns.appendChild(no); btns.appendChild(yes);
+    wrap.appendChild(msg); wrap.appendChild(btns);
+    document.body.appendChild(wrap);
+    timer = setTimeout(close, 9000);  // auto-dismiss; still counts as seen
+    try { requestAnimationFrame(function(){ wrap.classList.add('ex-nudge--in'); }); }
+    catch(_e){ wrap.classList.add('ex-nudge--in'); }
+  }
 
   // ── Click dispatch (single delegated listener on the root) ───
   function _onClick(e){
@@ -216,8 +280,8 @@
     if(act === 'choice'){
       var i = +btn.getAttribute('data-i');
       var ok = (i === q.answer) || (q.choices[i] === q.answer);
-      if(ok){ btn.classList.add('ex-right'); _say(_run.host, q.explain || 'Nice!', true); _disableGroup(_run.host, '.ex-choice'); setTimeout(_advance, _reduced() ? 700 : 850); }
-      else { _markWrong(); _nudge(btn); btn.classList.add('ex-off'); _say(_run.host, 'Not quite — try again, you’ve got this.', false); }
+      if(ok){ btn.classList.add('ex-right'); if(window.sfx) window.sfx.correct(); _say(_run.host, q.explain || 'Nice!', true); _disableGroup(_run.host, '.ex-choice'); setTimeout(_advance, _reduced() ? 700 : 850); }
+      else { _markWrong(); if(window.sfx) window.sfx.tryAgain(); _nudge(btn); btn.classList.add('ex-off'); _say(_run.host, 'Not quite — try again, you’ve got this.', false); }
       return;
     }
 
@@ -232,10 +296,12 @@
         st.matched[idx] = true;
         [st.sel.el, btn].forEach(function(el){ el.classList.remove('ex-sel'); el.classList.add('ex-right'); el.setAttribute('disabled',''); el.setAttribute('aria-pressed','false'); });
         st.sel = null;
+        if(window.sfx) window.sfx.correct();
         if(Object.keys(st.matched).length === q.pairs.length){ _say(_run.host, q.explain || 'All matched!', true); setTimeout(_advance, _reduced() ? 700 : 850); }
         else { _say(_run.host, 'Match!', true); }
       } else {
         _markWrong();
+        if(window.sfx) window.sfx.tryAgain();
         var a = st.sel.el, b = btn; _nudge(a); _nudge(b); a.classList.remove('ex-sel'); a.setAttribute('aria-pressed','false'); st.sel = null;
         _say(_run.host, 'Those don’t match — try again.', false);
       }
@@ -262,12 +328,12 @@
       if(q.type === 'word'){
         var want = (q.answer || []).slice().sort().join(',');
         var got = Object.keys(_run.qstate.sel).map(Number).sort(function(a,b){ return a-b; }).join(',');
-        if(want === got){ _say(_run.host, q.explain || 'Exactly!', true); _disableGroup(_run.host, '.ex-word'); btn.setAttribute('disabled',''); setTimeout(_advance, _reduced() ? 700 : 850); }
-        else { _markWrong(); _nudge(_run.host.querySelector('.ex-words')); _say(_run.host, 'Close — adjust your picks and check again.', false); }
+        if(want === got){ if(window.sfx) window.sfx.correct(); _say(_run.host, q.explain || 'Exactly!', true); _disableGroup(_run.host, '.ex-word'); btn.setAttribute('disabled',''); setTimeout(_advance, _reduced() ? 700 : 850); }
+        else { _markWrong(); if(window.sfx) window.sfx.tryAgain(); _nudge(_run.host.querySelector('.ex-words')); _say(_run.host, 'Close — adjust your picks and check again.', false); }
       } else if(q.type === 'order'){
         var ans = (q.answer || []).join(','), cur = _run.qstate.order.join(',');
-        if(ans === cur){ _say(_run.host, q.explain || 'Right order!', true); _disableGroup(_run.host, '.ex-omove'); btn.setAttribute('disabled',''); setTimeout(_advance, _reduced() ? 700 : 850); }
-        else { _markWrong(); _nudge(_run.host.querySelector('.ex-order')); _say(_run.host, 'Not the right order yet — try again.', false); }
+        if(ans === cur){ if(window.sfx) window.sfx.correct(); _say(_run.host, q.explain || 'Right order!', true); _disableGroup(_run.host, '.ex-omove'); btn.setAttribute('disabled',''); setTimeout(_advance, _reduced() ? 700 : 850); }
+        else { _markWrong(); if(window.sfx) window.sfx.tryAgain(); _nudge(_run.host.querySelector('.ex-order')); _say(_run.host, 'Not the right order yet — try again.', false); }
       }
       return;
     }

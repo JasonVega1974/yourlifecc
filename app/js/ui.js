@@ -852,9 +852,9 @@ function openSettings(anchorId){
   // 2026-06-07 — Faith tab swap dropdown.
   const _tsEl=document.getElementById('settingsTabSwap');
   if(_tsEl) _tsEl.value = (D.tabSwap && TAB_SWAP_OPTIONS[D.tabSwap]) ? D.tabSwap : '';
-  // 2026-06-07 — Skills Step 3: sound-effects opt-in toggle.
-  const _ssEl=document.getElementById('tg-skillsSound');
-  if(_ssEl) _ssEl.classList.toggle('on', !!D.skillsSound);
+  // WC-D2 (2026-06-14): unified sound-effects toggle, backed by D.soundEnabled.
+  const _ssEl=document.getElementById('tg-soundEnabled');
+  if(_ssEl) _ssEl.classList.toggle('on', !!D.soundEnabled);
   // Email Bundle (2026-06-08) — Email Preferences section hydration.
   // Sets per-tier visibility for all 4 toggles + status badges via
   // _hydrateEmailPrefsSettings() in parent.js. Replaces the previous

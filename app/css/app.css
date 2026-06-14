@@ -10109,3 +10109,19 @@ body:has(#s-parent.sec.active #parentCelestialHome:not(.pch-entered):not(.pch-cl
 :root.light .ex-wrong{border-color:#dc2626!important;background:color-mix(in srgb,#dc2626 12%,transparent)!important;}
 :root.light .ex-feedback--no{color:#b91c1c;}
 :root.light .ex-btn--primary{color:#ffffff;}
+
+/* ── WC-D2: one-time "Add sound effects?" opt-in nudge ───────────────────
+   Token-based so it adapts to light mode automatically; explicit light
+   refinements below for shadow + primary-button text contrast. */
+.ex-nudge{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translate(-50%,1.4rem);z-index:99999;display:flex;flex-direction:column;gap:.6rem;width:min(92vw,380px);padding:.85rem 1rem;background:var(--s2);color:var(--tx);border:1px solid var(--br);border-radius:var(--r,14px);box-shadow:0 14px 38px rgba(0,0,0,.45);opacity:0;transition:opacity .22s ease,transform .22s ease;}
+.ex-nudge--in{opacity:1;transform:translate(-50%,0);}
+.ex-nudge__msg{display:flex;align-items:center;gap:.55rem;font-size:.86rem;line-height:1.3;}
+.ex-nudge__emoji{font-size:1.15rem;flex:0 0 auto;}
+.ex-nudge__btns{display:flex;justify-content:flex-end;gap:.5rem;}
+.ex-nudge__btn{font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer;padding:.42rem .9rem;border-radius:999px;border:1px solid var(--br);background:transparent;color:var(--tx2);}
+.ex-nudge__btn:hover{border-color:var(--c);color:var(--tx);}
+.ex-nudge__btn--primary{border-color:transparent;background:var(--c);color:#fff;}
+.ex-nudge__btn--primary:hover{color:#fff;filter:brightness(1.06);}
+@media (prefers-reduced-motion:reduce){.ex-nudge{transition:none;transform:translate(-50%,0);}}
+:root.light .ex-nudge{box-shadow:0 12px 30px rgba(31,24,16,.18);}
+:root.light .ex-nudge__btn--primary{color:#ffffff;}

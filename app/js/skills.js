@@ -3430,9 +3430,9 @@ let _quizShuffled = [];
 //   _quizPowerExpired — set true when timer hits 0; guards showQuestion
 //                       and answerQuestion from running after end
 //
-// Sound: D.skillsSound (default false in data.js DEF) gates all
-// quiz audio. Tones synthesized via Web Audio API — no asset files,
-// no fetches, no SW cache implications. Toggle lives in Me → Settings.
+// Sound: converged onto the unified window.sfx layer (WC-D2). The single
+// gate is D.soundEnabled (absorbed the retired D.skillsSound); synthesis +
+// the shared AudioContext live in sfx.js. Toggle lives in Me → Settings.
 // ════════════════════════════════════════════════════════════
 let _quizStreak = 0;
 let _quizMaxStreak = 0;
@@ -3441,63 +3441,31 @@ let _quizPowerTimerId = 0;
 let _quizPowerStartMs = 0;
 let _quizPowerExpired = false;
 
-// ─── Sound (Web Audio API, opt-in via D.skillsSound) ─────────
-let _skAudioCtx = null;
-function _skGetAudioCtx(){
-  if(_skAudioCtx){
-    // iOS suspends contexts when the tab is backgrounded.
-    if(_skAudioCtx.state === 'suspended' && typeof _skAudioCtx.resume === 'function'){
-      try { _skAudioCtx.resume(); } catch(_){}
-    }
-    return _skAudioCtx;
-  }
-  const AC = window.AudioContext || window.webkitAudioContext;
-  if(!AC) return null;
-  try { _skAudioCtx = new AC(); return _skAudioCtx; } catch(e){ return null; }
-}
-function _skPlayTone(freq, duration, type, gainPeak){
-  if(typeof D === 'undefined' || !D || !D.skillsSound) return;
-  const ctx = _skGetAudioCtx();
-  if(!ctx) return;
-  try {
-    const osc  = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = type || 'sine';
-    osc.frequency.value = freq;
-    const peak = (typeof gainPeak === 'number') ? gainPeak : 0.14;
-    gain.gain.setValueAtTime(peak, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
-    osc.connect(gain).connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + duration);
-  } catch(_){}
-}
-function _skPlayCorrect(){
-  _skPlayTone(880, 0.10, 'sine');
-  setTimeout(function(){ _skPlayTone(1320, 0.12, 'sine'); }, 70);
-}
-function _skPlayWrong(){
-  _skPlayTone(220, 0.18, 'triangle', 0.10);
-}
-function _skPlayPass(){
-  // C-E-G arpeggio
-  _skPlayTone(523, 0.16, 'triangle');
-  setTimeout(function(){ _skPlayTone(659, 0.16, 'triangle'); }, 120);
-  setTimeout(function(){ _skPlayTone(784, 0.26, 'triangle'); }, 240);
-}
+// ─── Sound — converged onto the unified window.sfx layer (WC-D2) ─────
+// Thin wrappers that preserve the long-standing call sites (_skPlayCorrect
+// on a right answer, _skPlayWrong on a wrong one, _skPlayPass on a quiz
+// pass) while the synthesis, the single D.soundEnabled gate, and the shared
+// AudioContext all live in sfx.js. No local AudioContext here anymore.
+function _skPlayCorrect(){ if(window.sfx) window.sfx.correct(); }
+function _skPlayWrong(){ if(window.sfx) window.sfx.tryAgain(); }
+function _skPlayPass(){ if(window.sfx) window.sfx.perfect(); }
 
-// Settings → 🔊 Skills sound effects toggle handler. Wired from
-// the .tg button in #sp; hydrated by openSettings() in ui.js.
-function toggleSkillsSound(btn){
+// Settings → 🔊 Sound effects toggle handler (WC-D2: ONE toggle, backed by
+// D.soundEnabled, which absorbed the retired skillsSound). Wired from the
+// .tg button in #sp; hydrated by openSettings() in ui.js. The confirm ding
+// on enable is an explicit user gesture, so it also unlocks audio on iOS.
+function toggleSound(btn){
   if(typeof D === 'undefined' || !D) return;
-  D.skillsSound = !D.skillsSound;
-  if(btn) btn.classList.toggle('on', !!D.skillsSound);
+  D.soundEnabled = !D.soundEnabled;
+  if(btn) btn.classList.toggle('on', !!D.soundEnabled);
   if(typeof save === 'function') save();
-  if(D.skillsSound && typeof _skPlayCorrect === 'function') _skPlayCorrect();
+  if(D.soundEnabled && window.sfx){ try { window.sfx.unlock(); } catch(_){} window.sfx.correct(); }
   if(typeof showToast === 'function'){
-    showToast(D.skillsSound ? 'Skills sound ON 🔊' : 'Skills sound OFF');
+    showToast(D.soundEnabled ? 'Sound effects ON 🔊' : 'Sound effects OFF');
   }
 }
+// Back-compat alias — a stale cached app shell may still call the old name.
+function toggleSkillsSound(btn){ return toggleSound(btn); }
 
 // ─── Combo escalation FX ─────────────────────────────────────
 // Fires at streak 3 / 5 / 7. Banner is body-appended, auto-removed
@@ -3514,6 +3482,8 @@ function _skTriggerCombo(streak){
     emoji = '🌟';
     _skScreenFlash(col);
   } else return;
+  // WC-D2: streak blip rides this genuine combo milestone (banner + confetti below)
+  if(window.sfx) window.sfx.streak();
   const banner = document.createElement('div');
   banner.className = 'sk-combo-banner';
   banner.style.setProperty('--combo-accent', col);
@@ -4131,7 +4101,7 @@ function finishSkillQuiz(){
     save(); renderGameTickets();
     // 🏆 Big confetti burst on quiz pass
     setTimeout(()=>{ if(typeof launchBigConfetti==='function') launchBigConfetti(); }, 300);
-    // 2026-06-07 — Skills Step 3: pass fanfare (gated by D.skillsSound).
+    // Pass fanfare — via window.sfx.perfect(), gated by D.soundEnabled (WC-D2).
     if(typeof _skPlayPass === 'function') setTimeout(_skPlayPass, 200);
     // FAF Inc 2 — quiz_passed fires on every pass (incl. retakes);
     // cert_earned fires only on the first-ever cert for this subject
