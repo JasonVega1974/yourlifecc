@@ -120,7 +120,14 @@
       if (seed < 0) seed = 0;
       D.xpStreak.count = seed;
       D.xpStreak.longest = seed;
-      D.xpStreak.lastDayKey = _today();
+      // Anchor depends on whether the seed already includes today.
+      // getScriptureStreak() always counts today (read/Sunday/skip on its first
+      // step), so a POSITIVE seed includes today -> anchor today: today's XP
+      // no-ops and tomorrow increments to seed+1 (no double-count). A ZERO seed
+      // (brand-new kid with no prior streak, or getScriptureStreak unavailable)
+      // does NOT include today -> anchor YESTERDAY so today's first XP bumps
+      // 0 -> 1. Without this, a new kid's first active day would read 0/hide.
+      D.xpStreak.lastDayKey = (seed > 0) ? _today() : _dayKeyOffset(-1);
     }
   }
   // Called from awardXP on every award; only acts on the first XP of a new day.
