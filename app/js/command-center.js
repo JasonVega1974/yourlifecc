@@ -17,6 +17,18 @@
 (function(){
   'use strict';
 
+  // ── WC-2c home-return reinforcement state ────────────────────
+  // Last-rendered ring pct + streak, so we can sweep the ring from its
+  // previous value and pulse the flame only when the streak grew since
+  // the last home render (XP is earned on feature tabs, so these fire on
+  // the next home paint, not at earn time — the toast covers that).
+  var _ccLastRingPct = null;
+  var _ccLastStreak  = null;
+  function _ccReducedMotion(){
+    try { return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
+    catch(_e){ return false; }
+  }
+
   // ── helpers ──────────────────────────────────────────────────
   function _ccEsc(s){
     if (s == null) return '';
@@ -63,7 +75,14 @@
 
   // ── live data: streak / tasks / points ───────────────────────
   function _ccStreak(){
-    // v1 canonical: D.streak (aggregate Daily W's). Broader rollup deferred.
+    // WC-2b-ii — the headline flame now shows the unified XP streak (any-XP
+    // day, Sabbath-bridged) via getXpStreak(). D.streak (daily-checks) keeps
+    // incrementing in ui.js but no longer drives this flame; it is only the
+    // fallback if xp.js hasn't loaded yet.
+    if (typeof getXpStreak === 'function'){
+      var s = getXpStreak();
+      if (typeof s === 'number' && s >= 0) return s;
+    }
     if (typeof D !== 'undefined' && D && typeof D.streak === 'number' && D.streak >= 0) return D.streak;
     return 0;
   }
@@ -582,6 +601,35 @@
         + '</div>' )
       : '';
 
+    // WC-2b-i — daily-goal XP ring. xpToday / dailyGoal, brass fill turning
+    // green at 100%. Readers come from xp.js (guarded). Geometry: r=26 →
+    // circumference ~163.4; the fill arc starts at 12 o'clock via the -90deg
+    // rotation + stroke-dashoffset. Theme-independent (dark scene, matches the
+    // cc- chrome — no light pass) and reduced-motion safe (CSS gates the fill
+    // transition). The flame repoint (streak) is WC-2b-ii.
+    var _xpGoal  = (typeof getDailyGoal === 'function') ? getDailyGoal() : 25;
+    var _xpToday = (typeof getXpToday === 'function') ? getXpToday() : 0;
+    var _xpPct   = (_xpGoal > 0) ? Math.min(100, Math.round((_xpToday / _xpGoal) * 100)) : 0;
+    var _xpMet   = _xpGoal > 0 && _xpToday >= _xpGoal;
+    var _xpC     = 2 * Math.PI * 26;
+    var _xpOff   = (_xpC * (1 - _xpPct / 100)).toFixed(1);
+    var _xpAria  = _xpToday + ' of ' + _xpGoal + ' daily XP' + (_xpMet ? ', goal met' : '');
+    var ringHtml = ''
+      + '<div class="cc-ring' + (_xpMet ? ' cc-ring--met' : '') + '" role="group" aria-label="' + _xpAria + '">'
+      +   '<div class="cc-ring__circle">'
+      +     '<svg class="cc-ring__svg" viewBox="0 0 64 64" aria-hidden="true">'
+      +       '<circle class="cc-ring__track" cx="32" cy="32" r="26"/>'
+      +       '<circle class="cc-ring__fill" cx="32" cy="32" r="26" transform="rotate(-90 32 32)" '
+      +         'stroke-dasharray="' + _xpC.toFixed(1) + '" stroke-dashoffset="' + _xpOff + '"/>'
+      +     '</svg>'
+      +     '<div class="cc-ring__num" aria-hidden="true">' + _xpToday + '</div>'
+      +   '</div>'
+      +   '<div class="cc-ring__body">'
+      +     '<div class="cc-ring__title">' + (_xpMet ? 'Daily goal met' : 'XP today') + '</div>'
+      +     '<div class="cc-ring__meta">' + (_xpMet ? ('+' + _xpToday + ' XP — nice work') : (_xpToday + ' / ' + _xpGoal + ' XP')) + '</div>'
+      +   '</div>'
+      + '</div>';
+
     root.innerHTML = ''
       + '<main class="cc-shell" role="main">'
       +   '<header class="cc-greeting" aria-label="Greeting">'
@@ -596,6 +644,7 @@
       +   '</header>'
 
       +   '<section class="cc-stats'+(streak>=1?'':' cc-stats--no-streak')+'" aria-label="Today\'s progress">'
+      +     ringHtml
       +     streakHtml
       +     '<div class="cc-chip" role="group" aria-label="'+tasks+' tasks today">'
       +       '<div class="cc-chip__num">'+tasks+'</div>'
@@ -625,6 +674,31 @@
       +     '</div>'
       +   '</section>'
       + '</main>';
+
+    // WC-2c — home-return reinforcements (compose with the existing render;
+    // the ring otherwise snaps). Sweep the fill from its previous pct, and
+    // pulse the flame if the streak ticked since the last render. Gated under
+    // reduced-motion (snap/no pulse). Wrapped defensively — never block render.
+    try {
+      var _reduced = _ccReducedMotion();
+      var _fill = root.querySelector('.cc-ring__fill');
+      if (_fill && !_reduced && _ccLastRingPct !== null && _ccLastRingPct !== _xpPct){
+        _fill.style.transition = 'none';
+        _fill.style.strokeDashoffset = (_xpC * (1 - _ccLastRingPct / 100)).toFixed(1);
+        void _fill.getBoundingClientRect();        // reflow so the old value paints first
+        _fill.style.transition = '';
+        requestAnimationFrame(function(){
+          _fill.style.strokeDashoffset = (_xpC * (1 - _xpPct / 100)).toFixed(1);
+        });
+      }
+      var _curStreak = (typeof getXpStreak === 'function') ? getXpStreak() : streak;
+      if (!_reduced && _ccLastStreak !== null && _curStreak > _ccLastStreak){
+        var _streakEl = root.querySelector('.cc-streak');
+        if (_streakEl) _streakEl.classList.add('cc-streak--pulse');
+      }
+      _ccLastRingPct = _xpPct;
+      _ccLastStreak  = _curStreak;
+    } catch(_e){}
 
     // Wire destination clicks (event delegation — single listener).
     // Catches BOTH tile buttons in .cc-tiles AND orb wrappers in

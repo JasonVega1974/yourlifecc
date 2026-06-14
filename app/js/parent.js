@@ -2526,7 +2526,11 @@ function renderParentMultiChild(){
         const gradeMap = {'A+':4,'A':4,'A-':3.7,'B+':3.3,'B':3,'B-':2.7,'C+':2.3,'C':2,'C-':1.7,'D+':1.3,'D':1,'D-':0.7,'F':0};
         const grades = classes.filter(cl=>cl.grade).map(cl=>gradeMap[cl.grade]||0);
         const gpa = grades.length ? (grades.reduce((a,b)=>a+b,0)/grades.length).toFixed(2) : '—';
-        const streak = d.streak||0;
+        // WC-2b (A) — unified streak: fresh read of this kid's xpStreak
+        // (today/yesterday/Sabbath check via xp.js), NOT the stale
+        // never-resetting d.streak. Pure read — no seeding on the parent
+        // view; a kid unmigrated since WC-2b reads 0 until their next login.
+        const streak = (typeof window.getXpStreakFromData === 'function') ? window.getXpStreakFromData(p.data) : 0;
         const certs = Object.values(d.skillCerts||{}).filter(Boolean).length;
         const chorePts = (d.chorePoints||{}).total||0;
         const goalsD = (d.goals||[]).filter(g=>g.done).length;
@@ -5749,6 +5753,11 @@ function _hydrateEmailPrefsSettings(){
     if(eEl) eEl.classList.toggle('on', p.engagementOptIn === true);
   }
 
+  // WC-3d — streak reminders (push). Opt-OUT model: ON = NOT opted out.
+  // Device-level (not plan-gated), so available to all tiers.
+  const spEl = document.getElementById('tg-streakPushOptIn');
+  if(spEl) spEl.classList.toggle('on', !(D.pushPrefs && D.pushPrefs.retentionOptOut === true));
+
   // Crossover — faith-free only
   if(isFaithFree){
     setBadge('ep-crossover-status', '', null);
@@ -5893,6 +5902,23 @@ function setEngagementOptIn(btn){
     showToast(D.emailPrefs.engagementOptIn
       ? 'Engagement emails ON ✉️'
       : 'Engagement emails OFF');
+  }
+}
+
+// WC-3d — streak-at-risk PUSH opt-out toggle (Me → Settings → #tg-streakPushOptIn).
+// Opt-OUT model: the toggle reads ON when retention push is ENABLED
+// (D.pushPrefs.retentionOptOut !== true). Flipping it mutes the streak push
+// WITHOUT unsubscribing the device. The push cron (api/cron/push-tick) reads
+// D.pushPrefs.retentionOptOut server-side via the synced profiles.data blob.
+function setStreakPushOptIn(btn){
+  if(typeof D === 'undefined' || !D) return;
+  if(!D.pushPrefs || typeof D.pushPrefs !== 'object') D.pushPrefs = { retentionOptOut:false, lastStreakRiskPush:null };
+  D.pushPrefs.retentionOptOut = (D.pushPrefs.retentionOptOut === true) ? false : true;
+  var enabled = (D.pushPrefs.retentionOptOut !== true);
+  if(btn) btn.classList.toggle('on', enabled);
+  if(typeof save === 'function') save();
+  if(typeof showToast === 'function'){
+    showToast(enabled ? 'Streak reminders ON 🔥' : 'Streak reminders OFF');
   }
 }
 

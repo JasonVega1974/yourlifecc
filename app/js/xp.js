@@ -59,14 +59,28 @@
     n = +n || 0;
     if (n <= 0) return;
     _rollover();
-    D.xpToday = (+D.xpToday || 0) + n;
+    // Snapshot pre-award state for the juice deltas, then commit.
+    var goal     = getDailyGoal();
+    var oldToday = (+D.xpToday || 0);
+    var streakTicked = _streakBumpForToday();   // WC-2b-ii count + WC-2c tick signal
+    D.xpToday = oldToday + n;
     D.xpTotal = (+D.xpTotal || 0) + n;
     if (!Array.isArray(D.xpLog)) D.xpLog = [];
     D.xpLog.push({ ts: Date.now(), n: n, source: source || 'unknown' });
     if (D.xpLog.length > XP_LOG_CAP) D.xpLog = D.xpLog.slice(D.xpLog.length - XP_LOG_CAP);
     if (typeof save === 'function') save();
-    // WC-2c plugs the juice/animation in here. Guarded — never required.
-    try { if (typeof window !== 'undefined' && typeof window.xpJuice === 'function') window.xpJuice(n, source); } catch(_){}
+    // WC-2c — juice. Fires AFTER the award commits, with the full delta so
+    // xp-juice.js never recomputes or races. goalMet is the first cross of
+    // dailyGoal today (xpToday only rises and resets daily -> at most once/day).
+    // Guarded — never required.
+    var meta = {
+      newToday:     D.xpToday,
+      newTotal:     D.xpTotal,
+      newStreak:    getXpStreak(),
+      streakTicked: streakTicked,
+      goalMet:      (oldToday < goal && D.xpToday >= goal)
+    };
+    try { if (typeof window !== 'undefined' && typeof window.xpJuice === 'function') window.xpJuice(n, source, meta); } catch(_){}
   }
 
   // ── readers ──────────────────────────────────────────────────
@@ -75,6 +89,100 @@
   function getDailyGoal(){
     if (typeof D !== 'undefined' && D && +D.dailyGoal > 0) return +D.dailyGoal;
     return DEFAULT_DAILY_GOAL;
+  }
+
+  // ── unified streak (the flame) — WC-2b-ii ────────────────────
+  // A day counts if the kid earned ANY XP that day (gentler than "hit the
+  // daily goal" — the ring is the separate goal-met signal). All day keys are
+  // UTC, matching the rest of the app's toISOString().slice(0,10).
+  function _dayKeyOffset(delta){
+    var d = new Date();
+    d.setUTCDate(d.getUTCDate() + delta);
+    return d.toISOString().slice(0, 10);
+  }
+  // Sabbath bridge: an idle Sunday between two active days must not break the
+  // streak (active Sat -> idle Sun -> active Mon continues), matching the faith
+  // app's Sunday auto-protect. The ONLY all-Sunday gap is exactly a one-day gap
+  // whose bridged day is Sunday — any longer gap necessarily includes a
+  // non-Sunday — so this stays simple, not gnarly on multi-day/week gaps.
+  function _isSabbathBridge(lastKey, todayKey){
+    if (!lastKey) return false;
+    var last  = Date.parse(lastKey  + 'T00:00:00Z');
+    var today = Date.parse(todayKey + 'T00:00:00Z');
+    if (isNaN(last) || isNaN(today)) return false;
+    if (Math.round((today - last) / 86400000) !== 2) return false;
+    var mid = new Date(last); mid.setUTCDate(mid.getUTCDate() + 1);
+    return mid.getUTCDay() === 0;
+  }
+  // One-time migration seed (lastDayKey === null) so the flame doesn't reset to
+  // 1 when the headline repoints from D.streak to this. Seed from
+  // getScriptureStreak() — read-only into faith.js; it has Sunday/skip
+  // forgiveness and returns 0 when truly broken, so it never over-credits.
+  // D.streak is NOT folded in: ui.js increments it but never resets it on a
+  // missed day (verified), so it is stale-high. getScriptureStreak() already
+  // counts today (read/Sunday/skip), so anchoring lastDayKey=today makes
+  // today's XP a no-op and tomorrow increments to seed+1 — no double-count.
+  function _ensureXpStreak(){
+    if (typeof D === 'undefined' || !D) return;
+    if (!D.xpStreak || typeof D.xpStreak !== 'object'){
+      D.xpStreak = { count: 0, lastDayKey: null, longest: 0 };
+    }
+    if (D.xpStreak.lastDayKey === null){
+      var seed = 0;
+      try { if (typeof getScriptureStreak === 'function') seed = +getScriptureStreak() || 0; } catch(_){}
+      if (seed < 0) seed = 0;
+      D.xpStreak.count = seed;
+      D.xpStreak.longest = seed;
+      // Anchor depends on whether the seed already includes today.
+      // getScriptureStreak() always counts today (read/Sunday/skip on its first
+      // step), so a POSITIVE seed includes today -> anchor today: today's XP
+      // no-ops and tomorrow increments to seed+1 (no double-count). A ZERO seed
+      // (brand-new kid with no prior streak, or getScriptureStreak unavailable)
+      // does NOT include today -> anchor YESTERDAY so today's first XP bumps
+      // 0 -> 1. Without this, a new kid's first active day would read 0/hide.
+      D.xpStreak.lastDayKey = (seed > 0) ? _today() : _dayKeyOffset(-1);
+    }
+  }
+  // Called from awardXP on every award; only acts on the first XP of a new day.
+  // Returns true iff the streak actually advanced this award (WC-2c tick
+  // signal for the flame pulse) — false on same-day re-awards and the seed.
+  function _streakBumpForToday(){
+    _ensureXpStreak();
+    var s = (typeof D !== 'undefined' && D) ? D.xpStreak : null;
+    if (!s) return false;
+    var today = _today();
+    if (s.lastDayKey === today) return false;            // already counted today (incl. the seed)
+    if (s.lastDayKey === _dayKeyOffset(-1) || _isSabbathBridge(s.lastDayKey, today)){
+      s.count = (+s.count || 0) + 1;                      // consecutive (or Sabbath-bridged)
+    } else {
+      s.count = 1;                                         // a gap -> fresh streak
+    }
+    s.lastDayKey = today;
+    if (s.count > (+s.longest || 0)) s.longest = s.count;
+    return true;                                           // streak ticked
+  }
+  // Reader: live truth without a cron. Returns count while the streak is
+  // current (today / yesterday / Sabbath-bridged); 0 once broken (the reset to
+  // 1 happens on the next awardXP, not on read).
+  // Freshness-aware reader usable on ANY profile's data — the live active D or
+  // an inactive kid's p.data (parent-hub kid cards). Single source for the
+  // today/yesterday/Sabbath check, so a stale lastDayKey reads 0 rather than a
+  // falsely-live streak. PURE READ — does NOT seed; seeding belongs to the
+  // owning profile's own session (a kid unmigrated since WC-2b reads 0 here
+  // until their next login, by design — we don't fake it).
+  function getXpStreakFromData(data){
+    if (!data || typeof data !== 'object') return 0;
+    var s = data.xpStreak;
+    if (!s || typeof s !== 'object') return 0;
+    var today = _today();
+    if (s.lastDayKey === today) return (+s.count || 0);
+    if (s.lastDayKey === _dayKeyOffset(-1)) return (+s.count || 0);
+    if (_isSabbathBridge(s.lastDayKey, today)) return (+s.count || 0);
+    return 0;
+  }
+  function getXpStreak(){
+    _ensureXpStreak();
+    return getXpStreakFromData(typeof D !== 'undefined' ? D : null);
   }
 
   // ── guard helpers (key-agnostic: count deltas beat date-key math) ─
@@ -241,6 +349,8 @@
     window.getXpToday   = getXpToday;
     window.getXpTotal   = getXpTotal;
     window.getDailyGoal = getDailyGoal;
+    window.getXpStreak  = getXpStreak;
+    window.getXpStreakFromData = getXpStreakFromData;
     window.XP_VALUES    = XP_VALUES;
   }
 })();

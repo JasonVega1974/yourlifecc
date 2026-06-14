@@ -435,6 +435,15 @@
     <div style="font-size:.6rem;color:var(--tx3);margin-top:.15rem;padding-left:.2rem;">We'll let you know when streaks are at risk, new features ship, or you've been away a while. Max 1 per week. Unsubscribe anytime.</div>
   </div>
 
+  <!-- WC-3d — streak-at-risk PUSH opt-out (opt-out model: ON = reminders enabled) -->
+  <div style="margin-top:.7rem;padding-top:.6rem;border-top:1px solid rgba(255,255,255,.06);">
+    <div class="tr">
+      <span style="font-size:.84rem;">🔥 Streak reminders (push)</span>
+      <button class="tg" id="tg-streakPushOptIn" onclick="setStreakPushOptIn(this)"></button>
+    </div>
+    <div style="font-size:.6rem;color:var(--tx3);margin-top:.15rem;padding-left:.2rem;">A gentle push when a kid's streak is at risk and they haven't earned XP today. Evening only, max 1 per day. Requires notifications turned on for this device.</div>
+  </div>
+
   <!-- SCRIPTURE MANAGEMENT -->
   <div style="margin-top:1rem;padding-top:.9rem;border-top:1px solid rgba(255,255,255,.06);">
     <div style="font-family:var(--fh);font-size:.73rem;letter-spacing:1px;color:#c8d4e8;margin-bottom:.55rem;">✝️ SCRIPTURE ROTATION</div>
@@ -755,6 +764,8 @@
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
+<!-- WC-2c — XP juice toast (filled + shown by xp-juice.js on every awardXP) -->
+<div class="xpj-toast" id="xpJuiceToast" role="status" aria-live="polite" aria-hidden="true"></div>
 
 <!-- WELCOME MODAL (first time) -->
 <div id="welcomeModal" style="display:none;position:fixed;inset:0;background:rgba(4,6,16,.97);backdrop-filter:blur(16px);z-index:99998;align-items:center;justify-content:center;">
@@ -1107,7 +1118,50 @@
   .cc-chip{display:flex;flex-direction:column;justify-content:center;gap:.2rem;padding:.9rem 1rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;}
   .cc-chip__num{font-family:ui-monospace,'JetBrains Mono',monospace;font-feature-settings:"tnum";font-weight:700;font-size:1.35rem;color:#F1E9D5;letter-spacing:-.01em;line-height:1.1;}
   .cc-chip__label{font-size:.74rem;color:#9AA0B4;letter-spacing:.04em;}
+  /* WC-2b-i — daily-goal XP ring. Full-width lead element in cc-stats; brass
+     fill turns green at 100%. Theme-independent (dark scene, matches the cc-
+     chrome — no :root.light pass), reduced-motion safe. */
+  .cc-ring{grid-column:1 / -1;display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:18px;}
+  .cc-ring__circle{position:relative;width:64px;height:64px;flex-shrink:0;}
+  .cc-ring__svg{width:64px;height:64px;display:block;}
+  .cc-ring__track{fill:none;stroke:rgba(255,255,255,.10);stroke-width:6;}
+  .cc-ring__fill{fill:none;stroke:#FBBF24;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .6s ease,stroke .4s ease;}
+  .cc-ring--met .cc-ring__fill{stroke:#34D399;}
+  .cc-ring__num{position:absolute;inset:0;display:grid;place-items:center;font-family:ui-monospace,'JetBrains Mono',monospace;font-feature-settings:"tnum";font-weight:700;font-size:1.15rem;color:#F1E9D5;letter-spacing:-.01em;}
+  .cc-ring--met .cc-ring__num{color:#34D399;}
+  .cc-ring__body{display:flex;flex-direction:column;gap:.15rem;min-width:0;}
+  .cc-ring__title{font-size:.92rem;color:#F1E9D5;font-weight:500;}
+  .cc-ring__meta{font-size:.74rem;color:#9AA0B4;font-feature-settings:"tnum";letter-spacing:.02em;}
+  .cc-ring--met .cc-ring__meta{color:#34D399;}
+  @media (prefers-reduced-motion: reduce){ .cc-ring__fill{transition:none;} }
   @media (min-width:720px){ .cc-stats{grid-template-columns:1.4fr 1fr 1fr;} .cc-streak{grid-column:auto;} .cc-streak__num{font-size:4rem;} .cc-stats.cc-stats--no-streak{grid-template-columns:1fr 1fr;} }
+  /* WC-2c — flame pulse when the streak ticks (added on home render by
+     command-center.js; the chip's fire icon gives a single beat). */
+  .cc-streak--pulse .cc-streak__icon{animation:ccStreakPulse .6s ease;}
+  @keyframes ccStreakPulse{0%{transform:scale(1);}40%{transform:scale(1.14);}100%{transform:scale(1);}}
+
+  /* WC-2c — XP juice toast. Celebration overlay (theme-independent, like
+     #toast): flat dark surface + brass accent; the "lift" is motion, not
+     decoration. Slides in from the top, holds, clears. Reduced-motion strips
+     all motion (fade only, no flourish) while keeping the text/state. */
+  .xpj-toast{position:fixed;top:14px;left:50%;transform:translate(-50%,-160%);z-index:100000;display:flex;align-items:center;gap:.6rem;max-width:88vw;padding:.6rem .95rem;border-radius:14px;background:#13192b;border:1px solid rgba(251,191,36,.42);box-shadow:0 10px 34px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:transform .34s cubic-bezier(.2,.9,.3,1.2),opacity .3s ease;}
+  .xpj-toast.show{transform:translate(-50%,0);opacity:1;}
+  .xpj-toast__flame{width:22px;height:22px;flex-shrink:0;filter:drop-shadow(0 0 4px rgba(251,191,36,.5));}
+  .xpj-toast__body{display:flex;flex-direction:column;gap:.05rem;min-width:0;}
+  .xpj-toast__title{font-family:ui-monospace,'JetBrains Mono',monospace;font-feature-settings:"tnum";font-weight:700;font-size:1rem;color:#FBBF24;letter-spacing:-.01em;line-height:1.15;}
+  .xpj-toast__sub{font-size:.72rem;color:#F1E9D5;letter-spacing:.02em;}
+  .xpj-toast--goal{border-color:rgba(52,211,153,.5);}
+  .xpj-toast--goal .xpj-toast__title{color:#34D399;}
+  .xpj-toast--goal .xpj-toast__flame{filter:drop-shadow(0 0 6px rgba(52,211,153,.55));}
+  .xpj-toast--goal.show{animation:xpjFlourish .55s ease;}
+  @keyframes xpjFlourish{0%{transform:translate(-50%,0) scale(.92);}55%{transform:translate(-50%,0) scale(1.06);}100%{transform:translate(-50%,0) scale(1);}}
+  .xpj-toast--reduced{transition:opacity .15s ease;transform:translate(-50%,0);}
+  .xpj-toast--reduced.show{transform:translate(-50%,0);animation:none;}
+  @media (prefers-reduced-motion: reduce){
+    .cc-streak--pulse .cc-streak__icon{animation:none;}
+    .xpj-toast{transition:opacity .15s ease;transform:translate(-50%,0);}
+    .xpj-toast.show{transform:translate(-50%,0);animation:none;}
+  }
 
   /* ── constellation: living space scene ─────────────────────
      A layered backdrop (deep sky + 2 nebula washes + starfield)
@@ -15894,6 +15948,24 @@
               #parentCelestialHome .pch-stat__num{font-family:var(--fh,'Bebas Neue',var(--fm,sans-serif));font-size:1.9rem;line-height:1;color:#F1E9D5;letter-spacing:.02em;}
               #parentCelestialHome .pch-stat__label{font-size:.72rem;color:#9AA0B4;margin-top:.4rem;font-weight:500;}
 
+              /* WC-2b-i — family XP ring (full-width lead in pch-stats).
+                 Brass fill turns green at 100%. Dark by default; the
+                 :root.light pass below matches the pch- surface (which,
+                 unlike the child cc- chrome, is NOT theme-independent). */
+              #parentCelestialHome .pch-xpring{grid-column:1 / -1;display:flex;align-items:center;gap:.9rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:.85rem 1rem;}
+              #parentCelestialHome .pch-xpring__circle{position:relative;width:56px;height:56px;flex-shrink:0;}
+              #parentCelestialHome .pch-xpring__svg{width:56px;height:56px;display:block;}
+              #parentCelestialHome .pch-xpring__track{fill:none;stroke:rgba(255,255,255,.10);stroke-width:6;}
+              #parentCelestialHome .pch-xpring__fill{fill:none;stroke:#FBBF24;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .6s ease,stroke .4s ease;}
+              #parentCelestialHome .pch-xpring--met .pch-xpring__fill{stroke:#34D399;}
+              #parentCelestialHome .pch-xpring__num{position:absolute;inset:0;display:grid;place-items:center;font-family:ui-monospace,'JetBrains Mono',monospace;font-feature-settings:"tnum";font-weight:700;font-size:1.05rem;color:#F1E9D5;}
+              #parentCelestialHome .pch-xpring--met .pch-xpring__num{color:#34D399;}
+              #parentCelestialHome .pch-xpring__body{display:flex;flex-direction:column;gap:.15rem;min-width:0;}
+              #parentCelestialHome .pch-xpring__title{font-size:.9rem;color:#F1E9D5;font-weight:500;}
+              #parentCelestialHome .pch-xpring__meta{font-size:.72rem;color:#9AA0B4;font-feature-settings:"tnum";letter-spacing:.02em;}
+              #parentCelestialHome .pch-xpring--met .pch-xpring__meta{color:#34D399;}
+              @media (prefers-reduced-motion: reduce){ #parentCelestialHome .pch-xpring__fill{transition:none;} }
+
               /* Constellation */
               /* World-class pass 2 (2026-06-11) -- sky panel.
                  The constellation section is framed as a viewport
@@ -15957,6 +16029,21 @@
               :root.light #parentCelestialHome .pch-stat__label{
                 color:#4a4b52;
               }
+              /* WC-2b-i — family XP ring, light pass (paper card + dark ink +
+                 deepened amber/green so the fill stays AA-legible on white). */
+              :root.light #parentCelestialHome .pch-xpring{
+                background:#ffffff;
+                border-color:rgba(15,23,42,.08);
+                box-shadow:0 1px 4px rgba(15,23,42,.05);
+              }
+              :root.light #parentCelestialHome .pch-xpring__track{stroke:rgba(15,23,42,.10);}
+              :root.light #parentCelestialHome .pch-xpring__fill{stroke:#b45309;}
+              :root.light #parentCelestialHome .pch-xpring--met .pch-xpring__fill{stroke:#059669;}
+              :root.light #parentCelestialHome .pch-xpring__num{color:#0f172a;}
+              :root.light #parentCelestialHome .pch-xpring--met .pch-xpring__num{color:#059669;}
+              :root.light #parentCelestialHome .pch-xpring__title{color:#0f172a;}
+              :root.light #parentCelestialHome .pch-xpring__meta{color:#4a4b52;}
+              :root.light #parentCelestialHome .pch-xpring--met .pch-xpring__meta{color:#059669;}
               :root.light #parentCelestialHome .pch-section-label{
                 color:#0f172a;
               }
@@ -16522,6 +16609,21 @@
 
               <!-- Family stat tiles (Phase 3 fills the numbers) -->
               <section class="pch-stats" aria-label="Family stats today">
+                <!-- WC-2b-i — family XP ring (Σ kid xpToday / Σ kid dailyGoal,
+                     rollover-correct). Numbers hydrated by renderParentCelestialHome. -->
+                <div class="pch-xpring" id="pchXpRing" role="group" aria-label="Family XP today">
+                  <div class="pch-xpring__circle">
+                    <svg class="pch-xpring__svg" viewBox="0 0 64 64" aria-hidden="true">
+                      <circle class="pch-xpring__track" cx="32" cy="32" r="26"/>
+                      <circle class="pch-xpring__fill" id="pchXpRingFill" cx="32" cy="32" r="26" transform="rotate(-90 32 32)" stroke-dasharray="163.4" stroke-dashoffset="163.4"/>
+                    </svg>
+                    <div class="pch-xpring__num" id="pchXpRingNum" aria-hidden="true">0</div>
+                  </div>
+                  <div class="pch-xpring__body">
+                    <div class="pch-xpring__title" id="pchXpRingTitle">Family XP today</div>
+                    <div class="pch-xpring__meta" id="pchXpRingMeta">0 / 0 XP</div>
+                  </div>
+                </div>
                 <div class="pch-stat"><div class="pch-stat__num" id="pchStatChores">&mdash;</div><div class="pch-stat__label">Chores pending</div></div>
                 <div class="pch-stat"><div class="pch-stat__num" id="pchStatGoals">&mdash;</div><div class="pch-stat__label">Goals in progress</div></div>
                 <div class="pch-stat"><div class="pch-stat__num" id="pchStatBadges">&mdash;</div><div class="pch-stat__label">Badges today</div></div>
@@ -20330,6 +20432,9 @@
      chores/goals/skills/health/habits) without editing those modules; loads
      after them + faith.js so the targets exist. Composes with streaks.js. -->
 <script defer src="/app/js/xp.js"></script>
+<!-- WC-2c — XP juice layer. Defines window.xpJuice (the +N toast); awardXP in
+     xp.js calls it guarded, so load order vs xp.js is not critical. -->
+<script defer src="/app/js/xp-juice.js"></script>
 
 <!-- V1 Rebuild · Session 1 — Daily Briefing card render module. Must load
      after streaks.js (uses getScriptureStreak) and before init.js (which
