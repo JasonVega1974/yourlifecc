@@ -158,6 +158,12 @@ module.exports = async function handler(req, res){
     }
   }
 
+  // TEST-ONLY plumbing bypass: ?force=1 (with testUser) sends a sample push to
+  // your own device REGARDLESS of the opt-out / at-risk / cooldown / evening
+  // gates — so delivery + copy + the /app deep-link can be verified separately
+  // from the gates under review. Has no effect in scheduled mode.
+  const forced = (mode === 'test') && req.query && (req.query.force === '1' || req.query.force === 'true');
+
   const now = Date.now();
   const nowIso = new Date(now).toISOString();
   const todayUTC = nowIso.slice(0, 10);
@@ -200,8 +206,8 @@ module.exports = async function handler(req, res){
     const data = dataById[uid] || {};
     const pushPrefs = (data.pushPrefs && typeof data.pushPrefs === 'object') ? data.pushPrefs : {};
 
-    // opt-out (always)
-    if(pushPrefs.retentionOptOut === true){
+    // opt-out (always — except a forced plumbing test)
+    if(!forced && pushPrefs.retentionOptOut === true){
       results.skipped++; results.details.push({ user_id: uid, reason: 'opted_out' }); continue;
     }
 
@@ -224,10 +230,16 @@ module.exports = async function handler(req, res){
       }
     }
 
-    // at-risk kids
-    const atRisk = _atRiskKids(data, todayUTC);
+    // at-risk kids (forced plumbing test: send a representative sample if the
+    // account isn't genuinely at-risk, so copy still renders).
+    let atRisk = _atRiskKids(data, todayUTC);
     if(!atRisk.length){
-      results.skipped++; results.details.push({ user_id: uid, reason: 'no_at_risk_kid' }); continue;
+      if(forced){
+        const sampleName = (_kidList(data)[0] && _kidList(data)[0].name) || 'your kid';
+        atRisk = [{ name: sampleName, streak: 5 }];
+      } else {
+        results.skipped++; results.details.push({ user_id: uid, reason: 'no_at_risk_kid' }); continue;
+      }
     }
 
     const copy = _composePush(atRisk);
