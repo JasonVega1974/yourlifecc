@@ -63,7 +63,14 @@
 
   // ── live data: streak / tasks / points ───────────────────────
   function _ccStreak(){
-    // v1 canonical: D.streak (aggregate Daily W's). Broader rollup deferred.
+    // WC-2b-ii — the headline flame now shows the unified XP streak (any-XP
+    // day, Sabbath-bridged) via getXpStreak(). D.streak (daily-checks) keeps
+    // incrementing in ui.js but no longer drives this flame; it is only the
+    // fallback if xp.js hasn't loaded yet.
+    if (typeof getXpStreak === 'function'){
+      var s = getXpStreak();
+      if (typeof s === 'number' && s >= 0) return s;
+    }
     if (typeof D !== 'undefined' && D && typeof D.streak === 'number' && D.streak >= 0) return D.streak;
     return 0;
   }
