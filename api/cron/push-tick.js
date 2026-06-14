@@ -8,20 +8,24 @@
 // Fires ONE push per ACCOUNT, naming the at-risk kid(s), when ALL gates pass:
 //   • has a push subscription (by construction)
 //   • data.pushPrefs.retentionOptOut !== true
-//   • >=1 kid with xpStreak.count >= 3 AND xpStreak.lastDayKey !== UTC-today
-//     AND not goal-met today (implied by the above; guarded explicitly)
+//   • >=1 kid with xpStreak.count >= 3 AND NOT earned today on the user's
+//     LOCAL day — "earned today" is derived from xpLog timestamps, NOT the
+//     UTC-keyed xpStreak.lastDayKey, so the local-evening window can't
+//     false-fire across the UTC boundary for American timezones
 //   • local hour in [18, 22) via data.emailPrefs.timezoneOffsetMin
 //     — SKIP the account if the offset is unset (we won't guess the tz)
 //   • shared cross-channel stamp data.lastStreakNudgeDate !== UTC-today
 //     (coordinates with engagement-tick's EMAIL streak trigger — one streak
-//      nudge per account per day across BOTH channels)
-//   • push channel cooldown data.pushPrefs.lastStreakRiskPush !== UTC-today
+//      nudge per account per day across BOTH channels; UTC on both sides)
+//   • push channel cooldown data.pushPrefs.lastStreakRiskPush !== LOCAL-today
+//     (LOCAL date so the 4h window can't span a UTC roll -> at most 1/evening)
 //
-// On send   → stamp data.pushPrefs.lastStreakRiskPush + data.lastStreakNudgeDate = UTC-today
+// On send   → stamp pushPrefs.lastStreakRiskPush = LOCAL-today + lastStreakNudgeDate = UTC-today
 // On 410/404 (gone) → DELETE the push_subscriptions row (cleanup)
 //
-// Deadline-AGNOSTIC copy: the XP streak's day boundary is UTC, so we don't
-// promise a local "before midnight" deadline — just "hasn't earned today".
+// Deadline-AGNOSTIC copy ("hasn't earned today", no "before midnight"). NOTE:
+// the streak ENGINE stays UTC-day (xpStreak.lastDayKey, WC-2b-ii deferred) —
+// this cron makes the NUDGE local-correct without touching the engine.
 //
 // Dispatch modes (mirror engagement-tick):
 //   SCHEDULED — Vercel Cron hourly. Bearer ${CRON_SECRET}.
@@ -89,17 +93,38 @@ function _kidList(data){
   return [{ name: (data.name || 'Your kid'), d: data }];
 }
 
-// At-risk kids: streak >= MIN_STREAK, not earned today (lastDayKey !==
-// UTC-today), not goal-met today (implied, guarded). Returns [{name, streak}].
-function _atRiskKids(data, todayUTC){
+// Did this kid earn ANY XP on the given LOCAL date? Derived from xpLog
+// timestamps (absolute epoch ms) so it sidesteps the UTC-keyed
+// xpStreak.lastDayKey — which would read false "not earned today" for the
+// ENTIRE local evening in UTC-negative (American) timezones, where UTC
+// midnight falls before/inside the 18:00-22:00 local window. xpLog rides in
+// the same profiles.data blob we already read; no streak-engine change.
+function _earnedOnLocalDate(kidData, offsetMin, localDate){
+  const log = Array.isArray(kidData && kidData.xpLog) ? kidData.xpLog : [];
+  for(let i = log.length - 1; i >= 0; i--){
+    const e = log[i];
+    const ts = e && +e.ts;
+    if(!ts) continue;
+    if(new Date(ts - offsetMin * 60000).toISOString().slice(0, 10) === localDate) return true;
+  }
+  return false;
+}
+
+// At-risk kids: streak >= MIN_STREAK AND not earned today on the user's LOCAL
+// day (via xpLog, NOT the UTC-keyed lastDayKey). "Earned today (local)"
+// subsumes goal-met-today. Returns [{name, streak}].
+//
+// NOTE (on the record): the streak ENGINE itself is still UTC-day keyed
+// (xpStreak.lastDayKey / xpDayKey) — the WC-2b-ii deferred limitation. This
+// makes the NUDGE local-correct; the engine's reset-at-UTC-midnight quirk is a
+// separate future change and is intentionally NOT touched here.
+function _atRiskKids(data, offsetMin, localDate){
   return _kidList(data).map(function(k){
     const s = k.d && k.d.xpStreak;
     if(!s || typeof s !== 'object') return null;
     const count = +s.count || 0;
     if(count < MIN_STREAK) return null;
-    if(s.lastDayKey === todayUTC) return null;            // earned today -> safe
-    const metToday = (k.d.xpDayKey === todayUTC) && ((+k.d.xpToday || 0) >= (+k.d.dailyGoal || 25));
-    if(metToday) return null;                              // implied by above; explicit
+    if(_earnedOnLocalDate(k.d, offsetMin, localDate)) return null;   // earned today (local) -> safe
     return { name: k.name, streak: count };
   }).filter(Boolean);
 }
@@ -206,6 +231,18 @@ module.exports = async function handler(req, res){
     const data = dataById[uid] || {};
     const pushPrefs = (data.pushPrefs && typeof data.pushPrefs === 'object') ? data.pushPrefs : {};
 
+    // Per-user LOCAL date + hour. offsetMin is getTimezoneOffset()-style
+    // (positive = behind UTC). Keying BOTH the cooldown stamp and "earned
+    // today" to the LOCAL date is what stops the 18:00-22:00-local window from
+    // straddling a UTC boundary and either double-pinging or false-firing in
+    // American timezones. effOffset's UTC fallback only matters in test mode
+    // (scheduled skips an unset offset below, so it never uses the fallback).
+    const offsetMin = (data.emailPrefs && typeof data.emailPrefs.timezoneOffsetMin === 'number')
+      ? data.emailPrefs.timezoneOffsetMin : null;
+    const effOffset = (offsetMin === null) ? 0 : offsetMin;
+    const localDate = new Date(now - effOffset * 60000).toISOString().slice(0, 10);
+    const localHour = _localHour(now, effOffset);
+
     // opt-out (always — except a forced plumbing test)
     if(!forced && pushPrefs.retentionOptOut === true){
       results.skipped++; results.details.push({ user_id: uid, reason: 'opted_out' }); continue;
@@ -213,26 +250,23 @@ module.exports = async function handler(req, res){
 
     // scheduled-only gates (test bypasses cooldown / shared-stamp / evening)
     if(mode === 'scheduled'){
-      if(pushPrefs.lastStreakRiskPush === todayUTC){
-        results.skipped++; results.details.push({ user_id: uid, reason: 'push_cooldown' }); continue;
-      }
-      if(data.lastStreakNudgeDate === todayUTC){
-        results.skipped++; results.details.push({ user_id: uid, reason: 'streak_nudge_already_today' }); continue;
-      }
-      const offsetMin = (data.emailPrefs && typeof data.emailPrefs.timezoneOffsetMin === 'number')
-        ? data.emailPrefs.timezoneOffsetMin : null;
       if(offsetMin === null){
         results.skipped++; results.details.push({ user_id: uid, reason: 'no_timezone' }); continue;
       }
-      const h = _localHour(now, offsetMin);
-      if(h < EVENING_START_HOUR || h >= EVENING_END_HOUR){
-        results.skipped++; results.details.push({ user_id: uid, reason: 'not_evening', localHour: h }); continue;
+      if(pushPrefs.lastStreakRiskPush === localDate){            // push 1/LOCAL-day cooldown
+        results.skipped++; results.details.push({ user_id: uid, reason: 'push_cooldown' }); continue;
+      }
+      if(data.lastStreakNudgeDate === todayUTC){                 // shared cross-channel stamp (UTC, matches email)
+        results.skipped++; results.details.push({ user_id: uid, reason: 'streak_nudge_already_today' }); continue;
+      }
+      if(localHour < EVENING_START_HOUR || localHour >= EVENING_END_HOUR){
+        results.skipped++; results.details.push({ user_id: uid, reason: 'not_evening', localHour: localHour }); continue;
       }
     }
 
     // at-risk kids (forced plumbing test: send a representative sample if the
     // account isn't genuinely at-risk, so copy still renders).
-    let atRisk = _atRiskKids(data, todayUTC);
+    let atRisk = _atRiskKids(data, effOffset, localDate);
     if(!atRisk.length){
       if(forced){
         const sampleName = (_kidList(data)[0] && _kidList(data)[0].name) || 'your kid';
@@ -252,8 +286,8 @@ module.exports = async function handler(req, res){
 
       if(mode === 'scheduled'){
         const newData = Object.assign({}, data, {
-          pushPrefs: Object.assign({}, pushPrefs, { lastStreakRiskPush: todayUTC }),
-          lastStreakNudgeDate: todayUTC
+          pushPrefs: Object.assign({}, pushPrefs, { lastStreakRiskPush: localDate }),  // 1/LOCAL-day cooldown
+          lastStreakNudgeDate: todayUTC                                                // shared (UTC, matches email)
         });
         try {
           await _supaPatch('profiles?user_id=eq.' + encodeURIComponent(uid), { data: newData }, serviceKey);
