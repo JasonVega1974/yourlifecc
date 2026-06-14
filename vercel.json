@@ -13,7 +13,8 @@
   "crons": [
     { "path": "/api/cron/weekly-digest",   "schedule": "0 * * * 0,1" },
     { "path": "/api/cron/engagement-tick", "schedule": "0 * * * *" },
-    { "path": "/api/cron/crossover-tick",  "schedule": "0 10 * * 3" }
+    { "path": "/api/cron/crossover-tick",  "schedule": "0 10 * * 3" },
+    { "path": "/api/cron/push-tick",       "schedule": "0 * * * *" }
   ],
   "functions": {
     "api/cron/crossover-tick.js": {

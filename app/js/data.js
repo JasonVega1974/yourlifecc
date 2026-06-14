@@ -410,6 +410,14 @@ const DEF = {
     signupPromptShown:     false,   // Part 1 signup email-prefs modal
     crossoverBannerShown:  false    // Part 2 faith-free awareness banner
   },
+  // WC-3d — push retention prefs + the shared cross-channel streak-nudge stamp.
+  // pushPrefs.retentionOptOut mutes the streak-at-risk PUSH without killing the
+  // device subscription. pushPrefs.lastStreakRiskPush is the push channel's own
+  // per-day cooldown (UTC date). lastStreakNudgeDate is SHARED: both the push
+  // cron (api/cron/push-tick) and the email cron (engagement-tick) check + set
+  // it so a family gets at most one streak nudge per day across BOTH channels.
+  pushPrefs:           { retentionOptOut: false, lastStreakRiskPush: null },
+  lastStreakNudgeDate: null,
   // ── Family Activity Feed (FAF Inc 1, 2026-06-08) ────────────
   // Unified, append-only event stream powering the Parent Hub
   // home strip (FAF Inc 4) and the full Activity tab feed (FAF
