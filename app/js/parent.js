@@ -5753,6 +5753,11 @@ function _hydrateEmailPrefsSettings(){
     if(eEl) eEl.classList.toggle('on', p.engagementOptIn === true);
   }
 
+  // WC-3d — streak reminders (push). Opt-OUT model: ON = NOT opted out.
+  // Device-level (not plan-gated), so available to all tiers.
+  const spEl = document.getElementById('tg-streakPushOptIn');
+  if(spEl) spEl.classList.toggle('on', !(D.pushPrefs && D.pushPrefs.retentionOptOut === true));
+
   // Crossover — faith-free only
   if(isFaithFree){
     setBadge('ep-crossover-status', '', null);
@@ -5897,6 +5902,23 @@ function setEngagementOptIn(btn){
     showToast(D.emailPrefs.engagementOptIn
       ? 'Engagement emails ON ✉️'
       : 'Engagement emails OFF');
+  }
+}
+
+// WC-3d — streak-at-risk PUSH opt-out toggle (Me → Settings → #tg-streakPushOptIn).
+// Opt-OUT model: the toggle reads ON when retention push is ENABLED
+// (D.pushPrefs.retentionOptOut !== true). Flipping it mutes the streak push
+// WITHOUT unsubscribing the device. The push cron (api/cron/push-tick) reads
+// D.pushPrefs.retentionOptOut server-side via the synced profiles.data blob.
+function setStreakPushOptIn(btn){
+  if(typeof D === 'undefined' || !D) return;
+  if(!D.pushPrefs || typeof D.pushPrefs !== 'object') D.pushPrefs = { retentionOptOut:false, lastStreakRiskPush:null };
+  D.pushPrefs.retentionOptOut = (D.pushPrefs.retentionOptOut === true) ? false : true;
+  var enabled = (D.pushPrefs.retentionOptOut !== true);
+  if(btn) btn.classList.toggle('on', enabled);
+  if(typeof save === 'function') save();
+  if(typeof showToast === 'function'){
+    showToast(enabled ? 'Streak reminders ON 🔥' : 'Streak reminders OFF');
   }
 }
 

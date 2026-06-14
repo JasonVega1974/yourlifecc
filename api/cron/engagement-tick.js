@@ -587,8 +587,14 @@ function _buildContext(row, nowMs){
 
 // ── Per-user dispatch ────────────────────────────────────────
 // Returns { sent: bool, trigger?: string, payload?: obj, skip?: string, diag: obj }
-function _evaluateUser(row, nowMs, mode){
+function _evaluateUser(row, nowMs, mode, opts){
+  opts = opts || {};
   const ctx = _buildContext(row, nowMs);
+  // WC-3d — push owns streak nudges for subscribed accounts, and both channels
+  // share one streak-nudge/day stamp. These two flags gate ONLY the email
+  // streak trigger below; nothing else in this function changes.
+  ctx.hasPushSub = !!(opts.pushSubs && opts.pushSubs.has(String(ctx.userId)));
+  ctx.todayUTC   = opts.todayUTC || '';
   const diag = {
     userId:           ctx.userId,
     planStatus:       ctx.planStatus,
@@ -637,7 +643,9 @@ function _evaluateUser(row, nowMs, mode){
   // Trigger evaluation — first non-null in priority order wins.
   const triggers = [
     ['inactivity',     _evalInactivity(ctx),     _renderInactivityEmail],
-    ['streak_at_risk', _evalStreakAtRisk(ctx),   _renderStreakAtRiskEmail],
+    // WC-3d — skip the EMAIL streak nudge if push owns this account (has a
+    // subscription) or a streak nudge already went out today (either channel).
+    ['streak_at_risk', (ctx.hasPushSub || (ctx.todayUTC && ctx.data.lastStreakNudgeDate === ctx.todayUTC)) ? null : _evalStreakAtRisk(ctx), _renderStreakAtRiskEmail],
     ['release_notes',  _evalReleaseNotes(ctx),   _renderReleaseNotesEmail],
     ['refer_a_friend', _evalReferAFriend(ctx),   _renderReferAFriendEmail],
     ['onboarding',     _evalOnboarding(ctx),     _renderOnboardingEmail]
@@ -693,6 +701,19 @@ module.exports = async function handler(req, res){
 
   const now = Date.now();
   const nowIso = new Date(now).toISOString();
+  const todayUTC = nowIso.slice(0, 10);
+
+  // WC-3d — accounts with a push subscription are owned by the push streak
+  // nudge (api/cron/push-tick); skip the EMAIL streak trigger for them so the
+  // same family is never double-nudged. Defensive: on failure, the empty set
+  // means the email streak trigger behaves EXACTLY as before this change.
+  let pushSubs = new Set();
+  try {
+    const _ps = await _supaGet('push_subscriptions?select=user_id&limit=5000', serviceKey);
+    if(Array.isArray(_ps)) _ps.forEach(function(s){ if(s && s.user_id) pushSubs.add(String(s.user_id)); });
+  } catch(e){
+    console.warn('engagement-tick: push_subscriptions fetch failed (email streak trigger stays active):', e && e.message);
+  }
 
   // Fetch audience
   let rows;
@@ -737,7 +758,7 @@ module.exports = async function handler(req, res){
     results.considered++;
     if(!row || !row.user_id){ results.skipped++; continue; }
 
-    const eval_ = _evaluateUser(row, now, mode);
+    const eval_ = _evaluateUser(row, now, mode, { pushSubs: pushSubs, todayUTC: todayUTC });
 
     if(eval_.skip){
       results.skipped++;
@@ -793,6 +814,11 @@ module.exports = async function handler(req, res){
           newPrefs.lastReferralNudge = nowIso;
         }
         const newData = Object.assign({}, ctx.data, { emailPrefs: newPrefs });
+        // WC-3d — shared cross-channel streak-nudge stamp so the push cron
+        // skips this account today (one streak nudge/day across both channels).
+        if(trigger === 'streak_at_risk'){
+          newData.lastStreakNudgeDate = todayUTC;
+        }
         try {
           await _supaPatch(
             'profiles?user_id=eq.' + encodeURIComponent(row.user_id),
