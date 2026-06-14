@@ -59,15 +59,28 @@
     n = +n || 0;
     if (n <= 0) return;
     _rollover();
-    _streakBumpForToday();   // WC-2b-ii — count an any-XP day on the first XP of a new day
-    D.xpToday = (+D.xpToday || 0) + n;
+    // Snapshot pre-award state for the juice deltas, then commit.
+    var goal     = getDailyGoal();
+    var oldToday = (+D.xpToday || 0);
+    var streakTicked = _streakBumpForToday();   // WC-2b-ii count + WC-2c tick signal
+    D.xpToday = oldToday + n;
     D.xpTotal = (+D.xpTotal || 0) + n;
     if (!Array.isArray(D.xpLog)) D.xpLog = [];
     D.xpLog.push({ ts: Date.now(), n: n, source: source || 'unknown' });
     if (D.xpLog.length > XP_LOG_CAP) D.xpLog = D.xpLog.slice(D.xpLog.length - XP_LOG_CAP);
     if (typeof save === 'function') save();
-    // WC-2c plugs the juice/animation in here. Guarded — never required.
-    try { if (typeof window !== 'undefined' && typeof window.xpJuice === 'function') window.xpJuice(n, source); } catch(_){}
+    // WC-2c — juice. Fires AFTER the award commits, with the full delta so
+    // xp-juice.js never recomputes or races. goalMet is the first cross of
+    // dailyGoal today (xpToday only rises and resets daily -> at most once/day).
+    // Guarded — never required.
+    var meta = {
+      newToday:     D.xpToday,
+      newTotal:     D.xpTotal,
+      newStreak:    getXpStreak(),
+      streakTicked: streakTicked,
+      goalMet:      (oldToday < goal && D.xpToday >= goal)
+    };
+    try { if (typeof window !== 'undefined' && typeof window.xpJuice === 'function') window.xpJuice(n, source, meta); } catch(_){}
   }
 
   // ── readers ──────────────────────────────────────────────────
@@ -131,12 +144,14 @@
     }
   }
   // Called from awardXP on every award; only acts on the first XP of a new day.
+  // Returns true iff the streak actually advanced this award (WC-2c tick
+  // signal for the flame pulse) — false on same-day re-awards and the seed.
   function _streakBumpForToday(){
     _ensureXpStreak();
     var s = (typeof D !== 'undefined' && D) ? D.xpStreak : null;
-    if (!s) return;
+    if (!s) return false;
     var today = _today();
-    if (s.lastDayKey === today) return;                  // already counted today (incl. the seed)
+    if (s.lastDayKey === today) return false;            // already counted today (incl. the seed)
     if (s.lastDayKey === _dayKeyOffset(-1) || _isSabbathBridge(s.lastDayKey, today)){
       s.count = (+s.count || 0) + 1;                      // consecutive (or Sabbath-bridged)
     } else {
@@ -144,6 +159,7 @@
     }
     s.lastDayKey = today;
     if (s.count > (+s.longest || 0)) s.longest = s.count;
+    return true;                                           // streak ticked
   }
   // Reader: live truth without a cron. Returns count while the streak is
   // current (today / yesterday / Sabbath-bridged); 0 once broken (the reset to
