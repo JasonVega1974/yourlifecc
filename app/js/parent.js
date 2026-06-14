@@ -2526,7 +2526,11 @@ function renderParentMultiChild(){
         const gradeMap = {'A+':4,'A':4,'A-':3.7,'B+':3.3,'B':3,'B-':2.7,'C+':2.3,'C':2,'C-':1.7,'D+':1.3,'D':1,'D-':0.7,'F':0};
         const grades = classes.filter(cl=>cl.grade).map(cl=>gradeMap[cl.grade]||0);
         const gpa = grades.length ? (grades.reduce((a,b)=>a+b,0)/grades.length).toFixed(2) : '—';
-        const streak = d.streak||0;
+        // WC-2b (A) — unified streak: fresh read of this kid's xpStreak
+        // (today/yesterday/Sabbath check via xp.js), NOT the stale
+        // never-resetting d.streak. Pure read — no seeding on the parent
+        // view; a kid unmigrated since WC-2b reads 0 until their next login.
+        const streak = (typeof window.getXpStreakFromData === 'function') ? window.getXpStreakFromData(p.data) : 0;
         const certs = Object.values(d.skillCerts||{}).filter(Boolean).length;
         const chorePts = (d.chorePoints||{}).total||0;
         const goalsD = (d.goals||[]).filter(g=>g.done).length;
