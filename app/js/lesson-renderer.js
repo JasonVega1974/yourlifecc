@@ -154,6 +154,74 @@
       $income.addEventListener('input', render);
       $status.addEventListener('change', render);
       render();
+    },
+
+    // Compound-growth projector — future value of a monthly contribution
+    // (ordinary annuity, monthly compounding) with a contributed-vs-growth bar.
+    compoundGrowth: function(mountEl, config){
+      var c = config || {};
+      var d = { monthly:c.monthly || 150, start:c.startAge || 16, retire:c.retireAge || 65, rate:(c.rate != null ? c.rate : 8) };
+      mountEl.innerHTML =
+        '<div class="lr-calc">'
+        + '<div class="lr-calc__head">Compound-growth projector</div>'
+        + '<div class="lr-calc__controls">'
+        +   '<label class="lr-calc__field"><span>$ / month</span><input type="number" class="cg-m" min="0" step="10" value="' + d.monthly + '" inputmode="numeric"></label>'
+        +   '<label class="lr-calc__field"><span>Start age</span><input type="number" class="cg-s" min="0" max="90" step="1" value="' + d.start + '" inputmode="numeric"></label>'
+        +   '<label class="lr-calc__field"><span>Retire age</span><input type="number" class="cg-r" min="1" max="100" step="1" value="' + d.retire + '" inputmode="numeric"></label>'
+        +   '<label class="lr-calc__field"><span>Return %/yr</span><input type="number" class="cg-y" min="0" max="20" step="0.5" value="' + d.rate + '" inputmode="decimal"></label>'
+        + '</div><div class="lr-calc__out" aria-live="polite"></div></div>';
+      var $m = mountEl.querySelector('.cg-m'), $s = mountEl.querySelector('.cg-s'),
+          $r = mountEl.querySelector('.cg-r'), $y = mountEl.querySelector('.cg-y'),
+          $out = mountEl.querySelector('.lr-calc__out');
+      function render(){
+        var pmt = Math.max(0, parseFloat($m.value) || 0);
+        var years = Math.max(0, (parseFloat($r.value) || 0) - (parseFloat($s.value) || 0));
+        var n = years * 12;
+        var rate = Math.max(0, parseFloat($y.value) || 0) / 100 / 12;
+        var fv = (rate > 0) ? pmt * ((Math.pow(1 + rate, n) - 1) / rate) : pmt * n;
+        var put = pmt * n;
+        var growth = Math.max(0, fv - put);
+        var gp = fv > 0 ? (growth / fv) * 100 : 0, pp = 100 - gp;
+        $out.innerHTML =
+          '<div class="lr-calc__stats">'
+          +   '<div class="lr-calc__stat"><div class="lr-calc__sv">' + money(fv) + '</div><div class="lr-calc__sl">at age ' + (parseInt($r.value, 10) || 0) + '</div></div>'
+          +   '<div class="lr-calc__stat"><div class="lr-calc__sv">' + money(put) + '</div><div class="lr-calc__sl">you put in</div></div>'
+          +   '<div class="lr-calc__stat"><div class="lr-calc__sv">' + money(growth) + '</div><div class="lr-calc__sl">growth</div></div>'
+          + '</div>'
+          + '<div class="lr-brk__bar" style="margin-top:.5rem;">'
+          +   '<div class="lr-brk__seg" style="width:' + pp.toFixed(1) + '%;background:#64748b;"></div>'
+          +   '<div class="lr-brk__seg" style="width:' + gp.toFixed(1) + '%;background:var(--lr-accent,#10b981);"></div>'
+          + '</div>'
+          + '<div class="lr-brk__legend"><div class="lr-brk__leg"><span class="lr-brk__dot" style="background:#64748b;"></span><b>Contributions</b></div>'
+          +   '<div class="lr-brk__leg"><span class="lr-brk__dot" style="background:var(--lr-accent,#10b981);"></span><b>Compound growth</b></div></div>'
+          + '<div class="lr-calc__note">' + Math.round(years) + ' years of investing · estimate, monthly compounding.</div>';
+      }
+      [$m, $s, $r, $y].forEach(function(el){ el.addEventListener('input', render); });
+      render();
+    },
+
+    // 4%-rule retirement target — annual spending → the nest egg you need.
+    retirementTarget: function(mountEl, config){
+      var spend = (config && config.spending) || 50000;
+      mountEl.innerHTML =
+        '<div class="lr-calc">'
+        + '<div class="lr-calc__head">Your retirement number (4% rule)</div>'
+        + '<div class="lr-calc__controls">'
+        +   '<label class="lr-calc__field"><span>Yearly spending in retirement</span><input type="number" class="rt-s" min="0" step="1000" value="' + spend + '" inputmode="numeric"></label>'
+        + '</div><div class="lr-calc__out" aria-live="polite"></div></div>';
+      var $s = mountEl.querySelector('.rt-s'), $out = mountEl.querySelector('.lr-calc__out');
+      function render(){
+        var s = Math.max(0, parseFloat($s.value) || 0);
+        var target = s * 25;
+        $out.innerHTML =
+          '<div class="lr-calc__stats">'
+          +   '<div class="lr-calc__stat"><div class="lr-calc__sv">' + money(target) + '</div><div class="lr-calc__sl">target nest egg</div></div>'
+          +   '<div class="lr-calc__stat"><div class="lr-calc__sv">' + money(s) + '</div><div class="lr-calc__sl">supported / year</div></div>'
+          + '</div>'
+          + '<div class="lr-calc__note">Target = yearly spending × 25. Withdraw 4% a year and it historically lasts 30+ years.</div>';
+      }
+      $s.addEventListener('input', render);
+      render();
     }
   };
 
@@ -336,9 +404,14 @@
         if(l.tip) blocks.push({ type:'tip', text:l.tip });
         if(Array.isArray(l.q)){
           l.q.forEach(function(qq){
-            if(qq && qq.q && Array.isArray(qq.opts)){
-              blocks.push({ type:'check', q:qq.q, opts:qq.opts, ans:qq.ans|0, explain:qq.explain });
-            }
+            if(!qq || !qq.q) return;
+            // Two legacy inline-check shapes coexist in SK_DATA:
+            //   { opts, ans, explain }  and  { a, c, e }. Normalize both.
+            var opts = Array.isArray(qq.opts) ? qq.opts : (Array.isArray(qq.a) ? qq.a : null);
+            if(!opts) return;
+            var ans = (qq.ans != null) ? qq.ans : (qq.c != null ? qq.c : 0);
+            var explain = qq.explain || qq.e || '';
+            blocks.push({ type:'check', q:qq.q, opts:opts, ans:ans|0, explain:explain });
           });
         }
         return { title: l.h, blocks: blocks };

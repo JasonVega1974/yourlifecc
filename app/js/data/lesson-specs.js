@@ -221,6 +221,164 @@ const SK_SPECS = {
         ]
       }
     ]
+  },
+
+  // ═══════════════════════════════════════════════════════════════════
+  // INVESTING & RETIREMENT — hand-elevated (compound-growth + 4%-rule widgets)
+  // ═══════════════════════════════════════════════════════════════════
+  investing: {
+    key: 'investing',
+    color: '#10b981',
+    lessons: [
+      // ── L1 — Why investing matters ───────────────────────────
+      {
+        id: 'investing-1',
+        title: "Why Investing Is the Most Important Financial Skill You'll Ever Learn",
+        duration: '6 min',
+        blocks: [
+          { type:'lead', text:"Most people think investing is for the wealthy or for finance professionals. It isn't. It's for anyone who wants more money in the future than they have today." },
+          { type:'keyIdea', title:'Compound growth is your money earning money', text:"Put money to work and it earns more money with no extra effort from you. Your earnings then generate their own earnings — growth on top of growth. It's the closest thing to a financial superpower that exists." },
+          { type:'keyIdea', title:'The Rule of 72', text:"Divide 72 by your annual return to see how many years it takes to double your money. At 8% (roughly the S&P 500 average), your money doubles about every 9 years." },
+          { type:'widget', kind:'compoundGrowth', config:{ monthly:150, startAge:16, retireAge:65, rate:8 } },
+          { type:'keyIdea', title:'A 14-year head start changes everything', text:"Two people each invest $150/month until 65. The one who starts at 16 instead of 30 ends up with roughly three times as much — not from bigger deposits, but from extra years of compounding. Slide the start age in the projector above and watch the total swing." },
+          { type:'keyIdea', title:'Not investing is a guaranteed loss', text:"Inflation runs about 3% a year, so cash sitting in a checking account loses purchasing power every year. Staying out isn't playing it safe — it's a slow, guaranteed loss." },
+          { type:'takeaways', items:[
+            "Compound growth is exponential — earnings earn their own earnings.",
+            "Starting young beats contributing more later; time is the biggest lever.",
+            "Cash left uninvested quietly loses to inflation every year."
+          ] },
+          { type:'tip', text:"Time in the market beats timing the market. The best time to start was yesterday; the second best time is today." },
+          { type:'check', q:"At an 8% annual return, how long does it take to double your money (Rule of 72)?", opts:["4 years","6 years","9 years","12 years"], ans:2, explain:"72 ÷ 8 = 9 years. The Rule of 72 gives a quick doubling-time estimate for any rate." }
+        ]
+      },
+
+      // ── L2 — Stocks ──────────────────────────────────────────
+      {
+        id: 'investing-2',
+        title: 'Understanding Stocks — Owning a Piece of Real Companies',
+        duration: '6 min',
+        blocks: [
+          { type:'lead', text:"When you buy a stock, you're buying a small ownership stake in a real company. If that company grows and becomes more valuable, your stake grows with it." },
+          { type:'list', style:'check', items:[
+            { strong:'Price appreciation:', text:"the share price rises as the company becomes more valuable." },
+            { strong:'Dividends:', text:"some companies pay shareholders a slice of profits regularly (Apple, Coca-Cola, Johnson & Johnson)." }
+          ] },
+          { type:'compare',
+            left:{ title:'Individual stocks', points:[
+              "Higher risk, higher potential reward",
+              "Requires real research",
+              "Even most professionals fail to beat the market long-term"
+            ] },
+            right:{ title:'Index funds', points:[
+              "Own a sliver of 500+ companies at once",
+              "Lower fees, lower risk",
+              "Beat most active traders on average"
+            ] } },
+          { type:'stat', items:[
+            { value:'~10%', label:'S&P 500 avg / yr (100 yrs)' },
+            { value:'$5–10', label:'buy fractional shares' },
+            { value:'500+', label:'companies in one index fund' }
+          ] },
+          { type:'keyIdea', title:'The long-term trend is up', text:"The S&P 500 has averaged about 10% a year over a century. There have been crashes — 2008, 2020 — but anyone who stayed invested through them came out ahead." },
+          { type:'takeaways', items:[
+            "A share is part-ownership: you grow when the company grows.",
+            "Index funds beat most stock-pickers thanks to low fees + diversification.",
+            "Fractional shares mean you can start with a few dollars."
+          ] },
+          { type:'tip', text:"Most professional fund managers fail to beat a simple S&P 500 index fund over 10+ years. Simple, boring index investing usually wins." },
+          { type:'check', q:"Why do index funds typically outperform most actively managed funds over 10+ years?", opts:["They own only the best stocks","Famous managers run them","Lower fees and broad diversification — most active managers can't consistently beat the market","The government guarantees returns"], ans:2, explain:"After fees, ~80–90% of active managers underperform the index over a decade-plus. Low cost + diversification compound into a big edge." }
+        ]
+      },
+
+      // ── L3 — Retirement accounts ─────────────────────────────
+      {
+        id: 'investing-3',
+        title: 'Retirement Accounts — Your Greatest Financial Tool',
+        duration: '7 min',
+        blocks: [
+          { type:'lead', text:"A retirement account isn't just a place to save — it's a legal tax shelter that can add hundreds of thousands of dollars to your wealth over a lifetime. Not using one leaves real money on the table." },
+          { type:'keyIdea', title:'Employer match = a guaranteed 100% return', text:"If your employer matches 50% of contributions up to 6% of salary, putting in 6% of a $60K salary adds $1,800 of free money. No market investment reliably beats free — never leave it uncollected." },
+          { type:'compare',
+            left:{ title:'401(k) — via employer', points:[
+              "Contributions are pre-tax — lowers your taxable income now",
+              "Often comes with an employer match (free money)",
+              "2025 limit: $23,500/year"
+            ] },
+            right:{ title:'Roth IRA — best for the young', points:[
+              "After-tax in; all growth is tax-free forever",
+              "2025 limit: $7,000/year",
+              "Your tax rate is likely the lowest it'll ever be"
+            ] } },
+          { type:'steps', items:[
+            { title:'401(k) up to the match', text:"Free money always comes first." },
+            { title:'Max the Roth IRA', text:"$7,000/year of tax-free growth." },
+            { title:'Back to the 401(k)', text:"If you still have more to invest." }
+          ] },
+          { type:'takeaways', items:[
+            "Always capture the full employer match first — it's a guaranteed return.",
+            "A Roth is ideal young: pay low taxes now, never again on the growth.",
+            "Follow the order: match → Roth → more 401(k)."
+          ] },
+          { type:'tip', text:"An employer match is a guaranteed 50–100% instant return on your contribution. It's the best investment you'll ever make." },
+          { type:'check', q:"What's the correct contribution priority order?", opts:["Roth IRA first, then 401(k)","401(k) to the employer match → Roth IRA → more 401(k)","Max both at the same time","Savings account first, then retirement"], ans:1, explain:"Capture free match money first, then max the tax-free Roth, then return to the 401(k). That order squeezes the most from every dollar." }
+        ]
+      },
+
+      // ── L4 — Funds, ETFs & fees ──────────────────────────────
+      {
+        id: 'investing-4',
+        title: 'Mutual Funds, ETFs & the Power of Not Trying to Be Smart',
+        duration: '6 min',
+        blocks: [
+          { type:'lead', text:"The investment industry spends billions convincing you that you need their experts to beat the market. The data disagrees: simple, low-cost index investing outperforms nearly every other strategy over 20+ years." },
+          { type:'compare',
+            left:{ title:'Mutual funds', points:[
+              "Pooled money, manager picks stocks",
+              "Usually higher fees (1–2% expense ratio)",
+              "Priced once per day"
+            ] },
+            right:{ title:'ETFs', points:[
+              "Trade like a stock all day",
+              "Usually track an index automatically",
+              "Low fees (0.03–0.20% for index ETFs)"
+            ] } },
+          { type:'keyIdea', title:'Fees are the silent wealth-killer', text:"$10,000 invested for 30 years at 8% grows to about $99,500 with a 0.05% fee — but only about $76,100 with a 1% fee. That tiny-sounding 0.95% costs you $23,400 on a single $10,000 investment." },
+          { type:'keyIdea', title:'Dollar-cost averaging', text:"Invest the same amount every month no matter what the market does. High prices buy fewer shares, low prices buy more — and you automatically avoid the trap of trying to time the market." },
+          { type:'takeaways', items:[
+            "Index ETFs charge a fraction of what active mutual funds do.",
+            "Fees compound against you exactly like returns compound for you.",
+            "Automate steady monthly investing and ignore the headlines."
+          ] },
+          { type:'tip', text:"Lower fees are the only guaranteed return in investing. Every 1% you avoid keeps that 1% compounding for you instead." },
+          { type:'check', q:"On a $10,000 investment over 30 years, a 1% annual fee vs a 0.05% fee costs roughly:", opts:["$500","$5,000","$23,000","$50,000"], ans:2, explain:"Fees compound against you — a ~1% drag quietly extracts tens of thousands over decades." }
+        ]
+      },
+
+      // ── L5 — Planning for retirement ─────────────────────────
+      {
+        id: 'investing-5',
+        title: 'Planning for Retirement — The Numbers That Actually Matter',
+        duration: '6 min',
+        blocks: [
+          { type:'lead', text:"Retirement planning doesn't need a financial advisor to understand. It needs a few key numbers and an early-enough start for them to work." },
+          { type:'keyIdea', title:'The 4% rule', text:"You can withdraw about 4% of your portfolio a year in retirement without running out over 30 years. Flip it around: your target number is your annual expenses × 25." },
+          { type:'widget', kind:'retirementTarget', config:{ spending:50000 } },
+          { type:'list', style:'check', items:[
+            { strong:'Start at 20:', text:"about $200/month to reach $1M by 65." },
+            { strong:'Start at 30:', text:"about $435/month — the 10-year delay more than doubles the cost." },
+            { strong:'Start at 40:', text:"about $1,050/month for the same goal." }
+          ] },
+          { type:'keyIdea', title:'Social Security is not a retirement plan', text:"The average benefit is about $1,900/month — far less than most people need. Treat it as a bonus on top of your own savings, not a strategy." },
+          { type:'takeaways', items:[
+            "Your number is annual expenses × 25 — that's the whole formula.",
+            "Every year you delay sharply raises the monthly amount you need.",
+            "Aim to save 15–20% of gross income, automated so it happens first."
+          ] },
+          { type:'tip', text:"Your target retirement number is your annual expenses multiplied by 25. That's it — that's the math." },
+          { type:'check', q:"Using the 4% rule, how much do you need to spend $50,000/year in retirement?", opts:["$500,000","$750,000","$1,250,000","$2,000,000"], ans:2, explain:"$50,000 × 25 = $1,250,000. Withdrawn at 4% a year, that historically lasts 30+ years." }
+        ]
+      }
+    ]
   }
 };
 
