@@ -622,6 +622,208 @@ const SK_SPECS = {
         ]
       }
     ]
+  },
+
+  // ═══════════════════════════════════════════════════════════════════
+  // COOKING & FOOD — full module elevated. L1 kitchen safety is the
+  // safety-critical lesson (grease fire, USDA temps, knife claw grip);
+  // L2–L6 are structured. Matched by title (per-lesson).
+  // ═══════════════════════════════════════════════════════════════════
+  cooking: {
+    key: 'cooking',
+    color: '#fb923c',
+    lessons: [
+      // ── L1 — Kitchen Safety (SAFETY-CRITICAL) ────────────────
+      {
+        id:'cooking-safety', matchTitle:'Kitchen Safety — The Rules That Prevent Real Harm',
+        title:'Kitchen Safety — The Rules That Prevent Real Harm', duration:'8 min',
+        blocks:[
+          { type:'lead', text:"The kitchen is where most household accidents happen — burns, cuts, falls, and foodborne illness. The good news: nearly all of it is preventable. Before you learn to cook, learn to cook safely." },
+          { type:'safety', title:'Grease fire: never water', text:"If oil or grease catches fire, never throw water on it — the water flashes to steam and blasts burning oil everywhere. Turn off the heat. Smother the pan by sliding a metal lid or a baking sheet over it and leave it covered. For a small flare-up you can dump baking soda on it — never flour, which can ignite. Don't try to carry a flaming pan anywhere. If the fire is spreading or you're unsure, get everyone out and call 911." },
+          { type:'diagram', kind:'greaseFire' },
+          { type:'keyIdea', title:'A sharp knife is safer than a dull one', text:"Dull knives need more force and slip more easily, causing worse cuts. Hone the edge before each use and sharpen every few months." },
+          { type:'illustratedSteps', steps:[
+            { num:1, text:"Steady the cutting board first — put a damp towel under it so it can't slide while you work." },
+            { num:2, text:"Hold the food in a \"claw\" grip: fingertips curled under, knuckles guiding the side of the blade, so the edge never reaches your fingertips.", diagram:{ kind:'knifeClaw' } },
+            { num:3, text:"Cut on a downward, away-from-your-body motion. Never drop a knife into a sink full of water — wash it right away, separately. And if a knife falls, step back and let it fall; don't try to catch it." }
+          ] },
+          { type:'safety', title:'The danger zone: 40–140°F', text:"Bacteria multiply fastest between 40°F and 140°F. Keep the fridge at or below 40°F and the freezer at 0°F. Never thaw meat on the counter — thaw it in the fridge, in a sealed bag under cold water (changed every 30 minutes), or in the microwave to cook immediately. Don't leave perishable food out longer than 2 hours (1 hour above 90°F)." },
+          { type:'diagram', kind:'foodTempChart' },
+          { type:'list', style:'check', items:[
+            { strong:'Poultry — 165°F.', text:"Chicken, turkey, and all reheated leftovers." },
+            { strong:'Ground meats — 160°F.', text:"Ground beef, pork, and similar." },
+            { strong:'Fresh beef, pork, lamb — 145°F,', text:"then rest 3 minutes before cutting." },
+            { strong:'Fish — 145°F.', text:"Until it flakes and is opaque." }
+          ] },
+          { type:'keyIdea', title:'Stop cross-contamination', text:"Use separate cutting boards for raw meat and for produce, and wash your hands, surfaces, and utensils right after they touch raw meat — bacteria spread invisibly from one food to another." },
+          { type:'takeaways', items:[
+            "Grease fire: turn off the heat and smother with a lid — never water; if it's spreading, get out and call 911.",
+            "A sharp knife, a claw grip, and a towel-steadied board prevent most cuts.",
+            "Cook to safe internal temps and keep perishables out of the 40–140°F danger zone."
+          ] },
+          { type:'tip', text:"Buy an instant-read thermometer ($10–$15) — it's the only reliable way to know meat is safe. Guessing by color or texture is exactly how people give themselves food poisoning." },
+          { type:'check', q:"A pan of oil bursts into flames on the stove. What do you do?", opts:[
+            "Throw a cup of water on it",
+            "Turn off the heat and slide a metal lid over the pan",
+            "Pick it up and carry it outside",
+            "Fan the flames to blow them out"
+          ], ans:1, explain:"Water makes a grease fire explode. Cut the heat and smother it with a metal lid or baking sheet (or baking soda for a small flare). If it's spreading or you're unsure, get out and call 911." }
+        ]
+      },
+
+      // ── L2 — Five Foundational Meals (structured) ────────────
+      {
+        id:'cooking-meals', matchTitle:'5 Foundational Meals Every Adult Should Master',
+        title:'5 Foundational Meals Every Adult Should Master', duration:'7 min',
+        blocks:[
+          { type:'lead', text:"You don't need to be a chef — you need to reliably feed yourself well. Master these five and you've got a foundation that covers most days, costs a fraction of takeout, and beats waiting for delivery." },
+          { type:'list', style:'check', items:[
+            { strong:'Scrambled eggs:', text:"low heat, butter in the pan, stir slowly and constantly, pull them off while still slightly wet — carryover heat finishes them creamy." },
+            { strong:'Rice & protein bowl:', text:"rice in 1.5× water, simmer covered 18 min (don't lift the lid); sear a protein; add a sauce; build the bowl." },
+            { strong:'Pasta with real sauce:', text:"salt the water like the sea, cook 1 minute short, then finish the pasta in the sauce with a splash of pasta water so it clings." },
+            { strong:'Sheet-pan dinner:', text:"425°F, toss protein + vegetables in oil, salt, pepper; spread in a single layer (crowding steams instead of roasting)." },
+            { strong:'Stir fry:', text:"everything cut and ready first; screaming-hot pan; aromatics, then protein, then vegetables by density, sauce last." }
+          ] },
+          { type:'keyIdea', title:'Skill comes from repetition', text:"Make the same dish five times and it becomes automatic — then it's yours forever and you can riff on it endlessly. Learn these five well before anything more complex." },
+          { type:'takeaways', items:[
+            "Five reliable meals cover most of your week for a fraction of takeout.",
+            "The rice-bowl, sheet-pan, and stir-fry formats are endlessly variable.",
+            "Repetition, not complexity, builds real cooking skill."
+          ] },
+          { type:'tip', text:"Pick ONE of the five and cook it three times this week. Locking in a single dish you can make without thinking is worth more than ten recipes you try once." },
+          { type:'check', q:"When should you take scrambled eggs off the heat?", opts:[
+            "When they're completely dry and firm",
+            "While they still look slightly wet — carryover heat finishes them",
+            "The moment you crack them in",
+            "After they brown on the bottom"
+          ], ans:1, explain:"Eggs keep cooking from residual heat after you pull the pan. Take them off slightly underdone and they finish soft and creamy instead of rubbery." }
+        ]
+      },
+
+      // ── L3 — Meal Prep (structured) ──────────────────────────
+      {
+        id:'cooking-mealprep', matchTitle:'Meal Prep — Feed Yourself Well All Week for Under $60',
+        title:'Meal Prep — Feed Yourself Well All Week for Under $60', duration:'6 min',
+        blocks:[
+          { type:'lead', text:"Meal prep isn't eating sad identical containers every day. It's doing the slow, boring parts of cooking once so that putting a meal together on a Tuesday night takes 5 minutes instead of 45." },
+          { type:'keyIdea', title:'Cook components, not meals', text:"Spend ~90 minutes on Sunday cooking building blocks, then assemble different meals from them all week — you're never eating the same exact plate twice." },
+          { type:'list', style:'check', items:[
+            { strong:'1 grain or starch', text:"— a big batch of rice, quinoa, or roasted potatoes (keeps ~5 days)." },
+            { strong:'1–2 proteins', text:"— a tray of chicken thighs (425°F, 25 min), ground beef, or hard-boiled eggs (keeps ~4 days)." },
+            { strong:'2–3 vegetables', text:"— roast two sheet pans and prep some raw for snacking." },
+            { strong:'1–2 sauces', text:"— teriyaki, tahini-lemon, peanut-ginger; a sauce turns the same parts into a different meal." }
+          ] },
+          { type:'list', style:'bullet', items:[
+            { strong:'The grocery math:', text:"chicken thighs $8–12, ground beef $10–14, rice (5 lb) $6, frozen veg $8–12, eggs $4–6, pantry staples $10–15 — about $50–60 for the week vs $50–100 eating out at lunch alone." }
+          ] },
+          { type:'takeaways', items:[
+            "Prep components on Sunday; weeknight meals become 5-minute assembly.",
+            "Mix and match grain + protein + veg + sauce so meals never repeat exactly.",
+            "A week of real food runs ~$50–60 — cheaper than takeout lunches."
+          ] },
+          { type:'tip', text:"The hardest part is starting. Commit to ONE 90-minute Sunday, and start simpler than you think — one protein and one grain is enough. Once there's ready food every night, the habit sells itself." },
+          { type:'check', q:"What's the core idea of meal prep?", opts:[
+            "Eat the exact same meal every day",
+            "Do the slow prep once so weeknight meals are fast to assemble",
+            "Only eat cold food from containers",
+            "Cook every dinner completely from scratch each night"
+          ], ans:1, explain:"You batch the slow components (grain, protein, veg, sauce) once, then assemble varied meals quickly all week." }
+        ]
+      },
+
+      // ── L4 — Grocery Shopping (structured) ───────────────────
+      {
+        id:'cooking-grocery', matchTitle:'Grocery Shopping — Buy Smart, Waste Less, Spend Less',
+        title:'Grocery Shopping — Buy Smart, Waste Less, Spend Less', duration:'6 min',
+        blocks:[
+          { type:'lead', text:"The average American wastes about 30–40% of the food they buy. Between that waste and impulse buys, most people quietly overspend on groceries. A few habits change everything." },
+          { type:'list', style:'check', items:[
+            { strong:'Plan first, then list.', text:"Decide on 4–5 meals and build your list from the plan — not from wandering the aisles." },
+            { strong:'Check what you already have', text:"so you don't buy duplicates buried in the pantry." },
+            { strong:'Never shop hungry', text:"— hungry shoppers reliably spend 20%+ more and grab high-calorie impulse items." }
+          ] },
+          { type:'list', style:'check', items:[
+            { strong:'Store brands', text:"— 20–40% cheaper than name brands for nearly identical canned goods, grains, dairy, and frozen veg." },
+            { strong:'Read the unit price', text:"(per ounce), not the package price — but only buy the bigger size if you'll use it before it spoils." },
+            { strong:'Frozen vegetables', text:"are frozen at peak ripeness, keep nearly all their nutrients, and cost 40–60% less — perfect for cooked dishes." },
+            { strong:'Buy protein in bulk and freeze;', text:"eggs and dried beans/lentils are cheap, complete nutrition." }
+          ] },
+          { type:'keyIdea', title:'Shop the perimeter first', text:"The outer ring — produce, meat, dairy, eggs — is where you build real meals. The center aisles hold the most-processed, highest-margin food. Fill your cart on the perimeter before you head into the middle." },
+          { type:'takeaways', items:[
+            "Plan meals, check your pantry, and never shop hungry.",
+            "Store brands, unit pricing, and frozen veg cut the bill without cutting nutrition.",
+            "First-in-first-out + one \"use what we have\" meal a week kills food waste."
+          ] },
+          { type:'tip', text:"Move older items to the front when you put groceries away (first-in, first-out), keep produce where you can see it, and plan one \"use what we have\" meal each week. Most waste is just food you forgot you had." },
+          { type:'check', q:"Why is it a bad idea to grocery shop while hungry?", opts:[
+            "Stores raise prices in the evening",
+            "Hungry shoppers spend 20%+ more and grab impulse items",
+            "Fresh food sells out by then",
+            "You can't read unit prices on an empty stomach"
+          ], ans:1, explain:"Shopping hungry reliably drives up spending and steers you toward high-calorie impulse buys. Eat first, then shop your list." }
+        ]
+      },
+
+      // ── L5 — Reading Nutrition Labels (structured) ───────────
+      {
+        id:'cooking-labels', matchTitle:"Reading Nutrition Labels — Don't Get Fooled",
+        title:"Reading Nutrition Labels — Don't Get Fooled", duration:'7 min',
+        blocks:[
+          { type:'lead', text:"Food packaging is one of the most effective marketing environments ever built. Front-of-box claims — \"natural,\" \"wholesome,\" \"made with real fruit,\" \"multigrain\" — are almost entirely unregulated. The label on the back is regulated, and it tells the real story." },
+          { type:'steps', items:[
+            { title:'Serving size first', text:"Every number on the label is per serving. A bag that looks like one serving often holds 2.5 — so you'd multiply everything by 2.5. This is the #1 way people undercount calories." },
+            { title:'Calories', text:"Your energy intake. A moderately active adult needs roughly 2,000–2,500 a day, so a 500-calorie snack is a fifth of the budget." },
+            { title:'Protein', text:"Most people need about 0.7–1.0 g per pound of body weight daily; check whether a food meaningfully adds to that." },
+            { title:'Fats', text:"Type matters more than total — limit saturated fat and avoid trans fat entirely (any amount is harmful)." },
+            { title:'Sodium', text:"Aim under ~2,300 mg a day. A single can of soup can hold 800–1,200 mg; processed and restaurant food is the main source." },
+            { title:'Added sugars', text:"Listed separately from total sugars — keep under ~25 g (women) / 36 g (men). One flavored yogurt can hit 20–25 g." },
+            { title:'Ingredient list', text:"Listed by weight. If sugar, high-fructose corn syrup, or a refined grain is in the first three, that's mostly what it is. Shorter and more recognizable is better." }
+          ] },
+          { type:'keyIdea', title:'The serving-size trick', text:"Manufacturers shrink the \"serving\" so the calorie and sugar numbers look small. Always check servings-per-container and do the math for what you'll actually eat." },
+          { type:'takeaways', items:[
+            "Read serving size first — it scales every other number.",
+            "Watch saturated/trans fat, sodium, and added sugars specifically.",
+            "A short, recognizable ingredient list usually beats a long one."
+          ] },
+          { type:'tip', text:"Simplest heuristic: if a food needs an elaborate label to justify itself, it's probably not the best choice. Whole foods — chicken, broccoli, eggs, apples, rice — don't advertise their healthfulness." },
+          { type:'check', q:"A chip bag says 150 calories per serving and \"2.5 servings per container.\" Eating the whole bag is about:", opts:["150 calories","250 calories","375 calories","500 calories"], ans:2, explain:"150 × 2.5 = 375. The label's numbers are per serving — always multiply by servings-per-container for what you actually eat." }
+        ]
+      },
+
+      // ── L6 — Spices & Flavor (structured) ────────────────────
+      {
+        id:'cooking-spices', matchTitle:'Essential Spices and Flavor — Making Food You Actually Want to Eat',
+        title:'Essential Spices and Flavor — Making Food You Actually Want to Eat', duration:'6 min',
+        blocks:[
+          { type:'lead', text:"Boiled chicken and plain rice isn't a nutrition plan — it's a punishment that sends people back to fast food. Seasoning food well is what makes home cooking sustainable. You don't need 50 spices; you need the right 10." },
+          { type:'list', style:'check', items:[
+            { strong:'Kosher salt', text:"— the foundation; properly salted food tastes like itself, more intensely. Most home cooks undersalt." },
+            { strong:'Black pepper (fresh-ground)', text:"— pre-ground loses its punch fast; a grinder is a real upgrade." },
+            { strong:'Garlic powder & onion powder', text:"— savory depth in nearly everything." },
+            { strong:'Smoked paprika', text:"— smoky and slightly sweet; transforms chicken and roasted veg." },
+            { strong:'Cumin', text:"— earthy and warm; Mexican, Indian, Middle-Eastern dishes, chili." },
+            { strong:'Italian seasoning & chili powder', text:"— pasta/pizza, and chili/taco warmth." },
+            { strong:'Cayenne & cinnamon', text:"— a little background heat; cinnamon adds warmth to chili and oatmeal, not just baking." }
+          ] },
+          { type:'keyIdea', title:'A universal seasoning formula', text:"For almost any protein or vegetable: salt + pepper + garlic powder + smoked paprika, plus cumin or Italian seasoning depending on the direction. It works on chicken, beef, pork, fish, and roasted veg every time." },
+          { type:'list', style:'bullet', items:[
+            { strong:'Umami boosters:', text:"soy sauce, Worcestershire, a few drops of fish sauce, parmesan, tomato paste, or miso amplify savory flavor in any dish that tastes \"flat.\"" }
+          ] },
+          { type:'takeaways', items:[
+            "Ten spices cover almost everything you'll cook.",
+            "Salt + pepper + garlic powder + smoked paprika is a reliable base for anything.",
+            "A splash of an umami booster fixes \"flat\" savory dishes."
+          ] },
+          { type:'tip', text:"Season in layers — a little salt on the raw food, again while it cooks, and adjusted at the end — and taste as you go. Every taste trains your palate." },
+          { type:'check', q:"Properly salted food tastes:", opts:[
+            "Noticeably salty",
+            "Like itself, only more intense",
+            "Bland and flat",
+            "Slightly sweet"
+          ], ans:1, explain:"The right amount of salt doesn't read as \"salty\" — it makes the food taste more like itself. That's why undersalting, not oversalting, is the common mistake." }
+        ]
+      }
+    ]
   }
 };
 

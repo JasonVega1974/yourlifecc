@@ -262,6 +262,73 @@
         + '<text x="98" y="71" font-size="9.5" font-weight="700" fill="var(--gr,#34d399)">his head = OK</text>'
         + '<text x="107" y="150" text-anchor="middle" font-size="9.5" fill="var(--tx3)">see the top of his head? ≤ 2/32" — replace</text>'
         + '</svg>';
+    },
+    // Knife "claw" grip — guiding hand with fingertips curled back, knuckles
+    // guiding the blade so the edge never reaches the fingertips.
+    knifeClaw: function(cfg, ctx){
+      return '<svg viewBox="0 0 216 152" class="lr-svg lr-svg--wide" role="img" aria-label="The claw grip: curl your fingertips under and let your knuckles guide the side of the blade, on a board steadied by a damp towel">'
+        + '<rect x="16" y="118" width="184" height="11" rx="3" fill="var(--s3)" stroke="var(--br)" stroke-width="1.5"/>'
+        + '<rect x="22" y="129" width="172" height="5" rx="2" fill="var(--tx3)" opacity=".45"/>'
+        + '<text x="108" y="147" text-anchor="middle" font-size="8.5" fill="var(--tx3)">damp towel keeps the board from sliding</text>'
+        + '<rect x="92" y="100" width="92" height="18" rx="3" fill="var(--gr,#34d399)"/>'
+        // arm + back of hand
+        + '<path d="M44 52 L14 38" stroke="var(--s4)" stroke-width="14" stroke-linecap="round"/>'
+        + '<ellipse cx="62" cy="58" rx="26" ry="15" fill="var(--s4)" stroke="var(--tx2)" stroke-width="2"/>'
+        // three curled fingers (knuckle to the right ~x100, fingertip tucked left ~x82 on the board)
+        + '<g fill="none" stroke="var(--s4)" stroke-width="11" stroke-linecap="round">'
+        +   '<path d="M70 66 Q 98 78 96 96 Q 94 110 82 116"/>'
+        +   '<path d="M80 66 Q 104 80 100 98 Q 98 110 88 116"/>'
+        + '</g>'
+        + '<circle cx="100" cy="96" r="5" fill="var(--tx2)"/>'   // knuckle facing the blade
+        // knife: blade rides against the knuckles; fingertips are safely behind it
+        + '<rect x="108" y="40" width="7" height="78" rx="2" fill="var(--tx2)"/>'
+        + '<rect x="104" y="22" width="16" height="20" rx="3" fill="var(--tx3)"/>'
+        + '<text x="150" y="62" font-size="9" font-weight="700" fill="var(--tx2)">knuckles guide →</text>'
+        + '<text x="14" y="100" font-size="9" font-weight="700" fill="var(--gr,#34d399)">fingertips</text>'
+        + '<text x="14" y="111" font-size="9" font-weight="700" fill="var(--gr,#34d399)">curled back</text>'
+        + '</svg>';
+    },
+    // Vertical food thermometer: 40–140°F danger zone banded, USDA safe temps marked.
+    foodTempChart: function(cfg, ctx){
+      return '<svg viewBox="0 0 218 208" class="lr-svg lr-svg--wide" role="img" aria-label="USDA safe internal temperatures: poultry and reheated leftovers 165, ground meats 160, beef pork lamb and fish 145 with a 3 minute rest for beef pork lamb; the bacteria danger zone is 40 to 140 degrees, keep perishables there under 2 hours">'
+        + '<rect x="46" y="24" width="20" height="158" rx="10" fill="var(--s2)" stroke="var(--tx2)" stroke-width="2"/>'
+        + '<rect x="48" y="26" width="16" height="33" fill="#34d399" opacity=".5"/>'
+        + '<rect x="48" y="59" width="16" height="86" fill="#f59e0b" opacity=".55"/>'
+        + '<rect x="48" y="145" width="16" height="35" fill="#60a5fa" opacity=".5"/>'
+        + '<circle cx="56" cy="190" r="17" fill="#ef4444"/>'
+        // danger-zone boundaries
+        + '<line x1="40" y1="59" x2="70" y2="59" stroke="var(--tx2)" stroke-width="1.5"/><text x="38" y="56" text-anchor="end" font-size="9" fill="var(--tx2)">140°F</text>'
+        + '<line x1="40" y1="145" x2="70" y2="145" stroke="var(--tx2)" stroke-width="1.5"/><text x="38" y="142" text-anchor="end" font-size="9" fill="var(--tx2)">40°F</text>'
+        + '<text x="38" y="98" text-anchor="end" font-size="9.5" font-weight="700" fill="#d9822b">DANGER</text>'
+        + '<text x="38" y="109" text-anchor="end" font-size="9.5" font-weight="700" fill="#d9822b">ZONE</text>'
+        + '<text x="38" y="121" text-anchor="end" font-size="8" fill="var(--tx3)">≤ 2 hrs</text>'
+        // safe-temp ticks + leaders + labels
+        + '<line x1="66" y1="40" x2="84" y2="36" stroke="var(--tx3)" stroke-width="1"/><text x="88" y="40" font-size="9" fill="var(--tx)"><tspan font-weight="700">165°F</tspan> poultry · leftovers</text>'
+        + '<line x1="66" y1="45" x2="84" y2="56" stroke="var(--tx3)" stroke-width="1"/><text x="88" y="60" font-size="9" fill="var(--tx)"><tspan font-weight="700">160°F</tspan> ground meats</text>'
+        + '<line x1="66" y1="57" x2="84" y2="78" stroke="var(--tx3)" stroke-width="1"/><text x="88" y="82" font-size="9" fill="var(--tx)"><tspan font-weight="700">145°F</tspan> beef·pork·lamb·fish</text>'
+        + '<text x="88" y="93" font-size="7.5" fill="var(--tx3)">beef/pork/lamb: rest 3 min</text>'
+        + '</svg>';
+    },
+    // Grease fire response: cut the heat, slide a metal lid over to smother — never water.
+    greaseFire: function(cfg, ctx){
+      return '<svg viewBox="0 0 222 158" class="lr-svg lr-svg--wide" role="img" aria-label="Grease fire: turn off the heat and slide a metal lid or baking sheet over the pan to smother it. Never use water.">'
+        + '<rect x="24" y="132" width="150" height="10" rx="3" fill="var(--s4)"/>'
+        + '<rect x="56" y="108" width="92" height="22" rx="4" fill="var(--s3)" stroke="var(--tx2)" stroke-width="2"/>'
+        + '<rect x="146" y="114" width="46" height="8" rx="4" fill="var(--tx3)"/>'
+        // flames
+        + '<path d="M78 108 Q 70 86 82 74 Q 80 92 92 84 Q 90 100 78 108 Z" fill="#fb923c"/>'
+        + '<path d="M104 108 Q 94 80 110 64 Q 106 88 122 78 Q 120 100 104 108 Z" fill="#ef4444"/>'
+        + '<path d="M128 108 Q 122 88 132 78 Q 130 94 142 88 Q 140 102 128 108 Z" fill="#fb923c"/>'
+        // lid sliding over (with motion arrow)
+        + '<path d="M44 70 A 52 30 0 0 1 148 70" fill="none" stroke="var(--tx2)" stroke-width="4"/>'
+        + '<rect x="90" y="52" width="12" height="9" rx="3" fill="var(--tx2)"/>'
+        + '<line x1="150" y1="64" x2="120" y2="64" stroke="var(--gr,#34d399)" stroke-width="3"/>'
+        + _arrowhead(120, 64, Math.PI, 'var(--gr,#34d399)')
+        + '<text x="96" y="44" text-anchor="middle" font-size="9.5" font-weight="700" fill="var(--gr,#34d399)">slide a metal lid over — smother it</text>'
+        // never water badge
+        + '<g transform="translate(196,40)"><path d="M0 -16 C 9 -4, 11 2, 11 6 A 11 11 0 1 1 -11 6 C -11 2, -9 -4, 0 -16 Z" fill="#60a5fa"/><circle r="17" fill="none" stroke="#ef4444" stroke-width="3"/><line x1="-12" y1="12" x2="12" y2="-12" stroke="#ef4444" stroke-width="3"/></g>'
+        + '<text x="196" y="74" text-anchor="middle" font-size="9" font-weight="700" fill="#ef4444">never water</text>'
+        + '</svg>';
     }
   };
 
