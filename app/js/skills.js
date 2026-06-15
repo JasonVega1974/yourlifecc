@@ -4455,18 +4455,25 @@ function openSkillCategory(key){
   const title = document.getElementById('skModalTitle'); if(title) title.textContent = cat.name;
   const meta = document.getElementById('skModalMeta'); if(meta) meta.textContent = lessons.length+' lessons'+(hasCert?' · ✅ Certified':'');
 
-  // Populate lessons tab.
-  // ISOLATION (lesson-renderer redesign): if a hand-authored block spec
-  // exists for this category AND the renderer is loaded, render the new
-  // spec-driven format. Every other category falls through to the legacy
-  // prose accordion below, byte-for-byte unchanged — so we can prototype
-  // one module (taxes) safely and reversibly.
+  // Populate lessons tab — every category renders through lesson-renderer.js.
+  // A hand-authored block spec (window.SK_SPECS[key], e.g. taxes) gets the
+  // full rich treatment; every other category is auto-converted from its
+  // legacy { h, b, tip, q } via fromLegacy() — same shell, lead + verbatim
+  // prose + the (previously hidden) tip + any inline check. The original
+  // prose accordion (_skRenderLegacyLessons) remains the safety net for an
+  // empty category, a missing renderer, or any thrown error.
   const body = document.getElementById('skillModalBody');
   if(body){
-    const spec = (window.SK_SPECS && window.SK_SPECS[key]) || null;
-    if(spec && window.lessonRenderer && typeof window.lessonRenderer.mount === 'function'){
-      try { window.lessonRenderer.mount(body, spec); }
-      catch(_e){ _skRenderLegacyLessons(body, lessons, cat); }
+    const lr = window.lessonRenderer;
+    const canRender = lr && typeof lr.mount === 'function';
+    if(canRender && lessons.length > 0){
+      try {
+        const moduleSpec = (window.SK_SPECS && window.SK_SPECS[key])
+          || lr.fromLegacy(lessons, { key:key, color:cat.color });
+        lr.mount(body, moduleSpec);
+      } catch(_e){
+        _skRenderLegacyLessons(body, lessons, cat);
+      }
     } else {
       _skRenderLegacyLessons(body, lessons, cat);
     }

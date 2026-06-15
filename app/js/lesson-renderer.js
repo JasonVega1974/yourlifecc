@@ -309,7 +309,44 @@
     _mountWidgets(host);
   }
 
+  // ── Baseline auto-conversion ─────────────────────────────────
+  // Turn a legacy SK_DATA module (array of { h, b, tip, q? }) into a module
+  // spec WITHOUT hand-authoring, so every category gets the new shell at
+  // once. Conservative + lossless: the first <p> becomes a `lead`, the rest
+  // of the body is kept VERBATIM as a trusted `prose` block (so every <ul>,
+  // <strong>, and sub-paragraph survives exactly), the long-dark `tip` field
+  // finally renders as a callout, and any inline `q` checks are surfaced.
+  // Hand-authored SK_SPECS modules (e.g. taxes) bypass this entirely.
+  function fromLegacy(lessons, meta){
+    meta = meta || {};
+    return {
+      key: meta.key,
+      color: meta.color,
+      lessons: (lessons || []).map(function(l){
+        var blocks = [];
+        var body = String(l.b || '');
+        var rest = body;
+        var m = body.match(/^\s*<p>([\s\S]*?)<\/p>/i);
+        if(m){
+          var leadTxt = m[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+          // Only promote to a lead if it's a real sentence, not a tiny label.
+          if(leadTxt.length >= 40){ blocks.push({ type:'lead', text:leadTxt }); rest = body.slice(m[0].length); }
+        }
+        if(rest && rest.replace(/\s+/g, '')) blocks.push({ type:'prose', html:rest });
+        if(l.tip) blocks.push({ type:'tip', text:l.tip });
+        if(Array.isArray(l.q)){
+          l.q.forEach(function(qq){
+            if(qq && qq.q && Array.isArray(qq.opts)){
+              blocks.push({ type:'check', q:qq.q, opts:qq.opts, ans:qq.ans|0, explain:qq.explain });
+            }
+          });
+        }
+        return { title: l.h, blocks: blocks };
+      })
+    };
+  }
+
   if(typeof window !== 'undefined'){
-    window.lessonRenderer = { mount: mount, blocks: BLOCKS, viz: VIZ, widgets: WIDGETS, computeTax: computeTax };
+    window.lessonRenderer = { mount: mount, fromLegacy: fromLegacy, blocks: BLOCKS, viz: VIZ, widgets: WIDGETS, computeTax: computeTax };
   }
 })();
