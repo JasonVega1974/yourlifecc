@@ -10241,3 +10241,38 @@ body:has(#s-parent.sec.active #parentCelestialHome:not(.pch-entered):not(.pch-cl
 :root.light .lr-check__opt--wrong{border-color:#dc2626;background:color-mix(in srgb,#dc2626 10%,transparent);}
 :root.light .lr-check__fb--no{color:#b91c1c;}
 :root.light .lr-brk__bar{border-color:rgba(31,24,16,.12);}
+
+/* ── Visual lesson blocks (WC visual phase): diagrams, illustrated steps,
+   safety callout. Token-based; light + reduced-motion passes at the end. ── */
+.lr-diagram{display:flex;justify-content:center;padding:.3rem 0;}
+.lr-svg{width:100%;height:auto;display:block;max-width:230px;margin:0 auto;}
+.lr-svg--wide{max-width:260px;}
+
+/* illustrated steps */
+.lr-isteps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.7rem;}
+.lr-istep{display:flex;gap:.85rem;align-items:center;background:var(--s1);border:1px solid var(--br);border-radius:14px;padding:.7rem .8rem;}
+.lr-istep__dia{flex:0 0 40%;max-width:150px;}
+.lr-istep__body{flex:1 1 auto;display:flex;gap:.55rem;align-items:flex-start;}
+.lr-istep--nodia .lr-istep__body{padding-left:.1rem;}
+.lr-istep__n{flex:0 0 auto;width:24px;height:24px;border-radius:50%;background:var(--lr-accent,var(--c));color:#0b1220;font-weight:900;font-size:.78rem;display:flex;align-items:center;justify-content:center;margin-top:.05rem;}
+.lr-istep__x{font-size:.84rem;line-height:1.5;color:var(--tx);}
+@media (max-width:440px){.lr-istep{flex-direction:column;align-items:stretch;}.lr-istep__dia{max-width:200px;margin:0 auto .3rem;}}
+
+/* safety callout — danger-accented, distinct from .lr-tip */
+.lr-safety{display:flex;gap:.6rem;align-items:flex-start;background:color-mix(in srgb,#ef4444 12%,var(--s2));border:1px solid color-mix(in srgb,#ef4444 34%,transparent);border-left:4px solid #ef4444;border-radius:12px;padding:.75rem .85rem;}
+.lr-safety__i{font-size:1.05rem;flex:0 0 auto;line-height:1.35;}
+.lr-safety__t{font-weight:800;color:#ef4444;font-size:.82rem;margin-bottom:.2rem;letter-spacing:.2px;}
+.lr-safety__x{font-size:.84rem;line-height:1.5;color:var(--tx);}
+
+/* star-pattern sequence glow (gated by ctx.animate AND the media query below) */
+.lr-star__ring{opacity:.2;}
+.lr-star__glow{animation:lrStarPulse 4.6s ease-in-out infinite;}
+@keyframes lrStarPulse{0%,16%,100%{opacity:.16;}5%{opacity:.95;}}
+
+/* ── Light-mode pass ── */
+:root.light .lr-istep{box-shadow:0 3px 10px rgba(31,24,16,.05);}
+:root.light .lr-safety{background:color-mix(in srgb,#dc2626 9%,var(--s1));border-color:color-mix(in srgb,#dc2626 28%,transparent);border-left-color:#dc2626;}
+:root.light .lr-safety__t{color:#b91c1c;}
+
+/* ── Reduced-motion: no glow; diagram stays fully readable static ── */
+@media (prefers-reduced-motion:reduce){.lr-star__glow{animation:none;opacity:.2;}}

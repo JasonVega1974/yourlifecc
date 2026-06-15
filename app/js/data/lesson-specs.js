@@ -379,6 +379,50 @@ const SK_SPECS = {
         ]
       }
     ]
+  },
+
+  // ═══════════════════════════════════════════════════════════════════
+  // CAR & DRIVING — ONE lesson elevated (change-a-tire). The other car
+  // lessons stay on the fromLegacy() baseline; matchTitle targets just
+  // this lesson by its SK_DATA heading (per-lesson elevation).
+  // ═══════════════════════════════════════════════════════════════════
+  car: {
+    key: 'car',
+    color: '#60a5fa',
+    lessons: [
+      {
+        id: 'car-change-tire',
+        matchTitle: 'How to Change a Flat Tire — Every Step, Every Detail',
+        title: 'How to Change a Flat Tire — Every Step, Every Detail',
+        duration: '8 min',
+        blocks: [
+          { type:'lead', text:"Every driver faces a flat eventually — on a highway, at night, in the rain. Calling roadside assistance is always a fine choice, but knowing how to do this yourself means you're never stranded and helpless." },
+          { type:'safety', title:'Get safe before you touch a single lug nut', text:"Signal, slow down, and pull completely off the road onto firm, level ground — never soft dirt, where the jack can sink. Turn on your hazard lights and set the parking brake. If you're on a narrow shoulder, in fast traffic, or anything feels unsafe, stay in the car with your seatbelt on and call roadside assistance instead. No tire is worth your life." },
+          { type:'diagram', kind:'toolRow' },
+          { type:'illustratedSteps', steps:[
+            { num:1, text:"With the tire still on the ground, break each lug nut loose about a half turn counter-clockwise — in a star pattern, not a circle. Doing this before you lift keeps the wheel from spinning.", diagram:{ kind:'wheelLoosen' } },
+            { num:2, text:"Place the jack under the manufacturer's reinforced jack point near the flat — check your owner's manual, because the exact spot is vehicle-specific and the wrong location can bend the frame. Raise until the flat is about 6 inches off the ground.", diagram:{ kind:'carJackPoint' } },
+            { num:3, text:"Remove the loosened lug nuts the rest of the way and keep them together in your pocket or a cup. Pull the flat straight off, set it aside, then lift the spare on and push it flush against the hub." },
+            { num:4, text:"Hand-tighten all the nuts first, then tighten firmly in a star pattern — each nut roughly opposite the last — so the wheel seats evenly. Never tighten them in a circle.", diagram:{ kind:'starPattern' } },
+            { num:5, text:"Lower the car most of the way, do a final star-pattern tighten while the tire still can't spin, then lower fully. Stow the flat where the spare was and get it repaired soon.", diagram:{ kind:'carJackPoint' } }
+          ] },
+          { type:'safety', title:'A donut spare is temporary', text:"Compact “donut” spares are rated for roughly 50 mph and 50–70 miles — just enough to reach a shop. Get your real tire repaired or replaced right away, and re-check that the lug nuts are still tight after the first 25–50 miles." },
+          { type:'takeaways', items:[
+            "Loosen the lug nuts while the wheel is still on the ground.",
+            "Jack only on the reinforced frame point your owner's manual shows.",
+            "Hand-tighten first, then torque in a star pattern — never a circle.",
+            "If the location or traffic feels unsafe, call for help instead."
+          ] },
+          { type:'tip', text:"Practice once in your driveway before you ever need it for real. A 20-minute dry run removes almost all the stress of doing it on a dark shoulder." },
+          { type:'check', q:"Why do you loosen the lug nuts BEFORE jacking the car up?", opts:[
+            "It's faster that way",
+            "On the ground the wheel can't spin, so you have the traction to break them loose",
+            "The jack is more stable with the nuts loose",
+            "It prevents over-tightening later"
+          ], ans:1, explain:"With the tire on the ground it can't spin freely, so the wheel holds still while you break each stuck lug nut loose. Once the car is lifted, the wheel just spins and you lose that traction." }
+        ]
+      }
+    ]
   }
 };
 

@@ -4465,11 +4465,13 @@ function openSkillCategory(key){
   const body = document.getElementById('skillModalBody');
   if(body){
     const lr = window.lessonRenderer;
-    const canRender = lr && typeof lr.mount === 'function';
+    const canRender = lr && typeof lr.mount === 'function' && typeof lr.composeModule === 'function';
     if(canRender && lessons.length > 0){
       try {
-        const moduleSpec = (window.SK_SPECS && window.SK_SPECS[key])
-          || lr.fromLegacy(lessons, { key:key, color:cat.color });
+        // composeModule overlays any hand-authored lessons (window.SK_SPECS[key])
+        // on top of the fromLegacy() baseline — per lesson, so one elevated
+        // lesson (e.g. the tire lesson) coexists with auto-converted siblings.
+        const moduleSpec = lr.composeModule(lessons, (window.SK_SPECS && window.SK_SPECS[key]) || null, { key:key, color:cat.color });
         lr.mount(body, moduleSpec);
       } catch(_e){
         _skRenderLegacyLessons(body, lessons, cat);

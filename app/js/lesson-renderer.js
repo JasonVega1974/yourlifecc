@@ -48,6 +48,28 @@
     try { return '$' + Math.round(n).toLocaleString('en-US'); } catch(_e){ return '$' + Math.round(n); }
   }
   function pct(x){ return (Math.round(x * 1000) / 10) + '%'; }
+  // Reduced-motion gate (mirrors exercise-engine). Diagrams stay fully
+  // readable static; only CSS glow/animation is suppressed when true.
+  function _reduced(){
+    try { return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
+    catch(_e){ return false; }
+  }
+  // 5 lug nuts evenly around a hub (schematic).
+  function _lugs(cx, cy, r, nr, fill){
+    var s = '';
+    for(var k = 0; k < 5; k++){
+      var a = (-90 + k * 72) * Math.PI / 180;
+      s += '<circle cx="' + (cx + r * Math.cos(a)).toFixed(1) + '" cy="' + (cy + r * Math.sin(a)).toFixed(1) + '" r="' + nr + '" fill="' + fill + '"/>';
+    }
+    return s;
+  }
+  // Small triangular arrowhead at (x,y) pointing along angle `ang` (radians).
+  function _arrowhead(x, y, ang, color){
+    var s = 8;
+    var p2x = x - s * Math.cos(ang - 0.42), p2y = y - s * Math.sin(ang - 0.42);
+    var p3x = x - s * Math.cos(ang + 0.42), p3y = y - s * Math.sin(ang + 0.42);
+    return '<polygon points="' + x.toFixed(1) + ',' + y.toFixed(1) + ' ' + p2x.toFixed(1) + ',' + p2y.toFixed(1) + ' ' + p3x.toFixed(1) + ',' + p3y.toFixed(1) + '" fill="' + color + '"/>';
+  }
 
   // ── Declarative visuals ──────────────────────────────────────
   // 2025 single-filer federal brackets, for the bracket ladder + calculator.
@@ -93,6 +115,85 @@
       return '<figure class="lr-brk"><figcaption class="lr-brk__cap">2025 federal brackets · ' + esc(status === 'married' ? 'married filing jointly' : 'single filer') + '</figcaption>'
         + '<div class="lr-brk__bar">' + bar + '</div>'
         + '<div class="lr-brk__legend">' + legend + '</div></figure>';
+    }
+  };
+
+  // ── Schematic diagrams (reusable SVG primitives) ─────────────
+  // Clean shapes, theme-token colors (adapt to light/dark). `ctx.animate`
+  // is false under prefers-reduced-motion — diagrams stay fully readable;
+  // only the star-sequence glow is gated.
+  var DIAGRAMS = {
+    // Break each lug nut loose while the wheel is still on the ground.
+    wheelLoosen: function(cfg, ctx){
+      var cx = 78, cy = 88;
+      return '<svg viewBox="0 0 210 174" class="lr-svg" role="img" aria-label="Break each lug nut loose about a half turn counter-clockwise while the tire is still on the ground">'
+        + '<line x1="10" y1="150" x2="200" y2="150" stroke="var(--tx3)" stroke-width="3" stroke-linecap="round"/>'
+        + '<g stroke="var(--tx3)" stroke-width="1.5" opacity=".5"><line x1="26" y1="150" x2="18" y2="162"/><line x1="64" y1="150" x2="56" y2="162"/><line x1="102" y1="150" x2="94" y2="162"/><line x1="140" y1="150" x2="132" y2="162"/><line x1="178" y1="150" x2="170" y2="162"/></g>'
+        + '<circle cx="' + cx + '" cy="' + cy + '" r="54" fill="none" stroke="var(--tx2)" stroke-width="16"/>'
+        + '<circle cx="' + cx + '" cy="' + cy + '" r="38" fill="var(--s2)" stroke="var(--br)" stroke-width="2"/>'
+        + _lugs(cx, cy, 22, 5.5, 'var(--tx3)')
+        + '<circle cx="' + cx + '" cy="' + cy + '" r="8" fill="var(--tx3)"/>'
+        + '<rect x="' + (cx + 16) + '" y="' + (cy - 6) + '" width="96" height="12" rx="3" fill="var(--lr-accent,#60a5fa)"/>'
+        + '<circle cx="' + (cx + 22) + '" cy="' + cy + '" r="11" fill="none" stroke="var(--lr-accent,#60a5fa)" stroke-width="5"/>'
+        + '<path d="M' + cx + ' ' + (cy - 50) + ' A50 50 0 0 0 ' + (cx - 50) + ' ' + cy + '" fill="none" stroke="var(--gr,#34d399)" stroke-width="4"/>'
+        + _arrowhead(cx - 50, cy, Math.PI / 2, 'var(--gr,#34d399)')
+        + '<text x="158" y="44" text-anchor="middle" font-size="12" font-weight="700" fill="var(--gr,#34d399)">loosen ½ turn</text>'
+        + '<text x="105" y="170" text-anchor="middle" font-size="11" fill="var(--tx3)">tire still on the ground</text>'
+        + '</svg>';
+    },
+    // Jack under the reinforced frame jack point near the flat.
+    carJackPoint: function(cfg, ctx){
+      return '<svg viewBox="0 0 250 150" class="lr-svg" role="img" aria-label="Place the jack under the reinforced frame jack point shown in your owner manual, near the flat tire">'
+        + '<line x1="10" y1="132" x2="240" y2="132" stroke="var(--tx3)" stroke-width="3" stroke-linecap="round"/>'
+        + '<path d="M28 98 L52 98 Q60 72 92 68 L150 66 Q178 66 198 94 L218 98 L224 102 L224 110 L28 110 Z" fill="var(--s3)" stroke="var(--tx2)" stroke-width="2"/>'
+        + '<path d="M72 70 L96 72 L148 70 L172 72" fill="none" stroke="var(--tx2)" stroke-width="2" opacity=".7"/>'
+        + '<circle cx="74" cy="112" r="20" fill="var(--tx2)"/><circle cx="74" cy="112" r="9" fill="var(--s2)"/>'
+        + '<circle cx="188" cy="112" r="20" fill="var(--tx2)"/><circle cx="188" cy="112" r="9" fill="var(--s2)"/>'
+        + '<g stroke="var(--lr-accent,#60a5fa)" stroke-width="3" fill="none"><path d="M150 110 L138 122 L150 132 M150 110 L162 122 L150 132"/></g>'
+        + '<rect x="139" y="130" width="22" height="5" rx="2" fill="var(--lr-accent,#60a5fa)"/>'
+        + '<line x1="150" y1="110" x2="150" y2="98" stroke="var(--g,#fbbf24)" stroke-width="3"/>'
+        + _arrowhead(150, 98, -Math.PI / 2, 'var(--g,#fbbf24)')
+        + '<text x="150" y="90" text-anchor="middle" font-size="11" font-weight="700" fill="var(--g,#fbbf24)">frame jack point</text>'
+        + '</svg>';
+    },
+    // 5 lug nuts numbered in star tightening order, with the star path.
+    starPattern: function(cfg, ctx){
+      var cx = 85, cy = 88, R = 56, nr = 15;
+      var seq = [0, 2, 4, 1, 3];               // pentagram tightening order
+      var pos = [];
+      for(var k = 0; k < 5; k++){ var a = (-90 + k * 72) * Math.PI / 180; pos.push([cx + R * Math.cos(a), cy + R * Math.sin(a)]); }
+      var numAt = [];
+      seq.forEach(function(p, i){ numAt[p] = i + 1; });
+      var d = 'M' + pos[seq[0]][0].toFixed(1) + ' ' + pos[seq[0]][1].toFixed(1);
+      for(var i = 1; i < seq.length; i++){ d += ' L' + pos[seq[i]][0].toFixed(1) + ' ' + pos[seq[i]][1].toFixed(1); }
+      d += ' Z';
+      var nuts = '';
+      for(var p = 0; p < 5; p++){
+        var x = pos[p][0], y = pos[p][1], n = numAt[p];
+        var glow = (ctx && ctx.animate) ? ' lr-star__glow' : '';
+        nuts += '<circle class="lr-star__ring' + glow + '" style="animation-delay:' + ((n - 1) * 0.9).toFixed(2) + 's" cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + (nr + 5) + '" fill="none" stroke="var(--lr-accent,#60a5fa)" stroke-width="3"/>'
+          + '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + nr + '" fill="var(--s2)" stroke="var(--tx3)" stroke-width="2"/>'
+          + '<text x="' + x.toFixed(1) + '" y="' + (y + 5).toFixed(1) + '" text-anchor="middle" font-size="16" font-weight="800" fill="var(--tx)">' + n + '</text>';
+      }
+      return '<svg viewBox="0 0 170 178" class="lr-svg" role="img" aria-label="Tighten the lug nuts in a star pattern: one, two, three, four, five across the wheel, not in a circle">'
+        + '<circle cx="' + cx + '" cy="' + cy + '" r="' + (R + 16) + '" fill="none" stroke="var(--br)" stroke-width="2"/>'
+        + '<path d="' + d + '" fill="none" stroke="var(--lr-accent,#60a5fa)" stroke-width="2" stroke-dasharray="4 4" opacity=".55"/>'
+        + '<circle cx="' + cx + '" cy="' + cy + '" r="9" fill="var(--tx3)"/>'
+        + nuts
+        + '<text x="' + cx + '" y="172" text-anchor="middle" font-size="11" fill="var(--tx3)">star order 1 → 2 → 3 → 4 → 5</text>'
+        + '</svg>';
+    },
+    // The three tools you need, labeled.
+    toolRow: function(cfg, ctx){
+      return '<svg viewBox="0 0 252 104" class="lr-svg lr-svg--wide" role="img" aria-label="Tools you need: a jack, a lug wrench, and the spare tire">'
+        + '<g transform="translate(42,38)"><g stroke="var(--tx2)" stroke-width="3" fill="none"><path d="M-16 18 L0 0 L16 18 M-16 18 L0 34 L16 18"/></g><rect x="-15" y="32" width="30" height="6" rx="2" fill="var(--tx2)"/></g>'
+        + '<text x="42" y="94" text-anchor="middle" font-size="11" fill="var(--tx2)">Jack</text>'
+        + '<g transform="translate(126,36)" stroke="var(--tx2)" stroke-width="6" stroke-linecap="round" fill="none"><line x1="-22" y1="0" x2="22" y2="0"/><line x1="0" y1="-20" x2="0" y2="22"/></g>'
+        + '<circle cx="126" cy="60" r="6" fill="var(--s2)" stroke="var(--tx2)" stroke-width="4"/>'
+        + '<text x="126" y="94" text-anchor="middle" font-size="11" fill="var(--tx2)">Lug wrench</text>'
+        + '<g transform="translate(210,40)"><circle r="26" fill="none" stroke="var(--tx2)" stroke-width="9"/><circle r="9" fill="var(--s2)" stroke="var(--br)" stroke-width="2"/></g>'
+        + '<text x="210" y="94" text-anchor="middle" font-size="11" fill="var(--tx2)">Spare</text>'
+        + '</svg>';
     }
   };
 
@@ -289,16 +390,38 @@
       // Placeholder; populated in _mountWidgets after innerHTML is set.
       return '<div class="lr-widget" data-lr-widget="' + esc(b.kind) + '" data-lr-config="' + esc(JSON.stringify(b.config || {})) + '"></div>';
     },
+    diagram: function(b, ctx){
+      var fn = DIAGRAMS[b.kind];
+      return '<div class="lr-diagram">' + (fn ? fn(b.config || {}, ctx || {}) : '') + '</div>';
+    },
+    illustratedSteps: function(b, ctx){
+      var items = (b.steps || []).map(function(s){
+        var fn = s.diagram && DIAGRAMS[s.diagram.kind];
+        var dia = fn ? '<div class="lr-istep__dia">' + fn(s.diagram.config || {}, ctx || {}) + '</div>' : '';
+        return '<li class="lr-istep' + (dia ? '' : ' lr-istep--nodia') + '">'
+          + dia
+          + '<div class="lr-istep__body"><span class="lr-istep__n">' + esc(s.num) + '</span><span class="lr-istep__x">' + esc(s.text) + '</span></div>'
+          + '</li>';
+      }).join('');
+      return '<ol class="lr-isteps">' + items + '</ol>';
+    },
+    // Danger-accented callout — distinct from `tip`, for safety-critical warnings.
+    safety: function(b){
+      return '<aside class="lr-safety" role="note"><span class="lr-safety__i" aria-hidden="true">⚠️</span>'
+        + '<div class="lr-safety__x">'
+        + (b.title ? '<div class="lr-safety__t">' + esc(b.title) + '</div>' : '')
+        + '<div>' + esc(b.text) + '</div></div></aside>';
+    },
     prose: function(b){ return '<div class="lr-prose">' + (b.html || '') + '</div>'; }  // trusted, verbatim
   };
 
-  function renderBlock(b){
+  function renderBlock(b, ctx){
     if(!b || !b.type) return '';
     var fn = BLOCKS[b.type];
-    return fn ? fn(b) : '';
+    return fn ? fn(b, ctx) : '';
   }
-  function renderLessonBody(lesson){
-    return (lesson.blocks || []).map(renderBlock).join('');
+  function renderLessonBody(lesson, ctx){
+    return (lesson.blocks || []).map(function(b){ return renderBlock(b, ctx); }).join('');
   }
 
   // ── Mount ────────────────────────────────────────────────────
@@ -346,6 +469,7 @@
     if(!host || !moduleSpec) return;
     var color = moduleSpec.color || 'var(--c)';
     var lessons = moduleSpec.lessons || [];
+    var ctx = { animate: !_reduced() };   // diagram animation gate
     host.innerHTML = '<div class="lr-mod" style="--lr-accent:' + color + ';">'
       + lessons.map(function(lesson, i){
           var openCls = i === 0 ? ' lr-l--open' : '';
@@ -356,7 +480,7 @@
             +   (lesson.duration ? '<span class="lr-l__d">' + esc(lesson.duration) + '</span>' : '')
             +   '<span class="lr-l__chev" aria-hidden="true">▾</span>'
             + '</button>'
-            + '<div class="lr-l__body">' + renderLessonBody(lesson) + '</div>'
+            + '<div class="lr-l__body">' + renderLessonBody(lesson, ctx) + '</div>'
             + '</section>';
         }).join('')
       + '</div>';
@@ -419,7 +543,38 @@
     };
   }
 
+  // ── Per-LESSON elevation ─────────────────────────────────────
+  // Compose the module to render: start from the auto-converted baseline,
+  // then overlay any hand-authored lessons one at a time. A hand-authored
+  // lesson targets its baseline slot by `matchTitle` (stable) or
+  // `matchIndex`; with neither, lessons map positionally (a fully authored
+  // module like taxes/investing simply replaces every slot in order). This
+  // is what lets ONE lesson in a category be elevated while its siblings
+  // stay on fromLegacy().
+  function composeModule(legacyLessons, authored, meta){
+    meta = meta || {};
+    var baseline = fromLegacy(legacyLessons || [], meta).lessons;
+    var color = (authored && authored.color) || meta.color;
+    if(!authored || !Array.isArray(authored.lessons) || !authored.lessons.length){
+      return { key: meta.key, color: color, lessons: baseline };
+    }
+    var merged = baseline.slice();
+    var pos = 0;
+    authored.lessons.forEach(function(L){
+      var idx = -1;
+      if(typeof L.matchIndex === 'number') idx = L.matchIndex;
+      else if(L.matchTitle){
+        for(var i = 0; i < legacyLessons.length; i++){
+          if(legacyLessons[i] && legacyLessons[i].h === L.matchTitle){ idx = i; break; }
+        }
+      } else { idx = pos++; }
+      if(idx >= 0 && idx < merged.length) merged[idx] = L;
+      else merged.push(L);
+    });
+    return { key: meta.key, color: color, lessons: merged };
+  }
+
   if(typeof window !== 'undefined'){
-    window.lessonRenderer = { mount: mount, fromLegacy: fromLegacy, blocks: BLOCKS, viz: VIZ, widgets: WIDGETS, computeTax: computeTax };
+    window.lessonRenderer = { mount: mount, fromLegacy: fromLegacy, composeModule: composeModule, blocks: BLOCKS, viz: VIZ, diagrams: DIAGRAMS, widgets: WIDGETS, computeTax: computeTax };
   }
 })();
