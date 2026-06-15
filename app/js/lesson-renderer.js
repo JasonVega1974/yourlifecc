@@ -885,15 +885,22 @@
         return '<div class="lr-calc__sub">' + label + '</div><div class="lr-calc__stats">'
           + stat(t, 'to pay off', col) + stat(intr, 'interest', col) + stat(paid, 'total paid', col) + '</div>';
       }
-      // Chart the entered (fixed-payment) scenario so a bigger payment visibly
+      // The chart leads with the minimum-payment trap so the swelling interest
+      // gap is the first thing the learner sees. Once they engage the payment
+      // input, the chart follows their entered payment, so raising it visibly
       // shrinks the interest band. Lower band = cumulative principal paid;
-      // widening upper gap = interest handed over (the card-debt cost). When the
+      // widening upper gap = interest handed over (the card-debt cost). When a
       // payment can't pay the balance off, the schedule is bounded and the
       // endpoint reads "still owing $X after N yrs" instead of running forever.
+      // The caption + endpoint numbers always match whichever stat card the
+      // chart is showing, so the two stay coherent.
+      var paymentTouched = false;
       function chartFor(bal, r12, pay, animate){
-        if(!(bal > 0 && pay > 0)) return '';
-        var sched = _cardSchedulePoints(bal, r12, 'fixed', pay, 360);
-        if(sched.raw.length < 2) return '';
+        if(!(bal > 0)) return '';
+        var useMin = !paymentTouched;
+        var sched = useMin ? _cardSchedulePoints(bal, r12, 'min', 0, 360)
+                           : (pay > 0 ? _cardSchedulePoints(bal, r12, 'fixed', pay, 360) : null);
+        if(!sched || sched.raw.length < 2) return '';
         var SEG = Math.min(60, sched.raw.length - 1);
         var pts = [];
         for(var j = 0; j <= SEG; j++){
@@ -903,7 +910,8 @@
         var endText = sched.paidOff
           ? money(bal) + ' borrowed → ' + money(sched.paid) + ' paid (' + money(sched.interest) + ' interest)'
           : money(bal) + ' borrowed → still owing ' + money(sched.endBal) + ' after ' + Math.round(sched.months / 12) + ' yrs';
-        return growthChart({ points: pts, years: Math.round(sched.months / 12),
+        var caption = '<div class="lr-calc__sub">' + (useMin ? 'Paying only the minimum' : 'Paying ' + money(pay) + ' / month') + ' — over time</div>';
+        return caption + growthChart({ points: pts, years: Math.round(sched.months / 12),
           lowerLabel: 'Principal', upperLabel: 'Interest', lowerColor: '#64748b', upperColor: '#ef4444',
           endText: endText,
           aria: 'Illustrative credit-card payoff — principal versus interest paid over time; the widening interest gap is the cost of carrying the balance' }, animate);
@@ -922,7 +930,8 @@
         var animate = !!firstTime && !_reduced();
         $o.innerHTML = block('Paying only the minimum', mn, '#ef4444') + block('Paying ' + money(pay) + ' / month', fx, '#34d399') + chartFor(bal, r12, pay, animate) + note;
       }
-      [$b, $r, $p].forEach(function(el){ el.addEventListener('input', function(){ render(false); }); });
+      $p.addEventListener('input', function(){ paymentTouched = true; render(false); });
+      [$b, $r].forEach(function(el){ el.addEventListener('input', function(){ render(false); }); });
       render(true);
     },
 
