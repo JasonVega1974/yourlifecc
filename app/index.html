@@ -423,16 +423,27 @@
     <div style="font-size:.6rem;color:var(--tx3);margin-top:.25rem;padding-left:.2rem;">Replaces the ✝️ Faith tab in the mobile bottom bar. The Well stays reachable from the sidebar.</div>
   </div>
 
-  <!-- WC-D2 (2026-06-14): unified sound-effects opt-in (the ONE toggle —
-       absorbed the retired "Skills sound effects"). Wired to toggleSound()
-       in skills.js; hydrated by openSettings() in ui.js from D.soundEnabled
-       (default OFF). Gates window.sfx.* across the quiz AND practice. -->
+  <!-- Feedback group (WC-D2 Sound / WC-D3 Vibration). Two independent
+       modalities: Sound = D.soundEnabled (default OFF, toggleSound) gating
+       window.sfx.*; Vibration = D.hapticsEnabled (default ON where supported,
+       toggleHaptics) gating window.haptics.*. Both hydrated by openSettings()
+       in ui.js. The Vibration row (#feedbackVibrationRow) is shown only where
+       'vibrate' in navigator — Android-Chromium; openSettings() hides it on
+       iOS / Firefox 129+ so it's never a dead switch. -->
   <div style="margin-top:.7rem;padding-top:.6rem;border-top:1px solid rgba(255,255,255,.06);">
+    <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;color:var(--tx3);margin-bottom:.4rem;padding-left:.2rem;">Feedback</div>
     <div class="tr">
       <span style="font-size:.84rem;">🔊 Sound effects</span>
       <button class="tg" id="tg-soundEnabled" onclick="toggleSound(this)"></button>
     </div>
     <div style="font-size:.6rem;color:var(--tx3);margin-top:.15rem;padding-left:.2rem;">Subtle ding on a right answer, soft thud on a wrong one, fanfare on a perfect set. Off by default.</div>
+    <div id="feedbackVibrationRow" style="margin-top:.55rem;">
+      <div class="tr">
+        <span style="font-size:.84rem;">📳 Vibration</span>
+        <button class="tg" id="tg-hapticsEnabled" onclick="toggleHaptics(this)"></button>
+      </div>
+      <div style="font-size:.6rem;color:var(--tx3);margin-top:.15rem;padding-left:.2rem;">A light buzz on the same moments. Android only; on by default.</div>
+    </div>
   </div>
 
   <!-- Email Bundle Track 2 (2026-06-08) — engagement opt-in toggle.
@@ -20465,6 +20476,10 @@
      gated by D.soundEnabled. The exercise engine + skills quiz call it guarded,
      so load order vs them is loose; placed here before its consumers. -->
 <script defer src="/app/js/sfx.js"></script>
+<!-- WC-D3 — haptics layer. Defines window.haptics (Android-Chromium vibration),
+     gated by D.hapticsEnabled. Engine + skills call it guarded alongside sfx,
+     so load order is loose; no-op where navigator.vibrate is unsupported. -->
+<script defer src="/app/js/haptics.js"></script>
 <!-- WC-D1 — interactive exercise engine. Presents only; calls awardPracticeSet
      (xp.js) + megaConfetti (celebrations.js) at runtime, so load order is loose. -->
 <script defer src="/app/js/exercise-engine.js"></script>

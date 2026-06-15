@@ -148,6 +148,13 @@ const DEF = {
   // shown after a first completed practice set. Set true the moment the
   // nudge is shown (accept OR ignore), so it never re-nags.
   soundNudgeSeen:false,
+  // 2026-06-14 — WC-D3: vibration feedback preference (mirrors soundEnabled
+  // but a separate, SILENT modality — someone in a quiet room may want buzz
+  // without sound). Default ON: silent, so the quiet-space concern doesn't
+  // apply, and it's a clean no-op where navigator.vibrate is unsupported
+  // (iOS Safari, Firefox 129+). The Settings → Feedback → Vibration row is
+  // hidden where unsupported, so this is never a dead toggle.
+  hapticsEnabled:true,
   // streak / checkin
   streak:0, lastCheckin:null, checkin:{}, customHabits:[], dailyChecks:{},
   // V1 Rebuild — Session 1 (Daily Briefing). Keyed by YYYY-MM-DD; per-day

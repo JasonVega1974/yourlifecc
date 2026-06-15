@@ -186,6 +186,7 @@
       // Fanfare rides the 🎉 + XP line (shown even under reduced motion).
       // Sound is not motion, so it still plays when confetti is suppressed.
       try { if(window.sfx) window.sfx.perfect(); } catch(_e){}
+      if(window.haptics) window.haptics.perfect();
       if(!_reduced()){
         try { if(typeof window.megaConfetti === 'function') window.megaConfetti(); else if(typeof window.launchBigConfetti === 'function') window.launchBigConfetti(); } catch(_e){}
       }
@@ -280,8 +281,8 @@
     if(act === 'choice'){
       var i = +btn.getAttribute('data-i');
       var ok = (i === q.answer) || (q.choices[i] === q.answer);
-      if(ok){ btn.classList.add('ex-right'); if(window.sfx) window.sfx.correct(); _say(_run.host, q.explain || 'Nice!', true); _disableGroup(_run.host, '.ex-choice'); setTimeout(_advance, _reduced() ? 700 : 850); }
-      else { _markWrong(); if(window.sfx) window.sfx.tryAgain(); _nudge(btn); btn.classList.add('ex-off'); _say(_run.host, 'Not quite — try again, you’ve got this.', false); }
+      if(ok){ btn.classList.add('ex-right'); if(window.sfx) window.sfx.correct(); if(window.haptics) window.haptics.correct(); _say(_run.host, q.explain || 'Nice!', true); _disableGroup(_run.host, '.ex-choice'); setTimeout(_advance, _reduced() ? 700 : 850); }
+      else { _markWrong(); if(window.sfx) window.sfx.tryAgain(); if(window.haptics) window.haptics.wrong(); _nudge(btn); btn.classList.add('ex-off'); _say(_run.host, 'Not quite — try again, you’ve got this.', false); }
       return;
     }
 
@@ -297,11 +298,13 @@
         [st.sel.el, btn].forEach(function(el){ el.classList.remove('ex-sel'); el.classList.add('ex-right'); el.setAttribute('disabled',''); el.setAttribute('aria-pressed','false'); });
         st.sel = null;
         if(window.sfx) window.sfx.correct();
+        if(window.haptics) window.haptics.correct();
         if(Object.keys(st.matched).length === q.pairs.length){ _say(_run.host, q.explain || 'All matched!', true); setTimeout(_advance, _reduced() ? 700 : 850); }
         else { _say(_run.host, 'Match!', true); }
       } else {
         _markWrong();
         if(window.sfx) window.sfx.tryAgain();
+        if(window.haptics) window.haptics.wrong();
         var a = st.sel.el, b = btn; _nudge(a); _nudge(b); a.classList.remove('ex-sel'); a.setAttribute('aria-pressed','false'); st.sel = null;
         _say(_run.host, 'Those don’t match — try again.', false);
       }
@@ -328,12 +331,12 @@
       if(q.type === 'word'){
         var want = (q.answer || []).slice().sort().join(',');
         var got = Object.keys(_run.qstate.sel).map(Number).sort(function(a,b){ return a-b; }).join(',');
-        if(want === got){ if(window.sfx) window.sfx.correct(); _say(_run.host, q.explain || 'Exactly!', true); _disableGroup(_run.host, '.ex-word'); btn.setAttribute('disabled',''); setTimeout(_advance, _reduced() ? 700 : 850); }
-        else { _markWrong(); if(window.sfx) window.sfx.tryAgain(); _nudge(_run.host.querySelector('.ex-words')); _say(_run.host, 'Close — adjust your picks and check again.', false); }
+        if(want === got){ if(window.sfx) window.sfx.correct(); if(window.haptics) window.haptics.correct(); _say(_run.host, q.explain || 'Exactly!', true); _disableGroup(_run.host, '.ex-word'); btn.setAttribute('disabled',''); setTimeout(_advance, _reduced() ? 700 : 850); }
+        else { _markWrong(); if(window.sfx) window.sfx.tryAgain(); if(window.haptics) window.haptics.wrong(); _nudge(_run.host.querySelector('.ex-words')); _say(_run.host, 'Close — adjust your picks and check again.', false); }
       } else if(q.type === 'order'){
         var ans = (q.answer || []).join(','), cur = _run.qstate.order.join(',');
-        if(ans === cur){ if(window.sfx) window.sfx.correct(); _say(_run.host, q.explain || 'Right order!', true); _disableGroup(_run.host, '.ex-omove'); btn.setAttribute('disabled',''); setTimeout(_advance, _reduced() ? 700 : 850); }
-        else { _markWrong(); if(window.sfx) window.sfx.tryAgain(); _nudge(_run.host.querySelector('.ex-order')); _say(_run.host, 'Not the right order yet — try again.', false); }
+        if(ans === cur){ if(window.sfx) window.sfx.correct(); if(window.haptics) window.haptics.correct(); _say(_run.host, q.explain || 'Right order!', true); _disableGroup(_run.host, '.ex-omove'); btn.setAttribute('disabled',''); setTimeout(_advance, _reduced() ? 700 : 850); }
+        else { _markWrong(); if(window.sfx) window.sfx.tryAgain(); if(window.haptics) window.haptics.wrong(); _nudge(_run.host.querySelector('.ex-order')); _say(_run.host, 'Not the right order yet — try again.', false); }
       }
       return;
     }

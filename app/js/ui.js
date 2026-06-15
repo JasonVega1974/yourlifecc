@@ -855,6 +855,19 @@ function openSettings(anchorId){
   // WC-D2 (2026-06-14): unified sound-effects toggle, backed by D.soundEnabled.
   const _ssEl=document.getElementById('tg-soundEnabled');
   if(_ssEl) _ssEl.classList.toggle('on', !!D.soundEnabled);
+  // WC-D3 (2026-06-14): Vibration toggle — render + hydrate ONLY where the
+  // Vibration API exists (Android-Chromium). Hidden on iOS / Firefox 129+ so
+  // it's never a dead switch.
+  const _vibRow=document.getElementById('feedbackVibrationRow');
+  if(_vibRow){
+    if(typeof navigator!=='undefined' && ('vibrate' in navigator)){
+      _vibRow.style.display='';
+      const _hEl=document.getElementById('tg-hapticsEnabled');
+      if(_hEl) _hEl.classList.toggle('on', !!D.hapticsEnabled);
+    } else {
+      _vibRow.style.display='none';
+    }
+  }
   // Email Bundle (2026-06-08) — Email Preferences section hydration.
   // Sets per-tier visibility for all 4 toggles + status badges via
   // _hydrateEmailPrefsSettings() in parent.js. Replaces the previous

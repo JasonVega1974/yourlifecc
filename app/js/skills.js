@@ -3446,9 +3446,11 @@ let _quizPowerExpired = false;
 // on a right answer, _skPlayWrong on a wrong one, _skPlayPass on a quiz
 // pass) while the synthesis, the single D.soundEnabled gate, and the shared
 // AudioContext all live in sfx.js. No local AudioContext here anymore.
-function _skPlayCorrect(){ if(window.sfx) window.sfx.correct(); }
-function _skPlayWrong(){ if(window.sfx) window.sfx.tryAgain(); }
-function _skPlayPass(){ if(window.sfx) window.sfx.perfect(); }
+// WC-D3: haptics ride alongside the sound here, so every existing call
+// site (correct answer / wrong answer / quiz pass) mirrors both modalities.
+function _skPlayCorrect(){ if(window.sfx) window.sfx.correct(); if(window.haptics) window.haptics.correct(); }
+function _skPlayWrong(){ if(window.sfx) window.sfx.tryAgain(); if(window.haptics) window.haptics.wrong(); }
+function _skPlayPass(){ if(window.sfx) window.sfx.perfect(); if(window.haptics) window.haptics.perfect(); }
 
 // Settings → 🔊 Sound effects toggle handler (WC-D2: ONE toggle, backed by
 // D.soundEnabled, which absorbed the retired skillsSound). Wired from the
@@ -3467,6 +3469,21 @@ function toggleSound(btn){
 // Back-compat alias — a stale cached app shell may still call the old name.
 function toggleSkillsSound(btn){ return toggleSound(btn); }
 
+// Settings → 📳 Vibration toggle handler (WC-D3). Separate, silent modality
+// backed by D.hapticsEnabled. The row is only rendered where navigator.vibrate
+// exists (openSettings() in ui.js), so this is never a dead switch. A tiny
+// confirm buzz on enable rides the explicit user gesture.
+function toggleHaptics(btn){
+  if(typeof D === 'undefined' || !D) return;
+  D.hapticsEnabled = !D.hapticsEnabled;
+  if(btn) btn.classList.toggle('on', !!D.hapticsEnabled);
+  if(typeof save === 'function') save();
+  if(D.hapticsEnabled && window.haptics) window.haptics.correct();
+  if(typeof showToast === 'function'){
+    showToast(D.hapticsEnabled ? 'Vibration ON 📳' : 'Vibration OFF');
+  }
+}
+
 // ─── Combo escalation FX ─────────────────────────────────────
 // Fires at streak 3 / 5 / 7. Banner is body-appended, auto-removed
 // after the animation completes. Screen flash (streak 7) uses an
@@ -3482,8 +3499,9 @@ function _skTriggerCombo(streak){
     emoji = '🌟';
     _skScreenFlash(col);
   } else return;
-  // WC-D2: streak blip rides this genuine combo milestone (banner + confetti below)
+  // WC-D2/D3: streak blip + buzz ride this genuine combo milestone (banner + confetti below)
   if(window.sfx) window.sfx.streak();
+  if(window.haptics) window.haptics.streak();
   const banner = document.createElement('div');
   banner.className = 'sk-combo-banner';
   banner.style.setProperty('--combo-accent', col);
