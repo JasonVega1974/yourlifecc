@@ -506,6 +506,7 @@ const SK_SPECS = {
               "Optional once the car is paid off"
             ] } },
           { type:'keyIdea', title:'State minimums are dangerously low', text:"Liability is written as three numbers — 25/50/25 means $25k per injured person, $50k per accident, $25k property. A serious crash can top $100k, and a judgment beyond your limits exposes your savings and future wages. Consider 100/300/100 or higher if you have assets." },
+          { type:'diagram', kind:'liabilityLimits' },
           { type:'list', style:'check', items:[
             { strong:'Uninsured/underinsured motorist:', text:"about 1 in 8 drivers is uninsured — this is cheap and covers a very real risk. Recommended." },
             { strong:'Medical payments / PIP:', text:"pays your and your passengers' medical bills regardless of fault; required in no-fault states." },
@@ -743,6 +744,7 @@ const SK_SPECS = {
         blocks:[
           { type:'lead', text:"Meal prep isn't eating sad identical containers every day. It's doing the slow, boring parts of cooking once so that putting a meal together on a Tuesday night takes 5 minutes instead of 45." },
           { type:'keyIdea', title:'Cook components, not meals', text:"Spend ~90 minutes on Sunday cooking building blocks, then assemble different meals from them all week — you're never eating the same exact plate twice." },
+          { type:'diagram', kind:'mealMatrix' },
           { type:'list', style:'check', items:[
             { strong:'1 grain or starch', text:"— a big batch of rice, quinoa, or roasted potatoes (keeps ~5 days)." },
             { strong:'1–2 proteins', text:"— a tray of chicken thighs (425°F, 25 min), ground beef, or hard-boiled eggs (keeps ~4 days)." },
@@ -785,6 +787,7 @@ const SK_SPECS = {
             { strong:'Buy protein in bulk and freeze;', text:"eggs and dried beans/lentils are cheap, complete nutrition." }
           ] },
           { type:'keyIdea', title:'Shop the perimeter first', text:"The outer ring — produce, meat, dairy, eggs — is where you build real meals. The center aisles hold the most-processed, highest-margin food. Fill your cart on the perimeter before you head into the middle." },
+          { type:'diagram', kind:'storePerimeter' },
           { type:'takeaways', items:[
             "Plan meals, check your pantry, and never shop hungry.",
             "Store brands, unit pricing, and frozen veg cut the bill without cutting nutrition.",

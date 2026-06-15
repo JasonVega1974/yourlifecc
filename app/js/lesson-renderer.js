@@ -487,6 +487,57 @@
         + '<text x="266" y="16" text-anchor="end" font-size="9.5" font-weight="700" fill="var(--gr,#34d399)">↑ over decades</text>'
         + '<text x="12" y="135" font-size="8" fill="var(--tx3)">Illustrative — not real data or a return prediction.</text>'
         + '</svg>';
+    },
+    // Store map — perimeter (whole foods) highlighted vs the center
+    // packaged-food aisles. "Shop the perimeter first."
+    storePerimeter: function(cfg, ctx){
+      var P = '#34d399';
+      return '<svg viewBox="0 0 240 180" class="lr-svg lr-svg--wide" role="img" aria-label="A store map: shop the perimeter — produce, meat and seafood, dairy, eggs and bakery — for whole foods, before the center packaged-food aisles">'
+        + '<rect x="10" y="12" width="220" height="154" rx="6" fill="' + P + '" fill-opacity="0.16" stroke="' + P + '" stroke-width="2"/>'
+        + '<rect x="58" y="50" width="124" height="78" rx="4" fill="var(--s3)" stroke="var(--br)" stroke-width="1.5"/>'
+        + '<g stroke="var(--tx3)" stroke-width="1.5" opacity=".45"><line x1="90" y1="56" x2="90" y2="122"/><line x1="120" y1="56" x2="120" y2="122"/><line x1="150" y1="56" x2="150" y2="122"/></g>'
+        + '<text x="120" y="84" text-anchor="middle" font-size="9.5" font-weight="700" fill="var(--tx2)">Center aisles</text>'
+        + '<text x="120" y="96" text-anchor="middle" font-size="8" fill="var(--tx3)">packaged &amp; processed</text>'
+        + '<text x="120" y="35" text-anchor="middle" font-size="10" font-weight="800" fill="' + P + '">Produce</text>'
+        + '<text x="120" y="152" text-anchor="middle" font-size="10" font-weight="800" fill="' + P + '">Dairy</text>'
+        + '<text x="34" y="86" text-anchor="middle" font-size="9" font-weight="800" fill="' + P + '">Eggs &amp;</text><text x="34" y="97" text-anchor="middle" font-size="9" font-weight="800" fill="' + P + '">bakery</text>'
+        + '<text x="206" y="86" text-anchor="middle" font-size="9" font-weight="800" fill="' + P + '">Meat &amp;</text><text x="206" y="97" text-anchor="middle" font-size="9" font-weight="800" fill="' + P + '">seafood</text>'
+        + '<text x="120" y="177" text-anchor="middle" font-size="8" fill="var(--tx3)">Shop the perimeter first — fill the cart before the middle</text>'
+        + '</svg>';
+    },
+    // 25/50/25 liability limits — per-person vs per-accident vs property,
+    // with the 100/300/100 step-up.
+    liabilityLimits: function(cfg, ctx){
+      function box(v, tag, cap, col){
+        return '<div class="lr-ll__box"><div class="lr-ll__v" style="color:' + col + ';">$' + v + 'k</div>'
+          + '<div class="lr-ll__tag">' + tag + '</div><div class="lr-ll__cap">' + cap + '</div></div>';
+      }
+      return '<div class="lr-ll">'
+        + '<div class="lr-ll__row">'
+        +   box('25', 'per person', 'Bodily injury — the most paid to each injured person', '#60a5fa')
+        +   box('50', 'per accident', 'Bodily injury — total cap for everyone hurt in the crash', '#fbbf24')
+        +   box('25', 'property', "Damage to other people's cars or property", '#34d399')
+        + '</div>'
+        + '<div class="lr-ll__note">Written as <b>25 / 50 / 25</b>. State minimums are low — a common safer step-up is <b>100 / 300 / 100</b>.</div>'
+        + '</div>';
+    },
+    // Meal-prep matrix — the same prepped components recombined into a
+    // different meal each day (grain / protein / veg / sauce).
+    mealMatrix: function(cfg, ctx){
+      var head = ['', 'Grain', 'Protein', 'Veg', 'Sauce'];
+      var rows = [
+        ['Mon', 'Rice', 'Chicken', 'Broccoli', 'Teriyaki'],
+        ['Tue', '—', 'Chicken', 'Salad', 'Dressing'],
+        ['Wed', 'Quinoa', 'Egg', 'Roasted veg', '—'],
+        ['Thu', 'Pasta', '—', 'Tomato', 'Marinara'],
+        ['Fri', 'Rice', 'Beef', 'Stir-fry', 'Soy-ginger']
+      ];
+      var hh = head.map(function(h, i){ return '<div class="lr-mm__h' + (i === 0 ? ' lr-mm__day' : '') + '">' + h + '</div>'; }).join('');
+      var rr = rows.map(function(r){ return r.map(function(c, i){ return '<div class="lr-mm__c' + (i === 0 ? ' lr-mm__day' : '') + '">' + c + '</div>'; }).join(''); }).join('');
+      return '<div class="lr-mm" role="img" aria-label="A week of meals built from the same prepped components — grain, protein, vegetable, and sauce — recombined into a different meal each day">'
+        + '<div class="lr-mm__grid">' + hh + rr + '</div>'
+        + '<div class="lr-mm__cap">Prep the components once, then recombine grain + protein + veg + sauce into a different meal each night.</div>'
+        + '</div>';
     }
   };
 

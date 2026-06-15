@@ -10384,3 +10384,26 @@ body:has(#s-parent.sec.active #parentCelestialHome:not(.pch-entered):not(.pch-cl
 @keyframes lrDraw{from{stroke-dashoffset:var(--len,330);}to{stroke-dashoffset:0;}}
 .lr-mline--draw{stroke-dasharray:var(--len,330);stroke-dashoffset:0;animation:lrDraw 1.7s ease-out;}
 @media (prefers-reduced-motion:reduce){.lr-mline--draw{animation:none;stroke-dasharray:none;}}
+
+/* ── Visual pass final batch: liabilityLimits · mealMatrix ──────────────
+   (storePerimeter is pure SVG on .lr-svg — no extra CSS needed.) */
+
+/* liabilityLimits — three labeled limit cards + step-up note */
+.lr-ll{display:flex;flex-direction:column;gap:.5rem;}
+.lr-ll__row{display:flex;gap:.5rem;}
+.lr-ll__box{flex:1 1 0;background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:.55rem .4rem;text-align:center;}
+.lr-ll__v{font-size:1.25rem;font-weight:900;line-height:1;}
+.lr-ll__tag{font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--tx2);margin:.15rem 0;}
+.lr-ll__cap{font-size:.58rem;color:var(--tx3);line-height:1.2;}
+.lr-ll__note{font-size:.7rem;color:var(--tx2);line-height:1.4;}
+.lr-ll__note b{color:var(--tx);}
+@media (max-width:380px){.lr-ll__v{font-size:1.05rem;}}
+:root.light .lr-ll__box{box-shadow:0 3px 10px rgba(31,24,16,.05);}
+
+/* mealMatrix — day × component grid */
+.lr-mm__grid{display:grid;grid-template-columns:auto repeat(4,1fr);gap:1.5px;background:var(--br);border:1px solid var(--br);border-radius:8px;overflow:hidden;}
+.lr-mm__c,.lr-mm__h{background:var(--s1);padding:.32rem .22rem;font-size:.58rem;text-align:center;line-height:1.15;color:var(--tx);display:flex;align-items:center;justify-content:center;}
+.lr-mm__h{background:var(--s2);font-weight:800;color:var(--tx2);font-size:.55rem;text-transform:uppercase;letter-spacing:.02em;}
+.lr-mm__day{background:var(--s2);font-weight:800;color:var(--tx2);}
+.lr-mm__cap{font-size:.62rem;color:var(--tx3);margin-top:.4rem;line-height:1.35;}
+:root.light .lr-mm__grid{box-shadow:0 3px 10px rgba(31,24,16,.05);}
