@@ -558,6 +558,51 @@
     return { std:t.std, taxable:taxable, tax:tax, marginal:marginal, eff:(income > 0 ? tax / income : 0), rows:rows };
   }
 
+  // ── Reusable animated growth chart ──────────────────────────
+  // Stacked bands (cumulative contributions, then growth on top) with an
+  // animated total-balance line. PRESENTATIONAL ONLY — the caller passes the
+  // already-computed points, so the chart can never disagree with the
+  // widget's numbers. Reusable for loan / payoff curves later.
+  //   data.points: [{ contrib, total }]  (total >= contrib; last point = endpoint)
+  //   data.endIn / data.endTotal: money strings for the "$X in → $Y total" note
+  //   data.years, data.lowerLabel, data.upperLabel, data.aria
+  //   animate=true → the total line draws left-to-right via stroke-dashoffset.
+  function growthChart(data, animate){
+    var pts = (data && data.points) || [];
+    var n = pts.length;
+    if(n < 2) return '';
+    var W = 300, H = 158, padL = 8, padR = 8, padT = 18, padB = 18;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var yMax = 0; for(var k = 0; k < n; k++){ if(pts[k].total > yMax) yMax = pts[k].total; }
+    yMax = yMax > 0 ? yMax * 1.06 : 1;
+    function X(i){ return padL + (i / (n - 1)) * plotW; }
+    function Y(v){ return padT + plotH - (Math.max(0, v) / yMax) * plotH; }
+    var yBase = Y(0), cTop = [], tTop = [];
+    for(var i = 0; i < n; i++){ cTop.push(X(i).toFixed(1) + ' ' + Y(pts[i].contrib).toFixed(1)); tTop.push(X(i).toFixed(1) + ' ' + Y(pts[i].total).toFixed(1)); }
+    var contribArea = 'M' + X(0).toFixed(1) + ' ' + yBase.toFixed(1) + ' L' + cTop.join(' L') + ' L' + X(n - 1).toFixed(1) + ' ' + yBase.toFixed(1) + ' Z';
+    var growthArea = 'M' + cTop.join(' L') + ' L' + tTop.slice().reverse().join(' L') + ' Z';
+    var totalLine = 'M' + tTop.join(' L');
+    var ex = X(n - 1), ey = Y(pts[n - 1].total);
+    var accent = 'var(--lr-accent,#10b981)';
+    var yrs = (data && data.years != null) ? data.years : (n - 1);
+    var endNote = (data && data.endTotal) ? '<text x="' + (W - padR) + '" y="' + (ey > 30 ? (ey - 7).toFixed(1) : (ey + 12).toFixed(1)) + '" text-anchor="end" font-size="9.5" font-weight="800" fill="var(--tx)">' + esc((data.endIn || '') + ' in → ' + data.endTotal + ' total') + '</text>' : '';
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" class="lr-svg lr-gchart" role="img" aria-label="' + esc((data && data.aria) || 'Illustrative growth-over-time graph') + '">'
+      + '<line x1="' + padL + '" y1="' + yBase.toFixed(1) + '" x2="' + (W - padR) + '" y2="' + yBase.toFixed(1) + '" stroke="var(--br)" stroke-width="1"/>'
+      + '<path d="' + contribArea + '" fill="#64748b" fill-opacity="0.5"/>'
+      + '<path d="' + growthArea + '" fill="' + accent + '" fill-opacity="0.28"/>'
+      + '<path d="' + totalLine + '" fill="none" stroke="' + accent + '" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" pathLength="1"' + (animate ? ' class="lr-gchart__draw"' : '') + '/>'
+      + '<circle cx="' + ex.toFixed(1) + '" cy="' + ey.toFixed(1) + '" r="3.2" fill="' + accent + '"/>'
+      + endNote
+      + '<text x="' + padL + '" y="' + (H - 5) + '" font-size="8.5" fill="var(--tx3)">0</text>'
+      + '<text x="' + (W - padR) + '" y="' + (H - 5) + '" text-anchor="end" font-size="8.5" fill="var(--tx3)">' + yrs + ' yrs</text>'
+      + '</svg>';
+    var legend = '<div class="lr-brk__legend" style="justify-content:center;">'
+      + '<div class="lr-brk__leg"><span class="lr-brk__dot" style="background:#64748b;"></span><b>' + esc((data && data.lowerLabel) || 'You contributed') + '</b></div>'
+      + '<div class="lr-brk__leg"><span class="lr-brk__dot" style="background:' + accent + ';"></span><b>' + esc((data && data.upperLabel) || 'Growth') + '</b></div>'
+      + '</div>';
+    return svg + legend;
+  }
+
   var WIDGETS = {
     taxCalculator: function(mountEl, config){
       var income = (config && config.income) || 60000;
@@ -618,7 +663,7 @@
       var $m = mountEl.querySelector('.cg-m'), $s = mountEl.querySelector('.cg-s'),
           $r = mountEl.querySelector('.cg-r'), $y = mountEl.querySelector('.cg-y'),
           $out = mountEl.querySelector('.lr-calc__out');
-      function render(){
+      function render(firstTime){
         var pmt = Math.max(0, parseFloat($m.value) || 0);
         var years = Math.max(0, (parseFloat($r.value) || 0) - (parseFloat($s.value) || 0));
         var n = years * 12;
@@ -626,23 +671,29 @@
         var fv = (rate > 0) ? pmt * ((Math.pow(1 + rate, n) - 1) / rate) : pmt * n;
         var put = pmt * n;
         var growth = Math.max(0, fv - put);
-        var gp = fv > 0 ? (growth / fv) * 100 : 0, pp = 100 - gp;
+        // Sample the SAME annuity curve for the chart. The last sample is at
+        // month n, so its total equals fv exactly — chart and stat agree.
+        var SEG = Math.max(8, Math.min(60, Math.round(years)));
+        var pts = [];
+        for(var j = 0; j <= SEG; j++){
+          var mo = (j / SEG) * n;
+          var bal = (rate > 0) ? pmt * ((Math.pow(1 + rate, mo) - 1) / rate) : pmt * mo;
+          pts.push({ contrib: pmt * mo, total: bal });
+        }
+        var animate = !!firstTime && !_reduced();   // draw on first render only; static on input
         $out.innerHTML =
           '<div class="lr-calc__stats">'
           +   '<div class="lr-calc__stat"><div class="lr-calc__sv">' + money(fv) + '</div><div class="lr-calc__sl">at age ' + (parseInt($r.value, 10) || 0) + '</div></div>'
           +   '<div class="lr-calc__stat"><div class="lr-calc__sv">' + money(put) + '</div><div class="lr-calc__sl">you put in</div></div>'
           +   '<div class="lr-calc__stat"><div class="lr-calc__sv">' + money(growth) + '</div><div class="lr-calc__sl">growth</div></div>'
           + '</div>'
-          + '<div class="lr-brk__bar" style="margin-top:.5rem;">'
-          +   '<div class="lr-brk__seg" style="width:' + pp.toFixed(1) + '%;background:#64748b;"></div>'
-          +   '<div class="lr-brk__seg" style="width:' + gp.toFixed(1) + '%;background:var(--lr-accent,#10b981);"></div>'
-          + '</div>'
-          + '<div class="lr-brk__legend"><div class="lr-brk__leg"><span class="lr-brk__dot" style="background:#64748b;"></span><b>Contributions</b></div>'
-          +   '<div class="lr-brk__leg"><span class="lr-brk__dot" style="background:var(--lr-accent,#10b981);"></span><b>Compound growth</b></div></div>'
-          + '<div class="lr-calc__note">' + Math.round(years) + ' years of investing · estimate, monthly compounding.</div>';
+          + growthChart({ points: pts, endIn: money(put), endTotal: money(fv), years: Math.round(years),
+              lowerLabel: 'You contributed', upperLabel: 'Growth',
+              aria: 'Illustrative graph of an investment growing over ' + Math.round(years) + ' years — your contributions versus compound growth; the widening gap is the growth' }, animate)
+          + '<div class="lr-calc__note">' + Math.round(years) + ' years of investing · estimate, monthly compounding. Illustrative.</div>';
       }
-      [$m, $s, $r, $y].forEach(function(el){ el.addEventListener('input', render); });
-      render();
+      [$m, $s, $r, $y].forEach(function(el){ el.addEventListener('input', function(){ render(false); }); });
+      render(true);
     },
 
     // 4%-rule retirement target — annual spending → the nest egg you need.
@@ -1132,6 +1183,6 @@
   }
 
   if(typeof window !== 'undefined'){
-    window.lessonRenderer = { mount: mount, fromLegacy: fromLegacy, composeModule: composeModule, blocks: BLOCKS, viz: VIZ, diagrams: DIAGRAMS, widgets: WIDGETS, computeTax: computeTax };
+    window.lessonRenderer = { mount: mount, fromLegacy: fromLegacy, composeModule: composeModule, blocks: BLOCKS, viz: VIZ, diagrams: DIAGRAMS, widgets: WIDGETS, growthChart: growthChart, computeTax: computeTax };
   }
 })();

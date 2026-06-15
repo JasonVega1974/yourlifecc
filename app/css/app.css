@@ -10439,3 +10439,10 @@ body:has(#s-parent.sec.active #parentCelestialHome:not(.pch-entered):not(.pch-cl
 .ff-fa-item--picked .ff-fa-item__act{color:var(--gr,#34d399);}
 :root.light .ff-fa-card{box-shadow:0 4px 16px rgba(31,24,16,.06);}
 @media (prefers-reduced-motion:reduce){.ff-fa-item{transition:none;}}
+
+/* ── Reusable animated growth chart (compound-growth showcase) ──────────── */
+.lr-gchart{width:100%;height:auto;display:block;max-width:340px;margin:.45rem auto .15rem;}
+@keyframes lrGchartDraw{from{stroke-dashoffset:1;}to{stroke-dashoffset:0;}}
+.lr-gchart__draw{stroke-dasharray:1;stroke-dashoffset:0;animation:lrGchartDraw 1.5s ease-out;}
+:root.light .lr-gchart [fill="#64748b"]{fill:#475569;}
+@media (prefers-reduced-motion:reduce){.lr-gchart__draw{animation:none;stroke-dasharray:none;}}
