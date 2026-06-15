@@ -5370,6 +5370,11 @@
        by renderSkillsDomains() in skills.js from the SK_DOMAINS map.
        Sits above the grid; tapping a card filters #skillsGrid below
        to that domain. Tapping the active card (or "All") clears it. -->
+  <!-- Reach: full-app awareness card — faith_free only, populated by
+       _skRenderFullAppCard() in skills.js; gated by the crossover banner
+       eligibility (faith_free + not dismissed). Empty + hidden otherwise. -->
+  <div id="ffFullAppCard" style="display:none;"></div>
+
   <div id="skDomainStrip" aria-label="Filter by skill domain"></div>
 
   <!-- Category grid — Phase 5.8 Pass C uses the global .topic-card-grid pattern -->

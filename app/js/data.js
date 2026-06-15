@@ -163,6 +163,13 @@ const DEF = {
   // CTA also flips emailPrefs.crossoverOptOut=false (the live soft-invite).
   academyInterest:false,
   academyInterestAt:null,
+  // 2026-06-15 — Reach: full-app "tap to pick" awareness (faith_free only).
+  // Each tap on the in-academy awareness card records per-feature interest
+  // here, top-level so it's aggregate-countable from PostgREST WITHOUT a
+  // migration, e.g. profiles?select=user_id&data->fullAppInterest->>parentHub=eq.true
+  // The 'moneyModules' key stays consistent with academyInterest above.
+  fullAppInterest:{},
+  fullAppInterestAt:null,
   // streak / checkin
   streak:0, lastCheckin:null, checkin:{}, customHabits:[], dailyChecks:{},
   // V1 Rebuild — Session 1 (Daily Briefing). Keyed by YYYY-MM-DD; per-day

@@ -4360,6 +4360,8 @@ function buildSkillsGrid(filter){
       <div class="topic-card-desc">${desc}</div>
     </div>`;
   }).join('');
+  // Reach: faith_free full-app awareness card (no-op for every other tier).
+  if(typeof _skRenderFullAppCard === 'function') _skRenderFullAppCard();
 }
 
 // ── Phase 5.8 Pass C helpers — inline modal mode for Life Skills ────────
@@ -4392,6 +4394,9 @@ function _skillsHideGridView(){
   if(search && search.parentElement) search.parentElement.style.display = 'none';
   const pb = document.getElementById('skillsPBBalance');
   if(pb && pb.parentElement) pb.parentElement.style.display = 'none';
+  // Reach: hide the full-app awareness card while a category is open inline.
+  const fac = document.getElementById('ffFullAppCard');
+  if(fac) fac.style.display = 'none';
 }
 
 function _skillsShowGridView(){
@@ -4401,6 +4406,8 @@ function _skillsShowGridView(){
   if(search && search.parentElement) search.parentElement.style.display = '';
   const pb = document.getElementById('skillsPBBalance');
   if(pb && pb.parentElement) pb.parentElement.style.display = '';
+  // Reach: restore the full-app awareness card per current eligibility.
+  if(typeof _skRenderFullAppCard === 'function') _skRenderFullAppCard();
 }
 
 function _skillsInjectBackBtn(){
@@ -4483,6 +4490,88 @@ function academyNotifyInterest(key, btn){
     if(cta) cta.outerHTML = '<div class="sk-lock-panel__ack">✓ Got it — we’ll let you know the moment the full Academy opens up for you.</div>';
   }
   if(typeof showToast === 'function') showToast('Thanks — we’ll keep you posted ✨');
+}
+
+// ── Reach: full-app "tap to pick" awareness card (faith_free only) ────────
+// Honest list of real full-app features, each with one soft "I'd want this"
+// tap. Hosted in the academy, gated by the crossover banner machinery
+// (faith_free + not dismissed). Every other tier never sees it.
+const _FULL_APP_FEATURES = [
+  { key:'moneyManager', icon:'💰', label:'Money Manager',                 desc:'Track your money, set a budget, and watch your savings grow.' },
+  { key:'goalsHabits',  icon:'🎯', label:'Goals & Habits',                desc:'Set real goals and build daily habits that stick.' },
+  { key:'moneyModules', icon:'📈', label:'Money modules in the Academy',  desc:'Unlock the Taxes, Investing, and Credit lessons.' },
+  { key:'journalMood',  icon:'✍️', label:'Journal & Mood',                desc:'A private journal and mood tracker for the hard days and the good ones.' },
+  { key:'jobsResume',   icon:'📄', label:'Jobs & Resume',                 desc:'Build a resume and get ready for your first job.' }
+];
+
+function _skFullAppPicked(key){
+  const fi = (typeof D !== 'undefined' && D && D.fullAppInterest) || {};
+  // 'moneyModules' agrees with the academyInterest flag set by the locked-
+  // category CTA — never contradicts it.
+  return fi[key] === true || (key === 'moneyModules' && typeof D !== 'undefined' && D && D.academyInterest === true);
+}
+
+function _skRenderFullAppCard(){
+  const card = document.getElementById('ffFullAppCard');
+  if(!card) return;
+  // Eligibility = the revived crossover banner machinery: faith_free only,
+  // and only until dismissed (emailPrefs.crossoverBannerShown).
+  const pe = (typeof _emailPrefsEnsure === 'function') ? _emailPrefsEnsure()
+           : (typeof D !== 'undefined' && D ? D.emailPrefs : null);
+  const dismissed = !!(pe && pe.crossoverBannerShown === true);
+  if(window._faithFree !== true || dismissed){ card.style.display = 'none'; card.innerHTML = ''; return; }
+  const esc = (typeof escapeHtml === 'function') ? escapeHtml : function(s){ return s; };
+  const rows = _FULL_APP_FEATURES.map(function(f){
+    const on = _skFullAppPicked(f.key);
+    return '<button class="ff-fa-item' + (on ? ' ff-fa-item--picked' : '') + '" type="button"'
+      + (on ? ' disabled' : '') + ' onclick="fullAppInterest(\'' + f.key + '\', this)">'
+      + '<span class="ff-fa-item__ic" aria-hidden="true">' + f.icon + '</span>'
+      + '<span class="ff-fa-item__txt"><b>' + esc(f.label) + '</b> ' + esc(f.desc) + '</span>'
+      + '<span class="ff-fa-item__act">' + (on ? '✓ On your list' : 'I’d want this') + '</span></button>';
+  }).join('');
+  card.innerHTML =
+    '<button class="ff-fa-card__x" type="button" onclick="_dismissFullAppCard(this)" aria-label="Dismiss">✕</button>'
+    + '<div class="ff-fa-card__title">What’s also in YourLife CC?</div>'
+    + '<div class="ff-fa-card__sub">You’re on the free Faith path. Here’s what the full app adds — tap anything you’d want and we’ll keep you posted. No pressure.</div>'
+    + '<div class="ff-fa-card__list">' + rows + '</div>';
+  card.style.display = '';
+}
+
+// One feature tap → record per-feature interest (countable), keep the
+// crossover soft-invite email on, gentle ack, no re-nag (button disables).
+function fullAppInterest(key, btn){
+  try {
+    if(typeof D !== 'undefined' && D){
+      if(!D.fullAppInterest || typeof D.fullAppInterest !== 'object') D.fullAppInterest = {};
+      D.fullAppInterest[key] = true;
+      if(!D.fullAppInterestAt) D.fullAppInterestAt = new Date().toISOString();
+      if(key === 'moneyModules') D.academyInterest = true;   // stay consistent with the locked-category CTA
+      if(!D.emailPrefs || typeof D.emailPrefs !== 'object') D.emailPrefs = {};
+      D.emailPrefs.crossoverOptOut = false;                  // existing soft-invite email surface
+    }
+    if(typeof save === 'function') save();
+    if(typeof cloudSync === 'function') cloudSync();
+  } catch(_e){}
+  if(btn){
+    btn.classList.add('ff-fa-item--picked');
+    btn.setAttribute('disabled', '');
+    const act = btn.querySelector('.ff-fa-item__act');
+    if(act) act.textContent = '✓ On your list';
+  }
+  if(typeof showToast === 'function') showToast('Added — we’ll keep you posted ✨');
+}
+
+// Dismiss the whole card — reuses the crossover banner's shown-once flag so
+// it stays gentle and never re-nags.
+function _dismissFullAppCard(btn){
+  try {
+    const p = (typeof _emailPrefsEnsure === 'function') ? _emailPrefsEnsure() : null;
+    if(p){ p.crossoverBannerShown = true; }
+    else if(typeof D !== 'undefined' && D){ if(!D.emailPrefs) D.emailPrefs = {}; D.emailPrefs.crossoverBannerShown = true; }
+    if(typeof save === 'function') save();
+  } catch(_e){}
+  const card = document.getElementById('ffFullAppCard');
+  if(card){ card.style.display = 'none'; card.innerHTML = ''; }
 }
 
 function openSkillCategory(key){
