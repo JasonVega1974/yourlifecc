@@ -115,6 +115,42 @@
       return '<figure class="lr-brk"><figcaption class="lr-brk__cap">2025 federal brackets · ' + esc(status === 'married' ? 'married filing jointly' : 'single filer') + '</figcaption>'
         + '<div class="lr-brk__bar">' + bar + '</div>'
         + '<div class="lr-brk__legend">' + legend + '</div></figure>';
+    },
+    // FICO score ranges 300–850 as a proportional band.
+    creditScoreBand: function(data){
+      var bands = [
+        { lo:300, hi:579, name:'Poor', color:'#ef4444' },
+        { lo:580, hi:669, name:'Fair', color:'#fb923c' },
+        { lo:670, hi:739, name:'Good', color:'#fbbf24' },
+        { lo:740, hi:799, name:'Very good', color:'#a3e635' },
+        { lo:800, hi:850, name:'Exceptional', color:'#34d399' }
+      ];
+      var total = 850 - 300;
+      var bar = bands.map(function(b){
+        var w = ((b.hi - b.lo + 1) / total) * 100;
+        return '<div class="lr-brk__seg" style="width:' + w.toFixed(1) + '%;background:' + b.color + ';" title="' + b.name + ' ' + b.lo + '–' + b.hi + '"><span class="lr-brk__rate">' + (w > 15 ? b.name : '') + '</span></div>';
+      }).join('');
+      var legend = bands.map(function(b){
+        return '<div class="lr-brk__leg"><span class="lr-brk__dot" style="background:' + b.color + ';"></span><b>' + b.lo + '–' + b.hi + '</b> <span>' + b.name + '</span></div>';
+      }).join('');
+      return '<figure class="lr-brk"><figcaption class="lr-brk__cap">FICO score ranges (300–850)</figcaption><div class="lr-brk__bar">' + bar + '</div><div class="lr-brk__legend">' + legend + '</div></figure>';
+    },
+    // The five FICO factors and their weights as a stacked 100% bar.
+    creditFactors: function(data){
+      var f = [
+        { name:'Payment history', pct:35, color:'#34d399' },
+        { name:'Utilization', pct:30, color:'#60a5fa' },
+        { name:'Length of history', pct:15, color:'#a78bfa' },
+        { name:'Credit mix', pct:10, color:'#fbbf24' },
+        { name:'New credit', pct:10, color:'#fb7185' }
+      ];
+      var bar = f.map(function(x){
+        return '<div class="lr-brk__seg" style="width:' + x.pct + '%;background:' + x.color + ';"><span class="lr-brk__rate">' + (x.pct >= 15 ? x.pct + '%' : '') + '</span></div>';
+      }).join('');
+      var legend = f.map(function(x){
+        return '<div class="lr-brk__leg"><span class="lr-brk__dot" style="background:' + x.color + ';"></span><b>' + x.pct + '%</b> <span>' + x.name + '</span></div>';
+      }).join('');
+      return '<figure class="lr-brk"><figcaption class="lr-brk__cap">What makes up your FICO score</figcaption><div class="lr-brk__bar">' + bar + '</div><div class="lr-brk__legend">' + legend + '</div></figure>';
     }
   };
 
@@ -548,6 +584,96 @@
       [$t, $m, $a].forEach(function(el){ el.addEventListener('input', upd); });
       $e.addEventListener('input', upd2);
       upd(); upd2();
+    },
+
+    // Credit-card payoff / minimum-payment trap. Honest amortization:
+    // interest = APR/12 on the running balance; the MINIMUM recomputes each
+    // month as max($25 floor, 1% of balance + that month's interest) — the
+    // common real-card formula that drops principal ~1%/month; a guard
+    // returns "never" when a payment can't cover the month's interest. (Kin
+    // to savingsGoal's month loop, but it runs in reverse with a recomputing
+    // payment, so it's its own engine.)
+    cardPayoff: function(mountEl, config){
+      var c = config || {};
+      var balance = c.balance || 3000, apr = (c.apr != null ? c.apr : 22), payment = c.payment || 150;
+      var PRINPCT = 0.01, FLOOR = 25;
+      mountEl.innerHTML =
+        '<div class="lr-calc">'
+        + '<div class="lr-calc__head">Credit-card payoff</div>'
+        + '<div class="lr-calc__controls">'
+        +   '<label class="lr-calc__field"><span>Balance</span><input type="number" class="cp-b" min="0" step="100" value="' + balance + '" inputmode="numeric"></label>'
+        +   '<label class="lr-calc__field"><span>APR %</span><input type="number" class="cp-r" min="0" max="40" step="0.1" value="' + apr + '" inputmode="decimal"></label>'
+        +   '<label class="lr-calc__field"><span>Your payment / mo</span><input type="number" class="cp-p" min="0" step="10" value="' + payment + '" inputmode="numeric"></label>'
+        + '</div><div class="lr-calc__out cp-out" aria-live="polite"></div>'
+        + '<div class="lr-calc__note">Minimum assumed at 1% of the balance plus that month\'s interest, or $25 — whichever is greater (a common card formula). General financial education, not personalized advice.</div>'
+        + '</div>';
+      var $b = mountEl.querySelector('.cp-b'), $r = mountEl.querySelector('.cp-r'), $p = mountEl.querySelector('.cp-p'), $o = mountEl.querySelector('.cp-out');
+      function sim(bal0, r12, mode, fixed){
+        var bal = bal0, months = 0, interest = 0;
+        while(bal > 0.005 && months < 1200){
+          var i = bal * r12;
+          var pay = (mode === 'min') ? Math.max(FLOOR, PRINPCT * bal + i) : fixed;
+          bal += i; interest += i;
+          if(pay > bal) pay = bal;
+          if(pay <= i) return { months:-1, interest:0, paid:0 };   // never amortizes
+          bal -= pay; months++;
+        }
+        return bal <= 0.005 ? { months:months, interest:interest, paid:bal0 + interest } : { months:-1, interest:0, paid:0 };
+      }
+      function fmt(m){ if(m < 0) return 'never'; var y = Math.floor(m / 12), mm = m % 12; return y ? (y + ' yr' + (mm ? ' ' + mm + ' mo' : '')) : (m + ' mo'); }
+      function stat(v, l, col){ return '<div class="lr-calc__stat"><div class="lr-calc__sv" style="color:' + col + ';">' + v + '</div><div class="lr-calc__sl">' + l + '</div></div>'; }
+      function block(label, res, col){
+        var t = res.months < 0 ? 'never' : fmt(res.months);
+        var intr = res.months < 0 ? '—' : money(res.interest);
+        var paid = res.months < 0 ? '—' : money(res.paid);
+        return '<div class="lr-calc__sub">' + label + '</div><div class="lr-calc__stats">'
+          + stat(t, 'to pay off', col) + stat(intr, 'interest', col) + stat(paid, 'total paid', col) + '</div>';
+      }
+      function render(){
+        var bal = Math.max(0, parseFloat($b.value) || 0), apr2 = Math.max(0, parseFloat($r.value) || 0), pay = Math.max(0, parseFloat($p.value) || 0);
+        var r12 = apr2 / 100 / 12;
+        var mn = sim(bal, r12, 'min'), fx = sim(bal, r12, 'fixed', pay);
+        var note = '';
+        if(mn.months > 0 && fx.months > 0){
+          var savedI = Math.max(0, mn.interest - fx.interest), savedM = mn.months - fx.months;
+          note = '<div class="lr-calc__note">Paying ' + money(pay) + '/mo instead of the minimum saves ' + money(savedI) + ' in interest and ' + fmt(savedM) + '.</div>';
+        } else if(fx.months < 0 && pay > 0){
+          note = '<div class="lr-calc__note">That payment doesn\'t cover the monthly interest — the balance never goes down. Pay more than the interest each month.</div>';
+        }
+        $o.innerHTML = block('Paying only the minimum', mn, '#ef4444') + block('Paying ' + money(pay) + ' / month', fx, '#34d399') + note;
+      }
+      [$b, $r, $p].forEach(function(el){ el.addEventListener('input', render); });
+      render();
+    },
+
+    // Credit utilization meter — balance ÷ limit, color-zoned, with the
+    // under-30% guideline marked.
+    utilizationMeter: function(mountEl, config){
+      var c = config || {};
+      var balance = c.balance || 1500, limit = c.limit || 5000;
+      mountEl.innerHTML =
+        '<div class="lr-calc">'
+        + '<div class="lr-calc__head">Credit utilization</div>'
+        + '<div class="lr-calc__controls">'
+        +   '<label class="lr-calc__field"><span>Card balance(s)</span><input type="number" class="um-b" min="0" step="50" value="' + balance + '" inputmode="numeric"></label>'
+        +   '<label class="lr-calc__field"><span>Total credit limit</span><input type="number" class="um-l" min="0" step="100" value="' + limit + '" inputmode="numeric"></label>'
+        + '</div>'
+        + '<div class="lr-util"><div class="lr-util__bar"><div class="lr-util__fill um-fill"></div><div class="lr-util__mark" style="left:30%;"></div><div class="lr-util__marklabel" style="left:30%;">30%</div></div></div>'
+        + '<div class="lr-calc__out um-out" aria-live="polite"></div>'
+        + '<div class="lr-calc__note">Under 30% is a widely-used guideline; under 10% is excellent. A guideline, not a rule.</div>'
+        + '</div>';
+      var $b = mountEl.querySelector('.um-b'), $l = mountEl.querySelector('.um-l'), $fill = mountEl.querySelector('.um-fill'), $o = mountEl.querySelector('.um-out');
+      function render(){
+        var b = Math.max(0, parseFloat($b.value) || 0), l = Math.max(0, parseFloat($l.value) || 0);
+        var u = l > 0 ? (b / l) * 100 : 0;
+        var col = u < 10 ? '#34d399' : u < 30 ? '#60a5fa' : u <= 50 ? '#f59e0b' : '#ef4444';
+        var label = u < 10 ? 'Excellent' : u < 30 ? 'Good' : u <= 50 ? 'High' : 'Very high';
+        $fill.style.width = Math.min(100, u).toFixed(1) + '%';
+        $fill.style.background = col;
+        $o.innerHTML = '<div class="lr-calc__stats"><div class="lr-calc__stat"><div class="lr-calc__sv" style="color:' + col + ';">' + u.toFixed(0) + '%</div><div class="lr-calc__sl">utilization · ' + label + '</div></div></div>';
+      }
+      [$b, $l].forEach(function(el){ el.addEventListener('input', render); });
+      render();
     }
   };
 

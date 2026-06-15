@@ -10294,3 +10294,14 @@ body:has(#s-parent.sec.active #parentCelestialHome:not(.pch-entered):not(.pch-cl
 .lr-split__amt{flex:0 0 auto;min-width:104px;text-align:right;font-weight:700;color:var(--tx);font-size:.78rem;}
 @media (max-width:430px){.lr-split__sub{display:none;}.lr-split__amt{min-width:88px;}}
 :root.light .lr-split__pctin{background:var(--s1);border-color:var(--br);}
+
+/* Credit module: utilization meter + payoff sub-labels. Reuses .lr-calc;
+   token-based; light + reduced-motion passes below. */
+.lr-calc__sub{font-size:.72rem;font-weight:700;color:var(--tx2);margin:.5rem 0 .3rem;}
+.lr-util{margin:.45rem 0 .1rem;}
+.lr-util__bar{position:relative;height:24px;border-radius:8px;background:var(--s1);border:1px solid var(--br);}
+.lr-util__fill{height:100%;border-radius:7px 0 0 7px;transition:width .2s ease, background .2s ease;}
+.lr-util__mark{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--tx2);}
+.lr-util__marklabel{position:absolute;top:-14px;transform:translateX(-50%);font-size:.56rem;color:var(--tx3);}
+:root.light .lr-util__mark{background:var(--tx3);}
+@media (prefers-reduced-motion:reduce){.lr-util__fill{transition:none;}}

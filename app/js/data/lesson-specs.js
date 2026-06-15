@@ -896,6 +896,165 @@ const SK_SPECS = {
         ]
       }
     ]
+  },
+
+  // ═══════════════════════════════════════════════════════════════════
+  // CREDIT & BANKING — full module elevated. cardPayoff (L4) is the
+  // headline; utilizationMeter (L2); creditScoreBand (L1) + creditFactors
+  // (L2) viz bars. Guidelines framed as guidelines; education-not-advice.
+  // ═══════════════════════════════════════════════════════════════════
+  credit: {
+    key: 'credit',
+    color: '#4ade80',
+    lessons: [
+      // ── L1 — What Is a Credit Score ──────────────────────────
+      {
+        id:'credit-score', matchTitle:'What Is a Credit Score — and Why It Controls More Than You Think',
+        title:'What Is a Credit Score — and Why It Controls More Than You Think', duration:'6 min',
+        blocks:[
+          { type:'lead', text:"Your credit score is a three-digit number from 300 to 850 — a financial reputation score. Lenders use it to decide whether to approve you and at what interest rate, but its reach goes well beyond borrowing." },
+          { type:'viz', kind:'creditScoreBand' },
+          { type:'list', style:'check', items:[
+            { strong:'Mortgage rate:', text:"a 760 might get 6.5% where a 620 gets 8.5% — about $180,000 more interest over 30 years on a $300k loan." },
+            { strong:'Auto loans, rent, utilities:', text:"poor credit can add $100–$200/month to a car payment, trigger apartment rejections, and require utility deposits." },
+            { strong:'Jobs and insurance:', text:"some finance/government/security roles check credit, and in most states your score affects car and home insurance rates." }
+          ] },
+          { type:'keyIdea', title:'FICO drives about 90% of lending', text:"You actually have several FICO versions — different ones for mortgages, auto loans, and cards — but they all come from the same underlying credit report." },
+          { type:'takeaways', items:[
+            "A 300–850 score quietly shapes borrowing, housing, some jobs, and insurance.",
+            "Higher scores mean lower rates — worth tens of thousands over a lifetime.",
+            "All your FICO versions trace back to one credit report."
+          ] },
+          { type:'tip', text:"Check your score free at CreditKarma or through your bank or card issuer — many now show a free FICO score. Checking your own is a \"soft inquiry\" and never affects your score; only a lender's \"hard inquiry\" causes a small temporary dip." },
+          { type:'check', q:"Does checking your own credit score lower it?", opts:[
+            "Yes, every check drops it a little",
+            "No — checking your own is a soft inquiry that doesn't affect your score",
+            "Only if you check more than once a month",
+            "Only hard inquiries from checking raise it"
+          ], ans:1, explain:"Looking at your own score is a soft inquiry with zero score impact. Only a lender's hard inquiry (when you apply for credit) causes a small, temporary dip." },
+          { type:'prose', html:'<p style="font-size:.72rem;color:var(--tx3);margin:0;">General financial education, not personalized financial advice. Guidelines like “pay in full” and “utilization under 30%” are common rules of thumb — adjust to your situation.</p>' }
+        ]
+      },
+
+      // ── L2 — The Five Factors ────────────────────────────────
+      {
+        id:'credit-factors', matchTitle:'The Five Factors That Build or Destroy Your Score',
+        title:'The Five Factors That Build or Destroy Your Score', duration:'7 min',
+        blocks:[
+          { type:'lead', text:"Your score isn't mysterious — it's calculated from five specific, weighted factors. Knowing them lets you build your score on purpose instead of guessing why it moved." },
+          { type:'viz', kind:'creditFactors' },
+          { type:'list', style:'check', items:[
+            { strong:'Payment history — 35%:', text:"on-time vs late, for up to 7 years. A single 30-day late can cost 50–100 points and lingers for years." },
+            { strong:'Utilization — 30%:', text:"how much of your available credit you're using; it updates every billing cycle." },
+            { strong:'Length of history — 15%:', text:"the age of your accounts — which is why closing old cards often hurts." },
+            { strong:'Credit mix — 10% & new credit — 10%:', text:"a variety of credit types helps slightly; each new application is a small temporary dip." }
+          ] },
+          { type:'widget', kind:'utilizationMeter', config:{ balance:1500, limit:5000 } },
+          { type:'keyIdea', title:'Utilization is the fastest lever you have', text:"Because it refreshes every cycle, paying a balance down (or raising a limit without spending more) can move your score within about 30 days. Aim under 30%; under 10% is excellent." },
+          { type:'takeaways', items:[
+            "Payment history (35%) and utilization (30%) are two-thirds of your score.",
+            "Never pay late — autopay at least the minimum as a backstop.",
+            "Lowering utilization is the quickest legitimate score boost."
+          ] },
+          { type:'tip', text:"The fastest honest improvement: drive utilization below 10% and make sure nothing is ever late. A 600 score can reach 720+ within about 12 months of consistent on-time payments and low utilization." },
+          { type:'check', q:"Which factor carries the most weight in your FICO score?", opts:[
+            "Credit utilization",
+            "Length of credit history",
+            "Payment history",
+            "Credit mix"
+          ], ans:2, explain:"Payment history is 35% — the single biggest factor. That's why even one missed payment hurts, and why on-time payments are the foundation of a good score." }
+        ]
+      },
+
+      // ── L3 — Building Credit From Zero ───────────────────────
+      {
+        id:'credit-build', matchTitle:'Building Credit From Zero — A Step-by-Step Plan',
+        title:'Building Credit From Zero — A Step-by-Step Plan', duration:'7 min',
+        blocks:[
+          { type:'lead', text:"Having no credit history is almost as limiting as bad credit — lenders have nothing to evaluate. Here's how to build from scratch, fastest and most effective first." },
+          { type:'steps', items:[
+            { title:'Become an authorized user', text:"Ask a trusted family member with good credit to add you to their card. You inherit their on-time history and account age — often a scoreable file within 1–2 billing cycles, even without using the card." },
+            { title:'Get a secured card', text:"A $200–$500 deposit becomes your limit. Put one small recurring charge on it and pay the FULL balance every month. Most issuers upgrade you in 6–12 months and return the deposit (Discover It Secured, Capital One Secured — no annual fee)." },
+            { title:'Consider a credit-builder loan', text:"Some credit unions let you \"borrow\" into a locked savings account; your payments build credit and you get the savings at the end (e.g. Self)." },
+            { title:"Student card if you're in college", text:"Lower approval bar, real rewards, no annual fee — a solid first unsecured card." }
+          ] },
+          { type:'keyIdea', title:'The cardinal rule', text:"Only charge what you already have the cash to pay off right now. Use the card like a debit card that also builds credit — never spend money you don't have for rewards or \"I'll pay it later.\"" },
+          { type:'takeaways', items:[
+            "Authorized-user status is the fastest way to a score from zero.",
+            "A secured card paid in full monthly builds credit in 3–6 months; 670+ in 12–18.",
+            "Treat the card like a debit card — charge only what you can already cover."
+          ] },
+          { type:'tip', text:"The one habit that protects your score forever: set autopay for the FULL statement balance on every card — not the minimum. It eliminates interest, keeps utilization low, and guarantees you never miss a payment." },
+          { type:'check', q:"What's the cardinal rule for using a card to build credit?", opts:[
+            "Carry a small balance to show activity",
+            "Only charge what you already have the cash to pay off now",
+            "Use as much of the limit as possible",
+            "Pay only the minimum to keep cash free"
+          ], ans:1, explain:"Use the card like a debit card — charge only what you can already cover and pay it in full. Carrying a balance just costs interest; it doesn't help your score." }
+        ]
+      },
+
+      // ── L4 — Credit Cards: Interest, Minimums (headline) ─────
+      {
+        id:'credit-cards', matchTitle:'Credit Cards — Interest, Minimums, and How to Use Them Correctly',
+        title:'Credit Cards — Interest, Minimums, and How to Use Them Correctly', duration:'8 min',
+        blocks:[
+          { type:'lead', text:"Used right, a credit card is an interest-free 30-day loan with rewards and fraud protection. Used wrong, it's 20–30% debt that takes years to escape. The difference is entirely in how you use it — and the math is stark." },
+          { type:'keyIdea', title:'Pay in full and you pay zero interest', text:"When you pay the full statement balance every month, you owe no interest and keep the rewards. The moment you carry a balance, the interest dwarfs any cash back." },
+          { type:'widget', kind:'cardPayoff', config:{ balance:3000, apr:22, payment:150 } },
+          { type:'keyIdea', title:'The minimum-payment trap', text:"Minimum payments are designed to keep you in debt: most of each one is interest, so a few-thousand-dollar balance at a typical card APR can take well over a decade to clear and more than double what you paid for the purchases. Try the calculator above — switching from the minimum to a fixed higher payment collapses both the years and the interest." },
+          { type:'list', style:'check', items:[
+            { strong:'If you already carry a balance:', text:"stop using the card for new purchases, then attack the debt." },
+            { strong:'Avalanche', text:"— highest interest rate first (mathematically optimal)." },
+            { strong:'Snowball', text:"— smallest balance first (psychologically motivating). The method matters less than paying extra every month, consistently." }
+          ] },
+          { type:'takeaways', items:[
+            "Paying the full statement balance monthly = zero interest + rewards.",
+            "Paying only the minimum can turn $3,000 into ~$8,500 over ~19 years.",
+            "Carrying a balance? Stop charging, then attack it (avalanche or snowball)."
+          ] },
+          { type:'tip', text:"Card rewards are funded largely by the interest paid by the ~55% of cardholders who carry a balance. Be in the ~45% who pay in full — they get the rewards without paying for them." },
+          { type:'check', q:"What's the only way to use a credit card that costs you nothing in interest?", opts:[
+            "Pay the minimum on time every month",
+            "Pay the full statement balance every month",
+            "Keep utilization under 30%",
+            "Use a card with no annual fee"
+          ], ans:1, explain:"Paying the full statement balance each month means zero interest — you're using the card as a free 30-day loan. The minimum still leaves a balance accruing interest." }
+        ]
+      },
+
+      // ── L5 — Your Credit Report ──────────────────────────────
+      {
+        id:'credit-report', matchTitle:'Your Credit Report — Reading It and Disputing Errors',
+        title:'Your Credit Report — Reading It and Disputing Errors', duration:'6 min',
+        blocks:[
+          { type:'lead', text:"Your score is calculated from your credit report — and about 1 in 4 people has an error big enough to hurt it, while most have never looked. You're legally entitled to check for free." },
+          { type:'keyIdea', title:'The only official free source', text:"AnnualCreditReport.com is the federally mandated site — free reports from all three bureaus (Equifax, Experian, TransUnion), one each per year. Stagger them: pull one bureau every four months to monitor all year for free." },
+          { type:'list', style:'check', items:[
+            { strong:'Accounts you never opened', text:"— a red flag for identity theft." },
+            { strong:'On-time payments marked late,', text:"wrong balances or limits, or closed accounts shown as open." },
+            { strong:'Wrong personal info, duplicates,', text:"or negative items past the 7-year limit (bankruptcies, 10 years)." }
+          ] },
+          { type:'steps', items:[
+            { title:'Dispute with the bureau', text:"Submit online at the bureau's site with any supporting documents; they must investigate within 30 days and remove or correct anything they can't verify." },
+            { title:'Also dispute with the lender', text:"The company that reported the error reports to all three bureaus, so notify them too." }
+          ] },
+          { type:'keyIdea', title:'A freeze beats a fraud alert', text:"If you find accounts you never opened, a credit freeze (free, indefinite) is the strongest protection — no one can open new credit in your name. You freeze and unfreeze online in minutes at each bureau." },
+          { type:'takeaways', items:[
+            "Check free at AnnualCreditReport.com — the only official source.",
+            "Look for unknown accounts, wrong late marks, and stale negatives.",
+            "Dispute errors within 30 days; freeze your credit to block identity theft."
+          ] },
+          { type:'tip', text:"If you're not actively applying for credit, consider a freeze on all three bureaus. It's free, doesn't affect your score, and is the most effective identity-theft prevention there is — just unfreeze when you need to apply, then refreeze." },
+          { type:'check', q:"What's the only official site for truly free credit reports?", opts:[
+            "CreditKarma.com",
+            "The three bureaus' marketing sites",
+            "AnnualCreditReport.com",
+            "Your bank's app"
+          ], ans:2, explain:"AnnualCreditReport.com is the one federally mandated free source for reports from all three bureaus. Other sites may be useful but aren't the official free-report channel." }
+        ]
+      }
+    ]
   }
 };
 
