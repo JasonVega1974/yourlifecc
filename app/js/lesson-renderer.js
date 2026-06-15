@@ -189,6 +189,26 @@
           + (x.note ? '<div class="lr-vb__note">' + esc(x.note) + '</div>' : '');
       }).join('');
       return '<figure class="lr-brk">' + cap + '<div class="lr-vb">' + rows + '</div></figure>';
+    },
+    // Horizontal timeline — labeled markers along a line (shared primitive).
+    //   data.items: [{ label, sub?, pos? (0–100), highlight?, color? }]
+    //   No pos → markers distribute evenly. data.caption optional.
+    dateTimeline: function(data){
+      data = data || {};
+      var items = data.items || [];
+      var n = items.length || 1;
+      var cap = data.caption ? '<figcaption class="lr-brk__cap">' + esc(data.caption) + '</figcaption>' : '';
+      var marks = items.map(function(x, i){
+        var pos = (typeof x.pos === 'number') ? x.pos : (n === 1 ? 50 : 10 + (i / (n - 1)) * 80);
+        var edge = pos <= 12 ? ' lr-tl__mark--start' : pos >= 88 ? ' lr-tl__mark--end' : '';
+        var col = x.color || 'var(--lr-accent,var(--c))';
+        return '<div class="lr-tl__mark' + edge + (x.highlight ? ' lr-tl__mark--hl' : '') + '" style="left:' + pos.toFixed(1) + '%;">'
+          + '<div class="lr-tl__lab">' + esc(x.label) + '</div>'
+          + '<div class="lr-tl__dot" style="background:' + col + ';"></div>'
+          + (x.sub ? '<div class="lr-tl__sub">' + esc(x.sub) + '</div>' : '')
+          + '</div>';
+      }).join('');
+      return '<figure class="lr-tl">' + cap + '<div class="lr-tl__track"><div class="lr-tl__line"></div>' + marks + '</div></figure>';
     }
   };
 

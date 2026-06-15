@@ -10319,3 +10319,19 @@ body:has(#s-parent.sec.active #parentCelestialHome:not(.pch-entered):not(.pch-cl
 @media (max-width:430px){.lr-vb__label{flex-basis:33%;}.lr-vb__note{padding-left:0;}}
 :root.light .lr-vb__track{background:var(--s1);border-color:var(--br);}
 @media (prefers-reduced-motion:reduce){.lr-vb__fill{transition:none;}}
+
+/* dateTimeline — horizontal timeline with labeled markers. Token-based;
+   light + reduced-motion passes below. */
+.lr-tl{margin:.3rem 0 .1rem;}
+.lr-tl__track{position:relative;height:82px;margin:.5rem .2rem 0;}
+.lr-tl__line{position:absolute;top:36px;left:2%;right:2%;height:3px;border-radius:2px;background:var(--br);}
+.lr-tl__mark{position:absolute;top:0;width:74px;display:flex;flex-direction:column;align-items:center;text-align:center;transform:translateX(-50%);}
+.lr-tl__mark--start{transform:none;align-items:flex-start;text-align:left;}
+.lr-tl__mark--end{transform:translateX(-100%);align-items:flex-end;text-align:right;}
+.lr-tl__lab{font-size:.64rem;font-weight:800;color:var(--tx);line-height:1.1;min-height:30px;display:flex;align-items:flex-end;}
+.lr-tl__dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--bg);box-shadow:0 0 0 2px var(--br);flex:0 0 auto;}
+.lr-tl__mark--hl .lr-tl__dot{box-shadow:0 0 0 3px var(--lr-accent,var(--c));}
+.lr-tl__sub{font-size:.56rem;color:var(--tx3);line-height:1.18;margin-top:4px;}
+:root.light .lr-tl__line{background:var(--br);}
+:root.light .lr-tl__dot{border-color:var(--s1);}
+@media (prefers-reduced-motion:reduce){.lr-tl__dot{transition:none;}}

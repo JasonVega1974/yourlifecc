@@ -98,6 +98,11 @@ const SK_SPECS = {
         duration: '7 min',
         blocks: [
           { type:'lead', text:"Filing is how you officially report your income and settle up on what you owe. The deadline is April 15 (or the next business day). Here is the whole process, start to finish." },
+          { type:'viz', kind:'dateTimeline', data:{ caption:'The tax-year calendar', items:[
+            { label:'Jan 31', sub:'W-2s & 1099s arrive' },
+            { label:'Apr 15', sub:'File & pay', highlight:true },
+            { label:'Oct 15', sub:'Extension deadline (file only)' }
+          ] } },
           { type:'steps', items:[
             { title:'Gather your documents (Jan–Feb)', text:"W-2s and 1099s arrive by Jan 31; 1098s for student-loan and mortgage interest; SSNs for everyone on the return; last year's return for your AGI; receipts for deductions." },
             { title:'Choose a filing method', text:"IRS Free File (free under ~$89k), FreeTaxUSA (free federal, $15 state), TurboTax/H&R Block for hand-holding, or a CPA if you're self-employed or had a big life change." },
@@ -1007,6 +1012,12 @@ const SK_SPECS = {
             { title:'Consider a credit-builder loan', text:"Some credit unions let you \"borrow\" into a locked savings account; your payments build credit and you get the savings at the end (e.g. Self)." },
             { title:"Student card if you're in college", text:"Lower approval bar, real rewards, no annual fee — a solid first unsecured card." }
           ] },
+          { type:'viz', kind:'dateTimeline', data:{ caption:'What building credit looks like over time', items:[
+            { label:'Now', sub:'Authorized user added' },
+            { label:'1–2 cycles', sub:'Scoreable file appears' },
+            { label:'3–6 mo', sub:'Secured-card history building' },
+            { label:'12–18 mo', sub:'670+ (Good)', highlight:true }
+          ] } },
           { type:'keyIdea', title:'The cardinal rule', text:"Only charge what you already have the cash to pay off right now. Use the card like a debit card that also builds credit — never spend money you don't have for rewards or \"I'll pay it later.\"" },
           { type:'takeaways', items:[
             "Authorized-user status is the fastest way to a score from zero.",
@@ -1059,6 +1070,11 @@ const SK_SPECS = {
         blocks:[
           { type:'lead', text:"Your score is calculated from your credit report — and about 1 in 4 people has an error big enough to hurt it, while most have never looked. You're legally entitled to check for free." },
           { type:'keyIdea', title:'The only official free source', text:"AnnualCreditReport.com is the federally mandated site — free reports from all three bureaus (Equifax, Experian, TransUnion), one each per year. Stagger them: pull one bureau every four months to monitor all year for free." },
+          { type:'viz', kind:'dateTimeline', data:{ caption:'Stagger your 3 free reports — one every ~4 months, year-round', items:[
+            { label:'Month 1', sub:'Equifax' },
+            { label:'Month 5', sub:'Experian' },
+            { label:'Month 9', sub:'TransUnion' }
+          ] } },
           { type:'list', style:'check', items:[
             { strong:'Accounts you never opened', text:"— a red flag for identity theft." },
             { strong:'On-time payments marked late,', text:"wrong balances or limits, or closed accounts shown as open." },
