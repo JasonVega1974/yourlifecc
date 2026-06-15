@@ -1106,6 +1106,223 @@ const SK_SPECS = {
         ]
       }
     ]
+  },
+
+  // ═══════════════════════════════════════════════════════════════════
+  // COLLEGE & FUTURE — full module elevated. One calculator (Student Loan
+  // Math); paths comparison (valueBars); FAFSA/Resume as steps; the rest
+  // honest structured prose. Faithful to existing content — no new claims
+  // or figures; aid/loan figures kept illustrative, not advice.
+  // ═══════════════════════════════════════════════════════════════════
+  college: {
+    key: 'college',
+    color: '#fde68a',
+    lessons: [
+      // ── L1 — Is College Right for You? (paths) ───────────────
+      {
+        id:'college-paths', matchTitle:'Is College Right for You?',
+        title:'Is College Right for You?', duration:'5 min',
+        blocks:[
+          { type:'lead', text:"There's more than one good path after high school — the right one depends on where you want to end up, not on what everyone else is doing." },
+          { type:'compare',
+            left:{ title:'A 4-year degree is required for', points:['Medicine','Law','Engineering','Teaching'] },
+            right:{ title:'Strong alternatives', points:['Community college — then transfer','Trade school — electricians/plumbers earn $60–100k+','Military — training plus the GI Bill'] } },
+          { type:'viz', kind:'valueBars', data:{ mode:'compare', unit:'%', caption:'Relative cost of the first two years (illustrative)', items:[
+            { label:'4-year college', value:100 },
+            { label:'Community college, then transfer', value:35, highlight:true, note:'Roughly 60–70% cheaper for the first two years.' }
+          ] } },
+          { type:'takeaways', items:[
+            "Some careers require a 4-year degree; many don't.",
+            "Community college first can cut the cost of the early years sharply.",
+            "Trade school and the military are real, well-paying paths too."
+          ] },
+          { type:'check', q:"Which path is required to become a doctor, lawyer, or engineer?", opts:[
+            "A trade-school certificate",
+            "A 4-year degree (and beyond)",
+            "Military service",
+            "Community college only"
+          ], ans:1, explain:"Medicine, law, and engineering require a 4-year degree (and usually more). Many other good careers don't — trades, the military, and community-college routes are all strong options." }
+        ]
+      },
+
+      // ── L2 — Choosing a Major Wisely (prose) ─────────────────
+      {
+        id:'college-major', matchTitle:'Choosing a Major Wisely',
+        title:'Choosing a Major Wisely', duration:'5 min',
+        blocks:[
+          { type:'lead', text:"A major is a big bet on your future — make it with your eyes open, not just on what sounds interesting in the moment." },
+          { type:'keyIdea', title:'Ask where it leads — before you commit', text:"What jobs does this major lead to? What's the starting salary? Will it cover your loan payments? Answer those first." },
+          { type:'list', style:'check', items:[
+            { strong:'Talk to 3 people', text:"who actually WORK in that field — not just professors or admissions." },
+            { strong:'Follow the path to a job,', text:"not just the subject you enjoy in class." }
+          ] },
+          { type:'takeaways', items:[
+            "Pick a major for where it leads, not just because it sounds interesting.",
+            "Check the jobs and the starting salary it realistically opens.",
+            "Talk to people doing the actual work before you commit."
+          ] },
+          { type:'tip', text:"Don't choose a major just because it sounds interesting. Know where it leads." },
+          { type:'check', q:"Before committing to a major, the smartest move is to:", opts:[
+            "Pick whatever sounds most interesting",
+            "Ask what jobs and salary it leads to, and talk to people in the field",
+            "Choose the one with the easiest classes",
+            "Decide based on which has the nicest building"
+          ], ans:1, explain:"Find out where the major actually leads — the jobs, the starting pay, whether it covers loan payments — and talk to people doing that work." }
+        ]
+      },
+
+      // ── L3 — FAFSA (procedural / steps) ──────────────────────
+      {
+        id:'college-fafsa', matchTitle:'FAFSA',
+        title:'FAFSA — The Form That Unlocks Aid', duration:'5 min',
+        blocks:[
+          { type:'lead', text:"The FAFSA is the form that unlocks financial aid — grants, work-study, and loans. Filing it is one of the highest-value things you can do for paying for college." },
+          { type:'steps', items:[
+            { title:'File every single year', text:"Aid isn't automatic — you re-file each year you're in school." },
+            { title:'It opens October 1', text:"File as early as you can — some aid runs out." },
+            { title:"It's based on family income", text:"That's what determines how much help you qualify for." },
+            { title:'It decides your aid mix', text:"Grants (free money), work-study, and loans all flow from it." }
+          ] },
+          { type:'keyIdea', title:'Grants are free money', text:"The FAFSA can qualify you for grants you never repay — so file even if you assume you won't qualify." },
+          { type:'takeaways', items:[
+            "File the FAFSA every year, as early after October 1 as you can.",
+            "It determines grants, work-study, and loans based on family income.",
+            "Grants are free money — never skip the form that unlocks them."
+          ] },
+          { type:'check', q:"How often should you file the FAFSA, and when does it open?", opts:[
+            "Once, ever — when it opens in January",
+            "Every year — it opens October 1",
+            "Only if you want loans — opens in spring",
+            "Every two years — opens in summer"
+          ], ans:1, explain:"File every single year, and do it as early as you can after it opens on October 1, since some aid runs out." }
+        ]
+      },
+
+      // ── L4 — Student Loan Math (RICH: calculator) ────────────
+      {
+        id:'college-loans', matchTitle:'Student Loan Math',
+        title:'Student Loan Math', duration:'6 min',
+        blocks:[
+          { type:'lead', text:"Loans can make college possible — but the monthly payment after graduation is real money. Know the math before you borrow." },
+          { type:'widget', kind:'loanCalculator', config:{ amount:37000, rate:6.5, years:10 } },
+          { type:'keyIdea', title:'The borrowing rule of thumb', text:"Try not to borrow more in total than you expect to earn in your first year out of school — that keeps the monthly payment manageable. (For example, about $37,000 at 6.5% over 10 years is roughly $420 a month.)" },
+          { type:'takeaways', items:[
+            "Every dollar borrowed comes back as a monthly payment plus interest.",
+            "A common guideline: don't borrow more in total than your expected first-year salary.",
+            "Federal loans usually beat private ones for rates and repayment options."
+          ] },
+          { type:'tip', text:"Always choose federal over private loans when you can — better rates, income-driven repayment, and forgiveness programs." },
+          { type:'check', q:"A smart rule of thumb for how much to borrow in total is:", opts:[
+            "Whatever the school will lend you",
+            "No more than your expected first-year salary",
+            "Double your expected first-year salary",
+            "It doesn't matter — loans are deferred"
+          ], ans:1, explain:"Keeping total borrowing at or below your expected first-year salary keeps the monthly payment manageable after graduation." },
+          { type:'prose', html:'<p style="font-size:.72rem;color:var(--tx3);margin:0;">General information, not financial or admissions advice. The example figures ($37,000, 6.5%, 10 years) are illustrative only — not current rates.</p>' }
+        ]
+      },
+
+      // ── L5 — Scholarships (prose) ────────────────────────────
+      {
+        id:'college-scholarships', matchTitle:'Scholarships',
+        title:'Scholarships', duration:'5 min',
+        blocks:[
+          { type:'lead', text:"Scholarships are free money you never repay — and a lot of it goes unclaimed simply because people don't apply." },
+          { type:'list', style:'check', items:[
+            { strong:'Apply to every one', text:"you're eligible for — including the small $500 ones." },
+            { strong:'Local foundation scholarships', text:"have way less competition than the big national ones." },
+            { strong:'Search Fastweb.com and scholarships.com', text:"to find ones that match you." }
+          ] },
+          { type:'keyIdea', title:'Small + local = better odds', text:"Local and small-dollar scholarships get far fewer applicants, so your odds are much higher — and they add up." },
+          { type:'takeaways', items:[
+            "Scholarships are free money — apply widely, even to small ones.",
+            "Local and small awards are the most winnable (less competition).",
+            "Use Fastweb and scholarships.com to find matches."
+          ] },
+          { type:'check', q:"Why are local, small-dollar scholarships often the smartest to chase?", opts:[
+            "They pay the most",
+            "They have far less competition, and they add up",
+            "They don't require an application",
+            "They're the only ones that are free money"
+          ], ans:1, explain:"Local and small ($500) scholarships get far fewer applicants, so your odds are much higher — and several of them add up." }
+        ]
+      },
+
+      // ── L6 — Surviving First Year (prose) ────────────────────
+      {
+        id:'college-firstyear', matchTitle:'Surviving First Year',
+        title:'Surviving First Year', duration:'5 min',
+        blocks:[
+          { type:'lead', text:"The first year sets the tone for everything after it. A few simple habits make the difference between thriving and drifting." },
+          { type:'list', style:'check', items:[
+            { strong:'Go to every class', text:"— attendance alone keeps most students on track." },
+            { strong:'Visit professors in office hours', text:"— they remember the students who show up." },
+            { strong:'Find your community in the first 2 weeks', text:"— it's much harder to do later." },
+            { strong:'Find a church before you need it,', text:"and call home regularly." }
+          ] },
+          { type:'takeaways', items:[
+            "Show up — to class and to office hours.",
+            "Build your community early, in the first two weeks.",
+            "Stay connected to home and to faith."
+          ] },
+          { type:'check', q:"When is the best time to find your community in your first year?", opts:[
+            "Toward the end of the year",
+            "In the first two weeks",
+            "Only after grades come out",
+            "It doesn't matter when"
+          ], ans:1, explain:"Find your community in the first two weeks — it's much harder to break in once groups have already formed." }
+        ]
+      },
+
+      // ── L7 — GPA Still Matters (prose) ───────────────────────
+      {
+        id:'college-gpa', matchTitle:'GPA Still Matters',
+        title:'GPA Still Matters', duration:'4 min',
+        blocks:[
+          { type:'lead', text:"Your GPA isn't everything — but especially early on, it quietly opens or closes doors." },
+          { type:'keyIdea', title:'A 3.5+ opens doors', text:"A 3.5 or higher opens graduate school, top internships, and competitive employers. Most ask for your GPA on first-job applications." },
+          { type:'keyIdea', title:'…then it fades', text:"After 3–5 years of work experience, your GPA matters much less. Early grades buy you options; your experience takes over from there." },
+          { type:'takeaways', items:[
+            "Early on, a strong GPA (3.5+) unlocks internships, grad school, and first jobs.",
+            "First-job applications usually still ask for it.",
+            "After a few years of experience, it fades in importance."
+          ] },
+          { type:'check', q:"When does your GPA matter the MOST?", opts:[
+            "Throughout your entire career equally",
+            "Early — for internships, grad school, and first jobs",
+            "Only after 5+ years of experience",
+            "It never really matters"
+          ], ans:1, explain:"Early on it gates internships, grad school, and first jobs; after 3–5 years of experience it matters much less." }
+        ]
+      },
+
+      // ── L8 — Building Resume in College (steps) ──────────────
+      {
+        id:'college-resume', matchTitle:'Building Resume in College',
+        title:'Building Your Resume in College', duration:'5 min',
+        blocks:[
+          { type:'lead', text:"By the time you graduate, what you DID matters more than your grades. Build the resume while you're still in school." },
+          { type:'keyIdea', title:'Internships > grades after graduation', text:"On a post-graduation resume, internships beat GPA — employers want to see that you've actually done the work." },
+          { type:'steps', items:[
+            { title:'Start internships sophomore year', text:"Don't wait until senior year — begin pursuing them early." },
+            { title:'Join 1–2 career-related clubs', text:"Pick ones tied to where you want to work." },
+            { title:'Seek leadership roles', text:"Leading something — even small — stands out." },
+            { title:'Build and update LinkedIn', text:"Keep it current every semester." }
+          ] },
+          { type:'takeaways', items:[
+            "After graduation, internships outweigh grades on a resume.",
+            "Start sophomore year; join a club or two and seek leadership.",
+            "Keep LinkedIn updated every semester."
+          ] },
+          { type:'check', q:"When should you start pursuing internships?", opts:[
+            "Senior year, right before graduating",
+            "Sophomore year",
+            "Only after you graduate",
+            "Whenever you happen to have time"
+          ], ans:1, explain:"Start sophomore year — internships matter more than grades on a post-graduation resume, so begin building them early." }
+        ]
+      }
+    ]
   }
 };
 

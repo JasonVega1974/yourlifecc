@@ -847,6 +847,39 @@
       }
       [$b, $l].forEach(function(el){ el.addEventListener('input', render); });
       render();
+    },
+
+    // Student-loan estimator — standard fixed-rate amortization (level
+    // payment). Honest math; framed as an estimate / illustrative figures.
+    loanCalculator: function(mountEl, config){
+      var c = config || {};
+      var amount = c.amount || 37000, rate = (c.rate != null ? c.rate : 6.5), years = c.years || 10;
+      mountEl.innerHTML =
+        '<div class="lr-calc">'
+        + '<div class="lr-calc__head">Student-loan estimator</div>'
+        + '<div class="lr-calc__controls">'
+        +   '<label class="lr-calc__field"><span>Loan amount</span><input type="number" class="ln-a" min="0" step="500" value="' + amount + '" inputmode="numeric"></label>'
+        +   '<label class="lr-calc__field"><span>Rate %</span><input type="number" class="ln-r" min="0" max="20" step="0.1" value="' + rate + '" inputmode="decimal"></label>'
+        +   '<label class="lr-calc__field"><span>Years</span><input type="number" class="ln-y" min="1" max="30" step="1" value="' + years + '" inputmode="numeric"></label>'
+        + '</div><div class="lr-calc__out ln-out" aria-live="polite"></div>'
+        + '<div class="lr-calc__note">Estimate only — standard fixed-rate amortization. General information, not financial or admissions advice; figures are illustrative examples, not current rates.</div>'
+        + '</div>';
+      var $a = mountEl.querySelector('.ln-a'), $r = mountEl.querySelector('.ln-r'), $y = mountEl.querySelector('.ln-y'), $o = mountEl.querySelector('.ln-out');
+      function render(){
+        var P = Math.max(0, parseFloat($a.value) || 0);
+        var rate2 = Math.max(0, parseFloat($r.value) || 0);
+        var yrs = Math.max(0, parseFloat($y.value) || 0);
+        var r = rate2 / 100 / 12, n = yrs * 12;
+        var mo = (n <= 0) ? 0 : (r === 0 ? P / n : P * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1));
+        var total = mo * n, interest = Math.max(0, total - P);
+        $o.innerHTML = '<div class="lr-calc__stats">'
+          + '<div class="lr-calc__stat"><div class="lr-calc__sv">' + money(mo) + '</div><div class="lr-calc__sl">per month</div></div>'
+          + '<div class="lr-calc__stat"><div class="lr-calc__sv">' + money(total) + '</div><div class="lr-calc__sl">total paid</div></div>'
+          + '<div class="lr-calc__stat"><div class="lr-calc__sv">' + money(interest) + '</div><div class="lr-calc__sl">interest</div></div>'
+          + '</div>';
+      }
+      [$a, $r, $y].forEach(function(el){ el.addEventListener('input', render); });
+      render();
     }
   };
 
