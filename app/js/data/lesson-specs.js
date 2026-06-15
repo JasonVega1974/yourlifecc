@@ -68,6 +68,11 @@ const SK_SPECS = {
             { value:'28–30%', label:'set aside per payment' },
             { value:'4×/yr', label:'quarterly deadlines' }
           ] },
+          { type:'viz', kind:'valueBars', data:{ mode:'stack', money:true, caption:'Where a $100 freelance (1099) payment goes — before you spend any of it', items:[
+            { label:'Self-employment tax (15.3%)', value:14, color:'#fb7185' },
+            { label:'Income tax (set aside)', value:14, color:'#fbbf24' },
+            { label:'Yours to keep', value:72, color:'#34d399' }
+          ] } },
           { type:'list', style:'check', items:[
             { strong:'Quarterly estimated taxes:', text:"due Apr 15, Jun 15, Sep 15, and Jan 15 — miss them and you owe an underpayment penalty even if you pay in full at filing." }
           ] },
@@ -123,6 +128,10 @@ const SK_SPECS = {
         blocks: [
           { type:'lead', text:"A deduction reduces your taxable income before your rate is applied. In the 22% bracket a $1,000 deduction saves you $220 — real money that compounds once you know every deduction you can take." },
           { type:'keyIdea', title:'Standard vs. itemize — take the bigger one', text:"You pick one or the other. About 90% of people take the standard deduction; only itemize if your specific deductible expenses (mortgage interest, big medical bills, large charitable gifts) add up to more." },
+          { type:'viz', kind:'valueBars', data:{ mode:'compare', money:true, caption:'Take whichever is bigger — for most people, the standard deduction', items:[
+            { label:'Standard deduction (single)', value:15750, color:'#34d399', highlight:true, note:'Most people take this — no receipts needed.' },
+            { label:'Example itemized total', value:9400, color:'#60a5fa', note:'Mortgage interest + SALT + charitable gifts.' }
+          ] } },
           { type:'stat', items:[
             { value:'$15,750', label:'standard — single (2025)' },
             { value:'$31,500', label:'standard — married jointly' },
@@ -157,6 +166,10 @@ const SK_SPECS = {
         blocks: [
           { type:'lead', text:"Credits are far more valuable than deductions. A deduction shrinks your taxable income; a credit cuts your actual tax bill dollar-for-dollar." },
           { type:'keyIdea', title:'A credit beats a deduction', text:"A $1,000 credit saves you $1,000 no matter your bracket. A $1,000 deduction saves only $220 in the 22% bracket. Always chase credits first." },
+          { type:'viz', kind:'valueBars', data:{ mode:'compare', money:true, caption:'What $1,000 actually saves you (22% bracket)', items:[
+            { label:'$1,000 tax credit', value:1000, color:'#34d399', highlight:true, note:'Cuts your tax bill dollar-for-dollar.' },
+            { label:'$1,000 deduction', value:220, color:'#60a5fa', note:'Only saves your rate — 22% of $1,000.' }
+          ] } },
           { type:'list', style:'check', items:[
             { strong:'Non-refundable:', text:"can take your tax to $0 but not below." },
             { strong:'Refundable:', text:"can go below $0 — the IRS sends you the difference even if you owed nothing." },
@@ -298,6 +311,10 @@ const SK_SPECS = {
         blocks: [
           { type:'lead', text:"A retirement account isn't just a place to save — it's a legal tax shelter that can add hundreds of thousands of dollars to your wealth over a lifetime. Not using one leaves real money on the table." },
           { type:'keyIdea', title:'Employer match = a guaranteed 100% return', text:"If your employer matches 50% of contributions up to 6% of salary, putting in 6% of a $60K salary adds $1,800 of free money. No market investment reliably beats free — never leave it uncollected." },
+          { type:'viz', kind:'valueBars', data:{ mode:'stack', money:true, caption:'A 50%-up-to-6% match on a $60k salary — going into your 401(k) each year', items:[
+            { label:'Your 6% contribution', value:3600, color:'#60a5fa' },
+            { label:'Free employer match', value:1800, color:'#34d399', highlight:true }
+          ] } },
           { type:'compare',
             left:{ title:'401(k) — via employer', points:[
               "Contributions are pre-tax — lowers your taxable income now",
@@ -343,6 +360,10 @@ const SK_SPECS = {
               "Low fees (0.03–0.20% for index ETFs)"
             ] } },
           { type:'keyIdea', title:'Fees are the silent wealth-killer', text:"$10,000 invested for 30 years at 8% grows to about $99,500 with a 0.05% fee — but only about $76,100 with a 1% fee. That tiny-sounding 0.95% costs you $23,400 on a single $10,000 investment." },
+          { type:'viz', kind:'valueBars', data:{ mode:'compare', money:true, caption:'$10,000 invested for 30 years at 8% — the only difference is the fee', items:[
+            { label:'0.05% fee (index fund)', value:99500, color:'#34d399', highlight:true },
+            { label:'1% fee (typical active)', value:76100, color:'#fb7185', note:'That 0.95% quietly costs $23,400.' }
+          ] } },
           { type:'keyIdea', title:'Dollar-cost averaging', text:"Invest the same amount every month no matter what the market does. High prices buy fewer shares, low prices buy more — and you automatically avoid the trap of trying to time the market." },
           { type:'takeaways', items:[
             "Index ETFs charge a fraction of what active mutual funds do.",
@@ -610,6 +631,14 @@ const SK_SPECS = {
             { strong:'Maintenance & repairs:', text:"budget ~$100–$150/mo averaged (oil, tires, brakes, surprises)." },
             { strong:'Registration & taxes:', text:"$100–$700/year, varies a lot by state and value." }
           ] },
+          { type:'viz', kind:'valueBars', data:{ mode:'stack', money:true, caption:'A typical new-car monthly cost — the loan payment is only part of it', items:[
+            { label:'Depreciation', value:350, color:'#fb7185', highlight:true },
+            { label:'Loan payment', value:450, color:'#60a5fa' },
+            { label:'Insurance', value:200, color:'#fbbf24' },
+            { label:'Fuel', value:140, color:'#34d399' },
+            { label:'Maintenance', value:125, color:'#a78bfa' },
+            { label:'Registration', value:30, color:'#22d3ee' }
+          ] } },
           { type:'keyIdea', title:'Depreciation is the hidden giant', text:"A new car loses about 20–25% of its value in the first year and 50–60% over five years. You don't feel it monthly, but it's exactly what you've lost the day you sell." },
           { type:'keyIdea', title:'The 15–20% rule', text:"Keep all car costs combined under 15–20% of your take-home pay. At $3,500/month take-home, that's $525–$700 for everything car-related — not just the loan." },
           { type:'takeaways', items:[

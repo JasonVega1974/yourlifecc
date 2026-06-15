@@ -10305,3 +10305,17 @@ body:has(#s-parent.sec.active #parentCelestialHome:not(.pch-entered):not(.pch-cl
 .lr-util__marklabel{position:absolute;top:-14px;transform:translateX(-50%);font-size:.56rem;color:var(--tx3);}
 :root.light .lr-util__mark{background:var(--tx3);}
 @media (prefers-reduced-motion:reduce){.lr-util__fill{transition:none;}}
+
+/* valueBars — compare mode rows (stack mode reuses .lr-brk). Token-based;
+   light + reduced-motion passes below. */
+.lr-vb{display:flex;flex-direction:column;gap:.5rem;}
+.lr-vb__row{display:flex;align-items:center;gap:.5rem;font-size:.8rem;}
+.lr-vb__label{flex:0 0 38%;color:var(--tx);font-weight:600;line-height:1.15;}
+.lr-vb__track{flex:1 1 auto;height:18px;background:var(--s1);border:1px solid var(--br);border-radius:6px;overflow:hidden;}
+.lr-vb__fill{display:block;height:100%;border-radius:5px 0 0 5px;transition:width .25s ease;}
+.lr-vb__fill--hl{outline:2px solid var(--tx);outline-offset:-2px;}
+.lr-vb__val{flex:0 0 auto;min-width:60px;text-align:right;font-weight:800;color:var(--tx);}
+.lr-vb__note{font-size:.66rem;color:var(--tx3);padding-left:38%;margin-top:-.18rem;}
+@media (max-width:430px){.lr-vb__label{flex-basis:33%;}.lr-vb__note{padding-left:0;}}
+:root.light .lr-vb__track{background:var(--s1);border-color:var(--br);}
+@media (prefers-reduced-motion:reduce){.lr-vb__fill{transition:none;}}

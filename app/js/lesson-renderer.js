@@ -151,6 +151,44 @@
         return '<div class="lr-brk__leg"><span class="lr-brk__dot" style="background:' + x.color + ';"></span><b>' + x.pct + '%</b> <span>' + x.name + '</span></div>';
       }).join('');
       return '<figure class="lr-brk"><figcaption class="lr-brk__cap">What makes up your FICO score</figcaption><div class="lr-brk__bar">' + bar + '</div><div class="lr-brk__legend">' + legend + '</div></figure>';
+    },
+    // Generic proportional labeled bars — the shared visual-pass primitive.
+    //   data.mode 'stack'  → one bar split into segments (composition)
+    //   data.mode 'compare'→ one bar per item, scaled to the max (magnitude)
+    //   data.items: [{ label, value, color?, note?, highlight? }]
+    //   data.money:true formats values as currency; data.unit appends a unit.
+    //   data.caption: optional heading.
+    valueBars: function(data){
+      data = data || {};
+      var items = data.items || [];
+      var PAL = ['#60a5fa', '#fbbf24', '#34d399', '#a78bfa', '#fb7185', '#22d3ee'];
+      var cap = data.caption ? '<figcaption class="lr-brk__cap">' + esc(data.caption) + '</figcaption>' : '';
+      function fv(v){ return data.money ? money(v) : esc(v + (data.unit ? data.unit : '')); }
+      if(data.mode === 'stack'){
+        var total = items.reduce(function(s, x){ return s + (x.value || 0); }, 0) || 1;
+        var bar = items.map(function(x, i){
+          var w = ((x.value || 0) / total) * 100, col = x.color || PAL[i % PAL.length];
+          return '<div class="lr-brk__seg" style="width:' + w.toFixed(1) + '%;background:' + col + ';'
+            + (x.highlight ? 'outline:2px solid var(--tx);outline-offset:-2px;' : '') + '" title="' + esc(x.label) + '">'
+            + '<span class="lr-brk__rate">' + (w >= 13 ? Math.round(w) + '%' : '') + '</span></div>';
+        }).join('');
+        var legend = items.map(function(x, i){
+          var col = x.color || PAL[i % PAL.length];
+          return '<div class="lr-brk__leg"><span class="lr-brk__dot" style="background:' + col + ';"></span><b>' + fv(x.value) + '</b> <span>' + esc(x.label) + (x.highlight ? ' ★' : '') + '</span></div>';
+        }).join('');
+        return '<figure class="lr-brk">' + cap + '<div class="lr-brk__bar">' + bar + '</div><div class="lr-brk__legend">' + legend + '</div></figure>';
+      }
+      // compare mode
+      var max = items.reduce(function(m, x){ return Math.max(m, x.value || 0); }, 0) || 1;
+      var rows = items.map(function(x, i){
+        var w = ((x.value || 0) / max) * 100, col = x.color || PAL[i % PAL.length];
+        return '<div class="lr-vb__row">'
+          + '<span class="lr-vb__label">' + esc(x.label) + '</span>'
+          + '<span class="lr-vb__track"><span class="lr-vb__fill' + (x.highlight ? ' lr-vb__fill--hl' : '') + '" style="width:' + w.toFixed(1) + '%;background:' + col + ';"></span></span>'
+          + '<span class="lr-vb__val">' + fv(x.value) + '</span></div>'
+          + (x.note ? '<div class="lr-vb__note">' + esc(x.note) + '</div>' : '');
+      }).join('');
+      return '<figure class="lr-brk">' + cap + '<div class="lr-vb">' + rows + '</div></figure>';
     }
   };
 
