@@ -824,6 +824,78 @@ const SK_SPECS = {
         ]
       }
     ]
+  },
+
+  // ═══════════════════════════════════════════════════════════════════
+  // BUDGETING & SAVING — both lessons elevated. Number-heavy, so each gets
+  // an interactive widget (budgetSplitter, savingsGoal). Guidelines framed
+  // as guidelines; general-education (not advice) note in L1.
+  // ═══════════════════════════════════════════════════════════════════
+  budgeting: {
+    key: 'budgeting',
+    color: '#34d399',
+    lessons: [
+      // ── L1 — Zero-Based Budget / 50-30-20 ────────────────────
+      {
+        id:'budget-zero', matchTitle:'The Zero-Based Budget — Every Dollar Has a Job',
+        title:'The Zero-Based Budget — Every Dollar Has a Job', duration:'7 min',
+        blocks:[
+          { type:'lead', text:"A budget isn't a restriction on your freedom — it's a plan that puts you in control. The most reliable method for most people is zero-based budgeting: you assign every dollar of income to a category until income minus allocations equals zero, so nothing is unaccounted for." },
+          { type:'keyIdea', title:'Give every dollar a job', text:"Zero-based doesn't mean spending everything — savings and investing are categories too. It means no dollar is left unassigned, which is how money quietly disappears." },
+          { type:'widget', kind:'budgetSplitter', config:{ income:3500, needs:50, wants:30, goals:20 } },
+          { type:'steps', items:[
+            { title:'Add up your monthly take-home', text:"Your income after taxes — the real number you have to work with." },
+            { title:'List every fixed expense', text:"Same amount each month: rent, car payment, insurance, subscriptions." },
+            { title:'Estimate variable necessities', text:"Groceries, gas, utilities — average a few months if you can." },
+            { title:"Assign what's left", text:"Split the remainder between wants and financial goals." },
+            { title:'Make it total zero', text:"Add it up; if it doesn't equal your income, adjust until it does." }
+          ] },
+          { type:'keyIdea', title:'The #1 budget-killer: irregular expenses', text:"Annual subscriptions, car registration, and holiday gifts feel \"free\" because they aren't monthly — then they blindside you. Divide each annual cost by 12 and set that aside every month, so the money is already there when the bill lands." },
+          { type:'takeaways', items:[
+            "Assign every dollar — including savings — so nothing is unaccounted for.",
+            "50/30/20 (needs / wants / goals) is a widely-used starting split to adjust from.",
+            "Bank irregular expenses monthly (annual ÷ 12) so they never become emergencies."
+          ] },
+          { type:'tip', text:"Add up your irregular yearly costs and divide by 12: $600 car registration + $400 annual subscriptions + $800 holiday gifts = $1,800/year = $150/month set aside automatically. Then those bills never feel like emergencies." },
+          { type:'check', q:"In the 50/30/20 guideline, what does the 20% go toward?", opts:[
+            "Dining out and entertainment",
+            "Housing and transportation",
+            "Financial goals — emergency fund, retirement, debt paydown, saving",
+            "Taxes and payroll deductions"
+          ], ans:2, explain:"The 20% is for financial progress: building your emergency fund, contributing to retirement, paying debt beyond the minimums, and saving toward goals." },
+          { type:'prose', html:'<p style="font-size:.72rem;color:var(--tx3);margin:0;">General financial education, not personalized financial advice. Figures like 50/30/20 are common guidelines — adjust them to your own situation.</p>' }
+        ]
+      },
+
+      // ── L2 — Emergency Fund ──────────────────────────────────
+      {
+        id:'budget-emergency', matchTitle:'Emergency Fund — Why $1,000 Can Change Your Life',
+        title:'Emergency Fund — Why $1,000 Can Change Your Life', duration:'6 min',
+        blocks:[
+          { type:'lead', text:"An emergency fund is the foundation of financial stability. Without it, any unexpected expense — a car repair, a medical bill, a lost job — becomes a crisis that forces debt and derails your goals. With it, the same event is merely an inconvenience." },
+          { type:'keyIdea', title:'A two-stage approach', text:"Stage 1: a $1,000 starter fund handles most common emergencies and comes before any other saving or investing. Stage 2: once high-interest debt is paid, build toward 3–6 months of expenses. These are common guidelines — adjust to your situation." },
+          { type:'widget', kind:'savingsGoal', config:{ target:1000, monthly:333, apy:4, expenses:2500 } },
+          { type:'list', style:'check', items:[
+            { strong:'Keep it in a high-yield savings account', text:"(HYSA) — these have recently paid around 4–5% APY, far more than a big-bank checking account." },
+            { strong:'Separate from your checking', text:"so it's accessible within a day or two but not automatically spent." },
+            { strong:'Not CDs or investments', text:"— an emergency fund has to stay liquid; you can't risk it being locked up or down when you need it." }
+          ] },
+          { type:'keyIdea', title:"It's mental-health infrastructure", text:"People with even a small savings cushion make better decisions across the board. The anxiety of zero savings affects thinking, relationships, and health — the fund protects far more than your wallet." },
+          { type:'takeaways', items:[
+            "Build a $1,000 starter fund first — it defuses most common emergencies.",
+            "Then work toward 3–6 months of expenses in a liquid HYSA.",
+            "Keep it at a separate bank so it isn't casually spent."
+          ] },
+          { type:'tip', text:"Keep the fund at a different bank from your checking, with no debit card attached. The 1–2 business-day transfer delay is a feature, not a bug — it stops the \"emergency\" fund from becoming the \"I really want this\" fund." },
+          { type:'check', q:"A widely-recommended FIRST emergency-fund milestone is:", opts:[
+            "$500",
+            "$1,000 — enough to handle most common emergencies",
+            "One month of expenses",
+            "$5,000"
+          ], ans:1, explain:"$1,000 is the common Stage-1 target: it covers most everyday emergencies (a car repair, a medical copay) and is built before other goals, which changes how you handle the unexpected." }
+        ]
+      }
+    ]
   }
 };
 

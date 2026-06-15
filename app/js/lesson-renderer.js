@@ -458,6 +458,96 @@
       }
       $s.addEventListener('input', render);
       render();
+    },
+
+    // 50/30/20 split — take-home income in, live dollar amounts out. The
+    // three percentages are editable and always RE-NORMALIZED to total 100%.
+    budgetSplitter: function(mountEl, config){
+      var c = config || {};
+      var inc = c.income || 3500;
+      var dN = (c.needs != null ? c.needs : 50), dW = (c.wants != null ? c.wants : 30), dG = (c.goals != null ? c.goals : 20);
+      var COL = { needs:'#60a5fa', wants:'#fbbf24', goals:'#34d399' };
+      function row(key, label, sub, val, col){
+        return '<div class="lr-split__row"><span class="lr-split__dot" style="background:' + col + ';"></span>'
+          + '<span class="lr-split__label">' + label + '<span class="lr-split__sub">' + sub + '</span></span>'
+          + '<input type="number" class="lr-split__pctin bs-' + key + '" min="0" max="100" step="1" value="' + val + '" inputmode="numeric"><span class="lr-split__pctsym">%</span>'
+          + '<span class="lr-split__amt bs-amt-' + key + '"></span></div>';
+      }
+      mountEl.innerHTML =
+        '<div class="lr-calc">'
+        + '<div class="lr-calc__head">50 / 30 / 20 budget</div>'
+        + '<div class="lr-calc__controls"><label class="lr-calc__field"><span>Monthly take-home pay</span><input type="number" class="bs-income" min="0" step="100" value="' + inc + '" inputmode="numeric"></label></div>'
+        + '<div class="lr-split">'
+        +   row('needs', 'Needs', 'housing, food, utilities, minimum debt', dN, COL.needs)
+        +   row('wants', 'Wants', 'dining out, fun, subscriptions', dW, COL.wants)
+        +   row('goals', 'Goals', 'savings, investing, extra debt payoff', dG, COL.goals)
+        + '</div>'
+        + '<div class="lr-brk__bar" style="margin-top:.55rem;"><div class="lr-brk__seg bs-bar-needs" style="background:' + COL.needs + ';"></div><div class="lr-brk__seg bs-bar-wants" style="background:' + COL.wants + ';"></div><div class="lr-brk__seg bs-bar-goals" style="background:' + COL.goals + ';"></div></div>'
+        + '<div class="lr-calc__note">Percentages re-normalize to total 100%. 50/30/20 is a widely-used guideline, not a rule — adjust it to your situation.</div>'
+        + '</div>';
+      var $i = mountEl.querySelector('.bs-income');
+      var $n = mountEl.querySelector('.bs-needs'), $w = mountEl.querySelector('.bs-wants'), $g = mountEl.querySelector('.bs-goals');
+      function upd(){
+        var income = Math.max(0, parseFloat($i.value) || 0);
+        var n = Math.max(0, parseFloat($n.value) || 0), w = Math.max(0, parseFloat($w.value) || 0), g = Math.max(0, parseFloat($g.value) || 0);
+        var sum = n + w + g; if(sum <= 0){ n = 50; w = 30; g = 20; sum = 100; }
+        var parts = { needs:n / sum, wants:w / sum, goals:g / sum };
+        Object.keys(parts).forEach(function(k){
+          var amt = mountEl.querySelector('.bs-amt-' + k);
+          var bar = mountEl.querySelector('.bs-bar-' + k);
+          if(amt) amt.textContent = money(income * parts[k]) + ' · ' + Math.round(parts[k] * 100) + '%';
+          if(bar) bar.style.width = (parts[k] * 100).toFixed(1) + '%';
+        });
+      }
+      [$i, $n, $w, $g].forEach(function(el){ el.addEventListener('input', upd); });
+      upd();
+    },
+
+    // Savings-goal timeline — months to reach a target at $X/month (honest
+    // month-by-month accrual, optional APY) + a Stage-2 target from expenses.
+    savingsGoal: function(mountEl, config){
+      var c = config || {};
+      var target = c.target || 1000, monthly = c.monthly || 333, apy = (c.apy != null ? c.apy : 4), exp = c.expenses || 2500;
+      mountEl.innerHTML =
+        '<div class="lr-calc">'
+        + '<div class="lr-calc__head">Savings-goal timeline</div>'
+        + '<div class="lr-calc__controls">'
+        +   '<label class="lr-calc__field"><span>Goal amount</span><input type="number" class="sg-t" min="0" step="100" value="' + target + '" inputmode="numeric"></label>'
+        +   '<label class="lr-calc__field"><span>Saving / month</span><input type="number" class="sg-m" min="0" step="10" value="' + monthly + '" inputmode="numeric"></label>'
+        +   '<label class="lr-calc__field"><span>APY % (optional)</span><input type="number" class="sg-a" min="0" max="10" step="0.1" value="' + apy + '" inputmode="decimal"></label>'
+        + '</div><div class="lr-calc__out sg-out" aria-live="polite"></div>'
+        + '<div class="lr-calc__head" style="margin-top:.7rem;">Stage-2 target from expenses</div>'
+        + '<div class="lr-calc__controls"><label class="lr-calc__field"><span>Monthly expenses</span><input type="number" class="sg-e" min="0" step="100" value="' + exp + '" inputmode="numeric"></label></div>'
+        + '<div class="lr-calc__out sg-out2" aria-live="polite"></div>'
+        + '</div>';
+      var $t = mountEl.querySelector('.sg-t'), $m = mountEl.querySelector('.sg-m'), $a = mountEl.querySelector('.sg-a'), $e = mountEl.querySelector('.sg-e');
+      var $o1 = mountEl.querySelector('.sg-out'), $o2 = mountEl.querySelector('.sg-out2');
+      function monthsTo(tg, mo, a){
+        var r = a / 100 / 12, bal = 0, m = 0;
+        if(mo <= 0 && r <= 0) return { m:-1, bal:0 };
+        while(bal < tg && m < 1200){ bal = bal * (1 + r) + mo; m++; }
+        return bal >= tg ? { m:m, bal:bal } : { m:-1, bal:bal };
+      }
+      function fmt(m){ if(m < 0) return '—'; if(m <= 1) return '1 mo'; var y = Math.floor(m / 12), mm = m % 12; return y ? (y + ' yr' + (mm ? ' ' + mm + ' mo' : '')) : (m + ' mo'); }
+      function upd(){
+        var tg = Math.max(0, parseFloat($t.value) || 0), mo = Math.max(0, parseFloat($m.value) || 0), a = Math.max(0, parseFloat($a.value) || 0);
+        var res = monthsTo(tg, mo, a), m = res.m, put = mo * (m < 0 ? 0 : m), interest = Math.max(0, res.bal - put);
+        $o1.innerHTML = '<div class="lr-calc__stats">'
+          + '<div class="lr-calc__stat"><div class="lr-calc__sv">' + fmt(m) + '</div><div class="lr-calc__sl">to reach ' + money(tg) + '</div></div>'
+          + '<div class="lr-calc__stat"><div class="lr-calc__sv">' + money(put) + '</div><div class="lr-calc__sl">you save</div></div>'
+          + '<div class="lr-calc__stat"><div class="lr-calc__sv">' + money(interest) + '</div><div class="lr-calc__sl">interest</div></div>'
+          + '</div>' + (m < 0 ? '<div class="lr-calc__note">Enter a monthly amount (or APY) so the goal is reachable.</div>' : '');
+      }
+      function upd2(){
+        var e = Math.max(0, parseFloat($e.value) || 0);
+        $o2.innerHTML = '<div class="lr-calc__stats">'
+          + '<div class="lr-calc__stat"><div class="lr-calc__sv">' + money(e * 3) + '</div><div class="lr-calc__sl">3 months</div></div>'
+          + '<div class="lr-calc__stat"><div class="lr-calc__sv">' + money(e * 6) + '</div><div class="lr-calc__sl">6 months</div></div>'
+          + '</div><div class="lr-calc__note">A common guideline is 3–6 months of expenses (dual income often 3–4, single income closer to 6).</div>';
+      }
+      [$t, $m, $a].forEach(function(el){ el.addEventListener('input', upd); });
+      $e.addEventListener('input', upd2);
+      upd(); upd2();
     }
   };
 

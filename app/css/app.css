@@ -10281,3 +10281,16 @@ body:has(#s-parent.sec.active #parentCelestialHome:not(.pch-entered):not(.pch-cl
    star keyframes. Reduced-motion drops the animation; numbers stay readable. */
 .lr-seqglow{opacity:.18;animation:lrStarPulse 4.6s ease-in-out infinite;}
 @media (prefers-reduced-motion:reduce){.lr-seqglow{animation:none;opacity:.16;}}
+
+/* budgetSplitter rows (Budgeting module). Reuses .lr-calc + .lr-brk bar;
+   these add the editable 50/30/20 rows. Token-based; light pass below. */
+.lr-split{display:flex;flex-direction:column;gap:.45rem;margin-top:.2rem;}
+.lr-split__row{display:flex;align-items:center;gap:.5rem;font-size:.82rem;}
+.lr-split__dot{width:11px;height:11px;border-radius:3px;flex:0 0 auto;}
+.lr-split__label{display:flex;flex-direction:column;flex:1 1 auto;color:var(--tx);font-weight:600;line-height:1.15;}
+.lr-split__sub{font-size:.6rem;color:var(--tx3);font-weight:400;}
+.lr-split__pctin{width:46px;font-family:inherit;font-size:.82rem;padding:.3rem .35rem;border-radius:8px;border:1px solid var(--br);background:var(--s1);color:var(--tx);text-align:right;}
+.lr-split__pctsym{color:var(--tx3);font-size:.72rem;margin-left:-.25rem;}
+.lr-split__amt{flex:0 0 auto;min-width:104px;text-align:right;font-weight:700;color:var(--tx);font-size:.78rem;}
+@media (max-width:430px){.lr-split__sub{display:none;}.lr-split__amt{min-width:88px;}}
+:root.light .lr-split__pctin{background:var(--s1);border-color:var(--br);}
