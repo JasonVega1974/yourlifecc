@@ -4423,6 +4423,23 @@ function updateSkillsStats(){
   const e3 = document.getElementById('skQuizPassed'); if(e3) e3.textContent = quizzes;
 }
 
+// Legacy prose-accordion renderer (the original lesson list). Preserved
+// verbatim as the fallback for every category without a block spec, and as
+// the safety net if the spec renderer throws.
+function _skRenderLegacyLessons(body, lessons, cat){
+  body.innerHTML = lessons.length===0 ? '<div style="text-align:center;padding:2rem;color:var(--tx3);">No lessons in this category yet — try the quiz to test what you already know.</div>' :
+    lessons.map((l,i)=>`
+      <div style="border-bottom:1px solid rgba(255,255,255,.04);padding:.8rem 0;">
+        <div style="display:flex;align-items:center;gap:.4rem;cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+          <span style="font-size:.7rem;font-weight:800;color:${cat.color};width:22px;">L${i+1}</span>
+          <span style="font-size:.85rem;font-weight:700;">${l.h}</span>
+          <span style="margin-left:auto;font-size:.6rem;color:var(--tx3);">▼</span>
+        </div>
+        <div style="display:none;margin-top:.5rem;font-size:.82rem;color:var(--tx2);line-height:1.7;padding-left:26px;">${l.b}</div>
+      </div>
+    `).join('');
+}
+
 function openSkillCategory(key){
   const cat = SK_CATS.find(c=>c.key===key); if(!cat) return;
   // Phase 5.8 Pass C — inline mode: relocate modal, hide the grid view,
@@ -4438,20 +4455,21 @@ function openSkillCategory(key){
   const title = document.getElementById('skModalTitle'); if(title) title.textContent = cat.name;
   const meta = document.getElementById('skModalMeta'); if(meta) meta.textContent = lessons.length+' lessons'+(hasCert?' · ✅ Certified':'');
 
-  // Populate lessons tab
+  // Populate lessons tab.
+  // ISOLATION (lesson-renderer redesign): if a hand-authored block spec
+  // exists for this category AND the renderer is loaded, render the new
+  // spec-driven format. Every other category falls through to the legacy
+  // prose accordion below, byte-for-byte unchanged — so we can prototype
+  // one module (taxes) safely and reversibly.
   const body = document.getElementById('skillModalBody');
   if(body){
-    body.innerHTML = lessons.length===0 ? '<div style="text-align:center;padding:2rem;color:var(--tx3);">No lessons in this category yet — try the quiz to test what you already know.</div>' :
-      lessons.map((l,i)=>`
-        <div style="border-bottom:1px solid rgba(255,255,255,.04);padding:.8rem 0;">
-          <div style="display:flex;align-items:center;gap:.4rem;cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
-            <span style="font-size:.7rem;font-weight:800;color:${cat.color};width:22px;">L${i+1}</span>
-            <span style="font-size:.85rem;font-weight:700;">${l.h}</span>
-            <span style="margin-left:auto;font-size:.6rem;color:var(--tx3);">▼</span>
-          </div>
-          <div style="display:none;margin-top:.5rem;font-size:.82rem;color:var(--tx2);line-height:1.7;padding-left:26px;">${l.b}</div>
-        </div>
-      `).join('');
+    const spec = (window.SK_SPECS && window.SK_SPECS[key]) || null;
+    if(spec && window.lessonRenderer && typeof window.lessonRenderer.mount === 'function'){
+      try { window.lessonRenderer.mount(body, spec); }
+      catch(_e){ _skRenderLegacyLessons(body, lessons, cat); }
+    } else {
+      _skRenderLegacyLessons(body, lessons, cat);
+    }
   }
 
   // Show quiz button in footer

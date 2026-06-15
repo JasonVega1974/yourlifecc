@@ -20359,6 +20359,12 @@
 <script defer src="/app/js/health.js"></script>
 <script defer src="/app/js/goals.js"></script>
 <script defer src="/app/js/skills.js"></script>
+<!-- Life-Skills lesson redesign — spec-driven block renderer + hand-authored
+     module specs. skills.js openSkillCategory() routes a category here only
+     when window.SK_SPECS[key] exists; all others stay on the legacy accordion.
+     Both consumed at click-time, so load order vs skills.js is loose. -->
+<script defer src="/app/js/lesson-renderer.js"></script>
+<script defer src="/app/js/data/lesson-specs.js"></script>
 <!-- Tab 1 Inc 5 Step D — SortableJS for chore kanban drag-drop.
      Defer keeps the parser flowing; chores.js checks `typeof Sortable`
      before instantiating so the kanban degrades to a static list if
