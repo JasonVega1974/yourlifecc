@@ -583,24 +583,56 @@
     var growthArea = 'M' + cTop.join(' L') + ' L' + tTop.slice().reverse().join(' L') + ' Z';
     var totalLine = 'M' + tTop.join(' L');
     var ex = X(n - 1), ey = Y(pts[n - 1].total);
-    var accent = 'var(--lr-accent,#10b981)';
+    var lowerC = (data && data.lowerColor) || '#64748b';
+    var upperC = (data && data.upperColor) || 'var(--lr-accent,#10b981)';
     var yrs = (data && data.years != null) ? data.years : (n - 1);
-    var endNote = (data && data.endTotal) ? '<text x="' + (W - padR) + '" y="' + (ey > 30 ? (ey - 7).toFixed(1) : (ey + 12).toFixed(1)) + '" text-anchor="end" font-size="9.5" font-weight="800" fill="var(--tx)">' + esc((data.endIn || '') + ' in → ' + data.endTotal + ' total') + '</text>' : '';
+    var endTxt = (data && data.endText) ? data.endText
+               : (data && data.endTotal ? ((data.endIn || '') + ' in → ' + data.endTotal + ' total') : '');
+    var endNote = endTxt ? '<text x="' + (W - padR) + '" y="' + (ey > 30 ? (ey - 7).toFixed(1) : (ey + 12).toFixed(1)) + '" text-anchor="end" font-size="9.5" font-weight="800" fill="var(--tx)">' + esc(endTxt) + '</text>' : '';
     var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" class="lr-svg lr-gchart" role="img" aria-label="' + esc((data && data.aria) || 'Illustrative growth-over-time graph') + '">'
       + '<line x1="' + padL + '" y1="' + yBase.toFixed(1) + '" x2="' + (W - padR) + '" y2="' + yBase.toFixed(1) + '" stroke="var(--br)" stroke-width="1"/>'
-      + '<path d="' + contribArea + '" fill="#64748b" fill-opacity="0.5"/>'
-      + '<path d="' + growthArea + '" fill="' + accent + '" fill-opacity="0.28"/>'
-      + '<path d="' + totalLine + '" fill="none" stroke="' + accent + '" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" pathLength="1"' + (animate ? ' class="lr-gchart__draw"' : '') + '/>'
-      + '<circle cx="' + ex.toFixed(1) + '" cy="' + ey.toFixed(1) + '" r="3.2" fill="' + accent + '"/>'
+      + '<path d="' + contribArea + '" fill="' + lowerC + '" fill-opacity="0.5"/>'
+      + '<path d="' + growthArea + '" fill="' + upperC + '" fill-opacity="0.28"/>'
+      + '<path d="' + totalLine + '" fill="none" stroke="' + upperC + '" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" pathLength="1"' + (animate ? ' class="lr-gchart__draw"' : '') + '/>'
+      + '<circle cx="' + ex.toFixed(1) + '" cy="' + ey.toFixed(1) + '" r="3.2" fill="' + upperC + '"/>'
       + endNote
       + '<text x="' + padL + '" y="' + (H - 5) + '" font-size="8.5" fill="var(--tx3)">0</text>'
       + '<text x="' + (W - padR) + '" y="' + (H - 5) + '" text-anchor="end" font-size="8.5" fill="var(--tx3)">' + yrs + ' yrs</text>'
       + '</svg>';
     var legend = '<div class="lr-brk__legend" style="justify-content:center;">'
-      + '<div class="lr-brk__leg"><span class="lr-brk__dot" style="background:#64748b;"></span><b>' + esc((data && data.lowerLabel) || 'You contributed') + '</b></div>'
-      + '<div class="lr-brk__leg"><span class="lr-brk__dot" style="background:' + accent + ';"></span><b>' + esc((data && data.upperLabel) || 'Growth') + '</b></div>'
+      + '<div class="lr-brk__leg"><span class="lr-brk__dot" style="background:' + lowerC + ';"></span><b>' + esc((data && data.lowerLabel) || 'You contributed') + '</b></div>'
+      + '<div class="lr-brk__leg"><span class="lr-brk__dot" style="background:' + upperC + ';"></span><b>' + esc((data && data.upperLabel) || 'Growth') + '</b></div>'
       + '</div>';
     return svg + legend;
+  }
+
+  // Amortization schedule for a credit-card balance, accumulating cumulative
+  // principal-paid and total-paid per month — the points behind cardPayoff's
+  // growth chart. mode 'min' recomputes the minimum each month (1% of balance +
+  // that month's interest, $25 floor — same formula as the widget's sim());
+  // mode 'fixed' applies a flat payment. Bounded by capMonths so the
+  // never-pays-off trap is charted to a horizon and annotated rather than
+  // looping forever. Returns raw points {p: principal paid, t: total paid},
+  // plus a summary that agrees to the cent with the widget's totals.
+  function _cardSchedulePoints(bal0, r12, mode, fixed, capMonths){
+    var FLOOR = 25, PRINPCT = 0.01;
+    var cap = capMonths || 360;
+    var bal = bal0, m = 0, cumPay = 0, paidOff = false;
+    var raw = [{ p: 0, t: 0 }];
+    while(bal > 0.005 && m < cap){
+      var i = bal * r12;
+      var pay = (mode === 'min') ? Math.max(FLOOR, PRINPCT * bal + i) : fixed;
+      bal += i;
+      if(pay > bal) pay = bal;
+      bal -= pay;
+      if(bal < 0.005) bal = 0;
+      m++; cumPay += pay;
+      raw.push({ p: Math.max(0, bal0 - bal), t: cumPay });
+      if(bal <= 0.005){ paidOff = true; break; }
+    }
+    var principal = Math.max(0, bal0 - bal);
+    return { raw: raw, months: m, paidOff: paidOff, endBal: bal,
+             principal: principal, interest: cumPay - principal, paid: cumPay };
   }
 
   var WIDGETS = {
@@ -853,7 +885,30 @@
         return '<div class="lr-calc__sub">' + label + '</div><div class="lr-calc__stats">'
           + stat(t, 'to pay off', col) + stat(intr, 'interest', col) + stat(paid, 'total paid', col) + '</div>';
       }
-      function render(){
+      // Chart the entered (fixed-payment) scenario so a bigger payment visibly
+      // shrinks the interest band. Lower band = cumulative principal paid;
+      // widening upper gap = interest handed over (the card-debt cost). When the
+      // payment can't pay the balance off, the schedule is bounded and the
+      // endpoint reads "still owing $X after N yrs" instead of running forever.
+      function chartFor(bal, r12, pay, animate){
+        if(!(bal > 0 && pay > 0)) return '';
+        var sched = _cardSchedulePoints(bal, r12, 'fixed', pay, 360);
+        if(sched.raw.length < 2) return '';
+        var SEG = Math.min(60, sched.raw.length - 1);
+        var pts = [];
+        for(var j = 0; j <= SEG; j++){
+          var idx = Math.round(j / SEG * (sched.raw.length - 1));
+          pts.push({ contrib: sched.raw[idx].p, total: sched.raw[idx].t });
+        }
+        var endText = sched.paidOff
+          ? money(bal) + ' borrowed → ' + money(sched.paid) + ' paid (' + money(sched.interest) + ' interest)'
+          : money(bal) + ' borrowed → still owing ' + money(sched.endBal) + ' after ' + Math.round(sched.months / 12) + ' yrs';
+        return growthChart({ points: pts, years: Math.round(sched.months / 12),
+          lowerLabel: 'Principal', upperLabel: 'Interest', lowerColor: '#64748b', upperColor: '#ef4444',
+          endText: endText,
+          aria: 'Illustrative credit-card payoff — principal versus interest paid over time; the widening interest gap is the cost of carrying the balance' }, animate);
+      }
+      function render(firstTime){
         var bal = Math.max(0, parseFloat($b.value) || 0), apr2 = Math.max(0, parseFloat($r.value) || 0), pay = Math.max(0, parseFloat($p.value) || 0);
         var r12 = apr2 / 100 / 12;
         var mn = sim(bal, r12, 'min'), fx = sim(bal, r12, 'fixed', pay);
@@ -864,10 +919,11 @@
         } else if(fx.months < 0 && pay > 0){
           note = '<div class="lr-calc__note">That payment doesn\'t cover the monthly interest — the balance never goes down. Pay more than the interest each month.</div>';
         }
-        $o.innerHTML = block('Paying only the minimum', mn, '#ef4444') + block('Paying ' + money(pay) + ' / month', fx, '#34d399') + note;
+        var animate = !!firstTime && !_reduced();
+        $o.innerHTML = block('Paying only the minimum', mn, '#ef4444') + block('Paying ' + money(pay) + ' / month', fx, '#34d399') + chartFor(bal, r12, pay, animate) + note;
       }
-      [$b, $r, $p].forEach(function(el){ el.addEventListener('input', render); });
-      render();
+      [$b, $r, $p].forEach(function(el){ el.addEventListener('input', function(){ render(false); }); });
+      render(true);
     },
 
     // Credit utilization meter — balance ÷ limit, color-zoned, with the
@@ -916,21 +972,44 @@
         + '<div class="lr-calc__note">Estimate only — standard fixed-rate amortization. General information, not financial or admissions advice; figures are illustrative examples, not current rates.</div>'
         + '</div>';
       var $a = mountEl.querySelector('.ln-a'), $r = mountEl.querySelector('.ln-r'), $y = mountEl.querySelector('.ln-y'), $o = mountEl.querySelector('.ln-out');
-      function render(){
+      function render(firstTime){
         var P = Math.max(0, parseFloat($a.value) || 0);
         var rate2 = Math.max(0, parseFloat($r.value) || 0);
         var yrs = Math.max(0, parseFloat($y.value) || 0);
         var r = rate2 / 100 / 12, n = yrs * 12;
         var mo = (n <= 0) ? 0 : (r === 0 ? P / n : P * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1));
         var total = mo * n, interest = Math.max(0, total - P);
-        $o.innerHTML = '<div class="lr-calc__stats">'
+        var statsHtml = '<div class="lr-calc__stats">'
           + '<div class="lr-calc__stat"><div class="lr-calc__sv">' + money(mo) + '</div><div class="lr-calc__sl">per month</div></div>'
           + '<div class="lr-calc__stat"><div class="lr-calc__sv">' + money(total) + '</div><div class="lr-calc__sl">total paid</div></div>'
           + '<div class="lr-calc__stat"><div class="lr-calc__sv">' + money(interest) + '</div><div class="lr-calc__sl">interest</div></div>'
           + '</div>';
+        // Mirror of compound growth: lower band = cumulative principal paid down,
+        // widening upper gap = cumulative interest. Cumulative total paid is the
+        // level payment × months (a straight line); the remaining balance at
+        // month m comes from the closed-form amortization, so the curve and the
+        // stated totals are the same math — endpoint lands exactly on P / total.
+        var chartHtml = '';
+        if(P > 0 && n > 0 && mo > 0){
+          var SEG = Math.max(8, Math.min(60, Math.round(yrs)));
+          var pts = [];
+          for(var j = 0; j <= SEG; j++){
+            var m = (j / SEG) * n;
+            var balm = (r > 0) ? (P * Math.pow(1 + r, m) - mo * ((Math.pow(1 + r, m) - 1) / r)) : (P - mo * m);
+            if(balm < 0) balm = 0;
+            var cumPrincipal = Math.max(0, P - balm);
+            pts.push({ contrib: cumPrincipal, total: Math.max(cumPrincipal, mo * m) });
+          }
+          var animate = !!firstTime && !_reduced();
+          chartHtml = growthChart({ points: pts, years: Math.round(yrs),
+            lowerLabel: 'Principal', upperLabel: 'Interest', lowerColor: '#64748b', upperColor: '#f59e0b',
+            endText: money(P) + ' borrowed → ' + money(total) + ' paid (' + money(interest) + ' interest)',
+            aria: 'Illustrative loan repayment over ' + Math.round(yrs) + ' years — principal paid versus interest; the gap between the lines is the interest' }, animate);
+        }
+        $o.innerHTML = statsHtml + chartHtml;
       }
-      [$a, $r, $y].forEach(function(el){ el.addEventListener('input', render); });
-      render();
+      [$a, $r, $y].forEach(function(el){ el.addEventListener('input', function(){ render(false); }); });
+      render(true);
     }
   };
 
@@ -1183,6 +1262,6 @@
   }
 
   if(typeof window !== 'undefined'){
-    window.lessonRenderer = { mount: mount, fromLegacy: fromLegacy, composeModule: composeModule, blocks: BLOCKS, viz: VIZ, diagrams: DIAGRAMS, widgets: WIDGETS, growthChart: growthChart, computeTax: computeTax };
+    window.lessonRenderer = { mount: mount, fromLegacy: fromLegacy, composeModule: composeModule, blocks: BLOCKS, viz: VIZ, diagrams: DIAGRAMS, widgets: WIDGETS, growthChart: growthChart, cardSchedulePoints: _cardSchedulePoints, computeTax: computeTax };
   }
 })();
