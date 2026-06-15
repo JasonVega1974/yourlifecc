@@ -298,6 +298,7 @@ const SK_SPECS = {
             { value:'500+', label:'companies in one index fund' }
           ] },
           { type:'keyIdea', title:'The long-term trend is up', text:"The S&P 500 has averaged about 10% a year over a century. There have been crashes — 2008, 2020 — but anyone who stayed invested through them came out ahead." },
+          { type:'diagram', kind:'marketLine' },
           { type:'takeaways', items:[
             "A share is part-ownership: you grow when the company grows.",
             "Index funds beat most stock-pickers thanks to low fees + diversification.",
@@ -591,6 +592,7 @@ const SK_SPECS = {
         blocks:[
           { type:'lead', text:"Your dashboard lights are the car talking to you. Panicking at every light and ignoring them all are both wrong and costly. Here's what the big ones mean and what to do." },
           { type:'safety', title:'Red lights mean stop — now', text:"Red oil-pressure light: pull over and shut the engine off immediately — running with no oil pressure can destroy the engine in minutes. Temperature light (overheating): pull over and let it cool, and NEVER open a hot radiator cap — the pressurized steam causes severe burns. Red brake warning with the parking brake released: don't drive — get it towed or inspected." },
+          { type:'diagram', kind:'dashLights' },
           { type:'compare',
             left:{ title:'🔴 Red — stop now', points:[
               "Oil pressure — pull over, engine off",
@@ -804,6 +806,7 @@ const SK_SPECS = {
         title:"Reading Nutrition Labels — Don't Get Fooled", duration:'7 min',
         blocks:[
           { type:'lead', text:"Food packaging is one of the most effective marketing environments ever built. Front-of-box claims — \"natural,\" \"wholesome,\" \"made with real fruit,\" \"multigrain\" — are almost entirely unregulated. The label on the back is regulated, and it tells the real story." },
+          { type:'diagram', kind:'nutritionLabel' },
           { type:'steps', items:[
             { title:'Serving size first', text:"Every number on the label is per serving. A bag that looks like one serving often holds 2.5 — so you'd multiply everything by 2.5. This is the #1 way people undercount calories." },
             { title:'Calories', text:"Your energy intake. A moderately active adult needs roughly 2,000–2,500 a day, so a 500-calorie snack is a fifth of the budget." },

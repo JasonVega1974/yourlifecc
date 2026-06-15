@@ -423,6 +423,70 @@
         + '<g transform="translate(196,40)"><path d="M0 -16 C 9 -4, 11 2, 11 6 A 11 11 0 1 1 -11 6 C -11 2, -9 -4, 0 -16 Z" fill="#60a5fa"/><circle r="17" fill="none" stroke="#ef4444" stroke-width="3"/><line x1="-12" y1="12" x2="12" y2="-12" stroke="#ef4444" stroke-width="3"/></g>'
         + '<text x="196" y="74" text-anchor="middle" font-size="9" font-weight="700" fill="#ef4444">never water</text>'
         + '</svg>';
+    },
+    // Annotated Nutrition Facts panel — recognizable FDA layout, generic
+    // values, numbered callouts in read-order (serving size → calories →
+    // sodium → added sugars → ingredients).
+    nutritionLabel: function(cfg, ctx){
+      function bdg(n){ return '<span class="lr-nf__badge">' + n + '</span>'; }
+      var sp = '<span class="lr-nf__badge lr-nf__badge--blank"></span>';
+      return '<div class="lr-nf" role="img" aria-label="A Nutrition Facts panel, read in order: serving size, calories, sodium, added sugars, then the ingredient list">'
+        + '<div class="lr-nf__title">Nutrition Facts</div>'
+        + '<div class="lr-nf__rule lr-nf__rule--thin"></div>'
+        + '<div class="lr-nf__servings">8 servings per container</div>'
+        + '<div class="lr-nf__row lr-nf__serv">' + bdg(1) + '<b>Serving size</b><span class="lr-nf__r">2/3 cup (55g)</span></div>'
+        + '<div class="lr-nf__rule lr-nf__rule--thick"></div>'
+        + '<div class="lr-nf__calrow">' + bdg(2) + '<div class="lr-nf__calbox"><div class="lr-nf__calsmall">Amount per serving</div><div class="lr-nf__calbig"><span>Calories</span><span>230</span></div></div></div>'
+        + '<div class="lr-nf__rule lr-nf__rule--med"></div>'
+        + '<div class="lr-nf__dv">% Daily Value*</div>'
+        + '<div class="lr-nf__row">' + sp + '<b>Total Fat</b> 8g<span class="lr-nf__r">10%</span></div>'
+        + '<div class="lr-nf__row">' + bdg(3) + '<b>Sodium</b> 640mg<span class="lr-nf__r">28%</span></div>'
+        + '<div class="lr-nf__row">' + sp + '<b>Total Carbohydrate</b> 37g<span class="lr-nf__r">13%</span></div>'
+        + '<div class="lr-nf__row lr-nf__ind">' + sp + 'Total Sugars 12g</div>'
+        + '<div class="lr-nf__row lr-nf__ind2">' + bdg(4) + 'Includes 10g Added Sugars<span class="lr-nf__r">20%</span></div>'
+        + '<div class="lr-nf__row">' + sp + '<b>Protein</b> 3g</div>'
+        + '<div class="lr-nf__rule lr-nf__rule--thick"></div>'
+        + '<div class="lr-nf__ing">' + bdg(5) + '<b>Ingredients:</b> Whole grain oats, sugar, salt, malt flavoring.</div>'
+        + '<div class="lr-nf__legend"><b>1</b> serving size → <b>2</b> calories → <b>3</b> sodium → <b>4</b> added sugars → <b>5</b> ingredients</div>'
+        + '</div>';
+    },
+    // Dashboard warning lights — recognizable symbols grouped red (stop /
+    // serious) vs amber (caution).
+    dashLights: function(cfg, ctx){
+      function cell(ic, cap){ return '<div class="lr-dl__cell">' + ic + '<div class="lr-dl__cap">' + cap + '</div></div>'; }
+      var R = '#ef4444', A = '#f59e0b';
+      function svg(inner){ return '<svg viewBox="0 0 40 40" class="lr-dl__ic" aria-hidden="true">' + inner + '</svg>'; }
+      var oil = svg('<g fill="' + R + '"><path d="M4 23q0-4 5-4h9l7-5 1 2-6 5v2q0 4-4 4H9q-5 0-5-4z"/><rect x="10" y="14" width="9" height="3" rx="1"/><path d="M32 24q3 4 0 7-3-3 0-7z"/></g>');
+      var temp = svg('<g fill="' + R + '"><rect x="18" y="6" width="4" height="18" rx="2"/><circle cx="20" cy="28" r="5.5"/></g><path d="M5 35q3-3 6 0t6 0 6 0 6 0" fill="none" stroke="' + R + '" stroke-width="2.2"/>');
+      var batt = svg('<g fill="' + R + '"><rect x="6" y="14" width="28" height="16" rx="2"/><rect x="11" y="11" width="5" height="3"/><rect x="24" y="11" width="5" height="3"/></g><g fill="#fff"><rect x="11.5" y="20.8" width="6" height="2.4"/><rect x="13.3" y="19" width="2.4" height="6"/><rect x="22.5" y="20.8" width="6" height="2.4"/></g>');
+      var brake = svg('<g fill="none" stroke="' + R + '" stroke-width="2.4"><circle cx="20" cy="20" r="8.5"/><path d="M6.5 13a10 10 0 0 0 0 14"/><path d="M33.5 13a10 10 0 0 1 0 14"/></g><g fill="' + R + '"><rect x="18.7" y="14.5" width="2.6" height="7.5" rx="1.3"/><circle cx="20" cy="25" r="1.6"/></g>');
+      var eng = svg('<path d="M9 18h3v-3h7v3h3l3-3v3h4v3h2v4h-2v3h-7l-2 2h-5v-2h-2a3 3 0 0 1-3-3h-2v-4h2z" fill="' + A + '"/>');
+      var tpms = svg('<g fill="' + A + '"><path d="M7 9q13-3 26 0 3 9 0 18h-4q2-7 0-14-9-2-18 0-2 7 0 14H7q-3-9 0-18z"/></g><g fill="' + A + '"><rect x="18.7" y="14.5" width="2.6" height="7.5" rx="1.3"/><circle cx="20" cy="25" r="1.6"/></g>');
+      return '<div class="lr-dl">'
+        + '<div class="lr-dl__group lr-dl__group--red"><div class="lr-dl__ghead">🔴 Red — pull over / serious</div><div class="lr-dl__grid">'
+        +   cell(oil, 'Oil pressure') + cell(temp, 'Temperature') + cell(batt, 'Battery / charging') + cell(brake, 'Brake system')
+        + '</div></div>'
+        + '<div class="lr-dl__group lr-dl__group--amber"><div class="lr-dl__ghead">🟡 Amber — caution</div><div class="lr-dl__grid">'
+        +   cell(eng, 'Check engine') + cell(tpms, 'Tire pressure')
+        + '</div></div>'
+        + '<div class="lr-dl__note">A red oil-pressure or temperature light means stop and shut the engine off now. Amber lights mean address it within days.</div>'
+        + '</div>';
+    },
+    // Stylized long-term market line — up over decades through the 2008/2020
+    // dips and recoveries. Illustrative, NOT real data or a prediction.
+    marketLine: function(cfg, ctx){
+      var an = ctx && ctx.animate;
+      var line = 'M12 112 L52 86 L74 104 L108 70 L150 56 L186 76 L214 44 L268 20';
+      return '<svg viewBox="0 0 280 140" class="lr-svg lr-svg--wide" role="img" aria-label="An illustrative long-term market line trending upward over decades, dipping during the 2008 and 2020 downturns and recovering to new highs. Not real data or a return prediction.">'
+        + '<defs><linearGradient id="lrmkt" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--gr,#34d399)" stop-opacity="0.3"/><stop offset="100%" stop-color="var(--gr,#34d399)" stop-opacity="0"/></linearGradient></defs>'
+        + '<line x1="12" y1="118" x2="268" y2="118" stroke="var(--br)" stroke-width="1.5"/>'
+        + '<path d="' + line + ' L268 118 L12 118 Z" fill="url(#lrmkt)"/>'
+        + '<path d="' + line + '" fill="none" stroke="var(--gr,#34d399)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"' + (an ? ' class="lr-mline--draw" style="--len:330;"' : '') + '/>'
+        + '<circle cx="74" cy="104" r="3.6" fill="#ef4444"/><text x="74" y="116" text-anchor="middle" font-size="9" fill="var(--tx3)">2008</text>'
+        + '<circle cx="186" cy="76" r="3.6" fill="#ef4444"/><text x="190" y="90" text-anchor="middle" font-size="9" fill="var(--tx3)">2020</text>'
+        + '<text x="266" y="16" text-anchor="end" font-size="9.5" font-weight="700" fill="var(--gr,#34d399)">↑ over decades</text>'
+        + '<text x="12" y="135" font-size="8" fill="var(--tx3)">Illustrative — not real data or a return prediction.</text>'
+        + '</svg>';
     }
   };
 
