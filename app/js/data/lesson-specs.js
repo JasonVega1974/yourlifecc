@@ -421,6 +421,205 @@ const SK_SPECS = {
             "It prevents over-tightening later"
           ], ans:1, explain:"With the tire on the ground it can't spin freely, so the wheel holds still while you break each stuck lug nut loose. Once the car is lifted, the wheel just spins and you lose that traction." }
         ]
+      },
+
+      // ── L2 — Engine Oil (procedural) ─────────────────────────
+      {
+        id:'car-oil', matchTitle:'Engine Oil — Why It Matters More Than Almost Any Other Maintenance',
+        title:'Engine Oil — Why It Matters More Than Almost Any Other Maintenance', duration:'7 min',
+        blocks:[
+          { type:'lead', text:"Engine oil is the single most important fluid in your car. It lubricates, cools, cleans, prevents corrosion, and seals — all at once. When it breaks down it can't do any of them, and the engine quietly wears itself out." },
+          { type:'keyIdea', title:'A $40 change prevents a $4,000 repair', text:"Skip oil changes and the oil turns thick, dark, and acidic until metal grinds on metal. An engine that could last 200,000+ miles can fail by 80,000 — often with no warning." },
+          { type:'list', style:'check', items:[
+            { strong:'Conventional:', text:"every 3,000–5,000 miles." },
+            { strong:'Synthetic blend:', text:"every 5,000–7,500 miles." },
+            { strong:'Full synthetic:', text:"every 7,500–10,000 miles (some up to 15,000)." },
+            { strong:'Severe service', text:"(short trips, towing, extreme heat/cold): shorten by 20–30%. Always follow your owner's manual." }
+          ] },
+          { type:'illustratedSteps', steps:[
+            { num:1, text:"Park on level ground and let the engine sit off for at least 10 minutes so the oil drains back down for an accurate reading." },
+            { num:2, text:"Pull the dipstick, wipe it completely clean, reinsert it fully, then pull it again — that second pull is the real measurement." },
+            { num:3, text:"Read the level (it should sit between MIN and MAX) and the color: amber to light brown is good, dark brown is due soon, black and gritty is overdue.", diagram:{ kind:'oilDipstick' } }
+          ] },
+          { type:'safety', title:"Milky or foamy oil — don't drive", text:"If the oil on the dipstick looks milky, foamy, or tan, that can mean coolant is leaking into it (a possible head-gasket failure). Don't keep driving — have it checked, because running it can destroy the engine." },
+          { type:'keyIdea', title:'Match the viscosity exactly', text:"Your manual lists the exact grade, e.g. 5W-30 — the first number is cold-weather flow, the second is hot-running thickness. The wrong grade lubricates poorly. Correct viscosity and on-schedule changes matter more than the brand." },
+          { type:'takeaways', items:[
+            "Oil does five jobs at once; degraded oil does none of them.",
+            "Check it monthly: wipe, reinsert, pull, then read level and color.",
+            "Use the exact viscosity your manual specifies, and change on schedule."
+          ] },
+          { type:'tip', text:"When you get an oil change, note the odometer and set a phone reminder for your interval (e.g. +5,000 miles). Don't rely on memory — the reminder fires right when you're due." },
+          { type:'check', q:"The oil on your dipstick looks milky and tan. What does that suggest?", opts:[
+            "Totally normal — drive on",
+            "Just time for a routine change",
+            "Coolant may be leaking into the oil — stop driving and get it checked",
+            "You simply overfilled it"
+          ], ans:2, explain:"Milky/foamy oil can mean coolant is mixing in (a possible head-gasket leak). Continuing to drive risks serious engine damage — get it inspected." }
+        ]
+      },
+
+      // ── L3 — Car Insurance (conceptual) ──────────────────────
+      {
+        id:'car-insurance', matchTitle:"Car Insurance — What You're Actually Buying and What to Skip",
+        title:"Car Insurance — What You're Actually Buying and What to Skip", duration:'7 min',
+        blocks:[
+          { type:'lead', text:"Car insurance is legally required and financially critical everywhere — yet most people choose it on price alone without knowing what each part actually covers. Here's what you're buying and where to stop overpaying." },
+          { type:'keyIdea', title:'You buy several separate coverages', text:"Liability, collision, comprehensive, uninsured-motorist, and medical/PIP are all distinct. Liability covers damage and injuries you cause to others — never your own car or injuries." },
+          { type:'compare',
+            left:{ title:'Collision', points:[
+              "Damage to YOUR car from hitting a vehicle or object",
+              "Pays regardless of fault",
+              "Has a deductible ($500–$2,000)",
+              "Required if you have a loan or lease"
+            ] },
+            right:{ title:'Comprehensive', points:[
+              "Everything that isn't a collision",
+              "Theft, vandalism, hail, flood, fire, hitting an animal",
+              "Also has a deductible",
+              "Optional once the car is paid off"
+            ] } },
+          { type:'keyIdea', title:'State minimums are dangerously low', text:"Liability is written as three numbers — 25/50/25 means $25k per injured person, $50k per accident, $25k property. A serious crash can top $100k, and a judgment beyond your limits exposes your savings and future wages. Consider 100/300/100 or higher if you have assets." },
+          { type:'list', style:'check', items:[
+            { strong:'Uninsured/underinsured motorist:', text:"about 1 in 8 drivers is uninsured — this is cheap and covers a very real risk. Recommended." },
+            { strong:'Medical payments / PIP:', text:"pays your and your passengers' medical bills regardless of fault; required in no-fault states." },
+            { strong:'Drop collision & comprehensive', text:"on an older car worth less than ~10× the annual premium for that coverage." }
+          ] },
+          { type:'takeaways', items:[
+            "Liability protects others; collision and comprehensive protect your car.",
+            "State-minimum liability is a trap — raise it if you have assets to protect.",
+            "On a low-value car, collision/comprehensive may cost more than they're worth."
+          ] },
+          { type:'tip', text:"Use a comparison site (The Zebra, NerdWallet, Policygenius) to price 10+ insurers at once. For identical coverage the cheapest vs priciest can differ $600–$1,500/year. Never auto-renew without checking competitors every couple of years." },
+          { type:'check', q:"A liability policy of 25/50/25 means the property-damage limit per accident is:", opts:["$25,000","$50,000","$100,000","Unlimited"], ans:0, explain:"The three numbers are $25k per injured person / $50k per accident for injuries / $25k for property damage. The last number — $25,000 — is the property limit." }
+        ]
+      },
+
+      // ── L4 — Jump-Starting (SAFETY-CRITICAL, procedural) ─────
+      {
+        id:'car-jumpstart', matchTitle:'Jump-Starting a Dead Battery — The Exact Correct Procedure',
+        title:'Jump-Starting a Dead Battery — The Exact Correct Procedure', duration:'8 min',
+        blocks:[
+          { type:'lead', text:"Getting jumper-cable polarity or order wrong doesn't just fail to start the car — it can fry expensive electronics, destroy the battery, or ignite hydrogen gas right next to the battery. Done in the right order, it's safe and simple." },
+          { type:'safety', title:'Before you connect anything', text:"Turn BOTH cars off and take the keys out while you attach the clamps. Don't jump a battery that's cracked, leaking, bulging, or frozen (slushy) — it can rupture; call for roadside help instead. Once one cable end is connected, never let the clamp ends touch each other or any metal." },
+          { type:'diagram', kind:'jumperCables' },
+          { type:'illustratedSteps', steps:[
+            { num:1, text:"Connect the clamps in this exact order (see the diagram): red to the DEAD battery + , red to the GOOD battery + , black to the GOOD battery − , and finally black to bare unpainted metal on the DEAD car's engine — a bolt or bracket away from the battery, NOT the dead battery's − terminal.", diagram:{ kind:'jumperCables' } },
+            { num:2, text:"Start the GOOD car and let it run 2–3 minutes, then try the dead car. Don't crank longer than 5 seconds at a time. If it won't start after 3–4 tries, stop — the battery may be beyond a jump or something else is wrong." },
+            { num:3, text:"Disconnect in the REVERSE order: black off the engine ground, black off the good battery − , red off the good + , red off the now-running car + . Then drive 20–30 minutes at highway speed to let the alternator recharge." }
+          ] },
+          { type:'keyIdea', title:'Why clamp 4 goes on bare metal, not the battery', text:"That last connection is the one that sparks. Batteries vent hydrogen — especially while charging — and a spark at the dead battery's − terminal can ignite it. Grounding on bare engine metal away from the battery puts the spark somewhere harmless." },
+          { type:'keyIdea', title:'Polarity is unforgiving', text:"Red is always positive (+), black always negative (−). Reversing them can instantly destroy electronics in both cars. If you're ever unsure which terminal is which, stop and get help rather than guess." },
+          { type:'takeaways', items:[
+            "Order: red→dead +, red→good +, black→good −, black→bare engine metal on the dead car.",
+            "Both engines off and keys out while you connect the clamps.",
+            "The final clamp goes on bare metal away from the battery — never the dead − terminal.",
+            "Reversed polarity fries electronics; a cracked or frozen battery means call for help."
+          ] },
+          { type:'tip', text:"A portable jump starter (about the size of a thick paperback, $50–$80) lets you jump your own car with no second vehicle — and holds a charge for months. One of the best things you can keep in a glove box." },
+          { type:'check', q:"Where does the FINAL (4th) clamp go?", opts:[
+            "On the dead battery's − terminal",
+            "On the good battery's − terminal",
+            "On bare unpainted engine metal on the dead car, away from the battery",
+            "On either positive terminal"
+          ], ans:2, explain:"The last connection sparks, and batteries vent flammable hydrogen. Grounding on bare engine metal away from the dead battery keeps that spark away from the gas." }
+        ]
+      },
+
+      // ── L5 — Tire Care (procedural-lite) ─────────────────────
+      {
+        id:'car-tire-care', matchTitle:'Tire Care — Safety, Savings, and When to Replace',
+        title:'Tire Care — Safety, Savings, and When to Replace', duration:'7 min',
+        blocks:[
+          { type:'lead', text:"Tires are your car's only contact with the road — four roughly hand-sized patches handle all your accelerating, braking, and turning. Worn or underinflated tires lengthen your stopping distance and raise blowout risk." },
+          { type:'keyIdea', title:'Set pressure to the door-jamb number', text:"Use the PSI on the sticker inside the driver's door jamb (or your manual) — not the bigger maximum number molded on the sidewall. Check when the tires are cold (driven under a mile), since heat inflates the reading." },
+          { type:'list', style:'check', items:[
+            { strong:'Tires lose 1–2 PSI a month', text:"and about 1 PSI per 10°F temperature drop — check monthly." },
+            { strong:'Underinflation:', text:"outer-edge wear, worse fuel economy, sluggish handling, higher blowout risk." },
+            { strong:'Overinflation:', text:"center wear, harsher ride, less traction." }
+          ] },
+          { type:'illustratedSteps', steps:[
+            { num:1, text:"Check tread depth with the penny test: insert a penny upside down into a groove. If you can see the top of Lincoln's head, you're at or below 2/32\" — the legal minimum and genuinely dangerous in rain. Replace now.", diagram:{ kind:'treadPenny' } },
+            { num:2, text:"Want earlier warning? Use a quarter: if you can see the top of Washington's head, you're around 4/32\" — still legal, but start budgeting for new tires." },
+            { num:3, text:"Rotate your tires every 5,000–7,500 miles so all four wear evenly — it can add 15,000–25,000 miles to a set, and many shops do it free with an oil change." }
+          ] },
+          { type:'safety', title:'Replace regardless of tread if you see these', text:"Any sidewall bulge, crack, or cut; any tire over 6 years old (check the DOT date code on the sidewall); or new vibration/pulling after a hard pothole or curb strike. These signal structural failure and blowout risk — don't postpone, especially before a long or wet-weather trip." },
+          { type:'takeaways', items:[
+            "Inflate to the door-jamb PSI, checked cold, every month.",
+            "Penny shows Lincoln's head = 2/32\" = replace now.",
+            "Rotate every 5,000–7,500 miles to even out wear and stretch tire life."
+          ] },
+          { type:'tip', text:"Buy tires in pairs at minimum (all four is ideal). And put new tires on the REAR axle regardless of which wheels drive — it keeps the back from sliding out first in hard or wet braking." },
+          { type:'check', q:"You do the penny test and can see the top of Lincoln's head in the groove. That means:", opts:[
+            "Plenty of tread left",
+            "About 2/32\" of tread — replace now",
+            "The tire is overinflated",
+            "It's just time to rotate"
+          ], ans:1, explain:"Seeing the top of his head means the tread is down to ~2/32\" — the legal minimum and unsafe in the wet. Replace the tire." }
+        ]
+      },
+
+      // ── L6 — Warning Lights & Monthly Checks (conceptual + safety) ──
+      {
+        id:'car-warning-lights', matchTitle:'Understanding Warning Lights and Monthly Car Checks',
+        title:'Understanding Warning Lights and Monthly Car Checks', duration:'7 min',
+        blocks:[
+          { type:'lead', text:"Your dashboard lights are the car talking to you. Panicking at every light and ignoring them all are both wrong and costly. Here's what the big ones mean and what to do." },
+          { type:'safety', title:'Red lights mean stop — now', text:"Red oil-pressure light: pull over and shut the engine off immediately — running with no oil pressure can destroy the engine in minutes. Temperature light (overheating): pull over and let it cool, and NEVER open a hot radiator cap — the pressurized steam causes severe burns. Red brake warning with the parking brake released: don't drive — get it towed or inspected." },
+          { type:'compare',
+            left:{ title:'🔴 Red — stop now', points:[
+              "Oil pressure — pull over, engine off",
+              "Temperature — overheating, pull over",
+              "Battery/charging — alternator not charging",
+              "Brake system — don't drive, inspect"
+            ] },
+            right:{ title:'🟡 Yellow — days to weeks', points:[
+              "Check engine — scan it free at a parts store",
+              "Flashing check engine — active misfire, stop",
+              "TPMS — a tire 25%+ low on pressure",
+              "Low fuel / traction-control off"
+            ] } },
+          { type:'list', style:'check', items:[
+            { strong:'Monthly 5-minute check:', text:"oil level + color on the dipstick, tire pressure on all four, coolant in the reservoir (cold engine only), washer fluid, and a walk-around to confirm headlights, brake lights, and turn signals all work." }
+          ] },
+          { type:'takeaways', items:[
+            "Red = stop and address now; yellow = handle within days to weeks.",
+            "A flashing check-engine light means an active misfire — stop driving.",
+            "Five minutes of monthly checks catches most problems before they're expensive."
+          ] },
+          { type:'tip', text:"Keep a $20–$40 OBD-II reader in the glove box. When the check-engine light comes on, read the code yourself first — it tells you whether you're looking at a $10 gas cap or a $400 sensor, and keeps you from being upsold repairs you don't need." },
+          { type:'check', q:"The red oil-pressure light comes on while you're driving. You should:", opts:[
+            "Top off the fuel and keep going",
+            "Drive to the next exit and decide there",
+            "Pull over and shut the engine off right away",
+            "Ignore it if the car still feels fine"
+          ], ans:2, explain:"No oil pressure means metal parts are running without lubrication — that can destroy an engine in minutes. Pull over and shut it off immediately, then check the oil or have it towed." }
+        ]
+      },
+
+      // ── L7 — True Cost of Ownership (conceptual) ─────────────
+      {
+        id:'car-true-cost', matchTitle:'The True Cost of Car Ownership — Running the Real Numbers',
+        title:'The True Cost of Car Ownership — Running the Real Numbers', duration:'6 min',
+        blocks:[
+          { type:'lead', text:"The most common car-buying mistake is looking only at the monthly payment. The payment is one of six costs — and sometimes not even the biggest. Add them all up before you commit." },
+          { type:'keyIdea', title:'Six costs, not one', text:"Loan payment, insurance, fuel, maintenance & repairs, registration & taxes, and depreciation. The sticker payment hides most of them — and the hidden ones are often larger." },
+          { type:'list', style:'check', items:[
+            { strong:'Loan payment:', text:"$200–$700+/mo. A $25,000 car at 8% over 60 months is $507/mo and ~$5,400 in interest; longer terms lower the payment but raise total cost." },
+            { strong:'Insurance:', text:"$100–$400+/mo (under-25 drivers pay the most)." },
+            { strong:'Fuel:', text:"$80–$200/mo — monthly miles ÷ MPG × price per gallon." },
+            { strong:'Maintenance & repairs:', text:"budget ~$100–$150/mo averaged (oil, tires, brakes, surprises)." },
+            { strong:'Registration & taxes:', text:"$100–$700/year, varies a lot by state and value." }
+          ] },
+          { type:'keyIdea', title:'Depreciation is the hidden giant', text:"A new car loses about 20–25% of its value in the first year and 50–60% over five years. You don't feel it monthly, but it's exactly what you've lost the day you sell." },
+          { type:'keyIdea', title:'The 15–20% rule', text:"Keep all car costs combined under 15–20% of your take-home pay. At $3,500/month take-home, that's $525–$700 for everything car-related — not just the loan." },
+          { type:'takeaways', items:[
+            "Total realistic ownership often runs $700–$1,500+/month, all in.",
+            "Depreciation usually dwarfs the payment on a new car.",
+            "A 2–4 year-old reliable used car skips the worst depreciation."
+          ] },
+          { type:'tip', text:"Before buying anything, add up all six costs for the specific car. If the total tops 15–20% of your monthly take-home, it's outside your budget no matter how friendly the monthly payment looks." },
+          { type:'check', q:"On a brand-new car, which cost is usually the biggest — and the easiest to overlook?", opts:["Fuel","The monthly loan payment","Depreciation","Registration fees"], ans:2, explain:"A new car can shed 20–25% of its value in year one — often more than a year of payments — yet it never shows up as a monthly bill. It's the hidden giant of ownership cost." }
+        ]
       }
     ]
   }

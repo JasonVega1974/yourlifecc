@@ -194,6 +194,74 @@
         + '<g transform="translate(210,40)"><circle r="26" fill="none" stroke="var(--tx2)" stroke-width="9"/><circle r="9" fill="var(--s2)" stroke="var(--br)" stroke-width="2"/></g>'
         + '<text x="210" y="94" text-anchor="middle" font-size="11" fill="var(--tx2)">Spare</text>'
         + '</svg>';
+    },
+    // Jumper-cable connection order. The whole point of this diagram is WHERE
+    // clamp 4 lands: bare unpainted engine metal, away from the battery — and
+    // the dead battery's − terminal is explicitly marked "never here", because
+    // the final spark there can ignite vented hydrogen.
+    jumperCables: function(cfg, ctx){
+      var an = ctx && ctx.animate;
+      function badge(x, y, n, fill){
+        var g = an ? '<circle class="lr-seqglow" style="animation-delay:' + ((n - 1) * 0.9).toFixed(2) + 's" cx="' + x + '" cy="' + y + '" r="15" fill="' + fill + '"/>' : '';
+        return g + '<circle cx="' + x + '" cy="' + y + '" r="10" fill="' + fill + '"/><text x="' + x + '" y="' + (y + 4) + '" text-anchor="middle" font-size="12" font-weight="800" fill="#0b1220">' + n + '</text>';
+      }
+      var s = '<svg viewBox="0 0 286 200" class="lr-svg lr-svg--wide" role="img" aria-label="Jumper cable order: one, red to the dead battery positive; two, red to the good battery positive; three, black to the good battery negative; four, black to bare unpainted engine metal on the dead car, away from the battery — never the dead battery negative terminal">';
+      // red cable (1 -> 2) over the top, black cable (3 -> 4) down to the ground bolt
+      s += '<path d="M40 50 C 64 18, 178 18, 198 50" fill="none" stroke="#ef4444" stroke-width="4"/>';
+      s += '<path d="M246 50 C 258 116, 206 150, 162 162" fill="none" stroke="var(--tx2)" stroke-width="4"/>';
+      // dead battery
+      s += '<rect x="20" y="62" width="88" height="50" rx="5" fill="var(--s3)" stroke="var(--tx2)" stroke-width="2"/>';
+      s += '<text x="64" y="92" text-anchor="middle" font-size="12" font-weight="700" fill="var(--tx2)">DEAD</text>';
+      s += '<rect x="35" y="52" width="10" height="12" fill="#ef4444"/><text x="40" y="48" text-anchor="middle" font-size="13" font-weight="800" fill="#ef4444">+</text>';
+      s += '<rect x="83" y="52" width="10" height="12" fill="var(--tx3)"/>';
+      // forbidden marker on dead − terminal
+      s += '<circle cx="88" cy="58" r="13" fill="none" stroke="#ef4444" stroke-width="2.5"/><line x1="79" y1="67" x2="97" y2="49" stroke="#ef4444" stroke-width="2.5"/>';
+      s += '<text x="104" y="44" font-size="9" font-weight="700" fill="#ef4444">never here</text>';
+      // good battery
+      s += '<rect x="178" y="62" width="88" height="50" rx="5" fill="var(--s3)" stroke="var(--tx2)" stroke-width="2"/>';
+      s += '<text x="222" y="92" text-anchor="middle" font-size="12" font-weight="700" fill="var(--tx2)">GOOD</text>';
+      s += '<rect x="193" y="52" width="10" height="12" fill="#ef4444"/><text x="198" y="48" text-anchor="middle" font-size="13" font-weight="800" fill="#ef4444">+</text>';
+      s += '<rect x="241" y="52" width="10" height="12" fill="var(--tx3)"/><text x="246" y="48" text-anchor="middle" font-size="13" font-weight="800" fill="var(--tx3)">−</text>';
+      // engine ground bolt — lower middle, clearly away from both batteries
+      s += '<g transform="translate(150,172)"><polygon points="-11,-6 0,-12 11,-6 11,6 0,12 -11,6" fill="var(--s4)" stroke="var(--tx2)" stroke-width="2"/><circle r="4" fill="var(--tx3)"/></g>';
+      s += '<text x="150" y="194" text-anchor="middle" font-size="9.5" font-weight="700" fill="var(--gr,#34d399)">bare engine metal · away from battery</text>';
+      // clamps
+      s += badge(40, 50, 1, '#ef4444') + badge(198, 50, 2, '#ef4444') + badge(246, 50, 3, '#9ca3af') + badge(150, 160, 4, '#9ca3af');
+      s += '</svg>';
+      return s;
+    },
+    // Engine-oil dipstick: MIN/MAX marks, level band, and an oil-colour legend.
+    oilDipstick: function(cfg, ctx){
+      return '<svg viewBox="0 0 210 188" class="lr-svg" role="img" aria-label="Engine oil dipstick: wipe it clean, reinsert fully, pull again, and read that the oil sits between the MIN and MAX marks; amber is good, dark brown is due soon, black is overdue">'
+        + '<circle cx="96" cy="26" r="15" fill="none" stroke="var(--tx2)" stroke-width="6"/>'
+        + '<rect x="90" y="38" width="12" height="122" rx="5" fill="var(--s3)" stroke="var(--tx2)" stroke-width="2"/>'
+        + '<line x1="82" y1="120" x2="110" y2="120" stroke="var(--tx2)" stroke-width="2"/><text x="120" y="124" font-size="11" font-weight="700" fill="var(--tx2)">MAX</text>'
+        + '<line x1="82" y1="150" x2="110" y2="150" stroke="var(--tx2)" stroke-width="2"/><text x="120" y="154" font-size="11" font-weight="700" fill="var(--tx2)">MIN</text>'
+        + '<rect x="90" y="130" width="12" height="30" rx="3" fill="#d9a441"/>'
+        + '<text x="120" y="174" font-size="9.5" fill="var(--tx3)">level: good</text>'
+        + '<g font-size="9.5">'
+        +   '<rect x="14" y="118" width="12" height="12" rx="2" fill="#d9a441" stroke="var(--br)"/><text x="31" y="128" fill="var(--tx2)">amber — good</text>'
+        +   '<rect x="14" y="136" width="12" height="12" rx="2" fill="#6b4423" stroke="var(--br)"/><text x="31" y="146" fill="var(--tx2)">dark — due soon</text>'
+        +   '<rect x="14" y="154" width="12" height="12" rx="2" fill="#1f1a17" stroke="var(--br)"/><text x="31" y="164" fill="var(--tx2)">black — overdue</text>'
+        + '</g>'
+        + '</svg>';
+    },
+    // Penny tread test: penny inserted head-down into a groove; if tread no
+    // longer covers the top of Lincoln's head, the tire is at/under 2/32".
+    treadPenny: function(cfg, ctx){
+      return '<svg viewBox="0 0 214 152" class="lr-svg lr-svg--wide" role="img" aria-label="Penny tread test: insert a penny upside down into the tread groove; if you can see the top of Lincoln head above the tread, the tire is worn to two thirty-seconds of an inch and must be replaced">'
+        + '<line x1="12" y1="136" x2="202" y2="136" stroke="var(--tx3)" stroke-width="3"/>'
+        + '<g fill="var(--tx2)"><rect x="20" y="74" width="44" height="62" rx="3"/><rect x="86" y="74" width="44" height="62" rx="3"/><rect x="152" y="74" width="42" height="62" rx="3"/></g>'
+        // penny in the left groove (x 64-86)
+        + '<rect x="66" y="42" width="18" height="94" rx="3" fill="#c98a4a" stroke="#a5692f" stroke-width="1.5"/>'
+        + '<circle cx="75" cy="112" r="10" fill="#a5692f"/>'
+        + '<path d="M70 112 q5 -9 10 0" fill="none" stroke="#7c4a1e" stroke-width="1.5"/>'
+        // tread-surface reference line
+        + '<line x1="60" y1="74" x2="92" y2="74" stroke="var(--gr,#34d399)" stroke-width="2" stroke-dasharray="3 3"/>'
+        + '<text x="98" y="60" font-size="9.5" font-weight="700" fill="var(--gr,#34d399)">tread covers</text>'
+        + '<text x="98" y="71" font-size="9.5" font-weight="700" fill="var(--gr,#34d399)">his head = OK</text>'
+        + '<text x="107" y="150" text-anchor="middle" font-size="9.5" fill="var(--tx3)">see the top of his head? ≤ 2/32" — replace</text>'
+        + '</svg>';
     }
   };
 

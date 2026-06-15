@@ -10276,3 +10276,8 @@ body:has(#s-parent.sec.active #parentCelestialHome:not(.pch-entered):not(.pch-cl
 
 /* ── Reduced-motion: no glow; diagram stays fully readable static ── */
 @media (prefers-reduced-motion:reduce){.lr-star__glow{animation:none;opacity:.2;}}
+
+/* Generic sequence-glow for numbered diagrams (jumperCables); reuses the
+   star keyframes. Reduced-motion drops the animation; numbers stay readable. */
+.lr-seqglow{opacity:.18;animation:lrStarPulse 4.6s ease-in-out infinite;}
+@media (prefers-reduced-motion:reduce){.lr-seqglow{animation:none;opacity:.16;}}
