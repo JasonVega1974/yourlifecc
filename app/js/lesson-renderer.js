@@ -289,6 +289,147 @@
         + '<text x="210" y="94" text-anchor="middle" font-size="11" fill="var(--tx2)">Spare</text>'
         + '</svg>';
     },
+    // ── Home Repairs & DIY diagrams ──────────────────────────────
+    // The starter home tool kit — six recognizable silhouettes, labeled.
+    toolGrid: function(cfg, ctx){
+      function lbl(x, y, t){ return '<text x="' + x + '" y="' + y + '" text-anchor="middle" font-size="10.5" fill="var(--tx2)">' + t + '</text>'; }
+      return '<svg viewBox="0 0 300 178" class="lr-svg lr-svg--wide" role="img" aria-label="A starter home tool kit: hammer, screwdrivers, a cordless drill, an adjustable wrench, a tape measure, and pliers">'
+        // row 1 — hammer / screwdrivers / drill
+        + '<rect x="47" y="36" width="6" height="40" rx="2" fill="var(--s4)"/><path d="M33 30 h22 a3 3 0 0 1 3 3 v7 a3 3 0 0 1 -3 3 h-22 l-5 -6 z" fill="var(--tx2)"/>'
+        + lbl(43, 92, 'Hammer')
+        + '<rect x="140" y="30" width="20" height="13" rx="4" fill="var(--lr-accent,#60a5fa)"/><rect x="148" y="42" width="4" height="26" fill="var(--tx2)"/><rect x="147" y="68" width="6" height="6" fill="var(--tx3)"/>'
+        + lbl(150, 92, 'Screwdrivers')
+        + '<rect x="236" y="30" width="26" height="18" rx="4" fill="var(--tx2)"/><rect x="241" y="48" width="9" height="16" rx="2" fill="var(--s4)"/><rect x="262" y="34" width="11" height="9" rx="2" fill="var(--tx3)"/><line x1="273" y1="38.5" x2="289" y2="38.5" stroke="var(--tx2)" stroke-width="3"/>'
+        + lbl(254, 92, 'Cordless drill')
+        // row 2 — wrench / tape measure / pliers
+        + '<g transform="rotate(38 46 124)"><rect x="43" y="108" width="6" height="34" rx="2" fill="var(--tx2)"/><path d="M37 102 h18 v7 h-6 v6 h6 v7 h-18 z" fill="var(--tx2)"/></g>'
+        + lbl(46, 168, 'Adjustable wrench')
+        + '<path d="M136 110 a15 15 0 1 1 30 0 v8 a6 6 0 0 1 -6 6 h-18 a6 6 0 0 1 -6 -6 z" fill="var(--s3)" stroke="var(--tx2)" stroke-width="2"/><circle cx="151" cy="110" r="6" fill="var(--s2)" stroke="var(--tx2)" stroke-width="1.5"/><rect x="160" y="122" width="13" height="6" rx="1" fill="var(--g,#fbbf24)"/>'
+        + lbl(151, 168, 'Tape measure')
+        + '<g stroke="var(--tx2)" stroke-width="5" fill="none" stroke-linecap="round"><path d="M244 140 L252 116 L258 104"/><path d="M260 140 L252 116 L246 104"/></g>'
+        + lbl(252, 168, 'Pliers')
+        + '</svg>';
+    },
+    // Under-sink P-trap: the U-bend holds a water seal (blocks sewer gas) and
+    // is exactly where hair/grease clogs collect. Slip nuts unscrew to clear it.
+    pTrap: function(cfg, ctx){
+      return '<svg viewBox="0 0 232 174" class="lr-svg lr-svg--wide" role="img" aria-label="The P-trap under a sink: the U-bend holds a water seal that blocks sewer gas and is where hair and grease clogs collect; the slip nuts unscrew so you can clear it">'
+        + '<rect x="50" y="14" width="60" height="9" rx="3" fill="var(--s4)"/><text x="80" y="11" text-anchor="middle" font-size="9" fill="var(--tx3)">sink drain</text>'
+        + '<rect x="196" y="60" width="14" height="56" rx="3" fill="var(--s3)" stroke="var(--tx2)" stroke-width="2"/><text x="203" y="130" text-anchor="middle" font-size="9" fill="var(--tx3)">wall</text>'
+        // pipe body
+        + '<path d="M80 23 V120 C80 148 122 148 122 120 V100 H198" fill="none" stroke="var(--tx2)" stroke-width="13" stroke-linecap="round"/>'
+        + '<path d="M80 23 V120 C80 148 122 148 122 120 V100 H198" fill="none" stroke="var(--s4)" stroke-width="7" stroke-linecap="round"/>'
+        // water seal in the bend
+        + '<path d="M84 118 C84 140 118 140 118 118" fill="none" stroke="#3b82f6" stroke-width="6" stroke-linecap="round" opacity=".8"/>'
+        // clog blob sitting in the trap
+        + '<ellipse cx="101" cy="132" rx="15" ry="7.5" fill="#6b4f33"/><g stroke="#4a3522" stroke-width="1.2" opacity=".8"><path d="M90 132 q5 -5 10 0"/><path d="M101 134 q6 -4 11 -1"/></g>'
+        // slip nut rings
+        + '<rect x="73" y="60" width="14" height="9" rx="2" fill="var(--tx3)"/><rect x="115" y="96" width="14" height="9" rx="2" fill="var(--tx3)"/>'
+        // labels
+        + '<g font-size="9" fill="var(--tx2)">'
+        +   '<line x1="118" y1="118" x2="160" y2="92" stroke="var(--tx3)" stroke-width="1"/><text x="163" y="90" fill="#3b82f6">water seal —</text><text x="163" y="101" fill="#3b82f6">blocks sewer gas</text>'
+        +   '<line x1="101" y1="139" x2="101" y2="160" stroke="var(--tx3)" stroke-width="1"/><text x="101" y="170" text-anchor="middle" fill="#8a6a44">clogs collect here</text>'
+        +   '<text x="80" y="56" text-anchor="middle" fill="var(--tx3)">slip nut</text>'
+        + '</g>'
+        + '</svg>';
+    },
+    // Toilet-tank cutaway: the flapper (the $5 fix) seals the flush valve;
+    // the fill valve + float refill the tank; the supply shut-off is at the base.
+    toiletTank: function(cfg, ctx){
+      var an = ctx && ctx.animate;
+      return '<svg viewBox="0 0 224 182" class="lr-svg lr-svg--wide" role="img" aria-label="Toilet tank cutaway: the flapper seals the flush valve at the bottom and is the most common five-dollar fix; the fill valve and float refill the tank; the shut-off valve is on the supply line at the base">'
+        + '<rect x="26" y="30" width="150" height="118" rx="8" fill="none" stroke="var(--tx2)" stroke-width="3"/>'
+        + '<rect x="30" y="74" width="142" height="70" rx="4" fill="#3b82f6" opacity=".12"/><text x="36" y="86" font-size="8.5" fill="#3b82f6">water</text>'
+        // handle + lever
+        + '<rect x="12" y="40" width="16" height="7" rx="2" fill="var(--tx3)"/><line x1="28" y1="44" x2="60" y2="52" stroke="var(--tx3)" stroke-width="2"/>'
+        // fill valve tower + float
+        + '<rect x="54" y="50" width="11" height="78" rx="3" fill="var(--s4)" stroke="var(--tx2)" stroke-width="1.5"/>'
+        + '<line x1="65" y1="74" x2="96" y2="82" stroke="var(--tx2)" stroke-width="3"/><ellipse cx="106" cy="84" rx="13" ry="9" fill="var(--s3)" stroke="var(--tx2)" stroke-width="1.5"/>'
+        // overflow tube
+        + '<rect x="120" y="72" width="9" height="56" rx="2" fill="var(--s4)" stroke="var(--tx2)" stroke-width="1.5"/>'
+        // flapper over the flush opening (highlighted) + chain
+        + '<line x1="60" y1="52" x2="118" y2="120" stroke="var(--tx3)" stroke-width="1.2" stroke-dasharray="2 2"/>'
+        + (an ? '<ellipse class="lr-seqglow" cx="118" cy="130" rx="22" ry="13" fill="#ef4444"/>' : '')
+        + '<path d="M104 130 q14 -12 28 0 q -14 8 -28 0 z" fill="#ef4444" opacity=".85" stroke="var(--tx2)" stroke-width="1"/>'
+        // supply line + shut-off valve at base
+        + '<line x1="60" y1="148" x2="60" y2="168" stroke="var(--tx2)" stroke-width="5"/><circle cx="60" cy="166" r="7" fill="var(--s3)" stroke="var(--tx2)" stroke-width="2"/><line x1="60" y1="159" x2="60" y2="173" stroke="var(--tx2)" stroke-width="2"/>'
+        // labels
+        + '<g font-size="9" fill="var(--tx2)">'
+        +   '<line x1="132" y1="130" x2="176" y2="130" stroke="var(--tx3)" stroke-width="1"/><text x="180" y="127" fill="#ef4444">flapper</text><text x="180" y="138" fill="#ef4444">($5 fix)</text>'
+        +   '<text x="59" y="46" text-anchor="middle" fill="var(--tx3)">fill valve</text>'
+        +   '<line x1="60" y1="166" x2="92" y2="166" stroke="var(--tx3)" stroke-width="1"/><text x="95" y="169">shut-off valve</text>'
+        + '</g>'
+        + '</svg>';
+    },
+    // Large drywall-hole repair in cross-section: backer board behind the hole,
+    // patch screwed to it, then mesh tape and joint compound feathered out wide.
+    drywallPatch: function(cfg, ctx){
+      return '<svg viewBox="0 0 252 168" class="lr-svg lr-svg--wide" role="img" aria-label="Large drywall hole repair seen edge-on: a backer board is slipped behind the hole, the patch is screwed to it, then mesh tape and joint compound are feathered out six inches or more on the wall face">'
+        + '<text x="156" y="16" text-anchor="middle" font-size="9" fill="var(--tx3)">existing wall (edge-on)</text>'
+        + '<rect x="150" y="24" width="12" height="42" fill="var(--s3)" stroke="var(--tx2)" stroke-width="1.5"/>'
+        + '<rect x="150" y="100" width="12" height="44" fill="var(--s3)" stroke="var(--tx2)" stroke-width="1.5"/>'
+        // backer board behind
+        + '<rect x="138" y="58" width="12" height="52" rx="1" fill="var(--s4)" stroke="var(--tx2)" stroke-width="1.5"/>'
+        // patch in the hole
+        + '<rect x="150" y="66" width="12" height="34" fill="var(--lr-accent,#60a5fa)" opacity=".45" stroke="var(--tx2)" stroke-width="1.5"/>'
+        // screws into the backer
+        + '<g stroke="var(--tx2)" stroke-width="2"><line x1="150" y1="62" x2="139" y2="62"/><line x1="150" y1="104" x2="139" y2="104"/></g>'
+        // feathered compound on the face
+        + '<path d="M162 46 Q 184 56 188 84 Q 184 112 162 122 L162 46 Z" fill="#cbd5e1" opacity=".22" stroke="var(--tx3)" stroke-width="1" stroke-dasharray="3 3"/>'
+        + '<g font-size="9" fill="var(--tx2)">'
+        +   '<line x1="138" y1="84" x2="92" y2="84" stroke="var(--tx3)" stroke-width="1"/><text x="88" y="81" text-anchor="end">backer board</text><text x="88" y="92" text-anchor="end">slipped behind</text>'
+        +   '<line x1="156" y1="84" x2="156" y2="152" stroke="var(--tx3)" stroke-width="1"/><text x="156" y="162" text-anchor="middle" fill="var(--lr-accent,#60a5fa)">patch screwed on</text>'
+        +   '<line x1="188" y1="84" x2="212" y2="84" stroke="var(--tx3)" stroke-width="1"/><text x="216" y="81">tape &amp;</text><text x="216" y="92">feather wide</text>'
+        + '</g>'
+        + '</svg>';
+    },
+    // Breaker panel: a tripped breaker sits in the MIDDLE position. Flip it
+    // fully OFF, then back ON. The tripped breaker pulses when animated.
+    breakerPanel: function(cfg, ctx){
+      var an = ctx && ctx.animate;
+      function brk(x, y, state){
+        var col = state === 'trip' ? '#ef4444' : (state === 'on' ? 'var(--gr,#34d399)' : 'var(--tx3)');
+        var nx = state === 'trip' ? x + 9 : (state === 'on' ? x + 16 : x + 2);
+        return '<rect x="' + x + '" y="' + y + '" width="27" height="14" rx="2" fill="var(--s3)" stroke="var(--tx2)" stroke-width="1.5"/>'
+          + '<rect x="' + nx + '" y="' + (y + 2.5) + '" width="9" height="9" rx="1.5" fill="' + col + '"/>';
+      }
+      var rows = [60, 80, 100, 120, 140];
+      var left = '', right = '';
+      rows.forEach(function(y, i){
+        left += brk(58, y, i === 2 ? 'trip' : 'on');
+        right += brk(96, y, i === 1 ? 'off' : 'on');
+      });
+      return '<svg viewBox="0 0 224 182" class="lr-svg lr-svg--wide" role="img" aria-label="A breaker panel: a tripped breaker rests in the middle position, neither fully on nor off. To reset it, flip it fully off, then back on. The main breaker is at the top.">'
+        + '<rect x="40" y="20" width="100" height="150" rx="6" fill="var(--s2)" stroke="var(--tx2)" stroke-width="3"/>'
+        + '<rect x="58" y="34" width="65" height="16" rx="2" fill="var(--s3)" stroke="var(--tx2)" stroke-width="1.5"/><text x="90" y="46" text-anchor="middle" font-size="9" font-weight="700" fill="var(--tx2)">MAIN</text>'
+        + (an ? '<circle class="lr-seqglow" cx="71.5" cy="107" r="22" fill="#ef4444"/>' : '')
+        + left + right
+        // callout to the tripped breaker
+        + '<line x1="85" y1="107" x2="150" y2="107" stroke="var(--tx3)" stroke-width="1"/>'
+        + '<text x="154" y="98" font-size="9.5" font-weight="700" fill="#ef4444">tripped —</text>'
+        + '<text x="154" y="110" font-size="9.5" font-weight="700" fill="#ef4444">middle position</text>'
+        + '<text x="154" y="126" font-size="9" fill="var(--tx2)">flip fully OFF,</text>'
+        + '<text x="154" y="137" font-size="9" fill="var(--tx2)">then back ON</text>'
+        + '</svg>';
+    },
+    // Main water shut-off on the supply line near the meter — turn the wheel
+    // clockwise to close. The handle pulses when animated.
+    shutoffValve: function(cfg, ctx){
+      var an = ctx && ctx.animate;
+      return '<svg viewBox="0 0 232 150" class="lr-svg lr-svg--wide" role="img" aria-label="The main water shut-off on the supply line near the meter: turn the round handle clockwise to close it and stop all water to the house">'
+        + '<line x1="10" y1="90" x2="222" y2="90" stroke="#3b82f6" stroke-width="13" stroke-linecap="round"/>'
+        + '<line x1="10" y1="90" x2="222" y2="90" stroke="#60a5fa" stroke-width="4" opacity=".55"/>'
+        + '<rect x="14" y="66" width="34" height="46" rx="4" fill="var(--s3)" stroke="var(--tx2)" stroke-width="2"/><text x="31" y="126" text-anchor="middle" font-size="9" fill="var(--tx3)">meter</text>'
+        + '<rect x="116" y="78" width="28" height="24" rx="3" fill="var(--tx2)"/>'
+        + '<line x1="130" y1="78" x2="130" y2="50" stroke="var(--tx2)" stroke-width="5"/>'
+        + (an ? '<circle class="lr-seqglow" cx="130" cy="44" r="21" fill="#34d399"/>' : '')
+        + '<circle cx="130" cy="44" r="16" fill="none" stroke="var(--tx2)" stroke-width="5"/>'
+        + '<path d="M130 26 A18 18 0 0 1 148 44" fill="none" stroke="var(--gr,#34d399)" stroke-width="3"/>'
+        + _arrowhead(148, 44, Math.PI / 2, 'var(--gr,#34d399)')
+        + '<text x="128" y="16" text-anchor="middle" font-size="10" font-weight="700" fill="var(--gr,#34d399)">clockwise = close</text>'
+        + '<text x="150" y="124" text-anchor="middle" font-size="9.5" fill="var(--tx3)">main water shut-off</text>'
+        + '</svg>';
+    },
     // Jumper-cable connection order. The whole point of this diagram is WHERE
     // clamp 4 lands: bare unpainted engine metal, away from the battery — and
     // the dead battery's − terminal is explicitly marked "never here", because

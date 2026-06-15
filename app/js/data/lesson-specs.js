@@ -1323,6 +1323,206 @@ const SK_SPECS = {
         ]
       }
     ]
+  },
+
+  // ═══════════════════════════════════════════════════════════════════
+  // HOME REPAIRS & DIY — full module elevated. This is the diagram-and-
+  // steps module: every lesson is procedural, so each carries a schematic
+  // diagram and (where there's a real sequence) animated illustratedSteps.
+  // Electrical (L5) and water (L6) get safety blocks handled with the same
+  // care as the Car jump-start / grease-fire warnings. Content is faithful
+  // to SK_DATA.diy — no new claims.
+  // ═══════════════════════════════════════════════════════════════════
+  diy: {
+    key: 'diy',
+    color: '#78716c',
+    lessons: [
+      // ── L1 — Basic Tool Kit (identification) ─────────────────
+      {
+        id:'diy-toolkit', matchTitle:'Your Basic Tool Kit — What Every Person Should Own',
+        title:'Your Basic Tool Kit — What Every Person Should Own', duration:'6 min',
+        blocks:[
+          { type:'lead', text:"You don't need a garage full of tools. About a dozen items handle the overwhelming majority of everyday home tasks — hanging things, tightening things, small repairs — and the whole kit fits in one box." },
+          { type:'keyIdea', title:'Twelve items, ~90% of home jobs', text:"A solid starter kit runs about $50–80. The single most versatile piece is a cordless drill ($40–60) — it drives screws, drills holes, and saves you more time than anything else in the box." },
+          { type:'diagram', kind:'toolGrid' },
+          { type:'list', style:'check', items:[
+            { strong:'Hammer', text:"and a tape measure — the two you'll reach for most." },
+            { strong:'Screwdrivers:', text:"Phillips and flathead, or a single multi-bit driver." },
+            { strong:'Adjustable wrench, pliers,', text:"and a set of Allen (hex) wrenches." },
+            { strong:'Utility knife and a level', text:"— for clean cuts and hanging things straight." },
+            { strong:'Duct tape, electrical tape, and WD-40', text:"— the three that fix or free almost anything." },
+            { strong:'A cordless drill', text:"— your most versatile tool by far." }
+          ] },
+          { type:'tip', text:"You don't need professional-grade tools for home repairs. Buy basics cheap at Harbor Freight, or find quality used tools at estate sales and on Facebook Marketplace." },
+          { type:'takeaways', items:[
+            "A dozen tools cover almost every household job — you don't need more to start.",
+            "A cordless drill is the highest-value tool in the kit.",
+            "Buy basic-grade and used; you don't need pro tools for home repairs."
+          ] },
+          { type:'check', q:"What's the single most versatile tool in a starter kit?", opts:[
+            "A hammer",
+            "A cordless drill",
+            "An adjustable wrench",
+            "A level"
+          ], ans:1, explain:"A cordless drill drives screws and bores holes — it does more, faster, than anything else in the box, which is why it's the one power tool worth buying first." }
+        ]
+      },
+
+      // ── L2 — Unclog a Drain (procedural + escalation) ────────
+      {
+        id:'diy-drain', matchTitle:'Unclog a Drain — Without Calling a Plumber',
+        title:'Unclog a Drain — Without Calling a Plumber', duration:'6 min',
+        blocks:[
+          { type:'lead', text:"A plumber can charge $150–300 for a clog you can often clear yourself in about ten minutes. The trick is knowing that bathroom and kitchen clogs have different causes — and different fixes." },
+          { type:'keyIdea', title:'The clog lives in the trap', text:"Under every sink is a U-shaped pipe — the P-trap. It holds a little water that blocks sewer gas, and it's exactly where hair and grease collect. That's the spot you're clearing." },
+          { type:'diagram', kind:'pTrap' },
+          { type:'illustratedSteps', steps:[
+            { num:1, text:"Bathroom sink or tub — the clog is almost always hair. Remove the drain cover and pull out the hair. For deeper clogs, work a $3 plastic drain snake (a \"Zip-It\") down and pull the gunk back up, then run hot water for 2 minutes." },
+            { num:2, text:"Kitchen sink — grease and food. Pour half a cup of baking soda down the drain, then half a cup of white vinegar. Give it 15 minutes to fizz and break the grease down." },
+            { num:3, text:"Flush with a kettle of boiling water. If it's still slow, work a flat-bottom sink plunger over the drain to push the clog free." }
+          ] },
+          { type:'safety', title:'When to stop and call a plumber', text:"Call a pro if several drains clog at the same time, water backs up into other drains or fixtures, you smell sewage, or you've already tried everything twice. Those point to a blockage deep in the main line — not the trap — and forcing it can make things worse." },
+          { type:'takeaways', items:[
+            "Bathroom clogs are hair; kitchen clogs are grease — clear them differently.",
+            "Baking soda + vinegar + boiling water clears most kitchen drains for pennies.",
+            "Multiple drains backing up at once means the main line — call a plumber."
+          ] },
+          { type:'check', q:"Which sign means you should call a plumber instead of trying again?", opts:[
+            "One bathroom sink drains slowly",
+            "Several drains back up at the same time",
+            "The water is a little cloudy",
+            "It took two tries to clear"
+          ], ans:1, explain:"Several drains backing up together (or sewage smell, or water rising in other fixtures) points to a blockage in the main line — deeper than the trap, and a job for a plumber." }
+        ]
+      },
+
+      // ── L3 — Fix a Running Toilet (procedural, water) ────────
+      {
+        id:'diy-toilet', matchTitle:'Fix a Running Toilet — The Most Common Home Repair',
+        title:'Fix a Running Toilet — The Most Common Home Repair', duration:'6 min',
+        blocks:[
+          { type:'lead', text:"A running toilet is the most common home repair there is — and one of the cheapest to fix. Left alone it can waste around 200 gallons a day and add $100 or more to a monthly water bill." },
+          { type:'keyIdea', title:'Usually a $5 flapper', text:"The flapper is the rubber seal at the bottom of the tank. When it stops sealing, water trickles past nonstop — that's the running sound. Replacing it takes about ten minutes and costs $5–15." },
+          { type:'diagram', kind:'toiletTank' },
+          { type:'illustratedSteps', steps:[
+            { num:1, text:"Turn off the water at the shut-off valve on the supply line behind the toilet (clockwise to close)." },
+            { num:2, text:"Flush to empty the tank so you can work dry." },
+            { num:3, text:"Unhook the old flapper from the flush valve and unclip its chain from the handle lever." },
+            { num:4, text:"Hook on the new flapper ($5), reconnect the chain, turn the water back on, and test a flush." }
+          ] },
+          { type:'tip', text:"If a new flapper doesn't fix it, the fill valve may need adjusting or replacing ($8–15). Search YouTube for your specific toilet model — someone has filmed the exact part." },
+          { type:'takeaways', items:[
+            "A running toilet is usually a worn flapper — a $5, ten-minute fix.",
+            "Always shut off the supply valve and flush the tank empty before you start.",
+            "If the flapper isn't it, look at the fill valve next."
+          ] },
+          { type:'check', q:"What's the most common cause of a running toilet?", opts:[
+            "A cracked tank",
+            "A worn flapper that no longer seals",
+            "Low water pressure",
+            "A clogged drain"
+          ], ans:1, explain:"A worn flapper stops sealing the flush valve, so water trickles past continuously. Swapping it ($5) fixes the large majority of running toilets." }
+        ]
+      },
+
+      // ── L4 — Patch a Wall Hole (procedural) ──────────────────
+      {
+        id:'diy-drywall', matchTitle:'Patch a Wall Hole — From Nail Holes to Fist-Sized Damage',
+        title:'Patch a Wall Hole — From Nail Holes to Fist-Sized Damage', duration:'7 min',
+        blocks:[
+          { type:'lead', text:"Knowing how to patch drywall is what saves your security deposit. The method scales with the damage — a nail hole, a doorknob ding, and a fist-sized hole each need a different approach." },
+          { type:'list', style:'check', items:[
+            { strong:'Small (nail/screw):', text:"fill with lightweight spackle, let it dry ~30 min, sand smooth, touch up paint. About $5, five minutes." },
+            { strong:'Medium (1–3 inches):', text:"use a drywall patch kit ($5–8) — spackle over the mesh in thin layers, sanding between, then paint." },
+            { strong:'Large (3+ inches):', text:"this one needs a backer board and joint compound — the steps below." }
+          ] },
+          { type:'diagram', kind:'drywallPatch' },
+          { type:'illustratedSteps', steps:[
+            { num:1, text:"Cut a clean square around the damage, then cut a matching piece of drywall to fit the opening." },
+            { num:2, text:"Slip a backer board behind the hole and screw it to the back of the existing drywall so it can't shift." },
+            { num:3, text:"Screw the patch to the backer board, then cover the seams with mesh tape." },
+            { num:4, text:"Spread joint compound in 2–3 thin coats, sanding between each and feathering it wider than the patch so it blends in. Prime, then paint." }
+          ] },
+          { type:'takeaways', items:[
+            "Match the method to the hole — spackle for nails, a kit for mid-size, backer + compound for large.",
+            "A fist-sized hole needs a backer board behind it before the patch goes on.",
+            "Thin coats sanded and feathered wide are what make a patch disappear."
+          ] },
+          { type:'check', q:"For a fist-sized hole, what goes in first?", opts:[
+            "Spackle smeared straight across the gap",
+            "A backer board screwed behind the hole",
+            "Mesh tape over the opening",
+            "A coat of primer"
+          ], ans:1, explain:"A large hole has nothing to hold filler, so you first screw a backer board behind it, then screw the patch to that backer before taping and compounding." }
+        ]
+      },
+
+      // ── L5 — Circuit Breaker + Electrical Safety (SAFETY) ────
+      {
+        id:'diy-breaker', matchTitle:'Reset a Circuit Breaker and Basic Electrical Safety',
+        title:'Reset a Circuit Breaker and Basic Electrical Safety', duration:'7 min',
+        blocks:[
+          { type:'lead', text:"When the power dies in one room while the rest of the house is fine, it's almost never an outage — it's a tripped breaker, and resetting it takes about thirty seconds once you know what to look for." },
+          { type:'keyIdea', title:'One dark room = one tripped breaker', text:"A breaker trips to protect the circuit when it's overloaded, shorted, or hit by a ground fault. The power company isn't involved — the fix is at your own panel." },
+          { type:'safety', title:'Resetting is safe — touching wiring is not', text:"Flipping a tripped breaker is safe; you're only moving a switch. But never touch wiring itself unless you've shut off its breaker AND confirmed the circuit is dead with a non-contact voltage tester — water and electricity kill. If a breaker trips again right after you reset it, or an outlet is warm or scorched, stop and call a licensed electrician instead of resetting it again." },
+          { type:'diagram', kind:'breakerPanel' },
+          { type:'illustratedSteps', steps:[
+            { num:1, text:"Find your electrical panel — usually a grey metal door in a basement, garage, utility closet, or hallway." },
+            { num:2, text:"Look for the one breaker sitting in the middle position, not lined up with its neighbors. That's the tripped one." },
+            { num:3, text:"Flip it fully OFF first — you'll feel it click — then flip it back ON. A breaker only resets from the full-off position." }
+          ] },
+          { type:'list', style:'check', items:[
+            { strong:'Never touch wires', text:"you're not certain are dead." },
+            { strong:"Don't overload power strips", text:"— daisy-chaining strips together is a fire hazard." },
+            { strong:'Replace frayed cords', text:"rather than taping over them." },
+            { strong:'A warm outlet', text:"is a warning — stop using it and call an electrician." }
+          ] },
+          { type:'takeaways', items:[
+            "A tripped breaker rests in the middle; reset it by flipping fully OFF, then ON.",
+            "A breaker that keeps tripping is a problem to diagnose, not to keep resetting.",
+            "Treat wiring as live until a voltage tester proves it dead — water and electricity kill."
+          ] },
+          { type:'check', q:"How do you reset a tripped breaker?", opts:[
+            "Tap it gently toward ON",
+            "Flip it fully OFF first, then back ON",
+            "Hold it in the middle for ten seconds",
+            "Turn off the main breaker first"
+          ], ans:1, explain:"A tripped breaker sits in the middle and won't re-energize from there. Flip it all the way OFF (you'll feel the click), then back ON." }
+        ]
+      },
+
+      // ── L6 — Stop a Leak + Shut-Off Valves (SAFETY/urgency) ──
+      {
+        id:'diy-shutoff', matchTitle:'Stop a Leak and Know Your Shut-Off Valves',
+        title:'Stop a Leak and Know Your Shut-Off Valves', duration:'7 min',
+        blocks:[
+          { type:'lead', text:"Water damage is the #1 home insurance claim in America, and a burst line floods a room in minutes. The single most valuable thing you can do is find your main water shut-off before you ever need it." },
+          { type:'safety', title:'Find your main shut-off now — before you need it', text:"Locate the main water shut-off today — it's usually near the meter, in a basement, crawl space, or outside. Turn it clockwise to stop all water to the house. Shut the water off before any plumbing repair, and make sure everyone in the home knows where that valve is." },
+          { type:'diagram', kind:'shutoffValve' },
+          { type:'illustratedSteps', steps:[
+            { num:1, text:"For a leaking faucet — usually a worn washer — shut off the water at the stop valves under the sink before you take anything apart." },
+            { num:2, text:"Disassemble the handle and find the small rubber washer that's worn out." },
+            { num:3, text:"Replace the washer ($1), reassemble the handle, and turn the water back on to test." }
+          ] },
+          { type:'list', style:'check', items:[
+            { strong:'Leaking pipe joint:', text:"tighten the fitting first; if it still weeps, wrap it with plumber's tape ($2) and retighten." },
+            { strong:'Cracked pipe:', text:"wrap it with self-fusing silicone tape to hold it until a plumber arrives." },
+            { strong:'Any major leak:', text:"shut the main valve first, then fix or call — stopping the water is always step one." }
+          ] },
+          { type:'takeaways', items:[
+            "Know where your main shut-off is and which way it turns — clockwise to close.",
+            "A dripping faucet is usually a $1 washer; shut off the under-sink valves first.",
+            "For pipe leaks, stop the water before anything else — it's always step one."
+          ] },
+          { type:'check', q:"Which way do you turn the main valve to shut the water off?", opts:[
+            "Counter-clockwise",
+            "Clockwise",
+            "Pull it straight out",
+            "It doesn't matter"
+          ], ans:1, explain:"Righty-tighty — turn the main shut-off clockwise to close it and stop all water to the house. Find it and try it once before an emergency makes you hunt for it." }
+        ]
+      }
+    ]
   }
 };
 
