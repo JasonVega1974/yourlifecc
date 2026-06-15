@@ -21116,6 +21116,10 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="ff-nav-icon">⛪</span>
     <span class="ff-nav-label">Home</span>
   </button>
+  <button class="ff-nav-btn" id="ffNavSkills" onclick="ffNavGo('skills')">
+    <span class="ff-nav-icon">🧠</span>
+    <span class="ff-nav-label">Skills</span>
+  </button>
   <button class="ff-nav-btn" id="ffNavSettings" onclick="ffNavGo('settings')">
     <span class="ff-nav-icon">⚙️</span>
     <span class="ff-nav-label">Settings</span>
@@ -21265,6 +21269,11 @@ document.addEventListener('DOMContentLoaded', function() {
       ffSetActive('home');
       document.body.classList.add('ff-hero-active');
       if(typeof showSection === 'function') showSection('s-hero');
+    } else if(target === 'skills'){
+      // Reach build 1 — faith_free can now enter the Life Skills Academy.
+      ffSetActive('skills');
+      document.body.classList.remove('ff-hero-active');
+      if(typeof showSection === 'function') showSection('s-skills');
     } else if(target === 'settings'){
       ffSetActive('settings');
       if(typeof openSettings === 'function') openSettings();
@@ -21364,7 +21373,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function ffSetActive(tab){
     document.querySelectorAll('.ff-nav-btn').forEach(function(b){ b.classList.remove('active'); });
-    var map = { home:'ffNavHome', settings:'ffNavSettings', profile:'ffNavProfile', search:'ffNavSearch' };
+    var map = { home:'ffNavHome', skills:'ffNavSkills', settings:'ffNavSettings', profile:'ffNavProfile', search:'ffNavSearch' };
     var btn = document.getElementById(map[tab]);
     if(btn) btn.classList.add('active');
   }

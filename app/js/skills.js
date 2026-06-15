@@ -4346,11 +4346,15 @@ function buildSkillsGrid(filter){
     const cc = cat.color || '#38bdf8';
     const photo = (typeof SK_CAT_PHOTOS !== 'undefined') ? SK_CAT_PHOTOS[cat.key] : null;
     const cardId = 'sk-' + cat.key;
+    // Reach build 1 — faith_free-only lock badge on the premium money modules.
+    // isAcademyCategoryLocked short-circuits false for every other tier.
+    const locked = (typeof isAcademyCategoryLocked === 'function') && isAcademyCategoryLocked(cat.key);
     const hero = photo
       ? `<div class="topic-card-hero-wrap" style="background:linear-gradient(135deg, ${cc}55, ${cc}18);"><img class="topic-card-hero" data-card-id="${cardId}" loading="lazy" src="${photo}" alt="${cat.name}"></div>`
       : `<div class="topic-card-hero-wrap topic-card-hero-fallback" data-card-id="${cardId}" style="background:linear-gradient(135deg, ${cc}55, ${cc}18);"></div>`;
-    return `<div class="topic-card sk-topic-card" style="border-color:${cc}33;--sk-card-accent:${cc};" onclick="openSkillCategory('${cat.key}')">
+    return `<div class="topic-card sk-topic-card${locked?' sk-locked':''}" style="border-color:${cc}33;--sk-card-accent:${cc};" onclick="openSkillCategory('${cat.key}')">
       ${hasCert?'<div class="sk-cert-pill"><span>✓ Cert</span></div>':''}
+      ${locked?'<div class="sk-lock-pill" aria-label="Part of the full Academy">🔒</div>':''}
       ${hero}
       <div class="topic-card-title">${cat.name}</div>
       <div class="topic-card-desc">${desc}</div>
@@ -4440,6 +4444,47 @@ function _skRenderLegacyLessons(body, lessons, cat){
     `).join('');
 }
 
+// Reach build 1 — calm premium probe shown to faith_free for a locked money
+// module. Honest + teen-appropriate: no fake purchase, no urgency, no nag.
+// If interest was already recorded, show the warm acknowledgement instead of
+// re-offering the CTA.
+function _skRenderLockedPanel(body, cat, key){
+  const esc = (typeof escapeHtml === 'function') ? escapeHtml : function(s){ return s; };
+  const already = (typeof D !== 'undefined' && D && D.academyInterest === true);
+  body.innerHTML =
+    '<div class="sk-lock-panel">'
+    + '<div class="sk-lock-panel__icon" aria-hidden="true">🔒</div>'
+    + '<div class="sk-lock-panel__title">' + esc(cat.name) + ' is part of the full Academy</div>'
+    + '<div class="sk-lock-panel__body">The money modules — Taxes, Investing, and Credit — come with the full Life Skills Academy. Everything else in the Academy is open to you right now.</div>'
+    + (already
+        ? '<div class="sk-lock-panel__ack">✓ Got it — we’ll let you know the moment the full Academy opens up for you.</div>'
+        : '<button class="sk-lock-panel__cta" type="button" onclick="academyNotifyInterest(\'' + key + '\', this)">Let me know when I can get this</button>')
+    + '</div>';
+}
+
+// CTA handler — records interest in an aggregate-countable way (a top-level
+// blob flag, queryable via PostgREST data->>academyInterest) AND opts the
+// account into the existing crossover soft-invite email. Swaps the button
+// for a warm one-line acknowledgement. No new email infrastructure.
+function academyNotifyInterest(key, btn){
+  try {
+    if(typeof D !== 'undefined' && D){
+      D.academyInterest = true;
+      if(!D.academyInterestAt) D.academyInterestAt = new Date().toISOString();
+      if(!D.emailPrefs || typeof D.emailPrefs !== 'object') D.emailPrefs = {};
+      D.emailPrefs.crossoverOptOut = false;   // ensure the live soft-invite surface is on
+    }
+    if(typeof save === 'function') save();
+    if(typeof cloudSync === 'function') cloudSync();   // push the flag to the cloud promptly
+  } catch(_e){}
+  const panel = (btn && btn.closest) ? btn.closest('.sk-lock-panel') : null;
+  if(panel){
+    const cta = panel.querySelector('.sk-lock-panel__cta');
+    if(cta) cta.outerHTML = '<div class="sk-lock-panel__ack">✓ Got it — we’ll let you know the moment the full Academy opens up for you.</div>';
+  }
+  if(typeof showToast === 'function') showToast('Thanks — we’ll keep you posted ✨');
+}
+
 function openSkillCategory(key){
   const cat = SK_CATS.find(c=>c.key===key); if(!cat) return;
   // Phase 5.8 Pass C — inline mode: relocate modal, hide the grid view,
@@ -4454,6 +4499,21 @@ function openSkillCategory(key){
   const icon = document.getElementById('skModalIcon'); if(icon) icon.textContent = cat.icon;
   const title = document.getElementById('skModalTitle'); if(title) title.textContent = cat.name;
   const meta = document.getElementById('skModalMeta'); if(meta) meta.textContent = lessons.length+' lessons'+(hasCert?' · ✅ Certified':'');
+
+  // Reach build 1 — faith_free locked money modules show a calm premium probe
+  // INSTEAD of lessons; the quiz/cert are hidden. Other tiers never hit this
+  // branch (isAcademyCategoryLocked is false for them).
+  if(typeof isAcademyCategoryLocked === 'function' && isAcademyCategoryLocked(key)){
+    if(meta) meta.textContent = '🔒 Full Academy';
+    const lockedBody = document.getElementById('skillModalBody');
+    if(lockedBody) _skRenderLockedPanel(lockedBody, cat, key);
+    const lockedQuizBtn = document.getElementById('skStartQuizBtn');
+    if(lockedQuizBtn) lockedQuizBtn.style.display = 'none';
+    switchSkTab('lessons');
+    openModal('skillsModal');
+    if(typeof logActivity === 'function') logActivity('lesson', 'Academy locked view: ' + cat.name);
+    return;
+  }
 
   // Populate lessons tab — every category renders through lesson-renderer.js.
   // A hand-authored block spec (window.SK_SPECS[key], e.g. taxes) gets the

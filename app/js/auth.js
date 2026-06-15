@@ -274,7 +274,19 @@ async function authForgotPassword(){
 // tier, not a parent/child product; Parent Hub access doesn't apply.
 // s-worship added in F1.0 — Worship Playlist available to all members.
 // s-christian-living added in F1.1 — Life Guides available to all members.
-const FAITH_FREE_ALLOWED = ['s-hero', 's-scripture', 's-worship', 's-christian-living', 's-flashcards'];
+// s-skills added 2026-06-15 (Reach build 1) — faith_free may now reach the
+// Life Skills Academy. Per-category access INSIDE the academy is gated
+// separately (see FAITH_FREE_LOCKED_CATEGORIES) so the three money modules
+// stay premium while everything else opens. No other tier is affected.
+const FAITH_FREE_ALLOWED = ['s-hero', 's-scripture', 's-worship', 's-christian-living', 's-flashcards', 's-skills'];
+
+// Academy categories that remain premium for faith_free only (a gentle
+// upgrade probe). Short-circuits to false for every other tier, so paid
+// users see the whole academy exactly as before.
+const FAITH_FREE_LOCKED_CATEGORIES = ['taxes', 'investing', 'credit'];
+function isAcademyCategoryLocked(key){
+  return window._faithFree === true && FAITH_FREE_LOCKED_CATEGORIES.indexOf(key) !== -1;
+}
 
 // Single source of truth for "is this section reachable for the current user?"
 // Used by buildSideNav, showSection, and applySettings. Returning true for

@@ -155,6 +155,14 @@ const DEF = {
   // (iOS Safari, Firefox 129+). The Settings → Feedback → Vibration row is
   // hidden where unsupported, so this is never a dead toggle.
   hapticsEnabled:true,
+  // 2026-06-15 — Reach build 1: when a faith_free user taps "Let me know
+  // when I can get this" on a locked academy module, this top-level flag is
+  // set true (+ academyInterestAt timestamp). Stored at the TOP of the blob
+  // on purpose so it's aggregate-countable from PostgREST without a schema
+  // migration: profiles?select=user_id&data->>academyInterest=eq.true. The
+  // CTA also flips emailPrefs.crossoverOptOut=false (the live soft-invite).
+  academyInterest:false,
+  academyInterestAt:null,
   // streak / checkin
   streak:0, lastCheckin:null, checkin:{}, customHabits:[], dailyChecks:{},
   // V1 Rebuild — Session 1 (Daily Briefing). Keyed by YYYY-MM-DD; per-day
