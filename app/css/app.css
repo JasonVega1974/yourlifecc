@@ -8177,7 +8177,8 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 
 /* ─── Power Card — Life tab hero tiles ───────────────────────── */
 #s-life .tab-landing-card.tlc-power,
-#s-learn .tab-landing-card.tlc-power{
+#s-learn .tab-landing-card.tlc-power,
+#s-me .tab-landing-card.tlc-power{
   position:relative;
   isolation:isolate;
   overflow:hidden;
@@ -8194,7 +8195,8 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
   min-height:128px;
 }
 #s-life .tab-landing-card.tlc-power::before,
-#s-learn .tab-landing-card.tlc-power::before{
+#s-learn .tab-landing-card.tlc-power::before,
+#s-me .tab-landing-card.tlc-power::before{
   content:'';
   position:absolute; inset:0;
   border-radius:18px;
@@ -8212,7 +8214,9 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 #s-life .tab-landing-card.tlc-power:hover,
 #s-life .tab-landing-card.tlc-power:focus-visible,
 #s-learn .tab-landing-card.tlc-power:hover,
-#s-learn .tab-landing-card.tlc-power:focus-visible{
+#s-learn .tab-landing-card.tlc-power:focus-visible,
+#s-me .tab-landing-card.tlc-power:hover,
+#s-me .tab-landing-card.tlc-power:focus-visible{
   transform:translateY(-3px);
   box-shadow:
     0 14px 36px color-mix(in srgb, var(--tlc-grad-a, var(--card-accent, var(--c))) 30%, transparent),
@@ -8220,29 +8224,32 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
   outline:none;
 }
 #s-life .tab-landing-card.tlc-power:active,
-#s-learn .tab-landing-card.tlc-power:active{
+#s-learn .tab-landing-card.tlc-power:active,
+#s-me .tab-landing-card.tlc-power:active{
   transform:translateY(-1px) scale(.99);
 }
 
 /* Theme palettes — vivid 2-stop gradients per section. Shared by the Life
    hero cards and (2026-06-15) the Learn landing cards. */
-#s-life .tlc-power[data-theme="lightning"], #s-learn .tlc-power[data-theme="lightning"]{ --tlc-grad-a:#38bdf8; --tlc-grad-b:#818cf8; }
-#s-life .tlc-power[data-theme="forge"],     #s-learn .tlc-power[data-theme="forge"]    { --tlc-grad-a:#fb923c; --tlc-grad-b:#ef4444; }
-#s-life .tlc-power[data-theme="hunter"],    #s-learn .tlc-power[data-theme="hunter"]   { --tlc-grad-a:#34d399; --tlc-grad-b:#14b8a6; }
-#s-life .tlc-power[data-theme="treasury"],  #s-learn .tlc-power[data-theme="treasury"] { --tlc-grad-a:#fbbf24; --tlc-grad-b:#16a34a; }
-#s-life .tlc-power[data-theme="time"],      #s-learn .tlc-power[data-theme="time"]     { --tlc-grad-a:#818cf8; --tlc-grad-b:#a78bfa; }
-#s-life .tlc-power[data-theme="mind"],      #s-learn .tlc-power[data-theme="mind"]     { --tlc-grad-a:#ec4899; --tlc-grad-b:#f472b6; }
+#s-life .tlc-power[data-theme="lightning"], #s-learn .tlc-power[data-theme="lightning"], #s-me .tlc-power[data-theme="lightning"]{ --tlc-grad-a:#38bdf8; --tlc-grad-b:#818cf8; }
+#s-life .tlc-power[data-theme="forge"],     #s-learn .tlc-power[data-theme="forge"],     #s-me .tlc-power[data-theme="forge"]    { --tlc-grad-a:#fb923c; --tlc-grad-b:#ef4444; }
+#s-life .tlc-power[data-theme="hunter"],    #s-learn .tlc-power[data-theme="hunter"],    #s-me .tlc-power[data-theme="hunter"]   { --tlc-grad-a:#34d399; --tlc-grad-b:#14b8a6; }
+#s-life .tlc-power[data-theme="treasury"],  #s-learn .tlc-power[data-theme="treasury"],  #s-me .tlc-power[data-theme="treasury"] { --tlc-grad-a:#fbbf24; --tlc-grad-b:#16a34a; }
+#s-life .tlc-power[data-theme="time"],      #s-learn .tlc-power[data-theme="time"],      #s-me .tlc-power[data-theme="time"]     { --tlc-grad-a:#818cf8; --tlc-grad-b:#a78bfa; }
+#s-life .tlc-power[data-theme="mind"],      #s-learn .tlc-power[data-theme="mind"],      #s-me .tlc-power[data-theme="mind"]     { --tlc-grad-a:#ec4899; --tlc-grad-b:#f472b6; }
 /* Two extra palettes used only by the Learn landing (8 distinct cards). */
-#s-learn .tlc-power[data-theme="ocean"]{ --tlc-grad-a:#06b6d4; --tlc-grad-b:#3b82f6; }
-#s-learn .tlc-power[data-theme="ember"]{ --tlc-grad-a:#f59e0b; --tlc-grad-b:#f43f5e; }
+#s-learn .tlc-power[data-theme="ocean"], #s-me .tlc-power[data-theme="ocean"]{ --tlc-grad-a:#06b6d4; --tlc-grad-b:#3b82f6; }
+#s-learn .tlc-power[data-theme="ember"], #s-me .tlc-power[data-theme="ember"]{ --tlc-grad-a:#f59e0b; --tlc-grad-b:#f43f5e; }
 /* Learn cards carry no stat line → shorter than the Life heroes; the bg tint
    follows the card's theme (Life sets --card-accent inline; Learn maps it from
    the theme palette so the wash matches the gradient border). */
-#s-learn .tab-landing-card.tlc-power{ min-height:104px; --card-accent:var(--tlc-grad-a, var(--c)); }
+#s-learn .tab-landing-card.tlc-power,
+#s-me .tab-landing-card.tlc-power{ min-height:104px; --card-accent:var(--tlc-grad-a, var(--c)); }
 
 /* Idle shimmer sweep. Auto-suppressed by global reduced-motion rule. */
 #s-life .tlc-power .tlc-shimmer,
-#s-learn .tlc-power .tlc-shimmer{
+#s-learn .tlc-power .tlc-shimmer,
+#s-me .tlc-power .tlc-shimmer{
   position:absolute; inset:0;
   border-radius:18px;
   background:linear-gradient(110deg,
@@ -8275,30 +8282,34 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
    run replays each visit. Per-card stagger is by nth-child — decoupled from
    the theme palette so colour and timing are independent. Life's perpetual
    shimmer above is untouched. */
-#s-learn .tlc-power .tlc-shimmer{ animation-iteration-count:3; }
-#s-learn .tab-landing-card.tlc-power:nth-child(1) .tlc-shimmer{ animation-delay:0s; }
-#s-learn .tab-landing-card.tlc-power:nth-child(2) .tlc-shimmer{ animation-delay:.28s; }
-#s-learn .tab-landing-card.tlc-power:nth-child(3) .tlc-shimmer{ animation-delay:.56s; }
-#s-learn .tab-landing-card.tlc-power:nth-child(4) .tlc-shimmer{ animation-delay:.84s; }
-#s-learn .tab-landing-card.tlc-power:nth-child(5) .tlc-shimmer{ animation-delay:1.12s; }
-#s-learn .tab-landing-card.tlc-power:nth-child(6) .tlc-shimmer{ animation-delay:1.4s; }
-#s-learn .tab-landing-card.tlc-power:nth-child(7) .tlc-shimmer{ animation-delay:1.68s; }
-#s-learn .tab-landing-card.tlc-power:nth-child(8) .tlc-shimmer{ animation-delay:1.96s; }
+#s-learn .tlc-power .tlc-shimmer,
+#s-me .tlc-power .tlc-shimmer{ animation-iteration-count:3; }
+#s-learn .tab-landing-card.tlc-power:nth-child(1) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(1) .tlc-shimmer{ animation-delay:0s; }
+#s-learn .tab-landing-card.tlc-power:nth-child(2) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(2) .tlc-shimmer{ animation-delay:.28s; }
+#s-learn .tab-landing-card.tlc-power:nth-child(3) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(3) .tlc-shimmer{ animation-delay:.56s; }
+#s-learn .tab-landing-card.tlc-power:nth-child(4) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(4) .tlc-shimmer{ animation-delay:.84s; }
+#s-learn .tab-landing-card.tlc-power:nth-child(5) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(5) .tlc-shimmer{ animation-delay:1.12s; }
+#s-learn .tab-landing-card.tlc-power:nth-child(6) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(6) .tlc-shimmer{ animation-delay:1.4s; }
+#s-learn .tab-landing-card.tlc-power:nth-child(7) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(7) .tlc-shimmer{ animation-delay:1.68s; }
+#s-learn .tab-landing-card.tlc-power:nth-child(8) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(8) .tlc-shimmer{ animation-delay:1.96s; }
 
 /* Inner layout — keep content above the shimmer/border layers */
 #s-life .tlc-power > *,
-#s-learn .tlc-power > *{ position:relative; z-index:1; }
+#s-learn .tlc-power > *,
+#s-me .tlc-power > *{ position:relative; z-index:1; }
 #s-life .tlc-power .tlc-row-top{
   display:flex; align-items:center; gap:10px;
   margin-bottom:6px;
 }
 #s-life .tlc-power .tlc-icon,
-#s-learn .tlc-power .tlc-icon{
+#s-learn .tlc-power .tlc-icon,
+#s-me .tlc-power .tlc-icon{
   font-size:1.85rem; line-height:1;
   filter:drop-shadow(0 0 10px color-mix(in srgb, var(--tlc-grad-a, var(--card-accent, var(--c))) 60%, transparent));
 }
 #s-life .tlc-power .tlc-label,
-#s-learn .tlc-power .tlc-label{
+#s-learn .tlc-power .tlc-label,
+#s-me .tlc-power .tlc-label{
   flex:1;
   font-family:var(--fh);
   font-size:1.2rem;
@@ -8485,7 +8496,8 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
    here with higher specificity + !important. Shimmer flips to multiply
    so it darkens softly on light bg instead of going invisible. */
 :root.light #s-life .tab-landing-card.tlc-power,
-:root.light #s-learn .tab-landing-card.tlc-power{
+:root.light #s-learn .tab-landing-card.tlc-power,
+:root.light #s-me .tab-landing-card.tlc-power{
   background:
     linear-gradient(140deg,
       color-mix(in srgb, var(--card-accent, var(--c)) 14%, #fff) 0%,
@@ -8498,7 +8510,8 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 :root.light #s-life .tlc-power .tlc-stat      { color:#0f172a !important; }
 :root.light #s-life .tlc-power .tlc-faith-line{ color:#64748b !important; }
 :root.light #s-life .tlc-power .tlc-shimmer,
-:root.light #s-learn .tlc-power .tlc-shimmer  { opacity:.28; mix-blend-mode:multiply; }
+:root.light #s-learn .tlc-power .tlc-shimmer,
+:root.light #s-me .tlc-power .tlc-shimmer     { opacity:.28; mix-blend-mode:multiply; }
 :root.light #s-life .tab-landing-more-label   { color:#64748b !important; }
 :root.light #s-life .tab-landing-card.tlc-mini{
   background:#fff !important;

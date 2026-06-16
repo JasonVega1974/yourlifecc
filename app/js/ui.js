@@ -1201,14 +1201,14 @@ const TAB_IA = [
   },
   {id:'me',    label:'Me',    icon:'🧑', accent:'var(--c)',
     primary:[
-      {sectionId:'s-badges',     label:'Badges',     icon:'🏅', accent:'var(--c)'},
-      {sectionId:'s-milestones', label:'Milestones', icon:'🗺️', accent:'var(--section-goals)'},
-      {sectionId:'s-bio',        label:'Bio Page',   icon:'📋', accent:'var(--c)'},
-      {sectionId:'s-mentors',    label:'My People',  icon:'🤝', accent:'var(--section-journal)'},
-      {sectionId:'s-referral',   label:'Refer',      icon:'🎁', accent:'var(--c)'},
-      {action:'settings',        label:'Settings',   icon:'⚙️', accent:'var(--c)'},
-      {action:'profile',         label:'Profile',    icon:'👤', accent:'var(--c)'},
-      {action:'sign-out',        label:'Sign Out',   icon:'🚪', accent:'var(--c)'}
+      {sectionId:'s-badges',     label:'Badges',     icon:'🏅', accent:'var(--c)',              theme:'treasury'},
+      {sectionId:'s-milestones', label:'Milestones', icon:'🗺️', accent:'var(--section-goals)',   theme:'lightning'},
+      {sectionId:'s-bio',        label:'Bio Page',   icon:'📋', accent:'var(--c)',              theme:'ocean'},
+      {sectionId:'s-mentors',    label:'My People',  icon:'🤝', accent:'var(--section-journal)', theme:'mind'},
+      {sectionId:'s-referral',   label:'Refer',      icon:'🎁', accent:'var(--c)',              theme:'ember'},
+      {action:'settings',        label:'Settings',   icon:'⚙️', accent:'var(--c)',              theme:'hunter'},
+      {action:'profile',         label:'Profile',    icon:'👤', accent:'var(--c)',              theme:'time'},
+      {action:'sign-out',        label:'Sign Out',   icon:'🚪', accent:'var(--c)',              theme:'forge'}
     ]
   }
 ];
@@ -1281,10 +1281,16 @@ function renderTabLanding(tabId){
     } else if(card.action){
       onclick = "handleTabAction('" + card.action + "')";
     }
-    return '<button type="button" class="tab-landing-card"'
-      + ' style="--card-accent:'+accent+';"'
+    // Cards with a `theme` get the Power-Card shell (gradient border/bg, bounded
+    // shimmer, icon glow); the bg tint follows the theme via CSS, so no inline
+    // --card-accent. Cards WITHOUT a theme render exactly as before — so other
+    // generic tabs that use this renderer are untouched.
+    const themed = !!card.theme;
+    return '<button type="button" class="tab-landing-card'+(themed?' tlc-power':'')+'"'
+      + (themed ? ' data-theme="'+card.theme+'"' : ' style="--card-accent:'+accent+';"')
       + ' onclick="'+onclick+'"'
       + ' aria-label="'+card.label+'">'
+      + (themed ? '<span class="tlc-shimmer" aria-hidden="true"></span>' : '')
       + '<span class="tlc-icon" aria-hidden="true">'+(card.icon||'•')+'</span>'
       + '<span class="tlc-label">'+card.label+'</span>'
     + '</button>';
@@ -2296,6 +2302,13 @@ function showSection(id, fromMobile){
   // the user lands here (boot order, late inserts, etc).
   if(id==='s-learn' && typeof renderLearnLanding === 'function'){
     setTimeout(renderLearnLanding, 30);
+  }
+  // 2026-06-15 — Me landing carries the Power-Card shell too, but (unlike Learn)
+  // has no bespoke renderer. Re-render on entry so the BOUNDED shimmer replays
+  // each visit — the boot-time render fires off-screen and the finite animation
+  // would otherwise never play. Cheap (8 stateless cards), no lost state.
+  if(id==='s-me' && typeof renderTabLanding === 'function'){
+    setTimeout(function(){ renderTabLanding('me'); }, 30);
   }
   // 2026-06-07 — Life tab "Superpowers" upgrade. Re-render on entry so
   // Power Card live stats (today's habit count, weekly money net, etc.)
