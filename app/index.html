@@ -15615,48 +15615,57 @@
   <div id="sp-mine" style="display:none;">
 
     <!-- ⚠️ DISCLAIMER -->
-    <div style="background:rgba(239,68,68,.06);border:1.5px solid rgba(239,68,68,.3);border-radius:12px;padding:.9rem 1rem;margin-bottom:1rem;">
-      <div style="font-size:.72rem;font-weight:900;color:#f87171;text-transform:uppercase;letter-spacing:1px;margin-bottom:.4rem;">⚠️ Important Disclaimer</div>
-      <div style="font-size:.72rem;color:var(--tx2);line-height:1.7;">
-        The information in My Sports is provided <b style="color:var(--tx);">for reference and personal tracking purposes only</b> and does not constitute professional medical, athletic, or nutritional advice. YourLife.CC is <b style="color:var(--tx);">not a substitute for qualified coaching, athletic training, or medical care.</b> Injury prevention, nutrition, hydration, and conditioning information included here references publicly available guidance from reputable organizations (NATA, CDC, NIH, NSCA) and is intended as a <b style="color:var(--tx);">starting point for your own research</b> — not a complete or personalized protocol. <b style="color:var(--tx);">Always consult a licensed medical professional</b> before beginning any training program, making dietary changes, or managing an injury. YourLife.CC assumes no liability for injury, illness, or outcomes resulting from information tracked or referenced in this section. <b style="color:var(--tx);">Your coach and doctor are your primary resources — use them.</b>
+    <div class="msp-disc">
+      <div class="msp-disc__t">⚠️ Important disclaimer</div>
+      <div class="msp-disc__b">
+        The information in My Sports is provided <b>for reference and personal tracking purposes only</b> and does not constitute professional medical, athletic, or nutritional advice. YourLife.CC is <b>not a substitute for qualified coaching, athletic training, or medical care.</b> Injury prevention, nutrition, hydration, and conditioning information included here references publicly available guidance from reputable organizations (NATA, CDC, NIH, NSCA) and is intended as a <b>starting point for your own research</b> — not a complete or personalized protocol. <b>Always consult a licensed medical professional</b> before beginning any training program, making dietary changes, or managing an injury. YourLife.CC assumes no liability for injury, illness, or outcomes resulting from information tracked or referenced in this section. <b>Your coach and doctor are your primary resources — use them.</b>
       </div>
     </div>
 
     <!-- Add Sport -->
-    <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:.8rem 1rem;margin-bottom:.8rem;">
-      <div style="font-size:.8rem;font-weight:800;margin-bottom:.6rem;">➕ Add a Sport</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.4rem;">
-        <select id="mySportSelect" style="font-size:.78rem;border-radius:8px;padding:.4rem .6rem;background:var(--input-bg);border:1px solid var(--input-border);color:var(--tx);">
-          <option value="">Select sport...</option>
-          <option>Football</option><option>Basketball</option><option>Soccer</option>
-          <option>Baseball</option><option>Softball</option><option>Wrestling</option>
-          <option>Track & Field</option><option>Cross Country</option><option>Volleyball</option>
-          <option>Swimming</option><option>Tennis</option><option>Golf</option>
-          <option>Lacrosse</option><option>Cheerleading</option><option>Gymnastics</option>
-          <option>Hockey</option><option>Rugby</option><option>Rowing</option>
-          <option>Water Polo</option><option>Bowling</option><option>Archery</option>
-          <option>Cycling</option><option>Martial Arts</option><option>MMA</option><option>Boxing</option><option>Jiu-Jitsu</option><option>Judo</option><option>Karate</option><option>Taekwondo</option><option>Dance</option>
-          <option>Other</option>
-        </select>
-        <input type="text" id="mySportCustom" placeholder="Or type sport name..." style="font-size:.78rem;border-radius:8px;padding:.4rem .6rem;background:var(--input-bg);border:1px solid var(--input-border);color:var(--tx);">
+    <div class="msp-add">
+      <div class="msp-add__title">➕ Add a sport</div>
+      <div class="msp-grid2">
+        <div class="msp-field">
+          <label class="msp-label" for="mySportSelect">Sport</label>
+          <select id="mySportSelect" class="msp-select">
+            <option value="">Select sport...</option>
+            <option>Football</option><option>Basketball</option><option>Soccer</option>
+            <option>Baseball</option><option>Softball</option><option>Wrestling</option>
+            <option>Track & Field</option><option>Cross Country</option><option>Volleyball</option>
+            <option>Swimming</option><option>Tennis</option><option>Golf</option>
+            <option>Lacrosse</option><option>Cheerleading</option><option>Gymnastics</option>
+            <option>Hockey</option><option>Rugby</option><option>Rowing</option>
+            <option>Water Polo</option><option>Bowling</option><option>Archery</option>
+            <option>Cycling</option><option>Martial Arts</option><option>MMA</option><option>Boxing</option><option>Jiu-Jitsu</option><option>Judo</option><option>Karate</option><option>Taekwondo</option><option>Dance</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="msp-field"><label class="msp-label" for="mySportCustom">Or type your own</label><input type="text" id="mySportCustom" class="msp-input" placeholder="Sport name..."></div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.4rem;">
-        <input type="text" id="mySportTeam" placeholder="Team name..." style="font-size:.78rem;border-radius:8px;padding:.4rem .6rem;background:var(--input-bg);border:1px solid var(--input-border);color:var(--tx);">
-        <input type="text" id="mySportPosition" placeholder="Position/event..." style="font-size:.78rem;border-radius:8px;padding:.4rem .6rem;background:var(--input-bg);border:1px solid var(--input-border);color:var(--tx);">
+      <div class="msp-grid2">
+        <div class="msp-field"><label class="msp-label" for="mySportTeam">Team</label><input type="text" id="mySportTeam" class="msp-input" placeholder="Team name..."></div>
+        <div class="msp-field"><label class="msp-label" for="mySportPosition">Position / event</label><input type="text" id="mySportPosition" class="msp-input" placeholder="Position/event..."></div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.4rem;margin-bottom:.4rem;">
-        <select id="mySportLevel" style="font-size:.78rem;border-radius:8px;padding:.4rem .6rem;background:var(--input-bg);border:1px solid var(--input-border);color:var(--tx);">
-          <option value="">Level...</option>
-          <option>Youth</option><option>Middle School</option><option>JV</option>
-          <option>Varsity</option><option>Club</option><option>College</option><option>Recreational</option>
-        </select>
-        <select id="mySportSeason" style="font-size:.78rem;border-radius:8px;padding:.4rem .6rem;background:var(--input-bg);border:1px solid var(--input-border);color:var(--tx);">
-          <option value="">Season...</option>
-          <option>Fall</option><option>Winter</option><option>Spring</option><option>Summer</option><option>Year-round</option>
-        </select>
-        <input type="number" id="mySportYear" placeholder="Year (e.g. 2025)" style="font-size:.78rem;border-radius:8px;padding:.4rem .6rem;background:var(--input-bg);border:1px solid var(--input-border);color:var(--tx);">
+      <div class="msp-grid3">
+        <div class="msp-field">
+          <label class="msp-label" for="mySportLevel">Level</label>
+          <select id="mySportLevel" class="msp-select">
+            <option value="">Level...</option>
+            <option>Youth</option><option>Middle School</option><option>JV</option>
+            <option>Varsity</option><option>Club</option><option>College</option><option>Recreational</option>
+          </select>
+        </div>
+        <div class="msp-field">
+          <label class="msp-label" for="mySportSeason">Season</label>
+          <select id="mySportSeason" class="msp-select">
+            <option value="">Season...</option>
+            <option>Fall</option><option>Winter</option><option>Spring</option><option>Summer</option><option>Year-round</option>
+          </select>
+        </div>
+        <div class="msp-field"><label class="msp-label" for="mySportYear">Year</label><input type="number" id="mySportYear" class="msp-input" placeholder="e.g. 2025"></div>
       </div>
-      <button onclick="addMySport()" class="btn bp" style="width:100%;font-size:.82rem;">+ Add This Sport</button>
+      <button onclick="addMySport()" class="btn bp msp-addbtn">+ Add this sport</button>
     </div>
 
     <!-- My Sports List -->

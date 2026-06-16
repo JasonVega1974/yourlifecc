@@ -845,70 +845,41 @@ function renderMySports(){
   _migrateMySports();            // fold any legacy localStorage data into D once
   const sports = getMySports();
   if(!sports.length){
-    container.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--tx2);font-size:.82rem;">No sports added yet. Add your first sport above! 🏅</div>`;
+    container.innerHTML = '<div class="msp-empty"><span class="msp-empty__e" aria-hidden="true">🏅</span>'
+      + '<div class="msp-empty__t">No sports added yet. Add your first sport to start tracking your seasons and recruiting profile.</div>'
+      + '<button class="btn bp msp-empty__cta" onclick="var s=document.getElementById(\'mySportSelect\'); if(s){ s.scrollIntoView({block:\'center\'}); s.focus(); }">Add your first sport</button></div>';
     return;
   }
   container.innerHTML = sports.map(s=>{
     const data = s.dataId ? SPORT_DATA.find(x=>x.id===s.dataId) : null;
     const seasons = s.seasons||[];
-
-    // Build seasons table rows
     const hasSeasons = seasons.length > 0;
     const allKeys = hasSeasons
       ? [...new Set(seasons.flatMap(ss=>Object.keys(ss.stats||{})).filter(k=>seasons.some(ss=>ss.stats&&ss.stats[k])))]
       : [];
     const fields = data && data.statFields ? data.statFields : [];
 
-    const tableHtml = hasSeasons ? `
-      <div style="overflow-x:auto;margin-top:.6rem;">
-        <table style="width:100%;border-collapse:collapse;font-size:.75rem;">
-          <thead>
-            <tr style="background:#1a2235;">
-              <th style="text-align:left;padding:.4rem .6rem;color:var(--tx2);font-weight:700;font-size:.65rem;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid rgba(255,255,255,.1);">Season</th>
-              ${allKeys.map(k=>{
-                const f = fields.find(f=>f.key===k);
-                return `<th style="text-align:center;padding:.4rem .5rem;color:var(--tx2);font-weight:700;font-size:.65rem;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid rgba(255,255,255,.1);">${f?f.label:k}</th>`;
-              }).join('')}
-              <th style="text-align:center;padding:.4rem .5rem;color:var(--tx2);font-weight:700;font-size:.65rem;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid rgba(255,255,255,.1);"></th>
-            </tr>
-          </thead>
-          <tbody>
-            ${seasons.map((ss,i)=>`
-              <tr style="background:${i%2===0?'rgba(255,255,255,.03)':'rgba(255,255,255,.015)'};border-bottom:1px solid rgba(255,255,255,.05);">
-                <td style="padding:.45rem .6rem;color:var(--tx);font-weight:700;white-space:nowrap;">${ss.seasonLabel||'Season '+(i+1)}</td>
-                ${allKeys.map(k=>`<td style="text-align:center;padding:.45rem .5rem;color:var(--c);font-weight:800;">${(ss.stats&&ss.stats[k])||'—'}</td>`).join('')}
-                <td style="text-align:center;padding:.45rem .4rem;">
-                  <button onclick="deleteSeasonStat(${s.id},${i})" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:.8rem;padding:.1rem .3rem;">✕</button>
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>` : `<div style="font-size:.75rem;color:var(--tx2);padding:.5rem 0;">No seasons logged yet.</div>`;
+    const tableHtml = hasSeasons
+      ? '<div class="msp-tablewrap"><table class="msp-table"><thead><tr><th>Season</th>'
+          + allKeys.map(k=>{ const f = fields.find(f=>f.key===k); return '<th>'+escapeHtml(f?f.label:k)+'</th>'; }).join('')
+          + '<th aria-label="Remove"></th></tr></thead><tbody>'
+          + seasons.map((ss,i)=>'<tr><td>'+escapeHtml(ss.seasonLabel||('Season '+(i+1)))+'</td>'
+              + allKeys.map(k=>'<td><span class="msp-tv">'+escapeHtml((ss.stats&&ss.stats[k])||'—')+'</span></td>').join('')
+              + '<td><button class="msp-rowdel" onclick="deleteSeasonStat('+s.id+','+i+')" aria-label="Remove '+escapeHtml(ss.seasonLabel||('Season '+(i+1)))+'">✕</button></td></tr>').join('')
+          + '</tbody></table></div>'
+      : '<div class="msp-noseasons">No seasons logged yet.</div>';
 
-    return `
-    <div style="background:var(--s1,#131927);border:1px solid rgba(255,255,255,.1);border-radius:14px;margin-bottom:.8rem;overflow:hidden;">
-      <!-- Header -->
-      <div style="display:flex;align-items:center;gap:.7rem;padding:.8rem 1rem;background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.08);">
-        <div style="font-size:1.6rem;">${s.emoji}</div>
-        <div style="flex:1;">
-          <div style="font-size:.9rem;font-weight:900;color:var(--tx);">${escapeHtml(s.name)}</div>
-          <div style="font-size:.7rem;color:var(--tx2);margin-top:.1rem;">${escapeHtml([s.team,s.position,s.level,s.season,s.year].filter(Boolean).join(' · ')||'No details added')}</div>
-        </div>
-        <div style="display:flex;gap:.35rem;">
-          <button onclick="openSportEditor(${s.id})" style="background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.25);border-radius:7px;padding:.3rem .65rem;color:#38bdf8;font-size:.7rem;cursor:pointer;font-weight:700;">✏️ Edit</button>
-          <button onclick="deleteMySport(${s.id})" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:7px;padding:.3rem .55rem;color:#f87171;font-size:.7rem;cursor:pointer;">✕</button>
-        </div>
-      </div>
-      <!-- Season Stats Table -->
-      <div style="padding:.7rem 1rem;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem;">
-          <div style="font-size:.65rem;font-weight:800;color:var(--c);text-transform:uppercase;letter-spacing:1px;">📊 Season Stats</div>
-          <button onclick="openSeasonEditor(${s.id})" style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:7px;padding:.25rem .65rem;color:#22c55e;font-size:.68rem;cursor:pointer;font-weight:700;">+ Add Season</button>
-        </div>
-        ${tableHtml}
-      </div>
-    </div>`;
+    return '<div class="msp-card">'
+      + '<div class="msp-card__head"><span class="msp-emoji" aria-hidden="true">'+s.emoji+'</span>'
+      +   '<div class="msp-id"><div class="msp-name">'+escapeHtml(s.name)+'</div>'
+      +     '<div class="msp-meta">'+escapeHtml([s.team,s.position,s.level,s.season,s.year].filter(Boolean).join(' · ')||'No details added')+'</div></div>'
+      +   '<div class="msp-actions">'
+      +     '<button class="msp-btn msp-btn--edit" onclick="openSportEditor('+s.id+')">✏️ Edit</button>'
+      +     '<button class="msp-btn msp-btn--danger" onclick="deleteMySport('+s.id+')" aria-label="Remove sport">✕</button>'
+      +   '</div></div>'
+      + '<div class="msp-body"><div class="msp-bodyhead"><span class="msp-bodyhead__l">📊 Season stats</span>'
+      +   '<button class="msp-btn msp-btn--add" onclick="openSeasonEditor('+s.id+')">+ Add season</button></div>'
+      +   tableHtml + '</div></div>';
   }).join('');
 }
 
@@ -953,50 +924,43 @@ function saveSportProfile(sportId){
 function createSportEditorModal(){
   const m = document.createElement('div');
   m.id = 'sportEditorModal';
-  m.style.cssText='display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center;padding:1rem;';
+  m.className = 'msp-overlay';
   m.innerHTML=`
-    <div style="background:#131927;border:1px solid rgba(255,255,255,.1);border-radius:20px;max-width:460px;width:100%;max-height:85vh;overflow-y:auto;padding:1.4rem;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-        <div style="font-size:.95rem;font-weight:900;color:var(--tx);" id="seModalTitle">Sport Profile</div>
-        <button onclick="document.getElementById('sportEditorModal').style.display='none'" style="background:rgba(255,255,255,.08);border:none;border-radius:50%;width:28px;height:28px;color:var(--tx);cursor:pointer;font-size:1rem;">✕</button>
+    <div class="msp-sheet" role="dialog" aria-modal="true" aria-labelledby="seModalTitle">
+      <div class="msp-sheet__head">
+        <div class="msp-sheet__title" id="seModalTitle">Sport profile</div>
+        <button class="msp-x" type="button" aria-label="Close" onclick="document.getElementById('sportEditorModal').style.display='none'">✕</button>
       </div>
-      <div style="font-size:.75rem;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:1px;margin-bottom:.5rem;">🏋️ Athletic Profile</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.6rem;">
-        <div>
-          <label style="font-size:.7rem;color:var(--tx2);">Height</label>
-          <input id="seHeight" placeholder='e.g. 6\'2"' style="width:100%;font-size:.8rem;border-radius:8px;padding:.4rem .6rem;background:var(--input-bg);border:1px solid var(--input-border);color:var(--tx);box-sizing:border-box;margin-top:.2rem;">
-        </div>
-        <div>
-          <label style="font-size:.7rem;color:var(--tx2);">Weight (lbs)</label>
-          <input id="seWeight" placeholder='e.g. 185' style="width:100%;font-size:.8rem;border-radius:8px;padding:.4rem .6rem;background:var(--input-bg);border:1px solid var(--input-border);color:var(--tx);box-sizing:border-box;margin-top:.2rem;">
-        </div>
-        <div>
-          <label style="font-size:.7rem;color:var(--tx2);">GPA</label>
-          <input id="seGpa" placeholder='e.g. 3.7' style="width:100%;font-size:.8rem;border-radius:8px;padding:.4rem .6rem;background:var(--input-bg);border:1px solid var(--input-border);color:var(--tx);box-sizing:border-box;margin-top:.2rem;">
-        </div>
-        <div>
-          <label style="font-size:.7rem;color:var(--tx2);">Graduation Year</label>
-          <input id="seGradYear" placeholder='e.g. 2027' style="width:100%;font-size:.8rem;border-radius:8px;padding:.4rem .6rem;background:var(--input-bg);border:1px solid var(--input-border);color:var(--tx);box-sizing:border-box;margin-top:.2rem;">
-        </div>
+      <div class="msp-formlabel">🏋️ Athletic profile</div>
+      <div class="msp-grid2">
+        <div class="msp-field"><label class="msp-label" for="seHeight">Height</label><input id="seHeight" class="msp-input" placeholder='e.g. 6\'2"'></div>
+        <div class="msp-field"><label class="msp-label" for="seWeight">Weight (lbs)</label><input id="seWeight" class="msp-input" placeholder='e.g. 185'></div>
+        <div class="msp-field"><label class="msp-label" for="seGpa">GPA</label><input id="seGpa" class="msp-input" placeholder='e.g. 3.7'></div>
+        <div class="msp-field"><label class="msp-label" for="seGradYear">Graduation year</label><input id="seGradYear" class="msp-input" placeholder='e.g. 2027'></div>
       </div>
-      <div style="font-size:.75rem;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:1px;margin-bottom:.5rem;">👤 Coach Info</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.6rem;">
-        <div>
-          <label style="font-size:.7rem;color:var(--tx2);">Coach Name</label>
-          <input id="seCoach" placeholder='Coach Smith' style="width:100%;font-size:.8rem;border-radius:8px;padding:.4rem .6rem;background:var(--input-bg);border:1px solid var(--input-border);color:var(--tx);box-sizing:border-box;margin-top:.2rem;">
-        </div>
-        <div>
-          <label style="font-size:.7rem;color:var(--tx2);">Coach Email</label>
-          <input id="seCoachEmail" placeholder='coach@school.edu' style="width:100%;font-size:.8rem;border-radius:8px;padding:.4rem .6rem;background:var(--input-bg);border:1px solid var(--input-border);color:var(--tx);box-sizing:border-box;margin-top:.2rem;">
-        </div>
+      <div class="msp-formlabel">👤 Coach info</div>
+      <div class="msp-grid2">
+        <div class="msp-field"><label class="msp-label" for="seCoach">Coach name</label><input id="seCoach" class="msp-input" placeholder='Coach Smith'></div>
+        <div class="msp-field"><label class="msp-label" for="seCoachEmail">Coach email</label><input id="seCoachEmail" class="msp-input" type="email" placeholder='coach@school.edu'></div>
       </div>
-      <div style="font-size:.75rem;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:1px;margin-bottom:.5rem;">📝 Notes</div>
-      <textarea id="seNotes" rows="3" placeholder="Goals, highlights, recruiting notes..." style="width:100%;font-size:.8rem;border-radius:8px;padding:.5rem .7rem;background:var(--input-bg);border:1px solid var(--input-border);color:var(--tx);resize:vertical;box-sizing:border-box;margin-bottom:.8rem;"></textarea>
-      <button id="seSaveBtn" class="btn bp" style="width:100%;">💾 Save Profile</button>
+      <div class="msp-formlabel">📝 Notes</div>
+      <textarea id="seNotes" class="msp-textarea" rows="3" placeholder="Goals, highlights, recruiting notes..."></textarea>
+      <button id="seSaveBtn" class="btn bp msp-addbtn">Save profile</button>
     </div>`;
   document.body.appendChild(m);
   m.addEventListener('click',e=>{ if(e.target===m) m.style.display='none'; });
+  _wireMspEscape();
   return m;
+}
+/* Esc-to-close for the My Sports editor modals (wired once). Mirrors the
+   .sds sheet's keyboard behaviour so both overlays close consistently. */
+function _wireMspEscape(){
+  if(window._mspKeyWired) return;
+  window._mspKeyWired = true;
+  document.addEventListener('keydown', function(e){
+    if(e.key !== 'Escape') return;
+    ['sportEditorModal','seasonEditorModal'].forEach(function(id){ var el = document.getElementById(id); if(el) el.style.display = 'none'; });
+  });
 }
 
 /* ── Season Stats Editor Modal ─────────────────────────────── */
@@ -1008,43 +972,32 @@ function openSeasonEditor(sportId){
 
   const modal = document.getElementById('seasonEditorModal') || createSeasonEditorModal();
 
-  modal.querySelector('#ssModalTitle').textContent = sport.emoji+' '+sport.name+' — Season Stats';
+  modal.querySelector('#ssModalTitle').textContent = sport.emoji+' '+sport.name+' — Season stats';
 
   // Render existing seasons
   const existing = modal.querySelector('#ssExisting');
   existing.innerHTML = (sport.seasons||[]).length
-    ? (sport.seasons||[]).map((ss,i)=>`
-        <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:.6rem .8rem;margin-bottom:.4rem;display:flex;justify-content:space-between;align-items:center;">
-          <div>
-            <div style="font-size:.78rem;font-weight:800;color:var(--tx);">${ss.seasonLabel||'Season '+(i+1)}</div>
-            <div style="font-size:.68rem;color:var(--tx2);">${Object.entries(ss.stats||{}).filter(([k,v])=>v).map(([k,v])=>{
-              const f=data&&data.statFields?data.statFields.find(f=>f.key===k):null;
-              return (f?f.label:k)+': '+v;
-            }).join(' · ')}</div>
-          </div>
-          <button onclick="deleteSeasonStat(${sportId},${i})" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:6px;padding:.2rem .5rem;color:#f87171;font-size:.68rem;cursor:pointer;">✕</button>
-        </div>
-      `).join('')
-    : '<div style="font-size:.75rem;color:var(--tx2);text-align:center;padding:.8rem;">No seasons logged yet.</div>';
+    ? (sport.seasons||[]).map((ss,i)=>'<div class="msp-seasonrow"><div class="msp-seasonrow__l">'
+        + '<div class="msp-seasonrow__t">'+escapeHtml(ss.seasonLabel||('Season '+(i+1)))+'</div>'
+        + '<div class="msp-seasonrow__s">'+escapeHtml(Object.entries(ss.stats||{}).filter(([k,v])=>v).slice(0,3).map(([k,v])=>{
+            const f=data&&data.statFields?data.statFields.find(f=>f.key===k):null;
+            return (f?f.label:k)+': '+v;
+          }).join(' · '))+'</div></div>'
+        + '<button class="msp-btn msp-btn--danger" onclick="deleteSeasonStat('+sportId+','+i+')" aria-label="Remove '+escapeHtml(ss.seasonLabel||('Season '+(i+1)))+'">✕</button></div>').join('')
+    : '<div class="msp-noseasons" style="text-align:center;">No seasons logged yet.</div>';
 
   // Build stat input fields
   const fields = data && data.statFields
     ? data.statFields
     : [{key:'gp',label:'Games Played',type:'number'},{key:'pts',label:'Points/Score',type:'number'},{key:'note',label:'Note',type:'text'}];
 
-  modal.querySelector('#ssFields').innerHTML = `
-    <div style="margin-bottom:.5rem;">
-      <label style="font-size:.7rem;color:var(--tx2);">Season Label (e.g. "Fall 2025")</label>
-      <input id="ssSeasonLabel" placeholder="Fall 2025" style="width:100%;font-size:.8rem;border-radius:8px;padding:.4rem .6rem;background:var(--input-bg);border:1px solid var(--input-border);color:var(--tx);box-sizing:border-box;margin-top:.2rem;">
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem;">
-      ${fields.map(f=>`
-        <div>
-          <label style="font-size:.7rem;color:var(--tx2);">${f.label}</label>
-          <input id="ssStat_${f.key}" type="${f.type}" placeholder="${f.label}" style="width:100%;font-size:.8rem;border-radius:8px;padding:.4rem .6rem;background:var(--input-bg);border:1px solid var(--input-border);color:var(--tx);box-sizing:border-box;margin-top:.2rem;">
-        </div>
-      `).join('')}
-    </div>`;
+  modal.querySelector('#ssFields').innerHTML =
+    '<div class="msp-field" style="margin-bottom:.55rem;"><label class="msp-label" for="ssSeasonLabel">Season label (e.g. "Fall 2025")</label>'
+    + '<input id="ssSeasonLabel" class="msp-input" placeholder="Fall 2025"></div>'
+    + '<div class="msp-grid2" style="margin-bottom:0;">'
+    + fields.map(f=>'<div class="msp-field"><label class="msp-label" for="ssStat_'+f.key+'">'+escapeHtml(f.label)+'</label>'
+        + '<input id="ssStat_'+f.key+'" class="msp-input" type="'+f.type+'" placeholder="'+escapeHtml(f.label)+'"></div>').join('')
+    + '</div>';
 
   modal.querySelector('#ssAddBtn').onclick = ()=> addSeasonStat(sportId, fields);
   modal.style.display='flex';
@@ -1081,23 +1034,22 @@ function deleteSeasonStat(sportId, idx){
 function createSeasonEditorModal(){
   const m = document.createElement('div');
   m.id='seasonEditorModal';
-  m.style.cssText='display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center;padding:1rem;';
+  m.className = 'msp-overlay';
   m.innerHTML=`
-    <div style="background:#131927;border:1px solid rgba(255,255,255,.1);border-radius:20px;max-width:480px;width:100%;max-height:85vh;overflow-y:auto;padding:1.4rem;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem;">
-        <div style="font-size:.95rem;font-weight:900;color:var(--tx);" id="ssModalTitle">Season Stats</div>
-        <button onclick="document.getElementById('seasonEditorModal').style.display='none'" style="background:rgba(255,255,255,.08);border:none;border-radius:50%;width:28px;height:28px;color:var(--tx);cursor:pointer;font-size:1rem;">✕</button>
+    <div class="msp-sheet" role="dialog" aria-modal="true" aria-labelledby="ssModalTitle">
+      <div class="msp-sheet__head">
+        <div class="msp-sheet__title" id="ssModalTitle">Season stats</div>
+        <button class="msp-x" type="button" aria-label="Close" onclick="document.getElementById('seasonEditorModal').style.display='none'">✕</button>
       </div>
-      <!-- Existing seasons -->
-      <div style="font-size:.75rem;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:1px;margin-bottom:.4rem;">📅 Previous Seasons</div>
+      <div class="msp-formlabel">📅 Previous seasons</div>
       <div id="ssExisting" style="margin-bottom:1rem;"></div>
-      <!-- Add new season -->
-      <div style="font-size:.75rem;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:1px;margin-bottom:.5rem;">➕ Add New Season</div>
+      <div class="msp-formlabel">➕ Add a new season</div>
       <div id="ssFields"></div>
-      <button id="ssAddBtn" class="btn bp" style="width:100%;margin-top:.8rem;">📈 Save Season Stats</button>
+      <button id="ssAddBtn" class="btn bp msp-addbtn" style="margin-top:.8rem;">Save season stats</button>
     </div>`;
   document.body.appendChild(m);
   m.addEventListener('click',e=>{ if(e.target===m) m.style.display='none'; });
+  _wireMspEscape();
   return m;
 }
 

@@ -8468,6 +8468,85 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 :root.light .sfind-fit{ color:#fff; background:#047857; }
 :root.light .sfind-restart{ background:rgba(0,0,0,.02); color:#1f1810; }
 :root.light .sfind-restart:hover{ background:rgba(0,0,0,.05); }
+
+/* ── My Sports tracker (Phase B modernization) — .msp-* ────────────────
+   Brought up to the Sports detail-sheet quality bar: flat cards, thin
+   borders, clean inputs with a single focus ring, conventional action
+   colours (sky=edit, red=remove, green=add season). Light + reduced-motion
+   handled. Wellbeing: weight is a single static profile field, never charted. */
+.msp-disc{ background:rgba(239,68,68,.06); border:1px solid rgba(239,68,68,.28); border-radius:12px; padding:.85rem 1rem; margin-bottom:1rem; }
+.msp-disc__t{ font-size:.68rem; font-weight:700; color:#f87171; text-transform:uppercase; letter-spacing:1px; margin-bottom:.4rem; }
+.msp-disc__b{ font-size:.72rem; color:var(--tx2); line-height:1.7; }
+.msp-disc__b b{ color:var(--tx); font-weight:600; }
+/* Add-a-sport form */
+.msp-add{ background:rgba(255,255,255,.025); border:1px solid var(--br); border-radius:14px; padding:1rem; margin-bottom:1rem; }
+.msp-add__title{ font-family:var(--fh); font-size:.95rem; letter-spacing:.04em; color:var(--tx); margin-bottom:.75rem; }
+.msp-grid2{ display:grid; grid-template-columns:1fr 1fr; gap:.5rem; margin-bottom:.55rem; }
+.msp-grid3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:.5rem; margin-bottom:.55rem; }
+.msp-field{ display:flex; flex-direction:column; gap:.25rem; }
+.msp-label{ font-size:.7rem; color:var(--tx2); }
+.msp-input, .msp-select, .msp-textarea{ width:100%; font-size:.82rem; font-family:var(--fm); color:var(--tx); background:var(--input-bg); border:1px solid var(--input-border); border-radius:9px; padding:.5rem .65rem; box-sizing:border-box; min-height:42px; }
+.msp-input:focus, .msp-select:focus, .msp-textarea:focus{ outline:none; border-color:color-mix(in srgb, #38bdf8 60%, transparent); box-shadow:0 0 0 3px rgba(56,189,248,.18); }
+.msp-textarea{ resize:vertical; min-height:66px; line-height:1.5; }
+.msp-addbtn{ width:100%; margin-top:.25rem; }
+/* Sport entry card */
+.msp-card{ background:rgba(255,255,255,.025); border:1px solid var(--br); border-radius:14px; margin-bottom:.8rem; overflow:hidden; }
+.msp-card__head{ display:flex; align-items:center; gap:.7rem; padding:.85rem 1rem; border-bottom:1px solid var(--br); }
+.msp-emoji{ font-size:1.7rem; line-height:1; flex:0 0 auto; }
+.msp-id{ flex:1; min-width:0; }
+.msp-name{ font-family:var(--fh); font-size:1.06rem; letter-spacing:.02em; color:var(--tx); line-height:1.1; }
+.msp-meta{ font-size:.72rem; color:var(--tx2); margin-top:.18rem; }
+.msp-actions{ display:flex; gap:.4rem; flex:0 0 auto; }
+.msp-btn{ display:inline-flex; align-items:center; justify-content:center; gap:.3rem; min-height:34px; padding:.35rem .65rem; border-radius:9px; font-family:var(--fm); font-size:.72rem; font-weight:600; cursor:pointer; border:1px solid var(--br); background:rgba(255,255,255,.04); color:var(--tx2); transition:filter .12s ease; }
+.msp-btn:hover{ filter:brightness(1.15); }
+.msp-btn--edit{ color:#38bdf8; border-color:rgba(56,189,248,.28); background:rgba(56,189,248,.10); }
+.msp-btn--danger{ color:#f87171; border-color:rgba(239,68,68,.28); background:rgba(239,68,68,.08); }
+.msp-btn--add{ color:#34d399; border-color:rgba(52,211,153,.28); background:rgba(52,211,153,.10); }
+.msp-body{ padding:.8rem 1rem; }
+.msp-bodyhead{ display:flex; justify-content:space-between; align-items:center; gap:.6rem; margin-bottom:.55rem; }
+.msp-bodyhead__l{ font-family:var(--fh); font-size:.7rem; letter-spacing:1px; text-transform:uppercase; color:var(--tx2); }
+/* Seasons table */
+.msp-tablewrap{ position:relative; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.msp-tablewrap::after{ content:''; position:absolute; top:0; right:0; bottom:0; width:22px; background:linear-gradient(90deg, transparent, var(--s1)); pointer-events:none; }
+.msp-table{ width:100%; border-collapse:collapse; font-size:.78rem; }
+.msp-table th{ text-align:center; padding:.45rem .55rem; color:var(--tx3); font-family:var(--fm); font-weight:600; font-size:.64rem; text-transform:uppercase; letter-spacing:.5px; border-bottom:1px solid var(--br); white-space:nowrap; }
+.msp-table th:first-child{ text-align:left; }
+.msp-table td{ padding:.5rem .55rem; text-align:center; color:var(--tx2); border-bottom:1px solid var(--br); white-space:nowrap; }
+.msp-table td:first-child{ text-align:left; color:var(--tx); font-weight:600; }
+.msp-table tbody tr:last-child td{ border-bottom:none; }
+.msp-tv{ color:var(--tx); font-weight:600; }
+.msp-rowdel{ display:inline-flex; align-items:center; justify-content:center; background:none; border:none; color:var(--tx3); cursor:pointer; font-size:.85rem; padding:0 .35rem; min-width:44px; min-height:44px; line-height:1; }
+.msp-rowdel:hover{ color:#f87171; }
+.msp-noseasons{ font-size:.78rem; color:var(--tx2); padding:.5rem 0; }
+/* Empty state */
+.msp-empty{ max-width:380px; margin:0 auto; text-align:center; padding:2.6rem 1rem; color:var(--tx2); }
+.msp-empty__e{ font-size:2.6rem; display:block; margin-bottom:.6rem; }
+.msp-empty__t{ font-size:.85rem; line-height:1.55; margin-bottom:1.1rem; }
+.msp-empty__cta{ display:inline-block; width:auto; min-width:200px; }
+/* Editor modal (overlay + sheet) */
+.msp-overlay{ display:none; position:fixed; inset:0; z-index:9999; align-items:center; justify-content:center; padding:1rem; background:rgba(2,6,18,.62); -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px); }
+.msp-sheet{ position:relative; width:100%; max-width:460px; max-height:88vh; overflow-y:auto; background:var(--s1); border:1px solid var(--br); border-radius:20px; box-shadow:0 18px 60px rgba(0,0,0,.5); padding:1.3rem; -webkit-overflow-scrolling:touch; }
+.msp-sheet__head{ display:flex; justify-content:space-between; align-items:center; gap:.6rem; margin-bottom:1rem; }
+.msp-sheet__title{ font-family:var(--fh); font-size:1.06rem; letter-spacing:.02em; color:var(--tx); }
+.msp-x{ flex:0 0 auto; width:44px; height:44px; border:none; border-radius:50%; background:radial-gradient(circle 16px at center, rgba(255,255,255,.08) 99%, transparent 100%); color:var(--tx2); cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
+.msp-x:hover{ background:rgba(255,255,255,.16); color:var(--tx); }
+.msp-formlabel{ font-family:var(--fh); font-size:.7rem; letter-spacing:1px; text-transform:uppercase; color:var(--tx2); margin:.2rem 0 .5rem; }
+.msp-seasonrow{ display:flex; justify-content:space-between; align-items:center; gap:.6rem; background:rgba(255,255,255,.04); border:1px solid var(--br); border-radius:10px; padding:.55rem .75rem; margin-bottom:.4rem; }
+.msp-seasonrow__l{ min-width:0; }
+.msp-seasonrow__t{ font-size:.8rem; font-weight:600; color:var(--tx); }
+.msp-seasonrow__s{ font-size:.7rem; color:var(--tx2); margin-top:.1rem; }
+@media (prefers-reduced-motion: reduce){ .msp-btn{ transition:none; } }
+/* Light mode */
+:root.light .msp-add, :root.light .msp-card{ background:rgba(0,0,0,.025); border-color:rgba(0,0,0,.08); }
+:root.light .msp-card__head{ border-bottom-color:rgba(0,0,0,.08); }
+:root.light .msp-meta, :root.light .msp-disc__b, :root.light .msp-noseasons, :root.light .msp-empty, :root.light .msp-table td, :root.light .msp-seasonrow__s{ color:#4e4538; }
+:root.light .msp-name, :root.light .msp-table td:first-child, :root.light .msp-tv, :root.light .msp-seasonrow__t, :root.light .msp-disc__b b{ color:#1f1810; }
+:root.light .msp-table th{ color:#6e6558; border-bottom-color:rgba(0,0,0,.08); }
+:root.light .msp-table td{ border-bottom-color:rgba(0,0,0,.06); }
+:root.light .msp-btn{ background:rgba(0,0,0,.03); border-color:rgba(0,0,0,.10); }
+:root.light .msp-seasonrow{ background:rgba(0,0,0,.03); border-color:rgba(0,0,0,.08); }
+:root.light .msp-x{ background:radial-gradient(circle 16px at center, rgba(0,0,0,.06) 99%, transparent 100%); color:#4e4538; }
+:root.light .msp-x:hover{ background:radial-gradient(circle 16px at center, rgba(0,0,0,.12) 99%, transparent 100%); color:#1f1810; }
 #s-learn .tab-landing-card.tlc-power:nth-child(1) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(1) .tlc-shimmer{ animation-delay:0s; }
 #s-learn .tab-landing-card.tlc-power:nth-child(2) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(2) .tlc-shimmer{ animation-delay:.28s; }
 #s-learn .tab-landing-card.tlc-power:nth-child(3) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(3) .tlc-shimmer{ animation-delay:.56s; }
