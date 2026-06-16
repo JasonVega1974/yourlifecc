@@ -1297,22 +1297,31 @@ function renderTabLanding(tabId){
 function renderLearnLanding(){
   const host = document.querySelector('.tab-landing[data-tab="learn"]');
   if(!host) return;
+  // 2026-06-15 — Learn landing gets the Life tab's Power-Card shell (gradient
+  // border, accent-gradient bg, idle shimmer, hover/icon glow). Shell only —
+  // no live stat/streak/faith line (those are Life-specific). Each card carries
+  // one of the shared theme palettes (6 from Life + ocean/ember added in
+  // app.css), chosen for visual variety across the grid. The shimmer is bounded
+  // (finite iteration in app.css) and replays because showSection('s-learn')
+  // re-runs this renderer on every entry (ui.js ~2281).
   const LEARN_CARDS = [
-    {id:'s-school',    icon:'📚', label:'School',           sub:'Classes, assignments, GPA, study timer'},
-    {id:'s-cbt',       icon:'💻', label:'Tech Skills',      sub:'Typing, Windows, Linux, coding, internet safety'},
-    {id:'s-resume',    icon:'📄', label:'Jobs / Resume',    sub:'Build a resume, track applications, prep interviews'},
-    {id:'s-resources', icon:'📐', label:'School Resources', sub:'Math, science, writing, calculators'},
-    {id:'s-growing',   icon:'🌱', label:'Growing Up',       sub:'Life skills for becoming an adult'},
-    {id:'s-driving',   icon:'🚗', label:'Driving',          sub:'Permit, license, road safety, car care'},
-    {id:'s-craft',     icon:'🎵', label:'Music & Practice', sub:'Practice timer, instrument guides, track upload'},
-    {id:'s-sports',    icon:'🏆', label:'Sports',           sub:'Explore sports across school levels'}
+    {id:'s-school',    icon:'📚', label:'School',           sub:'Classes, assignments, GPA, study timer',          theme:'mind'},
+    {id:'s-cbt',       icon:'💻', label:'Tech Skills',      sub:'Typing, Windows, Linux, coding, internet safety', theme:'lightning'},
+    {id:'s-resume',    icon:'📄', label:'Jobs / Resume',    sub:'Build a resume, track applications, prep interviews', theme:'treasury'},
+    {id:'s-resources', icon:'📐', label:'School Resources', sub:'Math, science, writing, calculators',             theme:'ocean'},
+    {id:'s-growing',   icon:'🌱', label:'Growing Up',       sub:'Life skills for becoming an adult',               theme:'hunter'},
+    {id:'s-driving',   icon:'🚗', label:'Driving',          sub:'Permit, license, road safety, car care',          theme:'forge'},
+    {id:'s-craft',     icon:'🎵', label:'Music & Practice', sub:'Practice timer, instrument guides, track upload', theme:'time'},
+    {id:'s-sports',    icon:'🏆', label:'Sports',           sub:'Explore sports across school levels',             theme:'ember'}
   ];
   host.innerHTML = LEARN_CARDS
     .filter(c => document.getElementById(c.id))
     .map(c =>
-      '<button type="button" class="tab-landing-card"'
+      '<button type="button" class="tab-landing-card tlc-power"'
+        + ' data-theme="' + c.theme + '"'
         + ' onclick="showSection(\'' + c.id + '\')"'
         + ' aria-label="' + c.label + '">'
+        + '<span class="tlc-shimmer" aria-hidden="true"></span>'
         + '<span class="tlc-icon" aria-hidden="true">' + c.icon + '</span>'
         + '<span class="tlc-label">' + c.label + '</span>'
         + '<span class="tlc-sub">' + c.sub + '</span>'
