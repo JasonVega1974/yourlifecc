@@ -354,32 +354,287 @@ function showSportDetail(id){
   const hex   = THEME_HEX[theme] || THEME_HEX.lightning;
   const levelName  = l => l==='ms'?'Middle School' : l==='hs'?'High School' : 'College';
   const levelChips = s.levels.map(l=>'<span class="sds-chip">'+levelName(l)+'</span>').join('');
-  const statChips  = (s.statFields||[]).map(f=>'<span class="sds-stat">'+_sdEsc(f.label)+'</span>').join('');
+  // Phase 3: a sport with an authored SPORT_DETAIL entry renders the deep guide;
+  // every other sport renders the original basic sheet byte-for-byte (below).
+  const detail  = (typeof SPORT_DETAIL!=='undefined' && SPORT_DETAIL[id]) ? SPORT_DETAIL[id] : null;
+  const tagline = (detail && detail.tagline) ? '<p class="sds-tag">'+_sdEsc(detail.tagline)+'</p>' : '';
+  const body    = detail ? _sportDeepBody(s, detail) : _sportBasicBody(s);
   m.innerHTML =
     '<div class="sds-sheet" role="dialog" aria-modal="true" aria-label="' + _sdEsc(s.name) + ' details" style="--sd-a:' + hex[0] + ';--sd-b:' + hex[1] + ';">'
     + '<button class="sds-close" type="button" aria-label="Close" onclick="closeSportSheet()">✕</button>'
     + '<div class="sds-head">'
     +   '<span class="sds-emoji" aria-hidden="true">' + s.emoji + '</span>'
-    +   '<div class="sds-headtext"><h2 class="sds-name">' + _sdEsc(s.name) + '</h2><div class="sds-levels">' + levelChips + '</div></div>'
+    +   '<div class="sds-headtext"><h2 class="sds-name">' + _sdEsc(s.name) + '</h2>' + tagline + '<div class="sds-levels">' + levelChips + '</div></div>'
     + '</div>'
-    + '<div class="sds-body">'
-    +   '<p class="sds-overview">' + _sdEsc(s.desc) + '</p>'
-    +   '<section class="sds-sec"><div class="sds-sec__label sds-l--gold">🎓 The scholarship reality</div>'
-    +     '<div class="sds-kv"><span class="sds-kv__k">Who gets one</span><span class="sds-kv__v">' + _sdEsc(s.scholarship.pct) + ' of HS athletes</span></div>'
-    +     '<div class="sds-kv"><span class="sds-kv__k">Typical value</span><span class="sds-kv__v">' + _sdEsc(s.scholarship.avg) + '</span></div>'
-    +     '<p class="sds-note">' + _sdEsc(s.scholarship.note) + '</p></section>'
-    +   '<section class="sds-sec"><div class="sds-sec__label sds-l--green">💚 Staying healthy</div>'
-    +     '<p class="sds-line"><b class="sds-amber">Common injuries:</b> ' + _sdEsc(s.health.injuries) + '</p>'
-    +     '<p class="sds-line"><b class="sds-grn">Prevention:</b> ' + _sdEsc(s.health.prevention) + '</p></section>'
-    +   '<section class="sds-sec"><div class="sds-sec__label sds-l--blue">📈 How to develop</div>'
-    +     '<p class="sds-line">' + _sdEsc(s.development) + '</p></section>'
-    +   (statChips ? '<section class="sds-sec"><div class="sds-sec__label sds-l--violet">📊 Stats to track</div><div class="sds-stats">' + statChips + '</div></section>' : '')
-    + '</div>'
+    + '<div class="sds-body">' + body + '</div>'
     + '</div>';
   try { window._sdsReturnFocus = document.activeElement; } catch(e){}
   m.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
+/* The original Phase-2A body — unchanged, now factored out. Every sport without
+   an authored `detail` still renders exactly this. */
+function _sportBasicBody(s){
+  const statChips = (s.statFields||[]).map(f=>'<span class="sds-stat">'+_sdEsc(f.label)+'</span>').join('');
+  return ''
+    + '<p class="sds-overview">' + _sdEsc(s.desc) + '</p>'
+    + '<section class="sds-sec"><div class="sds-sec__label sds-l--gold">🎓 The scholarship reality</div>'
+    +   '<div class="sds-kv"><span class="sds-kv__k">Who gets one</span><span class="sds-kv__v">' + _sdEsc(s.scholarship.pct) + ' of HS athletes</span></div>'
+    +   '<div class="sds-kv"><span class="sds-kv__k">Typical value</span><span class="sds-kv__v">' + _sdEsc(s.scholarship.avg) + '</span></div>'
+    +   '<p class="sds-note">' + _sdEsc(s.scholarship.note) + '</p></section>'
+    + '<section class="sds-sec"><div class="sds-sec__label sds-l--green">💚 Staying healthy</div>'
+    +   '<p class="sds-line"><b class="sds-amber">Common injuries:</b> ' + _sdEsc(s.health.injuries) + '</p>'
+    +   '<p class="sds-line"><b class="sds-grn">Prevention:</b> ' + _sdEsc(s.health.prevention) + '</p></section>'
+    + '<section class="sds-sec"><div class="sds-sec__label sds-l--blue">📈 How to develop</div>'
+    +   '<p class="sds-line">' + _sdEsc(s.development) + '</p></section>'
+    + ((s.statFields||[]).length ? '<section class="sds-sec"><div class="sds-sec__label sds-l--violet">📊 Stats to track</div><div class="sds-stats">' + statChips + '</div></section>' : '');
+}
+/* Phase 3 deep guide body. A real resource: season reality, skill progression,
+   roles, the mental game, how to start + find a team, the honest recruiting
+   path (existing scholarship facts preserved verbatim), health (incl. health-
+   first fueling — never weight/calorie/body-comp), and a character/role-model
+   angle. All sections are flat .sds-* cards (theme accent stays on the header). */
+function _sportDeepBody(s, d){
+  const esc = _sdEsc;
+  // Each deep section carries a square, color-coded left edge-tab (sds-deepsec--<tone>)
+  // matching its label meaning-colour — a flat scannability cue for the long scroll.
+  const sec  = (cls, icon, label, inner) => { const tone = cls.replace('sds-l--',''); return '<section class="sds-sec sds-deepsec sds-deepsec--'+tone+'"><div class="sds-sec__label '+cls+'">'+icon+' '+esc(label)+'</div>'+inner+'</section>'; };
+  const line = (lead, text) => '<p class="sds-line">'+(lead?'<b>'+esc(lead)+'</b> ':'')+esc(text)+'</p>';
+  const steps = (arr, body) => '<ol class="sds-steps">'+arr.map((x,i)=>'<li class="sds-step"><span class="sds-step__n" aria-hidden="true">'+(i+1)+'</span><span class="sds-step__b">'+body(x)+'</span></li>').join('')+'</ol>';
+  const titled = (t, rest) => '<span class="sds-step__t">'+esc(t)+'</span>'+esc(rest);
+
+  let html = '<p class="sds-overview sds-lead">' + esc(d.overview) + '</p>';
+
+  html += sec('sds-l--blue', '🎬', 'What a season really looks like',
+    line('A practice:', d.season.practice) + line('The season:', d.season.arc) + line('Time it takes:', d.season.commitment));
+
+  html += sec('sds-l--blue', '🪜', 'Getting better, stage by stage',
+    steps(d.progression, p => titled(p.stage, p.focus)));
+
+  html += sec('sds-l--blue', '🧭', d.roles.label,
+    '<div class="sds-roles">' + d.roles.items.map(r => '<div class="sds-role"><span class="sds-role__n">'+esc(r.name)+'</span><span class="sds-role__b">'+esc(r.blurb)+'</span></div>').join('') + '</div>');
+
+  html += sec('sds-l--blue', '🧠', 'The mental game', '<p class="sds-line">' + esc(d.mental) + '</p>');
+
+  html += sec('sds-l--green', '🚀', 'How to start & find a team',
+    steps(d.getStarted.steps, t => esc(t))
+    + '<div class="sds-finds">' + d.getStarted.findTeam.map(f => '<div class="sds-find"><span class="sds-find__v">'+esc(f.venue)+'</span><span class="sds-find__h">'+esc(f.how)+'</span></div>').join('') + '</div>');
+
+  html += sec('sds-l--gold', '🎓', 'Recruiting & scholarship reality',
+    '<p class="sds-note">' + esc(d.recruiting.truth) + '</p>'
+    + '<div class="sds-kv"><span class="sds-kv__k">Who gets one</span><span class="sds-kv__v">' + esc(s.scholarship.pct) + ' of HS athletes</span></div>'
+    + '<div class="sds-kv"><span class="sds-kv__k">Typical value</span><span class="sds-kv__v">' + esc(s.scholarship.avg) + '</span></div>'
+    + steps(d.recruiting.timeline, t => titled(t.when, t.doThis))
+    + line('Divisions:', d.recruiting.divisions));
+
+  let healthInner = line('Common injuries:', d.health.injuries) + line('Staying healthy:', d.health.prevention) + line('Fueling well:', d.health.fuel);
+  if(d.health.note) healthInner += line('Good to know:', d.health.note);
+  html += sec('sds-l--green', '💚', 'Health & staying in the game', healthInner);
+
+  html += sec('sds-l--violet', '⭐', 'Character & role models',
+    '<div class="sds-model"><div class="sds-model__trait">' + esc(d.character.trait) + '</div>'
+    + '<div class="sds-model__name">' + esc(d.character.model) + '</div>'
+    + '<p class="sds-model__why">' + esc(d.character.why) + '</p></div>');
+
+  const statChips = (s.statFields||[]).map(f => '<span class="sds-stat">'+esc(f.label)+'</span>').join('');
+  if(statChips) html += sec('sds-l--violet', '📊', 'Stats to track', '<div class="sds-stats">' + statChips + '</div>');
+
+  return html;
+}
+
+/* ── Phase 3 deep-guide content (SPORT_DETAIL) ───────────────
+   Authored + adversarially wellbeing/accuracy-audited per sport (team /
+   individual / contact exemplars first). Kept in its own map so SPORT_DATA
+   stays untouched. Wellbeing rails: skill/health/durability framing only —
+   weight appears solely as a static recruiting fact (e.g. a weight class),
+   never a goal/target/metric; fueling is "eat enough & well", never
+   restriction/calories/macros/body-comp; character is secular. */
+const SPORT_DETAIL = {
+  "basketball": {
+    "tagline": "Five players, one ball, endless decisions per second.",
+    "overview": "Basketball is a fast, skill-intensive game built on footwork, court IQ, and conditioning. There's a fit for every kind of athlete: the steady decision-maker who runs the offense, the sharpshooter, the relentless defender, the rebounder who owns the paint, the energy player off the bench. You don't need to be the tallest or the fastest in the gym to matter. You need a skill the team can count on and the willingness to do the unglamorous work.",
+    "season": {
+      "practice": "A typical practice opens with a dynamic warmup and ballhandling, moves into shooting and skill stations, then position and team work: half-court sets, defensive shell drills, transition. It usually closes with conditioning or live 5-on-5 scrimmage. Expect plenty of reps on fundamentals even at varsity level.",
+      "arc": "Tryouts and preseason in late fall build conditioning and install the system. The regular season runs winter (roughly 20-25+ games) with practices most days and 1-2 games a week. It builds toward conference play, then district/regional/state postseason brackets. Many players then roll into AAU/club season in spring and summer.",
+      "commitment": "In season, expect 10-15+ hours a week between practices, games, travel, and film. Off-season skill work adds more if you choose to put it in. Rest days are part of training, not a break from it: your nervous system, joints, and shot all sharpen during recovery, and skipping rest is how overuse injuries and burnout start."
+    },
+    "progression": [
+      { "stage": "Beginner", "focus": "Master a comfortable dribble with both hands, a repeatable shooting form (balance, elbow, follow-through), and the triple-threat stance. Learn to pivot without traveling, make a chest and bounce pass, and play on-ball defense in a stance. Learn the rules and basic spacing." },
+      { "stage": "Developing", "focus": "Build a reliable jump shot out to the free-throw line, finish layups with both hands, and read pick-and-roll. Sharpen footwork: jab steps, change of pace, defensive slides without crossing your feet. Start understanding rotations, help defense, and boxing out." },
+      { "stage": "Intermediate", "focus": "Extend range toward and past the three-point line, develop a counter move off your go-to, and make quick reads (drive, kick, finish). Defend multiple positions, communicate switches, and play with pace and control. Film yourself to spot habits." },
+      { "stage": "Advanced", "focus": "Specialize in a role you do at a high level while staying a complete player. Shoot off the dribble and the catch, run an offense or anchor a defense, and impact winning in ways the box score misses: spacing, screens, deflections, leadership." }
+    ],
+    "roles": {
+      "label": "Positions",
+      "items": [
+        { "name": "Point Guard (PG)", "blurb": "The floor general. Runs the offense, sets the pace, handles pressure, and gets teammates the ball where they're dangerous. Lives on vision, ballhandling, and decision-making." },
+        { "name": "Shooting Guard (SG)", "blurb": "The perimeter scorer. Knocks down shots off the catch and the dribble, moves without the ball, and often defends the other team's best guard. Lives on shooting touch and conditioning." },
+        { "name": "Small Forward (SF)", "blurb": "The versatile wing. Scores inside and out, rebounds, and guards multiple positions. Often the most adaptable player on the floor." },
+        { "name": "Power Forward (PF)", "blurb": "The interior workhorse. Rebounds, sets screens, scores around the rim, and increasingly stretches the floor with outside shooting. Lives on positioning, strength, and effort." },
+        { "name": "Center (C)", "blurb": "The anchor. Protects the rim, controls the boards, finishes inside, and communicates the defense. The last line of defense and a screen-setting hub on offense." },
+        { "name": "Sixth man / role player", "blurb": "The energy and specialist spot. A spark off the bench, a defensive stopper, a corner shooter, a hustle rebounder. Every winning team needs players who do one thing reliably." }
+      ]
+    },
+    "mental": "Basketball is a game of mistakes; you'll turn it over, miss shots, and get scored on, sometimes in front of a crowd. What separates good players is the next play: a short memory, eyes up, and energy back on defense before the miss even registers. Nerves are normal, even for starters; channel them into your routine (same free-throw ritual, same pre-game prep) so your body knows what to do when your head is loud. Being a good teammate is a skill you practice on purpose: talk on defense, celebrate an assist as much as a bucket, stay ready when you're on the bench, and own your mistakes instead of pointing fingers. Coaches notice the kid who lifts the group.",
+    "getStarted": {
+      "steps": [
+        "Get a ball and find a hoop. Spend 15-20 minutes a day on form shooting close to the rim and ballhandling with both hands. Consistency beats marathon sessions.",
+        "Learn the rules and watch the game with intent: notice spacing, screens, and where good players move without the ball.",
+        "Play live as often as you can. Pickup games, open gyms, and driveway 1-on-1 teach reads no drill can.",
+        "Film yourself shooting and playing, then compare to your form. Fix one habit at a time.",
+        "Find a team or league to play organized ball and get coached."
+      ],
+      "findTeam": [
+        { "venue": "School team", "how": "Ask your PE teacher or athletic office when basketball tryouts are (usually late fall). Show up in shape, knowing the basics, and ready to defend and compete. Freshman, JV, and varsity levels mean there's often a spot to grow into." },
+        { "venue": "Club / AAU travel", "how": "Search for AAU or club programs in your area and attend their open tryouts, often in spring. This is the real recruiting pathway: AAU tournaments and exposure camps are where college coaches watch. Ask about cost and travel up front, and look for programs that develop players, not just collect them." },
+        { "venue": "Rec & community leagues", "how": "Check your local rec center, YMCA, Boys & Girls Club, or city parks-and-rec for youth and teen leagues. These are lower-cost, lower-pressure, and a great place to start, get reps, and just love the game." },
+        { "venue": "Open gyms & pickup", "how": "Most schools and rec centers run open gym hours. Show up, get in line, call winners, and play. No signup, no tryout, just basketball and the fastest way to improve your feel for the game." }
+      ]
+    },
+    "recruiting": {
+      "truth": "Be honest with yourself about the numbers: only about 1% of high school players go on to play NCAA Division I. That is not a reason to quit; it's a reason to play for the right reasons and keep options open. Far more players thrive in D2, D3, NAIA, and JUCO, and millions more play rec and intramural ball for the rest of their lives. College basketball is a great goal; making it your only definition of success is a setup for heartbreak. Chase being the best version of your game, and let recruiting follow.",
+      "timeline": [
+        { "when": "Freshman / Sophomore year", "doThis": "Play as much as you can (school plus AAU/club), build fundamentals, and keep your grades strong. Academics open doors and money that talent alone won't." },
+        { "when": "Junior year", "doThis": "Get seen. Compete at AAU tournaments and exposure camps, build a highlight film, and email coaches at programs that fit you academically and athletically. Be realistic about which divisions match your level." },
+        { "when": "Summer before / Senior year", "doThis": "Take official and unofficial visits, narrow your list by fit (playing time, major, coaching staff, cost), and finalize academic eligibility through the NCAA/NAIA clearinghouse." },
+        { "when": "Throughout", "doThis": "Stay coachable and durable. References from your coaches and your reputation as a teammate matter as much as your stat line." }
+      ],
+      "divisions": "D1 basketball offers full scholarships, but they're rare and intensely competitive. Men's and women's D1 basketball are head-count sports, so an offer is typically a full ride covering tuition, room, board, and fees, which can be worth tens of thousands of dollars a year and more at pricier schools. D2 and NAIA often blend partial athletic money with academic aid. D3 offers no athletic scholarships but strong academic and need-based aid, often at excellent schools. JUCO is a real path to develop, get grades right, and transfer up. The smartest move is to pick the level and school where you'll actually play, get a degree you want, and afford it. Fit and academics beat prestige every time."
+    },
+    "health": {
+      "injuries": "Ankle sprains are the most common, along with knee issues (including ACL/patellar strain), jammed fingers, and shin splints from repeated jumping and cutting. Overuse injuries climb when players skip rest.",
+      "prevention": "Always do a dynamic warmup before play (leg swings, lunges, light jog, gradual cutting), strengthen your ankles and hips, and drill proper landing mechanics: land soft on both feet with bent knees. Build single-leg balance and core strength, work on jumping and decelerating under control, and respect rest and recovery days so tissue can adapt. Good shoes and taped or braced ankles help if you've sprained before.",
+      "fuel": "Fuel your body to grow and compete, not to shrink it. Eat enough across the day: balanced meals with carbs for energy, protein to repair muscle, plus fruits, vegetables, and healthy fats. Hydrate before, during, and after, especially in hot gyms; bring water to every practice. Sleep is where you actually get better, so aim for a full night, 8-10 hours for teens. Eating enough and sleeping well will do more for your game than any supplement.",
+      "note": "Take any head contact seriously. If you take a hard fall or collision and feel dizzy, foggy, or have a headache, sit out and tell a coach or parent; never play through a suspected concussion. There's no toughness award for hiding it."
+    },
+    "character": {
+      "trait": "Work ethic and humility",
+      "model": "Tim Duncan",
+      "why": "Duncan won at the highest level for nearly two decades by mastering fundamentals instead of flash. Teammates and coaches described him as humble, unselfish, and team-first; he let his game and his consistency speak, took coaching, and made everyone around him better. He's a model for the truth that the unglamorous work, footwork, positioning, and showing up the same way every day, is what builds a great player and a great teammate."
+    }
+  },
+  "track": {
+    "tagline": "A sport with an event for every kind of athlete.",
+    "overview": "Track & field is one sport made of many: sprints, distance, hurdles, jumps, and throws, each rewarding a different kind of athlete. A sprinter, a miler, a thrower, and a pole vaulter look nothing alike in how they compete, and all of them belong on the same team. It is the most accessible high school sport to start because most programs have no cuts: you show up, you train, you compete. The scoreboard is honest here. The clock and the tape measure do not care who you are, only what you did that day.",
+    "season": {
+      "practice": "Practice splits by event group. After a shared warm-up and dynamic stretching, sprinters do block starts and acceleration work, distance runners head out for intervals or a tempo run, hurdlers drill trail-leg mechanics, jumpers rep approach runs and takeoffs, and throwers work technique in the ring or on the runway. Most sessions end with strength, mobility, and cooldown. You spend more time on one or two events than on everything at once.",
+      "arc": "Many areas have two seasons: indoor (winter) and outdoor (spring), plus optional summer club meets. Early weeks build base fitness and clean technique. Mid-season is dual meets and invitationals where you chase personal records. The season peaks at conference, then sectional/regional, then state qualifying meets, where one good performance can change your year.",
+      "commitment": "Expect roughly 10-15 hours a week in season: practice most weekdays plus Saturday meets that can run long. Rest days are not optional extras, they are part of the training. Sprint and jump power and distance endurance are both built during recovery, not just during hard work. A planned easy day or full day off is when your body actually adapts and gets faster."
+    },
+    "progression": [
+      { "stage": "Beginner (first season)", "focus": "Try a couple of event groups and find what clicks. Learn to warm up properly, run relaxed, and understand meet logistics: heats, marks, scratches. Goal is a baseline PR and clean fundamentals, not a finished athlete." },
+      { "stage": "Developing", "focus": "Settle into one or two events. Sharpen technique: block starts, hurdle rhythm, jump approach steps, or throw footwork. Build consistency so your performances stop swinging wildly meet to meet. Add structured strength and mobility work." },
+      { "stage": "Competitive", "focus": "Train your event with intent: race tactics, splits, approach precision, or release angles. Know your seed marks and where you stand in your conference and section. Start tracking the qualifying standards that matter for your goals." },
+      { "stage": "Advanced", "focus": "Refine the small margins that separate places at state and beyond. Periodize your training to peak at the right meets, manage load to stay healthy, and compete with a plan for every round. This is where state-level marks open college doors." }
+    ],
+    "roles": {
+      "label": "Event groups",
+      "items": [
+        { "name": "Sprints (100/200/400)", "blurb": "Explosive, fast-twitch racing. Block starts, top-end speed, and holding form when it hurts. Also the backbone of relay teams." },
+        { "name": "Distance (800 to 3200 / XC crossover)", "blurb": "Endurance, pacing, and mental grit. Built on consistent mileage and interval work. Often the same athletes who run cross country in fall." },
+        { "name": "Hurdles (100/110, 300/400)", "blurb": "Sprinting plus rhythm and technique. Trail-leg mechanics and three-step patterns between barriers. Rewards athletes who love a technical challenge." },
+        { "name": "Jumps (long, triple, high, pole vault)", "blurb": "Speed converted into distance or height. Precise approach runs and takeoff timing. Pole vault especially rewards coordination and fearless practice." },
+        { "name": "Throws (shot put, discus, javelin)", "blurb": "Power, balance, and technique in the ring or on the runway. Footwork and timing matter as much as raw strength. A great fit for athletes who love refining a skill." },
+        { "name": "Relays & multi-events", "blurb": "Relays (4x100, 4x400) add team handoffs and chemistry to an individual sport. Multi-events (heptathlon/decathlon) reward versatile athletes who train across groups." }
+      ]
+    },
+    "mental": "Track exposes you because the result is just a number, and that is also what makes it fair. Pre-race nerves are normal even for elite athletes; channel them with a fixed warm-up routine and a simple cue to focus on (drive your arms, relax your shoulders, hit your first mark). A bad race or a foul is one data point, not a verdict, and the next meet always comes. Even in an individual sport, teammates matter: you split relays, share warm-ups, and cheer each other through the last 100 meters. Be the athlete who claps for the freshman's first PR as loud as for your own.",
+    "getStarted": {
+      "steps": [
+        "Pick the season: most schools run outdoor track in spring, and some add indoor in winter. Find the start date from the athletic office or coach.",
+        "Get a physical. Nearly every school requires a current sports physical and signed forms before you can practice.",
+        "Show up to the first practice. Track usually has no cuts, so the hardest part is walking onto the track that first day.",
+        "Try a couple of event groups before committing. Tell a coach you are new and ask where they think you might fit.",
+        "Get basic gear: running shoes that fit well now, and event-specific spikes later once you know your event. Borrow or buy used to start."
+      ],
+      "findTeam": [
+        { "venue": "Your high school team", "how": "Email or find the head track coach, ask about the season start and physical requirements, and just attend the first practice. This is the no-cut, lowest-barrier entry point for almost everyone." },
+        { "venue": "USATF / AAU club or travel team", "how": "Search the USA Track & Field (USATF) or AAU club finder for your area for summer and year-round competition. Clubs let you keep training and competing outside the school season and reach bigger meets." },
+        { "venue": "Community / rec running programs", "how": "Local parks departments, YMCAs, and all-comers summer meets welcome newcomers with no experience. A great low-pressure way to test events and build fitness before a school season." },
+        { "venue": "Cross country (fall crossover)", "how": "If distance running interests you, joining cross country in the fall builds the base that carries straight into spring track. Same coaches and teammates at many schools." }
+      ]
+    },
+    "recruiting": {
+      "truth": "Be clear-eyed: only about 1-2% of high school track athletes compete in college on scholarship, and most who do receive partial aid. Track is an equivalency sport, meaning a D1 program divides a limited scholarship budget into many partial awards spread across dozens of athletes and every event group — so full rides are rare and most recruited athletes get partial aid. (Scholarship and roster rules have changed in recent years, so confirm the current limits for your division and gender when you start talking to coaches.) The athletes who get recruited have marks, the times and distances that meet a program's standards. That is the currency. Most track athletes do not compete in college, and that is completely fine: the discipline, fitness, and habits you build here outlast the sport.",
+      "timeline": [
+        { "when": "Freshman / Sophomore", "doThis": "Compete, find your best event, and chase honest PRs. Keep your grades strong; academics open as many doors as marks do. Start a simple log of your results and the meets you ran." },
+        { "when": "Junior year", "doThis": "Know the recruiting standards for your event at the division levels that fit you. Email coaches with your verified marks (FAT times, measured distances), your GPA/test scores, and a meet schedule. Junior-year marks matter most." },
+        { "when": "Summer before senior year", "doThis": "Attend college camps or compete at meets where target coaches will see you. Narrow your list by academic fit and the program's culture, not just name recognition. Follow up with coaches who showed interest." },
+        { "when": "Senior year", "doThis": "Lock in official visits, compare any aid offers honestly (athletic plus academic), and confirm you have the marks and grades for admission. Have a plan you are happy with even if the offer is partial or walk-on." }
+      ],
+      "divisions": "Aim for fit over prestige. D1 has the deepest talent and the most pressure, but D2, D3, NAIA, and JUCO all offer real competition and often a better balance of athletics and academics. D3 gives no athletic scholarships but can stack generous academic and need-based aid. JUCO is a strong path to develop marks and transfer up. The best program is the one where you would be happy even if you got injured, because the academics, coaches, and people fit you."
+    },
+    "health": {
+      "injuries": "The common ones are overuse: shin splints and stress fractures (especially in distance runners and jumpers), hamstring and groin pulls (sprinters and hurdlers), and tendon irritation in the knees, Achilles, and shoulders (throwers). Most trace back to doing too much too soon.",
+      "prevention": "Increase mileage and training load gradually, never spiking volume after time off. Warm up dynamically before every session, build strength and mobility for your event, and replace running shoes before they break down. Take your rest days seriously and treat sleep as part of training. If something hurts beyond normal soreness, stop and get it checked early rather than running through it.",
+      "fuel": "Fuel your body well and eat enough to train and grow. You are an athlete who is also still growing, so meals should be plentiful and balanced: carbohydrates for energy, protein to repair muscle, and plenty of fruits and vegetables. Eat a real meal a few hours before competing and refuel within an hour after hard sessions. Hydrate through the day, not just at practice, and prioritize sleep, which is when your body actually adapts and gets faster.",
+      "note": "Track has no weight classes and no reason to manipulate your weight. Eating too little to chase a number does the opposite of what you want: it raises stress-fracture risk, drains your energy, and stalls progress. Strong, well-fueled, and durable beats light every time. If running, eating, or your body image starts to feel anxious or controlling, talk to a coach, parent, athletic trainer, or doctor."
+    },
+    "character": {
+      "trait": "Disciplined consistency",
+      "model": "Eliud Kipchoge",
+      "why": "The marathon world record holder is known less for raw talent than for relentless, humble consistency: he keeps a simple training log, shares chores at his training camp despite his fame, and credits his results to showing up every day. His line, that only the disciplined ones are free in life, captures why the unglamorous daily work, the easy runs and the rest days, is what builds a real athlete."
+    }
+  },
+  "wrestling": {
+    "tagline": "Just you, the other kid, and what you put in the room.",
+    "overview": "Wrestling is one of the oldest sports on earth: two athletes, a circle, and the goal of controlling your opponent and pinning their shoulders to the mat. It rewards leverage and technique over raw size, which is why there is a place for the explosive kid, the relentless grinder, the cerebral chess-player, and the late starter who simply outworks everyone. You compete inside your own weight class against someone your own size, so this is a sport for every kind of athlete who is willing to learn and keep showing up.",
+    "season": {
+      "practice": "A typical practice is warm-up and movement drilling, then technique (a takedown, an escape, a pin combination) broken down rep by rep, then live wrestling in short hard goes, then conditioning. You drill the same moves hundreds of times until they happen without thinking. Expect to be tired, sweaty, and a little sore - and to learn something concrete every single day.",
+      "arc": "Folkstyle season (the high-school and college style) runs roughly November to February or March: preseason conditioning, dual meets and weekend tournaments through the winter, then the postseason ladder - districts/regionals to state. Many wrestlers add a spring/summer freestyle and Greco-Roman season to keep building, but that is optional, not required.",
+      "commitment": "In season, expect practice 5-6 days a week plus weekend competitions - roughly 10-15 hours. Rest days are part of the training, not a break from it: muscle, skin, and your nervous system rebuild on the days off, and overtraining is how good wrestlers get hurt or burned out. A planned rest day makes you better, not softer."
+    },
+    "progression": [
+      { "stage": "Beginner (first season)", "focus": "Learn the stance, motion, and level change. Get comfortable in contact and being on your back without panicking. Master a basic takedown (often a double-leg), a stand-up escape, and a pinning hold. Losing a lot early is normal - everyone does. Show up every day." },
+      { "stage": "Intermediate (1-2 years in)", "focus": "Build a go-to series: a takedown you can hit on anyone, an answer when you are on bottom, and a finish on top. Learn to chain moves so a stopped shot flows into the next attack. Start scouting opponents and wrestling smart, not just hard." },
+      { "stage": "Advanced (varsity / postseason)", "focus": "Sharpen your A-game until it works against the best in your bracket, develop counters to their counters, and master mat-sense - scoring in scrambles, riding time, managing the clock. Funk, setups, and pace separate placers from the pack. This is technique and timing, never about changing your body." }
+    ],
+    "roles": {
+      "label": "Styles & weight classes",
+      "items": [
+        { "name": "Folkstyle", "blurb": "The American scholastic style used in every U.S. high school and college. Rewards control and riding on top, with points for escapes and reversals. This is the style you compete in to get recruited." },
+        { "name": "Freestyle", "blurb": "An international and Olympic style, big in spring/summer club season. Faster and more open, with exposure points and big throws - great for rounding out your attack." },
+        { "name": "Greco-Roman", "blurb": "Olympic style with no attacks below the waist - all upper-body: ties, throws, and leverage. Builds elite hand-fighting and a fearsome upper body." },
+        { "name": "Weight classes", "blurb": "You wrestle others within your weight class, from the lightest up to heavyweight. Your class is simply where your natural, well-fueled body sits - a fact about you, never a number to chase. You compete at the weight you walk around at, hydrated and strong." }
+      ]
+    },
+    "mental": "Wrestling is famously a mental sport because there is nowhere to hide - no teammate to pass to, no bench to blame. The flip side is that nerves before a match are normal, even for state champs; a routine (warm-up, breathing, the same three things you tell yourself) turns that adrenaline into focus. You will get taken down, scored on, and pinned, and the wrestlers who improve are the ones who treat a loss as film to study rather than a verdict on who they are. And though you compete alone, you are made by your room: good teammates give honest goes in practice, celebrate each other's wins, and pick each other up after losses.",
+    "getStarted": {
+      "steps": [
+        "Find the wrestling program at your school or a local club and ask to attend a practice - most coaches welcome newcomers any time and will lend you gear to start.",
+        "Get the basics: wrestling shoes, headgear, and clean workout clothes. You do not need a singlet to begin practicing.",
+        "Learn and live the hygiene rules from day one - shower right after every practice, wash gear, and never wrestle with an open or suspicious skin spot. This protects you and your teammates.",
+        "Commit to showing up daily for a full season before you judge it. Wrestling feels awkward and humbling for the first few weeks, then it clicks.",
+        "Compete at your natural weight from the start. Eat enough, drink water, and let your body tell you your class - never the other way around."
+      ],
+      "findTeam": [
+        { "venue": "Your school team", "how": "Ask the athletic office or PE teacher who the wrestling coach is, then email or catch the coach and say you want to try out. Middle and high schools rarely cut wrestlers - they need bodies in every weight class." },
+        { "venue": "A youth or club program", "how": "Search for a local wrestling club, USA Wrestling club, or 'kids/youth wrestling' near you. These run year-round, take total beginners, and are how most wrestlers log extra mat time." },
+        { "venue": "Rec leagues & community centers", "how": "Many YMCAs, rec departments, and Police Athletic Leagues run intro wrestling in winter - low cost, low pressure, and a great place to find out if you like the contact before joining a school team." }
+      ]
+    },
+    "recruiting": {
+      "truth": "Be honest with yourself: most high-school wrestlers do not wrestle in college, and that is completely fine - the discipline, toughness, and habits you build carry into the rest of your life no matter what. For those who do compete in college, wrestling is an equivalency sport: D1 splits about 9.9 scholarships across 10 weight classes, so almost everyone is on a partial. About 1-2% of high schoolers wrestle in college, and the average award is partial - around $8,000 a year. What actually moves the needle is state placement and clean, finishable technique on film, not your record against weak competition.",
+      "timeline": [
+        { "when": "Grades 9-10", "doThis": "Wrestle as much live as you can, compete in offseason freestyle/Greco, and start a highlight reel. Keep your grades up - academics widen every door, especially at D3 and NAIA." },
+        { "when": "Grade 11", "doThis": "Chase a strong postseason finish (qualify for and place at regionals/state if you can), build a recruiting profile with your record and key match film, and email coaches at programs that fit you academically and as a wrestler." },
+        { "when": "Grade 12", "doThis": "Follow up with interested coaches, take official/unofficial visits, and choose for fit - the room, the coaching, the major - over the logo. Lock in academic eligibility and finalize any aid." }
+      ],
+      "divisions": "There are far more landing spots than just D1. D2, D3, NAIA, and JUCO all have strong wrestling, and many are the better choice for a real chance to compete, get coached, and graduate. D3 offers no athletic scholarships but strong academic and need-based aid, and JUCO can be a launchpad to a four-year program. Pick the place where you will actually wrestle, fit in, and earn a degree - prestige is worth nothing if you ride the bench or never finish school."
+    },
+    "health": {
+      "injuries": "The most common issues are skin infections (ringworm, impetigo, herpes gladiatorum) from mat contact, plus shoulder and knee injuries, cauliflower ear, and sprains from scrambles. Most are preventable with hygiene and good technique.",
+      "prevention": "Shower immediately after every practice, wash your gear and the mats, and sit out any session if you have an open or unidentified skin spot - this is non-negotiable and protects the whole room. Build durability with strength and mobility work, drill safe technique so your body is in good positions, wear headgear, and treat rest and recovery as real training. Sleep is when you rebuild.",
+      "fuel": "Fuel your body to train and grow: eat regular, balanced meals with protein, carbs for energy, fruits and vegetables, and plenty of water all day. The goal is eating enough to wrestle hard and recover - never eating less. Skipping meals or restricting to drop weight wrecks your strength, focus, and long-term health.",
+      "note": "Wrestling has a dangerous weight-cutting culture, and you must reject it: aggressive cutting through dehydration, starvation, or sweating down has killed wrestlers, which is exactly why hydration tests and weight-management rules now exist. Your weight class is wherever your healthy, hydrated, well-fed body lands. Compete there. Never starve, dehydrate, or cut to 'make weight' - if a coach pressures you to, talk to a parent or trusted adult."
+    },
+    "character": {
+      "trait": "Relentless work ethic paired with humility",
+      "model": "Dan Gable",
+      "why": "Gable is wrestling's standard for character because of how he trained and how he carried himself - legendary, near-obsessive work in the room, yet known for crediting his coaches and teammates and pouring himself into developing others. He turned discipline and toughness into a way of treating the sport and the people in it with respect. The lesson is not to copy his volume, but his mindset: outwork the excuses, stay humble, and lift everyone around you."
+    }
+  }
+};
 
 /* ── "Find your sport" finder (Phase 2B) ─────────────────────
    A short, encouraging finder. Matches by INTEREST / PREFERENCE only —

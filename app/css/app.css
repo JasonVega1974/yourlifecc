@@ -8368,6 +8368,43 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 :root.light .sds-l--violet{ color:#7c3aed; }
 :root.light .sds-close{ background:radial-gradient(circle 15px at center, rgba(0,0,0,.06) 99%, transparent 100%); color:#4e4538; }
 
+/* ── Deep sport guide (Phase 3) — additive .sds-* sub-components ────────
+   The detail sheet becomes a real resource. Body stays flat + neutral
+   (theme accent lives on the header only, per the 2A discipline + the
+   visual-design skill): quiet step numbers, soft grouping fills, no new
+   gradients/glow. Light handled; no motion to reduce here. */
+.sds-tag{ margin:.3rem 0 0; font-size:.8rem; line-height:1.45; color:var(--tx2); }
+.sds-lead{ font-size:.92rem; line-height:1.62; color:var(--tx); }
+.sds-line b{ color:var(--tx); font-weight:600; }
+/* Square, color-coded left edge-tab per deep section (inset so it never rounds
+   into the card corner — flat scannability cue, not a rounded single-side accent). */
+.sds-deepsec{ position:relative; }
+.sds-deepsec::before{ content:''; position:absolute; left:0; top:12px; bottom:12px; width:3px; border-radius:0 3px 3px 0; background:var(--sds-edge, transparent); }
+.sds-deepsec--gold{ --sds-edge:#f5a623; } .sds-deepsec--green{ --sds-edge:#34d399; } .sds-deepsec--blue{ --sds-edge:#60a5fa; } .sds-deepsec--violet{ --sds-edge:#a78bfa; }
+.sds-steps{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.6rem; }
+.sds-step{ display:flex; gap:.6rem; align-items:flex-start; }
+.sds-step__n{ flex:0 0 auto; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.72rem; font-weight:700; color:var(--tx2); background:rgba(255,255,255,.06); border:1px solid var(--br); margin-top:.05rem; }
+.sds-step__b{ font-size:.8rem; line-height:1.55; color:var(--tx2); }
+.sds-step__t{ display:block; font-weight:600; color:var(--tx); }
+.sds-roles{ display:flex; flex-direction:column; gap:.6rem; }
+.sds-role{ display:flex; flex-direction:column; gap:.12rem; }
+.sds-role__n{ font-size:.82rem; font-weight:600; color:var(--tx); }
+.sds-role__b{ font-size:.78rem; line-height:1.5; color:var(--tx2); }
+.sds-finds{ display:flex; flex-direction:column; gap:.45rem; margin-top:.6rem; }
+.sds-find{ display:flex; flex-direction:column; gap:.12rem; padding:.5rem .65rem; border-radius:10px; background:rgba(255,255,255,.04); }
+.sds-find__v{ font-size:.72rem; font-weight:700; letter-spacing:.03em; text-transform:uppercase; color:var(--tx); }
+.sds-find__h{ font-size:.78rem; line-height:1.5; color:var(--tx2); }
+.sds-model{ padding:.8rem .9rem; border-radius:12px; background:rgba(255,255,255,.04); }
+.sds-model__trait{ font-size:.72rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--tx2); }
+.sds-model__name{ margin-top:.2rem; font-family:var(--fh); font-size:1.15rem; letter-spacing:.02em; color:var(--tx); }
+.sds-model__why{ margin:.4rem 0 0; font-size:.8rem; line-height:1.55; color:var(--tx2); }
+:root.light .sds-tag, :root.light .sds-step__b, :root.light .sds-role__b, :root.light .sds-find__h, :root.light .sds-model__why{ color:#4e4538; }
+:root.light .sds-step__t, :root.light .sds-role__n, :root.light .sds-find__v, :root.light .sds-model__name, :root.light .sds-line b{ color:#1f1810; }
+:root.light .sds-lead{ color:#1f1810; }
+:root.light .sds-step__n{ background:rgba(0,0,0,.04); }
+:root.light .sds-find, :root.light .sds-model{ background:rgba(0,0,0,.03); }
+:root.light .sds-deepsec--gold{ --sds-edge:#b45309; } :root.light .sds-deepsec--green{ --sds-edge:#047857; } :root.light .sds-deepsec--blue{ --sds-edge:#2563eb; } :root.light .sds-deepsec--violet{ --sds-edge:#7c3aed; }
+
 /* ── "Find your sport" finder (Phase 2B) — .sfind-* ────────────────────
    A launch CTA at the top of Explore + a stepped finder that reuses the
    .sds-overlay/.sds-sheet container. Interest/preference matching only.
