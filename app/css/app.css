@@ -8005,9 +8005,10 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
   filter:grayscale(.3); opacity:.75;
   transition:filter .15s ease, opacity .15s ease, transform .15s ease;
 }
-/* SVG glyph (used by the Parent tab) inherits currentColor so the
-   active state's color:var(--tab-accent) tints it. display:block
-   removes inline-baseline whitespace under the svg box. */
+/* SVG glyph (used by the Parent tab) carries its own two-tone brand fills,
+   so it stays colored in every state like the emoji tabs (the shared
+   grayscale/opacity treatment above still applies). display:block removes
+   inline-baseline whitespace under the svg box. */
 #bottomTabBar .tab-btn .tab-icon-svg{
   display:block;
 }

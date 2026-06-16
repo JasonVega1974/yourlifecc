@@ -1186,16 +1186,20 @@ const TAB_IA = [
   // glyph in the bar. Swapped to an inline SVG that takes currentColor
   // — picks up the active tab-accent and the muted inactive --tx2.
   {id:'family', label:'Parent',
-    icon:'<svg class="tab-icon-svg" viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true">'
-       + '<path d="M9 12c2.21 0 4-1.79 4-4S11.21 4 9 4 5 5.79 5 8s1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>'
-       + '<path d="M16.5 12c1.93 0 3.5-1.57 3.5-3.5S18.43 5 16.5 5c-.55 0-1.07.13-1.54.35.66.95 1.04 2.11 1.04 3.15s-.38 2.2-1.04 3.15c.47.22.99.35 1.54.35zm.5 2c-.66 0-1.42.05-2.21.16C16.5 15.27 17 16.55 17 18v2h6v-2c0-2.66-5.33-4-6-4z"/>'
+    // Two-person "Parent" glyph stays an inline SVG (the family emoji renders
+    // monochrome on Windows/Android), but carries fixed two-tone brand fills so
+    // it reads COLORED in every state like the emoji tabs — front figure sky,
+    // back figure purple — instead of the old currentColor monochrome.
+    icon:'<svg class="tab-icon-svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true">'
+       + '<path fill="#38bdf8" d="M9 12c2.21 0 4-1.79 4-4S11.21 4 9 4 5 5.79 5 8s1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>'
+       + '<path fill="#a78bfa" d="M16.5 12c1.93 0 3.5-1.57 3.5-3.5S18.43 5 16.5 5c-.55 0-1.07.13-1.54.35.66.95 1.04 2.11 1.04 3.15s-.38 2.2-1.04 3.15c.47.22.99.35 1.54.35zm.5 2c-.66 0-1.42.05-2.21.16C16.5 15.27 17 16.55 17 18v2h6v-2c0-2.66-5.33-4-6-4z"/>'
        + '</svg>',
     accent:'var(--c)',
     primary:[
       {sectionId:'s-parent', label:'Parent Hub', icon:'👨‍👩‍👧'}
     ]
   },
-  {id:'me',    label:'Me',    icon:'👤', accent:'var(--c)',
+  {id:'me',    label:'Me',    icon:'🧑', accent:'var(--c)',
     primary:[
       {sectionId:'s-badges',     label:'Badges',     icon:'🏅', accent:'var(--c)'},
       {sectionId:'s-milestones', label:'Milestones', icon:'🗺️', accent:'var(--section-goals)'},
