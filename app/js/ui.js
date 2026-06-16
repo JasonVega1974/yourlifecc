@@ -1180,6 +1180,15 @@ const TAB_IA = [
       {sectionId:'s-reading',    label:'Reading List', icon:'📖', accent:'var(--section-journal)'}
     ]
   },
+  // 2026-06-15 — Learn tab (mobile bottom bar). Routes to the bespoke Learn
+  // landing (#s-learn, populated by renderLearnLanding — NOT the generic
+  // renderTabLanding pass; see renderAllTabLandings). primary[] exists only so
+  // _tabForSection's fallback maps s-learn → this tab for active-highlighting.
+  {id:'learn', label:'Learn', icon:'📚', accent:'var(--c)',
+    primary:[
+      {sectionId:'s-learn', label:'Learn', icon:'📚'}
+    ]
+  },
   // 2026-06-06 — Family → Parent. The compound emoji 👨‍👩‍👧 renders as a
   // monochrome silhouette on Windows + older Android and ignores CSS
   // color, so the tab read flat-grey against every other (colorful)
@@ -1503,7 +1512,11 @@ function renderLifeLanding(){
 }
 
 function renderAllTabLandings(){
-  renderTabLanding('learn');
+  // renderLearnLanding() is the SOLE populator of .tab-landing[data-tab="learn"].
+  // Do NOT call renderTabLanding('learn'): now that TAB_IA has a 'learn' entry,
+  // the generic renderer would write a generic card into the host and race with
+  // (clobber) renderLearnLanding's output. The Learn tab button still comes from
+  // TAB_IA via renderBottomTabBar; only the generic LANDING pass is skipped.
   renderLearnLanding();
   renderLifeLanding();
   renderTabLanding('me');
