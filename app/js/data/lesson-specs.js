@@ -1523,6 +1523,245 @@ const SK_SPECS = {
         ]
       }
     ]
+  },
+
+  // ═══════════════════════════════════════════════════════════════════
+  // CAREER & WORK — full module elevated. Rich where it earns it: a
+  // weak-vs-strong resume compare (L1), the STAR steps (L2), a first-
+  // paycheck breakdown widget (L3 — the number-heavy one; FICA exact,
+  // income tax illustrative, complements the Taxes module without
+  // duplicating W-2-vs-1099), and the compound-growth projector + a
+  // start-at-22-vs-32 compare for the 401(k) (L4). Networking (L5),
+  // professionalism (L6), and side hustles (L7) are list/relationship
+  // lessons — honest structured prose, no forced widgets. Faithful to
+  // SK_DATA.career — no new claims or figures.
+  // ═══════════════════════════════════════════════════════════════════
+  career: {
+    key: 'career',
+    color: '#f59e0b',
+    lessons: [
+      // ── L1 — Resume (procedural / structural) ────────────────
+      {
+        id:'career-resume', matchTitle:'Building a Resume That Actually Gets Read',
+        title:'Building a Resume That Actually Gets Read', duration:'7 min',
+        blocks:[
+          { type:'lead', text:"Hiring managers spend an average of 7 seconds on a first resume scan. Yours has to communicate competence and relevance instantly or it's set aside — and most resumes fail on how the experience is presented, not on a lack of experience." },
+          { type:'keyIdea', title:'One page, clean, machine-readable', text:"Under 10 years of experience? One page, always. Skip graphics, photos, and charts — they confuse the Applicant Tracking Systems (ATS) that parse your resume before a human ever sees it. Standard fonts, consistent formatting, clear sections." },
+          { type:'compare',
+            left:{ title:'Weak bullets', points:[
+              "\"Responsible for managing social media\"",
+              "\"Helped customers\"",
+              "Vague, passive, no result"
+            ] },
+            right:{ title:'Strong bullets — action + what + result', points:[
+              "\"Grew Instagram following from 800 to 4,200 in 6 months\"",
+              "\"Resolved 40+ customer inquiries daily with 97% satisfaction\"",
+              "Specific, active, measurable"
+            ] } },
+          { type:'keyIdea', title:"Mirror the posting's exact words", text:"Many companies score resumes against the job description before a human reviews them. If the posting says \"project management\" and you wrote \"managed projects,\" the software may score you lower for the same skill. Use their language." },
+          { type:'list', style:'check', items:[
+            { strong:'Include:', text:"work experience (newest first), education, hard skills (software, tools, languages), relevant projects. Tailor it for every application." },
+            { strong:'Contact line:', text:"name large at top, professional email (firstname.lastname@gmail.com), phone, LinkedIn URL, city/state — no full address." },
+            { strong:'Leave out:', text:"objective statements, \"references available on request,\" high school once you have college, and jobs over 10 years old." }
+          ] },
+          { type:'tip', text:"Paste your resume and the job description into jobscan.co — it scores your keyword-match percentage and shows exactly what's missing. Optimizing this alone can move you from auto-rejected to an interview." },
+          { type:'takeaways', items:[
+            "One page, no graphics, standard fonts — readable by ATS and humans.",
+            "Every bullet: action verb + what you did + the result or scale.",
+            "Mirror the posting's keywords and tailor for each application."
+          ] },
+          { type:'check', q:"Which bullet is strongest on a resume?", opts:[
+            "Responsible for managing social media",
+            "Helped customers with various tasks",
+            "Grew Instagram following from 800 to 4,200 in 6 months",
+            "Hard worker and team player"
+          ], ans:2, explain:"Action verb + what you did + a measurable result. \"Grew … from 800 to 4,200 in 6 months\" shows scale and outcome; the others are vague or passive." }
+        ]
+      },
+
+      // ── L2 — Interview (procedural) ──────────────────────────
+      {
+        id:'career-interview', matchTitle:'Acing the Interview — Preparation That Actually Works',
+        title:'Acing the Interview — Preparation That Actually Works', duration:'7 min',
+        blocks:[
+          { type:'lead', text:"Most interview failures are preparation failures, not performance failures. Interviews reward the people who thought deeply about the questions in advance — not the ones who think fastest on their feet." },
+          { type:'list', style:'check', items:[
+            { strong:'Research the company:', text:"About page, mission, recent news, Glassdoor, and your interviewers' LinkedIn. They notice immediately when you haven't." },
+            { strong:'Understand the role:', text:"reread the job description and prepare a specific example for every requirement listed." },
+            { strong:'Prepare \"Tell me about yourself\":', text:"it opens 90% of interviews — a 90-second professional narrative, not your life story. Practice it aloud until it sounds natural." }
+          ] },
+          { type:'steps', items:[
+            { title:'Situation', text:"Briefly set the context for your story." },
+            { title:'Task', text:"What you needed to accomplish." },
+            { title:'Action', text:"What you specifically did — the most important part of the answer." },
+            { title:'Result', text:"The outcome, quantified wherever you can." }
+          ] },
+          { type:'keyIdea', title:'Prepare 5–7 flexible STAR stories', text:"The same story about a project can answer \"tell me about a time you led a team,\" \"dealt with a tight deadline,\" or \"solved a hard problem.\" A handful of strong stories covers most behavioral questions." },
+          { type:'keyIdea', title:'Ask them thoughtful questions', text:"\"What does success look like in this role after 90 days?\" \"What's the biggest challenge the team faces?\" signal real interest. Save \"How much vacation do I get?\" for the offer stage." },
+          { type:'tip', text:"Record a mock interview on your phone and watch it back. Most people have no idea what they look and sound like — filler words, rushed answers, poor eye contact. Thirty minutes of self-review beats hours of mental rehearsal." },
+          { type:'takeaways', items:[
+            "Preparation, not improvisation, is what wins interviews.",
+            "Answer behavioral questions with STAR: Situation, Task, Action, Result.",
+            "Send a brief, specific thank-you within 24 hours — 80% of candidates don't."
+          ] },
+          { type:'check', q:"In the STAR method, which part matters most?", opts:[
+            "Situation — the backstory",
+            "Task — the goal",
+            "Action — what you specifically did",
+            "Result — only the number matters"
+          ], ans:2, explain:"Action is the heart of the answer — it's where you show what YOU actually did. Situation and Task are brief setup; Result quantifies the payoff." }
+        ]
+      },
+
+      // ── L3 — Paycheck (number-heavy → widget) ────────────────
+      {
+        id:'career-paycheck', matchTitle:'Understanding Your Paycheck — Every Line Explained',
+        title:'Understanding Your Paycheck — Every Line Explained', duration:'7 min',
+        blocks:[
+          { type:'lead', text:"Your first paycheck is often confusing and a little disappointing — what lands in your bank account is noticeably less than what you were told you'd earn. Here's where every dollar goes." },
+          { type:'keyIdea', title:'Build your budget on net, not gross', text:"Gross pay is what's quoted in the offer; every line below it is a deduction. Net pay — what actually hits your account — is the number your budget should be built around." },
+          { type:'widget', kind:'paycheckBreakdown', config:{ gross:45000, taxRate:12 } },
+          { type:'list', style:'check', items:[
+            { strong:'Pre-tax deductions:', text:"401(k), health-insurance premium, HSA/FSA, dental/vision — these come out before tax and lower your taxable income." },
+            { strong:'FICA (fixed by law):', text:"Social Security 6.2% up to the wage cap ($176,100 in 2025), Medicare 1.45% on all wages (+0.9% above $200,000)." },
+            { strong:'Income tax:', text:"federal (from your W-4) and state — 9 states have none. Reconciled when you file." },
+            { strong:'YTD columns:', text:"running yearly totals — useful for tracking against limits like the $23,500 401(k) cap." }
+          ] },
+          { type:'tip', text:"Review every paycheck, at least for the first few months — payroll errors happen (wrong deductions, missing raises, bad withholding) and catching them is on you. Keep your last few stubs; you'll need them for apartments, loans, and taxes." },
+          { type:'takeaways', items:[
+            "Gross is the headline; net is what you actually live on.",
+            "FICA is fixed at 7.65% (6.2% Social Security + 1.45% Medicare).",
+            "Pre-tax deductions lower your taxable income; review every stub for errors."
+          ] },
+          { type:'check', q:"Social Security and Medicare together (FICA) take what share of wages?", opts:[
+            "1.45%",
+            "6.2%",
+            "7.65%",
+            "It depends on your tax bracket"
+          ], ans:2, explain:"6.2% Social Security + 1.45% Medicare = 7.65%. FICA is a flat, fixed rate set by law — separate from income-tax withholding, which depends on your W-4 and state." }
+        ]
+      },
+
+      // ── L4 — 401(k) (compound growth) ────────────────────────
+      {
+        id:'career-401k', matchTitle:'The 401(k) — Why Starting Now Is Worth Hundreds of Thousands',
+        title:'The 401(k) — Why Starting Now Is Worth Hundreds of Thousands', duration:'8 min',
+        blocks:[
+          { type:'lead', text:"A 401(k) is the most powerful wealth-building tool available to working Americans — and most young workers either skip it or use it wrong. The compound-growth math makes the decision obvious." },
+          { type:'keyIdea', title:'The match is free money — always take it', text:"Most employers match 3–6% of your salary, e.g. \"100% of your first 3% and 50% of the next 2%.\" That's an immediate 50–100% return on the matched amount. Not capturing the full match is turning down part of your pay." },
+          { type:'widget', kind:'compoundGrowth', config:{ monthly:300, startAge:22, retireAge:65, rate:8 } },
+          { type:'viz', kind:'valueBars', data:{ mode:'compare', money:true, caption:'$300/month at 8% until 65 — the only difference is when you start (illustrative)', items:[
+            { label:'Start at 22', value:1150000, color:'#34d399', highlight:true },
+            { label:'Start at 32', value:520000, color:'#fb7185', note:'Ten years later costs ~$630,000.' }
+          ] } },
+          { type:'keyIdea', title:'Pick low-cost index or target-date funds', text:"For most people a low-cost S&P 500 index fund or a target-date fund (e.g. \"Target Date 2060\") is the right choice. Avoid actively managed funds with expense ratios over 0.5% — fees compound against you exactly like returns compound for you." },
+          { type:'list', style:'check', items:[
+            { strong:'Set it up week one:', text:"many plans have a waiting period — don't delay the clock." },
+            { strong:'Capture the full match', text:"on day one — that's the floor, not the goal." },
+            { strong:'Raise it 1% every January', text:"until you're at 10–15% of income (the 2025 employee cap is $23,500). You won't feel the gradual increase." }
+          ] },
+          { type:'takeaways', items:[
+            "An employer match is an instant 50–100% return — never leave it on the table.",
+            "Starting ten years earlier can roughly double your ending balance.",
+            "Low-cost index or target-date funds beat high-fee active funds over time."
+          ] },
+          { type:'check', q:"Your employer matches 100% of your first 3%. Contributing at least 3% gets you…", opts:[
+            "A small bonus at year-end",
+            "An immediate ~100% return on that money — free retirement savings",
+            "A lower paycheck with no benefit",
+            "Nothing until you retire"
+          ], ans:1, explain:"A 100% match doubles every dollar you put in up to that limit — an immediate, guaranteed return you can't get anywhere else. Not contributing enough to capture it is leaving pay behind." }
+        ]
+      },
+
+      // ── L5 — Networking (relationship lesson → prose) ────────
+      {
+        id:'career-networking', matchTitle:'Networking — The Real Way Most Jobs Are Filled',
+        title:'Networking — The Real Way Most Jobs Are Filled', duration:'7 min',
+        blocks:[
+          { type:'lead', text:"Studies consistently find that 70–80% of jobs are filled through networking before — or instead of — being publicly posted. The \"hidden job market\" is real, and most people access it poorly or not at all." },
+          { type:'stat', items:[
+            { value:'70–80%', label:'of jobs filled through networking' },
+            { value:'20 min', label:'all an informational interview asks' }
+          ] },
+          { type:'keyIdea', title:"Networking isn't a room full of business cards", text:"That's a networking event, and it's mostly a waste of time. Real networking is building genuine relationships over time with people in your field — and it works even if you're not naturally social." },
+          { type:'list', style:'check', items:[
+            { strong:'Start with your warm network:', text:"professors, former employers, coaches, family friends, church members, classmates. Someone you know almost certainly connects to where you want to go — ask for an introduction." },
+            { strong:'LinkedIn as a tool:', text:"a complete profile is searchable by recruiters. Connect with everyone you meet professionally; post occasionally about what you're learning." },
+            { strong:'Give before you ask:', text:"share articles, make introductions, congratulate wins. People who only show up when they need something get less in return." }
+          ] },
+          { type:'keyIdea', title:'The informational interview', text:"The most underused career tool. Ask someone in a role you're curious about for 20 minutes to learn — not for a job. A script: \"I'm trying to understand what it's like to work in [field]. Would you be open to a 20-minute call about your career path?\" It often leads to referrals and unadvertised openings." },
+          { type:'takeaways', items:[
+            "Most jobs are filled through relationships before they're ever posted.",
+            "Map your warm network first — you're closer to opportunities than you think.",
+            "Ask to learn (the informational interview), and give before you ask."
+          ] },
+          { type:'check', q:"What is an informational interview?", opts:[
+            "A formal job interview over the phone",
+            "Asking someone for ~20 minutes to learn about their work and path — not for a job",
+            "A background check employers run",
+            "A networking event with name tags"
+          ], ans:1, explain:"You're asking to learn, not to be hired. People are remarkably willing to share 20 minutes — and those conversations often surface referrals and unadvertised roles." }
+        ]
+      },
+
+      // ── L6 — Professionalism (relationship lesson → prose) ───
+      {
+        id:'career-professionalism', matchTitle:'Professionalism and Work Ethic — What Actually Gets You Promoted',
+        title:'Professionalism and Work Ethic — What Actually Gets You Promoted', duration:'7 min',
+        blocks:[
+          { type:'lead', text:"Technical skill gets you the job; work ethic and professional behavior decide whether you advance. The people who rise fastest aren't always the most talented — they're the most reliable and trusted. These are completely teachable and within your control." },
+          { type:'keyIdea', title:'Reliability is the single most valuable trait', text:"Do what you say you will, when you said you'd do it — it sounds obvious and it's remarkably rare. If you'll miss a deadline, say so 24–48 hours before, not after. Managers build their whole workload around what they can count on from you." },
+          { type:'list', style:'check', items:[
+            { strong:'Responsiveness:', text:"reply within one business day. Even if you can't fully answer yet, acknowledge it with an ETA: \"Got it — I'll have this to you by Thursday.\"" },
+            { strong:'Take initiative:', text:"don't wait to be told the next thing. After a task, ask \"What else would be helpful?\" — that one question, asked genuinely, is worth raises." },
+            { strong:'Manage up:', text:"understand your manager's pressures and update them before they ask. Make their life easier and you become indispensable." },
+            { strong:'Handle mistakes well:', text:"own it quickly, explain briefly, then shift to \"here's how I'll fix it and what I'm changing so it won't happen again.\"" }
+          ] },
+          { type:'keyIdea', title:'Reputation is built in thousands of small moments', text:"How you handle the boring tasks, how you treat the receptionist, whether you keep your smaller commitments — these accumulate into the reputation that decides what opportunities come to you." },
+          { type:'tip', text:"The first 90 days of any new job set your reputation for years. Show up a few minutes early, learn people's names, take notes, ask questions, and volunteer for the unglamorous tasks. That sprint of first impressions compounds the whole time you're there." },
+          { type:'takeaways', items:[
+            "Reliability — doing what you said, when you said — is the trait that gets you promoted.",
+            "Communicate a slip 24–48 hours early, not after the deadline passes.",
+            "Own mistakes fast and pivot straight to the fix and the prevention."
+          ] },
+          { type:'check', q:"You realize you can't hit a deadline. When do you tell your manager?", opts:[
+            "After the deadline, with an apology",
+            "24–48 hours before, so they can adjust",
+            "Only if they ask about it",
+            "Never — just work harder and hope"
+          ], ans:1, explain:"Early warning lets a manager re-plan; a silent miss breaks the trust their whole workload depends on. Reliability is as much about communicating slips as about hitting dates." }
+        ]
+      },
+
+      // ── L7 — Side Hustles (list lesson → prose) ──────────────
+      {
+        id:'career-sidehustle', matchTitle:'Side Hustles and Multiple Income Streams',
+        title:'Side Hustles and Multiple Income Streams', duration:'7 min',
+        blocks:[
+          { type:'lead', text:"A single income source is a single point of failure. Building even one additional stream — however modest — adds flexibility, lowers anxiety, and builds skills that often grow into something bigger. The time to start is before you desperately need it." },
+          { type:'list', style:'check', items:[
+            { strong:'Freelance services (highest rate):', text:"design, web dev, video editing, writing, photography, social media. Fiverr/Upwork for first clients, then direct outreach. Often $25–$75+/hour." },
+            { strong:'Tutoring:', text:"academic subjects, instruments, test prep. Wyzant connects tutors and students — $25–$80/hour with real expertise." },
+            { strong:'Gig services:', text:"DoorDash, Uber Eats, Instacart, TaskRabbit — lower rate but immediate and flexible. Best as a bridge, not a long-term plan." },
+            { strong:'Reselling & content:', text:"flip thrift/clearance finds on eBay or Poshmark; or build a YouTube/newsletter/podcast niche (a 6–18-month payoff, but the audience compounds)." }
+          ] },
+          { type:'keyIdea', title:'Set aside 28–30% for taxes from the first dollar', text:"All side-hustle income is self-employment income. Track every payment (even cash) and every business expense. Earn over $400/year and you must file a Schedule SE — and may owe quarterly estimated taxes. Setting money aside up front prevents an April surprise." },
+          { type:'tip', text:"Start the hustle you can start this week — not the one that needs months of planning. The learning from doing it poorly and refining it is worth far more than the perfect version that never launches." },
+          { type:'takeaways', items:[
+            "A second income stream is insurance against a single point of failure.",
+            "Side-hustle income is self-employment income — set aside 28–30% from dollar one.",
+            "Over $400/year means a Schedule SE and possibly quarterly estimated taxes."
+          ] },
+          { type:'check', q:"On side-hustle income, how much should you set aside for taxes?", opts:[
+            "Nothing until you file in April",
+            "About 28–30% from the first dollar",
+            "Exactly 7.65%",
+            "Only if you earn over $50,000"
+          ], ans:1, explain:"Self-employment income has no employer withholding, so set aside ~28–30% yourself from the start. Over $400/year you file a Schedule SE and may owe quarterly estimated payments." }
+        ]
+      }
+    ]
   }
 };
 

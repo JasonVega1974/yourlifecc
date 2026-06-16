@@ -1166,6 +1166,47 @@
       }
       [$a, $r, $y].forEach(function(el){ el.addEventListener('input', function(){ render(false); }); });
       render(true);
+    },
+
+    // First-paycheck breakdown — gross to net. FICA is exact (Social Security
+    // 6.2% to the wage cap + Medicare 1.45%); income-tax withholding is a
+    // user-adjustable illustrative rate, framed as general info, not advice.
+    // Complements the Taxes module (brackets / W-2-vs-1099) — this is the
+    // paycheck mechanics, not the return.
+    paycheckBreakdown: function(mountEl, config){
+      var c = config || {};
+      var gross = c.gross || 45000, taxRate = (c.taxRate != null ? c.taxRate : 12);
+      var SS_CAP = 176100, SS_RATE = 0.062, MED_RATE = 0.0145;
+      mountEl.innerHTML =
+        '<div class="lr-calc">'
+        + '<div class="lr-calc__head">Where your paycheck goes</div>'
+        + '<div class="lr-calc__controls">'
+        +   '<label class="lr-calc__field"><span>Annual gross pay</span><input type="number" class="pb-g" min="0" step="1000" value="' + gross + '" inputmode="numeric"></label>'
+        +   '<label class="lr-calc__field"><span>Income tax % (illustrative)</span><input type="number" class="pb-t" min="0" max="50" step="1" value="' + taxRate + '" inputmode="numeric"></label>'
+        + '</div><div class="lr-calc__out pb-out" aria-live="polite"></div>'
+        + '<div class="lr-calc__note">Social Security (6.2% up to $176,100) and Medicare (1.45%) are fixed by law — together that\'s FICA, 7.65%. The income-tax line is an illustrative estimate; your real withholding depends on your W-4 and state (9 states have none). General info, not tax advice.</div>'
+        + '</div>';
+      var $g = mountEl.querySelector('.pb-g'), $t = mountEl.querySelector('.pb-t'), $o = mountEl.querySelector('.pb-out');
+      function seg(amt, total, col){ var pct = total > 0 ? (amt / total * 100) : 0; return '<div style="width:' + pct.toFixed(1) + '%;background:' + col + ';"></div>'; }
+      function legdot(col, label, amt){ return '<div class="lr-brk__leg"><span class="lr-brk__dot" style="background:' + col + ';"></span><b>' + label + '</b> ' + money(amt) + '</div>'; }
+      function render(){
+        var g = Math.max(0, parseFloat($g.value) || 0);
+        var tr = Math.max(0, Math.min(50, parseFloat($t.value) || 0));
+        var ss = SS_RATE * Math.min(g, SS_CAP);
+        var med = MED_RATE * g + (g > 200000 ? 0.009 * (g - 200000) : 0);
+        var inc = (tr / 100) * g;
+        var net = Math.max(0, g - ss - med - inc);
+        var NET = '#34d399', INC = '#f59e0b', SS = '#60a5fa', MED = '#a78bfa';
+        $o.innerHTML = '<div class="lr-calc__stats">'
+          + '<div class="lr-calc__stat"><div class="lr-calc__sv" style="color:' + NET + ';">' + money(net) + '</div><div class="lr-calc__sl">take-home / year</div></div>'
+          + '<div class="lr-calc__stat"><div class="lr-calc__sv">' + money(net / 12) + '</div><div class="lr-calc__sl">take-home / month</div></div>'
+          + '<div class="lr-calc__stat"><div class="lr-calc__sv">' + money(g - net) + '</div><div class="lr-calc__sl">withheld / year</div></div>'
+          + '</div>'
+          + '<div style="display:flex;height:18px;border-radius:6px;overflow:hidden;margin:.5rem 0;background:var(--s3);">' + seg(net, g, NET) + seg(inc, g, INC) + seg(ss, g, SS) + seg(med, g, MED) + '</div>'
+          + '<div class="lr-brk__legend" style="flex-wrap:wrap;gap:.3rem .8rem;justify-content:flex-start;">' + legdot(NET, 'Take-home', net) + legdot(INC, 'Income tax', inc) + legdot(SS, 'Social Security', ss) + legdot(MED, 'Medicare', med) + '</div>';
+      }
+      [$g, $t].forEach(function(el){ el.addEventListener('input', render); });
+      render();
     }
   };
 
