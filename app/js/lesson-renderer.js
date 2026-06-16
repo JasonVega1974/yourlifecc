@@ -294,19 +294,24 @@
     toolGrid: function(cfg, ctx){
       function lbl(x, y, t){ return '<text x="' + x + '" y="' + y + '" text-anchor="middle" font-size="10.5" fill="var(--tx2)">' + t + '</text>'; }
       return '<svg viewBox="0 0 300 178" class="lr-svg lr-svg--wide" role="img" aria-label="A starter home tool kit: hammer, screwdrivers, a cordless drill, an adjustable wrench, a tape measure, and pliers">'
-        // row 1 — hammer / screwdrivers / drill
-        + '<rect x="47" y="36" width="6" height="40" rx="2" fill="var(--s4)"/><path d="M33 30 h22 a3 3 0 0 1 3 3 v7 a3 3 0 0 1 -3 3 h-22 l-5 -6 z" fill="var(--tx2)"/>'
+        // row 1 — hammer (claw) / screwdrivers / drill
+        + '<rect x="48" y="40" width="6" height="39" rx="2" fill="var(--s4)"/>'
+        + '<rect x="42" y="29" width="22" height="10" rx="3" fill="var(--tx2)"/>'
+        + '<path d="M44 30 q-13 -1 -18 5" fill="none" stroke="var(--tx2)" stroke-width="3.5" stroke-linecap="round"/>'
+        + '<path d="M44 38 q-13 1 -18 -5" fill="none" stroke="var(--tx2)" stroke-width="3.5" stroke-linecap="round"/>'
         + lbl(43, 92, 'Hammer')
         + '<rect x="140" y="30" width="20" height="13" rx="4" fill="var(--lr-accent,#60a5fa)"/><rect x="148" y="42" width="4" height="26" fill="var(--tx2)"/><rect x="147" y="68" width="6" height="6" fill="var(--tx3)"/>'
         + lbl(150, 92, 'Screwdrivers')
         + '<rect x="236" y="30" width="26" height="18" rx="4" fill="var(--tx2)"/><rect x="241" y="48" width="9" height="16" rx="2" fill="var(--s4)"/><rect x="262" y="34" width="11" height="9" rx="2" fill="var(--tx3)"/><line x1="273" y1="38.5" x2="289" y2="38.5" stroke="var(--tx2)" stroke-width="3"/>'
         + lbl(254, 92, 'Cordless drill')
-        // row 2 — wrench / tape measure / pliers
-        + '<g transform="rotate(38 46 124)"><rect x="43" y="108" width="6" height="34" rx="2" fill="var(--tx2)"/><path d="M37 102 h18 v7 h-6 v6 h6 v7 h-18 z" fill="var(--tx2)"/></g>'
+        // row 2 — wrench (open jaw) / tape measure / pliers (pivot + jaw)
+        + '<path d="M38 100 L42 100 L42 110 A4 4 0 0 0 50 110 L50 100 L54 100 L54 120 L38 120 Z" fill="var(--tx2)"/>'
+        + '<rect x="43" y="118" width="6" height="26" rx="2" fill="var(--tx2)"/>'
         + lbl(46, 168, 'Adjustable wrench')
         + '<path d="M136 110 a15 15 0 1 1 30 0 v8 a6 6 0 0 1 -6 6 h-18 a6 6 0 0 1 -6 -6 z" fill="var(--s3)" stroke="var(--tx2)" stroke-width="2"/><circle cx="151" cy="110" r="6" fill="var(--s2)" stroke="var(--tx2)" stroke-width="1.5"/><rect x="160" y="122" width="13" height="6" rx="1" fill="var(--g,#fbbf24)"/>'
         + lbl(151, 168, 'Tape measure')
-        + '<g stroke="var(--tx2)" stroke-width="5" fill="none" stroke-linecap="round"><path d="M244 140 L252 116 L258 104"/><path d="M260 140 L252 116 L246 104"/></g>'
+        + '<g stroke="var(--tx2)" stroke-width="4.5" fill="none" stroke-linecap="round"><path d="M245 141 L252 120 L255 106"/><path d="M259 141 L252 120 L249 106"/></g>'
+        + '<circle cx="252" cy="120" r="3.6" fill="var(--s2)" stroke="var(--tx2)" stroke-width="2"/>'
         + lbl(252, 168, 'Pliers')
         + '</svg>';
     },
@@ -322,14 +327,14 @@
         // water seal in the bend
         + '<path d="M84 118 C84 140 118 140 118 118" fill="none" stroke="#3b82f6" stroke-width="6" stroke-linecap="round" opacity=".8"/>'
         // clog blob sitting in the trap
-        + '<ellipse cx="101" cy="132" rx="15" ry="7.5" fill="#6b4f33"/><g stroke="#4a3522" stroke-width="1.2" opacity=".8"><path d="M90 132 q5 -5 10 0"/><path d="M101 134 q6 -4 11 -1"/></g>'
+        + '<ellipse cx="101" cy="132" rx="15" ry="7.5" fill="#b45309"/><g stroke="#7c2d12" stroke-width="2" opacity=".85" fill="none"><path d="M90 132 q5 -5 10 0"/><path d="M101 134 q6 -4 11 -1"/></g>'
         // slip nut rings
         + '<rect x="73" y="60" width="14" height="9" rx="2" fill="var(--tx3)"/><rect x="115" y="96" width="14" height="9" rx="2" fill="var(--tx3)"/>'
-        // labels
+        // labels — kept on the open left/bottom so nothing clips or overlaps the pipe
         + '<g font-size="9" fill="var(--tx2)">'
-        +   '<line x1="118" y1="118" x2="160" y2="92" stroke="var(--tx3)" stroke-width="1"/><text x="163" y="90" fill="#3b82f6">water seal —</text><text x="163" y="101" fill="#3b82f6">blocks sewer gas</text>'
-        +   '<line x1="101" y1="139" x2="101" y2="160" stroke="var(--tx3)" stroke-width="1"/><text x="101" y="170" text-anchor="middle" fill="#8a6a44">clogs collect here</text>'
-        +   '<text x="80" y="56" text-anchor="middle" fill="var(--tx3)">slip nut</text>'
+        +   '<line x1="86" y1="127" x2="70" y2="106" stroke="var(--tx3)" stroke-width="1"/><text x="68" y="103" text-anchor="end" fill="#3b82f6">water seal</text>'
+        +   '<line x1="101" y1="140" x2="101" y2="161" stroke="var(--tx3)" stroke-width="1"/><text x="101" y="170" text-anchor="middle" fill="#8a6a44">clogs collect here</text>'
+        +   '<line x1="73" y1="64" x2="62" y2="52" stroke="var(--tx3)" stroke-width="1"/><text x="60" y="50" text-anchor="end" fill="var(--tx3)">slip nut</text>'
         + '</g>'
         + '</svg>';
     },
@@ -339,7 +344,7 @@
       var an = ctx && ctx.animate;
       return '<svg viewBox="0 0 224 182" class="lr-svg lr-svg--wide" role="img" aria-label="Toilet tank cutaway: the flapper seals the flush valve at the bottom and is the most common five-dollar fix; the fill valve and float refill the tank; the shut-off valve is on the supply line at the base">'
         + '<rect x="26" y="30" width="150" height="118" rx="8" fill="none" stroke="var(--tx2)" stroke-width="3"/>'
-        + '<rect x="30" y="74" width="142" height="70" rx="4" fill="#3b82f6" opacity=".12"/><text x="36" y="86" font-size="8.5" fill="#3b82f6">water</text>'
+        + '<rect x="30" y="74" width="142" height="70" rx="4" fill="#3b82f6" opacity=".12"/>'
         // handle + lever
         + '<rect x="12" y="40" width="16" height="7" rx="2" fill="var(--tx3)"/><line x1="28" y1="44" x2="60" y2="52" stroke="var(--tx3)" stroke-width="2"/>'
         // fill valve tower + float
@@ -364,22 +369,22 @@
     // Large drywall-hole repair in cross-section: backer board behind the hole,
     // patch screwed to it, then mesh tape and joint compound feathered out wide.
     drywallPatch: function(cfg, ctx){
-      return '<svg viewBox="0 0 252 168" class="lr-svg lr-svg--wide" role="img" aria-label="Large drywall hole repair seen edge-on: a backer board is slipped behind the hole, the patch is screwed to it, then mesh tape and joint compound are feathered out six inches or more on the wall face">'
+      return '<svg viewBox="0 0 276 168" class="lr-svg lr-svg--wide" role="img" aria-label="Large drywall hole repair seen edge-on: a backer board is slipped behind the hole, the patch is screwed to it, then mesh tape and joint compound are feathered out wide on the wall face">'
         + '<text x="156" y="16" text-anchor="middle" font-size="9" fill="var(--tx3)">existing wall (edge-on)</text>'
         + '<rect x="150" y="24" width="12" height="42" fill="var(--s3)" stroke="var(--tx2)" stroke-width="1.5"/>'
         + '<rect x="150" y="100" width="12" height="44" fill="var(--s3)" stroke="var(--tx2)" stroke-width="1.5"/>'
         // backer board behind
         + '<rect x="138" y="58" width="12" height="52" rx="1" fill="var(--s4)" stroke="var(--tx2)" stroke-width="1.5"/>'
-        // patch in the hole
-        + '<rect x="150" y="66" width="12" height="34" fill="var(--lr-accent,#60a5fa)" opacity=".45" stroke="var(--tx2)" stroke-width="1.5"/>'
+        // patch in the hole — distinct blue so it reads apart from the tan wall/backer
+        + '<rect x="150" y="66" width="12" height="34" fill="#60a5fa" opacity=".5" stroke="#60a5fa" stroke-width="1.5"/>'
         // screws into the backer
         + '<g stroke="var(--tx2)" stroke-width="2"><line x1="150" y1="62" x2="139" y2="62"/><line x1="150" y1="104" x2="139" y2="104"/></g>'
-        // feathered compound on the face
-        + '<path d="M162 46 Q 184 56 188 84 Q 184 112 162 122 L162 46 Z" fill="#cbd5e1" opacity=".22" stroke="var(--tx3)" stroke-width="1" stroke-dasharray="3 3"/>'
+        // joint compound — a thin lens feathered against the face (not a lump)
+        + '<path d="M162 54 Q 174 62 176 84 Q 174 106 162 114 Z" fill="#94a3b8" opacity=".32" stroke="var(--tx2)" stroke-width="1" stroke-dasharray="3 2"/>'
         + '<g font-size="9" fill="var(--tx2)">'
         +   '<line x1="138" y1="84" x2="92" y2="84" stroke="var(--tx3)" stroke-width="1"/><text x="88" y="81" text-anchor="end">backer board</text><text x="88" y="92" text-anchor="end">slipped behind</text>'
-        +   '<line x1="156" y1="84" x2="156" y2="152" stroke="var(--tx3)" stroke-width="1"/><text x="156" y="162" text-anchor="middle" fill="var(--lr-accent,#60a5fa)">patch screwed on</text>'
-        +   '<line x1="188" y1="84" x2="212" y2="84" stroke="var(--tx3)" stroke-width="1"/><text x="216" y="81">tape &amp;</text><text x="216" y="92">feather wide</text>'
+        +   '<line x1="156" y1="84" x2="156" y2="152" stroke="var(--tx3)" stroke-width="1"/><text x="156" y="162" text-anchor="middle" fill="#60a5fa">patch screwed on</text>'
+        +   '<line x1="178" y1="84" x2="206" y2="84" stroke="var(--tx3)" stroke-width="1"/><text x="272" y="81" text-anchor="end">tape &amp;</text><text x="272" y="92" text-anchor="end">feather wide</text>'
         + '</g>'
         + '</svg>';
     },
@@ -423,10 +428,11 @@
         + '<rect x="116" y="78" width="28" height="24" rx="3" fill="var(--tx2)"/>'
         + '<line x1="130" y1="78" x2="130" y2="50" stroke="var(--tx2)" stroke-width="5"/>'
         + (an ? '<circle class="lr-seqglow" cx="130" cy="44" r="21" fill="#34d399"/>' : '')
-        + '<circle cx="130" cy="44" r="16" fill="none" stroke="var(--tx2)" stroke-width="5"/>'
-        + '<path d="M130 26 A18 18 0 0 1 148 44" fill="none" stroke="var(--gr,#34d399)" stroke-width="3"/>'
-        + _arrowhead(148, 44, Math.PI / 2, 'var(--gr,#34d399)')
-        + '<text x="128" y="16" text-anchor="middle" font-size="10" font-weight="700" fill="var(--gr,#34d399)">clockwise = close</text>'
+        + '<circle cx="130" cy="44" r="16" fill="#34d399" fill-opacity="0.85" stroke="#0e7a59" stroke-width="2.5"/>'
+        + '<g stroke="#0e7a59" stroke-width="2"><line x1="130" y1="32" x2="130" y2="56"/><line x1="118" y1="44" x2="142" y2="44"/></g>'
+        + '<path d="M130 24 A20 20 0 0 1 150 44" fill="none" stroke="var(--gr,#34d399)" stroke-width="3"/>'
+        + _arrowhead(150, 44, Math.PI / 2, 'var(--gr,#34d399)')
+        + '<text x="128" y="14" text-anchor="middle" font-size="10" font-weight="700" fill="var(--gr,#34d399)">clockwise = close</text>'
         + '<text x="150" y="124" text-anchor="middle" font-size="9.5" fill="var(--tx3)">main water shut-off</text>'
         + '</svg>';
     },
