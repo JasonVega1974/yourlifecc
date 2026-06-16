@@ -8367,6 +8367,70 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 :root.light .sds-l--blue{ color:#2563eb; }
 :root.light .sds-l--violet{ color:#7c3aed; }
 :root.light .sds-close{ background:radial-gradient(circle 15px at center, rgba(0,0,0,.06) 99%, transparent 100%); color:#4e4538; }
+
+/* ── "Find your sport" finder (Phase 2B) — .sfind-* ────────────────────
+   A launch CTA at the top of Explore + a stepped finder that reuses the
+   .sds-overlay/.sds-sheet container. Interest/preference matching only.
+   Light + reduced-motion handled. */
+.sfind-launch{
+  display:flex; align-items:center; gap:.85rem; width:100%;
+  margin:0 0 1rem; padding:1rem 1.1rem; text-align:left; cursor:pointer;
+  border-radius:14px; font-family:var(--fm); color:var(--tx);
+  /* Feature anchor of the Explore tab — reads as the primary entry point, not a list row. */
+  background:linear-gradient(135deg, color-mix(in srgb, #38bdf8 24%, transparent), color-mix(in srgb, #a78bfa 13%, transparent)), var(--s1);
+  border:1px solid color-mix(in srgb, #38bdf8 40%, transparent);
+  box-shadow:0 2px 16px rgba(56,189,248,.10);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.sfind-launch:hover{ transform:translateY(-2px); box-shadow:0 10px 26px rgba(56,189,248,.20); }
+.sfind-launch__spark{ font-size:1.5rem; flex:0 0 auto; }
+.sfind-launch__txt{ display:flex; flex-direction:column; gap:.12rem; flex:1 1 auto; min-width:0; }
+.sfind-launch__txt b{ font-family:var(--fh); font-size:1rem; letter-spacing:.03em; color:var(--tx); }
+.sfind-launch__txt span{ font-size:.74rem; color:var(--tx2); }
+.sfind-launch__go{ font-size:1.2rem; color:#60a5fa; flex:0 0 auto; }
+.sfind-sheet{ max-width:460px; }
+.sfind-body{ padding:1.5rem 1.4rem 1.4rem; }
+.sfind-progress{ display:flex; align-items:center; justify-content:space-between; margin-bottom:1.1rem; padding-right:2.6rem; }
+.sfind-dots{ display:flex; gap:.4rem; }
+.sfind-dot{ width:7px; height:7px; border-radius:50%; background:var(--br); }
+.sfind-dot.on{ background:linear-gradient(135deg, var(--sd-a, var(--c)), var(--sd-b, var(--c))); }
+.sfind-step{ font-size:.72rem; letter-spacing:.04em; color:var(--tx3); text-transform:uppercase; }
+.sfind-q{ margin:0 0 1.1rem; font-family:var(--fh); font-size:1.3rem; letter-spacing:.02em; line-height:1.25; color:var(--tx); }
+.sfind-opts{ display:flex; flex-direction:column; gap:.6rem; }
+.sfind-opt{
+  display:flex; align-items:center; gap:.75rem; width:100%; min-height:52px;
+  padding:.7rem .9rem; text-align:left; cursor:pointer;
+  border-radius:12px; font-family:var(--fm); font-size:.9rem; color:var(--tx);
+  background:rgba(255,255,255,.04); border:1px solid var(--br);
+  transition:transform .12s ease, border-color .12s ease, background .12s ease;
+}
+.sfind-opt:hover{ transform:translateY(-1px); border-color:color-mix(in srgb, var(--sd-a, var(--c)) 50%, transparent); background:rgba(255,255,255,.06); }
+.sfind-opt__e{ font-size:1.35rem; flex:0 0 auto; }
+.sfind-sub{ margin:-.4rem 0 1rem; font-size:.82rem; line-height:1.55; color:var(--tx2); }
+.sfind-results{ display:flex; flex-direction:column; gap:.5rem; }
+.sfind-res{
+  display:flex; align-items:center; gap:.7rem; width:100%; min-height:52px;
+  padding:.6rem .8rem; text-align:left; cursor:pointer;
+  border-radius:12px; font-family:var(--fm); color:var(--tx);
+  background:rgba(255,255,255,.04); border:1px solid var(--br);
+  transition:transform .12s ease, border-color .12s ease;
+}
+.sfind-res:hover{ transform:translateY(-1px); border-color:color-mix(in srgb, var(--sd-a, var(--c)) 50%, transparent); }
+.sfind-res__e{ font-size:1.5rem; flex:0 0 auto; }
+.sfind-res__txt{ flex:1 1 auto; display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; font-size:.92rem; font-weight:700; }
+.sfind-fit{ font-size:.62rem; font-weight:800; letter-spacing:.03em; text-transform:uppercase; color:#0b1220; background:#34d399; border-radius:999px; padding:.2rem .5rem; }
+.sfind-res__go{ font-size:1.1rem; color:var(--tx3); flex:0 0 auto; }
+.sfind-restart{ margin-top:1rem; width:100%; padding:.65rem; cursor:pointer; background:rgba(255,255,255,.03); border:1px solid color-mix(in srgb, var(--sd-a, var(--c)) 26%, var(--br)); border-radius:10px; color:var(--tx); font-family:var(--fm); font-size:.82rem; }
+.sfind-restart:hover{ background:rgba(255,255,255,.06); border-color:color-mix(in srgb, var(--sd-a, var(--c)) 50%, transparent); }
+@media (prefers-reduced-motion: reduce){ .sfind-launch, .sfind-opt, .sfind-res{ transition:none; } }
+:root.light .sfind-launch{ background:linear-gradient(135deg, color-mix(in srgb, #38bdf8 20%, #fff), color-mix(in srgb, #a78bfa 8%, #fff)); border-color:rgba(56,189,248,.38); color:#1f1810; box-shadow:0 2px 14px rgba(56,189,248,.12); }
+:root.light .sfind-launch__txt span{ color:#4e4538; }
+:root.light .sfind-opt, :root.light .sfind-res{ background:rgba(0,0,0,.03); border-color:rgba(0,0,0,.10); color:#1f1810; }
+:root.light .sfind-opt:hover, :root.light .sfind-res:hover{ background:rgba(0,0,0,.05); }
+:root.light .sfind-sub{ color:#4e4538; }
+:root.light .sfind-fit{ color:#fff; background:#047857; }
+:root.light .sfind-restart{ background:rgba(0,0,0,.02); color:#1f1810; }
+:root.light .sfind-restart:hover{ background:rgba(0,0,0,.05); }
 #s-learn .tab-landing-card.tlc-power:nth-child(1) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(1) .tlc-shimmer{ animation-delay:0s; }
 #s-learn .tab-landing-card.tlc-power:nth-child(2) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(2) .tlc-shimmer{ animation-delay:.28s; }
 #s-learn .tab-landing-card.tlc-power:nth-child(3) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(3) .tlc-shimmer{ animation-delay:.56s; }

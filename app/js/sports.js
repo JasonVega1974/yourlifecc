@@ -310,7 +310,7 @@ function renderSportsGrid(){
 /* Section render entry — wired to the showSection('s-sports') hook in ui.js
    (was a no-op: renderSports didn't exist). Re-rendering the Explore grid on
    entry replays the bounded shimmer. Filters persist via the module vars. */
-function renderSports(){ renderSportsGrid(); }
+function renderSports(){ _injectFinderLaunch(); renderSportsGrid(); }
 
 /* ── Sport detail sheet (Phase 2A) ───────────────────────────
    A Power-Card-styled sheet built from SPORT_DATA. Theme accent on the
@@ -379,6 +379,124 @@ function showSportDetail(id){
   try { window._sdsReturnFocus = document.activeElement; } catch(e){}
   m.classList.add('open');
   document.body.style.overflow = 'hidden';
+}
+
+/* ── "Find your sport" finder (Phase 2B) ─────────────────────
+   A short, encouraging finder. Matches by INTEREST / PREFERENCE only —
+   never body type, size, or physique. Every answer set yields suggestions
+   (inclusive: "no wrong choice"); each result opens the detail sheet. Tags
+   are lightweight sport metadata, NOT a user store. */
+const SPORT_TAGS = {
+  football:    {type:'team',       place:'outdoor', contact:'high', time:'season'},
+  basketball:  {type:'team',       place:'indoor',  contact:'med',  time:'season'},
+  soccer:      {type:'team',       place:'outdoor', contact:'med',  time:'year'},
+  baseball:    {type:'team',       place:'outdoor', contact:'low',  time:'season'},
+  softball:    {type:'team',       place:'outdoor', contact:'low',  time:'season'},
+  track:       {type:'individual', place:'outdoor', contact:'low',  time:'season'},
+  crosscountry:{type:'individual', place:'outdoor', contact:'low',  time:'season'},
+  volleyball:  {type:'team',       place:'indoor',  contact:'low',  time:'season'},
+  swimming:    {type:'individual', place:'indoor',  contact:'low',  time:'year'},
+  wrestling:   {type:'individual', place:'indoor',  contact:'high', time:'season'},
+  tennis:      {type:'individual', place:'outdoor', contact:'low',  time:'year'},
+  golf:        {type:'individual', place:'outdoor', contact:'low',  time:'year'},
+  lacrosse:    {type:'team',       place:'outdoor', contact:'high', time:'season'},
+  gymnastics:  {type:'individual', place:'indoor',  contact:'low',  time:'year'},
+  hockey:      {type:'team',       place:'indoor',  contact:'high', time:'year'},
+  cheerleading:{type:'team',       place:'indoor',  contact:'med',  time:'year'}
+};
+const FINDER_Q = [
+  { key:'type', q:'Do you like being part of a team — or doing your own thing?',
+    opts:[{e:'🤝',l:'On a team',v:'team'},{e:'🎯',l:'On my own',v:'individual'},{e:'✨',l:'Either is great',v:'any'}] },
+  { key:'place', q:'Where do you like to be?',
+    opts:[{e:'🌤️',l:'Outdoors',v:'outdoor'},{e:'🏟️',l:'Indoors',v:'indoor'},{e:'✨',l:'No preference',v:'any'}] },
+  { key:'contact', q:'How much physical contact are you up for?',
+    opts:[{e:'💥',l:'Bring it on',v:'high'},{e:'👋',l:'A little',v:'med'},{e:'🕊️',l:'Little to none',v:'low'},{e:'✨',l:'No preference',v:'any'}] },
+  { key:'time', q:'How much time do you want to put in?',
+    opts:[{e:'🔥',l:'Year-round, all in',v:'year'},{e:'📅',l:'Just a season',v:'season'},{e:'✨',l:'No preference',v:'any'}] }
+];
+let _finderStep = 0, _finderAnswers = {};
+
+function _sportFinderEl(){
+  let m = document.getElementById('sportFinderModal');
+  if(m) return m;
+  m = document.createElement('div');
+  m.id = 'sportFinderModal';
+  m.className = 'sds-overlay';
+  document.body.appendChild(m);
+  m.addEventListener('click', e=>{ if(e.target===m) closeSportFinder(); });
+  return m;
+}
+function closeSportFinder(){
+  const m = document.getElementById('sportFinderModal');
+  if(m){ m.classList.remove('open'); document.body.style.overflow=''; }
+}
+function openSportFinder(){
+  _finderStep = 0; _finderAnswers = {};
+  const m = _sportFinderEl();
+  _finderRender();
+  m.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function finderAnswer(key, val){ _finderAnswers[key] = val; _finderStep++; _finderRender(); }
+function finderRestart(){ _finderStep = 0; _finderAnswers = {}; _finderRender(); }
+function _finderScore(){
+  const a = _finderAnswers, keys = ['type','place','contact','time'];
+  return SPORT_DATA.map(s=>{
+    const t = SPORT_TAGS[s.id] || {};
+    let score = 0, asked = 0;
+    keys.forEach(k=>{ if(a[k] && a[k]!=='any'){ asked++; if(t[k]===a[k]) score++; } });
+    return { s, score, asked };
+  }).sort((x,y)=> y.score - x.score || x.s.name.localeCompare(y.s.name));
+}
+function _finderRender(){
+  const m = document.getElementById('sportFinderModal');
+  if(!m) return;
+  const total = FINDER_Q.length;
+  let inner;
+  if(_finderStep < total){
+    const q = FINDER_Q[_finderStep];
+    const dots = FINDER_Q.map((_,i)=>'<span class="sfind-dot'+(i<=_finderStep?' on':'')+'"></span>').join('');
+    const opts = q.opts.map(o=>'<button type="button" class="sfind-opt" onclick="finderAnswer(\''+q.key+'\',\''+o.v+'\')"><span class="sfind-opt__e" aria-hidden="true">'+o.e+'</span><span>'+o.l+'</span></button>').join('');
+    inner =
+      '<div class="sfind-progress"><div class="sfind-dots">'+dots+'</div><div class="sfind-step">'+(_finderStep+1)+' of '+total+'</div></div>'
+      + '<h2 class="sfind-q">'+_sdEsc(q.q)+'</h2>'
+      + '<div class="sfind-opts">'+opts+'</div>';
+  } else {
+    const ranked = _finderScore();
+    const best = ranked.length ? ranked[0].score : 0;
+    // Show the strongest matches; pad to a friendly minimum so results never feel
+    // thin (near-matches are honest "also worth a look" options, badged only when perfect).
+    let top = ranked.filter(r=> r.asked===0 ? true : r.score>=Math.max(1,best));
+    if(top.length < 4) top = ranked.slice(0, Math.min(6, Math.max(4, top.length)));
+    top = top.slice(0, 6);
+    const list = (top.length ? top : ranked.slice(0,6)).map(r=>{
+      const s = r.s;
+      const fit = (r.asked>0 && r.score===r.asked) ? '<span class="sfind-fit">✨ Great fit</span>' : '';
+      return '<button type="button" class="sfind-res" onclick="closeSportFinder();showSportDetail(\''+s.id+'\')">'
+        + '<span class="sfind-res__e" aria-hidden="true">'+s.emoji+'</span>'
+        + '<span class="sfind-res__txt"><b>'+_sdEsc(s.name)+'</b>'+fit+'</span>'
+        + '<span class="sfind-res__go" aria-hidden="true">→</span></button>';
+    }).join('');
+    inner =
+      '<h2 class="sfind-q">Sports that fit you</h2>'
+      + '<p class="sfind-sub">Great starting points based on what you told us. Tap any to learn more — there’s no wrong choice.</p>'
+      + '<div class="sfind-results">'+list+'</div>'
+      + '<button type="button" class="sfind-restart" onclick="finderRestart()">↺ Start over</button>';
+  }
+  m.innerHTML = '<div class="sds-sheet sfind-sheet" role="dialog" aria-modal="true" aria-label="Find your sport" style="--sd-a:#38bdf8;--sd-b:#a78bfa;">'
+    + '<button class="sds-close" type="button" aria-label="Close" onclick="closeSportFinder()">✕</button>'
+    + '<div class="sfind-body" aria-live="polite">'+inner+'</div></div>';
+}
+function _injectFinderLaunch(){
+  const host = document.getElementById('sp-explore');
+  if(!host || document.getElementById('sportFinderLaunch')) return;
+  const b = document.createElement('button');
+  b.id = 'sportFinderLaunch'; b.className = 'sfind-launch'; b.type = 'button';
+  b.setAttribute('onclick','openSportFinder()');
+  b.innerHTML = '<span class="sfind-launch__spark" aria-hidden="true">✨</span>'
+    + '<span class="sfind-launch__txt"><b>Find your sport</b><span>Answer 4 quick questions — find one that fits you</span></span>'
+    + '<span class="sfind-launch__go" aria-hidden="true">→</span>';
+  host.insertBefore(b, host.firstChild);
 }
 
 /* ── Main tab switcher ─────────────────────────────────────── */
