@@ -21115,6 +21115,22 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
+<!-- REACH: Life Skills discovery doorway — faith_free home only.
+     Shown via html[data-faith-free="1"] body.ff-hero-active (display:none for
+     every other tier / view), so non-faith_free never see it and render
+     byte-identical. Routes into the academy via ffNavGo('skills') (which already
+     writes 'skills' to sections_visited — reach measured by the existing metric).
+     Purely additive: does NOT touch the Well hero (#faithHeroCinematic) or any
+     faith content. Persistent doorway; the "New" pill is a one-time accent that
+     clears once the card is tapped. -->
+<button id="ffSkillsCard" type="button" onclick="ffSkillsCardGo()" aria-label="Explore the free Life Skills Academy">
+  <span class="ff-skills-card__icon" aria-hidden="true">🎓</span>
+  <span class="ff-skills-card__body">
+    <span class="ff-skills-card__title">The full Life Skills Academy is open to you — free<span class="ff-skills-card__pill">New</span></span>
+    <span class="ff-skills-card__sub">Money, cooking, college, career &amp; more. Tap to explore.</span>
+  </span>
+</button>
+
 <!-- FAITH-FREE MOBILE BOTTOM NAV -->
 <nav id="ffBottomNav" aria-label="Faith navigation">
   <button class="ff-nav-btn" id="ffNavHome" onclick="ffNavGo('home')">
@@ -21267,6 +21283,28 @@ document.addEventListener('DOMContentLoaded', function() {
     if(verEl) verEl.textContent = 'YourLife CC v203';
 
     ffSetActive('home');
+    ffInitSkillsCard();
+  }
+
+  // Reach: Life Skills discovery doorway. Tapping routes into the academy and
+  // retires the one-time "New" pill (persistent doorway stays). Per-user
+  // localStorage flag so it survives cloudLoad and is scoped to the account.
+  function _ffSkillsCardKey(){ return 'ylcc_skillsCardSeen_' + ((window._supaUser && _supaUser.id) || 'anon'); }
+  window.ffSkillsCardGo = function(){
+    try {
+      localStorage.setItem(_ffSkillsCardKey(), '1');
+      var card = document.getElementById('ffSkillsCard');
+      if(card) card.classList.add('ff-skills-card--seen');
+    } catch(e){}
+    if(typeof ffNavGo === 'function') ffNavGo('skills');
+  };
+  function ffInitSkillsCard(){
+    try {
+      if(localStorage.getItem(_ffSkillsCardKey()) === '1'){
+        var card = document.getElementById('ffSkillsCard');
+        if(card) card.classList.add('ff-skills-card--seen');
+      }
+    } catch(e){}
   }
 
   window.ffNavGo = function(target){
