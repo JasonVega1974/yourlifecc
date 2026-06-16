@@ -45,6 +45,13 @@ function _ylccEnforceOwner(userId){
           try { localStorage.removeItem(k); } catch(_){}
         }
       }
+      // Sports Phase B — the legacy My Sports tracker used a bare, un-prefixed
+      // `mySports` localStorage key, so it escapes the prefix sweep above and
+      // would otherwise survive a user switch (leaking the previous kid's sports
+      // PII — weight, GPA, coach email — into this account). Remove it explicitly
+      // here so it's destroyed BEFORE anything can read or migrate it. New writes
+      // go to D.mySports, which IS swept (it lives in the lifeos_v2/D blob).
+      try { localStorage.removeItem('mySports'); } catch(_){}
       try { sessionStorage.clear(); } catch(_){}
       if(rememberEmail){
         try { localStorage.setItem('lifeos_remember_email', rememberEmail); } catch(_){}
@@ -102,6 +109,8 @@ function loadData(){
       for(const key of Object.keys(DEF)){ if(key in p) D[key]=p[key]; }
       // Sanitize scrReadDays — must always be an object, never an array
       if(!D.scrReadDays || Array.isArray(D.scrReadDays)) D.scrReadDays = {};
+      // Sports Phase B — mySports must always be an array
+      if(!Array.isArray(D.mySports)) D.mySports = [];
       if(!D.devPopupSeen) D.devPopupSeen = '';
       // WC-D2 (2026-06-14): one-time seed of the unified soundEnabled pref
       // from the retired skillsSound. Keyed off the STORED blob — once
@@ -471,6 +480,8 @@ async function cloudLoad(){
     for(const k of Object.keys(saved)){ if(!(k in DEF) && k !== 'undefined') D[k] = saved[k]; }
     // Sanitize scrReadDays — must always be an object {date:true}, never an array
     if(!D.scrReadDays || Array.isArray(D.scrReadDays)) D.scrReadDays = {};
+    // Sports Phase B — mySports must always be an array
+    if(!Array.isArray(D.mySports)) D.mySports = [];
     // Ensure devPopupSeen exists
     if(!D.devPopupSeen) D.devPopupSeen = '';
     // WC-D2 (2026-06-14): seed the unified soundEnabled pref from the

@@ -763,9 +763,40 @@ function sportMainTab(tab, btn){
   if(tab==='mine') renderMySports();
 }
 
-/* ── My Sports — localStorage ──────────────────────────────── */
-function getMySports(){ try{ return JSON.parse(localStorage.getItem('mySports')||'[]'); }catch(e){ return []; } }
-function saveMySports(arr){ localStorage.setItem('mySports', JSON.stringify(arr)); }
+/* ── My Sports — owner-guarded, cloud-synced D blob (Phase B) ──
+   Was a device-only bare `mySports` localStorage key OUTSIDE the owner-guard,
+   so one kid's sports profile (weight, GPA, coach email) leaked into a sibling's
+   session on a shared device. Now persisted in D.mySports → save() writes it to
+   localStorage[lifeos_v2] + debounced cloudSync() into profiles.data (RLS:
+   auth.uid()=user_id), and _ylccEnforceOwner resets it to DEF on a user switch.
+   Legacy localStorage data is folded in once by _migrateMySports() below. */
+function getMySports(){ if(!Array.isArray(D.mySports)) D.mySports = []; return D.mySports; }
+function saveMySports(arr){ D.mySports = Array.isArray(arr) ? arr : []; if(typeof save === 'function') save(); }
+
+/* One-time, idempotent migration of the legacy device-only mySports key into
+   the owner-guarded D blob. Runs lazily from renderMySports() (and is a no-op
+   after the bare key is removed). SAFE BY CONSTRUCTION: it only ever runs in
+   the device's own already-loaded session, and the owner-guard sweep
+   (_ylccEnforceOwner) has already DELETED a different user's bare key on sign-in
+   — so this never attaches another kid's data to the current profile; it only
+   relocates the active user's own data from the bare key into D, then clears it. */
+function _migrateMySports(){
+  try{
+    var raw = localStorage.getItem('mySports');
+    if(raw == null) return;               // nothing legacy / already migrated
+    var legacy = null;
+    try{ legacy = JSON.parse(raw); }catch(e){ legacy = null; }
+    if(!Array.isArray(D.mySports)) D.mySports = [];
+    if(Array.isArray(legacy) && legacy.length){
+      var have = {};
+      D.mySports.forEach(function(s){ if(s && s.id != null) have[s.id] = true; });
+      // Cloud/D is authoritative; only add legacy entries not already present (by id).
+      legacy.forEach(function(s){ if(s && (s.id == null || !have[s.id])) D.mySports.push(s); });
+    }
+    localStorage.removeItem('mySports'); // remove the device-only leak source
+    if(typeof save === 'function') save(); // persist into the owner-guarded D (LS + cloud)
+  }catch(e){}
+}
 
 function addMySport(){
   const select = document.getElementById('mySportSelect');
@@ -811,6 +842,7 @@ function deleteMySport(id){
 function renderMySports(){
   const container = document.getElementById('mySportsList');
   if(!container) return;
+  _migrateMySports();            // fold any legacy localStorage data into D once
   const sports = getMySports();
   if(!sports.length){
     container.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--tx2);font-size:.82rem;">No sports added yet. Add your first sport above! 🏅</div>`;

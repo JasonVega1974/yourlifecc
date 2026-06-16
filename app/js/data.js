@@ -347,6 +347,13 @@ const DEF = {
   gigLog:[], craftName:'My Craft', myInstruments:[], practiceSessions:[],
   // driving
   driverChecklist:{},
+  // Sports Phase B (2026-06-16) — the My Sports tracker. Moved here from a
+  // device-only bare `mySports` localStorage key so its profile PII (weight,
+  // GPA, coach email) rides the owner-guarded, cloud-synced, RLS-protected D
+  // blob and is reset to DEF on a user switch. Array of sport entries; legacy
+  // localStorage data is folded in once by _migrateMySports() (sports.js).
+  // Wellbeing: weight is a static recruiting fact only — never tracked over time.
+  mySports:[],
   // chores / rewards
   choreList:[], choreLog:[], chores:{}, selfChores:[], chorePoints:{total:0,spent:0}, chorePin:'',
   // 2026-06-06 — Tab 1 Increment 5 Step B. Parallel badge surface for
