@@ -1198,6 +1198,870 @@ const SPORT_DETAIL = {
       "model": "Peyton Manning",
       "why": "Manning was famous for preparation, not flash: he out-studied everyone, knew his assignments and his teammates' cold, and made the players around him better. He treated linemen, backups, and staff with respect, owned his mistakes, and let relentless work and accountability define him. He's a model for the truth that the unseen work, film study, mastering your assignment, and showing up the same way every day, is what builds a great player and a leader teammates trust."
     }
+  },
+  "soccer": {
+    "tagline": "The world's game. Eleven players, one ball, ninety minutes of reading what happens next.",
+    "overview": "Soccer rewards endurance, first touch, and vision more than raw size. The smallest player on the pitch can be the best one - what wins is control of the ball, awareness of space, and the engine to keep running in minute 85 the way you ran in minute 5. There is a position and a role for almost every body and temperament: relentless runners, calm passers, brave defenders, quick finishers, fearless keepers. You don't need to be tall or fast to start - you need a good touch, a willingness to work, and the patience to learn where to be before the ball arrives. Everything else is built through reps.",
+    "season": {
+      "practice": "High school season runs through the fall (or spring for girls in some states) with 4-6 sessions a week of training plus 1-2 games; club soccer runs nearly year-round with practices 2-4 nights a week and weekend matches or showcase tournaments.",
+      "arc": "Preseason builds your aerobic base and reintroduces ball work; the regular season layers in tactics and game fitness; playoffs and showcases peak; the off weeks are for rest, cross-training, and fixing one weakness. Many committed players juggle a high school season and a club season back to back - guard against running 12 months straight.",
+      "commitment": "Plan on 2-3 dedicated rest or active-recovery days a week even in season - legs that never recover get hurt. Take at least a few weeks fully off the ball each year. A real off-period is not laziness; it is how tendons, growth plates, and motivation all reset."
+    },
+    "progression": [
+      {
+        "stage": "Beginner",
+        "focus": "Comfort on the ball with both feet - dribbling at a walk then a jog, simple inside-of-foot passes, trapping a moving ball dead. Learn the basic shape of the field and what each position roughly does."
+      },
+      {
+        "stage": "Developing",
+        "focus": "First touch under light pressure, passing and receiving on the move, striking a clean ball with your laces, and reading when to dribble vs. pass. Pick a position you enjoy and learn its job in and out of possession."
+      },
+      {
+        "stage": "Competitive",
+        "focus": "Tactical awareness - scanning before you receive, playing one and two touch, defending angles instead of lunging, and timing runs. Develop a weaker foot and a position-specific skill (a keeper's distribution, a winger's cross, a center back's heading)."
+      },
+      {
+        "stage": "Advanced",
+        "focus": "Game intelligence at speed - controlling tempo, exploiting space before it opens, and consistency match to match. This is where decision-making, not just technique, separates players. Film study and honest self-review become part of training."
+      }
+    ],
+    "roles": {
+      "label": "Positions",
+      "items": [
+        {
+          "name": "Goalkeeper (GK)",
+          "blurb": "The last line and the first attack. Needs brave hands, quick feet, loud communication, and increasingly the ability to play out of the back with the ball at their feet. A specialist role - find a keeper coach early."
+        },
+        {
+          "name": "Defenders",
+          "blurb": "Center backs read danger, win duels, and organize; outside backs defend the flank and join the attack. Positioning and timing beat raw speed. Calm under pressure is the job."
+        },
+        {
+          "name": "Midfielders",
+          "blurb": "The engine room. Defensive mids screen and recover; central mids link play and dictate tempo; attacking mids create chances. The most running and the most decisions per minute on the field."
+        },
+        {
+          "name": "Forwards",
+          "blurb": "Wingers beat defenders and deliver; strikers finish and press from the front. Needs sharp movement, composure in front of goal, and a short memory after a miss."
+        }
+      ]
+    },
+    "mental": "Soccer is a low-scoring game built on mistakes - you will give the ball away, get beaten, and miss chances every single match, and so will the best player on the field. The mental skill is the short memory: lose the ball, win it back; miss the shot, make the next run. Confidence comes from preparation, not from never failing. Learn to communicate out loud (good players talk constantly), to stay switched on when the ball is 60 yards away, and to handle a coach's hard coaching without collapsing. The 90-minute focus is a muscle - it trains like any other.",
+    "getStarted": {
+      "steps": [
+        "Get a ball and juggle and dribble at home - daily touches on the ball are the single best thing a beginner can do, and they cost nothing.",
+        "Join any organized team - rec, school, or club - to learn the flow of a real game; you cannot learn spacing alone in a backyard.",
+        "Play small-sided pickup (3v3, 5v5) as much as you can; more touches per minute than full-field games and the fastest way to improve decisions.",
+        "Pick a position you enjoy, then learn one new skill for it each month - a move, a pass, a defensive habit.",
+        "Watch full matches and follow one player in your position for a half - notice their movement when they don't have the ball."
+      ],
+      "findTeam": [
+        {
+          "venue": "School team",
+          "how": "Try out through your middle or high school athletics office. No-cut JV programs exist in many schools - ask the coach about levels and tryout dates before the season."
+        },
+        {
+          "venue": "Club / travel",
+          "how": "Search your state youth soccer association or US Youth Soccer for local clubs; most hold open tryouts in spring. Clubs range from house-level to elite (ECNL, MLS NEXT) - start where you can play real minutes, not on the bench of the highest team."
+        },
+        {
+          "venue": "Rec league",
+          "how": "City parks and rec departments and the YMCA run low-cost, low-pressure leagues open to all skill levels with rolling sign-ups - the best on-ramp if you've never played."
+        }
+      ]
+    },
+    "recruiting": {
+      "truth": "The large majority of high school soccer players do not play in college, and that is completely fine. Soccer is a game you can play in pickup, intramural, and adult leagues for the rest of your life. Chasing a roster spot should never be the only reason you play - if it happens, treat it as a bonus on top of a sport you love.",
+      "timeline": [
+        {
+          "when": "9th-10th grade",
+          "doThis": "Play as much real soccer as you can and get into a competitive club environment if recruiting is a goal. Keep your grades up from day one - academics open more doors than highlight clips. Start saving game clips."
+        },
+        {
+          "when": "10th-11th grade",
+          "doThis": "Build an honest highlight video (full clips and game film, not just goals), play in showcases where college coaches actually attend, and email coaches at programs that fit you. Take an unofficial visit or two to feel out levels."
+        },
+        {
+          "when": "11th-12th grade",
+          "doThis": "Narrow to schools that fit academically, financially, and athletically. Keep in touch with interested coaches, attend their ID camps, and be realistic about which division matches your level and your life."
+        },
+        {
+          "when": "Throughout",
+          "doThis": "Stay healthy and durable - a recruit who is always injured is a hard recruit. Protect your body and your transcript as carefully as your touch."
+        }
+      ],
+      "divisions": "NCAA D1, D2, D3, NAIA, and junior colleges all field soccer teams at very different intensities. As of the 2025-26 House settlement, sport-by-sport scholarship caps were replaced by roster limits - a school can offer full, partial, or no aid to any player up to its roster size, so older per-team scholarship counts are outdated. The practical reality is unchanged: most college players receive partial aid or none, and full rides are rare, especially on the men's side. D3 and many NAIA schools give no athletic money but often strong academic aid. Confirm current limits and aid for your division directly with coaches, and weigh fit, playing time, and academics over the prestige of a logo."
+    },
+    "health": {
+      "injuries": "ACL tears (especially in female players), ankle and knee sprains, hamstring and groin strains, and concussions - from head-to-head and head-to-ground collisions more than from clean headers.",
+      "prevention": "Do a neuromuscular warm-up like FIFA 11+ before every session - it measurably cuts ACL and lower-limb injury rates. Build hip, hamstring, and core strength; learn to land and cut under control. Use proper heading technique and respect age guidelines that limit heading for younger players. Report and rest any suspected concussion - no header, no header drill, no game until cleared. Don't play 12 months straight; overuse is its own injury.",
+      "fuel": "Eat enough to train, grow, and recover - soccer burns a huge amount of energy, and underfueling shows up as fatigue, poor touch late in games, and injuries that won't heal. Build meals around carbs for running energy, protein to repair muscle, and plenty of fruit and vegetables. Eat to grow, not to shrink. Hydrate before, during, and after - cramps in the second half are usually a fluid story. Sleep 8-10 hours; recovery happens at night, not in the gym.",
+      "note": "Soccer demands a real aerobic base, so off-season fitness matters - but legs need recovery days, and growing bodies need rest more than extra reps. Durability and fitness, never performance at any cost."
+    },
+    "character": {
+      "trait": "Composure and leadership under pressure",
+      "model": "Megan Rapinoe",
+      "why": "Beyond the trophies, she was known for stepping up in the biggest moments - including taking and converting high-pressure penalties when the whole tournament was watching - and for leading and standing up for what she believed in. The lesson for a young player is that real influence on a team comes from being reliable when it's hardest and from how you carry yourself, not just from raw talent."
+    }
+  },
+  "baseball": {
+    "tagline": "A game of failure handled well — fail 7 of 10 at bat and you're an All-Star. Patience, repetition, and one explosive swing.",
+    "overview": "Baseball rewards the long game. It's nine players, but every at-bat and every pitch is a one-on-one battle, so quiet kids and loud kids both find a home. There's no single body type that wins — wiry contact hitters, tall pitchers, stocky catchers, and fast middle infielders all start. What separates players is repeatable skill: a clean swing, a true throw, reading the game a half-second early. It's a slow sport to look at and a fast one to play, and the kids who love the daily grind of reps tend to be the ones who stick.",
+    "season": {
+      "practice": "In season, roughly 5-6 days/week: team practice or a game most days, plus throwing and hitting. Pitchers throw on a structured schedule with mandatory rest between outings. Off-season is lighter — 3-4 days of strength, agility, and skill work.",
+      "arc": "High school season runs spring (Feb-May/June depending on region). Many players add summer travel/showcase ball (June-Aug) and fall ball. The honest catch: stacking spring + summer + fall with no break is how arms break down. Build in a true off-season.",
+      "commitment": "Plan at least 1-2 full rest days a week and 2-3 months a year with NO competitive throwing — arms need real recovery, not just lighter days. More baseball is not always better baseball."
+    },
+    "progression": [
+      {
+        "stage": "Beginner",
+        "focus": "Learn to catch, throw with clean mechanics, and make contact. Field ground balls and fly balls. Understand the count, outs, and where to throw. Have fun and play multiple positions."
+      },
+      {
+        "stage": "Developing",
+        "focus": "Consistent swing you can repeat, accurate throws from a real position, base-running reads, and bunting. Start tracking pitch types. Pitchers: command of one or two pitches over raw velocity."
+      },
+      {
+        "stage": "Skilled",
+        "focus": "Hit good pitching, drive the ball to all fields, and defend a position at game speed. Pitchers develop a third pitch and command the zone. Read situations before they happen."
+      },
+      {
+        "stage": "Advanced",
+        "focus": "Compete against elite arms and hitters, perform under recruiting eyes, and own a defined role. This is skill, timing, and baseball IQ — not size. Late physical maturity is common; many late bloomers pass early peakers."
+      }
+    ],
+    "roles": {
+      "label": "Positions & roles",
+      "items": [
+        {
+          "name": "Pitchers (SP / RP / closer)",
+          "blurb": "The most scrutinized arms on the field. Starters go deep into games; relievers and closers handle short, high-leverage stretches. Velocity gets attention, but command, a usable off-speed pitch, and durability keep you on the mound."
+        },
+        {
+          "name": "Catcher",
+          "blurb": "The field general — calls pitches, blocks the plate, controls the running game, and manages the pitcher. Toughness and game smarts matter as much as the bat. Heavily recruited because the position is hard to fill."
+        },
+        {
+          "name": "Infield (1B, 2B, SS, 3B)",
+          "blurb": "Quick hands, footwork, and arm strength. Shortstop and second-base players turn double plays and cover ground; corners (1B/3B) defend hard-hit balls and often carry more power in the lineup."
+        },
+        {
+          "name": "Outfield (LF, CF, RF)",
+          "blurb": "Range, reads off the bat, and arm strength. Center field rewards speed; corners reward a strong, accurate arm. Often where the lineup's best athletes and hitters live."
+        },
+        {
+          "name": "Hitter / DH",
+          "blurb": "Every position player is a hitter first to the recruiter — contact, plate discipline, and the ability to drive the ball. The DH role lets a strong bat contribute without playing the field."
+        }
+      ]
+    },
+    "mental": "Baseball is a sport of managed failure. A great hitter is out 70% of the time, errors happen in front of everyone, and a bad inning can't be erased — only answered by the next pitch. The players who last build a short memory: let the last at-bat go, lock onto the next one. Slumps are normal and temporary; pressing makes them worse. Learn to slow your breathing, trust your reps, and judge yourself on process — good swings, smart throws, right reads — not just the box score. The scoreboard lies about how you played more often than people admit.",
+    "getStarted": {
+      "steps": [
+        "Get a glove that fits and learn to throw and catch with clean mechanics before anything else — bad throwing habits cause arm injuries later.",
+        "Join any organized team — rec league, school, or a local club — and play. Reps against live pitching beat solo drills.",
+        "Try multiple positions early. Don't lock into 'I'm only a pitcher' at 13; versatility keeps you on the field and protects your arm.",
+        "Hit off a tee and do soft-toss regularly — a repeatable swing is built on boring volume, not batting-cage home-run derbies.",
+        "If you fall in love with it, find a coach or program that teaches mechanics and arm care, not just wins."
+      ],
+      "findTeam": [
+        {
+          "venue": "School team",
+          "how": "Try out for your middle or high school team — ask the athletic office or coach about tryout dates (usually late winter/early spring). No experience needed for JV or freshman teams at most schools."
+        },
+        {
+          "venue": "Club / travel ball",
+          "how": "Search local travel organizations or academies and attend a tryout. These cost money and travel more; they're where recruiting happens, but you don't need them to start or to enjoy the game."
+        },
+        {
+          "venue": "Rec / Little League / Babe Ruth",
+          "how": "Sign up through your city parks department or a local league online — open to all skill levels, low cost, and the best low-pressure place to learn the game."
+        }
+      ]
+    },
+    "recruiting": {
+      "truth": "Most high-school players — the large majority — never play college baseball, and that is completely fine. Baseball can be a sport you love for life: rec leagues, coaching, intramurals, or just playing catch with your own kids someday. Don't let 'will I get recruited' steal the joy of the game you have right now.",
+      "timeline": [
+        {
+          "when": "9th-10th grade",
+          "doThis": "Play, get strong and healthy, and build clean mechanics. Keep your grades up — academics open more doors and money than most people expect. No need for expensive showcases yet; develop the skill first."
+        },
+        {
+          "when": "11th grade",
+          "doThis": "This is the key recruiting window. If college is a real goal, get evaluated at legit showcases or camps, build an honest highlight profile, and email coaches at programs that fit your level and your grades. Be realistic about which divisions match your ability."
+        },
+        {
+          "when": "12th grade",
+          "doThis": "Finalize your list, take official/unofficial visits, and weigh fit, playing time, academics, and cost — not just the most famous name. Walk-on and partial-aid paths are common and legitimate."
+        }
+      ],
+      "divisions": "The college landscape changed in 2025-26 under the House v. NCAA settlement: the old per-team scholarship caps (you may have heard '11.7 scholarships') are gone, replaced by roster limits, and schools can now offer full, partial, or no aid up to that limit. The honest reality hasn't changed — most college baseball players get partial aid or none, and full rides are rare. Confirm current roster and aid rules for any specific division with that program's coach. On the draft path: a player can be drafted out of high school, but once you enroll at a four-year college you generally aren't draft-eligible again until after your junior year or age 21 — JUCO (two-year college) players can be drafted sooner. A signing bonus is real money but it's an either/or with the college experience; it's a personal and family decision, not a no-brainer. Across all of this, prioritize fit, playing time, and academics over prestige — the right program for YOU beats a famous logo on the bench."
+    },
+    "health": {
+      "injuries": "Arm injuries dominate baseball: rotator-cuff and shoulder strain, and elbow UCL damage (the ligament repaired by 'Tommy John' surgery). Also back strain from rotation and the occasional hit-by-pitch or sliding injury.",
+      "prevention": "Arm care is everything. Respect pitch counts and required rest days between outings — these exist because of real injury data, not to slow you down. Don't pitch through soreness, don't throw year-round with no off-season, and avoid maxing out velocity on every pitch. A proper warm-up, gradual throwing buildup, mobility work, and balanced shoulder/core strength protect the arm. If your elbow or shoulder hurts, stop and tell an adult — pushing through is how a sore arm becomes surgery.",
+      "fuel": "Eat enough to fuel long days of practice and games and to support a growing body — that means real meals with carbs for energy, protein to recover, and plenty of fruits and vegetables. Eat to grow, not to shrink. Hydrate well, especially for hot spring and summer doubleheaders, and sleep 8-10 hours so your body and arm actually recover. Food is fuel, not something to restrict.",
+      "note": "Weight and size are static facts for a recruiting profile, never a goal to chase. Don't try to bulk up or slim down to fit a position — build healthy, durable strength and let your body grow on its own timeline. Late maturers catch up; injuries from overdoing it don't always."
+    },
+    "character": {
+      "trait": "Steady professionalism and respect for the game",
+      "model": "Derek Jeter",
+      "why": "Across 20 seasons Jeter built a reputation for showing up, playing the game the right way, and handling both winning and pressure with composure and class — rarely making headlines for anything but his play and conduct. He's a secular example of how steady, respectful professionalism earns lasting respect, which fits baseball's grind: it's the everyday consistency, not the flashy moment, that defines a player."
+    }
+  },
+  "softball": {
+    "tagline": "A thinking-fast game of split-second reads, clean throws, and the nerve to come through with the bases loaded.",
+    "overview": "Fast-pitch softball rewards players who read the game quickly and execute clean fundamentals under pressure. It's a sport of repeatable skills — fielding a ground ball the same way every time, putting the bat on the ball, throwing accurately to a base — stacked on top of fast decisions. There's a spot for every kind of athlete: the patient contact hitter, the rangey shortstop, the steady catcher who runs the defense, the pitcher who lives in the circle. You don't need a certain build to belong here. Quick hands, a coachable attitude, and a willingness to take a thousand reps will take you further than raw size ever will. The windmill (fast-pitch) motion is its own distinct skill — powerful and demanding — which is exactly why it's learnable: with good coaching and arm care, you build it rep by rep.",
+    "season": {
+      "practice": "In-season teams typically practice or play 4-6 days a week — a mix of hitting, fielding, situational reps, and conditioning. Pitchers add separate bullpen and arm-care sessions. Build in at least one full rest day every week so your arm and body recover.",
+      "arc": "High school season runs in spring (roughly Feb-May depending on region). But the recruiting engine is travel/club ball, which runs summer and fall showcases and tournaments. Many serious players are on a near-year-round cycle — which makes deliberate off weeks essential, not optional.",
+      "commitment": "Real but manageable if you protect recovery. Expect several practices plus games or a weekend tournament most weeks in season. Guard one rest day weekly and take a few weeks fully off the throwing motion each year to let your arm heal. Tired arms get hurt; rested arms get better."
+    },
+    "progression": [
+      {
+        "stage": "Beginner",
+        "focus": "Learn to catch and throw correctly, field a ground ball with two hands in front of you, and make solid contact off a tee and front toss. Master the overhand throw before anything else. Goal here is clean, repeatable mechanics — not power."
+      },
+      {
+        "stage": "Developing",
+        "focus": "Live hitting against real speed, footwork at your position, reading hops, and game situations (where's the play, what's the count). Pitchers begin the windmill motion with a coach who teaches arm care from day one. Hit off-speed, not just fastballs."
+      },
+      {
+        "stage": "Competitive",
+        "focus": "Play travel/club ball for real reps against strong competition. Sharpen one or two positions, get faster and more agile, and learn to perform when it matters. Pitchers and catchers refine their pitch mix and game-calling. Consistency under pressure separates players here."
+      },
+      {
+        "stage": "Advanced",
+        "focus": "Elite reads, plus-level skill at a specific position, and the mental game to stay locked in across a long tournament. This is showcase and recruiting territory — but it's built on the same fundamentals, just executed faster and cleaner than everyone else."
+      }
+    ],
+    "roles": {
+      "label": "Positions",
+      "items": [
+        {
+          "name": "Pitcher",
+          "blurb": "Runs the game from the circle with the windmill motion. The most specialized, arm-demanding role — protect it with mechanics and rest."
+        },
+        {
+          "name": "Catcher",
+          "blurb": "The field general. Calls pitches, blocks balls in the dirt, throws out runners, and keeps the defense organized. Tough and tactical."
+        },
+        {
+          "name": "Corner infield (1B / 3B)",
+          "blurb": "First base scoops throws and saves errors; third is the 'hot corner' — quick reactions and a strong arm across the diamond."
+        },
+        {
+          "name": "Middle infield (SS / 2B)",
+          "blurb": "Range, soft hands, and fast footwork. Turn double plays and cover the most ground in the infield."
+        },
+        {
+          "name": "Outfield (LF / CF / RF)",
+          "blurb": "Cover ground, read the ball off the bat, and make accurate throws to the right base. Center field needs the most speed and range."
+        },
+        {
+          "name": "Utility / DP / Flex",
+          "blurb": "Players who can hit, fill multiple spots, or specialize as a designated hitter. Versatility keeps you in the lineup."
+        }
+      ]
+    },
+    "mental": "Softball is a game of failure — even great hitters get out most of the time, and every fielder boots a ball eventually. The players who last are the ones with short memories: make the error, flush it, get ready for the next pitch. Stay present, control your breathing in tight spots, and trust the reps you've put in. Confidence here isn't loud; it's the quiet belief that you've done the work and you'll handle whatever comes. Be a teammate who picks people up after mistakes — that's the dugout culture that wins close games.",
+    "getStarted": {
+      "steps": [
+        "Learn to catch and throw correctly first — get the overhand throw clean before anything fancy.",
+        "Get a glove that fits and break it in; borrow gear to start, you don't need everything.",
+        "Hit off a tee and field grounders against a wall or with a parent — quality reps add up fast.",
+        "Join a team (rec, school, or club) to learn positions and game situations with coaching.",
+        "If you love it and want to play seriously, look into travel/club ball — that's the recruiting pathway."
+      ],
+      "findTeam": [
+        {
+          "venue": "School team",
+          "how": "Try out for your middle or high school team — ask the athletic office or PE teacher about tryout dates and what to bring. No cost beyond basic gear."
+        },
+        {
+          "venue": "Rec / Little League",
+          "how": "Local parks-and-rec or Little League Softball leagues take beginners of all ages with low fees and no tryout. The best place to start and learn the game."
+        },
+        {
+          "venue": "Travel / club ball",
+          "how": "Tryout-based teams that travel to tournaments and showcases — the main recruiting pathway. More time and cost; ask local coaches or search USA Softball / your state's club directory to find teams near you."
+        }
+      ]
+    },
+    "recruiting": {
+      "truth": "Here's the honest part: most players who love softball don't play in college, and that is completely fine. Playing through high school teaches you toughness, teamwork, and how to handle failure — skills that outlast the sport. If college ball is the goal, chase it with open eyes. If it's not, the game still gave you something real.",
+      "timeline": [
+        {
+          "when": "Grades 7-9 (MS / early HS)",
+          "doThis": "Build fundamentals and play as much as you can. Get on a club/travel team if you want to pursue recruiting. Keep your grades strong — academics open doors and money that athletics can't."
+        },
+        {
+          "when": "Grades 9-10",
+          "doThis": "Lock in your primary position, play strong travel/showcase events, and start a simple highlight reel. Begin a list of schools that fit you academically and athletically, not just by name."
+        },
+        {
+          "when": "Grade 11",
+          "doThis": "The key recruiting window. Attend camps and showcases, email coaches with your video, schedule, and GPA, and take unofficial visits. Be realistic about the division level that fits you."
+        },
+        {
+          "when": "Grade 12",
+          "doThis": "Finalize visits, compare offers (athletic and academic aid together), and choose the school where you'd be happy even if you got hurt and never played. Fit first."
+        }
+      ],
+      "divisions": "College softball spans NCAA D1, D2, D3, NAIA, and junior college (NJCAA) — plus club teams that are real, competitive, and a great way to keep playing. Big news: the 2025-26 House settlement changed the scholarship rules. Sport-by-sport scholarship caps were replaced with roster limits, so older 'X scholarships per team' numbers are outdated — don't rely on them. The honest reality stays the same: most college athletes get partial aid or none, and full rides remain rare. Don't chase prestige. Chase fit, playing time, the right academic program, and a coach you trust. Always confirm current scholarship and roster limits for your division directly with the coaches recruiting you."
+    },
+    "health": {
+      "injuries": "Most common are overuse and impact injuries — shoulder and elbow strain (especially for pitchers from the windmill motion), ankle and knee sprains from sliding and fielding, finger and wrist jams, and the occasional bruise from a hard-hit ball. Catchers also wear on their knees.",
+      "prevention": "Warm up and throw progressively before going full speed — never max-effort cold. Learn correct throwing and pitching mechanics from a qualified coach; bad mechanics cause most arm injuries. Pitchers: follow a real arm-care routine (bands, shoulder strengthening) and respect pitch-count and rest limits — don't pitch through arm pain. Build overall strength and agility, take at least one rest day a week, and take a few weeks fully off throwing each year to recover.",
+      "fuel": "Fuel to train, grow, and recover — eat ENOUGH, not less. Your body needs steady, balanced meals and snacks to power through long practices and tournament days. Hydrate before, during, and after — hot spring and summer games drain you fast. Prioritize sleep; it's when your body actually rebuilds. The goal is to fuel your body well so it can grow strong and durable — eat enough to grow, never to shrink. No calorie counting, no skipping meals, no weight goals.",
+      "note": "Listen to your arm. Shoulder or elbow pain that lingers is a signal, not something to push through — tell a coach or parent and get it checked early. A small problem rested is far better than a big one that ends a season."
+    },
+    "character": {
+      "trait": "Composure under pressure",
+      "model": "Cat Osterman",
+      "why": "One of the most respected pitchers in softball history, Osterman was known not just for her dominance but for her calm, professional poise in the circle and her gracious conduct as a longtime mentor and ambassador for the game. She showed that the best competitors stay composed — handling big moments and tough losses with the same steady class, and lifting up the next generation along the way."
+    }
+  },
+  "volleyball": {
+    "tagline": "Six players, one ball, and a rally that's never the same twice.",
+    "overview": "Volleyball is a fast, technical team sport built on reading the play, precise touches, and trusting the five people around you. There's a fit for every kind of athlete: the setter who quarterbacks every point, the explosive hitter who finishes rallies, the middle who travels the net to block, the libero who reads a hitter and digs the ball off the floor. Height helps at the net, but it's nowhere near the whole game; ball control, court sense, footwork, and quickness win rallies, and the libero and defensive spots reward exactly those skills. You don't need a certain body to belong here. You need clean contacts you can repeat under pressure, good feet, and the willingness to communicate and cover for your teammates.",
+    "season": {
+      "practice": "A typical practice opens with a dynamic warmup and ballhandling (pepper, passing lines), then moves into skill work by phase: serving, passing/serve-receive, setting, hitting approaches, and blocking footwork. It usually builds into 6-on-6 wash drills and live scrimmage with scoring, plus serving under fatigue at the end. Expect heavy reps on passing and serve-receive at every level; the team that controls the first contact controls the match.",
+      "arc": "Tryouts and preseason hit in late summer, building conditioning and installing the system and rotations. The school season runs fall (roughly 20-30+ matches) with practices most days and 1-2 matches a week, building toward conference, then district/regional/state brackets. Many players then roll into club season, which runs roughly winter through spring and is the heart of the recruiting calendar.",
+      "commitment": "In season, expect 12-18+ hours a week between practices, matches, travel, and film; club tournament weekends are long days on your feet. Rest days are part of the plan, not a reward: jumping and hitting load up your knees and shoulder, and they adapt during recovery. Skipping rest is exactly how patellar tendinitis and shoulder overuse start. Build in real days off and listen when something nags."
+    },
+    "progression": [
+      {
+        "stage": "Beginner",
+        "focus": "Learn a platform pass (forearm passing) you can repeat, a clean overhand set with your fingers, and a consistent underhand or float serve that lands in. Learn to move your feet to the ball instead of reaching, call the ball loudly, and understand rotation, the three-contact rule, and basic court positions."
+      },
+      {
+        "stage": "Developing",
+        "focus": "Pass a served ball to target consistently, set off the net with control, and learn a four-step (or three-step) hitting approach with proper arm swing and timing. Start serving with intent to zones, read where the set is going on defense, and learn to base-and-read your block footwork. Get comfortable in serve-receive."
+      },
+      {
+        "stage": "Intermediate",
+        "focus": "Hit with shot variety (line, cross, high hands off the block, tips and rolls) instead of swinging full every time. Block as a unit and read hitters' shoulders and approach. As a setter, run a faster offense and disguise your sets; as a passer/libero, take a bigger seam and dig hard-driven balls. Film yourself to clean up footwork and arm swing."
+      },
+      {
+        "stage": "Advanced",
+        "focus": "Specialize in a position you play at a high level while staying a complete, reliable player. Read the whole court a beat early, terminate or dig balls others can't reach, serve aggressively under pressure, and run or anchor a system. Impact winning in the ways the box score misses: clean serve-receive, smart coverage, and calm communication when the gym is loud."
+      }
+    ],
+    "roles": {
+      "label": "Positions",
+      "items": [
+        {
+          "name": "Outside Hitter (OH)",
+          "blurb": "The all-around workhorse. Hits from the left front, passes in serve-receive, and plays back-row defense. Gets a high volume of swings, including the tough out-of-system ball. Lives on a reliable arm swing and consistency."
+        },
+        {
+          "name": "Opposite / Right-Side Hitter",
+          "blurb": "Attacks from the right front and is the primary blocker against the other team's outside. Often a powerful scorer and, in some systems, a second setting option. Lives on footwork, blocking range, and a heavy swing."
+        },
+        {
+          "name": "Middle Blocker (MB)",
+          "blurb": "The net traveler. Reads the setter and forms the block on every play, and attacks quick tempo sets in the middle. Demands fast footwork, timing, and the ability to make decisions in a split second. Effort and reading, not just height, make a middle."
+        },
+        {
+          "name": "Setter",
+          "blurb": "The floor general. Touches the second ball nearly every rally, runs the offense, decides who gets the ball and when, and disguises the play. Lives on soft hands, quick feet, court vision, and steady decision-making under pressure."
+        },
+        {
+          "name": "Libero",
+          "blurb": "The back-row specialist (different jersey). The best passer and digger on the team, anchoring serve-receive and defense. Cannot attack above the net or block, so it's a pure skill, reading, and ball-control position; quickness and grit matter far more than height."
+        },
+        {
+          "name": "Defensive Specialist (DS)",
+          "blurb": "A back-row defender and passer who subs in to shore up serve-receive and defense, and often to serve. A great role for a quick, scrappy player who reads the game and controls the ball; every winning team needs reliable passing off the bench."
+        }
+      ]
+    },
+    "mental": "Volleyball is a game of errors, and the scoreboard moves on every single one; you'll shank a pass, get stuffed, or miss a serve at the worst time, sometimes with everyone watching. What separates good players is the next ball: a short memory, eyes up, and quick reset to be ready when the serve comes again. Because it's rally scoring, momentum swings fast, so the steadiest team usually wins, not the most talented. Nerves are normal even for starters; lean on a routine (the same pre-serve breath and bounce) so your body knows what to do when your head gets loud. Being a great teammate is a skill you practice on purpose: call the ball loudly, celebrate a good dig as much as a kill, cover your hitter, stay ready on the bench, and own your error instead of pointing at the pass. Coaches and recruiters notice the player who keeps the group calm and connected.",
+    "getStarted": {
+      "steps": [
+        "Get a ball and a wall (or a partner). Spend 15-20 minutes a day on platform passing and overhand setting against a wall; clean, repeatable contacts are the whole foundation.",
+        "Learn the rules and watch the game with intent: notice serve-receive formations, how setters disguise the play, and where defenders move before the ball is even hit.",
+        "Play and rep as much as you can. Pepper with a friend, open gyms, and grass/sand doubles all build ball control fast because you touch the ball constantly.",
+        "Film yourself passing, setting, and approaching, then fix one habit at a time: your platform angle, your footwork to the ball, your arm swing.",
+        "Find a team or program to play organized ball and get coached on rotations, systems, and reads."
+      ],
+      "findTeam": [
+        {
+          "venue": "School team",
+          "how": "Ask your PE teacher or athletic office when volleyball tryouts are (usually late summer for fall season). Show up in shape, knowing how to pass, set, and serve, and ready to communicate and hustle. Freshman, JV, and varsity levels mean there's often a spot to grow into."
+        },
+        {
+          "venue": "Club / travel volleyball",
+          "how": "Search for junior club programs in your area (often affiliated with USA Volleyball/AAU) and attend open tryouts, usually in the fall for a winter-spring season. This is the #1 recruiting pathway: club tournaments and qualifiers are where college coaches watch. Ask about cost, travel, and team level up front, and look for a program that develops players, not just collects them."
+        },
+        {
+          "venue": "Rec & community leagues",
+          "how": "Check your local rec center, YMCA, parks-and-rec, or school intramurals for youth and teen leagues. These are lower-cost, lower-pressure, and a great place to start, learn the game, and get reps without the club commitment."
+        },
+        {
+          "venue": "Open gyms, sand & pickup",
+          "how": "Many schools, rec centers, and beaches run open gyms or sand courts. Show up, get in a rotation, and play. Grass and sand doubles especially force you to do everything (pass, set, hit, defend), which makes you a far better indoor player."
+        }
+      ]
+    },
+    "recruiting": {
+      "truth": "Be honest with yourself about the numbers: only a small fraction of high school volleyball players go on to play in college, and far fewer at the Division I level. That isn't a reason to quit; it's a reason to play for the love of it and keep your options open. Plenty of players thrive in D2, D3, NAIA, and JUCO, and many more keep playing club, sand, intramural, and rec leagues for the rest of their lives. College volleyball is a great goal; making it your only definition of success sets you up for heartbreak. Chase being the best, most reliable version of your game, take care of your body and your grades, and let recruiting follow.",
+      "timeline": [
+        {
+          "when": "Freshman / Sophomore year",
+          "doThis": "Play as much as you can (school plus club), build rock-solid fundamentals in passing, setting, and serving, and keep your grades strong. Academics open doors and money that athletics alone won't."
+        },
+        {
+          "when": "Junior year",
+          "doThis": "Get seen. Club is where it happens: compete at qualifiers and showcases, build a highlight and skills video, and email coaches at programs that fit you academically and athletically. Be realistic about which division and level match your game right now."
+        },
+        {
+          "when": "Summer before / Senior year",
+          "doThis": "Take official and unofficial visits, narrow your list by fit (playing time, position need, major, coaching staff, cost), and finalize academic eligibility through the NCAA/NAIA clearinghouse."
+        },
+        {
+          "when": "Throughout",
+          "doThis": "Stay coachable, communicative, and durable. Your reputation as a teammate and a passer who shows up every rally matters as much as your kill totals; coaches recruit character and consistency."
+        }
+      ],
+      "divisions": "Here's the honest, current picture: starting with the 2025-26 school year, the old per-team scholarship caps were replaced by roster limits under the House v. NCAA settlement. That means a school can now offer full, partial, or no scholarship to any athlete up to its roster limit, so the familiar 'X scholarships per team' figures you'll find online are outdated. The reality on the ground hasn't flipped overnight: most college athletes still get partial aid or none, and full rides remain relatively rare and competitive, especially outside the top D1 women's programs. D2 and NAIA commonly blend partial athletic money with academic aid; D3 offers no athletic scholarships but strong academic and need-based aid at often-excellent schools; JUCO is a real path to develop, fix grades, and transfer up. Because the rules just changed, confirm the current roster and aid limits for your division and gender directly with college coaches, don't trust an old chart. The smartest move is unchanged: pick the level and school where you'll actually play, get a degree you want, and can afford. Fit and academics beat prestige every time."
+    },
+    "health": {
+      "injuries": "Ankle sprains are the most common, usually from landing on a teammate's or blocker's foot at the net. Knee issues like patellar tendinitis ('jumper's knee') and shoulder overuse (from repeated hitting and serving) build up over a season, along with jammed fingers from blocking and contact. Overuse injuries climb fast when players skip rest.",
+      "prevention": "Always do a dynamic warmup before play (leg swings, lunges, light jog, arm circles, then gradual jumping and swinging). Drill soft landing mechanics: land on both feet with bent knees and absorb the jump, and learn to land sideways off the net to avoid coming down on a foot. Strengthen your ankles, hips, and core, build single-leg balance, and work on jumping and decelerating under control. Take care of your hitting shoulder with rotator-cuff and scapular strength work, and respect rest and recovery days so tissue can adapt. Bracing or taping helps if you've sprained an ankle before.",
+      "fuel": "Fuel your body to grow and compete, not to shrink it. Eat enough across the day, including long tournament days: balanced meals with carbs for energy, protein to repair muscle, plus fruits, vegetables, and healthy fats. Pack snacks for club weekends so you're not running on empty between matches. Hydrate before, during, and after, especially in hot gyms; bring water to every practice. Sleep is where you actually get better, so aim for a full night, 8-10 hours for teens. Eating enough and sleeping well will do more for your game than any supplement.",
+      "note": "Take your shoulder and knees seriously over a long season; nagging pain that doesn't ease with rest is a signal to back off and get it checked, not to push through. And take any head contact (a hard collision or fall) seriously: if you feel dizzy, foggy, or get a headache, sit out and tell a coach or parent. There's no toughness award for hiding an injury."
+    },
+    "character": {
+      "trait": "Composure and relentless team-first effort",
+      "model": "Karch Kiraly",
+      "why": "Kiraly is the only player to win Olympic gold in both indoor and beach volleyball, and what made him great wasn't just talent; it was his ball control, his relentless effort on defense, and his calm, demanding leadership. He was known for doing the unglamorous work (passing, digging, reading the game) at the highest level and for holding himself and his teammates to a standard of focus and class. He's a model for the truth that mastering the fundamentals, staying composed when the rally gets chaotic, and competing for your teammates is what builds both a great player and a great teammate."
+    }
+  },
+  "tennis": {
+    "tagline": "You and a racquet against the problem in front of you. No teammates to blame, no clock to hide behind, just whether you solve it.",
+    "overview": "Tennis rewards problem-solvers, not body types. The best junior on your court might be tall and powerful or small and relentless. What every good player shares is racquet skill, footwork, and the patience to construct a point. It is one of the most globally played sports, which means deep talent but also a clear, public yardstick: your UTR (Universal Tennis Rating), a number from roughly 1 to 16 that travels with you and tells coaches exactly where you stand. You can start at any age and improve at any age. Progress comes from reps, smart coaching, and competitive matches, not from genetics. If you can grip a racquet and keep showing up, there is a place for you in this sport.",
+    "season": {
+      "practice": "In-season: 4-6 days/week mixing drilling, point play, and match-style practice sets, often with 1-2 days of conditioning or hitting baskets. Competitive juniors add private lessons. Build in at least 1 full rest day; growing bodies need recovery to absorb the work.",
+      "arc": "High school season runs a single semester (spring in most states, fall in some). Serious players treat tennis as year-round: USTA junior tournaments cluster in summer and over breaks, with a winter indoor stretch. The off-season is for fixing technique and building strength, not just grinding matches.",
+      "commitment": "Recreational: a few hours a week. High school team: daily practice plus matches. Tournament-track junior: 10-15+ hours/week including lessons, drilling, fitness, and weekend tournaments that can eat whole days. Protect sleep and at least one rest day no matter the level - chronic overuse, not talent, is what ends most junior careers early."
+    },
+    "progression": [
+      {
+        "stage": "Beginner",
+        "focus": "Continental and forehand grips, ready position, and consistent rallying. Goal: keep 10+ balls in play, serve into the box reliably, and move with split-steps instead of standing flat. Footwork over power."
+      },
+      {
+        "stage": "Developing",
+        "focus": "Reliable topspin forehand and backhand, a directable serve with first/second-serve thinking, and approach shots and volleys. Start playing USTA sanctioned matches to earn a real UTR. Learn to play a full match without falling apart mentally."
+      },
+      {
+        "stage": "Advanced",
+        "focus": "Weapons and patterns: a serve you can spot, a forehand you build points around, and the ability to change spin, depth, and pace on purpose. Develop a clear style and a B-plan when it stops working. Doubles tactics (poaching, court coverage) become real, and your UTR starts mattering to college coaches."
+      }
+    ],
+    "roles": {
+      "label": "Formats & playing styles",
+      "items": [
+        {
+          "name": "Singles",
+          "blurb": "You cover the whole court alone. Rewards fitness, shot tolerance, and the discipline to construct points rather than go for too much."
+        },
+        {
+          "name": "Doubles",
+          "blurb": "Two per side, heavier on serving, returning, net play, and communication. Often where college teams clinch dual matches - and a great path onto a roster if your singles UTR is borderline."
+        },
+        {
+          "name": "Baseliner",
+          "blurb": "Lives behind the baseline, wins with consistency, depth, and footwork. The most common modern style. Patient, grinding, hard to rush."
+        },
+        {
+          "name": "Serve-and-volley / net-rusher",
+          "blurb": "Pressures opponents by getting forward and finishing at the net. Rarer today, but a sharp weapon in doubles and on fast courts."
+        },
+        {
+          "name": "All-court player",
+          "blurb": "Comfortable everywhere - rallies from the baseline, comes in when the ball is short, mixes spins. The most adaptable style, and what most coaches hope to develop."
+        }
+      ]
+    },
+    "mental": "Tennis is the loneliest scoreboard in sports: no coaching during points in most junior matches, no teammate to bail you out, and a margin so thin that you can lose more points than your opponent and still win the match. That structure makes it a brutal but honest teacher of composure. The skill to build is resetting between points - a deep breath, a routine at the back fence, a short memory. You will play matches where your strokes feel perfect and you lose, and matches where everything is ugly and you win; learning to compete instead of to perform is the whole game. Treat every \"I'm choking\" or \"I can't close this out\" as information, not a verdict. The players who last are the ones who get curious about the next point instead of angry about the last one.",
+    "getStarted": {
+      "steps": [
+        "Get on a court with a racquet that fits your hand and a can of balls - borrow or buy used to start. Take a group lesson or clinic at a local park, rec center, or club to learn grips and basic strokes correctly before bad habits set in.",
+        "Build consistency before power: rally with a wall, a parent, a friend, or a ball machine and aim to keep the ball in play. Footwork and repetition beat trying to hit winners.",
+        "Try out for your middle or high school team - most have no-cut or low-bar tryouts and welcome beginners, especially for doubles and JV.",
+        "Create a UTR Sports profile (free). It becomes your competitive identity the moment you play rated matches.",
+        "Enter a USTA sanctioned junior tournament in your age division to get your first real UTR and a regional ranking. Play up when you can handle it - matches against better players raise your rating faster than easy wins."
+      ],
+      "findTeam": [
+        {
+          "venue": "School team",
+          "how": "Ask the athletic office or a PE teacher when tryouts are. Many programs run spring (or fall) and take JV players at any level. Show up to the interest meeting and bring a racquet."
+        },
+        {
+          "venue": "Club / academy",
+          "how": "Search local tennis clubs and junior academies for group clinics by level (beginner, intermediate, high-performance). Most offer trial lessons. This is where year-round players train and where coaches help you enter tournaments."
+        },
+        {
+          "venue": "Rec / community",
+          "how": "City Parks & Rec departments, YMCAs, and public courts run cheap or free clinics, ladders, and 'Net Generation' (USTA youth) programs. The lowest-cost on-ramp to find hitting partners and a coach."
+        },
+        {
+          "venue": "USTA",
+          "how": "Make a free UTR Sports profile and a USTA membership, then find sanctioned junior tournaments and local leagues by zip code. This is how you turn practice into a ranking coaches can see."
+        }
+      ]
+    },
+    "recruiting": {
+      "truth": "The honest math: the large majority of high school tennis players do not play in college, and that is completely fine. Tennis can be a sport you love and play well for the rest of your life - in leagues, on weekends, at the gym you join in your 40s - whether or not a college coach ever calls. If you do want to play in college, your UTR is the single most important number; recruiting is increasingly transparent because coaches can look you up in seconds. Pursue it because you love competing, not because you expect it to pay for school.",
+      "timeline": [
+        {
+          "when": "Freshman / Sophomore (9-10)",
+          "doThis": "Play. Get a real UTR by entering USTA sanctioned tournaments, raise it through competitive matches, and build your game and fitness. Keep grades strong - academics widen your options more than any forehand. No need to contact coaches yet."
+        },
+        {
+          "when": "Junior year (11)",
+          "doThis": "The key recruiting year. Build a target list of programs that match your UTR honestly (coaches list current player ratings - aim where you'd actually compete). Email coaches with your UTR, schedule, video, and academics. Play national-level tournaments if you're chasing higher divisions, and take official/unofficial visits."
+        },
+        {
+          "when": "Senior year (12)",
+          "doThis": "Finalize fit, narrow offers, and confirm what aid each program can actually put together for your division - rules changed in 2025-26, so ask coaches directly. Keep your UTR up and your grades steady through signing. Less competitive divisions recruit later, so keep options open."
+        },
+        {
+          "when": "Throughout",
+          "doThis": "Be coachable, be honest about your level, and prioritize a school you'd be happy at without tennis. Injuries, burnout, and recruiting reality all change fast - a great academic fit protects you when sport plans shift."
+        }
+      ],
+      "divisions": "College tennis runs across NCAA D1, D2, D3, NAIA, and junior colleges, plus men's and women's programs. UTR ranges loosely sort the levels (top D1 lineups are very high, with strong tennis at every tier below), but fit matters more than prestige: playing time, the coach, the academics, and the cost you can actually afford. Here is the part that recently changed - the House v. NCAA settlement took effect for 2025-26 and replaced the old per-team scholarship caps (you may have seen figures like '4.5 for men, 8 for women' - those are outdated) with roster limits. Schools can now offer full, partial, or no aid to any player up to the roster limit, but most college athletes receive partial aid or none, and full rides remain rare in tennis. D3 and the Ivies offer no athletic scholarships at all but often strong academic and need-based aid. Don't trust old scholarship numbers online - ask each coach what they can actually offer for your division in the current year, and weigh academic aid alongside it."
+    },
+    "health": {
+      "injuries": "Overuse injuries dominate: tennis elbow (lateral epicondylitis) and wrist strain from repetitive impact and grip, rotator cuff and shoulder issues from serving, and lower-body problems like ankle sprains, knee pain, and stress injuries from constant stop-start movement. Lower-back strain is common from the serve and trunk rotation.",
+      "prevention": "Use sound grip technique and properly strung, correctly sized equipment - many elbow problems are technique or gear, not effort. Warm up and do dynamic movement prep before hitting; cool down after. Build forearm, shoulder (rotator cuff), core, and leg strength so your joints aren't carrying the load alone. Respect rest days and don't spike your hours suddenly; if something hurts on every serve or backhand, stop and get it checked early rather than playing through it.",
+      "fuel": "Fuel to play and to grow. Tennis matches can run hours in the heat, so eat enough - balanced meals with carbs for energy, protein to repair, and fruits and vegetables across the day - and never train on empty. Hydrate before, during, and after; bring water (and electrolytes for long hot matches) and sip on every changeover. The goal is to eat enough to grow and recover, not to shrink. Prioritize 8-10 hours of sleep - it is when your body actually builds the strength and skill you practiced.",
+      "note": "Heat is a real hazard in tennis - long outdoor matches cause cramping and heat illness. Learn the early signs (dizziness, cramping, nausea), use changeovers to cool and drink, and never tough out heat symptoms to finish a match. Your durability over years matters far more than any single result."
+    },
+    "character": {
+      "trait": "Composure and self-honesty under pressure",
+      "model": "Roger Federer",
+      "why": "Federer is widely respected not just for how he played but for how he conducted himself - calm under pressure, gracious in defeat, and known for sportsmanship across a 20-plus-year career. He had a famously hot temper as a junior and openly talks about learning to master it; that arc is the useful one for a teen. In a sport with no coaching mid-match and a scoreboard that exposes you, the model isn't to never feel rattled - it's to reset, respect your opponent, and call your own lines honestly when no referee is watching."
+    }
+  },
+  "golf": {
+    "tagline": "A game you can play for life - and one where your scorecard, not your size, decides everything.",
+    "overview": "Golf is an individual stroke-play sport: you against the course, every shot counting, no one to hide behind and no one to blame. That honesty is the appeal. Anyone can play it - tall or short, lean or strong, fast or not - because the game rewards control, patience, and good decisions over raw athleticism. In high school you compete individually but your scores often combine into a team total. In college, the team format sharpens: a lineup of 5 plays, and the best 4 scores count. It has one of the strongest academic cultures in sports and travels with you into adulthood, business, and family long after most sports stop. You do not need a country club to start - public courses, ranges, and junior programs exist exactly for new players. What you do need is a willingness to practice the unglamorous parts and keep your head when a hole goes wrong.",
+    "season": {
+      "practice": "Range and short-game work most days in season, plus play (9-18 holes) when you can. A common week: 2-3 full-swing range sessions, 2-3 short-game/putting sessions, 1-2 rounds on course. Quality reps beat ball-beating - 50 focused balls with a target beats 200 mindless ones.",
+      "arc": "High school golf is typically a fall or spring season depending on your state and gender; serious junior players compete in tournaments year-round (AJGA, state and local junior tours) outside the school season. Off-season is for swing changes, strength and mobility work, and building your tournament resume.",
+      "commitment": "Plan on most days touching the game in season, but build in 1-2 real rest days a week - your back, wrists, and focus all need recovery. More is not better if your body is breaking down or your practice has gone mindless. Walking 18 holes is real physical load; respect it."
+    },
+    "progression": [
+      {
+        "stage": "Beginner",
+        "focus": "Learn a safe, repeatable grip, posture, and setup. Make solid contact and get the ball airborne consistently. Learn the rules and on-course etiquette (pace, where to stand, repairing the green). Start putting and chipping early - that is where scores actually live."
+      },
+      {
+        "stage": "Developing",
+        "focus": "Build a reliable full swing and start shaping a short game. Establish a verified handicap index by posting real scores. Play your first local junior events. Learn course management - aiming at the fat part of the green, laying up when smart, avoiding the big number."
+      },
+      {
+        "stage": "Competitive",
+        "focus": "Get your handicap into the single digits. Compete in state and regional junior events and start AJGA. Sharpen wedge distances, putting under pressure, and your pre-shot routine. Learn to score on bad-swing days - that is the skill that wins."
+      },
+      {
+        "stage": "Advanced / recruitable",
+        "focus": "Consistent low scores in real tournament conditions, a verified low handicap, and ranked junior results (AJGA, state rankings). A repeatable routine, mental steadiness over 36-hole events, and the maturity to manage your own schedule and travel."
+      }
+    ],
+    "roles": {
+      "label": "Formats and parts of the game (golf has no positions - master these instead)",
+      "items": [
+        {
+          "name": "Stroke play",
+          "blurb": "The standard format: every shot counts, lowest total wins. Rewards consistency and avoiding disaster holes. This is what most junior and college events use."
+        },
+        {
+          "name": "Match play",
+          "blurb": "You compete hole-by-hole against one opponent; win more holes, win the match. More aggressive and strategic - a blow-up hole only costs you one hole, not your whole round."
+        },
+        {
+          "name": "Driving",
+          "blurb": "Getting the ball in play off the tee. Distance helps, but position and keeping it in the fairway matter more than raw power for scoring."
+        },
+        {
+          "name": "Irons / approach play",
+          "blurb": "Hitting greens from distance and controlling where the ball lands. The bridge between a good drive and a makeable putt."
+        },
+        {
+          "name": "Short game",
+          "blurb": "Chipping, pitching, and bunker play around the green. This is where amateurs lose the most strokes and where you can score fastest with practice - no athleticism required, just reps."
+        },
+        {
+          "name": "Putting & course management",
+          "blurb": "Putting is nearly half your strokes; course management is deciding the smart shot, not just the heroic one. Together they separate good ball-strikers from low scorers."
+        }
+      ]
+    },
+    "mental": "Golf is the most exposed mental game in sports - every mistake is yours alone, visible on the card, with minutes to stew before the next shot. The players who last learn to treat each shot as its own event: hit it, accept it, move on. A bad hole is not a bad round until you let it be. Build a consistent pre-shot routine so pressure has something steady to land on. Expect frustration - it is built into the game - and judge yourself on your process and your composure, not just the number. The discipline you build standing over a 4-foot putt with everything on the line transfers directly to tests, interviews, and hard conversations for the rest of your life.",
+    "getStarted": {
+      "steps": [
+        "Get to a range or short-game area and take 2-3 lessons from a PGA professional to build a safe grip and setup early - it is far easier than fixing bad habits later.",
+        "Learn the rules and etiquette before your first round (pace of play, where to stand, fixing your marks). It shows respect and makes playing with others easy.",
+        "Start a verified handicap by posting your real scores through a GHIN account (ask a local course or junior program how to set one up). Recruiters and tournaments rely on it.",
+        "Spend at least half your practice on putting and the short game - it lowers scores faster than chasing distance.",
+        "Play actual rounds, not just the range. On-course scoring, course management, and nerves are different skills than hitting balls."
+      ],
+      "findTeam": [
+        {
+          "venue": "School team",
+          "how": "Most high schools have a golf team; ask the athletic office or a coach about tryouts and the season. Many will help a beginner who shows up coachable and on time."
+        },
+        {
+          "venue": "Junior golf programs / club",
+          "how": "Local courses, First Tee chapters, and junior tours run clinics and events for new and improving players. First Tee is built for beginners and teaches the game plus life skills affordably."
+        },
+        {
+          "venue": "Public course / rec",
+          "how": "Public and municipal courses offer affordable junior rates, range access, and group lessons - no membership needed. This is the cheapest honest on-ramp into the game."
+        }
+      ]
+    },
+    "recruiting": {
+      "truth": "Most junior golfers do not play in college - and that is completely fine. Golf is a lifetime game; the round you play at 50 matters more than whether you made a college roster at 18. If college golf is the goal, recruiting runs on cold numbers - a verified handicap index, tournament scoring average, and ranked junior results - which makes it one of the more transparent recruiting paths. Chase fit and academics over a famous logo.",
+      "timeline": [
+        {
+          "when": "9th-10th grade",
+          "doThis": "Establish and lower your verified handicap. Play local and state junior events to learn tournament golf. Build the academic record - golf programs care about grades, and good ones open doors."
+        },
+        {
+          "when": "11th grade",
+          "doThis": "Play a competitive tournament schedule (state events, regional tours, AJGA if your scores qualify). Build a simple recruiting profile with your handicap, scoring average, and results. Start emailing coaches at realistic-fit schools with your numbers and schedule."
+        },
+        {
+          "when": "12th grade",
+          "doThis": "Keep competing and posting scores, take official/unofficial visits, and weigh offers by academic fit, coach relationship, and where you would actually be happy - not prestige. Confirm current scholarship and roster rules directly with each coach."
+        }
+      ],
+      "divisions": "The rules changed for 2025-26 under the House settlement: the old sport-by-sport scholarship caps (the per-team numbers golf used to quote) are gone, replaced by roster limits. A school can now give full, partial, or no aid to any player up to its roster limit. In practice, most college golfers receive partial aid or none, and full rides remain rare - golf money is usually split across a roster. Across D1, D2, D3, NAIA, and junior college there is a fit for a wide range of players; D3 offers no athletic scholarships but often strong academic aid. Do not assume any specific number - confirm current limits for your division and school directly with the coach, and weigh academics and fit first."
+    },
+    "health": {
+      "injuries": "Lower-back strain, lead-wrist and elbow tendon issues, and shoulder irritation - mostly overuse from repetitive swinging and from ball-beating with poor mechanics.",
+      "prevention": "Build core and hip strength and rotational mobility, warm up before you swing hard, and get your swing mechanics checked - efficient technique protects your back. Vary your practice so you are not pounding hundreds of identical reps, and take real rest days when something aches. Pain in the back, wrist, or elbow is a signal to stop and recover, not push through.",
+      "fuel": "Fuel to grow and to last 18 holes on your feet - eat ENOUGH across regular meals and snacks, especially before and during a long round. Bring food and water onto the course; a round can be 4-5 hours in the sun, so hydrate steadily and snack on the back nine to keep your focus and energy up. Prioritize sleep and real recovery between practice and tournament days. Eat to grow and play well, never to shrink - no calorie counting, no weight goals, just enough good fuel to keep your body and mind sharp.",
+      "note": "Sun protection matters in golf more than almost any sport - hat, sunscreen, and sunglasses on every round. Heat and dehydration quietly wreck scores and health over a long day, so manage them before you feel them."
+    },
+    "character": {
+      "trait": "Honesty and self-governed integrity",
+      "model": "Bobby Jones",
+      "why": "Golf is the only major sport where players routinely call penalties on themselves, even when no one else saw. Bobby Jones famously penalized himself a stroke in a U.S. Open when his ball moved - a stroke that may have cost him the title - and when praised, said you might as well praise a man for not robbing a bank. That is the standard golf still holds: you are accountable to the rules even when it costs you and no one is watching. Living that on the course builds the kind of integrity that defines you everywhere else."
+    }
+  },
+  "lacrosse": {
+    "tagline": "A field-running, stick-skill team sport where smarts and effort beat size.",
+    "overview": "Lacrosse is a fast, transition-heavy team sport built on stick skills, field vision, and conditioning. Two things to know up front. First, men's and women's lacrosse are genuinely different games. Men's is full-contact with helmet, gloves, and pads, and allows body checking. Women's is limited-contact with no body checking and lighter gear (eyewear and mouthguard, plus a different stick and rules). They are not the same sport with different uniforms. Second, no body type owns this game. Quick, smaller players thrive at attack and midfield; rangy players dominate defense and win balls in the air; goalies are made of reaction time and nerve. What carries you is clean stick work with both hands, the conditioning to run for a full game, and the lacrosse IQ to read the field. Skill beats size here, and skill is trainable. A wall and a stick will take a beginner further than any growth spurt.",
+    "season": {
+      "practice": "In-season: practice 4-5 days a week (90 min to 2 hours) plus 1-2 games. Expect wall ball, line drills, ground-ball work, transition, and full-field scrimmage. Off-season is where stick skills and conditioning actually get built - wall ball almost daily, plus club ball and showcases for older players.",
+      "arc": "High school spring season runs roughly Feb-May. Club/travel season layers on top in summer and fall, which is when most college recruiting happens. Many serious players play 9-11 months a year split across school and club - guard against burnout by protecting a true off-stretch.",
+      "commitment": "A committed high-schooler trains most days, but you need at least 1-2 full rest days every week and a few weeks fully off the stick each year. Rest is when your body actually adapts and your joints recover. More reps on a tired body is how overuse injuries and burnout happen, not how you get better."
+    },
+    "progression": [
+      {
+        "stage": "Beginner (new to the stick)",
+        "focus": "Learn to cradle, throw, and catch with your dominant hand, then immediately start your off-hand. Wall ball is everything - 50-100 reps a day builds more than any drill. Learn ground balls (low, two hands, scoop through it) and basic field positioning. Get the rules for YOUR game (men's vs women's) clear."
+      },
+      {
+        "stage": "Developing",
+        "focus": "Off-hand becomes reliable under light pressure. Add dodging, shooting on the run, and off-ball movement. Goalies drill footwork and arc; defenders learn approach and positioning over slashing. Start playing real game situations so decisions get faster."
+      },
+      {
+        "stage": "Competitive (varsity/club)",
+        "focus": "Both hands are weapons. You read defenses, win ground-ball battles, and play your role inside a team system. Conditioning lets you compete late in games. This is the level where film study and IQ separate players more than athleticism."
+      },
+      {
+        "stage": "Advanced (recruitable)",
+        "focus": "Polished, position-specific skill and consistency under pressure. You impact games in transition and in the clutch, communicate on the field, and perform at club tournaments and showcases where coaches watch. Reliability and decision-making set you apart."
+      }
+    ],
+    "roles": {
+      "label": "Positions",
+      "items": [
+        {
+          "name": "Attack",
+          "blurb": "Lives near the opponent's goal. Job is to score and feed. Needs both hands, dodging, vision, and finishing under pressure. Quickness and stick skill matter far more than size."
+        },
+        {
+          "name": "Midfield",
+          "blurb": "Runs the whole field, plays both offense and defense, and lives in transition. The conditioning position - endurance and two-way IQ are the price of entry. Often the most positionally flexible role."
+        },
+        {
+          "name": "Defense",
+          "blurb": "Stops the other team's best scorers. In men's play, uses the long pole, body positioning, and checks; in women's, uses footwork, angles, and stick checks within the limited-contact rules. Communication and discipline over reckless aggression."
+        },
+        {
+          "name": "Goalie",
+          "blurb": "Last line of defense and the loudest voice on the field. Lives on reaction time, fearlessness, and footwork, and runs the defense by directing it. A great goalie wins games and is always in demand."
+        },
+        {
+          "name": "Specialists (men's: FOGO / women's: draw)",
+          "blurb": "Men's faceoff specialists (FOGO) win possessions at the X; women's draw specialists win the draw control at the center. Possession is a hidden superpower - winning these reps changes games and is a recruitable skill on its own."
+        }
+      ]
+    },
+    "mental": "Lacrosse moves fast and punishes hesitation, so the mental game is real. You will throw the ball away, get beat, or let in a goal - everyone does. The players who get better are the ones with a short memory: next play, next ground ball, reset. Wall ball is a quiet discipline test - the kids who put in unseen reps are the ones who look effortless on Saturday. Learn to control what you can (effort, hustle to ground balls, communication) and let go of what you can't (a ref's call, a bad bounce). Lean on teammates and coaches when you're frustrated. If the sport ever stops being something you look forward to, that's worth talking about with someone you trust - this is a game, and it's supposed to add to your life, not drain it.",
+    "getStarted": {
+      "steps": [
+        "Figure out which game you're playing - men's (full-contact) or women's (limited-contact). The rules, sticks, and gear differ, so get the right basics from the start.",
+        "Get a stick and a ball and find a wall. Wall ball is the single highest-value thing a beginner can do. Start with your dominant hand, then force the off-hand early.",
+        "Learn to scoop ground balls and cradle while moving. Possession in lacrosse comes from ground balls, and beginners who hustle to loose balls play immediately.",
+        "Borrow or buy entry-level gear - many programs and rec leagues have loaner gear so you don't have to invest before you know you love it.",
+        "Join a team (school, club, or rec) and tell the coach you're new. Coaches expect to teach fundamentals and value coachable, hardworking beginners."
+      ],
+      "findTeam": [
+        {
+          "venue": "School team",
+          "how": "Ask your PE teacher, athletic director, or the lacrosse coach about tryouts and the spring schedule. No-cut JV and developmental programs exist at many schools - just show up willing to learn."
+        },
+        {
+          "venue": "Club / travel team",
+          "how": "Search US Lacrosse / USA Lacrosse and local club programs in your area. Club is the main recruiting pathway for older players, but many clubs also run beginner and developmental teams. Expect tryouts and travel costs - ask about financial aid, which many clubs offer."
+        },
+        {
+          "venue": "Rec / community league",
+          "how": "Check your city parks department, YMCA, or a local youth lacrosse association. Rec leagues are the lowest-pressure, lowest-cost way to learn the game and often supply loaner gear."
+        }
+      ]
+    },
+    "recruiting": {
+      "truth": "Most people who play high school lacrosse do not play in college, and that is completely fine. Lacrosse gives you conditioning, teammates, stick skills, and grit you keep for life whether or not you ever play past 12th grade. Play because you love the game, not only to chase a roster spot.",
+      "timeline": [
+        {
+          "when": "9th-10th grade",
+          "doThis": "Build skill and play - school plus a club team if you can. Master your off-hand. Keep grades strong; academics open more doors (and more aid) than most athletes expect. No need to stress about contacting coaches yet."
+        },
+        {
+          "when": "10th-11th grade",
+          "doThis": "Play club and attend tournaments and showcases where college coaches actually watch - this is lacrosse's primary recruiting stage. Make a simple highlight clip, build a target list of schools that fit you academically and athletically, and start emailing coaches with your schedule and film."
+        },
+        {
+          "when": "11th-12th grade",
+          "doThis": "Take official/unofficial visits, keep communicating with coaches who show real interest, and be honest about where you'd genuinely fit and play. Confirm current scholarship and roster rules directly with each program (the rules changed recently - see below). Have an academic backup plan."
+        }
+      ],
+      "divisions": "The college landscape changed for 2025-26 under the House v. NCAA settlement. The old per-team scholarship caps (the kind of '12.6 for men, 12 for women' figures you may have seen) no longer work the way they used to - sport-by-sport scholarship limits were replaced by roster limits, and a school can now offer full, partial, or no aid to any athlete up to its roster limit. What hasn't changed: most college lacrosse players receive partial aid or none, and full rides remain rare. Don't chase a number or a prestige logo. Chase fit - a program where you'll actually play, that's strong academically for what you want to study, and where you can picture yourself happy for four years. D1, D2, D3, NAIA, and club lacrosse all offer great experiences; D3 gives no athletic scholarships but often strong academic aid. Always confirm current scholarship and roster rules for your division directly with the coaches recruiting you."
+    },
+    "health": {
+      "injuries": "Most common: concussions (especially in men's contact, but possible in both games), shoulder and wrist injuries, ankle sprains and knee injuries (ACL risk is notable in women's lacrosse), and the bruises and overuse aches that come with a long, run-heavy season.",
+      "prevention": "Wear properly fitted gear and a current mouthguard, and never play through a suspected concussion - report head injuries immediately and follow a real return-to-play protocol cleared by a medical professional. Warm up and do dynamic prep before practice. Build conditioning gradually and include knee/ankle stability and neck-strengthening work (both lower ACL and concussion risk). Clean stick skills reduce reckless contact. Respect rest days so overuse injuries don't pile up.",
+      "fuel": "Eat ENOUGH to fuel long runs and keep growing - lacrosse burns a lot over a full game. Build plates around carbs for energy, protein to recover, and plenty of fruits and vegetables, and eat regularly across the day. Hydrate before, during, and after (spring and summer heat is real), and sleep 8-10 hours so your body actually adapts. Eat to grow and play strong, not to shrink. This isn't a weight-class sport - your weight is just a fact, never a goal or something to track. If food or your body ever feels stressful, talk to a parent, coach, or doctor.",
+      "note": "Tell a coach or athletic trainer about pain early instead of hiding it - especially anything to do with your head. A small issue caught now is a problem you avoid later, and there's no toughness in playing hurt."
+    },
+    "character": {
+      "trait": "Selfless leadership and class",
+      "model": "Paul Rabil",
+      "why": "Rabil is one of the most accomplished and recognizable lacrosse players ever, but he's most respected for how he carried himself - relentless work ethic, sportsmanship, and growing the game for everyone by co-founding a professional league and teaching his craft openly. He models that you can compete ferociously and still lift up the sport and the people around you. That's the trait worth copying: be the player whose effort and conduct make the whole team better."
+    }
+  },
+  "hockey": {
+    "tagline": "Fast, physical, and skilled - hockey rewards work ethic and never stops teaching you.",
+    "overview": "Ice hockey is a team contact sport built on skating, puck skill, and reading the game at speed. It asks a lot - learning to skate well takes real time and patience - but it gives back teamwork, toughness, and a sport you can play for life. There's a place on the ice for every kind of player: the fast skater, the smart passer, the steady defender, the calm goalie. Skill, hockey sense, and effort matter far more than how big you are - players of all sizes and builds succeed at every level. If you love being part of a team and you're willing to put in the reps, you can play this game.",
+    "season": {
+      "practice": "Club/travel teams typically practice 2-4 times a week with games on weekends; high school seasons run through the winter. Add skating, stickhandling, and off-ice training as you progress, but always build in days off.",
+      "arc": "Winter is the main season (roughly November-March for high school), often with fall tryouts and spring/summer skills, camps, and optional spring leagues. Many serious players also do dryland and skating in the off-season.",
+      "commitment": "Real but flexible - rec hockey can be one practice and a game a week, while travel and high school hockey is a multi-day commitment. Protect at least 1-2 full rest days a week, and take a few weeks off the ice each year to let your body and mind recover. More ice time is not always better."
+    },
+    "progression": [
+      {
+        "stage": "Beginner",
+        "focus": "Learn to skate first - forward, backward, stopping, and edges. Get comfortable on the ice, learn basic puck handling, and understand the rules and positions. Borrow or rent gear before buying."
+      },
+      {
+        "stage": "Developing",
+        "focus": "Build crossovers, tighter turns, and a quick first step. Work on passing, receiving, and a basic wrist and snap shot. Start reading the game - support the puck, get open, and play your position."
+      },
+      {
+        "stage": "Competitive",
+        "focus": "Sharpen edge work, shooting in stride, and decision-making at game speed. Learn systems (forecheck, breakouts, defensive coverage), play both ways, and compete in battles and on special teams."
+      },
+      {
+        "stage": "Advanced",
+        "focus": "Refine pace, hockey IQ, and consistency shift to shift. Specialize where you're strongest, add strength and agility through smart off-ice training, and play up against tougher competition to keep growing - skill and reads, not size."
+      }
+    ],
+    "roles": {
+      "label": "Positions",
+      "items": [
+        {
+          "name": "Center (C)",
+          "blurb": "The forward who plays the middle of the ice end to end, takes faceoffs, and links offense and defense. Rewards two-way effort, vision, and conditioning."
+        },
+        {
+          "name": "Winger (LW/RW)",
+          "blurb": "Plays the wings and the boards, drives the net, and finishes chances. Rewards speed, a quick shot, and battling for pucks along the wall."
+        },
+        {
+          "name": "Defenseman (D)",
+          "blurb": "Defends the rush, moves the puck out cleanly, and runs the play from the blue line. Needs strong backward skating, good gaps, and composure under pressure."
+        },
+        {
+          "name": "Goaltender (G)",
+          "blurb": "The last line - tracks the puck, controls rebounds, and stays calm when shots come. A specialized position with its own technique, gear, and mindset."
+        }
+      ]
+    },
+    "mental": "Hockey moves fast and doesn't wait for you to feel ready - mistakes happen in front of everyone, and the next shift comes whether the last one went well or not. The mental game is learning to reset quickly: short memory after a bad play, next-shift focus, and trust in your training. It teaches composure under contact, reading the game instead of just reacting, and the team-first habit of doing the unglamorous work - backchecking, blocking shots, finishing checks clean. Handling a coach's feedback, sitting a shift, and bouncing back builds resilience that lasts well beyond the rink.",
+    "getStarted": {
+      "steps": [
+        "Take a learn-to-skate or learn-to-play hockey program - skating is the foundation, and most rinks and youth associations run beginner sessions.",
+        "Borrow or rent gear to start. A helmet with a cage, gloves, shin/elbow/shoulder pads, skates, and a stick are the basics - don't buy everything new until you know you're sticking with it.",
+        "Get on the ice often: public skates, stick-and-puck sessions, and drop-in games all build comfort and confidence faster than anything else.",
+        "Join a beginner or house-league team to start playing real games at your level, and ask coaches what to work on next.",
+        "As you improve, look into travel/AAA, high school, or prep hockey - and remember strong skating and hockey sense open more doors than chasing the highest level too early."
+      ],
+      "findTeam": [
+        {
+          "venue": "School",
+          "how": "Many high schools field hockey teams or co-op with nearby schools - ask the athletic office about tryouts, club teams, or how to get on a co-op roster."
+        },
+        {
+          "venue": "Club / Travel",
+          "how": "Local youth hockey associations and travel clubs run teams at every level from house league to AAA. Look up your area's association or USA Hockey to find registration and tryout dates."
+        },
+        {
+          "venue": "Rec / Drop-in",
+          "how": "Most rinks run house leagues and drop-in 'stick time' or pickup skates for all ages and levels - the lowest-pressure way to start playing and improving."
+        }
+      ]
+    },
+    "recruiting": {
+      "truth": "Most players who love hockey will not play in college, and that is completely fine. Hockey is worth playing for the team, the skills, and the lifelong love of the game - not just as a path to a scholarship. College spots are limited and recruiting is competitive, so play because you love it, keep your grades strong, and let the rest follow.",
+      "timeline": [
+        {
+          "when": "Grades 9-10",
+          "doThis": "Focus on getting better and playing as much as you can - skating, skills, and game reps. Keep your grades up from day one; academics open as many doors as hockey does. Play at a level that challenges and develops you."
+        },
+        {
+          "when": "Grade 11",
+          "doThis": "Hockey's recruiting clock runs later than most sports - many players develop in juniors after high school. If college is a real goal, talk honestly with your coach about fit, keep current game film, and start emailing coaches at programs that match you academically and athletically."
+        },
+        {
+          "when": "Grade 12 / post-grad",
+          "doThis": "Many committed players spend a year or two in junior hockey before college. Choose your next step - school, prep, or juniors - based on development and academic fit, and confirm current eligibility and roster rules directly with college coaches."
+        }
+      ],
+      "divisions": "College hockey runs across NCAA Division I and Division III plus ACHA (club) hockey, and the typical path runs through junior leagues like the USHL and NAHL or strong prep programs. A major recent change: starting in 2025-26, players in the major-junior CHL (OHL, WHL, QMJHL) can keep NCAA Division I eligibility - previously they were treated as professionals and barred (note: this applies to D1, not D3). Also new for 2025-26, the House settlement replaced fixed per-team scholarship caps with roster limits, so schools can give full, partial, or no aid to any rostered player. Older 'X scholarships per team' figures (like the old 18 for men's D1) are outdated. The honest reality: most college athletes get partial aid or none, full rides are rare, and the rules are changing - so confirm current limits for your division and level directly with coaches. Chase fit and academics over prestige; the right program is one where you'll play, develop, and get a degree you value."
+    },
+    "health": {
+      "injuries": "Concussions are the most important risk in a contact sport - take any head injury seriously. Shoulder, wrist (from falls and board contact), knee, and hand injuries are also common, along with cuts and bruises.",
+      "prevention": "Wear properly fitted, certified gear every time, including a helmet with a cage or shield and a mouthguard. Learn legal body contact and how to take and give a check safely, build neck, core, and leg strength, and never play through a suspected concussion - report it and get cleared by a medical professional before returning.",
+      "fuel": "Fuel to grow and play, not to shrink. Eat enough balanced food - carbs for energy, protein to recover, fruits and vegetables - especially around practices and games, which burn a lot in the cold. Hydrate before, during, and after ice time (you sweat more than you think under all that gear), and prioritize sleep and rest days so your body can recover and develop.",
+      "note": "Hockey gear is expensive and grows with you - check used-gear swaps and association loaner programs. Get skates fitted properly; bad-fitting skates cause blisters and hold back your skating more than anything else."
+    },
+    "character": {
+      "trait": "Selfless team-first leadership",
+      "model": "Sidney Crosby",
+      "why": "One of the best players of his generation, Crosby is widely respected for his relentless work ethic, accountability, and putting the team before personal stats. He's known for leading by example, staying composed and professional under enormous pressure, and treating the game and his teammates with respect - the kind of conduct any young player can learn from."
+    }
   }
 };
 
