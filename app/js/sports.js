@@ -268,6 +268,16 @@ function filterSportsLevel(level, btn){
   renderSportsGrid();
 }
 
+/* Sports world-class · Phase 1 — Explore cards wear the shared Power-Card
+   shell (tlc-power). A stable per-sport theme (2 of each of the 8 palettes)
+   so a sport's colour doesn't shift when filters reorder the grid. The shell
+   CSS lives in app.css (#s-sports added to the shared selectors). */
+const SPORT_THEME = {
+  football:'forge',  basketball:'ember',   soccer:'hunter',    baseball:'ocean',
+  softball:'mind',   track:'lightning',    crosscountry:'treasury', volleyball:'time',
+  swimming:'ocean',  wrestling:'forge',    tennis:'hunter',    golf:'treasury',
+  lacrosse:'mind',   gymnastics:'ember',   hockey:'lightning', cheerleading:'time'
+};
 function renderSportsGrid(){
   const grid = document.getElementById('sportsGrid');
   if(!grid) return;
@@ -276,14 +286,31 @@ function renderSportsGrid(){
     const lOk = _activeLevel==='all' || s.levels.includes(_activeLevel);
     return gOk && lOk;
   });
-  grid.innerHTML = filtered.map(s=>`
-    <div onclick="showSportDetail('${s.id}')" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:.9rem 1rem;cursor:pointer;transition:all .2s;" onmouseover="this.style.borderColor='var(--c)'" onmouseout="this.style.borderColor='rgba(255,255,255,.07)'">
-      <div style="font-size:1.6rem;margin-bottom:.3rem;">${s.emoji}</div>
-      <div style="font-size:.85rem;font-weight:800;color:var(--tx);">${s.name}</div>
-      <div style="font-size:.7rem;color:var(--tx2);margin-top:.2rem;">${s.levels.map(l=>l==='ms'?'Middle School':l==='hs'?'High School':'College').join(' · ')}</div>
-    </div>
-  `).join('');
+  grid.innerHTML = filtered.map((s,i)=>{
+    const theme  = SPORT_THEME[s.id] || 'lightning';
+    // Abbreviated so it stays a single tight meta-line in the 2-col phone grid
+    // (full names wrapped to 3 ragged lines). MS/HS are explained in the section header.
+    const levels = s.levels.map(l=>l==='ms'?'MS':l==='hs'?'HS':'College').join(' · ');
+    // Staggered, repeating shimmer delay (bounded to 3 sweeps in CSS); replays
+    // on entry because renderSports() re-runs this from the showSection hook.
+    const delay  = ((i % 6) * 0.16).toFixed(2);
+    return '<button type="button" class="tab-landing-card tlc-power"'
+      + ' data-theme="' + theme + '"'
+      + ' style="--tlc-shimmer-delay:' + delay + 's;"'
+      + ' onclick="showSportDetail(\'' + s.id + '\')"'
+      + ' aria-label="' + s.name + '">'
+      + '<span class="tlc-shimmer" aria-hidden="true"></span>'
+      + '<span class="tlc-icon" aria-hidden="true">' + s.emoji + '</span>'
+      + '<span class="tlc-label">' + s.name + '</span>'
+      + '<span class="tlc-sub">' + levels + '</span>'
+    + '</button>';
+  }).join('');
 }
+
+/* Section render entry — wired to the showSection('s-sports') hook in ui.js
+   (was a no-op: renderSports didn't exist). Re-rendering the Explore grid on
+   entry replays the bounded shimmer. Filters persist via the module vars. */
+function renderSports(){ renderSportsGrid(); }
 
 function showSportDetail(id){
   const s = SPORT_DATA.find(x=>x.id===id);
