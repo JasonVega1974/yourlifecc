@@ -8293,6 +8293,15 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 #s-learn .tab-landing-card.tlc-power:nth-child(7) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(7) .tlc-shimmer{ animation-delay:1.68s; }
 #s-learn .tab-landing-card.tlc-power:nth-child(8) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(8) .tlc-shimmer{ animation-delay:1.96s; }
 
+/* Learn landing splits into a main grid + an "Activities" group, so the host
+   stacks (block) and each group is its own .tab-landing-hero grid. The activity
+   cards reset to nth-child 1–2 of their group — continue their shimmer delay so
+   the staggered sweep still reads as one cascade top-to-bottom. #s-learn only;
+   #s-life / #s-me unaffected. */
+#s-learn .tab-landing{ display:block; }
+#s-learn .lr-activities .tab-landing-card.tlc-power:nth-child(1) .tlc-shimmer{ animation-delay:1.68s; }
+#s-learn .lr-activities .tab-landing-card.tlc-power:nth-child(2) .tlc-shimmer{ animation-delay:1.96s; }
+
 /* Inner layout — keep content above the shimmer/border layers */
 #s-life .tlc-power > *,
 #s-learn .tlc-power > *,
@@ -8512,7 +8521,8 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 :root.light #s-life .tlc-power .tlc-shimmer,
 :root.light #s-learn .tlc-power .tlc-shimmer,
 :root.light #s-me .tlc-power .tlc-shimmer     { opacity:.28; mix-blend-mode:multiply; }
-:root.light #s-life .tab-landing-more-label   { color:#64748b !important; }
+:root.light #s-life .tab-landing-more-label,
+:root.light #s-learn .tab-landing-more-label  { color:#64748b !important; }
 :root.light #s-life .tab-landing-card.tlc-mini{
   background:#fff !important;
 }

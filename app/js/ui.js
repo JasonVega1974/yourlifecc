@@ -1333,19 +1333,33 @@ function renderLearnLanding(){
     {id:'s-craft',     icon:'🎵', label:'Music & Practice', sub:'Practice timer, instrument guides, track upload', theme:'time'},
     {id:'s-sports',    icon:'🏆', label:'Sports',           sub:'Explore sports across school levels',             theme:'ember'}
   ];
-  host.innerHTML = LEARN_CARDS
-    .filter(c => document.getElementById(c.id))
-    .map(c =>
-      '<button type="button" class="tab-landing-card tlc-power"'
-        + ' data-theme="' + c.theme + '"'
-        + ' onclick="showSection(\'' + c.id + '\')"'
-        + ' aria-label="' + c.label + '">'
-        + '<span class="tlc-shimmer" aria-hidden="true"></span>'
-        + '<span class="tlc-icon" aria-hidden="true">' + c.icon + '</span>'
-        + '<span class="tlc-label">' + c.label + '</span>'
-        + '<span class="tlc-sub">' + c.sub + '</span>'
-      + '</button>'
-    ).join('');
+  function cardHtml(c){
+    return '<button type="button" class="tab-landing-card tlc-power"'
+      + ' data-theme="' + c.theme + '"'
+      + ' onclick="showSection(\'' + c.id + '\')"'
+      + ' aria-label="' + c.label + '">'
+      + '<span class="tlc-shimmer" aria-hidden="true"></span>'
+      + '<span class="tlc-icon" aria-hidden="true">' + c.icon + '</span>'
+      + '<span class="tlc-label">' + c.label + '</span>'
+      + '<span class="tlc-sub">' + c.sub + '</span>'
+    + '</button>';
+  }
+  // Split into the main set + an "Activities" group (Music & Sports) under a
+  // subhead — mirrors the Life landing's .tab-landing-more-label pattern. Each
+  // group is its own .tab-landing-hero grid (the host is display:block for
+  // #s-learn in app.css). The activities cards' shimmer delay is continued
+  // (1.68s/1.96s, via .lr-activities in app.css) so the staggered sweep still
+  // reads as one cascade top-to-bottom even though nth-child resets per group.
+  const ACTIVITY_IDS = ['s-craft', 's-sports'];
+  const present    = LEARN_CARDS.filter(c => document.getElementById(c.id));
+  const mainCards  = present.filter(c => ACTIVITY_IDS.indexOf(c.id) === -1);
+  const activities = present.filter(c => ACTIVITY_IDS.indexOf(c.id) !== -1);
+  host.innerHTML =
+      '<div class="tab-landing-hero">' + mainCards.map(cardHtml).join('') + '</div>'
+    + (activities.length
+        ? '<div class="tab-landing-more-label">Activities</div>'
+          + '<div class="tab-landing-hero lr-activities">' + activities.map(cardHtml).join('') + '</div>'
+        : '');
 }
 
 // ════════════════════════════════════════════════════════════
