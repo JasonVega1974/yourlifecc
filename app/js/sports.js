@@ -312,39 +312,73 @@ function renderSportsGrid(){
    entry replays the bounded shimmer. Filters persist via the module vars. */
 function renderSports(){ renderSportsGrid(); }
 
+/* ── Sport detail sheet (Phase 2A) ───────────────────────────
+   A Power-Card-styled sheet built from SPORT_DATA. Theme accent on the
+   header ties it to the Explore card's colour (the shell nod); the body
+   is clean, organised content with conventional meaning-colours (gold =
+   scholarship, amber/green = injury/prevention, blue = development). The
+   existing health-first framing — scholarship realism, anti-weight-cutting,
+   injury prevention — is presented verbatim, not rewritten. CSS: app.css
+   .sds-* (light/dark/reduced-motion handled). */
+const THEME_HEX = {
+  forge:['#fb923c','#ef4444'], ember:['#f59e0b','#f43f5e'], hunter:['#34d399','#14b8a6'],
+  ocean:['#06b6d4','#3b82f6'], mind:['#ec4899','#f472b6'], lightning:['#38bdf8','#818cf8'],
+  treasury:['#fbbf24','#16a34a'], time:['#818cf8','#a78bfa']
+};
+function _sdEsc(s){ return (typeof escapeHtml==='function') ? escapeHtml(String(s==null?'':s)) : String(s==null?'':s); }
+function _sportSheetEl(){
+  let m = document.getElementById('sportDetailModal');
+  if(m) return m;
+  m = document.createElement('div');
+  m.id = 'sportDetailModal';
+  m.className = 'sds-overlay';
+  document.body.appendChild(m);
+  m.addEventListener('click', e=>{ if(e.target===m) closeSportSheet(); });
+  if(!window._sdsKeyWired){
+    window._sdsKeyWired = true;
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeSportSheet(); });
+  }
+  return m;
+}
+function closeSportSheet(){
+  const m = document.getElementById('sportDetailModal');
+  if(m){ m.classList.remove('open'); document.body.style.overflow=''; }
+  // a11y — return focus to the sport card that opened the sheet.
+  try { if(window._sdsReturnFocus && window._sdsReturnFocus.focus) window._sdsReturnFocus.focus(); } catch(e){}
+}
 function showSportDetail(id){
   const s = SPORT_DATA.find(x=>x.id===id);
   if(!s) return;
-  const modal = document.getElementById('sportDetailModal') || createSportModal();
-  modal.querySelector('#sdTitle').textContent = s.emoji+' '+s.name;
-  modal.querySelector('#sdDesc').textContent  = s.desc;
-  modal.querySelector('#sdScholarship').innerHTML = `
-    <b style="color:#f5a623;">🎓 Scholarships:</b> ${s.scholarship.pct} of HS athletes receive one. Avg: ${s.scholarship.avg}.<br><span style="color:var(--tx2);">${s.scholarship.note}</span>`;
-  modal.querySelector('#sdHealth').innerHTML = `
-    <b style="color:#f87171;">⚠️ Common Injuries:</b> ${s.health.injuries}<br>
-    <b style="color:#22c55e;">✅ Prevention:</b> ${s.health.prevention}`;
-  modal.querySelector('#sdDev').textContent = s.development;
-  modal.style.display = 'flex';
-}
-
-function createSportModal(){
-  const m = document.createElement('div');
-  m.id = 'sportDetailModal';
-  m.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9999;align-items:center;justify-content:center;padding:1rem;';
-  m.innerHTML = `
-    <div style="background:#131927;border:1px solid rgba(255,255,255,.1);border-radius:20px;max-width:500px;width:100%;max-height:80vh;overflow-y:auto;padding:1.4rem;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem;">
-        <div style="font-size:1.1rem;font-weight:900;color:var(--tx);" id="sdTitle"></div>
-        <button onclick="document.getElementById('sportDetailModal').style.display='none'" style="background:rgba(255,255,255,.08);border:none;border-radius:50%;width:28px;height:28px;color:var(--tx);cursor:pointer;font-size:1rem;">✕</button>
-      </div>
-      <div style="font-size:.82rem;color:var(--tx2);margin-bottom:.8rem;line-height:1.6;" id="sdDesc"></div>
-      <div style="font-size:.78rem;line-height:1.7;margin-bottom:.7rem;" id="sdScholarship"></div>
-      <div style="font-size:.78rem;line-height:1.7;margin-bottom:.7rem;" id="sdHealth"></div>
-      <div style="font-size:.78rem;color:var(--tx2);line-height:1.6;" id="sdDev"></div>
-    </div>`;
-  document.body.appendChild(m);
-  m.addEventListener('click', e=>{ if(e.target===m) m.style.display='none'; });
-  return m;
+  const m = _sportSheetEl();
+  const theme = (typeof SPORT_THEME!=='undefined' && SPORT_THEME[id]) ? SPORT_THEME[id] : 'lightning';
+  const hex   = THEME_HEX[theme] || THEME_HEX.lightning;
+  const levelName  = l => l==='ms'?'Middle School' : l==='hs'?'High School' : 'College';
+  const levelChips = s.levels.map(l=>'<span class="sds-chip">'+levelName(l)+'</span>').join('');
+  const statChips  = (s.statFields||[]).map(f=>'<span class="sds-stat">'+_sdEsc(f.label)+'</span>').join('');
+  m.innerHTML =
+    '<div class="sds-sheet" role="dialog" aria-modal="true" aria-label="' + _sdEsc(s.name) + ' details" style="--sd-a:' + hex[0] + ';--sd-b:' + hex[1] + ';">'
+    + '<button class="sds-close" type="button" aria-label="Close" onclick="closeSportSheet()">✕</button>'
+    + '<div class="sds-head">'
+    +   '<span class="sds-emoji" aria-hidden="true">' + s.emoji + '</span>'
+    +   '<div class="sds-headtext"><h2 class="sds-name">' + _sdEsc(s.name) + '</h2><div class="sds-levels">' + levelChips + '</div></div>'
+    + '</div>'
+    + '<div class="sds-body">'
+    +   '<p class="sds-overview">' + _sdEsc(s.desc) + '</p>'
+    +   '<section class="sds-sec"><div class="sds-sec__label sds-l--gold">🎓 The scholarship reality</div>'
+    +     '<div class="sds-kv"><span class="sds-kv__k">Who gets one</span><span class="sds-kv__v">' + _sdEsc(s.scholarship.pct) + ' of HS athletes</span></div>'
+    +     '<div class="sds-kv"><span class="sds-kv__k">Typical value</span><span class="sds-kv__v">' + _sdEsc(s.scholarship.avg) + '</span></div>'
+    +     '<p class="sds-note">' + _sdEsc(s.scholarship.note) + '</p></section>'
+    +   '<section class="sds-sec"><div class="sds-sec__label sds-l--green">💚 Staying healthy</div>'
+    +     '<p class="sds-line"><b class="sds-amber">Common injuries:</b> ' + _sdEsc(s.health.injuries) + '</p>'
+    +     '<p class="sds-line"><b class="sds-grn">Prevention:</b> ' + _sdEsc(s.health.prevention) + '</p></section>'
+    +   '<section class="sds-sec"><div class="sds-sec__label sds-l--blue">📈 How to develop</div>'
+    +     '<p class="sds-line">' + _sdEsc(s.development) + '</p></section>'
+    +   (statChips ? '<section class="sds-sec"><div class="sds-sec__label sds-l--violet">📊 Stats to track</div><div class="sds-stats">' + statChips + '</div></section>' : '')
+    + '</div>'
+    + '</div>';
+  try { window._sdsReturnFocus = document.activeElement; } catch(e){}
+  m.classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 
 /* ── Main tab switcher ─────────────────────────────────────── */

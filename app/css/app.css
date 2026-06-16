@@ -8298,6 +8298,75 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
    auto-fill, #s-sports-scoped) so the shelled cards read like the landings. */
 #s-sports #sportsGrid{ display:grid; grid-template-columns:repeat(2,1fr); gap:.7rem; }
 @media (min-width:861px){ #s-sports #sportsGrid{ grid-template-columns:repeat(3,1fr); gap:.9rem; } }
+
+/* ── Sport detail sheet (Phase 2A) — .sds-* ────────────────────────────
+   ONE theme accent (the sport's gradient on the top bar + the emoji tile,
+   --sd-a/--sd-b set inline) ties the sheet to its Explore card; the body
+   stays flat + organised (soft surface, thin border, conventional meaning-
+   colours). Light + reduced-motion handled. */
+.sds-overlay{
+  position:fixed; inset:0; z-index:9999;
+  display:flex; align-items:center; justify-content:center; padding:1rem;
+  background:rgba(2,6,18,.62);
+  -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px);
+  opacity:0; visibility:hidden; pointer-events:none;
+  transition:opacity .2s ease, visibility .2s ease;
+}
+.sds-overlay.open{ opacity:1; visibility:visible; pointer-events:auto; }
+.sds-sheet{
+  position:relative; width:100%; max-width:540px; max-height:88vh; overflow-y:auto;
+  background:var(--s1); border:1px solid var(--br); border-radius:20px;
+  box-shadow:0 18px 60px rgba(0,0,0,.5);
+  transform:translateY(14px); transition:transform .25s ease;
+  -webkit-overflow-scrolling:touch;
+}
+.sds-overlay.open .sds-sheet{ transform:none; }
+.sds-sheet::before{ content:''; position:absolute; top:0; left:0; right:0; height:4px;
+  background:linear-gradient(90deg, var(--sd-a, var(--c)), var(--sd-b, var(--c))); border-radius:20px 20px 0 0; }
+.sds-close{   /* 44px tap target; the visible disc is a 30px radial fill */
+  position:absolute; top:.7rem; right:.7rem; z-index:2;
+  width:44px; height:44px; border:none; cursor:pointer; line-height:1;
+  background:radial-gradient(circle 15px at center, rgba(255,255,255,.08) 99%, transparent 100%);
+  color:var(--tx2); font-size:.95rem;
+  display:flex; align-items:center; justify-content:center;
+}
+.sds-close:hover{ background:radial-gradient(circle 15px at center, rgba(255,255,255,.16) 99%, transparent 100%); color:var(--tx); }
+.sds-head{ display:flex; align-items:center; gap:.9rem; padding:1.4rem 1.4rem 1rem; }
+.sds-emoji{
+  flex:0 0 auto; width:56px; height:56px; border-radius:16px;
+  display:flex; align-items:center; justify-content:center; font-size:1.9rem; line-height:1;
+  background:linear-gradient(140deg, color-mix(in srgb, var(--sd-a) 26%, transparent), color-mix(in srgb, var(--sd-b) 12%, transparent));
+  border:1px solid color-mix(in srgb, var(--sd-a) 30%, transparent);
+  filter:drop-shadow(0 0 10px color-mix(in srgb, var(--sd-a) 45%, transparent));
+}
+.sds-name{ margin:0; font-family:var(--fh); font-size:1.5rem; letter-spacing:.04em; color:var(--tx); line-height:1.05; }
+.sds-levels{ display:flex; flex-wrap:wrap; gap:.35rem; margin-top:.45rem; }
+.sds-chip{ font-size:.7rem; font-weight:700; letter-spacing:.02em; padding:.18rem .55rem; border-radius:999px; color:var(--tx2); background:rgba(255,255,255,.08); border:1px solid var(--br); }
+.sds-body{ padding:0 1.4rem 1.4rem; display:flex; flex-direction:column; gap:.85rem; }
+.sds-overview{ margin:0; font-size:.86rem; line-height:1.6; color:var(--tx2); }
+.sds-sec{ background:rgba(255,255,255,.025); border:1px solid var(--br); border-radius:14px; padding:.85rem .95rem; }
+.sds-sec__label{ font-family:var(--fh); font-size:.7rem; letter-spacing:1.2px; font-weight:700; text-transform:uppercase; color:var(--tx2); margin-bottom:.55rem; }
+.sds-l--gold{ color:#f5a623; } .sds-l--green{ color:#34d399; } .sds-l--blue{ color:#60a5fa; } .sds-l--violet{ color:#a78bfa; }
+.sds-kv{ display:flex; justify-content:space-between; gap:.8rem; padding:.25rem 0; font-size:.8rem; }
+.sds-kv__k{ color:var(--tx3); } .sds-kv__v{ color:var(--tx); font-weight:600; text-align:right; }
+.sds-note{ margin:.5rem 0 0; font-size:.78rem; line-height:1.6; color:var(--tx2); }
+.sds-line{ margin:0 0 .4rem; font-size:.8rem; line-height:1.6; color:var(--tx2); }
+.sds-line:last-child{ margin-bottom:0; }
+.sds-amber{ color:#f59e0b; } .sds-grn{ color:#34d399; }
+.sds-stats{ display:flex; flex-wrap:wrap; gap:.4rem; }
+.sds-stat{ font-size:.72rem; color:var(--tx2); padding:.28rem .6rem; border-radius:8px; background:rgba(255,255,255,.08); border:1px solid var(--br); }
+@media (prefers-reduced-motion: reduce){ .sds-overlay, .sds-sheet{ transition:none; } .sds-sheet{ transform:none; } }
+:root.light .sds-overlay{ background:rgba(31,24,16,.42); }
+:root.light .sds-sheet{ background:var(--s1); border-color:rgba(0,0,0,.10); box-shadow:0 18px 50px rgba(31,24,16,.18); }
+:root.light .sds-sec{ background:rgba(0,0,0,.025); border-color:rgba(0,0,0,.08); }
+:root.light .sds-chip, :root.light .sds-stat{ background:rgba(0,0,0,.07); border-color:rgba(0,0,0,.14); }
+:root.light .sds-overview, :root.light .sds-note, :root.light .sds-line{ color:#4e4538; }
+:root.light .sds-l--gold{ color:#b45309; }
+:root.light .sds-amber{ color:#d97706; }
+:root.light .sds-l--green, :root.light .sds-grn{ color:#047857; }
+:root.light .sds-l--blue{ color:#2563eb; }
+:root.light .sds-l--violet{ color:#7c3aed; }
+:root.light .sds-close{ background:radial-gradient(circle 15px at center, rgba(0,0,0,.06) 99%, transparent 100%); color:#4e4538; }
 #s-learn .tab-landing-card.tlc-power:nth-child(1) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(1) .tlc-shimmer{ animation-delay:0s; }
 #s-learn .tab-landing-card.tlc-power:nth-child(2) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(2) .tlc-shimmer{ animation-delay:.28s; }
 #s-learn .tab-landing-card.tlc-power:nth-child(3) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(3) .tlc-shimmer{ animation-delay:.56s; }
