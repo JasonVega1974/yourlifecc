@@ -633,6 +633,571 @@ const SPORT_DETAIL = {
       "model": "Dan Gable",
       "why": "Gable is wrestling's standard for character because of how he trained and how he carried himself - legendary, near-obsessive work in the room, yet known for crediting his coaches and teammates and pouring himself into developing others. He turned discipline and toughness into a way of treating the sport and the people in it with respect. The lesson is not to copy his volume, but his mindset: outwork the excuses, stay humble, and lift everyone around you."
     }
+  },
+  "crosscountry": {
+    "tagline": "Show up easy days and hard days alike. The runner who fuels well and runs consistently beats the one chasing light.",
+    "overview": "Cross country is distance running over grass, dirt, and hills - usually 5K (3.1 miles) in high school, 6K-10K in college. You race alone against the clock and the field, but the team scores together: each runner's finishing place becomes points, the lowest team total wins, and the 5th and 6th runners decide meets as much as the 1st. There is no body type for this sport. Tall, short, sturdy, late-blooming, early-blooming - they all run, and the athlete who trains consistently and fuels enough to recover beats the one trying to be smaller almost every time. It's mostly the same aerobic base as distance track, just on grass and hills. Anyone willing to build mileage slowly and run easy on easy days belongs here.",
+    "season": {
+      "practice": "Most teams run 5-6 days a week in season: a mix of easy runs, one harder workout (intervals or tempo), a long run on the weekend, plus strength and mobility work. Easy days should feel conversational - actually easy. At least one full rest day a week is part of the plan, not a reward for it.",
+      "arc": "Summer is base-building (easy aerobic miles before anyone races). The fall season runs roughly August through the conference, regional, and state championships in late October or November. Then a deliberate down week or two before winter training and indoor/outdoor track pick the base back up.",
+      "commitment": "Plan on 6-10 hours a week in season including the long run and meets. Saturday meets can eat a morning. The non-negotiables that make it sustainable: 1+ rest day weekly, 8-10 hours of sleep, and easy days kept truly easy so the hard days land. Skipping rest is how you get hurt, not how you get fast."
+    },
+    "progression": [
+      {
+        "stage": "Beginner (first season)",
+        "focus": "Build the habit of running, not speed. Run-walk if you need to, finish every easy run able to talk, and add mileage slowly - roughly 10% a week, no more. Learn to lace shoes right, warm up, and cool down. The only goal is to finish the season healthy and still wanting to run."
+      },
+      {
+        "stage": "Developing",
+        "focus": "A consistent weekly mileage you recover from, one structured workout a week (intervals or tempo), and a weekend long run. Start logging easy/hard days and how you slept and ate. Add basic strength - hips, core, calves - twice a week to bank durability. Race times drop on their own when the base is steady."
+      },
+      {
+        "stage": "Competitive (varsity)",
+        "focus": "Higher but still recoverable mileage, two quality workouts plus a long run, and pacing discipline so you don't go out too fast. Learn race tactics: pack running, surging hills, closing the last 800. Strength and mobility become non-optional injury insurance."
+      },
+      {
+        "stage": "Advanced (college-track athlete)",
+        "focus": "Periodized training built around peaking for championships, higher mileage introduced gradually over years (not one summer), and sharp self-knowledge about fueling, sleep, and early injury signs. Skill here is patience and consistency over time - never getting smaller."
+      }
+    ],
+    "roles": {
+      "label": "How a team scores (and where you fit)",
+      "items": [
+        {
+          "name": "Top 5 scorers",
+          "blurb": "Your team's five finishers whose places are added up - lowest total wins. Every runner is trying to earn one of these spots, and they shift meet to meet."
+        },
+        {
+          "name": "6th & 7th (displacers)",
+          "blurb": "They don't add to your score but they push rival runners to higher places, raising the other team's total. Quietly decide close meets - depth wins championships."
+        },
+        {
+          "name": "Front-runner / pacesetter",
+          "blurb": "Comfortable leading and setting honest early pace. A role of nerve and rhythm, not of being the lightest - it's about race sense."
+        },
+        {
+          "name": "Closer / pack runner",
+          "blurb": "Sits in, runs with teammates, and finishes hard over the last kilometer. Most points are won in the final stretch, where strength and grit show."
+        }
+      ]
+    },
+    "mental": "Cross country is mostly run between your ears. Races hurt on purpose - the skill is staying calm when it does, holding pace when your brain begs you to back off, and reeling in one runner at a time instead of staring at the leader. The bigger mental work is patience across months: trusting that boring easy miles are doing something, not panicking after a bad race, and resisting the lie that lighter is faster. Define a good day by effort and showing up, not by a number on a watch or a scale. The runners who last are the ones who are kind to themselves on hard days and still toe the line the next morning.",
+    "getStarted": {
+      "steps": [
+        "Get one pair of properly fitted running shoes from a running store - tell them you're starting cross country and let them watch you walk. This is the one piece of gear that prevents injuries.",
+        "Start with easy run-walks 3-4 days a week and build slowly. If you can talk while running, the pace is right. Add no more than about 10% more total time or distance per week.",
+        "Eat enough to recover and drink water through the day - fuel before and after runs is what lets your body adapt and get stronger.",
+        "Find a team or group and just show up to a practice; coaches expect beginners and there are no tryout cuts in most programs.",
+        "Keep a simple log: how far, how it felt, how you slept. Patterns in that log teach you more than any single workout."
+      ],
+      "findTeam": [
+        {
+          "venue": "High school team",
+          "how": "Cross country almost never cuts - if you can run, you can join. Find the coach through the athletics office, show up to summer or preseason practice, and complete the school's sports physical and forms."
+        },
+        {
+          "venue": "Club / USATF youth or junior team",
+          "how": "Search USATF or RRCA for a local club. These run summer and into fall and are great if your school has no team or you want more coaching. Most welcome all levels."
+        },
+        {
+          "venue": "Rec & community running groups",
+          "how": "Parks & rec departments, local running stores, and YMCA often host beginner run groups or couch-to-5K programs. A low-pressure way to build a base and meet other runners before joining a competitive team."
+        },
+        {
+          "venue": "Local road races (5K fun runs)",
+          "how": "Sign up for a community 5K - many are free or cheap and welcome walkers. It gets you a baseline time and a taste of racing with zero commitment."
+        }
+      ]
+    },
+    "recruiting": {
+      "truth": "Be honest with yourself: most high school runners do not compete in college, and that is completely fine. Running is a lifelong sport - the fitness, discipline, and friendships outlast any roster spot. If you love it, keep racing for your high school team and run for life. College running is a path for some, not a verdict on whether you're a real runner.",
+      "timeline": [
+        {
+          "when": "9th-10th grade",
+          "doThis": "Just train consistently, stay healthy, and build a base. Race for your team and learn to love the process. Keep your grades up - academics open more doors in running recruiting than almost any other sport. No need to think about recruiting yet."
+        },
+        {
+          "when": "11th grade",
+          "doThis": "This is when times start to matter to coaches. Keep a simple athletic resume of your PRs, school, and grades. Email coaches at schools that fit you academically with your honest times and ask about their program. Go to a summer running camp if you can."
+        },
+        {
+          "when": "12th grade",
+          "doThis": "Take visits, compare programs honestly, and confirm current roster and aid rules directly with each coach - the rules changed in 2025-26 (see below). Choose the school where you'd be happy even if running ended. Sign and finish strong."
+        }
+      ],
+      "divisions": "There are running programs across NCAA Divisions I, II, and III, plus NAIA and junior colleges - and a fast NAIA or D-III runner on a team that fits is far better off than a miserable one chasing a famous name. Important and current: the House v. NCAA settlement took effect in 2025-26 and replaced old per-sport scholarship limits with roster limits, so a school can offer full, partial, or no aid to any runner up to the roster cap. The reality hasn't changed much for distance runners: most get partial aid or none, full rides are rare, and academic money often matters more than athletic money. Ignore any old 'X scholarships per team' figure - confirm current limits for your division directly with the coach. Pick fit and academics over prestige every time."
+    },
+    "health": {
+      "injuries": "The common ones are overuse, not contact: stress fractures (often shin or foot), IT band syndrome, shin splints, plantar fasciitis, Achilles and runner's knee. Almost all of them come from doing too much too soon, running hard on tired legs, or under-fueling. Sharp, localized, or worsening pain - especially bone pain - means stop and see an athletic trainer or doctor, not run through it.",
+      "prevention": "Build mileage slowly (about 10% a week), keep easy days genuinely easy, and take your rest day. Strength work for hips, core, and calves twice a week, regular foam rolling and mobility, replacing shoes on schedule, and sleeping 8-10 hours do more to keep you healthy than any single workout. Listen to small aches early - they're cheap to fix and expensive to ignore.",
+      "fuel": "Fuel to grow, not to shrink. Endurance running burns a lot of energy, and your body needs enough food - carbs, protein, fats, plus iron and calcium-rich foods - to repair, adapt, and get faster. This is the part people get backwards: under-fueling doesn't make you faster, it directly CAUSES stress fractures, drains your energy, stalls your progress, and (for girls) can disrupt periods - a real warning sign called RED-S / the female athlete triad. Eat before runs, refuel after, drink water through the day. Strong and durable beats light and small, every season. There are no calorie or weight goals here - just eat enough and eat well.",
+      "note": "Growth and puberty are normal and good - your body is supposed to change, gain, and get stronger as you grow, and that's a sign of health, not a problem to fix. A bigger, stronger body is usually a faster, more durable one over time. Cross country has a real culture around leanness, and it's worth naming plainly: lighter is not a training goal, and no one should ever feel they must shrink to belong on a team. If eating or body image starts to feel anxious or controlling - counting, restricting, dreading meals, or tying your worth to a number - talk to a coach, parent, athletic trainer, or doctor. Reaching out early is strength, and it's how good runners stay runners."
+    },
+    "character": {
+      "trait": "Quiet consistency and respect for the work",
+      "model": "Eliud Kipchoge",
+      "why": "The marathon great is known less for any single win than for his discipline and humility - he logs the same easy miles in a simple training camp, sleeps and recovers like it's part of the job, and famously says 'only the disciplined ones are free.' He shows that greatness in distance running comes from showing up consistently, respecting recovery, and steady patient effort - not from shortcuts or trying to be the smallest runner on the line."
+    }
+  },
+  "swimming": {
+    "tagline": "Just you, the clock, and the water that doesn't lie.",
+    "overview": "Swimming is power and technique against the resistance of water and the honesty of a clock. There's a place for every kind of athlete: the explosive 50-freestyle sprinter, the gritty distance swimmer who eats up the 500 and the mile, the technical butterflyer, the strategic individual-medley racer who has to do all four strokes. You don't need a particular body type to belong here. Tall and short, lean and powerful, kids who grew early and kids still growing all swim fast. A body in a racing suit is an athlete's body, full stop. What matters is your stroke, your feel for the water, your work in training, and your willingness to show up to early practices when the pool is cold. The clock rewards the swimmer who put in the meters, not the one who looks a certain way.",
+    "season": {
+      "practice": "A typical practice opens with a dryland or in-water warm-up, then a main set built around your event group: sprinters do short, fast repeats with full rest; distance swimmers grind long aerobic sets; everyone drills stroke technique, starts off the blocks, flip turns, and underwater dolphin kicks. Sessions often close with a cool-down swim and some dryland core or mobility work. You'll log thousands of yards or meters in a single practice, with the coach calling intervals off the pace clock.",
+      "arc": "High school season usually runs late fall into winter, building from base conditioning toward a championship taper, where you cut back volume so you're rested and fast for the conference, sectional, and state meets. Many swimmers also swim club year-round (USA Swimming), with short-course season in winter and long-course in summer, peaking at championship meets. The whole year is shaped around resting hard at the right time so you can race fast when it counts.",
+      "commitment": "In season, expect 10-20+ hours a week between pool practices (often before school and after), meets that can fill a whole Saturday, and dryland work. Serious club swimmers train more. Rest days and recovery are part of the plan, not a break from it: your shoulders, your aerobic system, and your speed all rebuild during recovery. Skipping rest is how shoulder overuse and burnout start, so honor the easy days and the days off."
+    },
+    "progression": [
+      {
+        "stage": "Beginner",
+        "focus": "Get comfortable and safe in deep water and learn the four strokes well enough to swim a length of each. Master freestyle breathing on a rhythm, a basic flip turn, and how to read a pace clock. Learn meet basics: how heats and lanes work, what a false start is, and how to leave the blocks legally. The goal is clean fundamentals and your first honest times, not finished technique."
+      },
+      {
+        "stage": "Developing",
+        "focus": "Sharpen stroke technique so you stop fighting the water: a high elbow catch, a steady kick, streamlined push-offs, and underwater dolphin kicks off every wall. Build aerobic base through consistent yardage and learn to hold pace across a set. Start picking the events that suit you and add structured dryland strength and shoulder care."
+      },
+      {
+        "stage": "Intermediate",
+        "focus": "Train your main events with intent: race strategy, split times, turn and underwater work where races are won, and a reliable start. Know your best times and where they stand in your league and age group. Begin tracking the time standards that matter for your goals (sectionals, state cuts, recruiting times)."
+      },
+      {
+        "stage": "Advanced",
+        "focus": "Refine the small margins, the tenths of a second in your starts, turns, and finishes, that decide places at championship meets. Periodize training and taper so you peak when it matters, manage load to protect your shoulders, and race with a plan for every event. This is where nationally competitive times open college doors."
+      }
+    ],
+    "roles": {
+      "label": "Strokes, distances & relays",
+      "items": [
+        {
+          "name": "Freestyle",
+          "blurb": "The fastest stroke and the foundation of the sport. Ranges from the all-out 50 sprint to the 500 and the mile (1650) for distance swimmers. Rewards a strong catch, steady kick, and clean breathing."
+        },
+        {
+          "name": "Backstroke",
+          "blurb": "The only stroke raced on your back, starting in the water off the wall. Demands body position, a steady rhythm, and a great backstroke flip turn. Rewards swimmers with feel for staying flat and long."
+        },
+        {
+          "name": "Breaststroke",
+          "blurb": "The most technical stroke, built on timing: pull, breathe, kick, glide. A legal whip kick and tight streamline make or break it. Rewards patient swimmers who love refining a precise skill."
+        },
+        {
+          "name": "Butterfly",
+          "blurb": "The most physically demanding stroke, powered by a strong core and dolphin kick. Rhythm and timing matter more than brute force. Rewards athletes who can stay smooth when it's burning."
+        },
+        {
+          "name": "Individual Medley (IM)",
+          "blurb": "All four strokes in one race (200 or 400), swum fly, back, breast, free. Rewards the complete, versatile swimmer who has no glaring weakness and can manage a race across changing strokes."
+        },
+        {
+          "name": "Relays",
+          "blurb": "Where an individual sport becomes a team one: the 200/400 free relay and the 200/400 medley relay. Adds the pressure and thrill of clean exchanges, relay starts, and racing for teammates, not just yourself."
+        }
+      ]
+    },
+    "mental": "Swimming is honest to the point of being brutal: your time is just a number on a board, and there's nowhere to hide when you touch the wall. That's also what makes it fair. Pre-race nerves behind the blocks are normal even for Olympians; channel them with a fixed warm-up and a simple race cue (fast feet off the start, hold your stroke, finish through the wall). A bad swim is one race, not a verdict, and there's always another heat. The training is mentally hard too, staring at a black line for thousands of yards, so build the habit of staying present set by set. And even though you race alone, the team is real: you split relays, cheer the lanes next to you through the last 25, and warm up together at 6 a.m. Be the swimmer who claps loudest for a teammate's first best time.",
+    "getStarted": {
+      "steps": [
+        "Get water-confident and learn the strokes. Swim lessons or a learn-to-swim program at a pool, YMCA, or rec center is the right starting point if you're new, no shame in it at any age.",
+        "Learn to read a pace clock and swim a length of each of the four strokes. These basics let you join a practice without getting lost.",
+        "Get a physical. Nearly every school and club requires a current sports physical and signed forms before you can practice or compete.",
+        "Get simple gear to start: well-fitting goggles, a swim cap, and a practice suit. Borrow or buy used; you don't need a tech racing suit to begin.",
+        "Find a team or program and just show up to the first practice. Tell the coach you're new and ask which events might fit you."
+      ],
+      "findTeam": [
+        {
+          "venue": "High school swim team",
+          "how": "Ask your athletic office or find the swim coach about the season start (usually fall/winter) and physical requirements. Many high school teams have no cuts and welcome beginners, so the hardest part is showing up to that first practice."
+        },
+        {
+          "venue": "USA Swimming club team",
+          "how": "Use the USA Swimming club finder to locate a year-round team near you and attend a tryout or trial practice. This is the main pathway to nationally competitive times and college recruiting. Ask up front about cost, practice schedule, and how they develop swimmers."
+        },
+        {
+          "venue": "Summer / rec & YMCA leagues",
+          "how": "Summer swim leagues, YMCA teams, and parks-and-rec programs are lower-cost, lower-pressure, and a great place to start, race, and just love the water. Many fast swimmers began in a neighborhood summer league."
+        },
+        {
+          "venue": "Learn-to-swim & masters-style lessons",
+          "how": "If you're new to swimming entirely, start with group or private lessons at a local pool or YMCA to build water safety and stroke basics before joining a competitive team. It's the right, normal first step."
+        }
+      ]
+    },
+    "recruiting": {
+      "truth": "Be clear-eyed about the numbers: most high school swimmers don't go on to swim in college, and most who do receive partial aid, not a full ride. That's not a reason to quit, it's a reason to swim for the right reasons and keep your options open. The swimmers who get recruited have times, USA Swimming and high school times that meet a program's standards. That is the currency, and it's measured by the clock, not by how you look. Many more swimmers thrive in D2, D3, NAIA, and JUCO than in D1, and millions more swim for fitness and joy for life. Making college swimming your only definition of success is a setup for heartbreak; chase being the fastest, most complete version of your own swimmer, and let recruiting follow.",
+      "timeline": [
+        {
+          "when": "Freshman / Sophomore year",
+          "doThis": "Train consistently (high school plus club), find the events that suit you, and chase honest best times. Keep your grades strong, academics open as many doors and as much money as your times do. Keep a simple log of your verified times and the meets you swam."
+        },
+        {
+          "when": "Junior year",
+          "doThis": "Know the recruiting time standards for your events at the division levels that fit you. Email coaches with your best times (with the meet and date), your GPA and test scores, and your meet schedule. Junior-year times matter most, so race the meets where you can drop time."
+        },
+        {
+          "when": "Summer before senior year",
+          "doThis": "Swim long-course championship meets and college camps where target coaches can see you. Narrow your list by academic fit and team culture, not just name recognition, and follow up with coaches who showed interest."
+        },
+        {
+          "when": "Senior year",
+          "doThis": "Take official and unofficial visits, compare any aid offers honestly (athletic plus academic), and confirm your eligibility through the NCAA/NAIA process. Have a plan you're happy with even if the offer is partial or a walk-on spot."
+        }
+      ],
+      "divisions": "Aim for fit over prestige. Important: the rules changed for 2025-26 under the House v. NCAA settlement, which replaced the old per-team scholarship caps with overall roster limits, so a program can now give full, partial, or no aid to swimmers up to its roster limit. The old swimming scholarship counts you may see quoted are outdated, confirm the current limits for your division and gender with coaches when you start talking. In practice, full rides remain rare and most recruited swimmers get partial athletic aid often stacked with academic money. D1 has the deepest talent and the most pressure; D2, D3, NAIA, and JUCO all offer real competition and often a better athletics-academics balance. D3 gives no athletic scholarships but can stack generous academic and need-based aid at strong schools. JUCO is a real path to develop times and transfer up. The best program is the one where you'd be happy even if you got injured, because the academics, coaches, and people fit you."
+    },
+    "health": {
+      "injuries": "The most common issues are overuse, especially shoulder impingement and tendon irritation (\"swimmer's shoulder\") from the high volume of overhead strokes. Breaststrokers can develop knee irritation from the whip kick, and neck and lower-back strain show up from poor body position and a lot of yardage. Most of these trace back to doing too much too soon or training through fatigue.",
+      "prevention": "Build training volume gradually and never spike yardage after time off. Do regular dryland and shoulder-care work: rotator-cuff and scapular strengthening, core stability, and mobility. Keep your stroke technique clean, since most shoulder problems start with mechanics. Warm up before hard sets, respect rest and recovery days so tissue can adapt, and if a shoulder, knee, or back ache goes beyond normal soreness, get it checked early instead of swimming through it.",
+      "fuel": "Fuel to grow, not to shrink. Swimming burns a lot of energy, often two practices a day, so you need to eat plenty and eat well: balanced meals with carbohydrates for energy, protein to repair muscle, and lots of fruits, vegetables, and healthy fats. Eat a real meal a few hours before racing and refuel within an hour after hard training. Growth and puberty are normal and good; a growing athlete needs more food, not less. Hydrate through the day (yes, you sweat in the pool even when you can't feel it), and treat sleep as part of training, aim for 8-10 hours, because that's when your body actually adapts and gets faster.",
+      "note": "Swimming has no weight classes and no reason to manipulate your body. Strong and durable beats light or small every time: a powerful, well-fueled swimmer moves more water. Racing suits are tight by design and the pool exposes more of your body than most sports, which can feel uncomfortable, that's normal, and it never means your body needs to change. No body type is required to be fast, and fit with a team or program is about your interest and skill, never your size. If eating or body image starts to feel anxious or controlling, talk to a coach, parent, athletic trainer, or doctor. Asking for help early is strength, not weakness."
+    },
+    "character": {
+      "trait": "Resilience and humility",
+      "model": "Katie Ledecky",
+      "why": "Ledecky is one of the most dominant distance swimmers ever, yet she's known for an almost unglamorous love of the daily grind: thousands of meters, the same hard sets, showing up and out-working everyone with no drama. Teammates and coaches describe her as humble, gracious in winning and losing, and genuinely encouraging to younger swimmers. She models the truth that the boring, repeated work, the early practices and the meters no one sees, is what builds both a great racer and a great teammate."
+    }
+  },
+  "gymnastics": {
+    "tagline": "Power, grace, and discipline — one skill, then the next, then the next.",
+    "overview": "Gymnastics is one of the most technically demanding sports there is: you train strength, flexibility, air awareness, and nerve, then perform it under bright lights with judges watching every landing. It rewards patience and repetition more than almost any other sport — progress is measured in skills mastered, not seasons survived. There is no body type that \"belongs\" in gymnastics. Judges score what you DO — amplitude, form, control, and stuck landings — not how you look or how small you are. Power comes from being strong and well-fueled, and the gymnasts who last are the ones who grow into durable, capable bodies. Growing taller, getting stronger, and going through puberty are normal and good; they change how you train, but they do not end your gymnastics. If you love learning hard skills and chasing clean execution, this sport is for you.",
+    "season": {
+      "practice": "Club gymnastics is year-round. Lower levels train roughly 6-12 hours a week; competitive Levels 8-10 and elite often train 16-25+ hours across 4-6 days, split between strength/conditioning, event rotations, and routine run-throughs.",
+      "arc": "USAG competition season generally runs winter into spring (sectionals, state, regionals, and for top levels nationals), with summer and fall used to upgrade skills and build new routines. College season runs January through April.",
+      "commitment": "This is a high-hours sport, so rest is part of the plan, not a reward. Build in at least one full day off each week, protect 8-10 hours of sleep, and take real off-weeks after big meets. Wrists, ankles, and backs need recovery time — chronic soreness or pain that lingers is a signal to back off, not push through."
+    },
+    "progression": [
+      {
+        "stage": "Beginner (rec / USAG Level 1-3 or Xcel Bronze)",
+        "focus": "Basics on all four events: handstands, cartwheels, pullovers and casts on bars, straight-line walks and jumps on beam, rolls and round-offs on floor, plus daily flexibility and core. Learn how to fall and bail safely. The goal here is clean fundamentals, not big tricks."
+      },
+      {
+        "stage": "Developing (USAG Level 4-7 or Xcel Silver/Gold)",
+        "focus": "Real routines on each event, back handsprings, kips on bars, leaps and turns on beam and floor. Conditioning ramps up. You start to find which events click for you. Skill mastery — not size or weight — is what moves you up a level."
+      },
+      {
+        "stage": "Advanced (USAG Level 8-10)",
+        "focus": "Difficult, connected skills and full competitive routines: giants and release moves on bars, series and dismounts on beam, tumbling passes with twists on floor, more powerful vaults. Level 9-10 meet experience and a strong all-around (or one or two standout events) is what college coaches look for."
+      },
+      {
+        "stage": "Elite / collegiate",
+        "focus": "Elite is the international/Olympic track with its own qualifying system; college gymnastics is the more common end goal for most competitive club gymnasts. Both demand consistency under pressure, clean execution, and durability built over years."
+      }
+    ],
+    "roles": {
+      "label": "The four events (plus all-around)",
+      "items": [
+        {
+          "name": "Vault",
+          "blurb": "A few seconds of pure power and air awareness — sprint, hurdle, block off the table, and stick a blind landing. Rewards explosiveness and fearless commitment."
+        },
+        {
+          "name": "Uneven bars",
+          "blurb": "Swing, rhythm, and grip strength. Giants, transitions, release moves, and a controlled dismount. The most technical event for timing and air sense."
+        },
+        {
+          "name": "Balance beam",
+          "blurb": "Four inches of nerve. Acro series, leaps, turns, and dismounts performed with total control. Mental focus and consistency matter as much as the skills."
+        },
+        {
+          "name": "Floor exercise",
+          "blurb": "Tumbling passes, leaps, and dance to music — power and artistry together. Where personality and amplitude show, and where conditioning is tested most."
+        },
+        {
+          "name": "All-around",
+          "blurb": "Competing all four events and scoring across them. The all-arounder is versatile and consistent — strong everywhere, with no event left to chance."
+        }
+      ]
+    },
+    "mental": "Gymnastics is a confidence sport disguised as a physical one. You will spend months on a single skill, fall hundreds of times, and have meets where one wobble costs a podium — and you have to come back the next day and do it again. The mental game is learning to compete one event at a time, reset after a fall, and trust training when fear shows up (it will, especially on new skills and on beam). Talk openly with your coach about skills that scare you — pushing a terrified gymnast onto a skill is how injuries and \"the twisties\" happen. Celebrate the skill you stuck in practice, not just the score. The gymnasts who last are the ones who stay curious and patient, not the ones who never get scared.",
+    "getStarted": {
+      "steps": [
+        "Find a USA Gymnastics (USAG) member club near you and sign up for a beginner or rec class — no experience needed, and most clubs start kids and teens at the basics.",
+        "Go consistently and build the fundamentals: handstands, flexibility, core strength, and how to fall safely. These never stop mattering.",
+        "Ask your coach about the team or pre-team track once you're comfortable; they'll point you toward USAG Levels or the Xcel program based on your skills and goals.",
+        "Get the basics of safety dialed in — proper warm-up, listening to your body, and never trying big skills without a coach and mats. Fuel and sleep well so you have the energy to train.",
+        "Compete when you're ready. Local meets are low-pressure ways to learn how to perform, and they show you what to work on next."
+      ],
+      "findTeam": [
+        {
+          "venue": "Club / private gym (USAG or Xcel)",
+          "how": "The main pathway. Search 'USA Gymnastics member club' plus your town, call to ask about beginner classes and the team track, and visit to watch a practice before signing up."
+        },
+        {
+          "venue": "Rec center / YMCA",
+          "how": "Lower-cost intro classes for fundamentals and fun. Great for trying the sport before committing to a competitive club; ask the front desk about youth/teen gymnastics."
+        },
+        {
+          "venue": "School (high school team, where offered)",
+          "how": "Some states sanction high school girls' gymnastics — ask the athletic director. Where it exists you can compete for your school alongside or instead of club."
+        },
+        {
+          "venue": "Xcel program",
+          "how": "USAG's flexible, lower-hours competitive track. Ask any member club if they offer Xcel — it's a great fit for teens starting later or wanting to compete without elite-level hours."
+        }
+      ]
+    },
+    "recruiting": {
+      "truth": "Honest truth: most gymnasts do not compete in college, and that is completely okay. Gymnastics gives you discipline, body awareness, work ethic, and resilience that carry into the rest of your life whether or not you ever compete past your club years. College rosters are small, so chase the sport because you love learning hard skills — not only as a ticket somewhere.",
+      "timeline": [
+        {
+          "when": "Freshman / Level 8-ish",
+          "doThis": "Train consistently, keep your grades strong, and focus on clean execution. It's early — build skills and stay healthy rather than worrying about recruiting."
+        },
+        {
+          "when": "Sophomore",
+          "doThis": "Compete at Level 9/10 if you're on that track, start a simple highlight reel (full routines, not just big skills), and research college programs and academics that fit you."
+        },
+        {
+          "when": "Junior",
+          "doThis": "Reach out to college coaches with your reel, scores, and academics. Attend camps at schools you like. This is the key window — coaches watch juniors closely. Take official/unofficial visits."
+        },
+        {
+          "when": "Senior",
+          "doThis": "Finalize your list around fit — coaching, team culture, academics, and where you'd be happy if gymnastics ended tomorrow. Confirm any aid in writing and lock in your academics."
+        }
+      ],
+      "divisions": "Look for fit and academics over prestige. NCAA gymnastics (D1, D2, D3) and NAIA all offer paths, and a great team culture matters more than a famous name. On money: the rules changed for 2025-26 under the House v. NCAA settlement — old 'X scholarships per team' figures are outdated. Schools now operate under roster limits and can offer full, partial, or no athletic aid to athletes up to that limit. Most college athletes get partial aid or none, and full rides remain rare, so weigh academic scholarships and overall cost too. Always confirm current scholarship and roster rules for a specific division and school directly with that coach. (Related growing college pathways: Acrobatics & Tumbling and STUNT gained NCAA championship status starting in 2026 — worth a look if those styles appeal to you.)"
+    },
+    "health": {
+      "injuries": "Common areas are wrists, ankles, lower back, elbows, and knees, plus overuse issues like stress fractures from high-impact landings and repetitive loading. Most are manageable with smart training, good technique, and rest.",
+      "prevention": "Progressive skill development (no skipping steps), thorough warm-ups, wrist and ankle strengthening, proper landing mechanics, and matting/spotting on new skills. Don't train through pain — lingering or sharp pain means see an athletic trainer or doctor. Real rest days and enough sleep are prevention, not laziness.",
+      "fuel": "Fuel to grow and get strong, not to shrink. Gymnastics is powered by energy — eat ENOUGH, across regular meals and snacks, with carbs for power, protein for recovery, and plenty of water through long training sessions. Strong and durable beats light and small every single time; under-fueling steals the power your skills depend on and raises injury and stress-fracture risk. There are no calorie counts, macros, or weight goals here — just eating well and often enough to train hard and grow.",
+      "note": "Gymnastics has real, well-documented pressure around leanness and body image, so this part matters as much as any skill. Growing, gaining strength, and going through puberty are normal and good — they do not end your gymnastics; they change how you train, and good coaches adjust with you. Judges score skill and execution, never body size, and no body type is required to belong here. If eating or body image starts to feel anxious or controlling, talk to a coach, parent, athletic trainer, or doctor. Asking for help early is a strength, and you deserve support."
+    },
+    "character": {
+      "trait": "Resilience and grace under pressure",
+      "model": "Simone Biles",
+      "why": "Beyond being the most decorated gymnast in history, Biles is widely respected for what she modeled in 2021: she stepped back at the Tokyo Olympics when she lost her air awareness ('the twisties'), openly prioritizing her safety and mental health over a medal — then returned to win again. She showed that listening to your body and mind, asking for help, and protecting yourself are signs of strength, not weakness. For a sport with real wellbeing pressures, that's exactly the example worth following."
+    }
+  },
+  "cheerleading": {
+    "tagline": "A team that builds people into the air and catches them every time.",
+    "overview": "Cheerleading is a real athletic sport that blends tumbling, stunting, jumps, and synchronized performance into one routine where every person has a job and the whole thing falls apart if anyone skips theirs. There is a place for every kind of athlete here: the powerful base who holds a teammate overhead, the flyer with the air awareness and trust to be up there, the tumbler who throws passes across the floor, the back spot who runs the stunt and protects everyone's safety. You do not need a particular body type, and no one should ever tell you that you do. Strong bases and strong flyers are both built by training hard and fueling well, and the fit between you and a role is about your interest, your skill, and what the team needs, never about your size. This is a trust sport: you literally put your body in your teammates' hands, and they put theirs in yours.",
+    "season": {
+      "practice": "A typical practice opens with a dynamic warmup and conditioning, then splits into stations: tumbling lines (back handsprings, layouts, full passes), stunt groups drilling load-ins and dismounts with spotters, jump technique, and finally putting sections of the routine together to count and music. Safety is built in, not bolted on: stunts progress only when the group has the previous skill clean, and spotters stay engaged every rep. Expect to rep the same eight counts until the timing is automatic for all twenty-some people at once.",
+      "arc": "School cheer often runs across the year: a fall sideline season for football, a winter season for basketball, and for competitive squads a competition season that peaks at regional and national championships in late winter and spring. All-Star (club) cheer runs a competition season from roughly late summer through April, ending at big national events. Tryouts are usually in spring for the next school year. Early weeks build conditioning and clean fundamentals; mid-season is about cleaning the routine; the peak is competition day, where a two-and-a-half-minute routine is the whole season.",
+      "commitment": "In season expect roughly 10-15+ hours a week between practice, games or competitions, and travel, more on a serious All-Star or competitive school squad. Rest days are part of training, not time off: your wrists, ankles, shoulders, and nervous system recover and get stronger on the days you are not pounding tumbling passes. Skipping rest is how overuse injuries and burnout start. Build in at least one or two genuine rest or light days a week, and treat sleep as part of the program."
+    },
+    "progression": [
+      {
+        "stage": "Beginner",
+        "focus": "Build body control and trust before height. Learn a solid forward and backward roll, cartwheel, round-off, and bridge; develop core and shoulder strength; and learn the sharp, full-body motions and clean jumps (toe touch, hurdler) that make a routine look crisp. In stunts, learn to base and back-spot a simple two-person or thigh-stand stunt with proper grips and a spotter. Learn the counts and how to perform to a crowd."
+      },
+      {
+        "stage": "Developing",
+        "focus": "Add a standing back handspring and a round-off back handspring with confidence, and clean up jump technique (height, pointed toes, timing). In stunting, progress to extension-level stunts and basic dismounts as a group, with everyone solid on their role. Flyers build the body tension and air awareness to hold positions; bases and back spots build the strength and footwork to hold and absorb."
+      },
+      {
+        "stage": "Intermediate",
+        "focus": "Develop tumbling toward a layout and connected passes (round-off back handspring tuck), and contribute to harder stunts and basket tosses with clean technique. Learn to hit a full routine with stamina so your last eight counts look like your first. Start mentoring newer teammates on the skills you have mastered."
+      },
+      {
+        "stage": "Advanced",
+        "focus": "Specialize where you excel (elite tumbler, base, flyer, or back spot) while staying a reliable all-around teammate. Throw advanced passes (full twisting layouts) or anchor complex pyramids and tosses with the consistency a routine demands. At this level, leadership, consistency under pressure, and protecting your group's safety matter as much as the hardest skill."
+      }
+    ],
+    "roles": {
+      "label": "Roles",
+      "items": [
+        {
+          "name": "Base",
+          "blurb": "The strength and foundation of every stunt. Bases hold, lift, and catch the flyer using legs, core, and technique, not just arms. Footwork, timing, and communication keep the stunt and the flyer safe. Strong bases are built by training and fueling well."
+        },
+        {
+          "name": "Flyer",
+          "blurb": "The athlete lifted into the air to hit positions and get tossed and caught. Flying takes body tension, balance, air awareness, and real courage to trust the group below. There is no required size to fly, and no one should be pressured to shrink to do it; good technique from the whole group is what makes it safe."
+        },
+        {
+          "name": "Back spot",
+          "blurb": "The leader and safety anchor of the stunt group. The back spot calls the counts, supports the flyer's ankles and waist, watches the whole stunt, and is responsible for protecting the flyer's head and neck on any dismount or fall. Often the most experienced person in the group."
+        },
+        {
+          "name": "Tumbler",
+          "blurb": "The athlete who throws the floor passes, from round-offs and handsprings to layouts and fulls. Tumbling is power, timing, and fearless repetition built progressively over time with proper coaching and matting."
+        },
+        {
+          "name": "Jumper / dancer",
+          "blurb": "Every cheerleader performs the jumps (toe touches, pikes, hurdlers) and dance sections in sync. Sharp motions, height, and timing across the whole squad are what make a routine look clean and powerful to judges and crowds."
+        }
+      ]
+    },
+    "mental": "Cheerleading is a sport where one person's missed count or late catch affects everyone, so the mental game is about trust and ownership. You will drop stunts, fall out of tumbling passes, and have rough practices, sometimes right before a competition. The athletes who get better have a short memory: reset, communicate, and run it again. Performing in front of a crowd or judges brings real nerves; channel them into your routine and your counts so your body does what it has drilled a thousand times even when your head is loud. Being a good teammate is a skill you practice on purpose here: spot every rep like it matters, own your mistakes instead of blaming your group, hype up the teammate who is struggling with a skill, and keep your energy up even when you are tired. The squads that win are the ones where everyone protects each other, on the mat and off it.",
+    "getStarted": {
+      "steps": [
+        "Build a base of strength and body control first: core, shoulders, and legs, plus basic tumbling like rolls, cartwheels, and a round-off. A tumbling class at a local gym is the fastest safe start.",
+        "Learn the motions and jumps. Sharp arm motions and clean jumps (toe touch, hurdler) are half of what makes a cheerleader look polished, and you can practice them anywhere.",
+        "Take a beginner stunt or cheer class so you learn grips, spotting, and safety from a coach before ever trying skills on your own. Never teach yourself stunting or tumbling off videos.",
+        "Watch routines with intent: notice how bases, flyers, and back spots move together, and how the whole squad stays in sync.",
+        "Find a school squad, All-Star gym, or rec program and try out or sign up. Show up coachable, in shape, and ready to learn your role."
+      ],
+      "findTeam": [
+        {
+          "venue": "School squad",
+          "how": "Ask your athletic office or a current cheerleader when tryouts are (usually spring for the next school year). Show up knowing basic motions, jumps, and any tumbling you have, ready to learn a short routine on the spot. Many schools have JV and varsity levels, plus separate sideline and competitive squads, so there is often a spot to grow into."
+        },
+        {
+          "venue": "All-Star / club gym",
+          "how": "Search for All-Star cheer gyms in your area and ask about evaluations or beginner teams. All-Star is the fastest skill-building pathway and runs leveled teams (1 through 6) so beginners and elite athletes both have a place. Ask about cost, travel, and time commitment up front, since competitive All-Star can be a big investment."
+        },
+        {
+          "venue": "Rec & community programs",
+          "how": "Check your local parks-and-rec, YMCA, or youth cheer league for lower-cost, lower-pressure squads, often tied to youth football. A great place to start, learn basics, and find out if you love it before committing to a bigger program."
+        },
+        {
+          "venue": "Tumbling & stunt classes",
+          "how": "Most gymnastics and All-Star gyms offer drop-in tumbling and stunt clinics with no team commitment. These build the exact skills tryouts look for and teach them safely with coaches and proper matting."
+        }
+      ]
+    },
+    "recruiting": {
+      "truth": "Be honest with yourself about the numbers: most high school cheerleaders do not cheer in college, and that is completely fine. The strength, discipline, teamwork, and confidence you build here outlast the sport. For those who want to continue, the pathways are real and growing, but they are competitive and most athletes who continue get partial aid or none. Traditional sideline and competitive cheer at many colleges is funded as an activity or club rather than a full athletic scholarship, while the closely related collegiate sports give a clearer scholarship and recruiting path. Cheer for the love of it and the team, do the work, and let the next step follow, rather than making a college roster the only measure of whether it was worth it.",
+      "timeline": [
+        {
+          "when": "Freshman / Sophomore year",
+          "doThis": "Build skills and keep your grades strong. Get consistent tumbling and stunting through a school squad or All-Star gym, and start a simple record of your skills (tumbling passes, stunt positions, All-Star level). Academics open doors and money that athletics alone will not."
+        },
+        {
+          "when": "Junior year",
+          "doThis": "Decide which pathway fits: sideline/competitive college cheer, or the NCAA sports Acrobatics & Tumbling or STUNT. Make a skills video, research programs that fit you academically, and email coaches with your skills, your level, your GPA, and a clip. Visit programs if you can."
+        },
+        {
+          "when": "Summer before senior year",
+          "doThis": "Attend college cheer or A&T/STUNT clinics and prospect camps where coaches evaluate athletes directly. Narrow your list by academic fit, cost, and team culture, not just name recognition, and follow up with any coach who showed interest."
+        },
+        {
+          "when": "Senior year",
+          "doThis": "Lock in tryouts or visits, compare any aid offers honestly (athletic plus academic plus need-based), and confirm you have the grades and skills for both admission and the team. Have a plan you are happy with even if the spot is a walk-on or partial."
+        }
+      ],
+      "divisions": "The college landscape changed in 2025-26, so confirm current rules with coaches rather than relying on older scholarship numbers. Under the House settlement, sport-by-sport scholarship caps were replaced by roster limits, meaning a school can offer full, partial, or no scholarship to athletes up to a team's roster size; full rides are rare in most sports and partial aid or none is the norm. Traditional sideline and competitive cheer is still not an NCAA championship sport and is often funded as an activity, with limited and school-dependent aid. The two closely related collegiate sports, Acrobatics & Tumbling and STUNT, were elevated to NCAA championship status beginning in 2026 and are real, growing pathways with clearer recruiting structures. Across all of it, pick the school where you will get a degree you want, afford it, and be happy even if you stopped competing. Fit and academics beat prestige every time."
+    },
+    "health": {
+      "injuries": "The common ones are ankle and wrist sprains from tumbling and landings, knee injuries (including ACL), and concussions from stunt and basket-toss falls, which are the most serious risk in the sport. Overuse injuries in the wrists, shoulders, and lower back climb when athletes pound tumbling without enough rest.",
+      "prevention": "Safety comes from technique and progression, not from anyone being smaller. Always warm up dynamically, and only attempt stunts and tumbling skills you have earned, with trained spotters and proper matting; never skip steps to rush a skill. Strengthen ankles, wrists, core, and shoulders so your joints can absorb landings, and drill safe landing and dismount mechanics. Good technique from the whole stunt group, not a lighter flyer, is what makes stunts safe. Respect rest and recovery days so tissue can adapt, and replace worn shoes.",
+      "fuel": "Fuel your body to grow and get stronger, not to shrink it. This is the sport where you may hear pressure about a flyer's weight, so be clear: no one should ever push a flyer to lose weight, and strong, well-fueled bases and flyers are what make stunting safe. Eat enough across the whole day, with balanced meals: carbohydrates for energy, protein to repair muscle, and plenty of fruits, vegetables, and healthy fats. Hydrate before, during, and after practice, especially in hot gyms, and aim for a full night of sleep (8-10 hours for teens), which is when your body actually adapts and gets stronger. Strong and durable beats light or small, every time.",
+      "note": "Take every head impact seriously: if you fall or get hit and feel dizzy, foggy, or headachy, sit out and tell a coach, parent, or athletic trainer; never hide a suspected concussion to stay in a routine. And know that growing and going through puberty are normal and good, not problems to fix; your body changing is part of becoming a stronger athlete. If eating or body image ever starts to feel anxious or controlling, talk to a coach, parent, athletic trainer, or doctor. Asking for help early is strength, not weakness."
+    },
+    "character": {
+      "trait": "Trust and team-first selflessness",
+      "model": "Sydney McLaughlin-Levrone",
+      "why": "The Olympic champion hurdler is widely respected for the way she carries herself: humble in victory, gracious in defeat, and consistent about crediting her team, coaches, and family rather than herself. She models the exact mindset cheerleading demands, that the work is shared, that you protect and lift the people around you, and that how you treat your teammates matters as much as the skills you can throw. Her steady, no-drama character under enormous pressure is a model for any young athlete in a trust-based team sport."
+    }
+  },
+  "football": {
+    "tagline": "Eleven players, one assignment each, every snap.",
+    "overview": "Football is a game of leverage, technique, and trust: eleven players each doing one job so the play works. The myth is that you have to be the biggest kid on the field. The truth is there is a role for nearly every build and temperament. Lean and fast plays receiver or corner; quick and tough plays running back or linebacker; smart and patient quarterbacks the offense; strong and disciplined anchors the line; a precise foot kicks and punts. What every spot rewards is the same: knowing your assignment, playing low and under control, and competing on every down. You earn a place here with skill, effort, and how coachable you are, never with a number on a scale.",
+    "season": {
+      "practice": "A typical practice opens with a dynamic warmup and form-tackling or ball-handling fundamentals, then breaks into position groups: linemen work hand placement and footwork, skill players run routes and coverage, the quarterback and receivers time throws. It builds to team periods, install of that week's plays, and situational work (red zone, two-minute, special teams), often closing with conditioning. Safe tackling and blocking technique get drilled constantly, at every level.",
+      "arc": "Summer brings weight room, 7-on-7, and a preseason camp where the team installs its system and earns conditioning. The regular season runs late summer into fall, usually one game a week (often Friday nights) with practice most other days and a film session. It builds toward conference play and then a playoff bracket. Off-season is strength work, speed and agility, and skill development, with rest built in.",
+      "commitment": "In season, expect 12-18+ hours a week between practices, the game, travel, film study, and special teams. Off-season strength and speed work adds more if you choose to put it in. Rest days are part of the program, not a reward for finishing it: muscle, joints, and your nervous system rebuild during sleep and recovery, and skipping rest is how soft-tissue injuries and burnout start. One full day off a week is normal and smart."
+    },
+    "progression": [
+      {
+        "stage": "Beginner",
+        "focus": "Learn the rules, the positions, and your stance. Get the fundamentals of a safe, heads-up tackle (eyes up, never lead with the crown of your helmet), a basic block with proper hand placement, and how to catch with your hands away from your body. Learn one position's assignment well before trying to learn them all."
+      },
+      {
+        "stage": "Developing",
+        "focus": "Build position-specific technique: route running and ball security, pad level and footwork on the line, backpedal and breaks for defensive backs, reading your keys at linebacker. Start learning the playbook and the why behind assignments. Add general strength and speed work appropriate for your age."
+      },
+      {
+        "stage": "Intermediate",
+        "focus": "Play faster by thinking less: recognize fronts and coverages, diagnose plays pre-snap, and trust your technique under contact. Sharpen your craft (release moves, hand combat, tackling angles) and study film to fix habits. Become reliable on special teams, which is real playing time and value."
+      },
+      {
+        "stage": "Advanced",
+        "focus": "Master a position at a high level while understanding the whole scheme. Win your one-on-one matchup consistently, communicate and lead your unit, and impact winning in ways the stat sheet misses: a perfect block, a leverage tackle, a checked protection. This is the level that earns trust and, for some, college looks."
+      }
+    ],
+    "roles": {
+      "label": "Positions",
+      "items": [
+        {
+          "name": "Quarterback (QB)",
+          "blurb": "The decision-maker. Runs the offense, reads the defense, and delivers the ball on time. Lives on accuracy, processing speed, leadership, and poise under pressure, not arm strength alone."
+        },
+        {
+          "name": "Running back & receiver",
+          "blurb": "The ball handlers. Backs run, block, and catch on vision, balance, and ball security; receivers and tight ends win with crisp routes, reliable hands, and separation. Precise, decisive athletes."
+        },
+        {
+          "name": "Offensive line (T, G, C)",
+          "blurb": "The unsung anchors. Protect the quarterback and open running lanes with footwork, hand placement, and leverage. The most team-first spot on the field: no stats, just trust and technique."
+        },
+        {
+          "name": "Defensive line / Edge",
+          "blurb": "The disruptors. Beat blocks, set the edge, rush the passer, and stuff the run with hand combat and explosiveness. Leverage and effort beat raw size here."
+        },
+        {
+          "name": "Linebacker",
+          "blurb": "The defense's quarterback. Reads plays, fills gaps, covers, and tackles in space. Rewards instincts, communication, and players who love to read and react."
+        },
+        {
+          "name": "Defensive back & specialists",
+          "blurb": "DBs cover, break on the ball, and tackle in the open field on footwork and a short memory. Kickers, punters, and snappers win field position on pure technique and nerve, a real path onto the team."
+        }
+      ]
+    },
+    "mental": "Football is a game of short memory and the next play. You will get beat on a rep, miss a tackle, drop a pass, sometimes under Friday-night lights with a crowd watching. What separates good players is how fast they reset: eyes up, learn it on the sideline from film, and go win the next snap. Nerves before a game are normal even for starters; channel them into your routine and your assignment so your body knows what to do when your head is loud. This is the ultimate team sport: your job only works if ten others do theirs, so being a good teammate is a skill you practice on purpose. Talk on defense, finish your block for the guy with the ball, lift the freshman, own your mistake instead of pointing at someone else. Coaches recruit character, and teammates remember who they could count on.",
+    "getStarted": {
+      "steps": [
+        "Get a physical and the paperwork done early. Nearly every program requires a current sports physical and signed forms before you can practice or hit.",
+        "Learn the game with intent: watch film and live games noticing assignments, leverage, and where players line up, not just the ball.",
+        "Get in football shape over the summer: general strength, speed, agility, and conditioning. Show up to camp ready to compete, not to get into shape on day one.",
+        "Pick a position to start and learn its fundamentals and one assignment cold. Tell a coach you're new and ask where your speed, size, and instincts fit best.",
+        "Don't sleep on special teams. It's real playing time and the fastest way for a new player to earn the field and the coaches' trust."
+      ],
+      "findTeam": [
+        {
+          "venue": "School team",
+          "how": "Ask your athletic office or a PE teacher when football starts; summer camp and tryouts usually begin weeks before fall classes. Most schools have freshman, JV, and varsity levels, so there's often a spot to grow into. Show up in shape, knowing the basics, ready to be coached."
+        },
+        {
+          "venue": "Youth & club leagues",
+          "how": "For younger or newer players, look up Pop Warner, American Youth Football, or local Parks & Rec tackle and flag leagues. These teach fundamentals and safe technique in age- and often weight-grouped divisions, a lower-pressure place to learn the game."
+        },
+        {
+          "venue": "Flag football",
+          "how": "A fast-growing, non-contact way to learn football's skills and IQ with far less injury risk. Check school clubs, rec leagues, and the NFL FLAG network. Girls' flag football is now a sanctioned high school sport in a growing number of states and an emerging college pathway."
+        },
+        {
+          "venue": "7-on-7 & camps",
+          "how": "Off-season 7-on-7 (passing-game, no linemen) and position camps build skill and get skill-position players seen. Search local programs and college-run camps, and ask about cost and travel up front. Great for development and exposure once you know your position."
+        }
+      ]
+    },
+    "recruiting": {
+      "truth": "Be honest with yourself about the numbers: only a small share of high school football players, well under one in ten, ever play in college, and a tiny fraction of those play at the highest level on a full scholarship. That isn't a reason to quit; it's a reason to play for the right reasons and keep your options open. Far more players find a great home in D2, D3, NAIA, and JUCO, and most who love the game move on to coaching, refereeing, intramurals, or just being a fan with stories. College football is a worthy goal; making it your only measure of success sets you up for heartache. Chase being the best, most coachable version of your game, take care of your grades, and let recruiting follow.",
+      "timeline": [
+        {
+          "when": "Freshman / Sophomore year",
+          "doThis": "Play, learn your position, and lift and run to build a healthy athletic base. Keep your grades strong from day one. Academics open doors and money that football alone won't, and stay eligible: ineligible players don't get recruited."
+        },
+        {
+          "when": "Junior year",
+          "doThis": "This is the big year. Build a highlight film from game tape, get verified athletic testing if you can, and email coaches at programs that fit you academically and athletically. Attend camps to be evaluated in person. Be realistic about which level matches your film."
+        },
+        {
+          "when": "Summer before / Senior year",
+          "doThis": "Take visits, narrow your list by fit (playing time, major, coaching staff, cost, where you'd actually be happy), and finalize academic eligibility through the NCAA or NAIA clearinghouse. Keep your senior film and grades up; offers can come late."
+        },
+        {
+          "when": "Throughout",
+          "doThis": "Stay coachable, durable, and a leader. Coaches recruit character and ask around: a reputation as a great teammate and a hard worker can matter as much as your stat line."
+        }
+      ],
+      "divisions": "The recruiting rules changed in 2025-26. Under the House v. NCAA settlement, the old per-team scholarship caps are gone, replaced by roster limits (football's is set at 105), and a school can offer any athlete a full, partial, or no scholarship up to that roster limit. What that means for you: most college players get partial aid or none, and full rides remain rare and competitive, so don't treat any old 'X scholarships per team' figure as current, and confirm the rules for your division with coaches directly. D1 (FBS and FCS) is the highest level and the hardest to reach. D2 and NAIA often blend partial athletic money with academic aid. D3 offers no athletic scholarships but strong academic and need-based aid at often-excellent schools. JUCO is a real path to develop, fix grades, and transfer up. The smartest move is to pick the level and school where you'll actually play, get a degree you want, and afford it. Fit and academics beat prestige every time."
+    },
+    "health": {
+      "injuries": "Football carries real contact risk: concussions, sprains and ligament tears in the knee (ACL/MCL) and ankle, shoulder injuries and stingers, and the bumps and bruises of a contact sport. Heat illness is a serious preseason risk. Overuse injuries climb when players skip rest and recovery.",
+      "prevention": "Technique is your best protection: drill heads-up, see-what-you-hit tackling and proper blocking, and never lead with the crown of your helmet. Always warm up and build flexibility, strength, and especially neck and core strength. Make sure your helmet and pads fit and are worn correctly every rep. Hydrate and acclimate carefully in summer heat to prevent heat illness, and respect rest days so your body adapts and durable strength sticks.",
+      "fuel": "Fuel to grow and get strong, not to hit a number on the scale. Your body is still developing, and growth and puberty are normal and good; let your size come on its own timeline. Eat enough across the day, real, balanced meals with carbs for energy, protein to repair and build muscle, plus fruits, vegetables, and healthy fats, and hydrate well, especially in the heat. Strength and durability are built in the weight room and the kitchen over time, never by force-bulking or chasing pounds fast. Strong and durable beats simply heavier or bigger, and sleep (8-10 hours for teens) is where you actually get better.",
+      "note": "Take any head contact seriously, this is the most important rule in football. If you take a hard hit or collision and feel dizzy, foggy, slow, or have a headache or blurry vision, come out and tell a coach, parent, or athletic trainer right away. Never hide a suspected concussion or talk your way back in; there is no toughness award for it, and a brain needs time to heal. Linemen sometimes feel pressure to 'bulk up' fast, ignore it: build strength the healthy way with training, eating enough good food, and sleep, and never make weight a goal. If eating or body image ever starts to feel anxious or controlling, talk to a coach, parent, athletic trainer, or doctor."
+    },
+    "character": {
+      "trait": "Discipline and team-first leadership",
+      "model": "Peyton Manning",
+      "why": "Manning was famous for preparation, not flash: he out-studied everyone, knew his assignments and his teammates' cold, and made the players around him better. He treated linemen, backups, and staff with respect, owned his mistakes, and let relentless work and accountability define him. He's a model for the truth that the unseen work, film study, mastering your assignment, and showing up the same way every day, is what builds a great player and a leader teammates trust."
+    }
   }
 };
 
