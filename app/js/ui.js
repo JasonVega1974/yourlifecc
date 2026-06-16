@@ -1709,8 +1709,11 @@ function handleTabAction(action){
       else if(typeof openSettings === 'function') openSettings();
       break;
     case 'profile':
-      if(typeof openProfileSwitcher === 'function') openProfileSwitcher();
-      else if(typeof renderProfileSwitcher === 'function') renderProfileSwitcher();
+      // Open the real profile editor (#profileModal, misc.js). The old switcher
+      // path (openProfileSwitcher = undefined; renderProfileSwitcher early-
+      // returns since #profileSwitcher/#profileTabs were removed ~v150) opened
+      // nothing — this revives the orphaned, fully-built modal.
+      if(typeof openProfile === 'function') openProfile();
       break;
     case 'sign-out':
       if(typeof signOut === 'function') signOut();
