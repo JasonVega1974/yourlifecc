@@ -1387,6 +1387,39 @@ function populateParentChildSelect(){
     opt.textContent = D.name || 'Current Child';
     sel.appendChild(opt);
   }
+  if(typeof renderParentChildCards === 'function') renderParentChildCards();
+}
+
+// Parent Hub child cards (replaces the "Viewing:" dropdown strip). One card per
+// child profile (!isParent); tapping calls switchParentView() unchanged. The
+// active card reflects _activeProfileId and re-highlights automatically because
+// renderParentDash() -> populateParentChildSelect() -> this runs on every switch.
+function renderParentChildCards(){
+  const host = document.getElementById('parentChildCards');
+  if(!host) return;
+  const kids = (_profiles || []).filter(function(p){ return !p.isParent; });
+  if(!kids.length){
+    host.innerHTML = '<div class="pcc-empty">No children added yet</div>';
+    return;
+  }
+  host.innerHTML = kids.map(function(p){
+    const initial = ((p.name || '?').trim().charAt(0) || '?').toUpperCase();
+    const color = _pccColor(p.id);
+    const active = (p.id === _activeProfileId) ? ' active' : '';
+    return '<button type="button" class="pcc-card' + active + '" onclick="switchParentView(\'' + p.id + '\')" aria-label="View ' + escapeHtml(p.name) + '"' + (active ? ' aria-current="true"' : '') + '>'
+      + '<span class="pcc-av" style="background:' + color + ';" aria-hidden="true">' + escapeHtml(initial) + '</span>'
+      + '<span class="pcc-name">' + escapeHtml(p.name) + '</span>'
+    + '</button>';
+  }).join('');
+}
+
+// Deterministic avatar color from the profile id (stable per child, order-agnostic).
+function _pccColor(id){
+  const colors = ['#38bdf8','#22c55e','#f5a623','#f472b6','#a78bfa','#22d3ee','#ef4444'];
+  const s = String(id || '');
+  let h = 0;
+  for(let i=0;i<s.length;i++){ h = (h * 31 + s.charCodeAt(i)) >>> 0; }
+  return colors[h % colors.length];
 }
 
 function switchParentView(profileId){

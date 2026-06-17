@@ -11167,3 +11167,33 @@ html.flatnav .app-menu-label{ display:none !important; }
   .fl-card{ transition:none; }
   .fl-card:hover{ transform:none; }
 }
+
+/* ── Parent Hub child selector cards (replaces the "Viewing:" dropdown) ──
+   Built by renderParentChildCards() in email.js; one card per child profile.
+   Active card reflects _activeProfileId. */
+.pcc-row{ display:flex; gap:.6rem; flex-wrap:wrap; align-items:flex-start; }
+.pcc-card{
+  display:flex; flex-direction:column; align-items:center; gap:.4rem;
+  background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08);
+  border-radius:12px; padding:.6rem .7rem; min-width:72px; cursor:pointer;
+  font-family:var(--fm);
+  transition:transform .12s ease, border-color .12s ease, background .12s ease;
+}
+.pcc-card:hover{ background:rgba(255,255,255,.06); }
+.pcc-card:active{ transform:scale(.97); }
+.pcc-card.active{ border-color:var(--c); background:rgba(56,189,248,.1); }
+.pcc-av{ width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.1rem; font-weight:800; color:#fff; }
+.pcc-name{ font-size:.72rem; font-weight:700; color:var(--tx2); max-width:84px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pcc-card.active .pcc-name{ color:var(--tx); }
+.pcc-empty{ font-size:.78rem; color:var(--tx3); padding:.5rem .2rem; }
+
+/* Light mode */
+:root.light .pcc-card{ background:rgba(15,23,42,.03); border-color:rgba(15,23,42,.1); }
+:root.light .pcc-card:hover{ background:rgba(15,23,42,.06); }
+:root.light .pcc-card.active{ background:rgba(56,189,248,.12); }
+
+/* Reduced motion */
+@media (prefers-reduced-motion:reduce){
+  .pcc-card{ transition:none; }
+  .pcc-card:active{ transform:none; }
+}

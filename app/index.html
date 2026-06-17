@@ -15773,9 +15773,11 @@
     </div>
 
     <!-- CHILD SELECTOR (always visible at top) -->
-    <div class="ph-view-row" style="background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.1);border-radius:10px;padding:.5rem .8rem;margin-bottom:.7rem;display:flex;align-items:center;gap:.5rem;">
-      <span style="font-size:.75rem;font-weight:700;">👤 Viewing:</span>
-      <select id="parentChildSelect" onchange="switchParentView(this.value)" style="flex:1;font-size:.8rem;font-weight:700;"></select>
+    <div class="ph-view-row" style="margin-bottom:.7rem;">
+      <!-- #parentChildSelect kept in the DOM (hidden) for JS that still
+           references it; the card row below is the new UI layer. -->
+      <select id="parentChildSelect" onchange="switchParentView(this.value)" style="display:none;"></select>
+      <div id="parentChildCards" class="pcc-row"></div>
     </div>
 
     <!-- LEFT NAV + RIGHT CONTENT LAYOUT -->
