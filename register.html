@@ -468,10 +468,15 @@ async function applyCoupon(){
 function updateOrderSummary(){
   const plan = sponsorData ? 'sponsored' : selectedPlan;
   if(!PLAN_INFO[plan]) return;
-  document.getElementById('osPlan').textContent = PLAN_INFO[plan].name;
+  const osPlan = document.getElementById('osPlan');
+  if(osPlan) osPlan.textContent = PLAN_INFO[plan].name;
   // Discount preview removed — Stripe shows the true final amount at checkout.
-  document.getElementById('discountRow').style.display='none';
-  document.getElementById('osPrice').textContent = PLAN_INFO[plan].price;
+  // discountRow was removed from the markup; guard so its absence can't crash
+  // the coupon flow (was: Cannot read properties of null reading 'style').
+  const discountRow = document.getElementById('discountRow');
+  if(discountRow) discountRow.style.display='none';
+  const osPrice = document.getElementById('osPrice');
+  if(osPrice) osPrice.textContent = PLAN_INFO[plan].price;
 }
 
 function selectPlan(plan){
