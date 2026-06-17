@@ -11100,3 +11100,70 @@ body:has(#s-parent.sec.active #parentCelestialHome:not(.pch-entered):not(.pch-cl
 .lr-gchart__draw{stroke-dasharray:1;stroke-dashoffset:0;animation:lrGchartDraw 1.5s ease-out;}
 :root.light .lr-gchart [fill="#64748b"]{fill:#475569;}
 @media (prefers-reduced-motion:reduce){.lr-gchart__draw{animation:none;stroke-dasharray:none;}}
+
+/* ════════════════════════════════════════════════════════════════════════
+   Entry-redesign Phase 2 — flat nav (flag-gated via html.flatnav)
+   ADDITIVE + REVERSIBLE. Without the ylcc_entry_gate flag, <html> has no
+   .flatnav class and NONE of these rules apply - the existing users see
+   today's sidebar + mobile quick row byte-for-byte. With the flag on, the
+   sidebar + #mobileQuickRow + hamburger hide, main content reflows full-
+   width, the top bar carries the wordmark + Switch Profile, and the Home
+   card launcher replaces the legacy destination list. Phase 3 deletes the
+   hidden machinery; this phase only hides it.
+   ════════════════════════════════════════════════════════════════════════ */
+/* Desktop: hide sidebar, reflow main content, full-width top bar */
+html.flatnav #sidebar,
+html.flatnav #sideOverlay,
+html.flatnav #sideExpandTab{ display:none !important; }
+html.flatnav #mainWrap{ margin-left:0 !important; width:100vw !important; }
+html.flatnav #topQuickBtns{ left:0 !important; }
+
+/* Top-bar wordmark (desktop) - hidden unless flatnav */
+#tqbWordmark{ display:none; }
+html.flatnav #tqbWordmark{ display:flex; flex-direction:column; justify-content:center; margin-right:auto; line-height:1; }
+#tqbWordmark .tqb-mark{ font-family:var(--fh); font-size:1.15rem; letter-spacing:.13em; color:var(--c); }
+#tqbWordmark .tqb-sub{ font-size:.6rem; letter-spacing:.12em; color:var(--mt); margin-top:.15rem; }
+
+/* Switch Profile button - only under flatnav (depends on the gate picker) */
+.switch-prof-btn{ display:none; }
+html.flatnav .switch-prof-btn{ display:inline-flex; align-items:center; gap:.3rem; }
+
+/* Mobile: hide the quick row + hamburger; reveal the mBar flat controls */
+html.flatnav #mobileQuickRow{ display:none !important; }
+html.flatnav .hamb{ display:none !important; }
+#mBarFlatBtns{ display:none; }
+html.flatnav #mBarFlatBtns{ display:flex; align-items:center; gap:.4rem; }
+html.flatnav #mBarLangBtn{ display:inline-flex !important; align-items:center; justify-content:center; }
+
+/* Home launcher (#homeLauncher) - shown only under flatnav; replaces the
+   legacy #appMenu destination list + its label. */
+#homeLauncher{ display:none; }
+html.flatnav #homeLauncher{ display:block; }
+html.flatnav #appMenu,
+html.flatnav .app-menu-label{ display:none !important; }
+
+.fl-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:1rem; margin-top:1rem; }
+.fl-card{
+  background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
+  border:1px solid rgba(255,255,255,.08); border-radius:14px; overflow:hidden;
+  cursor:pointer; display:flex; flex-direction:column; text-align:left;
+  font-family:var(--fm); width:100%; padding:0;
+  transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.fl-card:hover{ transform:translateY(-2px); box-shadow:0 8px 26px rgba(15,23,42,.28); }
+.fl-card:active{ transform:translateY(0) scale(.99); }
+.fl-hero{ height:118px; display:flex; align-items:center; justify-content:center; border-bottom:1px solid rgba(255,255,255,.06); }
+.fl-hero-icon{ font-size:2.6rem; line-height:1; filter:drop-shadow(0 4px 10px rgba(0,0,0,.35)); }
+.fl-card-title{ font-family:var(--fh,var(--fm)); font-size:1rem; font-weight:800; color:var(--tx); padding:.85rem .9rem .3rem; letter-spacing:.01em; }
+.fl-card-desc{ font-size:.74rem; font-weight:600; color:var(--tx2); padding:0 .9rem 1rem; line-height:1.5; }
+
+/* Light mode */
+:root.light .fl-card{ background:linear-gradient(135deg,rgba(15,23,42,.04),rgba(15,23,42,.02)); border-color:rgba(15,23,42,.1); }
+:root.light .fl-hero{ border-bottom-color:rgba(15,23,42,.06); }
+:root.light .fl-hero-icon{ filter:drop-shadow(0 3px 8px rgba(15,23,42,.18)); }
+
+/* Reduced motion */
+@media (prefers-reduced-motion:reduce){
+  .fl-card{ transition:none; }
+  .fl-card:hover{ transform:none; }
+}

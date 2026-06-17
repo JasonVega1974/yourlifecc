@@ -110,6 +110,53 @@
     }
   }
 
+  // ── Entry-redesign Phase 2 — Home card launcher (flag-gated) ──────────
+  // Six .fl-card destinations rendered into #homeLauncher (inside #appHome),
+  // shown only under html.flatnav. Every card routes via the EXISTING
+  // showSection()/wellGoto() router — no new routes. Slot 2 (The Well) is
+  // swappable via D.tabSwap, mirroring renderBottomTabBar's faith slot.
+  // Faith-free users keep ffBottomNav and never see this surface.
+  var _FL_CARDS = [
+    { label:'The Well',    icon:'✝️', desc:'Bible, prayer, plans, and growth',          accent:'#a78bfa', route:"showSection('s-scripture')" },
+    { label:'Learn',       icon:'📚', desc:'Life skills, school, driving, and jobs',     accent:'#38bdf8', route:"showSection('s-learn')" },
+    { label:'Life Skills', icon:'🧠', desc:'Learn one new thing today',                  accent:'#34d399', route:"showSection('s-skills')" },
+    { label:'Life',        icon:'⚡',       desc:'Habits, goals, money, and schedule',         accent:'#fb923c', route:"showSection('s-life')" },
+    { label:'My People',   icon:'🤝', desc:'Mentors, family, and your circle',           accent:'#f472b6', route:"showSection('s-mentors')" },
+    { label:'Me',          icon:'🧑', desc:'Badges, milestones, profile, and settings',  accent:'#fbbf24', route:"showSection('s-me')" }
+  ];
+
+  function _flRgba(hex, a){
+    var h = String(hex).replace('#','');
+    var r = parseInt(h.substring(0,2),16);
+    var g = parseInt(h.substring(2,4),16);
+    var b = parseInt(h.substring(4,6),16);
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+  }
+
+  function renderHomeLauncher(){
+    if (typeof document === 'undefined') return;
+    var host = document.getElementById('homeLauncher');
+    if (!host) return;
+    if (window._faithFree){ host.innerHTML = ''; return; }
+    var cards = _FL_CARDS.slice();
+    // Slot 2 (index 0 = The Well) honors the faith-tab-swap pin if set.
+    try {
+      var sw  = (typeof D !== 'undefined' && D && D.tabSwap) ? D.tabSwap : '';
+      var opt = (typeof TAB_SWAP_OPTIONS !== 'undefined') ? TAB_SWAP_OPTIONS[sw] : null;
+      if (opt){
+        cards[0] = { label:opt.label, icon:opt.icon, desc:'Your pinned space', accent:'#a78bfa', route:"showSection('" + opt.sectionId + "')" };
+      }
+    } catch(_){}
+    host.innerHTML = '<div class="fl-grid">' + cards.map(function(c){
+      var hero = 'background:radial-gradient(120% 100% at 50% 0%, ' + _flRgba(c.accent,.42) + ' 0%, transparent 70%), linear-gradient(135deg, ' + _flRgba(c.accent,.20) + ', var(--s1));';
+      return '<button type="button" class="fl-card" style="border-color:' + _flRgba(c.accent,.30) + ';" onclick="' + c.route + '" aria-label="' + _ahEsc(c.label) + '">' +
+        '<span class="fl-hero" style="' + hero + '"><span class="fl-hero-icon" aria-hidden="true">' + c.icon + '</span></span>' +
+        '<span class="fl-card-title">' + _ahEsc(c.label) + '</span>' +
+        '<span class="fl-card-desc">' + _ahEsc(c.desc) + '</span>' +
+      '</button>';
+    }).join('') + '</div>';
+  }
+
   // Hide the appHome when the parent surface is active OR the user
   // is on a faith-free plan (their cinematic Enter The Well hero
   // takes the whole screen). Otherwise: prefer the Command Center
@@ -133,6 +180,21 @@
     if (hideForParent || hideForFaithFree){
       if (home) home.style.display = 'none';
       if (cc)   cc.style.display   = 'none';
+      return;
+    }
+
+    // Entry-redesign Phase 2 (flag-gated): flatnav forces the simplified
+    // #appHome surface (greeting + Daily Briefing + the card launcher) and
+    // suppresses the Constellation Command Center. Reversible: flag off ->
+    // no .flatnav class -> the CC-preference path below runs unchanged.
+    if (document.documentElement.classList.contains('flatnav')){
+      if (cc) cc.style.display = 'none';
+      if (home){
+        home.style.display = '';
+        renderAppGreeting();
+        if (typeof renderHomeLauncher === 'function'){ try { renderHomeLauncher(); } catch (e) {} }
+        if (typeof renderDailyGrowth === 'function'){ try { renderDailyGrowth(); } catch (e) {} }
+      }
       return;
     }
 
@@ -206,5 +268,6 @@
     window.appOpenDest        = appOpenDest;
     window.renderAppGreeting  = renderAppGreeting;
     window.maybeRenderAppHome = maybeRenderAppHome;
+    window.renderHomeLauncher = renderHomeLauncher;
   }
 })();

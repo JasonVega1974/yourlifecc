@@ -2507,6 +2507,27 @@ function _entryPinPad(profile, continueFn){
   paint();
 }
 
+// Entry-redesign Phase 2 — switch profile mid-session WITHOUT signing out of
+// Supabase. Drop the remember-device token (so it can't auto-skip the picker),
+// lock the parent dash (hand-off hygiene), then re-show the gate picker. The
+// gate's _entryFinishAndRoute loads the chosen profile + routes (parent -> Hub,
+// child -> age-gate/Home); the continuation refreshes the renders so the newly
+// active profile paints. Only wired to a button shown under html.flatnav.
+function switchProfileGate(){
+  try { localStorage.removeItem(_ENTRY_REMEMBER_KEY); } catch(e){}
+  try { if(typeof lockParentDash === 'function') lockParentDash(); } catch(e){}
+  try {
+    showEntryGate(function(){
+      try { if(typeof applyName === 'function') applyName(); } catch(e){}
+      try { if(typeof applyStageFilter === 'function') applyStageFilter(); } catch(e){}
+      try { if(typeof applyTheme === 'function') applyTheme(); } catch(e){}
+      try { if(typeof applyPalette === 'function') applyPalette(); } catch(e){}
+      try { if(typeof updateHeroDashboard === 'function') updateHeroDashboard(); } catch(e){}
+      try { if(typeof maybeRenderAppHome === 'function') maybeRenderAppHome(); } catch(e){}
+    });
+  } catch(e){ try { console.error('[switchProfileGate]', e); } catch(_){} }
+}
+
 function removeProfile(id){
   if(!confirm('Remove this profile? This cannot be undone.')) return;
   _profiles = _profiles.filter(p=>p.id!==id);
