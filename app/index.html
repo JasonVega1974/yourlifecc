@@ -20955,13 +20955,14 @@ document.addEventListener('DOMContentLoaded', function() {
       console.warn('[SW] registration failed:', err);
     });
 
-    // When the controlling SW changes, reload once to pick up new assets.
-    var refreshing = false;
-    navigator.serviceWorker.addEventListener('controllerchange', function(){
-      if (refreshing) return;
-      refreshing = true;
-      location.reload();
-    });
+    // NOTE: intentionally NO controllerchange auto-reload.
+    // A new SW still skipWaiting()s + clients.claim()s and takes control
+    // silently; fresh /app/js + /app/css arrive on the next navigation via
+    // the network-first fetch handler. The old auto-reload bounced fresh
+    // email-confirm signups to the auth screen (it fired ~6s into the
+    // first-ever /app/ load, mid-auth-bootstrap) - see the 2026-06-17
+    // entry/reload investigation. Do not reinstate without a
+    // "had a previous controller" guard.
   });
 })();
 </script>
