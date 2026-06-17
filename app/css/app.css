@@ -8320,18 +8320,37 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
   transform:translateY(14px);
   transition:transform .25s ease, max-width .28s ease, max-height .28s ease, min-height .28s ease, border-radius .25s ease;
   -webkit-overflow-scrolling:touch;
+  scrollbar-width:auto; scrollbar-color:rgba(255,255,255,.30) transparent;   /* Firefox: grabbable, contrasting thumb */
 }
 .sds-overlay.open .sds-sheet{ transform:none; }
 .sds-sheet:focus, .sds-sheet:focus-visible{ outline:none; }  /* programmatic dialog focus — buttons keep their own ring */
+/* Scrollbar — wide enough to grab (~12px), contrasting thumb in both themes. */
+.sds-sheet::-webkit-scrollbar{ width:12px; }
+.sds-sheet::-webkit-scrollbar-track{ background:transparent; }
+.sds-sheet::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.26); border-radius:8px; border:3px solid transparent; background-clip:padding-box; }
+.sds-sheet::-webkit-scrollbar-thumb:hover{ background:rgba(255,255,255,.42); }
+/* Fade on entering/exiting full-screen so the mode change reads polished (reduced-motion zeroes it). */
+@keyframes sds-fade{ 0%{ opacity:1 } 30%{ opacity:.4 } 100%{ opacity:1 } }
+.sds-sheet.sds-anim{ animation:sds-fade .34s ease; }
 .sds-sheet::before{ content:''; position:absolute; top:0; left:0; right:0; height:4px;
   background:linear-gradient(90deg, var(--sd-a, var(--c)), var(--sd-b, var(--c))); border-radius:20px 20px 0 0; }
+/* Controls cluster — sticky top-right of the sheet header; stays visible while the
+   sheet scrolls, in windowed AND full-screen. Roomy, not crammed. */
+.sds-controls{
+  position:sticky; top:0; z-index:6;
+  display:flex; justify-content:flex-end; align-items:center; gap:.55rem;
+  padding:.85rem 1rem 0; margin-bottom:-3.55rem;   /* overlay the header beneath, not stack above it */
+  pointer-events:none;
+}
+.sds-controls > button{ pointer-events:auto; position:static; top:auto; right:auto; }
 .sds-close{   /* 44px tap target; the visible disc is a 30px radial fill */
   position:absolute; top:.7rem; right:.7rem; z-index:2;
-  width:44px; height:44px; border:none; cursor:pointer; line-height:1;
+  width:44px; height:44px; border:none; cursor:pointer; line-height:0;
   background:radial-gradient(circle 15px at center, rgba(255,255,255,.08) 99%, transparent 100%);
-  color:var(--tx2); font-size:.95rem;
+  color:var(--tx2);
   display:flex; align-items:center; justify-content:center;
 }
+.sds-close svg{ width:16px; height:16px; }
 .sds-close:hover{ background:radial-gradient(circle 15px at center, rgba(255,255,255,.16) 99%, transparent 100%); color:var(--tx); }
 /* Full-screen toggle — sits just left of the close X; same 44px tap target. */
 .sds-fs{
@@ -8345,11 +8364,13 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 .sds-fs svg{ width:16px; height:16px; }   /* optical parity with the close glyph */
 /* Expanded: shape + color, not color alone (WCAG 1.4.1) — the disc fills in the sport accent. */
 .sds-fs[aria-pressed="true"]{ color:var(--sd-a, var(--c)); background:radial-gradient(circle 15px at center, color-mix(in srgb, var(--sd-a) 20%, transparent) 99%, transparent 100%); }
-/* Full-screen state — the sheet grows to fill the whole window (the overlay is
-   already fixed/inset:0 at z 9999, covering the app nav + top bar). CSS expand,
-   not the Fullscreen API — predictable in the PWA incl. iOS. The close X + toggle
-   stay pinned top-right and tappable. Transition honored; reduced-motion zeroes it. */
-.sds-overlay.sds-full{ padding:0; }
+/* Full-screen state — the sheet grows to fill the whole window. The overlay is
+   raised to the app's modal layer (z 100000, above the global top bar #topQuickBtns
+   at 99990 and #sidebar at 900) so it genuinely covers the app chrome — the sheet's
+   hero header becomes the only header, edge-to-edge. CSS expand, not the Fullscreen
+   API (predictable in the PWA incl. iOS). Close X + toggle stay pinned + tappable;
+   transition + fade honored, reduced-motion zeroes them. */
+.sds-overlay.sds-full{ padding:0; z-index:100000; }
 .sds-overlay.sds-full .sds-sheet{ max-width:100vw; min-height:100vh; max-height:100vh; border-radius:0; }
 .sds-overlay.sds-full .sds-sheet::before{ border-radius:0; height:6px; }   /* a firmer top anchor for the full-screen mode */
 .sds-head{ display:flex; align-items:center; gap:.9rem; padding:1.4rem 1.4rem 1rem; }
@@ -8376,7 +8397,7 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 .sds-amber{ color:#f59e0b; } .sds-grn{ color:#34d399; }
 .sds-stats{ display:flex; flex-wrap:wrap; gap:.4rem; }
 .sds-stat{ font-size:.72rem; color:var(--tx2); padding:.28rem .6rem; border-radius:8px; background:rgba(255,255,255,.08); border:1px solid var(--br); }
-@media (prefers-reduced-motion: reduce){ .sds-overlay, .sds-sheet{ transition:none; } .sds-sheet{ transform:none; } }
+@media (prefers-reduced-motion: reduce){ .sds-overlay, .sds-sheet{ transition:none; } .sds-sheet{ transform:none; } .sds-sheet.sds-anim{ animation:none; } }
 :root.light .sds-overlay{ background:rgba(31,24,16,.42); }
 :root.light .sds-sheet{ background:var(--s1); border-color:rgba(0,0,0,.10); box-shadow:0 18px 50px rgba(31,24,16,.18); }
 :root.light .sds-sec{ background:rgba(0,0,0,.025); border-color:rgba(0,0,0,.08); }
@@ -8391,6 +8412,9 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 :root.light .sds-close:hover{ background:radial-gradient(circle 15px at center, rgba(0,0,0,.12) 99%, transparent 100%); color:#1f1810; }
 :root.light .sds-fs{ background:radial-gradient(circle 15px at center, rgba(0,0,0,.06) 99%, transparent 100%); color:#4e4538; }
 :root.light .sds-fs:hover{ background:radial-gradient(circle 15px at center, rgba(0,0,0,.12) 99%, transparent 100%); color:#1f1810; }
+:root.light .sds-sheet{ scrollbar-color:rgba(0,0,0,.32) transparent; }
+:root.light .sds-sheet::-webkit-scrollbar-thumb{ background:rgba(0,0,0,.28); border:3px solid transparent; background-clip:padding-box; }
+:root.light .sds-sheet::-webkit-scrollbar-thumb:hover{ background:rgba(0,0,0,.44); }
 
 /* ── Deep sport guide (Phase 3) — additive .sds-* sub-components ────────
    The detail sheet becomes a real resource. Body stays flat + neutral

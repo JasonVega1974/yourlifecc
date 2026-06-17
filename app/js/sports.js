@@ -353,9 +353,14 @@ function closeSportSheet(){
    put (both controls are absolute to the sheet). Reduced-motion handled in CSS. */
 var _SDS_FS_EXPAND   = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M21 16v3a2 2 0 0 1-2 2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
 var _SDS_FS_COLLAPSE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>';
+var _SDS_CLOSE_X     = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6 18 18M18 6 6 18"/></svg>';
 function toggleSportSheetFull(btn){
   const m = document.getElementById('sportDetailModal'); if(!m) return;
   const full = m.classList.toggle('sds-full');
+  // Brief cross-fade so entering/exiting full screen reads polished, not abrupt.
+  // (CSS @keyframes sds-fade; zeroed under prefers-reduced-motion.) Reflow to restart it.
+  const sh = m.querySelector('.sds-sheet');
+  if(sh){ sh.classList.remove('sds-anim'); void sh.offsetWidth; sh.classList.add('sds-anim'); }
   if(btn){
     btn.setAttribute('aria-pressed', full ? 'true' : 'false');
     btn.setAttribute('aria-label', full ? 'Exit full screen' : 'Enter full screen');
@@ -377,8 +382,10 @@ function showSportDetail(id){
   const body    = detail ? _sportDeepBody(s, detail) : _sportBasicBody(s);
   m.innerHTML =
     '<div class="sds-sheet" role="dialog" aria-modal="true" tabindex="-1" aria-label="' + _sdEsc(s.name) + ' details" style="--sd-a:' + hex[0] + ';--sd-b:' + hex[1] + ';">'
-    + '<button class="sds-fs" type="button" aria-label="Enter full screen" aria-pressed="false" onclick="toggleSportSheetFull(this)">' + _SDS_FS_EXPAND + '</button>'
-    + '<button class="sds-close" type="button" aria-label="Close" onclick="closeSportSheet()">✕</button>'
+    + '<div class="sds-controls">'
+    +   '<button class="sds-fs" type="button" aria-label="Enter full screen" aria-pressed="false" onclick="toggleSportSheetFull(this)">' + _SDS_FS_EXPAND + '</button>'
+    +   '<button class="sds-close" type="button" aria-label="Close" onclick="closeSportSheet()">' + _SDS_CLOSE_X + '</button>'
+    + '</div>'
     + '<div class="sds-head">'
     +   '<span class="sds-emoji" aria-hidden="true">' + s.emoji + '</span>'
     +   '<div class="sds-headtext"><h2 class="sds-name">' + _sdEsc(s.name) + '</h2>' + tagline + '<div class="sds-levels">' + levelChips + '</div></div>'
