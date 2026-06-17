@@ -146,5 +146,31 @@
     Array.prototype.forEach.call(secs, function(el){ obs.observe(el); });
   }
 
-  window.sportsFxApply = apply;
+  // Generic scroll-reveal for surfaces beyond the deep sheet (e.g. the My Sports
+  // athlete page). Reveal ONLY — no count-up — so nothing here ever animates a
+  // number (weight stays a static, un-animated field). Observed against the page
+  // viewport; full reduced-motion path (instant, no movement).
+  function reveal(scope, sel){
+    if(!scope) return null;
+    var els = scope.querySelectorAll(sel);
+    var i = 0;
+    Array.prototype.forEach.call(els, function(el){ el.classList.add('fx-reveal'); el.style.setProperty('--fx-i', (i++ % 6)); });
+    if(prefersReduce()){ Array.prototype.forEach.call(els, function(el){ el.classList.add('fx-in'); }); return null; }
+    var remaining = els.length;
+    if(!remaining) return null;
+    var obs = new IntersectionObserver(function(entries, o){
+      entries.forEach(function(en){
+        if(!en.isIntersecting) return;
+        en.target.classList.add('fx-in');
+        o.unobserve(en.target);
+        if(--remaining <= 0){ try { o.disconnect(); } catch(e){} }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -5% 0px' });
+    Array.prototype.forEach.call(els, function(el){ obs.observe(el); });
+    return obs;
+  }
+
+  window.sportsFxApply  = apply;
+  window.sportsFxReveal = function(scope, sel){ return reveal(scope, sel || '.fx-reveal-target'); };
+  window.sportsFxMotif  = function(id){ return MOTIFS[id] || ''; };
 })();

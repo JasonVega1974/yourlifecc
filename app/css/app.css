@@ -8548,6 +8548,70 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 :root.light .msp-x{ background:radial-gradient(circle 16px at center, rgba(0,0,0,.06) 99%, transparent 100%); color:#4e4538; }
 :root.light .msp-x:hover{ background:radial-gradient(circle 16px at center, rgba(0,0,0,.12) 99%, transparent 100%); color:#1f1810; }
 
+/* ── My Sports — the athlete page (Phase-B redesign) — .msp-ath / .msp-asec ───
+   Flat sections, one themed IDENTITY hero (band + reused sports-fx motif), the
+   milestones/reflection documentation engine, an understated "what coaches see"
+   row, and a gentle completeness cue. Reveal via .fx-reveal/.fx-in (sports-fx).
+   No count-up anywhere here — no number, incl. weight, ever animates. Light +
+   reduced-motion handled (the .fx-* reduced-motion rules already apply). */
+.msp-ath{ display:flex; flex-direction:column; gap:.7rem; margin-bottom:1.2rem; }
+.msp-asec{ background:rgba(255,255,255,.025); border:1px solid var(--br); border-radius:14px; padding:.9rem 1rem; }
+.msp-asec__l{ font-family:var(--fh); font-size:.72rem; letter-spacing:1px; text-transform:uppercase; color:var(--tx2); margin-bottom:.6rem; }
+.msp-asec__empty{ margin:0 0 .6rem; font-size:.8rem; line-height:1.55; color:var(--tx2); }
+/* Identity hero */
+/* The identity hero is the page's signature — distinct radius + more breathing
+   room than the flat content sections, and the name (not the jersey) dominates. */
+.msp-hero{ position:relative; overflow:hidden; border-radius:16px; padding:1.45rem 1.2rem 1.5rem;
+  background:linear-gradient(150deg, color-mix(in srgb, var(--sd-a) 30%, var(--s1)), color-mix(in srgb, var(--sd-b) 12%, var(--s1))); }
+.msp-hero-art{ position:absolute; bottom:-14px; right:-8px; width:118px; height:118px; pointer-events:none; color:var(--sd-a); opacity:.24; }
+.msp-hero-art svg{ width:100%; height:100%; display:block; }
+.msp-hero__top, .msp-hero__name, .msp-hero__sub, .msp-hero__motto, .msp-hero__edit{ position:relative; z-index:1; }
+.msp-hero__top{ display:flex; align-items:center; gap:.6rem; margin-bottom:.4rem; }
+.msp-jersey{ font-family:var(--fh); font-size:1.5rem; letter-spacing:.04em; color:var(--tx); line-height:1; }
+.msp-jersey--ghost{ color:var(--tx3); opacity:.55; }
+.msp-hero__emoji{ font-size:1.4rem; line-height:1; }
+.msp-iconx{ margin-left:auto; width:34px; height:34px; border:none; border-radius:9px; background:rgba(255,255,255,.08); color:var(--tx2); cursor:pointer; font-size:.85rem; line-height:1; }
+.msp-iconx:hover{ background:rgba(255,255,255,.16); color:var(--tx); }
+.msp-hero__name{ margin:.15rem 0 0; font-family:var(--fh); font-size:1.8rem; letter-spacing:.02em; color:var(--tx); line-height:1.05; }
+.msp-hero__sub{ font-size:.8rem; color:var(--tx2); margin-top:.2rem; }
+.msp-hero__motto{ margin:.55rem 0 0; font-size:.92rem; line-height:1.5; font-style:italic; color:var(--tx); }
+.msp-hero__edit{ margin-top:.7rem; }
+/* Milestones */
+.msp-mschips{ display:flex; flex-wrap:wrap; gap:.45rem; margin-bottom:.7rem; }
+.msp-mschip{ display:inline-flex; align-items:center; gap:.4rem; padding:.35rem .3rem .35rem .7rem; border-radius:999px; font-size:.8rem; color:var(--tx); background:color-mix(in srgb, var(--sd-a) 14%, transparent); border:1px solid color-mix(in srgb, var(--sd-a) 26%, var(--br)); }
+.msp-mschip__d{ font-size:.68rem; color:var(--tx2); }
+.msp-mschip__x{ display:inline-flex; align-items:center; justify-content:center; min-width:32px; min-height:32px; margin:-4px -6px -4px 0; border:none; border-radius:50%; background:none; color:var(--tx3); cursor:pointer; font-size:.72rem; }
+.msp-mschip__x:hover{ color:#f87171; }
+.msp-addmoment{ display:flex; gap:.45rem; flex-wrap:wrap; }
+.msp-addmoment__t{ flex:1 1 60%; min-width:160px; }
+.msp-addmoment__d{ flex:1 1 22%; min-width:96px; }
+/* Reflection */
+.msp-reflect__q{ margin:0 0 .45rem; font-size:.86rem; font-weight:600; color:var(--tx); }
+.msp-reflect__t{ margin:0 0 .65rem; font-size:.84rem; line-height:1.6; color:var(--tx2); white-space:pre-wrap; }
+/* What coaches see */
+.msp-facts{ display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:.7rem; }
+.msp-fact{ display:flex; flex-direction:column; gap:.05rem; padding:.4rem .65rem; border-radius:9px; background:rgba(255,255,255,.04); min-width:74px; }
+.msp-fact__k{ font-size:.62rem; text-transform:uppercase; letter-spacing:.04em; color:var(--tx3); }
+.msp-fact__v{ font-size:.86rem; font-weight:600; color:var(--tx); }
+.msp-coachrow{ display:flex; gap:.45rem; flex-wrap:wrap; margin-top:.7rem; }
+.msp-fieldnote{ margin:.7rem 0 .8rem; font-size:.72rem; line-height:1.5; color:var(--tx2); }
+/* Gentle completeness — invitational, never a streak/frequency/shame. Extra top
+   gap so the journey celebration is never read as adjacent to the weight fact. */
+.msp-shape{ display:flex; flex-direction:column; gap:.2rem; margin-top:.35rem; background:rgba(255,255,255,.02); }
+.msp-shape__t{ font-size:.82rem; font-weight:600; color:var(--tx); }
+.msp-shape__h{ font-size:.76rem; line-height:1.5; color:var(--tx2); }
+/* Comfortable 40px tap targets for the athlete-page action buttons. */
+.msp-ath .msp-btn{ min-height:40px; }
+/* Light mode */
+:root.light .msp-asec{ background:rgba(0,0,0,.025); border-color:rgba(0,0,0,.08); }
+/* Light hero: a warmer sport-tinted band so the page still feels like yours in light. */
+:root.light .msp-hero{ background:linear-gradient(150deg, color-mix(in srgb, var(--sd-a) 34%, #fff), color-mix(in srgb, var(--sd-b) 16%, #fff)); }
+:root.light .msp-asec__empty, :root.light .msp-hero__sub, :root.light .msp-mschip__d, :root.light .msp-reflect__t, :root.light .msp-shape__h, :root.light .msp-fact__k{ color:#4e4538; }
+:root.light .msp-jersey, :root.light .msp-hero__name, :root.light .msp-hero__motto, :root.light .msp-reflect__q, :root.light .msp-fact__v, :root.light .msp-shape__t{ color:#1f1810; }
+:root.light .msp-hero-art{ color:color-mix(in srgb, var(--sd-a) 58%, #1f1810); opacity:.33; }
+:root.light .msp-fact, :root.light .msp-iconx{ background:rgba(0,0,0,.04); }
+:root.light .msp-iconx{ color:#4e4538; }
+
 /* ── Sports deep-sheet visual layer (Phase V) — hero + scroll-reveal + count-up.
    CSS/SVG + transform/opacity ONLY; the .fx-reveal hidden state is applied by
    sports-fx.js, so a sheet rendered without the module looks exactly as before.

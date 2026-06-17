@@ -2814,6 +2814,11 @@ function addMySport(){
     level: level.value, season: season.value, year: year.value,
     emoji: data ? data.emoji : '🏅',
     dataId: data ? data.id : null,
+    // Athlete-page fields (Phase-B redesign) — identity + the documentation engine.
+    // All ride the SAME owner-guarded D.mySports path; no new storage key.
+    jersey: '', motto: '',
+    milestones: [],   // [{ id, text, date }] — experiences, never metrics
+    reflection: '',   // gentle season reflection (growth/character), free text
     profile:{ height:'', weight:'', gpa:'', gradYear:'', coach:'', coachEmail:'' },
     seasons: [],
     notes: ''
@@ -2835,7 +2840,18 @@ function deleteMySport(id){
   renderMySports();
 }
 
-/* ── Render My Sports list ─────────────────────────────────── */
+/* ── My Sports — the athlete page (Phase-B redesign) ──────────
+   Reframed from a form into the user's athlete page: a themed IDENTITY card
+   (jersey / name / position / school / motto + the sports-fx hero + motif), a
+   MILESTONES & memories documentation engine (free-text experiences, not
+   metrics), a gentle SEASON REFLECTION (growth/character), an understated
+   "WHAT COACHES SEE" recruiting row (weight = exactly ONE static field), and a
+   gentle, invitational COMPLETENESS cue. Presentation only — every field rides
+   the same owner-guarded D.mySports path. Wellbeing rails: nothing
+   motivating/celebratory/animated ever attaches to weight or body metrics;
+   completeness counts identity/milestones/reflection only; no streaks or
+   frequency loops. The reveal uses sportsFxReveal (no count-up — weight is
+   never animated). */
 function renderMySports(){
   const container = document.getElementById('mySportsList');
   if(!container) return;
@@ -2843,41 +2859,135 @@ function renderMySports(){
   const sports = getMySports();
   if(!sports.length){
     container.innerHTML = '<div class="msp-empty"><span class="msp-empty__e" aria-hidden="true">🏅</span>'
-      + '<div class="msp-empty__t">No sports added yet. Add your first sport to start tracking your seasons and recruiting profile.</div>'
-      + '<button class="btn bp msp-empty__cta" onclick="var s=document.getElementById(\'mySportSelect\'); if(s){ s.scrollIntoView({block:\'center\'}); s.focus(); }">Add your first sport</button></div>';
+      + '<div class="msp-empty__t">This is your athlete page. Add a sport, then make it yours — your name and number, the moments that mattered, and what you took from each season.</div>'
+      + '<button class="btn bp msp-empty__cta" onclick="var s=document.getElementById(\'mySportSelect\'); if(s){ s.scrollIntoView({block:\'center\'}); s.focus(); }">Start your athlete page</button></div>';
     return;
   }
-  container.innerHTML = sports.map(s=>{
-    const data = s.dataId ? SPORT_DATA.find(x=>x.id===s.dataId) : null;
-    const seasons = s.seasons||[];
-    const hasSeasons = seasons.length > 0;
-    const allKeys = hasSeasons
-      ? [...new Set(seasons.flatMap(ss=>Object.keys(ss.stats||{})).filter(k=>seasons.some(ss=>ss.stats&&ss.stats[k])))]
-      : [];
-    const fields = data && data.statFields ? data.statFields : [];
+  const athleteName = (typeof D !== 'undefined' && D.name) ? D.name : '';
+  container.innerHTML = sports.map(s => _renderAthlete(s, athleteName)).join('');
+  // Entrance reveal only — NO count-up, so no number (incl. weight) ever animates.
+  if(typeof window.sportsFxReveal === 'function'){ try { window.sportsFxReveal(container, '.fx-reveal-target'); } catch(e){} }
+}
 
-    const tableHtml = hasSeasons
-      ? '<div class="msp-tablewrap"><table class="msp-table"><thead><tr><th>Season</th>'
-          + allKeys.map(k=>{ const f = fields.find(f=>f.key===k); return '<th>'+escapeHtml(f?f.label:k)+'</th>'; }).join('')
-          + '<th aria-label="Remove"></th></tr></thead><tbody>'
-          + seasons.map((ss,i)=>'<tr><td>'+escapeHtml(ss.seasonLabel||('Season '+(i+1)))+'</td>'
-              + allKeys.map(k=>'<td><span class="msp-tv">'+escapeHtml((ss.stats&&ss.stats[k])||'—')+'</span></td>').join('')
-              + '<td><button class="msp-rowdel" onclick="deleteSeasonStat('+s.id+','+i+')" aria-label="Remove '+escapeHtml(ss.seasonLabel||('Season '+(i+1)))+'">✕</button></td></tr>').join('')
-          + '</tbody></table></div>'
-      : '<div class="msp-noseasons">No seasons logged yet.</div>';
+function _renderAthlete(s, athleteName){
+  const esc = escapeHtml;
+  const jersey = s.jersey||'', motto = s.motto||'', milestones = s.milestones||[], reflection = s.reflection||'';
+  const themeId = (s.dataId && typeof SPORT_THEME !== 'undefined' && SPORT_THEME[s.dataId]) ? s.dataId : null;
+  const theme = themeId ? SPORT_THEME[themeId] : 'lightning';
+  const hex = (typeof THEME_HEX !== 'undefined' && THEME_HEX[theme]) ? THEME_HEX[theme] : ['#38bdf8','#818cf8'];
+  const motif = (themeId && typeof window.sportsFxMotif === 'function') ? window.sportsFxMotif(themeId) : '';
+  const subline = [s.name, s.position, s.team].filter(Boolean).join(' · ');
 
-    return '<div class="msp-card">'
-      + '<div class="msp-card__head"><span class="msp-emoji" aria-hidden="true">'+s.emoji+'</span>'
-      +   '<div class="msp-id"><div class="msp-name">'+escapeHtml(s.name)+'</div>'
-      +     '<div class="msp-meta">'+escapeHtml([s.team,s.position,s.level,s.season,s.year].filter(Boolean).join(' · ')||'No details added')+'</div></div>'
-      +   '<div class="msp-actions">'
-      +     '<button class="msp-btn msp-btn--edit" onclick="openSportEditor('+s.id+')">✏️ Edit</button>'
-      +     '<button class="msp-btn msp-btn--danger" onclick="deleteMySport('+s.id+')" aria-label="Remove sport">✕</button>'
-      +   '</div></div>'
-      + '<div class="msp-body"><div class="msp-bodyhead"><span class="msp-bodyhead__l">📊 Season stats</span>'
-      +   '<button class="msp-btn msp-btn--add" onclick="openSeasonEditor('+s.id+')">+ Add season</button></div>'
-      +   tableHtml + '</div></div>';
-  }).join('');
+  // 1) Identity card (the hero — the athlete is the first thing seen)
+  let html = '<div class="msp-ath" style="--sd-a:'+hex[0]+';--sd-b:'+hex[1]+';">'
+    + '<div class="msp-asec msp-hero fx-reveal-target">'
+    +   (motif ? '<div class="msp-hero-art" aria-hidden="true">'+motif+'</div>' : '')
+    +   '<div class="msp-hero__top">'
+    +     (jersey ? '<span class="msp-jersey">#'+esc(jersey)+'</span>' : '<span class="msp-jersey msp-jersey--ghost">#</span>')
+    +     '<span class="msp-hero__emoji" aria-hidden="true">'+s.emoji+'</span>'
+    +     '<button class="msp-iconx" type="button" onclick="deleteMySport('+s.id+')" aria-label="Remove '+esc(s.name)+'">✕</button>'
+    +   '</div>'
+    +   '<h3 class="msp-hero__name">'+esc(athleteName || s.name)+'</h3>'
+    +   '<div class="msp-hero__sub">'+esc(subline || 'Add your position and school')+'</div>'
+    +   (motto ? '<p class="msp-hero__motto">&ldquo;'+esc(motto)+'&rdquo;</p>' : '')
+    +   '<button class="msp-btn msp-btn--edit msp-hero__edit" type="button" onclick="openSportEditor('+s.id+')">✏️ Edit identity</button>'
+    + '</div>';
+
+  // 2) Milestones & memories — experiences, not metrics
+  const chips = milestones.map(m =>
+    '<span class="msp-mschip">'+esc(m.text) + (m.date ? '<span class="msp-mschip__d">'+esc(m.date)+'</span>' : '')
+    + '<button class="msp-mschip__x" type="button" onclick="deleteMilestone('+s.id+',\''+esc(m.id)+'\')" aria-label="Remove moment: '+esc(m.text)+'">✕</button></span>').join('');
+  html += '<div class="msp-asec fx-reveal-target"><div class="msp-asec__l">✨ Milestones &amp; memories</div>'
+    + (chips ? '<div class="msp-mschips">'+chips+'</div>' : '<p class="msp-asec__empty">Capture the moments that mattered — a first varsity start, a comeback, the day it finally clicked.</p>')
+    + '<div class="msp-addmoment">'
+    +   '<input class="msp-input msp-addmoment__t" id="msMs_'+s.id+'" aria-label="Add a moment" placeholder="Add a moment — e.g. named team captain" maxlength="90">'
+    +   '<input class="msp-input msp-addmoment__d" id="msMsD_'+s.id+'" aria-label="When (optional)" placeholder="When (optional)" maxlength="24">'
+    +   '<button class="msp-btn msp-btn--add" type="button" onclick="addMilestone('+s.id+')">+ Add a moment</button>'
+    + '</div></div>';
+
+  // 3) Season reflection — gentle, growth/character framed
+  html += '<div class="msp-asec fx-reveal-target"><div class="msp-asec__l">🌱 Season reflection</div>'
+    + '<p class="msp-reflect__q">What did this season teach you?</p>'
+    + (reflection ? '<p class="msp-reflect__t">'+esc(reflection)+'</p>' : '<p class="msp-asec__empty">A line or two on how you grew — on the field or off it.</p>')
+    + '<button class="msp-btn msp-btn--edit" type="button" onclick="openReflection('+s.id+')">'+(reflection ? '✏️ Edit reflection' : '+ Add your reflection')+'</button></div>';
+
+  // 4) What coaches see — quiet recruiting row (weight = ONE static field) + stats
+  const p = s.profile||{};
+  const facts = [];
+  if(s.position) facts.push(['Position', s.position]);
+  if(s.level)    facts.push(['Grade', s.level]);
+  if(p.gradYear) facts.push(['Grad year', p.gradYear]);
+  if(p.gpa)      facts.push(['GPA', p.gpa]);
+  if(p.height)   facts.push(['Height', p.height]);
+  if(p.weight)   facts.push(['Weight', p.weight]);   // static recruiting snapshot — never tracked/animated
+  const factRow = facts.length
+    ? '<div class="msp-facts">'+facts.map(f=>'<div class="msp-fact"><span class="msp-fact__k">'+esc(f[0])+'</span><span class="msp-fact__v">'+esc(f[1])+'</span></div>').join('')+'</div>'
+    : '<p class="msp-asec__empty">Add the recruiting snapshot coaches look for.</p>';
+  html += '<div class="msp-asec fx-reveal-target"><div class="msp-asec__l">🎓 What coaches see</div>'
+    + factRow + _renderSeasonStats(s)
+    + '<div class="msp-coachrow"><button class="msp-btn msp-btn--edit" type="button" onclick="openSportEditor('+s.id+')">✏️ Edit recruiting</button>'
+    +   '<button class="msp-btn msp-btn--add" type="button" onclick="openSeasonEditor('+s.id+')">+ Add season</button></div></div>';
+
+  // 5) Gentle completeness — identity / milestones / reflection ONLY (no body data)
+  const parts = [ !!(motto || jersey), milestones.length > 0, !!reflection ];
+  const done = parts.filter(Boolean).length;
+  html += '<div class="msp-asec msp-shape fx-reveal-target">'
+    + (done >= 3
+        ? '<span class="msp-shape__t">🌟 Your page is looking great — your identity, your milestones, and your reflection are all here.</span>'
+        : '<span class="msp-shape__t">Your page is taking shape · '+done+' of 3 parts started</span><span class="msp-shape__h">'+_shapeHint(parts)+'</span>')
+    + '</div>';
+
+  return html + '</div>';
+}
+
+function _shapeHint(parts){
+  if(!parts[0]) return 'Add a motto or your number to make it yours.';
+  if(!parts[1]) return 'Add a milestone — a moment from your journey.';
+  if(!parts[2]) return 'Add a reflection on what this season taught you.';
+  return '';
+}
+
+/* The season-stats table — recruiting performance data (records, points), not
+   body data. Kept inside "What coaches see". */
+function _renderSeasonStats(s){
+  const data = s.dataId ? SPORT_DATA.find(x=>x.id===s.dataId) : null;
+  const seasons = s.seasons||[];
+  if(!seasons.length) return '<div class="msp-noseasons">No seasons logged yet.</div>';
+  const allKeys = [...new Set(seasons.flatMap(ss=>Object.keys(ss.stats||{})).filter(k=>seasons.some(ss=>ss.stats&&ss.stats[k])))];
+  const fields = data && data.statFields ? data.statFields : [];
+  return '<div class="msp-tablewrap"><table class="msp-table"><thead><tr><th>Season</th>'
+    // Presentation-layer relabel only (SPORT_DATA byte-identical): make the wrestling
+    // weight-class column unmistakably a competition bracket, never a body-weight log.
+    + allKeys.map(k=>{ const f = fields.find(f=>f.key===k); const label = (f && f.key==='weightClass') ? 'Weight class (bracket)' : (f?f.label:k); return '<th>'+escapeHtml(label)+'</th>'; }).join('')
+    + '<th aria-label="Remove"></th></tr></thead><tbody>'
+    + seasons.map((ss,i)=>'<tr><td>'+escapeHtml(ss.seasonLabel||('Season '+(i+1)))+'</td>'
+        + allKeys.map(k=>'<td><span class="msp-tv">'+escapeHtml((ss.stats&&ss.stats[k])||'—')+'</span></td>').join('')
+        + '<td><button class="msp-rowdel" type="button" onclick="deleteSeasonStat('+s.id+','+i+')" aria-label="Remove '+escapeHtml(ss.seasonLabel||('Season '+(i+1)))+'">✕</button></td></tr>').join('')
+    + '</tbody></table></div>';
+}
+
+/* Milestones & reflection — the documentation engine. Experiences/growth, free
+   text; never weight/body-comp, never tracked-over-time metrics. */
+function addMilestone(sportId){
+  const t = document.getElementById('msMs_'+sportId);
+  const dEl = document.getElementById('msMsD_'+sportId);
+  const text = t ? t.value.trim() : '';
+  if(!text) return;
+  const sports = getMySports();
+  const sp = sports.find(x=>x.id===sportId);
+  if(!sp) return;
+  if(!Array.isArray(sp.milestones)) sp.milestones = [];
+  sp.milestones.push({ id: 'm'+Date.now(), text: text, date: dEl ? dEl.value.trim() : '' });
+  saveMySports(sports);
+  renderMySports();
+}
+function deleteMilestone(sportId, mid){
+  const sports = getMySports();
+  const sp = sports.find(x=>x.id===sportId);
+  if(!sp || !Array.isArray(sp.milestones)) return;
+  sp.milestones = sp.milestones.filter(m=>String(m.id)!==String(mid));
+  saveMySports(sports);
+  renderMySports();
 }
 
 /* ── Sport Profile Editor Modal ────────────────────────────── */
@@ -2885,34 +2995,31 @@ function openSportEditor(sportId){
   const sports = getMySports();
   const sport = sports.find(s=>s.id===sportId);
   if(!sport) return;
-
+  const p = sport.profile||{};
   const modal = document.getElementById('sportEditorModal') || createSportEditorModal();
-
-  modal.querySelector('#seModalTitle').textContent = sport.emoji+' '+sport.name+' — Profile';
-  modal.querySelector('#seHeight').value    = sport.profile.height||'';
-  modal.querySelector('#seWeight').value    = sport.profile.weight||'';
-  modal.querySelector('#seGpa').value       = sport.profile.gpa||'';
-  modal.querySelector('#seGradYear').value  = sport.profile.gradYear||'';
-  modal.querySelector('#seCoach').value     = sport.profile.coach||'';
-  modal.querySelector('#seCoachEmail').value= sport.profile.coachEmail||'';
-  modal.querySelector('#seNotes').value     = sport.notes||'';
+  modal.querySelector('#seModalTitle').textContent = sport.emoji+' '+sport.name+' — Your page';
+  const set = (id,v)=>{ const el = modal.querySelector('#'+id); if(el) el.value = v||''; };
+  set('seJersey', sport.jersey); set('sePosition', sport.position); set('seTeam', sport.team); set('seMotto', sport.motto);
+  set('seHeight', p.height); set('seWeight', p.weight); set('seGpa', p.gpa);
+  set('seGradYear', p.gradYear); set('seCoach', p.coach); set('seCoachEmail', p.coachEmail);
   modal.querySelector('#seSaveBtn').onclick = ()=> saveSportProfile(sportId);
   modal.style.display = 'flex';
+  const j = modal.querySelector('#seJersey'); if(j) j.focus();
 }
 
 function saveSportProfile(sportId){
   const sports = getMySports();
   const idx = sports.findIndex(s=>s.id===sportId);
   if(idx<0) return;
+  const v = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  sports[idx].jersey   = v('seJersey');
+  sports[idx].position = v('sePosition');
+  sports[idx].team     = v('seTeam');
+  sports[idx].motto    = v('seMotto');
   sports[idx].profile = {
-    height:    document.getElementById('seHeight').value.trim(),
-    weight:    document.getElementById('seWeight').value.trim(),
-    gpa:       document.getElementById('seGpa').value.trim(),
-    gradYear:  document.getElementById('seGradYear').value.trim(),
-    coach:     document.getElementById('seCoach').value.trim(),
-    coachEmail:document.getElementById('seCoachEmail').value.trim(),
+    height: v('seHeight'), weight: v('seWeight'), gpa: v('seGpa'),
+    gradYear: v('seGradYear'), coach: v('seCoach'), coachEmail: v('seCoachEmail'),
   };
-  sports[idx].notes = document.getElementById('seNotes').value.trim();
   saveMySports(sports);
   document.getElementById('sportEditorModal').style.display='none';
   renderMySports();
@@ -2925,24 +3032,69 @@ function createSportEditorModal(){
   m.innerHTML=`
     <div class="msp-sheet" role="dialog" aria-modal="true" aria-labelledby="seModalTitle">
       <div class="msp-sheet__head">
-        <div class="msp-sheet__title" id="seModalTitle">Sport profile</div>
+        <div class="msp-sheet__title" id="seModalTitle">Your page</div>
         <button class="msp-x" type="button" aria-label="Close" onclick="document.getElementById('sportEditorModal').style.display='none'">✕</button>
       </div>
-      <div class="msp-formlabel">🏋️ Athletic profile</div>
+      <div class="msp-formlabel">🎽 Your identity</div>
+      <div class="msp-grid2">
+        <div class="msp-field"><label class="msp-label" for="seJersey">Jersey number</label><input id="seJersey" class="msp-input" placeholder="e.g. 7" maxlength="6"></div>
+        <div class="msp-field"><label class="msp-label" for="sePosition">Position / event</label><input id="sePosition" class="msp-input" placeholder="e.g. Point guard"></div>
+      </div>
+      <div class="msp-field" style="margin-bottom:.55rem;"><label class="msp-label" for="seTeam">School / team</label><input id="seTeam" class="msp-input" placeholder="e.g. Lincoln HS"></div>
+      <div class="msp-field" style="margin-bottom:.2rem;"><label class="msp-label" for="seMotto">Your motto</label><input id="seMotto" class="msp-input" placeholder="A line you play by" maxlength="80"></div>
+      <div class="msp-formlabel">🎓 What coaches see</div>
       <div class="msp-grid2">
         <div class="msp-field"><label class="msp-label" for="seHeight">Height</label><input id="seHeight" class="msp-input" placeholder='e.g. 6\'2"'></div>
-        <div class="msp-field"><label class="msp-label" for="seWeight">Weight (lbs)</label><input id="seWeight" class="msp-input" placeholder='e.g. 185'></div>
-        <div class="msp-field"><label class="msp-label" for="seGpa">GPA</label><input id="seGpa" class="msp-input" placeholder='e.g. 3.7'></div>
-        <div class="msp-field"><label class="msp-label" for="seGradYear">Graduation year</label><input id="seGradYear" class="msp-input" placeholder='e.g. 2027'></div>
+        <div class="msp-field"><label class="msp-label" for="seWeight">Weight (lbs)</label><input id="seWeight" class="msp-input" placeholder="e.g. 185"></div>
+        <div class="msp-field"><label class="msp-label" for="seGpa">GPA</label><input id="seGpa" class="msp-input" placeholder="e.g. 3.7"></div>
+        <div class="msp-field"><label class="msp-label" for="seGradYear">Graduation year</label><input id="seGradYear" class="msp-input" placeholder="e.g. 2027"></div>
+        <div class="msp-field"><label class="msp-label" for="seCoach">Coach name</label><input id="seCoach" class="msp-input" placeholder="Coach Smith"></div>
+        <div class="msp-field"><label class="msp-label" for="seCoachEmail">Coach email</label><input id="seCoachEmail" class="msp-input" type="email" placeholder="coach@school.edu"></div>
       </div>
-      <div class="msp-formlabel">👤 Coach info</div>
-      <div class="msp-grid2">
-        <div class="msp-field"><label class="msp-label" for="seCoach">Coach name</label><input id="seCoach" class="msp-input" placeholder='Coach Smith'></div>
-        <div class="msp-field"><label class="msp-label" for="seCoachEmail">Coach email</label><input id="seCoachEmail" class="msp-input" type="email" placeholder='coach@school.edu'></div>
+      <p class="msp-fieldnote">Weight here is just a recruiting snapshot for coaches &mdash; it is never tracked over time, charted, or counted toward your page.</p>
+      <button id="seSaveBtn" class="btn bp msp-addbtn">Save</button>
+    </div>`;
+  document.body.appendChild(m);
+  m.addEventListener('click',e=>{ if(e.target===m) m.style.display='none'; });
+  _wireMspEscape();
+  return m;
+}
+
+/* ── Season Reflection editor ──────────────────────────────── */
+function openReflection(sportId){
+  const sports = getMySports();
+  const sport = sports.find(s=>s.id===sportId);
+  if(!sport) return;
+  const modal = document.getElementById('reflectionModal') || createReflectionModal();
+  modal.querySelector('#refTitle').textContent = sport.emoji+' '+sport.name+' — Reflection';
+  modal.querySelector('#refText').value = sport.reflection||'';
+  modal.querySelector('#refSaveBtn').onclick = ()=> saveReflection(sportId);
+  modal.style.display = 'flex';
+  const t = modal.querySelector('#refText'); if(t) t.focus();
+}
+function saveReflection(sportId){
+  const sports = getMySports();
+  const idx = sports.findIndex(s=>s.id===sportId);
+  if(idx<0) return;
+  const el = document.getElementById('refText');
+  sports[idx].reflection = el ? el.value.trim() : '';
+  saveMySports(sports);
+  document.getElementById('reflectionModal').style.display='none';
+  renderMySports();
+}
+function createReflectionModal(){
+  const m = document.createElement('div');
+  m.id = 'reflectionModal';
+  m.className = 'msp-overlay';
+  m.innerHTML=`
+    <div class="msp-sheet" role="dialog" aria-modal="true" aria-labelledby="refTitle">
+      <div class="msp-sheet__head">
+        <div class="msp-sheet__title" id="refTitle">Reflection</div>
+        <button class="msp-x" type="button" aria-label="Close" onclick="document.getElementById('reflectionModal').style.display='none'">✕</button>
       </div>
-      <div class="msp-formlabel">📝 Notes</div>
-      <textarea id="seNotes" class="msp-textarea" rows="3" placeholder="Goals, highlights, recruiting notes..."></textarea>
-      <button id="seSaveBtn" class="btn bp msp-addbtn">Save profile</button>
+      <p class="msp-reflect__q" style="margin-top:0;">What did this season teach you? How did you grow &mdash; on the field or off it?</p>
+      <textarea id="refText" class="msp-textarea" rows="5" placeholder="It taught me..."></textarea>
+      <button id="refSaveBtn" class="btn bp msp-addbtn">Save reflection</button>
     </div>`;
   document.body.appendChild(m);
   m.addEventListener('click',e=>{ if(e.target===m) m.style.display='none'; });
@@ -2950,13 +3102,13 @@ function createSportEditorModal(){
   return m;
 }
 /* Esc-to-close for the My Sports editor modals (wired once). Mirrors the
-   .sds sheet's keyboard behaviour so both overlays close consistently. */
+   .sds sheet's keyboard behaviour so all overlays close consistently. */
 function _wireMspEscape(){
   if(window._mspKeyWired) return;
   window._mspKeyWired = true;
   document.addEventListener('keydown', function(e){
     if(e.key !== 'Escape') return;
-    ['sportEditorModal','seasonEditorModal'].forEach(function(id){ var el = document.getElementById(id); if(el) el.style.display = 'none'; });
+    ['sportEditorModal','seasonEditorModal','reflectionModal'].forEach(function(id){ var el = document.getElementById(id); if(el) el.style.display = 'none'; });
   });
 }
 
