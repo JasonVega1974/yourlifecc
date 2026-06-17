@@ -8547,6 +8547,29 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 :root.light .msp-seasonrow{ background:rgba(0,0,0,.03); border-color:rgba(0,0,0,.08); }
 :root.light .msp-x{ background:radial-gradient(circle 16px at center, rgba(0,0,0,.06) 99%, transparent 100%); color:#4e4538; }
 :root.light .msp-x:hover{ background:radial-gradient(circle 16px at center, rgba(0,0,0,.12) 99%, transparent 100%); color:#1f1810; }
+
+/* ── Sports deep-sheet visual layer (Phase V) — hero + scroll-reveal + count-up.
+   CSS/SVG + transform/opacity ONLY; the .fx-reveal hidden state is applied by
+   sports-fx.js, so a sheet rendered without the module looks exactly as before.
+   Full reduced-motion path below. */
+.sds-head.sds-hero{ position:relative; overflow:hidden; padding-top:1.55rem; padding-bottom:1.25rem;
+  /* Mixed over the sheet surface (not transparent) so the band reads as a distinct
+     themed zone — the one "signature" moment; body below stays flat. */
+  background:linear-gradient(135deg, color-mix(in srgb, var(--sd-a) 30%, var(--s1)), color-mix(in srgb, var(--sd-b) 13%, var(--s1))); }
+/* Motif anchored low-right so the horizontal figures clear the title baseline. */
+.sds-hero-art{ position:absolute; bottom:-12px; right:-6px; width:128px; height:128px; pointer-events:none; color:var(--sd-a); opacity:.26; }
+.sds-hero-art svg{ width:100%; height:100%; display:block; }
+.sds-head.sds-hero .sds-emoji, .sds-head.sds-hero .sds-headtext{ position:relative; z-index:1; }
+.fx-reveal{ opacity:0; transform:translateY(16px); }
+.fx-in{ opacity:1; transform:none; transition:opacity .5s ease, transform .5s cubic-bezier(.22,.61,.36,1); transition-delay:calc(var(--fx-i, 0) * 60ms); }
+.fx-num{ display:inline-block; font-variant-numeric:tabular-nums; }
+@media (prefers-reduced-motion: reduce){
+  .fx-reveal{ opacity:1; transform:none; }
+  .fx-in{ transition:none; transition-delay:0s; }
+}
+:root.light .sds-head.sds-hero{ background:linear-gradient(135deg, color-mix(in srgb, var(--sd-a) 24%, #fff), color-mix(in srgb, var(--sd-b) 11%, #fff)); }
+:root.light .sds-hero-art{ opacity:.2; }
+
 #s-learn .tab-landing-card.tlc-power:nth-child(1) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(1) .tlc-shimmer{ animation-delay:0s; }
 #s-learn .tab-landing-card.tlc-power:nth-child(2) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(2) .tlc-shimmer{ animation-delay:.28s; }
 #s-learn .tab-landing-card.tlc-power:nth-child(3) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(3) .tlc-shimmer{ animation-delay:.56s; }

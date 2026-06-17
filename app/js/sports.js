@@ -371,6 +371,9 @@ function showSportDetail(id){
   try { window._sdsReturnFocus = document.activeElement; } catch(e){}
   m.classList.add('open');
   document.body.style.overflow = 'hidden';
+  // Phase V — apply the optional visual layer (hero + scroll-reveal + count-up).
+  // Guarded: if sports-fx.js isn't loaded, the sheet renders exactly as before.
+  if(typeof window.sportsFxApply === 'function'){ try { window.sportsFxApply(m, id); } catch(e){} }
 }
 /* The original Phase-2A body — unchanged, now factored out. Every sport without
    an authored `detail` still renders exactly this. */
