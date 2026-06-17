@@ -8575,6 +8575,24 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
    extend-only (zero deletions). */
 :root.light .sds-head.sds-hero .sds-hero-art{ color:color-mix(in srgb, var(--sd-a) 58%, #1f1810); opacity:.3; }
 
+/* ── Beyond the Game (Phase V Part 2) — honest-odds funnel + role models ──────
+   The funnel bar is the showcase viz: a flat themed block that shrinks per tier
+   (no width animation — it reveals/counts up via the shared fx layer). Figure +
+   caption are full-width text. Additive; light handled. */
+.sds-funnel{ display:flex; flex-direction:column; gap:.75rem; margin:.75rem 0 .2rem; }
+.sds-fbar{ height:10px; border-radius:5px; min-width:26px; margin-bottom:.35rem;
+  background:linear-gradient(90deg, color-mix(in srgb, var(--sd-a) 55%, transparent), color-mix(in srgb, var(--sd-b) 26%, transparent)); }
+.sds-ffig{ font-family:var(--fh); font-size:1rem; letter-spacing:.02em; color:var(--tx); }
+.sds-fcap{ margin:.1rem 0 0; font-size:.76rem; line-height:1.5; color:var(--tx2); }
+.sds-fcap b{ color:var(--tx); font-weight:600; }
+.sds-rmlabel{ margin-top:.75rem; font-size:.68rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--tx3); }
+.sds-rms{ display:flex; flex-direction:column; gap:.5rem; margin-top:.45rem; }
+.sds-rm{ display:flex; flex-direction:column; gap:.12rem; }
+.sds-rm__n{ font-size:.84rem; font-weight:600; color:var(--tx); }
+.sds-rm__f{ font-size:.78rem; line-height:1.5; color:var(--tx2); }
+:root.light .sds-fcap, :root.light .sds-rm__f{ color:#4e4538; }
+:root.light .sds-ffig, :root.light .sds-fcap b, :root.light .sds-rm__n{ color:#1f1810; }
+
 #s-learn .tab-landing-card.tlc-power:nth-child(1) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(1) .tlc-shimmer{ animation-delay:0s; }
 #s-learn .tab-landing-card.tlc-power:nth-child(2) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(2) .tlc-shimmer{ animation-delay:.28s; }
 #s-learn .tab-landing-card.tlc-power:nth-child(3) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(3) .tlc-shimmer{ animation-delay:.56s; }

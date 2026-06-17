@@ -439,6 +439,27 @@ function _sportDeepBody(s, d){
     + '<div class="sds-model__name">' + esc(d.character.model) + '</div>'
     + '<p class="sds-model__why">' + esc(d.character.why) + '</p></div>');
 
+  // Beyond the Game (Phase V Part 2) — the honest HS->college->pro odds funnel +
+  // the off-field mission. The funnel bar is a flat themed viz (decreasing width);
+  // the figure + caption are full-width text (robust to long figures), and clean
+  // counts (>=1000) count up on reveal via the shared sports-fx layer.
+  const btg = (typeof SPORT_BTG !== 'undefined' && SPORT_BTG[s.id]) ? SPORT_BTG[s.id] : null;
+  if(btg){
+    const wrapFig = fig => { const m = String(fig).match(/\d{1,3}(?:,\d{3})+|\d{4,}/); if(!m) return esc(fig); const raw = m[0]; return esc(fig.slice(0, m.index)) + '<span class="fx-num" data-countup="'+raw.replace(/,/g,'')+'">'+esc(raw)+'</span>' + esc(fig.slice(m.index + raw.length)); };
+    const widths = [100, 54, 28];
+    const funnel = '<div class="sds-funnel">' + btg.funnel.map((t,i) =>
+      '<div class="sds-ftier"><div class="sds-fbar" style="width:'+(widths[i] != null ? widths[i] : 26)+'%;" aria-hidden="true"></div>'
+      + '<div class="sds-ffig">'+wrapFig(t.figure)+'</div>'
+      + '<p class="sds-fcap"><b>'+esc(t.tier)+'</b> · '+esc(t.of)+'</p></div>').join('') + '</div>';
+    html += sec('sds-l--violet', '🔭', 'The honest odds', '<p class="sds-note">'+esc(btg.oddsTruth)+'</p>' + funnel);
+    const cm = (d.character && d.character.model) ? String(d.character.model).toLowerCase() : '';
+    const models = (btg.roleModels||[]).filter(m => m.name.toLowerCase() !== cm)
+      .map(m => '<div class="sds-rm"><span class="sds-rm__n">'+esc(m.name)+'</span><span class="sds-rm__f">'+esc(m.for)+'</span></div>').join('');
+    html += sec('sds-l--green', '🌟', 'Bigger than the game',
+      line('What it sets up off the field:', btg.education)
+      + (models ? '<div class="sds-rmlabel">People who model it well</div><div class="sds-rms">'+models+'</div>' : ''));
+  }
+
   const statChips = (s.statFields||[]).map(f => '<span class="sds-stat">'+esc(f.label)+'</span>').join('');
   if(statChips) html += sec('sds-l--violet', '📊', 'Stats to track', '<div class="sds-stats">' + statChips + '</div>');
 
@@ -2065,6 +2086,550 @@ const SPORT_DETAIL = {
       "model": "Sidney Crosby",
       "why": "One of the best players of his generation, Crosby is widely respected for his relentless work ethic, accountability, and putting the team before personal stats. He's known for leading by example, staying composed and professional under enormous pressure, and treating the game and his teammates with respect - the kind of conduct any young player can learn from."
     }
+  }
+};
+
+/* ── Beyond the Game (Phase V Part 2) ─────────────────────────
+   Per-sport "beyond the game" content: the honest HS->college->pro odds
+   (web-verified vs NCAA data; empowering realism, never dream-crushing), the
+   athlete-education mission gem, and secular character/leadership role models.
+   Own map so SPORT_DETAIL stays byte-identical; rendered as the closing deep-
+   sheet section + the count-up funnel (built on the shared sports-fx layer). */
+const SPORT_BTG = {
+  "football": {
+    "oddsTruth": "Here's the honest math, and it's good news, not bad: of all the kids who play high school football, only a small slice play in college, and a tiny slice of those ever play a down in the NFL. Read that and feel free, not small. Going pro is a long-shot bonus, never the point. You are not playing to beat the odds -- you're playing for what football builds in you right now: discipline, toughness, brotherhood, and a body and mind that work. If the NFL never calls, you did not fail. The kid who gives everything to this game and walks away stronger, with a degree and real friends, won. That's the win that's actually on the table.",
+    "funnel": [
+      {
+        "tier": "In high school",
+        "figure": "~1 million",
+        "of": "boys play football nationwide each year"
+      },
+      {
+        "tier": "Make an NCAA roster",
+        "figure": "~7%",
+        "of": "of HS players go on to play NCAA football"
+      },
+      {
+        "tier": "Get drafted to the NFL",
+        "figure": "~1.6%",
+        "of": "of NCAA players are drafted to the pros"
+      }
+    ],
+    "education": "This is the real prize: football opens the door to college. Scholarships and recruiting attention can put you on a campus and in a classroom you might not have reached otherwise -- that degree and that network outlast any highlight reel. And the game itself trains things employers and life reward: showing up early, taking coaching, leading a unit, bouncing back from a bad play, and trusting teammates to do their job so you can do yours. You carry every bit of that off the field, no matter how far you go on it.",
+    "roleModels": [
+      {
+        "name": "Peyton Manning",
+        "for": "Relentless preparation and film study, treating teammates and opponents with respect, and becoming a steady, generous leader and mentor long after his playing days."
+      },
+      {
+        "name": "Russell Wilson",
+        "for": "Composure under pressure, an upbeat leadership style that lifts the room, and consistent work with youth and hospital charities off the field."
+      },
+      {
+        "name": "J.J. Watt",
+        "for": "All-out work ethic and the way he carries himself -- famously rallying massive disaster-relief efforts and quietly helping people, leading by example more than by talk."
+      }
+    ]
+  },
+  "basketball": {
+    "oddsTruth": "Here's the honest truth, and it should make you feel free, not small: almost nobody who plays basketball plays it for a living, and that's completely okay. The pros are a lottery-ticket bonus on top of everything the game already gives you - not the reason to lace up. Read the numbers below clear-eyed. They aren't a verdict on you; they're just how rare the pro tier is. If you never make it past your high school gym, you have not failed at anything. The real win is who you become from showing up, working hard, and competing - and that's a win you get to keep no matter what level you reach.",
+    "funnel": [
+      {
+        "tier": "In high school",
+        "figure": "~540,000",
+        "of": "boys playing nationwide (girls add ~356,000 more)"
+      },
+      {
+        "tier": "Make an NCAA roster",
+        "figure": "~3.6% / ~4.7%",
+        "of": "of HS players reach the NCAA (men / women)"
+      },
+      {
+        "tier": "Get drafted to the pros",
+        "figure": "~1.0% / ~0.8%",
+        "of": "of NCAA players are drafted (NBA / WNBA)"
+      }
+    ],
+    "education": "The biggest door basketball can open isn't the NBA - it's a classroom. A roster spot can come with a scholarship, and that scholarship is really access to an education and a degree you keep for life, long after your last game. And the things the game drills into you - discipline, reading a situation fast, trusting teammates, staying composed when you're down, doing the unglamorous reps - those are the exact skills that win in college, in a first job, and in life. You're not just building a jump shot; you're building the person who shows up when it's hard.",
+    "roleModels": [
+      {
+        "name": "Tim Duncan",
+        "for": "Quiet, ego-free leadership - let his game and his teammates speak, stayed humble at the top, and finished his degree before chasing the league."
+      },
+      {
+        "name": "Sue Bird",
+        "for": "Elevating everyone around her, leading with poise over two decades, and carrying herself with class on and off the court."
+      },
+      {
+        "name": "Stephen Curry",
+        "for": "Relentless, unflashy work ethic, gratitude, and lifting up the people around him - proof that being the hardest worker matters more than being the biggest name."
+      }
+    ]
+  },
+  "soccer": {
+    "oddsTruth": "Here's the honest truth, and it should set you free, not shrink you: almost everyone who loves soccer plays it without ever turning pro, and that is not failure. It's the normal, beautiful path. The pro level is a long-shot bonus draw, never the reason to lace up. You play for what the game is handing you right now: fitness, discipline, the read-the-field smarts, teammates who become family, and the doors a strong player can open at school. Reach for the top with everything you've got, and know your worth was never sitting at the end of that funnel.",
+    "funnel": [
+      {
+        "tier": "In high school",
+        "figure": "~850,000",
+        "of": "boys and girls play soccer nationwide each year"
+      },
+      {
+        "tier": "Make an NCAA roster",
+        "figure": "~5.6% (men) / ~7.9% (women)",
+        "of": "of HS players go on to compete in the NCAA"
+      },
+      {
+        "tier": "Reach the pros",
+        "figure": "~1.4% (men)",
+        "of": "of NCAA men's players are drafted by MLS. On the women's side, the NWSL dropped its college draft in 2024 and now signs players directly, so there's no single draft percentage -- but the pro pathway is very real and growing for women."
+      }
+    ],
+    "education": "This is the real prize. A college soccer roster spot can be your ticket onto a campus and into a degree you carry for life long after the cleats are hung up. Coaches and admissions notice players who show up, train, and lead, and that can open scholarship money and acceptance letters. Even beyond the money, the game is teaching you transferable things: how to work under pressure, communicate fast, recover from a loss, and keep promises to a team. Those travel with you into any classroom, job, or family you build.",
+    "roleModels": [
+      {
+        "name": "Megan Rapinoe",
+        "for": "Used her platform and captain's voice to stand up for teammates and fight for fair treatment, leading off the field as much as on it."
+      },
+      {
+        "name": "Tim Howard",
+        "for": "Played at the highest level while openly managing Tourette syndrome, showing that grit and steadiness beat any obstacle put in front of you."
+      },
+      {
+        "name": "Christian Pulisic",
+        "for": "Carried big expectations young with humility, kept his head down to work, and stayed gracious and team-first under intense pressure."
+      }
+    ]
+  },
+  "baseball": {
+    "oddsTruth": "Here's the honest math, and it's good news, not bad: baseball gives you the most where it costs you the least. The pro path is a long-shot bonus -- not the point, and never the scoreboard for your worth. Play for what the game hands you right now: the work ethic, the way you handle a strikeout and step back in, the teammates, the joy of a clean play. Almost nobody reaches the bigs, and that is not failure -- it is just rare. The kid who never gets drafted still walks away built, schooled, and connected. That is the win you can actually count on.",
+    "funnel": [
+      {
+        "tier": "In high school",
+        "figure": "~473,000",
+        "of": "boys play baseball nationwide"
+      },
+      {
+        "tier": "Make an NCAA roster",
+        "figure": "~8.8%",
+        "of": "of HS players go on to play in the NCAA"
+      },
+      {
+        "tier": "Get drafted (MLB)",
+        "figure": "~4.9%",
+        "of": "of draft-eligible NCAA players are picked in the MLB draft"
+      }
+    ],
+    "education": "The real prize baseball can hand you is a door, not a contract. A roster spot often comes with scholarship money -- which is really access to a college education you might not have paid for otherwise -- plus coaches and alumni who open networks for life. The discipline of daily reps, the patience of a long season, learning to fail in front of a crowd and reset for the next pitch: those transfer straight into school, work, and being someone people can count on. You keep the degree and the character long after you hang up the cleats.",
+    "roleModels": [
+      {
+        "name": "Derek Jeter",
+        "for": "carried himself with quiet class and accountability for two decades, led by example, and never made it about himself"
+      },
+      {
+        "name": "Mariano Rivera",
+        "for": "humble, gracious, and respectful to teammates and opponents alike -- the first player ever voted to the Hall of Fame unanimously, as much for character as for skill"
+      },
+      {
+        "name": "Jackie Robinson",
+        "for": "showed courage and dignity under enormous pressure, lifting others by how he endured and led with restraint and conviction"
+      }
+    ]
+  },
+  "softball": {
+    "oddsTruth": "Here's the honest truth, said with respect: most great softball players don't play in college, and most college players don't play pro -- and that takes nothing away from you. The diamond gives you its best gifts now: grit, footwork, a team that has your back, a body that moves well, and a reason to keep showing up. Pro softball is a long-shot bonus, not the scoreboard your worth is measured on. Hanging up the cleats one day isn't losing -- it's graduating into everything the game built in you. Play because you love it and because it's making you into someone steady. That return is guaranteed.",
+    "funnel": [
+      {
+        "tier": "In high school",
+        "figure": "~338,000",
+        "of": "girls play softball nationwide"
+      },
+      {
+        "tier": "Make an NCAA roster",
+        "figure": "~6.5%",
+        "of": "of HS players go on to play NCAA softball"
+      },
+      {
+        "tier": "Reach the pros",
+        "figure": "very few",
+        "of": "no standard pro tier -- pro softball is small and still finding its footing; the AUSL (Athletes Unlimited Softball League, launched 2025) signs only a handful of top college stars each year"
+      }
+    ],
+    "education": "Here's the real prize: softball is a door to education. Even a partial scholarship -- or just being a recruited athlete who stands out on an application -- can put college within reach and lower the bill. But the deeper win travels with you for life: showing up to early practice teaches discipline, owning an error teaches accountability, captaining a huddle teaches leadership, and grinding through a slump teaches you that effort pays off even when results lag. Coaches and employers chase those exact traits. The classroom and the career are the field the game is really preparing you for.",
+    "roleModels": [
+      {
+        "name": "Jennie Finch",
+        "for": "Carried herself with class and humility at the top of the sport, and has spent her career growing the game and mentoring young players rather than chasing the spotlight."
+      },
+      {
+        "name": "Cat Osterman",
+        "for": "Known for relentless preparation and quiet leadership, she set a standard of professionalism and gives back as a coach lifting the next generation."
+      },
+      {
+        "name": "Natasha Watley",
+        "for": "A trailblazing leader who plays and gives with generosity, building youth programs to open the game to kids who never had access to it."
+      }
+    ]
+  },
+  "track": {
+    "oddsTruth": "Here is the honest, freeing truth: about 1 in 16 high school track athletes goes on to run, jump, or throw in the NCAA, and the pro/Olympic level is tiny and elite. Read that and breathe easy, not small. You don't lace up to chase a long shot. You do it for what the work gives you right now: a body that gets stronger, a mind that learns to grind, and a clock that teaches you to compete against yourself. Making the Olympics would be a rare bonus on top of all that, never the point. Not reaching the top is not failure. The kid who keeps showing up to practice is already winning the thing that matters.",
+    "funnel": [
+      {
+        "tier": "In high school",
+        "figure": "~1.16 million",
+        "of": "boys and girls run track & field nationwide"
+      },
+      {
+        "tier": "Make an NCAA roster",
+        "figure": "~5.4% men / ~6.5% women",
+        "of": "of HS track athletes compete in the NCAA"
+      },
+      {
+        "tier": "Reach the top",
+        "figure": "tiny, elite",
+        "of": "there is no standard pro tier - the peak is Olympic/elite and extremely rare"
+      }
+    ],
+    "education": "This is the real prize. Track is one of the widest doors in sport to a college education - schools sponsor it for both men and women, and a roster spot can come with scholarship money and academic support that opens classrooms you might not otherwise reach. The habits track builds travel everywhere: showing up early, splitting a big goal into daily reps, handling a bad race and resetting for the next one. That is discipline, resilience, and time management an employer will pay for long after your last meet. The medal you keep is the person the training makes you.",
+    "roleModels": [
+      {
+        "name": "Allyson Felix",
+        "for": "Carried herself with quiet class through a long career and used her platform to fight for better treatment of mothers in sport - leading by lifting others, not by talking herself up."
+      },
+      {
+        "name": "Sydney McLaughlin-Levrone",
+        "for": "Models humility, steady work, and grace under enormous pressure - she talks about gratitude and process over hype, and treats competitors with respect."
+      },
+      {
+        "name": "Steve Prefontaine",
+        "for": "Remembered for guts, honesty, and giving everything he had in every race - a reminder that effort and heart are the legacy, not just the times on the clock."
+      }
+    ]
+  },
+  "crosscountry": {
+    "oddsTruth": "Here's the honest truth, runner to runner: most high schoolers don't run in college, and almost no one makes a living running. There's no clear pro tier in cross country -- the very top is sponsored elite and Olympic distance running, and that's rare enough that you can count the names. So don't run to \"make it.\" Run for what the miles are already giving you: a body that's strong, a mind that holds discipline when it's hard, and proof you can do hard things when no one's watching. Reaching the next level is a bonus, never the point. If your last race is in high school, you didn't fall short -- you got everything the sport had to give.",
+    "funnel": [
+      {
+        "tier": "In high school",
+        "figure": "~430,000",
+        "of": "boys and girls run cross country nationwide"
+      },
+      {
+        "tier": "Make an NCAA roster",
+        "figure": "~5.3% (men), ~7.1% (women)",
+        "of": "of HS runners go on to compete in the NCAA"
+      }
+    ],
+    "education": "This is the real prize. A cross country roster spot can open the door to a college education -- partial scholarships, plus walk-on chances and academic aid that coaches help you find, because distance programs value runners who show up and grind. But the deeper win is who the training makes you: someone who plans the long game, manages time around hard workouts, pushes through discomfort, and finishes what they start. Those are the exact habits that carry into a degree, a first job, and a whole life -- long after the spikes are retired.",
+    "roleModels": [
+      {
+        "name": "Eliud Kipchoge",
+        "for": "Carries himself with humility and discipline -- famous for the line \"no human is limited\" and for crediting his team, not just himself. He models patience, steady daily work, and grace in both winning and losing."
+      },
+      {
+        "name": "Molly Seidel",
+        "for": "Open and honest about mental health and the pressure athletes carry, she shows that toughness includes asking for help and looking out for teammates -- leading with realness, not just results."
+      },
+      {
+        "name": "Galen Rupp",
+        "for": "Known for relentless, quiet consistency over many years and for mentoring younger runners coming up. He models showing up, doing the unglamorous work, and lifting the next generation."
+      }
+    ]
+  },
+  "volleyball": {
+    "oddsTruth": "Here's the honest truth, and it's good news, not bad: about 4% of high-school volleyball players go on to play in the NCAA. That's a real, reachable goal worth chasing hard. But unlike some sports, volleyball has no standard pro draft in the U.S. - paid pro careers exist (the LOVB league here, plus clubs overseas), but the data is thin and the spots are few. So play volleyball for what it actually gives you right now: the discipline, the team trust, the joy, the health, and the doors it opens to college. Reaching the NCAA would be a win; a paid pro career would be a rare bonus on top. Not making either is not failure - the kid who grew through the grind already won the real prize.",
+    "funnel": [
+      {
+        "tier": "In high school",
+        "figure": "~493,000",
+        "of": "girls play volleyball nationwide (one of the largest girls' HS sports - second only to track & field)"
+      },
+      {
+        "tier": "Make an NCAA roster",
+        "figure": "~4%",
+        "of": "of HS players go on to play in the NCAA (men's is similar, ~3.7%)"
+      }
+    ],
+    "education": "This is the real payoff. A volleyball scholarship isn't about the sport - it's about access to a college education you might not otherwise afford, and the degree you walk away with long after your last match. The court teaches what classrooms can't: communicating fast under pressure, trusting teammates, owning your role, bouncing back point after point. Those habits - reliability, leadership, grit - are exactly what colleges and employers want. Whether you play one season or four, the sport builds the person.",
+    "roleModels": [
+      {
+        "name": "Kerri Walsh Jennings",
+        "for": "How she carries herself - relentless work ethic, gracious in wins and losses, and decades of mentoring younger players and growing the game."
+      },
+      {
+        "name": "Foluke Akinradewo Gunderson",
+        "for": "Quiet, steady leadership and humility - a teammate-first captain who modeled showing up, doing your job, and lifting the people around you."
+      },
+      {
+        "name": "David Lee",
+        "for": "Calm, team-first competitor known for his composure, sportsmanship, and steadying presence under pressure rather than chasing the spotlight."
+      }
+    ]
+  },
+  "swimming": {
+    "oddsTruth": "Here's the honest truth, said with respect: swimming gives you almost everything that matters long before any podium does - discipline, health, a team, and doors to a college education. Only a small share of swimmers go on to compete in college, and the very top is Olympic and national-team level, which is rare. That takes nothing away from what the pool builds in you. Reaching the elite tier is a bonus, never the point - the kid who swims hard and grows is already winning.",
+    "funnel": [
+      {
+        "tier": "In high school",
+        "figure": "~255,000",
+        "of": "boys and girls swim and dive on HS teams nationwide (NFHS, recent year)"
+      },
+      {
+        "tier": "Make an NCAA roster",
+        "figure": "~7%",
+        "of": "of HS swimmers go on to compete in the NCAA across all three divisions (slightly higher for girls, ~7.5%, than boys, ~7%)"
+      },
+      {
+        "tier": "Reach the top",
+        "figure": "Olympic / elite only",
+        "of": "swimming has no standard pro league - the ceiling is national-team and Olympic level, and that's extremely rare"
+      }
+    ],
+    "education": "This is the real prize. A swimming roster spot can open the door to a college education - financial aid, an academic home, and a network you carry for life. And the habits the pool builds travel everywhere: getting up before dawn, showing up when it's hard, managing time around a brutal schedule, handling pressure one race at a time. Those are the skills that make a strong student, employee, and adult - no matter how fast your final time ever was.",
+    "roleModels": [
+      {
+        "name": "Katie Ledecky",
+        "for": "Quiet, relentless work ethic and humility - lets her preparation speak, treats teammates and rivals with grace, and stays grounded through years at the top."
+      },
+      {
+        "name": "Michael Phelps",
+        "for": "Turning his platform toward honest talk about mental health, showing that asking for help is strength and that an athlete is more than their results."
+      },
+      {
+        "name": "Caeleb Dressel",
+        "for": "Openness about pressure and stepping back to protect his wellbeing, and the steady, team-first way he carries himself and lifts younger swimmers."
+      }
+    ]
+  },
+  "wrestling": {
+    "oddsTruth": "Here's the honest math: about 3 in 100 high school wrestlers ever wrestle in college, and the very top of the sport is Olympic and elite-level only -- no big standard pro league, just a tiny handful who make a living at it. Read that and feel free, not small. You don't step on the mat to beat those odds; you step on it for what wrestling forges in you right now -- toughness, discipline, the habit of getting up. Reaching the elite level would be a wild bonus, never the point. If your last match is in high school or college, you have not failed at anything. The grit a wrestler builds shows up for the rest of your life, in rooms that have nothing to do with a singlet.",
+    "funnel": [
+      {
+        "tier": "In high school",
+        "figure": "~300,000",
+        "of": "wrestlers nationwide (NCAA, recent year)"
+      },
+      {
+        "tier": "Make an NCAA roster",
+        "figure": "~3.0%",
+        "of": "of HS wrestlers go on to wrestle in the NCAA (roughly 7,000-9,000 college wrestlers across all divisions)"
+      },
+      {
+        "tier": "Reach the top",
+        "figure": "Olympic / elite-only",
+        "of": "no standard pro league -- the ceiling is national team and Olympic level, reached by an extremely small number"
+      }
+    ],
+    "education": "The biggest door wrestling opens isn't a podium -- it's a classroom. College wrestling spots come with scholarship and recruiting support that can make a degree reachable when it otherwise might not be, and that education outlasts every match. Beyond the scholarship, the mat trains things employers and life reward: showing up when it's hard, cutting through nerves alone in the circle, owning a loss and adjusting, and out-working the room. Wrestlers carry discipline, self-reliance, and resilience into every job and relationship they ever have. That is the real prize, no matter how far up the bracket you go.",
+    "roleModels": [
+      {
+        "name": "Jordan Burroughs",
+        "for": "world and Olympic champion known for humility, mentoring younger wrestlers, and being a steady family man and ambassador for the sport"
+      },
+      {
+        "name": "Kyle Snyder",
+        "for": "carries himself with quiet discipline and class, leads by work ethic and example rather than talk"
+      },
+      {
+        "name": "Kyle Dake",
+        "for": "respected for relentless preparation, grace in winning and losing, and lifting up teammates and the wrestling community"
+      }
+    ]
+  },
+  "tennis": {
+    "oddsTruth": "Here's the honest truth: only about 5 out of every 100 high school tennis players go on to play in the NCAA, and the pro tour is rarer still. Read that and feel free, not small. The pro tour is a long-shot bonus, never the point. You play tennis for what it builds in you right now - the discipline of practicing a serve a thousand times, the calm of solving problems alone on the court, the grit to lose a tough match and show up the next morning. Not turning pro is not failure. The kid who uses tennis to earn a degree, make lifelong friends, and learn to handle pressure has already won the thing that lasts.",
+    "funnel": [
+      {
+        "tier": "In high school",
+        "figure": "~360,000",
+        "of": "boys and girls play HS tennis nationwide"
+      },
+      {
+        "tier": "Make an NCAA roster",
+        "figure": "~5% (men), ~5% (women)",
+        "of": "of HS tennis players go on to play in the NCAA (roughly 1 in 20)"
+      }
+    ],
+    "education": "This is the real prize: tennis can open the door to college. Coaches recruit across all three NCAA divisions, and scholarship or admissions support can put a degree within reach that changes a family's whole trajectory. The point of the scholarship isn't the tennis - it's the education and the doors it opens. And the habits tennis drills into you - showing up early, managing your own schedule, staying composed when you're down a set, owning your mistakes because there's no teammate to blame - are exactly the skills colleges, employers, and life reward long after you hang up the racket.",
+    "roleModels": [
+      {
+        "name": "Roger Federer",
+        "for": "Carried himself with grace and respect for opponents and officials across two decades; widely admired for sportsmanship, humility in winning and losing, and a foundation funding education for kids in Africa."
+      },
+      {
+        "name": "Frances Tiafoe",
+        "for": "Son of immigrant parents who grew up at the tennis center where his dad worked; models gratitude, joy, and work ethic, and openly uses his platform to show kids from any background they belong in the game."
+      },
+      {
+        "name": "Coco Gauff",
+        "for": "Leads with poise and maturity well beyond her years; known for thoughtful interviews, lifting up younger players, and handling pressure and setbacks with composure and class."
+      }
+    ]
+  },
+  "golf": {
+    "oddsTruth": "Here is the honest truth about golf: there is no clean, guaranteed road to the pros, and you should not need one. Tours like the PGA and LPGA exist, but reaching them is rare enough that the NCAA does not even publish a standard pro figure for golf the way it does for football or basketball. Read that as freedom, not a closed door. Golf gives you a real shot at a college roster and a scholarship that pays for school, and it builds a level head and self-discipline you will use for the rest of your life. Chasing the pro tour is a long-shot bonus, never the point. If you never turn pro, you have not failed -- you have already won the things that actually last.",
+    "funnel": [
+      {
+        "tier": "In high school",
+        "figure": "~162,000 boys / ~85,000 girls",
+        "of": "play high school golf nationwide"
+      },
+      {
+        "tier": "Make an NCAA roster",
+        "figure": "~5.4% (boys) / ~6.9% (girls)",
+        "of": "of HS golfers go on to play in the NCAA"
+      }
+    ],
+    "education": "This is the real prize. A golf roster spot can open the door to a college education -- scholarship money, admission support, and a built-in team and coaches who want you to graduate. The discipline golf teaches you (managing your own emotions, recovering after a bad hole, being honest enough to call a penalty on yourself when no one is watching) is exactly what employers and life reward. Golf is also a sport you can play and enjoy for sixty more years, long after every other game is over. Whatever level you reach, what it builds in you -- patience, integrity, composure -- and the doors it opens to school are yours to keep.",
+    "roleModels": [
+      {
+        "name": "Annika Sorenstam",
+        "for": "Models steady class and quiet, relentless work; built a foundation that mentors young players and lifts the next generation of girls in golf."
+      },
+      {
+        "name": "Gary Player",
+        "for": "Known for discipline, fitness, and a lifetime of sportsmanship; treated every opponent with respect and credited hard work over natural talent."
+      },
+      {
+        "name": "Lorena Ochoa",
+        "for": "Carried herself with humility at the very top, then stepped away on her own terms to serve kids through her foundation -- character over chasing more."
+      }
+    ]
+  },
+  "lacrosse": {
+    "oddsTruth": "Here's the honest, freeing truth: of every group of high school lacrosse players, most will not play in the NCAA, and that is completely normal -- not a failure. Lacrosse actually has one of the friendliest paths to college play of any sport, but the pro game (the PLL) is tiny and brand new, so reaching it is a rare bonus, never the goal. Play because the game makes you tougher, faster, and more connected to a team right now. Where you finish on the ladder has nothing to do with your worth; what the sport builds in you travels with you for life.",
+    "funnel": [
+      {
+        "tier": "In high school",
+        "figure": "~114,000 boys / ~99,000 girls",
+        "of": "play lacrosse nationwide each year"
+      },
+      {
+        "tier": "Make an NCAA roster",
+        "figure": "~13-14% (boys) / ~13% (girls)",
+        "of": "of HS players go on to play in the NCAA -- one of the better odds in all of sports"
+      },
+      {
+        "tier": "Reach the pros",
+        "figure": "~0.8%",
+        "of": "of NCAA men reach the pro PLL; the league is small and new, and there is no comparable women's pro tier"
+      }
+    ],
+    "education": "This is the real prize. Lacrosse is one of the surest sports for turning play into a college opportunity, and a roster spot or scholarship is access -- to a degree, a network, and doors that stay open long after your last game. On the way there the sport drills habits that outlast it: showing up early, reading a fast-moving field, trusting teammates, and bouncing back after a loss. Those are the skills colleges, employers, and life reward. Chase the education the game can unlock, and you win no matter how far you climb.",
+    "roleModels": [
+      {
+        "name": "Paul Rabil",
+        "for": "A founder of the PLL who built the modern pro game so players after him could earn a living -- known for relentless work, humility, and lifting the whole sport, not just himself"
+      },
+      {
+        "name": "Lyle Thompson",
+        "for": "Carries himself with quiet dignity and pride in his roots, mentors young players, and lets his game and his character -- not trash talk -- do the talking"
+      },
+      {
+        "name": "Taylor Cummings",
+        "for": "A three-time national player of the year who leads by example and gives back through coaching and growing the women's game for the next generation"
+      }
+    ]
+  },
+  "gymnastics": {
+    "oddsTruth": "Here's the honest truth about gymnastics: it has no normal pro league. The very top is the national team and the Olympics, and that road is one of the narrowest in all of sports. Almost no one walks it, and that is not a knock on you. Read it the other way: gymnastics asks for discipline, courage, and daily repetition that most people never build, and you keep every bit of that whether or not you ever make a college roster. Going elite would be a rare bonus on top of a great thing. It is never the point, and not reaching it is not failure. The strength, nerve, and work ethic this sport puts in you are yours for life.",
+    "funnel": [
+      {
+        "tier": "In high school / club",
+        "figure": "hundreds of thousands",
+        "of": "young gymnasts train in clubs nationwide (the NCAA does not publish a clean HS rate, since most train at clubs, not school teams)"
+      },
+      {
+        "tier": "Compete in the NCAA",
+        "figure": "~3,500 women, ~200 men",
+        "of": "across roughly 84-86 women's and only about 15 men's college programs - mostly Level 10/elite recruits"
+      },
+      {
+        "tier": "Reach the top (Olympic / elite)",
+        "figure": "a few dozen",
+        "of": "make a U.S. national or Olympic team - no standard pro league exists, so this is the rare ceiling"
+      }
+    ],
+    "education": "The real prize in gymnastics is the door it opens to college. Women's gymnastics is a fully-funded NCAA scholarship sport, so a strong gymnast can earn a debt-free or low-cost education, and a degree outlasts any routine you'll ever do. Beyond the scholarship, the sport quietly builds the exact things that carry you through life: showing up every day, performing under pressure, falling and getting back on the beam, and trusting your own preparation. That discipline, poise, and grit transfer to any classroom, job, or team you ever join.",
+    "roleModels": [
+      {
+        "name": "Simone Biles",
+        "for": "how she speaks openly about mental health and well-being, puts her own health first, and uses her platform to make the sport safer and kinder for the gymnasts who come after her"
+      },
+      {
+        "name": "Gabby Douglas",
+        "for": "the poise and humility she carried as a young pioneer, leading from within a team and staying gracious in the brightest spotlight"
+      },
+      {
+        "name": "Sam Mikulak",
+        "for": "his resilience and longevity in men's gymnastics, the way he kept competing through injuries and worked to lift and protect a sport with few programs left"
+      }
+    ]
+  },
+  "hockey": {
+    "oddsTruth": "Here's the honest part, said with respect for you: hockey has one of the friendliest college funnels of any sport, and even so, the pros are a long shot for almost everyone who laces up. Read that and feel free, not small. You don't play hockey to \"make it\" - you play for what it's building in you right now: grit, composure under pressure, the habit of showing up at 5 a.m. when no one's watching. Reaching the NHL would be a wild bonus on top of all that. Not reaching it is not failure - it never was. The kid who gives everything and tops out in juniors or college walks away with the exact same character, friendships, and open doors as the one who gets drafted.",
+    "funnel": [
+      {
+        "tier": "In high school",
+        "figure": "~32,000",
+        "of": "boys play HS ice hockey nationwide (many more play club/juniors)"
+      },
+      {
+        "tier": "Make an NCAA roster",
+        "figure": "~11%",
+        "of": "of HS hockey players reach the NCAA - one of the highest rates of any sport"
+      },
+      {
+        "tier": "Get drafted (NHL)",
+        "figure": "~7%",
+        "of": "of draft-eligible NCAA players are picked in the NHL Draft"
+      }
+    ],
+    "education": "This is the real prize: hockey can open the door to college. A scholarship or a roster spot isn't just ice time - it's access to an education and a degree that pays off for the rest of your life, long after the skates are hung up. And the things the rink drills into you - discipline, teamwork, handling adversity, leading and being led, bouncing back from a bad shift - are exactly the skills that make you good at school, at work, and at being a steady person. The doors hockey opens off the ice outlast anything on the scoreboard.",
+    "roleModels": [
+      {
+        "name": "Sidney Crosby",
+        "for": "Leads by relentless work ethic and humility - first one on the ice, last off, and famous for treating equipment staff and young teammates with the same respect as stars."
+      },
+      {
+        "name": "P.K. Subban",
+        "for": "Carries himself with joy and generosity off the ice, known for huge community giving and lifting up kids who didn't see themselves in the sport."
+      },
+      {
+        "name": "Hayley Wickenheiser",
+        "for": "One of the most respected leaders in the game - relentless competitor who built her life around education and mentoring the next generation."
+      }
+    ]
+  },
+  "cheerleading": {
+    "oddsTruth": "Here's the honest part: cheerleading has no standard pro league, and only a small slice of high-school cheerleaders go on to do it in college. That's not a warning - it's freedom. You don't cheer to chase a paycheck that doesn't exist; you cheer for what it actually hands you right now: strength, fearless teamwork, poise under pressure, and a crew that has your back. Going on to a college squad or one of the new NCAA pathways is a real, worthy goal - a bonus if it comes. But not getting there is not failing. The discipline and confidence you build on the mat are yours for life, no matter the highest stage you ever step onto.",
+    "funnel": [
+      {
+        "tier": "In high school",
+        "figure": "~206,000",
+        "of": "girls in competitive cheer/spirit nationwide (NFHS 2024-25), plus many more on sideline squads"
+      },
+      {
+        "tier": "Compete in college",
+        "figure": "a small share",
+        "of": "go on to a college spirit squad, STUNT, or Acrobatics & Tumbling team"
+      }
+    ],
+    "education": "This is the real prize. College spirit squads and the fast-growing NCAA pathways - STUNT and Acrobatics & Tumbling, now full championship sports - can open doors to scholarships and campus opportunities, and scholarship money is really access to an education and a degree that pays off for decades. Even off the mat, cheer builds the stuff colleges and employers want: showing up early, leading a group, performing when the pressure is on, and trusting teammates with literal weight on the line. Those habits travel everywhere - that's the door cheer opens.",
+    "roleModels": [
+      {
+        "name": "Gabby Douglas",
+        "for": "Olympic gymnast whose grit, humility, and work ethic in a tumbling-heavy sport model how to handle big pressure and bigger setbacks with grace."
+      },
+      {
+        "name": "Simone Biles",
+        "for": "shows that real toughness includes knowing your limits, speaking up for your wellbeing, and lifting up teammates - leadership beyond any score."
+      },
+      {
+        "name": "Laurie Hernandez",
+        "for": "carries herself with joy and encouragement, cheering on competitors and proving you can be fierce and kind at the same time."
+      }
+    ]
   }
 };
 

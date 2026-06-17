@@ -115,10 +115,11 @@
       head.insertBefore(art, head.firstChild);
     }
 
-    // 2) Count-up targets — the recruiting scholarship figures.
-    var numEls = [];
+    // 2) Count-up targets — wrap the recruiting scholarship figures, then collect
+    //    every .fx-num (recruiting + any pre-marked funnel figures from Beyond the Game).
     var gold = sheet.querySelector('.sds-deepsec--gold');
-    if(gold){ Array.prototype.forEach.call(gold.querySelectorAll('.sds-kv__v'), function(v){ var n = wrapNumber(v); if(n) numEls.push(n); }); }
+    if(gold){ Array.prototype.forEach.call(gold.querySelectorAll('.sds-kv__v'), function(v){ wrapNumber(v); }); }
+    var numEls = Array.prototype.slice.call(sheet.querySelectorAll('.fx-num[data-countup]'));
 
     // 3) Scroll-reveal — hidden state applied here (so no-module = visible).
     var secs = sheet.querySelectorAll('.sds-lead, .sds-sec');
