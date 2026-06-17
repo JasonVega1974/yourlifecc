@@ -146,28 +146,32 @@
     Array.prototype.forEach.call(secs, function(el){ obs.observe(el); });
   }
 
-  // Generic scroll-reveal for surfaces beyond the deep sheet (e.g. the My Sports
-  // athlete page). Reveal ONLY — no count-up — so nothing here ever animates a
-  // number (weight stays a static, un-animated field). Observed against the page
-  // viewport; full reduced-motion path (instant, no movement).
+  // On-open entrance reveal for the two My Sports tab surfaces (the "add a sport"
+  // intake + the athlete list). Reveal ONLY — no count-up — so nothing here ever
+  // animates a number (weight stays a static, un-animated field).
+  //
+  // DELIBERATELY NOT IntersectionObserver-gated: both callers are shown via a
+  // display-toggle when the My Sports tab opens, they are NOT scrolled into view.
+  // A viewport IntersectionObserver could (and on production DID) fail to deliver
+  // its initial callback for freshly display-toggled content, stranding it —
+  // including the ONLY "add a sport" control — permanently at opacity:0. So we
+  // trigger the .fx-in fade deterministically on the next frame instead; the
+  // per-element --fx-i delay still produces the staggered entrance. (The Explore
+  // deep sheet keeps its own scroll-reveal in apply(), which observes against the
+  // scrollable sheet — that path is unaffected.) Full reduced-motion path below.
   function reveal(scope, sel){
     if(!scope) return null;
     var els = scope.querySelectorAll(sel);
     var i = 0;
     Array.prototype.forEach.call(els, function(el){ el.classList.add('fx-reveal'); el.style.setProperty('--fx-i', (i++ % 6)); });
-    if(prefersReduce()){ Array.prototype.forEach.call(els, function(el){ el.classList.add('fx-in'); }); return null; }
-    var remaining = els.length;
-    if(!remaining) return null;
-    var obs = new IntersectionObserver(function(entries, o){
-      entries.forEach(function(en){
-        if(!en.isIntersecting) return;
-        en.target.classList.add('fx-in');
-        o.unobserve(en.target);
-        if(--remaining <= 0){ try { o.disconnect(); } catch(e){} }
-      });
-    }, { threshold: 0.1, rootMargin: '0px 0px -5% 0px' });
-    Array.prototype.forEach.call(els, function(el){ obs.observe(el); });
-    return obs;
+    if(!els.length) return null;
+    var revealAll = function(){ Array.prototype.forEach.call(els, function(el){ el.classList.add('fx-in'); }); };
+    if(prefersReduce()){ revealAll(); return null; }
+    if(typeof requestAnimationFrame === 'function'){
+      requestAnimationFrame(function(){ requestAnimationFrame(revealAll); });
+    } else { revealAll(); }
+    setTimeout(revealAll, 250);   // belt-and-suspenders: never leave content hidden
+    return null;
   }
 
   window.sportsFxApply  = apply;
