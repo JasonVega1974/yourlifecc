@@ -2754,10 +2754,14 @@ function _injectFinderLaunch(){
 /* ── Main tab switcher ─────────────────────────────────────── */
 function sportMainTab(tab, btn){
   document.querySelectorAll('#s-sports > .tabs > .tab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('sp-explore').style.display = tab==='explore' ? '' : 'none';
-  document.getElementById('sp-mine').style.display    = tab==='mine'    ? '' : 'none';
-  if(tab==='mine'){ renderMySports(); renderSportPicker(); renderSportPreview(); }
+  // The topic-grid nav (tgOpenTopic in ui.js) invokes this as sportMainTab('mine')
+  // with NO btn, inside a try/catch that swallows errors. Touching btn.classList
+  // unguarded threw here and silently aborted before the render calls below — which
+  // is why My Sports opened to an empty picker on real navigation. Guard it.
+  if(btn) btn.classList.add('active');
+  const ex = document.getElementById('sp-explore'); if(ex) ex.style.display = tab==='explore' ? '' : 'none';
+  const mn = document.getElementById('sp-mine');    if(mn) mn.style.display    = tab==='mine'    ? '' : 'none';
+  if(tab==='mine'){ renderMySports(); }  // renderMySports builds the list AND the intake picker + live preview
 }
 
 /* ── My Sports — owner-guarded, cloud-synced D blob (Phase B) ──
@@ -2975,6 +2979,14 @@ function deleteMySport(id){
    frequency loops. The reveal uses sportsFxReveal (no count-up — weight is
    never animated). */
 function renderMySports(){
+  // The intake (sport-tile picker + live preview) is part of the My Sports view, so
+  // build it on EVERY entry to the view — before any early-return below — regardless
+  // of how the view was opened (topic-grid nav, tab click, or a post-edit re-render)
+  // and even when the user has no sports yet (the empty-state path returns early).
+  // This is the call site that was missing: nothing on the real open path invoked
+  // the picker. renderSportPicker self-heals, so repeat calls are cheap no-ops.
+  if(typeof renderSportPicker === 'function') renderSportPicker();
+  if(typeof renderSportPreview === 'function') renderSportPreview();
   const container = document.getElementById('mySportsList');
   if(!container) return;
   _migrateMySports();            // fold any legacy localStorage data into D once
