@@ -2851,15 +2851,43 @@ function _heroSafePos(pos){
 }
 function renderSportPicker(){
   const grid = document.getElementById('sportPickerGrid');
-  if(!grid || grid.dataset.built === '1') return;
-  const tiles = SPORT_DATA.map(s=>{
-    const hex = (typeof THEME_HEX !== 'undefined' && SPORT_THEME[s.id]) ? THEME_HEX[SPORT_THEME[s.id]] : ['#38bdf8','#818cf8'];
-    return '<button type="button" class="msp-tile" data-sport="'+s.id+'" style="--sd-a:'+hex[0]+';--sd-b:'+hex[1]+';" onclick="selectSportTile(\''+s.id+'\')" aria-label="'+escapeHtml(s.name)+'">'
-      + '<span class="msp-tile__e" aria-hidden="true">'+s.emoji+'</span><span class="msp-tile__n">'+escapeHtml(s.name)+'</span></button>';
-  }).join('');
-  grid.innerHTML = tiles
-    + '<button type="button" class="msp-tile msp-tile--more" data-sport="__more" onclick="selectSportCustom()" aria-label="Add another sport"><span class="msp-tile__e" aria-hidden="true">➕</span><span class="msp-tile__n">More / other</span></button>';
-  grid.dataset.built = '1';
+  if(!grid){ try { console.warn('[picker] #sportPickerGrid not found'); } catch(e){} return; }
+  // Self-heal: (re)build when never built OR when a prior attempt left it empty.
+  // The tiles are the ONLY way to add a sport — never early-return on a blank grid.
+  if(grid.dataset.built === '1' && grid.children.length > 0) return;
+
+  // Resolve dependencies defensively. A top-level `const` that hasn't initialised
+  // yet sits in its temporal dead zone and THROWS even on `typeof` — so each
+  // lookup is wrapped. The sport catalog is required; the theme maps are optional
+  // (a missing/uninitialised theme must degrade to default colors, never blank the
+  // whole picker). escapeHtml lives in parent.js (loads after this file).
+  var catalog = null, themeMap = {}, hexMap = {}, esc;
+  try { if(typeof SPORT_DATA  !== 'undefined') catalog  = SPORT_DATA; }  catch(e){ try { console.error('[picker] SPORT_DATA inaccessible:', e && e.message); } catch(_){} }
+  try { if(typeof SPORT_THEME !== 'undefined') themeMap = SPORT_THEME || {}; } catch(e){ try { console.error('[picker] SPORT_THEME inaccessible:', e && e.message); } catch(_){} }
+  try { if(typeof THEME_HEX   !== 'undefined') hexMap   = THEME_HEX || {}; }   catch(e){ try { console.error('[picker] THEME_HEX inaccessible:', e && e.message); } catch(_){} }
+  esc = (typeof escapeHtml === 'function') ? escapeHtml
+      : function(x){ return String(x == null ? '' : x).replace(/[&<>]/g, function(c){ return c === '&' ? '&amp;' : c === '<' ? '&lt;' : '&gt;'; }); };
+
+  if(!Array.isArray(catalog) || !catalog.length){
+    var t; try { t = typeof SPORT_DATA; } catch(e){ t = 'TDZ-throw'; }
+    try { console.error('[picker] sport catalog unavailable/empty — cannot build tiles (typeof SPORT_DATA=' + t + ', len=' + (catalog && catalog.length) + ')'); } catch(e){}
+    return;
+  }
+
+  try {
+    var tiles = catalog.map(function(s){
+      var pal = themeMap[s.id], hex = (pal && hexMap[pal]) ? hexMap[pal] : ['#38bdf8','#818cf8'];
+      return '<button type="button" class="msp-tile" data-sport="'+s.id+'" style="--sd-a:'+hex[0]+';--sd-b:'+hex[1]+';" onclick="selectSportTile(\''+s.id+'\')" aria-label="'+esc(s.name)+'">'
+        + '<span class="msp-tile__e" aria-hidden="true">'+s.emoji+'</span><span class="msp-tile__n">'+esc(s.name)+'</span></button>';
+    }).join('');
+    grid.innerHTML = tiles
+      + '<button type="button" class="msp-tile msp-tile--more" data-sport="__more" onclick="selectSportCustom()" aria-label="Add another sport"><span class="msp-tile__e" aria-hidden="true">➕</span><span class="msp-tile__n">More / other</span></button>';
+    grid.dataset.built = '1';
+    try { console.log('[picker] built ' + grid.children.length + ' tiles from ' + catalog.length + ' sports'); } catch(e){}
+  } catch(e){
+    try { console.error('[picker] threw while building tiles:', e); } catch(_){}
+    return;
+  }
   // Entrance reveal (once) — reuses the sports-fx layer; reveal only, no count-up.
   const intake = document.getElementById('sportIntake');
   if(intake && typeof window.sportsFxReveal === 'function'){ try { window.sportsFxReveal(intake, '.fx-reveal-target'); } catch(e){} }
