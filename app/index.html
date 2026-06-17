@@ -834,7 +834,8 @@
 
 <!-- PIN MODAL — full screen, matches child login style -->
 <div id="pinModal" style="display:none;position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#0a0a14,#1a1a2e,#16213e);align-items:center;justify-content:center;flex-direction:column;">
-  <div style="text-align:center;max-width:340px;width:92%;">
+  <div style="text-align:center;max-width:340px;width:92%;position:relative;">
+    <button onclick="_pinCancel()" aria-label="Close" title="Close" style="position:absolute;top:-.25rem;right:-.25rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.7);width:34px;height:34px;border-radius:50%;font-size:1.05rem;line-height:1;cursor:pointer;font-family:var(--fn);display:flex;align-items:center;justify-content:center;">✕</button>
     <!-- Avatar circle -->
     <div id="pinModalIcon" style="width:64px;height:64px;border-radius:50%;background:var(--c);display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto .8rem;box-shadow:0 4px 20px rgba(56,189,248,.35);">🔒</div>
     <div id="pinModalTitle" style="font-size:1.3rem;font-weight:900;color:#fff;margin-bottom:.25rem;letter-spacing:.01em;"></div>
@@ -859,7 +860,7 @@
       <button onclick="_pinKey('7')" class="pin-btn">7</button>
       <button onclick="_pinKey('8')" class="pin-btn">8</button>
       <button onclick="_pinKey('9')" class="pin-btn">9</button>
-      <button onclick="_pinCancel()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.4);border-radius:12px;padding:.9rem;font-size:.62rem;font-weight:700;cursor:pointer;font-family:var(--fn);">Cancel</button>
+      <button onclick="_pinClear()" class="pin-btn" aria-label="Clear PIN entry">*</button>
       <button onclick="_pinKey('0')" class="pin-btn">0</button>
       <button onclick="_pinKey('⌫')" class="pin-btn" style="font-size:1.2rem;">⌫</button>
     </div>

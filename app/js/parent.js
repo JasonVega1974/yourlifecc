@@ -5612,6 +5612,16 @@ function _pinError(msg){
   setTimeout(()=>{ _pinEntry=''; _pinUpdateDots(); if(errEl) errEl.textContent=''; }, 800);
 }
 
+// Clear the current PIN entry without dismissing the modal (the bottom-left
+// '*' key on the #pinModal pad). Dots reset to empty; no error shown; modal
+// stays open. Dismiss now lives on the new top-right close (X) -> _pinCancel().
+function _pinClear(){
+  _pinEntry = '';
+  _pinUpdateDots();
+  const errEl = document.getElementById('pinModalError');
+  if(errEl) errEl.textContent = '';
+}
+
 async function _pinSubmit(){
   if(_pinMode === 'enter'){
     // _pinExpected (legacy plaintext) is honored only when explicitly passed.
