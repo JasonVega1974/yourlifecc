@@ -8569,6 +8569,11 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 }
 :root.light .sds-head.sds-hero{ background:linear-gradient(135deg, color-mix(in srgb, var(--sd-a) 24%, #fff), color-mix(in srgb, var(--sd-b) 11%, #fff)); }
 :root.light .sds-hero-art{ opacity:.2; }
+/* Part 1: on the pale light band the bright accent washes out — override with a
+   DEEP-toned motif (theme mixed toward the warm ink) at higher opacity so it
+   reads. Additive: higher specificity than the rule above, keeps app.css
+   extend-only (zero deletions). */
+:root.light .sds-head.sds-hero .sds-hero-art{ color:color-mix(in srgb, var(--sd-a) 58%, #1f1810); opacity:.3; }
 
 #s-learn .tab-landing-card.tlc-power:nth-child(1) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(1) .tlc-shimmer{ animation-delay:0s; }
 #s-learn .tab-landing-card.tlc-power:nth-child(2) .tlc-shimmer, #s-me .tab-landing-card.tlc-power:nth-child(2) .tlc-shimmer{ animation-delay:.28s; }

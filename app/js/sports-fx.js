@@ -17,41 +17,44 @@
 (function(){
   'use strict';
 
-  // Phase V sample allowlist — one team / one individual / one reviewed exemplar.
-  // Expand to all 16 once the pattern is approved.
-  var FX_SPORTS = { basketball:1, track:1, swimming:1 };
-
-  // Original line-art motifs (stroke paths, fill:none, currentColor → theme).
+  // Original line-art motifs — ENVIRONMENTAL: each evokes the sport's SPACE or
+  // signature equipment (the emoji is the sport ID; the motif is its place).
+  // Clean geometric forms, stroke paths, fill:none, currentColor → theme. One
+  // per SPORT_DATA sport so the hero treatment can roll across all 16.
+  function svg(body){ return '<svg viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">' + body + '</svg>'; }
   var MOTIFS = {
-    basketball:
-      '<svg viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">'
-      + '<circle cx="60" cy="60" r="46"/>'
-      + '<line x1="60" y1="14" x2="60" y2="106"/>'
-      + '<line x1="14" y1="60" x2="106" y2="60"/>'
-      + '<path d="M27 27 Q60 60 27 93"/>'
-      + '<path d="M93 27 Q60 60 93 93"/>'
-      + '</svg>',
-    track:
-      '<svg viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">'
-      + '<circle cx="66" cy="24" r="8.5"/>'                 // head
-      + '<path d="M62 34 L53 63"/>'                          // forward-leaning torso
-      + '<path d="M59 41 L77 35"/>'                          // lead arm reaching
-      + '<path d="M56 44 L41 51"/>'                          // trailing arm
-      + '<path d="M53 63 L67 58 L71 41"/>'                   // driving front leg (knee up)
-      + '<path d="M53 63 L41 80 L30 92"/>'                   // extended back leg
-      + '<line x1="18" y1="101" x2="100" y2="101"/>'         // track line
-      + '<line x1="12" y1="40" x2="30" y2="40"/>'            // speed line
-      + '<line x1="9" y1="52" x2="29" y2="52"/>'             // speed line
-      + '</svg>',
-    swimming:
-      '<svg viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">'
-      + '<path d="M6 76 Q22 68 38 76 T70 76 T102 76 T134 76"/>'  // water surface
-      + '<circle cx="50" cy="64" r="8"/>'                        // head at the surface
-      + '<path d="M45 67 Q70 78 98 68"/>'                        // body along the surface
-      + '<path d="M55 60 Q64 38 82 46"/>'                        // recovering arm arcing over
-      + '<path d="M47 68 L38 82"/>'                              // pulling arm
-      + '<path d="M40 84 L35 90 M46 86 L43 92"/>'                // splash
-      + '</svg>',
+    // gridiron — yard lines, hash marks + a goalpost
+    football: svg('<path d="M16 46 H104 M16 62 H104 M16 78 H104 M16 94 H104"/><path d="M58 46 v5 M62 46 v5 M58 62 v5 M62 62 v5 M58 78 v5 M62 78 v5"/><path d="M48 46 V26 M72 46 V26 M44 30 H76 M60 30 V14"/>'),
+    // the key — lane, free-throw circle, baseline + restricted arc
+    basketball: svg('<rect x="44" y="34" width="32" height="58"/><circle cx="60" cy="34" r="15"/><path d="M44 92 H76"/><path d="M51 92 a9 9 0 0 1 18 0"/>'),
+    // the pitch — boundary, halfway line, center circle, penalty boxes
+    soccer: svg('<rect x="20" y="24" width="80" height="72" rx="2"/><path d="M20 60 H100"/><circle cx="60" cy="60" r="13"/><rect x="46" y="24" width="28" height="13"/><rect x="46" y="83" width="28" height="13"/>'),
+    // the diamond — bases, pitcher\'s mound + foul lines
+    baseball: svg('<path d="M60 30 L86 56 L60 82 L34 56 Z"/><circle cx="60" cy="56" r="4.5"/><path d="M60 82 L32 100 M60 82 L88 100"/><rect x="57.5" y="79.5" width="5" height="5"/><rect x="83" y="53.5" width="5" height="5"/><rect x="57.5" y="28" width="5" height="5"/><rect x="32" y="53.5" width="5" height="5"/>'),
+    // the diamond — with the softball pitching circle (heavier so it reads small)
+    softball: svg('<path d="M60 32 L84 56 L60 80 L36 56 Z"/><circle cx="60" cy="56" r="10" stroke-width="3.4"/><path d="M60 80 L34 98 M60 80 L86 98"/>'),
+    // the oval — outer track + inner lane + finish line
+    track: svg('<rect x="20" y="38" width="80" height="46" rx="23"/><rect x="31" y="48" width="58" height="26" rx="13"/><path d="M60 38 V48"/>'),
+    // a winding course — hill ridge, an S-curving trail + a finish arch at its end
+    crosscountry: svg('<path d="M10 54 Q32 38 54 52 T96 48"/><path d="M14 96 Q34 88 42 76 Q50 62 68 66 Q82 69 86 80"/><path d="M76 80 V70 M96 80 V70 M76 70 a10 10 0 0 1 20 0"/>'),
+    // the court — net, attack lines + center net mesh
+    volleyball: svg('<rect x="24" y="44" width="72" height="34"/><path d="M60 34 V88"/><path d="M44 44 V78 M76 44 V78"/><path d="M55 42 H65 M55 50 H65 M55 58 H65 M55 66 H65 M58 40 V72 M62 40 V72"/>'),
+    // the pool — lane ropes + wall T-marks
+    swimming: svg('<rect x="18" y="34" width="84" height="52" rx="2"/><path d="M18 47 H102 M18 60 H102 M18 73 H102"/><path d="M28 42 V52 M92 42 V52 M28 68 V78 M92 68 V78"/>'),
+    // the mat — concentric circles + center starting lines
+    wrestling: svg('<circle cx="60" cy="60" r="42"/><circle cx="60" cy="60" r="26"/><circle cx="60" cy="60" r="5"/><path d="M52 57 H58 M52 63 H58 M62 57 H68 M62 63 H68"/>'),
+    // the court — net, singles lines, service boxes
+    tennis: svg('<rect x="22" y="28" width="76" height="64"/><path d="M22 60 H98"/><path d="M34 28 V92 M86 28 V92"/><path d="M34 44 H86 M34 76 H86"/><path d="M60 44 V76"/>'),
+    // the green — flagstick, flag, hole + a fairway sweep
+    golf: svg('<ellipse cx="58" cy="62" rx="42" ry="26"/><circle cx="68" cy="58" r="3"/><path d="M68 58 V22"/><path d="M68 22 L90 28 L68 35"/><path d="M16 92 Q40 82 60 86"/>'),
+    // the goal, net + the full crease arc and restraining line (the lacrosse tell)
+    lacrosse: svg('<rect x="48" y="40" width="24" height="20"/><path d="M48 47 H72 M48 54 H72 M56 40 V60 M64 40 V60"/><path d="M26 60 a34 34 0 0 1 68 0"/><path d="M26 60 H94"/><path d="M20 78 H100"/>'),
+    // the uneven bars — two asymmetric rail sets, side by side (no figure)
+    gymnastics: svg('<path d="M26 46 H58 M28 46 V96 M56 46 V96"/><path d="M62 72 H96 M64 72 V96 M94 72 V96"/><path d="M22 96 H100"/>'),
+    // the rink — center line, faceoff circle, blue lines + dots
+    hockey: svg('<rect x="18" y="30" width="84" height="60" rx="20"/><path d="M60 30 V90"/><circle cx="60" cy="60" r="10"/><path d="M40 30 V90 M80 30 V90"/><circle cx="32" cy="46" r="1.8"/><circle cx="88" cy="74" r="1.8"/>'),
+    // the competition floor — bordered mat, interior panel grid + a tumbling-pass arc
+    cheerleading: svg('<rect x="18" y="38" width="84" height="48" rx="3"/><rect x="25" y="45" width="70" height="34"/><path d="M48 45 V79 M72 45 V79 M25 62 H95"/><path d="M30 76 Q50 46 66 72 Q78 90 92 56"/>'),
   };
 
   function prefersReduce(){
@@ -96,14 +99,14 @@
   }
 
   function apply(overlay, id){
-    if(!overlay || !FX_SPORTS[id]) return;
+    if(!overlay) return;
     var sheet = overlay.querySelector('.sds-sheet');
     if(!sheet) return;
     if(window._sportsFxObs){ try { window._sportsFxObs.disconnect(); } catch(e){} window._sportsFxObs = null; }
 
     // 1) Hero band — theme palette (CSS, from --sd-a/--sd-b) + line-art motif.
     var head = sheet.querySelector('.sds-head');
-    if(head && !head.querySelector('.sds-hero-art')){
+    if(head && MOTIFS[id] && !head.querySelector('.sds-hero-art')){
       head.classList.add('sds-hero');
       var art = document.createElement('div');
       art.className = 'sds-hero-art';
