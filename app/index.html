@@ -15614,58 +15614,52 @@
   <!-- ═══ MY SPORTS TAB ═══ -->
   <div id="sp-mine" style="display:none;">
 
-    <!-- ⚠️ DISCLAIMER -->
-    <div class="msp-disc">
-      <div class="msp-disc__t">⚠️ Important disclaimer</div>
-      <div class="msp-disc__b">
+    <!-- Disclaimer — calm, collapsible; the key summary stays visible, full substance one tap away -->
+    <details class="msp-disc2">
+      <summary class="msp-disc2__sum">
+        <span class="msp-disc2__i" aria-hidden="true">ℹ️</span>
+        <span class="msp-disc2__s">For reference and personal tracking only - not medical, athletic, or nutritional advice. Your coach and doctor are your primary resources. <span class="msp-disc2__more">Read the full note</span></span>
+        <span class="msp-disc2__chev" aria-hidden="true">⌄</span>
+      </summary>
+      <div class="msp-disc2__b">
         The information in My Sports is provided <b>for reference and personal tracking purposes only</b> and does not constitute professional medical, athletic, or nutritional advice. YourLife.CC is <b>not a substitute for qualified coaching, athletic training, or medical care.</b> Injury prevention, nutrition, hydration, and conditioning information included here references publicly available guidance from reputable organizations (NATA, CDC, NIH, NSCA) and is intended as a <b>starting point for your own research</b> — not a complete or personalized protocol. <b>Always consult a licensed medical professional</b> before beginning any training program, making dietary changes, or managing an injury. YourLife.CC assumes no liability for injury, illness, or outcomes resulting from information tracked or referenced in this section. <b>Your coach and doctor are your primary resources — use them.</b>
       </div>
-    </div>
+    </details>
 
-    <!-- Add Sport -->
-    <div class="msp-add">
-      <div class="msp-add__title">➕ Add a sport</div>
-      <div class="msp-grid2">
-        <div class="msp-field">
-          <label class="msp-label" for="mySportSelect">Sport</label>
-          <select id="mySportSelect" class="msp-select">
-            <option value="">Select sport...</option>
-            <option>Football</option><option>Basketball</option><option>Soccer</option>
-            <option>Baseball</option><option>Softball</option><option>Wrestling</option>
-            <option>Track & Field</option><option>Cross Country</option><option>Volleyball</option>
-            <option>Swimming</option><option>Tennis</option><option>Golf</option>
-            <option>Lacrosse</option><option>Cheerleading</option><option>Gymnastics</option>
-            <option>Hockey</option><option>Rugby</option><option>Rowing</option>
-            <option>Water Polo</option><option>Bowling</option><option>Archery</option>
-            <option>Cycling</option><option>Martial Arts</option><option>MMA</option><option>Boxing</option><option>Jiu-Jitsu</option><option>Judo</option><option>Karate</option><option>Taekwondo</option><option>Dance</option>
-            <option>Other</option>
-          </select>
-        </div>
-        <div class="msp-field"><label class="msp-label" for="mySportCustom">Or type your own</label><input type="text" id="mySportCustom" class="msp-input" placeholder="Sport name..."></div>
+    <!-- Start your athlete page (intake — themed sport picker + live preview) -->
+    <div class="msp-intake" id="sportIntake">
+      <div class="msp-intake__title fx-reveal-target">Add a sport you play</div>
+      <div class="msp-intake__sub fx-reveal-target">Pick your sport - your page starts taking shape as you go.</div>
+      <div id="sportPickerGrid" class="msp-picker fx-reveal-target"></div>
+      <div class="msp-field msp-customwrap fx-reveal-target" id="mySportCustomWrap" style="display:none;">
+        <label class="msp-label" for="mySportCustom">Your sport</label>
+        <input type="text" id="mySportCustom" class="msp-input" placeholder="Type your sport" aria-label="Type your sport" oninput="renderSportPreview()">
       </div>
-      <div class="msp-grid2">
-        <div class="msp-field"><label class="msp-label" for="mySportTeam">Team</label><input type="text" id="mySportTeam" class="msp-input" placeholder="Team name..."></div>
-        <div class="msp-field"><label class="msp-label" for="mySportPosition">Position / event</label><input type="text" id="mySportPosition" class="msp-input" placeholder="Position/event..."></div>
-      </div>
-      <div class="msp-grid3">
-        <div class="msp-field">
-          <label class="msp-label" for="mySportLevel">Level</label>
-          <select id="mySportLevel" class="msp-select">
-            <option value="">Level...</option>
-            <option>Youth</option><option>Middle School</option><option>JV</option>
-            <option>Varsity</option><option>Club</option><option>College</option><option>Recreational</option>
-          </select>
+      <input type="hidden" id="mySportSelect" value="">
+      <div class="msp-intake__fields fx-reveal-target">
+        <div class="msp-grid2">
+          <div class="msp-field"><label class="msp-label" for="mySportTeam">School / team</label><input type="text" id="mySportTeam" class="msp-input" placeholder="e.g. Lincoln HS" oninput="renderSportPreview()"></div>
+          <div class="msp-field"><label class="msp-label" for="mySportPosition">Position / event</label><input type="text" id="mySportPosition" class="msp-input" placeholder="e.g. Point guard" oninput="renderSportPreview()"></div>
         </div>
-        <div class="msp-field">
-          <label class="msp-label" for="mySportSeason">Season</label>
-          <select id="mySportSeason" class="msp-select">
-            <option value="">Season...</option>
-            <option>Fall</option><option>Winter</option><option>Spring</option><option>Summer</option><option>Year-round</option>
-          </select>
+        <div class="msp-grid3">
+          <div class="msp-field"><label class="msp-label" for="mySportLevel">Level</label>
+            <select id="mySportLevel" class="msp-select" onchange="renderSportPreview()">
+              <option value="">Level...</option>
+              <option>Youth</option><option>Middle School</option><option>JV</option>
+              <option>Varsity</option><option>Club</option><option>College</option><option>Recreational</option>
+            </select>
+          </div>
+          <div class="msp-field"><label class="msp-label" for="mySportSeason">Season</label>
+            <select id="mySportSeason" class="msp-select" onchange="renderSportPreview()">
+              <option value="">Season...</option>
+              <option>Fall</option><option>Winter</option><option>Spring</option><option>Summer</option><option>Year-round</option>
+            </select>
+          </div>
+          <div class="msp-field"><label class="msp-label" for="mySportYear">Year</label><input type="number" id="mySportYear" class="msp-input" placeholder="e.g. 2025" oninput="renderSportPreview()"></div>
         </div>
-        <div class="msp-field"><label class="msp-label" for="mySportYear">Year</label><input type="number" id="mySportYear" class="msp-input" placeholder="e.g. 2025"></div>
       </div>
-      <button onclick="addMySport()" class="btn bp msp-addbtn">+ Add this sport</button>
+      <div id="sportPreview" class="msp-preview fx-reveal-target" aria-live="polite"></div>
+      <button id="mySportCTA" onclick="addMySport()" class="btn bp msp-addbtn" disabled aria-disabled="true">Pick a sport to start</button>
     </div>
 
     <!-- My Sports List -->

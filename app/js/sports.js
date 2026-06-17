@@ -2757,7 +2757,7 @@ function sportMainTab(tab, btn){
   btn.classList.add('active');
   document.getElementById('sp-explore').style.display = tab==='explore' ? '' : 'none';
   document.getElementById('sp-mine').style.display    = tab==='mine'    ? '' : 'none';
-  if(tab==='mine') renderMySports();
+  if(tab==='mine'){ renderMySports(); renderSportPicker(); renderSportPreview(); }
 }
 
 /* ── My Sports — owner-guarded, cloud-synced D blob (Phase B) ──
@@ -2828,10 +2828,104 @@ function addMySport(){
   arr.push(sport);
   saveMySports(arr);
 
-  // Reset form
-  select.value=''; custom.value=''; team.value=''; pos.value='';
-  level.value=''; season.value=''; year.value='';
+  resetSportIntake();
   renderMySports();
+}
+
+/* ── "Start your athlete page" intake (Phase-B reskin) ───────
+   A themed sport-tile picker + a live "your page, forming" preview that themes
+   to the chosen sport (SPORT_THEME + the sports-fx motif). Presentation/UX only:
+   the SAME fields write the SAME sport entry to the owner-guarded D.mySports path
+   via addMySport(). The hidden #mySportSelect holds the picked sport so the data
+   path is unchanged; "More / other" reveals the free-text custom input. No body
+   metrics, no compulsion mechanics — invitational copy only. */
+/* Wellbeing guard: the "Position / event" field is free text, so a user (or a
+   wrestler entering a class) can type a body-weight figure like "152 lb". Weight
+   is allowed to live quietly in "What coaches see" as ONE static fact, but it
+   must NEVER ride inside the celebratory, theme-glowing hero subtitle — not in
+   the live preview, not on the athlete page. This strips a weight-shaped value
+   out of the HERO line only; the field is still saved and shown in the quiet
+   facts row untouched. */
+function _heroSafePos(pos){
+  return /\b\d{2,3}\s?(?:lb|lbs|kg|pounds?|kilos?)\b/i.test(String(pos || '')) ? '' : pos;
+}
+function renderSportPicker(){
+  const grid = document.getElementById('sportPickerGrid');
+  if(!grid || grid.dataset.built === '1') return;
+  const tiles = SPORT_DATA.map(s=>{
+    const hex = (typeof THEME_HEX !== 'undefined' && SPORT_THEME[s.id]) ? THEME_HEX[SPORT_THEME[s.id]] : ['#38bdf8','#818cf8'];
+    return '<button type="button" class="msp-tile" data-sport="'+s.id+'" style="--sd-a:'+hex[0]+';--sd-b:'+hex[1]+';" onclick="selectSportTile(\''+s.id+'\')" aria-label="'+escapeHtml(s.name)+'">'
+      + '<span class="msp-tile__e" aria-hidden="true">'+s.emoji+'</span><span class="msp-tile__n">'+escapeHtml(s.name)+'</span></button>';
+  }).join('');
+  grid.innerHTML = tiles
+    + '<button type="button" class="msp-tile msp-tile--more" data-sport="__more" onclick="selectSportCustom()" aria-label="Add another sport"><span class="msp-tile__e" aria-hidden="true">➕</span><span class="msp-tile__n">More / other</span></button>';
+  grid.dataset.built = '1';
+  // Entrance reveal (once) — reuses the sports-fx layer; reveal only, no count-up.
+  const intake = document.getElementById('sportIntake');
+  if(intake && typeof window.sportsFxReveal === 'function'){ try { window.sportsFxReveal(intake, '.fx-reveal-target'); } catch(e){} }
+}
+function _setActiveTile(key){
+  const grid = document.getElementById('sportPickerGrid'); if(!grid) return;
+  Array.prototype.forEach.call(grid.querySelectorAll('.msp-tile'), function(t){ t.classList.toggle('msp-tile--active', t.dataset.sport === key); });
+}
+function _themeIntake(dataId){
+  const intake = document.getElementById('sportIntake'); if(!intake) return;
+  const hex = (dataId && typeof SPORT_THEME !== 'undefined' && SPORT_THEME[dataId]) ? THEME_HEX[SPORT_THEME[dataId]] : ['#38bdf8','#818cf8'];
+  intake.style.setProperty('--sd-a', hex[0]);
+  intake.style.setProperty('--sd-b', hex[1]);
+}
+function selectSportTile(dataId){
+  const s = SPORT_DATA.find(x=>x.id===dataId);
+  if(!s) return;
+  const sel = document.getElementById('mySportSelect'); if(sel) sel.value = s.name;
+  const custom = document.getElementById('mySportCustom'); if(custom) custom.value = '';
+  const cw = document.getElementById('mySportCustomWrap'); if(cw) cw.style.display = 'none';
+  _setActiveTile(dataId);
+  _themeIntake(s.id);
+  renderSportPreview();
+}
+function selectSportCustom(){
+  const sel = document.getElementById('mySportSelect'); if(sel) sel.value = '';
+  const cw = document.getElementById('mySportCustomWrap'); if(cw) cw.style.display = '';
+  const custom = document.getElementById('mySportCustom'); if(custom){ try { custom.focus(); } catch(e){} }
+  _setActiveTile('__more');
+  _themeIntake(null);
+  renderSportPreview();
+}
+function resetSportIntake(){
+  ['mySportSelect','mySportCustom','mySportTeam','mySportPosition','mySportYear','mySportLevel','mySportSeason'].forEach(function(id){ var el = document.getElementById(id); if(el) el.value = ''; });
+  const cw = document.getElementById('mySportCustomWrap'); if(cw) cw.style.display = 'none';
+  _setActiveTile(null);
+  _themeIntake(null);
+  renderSportPreview();
+}
+function renderSportPreview(){
+  const prev = document.getElementById('sportPreview'); if(!prev) return;
+  const sel = document.getElementById('mySportSelect');
+  const custom = document.getElementById('mySportCustom');
+  const name = (custom && custom.value.trim()) || (sel && sel.value) || '';
+  const cta = document.getElementById('mySportCTA');
+  if(!name){
+    prev.innerHTML = '<div class="msp-preview__ghost"><span class="msp-preview__ghe" aria-hidden="true">🏅</span><span>Pick a sport above to watch your page start forming.</span></div>';
+    if(cta){ cta.textContent = 'Pick a sport to start'; cta.disabled = true; cta.setAttribute('aria-disabled','true'); }
+    return;
+  }
+  const data = SPORT_DATA.find(s=>s.name.toLowerCase()===name.toLowerCase());
+  const emoji = data ? data.emoji : '🏅';
+  const themeId = data ? data.id : null;
+  const hex = (themeId && SPORT_THEME[themeId]) ? THEME_HEX[SPORT_THEME[themeId]] : ['#38bdf8','#818cf8'];
+  const motif = (themeId && typeof window.sportsFxMotif === 'function') ? window.sportsFxMotif(themeId) : '';
+  const val = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const sub = [_heroSafePos(val('mySportPosition')), val('mySportTeam'), val('mySportLevel')].filter(Boolean).join(' · ');
+  const athleteName = (typeof D !== 'undefined' && D.name) ? D.name : '';
+  prev.style.setProperty('--sd-a', hex[0]); prev.style.setProperty('--sd-b', hex[1]);
+  prev.innerHTML = '<div class="msp-preview__card msp-hero">'
+    + (motif ? '<div class="msp-hero-art" aria-hidden="true">'+motif+'</div>' : '')
+    + '<div class="msp-preview__tag">Your page, forming</div>'
+    + '<div class="msp-hero__emoji" aria-hidden="true">'+emoji+'</div>'
+    + '<div class="msp-hero__name">'+escapeHtml(athleteName || name)+'</div>'
+    + '<div class="msp-hero__sub">'+escapeHtml([name, sub].filter(Boolean).join(' · '))+'</div></div>';
+  if(cta){ cta.textContent = 'Start my ' + (data ? data.name : name) + ' page'; cta.disabled = false; cta.removeAttribute('aria-disabled'); }
 }
 
 function deleteMySport(id){
@@ -2876,7 +2970,7 @@ function _renderAthlete(s, athleteName){
   const theme = themeId ? SPORT_THEME[themeId] : 'lightning';
   const hex = (typeof THEME_HEX !== 'undefined' && THEME_HEX[theme]) ? THEME_HEX[theme] : ['#38bdf8','#818cf8'];
   const motif = (themeId && typeof window.sportsFxMotif === 'function') ? window.sportsFxMotif(themeId) : '';
-  const subline = [s.name, s.position, s.team].filter(Boolean).join(' · ');
+  const subline = [s.name, _heroSafePos(s.position), s.team].filter(Boolean).join(' · ');
 
   // 1) Identity card (the hero — the athlete is the first thing seen)
   let html = '<div class="msp-ath" style="--sd-a:'+hex[0]+';--sd-b:'+hex[1]+';">'

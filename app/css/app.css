@@ -8612,6 +8612,78 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 :root.light .msp-fact, :root.light .msp-iconx{ background:rgba(0,0,0,.04); }
 :root.light .msp-iconx{ color:#4e4538; }
 
+/* ── My Sports — "start your athlete page" intake (Phase-B reskin) — .msp-intake ─
+   A calm collapsible disclaimer, a themed sport-tile picker, and a live preview
+   that themes to the chosen sport. Reveal via .fx-reveal/.fx-in (sports-fx). No
+   count-up, no body metrics. Light + reduced-motion handled. */
+/* Disclaimer — calm note, full substance one tap away (native <details> = a11y). */
+.msp-disc2{ background:rgba(255,255,255,.025); border:1px solid var(--br); border-radius:12px; margin-bottom:1rem; }
+.msp-disc2__sum{ display:flex; gap:.55rem; align-items:flex-start; padding:.8rem 1rem; cursor:pointer; list-style:none; min-height:44px; box-sizing:border-box; }
+.msp-disc2__sum::-webkit-details-marker{ display:none; }
+.msp-disc2__i{ flex:0 0 auto; font-size:1rem; line-height:1.45; }
+.msp-disc2__s{ font-size:.74rem; line-height:1.55; color:var(--tx2); }
+.msp-disc2__more{ color:var(--c, #38bdf8); white-space:nowrap; }
+.msp-disc2[open] .msp-disc2__more{ display:none; }
+/* Visible expand affordance — the summary is interactive, so say so. */
+.msp-disc2__chev{ flex:0 0 auto; margin-left:auto; align-self:center; font-size:1.05rem; line-height:1; color:var(--tx3); transition:transform .15s ease; }
+.msp-disc2[open] .msp-disc2__chev{ transform:rotate(180deg); }
+.msp-disc2__b{ padding:0 1rem 1rem; font-size:.74rem; line-height:1.7; color:var(--tx2); }
+.msp-disc2__b b{ color:var(--tx); font-weight:600; }
+/* Intake */
+.msp-intake{ margin-bottom:1.2rem; }
+.msp-intake__title{ font-family:var(--fh); font-size:1.55rem; letter-spacing:.03em; color:var(--tx); }
+.msp-intake__sub{ font-size:.8rem; color:var(--tx2); margin:.2rem 0 .85rem; }
+/* Sport-tile picker */
+.msp-picker{ display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem; margin-bottom:.85rem; }
+@media (min-width:520px){ .msp-picker{ grid-template-columns:repeat(4,1fr); } }
+.msp-tile{ position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.3rem; min-height:74px; padding:.6rem .4rem; cursor:pointer; text-align:center;
+  border-radius:12px; font-family:var(--fm); color:var(--tx);
+  background:color-mix(in srgb, var(--sd-a) 9%, var(--s1)); border:1px solid var(--br);
+  transition:transform .12s ease, border-color .12s ease, background .12s ease; }
+.msp-tile:hover{ transform:translateY(-1px); border-color:color-mix(in srgb, var(--sd-a) 45%, transparent); }
+/* Selected: unmistakable — a 2px sport-color perimeter, deeper fill, and a corner check. */
+.msp-tile--active{ background:color-mix(in srgb, var(--sd-a) 30%, var(--s1)); border:2px solid color-mix(in srgb, var(--sd-a) 85%, transparent); box-shadow:0 4px 14px -6px color-mix(in srgb, var(--sd-a) 70%, transparent); }
+.msp-tile--active::after{ content:"\2713"; position:absolute; top:5px; right:6px; width:16px; height:16px; display:flex; align-items:center; justify-content:center; font-size:.6rem; font-weight:700; line-height:1; color:#0b1220; border-radius:50%; background:color-mix(in srgb, var(--sd-a) 92%, #fff); }
+.msp-tile__e{ font-size:1.5rem; line-height:1; }
+.msp-tile__n{ font-size:.72rem; line-height:1.2; color:var(--tx2); }
+.msp-tile--active .msp-tile__n{ color:var(--tx); font-weight:600; }
+.msp-tile--more{ background:rgba(255,255,255,.03); }
+.msp-tile--more .msp-tile__e{ color:var(--tx3); }
+/* "More / other" is the custom path, not a sport — neutral active treatment (no sport gradient). */
+.msp-tile--more.msp-tile--active{ background:rgba(255,255,255,.07); border-color:var(--tx3); box-shadow:none; }
+.msp-tile--more.msp-tile--active::after{ background:var(--tx2); color:var(--s1); }
+.msp-customwrap{ margin-bottom:.85rem; }
+.msp-intake__fields{ display:flex; flex-direction:column; gap:0; }
+/* Live preview — a mini athlete card that themes + forms as you type */
+.msp-preview{ margin:.3rem 0 .9rem; }
+.msp-preview__ghost{ display:flex; align-items:center; gap:.6rem; padding:1rem; border-radius:14px; border:1px dashed var(--br); font-size:.8rem; line-height:1.5; color:var(--tx2); }
+.msp-preview__ghe{ font-size:1.4rem; opacity:.7; }
+.msp-preview__card{ position:relative; overflow:hidden; border-radius:16px; padding:1.15rem 1.2rem 1.3rem; border:1px solid color-mix(in srgb, var(--sd-a) 30%, var(--br)); border-left:4px solid color-mix(in srgb, var(--sd-a) 78%, transparent);
+  background:linear-gradient(150deg, color-mix(in srgb, var(--sd-a) 36%, var(--s1)), color-mix(in srgb, var(--sd-b) 16%, var(--s1))); box-shadow:0 10px 30px -16px color-mix(in srgb, var(--sd-a) 80%, transparent); }
+.msp-preview__tag{ position:relative; z-index:1; font-size:.72rem; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:color-mix(in srgb, var(--sd-a) 60%, var(--tx2)); margin-bottom:.45rem; }
+.msp-preview__card .msp-hero__emoji{ position:relative; z-index:1; font-size:1.7rem; line-height:1; }
+.msp-preview__card .msp-hero__name{ margin-top:.15rem; font-size:2rem; line-height:1.02; }
+/* Themed CTA — fills with the chosen sport's accent */
+.msp-intake .msp-addbtn{ background:linear-gradient(135deg, var(--sd-a, #38bdf8), var(--sd-b, #818cf8)); border:none; color:#0b1220; }
+/* Inert until a sport is chosen — honest about what's actionable. */
+.msp-intake .msp-addbtn:disabled{ background:rgba(255,255,255,.06); color:var(--tx3); cursor:not-allowed; box-shadow:none; }
+/* Light mode */
+:root.light .msp-disc2{ background:rgba(0,0,0,.025); border-color:rgba(0,0,0,.08); }
+:root.light .msp-disc2__s, :root.light .msp-disc2__b{ color:#4e4538; }
+:root.light .msp-disc2__b b, :root.light .msp-intake__title, :root.light .msp-tile--active .msp-tile__n{ color:#1f1810; }
+:root.light .msp-intake__sub, :root.light .msp-tile__n, :root.light .msp-preview__ghost{ color:#4e4538; }
+/* Light mode: against white, color-mix dilutes hard — keep the sport color readable
+   as a real sport color (richer fills, a solid sport-color perimeter when chosen). */
+:root.light .msp-tile{ background:color-mix(in srgb, var(--sd-a) 17%, #fff); border-color:color-mix(in srgb, var(--sd-a) 22%, rgba(0,0,0,.1)); }
+:root.light .msp-tile--active{ background:color-mix(in srgb, var(--sd-a) 30%, #fff); border-color:color-mix(in srgb, var(--sd-a) 80%, #fff); box-shadow:0 4px 14px -6px color-mix(in srgb, var(--sd-a) 60%, transparent); }
+:root.light .msp-tile--active::after{ background:color-mix(in srgb, var(--sd-a) 80%, #1f1810); color:#fff; }
+:root.light .msp-tile--more.msp-tile--active{ background:rgba(0,0,0,.05); border-color:#9a8d78; }
+:root.light .msp-preview__card{ background:linear-gradient(150deg, color-mix(in srgb, var(--sd-a) 42%, #fff), color-mix(in srgb, var(--sd-b) 20%, #fff)); border-left-color:color-mix(in srgb, var(--sd-a) 70%, #fff); }
+:root.light .msp-preview__tag{ color:color-mix(in srgb, var(--sd-a) 55%, #4e4538); }
+:root.light .msp-intake .msp-addbtn:disabled{ background:rgba(0,0,0,.06); color:#8a7d68; }
+/* Tile hover + chevron are the only motion here — honor reduced-motion. */
+@media (prefers-reduced-motion: reduce){ .msp-tile{ transition:none; } .msp-disc2__chev{ transition:none; } }
+
 /* ── Sports deep-sheet visual layer (Phase V) — hero + scroll-reveal + count-up.
    CSS/SVG + transform/opacity ONLY; the .fx-reveal hidden state is applied by
    sports-fx.js, so a sheet rendered without the module looks exactly as before.
