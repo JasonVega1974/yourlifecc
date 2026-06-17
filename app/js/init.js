@@ -337,6 +337,9 @@ async function init(){
                 if(_ae) _ae.style.display = 'none';
                 authSetLoading(false);
                 setSyncSt(loaded ? 'cloud' : 'local');
+                // Entry gate (Phase 1, flag-gated). OFF by default → returns false →
+                // the existing two lines below run unchanged. Both boot paths hook here.
+                if(typeof _entryGateMaybe === 'function' && _entryGateMaybe(function(){ finishInit(true); setTimeout(setupContestFreeUser, 500); })) return;
                 finishInit(true);
                 setTimeout(setupContestFreeUser, 500);
               });
@@ -398,6 +401,10 @@ async function init(){
       const loaded = await cloudLoad();
       if(!loaded){ loadData(); setTimeout(cloudSync, 1500); }
       setSyncSt(loaded ? 'cloud' : 'cloud');
+      // Entry gate (Phase 1, flag-gated). OFF by default → returns false → the
+      // existing age-gate/finishInit continuation below runs byte-for-byte. When ON,
+      // the gate handles the child age-gate + Parent Hub route itself (plain finishInit).
+      if(typeof _entryGateMaybe === 'function' && _entryGateMaybe(function(){ finishInit(true); setTimeout(setupContestFreeUser, 500); })) return;
       // Read via _ylccGetFlag — survives cloudLoad's D overwrite (the
       // per-user LS key is the authoritative source once auth has
       // resolved, which it has by this point).

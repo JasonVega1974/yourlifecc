@@ -2301,6 +2301,212 @@ function switchToProfile(id){
   }
 }
 
+/* ── Entry gate (Entry-redesign Phase 1, flag-gated, additive) ──────────────
+   A "who's using YourLife?" + PIN front door inserted AFTER login + cloudLoad +
+   _ylccMarkAuthResolved(), BEFORE finishInit(). Behind localStorage
+   'ylcc_entry_gate' === '1' (default OFF → pure pass-through; the existing users
+   see byte-for-byte today's boot). Lives in parent.js for direct access to the
+   _profiles model + reuse of verifyParentPin/verifyChildPin (client-side — today's
+   posture, NOT presented as hardened; server-verify is the next track) and
+   showAgePickerModal/showKidOnboard (children route THROUGH the age-gate). Parent
+   path → Parent Hub; child path → their owner-guarded profile. Remember-device is
+   a soft client-side token. Built dynamically — no index.html markup. */
+var _ENTRY_GATE_KEY     = 'ylcc_entry_gate';
+var _ENTRY_REMEMBER_KEY = 'ylcc_entry_remember';
+
+function _entryGateEnabled(){
+  try { return localStorage.getItem(_ENTRY_GATE_KEY) === '1'; } catch(e){ return false; }
+}
+
+// Returns true if the gate took over (caller MUST early-return); false → pass-through.
+// FAILS SAFE: any error returns false so the caller runs the normal boot — a gate
+// bug can never strand a user, even with the flag accidentally on.
+function _entryGateMaybe(continueFn){
+  try {
+    if(!_entryGateEnabled()) return false;
+    showEntryGate(continueFn);
+    return true;
+  } catch(e){
+    try { console.error('[entry-gate] error — passing through to normal boot:', e); } catch(_){}
+    return false;
+  }
+}
+
+function _entryProfiles(){
+  // Prime _profiles (initProfiles normally runs later inside finishInit; safe to
+  // run early so the picker + verifyParentPin's scan see the family).
+  try { if(typeof initProfiles === 'function' && (!_profiles || !_profiles.length)) initProfiles(); } catch(e){}
+  if(_profiles && _profiles.length) return _profiles.slice();
+  // Solo / not-yet-multi-profile: one owner card synthesised from D / auth.
+  var nm = (typeof D!=='undefined' && D && D.name) ? D.name
+         : ((typeof _supaUser!=='undefined' && _supaUser && _supaUser.email) ? _supaUser.email.split('@')[0] : 'You');
+  return [{ id:'_solo', name:nm, isParent:true, _solo:true }];
+}
+
+function _entryHasParentPin(){
+  if(typeof D!=='undefined' && D && (D.parentPinHash || D.chorePin || D.parentPIN)) return true;
+  if(typeof _profiles!=='undefined' && _profiles){
+    for(var i=0;i<_profiles.length;i++){ var pd=_profiles[i] && _profiles[i].data; if(pd && (pd.parentPinHash||pd.chorePin||pd.parentPIN)) return true; }
+  }
+  return false;
+}
+
+function _entryRememberValid(profiles){
+  try {
+    var rec = JSON.parse(localStorage.getItem(_ENTRY_REMEMBER_KEY) || 'null');
+    if(!rec || !rec.id || !rec.exp || rec.exp < Date.now()) return null;
+    var uid = (typeof _supaUser!=='undefined' && _supaUser && _supaUser.id) ? _supaUser.id : '';
+    if(rec.uid && rec.uid !== uid) return null;   // cross-account guard
+    return profiles.find(function(p){ return p.id === rec.id; }) || null;
+  } catch(e){ return null; }
+}
+function _entryRememberStore(profile){
+  try {
+    var uid = (typeof _supaUser!=='undefined' && _supaUser && _supaUser.id) ? _supaUser.id : '';
+    localStorage.setItem(_ENTRY_REMEMBER_KEY, JSON.stringify({ id:profile.id, uid:uid, exp: Date.now() + 30*24*60*60*1000 }));
+  } catch(e){}
+}
+
+// Light boot-time active-profile swap (mirrors switchToProfile's data load minus
+// renders — the continuation renders). Only for real multi-profile picks; solo is
+// already loaded into D.
+function _entryActivate(profile){
+  if(!profile || profile._solo) return;
+  if(_activeProfileId && _activeProfileId !== profile.id){
+    var cur = _profiles.find(function(p){ return p.id===_activeProfileId; });
+    if(cur){ try { cur.data = JSON.parse(JSON.stringify(D)); } catch(e){} }
+  }
+  if(profile.isParent === false && typeof lockParentDash === 'function'){ try { lockParentDash(); } catch(e){} }
+  _activeProfileId = profile.id;
+  try { localStorage.setItem(_ylccUserKey('ylcc_active_profile'), profile.id); } catch(e){}
+  var saved = profile.data || {};
+  for(var k in D){ if(D.hasOwnProperty(k)) delete D[k]; }
+  Object.assign(D, saved);
+  D.name = profile.name;
+  D._activeProfileId = profile.id;
+  try { if(typeof saveProfiles==='function') saveProfiles(); if(typeof save==='function') save(); } catch(e){}
+}
+
+function _entryCloseGate(){
+  var el = document.getElementById('entryGate');
+  if(el){ el.classList.remove('open'); setTimeout(function(){ if(el && el.parentNode) el.parentNode.removeChild(el); }, 200); }
+}
+
+// Activate the chosen profile + hand control back to the EXISTING boot sequence:
+// children through the age-gate + kid-onboard (exactly as switchToProfile does),
+// parents to the Parent Hub.
+function _entryFinishAndRoute(profile, continueFn){
+  _entryActivate(profile);
+  _entryCloseGate();
+  if(profile && profile.isParent === false
+     && typeof _ylccGetFlag==='function' && !_ylccGetFlag('ageBracket','')
+     && !window._faithFree && typeof showAgePickerModal==='function'){
+    showAgePickerModal(function(){
+      if(typeof continueFn==='function') continueFn();
+      setTimeout(function(){ try { if(typeof showKidOnboard==='function' && !D.kidOnboardDone) showKidOnboard(); } catch(e){} }, 250);
+    }, { viaKidActivation:true });
+    return;
+  }
+  if(typeof continueFn==='function') continueFn();
+  if(profile && profile.isParent){
+    setTimeout(function(){ try { if(typeof showSection==='function') showSection('s-parent'); } catch(e){} }, 80);
+  }
+}
+
+function _entryAvatar(p){
+  var ch = (p.name||'?').trim().charAt(0).toUpperCase() || '?';
+  return '<span class="egate-av" aria-hidden="true">'+escapeHtml(ch)+'</span>';
+}
+
+function showEntryGate(continueFn){
+  var profiles = _entryProfiles();
+  var remembered = _entryRememberValid(profiles);
+  if(remembered){ _entryFinishAndRoute(remembered, continueFn); return; }
+
+  var prev = document.getElementById('entryGate'); if(prev && prev.parentNode) prev.parentNode.removeChild(prev);
+  var ov = document.createElement('div');
+  ov.id = 'entryGate'; ov.className = 'egate';
+  ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-label','Who is using YourLife');
+  var cards = profiles.map(function(p, i){
+    return '<button type="button" class="egate-card" data-idx="'+i+'" aria-label="'+escapeHtml(p.name)+(p.isParent?' (parent)':'')+'">'
+      + _entryAvatar(p)
+      + '<span class="egate-card__n">'+escapeHtml(p.name)+'</span>'
+      + '<span class="egate-card__r">'+(p.isParent?'Parent':'Child')+'</span></button>';
+  }).join('');
+  ov.innerHTML = '<div class="egate-sheet">'
+    + '<div class="egate-h">Who is using YourLife?</div>'
+    + '<div class="egate-sub">Pick your profile to continue.</div>'
+    + '<div class="egate-grid">'+cards+'</div>'
+    + '<div class="egate-pin" id="entryPin" hidden></div></div>';
+  document.body.appendChild(ov);
+  Array.prototype.forEach.call(ov.querySelectorAll('.egate-card'), function(c){
+    c.addEventListener('click', function(){ _entryPick(profiles[parseInt(c.dataset.idx,10)], continueFn); });
+  });
+  if(typeof requestAnimationFrame==='function'){ requestAnimationFrame(function(){ ov.classList.add('open'); }); }
+  else ov.classList.add('open');
+}
+
+function _entryPick(profile, continueFn){
+  if(!profile) return;
+  // A profile needs a PIN if: parent with any parent-PIN set, OR child (4-digit; its
+  // PIN is profile.pinHash, or the id-as-PIN soft fallback). No parent PIN set → soft pass.
+  var needsPin = profile.isParent ? _entryHasParentPin() : true;
+  if(!needsPin){ _entryFinishAndRoute(profile, continueFn); return; }
+  _entryPinPad(profile, continueFn);
+}
+
+function _entryPinPad(profile, continueFn){
+  var ov = document.getElementById('entryGate'); if(!ov) return;
+  var len = profile.isParent ? 6 : 4;
+  var buf = '';
+  var grid = ov.querySelector('.egate-grid'); if(grid) grid.hidden = true;
+  var pad = ov.querySelector('#entryPin'); if(!pad) return;
+  pad.hidden = false;
+  function dotsHtml(){ var s=''; for(var i=0;i<len;i++){ s += '<span class="egate-dot'+(i<buf.length?' on':'')+'"></span>'; } return s; }
+  function keysHtml(){
+    var rows = ['1','2','3','4','5','6','7','8','9','rem','0','del'];
+    return rows.map(function(k){
+      if(k==='del') return '<button type="button" class="egate-key egate-key--act" data-k="del" aria-label="Delete">⌫</button>';
+      if(k==='rem') return '<button type="button" class="egate-key egate-key--rem" data-k="rem" role="checkbox" aria-checked="false" aria-label="Remember this device for 30 days">☆</button>';
+      return '<button type="button" class="egate-key" data-k="'+k+'">'+k+'</button>';
+    }).join('');
+  }
+  var remember = false;
+  function paint(){
+    pad.innerHTML = '<button type="button" class="egate-back" id="entryBack" aria-label="Back to profiles">‹ Back</button>'
+      + '<div class="egate-who">'+_entryAvatar(profile)+'<span>'+escapeHtml(profile.name)+'</span></div>'
+      + '<div class="egate-prompt">Enter '+(profile.isParent?'parent ':'')+'PIN</div>'
+      + '<div class="egate-dots" id="entryDots">'+dotsHtml()+'</div>'
+      + '<div class="egate-err" id="entryErr" aria-live="polite"></div>'
+      + '<div class="egate-keys">'+keysHtml()+'</div>'
+      + '<div class="egate-remlabel">☆ = remember this device for 30 days</div>';
+    pad.querySelector('#entryBack').addEventListener('click', function(){ pad.hidden = true; if(grid) grid.hidden = false; });
+    Array.prototype.forEach.call(pad.querySelectorAll('.egate-key'), function(b){
+      b.addEventListener('click', function(){ _onKey(b.dataset.k, b); });
+    });
+  }
+  function setDots(){ var d=pad.querySelector('#entryDots'); if(d) d.innerHTML = dotsHtml(); }
+  function fail(msg){ var e=pad.querySelector('#entryErr'); if(e) e.textContent = msg||'Incorrect PIN'; var d=pad.querySelector('#entryDots'); if(d){ d.classList.add('shake'); setTimeout(function(){ d.classList.remove('shake'); }, 500); } buf=''; setDots(); }
+  function _onKey(k, btn){
+    if(k==='rem'){ remember=!remember; if(btn){ btn.setAttribute('aria-checked', remember?'true':'false'); btn.classList.toggle('on', remember); btn.textContent = remember?'★':'☆'; } return; }
+    if(k==='del'){ buf = buf.slice(0,-1); setDots(); return; }
+    if(buf.length >= len) return;
+    buf += k; setDots();
+    if(buf.length === len) _submit();
+  }
+  function _submit(){
+    var attempt = buf;
+    var verify = profile.isParent
+      ? (typeof verifyParentPin==='function' ? verifyParentPin(attempt) : Promise.resolve(true))
+      : (typeof verifyChildPin==='function' ? verifyChildPin(profile, attempt) : Promise.resolve(true));
+    Promise.resolve(verify).then(function(ok){
+      if(ok){ if(remember) _entryRememberStore(profile); _entryFinishAndRoute(profile, continueFn); }
+      else fail();
+    }).catch(function(){ fail('Could not verify — try again'); });
+  }
+  paint();
+}
+
 function removeProfile(id){
   if(!confirm('Remove this profile? This cannot be undone.')) return;
   _profiles = _profiles.filter(p=>p.id!==id);

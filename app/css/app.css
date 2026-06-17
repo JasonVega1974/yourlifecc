@@ -8732,6 +8732,62 @@ button.bp, button.bgh, button.bgr, button.bo{ min-height:44px; }
 /* Tile hover + chevron are the only motion here — honor reduced-motion. */
 @media (prefers-reduced-motion: reduce){ .msp-tile{ transition:none; } .msp-disc2__chev{ transition:none; } }
 
+/* ── Entry gate (Entry-redesign Phase 1) — "who is using YourLife?" front door.
+   Full-viewport modal at the app's modal layer; themed, light + dark + reduced-motion.
+   Built dynamically by parent.js; only ever shown when the ylcc_entry_gate flag is on. */
+.egate{ position:fixed; inset:0; z-index:100000; display:flex; align-items:center; justify-content:center; padding:1.2rem;
+  background:radial-gradient(120% 90% at 50% 0%, #15223f 0%, #0b1020 60%, #070b16 100%);
+  opacity:0; visibility:hidden; transition:opacity .22s ease, visibility .22s ease; }
+.egate.open{ opacity:1; visibility:visible; }
+.egate-grid[hidden], .egate-pin[hidden]{ display:none !important; }   /* explicit display above must not defeat the [hidden] toggle */
+.egate-sheet{ width:100%; max-width:460px; max-height:92vh; overflow-y:auto; text-align:center; color:var(--tx, #e8eefc); }
+.egate-h{ font-family:var(--fh); font-size:1.8rem; letter-spacing:.03em; color:var(--tx, #fff); margin:0 0 .25rem; }
+.egate-sub{ font-size:.86rem; color:var(--tx2, #9fb0d0); margin:0 0 1.4rem; }
+.egate-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:.7rem; }
+.egate-card{ display:flex; flex-direction:column; align-items:center; gap:.5rem; padding:1.15rem .7rem; cursor:pointer;
+  border-radius:16px; font-family:var(--fm); min-height:120px; justify-content:center;
+  background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12);
+  transition:transform .12s ease, border-color .12s ease, background .12s ease; }
+.egate-card:hover{ transform:translateY(-2px); border-color:rgba(125,211,252,.55); background:rgba(125,211,252,.08); }
+.egate-card:focus-visible{ outline:2px solid #7dd3fc; outline-offset:2px; }
+.egate-av{ width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-family:var(--fh); font-size:1.5rem; color:#0b1020; background:linear-gradient(135deg, #7dd3fc, #a78bfa); }
+.egate-card__n{ font-size:.95rem; font-weight:700; color:var(--tx, #eaf1ff); }
+.egate-card__r{ font-size:.66rem; letter-spacing:.08em; text-transform:uppercase; color:var(--tx3, #6b7ba0); }
+/* PIN pad */
+.egate-pin{ display:flex; flex-direction:column; align-items:center; }
+.egate-back{ align-self:flex-start; background:none; border:none; color:var(--tx2, #9fb0d0); font-size:.85rem; cursor:pointer; padding:.3rem .1rem; }
+.egate-who{ display:flex; align-items:center; gap:.55rem; margin:.4rem 0 .2rem; font-weight:700; color:var(--tx, #eaf1ff); }
+.egate-who .egate-av{ width:34px; height:34px; font-size:1rem; }
+.egate-prompt{ font-size:.9rem; color:var(--tx2, #9fb0d0); margin-bottom:1rem; }
+.egate-dots{ display:flex; gap:.55rem; justify-content:center; margin-bottom:.6rem; }
+.egate-dot{ width:13px; height:13px; border-radius:50%; border:1.5px solid rgba(255,255,255,.35); transition:background .12s ease, border-color .12s ease; }
+.egate-dot.on{ background:#7dd3fc; border-color:#7dd3fc; }
+.egate-dots.shake{ animation:egate-shake .45s ease; }
+@keyframes egate-shake{ 0%,100%{ transform:translateX(0); } 20%,60%{ transform:translateX(-7px); } 40%,80%{ transform:translateX(7px); } }
+.egate-err{ min-height:1.1rem; font-size:.78rem; color:#fda4af; margin-bottom:.55rem; }
+.egate-keys{ display:grid; grid-template-columns:repeat(3, 64px); gap:.6rem; justify-content:center; }
+.egate-key{ width:64px; height:64px; border-radius:50%; border:1px solid rgba(255,255,255,.14); cursor:pointer;
+  background:rgba(255,255,255,.05); color:var(--tx, #eaf1ff); font-size:1.3rem; font-family:var(--fm);
+  display:flex; align-items:center; justify-content:center; transition:background .1s ease; }
+.egate-key:hover{ background:rgba(255,255,255,.12); }
+.egate-key--act, .egate-key--rem{ font-size:1.1rem; color:var(--tx2, #9fb0d0); background:transparent; border-color:transparent; }
+.egate-key--rem.on{ color:#fbbf24; }
+.egate-remlabel{ font-size:.7rem; color:var(--tx3, #6b7ba0); margin-top:.7rem; }
+/* Light mode */
+:root.light .egate{ background:radial-gradient(120% 90% at 50% 0%, #efe9dd 0%, #e7e0d2 60%, #ded6c6 100%); }
+:root.light .egate-h{ color:#1f1810; }
+:root.light .egate-sub, :root.light .egate-prompt, :root.light .egate-back{ color:#4e4538; }
+:root.light .egate-card{ background:rgba(0,0,0,.035); border-color:rgba(0,0,0,.1); }
+:root.light .egate-card:hover{ background:rgba(56,189,248,.1); border-color:rgba(56,189,248,.5); }
+:root.light .egate-card__n, :root.light .egate-who{ color:#1f1810; }
+:root.light .egate-card__r, :root.light .egate-remlabel{ color:#8a7d68; }
+:root.light .egate-dot{ border-color:rgba(0,0,0,.3); }
+:root.light .egate-key{ background:rgba(0,0,0,.04); border-color:rgba(0,0,0,.1); color:#1f1810; }
+:root.light .egate-key:hover{ background:rgba(0,0,0,.09); }
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce){ .egate, .egate-card, .egate-dot, .egate-key{ transition:none; } .egate-dots.shake{ animation:none; } }
+
 /* ── Sports deep-sheet visual layer (Phase V) — hero + scroll-reveal + count-up.
    CSS/SVG + transform/opacity ONLY; the .fx-reveal hidden state is applied by
    sports-fx.js, so a sheet rendered without the module looks exactly as before.
