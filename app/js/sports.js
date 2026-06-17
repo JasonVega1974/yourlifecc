@@ -342,9 +342,25 @@ function _sportSheetEl(){
 }
 function closeSportSheet(){
   const m = document.getElementById('sportDetailModal');
-  if(m){ m.classList.remove('open'); document.body.style.overflow=''; }
+  if(m){ m.classList.remove('open'); m.classList.remove('sds-full'); document.body.style.overflow=''; }
   // a11y — return focus to the sport card that opened the sheet.
   try { if(window._sdsReturnFocus && window._sdsReturnFocus.focus) window._sdsReturnFocus.focus(); } catch(e){}
+}
+/* Distraction-free reading: a CSS expand (NOT the browser Fullscreen API — more
+   predictable in the PWA, esp. iOS) that grows the sheet to fill the whole window.
+   The overlay is already fixed/inset:0 at z 9999, so it covers the app's nav +
+   top bar; full-screen just removes the centered-card margins. The close X stays
+   put (both controls are absolute to the sheet). Reduced-motion handled in CSS. */
+var _SDS_FS_EXPAND   = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M21 16v3a2 2 0 0 1-2 2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
+var _SDS_FS_COLLAPSE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>';
+function toggleSportSheetFull(btn){
+  const m = document.getElementById('sportDetailModal'); if(!m) return;
+  const full = m.classList.toggle('sds-full');
+  if(btn){
+    btn.setAttribute('aria-pressed', full ? 'true' : 'false');
+    btn.setAttribute('aria-label', full ? 'Exit full screen' : 'Enter full screen');
+    btn.innerHTML = full ? _SDS_FS_COLLAPSE : _SDS_FS_EXPAND;
+  }
 }
 function showSportDetail(id){
   const s = SPORT_DATA.find(x=>x.id===id);
@@ -360,7 +376,8 @@ function showSportDetail(id){
   const tagline = (detail && detail.tagline) ? '<p class="sds-tag">'+_sdEsc(detail.tagline)+'</p>' : '';
   const body    = detail ? _sportDeepBody(s, detail) : _sportBasicBody(s);
   m.innerHTML =
-    '<div class="sds-sheet" role="dialog" aria-modal="true" aria-label="' + _sdEsc(s.name) + ' details" style="--sd-a:' + hex[0] + ';--sd-b:' + hex[1] + ';">'
+    '<div class="sds-sheet" role="dialog" aria-modal="true" tabindex="-1" aria-label="' + _sdEsc(s.name) + ' details" style="--sd-a:' + hex[0] + ';--sd-b:' + hex[1] + ';">'
+    + '<button class="sds-fs" type="button" aria-label="Enter full screen" aria-pressed="false" onclick="toggleSportSheetFull(this)">' + _SDS_FS_EXPAND + '</button>'
     + '<button class="sds-close" type="button" aria-label="Close" onclick="closeSportSheet()">✕</button>'
     + '<div class="sds-head">'
     +   '<span class="sds-emoji" aria-hidden="true">' + s.emoji + '</span>'
@@ -369,8 +386,11 @@ function showSportDetail(id){
     + '<div class="sds-body">' + body + '</div>'
     + '</div>';
   try { window._sdsReturnFocus = document.activeElement; } catch(e){}
+  m.classList.remove('sds-full');   // every sheet opens windowed; toggle re-expands
   m.classList.add('open');
   document.body.style.overflow = 'hidden';
+  // a11y — move focus into the dialog on open (returned to the triggering card on close).
+  try { const sh = m.querySelector('.sds-sheet'); if(sh) sh.focus(); } catch(e){}
   // Phase V — apply the optional visual layer (hero + scroll-reveal + count-up).
   // Guarded: if sports-fx.js isn't loaded, the sheet renders exactly as before.
   if(typeof window.sportsFxApply === 'function'){ try { window.sportsFxApply(m, id); } catch(e){} }
