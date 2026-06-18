@@ -11221,3 +11221,10 @@ html.flatnav.light #childHeroCanvas{ display:none; }
    light rule so afternoon wins in either theme by source order. */
 html.flatnav #childHero.chs-day{ background:linear-gradient(180deg,#93c5fd,#bae6fd); }
 html.flatnav #childHero.chs-day #childHeroCanvas{ display:none; }
+
+/* Match the full-bleed canvas: the greeting (index.html) + the briefing wrapper
+   go edge-to-edge too — escaping #appHome's max-width:1100px (desktop) and #app's
+   side padding via the same no-negative-margin transform. Zero #appHome's top
+   padding so the canvas is flush under the top bar with no dark band above it. */
+html.flatnav #appHome{ padding-top:0; }
+html.flatnav #appDailyBriefingWrap{ position:relative; left:50%; transform:translateX(-50%); width:100vw; }

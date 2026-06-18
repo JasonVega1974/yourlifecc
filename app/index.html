@@ -8683,7 +8683,7 @@
        (#fzHome), which shares .fz-greet-*, is unaffected. Top corners flat + no
        top border so the #childHero canvas (bottom darkens to #0d1b2e) bleeds in
        flush above it. Co-owned hex: #0d1b2e (= canvas seam color). */
-    html.flatnav #appGreeting{ background:#0d1b2e; border:1px solid rgba(245,166,35,.18); border-top:0; border-radius:0 0 14px 14px; padding:1.1rem 1.2rem; margin-bottom:1rem; }
+    html.flatnav #appGreeting{ background:#0d1b2e; border:1px solid rgba(245,166,35,.18); border-top:0; border-radius:0 0 14px 14px; padding:1.1rem 1.2rem; position:relative; left:50%; transform:translateX(-50%); width:100vw; margin-top:0; margin-bottom:0; }
     html.flatnav #appGreeting .fz-greet-row{ padding:0; }
     html.flatnav #appGreeting .fz-greet-hi{ color:#f7f9fc; }
     html.flatnav #appGreeting .fz-greet-hi .ag-name{ color:#f5a623; }
