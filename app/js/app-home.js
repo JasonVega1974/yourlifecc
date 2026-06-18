@@ -143,22 +143,21 @@
     });
   }
 
-  // Home launcher — its current 6 cards, now built through the unified component
-  // (same icons / titles / descriptions / routes; consistent motion + the
-  // constrained 4-family palette). Slot 2 (The Well) honors D.tabSwap; faith-free
-  // bails (keeps ffBottomNav).
+  // Home launcher — Tier 1, five pillars (Phase B): The Well, Learn, Life,
+  // Growth, Me. Life Skills + My People moved off Home (still reachable inside
+  // the Life and Me landings). Built through the unified card; slot 0 (The Well)
+  // honors D.tabSwap; faith-free bails (keeps ffBottomNav).
   function renderHomeLauncher(){
     if (typeof document === 'undefined') return;
     var host = document.getElementById('homeLauncher');
     if (!host) return;
     if (window._faithFree){ host.innerHTML = ''; return; }
     var items = [
-      { icon:'✝️', title:'The Well',    desc:'Bible, prayer, plans, and growth',         hue:'violet',  onClick:function(){ showSection('s-scripture'); } },
-      { icon:'📚', title:'Learn',       desc:'Life skills, school, driving, and jobs',    hue:'cool',    onClick:function(){ showSection('s-learn'); } },
-      { icon:'🧠', title:'Life Skills', desc:'Learn one new thing today',                 hue:'emerald', onClick:function(){ showSection('s-skills'); } },
-      { icon:'⚡', title:'Life',        desc:'Habits, goals, money, and schedule',        hue:'amber',   onClick:function(){ showSection('s-life'); } },
-      { icon:'🤝', title:'My People',   desc:'Mentors, family, and your circle',          hue:'violet',  onClick:function(){ showSection('s-mentors'); } },
-      { icon:'🧑', title:'Me',          desc:'Badges, milestones, profile, and settings', hue:'amber',   onClick:function(){ showSection('s-me'); } }
+      { icon:'✝️', title:'The Well', desc:'Bible, prayer, plans, and growth',       hue:'violet',  onClick:function(){ showSection('s-scripture'); } },
+      { icon:'📚', title:'Learn',    desc:'Life skills, school, driving, and jobs',  hue:'cool',    onClick:function(){ showSection('s-learn'); } },
+      { icon:'⚡', title:'Life',     desc:'Habits, goals, money, and schedule',      hue:'amber',   onClick:function(){ showSection('s-life'); } },
+      { icon:'📈', title:'Growth',   desc:'Badges, milestones, challenges, rewards', hue:'emerald', onClick:function(){ showSection('s-growth'); } },
+      { icon:'🧑', title:'Me',       desc:'Profile, people, bio, and settings',      hue:'violet',  onClick:function(){ showSection('s-me'); } }
     ];
     // Slot 2 (index 0 = The Well) honors the faith-tab-swap pin if set.
     try {
@@ -170,6 +169,21 @@
       }
     } catch(_){}
     renderYlCards(host, items);
+  }
+
+  // Growth landing (Tier 2 under the Growth pillar) — Badges / Milestones /
+  // Challenges / Rewards, each routing to its existing section. Same unified
+  // card. (Streaks omitted: no standalone streaks view exists yet.)
+  function renderGrowthLanding(){
+    if (typeof document === 'undefined') return;
+    var host = document.getElementById('growthLauncher');
+    if (!host) return;
+    renderYlCards(host, [
+      { icon:'🏅', title:'Badges',     desc:'What you have earned',       hue:'amber',   onClick:function(){ showSection('s-badges'); } },
+      { icon:'🗺️', title:'Milestones', desc:'Your journey so far',        hue:'cool',    onClick:function(){ showSection('s-milestones'); } },
+      { icon:'🏆', title:'Challenges',  desc:'Goals and contests to take', hue:'violet',  onClick:function(){ showSection('s-contests'); } },
+      { icon:'🎁', title:'Rewards',     desc:'Spend what you earn',        hue:'emerald', onClick:function(){ showSection('s-rewards'); } }
+    ]);
   }
 
   // Hide the appHome when the parent surface is active OR the user
@@ -286,5 +300,6 @@
     window.maybeRenderAppHome = maybeRenderAppHome;
     window.renderHomeLauncher = renderHomeLauncher;
     window.renderYlCards      = renderYlCards;
+    window.renderGrowthLanding = renderGrowthLanding;
   }
 })();

@@ -2339,6 +2339,10 @@ function showSection(id, fromMobile){
   if(id==='s-hero' && typeof maybeRenderAppHome === 'function'){
     setTimeout(maybeRenderAppHome, 30);
   }
+  // Phase B — Growth landing (Tier 2). Render its .yl-card grid on entry.
+  if(id==='s-growth' && typeof renderGrowthLanding === 'function'){
+    setTimeout(renderGrowthLanding, 30);
+  }
   // V1 Rebuild · Faith Tab redesign — refresh the 3 zones whenever the
   // user enters the Well so today's challenge / mood / curiosity streak
   // are current.

@@ -11149,10 +11149,14 @@ html.flatnav .app-menu-label{ display:none !important; }
    hover/focus only; reduced-motion drops the sweep. Scoped to html.flatnav so
    flag-off users see zero change. Replaces the old per-card .fl-card system
    (rainbow hues + Bebas title + always-on hover-lift). */
-html.flatnav .yl-card-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:.85rem; margin-top:1rem; }
+/* Flex (not auto-fill grid) + justify-content:center so a wrapped last row
+   centers instead of orphaning a card to the left. flex 1 1 170 / max 240 lets
+   5 pillars sit in one desktop row and 4 Growth cards in one row, stacking to
+   2-up on narrow screens. */
+html.flatnav .yl-card-grid{ display:flex; flex-wrap:wrap; justify-content:center; gap:.85rem; margin-top:1rem; }
 html.flatnav .yl-card{
   position:relative; display:flex; flex-direction:column;
-  width:100%; padding:0; border-radius:14px;
+  flex:1 1 170px; max-width:240px; padding:0; border-radius:14px;
   background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08);
   color:var(--tx); font-family:var(--fm); text-align:left; cursor:pointer;
   transition:transform .12s ease; -webkit-tap-highlight-color:transparent;
