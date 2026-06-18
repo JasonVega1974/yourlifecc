@@ -2403,6 +2403,7 @@ function _entryFinishAndRoute(profile, continueFn){
      && !window._faithFree && typeof showAgePickerModal==='function'){
     showAgePickerModal(function(){
       if(typeof continueFn==='function') continueFn();
+      _entryRouteChildHome();
       setTimeout(function(){ try { if(typeof showKidOnboard==='function' && !D.kidOnboardDone) showKidOnboard(); } catch(e){} }, 250);
     }, { viaKidActivation:true });
     return;
@@ -2410,7 +2411,18 @@ function _entryFinishAndRoute(profile, continueFn){
   if(typeof continueFn==='function') continueFn();
   if(profile && profile.isParent){
     setTimeout(function(){ try { if(typeof showSection==='function') showSection('s-parent'); } catch(e){} }, 80);
+  } else {
+    // Child: always land on their own home. Without this, a child activated
+    // while the app is still on s-parent (e.g. Switch Profile right after a
+    // Parent session) stays on the Parent Hub - and lockParentDash() (called by
+    // switchProfileGate + _entryActivate) reveals the #parentGate parent-PIN
+    // pad. Symmetric with the parent -> s-parent route above.
+    _entryRouteChildHome();
   }
+}
+
+function _entryRouteChildHome(){
+  setTimeout(function(){ try { if(typeof showSection==='function') showSection('s-hero'); } catch(e){} }, 80);
 }
 
 function _entryAvatar(p){
