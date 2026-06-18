@@ -116,45 +116,58 @@
   // showSection()/wellGoto() router — no new routes. Slot 2 (The Well) is
   // swappable via D.tabSwap, mirroring renderBottomTabBar's faith slot.
   // Faith-free users keep ffBottomNav and never see this surface.
-  var _FL_CARDS = [
-    { label:'The Well',    icon:'✝️', desc:'Bible, prayer, plans, and growth',          accent:'#a78bfa', route:"showSection('s-scripture')" },
-    { label:'Learn',       icon:'📚', desc:'Life skills, school, driving, and jobs',     accent:'#38bdf8', route:"showSection('s-learn')" },
-    { label:'Life Skills', icon:'🧠', desc:'Learn one new thing today',                  accent:'#34d399', route:"showSection('s-skills')" },
-    { label:'Life',        icon:'⚡',       desc:'Habits, goals, money, and schedule',         accent:'#fb923c', route:"showSection('s-life')" },
-    { label:'My People',   icon:'🤝', desc:'Mentors, family, and your circle',           accent:'#f472b6', route:"showSection('s-mentors')" },
-    { label:'Me',          icon:'🧑', desc:'Badges, milestones, profile, and settings',  accent:'#fbbf24', route:"showSection('s-me')" }
-  ];
-
-  function _flRgba(hex, a){
-    var h = String(hex).replace('#','');
-    var r = parseInt(h.substring(0,2),16);
-    var g = parseInt(h.substring(2,4),16);
-    var b = parseInt(h.substring(4,6),16);
-    return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+  // Unified card component (Phase A — nav-reorg foundation). EVERY flat-nav
+  // card is produced here so motion, palette, font, and a11y stay identical
+  // everywhere. items: [{ icon, title, desc, status?, hue, onClick }]. hue maps
+  // to one of 4 families (cool/amber/emerald/violet). Static at rest; the
+  // gradient-border sweep + focus ring are CSS (.yl-card). a11y: one aria-label
+  // (= title) on the card, inner text aria-hidden so SR announces it once.
+  var _YL_HUES = { cool:1, amber:1, emerald:1, violet:1 };
+  function renderYlCards(hostEl, items){
+    if (typeof document === 'undefined' || !hostEl || !items) return;
+    hostEl.innerHTML = '<div class="yl-card-grid">' + items.map(function(it){
+      var fam = _YL_HUES[it.hue] ? it.hue : 'cool';
+      var status = it.status ? ('<span class="yl-card__status" aria-hidden="true">' + _ahEsc(it.status) + '</span>') : '';
+      return '<button type="button" class="yl-card yl-card--' + fam + '" aria-label="' + _ahEsc(it.title) + '">' +
+        '<span class="yl-card__icon" aria-hidden="true">' + it.icon + '</span>' +
+        '<span class="yl-card__title" aria-hidden="true">' + _ahEsc(it.title) + '</span>' +
+        '<span class="yl-card__desc" aria-hidden="true">' + _ahEsc(it.desc) + '</span>' +
+        status +
+      '</button>';
+    }).join('') + '</div>';
+    var btns = hostEl.querySelectorAll('.yl-card');
+    items.forEach(function(it, i){
+      if (btns[i] && typeof it.onClick === 'function') btns[i].addEventListener('click', it.onClick);
+    });
   }
 
+  // Home launcher — its current 6 cards, now built through the unified component
+  // (same icons / titles / descriptions / routes; consistent motion + the
+  // constrained 4-family palette). Slot 2 (The Well) honors D.tabSwap; faith-free
+  // bails (keeps ffBottomNav).
   function renderHomeLauncher(){
     if (typeof document === 'undefined') return;
     var host = document.getElementById('homeLauncher');
     if (!host) return;
     if (window._faithFree){ host.innerHTML = ''; return; }
-    var cards = _FL_CARDS.slice();
+    var items = [
+      { icon:'✝️', title:'The Well',    desc:'Bible, prayer, plans, and growth',         hue:'violet',  onClick:function(){ showSection('s-scripture'); } },
+      { icon:'📚', title:'Learn',       desc:'Life skills, school, driving, and jobs',    hue:'cool',    onClick:function(){ showSection('s-learn'); } },
+      { icon:'🧠', title:'Life Skills', desc:'Learn one new thing today',                 hue:'emerald', onClick:function(){ showSection('s-skills'); } },
+      { icon:'⚡', title:'Life',        desc:'Habits, goals, money, and schedule',        hue:'amber',   onClick:function(){ showSection('s-life'); } },
+      { icon:'🤝', title:'My People',   desc:'Mentors, family, and your circle',          hue:'violet',  onClick:function(){ showSection('s-mentors'); } },
+      { icon:'🧑', title:'Me',          desc:'Badges, milestones, profile, and settings', hue:'amber',   onClick:function(){ showSection('s-me'); } }
+    ];
     // Slot 2 (index 0 = The Well) honors the faith-tab-swap pin if set.
     try {
       var sw  = (typeof D !== 'undefined' && D && D.tabSwap) ? D.tabSwap : '';
       var opt = (typeof TAB_SWAP_OPTIONS !== 'undefined') ? TAB_SWAP_OPTIONS[sw] : null;
       if (opt){
-        cards[0] = { label:opt.label, icon:opt.icon, desc:'Your pinned space', accent:'#a78bfa', route:"showSection('" + opt.sectionId + "')" };
+        items[0] = { icon:opt.icon, title:opt.label, desc:'Your pinned space', hue:'violet',
+          onClick:(function(sec){ return function(){ showSection(sec); }; })(opt.sectionId) };
       }
     } catch(_){}
-    host.innerHTML = '<div class="fl-grid">' + cards.map(function(c){
-      var hero = 'background:radial-gradient(120% 100% at 50% 0%, ' + _flRgba(c.accent,.42) + ' 0%, transparent 70%), linear-gradient(135deg, ' + _flRgba(c.accent,.20) + ', var(--s1));';
-      return '<button type="button" class="fl-card" style="border-color:' + _flRgba(c.accent,.30) + ';" onclick="' + c.route + '" aria-label="' + _ahEsc(c.label) + '">' +
-        '<span class="fl-hero" style="' + hero + '"><span class="fl-hero-icon" aria-hidden="true">' + c.icon + '</span></span>' +
-        '<span class="fl-card-title">' + _ahEsc(c.label) + '</span>' +
-        '<span class="fl-card-desc">' + _ahEsc(c.desc) + '</span>' +
-      '</button>';
-    }).join('') + '</div>';
+    renderYlCards(host, items);
   }
 
   // Hide the appHome when the parent surface is active OR the user
@@ -270,5 +283,6 @@
     window.renderAppGreeting  = renderAppGreeting;
     window.maybeRenderAppHome = maybeRenderAppHome;
     window.renderHomeLauncher = renderHomeLauncher;
+    window.renderYlCards      = renderYlCards;
   }
 })();

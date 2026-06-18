@@ -11142,30 +11142,52 @@ html.flatnav #homeLauncher{ display:block; }
 html.flatnav #appMenu,
 html.flatnav .app-menu-label{ display:none !important; }
 
-.fl-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:1rem; margin-top:1rem; }
-.fl-card{
-  background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
-  border:1px solid rgba(255,255,255,.08); border-radius:14px; overflow:hidden;
-  cursor:pointer; display:flex; flex-direction:column; text-align:left;
-  font-family:var(--fm); width:100%; padding:0;
-  transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+/* ── Unified card component (.yl-card) — Phase A nav-reorg foundation ───────
+   ONE card for every flat-nav tier (built by renderYlCards() in app-home.js):
+   one radius, one padding, one gradient-border treatment; hue from 4 families
+   (cool / amber / emerald / violet); STATIC at rest, gradient-border SWEEP on
+   hover/focus only; reduced-motion drops the sweep. Scoped to html.flatnav so
+   flag-off users see zero change. Replaces the old per-card .fl-card system
+   (rainbow hues + Bebas title + always-on hover-lift). */
+html.flatnav .yl-card-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:.85rem; margin-top:1rem; }
+html.flatnav .yl-card{
+  position:relative; display:flex; flex-direction:column; align-items:flex-start; gap:.35rem;
+  width:100%; min-height:96px; padding:1rem 1.1rem; border-radius:14px;
+  background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08);
+  color:var(--tx); font-family:var(--fm); text-align:left; cursor:pointer;
+  transition:transform .12s ease; -webkit-tap-highlight-color:transparent;
 }
-.fl-card:hover{ transform:translateY(-2px); box-shadow:0 8px 26px rgba(15,23,42,.28); }
-.fl-card:active{ transform:translateY(0) scale(.99); }
-.fl-hero{ height:118px; display:flex; align-items:center; justify-content:center; border-bottom:1px solid rgba(255,255,255,.06); }
-.fl-hero-icon{ font-size:2.6rem; line-height:1; filter:drop-shadow(0 4px 10px rgba(0,0,0,.35)); }
-.fl-card-title{ font-family:var(--fh,var(--fm)); font-size:1rem; font-weight:800; color:var(--tx); padding:.85rem .9rem .3rem; letter-spacing:.01em; }
-.fl-card-desc{ font-size:.74rem; font-weight:600; color:var(--tx2); padding:0 .9rem 1rem; line-height:1.5; }
-
-/* Light mode */
-:root.light .fl-card{ background:linear-gradient(135deg,rgba(15,23,42,.04),rgba(15,23,42,.02)); border-color:rgba(15,23,42,.1); }
-:root.light .fl-hero{ border-bottom-color:rgba(15,23,42,.06); }
-:root.light .fl-hero-icon{ filter:drop-shadow(0 3px 8px rgba(15,23,42,.18)); }
-
-/* Reduced motion */
+html.flatnav .yl-card:active{ transform:scale(.99); }
+html.flatnav .yl-card:focus-visible{ outline:2px solid var(--c); outline-offset:2px; }
+/* Gradient border via mask — hidden at rest, sweeps in on hover/focus. */
+html.flatnav .yl-card::before{
+  content:''; position:absolute; inset:0; border-radius:inherit; padding:1px; pointer-events:none;
+  background:linear-gradient(120deg, var(--h1,#38bdf8), var(--h2,#6366f1), var(--h1,#38bdf8));
+  background-size:200% 100%;
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor;
+          mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);         mask-composite:exclude;
+  opacity:0; transition:opacity .2s ease;
+}
+html.flatnav .yl-card:hover::before, html.flatnav .yl-card:focus-visible::before{ opacity:1; animation:yl-card-sweep 1.4s linear infinite; }
+@keyframes yl-card-sweep{ from{ background-position:0 0; } to{ background-position:200% 0; } }
+/* Hue families — set --h1/--h2 for the gradient border (4 families, not a rainbow) */
+html.flatnav .yl-card--cool{    --h1:#38bdf8; --h2:#6366f1; }
+html.flatnav .yl-card--amber{   --h1:#fbbf24; --h2:#f59e0b; }
+html.flatnav .yl-card--emerald{ --h1:#34d399; --h2:#10b981; }
+html.flatnav .yl-card--violet{  --h1:#a78bfa; --h2:#8b5cf6; }
+/* Content — icon top-left (consistent size); title var(--fm) 700 (NOT Bebas);
+   title + desc one line each; status shares the desc slot styling. */
+html.flatnav .yl-card__icon{ font-size:1.6rem; line-height:1; }
+html.flatnav .yl-card__title{ font-family:var(--fm); font-weight:700; font-size:.95rem; color:var(--tx); line-height:1.25; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+html.flatnav .yl-card__desc{ font-size:.76rem; font-weight:500; color:var(--tx2); line-height:1.4; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+html.flatnav .yl-card__status{ font-size:.7rem; font-weight:600; color:var(--tx3); letter-spacing:.02em; }
+/* Light mode (title/desc/status already use theme tokens) */
+html.flatnav.light .yl-card{ background:rgba(15,23,42,.03); border-color:rgba(15,23,42,.1); }
+/* Reduced motion — no sweep; the gradient border just appears on hover/focus */
 @media (prefers-reduced-motion:reduce){
-  .fl-card{ transition:none; }
-  .fl-card:hover{ transform:none; }
+  html.flatnav .yl-card{ transition:none; }
+  html.flatnav .yl-card:active{ transform:none; }
+  html.flatnav .yl-card:hover::before, html.flatnav .yl-card:focus-visible::before{ animation:none; opacity:1; }
 }
 
 /* ── Parent Hub child selector cards (replaces the "Viewing:" dropdown) ──
