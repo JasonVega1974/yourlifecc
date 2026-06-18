@@ -192,6 +192,7 @@
       if (home){
         home.style.display = '';
         renderAppGreeting();
+        if (typeof renderChildHeroScene === 'function'){ try { renderChildHeroScene(); } catch (e) {} }
         if (typeof renderHomeLauncher === 'function'){ try { renderHomeLauncher(); } catch (e) {} }
         if (typeof renderDailyGrowth === 'function'){ try { renderDailyGrowth(); } catch (e) {} }
       }

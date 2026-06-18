@@ -1435,6 +1435,10 @@
        appOpenDest router).
        ════════════════════════════════════════════════════════════ -->
   <div id="appHome">
+    <!-- Child home star-field hero (canvas). Flag-gated via html.flatnav
+         (hidden otherwise). Painted by child-hero-scene.js; light mode shows
+         a CSS daytime gradient instead. Decorative -> aria-hidden. -->
+    <div id="childHero" aria-hidden="true"><canvas id="childHeroCanvas"></canvas></div>
     <div id="appGreeting"></div>
     <div id="appDailyBriefingWrap">
 
@@ -8677,14 +8681,19 @@
     /* Child home greeting — warm-dark treatment. SCOPED to #appGreeting so the
        faith-zones home (#fzHome), which shares .fz-greet-*, is unchanged.
        Flat-premium: solid navy fill, faint amber border, no shadow/gradient. */
-    #appGreeting{ background:#0d1b2e; border:1px solid rgba(245,166,35,.18); border-radius:14px; padding:1.1rem 1.2rem; margin-bottom:1rem; }
-    #appGreeting .fz-greet-row{ padding:0; }
-    #appGreeting .fz-greet-hi{ color:#f7f9fc; }
-    #appGreeting .fz-greet-hi .ag-name{ color:#f5a623; }
-    #appGreeting .fz-greet-sub{ color:var(--tx2); }
-    :root.light #appGreeting{ background:#fbf6ec; border-color:rgba(245,166,35,.30); }
-    :root.light #appGreeting .fz-greet-hi{ color:#1a1f2e; }
-    :root.light #appGreeting .fz-greet-hi .ag-name{ color:#b06f0a; }
+    /* Child home greeting card — warm-dark treatment. SCOPED to html.flatnav
+       #appGreeting so flag-off users see zero change AND the faith-zones home
+       (#fzHome), which shares .fz-greet-*, is unaffected. Top corners flat + no
+       top border so the #childHero canvas (bottom darkens to #0d1b2e) bleeds in
+       flush above it. Co-owned hex: #0d1b2e (= canvas seam color). */
+    html.flatnav #appGreeting{ background:#0d1b2e; border:1px solid rgba(245,166,35,.18); border-top:0; border-radius:0 0 14px 14px; padding:1.1rem 1.2rem; margin-bottom:1rem; }
+    html.flatnav #appGreeting .fz-greet-row{ padding:0; }
+    html.flatnav #appGreeting .fz-greet-hi{ color:#f7f9fc; }
+    html.flatnav #appGreeting .fz-greet-hi .ag-name{ color:#f5a623; }
+    html.flatnav #appGreeting .fz-greet-sub{ color:var(--tx2); }
+    html.flatnav.light #appGreeting{ background:#fbf6ec; border-color:rgba(245,166,35,.30); }
+    html.flatnav.light #appGreeting .fz-greet-hi{ color:#1a1f2e; }
+    html.flatnav.light #appGreeting .fz-greet-hi .ag-name{ color:#b06f0a; }
     .fz-streak{
       font-size:.85rem; font-weight:700;
       color:#ff7a3d;
@@ -20544,6 +20553,9 @@
      Loads after daily-briefing.js so its DOM target is in place.
      2026-06-04 — Chooser now routes to Command Center first; this
      surface stays as fallback (window._ccDisabled rollback). -->
+<!-- Child home star-field hero canvas (flat-nav). Idempotent mount via
+     renderChildHeroScene(), called from app-home.js:maybeRenderAppHome(). -->
+<script defer src="/app/js/child-hero-scene.js"></script>
 <script defer src="/app/js/app-home.js"></script>
 
 <!-- V1 Rebuild · Faith Tab redesign — Zone 1/2/3 data + render module.

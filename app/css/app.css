@@ -11197,3 +11197,16 @@ html.flatnav .app-menu-label{ display:none !important; }
   .pcc-card{ transition:none; }
   .pcc-card:active{ transform:none; }
 }
+
+/* ── Child home star-field hero (#childHero) — flag-gated via html.flatnav ──
+   Dark mode: the canvas paints the night-sky scene (child-hero-scene.js),
+   bottom-darkening to #0d1b2e so it bleeds into #appGreeting below. Light mode:
+   canvas hidden, host shows a daytime sky gradient (no stars). Hidden entirely
+   when the flag is off. */
+#childHero{ display:none; }
+html.flatnav #childHero{ display:block; position:relative; width:100%; height:180px; overflow:hidden; border-radius:14px 14px 0 0; }
+html.flatnav #childHeroCanvas{ display:block; width:100%; height:100%; }
+@media (min-width:861px){ html.flatnav #childHero{ height:220px; } }
+/* Light-mode daytime variant — CSS-only sky, no canvas/stars */
+html.flatnav.light #childHero{ background:linear-gradient(180deg,#dbeafe,#e0f2fe); }
+html.flatnav.light #childHeroCanvas{ display:none; }
