@@ -129,10 +129,12 @@
       var fam = _YL_HUES[it.hue] ? it.hue : 'cool';
       var status = it.status ? ('<span class="yl-card__status" aria-hidden="true">' + _ahEsc(it.status) + '</span>') : '';
       return '<button type="button" class="yl-card yl-card--' + fam + '" aria-label="' + _ahEsc(it.title) + '">' +
-        '<span class="yl-card__icon" aria-hidden="true">' + it.icon + '</span>' +
-        '<span class="yl-card__title" aria-hidden="true">' + _ahEsc(it.title) + '</span>' +
-        '<span class="yl-card__desc" aria-hidden="true">' + _ahEsc(it.desc) + '</span>' +
-        status +
+        '<span class="yl-card__hero"><span class="yl-card__icon" aria-hidden="true">' + it.icon + '</span></span>' +
+        '<span class="yl-card__body">' +
+          '<span class="yl-card__title" aria-hidden="true">' + _ahEsc(it.title) + '</span>' +
+          '<span class="yl-card__desc" aria-hidden="true">' + _ahEsc(it.desc) + '</span>' +
+          status +
+        '</span>' +
       '</button>';
     }).join('') + '</div>';
     var btns = hostEl.querySelectorAll('.yl-card');

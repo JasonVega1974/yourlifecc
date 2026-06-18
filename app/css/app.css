@@ -11149,10 +11149,10 @@ html.flatnav .app-menu-label{ display:none !important; }
    hover/focus only; reduced-motion drops the sweep. Scoped to html.flatnav so
    flag-off users see zero change. Replaces the old per-card .fl-card system
    (rainbow hues + Bebas title + always-on hover-lift). */
-html.flatnav .yl-card-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:.85rem; margin-top:1rem; }
+html.flatnav .yl-card-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:.85rem; margin-top:1rem; }
 html.flatnav .yl-card{
-  position:relative; display:flex; flex-direction:column; align-items:flex-start; gap:.35rem;
-  width:100%; min-height:96px; padding:1rem 1.1rem; border-radius:14px;
+  position:relative; display:flex; flex-direction:column;
+  width:100%; padding:0; border-radius:14px;
   background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08);
   color:var(--tx); font-family:var(--fm); text-align:left; cursor:pointer;
   transition:transform .12s ease; -webkit-tap-highlight-color:transparent;
@@ -11171,18 +11171,28 @@ html.flatnav .yl-card::before{
 html.flatnav .yl-card:hover::before, html.flatnav .yl-card:focus-visible::before{ opacity:1; animation:yl-card-sweep 1.4s linear infinite; }
 @keyframes yl-card-sweep{ from{ background-position:0 0; } to{ background-position:200% 0; } }
 /* Hue families — set --h1/--h2 for the gradient border (4 families, not a rainbow) */
-html.flatnav .yl-card--cool{    --h1:#38bdf8; --h2:#6366f1; }
-html.flatnav .yl-card--amber{   --h1:#fbbf24; --h2:#f59e0b; }
-html.flatnav .yl-card--emerald{ --h1:#34d399; --h2:#10b981; }
-html.flatnav .yl-card--violet{  --h1:#a78bfa; --h2:#8b5cf6; }
-/* Content — icon top-left (consistent size); title var(--fm) 700 (NOT Bebas);
+html.flatnav .yl-card--cool{    --h1:#38bdf8; --h2:#6366f1; --glow:rgba(56,189,248,.30); }
+html.flatnav .yl-card--amber{   --h1:#fbbf24; --h2:#f59e0b; --glow:rgba(251,191,36,.30); }
+html.flatnav .yl-card--emerald{ --h1:#34d399; --h2:#10b981; --glow:rgba(52,211,153,.30); }
+html.flatnav .yl-card--violet{  --h1:#a78bfa; --h2:#8b5cf6; --glow:rgba(167,139,250,.30); }
+/* Hero zone — large centered icon over a radial glow drawn from the card's hue
+   family (--glow), with a soft divider into the text area. The glow is a STATIC
+   background (not motion), so it's fine always-on + under reduced-motion; the
+   sweep stays hover/focus-only. Own rounded top so the card needs no overflow:
+   hidden (which would clip the ::before gradient border). */
+html.flatnav .yl-card__hero{ display:flex; align-items:center; justify-content:center; height:104px; border-radius:14px 14px 0 0; border-bottom:1px solid rgba(255,255,255,.06);
+  background:radial-gradient(120% 100% at 50% 0%, var(--glow,rgba(56,189,248,.30)) 0%, transparent 70%); }
+html.flatnav .yl-card__icon{ font-size:2.6rem; line-height:1; filter:drop-shadow(0 4px 10px rgba(0,0,0,.35)); }
+/* Text area under the hero — left-aligned; title var(--fm) 700 (NOT Bebas);
    title + desc one line each; status shares the desc slot styling. */
-html.flatnav .yl-card__icon{ font-size:1.6rem; line-height:1; }
+html.flatnav .yl-card__body{ display:flex; flex-direction:column; gap:.3rem; padding:.8rem .9rem 1rem; }
 html.flatnav .yl-card__title{ font-family:var(--fm); font-weight:700; font-size:.95rem; color:var(--tx); line-height:1.25; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 html.flatnav .yl-card__desc{ font-size:.76rem; font-weight:500; color:var(--tx2); line-height:1.4; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 html.flatnav .yl-card__status{ font-size:.7rem; font-weight:600; color:var(--tx3); letter-spacing:.02em; }
 /* Light mode (title/desc/status already use theme tokens) */
 html.flatnav.light .yl-card{ background:rgba(15,23,42,.03); border-color:rgba(15,23,42,.1); }
+html.flatnav.light .yl-card__hero{ border-bottom-color:rgba(15,23,42,.06); }
+html.flatnav.light .yl-card__icon{ filter:drop-shadow(0 3px 8px rgba(15,23,42,.18)); }
 /* Reduced motion — no sweep; the gradient border just appears on hover/focus */
 @media (prefers-reduced-motion:reduce){
   html.flatnav .yl-card{ transition:none; }
