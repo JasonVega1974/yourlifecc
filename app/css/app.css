@@ -11214,6 +11214,10 @@ html.flatnav #childHeroCanvas{ display:block; width:100%; height:100%; }
    section so the canvas starts exactly where the top bar ends — no negative
    margins. Degrades gracefully (small gap) where :has() is unsupported. */
 html.flatnav #app:has(#s-hero.active){ padding-top:0; }
+/* The real gap above the canvas was #s-hero's own .sec padding-top (2.2rem,
+   app.css:275) — #app/#appHome were already zeroed. Zero it on the home section
+   under flatnav so the canvas is truly flush under the top bar. */
+html.flatnav #s-hero{ padding-top:0; }
 /* Light-mode daytime variant — CSS-only sky, no canvas/stars */
 html.flatnav.light #childHero{ background:linear-gradient(180deg,#dbeafe,#e0f2fe); }
 html.flatnav.light #childHeroCanvas{ display:none; }
