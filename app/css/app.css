@@ -11339,3 +11339,44 @@ html.flatnav #appHome > #homeLauncher{ margin:1rem 0 0; }
    so the two read as one column; small top gap off the flush top bar. */
 html.flatnav #appDailyBriefingWrap{ padding:0 1.2rem; margin:.9rem 0 1rem; }
 @media (min-width:720px){ html.flatnav #appDailyBriefingWrap{ padding:0 2rem; } }
+
+/* ── Command Center "Jump in" tiles (flatnav) — mirror the .yl-card polish ───
+   A soft per-tile accent icon glow (static) + a gradient-border sweep that is
+   hidden at rest and sweeps in on hover/focus (reuses @keyframes yl-card-sweep).
+   Scoped to html.flatnav so the flag-off Command Center tiles stay byte-identical
+   (no markup change — the per-tile accent rides the existing [data-dest], same
+   hue as each tile's constellation star / pillar family). */
+html.flatnav .cc-tile{ overflow:visible; }
+html.flatnav .cc-tile[data-dest="habits"]{ --tile-accent:#F5A623; }
+html.flatnav .cc-tile[data-dest="chores"]{ --tile-accent:#6AA7FF; }
+html.flatnav .cc-tile[data-dest="goals"]{  --tile-accent:#7EC19A; }
+html.flatnav .cc-tile[data-dest="money"]{  --tile-accent:#F47B5A; }
+html.flatnav .cc-tile[data-dest="skills"]{ --tile-accent:#D4A04C; }
+html.flatnav .cc-tile[data-dest="health"]{ --tile-accent:#4A9082; }
+html.flatnav .cc-tile[data-dest="learn"]{  --tile-accent:#38BDF8; }
+html.flatnav .cc-tile[data-dest="growth"]{ --tile-accent:#34D399; }
+html.flatnav .cc-tile[data-dest="me"]{     --tile-accent:#A78BFA; }
+/* Icon glow — soft radial in the tile accent, emanating from the icon corner
+   (z:0, behind the z:1 content). Static, so it is fine under reduced-motion. */
+html.flatnav .cc-tile::after{
+  content:''; position:absolute; left:0; top:0; width:130px; height:130px; pointer-events:none; z-index:0;
+  background:radial-gradient(circle at 34px 36px, color-mix(in srgb, var(--tile-accent,#FBBF24) 26%, transparent) 0%, transparent 62%);
+}
+/* Gradient-border sweep — hidden at rest, sweeps in on hover/focus only. */
+html.flatnav .cc-tile::before{
+  content:''; position:absolute; inset:0; border-radius:inherit; padding:1px; pointer-events:none; z-index:2;
+  background:linear-gradient(120deg, transparent 18%, var(--tile-accent,#FBBF24) 50%, transparent 82%);
+  background-size:200% 100%;
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor;
+          mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);         mask-composite:exclude;
+  opacity:0; transition:opacity .2s ease;
+}
+html.flatnav .cc-tile:hover::before, html.flatnav .cc-tile:focus-visible::before{ opacity:1; animation:yl-card-sweep 1.4s linear infinite; }
+html.flatnav .cc-tile:focus-visible{ outline-color:var(--tile-accent,#FBBF24); }
+/* Faith tile stays de-emphasized — no glow, no sweep. */
+html.flatnav .cc-tile--faith::after, html.flatnav .cc-tile--faith::before{ display:none; }
+/* Reduced motion — keep the static glow, drop the sweep (the CC reduced-motion
+   block also neutralizes it; explicit here for clarity). */
+@media (prefers-reduced-motion:reduce){
+  html.flatnav .cc-tile:hover::before, html.flatnav .cc-tile:focus-visible::before{ animation:none; opacity:1; }
+}
