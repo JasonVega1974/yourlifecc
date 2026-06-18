@@ -2198,6 +2198,27 @@ function showTopicCard(scope, topicId){
   }
 }
 
+// Entry-redesign — inject a subtle "back to Home" link at the top of each main
+// section under html.flatnav (the sidebar is hidden there, so sections need a
+// way back to Home). Idempotent; skipped on Home / Parent Hub / The Well
+// (faith.js owns #s-scripture). Hidden via CSS when the flag is off.
+function _ensureFlatBack(sectionEl){
+  try {
+    if(!sectionEl || !document.documentElement.classList.contains('flatnav')) return;
+    var id = sectionEl.id;
+    if(id === 's-hero' || id === 's-parent' || id === 's-scripture') return;
+    var first = sectionEl.firstElementChild;
+    if(first && first.classList && first.classList.contains('flatnav-back')) return;
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'flatnav-back';
+    b.setAttribute('aria-label', 'Back to Home');
+    b.textContent = '← Home';
+    b.onclick = function(){ if(typeof showSection === 'function') showSection('s-hero'); };
+    sectionEl.insertBefore(b, sectionEl.firstChild);
+  } catch(e){}
+}
+
 function showSection(id, fromMobile){
   // Stop all audio (TTS, MP3, ambient) when navigating between sections
   if(typeof stopAllAudio === 'function') stopAllAudio();
@@ -2245,6 +2266,7 @@ function showSection(id, fromMobile){
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
   const target = document.getElementById(id);
   if(target){ target.style.display = ''; target.classList.add('active'); }
+  _ensureFlatBack(target);
   _activeSection = id;
   // Engagement aggregate write to profiles (debounced inside the helper).
   if(typeof trackSectionVisit === 'function') trackSectionVisit(id);

@@ -8694,6 +8694,15 @@
     /* Afternoon: when #childHero has .chs-day (set by child-hero-scene.js),
        lighten the greeting slightly. Amber name + everything else unchanged. */
     html.flatnav #childHero.chs-day ~ #appGreeting{ background:#0f2035; }
+    /* Per-section "back to Home" link (injected by ui.js _ensureFlatBack) — the
+       sidebar is hidden under flatnav, so each section needs a way Home. Subtle
+       text link, 44px tap target, theme-aware (--tx2). Shown only under flatnav;
+       the floating #mobileHomeBack is hidden under flatnav so the back affordance
+       is single + consistent. */
+    .flatnav-back{ display:none; }
+    html.flatnav .flatnav-back{ display:inline-flex; align-items:center; gap:.35rem; background:none; border:0; cursor:pointer; color:var(--tx2); font-family:var(--fm); font-size:.82rem; font-weight:600; padding:.6rem .2rem; min-height:44px; -webkit-tap-highlight-color:transparent; }
+    html.flatnav .flatnav-back:hover{ color:var(--tx); }
+    html.flatnav #mobileHomeBack{ display:none !important; }
     .fz-streak{
       font-size:.85rem; font-weight:700;
       color:#ff7a3d;
