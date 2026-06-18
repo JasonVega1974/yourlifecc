@@ -11213,11 +11213,16 @@ html.flatnav #childHeroCanvas{ display:block; width:100%; height:100%; }
 /* Flush to the top bar: zero #app's top padding while Home is the active
    section so the canvas starts exactly where the top bar ends — no negative
    margins. Degrades gracefully (small gap) where :has() is unsupported. */
-html.flatnav #app:has(#s-hero.active){ padding-top:0; }
+html.flatnav #app{ padding-top:0; }  /* all flatnav sections, not just Home (was :has(#s-hero.active), which left non-home sections with #app's 1.6rem) */
 /* The real gap above the canvas was #s-hero's own .sec padding-top (2.2rem,
    app.css:275) — #app/#appHome were already zeroed. Zero it on the home section
    under flatnav so the canvas is truly flush under the top bar. */
 html.flatnav #s-hero{ padding-top:0; }
+/* Tighten non-home sections under flatnav: zero the .sec top padding (2.2rem,
+   app.css:275) so the per-section back link + title sit just below the top bar.
+   The ~10px breathing room is the .flatnav-back's own padding. No stray hero
+   renders here (the constellation lives only in #s-hero/#appCommandCenter). */
+html.flatnav .sec:not(#s-hero){ padding-top:0; margin-top:0; }
 /* Light-mode daytime variant — CSS-only sky, no canvas/stars */
 html.flatnav.light #childHero{ background:linear-gradient(180deg,#dbeafe,#e0f2fe); }
 html.flatnav.light #childHeroCanvas{ display:none; }
