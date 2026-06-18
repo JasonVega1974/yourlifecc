@@ -11204,6 +11204,56 @@ html.flatnav.light .yl-card__icon{ filter:drop-shadow(0 3px 8px rgba(15,23,42,.1
   html.flatnav .yl-card:hover::before, html.flatnav .yl-card:focus-visible::before{ animation:none; opacity:1; }
 }
 
+/* ── Tier-1 pillar bands (.yl-pillar) — Phase B.2 ──────────────────────────
+   Full-width stacked rows for the 5 Home pillars, visually distinct from the
+   Tier-2 .yl-card grids (bands are always full width -> no grid-orphan). Echoes
+   the card hue language (--h1/--h2/--glow). Static at rest; hover/focus
+   intensifies the hue wash + slides the chevron. Scoped to html.flatnav. */
+html.flatnav .yl-pillar-stack{ display:flex; flex-direction:column; gap:.6rem; margin-top:1rem; }
+html.flatnav .yl-pillar{
+  position:relative; display:flex; align-items:center; gap:.9rem;
+  width:100%; min-height:72px; padding:.85rem 1rem .85rem 1.15rem;
+  border-radius:14px; overflow:hidden;
+  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
+  color:var(--tx); font-family:var(--fm); text-align:left; cursor:pointer;
+  transition:transform .14s ease, border-color .18s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+/* left-edge hue bar (category accent) */
+html.flatnav .yl-pillar::before{ content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:linear-gradient(180deg, var(--h1,#38bdf8), var(--h2,#6366f1)); }
+/* low-opacity hue wash from the left; intensifies on hover/focus */
+html.flatnav .yl-pillar::after{ content:''; position:absolute; inset:0; pointer-events:none; opacity:.45; transition:opacity .2s ease;
+  background:radial-gradient(120% 140% at 0% 50%, var(--glow,rgba(56,189,248,.30)) 0%, transparent 55%); }
+html.flatnav .yl-pillar:hover, html.flatnav .yl-pillar:focus-visible{ transform:translateX(2px); border-color:rgba(255,255,255,.16); }
+html.flatnav .yl-pillar:hover::after, html.flatnav .yl-pillar:focus-visible::after{ opacity:1; }
+html.flatnav .yl-pillar:active{ transform:translateX(0) scale(.995); }
+html.flatnav .yl-pillar:focus-visible{ outline:2px solid var(--c); outline-offset:2px; }
+/* icon glow tile (echoes the .yl-card hero glow) */
+html.flatnav .yl-pillar__icon{ position:relative; z-index:1; flex-shrink:0; width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.5rem;
+  background:radial-gradient(120% 120% at 50% 0%, var(--glow,rgba(56,189,248,.30)) 0%, transparent 75%), rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); }
+html.flatnav .yl-pillar__text{ position:relative; z-index:1; flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:.1rem; }
+html.flatnav .yl-pillar__title{ font-family:var(--fm); font-weight:700; font-size:1rem; color:var(--tx); line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+html.flatnav .yl-pillar__desc{ font-size:.78rem; font-weight:500; color:var(--tx2); line-height:1.35; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+html.flatnav .yl-pillar__chev{ position:relative; z-index:1; flex-shrink:0; color:var(--tx3); font-size:1.3rem; transition:transform .15s ease, color .15s ease; }
+html.flatnav .yl-pillar:hover .yl-pillar__chev, html.flatnav .yl-pillar:focus-visible .yl-pillar__chev{ transform:translateX(3px); color:var(--tx2); }
+/* hue families — same values as the cards (.yl-card untouched) */
+html.flatnav .yl-pillar--cool{    --h1:#38bdf8; --h2:#6366f1; --glow:rgba(56,189,248,.30); }
+html.flatnav .yl-pillar--amber{   --h1:#fbbf24; --h2:#f59e0b; --glow:rgba(251,191,36,.30); }
+html.flatnav .yl-pillar--emerald{ --h1:#34d399; --h2:#10b981; --glow:rgba(52,211,153,.30); }
+html.flatnav .yl-pillar--violet{  --h1:#a78bfa; --h2:#8b5cf6; --glow:rgba(167,139,250,.30); }
+/* light mode */
+html.flatnav.light .yl-pillar{ background:rgba(15,23,42,.03); border-color:rgba(15,23,42,.1); }
+html.flatnav.light .yl-pillar:hover, html.flatnav.light .yl-pillar:focus-visible{ border-color:rgba(15,23,42,.18); }
+html.flatnav.light .yl-pillar__icon{ background:radial-gradient(120% 120% at 50% 0%, var(--glow) 0%, transparent 75%), rgba(15,23,42,.04); border-color:rgba(15,23,42,.08); }
+/* reduced motion — no slide; just the hue wash + border change */
+@media (prefers-reduced-motion:reduce){
+  html.flatnav .yl-pillar{ transition:none; }
+  html.flatnav .yl-pillar:hover, html.flatnav .yl-pillar:focus-visible{ transform:none; }
+  html.flatnav .yl-pillar:active{ transform:none; }
+  html.flatnav .yl-pillar__chev{ transition:none; }
+  html.flatnav .yl-pillar:hover .yl-pillar__chev, html.flatnav .yl-pillar:focus-visible .yl-pillar__chev{ transform:none; }
+}
+
 /* ── Parent Hub child selector cards (replaces the "Viewing:" dropdown) ──
    Built by renderParentChildCards() in email.js; one card per child profile.
    Active card reflects _activeProfileId. */

@@ -145,8 +145,8 @@
 
   // Home launcher — Tier 1, five pillars (Phase B): The Well, Learn, Life,
   // Growth, Me. Life Skills + My People moved off Home (still reachable inside
-  // the Life and Me landings). Built through the unified card; slot 0 (The Well)
-  // honors D.tabSwap; faith-free bails (keeps ffBottomNav).
+  // the Life and Me landings). Rendered as Tier-1 pillar bands (renderPillars,
+  // Phase B.2); slot 0 (The Well) honors D.tabSwap; faith-free bails (ffBottomNav).
   function renderHomeLauncher(){
     if (typeof document === 'undefined') return;
     var host = document.getElementById('homeLauncher');
@@ -168,7 +168,31 @@
           onClick:(function(sec){ return function(){ showSection(sec); }; })(opt.sectionId) };
       }
     } catch(_){}
-    renderYlCards(host, items);
+    renderPillars(host, items);
+  }
+
+  // Tier-1 pillar bands (Phase B.2) — full-width stacked rows for the 5 main
+  // areas, visually distinct from the Tier-2 .yl-card grids (bands are always
+  // full width, so no grid-orphan). Same {icon,title,desc,hue,onClick} signature
+  // + hue families as renderYlCards; the icon glow tile echoes the card hero.
+  // a11y: one aria-label (= title) on the band, inner text aria-hidden.
+  function renderPillars(hostEl, items){
+    if (typeof document === 'undefined' || !hostEl || !items) return;
+    hostEl.innerHTML = '<div class="yl-pillar-stack">' + items.map(function(it){
+      var fam = _YL_HUES[it.hue] ? it.hue : 'cool';
+      return '<button type="button" class="yl-pillar yl-pillar--' + fam + '" aria-label="' + _ahEsc(it.title) + '">' +
+        '<span class="yl-pillar__icon" aria-hidden="true">' + it.icon + '</span>' +
+        '<span class="yl-pillar__text">' +
+          '<span class="yl-pillar__title" aria-hidden="true">' + _ahEsc(it.title) + '</span>' +
+          '<span class="yl-pillar__desc" aria-hidden="true">' + _ahEsc(it.desc) + '</span>' +
+        '</span>' +
+        '<span class="yl-pillar__chev" aria-hidden="true">›</span>' +
+      '</button>';
+    }).join('') + '</div>';
+    var btns = hostEl.querySelectorAll('.yl-pillar');
+    items.forEach(function(it, i){
+      if (btns[i] && typeof it.onClick === 'function') btns[i].addEventListener('click', it.onClick);
+    });
   }
 
   // Growth landing (Tier 2 under the Growth pillar) — Badges / Milestones /
@@ -301,5 +325,6 @@
     window.renderHomeLauncher = renderHomeLauncher;
     window.renderYlCards      = renderYlCards;
     window.renderGrowthLanding = renderGrowthLanding;
+    window.renderPillars       = renderPillars;
   }
 })();
