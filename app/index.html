@@ -8691,6 +8691,9 @@
     html.flatnav.light #appGreeting{ background:#fbf6ec; border-color:rgba(245,166,35,.30); }
     html.flatnav.light #appGreeting .fz-greet-hi{ color:#1a1f2e; }
     html.flatnav.light #appGreeting .fz-greet-hi .ag-name{ color:#b06f0a; }
+    /* Afternoon: when #childHero has .chs-day (set by child-hero-scene.js),
+       lighten the greeting slightly. Amber name + everything else unchanged. */
+    html.flatnav #childHero.chs-day ~ #appGreeting{ background:#0f2035; }
     .fz-streak{
       font-size:.85rem; font-weight:700;
       color:#ff7a3d;

@@ -11204,9 +11204,20 @@ html.flatnav .app-menu-label{ display:none !important; }
    canvas hidden, host shows a daytime sky gradient (no stars). Hidden entirely
    when the flag is off. */
 #childHero{ display:none; }
-html.flatnav #childHero{ display:block; position:relative; width:100%; height:180px; overflow:hidden; border-radius:14px 14px 0 0; }
+/* Full-bleed without negative margins: width:100vw + left:50% + translateX(-50%)
+   re-centers on the viewport past #app's side padding; #mainWrap's overflow-x:
+   hidden clips the scrollbar-width overflow. */
+html.flatnav #childHero{ display:block; position:relative; left:50%; transform:translateX(-50%); width:100vw; height:180px; overflow:hidden; border-radius:14px 14px 0 0; }
 html.flatnav #childHeroCanvas{ display:block; width:100%; height:100%; }
 @media (min-width:861px){ html.flatnav #childHero{ height:220px; } }
+/* Flush to the top bar: zero #app's top padding while Home is the active
+   section so the canvas starts exactly where the top bar ends — no negative
+   margins. Degrades gracefully (small gap) where :has() is unsupported. */
+html.flatnav #app:has(#s-hero.active){ padding-top:0; }
 /* Light-mode daytime variant — CSS-only sky, no canvas/stars */
 html.flatnav.light #childHero{ background:linear-gradient(180deg,#dbeafe,#e0f2fe); }
 html.flatnav.light #childHeroCanvas{ display:none; }
+/* Afternoon (12-17): JS adds .chs-day -> daytime sky, canvas hidden. After the
+   light rule so afternoon wins in either theme by source order. */
+html.flatnav #childHero.chs-day{ background:linear-gradient(180deg,#93c5fd,#bae6fd); }
+html.flatnav #childHero.chs-day #childHeroCanvas{ display:none; }
