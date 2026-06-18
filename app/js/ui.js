@@ -1275,11 +1275,39 @@ function renderBottomTabBar(){
   setActiveBottomTab(_tabForSection(_activeSection) || 'home');
 }
 
+// Phase C — shared subheading for flat-nav landing groups (MORE / Activities).
+function _ylSubLabel(t){
+  return '<div style="font-size:.72rem;font-weight:700;letter-spacing:.08em;color:var(--tx2);margin:1.3rem 0 .6rem;">' + t + '</div>';
+}
+
 function renderTabLanding(tabId){
   const tab = TAB_IA.find(t => t.id === tabId);
   if(!tab) return;
   const host = document.querySelector('.tab-landing[data-tab="'+tabId+'"]');
   if(!host) return;
+  // Phase C — flat-nav: render the Me landing as .yl-card (navigational entries;
+  // Sign Out kept out of the grid as a plain de-emphasized link). Flag-off falls
+  // through to the legacy .tab-landing-card markup below, byte-identical.
+  if(tabId==='me' && document.documentElement.classList.contains('flatnav') && typeof renderYlCards==='function'){
+    var _meHue={ 's-badges':'amber','s-milestones':'amber','s-bio':'violet','s-mentors':'violet','s-referral':'amber','settings':'cool','profile':'violet' };
+    var _meDesc={ 's-badges':'What you have earned','s-milestones':'Your journey so far','s-bio':'Your public page','s-mentors':'Mentors, family, your circle','s-referral':'Invite a friend','settings':'Preferences and account','profile':'Name, age, interests' };
+    var _meItems = tab.primary.filter(function(c){ return c.action !== 'sign-out'; }).map(function(c){
+      var key = c.sectionId || c.action;
+      var cb;
+      if(c.sectionId){ cb = (function(id){ return function(){ showSection(id); }; })(c.sectionId); }
+      else { cb = (function(a){ return function(){ if(typeof handleTabAction==='function') handleTabAction(a); }; })(c.action); }
+      return { icon:c.icon, title:c.label, desc:(_meDesc[key]||''), hue:(_meHue[key]||'cool'), onClick:cb };
+    });
+    host.innerHTML = '<div id="ylMeGrid"></div><div id="ylMeFoot"></div>';
+    renderYlCards(document.getElementById('ylMeGrid'), _meItems);
+    var _foot = document.getElementById('ylMeFoot');
+    if(_foot){
+      _foot.innerHTML = '<button type="button" class="yl-signout" style="display:block;margin:1.2rem auto 0;background:none;border:0;color:var(--tx3);font-family:var(--fm);font-size:.8rem;text-decoration:underline;cursor:pointer;">Sign out</button>';
+      var _so = _foot.querySelector('.yl-signout');
+      if(_so) _so.addEventListener('click', function(){ if(typeof handleTabAction==='function') handleTabAction('sign-out'); });
+    }
+    return;
+  }
   host.innerHTML = tab.primary.map(card => {
     const accent = card.accent || tab.accent || 'var(--c)';
     let onclick = '';
@@ -1333,6 +1361,20 @@ function renderLearnLanding(){
     {id:'s-craft',     icon:'🎵', label:'Music & Practice', sub:'Practice timer, instrument guides, track upload', theme:'time'},
     {id:'s-sports',    icon:'🏆', label:'Sports',           sub:'Explore sports across school levels',             theme:'ember'}
   ];
+  // Phase C — flat-nav: render Learn as .yl-card (main + Activities groups).
+  // Flag-off falls through to the legacy .tab-landing-card markup below.
+  if(document.documentElement.classList.contains('flatnav') && typeof renderYlCards==='function'){
+    var _lnHue={ 's-school':'cool','s-cbt':'emerald','s-resume':'emerald','s-resources':'cool','s-growing':'emerald','s-driving':'cool','s-craft':'violet','s-sports':'amber' };
+    var _lnAct=['s-craft','s-sports'];
+    var _lnPresent = LEARN_CARDS.filter(function(c){ return document.getElementById(c.id); });
+    var _lnToItem = function(c){ return { icon:c.icon, title:c.label, desc:c.sub, hue:(_lnHue[c.id]||'cool'), onClick:(function(id){ return function(){ showSection(id); }; })(c.id) }; };
+    var _lnMain = _lnPresent.filter(function(c){ return _lnAct.indexOf(c.id)===-1; }).map(_lnToItem);
+    var _lnActs = _lnPresent.filter(function(c){ return _lnAct.indexOf(c.id)!==-1; }).map(_lnToItem);
+    host.innerHTML = '<div id="ylLearnMain"></div>' + (_lnActs.length ? _ylSubLabel('Activities') + '<div id="ylLearnAct"></div>' : '');
+    renderYlCards(document.getElementById('ylLearnMain'), _lnMain);
+    if(_lnActs.length) renderYlCards(document.getElementById('ylLearnAct'), _lnActs);
+    return;
+  }
   function cardHtml(c){
     return '<button type="button" class="tab-landing-card tlc-power"'
       + ' data-theme="' + c.theme + '"'
@@ -1469,6 +1511,22 @@ function renderLifeLanding(){
   if(!tab) return;
   var host = document.querySelector('.tab-landing[data-tab="life"]');
   if(!host) return;
+
+  // Phase C — flat-nav: render Life as .yl-card (heroes + MORE groups), excluding
+  // Challenges/Rewards (now in Growth) + Fuel Wall (scrapped). Flag-off falls
+  // through to the legacy .tab-landing-card markup below, byte-identical.
+  if(document.documentElement.classList.contains('flatnav') && typeof renderYlCards==='function'){
+    var _lfExcl={ 's-contests':1, 's-rewards':1, 's-motivation':1 };
+    var _lfHue={ 's-health':'amber','s-chores':'amber','s-goals':'amber','s-finance':'emerald','s-schedule':'cool','s-skills':'emerald','s-calendar':'cool','s-journal':'violet','s-mood':'violet','s-reading':'cool' };
+    var _lfDesc={ 's-calendar':'Plan your week','s-journal':'Write down your day','s-mood':'How are you feeling?','s-reading':'Track what you read' };
+    var _lfToItem = function(c){ return { icon:c.icon, title:c.label, desc:(c.sub || _lfDesc[c.sectionId] || ''), hue:(_lfHue[c.sectionId]||'cool'), onClick:(function(id){ return function(){ showSection(id); }; })(c.sectionId) }; };
+    var _lfHeroes = tab.primary.filter(function(c){ return c.tier==='hero' && c.sectionId; }).map(_lfToItem);
+    var _lfMore = tab.primary.filter(function(c){ return c.tier!=='hero' && c.sectionId && !_lfExcl[c.sectionId]; }).map(_lfToItem);
+    host.innerHTML = '<div id="ylLifeHero"></div>' + (_lfMore.length ? _ylSubLabel('More') + '<div id="ylLifeMore"></div>' : '');
+    renderYlCards(document.getElementById('ylLifeHero'), _lfHeroes);
+    if(_lfMore.length) renderYlCards(document.getElementById('ylLifeMore'), _lfMore);
+    return;
+  }
 
   var heroes = tab.primary.filter(function(c){ return c.tier === 'hero'; });
   var more   = tab.primary.filter(function(c){ return c.tier !== 'hero'; });
