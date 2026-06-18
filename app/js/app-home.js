@@ -236,11 +236,40 @@
       return;
     }
 
-    // Entry-redesign Phase 2 (flag-gated): flatnav forces the simplified
-    // #appHome surface (greeting + Daily Briefing + the card launcher) and
-    // suppresses the Constellation Command Center. Reversible: flag off ->
-    // no .flatnav class -> the CC-preference path below runs unchanged.
+    // New direction (2026-06-18): under flatnav the Constellation Command Center
+    // IS the home + nav (the constellation the user likes), with the Daily
+    // Briefing kept above it. The pillar / star-field / greeting #appHome path is
+    // left in place but used only as a fallback if the CC module hasn't loaded.
+    // Flag off -> no .flatnav -> the CC-preference path below is reached directly
+    // (the flag-off Command Center stays byte-identical).
     if (document.documentElement.classList.contains('flatnav')){
+      if (cc && typeof window.renderCommandCenter === 'function' && !window._ccDisabled){
+        if (home) home.style.display = 'none';
+        // Lift the Daily Briefing out of (now-hidden) #appHome to sit directly
+        // above the Command Center. Idempotent; flag-off never runs this path.
+        var briefF = document.getElementById('appDailyBriefingWrap');
+        if (briefF && cc.parentNode && briefF.nextElementSibling !== cc){
+          cc.parentNode.insertBefore(briefF, cc);
+        }
+        if (briefF) briefF.style.display = '';
+        try { window.renderCommandCenter(); }
+        catch (e){
+          try { console.warn('[appHome] CC render failed (flatnav), falling back', e); } catch(_){}
+          cc.style.display = 'none';
+          if (home){
+            home.style.display = '';
+            renderAppGreeting();
+            if (typeof renderHomeLauncher === 'function'){ try { renderHomeLauncher(); } catch (e2) {} }
+            if (typeof renderDailyGrowth === 'function'){ try { renderDailyGrowth(); } catch (e2) {} }
+          }
+          return;
+        }
+        cc.style.display = '';
+        if (typeof renderDailyBriefing === 'function'){ try { renderDailyBriefing(); } catch (eb) {} }
+        if (typeof renderDailyGrowth === 'function'){ try { renderDailyGrowth(); } catch (eg) {} }
+        return;
+      }
+      // CC module not loaded yet — fall back to the simplified #appHome path.
       if (cc) cc.style.display = 'none';
       if (home){
         home.style.display = '';
@@ -255,6 +284,15 @@
     // Prefer Command Center when the module is loaded and the
     // container exists. Hide the legacy #appHome.
     if (cc && typeof window.renderCommandCenter === 'function' && !window._ccDisabled){
+      // If a prior flatnav render lifted the Daily Briefing out of #appHome,
+      // restore it to its original slot so the flag-off DOM is unchanged.
+      // No-op on normal flag-off (the briefing never left #appHome).
+      var briefR = document.getElementById('appDailyBriefingWrap');
+      if (briefR && home && briefR.parentNode !== home){
+        var gcR = home.querySelector('.today-growth-card');
+        if (gcR) home.insertBefore(briefR, gcR); else home.appendChild(briefR);
+        briefR.style.display = '';
+      }
       if (home) home.style.display = 'none';
       try { window.renderCommandCenter(); } catch (e) {
         // Defensive: if Command Center throws, fall back to #appHome

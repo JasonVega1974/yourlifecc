@@ -670,6 +670,7 @@
       +     '<h2 class="cc-section-label">Jump in</h2>'
       +     '<div class="cc-tiles" style="--cc-accent:'+focusTile.accent+';">'
       +       tilesHtml
+      +       _ccNavTiles()
       +       faithHtml
       +     '</div>'
       +   '</section>'
@@ -732,8 +733,33 @@
     money:   's-finance',
     skills:  's-skills',
     health:  's-health',
-    faith:   's-scripture'
+    faith:   's-scripture',
+    // Flat-nav only — the extra "Jump in" tiles (sidebar replacement). Flag-off
+    // never emits these dests, so adding them here is byte-identical for flag-off.
+    learn:   's-learn',
+    growth:  's-growth',
+    me:      's-me'
   };
+
+  // Flat-nav coverage — with the sidebar gone, the constellation alone does not
+  // reach Learn / Growth / Me, so extend the "Jump in" tile row with them.
+  // Returns '' under flag-off, so the flag-off Command Center is byte-identical.
+  function _ccNavTiles(){
+    if (!document.documentElement.classList.contains('flatnav')) return '';
+    var nav = [
+      { dest:'learn',  icon:'📚', label:'Learn',  meta:'School, jobs, skills' },
+      { dest:'growth', icon:'📈', label:'Growth', meta:'Badges and milestones' },
+      { dest:'me',     icon:'🧑', label:'Me',     meta:'Profile and settings' }
+    ];
+    return nav.map(function(n){
+      return '<button class="cc-tile" type="button" data-dest="'+n.dest+'" '
+        + 'aria-label="'+_ccEsc(n.label)+' — '+_ccEsc(n.meta)+'">'
+        + '<span class="cc-tile__icon" aria-hidden="true">'+n.icon+'</span>'
+        + '<span class="cc-tile__title">'+_ccEsc(n.label)+'</span>'
+        + '<span class="cc-tile__meta">'+_ccEsc(n.meta)+'</span>'
+        + '</button>';
+    }).join('');
+  }
 
   function ccOpenDest(dest){
     var target = _CC_SECTION_MAP[dest];

@@ -11334,3 +11334,8 @@ html.flatnav #appHome{ padding-top:0; max-width:760px; }
 html.flatnav #appHome > #appDailyBriefingWrap,
 html.flatnav #appHome > .today-growth-card,
 html.flatnav #appHome > #homeLauncher{ margin:1rem 0 0; }
+/* CC home (2026-06-18) — the Daily Briefing is lifted above the Command Center
+   (app-home.js maybeRenderAppHome) and aligned to the .cc-shell content padding
+   so the two read as one column; small top gap off the flush top bar. */
+html.flatnav #appDailyBriefingWrap{ padding:0 1.2rem; margin:.9rem 0 1rem; }
+@media (min-width:720px){ html.flatnav #appDailyBriefingWrap{ padding:0 2rem; } }
