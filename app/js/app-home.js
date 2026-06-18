@@ -78,7 +78,7 @@
     el.innerHTML =
       '<div class="fz-greet-row">' +
         '<div class="fz-greet-text">' +
-          '<div class="fz-greet-hi">Good ' + part + ', ' + _ahEsc(name) + ' 👋</div>' +
+          '<div class="fz-greet-hi">Good ' + part + ', <span class="ag-name">' + _ahEsc(name) + '</span> 👋</div>' +
           "<div class=\"fz-greet-sub\">Here's your day.</div>" +
         '</div>' +
         streakChip +

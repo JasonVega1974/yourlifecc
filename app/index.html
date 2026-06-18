@@ -8674,6 +8674,17 @@
       font-size:1.4rem; font-weight:700; color:var(--tx); line-height:1.2;
     }
     .fz-greet-sub{ font-size:.85rem; color:var(--tx2); margin-top:.25rem; }
+    /* Child home greeting — warm-dark treatment. SCOPED to #appGreeting so the
+       faith-zones home (#fzHome), which shares .fz-greet-*, is unchanged.
+       Flat-premium: solid navy fill, faint amber border, no shadow/gradient. */
+    #appGreeting{ background:#0d1b2e; border:1px solid rgba(245,166,35,.18); border-radius:14px; padding:1.1rem 1.2rem; margin-bottom:1rem; }
+    #appGreeting .fz-greet-row{ padding:0; }
+    #appGreeting .fz-greet-hi{ color:#f7f9fc; }
+    #appGreeting .fz-greet-hi .ag-name{ color:#f5a623; }
+    #appGreeting .fz-greet-sub{ color:var(--tx2); }
+    :root.light #appGreeting{ background:#fbf6ec; border-color:rgba(245,166,35,.30); }
+    :root.light #appGreeting .fz-greet-hi{ color:#1a1f2e; }
+    :root.light #appGreeting .fz-greet-hi .ag-name{ color:#b06f0a; }
     .fz-streak{
       font-size:.85rem; font-weight:700;
       color:#ff7a3d;
