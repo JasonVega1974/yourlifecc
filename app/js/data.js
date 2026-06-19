@@ -354,6 +354,10 @@ const DEF = {
   // localStorage data is folded in once by _migrateMySports() (sports.js).
   // Wellbeing: weight is a static recruiting fact only — never tracked over time.
   mySports:[],
+  // Home Shortcuts (Phase D) — per-profile pinned feature shortcuts shown on the
+  // flat-nav Command Center home. Items {route, icon, title, hue}; soft cap 8.
+  // Read/written ONLY by the flat-nav shortcut code; inert ([]) for flag-off.
+  homeShortcuts:[],
   // chores / rewards
   choreList:[], choreLog:[], chores:{}, selfChores:[], chorePoints:{total:0,spent:0}, chorePin:'',
   // 2026-06-06 — Tab 1 Increment 5 Step B. Parallel badge surface for

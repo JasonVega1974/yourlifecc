@@ -11380,3 +11380,36 @@ html.flatnav .cc-tile--faith::after, html.flatnav .cc-tile--faith::before{ displ
 @media (prefers-reduced-motion:reduce){
   html.flatnav .cc-tile:hover::before, html.flatnav .cc-tile:focus-visible::before{ animation:none; opacity:1; }
 }
+
+/* ── Phase D — Home Shortcuts (pin-to-Home) ─────────────────────────────────
+   The pin star on .yl-card feature cards + the CC "My Shortcuts" zone. All
+   html.flatnav-scoped (flag-off cards / CC never render these). */
+html.flatnav .yl-card__pin{
+  position:absolute; top:6px; right:6px; z-index:3;
+  width:44px; height:44px; display:flex; align-items:center; justify-content:center;
+  font-size:1.1rem; line-height:1; color:var(--tx2); cursor:pointer; border-radius:50%;
+  background:transparent; -webkit-tap-highlight-color:transparent; user-select:none;
+  transition:color .15s ease, background .15s ease, transform .12s ease;
+}
+html.flatnav .yl-card__pin:hover{ color:var(--tx); background:rgba(255,255,255,.08); }
+html.flatnav .yl-card__pin:active{ transform:scale(.9); }
+html.flatnav .yl-card__pin[aria-pressed="true"]{ color:#F5A623; }
+html.flatnav .yl-card__pin:focus-visible{ outline:2px solid var(--c); outline-offset:2px; }
+html.flatnav .yl-card__pin--disabled{ opacity:.32; cursor:not-allowed; }
+html.flatnav.light .yl-card__pin:hover{ background:rgba(15,23,42,.06); }
+html.flatnav.light .yl-card__pin[aria-pressed="true"]{ color:#b06f0a; }
+/* CC "My Shortcuts" zone — pinned items as .cc-tile tiles (inherit the tile glow
+   via inline --tile-accent) + an empty-state hint at 0 pinned. */
+html.flatnav .cc-shortcuts-sec{ margin-top:1.4rem; }
+html.flatnav .cc-shortcuts-empty{ font-size:.85rem; color:#9AA0B4; line-height:1.5; padding:.85rem 1rem; border:1px dashed rgba(255,255,255,.14); border-radius:14px; text-align:center; }
+html.flatnav .cc-shortcut-tile{ min-height:92px; }
+html.flatnav .cc-shortcut-remove{ position:absolute; top:6px; right:6px; z-index:3; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:1rem; line-height:1; color:#9AA0B4; cursor:pointer; border-radius:50%; background:transparent; -webkit-tap-highlight-color:transparent; transition:color .15s ease, background .15s ease; }
+html.flatnav .cc-shortcut-remove:hover{ color:#F1E9D5; background:rgba(255,255,255,.12); }
+html.flatnav .cc-shortcut-remove:focus-visible{ outline:2px solid var(--tile-accent,#FBBF24); outline-offset:2px; }
+:root.light #appCommandCenter .cc-shortcuts-empty{ color:#4a4b52; border-color:rgba(15,23,42,.18); }
+:root.light #appCommandCenter .cc-shortcut-remove{ color:#4a4b52; }
+:root.light #appCommandCenter .cc-shortcut-remove:hover{ color:#0f172a; background:rgba(15,23,42,.08); }
+@media (prefers-reduced-motion:reduce){
+  html.flatnav .yl-card__pin, html.flatnav .cc-shortcut-remove{ transition:none; }
+  html.flatnav .yl-card__pin:active{ transform:none; }
+}

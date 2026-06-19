@@ -123,12 +123,26 @@
   // gradient-border sweep + focus ring are CSS (.yl-card). a11y: one aria-label
   // (= title) on the card, inner text aria-hidden so SR announces it once.
   var _YL_HUES = { cool:1, amber:1, emerald:1, violet:1 };
+  var _AH_SHORTCUT_CAP = 8;  // Phase D — soft cap on Home Shortcuts
   function renderYlCards(hostEl, items){
     if (typeof document === 'undefined' || !hostEl || !items) return;
+    var _atCap = (typeof D !== 'undefined' && D && Array.isArray(D.homeShortcuts) && D.homeShortcuts.length >= _AH_SHORTCUT_CAP);
     hostEl.innerHTML = '<div class="yl-card-grid">' + items.map(function(it){
       var fam = _YL_HUES[it.hue] ? it.hue : 'cool';
       var status = it.status ? ('<span class="yl-card__status" aria-hidden="true">' + _ahEsc(it.status) + '</span>') : '';
+      // Phase D — pin-to-Home star, only on routable feature cards. A <span
+      // role="button"> (NOT a nested <button>, which the parser would eject).
+      var pin = '';
+      if (it.route){
+        var _pd  = _ahIsPinned(it.route);
+        var _dim = (_atCap && !_pd) ? ' yl-card__pin--disabled' : '';
+        pin = '<span class="yl-card__pin' + _dim + '" role="button" tabindex="0" data-route="' + _ahEsc(it.route) + '"'
+          + ' aria-pressed="' + (_pd ? 'true' : 'false') + '" aria-disabled="' + ((_atCap && !_pd) ? 'true' : 'false') + '"'
+          + ' aria-label="' + (_pd ? 'Unpin ' : 'Pin ') + _ahEsc(it.title) + (_pd ? ' from Home' : ' to Home') + '">'
+          + (_pd ? '★' : '☆') + '</span>';
+      }
       return '<button type="button" class="yl-card yl-card--' + fam + '" aria-label="' + _ahEsc(it.title) + '">' +
+        pin +
         '<span class="yl-card__hero"><span class="yl-card__icon" aria-hidden="true">' + it.icon + '</span></span>' +
         '<span class="yl-card__body">' +
           '<span class="yl-card__title" aria-hidden="true">' + _ahEsc(it.title) + '</span>' +
@@ -139,7 +153,103 @@
     }).join('') + '</div>';
     var btns = hostEl.querySelectorAll('.yl-card');
     items.forEach(function(it, i){
-      if (btns[i] && typeof it.onClick === 'function') btns[i].addEventListener('click', it.onClick);
+      var card = btns[i]; if (!card) return;
+      if (typeof it.onClick === 'function') card.addEventListener('click', it.onClick);
+      var pinEl = card.querySelector('.yl-card__pin');
+      if (pinEl && it.route){
+        var _toggle = function(ev){ if (ev){ ev.stopPropagation(); ev.preventDefault(); } if (typeof window.toggleHomeShortcut === 'function') window.toggleHomeShortcut({ route:it.route, icon:it.icon, title:it.title, hue:it.hue }, pinEl); };
+        pinEl.addEventListener('click', _toggle);
+        pinEl.addEventListener('keydown', function(ev){ if (ev.key === 'Enter' || ev.key === ' ' || ev.key === 'Spacebar'){ _toggle(ev); } });
+      }
+    });
+  }
+
+  // ── Phase D — Home Shortcuts (pin-to-Home) ───────────────────────────────
+  // Per-profile D.homeShortcuts [{route,icon,title,hue}] (in DEF; persists via
+  // save()/loadData/cloudLoad). The star lives on .yl-card feature cards; pinned
+  // items render as .cc-tile tiles in the CC "My Shortcuts" zone. flatnav-only
+  // (legacy flag-off cards are built by a different path + never get a star; the
+  // CC zone is flatnav-gated in command-center.js).
+  function _ahIsPinned(route){
+    return (typeof D !== 'undefined' && D && Array.isArray(D.homeShortcuts))
+      ? D.homeShortcuts.some(function(s){ return s && s.route === route; })
+      : false;
+  }
+  function _ahRefreshPins(){
+    if (typeof document === 'undefined') return;
+    var atCap = (typeof D !== 'undefined' && D && Array.isArray(D.homeShortcuts) && D.homeShortcuts.length >= _AH_SHORTCUT_CAP);
+    Array.prototype.forEach.call(document.querySelectorAll('.yl-card__pin'), function(p){
+      var pinned = _ahIsPinned(p.getAttribute('data-route'));
+      p.textContent = pinned ? '★' : '☆';
+      p.setAttribute('aria-pressed', pinned ? 'true' : 'false');
+      var dis = atCap && !pinned;
+      p.setAttribute('aria-disabled', dis ? 'true' : 'false');
+      p.classList.toggle('yl-card__pin--disabled', dis);
+    });
+  }
+  function toggleHomeShortcut(item, pinEl){
+    if (typeof D === 'undefined' || !D || !item || !item.route) return;
+    if (!Array.isArray(D.homeShortcuts)) D.homeShortcuts = [];
+    var idx = -1;
+    for (var i = 0; i < D.homeShortcuts.length; i++){ if (D.homeShortcuts[i] && D.homeShortcuts[i].route === item.route){ idx = i; break; } }
+    if (idx >= 0){
+      D.homeShortcuts.splice(idx, 1);                          // unpin
+    } else {
+      if (D.homeShortcuts.length >= _AH_SHORTCUT_CAP){          // soft cap
+        if (typeof showToast === 'function') showToast('Home is full (' + _AH_SHORTCUT_CAP + ') — remove one first');
+        return;
+      }
+      D.homeShortcuts.push({ route:item.route, icon:item.icon, title:item.title, hue:item.hue });
+    }
+    if (typeof save === 'function') save();
+    var nowPinned = _ahIsPinned(item.route);
+    if (pinEl){
+      pinEl.textContent = nowPinned ? '★' : '☆';
+      pinEl.setAttribute('aria-pressed', nowPinned ? 'true' : 'false');
+      pinEl.setAttribute('aria-label', (nowPinned ? 'Unpin ' : 'Pin ') + (item.title || '') + (nowPinned ? ' from Home' : ' to Home'));
+    }
+    if (typeof renderHomeShortcuts === 'function') renderHomeShortcuts();
+    _ahRefreshPins();
+  }
+  function _ahUnpinRoute(route){
+    if (typeof D === 'undefined' || !D || !Array.isArray(D.homeShortcuts)) return;
+    for (var i = 0; i < D.homeShortcuts.length; i++){
+      if (D.homeShortcuts[i] && D.homeShortcuts[i].route === route){
+        D.homeShortcuts.splice(i, 1);
+        if (typeof save === 'function') save();
+        if (typeof renderHomeShortcuts === 'function') renderHomeShortcuts();
+        _ahRefreshPins();
+        return;
+      }
+    }
+  }
+  var _AH_HUE_HEX = { cool:'#38BDF8', amber:'#F5A623', emerald:'#34D399', violet:'#A78BFA' };
+  function renderHomeShortcuts(){
+    if (typeof document === 'undefined') return;
+    var host = document.getElementById('ccShortcuts');
+    if (!host) return;
+    var list = (typeof D !== 'undefined' && D && Array.isArray(D.homeShortcuts)) ? D.homeShortcuts : [];
+    if (!list.length){
+      host.innerHTML = '<div class="cc-shortcuts-empty">Tap the ☆ on any feature to pin it here for one-tap access.</div>';
+      return;
+    }
+    host.innerHTML = '<div class="cc-tiles cc-shortcuts-grid">' + list.map(function(s){
+      var accent = _AH_HUE_HEX[s.hue] || '#FBBF24';
+      return '<button type="button" class="cc-tile cc-shortcut-tile" data-route="' + _ahEsc(s.route) + '" style="--tile-accent:' + accent + ';" aria-label="' + _ahEsc(s.title) + '">'
+        + '<span class="cc-tile__icon" aria-hidden="true">' + s.icon + '</span>'
+        + '<span class="cc-tile__title">' + _ahEsc(s.title) + '</span>'
+        + '<span class="cc-shortcut-remove" role="button" tabindex="0" data-route="' + _ahEsc(s.route) + '" aria-label="Remove ' + _ahEsc(s.title) + ' from Home">×</span>'
+        + '</button>';
+    }).join('') + '</div>';
+    Array.prototype.forEach.call(host.querySelectorAll('.cc-shortcut-tile'), function(tile){
+      var route = tile.getAttribute('data-route');
+      tile.addEventListener('click', function(){ if (typeof showSection === 'function') showSection(route); });
+      var rm = tile.querySelector('.cc-shortcut-remove');
+      if (rm){
+        var _rm = function(ev){ if (ev){ ev.stopPropagation(); ev.preventDefault(); } _ahUnpinRoute(route); };
+        rm.addEventListener('click', _rm);
+        rm.addEventListener('keydown', function(ev){ if (ev.key === 'Enter' || ev.key === ' ' || ev.key === 'Spacebar'){ _rm(ev); } });
+      }
     });
   }
 
@@ -203,10 +313,10 @@
     var host = document.getElementById('growthLauncher');
     if (!host) return;
     renderYlCards(host, [
-      { icon:'🏅', title:'Badges',     desc:'What you have earned',       hue:'amber',   onClick:function(){ showSection('s-badges'); } },
-      { icon:'🗺️', title:'Milestones', desc:'Your journey so far',        hue:'cool',    onClick:function(){ showSection('s-milestones'); } },
-      { icon:'🏆', title:'Challenges',  desc:'Goals and contests to take', hue:'violet',  onClick:function(){ showSection('s-contests'); } },
-      { icon:'🎁', title:'Rewards',     desc:'Spend what you earn',        hue:'emerald', onClick:function(){ showSection('s-rewards'); } }
+      { icon:'🏅', title:'Badges',     desc:'What you have earned',       hue:'amber',   route:'s-badges',     onClick:function(){ showSection('s-badges'); } },
+      { icon:'🗺️', title:'Milestones', desc:'Your journey so far',        hue:'cool',    route:'s-milestones', onClick:function(){ showSection('s-milestones'); } },
+      { icon:'🏆', title:'Challenges',  desc:'Goals and contests to take', hue:'violet',  route:'s-contests',   onClick:function(){ showSection('s-contests'); } },
+      { icon:'🎁', title:'Rewards',     desc:'Spend what you earn',        hue:'emerald', route:'s-rewards',    onClick:function(){ showSection('s-rewards'); } }
     ]);
   }
 
@@ -364,5 +474,7 @@
     window.renderYlCards      = renderYlCards;
     window.renderGrowthLanding = renderGrowthLanding;
     window.renderPillars       = renderPillars;
+    window.toggleHomeShortcut  = toggleHomeShortcut;
+    window.renderHomeShortcuts = renderHomeShortcuts;
   }
 })();

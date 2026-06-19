@@ -111,6 +111,8 @@ function loadData(){
       if(!D.scrReadDays || Array.isArray(D.scrReadDays)) D.scrReadDays = {};
       // Sports Phase B — mySports must always be an array
       if(!Array.isArray(D.mySports)) D.mySports = [];
+      // Home Shortcuts (Phase D) — must always be an array
+      if(!Array.isArray(D.homeShortcuts)) D.homeShortcuts = [];
       if(!D.devPopupSeen) D.devPopupSeen = '';
       // WC-D2 (2026-06-14): one-time seed of the unified soundEnabled pref
       // from the retired skillsSound. Keyed off the STORED blob — once
@@ -482,6 +484,8 @@ async function cloudLoad(){
     if(!D.scrReadDays || Array.isArray(D.scrReadDays)) D.scrReadDays = {};
     // Sports Phase B — mySports must always be an array
     if(!Array.isArray(D.mySports)) D.mySports = [];
+    // Home Shortcuts (Phase D) — must always be an array
+    if(!Array.isArray(D.homeShortcuts)) D.homeShortcuts = [];
     // Ensure devPopupSeen exists
     if(!D.devPopupSeen) D.devPopupSeen = '';
     // WC-D2 (2026-06-14): seed the unified soundEnabled pref from the

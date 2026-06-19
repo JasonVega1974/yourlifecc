@@ -1296,7 +1296,7 @@ function renderTabLanding(tabId){
       var cb;
       if(c.sectionId){ cb = (function(id){ return function(){ showSection(id); }; })(c.sectionId); }
       else { cb = (function(a){ return function(){ if(typeof handleTabAction==='function') handleTabAction(a); }; })(c.action); }
-      return { icon:c.icon, title:c.label, desc:(_meDesc[key]||''), hue:(_meHue[key]||'cool'), onClick:cb };
+      return { icon:c.icon, title:c.label, desc:(_meDesc[key]||''), hue:(_meHue[key]||'cool'), route:c.sectionId, onClick:cb };
     });
     host.innerHTML = '<div id="ylMeGrid"></div><div id="ylMeFoot"></div>';
     renderYlCards(document.getElementById('ylMeGrid'), _meItems);
@@ -1367,7 +1367,7 @@ function renderLearnLanding(){
     var _lnHue={ 's-school':'cool','s-cbt':'emerald','s-resume':'emerald','s-resources':'cool','s-growing':'emerald','s-driving':'cool','s-craft':'violet','s-sports':'amber' };
     var _lnAct=['s-craft','s-sports'];
     var _lnPresent = LEARN_CARDS.filter(function(c){ return document.getElementById(c.id); });
-    var _lnToItem = function(c){ return { icon:c.icon, title:c.label, desc:c.sub, hue:(_lnHue[c.id]||'cool'), onClick:(function(id){ return function(){ showSection(id); }; })(c.id) }; };
+    var _lnToItem = function(c){ return { icon:c.icon, title:c.label, desc:c.sub, hue:(_lnHue[c.id]||'cool'), route:c.id, onClick:(function(id){ return function(){ showSection(id); }; })(c.id) }; };
     var _lnMain = _lnPresent.filter(function(c){ return _lnAct.indexOf(c.id)===-1; }).map(_lnToItem);
     var _lnActs = _lnPresent.filter(function(c){ return _lnAct.indexOf(c.id)!==-1; }).map(_lnToItem);
     host.innerHTML = '<div id="ylLearnMain"></div>' + (_lnActs.length ? _ylSubLabel('Activities') + '<div id="ylLearnAct"></div>' : '');
@@ -1519,7 +1519,7 @@ function renderLifeLanding(){
     var _lfExcl={ 's-contests':1, 's-rewards':1, 's-motivation':1 };
     var _lfHue={ 's-health':'amber','s-chores':'amber','s-goals':'amber','s-finance':'emerald','s-schedule':'cool','s-skills':'emerald','s-calendar':'cool','s-journal':'violet','s-mood':'violet','s-reading':'cool' };
     var _lfDesc={ 's-calendar':'Plan your week','s-journal':'Write down your day','s-mood':'How are you feeling?','s-reading':'Track what you read' };
-    var _lfToItem = function(c){ return { icon:c.icon, title:c.label, desc:(c.sub || _lfDesc[c.sectionId] || ''), hue:(_lfHue[c.sectionId]||'cool'), onClick:(function(id){ return function(){ showSection(id); }; })(c.sectionId) }; };
+    var _lfToItem = function(c){ return { icon:c.icon, title:c.label, desc:(c.sub || _lfDesc[c.sectionId] || ''), hue:(_lfHue[c.sectionId]||'cool'), route:c.sectionId, onClick:(function(id){ return function(){ showSection(id); }; })(c.sectionId) }; };
     var _lfHeroes = tab.primary.filter(function(c){ return c.tier==='hero' && c.sectionId; }).map(_lfToItem);
     var _lfMore = tab.primary.filter(function(c){ return c.tier!=='hero' && c.sectionId && !_lfExcl[c.sectionId]; }).map(_lfToItem);
     host.innerHTML = '<div id="ylLifeHero"></div>' + (_lfMore.length ? _ylSubLabel('More') + '<div id="ylLifeMore"></div>' : '');

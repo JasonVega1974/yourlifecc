@@ -666,6 +666,12 @@
       +     '</svg>'
       +   '</section>'
 
+      +   (document.documentElement.classList.contains('flatnav')
+            ? '<section class="cc-shortcuts-sec" aria-label="My Shortcuts">'
+              + '<h2 class="cc-section-label">My Shortcuts</h2>'
+              + '<div id="ccShortcuts"></div>'
+              + '</section>'
+            : '')
       +   '<section aria-label="Destinations">'
       +     '<h2 class="cc-section-label">Jump in</h2>'
       +     '<div class="cc-tiles" style="--cc-accent:'+focusTile.accent+';">'
@@ -675,6 +681,10 @@
       +     '</div>'
       +   '</section>'
       + '</main>';
+
+    // Phase D — fill the flat-nav "My Shortcuts" zone (renderHomeShortcuts lives
+    // in app-home.js; no #ccShortcuts + no-op under flag-off).
+    if (typeof window.renderHomeShortcuts === 'function'){ try { window.renderHomeShortcuts(); } catch(_s){} }
 
     // WC-2c — home-return reinforcements (compose with the existing render;
     // the ring otherwise snaps). Sweep the fill from its previous pct, and
