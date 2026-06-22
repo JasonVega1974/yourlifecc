@@ -11414,3 +11414,29 @@ html.flatnav .cc-shortcut-remove:focus-visible{ outline:2px solid var(--tile-acc
   html.flatnav .yl-card__pin, html.flatnav .cc-shortcut-remove{ transition:none; }
   html.flatnav .yl-card__pin:active{ transform:none; }
 }
+
+/* ── Me landing host must be a block (its .tab-landing defaults to a grid,
+   unlike #s-learn / #s-life which are display:block) — otherwise #ylMeGrid and
+   the sign-out (#ylMeFoot) split into separate grid cells (grid in the left
+   third, sign-out floating in the center). All flatnav widths; flag-off keeps
+   the grid for its legacy .tab-landing-card layout. */
+html.flatnav #s-me .tab-landing{ display:block; }
+
+/* ── Desktop layout (flatnav, >=861px) — fixes the narrow/orphaned Jump-in grid
+   and the cramped landing cards. All html.flatnav + desktop-media scoped, so the
+   34 flag-off users (and mobile flatnav) are byte-identical. ───────────────── */
+@media (min-width:861px){
+  /* Fix 1 — Command Center "Jump in": use the width, lay the 10 tiles out as two
+     even rows of 5 (no orphan row), bigger tiles. Faith stays a full-width bar
+     (.cc-tile--faith grid-column:1/-1). The constellation is fixed 320px tall so
+     widening just spreads it, never balloons it. */
+  html.flatnav #appCommandCenter{ max-width:1240px; }
+  html.flatnav .cc-tiles{ grid-template-columns:repeat(5,1fr); }
+  html.flatnav .cc-tile{ min-height:140px; padding:1.3rem 1.15rem; }
+  /* Fix 2 — bigger, evenly-filled feature cards across all flat-nav landings
+     (Learn / Life / Me / Growth): a centered column with 3-4 cards across,
+     consistent app-wide. Me's host is block (above), so its grid is full-width
+     and the sign-out sits below it. */
+  html.flatnav .yl-card-grid{ max-width:1040px; margin-left:auto; margin-right:auto; }
+  html.flatnav .yl-card{ flex-basis:240px; max-width:300px; }
+}
