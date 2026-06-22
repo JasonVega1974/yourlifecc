@@ -11440,3 +11440,56 @@ html.flatnav #s-me .tab-landing{ display:block; }
   html.flatnav .yl-card-grid{ max-width:1040px; margin-left:auto; margin-right:auto; }
   html.flatnav .yl-card{ flex-basis:240px; max-width:300px; }
 }
+
+/* ── Phase 1 card unification (flatnav-only; flag-off byte-identical) ────────
+   Bring the .yl-card accent + glow + gradient-border sweep to two more card
+   systems. ALL html.flatnav-scoped — the 34 flag-off users' Habits + Skills
+   cards are untouched (verified). Done habit tiles keep their green completed
+   look (no sweep/glow fighting the check/strikethrough). reduced-motion: static
+   glow, no sweep. Per-habit hue rides data-hb-hue (added in habits.js only under
+   flatnav). Skills cards are scoped to #s-skills so Faith's .topic-card (the
+   shared pattern) is never touched. */
+html.flatnav .hb-tile{ position:relative; }
+html.flatnav .hb-tile > div{ position:relative; z-index:1; }
+html.flatnav .hb-tile[data-hb-hue="cool"]{    --hb-accent:#38BDF8; }
+html.flatnav .hb-tile[data-hb-hue="amber"]{   --hb-accent:#F5A623; }
+html.flatnav .hb-tile[data-hb-hue="emerald"]{ --hb-accent:#34D399; }
+html.flatnav .hb-tile[data-hb-hue="violet"]{  --hb-accent:#A78BFA; }
+/* icon glow — soft accent radial behind the left icon (not on done tiles). */
+html.flatnav .hb-tile:not(.hb-tile-done)::after{
+  content:''; position:absolute; left:0; top:0; width:90px; height:100%; pointer-events:none; z-index:0;
+  background:radial-gradient(circle at 24px 50%, color-mix(in srgb, var(--hb-accent,#FBBF24) 24%, transparent) 0%, transparent 60%);
+}
+/* gradient-border sweep — hidden at rest, sweeps on hover/focus only (not done). */
+html.flatnav .hb-tile:not(.hb-tile-done)::before{
+  content:''; position:absolute; inset:0; border-radius:inherit; padding:1px; pointer-events:none; z-index:2;
+  background:linear-gradient(120deg, transparent 18%, var(--hb-accent,#FBBF24) 50%, transparent 82%);
+  background-size:200% 100%;
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor;
+          mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);         mask-composite:exclude;
+  opacity:0; transition:opacity .2s ease;
+}
+html.flatnav .hb-tile:not(.hb-tile-done):hover::before,
+html.flatnav .hb-tile:not(.hb-tile-done):focus-visible::before{ opacity:1; animation:yl-card-sweep 1.4s linear infinite; }
+html.flatnav .hb-tile:not(.hb-tile-done):focus-visible{ outline:2px solid var(--hb-accent,#FBBF24); outline-offset:2px; }
+
+/* Skills topic cards — animate the existing cat-color gradient border (::after)
+   into a sweep on hover/focus (the card already carries a static border + an
+   accent box-shadow glow). #s-skills only -> Faith's shared .topic-card pattern
+   is untouched. The photo hero (z:3) is never overlaid; only the card-edge
+   border animates. */
+html.flatnav #s-skills .sk-topic-card:hover::after,
+html.flatnav #s-skills .sk-topic-card:focus-visible::after{
+  background:linear-gradient(120deg, transparent 18%, var(--sk-card-accent, var(--c)) 50%, transparent 82%);
+  background-size:200% 100%;
+  opacity:1;
+  animation:yl-card-sweep 1.4s linear infinite;
+}
+html.flatnav #s-skills .sk-topic-card:focus-visible{ outline:2px solid var(--sk-card-accent, var(--c)); outline-offset:2px; }
+
+@media (prefers-reduced-motion:reduce){
+  html.flatnav .hb-tile:not(.hb-tile-done):hover::before,
+  html.flatnav .hb-tile:not(.hb-tile-done):focus-visible::before{ animation:none; opacity:1; }
+  html.flatnav #s-skills .sk-topic-card:hover::after,
+  html.flatnav #s-skills .sk-topic-card:focus-visible::after{ animation:none; }
+}

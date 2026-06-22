@@ -350,6 +350,15 @@ function renderHabitsToday(){
   `;
 }
 
+// Phase 1 — stable per-habit hue (id hash -> 4 families cool/amber/emerald/violet).
+// Categories are only Health/Faith, so a hash gives the per-habit variety. Used
+// ONLY under flatnav to tag .hb-tile for the accent/glow/sweep CSS.
+function _hbHueFor(h){
+  const s = String((h && (h.id || h.name)) || '');
+  let n = 0; for(let i=0;i<s.length;i++) n = (n + s.charCodeAt(i)) % 4;
+  return ['cool','amber','emerald','violet'][n];
+}
+
 function renderHabitTile(h, today){
   const done   = !!(h.completions||{})[today];
   const streak = getHabitCurrentStreak(h);
@@ -357,9 +366,14 @@ function renderHabitTile(h, today){
   const bg     = done
     ? 'background:linear-gradient(135deg,rgba(52,211,153,.18),rgba(34,197,94,.08));border:1.5px solid #34d399;'
     : 'background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);';
+  // Phase 1 — under flatnav ONLY, tag the tile with a per-habit hue so the
+  // accent/glow/sweep CSS (app.css, html.flatnav-scoped) can key off it. Flag-off
+  // omits the attr entirely -> .hb-tile markup is byte-identical for the 34 users.
+  const _hbFlat = (typeof document !== 'undefined') && document.documentElement && document.documentElement.classList.contains('flatnav');
+  const hueAttr = _hbFlat ? (' data-hb-hue="' + _hbHueFor(h) + '"') : '';
   return `
     <div onclick="toggleHabitV2Today('${escapeHtml(h.id)}')"
-         class="hb-tile${done?' hb-tile-done':''}"
+         class="hb-tile${done?' hb-tile-done':''}"${hueAttr}
          style="${bg}padding:.7rem .85rem;border-radius:12px;cursor:pointer;
                 display:flex;align-items:center;gap:.65rem;transition:all .2s;">
       <div style="width:28px;height:28px;border-radius:8px;
