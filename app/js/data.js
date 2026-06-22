@@ -19,6 +19,10 @@ const DEF = {
   verses:[], verseIdx:0, verseSpeed:60000, verseSpeedMs:60000,
   favVerses:[], prayers:[], bibleReadings:[], scrNotes:{}, scrHighlight:{},
   scrPoints:0, scrReadDays:{}, devPopupSeen:'',
+  // Sync v2 — last-saved timestamp (ms). Stamped by save(); drives cloudLoad's
+  // last-write-wins merge so an older/empty cloud value can't overwrite newer
+  // local data. In DEF so loadData restores it from localStorage on reload.
+  _savedAt:0,
   // WC-2a — unified app-wide XP currency. xpTotal is the single player-facing
   // progress score (drives the WC-2b ring / streak / league). Purely additive
   // and SEPARATE from the feature-internal mechanics chorePoints (spendable

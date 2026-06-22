@@ -88,16 +88,136 @@ function save(){
     D.resume.experience=collectEntries('exp');
     D.resume.education=collectEntries('edu');
   }
-  // Sync current profile data if in multi-profile mode (parent.js)
+  // Sync v2 — all changes here are gated on the kill switch so OFF reproduces
+  // the original save() (no _savedAt stamp, full per-profile snapshot). Stamp
+  // FIRST so the timestamp rides into the per-profile snapshot + the cloud map.
+  var _v2 = _syncV2();
+  if(_v2) D._savedAt = Date.now();
+  // Sync current profile data if in multi-profile mode (parent.js). Under v2,
+  // strip the account-level map/index so a per-profile snapshot never nests
+  // _profileData; under legacy, snapshot the full D exactly as before.
   if(typeof _activeProfileId !== 'undefined' && _activeProfileId && typeof _profiles !== 'undefined'){
     const curProfile = _profiles.find(p=>p.id===_activeProfileId);
-    if(curProfile) curProfile.data = JSON.parse(JSON.stringify(D));
+    if(curProfile){
+      var _snap = JSON.parse(JSON.stringify(D));
+      curProfile.data = (_v2 && typeof _pmStripAccount === 'function') ? _pmStripAccount(_snap) : _snap;
+    }
   }
-  localStorage.setItem(LS, JSON.stringify(D));
+  // Keep lifeos_v2 lean under v2 — don't persist the full _profileData map there
+  // (duplicates every per-profile key + risks the LS quota). No-op under legacy
+  // (D never carries _profileData when v2 is off).
+  var _toStore = D;
+  if(_v2 && D && D._profileData){ _toStore = Object.assign({}, D); delete _toStore._profileData; }
+  localStorage.setItem(LS, JSON.stringify(_toStore));
   showSaved();
   // Sync to Supabase if logged in (debounced 2s)
   clearTimeout(_wpTimer);
   _wpTimer = setTimeout(cloudSync, 2000);
+}
+
+// ── Multi-profile cloud round-trip (sync v2) — pure, testable merge core ─────
+// The data-loss bug: the cloud row carried only the ACTIVE profile's flat blob
+// (+ a slim _profiles index), so a sync from a different profile zeroed the
+// others on the next boot's cloud-wins cloudLoad. v2 stores EVERY profile under
+// data._profileData and merges by _savedAt (last-write-wins): a missing or older
+// cloud value never overwrites a populated/newer local one. These functions are
+// pure (no IO) so the harness can prove every scenario deterministically.
+// Kill switch: localStorage.ylcc_sync_v2 === '0' reverts to the legacy path.
+function _syncV2(){ try { return localStorage.getItem('ylcc_sync_v2') !== '0'; } catch(_){ return true; } }
+
+var _PM_ACCOUNT_KEYS = ['_profiles','_activeProfileId','_profileData'];
+// Strip account-level keys so a per-profile snapshot can never nest the map/index.
+function _pmStripAccount(d){
+  if(!d || typeof d !== 'object') return null;
+  var out = {};
+  for(var k in d){ if(Object.prototype.hasOwnProperty.call(d,k) && _PM_ACCOUNT_KEYS.indexOf(k) === -1) out[k] = d[k]; }
+  return out;
+}
+function _pmSavedAt(d){ return (d && typeof d._savedAt === 'number' && isFinite(d._savedAt)) ? d._savedAt : 0; }
+
+// Build the cloud _profileData map from live _profiles[].data (account keys stripped).
+function _pmBuildProfileData(profiles){
+  var map = {};
+  (profiles||[]).forEach(function(p){
+    if(p && p.id && p.data && typeof p.data === 'object'){
+      var s = _pmStripAccount(p.data);
+      if(s) map[p.id] = s;
+    }
+  });
+  return map;
+}
+
+// Last-write-wins pick between cloud + local snapshots of the SAME profile.
+// A missing side loses; newer _savedAt wins; tie/older-local -> cloud.
+function _pmMergeBySavedAt(cloudData, localData){
+  var hasC = cloudData && typeof cloudData === 'object';
+  var hasL = localData && typeof localData === 'object';
+  if(hasC && !hasL) return cloudData;
+  if(hasL && !hasC) return localData;
+  if(!hasC && !hasL) return null;
+  return (_pmSavedAt(localData) > _pmSavedAt(cloudData)) ? localData : cloudData;
+}
+
+// Merge cloud + local per-profile maps over the UNION of ids — a profile present
+// only locally is never dropped (migration: cloud lacking _profileData -> local).
+function _pmMergeProfileData(cloudPD, localPD){
+  cloudPD = cloudPD || {}; localPD = localPD || {};
+  var ids = {}; Object.keys(cloudPD).forEach(function(k){ ids[k]=1; }); Object.keys(localPD).forEach(function(k){ ids[k]=1; });
+  var out = {};
+  Object.keys(ids).forEach(function(id){
+    var m = _pmMergeBySavedAt(cloudPD[id], localPD[id]);
+    if(m) out[id] = m;
+  });
+  return out;
+}
+
+// PURE boot plan — decide what to load given the cloud blob + local context.
+// ctx = { localActiveId, localActiveBlob, localProfileBlobs:{id:blob}, localProfilesIndex:[slim] }
+// Returns { multi, D (active profile data, account keys stripped), profileData|null, activeId, profilesSlim }.
+function _pmCloudLoadPlan(saved, ctx){
+  saved = saved || {}; ctx = ctx || {};
+  var cloudPD = (saved._profileData && typeof saved._profileData === 'object') ? saved._profileData : {};
+  var flatCloud = _pmStripAccount(saved) || {};
+  var localBlobs = ctx.localProfileBlobs || {};
+  var localActive = ctx.localActiveBlob || null;
+  var activeId = ctx.localActiveId || saved._activeProfileId || null;
+  var profilesSlim = (saved._profiles && saved._profiles.length) ? saved._profiles : (ctx.localProfilesIndex || []);
+
+  var isMulti = (saved._profiles && saved._profiles.length > 0)
+             || (ctx.localProfilesIndex && ctx.localProfilesIndex.length > 0)
+             || Object.keys(cloudPD).length > 0
+             || Object.keys(localBlobs).length > 0;
+
+  if(!isMulti){
+    // SOLO — last-write-wins between the flat cloud blob and the local blob.
+    var pick = _pmMergeBySavedAt(Object.keys(flatCloud).length ? flatCloud : null, localActive);
+    return { multi:false, D: pick || flatCloud || {}, profileData:null, activeId:activeId, profilesSlim:profilesSlim };
+  }
+
+  // MULTI — attribute the legacy flat cloud blob to the profile that SYNCED it
+  // (saved._activeProfileId), so a poisoned blob from profile B is never loaded
+  // into profile A. Then merge per-profile and load the LOCAL active profile.
+  var cloudActive = saved._activeProfileId;
+  if(cloudActive && !cloudPD[cloudActive] && Object.keys(flatCloud).length){
+    cloudPD = Object.assign({}, cloudPD); cloudPD[cloudActive] = flatCloud;
+  }
+  var localPD = {};
+  Object.keys(localBlobs).forEach(function(id){ var s=_pmStripAccount(localBlobs[id]); if(s) localPD[id]=s; });
+  if(activeId && localActive){ var sa=_pmStripAccount(localActive); if(sa) localPD[activeId]=sa; }   // lifeos_v2 is freshest active
+
+  var mergedPD = _pmMergeProfileData(cloudPD, localPD);
+  var activeData = (activeId && mergedPD[activeId]) ? mergedPD[activeId] : (localPD[activeId] || flatCloud || {});
+  return { multi:true, D: activeData, profileData: mergedPD, activeId: activeId, profilesSlim: profilesSlim };
+}
+
+// LEGACY overlay — the exact blind cloud-wins used before sync v2 (DEF keys then
+// non-DEF keys, cloud wins). Used by cloudLoad's kill-switch path AND asserted by
+// the harness so the rollback is provably identical to pre-sync-v2 behavior.
+function _pmLegacyOverlay(saved, base, defKeys){
+  base = base || {}; saved = saved || {}; defKeys = defKeys || [];
+  for(var i=0;i<defKeys.length;i++){ var k=defKeys[i]; if(k in saved) base[k] = saved[k]; }
+  Object.keys(saved).forEach(function(k){ if(defKeys.indexOf(k) === -1 && k !== 'undefined') base[k] = saved[k]; });
+  return base;
 }
 
 function loadData(){
@@ -234,6 +354,13 @@ async function cloudSync(){
             Object.keys(serverD || {}).forEach(k => allKeys.add(k));
             allKeys.forEach(k => {
               if(k === 'undefined') return;
+              // Sync v2 — never take-or-drop the whole profile map wholesale:
+              // merge it per-profile (last-write-wins) so a concurrent device's
+              // profiles can't be clobbered or dropped by this write.
+              if(k === '_profileData' && _syncV2() && typeof _pmMergeProfileData === 'function'){
+                D[k] = _pmMergeProfileData(serverD[k], myPending[k]);
+                return;
+              }
               const localEdited = JSON.stringify(myPending[k]) !== JSON.stringify(baseline[k]);
               if(localEdited){
                 D[k] = myPending[k];      // this device modified it — keep our value
@@ -248,6 +375,18 @@ async function cloudSync(){
       }
     }
 
+    // Sync v2 — round-trip EVERY profile, not just the active one. Refresh the
+    // active profile's snapshot from live D, then build the per-profile map
+    // (account keys stripped) so a sync from one profile can't zero the others.
+    if(_syncV2() && typeof _profiles !== 'undefined' && _profiles && _profiles.length > 0){
+      try {
+        if(_activeProfileId){
+          var _ap = _profiles.find(function(p){ return p && p.id === _activeProfileId; });
+          if(_ap) _ap.data = _pmStripAccount(JSON.parse(JSON.stringify(D)));
+        }
+        D._profileData = _pmBuildProfileData(_profiles);
+      } catch(_){}
+    }
     const writeStamp = new Date().toISOString();
     const { data: writeRow, error } = await supa.from('profiles').upsert({
       user_id: _supaUser.id,
@@ -477,9 +616,34 @@ async function cloudLoad(){
     // subsequent cloudSync calls have a baseline to detect cross-device
     // writes against. Refreshed below from the post-load re-save's echo.
     if(data.updated_at) _lastSeenUpdatedAt = data.updated_at;
-    for(const k of Object.keys(DEF)){ if(k in saved) D[k] = saved[k]; }
-    // Also restore keys saved in D that aren't in DEF (pb, myInstruments, etc.)
-    for(const k of Object.keys(saved)){ if(!(k in DEF) && k !== 'undefined') D[k] = saved[k]; }
+    // ── Sync v2 — last-write-wins, multi-profile-safe load (replaces blind
+    // cloud-wins). Build the device's local context, merge per-profile via the
+    // pure plan, load the ACTIVE profile (never another profile's blob), and
+    // restore all profiles. Kill switch ylcc_sync_v2='0' -> the legacy overlay.
+    var _v2Multi = false;
+    if(_syncV2()){
+      var _laBlob = null, _laId = null, _lIdx = [], _lBlobs = {};
+      try { _laBlob = JSON.parse(localStorage.getItem(LS) || 'null'); } catch(_){}
+      try { _laId = localStorage.getItem(_ylccUserKey('ylcc_active_profile')) || localStorage.getItem('ylcc_active_profile') || null; } catch(_){}
+      try { _lIdx = JSON.parse(localStorage.getItem('ylcc_profiles') || '[]') || []; } catch(_){ _lIdx = []; }
+      try { (_lIdx||[]).forEach(function(p){ if(p && p.id){ try { var raw = localStorage.getItem(_ylccProfileDataKey(p.id)); if(raw) _lBlobs[p.id] = JSON.parse(raw); } catch(_e){} } }); } catch(_){}
+      var _plan = _pmCloudLoadPlan(saved, { localActiveId:_laId, localActiveBlob:_laBlob, localProfileBlobs:_lBlobs, localProfilesIndex:_lIdx });
+      var _pd = (_plan && _plan.D) ? _plan.D : {};
+      for(const k of Object.keys(DEF)){ if(k in _pd) D[k] = _pd[k]; }
+      for(const k of Object.keys(_pd)){ if(!(k in DEF) && k !== 'undefined' && _PM_ACCOUNT_KEYS.indexOf(k) === -1) D[k] = _pd[k]; }
+      _v2Multi = !!(_plan && _plan.multi);
+      if(_v2Multi){
+        _profiles = JSON.parse(JSON.stringify(_plan.profilesSlim || []));
+        _activeProfileId = _plan.activeId || null;
+        var _mpd = _plan.profileData || {};
+        _profiles.forEach(function(p){ if(p && p.id && _mpd[p.id]) p.data = JSON.parse(JSON.stringify(_mpd[p.id])); });
+        try { saveProfiles(); } catch(_){}   // writes slim index + per-profile keys + D._profiles/_activeProfileId
+      }
+    } else {
+      // LEGACY (kill switch) — original blind cloud-wins overlay, unchanged
+      // behavior (DEF keys then non-DEF keys, cloud wins).
+      _pmLegacyOverlay(saved, D, Object.keys(DEF));
+    }
     // Sanitize scrReadDays — must always be an object {date:true}, never an array
     if(!D.scrReadDays || Array.isArray(D.scrReadDays)) D.scrReadDays = {};
     // Sports Phase B — mySports must always be an array
@@ -511,10 +675,16 @@ async function cloudLoad(){
     // Route through saveProfiles so per-profile data lands in its own LS key
     // and the index stays slim — writing the cloud's bloated array directly
     // into ylcc_profiles is what blew the quota in the first place.
-    if(saved._profiles && saved._profiles.length > 0){
+    // Legacy path only — v2 already restored profiles via the plan above.
+    if(!_v2Multi && saved._profiles && saved._profiles.length > 0){
       _profiles = JSON.parse(JSON.stringify(saved._profiles));
       _activeProfileId = saved._activeProfileId || null;
       try { saveProfiles(); } catch(_){}
+    }
+    // Sync v2 — make the re-save carry the full per-profile map so the row is
+    // upgraded in place (old single-blob rows gain _profileData; never blanked).
+    if(_v2Multi && typeof _pmBuildProfileData === 'function'){
+      try { D._profileData = _pmBuildProfileData(_profiles); } catch(_){}
     }
     // Re-save cleaned data back to Supabase immediately so bad values don't persist
     try {
