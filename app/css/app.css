@@ -11353,6 +11353,7 @@ html.flatnav .cc-tile[data-dest="goals"]{  --tile-accent:#7EC19A; }
 html.flatnav .cc-tile[data-dest="money"]{  --tile-accent:#F47B5A; }
 html.flatnav .cc-tile[data-dest="skills"]{ --tile-accent:#D4A04C; }
 html.flatnav .cc-tile[data-dest="health"]{ --tile-accent:#4A9082; }
+html.flatnav .cc-tile[data-dest="life"]{   --tile-accent:#F5A623; }
 html.flatnav .cc-tile[data-dest="learn"]{  --tile-accent:#38BDF8; }
 html.flatnav .cc-tile[data-dest="growth"]{ --tile-accent:#34D399; }
 html.flatnav .cc-tile[data-dest="me"]{     --tile-accent:#A78BFA; }

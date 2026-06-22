@@ -746,17 +746,20 @@
     faith:   's-scripture',
     // Flat-nav only — the extra "Jump in" tiles (sidebar replacement). Flag-off
     // never emits these dests, so adding them here is byte-identical for flag-off.
+    life:    's-life',
     learn:   's-learn',
     growth:  's-growth',
     me:      's-me'
   };
 
   // Flat-nav coverage — with the sidebar gone, the constellation alone does not
-  // reach Learn / Growth / Me, so extend the "Jump in" tile row with them.
-  // Returns '' under flag-off, so the flag-off Command Center is byte-identical.
+  // reach the Life landing (Schedule/Calendar/Journal/Mood/Reading) or Learn /
+  // Growth / Me, so extend the "Jump in" tile row with them. Returns '' under
+  // flag-off, so the flag-off Command Center is byte-identical.
   function _ccNavTiles(){
     if (!document.documentElement.classList.contains('flatnav')) return '';
     var nav = [
+      { dest:'life',   icon:'⚡', label:'Life',   meta:'Schedule, calendar, journal' },
       { dest:'learn',  icon:'📚', label:'Learn',  meta:'School, jobs, skills' },
       { dest:'growth', icon:'📈', label:'Growth', meta:'Badges and milestones' },
       { dest:'me',     icon:'🧑', label:'Me',     meta:'Profile and settings' }
