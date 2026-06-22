@@ -23,6 +23,20 @@ const DEF = {
   // last-write-wins merge so an older/empty cloud value can't overwrite newer
   // local data. In DEF so loadData restores it from localStorage on reload.
   _savedAt:0,
+  // ── DEF-membership backfill (2026-06-22 persistence audit, Tier 1) — these
+  //    were written by their modules but MISSING from DEF, so loadData (which
+  //    restores only DEF keys) silently dropped them on an offline reload.
+  //    Defaults match each writer's first-use shape. See the audit + the rule.
+  habitsV2:[],                 // habits.js — [{id,name,emoji,...,completions:{}}]
+  habitStacks:[],              // habits.js — [{id,name,cue,habitIds:[],createdAt}]
+  _habitsV2Seeded:false,       // habits.js — one-time seed flag (boolean)
+  savedResumes:{},             // resume.js — {name: <resume snapshot>}
+  scheduleBlocks:[],           // school.js — [{id,act,actLabel,...}]
+  academyProgress:{},          // faith.js (lesson-renderer) — {'lesson-<id>':{...}}
+  moneyLessonsProgress:{ opened:{}, completed:{}, openedAt:{}, completedAt:{} }, // finance.js
+  choreStreak:{ current:0, longest:0, total:0, last:null },  // chores.js
+  firstUseDate:'',             // chores.js — 'YYYY-MM-DD' first app-use date
+  parentPinHash:'',            // auth.js — active profile's parent PIN hash (also per-profile)
   // WC-2a — unified app-wide XP currency. xpTotal is the single player-facing
   // progress score (drives the WC-2b ring / streak / league). Purely additive
   // and SEPARATE from the feature-internal mechanics chorePoints (spendable
