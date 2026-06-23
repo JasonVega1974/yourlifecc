@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Join the YourLife CC Waitlist</title>
+<meta name="description" content="Join the YourLife CC waitlist - the family command center for Christian parents. Habits, chores, money, school, and faith in one calm place.">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://yourlifecc.com/join.html">
+<link rel="icon" href="/app/icons/icon-192.png">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://yourlifecc.com/join.html">
+<meta property="og:title" content="Join the YourLife CC Waitlist">
+<meta property="og:description" content="The family command center for Christian parents. Join the waitlist for early access.">
+<meta property="og:image" content="https://yourlifecc.com/og-app.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="YourLifeCC">
+
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    min-height:100vh;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:#eef1f7;
+    background:#0a1424;
+    background-image:
+      radial-gradient(ellipse 80% 60% at 50% -10%, rgba(245,166,35,.16), transparent 60%),
+      radial-gradient(ellipse 70% 60% at 80% 110%, rgba(99,102,241,.14), transparent 60%),
+      linear-gradient(180deg, #0c1a30 0%, #0a1424 100%);
+    -webkit-font-smoothing:antialiased;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:1.5rem 1.1rem 2rem;
+  }
+
+  .wl-wrap{ width:100%; max-width:440px; }
+
+  .wl-brand{
+    text-align:center; margin:0 0 1.25rem;
+    font-weight:800; letter-spacing:.02em; font-size:1.05rem; color:#f1ece1;
+  }
+  .wl-brand b{ color:#f5a623; }
+
+  .wl-card{
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:20px;
+    padding:1.6rem 1.35rem 1.5rem;
+    box-shadow:0 30px 80px rgba(0,0,0,.45);
+  }
+
+  /* COPY: hero (Jason can replace the words; keep the structure) */
+  .wl-hero h1{
+    margin:.1rem 0 .55rem;
+    font-size:1.65rem; line-height:1.18; font-weight:800; color:#f6f1e6;
+    letter-spacing:-.01em;
+  }
+  .wl-hero p{
+    margin:0 0 1.35rem;
+    font-size:.97rem; line-height:1.5; color:#aeb8cd;
+  }
+
+  .wl-field{ margin-bottom:.8rem; }
+  .wl-label{ display:block; font-size:.78rem; font-weight:600; color:#c2cadb; margin:0 0 .3rem; letter-spacing:.01em; }
+  .wl-input{
+    width:100%; font-size:1rem; color:#f3f5fa; font-family:inherit;
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:12px; padding:.8rem .9rem;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .wl-input::placeholder{ color:#7c879b; }
+  .wl-input:focus{ outline:none; border-color:#f5a623; box-shadow:0 0 0 3px rgba(245,166,35,.22); }
+
+  .wl-btn{
+    width:100%; margin-top:.5rem;
+    font-size:1.02rem; font-weight:800; font-family:inherit;
+    color:#1a1205; background:#f5a623;
+    border:0; border-radius:12px; padding:.9rem 1rem; cursor:pointer;
+    transition:transform .12s ease, background .15s ease, opacity .15s ease;
+  }
+  .wl-btn:hover{ background:#f6b441; }
+  .wl-btn:active{ transform:scale(.99); }
+  .wl-btn:disabled{ opacity:.6; cursor:default; }
+
+  .wl-error{
+    display:none; margin-top:.7rem; font-size:.85rem; line-height:1.4;
+    color:#fca5a5; background:rgba(248,113,113,.08);
+    border:1px solid rgba(248,113,113,.25); border-radius:10px; padding:.6rem .7rem;
+  }
+  .wl-error a{ color:#fca5a5; }
+
+  .wl-fine{ margin:.85rem 0 0; font-size:.7rem; line-height:1.4; color:#7c879b; text-align:center; }
+
+  /* honeypot: present in the DOM for bots, invisible + unreachable for humans */
+  .wl-hp{
+    position:absolute !important; left:-9999px !important;
+    width:1px; height:1px; overflow:hidden; opacity:0;
+  }
+
+  /* success state */
+  .wl-done{ display:none; text-align:center; }
+  .wl-done .wl-check{
+    width:54px; height:54px; margin:.2rem auto 1rem; border-radius:50%;
+    background:rgba(52,211,153,.14); border:1px solid rgba(52,211,153,.4);
+    display:flex; align-items:center; justify-content:center; font-size:1.6rem;
+  }
+  .wl-done h2{ margin:0 0 .5rem; font-size:1.4rem; font-weight:800; color:#f6f1e6; }
+  .wl-done p{ margin:0; font-size:.97rem; line-height:1.5; color:#aeb8cd; }
+
+  .wl-foot{
+    margin:1.4rem 0 0; text-align:center; font-size:.74rem; line-height:1.5; color:#6f7a90;
+  }
+  .wl-foot a{ color:#9aa6bd; text-decoration:none; }
+  .wl-foot a:hover{ text-decoration:underline; }
+
+  @media (min-width:480px){
+    .wl-hero h1{ font-size:1.85rem; }
+    .wl-card{ padding:1.9rem 1.7rem 1.7rem; }
+  }
+</style>
+</head>
+<body>
+  <div class="wl-wrap">
+    <div class="wl-brand">YourLife <b>CC</b></div>
+
+    <div class="wl-card" id="wlCard">
+
+      <!-- COPY: hero -->
+      <div class="wl-hero">
+        <h1>Raising kids who love God and grow into capable adults.</h1>
+        <p>YourLife CC is the family command center for Christian parents - habits, chores, money, school, and faith, all in one calm place. Join the waitlist for early access.</p>
+      </div>
+      <!-- /COPY: hero -->
+
+      <form id="wlForm" novalidate>
+        <div class="wl-field">
+          <label class="wl-label" for="wlEmail">Email</label>
+          <input class="wl-input" id="wlEmail" name="email" type="email" inputmode="email"
+                 autocomplete="email" required placeholder="you@example.com">
+        </div>
+
+        <div class="wl-field">
+          <label class="wl-label" for="wlName">Your name <span style="color:#7c879b;font-weight:400;">(optional)</span></label>
+          <input class="wl-input" id="wlName" name="name" type="text" autocomplete="name" placeholder="First name">
+        </div>
+
+        <!-- honeypot — leave empty; bots that fill it are silently dropped -->
+        <div class="wl-hp" aria-hidden="true">
+          <label for="wlCompany">Company</label>
+          <input id="wlCompany" name="company" type="text" tabindex="-1" autocomplete="off">
+        </div>
+
+        <input id="wlSource" name="source" type="hidden" value="direct">
+
+        <button class="wl-btn" id="wlSubmit" type="submit">Join the waitlist</button>
+
+        <div class="wl-error" id="wlError" role="alert"></div>
+      </form>
+
+      <div class="wl-done" id="wlDone">
+        <div class="wl-check" aria-hidden="true">&#10003;</div>
+        <h2>You're on the list.</h2>
+        <p id="wlDoneMsg">We'll be in touch soon.</p>
+      </div>
+
+      <p class="wl-fine">No spam. We'll only email you about YourLife CC.</p>
+    </div>
+
+    <div class="wl-foot">
+      Kingdom Creatives LLC &middot; <a href="mailto:info@kingdom-creatives.com">info@kingdom-creatives.com</a><br>
+      <a href="https://yourlifecc.com">yourlifecc.com</a>
+    </div>
+  </div>
+
+<script>
+(function(){
+  // Supabase (public anon key by design; the waitlist table's RLS allows
+  // insert-only for anon, so the list is unreadable from the client).
+  var SUPA_URL = 'https://hrohgwcbfgywkpnvqxhk.supabase.co';
+  var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhyb2hnd2NiZmd5d2twbnZxeGhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MjcxNDYsImV4cCI6MjA4ODQwMzE0Nn0.PuWtBpiMw2DiCLp26ZP_Rd9BwzFvWT0sNZrDUNdULyo';
+
+  // Channel attribution from ?src= (e.g. ?src=nextdoor, ?src=facebook).
+  // Sanitize to [a-z0-9_-], cap 32 chars, default 'direct'.
+  var rawSrc = '';
+  try { rawSrc = new URLSearchParams(window.location.search).get('src') || ''; } catch(e){ rawSrc = ''; }
+  var src = (rawSrc || 'direct').toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 32) || 'direct';
+  var srcEl = document.getElementById('wlSource');
+  if (srcEl) srcEl.value = src;
+
+  var form  = document.getElementById('wlForm');
+  var btn   = document.getElementById('wlSubmit');
+  var errEl = document.getElementById('wlError');
+  var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  function setError(msg){ if(errEl){ errEl.innerHTML = msg; errEl.style.display = 'block'; } }
+  function clearError(){ if(errEl){ errEl.textContent = ''; errEl.style.display = 'none'; } }
+
+  function showSuccess(email, already){
+    var done = document.getElementById('wlDone');
+    var msgEl = document.getElementById('wlDoneMsg');
+    if (msgEl){
+      msgEl.textContent = already
+        ? "You're already on the list - we'll be in touch."
+        : ("We'll reach out at " + email + " when it's your turn.");
+    }
+    if (form) form.style.display = 'none';
+    if (done) done.style.display = 'block';
+  }
+
+  if (form){
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      clearError();
+
+      var email = (document.getElementById('wlEmail').value || '').trim();
+      var name  = (document.getElementById('wlName').value || '').trim();
+      var hp    = document.getElementById('wlCompany');
+
+      // Honeypot filled -> almost certainly a bot. Show success, write nothing.
+      if (hp && hp.value){ showSuccess(email, false); return; }
+
+      if (!emailRe.test(email)){ setError('Please enter a valid email address.'); return; }
+
+      btn.disabled = true;
+      var label = btn.textContent;
+      btn.textContent = 'Joining...';
+
+      fetch(SUPA_URL + '/rest/v1/waitlist', {
+        method: 'POST',
+        headers: {
+          'apikey': SUPA_KEY,
+          'Authorization': 'Bearer ' + SUPA_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ email: email, name: name || null, source: src })
+      }).then(function(res){
+        if (res.ok){ showSuccess(email, false); return; }       // 200 / 201 / 204
+        if (res.status === 409){ showSuccess(email, true); return; } // duplicate email
+        throw new Error('http ' + res.status);
+      }).catch(function(){
+        btn.disabled = false;
+        btn.textContent = label;
+        setError('Something went wrong. Please try again, or email <a href="mailto:info@kingdom-creatives.com">info@kingdom-creatives.com</a>.');
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>
