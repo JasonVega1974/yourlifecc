@@ -360,6 +360,23 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
           <tbody id="waitTable"><tr class="loading-row"><td colspan="7">LOADING...</td></tr></tbody>
         </table>
       </div>
+
+      <!-- Ad-capture waitlist (join.html email signups). Read via the
+           service-role endpoint /api/admin/waitlist — the `waitlist` table is
+           anon-insert-only with NO public read. Distinct from the sponsorship
+           "Waitlist Applications" card above. -->
+      <div class="card card-full" id="adWaitlistCard">
+        <div class="card-header"><span class="card-title">Ad-Capture Waitlist <span style="color:var(--tx3);font-weight:400;font-size:.8em;">join.html signups</span></span><span class="card-badge" id="adWaitBadge">—</span></div>
+        <div style="padding:1rem 1.5rem;display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;">
+          <button class="btn-sm btn-blue" id="adWaitLoadBtn" onclick="loadAdWaitlist()">Load waitlist</button>
+          <button class="btn-sm btn-blue" id="adWaitCsvBtn" onclick="downloadAdWaitlistCsv()" style="display:none;">Download CSV</button>
+          <span id="adWaitStatus" style="font-size:.72rem;color:var(--tx3);"></span>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Email</th><th>Name</th><th>Source</th><th>Date</th></tr></thead>
+          <tbody id="adWaitTable"><tr><td colspan="4" style="color:var(--tx3);padding:1rem 1.5rem;">Click "Load waitlist" to view ad-capture signups.</td></tr></tbody>
+        </table>
+      </div>
     </div><!-- end tab-waitlist -->
 
     <!-- ══ CONTEST TAB ══ -->
@@ -1452,6 +1469,84 @@ function getAdminSecret(){
   return _adminSecret;
 }
 function clearAdminSecret(){ _adminSecret = ''; }
+
+// ── Ad-capture waitlist (join.html signups) ──────────────────────────────
+// Reads the `waitlist` table via the service-role endpoint /api/admin/waitlist
+// (the table is anon-insert-only with NO public SELECT, so this is the only
+// safe read path). Reuses the in-memory getAdminSecret() — no second prompt.
+let _adWaitRows = [];
+function _adEsc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function _adWaitStatus(msg, color){ const el = document.getElementById('adWaitStatus'); if(el){ el.textContent = msg || ''; el.style.color = color || 'var(--tx3)'; } }
+
+async function loadAdWaitlist(){
+  const btn = document.getElementById('adWaitLoadBtn');
+  const tbody = document.getElementById('adWaitTable');
+  const secret = getAdminSecret();
+  if(!secret){ _adWaitStatus('Cancelled - no secret provided.', 'var(--amber)'); return; }
+
+  if(btn){ btn.disabled = true; btn.textContent = 'Loading...'; }
+  _adWaitStatus('Loading...', 'var(--tx3)');
+  if(tbody) tbody.innerHTML = '<tr class="loading-row"><td colspan="4">LOADING...</td></tr>';
+
+  try{
+    const res = await fetch('/api/admin/waitlist', { headers: { 'Authorization': 'Bearer ' + secret } });
+    if(res.status === 401){
+      clearAdminSecret();
+      _adWaitStatus('Auth failed - wrong ADMIN_SECRET. Try again.', 'var(--amber)');
+      if(tbody) tbody.innerHTML = '<tr><td colspan="4" style="color:var(--tx3);padding:1rem 1.5rem;">Not loaded.</td></tr>';
+      return;
+    }
+    const data = await res.json().catch(function(){ return {}; });
+    if(!res.ok){
+      _adWaitStatus(data.error || ('Load failed (' + res.status + ')'), 'var(--amber)');
+      if(tbody) tbody.innerHTML = '<tr><td colspan="4" style="color:var(--tx3);padding:1rem 1.5rem;">Could not load. Try again, or contact info@kingdom-creatives.com.</td></tr>';
+      return;
+    }
+    _adWaitRows = Array.isArray(data.rows) ? data.rows : [];
+    renderAdWaitlist();
+  }catch(e){
+    _adWaitStatus('Network error. Try again, or contact info@kingdom-creatives.com.', 'var(--amber)');
+    if(tbody) tbody.innerHTML = '<tr><td colspan="4" style="color:var(--tx3);padding:1rem 1.5rem;">Network error.</td></tr>';
+  }finally{
+    if(btn){ btn.disabled = false; btn.textContent = 'Reload'; }
+  }
+}
+
+function renderAdWaitlist(){
+  const tbody = document.getElementById('adWaitTable');
+  const badge = document.getElementById('adWaitBadge');
+  const csvBtn = document.getElementById('adWaitCsvBtn');
+  const rows = _adWaitRows;
+  if(badge) badge.textContent = rows.length + (rows.length === 1 ? ' signup' : ' signups');
+  if(!rows.length){
+    if(tbody) tbody.innerHTML = '<tr><td colspan="4" style="color:var(--tx3);padding:1rem 1.5rem;">No signups yet.</td></tr>';
+    if(csvBtn) csvBtn.style.display = 'none';
+    _adWaitStatus('', '');
+    return;
+  }
+  if(tbody) tbody.innerHTML = rows.map(function(r){
+    const d = r.created_at ? new Date(r.created_at) : null;
+    const dateStr = (d && !isNaN(d.getTime())) ? d.toLocaleString() : '';
+    return '<tr><td>' + _adEsc(r.email) + '</td><td>' + _adEsc(r.name || '') + '</td><td>' + _adEsc(r.source || '') + '</td><td>' + _adEsc(dateStr) + '</td></tr>';
+  }).join('');
+  if(csvBtn) csvBtn.style.display = '';
+  _adWaitStatus('Loaded ' + rows.length + '.', 'var(--green)');
+}
+
+function downloadAdWaitlistCsv(){
+  const rows = _adWaitRows;
+  if(!rows.length) return;
+  const cell = function(v){ const s = String(v == null ? '' : v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s; };
+  const lines = ['email,name,source,created_at'].concat(rows.map(function(r){
+    return [cell(r.email), cell(r.name || ''), cell(r.source || ''), cell(r.created_at || '')].join(',');
+  }));
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'waitlist.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+}
 
 async function sendViaBrevo(recipients, subject, body, fromName){
   const btn = document.getElementById('sendBtn');
