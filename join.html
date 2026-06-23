@@ -134,9 +134,12 @@
   .wl-shots{ display:flex; gap:.65rem; overflow-x:auto; scroll-snap-type:x mandatory; padding:.1rem .1rem .4rem; -webkit-overflow-scrolling:touch; }
   .wl-shots::-webkit-scrollbar{ height:0; background:transparent; }
   .wl-shot{ flex:0 0 auto; width:118px; margin:0; scroll-snap-align:center; text-align:center; }
-  .wl-phone{ position:relative; width:118px; height:242px; border-radius:22px; background:#1a2236; border:1px solid rgba(255,255,255,.12); padding:6px; box-shadow:0 14px 32px rgba(0,0,0,.42); }
+  /* Frame contrast — defined bezel (gradient + light edge), a thin gold rim,
+     and a soft drop shadow so dark screenshots visibly lift off the dark page.
+     Same class drives the post-signup reward frames. */
+  .wl-phone{ position:relative; width:118px; height:242px; border-radius:22px; background:linear-gradient(155deg,#243049,#161d30 62%,#10172a); border:1px solid rgba(255,255,255,.16); padding:6px; box-shadow:0 0 0 1px rgba(245,166,35,.26), inset 0 1px 0 rgba(255,255,255,.13), 0 18px 40px rgba(0,0,0,.55), 0 5px 14px rgba(0,0,0,.42); }
   .wl-phone::before{ content:''; position:absolute; top:8px; left:50%; transform:translateX(-50%); width:34px; height:4px; border-radius:3px; background:rgba(255,255,255,.18); z-index:2; }
-  .wl-screen{ width:100%; height:100%; border-radius:16px; overflow:hidden; background:#0c1a30 center/cover no-repeat; display:flex; align-items:center; justify-content:center; }
+  .wl-screen{ width:100%; height:100%; border-radius:16px; overflow:hidden; background:#0c1a30 center/cover no-repeat; display:flex; align-items:center; justify-content:center; box-shadow:inset 0 0 0 1px rgba(255,255,255,.06), inset 0 2px 8px rgba(0,0,0,.45); }
   .wl-screen.has-shot .wl-ph{ display:none; }
   .wl-ph{ text-align:center; padding:.7rem .5rem; }
   .wl-ph-mark{ font-size:.82rem; font-weight:800; color:#f1ece1; margin-bottom:.45rem; letter-spacing:.01em; }
@@ -145,6 +148,23 @@
   .wl-shot figcaption{ margin-top:.5rem; font-size:.73rem; color:#aeb8cd; line-height:1.3; }
   @media (min-width:480px){ .wl-shots{ justify-content:center; } }
   @media (prefers-reduced-motion:reduce){ .wl-shots{ scroll-behavior:auto; } }
+
+  /* Desktop comfort — a modest wider column (not full-width), more padding, a
+     one-step type bump, and bigger phones so the page + screenshot row don't
+     read cramped on desktop. Phone view (<600px) is unchanged. */
+  @media (min-width:600px){
+    .wl-wrap{ max-width:600px; }
+    .wl-card{ padding:2.3rem 2.2rem 2rem; }
+    .wl-hero h1{ font-size:2.05rem; }
+    .wl-hero p{ font-size:1.04rem; }
+    .wl-benefits li{ font-size:.98rem; }
+    .wl-trust{ font-size:.86rem; }
+    .wl-peek-head{ font-size:.76rem; }
+    .wl-shots{ gap:1rem; }
+    .wl-shot{ width:152px; }
+    .wl-phone{ width:152px; height:312px; }
+    .wl-shot figcaption{ font-size:.8rem; }
+  }
 </style>
 </head>
 <body>
