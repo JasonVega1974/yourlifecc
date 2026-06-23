@@ -121,6 +121,30 @@
     .wl-hero h1{ font-size:1.85rem; }
     .wl-card{ padding:1.9rem 1.7rem 1.7rem; }
   }
+
+  /* ── Sell layer ── */
+  .wl-benefits{ list-style:none; margin:0 0 .9rem; padding:0; }
+  .wl-benefits li{ display:flex; gap:.6rem; align-items:flex-start; font-size:.92rem; line-height:1.42; color:#cdd5e4; margin-bottom:.6rem; }
+  .wl-bi{ flex:0 0 auto; width:20px; height:20px; border-radius:50%; background:rgba(245,166,35,.16); color:#f5a623; display:flex; align-items:center; justify-content:center; font-size:.66rem; margin-top:.05rem; }
+  .wl-trust{ margin:0 0 1.4rem; font-size:.82rem; color:#9aa6bd; font-style:italic; }
+
+  /* ── Screenshot peek (see-the-app demo; reused as the signup reward) ── */
+  .wl-peek{ margin:1.5rem 0 .2rem; }
+  .wl-peek-head{ font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#9aa6bd; text-align:center; margin:0 0 .9rem; }
+  .wl-shots{ display:flex; gap:.65rem; overflow-x:auto; scroll-snap-type:x mandatory; padding:.1rem .1rem .4rem; -webkit-overflow-scrolling:touch; }
+  .wl-shots::-webkit-scrollbar{ height:0; background:transparent; }
+  .wl-shot{ flex:0 0 auto; width:118px; margin:0; scroll-snap-align:center; text-align:center; }
+  .wl-phone{ position:relative; width:118px; height:242px; border-radius:22px; background:#1a2236; border:1px solid rgba(255,255,255,.12); padding:6px; box-shadow:0 14px 32px rgba(0,0,0,.42); }
+  .wl-phone::before{ content:''; position:absolute; top:8px; left:50%; transform:translateX(-50%); width:34px; height:4px; border-radius:3px; background:rgba(255,255,255,.18); z-index:2; }
+  .wl-screen{ width:100%; height:100%; border-radius:16px; overflow:hidden; background:#0c1a30 center/cover no-repeat; display:flex; align-items:center; justify-content:center; }
+  .wl-screen.has-shot .wl-ph{ display:none; }
+  .wl-ph{ text-align:center; padding:.7rem .5rem; }
+  .wl-ph-mark{ font-size:.82rem; font-weight:800; color:#f1ece1; margin-bottom:.45rem; letter-spacing:.01em; }
+  .wl-ph-mark b{ color:#f5a623; }
+  .wl-ph-label{ font-size:.66rem; color:#93a0b8; line-height:1.3; }
+  .wl-shot figcaption{ margin-top:.5rem; font-size:.73rem; color:#aeb8cd; line-height:1.3; }
+  @media (min-width:480px){ .wl-shots{ justify-content:center; } }
+  @media (prefers-reduced-motion:reduce){ .wl-shots{ scroll-behavior:auto; } }
 </style>
 </head>
 <body>
@@ -135,6 +159,15 @@
         <p>YourLife CC is the family command center for Christian parents - habits, chores, money, school, and faith, all in one calm place. Join the waitlist for early access.</p>
       </div>
       <!-- /COPY: hero -->
+
+      <!-- COPY: benefits -->
+      <ul class="wl-benefits">
+        <li><span class="wl-bi" aria-hidden="true">&#10003;</span> Habits &amp; chores that actually stick - streaks and rhythm, not nagging</li>
+        <li><span class="wl-bi" aria-hidden="true">&#10003;</span> Money &amp; real-world life skills built for teens</li>
+        <li><span class="wl-bi" aria-hidden="true">&#10003;</span> School, responsibilities, and family life in one calm place</li>
+        <li><span class="wl-bi" aria-hidden="true">&#10003;</span> Faith woven through it all - devotionals, Scripture, and The Well</li>
+      </ul>
+      <p class="wl-trust"><!-- COPY: trust -->Built by a Christian dad in Idaho.</p>
 
       <form id="wlForm" novalidate>
         <div class="wl-field">
@@ -161,10 +194,33 @@
         <div class="wl-error" id="wlError" role="alert"></div>
       </form>
 
+      <!-- COPY: screenshot peek — "see the app", no account required. Drop real
+           shots at /join-shots/{home,habits,faith}.png and they swap in; absent
+           files keep the placeholder below. -->
+      <div class="wl-peek" id="wlPeekWrap">
+        <p class="wl-peek-head" id="wlPeekHead">See the app - no account needed</p>
+        <div class="wl-shots" id="wlShots">
+          <figure class="wl-shot">
+            <div class="wl-phone"><div class="wl-screen" id="shot-home"><div class="wl-ph"><div class="wl-ph-mark">YourLife <b>CC</b></div><div class="wl-ph-label">Your Constellation home</div></div></div></div>
+            <figcaption>Your Constellation home</figcaption>
+          </figure>
+          <figure class="wl-shot">
+            <div class="wl-phone"><div class="wl-screen" id="shot-habits"><div class="wl-ph"><div class="wl-ph-mark">YourLife <b>CC</b></div><div class="wl-ph-label">Habits &amp; chores</div></div></div></div>
+            <figcaption>Habits &amp; chores</figcaption>
+          </figure>
+          <figure class="wl-shot">
+            <div class="wl-phone"><div class="wl-screen" id="shot-faith"><div class="wl-ph"><div class="wl-ph-mark">YourLife <b>CC</b></div><div class="wl-ph-label">The Well</div></div></div></div>
+            <figcaption>The Well - your faith hub</figcaption>
+          </figure>
+        </div>
+      </div>
+
       <div class="wl-done" id="wlDone">
         <div class="wl-check" aria-hidden="true">&#10003;</div>
         <h2>You're on the list.</h2>
         <p id="wlDoneMsg">We'll be in touch soon.</p>
+        <!-- COPY: reward — the screenshot peek relocates here on success -->
+        <div id="wlRewardSlot"></div>
       </div>
 
       <p class="wl-fine">No spam. We'll only email you about YourLife CC.</p>
@@ -191,6 +247,21 @@
   var srcEl = document.getElementById('wlSource');
   if (srcEl) srcEl.value = src;
 
+  // Screenshot peek — swap each phone's placeholder for a real screenshot if the
+  // file exists at /join-shots/<id>.png. Drop the 3 files in and they appear;
+  // a missing file keeps the built-in placeholder (no code change needed).
+  ['home', 'habits', 'faith'].forEach(function(id){
+    var screen = document.getElementById('shot-' + id);
+    if (!screen) return;
+    var img = new Image();
+    img.onload = function(){
+      screen.style.backgroundImage = 'url("/join-shots/' + id + '.png")';
+      screen.classList.add('has-shot');
+    };
+    img.onerror = function(){ /* keep the placeholder */ };
+    img.src = '/join-shots/' + id + '.png';
+  });
+
   var form  = document.getElementById('wlForm');
   var btn   = document.getElementById('wlSubmit');
   var errEl = document.getElementById('wlError');
@@ -209,6 +280,15 @@
     }
     if (form) form.style.display = 'none';
     if (done) done.style.display = 'block';
+    // Reward — relocate the screenshot peek into the confirmation as the sneak
+    // peek (moves the same node; no duplicate IDs, keeps any loaded images).
+    var peek = document.getElementById('wlPeekWrap');
+    var slot = document.getElementById('wlRewardSlot');
+    var head = document.getElementById('wlPeekHead');
+    if (peek && slot && peek.parentNode !== slot){
+      if (head) head.textContent = "Here's your sneak peek";
+      slot.appendChild(peek);
+    }
   }
 
   if (form){
