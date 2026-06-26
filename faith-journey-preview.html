@@ -296,13 +296,21 @@ body{margin:0;background:#05070f;}
   document.getElementById('fjStars').innerHTML = stars;
 
   // ---- footprint trail along the path (sampled with SVG getPointAtLength) ----
-  // A gentle dotted trail ON the path (not literal footprints): small warm muted
-  // dots on the traveled portion fading to faint cool dots ahead.
-  function dotFuture(x,y){
-    return '<div style="position:absolute;left:'+x+'px;top:'+y+'px;width:3px;height:3px;border-radius:50%;transform:translate(-50%,-50%);background:rgba(176,192,224,.26);"></div>';
-  }
-  function dotDone(x,y){
-    return '<div style="position:absolute;left:'+x+'px;top:'+y+'px;width:3.5px;height:3.5px;border-radius:50%;transform:translate(-50%,-50%);background:rgba(243,200,130,.5);box-shadow:0 0 5px rgba(245,185,80,.35);"></div>';
+  // Graceful footprint silhouette (toes + ball + heel), oriented along the path
+  // and mirrored left/right. Soft + low-opacity: muted warm gold for traveled
+  // prints (gentle glow), pale faint cream for the prints ahead. Reads clearly
+  // as footsteps without the bright-gold-nugget look.
+  function foot(x,y,ang,flip,done){
+    var sole = done ? 'rgba(246,222,165,.42)' : 'rgba(228,224,210,.20)';
+    var toe  = done ? 'rgba(250,232,185,.52)' : 'rgba(232,228,214,.24)';
+    var glow = done ? 'filter:drop-shadow(0 0 4px rgba(245,198,112,.32));' : '';
+    return '<div style="position:absolute;left:'+x+'px;top:'+y+'px;width:14px;height:20px;'+glow+'transform:translate(-50%,-50%) rotate('+ang+'deg) scaleX('+flip+');">'
+      +'<div style="position:absolute;left:5px;top:0;width:2.6px;height:3px;border-radius:50%;background:'+toe+';"></div>'
+      +'<div style="position:absolute;left:7.6px;top:1.1px;width:2.3px;height:2.7px;border-radius:50%;background:'+toe+';"></div>'
+      +'<div style="position:absolute;left:9.7px;top:2.7px;width:2px;height:2.4px;border-radius:50%;background:'+toe+';"></div>'
+      +'<div style="position:absolute;left:3.5px;top:3.4px;width:9px;height:9.5px;border-radius:56% 44% 50% 50% / 64% 60% 40% 40%;background:'+sole+';"></div>'
+      +'<div style="position:absolute;left:4.6px;top:11.6px;width:6.2px;height:7.6px;border-radius:50% 50% 50% 50% / 44% 44% 60% 60%;background:'+sole+';"></div>'
+      +'</div>';
   }
   try {
     var NS='http://www.w3.org/2000/svg';
@@ -314,11 +322,17 @@ body{margin:0;background:#05070f;}
     var pc=document.createElementNS(NS,'path'); pc.setAttribute('d',build(nodes.slice(0,compIndex+1)));
     svg.appendChild(pf); svg.appendChild(pc); document.body.appendChild(svg);
     var total=pf.getTotalLength(), compLen=pc.getTotalLength();
-    var doneHTML='', futureHTML='';
-    for(var ss=16; ss<total-10; ss+=15){
+    var doneHTML='', futureHTML='', side=1;
+    // Stride down the path (~32px apart), staggered left/right of the centerline.
+    for(var ss=20; ss<total-14; ss+=32){
       var p=pf.getPointAtLength(ss);
-      var x=+p.x.toFixed(1), y=+p.y.toFixed(1);
-      if(ss<=compLen+6) doneHTML+=dotDone(x,y); else futureHTML+=dotFuture(x,y);
+      var p2=pf.getPointAtLength(Math.min(ss+1.2,total));
+      var dx=p2.x-p.x, dy=p2.y-p.y; var len=Math.hypot(dx,dy)||1; var off=7*side;
+      var x=+(p.x+(-dy/len)*off).toFixed(1);
+      var y=+(p.y+(dx/len)*off).toFixed(1);
+      var ang=+(Math.atan2(dy,dx)*180/Math.PI+90).toFixed(1);
+      if(ss<=compLen+6) doneHTML+=foot(x,y,ang,side,true); else futureHTML+=foot(x,y,ang,side,false);
+      side*=-1;
     }
     document.body.removeChild(svg);
     document.getElementById('fjStepDone').innerHTML = doneHTML;
