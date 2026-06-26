@@ -1713,6 +1713,25 @@ function toggleTraitDetail(key){
 
 function fzGoHome(){
   if (typeof document === 'undefined') return;
+  // Phase 3 — flag ON: back returns to the JOURNEY home (not the classic
+  // #fzHome). Close the open destination, then re-render the journey home
+  // (which re-shows #fzJourneyHome, hides #fzHome, and rebuilds greeting/
+  // streak/scene/doorways). Flag OFF falls through to the existing logic below,
+  // byte-identical. Thin conditional only — fzOpenDest + sub-views untouched.
+  if (_fjHomeOn()){
+    _fzCurrentDest = null;
+    var jdest = document.getElementById('fzDest');
+    var jbody = document.getElementById('fzDestBody');
+    if (jdest) jdest.style.display = 'none';
+    if (jbody) jbody.innerHTML = '';
+    var jz3 = document.getElementById('fzZone3Wrap');
+    if (jz3) jz3.style.display = 'none';
+    if (typeof D !== 'undefined' && D) D.faithExploreOpen = false;
+    if (typeof renderFaithJourneyHome === 'function') renderFaithJourneyHome();
+    var jsec = document.getElementById('s-scripture');
+    if (jsec) setTimeout(function(){ jsec.scrollIntoView({ behavior:'smooth', block:'start' }); }, 40);
+    return;
+  }
   _fzCurrentDest = null;
   var dest = document.getElementById('fzDest');
   var home = document.getElementById('fzHome');
