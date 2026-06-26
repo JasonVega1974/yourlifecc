@@ -9721,6 +9721,11 @@ html[data-faith-free="1"] #ffBottomNav {
    wrong here (a light card over the dark hero). No animation → no reduced-
    motion rule needed. */
 #ffSkillsCard { display: none; }
+/* PARKED 2026-06-26 — re-add later: faith journey traction. Hides the
+   "The full Life Skills Academy is open to you — free" hero card (CSS-only;
+   markup + the ff-hero show-rule below are untouched). The !important overrides
+   the show-rule. To restore: delete just this one rule. */
+#ffSkillsCard { display: none !important; }
 html[data-faith-free="1"] body.ff-hero-active #ffSkillsCard {
   display: flex; align-items: center; gap: .65rem;
   position: fixed; left: 50%; transform: translateX(-50%);
