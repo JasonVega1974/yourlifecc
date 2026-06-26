@@ -1196,23 +1196,25 @@ function _fjFoot(x,y,ang,flip,done){
 
 function _fjRenderScene(){
   if (typeof document === 'undefined') return;
-  // Star field (44 deterministic stars).
+  // Full-width star field — percentage positions so stars scatter across the
+  // WHOLE night sky (#fjSkyStars fills #fzJourneyHome), not just the 393 path
+  // column. More stars to cover the larger area.
   try {
-    var starHost = document.getElementById('fjStars');
-    if (starHost){
+    var sky = document.getElementById('fjSkyStars');
+    if (sky){
       var stars = '';
-      for (var i=0;i<44;i++){
-        var l = Math.round((i*97.13)%383)+4;
-        var t = Math.round((i*151.7)%1546)+8;
+      for (var i=0;i<72;i++){
+        var lp = ((i*37.31)%100).toFixed(2);
+        var tp = ((i*61.73)%100).toFixed(2);
         var bright = (i%6===0);
-        var s = bright?2.8:((i%3===0)?1.7:1.1);
-        var op = (0.35+((i*53)%50)/100).toFixed(2);
+        var s = bright?2.6:((i%3===0)?1.6:1.1);
+        var op = (0.30+((i*53)%55)/100).toFixed(2);
         var dur = (2.6+((i*31)%42)/10).toFixed(1);
         var d = (((i*17)%50)/10).toFixed(1);
-        var sh = bright?'0 0 10px 1px rgba(255,245,215,.95)':'0 0 6px rgba(255,238,200,.85)';
-        stars += '<div style="position:absolute;left:'+l+'px;top:'+t+'px;width:'+s+'px;height:'+s+'px;border-radius:50%;background:#fff;opacity:'+op+';box-shadow:'+sh+';animation:twinkle '+dur+'s ease-in-out infinite;animation-delay:'+d+'s;"></div>';
+        var sh = bright?'0 0 9px 1px rgba(255,245,215,.9)':'0 0 6px rgba(255,238,200,.8)';
+        stars += '<div style="position:absolute;left:'+lp+'%;top:'+tp+'%;width:'+s+'px;height:'+s+'px;border-radius:50%;background:#fff;opacity:'+op+';box-shadow:'+sh+';animation:twinkle '+dur+'s ease-in-out infinite;animation-delay:'+d+'s;"></div>';
       }
-      starHost.innerHTML = stars;
+      sky.innerHTML = stars;
     }
   } catch (e){}
   // Footprint trail along the path (illustrative — no real progress).
@@ -1242,22 +1244,6 @@ function _fjRenderScene(){
     if (dH) dH.innerHTML = doneHTML;
     if (fH) fH.innerHTML = futureHTML;
   } catch (e){}
-}
-
-// Responsive fit — the scene is authored on a fixed 393px grid (cross, nodes,
-// footprints all use 393-space coordinates). Rather than rework every absolute
-// coordinate, scale the whole scene uniformly to fill its wrapper width, so
-// EVERYTHING stays perfectly aligned at any width: scales UP to fill desktop
-// (capped by .fj-wrap max-width) and DOWN to fit phones < 393px (no clipping).
-function _fjFitScene(){
-  if (typeof document === 'undefined') return;
-  var wrap  = document.getElementById('fjSceneWrap');
-  var scene = document.getElementById('fjScene');
-  if (!wrap || !scene) return;
-  var w = wrap.clientWidth || 393;
-  var s = w / 393;
-  scene.style.transform = 'scale(' + s + ')';
-  wrap.style.height = (1576 * s) + 'px';
 }
 
 function renderFaithJourneyHome(){
@@ -1320,13 +1306,6 @@ function renderFaithJourneyHome(){
   } catch (e){}
   // Illustrative scene — stars + footprint trail (no real progress lit).
   _fjRenderScene();
-  // Responsive fit — scale the fixed 393px scene to fill the content width.
-  _fjFitScene();
-  if (typeof requestAnimationFrame === 'function') requestAnimationFrame(_fjFitScene);
-  if (typeof window !== 'undefined' && !window.__fjResizeHooked){
-    window.__fjResizeHooked = true;
-    try { window.addEventListener('resize', function(){ var hh = document.getElementById('fzJourneyHome'); if (hh && hh.style.display !== 'none') _fjFitScene(); }); } catch (e){}
-  }
 }
 
 // ════════════════════════════════════════════════════════════
