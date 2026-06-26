@@ -7985,10 +7985,16 @@
         /* Faith-only experience is BYTE-IDENTICAL to today: never
            reveal the gate for these users. */
         if(window._faithFree){ g.hidden = true; return; }
-        // Journey home active (account flag D.faithJourneyHome) — suppress the
-        // gate so faith-tab entry + doorway nav never trigger "Enter the Well".
-        // Flag-off (no D.faithJourneyHome): skipped -> gate behaves as today.
-        if(window.D && window.D.faithJourneyHome){ g.hidden = true; return; }
+        // Journey home active — suppress the gate so faith-tab entry, back, and
+        // any re-nav never trigger "Enter the Well". Read the flag via _fjHomeOn()
+        // (faith-zones), which reads the real `D` — a top-level `let`, so it is
+        // NOT a window property: the earlier `window.D` check was always undefined
+        // and never fired. Bare `D` is a fallback; try/catch guards TDZ/load order.
+        // Flag-off: both false -> skipped -> gate behaves exactly as today.
+        try {
+          if((typeof _fjHomeOn === 'function' && _fjHomeOn()) ||
+             (typeof D !== 'undefined' && D && D.faithJourneyHome)){ g.hidden = true; return; }
+        } catch(_fjGateErr){}
         if(window._wellGateSeenThisLoad){ g.hidden = true; return; }
         g.hidden = false;
         _startAnim();
