@@ -1069,8 +1069,8 @@ function renderFaithZones(){
   // show Zone 3 now.
   D.faithExploreOpen = false;
 
-  // Phase 3 — flag-gated Faith Journey home (ylcc_faith_journey_home, default
-  // OFF). Flag-OFF: _fjHomeOn() is false and the existing path below runs
+  // Phase 3 — flag-gated Faith Journey home (account-based D.faithJourneyHome,
+  // default OFF). Flag-OFF: _fjHomeOn() is false and the existing path below runs
   // UNCHANGED (byte-identical). Flag-ON: render the journey home and return. The
   // try/catch falls through to the classic home if the journey render throws.
   if (_fjHomeOn()){
@@ -1155,17 +1155,19 @@ function renderFzGreeting(){
 }
 
 // ════════════════════════════════════════════════════════════
-// Phase 3 — Faith Journey home (flag-gated · ylcc_faith_journey_home)
+// Phase 3 — Faith Journey home (flag-gated · account-based D.faithJourneyHome)
 // A night-sky "walk with God" home: Well hero (verse + greeting) → an
 // ILLUSTRATIVE discipleship path (no real progress lit) → the daily doorways
 // (wired to the existing fzOpenDest destinations). Greeting/streak/points use
 // LIVE in-app data. Only renders when the per-user flag is ON.
 // ════════════════════════════════════════════════════════════
 function _fjHomeOn(){
-  try {
-    var k = (typeof _ylccUserKey === 'function') ? _ylccUserKey('ylcc_faith_journey_home') : null;
-    return !!k && localStorage.getItem(k) === '1';
-  } catch (e){ return false; }
+  // ACCOUNT-based opt-in: reads D.faithJourneyHome, which lives in the synced
+  // profiles.data blob (restored by cloudLoad on every device), so enabling it
+  // once shows it on all the user's devices. Default false -> classic faith
+  // home, byte-identical. Set D.faithJourneyHome = true (then save()) to enable.
+  try { return !!(typeof D !== 'undefined' && D && D.faithJourneyHome); }
+  catch (e){ return false; }
 }
 
 function _fjEnsureFonts(){

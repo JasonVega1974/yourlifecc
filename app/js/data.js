@@ -113,6 +113,10 @@ const DEF = {
   // V1 Rebuild · Faith Tab Redesign — Zone 3 toggle state. true means
   // the Explore section is expanded; persists across sessions.
   faithExploreOpen:false,
+  // Phase 3 — Faith Journey home opt-in (ACCOUNT-based: this blob syncs to
+  // profiles.data and cloudLoad restores it, so the flag follows the user across
+  // devices). Default false = classic faith home (byte-identical). Per-user opt-in.
+  faithJourneyHome:false,
   // V1 Rebuild · Session 2 — Night Reflection log. Each entry shape:
   // { date:'YYYY-MM-DD', mood:'😞|😐|🙂|🔥', text:string, prayed:bool, ts:isoString }
   // Capped client-side to the most recent 60 entries by faith-zones.js
