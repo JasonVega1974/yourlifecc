@@ -1069,6 +1069,14 @@ function renderFaithZones(){
   // show Zone 3 now.
   D.faithExploreOpen = false;
 
+  // Phase 3 — flag-gated Faith Journey home (ylcc_faith_journey_home, default
+  // OFF). Flag-OFF: _fjHomeOn() is false and the existing path below runs
+  // UNCHANGED (byte-identical). Flag-ON: render the journey home and return. The
+  // try/catch falls through to the classic home if the journey render throws.
+  if (_fjHomeOn()){
+    try { renderFaithJourneyHome(); return; } catch (e) {}
+  }
+
   // 2026-05-30 — Smart Welcome gate. If the user is returning after
   // a 24h+ gap, route them through the welcome screen with
   // time-aware paths + "continue where you left off" CTA. Otherwise
@@ -1144,6 +1152,158 @@ function renderFzGreeting(){
   if (typeof renderDailyGrowth === 'function'){
     try { renderDailyGrowth(); } catch (e) {}
   }
+}
+
+// ════════════════════════════════════════════════════════════
+// Phase 3 — Faith Journey home (flag-gated · ylcc_faith_journey_home)
+// A night-sky "walk with God" home: Well hero (verse + greeting) → an
+// ILLUSTRATIVE discipleship path (no real progress lit) → the daily doorways
+// (wired to the existing fzOpenDest destinations). Greeting/streak/points use
+// LIVE in-app data. Only renders when the per-user flag is ON.
+// ════════════════════════════════════════════════════════════
+function _fjHomeOn(){
+  try {
+    var k = (typeof _ylccUserKey === 'function') ? _ylccUserKey('ylcc_faith_journey_home') : null;
+    return !!k && localStorage.getItem(k) === '1';
+  } catch (e){ return false; }
+}
+
+function _fjEnsureFonts(){
+  if (typeof document === 'undefined' || document.getElementById('fjFonts')) return;
+  try {
+    var l = document.createElement('link');
+    l.id = 'fjFonts'; l.rel = 'stylesheet';
+    l.href = 'https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&display=swap';
+    document.head.appendChild(l);
+  } catch (e){}
+}
+
+// Footprint silhouette (toes + ball + heel), oriented along the path and
+// mirrored left/right. Muted warm gold for traveled prints, pale faint cream
+// ahead. Illustrative only — not tied to any real progress.
+function _fjFoot(x,y,ang,flip,done){
+  var sole = done ? 'rgba(246,222,165,.42)' : 'rgba(228,224,210,.20)';
+  var toe  = done ? 'rgba(250,232,185,.52)' : 'rgba(232,228,214,.24)';
+  var glow = done ? 'filter:drop-shadow(0 0 4px rgba(245,198,112,.32));' : '';
+  return '<div style="position:absolute;left:'+x+'px;top:'+y+'px;width:14px;height:20px;'+glow+'transform:translate(-50%,-50%) rotate('+ang+'deg) scaleX('+flip+');">'
+    +'<div style="position:absolute;left:5px;top:0;width:2.6px;height:3px;border-radius:50%;background:'+toe+';"></div>'
+    +'<div style="position:absolute;left:7.6px;top:1.1px;width:2.3px;height:2.7px;border-radius:50%;background:'+toe+';"></div>'
+    +'<div style="position:absolute;left:9.7px;top:2.7px;width:2px;height:2.4px;border-radius:50%;background:'+toe+';"></div>'
+    +'<div style="position:absolute;left:3.5px;top:3.4px;width:9px;height:9.5px;border-radius:56% 44% 50% 50% / 64% 60% 40% 40%;background:'+sole+';"></div>'
+    +'<div style="position:absolute;left:4.6px;top:11.6px;width:6.2px;height:7.6px;border-radius:50% 50% 50% 50% / 44% 44% 60% 60%;background:'+sole+';"></div>'
+    +'</div>';
+}
+
+function _fjRenderScene(){
+  if (typeof document === 'undefined') return;
+  // Star field (44 deterministic stars).
+  try {
+    var starHost = document.getElementById('fjStars');
+    if (starHost){
+      var stars = '';
+      for (var i=0;i<44;i++){
+        var l = Math.round((i*97.13)%383)+4;
+        var t = Math.round((i*151.7)%1546)+8;
+        var bright = (i%6===0);
+        var s = bright?2.8:((i%3===0)?1.7:1.1);
+        var op = (0.35+((i*53)%50)/100).toFixed(2);
+        var dur = (2.6+((i*31)%42)/10).toFixed(1);
+        var d = (((i*17)%50)/10).toFixed(1);
+        var sh = bright?'0 0 10px 1px rgba(255,245,215,.95)':'0 0 6px rgba(255,238,200,.85)';
+        stars += '<div style="position:absolute;left:'+l+'px;top:'+t+'px;width:'+s+'px;height:'+s+'px;border-radius:50%;background:#fff;opacity:'+op+';box-shadow:'+sh+';animation:twinkle '+dur+'s ease-in-out infinite;animation-delay:'+d+'s;"></div>';
+      }
+      starHost.innerHTML = stars;
+    }
+  } catch (e){}
+  // Footprint trail along the path (illustrative — no real progress).
+  try {
+    var NS = 'http://www.w3.org/2000/svg';
+    var nodes = [{x:126,y:1476},{x:266,y:1322},{x:120,y:1168},{x:264,y:1012},{x:130,y:850},{x:268,y:688},{x:124,y:530},{x:196,y:392}];
+    var compIndex = 4;
+    var build = function(pts){ var dd='M'+pts[0].x+','+pts[0].y; for(var i=1;i<pts.length;i++){ var a=pts[i-1],b=pts[i]; var c1y=a.y+(b.y-a.y)*0.45; var c2y=a.y+(b.y-a.y)*0.55; dd+=' C'+a.x+','+c1y+' '+b.x+','+c2y+' '+b.x+','+b.y; } return dd; };
+    var svg = document.createElementNS(NS,'svg'); svg.style.cssText='position:absolute;left:-9999px;top:0;width:0;height:0;overflow:hidden;';
+    var pf = document.createElementNS(NS,'path'); pf.setAttribute('d',build(nodes));
+    var pc = document.createElementNS(NS,'path'); pc.setAttribute('d',build(nodes.slice(0,compIndex+1)));
+    svg.appendChild(pf); svg.appendChild(pc); document.body.appendChild(svg);
+    var total = pf.getTotalLength(), compLen = pc.getTotalLength();
+    var doneHTML='', futureHTML='', side=1;
+    for (var ss=20; ss<total-14; ss+=32){
+      var p = pf.getPointAtLength(ss);
+      var p2 = pf.getPointAtLength(Math.min(ss+1.2,total));
+      var dx=p2.x-p.x, dy=p2.y-p.y; var len=Math.hypot(dx,dy)||1; var off=7*side;
+      var x = +(p.x+(-dy/len)*off).toFixed(1);
+      var y = +(p.y+(dx/len)*off).toFixed(1);
+      var ang = +(Math.atan2(dy,dx)*180/Math.PI+90).toFixed(1);
+      if (ss<=compLen+6) doneHTML+=_fjFoot(x,y,ang,side,true); else futureHTML+=_fjFoot(x,y,ang,side,false);
+      side*=-1;
+    }
+    document.body.removeChild(svg);
+    var dH=document.getElementById('fjStepDone'), fH=document.getElementById('fjStepFuture');
+    if (dH) dH.innerHTML = doneHTML;
+    if (fH) fH.innerHTML = futureHTML;
+  } catch (e){}
+}
+
+function renderFaithJourneyHome(){
+  if (typeof document === 'undefined') return;
+  var host = document.getElementById('fzJourneyHome');
+  if (!host) return;
+  _fjEnsureFonts();
+  // Journey home is the visible view; hide the classic home + any open dest.
+  var classic = document.getElementById('fzHome');
+  var dest    = document.getElementById('fzDest');
+  if (classic) classic.style.display = 'none';
+  if (dest)    dest.style.display = 'none';
+  host.style.display = 'block';
+  _fzCurrentDest = null;
+
+  // Wire the daily doorways to the EXISTING fzOpenDest() (unmodified). Hide the
+  // journey home first so the destination view shows alone; the dest's own back
+  // button (fzGoHome) then returns to the classic #fzHome, unchanged. Idempotent
+  // — el.onclick overwrites on every render.
+  try {
+    var doors = host.querySelectorAll('[data-fjdest]');
+    for (var di=0; di<doors.length; di++){
+      (function(el){
+        var dst = el.getAttribute('data-fjdest');
+        el.onclick = function(){ host.style.display = 'none'; if (typeof fzOpenDest === 'function') fzOpenDest(dst); };
+      })(doors[di]);
+    }
+  } catch (e){}
+
+  // Greeting — live time-of-day + real first name (same _fzFirstName source as
+  // the classic faith greeting). New user still shows their real name.
+  var gEl = document.getElementById('fjGreeting');
+  if (gEl){
+    var h = new Date().getHours();
+    var part = h < 12 ? 'GOOD MORNING' : (h < 17 ? 'GOOD AFTERNOON' : 'GOOD EVENING');
+    var nm = (typeof _fzFirstName === 'function') ? _fzFirstName() : 'friend';
+    gEl.textContent = part + ', ' + String(nm == null ? 'friend' : nm).toUpperCase();
+  }
+  // Streak — live D.xpStreak.count (honest; new user = 0).
+  var sEl = document.getElementById('fjStreak');
+  if (sEl){
+    var st = (typeof D !== 'undefined' && D && D.xpStreak && typeof D.xpStreak.count === 'number') ? D.xpStreak.count : 0;
+    sEl.textContent = st;
+  }
+  // Points — live D.scrPoints faith/devotional points (honest; new user = 0).
+  var pEl = document.getElementById('fjPoints');
+  if (pEl){
+    var pts = (typeof D !== 'undefined' && D && typeof D.scrPoints === 'number') ? D.scrPoints : 0;
+    pEl.textContent = Number(pts).toLocaleString();
+  }
+  // Today's verse — from the app's real VERSES list (day-of-year pick).
+  try {
+    var vEl = document.getElementById('fjVerse'), rEl = document.getElementById('fjRef');
+    if (vEl && rEl && typeof VERSES !== 'undefined' && VERSES && VERSES.length){
+      var now = new Date(), start = new Date(now.getFullYear(), 0, 0);
+      var doy = Math.floor((now - start) / 86400000);
+      var v = VERSES[doy % VERSES.length];
+      if (v){ vEl.textContent = v.t; rEl.textContent = v.r; }
+    }
+  } catch (e){}
+  // Illustrative scene — stars + footprint trail (no real progress lit).
+  _fjRenderScene();
 }
 
 // ════════════════════════════════════════════════════════════
