@@ -146,29 +146,29 @@ body{margin:0;background:#05070f;}
           <div style="font:500 9px/1.4 Oswald;letter-spacing:.1em;color:#8a90a4;margin-top:9px;">AN OVERVIEW OF THE DISCIPLESHIP PATH · ILLUSTRATIVE</div>
         </div>
 
-        <div style="position:absolute;left:264px;top:1012px;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#ffe39a,#f3a82a 66%,#c5811a);box-shadow:0 0 0 4px rgba(245,180,49,.12),0 0 20px rgba(245,180,49,.42);display:flex;align-items:center;justify-content:center;">
-          <span style="color:#3a2407;font:700 22px/1 Oswald;">✓</span>
+        <div style="position:absolute;left:264px;top:1012px;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;background:transparent;border:1.5px solid rgba(240,200,130,.45);box-shadow:0 0 10px rgba(245,180,49,.08);display:flex;align-items:center;justify-content:center;">
+          <span style="color:rgba(245,205,140,.82);font:600 14px/1 Oswald;">✓</span>
         </div>
         <div style="position:absolute;right:163px;top:1012px;transform:translateY(-50%);width:178px;text-align:right;">
           <div style="font:600 17px/1 Oswald;letter-spacing:.02em;color:#e7dcc4;">ROOTED IN THE WORD</div>
           <div style="font:italic 400 12px/1.3 Newsreader;color:#8b93ab;margin-top:3px;">“Rooted and built up in Him.” — Col 2:7</div>        </div>
 
-        <div style="position:absolute;left:120px;top:1168px;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#ffe39a,#f3a82a 66%,#c5811a);box-shadow:0 0 0 4px rgba(245,180,49,.12),0 0 20px rgba(245,180,49,.42);display:flex;align-items:center;justify-content:center;">
-          <span style="color:#3a2407;font:700 22px/1 Oswald;">✓</span>
+        <div style="position:absolute;left:120px;top:1168px;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;background:transparent;border:1.5px solid rgba(240,200,130,.45);box-shadow:0 0 10px rgba(245,180,49,.08);display:flex;align-items:center;justify-content:center;">
+          <span style="color:rgba(245,205,140,.82);font:600 14px/1 Oswald;">✓</span>
         </div>
         <div style="position:absolute;left:164px;top:1168px;transform:translateY(-50%);width:178px;">
           <div style="font:600 17px/1 Oswald;letter-spacing:.02em;color:#e7dcc4;">BAPTISM</div>
           <div style="font:italic 400 12px/1.3 Newsreader;color:#8b93ab;margin-top:3px;">“Raised to walk in new life.” — Rom 6:4</div>        </div>
 
-        <div style="position:absolute;left:266px;top:1322px;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#ffe39a,#f3a82a 66%,#c5811a);box-shadow:0 0 0 4px rgba(245,180,49,.12),0 0 20px rgba(245,180,49,.42);display:flex;align-items:center;justify-content:center;">
-          <span style="color:#3a2407;font:700 22px/1 Oswald;">✓</span>
+        <div style="position:absolute;left:266px;top:1322px;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;background:transparent;border:1.5px solid rgba(240,200,130,.45);box-shadow:0 0 10px rgba(245,180,49,.08);display:flex;align-items:center;justify-content:center;">
+          <span style="color:rgba(245,205,140,.82);font:600 14px/1 Oswald;">✓</span>
         </div>
         <div style="position:absolute;right:163px;top:1322px;transform:translateY(-50%);width:178px;text-align:right;">
           <div style="font:600 17px/1 Oswald;letter-spacing:.02em;color:#e7dcc4;">ACCEPTED CHRIST</div>
           <div style="font:italic 400 12px/1.3 Newsreader;color:#8b93ab;margin-top:3px;">“A new creation.” — 2 Corinthians 5:17</div>        </div>
 
-        <div style="position:absolute;left:126px;top:1476px;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#ffe39a,#f3a82a 66%,#c5811a);box-shadow:0 0 0 4px rgba(245,180,49,.12),0 0 20px rgba(245,180,49,.42);display:flex;align-items:center;justify-content:center;">
-          <span style="color:#3a2407;font:700 22px/1 Oswald;">✓</span>
+        <div style="position:absolute;left:126px;top:1476px;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;background:transparent;border:1.5px solid rgba(240,200,130,.45);box-shadow:0 0 10px rgba(245,180,49,.08);display:flex;align-items:center;justify-content:center;">
+          <span style="color:rgba(245,205,140,.82);font:600 14px/1 Oswald;">✓</span>
         </div>
         <div style="position:absolute;left:170px;top:1476px;transform:translateY(-50%);width:178px;">
           <div style="font:600 17px/1 Oswald;letter-spacing:.02em;color:#e7dcc4;">CURIOUS</div>
@@ -296,23 +296,13 @@ body{margin:0;background:#05070f;}
   document.getElementById('fjStars').innerHTML = stars;
 
   // ---- footprint trail along the path (sampled with SVG getPointAtLength) ----
-  function footFuture(x,y,ang,flip){
-    return '<div style="position:absolute;left:'+x+'px;top:'+y+'px;width:14px;height:20px;transform:translate(-50%,-50%) rotate('+ang+'deg) scaleX('+flip+');">'
-      +'<div style="position:absolute;left:5.5px;top:0;width:2.4px;height:2.6px;border-radius:50%;background:rgba(168,186,222,.34);"></div>'
-      +'<div style="position:absolute;left:7.8px;top:1.1px;width:2px;height:2.2px;border-radius:50%;background:rgba(168,186,222,.3);"></div>'
-      +'<div style="position:absolute;left:9.6px;top:2.6px;width:1.7px;height:1.9px;border-radius:50%;background:rgba(168,186,222,.27);"></div>'
-      +'<div style="position:absolute;left:4px;top:3px;width:8.5px;height:9px;border-radius:54% 46% 50% 50% / 62% 60% 40% 40%;background:rgba(150,170,212,.07);border:1.3px solid rgba(165,184,220,.32);"></div>'
-      +'<div style="position:absolute;left:5px;top:11px;width:6px;height:7.5px;border-radius:50% 50% 50% 50% / 44% 44% 60% 60%;background:rgba(150,170,212,.07);border:1.3px solid rgba(165,184,220,.32);"></div>'
-      +'</div>';
+  // A gentle dotted trail ON the path (not literal footprints): small warm muted
+  // dots on the traveled portion fading to faint cool dots ahead.
+  function dotFuture(x,y){
+    return '<div style="position:absolute;left:'+x+'px;top:'+y+'px;width:3px;height:3px;border-radius:50%;transform:translate(-50%,-50%);background:rgba(176,192,224,.26);"></div>';
   }
-  function footDone(x,y,ang,flip){
-    return '<div style="position:absolute;left:'+x+'px;top:'+y+'px;width:14px;height:20px;filter:drop-shadow(0 0 5px rgba(245,180,49,.55));transform:translate(-50%,-50%) rotate('+ang+'deg) scaleX('+flip+');">'
-      +'<div style="position:absolute;left:5.5px;top:0;width:2.6px;height:2.8px;border-radius:50%;background:#ffd062;"></div>'
-      +'<div style="position:absolute;left:7.9px;top:1.1px;width:2.2px;height:2.4px;border-radius:50%;background:#fbc551;"></div>'
-      +'<div style="position:absolute;left:9.8px;top:2.6px;width:1.8px;height:2px;border-radius:50%;background:#f5b942;"></div>'
-      +'<div style="position:absolute;left:4px;top:3px;width:8.5px;height:9px;border-radius:54% 46% 50% 50% / 62% 60% 40% 40%;background:linear-gradient(165deg,#ffe9ab,#f3a92c);"></div>'
-      +'<div style="position:absolute;left:5px;top:11px;width:6px;height:7.5px;border-radius:50% 50% 50% 50% / 44% 44% 60% 60%;background:linear-gradient(180deg,#f4b13a,#dd8f22);"></div>'
-      +'</div>';
+  function dotDone(x,y){
+    return '<div style="position:absolute;left:'+x+'px;top:'+y+'px;width:3.5px;height:3.5px;border-radius:50%;transform:translate(-50%,-50%);background:rgba(243,200,130,.5);box-shadow:0 0 5px rgba(245,185,80,.35);"></div>';
   }
   try {
     var NS='http://www.w3.org/2000/svg';
@@ -324,16 +314,11 @@ body{margin:0;background:#05070f;}
     var pc=document.createElementNS(NS,'path'); pc.setAttribute('d',build(nodes.slice(0,compIndex+1)));
     svg.appendChild(pf); svg.appendChild(pc); document.body.appendChild(svg);
     var total=pf.getTotalLength(), compLen=pc.getTotalLength();
-    var doneHTML='', futureHTML='', side=1;
-    for(var ss=20; ss<total-14; ss+=32){
+    var doneHTML='', futureHTML='';
+    for(var ss=16; ss<total-10; ss+=15){
       var p=pf.getPointAtLength(ss);
-      var p2=pf.getPointAtLength(Math.min(ss+1.2,total));
-      var dx=p2.x-p.x, dy=p2.y-p.y; var len=Math.hypot(dx,dy)||1; var off=7*side;
-      var x=+(p.x+(-dy/len)*off).toFixed(1);
-      var y=+(p.y+(dx/len)*off).toFixed(1);
-      var ang=+(Math.atan2(dy,dx)*180/Math.PI+90).toFixed(1);
-      if(ss<=compLen+6) doneHTML+=footDone(x,y,ang,side); else futureHTML+=footFuture(x,y,ang,side);
-      side*=-1;
+      var x=+p.x.toFixed(1), y=+p.y.toFixed(1);
+      if(ss<=compLen+6) doneHTML+=dotDone(x,y); else futureHTML+=dotFuture(x,y);
     }
     document.body.removeChild(svg);
     document.getElementById('fjStepDone').innerHTML = doneHTML;
