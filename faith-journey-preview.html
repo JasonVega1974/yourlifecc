@@ -11,6 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<!-- Supabase JS (read-only). Established standalone-page pattern; CSP already allows jsdelivr + supabase.co. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;}
 body{margin:0;background:#05070f;}
@@ -82,7 +84,7 @@ body{margin:0;background:#05070f;}
         </div>
 
         <div style="position:absolute;left:0;right:0;top:104px;text-align:center;">
-          <div id="fjGreeting" style="font:600 13px/1 Oswald;letter-spacing:.16em;color:#ece0c8;">GOOD MORNING, JASON</div>
+          <div id="fjGreeting" style="font:600 13px/1 Oswald;letter-spacing:.16em;color:#ece0c8;">WELCOME</div>
         </div>
         <div style="position:absolute;left:50%;top:150px;transform:translateX(-50%);width:322px;padding:14px 18px;text-align:center;">
           <div style="font:600 9.5px/1 Oswald;letter-spacing:.22em;color:#f5b431;">TODAY'S VERSE</div>
@@ -115,18 +117,14 @@ body{margin:0;background:#05070f;}
         </div>
         <div style="position:absolute;left:164px;top:530px;transform:translateY(-50%);width:178px;opacity:.55;">
           <div style="font:600 16px/1 Oswald;letter-spacing:.02em;color:#9aa3bb;">MAKING DISCIPLES</div>
-          <div style="font:italic 400 12px/1.3 Newsreader;color:#737b94;margin-top:3px;">“Go and make disciples.” — Matt 28:19</div>
-          <div style="font:600 9px/1 Oswald;letter-spacing:.14em;color:#6f7790;margin-top:6px;">STILL AHEAD</div>
-        </div>
+          <div style="font:italic 400 12px/1.3 Newsreader;color:#737b94;margin-top:3px;">“Go and make disciples.” — Matt 28:19</div>        </div>
 
         <div style="position:absolute;left:268px;top:688px;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#23304f,#141d34);border:1px solid rgba(245,180,49,.3);box-shadow:0 0 16px rgba(245,180,49,.14);display:flex;align-items:center;justify-content:center;opacity:.95;">
           <div style="width:10px;height:10px;border-radius:50%;background:rgba(245,200,120,.55);"></div>
         </div>
         <div style="position:absolute;right:165px;top:688px;transform:translateY(-50%);width:178px;text-align:right;opacity:.82;">
           <div style="font:600 16px/1 Oswald;letter-spacing:.02em;color:#c3c9d8;">SERVING OTHERS</div>
-          <div style="font:italic 400 12px/1.3 Newsreader;color:#8b93ab;margin-top:3px;">“Serve one another in love.” — Gal 5:13</div>
-          <div style="font:600 9px/1 Oswald;letter-spacing:.14em;color:#e0b562;margin-top:6px;">UP NEXT →</div>
-        </div>
+          <div style="font:italic 400 12px/1.3 Newsreader;color:#8b93ab;margin-top:3px;">“Serve one another in love.” — Gal 5:13</div>        </div>
 
         <div style="position:absolute;left:130px;top:850px;width:0;height:0;">
           <div style="position:absolute;left:0;top:0;width:84px;height:84px;border-radius:50%;border:2px solid rgba(245,180,49,.55);transform:translate(-50%,-50%);animation:beacon 3.6s ease-out infinite;"></div>
@@ -142,15 +140,10 @@ body{margin:0;background:#05070f;}
           </div>
         </div>
         <div style="position:absolute;left:178px;top:806px;width:178px;text-align:left;">
-          <div style="font:600 11px/1 Oswald;letter-spacing:.22em;color:#f5b431;margin-bottom:6px;">YOU'RE HERE</div>
+          <div style="font:600 11px/1 Oswald;letter-spacing:.22em;color:#f5b431;margin-bottom:6px;">THE JOURNEY</div>
           <div id="fjCurrentLabel" style="font:700 24px/1 Oswald;letter-spacing:.01em;color:#f7efdb;">DISCIPLESHIP</div>
           <div style="font:italic 400 12.5px/1.35 Newsreader;color:#aab2c9;margin-top:5px;">“If you abide in my word, you<br>are truly my disciples.” — John 8:31</div>
-          <div style="display:flex;align-items:center;gap:8px;margin-top:9px;">
-            <div style="flex:0 0 96px;height:5px;border-radius:3px;background:rgba(255,255,255,.13);overflow:hidden;">
-              <div style="width:50%;height:100%;background:linear-gradient(90deg,#f5b431,#ffd873);border-radius:3px;box-shadow:0 0 8px rgba(245,180,49,.6);"></div>
-            </div>
-            <span style="font:600 9px/1 Oswald;letter-spacing:.1em;color:#cbb48a;">2 / 4 STEPS</span>
-          </div>
+          <div style="font:500 9px/1.4 Oswald;letter-spacing:.1em;color:#8a90a4;margin-top:9px;">AN OVERVIEW OF THE DISCIPLESHIP PATH · ILLUSTRATIVE</div>
         </div>
 
         <div style="position:absolute;left:264px;top:1012px;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#ffe39a,#f3a82a 66%,#c5811a);box-shadow:0 0 0 4px rgba(245,180,49,.12),0 0 20px rgba(245,180,49,.42);display:flex;align-items:center;justify-content:center;">
@@ -158,36 +151,28 @@ body{margin:0;background:#05070f;}
         </div>
         <div style="position:absolute;right:163px;top:1012px;transform:translateY(-50%);width:178px;text-align:right;">
           <div style="font:600 17px/1 Oswald;letter-spacing:.02em;color:#e7dcc4;">ROOTED IN THE WORD</div>
-          <div style="font:italic 400 12px/1.3 Newsreader;color:#8b93ab;margin-top:3px;">“Rooted and built up in Him.” — Col 2:7</div>
-          <div style="font:600 9px/1 Oswald;letter-spacing:.14em;color:#dcb05e;margin-top:6px;">✓ COMPLETE</div>
-        </div>
+          <div style="font:italic 400 12px/1.3 Newsreader;color:#8b93ab;margin-top:3px;">“Rooted and built up in Him.” — Col 2:7</div>        </div>
 
         <div style="position:absolute;left:120px;top:1168px;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#ffe39a,#f3a82a 66%,#c5811a);box-shadow:0 0 0 4px rgba(245,180,49,.12),0 0 20px rgba(245,180,49,.42);display:flex;align-items:center;justify-content:center;">
           <span style="color:#3a2407;font:700 22px/1 Oswald;">✓</span>
         </div>
         <div style="position:absolute;left:164px;top:1168px;transform:translateY(-50%);width:178px;">
           <div style="font:600 17px/1 Oswald;letter-spacing:.02em;color:#e7dcc4;">BAPTISM</div>
-          <div style="font:italic 400 12px/1.3 Newsreader;color:#8b93ab;margin-top:3px;">“Raised to walk in new life.” — Rom 6:4</div>
-          <div style="font:600 9px/1 Oswald;letter-spacing:.14em;color:#dcb05e;margin-top:6px;">✓ COMPLETE</div>
-        </div>
+          <div style="font:italic 400 12px/1.3 Newsreader;color:#8b93ab;margin-top:3px;">“Raised to walk in new life.” — Rom 6:4</div>        </div>
 
         <div style="position:absolute;left:266px;top:1322px;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#ffe39a,#f3a82a 66%,#c5811a);box-shadow:0 0 0 4px rgba(245,180,49,.12),0 0 20px rgba(245,180,49,.42);display:flex;align-items:center;justify-content:center;">
           <span style="color:#3a2407;font:700 22px/1 Oswald;">✓</span>
         </div>
         <div style="position:absolute;right:163px;top:1322px;transform:translateY(-50%);width:178px;text-align:right;">
           <div style="font:600 17px/1 Oswald;letter-spacing:.02em;color:#e7dcc4;">ACCEPTED CHRIST</div>
-          <div style="font:italic 400 12px/1.3 Newsreader;color:#8b93ab;margin-top:3px;">“A new creation.” — 2 Corinthians 5:17</div>
-          <div style="font:600 9px/1 Oswald;letter-spacing:.14em;color:#dcb05e;margin-top:6px;">✓ COMPLETE</div>
-        </div>
+          <div style="font:italic 400 12px/1.3 Newsreader;color:#8b93ab;margin-top:3px;">“A new creation.” — 2 Corinthians 5:17</div>        </div>
 
         <div style="position:absolute;left:126px;top:1476px;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#ffe39a,#f3a82a 66%,#c5811a);box-shadow:0 0 0 4px rgba(245,180,49,.12),0 0 20px rgba(245,180,49,.42);display:flex;align-items:center;justify-content:center;">
           <span style="color:#3a2407;font:700 22px/1 Oswald;">✓</span>
         </div>
         <div style="position:absolute;left:170px;top:1476px;transform:translateY(-50%);width:178px;">
           <div style="font:600 17px/1 Oswald;letter-spacing:.02em;color:#e7dcc4;">CURIOUS</div>
-          <div style="font:italic 400 12px/1.3 Newsreader;color:#8b93ab;margin-top:3px;">“Come and see.” — John 1:39</div>
-          <div style="font:600 9px/1 Oswald;letter-spacing:.14em;color:#dcb05e;margin-top:6px;">✓ COMPLETE</div>
-        </div>
+          <div style="font:italic 400 12px/1.3 Newsreader;color:#8b93ab;margin-top:3px;">“Come and see.” — John 1:39</div>        </div>
 
       </div>
 
@@ -268,23 +253,23 @@ body{margin:0;background:#05070f;}
       </div>
     </div>
 
-    <div style="position:absolute;top:56px;left:0;right:0;padding:0 18px;display:flex;align-items:center;justify-content:space-between;z-index:6;">
+    <div id="fjPills" style="position:absolute;top:56px;left:0;right:0;padding:0 18px;display:flex;align-items:center;justify-content:space-between;z-index:6;">
       <div style="display:flex;align-items:center;gap:7px;background:linear-gradient(180deg,rgba(255,142,42,.24),rgba(220,90,20,.18));border:1px solid rgba(255,150,60,.42);padding:7px 13px;border-radius:999px;box-shadow:0 2px 12px rgba(230,110,30,.28);">
         <span style="font-size:15px;line-height:1;">🔥</span>
-        <span style="font:600 13px/1 Oswald;color:#ffd9a8;letter-spacing:.04em;"><span style="color:#fff;">12</span> DAY STREAK</span>
+        <span style="font:600 13px/1 Oswald;color:#ffd9a8;letter-spacing:.04em;"><span style="color:#fff;" id="fjStreak">—</span> DAY STREAK</span>
       </div>
-      <div style="display:flex;align-items:center;gap:7px;background:rgba(245,180,49,.12);border:1px solid rgba(245,180,49,.32);padding:7px 13px;border-radius:999px;">
+      <div style="display:flex;align-items:center;gap:7px;background:rgba(245,180,49,.12);border:1px solid rgba(245,180,49,.32);padding:7px 13px;border-radius:999px;" aria-label="Faith points">
         <span style="color:#f5c34a;font-size:14px;line-height:1;">✦</span>
-        <span style="font:600 13px/1 Oswald;color:#f3e3c0;letter-spacing:.04em;">1,240</span>
+        <span style="font:600 13px/1 Oswald;color:#f3e3c0;letter-spacing:.04em;"><span id="fjPoints">—</span> PTS</span>
       </div>
     </div>
 
     <div style="position:absolute;bottom:0;left:0;right:0;padding:20px 20px 26px;background:linear-gradient(180deg,rgba(10,15,32,0) 0%,rgba(10,15,32,.82) 42%,#0a0f20 100%);z-index:6;">
-      <button type="button" class="fj-cont" onclick="return false;" style="width:100%;border:none;cursor:pointer;padding:17px;border-radius:18px;background:linear-gradient(180deg,#ffd35e,#f5a623);color:#3a2406;font:700 16px/1 Oswald;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;gap:10px;animation:btnglow 3.4s ease-in-out infinite;">
-        CONTINUE YOUR WALK
+      <button type="button" class="fj-cont" id="fjCta" onclick="window.location.href='/app/'" style="width:100%;border:none;cursor:pointer;padding:17px;border-radius:18px;background:linear-gradient(180deg,#ffd35e,#f5a623);color:#3a2406;font:700 16px/1 Oswald;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;gap:10px;animation:btnglow 3.4s ease-in-out infinite;">
+        <span id="fjCtaLabel">CONTINUE YOUR WALK</span>
         <span style="font-size:18px;line-height:1;">→</span>
       </button>
-      <div style="text-align:center;margin-top:11px;font:italic 400 12px/1.3 Newsreader;color:#8a91a8;">Next in Discipleship · a moment in the Word on walking with Him</div>
+      <div id="fjCtaSub" style="text-align:center;margin-top:11px;font:italic 400 12px/1.3 Newsreader;color:#8a91a8;">A moment in the Word on walking with Him</div>
     </div>
 
   </div>
@@ -295,8 +280,6 @@ body{margin:0;background:#05070f;}
 // to real data). Generates the star field + the footprint trail along the path,
 // and sets the time-based greeting + day-of-year verse.
 (function(){
-  var PROPS = { userName:'Jason', streakDays:12, growthPoints:1240, currentStepLabel:'Discipleship' };
-
   // ---- star field (44 deterministic stars) ----
   var stars = '';
   for(var i=0;i<44;i++){
@@ -357,13 +340,8 @@ body{margin:0;background:#05070f;}
     document.getElementById('fjStepFuture').innerHTML = futureHTML;
   } catch(e){}
 
-  // ---- greeting (time of day) ----
-  var now=new Date(); var h=now.getHours();
-  var part = h<12?'GOOD MORNING':(h<17?'GOOD AFTERNOON':'GOOD EVENING');
-  document.getElementById('fjGreeting').textContent = part+', '+PROPS.userName.toUpperCase();
-  document.getElementById('fjCurrentLabel').textContent = PROPS.currentStepLabel.toUpperCase();
-
-  // ---- daily verse (day of year) ----
+  // ---- daily verse (day of year) — generic, not personal ----
+  var now=new Date();
   var verses=[
     {t:'His mercies are new every morning.',r:'Lamentations 3:23'},
     {t:'This is the day the Lord has made.',r:'Psalm 118:24'},
@@ -378,6 +356,77 @@ body{margin:0;background:#05070f;}
   var dv=verses[doy%verses.length];
   document.getElementById('fjVerse').textContent = dv.t;
   document.getElementById('fjRef').textContent = dv.r;
+})();
+
+// ── Real user scalars (READ-ONLY) ──────────────────────────────────────────
+// Wires name greeting + day streak + faith points from the signed-in user's
+// profiles.data (the D JSONB blob). Signed-out, or ANY error, falls back to an
+// honest "Sign in to see your journey" state — never fabricated. A brand-new
+// signed-in user shows real early state (0 streak, 0 points, real name). The
+// 8-step ladder is left illustrative — no step is lit from real data.
+(function(){
+  var SUPA_URL = 'https://hrohgwcbfgywkpnvqxhk.supabase.co';
+  var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhyb2hnd2NiZmd5d2twbnZxeGhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MjcxNDYsImV4cCI6MjA4ODQwMzE0Nn0.PuWtBpiMw2DiCLp26ZP_Rd9BwzFvWT0sNZrDUNdULyo';
+
+  var greetEl  = document.getElementById('fjGreeting');
+  var streakEl = document.getElementById('fjStreak');
+  var pointsEl = document.getElementById('fjPoints');
+  var pillsEl  = document.getElementById('fjPills');
+  var ctaLabel = document.getElementById('fjCtaLabel');
+  var ctaSub   = document.getElementById('fjCtaSub');
+
+  function part(){ var h=new Date().getHours(); return h<12?'GOOD MORNING':(h<17?'GOOD AFTERNOON':'GOOD EVENING'); }
+  function first(s){ return String(s==null?'':s).trim().split(/\s+/)[0]; }
+
+  // Mirrors faith-zones.js _fzFirstName(): active child profile -> auth metadata
+  // (first_name / full_name) -> D.name -> email local-part -> 'friend'.
+  function firstName(user, blob){
+    try {
+      var profs = blob && blob._profiles, aid = blob && blob._activeProfileId;
+      if(Array.isArray(profs) && aid){
+        var ap=null; for(var i=0;i<profs.length;i++){ if(profs[i] && profs[i].id===aid){ ap=profs[i]; break; } }
+        var pdata = (blob._profileData && blob._profileData[aid]) || (ap && ap.data) || null;
+        var pname = (ap && ap.name) || (pdata && pdata.name) || null;
+        if(ap && ap.isParent===false && pname) return first(pname);
+      }
+    } catch(e){}
+    var md = (user && user.user_metadata) || {};
+    if(md.first_name) return first(md.first_name);
+    if(md.full_name)  return first(md.full_name);
+    if(blob && blob.name) return first(blob.name);
+    if(user && user.email) return String(user.email).split('@')[0];
+    return 'friend';
+  }
+
+  function signedOut(){
+    if(greetEl)  greetEl.textContent = 'SIGN IN TO SEE YOUR JOURNEY';
+    if(pillsEl)  pillsEl.style.display = 'none';
+    if(ctaLabel) ctaLabel.textContent = 'SIGN IN';
+    if(ctaSub)   ctaSub.textContent = 'Sign in to track your real journey.';
+  }
+
+  function signedIn(user, blob){
+    var name = firstName(user, blob);
+    if(greetEl) greetEl.textContent = part() + ', ' + String(name).toUpperCase();
+    var streak = (blob && blob.xpStreak && typeof blob.xpStreak.count === 'number') ? blob.xpStreak.count : 0;
+    var pts    = (blob && typeof blob.scrPoints === 'number') ? blob.scrPoints : 0;
+    if(streakEl) streakEl.textContent = streak;
+    if(pointsEl) pointsEl.textContent = Number(pts).toLocaleString();
+  }
+
+  (async function(){
+    try {
+      if(!window.supabase || !window.supabase.createClient){ signedOut(); return; }
+      var supa = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+      var sess = await supa.auth.getSession();
+      var session = (sess && sess.data) ? sess.data.session : null;
+      if(!session || !session.user){ signedOut(); return; }
+      var blob = {};
+      var resp = await supa.from('profiles').select('data').eq('user_id', session.user.id).single();
+      if(resp && resp.data && resp.data.data) blob = resp.data.data;  // null on no-row -> {} (new-user early state)
+      signedIn(session.user, blob);
+    } catch(e){ signedOut(); }
+  })();
 })();
 </script>
 </body>
