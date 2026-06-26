@@ -1071,10 +1071,14 @@ function renderFaithZones(){
 
   // Phase 3 — flag-gated Faith Journey home (account-based D.faithJourneyHome,
   // default OFF). Flag-OFF: _fjHomeOn() is false and the existing path below runs
-  // UNCHANGED (byte-identical). Flag-ON: render the journey home and return. The
-  // try/catch falls through to the classic home if the journey render throws.
+  // UNCHANGED (byte-identical). Flag-ON: hide the classic home UP FRONT and
+  // ALWAYS return, so a partial/throwing journey render can never fall through
+  // and re-show #fzHome stacked under the journey scene.
   if (_fjHomeOn()){
-    try { renderFaithJourneyHome(); return; } catch (e) {}
+    var _ch = document.getElementById('fzHome');
+    if (_ch) _ch.style.display = 'none';
+    try { renderFaithJourneyHome(); } catch (e) {}
+    return;
   }
 
   // 2026-05-30 — Smart Welcome gate. If the user is returning after
@@ -1261,16 +1265,36 @@ function renderFaithJourneyHome(){
   host.style.display = 'block';
   _fzCurrentDest = null;
 
+  // Returning to the journey home — drop any leftover Explore "back" button.
+  try { var _eb = document.getElementById('fjExploreBack'); if (_eb) _eb.remove(); } catch (e){}
   // Wire the daily doorways to the EXISTING fzOpenDest() (unmodified). Hide the
-  // journey home first so the destination view shows alone; the dest's own back
-  // button (fzGoHome) then returns to the classic #fzHome, unchanged. Idempotent
-  // — el.onclick overwrites on every render.
+  // journey home first so the destination shows alone; the dest's back button
+  // (fzGoHome, flag-on) returns here. EXPLORE is special — its legacy Zone 3
+  // surface lives inside #fzHome, so we show #fzHome + a "back to journey" button
+  // (no gate; Bug 1 fixed). Idempotent — el.onclick overwrites on every render.
   try {
     var doors = host.querySelectorAll('[data-fjdest]');
     for (var di=0; di<doors.length; di++){
       (function(el){
         var dst = el.getAttribute('data-fjdest');
-        el.onclick = function(){ host.style.display = 'none'; if (typeof fzOpenDest === 'function') fzOpenDest(dst); };
+        el.onclick = function(){
+          host.style.display = 'none';
+          if (dst === 'explore'){
+            var ch = document.getElementById('fzHome');
+            if (ch){
+              ch.style.display = '';
+              if (!document.getElementById('fjExploreBack')){
+                var b = document.createElement('button');
+                b.id = 'fjExploreBack'; b.type = 'button';
+                b.textContent = '← Back to your journey';
+                b.style.cssText = 'display:block;width:100%;margin:0 0 .75rem;padding:.7rem 1rem;border:1px solid rgba(245,180,49,.4);border-radius:12px;background:rgba(245,180,49,.1);color:#f5b431;font:600 .8rem/1 Oswald,sans-serif;letter-spacing:.04em;cursor:pointer;';
+                b.onclick = function(){ var x = document.getElementById('fjExploreBack'); if (x) x.remove(); if (typeof renderFaithJourneyHome === 'function') renderFaithJourneyHome(); };
+                ch.insertBefore(b, ch.firstChild);
+              }
+            }
+          }
+          if (typeof fzOpenDest === 'function') fzOpenDest(dst);
+        };
       })(doors[di]);
     }
   } catch (e){}

@@ -7985,6 +7985,10 @@
         /* Faith-only experience is BYTE-IDENTICAL to today: never
            reveal the gate for these users. */
         if(window._faithFree){ g.hidden = true; return; }
+        // Journey home active (account flag D.faithJourneyHome) — suppress the
+        // gate so faith-tab entry + doorway nav never trigger "Enter the Well".
+        // Flag-off (no D.faithJourneyHome): skipped -> gate behaves as today.
+        if(window.D && window.D.faithJourneyHome){ g.hidden = true; return; }
         if(window._wellGateSeenThisLoad){ g.hidden = true; return; }
         g.hidden = false;
         _startAnim();
