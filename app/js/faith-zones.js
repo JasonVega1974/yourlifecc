@@ -1244,6 +1244,22 @@ function _fjRenderScene(){
   } catch (e){}
 }
 
+// Responsive fit — the scene is authored on a fixed 393px grid (cross, nodes,
+// footprints all use 393-space coordinates). Rather than rework every absolute
+// coordinate, scale the whole scene uniformly to fill its wrapper width, so
+// EVERYTHING stays perfectly aligned at any width: scales UP to fill desktop
+// (capped by .fj-wrap max-width) and DOWN to fit phones < 393px (no clipping).
+function _fjFitScene(){
+  if (typeof document === 'undefined') return;
+  var wrap  = document.getElementById('fjSceneWrap');
+  var scene = document.getElementById('fjScene');
+  if (!wrap || !scene) return;
+  var w = wrap.clientWidth || 393;
+  var s = w / 393;
+  scene.style.transform = 'scale(' + s + ')';
+  wrap.style.height = (1576 * s) + 'px';
+}
+
 function renderFaithJourneyHome(){
   if (typeof document === 'undefined') return;
   var host = document.getElementById('fzJourneyHome');
@@ -1304,6 +1320,13 @@ function renderFaithJourneyHome(){
   } catch (e){}
   // Illustrative scene — stars + footprint trail (no real progress lit).
   _fjRenderScene();
+  // Responsive fit — scale the fixed 393px scene to fill the content width.
+  _fjFitScene();
+  if (typeof requestAnimationFrame === 'function') requestAnimationFrame(_fjFitScene);
+  if (typeof window !== 'undefined' && !window.__fjResizeHooked){
+    window.__fjResizeHooked = true;
+    try { window.addEventListener('resize', function(){ var hh = document.getElementById('fzJourneyHome'); if (hh && hh.style.display !== 'none') _fjFitScene(); }); } catch (e){}
+  }
 }
 
 // ════════════════════════════════════════════════════════════
