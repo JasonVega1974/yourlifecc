@@ -1166,12 +1166,21 @@ function renderFzGreeting(){
 // LIVE in-app data. Only renders when the per-user flag is ON.
 // ════════════════════════════════════════════════════════════
 function _fjHomeOn(){
-  // ACCOUNT-based opt-in: reads D.faithJourneyHome, which lives in the synced
-  // profiles.data blob (restored by cloudLoad on every device), so enabling it
-  // once shows it on all the user's devices. Default false -> classic faith
-  // home, byte-identical. Set D.faithJourneyHome = true (then save()) to enable.
-  try { return !!(typeof D !== 'undefined' && D && D.faithJourneyHome); }
-  catch (e){ return false; }
+  // ROLLOUT BOUNDARY (single source of truth — gate guard, renderFaithZones,
+  // fzGoHome, and the floating Back all key off this):
+  //   1) Explicit per-account opt-in: D.faithJourneyHome === true  -> ON for ANY
+  //      account (e.g. full-app test / early-adopter accounts). Synced via
+  //      profiles.data so it follows the user across devices.
+  //   2) Faith-free accounts (window._faithFree) -> ON by default (the rollout).
+  //   3) Everyone else — full-app / family, not opted in -> OFF -> classic Well,
+  //      BYTE-IDENTICAL to today.
+  // window._faithFree is set in auth.js (line 387) from profiles.plan_status ===
+  // 'faith_free', so it is the canonical faith-free vs full-app distinction.
+  try {
+    if (typeof D !== 'undefined' && D && D.faithJourneyHome === true) return true;
+    if (typeof window !== 'undefined' && window._faithFree === true) return true;
+    return false;
+  } catch (e){ return false; }
 }
 
 function _fjEnsureFonts(){
