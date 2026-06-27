@@ -1650,7 +1650,13 @@ function _updateMobileHomeBack(){
     isParent = _hasKids && !_isSolo && !_isFF && _activeKind !== 'kid';
   } catch(_e){}
 
-  btn.style.display = ((standalone || narrow) && !isHome && !isParent) ? 'inline-flex' : 'none';
+  // Faith Journey home active on the faith tab — the faith section has its own
+  // "Home" control (fz-back-btn -> fzGoHome -> journey home), so suppress the
+  // global floating "Back" here. Otherwise it shows a second, conflicting control
+  // whose hard-coded showSection('s-hero') leaves the journey for the app/faith
+  // landing. Flag-off: _fjHomeOn() is false -> term drops out -> byte-identical.
+  var _fjFaith = (_activeSection === 's-scripture') && (typeof _fjHomeOn === 'function') && _fjHomeOn();
+  btn.style.display = ((standalone || narrow) && !isHome && !isParent && !_fjFaith) ? 'inline-flex' : 'none';
 }
 
 // ════════════════════════════════════════════════════════════
