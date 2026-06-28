@@ -266,7 +266,8 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
       <div class="kpi-card" style="--accent-color:var(--blue)"><div class="kpi-label">Total Signups</div><div class="kpi-value" id="kTotalSignups">—</div><div class="kpi-sub" id="kTotalSignupsSub">All time accounts</div></div>
       <div class="kpi-card" style="--accent-color:var(--green)"><div class="kpi-label">Paying Users</div><div class="kpi-value" id="kPayingUsers">—</div><div class="kpi-sub" id="kPayingSub">—</div></div>
       <div class="kpi-card" style="--accent-color:var(--amber)"><div class="kpi-label">MRR Estimate</div><div class="kpi-value" id="kMRR">—</div><div class="kpi-sub" id="kMRRSub">—</div></div>
-      <div class="kpi-card" style="--accent-color:var(--purple)"><div class="kpi-label">Active (7 days)</div><div class="kpi-value" id="kActive7">—</div><div class="kpi-sub">synced in last 7 days</div></div>
+      <div class="kpi-card" style="--accent-color:var(--purple)"><div class="kpi-label">Opened App (7d)</div><div class="kpi-value" id="kOpened7">—</div><div class="kpi-sub">app opened/synced · excl. admin/test</div></div>
+      <div class="kpi-card" style="--accent-color:var(--green)"><div class="kpi-label">Engaged (7d)</div><div class="kpi-value" id="kEngaged7">—</div><div class="kpi-sub" id="kEngaged7Sub">real section activity · excl. admin/test</div></div>
       <div class="kpi-card" style="--accent-color:var(--red)"><div class="kpi-label">At-Risk</div><div class="kpi-value" id="kAtRisk">—</div><div class="kpi-sub">14+ days, never synced</div></div>
     </div>
     <div class="section-grid">
@@ -785,8 +786,10 @@ function engagementScore(sessions){
 function classifyEngagement(user){
   var visited = Array.isArray(user.sections_visited) ? user.sections_visited.length : 0;
   var visits  = user.section_visit_count || 0;
-  // Fall back to legacy sessions_30d if last_active is missing.
-  var lastActiveSrc = user.last_active || user.updated_at || null;
+  // Fix 2 — engagement tiers key off last_active ONLY (real navigation), so the
+  // table agrees with the "Engaged (7d)" KPI. updated_at (app-open) is NOT a
+  // fallback here — a bounce-only open should not inflate the tier.
+  var lastActiveSrc = user.last_active || null;
   var lastActiveMs  = lastActiveSrc ? new Date(lastActiveSrc).getTime() : 0;
   var hoursSince    = lastActiveMs > 0 ? (Date.now() - lastActiveMs) / 3600000 : 9999;
   var isToday       = hoursSince < 24;
@@ -886,7 +889,7 @@ function _getVal(u, col){
   if(col==='sessions_30d') return u.sessions_30d||0;
   // New engagement columns (require docs/migrations/engagement-tracking.sql
   // + admin-data edge function update to be exposed).
-  if(col==='last_active')        return (u.last_active||u.updated_at) ? new Date(u.last_active||u.updated_at).getTime() : 0;
+  if(col==='last_active')        return u.last_active ? new Date(u.last_active).getTime() : 0;
   if(col==='sections_visited')   return Array.isArray(u.sections_visited) ? u.sections_visited.length : 0;
   if(col==='section_visit_count')return u.section_visit_count || 0;
   if(col==='total_sessions')     return u.total_sessions || 0;
@@ -918,7 +921,7 @@ function renderUsers(){
     : users.map(u=>{
         var visitedArr = Array.isArray(u.sections_visited) ? u.sections_visited : [];
         var visitedTip = visitedArr.length ? visitedArr.join(', ') : 'none yet';
-        var lastActiveSrc = u.last_active || u.updated_at;
+        var lastActiveSrc = u.last_active;
         return `<tr>
           <td class="email-cell">${u.email||'—'}${u.is_admin?' <span class="badge badge-synced">Admin</span>':''}</td>
           <td>${planBadge(u.plan,u.plan_status)}</td>
@@ -947,7 +950,11 @@ async function loadAll(){
 
     const paying=counted.filter(u=>['monthly','yearly','lifetime','active'].includes((u.plan||u.plan_status||'').toLowerCase()));
     const free=counted.filter(u=>{const p=(u.plan||u.plan_status||'').toLowerCase();return p==='free_contest'||p==='';});
-    const active7=counted.filter(u=>u.updated_at&&daysSince(u.updated_at)<=7);
+    // Fix 2 — two honest signals: "opened" (updated_at bumps on any app boot/sync)
+    // vs "engaged" (last_active only bumps on real section navigation).
+    const opened7=counted.filter(u=>u.updated_at&&daysSince(u.updated_at)<=7);
+    const engaged7=counted.filter(u=>u.last_active&&daysSince(u.last_active)<=7);
+    const noEngData=counted.filter(u=>!u.last_active).length; // null last_active = pre-tracking rows
     const atRisk=counted.filter(u=>daysSince(u.created_at)>=14&&(!u.updated_at||u.updated_at===u.created_at));
     const mrr=paying.reduce((s,u)=>s+estimateMRR(u.plan,u.plan_status),0);
 
@@ -957,7 +964,9 @@ async function loadAll(){
     document.getElementById('kPayingSub').textContent=`${free.length} free · ${paying.length} paid · excl. admin/test`;
     document.getElementById('kMRR').textContent='$'+mrr.toFixed(0);
     document.getElementById('kMRRSub').textContent=`~$${(mrr*12).toFixed(0)} ARR est. · excl. admin/test`;
-    document.getElementById('kActive7').textContent=active7.length;
+    document.getElementById('kOpened7').textContent=opened7.length;
+    document.getElementById('kEngaged7').textContent=engaged7.length;
+    const _engSub=document.getElementById('kEngaged7Sub'); if(_engSub) _engSub.textContent=`real section activity · ${noEngData} pre-tracking nulls · excl. admin/test`;
     document.getElementById('kAtRisk').textContent=atRisk.length;
 
     const recent=all.slice(0,50);
