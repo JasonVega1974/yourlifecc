@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Legacy Vault — Jason Vega</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#FAF6F0;--bg2:#F2EAD8;--bg3:#EDE3CC;--surface:#FFFFFF;
+  --border:#D6C9B0;--ink:#1a1410;--ink2:#4a3f30;--muted:#7a6a5a;
+  --warm:#8B5E3C;--gold:#C9A84C;--gold2:#a07830;--accent:#4A6741;
+  --danger:#8B3A3A;--tab-bg:#EDE3CC;--tab-act:#1a1410;
+  --tab-txt:#4a3f30;--tab-atxt:#FAF6F0;
+  --shadow:0 2px 16px rgba(26,20,16,0.08);
+  --shadow-lg:0 8px 40px rgba(26,20,16,0.14);
+  --radius:6px;--t:0.25s cubic-bezier(.4,0,.2,1);
+}
+[data-theme="dark"] {
+  --bg:#12100e;--bg2:#1c1814;--bg3:#26221c;--surface:#1c1814;
+  --border:#3a3228;--ink:#F2EAD8;--ink2:#c8b898;--muted:#8a7a6a;
+  --warm:#C9935C;--gold:#D4AA5C;--gold2:#b08838;--accent:#6A9461;
+  --danger:#c06060;--tab-act:#C9A84C;--tab-txt:#8a7a6a;--tab-atxt:#12100e;
+  --shadow:0 2px 16px rgba(0,0,0,0.3);--shadow-lg:0 8px 40px rgba(0,0,0,0.5);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;transition:background var(--t),color var(--t);min-height:100vh}
+
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:200;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:52px;gap:12px;box-shadow:var(--shadow);transition:background var(--t),border-color var(--t)}
+.topbar-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.topbar-cross{color:var(--gold);font-size:15px;letter-spacing:3px}
+.topbar-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:400;letter-spacing:3px;text-transform:uppercase;color:var(--ink)}
+.topbar-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+#google_translate_element{font-size:12px}
+.goog-te-banner-frame{display:none!important}
+body{top:0!important}
+.theme-toggle{background:var(--bg3);border:1px solid var(--border);border-radius:20px;width:52px;height:26px;cursor:pointer;position:relative;flex-shrink:0;transition:background var(--t),border-color var(--t)}
+.theme-toggle::before{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--gold);transition:transform var(--t),background var(--t)}
+[data-theme="dark"] .theme-toggle::before{transform:translateX(26px);background:var(--ink2)}
+.toggle-icons{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 5px;font-size:10px;pointer-events:none}
+.print-btn{background:var(--warm);color:#fff;border:none;padding:6px 14px;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:opacity .2s;flex-shrink:0}
+.print-btn:hover{opacity:.85}
+
+/* LAYOUT */
+.app{display:flex;min-height:calc(100vh - 52px)}
+
+/* SIDEBAR */
+.sidebar{width:210px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);padding:20px 0;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;transition:background var(--t),border-color var(--t)}
+.sb-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);padding:0 18px 8px;font-weight:600}
+.tab-btn{display:flex;align-items:center;gap:10px;width:100%;padding:10px 18px;background:none;border:none;border-left:3px solid transparent;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:400;color:var(--tab-txt);text-align:left;transition:all .18s}
+.tab-btn:hover{background:var(--bg3);color:var(--ink)}
+.tab-btn.active{background:var(--tab-act);color:var(--tab-atxt);border-left-color:var(--gold);font-weight:500}
+.t-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.t-num{margin-left:auto;font-size:9px;letter-spacing:1px;opacity:.4}
+.sb-div{height:1px;background:var(--border);margin:8px 18px}
+
+/* MAIN */
+.main{flex:1;padding:40px 44px 80px;max-width:900px;min-width:0}
+.tab-panel{display:none}
+.tab-panel.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* COVER */
+.cover-panel{background:var(--ink);border-radius:10px;padding:56px 44px;text-align:center;position:relative;overflow:hidden;margin-bottom:28px}
+.cover-panel::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(201,168,76,.15) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(139,94,60,.18) 0%,transparent 60%);pointer-events:none}
+.cv-cross{font-size:20px;color:var(--gold);letter-spacing:10px;margin-bottom:20px;position:relative;z-index:1}
+.cv-h1{font-family:'Cormorant Garamond',serif;font-size:clamp(34px,6vw,62px);font-weight:300;letter-spacing:7px;text-transform:uppercase;color:#FAF6F0;line-height:1.1;position:relative;z-index:1}
+.cv-sub{display:block;font-size:.37em;letter-spacing:13px;color:var(--gold);font-weight:400;margin-bottom:4px}
+.cv-rule{width:56px;height:1px;background:var(--gold);margin:22px auto;position:relative;z-index:1}
+.cv-owner{font-family:'Cormorant Garamond',serif;font-size:19px;font-style:italic;font-weight:300;color:rgba(250,246,240,.6);position:relative;z-index:1;letter-spacing:2px}
+.cv-verse{margin-top:28px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:rgba(250,246,240,.38);max-width:360px;margin-left:auto;margin-right:auto;line-height:1.9;position:relative;z-index:1}
+
+/* QUICK CARDS */
+.qc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px}
+.qc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 14px;cursor:pointer;transition:all .2s;text-align:center;box-shadow:var(--shadow)}
+.qc:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.qc-ico{font-size:26px;margin-bottom:7px}
+.qc-lbl{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.qc-desc{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.4}
+
+/* SECTION HEADERS */
+.sec-hdr{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.sec-ico{width:38px;height:38px;background:var(--ink);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:17px;border-radius:var(--radius);flex-shrink:0}
+[data-theme="dark"] .sec-ico{background:var(--bg3)}
+.sec-ttl{font-family:'Cormorant Garamond',serif;font-size:25px;font-weight:400;letter-spacing:2px;text-transform:uppercase;color:var(--ink)}
+.sec-num{margin-left:auto;font-size:10px;color:var(--muted);letter-spacing:3px}
+
+/* NOTE */
+.note{background:var(--bg2);border-left:3px solid var(--gold);padding:11px 15px;margin-bottom:18px;font-style:italic;color:var(--muted);font-size:12.5px;line-height:1.7;border-radius:0 var(--radius) var(--radius) 0}
+.note.danger{border-left-color:var(--danger);background:rgba(139,58,58,.06)}
+.note.faith{border-left-color:var(--accent);background:rgba(74,103,65,.06)}
+
+/* FIELDS */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--border)}
+.fg.c1{grid-template-columns:1fr}
+.field{padding:13px 15px 13px 0;border-bottom:1px solid var(--border)}
+.fg:not(.c1) .field:nth-child(even){padding-left:15px;padding-right:0;border-left:1px solid var(--border)}
+.flbl{font-size:9.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.fval{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--ink);border-bottom:1px dashed var(--border);min-height:27px;padding-bottom:3px;line-height:1.6}
+.fval.tall{min-height:52px}
+.fval.taller{min-height:88px}
+.fval.pre{color:var(--warm)}
+
+/* TABLES */
+.dt{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:6px}
+.dt th{text-align:left;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:600;padding:8px 10px;background:var(--bg2);border:1px solid var(--border)}
+.dt td{padding:10px;border:1px solid var(--border);vertical-align:top;color:var(--ink);background:var(--surface);transition:background var(--t)}
+.dt tr:hover td{background:var(--bg2)}
+.dt td.ac{color:var(--warm);font-weight:500}
+.dt td.pre{color:var(--warm)}
+
+/* SUB TITLE */
+.sub{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--warm);font-weight:600;margin:26px 0 11px}
+
+/* ICE CARD */
+.ice{background:var(--ink);border-radius:8px;padding:26px 30px;margin-bottom:22px;position:relative;overflow:hidden}
+[data-theme="dark"] .ice{background:#26221c;border:1px solid var(--border)}
+.ice::after{content:'ICE';position:absolute;right:-8px;top:-12px;font-family:'Cormorant Garamond',serif;font-size:96px;font-weight:600;color:rgba(255,255,255,.04);line-height:1;pointer-events:none}
+.ice h3{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:400;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:18px}
+.ice-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.ice-item label{display:block;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(250,246,240,.38);margin-bottom:3px}
+[data-theme="dark"] .ice-item label{color:var(--muted)}
+.iv{font-family:'Cormorant Garamond',serif;font-size:16px;color:#FAF6F0;border-bottom:1px dashed rgba(250,246,240,.18);min-height:26px;padding-bottom:3px}
+[data-theme="dark"] .iv{color:var(--ink)}
+
+/* FAITH */
+.faith-blk{background:linear-gradient(135deg,var(--bg2),rgba(74,103,65,.08));border:1px solid var(--border);border-radius:var(--radius);padding:26px 30px;position:relative;margin-bottom:22px}
+.faith-blk::before{content:'✝';position:absolute;right:22px;top:16px;font-size:54px;color:rgba(74,103,65,.1);pointer-events:none}
+.faith-blk h3{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:400;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px}
+
+/* WISH */
+.wish{padding:15px 0;border-bottom:1px solid var(--border)}
+.wish:last-child{border-bottom:none}
+.wlbl{font-size:9.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.wval{font-family:'Cormorant Garamond',serif;font-size:16px;min-height:46px;border-bottom:1px dashed var(--border);line-height:1.9;color:var(--ink)}
+
+/* TRAVEL CARD */
+.travel-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;margin-bottom:18px;display:flex;gap:18px;align-items:center}
+.travel-card .em{font-size:34px}
+.travel-card h4{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--warm);letter-spacing:1px}
+.travel-card p{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* DIVIDER */
+.divider{display:flex;align-items:center;gap:14px;margin:28px 0;color:var(--muted);font-size:10px;letter-spacing:3px;text-transform:uppercase}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* SIG */
+.sig{margin-top:36px;padding:26px 30px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg2);display:grid;grid-template-columns:1fr 1fr;gap:36px}
+.sig-line{border-top:1px solid var(--ink2);padding-top:7px;margin-top:44px;font-size:11px;letter-spacing:1px;color:var(--muted)}
+
+/* CLOSING */
+.closing{text-align:center;margin-top:44px;padding:26px;border-top:1px solid var(--border)}
+.closing p{font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;color:var(--muted);line-height:1.9}
+.closing span{display:block;font-size:10px;letter-spacing:3px;color:var(--border);margin-top:9px;font-style:normal}
+.confid{text-align:center;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);opacity:.4;margin:14px 0}
+
+/* MOBILE */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .main{padding:22px 14px 72px}
+  .qc-grid{grid-template-columns:1fr 1fr}
+  .fg{grid-template-columns:1fr}
+  .fg:not(.c1) .field:nth-child(even){padding-left:0;border-left:none}
+  .ice-grid{grid-template-columns:1fr}
+  .sig{grid-template-columns:1fr}
+  .mob-nav{display:flex!important}
+}
+.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);z-index:200;overflow-x:auto}
+.mob-nav .tab-btn{flex-direction:column;gap:2px;padding:7px 10px;font-size:9px;border-left:none;border-bottom:3px solid transparent;white-space:nowrap;min-width:60px;justify-content:center;text-align:center}
+.mob-nav .tab-btn.active{background:transparent;border-bottom-color:var(--gold);color:var(--gold)}
+.mob-nav .t-icon{font-size:17px;width:auto}
+.mob-nav .t-num{display:none}
+
+/* PRINT */
+@media print{
+  .topbar,.sidebar,.mob-nav{display:none!important}
+  .main{padding:0;max-width:100%}
+  .tab-panel{display:block!important}
+  .app{display:block}
+  .cover-panel{page-break-after:always}
+  body{background:#fff;color:#000}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-brand">
+    <span class="topbar-cross">† †</span>
+    <span class="topbar-title">Legacy Vault</span>
+  </div>
+  <div class="topbar-right">
+    <div id="google_translate_element"></div>
+    <div class="theme-toggle" onclick="toggleTheme()" title="Toggle dark / light">
+      <div class="toggle-icons"><span>☀️</span><span>🌙</span></div>
+    </div>
+    <button class="print-btn" onclick="window.print()">⎙ Print / PDF</button>
+  </div>
+</div>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sb-label">Navigation</div>
+    <button class="tab-btn active" onclick="go('home',this)"><span class="t-icon">🏠</span>Overview<span class="t-num">00</span></button>
+    <div class="sb-div"></div>
+    <button class="tab-btn" onclick="go('ice',this)"><span class="t-icon">🚨</span>Emergency<span class="t-num">01</span></button>
+    <button class="tab-btn" onclick="go('legal',this)"><span class="t-icon">📋</span>Legal Docs<span class="t-num">02</span></button>
+    <button class="tab-btn" onclick="go('finance',this)"><span class="t-icon">🏦</span>Finances<span class="t-num">03</span></button>
+    <button class="tab-btn" onclick="go('insurance',this)"><span class="t-icon">🛡️</span>Insurance<span class="t-num">04</span></button>
+    <button class="tab-btn" onclick="go('digital',this)"><span class="t-icon">🔐</span>Digital Access<span class="t-num">05</span></button>
+    <button class="tab-btn" onclick="go('property',this)"><span class="t-icon">🏡</span>Property<span class="t-num">06</span></button>
+    <div class="sb-div"></div>
+    <button class="tab-btn" onclick="go('faith',this)"><span class="t-icon">✝️</span>Faith & Wishes<span class="t-num">07</span></button>
+    <button class="tab-btn" onclick="go('letters',this)"><span class="t-icon">💌</span>Letters<span class="t-num">08</span></button>
+    <div class="sb-div"></div>
+    <button class="tab-btn" onclick="go('travel',this)"><span class="t-icon">✈️</span>Cozumel Trip<span class="t-num">09</span></button>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- 00 HOME -->
+    <div id="tab-home" class="tab-panel active">
+      <div class="cover-panel">
+        <div class="cv-cross">† † †</div>
+        <h1 class="cv-h1"><span class="cv-sub">Personal</span>Legacy Vault</h1>
+        <div class="cv-rule"></div>
+        <div class="cv-owner">Jason &amp; [Spouse] Vega · Nampa, Idaho</div>
+        <div class="cv-verse">"I know whom I have believed, and am convinced that he is able to guard what I have entrusted to him until that day." — 2 Timothy 1:12</div>
+      </div>
+      <div class="confid">— Confidential · Personal · April 2026 —</div>
+      <div class="sub">Quick Access</div>
+      <div class="qc-grid">
+        <div class="qc" onclick="go('ice')"><div class="qc-ico">🚨</div><div class="qc-lbl">Emergency</div><div class="qc-desc">Contacts, medical, who to call</div></div>
+        <div class="qc" onclick="go('travel')"><div class="qc-ico">✈️</div><div class="qc-lbl">Cozumel Trip</div><div class="qc-desc">April 4–11 · Share with son before leaving</div></div>
+        <div class="qc" onclick="go('finance')"><div class="qc-ico">🏦</div><div class="qc-lbl">Finances</div><div class="qc-desc">Bank, 401k, business accounts</div></div>
+        <div class="qc" onclick="go('legal')"><div class="qc-ico">📋</div><div class="qc-lbl">Legal Docs</div><div class="qc-desc">Will, trust, POA locations</div></div>
+        <div class="qc" onclick="go('digital')"><div class="qc-ico">🔐</div><div class="qc-lbl">Digital Access</div><div class="qc-desc">Passwords, accounts, subscriptions</div></div>
+        <div class="qc" onclick="go('faith')"><div class="qc-ico">✝️</div><div class="qc-lbl">Faith &amp; Wishes</div><div class="qc-desc">Final wishes, memorial, scripture</div></div>
+      </div>
+      <div class="divider">A Note for Whoever Opens This</div>
+      <div class="note faith">This document was prepared by Jason and [Spouse] Vega with love for their family. It is not a legal document — it is a roadmap. It tells you where to find everything and what we wanted. Please read the Emergency tab first, then work through the others at your own pace. We are at peace. We love you.</div>
+      <div class="closing">
+        <p>"For I am convinced that neither death nor life... will be able to separate us from the love of God that is in Christ Jesus our Lord."</p>
+        <span>Romans 8:38–39</span>
+      </div>
+    </div>
+
+    <!-- 01 EMERGENCY -->
+    <div id="tab-ice" class="tab-panel">
+      <div class="sec-hdr"><div class="sec-ico">🚨</div><div class="sec-ttl">In Case of Emergency</div><div class="sec-num">01</div></div>
+      <div class="note danger">Read this section first. Share with your son before every major trip.</div>
+      <div class="ice">
+        <h3>Primary Identity</h3>
+        <div class="ice-grid">
+          <div class="ice-item"><label>Full Legal Name — Person 1</label><div class="iv">Jason Allen Vega</div></div>
+          <div class="ice-item"><label>Full Legal Name — Person 2</label><div class="iv">&nbsp;</div></div>
+          <div class="ice-item"><label>Date of Birth — Person 1</label><div class="iv">&nbsp;</div></div>
+          <div class="ice-item"><label>Date of Birth — Person 2</label><div class="iv">&nbsp;</div></div>
+          <div class="ice-item"><label>Blood Type — Person 1</label><div class="iv">&nbsp;</div></div>
+          <div class="ice-item"><label>Blood Type — Person 2</label><div class="iv">&nbsp;</div></div>
+          <div class="ice-item"><label>Allergies / Medical Conditions</label><div class="iv">&nbsp;</div></div>
+          <div class="ice-item"><label>Current Medications</label><div class="iv">&nbsp;</div></div>
+        </div>
+      </div>
+      <div class="sub">Who to Call First</div>
+      <table class="dt"><thead><tr><th>Name</th><th>Relationship</th><th>Phone</th><th>Notes</th></tr></thead><tbody>
+        <tr><td class="pre">[Son's Name]</td><td>Son / Next of Kin</td><td>&nbsp;</td><td>Primary contact</td></tr>
+        <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+      </tbody></table>
+      <div class="sub">Key Professionals</div>
+      <div class="fg">
+        <div class="field"><div class="flbl">Attorney Name</div><div class="fval">&nbsp;</div></div>
+        <div class="field"><div class="flbl">Attorney Phone / Firm</div><div class="fval">&nbsp;</div></div>
+        <div class="field"><div class="flbl">Pastor</div><div class="fval pre">Celebration Church, Nampa, ID</div></div>
+        <div class="field"><div class="flbl">Pastor Phone</div><div class="fval">&nbsp;</div></div>
+        <div class="field"><div class="flbl">Doctor — Person 1</div><div class="fval">&nbsp;</div></div>
+        <div class="field"><div class="flbl">Doctor — Person 2</div><div class="fval">&nbsp;</div></div>
+      </div>
+    </div>
+
+    <!-- 02 LEGAL -->
+    <div id="tab-legal" class="tab-panel">
+      <div class="sec-hdr"><div class="sec-ico">📋</div><div class="sec-ttl">Legal Documents</div><div class="sec-num">02</div></div>
+      <div class="note">Note where each document is physically stored and whether a digital copy exists.</div>
+      <table class="dt"><thead><tr><th>Document</th><th>Exists?</th><th>Physical Location</th><th>Digital / Notes</th></tr></thead><tbody>
+        <tr><td class="ac">Last Will &amp; Testament</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td class="ac">Living Trust</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>Power of Attorney (Financial)</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>Medical Power of Attorney</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>Living Will / Advance Directive</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>Marriage Certificate</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>Birth Certificates</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>Social Security Cards</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>Passports</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>Property Deed — Lotus Springs, Nampa</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>Vehicle Title(s)</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+      </tbody></table>
+      <div class="sig">
+        <div><div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Prepared by</div><div class="sig-line">Jason Vega</div><div style="margin-top:8px;font-size:11px;color:var(--muted)">Date: April 2026</div></div>
+        <div><div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Co-Prepared by</div><div class="sig-line">&nbsp;</div><div style="margin-top:8px;font-size:11px;color:var(--muted)">Date: April 2026</div></div>
+      </div>
+    </div>
+
+    <!-- 03 FINANCES -->
+    <div id="tab-finance" class="tab-panel">
+      <div class="sec-hdr"><div class="sec-ico">🏦</div><div class="sec-ttl">Financial Accounts</div><div class="sec-num">03</div></div>
+      <div class="sub">Banking</div>
+      <table class="dt"><thead><tr><th>Institution</th><th>Account Type</th><th>Last 4</th><th>Online Login Location</th><th>Beneficiary</th></tr></thead><tbody>
+        <tr><td>&nbsp;</td><td>Checking</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>&nbsp;</td><td>Savings</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+      </tbody></table>
+      <div class="sub">Retirement &amp; Investments</div>
+      <table class="dt"><thead><tr><th>Institution / Plan</th><th>Type</th><th>Account #</th><th>HR / Contact</th><th>Beneficiary</th></tr></thead><tbody>
+        <tr><td class="pre">Roady's 401(k)</td><td>401(k)</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+      </tbody></table>
+      <div class="sub">Business Interests</div>
+      <table class="dt"><thead><tr><th>Business</th><th>Role / Ownership</th><th>EIN / LLC #</th><th>Next Steps if Gone</th></tr></thead><tbody>
+        <tr><td class="pre">Kingdom Creatives LLC</td><td>Founder / CEO</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td class="pre">YourLife CC (yourlifecc.com)</td><td>Founder / Solo Developer</td><td>&nbsp;</td><td>Vercel hosting, GitHub jasonvega1974</td></tr>
+      </tbody></table>
+      <div class="sub">Debts / Loans</div>
+      <table class="dt"><thead><tr><th>Lender</th><th>Type</th><th>Balance (approx)</th><th>Monthly Payment</th><th>Account #</th></tr></thead><tbody>
+        <tr><td>&nbsp;</td><td>Mortgage</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+      </tbody></table>
+    </div>
+
+    <!-- 04 INSURANCE -->
+    <div id="tab-insurance" class="tab-panel">
+      <div class="sec-hdr"><div class="sec-ico">🛡️</div><div class="sec-ttl">Insurance Policies</div><div class="sec-num">04</div></div>
+      <table class="dt"><thead><tr><th>Type</th><th>Provider</th><th>Policy #</th><th>Coverage</th><th>Agent / Phone</th><th>Beneficiary</th></tr></thead><tbody>
+        <tr><td class="ac">Life — Jason</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td class="ac">Life — Spouse</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>Health</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>Home / Property</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>Auto</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td class="pre">Travel — Cozumel Apr 2026</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+      </tbody></table>
+    </div>
+
+    <!-- 05 DIGITAL -->
+    <div id="tab-digital" class="tab-panel">
+      <div class="sec-hdr"><div class="sec-ico">🔐</div><div class="sec-ttl">Digital Access &amp; Passwords</div><div class="sec-num">05</div></div>
+      <div class="note danger">Do not store plain-text passwords on a printed document unless kept in a locked safe. Record where your password manager lives and how to access the master password.</div>
+      <div class="sub">Password Manager</div>
+      <div class="fg">
+        <div class="field"><div class="flbl">Password Manager App</div><div class="fval">&nbsp;</div></div>
+        <div class="field"><div class="flbl">Master Password / Where Stored</div><div class="fval">&nbsp;</div></div>
+      </div>
+      <div class="sub">Critical Accounts</div>
+      <table class="dt"><thead><tr><th>Account / Service</th><th>Username / Email</th><th>Where to Find Password</th><th>What to Do</th></tr></thead><tbody>
+        <tr><td class="ac">Email (Primary)</td><td>&nbsp;</td><td>&nbsp;</td><td>Check for important accounts</td></tr>
+        <tr><td>Apple ID / iCloud</td><td>&nbsp;</td><td>&nbsp;</td><td>Access photos, contacts, files</td></tr>
+        <tr><td>Google Account</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td class="pre">GitHub — jasonvega1974</td><td>jasonvega1974</td><td>Password manager</td><td>All business code repos</td></tr>
+        <tr><td class="pre">Vercel (YourLife CC)</td><td>&nbsp;</td><td>&nbsp;</td><td>Hosts yourlifecc.com</td></tr>
+        <tr><td class="pre">Supabase</td><td>&nbsp;</td><td>&nbsp;</td><td>Database — YourLife CC &amp; KC</td></tr>
+        <tr><td class="pre">Stripe</td><td>&nbsp;</td><td>&nbsp;</td><td>YourLife CC payments</td></tr>
+        <tr><td>Bank Online</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>Home Security / Alarm</td><td>N/A</td><td>N/A</td><td>Code: _____________</td></tr>
+        <tr><td>Facebook</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+      </tbody></table>
+      <div class="sub">Subscriptions to Cancel</div>
+      <table class="dt"><thead><tr><th>Service</th><th>Billed To</th><th>$/Mo</th><th>How to Cancel</th></tr></thead><tbody>
+        <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+      </tbody></table>
+    </div>
+
+    <!-- 06 PROPERTY -->
+    <div id="tab-property" class="tab-panel">
+      <div class="sec-hdr"><div class="sec-ico">🏡</div><div class="sec-ttl">Property &amp; Home</div><div class="sec-num">06</div></div>
+      <div class="fg">
+        <div class="field"><div class="flbl">Home Address</div><div class="fval pre">Lotus Springs, Nampa, Idaho</div></div>
+        <div class="field"><div class="flbl">Mortgage Lender / Servicer</div><div class="fval">&nbsp;</div></div>
+        <div class="field"><div class="flbl">Monthly Payment</div><div class="fval">&nbsp;</div></div>
+        <div class="field"><div class="flbl">Loan / Account Number</div><div class="fval">&nbsp;</div></div>
+        <div class="field"><div class="flbl">Safe Location</div><div class="fval">&nbsp;</div></div>
+        <div class="field"><div class="flbl">Safe Combination</div><div class="fval">&nbsp;</div></div>
+        <div class="field"><div class="flbl">Spare Key Location</div><div class="fval">&nbsp;</div></div>
+        <div class="field"><div class="flbl">HOA Contact (if applicable)</div><div class="fval">&nbsp;</div></div>
+      </div>
+      <div class="sub">Vehicles</div>
+      <table class="dt"><thead><tr><th>Vehicle</th><th>Year / Make / Model</th><th>Plate #</th><th>Loan / Lender</th><th>Title Location</th></tr></thead><tbody>
+        <tr><td class="ac">Vehicle 1</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td class="ac">Vehicle 2</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+      </tbody></table>
+    </div>
+
+    <!-- 07 FAITH -->
+    <div id="tab-faith" class="tab-panel">
+      <div class="sec-hdr"><div class="sec-ico">✝️</div><div class="sec-ttl">Faith, Values &amp; Final Wishes</div><div class="sec-num">07</div></div>
+      <div class="faith-blk">
+        <h3>Our Faith</h3>
+        <div class="fg c1" style="border-top:none">
+          <div class="field"><div class="flbl">Church / Faith Community</div><div class="fval pre">Celebration Church — Nampa, Idaho</div></div>
+          <div class="field"><div class="flbl">Pastor</div><div class="fval pre">Pastor Tim</div></div>
+          <div class="field"><div class="flbl">A message about our faith we want our family to hold onto</div><div class="fval taller">&nbsp;</div></div>
+        </div>
+      </div>
+      <div class="sub">Final Wishes — Jason</div>
+      <div class="wish"><div class="wlbl">Burial or Cremation Preference</div><div class="wval">&nbsp;</div></div>
+      <div class="wish"><div class="wlbl">Preferred Memorial Service</div><div class="wval">&nbsp;</div></div>
+      <div class="wish"><div class="wlbl">Music I'd want played</div><div class="wval">&nbsp;</div></div>
+      <div class="wish"><div class="wlbl">Scripture / Reading I'd want shared</div><div class="wval">&nbsp;</div></div>
+      <div class="wish"><div class="wlbl">Who I'd want to speak</div><div class="wval">&nbsp;</div></div>
+      <div class="wish"><div class="wlbl">Anything else I want people to know</div><div class="wval tall">&nbsp;</div></div>
+      <div class="divider">Spouse</div>
+      <div class="sub">Final Wishes — [Spouse]</div>
+      <div class="wish"><div class="wlbl">Burial or Cremation Preference</div><div class="wval">&nbsp;</div></div>
+      <div class="wish"><div class="wlbl">Preferred Memorial Service</div><div class="wval">&nbsp;</div></div>
+      <div class="wish"><div class="wlbl">Music I'd want played</div><div class="wval">&nbsp;</div></div>
+      <div class="wish"><div class="wlbl">Anything else I want people to know</div><div class="wval tall">&nbsp;</div></div>
+    </div>
+
+    <!-- 08 LETTERS -->
+    <div id="tab-letters" class="tab-panel">
+      <div class="sec-hdr"><div class="sec-ico">💌</div><div class="sec-ttl">Personal Letters &amp; Messages</div><div class="sec-num">08</div></div>
+      <div class="note faith">These are the words your family will treasure most. Write them when you're ready. Attach additional pages. Consider one for each child, your spouse, and anyone who matters deeply.</div>
+      <div class="wish"><div class="wlbl">Letter to [Son's Name]</div><div class="wval" style="min-height:120px">&nbsp;</div></div>
+      <div class="wish"><div class="wlbl">Letter to My Spouse</div><div class="wval" style="min-height:120px">&nbsp;</div></div>
+      <div class="wish"><div class="wlbl">Life Lessons — What I Hope You Remember</div><div class="wval" style="min-height:100px">&nbsp;</div></div>
+      <div class="wish"><div class="wlbl">Favorite Memories I Want You to Know About</div><div class="wval" style="min-height:80px">&nbsp;</div></div>
+      <div class="wish"><div class="wlbl">A Playlist to Remember Me By</div><div class="wval" style="min-height:80px">&nbsp;</div></div>
+    </div>
+
+    <!-- 09 TRAVEL -->
+    <div id="tab-travel" class="tab-panel">
+      <div class="sec-hdr"><div class="sec-ico">✈️</div><div class="sec-ttl">Cozumel Trip · April 2026</div><div class="sec-num">09</div></div>
+      <div class="travel-card">
+        <div class="em">🌊</div>
+        <div><h4>Cozumel, Mexico — April 4–11, 2026</h4><p>Share this entire tab with your son before you leave. Save or screenshot for offline access.</p></div>
+      </div>
+      <div class="note danger">US Embassy Emergency (Mexico): <strong>+1-844-528-6611</strong> &nbsp;·&nbsp; Mexico Emergency: <strong>911</strong></div>
+      <div class="fg">
+        <div class="field"><div class="flbl">Departure Date</div><div class="fval pre">April 4, 2026</div></div>
+        <div class="field"><div class="flbl">Return Date</div><div class="fval pre">April 11, 2026</div></div>
+        <div class="field"><div class="flbl">Flight Confirmation # (Outbound)</div><div class="fval">&nbsp;</div></div>
+        <div class="field"><div class="flbl">Flight Confirmation # (Return)</div><div class="fval">&nbsp;</div></div>
+        <div class="field"><div class="flbl">Airline</div><div class="fval">&nbsp;</div></div>
+        <div class="field"><div class="flbl">Departure Airport</div><div class="fval">&nbsp;</div></div>
+        <div class="field"><div class="flbl">Hotel / Resort Name</div><div class="fval">&nbsp;</div></div>
+        <div class="field"><div class="flbl">Hotel Phone / Address</div><div class="fval">&nbsp;</div></div>
+        <div class="field"><div class="flbl">Travel Insurance Provider</div><div class="fval">&nbsp;</div></div>
+        <div class="field"><div class="flbl">Travel Insurance Policy #</div><div class="fval">&nbsp;</div></div>
+        <div class="field"><div class="flbl">Travel Insurance 24/7 Phone</div><div class="fval">&nbsp;</div></div>
+        <div class="field"><div class="flbl">Credit Card Used for Trip</div><div class="fval">&nbsp;</div></div>
+      </div>
+      <div class="sub">While We're Gone — Home</div>
+      <div class="fg">
+        <div class="field"><div class="flbl">Who has a key / checking on home</div><div class="fval">&nbsp;</div></div>
+        <div class="field"><div class="flbl">Pets — Who is caring for them</div><div class="fval">&nbsp;</div></div>
+        <div class="field"><div class="flbl">Mail / Packages</div><div class="fval">&nbsp;</div></div>
+        <div class="field"><div class="flbl">Cars parked at</div><div class="fval">&nbsp;</div></div>
+      </div>
+      <div class="sub">Emergency Contacts — Mexico</div>
+      <table class="dt"><thead><tr><th>Service</th><th>Number</th><th>Notes</th></tr></thead><tbody>
+        <tr><td class="pre">US Embassy Emergency</td><td>+1-844-528-6611</td><td>24/7</td></tr>
+        <tr><td class="pre">Mexico Emergency (Police/Fire/Medical)</td><td>911</td><td>&nbsp;</td></tr>
+        <tr><td>Hotel Front Desk</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>Travel Insurance 24/7</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+      </tbody></table>
+    </div>
+
+  </main>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<div class="mob-nav">
+  <button class="tab-btn active" onclick="go('home',this)"><span class="t-icon">🏠</span>Home</button>
+  <button class="tab-btn" onclick="go('ice',this)"><span class="t-icon">🚨</span>Emergency</button>
+  <button class="tab-btn" onclick="go('legal',this)"><span class="t-icon">📋</span>Legal</button>
+  <button class="tab-btn" onclick="go('finance',this)"><span class="t-icon">🏦</span>Finance</button>
+  <button class="tab-btn" onclick="go('insurance',this)"><span class="t-icon">🛡️</span>Insurance</button>
+  <button class="tab-btn" onclick="go('digital',this)"><span class="t-icon">🔐</span>Digital</button>
+  <button class="tab-btn" onclick="go('property',this)"><span class="t-icon">🏡</span>Property</button>
+  <button class="tab-btn" onclick="go('faith',this)"><span class="t-icon">✝️</span>Faith</button>
+  <button class="tab-btn" onclick="go('letters',this)"><span class="t-icon">💌</span>Letters</button>
+  <button class="tab-btn" onclick="go('travel',this)"><span class="t-icon">✈️</span>Cozumel</button>
+</div>
+
+<!-- GOOGLE TRANSLATE -->
+<script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'en',
+    includedLanguages: 'en,es,fr,de,it,pt,zh-CN,ja,ko,ar,ru,hi,tl',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+</script>
+<script src="//translate.googleapis.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<script>
+// Theme
+(function(){
+  const s = localStorage.getItem('lv-theme')||'light';
+  document.documentElement.setAttribute('data-theme',s);
+})();
+function toggleTheme(){
+  const h=document.documentElement;
+  const n=h.getAttribute('data-theme')==='dark'?'light':'dark';
+  h.setAttribute('data-theme',n);
+  localStorage.setItem('lv-theme',n);
+}
+
+// Tabs
+function go(id){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  const panel=document.getElementById('tab-'+id);
+  if(panel) panel.classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>{
+    const oc=b.getAttribute('onclick')||'';
+    if(oc.includes("'"+id+"'")||oc.includes('"'+id+'"')) b.classList.add('active');
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>

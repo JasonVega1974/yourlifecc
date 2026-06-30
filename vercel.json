@@ -8,6 +8,7 @@
     { "source": "/faith", "destination": "/faith.html" },
     { "source": "/return", "destination": "/return.html" },
     { "source": "/unsubscribe", "destination": "/unsubscribe.html" },
+    { "source": "/legacy-vault", "destination": "/legacy-vault.html" },
     { "source": "/prayer/:id", "destination": "/api/prayer-share?id=:id" }
   ],
   "crons": [
