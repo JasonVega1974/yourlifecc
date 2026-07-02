@@ -1339,6 +1339,23 @@ function renderFaithJourneyHome(){
       if (v){ vEl.textContent = v.t; rEl.textContent = v.r; }
     }
   } catch (e){}
+  // My Walk tile progress teaser — grace-first: show NOTHING until a step is
+  // taken (spec §5, never make anyone feel behind). walkGetProgress() is from
+  // walk-path.js and returns {done,total,pct}; typeof-guarded so a module-load
+  // failure is a silent no-op.
+  try {
+    var _wt = document.getElementById('walkTeaser');
+    if (_wt){
+      var _wp = (typeof window.walkGetProgress === 'function') ? window.walkGetProgress() : null;
+      if (_wp && _wp.done > 0){
+        _wt.textContent = _wp.done + ' of ' + _wp.total + ' steps · ' + _wp.pct + '%';
+        _wt.style.display = '';
+      } else {
+        _wt.textContent = '';
+        _wt.style.display = 'none';
+      }
+    }
+  } catch (e){}
   // Illustrative scene — stars + footprint trail (no real progress lit).
   _fjRenderScene();
 }
@@ -1440,6 +1457,15 @@ function fzOpenDest(dest){
   } else if (dest === 'heart'){
     titleEl.textContent = "Heart Check";
     bodyEl.innerHTML = renderHeartCheckPicker();
+  } else if (dest === 'walk'){
+    // My Walk with God — full-height pathway via the standard destination
+    // takeover. renderWalkPath (walk-path.js) draws the node trail, golden-cross
+    // horizon, "YOU ARE HERE" beacon, and weekly quests into #walkPathWrap.
+    // typeof-guarded so a module-load failure falls back to an empty panel
+    // instead of blanking the app.
+    titleEl.textContent = "✨ My Walk with God";
+    bodyEl.innerHTML = '<div id="walkPathWrap"></div>';
+    if (typeof window.renderWalkPath === 'function'){ window.renderWalkPath('walkPathWrap'); }
   }
 
   setTimeout(function(){ destEl.scrollIntoView({ behavior:'smooth', block:'start' }); }, 60);
