@@ -268,7 +268,7 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
       <div class="kpi-card" style="--accent-color:var(--amber)"><div class="kpi-label">MRR Estimate</div><div class="kpi-value" id="kMRR">—</div><div class="kpi-sub" id="kMRRSub">—</div></div>
       <div class="kpi-card" style="--accent-color:var(--purple)"><div class="kpi-label">Opened App (7d)</div><div class="kpi-value" id="kOpened7">—</div><div class="kpi-sub">app opened/synced · excl. admin/test</div></div>
       <div class="kpi-card" style="--accent-color:var(--green)"><div class="kpi-label">Engaged (7d)</div><div class="kpi-value" id="kEngaged7">—</div><div class="kpi-sub" id="kEngaged7Sub">real section activity · excl. admin/test</div></div>
-      <div class="kpi-card" style="--accent-color:var(--red)"><div class="kpi-label">At-Risk</div><div class="kpi-value" id="kAtRisk">—</div><div class="kpi-sub">14+ days old, no engagement 14+ days</div></div>
+      <div class="kpi-card" style="--accent-color:var(--red)"><div class="kpi-label">At-Risk</div><div class="kpi-value" id="kAtRisk">—</div><div class="kpi-sub">14+ days, never synced</div></div>
     </div>
     <div class="section-grid">
       <div class="card">
@@ -286,7 +286,7 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
         <table class="data-table"><thead><tr><th>Email</th><th>Plan</th><th>Last Sync</th><th>Status</th></tr></thead><tbody id="lastActive"><tr class="loading-row"><td colspan="4">LOADING...</td></tr></tbody></table>
       </div>
       <div class="card">
-        <div class="card-header"><span class="card-title">Churn Risk</span><span class="card-badge" id="churnBadge">14+ Days No Engagement</span></div>
+        <div class="card-header"><span class="card-title">Churn Risk</span><span class="card-badge" id="churnBadge">14+ Days No Sync</span></div>
         <div id="churnList"><div class="empty-state">LOADING...</div></div>
       </div>
     </div>
@@ -955,10 +955,7 @@ async function loadAll(){
     const opened7=counted.filter(u=>u.updated_at&&daysSince(u.updated_at)<=7);
     const engaged7=counted.filter(u=>u.last_active&&daysSince(u.last_active)<=7);
     const noEngData=counted.filter(u=>!u.last_active).length; // null last_active = pre-tracking rows
-    // Fix 3 — At-Risk = signed up 14+ days ago AND no real engagement in 14+
-    // days. Replaces the dead `updated_at === created_at` clause (client ISO
-    // string vs Postgres timestamptz never matched, so it never fired).
-    const atRisk=counted.filter(u=>daysSince(u.created_at)>=14&&(!u.last_active||daysSince(u.last_active)>=14));
+    const atRisk=counted.filter(u=>daysSince(u.created_at)>=14&&(!u.updated_at||u.updated_at===u.created_at));
     const mrr=paying.reduce((s,u)=>s+estimateMRR(u.plan,u.plan_status),0);
 
     document.getElementById('kTotalSignups').textContent=counted.length;
@@ -988,7 +985,7 @@ async function loadAll(){
     document.getElementById('lastActive').innerHTML=synced.length===0?'<tr class="loading-row"><td colspan="4">NO SYNC DATA YET</td></tr>':synced.map(u=>`<tr><td class="email-cell">${u.email||'—'}</td><td>${planBadge(u.plan,u.plan_status)}</td><td style="font-family:var(--fm);font-size:.7rem">${fmtAgo(u.updated_at)}</td><td>${activityBadge(u.updated_at)}</td></tr>`).join('');
 
     document.getElementById('churnBadge').textContent=`${atRisk.length} users`;
-    document.getElementById('churnList').innerHTML=atRisk.length===0?'<div class="empty-state">NO AT-RISK USERS ✓</div>':atRisk.map(u=>`<div class="churn-bar"><div class="churn-email">${u.email||'—'}</div><div class="churn-plan">${u.plan||u.plan_status||'unknown'}</div><div class="churn-days">Signed up ${daysSince(u.created_at)}d ago · ${u.last_active?('last engaged '+daysSince(u.last_active)+'d ago'):'never engaged'}</div></div>`).join('');
+    document.getElementById('churnList').innerHTML=atRisk.length===0?'<div class="empty-state">NO AT-RISK USERS ✓</div>':atRisk.map(u=>`<div class="churn-bar"><div class="churn-email">${u.email||'—'}</div><div class="churn-plan">${u.plan||u.plan_status||'unknown'}</div><div class="churn-days">Signed up ${daysSince(u.created_at)}d ago — never synced</div></div>`).join('');
 
     document.getElementById('allUsersBadge').textContent=`${all.length} total`;
     _allUsers = all;
