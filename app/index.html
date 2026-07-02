@@ -20833,6 +20833,10 @@
      so it can hand tool routes to fzOpenDest at runtime. Dark launch — nothing
      renders until renderWalkPath() is called; no doorway wired yet. -->
 <script defer src="/app/js/walk-path.js"></script>
+<!-- Walk-quest hooks: wraps existing feature globals to bump weekly quests on
+     real activity. Loads after walk-path.js + every module it wraps; installs on
+     DOMContentLoaded so all targets exist. Dark launch (accrues, no render). -->
+<script defer src="/app/js/walk-quest-hooks.js"></script>
 
 <!-- App bootstrap: must load last -->
 <script defer src="/app/js/init.js"></script>
