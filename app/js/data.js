@@ -117,6 +117,10 @@ const DEF = {
   // profiles.data and cloudLoad restores it, so the flag follows the user across
   // devices). Default false = classic faith home (byte-identical). Per-user opt-in.
   faithJourneyHome:false,
+  // My Walk with God pathway — completed stations, reflections, weekly quest
+  // state (walk-path.js). cloudLoad() restores it automatically; no sync.js
+  // changes needed. Dark launch — nothing reads it until renderWalkPath() runs.
+  walk:{},
   // V1 Rebuild · Session 2 — Night Reflection log. Each entry shape:
   // { date:'YYYY-MM-DD', mood:'😞|😐|🙂|🔥', text:string, prayed:bool, ts:isoString }
   // Capped client-side to the most recent 60 entries by faith-zones.js
