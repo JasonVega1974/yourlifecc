@@ -263,7 +263,7 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
     <!-- USERS TAB -->
     <div class="tab-panel active" id="tab-users">
     <div class="kpi-grid">
-      <div class="kpi-card" style="--accent-color:var(--blue)"><div class="kpi-label">Total Signups</div><div class="kpi-value" id="kTotalSignups">—</div><div class="kpi-sub" id="kTotalSignupsSub">All time accounts</div></div>
+      <div class="kpi-card" style="--accent-color:var(--blue)"><div class="kpi-label">Total Signups</div><div class="kpi-value" id="kTotalSignups">—</div><div class="kpi-sub">All time accounts</div></div>
       <div class="kpi-card" style="--accent-color:var(--green)"><div class="kpi-label">Paying Users</div><div class="kpi-value" id="kPayingUsers">—</div><div class="kpi-sub" id="kPayingSub">—</div></div>
       <div class="kpi-card" style="--accent-color:var(--amber)"><div class="kpi-label">MRR Estimate</div><div class="kpi-value" id="kMRR">—</div><div class="kpi-sub" id="kMRRSub">—</div></div>
       <div class="kpi-card" style="--accent-color:var(--purple)"><div class="kpi-label">Active (7 days)</div><div class="kpi-value" id="kActive7">—</div><div class="kpi-sub">synced in last 7 days</div></div>
@@ -704,20 +704,6 @@ const EDGE_URL    = 'https://hrohgwcbfgywkpnvqxhk.supabase.co/functions/v1/admin
 const ADMIN_TOKEN = 'ylcc-admin-2729';
 const ADMIN_PIN   = '272927';
 const MRR_MAP     = {monthly:9.99,yearly:6.58,lifetime:0,free_contest:0,active:9.99};
-
-// ── ADMIN/TEST EXCLUSION ──────────────────────────────────────
-// Accounts excluded from KPI AGGREGATES only (Active7, sessions, scores,
-// Last Active, MRR, plan breakdown, tiers). The All Users table still shows
-// everyone (with the Admin badge). is_admin comes from the profiles row;
-// TEST_EMAILS is a manual allowlist of personal/test logins — keep it current.
-const TEST_EMAILS = new Set([
-  'jasonvega1974@gmail.com'
-  // add other personal/test logins here
-].map(e=>e.toLowerCase()));
-function isExcludedFromStats(u){
-  return u && (u.is_admin === true || TEST_EMAILS.has((u.email||'').toLowerCase()));
-}
-
 let pinBuffer = '';
 
 function pinPress(d){
@@ -940,23 +926,18 @@ async function loadAll(){
     const json=await res.json();
     if(!res.ok) throw new Error(json.error||'Failed to load');
     const all=json.profiles||[];
-    // Fix 1 — KPI aggregates exclude admin/test accounts; the All Users table
-    // below still renders everyone (with the Admin badge).
-    const counted=all.filter(u=>!isExcludedFromStats(u));
-    const exclCount=all.length-counted.length;
 
-    const paying=counted.filter(u=>['monthly','yearly','lifetime','active'].includes((u.plan||u.plan_status||'').toLowerCase()));
-    const free=counted.filter(u=>{const p=(u.plan||u.plan_status||'').toLowerCase();return p==='free_contest'||p==='';});
-    const active7=counted.filter(u=>u.updated_at&&daysSince(u.updated_at)<=7);
-    const atRisk=counted.filter(u=>daysSince(u.created_at)>=14&&(!u.updated_at||u.updated_at===u.created_at));
+    const paying=all.filter(u=>['monthly','yearly','lifetime','active'].includes((u.plan||u.plan_status||'').toLowerCase()));
+    const free=all.filter(u=>{const p=(u.plan||u.plan_status||'').toLowerCase();return p==='free_contest'||p==='';});
+    const active7=all.filter(u=>u.updated_at&&daysSince(u.updated_at)<=7);
+    const atRisk=all.filter(u=>daysSince(u.created_at)>=14&&(!u.updated_at||u.updated_at===u.created_at));
     const mrr=paying.reduce((s,u)=>s+estimateMRR(u.plan,u.plan_status),0);
 
-    document.getElementById('kTotalSignups').textContent=counted.length;
-    const _tsSub=document.getElementById('kTotalSignupsSub'); if(_tsSub) _tsSub.textContent=`active accounts · excl. ${exclCount} admin/test`;
+    document.getElementById('kTotalSignups').textContent=all.length;
     document.getElementById('kPayingUsers').textContent=paying.length;
-    document.getElementById('kPayingSub').textContent=`${free.length} free · ${paying.length} paid · excl. admin/test`;
+    document.getElementById('kPayingSub').textContent=`${free.length} free · ${paying.length} paid`;
     document.getElementById('kMRR').textContent='$'+mrr.toFixed(0);
-    document.getElementById('kMRRSub').textContent=`~$${(mrr*12).toFixed(0)} ARR est. · excl. admin/test`;
+    document.getElementById('kMRRSub').textContent=`~$${(mrr*12).toFixed(0)} ARR est.`;
     document.getElementById('kActive7').textContent=active7.length;
     document.getElementById('kAtRisk').textContent=atRisk.length;
 
@@ -968,11 +949,11 @@ async function loadAll(){
     }).join('');
 
     const planCounts={};
-    counted.forEach(u=>{const p=(u.plan||u.plan_status||'unknown').toLowerCase();planCounts[p]=(planCounts[p]||0)+1;});
+    all.forEach(u=>{const p=(u.plan||u.plan_status||'unknown').toLowerCase();planCounts[p]=(planCounts[p]||0)+1;});
     const planOrder=['monthly','yearly','lifetime','active','free_contest','cancelled','past_due'];
-    document.getElementById('planBreakdown').innerHTML=Object.entries(planCounts).sort((a,b)=>(planOrder.indexOf(a[0])<0?99:planOrder.indexOf(a[0]))-(planOrder.indexOf(b[0])<0?99:planOrder.indexOf(b[0]))).map(([plan,count])=>{const mrrEst=estimateMRR(plan,plan)*count;const pct=counted.length>0?((count/counted.length)*100).toFixed(0):0;return`<tr><td>${planBadge(plan,plan)}</td><td class="email-cell">${count}</td><td>${mrrEst>0?'$'+mrrEst.toFixed(0):'—'}</td><td style="color:var(--tx3)">${pct}%</td></tr>`;}).join('');
+    document.getElementById('planBreakdown').innerHTML=Object.entries(planCounts).sort((a,b)=>(planOrder.indexOf(a[0])<0?99:planOrder.indexOf(a[0]))-(planOrder.indexOf(b[0])<0?99:planOrder.indexOf(b[0]))).map(([plan,count])=>{const mrrEst=estimateMRR(plan,plan)*count;const pct=all.length>0?((count/all.length)*100).toFixed(0):0;return`<tr><td>${planBadge(plan,plan)}</td><td class="email-cell">${count}</td><td>${mrrEst>0?'$'+mrrEst.toFixed(0):'—'}</td><td style="color:var(--tx3)">${pct}%</td></tr>`;}).join('');
 
-    const synced=[...counted].filter(u=>u.updated_at).sort((a,b)=>new Date(b.updated_at)-new Date(a.updated_at)).slice(0,10);
+    const synced=[...all].filter(u=>u.updated_at).sort((a,b)=>new Date(b.updated_at)-new Date(a.updated_at)).slice(0,10);
     document.getElementById('lastActive').innerHTML=synced.length===0?'<tr class="loading-row"><td colspan="4">NO SYNC DATA YET</td></tr>':synced.map(u=>`<tr><td class="email-cell">${u.email||'—'}</td><td>${planBadge(u.plan,u.plan_status)}</td><td style="font-family:var(--fm);font-size:.7rem">${fmtAgo(u.updated_at)}</td><td>${activityBadge(u.updated_at)}</td></tr>`).join('');
 
     document.getElementById('churnBadge').textContent=`${atRisk.length} users`;
@@ -982,7 +963,7 @@ async function loadAll(){
     _allUsers = all;
     _sortCol = 'engagement_score'; _sortDir = -1;
     renderUsers();
-    renderTierSummary(counted);
+    renderTierSummary(all);
 
     document.getElementById('lastRefresh').textContent='Updated '+new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
   }catch(e){console.error(e);document.getElementById('lastRefresh').textContent='Error: '+e.message;}
