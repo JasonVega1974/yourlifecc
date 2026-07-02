@@ -20714,6 +20714,9 @@
 <script defer src="/app/js/data/podcasts.js"></script>
 <script defer src="/app/js/data/reading-plans.js"></script>
 <script defer src="/app/js/data/audio-content.js"></script>
+<!-- My Walk with God pathway data (WALK_STATIONS / WALK_CHAPTERS / WALK_HORIZON /
+     WALK_QUESTS_POOL) — pure data, read by walk-path.js. -->
+<script defer src="/app/js/data/walk-stations-data.js"></script>
 <!-- Leaflet (F3-B) — open-source map library, MIT-licensed. Only loads when used. -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -20826,6 +20829,10 @@
      called by quick-prayers.js card actions; load after both. -->
 <script defer src="/app/js/prayer-focus.js"></script>
 <script defer src="/app/js/faith-zones.js"></script>
+<!-- My Walk with God pathway engine (renderWalkPath). Loads after faith-zones.js
+     so it can hand tool routes to fzOpenDest at runtime. Dark launch — nothing
+     renders until renderWalkPath() is called; no doorway wired yet. -->
+<script defer src="/app/js/walk-path.js"></script>
 
 <!-- App bootstrap: must load last -->
 <script defer src="/app/js/init.js"></script>
