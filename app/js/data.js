@@ -529,6 +529,25 @@ const DEF = {
 };
 
 let D = JSON.parse(JSON.stringify(DEF));
+
+// 2026-07-03 — window.D bridge. `let D` lives in the global LEXICAL
+// environment, NOT on window, so `window.D` was always undefined. Any module
+// reading/writing `window.D` (walk-path.js W(), sfx.js, haptics.js,
+// exercise-engine.js, two index.html fallbacks) silently operated on nothing —
+// walk-path.js even created a PHANTOM `window.D = {}` and stored My Walk
+// progress there, where save()/cloudSync never saw it and the journey home
+// (which reads the real D) never lit up. A live accessor keeps window.D
+// permanently in sync with the binding, INCLUDING after the two `D = …`
+// reassignments (auth.js owner-guard reset, email.js profile switch) that a
+// one-time `window.D = D` copy would go stale on.
+try {
+  Object.defineProperty(window, 'D', {
+    configurable: true,
+    get: function(){ return D; },
+    set: function(v){ D = v; }
+  });
+} catch (e) { try { window.D = D; } catch (e2) {} }
+
 let _txFilter='all', _asgFilter='all', _gFilter='all', _galFilter='all';
 let _timerSecs=1500, _timerRunning=false, _timerInterval=null, _timerStart=null;
 let _calY=new Date().getFullYear(), _calM=new Date().getMonth();
