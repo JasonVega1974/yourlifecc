@@ -656,6 +656,8 @@
       +     '</div>'
       +   '</section>'
 
+      +   _ccClimbCard()
+
       +   '<section class="cc-constellation" aria-label="Life constellation">'
       +     '<div class="cc-constellation__caption">Today\'s focus &middot; <span style="color:'+focusTile.accent+';">'+_ccEsc(focus.caption)+'</span></div>'
       +     '<svg class="cc-constellation__svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Animated graph of six life domains">'
@@ -775,14 +777,130 @@
   }
 
   function ccOpenDest(dest){
+    if (dest === 'climb'){ ccOpenClimb(); return; }
     var target = _CC_SECTION_MAP[dest];
     if (!target){ try { console.warn('[ccOpenDest] no section for', dest); } catch(_){} return; }
     if (typeof showSection === 'function') showSection(target);
+  }
+
+  // ── featured MY CLIMB card (L2 doorway) ──────────────────────
+  // Child-home equivalent of the faith journey home's featured MY WALK
+  // card. Cyan is the climb's signature (gold stays the Well's). The
+  // progress teaser renders only once at least one step is done — a
+  // fresh account sees the invitation, never a zero.
+  function _ccClimbCard(){
+    var teaser = '';
+    try {
+      if (typeof window.lifeGetProgress === 'function'){
+        var p = window.lifeGetProgress();
+        if (p && p.done > 0){
+          teaser = '<span class="cc-climb__teaser">' + p.done + ' of ' + p.total + ' steps &middot; ' + p.pct + '%</span>';
+        }
+      }
+    } catch(_){}
+    return ''
+      + '<section class="cc-climb-sec" aria-label="My Climb">'
+      +   '<button class="cc-climb" type="button" data-dest="climb" aria-label="My Climb — your road to adulthood">'
+      +     '<span class="cc-climb__icon" aria-hidden="true">⛰️</span>'
+      +     '<span class="cc-climb__body">'
+      +       '<span class="cc-climb__title">MY CLIMB</span>'
+      +       '<span class="cc-climb__sub">Your road to adulthood.</span>'
+      +       teaser
+      +     '</span>'
+      +     '<span class="cc-climb__chev" aria-hidden="true">›</span>'
+      +   '</button>'
+      + '</section>';
+  }
+
+  // ── MY CLIMB overlay host (Option B) ─────────────────────────
+  // The CC has no destination-takeover pattern (ccOpenDest only routes
+  // to sections via showSection), so the climb gets a minimal
+  // full-screen host: a fixed overlay that mounts #lifePathWrap and
+  // calls renderLifePath(). z-index 8000 — BELOW life-path.js's own
+  // station sheet (#lifeStationOverlay, z 9000) so station pages open
+  // above the path as designed. Styles live in the #appCommandCenter
+  // style block in index.html.
+  function _ccClimbOverlay(){
+    var ov = document.getElementById('lifeClimbOverlay');
+    if (ov) return ov;
+    ov = document.createElement('div');
+    ov.id = 'lifeClimbOverlay';
+    ov.innerHTML = ''
+      + '<div class="cc-climb-ovbar">'
+      +   '<button type="button" class="cc-climb-ovhome" id="ccClimbHomeBtn">← Home</button>'
+      +   '<span class="cc-climb-ovtitle">MY CLIMB</span>'
+      + '</div>'
+      + '<div id="lifePathWrap"></div>';
+    document.body.appendChild(ov);
+    ov.querySelector('#ccClimbHomeBtn').addEventListener('click', ccCloseClimb);
+    // Esc: close the station sheet first if it's up, else leave the climb.
+    document.addEventListener('keydown', function(e){
+      if (e.key !== 'Escape') return;
+      if (ov.style.display !== 'block') return;
+      var st = document.getElementById('lifeStationOverlay');
+      if (st && st.style.display === 'flex'){
+        if (typeof window.lifeCloseStation === 'function') window.lifeCloseStation();
+        return;
+      }
+      ccCloseClimb();
+    });
+    return ov;
+  }
+
+  function ccOpenClimb(){
+    // Module-load failure degrades to a quiet notice, never a dead tap.
+    if (typeof window.renderLifePath !== 'function'){
+      if (typeof window.showToast === 'function') window.showToast('My Climb is unavailable right now — try a refresh');
+      return;
+    }
+    // Station "Open tool" buttons route via showSection (life-path.js
+    // lifeOpenTool) — wrap it ONCE so the host overlay closes first and
+    // the destination is actually visible. Wrapper etiquette per
+    // xp.js/streaks.js: patch the global from outside, no life-path.js
+    // edits, idempotent via window flag.
+    if (!window._ccClimbToolWrapped && typeof window.lifeOpenTool === 'function'){
+      window._ccClimbToolWrapped = true;
+      var _origTool = window.lifeOpenTool;
+      window.lifeOpenTool = function(){
+        try { ccCloseClimb(); } catch(_){}
+        return _origTool.apply(this, arguments);
+      };
+    }
+    var ov = _ccClimbOverlay();
+    ov.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    try {
+      window.renderLifePath('lifePathWrap');
+    } catch(e){
+      ccCloseClimb();
+      if (typeof window.showToast === 'function') window.showToast('My Climb could not open');
+      try { console.error('[ccOpenClimb]', e); } catch(_){}
+      return;
+    }
+    // The climb reads bottom-up (chapter 1 nearest the thumb). Land on
+    // the pulsing current-step beacon; a finished climb lands on the
+    // summit at the top instead.
+    try {
+      var cur = ov.querySelector('.lp-current');
+      if (cur && cur.scrollIntoView) cur.scrollIntoView({ block:'center' });
+      else ov.scrollTop = 0;
+    } catch(_){}
+  }
+
+  function ccCloseClimb(){
+    var ov = document.getElementById('lifeClimbOverlay');
+    if (ov) ov.style.display = 'none';
+    document.body.style.overflow = '';
+    if (typeof window.lifeCloseStation === 'function'){ try { window.lifeCloseStation(); } catch(_){} }
+    // Re-render home so the card teaser reflects any steps just taken.
+    try { renderCommandCenter(); } catch(_){}
   }
 
   // ── exports ──────────────────────────────────────────────────
   if (typeof window !== 'undefined'){
     window.renderCommandCenter = renderCommandCenter;
     window.ccOpenDest          = ccOpenDest;
+    window.ccOpenClimb         = ccOpenClimb;
+    window.ccCloseClimb        = ccCloseClimb;
   }
 })();
