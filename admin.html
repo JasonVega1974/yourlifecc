@@ -1698,20 +1698,23 @@ async function approveWaitlist(id, btn){
 ══════════════════════════════════════════════════════════════════ */
 const PM_INVENTORY = [
   // ── Bible & Faith (12) ──
-  // ── Faith Journey Home (2026-07-03) — the faith-free journey home's photo
-  // cards. No defaults: until a photo is uploaded the app shows its styled
-  // gradient+icon placeholder (never a broken image), so defaultUrl is ''.
-  // card_id mirrors the img[data-card-id="fj-…"] attrs in app/index.html.
+  // ── Faith Journey Home (2026-07-03, rev. same day) — ONLY the journey
+  // cards with no legacy equivalent get fj-* keys. Every other journey card
+  // reuses its legacy bf-* key (managed under Bible & Faith below), so
+  // photos already uploaded there appear on the journey home automatically:
+  //   Prayer→bf-prayer · Worship→bf-worship · Bible Hub→bf-biblehub ·
+  //   Proof→bf-proofProphecy · Timeline→bf-timeline · Archaeology→
+  //   bf-biblelands · Academy→bf-academy · Reading Plans→bf-readingPlans ·
+  //   Devotionals→bf-devotional · Memory Verses→bf-memorize · Sermon Notes→
+  //   bf-journey · Traditions→bf-denominations · Podcasts→bf-podcasts.
+  // No defaults here: these five show the styled gradient+icon placeholder
+  // until a photo is uploaded (never a broken image).
   {id:'fj-my-walk',        section:'Faith Journey Home', title:'My Walk (featured)',    defaultUrl:''},
   {id:'fj-mystery',        section:'Faith Journey Home', title:"Today's Mystery",       defaultUrl:''},
-  {id:'fj-prayer',         section:'Faith Journey Home', title:'Prayer',                defaultUrl:''},
   {id:'fj-real-life-win',  section:'Faith Journey Home', title:'Real Life Win',         defaultUrl:''},
-  {id:'fj-worship',        section:'Faith Journey Home', title:'Worship Playlist',      defaultUrl:''},
-  {id:'fj-bible-hub',      section:'Faith Journey Home', title:'Bible Hub',             defaultUrl:''},
-  {id:'fj-proof',          section:'Faith Journey Home', title:'Proof & Prophecy',      defaultUrl:''},
-  {id:'fj-timeline',       section:'Faith Journey Home', title:'Bible Timeline',        defaultUrl:''},
-  {id:'fj-archaeology',    section:'Faith Journey Home', title:'Biblical Archaeology',  defaultUrl:''},
-  {id:'fj-more',           section:'Faith Journey Home', title:'More',                  defaultUrl:''},
+  {id:'fj-reflect',        section:'Faith Journey Home', title:'Night Reflection',      defaultUrl:''},
+  {id:'fj-growth',         section:'Faith Journey Home', title:'Growth Profile',        defaultUrl:''},
+  {id:'fj-heart',          section:'Faith Journey Home', title:'Heart Check',           defaultUrl:''},
   {id:'bf-stories',         section:'Bible & Faith',   title:'Story Mode',            defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/3/3f/The_Wise_Men.jpg'},
   {id:'bf-flashcards',      section:'Bible & Faith',   title:'Bible Flashcards',      defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Flash_cards_for_language_learning.jpg/1280px-Flash_cards_for_language_learning.jpg'},
   {id:'bf-worship',         section:'Bible & Faith',   title:'Worship Playlist',      defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/4/49/RH_Worship_Team.jpg'},
