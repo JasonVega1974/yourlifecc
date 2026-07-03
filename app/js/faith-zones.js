@@ -1529,7 +1529,9 @@ function renderFaithJourneyHome(){
     // 2026-07-03 — GROW + CHURCH & YOU deep links (their bf-* panels live in
     // Zone 3 inside #fzHome). podcasts navigates to its own page and
     // reflect/growth/heart are dest takeovers — none of those belong here.
-    academy:1, plans:1, devotional:1, memorize:1, traditions:1, sermon:1 };
+    academy:1, plans:1, devotional:1, memorize:1, traditions:1, sermon:1,
+    // 2026-07-03 — MEET JESUS + LISTEN (bf-* panels in Zone 3 too).
+    jesus:1, audio:1, sleep:1, createmed:1 };
   try {
     var doors = host.querySelectorAll('[data-fjdest]');
     for (var di=0; di<doors.length; di++){
@@ -1674,7 +1676,9 @@ function fzOpenDest(dest){
     // plans rides bfTab's readingPlans alias (pre-selects the reading
     // sub-tab); sermon notes live partway down the Journey panel.
     academy:'academy', plans:'readingPlans', devotional:'devotional', memorize:'memorize',
-    traditions:'denominations', sermon:'journey'
+    traditions:'denominations', sermon:'journey',
+    // 2026-07-03 — MEET JESUS + LISTEN sections.
+    jesus:'jesus', audio:'audioMeditations', sleep:'sleepStories', createmed:'createMeditation'
   };
   // Scroll target per DEST where it isn't simply 'bf-' + tab.
   var _fzTabScrollId = { plans:'bf-plans', sermon:'sermonNotesList' };
@@ -2440,7 +2444,11 @@ var _FZ_CONTINUE_LABELS = {
   devotional:  { emoji:'🕊️', text:"Continue today's devotional" },
   memorize:    { emoji:'🧠', text:"Continue memory verses"      },
   traditions:  { emoji:'✝️', text:"Continue Christian Traditions"},
-  sermon:      { emoji:'📝', text:"Back to your sermon notes"   }
+  sermon:      { emoji:'📝', text:"Back to your sermon notes"   },
+  jesus:       { emoji:'✝️', text:"Keep meeting Jesus"          },
+  audio:       { emoji:'🎧', text:"Continue Audio Meditations"  },
+  sleep:       { emoji:'🌙', text:"Back to Sleep Stories"       },
+  createmed:   { emoji:'🎼', text:"Continue your meditation"    }
 };
 
 function renderContinueOption(){
