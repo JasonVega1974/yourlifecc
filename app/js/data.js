@@ -121,6 +121,7 @@ const DEF = {
   // state (walk-path.js). cloudLoad() restores it automatically; no sync.js
   // changes needed. Dark launch — nothing reads it until renderWalkPath() runs.
   walk:{},
+  lifePath: {},  // L1 My Climb (road to adulthood) — completed stations, timestamped reflections, weekly quest state (life-path.js)
   // My Story (walk-story.js, 2026-07-03) — user-created spiritual-journal
   // entries on the My Walk timeline. Array of
   //   { id:'ws_<ms>', type:'milestone'|'note'|'verse', ts:<ISO>,
