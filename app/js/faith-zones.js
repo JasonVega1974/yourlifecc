@@ -1384,6 +1384,104 @@ function _fjRenderStations(st){
   hostEl.innerHTML = html;
 }
 
+// ════════════════════════════════════════════════════════════
+// 2026-07-03 — "My Journey so far" walk journal
+// Renders below the quest board inside the My Walk destination. Reads ONLY
+// existing D.walk state — completed (station → date), reflections (station →
+// text, NO timestamp of its own, so each shows under its station's dated
+// entry), questDone (quest → date). Chronological, newest first; stations
+// outrank quests on the same day. Empty state is a warm one-liner — never
+// fake data. Additive module: walk-path.js untouched.
+// ════════════════════════════════════════════════════════════
+function _fjWalkJournalEntries(){
+  var w = (typeof D !== 'undefined' && D && D.walk && typeof D.walk === 'object') ? D.walk : {};
+  var completed   = (w.completed   && typeof w.completed   === 'object') ? w.completed   : {};
+  var reflections = (w.reflections && typeof w.reflections === 'object') ? w.reflections : {};
+  var questDone   = (w.questDone   && typeof w.questDone   === 'object') ? w.questDone   : {};
+  var stations = (typeof window !== 'undefined' && Array.isArray(window.WALK_STATIONS))    ? window.WALK_STATIONS    : [];
+  var quests   = (typeof window !== 'undefined' && Array.isArray(window.WALK_QUESTS_POOL)) ? window.WALK_QUESTS_POOL : [];
+  var out = [];
+  Object.keys(completed).forEach(function(id){
+    var s = null;
+    for (var i = 0; i < stations.length; i++){ if (stations[i] && stations[i].id === id){ s = stations[i]; break; } }
+    var refl = reflections[id];
+    out.push({
+      kind: 'station',
+      date: String(completed[id] || ''),
+      icon: (s && s.icon) || '👣',
+      title: (s && s.name) || id,
+      reflection: (typeof refl === 'string' && refl.trim()) ? refl.trim() : ''
+    });
+  });
+  Object.keys(questDone).forEach(function(qid){
+    var q = null;
+    for (var j = 0; j < quests.length; j++){ if (quests[j] && quests[j].id === qid){ q = quests[j]; break; } }
+    out.push({
+      kind: 'quest',
+      date: String(questDone[qid] || ''),
+      icon: (q && q.icon) || '🏆',
+      title: 'Quest: ' + ((q && q.title) || qid),
+      reflection: ''
+    });
+  });
+  out.sort(function(a, b){
+    if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+    if (a.kind !== b.kind) return a.kind === 'station' ? -1 : 1;
+    return 0;
+  });
+  return out;
+}
+
+function renderWalkJournal(hostId){
+  if (typeof document === 'undefined') return;
+  var host = document.getElementById(hostId || 'walkJournalWrap');
+  if (!host) return;
+  var entries = _fjWalkJournalEntries();
+  // Hardcoded night-sky hex on purpose — this continues the walk scene
+  // (wk-scene, also hardcoded), not the themed dest chrome.
+  var h = '<div style="margin-top:1.8rem;">'
+        + '<div style="font:600 10px/1 Oswald,sans-serif;letter-spacing:.26em;color:#f5b431;margin-bottom:.7rem;">MY JOURNEY SO FAR</div>';
+  if (!entries.length){
+    h += '<div style="background:rgba(20,26,48,.8);border:1px solid rgba(245,180,49,.14);border-radius:14px;padding:1.1rem 1rem;font:italic 400 .85rem/1.5 Georgia,serif;color:#aab2c9;">Your journey starts with a single step — the path above is waiting.</div>';
+  } else {
+    h += '<div style="background:rgba(20,26,48,.8);border:1px solid rgba(245,180,49,.14);border-radius:14px;padding:.4rem .9rem;">';
+    for (var i = 0; i < entries.length; i++){
+      var e = entries[i];
+      var border = (i === entries.length - 1) ? '' : 'border-bottom:1px solid rgba(255,255,255,.06);';
+      h += '<div style="display:flex;gap:.7rem;align-items:flex-start;padding:.75rem 0;' + border + '">'
+         + '<span style="font-size:1.15rem;line-height:1.2;" aria-hidden="true">' + _fzEsc(e.icon) + '</span>'
+         + '<span style="flex:1;min-width:0;">'
+         +   '<span style="display:block;font:600 .82rem/1.3 Oswald,sans-serif;letter-spacing:.02em;color:#e7dcc4;">' + _fzEsc(e.title) + '</span>'
+         +   (e.reflection ? '<span style="display:block;font:italic 400 .78rem/1.45 Georgia,serif;color:#9aa2ba;margin-top:.25rem;">“' + _fzEsc(e.reflection) + '”</span>' : '')
+         + '</span>'
+         + '<span style="flex-shrink:0;font:500 .68rem/1.4 Oswald,sans-serif;letter-spacing:.06em;color:#8a90a4;">' + _fzEsc(_fzFriendlyDate(e.date)) + '</span>'
+         + '</div>';
+    }
+    h += '</div>';
+  }
+  h += '</div>';
+  host.innerHTML = h;
+}
+
+// Keep the journal live after a step is marked or a reflection saved,
+// WITHOUT editing walk-path.js — wrapper-installer pattern (mirrors
+// walk-quest-hooks.js). Installed on first walk-dest open; no-ops and
+// retries next open if walk-path.js hasn't loaded yet.
+function _fjInstallWalkJournalHooks(){
+  if (typeof window === 'undefined' || window.__fjWalkJournalHooked) return;
+  if (typeof window.walkMarkStep !== 'function') return; // walk-path not loaded — retry on next open
+  ['walkMarkStep', 'walkSaveReflection'].forEach(function(fn){
+    if (typeof window[fn] !== 'function') return;
+    var _orig = window[fn];
+    window[fn] = function(){
+      var r = _orig.apply(this, arguments);
+      try { if (document.getElementById('walkJournalWrap')) renderWalkJournal('walkJournalWrap'); } catch (e){}
+      return r;
+    };
+  });
+  window.__fjWalkJournalHooked = true;
+}
+
 // Home-vista footprint → My Walk, opened at that station. fzOpenDest('walk')
 // renders the full path synchronously into #fzDest; the station sheet
 // (walkOpenStation, walk-path.js) mounts its own body-level overlay right
@@ -1502,6 +1600,27 @@ function renderFaithJourneyHome(){
         _wt.style.display = 'none';
       }
     }
+    // Second teaser line (2026-07-03): "Last step: {station} · {date}" — the
+    // most recently dated completion. Grace-first: hidden when no steps yet.
+    var _wtl = document.getElementById('walkTeaserLast');
+    if (_wtl){
+      var _comp = (typeof D !== 'undefined' && D && D.walk && D.walk.completed && typeof D.walk.completed === 'object') ? D.walk.completed : {};
+      var _lastId = null, _lastDate = '';
+      Object.keys(_comp).forEach(function(id){
+        var dd = String(_comp[id] || '');
+        if (dd > _lastDate){ _lastDate = dd; _lastId = id; }
+      });
+      if (_lastId && _lastDate){
+        var _sts = (typeof window !== 'undefined' && Array.isArray(window.WALK_STATIONS)) ? window.WALK_STATIONS : [];
+        var _st = null;
+        for (var _si = 0; _si < _sts.length; _si++){ if (_sts[_si] && _sts[_si].id === _lastId){ _st = _sts[_si]; break; } }
+        _wtl.textContent = 'Last step: ' + ((_st && _st.name) || _lastId) + ' · ' + _fzFriendlyDate(_lastDate);
+        _wtl.style.display = '';
+      } else {
+        _wtl.textContent = '';
+        _wtl.style.display = 'none';
+      }
+    }
   } catch (e){}
   // Scene — stars + footprint trail + the 7 core-step markers, all lit from
   // real D.walk progress (neutral when walk-path.js isn't loaded).
@@ -1539,7 +1658,7 @@ function fzOpenDest(dest){
     if (typeof showSection === 'function') showSection('s-worship');
     return;
   }
-  var _fzTabAlias = { biblehub:'bible', timeline:'timeline', proof:'proofProphecy', archaeology:'bibleworld' };
+  var _fzTabAlias = { biblehub:'bible', timeline:'timeline', proof:'proofProphecy', archaeology:'bibleworld', prayerwall:'prayer' };
   if (_fzTabAlias[dest]){
     if (D){
       D.faithLastDest = dest;
@@ -1588,15 +1707,43 @@ function fzOpenDest(dest){
     bodyEl.innerHTML = '<div id="fzZone1" class="fz-zone fz-zone-1" aria-label="Convince Me hero"></div>';
     if (typeof renderConvinceMeHero === 'function') renderConvinceMeHero();
   } else if (dest === 'prayer'){
-    titleEl.textContent = "Quick Prayer";
+    // 2026-07-03 — unified Prayer hub. ONE door for every prayer surface,
+    // composed from the existing renderers (no new features):
+    //   Quick Prayers — composer + full library (each prayer's "Pray" button
+    //                   already opens the Pray-This focus overlay)
+    //   My Prayers    — quick-prayer journal (write / answered / history)
+    //   Focus         — today's rotating prayer + a straight door into
+    //                   openPrayerFocus (prayer-focus.js)
+    // The legacy Prayer Wall (#bf-prayer: requests, praises, how-to,
+    // examples, who-to-pray) is pinned to static Zone 3 markup and can't be
+    // inlined — the door row below routes there via fzPrayerOpenWall().
+    titleEl.textContent = "Prayer";
     bodyEl.innerHTML =
-      '<div class="fz-dest-intro">What\'s on your heart right now?</div>' +
-      '<div id="fzPrayerCard" class="fz-today-card fz-prayer-card" role="button" tabindex="0"></div>' +
-      '<div id="quickPrayerLibrary" style="margin-top:1.75rem;"></div>' +
-      '<div id="fzQuickPrayerJournal" style="margin-top:1.75rem;"></div>';
+      '<div class="fz-ph-tabs" role="tablist">' +
+        '<button type="button" class="fz-ph-tab active" data-ph-tab="quick" onclick="fzPrayerHubTab(\'quick\')">Quick Prayers</button>' +
+        '<button type="button" class="fz-ph-tab" data-ph-tab="mine" onclick="fzPrayerHubTab(\'mine\')">My Prayers</button>' +
+        '<button type="button" class="fz-ph-tab" data-ph-tab="focus" onclick="fzPrayerHubTab(\'focus\')">Focus</button>' +
+      '</div>' +
+      '<div id="fzPhQuick">' +
+        '<div class="fz-dest-intro">What\'s on your heart right now?</div>' +
+        '<div id="fzPrayerCard" class="fz-today-card fz-prayer-card" role="button" tabindex="0"></div>' +
+        '<div id="quickPrayerLibrary" style="margin-top:1.75rem;"></div>' +
+      '</div>' +
+      '<div id="fzPhMine" style="display:none;">' +
+        '<div id="fzQuickPrayerJournal"></div>' +
+      '</div>' +
+      '<div id="fzPhFocus" style="display:none;"></div>' +
+      '<button type="button" class="fz-ph-wall" onclick="fzPrayerOpenWall()">' +
+        '<span aria-hidden="true" style="font-size:1.3rem;">🕊️</span>' +
+        '<span style="flex:1;min-width:0;">Prayer Wall' +
+          '<span class="fz-ph-wall-sub">Requests, praises &amp; answered — plus how to pray</span>' +
+        '</span>' +
+        '<span aria-hidden="true">→</span>' +
+      '</button>';
     if (typeof renderQuickPrayerCard       === 'function') renderQuickPrayerCard();
     if (typeof renderQuickPrayerLibrary    === 'function') renderQuickPrayerLibrary('quickPrayerLibrary');
     if (typeof renderQuickPrayerJournal    === 'function') renderQuickPrayerJournal();
+    _fzRenderPrayerFocusTab();
   } else if (dest === 'reallife'){
     titleEl.textContent = "Real Life Win";
     bodyEl.innerHTML = renderRealLifeWinDestination();
@@ -1642,11 +1789,94 @@ function fzOpenDest(dest){
     // typeof-guarded so a module-load failure falls back to an empty panel
     // instead of blanking the app.
     titleEl.textContent = "✨ My Walk with God";
-    bodyEl.innerHTML = '<div id="walkPathWrap"></div>';
+    bodyEl.innerHTML = '<div id="walkPathWrap"></div><div id="walkJournalWrap"></div>';
     if (typeof window.renderWalkPath === 'function'){ window.renderWalkPath('walkPathWrap'); }
+    // "My Journey so far" — journal below the quest board (additive; reads
+    // existing D.walk state only, no walk-path.js edits).
+    renderWalkJournal('walkJournalWrap');
+    _fjInstallWalkJournalHooks();
   }
 
   setTimeout(function(){ destEl.scrollIntoView({ behavior:'smooth', block:'start' }); }, 60);
+}
+
+// ════════════════════════════════════════════════════════════
+// 2026-07-03 — Prayer hub helpers (tabs · Focus tab · Prayer Wall door)
+// ════════════════════════════════════════════════════════════
+function fzPrayerHubTab(tab){
+  if (typeof document === 'undefined') return;
+  var map = { quick:'fzPhQuick', mine:'fzPhMine', focus:'fzPhFocus' };
+  Object.keys(map).forEach(function(k){
+    var el = document.getElementById(map[k]);
+    if (el) el.style.display = (k === tab) ? '' : 'none';
+  });
+  var tabs = document.querySelectorAll('.fz-ph-tab');
+  for (var i = 0; i < tabs.length; i++){
+    tabs[i].classList.toggle('active', tabs[i].getAttribute('data-ph-tab') === tab);
+  }
+}
+
+// Today's rotating library prayer — same day-of-year pick pattern as Real
+// Life Wins, same data source the library renders from (window.QUICK_PRAYERS).
+function _fzTodaysLibraryPrayer(){
+  var list = (typeof window !== 'undefined' && Array.isArray(window.QUICK_PRAYERS)) ? window.QUICK_PRAYERS : [];
+  if (!list.length) return null;
+  return list[Math.floor(Date.now() / 86400000) % list.length] || null;
+}
+
+function _fzRenderPrayerFocusTab(){
+  if (typeof document === 'undefined') return;
+  var host = document.getElementById('fzPhFocus');
+  if (!host) return;
+  var p = _fzTodaysLibraryPrayer();
+  if (!p){
+    host.innerHTML = '<div class="fz-empty">The prayer library is still loading…</div>';
+    return;
+  }
+  host.innerHTML =
+    '<div class="fz-rlw-card">' +
+      '<div class="fz-rlw-emoji" aria-hidden="true">🕊️</div>' +
+      '<div class="fz-rlw-cat">Today\'s focus</div>' +
+      '<div class="fz-rlw-text">' + _fzEsc(p.title || '') + '</div>' +
+      (p.verse ? '<div class="fz-dest-intro">' + _fzEsc(p.verse) + '</div>' : '') +
+      '<button class="fz-rlw-btn" onclick="fzPrayerFocusToday()">Begin focus 🕊️</button>' +
+    '</div>';
+}
+
+// Opens the Pray-This overlay with today's prayer — the exact payload the
+// library's per-prayer "Pray" button passes (quick-prayers.js).
+function fzPrayerFocusToday(){
+  var p = _fzTodaysLibraryPrayer();
+  if (!p) return;
+  if (typeof window !== 'undefined' && typeof window.openPrayerFocus === 'function'){
+    window.openPrayerFocus({ title: p.title, text: p.text, verse: p.verse, trait: 'faith', traitAmount: 3 });
+  } else if (typeof showToast === 'function'){
+    showToast('Prayer focus unavailable — reload the app');
+  }
+}
+
+// Hub → legacy Prayer Wall (#bf-prayer, static Zone 3 markup inside #fzHome).
+// Close the hub dest, reveal the classic home that hosts Zone 3, then route
+// through the 'prayerwall' tab alias (bfTab('prayer') + scroll). Journey
+// users get the same "back to your journey" pill the More door injects.
+function fzPrayerOpenWall(){
+  if (typeof document === 'undefined') return;
+  var dest = document.getElementById('fzDest');
+  var body = document.getElementById('fzDestBody');
+  var home = document.getElementById('fzHome');
+  if (dest) dest.style.display = 'none';
+  if (body) body.innerHTML = '';
+  _fzCurrentDest = null;
+  if (home) home.style.display = '';
+  if (_fjHomeOn() && home && !document.getElementById('fjExploreBack')){
+    var b = document.createElement('button');
+    b.id = 'fjExploreBack'; b.type = 'button';
+    b.textContent = '← Back to your journey';
+    b.style.cssText = 'display:block;width:100%;margin:0 0 .75rem;padding:.7rem 1rem;border:1px solid rgba(245,180,49,.4);border-radius:12px;background:rgba(245,180,49,.1);color:#f5b431;font:600 .8rem/1 Oswald,sans-serif;letter-spacing:.04em;cursor:pointer;';
+    b.onclick = function(){ var x = document.getElementById('fjExploreBack'); if (x) x.remove(); if (typeof renderFaithJourneyHome === 'function') renderFaithJourneyHome(); };
+    home.insertBefore(b, home.firstChild);
+  }
+  if (typeof fzOpenDest === 'function') fzOpenDest('prayerwall');
 }
 
 // ════════════════════════════════════════════════════════════
@@ -2184,7 +2414,8 @@ var _FZ_CONTINUE_LABELS = {
   biblehub:    { emoji:'📖', text:"Back to the Bible"           },
   timeline:    { emoji:'🗺️', text:"Continue the Bible Timeline" },
   proof:       { emoji:'📜', text:"Continue Proof & Prophecy"   },
-  archaeology: { emoji:'🏺', text:"Keep exploring Bible Lands"  }
+  archaeology: { emoji:'🏺', text:"Keep exploring Bible Lands"  },
+  prayerwall:  { emoji:'🕊️', text:"Back to the Prayer Wall"     }
 };
 
 function renderContinueOption(){
@@ -2299,6 +2530,11 @@ if (typeof window !== 'undefined'){
   // 2026-07-03 — journey-home footprint deep link (inline onclick on the
   // #fjStations markers rendered by _fjRenderStations).
   window._fjOpenWalkAt     = _fjOpenWalkAt;
+  // 2026-07-03 — Prayer hub (inline onclick handlers) + walk journal.
+  window.fzPrayerHubTab    = fzPrayerHubTab;
+  window.fzPrayerFocusToday= fzPrayerFocusToday;
+  window.fzPrayerOpenWall  = fzPrayerOpenWall;
+  window.renderWalkJournal = renderWalkJournal;
   // 2026-05-30 — Heart Check public surface.
   window.openHeartCheck    = openHeartCheck;
   window.backToHeartPicker = backToHeartPicker;
@@ -2317,6 +2553,13 @@ if (typeof window !== 'undefined'){
 }
 
 if (typeof document !== 'undefined'){
+  // Quick-prayers dataset lazy-loads (data/quick-prayers.js fires this once
+  // the canonical JSON resolves). If the Prayer hub is open, refresh the
+  // Focus tab so "Today's focus" swaps its loading line for the real prayer
+  // — mirrors the library's own listener in quick-prayers.js.
+  document.addEventListener('quick-prayers:loaded', function(){
+    if (_fzCurrentDest === 'prayer') _fzRenderPrayerFocusTab();
+  });
   document.addEventListener('visibilitychange', function(){
     if (!document.hidden){
       // Refresh the greeting (time-of-day might've changed) +
