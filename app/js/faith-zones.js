@@ -1525,7 +1525,11 @@ function renderFaithJourneyHome(){
   // showSection swaps away and worshipClose routes back through s-scripture,
   // which re-renders this home. Idempotent — el.onclick overwrites on every
   // render.
-  var _fjLegacyDests = { explore:1, biblehub:1, timeline:1, proof:1, archaeology:1 };
+  var _fjLegacyDests = { explore:1, biblehub:1, timeline:1, proof:1, archaeology:1,
+    // 2026-07-03 — GROW + CHURCH & YOU deep links (their bf-* panels live in
+    // Zone 3 inside #fzHome). podcasts navigates to its own page and
+    // reflect/growth/heart are dest takeovers — none of those belong here.
+    academy:1, plans:1, devotional:1, memorize:1, traditions:1, sermon:1 };
   try {
     var doors = host.querySelectorAll('[data-fjdest]');
     for (var di=0; di<doors.length; di++){
@@ -1658,7 +1662,22 @@ function fzOpenDest(dest){
     if (typeof showSection === 'function') showSection('s-worship');
     return;
   }
-  var _fzTabAlias = { biblehub:'bible', timeline:'timeline', proof:'proofProphecy', archaeology:'bibleworld', prayerwall:'prayer' };
+  // 2026-07-03 — podcasts is its own page; browser back returns to the app
+  // (which re-renders the journey home via the s-scripture entry hook).
+  if (dest === 'podcasts'){
+    if (typeof window !== 'undefined') window.location.href = '/app/podcasts.html';
+    return;
+  }
+  var _fzTabAlias = {
+    biblehub:'bible', timeline:'timeline', proof:'proofProphecy', archaeology:'bibleworld', prayerwall:'prayer',
+    // 2026-07-03 — GROW + CHURCH & YOU cards (MORE-door retirement).
+    // plans rides bfTab's readingPlans alias (pre-selects the reading
+    // sub-tab); sermon notes live partway down the Journey panel.
+    academy:'academy', plans:'readingPlans', devotional:'devotional', memorize:'memorize',
+    traditions:'denominations', sermon:'journey'
+  };
+  // Scroll target per DEST where it isn't simply 'bf-' + tab.
+  var _fzTabScrollId = { plans:'bf-plans', sermon:'sermonNotesList' };
   if (_fzTabAlias[dest]){
     if (D){
       D.faithLastDest = dest;
@@ -1667,7 +1686,7 @@ function fzOpenDest(dest){
     var _fzTb = _fzTabAlias[dest];
     if (typeof bfTab === 'function') bfTab(_fzTb);
     setTimeout(function(){
-      var p = document.getElementById('bf-' + _fzTb);
+      var p = document.getElementById(_fzTabScrollId[dest] || ('bf-' + _fzTb));
       if (p) p.scrollIntoView({ behavior:'smooth', block:'start' });
     }, 120);
     return;
@@ -2415,7 +2434,13 @@ var _FZ_CONTINUE_LABELS = {
   timeline:    { emoji:'🗺️', text:"Continue the Bible Timeline" },
   proof:       { emoji:'📜', text:"Continue Proof & Prophecy"   },
   archaeology: { emoji:'🏺', text:"Keep exploring Bible Lands"  },
-  prayerwall:  { emoji:'🕊️', text:"Back to the Prayer Wall"     }
+  prayerwall:  { emoji:'🕊️', text:"Back to the Prayer Wall"     },
+  academy:     { emoji:'🎓', text:"Continue Faith Academy"      },
+  plans:       { emoji:'📚', text:"Continue your reading plan"  },
+  devotional:  { emoji:'🕊️', text:"Continue today's devotional" },
+  memorize:    { emoji:'🧠', text:"Continue memory verses"      },
+  traditions:  { emoji:'✝️', text:"Continue Christian Traditions"},
+  sermon:      { emoji:'📝', text:"Back to your sermon notes"   }
 };
 
 function renderContinueOption(){
