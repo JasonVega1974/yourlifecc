@@ -20930,6 +20930,8 @@
 <!-- My Walk with God pathway data (WALK_STATIONS / WALK_CHAPTERS / WALK_HORIZON /
      WALK_QUESTS_POOL) — pure data, read by walk-path.js. -->
 <script defer src="/app/js/data/walk-stations-data.js"></script>
+<!-- My Climb pathway data (L1) — pure data, read by life-path.js. -->
+<script defer src="/app/js/data/life-stations-data.js"></script>
 <!-- Leaflet (F3-B) — open-source map library, MIT-licensed. Only loads when used. -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -21051,6 +21053,11 @@
      walk-path.js (reads WALK_STATIONS/QUESTS + walkQuestBump); before
      walk-quest-hooks.js so hooks can wrap anything it exposes. -->
 <script defer src="/app/js/walk-story.js"></script>
+<!-- My Climb pathway engine (renderLifePath) — L1, road-to-adulthood sibling of
+     My Walk. Loads after ui.js (needs showSection() at runtime) and after
+     walk-path.js. Dark launch — nothing renders until renderLifePath() is
+     called; no doorway wired yet. -->
+<script defer src="/app/js/life-path.js"></script>
 <!-- Walk-quest hooks: wraps existing feature globals to bump weekly quests on
      real activity. Loads after walk-path.js + every module it wraps; installs on
      DOMContentLoaded so all targets exist. Dark launch (accrues, no render). -->
