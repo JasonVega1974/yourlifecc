@@ -121,6 +121,17 @@ const DEF = {
   // state (walk-path.js). cloudLoad() restores it automatically; no sync.js
   // changes needed. Dark launch — nothing reads it until renderWalkPath() runs.
   walk:{},
+  // My Story (walk-story.js, 2026-07-03) — user-created spiritual-journal
+  // entries on the My Walk timeline. Array of
+  //   { id:'ws_<ms>', type:'milestone'|'note'|'verse', ts:<ISO>,
+  //     date:'YYYY-MM-DD', title?, text?, ref?, witnesses?, church?,
+  //     photoPath? }
+  // ts is a full ISO timestamp from day one (station reflections lack one —
+  // lesson learned). photoPath is a PRIVATE storage path in the walk-photos
+  // bucket (signed-URL reads only), never a public URL. Auto entries
+  // (stations, quests, legacy FJ milestones) are composed at render time
+  // from their own sources and are never copied in here.
+  walkStory:[],
   // V1 Rebuild · Session 2 — Night Reflection log. Each entry shape:
   // { date:'YYYY-MM-DD', mood:'😞|😐|🙂|🔥', text:string, prayed:bool, ts:isoString }
   // Capped client-side to the most recent 60 entries by faith-zones.js
