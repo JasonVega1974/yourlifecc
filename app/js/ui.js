@@ -118,7 +118,7 @@ const MODE_LABELS={middle:'Middle School',fresh:'Freshman',mid_hs:'High School',
 const STAGE_CONFIG = {
   middle:{
     label:'Middle School',emoji:'🎒',
-    sections:['s-hero','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-reading','s-mood','s-chores','s-sports','s-parent','s-worship','s-flashcards'],
+    sections:['s-hero','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-habits','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-reading','s-mood','s-chores','s-sports','s-parent','s-worship','s-flashcards'],
     skillCats:['health','dental','cooking','relationships','faith','mental','emergency','family','digital','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
@@ -136,7 +136,7 @@ const STAGE_CONFIG = {
   },
   fresh:{
     label:'9th Grade',emoji:'📚',
-    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-reading','s-mentors','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-flashcards','s-badges','s-driving','s-sports','s-parent'],
+    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-habits','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-reading','s-mentors','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-flashcards','s-badges','s-driving','s-sports','s-parent'],
     skillCats:['health','dental','cooking','car','relationships','faith','mental','emergency','family','digital','civic','credit','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
@@ -154,7 +154,7 @@ const STAGE_CONFIG = {
   },
   mid_hs:{
     label:'10th–11th Grade',emoji:'📖',
-    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-flashcards','s-badges','s-driving','s-sports','s-parent'],
+    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-habits','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-flashcards','s-badges','s-driving','s-sports','s-parent'],
     skillCats:['taxes','car','health','dental','cooking','home','career','credit','relationships','faith','mental','civic','emergency','digital','family','college','adulting','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
@@ -172,7 +172,7 @@ const STAGE_CONFIG = {
   },
   senior:{
     label:'Senior Year',emoji:'🎓',
-    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-flashcards','s-badges','s-driving','s-sports','s-parent'],
+    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-habits','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-flashcards','s-badges','s-driving','s-sports','s-parent'],
     skillCats:['taxes','car','health','dental','cooking','home','career','credit','relationships','faith','mental','civic','emergency','digital','family','college','legal','adulting','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
@@ -192,7 +192,7 @@ const STAGE_CONFIG = {
   },
   college:{
     label:'College',emoji:'🏛️',
-    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-flashcards','s-badges','s-driving','s-sports','s-parent'],
+    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-habits','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-flashcards','s-badges','s-driving','s-sports','s-parent'],
     skillCats:['taxes','car','health','dental','cooking','home','career','credit','relationships','faith','mental','civic','emergency','digital','family','college','legal','adulting','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
@@ -211,7 +211,7 @@ const STAGE_CONFIG = {
   },
   adult:{
     label:'Young Adult',emoji:'💼',
-    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-flashcards','s-badges','s-driving','s-sports','s-parent'],
+    sections:['s-hero','s-finance','s-cbt','s-school','s-resources','s-schedule','s-calendar','s-health','s-habits','s-goals','s-skills','s-growing','s-craft','s-journal','s-motivation','s-resume','s-bio','s-reading','s-mentors','s-milestones','s-mood','s-contests','s-chores','s-rewards','s-scripture','s-worship','s-flashcards','s-badges','s-driving','s-sports','s-parent'],
     skillCats:['taxes','car','health','dental','cooking','home','career','credit','relationships','faith','mental','civic','emergency','digital','family','college','legal','adulting','safety','investing','insurance','travel'],
     careerTags:['all'],
     pathways:[
