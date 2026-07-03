@@ -1160,10 +1160,11 @@ function renderFzGreeting(){
 
 // ════════════════════════════════════════════════════════════
 // Phase 3 — Faith Journey home (flag-gated · account-based D.faithJourneyHome)
-// A night-sky "walk with God" home: Well hero (verse + greeting) → an
-// ILLUSTRATIVE discipleship path (no real progress lit) → the daily doorways
-// (wired to the existing fzOpenDest destinations). Greeting/streak/points use
-// LIVE in-app data. Only renders when the per-user flag is ON.
+// A night-sky "walk with God" home: Well hero (verse + greeting) → the 7 CORE
+// discipleship steps lit from REAL D.walk progress (_fjRenderStations) → the
+// daily doorways (wired to the existing fzOpenDest destinations).
+// Greeting/streak/points use LIVE in-app data. Only renders when the per-user
+// flag is ON.
 // ════════════════════════════════════════════════════════════
 function _fjHomeOn(){
   // ROLLOUT BOUNDARY (single source of truth — gate guard, renderFaithZones,
@@ -1195,7 +1196,8 @@ function _fjEnsureFonts(){
 
 // Footprint silhouette (toes + ball + heel), oriented along the path and
 // mirrored left/right. Muted warm gold for traveled prints, pale faint cream
-// ahead. Illustrative only — not tied to any real progress.
+// ahead. `done` prints cover the stretch of REAL walk progress (see
+// _fjWalkState); faint prints invite the road ahead.
 function _fjFoot(x,y,ang,flip,done){
   var sole = done ? 'rgba(246,222,165,.42)' : 'rgba(228,224,210,.20)';
   var toe  = done ? 'rgba(250,232,185,.52)' : 'rgba(232,228,214,.24)';
@@ -1232,11 +1234,20 @@ function _fjRenderScene(){
       sky.innerHTML = stars;
     }
   } catch (e){}
-  // Footprint trail along the path (illustrative — no real progress).
+  // Real walk state for the trail + station markers below. Computed once so
+  // footprints and markers can never disagree.
+  var wkState = _fjWalkState();
+  // Footprint trail along the path — REAL progress. Gold prints cover the
+  // stretch already walked (the leading run of completed core stations);
+  // faint prints invite the road ahead. Neutral (all faint) when walk-path.js
+  // isn't loaded.
   try {
     var NS = 'http://www.w3.org/2000/svg';
     var nodes = [{x:126,y:1476},{x:266,y:1322},{x:120,y:1168},{x:264,y:1012},{x:130,y:850},{x:268,y:688},{x:124,y:530},{x:196,y:392}];
-    var compIndex = 4;
+    // nodes[0..6] are the 7 core stations (bottom→top, same coords as
+    // _FJ_CORE); nodes[7] is the cross horizon. The traveled trail reaches
+    // node[doneLeading] — all 7 done → gold all the way to the cross.
+    var compIndex = wkState.doneLeading;
     var build = function(pts){ var dd='M'+pts[0].x+','+pts[0].y; for(var i=1;i<pts.length;i++){ var a=pts[i-1],b=pts[i]; var c1y=a.y+(b.y-a.y)*0.45; var c2y=a.y+(b.y-a.y)*0.55; dd+=' C'+a.x+','+c1y+' '+b.x+','+c2y+' '+b.x+','+b.y; } return dd; };
     var svg = document.createElementNS(NS,'svg'); svg.style.cssText='position:absolute;left:-9999px;top:0;width:0;height:0;overflow:hidden;';
     var pf = document.createElementNS(NS,'path'); pf.setAttribute('d',build(nodes));
@@ -1251,13 +1262,144 @@ function _fjRenderScene(){
       var x = +(p.x+(-dy/len)*off).toFixed(1);
       var y = +(p.y+(dx/len)*off).toFixed(1);
       var ang = +(Math.atan2(dy,dx)*180/Math.PI+90).toFixed(1);
-      if (ss<=compLen+6) doneHTML+=_fjFoot(x,y,ang,side,true); else futureHTML+=_fjFoot(x,y,ang,side,false);
+      if (compIndex>0 && ss<=compLen+6) doneHTML+=_fjFoot(x,y,ang,side,true); else futureHTML+=_fjFoot(x,y,ang,side,false);
       side*=-1;
     }
     document.body.removeChild(svg);
     var dH=document.getElementById('fjStepDone'), fH=document.getElementById('fjStepFuture');
     if (dH) dH.innerHTML = doneHTML;
     if (fH) fH.innerHTML = futureHTML;
+  } catch (e){}
+  // Station markers — done / current / future from the same state.
+  try { _fjRenderStations(wkState); } catch (e){}
+}
+
+// ────────────────────────────────────────────────────────────
+// The 7 CORE significant steps on the home vista (the spec's original seven),
+// mapped to real walk-path station ids (WALK_STATIONS in
+// data/walk-stations-data.js). Coordinates sit on the painted scene path in
+// index.html (#fjScene, bottom→top); side is the lane the marker occupies —
+// its label renders on the opposite side. The golden cross horizon above
+// station 7 is static markup ("Becoming Like Christ") and stays untouched.
+// ────────────────────────────────────────────────────────────
+var _FJ_CORE = [
+  { id:'curious',      x:126, y:1476, side:'L', name:'COME AND SEE',        verse:'“Come and see.” — John 1:39' },
+  { id:'accepted',     x:266, y:1322, side:'R', name:'SAYING YES TO JESUS', verse:'“A new creation.” — 2 Corinthians 5:17' },
+  { id:'baptism',      x:120, y:1168, side:'L', name:'BAPTISM',             verse:'“Raised to walk in new life.” — Rom 6:4' },
+  { id:'word',         x:264, y:1012, side:'R', name:'ROOTED IN THE WORD',  verse:'“Rooted and built up in Him.” — Col 2:7' },
+  { id:'discipleship', x:130, y:850,  side:'L', name:'DISCIPLESHIP',        verse:'“If you abide in my word, you are truly my disciples.” — John 8:31' },
+  { id:'serving',      x:268, y:688,  side:'R', name:'SERVING OTHERS',      verse:'“Serve one another in love.” — Gal 5:13' },
+  { id:'disciples',    x:124, y:530,  side:'L', name:'MAKING DISCIPLES',    verse:'“Go and make disciples.” — Matt 28:19' }
+];
+
+// Real walk state for the home vista. Existence-check walkGetProgress (proof
+// walk-path.js loaded), then read D.walk.completed directly. Neutral result
+// (nothing completed, no current beacon) when the module is missing — the
+// scene renders in its dim inviting state and never throws (spec §5: no
+// locks, nothing that accuses).
+function _fjWalkState(){
+  var st = { loaded:false, completed:{}, currentId:null, doneLeading:0 };
+  try {
+    if (typeof window === 'undefined' || typeof window.walkGetProgress !== 'function') return st;
+    st.loaded = true;
+    var comp = (typeof D !== 'undefined' && D && D.walk && D.walk.completed && typeof D.walk.completed === 'object')
+      ? D.walk.completed : {};
+    st.completed = comp;
+    // Current = FIRST of the 7 core steps not yet completed (grace-first —
+    // out-of-order completions still glow gold individually).
+    for (var i = 0; i < _FJ_CORE.length; i++){
+      if (!comp[_FJ_CORE[i].id]){ st.currentId = _FJ_CORE[i].id; break; }
+    }
+    // Leading run of completed steps — how far up the path the gold
+    // footprint trail reaches (0..7; 7 = all core steps walked).
+    var k = 0;
+    while (k < _FJ_CORE.length && comp[_FJ_CORE[k].id]) k++;
+    st.doneLeading = k;
+  } catch (e){}
+  return st;
+}
+
+// Render the 7 core-step markers + labels into #fjStations from real state.
+//   done    → warm gold glow ring + ✓ (the scene's rgba(245,180,49,…) palette)
+//   current → soft pulsing beacon — the walk path's "YOU ARE HERE" language,
+//             smaller (this is a vista, not the map). Beacon pulse honors
+//             prefers-reduced-motion via the #fzJourneyHome * override.
+//   future  → dim, inviting. No locks, no labels that accuse.
+// Every marker + label deep-links into My Walk at its station.
+function _fjRenderStations(st){
+  if (typeof document === 'undefined') return;
+  var hostEl = document.getElementById('fjStations');
+  if (!hostEl) return;
+  st = st || _fjWalkState();
+  var html = '';
+  for (var i = 0; i < _FJ_CORE.length; i++){
+    var s = _FJ_CORE[i];
+    var done = !!st.completed[s.id];
+    var isCur = st.currentId === s.id;
+    var open = "_fjOpenWalkAt('" + s.id + "')";
+    // Label geometry — opposite side of the marker's lane, same rules the
+    // old static markup used (L-lane marker → label right; R-lane → label
+    // left, right-aligned).
+    var labelPos = (s.side === 'L')
+      ? 'left:' + (s.x + 44) + 'px;text-align:left;'
+      : 'right:' + (393 - s.x + 40) + 'px;text-align:right;';
+    if (isCur){
+      // Beacon rings + glowing orb (decorative, behind the button).
+      html += '<div style="position:absolute;left:' + s.x + 'px;top:' + s.y + 'px;width:0;height:0;pointer-events:none;">'
+        + '<div style="position:absolute;left:0;top:0;width:62px;height:62px;border-radius:50%;border:2px solid rgba(245,180,49,.55);transform:translate(-50%,-50%);animation:beacon 3.6s ease-out infinite;"></div>'
+        + '<div style="position:absolute;left:0;top:0;width:62px;height:62px;border-radius:50%;border:2px solid rgba(245,180,49,.45);transform:translate(-50%,-50%);animation:beacon 3.6s ease-out infinite;animation-delay:1.8s;"></div>'
+        + '</div>'
+        + '<button type="button" onclick="' + open + '" aria-label="' + _fzEsc(s.name) + ' — your current step. Open in My Walk" style="position:absolute;left:' + s.x + 'px;top:' + s.y + 'px;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;background:radial-gradient(circle at 38% 30%,#fff4d2,#f7b733 58%,#d68a1c);animation:haze 3.2s ease-in-out infinite;border:0;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center;">'
+        + '<span style="width:22px;height:22px;border-radius:50%;background:radial-gradient(circle,#ffffff,rgba(255,255,255,0) 70%);"></span>'
+        + '</button>'
+        // Floating spark above the beacon — the "walk toward this" invitation.
+        + '<div style="position:absolute;left:' + s.x + 'px;top:' + (s.y - 92) + 'px;transform:translate(-50%,0);animation:floaty 4.2s ease-in-out infinite;pointer-events:none;">'
+        + '<div style="position:relative;width:44px;height:44px;display:flex;align-items:center;justify-content:center;">'
+        + '<div style="position:absolute;inset:-8px;border-radius:50%;background:radial-gradient(circle,rgba(255,233,170,.55),rgba(255,226,150,0) 64%);animation:sparklepulse 3s ease-in-out infinite;"></div>'
+        + '<span style="position:relative;font-size:27px;line-height:1;color:#fffaf0;text-shadow:0 0 10px rgba(255,225,150,1),0 0 22px rgba(255,200,110,.85),0 0 36px rgba(255,185,90,.55);">✦</span>'
+        + '</div></div>'
+        + '<div onclick="' + open + '" aria-hidden="true" style="position:absolute;' + labelPos + 'top:' + s.y + 'px;transform:translateY(-50%);width:178px;cursor:pointer;">'
+        + '<div style="font:600 10px/1 Oswald;letter-spacing:.24em;color:#f5b431;margin-bottom:6px;">YOU ARE HERE</div>'
+        + '<div style="font:700 20px/1.05 Oswald;letter-spacing:.01em;color:#f7efdb;">' + s.name + '</div>'
+        + '<div style="font:italic 400 12px/1.35 Newsreader;color:#aab2c9;margin-top:5px;">' + s.verse + '</div>'
+        + '</div>';
+    } else if (done){
+      html += '<button type="button" onclick="' + open + '" aria-label="' + _fzEsc(s.name) + ' — step taken. Open in My Walk" style="position:absolute;left:' + s.x + 'px;top:' + s.y + 'px;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 38% 32%,rgba(64,54,30,.92),rgba(30,26,16,.92));border:1.5px solid rgba(245,197,110,.72);box-shadow:0 0 14px rgba(245,180,49,.28),0 0 30px rgba(245,180,49,.12);padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center;">'
+        + '<span style="color:#f5cd8c;font:600 15px/1 Oswald;text-shadow:0 0 8px rgba(245,190,90,.8);">✓</span>'
+        + '</button>'
+        + '<div onclick="' + open + '" aria-hidden="true" style="position:absolute;' + labelPos + 'top:' + s.y + 'px;transform:translateY(-50%);width:178px;cursor:pointer;">'
+        + '<div style="font:600 16px/1.05 Oswald;letter-spacing:.02em;color:#e7dcc4;">' + s.name + '</div>'
+        + '<div style="font:italic 400 12px/1.3 Newsreader;color:#8b93ab;margin-top:3px;">' + s.verse + '</div>'
+        + '</div>';
+    } else {
+      html += '<button type="button" onclick="' + open + '" aria-label="' + _fzEsc(s.name) + ' — a step ahead. Open in My Walk" style="position:absolute;left:' + s.x + 'px;top:' + s.y + 'px;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#1c2945,#121a30);border:1px solid rgba(150,170,210,.22);box-shadow:0 0 12px rgba(8,12,26,.6);padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.85;">'
+        + '<span style="width:8px;height:8px;border-radius:50%;background:rgba(184,198,228,.4);"></span>'
+        + '</button>'
+        + '<div onclick="' + open + '" aria-hidden="true" style="position:absolute;' + labelPos + 'top:' + s.y + 'px;transform:translateY(-50%);width:178px;opacity:.55;cursor:pointer;">'
+        + '<div style="font:600 16px/1.05 Oswald;letter-spacing:.02em;color:#9aa3bb;">' + s.name + '</div>'
+        + '<div style="font:italic 400 12px/1.3 Newsreader;color:#737b94;margin-top:3px;">' + s.verse + '</div>'
+        + '</div>';
+    }
+  }
+  hostEl.innerHTML = html;
+}
+
+// Home-vista footprint → My Walk, opened at that station. fzOpenDest('walk')
+// renders the full path synchronously into #fzDest; the station sheet
+// (walkOpenStation, walk-path.js) mounts its own body-level overlay right
+// after. Both typeof-guarded — if walk-path.js is missing the user still
+// lands on the (empty-panel) walk destination instead of throwing.
+function _fjOpenWalkAt(stationId){
+  if (typeof document === 'undefined') return;
+  try {
+    var jh = document.getElementById('fzJourneyHome');
+    if (jh) jh.style.display = 'none';
+    if (typeof fzOpenDest === 'function') fzOpenDest('walk');
+    setTimeout(function(){
+      if (typeof window !== 'undefined' && typeof window.walkOpenStation === 'function'){
+        window.walkOpenStation(stationId);
+      }
+    }, 160);
   } catch (e){}
 }
 
@@ -1276,11 +1418,16 @@ function renderFaithJourneyHome(){
 
   // Returning to the journey home — drop any leftover Explore "back" button.
   try { var _eb = document.getElementById('fjExploreBack'); if (_eb) _eb.remove(); } catch (e){}
-  // Wire the daily doorways to the EXISTING fzOpenDest() (unmodified). Hide the
-  // journey home first so the destination shows alone; the dest's back button
-  // (fzGoHome, flag-on) returns here. EXPLORE is special — its legacy Zone 3
-  // surface lives inside #fzHome, so we show #fzHome + a "back to journey" button
-  // (no gate; Bug 1 fixed). Idempotent — el.onclick overwrites on every render.
+  // Wire the daily doorways to fzOpenDest(). Hide the journey home first so
+  // the destination shows alone; the dest's back button (fzGoHome, flag-on)
+  // returns here. LEGACY-SURFACE dests are special — their panels live inside
+  // #fzHome (Zone 3 bf-* panels for the tab deep links; the classic menu +
+  // topic grid for 'explore'/More), so we show #fzHome + a "back to journey"
+  // button (no gate; Bug 1 fixed). 'worship' is its own app section —
+  // showSection swaps away and worshipClose routes back through s-scripture,
+  // which re-renders this home. Idempotent — el.onclick overwrites on every
+  // render.
+  var _fjLegacyDests = { explore:1, biblehub:1, timeline:1, proof:1, archaeology:1 };
   try {
     var doors = host.querySelectorAll('[data-fjdest]');
     for (var di=0; di<doors.length; di++){
@@ -1288,7 +1435,7 @@ function renderFaithJourneyHome(){
         var dst = el.getAttribute('data-fjdest');
         el.onclick = function(){
           host.style.display = 'none';
-          if (dst === 'explore'){
+          if (_fjLegacyDests[dst]){
             var ch = document.getElementById('fzHome');
             if (ch){
               ch.style.display = '';
@@ -1356,7 +1503,8 @@ function renderFaithJourneyHome(){
       }
     }
   } catch (e){}
-  // Illustrative scene — stars + footprint trail (no real progress lit).
+  // Scene — stars + footprint trail + the 7 core-step markers, all lit from
+  // real D.walk progress (neutral when walk-path.js isn't loaded).
   _fjRenderScene();
 }
 
@@ -1375,6 +1523,36 @@ function fzOpenDest(dest){
   var titleEl= document.getElementById('fzDestTitle');
   var bodyEl = document.getElementById('fzDestBody');
   if (!home || !destEl || !titleEl || !bodyEl) return;
+
+  // 2026-07-03 — Journey-home deep links into legacy Well surfaces. Thin
+  // aliases only, no new features. 'worship' is its own app section (the
+  // same door the Zone 3 topic card uses); the rest map to bf-* tab panels
+  // inside Zone 3 — bfTab() auto-expands the wrap via
+  // ensureFaithExploreOpenForTab and injects its own "← Back to Home" pill.
+  // No destination takeover for any of these (like 'explore' below), so the
+  // home stays visible under the opened panel.
+  if (dest === 'worship'){
+    if (D){
+      D.faithLastDest = 'worship';
+      if (typeof save === 'function') save();
+    }
+    if (typeof showSection === 'function') showSection('s-worship');
+    return;
+  }
+  var _fzTabAlias = { biblehub:'bible', timeline:'timeline', proof:'proofProphecy', archaeology:'bibleworld' };
+  if (_fzTabAlias[dest]){
+    if (D){
+      D.faithLastDest = dest;
+      if (typeof save === 'function') save();
+    }
+    var _fzTb = _fzTabAlias[dest];
+    if (typeof bfTab === 'function') bfTab(_fzTb);
+    setTimeout(function(){
+      var p = document.getElementById('bf-' + _fzTb);
+      if (p) p.scrollIntoView({ behavior:'smooth', block:'start' });
+    }, 120);
+    return;
+  }
 
   // Explore is special — no destination takeover. The legacy Zone 3
   // wrap holds ~1700 lines of bf-* panels with IDs + handlers that
@@ -1999,7 +2177,14 @@ var _FZ_CONTINUE_LABELS = {
   reallife: { emoji:'🌍',  text:"Continue your Real Life Win"},
   reflect:  { emoji:'🌙',  text:"Continue Night Reflection" },
   growth:   { emoji:'✦',   text:"Check your Growth"         },
-  explore:  { emoji:'📖',  text:"Continue exploring"        }
+  explore:  { emoji:'📖',  text:"Continue exploring"        },
+  // 2026-07-03 — journey-home destinations + legacy deep links.
+  walk:        { emoji:'✨', text:"Continue your Walk with God" },
+  worship:     { emoji:'🎵', text:"Back to worship"             },
+  biblehub:    { emoji:'📖', text:"Back to the Bible"           },
+  timeline:    { emoji:'🗺️', text:"Continue the Bible Timeline" },
+  proof:       { emoji:'📜', text:"Continue Proof & Prophecy"   },
+  archaeology: { emoji:'🏺', text:"Keep exploring Bible Lands"  }
 };
 
 function renderContinueOption(){
@@ -2111,6 +2296,9 @@ if (typeof window !== 'undefined'){
   window.fzWelcomePath     = fzWelcomePath;
   window.fzWelcomeBrowse   = fzWelcomeBrowse;
   window.showWelcomeBack   = showWelcomeBack;
+  // 2026-07-03 — journey-home footprint deep link (inline onclick on the
+  // #fjStations markers rendered by _fjRenderStations).
+  window._fjOpenWalkAt     = _fjOpenWalkAt;
   // 2026-05-30 — Heart Check public surface.
   window.openHeartCheck    = openHeartCheck;
   window.backToHeartPicker = backToHeartPicker;
