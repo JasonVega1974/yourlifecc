@@ -1009,8 +1009,12 @@ function renderFaithHome(){
   // Engagement Loop — reading plan streak banner above topic grid
   if(typeof renderRpStreakBanner === 'function') renderRpStreakBanner();
 
-  // Worker 2 — Mood check-in (once per day, internal gate in checkShowMoodPrompt)
-  if(typeof checkShowMoodPrompt === 'function') checkShowMoodPrompt();
+  // Worker 2 mood check-in AUTO-prompt removed 2026-07-03. renderFaithHome
+  // runs even when bf-home is hidden under the journey home (Zone 3), but
+  // #moodCheckInOverlay is a document-level fixed sheet — so the "How are
+  // you feeling today?" popup appeared OVER the journey home on load. The
+  // picker now opens only on demand: the "😊 How I feel" button
+  // (checkShowMoodPrompt(true)) and the journey home's Heart Check card.
 
   // Worker 4 — Daily AI Devotional card (cached 24h per user)
   renderDailyAiDevotional();
