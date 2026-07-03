@@ -9607,6 +9607,23 @@
     @keyframes starpulse{0%,100%{opacity:.7;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.14)}}
     @keyframes shoot{0%{opacity:0;transform:translate(0,0)}3%{opacity:1}14%{opacity:0;transform:translate(196px,132px)}100%{opacity:0;transform:translate(196px,132px)}}
     @keyframes shoot2{0%{opacity:0;transform:translate(0,0)}4%{opacity:1}15%{opacity:0;transform:translate(-168px,150px)}100%{opacity:0;transform:translate(-168px,150px)}}
+    /* Desktop (min-width gate — a strict no-op on phones): the 440px phone
+       column left a wide dead starfield beside it on desktop. Widen the
+       content column to a comfortable cap; it centers in the full-bleed sky
+       (.fj-wrap is already margin:0 auto). Grids keep their column COUNTS —
+       arrangement unchanged, just wider tracks — and tiles gain a little
+       height so wider cards keep card proportions instead of flattening
+       into ribbons (!important only to outrank the tiles' inline
+       min-height). The scene is untouched: #fjScene stays fixed 393px with
+       its own margin:0 auto, so footprints, beacon and gold trail remain
+       dead-center in the column. */
+    @media (min-width:700px){
+      #fzJourneyHome .fj-wrap{ max-width:800px; }
+      #fzJourneyHome .fj-grid2{ gap:14px; }
+      #fzJourneyHome .fj-grid3{ gap:14px; }
+      #fzJourneyHome .fj-grid3 .fj-card{ min-height:118px !important; }
+      #fzJourneyHome .fj-grid2 .fj-card{ min-height:132px !important; }
+    }
     @media (prefers-reduced-motion:reduce){ #fzJourneyHome *{ animation:none !important; } }
   </style>
   <div id="fzJourneyHome" style="display:none;">
