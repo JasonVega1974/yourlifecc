@@ -1698,6 +1698,20 @@ async function approveWaitlist(id, btn){
 ══════════════════════════════════════════════════════════════════ */
 const PM_INVENTORY = [
   // ── Bible & Faith (12) ──
+  // ── Faith Journey Home (2026-07-03) — the faith-free journey home's photo
+  // cards. No defaults: until a photo is uploaded the app shows its styled
+  // gradient+icon placeholder (never a broken image), so defaultUrl is ''.
+  // card_id mirrors the img[data-card-id="fj-…"] attrs in app/index.html.
+  {id:'fj-my-walk',        section:'Faith Journey Home', title:'My Walk (featured)',    defaultUrl:''},
+  {id:'fj-mystery',        section:'Faith Journey Home', title:"Today's Mystery",       defaultUrl:''},
+  {id:'fj-prayer',         section:'Faith Journey Home', title:'Prayer',                defaultUrl:''},
+  {id:'fj-real-life-win',  section:'Faith Journey Home', title:'Real Life Win',         defaultUrl:''},
+  {id:'fj-worship',        section:'Faith Journey Home', title:'Worship Playlist',      defaultUrl:''},
+  {id:'fj-bible-hub',      section:'Faith Journey Home', title:'Bible Hub',             defaultUrl:''},
+  {id:'fj-proof',          section:'Faith Journey Home', title:'Proof & Prophecy',      defaultUrl:''},
+  {id:'fj-timeline',       section:'Faith Journey Home', title:'Bible Timeline',        defaultUrl:''},
+  {id:'fj-archaeology',    section:'Faith Journey Home', title:'Biblical Archaeology',  defaultUrl:''},
+  {id:'fj-more',           section:'Faith Journey Home', title:'More',                  defaultUrl:''},
   {id:'bf-stories',         section:'Bible & Faith',   title:'Story Mode',            defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/3/3f/The_Wise_Men.jpg'},
   {id:'bf-flashcards',      section:'Bible & Faith',   title:'Bible Flashcards',      defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Flash_cards_for_language_learning.jpg/1280px-Flash_cards_for_language_learning.jpg'},
   {id:'bf-worship',         section:'Bible & Faith',   title:'Worship Playlist',      defaultUrl:'https://upload.wikimedia.org/wikipedia/commons/4/49/RH_Worship_Team.jpg'},
@@ -1863,7 +1877,7 @@ if (typeof PROOF_PROPHECY_DATA !== 'undefined' && Array.isArray(PROOF_PROPHECY_D
 }
 
 // Section display order — add new sections here to control their position.
-const PM_SECTION_ORDER = ['Bible & Faith','Reading Plans','Proof & Prophecy','Faith Academy','Life Skills','School','Money Manager','Health & Wellness','Driving','Sports','Resume / Jobs'];
+const PM_SECTION_ORDER = ['Faith Journey Home','Bible & Faith','Reading Plans','Proof & Prophecy','Faith Academy','Life Skills','School','Money Manager','Health & Wellness','Driving','Sports','Resume / Jobs'];
 
 let PM_OVERRIDES = {};
 let PM_INITED    = false;
