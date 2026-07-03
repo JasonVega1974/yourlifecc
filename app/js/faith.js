@@ -9988,7 +9988,15 @@ var FJ_MILESTONE_TYPES = [
 function renderFJMilestones(){
   var el = document.getElementById('fjMilestonesContainer');
   if(!el) return;
-  var milestones = _fjGetMilestones().slice().sort(function(a,b){ return (b.date||'') > (a.date||'') ? 1 : -1; });
+  // 2026-07-03 — merge My Story milestones (D.walkStory via walk-story.js)
+  // so this panel and the My Story timeline read the same union and never
+  // diverge. Story entries are created/edited in My Story; this panel's
+  // own add-modal keeps writing the legacy store as before.
+  var milestones = _fjGetMilestones();
+  if (typeof window !== 'undefined' && typeof window.walkStoryFjMilestones === 'function'){
+    try { milestones = milestones.concat(window.walkStoryFjMilestones()); } catch(e){}
+  }
+  milestones = milestones.slice().sort(function(a,b){ return (b.date||'') > (a.date||'') ? 1 : -1; });
 
   var timelineHtml = milestones.length ? milestones.map(function(m,i){
     var typeInfo = FJ_MILESTONE_TYPES.find(function(t){ return t.id === m.milestone_type; }) || {icon:'✨'};
@@ -10017,6 +10025,13 @@ function renderFJMilestones(){
   if(!el.dataset.cloudLoaded){
     el.dataset.cloudLoaded = '1';
     _fjCloudLoadEntries('milestone', function(rows){
+      // 2026-07-03 — data-loss guard: the cloud upsert path has never
+      // succeeded (uuid id column rejects the 'm_<ms>' text ids), so the
+      // table can be empty while localStorage holds real milestones.
+      // Overwriting the local cache with an empty cloud result silently
+      // WIPED locally-saved milestones once per session. Only accept the
+      // cloud copy when it actually has rows.
+      if (!rows || !rows.length) return;
       var mapped = rows.map(function(r){
         return {id:r.id, milestone_type:r.milestone_type||'custom', title:r.title,
           date:r.date, description:r.description||'', church_name:r.church_name||'',
