@@ -9754,6 +9754,7 @@
           <div class="fjp-sub" style="padding-bottom:6px;">Your journey with God.</div>
           <div id="walkTeaser" style="display:none;font:600 11px/1.3 Oswald;letter-spacing:.03em;color:#f5b431;padding:0 14px 4px;"></div>
           <div id="walkTeaserLast" style="display:none;font:500 10.5px/1.35 Oswald;letter-spacing:.05em;color:#c9b489;padding:0 14px 8px;"></div>
+          <div id="walkTeaserEntry" style="display:none;font:500 10.5px/1.35 Oswald;letter-spacing:.05em;color:#a9a293;padding:0 14px 8px;"></div>
           <div style="height:7px;"></div>
         </button>
 
@@ -21045,6 +21046,11 @@
      so it can hand tool routes to fzOpenDest at runtime. Dark launch — nothing
      renders until renderWalkPath() is called; no doorway wired yet. -->
 <script defer src="/app/js/walk-path.js"></script>
+<!-- My Story — the walk's spiritual journal (timeline, add-entry sheet,
+     private milestone photos, on-this-day, share summary). Loads after
+     walk-path.js (reads WALK_STATIONS/QUESTS + walkQuestBump); before
+     walk-quest-hooks.js so hooks can wrap anything it exposes. -->
+<script defer src="/app/js/walk-story.js"></script>
 <!-- Walk-quest hooks: wraps existing feature globals to bump weekly quests on
      real activity. Loads after walk-path.js + every module it wraps; installs on
      DOMContentLoaded so all targets exist. Dark launch (accrues, no render). -->
