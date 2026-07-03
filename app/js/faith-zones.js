@@ -1475,7 +1475,14 @@ function _fjInstallWalkJournalHooks(){
     var _orig = window[fn];
     window[fn] = function(){
       var r = _orig.apply(this, arguments);
-      try { if (document.getElementById('walkJournalWrap')) renderWalkJournal('walkJournalWrap'); } catch (e){}
+      try {
+        // My Story when loaded; legacy journal fallback otherwise.
+        if (typeof window.renderWalkStory === 'function' && document.getElementById('walkStoryWrap')){
+          window.renderWalkStory('walkStoryWrap');
+        } else if (document.getElementById('walkJournalWrap')){
+          renderWalkJournal('walkJournalWrap');
+        }
+      } catch (e){}
       return r;
     };
   });
@@ -1625,6 +1632,21 @@ function renderFaithJourneyHome(){
       } else {
         _wtl.textContent = '';
         _wtl.style.display = 'none';
+      }
+    }
+    // Third teaser line (2026-07-03): "Last entry: …" from My Story
+    // (D.walkStory user entries). Hidden until the first entry exists.
+    var _wte = document.getElementById('walkTeaserEntry');
+    if (_wte){
+      var _le = (typeof window.walkStoryLastEntry === 'function') ? window.walkStoryLastEntry() : null;
+      if (_le && _le.ts){
+        var _days = Math.floor((Date.now() - new Date(_le.ts).getTime()) / 86400000);
+        var _ago = _days <= 0 ? 'today' : (_days === 1 ? 'yesterday' : _days + 'd ago');
+        _wte.textContent = 'Last entry: ' + _ago;
+        _wte.style.display = '';
+      } else {
+        _wte.textContent = '';
+        _wte.style.display = 'none';
       }
     }
   } catch (e){}
@@ -1812,11 +1834,18 @@ function fzOpenDest(dest){
     // typeof-guarded so a module-load failure falls back to an empty panel
     // instead of blanking the app.
     titleEl.textContent = "✨ My Walk with God";
-    bodyEl.innerHTML = '<div id="walkPathWrap"></div><div id="walkJournalWrap"></div>';
+    // 2026-07-03 — My Story (walk-story.js) absorbs the "My Journey so far"
+    // journal: path on top, daily strip (on-this-day + once/day prompt)
+    // between, full timeline below. Falls back to the old journal if
+    // walk-story.js failed to load.
+    bodyEl.innerHTML = '<div id="walkPathWrap"></div><div id="walkDailyStrip"></div><div id="walkStoryWrap"></div><div id="walkJournalWrap"></div>';
     if (typeof window.renderWalkPath === 'function'){ window.renderWalkPath('walkPathWrap'); }
-    // "My Journey so far" — journal below the quest board (additive; reads
-    // existing D.walk state only, no walk-path.js edits).
-    renderWalkJournal('walkJournalWrap');
+    if (typeof window.renderWalkStory === 'function'){
+      window.renderWalkStory('walkStoryWrap');
+      if (typeof window.renderWalkDailyStrip === 'function') window.renderWalkDailyStrip('walkDailyStrip');
+    } else {
+      renderWalkJournal('walkJournalWrap');
+    }
     _fjInstallWalkJournalHooks();
   }
 
