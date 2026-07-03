@@ -2418,7 +2418,22 @@ async function _completeOnboarding(name, age, ageBracket){
 // returning user with no D.onboardingDone either. The dedicated columns
 // (run docs/migrations/onboarding-flag.sql first) survive both.
 async function onbComplete(){
-  if(_onbSelectedAge && _onbSelectedAge !== 'parent') D.ageBracket = _onbSelectedAge;
+  if(_onbSelectedAge && _onbSelectedAge !== 'parent'){
+    // Phase 2.1 parity (2026-07-03) — mirror selectAgeBracket(), the
+    // parent-created-child path: dual-write the bracket via _ylccSetFlag
+    // (a bare D.ageBracket is lost if cloudLoad overwrites D before the
+    // debounced cloudSync lands) and apply the same D.sections reduction
+    // so a solo teen gets the identical surface a parent-created child
+    // of the same bracket gets. The wizard runs after finishInit already
+    // built the sidebar, so rebuild it; the applyStageFilter() call
+    // below re-applies the stage layer on the fresh nodes.
+    if(typeof _ylccSetFlag === 'function') _ylccSetFlag('ageBracket', _onbSelectedAge);
+    else D.ageBracket = _onbSelectedAge;
+    if(!window._faithFree && typeof applyAgeBracketSections === 'function'){
+      applyAgeBracketSections(_onbSelectedAge);
+      if(typeof buildSideNav === 'function') buildSideNav();
+    }
+  }
   if(_onbSelectedAge === 'parent'){
     if(!D.profile) D.profile = {};
     D.profile.parentMode = true;
