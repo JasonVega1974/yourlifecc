@@ -1376,6 +1376,34 @@
   .cc-tile--faith .cc-tile__meta{margin:0 0 0 auto;color:#6B6B80;}
   .cc-tile--faith:hover{background:#1F2440;border-color:rgba(255,255,255,.08);transform:none;}
 
+  /* ── featured MY CLIMB card (L2 doorway) ─────────────────────
+     Cyan is the climb's signature (#22d3ee family) — gold stays the
+     Well's. Featured treatment = stronger border + soft cyan glow,
+     mirroring the faith home's fjp-featured card, inside the CC's
+     card system (row layout, same radius/transition family). */
+  .cc-climb-sec{margin:1.1rem 0 .2rem;}
+  .cc-climb{position:relative;display:flex;align-items:center;gap:.9rem;width:100%;min-height:72px;padding:.95rem 1.1rem;background:linear-gradient(135deg,#0d1f33,#0b1626);border:1px solid rgba(34,211,238,.35);border-radius:18px;color:#e9f4f6;text-align:left;cursor:pointer;font-family:inherit;box-shadow:0 0 22px rgba(34,211,238,.12);transition:transform 200ms ease,background 200ms ease,border-color 200ms ease;}
+  .cc-climb:hover{transform:translateY(-2px);border-color:rgba(34,211,238,.55);}
+  .cc-climb:active{transform:scale(.97);}
+  .cc-climb:focus-visible{outline:2px solid #22d3ee;outline-offset:3px;}
+  .cc-climb__icon{flex:0 0 auto;width:40px;height:40px;border-radius:12px;background:rgba(34,211,238,.14);border:1px solid rgba(34,211,238,.4);display:grid;place-items:center;font-size:1.3rem;}
+  .cc-climb__body{display:flex;flex-direction:column;gap:.18rem;min-width:0;}
+  .cc-climb__title{font-size:.95rem;font-weight:600;letter-spacing:.14em;color:#c8f6ff;}
+  .cc-climb__sub{font-size:.8rem;font-style:italic;color:#9AA0B4;}
+  .cc-climb__teaser{font-family:ui-monospace,'JetBrains Mono',monospace;font-feature-settings:"tnum";font-size:.74rem;color:#67e8f9;margin-top:.1rem;}
+  .cc-climb__chev{margin-left:auto;font-size:1.4rem;line-height:1;color:rgba(103,232,249,.65);}
+
+  /* ── MY CLIMB overlay host ───────────────────────────────────
+     Scene layer: hardcoded night hex, no dark/light inversion (same
+     rule as the Well). z 8000 sits BELOW life-path.js's station sheet
+     (#lifeStationOverlay, z 9000). */
+  #lifeClimbOverlay{display:none;position:fixed;inset:0;z-index:8000;background:#060d1d;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
+  .cc-climb-ovbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:.85rem;padding:.65rem .9rem;padding-top:calc(.65rem + env(safe-area-inset-top,0px));background:rgba(6,13,29,.88);backdrop-filter:blur(8px);border-bottom:1px solid rgba(34,211,238,.16);}
+  .cc-climb-ovhome{padding:.42rem .85rem;border-radius:999px;border:1px solid rgba(34,211,238,.4);background:rgba(34,211,238,.1);color:#c8f6ff;font-size:.8rem;font-weight:500;font-family:inherit;cursor:pointer;}
+  .cc-climb-ovhome:hover{background:rgba(34,211,238,.18);}
+  .cc-climb-ovhome:focus-visible{outline:2px solid #22d3ee;outline-offset:2px;}
+  .cc-climb-ovtitle{font-size:.72rem;font-weight:600;letter-spacing:.2em;color:#8ecfdd;}
+
   /* ── reduced motion ─────────────────────────────────────────
      Freeze to a polished still frame. The hero stays fully
      legible (orbs visible, focus glow on, active link drawn)
@@ -16696,6 +16724,20 @@
                 border-color:rgba(15,23,42,.10);
                 color:#4a4b52;
               }
+              /* MY CLIMB featured card — dark-ink-on-paper with the cyan
+                 accent held at a legible cyan-700. The overlay itself is
+                 scene-layer (hardcoded night hex) and does not invert. */
+              :root.light #appCommandCenter .cc-climb{
+                background:#ffffff;
+                border-color:rgba(8,145,178,.4);
+                box-shadow:0 1px 4px rgba(15,23,42,.06);
+                color:#1a1233;
+              }
+              :root.light #appCommandCenter .cc-climb__title{color:#0e7490;}
+              :root.light #appCommandCenter .cc-climb__sub{color:#4a4b52;}
+              :root.light #appCommandCenter .cc-climb__teaser{color:#0e7490;}
+              :root.light #appCommandCenter .cc-climb__icon{background:rgba(8,145,178,.08);border-color:rgba(8,145,178,.3);}
+              :root.light #appCommandCenter .cc-climb__chev{color:rgba(8,145,178,.55);}
 
               /* Nebula layer — purely decorative. */
               #parentCelestialHome .pch-nebula{pointer-events:none;}
