@@ -8828,6 +8828,31 @@
       font-family:Georgia,serif; font-style:italic;
     }
 
+    /* 2026-07-03 — unified Prayer hub (fzOpenDest('prayer')): tab pills +
+       the Prayer Wall door row. Theme tokens throughout so light mode is
+       inherited, matching the rest of the destination surface. */
+    .fz-ph-tabs{ display:flex; gap:8px; margin-bottom:1.1rem; }
+    .fz-ph-tab{
+      flex:1; padding:.6rem .4rem; border-radius:999px;
+      border:1px solid var(--card-border); background:var(--card-bg);
+      color:var(--tx2); font-family:var(--fm); font-size:.78rem; font-weight:600;
+      letter-spacing:.03em; cursor:pointer; transition:all .15s ease;
+    }
+    .fz-ph-tab.active{
+      border-color:var(--p);
+      background:color-mix(in srgb, var(--p) 10%, transparent);
+      color:var(--tx);
+    }
+    .fz-ph-wall{
+      display:flex; align-items:center; gap:.7rem; width:100%;
+      margin-top:1.6rem; padding:.9rem 1rem; border-radius:14px;
+      border:1px solid var(--card-border); background:var(--card-bg);
+      color:var(--tx); font-family:var(--fm); font-size:.85rem; font-weight:600;
+      cursor:pointer; text-align:left; transition:border-color .15s ease;
+    }
+    .fz-ph-wall:hover{ border-color:var(--p); }
+    .fz-ph-wall-sub{ display:block; font-size:.7rem; font-weight:500; color:var(--tx2); margin-top:.2rem; }
+
     /* Real Life Win destination card */
     .fz-rlw-card{
       background:var(--card-bg);
@@ -9592,8 +9617,35 @@
     #fzJourneyHome .fj-card{ transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease; }
     #fzJourneyHome .fj-card:hover{ transform:translateY(-3px); }
     #fzJourneyHome .fj-eyebrow{ font:600 10px/1 Oswald,sans-serif; letter-spacing:.26em; color:rgba(245,180,49,.78); margin:22px 3px 10px; }
-    #fzJourneyHome .fj-grid2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    #fzJourneyHome .fj-grid3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:11px; }
+    /* Photo cards (2026-07-03) — legacy .topic-card anatomy (photo top,
+       title + subtitle below) in the night-sky family. Photos come from the
+       admin card-photo system: loadCardPhotoOverrides() (ui.js) swaps the
+       src of every img[data-card-id] at boot, so the fj-* imgs here ship
+       WITHOUT a src and the .fjp-ph gradient+icon placeholder (mirrors
+       ppPlaceholderHtml in faith.js) shows until an admin photo exists.
+       Never a broken image: no-src imgs paint nothing; onerror hides. */
+    #fzJourneyHome .fj-grid2, #fzJourneyHome .fj-grid3{ display:grid; grid-template-columns:1fr; gap:14px; }
+    #fzJourneyHome .fjp-card{ display:flex; flex-direction:column; width:100%; text-align:left; font-family:inherit; padding:0; overflow:hidden; cursor:pointer; border-radius:20px; background:linear-gradient(158deg,rgba(30,39,64,.92),rgba(15,21,40,.92)); border:1px solid rgba(245,180,49,.16); box-shadow:0 8px 22px rgba(0,0,0,.35); transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease; }
+    #fzJourneyHome .fjp-card:hover{ transform:translateY(-3px); border-color:rgba(245,180,49,.34); }
+    #fzJourneyHome .fjp-hero{ position:relative; width:100%; height:150px; overflow:hidden; border-bottom:1px solid rgba(245,180,49,.10); }
+    #fzJourneyHome .fjp-ph{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:42px;
+      background:radial-gradient(ellipse at 30% 30%, rgba(245,180,49,.20), transparent 60%),
+                 radial-gradient(ellipse at 75% 75%, rgba(108,150,230,.14), transparent 60%),
+                 linear-gradient(180deg,#1c2547 0%,#0d1226 100%); }
+    #fzJourneyHome img.fjp-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:brightness(.92) saturate(1.05); transition:transform .35s ease,filter .25s ease; }
+    #fzJourneyHome .fjp-card:hover img.fjp-img{ transform:scale(1.04); filter:brightness(1) saturate(1.1); }
+    /* Dark gradient on the photo's lower edge — keeps light titles legible
+       and blends any image into the dark card body (contrast rule). */
+    #fzJourneyHome .fjp-shade{ position:absolute; left:0; right:0; bottom:0; height:58%; background:linear-gradient(180deg,rgba(10,15,31,0),rgba(10,15,31,.82)); pointer-events:none; }
+    #fzJourneyHome .fjp-title{ font:700 14.5px/1.15 Oswald,sans-serif; letter-spacing:.03em; color:#efe7d4; padding:12px 14px 4px; }
+    #fzJourneyHome .fjp-sub{ font:italic 400 12px/1.4 Newsreader,serif; color:#9aa2ba; padding:0 14px 13px; }
+    #fzJourneyHome .fjp-featured .fjp-hero{ height:180px; }
+    #fzJourneyHome .fjp-more .fjp-hero{ height:110px; }
+    @media (min-width:700px){
+      #fzJourneyHome .fj-grid2{ grid-template-columns:1fr 1fr; }
+      #fzJourneyHome .fj-grid3{ grid-template-columns:1fr 1fr 1fr; }
+      #fzJourneyHome .fj-grid3 .fjp-hero{ height:132px; }
+    }
     @keyframes twinkle{0%,100%{opacity:.2}50%{opacity:1}}
     @keyframes beacon{0%{transform:translate(-50%,-50%) scale(.55);opacity:.5}70%{opacity:0}100%{transform:translate(-50%,-50%) scale(2.6);opacity:0}}
     @keyframes haze{0%,100%{box-shadow:0 0 0 6px rgba(245,180,49,.16),0 0 30px 6px rgba(245,180,49,.5)}50%{box-shadow:0 0 0 10px rgba(245,180,49,.24),0 0 50px 14px rgba(245,180,49,.78)}}
@@ -9607,22 +9659,13 @@
     @keyframes starpulse{0%,100%{opacity:.7;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.14)}}
     @keyframes shoot{0%{opacity:0;transform:translate(0,0)}3%{opacity:1}14%{opacity:0;transform:translate(196px,132px)}100%{opacity:0;transform:translate(196px,132px)}}
     @keyframes shoot2{0%{opacity:0;transform:translate(0,0)}4%{opacity:1}15%{opacity:0;transform:translate(-168px,150px)}100%{opacity:0;transform:translate(-168px,150px)}}
-    /* Desktop (min-width gate — a strict no-op on phones): the 440px phone
-       column left a wide dead starfield beside it on desktop. Widen the
-       content column to a comfortable cap; it centers in the full-bleed sky
-       (.fj-wrap is already margin:0 auto). Grids keep their column COUNTS —
-       arrangement unchanged, just wider tracks — and tiles gain a little
-       height so wider cards keep card proportions instead of flattening
-       into ribbons (!important only to outrank the tiles' inline
-       min-height). The scene is untouched: #fjScene stays fixed 393px with
-       its own margin:0 auto, so footprints, beacon and gold trail remain
-       dead-center in the column. */
+    /* Desktop (min-width gate — a strict no-op on phones): widen the content
+       column so it centers in the full-bleed sky (.fj-wrap is margin:0
+       auto). The scene is untouched: #fjScene stays fixed 393px with its own
+       margin:0 auto, so footprints, beacon and gold trail remain dead-center
+       in the column. Photo-grid column counts live in the .fjp block above. */
     @media (min-width:700px){
       #fzJourneyHome .fj-wrap{ max-width:800px; }
-      #fzJourneyHome .fj-grid2{ gap:14px; }
-      #fzJourneyHome .fj-grid3{ gap:14px; }
-      #fzJourneyHome .fj-grid3 .fj-card{ min-height:118px !important; }
-      #fzJourneyHome .fj-grid2 .fj-card{ min-height:132px !important; }
     }
     @media (prefers-reduced-motion:reduce){ #fzJourneyHome *{ animation:none !important; } }
   </style>
@@ -9698,75 +9741,118 @@
       <div style="background:transparent;padding:28px 16px 26px;">
         <div style="text-align:center;font:600 11px/1 Oswald;letter-spacing:.26em;color:#f5b431;">EXPLORE THE WELL</div>
         <div style="text-align:center;font:italic 400 15px/1.45 Newsreader;color:#aab2c9;margin:9px 0 22px;">What do you want to do today?</div>
-        <!-- Featured — My Walk. Full-width front door of the whole faith
-             experience. Same .fj-card family, promoted: stronger gold border
-             + soft glow. -->
-        <button type="button" class="fj-card" data-fjdest="walk" style="width:100%;text-align:left;font-family:inherit;background:linear-gradient(158deg,rgba(42,36,58,.94),rgba(18,20,40,.94));border:1px solid rgba(245,180,49,.36);border-radius:22px;padding:18px 17px;min-height:112px;display:flex;align-items:center;gap:14px;cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,.42),0 0 26px rgba(245,180,49,.16);">
-          <div style="width:52px;height:52px;flex-shrink:0;border-radius:16px;background:radial-gradient(circle at 35% 30%,rgba(245,192,80,.34),rgba(245,180,49,.1));border:1px solid rgba(245,180,49,.42);display:flex;align-items:center;justify-content:center;font-size:26px;color:#f3c969;">✨</div>
-          <div style="flex:1;min-width:0;">
-            <div style="font:700 17px/1.05 Oswald;letter-spacing:.03em;color:#f3ead6;">MY WALK</div>
-            <div style="font:italic 400 12.5px/1.32 Newsreader;color:#a9a293;margin-top:4px;">Your journey with God.</div>
-            <div id="walkTeaser" style="display:none;font:600 11px/1.3 Oswald;letter-spacing:.03em;color:#f5b431;margin-top:6px;"></div>
+        <!-- Featured — My Walk. Full-width photo card, front door of the
+             whole faith experience. Photo key fj-my-walk (admin card-photo
+             system); stronger gold border marks it as featured. -->
+        <button type="button" class="fjp-card fjp-featured" data-fjdest="walk" style="border-color:rgba(245,180,49,.36);box-shadow:0 10px 28px rgba(0,0,0,.42),0 0 26px rgba(245,180,49,.16);">
+          <div class="fjp-hero">
+            <div class="fjp-ph" aria-hidden="true">✨</div>
+            <img class="fjp-img" data-card-id="fj-my-walk" loading="lazy" alt="" onerror="this.style.display='none'">
+            <div class="fjp-shade" aria-hidden="true"></div>
           </div>
-          <div aria-hidden="true" style="flex-shrink:0;color:rgba(245,180,49,.6);font:600 18px/1 Oswald;">→</div>
+          <div class="fjp-title" style="font-size:17px;">MY WALK</div>
+          <div class="fjp-sub" style="padding-bottom:6px;">Your journey with God.</div>
+          <div id="walkTeaser" style="display:none;font:600 11px/1.3 Oswald;letter-spacing:.03em;color:#f5b431;padding:0 14px 4px;"></div>
+          <div id="walkTeaserLast" style="display:none;font:500 10.5px/1.35 Oswald;letter-spacing:.05em;color:#c9b489;padding:0 14px 8px;"></div>
+          <div style="height:7px;"></div>
         </button>
 
         <div class="fj-eyebrow">TODAY</div>
         <div class="fj-grid3">
-          <button type="button" class="fj-card" data-fjdest="mystery" style="text-align:left;font-family:inherit;background:linear-gradient(158deg,rgba(30,39,64,.92),rgba(15,21,40,.92));border:1px solid rgba(245,180,49,.16);border-radius:18px;padding:13px 12px;min-height:104px;display:flex;flex-direction:column;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.35);">
-            <div style="width:36px;height:36px;border-radius:12px;background:radial-gradient(circle at 35% 30%,rgba(245,192,80,.28),rgba(245,180,49,.08));border:1px solid rgba(245,180,49,.28);display:flex;align-items:center;justify-content:center;font-size:18px;color:#f3c969;">✝</div>
-            <div style="font:700 12px/1.2 Oswald;letter-spacing:.03em;color:#efe7d4;margin-top:auto;padding-top:10px;">TODAY'S MYSTERY</div>
+          <button type="button" class="fjp-card" data-fjdest="mystery">
+            <div class="fjp-hero">
+              <div class="fjp-ph" aria-hidden="true">✝</div>
+              <img class="fjp-img" data-card-id="fj-mystery" loading="lazy" alt="" onerror="this.style.display='none'">
+              <div class="fjp-shade" aria-hidden="true"></div>
+            </div>
+            <div class="fjp-title">TODAY'S MYSTERY</div>
+            <div class="fjp-sub">A question that pulls you in.</div>
           </button>
-          <button type="button" class="fj-card" data-fjdest="prayer" style="text-align:left;font-family:inherit;background:linear-gradient(158deg,rgba(30,39,64,.92),rgba(15,21,40,.92));border:1px solid rgba(245,180,49,.16);border-radius:18px;padding:13px 12px;min-height:104px;display:flex;flex-direction:column;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.35);">
-            <div style="width:36px;height:36px;border-radius:12px;background:radial-gradient(circle at 35% 30%,rgba(245,192,80,.28),rgba(245,180,49,.08));border:1px solid rgba(245,180,49,.28);display:flex;align-items:center;justify-content:center;font-size:18px;">🙏</div>
-            <div style="font:700 12px/1.2 Oswald;letter-spacing:.03em;color:#efe7d4;margin-top:auto;padding-top:10px;">QUICK PRAYER</div>
+          <button type="button" class="fjp-card" data-fjdest="prayer">
+            <div class="fjp-hero">
+              <div class="fjp-ph" aria-hidden="true">🙏</div>
+              <img class="fjp-img" data-card-id="fj-prayer" loading="lazy" alt="" onerror="this.style.display='none'">
+              <div class="fjp-shade" aria-hidden="true"></div>
+            </div>
+            <div class="fjp-title">PRAYER</div>
+            <div class="fjp-sub">Quick prayers, journal &amp; focus.</div>
           </button>
-          <button type="button" class="fj-card" data-fjdest="reallife" style="text-align:left;font-family:inherit;background:linear-gradient(158deg,rgba(30,39,64,.92),rgba(15,21,40,.92));border:1px solid rgba(245,180,49,.16);border-radius:18px;padding:13px 12px;min-height:104px;display:flex;flex-direction:column;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.35);">
-            <div style="width:36px;height:36px;border-radius:12px;background:radial-gradient(circle at 35% 30%,rgba(245,192,80,.28),rgba(245,180,49,.08));border:1px solid rgba(245,180,49,.28);display:flex;align-items:center;justify-content:center;font-size:18px;">🏆</div>
-            <div style="font:700 12px/1.2 Oswald;letter-spacing:.03em;color:#efe7d4;margin-top:auto;padding-top:10px;">REAL LIFE WIN</div>
+          <button type="button" class="fjp-card" data-fjdest="reallife">
+            <div class="fjp-hero">
+              <div class="fjp-ph" aria-hidden="true">🏆</div>
+              <img class="fjp-img" data-card-id="fj-real-life-win" loading="lazy" alt="" onerror="this.style.display='none'">
+              <div class="fjp-shade" aria-hidden="true"></div>
+            </div>
+            <div class="fjp-title">REAL LIFE WIN</div>
+            <div class="fjp-sub">Do something off your phone.</div>
           </button>
         </div>
 
         <div class="fj-eyebrow">WORSHIP &amp; WORD</div>
         <div class="fj-grid2">
-          <button type="button" class="fj-card" data-fjdest="worship" style="text-align:left;font-family:inherit;background:linear-gradient(158deg,rgba(30,39,64,.92),rgba(15,21,40,.92));border:1px solid rgba(245,180,49,.16);border-radius:20px;padding:16px 15px;min-height:120px;display:flex;flex-direction:column;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.35);">
-            <div style="width:42px;height:42px;border-radius:13px;background:radial-gradient(circle at 35% 30%,rgba(245,192,80,.28),rgba(245,180,49,.08));border:1px solid rgba(245,180,49,.28);display:flex;align-items:center;justify-content:center;font-size:21px;">🎵</div>
-            <div style="font:700 14.5px/1.08 Oswald;letter-spacing:.02em;color:#efe7d4;margin-top:auto;padding-top:12px;">WORSHIP PLAYLIST</div>
-            <div style="font:italic 400 12px/1.32 Newsreader;color:#9aa2ba;margin-top:5px;">Songs to fill the room.</div>
+          <button type="button" class="fjp-card" data-fjdest="worship">
+            <div class="fjp-hero">
+              <div class="fjp-ph" aria-hidden="true">🎵</div>
+              <img class="fjp-img" data-card-id="fj-worship" loading="lazy" alt="" onerror="this.style.display='none'">
+              <div class="fjp-shade" aria-hidden="true"></div>
+            </div>
+            <div class="fjp-title">WORSHIP PLAYLIST</div>
+            <div class="fjp-sub">Songs to fill the room.</div>
           </button>
-          <button type="button" class="fj-card" data-fjdest="biblehub" style="text-align:left;font-family:inherit;background:linear-gradient(158deg,rgba(30,39,64,.92),rgba(15,21,40,.92));border:1px solid rgba(245,180,49,.16);border-radius:20px;padding:16px 15px;min-height:120px;display:flex;flex-direction:column;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.35);">
-            <div style="width:42px;height:42px;border-radius:13px;background:radial-gradient(circle at 35% 30%,rgba(245,192,80,.28),rgba(245,180,49,.08));border:1px solid rgba(245,180,49,.28);display:flex;align-items:center;justify-content:center;font-size:21px;">📖</div>
-            <div style="font:700 14.5px/1.08 Oswald;letter-spacing:.02em;color:#efe7d4;margin-top:auto;padding-top:12px;">BIBLE HUB</div>
-            <div style="font:italic 400 12px/1.32 Newsreader;color:#9aa2ba;margin-top:5px;">Read · search · study tools.</div>
+          <button type="button" class="fjp-card" data-fjdest="biblehub">
+            <div class="fjp-hero">
+              <div class="fjp-ph" aria-hidden="true">📖</div>
+              <img class="fjp-img" data-card-id="fj-bible-hub" loading="lazy" alt="" onerror="this.style.display='none'">
+              <div class="fjp-shade" aria-hidden="true"></div>
+            </div>
+            <div class="fjp-title">BIBLE HUB</div>
+            <div class="fjp-sub">Read · search · study tools.</div>
           </button>
         </div>
 
         <div class="fj-eyebrow">DISCOVER</div>
         <div class="fj-grid3">
-          <button type="button" class="fj-card" data-fjdest="proof" style="text-align:left;font-family:inherit;background:linear-gradient(158deg,rgba(30,39,64,.92),rgba(15,21,40,.92));border:1px solid rgba(245,180,49,.16);border-radius:18px;padding:13px 12px;min-height:104px;display:flex;flex-direction:column;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.35);">
-            <div style="width:36px;height:36px;border-radius:12px;background:radial-gradient(circle at 35% 30%,rgba(245,192,80,.28),rgba(245,180,49,.08));border:1px solid rgba(245,180,49,.28);display:flex;align-items:center;justify-content:center;font-size:18px;">📜</div>
-            <div style="font:700 12px/1.2 Oswald;letter-spacing:.03em;color:#efe7d4;margin-top:auto;padding-top:10px;">PROOF &amp; PROPHECY</div>
+          <button type="button" class="fjp-card" data-fjdest="proof">
+            <div class="fjp-hero">
+              <div class="fjp-ph" aria-hidden="true">📜</div>
+              <img class="fjp-img" data-card-id="fj-proof" loading="lazy" alt="" onerror="this.style.display='none'">
+              <div class="fjp-shade" aria-hidden="true"></div>
+            </div>
+            <div class="fjp-title">PROOF &amp; PROPHECY</div>
+            <div class="fjp-sub">100 reasons to believe.</div>
           </button>
-          <button type="button" class="fj-card" data-fjdest="timeline" style="text-align:left;font-family:inherit;background:linear-gradient(158deg,rgba(30,39,64,.92),rgba(15,21,40,.92));border:1px solid rgba(245,180,49,.16);border-radius:18px;padding:13px 12px;min-height:104px;display:flex;flex-direction:column;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.35);">
-            <div style="width:36px;height:36px;border-radius:12px;background:radial-gradient(circle at 35% 30%,rgba(245,192,80,.28),rgba(245,180,49,.08));border:1px solid rgba(245,180,49,.28);display:flex;align-items:center;justify-content:center;font-size:18px;">🗺️</div>
-            <div style="font:700 12px/1.2 Oswald;letter-spacing:.03em;color:#efe7d4;margin-top:auto;padding-top:10px;">BIBLE TIMELINE</div>
+          <button type="button" class="fjp-card" data-fjdest="timeline">
+            <div class="fjp-hero">
+              <div class="fjp-ph" aria-hidden="true">🗺️</div>
+              <img class="fjp-img" data-card-id="fj-timeline" loading="lazy" alt="" onerror="this.style.display='none'">
+              <div class="fjp-shade" aria-hidden="true"></div>
+            </div>
+            <div class="fjp-title">BIBLE TIMELINE</div>
+            <div class="fjp-sub">A visual Bible chronology.</div>
           </button>
-          <button type="button" class="fj-card" data-fjdest="archaeology" style="text-align:left;font-family:inherit;background:linear-gradient(158deg,rgba(30,39,64,.92),rgba(15,21,40,.92));border:1px solid rgba(245,180,49,.16);border-radius:18px;padding:13px 12px;min-height:104px;display:flex;flex-direction:column;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.35);">
-            <div style="width:36px;height:36px;border-radius:12px;background:radial-gradient(circle at 35% 30%,rgba(245,192,80,.28),rgba(245,180,49,.08));border:1px solid rgba(245,180,49,.28);display:flex;align-items:center;justify-content:center;font-size:18px;">🏺</div>
-            <div style="font:700 12px/1.2 Oswald;letter-spacing:.03em;color:#efe7d4;margin-top:auto;padding-top:10px;">BIBLICAL ARCHAEOLOGY</div>
+          <button type="button" class="fjp-card" data-fjdest="archaeology">
+            <div class="fjp-hero">
+              <div class="fjp-ph" aria-hidden="true">🏺</div>
+              <img class="fjp-img" data-card-id="fj-archaeology" loading="lazy" alt="" onerror="this.style.display='none'">
+              <div class="fjp-shade" aria-hidden="true"></div>
+            </div>
+            <div class="fjp-title">BIBLICAL ARCHAEOLOGY</div>
+            <div class="fjp-sub">Sites, discoveries &amp; photos.</div>
           </button>
         </div>
 
         <!-- More — the legacy Explore surface (classic menu + Zone 3 topic grid).
              Everything not surfaced above (Academy, memorize, sermon notes,
-             Night Reflection, Growth, Heart Check…) remains reachable here. -->
-        <button type="button" class="fj-card" data-fjdest="explore" style="width:100%;margin-top:20px;text-align:left;font-family:inherit;background:linear-gradient(158deg,rgba(26,33,56,.9),rgba(13,18,36,.9));border:1px solid rgba(150,170,210,.18);border-radius:18px;padding:13px 15px;min-height:64px;display:flex;align-items:center;gap:12px;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.32);">
-          <div style="width:38px;height:38px;flex-shrink:0;border-radius:12px;background:rgba(150,170,210,.1);border:1px solid rgba(150,170,210,.22);display:flex;align-items:center;justify-content:center;font-size:19px;color:#aab4cc;">⋯</div>
-          <div style="min-width:0;">
-            <div style="font:700 13.5px/1.1 Oswald;letter-spacing:.03em;color:#dfe4f0;">MORE</div>
-            <div style="font:italic 400 11.5px/1.3 Newsreader;color:#8b93ab;margin-top:3px;">Academy, memory verses, sermon notes &amp; everything else.</div>
+             Night Reflection, Growth, Heart Check…) remains reachable here.
+             Photo key fj-more. -->
+        <button type="button" class="fjp-card fjp-more" data-fjdest="explore" style="margin-top:20px;border-color:rgba(150,170,210,.18);">
+          <div class="fjp-hero">
+            <div class="fjp-ph" aria-hidden="true" style="font-size:30px;color:#aab4cc;">⋯</div>
+            <img class="fjp-img" data-card-id="fj-more" loading="lazy" alt="" onerror="this.style.display='none'">
+            <div class="fjp-shade" aria-hidden="true"></div>
           </div>
-          <div aria-hidden="true" style="margin-left:auto;flex-shrink:0;color:rgba(170,180,204,.55);font:600 16px/1 Oswald;">→</div>
+          <div class="fjp-title" style="color:#dfe4f0;">MORE</div>
+          <div class="fjp-sub">Academy, memory verses, sermon notes &amp; everything else.</div>
         </button>
       </div>
 
@@ -10097,15 +10183,15 @@
         <div class="topic-card-title">Bible Hub</div>
         <div class="topic-card-desc">Read · search · Ask the Bible</div>
       </div>
-      <div class="topic-card accent-violet" onclick="bfTab('prayer')">
+      <!-- 2026-07-03 — prayer consolidation: the old "Prayer" (bfTab('prayer')
+           wall) and "Prayers" (fzGoToPrayerLibrary) cards collapsed into ONE
+           door → the unified prayer hub (fzOpenDest('prayer')): Quick Prayers
+           library + My Prayers journal + Pray-This focus, with the full
+           Prayer Wall reachable from inside the hub. -->
+      <div class="topic-card accent-violet" onclick="fzOpenDest('prayer')">
         <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(167,139,250,.22);"><img class="topic-card-hero" data-card-id="bf-prayer" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/4/4b/John_William_Waterhouse_-_The_Missal.JPG" alt="Prayer"></div>
         <div class="topic-card-title">Prayer</div>
-        <div class="topic-card-desc">Requests, praises &amp; answered</div>
-      </div>
-      <div class="topic-card accent-violet" onclick="fzGoToPrayerLibrary()">
-        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(167,139,250,.28),rgba(124,58,237,.18));display:flex;align-items:center;justify-content:center;font-size:3.5rem;">🙏</div>
-        <div class="topic-card-title">Prayers</div>
-        <div class="topic-card-desc">Prayers to pray for anxiety, school, forgiveness, and more.</div>
+        <div class="topic-card-desc">Quick prayers, journal, focus mode &amp; the prayer wall</div>
       </div>
       <div class="topic-card accent-gold" onclick="bfTab('academy')">
         <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(251,191,36,.22);"><img class="topic-card-hero" data-card-id="bf-academy" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Church_and_Cloisters%2C_St_Stephen%27s_House_LV_2025.jpg/1280px-Church_and_Cloisters%2C_St_Stephen%27s_House_LV_2025.jpg" alt="Academy"></div>
