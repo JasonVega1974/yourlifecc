@@ -162,7 +162,10 @@ const DEF = {
   // written by showSection() in ui.js; the Command Center reads it for
   // the "Continue where you left off" card. Mirrors faithLastDest
   // (string|null). Home/parent/Well navigations are not recorded.
+  // lifeLastDestTs is the ms timestamp of that write — the resume card
+  // hides when the destination is stale (>1h old) or the ts is missing.
   lifeLastDest:null,
+  lifeLastDestTs:0,
   // 2026-05-30 — Heart Check usage log. Each entry { key, date }
   // where key is one of the 12 HEART_CHECK ids. Capped to the
   // most recent 100 in faith-zones.js. Used for trait awards on
