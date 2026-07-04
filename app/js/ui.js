@@ -2143,6 +2143,10 @@ async function loadCardPhotoOverrides(){
     if(!resp.ok) return;
     const data = await resp.json();
     const overrides = (data && data.overrides) || {};
+    // Full map on window for renderers that rebuild their DOM (the
+    // Command Center photo-card home re-renders on every home paint, so
+    // the DOM swap below would be lost) — they read this at render time.
+    if(typeof window !== 'undefined') window.CARD_PHOTO_OVERRIDES = overrides;
     let appliedDom = 0;
     let appliedSk  = 0;
     let appliedAc  = 0;
@@ -2213,6 +2217,13 @@ async function loadCardPhotoOverrides(){
     // Reading Plans — re-render the card list if any plan photo overrides arrived.
     if(appliedRp > 0 && typeof renderReadingPlansCard === 'function'){
       try { renderReadingPlansCard(); } catch(e){}
+    }
+    // Command Center photo-card home — if it has already painted, re-render
+    // so ah-*/legacy-key overrides show without a reload (it reads
+    // window.CARD_PHOTO_OVERRIDES at render time).
+    const ccRoot = document.getElementById('appCommandCenter');
+    if(ccRoot && ccRoot.childElementCount > 0 && typeof renderCommandCenter === 'function'){
+      try { renderCommandCenter(); } catch(e){}
     }
   } catch(e){
     // Fail silently — overrides are non-essential. The base photo set
@@ -2332,6 +2343,18 @@ function showSection(id, fromMobile){
   if(target){ target.style.display = ''; target.classList.add('active'); }
   _ensureFlatBack(target);
   _activeSection = id;
+  // L2 photo-card home — remember the last real destination so the
+  // Command Center can offer "Continue where you left off". Mirrors
+  // faithLastDest. Home/parent are not resumable; the Well keeps its
+  // own faithLastDest. Only saves on change to avoid save() churn.
+  if(id && id.indexOf('s-') === 0 && id !== 's-hero' && id !== 's-parent' && id !== 's-scripture'){
+    try {
+      if(typeof D !== 'undefined' && D && D.lifeLastDest !== id){
+        D.lifeLastDest = id;
+        if(typeof save === 'function') save();
+      }
+    } catch(_e){}
+  }
   // Engagement aggregate write to profiles (debounced inside the helper).
   if(typeof trackSectionVisit === 'function') trackSectionVisit(id);
 
