@@ -807,13 +807,23 @@
   }
 
   // ── MY FAITH doorway — land on the faith journey home grid ───
-  // showSection('s-scripture') fires renderFaithZones on a 30ms
-  // timeout (ui.js), so the journey render is scheduled after it and
-  // wins the paint. Flag-off accounts keep their classic Well on every
-  // OTHER faith entry — this doorway alone force-shows the journey
-  // grid. If faith-zones failed to load, the user still lands in the
-  // Well (graceful degrade — never a dead tap).
+  // Entering via this doorway OPTS THE ACCOUNT IN: D.faithJourneyHome
+  // (already in DEF, syncs via profiles.data) flips true so _fjHomeOn()
+  // holds and every back path — fzGoHome, the Zone-3 back pill — routes
+  // to the journey grid instead of the classic list (the 2026-07-04
+  // back-to-old-list bug). showSection('s-scripture') fires
+  // renderFaithZones on a 30ms timeout (ui.js); with the flag set its
+  // own flag-on branch renders the journey home — the 120ms forced
+  // render remains as belt-and-suspenders for the first entry. If
+  // faith-zones failed to load, the user still lands in the Well
+  // (graceful degrade — never a dead tap).
   function ccOpenFaithHome(){
+    try {
+      if (typeof D !== 'undefined' && D && D.faithJourneyHome !== true){
+        D.faithJourneyHome = true;
+        if (typeof save === 'function') save();
+      }
+    } catch(_){}
     if (typeof showSection === 'function') showSection('s-scripture');
     setTimeout(function(){
       if (typeof window.renderFaithJourneyHome === 'function'){

@@ -772,7 +772,26 @@ function bfInjectBackPill(panelId){
   back.className = 'bf-back-btn topic-back-btn';
   back.type = 'button';
   back.innerHTML = '← Back to Home';
-  back.onclick = function(){ bfTab('home'); };
+  // 2026-07-04 — journey-aware back. When the journey home is the
+  // account's faith home (_fjHomeOn: faith-free, or opted in via the
+  // child-home My Faith doorway), "home" means the journey grid — the
+  // old hardcoded bfTab('home') stranded users on the classic Zone-1
+  // list with this panel still expanded below it. Collapse Zone 3
+  // first (mirrors fzGoHome's flag branch) so nothing bleeds under the
+  // grid; renderFaithJourneyHome itself removes any stray
+  // #fjExploreBack pill and hides #fzHome. Classic accounts fall
+  // through to bfTab('home') unchanged.
+  back.onclick = function(){
+    if (typeof _fjHomeOn === 'function' && _fjHomeOn()
+        && typeof renderFaithJourneyHome === 'function'){
+      if (typeof D !== 'undefined' && D) D.faithExploreOpen = false;
+      const z3 = document.getElementById('fzZone3Wrap');
+      if (z3) z3.style.display = 'none';
+      renderFaithJourneyHome();
+      return;
+    }
+    bfTab('home');
+  };
   el.insertBefore(back, el.firstChild);
 }
 
