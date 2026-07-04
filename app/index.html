@@ -1297,6 +1297,45 @@
   .cc-climb-ovhome:focus-visible{outline:2px solid #22d3ee;outline-offset:2px;}
   .cc-climb-ovtitle{font-size:.72rem;font-weight:600;letter-spacing:.2em;color:#8ecfdd;}
 
+  /* ── featured MY WALK WITH GOD card (gold twin of MY CLIMB) ──
+     Optional admin photo (fj-my-walk key, shared with the journey
+     home's featured card) paints as a dimmed cover layer under the
+     row content; the shade keeps text legible over any photo
+     (contrast rule). 16px radius per the design-system card scale. */
+  .cc-walk-sec{margin:.6rem 0 .2rem;}
+  .cc-walk{position:relative;display:flex;align-items:center;gap:.9rem;width:100%;min-height:72px;padding:.95rem 1.1rem;background:linear-gradient(135deg,#231a06,#140f02);border:1px solid rgba(251,191,36,.35);border-radius:16px;color:#f4ecd8;text-align:left;cursor:pointer;box-shadow:0 0 22px rgba(251,191,36,.10);transition:transform 200ms ease,background 200ms ease,border-color 200ms ease;overflow:hidden;}
+  .cc-walk:hover{transform:translateY(-2px);border-color:rgba(251,191,36,.55);}
+  .cc-walk:active{transform:scale(.97);}
+  .cc-walk:focus-visible{outline:2px solid #fbbf24;outline-offset:3px;}
+  .cc-walk__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.5) saturate(1.05);z-index:0;}
+  .cc-walk__shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,11,2,.85),rgba(15,11,2,.45));z-index:0;pointer-events:none;}
+  .cc-walk__icon{flex:0 0 auto;width:40px;height:40px;border-radius:12px;background:rgba(251,191,36,.14);border:1px solid rgba(251,191,36,.4);display:grid;place-items:center;font-size:1.3rem;position:relative;z-index:1;}
+  .cc-walk__body{display:flex;flex-direction:column;gap:.18rem;min-width:0;position:relative;z-index:1;}
+  .cc-walk__title{font-size:.95rem;font-weight:600;letter-spacing:.14em;color:#fde68a;}
+  .cc-walk__sub{font-size:.8rem;font-style:italic;color:#b7ac8d;}
+  .cc-walk__teaser{font-family:ui-monospace,'JetBrains Mono',monospace;font-feature-settings:"tnum";font-size:.74rem;color:#f5cd6e;margin-top:.1rem;}
+  .cc-walk__chev{margin-left:auto;font-size:1.4rem;line-height:1;color:rgba(253,230,138,.65);position:relative;z-index:1;}
+
+  /* ── MY WALK overlay host — scene layer (hardcoded walk night hex,
+     no dark/light inversion; same rule as the climb overlay). z 8000
+     sits BELOW walk-path.js's station sheet (#walkStationOverlay,
+     z 9000). Bar reuses the climb classes with a gold tint modifier. */
+  #ccWalkOverlay{display:none;position:fixed;inset:0;z-index:8000;background:#0a0f1f;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
+  .cc-walk-ovbar{border-bottom-color:rgba(251,191,36,.18)!important;background:rgba(10,15,31,.9)!important;}
+  .cc-walk-ovhome{border-color:rgba(251,191,36,.4)!important;background:rgba(251,191,36,.1)!important;color:#fde68a!important;}
+  .cc-walk-ovhome:hover{background:rgba(251,191,36,.18)!important;}
+  .cc-walk-ovhome:focus-visible{outline-color:#fbbf24!important;}
+  .cc-walk-ovtitle{color:#f5cd6e!important;}
+
+  /* ── promoted MY FAITH full-row tile — gold twin of the old muted
+     faith row (that de-emphasized treatment is superseded by this
+     doorway; layout rides the existing .cc-tile--faith full-row). */
+  .cc-tile--myfaith{background:#1d1708;border-color:rgba(251,191,36,.25);color:#f4ecd8;}
+  .cc-tile--myfaith .cc-tile__icon{background:rgba(251,191,36,.14);border-color:rgba(251,191,36,.35);font-size:1.1rem;}
+  .cc-tile--myfaith .cc-tile__title{color:#fde68a;font-weight:600;}
+  .cc-tile--myfaith .cc-tile__meta{color:#b7ac8d;}
+  .cc-tile--myfaith:hover{background:#251d0a;border-color:rgba(251,191,36,.45);}
+
   /* ── reduced motion ─────────────────────────────────────────
      Freeze to a still frame — no transitions or animations on the
      home. (The constellation-specific freezes left with the hero,
@@ -16638,6 +16677,32 @@
               :root.light #appCommandCenter .cc-climb__teaser{color:#0e7490;}
               :root.light #appCommandCenter .cc-climb__icon{background:rgba(8,145,178,.08);border-color:rgba(8,145,178,.3);}
               :root.light #appCommandCenter .cc-climb__chev{color:rgba(8,145,178,.55);}
+              /* MY WALK featured card + promoted MY FAITH tile — gold
+                 drops to amber-800 ink on paper. A cover photo fades to
+                 a faint texture (no shade needed under dark text). The
+                 walk overlay itself is scene-layer and does not invert. */
+              :root.light #appCommandCenter .cc-walk{
+                background:#ffffff;
+                border-color:rgba(180,120,20,.45);
+                box-shadow:0 1px 4px rgba(15,23,42,.06);
+                color:#1a1233;
+              }
+              :root.light #appCommandCenter .cc-walk__img{filter:brightness(.95) saturate(1.02);opacity:.16;}
+              :root.light #appCommandCenter .cc-walk__shade{display:none;}
+              :root.light #appCommandCenter .cc-walk__title{color:#92400e;}
+              :root.light #appCommandCenter .cc-walk__sub{color:#4a4b52;}
+              :root.light #appCommandCenter .cc-walk__teaser{color:#92400e;}
+              :root.light #appCommandCenter .cc-walk__icon{background:rgba(180,120,20,.10);border-color:rgba(180,120,20,.35);}
+              :root.light #appCommandCenter .cc-walk__chev{color:rgba(146,64,14,.55);}
+              :root.light #appCommandCenter .cc-tile--myfaith{
+                background:#ffffff;
+                border-color:rgba(180,120,20,.30);
+                color:#1a1233;
+              }
+              :root.light #appCommandCenter .cc-tile--myfaith:hover{background:#fdfbf6;border-color:rgba(180,120,20,.5);}
+              :root.light #appCommandCenter .cc-tile--myfaith .cc-tile__title{color:#92400e;}
+              :root.light #appCommandCenter .cc-tile--myfaith .cc-tile__meta{color:#4a4b52;}
+              :root.light #appCommandCenter .cc-tile--myfaith .cc-tile__icon{background:rgba(180,120,20,.10);border-color:rgba(180,120,20,.35);}
 
               /* Nebula layer — purely decorative. */
               #parentCelestialHome .pch-nebula{pointer-events:none;}

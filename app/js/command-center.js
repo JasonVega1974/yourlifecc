@@ -317,12 +317,17 @@
     var tasks  = _ccTasksToday();
     var points = _ccPoints();
 
+    // 2026-07-04 — Faith promoted on the child home. The old muted
+    // "Faith — optional" row (dest 'faith' → classic Well) is superseded
+    // by this gold MY FAITH doorway: dest 'faithhome' lands on the faith
+    // journey home grid (all 21 photo cards). The classic Well stays
+    // reachable inside the faith section itself.
     var faithHtml = ''
-      + '<button class="cc-tile cc-tile--faith" type="button" data-dest="faith" '
-      +   'aria-label="Faith — optional">'
-      +   '<span class="cc-tile__icon" aria-hidden="true">'+_CC_FAITH.icon+'</span>'
-      +   '<span class="cc-tile__title">'+_ccEsc(_CC_FAITH.label)+'</span>'
-      +   '<span class="cc-tile__meta">optional</span>'
+      + '<button class="cc-tile cc-tile--faith cc-tile--myfaith" type="button" data-dest="faithhome" '
+      +   'aria-label="My Faith — your faith journey">'
+      +   '<span class="cc-tile__icon" aria-hidden="true">✨</span>'
+      +   '<span class="cc-tile__title">My Faith</span>'
+      +   '<span class="cc-tile__meta">Your faith journey</span>'
       + '</button>';
 
     // Daily greeting — day-of-week + date in Bebas Neue, with an italic
@@ -420,6 +425,8 @@
       +   _ccContinueCard()
 
       +   _ccClimbCard()
+
+      +   _ccWalkCard()
 
       +   (document.documentElement.classList.contains('flatnav')
             ? '<section class="cc-shortcuts-sec" aria-label="My Shortcuts">'
@@ -551,6 +558,8 @@
 
   function ccOpenDest(dest){
     if (dest === 'climb'){ ccOpenClimb(); return; }
+    if (dest === 'walk'){ ccOpenWalk(); return; }
+    if (dest === 'faithhome'){ ccOpenFaithHome(); return; }
     var target = _CC_SECTION_MAP[dest];
     if (!target){ try { console.warn('[ccOpenDest] no section for', dest); } catch(_){} return; }
     if (typeof showSection === 'function') showSection(target);
@@ -669,11 +678,158 @@
     try { renderCommandCenter(); } catch(_){}
   }
 
+  // ── featured MY WALK WITH GOD card (L2 doorway) ──────────────
+  // Gold twin of MY CLIMB (cyan stays the climb's; gold is the walk's
+  // signature). Progress teaser from walkGetProgress (walk-path.js,
+  // 14 stations) renders only once at least one step is done — a
+  // fresh account sees the invitation, never a zero. Optional admin
+  // cover photo shares the journey home's fj-my-walk key, so one
+  // upload feeds both featured cards.
+  function _ccWalkCard(){
+    var teaser = '';
+    try {
+      if (typeof window.walkGetProgress === 'function'){
+        var p = window.walkGetProgress();
+        if (p && p.done > 0){
+          teaser = '<span class="cc-walk__teaser">' + p.done + ' of ' + p.total + ' steps &middot; ' + p.pct + '%</span>';
+        }
+      }
+    } catch(_){}
+    var url = '';
+    try { url = (window.CARD_PHOTO_OVERRIDES || {})['fj-my-walk'] || ''; } catch(_){}
+    var photo = url
+      ? '<img class="cc-walk__img" data-card-id="fj-my-walk" src="' + _ccEsc(url) + '" loading="lazy" alt="" onerror="this.style.display=\'none\'">'
+        + '<span class="cc-walk__shade" aria-hidden="true"></span>'
+      : '';
+    return ''
+      + '<section class="cc-walk-sec" aria-label="My Walk with God">'
+      +   '<button class="cc-walk" type="button" data-dest="walk" aria-label="My Walk with God — your discipleship journey">'
+      +     photo
+      +     '<span class="cc-walk__icon" aria-hidden="true">🙏</span>'
+      +     '<span class="cc-walk__body">'
+      +       '<span class="cc-walk__title">MY WALK WITH GOD</span>'
+      +       '<span class="cc-walk__sub">Your discipleship journey.</span>'
+      +       teaser
+      +     '</span>'
+      +     '<span class="cc-walk__chev" aria-hidden="true">›</span>'
+      +   '</button>'
+      + '</section>';
+  }
+
+  // ── MY WALK overlay host — mirror of _ccClimbOverlay ─────────
+  // z 8000 sits BELOW walk-path.js's own station sheet
+  // (#walkStationOverlay, z 9000) so station pages open above the
+  // path as designed. walk-path.js hard-codes 'walkPathWrap' in its
+  // own step re-render, so this host must own that id exclusively
+  // while open — ccOpenWalk strips the id from any stale faith-side
+  // host (fzOpenDest('walk') rebuilds its panel innerHTML on every
+  // open, so that node is disposable between visits).
+  function _ccWalkOverlay(){
+    var ov = document.getElementById('ccWalkOverlay');
+    if (ov) return ov;
+    ov = document.createElement('div');
+    ov.id = 'ccWalkOverlay';
+    ov.innerHTML = ''
+      + '<div class="cc-climb-ovbar cc-walk-ovbar">'
+      +   '<button type="button" class="cc-climb-ovhome cc-walk-ovhome" id="ccWalkHomeBtn">← Home</button>'
+      +   '<span class="cc-climb-ovtitle cc-walk-ovtitle">MY WALK WITH GOD</span>'
+      + '</div>'
+      + '<div style="max-width:560px;margin:0 auto;padding:1rem .9rem 2.5rem;"><div id="walkPathWrap"></div></div>';
+    document.body.appendChild(ov);
+    ov.querySelector('#ccWalkHomeBtn').addEventListener('click', ccCloseWalk);
+    // Esc: close the station sheet first if it's up, else leave the walk.
+    document.addEventListener('keydown', function(e){
+      if (e.key !== 'Escape') return;
+      if (ov.style.display !== 'block') return;
+      var st = document.getElementById('walkStationOverlay');
+      if (st && st.style.display !== 'none'){
+        if (typeof window.walkCloseStation === 'function') window.walkCloseStation();
+        return;
+      }
+      ccCloseWalk();
+    });
+    return ov;
+  }
+
+  function ccOpenWalk(){
+    // Module-load failure degrades to a quiet notice, never a dead tap.
+    if (typeof window.renderWalkPath !== 'function'){
+      if (typeof window.showToast === 'function') window.showToast('My Walk is unavailable right now — try a refresh');
+      return;
+    }
+    // Station "tool" chips route via showSection (walk-path.js
+    // walkOpenTool) — wrap it ONCE so this overlay closes first when it
+    // is the active host (no-op when the faith-side walk is the host).
+    // Same wrapper etiquette as the climb's lifeOpenTool patch.
+    if (!window._ccWalkToolWrapped && typeof window.walkOpenTool === 'function'){
+      window._ccWalkToolWrapped = true;
+      var _origTool = window.walkOpenTool;
+      window.walkOpenTool = function(){
+        try {
+          var _ov = document.getElementById('ccWalkOverlay');
+          if (_ov && _ov.style.display === 'block') ccCloseWalk();
+        } catch(_){}
+        return _origTool.apply(this, arguments);
+      };
+    }
+    var ov = _ccWalkOverlay();
+    // Exclusive id claim — see _ccWalkOverlay comment.
+    try {
+      document.querySelectorAll('[id="walkPathWrap"]').forEach(function(n){
+        if (!ov.contains(n)) n.removeAttribute('id');
+      });
+    } catch(_){}
+    ov.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    try {
+      window.renderWalkPath('walkPathWrap');
+    } catch(e){
+      ccCloseWalk();
+      if (typeof window.showToast === 'function') window.showToast('My Walk could not open');
+      try { console.error('[ccOpenWalk]', e); } catch(_){}
+      return;
+    }
+    // Land on the "YOU ARE HERE" beacon (current station) if present.
+    try {
+      var cur = ov.querySelector('.wk-current');
+      if (cur && cur.scrollIntoView) cur.scrollIntoView({ block:'center' });
+      else ov.scrollTop = 0;
+    } catch(_){}
+  }
+
+  function ccCloseWalk(){
+    var ov = document.getElementById('ccWalkOverlay');
+    if (ov) ov.style.display = 'none';
+    document.body.style.overflow = '';
+    if (typeof window.walkCloseStation === 'function'){ try { window.walkCloseStation(); } catch(_){} }
+    // Re-render home so the card teaser reflects any steps just taken.
+    try { renderCommandCenter(); } catch(_){}
+  }
+
+  // ── MY FAITH doorway — land on the faith journey home grid ───
+  // showSection('s-scripture') fires renderFaithZones on a 30ms
+  // timeout (ui.js), so the journey render is scheduled after it and
+  // wins the paint. Flag-off accounts keep their classic Well on every
+  // OTHER faith entry — this doorway alone force-shows the journey
+  // grid. If faith-zones failed to load, the user still lands in the
+  // Well (graceful degrade — never a dead tap).
+  function ccOpenFaithHome(){
+    if (typeof showSection === 'function') showSection('s-scripture');
+    setTimeout(function(){
+      if (typeof window.renderFaithJourneyHome === 'function'){
+        try { window.renderFaithJourneyHome(); } catch(_e){}
+      }
+    }, 120);
+  }
+
   // ── exports ──────────────────────────────────────────────────
   if (typeof window !== 'undefined'){
     window.renderCommandCenter = renderCommandCenter;
     window.ccOpenDest          = ccOpenDest;
     window.ccOpenClimb         = ccOpenClimb;
     window.ccCloseClimb        = ccCloseClimb;
+    window.ccOpenWalk          = ccOpenWalk;
+    window.ccCloseWalk         = ccCloseWalk;
+    window.ccOpenFaithHome     = ccOpenFaithHome;
   }
 })();
