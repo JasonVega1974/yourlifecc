@@ -8079,6 +8079,17 @@
       color:var(--tx);
       overflow:hidden;
     }
+    /* iOS Safari backface hardening (2026-07-04) — backface-visibility
+       breaks on WebKit when a face also carries overflow:hidden +
+       border-radius inside preserve-3d, ghosting the front face
+       mirror-reversed over the back face's action buttons. Don't rely
+       on culling alone: explicitly hide the non-active face, swapping
+       visibility at the flip's 90° midpoint (delay = half the .4s
+       rotation) so both faces never paint together. Theme-agnostic. */
+    .cm-card-front{ visibility:visible; transition:visibility 0s linear .2s; }
+    .cm-card-back { visibility:hidden;  transition:visibility 0s linear .2s; }
+    .cm-card-container.flipped .cm-card-front{ visibility:hidden; }
+    .cm-card-container.flipped .cm-card-back { visibility:visible; }
     /* Mobile compaction — front-face only. Back-face cap is lifted by
        `.flipped` rules below so the previous clip fix stands. */
     @media (max-width: 768px){
@@ -8490,7 +8501,8 @@
     }
 
     @media (prefers-reduced-motion: reduce){
-      .cm-card-inner, .cm-card-face::before, .cm-swipe-hint{
+      .cm-card-inner, .cm-card-face::before, .cm-swipe-hint,
+      .cm-card-front, .cm-card-back{
         transition:none !important;
         animation:none !important;
       }
