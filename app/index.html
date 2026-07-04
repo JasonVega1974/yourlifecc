@@ -1201,151 +1201,39 @@
     .xpj-toast.show{transform:translate(-50%,0);animation:none;}
   }
 
-  /* ── constellation: living space scene ─────────────────────
-     A layered backdrop (deep sky + 2 nebula washes + starfield)
-     sits behind the SVG node graph. The SVG itself drifts on a
-     slow float (transform-only). All motion is GPU-friendly. */
-  /* Base fill = page bg so an unpainted constellation never reads as
-     "a darker / black rectangle" sitting on the page. The nebula radial
-     overlays still add the warm + cool space tint on top. The previous
-     linear-gradient ended at #060912 (near-black) which was darker than
-     --bg and caused the load flash. */
-  .cc-constellation{
-    position:relative;width:100%;height:320px;margin:.4rem 0 1.6rem;
-    border-radius:22px;overflow:hidden;
-    background-color:var(--bg,#0d1117);
-    background-image:
-      radial-gradient(ellipse 80% 55% at 30% 25%, rgba(245,166,35,.10), transparent 60%),
-      radial-gradient(ellipse 90% 65% at 70% 75%, rgba(106,167,255,.10), transparent 60%),
-      radial-gradient(ellipse 60% 50% at 50% 50%, rgba(244,123,90,.06), transparent 70%);
-    border:1px solid rgba(255,255,255,.08);
-    box-shadow:inset 0 0 60px rgba(0,0,0,.25);
-  }
-  /* Nebula wash 1 — amber/coral, slow drift */
-  .cc-constellation::before{
-    content:'';position:absolute;inset:-20% -10%;
-    background:radial-gradient(ellipse 50% 35% at 30% 45%, rgba(245,166,35,.20), transparent 65%);
-    filter:blur(36px);opacity:.65;pointer-events:none;
-    animation:cc-nebula-1 32s ease-in-out infinite;
-    will-change:transform;
-  }
-  /* Nebula wash 2 — blue, drift opposite */
-  .cc-constellation::after{
-    content:'';position:absolute;inset:-15% -15%;
-    background:radial-gradient(ellipse 55% 35% at 70% 60%, rgba(106,167,255,.18), transparent 65%);
-    filter:blur(44px);opacity:.55;pointer-events:none;
-    animation:cc-nebula-2 40s ease-in-out infinite;
-    will-change:transform;
-  }
-  @keyframes cc-nebula-1{ 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(7%,-3%) scale(1.05);} }
-  @keyframes cc-nebula-2{ 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-5%,4%) scale(1.04);} }
+  /* ── photo-card home grid (L2, 2026-07-03) ──────────────────
+     Replaces the constellation hero. Mirrors the faith journey
+     home's card anatomy (photo hero + dark shade + title + sub)
+     in the CC's cyan family — gold stays the Well's. Placeholder
+     = night gradient + icon glyph until an admin photo is
+     uploaded (never a broken image). */
+  .cc-group{margin:1.5rem 0 0;}
+  .cc-eyebrow{font-size:.68rem;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:#67e8f9;margin:0 0 .7rem .3rem;}
+  .cc-cards{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;}
+  @media (min-width:720px){ .cc-cards{grid-template-columns:repeat(3,1fr);gap:1rem;} }
+  .cc-pcard{position:relative;display:flex;flex-direction:column;padding:0 0 .85rem;background:#0d1626;border:1px solid rgba(34,211,238,.16);border-radius:16px;overflow:hidden;color:#e9f4f6;text-align:left;cursor:pointer;font-family:inherit;transition:transform 200ms ease,border-color 200ms ease;}
+  .cc-pcard:hover{transform:translateY(-2px);border-color:rgba(34,211,238,.4);}
+  .cc-pcard:active{transform:scale(.97);}
+  .cc-pcard:focus-visible{outline:2px solid #22d3ee;outline-offset:3px;}
+  .cc-pcard__hero{position:relative;display:block;height:92px;background:linear-gradient(135deg,#123044,#0b1626);}
+  .cc-pcard__ph{position:absolute;inset:0;display:grid;place-items:center;font-size:1.9rem;opacity:.85;}
+  .cc-pcard__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .cc-pcard__shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,13,29,0) 35%,rgba(6,13,29,.82));}
+  .cc-pcard__title{font-size:.82rem;font-weight:600;letter-spacing:.1em;color:#c8f6ff;margin:.7rem .85rem 0;}
+  .cc-pcard__sub{font-size:.72rem;font-style:italic;color:#9AA0B4;margin:.2rem .85rem 0;}
 
-  .cc-constellation__svg{
-    width:100%;height:100%;display:block;position:relative;z-index:1;
-    animation:cc-float 9s ease-in-out infinite;
-    will-change:transform;
-  }
-  @keyframes cc-float{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-4px);} }
-
-  .cc-constellation__caption{
-    position:absolute;left:1rem;top:.85rem;z-index:2;
-    font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;
-    color:#9AA0B4;opacity:.9;pointer-events:none;
-  }
-  .cc-constellation__caption span{font-weight:600;}
-  @media (min-width:720px){ .cc-constellation{height:380px;} }
-
-  /* ── starfield ──────────────────────────────────────────────
-     Base opacity matches the twinkle keyframe's 0% value so the
-     first paint is the same brightness the animation cycles
-     through — no flash from invisible to visible. */
-  .cc-star{
-    fill:#F1E9D5;opacity:.18;
-    animation:cc-twinkle var(--td,3s) ease-in-out infinite;
-    animation-delay:var(--dl,0s);
-  }
-  @keyframes cc-twinkle{ 0%,100%{opacity:.18;} 50%{opacity:.85;} }
-
-  /* ── connection links ───────────────────────────────────────
-     Lines paint fully drawn from frame 0 (stroke-dashoffset:0).
-     Active links — those touching the focus node — are visible
-     from frame 0 and run a continuous dashed flow toward focus
-     (focus end is x1,y1, so stroke-dashoffset → 0 = inward). */
-  .cc-link{
-    stroke:rgba(241,233,213,.18);stroke-width:1;fill:none;stroke-linecap:round;
-    stroke-dasharray:300;stroke-dashoffset:0;
-  }
-  .cc-link--active{
-    stroke-width:1.4;stroke-opacity:.55;
-    stroke-dasharray:5 11;stroke-dashoffset:0;
-    opacity:.7;
-    animation:cc-flow 1.8s linear infinite;
-  }
-  @keyframes cc-flow{ from{stroke-dashoffset:16;} to{stroke-dashoffset:0;} }
-
-  /* ── nodes: layered breathing orbs ──────────────────────────
-     Three concentric circles per node:
-       .cc-orb__halo  outer translucent breath (scale + opacity)
-       .cc-orb__ring  middle ring with stroke
-       .cc-orb__core  bright centre point with drop-shadow glow
-     Brightness modifiers (--bright / --dim) and focus modifier
-     drive glow intensity. Pulses only render on focus. */
-  /* .cc-drift wrapper kept for DOM structure (renderCommandCenter
-     still emits <g class="cc-drift cc-drift--N"> around each orb)
-     but the positional drift animation is RETIRED 2026-06-12 --
-     orbs became tap targets, and a translating tap target works
-     against muscle memory and accessibility. Breathe still lives
-     on the inner .cc-orb / .star-node wrapper. */
-  .cc-drift{transform-origin:center;transform-box:fill-box;}
-
-  /* Orbs are fully visible on the first frame — the resting state.
-     Ambient life comes from .cc-orb__halo (cc-orb-breath) and the
-     parent .cc-drift wrapper, layered on top of the static orb. */
-  .cc-orb{transform-origin:center;transform-box:fill-box;opacity:1;}
-
-  .cc-orb__halo{
-    transform-origin:center;transform-box:fill-box;
-    fill-opacity:.18;
-    animation:cc-orb-breath 4.2s ease-in-out infinite;
-    will-change:transform,opacity;
-  }
-  .cc-orb__ring{fill-opacity:.18;stroke-opacity:.55;}
-  .cc-orb__core{filter:drop-shadow(0 0 4px currentColor);}
-  @keyframes cc-orb-breath{
-    0%,100%{transform:scale(1);    opacity:.7;}
-    50%    {transform:scale(1.22); opacity:1;}
-  }
-
-  /* Brightness — nodes with real data glow stronger */
-  .cc-orb--bright .cc-orb__halo{ fill-opacity:.24; }
-  .cc-orb--bright .cc-orb__core{ filter:drop-shadow(0 0 6px currentColor) drop-shadow(0 0 10px currentColor); }
-  .cc-orb--dim    .cc-orb__halo{ fill-opacity:.10; animation-duration:6s; opacity:.55; }
-  .cc-orb--dim    .cc-orb__ring{ fill-opacity:.10; stroke-opacity:.30; }
-  .cc-orb--dim    .cc-orb__core{ filter:drop-shadow(0 0 2px currentColor); opacity:.75; }
-
-  /* Focus orb — strongest glow, regardless of data state */
-  .cc-orb--focus .cc-orb__halo{ fill-opacity:.34; animation-duration:3.2s; opacity:1; }
-  .cc-orb--focus .cc-orb__ring{ fill-opacity:.30; stroke-opacity:.85; stroke-width:1.4; }
-  .cc-orb--focus .cc-orb__core{ filter:drop-shadow(0 0 8px currentColor) drop-shadow(0 0 14px currentColor); }
-
-  /* ── pulse rings — only on focus orb ────────────────────── */
-  .cc-pulse{
-    fill:none;stroke:currentColor;stroke-width:1.4;
-    opacity:0;
-    transform-origin:center;transform-box:fill-box;
-    animation:cc-pulse 2.6s ease-out infinite;
-    will-change:transform,opacity;
-  }
-  .cc-pulse--2{ animation-delay:1.3s; }
-  @keyframes cc-pulse{
-    0%   {transform:scale(1);   opacity:.75;}
-    80%  {opacity:.05;}
-    100% {transform:scale(3.2); opacity:0;}
-  }
-
-  /* Labels */
-  .cc-node__label{font-family:inherit;font-size:11px;font-weight:500;fill:#F1E9D5;letter-spacing:.04em;pointer-events:none;}
-  .cc-node__label--sub{fill:#9AA0B4;font-size:9px;}
+  /* ── continue-where-you-left-off card ───────────────────────
+     Compact cyan resume strip above MY CLIMB. Hidden entirely for
+     fresh users (no D.lifeLastDest). */
+  .cc-continue{position:relative;display:flex;align-items:center;gap:.85rem;width:100%;min-height:60px;padding:.75rem 1rem;margin:0 0 .9rem;background:rgba(34,211,238,.07);border:1px solid rgba(34,211,238,.28);border-radius:16px;color:#e9f4f6;text-align:left;cursor:pointer;font-family:inherit;transition:transform 200ms ease,border-color 200ms ease;}
+  .cc-continue:hover{transform:translateY(-2px);border-color:rgba(34,211,238,.5);}
+  .cc-continue:active{transform:scale(.97);}
+  .cc-continue:focus-visible{outline:2px solid #22d3ee;outline-offset:3px;}
+  .cc-continue__icon{flex:0 0 auto;width:34px;height:34px;border-radius:10px;background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.35);display:grid;place-items:center;font-size:1.05rem;}
+  .cc-continue__body{display:flex;flex-direction:column;gap:.14rem;min-width:0;}
+  .cc-continue__eyebrow{font-size:.6rem;font-weight:600;letter-spacing:.2em;color:#67e8f9;}
+  .cc-continue__title{font-size:.9rem;font-weight:500;color:#e9f4f6;}
+  .cc-continue__chev{margin-left:auto;font-size:1.3rem;line-height:1;color:rgba(103,232,249,.6);}
 
   /* tiles */
   .cc-section-label{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:#9AA0B4;margin:0 0 .8rem .3rem;font-weight:600;}
@@ -1405,24 +1293,15 @@
   .cc-climb-ovtitle{font-size:.72rem;font-weight:600;letter-spacing:.2em;color:#8ecfdd;}
 
   /* ── reduced motion ─────────────────────────────────────────
-     Freeze to a polished still frame. The hero stays fully
-     legible (orbs visible, focus glow on, active link drawn)
-     but nothing breathes, drifts, twinkles, or flows. */
+     Freeze to a still frame — no transitions or animations on the
+     home. (The constellation-specific freezes left with the hero,
+     2026-07-03; the photo-card grid has no ambient motion.) */
   @media (prefers-reduced-motion: reduce){
     #appCommandCenter *, #appCommandCenter *::before, #appCommandCenter *::after{
       animation-duration:.001ms !important;
       animation-iteration-count:1 !important;
       transition-duration:.001ms !important;
     }
-    #appCommandCenter .cc-constellation::before{opacity:.7 !important;}
-    #appCommandCenter .cc-constellation::after{opacity:.55 !important;}
-    #appCommandCenter .cc-constellation__svg{transform:none !important;}
-    #appCommandCenter .cc-star{opacity:.45 !important;}
-    #appCommandCenter .cc-link{stroke-dashoffset:0 !important;opacity:.7 !important;}
-    #appCommandCenter .cc-link--active{opacity:.7 !important;stroke-dasharray:5 11 !important;stroke-dashoffset:0 !important;}
-    #appCommandCenter .cc-orb{opacity:1 !important;transform:none !important;}
-    #appCommandCenter .cc-orb__halo{transform:scale(1.12) !important;opacity:.85 !important;}
-    #appCommandCenter .cc-pulse{opacity:.25 !important;transform:scale(1.6) !important;}
   }
 </style>
 
@@ -16644,53 +16523,47 @@
               @media (min-width:720px){ #parentCelestialHome .pch-constellation__svg{height:380px;} }
 
               /* ── Light-mode pass for the child Command Center
-                 (2026-06-12; constellation panel reworked 2026-06-13).
-                 Mirrors the parent's #s-parent light idiom: paper
-                 cards, dark heading ink, deepened amber accents.
-                 NOTE 2026-06-13: the initial light-mode pass assumed
-                 the .cc-constellation panel still painted stars on a
-                 dark backdrop in light mode. It did not -- the panel
-                 used background-color:var(--bg) which flips light, and
-                 the radial overlays (.06-.10 opacity) couldn't carry
-                 the contrast alone. Fixed below by giving both this
-                 panel AND the parent's .pch-constellation a deep
-                 aubergine-to-cocoa night-sky gradient framed with the
-                 #92400e amber accent. Star primitives pick up a subtle
-                 dark drop-shadow in light mode to stay crisp against
-                 the warm cocoa bottom band (per pre-impl visual review). */
+                 (2026-06-12; photo-card home 2026-07-03 — the
+                 constellation panel + its light-mode night gradient
+                 left with the hero). Mirrors the parent's #s-parent
+                 light idiom: paper cards, dark heading ink; the CC's
+                 cyan accents deepen to cyan-700 for contrast. */
               :root.light #appCommandCenter .cc-greeting__hello{color:#0f172a;}
               :root.light #appCommandCenter .cc-daystamp__date{color:#1a1233;}
               :root.light #appCommandCenter .cc-daystamp__sub,
               :root.light #appCommandCenter .cc-daystamp__quote{color:#4a4b52;}
 
-              /* Deep warm framed night-sky panel -- aubergine to cocoa,
-                 brass-amber #92400e frame at .65 opacity, two diagonal
-                 nebula washes (the third center ember radial was dropped
-                 per pre-impl review since it muddled warm-on-warm in
-                 the lower third). */
-              :root.light #appCommandCenter .cc-constellation{
-                background-color:#1a1226;
-                background-image:
-                  radial-gradient(ellipse 80% 55% at 30% 25%, rgba(245,166,35,.20), transparent 60%),
-                  radial-gradient(ellipse 90% 65% at 70% 75%, rgba(106,167,255,.14), transparent 60%),
-                  linear-gradient(180deg, #1a1226 0%, #2a1f33 50%, #3a2820 100%);
-                border:1.5px solid rgba(146,64,14,.65);
-                box-shadow:inset 0 0 0 1px rgba(255,255,255,.07),inset 0 0 60px rgba(0,0,0,.25);
-              }
-
-              /* Star primitive safety net for the warm bottom band --
-                 cream/brass node fills get a subtle dark drop-shadow so
-                 they stay crisp against the cocoa floor. Scoped to the
-                 two constellation panels only; other surfaces using the
-                 shared kit are unaffected. Dark mode untouched. */
-              :root.light #appCommandCenter .cc-constellation .star-core,
-              :root.light #appCommandCenter .cc-constellation .star-bloom,
-              :root.light #appCommandCenter .cc-constellation .star-halo,
+              /* Star primitive safety net (parent celestial home only —
+                 the child constellation is retired). Dark mode untouched. */
               :root.light #parentCelestialHome .pch-constellation .star-core,
               :root.light #parentCelestialHome .pch-constellation .star-bloom,
               :root.light #parentCelestialHome .pch-constellation .star-halo{
                 filter:drop-shadow(0 0 3px rgba(0,0,0,.45));
               }
+
+              /* Photo-card home grid — paper cards, ink titles, the
+                 photo hero keeps its own night gradient (scene-ish
+                 thumbnail, reads fine on paper). */
+              :root.light #appCommandCenter .cc-eyebrow{color:#0e7490;}
+              :root.light #appCommandCenter .cc-pcard{
+                background:#ffffff;
+                border-color:rgba(8,145,178,.22);
+                box-shadow:0 1px 4px rgba(15,23,42,.05);
+                color:#1a1233;
+              }
+              :root.light #appCommandCenter .cc-pcard:hover{border-color:rgba(8,145,178,.45);}
+              :root.light #appCommandCenter .cc-pcard__title{color:#0e7490;}
+              :root.light #appCommandCenter .cc-pcard__sub{color:#4a4b52;}
+              :root.light #appCommandCenter .cc-continue{
+                background:#ffffff;
+                border-color:rgba(8,145,178,.35);
+                box-shadow:0 1px 4px rgba(15,23,42,.05);
+                color:#1a1233;
+              }
+              :root.light #appCommandCenter .cc-continue__eyebrow{color:#0e7490;}
+              :root.light #appCommandCenter .cc-continue__title{color:#0f172a;}
+              :root.light #appCommandCenter .cc-continue__icon{background:rgba(8,145,178,.08);border-color:rgba(8,145,178,.3);}
+              :root.light #appCommandCenter .cc-continue__chev{color:rgba(8,145,178,.55);}
               :root.light #appCommandCenter .cc-time{color:#4a4b52;}
               :root.light #appCommandCenter .cc-section-label{color:#0f172a;}
               :root.light #appCommandCenter .cc-chip{
@@ -16825,14 +16698,15 @@
                 stroke-linejoin:round;
               }
               /* ── Shared kit primitives (2026-06-12) ─────────────
-                 Unscoped on purpose: applies to both the parent
-                 (#parentCelestialHome) and child (#appCommandCenter)
-                 constellation surfaces. .star-node carries the
+                 Unscoped on purpose. Since 2026-07-03 (child
+                 constellation retired for the photo-card home) the
+                 only consumer is the parent celestial home
+                 (#parentCelestialHome). .star-node carries the
                  breathe + hover/focus + flare; .star-bloom/.star-halo/
                  .star-core/.star-spike/.star-badge-* are the star
                  sub-elements; .star-microfield* are the background
-                 dots. Surface-specific state classes (.pch-node--hot,
-                 .cc-orb--focus, etc.) stay parent/child scoped above. */
+                 dots. Surface-specific state classes (.pch-node--hot
+                 etc.) stay parent-scoped above. */
               .star-node{
                 cursor:pointer;
                 transition:transform .25s ease;
