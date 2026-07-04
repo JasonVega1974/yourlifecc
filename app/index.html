@@ -8054,6 +8054,11 @@
       position:relative; width:100%;
       perspective:1400px;
       margin-bottom:.55rem;
+      /* iOS hardening v2 — hard clip at the card bounds (matches the
+         face radius) so neither a backface ghost nor content overflow
+         can ever paint past the card's bottom edge. */
+      overflow:hidden;
+      border-radius:22px;
     }
     .cm-card-inner{
       position:relative; width:100%;
@@ -8079,17 +8084,41 @@
       color:var(--tx);
       overflow:hidden;
     }
-    /* iOS Safari backface hardening (2026-07-04) — backface-visibility
-       breaks on WebKit when a face also carries overflow:hidden +
-       border-radius inside preserve-3d, ghosting the front face
-       mirror-reversed over the back face's action buttons. Don't rely
-       on culling alone: explicitly hide the non-active face, swapping
-       visibility at the flip's 90° midpoint (delay = half the .4s
-       rotation) so both faces never paint together. Theme-agnostic. */
-    .cm-card-front{ visibility:visible; transition:visibility 0s linear .2s; }
-    .cm-card-back { visibility:hidden;  transition:visibility 0s linear .2s; }
-    .cm-card-container.flipped .cm-card-front{ visibility:hidden; }
-    .cm-card-container.flipped .cm-card-back { visibility:visible; }
+    /* iOS Safari flip hardening v2 (2026-07-04) — two stacked bugs:
+       (1) WebKit backface-culling failure ghosted the front face
+       mirror-reversed over the back face's buttons; (2) both faces
+       share grid cell 1/1, so the card's natural height was the
+       TALLER face and the old max-height caps let the difference
+       paint past the un-clipped container. Fix: only the ACTIVE face
+       stays in flow — the non-active face goes absolute, so card
+       height tracks the active face's content (caps removed, nothing
+       clipped). Non-active face is hard-hidden (opacity + visibility
+       + pointer-events): the disappearing face hides INSTANTLY, the
+       appearing face waits for the 90° midpoint, so both are never
+       opaque together and iOS has nothing to ghost. isolation:isolate
+       gives each face its own stacking context (separate compositor
+       layers; must not touch transforms — .cm-card-back carries its
+       rotateY(180deg) below). Theme-agnostic. */
+    .cm-card-front, .cm-card-back{ isolation:isolate; }
+    .cm-card-front{
+      opacity:1; visibility:visible; pointer-events:auto;
+      transition:opacity 0s linear .2s, visibility 0s linear .2s;
+    }
+    .cm-card-container.flipped .cm-card-front{
+      position:absolute; inset:0;
+      opacity:0; visibility:hidden; pointer-events:none;
+      transition:none;
+    }
+    .cm-card-back{
+      position:absolute; inset:0;
+      opacity:0; visibility:hidden; pointer-events:none;
+      transition:none;
+    }
+    .cm-card-container.flipped .cm-card-back{
+      position:relative; inset:auto;
+      opacity:1; visibility:visible; pointer-events:auto;
+      transition:opacity 0s linear .2s, visibility 0s linear .2s;
+    }
     /* Mobile compaction — front-face only. Back-face cap is lifted by
        `.flipped` rules below so the previous clip fix stands. */
     @media (max-width: 768px){
@@ -8099,10 +8128,16 @@
          scroll curiosity. The .flipped state still grows freely (and
          floors at 320 so the back-face content has room). */
       #fzZone1{ margin-bottom:.5rem; }
-      .cm-card-container{ min-height:180px !important; max-height:210px !important; }
+      /* iOS hardening v2 — the 210px max-height cap is retired: front
+         content measures ~230-300px, so with the new container clip
+         the cap would cut the Skip/streak row. Height now tracks the
+         ACTIVE face's content (non-active face is absolute), so the
+         caps are unnecessary; the min-heights keep short cards from
+         collapsing. */
+      .cm-card-container{ min-height:180px !important; }
       .cm-card-inner{ min-height:180px; }
       .cm-card-face{ min-height:180px; padding:1rem 1.1rem; }
-      .cm-card-container.flipped{ max-height:none !important; min-height:320px !important; }
+      .cm-card-container.flipped{ min-height:320px !important; }
       /* Map spec's class names to the actual ones used in
          faith-zones.js: cm-question / cm-pill / cm-cta / cm-pos. */
       .cm-question{ font-size:1.05rem !important; line-height:1.4 !important; }
@@ -8111,8 +8146,8 @@
       .cm-pos{ font-size:.7rem; }
     }
     @media (min-width: 769px){
-      .cm-card-container{ max-height:300px; }
-      .cm-card-container.flipped{ max-height:none; }
+      /* iOS hardening v2 — desktop cap retired for the same reason as
+         mobile: height tracks the active face, the container clips. */
     }
 
     /* ── Scroll cue below the card — invites Zone 2 below the fold.
