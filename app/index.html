@@ -17228,13 +17228,15 @@
             <div id="fafHomeStrip" class="faf-home-strip" role="list" aria-label="Today's activity across all kids"></div>
           </div>
 
-          <!-- Phase 2 IA — 7-card grid (replaces the 4 fixed Quick
-               Action tiles). Painted by renderPhCardGrid() in parent.js
-               with live badges sourced from existing D.* arrays.
-               Reuses .phHomeAction base styling; .ph-card extends for
-               badges + slightly richer typography. -->
+          <!-- Phase 2 IA — 8-card launcher, re-skinned 2026-07-04 as the
+               journey-home photo-card grid (.phc-* in app.css). Painted by
+               renderPhCardGrid() in parent.js: three gold eyebrow sections
+               (Today / Motivation / Family & Settings), each card a photo
+               hero (admin override via data-card-id="ph-<slot>") + badge
+               chip from existing D.* arrays. Layout lives on the inner
+               .phc-grid rows, so this host stays a plain block. -->
           <div class="ph-hub-label" style="font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:#64748b;margin-bottom:8px;font-weight:800;">Hub</div>
-          <div id="phCardGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;"></div>
+          <div id="phCardGrid"></div>
         </div>
 
         <!-- Phase 2 IA — Sub-tab nav for multi-panel cards. Only the

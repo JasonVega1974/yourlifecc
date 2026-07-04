@@ -10664,6 +10664,55 @@ body:has(#s-parent.sec.active #parentCelestialHome:not(.pch-entered):not(.pch-cl
 :root.light #s-parent.sec{ background:none; }
 
 /* ════════════════════════════════════════════════════════════
+   2026-07-04 — Parent Hub photo-card launcher (Phase 1).
+   Re-skins the #phCardGrid 8-card launcher in the journey-home
+   .fjp-card anatomy (photo hero → gradient+icon placeholder →
+   dark shade → Oswald title → Newsreader italic sub) plus one
+   addition: a floating badge chip for live counts. Presentation
+   only — same phNav slots, same badge data, no routing change.
+   16px radius per the design-system card scale (interface card,
+   not scene — the fjp original's 20px stays journey-home-only).
+   Card body is theme-aware (paper in light mode); the photo
+   hero, its shade, and the badge plate are constant in both
+   modes — badge text sits on its own solid dark plate, never
+   the raw photo (contrast rule). Oswald/Newsreader lazy-loaded
+   by _phcEnsureFonts() in parent.js; Inter fallback until then.
+   ════════════════════════════════════════════════════════════ */
+.phc-eyebrow{ font:600 11px/1 Oswald,Inter,sans-serif; letter-spacing:.26em; text-transform:uppercase; color:rgba(245,180,49,.85); margin:1.15rem 3px .6rem; }
+#phCardGrid .phc-eyebrow:first-child{ margin-top:.2rem; }
+.phc-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; }
+.phc-card{ position:relative; display:flex; flex-direction:column; width:100%; text-align:left; font-family:inherit; padding:0; overflow:hidden; cursor:pointer;
+  border-radius:16px; background:linear-gradient(158deg,rgba(30,39,64,.92),rgba(15,21,40,.92));
+  border:1px solid rgba(245,180,49,.16); box-shadow:0 8px 22px rgba(0,0,0,.35);
+  transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease; }
+.phc-card:hover{ transform:translateY(-3px); border-color:rgba(245,180,49,.34); }
+.phc-card:active{ transform:scale(.99); }
+.phc-card:focus-visible{ outline:2px solid #f5b431; outline-offset:2px; }
+.phc-hero{ position:relative; width:100%; height:118px; overflow:hidden; border-bottom:1px solid rgba(245,180,49,.10); }
+.phc-ph{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:38px;
+  background:radial-gradient(ellipse at 30% 30%, rgba(245,180,49,.20), transparent 60%),
+             radial-gradient(ellipse at 75% 75%, rgba(108,150,230,.14), transparent 60%),
+             linear-gradient(180deg,#1c2547 0%,#0d1226 100%); }
+img.phc-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:brightness(.92) saturate(1.05); transition:transform .35s ease,filter .25s ease; }
+.phc-card:hover img.phc-img{ transform:scale(1.04); filter:brightness(1) saturate(1.1); }
+.phc-shade{ position:absolute; left:0; right:0; bottom:0; height:58%; background:linear-gradient(180deg,rgba(10,15,31,0),rgba(10,15,31,.82)); pointer-events:none; }
+.phc-badge{ position:absolute; top:8px; right:8px; z-index:2; font:700 10.5px/1 Oswald,Inter,sans-serif; letter-spacing:.06em;
+  color:#f5cd6e; background:rgba(10,15,31,.85); border:1px solid rgba(245,180,49,.35); border-radius:999px; padding:.32rem .55rem; }
+.phc-title{ font:700 14.5px/1.15 Oswald,sans-serif; letter-spacing:.03em; color:#efe7d4; padding:11px 13px 4px; }
+.phc-sub{ font:italic 400 12px/1.4 Newsreader,serif; color:#9aa2ba; padding:0 13px 12px; }
+@media (prefers-reduced-motion:reduce){
+  .phc-card, img.phc-img{ transition:none; }
+  .phc-card:hover{ transform:none; }
+  .phc-card:hover img.phc-img{ transform:none; }
+}
+/* Light mode — card body paints paper; hero/shade/badge stay constant. */
+:root.light .phc-card{ background:#ffffff; border-color:rgba(15,23,42,.10); box-shadow:0 2px 10px rgba(15,23,42,.08); }
+:root.light .phc-card:hover{ border-color:rgba(180,120,20,.40); }
+:root.light .phc-title{ color:#1f1810; }
+:root.light .phc-sub{ color:#6e6558; }
+:root.light .phc-eyebrow{ color:#92400e; }
+
+/* ════════════════════════════════════════════════════════════
    2026-06-06 — Parent Hub launcher grid layout guards.
    Bottom clearance previously lived here; superseded 2026-06-07 by
    the global .sec padding-bottom rule above. The overflow:visible /

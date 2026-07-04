@@ -3217,27 +3217,72 @@ function renderPhCardGrid(){
     ).length;
   })();
 
-  const cards = [
-    {slot:'chores',    icon:'✅',     label:'Chores',                 sub:'Verify · assign · history',         badge: pendTotal       > 0 ? pendTotal + ' pending'       : ''},
-    {slot:'rewards',   icon:'🪙',     label:'Rewards',                sub:'Award · deduct · store',            badge: pbBal           > 0 ? pbBal + ' PB balance'        : ''},
-    {slot:'allowance', icon:'💵',     label:'Allowance',              sub:'Recurring credit · per kid',        badge: allowanceActive > 0 ? allowanceActive + ' active'   : ''},
-    {slot:'contests',  icon:'🏆',     label:'Contests',               sub:'Leaderboard · MVP · contests',      badge: contestsActive  > 0 ? contestsActive + ' active'   : ''},
-    {slot:'activity',  icon:'📅',     label:'Activity',               sub:'Schedule · log · behavior',         badge: activityToday   > 0 ? activityToday + ' today'     : ''},
-    {slot:'reports',   icon:'📈',     label:'Reports',                sub:'AI summaries · quizzes · faith',    badge: ''},
-    {slot:'family',    icon:'👨‍👩‍👧',label:'Family',                 sub:'Kids · learning · refer',           badge: childCount      > 0 ? childCount + ' kid' + (childCount>1?'s':'') : ''},
-    {slot:'controls',  icon:'⚙️',    label:'Controls',               sub:'Screen · earnings · access',        badge: ''}
+  // Photo-card re-skin (2026-07-04) — same 8 cards / same phNav slots,
+  // now grouped under three gold eyebrows and rendered in the journey-
+  // home .fjp anatomy (.phc-* in app.css). Chores stays top-level per
+  // the standing anchor rule (never under Rewards).
+  const sections = [
+    {eyebrow:'Today', cards:[
+      {slot:'chores',    icon:'✅',     label:'Chores',    sub:'Verify · assign · history',       badge: pendTotal       > 0 ? pendTotal + ' pending'      : ''},
+      {slot:'activity',  icon:'📅',     label:'Activity',  sub:'Schedule · log · behavior',       badge: activityToday   > 0 ? activityToday + ' today'    : ''}
+    ]},
+    {eyebrow:'Motivation', cards:[
+      {slot:'rewards',   icon:'🪙',     label:'Rewards',   sub:'Award · deduct · store',          badge: pbBal           > 0 ? pbBal + ' PB balance'       : ''},
+      {slot:'allowance', icon:'💵',     label:'Allowance', sub:'Recurring credit · per kid',      badge: allowanceActive > 0 ? allowanceActive + ' active'  : ''},
+      {slot:'contests',  icon:'🏆',     label:'Contests',  sub:'Leaderboard · MVP · contests',    badge: contestsActive  > 0 ? contestsActive + ' active'   : ''}
+    ]},
+    {eyebrow:'Family & Settings', cards:[
+      {slot:'reports',   icon:'📈',     label:'Reports',   sub:'AI summaries · quizzes · faith',  badge: ''},
+      {slot:'family',    icon:'👨‍👩‍👧',label:'Family',    sub:'Kids · learning · refer',         badge: childCount      > 0 ? childCount + ' kid' + (childCount>1?'s':'') : ''},
+      {slot:'controls',  icon:'⚙️',    label:'Controls',  sub:'Screen · earnings · access',      badge: ''}
+    ]}
   ];
 
   const esc = (typeof _phEscape === 'function') ? _phEscape : function(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); };
 
-  grid.innerHTML = cards.map(c =>
-    '<button type="button" class="phHomeAction ph-card" data-ph-card="' + c.slot + '" onclick="phNav(\'' + c.slot + '\')">' +
-      '<div class="phaIc ph-card-icon">' + c.icon + '</div>' +
-      '<div class="phaLb ph-card-label">' + esc(c.label) + '</div>' +
-      '<div class="phaSb ph-card-sub">'  + esc(c.sub)   + '</div>' +
-      (c.badge ? '<div class="ph-card-badge">' + esc(c.badge) + '</div>' : '') +
-    '</button>'
+  // Admin photo per card: override map is populated by
+  // loadCardPhotoOverrides() (ui.js) before/around hub render; the img
+  // also ships without src when no override exists (no-src imgs paint
+  // nothing over the gradient placeholder — never a broken image), and
+  // keeps data-card-id so the boot-time DOM swap covers a render that
+  // beats the fetch.
+  const photoMap = (typeof window !== 'undefined' && window.CARD_PHOTO_OVERRIDES) || {};
+  const cardHtml = function(c){
+    const photoId = 'ph-' + c.slot;
+    const url = photoMap[photoId] || '';
+    return '<button type="button" class="phc-card" data-ph-card="' + c.slot + '" onclick="phNav(\'' + c.slot + '\')"' +
+      ' aria-label="' + esc(c.label + (c.badge ? ' — ' + c.badge : '')) + '">' +
+      '<div class="phc-hero">' +
+        '<div class="phc-ph" aria-hidden="true">' + c.icon + '</div>' +
+        '<img class="phc-img" data-card-id="' + photoId + '"' + (url ? ' src="' + esc(url) + '"' : '') + ' loading="lazy" alt="" onerror="this.style.display=\'none\'">' +
+        '<div class="phc-shade"></div>' +
+        (c.badge ? '<div class="phc-badge">' + esc(c.badge) + '</div>' : '') +
+      '</div>' +
+      '<div class="phc-title">' + esc(c.label) + '</div>' +
+      '<div class="phc-sub">'  + esc(c.sub)  + '</div>' +
+    '</button>';
+  };
+
+  _phcEnsureFonts();
+  grid.innerHTML = sections.map(s =>
+    '<div class="phc-eyebrow">' + esc(s.eyebrow) + '</div>' +
+    '<div class="phc-grid">' + s.cards.map(cardHtml).join('') + '</div>'
   ).join('');
+}
+
+// Oswald (titles/eyebrows/badges) + Newsreader italic (subtitles) for the
+// photo cards — same lazy-load pattern as faith-zones' _fjEnsureFonts and
+// command-center's _ccEnsureFonts (the head link only carries Bebas Neue +
+// Inter). Idempotent via the link id; CSS falls back to Inter until the
+// faces arrive.
+function _phcEnsureFonts(){
+  if (typeof document === 'undefined' || document.getElementById('phcFonts')) return;
+  try {
+    var l = document.createElement('link');
+    l.id = 'phcFonts'; l.rel = 'stylesheet';
+    l.href = 'https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;1,400&display=swap';
+    document.head.appendChild(l);
+  } catch (e){}
 }
 
 // ── PARENT HUB TABS ──────────────────────────────────────────
