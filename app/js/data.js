@@ -158,6 +158,11 @@ const DEF = {
   // surface "Continue where you left off" on the welcome screen.
   faithLastVisit:0,
   faithLastDest:null,
+  // L2 photo-card home — last main-app section opened ('s-goals' etc.),
+  // written by showSection() in ui.js; the Command Center reads it for
+  // the "Continue where you left off" card. Mirrors faithLastDest
+  // (string|null). Home/parent/Well navigations are not recorded.
+  lifeLastDest:null,
   // 2026-05-30 — Heart Check usage log. Each entry { key, date }
   // where key is one of the 12 HEART_CHECK ids. Capped to the
   // most recent 100 in faith-zones.js. Used for trait awards on
