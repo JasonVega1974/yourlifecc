@@ -1518,6 +1518,14 @@ function renderFaithJourneyHome(){
   var dest    = document.getElementById('fzDest');
   if (classic) classic.style.display = 'none';
   if (dest)    dest.style.display = 'none';
+  // 2026-07-04 — Zone 3 (#fzZone3Wrap) is a SIBLING of #fzHome/#fzDest,
+  // so hiding those never hid an expanded legacy bf-* panel — content
+  // bled below the journey grid on every back path. Collapse it centrally
+  // here so ALL returns (both #fjExploreBack copies, the Zone-3 back
+  // pill, fzGoHome, future paths) land clean. Approved tradeoff: the
+  // Explore browse-all surface never persists across a return home.
+  if (typeof D !== 'undefined' && D) D.faithExploreOpen = false;
+  if (typeof renderFaithExploreToggle === 'function') renderFaithExploreToggle();
   host.style.display = 'block';
   _fzCurrentDest = null;
 
@@ -1546,7 +1554,13 @@ function renderFaithJourneyHome(){
         var dst = el.getAttribute('data-fjdest');
         el.onclick = function(){
           host.style.display = 'none';
-          if (_fjLegacyDests[dst]){
+          // 2026-07-04 — Option B clean takeover. #fzZone3Wrap is a SIBLING
+          // of #fzHome, so the bf-* panel displays fine with the classic
+          // home left hidden. Flag-on: skip showing #fzHome and skip the
+          // #fjExploreBack inject — the target panel opens alone and its
+          // journey-aware "← Back to Home" pill (bfInjectBackPill, v459)
+          // handles the return. Flag-off keeps the original behavior.
+          if (_fjLegacyDests[dst] && !_fjHomeOn()){
             var ch = document.getElementById('fzHome');
             if (ch){
               ch.style.display = '';
