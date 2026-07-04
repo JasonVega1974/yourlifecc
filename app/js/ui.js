@@ -2343,15 +2343,21 @@ function showSection(id, fromMobile){
   if(target){ target.style.display = ''; target.classList.add('active'); }
   _ensureFlatBack(target);
   _activeSection = id;
-  // L2 photo-card home — remember the last real destination so the
-  // Command Center can offer "Continue where you left off". Mirrors
-  // faithLastDest. Home/parent are not resumable; the Well keeps its
-  // own faithLastDest. Only saves on change to avoid save() churn.
+  // L2 photo-card home — remember the last real destination + when, so
+  // the Command Center can offer "Continue where you left off" and hide
+  // it once stale (>1h). Mirrors faithLastDest. Home/parent are not
+  // resumable; the Well keeps its own faithLastDest. Saves on dest
+  // change or when the stamp is >5min old — fresh enough for a 1h
+  // staleness rule without save() churn on every tap.
   if(id && id.indexOf('s-') === 0 && id !== 's-hero' && id !== 's-parent' && id !== 's-scripture'){
     try {
-      if(typeof D !== 'undefined' && D && D.lifeLastDest !== id){
-        D.lifeLastDest = id;
-        if(typeof save === 'function') save();
+      if(typeof D !== 'undefined' && D){
+        var _llNow = Date.now();
+        if(D.lifeLastDest !== id || !D.lifeLastDestTs || (_llNow - D.lifeLastDestTs) > 300000){
+          D.lifeLastDest = id;
+          D.lifeLastDestTs = _llNow;
+          if(typeof save === 'function') save();
+        }
       }
     } catch(_e){}
   }
