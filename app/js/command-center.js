@@ -162,44 +162,52 @@
   // placeholder until uploaded — never a broken image). `photo` is the
   // ship-with default URL for legacy keys (same URL as PM_INVENTORY);
   // admin overrides arrive via window.CARD_PHOTO_OVERRIDES.
+  // Grouping confirmed 2026-07-03 (Step 5 spec): MY DAY / LEARN /
+  // BODY & MIND / MONEY / EXPLORE & CREATE / MORE (everything else).
+  // Spec deltas resolved against real sections: "Meditation" and "Art"
+  // have no main-app section (meditation audio lives in the Well) — no
+  // card rather than a dead route. "CBT"/"Tech" are one section
+  // (s-cbt) — rendered once, under EXPLORE & CREATE as TECH SKILLS.
+  // "Goals (savings)" maps to s-goals (savings goals ride inside
+  // Finance; s-goals is the only goals section).
   var _CC_HOME = [
     { eyebrow:'MY DAY', cards:[
       { dest:'habits',   section:'s-habits',    icon:'⚡', title:'HABITS',        sub:'Daily rhythms, kept.',          photoId:'ah-habits' },
-      { dest:'chores',   section:'s-chores',    icon:'📋', title:'CHORES',        sub:'Earn your keep.',               photoId:'ah-chores' },
       { dest:'schedule', section:'s-schedule',  icon:'📅', title:'SCHEDULE',      sub:'Plan your day.',                photoId:'ah-schedule' },
-      { dest:'calendar', section:'s-calendar',  icon:'🗓️', title:'CALENDAR',      sub:'The month ahead.',              photoId:'ah-calendar' }
+      { dest:'chores',   section:'s-chores',    icon:'📋', title:'CHORES',        sub:'Earn your keep.',               photoId:'ah-chores' },
+      { dest:'mood',     section:'s-mood',      icon:'😊', title:'MOOD',          sub:'How are you, really?',          photoId:'ah-mood' }
     ]},
     { eyebrow:'LEARN', cards:[
       { dest:'school',   section:'s-school',    icon:'📚', title:'SCHOOL',        sub:'Classes, GPA, homework.',       photoId:'school-classes', photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Elementary_classroom_in_Alaska.jpg/1280px-Elementary_classroom_in_Alaska.jpg' },
-      { dest:'resources',section:'s-resources', icon:'📐', title:'RESOURCES',     sub:'Tools for schoolwork.',         photoId:'ah-resources' },
       { dest:'skills',   section:'s-skills',    icon:'🧠', title:'LIFE SKILLS',   sub:'Lessons for real life.',        photoId:'ah-skills' },
-      { dest:'tech',     section:'s-cbt',       icon:'💻', title:'TECH SKILLS',   sub:'Typing, computers, code.',      photoId:'sk-digital', photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Wikipedia_homepage_on_a_large_Android_phone%2C_2015-04-16.jpg/1280px-Wikipedia_homepage_on_a_large_Android_phone%2C_2015-04-16.jpg' },
       { dest:'reading',  section:'s-reading',   icon:'📖', title:'READING LIST',  sub:'Books worth finishing.',        photoId:'ah-reading' }
     ]},
     { eyebrow:'BODY & MIND', cards:[
       { dest:'health',   section:'s-health',    icon:'💪', title:'HEALTH',        sub:'Body, food, energy.',           photoId:'health-habits', photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Cycling_in_Amsterdam_%28893%29.jpg/1280px-Cycling_in_Amsterdam_%28893%29.jpg' },
       { dest:'sports',   section:'s-sports',    icon:'🏆', title:'SPORTS',        sub:'Train and compete.',            photoId:'spt-explore', photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Narendra_Modi_Stadium_view_from_the_gallery.jpg/1280px-Narendra_Modi_Stadium_view_from_the_gallery.jpg' },
-      { dest:'mood',     section:'s-mood',      icon:'😊', title:'MOOD',          sub:'How are you, really?',          photoId:'ah-mood' },
-      { dest:'growing',  section:'s-growing',   icon:'🌱', title:'GROWING UP',    sub:'The changes, explained.',       photoId:'ah-growing' },
       { dest:'journal',  section:'s-journal',   icon:'✍️', title:'JOURNAL',       sub:'Write it down.',                photoId:'ah-journal' }
     ]},
     { eyebrow:'MONEY', cards:[
       { dest:'money',    section:'s-finance',   icon:'💰', title:'MONEY',         sub:'Save, spend, learn.',           photoId:'finance-overview', photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/USDnotesNew.png/1280px-USDnotesNew.png' },
       { dest:'rewards',  section:'s-rewards',   icon:'🎁', title:'REWARDS',       sub:'Spend your points.',            photoId:'ah-rewards' },
-      { dest:'contests', section:'s-contests',  icon:'🏆', title:'CHALLENGES',    sub:'Family contests.',              photoId:'ah-contests' }
+      { dest:'goals',    section:'s-goals',     icon:'🎯', title:'GOALS',         sub:'Aim at something.',             photoId:'ah-goals' }
     ]},
-    { eyebrow:'GROW', cards:[
-      { dest:'goals',      section:'s-goals',      icon:'🎯', title:'GOALS',       sub:'Aim at something.',            photoId:'ah-goals' },
-      { dest:'milestones', section:'s-milestones', icon:'🏆', title:'MILESTONES',  sub:'Moments that matter.',         photoId:'ah-milestones' },
-      { dest:'badges',     section:'s-badges',     icon:'🏅', title:'BADGES',      sub:'Your trophy shelf.',           photoId:'ah-badges' },
-      { dest:'motivation', section:'s-motivation', icon:'🔥', title:'FUEL WALL',   sub:'Words that push you.',         photoId:'ah-motivation' }
+    { eyebrow:'EXPLORE & CREATE', cards:[
+      { dest:'craft',    section:'s-craft',     icon:'🎵', title:'MUSIC & PRACTICE', sub:'Your craft, honed.',         photoId:'ah-craft' },
+      { dest:'tech',     section:'s-cbt',       icon:'💻', title:'TECH SKILLS',   sub:'Typing, computers, code.',      photoId:'sk-digital', photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Wikipedia_homepage_on_a_large_Android_phone%2C_2015-04-16.jpg/1280px-Wikipedia_homepage_on_a_large_Android_phone%2C_2015-04-16.jpg' }
     ]},
-    { eyebrow:'LIFE & FUTURE', cards:[
-      { dest:'driving',  section:'s-driving',   icon:'🚗', title:'DRIVING',       sub:'Road ready.',                   photoId:'sk-car', photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Convertible_Mercedes_Car_Driving_On_A_Highway.jpg/1280px-Convertible_Mercedes_Car_Driving_On_A_Highway.jpg' },
-      { dest:'resume',   section:'s-resume',    icon:'📄', title:'JOBS & RESUME', sub:'Get hired.',                    photoId:'rsm-prep', photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Job_interview.jpg/1280px-Job_interview.jpg' },
-      { dest:'bio',      section:'s-bio',       icon:'🪪', title:'BIO PAGE',      sub:'Your story, shareable.',        photoId:'ah-bio' },
-      { dest:'mentors',  section:'s-mentors',   icon:'🤝', title:'MY PEOPLE',     sub:'Mentors and allies.',           photoId:'ah-mentors' },
-      { dest:'craft',    section:'s-craft',     icon:'🎵', title:'MUSIC & PRACTICE', sub:'Your craft, honed.',         photoId:'ah-craft' }
+    { eyebrow:'MORE', cards:[
+      { dest:'calendar',   section:'s-calendar',   icon:'🗓️', title:'CALENDAR',      sub:'The month ahead.',           photoId:'ah-calendar' },
+      { dest:'resources',  section:'s-resources',  icon:'📐', title:'RESOURCES',     sub:'Tools for schoolwork.',      photoId:'ah-resources' },
+      { dest:'growing',    section:'s-growing',    icon:'🌱', title:'GROWING UP',    sub:'The changes, explained.',    photoId:'ah-growing' },
+      { dest:'milestones', section:'s-milestones', icon:'🏆', title:'MILESTONES',    sub:'Moments that matter.',       photoId:'ah-milestones' },
+      { dest:'badges',     section:'s-badges',     icon:'🏅', title:'BADGES',        sub:'Your trophy shelf.',         photoId:'ah-badges' },
+      { dest:'motivation', section:'s-motivation', icon:'🔥', title:'FUEL WALL',     sub:'Words that push you.',       photoId:'ah-motivation' },
+      { dest:'contests',   section:'s-contests',   icon:'🏆', title:'CHALLENGES',    sub:'Family contests.',           photoId:'ah-contests' },
+      { dest:'driving',    section:'s-driving',    icon:'🚗', title:'DRIVING',       sub:'Road ready.',                photoId:'sk-car', photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Convertible_Mercedes_Car_Driving_On_A_Highway.jpg/1280px-Convertible_Mercedes_Car_Driving_On_A_Highway.jpg' },
+      { dest:'resume',     section:'s-resume',     icon:'📄', title:'JOBS & RESUME', sub:'Get hired.',                 photoId:'rsm-prep', photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Job_interview.jpg/1280px-Job_interview.jpg' },
+      { dest:'bio',        section:'s-bio',        icon:'🪪', title:'BIO PAGE',      sub:'Your story, shareable.',     photoId:'ah-bio' },
+      { dest:'mentors',    section:'s-mentors',    icon:'🤝', title:'MY PEOPLE',     sub:'Mentors and allies.',        photoId:'ah-mentors' }
     ]}
   ];
   var _CC_FAITH = { key:'faith', section:'s-scripture', icon:'✝️', label:'Faith' };
@@ -249,24 +257,42 @@
     }).join('');
   }
 
-  // "Continue where you left off" — reads D.lifeLastDest (written by
-  // showSection in ui.js). Hidden for fresh users, hidden if the
-  // remembered section is no longer visible for this bracket/stage.
+  // "Continue where you left off" — reads D.lifeLastDest + its
+  // timestamp (written by showSection in ui.js). Hidden for fresh
+  // users, hidden when stale (>1h — a morning-after home should read
+  // as a fresh start, not yesterday's tab), hidden if the remembered
+  // section is no longer visible for this bracket/stage.
   function _ccContinueCard(){
     var last = (typeof D !== 'undefined' && D) ? D.lifeLastDest : null;
     if (!last || typeof last !== 'string') return '';
+    var ts = (typeof D !== 'undefined' && D && +D.lifeLastDestTs) || 0;
+    if (!ts || (Date.now() - ts) > 3600000) return '';
     var card = _ccCardBySection(last);
     if (!card || !_ccSectionVisible(card.section)) return '';
     return ''
       + '<button class="cc-continue" type="button" data-dest="'+_ccEsc(card.dest)+'" '
-      +   'aria-label="Continue where you left off — '+_ccEsc(card.title)+'">'
+      +   'aria-label="Continue where you left off — back to '+_ccEsc(card.title)+'">'
       +   '<span class="cc-continue__icon" aria-hidden="true">'+card.icon+'</span>'
       +   '<span class="cc-continue__body">'
       +     '<span class="cc-continue__eyebrow">CONTINUE WHERE YOU LEFT OFF</span>'
-      +     '<span class="cc-continue__title">'+_ccEsc(card.title)+'</span>'
+      +     '<span class="cc-continue__title">← Back to '+_ccEsc(card.title)+'</span>'
       +   '</span>'
       +   '<span class="cc-continue__chev" aria-hidden="true">›</span>'
       + '</button>';
+  }
+
+  // Oswald for the gold section eyebrows — same lazy-load pattern as
+  // faith-zones' _fjEnsureFonts (the head link only carries Bebas Neue
+  // + Inter). Idempotent via the link id; CSS falls back to Inter
+  // until the face arrives.
+  function _ccEnsureFonts(){
+    if (typeof document === 'undefined' || document.getElementById('ccFonts')) return;
+    try {
+      var l = document.createElement('link');
+      l.id = 'ccFonts'; l.rel = 'stylesheet';
+      l.href = 'https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&display=swap';
+      document.head.appendChild(l);
+    } catch (e){}
   }
 
   // ── render ───────────────────────────────────────────────────
@@ -274,6 +300,7 @@
     if (typeof document === 'undefined') return;
     var root = document.getElementById('appCommandCenter');
     if (!root) return;
+    _ccEnsureFonts();
 
     // Guarded rollback flag — `window._ccDisabled = true;` in the console
     // hides Command Center and lets app-home.js fall back to #appHome.
