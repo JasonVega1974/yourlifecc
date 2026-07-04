@@ -538,7 +538,7 @@ car:[
 <p><strong>The six components of total car ownership cost:</strong></p>
 
 <p><strong>1. Loan payment: $200–$700+/month</strong><br>
-Depends on purchase price, down payment, interest rate, and loan term. Interest rates in 2024 range from 5% (excellent credit, short term) to 14%+ (poor credit). A $25,000 car at 8% over 60 months costs $507/month — but you pay $5,400 in interest over the life of the loan. Longer terms lower your payment but dramatically increase total cost.</p>
+Depends on purchase price, down payment, interest rate, and loan term. Auto loan rates typically range from around 5% (excellent credit, short term) to 14%+ (poor credit) — check current rates before you shop. A $25,000 car at 8% over 60 months costs $507/month — but you pay $5,400 in interest over the life of the loan. Longer terms lower your payment but dramatically increase total cost.</p>
 
 <p><strong>2. Insurance: $100–$400+/month</strong><br>
 Young drivers (under 25) often pay $200–$400/month. Rates vary significantly by coverage level, vehicle type, and driving record. Sports cars, luxury vehicles, and vehicles with expensive parts (BMWs, certain SUVs) cost significantly more to insure.</p>

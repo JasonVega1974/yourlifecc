@@ -10579,6 +10579,14 @@ function _stBuildShell(){
     +'#studyToolsRoot .st-verse-text{font-family:Georgia,serif;font-style:italic;font-size:.87rem;color:var(--tx);line-height:1.7;}'
     +'#studyToolsRoot .st-verse-ref-lbl{font-size:.63rem;font-weight:700;letter-spacing:.1em;color:#38bdf8;text-transform:uppercase;margin-top:.3rem;}'
     +'#studyToolsRoot .st-empty{text-align:center;padding:1.8rem 1rem;color:var(--tx3);font-size:.82rem;line-height:1.6;}'
+    /* Light mode — white-alpha surfaces are invisible on the cream page; cyan text drops to sky-700 for contrast. */
+    +':root.light #studyToolsRoot .st-card{background:#ffffff;border-color:rgba(2,132,199,.30);}'
+    +':root.light #studyToolsRoot .st-tab-btn{background:rgba(15,23,42,.04);border-color:rgba(15,23,42,.12);}'
+    +':root.light #studyToolsRoot .st-tab-btn.active{background:rgba(2,132,199,.12);border-color:rgba(2,132,199,.45);color:#0369a1;}'
+    +':root.light #studyToolsRoot .st-note-item{background:#ffffff;border-color:rgba(15,23,42,.10);}'
+    +':root.light #studyToolsRoot .st-verse-box{background:rgba(2,132,199,.07);}'
+    +':root.light #studyToolsRoot .st-strongs-num,:root.light #studyToolsRoot .st-note-ref,:root.light #studyToolsRoot .st-verse-ref-lbl{color:#0369a1;}'
+    +':root.light #studyToolsRoot .st-ref-tag{background:rgba(2,132,199,.10);border-color:rgba(2,132,199,.30);color:#0369a1;}'
     +'</style>'
     +'<div style="display:flex;gap:.3rem;margin-bottom:.8rem;">'+tabBtns+'</div>'
     +'<div id="stPanel"></div>';

@@ -1250,7 +1250,7 @@
      focus tile + the keyboard focus ring, so exactly one accent shows at a
      time. The per-tile rainbow ::before wash is removed (interface layer is
      flat — no decorative gradients). */
-  .cc-tile{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:.65rem;padding:1.1rem 1rem;min-height:116px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:18px;color:#F1E9D5;text-align:left;cursor:pointer;font-family:inherit;transition:transform 200ms ease,background 200ms ease,border-color 200ms ease;overflow:hidden;}
+  .cc-tile{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:.65rem;padding:1.1rem 1rem;min-height:116px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:16px;color:#F1E9D5;text-align:left;cursor:pointer;font-family:inherit;transition:transform 200ms ease,background 200ms ease,border-color 200ms ease;overflow:hidden;}
   .cc-tile__icon{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);display:grid;place-items:center;font-size:1.15rem;position:relative;z-index:1;}
   .cc-tile__title{font-size:1rem;font-weight:600;letter-spacing:-.01em;color:#F1E9D5;position:relative;z-index:1;}
   .cc-tile__meta{font-family:ui-monospace,'JetBrains Mono',monospace;font-feature-settings:"tnum";font-size:.78rem;color:#9AA0B4;margin-top:auto;position:relative;z-index:1;}
@@ -1275,7 +1275,7 @@
      mirroring the faith home's fjp-featured card, inside the CC's
      card system (row layout, same radius/transition family). */
   .cc-climb-sec{margin:1.1rem 0 .2rem;}
-  .cc-climb{position:relative;display:flex;align-items:center;gap:.9rem;width:100%;min-height:72px;padding:.95rem 1.1rem;background:linear-gradient(135deg,#0d1f33,#0b1626);border:1px solid rgba(34,211,238,.35);border-radius:18px;color:#e9f4f6;text-align:left;cursor:pointer;font-family:inherit;box-shadow:0 0 22px rgba(34,211,238,.12);transition:transform 200ms ease,background 200ms ease,border-color 200ms ease;}
+  .cc-climb{position:relative;display:flex;align-items:center;gap:.9rem;width:100%;min-height:72px;padding:.95rem 1.1rem;background:linear-gradient(135deg,#0d1f33,#0b1626);border:1px solid rgba(34,211,238,.35);border-radius:16px;color:#e9f4f6;text-align:left;cursor:pointer;font-family:inherit;box-shadow:0 0 22px rgba(34,211,238,.12);transition:transform 200ms ease,background 200ms ease,border-color 200ms ease;}
   .cc-climb:hover{transform:translateY(-2px);border-color:rgba(34,211,238,.55);}
   .cc-climb:active{transform:scale(.97);}
   .cc-climb:focus-visible{outline:2px solid #22d3ee;outline-offset:3px;}
@@ -7095,7 +7095,7 @@
     #s-chores .ch-card{
       background:var(--cz-card-bg);
       border:1px solid var(--cz-card-border);
-      border-radius:10px;
+      border-radius:12px;
       padding:.55rem .6rem;
       margin-bottom:.45rem;
       box-shadow:inset 0 1px 0 var(--cz-surface-soft);
@@ -7170,7 +7170,7 @@
     /* Heatmap card */
     #s-chores .cz-heatmap-card{
       background:var(--cz-surface-soft);border:1px solid var(--cz-card-border);
-      border-radius:14px;padding:.9rem 1rem;margin-bottom:1.1rem;
+      border-radius:16px;padding:.9rem 1rem;margin-bottom:1.1rem;
     }
     #s-chores .cz-heatmap-caption{
       font-size:.6rem;color:var(--tx3);margin-top:.4rem;line-height:1.4;
@@ -10087,6 +10087,8 @@
         color:#fbbf24; font-weight:700;
       }
       :root.light #bf-home .well-votd-ref{color:#b45309;}
+      :root.light #votdListenBtn{color:#92400e!important;border-color:rgba(180,120,20,.35)!important;background:rgba(251,191,36,.12)!important;}
+      :root.light #votdMoodBtn{color:#6d28d9!important;}
       #bf-home .well-welcome{
         font-family:Georgia,'Times New Roman',serif; font-style:italic;
         font-size:1rem; line-height:1.6; color:var(--tx2);
@@ -10106,7 +10108,7 @@
       <div style="display:flex;gap:.35rem;margin-top:.5rem;flex-wrap:wrap;">
         <button onclick="_votdCopyVerse()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:var(--tx2);border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">📋 Copy</button>
         <button onclick="_votdSaveToJourney()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:var(--tx2);border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🔖 Journey</button>
-        <button onclick="checkShowMoodPrompt(true)" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.25);color:#a78bfa;border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">😊 How I feel</button>
+        <button id="votdMoodBtn" onclick="checkShowMoodPrompt(true)" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.25);color:#a78bfa;border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">😊 How I feel</button>
         <button id="votdListenBtn" onclick="speakVotd()" style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.22);color:#fde68a;border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🔊 Listen</button>
       </div>
     </div>
@@ -10166,6 +10168,24 @@
       #bf-home .fh-tile:hover{transform:translateY(-2px);background:rgba(255,255,255,.07);border-color:rgba(167,139,250,.35);}
       #bf-home .fh-tile-soon{opacity:.85;}
       #bf-home .fh-tile-soon::after{content:'Soon';font-size:.5rem;font-weight:800;background:rgba(167,139,250,.18);color:#a78bfa;border:1px solid rgba(167,139,250,.3);border-radius:4px;padding:.05rem .3rem;margin-left:auto;letter-spacing:.06em;}
+      /* Light mode — cards paint paper; gold/violet/green text drops to ink-safe
+         shades (the dark-alpha surfaces above are invisible on the cream page).
+         !important where an inline style must lose. */
+      :root.light #bf-home .fh-card{background:#ffffff;border-color:rgba(15,23,42,.08);}
+      :root.light #bf-home .fh-tile{background:#ffffff;border-color:rgba(15,23,42,.08);}
+      :root.light #bf-home .fh-tile:hover{background:#fdfbf6;border-color:rgba(124,58,237,.35);}
+      :root.light #bf-home .fh-btn-ghost{background:rgba(15,23,42,.05);border-color:rgba(15,23,42,.15);}
+      :root.light #bf-home .fh-btn-ghost:hover{background:rgba(15,23,42,.09);}
+      :root.light #bf-home .fh-xp-label{color:#6d28d9;}
+      :root.light #bf-home .fh-shield{background:rgba(180,120,20,.10);border-color:rgba(180,120,20,.35);color:#92400e;}
+      :root.light #bf-home #fhFamilyVerseCard{background:rgba(251,191,36,.10)!important;border-color:rgba(180,120,20,.3)!important;}
+      :root.light #bf-home #fhFamilyVerseCard > div:first-child{color:#92400e!important;}
+      :root.light #bf-home #fhFamilyVerseText{color:#3a2818!important;}
+      :root.light #bf-home #fhFamilyVerseRef{color:#b45309!important;}
+      :root.light #bf-home #rpStreakBanner{background:rgba(16,185,129,.10)!important;border-color:rgba(4,120,87,.3)!important;}
+      :root.light #bf-home #rpStreakBannerText{color:#047857!important;}
+      :root.light #bf-home #rpStreakBanner > span:last-child{color:rgba(4,120,87,.6)!important;}
+      :root.light #bf-home #faithSearchInput{background:rgba(15,23,42,.04)!important;border-color:rgba(15,23,42,.15)!important;}
       @media (min-width:720px){
         #bf-home .fh-grid{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;}
         #bf-home .fh-grid > .fh-card{margin-bottom:0;}
@@ -10908,7 +10928,7 @@
         background:rgba(255,255,255,.04);
         border:1px solid rgba(251,191,36,.16);
         border-left:4px solid #a78bfa;
-        border-radius:14px;padding:.85rem 1rem;
+        border-radius:16px;padding:.85rem 1rem;
         animation:prMineIn .42s ease both;
       }
       #bf-prayer .pr-mine-card.answered{border-left-color:#22c55e;background:rgba(34,197,94,.06);}
@@ -14225,13 +14245,15 @@
     }
     #s-worship .wp-card{
       background:rgba(255,255,255,.03);border:1px solid rgba(251,191,36,.18);
-      border-radius:14px;overflow:hidden;cursor:pointer;
+      border-radius:16px;overflow:hidden;cursor:pointer;
       transition:transform .2s, border-color .2s, box-shadow .2s;
     }
     #s-worship .wp-card:hover{
       transform:translateY(-3px);border-color:rgba(251,191,36,.5);
       box-shadow:0 8px 28px rgba(251,191,36,.18);
     }
+    :root.light #s-worship .wp-card{background:#ffffff;border-color:rgba(180,120,20,.28);}
+    :root.light #s-worship .wp-card:hover{box-shadow:0 8px 24px rgba(180,120,20,.16);}
     #s-worship .wp-card.active{
       border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24, 0 8px 28px rgba(251,191,36,.32);
     }
@@ -16777,7 +16799,7 @@
               #parentCelestialHome .pch-section-label{font-size:1.05rem;font-weight:500;color:#F1E9D5;margin:0 0 .85rem;}
               #parentCelestialHome .pch-tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:.65rem;}
               @media (min-width:720px){ #parentCelestialHome .pch-tiles{grid-template-columns:repeat(3,1fr);} }
-              #parentCelestialHome .pch-tile{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:.55rem;padding:1.1rem 1rem;min-height:112px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:18px;color:#F1E9D5;text-align:left;cursor:pointer;font-family:inherit;transition:transform 150ms ease,background 200ms ease,border-color 200ms ease,box-shadow 250ms ease;}
+              #parentCelestialHome .pch-tile{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:.55rem;padding:1.1rem 1rem;min-height:112px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:16px;color:#F1E9D5;text-align:left;cursor:pointer;font-family:inherit;transition:transform 150ms ease,background 200ms ease,border-color 200ms ease,box-shadow 250ms ease;}
               #parentCelestialHome .pch-tile:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.13);transform:translateY(-1px);}
               #parentCelestialHome .pch-tile:active{transform:scale(.98);}
               #parentCelestialHome .pch-tile:focus-visible{outline:2px solid #6AA7FF;outline-offset:2px;}
@@ -18452,12 +18474,12 @@
             #ph-chores .ph-ch-hint{font-size:.76rem;color:var(--tx3);margin-left:auto;font-family:var(--fm);}
             /* ─── Card primitive (used by approval cards) — warm depth via
                    gradient surface + top-edge highlight pseudo */
-            #ph-chores .ph-ch-card{position:relative;background:linear-gradient(150deg,var(--pc-surface-1),var(--pc-surface-2));border:1px solid var(--pc-line);border-radius:18px;padding:1.05rem 1.15rem;overflow:hidden;transition:transform .22s,border-color .22s,box-shadow .22s;}
+            #ph-chores .ph-ch-card{position:relative;background:linear-gradient(150deg,var(--pc-surface-1),var(--pc-surface-2));border:1px solid var(--pc-line);border-radius:16px;padding:1.05rem 1.15rem;overflow:hidden;transition:transform .22s,border-color .22s,box-shadow .22s;}
             #ph-chores .ph-ch-card::before{content:"";position:absolute;inset:0 0 auto 0;height:1px;background:linear-gradient(90deg,transparent,color-mix(in srgb, var(--tx) 18%, transparent),transparent);}
             #ph-chores .ph-ch-card + .ph-ch-card{margin-top:.7rem;}
             #ph-chores .ph-ch-card:hover{transform:translateY(-2px);border-color:var(--pc-line-2);box-shadow:0 12px 34px -18px rgba(0,0,0,.7);}
             #ph-chores .ph-ch-card-glow{box-shadow:0 0 0 1px var(--pc-gold-bd) inset, 0 14px 40px -24px color-mix(in srgb, var(--g) 50%, transparent);}
-            #ph-chores .ph-ch-card-empty{font-family:var(--fm);font-size:.78rem;color:var(--tx3);text-align:center;padding:.95rem;background:color-mix(in srgb, var(--tx) 4%, transparent);border:1px dashed var(--pc-line);border-radius:14px;}
+            #ph-chores .ph-ch-card-empty{font-family:var(--fm);font-size:.78rem;color:var(--tx3);text-align:center;padding:.95rem;background:color-mix(in srgb, var(--tx) 4%, transparent);border:1px dashed var(--pc-line);border-radius:16px;}
             /* ─── Approval row (avatar / meta / proof / actions) */
             #ph-chores .ph-ch-approw{display:flex;align-items:center;gap:.85rem;flex-wrap:wrap;}
             #ph-chores .ph-ch-ava{width:42px;height:42px;border-radius:50%;flex:none;display:grid;place-items:center;font-family:var(--fn);font-weight:700;font-size:1rem;color:#1b1606;background:linear-gradient(135deg,var(--pc-gold),color-mix(in srgb, var(--g) 70%, #c97c0c));}

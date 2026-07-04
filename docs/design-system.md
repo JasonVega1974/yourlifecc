@@ -187,6 +187,9 @@ Default body line-height `1.55`. Paragraph spacing = `0.75 × line-height` (≈1
 | `--radius-xl` | 24px | Hero card, modal, drawer |
 | `--radius-full` | 9999px | Pills, avatar, FAB |
 
+**As-built card radius scale (2026-07-04 unification — this is the ruling):**
+12px compact rows/list cards (`.ph-card`, `.pcc-card`, `.ch-card`, `.stat-tile`, `.st-card`, `.mz-allow-card`) · 16px standard cards and tiles (`.card` via `--r`, `.yl-card`, `.yl-pillar`, `.cc-tile`, `.pch-tile`, `.fh-card`, `--cd-card-radius` family) · 22px hero sheets (`#dailyBriefingCard`, `.qp-card`, `.wk-sheet`). Nested inner tiles (`.db-tile`, `.fh-tile`) stay 14px — inner radius smaller than its container. Scene-layer photo cards (`.fjp-card`, Journey Home, the Well) are exempt. Where `.claude/skills/visual-design/SKILL.md` says 12px cards, this table wins for YourLife CC.
+
 ### Shadow / elevation
 
 Six elevation levels. Dark mode shadows use a darker / more transparent base; light mode uses softer color.
