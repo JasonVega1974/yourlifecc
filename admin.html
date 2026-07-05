@@ -1715,6 +1715,24 @@ const PM_INVENTORY = [
   {id:'fj-reflect',        section:'Faith Journey Home', title:'Night Reflection',      defaultUrl:''},
   {id:'fj-growth',         section:'Faith Journey Home', title:'Growth Profile',        defaultUrl:''},
   {id:'fj-heart',          section:'Faith Journey Home', title:'Heart Check',           defaultUrl:''},
+  // ── Meet Jesus — The Story (2026-07-05) — chapter frontispiece banners
+  // for the Who Is Jesus scrollytelling (jesus-story.js reads
+  // window.CARD_PHOTO_OVERRIDES['jsy-*'] at render time).
+  // PHOTO GUIDANCE — real places only: Bethlehem hills, the Jordan,
+  // the Judean wilderness, Galilee, the Garden Tomb. No depictions of
+  // Jesus, no paintings, no clip-art crosses (house rule,
+  // docs/design-system.md). Photos render dimmed + scene-tinted under
+  // the night→dawn arc — landscapes read best.
+  // No defaults: chapters show the typographic frontispiece (numeral +
+  // title + epigraph + gold rule) until a photo is uploaded — that
+  // fallback is a finished look, never a broken image.
+  {id:'jsy-born',        section:'Meet Jesus — The Story', title:'I · Born (Bethlehem)',            defaultUrl:''},
+  {id:'jsy-hidden',      section:'Meet Jesus — The Story', title:'II · Hidden Years (Nazareth)',    defaultUrl:''},
+  {id:'jsy-river',       section:'Meet Jesus — The Story', title:'III · The River (Jordan)',        defaultUrl:''},
+  {id:'jsy-wilderness',  section:'Meet Jesus — The Story', title:'IV · The Wilderness (Judean)',    defaultUrl:''},
+  {id:'jsy-ministry',    section:'Meet Jesus — The Story', title:'V · The Ministry (Galilee)',      defaultUrl:''},
+  {id:'jsy-cross',       section:'Meet Jesus — The Story', title:'VI · The Cross (Jerusalem)',      defaultUrl:''},
+  {id:'jsy-risen',       section:'Meet Jesus — The Story', title:'VII · Risen (Garden Tomb)',       defaultUrl:''},
   // ── Main App Home (2026-07-03) — the Command Center photo-card home.
   // Same convention as the Faith Journey Home: ONLY cards with no legacy
   // equivalent get ah-* keys here. Seven cards reuse legacy keys managed
@@ -1920,7 +1938,7 @@ if (typeof PROOF_PROPHECY_DATA !== 'undefined' && Array.isArray(PROOF_PROPHECY_D
 }
 
 // Section display order — add new sections here to control their position.
-const PM_SECTION_ORDER = ['Main App Home','Faith Journey Home','Bible & Faith','Reading Plans','Proof & Prophecy','Faith Academy','Life Skills','School','Money Manager','Health & Wellness','Driving','Sports','Resume / Jobs'];
+const PM_SECTION_ORDER = ['Main App Home','Faith Journey Home','Meet Jesus — The Story','Bible & Faith','Reading Plans','Proof & Prophecy','Faith Academy','Life Skills','School','Money Manager','Health & Wellness','Driving','Sports','Resume / Jobs'];
 
 let PM_OVERRIDES = {};
 let PM_INITED    = false;

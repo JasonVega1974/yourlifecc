@@ -39,15 +39,57 @@ var _JSY_SEALS = {
   'Jeremiah 31:15': { line: 'Rachel’s weeping foretold the grief at Ramah.' }
 };
 
+// Frontispieces (2026-07-05): num = display Roman numeral (decorative
+// watermark — the Arabic "Chapter N" eyebrow stays the wayfinding
+// label); photoKey = admin_card_photos key (PM_INVENTORY section
+// "Meet Jesus — The Story"; real places only, house rule); epi/epiRef
+// = one-line scripture epigraph. Ch6 uses Matthew 27:45 — the verse
+// that mandates the scroll-darkening — NOT John 19:30, which the
+// chapter already renders verbatim in the Seven Last Words.
 var _JSY_CH_META = [
-  { n: 1, label: 'Born' },
-  { n: 2, label: 'Hidden Years' },
-  { n: 3, label: 'The River' },
-  { n: 4, label: 'The Wilderness' },
-  { n: 5, label: 'The Ministry' },
-  { n: 6, label: 'The Cross' },
-  { n: 7, label: 'Risen' }
+  { n: 1, label: 'Born',           num: 'I',   photoKey: 'jsy-born',       epi: 'The Word became flesh and dwelt among us.', epiRef: 'John 1:14' },
+  { n: 2, label: 'Hidden Years',   num: 'II',  photoKey: 'jsy-hidden',     epi: 'And Jesus increased in wisdom and in stature, and in favor with God and man.', epiRef: 'Luke 2:52' },
+  { n: 3, label: 'The River',      num: 'III', photoKey: 'jsy-river',      epi: 'This is my beloved Son, with whom I am well pleased.', epiRef: 'Matthew 3:17' },
+  { n: 4, label: 'The Wilderness', num: 'IV',  photoKey: 'jsy-wilderness', epi: 'Man shall not live by bread alone.', epiRef: 'Matthew 4:4' },
+  { n: 5, label: 'The Ministry',   num: 'V',   photoKey: 'jsy-ministry',   epi: 'I came that they may have life, and have it abundantly.', epiRef: 'John 10:10' },
+  { n: 6, label: 'The Cross',      num: 'VI',  photoKey: 'jsy-cross',      epi: 'Now from the sixth hour there was darkness over all the land.', epiRef: 'Matthew 27:45' },
+  { n: 7, label: 'Risen',          num: 'VII', photoKey: 'jsy-risen',      epi: 'He is not here, for he has risen.', epiRef: 'Matthew 28:6' }
 ];
+
+// Chapter frontispiece — typographic base always (numeral watermark +
+// eyebrow + title + epigraph + gold rule: finished with zero photos);
+// the photo banner renders ONLY when an admin override exists for the
+// chapter's key, read at render time from window.CARD_PHOTO_OVERRIDES
+// (the loader's generic map for re-rendering surfaces — CC grid
+// precedent). Photo sits AFTER the type block (text never overlays a
+// photo — AA is only ever checked against the authored scene), dimmed
+// + scene-tinted so the night→dawn arc stays the star. onerror removes
+// the whole banner — never a broken image. Ch6 gets the heavier dusk
+// scrim (the darkening ramp starts below the frontispiece).
+function _jsyFrontispiece(c){
+  var meta = _JSY_CH_META[c.n - 1];
+  var photo = '';
+  try {
+    var url = (typeof window !== 'undefined' && window.CARD_PHOTO_OVERRIDES) ? window.CARD_PHOTO_OVERRIDES[meta.photoKey] : '';
+    if (url){
+      photo = '<div class="jsy-front-photo">' +
+        '<img src="' + _jsyEsc(url) + '" alt="" loading="lazy" onerror="var p=this.parentNode;if(p&&p.parentNode)p.parentNode.removeChild(p);">' +
+        '<span class="jsy-front-scrim jsy-front-scrim' + c.n + '"></span></div>';
+    }
+  } catch(_e){}
+  return '<header class="jsy-chhead jsy-beat jsy-front">' +
+    '<div class="jsy-front-num" aria-hidden="true">' + meta.num + '</div>' +
+    '<div class="jsy-cheyebrow">Chapter ' + c.n + ' · ' + _jsyEsc(c.label) + '</div>' +
+    '<h3 class="jsy-chtitle">' + _jsyEsc(c.title) + '</h3>' +
+    '<div class="jsy-front-epi">“' + _jsyEsc(meta.epi) + '”<span class="jsy-front-epiref">' + _jsyEsc(meta.epiRef) + '</span></div>' +
+    '<div class="jsy-front-rule" aria-hidden="true"></div>' +
+    '</header>' +
+    // Banner is a SIBLING of the header, not a child — it breaks out
+    // of the 560px reading column so the width discontinuity reads
+    // "place, not card" (post-build review BLOCKING). Not a beat: it
+    // appears with no reveal animation (reduced-motion guarantee).
+    photo;
+}
 
 function _jsyEsc(s){
   return String(s == null ? '' : s)
@@ -226,9 +268,7 @@ function _jsyBuildHTML(chs, st){
 
 function _jsyBuildChapter(c, st){
   var h = '<section class="jsy-ch' + (c.cross ? ' jsy-ch--cross' : '') + '" id="jsyCh' + c.n + '" data-ch="' + c.n + '">' +
-    '<header class="jsy-chhead jsy-beat">' +
-    '<div class="jsy-cheyebrow">Chapter ' + c.n + ' · ' + _jsyEsc(c.label) + '</div>' +
-    '<h3 class="jsy-chtitle">' + _jsyEsc(c.title) + '</h3></header>';
+    _jsyFrontispiece(c);
 
   var blocks = [];
   c.beats.forEach(function(b){ blocks.push('<div class="jsy-beat">' + _jsyEsc(b) + '</div>'); });

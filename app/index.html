@@ -11166,11 +11166,68 @@
         }
         .jsy-top, .jsy-ch, .jsy-done{ grid-column:2; }
       }
-      /* Chapters — headers are scene text (dark scene both themes);
-         breathing room between chapters lets the light change land. */
-      .jsy-ch{ padding-top:24vh; }
+      /* Chapters — headers are scene text (dark scene both themes).
+         Frontispieces (2026-07-05) carry the chapter-opening weight
+         now, so the old 24vh scene-breathing gap drops to 8vh — the
+         opener must never become a wall of whitespace before beat 1. */
+      .jsy-ch{ padding-top:8vh; }
       .jsy-ch:first-of-type{ padding-top:6vh; }
       .jsy-chhead{ background:none; border:none; padding:0 .4rem; margin-bottom:1.1rem; max-width:560px; }
+      /* Frontispiece — typographic base is the finished zero-photo
+         look. The Roman numeral is a low-opacity gold watermark BEHIND
+         the type (decorative; the Arabic eyebrow stays the label —
+         VII must never be the only wayfinding). */
+      .jsy-front{ position:relative; padding-top:1.6rem; }
+      .jsy-front-num{
+        position:absolute; top:-.55rem; left:-.35rem; z-index:0; pointer-events:none;
+        font-family:Georgia,'Times New Roman',serif; font-size:4.25rem; line-height:.85;
+        color:#fbbf24; opacity:.16;
+      }
+      /* Darkest scenes (night/night/dusk): .16 gold composites to
+         near-black — nudge up so the watermark is quiet, not gone. */
+      .jsy-ch[data-ch="1"] .jsy-front-num, .jsy-ch[data-ch="2"] .jsy-front-num,
+      .jsy-ch[data-ch="6"] .jsy-front-num{ opacity:.26; }
+      .jsy-front .jsy-cheyebrow, .jsy-front .jsy-chtitle{ position:relative; z-index:1; }
+      .jsy-front-epi{
+        position:relative; z-index:1; margin-top:.55rem; max-width:35rem;
+        font-family:Georgia,'Times New Roman',serif; font-style:italic;
+        font-size:.95rem; line-height:1.6; color:rgba(241,233,213,.88);
+        text-shadow:0 1px 8px rgba(0,0,0,.55);
+      }
+      .jsy-front-epiref{
+        display:block; margin-top:.25rem; font-family:var(--fm); font-style:normal;
+        font-size:.66rem; font-weight:700; letter-spacing:.08em; color:rgba(251,191,36,.75);
+      }
+      .jsy-front-rule{ width:56px; height:1px; background:rgba(251,191,36,.55); margin-top:.9rem; }
+      /* Photo banner — an anchor, never a hero: full-bleed strip, no
+         card chrome, feathered into the scene top and bottom; source
+         pixels desaturated + darkened, then the chapter's own scene
+         hues as a scrim so the night→dawn arc reads through. Renders
+         only when an admin jsy-* photo exists (real places only). */
+      .jsy-front-photo{
+        position:relative; height:140px; overflow:hidden;
+        /* True breakout: a sibling of the header, escaping the flow
+           column's padding — wider than every 560px card, so the strip
+           reads as scenery, not another card (review BLOCKING fix). */
+        width:calc(100% + .6rem); margin:.35rem -.3rem 1.4rem;
+        -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 26px,#000 calc(100% - 26px),transparent 100%);
+        mask-image:linear-gradient(180deg,transparent 0,#000 26px,#000 calc(100% - 26px),transparent 100%);
+      }
+      @media (min-width:720px){ .jsy-front-photo{ height:210px; } }
+      .jsy-front-photo img{
+        width:100%; height:100%; object-fit:cover; display:block;
+        filter:saturate(.55) brightness(.65) contrast(1.05);
+      }
+      .jsy-front-scrim{ position:absolute; inset:0; pointer-events:none; }
+      .jsy-front-scrim1{ background:linear-gradient(180deg, rgba(9,13,31,.4) 0%, rgba(25,21,52,.68) 100%); }
+      .jsy-front-scrim2{ background:linear-gradient(180deg, rgba(16,18,43,.4) 0%, rgba(36,29,64,.68) 100%); }
+      .jsy-front-scrim3{ background:linear-gradient(180deg, rgba(18,34,44,.4) 0%, rgba(15,42,48,.68) 100%); }
+      .jsy-front-scrim4{ background:linear-gradient(180deg, rgba(36,26,16,.4) 0%, rgba(42,29,13,.68) 100%); }
+      .jsy-front-scrim5{ background:linear-gradient(180deg, rgba(46,36,16,.4) 0%, rgba(51,40,17,.68) 100%); }
+      /* Ch6: heavier dusk — the darkening ramp starts below the
+         frontispiece, so even a bright upload must read as late dusk. */
+      .jsy-front-scrim6{ background:linear-gradient(180deg, rgba(36,28,20,.55) 0%, rgba(18,14,11,.85) 100%); }
+      .jsy-front-scrim7{ background:linear-gradient(180deg, rgba(25,21,52,.4) 0%, rgba(58,42,20,.68) 100%); }
       .jsy-cheyebrow{
         font-family:var(--fm); font-size:.6rem; font-weight:800; letter-spacing:.22em;
         text-transform:uppercase; color:#fbbf24; margin-bottom:.4rem;
