@@ -66,6 +66,15 @@ const DEF = {
   // Daily-keyed log so re-opening a chapter doesn't repeatedly grant +2 XP.
   // Key shape: 'YYYY-MM-DD|<book>|<chapter>'. Pruned implicitly by date drift.
   faithChapterReadLog:{},
+  // Wave 2 §3a/§3d (2026-07-04) — Continue Reading. bibleLast is the
+  // resume pointer, overwritten on every ESV chapter render:
+  // { book, chapter, scrollPct, verse, snippet, ts }. bibleRead is the
+  // NON-METRIC "I read this chapter" map — streak/XP credit stays with
+  // the on-open awardEsvChapterXP call; Finished is a personal marker,
+  // never a second reward event. Shape: { '<book>|<chapter>':'YYYY-MM-DD' }.
+  // Object, never array (the scrReadDays lesson).
+  bibleLast:null,
+  bibleRead:{},
   // F2-F memory verses with SM-2-lite scheduling.
   // Each entry: { id, reference, text, category, ease, intervalDays, nextDue (ISO date),
   //               lastReviewed, mastered, masteredAt, createdAt, totalReviews, correctReviews }

@@ -1611,6 +1611,17 @@ function renderFaithJourneyHome(){
       if (v){ vEl.textContent = v.t; rEl.textContent = v.r; }
     }
   } catch (e){}
+  // Wave 2 §3a — Bible Hub card teaser. Repurposes the EXISTING single
+  // .fjp-sub line (id fjBibleSub, CSS-clamped to one line) so the shared
+  // 21-card anatomy keeps its row symmetry — no third line, ever. Falls
+  // back to the static copy when there's nothing to resume.
+  try {
+    var _bs = document.getElementById('fjBibleSub');
+    if (_bs){
+      var _bl = (typeof D !== 'undefined' && D && D.bibleLast && D.bibleLast.book) ? D.bibleLast : null;
+      _bs.textContent = _bl ? ('Continue in ' + _bl.book + ' ' + _bl.chapter + ' →') : 'Read · search · study tools.';
+    }
+  } catch (e){}
   // My Walk tile progress teaser — grace-first: show NOTHING until a step is
   // taken (spec §5, never make anyone feel behind). walkGetProgress() is from
   // walk-path.js and returns {done,total,pct}; typeof-guarded so a module-load

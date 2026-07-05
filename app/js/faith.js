@@ -2404,14 +2404,20 @@ async function openEsvReader(){
       : "'Georgia','Times New Roman',serif";
 
     document.getElementById('charBody').innerHTML = navHtml +
-      `<div id="esvPassageText" style="font-family:${fontFamily};font-size:${fontSize};line-height:${lineHeight};color:var(--tx);white-space:pre-wrap;">${passageHtml}</div>
-      <div style="margin-top:1.2rem;padding-top:.8rem;border-top:1px solid rgba(255,255,255,.06);font-size:.58rem;color:var(--tx3);line-height:1.6;">
+      `<div id="esvPassageText" style="font-family:${fontFamily};font-size:${fontSize};line-height:${lineHeight};color:var(--tx);white-space:pre-wrap;">${passageHtml}</div>` +
+      _esvChapterEndHtml(book, chNum, totalCh) +
+      `<div style="margin-top:1.2rem;padding-top:.8rem;border-top:1px solid var(--card-border);font-size:.58rem;color:var(--tx3);line-height:1.6;">
         Scripture quotations are from the ESV® Bible (The Holy Bible, English Standard Version®), copyright © 2001 by Crossway, a publishing ministry of Good News Publishers. Used by permission. All rights reserved.
       </div>`;
 
     // Mark this chapter as read for streak/XP. Lighter than a full devotional —
     // +2 XP per chapter, capped to once per day per chapter.
     awardEsvChapterXP(book, chNum);
+    // Wave 2 §3a — resume pointer (snippet captured now: the ESV text only
+    // exists here; other surfaces must never re-fetch just for a teaser).
+    _esvSaveResume(book, chNum, text);
+    _esvWireScrollSave();
+    _esvApplyPendingRestore();
   } catch(err){
     document.getElementById('charBody').innerHTML = `<div style="text-align:center;padding:1.5rem;color:#f87171;font-size:.82rem;">❌ ${err.message}</div>
       <div style="font-size:.75rem;color:var(--tx2);text-align:center;margin-top:.5rem;">Make sure your ESV API key is valid. Get one free at <span style="color:var(--c);">api.esv.org</span></div>`;
@@ -2933,6 +2939,180 @@ function awardEsvChapterXP(book, ch){
   save();
   if(typeof logActivity === 'function') logActivity('faith', 'Read ' + book + ' ' + ch);
   if(typeof renderFaithHome === 'function') renderFaithHome();
+}
+
+// ════════════════════════════════════════════════════════════
+// Wave 2 §3a/§3d (2026-07-04) — Continue Reading + chapter-end flow.
+// DESIGN DECISIONS (pre-build ux review, do not re-litigate casually):
+//  • Streak/XP credit stays with the on-open awardEsvChapterXP call —
+//    "✓ I read this chapter" is a NON-METRIC personal marker writing
+//    D.bibleRead only (no XP, no streak copy near it). It re-stamps
+//    scrReadDays idempotently as insurance, nothing more.
+//  • One first-class Next: the chapter-end "Next: <book> <ch> →" is
+//    the primary at-completion control; the top nav stays secondary.
+//  • Reflection is a collapsed "+ Add a thought" ghost link — never a
+//    blocking step — saving into the existing D.bibleReadings store
+//    (chapter-scoped, renders on the reading tab).
+//  • Resume restore prefers the verse anchor (survives font-size
+//    changes) and falls back to scrollPct; instant jump, no smooth.
+//  • Explicitly NOT added: progress meters, chapter counters, any
+//    percentage-of-Bible chrome.
+// ════════════════════════════════════════════════════════════
+let _esvPendingRestore = null;   // {verse, scrollPct} set by esvResume()
+let _esvScrollWired = false;
+let _esvScrollT = null;
+
+function _esvChapterEndHtml(book, chNum, totalCh){
+  const bookEsc = book.replace(/'/g, "\\'");
+  const readKey = book + '|' + chNum;
+  const isRead = !!(D && D.bibleRead && D.bibleRead[readKey]);
+  const nextBtn = chNum < totalCh
+    ? `<button type="button" class="esv-next-btn" onclick="navigateEsvChapter('${bookEsc}',${chNum + 1},${totalCh})">Next: ${book} ${chNum + 1} →</button>`
+    : `<div class="esv-book-done">You've reached the end of ${book}.</div>`;
+  return `<div id="esvChapterEnd" class="esv-chapter-end">
+      <button type="button" id="esvReadBtn" class="esv-read-btn${isRead ? ' esv-read-btn--done' : ''}" aria-pressed="${isRead}" ${isRead ? 'disabled' : ''} onclick="esvMarkRead('${bookEsc}',${chNum},this)">${isRead ? 'Read ✓' : 'I read this chapter ✓'}</button>
+      ${nextBtn}
+      <button type="button" id="esvReflectLink" class="esv-reflect-link" onclick="esvToggleReflect()">+ Add a thought</button>
+      <div id="esvReflectBox" style="display:none;" aria-live="polite">
+        <input type="text" id="esvReflectInput" maxlength="200" aria-label="A one-line thought on ${book} ${chNum}" placeholder="One line is plenty…">
+        <button type="button" class="esv-reflect-save" onclick="esvSaveReflection('${bookEsc}',${chNum})">Save</button>
+      </div>
+    </div>`;
+}
+
+// Snippet from the live ESV text we already hold. The teaser should be
+// SCRIPTURE, not a section heading — so prefer the first line that
+// carries a verse marker ([N]), then strip the markers, collapse
+// whitespace, cap ~90 chars. Falls back to any substantial line.
+function _esvSaveResume(book, chNum, text){
+  if(!D) return;
+  let snip = '';
+  try {
+    const rawLines = String(text).split('\n');
+    const vLine = rawLines.find(l => /\[\d+\]/.test(l))
+      || rawLines.find(l => l.trim().length >= 20)
+      || rawLines[0] || '';
+    snip = vLine.replace(/\[\d+\]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 90);
+  } catch(_e){}
+  D.bibleLast = { book: book, chapter: chNum, scrollPct: 0, verse: 0, snippet: snip, ts: Date.now() };
+  save();
+  renderBibleResumeCard();
+}
+
+function _esvWireScrollSave(){
+  const body = document.getElementById('charBody');
+  if(!body || _esvScrollWired) return;
+  _esvScrollWired = true;
+  body.addEventListener('scroll', function(){
+    if(!_esvCurrentBook || !D || !D.bibleLast) return;
+    if(D.bibleLast.book !== _esvCurrentBook || D.bibleLast.chapter !== _esvCurrentChapter) return;
+    clearTimeout(_esvScrollT);
+    _esvScrollT = setTimeout(function(){
+      const denom = body.scrollHeight - body.clientHeight;
+      D.bibleLast.scrollPct = denom > 0 ? Math.min(1, body.scrollTop / denom) : 0;
+      // Nearest verse anchor — first verse span at/below the viewport top.
+      let v = 0;
+      const spans = body.querySelectorAll('[id^="esv-v-"]');
+      for(let i = 0; i < spans.length; i++){
+        if(spans[i].offsetTop >= body.scrollTop){ v = parseInt(spans[i].id.slice(6), 10) || 0; break; }
+      }
+      D.bibleLast.verse = v;
+      D.bibleLast.ts = Date.now();
+      save();
+    }, 1200);
+  });
+}
+
+function _esvApplyPendingRestore(){
+  if(!_esvPendingRestore) return;
+  const r = _esvPendingRestore;
+  _esvPendingRestore = null;
+  const body = document.getElementById('charBody');
+  if(!body) return;
+  // Instant jump (no smooth — the modal's own entrance is the motion).
+  requestAnimationFrame(function(){
+    const target = r.verse ? document.getElementById('esv-v-' + r.verse) : null;
+    if(target){ body.scrollTop = Math.max(0, target.offsetTop - 40); }
+    else if(r.scrollPct){ body.scrollTop = r.scrollPct * (body.scrollHeight - body.clientHeight); }
+  });
+}
+
+function esvResume(){
+  if(!D || !D.bibleLast) return;
+  const bl = D.bibleLast;
+  _esvPendingRestore = { verse: bl.verse || 0, scrollPct: bl.scrollPct || 0 };
+  const sel = document.getElementById('esvBook'); if(sel) sel.value = bl.book;
+  if(typeof onEsvBookChange === 'function') onEsvBookChange();
+  const chSel = document.getElementById('esvChapter'); if(chSel) chSel.value = String(bl.chapter);
+  openEsvReader();
+}
+
+function esvMarkRead(book, chNum, btn){
+  if(!D) return;
+  if(!D.bibleRead || typeof D.bibleRead !== 'object') D.bibleRead = {};
+  const today = new Date().toISOString().slice(0,10);
+  D.bibleRead[book + '|' + chNum] = today;
+  // Insurance stamp only — the streak already fired on open (see the
+  // design-decision block above). Idempotent same-day write.
+  if(!D.scrReadDays) D.scrReadDays = {};
+  D.scrReadDays[today] = true;
+  save();
+  if(btn){ btn.textContent = 'Read ✓'; btn.classList.add('esv-read-btn--done'); btn.setAttribute('aria-pressed', 'true'); btn.disabled = true; }
+  renderBibleResumeCard();
+}
+
+function esvToggleReflect(){
+  const box = document.getElementById('esvReflectBox');
+  const link = document.getElementById('esvReflectLink');
+  if(!box) return;
+  const opening = box.style.display === 'none';
+  box.style.display = opening ? 'flex' : 'none';
+  // The link stays visible as the cancel path — an accidental tap must
+  // have a one-tap undo (post-build ux review catch).
+  if(link) link.textContent = opening ? 'Never mind' : '+ Add a thought';
+  if(opening){ const inp = document.getElementById('esvReflectInput'); if(inp) try { inp.focus(); } catch(_e){} }
+}
+
+function esvSaveReflection(book, chNum){
+  const inp = document.getElementById('esvReflectInput');
+  const textVal = inp ? inp.value.trim() : '';
+  if(!textVal){ showToast('Write a line first'); return; }
+  if(!D) return;
+  if(!Array.isArray(D.bibleReadings)) D.bibleReadings = [];
+  // Same shape saveBibleReading writes — renders on the reading tab.
+  D.bibleReadings.push({ id: Date.now(), book: book, chapter: chNum, verse: '', notes: textVal, highlight: '', date: new Date().toISOString() });
+  save();
+  if(typeof renderBibleReadings === 'function') try { renderBibleReadings(); } catch(_e){}
+  const box = document.getElementById('esvReflectBox');
+  if(box) box.innerHTML = '<div class="esv-reflect-saved">Saved to your reading journal ✓</div>';
+  showToast('Thought saved 📝');
+}
+
+// Resume card at the top of the Bible Hub's Read sub-tab. .fh-card
+// register (faith family), cc-continue BEHAVIOR (aria, chevron) — but
+// no staleness expiry: books take weeks; the card tells the truth with
+// a relative timestamp instead of vanishing.
+function _esvAgo(ts){
+  const d = Math.floor((Date.now() - ts) / 86400000);
+  if(d <= 0) return 'today';
+  if(d === 1) return 'yesterday';
+  return d + ' days ago';
+}
+function renderBibleResumeCard(){
+  const host = document.getElementById('esvResumeCard');
+  if(!host) return;
+  if(!D || !D.bibleLast || !D.bibleLast.book){ host.innerHTML = ''; return; }
+  const bl = D.bibleLast;
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  host.innerHTML =
+    '<button type="button" class="esv-resume" onclick="esvResume()" aria-label="Continue reading ' + esc(bl.book) + ' chapter ' + esc(bl.chapter) + '">' +
+      '<span class="esv-resume-body">' +
+        '<span class="esv-resume-eyebrow">Continue reading · ' + esc(_esvAgo(bl.ts || Date.now())) + '</span>' +
+        '<span class="esv-resume-title">' + esc(bl.book) + ' ' + esc(bl.chapter) + '</span>' +
+        (bl.snippet ? '<span class="esv-resume-snip">' + esc(bl.snippet) + '…</span>' : '') +
+      '</span>' +
+      '<span class="esv-resume-chev" aria-hidden="true">›</span>' +
+    '</button>';
 }
 
 // ── JESUS & GOD'S PURPOSE ────────────────────────────────────
@@ -11489,6 +11669,7 @@ function _bfBibleSubTab(tab){
     }
   });
   if(tab === 'listen') renderAudioBibleCard();
+  if(tab === 'read' && typeof renderBibleResumeCard === 'function') renderBibleResumeCard();
 }
 
 function _bfPlansSubTab(tab){

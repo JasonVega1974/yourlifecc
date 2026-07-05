@@ -10067,7 +10067,7 @@
               <div class="fjp-shade" aria-hidden="true"></div>
             </div>
             <div class="fjp-title">BIBLE HUB</div>
-            <div class="fjp-sub">Read · search · study tools.</div>
+            <div class="fjp-sub" id="fjBibleSub">Read · search · study tools.</div>
           </button>
         </div>
 
@@ -10842,6 +10842,83 @@
 
     <!-- Read sub-tab -->
     <div id="bibleSubTab_read">
+      <style>
+        /* Wave 2 §3a/§3d (2026-07-04) — Continue Reading + chapter end.
+           Interface layer, faith register (gold/violet family like the
+           surrounding .fh-card siblings — NOT cc-continue cyan). */
+        .esv-resume{
+          display:flex; align-items:center; gap:.8rem; width:100%; text-align:left;
+          background:rgba(251,191,36,.05); border:1px solid rgba(251,191,36,.25);
+          border-radius:16px; padding:.85rem 1rem; margin-bottom:.7rem; cursor:pointer;
+          color:var(--tx); font-family:var(--fm); min-height:44px;
+        }
+        .esv-resume:hover{ border-color:rgba(251,191,36,.5); }
+        .esv-resume:focus-visible{ outline:2px solid #fbbf24; outline-offset:2px; }
+        .esv-resume-body{ display:flex; flex-direction:column; gap:.15rem; min-width:0; flex:1; }
+        .esv-resume-eyebrow{ font-size:.6rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:#fbbf24; }
+        .esv-resume-title{ font-size:.98rem; font-weight:800; }
+        .esv-resume-snip{
+          font-family:Georgia,serif; font-style:italic; font-size:.8rem; color:var(--tx2);
+          overflow:hidden; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical;
+        }
+        .esv-resume-chev{ font-size:1.3rem; color:rgba(251,191,36,.65); }
+        .esv-chapter-end{
+          display:flex; flex-direction:column; gap:.55rem; align-items:center;
+          margin-top:1.4rem; padding-top:1rem; border-top:1px solid var(--card-border);
+        }
+        .esv-read-btn{
+          min-height:44px; min-width:220px; border-radius:10px; cursor:pointer;
+          background:transparent; border:1px solid rgba(251,191,36,.4); color:var(--tx);
+          font-family:var(--fm); font-weight:700; font-size:.85rem;
+        }
+        .esv-read-btn--done{ background:rgba(251,191,36,.12); color:#fbbf24; cursor:default; }
+        .esv-next-btn{
+          min-height:44px; min-width:220px; border-radius:10px; cursor:pointer;
+          /* Gold register — NOT var(--cd-banner): the reader header was
+             deliberately moved OFF that purple (faith.js "F9 gold
+             register"); the flow's primary CTA must speak the same
+             color language as the rest of the chapter-end cluster. */
+          background:#fbbf24; color:#241703; border:none;
+          font-family:var(--fm); font-weight:800; font-size:.88rem;
+        }
+        .esv-next-btn:hover{ background:#f5b431; }
+        .esv-book-done{ font-family:Georgia,serif; font-style:italic; font-size:.85rem; color:var(--tx2); }
+        .esv-reflect-link{
+          background:none; border:none; color:var(--tx3); font-family:var(--fm);
+          font-size:.78rem; cursor:pointer; min-height:44px; text-decoration:underline dotted;
+        }
+        .esv-reflect-link:hover{ color:var(--tx); }
+        #esvReflectBox{ display:flex; gap:.4rem; width:100%; max-width:420px; }
+        #esvReflectInput{
+          flex:1; min-height:44px; border-radius:10px; padding:.4rem .7rem;
+          background:var(--input-bg); border:1px solid var(--input-border); color:var(--tx);
+          font-family:Georgia,serif; font-style:italic; font-size:.85rem;
+        }
+        .esv-reflect-save{
+          min-height:44px; border-radius:10px; padding:0 1rem; cursor:pointer;
+          background:rgba(251,191,36,.12); border:1px solid rgba(251,191,36,.4);
+          color:#fbbf24; font-family:var(--fm); font-weight:700; font-size:.82rem;
+        }
+        .esv-reflect-saved{ font-family:var(--fm); font-size:.8rem; color:#fbbf24; padding:.6rem 0; }
+        .esv-read-btn:focus-visible, .esv-next-btn:focus-visible,
+        .esv-reflect-link:focus-visible, .esv-reflect-save:focus-visible{
+          outline:2px solid #fbbf24; outline-offset:2px;
+        }
+        :root.light .esv-resume{ background:#fff; border-color:rgba(180,120,20,.35); }
+        :root.light .esv-resume-eyebrow{ color:#92400e; }
+        :root.light .esv-resume-chev{ color:rgba(146,64,14,.6); }
+        :root.light .esv-read-btn{ border-color:rgba(180,120,20,.45); }
+        :root.light .esv-read-btn--done{ background:rgba(180,120,20,.10); color:#92400e; }
+        :root.light .esv-reflect-save{ background:rgba(180,120,20,.10); border-color:rgba(180,120,20,.4); color:#92400e; }
+        :root.light .esv-reflect-saved{ color:#92400e; }
+        :root.light .esv-next-btn{ background:#92400e; color:#fff; }
+        :root.light .esv-next-btn:hover{ background:#7c3608; }
+        /* Journey-home Bible teaser rides the EXISTING single sub line —
+           clamp so a long book name can never add a second line. */
+        #fjBibleSub{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+      </style>
+      <!-- Wave 2 §3a — Continue Reading resume card (renderBibleResumeCard) -->
+      <div id="esvResumeCard"></div>
       <!-- F2-D: Search bar (full-text ESV + my notes & highlights) -->
       <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:.7rem;margin-bottom:.6rem;">
         <div style="display:flex;gap:.4rem;align-items:center;">
