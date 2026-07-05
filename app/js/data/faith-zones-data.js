@@ -28,7 +28,7 @@ const CONVINCE_ME_DECK = [
       'No competing 1st-century account claims the resurrection was a hoax.'
     ],
     closer:'When the cost of telling the truth is your life, lies don\'t survive long.',
-    proofId:'res-eyewitness-count'
+    proofId:'five-hundred-witnesses'
   },
   {
     id:'cm2', cat:'Mystery', icon:'🔍',
@@ -41,7 +41,7 @@ const CONVINCE_ME_DECK = [
       'They claimed it was seeing Jesus alive — and kept claiming it under torture.'
     ],
     closer:'No spin doctor in history has flipped a defeated cult into a global movement in two months.',
-    proofId:'res-disciples-transformed'
+    proofId:'cowards-to-martyrs'
   },
   {
     id:'cm3', cat:'Mystery', icon:'🔍',
@@ -54,7 +54,7 @@ const CONVINCE_ME_DECK = [
       'No bribe, no woman, no political reward — just a claimed encounter.'
     ],
     closer:'Ambition doesn\'t walk away from power unless something bigger replaces it.',
-    proofId:'res-paul-conversion'
+    proofId:'paul-conversion'
   },
   {
     id:'cm4', cat:'Evidence', icon:'⚡',
@@ -67,7 +67,7 @@ const CONVINCE_ME_DECK = [
       'These sources had every incentive to ignore a fringe movement. They didn\'t.'
     ],
     closer:'When your enemies confirm the basic facts, the basic facts probably happened.',
-    proofId:'wit-tacitus'
+    proofId:'tacitus-christ'
   },
   {
     id:'cm5', cat:'Evidence', icon:'⚡',
@@ -80,7 +80,7 @@ const CONVINCE_ME_DECK = [
       'They never did — and the movement they tried to crush exploded.'
     ],
     closer:'The simplest disproof was a five-minute walk away. Nobody could take it.',
-    proofId:'res-empty-tomb'
+    proofId:'empty-tomb-undisputed'
   },
   {
     id:'cm6', cat:'Evidence', icon:'⚡',
@@ -93,7 +93,7 @@ const CONVINCE_ME_DECK = [
       'The detail survived only because the writers were reporting, not crafting.'
     ],
     closer:'Embarrassing details that don\'t help your case are usually the true ones.',
-    proofId:'res-women-witnesses'
+    proofId:'women-first-witnesses'
   },
   {
     id:'cm7', cat:'Science', icon:'🔭',
@@ -106,7 +106,7 @@ const CONVINCE_ME_DECK = [
       'No purely physical cause works: physics didn\'t exist yet.'
     ],
     closer:'The first verse of Genesis says "In the beginning." Modern cosmology agrees there was one.',
-    proofId:'sci-big-bang'
+    proofId:'universe-stretching'
   },
   {
     id:'cm8', cat:'Science', icon:'🔭',
@@ -119,7 +119,7 @@ const CONVINCE_ME_DECK = [
       'Atheist physicists call this "the most disturbing observation in modern science."'
     ],
     closer:'A universe this calibrated either won the lottery a hundred times in a row — or someone calibrated it.',
-    proofId:'sci-fine-tuning'
+    proofId:null
   },
   {
     id:'cm9', cat:'Science', icon:'🔭',
@@ -132,7 +132,7 @@ const CONVINCE_ME_DECK = [
       'The mathematician Fred Hoyle (atheist) called it "a tornado building a 747."'
     ],
     closer:'Information this dense doesn\'t arise from noise. It arises from intent.',
-    proofId:'sci-dna-information'
+    proofId:null
   },
   {
     id:'cm10', cat:'Prophecy', icon:'📜',
@@ -145,7 +145,7 @@ const CONVINCE_ME_DECK = [
       'No room for editing after the fact: the prophecy circulated for centuries first.'
     ],
     closer:'A 700-year time-stamped address in a tiny village isn\'t a lucky guess.',
-    proofId:'pro-bethlehem'
+    proofId:'bethlehem-birth'
   },
   {
     id:'cm11', cat:'Prophecy', icon:'📜',
@@ -158,7 +158,7 @@ const CONVINCE_ME_DECK = [
       'Jesus fulfilled hundreds — including ones he could not have engineered (his birthplace, death method, betrayal price).'
     ],
     closer:'At some point the math stops being coincidence and starts being a signature.',
-    proofId:'pro-stoner-math'
+    proofId:'messianic-prophecies'
   },
   {
     id:'cm12', cat:'Prophecy', icon:'📜',
@@ -171,7 +171,7 @@ const CONVINCE_ME_DECK = [
       'The differences were spelling and word order — nothing doctrinal changed.'
     ],
     closer:'A book that survives a thousand years of copying without drift is a book that was guarded.',
-    proofId:'mss-dead-sea-scrolls'
+    proofId:'dead-sea-scrolls'
   },
   {
     id:'cm13', cat:'Philosophy', icon:'💭',
@@ -184,7 +184,7 @@ const CONVINCE_ME_DECK = [
       'C.S. Lewis: "If we find a desire no experience in this world can satisfy, the explanation is we were made for another world."'
     ],
     closer:'Universal hunger usually points to the existence of real food.',
-    proofId:null
+    proofId:'phil-universal-belief'
   },
   {
     id:'cm14', cat:'Philosophy', icon:'💭',
@@ -197,7 +197,7 @@ const CONVINCE_ME_DECK = [
       'The argument for objective morality is one of the strongest cases for God ever made.'
     ],
     closer:'You can\'t call something crooked without knowing what straight looks like.',
-    proofId:null
+    proofId:'phil-moral-law'
   },
   {
     id:'cm15', cat:'Philosophy', icon:'💭',
@@ -210,7 +210,7 @@ const CONVINCE_ME_DECK = [
       'His subsequent writing converted thousands of other skeptics — including doctors and scientists.'
     ],
     closer:'When the strongest critic switches sides, the case deserves a second look.',
-    proofId:null
+    proofId:'phil-lewis-conversion'
   },
   {
     id:'cm16', cat:'Challenge', icon:'❓',
@@ -223,7 +223,7 @@ const CONVINCE_ME_DECK = [
       'The cross is God saying "I will not stay distant from your worst day."'
     ],
     closer:'The Christian answer to evil isn\'t a logic puzzle — it\'s a person who entered the pain.',
-    proofId:null
+    proofId:'phil-problem-of-evil'
   },
   {
     id:'cm17', cat:'Challenge', icon:'❓',
@@ -236,7 +236,7 @@ const CONVINCE_ME_DECK = [
       'You\'d stop being afraid of dying, which would change how you live.'
     ],
     closer:'The cost is your old self. The reward is everything you were actually built for.',
-    proofId:null
+    proofId:'phil-cost-of-belief'
   },
   {
     id:'cm18', cat:'Challenge', icon:'❓',
@@ -249,7 +249,7 @@ const CONVINCE_ME_DECK = [
       'The honest question: are you actually looking, or just looking for a reason not to look?'
     ],
     closer:'The Bible promises one thing for honest seekers: "Seek and you will find."',
-    proofId:null
+    proofId:'phil-honest-seeker'
   },
   {
     id:'cm19', cat:'Mystery', icon:'🔍',
@@ -262,7 +262,7 @@ const CONVINCE_ME_DECK = [
       'Many return permanently changed — losing their fear of death entirely.'
     ],
     closer:'When wildly different people report the same alien country, the country probably exists.',
-    proofId:null
+    proofId:'exp-near-death'
   },
   {
     id:'cm20', cat:'Evidence', icon:'⚡',
@@ -275,7 +275,7 @@ const CONVINCE_ME_DECK = [
       'Instead, the church grew fastest right where it was easiest to disprove.'
     ],
     closer:'You don\'t start a lie in the one city that can verify it. Unless it isn\'t a lie.',
-    proofId:'res-jerusalem-growth'
+    proofId:'jerusalem-explosive-growth'
   }
 ];
 
