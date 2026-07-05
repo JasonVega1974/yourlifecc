@@ -8102,7 +8102,11 @@
     .cm-card-front, .cm-card-back{ isolation:isolate; }
     .cm-card-front{
       opacity:1; visibility:visible; pointer-events:auto;
-      transition:opacity 0s linear .2s, visibility 0s linear .2s;
+      /* appearing face: 80ms fade from the 90° midpoint softens the
+         swap wink; visibility flips at the midpoint so the fade has a
+         visible element to animate. Disappearing face stays instant
+         (transition:none below) — both faces are never opaque together. */
+      transition:opacity .08s linear .2s, visibility 0s linear .2s;
     }
     .cm-card-container.flipped .cm-card-front{
       position:absolute; inset:0;
@@ -8117,7 +8121,7 @@
     .cm-card-container.flipped .cm-card-back{
       position:relative; inset:auto;
       opacity:1; visibility:visible; pointer-events:auto;
-      transition:opacity 0s linear .2s, visibility 0s linear .2s;
+      transition:opacity .08s linear .2s, visibility 0s linear .2s;
     }
     /* Mobile compaction — front-face only. Back-face cap is lifted by
        `.flipped` rules below so the previous clip fix stands. */
