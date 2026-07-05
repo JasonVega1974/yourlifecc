@@ -1966,13 +1966,87 @@ function renderHeartCheckPicker(){
              '<span class="hc-label">' + _fzEsc(item.label) + '</span>' +
            '</button>';
   }).join('');
+  // "Your Heart" journal door — only once there's a story to show.
+  var hasHistory = (typeof D !== 'undefined' && D && Array.isArray(D.heartChecks) && D.heartChecks.length > 0);
   return ''
     + '<div class="hc-intro">'
     +   '<div class="hc-intro-emoji" aria-hidden="true">💙</div>'
     +   '<div class="hc-intro-text">How are you really feeling right now?</div>'
     +   '<div class="hc-intro-sub">No filter. Pick what\'s closest.</div>'
     + '</div>'
-    + '<div class="hc-grid">' + cells + '</div>';
+    + '<div class="hc-grid">' + cells + '</div>'
+    + (hasHistory ? '<div class="hc-footer"><button class="hc-more-btn" onclick="renderHeartJournal()">Your Heart — last 30 days →</button></div>' : '');
+}
+
+// ════════════════════════════════════════════════════════════
+// The Pulse (2026-07-04) — Heart Check guided journey.
+// 5 beats replacing the old single-shot response card:
+//   1 name it (intensity slider) → 2 breathe (distress only, always
+//   skippable) → 3 the Word (staged verse) → 4 pray it (paced ring)
+//   → 5 after (delta with grace + action step) — plus a "Your Heart"
+//   30-day journal. Step machine mirrors Night Reflect's _nrSetStep;
+//   every beat renders into #fzDestBody via _hcHost (aria-live).
+// D.heartChecks entries gain before/after (backward compatible —
+// old {key,date} entries just lack them). The breathe beat NEVER
+// fires for grateful/joyful (high joy is not a problem to calm).
+// "Check on me tonight" push nudge DEFERRED — push infra is a
+// cron-only streak nudge; a one-off reminder needs server work.
+// All reward calls typeof-guarded. Quest/XP bumps throttled to
+// once per calendar day (walk-quest-hooks convention).
+// ════════════════════════════════════════════════════════════
+var _hcJ = null;                       // {key, before, after, entry, timer}
+var _HC_ALWAYS_BREATH = { anxious:1, angry:1 };
+var _HC_POSITIVE = { grateful:1, joyful:1 };
+function _hcToday(){ return new Date().toISOString().slice(0,10); }
+// Once-per-day throttle for XP/quest bumps. PERSISTED in D.hcDaily
+// (in DEF) — an in-memory map re-arms on every reload, which on a
+// phone means every app switch = farmable rewards (post-build ux
+// review catch). Falls back to a module map only if D is missing.
+var _hcOnceFallback = {};
+function _hcOnce(tag){
+  var store = (typeof D !== 'undefined' && D)
+    ? (D.hcDaily && typeof D.hcDaily === 'object' ? D.hcDaily : (D.hcDaily = {}))
+    : _hcOnceFallback;
+  if (store[tag] === _hcToday()) return false;
+  store[tag] = _hcToday();
+  if (store !== _hcOnceFallback) _fzSave();
+  return true;
+}
+function _hcReduced(){
+  return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+}
+function _hcClearTimer(){
+  if (_hcJ && _hcJ.timer){ clearTimeout(_hcJ.timer); clearInterval(_hcJ.timer); _hcJ.timer = null; }
+}
+function _hcHost(html){
+  var bodyEl = document.getElementById('fzDestBody');
+  if (!bodyEl) return null;
+  bodyEl.innerHTML =
+    '<button class="hc-back-to-picker" onclick="backToHeartPicker()">← Different feeling</button>' +
+    '<div class="hc-journey" aria-live="polite">' + html + '</div>';
+  return bodyEl;
+}
+// Intensity slider — shared by beats 1 and 5. Fill + live readout
+// carry the signal (never hue alone); heavy emotions ramp teal →
+// indigo → violet, positive emotions stay gold. aria-valuetext gets
+// "Anxious, 7 out of 10".
+function _hcSliderHtml(id, item, val){
+  return '' +
+    '<div class="hc-slider-wrap">' +
+      '<input type="range" class="hc-slider" id="' + id + '" min="1" max="10" step="1" value="' + val + '"' +
+        ' aria-label="Intensity" oninput="_hcSlide(this, \'' + id + '\')">' +
+      '<div class="hc-slider-readout" id="' + id + 'Out">' + val + ' of 10</div>' +
+    '</div>';
+}
+function _hcSlide(input, id){
+  var v = parseInt(input.value, 10) || 5;
+  var item = (_hcJ && typeof HEART_CHECK !== 'undefined') ? HEART_CHECK[_hcJ.key] : null;
+  var out = document.getElementById(id + 'Out');
+  if (out) out.textContent = v + ' of 10';
+  input.setAttribute('aria-valuetext', (item ? item.label + ', ' : '') + v + ' out of 10');
+  var band = _HC_POSITIVE[_hcJ && _hcJ.key] ? 'gold' : (v <= 3 ? 'calm' : (v <= 5 ? 'stirred' : (v <= 7 ? 'heavy' : 'storm')));
+  input.setAttribute('data-band', band);
+  input.style.setProperty('--hc-fill', (v * 10) + '%');
 }
 
 function openHeartCheck(key){
@@ -1980,58 +2054,247 @@ function openHeartCheck(key){
   if (typeof HEART_CHECK === 'undefined') return;
   var item = HEART_CHECK[key];
   if (!item) return;
-  var bodyEl = document.getElementById('fzDestBody');
-  if (!bodyEl) return;
-
-  bodyEl.innerHTML =
-    '<button class="hc-back-to-picker" onclick="backToHeartPicker()">← Different feeling</button>' +
-    '<div class="hc-response">' +
+  _hcClearTimer();
+  _hcJ = { key:key, before:5, after:null, entry:null, timer:null };
+  _hcHost(
+    '<div class="hc-beat hc-beat-in">' +
       '<div class="hc-emoji-large" aria-hidden="true">' + _fzEsc(item.emoji) + '</div>' +
       '<div class="hc-headline">' + _fzEsc(item.headline) + '</div>' +
-      '<div class="hc-section hc-verse-section">' +
-        '<div class="hc-section-label">A VERSE FOR THIS</div>' +
-        '<blockquote class="hc-verse">' + _fzEsc(item.verse) + '</blockquote>' +
-        '<div class="hc-verse-ref">— ' + _fzEsc(item.verseRef) + '</div>' +
-      '</div>' +
-      '<div class="hc-section hc-prayer-section">' +
-        '<div class="hc-section-label">PRAYER FOR RIGHT NOW</div>' +
-        '<div class="hc-prayer">' + _fzEsc(item.prayer) + '</div>' +
-        '<button class="hc-pray-btn" onclick="hcPrayWithThis(\'' + _fzEsc(key) + '\', this)">I prayed this 🙏</button>' +
-      '</div>' +
+      '<div class="hc-beat-q">How strong is it right now?</div>' +
+      _hcSliderHtml('hcBefore', item, 5) +
+      '<button class="hc-cta" onclick="_hcBeat1Done()">Continue →</button>' +
+    '</div>');
+  var s = document.getElementById('hcBefore');
+  if (s) _hcSlide(s, 'hcBefore');
+}
+
+function _hcBeat1Done(){
+  if (!_hcJ) return;
+  var s = document.getElementById('hcBefore');
+  _hcJ.before = s ? (parseInt(s.value, 10) || 5) : 5;
+  // Log the visit now (old behavior logged on open) so abandoned
+  // journeys still show what the user was carrying; beat 5 fills
+  // `after` into this same entry.
+  if (D){
+    if (!Array.isArray(D.heartChecks)) D.heartChecks = [];
+    _hcJ.entry = { key:_hcJ.key, date:new Date().toISOString(), before:_hcJ.before };
+    D.heartChecks.push(_hcJ.entry);
+    if (D.heartChecks.length > 100) D.heartChecks = D.heartChecks.slice(-100);
+    _fzSave();
+  }
+  var needBreath = !_HC_POSITIVE[_hcJ.key] && (_hcJ.before >= 6 || _HC_ALWAYS_BREATH[_hcJ.key]);
+  if (needBreath) _hcBeatBreathe(); else _hcBeatWord();
+}
+
+// Beat 2 — box breathing, 4-4-4-4, two cycles (~32s). Skippable from
+// the first frame. Reduced motion: the ring stays static; the phase
+// text + count keep the true cadence (pacing IS the point — only the
+// scaling visual drops).
+function _hcBeatBreathe(){
+  if (!_hcJ) return;
+  var cue = (typeof HEART_BREATH !== 'undefined' && HEART_BREATH[_hcJ.key]) ||
+            ['Breathe in — God is here.', 'Hold — He holds you.', 'Let it go — one breath at a time.'];
+  _hcHost(
+    '<div class="hc-beat hc-beat-in hc-breathe">' +
+      '<div class="hc-breath-scene" aria-hidden="true"><div class="hc-breath-ring" id="hcRing"></div></div>' +
+      '<div class="hc-breath-phase" id="hcPhase">Breathe in…</div>' +
+      '<div class="hc-breath-cue" id="hcCue">' + _fzEsc(cue[0]) + '</div>' +
+      '<div class="hc-breath-count" id="hcCount" aria-hidden="true">4</div>' +
+      '<button class="hc-skip" onclick="_hcBeatWord()">I\'m ready →</button>' +
+    '</div>');
+  var phases = [
+    { t:'Breathe in…', cls:'hc-ring-in',  cue:cue[0] },
+    { t:'Hold…',       cls:'hc-ring-hold', cue:cue[1] },
+    { t:'Let it go…',  cls:'hc-ring-out', cue:cue[2] },
+    { t:'Hold…',       cls:'hc-ring-hold', cue:cue[1] }
+  ];
+  var step = 0, tick = 0, cycles = 2;
+  var reduced = _hcReduced();
+  function apply(){
+    var p = phases[step % 4];
+    var ring = document.getElementById('hcRing');
+    var ph = document.getElementById('hcPhase');
+    var cu = document.getElementById('hcCue');
+    if (!ph) return;                         // beat left — stop silently
+    ph.textContent = p.t;
+    if (cu) cu.textContent = p.cue;
+    if (ring && !reduced) ring.className = 'hc-breath-ring ' + p.cls;
+  }
+  apply();
+  _hcJ.timer = setInterval(function(){
+    var co = document.getElementById('hcCount');
+    if (!document.getElementById('hcPhase')){ _hcClearTimer(); return; }
+    tick++;
+    if (co) co.textContent = String(4 - (tick % 4 === 0 ? 4 : tick % 4) + 1);
+    if (tick % 4 === 0){
+      step++;
+      if (step >= 4 * cycles){ _hcClearTimer(); _hcBeatWord(); return; }
+      apply();
+    }
+  }, 1000);
+  if (window.haptics && typeof window.haptics.correct === 'function') window.haptics.correct();
+}
+
+// Beat 3 — the Word, staged: verse renders in ~4-word groups with a
+// staggered fade (CSS; the app-wide reduced-motion catch-all makes
+// them instant, which is the correct fallback for reading).
+function _hcBeatWord(){
+  if (!_hcJ) return;
+  _hcClearTimer();
+  var item = HEART_CHECK[_hcJ.key];
+  var words = String(item.verse).split(/\s+/);
+  var groups = [];
+  for (var i = 0; i < words.length; i += 4) groups.push(words.slice(i, i + 4).join(' '));
+  var staged = groups.map(function(g, gi){
+    return '<span class="hc-vw" style="animation-delay:' + (gi * 0.18).toFixed(2) + 's">' + _fzEsc(g) + ' </span>';
+  }).join('');
+  _hcHost(
+    '<div class="hc-beat hc-beat-in">' +
+      '<div class="hc-section-label">A VERSE FOR THIS</div>' +
+      '<blockquote class="hc-verse hc-verse-staged">' + staged + '</blockquote>' +
+      '<div class="hc-verse-ref">— ' + _fzEsc(item.verseRef) + '</div>' +
+      '<button class="hc-cta" onclick="_hcBeatPray()" style="animation-delay:' + (groups.length * 0.18 + 0.3).toFixed(2) + 's">Pray it with me →</button>' +
+    '</div>');
+}
+
+// Beat 4 — paced prayer. 20s indigo progress ring + live countdown;
+// "Amen →" finishes early (prayer is not a hostage situation).
+function _hcBeatPray(){
+  if (!_hcJ) return;
+  var item = HEART_CHECK[_hcJ.key];
+  _hcHost(
+    '<div class="hc-beat hc-beat-in">' +
+      '<div class="hc-section-label">PRAYER FOR RIGHT NOW</div>' +
+      '<div class="hc-prayer">' + _fzEsc(item.prayer) + '</div>' +
+      '<div class="hc-pray-ring-wrap" aria-hidden="true"><div class="hc-pray-ring" id="hcPrayRing"></div><div class="hc-pray-count" id="hcPrayCount">20</div></div>' +
+      '<button class="hc-skip" id="hcAmen" onclick="_hcPrayDone()">Amen →</button>' +
+    '</div>');
+  var left = 20;
+  _hcJ.timer = setInterval(function(){
+    var co = document.getElementById('hcPrayCount');
+    if (!co){ _hcClearTimer(); return; }
+    left--;
+    co.textContent = String(Math.max(0, left));
+    var ring = document.getElementById('hcPrayRing');
+    if (ring) ring.style.setProperty('--hc-arc', ((20 - left) * 18) + 'deg');
+    if (left <= 0){ _hcClearTimer(); _hcPrayDone(); }
+  }, 1000);
+}
+
+function _hcPrayDone(){
+  if (!_hcJ || _hcJ.prayed) return;
+  _hcJ.prayed = true;
+  _hcClearTimer();
+  if (typeof awardTrait === 'function') awardTrait('faith', 2);
+  if (window.sfx && typeof window.sfx.correct === 'function') window.sfx.correct();
+  if (window.haptics && typeof window.haptics.correct === 'function') window.haptics.correct();
+  if (typeof window.walkQuestBump === 'function' && _hcOnce('prayer')) window.walkQuestBump('prayer', 1);
+  _hcBeatAfter();
+}
+
+// Beat 5 — the payoff: the same slider asks "And now?", the delta is
+// framed with grace either way, the action step lands here.
+function _hcBeatAfter(){
+  if (!_hcJ) return;
+  var item = HEART_CHECK[_hcJ.key];
+  _hcHost(
+    '<div class="hc-beat hc-beat-in">' +
+      '<div class="hc-beat-q">And now — how strong is it?</div>' +
+      _hcSliderHtml('hcAfter', item, _hcJ.before) +
+      '<button class="hc-cta" onclick="_hcFinish()">Save →</button>' +
+    '</div>');
+  var s = document.getElementById('hcAfter');
+  if (s) _hcSlide(s, 'hcAfter');
+}
+
+function _hcFinish(){
+  if (!_hcJ) return;
+  var item = HEART_CHECK[_hcJ.key];
+  var s = document.getElementById('hcAfter');
+  _hcJ.after = s ? (parseInt(s.value, 10) || _hcJ.before) : _hcJ.before;
+  if (_hcJ.entry){ _hcJ.entry.after = _hcJ.after; _fzSave(); }
+  var improved = _hcJ.after < _hcJ.before;
+  var delta = improved
+    ? 'You came in at ' + _hcJ.before + '. You\'re leaving at ' + _hcJ.after + '. That\'s not nothing — that\'s prayer working.'
+    : 'Still heavy. That\'s okay. God isn\'t done — and neither are you.';
+  // Completion rewards: XP once/day; celebration only when the weight
+  // actually dropped (confetti over "still heavy" would be tone-deaf).
+  if (typeof window.awardXP === 'function' && _hcOnce('xp')) window.awardXP(10, 'heart_check');
+  if (improved){
+    if (typeof screenFlash === 'function') screenFlash('#fbbf24', 200);
+    if (window.sfx && typeof window.sfx.perfect === 'function') window.sfx.perfect();
+    if (window.haptics && typeof window.haptics.correct === 'function') window.haptics.correct();
+  }
+  _hcHost(
+    '<div class="hc-beat hc-beat-in">' +
+      '<div class="hc-delta' + (improved ? ' hc-delta-improved' : '') + '">' + _fzEsc(delta) + '</div>' +
       '<div class="hc-section hc-action-section">' +
         '<div class="hc-section-label">ONE THING TO DO</div>' +
         '<div class="hc-action">' + _fzEsc(item.action) + '</div>' +
-        '<button class="hc-action-btn" onclick="hcDidAction(\'' + _fzEsc(key) + '\', this)">I\'ll do this →</button>' +
+        '<button class="hc-action-btn" onclick="hcDidAction(\'' + _fzEsc(_hcJ.key) + '\', this)">Done ✓</button>' +
       '</div>' +
       '<div class="hc-footer">' +
-        '<button class="hc-more-btn" onclick="backToHeartPicker()">Try a different feeling</button>' +
+        '<button class="hc-more-btn" onclick="renderHeartJournal()">Your Heart — last 30 days →</button>' +
+        '<button class="hc-more-btn" onclick="backToHeartPicker()">Done for now</button>' +
       '</div>' +
-    '</div>';
+    '</div>');
+}
 
-  // Track usage. Cap to most recent 100 entries to keep the cloud
-  // blob lean. Recorded the moment the user opens an emotion —
-  // even if they don't tap any CTA — so the log reflects what
-  // they were looking for, not just what they completed.
-  if (D){
-    if (!Array.isArray(D.heartChecks)) D.heartChecks = [];
-    D.heartChecks.push({ key:key, date:new Date().toISOString() });
-    if (D.heartChecks.length > 100){
-      D.heartChecks = D.heartChecks.slice(-100);
-    }
-    _fzSave();
-  }
+// "Your Heart" — 30-day emotional weather map. Intensity binned into
+// 4 bands (calm / stirred / heavy / storm) — legible beats precise —
+// with the emotion emoji as the second, non-hue channel. Insights are
+// computed client-side and stay honest.
+function renderHeartJournal(){
+  if (typeof document === 'undefined') return;
+  _hcClearTimer();
+  var bodyEl = document.getElementById('fzDestBody');
+  if (!bodyEl) return;
+  var all = (D && Array.isArray(D.heartChecks)) ? D.heartChecks : [];
+  var cutoff = Date.now() - 30 * 86400000;
+  var recent = all.filter(function(e){ return e && e.date && new Date(e.date).getTime() >= cutoff; });
+  var withDelta = recent.filter(function(e){ return typeof e.before === 'number' && typeof e.after === 'number'; });
+  var dropped = withDelta.filter(function(e){ return e.after < e.before; }).length;
+  var dots = recent.map(function(e){
+    var item = (typeof HEART_CHECK !== 'undefined') ? HEART_CHECK[e.key] : null;
+    var v = (typeof e.after === 'number') ? e.after : (typeof e.before === 'number' ? e.before : 5);
+    var band = v <= 3 ? 'calm' : (v <= 5 ? 'stirred' : (v <= 7 ? 'heavy' : 'storm'));
+    var day = String(e.date).slice(5, 10).replace('-', '/');
+    return '<span class="hc-dot hc-dot-' + band + '" title="' + _fzEsc((item ? item.label : e.key) + ' · ' + day) + '">' +
+             (item ? _fzEsc(item.emoji) : '·') + '</span>';
+  }).join('');
+  var counts = {};
+  recent.forEach(function(e){ counts[e.key] = (counts[e.key] || 0) + 1; });
+  var topKey = Object.keys(counts).sort(function(a, b){ return counts[b] - counts[a]; })[0];
+  var topItem = topKey && typeof HEART_CHECK !== 'undefined' ? HEART_CHECK[topKey] : null;
+  var insights = [];
+  if (recent.length) insights.push('You\'ve checked in ' + recent.length + ' time' + (recent.length === 1 ? '' : 's') + ' this month.');
+  if (withDelta.length) insights.push(dropped + ' of ' + withDelta.length + ' times, the weight dropped after prayer.');
+  if (topItem && counts[topKey] >= 3) insights.push(topItem.label + ' shows up most — ' + counts[topKey] + ' times.');
+  bodyEl.innerHTML =
+    '<button class="hc-back-to-picker" onclick="backToHeartPicker()">← Heart Check</button>' +
+    '<div class="hc-journey">' +
+      '<div class="hc-section-label">YOUR HEART · LAST 30 DAYS</div>' +
+      (recent.length
+        ? '<div class="hc-map">' + dots + '</div>' +
+          '<div class="hc-map-legend"><span class="hc-dot hc-dot-calm"></span>calm <span class="hc-dot hc-dot-stirred"></span>stirred <span class="hc-dot hc-dot-heavy"></span>heavy <span class="hc-dot hc-dot-storm"></span>storm</div>' +
+          insights.map(function(t){ return '<div class="hc-insight">' + _fzEsc(t) + '</div>'; }).join('')
+        : '<div class="hc-insight">No check-ins yet this month. Your heart\'s story starts with the first one.</div>') +
+    '</div>';
 }
 
 function backToHeartPicker(){
   if (typeof document === 'undefined') return;
+  _hcClearTimer();
+  _hcJ = null;
   var bodyEl = document.getElementById('fzDestBody');
   if (bodyEl) bodyEl.innerHTML = renderHeartCheckPicker();
 }
 
-// btn arg passed from the inline onclick so we don't rely on the
-// (now-deprecated, Safari-flaky) `event` global.
+// Action step "Done ✓" — kept name/signature (exported + reused by the
+// journey's beat 5). The dove sprite + hardcoded #7b68ee flash are
+// retired per the ux review (restrained button state + the trait
+// toast awardTrait already fires carry the moment).
 function hcPrayWithThis(key, btn){
-  if (typeof prayerDove === 'function' && btn) prayerDove(btn);
   if (typeof awardTrait === 'function') awardTrait('faith', 2);
   if (btn){
     btn.textContent = 'Amen 🙏';
@@ -2043,14 +2306,10 @@ function hcDidAction(key, btn){
   if (typeof HEART_CHECK === 'undefined') return;
   var item = HEART_CHECK[key];
   if (!item) return;
-  if (typeof traitExplosion === 'function' && typeof TRAITS !== 'undefined' && item.trait && TRAITS[item.trait]){
-    var t = TRAITS[item.trait];
-    traitExplosion(t.emoji, t.name);
-  }
   if (typeof awardTrait === 'function' && item.trait){
     awardTrait(item.trait, 3);
   }
-  if (typeof screenFlash === 'function') screenFlash('#7b68ee', 200);
+  if (typeof window.walkQuestBump === 'function' && _hcOnce('reflect')) window.walkQuestBump('reflect', 1);
   if (btn){
     btn.textContent = "You're doing it ✓";
     btn.disabled = true;
@@ -2616,6 +2875,14 @@ if (typeof window !== 'undefined'){
   window.backToHeartPicker = backToHeartPicker;
   window.hcPrayWithThis    = hcPrayWithThis;
   window.hcDidAction       = hcDidAction;
+  // 2026-07-04 — The Pulse journey (inline onclick handlers).
+  window._hcSlide          = _hcSlide;
+  window._hcBeat1Done      = _hcBeat1Done;
+  window._hcBeatWord       = _hcBeatWord;
+  window._hcBeatPray       = _hcBeatPray;
+  window._hcPrayDone       = _hcPrayDone;
+  window._hcFinish         = _hcFinish;
+  window.renderHeartJournal= renderHeartJournal;
   // Dev aid — call testWelcome() in DevTools to force-show the
   // welcome screen without waiting 24 hours for the gate to trip.
   // Spoofs faithLastVisit to 25h ago + faithLastDest to mystery.

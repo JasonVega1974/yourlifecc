@@ -170,7 +170,14 @@ const DEF = {
   // where key is one of the 12 HEART_CHECK ids. Capped to the
   // most recent 100 in faith-zones.js. Used for trait awards on
   // prayer/action completion + future personalization.
+  // 2026-07-04 (The Pulse) — entries gain optional numeric
+  // before/after intensity (1-10) written by the guided journey;
+  // old {key,date} entries stay valid and just lack them.
   heartChecks:[],
+  // 2026-07-04 (The Pulse) — per-day reward throttle for the guided
+  // journey: {prayer|reflect|xp: 'YYYY-MM-DD'}. MUST live in DEF (not
+  // a module var) or a reload re-arms the XP/quest farm.
+  hcDaily:{},
   // 2026-06-07 — Faith tab swap. When set, the bottom tab bar
   // replaces the ✝️ Faith slot with the chosen alternative.
   // Valid values: '' (default, keeps Faith) | 'habits' | 'goals'

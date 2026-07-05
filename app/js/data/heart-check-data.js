@@ -123,6 +123,28 @@ const HEART_CHECK = {
   }
 };
 
+// The Pulse (2026-07-04) — per-emotion box-breathing cues for the
+// guided journey's Breathe beat: [inhale line, hold line, release line].
+// Kept as a separate map so the 12 core entries stay untouched; the
+// journey reads HEART_BREATH[key] with a generic fallback. The two
+// positive emotions (grateful/joyful) never trigger the breathe beat
+// but keep cues for completeness.
+const HEART_BREATH = {
+  lost:        ["Breathe in — He knows the way.",              "Hold — you don't have to see the whole path.",   "Let it go — one step is enough tonight."],
+  anxious:     ["Breathe in — God is here.",                   "Hold — He holds you.",                           "Let it go — every worry, one breath at a time."],
+  defeated:    ["Breathe in — this is not the end of the story.","Hold — He finishes what He starts.",           "Let it go — today's score isn't the season."],
+  angry:       ["Breathe in — slow the fire.",                 "Hold — He sees what happened.",                  "Let it go — peace is yours to keep."],
+  doubting:    ["Breathe in — questions are allowed here.",    "Hold — He isn't afraid of your doubt.",          "Let it go — faith can limp and still walk."],
+  lonely:      ["Breathe in — you are not alone in this room.","Hold — He stayed.",                              "Let it go — the lie that no one sees you."],
+  heartbroken: ["Breathe in — He is near the brokenhearted.",  "Hold — tears are allowed here.",                 "Let it go — He keeps every one."],
+  numb:        ["Breathe in — even this, He understands.",     "Hold — feeling nothing isn't failing.",          "Let it go — He can work with quiet."],
+  tempted:     ["Breathe in — there is always a way out.",     "Hold — He was tempted too; He gets it.",         "Let it go — you are not your urge."],
+  stuck:       ["Breathe in — seasons change, even this one.", "Hold — He is working underground.",              "Let it go — stuck is not abandoned."],
+  grateful:    ["Breathe in — count one gift.",                "Hold — taste it fully.",                         "Let it go — send the thanks upward."],
+  joyful:      ["Breathe in — joy is His idea.",               "Hold — let it settle deep.",                     "Let it go — share it; joy multiplies."]
+};
+
 if (typeof window !== 'undefined') {
   window.HEART_CHECK = HEART_CHECK;
+  window.HEART_BREATH = HEART_BREATH;
 }
