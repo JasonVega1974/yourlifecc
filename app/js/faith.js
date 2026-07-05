@@ -11935,11 +11935,138 @@ function _rpStartOrContinue(planId){
   _rpOpenDay(planId);
 }
 
-function _rpOpenDay(planId){
+// ── W3-3 "The Path" — day-path, grace, graduation ─────────────
+// Advancement was VERIFIED completion-driven pre-build (currentDay
+// = dayNum+1 in _rpMarkComplete; startedDate is never read) — no
+// calendar migration needed. The path is decorative progress, not
+// nav: plans are strictly linear, so dots carry no tap handlers.
+var _RP_LADDER = ['start-fresh', 'foundations', 'deeper', 'through-the-story', 'whole-word'];
+
+// Next rung up the ladder that isn't already finished; null at the
+// summit (drives the "you've walked the whole path" variant).
+function _rpLadderNext(planId){
+  if(typeof READING_PLANS === 'undefined') return null;
+  var idx = _RP_LADDER.indexOf(planId);
+  for(var i = idx + 1; i < _RP_LADDER.length; i++){
+    var prog = _rpGetProgress(_RP_LADDER[i]);
+    if(!(prog && prog.completed)){
+      var p = READING_PLANS.find(function(x){ return x.id === _RP_LADDER[i]; });
+      if(p) return p;
+    }
+  }
+  return null;
+}
+
+// The day-path: ≤10 days → one dot per day (done/today/future);
+// 11-120 → week segments; >120 → 12 month segments, proportional
+// fill (spec 3a). justDay pulses the freshly-completed mark once.
+function _rpPathHTML(plan, prog, justDay){
+  var done = {};
+  (prog.completedDays || []).forEach(function(d){ done[d] = true; });
+  var cur = Math.min(prog.currentDay || 1, plan.days);
+  var html, d, cls;
+  if(plan.days <= 10){
+    html = '<div class="rp-path" aria-hidden="true">';
+    for(d = 1; d <= plan.days; d++){
+      cls = done[d] ? 'done' : (d === cur && !prog.completed ? 'today' : 'future');
+      html += '<span class="rp-pdot ' + cls + (justDay === d ? ' rp-pulse' : '') + '"></span>';
+    }
+    return html + '</div>';
+  }
+  var per = plan.days > 120 ? Math.ceil(plan.days / 12) : 7;
+  var segs = Math.ceil(plan.days / per);
+  var doneCount = (prog.completedDays || []).length;
+  html = '<div class="rp-path rp-path-segs" aria-hidden="true">';
+  for(var s = 0; s < segs; s++){
+    var start = s * per, end = Math.min(plan.days, (s + 1) * per), span = end - start;
+    var fillDays = Math.max(0, Math.min(doneCount - start, span));
+    var pct = Math.round((fillDays / span) * 100);
+    var isCur = !prog.completed && (cur - 1) >= start && (cur - 1) < end;
+    var isJust = justDay && (justDay - 1) >= start && (justDay - 1) < end;
+    html += '<span class="rp-pseg' + (isCur ? ' today' : '') + (isJust ? ' rp-pulse' : '') + '"><span class="rp-pseg-fill" style="width:' + pct + '%;"></span></span>';
+  }
+  return html + '</div>';
+}
+
+// Grace, not guilt (spec 3b): reopening after a gap shows ONE quiet
+// line in place of the day/streak subtitle — no red, no streak-loss
+// framing. Same gap boundary the streak calc already uses; shown once
+// per day per plan (prog.graceSeenDate), rotating 3 variants by date.
+function _rpGraceLine(plan, prog){
+  if(!prog || prog.completed || !prog.lastReadDate) return '';
+  var today = new Date().toISOString().slice(0,10);
+  var yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+  if(prog.lastReadDate === today || prog.lastReadDate === yesterday) return '';
+  if(prog.graceSeenDate === today) return '';
+  prog.graceSeenDate = today;
+  _rpSaveProgress(plan.id, prog);
+  var day = Math.min(prog.currentDay || 1, plan.days);
+  var variants = [
+    'Life happened. You’re on Day ' + day + ' — pick up right where you left off.',
+    'Welcome back. Day ' + day + ' is ready when you are.',
+    'No guilt here — Day ' + day + ' has been waiting for you.'
+  ];
+  var pick = variants[parseInt(today.replace(/-/g, ''), 10) % variants.length];
+  return '<span class="rp-grace">' + pick + '</span>';
+}
+
+// Plan completion (spec 3c) — the FULL win register (this surface's
+// only confetti moment; per-day stays win-lite) + the graduation log.
+function _rpPlanComplete(plan){
+  var reduced = false;
+  try { reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch(_e){}
+  try { if(!reduced && typeof window.megaConfetti === 'function') window.megaConfetti(); } catch(_e){}
+  try { if(!reduced && typeof window.screenFlash === 'function') window.screenFlash('rgba(16,185,129,.28)', 420); } catch(_e){}
+  try { if(window.sfx && typeof window.sfx.perfect === 'function') window.sfx.perfect(); } catch(_e){}
+  try { if(typeof window.awardXP === 'function') window.awardXP(50, 'reading_plan'); } catch(_e){}
+  if(typeof D !== 'undefined' && D){
+    if(!Array.isArray(D.plansCompleted)) D.plansCompleted = [];
+    var already = D.plansCompleted.some(function(e){ return e && e.id === plan.id; });
+    if(!already) D.plansCompleted.push({ id: plan.id, date: new Date().toISOString().slice(0,10) });
+    if(typeof save === 'function') save();
+  }
+  if(typeof showToast === 'function') showToast(plan.icon + ' Plan complete! +50 XP 🏆');
+}
+
+// The completion card + ladder. Also what a finished plan opens to
+// from the catalog (replaces the old dead-end "see you tomorrow").
+function _rpCompletionView(planId){
+  var plan = (typeof READING_PLANS !== 'undefined') ? READING_PLANS.find(function(p){ return p.id === planId; }) : null;
+  var root = document.getElementById('readingPlansRoot');
+  if(!plan || !root) return;
+  var prog = _rpGetProgress(planId) || { completedDays: [], currentDay: plan.days + 1, completed: true };
+  var next = _rpLadderNext(planId);
+  var html = '<div style="padding:.2rem 0 1rem;">';
+  // position:static — .pp-back-btn is authored absolute for modal
+  // headers; bare reuse pins it to #mainWrap's origin (post-build
+  // review BLOCKING). Static puts it in flow where it belongs.
+  html += '<button class="pp-back-btn" onclick="renderReadingPlansCard()" aria-label="Back to Plans" style="position:static;display:inline-block;margin-bottom:.7rem;">← Plans</button>';
+  html += '<div class="rp-done-card">';
+  html += '<div class="rp-done-icon">' + plan.icon + '</div>';
+  html += '<div class="rp-done-title">You finished ' + plan.title + '</div>';
+  html += '<div class="rp-done-sub">' + plan.days + ' days in the Word.</div>';
+  html += _rpPathHTML(plan, prog, 0);
+  if(next){
+    html += '<button class="rp-next-btn" onclick="_rpStartOrContinue(\'' + next.id + '\')">Ready for ' + next.days + ' days? Start ' + next.title + ' →</button>';
+  } else {
+    html += '<div class="rp-done-summit">You’ve walked the whole path — every plan, finished.</div>';
+    html += '<button class="rp-next-btn" onclick="if(typeof bfTab === \'function\') bfTab(\'academy\')">Explore Faith Academy →</button>';
+  }
+  // One forward action only — the top ← Plans pill is the escape
+  // hatch; a second "Back to plans" ghost diluted the ladder CTA
+  // (post-build review SHOULD).
+  html += '</div></div>';
+  root.innerHTML = html;
+}
+
+function _rpOpenDay(planId, justDay){
   var plan = (typeof READING_PLANS !== 'undefined') ? READING_PLANS.find(function(p){ return p.id === planId; }) : null;
   if(!plan) return;
   var prog = _rpGetProgress(planId);
   if(!prog){ _rpStartOrContinue(planId); return; }
+  // A finished plan opens to its completion card + the ladder, not a
+  // stale day view (W3-3).
+  if(prog.completed){ _rpCompletionView(planId); return; }
 
   var root = document.getElementById('readingPlansRoot');
   if(!root) return;
@@ -11950,12 +12077,19 @@ function _rpOpenDay(planId){
   var streak = _rpCalculateStreak(prog.completedDays || [], prog.lastReadDate || '');
   var today = new Date().toISOString().slice(0,10);
   var markedToday = (prog.completedDays || []).indexOf(dayNum) >= 0 && prog.lastReadDate === today;
-  var pct = Math.round(((dayNum - 1) / plan.days) * 100);
+  // Grace, not guilt: after a gap the quiet welcome-back line takes
+  // the subtitle slot (no streak-loss framing anywhere on this surface).
+  var grace = _rpGraceLine(plan, prog);
+  var subtitle = grace || ('Day ' + dayNum + ' of ' + plan.days + (streak > 0 ? ' · 🔥 ' + streak + ' day streak' : ''));
 
   var html = '<div style="padding:.2rem 0 1rem;">';
-  html += '<button class="pp-back-btn" onclick="renderReadingPlansCard()" aria-label="Back to Plans" style="margin-bottom:.7rem;">← Plans</button>';
-  html += '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.9rem;"><span style="font-size:1.4rem;">' + plan.icon + '</span><div style="flex:1;"><div style="font-size:.78rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em;">' + plan.title + '</div><div style="font-size:.67rem;color:var(--tx3);">Day ' + dayNum + ' of ' + plan.days + (streak > 0 ? ' · 🔥 ' + streak + ' day streak' : '') + '</div></div></div>';
-  html += '<div style="height:6px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-bottom:1.1rem;"><div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#38bdf8,#10b981);border-radius:99px;"></div></div>';
+  // position:static — same .pp-back-btn absolute-reuse fix as the
+  // completion view (this bare use predates W3-3; fixed with it).
+  html += '<button class="pp-back-btn" onclick="renderReadingPlansCard()" aria-label="Back to Plans" style="position:static;display:inline-block;margin-bottom:.7rem;">← Plans</button>';
+  html += '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.9rem;"><span style="font-size:1.4rem;">' + plan.icon + '</span><div style="flex:1;"><div style="font-size:.78rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em;">' + plan.title + '</div><div style="font-size:.67rem;color:var(--tx3);">' + subtitle + '</div></div></div>';
+  // The day-path replaces the old anonymous 6px bar (same info, now
+  // legible as a journey; day count stays in the subtitle above).
+  html += _rpPathHTML(plan, prog, justDay || 0);
 
   html += '<div style="background:var(--cd-banner);border-radius:16px;padding:1.15rem;margin-bottom:.9rem;box-shadow:var(--cd-banner-shadow);">';
   html += '<div style="font-size:.6rem;font-weight:800;letter-spacing:.2em;text-transform:uppercase;opacity:.75;margin-bottom:.3rem;">Day ' + dayNum + ' · ' + (dayData.theme||'') + '</div>';
@@ -12022,8 +12156,16 @@ function _rpMarkComplete(planId, dayNum){
   if(typeof renderRpStreakBanner === 'function') renderRpStreakBanner();
   if(typeof renderFaithHome === 'function') renderFaithHome();
 
+  // W3-3: finishing the LAST day graduates — full win register +
+  // completion card + ladder. Mid-plan days stay win-lite (the dot
+  // pulse via justDay; streak toast only from day 2).
+  if(prog.completed){
+    _rpPlanComplete(plan);
+    _rpCompletionView(planId);
+    return;
+  }
   if(prog.streak >= 2 && typeof showToast === 'function') showToast('🔥 ' + prog.streak + ' day streak!');
-  _rpOpenDay(planId);
+  _rpOpenDay(planId, dayNum);
 }
 
 function _rpPreviewNext(planId, currentDay){

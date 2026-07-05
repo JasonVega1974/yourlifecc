@@ -57,6 +57,13 @@ const DEF = {
   // F2-B reading plans: active is keyed by planId (object so multiple plans
   // can run concurrently); completed is an append-only list of planId archives.
   faithPlans:{ active:{}, completed:[] },
+  // W3-3 "The Path" (2026-07-05) — READING_PLANS graduation log:
+  // [{id, date}] appended once per finished plan. The catalog ✓ badge
+  // stays wired to per-plan localStorage progress (single source of
+  // truth); this array is the cloud-synced record for the ladder /
+  // "plans finished" count. Array of objects, append-only. In DEF so
+  // it survives offline reload.
+  plansCompleted:[],
   // F2-D Bible reader annotations. Each entry is { id, book, chapter, verse, ... }.
   // Highlights carry color, notes carry text, bookmarks just mark the verse.
   faithHighlights:[], faithNotes:[], faithBookmarks:[],

@@ -11624,6 +11624,45 @@
       #bf-plans .pl-empty{text-align:center;color:var(--tx3);font-size:.78rem;padding:1rem;font-style:italic;}
       .rp-btn{background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.55rem .95rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);}
       .rp-btn:hover{filter:brightness(1.1);}
+      /* ── W3-3 "The Path" (2026-07-05) — day-path, grace, graduation ──
+         Decorative progress (no tap handlers — plans are linear); this
+         screen's cyan/green register, deliberately NOT the faith gold.
+         3/7-day plans: one dot per day. 30/90: week segments. 365:
+         12 month segments (spec). Pulse = win-lite, one-shot, silent. */
+      .rp-path{display:flex;align-items:center;gap:.45rem;margin:0 0 1.1rem;}
+      .rp-pdot{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.16);}
+      .rp-pdot.done{background:#10b981;border-color:#10b981;}
+      .rp-pdot.today{background:rgba(56,189,248,.15);border-color:#38bdf8;box-shadow:0 0 0 3px rgba(56,189,248,.18);}
+      .rp-path-segs{gap:.3rem;}
+      .rp-pseg{flex:1;height:8px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden;}
+      .rp-pseg-fill{display:block;height:100%;background:linear-gradient(90deg,#38bdf8,#10b981);border-radius:99px;}
+      .rp-pseg.today{box-shadow:0 0 0 2px rgba(56,189,248,.45);}
+      /* Win-lite: 1→1.35→1 scale + transient glow on an 11px dot,
+         ~350ms, one-shot, no residual glow (persistent glow is
+         reserved for "today"). Segments get a glow-only variant —
+         a 35% transform on a wide flex pill shoves its neighbors
+         (post-build review). */
+      @keyframes rpPulse{0%{transform:scale(1);}45%{transform:scale(1.35);box-shadow:0 0 0 3px rgba(16,185,129,.25),0 0 10px rgba(16,185,129,.5);}100%{transform:scale(1);box-shadow:none;}}
+      @keyframes rpPulseSeg{0%{box-shadow:none;}45%{box-shadow:0 0 0 3px rgba(16,185,129,.3),0 0 12px rgba(16,185,129,.55);}100%{box-shadow:none;}}
+      .rp-pulse{animation:rpPulse .35s ease-out 1;}
+      .rp-pseg.rp-pulse{animation:rpPulseSeg .35s ease-out 1;}
+      /* Grace stays in the subtitle's own register — the italic and
+         the copy carry the moment, not the type scale. */
+      .rp-grace{font-size:.67rem;color:var(--tx3);font-style:italic;line-height:1.5;}
+      .rp-done-card{text-align:center;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.28);border-radius:16px;padding:1.5rem 1.15rem 1.25rem;}
+      .rp-done-icon{font-size:2.4rem;line-height:1;margin-bottom:.5rem;}
+      .rp-done-title{font-size:1.08rem;font-weight:800;color:var(--tx);margin-bottom:.25rem;}
+      .rp-done-sub{font-size:.82rem;color:var(--tx2);margin-bottom:1rem;}
+      .rp-done-card .rp-path{justify-content:center;margin-bottom:1.1rem;}
+      .rp-done-summit{font-size:.86rem;font-style:italic;color:var(--tx);margin-bottom:.8rem;}
+      .rp-next-btn{display:block;width:100%;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:14px;padding:.9rem;font-size:.88rem;font-weight:800;cursor:pointer;font-family:var(--fm);}
+      @media (prefers-reduced-motion: reduce){ .rp-pulse{animation:none;} .rp-pseg.rp-pulse{animation:none;} }
+      :root.light .rp-pdot{background:rgba(15,23,42,.08);border-color:rgba(15,23,42,.18);}
+      :root.light .rp-pdot.done{background:#059669;border-color:#059669;}
+      :root.light .rp-pdot.today{background:rgba(2,132,199,.12);border-color:#0284c7;box-shadow:0 0 0 3px rgba(2,132,199,.22);}
+      :root.light .rp-pseg{background:rgba(15,23,42,.08);}
+      :root.light .rp-pseg.today{box-shadow:0 0 0 2px rgba(2,132,199,.5);}
+      :root.light .rp-done-card{background:rgba(16,185,129,.07);border-color:rgba(4,120,87,.3);}
     </style>
 
     <div class="bf-section-hdr">
