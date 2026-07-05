@@ -139,7 +139,10 @@ function renderConvinceMeHero(){
           '<div class="cm-back-closer">' + _fzEsc(card.closer) + '</div>' +
           '<div class="cm-back-actions">' +
             '<button type="button" class="cm-back-btn" onclick="cmFlipBack()">← Back</button>' +
-            '<button type="button" class="cm-back-btn cm-dig" onclick="cmDigDeeper()">Dig Deeper 📖</button>' +
+            // Dig Deeper only when a real destination exists (proofId →
+            // the long-form proof drawer). 7 of 20 cards have none —
+            // a dead-end "coming soon" CTA is worse than no CTA.
+            (card.proofId ? '<button type="button" class="cm-back-btn cm-dig" onclick="cmDigDeeper()">Dig Deeper 📖</button>' : '') +
             '<button type="button" class="cm-back-btn cm-next" onclick="cmNext()">Next Mystery →</button>' +
           '</div>' +
         '</div>' +
