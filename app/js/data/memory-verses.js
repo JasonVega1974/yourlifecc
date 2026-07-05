@@ -81,7 +81,9 @@ const MEMORY_VERSE_LIBRARY = [
 const MEMORY_VERSE_CATEGORIES = [
   { id:'identity', label:'Identity',   icon:'💎', color:'#a78bfa' },
   { id:'peace',    label:'Peace',      icon:'🕊️', color:'#38bdf8' },
-  { id:'strength', label:'Strength',   icon:'💪', color:'#fbbf24' },
+  // W3-1 (2026-07-04) — Strength moved off #fbbf24: on the memorize
+  // surface gold keeps one lane (gold register + mastery moment).
+  { id:'strength', label:'Strength',   icon:'💪', color:'#f97316' },
   { id:'faith',    label:'Faith',      icon:'⚓', color:'#10b981' },
   { id:'love',     label:'Love',       icon:'❤️', color:'#f472b6' },
   { id:'wisdom',   label:'Wisdom',     icon:'🧠', color:'#a78bfa' },

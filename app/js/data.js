@@ -82,7 +82,14 @@ const DEF = {
   // F2-F memory verses with SM-2-lite scheduling.
   // Each entry: { id, reference, text, category, ease, intervalDays, nextDue (ISO date),
   //               lastReviewed, mastered, masteredAt, createdAt, totalReviews, correctReviews }
+  // W3-1 (2026-07-04) — entries gain optional `rung` (0-3, practice
+  // ladder position; absent = derived from interval) and `masterHits`
+  // (distinct ISO dates of from-the-heart passes; 3 => mastered —
+  // the second mastery path alongside interval>=90).
   memoryVerses:[],
+  // W3-1 — in-flight ladder session for same-day resume:
+  // { date:'YYYY-MM-DD', ids:[], idx, climbed, graced } or null.
+  mvSess:null,
   // F2-G Ask the Bible history. Each entry: { id, question, answer, verses[], application, createdAt }.
   // Capped client-side at 50 entries to keep the cloud-synced blob lean.
   faithAiHistory:[],

@@ -100,7 +100,9 @@
     }
 
     // 5 — verse: _mvApplySrUpdate(v, correct) is the SM-2-lite update; it flips
-    //     v.mastered to true (once, at intervalDays >= 90). Fire on that flip.
+    //     v.mastered to true once — via EITHER mastery path (intervalDays
+    //     >= 90, or W3-1's three from-the-heart days). Fire on that flip;
+    //     the before/after check is path-agnostic.
     if (typeof W._mvApplySrUpdate === 'function' && !W.__walkQ_verse) {
       W.__walkQ_verse = true;
       var _oMv = W._mvApplySrUpdate;

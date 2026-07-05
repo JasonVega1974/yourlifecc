@@ -1622,6 +1622,15 @@ function renderFaithJourneyHome(){
       _bs.textContent = _bl ? ('Continue in ' + _bl.book + ' ' + _bl.chapter + ' →') : 'Read · search · study tools.';
     }
   } catch (e){}
+  // W3-1 — Memory Verses card teaser: live due count on the existing
+  // single sub line (same clamp rules as the Bible teaser).
+  try {
+    var _ms = document.getElementById('fjMemorizeSub');
+    if (_ms){
+      var _due = (typeof _mvDueCount === 'function') ? _mvDueCount() : 0;
+      _ms.textContent = _due > 0 ? (_due + ' due today →') : 'Hide the Word in your heart.';
+    }
+  } catch (e){}
   // My Walk tile progress teaser — grace-first: show NOTHING until a step is
   // taken (spec §5, never make anyone feel behind). walkGetProgress() is from
   // walk-path.js and returns {done,total,pct}; typeof-guarded so a module-load

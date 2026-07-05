@@ -4970,7 +4970,8 @@ function prayerSetChip(/* legacy */){}
 // Storage: D.memoryVerses[] entries with ease/intervalDays/nextDue.
 // Library: window.MEMORY_VERSE_LIBRARY (50 verses across 9 categories,
 // loaded from app/js/data/memory-verses.js before faith.js).
-// Mastery: intervalDays >= 90 → marked mastered (still reviewable).
+// Mastery: intervalDays >= 90 OR 3 distinct from-the-heart days
+// (W3-1 masterHits), whichever first → marked mastered.
 
 let _mvView   = 'queue';      // queue | library | mastered | custom
 let _mvCustomCat = 'identity';
@@ -5093,7 +5094,7 @@ function _mvRenderLibrary(){
 
 function _mvRenderMastered(){
   const all = ((D && D.memoryVerses) || []).filter(v => v && v.mastered);
-  if(!all.length) return '<div class="mv-empty">No mastered verses yet — keep reviewing! Mastery hits when interval reaches 90 days.</div>';
+  if(!all.length) return '<div class="mv-empty">No mastered verses yet — keep climbing! A verse is mastered by three separate "from the heart" days, or when its review interval reaches 90 days.</div>';
   return '<div class="mv-grid">' + all.map(v => _mvCardHtml(v, true)).join('') + '</div>';
 }
 
@@ -5180,14 +5181,22 @@ function mvAddCustom(){
 }
 
 // Single-verse drill-down: opens the quiz modal seeded with just this verse.
+// W3-1 post-review Fix A — the card tap is the entry point people
+// actually use; it now feeds the LADDER for that single verse (a
+// transient, non-persisted session) instead of the legacy mode-picker
+// quiz. It never clobbers a paused daily session in D.mvSess — the
+// hero button resumes that untouched.
 function mvOpenVerse(id){
-  _mvQuizQueue   = [id];
-  _mvQuizIdx     = 0;
-  _mvQuizCorrect = 0;
-  _mvQuizMode    = 'cloze';
-  _mvSyncQuizModeChips();
+  var v = ((D && D.memoryVerses) || []).find(function(x){ return x && x.id === id; });
+  if(!v){ return; }
+  if(v.mastered){ showToast('Already hidden in your heart 🏆'); return; }
+  _mvGapDemote(v);
+  _mvLSess = { date: _mvTodayISO(), ids: [id], idx: 0, climbed: 0, graced: false };
+  _mvLDaily = false;
   if(typeof openModal === 'function') openModal('mvQuizModal');
-  _mvRenderQuestion();
+  var modes = document.getElementById('mvqModes');
+  if(modes) modes.style.display = 'none';
+  _mvLRender();
 }
 
 function mvStartQuiz(){
@@ -5213,6 +5222,297 @@ function mvCloseQuiz(){
   if(typeof closeModal === 'function') closeModal('mvQuizModal');
   renderMemorizePanel();
   if(typeof renderFaithHome === 'function') renderFaithHome();
+}
+
+// ════════════════════════════════════════════════════════════
+// W3-1 (2026-07-04) — "Hide It In Your Heart" practice ladder.
+// DECISIONS (Phase 0 locked + GO ratifications — do not re-litigate):
+//  • RUNG MACHINE: add=0 · Nailed=+1 (max 3) · Close=hold · Not yet=
+//    −1 max (floor 1 once a verse has history — a stumble costs one
+//    rung, never the staircase) · ≥21 silent days = −1 with grace
+//    copy, never guilt.
+//  • RUNG 2 IS BESPOKE, reason written down per the pre-review:
+//    exerciseEngine.run() hard-wires awardPracticeSet XP + perfect-
+//    clear megaConfetti on set completion, which violates the
+//    ratified per-rung win-lite register; its 'blank' format is
+//    one-blank-per-question, not progressive in-verse blanking. The
+//    engine's GUARANTEES are copied here explicitly instead: its
+//    reduced-motion shake gate, aria-live feedback line, and grace
+//    tone ("Not quite — try the next one"). Do NOT copy lmShake
+//    (known ungated-motion bug).
+//  • Blanks capped at 6 absolute, filled SEQUENTIALLY with one
+//    3-chip tray (3 chips on screen ever). Zero wrongs = Nailed,
+//    else Close — rung 1 grades objectively, no self-grade.
+//  • Self-grades (rungs 2-3) trusted at face value — no XP rides on
+//    them, so gaming buys nothing. "Not yet" is calm, never red.
+//  • Session is SEQUENTIAL WITH PERSISTED RESUME (D.mvSess, same-day)
+//    — the Meet Jesus reader pattern; swipe-deck formally rejected.
+//  • Rung pass = win-lite (sfx.correct + gold word-fill — no pulse
+//    animation, deliberately); mastery = the gold WIN in
+//    _mvSetMastered. Quest: once/day 'verse' bump via the persisted
+//    D.hcDaily throttle (GO-ratified) + the existing mastery-flip
+//    hook; q-verse1 copy updated to match.
+// ════════════════════════════════════════════════════════════
+var _MV_RUNGS = ['Read it', 'Fill the gaps', 'First letters', 'From the heart'];
+var _mvLBlank = null;   // rung-1 per-verse state {blanks:[{wi,word}], bi, wrongs, tray}
+// Active session pointer: the DAILY session is D.mvSess (persisted,
+// same-day resume); a single-verse card tap runs a TRANSIENT session
+// that never touches D.mvSess (Fix A).
+var _mvLSess = null;
+var _mvLDaily = false;
+
+function _mvRung(v){
+  if(typeof v.rung === 'number') return Math.max(0, Math.min(3, v.rung));
+  if(!v.totalReviews) return 0;
+  var iv = v.intervalDays || 1;
+  return iv <= 1 ? 1 : (iv <= 7 ? 2 : 3);
+}
+// Takes the PRE-update rung — the SM-2 update mutates interval/
+// totalReviews first, so re-deriving here would leap a first-read
+// verse straight to rung 3 (smoke-caught bug). The hasHistory:false
+// floor-0 branch is deliberate future-proofing: no current UI path
+// grades a rung-0 verse 'notyet' ("I read it" is always a pass), but
+// the machine stays correct if one ever does.
+function _mvRungAfter(rung, grade, hasHistory){
+  if(grade === 'nailed') return Math.min(3, rung + 1);
+  if(grade === 'close')  return rung;
+  return Math.max(hasHistory ? 1 : 0, rung - 1);
+}
+function _mvGapDemote(v){
+  if(!v.lastReviewed) return false;
+  var days = Math.floor((Date.now() - new Date(v.lastReviewed).getTime()) / 86400000);
+  if(days >= 21 && _mvRung(v) > 1){ v.rung = _mvRung(v) - 1; return true; }
+  return false;
+}
+
+function mvStartLadder(){
+  if(!D || !Array.isArray(D.memoryVerses)) return;
+  var today = _mvTodayISO();
+  // Same-day resume — a phone call mid-session must not reset progress.
+  if(!(D.mvSess && D.mvSess.date === today && Array.isArray(D.mvSess.ids) && D.mvSess.idx < D.mvSess.ids.length)){
+    var due = D.memoryVerses.filter(function(v){ return v && !v.mastered && (!v.nextDue || v.nextDue <= today); }).slice(0, 20);
+    if(!due.length){ showToast('Nothing due today — come back tomorrow 🌱'); return; }
+    var graced = false;
+    due.forEach(function(v){ if(_mvGapDemote(v)) graced = true; });
+    D.mvSess = { date: today, ids: due.map(function(v){ return v.id; }), idx: 0, climbed: 0, graced: graced };
+    save();
+  }
+  _mvLSess = D.mvSess;
+  _mvLDaily = true;
+  if(typeof openModal === 'function') openModal('mvQuizModal');
+  var modes = document.getElementById('mvqModes');
+  if(modes) modes.style.display = 'none';   // legacy mode picker hidden during ladder
+  _mvLRender();
+}
+
+function _mvLVerse(){
+  var s = _mvLSess;
+  if(!s) return null;
+  while(s.idx < s.ids.length){
+    var id = s.ids[s.idx];
+    var v = (D.memoryVerses || []).find(function(x){ return x && x.id === id; });
+    if(v && !v.mastered) return v;
+    s.idx++;                                 // deleted/mastered mid-session — skip
+  }
+  return null;
+}
+
+function _mvLRender(){
+  var body = document.getElementById('mvqBody');
+  var foot = document.getElementById('mvqFooter');
+  if(!body) return;
+  // Own the shared modal header — the legacy quiz's "Quiz / —"
+  // placeholders (or its stale progress) must never sit above the
+  // ladder's own aria-live position readout (Fix C).
+  var ttl = document.getElementById('mvqTitle');
+  var prg = document.getElementById('mvqProgress');
+  if(ttl) ttl.textContent = 'Hide It In Your Heart';
+  if(prg) prg.textContent = '';
+  var s = _mvLSess;
+  var v = _mvLVerse();
+  if(!v){ _mvLEnd(); return; }
+  var rung = _mvRung(v);
+  var esc = _jEsc;
+  var head =
+    '<div class="mvl-head">' +
+      '<span class="mvl-pos" aria-live="polite">' + (s.idx + 1) + ' of ' + s.ids.length + '</span>' +
+      '<span class="mvl-rung">' + esc(_MV_RUNGS[rung]) + '</span>' +
+      '<span class="mvl-cat">' + esc(v.category || '') + '</span>' +
+    '</div>' +
+    (s.graced && s.idx === 0 ? '<div class="mvl-grace">Welcome back — we eased a few verses down a rung so you can rebuild, not start over.</div>' : '');
+  var html = '';
+  if(rung === 0){
+    html = head +
+      '<div class="mvl-ref">' + esc(v.reference) + '</div>' +
+      '<blockquote class="mvl-verse">' + esc(v.text) + '</blockquote>' +
+      '<button type="button" class="mvl-cta" onclick="_mvLGrade(\'nailed\')">I read it ✓</button>';
+  } else if(rung === 1){
+    _mvLBlank = _mvLBuildBlanks(v);
+    html = head +
+      '<div class="mvl-ref">' + esc(v.reference) + '</div>' +
+      '<blockquote class="mvl-verse" id="mvlGapText">' + _mvLGapHtml(v) + '</blockquote>' +
+      '<div class="mvl-feedback" id="mvlFeedback" role="status" aria-live="polite"></div>' +
+      '<div class="mvl-tray" id="mvlTray"></div>';
+  } else if(rung === 2){
+    var fl = String(v.text).split(/\s+/).map(function(w){ return (w.match(/[A-Za-z]/) || [''])[0] || w[0] || ''; }).join(' ');
+    html = head +
+      '<div class="mvl-ref">' + esc(v.reference) + '</div>' +
+      '<div class="mvl-firstletters" aria-label="First letters of ' + esc(v.reference) + '. Recite from memory, then reveal.">' + esc(fl) + '</div>' +
+      '<button type="button" class="mvl-cta" onclick="_mvLReveal()">Show me →</button>' +
+      '<div id="mvlReveal"></div>';
+  } else {
+    html = head +
+      '<div class="mvl-ref mvl-ref-big">' + esc(v.reference) + '</div>' +
+      '<div class="mvl-heart-hint">From the heart — say it, then check yourself.</div>' +
+      '<button type="button" class="mvl-cta" onclick="_mvLReveal()">Show me →</button>' +
+      '<div id="mvlReveal"></div>';
+  }
+  body.innerHTML = html;
+  if(foot) foot.innerHTML = '<button type="button" class="mvl-quit" onclick="mvCloseQuiz()">Pause — pick up later today</button>';
+  if(rung === 1) _mvLRenderTray(v);
+}
+
+// ── Rung 1 — sequential blanks, one shared 3-chip tray ───────
+function _mvLBuildBlanks(v){
+  var words = String(v.text).split(/\s+/);
+  var idxs = [];
+  words.forEach(function(w, i){ if(w.replace(/[^A-Za-z]/g, '').length > 3) idxs.push(i); });
+  // Deterministic-ish spread: every kth content word, capped at 6.
+  var count = Math.min(6, Math.max(2, Math.ceil(idxs.length * 0.3)));
+  var step = Math.max(1, Math.floor(idxs.length / count));
+  var chosen = [];
+  for(var i = 0; i < idxs.length && chosen.length < count; i += step) chosen.push(idxs[i]);
+  // Floor: a custom verse of only short words must still have ONE
+  // real blank — zero blanks would auto-grade a silent free pass
+  // (post-review Fix E). Fall back to the longest word.
+  if(!chosen.length && words.length){
+    var li = 0;
+    words.forEach(function(w, i){ if(w.length > words[li].length) li = i; });
+    chosen = [li];
+  }
+  return { blanks: chosen.map(function(wi){ return { wi: wi, word: words[wi] }; }), bi: 0, wrongs: 0, words: words };
+}
+function _mvLGapHtml(v){
+  var st = _mvLBlank;
+  return st.words.map(function(w, i){
+    var b = st.blanks.findIndex(function(x){ return x.wi === i; });
+    if(b === -1) return _jEsc(w);
+    if(b < st.bi) return '<span class="mvl-filled">' + _jEsc(w) + '</span>';
+    if(b === st.bi) return '<span class="mvl-blank mvl-blank--now">____</span>';
+    return '<span class="mvl-blank">____</span>';
+  }).join(' ');
+}
+function _mvLRenderTray(v){
+  var tray = document.getElementById('mvlTray');
+  var st = _mvLBlank;
+  if(!tray || !st) return;
+  if(st.bi >= st.blanks.length){
+    // all blanks filled — objective grade: zero wrongs = Nailed.
+    _mvLGrade(st.wrongs === 0 ? 'nailed' : 'close');
+    return;
+  }
+  var correct = st.blanks[st.bi].word;
+  var pool = st.words.filter(function(w){ return w !== correct && w.replace(/[^A-Za-z]/g, '').length > 3; });
+  var d1 = pool[(st.bi * 7 + 3) % Math.max(1, pool.length)] || 'the';
+  var d2 = pool[(st.bi * 13 + 5) % Math.max(1, pool.length)] || 'and';
+  if(d2 === d1) d2 = pool[(st.bi * 17 + 1) % Math.max(1, pool.length)] || 'with';
+  var chips = [correct, d1, d2].sort(function(a, b){ return ((a + st.bi).length * 31 % 7) - ((b + st.bi).length * 31 % 7); });
+  // Chips pass an INDEX, not the word — an escaped apostrophe word
+  // ("God's" → God&#39;s) would never string-match its raw original.
+  st.tray = chips;
+  tray.innerHTML = chips.map(function(c, ci){
+    return '<button type="button" class="mvl-chip" onclick="_mvLChip(this, ' + ci + ')">' + _jEsc(c) + '</button>';
+  }).join('');
+}
+function _mvLChip(btn, ci){
+  var st = _mvLBlank;
+  var v = _mvLVerse();
+  if(!st || !v || !st.tray) return;
+  var word = st.tray[ci];
+  var correct = st.blanks[st.bi].word;
+  var fb = document.getElementById('mvlFeedback');
+  if(word === correct){
+    st.bi++;
+    if(fb) fb.textContent = '';
+    var gap = document.getElementById('mvlGapText');
+    if(gap) gap.innerHTML = _mvLGapHtml(v);
+    if(window.sfx && typeof window.sfx.correct === 'function') window.sfx.correct();
+    _mvLRenderTray(v);
+  } else {
+    st.wrongs++;
+    if(fb) fb.textContent = 'Not quite — try the next one. You\'ve got this.';
+    // Engine-copied shake, reduced-motion gated (NOT the ungated lmShake).
+    try {
+      var _red = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(!_red && btn){ btn.classList.remove('mvl-shake'); void btn.offsetWidth; btn.classList.add('mvl-shake'); }
+    } catch(_e){}
+  }
+}
+
+// ── Rungs 2-3 — reveal + calm self-grade ─────────────────────
+function _mvLReveal(){
+  var v = _mvLVerse();
+  var host = document.getElementById('mvlReveal');
+  if(!v || !host) return;
+  host.innerHTML =
+    '<blockquote class="mvl-verse">' + _jEsc(v.text) + '</blockquote>' +
+    '<div class="mvl-grades">' +
+      '<button type="button" class="mvl-grade mvl-grade--notyet" onclick="_mvLGrade(\'notyet\')">Not yet</button>' +
+      '<button type="button" class="mvl-grade mvl-grade--close" onclick="_mvLGrade(\'close\')">Close</button>' +
+      '<button type="button" class="mvl-grade mvl-grade--nailed" onclick="_mvLGrade(\'nailed\')">Nailed it</button>' +
+    '</div>';
+}
+
+function _mvLGrade(grade){
+  var v = _mvLVerse();
+  var s = _mvLSess;
+  if(!v || !s) return;
+  var rung = _mvRung(v);
+  var hadHistory = (v.totalReviews || 0) > 0;
+  if(grade === 'nailed'){
+    _mvApplySrUpdate(v, true, rung === 3 ? { heart: true } : undefined);
+    if(window.haptics && typeof window.haptics.correct === 'function') window.haptics.correct();
+  } else if(grade === 'close'){
+    _mvApplySrUpdate(v, true, { grade: 'close' });
+  } else {
+    _mvApplySrUpdate(v, false);
+  }
+  var newRung = _mvRungAfter(rung, grade, hadHistory);
+  if(newRung > rung) s.climbed++;
+  v.rung = newRung;
+  s.idx++;
+  save();
+  _mvLRender();
+}
+
+function _mvLEnd(){
+  var body = document.getElementById('mvqBody');
+  var foot = document.getElementById('mvqFooter');
+  var s = _mvLSess;
+  if(!body) return;
+  var ttl = document.getElementById('mvqTitle');
+  var prg = document.getElementById('mvqProgress');
+  if(ttl) ttl.textContent = 'Hide It In Your Heart';
+  if(prg) prg.textContent = '';
+  var soon = (D.memoryVerses || []).filter(function(v){ return v && !v.mastered && v.nextDue; })
+    .sort(function(a, b){ return a.nextDue < b.nextDue ? -1 : 1; })[0];
+  body.innerHTML =
+    '<div class="mvl-end">' +
+      '<div class="mvl-end-big">Session complete</div>' +
+      '<div class="mvl-end-line">' + (s ? s.ids.length : 0) + ' verse' + (s && s.ids.length === 1 ? '' : 's') + ' practiced · ' + (s ? s.climbed : 0) + ' rung' + (s && s.climbed === 1 ? '' : 's') + ' climbed</div>' +
+      (soon ? '<div class="mvl-end-next">Next up: ' + _jEsc(soon.reference) + ' on ' + _jEsc(soon.nextDue) + '</div>' : '') +
+    '</div>';
+  if(foot) foot.innerHTML = '<button type="button" class="mvl-cta" onclick="mvCloseQuiz()">Done</button>';
+  // Once/day quest bump via the persisted throttle (GO-ratified);
+  // the mastery-flip hook fires independently on masteries.
+  if(typeof _hcOnce === 'function' && typeof window.walkQuestBump === 'function' && _hcOnce('verse')){
+    window.walkQuestBump('verse', 1);
+  }
+  // Only the DAILY session clears its persisted slot; a transient
+  // single-verse session must leave a paused daily session intact.
+  if(_mvLDaily) D.mvSess = null;
+  _mvLSess = null;
+  save();
 }
 
 function mvSetQuizMode(mode, btn){
@@ -7674,7 +7974,8 @@ function playFx(type){
     const _orig = markDevFromPopup;
     markDevFromPopup = function(){ const today = new Date().toISOString().slice(0,10); const wasRead = !!(D.scrReadDays && D.scrReadDays[today]); _orig.apply(this, arguments); if(!wasRead) playFx('cross'); };
   }
-  // Memory verse mastered → sparkle (caught in _mvApplySrUpdate when intervalDays >= 90)
+  // Memory verse mastered → sparkle (caught in _mvApplySrUpdate on either
+  // mastery path: intervalDays >= 90 OR the W3-1 three-heart-days gate)
   if(typeof _mvApplySrUpdate === 'function'){
     const _orig = _mvApplySrUpdate;
     _mvApplySrUpdate = function(v, correct){ const wasMastered = !!(v && v.mastered); _orig.apply(this, arguments); if(v && v.mastered && !wasMastered) playFx('sparkle'); };
@@ -8280,25 +8581,60 @@ let _fhEnteredThisSession = false;
 })();
 
 // SM-2-lite update — adjusts ease and intervalDays in place, sets nextDue.
-function _mvApplySrUpdate(v, correct){
+// W3-1 (2026-07-04) — shared mastery setter for BOTH ratified paths
+// (interval>=90 OR three distinct from-the-heart days, whichever
+// first). Mastery is the WIN register per the GO: gold confetti +
+// flash (dailyThreeComplete idiom), reduced-motion gated. Called only
+// from inside _mvApplySrUpdate so the walk-quest-hooks wrapper's
+// before/after flip detection on v.mastered catches both paths.
+function _mvSetMastered(v){
+  if(v.mastered) return;
+  v.mastered = true;
+  v.masteredAt = new Date().toISOString();
+  D.scrPoints = (D.scrPoints || 0) + 25;
+  try {
+    var _red = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(!_red){
+      if(typeof megaConfetti === 'function') megaConfetti();
+      if(typeof screenFlash === 'function') screenFlash('#ffd700', 300);
+    }
+  } catch(_e){}
+  showToast('🏆 ' + v.reference + ' mastered! +25 XP');
+  if(typeof logActivity === 'function') logActivity('faith', 'Memory verse mastered: ' + v.reference);
+}
+
+// W3-1 — extended with an optional 3rd arg for the practice ladder:
+//   opts.grade === 'close'  → medium grade: counts as a pass, interval
+//     grows mildly (×1.3, no 1→3 jump), ease unchanged.
+//   opts.heart === true     → this pass was rung-3 "from the heart /
+//     Nailed it": record the day in v.masterHits (distinct dates);
+//     3 days => mastered.
+// Binary callers are byte-identical in behavior, and the
+// walk-quest-hooks wrapper (apply(this, arguments)) passes opts
+// through untouched — its quest bump on the mastered flip covers
+// both mastery paths.
+function _mvApplySrUpdate(v, correct, opts){
   const today = _mvTodayISO();
   v.totalReviews   = (v.totalReviews || 0) + 1;
   v.lastReviewed   = new Date().toISOString();
+  const grade = opts && opts.grade;
 
-  if(correct){
+  if(grade === 'close'){
+    v.correctReviews = (v.correctReviews || 0) + 1;
+    v.intervalDays = Math.max(1, Math.round((v.intervalDays || 1) * 1.3));
+  } else if(correct){
     v.correctReviews = (v.correctReviews || 0) + 1;
     if(_mvQuizCorrect !== undefined) _mvQuizCorrect++;
     if(!v.intervalDays || v.intervalDays < 1)      v.intervalDays = 1;
     else if(v.intervalDays === 1)                  v.intervalDays = 3;
     else                                            v.intervalDays = Math.round(v.intervalDays * (v.ease || 2.5));
     v.ease = Math.min(2.8, (v.ease || 2.5) + 0.1);
-    if(v.intervalDays >= 90 && !v.mastered){
-      v.mastered = true;
-      v.masteredAt = new Date().toISOString();
-      D.scrPoints = (D.scrPoints || 0) + 25;
-      showToast('🏆 ' + v.reference + ' mastered! +25 XP');
-      if(typeof logActivity === 'function') logActivity('faith', 'Memory verse mastered: ' + v.reference);
+    if(opts && opts.heart){
+      if(!Array.isArray(v.masterHits)) v.masterHits = [];
+      if(v.masterHits.indexOf(today) === -1) v.masterHits.push(today);
+      if(v.masterHits.length >= 3) _mvSetMastered(v);
     }
+    if(v.intervalDays >= 90) _mvSetMastered(v);
   } else {
     v.intervalDays = 1;
     v.ease = Math.max(1.3, (v.ease || 2.5) - 0.2);

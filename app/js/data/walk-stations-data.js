@@ -504,7 +504,7 @@ const WALK_HORIZON = {
 const WALK_QUESTS_POOL = [
   { id:'q-devotion3',  icon:'🕊️', title:'Quiet Time ×3',      desc:'Complete 3 devotionals this week',            metric:'devotional', target:3, xp:30 },
   { id:'q-prayer5',    icon:'🙏', title:'Faithful in Prayer',  desc:'Pray or journal a prayer 5 days this week',   metric:'prayer',     target:5, xp:40 },
-  { id:'q-verse1',     icon:'🧠', title:'Hide the Word',       desc:'Master 1 new memory verse',                   metric:'verse',      target:1, xp:25 },
+  { id:'q-verse1',     icon:'🧠', title:'Hide the Word',       desc:'Practice or master a memory verse',           metric:'verse',      target:1, xp:25 },
   { id:'q-read4',      icon:'📖', title:'Rooted Reader',       desc:'Read your plan 4 days this week',             metric:'reading',    target:4, xp:35 },
   { id:'q-station1',   icon:'👣', title:'Take a Step',         desc:'Complete 1 station on your Walk',             metric:'station',    target:1, xp:50 },
   { id:'q-kindness3',  icon:'🤝', title:'Hands & Feet',        desc:'Do 3 real-life acts of kindness',             metric:'kindness',   target:3, xp:30 },

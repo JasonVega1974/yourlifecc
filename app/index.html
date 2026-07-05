@@ -10174,7 +10174,7 @@
               <div class="fjp-shade" aria-hidden="true"></div>
             </div>
             <div class="fjp-title">MEMORY VERSES</div>
-            <div class="fjp-sub">Hide the Word in your heart.</div>
+            <div class="fjp-sub" id="fjMemorizeSub">Hide the Word in your heart.</div>
           </button>
         </div>
 
@@ -11029,9 +11029,9 @@
         :root.light .esv-reflect-saved{ color:#92400e; }
         :root.light .esv-next-btn{ background:#92400e; color:#fff; }
         :root.light .esv-next-btn:hover{ background:#7c3608; }
-        /* Journey-home Bible teaser rides the EXISTING single sub line —
-           clamp so a long book name can never add a second line. */
-        #fjBibleSub{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        /* Journey-home teasers ride the EXISTING single sub line —
+           clamp so long content can never add a second line. */
+        #fjBibleSub, #fjMemorizeSub{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
       </style>
       <!-- Wave 2 §3a — Continue Reading resume card (renderBibleResumeCard) -->
       <div id="esvResumeCard"></div>
@@ -13613,13 +13613,63 @@
       #bf-memorize .mv-card-ref{font-size:.72rem;font-weight:800;letter-spacing:.04em;margin-bottom:.25rem;}
       #bf-memorize .mv-card-text{font-size:.74rem;color:var(--tx2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
       #bf-memorize .mv-card-meta{display:flex;align-items:center;gap:.4rem;margin-top:.35rem;font-size:.6rem;color:var(--tx2);font-weight:700;letter-spacing:.06em;}
-      #bf-memorize .mv-due-pill{background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.3);border-radius:99px;padding:.05rem .4rem;font-size:.55rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;}
+      /* W3-1 — due pill moved off gold: #fbbf24 keeps ONE lane on this
+         surface (gold register + mastery moment), per the pre-review. */
+      #bf-memorize .mv-due-pill{background:rgba(167,139,250,.15);color:#a78bfa;border:1px solid rgba(167,139,250,.3);border-radius:99px;padding:.05rem .4rem;font-size:.55rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;}
       #bf-memorize .mv-mastered-pill{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3);border-radius:99px;padding:.05rem .4rem;font-size:.55rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;}
       #bf-memorize .mv-empty{text-align:center;padding:1rem;color:var(--tx2);font-size:.78rem;font-style:italic;}
       #bf-memorize .mv-add-form{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:.85rem 1rem;margin-bottom:.85rem;display:none;}
       #bf-memorize .mv-add-form.open{display:block;}
       #bf-memorize .mv-cat-chip{flex:0 0 auto;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--tx2);border-radius:99px;padding:.25rem .65rem;font-size:.65rem;font-weight:700;cursor:pointer;font-family:var(--fm);}
       #bf-memorize .mv-cat-chip.active{background:var(--cd-banner);color:var(--cd-banner-text);border-color:transparent;}
+      /* ── W3-1 "Hide It In Your Heart" practice ladder ──────────
+         Interface layer. ONE accent register in the session (gold +
+         neutrals) — category color stays in the Library browse view
+         (rainbow rule); the category shows here as a quiet text tag.
+         Grade buttons: "Not yet" is calm, never red. */
+      .mvl-head{display:flex;align-items:center;gap:.6rem;margin-bottom:.7rem;font-family:var(--fm);}
+      .mvl-pos{font-size:.7rem;font-weight:800;color:var(--tx3);}
+      .mvl-rung{font-size:.62rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#fbbf24;}
+      .mvl-cat{margin-left:auto;font-size:.62rem;font-weight:700;color:var(--tx3);text-transform:capitalize;}
+      .mvl-grace{font-family:Georgia,serif;font-style:italic;font-size:.8rem;color:var(--tx2);background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:.55rem .75rem;margin-bottom:.7rem;line-height:1.5;}
+      .mvl-ref{font-family:var(--fm);font-size:.8rem;font-weight:800;color:#fbbf24;margin-bottom:.5rem;}
+      .mvl-ref-big{font-size:1.05rem;text-align:center;margin:1rem 0 .4rem;}
+      .mvl-verse{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:1.05rem;line-height:1.75;color:var(--tx);margin:0 0 .8rem;}
+      .mvl-blank{color:var(--tx3);letter-spacing:.06em;}
+      .mvl-blank--now{color:#fbbf24;border-bottom:2px solid rgba(251,191,36,.6);}
+      .mvl-filled{color:#fbbf24;}
+      .mvl-feedback{min-height:1.4em;font-family:var(--fm);font-size:.78rem;color:var(--tx2);margin-bottom:.5rem;}
+      .mvl-tray{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;}
+      .mvl-chip{min-height:44px;min-width:96px;border-radius:10px;cursor:pointer;background:var(--card-bg);border:1px solid var(--card-border);color:var(--tx);font-family:Georgia,serif;font-style:italic;font-size:.95rem;padding:.5rem 1rem;}
+      .mvl-chip:hover{border-color:rgba(251,191,36,.5);}
+      @keyframes mvlShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+      .mvl-shake{animation:mvlShake .3s ease;}
+      .mvl-firstletters{font-family:Georgia,serif;font-size:1.15rem;letter-spacing:.35em;line-height:2;color:var(--tx);text-align:center;background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:1rem;margin-bottom:.8rem;}
+      .mvl-heart-hint{font-family:Georgia,serif;font-style:italic;font-size:.85rem;color:var(--tx2);text-align:center;margin-bottom:.8rem;}
+      .mvl-cta{display:block;margin:.4rem auto 0;min-height:44px;min-width:220px;border-radius:10px;cursor:pointer;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a0d1a;border:none;font-family:var(--fm);font-weight:800;font-size:.88rem;}
+      .mvl-grades{display:flex;gap:.5rem;justify-content:center;margin-top:.8rem;flex-wrap:wrap;}
+      .mvl-grade{min-height:44px;min-width:104px;border-radius:10px;cursor:pointer;font-family:var(--fm);font-weight:700;font-size:.85rem;}
+      .mvl-grade--notyet{background:transparent;border:1px solid var(--card-border);color:var(--tx2);}
+      .mvl-grade--close{background:var(--card-bg);border:1px solid var(--card-border);color:var(--tx);}
+      .mvl-grade--nailed{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.5);color:#fbbf24;}
+      .mvl-quit{background:transparent;border:none;color:var(--tx3);font-family:var(--fm);font-size:.75rem;cursor:pointer;min-height:44px;text-decoration:underline dotted;}
+      .mvl-end{text-align:center;padding:1.4rem 0;}
+      .mvl-end-big{font-family:var(--fh,var(--fm));font-size:1.3rem;color:var(--tx);margin-bottom:.5rem;}
+      .mvl-end-line{font-family:var(--fm);font-size:.9rem;color:var(--tx2);}
+      .mvl-end-next{font-family:var(--fm);font-size:.78rem;color:var(--tx3);margin-top:.6rem;}
+      .mvl-chip:focus-visible,.mvl-cta:focus-visible,.mvl-grade:focus-visible,.mvl-quit:focus-visible{outline:2px solid #fbbf24;outline-offset:2px;}
+      @media (prefers-reduced-motion: reduce){
+        .mvl-shake{animation:none !important;}
+      }
+      :root.light #bf-memorize .mvl-rung{color:#92400e;}
+      :root.light #bf-memorize .mvl-ref{color:#92400e;}
+      :root.light #bf-memorize .mvl-blank--now{color:#92400e;border-bottom-color:rgba(146,64,14,.5);}
+      :root.light #bf-memorize .mvl-filled{color:#92400e;}
+      :root.light #bf-memorize .mvl-chip{background:#ffffff;border-color:rgba(15,23,42,.12);}
+      :root.light #bf-memorize .mvl-grace{background:#ffffff;border-color:rgba(15,23,42,.10);}
+      :root.light #bf-memorize .mvl-firstletters{background:#ffffff;border-color:rgba(15,23,42,.10);}
+      :root.light #bf-memorize .mvl-grade--nailed{background:rgba(180,120,20,.10);border-color:rgba(180,120,20,.45);color:#92400e;}
+      :root.light #bf-memorize .mvl-grade--close{background:#ffffff;}
     </style>
 
     <!-- Section header + Today's review CTA -->
@@ -13627,7 +13677,7 @@
       <div class="bf-eyebrow">SPACED · REPETITION · HIDDEN IN HEART</div>
       <div class="bf-title">Memory Verses</div>
       <div class="bf-sub" id="mvHeroSub">Spaced repetition keeps verses in long-term memory — quick daily reviews that move from "due" to "mastered" over weeks.</div>
-      <button class="mv-hero-btn" id="mvQuizBtn" onclick="mvStartQuiz()" style="margin-top:.9rem;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a0d1a;border:none;border-radius:99px;padding:.7rem 1.3rem;font-size:.82rem;font-weight:900;letter-spacing:.04em;cursor:pointer;font-family:var(--fm);box-shadow:0 4px 16px rgba(251,191,36,.35);">▶ Start Today's Review</button>
+      <button class="mv-hero-btn" id="mvQuizBtn" onclick="mvStartLadder()" style="margin-top:.9rem;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a0d1a;border:none;border-radius:99px;padding:.7rem 1.3rem;font-size:.82rem;font-weight:900;letter-spacing:.04em;cursor:pointer;font-family:var(--fm);box-shadow:0 4px 16px rgba(251,191,36,.35);">▶ Start Today's Review</button>
     </div>
 
     <!-- Stats -->
@@ -13708,8 +13758,8 @@
         <button onclick="mvCloseQuiz()" style="margin-left:auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.78rem;font-weight:800;">✕</button>
       </div>
 
-      <!-- Mode picker -->
-      <div style="padding:.55rem 1.2rem 0;display:flex;gap:.35rem;flex-wrap:wrap;">
+      <!-- Mode picker (hidden while the W3-1 ladder session runs) -->
+      <div id="mvqModes" style="padding:.55rem 1.2rem 0;display:flex;gap:.35rem;flex-wrap:wrap;">
         <button class="mvq-mode active" data-mvq-mode="cloze"  onclick="mvSetQuizMode('cloze',this)"  style="flex:1;min-width:90px;background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:8px;padding:.4rem;font-size:.66rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Cloze (fill blanks)</button>
         <button class="mvq-mode"        data-mvq-mode="recite" onclick="mvSetQuizMode('recite',this)" style="flex:1;min-width:90px;background:rgba(255,255,255,.06);color:var(--tx);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:.4rem;font-size:.66rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Recite (type all)</button>
         <button class="mvq-mode"        data-mvq-mode="choice" onclick="mvSetQuizMode('choice',this)" style="flex:1;min-width:90px;background:rgba(255,255,255,.06);color:var(--tx);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:.4rem;font-size:.66rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Multi-choice (kids)</button>
