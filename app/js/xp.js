@@ -81,7 +81,15 @@
       streakTicked: streakTicked,
       goalMet:      (oldToday < goal && D.xpToday >= goal)
     };
-    try { if (typeof window !== 'undefined' && typeof window.xpJuice === 'function') window.xpJuice(n, source, meta); } catch(_){}
+    // W3-2 quiet-moment gate: contemplative completions (First Light's
+    // Amen) set window._ylccQuietMoment around their data call — the XP
+    // still commits above; only the juice toast stays silent. The flag
+    // is synchronous and cleared by the caller in a finally block.
+    try {
+      if (typeof window !== 'undefined' && typeof window.xpJuice === 'function' && !window._ylccQuietMoment){
+        window.xpJuice(n, source, meta);
+      }
+    } catch(_){}
   }
 
   // ── WC-D1 — practice-set award (anti-farm) ───────────────────

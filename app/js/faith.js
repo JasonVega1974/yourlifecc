@@ -849,6 +849,7 @@ function bfTab(tab, btn){
   if(tab==='bible'){ initEsvBible(); _bfBibleSubTab(_bibleSubTab); }
   if(tab==='journey') renderFaithJourney();
   if(tab==='jesus'){ renderJesusCard(); if(typeof renderMeetJesus === 'function') renderMeetJesus(); }
+  if(tab==='devotional' && typeof renderFirstLight === 'function') renderFirstLight();
   if(tab==='denominations') renderDenominationsCard();
   if(tab==='learnBible') renderLearnBibleGrid();
   if(tab==='plans') _bfPlansSubTab(_plansSubTab);
@@ -3871,25 +3872,268 @@ function openDevotionalCard(idx){
   openModal('charModal');
 }
 
-function markDevotionalRead(){
+// W3-2 (2026-07-04) — optional opts.quiet: First Light's Amen calls
+// this with {quiet:true} so ALL data writes + the name-wrapped hooks
+// (xp.js devotional XP, walk-quest-hooks 'devotional' bump — both
+// wrap this global and .apply(arguments) through) fire exactly as
+// the classic path, while the celebration stack (loud toast +
+// celebrateIfNeeded banner; the playFx('cross') wrap checks the flag
+// too) stays silent. Settle, not win — morning quiet is not a quiz
+// victory. Classic callers are byte-identical (no args).
+function markDevotionalRead(opts){
+  const quiet = !!(opts && opts.quiet);
   if(!D.scrReadDays) D.scrReadDays = {};
   const today = new Date().toISOString().slice(0,10);
-  if(D.scrReadDays[today]){ showToast('Already marked today'); return; }
+  if(D.scrReadDays[today]){ if(!quiet) showToast('Already marked today'); return; }
   D.scrReadDays[today] = true;
   D.devPopupSeen = today;
   try{ if(typeof _ylccUserKey === 'function') localStorage.setItem(_ylccUserKey('ylcc_devPopupSeen'), today); }catch(e){}
   if(!window._faithFree) D.scrPoints = (D.scrPoints||0) + 5;
   save();
-  showToast(window._faithFree ? 'Devotional read ✓' : 'Devotional read! +5 pts 🙏');
+  if(!quiet) showToast(window._faithFree ? 'Devotional read ✓' : 'Devotional read! +5 pts 🙏');
   if(typeof renderDevotionals === 'function') renderDevotionals();
   if(typeof renderScrStats === 'function') renderScrStats();
   if(typeof renderFaithHome === 'function') renderFaithHome();
   if(!window._faithFree && typeof earnPB === 'function') earnPB(2, 'Devotional reading');
-  if(typeof celebrateIfNeeded === 'function') celebrateIfNeeded('scripture');
+  if(!quiet && typeof celebrateIfNeeded === 'function') celebrateIfNeeded('scripture');
   if(typeof logActivity === 'function') logActivity('scripture', 'Read daily devotional');
   var _devTitle = '';
   try { var _di = getDailyDevotionalIdx(); if(DEVOTIONALS && DEVOTIONALS[_di]) _devTitle = DEVOTIONALS[_di].title; } catch(_){}
   logFaithActivity('devotional', { title: _devTitle });
+}
+
+// ════════════════════════════════════════════════════════════
+// W3-2 (2026-07-04) — "First Light" staged morning devotional.
+// DECISIONS (Phase 0 locked — do not re-litigate casually):
+//  • SOURCE: the STATIC DEVOTIONALS[] via getDailyDevotionalIdx()
+//    (deterministic date-hash — the whole family sees the same one).
+//    NEVER the per-user AI devotional (renderDailyDevFull) — that
+//    one is localStorage-cached per user and would quietly break
+//    the family promise.
+//  • Beats: Settle invite (classic card stays first-class below;
+//    "Just read it" is a co-equal button, not a demoted escape) →
+//    The Word (staged .hc-vw ONLY when scripture ≤ 24 words — the
+//    40-word passages in this array read as "why is the app making
+//    me wait" if staggered) → The Thought → Your Line (VISIBLE
+//    input, the reflect prompt is its real <label>, Skip co-equal
+//    with Save; entries join D.bibleReadings tagged
+//    source:'devotional' — one unified reading journal, deliberate)
+//    → Amen (15s eased ring, button live from frame one — prayer is
+//    not a hostage situation; throttled SR countdown, NOT the
+//    Pulse's silent aria-hidden timer).
+//  • COMPLETION = SETTLE: markDevotionalRead({quiet:true}) — data +
+//    name-wrapped XP/quest/streak fire; celebration stack silenced;
+//    one sfx.settle bell max. Streak mentioned only as a quiet
+//    caption, never a missed-day framing (grace over guilt).
+//  • NO dwell gates anywhere: every CTA is tappable the moment
+//    content is legible; the stagger is cosmetic.
+//  • Only the CSS mechanics are reused from the Pulse — no _hcJ
+//    state, no HEART_CHECK coupling, no trait awards.
+// ════════════════════════════════════════════════════════════
+var _dlBeat = 0;          // 0 = not running; 2..5 = live beat
+var _dlTimer = null;
+var _dlDismissed = false; // "Just read it" this visit
+
+function _dlToday(){
+  try {
+    var idx = getDailyDevotionalIdx();
+    var d = (typeof DEVOTIONALS !== 'undefined') ? DEVOTIONALS[idx] : null;
+    return d ? { idx: idx, dev: d } : null;
+  } catch(_e){ return null; }
+}
+function _dlReadToday(){
+  return !!(D && D.scrReadDays && D.scrReadDays[new Date().toISOString().slice(0,10)]);
+}
+
+// Settle invite at the top of #bf-devotional. Classic card renders
+// below it, untouched and always visible — "just read it" simply
+// dismisses this card for the visit.
+function renderFirstLight(){
+  var host = document.getElementById('devFirstLight');
+  if(!host) return;
+  if(_dlBeat > 0) return;                      // mid-flow — don't clobber
+  var t = _dlToday();
+  if(!t){ host.innerHTML = ''; return; }
+  // Read-today wins over an earlier "just read it" dismissal — once
+  // it's done (by any path), say so quietly.
+  if(_dlReadToday()){
+    host.innerHTML = '<div class="dl-done-note">First light done for today ✓</div>';
+    return;
+  }
+  if(_dlDismissed){ host.innerHTML = ''; return; }
+  host.innerHTML =
+    '<div class="dl-settle">' +
+      '<div class="dl-eyebrow">First light</div>' +
+      '<div class="dl-settle-line">Before the day gets loud.</div>' +
+      '<div class="dl-family">The whole family sees this one today.</div>' +
+      '<div class="dl-settle-row">' +
+        '<button type="button" class="dl-begin" onclick="dlBegin()">Begin →</button>' +
+        '<button type="button" class="dl-skipflow" onclick="dlJustRead()">Just read it</button>' +
+      '</div>' +
+    '</div>';
+}
+function dlJustRead(){
+  _dlDismissed = true;
+  var host = document.getElementById('devFirstLight');
+  // Not a one-way door: a slipped tap must not cost the feature for
+  // the day (post-review) — leave a quiet re-entry link.
+  if(host) host.innerHTML = '<div class="dl-reopen"><button type="button" class="dl-reopen-btn" onclick="_dlDismissed=false;renderFirstLight()">First light →</button></div>';
+}
+
+function dlBegin(){
+  var t = _dlToday();
+  if(!t) return;
+  _dlBeat = 2;
+  var wrap = document.getElementById('devClassicWrap');
+  if(wrap) wrap.style.display = 'none';
+  // One back per view: the generic "← Back to Home" pill hides while
+  // a beat is live — .dl-back is the single escape (post-review).
+  var bp = document.querySelector('#bf-devotional .bf-back-btn');
+  if(bp) bp.style.display = 'none';
+  _dlRender();
+}
+function _dlExit(){
+  if(_dlTimer){ clearInterval(_dlTimer); _dlTimer = null; }
+  _dlBeat = 0;
+  var wrap = document.getElementById('devClassicWrap');
+  if(wrap) wrap.style.display = '';
+  var bp = document.querySelector('#bf-devotional .bf-back-btn');
+  if(bp) bp.style.display = '';
+  renderFirstLight();
+  try { var p = document.getElementById('bf-devotional'); if(p) p.scrollIntoView({ block:'start' }); } catch(_e){}
+}
+
+function _dlRender(){
+  var host = document.getElementById('devFirstLight');
+  var t = _dlToday();
+  if(!host || !t){ _dlExit(); return; }
+  var dev = t.dev;
+  var esc = _jEsc;
+  var back = '<button type="button" class="dl-back" onclick="_dlExit()">← Devotionals</button>';
+  if(_dlBeat === 2){
+    // The Word — staged only under the 24-word cap; longer passages
+    // render static (the stagger is sacred pacing on short lines,
+    // a waiting room on long ones).
+    var words = String(dev.scripture).split(/\s+/);
+    var wordHtml;
+    if(words.length <= 24){
+      var groups = [];
+      for(var i = 0; i < words.length; i += 4) groups.push(words.slice(i, i + 4).join(' '));
+      wordHtml = '<blockquote class="dl-verse hc-verse-staged">' + groups.map(function(g, gi){
+        return '<span class="hc-vw" style="animation-delay:' + (gi * 0.18).toFixed(2) + 's">' + esc(g) + ' </span>';
+      }).join('') + '</blockquote>';
+    } else {
+      wordHtml = '<blockquote class="dl-verse">' + esc(dev.scripture) + '</blockquote>';
+    }
+    host.innerHTML = back +
+      '<div class="dl-beat">' +
+        '<div class="dl-eyebrow">The Word</div>' +
+        wordHtml +
+        '<div class="dl-ref">— ' + esc(dev.verse) + '</div>' +
+        '<button type="button" class="dl-cta" onclick="_dlBeat=3;_dlRender()">Continue →</button>' +
+      '</div>';
+  } else if(_dlBeat === 3){
+    host.innerHTML = back +
+      '<div class="dl-beat">' +
+        '<div class="dl-eyebrow">The Thought</div>' +
+        '<div class="dl-title">' + esc(dev.title) + '</div>' +
+        '<div class="dl-thought">' + esc(dev.body) + '</div>' +
+        '<button type="button" class="dl-cta" onclick="_dlBeat=4;_dlRender()">Continue →</button>' +
+      '</div>';
+  } else if(_dlBeat === 4){
+    host.innerHTML = back +
+      '<div class="dl-beat">' +
+        '<div class="dl-eyebrow">Your line</div>' +
+        '<label class="dl-line-label" for="dlLineInput">' + esc(dev.reflect) + '</label>' +
+        '<input type="text" id="dlLineInput" class="dl-line-input" maxlength="200" placeholder="One line is plenty…">' +
+        '<div class="dl-line-row">' +
+          '<button type="button" class="dl-skipflow" onclick="_dlBeat=5;_dlRender()">Skip</button>' +
+          '<button type="button" class="dl-cta dl-cta--inline" onclick="dlSaveLine()">Save &amp; continue →</button>' +
+        '</div>' +
+      '</div>';
+    var inp = document.getElementById('dlLineInput');
+    if(inp) try { inp.focus(); } catch(_e){}
+  } else if(_dlBeat === 5){
+    var prayer = dev.prayer || 'Lord, walk with me through this day. Amen.';
+    host.innerHTML = back +
+      '<div class="dl-beat">' +
+        '<div class="dl-eyebrow">Amen</div>' +
+        '<div class="dl-prayer">' + esc(prayer) + '</div>' +
+        '<div class="dl-ring-wrap" aria-hidden="true"><div class="dl-ring" id="dlRing"></div><div class="dl-ring-count" id="dlRingCount">15</div></div>' +
+        '<div id="dlSr" class="dl-sr" aria-live="polite"></div>' +
+        '<button type="button" class="dl-cta" id="dlAmen" onclick="dlDone()">Amen →</button>' +
+      '</div>';
+    var sr = document.getElementById('dlSr');
+    if(sr) sr.textContent = '15 seconds of quiet. Amen is available any time.';
+    var left = 15;
+    _dlTimer = setInterval(function(){
+      var co = document.getElementById('dlRingCount');
+      if(!co){ clearInterval(_dlTimer); _dlTimer = null; return; }
+      // Tab-away pause: never auto-complete (chime + completion) on a
+      // screen the user isn't looking at (post-review). Amen stays
+      // live when they return; the ring simply stops advancing.
+      var pane = document.getElementById('bf-devotional');
+      if(pane && pane.style.display === 'none'){ clearInterval(_dlTimer); _dlTimer = null; return; }
+      left--;
+      co.textContent = String(Math.max(0, left));
+      var ring = document.getElementById('dlRing');
+      if(ring) ring.style.setProperty('--dl-arc', ((15 - left) * 24) + 'deg');
+      var sre = document.getElementById('dlSr');
+      if(sre && (left === 10 || left === 5)) sre.textContent = left + ' seconds.';
+      if(left <= 0){ clearInterval(_dlTimer); _dlTimer = null; dlDone(); }
+    }, 1000);
+  }
+}
+
+function dlSaveLine(){
+  var inp = document.getElementById('dlLineInput');
+  var textVal = inp ? inp.value.trim() : '';
+  var t = _dlToday();
+  if(textVal && t && D){
+    if(!Array.isArray(D.bibleReadings)) D.bibleReadings = [];
+    // Joins the unified reading journal (chapter-thought shape) with a
+    // devotional tag — deliberate reuse, no new DEF store.
+    D.bibleReadings.push({ id: Date.now(), book: 'Devotional', chapter: '', verse: t.dev.verse, notes: textVal, highlight: '', date: new Date().toISOString(), source: 'devotional', title: t.dev.title });
+    save();
+    if(typeof renderBibleReadings === 'function') try { renderBibleReadings(); } catch(_e){}
+  }
+  _dlBeat = 5;
+  _dlRender();
+}
+
+function dlDone(){
+  if(_dlBeat === 0) return;                    // ring timeout after manual Amen
+  if(_dlTimer){ clearInterval(_dlTimer); _dlTimer = null; }
+  _dlBeat = 0;
+  // Data + wrapped XP/quest/streak — celebration stack silenced. The
+  // quiet-moment flag reaches what the opts arg cannot: the xpJuice
+  // toast (three wrap-layers downstream in xp.js) and walkQuestBump's
+  // trophy UI. Synchronous, cleared in finally.
+  if(typeof markDevotionalRead === 'function'){
+    try {
+      if(typeof window !== 'undefined') window._ylccQuietMoment = true;
+      markDevotionalRead({ quiet: true });
+    } finally {
+      if(typeof window !== 'undefined') window._ylccQuietMoment = false;
+    }
+  }
+  if(window.sfx && typeof window.sfx.settle === 'function') window.sfx.settle();
+  var host = document.getElementById('devFirstLight');
+  var streakLine = '';
+  try {
+    var st = (typeof getScriptureStreak === 'function') ? getScriptureStreak() : 0;
+    if(st > 1) streakLine = '<div class="dl-streak-note">Day ' + st + ' with the Word.</div>';
+  } catch(_e){}
+  if(host){
+    host.innerHTML =
+      '<div class="dl-beat dl-complete">' +
+        '<div class="dl-complete-line">Done. Go be light today.</div>' +
+        streakLine +
+        '<button type="button" class="dl-cta" onclick="_dlExit()">Close</button>' +
+      '</div>';
+  }
+  var wrap = document.getElementById('devClassicWrap');
+  if(wrap) wrap.style.display = '';
 }
 
 function showDailyDevModal(){
@@ -7968,7 +8212,7 @@ function playFx(type){
   // Devotional read → cross
   if(typeof markDevotionalRead === 'function'){
     const _orig = markDevotionalRead;
-    markDevotionalRead = function(){ const today = new Date().toISOString().slice(0,10); const wasRead = !!(D.scrReadDays && D.scrReadDays[today]); _orig.apply(this, arguments); if(!wasRead) playFx('cross'); };
+    markDevotionalRead = function(){ const today = new Date().toISOString().slice(0,10); const wasRead = !!(D.scrReadDays && D.scrReadDays[today]); _orig.apply(this, arguments); if(!wasRead && !(arguments[0] && arguments[0].quiet)) playFx('cross'); };
   }
   if(typeof markDevFromPopup === 'function'){
     const _orig = markDevFromPopup;

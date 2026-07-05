@@ -160,7 +160,9 @@ function walkQuestBump(metric,n,silent){
     if((w.questProg[metric]||0)>=q.target){
       w.questDone[q.id]=_todayKey(); touched=true;
       _xp(q.xp,'walk_quest');
-      if(!silent){
+      // W3-2 quiet-moment gate: no trophy toast / flash / buzz landing
+      // on top of a contemplative completion (progress still counts).
+      if(!silent && !(typeof window!=='undefined' && window._ylccQuietMoment)){
         _sfx('streak'); _buzz('streak'); _flash('rgba(245,180,49,.28)');
         _toast('🏆 Quest complete: '+q.title+'  +'+q.xp+' XP');
       }

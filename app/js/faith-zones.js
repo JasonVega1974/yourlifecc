@@ -1631,6 +1631,18 @@ function renderFaithJourneyHome(){
       _ms.textContent = _due > 0 ? (_due + ' due today →') : 'Hide the Word in your heart.';
     }
   } catch (e){}
+  // W3-2 — Devotionals card teaser: today's title (deterministic —
+  // the whole family sees the same one). Same single-line clamp.
+  try {
+    var _ds = document.getElementById('fjDevoSub');
+    if (_ds){
+      var _dd = null;
+      if (typeof getDailyDevotionalIdx === 'function' && typeof DEVOTIONALS !== 'undefined'){
+        _dd = DEVOTIONALS[getDailyDevotionalIdx()];
+      }
+      _ds.textContent = (_dd && _dd.title) ? ('Today: ' + _dd.title) : 'Today + the full 365 plan.';
+    }
+  } catch (e){}
   // My Walk tile progress teaser — grace-first: show NOTHING until a step is
   // taken (spec §5, never make anyone feel behind). walkGetProgress() is from
   // walk-path.js and returns {done,total,pct}; typeof-guarded so a module-load
