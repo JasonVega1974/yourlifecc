@@ -1782,6 +1782,7 @@ function fzOpenDest(dest){
         '<button type="button" class="fz-ph-tab active" data-ph-tab="quick" onclick="fzPrayerHubTab(\'quick\')">Quick Prayers</button>' +
         '<button type="button" class="fz-ph-tab" data-ph-tab="mine" onclick="fzPrayerHubTab(\'mine\')">My Prayers</button>' +
         '<button type="button" class="fz-ph-tab" data-ph-tab="focus" onclick="fzPrayerHubTab(\'focus\')">Focus</button>' +
+        '<button type="button" class="fz-ph-tab" data-ph-tab="breath" onclick="fzPrayerHubTab(\'breath\')">Breath</button>' +
       '</div>' +
       '<div id="fzPhQuick">' +
         '<div class="fz-dest-intro">What\'s on your heart right now?</div>' +
@@ -1792,6 +1793,7 @@ function fzOpenDest(dest){
         '<div id="fzQuickPrayerJournal"></div>' +
       '</div>' +
       '<div id="fzPhFocus" style="display:none;"></div>' +
+      '<div id="fzPhBreath" style="display:none;"></div>' +
       '<button type="button" class="fz-ph-wall" onclick="fzPrayerOpenWall()">' +
         '<span aria-hidden="true" style="font-size:1.3rem;">🕊️</span>' +
         '<span style="flex:1;min-width:0;">Prayer Wall' +
@@ -1803,6 +1805,7 @@ function fzOpenDest(dest){
     if (typeof renderQuickPrayerLibrary    === 'function') renderQuickPrayerLibrary('quickPrayerLibrary');
     if (typeof renderQuickPrayerJournal    === 'function') renderQuickPrayerJournal();
     _fzRenderPrayerFocusTab();
+    _fzRenderBreathPrayerTab();
   } else if (dest === 'reallife'){
     titleEl.textContent = "Real Life Win";
     bodyEl.innerHTML = renderRealLifeWinDestination();
@@ -1871,7 +1874,7 @@ function fzOpenDest(dest){
 // ════════════════════════════════════════════════════════════
 function fzPrayerHubTab(tab){
   if (typeof document === 'undefined') return;
-  var map = { quick:'fzPhQuick', mine:'fzPhMine', focus:'fzPhFocus' };
+  var map = { quick:'fzPhQuick', mine:'fzPhMine', focus:'fzPhFocus', breath:'fzPhBreath' };
   Object.keys(map).forEach(function(k){
     var el = document.getElementById(map[k]);
     if (el) el.style.display = (k === tab) ? '' : 'none';
@@ -1943,6 +1946,234 @@ function fzPrayerOpenWall(){
     home.insertBefore(b, home.firstChild);
   }
   if (typeof fzOpenDest === 'function') fzOpenDest('prayerwall');
+}
+
+// ════════════════════════════════════════════════════════════
+// Breath Prayer (Increment 2, 2026-07-04) — one line prayed on
+// the inhale, one on the exhale. Picker tab (interface layer,
+// theme-aware) → full-screen session overlay (SCENE LAYER:
+// hardcoded night hex, deliberately theme-independent like
+// prayer-focus.js / the climb & walk overlays — documented
+// exemption in docs/design-system.md). Cadence is DEVOTIONAL,
+// not clinical: 2-phase unequal, inhale 4s / exhale 6s, no hold
+// (longer exhale = parasympathetic + the exhale line is always
+// the longer phrase) — deliberately NOT the Pulse's 4-4-4-4 box
+// breathing (that's regulation; this is prayer). One fixed
+// cadence across all 10 pairs. Completion is a SETTLE, not a
+// win: one opt-in chime + "N breaths with God" — no confetti,
+// no flash, no XP (every session "succeeds"; celebration would
+// be noise). Quest 'prayer' bumps once/day via the same
+// persisted D.hcDaily store The Pulse uses. Haptics are silent
+// progressive enhancement (Android-only; never promised in
+// copy). Wake lock keeps the screen alive through a 5-minute
+// session where supported.
+// ════════════════════════════════════════════════════════════
+var _bpSel = null;               // selected pair id
+var _bpDur = 3;                  // minutes (1 | 3 | 5)
+var _bpState = null;             // {pair, total, elapsed, breaths, timer, phase, wakeLock, prevActive}
+var _BP_IN_MS = 4000, _BP_OUT_MS = 6000;
+
+function _fzRenderBreathPrayerTab(){
+  var host = document.getElementById('fzPhBreath');
+  if (!host) return;
+  if (typeof BREATH_PRAYERS === 'undefined' || !Array.isArray(BREATH_PRAYERS) || !BREATH_PRAYERS.length){
+    host.innerHTML = '<div class="fz-empty">Breath prayers are loading…</div>';
+    return;
+  }
+  if (!_bpSel) _bpSel = BREATH_PRAYERS[0].id;
+  var rows = BREATH_PRAYERS.map(function(p){
+    var sel = p.id === _bpSel;
+    return '<button type="button" class="fz-bp-row' + (sel ? ' fz-bp-row--sel' : '') + '" ' +
+      'data-bp="' + _fzEsc(p.id) + '" onclick="bpSelect(\'' + _fzEsc(p.id) + '\')" ' +
+      'aria-pressed="' + (sel ? 'true' : 'false') + '">' +
+      '<span class="fz-bp-lines">' +
+        '<span class="fz-bp-inhale">' + _fzEsc(p.inhale) + '</span>' +
+        '<span class="fz-bp-exhale">' + _fzEsc(p.exhale) + '</span>' +
+      '</span>' +
+      '<span class="fz-bp-meta">' + _fzEsc(p.when) + ' · ' + _fzEsc(p.ref) + '</span>' +
+    '</button>';
+  }).join('');
+  var durs = [1, 3, 5].map(function(m){
+    return '<button type="button" class="fz-bp-dur' + (m === _bpDur ? ' fz-bp-dur--sel' : '') + '" ' +
+      'onclick="bpSetDur(' + m + ')" aria-pressed="' + (m === _bpDur ? 'true' : 'false') + '">' +
+      m + ' min</button>';
+  }).join('');
+  host.innerHTML =
+    '<div class="fz-dest-intro">One line as you breathe in. One as you breathe out. That\'s the whole prayer.</div>' +
+    '<div class="fz-bp-list">' + rows + '</div>' +
+    '<div class="fz-bp-durrow" role="group" aria-label="Session length">' + durs + '</div>' +
+    '<button type="button" class="fz-rlw-btn fz-bp-begin" onclick="bpBegin()">Begin →</button>';
+}
+function bpSelect(id){ _bpSel = id; _fzRenderBreathPrayerTab(); }
+function bpSetDur(m){ _bpDur = m; _fzRenderBreathPrayerTab(); }
+
+function _bpPair(){
+  if (typeof BREATH_PRAYERS === 'undefined') return null;
+  for (var i = 0; i < BREATH_PRAYERS.length; i++){
+    if (BREATH_PRAYERS[i].id === _bpSel) return BREATH_PRAYERS[i];
+  }
+  return BREATH_PRAYERS[0] || null;
+}
+
+// Overlay shell — mirrors prayer-focus.js mechanics (close paths:
+// X, Esc, backdrop; focus trap between the two buttons; body
+// modal-open guard on close). Stars are generated once.
+function _bpOverlay(){
+  var ov = document.getElementById('breathPrayerOverlay');
+  if (ov) return ov;
+  ov = document.createElement('div');
+  ov.id = 'breathPrayerOverlay';
+  ov.setAttribute('role', 'dialog');
+  ov.setAttribute('aria-modal', 'true');
+  ov.setAttribute('aria-label', 'Breath prayer');
+  var stars = '';
+  for (var i = 0; i < 36; i++){
+    var sz = (Math.random() * 1.6 + 0.7).toFixed(1);
+    stars += '<span class="bp-star" style="left:' + (Math.random() * 100).toFixed(1) + '%;top:' +
+      (Math.random() * 100).toFixed(1) + '%;width:' + sz + 'px;height:' + sz + 'px;animation-delay:' +
+      (Math.random() * 6).toFixed(1) + 's;"></span>';
+  }
+  ov.innerHTML =
+    '<div class="bp-stars" aria-hidden="true">' + stars + '</div>' +
+    '<button type="button" class="bp-close" id="bpClose" aria-label="End quietly">×</button>' +
+    '<div class="bp-stage">' +
+      '<div class="bp-ring" id="bpRing" aria-hidden="true"></div>' +
+      '<div class="bp-plate">' +
+        '<div class="bp-line bp-line-in" id="bpLineIn"></div>' +
+        '<div class="bp-line bp-line-out" id="bpLineOut"></div>' +
+      '</div>' +
+      '<div class="bp-phase" id="bpPhase" aria-live="polite"></div>' +
+      '<div class="bp-left" id="bpLeft" aria-hidden="true"></div>' +
+    '</div>';
+  document.body.appendChild(ov);
+  document.getElementById('bpClose').addEventListener('click', bpEnd);
+  ov.addEventListener('click', function(e){ if (e.target === ov) bpEnd(); });
+  ov.addEventListener('keydown', function(e){
+    if (e.key === 'Escape'){ bpEnd(); return; }
+    if (e.key === 'Tab'){
+      // Trap between the (at most) two buttons present.
+      var btns = ov.querySelectorAll('button');
+      if (!btns.length) return;
+      var first = btns[0], last = btns[btns.length - 1];
+      if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+    }
+  });
+  return ov;
+}
+
+function bpBegin(){
+  var pair = _bpPair();
+  if (!pair) return;
+  var ov = _bpOverlay();
+  _bpState = {
+    pair: pair,
+    total: _bpDur * 60000,
+    elapsed: 0,
+    breaths: 0,
+    timer: null,
+    phase: 'in',
+    wakeLock: null,
+    prevActive: document.activeElement
+  };
+  document.getElementById('bpLineIn').textContent = pair.inhale;
+  document.getElementById('bpLineOut').textContent = pair.exhale;
+  ov.classList.add('open');
+  document.body.classList.add('modal-open');
+  var cb = document.getElementById('bpClose');
+  if (cb) try { cb.focus(); } catch(_){}
+  // Screen wake lock — a 5-minute session must not go dark mid-breath.
+  try {
+    if (navigator.wakeLock && navigator.wakeLock.request){
+      navigator.wakeLock.request('screen').then(function(wl){ if (_bpState) _bpState.wakeLock = wl; }).catch(function(){});
+    }
+  } catch(_){}
+  _bpPhase('in');
+}
+
+function _bpPhase(phase){
+  if (!_bpState) return;
+  _bpState.phase = phase;
+  var ring = document.getElementById('bpRing');
+  var lin = document.getElementById('bpLineIn');
+  var lout = document.getElementById('bpLineOut');
+  var ph = document.getElementById('bpPhase');
+  if (!ring || !lin || !lout || !ph){ bpEnd(); return; }
+  var ms = phase === 'in' ? _BP_IN_MS : _BP_OUT_MS;
+  var reduced = _hcReduced();
+  if (!reduced){
+    ring.style.transitionDuration = (ms / 1000) + 's';
+    ring.className = 'bp-ring ' + (phase === 'in' ? 'bp-ring--in' : 'bp-ring--out');
+  }
+  // Emphasis by opacity/scale, never hue alone.
+  lin.classList.toggle('bp-line--on', phase === 'in');
+  lout.classList.toggle('bp-line--on', phase === 'out');
+  ph.textContent = phase === 'in' ? 'Breathe in' : 'Breathe out';
+  // One pulse per BREATH (inhale only), not per phase — two buzzes every
+  // ~5s for five minutes is a metronome, not an enhancement (post-build
+  // ux review catch). Android-only anyway; the ring carries the cue.
+  if (phase === 'in' && window.haptics && typeof window.haptics.correct === 'function') window.haptics.correct();
+  _bpState.timer = setTimeout(function(){
+    if (!_bpState) return;
+    _bpState.elapsed += ms;
+    var lf = document.getElementById('bpLeft');
+    if (lf){
+      var remain = Math.max(0, _bpState.total - _bpState.elapsed);
+      var mm = Math.floor(remain / 60000), ss = Math.floor((remain % 60000) / 1000);
+      lf.textContent = mm + ':' + (ss < 10 ? '0' : '') + ss;
+    }
+    if (phase === 'out'){
+      _bpState.breaths++;
+      if (_bpState.elapsed >= _bpState.total){ _bpComplete(); return; }
+    }
+    _bpPhase(phase === 'in' ? 'out' : 'in');
+  }, ms);
+}
+
+function _bpComplete(){
+  if (!_bpState) return;
+  var n = _bpState.breaths;
+  var stage = document.querySelector('#breathPrayerOverlay .bp-stage');
+  if (stage){
+    stage.innerHTML =
+      '<div class="bp-done">' +
+        '<div class="bp-done-line">You just prayed without saying a word.</div>' +
+        '<div class="bp-done-count">' + n + ' breath' + (n === 1 ? '' : 's') + ' with God.</div>' +
+        '<button type="button" class="bp-done-btn" onclick="bpEnd()">Amen</button>' +
+      '</div>';
+    var db = document.querySelector('#breathPrayerOverlay .bp-done-btn');
+    if (db) try { db.focus(); } catch(_){}
+  }
+  // A settle, not a win: one opt-in low bell (sfx.settle — NOT the quiz
+  // correct() ding; register matters), quiet haptic, plumbing gated
+  // once/day — the trait too, per the feature's own no-farm ethic
+  // (post-build ux review). Nothing visual fires.
+  if (window.sfx && typeof window.sfx.settle === 'function') window.sfx.settle();
+  else if (window.sfx && typeof window.sfx.correct === 'function') window.sfx.correct();
+  if (window.haptics && typeof window.haptics.correct === 'function') window.haptics.correct();
+  if (typeof awardTrait === 'function' && _hcOnce('bp_trait')) awardTrait('faith', 2);
+  if (typeof window.walkQuestBump === 'function' && _hcOnce('prayer')) window.walkQuestBump('prayer', 1);
+  if (_bpState.timer){ clearTimeout(_bpState.timer); _bpState.timer = null; }
+}
+
+function bpEnd(){
+  if (_bpState){
+    if (_bpState.timer) clearTimeout(_bpState.timer);
+    try { if (_bpState.wakeLock) _bpState.wakeLock.release(); } catch(_){}
+    var prev = _bpState.prevActive;
+    _bpState = null;
+    if (prev && prev.focus) try { prev.focus(); } catch(_){}
+  }
+  var ov = document.getElementById('breathPrayerOverlay');
+  if (ov){
+    ov.classList.remove('open');
+    // Rebuild the stage next session (completion view replaced it).
+    ov.remove();
+  }
+  // Same guard idiom as prayer-focus.js — only drop modal-open when no
+  // other overlay still needs it.
+  var stillOpen = document.querySelector('.mo.open, #ppModal.open, #ppConvinceModal.open, #quickPrayerOverlay.open, #nightReflectOverlay.open, #prayerFocusOverlay.open');
+  if (!stillOpen) document.body.classList.remove('modal-open');
 }
 
 // ════════════════════════════════════════════════════════════
@@ -2875,6 +3106,11 @@ if (typeof window !== 'undefined'){
   window.backToHeartPicker = backToHeartPicker;
   window.hcPrayWithThis    = hcPrayWithThis;
   window.hcDidAction       = hcDidAction;
+  // 2026-07-04 — Breath Prayer (inline onclick handlers).
+  window.bpSelect          = bpSelect;
+  window.bpSetDur          = bpSetDur;
+  window.bpBegin           = bpBegin;
+  window.bpEnd             = bpEnd;
   // 2026-07-04 — The Pulse journey (inline onclick handlers).
   window._hcSlide          = _hcSlide;
   window._hcBeat1Done      = _hcBeat1Done;

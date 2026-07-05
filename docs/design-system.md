@@ -187,6 +187,8 @@ Default body line-height `1.55`. Paragraph spacing = `0.75 × line-height` (≈1
 | `--radius-xl` | 24px | Hero card, modal, drawer |
 | `--radius-full` | 9999px | Pills, avatar, FAB |
 
+**Scene-layer theme exemption (2026-07-04 — this is the ruling):** full-screen night-scene overlays are deliberately theme-INDEPENDENT (hardcoded hex, no `:root.light` pass): `#prayerFocusOverlay`, `#breathPrayerOverlay`, `#lifeClimbOverlay`, `#ccWalkOverlay`, `#fzJourneyHome`, the Well. A starfield that inverts to a pale sky in light mode is a bug, not a theme. Do not "fix" these in a light-mode audit. Their entry points (pickers, tabs, cards) remain interface-layer and MUST theme-adapt.
+
 **As-built card radius scale (2026-07-04 unification — this is the ruling):**
 12px compact rows/list cards (`.ph-card`, `.pcc-card`, `.ch-card`, `.stat-tile`, `.st-card`, `.mz-allow-card`) · 16px standard cards and tiles (`.card` via `--r`, `.yl-card`, `.yl-pillar`, `.cc-tile`, `.pch-tile`, `.fh-card`, `--cd-card-radius` family) · 22px hero sheets (`#dailyBriefingCard`, `.qp-card`, `.wk-sheet`). Nested inner tiles (`.db-tile`, `.fh-tile`) stay 14px — inner radius smaller than its container. Scene-layer photo cards (`.fjp-card`, Journey Home, the Well) are exempt. Where `.claude/skills/visual-design/SKILL.md` says 12px cards, this table wins for YourLife CC.
 

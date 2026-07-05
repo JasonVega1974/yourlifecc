@@ -100,6 +100,14 @@
     _tone(659, 0.09, 'square', 0.07, 0);
     _tone(988, 0.13, 'square', 0.08, 0.08);
   }
+  // settle   — one low bell, slow decay (design-system §6 "Success chime":
+  // single gentle tone, never percussion). For contemplative completions
+  // (Breath Prayer) where the quiz-register correct() ding would collapse
+  // a sacred moment into trivia feedback.
+  function settle(){
+    _tone(392, 0.9, 'sine', 0.10, 0);
+    _tone(784, 0.7, 'sine', 0.035, 0.02);   // faint octave shimmer
+  }
 
   if(typeof window !== 'undefined'){
     window.sfx = {
@@ -107,6 +115,7 @@
       tryAgain: tryAgain,
       perfect: perfect,
       streak: streak,
+      settle: settle,
       unlock: _unlock,
       isEnabled: _enabled
     };

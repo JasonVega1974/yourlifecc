@@ -9694,6 +9694,103 @@
       .hc-breath-ring{ transition:none !important; transform:scale(1.4) !important; }
       .hc-beat-in{ animation:none !important; }
     }
+
+    /* ── Breath Prayer (Increment 2, 2026-07-04) ─────────────────
+       Picker tab = interface layer (theme-aware, light pass below).
+       Session overlay = SCENE LAYER: hardcoded night hex, deliberately
+       theme-independent (a starfield that inverts to a pale sky in
+       light mode is a bug, not a theme) — same posture as
+       prayer-focus.js and the climb/walk overlays; exemption noted in
+       docs/design-system.md. Prayer lines sit on a solid dark plate
+       (contrast rule — text never floats on raw stars); emphasis is
+       opacity + scale, never hue alone. Ring is teal (--accent-
+       secondary family = the locked progress accent), NOT indigo. */
+    .fz-bp-list{ display:flex; flex-direction:column; gap:.5rem; margin:1rem 0; }
+    .fz-bp-row{
+      display:flex; flex-direction:column; gap:.2rem; text-align:left;
+      background:var(--card-bg); border:1px solid var(--card-border); border-radius:16px;
+      padding:.75rem .95rem; cursor:pointer; font-family:var(--fm); color:var(--tx);
+      min-height:44px;
+    }
+    .fz-bp-row--sel{ border-color:#14b8a6; background:rgba(20,184,166,.08); }
+    .fz-bp-lines{ display:flex; flex-wrap:wrap; gap:.35rem; align-items:baseline; }
+    .fz-bp-inhale{ font-family:Georgia,serif; font-style:italic; font-size:.98rem; }
+    .fz-bp-exhale{ font-family:Georgia,serif; font-style:italic; font-size:.98rem; color:var(--tx2); }
+    .fz-bp-exhale::before{ content:'— '; color:var(--tx3); }
+    .fz-bp-meta{ font-size:.72rem; color:var(--tx3); }
+    .fz-bp-durrow{ display:flex; gap:.5rem; justify-content:center; margin:1rem 0 .2rem; }
+    .fz-bp-dur{
+      min-width:84px; min-height:44px; border-radius:999px; cursor:pointer;
+      background:transparent; border:1px solid var(--card-border); color:var(--tx2);
+      font-family:var(--fm); font-weight:600; font-size:.88rem;
+    }
+    .fz-bp-dur--sel{ border-color:#14b8a6; color:var(--tx); background:rgba(20,184,166,.10); }
+    .fz-bp-begin{ display:block; margin:1rem auto 0; }
+    .fz-bp-row:focus-visible, .fz-bp-dur:focus-visible, .fz-bp-begin:focus-visible{
+      outline:2px solid #4338ca; outline-offset:2px;
+    }
+    :root.light .fz-bp-row{ background:#ffffff; border-color:rgba(15,23,42,.10); }
+    :root.light .fz-bp-row--sel{ border-color:#0f766e; background:rgba(15,118,110,.07); }
+    :root.light .fz-bp-dur--sel{ border-color:#0f766e; background:rgba(15,118,110,.08); }
+
+    /* Session overlay — scene layer, hardcoded hex throughout. */
+    #breathPrayerOverlay{
+      display:none; position:fixed; inset:0; z-index:100070;
+      background:linear-gradient(180deg,#0b0a1f 0%,#0a0d1a 60%,#07070f 100%);
+    }
+    #breathPrayerOverlay.open{ display:flex; align-items:center; justify-content:center; }
+    #breathPrayerOverlay .bp-stars{ position:absolute; inset:0; overflow:hidden; pointer-events:none; }
+    #breathPrayerOverlay .bp-star{
+      position:absolute; border-radius:50%; background:#f1e9d5; opacity:.25;
+      animation:bpTwinkle 5.5s ease-in-out infinite;
+    }
+    @keyframes bpTwinkle{ 0%,100%{ opacity:.15; } 50%{ opacity:.75; } }
+    #breathPrayerOverlay .bp-close{
+      position:absolute; top:calc(14px + env(safe-area-inset-top,0px)); right:16px; z-index:3;
+      width:44px; height:44px; border-radius:50%; cursor:pointer;
+      background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.18);
+      color:#e9ecf6; font-size:1.3rem; line-height:1;
+    }
+    #breathPrayerOverlay .bp-close:focus-visible{ outline:2px solid #14b8a6; outline-offset:2px; }
+    #breathPrayerOverlay .bp-stage{ position:relative; z-index:2; text-align:center; padding:1rem; max-width:480px; }
+    #breathPrayerOverlay .bp-ring{
+      width:110px; height:110px; margin:0 auto 1.4rem; border-radius:50%;
+      border:2px solid #14b8a6; background:rgba(20,184,166,.10);
+      transition-property:transform; transition-timing-function:ease-in-out;
+      transform:scale(1);
+    }
+    #breathPrayerOverlay .bp-ring--in{ transform:scale(1.75); }
+    #breathPrayerOverlay .bp-ring--out{ transform:scale(1); }
+    /* Solid plate behind the prayer lines — the contrast rule. */
+    #breathPrayerOverlay .bp-plate{
+      background:rgba(7,7,15,.82); border:1px solid rgba(255,255,255,.08);
+      border-radius:16px; padding:1.1rem 1.3rem; margin:1.2rem 0 .8rem;
+    }
+    #breathPrayerOverlay .bp-line{
+      font-family:Georgia,serif; font-style:italic; font-size:1.22rem; line-height:1.5;
+      color:#f1e9d5; opacity:.35; transform:scale(1);
+      transition:opacity 1.2s ease, transform 1.2s ease;
+    }
+    #breathPrayerOverlay .bp-line--on{ opacity:1; transform:scale(1.04); }
+    #breathPrayerOverlay .bp-phase{ font-family:var(--fm); font-weight:600; font-size:.9rem; color:#9aa2ba; }
+    #breathPrayerOverlay .bp-left{ font-family:var(--fm); font-size:.78rem; color:#6b7390; margin-top:.4rem; }
+    #breathPrayerOverlay .bp-done-line{
+      font-family:Georgia,serif; font-style:italic; font-size:1.25rem; color:#f1e9d5; line-height:1.55;
+    }
+    #breathPrayerOverlay .bp-done-count{ font-family:var(--fm); font-weight:600; font-size:1rem; color:#14b8a6; margin:1rem 0 1.6rem; }
+    #breathPrayerOverlay .bp-done-btn{
+      min-width:180px; min-height:44px; border-radius:10px; cursor:pointer;
+      background:rgba(20,184,166,.14); border:1px solid rgba(20,184,166,.45);
+      color:#d9fff6; font-family:var(--fm); font-weight:700; font-size:.95rem;
+    }
+    #breathPrayerOverlay .bp-done-btn:focus-visible{ outline:2px solid #14b8a6; outline-offset:2px; }
+    @media (prefers-reduced-motion: reduce){
+      /* Cadence (JS-timed phase text + countdown) continues; the ring
+         holds a mid scale and the stars stop twinkling. */
+      #breathPrayerOverlay .bp-ring{ transition:none !important; transform:scale(1.35) !important; }
+      #breathPrayerOverlay .bp-star{ animation:none !important; opacity:.3; }
+      #breathPrayerOverlay .bp-line{ transition:opacity .001s !important; transform:none !important; }
+    }
   </style>
 
   <!-- 2026-05-30 — Smart Welcome Back screen.
@@ -21127,6 +21224,10 @@
      on first Prayer tab open (SPEC 7b TIER 1 batch 2, v352). Do not
      add a <script> tag back here. -->
 <script defer src="/app/js/data/quick-prayers.js"></script>
+<!-- Breath Prayer pairs (Increment 2, 2026-07-04) — 10 static entries,
+     rendered by the prayer hub's Breath tab in faith-zones.js. Small
+     file, eager-loaded with its sibling prayer data (no lazy-load). -->
+<script defer src="/app/js/data/breath-prayers.js"></script>
 <!-- proof-prophecy.js is lazy-loaded by faith.js's _proofProphecyEnsureLoaded()
      (via ylccEnsureData in lazy-data.js) on first Proof & Prophecy tab open,
      and awaited in faithSearch() so search still surfaces proof hits (WC-1b).
