@@ -79,6 +79,13 @@ const DEF = {
   // index into RED_LETTERS (0-based). In DEF so a tired reader lands
   // back on statement 14, not statement 1.
   jwIdx:0,
+  // The Story scrollytelling (2026-07-05, jesus-story.js) — Who Is
+  // Jesus seven-chapter scroll journey. read:{1..7:true} chapter
+  // completion, lastCh resume pointer (jwIdx idiom), titles:{i:true}
+  // constellation visited stars, done = the all-seven settle moment
+  // has played (once ever), view:'story'|'page' escape preference.
+  // Object, never array. In DEF so progress survives offline reload.
+  jesusStory:{ read:{}, lastCh:1, titles:{}, done:false, view:'story' },
   // F2-F memory verses with SM-2-lite scheduling.
   // Each entry: { id, reference, text, category, ease, intervalDays, nextDue (ISO date),
   //               lastReviewed, mastered, masteredAt, createdAt, totalReviews, correctReviews }

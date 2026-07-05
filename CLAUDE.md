@@ -19,7 +19,7 @@ There is **no build step, no bundler, no test runner, no `package.json`**. Every
 
 ### The single-file shell + module pattern
 
-`app/index.html` (currently ~21,388 lines — refresh per the standing rule below when it drifts >5%) is the entire app shell — every section, modal, screen, and inline `<style>` block lives in this one file. Behavior is split across vanilla JS modules in `app/js/` that all load globally onto `window`. There are no ES modules, no imports, no classes — files cooperate via global functions and the shared mutable `D` state object.
+`app/index.html` (currently ~23,170 lines — refresh per the standing rule below when it drifts >5%) is the entire app shell — every section, modal, screen, and inline `<style>` block lives in this one file. Behavior is split across vanilla JS modules in `app/js/` that all load globally onto `window`. There are no ES modules, no imports, no classes — files cooperate via global functions and the shared mutable `D` state object.
 
 **Script load order matters and is fixed in `app/index.html` — the contiguous `<script src="/app/js/...">` block sits immediately before the Google Translate `<script>` tag near EOF, in this order:**
 
@@ -161,7 +161,7 @@ After any edit to `/app/index.html`, the index-html-guardian agent must verify t
 - Google Translate `<script>` tag present immediately before `</body>`
 - `</body>` and `</html>` close the file cleanly
 
-Line numbers drift with every edit; the agent verifies presence. (Snapshot for orientation, approx., drifts — refreshed 2026-06-12: file ~21,388 lines; the `function tick()` / `setInterval(tick` pair sits around line 20,000; Google Translate tag around line 20,366.)
+Line numbers drift with every edit; the agent verifies presence. (Snapshot for orientation, approx., drifts — refreshed 2026-07-05: file ~23,170 lines; the `function tick()` / `setInterval(tick` pair sits around line 21,627; Google Translate tag around line 22,079.)
 
 ## Roadmap & Current Phase
 

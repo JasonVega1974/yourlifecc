@@ -848,7 +848,7 @@ function bfTab(tab, btn){
   if(tab==='reading'){ populateBibleBooks(); renderBibleReadings(); }
   if(tab==='bible'){ initEsvBible(); _bfBibleSubTab(_bibleSubTab); }
   if(tab==='journey') renderFaithJourney();
-  if(tab==='jesus'){ renderJesusCard(); if(typeof renderMeetJesus === 'function') renderMeetJesus(); }
+  if(tab==='jesus'){ if(typeof renderJesusStory === 'function') renderJesusStory(); else renderJesusCard(); if(typeof renderMeetJesus === 'function') renderMeetJesus(); }
   if(tab==='devotional' && typeof renderFirstLight === 'function') renderFirstLight();
   if(tab==='denominations') renderDenominationsCard();
   if(tab==='learnBible') renderLearnBibleGrid();
@@ -10036,13 +10036,11 @@ function _jEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;')
 //    distance both solved by never coloring words). Documented
 //    exception in docs/design-system.md.
 //  • Hero is text — one illuminated line, no imagery (house rule).
-// The existing JESUS_DATA tab card stays untouched below as the
-// "Go deeper" study layer.
-// FOLLOW-UP (filed 2026-07-04, post-build ux review): the untouched
-// study card's bright purple-gradient header + violet pills clash
-// with this layer's restrained wine/gold register two scrolls below
-// it. Deliberately deferred, NOT silently accepted — restyle the
-// study card header into the same register in a future pass.
+// The existing JESUS_DATA tab card stays below as the "read as one
+// page" study escape for The Story scrollytelling (jesus-story.js).
+// FOLLOW-UP discharged 2026-07-05 (The Story increment): the study
+// card's purple-gradient header + violet pills/accents are restyled
+// into this layer's wine/gold register below.
 // ════════════════════════════════════════════════════════════
 var _jwKeysWired = false;
 
@@ -10213,16 +10211,16 @@ function renderJesusCard(){
     {id:'words', label:'His Words'},
     {id:'names', label:'Names &amp; Titles'}
   ].map(function(t,i){
-    return '<button class="jtab'+(i===0?' jtab-active':'')+'" onclick="switchJesusTab(\''+t.id+'\')" data-jtab="'+t.id+'" style="flex-shrink:0;font-size:.75rem;font-weight:700;padding:.3rem .65rem;border-radius:20px;border:1px solid rgba(167,139,250,.3);background:'+(i===0?'rgba(167,139,250,.25)':'none')+';color:var(--tx);cursor:pointer;white-space:nowrap;">'+t.label+'</button>';
+    return '<button class="jtab'+(i===0?' jtab-active':'')+'" onclick="switchJesusTab(\''+t.id+'\')" data-jtab="'+t.id+'" style="flex-shrink:0;font-size:.75rem;font-weight:700;padding:.3rem .65rem;border-radius:20px;border:1px solid rgba(159,18,57,.45);background:'+(i===0?'rgba(159,18,57,.28)':'none')+';color:var(--tx);cursor:pointer;white-space:nowrap;">'+t.label+'</button>';
   }).join('');
 
-  el.innerHTML = '<div class="faith-card card-jesus" id="card-jesus" style="border-radius:12px;overflow:hidden;border:1px solid rgba(167,139,250,.15);">'
-    +'<div style="background:linear-gradient(135deg,#3b0764,#6d28d9,#92400e);padding:1.3rem 1rem 1rem;text-align:center;">'
+  el.innerHTML = '<div class="faith-card card-jesus" id="card-jesus" style="border-radius:12px;overflow:hidden;border:1px solid rgba(251,191,36,.15);">'
+    +'<div style="background:linear-gradient(165deg,#221a12 0%,#171310 55%,#100d0a 100%);border-bottom:1px solid rgba(251,191,36,.14);padding:1.3rem 1rem 1rem;text-align:center;">'
     +'<div style="font-size:1.8rem;margin-bottom:.35rem;">✝</div>'
-    +'<h2 style="color:#fff;font-size:1.25rem;font-weight:900;margin:0 0 .2rem;">'+_jEsc(d.overview.title)+'</h2>'
-    +'<p style="color:rgba(255,255,255,.8);font-size:.8rem;margin:0;">'+_jEsc(d.overview.subtitle)+'</p>'
+    +'<h2 style="color:#f1e9d5;font-size:1.25rem;font-weight:800;margin:0 0 .2rem;">'+_jEsc(d.overview.title)+'</h2>'
+    +'<p style="color:rgba(251,191,36,.75);font-size:.8rem;margin:0;">'+_jEsc(d.overview.subtitle)+'</p>'
     +'</div>'
-    +'<div style="display:flex;gap:.3rem;overflow-x:auto;padding:.6rem .6rem .4rem;-webkit-overflow-scrolling:touch;scrollbar-width:none;background:var(--bg);border-bottom:1px solid rgba(167,139,250,.1);">'
+    +'<div style="display:flex;gap:.3rem;overflow-x:auto;padding:.6rem .6rem .4rem;-webkit-overflow-scrolling:touch;scrollbar-width:none;background:var(--bg);border-bottom:1px solid rgba(251,191,36,.1);">'
     +tabBtns
     +'</div>'
     +'<div style="padding:.7rem .6rem;">'
@@ -10245,7 +10243,7 @@ function switchJesusTab(tabId){
   var btns = document.querySelectorAll('#card-jesus .jtab');
   for(var j=0;j<btns.length;j++){
     var isActive = btns[j].getAttribute('data-jtab') === tabId;
-    btns[j].style.background = isActive ? 'rgba(167,139,250,.25)' : 'none';
+    btns[j].style.background = isActive ? 'rgba(159,18,57,.28)' : 'none';
     if(isActive) btns[j].classList.add('jtab-active'); else btns[j].classList.remove('jtab-active');
   }
 }
@@ -10293,7 +10291,7 @@ function _buildJesusLifeTab(life, resurrection){
   if(!life) return '';
   var acc = function(icon, title, body){
     return '<details style="margin-bottom:.45rem;">'
-      +'<summary style="cursor:pointer;padding:.55rem .7rem;background:rgba(167,139,250,.07);border-radius:8px;font-size:.83rem;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;"><span>'+icon+' '+_jEsc(title)+'</span><span style="font-size:.7rem;opacity:.5;">▼</span></summary>'
+      +'<summary style="cursor:pointer;padding:.55rem .7rem;background:rgba(159,18,57,.07);border-radius:8px;font-size:.83rem;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;"><span>'+icon+' '+_jEsc(title)+'</span><span style="font-size:.7rem;opacity:.5;">▼</span></summary>'
       +'<div style="padding:.65rem .5rem .3rem;font-size:.81rem;line-height:1.65;color:var(--tx2);">'+body+'</div>'
       +'</details>';
   };
@@ -10304,12 +10302,12 @@ function _buildJesusLifeTab(life, resurrection){
       +'<table style="width:100%;border-collapse:collapse;font-size:.75rem;">'
       +'<thead><tr><th style="text-align:left;padding:.25rem .4rem;color:var(--tx2);font-weight:600;">Prophecy</th><th style="text-align:left;padding:.25rem .4rem;color:var(--tx2);font-weight:600;">Reference</th></tr></thead>'
       +'<tbody>'+life.birth.propheciesFulfilled.map(function(p){
-        return '<tr><td style="padding:.3rem .4rem;border-top:1px solid rgba(167,139,250,.08);color:var(--tx);">'+_jEsc(p.prophecy)+'</td><td style="padding:.3rem .4rem;border-top:1px solid rgba(167,139,250,.08);color:var(--tx2);">'+_jEsc(p.reference)+'</td></tr>';
+        return '<tr><td style="padding:.3rem .4rem;border-top:1px solid rgba(251,191,36,.1);color:var(--tx);">'+_jEsc(p.prophecy)+'</td><td style="padding:.3rem .4rem;border-top:1px solid rgba(251,191,36,.1);color:var(--tx2);">'+_jEsc(p.reference)+'</td></tr>';
       }).join('')+'</tbody></table>';
   }
 
   var baptismBody = _jEsc(life.baptism.details);
-  if(life.baptism.significance) baptismBody += '<p style="margin:.5rem 0 0;font-style:italic;color:#a78bfa;font-size:.78rem;">'+_jEsc(life.baptism.significance)+'</p>';
+  if(life.baptism.significance) baptismBody += '<p style="margin:.5rem 0 0;font-style:italic;color:var(--tx2);border-left:3px solid #9f1239;padding-left:.6rem;font-size:.78rem;">'+_jEsc(life.baptism.significance)+'</p>';
 
   var ministryBody = _jEsc(life.ministry.details);
   if(life.ministry.miracles && life.ministry.miracles.length){
@@ -10347,11 +10345,11 @@ function _buildJesusCruxTab(crux){
       +'<div style="position:relative;padding-left:1.8rem;margin-bottom:1rem;">';
     crux.timeline.forEach(function(ev, i){
       html += '<div style="position:relative;padding-bottom:.75rem;">'
-        +'<div style="position:absolute;left:-1.75rem;top:.18rem;width:.85rem;height:.85rem;background:#7c3aed;border-radius:50%;border:2px solid var(--bg);z-index:1;"></div>'
-        +(i < crux.timeline.length-1 ? '<div style="position:absolute;left:-1.32rem;top:.85rem;width:2px;height:100%;background:rgba(124,58,237,.2);"></div>' : '')
+        +'<div style="position:absolute;left:-1.75rem;top:.18rem;width:.85rem;height:.85rem;background:#9f1239;border-radius:50%;border:2px solid var(--bg);z-index:1;"></div>'
+        +(i < crux.timeline.length-1 ? '<div style="position:absolute;left:-1.32rem;top:.85rem;width:2px;height:100%;background:rgba(159,18,57,.25);"></div>' : '')
         +'<div style="font-size:.81rem;font-weight:700;color:var(--tx);">'+_jEsc(ev.event)+'</div>'
         +'<div style="font-size:.77rem;color:var(--tx2);line-height:1.5;margin:.1rem 0;">'+_jEsc(ev.detail)+'</div>'
-        +'<div style="font-size:.7rem;color:#a78bfa;">'+_jEsc(ev.ref)+'</div>'
+        +'<div style="font-size:.7rem;color:var(--tx3);">'+_jEsc(ev.ref)+'</div>'
         +'</div>';
     });
     html += '</div>';
@@ -10362,7 +10360,7 @@ function _buildJesusCruxTab(crux){
     crux.sevenLastWords.forEach(function(w){
       html += '<div style="background:rgba(180,83,9,.05);border-left:3px solid #b45309;border-radius:0 8px 8px 0;padding:.55rem .75rem;margin-bottom:.45rem;">'
         +'<div style="font-size:.81rem;color:#c0392b;font-style:italic;font-weight:600;margin-bottom:.2rem;">"'+_jEsc(w.words)+'"</div>'
-        +'<div style="font-size:.7rem;color:#a78bfa;margin-bottom:.2rem;">'+_jEsc(w.ref)+'</div>'
+        +'<div style="font-size:.7rem;color:var(--tx3);margin-bottom:.2rem;">'+_jEsc(w.ref)+'</div>'
         +'<div style="font-size:.77rem;color:var(--tx2);">'+_jEsc(w.meaning)+'</div>'
         +'</div>';
     });
@@ -10373,7 +10371,7 @@ function _buildJesusCruxTab(crux){
     var sigLabels = {substitutionary:'Substitution', propitiation:'Propitiation', redemption:'Redemption', reconciliation:'Reconciliation', justification:'Justification'};
     Object.keys(crux.significance).forEach(function(k){
       html += '<div style="display:flex;gap:.5rem;align-items:flex-start;margin-bottom:.45rem;">'
-        +'<span style="flex-shrink:0;font-size:.68rem;font-weight:700;color:#7c3aed;padding:.15rem .35rem;background:rgba(124,58,237,.1);border-radius:4px;">'+(sigLabels[k]||k)+'</span>'
+        +'<span style="flex-shrink:0;font-size:.68rem;font-weight:700;color:var(--tx);padding:.15rem .35rem;background:rgba(159,18,57,.12);border-radius:4px;">'+(sigLabels[k]||k)+'</span>'
         +'<span style="font-size:.78rem;color:var(--tx2);line-height:1.5;">'+_jEsc(crux.significance[k])+'</span>'
         +'</div>';
     });
@@ -10388,9 +10386,9 @@ function _buildJesusTeachingsTab(teachings){
     if(cat.parables && cat.parables.length){
       body += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:.35rem;margin-top:.4rem;">'
         +cat.parables.map(function(p){
-          return '<div style="background:rgba(124,58,237,.06);border-radius:6px;padding:.4rem .55rem;">'
+          return '<div style="background:rgba(251,191,36,.06);border-radius:6px;padding:.4rem .55rem;">'
             +'<div style="font-size:.77rem;font-weight:700;color:var(--tx);">'+_jEsc(p.name)+'</div>'
-            +'<div style="font-size:.68rem;color:#a78bfa;margin:.1rem 0;">'+_jEsc(p.ref)+'</div>'
+            +'<div style="font-size:.68rem;color:var(--tx3);margin:.1rem 0;">'+_jEsc(p.ref)+'</div>'
             +'<div style="font-size:.72rem;color:var(--tx2);font-style:italic;">'+_jEsc(p.theme)+'</div>'
             +'</div>';
         }).join('')+'</div>';
@@ -10398,9 +10396,9 @@ function _buildJesusTeachingsTab(teachings){
     if(cat.statements && cat.statements.length){
       body += '<div style="margin-top:.4rem;">'
         +cat.statements.map(function(s){
-          return '<div style="border-left:3px solid #7c3aed;padding:.4rem .6rem;margin-bottom:.4rem;">'
-            +'<div style="font-size:.81rem;font-weight:700;color:#7c3aed;">'+_jEsc(s.statement)+'</div>'
-            +'<div style="font-size:.68rem;color:#a78bfa;margin:.15rem 0;">'+_jEsc(s.ref)+'</div>'
+          return '<div style="border-left:3px solid #9f1239;padding:.4rem .6rem;margin-bottom:.4rem;">'
+            +'<div style="font-size:.81rem;font-weight:700;color:var(--tx);">'+_jEsc(s.statement)+'</div>'
+            +'<div style="font-size:.68rem;color:var(--tx3);margin:.15rem 0;">'+_jEsc(s.ref)+'</div>'
             +'<div style="font-size:.77rem;color:var(--tx);">'+_jEsc(s.meaning)+'</div>'
             +'</div>';
         }).join('')+'</div>';
@@ -10409,7 +10407,7 @@ function _buildJesusTeachingsTab(teachings){
       body += '<div style="margin-top:.4rem;font-size:.72rem;color:var(--tx2);">Key passages: '+_jEsc(cat.keyPassages.join(' · '))+'</div>';
     }
     return '<details style="margin-bottom:.45rem;">'
-      +'<summary style="cursor:pointer;padding:.55rem .7rem;background:rgba(124,58,237,.06);border-radius:8px;font-size:.83rem;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;"><span>'+_jEsc(cat.label)+'</span><span style="font-size:.7rem;opacity:.5;">▼</span></summary>'
+      +'<summary style="cursor:pointer;padding:.55rem .7rem;background:rgba(159,18,57,.07);border-radius:8px;font-size:.83rem;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;"><span>'+_jEsc(cat.label)+'</span><span style="font-size:.7rem;opacity:.5;">▼</span></summary>'
       +'<div style="padding:.65rem .5rem .3rem;">'+body+'</div>'
       +'</details>';
   }).join('');
@@ -10439,7 +10437,7 @@ function _buildJesusWordsTab(redLetterWords){
   }).join('');
 
   return '<div style="margin-bottom:.6rem;">'
-    +'<select id="jWordsFilter" onchange="filterJesusWords(this.value)" style="width:100%;font-size:.81rem;padding:.4rem .5rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);">'+opts+'</select>'
+    +'<select id="jWordsFilter" onchange="filterJesusWords(this.value)" style="width:100%;font-size:.81rem;padding:.4rem .5rem;border-radius:8px;border:1px solid rgba(251,191,36,.2);background:var(--bg);color:var(--tx);">'+opts+'</select>'
     +'</div>'
     +'<div id="jWordsContainer">'+cards+'</div>';
 }
@@ -10450,7 +10448,7 @@ function _buildJesusNamesTab(keyTitles, strongsTerms, crossRefs){
     html += '<div style="font-size:.83rem;font-weight:700;margin-bottom:.5rem;color:var(--tx);">Names &amp; Titles of Jesus</div>'
       +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:.45rem;margin-bottom:1rem;">'
       +keyTitles.map(function(t){
-        return '<div style="background:rgba(167,139,250,.07);border-radius:8px;padding:.55rem .7rem;">'
+        return '<div style="background:rgba(251,191,36,.06);border-radius:8px;padding:.55rem .7rem;">'
           +'<div style="font-size:.83rem;font-weight:700;color:var(--tx);margin-bottom:.2rem;">'+_jEsc(t.title)+'</div>'
           +'<div style="font-size:.76rem;color:var(--tx2);margin-bottom:.25rem;">'+_jEsc(t.meaning)+'</div>'
           +(t.greek ? '<span style="font-size:.66rem;background:rgba(59,130,246,.1);color:#3b82f6;border-radius:3px;padding:.1rem .25rem;margin-right:.2rem;">'+_jEsc(t.greek)+'</span>' : '')
@@ -10465,7 +10463,7 @@ function _buildJesusNamesTab(keyTitles, strongsTerms, crossRefs){
       +'<summary style="cursor:pointer;padding:.55rem .7rem;background:rgba(59,130,246,.06);border-radius:8px;font-size:.83rem;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;"><span>Strong\'s Key Terms</span><span style="font-size:.7rem;opacity:.5;">▼</span></summary>'
       +'<div style="padding:.65rem .5rem .3rem;">'
       +strongsTerms.map(function(t){
-        return '<div style="display:flex;gap:.5rem;align-items:flex-start;margin-bottom:.45rem;padding-bottom:.45rem;border-bottom:1px solid rgba(167,139,250,.07);">'
+        return '<div style="display:flex;gap:.5rem;align-items:flex-start;margin-bottom:.45rem;padding-bottom:.45rem;border-bottom:1px solid rgba(251,191,36,.08);">'
           +'<span style="flex-shrink:0;min-width:3.2rem;font-size:.68rem;font-weight:700;color:#3b82f6;">'+_jEsc(t.strongs)+'</span>'
           +'<div><div style="font-size:.78rem;font-weight:700;color:var(--tx);">'+_jEsc(t.term)+'</div><div style="font-size:.73rem;color:var(--tx2);">'+_jEsc(t.definition)+'</div></div>'
           +'</div>';
@@ -10475,13 +10473,13 @@ function _buildJesusNamesTab(keyTitles, strongsTerms, crossRefs){
 
   if(crossRefs && crossRefs.length){
     html += '<details>'
-      +'<summary style="cursor:pointer;padding:.55rem .7rem;background:rgba(167,139,250,.07);border-radius:8px;font-size:.83rem;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;"><span>Cross References by Topic</span><span style="font-size:.7rem;opacity:.5;">▼</span></summary>'
+      +'<summary style="cursor:pointer;padding:.55rem .7rem;background:rgba(159,18,57,.07);border-radius:8px;font-size:.83rem;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;"><span>Cross References by Topic</span><span style="font-size:.7rem;opacity:.5;">▼</span></summary>'
       +'<div style="padding:.65rem .5rem .3rem;">'
       +crossRefs.map(function(r){
         return '<div style="margin-bottom:.5rem;">'
           +'<div style="font-size:.78rem;font-weight:700;color:var(--tx);margin-bottom:.2rem;">'+_jEsc(r.topic)+'</div>'
           +'<div style="display:flex;flex-wrap:wrap;gap:.2rem;">'
-          +r.refs.map(function(ref){ return '<span style="font-size:.71rem;background:rgba(167,139,250,.1);color:#a78bfa;border-radius:4px;padding:.1rem .3rem;">'+_jEsc(ref)+'</span>'; }).join('')
+          +r.refs.map(function(ref){ return '<span style="font-size:.71rem;background:rgba(251,191,36,.08);color:var(--tx2);border-radius:4px;padding:.1rem .3rem;">'+_jEsc(ref)+'</span>'; }).join('')
           +'</div></div>';
       }).join('')
       +'</div></details>';

@@ -11009,6 +11009,335 @@
       :root.light #jesusMeetHost .jq-item{ background:#ffffff; border-color:rgba(15,23,42,.10); }
       :root.light #jesusMeetHost .jq-ref{ color:#92400e; }
       :root.light #jesusMeetHost .mj-hero-ref{ color:rgba(251,191,36,.8); }
+
+      /* ── The Story — scrollytelling (2026-07-05) ─────────────────
+         Seven-chapter scroll journey; docs/THE_STORY_SCROLLYTELLING_
+         SPEC.md. Scene layer = hardcoded hex, SAME in both themes
+         (scene-lite precedent above); content beats = interface
+         tokens + light pass at the end. Gold #fbbf24 is the constant
+         thread through all seven ambiences (stars, seals, rail).
+         Native scroll only. */
+      #jesusStoryWrap{ position:relative; margin-top:1.1rem; }
+      .jsy-scene{
+        position:sticky; top:0; height:100vh; height:100dvh;
+        margin-bottom:-100vh; margin-bottom:-100dvh;
+        z-index:0; pointer-events:none; overflow:hidden; border-radius:16px;
+      }
+      .jsy-bg{ position:absolute; inset:0; opacity:0; transition:opacity 1.2s ease; }
+      .jsy-bg.on{ opacity:1; }
+      /* Ch1 Born — warm-leaning night (not cold cyan: it must sit under
+         the amber Meet Jesus hero) + a thin star field. */
+      .jsy-bg1{
+        background-image:
+          radial-gradient(1.3px 1.3px at 22% 24%, rgba(255,247,224,.6), transparent 60%),
+          radial-gradient(1px 1px at 68% 14%, rgba(251,191,36,.5), transparent 60%),
+          radial-gradient(1px 1px at 84% 42%, rgba(255,247,224,.4), transparent 60%),
+          radial-gradient(1.2px 1.2px at 40% 56%, rgba(251,191,36,.35), transparent 60%),
+          linear-gradient(180deg,#090d1f 0%,#10122b 55%,#191534 100%);
+        background-size:280px 240px,340px 300px,300px 260px,380px 320px,cover;
+        background-repeat:repeat,repeat,repeat,repeat,no-repeat;
+      }
+      /* Ch2 Hidden Years — night easing to pre-dawn indigo. */
+      .jsy-bg2{
+        background-image:
+          radial-gradient(1px 1px at 30% 30%, rgba(255,247,224,.3), transparent 60%),
+          radial-gradient(1px 1px at 75% 55%, rgba(251,191,36,.22), transparent 60%),
+          linear-gradient(180deg,#10122b 0%,#1a1738 55%,#241d40 100%);
+        background-size:320px 280px,360px 300px,cover;
+        background-repeat:repeat,repeat,no-repeat;
+      }
+      /* Ch3 The River — desaturated slate-teal (kept away from the
+         interactive faith accent) with light entering from above. */
+      .jsy-bg3{
+        background-image:
+          radial-gradient(120% 55% at 50% -10%, rgba(226,240,244,.14), transparent 60%),
+          linear-gradient(180deg,#12222c 0%,#14303a 55%,#0f2a30 100%);
+      }
+      /* Ch4 The Wilderness — dry ochre/umber dusk, sparse. */
+      .jsy-bg4{ background:linear-gradient(180deg,#241a10 0%,#33240f 55%,#2a1d0d 100%); }
+      /* Ch5 The Ministry — warm daylight golds (still dark enough for
+         cream headers to clear AA). */
+      .jsy-bg5{
+        background-image:
+          radial-gradient(130% 60% at 50% -10%, rgba(251,191,36,.13), transparent 60%),
+          linear-gradient(180deg,#2e2410 0%,#3d2f14 55%,#332811 100%);
+      }
+      /* Ch6 The Cross — base dusk; the .jsy-dark veil does the
+         scroll-linked darkening (Mt 27:45). */
+      .jsy-bg6{ background:linear-gradient(180deg,#241c14 0%,#1a140f 60%,#120e0b 100%); }
+      /* Ch7 Risen — pre-dawn base; .jsy-dawn floods warm gold up from
+         the bottom edge on first entry. */
+      .jsy-bg7{ background:linear-gradient(180deg,#191534 0%,#241d40 45%,#3a2a14 100%); }
+      /* The Cross veil — quantized stops (no per-pixel banding); the
+         .92 ceiling over #120e0b keeps a discernible silhouette, never
+         a true full black (reverence, not horror). Floor #050508. */
+      .jsy-dark{ position:absolute; inset:0; background:#050508; opacity:0; transition:opacity .6s linear; }
+      #jesusStoryWrap[data-dark="1"] .jsy-dark{ opacity:.22; }
+      #jesusStoryWrap[data-dark="2"] .jsy-dark{ opacity:.44; }
+      #jesusStoryWrap[data-dark="3"] .jsy-dark{ opacity:.62; }
+      #jesusStoryWrap[data-dark="4"] .jsy-dark{ opacity:.78; }
+      #jesusStoryWrap[data-dark="5"] .jsy-dark{ opacity:.92; }
+      /* The dawn break — the single most animated moment in the app:
+         one soft gradient plane, monotonic ease-out, no particles, no
+         overshoot, no sound. Once per session (JS-gated). */
+      .jsy-dawn{
+        position:absolute; inset:0; opacity:0; transform:translateY(26%);
+        background:linear-gradient(0deg, rgba(251,191,36,.34) 0%, rgba(217,151,32,.18) 34%, rgba(0,0,0,0) 68%);
+        transition:opacity 2s cubic-bezier(.16,1,.3,1), transform 2s cubic-bezier(.16,1,.3,1);
+      }
+      #jesusStoryWrap[data-ch="7"] .jsy-dawn.break{ opacity:1; transform:none; }
+      .jsy-dawn.no-anim{ transition:none; }
+
+      .jsy-flow{ position:relative; z-index:1; padding:0 .3rem 1.4rem; }
+      /* Top: kicker + escape + resume — scene text, hardcoded (dark
+         scene in both themes). */
+      .jsy-top{ padding:1.4rem .4rem .6rem; }
+      .jsy-kicker{
+        font-family:var(--fm); font-size:.6rem; font-weight:800; letter-spacing:.24em;
+        text-transform:uppercase; color:#fbbf24; text-shadow:0 1px 8px rgba(0,0,0,.55);
+      }
+      .jsy-tagline{
+        font-family:Georgia,'Times New Roman',serif; font-style:italic; font-size:1.02rem;
+        color:#f1e9d5; margin:.35rem 0 .8rem; text-shadow:0 1px 10px rgba(0,0,0,.55);
+      }
+      .jsy-toprow{ display:flex; flex-wrap:wrap; gap:.5rem; }
+      .jsy-escape, .jsy-resume{
+        min-height:44px; border-radius:999px; cursor:pointer; font-family:var(--fm);
+        font-size:.76rem; font-weight:700; padding:.45rem 1rem;
+        background:rgba(9,9,16,.6); border:1px solid rgba(251,191,36,.3); color:#f1e9d5;
+      }
+      .jsy-resume{ border-color:rgba(251,191,36,.55); color:#fbbf24; }
+      .jsy-viewlink{
+        min-height:44px; border-radius:999px; cursor:pointer; font-family:var(--fm);
+        font-size:.78rem; font-weight:700; padding:.45rem 1rem; margin-bottom:.7rem;
+        background:transparent; border:1px solid var(--card-border); color:var(--tx2);
+      }
+      /* Rail — mobile: sticky pill, dots + ONE running chapter label
+         (7 full labels don't fit 375px). Dot tap zones compress to
+         ~30×38px at this density — a documented exception to the 44px
+         floor, spacing-guarded. Desktop ≥720px: left column, labels. */
+      .jsy-rail{
+        position:sticky; top:.45rem; z-index:3; display:flex; align-items:center; gap:.55rem;
+        width:max-content; max-width:calc(100% - .5rem); margin:0 auto 1rem;
+        background:rgba(9,9,15,.78); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
+        border:1px solid rgba(251,191,36,.18); border-radius:999px; padding:.3rem .8rem;
+      }
+      .jsy-rail-track{ position:relative; display:flex; align-items:center; gap:.4rem; }
+      .jsy-dot{
+        position:relative; width:30px; height:38px; background:none; border:none; cursor:pointer;
+        display:flex; align-items:center; justify-content:center; padding:0;
+      }
+      .jsy-dot-pip{
+        width:9px; height:9px; border-radius:50%; background:rgba(241,233,213,.38);
+        border:1px solid rgba(241,233,213,.55); transition:background .3s, border-color .3s, box-shadow .3s;
+      }
+      .jsy-dot.read .jsy-dot-pip{ background:rgba(251,191,36,.85); border-color:rgba(251,191,36,.9); }
+      .jsy-dot.on .jsy-dot-pip{
+        border-color:#fbbf24; box-shadow:0 0 0 3px rgba(251,191,36,.22), 0 0 10px rgba(251,191,36,.45);
+      }
+      .jsy-dot-label{ display:none; }
+      .jsy-rail-now{
+        font-family:var(--fm); font-size:.68rem; font-weight:700; color:#f1e9d5;
+        white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:7.5rem;
+      }
+      /* All-seven completion — the dots connect into a single line. */
+      .jsy-rail.done .jsy-rail-track::before{
+        content:''; position:absolute; left:15px; right:15px; top:50%; height:1.5px;
+        background:rgba(251,191,36,.55); transform:translateY(-50%);
+      }
+      .jsy-rail.done .jsy-dot-pip{ background:rgba(251,191,36,.85); border-color:rgba(251,191,36,.9); }
+      @media (min-width:720px){
+        .jsy-flow{ display:grid; grid-template-columns:150px minmax(0,1fr); column-gap:1.15rem; }
+        .jsy-rail{
+          grid-column:1; grid-row:1 / span 99; align-self:start; top:.9rem;
+          flex-direction:column; align-items:stretch; width:auto; max-width:none; margin:1.2rem 0 0;
+          border-radius:16px; padding:.55rem .55rem;
+        }
+        .jsy-rail-track{ flex-direction:column; align-items:stretch; }
+        .jsy-dot{ width:100%; height:auto; min-height:38px; justify-content:flex-start; gap:.5rem; padding:0 .35rem; }
+        .jsy-dot-label{
+          display:block; font-family:var(--fm); font-size:.72rem; font-weight:700;
+          color:rgba(241,233,213,.65); white-space:nowrap;
+        }
+        .jsy-dot.on .jsy-dot-label, .jsy-dot.read .jsy-dot-label{ color:#f1e9d5; }
+        .jsy-rail-now{ display:none; }
+        .jsy-rail.done .jsy-rail-track::before{
+          left:.72rem; right:auto; top:19px; bottom:19px; width:1.5px; height:auto; transform:none;
+        }
+        .jsy-top, .jsy-ch, .jsy-done{ grid-column:2; }
+      }
+      /* Chapters — headers are scene text (dark scene both themes);
+         breathing room between chapters lets the light change land. */
+      .jsy-ch{ padding-top:24vh; }
+      .jsy-ch:first-of-type{ padding-top:6vh; }
+      .jsy-chhead{ background:none; border:none; padding:0 .4rem; margin-bottom:1.1rem; max-width:560px; }
+      .jsy-cheyebrow{
+        font-family:var(--fm); font-size:.6rem; font-weight:800; letter-spacing:.22em;
+        text-transform:uppercase; color:#fbbf24; margin-bottom:.4rem;
+        text-shadow:0 1px 8px rgba(0,0,0,.55);
+      }
+      .jsy-chtitle{
+        font-family:Georgia,'Times New Roman',serif; font-size:1.32rem; font-weight:400;
+        line-height:1.35; color:#f1e9d5; margin:0; text-shadow:0 1px 10px rgba(0,0,0,.55);
+      }
+      /* Beats — interface layer: token surfaces, fade-up reveal. */
+      .jsy-beat{
+        background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px;
+        padding:.85rem 1rem; margin:0 0 .8rem; max-width:560px;
+        font-family:var(--fm); font-size:.88rem; line-height:1.7; color:var(--tx);
+        opacity:0; transform:translateY(14px);
+        transition:opacity .5s ease, transform .5s ease, background-color .6s linear, border-color .6s linear;
+      }
+      .jsy-beat.seen{ opacity:1; transform:none; }
+      .jsy-chhead.jsy-beat{ background:none; border:none; }
+      /* The Cross: content plates take a SECOND, shallower darkening
+         curve (dark theme only — light keeps paper) so they integrate
+         with the receding scene instead of glowing; the gold border is
+         the last visible light. Plate floor #12100f (text stays AA). */
+      #jesusStoryWrap[data-dark="2"] .jsy-ch--cross .jsy-beat{ background:#191410; border-color:rgba(251,191,36,.12); }
+      #jesusStoryWrap[data-dark="3"] .jsy-ch--cross .jsy-beat{ background:#16120e; border-color:rgba(251,191,36,.15); }
+      #jesusStoryWrap[data-dark="4"] .jsy-ch--cross .jsy-beat{ background:#14110d; border-color:rgba(251,191,36,.18); }
+      #jesusStoryWrap[data-dark="5"] .jsy-ch--cross .jsy-beat{ background:#12100f; border-color:rgba(251,191,36,.2); }
+      #jesusStoryWrap[data-dark="2"] .jsy-ch--cross .jsy-chhead,
+      #jesusStoryWrap[data-dark="3"] .jsy-ch--cross .jsy-chhead,
+      #jesusStoryWrap[data-dark="4"] .jsy-ch--cross .jsy-chhead,
+      #jesusStoryWrap[data-dark="5"] .jsy-ch--cross .jsy-chhead{ background:none; border:none; }
+      .jsy-subhead{
+        background:none; border:none; padding:0 .4rem; margin:1.3rem 0 .7rem;
+        font-family:var(--fm); font-size:.62rem; font-weight:800; letter-spacing:.2em;
+        text-transform:uppercase; color:#fbbf24; text-shadow:0 1px 8px rgba(0,0,0,.55);
+      }
+      .jsy-ref{ font-family:var(--fm); font-size:.7rem; font-weight:700; color:#fbbf24; margin-top:.3rem; }
+      .jsy-event-name{ font-weight:700; font-size:.86rem; margin-bottom:.15rem; }
+      .jsy-event-detail{ font-size:.8rem; color:var(--tx2); line-height:1.6; }
+      .jsy-word{ border-left:3px solid #9f1239; }
+      .jsy-word-quote{
+        font-family:Georgia,'Times New Roman',serif; font-style:italic; font-size:1.02rem;
+        line-height:1.6; color:var(--tx); margin:0;
+      }
+      .jsy-word-meaning{ font-size:.8rem; color:var(--tx2); line-height:1.6; margin-top:.4rem; }
+      .jsy-aside{
+        border-left:3px solid #9f1239; font-family:Georgia,serif; font-style:italic;
+        font-size:.86rem; color:var(--tx2);
+      }
+      .jsy-group-label{
+        font-family:var(--fm); font-size:.62rem; font-weight:800; letter-spacing:.16em;
+        text-transform:uppercase; color:var(--tx3); margin-bottom:.5rem;
+      }
+      .jsy-group-list{ margin:0; padding-left:1.1rem; }
+      .jsy-group-list li{ font-size:.8rem; color:var(--tx2); line-height:1.55; margin-bottom:.3rem; }
+      .jsy-chip-row{ display:flex; flex-wrap:wrap; gap:.35rem; }
+      .jsy-chip{
+        font-family:var(--fm); font-size:.72rem; font-weight:700; color:var(--tx2);
+        border:1px solid var(--card-border); border-radius:999px; padding:.25rem .6rem;
+      }
+      .jsy-sig{ display:flex; gap:.5rem; align-items:flex-start; margin-bottom:.45rem; }
+      .jsy-sig-tag{
+        flex-shrink:0; font-family:var(--fm); font-size:.66rem; font-weight:700; color:var(--tx);
+        background:rgba(159,18,57,.12); border-radius:4px; padding:.15rem .4rem;
+      }
+      .jsy-sig-body{ font-size:.78rem; color:var(--tx2); line-height:1.55; }
+      /* Prophecy seals — gold wax-seal chips, expand in place. */
+      .jsy-seal-row{ display:flex; flex-wrap:wrap; gap:.4rem; }
+      .jsy-seal{
+        min-height:44px; border-radius:999px; cursor:pointer; font-family:var(--fm);
+        font-size:.74rem; font-weight:700; padding:.4rem .8rem;
+        background:rgba(251,191,36,.09); border:1px solid rgba(251,191,36,.4); color:#fbbf24;
+      }
+      .jsy-seal[aria-expanded="true"]{ background:rgba(251,191,36,.18); }
+      .jsy-seal-pop{
+        margin-top:.6rem; padding:.7rem .8rem; border-radius:10px;
+        background:var(--bg); border:1px solid var(--card-border); border-left:3px solid #9f1239;
+      }
+      .jsy-pop-title{ font-size:.84rem; font-weight:700; color:var(--tx); }
+      .jsy-pop-ref{ font-family:var(--fm); font-size:.72rem; font-weight:700; color:#fbbf24; margin:.2rem 0 .3rem; }
+      .jsy-pop-line{ font-size:.78rem; color:var(--tx2); line-height:1.55; }
+      .jsy-pop-door{
+        margin-top:.55rem; min-height:44px; border-radius:999px; cursor:pointer;
+        font-family:var(--fm); font-size:.75rem; font-weight:700; padding:.4rem .9rem;
+        background:transparent; border:1px solid rgba(159,18,57,.45); color:var(--tx);
+      }
+      /* Titles Constellation — a scene-lite night panel (both themes);
+         stars carry NO persistent labels (10 labels can't fit 340px) —
+         the tap card below reveals each title. */
+      .jsy-const{
+        background:linear-gradient(180deg,#0a0e20 0%,#141129 100%);
+        border:1px solid rgba(251,191,36,.18); padding:1rem .9rem 1.1rem; border-radius:16px;
+      }
+      .jsy-const-eyebrow{
+        font-family:var(--fm); font-size:.62rem; font-weight:800; letter-spacing:.2em;
+        text-transform:uppercase; color:#fbbf24; margin-bottom:.3rem;
+      }
+      .jsy-const-hint{ font-family:var(--fm); font-size:.76rem; color:rgba(241,233,213,.7); margin-bottom:.4rem; }
+      #jsyConstSvg{ display:block; width:100%; max-width:430px; height:auto; margin:0 auto; }
+      .jsy-star{ cursor:pointer; opacity:.5; transition:opacity .3s; }
+      .jsy-star.lit{ opacity:1; }
+      .jsy-star:focus-visible{ outline:none; }
+      .jsy-star:focus-visible .jsy-hit{ stroke:#fbbf24; stroke-width:1.5; stroke-dasharray:3 3; }
+      .jsy-link{
+        stroke:rgba(251,191,36,.5); stroke-width:1.2; fill:none;
+        stroke-dasharray:420; stroke-dashoffset:420; animation:jsyDraw 1.6s ease forwards;
+      }
+      .jsy-link.still{ stroke-dashoffset:0; animation:none; }
+      @keyframes jsyDraw{ to{ stroke-dashoffset:0; } }
+      .jsy-const-count{ font-family:var(--fm); font-size:.7rem; font-weight:700; color:rgba(241,233,213,.6); text-align:center; margin-top:.3rem; }
+      .jsy-const-card{
+        margin-top:.7rem; padding:.85rem .95rem; border-radius:12px;
+        background:rgba(9,9,16,.55); border:1px solid rgba(251,191,36,.22);
+      }
+      .jsy-tc-title{ font-family:Georgia,serif; font-size:1.02rem; color:#f1e9d5; margin-bottom:.3rem; }
+      .jsy-tc-meaning{ font-family:var(--fm); font-size:.8rem; color:rgba(241,233,213,.78); line-height:1.6; margin-bottom:.5rem; }
+      .jsy-tc-langs{ display:flex; flex-wrap:wrap; gap:.35rem; margin-bottom:.35rem; }
+      .jsy-tc-lang{
+        font-family:var(--fm); font-size:.68rem; font-weight:700; color:#fbbf24;
+        border:1px solid rgba(251,191,36,.3); border-radius:999px; padding:.2rem .55rem;
+      }
+      .jsy-tc-ref{ font-family:var(--fm); font-size:.72rem; font-weight:700; color:rgba(251,191,36,.75); }
+      .jsy-const-settle{
+        font-family:Georgia,serif; font-style:italic; font-size:.95rem; color:#f1e9d5;
+        text-align:center; margin-top:.7rem;
+      }
+      /* Completion — settle register: a quiet card, three doors. */
+      .jsy-done{
+        max-width:560px; margin:1.4rem 0 0; padding:1.3rem 1.1rem; border-radius:16px;
+        background:var(--card-bg); border:1px solid rgba(251,191,36,.25); text-align:center;
+        opacity:0; transition:opacity .8s ease;
+      }
+      .jsy-done.seen{ opacity:1; }
+      .jsy-done-title{ font-family:Georgia,serif; font-size:1.15rem; color:var(--tx); margin-bottom:.3rem; }
+      .jsy-done-sub{ font-family:var(--fm); font-size:.8rem; color:var(--tx2); margin-bottom:.9rem; }
+      .jsy-done-doors{ display:flex; flex-direction:column; gap:.5rem; }
+      @media (min-width:720px){ .jsy-done-doors{ flex-direction:row; justify-content:center; } }
+      .jsy-door{
+        min-height:44px; border-radius:999px; cursor:pointer; font-family:var(--fm);
+        font-size:.78rem; font-weight:700; padding:.5rem 1rem;
+        background:transparent; border:1px solid rgba(159,18,57,.45); color:var(--tx);
+      }
+      .jsy-door:hover{ background:rgba(159,18,57,.08); }
+      .jsy-dot:focus-visible, .jsy-seal:focus-visible, .jsy-escape:focus-visible,
+      .jsy-resume:focus-visible, .jsy-door:focus-visible, .jsy-pop-door:focus-visible,
+      .jsy-viewlink:focus-visible{ outline:2px solid #fbbf24; outline-offset:2px; }
+      /* Reduced motion — scenes switch instantly, beats render
+         immediately, the dawn is an instant state, no line-draw. */
+      @media (prefers-reduced-motion: reduce){
+        .jsy-beat{ opacity:1 !important; transform:none !important; transition:none !important; }
+        .jsy-bg, .jsy-dark, .jsy-dawn, .jsy-done{ transition:none !important; }
+        .jsy-link{ animation:none !important; stroke-dashoffset:0 !important; }
+      }
+      /* Light mode — beats/doors go paper; the scene, rail, top chrome
+         and constellation stay their hardcoded dark scene-lite selves.
+         [data-dark] beats: paper plates hold through the darkening
+         (white-on-black is the deliberate light-theme Cross look). */
+      :root.light .jsy-beat{ background:#ffffff; border-color:rgba(15,23,42,.10); }
+      :root.light .jsy-chhead.jsy-beat, :root.light .jsy-subhead{ background:none; border:none; }
+      :root.light #jesusStoryWrap[data-dark] .jsy-ch--cross .jsy-beat{ background:#ffffff; border-color:rgba(15,23,42,.10); }
+      :root.light #jesusStoryWrap[data-dark] .jsy-ch--cross .jsy-chhead{ background:none; border:none; }
+      :root.light .jsy-ref{ color:#92400e; }
+      :root.light .jsy-seal{ background:rgba(146,64,14,.07); border-color:rgba(146,64,14,.45); color:#92400e; }
+      :root.light .jsy-seal-pop{ background:#ffffff; border-color:rgba(15,23,42,.12); border-left-color:#9f1239; }
+      :root.light .jsy-pop-ref{ color:#92400e; }
+      :root.light .jsy-done{ background:#ffffff; border-color:rgba(146,64,14,.3); }
+      :root.light .jsy-viewlink{ background:#ffffff; border-color:rgba(15,23,42,.12); }
     </style>
     <div id="jesusMeetHost"></div>
     <div id="jesusCardContainer"></div>
@@ -21618,6 +21947,13 @@
 <script defer src="/app/js/quick-prayers.js"></script>
 <script defer src="/app/js/worship.js"></script>
 <script defer src="/app/js/faith-resources.js"></script>
+<!-- The Story scrollytelling (2026-07-05) — Who Is Jesus seven-chapter
+     scroll journey over JESUS_DATA. bfTab('jesus') in faith.js calls
+     renderJesusStory typeof-guarded, so ordering after faith.js is a
+     grouping choice, not a hard dependency. Uses ckBuildStar/ckCurvePath
+     (constellation-kit.js, later in this block) typeof-guarded with an
+     SVG fallback. -->
+<script defer src="/app/js/jesus-story.js"></script>
 <script defer src="/app/js/parent.js"></script>
 <!-- Part B Phase 3 — Parent Celestial Home renderer. Defines
      window.renderParentCelestialHome which renderParentHubHome()
