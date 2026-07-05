@@ -75,6 +75,10 @@ const DEF = {
   // Object, never array (the scrReadDays lesson).
   bibleLast:null,
   bibleRead:{},
+  // Meet Jesus rebuild (2026-07-04) — "In His Own Words" reader resume
+  // index into RED_LETTERS (0-based). In DEF so a tired reader lands
+  // back on statement 14, not statement 1.
+  jwIdx:0,
   // F2-F memory verses with SM-2-lite scheduling.
   // Each entry: { id, reference, text, category, ease, intervalDays, nextDue (ISO date),
   //               lastReviewed, mastered, masteredAt, createdAt, totalReviews, correctReviews }

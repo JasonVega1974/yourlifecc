@@ -187,6 +187,10 @@ Default body line-height `1.55`. Paragraph spacing = `0.75 × line-height` (≈1
 | `--radius-xl` | 24px | Hero card, modal, drawer |
 | `--radius-full` | 9999px | Pills, avatar, FAB |
 
+**Faith gold register (2026-07-04 — doc catches up to as-built reality):** gold `#fbbf24` (dark) / amber-800 `#92400e` (light) is the ESTABLISHED accent for faith-surface eyebrows, scripture references, and focus rings (the Well VOTD, Bible resume card, journey eyebrows, Meet Jesus, worship). This is distinct from the Parent-Portal amber CTA carve-out below, which governs amber as a *button fill* — the faith gold register is typographic/structural. The §1 indigo/teal pairing remains the target for a future faith-accent migration; until that migration is scheduled, new faith surfaces should match their gold-register neighbors, not fork.
+
+**Red-letter register exception (2026-07-04 — scoped like the Parent-Portal amber):** the Meet Jesus surface may use wine `#9f1239` as a STRUCTURAL accent only — left borders, quote glyphs, low-alpha washes — never as text color and never as a general palette entry. It is deliberately hue/saturation-distanced from `--error` `#ef4444`; do not "unify" them, and do not reuse `--error` decoratively (the old JESUS_LESSONS drift was corrected in the same commit). Faith imagery rule, codified: no stock Jesus imagery, no paintings-as-heroes, no crosses/doves/praying-hands clip-art on faith surfaces — text and scene treatments are the visual vocabulary.
+
 **Scene-layer theme exemption (2026-07-04 — this is the ruling):** full-screen night-scene overlays are deliberately theme-INDEPENDENT (hardcoded hex, no `:root.light` pass): `#prayerFocusOverlay`, `#breathPrayerOverlay`, `#lifeClimbOverlay`, `#ccWalkOverlay`, `#fzJourneyHome`, the Well. A starfield that inverts to a pale sky in light mode is a bug, not a theme. Do not "fix" these in a light-mode audit. Their entry points (pickers, tabs, cards) remain interface-layer and MUST theme-adapt.
 
 **As-built card radius scale (2026-07-04 unification — this is the ruling):**

@@ -848,7 +848,7 @@ function bfTab(tab, btn){
   if(tab==='reading'){ populateBibleBooks(); renderBibleReadings(); }
   if(tab==='bible'){ initEsvBible(); _bfBibleSubTab(_bibleSubTab); }
   if(tab==='journey') renderFaithJourney();
-  if(tab==='jesus') renderJesusCard();
+  if(tab==='jesus'){ renderJesusCard(); if(typeof renderMeetJesus === 'function') renderMeetJesus(); }
   if(tab==='denominations') renderDenominationsCard();
   if(tab==='learnBible') renderLearnBibleGrid();
   if(tab==='plans') _bfPlansSubTab(_plansSubTab);
@@ -3129,7 +3129,7 @@ const JESUS_LESSONS = [
     body:`<h4>You Were Made on Purpose, for a Purpose</h4><p><i>"For we are God's handiwork, created in Christ Jesus to do good works, which God prepared in advance for us to do"</i> (Ephesians 2:10).</p><h4>How to Find It</h4><p>Purpose is discovered at the intersection of three things: <b>What you're good at</b> (your gifts), <b>what breaks your heart</b> (the problems you can't ignore), and <b>what the world needs</b>. When all three overlap, you've found your purpose.</p><h4>Living with Purpose</h4><p>A nurse who treats every patient as made in God's image is living with purpose. An engineer who builds safe bridges is living with purpose. Whatever you do, do it as if you're doing it for God — because you are. <i>"Whatever you do, work at it with all your heart, as working for the Lord"</i> (Colossians 3:23).</p>`},
   {icon:'🕊️',title:'The Holy Spirit — God Living in You',color:'#06b6d4',
     body:`<h4>Who Is the Holy Spirit?</h4><p>The Holy Spirit is the third person of the Trinity — not a force or a feeling, but God himself living inside every believer. When Jesus left earth, he promised to send the Spirit as a helper, guide, and comforter.</p><h4>What the Spirit Does</h4><p><b>Guides you:</b> Have you ever felt a strong nudge to do the right thing, or a warning to stop? That's often the Spirit. <b>Convicts you:</b> That uncomfortable feeling when you've done something wrong? That's the Spirit's way of course-correcting. <b>Empowers you:</b> The courage to forgive, the strength to resist temptation, the ability to love people you normally couldn't — that's supernatural power.</p><h4>The Fruit of the Spirit</h4><p><i>"The fruit of the Spirit is love, joy, peace, patience, kindness, goodness, faithfulness, gentleness, and self-control"</i> (Galatians 5:22-23). These qualities grow in you as you walk with God.</p>`},
-  {icon:'🛡️',title:'Spiritual Warfare — The Battle for Your Mind',color:'#ef4444',
+  {icon:'🛡️',title:'Spiritual Warfare — The Battle for Your Mind',color:'#b45309',
     body:`<h4>You Are in a Battle</h4><p>Whether you realize it or not, there is a battle happening for your mind, your identity, and your purpose. The Bible says the enemy comes to steal, kill, and destroy (John 10:10) — but Jesus came to give life.</p><h4>The Armor of God</h4><p>Ephesians 6 describes spiritual armor: <b>Truth</b> protects your mind from lies. <b>Righteousness</b> guards your heart. <b>Peace</b> keeps you steady. <b>Faith</b> deflects attacks. <b>Salvation</b> protects your identity. <b>The Word of God</b> is your only offensive weapon.</p><h4>Practical Application</h4><p>When you feel anxious, fearful, or defeated — that's often a spiritual attack, not just emotions. Combat it with truth: "God has not given me a spirit of fear" (2 Timothy 1:7). Read scripture. Pray. Talk to someone you trust. You are not fighting alone.</p>`},
   {icon:'⛪',title:'The Church — Why Community Matters',color:'#38bdf8',
     body:`<h4>What Is the Church?</h4><p>The church is not a building — it's people. Every believer is part of one global family. The church exists to worship God together, learn together, serve together, and hold each other accountable.</p><h4>Why You Need It</h4><p>Faith was never meant to be a solo journey. You need people who will pray for you when you're struggling, celebrate with you when you're winning, and tell you the truth when you're off track. <i>"As iron sharpens iron, so one person sharpens another"</i> (Proverbs 27:17).</p><h4>Finding Your Place</h4><p>No church is perfect because churches are full of imperfect people. Look for a community that teaches the Bible, genuinely cares for people, and challenges you to grow. Your involvement doesn't have to start big — just show up consistently.</p>`},
@@ -3141,7 +3141,7 @@ const JESUS_LESSONS = [
     body:`<h4>What Is the Bible?</h4><p>The Bible is not just an ancient religious text — Christians believe it is God's direct communication to humanity. <i>"All Scripture is God-breathed and is useful for teaching, rebuking, correcting and training in righteousness"</i> (2 Timothy 3:16). God used approximately 40 human authors over 1,500 years — yet the message is unified.</p><h4>Why It Still Matters</h4><p>The Bible outsells every book in history every year. But more than popularity — it is the only book that has been proven historically accurate through archaeology, fulfilled prophecy, and manuscript evidence. The New Testament alone has over 5,800 Greek manuscripts, far more than any other ancient text.</p><h4>How to Read It</h4><p>Don't start at Genesis. Start with John — it tells you who Jesus is clearly. Then Proverbs for daily wisdom. Then Romans to understand the gospel deeply. Let it speak to your specific situation: search for what you need. It speaks to every human experience.`},
   {icon:'🙏',title:'How to Pray — Real Conversation with God',color:'#22c55e',
     body:`<h4>What Prayer Actually Is</h4><p>Prayer is not a religious ritual or magic formula. It is a conversation with God — the most powerful being in the universe who also knows every hair on your head and cares about your smallest worry.</p><h4>The Lord's Prayer as a Template</h4><p>Jesus gave his disciples a model prayer (Matthew 6:9-13): Start with <b>worship</b> ("Our Father in heaven, hallowed be your name"). Pray for <b>God's will</b> ("your kingdom come"). Bring your <b>needs</b> ("give us today our daily bread"). Ask for <b>forgiveness</b> and extend it. Ask for <b>protection</b> from temptation.</p><h4>Practical Tips</h4><p>Pray out loud or write it down — both help focus. Be honest. God already knows your thoughts, so pretending is pointless. Start with gratitude before requests. Set a specific time daily. Even 5 minutes changes your day. You don't need fancy words — just be real.`},
-  {icon:'⚡',title:'The Resurrection — Everything Depends on It',color:'#ef4444',
+  {icon:'⚡',title:'The Resurrection — Everything Depends on It',color:'#b45309',
     body:`<h4>The Central Claim</h4><p>Christianity rises or falls on one event: the resurrection of Jesus. Paul wrote, <i>"If Christ has not been raised, your faith is futile; you are still in your sins"</i> (1 Corinthians 15:17). No other religion makes this claim — a founder who died and physically came back.</p><h4>Evidence for the Resurrection</h4><p>The tomb was empty — even Jesus's enemies acknowledged this. Over 500 people saw Jesus alive after his death (1 Corinthians 15:6). The disciples were transformed from hiding in fear to dying for their testimony. People die for beliefs — but rarely for something they know is a lie.</p><h4>What It Means for You</h4><p>The resurrection means death is not the final word. It means Jesus has power over the very thing we fear most. And it means the same power that raised Jesus from the dead is available to you — to transform your life, restore broken things, and give you real hope.`},
   {icon:'🌱',title:'Growing in Your Faith — Discipleship',color:'#10b981',
     body:`<h4>What Is a Disciple?</h4><p>A disciple is not just someone who believes — it's someone who follows. Jesus said "Follow me" — not just "agree with me." The goal of Christian faith is not to check a box but to be transformed, day by day, into someone who thinks, loves, and acts more like Jesus.</p><h4>The Four Essentials</h4><p><b>Word:</b> Read the Bible regularly — it renews your mind. <b>Prayer:</b> Talk to God daily — it aligns your will with His. <b>Community:</b> Do life with other believers — it sharpens you. <b>Service:</b> Use your gifts to help others — it deepens your faith.</p><h4>The Long Game</h4><p>Discipleship is not a sprint. It's a lifetime of small choices — choosing truth over lies, love over selfishness, faith over fear — every single day. You won't be perfect. But you will grow. And the person you become in 10 years of walking with God is the most important investment you'll ever make.`},
@@ -3168,7 +3168,7 @@ const LEARN_BIBLE_LESSONS = [
     body:`<h4>Three Approaches</h4><p><b>Book Study:</b> Pick one book and read through it over days/weeks. Start with a short one: James (5 chapters), Philippians (4 chapters), or 1 John (5 chapters). Read a chapter per day.</p><p><b>Topic Study:</b> Pick a topic (forgiveness, fear, purpose) and look up every verse about it. Use a concordance or search tool. Write down what you learn.</p><p><b>Character Study:</b> Pick a person (David, Ruth, Paul, Peter) and read their story. Note their strengths, weaknesses, how God used them, and what you can learn.</p><h4>The Right Pace</h4><p>Quality over quantity. It's better to deeply read 5 verses than to skim 5 chapters. Stop when something strikes you. Sit with it. Ask God what he's saying through it.</p>`},
   {icon:'🗓️',title:'Bible Reading Plans',color:'#f59e0b',
     body:`<h4>Popular Plans</h4><p><b>One Year Bible:</b> Read the entire Bible in 365 days — about 15 minutes/day. Covers OT, NT, Psalms, and Proverbs daily.</p><p><b>Chronological:</b> Read the Bible in the order events happened (not the order books appear). Helps you understand the timeline.</p><p><b>Gospel-First:</b> Start with all 4 Gospels, then Acts, then Letters, then OT. Helps you see everything through Jesus.</p><h4>Building the Habit</h4><p>Same time every day. Same place. Start small — even 5 minutes counts. Don't read to check a box; read to hear from God. If you miss a day, don't try to "catch up" — just pick up where you left off. Consistency beats perfection.</p>`},
-  {icon:'🤔',title:'Hard Questions About the Bible',color:'#ef4444',
+  {icon:'🤔',title:'Hard Questions About the Bible',color:'#b45309',
     body:`<h4>Is the Bible Reliable?</h4><p>The Bible has more manuscript evidence than any other ancient text. Over 5,800 Greek manuscripts of the New Testament exist, the earliest dating within decades of the originals. For comparison, most ancient texts have fewer than 10 copies.</p><h4>What About Contradictions?</h4><p>Most "contradictions" are differences in perspective (like eyewitness accounts of the same event). Some are translation nuances. Serious study resolves most. Some remain mysteries — and that's okay. Faith doesn't require understanding everything.</p><h4>Is It All Literal?</h4><p>The Bible contains multiple genres: history (meant literally), poetry (meant metaphorically), prophecy (symbolic imagery), proverbs (general wisdom, not promises), and letters (practical instruction). Reading everything the same way misses the point. Context determines how to read each passage.</p>`},
   {icon:'💬',title:'Memorizing Scripture — Why and How',color:'#10b981',
     body:`<h4>Why Memorize?</h4><p>When anxiety hits at 2am, you can't Google fast enough. When temptation comes, you need truth already loaded. When a friend is hurting, the right verse at the right time changes everything. Scripture in your memory is available anytime, anywhere.</p><h4>How to Do It</h4><p><b>Start with 5 power verses:</b> John 3:16, Philippians 4:13, Proverbs 3:5-6, Romans 8:28, Jeremiah 29:11. These cover love, strength, trust, purpose, and hope.</p><p><b>The method:</b> Write the verse on a card. Read it aloud 5 times. Cover it and try to recite. Review yesterday's verse before adding a new one. After a week, you'll know it for life.</p><p><b>Make it stick:</b> Set it as your phone wallpaper. Write it on your bathroom mirror. Say it before meals. Teach it to someone else — teaching is the fastest way to memorize.</p>`},
@@ -3178,7 +3178,7 @@ const LEARN_BIBLE_LESSONS = [
     body:`<h4>One Unified Story</h4><p>The Bible is not a random collection of writings — it is one story told across 66 books. That story has four acts:</p><p><b>Creation:</b> God makes a perfect world and humans to share it with. They are made in His image with purpose and dignity. <b>Fall:</b> Humans choose independence from God. Sin, suffering, and death enter the world. Everything breaks.</p><p><b>Redemption:</b> God immediately begins a rescue plan. He calls Abraham, forms a nation (Israel), gives the Law, sends prophets — all pointing toward the ultimate rescue: Jesus. Jesus lives, dies, and rises to restore what was broken. <b>Restoration:</b> One day, everything is made new. No more suffering, death, or separation from God. The story ends where it began — humans and God together in a perfect world.</p><h4>Where You Are in the Story</h4><p>You are living in Act 3, between the resurrection and the final restoration. You are part of the rescue mission — a new creation called to bring glimpses of the restored world into the broken one.`},
   {icon:'🔑',title:'Key Verses Everyone Should Know',color:'#a78bfa',
     body:`<h4>The Gospel in One Verse</h4><p><b>John 3:16 —</b> "For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life."</p><h4>Identity</h4><p><b>Psalm 139:14 —</b> "I am fearfully and wonderfully made." <b>2 Corinthians 5:17 —</b> "If anyone is in Christ, the new creation has come."</p><h4>Strength and Peace</h4><p><b>Philippians 4:13 —</b> "I can do all this through him who gives me strength." <b>Philippians 4:6-7 —</b> "Do not be anxious about anything... the peace of God will guard your hearts."</p><h4>Trust and Purpose</h4><p><b>Proverbs 3:5-6 —</b> "Trust in the LORD with all your heart and lean not on your own understanding." <b>Jeremiah 29:11 —</b> "For I know the plans I have for you — plans to give you hope and a future." <b>Romans 8:28 —</b> "In all things God works for the good of those who love him."</p>`},
-  {icon:'📜',title:'The 10 Commandments — Still Relevant?',color:'#ef4444',
+  {icon:'📜',title:'The 10 Commandments — Still Relevant?',color:'#b45309',
     body:`<h4>The Original Ten</h4><p>God gave Moses ten commands that have shaped civilization more than any other document. They fall in two groups: the first four govern our relationship with God, the last six govern our relationships with people.</p><p><b>God-focused:</b> No other gods. No idols. Don't misuse God's name. Keep the Sabbath. <b>People-focused:</b> Honor your parents. Don't murder. Don't commit adultery. Don't steal. Don't lie. Don't covet.</p><h4>Jesus's Summary</h4><p>Jesus compressed all ten into two: Love God with everything you have. Love your neighbor as yourself. If you do both, all ten are covered.</p><h4>Are They Still Binding?</h4><p>Christians are not under the Law as a means of salvation — Jesus fulfilled the Law. But the moral principles (don't murder, don't steal, etc.) reflect God's unchanging character and are reinforced in the New Testament. They show us what love looks like in action.`},
   {icon:'🌊',title:'Major Themes Across the Whole Bible',color:'#06b6d4',
     body:`<h4>Covenant</h4><p>God makes binding promises — covenants — with his people. With Noah (never flood the whole earth again). With Abraham (a great nation and blessing to all peoples). With Moses (law and land). With David (an eternal king from his line). With everyone through Jesus (forgiveness and eternal life). Each covenant builds on the last.</p><h4>Redemption</h4><p>From Exodus (freeing slaves from Egypt) to the cross (freeing people from sin), redemption runs through every book. God is always in the business of rescuing people from bondage and restoring them to freedom.</p><h4>The Presence of God</h4><p>The central longing of the Bible is for God and humans to be together. Eden — they walked with God. Exodus — the tabernacle, God among the camp. Temple — God's house in Jerusalem. Jesus — God became human. Holy Spirit — God living inside believers. New Jerusalem — God with his people forever.`},
@@ -9439,6 +9439,185 @@ function _bsRenderLesson(out, lesson, track){
 function _jEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 // ── WHO IS JESUS? ─────────────────────────────────────────────
+
+// ════════════════════════════════════════════════════════════
+// Meet Jesus experiential layer (2026-07-04 rebuild).
+// DECISIONS (pre-build ux review — do not re-litigate casually):
+//  • Scope: Youth+ (12-22). A Kids-tier Meet Jesus is a deferred,
+//    separate surface — this one keeps its register.
+//  • Whole surface is SETTLE — no XP, no toasts, no celebration FX.
+//    (The old +5 XP path belonged to the orphaned JESUS_LESSONS dead
+//    code and stays dead; do not resurrect it here.)
+//  • "In His Own Words" is a RESUMABLE READER — position persists in
+//    D.jwIdx (DEF) — deliberately NOT a swipe deck (the Convince Me
+//    deck precedent has no resume; 24 statements need one).
+//  • Red-letter register: wine #9f1239, STRUCTURAL ONLY (border,
+//    glyph, wash) — never text (small-text contrast + --error
+//    distance both solved by never coloring words). Documented
+//    exception in docs/design-system.md.
+//  • Hero is text — one illuminated line, no imagery (house rule).
+// The existing JESUS_DATA tab card stays untouched below as the
+// "Go deeper" study layer.
+// FOLLOW-UP (filed 2026-07-04, post-build ux review): the untouched
+// study card's bright purple-gradient header + violet pills clash
+// with this layer's restrained wine/gold register two scrolls below
+// it. Deliberately deferred, NOT silently accepted — restyle the
+// study card header into the same register in a future pass.
+// ════════════════════════════════════════════════════════════
+var _jwKeysWired = false;
+
+function renderMeetJesus(){
+  var host = document.getElementById('jesusMeetHost');
+  if(!host) return;
+  if(host.dataset.view === 'reader'){ jwRender(); return; }
+  if(host.dataset.view === 'questions'){ mjOpenQuestions(); return; }
+  _mjRenderLanding();
+}
+
+function _mjRenderLanding(){
+  var host = document.getElementById('jesusMeetHost');
+  if(!host) return;
+  host.dataset.view = 'landing';
+  var n = (typeof RED_LETTERS !== 'undefined' && Array.isArray(RED_LETTERS)) ? RED_LETTERS.length : 0;
+  var idx = (typeof D !== 'undefined' && D && typeof D.jwIdx === 'number') ? D.jwIdx : 0;
+  var resume = idx > 0 && idx < n;
+  host.innerHTML =
+    '<div class="mj-hero">' +
+      '<div class="mj-hero-eyebrow">In his own words</div>' +
+      '<blockquote class="mj-hero-line">&ldquo;Come to me, all who labor and are heavy laden, and I will give you rest.&rdquo;</blockquote>' +
+      '<div class="mj-hero-ref">&mdash; Jesus of Nazareth &middot; Matthew 11:28</div>' +
+    '</div>' +
+    '<div class="mj-doors">' +
+      (n ? '<button type="button" class="mj-door" onclick="jwOpenReader()">' +
+        '<span class="mj-door-title">In His Own Words</span>' +
+        '<span class="mj-door-sub">' + (resume ? ('Pick up where you left off — ' + (idx + 1) + ' of ' + n + ' &rarr;') : (n + ' things he actually said, and why they landed hard.')) + '</span>' +
+      '</button>' : '') +
+      ((typeof JESUS_QUESTIONS !== 'undefined' && JESUS_QUESTIONS.length) ? '<button type="button" class="mj-door" onclick="mjOpenQuestions()">' +
+        '<span class="mj-door-title">Honest Questions</span>' +
+        '<span class="mj-door-sub">Was he real? Did he claim to be God? Asked straight, answered straight.</span>' +
+      '</button>' : '') +
+    '</div>' +
+    '<div class="mj-deeper-label">GO DEEPER &mdash; HIS LIFE &middot; THE CROSS &middot; TEACHINGS &middot; NAMES</div>';
+}
+
+// ── In His Own Words — resumable reader ──────────────────────
+function jwOpenReader(){
+  var host = document.getElementById('jesusMeetHost');
+  if(!host || typeof RED_LETTERS === 'undefined') return;
+  host.dataset.view = 'reader';
+  jwRender();
+}
+function jwRender(){
+  var host = document.getElementById('jesusMeetHost');
+  if(!host || typeof RED_LETTERS === 'undefined' || !RED_LETTERS.length) return;
+  var n = RED_LETTERS.length;
+  var idx = (typeof D !== 'undefined' && D && typeof D.jwIdx === 'number') ? D.jwIdx : 0;
+  idx = Math.max(0, Math.min(n - 1, idx));
+  // Self-heal a stale/corrupt stored index (e.g. the list shrank) so
+  // Prev/Next step from the clamped position, not the phantom one.
+  if(typeof D !== 'undefined' && D && D.jwIdx !== idx) D.jwIdx = idx;
+  var s = RED_LETTERS[idx];
+  host.innerHTML =
+    '<button type="button" class="mj-back" onclick="_mjRenderLanding()">&larr; Meet Jesus</button>' +
+    '<div class="jw-card">' +
+      '<div class="jw-eyebrow">' + _jEsc(s.group) + '</div>' +
+      '<blockquote class="jw-words">&ldquo;' + _jEsc(s.text) + '&rdquo;</blockquote>' +
+      '<div class="jw-ref">&mdash; ' + _jEsc(s.ref) + '</div>' +
+      '<div class="jw-scene">' + _jEsc(s.scene) + '</div>' +
+      '<div class="jw-then">' + _jEsc(s.then) + '</div>' +
+    '</div>' +
+    '<div class="jw-nav">' +
+      '<button type="button" class="jw-nav-btn" onclick="jwPrev()"' + (idx === 0 ? ' disabled' : '') + '>&lsaquo; Prev</button>' +
+      '<span class="jw-pos" aria-live="polite">' + (idx + 1) + ' of ' + n + '</span>' +
+      '<button type="button" class="jw-nav-btn" onclick="jwNext()"' + (idx === n - 1 ? ' disabled' : '') + '>Next &rsaquo;</button>' +
+    '</div>';
+  _jwWireKeys();
+}
+function _jwSetIdx(idx){
+  if(typeof D === 'undefined' || !D) return;
+  D.jwIdx = idx;
+  save();
+  jwRender();
+}
+function jwNext(){
+  if(typeof RED_LETTERS === 'undefined') return;
+  var idx = (D && typeof D.jwIdx === 'number') ? D.jwIdx : 0;
+  if(idx < RED_LETTERS.length - 1) _jwSetIdx(idx + 1);
+}
+function jwPrev(){
+  var idx = (D && typeof D.jwIdx === 'number') ? D.jwIdx : 0;
+  if(idx > 0) _jwSetIdx(idx - 1);
+}
+// Keyboard arrows advance the reader (25-item decks need more than
+// two buttons — pre-build a11y flag). Only when the reader view is
+// live and focus isn't in a form field.
+function _jwWireKeys(){
+  if(_jwKeysWired) return;
+  _jwKeysWired = true;
+  document.addEventListener('keydown', function(e){
+    var host = document.getElementById('jesusMeetHost');
+    if(!host || host.dataset.view !== 'reader') return;
+    var tag = (e.target && e.target.tagName) || '';
+    if(tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    if(e.key === 'ArrowRight') jwNext();
+    else if(e.key === 'ArrowLeft') jwPrev();
+  });
+}
+
+// ── Honest Questions — single-open accordion ─────────────────
+function mjOpenQuestions(){
+  var host = document.getElementById('jesusMeetHost');
+  if(!host || typeof JESUS_QUESTIONS === 'undefined') return;
+  host.dataset.view = 'questions';
+  var items = JESUS_QUESTIONS.map(function(q){
+    var paras = String(q.a).split('\n\n').map(function(p){ return '<p>' + _jEsc(p) + '</p>'; }).join('');
+    return '<div class="jq-item" id="jq-' + _jEsc(q.id) + '">' +
+      '<button type="button" class="jq-q" aria-expanded="false" onclick="jqToggle(\'' + _jEsc(q.id) + '\')">' +
+        '<span>' + _jEsc(q.q) + '</span><span class="jq-chev" aria-hidden="true">&#8964;</span>' +
+      '</button>' +
+      '<div class="jq-a" style="display:none;">' +
+        paras +
+        '<blockquote class="jq-verse">' + _jEsc(q.verse) + '</blockquote>' +
+        '<div class="jq-ref">&mdash; ' + _jEsc(q.verseRef) + '</div>' +
+        '<button type="button" class="jq-deeper" onclick="jqDeeper(\'' + _jEsc(q.deeper.kind) + '\')">' + _jEsc(q.deeper.label) + ' &rarr;</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  host.innerHTML =
+    '<button type="button" class="mj-back" onclick="_mjRenderLanding()">&larr; Meet Jesus</button>' +
+    '<div class="jq-list">' + items + '</div>';
+}
+// Single-open: opening one closes the others (Growth Profile
+// accordion precedent — no FAQ-pamphlet chrome, no badges).
+function jqToggle(id){
+  var item = document.getElementById('jq-' + id);
+  if(!item) return;
+  var a = item.querySelector('.jq-a');
+  var q = item.querySelector('.jq-q');
+  var opening = a && a.style.display === 'none';
+  document.querySelectorAll('#jesusMeetHost .jq-a').forEach(function(el){ el.style.display = 'none'; });
+  document.querySelectorAll('#jesusMeetHost .jq-q').forEach(function(el){ el.setAttribute('aria-expanded', 'false'); });
+  if(opening && a){
+    a.style.display = 'block';
+    if(q) q.setAttribute('aria-expanded', 'true');
+    try {
+      var _red = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      item.scrollIntoView({ behavior: _red ? 'auto' : 'smooth', block:'nearest' });
+    } catch(_e){}
+  }
+}
+// Doors deeper — all typeof-guarded, all existing routes.
+function jqDeeper(kind){
+  if(kind === 'proof'){ if(typeof bfTab === 'function') bfTab('proofProphecy'); return; }
+  if(kind === 'academy'){ if(typeof bfTab === 'function') bfTab('academy'); return; }
+  if(kind === 'words'){ jwOpenReader(); try { var h = document.getElementById('jesusMeetHost'); if(h) h.scrollIntoView({ block:'start' }); } catch(_e){} return; }
+  if(kind === 'walk'){ if(typeof fzOpenDest === 'function'){ fzOpenDest('walk'); } return; }
+  if(kind === 'story'){
+    _mjRenderLanding();
+    if(typeof switchJesusTab === 'function') switchJesusTab('life');
+    try { var c = document.getElementById('jesusCardContainer'); if(c) c.scrollIntoView({ behavior:'smooth', block:'start' }); } catch(_e){}
+  }
+}
 
 function renderJesusCard(){
   var el = document.getElementById('jesusCardContainer');
