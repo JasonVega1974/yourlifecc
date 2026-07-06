@@ -10218,6 +10218,20 @@
           </button>
         </div>
 
+        <!-- 2026-07-06 — WATCH: Bible Project video archive (curated playlists
+             + optional live channel feed). Routes via data-fjdest -> bf-videos.
+             No src on the img so the 🎬 placeholder shows (no external dep). -->
+        <div class="fj-eyebrow">WATCH</div>
+        <button type="button" class="fjp-card" data-fjdest="videos">
+          <div class="fjp-hero" style="height:120px;">
+            <div class="fjp-ph" aria-hidden="true">🎬</div>
+            <img class="fjp-img" data-card-id="bf-videos" loading="lazy" alt="" onerror="this.style.display='none'">
+            <div class="fjp-shade" aria-hidden="true"></div>
+          </div>
+          <div class="fjp-title">BIBLE PROJECT VIDEOS</div>
+          <div class="fjp-sub">Curated animated Bible explainers.</div>
+        </button>
+
         <!-- 2026-07-03 — the MORE door is gone: its features get first-class
              photo cards below (GROW + CHURCH & YOU). Cards mapped to legacy
              bf-* photo keys where those cards already exist in the admin
@@ -13665,6 +13679,13 @@
        impact-score gold meter, detail modal, Convince Me swipe deck,
        search, bookmark to D.savedProofs. Rendered by renderProofProphecy()
        in faith.js using PROOF_PROPHECY_DATA from /app/js/data/proof-prophecy.js. -->
+  <!-- 2026-07-06 — Bible Project video archive surface. renderVideoArchive()
+       (video-archive.js) fills #videoArchiveHost with curated playlists +
+       an optional live channel feed. bfTab('videos') shows this panel. -->
+  <div id="bf-videos" style="display:none;">
+    <div id="videoArchiveHost"></div>
+  </div>
+
   <div id="bf-proofProphecy" style="display:none;">
     <style>
       /* Global modal-open guard — when any modal is open, the top mobile
@@ -22572,6 +22593,9 @@
 <!-- Contextual faith videos (FAITH_VIDEOS) — pure data, read by faith-videos.js
      renderer. YouTube anchors placed inside walk stations + faith surfaces. -->
 <script defer src="/app/js/data/faith-videos.js"></script>
+<!-- Bible Project video archive (VIDEO_ARCHIVE) — curated playlists, pure
+     data, read by video-archive.js. -->
+<script defer src="/app/js/data/video-archive-data.js"></script>
 <!-- My Climb pathway data (L1) — pure data, read by life-path.js. -->
 <script defer src="/app/js/data/life-stations-data.js"></script>
 <!-- Leaflet (F3-B) — open-source map library, MIT-licensed. Only loads when used. -->
@@ -22600,6 +22624,9 @@
      (walk-path.js station sheets) + fvInject (faith.js bf-<tab> panels).
      Runtime-only calls, so load order vs. its hosts is not critical. -->
 <script defer src="/app/js/faith-videos.js"></script>
+<!-- Bible Project video archive surface — renderVideoArchive() fills the
+     bf-videos panel; live row hits /api/youtube-feed (graceful fallback). -->
+<script defer src="/app/js/video-archive.js"></script>
 <!-- Skeptic vs Evidence (Proof & Prophecy §4b) — after faith.js so the
      Open Full Proof door can call bfTab/ppOpenModal/ylccEnsureData. -->
 <script defer src="/app/js/skeptic-debates.js"></script>

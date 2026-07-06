@@ -439,7 +439,7 @@ function initScripture(){
 // the original 6 tabs. New tabs without renderers are stubs awaiting later phases.
 // btn is optional — when bfTab() is called programmatically (e.g., from a Quick
 // Tile or stub-panel CTA), the matching button is found via [data-bf-tab].
-const BF_TABS = ['home','devotional','jesus','denominations','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy','studyTools','readingPlans','audioBible','audioMeditations','sleepStories','createMeditation','dailyDevotional'];
+const BF_TABS = ['home','devotional','jesus','denominations','learnBible','reading','bible','journey','plans','prayer','memorize','academy','bibleworld','stories','timeline','proofProphecy','bibleStudy','studyTools','readingPlans','audioBible','audioMeditations','sleepStories','createMeditation','dailyDevotional','videos'];
 
 // Phase 5.8 v3 — Home-grid restorer. Defensive against any prior code
 // that may have set .topic-card-grid display:none inside #bf-home. The
@@ -872,6 +872,7 @@ function bfTab(tab, btn){
   if(tab==='sleepStories') renderSleepStoriesCard();
   if(tab==='createMeditation') renderCreateMeditationCard();
   if(tab==='dailyDevotional') renderDailyDevFull();
+  if(tab==='videos'){ if(typeof renderVideoArchive==='function') renderVideoArchive(); }
 
   // 📺 Contextual video anchors (faith-videos.js) — additive, idempotent,
   // safe if the module never loaded. Appends a "Watch" section to the

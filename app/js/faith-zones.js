@@ -1749,7 +1749,9 @@ function fzOpenDest(dest){
     academy:'academy', plans:'readingPlans', devotional:'devotional', memorize:'memorize',
     traditions:'denominations', sermon:'journey',
     // 2026-07-03 — MEET JESUS + LISTEN sections.
-    jesus:'jesus', audio:'audioMeditations', sleep:'sleepStories', createmed:'createMeditation'
+    jesus:'jesus', audio:'audioMeditations', sleep:'sleepStories', createmed:'createMeditation',
+    // 2026-07-06 — WATCH: Bible Project video archive surface.
+    videos:'videos'
   };
   // Scroll target per DEST where it isn't simply 'bf-' + tab.
   var _fzTabScrollId = { plans:'bf-plans', sermon:'sermonNotesList' };
