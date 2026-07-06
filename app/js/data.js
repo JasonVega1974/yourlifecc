@@ -33,6 +33,15 @@ const DEF = {
   savedResumes:{},             // resume.js — {name: <resume snapshot>}
   scheduleBlocks:[],           // school.js — [{id,act,actLabel,...}]
   academyProgress:{},          // faith.js (lesson-renderer) — {'lesson-<id>':{...}}
+  // W3-4 Tracks & Diplomas (2026-07-05) — earned track diplomas:
+  // [{track, name, date}], append-only, dedup by track. In DEF so a
+  // fridge-worthy artifact survives offline reload.
+  academyDiplomas:[],
+  // W3-4 — one-shot review queue: [{lessonId, qIdx, date}], cap 10
+  // (oldest dropped), dedup by lesson+question, entries retire on
+  // answer right OR wrong. Explicitly NOT a second SRS engine —
+  // memory verses own spaced repetition.
+  academyReview:[],
   moneyLessonsProgress:{ opened:{}, completed:{}, openedAt:{}, completedAt:{} }, // finance.js
   choreStreak:{ current:0, longest:0, total:0, last:null },  // chores.js
   firstUseDate:'',             // chores.js — 'YYYY-MM-DD' first app-use date

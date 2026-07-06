@@ -6545,50 +6545,124 @@ function _acEsc(s){
     .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+// ── W3-4 Tracks (2026-07-05) — three named tracks over the featured
+// catalog, derived from lesson.category at render time (new lessons
+// auto-join their track). The spec's "3 tracks of 5" was written
+// against a stale 15-lesson catalog; the catalog is 30, so tracks are
+// variable-length and the diploma = every lesson in the track.
+// Tracks are ordering + narrative, NOT locks: any lesson, any order.
+var _ACAD_TRACKS = [
+  { id:'foundations', name:'Foundations',    desc:'Who God is, the gospel, the Bible.',        cats:['theology','bible-study'],        accent:'#a78bfa' },
+  { id:'defender',    name:'Defender',       desc:'Why we believe — evidence and history.',    cats:['apologetics','church-history'],  accent:'#fb923c' },
+  { id:'walking',     name:'Walking It Out', desc:'Faith in real life, every day.',            cats:['christian-living'],              accent:'#38bdf8' }
+];
+var _acOpenTrack = null;   // expanded track id (default: first incomplete)
+
+function _acTrackLessons(track){
+  return _acFeatured().filter(function(l){ return l && track.cats.indexOf(l.category) !== -1; });
+}
+function _acTrackFor(lessonId){
+  var lesson = _acFeaturedById(lessonId);
+  if(!lesson) return null;
+  for(var i = 0; i < _ACAD_TRACKS.length; i++){
+    if(_ACAD_TRACKS[i].cats.indexOf(lesson.category) !== -1) return _ACAD_TRACKS[i];
+  }
+  return null;
+}
+function _acTrackDone(track){
+  var lessons = _acTrackLessons(track);
+  if(!lessons.length) return { done: 0, total: 0, complete: false };
+  var done = lessons.filter(function(l){ var p = _acLessonProgress(l.id); return p && p.passed; }).length;
+  return { done: done, total: lessons.length, complete: done === lessons.length };
+}
+
+function _acLessonCardHtml(l, cats){
+  const cat = cats[l.category] || { label:'Lesson', color:'#fbbf24', soft:'rgba(251,191,36,', icon:'📖' };
+  const prog = _acLessonProgress(l.id);
+  const done = prog && prog.passed;
+  const ctaLabel = done ? 'Retake Lesson →' : (prog && prog.total ? 'Continue →' : 'Start Lesson →');
+  const statusBit = done
+    ? '<span style="color:var(--tx3);">·</span><span style="color:#22c55e;">✓ Done</span>'
+    : (prog && prog.total ? '<span style="color:var(--tx3);">·</span><span style="color:var(--tx);">In progress</span>' : '');
+  const progressStrip = done
+    ? '<div style="margin-top:.55rem;height:5px;border-radius:99px;background:rgba(127,127,127,.22);overflow:hidden;">'
+      + '<div style="height:100%;width:100%;background:' + cat.color + ';transition:width .35s ease;border-radius:99px;"></div>'
+      + '</div>'
+    : '';
+  return ''
+    + '<button class="pl-card-v2" data-academy-id="' + _acEsc(l.id) + '" onclick="openLessonModal(this.dataset.academyId)" '
+    +   'style="--accent:' + cat.color + ';">'
+    + '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;">'
+    +   '<span style="font-size:1.7rem;line-height:1;">' + _acEsc(cat.icon) + '</span>'
+    +   '<div style="font-family:\'Bebas Neue\',var(--fm);letter-spacing:.06em;font-size:1.18rem;color:var(--tx);line-height:1.05;flex:1;min-width:0;">' + _acEsc(l.title) + '</div>'
+    +   '<span style="font-size:.56rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:' + cat.color + ';background:' + cat.soft + '0.18);border:1px solid ' + cat.soft + '0.35);padding:.18rem .55rem;border-radius:99px;white-space:nowrap;">' + _acEsc(cat.label) + '</span>'
+    + '</div>'
+    + '<div style="font-family:Georgia,serif;font-style:italic;font-size:.78rem;color:var(--tx2);line-height:1.55;margin-bottom:.7rem;">' + _acEsc(l.description) + '</div>'
+    + '<div style="display:flex;align-items:center;gap:.45rem;font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:' + cat.color + ';">'
+    +   '<span>' + _acEsc(l.duration || '8 min') + '</span>'
+    +   statusBit
+    +   '<span style="margin-left:auto;color:var(--tx);">' + ctaLabel + '</span>'
+    + '</div>'
+    + progressStrip
+    + '</button>';
+}
+
 function renderFeaturedAcademy(){
   const grid = document.getElementById('acFeaturedGrid');
   if(!grid) return;
-  const allLessons = _acFeatured();
-  const cats = _acCats();
-  // Filter by active category pill (defaults to 'all').
-  const filter = _acActiveFilter || 'all';
-  const lessons = filter === 'all'
-    ? allLessons
-    : allLessons.filter(l => l && l.category === filter);
-  if(!lessons.length){
-    grid.innerHTML = '<div style="grid-column:1/-1;padding:1.4rem 1rem;text-align:center;color:var(--tx2);font-size:.84rem;font-style:italic;font-family:Georgia,serif;">No lessons in this category yet.</div>';
+  if(!_acFeatured().length){
+    grid.innerHTML = '<div style="grid-column:1/-1;padding:1.4rem 1rem;text-align:center;color:var(--tx2);font-size:.84rem;font-style:italic;font-family:Georgia,serif;">Lessons loading…</div>';
     return;
   }
-  grid.innerHTML = lessons.map(function(l){
-    const cat = cats[l.category] || { label:'Lesson', color:'#fbbf24', soft:'rgba(251,191,36,', icon:'📖' };
-    const prog = _acLessonProgress(l.id);
-    const done = prog && prog.passed;
-    const ctaLabel = done ? 'Retake Lesson →' : (prog && prog.total ? 'Continue →' : 'Start Lesson →');
-    const statusBit = done
-      ? '<span style="color:var(--tx3);">·</span><span style="color:#22c55e;">✓ Done</span>'
-      : (prog && prog.total ? '<span style="color:var(--tx3);">·</span><span style="color:var(--tx);">In progress</span>' : '');
-    const progressStrip = done
-      ? '<div style="margin-top:.55rem;height:5px;border-radius:99px;background:rgba(127,127,127,.22);overflow:hidden;">'
-        + '<div style="height:100%;width:100%;background:' + cat.color + ';transition:width .35s ease;border-radius:99px;"></div>'
-        + '</div>'
-      : '';
-    return ''
-      + '<button class="pl-card-v2" data-academy-id="' + _acEsc(l.id) + '" onclick="openLessonModal(this.dataset.academyId)" '
-      +   'style="--accent:' + cat.color + ';">'
-      + '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;">'
-      +   '<span style="font-size:1.7rem;line-height:1;">' + _acEsc(cat.icon) + '</span>'
-      +   '<div style="font-family:\'Bebas Neue\',var(--fm);letter-spacing:.06em;font-size:1.18rem;color:var(--tx);line-height:1.05;flex:1;min-width:0;">' + _acEsc(l.title) + '</div>'
-      +   '<span style="font-size:.56rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:' + cat.color + ';background:' + cat.soft + '0.18);border:1px solid ' + cat.soft + '0.35);padding:.18rem .55rem;border-radius:99px;white-space:nowrap;">' + _acEsc(cat.label) + '</span>'
-      + '</div>'
-      + '<div style="font-family:Georgia,serif;font-style:italic;font-size:.78rem;color:var(--tx2);line-height:1.55;margin-bottom:.7rem;">' + _acEsc(l.description) + '</div>'
-      + '<div style="display:flex;align-items:center;gap:.45rem;font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:' + cat.color + ';">'
-      +   '<span>' + _acEsc(l.duration || '8 min') + '</span>'
-      +   statusBit
-      +   '<span style="margin-left:auto;color:var(--tx);">' + ctaLabel + '</span>'
-      + '</div>'
-      + progressStrip
-      + '</button>';
-  }).join('');
+  const cats = _acCats();
+  // Tracks replace the flat grid + category filter pills.
+  const filters = document.getElementById('acFilters');
+  if(filters) filters.style.display = 'none';
+  grid.style.display = 'block';
+
+  // Default-open track: the first with incomplete lessons (post-grad:
+  // the first track). Collapsing is what turns "pile" into "arc".
+  if(!_acOpenTrack){
+    const firstOpen = _ACAD_TRACKS.find(function(t){ return !_acTrackDone(t).complete; });
+    _acOpenTrack = (firstOpen || _ACAD_TRACKS[0]).id;
+  }
+
+  let html = _acReviewStripHtml();
+  html += '<div class="act-caption">Any order — the dots track your progress.</div>';
+  _ACAD_TRACKS.forEach(function(t){
+    const stat = _acTrackDone(t);
+    const open = _acOpenTrack === t.id;
+    const hasDiploma = (typeof D !== 'undefined' && D && Array.isArray(D.academyDiplomas))
+      ? D.academyDiplomas.some(function(d){ return d && d.track === t.id; }) : false;
+    const lessons = _acTrackLessons(t);
+    let dots = '';
+    lessons.forEach(function(l, i){
+      const p = _acLessonProgress(l.id);
+      dots += (p && p.passed)
+        ? '<span class="act-dot done" style="--tc:' + t.accent + ';">✓</span>'
+        : '<span class="act-dot" style="--tc:' + t.accent + ';">' + (i + 1) + '</span>';
+    });
+    html += '<section class="act-track' + (open ? ' open' : '') + '" data-track="' + t.id + '" style="--tc:' + t.accent + ';">'
+      + '<button type="button" class="act-head" aria-expanded="' + (open ? 'true' : 'false') + '" onclick="acToggleTrack(\'' + t.id + '\')">'
+      +   '<div class="act-head-main">'
+      +     '<div class="act-name">' + _acEsc(t.name)
+      +       (hasDiploma ? ' <span class="act-diploma-chip" style="--tc:' + t.accent + ';">🎓 Diploma</span>' : '')
+      +     '</div>'
+      +     '<div class="act-desc">' + _acEsc(t.desc) + '</div>'
+      +   '</div>'
+      +   '<div class="act-count">' + stat.done + ' of ' + stat.total + '</div>'
+      + '</button>'
+      + '<div class="act-rail" aria-hidden="true">' + dots + '</div>'
+      + (hasDiploma ? '<button type="button" class="act-view-diploma" onclick="acOpenDiploma(\'' + t.id + '\')">View diploma →</button>' : '')
+      + (open ? '<div class="ac-grid act-cards">' + lessons.map(function(l){ return _acLessonCardHtml(l, cats); }).join('') + '</div>' : '')
+      + '</section>';
+  });
+  grid.innerHTML = html;
+}
+
+function acToggleTrack(id){
+  _acOpenTrack = (_acOpenTrack === id) ? '__none__' : id;
+  renderFeaturedAcademy();
 }
 
 // Category filter pill handler. Re-renders the grid with the chosen filter.
@@ -6602,8 +6676,314 @@ function acFilter(category, el){
   renderFeaturedAcademy();
 }
 
+// ── W3-4 Diplomas — track completion → canvas certificate ────────
+// "Certificate" = legacy per-course artifact (cyan/violet app brand);
+// "Diploma" = per-track artifact (night-navy + faith gold) — a
+// deliberate tier distinction, not drift. Win register: diplomas ARE
+// achievement (unlike the faith settle surfaces) — confetti + flash +
+// 100 XP. All three tracks → Academy Graduate: chained primitives
+// (no new register) + awardTrait('wisdom') Growth Profile beat.
+function _acFirstName(){
+  var n = (typeof D !== 'undefined' && D && D.name) ? String(D.name).trim() : '';
+  if(!n && typeof D !== 'undefined' && D && D.profile && D.profile.parentName) n = String(D.profile.parentName).trim();
+  if(!n) return 'Faith Hub Member';
+  return n.split(/\s+/)[0];
+}
+
+function _acCheckDiplomas(lesson){
+  if(typeof D === 'undefined' || !D) return;
+  var track = _acTrackFor(lesson.id);
+  if(!track) return;
+  if(!_acTrackDone(track).complete) return;
+  if(!Array.isArray(D.academyDiplomas)) D.academyDiplomas = [];
+  if(D.academyDiplomas.some(function(d){ return d && d.track === track.id; })) return;
+  D.academyDiplomas.push({ track: track.id, name: _acFirstName(), date: new Date().toISOString().slice(0,10) });
+  if(typeof save === 'function') save();
+  // SEQUENCING (post-build review BLOCKING): the win register renders
+  // at z 99998/99999, every .mo modal at 100000 — celebration fired
+  // behind the still-open lesson modal was invisible. Close FIRST,
+  // celebrate on the open screen, then present the artifact after the
+  // burst has been seen.
+  if(typeof closeLessonModal === 'function') closeLessonModal();
+  var reduced = false;
+  try { reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch(_e){}
+  try { if(!reduced && typeof window.megaConfetti === 'function') window.megaConfetti(); } catch(_e){}
+  try { if(!reduced && typeof window.screenFlash === 'function') window.screenFlash('rgba(251,191,36,.3)', 420); } catch(_e){}
+  try { if(typeof window.awardXP === 'function') window.awardXP(100, 'academy_diploma'); } catch(_e){}
+  if(typeof showToast === 'function') showToast('🎓 ' + track.name + ' track complete — diploma earned!');
+  var isGrad = D.academyDiplomas.length >= _ACAD_TRACKS.length;
+  setTimeout(function(){ acOpenDiploma(track.id, isGrad); }, 1100);
+}
+
+// Open (or re-open from the track header) a diploma. isGrad chains the
+// Academy Graduate capstone after the canvas renders.
+function acOpenDiploma(trackId, isGrad){
+  var track = _ACAD_TRACKS.find(function(t){ return t.id === trackId; });
+  if(!track) return;
+  var rec = (typeof D !== 'undefined' && D && Array.isArray(D.academyDiplomas))
+    ? D.academyDiplomas.find(function(d){ return d && d.track === trackId; }) : null;
+  if(!rec) return;
+  var titleEl = document.getElementById('acDiplomaTitle');
+  if(titleEl) titleEl.textContent = track.name + ' — Diploma';
+  if(typeof openModal === 'function') openModal('acDiplomaModal');
+  _acDiplomaRender(track, rec);
+  if(isGrad) setTimeout(_acGraduateMoment, 1400);
+}
+
+function _acDiplomaRender(track, rec){
+  var canvas = document.getElementById('acDiplomaCanvas');
+  if(!canvas) return;
+  var draw = function(){
+    var W = 1200, H = 900;
+    var dpr = (typeof window !== 'undefined' && window.devicePixelRatio) ? Math.min(3, window.devicePixelRatio) : 1;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.width = '100%'; canvas.style.maxWidth = '540px'; canvas.style.height = 'auto';
+    var ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    var stat = _acTrackDone(track);
+    // Night-navy ground (the academy SVG palette — no new navy).
+    var g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#0a0d1a'); g.addColorStop(1, '#1a1233');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    // Thin double gold border.
+    ctx.strokeStyle = 'rgba(251,191,36,.85)'; ctx.lineWidth = 3;
+    ctx.strokeRect(36, 36, W - 72, H - 72);
+    ctx.strokeStyle = 'rgba(251,191,36,.35)'; ctx.lineWidth = 1;
+    ctx.strokeRect(48, 48, W - 96, H - 96);
+    // Five composition elements — restraint is the premium tell.
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(251,191,36,.8)';
+    ctx.font = '700 26px Georgia, serif';
+    ctx.fillText('F A I T H   A C A D E M Y', W / 2, 150);
+    ctx.fillStyle = '#fbbf24';
+    ctx.font = '64px "Bebas Neue", Georgia, serif';
+    ctx.fillText(track.name.toUpperCase(), W / 2, 250);
+    ctx.fillStyle = 'rgba(241,233,213,.75)';
+    ctx.font = 'italic 28px Georgia, serif';
+    ctx.fillText('awarded to', W / 2, 350);
+    ctx.fillStyle = '#f1e9d5';
+    ctx.font = '92px "Bebas Neue", Georgia, serif';
+    ctx.fillText(rec.name || _acFirstName(), W / 2, 470);
+    ctx.fillStyle = 'rgba(241,233,213,.8)';
+    ctx.font = '26px Georgia, serif';
+    ctx.fillText('completed the ' + track.name + ' track — ' + stat.total + ' of ' + stat.total + ' lessons', W / 2, 560);
+    ctx.fillStyle = 'rgba(251,191,36,.7)';
+    ctx.font = '22px Georgia, serif';
+    ctx.fillText(rec.date || '', W / 2, 620);
+    // Geometric seal — concentric gold rings, circular text, NO
+    // iconography (house rule: no clip-art; the mark IS the seal).
+    var sx = W / 2, sy = 745, r = 78;
+    ctx.strokeStyle = 'rgba(251,191,36,.9)'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI * 2); ctx.stroke();
+    ctx.strokeStyle = 'rgba(251,191,36,.45)'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(sx, sy, r - 10, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(sx, sy, r - 52, 0, Math.PI * 2); ctx.stroke();
+    var ring = 'YOURLIFE CC · FAITH ACADEMY · ';
+    ctx.fillStyle = 'rgba(251,191,36,.85)';
+    ctx.font = '700 13px Georgia, serif';
+    for(var i = 0; i < ring.length; i++){
+      var a = (i / ring.length) * Math.PI * 2 - Math.PI / 2;
+      ctx.save();
+      ctx.translate(sx + Math.cos(a) * (r - 28), sy + Math.sin(a) * (r - 28));
+      ctx.rotate(a + Math.PI / 2);
+      ctx.fillText(ring[i], 0, 0);
+      ctx.restore();
+    }
+  };
+  // Bebas Neue is a webfont — canvas won't wait for it; a cold render
+  // would bake the fallback serif into the exported PNG. Gate on
+  // document.fonts when available.
+  try {
+    if(document.fonts && document.fonts.ready && typeof document.fonts.ready.then === 'function'){
+      document.fonts.load('92px "Bebas Neue"').then(draw).catch(draw);
+    } else { draw(); }
+  } catch(_e){ draw(); }
+}
+
+function _acDiplomaBlob(cb){
+  var canvas = document.getElementById('acDiplomaCanvas');
+  if(!canvas){ cb(null); return; }
+  try { canvas.toBlob(function(b){ cb(b); }, 'image/png'); }
+  catch(_e){
+    try {
+      var dataUrl = canvas.toDataURL('image/png');
+      var bin = atob(dataUrl.split(',')[1]);
+      var arr = new Uint8Array(bin.length);
+      for(var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      cb(new Blob([arr], { type: 'image/png' }));
+    } catch(_e2){ cb(null); }
+  }
+}
+
+function acDiplomaDownload(){
+  _acDiplomaBlob(function(blob){
+    if(!blob){ if(typeof showToast === 'function') showToast('Could not export the diploma'); return; }
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'yourlifecc-diploma.png';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+    if(typeof showToast === 'function') showToast('Diploma downloaded ✓');
+  });
+}
+
+// Share = navigator.share({files}) (the skills.js certificate idiom —
+// YLM.share is text-only); falls back to download.
+function acDiplomaShare(){
+  _acDiplomaBlob(function(blob){
+    if(!blob){ acDiplomaDownload(); return; }
+    try {
+      var file = new File([blob], 'yourlifecc-diploma.png', { type: 'image/png' });
+      if(navigator.canShare && navigator.share && navigator.canShare({ files: [file] })){
+        navigator.share({ files: [file], title: 'Faith Academy Diploma' }).catch(function(){});
+        return;
+      }
+    } catch(_e){}
+    acDiplomaDownload();
+  });
+}
+
+// All three tracks → the capstone. Bigger through SEQUENCE of known
+// primitives (flash → double confetti → trait beat → capstone card),
+// never a new register. Trait: wisdom (📖 — "learned three tracks");
+// faith (✝️) stays reserved for trust/belief moments.
+// Z-ORDER (post-build review BLOCKING): every .mo modal is closed
+// first, and the overlay sits at 99997 — UNDER the confetti (99999)
+// and flash (99998) so the burst rains over the capstone card, above
+// everything else.
+function _acGraduateMoment(){
+  try { if(typeof closeModal === 'function') closeModal('acDiplomaModal'); } catch(_e){}
+  var reduced = false;
+  try { reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch(_e){}
+  try { if(!reduced && typeof window.screenFlash === 'function') window.screenFlash('rgba(251,191,36,.35)', 500); } catch(_e){}
+  try { if(!reduced && typeof window.megaConfetti === 'function'){ window.megaConfetti(); setTimeout(function(){ window.megaConfetti(); }, 700); } } catch(_e){}
+  try { if(typeof window.awardTrait === 'function') window.awardTrait('wisdom', 25); } catch(_e){}
+  var el = document.getElementById('acGradOverlay');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'acGradOverlay';
+    document.body.appendChild(el);
+  }
+  el.innerHTML = '<div class="ac-grad-card" role="dialog" aria-modal="true" aria-label="Academy Graduate">'
+    + '<div class="ac-grad-eye">FAITH ACADEMY</div>'
+    + '<div class="ac-grad-title">Academy Graduate</div>'
+    + '<div class="ac-grad-sub">Foundations · Defender · Walking It Out — every track, finished.</div>'
+    + '<button type="button" class="ac-grad-btn" onclick="acCloseGrad()">Amen. Continue →</button>'
+    + '</div>';
+  el.style.display = 'flex';
+  // Keyboard parity: focus the one action; Escape dismisses.
+  try {
+    var btn = el.querySelector('.ac-grad-btn');
+    if(btn && btn.focus) btn.focus();
+    if(!el.dataset.keys){
+      el.dataset.keys = '1';
+      document.addEventListener('keydown', function(e){
+        if(e.key === 'Escape' && el.style.display !== 'none') acCloseGrad();
+      });
+    }
+  } catch(_e){}
+}
+function acCloseGrad(){
+  var el = document.getElementById('acGradOverlay');
+  if(el) el.style.display = 'none';
+}
+
+// ── W3-4 Review queue — one-shot, cap 10, never a nag ────────────
+var _acReviewDismissed = false;   // session-only; strip returns next session
+
+function _acReviewStripHtml(){
+  if(_acReviewDismissed) return '';
+  var q = (typeof D !== 'undefined' && D && Array.isArray(D.academyReview)) ? D.academyReview : [];
+  q = q.filter(function(e){ return e && _acFeaturedById(e.lessonId); });
+  if(!q.length) return '';
+  return '<div class="ac-review-strip">'
+    + '<div class="ac-review-main"><span class="ac-review-eye">Quick review</span> ' + q.length + ' from last time — 60 seconds, no grade.</div>'
+    + '<button type="button" class="ac-review-go" onclick="acStartReview()">Start</button>'
+    + '<button type="button" class="ac-review-x" aria-label="Not now" onclick="acDismissReview()">✕</button>'
+    + '</div>';
+}
+function acDismissReview(){ _acReviewDismissed = true; renderFeaturedAcademy(); }
+
+var _acReviewState = null; // { items:[{lessonId,qIdx}], pos, right }
+function acStartReview(){
+  var q = (typeof D !== 'undefined' && D && Array.isArray(D.academyReview)) ? D.academyReview.slice() : [];
+  q = q.filter(function(e){ return e && _acFeaturedById(e.lessonId); });
+  if(!q.length) return;
+  _acReviewState = { items: q, pos: 0, right: 0 };
+  var titleEl = document.getElementById('lmTitle'); if(titleEl) titleEl.textContent = 'Quick Review';
+  var subEl = document.getElementById('lmSub'); if(subEl) subEl.textContent = 'One pass — every question retires, right or not.';
+  var eyeEl = document.getElementById('lmEye'); if(eyeEl) eyeEl.textContent = q.length + ' question' + (q.length > 1 ? 's' : '');
+  var iconEl = document.getElementById('lmIcon'); if(iconEl) iconEl.textContent = '🎓';
+  var headerEl = document.getElementById('lmHeader');
+  if(headerEl) headerEl.style.background = 'linear-gradient(135deg,rgba(20,15,40,0.95),rgba(40,25,60,0.92))';
+  if(typeof openModal === 'function') openModal('lessonModal');
+  _acReviewRender();
+}
+function _acReviewRender(){
+  var content = document.getElementById('lmContent');
+  if(!content || !_acReviewState) return;
+  var item = _acReviewState.items[_acReviewState.pos];
+  if(!item){ _acReviewFinish(); return; }
+  var lesson = _acFeaturedById(item.lessonId);
+  var q = lesson && lesson.quiz ? lesson.quiz[item.qIdx] : null;
+  if(!q){ _acReviewState.pos++; _acReviewRender(); return; }
+  var html = '<div class="lm-quiz">'
+    + '<div class="lm-quiz-progress">' + (_acReviewState.pos + 1) + ' of ' + _acReviewState.items.length + ' · from ' + _acEsc(lesson.title) + '</div>'
+    + '<div class="lm-quiz-q">' + _acEsc(q.q) + '</div>'
+    + '<div class="lm-quiz-options">';
+  (q.options || []).forEach(function(opt, i){
+    html += '<button class="lm-quiz-opt in" onclick="acReviewSelect(' + i + ',this)">' + _acEsc(opt) + '</button>';
+  });
+  html += '</div><div class="lm-quiz-feedback" id="lmQuizFeedback"></div>'
+    + '<div class="lm-quiz-next" id="lmQuizNextWrap"></div></div>';
+  content.innerHTML = html;
+}
+function acReviewSelect(idx, btn){
+  if(!_acReviewState) return;
+  var item = _acReviewState.items[_acReviewState.pos];
+  var lesson = _acFeaturedById(item.lessonId);
+  var q = lesson.quiz[item.qIdx];
+  var correct = (idx === q.correctIdx);
+  if(correct) _acReviewState.right++;
+  // One-shot means one-shot: the question retires right or wrong — a
+  // reset-on-miss loop would silently grow the second SRS engine the
+  // spec forbids.
+  if(typeof D !== 'undefined' && D && Array.isArray(D.academyReview)){
+    D.academyReview = D.academyReview.filter(function(e){ return !(e && e.lessonId === item.lessonId && e.qIdx === item.qIdx); });
+    if(typeof save === 'function') save();
+  }
+  var buttons = document.querySelectorAll('#lmContent .lm-quiz-opt');
+  buttons.forEach(function(b, i){
+    b.disabled = true;
+    if(i === q.correctIdx) b.classList.add('correct');
+    else if(b === btn) b.classList.add('wrong');
+  });
+  var fb = document.getElementById('lmQuizFeedback');
+  if(fb){
+    fb.innerHTML = (correct ? '<strong style="color:#22c55e;">✓ Got it.</strong> ' : '<strong style="color:#fbbf24;">Now you know.</strong> ') + _acEsc(q.explanation || '');
+    fb.classList.add('show');
+  }
+  var nextWrap = document.getElementById('lmQuizNextWrap');
+  if(nextWrap){
+    var isLast = (_acReviewState.pos + 1) >= _acReviewState.items.length;
+    nextWrap.innerHTML = '<button onclick="_acReviewState.pos++;_acReviewRender();">' + (isLast ? 'Done →' : 'Next →') + '</button>';
+  }
+}
+function _acReviewFinish(){
+  var content = document.getElementById('lmContent');
+  var st = _acReviewState;
+  _acReviewState = null;
+  if(content && st){
+    content.innerHTML = '<div class="lm-quiz"><div class="lm-quiz-result">'
+      + '<div class="lm-quiz-result-title">Review done</div>'
+      + '<div class="lm-quiz-pass">' + st.right + ' of ' + st.items.length + ' — all retired. No grade, just sharper.</div>'
+      + '<div class="lm-quiz-actions"><button class="secondary" onclick="closeLessonModal();renderFeaturedAcademy();">Done</button></div>'
+      + '</div></div>';
+  }
+}
+
 // ── Lesson modal ─────────────────────────────────────────────────
-let _lmQuizState = null; // { lessonId, qIdx, score, answeredAt }
+let _lmQuizState = null; // { lessonId, list, pos, score, wrong, retry, base, answered }
 
 function openLessonModal(lessonId){
   const lesson = _acFeaturedById(lessonId);
@@ -6648,11 +7028,14 @@ function _lmRenderLesson(lesson){
     html += '</div>';
   });
   if(lesson.keyVerse && lesson.keyVerse.text){
-    html += '<div class=”lm-keyverse”>'
-         +    '<div class=”lm-keyverse-text”>' + _acEsc('”' + lesson.keyVerse.text + '”') + '</div>'
-         +    '<div style=”display:flex;align-items:center;gap:.4rem;”>'
-         +    '<div class=”lm-keyverse-ref” style=”flex:1;”>— ' + _acEsc(lesson.keyVerse.ref || '') + '</div>'
-         +    '<button onclick=”_acSpeakVerse(this)” style=”background:none;border:1px solid rgba(255,255,255,.15);border-radius:4px;padding:.1rem .35rem;font-size:.65rem;color:var(--tx2);cursor:pointer;”>🔊</button>'
+    // W3-4 fix: this block shipped with curly-quote attribute delimiters
+    // (class=”…”), so .lm-keyverse styling and the 🔊 button were dead
+    // in production. Straight quotes restore the paid-for treatment.
+    html += '<div class="lm-keyverse">'
+         +    '<div class="lm-keyverse-text">' + _acEsc('“' + lesson.keyVerse.text + '”') + '</div>'
+         +    '<div style="display:flex;align-items:center;gap:.4rem;">'
+         +    '<div class="lm-keyverse-ref" style="flex:1;">— ' + _acEsc(lesson.keyVerse.ref || '') + '</div>'
+         +    '<button onclick="_acSpeakVerse(this)" data-verse="' + _acEsc(lesson.keyVerse.text) + '" style="background:none;border:1px solid rgba(255,255,255,.15);border-radius:4px;padding:.1rem .35rem;font-size:.65rem;color:var(--tx2);cursor:pointer;">🔊</button>'
          +    '</div>'
          +  '</div>';
   }
@@ -6676,21 +7059,48 @@ function closeLessonModal(){
 }
 
 // ── Inline quiz ──────────────────────────────────────────────────
-function startLessonQuiz(lessonId){
+// W3-4 (2026-07-05): the session now tracks WHICH questions were
+// missed (state.wrong, actual quiz indices) so a fail can offer
+// "Retry the ones you missed" over just that subset. In retry mode
+// (state.list = wrong indices from the full run, state.base = corrects
+// already banked) a question missed AGAIN is grace-banked into
+// D.academyReview instead of looping — the existing feedback UI has
+// already revealed the answer once, so a third in-place attempt is
+// empty motion; grace over guilt (the W3-3 ruling, applied to quizzes).
+function startLessonQuiz(lessonId, retryIdxs, baseScore){
   const lesson = _acFeaturedById(lessonId);
   if(!lesson || !lesson.quiz || !lesson.quiz.length) return;
-  _lmQuizState = { lessonId: lessonId, qIdx: 0, score: 0, answered: false };
+  const list = (retryIdxs && retryIdxs.length)
+    ? retryIdxs.slice()
+    : lesson.quiz.map(function(_, i){ return i; });
+  _lmQuizState = {
+    lessonId: lessonId, list: list, pos: 0, score: 0, wrong: [],
+    retry: !!(retryIdxs && retryIdxs.length), base: baseScore || 0,
+    answered: false
+  };
   _lmRenderQuizQuestion(lesson);
+}
+
+// Fail-screen CTA target — the wrong-only subset lives here between
+// the result render and the retry tap (arrays don't inline into
+// onclick attributes cleanly).
+let _lmLastWrong = null; // { lessonId, idxs, base }
+function lessonQuizRetryWrong(){
+  if(!_lmLastWrong) return;
+  startLessonQuiz(_lmLastWrong.lessonId, _lmLastWrong.idxs, _lmLastWrong.base);
 }
 
 function _lmRenderQuizQuestion(lesson){
   const content = document.getElementById('lmContent');
   if(!content || !_lmQuizState) return;
-  const q = lesson.quiz[_lmQuizState.qIdx];
+  const q = lesson.quiz[_lmQuizState.list[_lmQuizState.pos]];
   if(!q) return;
-  const total = lesson.quiz.length;
+  const total = _lmQuizState.list.length;
+  const remaining = total - _lmQuizState.pos;
   let html = '<div class="lm-quiz">'
-           +   '<div class="lm-quiz-progress">Question ' + (_lmQuizState.qIdx + 1) + ' of ' + total + '</div>'
+           +   (_lmQuizState.retry
+                ? '<div class="lm-quiz-progress">' + remaining + ' to go — you’ve got this.</div>'
+                : '<div class="lm-quiz-progress">Question ' + (_lmQuizState.pos + 1) + ' of ' + total + '</div>')
            +   '<div class="lm-quiz-q">' + _acEsc(q.q) + '</div>'
            +   '<div class="lm-quiz-options">';
   (q.options || []).forEach(function(opt, i){
@@ -6713,11 +7123,13 @@ function lessonQuizSelect(idx, btn){
   if(!_lmQuizState || _lmQuizState.answered) return;
   const lesson = _acFeaturedById(_lmQuizState.lessonId);
   if(!lesson) return;
-  const q = lesson.quiz[_lmQuizState.qIdx];
+  const quizIdx = _lmQuizState.list[_lmQuizState.pos];
+  const q = lesson.quiz[quizIdx];
   if(!q) return;
   _lmQuizState.answered = true;
   const correct = (idx === q.correctIdx);
   if(correct) _lmQuizState.score++;
+  else _lmQuizState.wrong.push(quizIdx);
   const buttons = document.querySelectorAll('#lmContent .lm-quiz-opt');
   buttons.forEach(function(b, i){
     b.disabled = true;
@@ -6734,7 +7146,7 @@ function lessonQuizSelect(idx, btn){
   }
   const nextWrap = document.getElementById('lmQuizNextWrap');
   if(nextWrap){
-    const isLast = (_lmQuizState.qIdx + 1) >= lesson.quiz.length;
+    const isLast = (_lmQuizState.pos + 1) >= _lmQuizState.list.length;
     nextWrap.innerHTML = '<button onclick="lessonQuizNext()">' + (isLast ? 'See Result →' : 'Next Question →') + '</button>';
   }
 }
@@ -6743,32 +7155,57 @@ function lessonQuizNext(){
   if(!_lmQuizState) return;
   const lesson = _acFeaturedById(_lmQuizState.lessonId);
   if(!lesson) return;
-  _lmQuizState.qIdx++;
-  if(_lmQuizState.qIdx >= lesson.quiz.length){
+  _lmQuizState.pos++;
+  if(_lmQuizState.pos >= _lmQuizState.list.length){
     _lmFinishQuiz(lesson);
     return;
   }
   _lmRenderQuizQuestion(lesson);
 }
 
+// Grace-bank a missed-twice question into the one-shot review queue.
+// Dedup by lesson+question; cap 10 (drop oldest). Explicitly NOT a
+// second SRS engine — memory verses own spaced repetition.
+function _acReviewBank(lessonId, qIdx){
+  if(typeof D === 'undefined' || !D) return;
+  if(!Array.isArray(D.academyReview)) D.academyReview = [];
+  const dup = D.academyReview.some(function(e){ return e && e.lessonId === lessonId && e.qIdx === qIdx; });
+  if(dup) return;
+  D.academyReview.push({ lessonId: lessonId, qIdx: qIdx, date: new Date().toISOString().slice(0,10) });
+  while(D.academyReview.length > 10) D.academyReview.shift();
+  if(typeof save === 'function') save();
+}
+
 function _lmFinishQuiz(lesson){
   const content = document.getElementById('lmContent');
   if(!content || !_lmQuizState) return;
   const total = lesson.quiz.length;
-  const score = _lmQuizState.score;
-  const pct = score / total;
-  const passed = pct >= 0.8;
+  const st = _lmQuizState;
+  const isRetry = st.retry;
+  // Retry math: base = corrects banked from the full run; graced =
+  // questions missed twice, banked to the review queue. A retry always
+  // COMPLETES the lesson (grace over guilt — the answer was already
+  // revealed once; nobody loops at 9pm), but stars stay honest: they
+  // score only true corrects.
+  const graced = isRetry ? st.wrong.slice() : [];
+  const trueScore = isRetry ? (st.base + st.score) : st.score;
+  const pct = trueScore / total;
+  const passed = isRetry ? true : pct >= 0.8;
   let stars;
   if(pct >= 0.95) stars = 3;
   else if(pct >= 0.8) stars = 2;
   else if(pct >= 0.6) stars = 1;
   else stars = 0;
 
+  if(isRetry){
+    graced.forEach(function(qi){ _acReviewBank(lesson.id, qi); });
+  }
+
   // Persist progress
   if(typeof D !== 'undefined' && D){
     if(!D.academyProgress) D.academyProgress = {};
     D.academyProgress['lesson-' + lesson.id] = {
-      score: score,
+      score: trueScore,
       total: total,
       passed: passed,
       date: new Date().toISOString().slice(0,10),
@@ -6784,29 +7221,47 @@ function _lmFinishQuiz(lesson){
     }
   }
 
-  const passMsg = passed
-    ? '<span class="lm-quiz-passmsg">Passed — lesson complete.</span>'
-    : '<span class="lm-quiz-failmsg">Below 80%.</span> Review the lesson and try again.';
+  let passMsg;
+  if(passed && isRetry && graced.length){
+    passMsg = '<span class="lm-quiz-passmsg">Lesson complete.</span> ' + graced.length + ' question' + (graced.length > 1 ? 's' : '') + ' banked for a quick review next time.';
+  } else if(passed){
+    passMsg = '<span class="lm-quiz-passmsg">Passed — lesson complete.</span>';
+  } else {
+    passMsg = '<span class="lm-quiz-failmsg">Not there yet.</span> The ones you missed are ready when you are.';
+  }
   let starsHtml = '';
   for(let i = 0; i < 3; i++){
     starsHtml += '<span class="lm-quiz-star ' + (i < stars ? 'filled' : 'empty') + '">★</span>';
   }
+  // Fail → primary CTA is the wrong-only retry (W3-4); full retake and
+  // lesson review stay as quiet secondaries.
+  const wrongIdxs = st.wrong.slice();
+  let actions;
+  if(!passed && wrongIdxs.length){
+    _lmLastWrong = { lessonId: lesson.id, idxs: wrongIdxs, base: st.score };
+    actions = '<button onclick="lessonQuizRetryWrong()">Retry the ones you missed (' + wrongIdxs.length + ')</button>'
+      + '<button class="secondary" onclick="_lmRenderLesson(_acFeaturedById(\'' + lesson.id + '\'))">Back to Lesson</button>'
+      + '<button class="secondary" onclick="startLessonQuiz(\'' + lesson.id + '\')">Retake All</button>';
+  } else {
+    actions = '<button onclick="startLessonQuiz(\'' + lesson.id + '\')">Retake Quiz</button>'
+      + '<button class="secondary" onclick="_lmRenderLesson(_acFeaturedById(\'' + lesson.id + '\'))">Back to Lesson</button>'
+      + '<button class="secondary" onclick="closeLessonModal();renderFeaturedAcademy();">Done</button>';
+  }
   content.innerHTML = '<div class="lm-quiz">'
     + '<div class="lm-quiz-result">'
     +   '<div class="lm-quiz-result-title">Quiz Complete</div>'
-    +   '<div class="lm-quiz-result-score">' + score + ' / ' + total + '</div>'
+    +   '<div class="lm-quiz-result-score">' + trueScore + ' / ' + total + '</div>'
     +   '<div class="lm-quiz-result-stars">' + starsHtml + '</div>'
     +   '<div class="lm-quiz-pass">' + passMsg + '</div>'
-    +   '<div class="lm-quiz-actions">'
-    +     '<button onclick="startLessonQuiz(\'' + lesson.id + '\')">Retake Quiz</button>'
-    +     '<button class="secondary" onclick="_lmRenderLesson(_acFeaturedById(\'' + lesson.id + '\'))">Back to Lesson</button>'
-    +     '<button class="secondary" onclick="closeLessonModal();renderFeaturedAcademy();">Done</button>'
-    +   '</div>'
+    +   '<div class="lm-quiz-actions">' + actions + '</div>'
     + '</div>'
     + '</div>';
   _lmQuizState = null;
   // Refresh the card grid so the "Complete ✓" badge shows up on return
   renderFeaturedAcademy();
+  // W3-4: a first-time pass may have completed a track → diploma (win
+  // register) and possibly the Academy Graduate capstone.
+  if(passed && typeof _acCheckDiplomas === 'function') _acCheckDiplomas(lesson);
 }
 
 function renderAcademyPanel(){

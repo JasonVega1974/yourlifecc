@@ -12673,6 +12673,104 @@
         display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
         gap:.85rem;margin-bottom:1.4rem;
       }
+      /* ── W3-4 Tracks & Diplomas (2026-07-05) ─────────────────────
+         Tracks are ordering + narrative, NOT locks: every dot renders
+         full-color and numbered (no today-ring, no dimmed "future" —
+         that visual grammar belongs to sequential surfaces and would
+         read as Duolingo gating here). Done = filled ✓. */
+      #bf-academy .act-caption{
+        font-family:var(--fm);font-size:.68rem;color:var(--tx3);font-style:italic;
+        margin:0 0 .8rem;
+      }
+      #bf-academy .act-track{
+        background:var(--cd-card-bg);border:var(--cd-card-border);border-radius:14px;
+        border-top:3px solid var(--tc,transparent);
+        padding:.9rem 1rem;margin-bottom:.8rem;
+      }
+      #bf-academy .act-head{
+        display:flex;align-items:center;gap:.7rem;width:100%;background:none;border:none;
+        padding:0;cursor:pointer;text-align:left;min-height:44px;
+      }
+      #bf-academy .act-name{
+        font-family:var(--fm);font-size:1.15rem;font-weight:700;color:var(--tx);
+        display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;
+      }
+      #bf-academy .act-desc{font-family:var(--fm);font-size:.75rem;color:var(--tx2);margin-top:.15rem;}
+      #bf-academy .act-head-main{flex:1;min-width:0;}
+      #bf-academy .act-count{
+        font-family:var(--fm);font-size:.72rem;font-weight:800;color:var(--tx3);white-space:nowrap;
+      }
+      #bf-academy .act-rail{display:flex;flex-wrap:wrap;gap:.4rem;margin:.6rem 0 .2rem;}
+      #bf-academy .act-dot{
+        width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+        font-family:var(--fm);font-size:.66rem;font-weight:800;
+        color:var(--tc,#fbbf24);border:1.5px solid var(--tc,#fbbf24);background:transparent;
+      }
+      #bf-academy .act-dot.done{background:#10b981;border-color:#10b981;color:#fff;}
+      #bf-academy .act-diploma-chip{
+        font-size:.6rem;font-weight:800;letter-spacing:.08em;color:var(--tc,#fbbf24);
+        background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.35);
+        border-radius:99px;padding:.12rem .5rem;
+      }
+      #bf-academy .act-view-diploma{
+        background:transparent;border:none;color:#fbbf24;font-family:var(--fm);
+        font-size:.74rem;font-weight:700;cursor:pointer;padding:.2rem 0 .4rem;min-height:44px;
+      }
+      #bf-academy .act-cards{margin-top:.7rem;margin-bottom:.2rem;}
+      /* Review strip — footnote-weight nudge, never a fourth card. */
+      #bf-academy .ac-review-strip{
+        display:flex;align-items:center;gap:.6rem;margin-bottom:.8rem;
+        background:rgba(251,191,36,.05);border-left:3px solid #fbbf24;border-radius:0 10px 10px 0;
+        padding:.55rem .75rem;
+      }
+      #bf-academy .ac-review-main{font-family:var(--fm);font-size:.76rem;color:var(--tx2);flex:1;min-width:0;}
+      #bf-academy .ac-review-eye{font-weight:800;color:#fbbf24;letter-spacing:.06em;text-transform:uppercase;font-size:.64rem;}
+      #bf-academy .ac-review-go{
+        background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.4);color:#fbbf24;
+        border-radius:999px;padding:.3rem .8rem;font-family:var(--fm);font-size:.72rem;font-weight:700;
+        cursor:pointer;min-height:44px;
+      }
+      #bf-academy .ac-review-x{
+        background:none;border:none;color:var(--tx3);cursor:pointer;font-size:.8rem;
+        min-width:44px;min-height:44px;
+      }
+      /* Academy Graduate capstone overlay — chained known primitives.
+         z 99997: above every closed surface, UNDER the confetti(99999)
+         and flash(99998) so the burst rains over the card. */
+      #acGradOverlay{
+        position:fixed;inset:0;z-index:99997;display:none;align-items:center;justify-content:center;
+        background:rgba(5,5,10,.82);padding:1.2rem;
+      }
+      .ac-grad-card{
+        max-width:420px;text-align:center;background:linear-gradient(180deg,#0a0d1a 0%,#1a1233 100%);
+        border:1px solid rgba(251,191,36,.5);border-radius:16px;padding:1.8rem 1.4rem;
+      }
+      .ac-grad-eye{font-family:var(--fm);font-size:.62rem;font-weight:800;letter-spacing:.24em;color:rgba(251,191,36,.8);margin-bottom:.6rem;}
+      .ac-grad-title{font-family:'Bebas Neue',Georgia,serif;font-size:2.1rem;letter-spacing:.04em;color:#fbbf24;margin-bottom:.4rem;}
+      .ac-grad-sub{font-family:Georgia,serif;font-style:italic;font-size:.9rem;color:#f1e9d5;line-height:1.6;margin-bottom:1.1rem;}
+      .ac-grad-btn{
+        min-height:44px;border-radius:999px;padding:.55rem 1.3rem;cursor:pointer;
+        background:rgba(251,191,36,.14);border:1px solid rgba(251,191,36,.5);color:#fbbf24;
+        font-family:var(--fm);font-size:.82rem;font-weight:800;
+      }
+      #bf-academy .act-head:focus-visible,#bf-academy .ac-review-go:focus-visible,
+      #bf-academy .ac-review-x:focus-visible,#bf-academy .act-view-diploma:focus-visible,
+      .ac-grad-btn:focus-visible{outline:2px solid #fbbf24;outline-offset:2px;}
+      :root.light #bf-academy .act-dot{color:var(--tx);}
+      :root.light #bf-academy .act-dot.done{background:#059669;border-color:#059669;color:#fff;}
+      /* Light pass for the capstone (app chrome, not an export — the
+         diploma CANVAS stays night-navy as the shareable artifact). */
+      :root.light #acGradOverlay{background:rgba(30,30,40,.45);}
+      :root.light .ac-grad-card{background:#ffffff;border-color:rgba(146,64,14,.45);}
+      :root.light .ac-grad-eye{color:#92400e;}
+      :root.light .ac-grad-title{color:#92400e;}
+      :root.light .ac-grad-sub{color:#1e293b;}
+      :root.light .ac-grad-btn{background:rgba(146,64,14,.08);border-color:rgba(146,64,14,.5);color:#92400e;}
+      :root.light #bf-academy .ac-review-strip{background:rgba(146,64,14,.06);border-left-color:#92400e;}
+      :root.light #bf-academy .ac-review-eye{color:#92400e;}
+      :root.light #bf-academy .ac-review-go{background:rgba(146,64,14,.08);border-color:rgba(146,64,14,.45);color:#92400e;}
+      :root.light #bf-academy .act-view-diploma{color:#92400e;}
+      :root.light #bf-academy .act-diploma-chip{color:#92400e;background:rgba(146,64,14,.07);border-color:rgba(146,64,14,.4);}
       /* Card: dark navy bg, gold border, 16px radius; lift + gold glow on hover */
       #bf-academy .ac-card{
         position:relative;cursor:pointer;overflow:hidden;
@@ -14125,6 +14223,27 @@
         <button onclick="acCertPrint()" style="flex:1;min-width:130px;background:rgba(255,255,255,.06);color:var(--tx);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.6rem .85rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);">🖨 Print</button>
       </div>
       <div style="padding:0 1.2rem 1rem;font-size:.62rem;color:var(--tx3);text-align:center;line-height:1.5;">Certificate ID: <span id="acCertIdLabel">—</span></div>
+    </div>
+  </div>
+
+  <!-- W3-4 Diploma modal (2026-07-05) — per-TRACK artifact, night-navy
+       + faith gold register ("Certificate" stays the legacy per-course
+       artifact — deliberate tier distinction). Canvas rendered by
+       _acDiplomaRender (DPR-aware, fonts.ready-gated). -->
+  <div id="acDiplomaModal" class="mo" onclick="if(event.target===this)closeModal('acDiplomaModal')">
+    <div class="md" style="max-width:620px;padding:0;">
+      <div style="padding:1rem 1.2rem .65rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid rgba(255,255,255,.06);">
+        <span style="font-size:1.2rem;">🎓</span>
+        <span id="acDiplomaTitle" style="font-family:var(--fh,var(--fm));font-size:1rem;font-weight:800;letter-spacing:.04em;color:var(--tx);">Diploma</span>
+        <button onclick="closeModal('acDiplomaModal')" aria-label="Close" style="margin-left:auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:.82rem;font-weight:800;">✕</button>
+      </div>
+      <div style="padding:.85rem 1.2rem;display:flex;justify-content:center;">
+        <canvas id="acDiplomaCanvas" style="width:100%;max-width:540px;aspect-ratio:1200/900;border-radius:10px;background:rgba(0,0,0,.25);box-shadow:0 8px 30px rgba(0,0,0,.4);"></canvas>
+      </div>
+      <div style="padding:.65rem 1.2rem 1.1rem;display:flex;gap:.4rem;flex-wrap:wrap;">
+        <button onclick="acDiplomaDownload()" style="flex:1;min-width:130px;min-height:44px;background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.6rem .85rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">⬇ Save image</button>
+        <button onclick="acDiplomaShare()" style="flex:1;min-width:130px;min-height:44px;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.4);border-radius:10px;padding:.6rem .85rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Share</button>
+      </div>
     </div>
   </div>
 
