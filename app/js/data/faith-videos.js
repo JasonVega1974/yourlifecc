@@ -21,7 +21,7 @@ const FAITH_VIDEOS = [
     source: 'The Bible Project',
     youtubeId: 'xrzq_X1NNaA',
     duration: '4:52',
-    placement: ['station:accepted', 'station:gospel'],
+    placement: ['station:accepted', 'station:gospel', 'lesson:gospel-1'],
     description: 'What the gospel actually is — and why it changes everything.'
   },
   {
@@ -39,7 +39,7 @@ const FAITH_VIDEOS = [
     source: 'The Bible Project',
     youtubeId: 'p7XRPGzL6kk',
     duration: '7:14',
-    placement: ['faith:jesus'],
+    placement: ['faith:jesus', 'lesson:who-is-jesus-1'],
     description: 'Who Jesus claimed to be — and why it matters.'
   },
   {
@@ -48,7 +48,7 @@ const FAITH_VIDEOS = [
     source: 'The Bible Project',
     youtubeId: 'Vb24Lk1Oh5M',
     duration: '6:01',
-    placement: ['faith:proof', 'story:cross'],
+    placement: ['faith:proof', 'story:cross', 'lesson:resurrection-1', 'lesson:resurrection-evidence'],
     description: 'The central claim of Christianity — examined.'
   },
   {
@@ -57,7 +57,7 @@ const FAITH_VIDEOS = [
     source: 'The Bible Project',
     youtubeId: 'oNNZO9i1Gjc',
     duration: '5:13',
-    placement: ['station:spirit'],
+    placement: ['station:spirit', 'lesson:spirit-1', 'lesson:holy-spirit'],
     description: 'Who the Holy Spirit is and how He works in your life.'
   },
   {
@@ -66,7 +66,7 @@ const FAITH_VIDEOS = [
     source: 'The Bible Project',
     youtubeId: '3-YlqQfKkKk',
     duration: '5:26',
-    placement: ['faith:prayer', 'station:prayer-learn'],
+    placement: ['faith:prayer', 'station:prayer-learn', 'lesson:pray-1', 'lesson:prayer-answers'],
     description: 'What prayer actually is — and how to do it.'
   },
   {
@@ -75,7 +75,7 @@ const FAITH_VIDEOS = [
     source: 'The Bible Project',
     youtubeId: 'YbipxLDtY8c',
     duration: '4:48',
-    placement: ['station:assurance'],
+    placement: ['station:assurance', 'lesson:identity-1'],
     description: 'Who you are now that you\'re in Christ.'
   },
   {
@@ -84,7 +84,7 @@ const FAITH_VIDEOS = [
     source: 'The Bible Project',
     youtubeId: '7_CGP-12AE0',
     duration: '6:42',
-    placement: ['station:word', 'faith:bible'],
+    placement: ['station:word', 'faith:bible', 'lesson:read-1', 'lesson:how-to-read-bible'],
     description: 'What the Bible is and how to read it.'
   }
 ];

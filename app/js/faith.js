@@ -7084,6 +7084,10 @@ function openLessonModal(lessonId){
   if(eyeEl) eyeEl.textContent = (lesson.duration || '8 min') + ' · ' + ((lesson.quiz || []).length) + ' questions';
 
   _lmRenderLesson(lesson);
+  // 📺 Contextual video anchor — same pattern as the curriculum lessons
+  // (openAcademyLesson). Prepends a "Watch" overview into the featured
+  // lesson body when a FAITH_VIDEOS entry is placed at lesson:<id>.
+  if(typeof window.fvInject==='function'){ try{ window.fvInject('lesson:'+lesson.id, 'lmContent', 'prepend'); }catch(_e){} }
 
   const wrap = document.getElementById('lmBodyWrap');
   if(wrap) wrap.scrollTop = 0;
@@ -7542,6 +7546,10 @@ function openAcademyLesson(courseId, lessonId){
     ? `<div style="margin-top:1.2rem;padding:.75rem;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);border-radius:10px;text-align:center;font-size:.78rem;font-weight:700;color:#10b981;">✅ Lesson complete · +5 XP earned</div>`
     : `<div style="margin-top:1.2rem;text-align:center;"><button onclick="academyMarkLessonNew('${courseId}','${lesson.id}')" style="background:linear-gradient(135deg,#38bdf8,${mod.color});color:#0b1220;border:none;border-radius:10px;padding:.6rem 1.4rem;font-size:.82rem;font-weight:800;cursor:pointer;font-family:var(--fm);">✅ Mark Lesson Complete +5 XP</button></div>`;
   document.getElementById('charBody').innerHTML = (lesson.body || '') + refsHtml + reflectHtml + cta;
+  // 📺 Contextual video anchor (faith-videos.js) — additive, idempotent,
+  // safe if the module never loaded. Prepends a "Watch" overview to the
+  // lesson body when a FAITH_VIDEOS entry is placed at lesson:<id>.
+  if(typeof window.fvInject==='function'){ try{ window.fvInject('lesson:'+lesson.id, 'charBody', 'prepend'); }catch(_e){} }
   document.getElementById('charQuiz').innerHTML = '';
   openModal('charModal');
   if(typeof logActivity === 'function') logActivity('faith', 'Academy lesson opened: ' + lesson.title);
