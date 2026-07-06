@@ -1,10 +1,16 @@
 // api/youtube-feed.js
 // Live feed for the Bible Project video archive surface.
-//   - Channel "latest uploads" via the CANONICAL channels.list -> uploads
-//     playlist -> playlistItems path (reliable + cheap: 1+1 quota units).
-//     This replaces search.list, which is 100 units AND can return empty
-//     for a valid channelId — a likely cause of the empty `videos` array.
-//   - A hand-picked BibleProject playlist via playlistItems.list.
+//   - Channel "latest uploads" via playlistItems.list on the channel's
+//     auto-generated UPLOADS playlist. Every channel has one; its id is the
+//     channel id with the 'UC' prefix swapped for 'UU'. This needs no OAuth
+//     and costs 1 quota unit — it replaces both the 100-unit search.list
+//     (which 403'd: "caller does not have permission" on the free tier) and
+//     the extra channels.list hop.
+//   - The old hand-picked playlist (PLH0Szn1…) 404'd (deleted or private),
+//     so the curated live-playlist section is retired. The response still
+//     returns `playlist: []` and the archive UI hides that section
+//     gracefully — one live feed now (latest uploads), two archive sections
+//     (Featured curated from VIDEO_ARCHIVE + New from Bible Project).
 //
 // SELF-ENABLING: if YOUTUBE_API_KEY is unset, returns { enabled:false,
 // videos:[], playlist:[] } (200, never an error) so the client shows the
@@ -15,11 +21,10 @@
 //
 // DIAGNOSE (raw YouTube state, no key leak):
 //   GET /api/youtube-feed?debug=1
-// adds a `diag` block with, per call: the API method, HTTP status, any
-// Google error message + reason, item count, and totalResults. That is the
-// raw signal needed to tell apart: wrong channel/playlist id (200 + 0
-// items / 404 playlistNotFound), a restricted key (403 + reason), and an
-// exceeded quota (403 quotaExceeded).
+// adds a `diag` block with the API method, HTTP status, any Google error
+// message + reason, item count, and totalResults — enough to tell apart a
+// wrong playlist id (404 playlistNotFound), a restricted key (403 + reason),
+// and an exceeded quota (403 quotaExceeded).
 //
 // KEY REQUIREMENTS (Google Cloud console): YouTube Data API v3 must be
 // ENABLED, and the key must NOT be HTTP-referrer-restricted (server calls
@@ -31,8 +36,8 @@
 
 const https = require('https');
 
-const CHANNEL_ID  = 'UCVfwlh9XpX2Y_tQfjeln9QA';           // BibleProject (verified)
-const PLAYLIST_ID = 'PLH0Szn1yYNedhbJcKSQbpwGmmk7fhwTyL'; // BibleProject playlist
+// BibleProject channel UCVfwlh9XpX2Y_tQfjeln9QA → uploads playlist (UC → UU).
+const UPLOADS_ID = 'UUVfwlh9XpX2Y_tQfjeln9QA';
 
 module.exports = async (req, res) => {
   res.setHeader('Content-Type', 'application/json');
@@ -44,46 +49,26 @@ module.exports = async (req, res) => {
     return res.status(200).json({ enabled: false, videos: [], playlist: [], keyPresent: false });
   }
 
-  const [ch, pl] = await Promise.all([
-    fetchChannelUploads(key),
-    fetchPlaylist(key, PLAYLIST_ID)
-  ]);
-  const videos   = ch.items;
-  const playlist = pl.items;
-  const hasData  = videos.length > 0 || playlist.length > 0;
+  const up = await fetchUploads(key);
+  const videos  = up.items;
+  const hasData = videos.length > 0;
 
   res.setHeader('Cache-Control', hasData
     ? 's-maxage=21600, stale-while-revalidate=86400'
     : 'no-store');
 
-  const body = { enabled: true, videos: videos, playlist: playlist };
-  if (debug) body.diag = { channel: ch.diag, playlist: pl.diag };
+  const body = { enabled: true, videos: videos, playlist: [] };
+  if (debug) body.diag = { uploads: up.diag };
   return res.status(200).json(body);
 };
 
-// channels.list -> relatedPlaylists.uploads -> playlistItems (latest first).
-async function fetchChannelUploads(key) {
-  const chUrl = api('channels', { id: CHANNEL_ID, part: 'contentDetails' }, key);
-  const ch = await getJson(chUrl);
-  const diag = diagOf('channels.list', ch);
-  if (ch.status !== 200 || errOf(ch)) return { items: [], diag: diag };
-
-  const uploads = path(ch.data, ['items', 0, 'contentDetails', 'relatedPlaylists', 'uploads']);
-  if (!uploads) { diag.note = 'channel returned no uploads playlist (check channel id)'; return { items: [], diag: diag }; }
-  diag.uploadsPlaylist = uploads;
-
-  const upUrl = api('playlistItems', { playlistId: uploads, part: 'snippet', maxResults: 12 }, key);
-  const up = await getJson(upUrl);
-  diag.uploads = diagOf('uploads.playlistItems', up);
-  if (up.status !== 200 || errOf(up)) return { items: [], diag: diag };
-  return { items: mapPlaylist(up.data), diag: diag };
-}
-
-async function fetchPlaylist(key, playlistId) {
-  const url = api('playlistItems', { playlistId: playlistId, part: 'snippet', maxResults: 25 }, key);
+// Latest uploads via playlistItems.list on the UU uploads playlist.
+// No channels.list, no search.list, no OAuth — free-tier safe.
+async function fetchUploads(key) {
+  const url = api('playlistItems', { playlistId: UPLOADS_ID, part: 'snippet', maxResults: 12 }, key);
   const r = await getJson(url);
-  const diag = diagOf('playlistItems', r);
-  diag.playlistId = playlistId;
+  const diag = diagOf('uploads.playlistItems', r);
+  diag.playlistId = UPLOADS_ID;
   if (r.status !== 200 || errOf(r)) return { items: [], diag: diag };
   return { items: mapPlaylist(r.data), diag: diag };
 }
