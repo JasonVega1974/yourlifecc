@@ -223,6 +223,12 @@ const DEF = {
   // before/after intensity (1-10) written by the guided journey;
   // old {key,date} entries stay valid and just lack them.
   heartChecks:[],
+  // ACTS Guided Prayer Journey (Wave 2 §2a, 2026-07-05) — in-flight
+  // draft so a mid-walk reload resumes: { date, moves:{adoration…},
+  // beat }. Cleared on finale-save or clean exit. The finished prayer
+  // lands as ONE combined entry in D.quickPrayers (source:'acts') —
+  // this key never accumulates. Object, never array.
+  actsSess:{ date:'', moves:{}, beat:0 },
   // 2026-07-04 (The Pulse) — per-day reward throttle for the guided
   // journey: {prayer|reflect|xp: 'YYYY-MM-DD'}. MUST live in DEF (not
   // a module var) or a reload re-arms the XP/quest farm.

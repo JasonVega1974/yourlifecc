@@ -4677,13 +4677,40 @@ function renderMyPrayersList(){
       </div>`;
     return;
   }
-  el.innerHTML = items.map(p => {
-    const status   = p.answered ? 'answered' : (p.status === 'ongoing' ? 'ongoing' : 'active');
-    const cat      = p.category || 'self';
-    const created  = (p.date || '').slice(0,10);
-    const ansDate  = (p.answeredAt || p.answeredDate || '').slice(0,10);
-    const title    = p.title ? escapeHtml(p.title) : '';
-    return `<div class="pr-mine-card ${status}">
+  // Wave 2 §2b — in the default view, answered prayers collect into a
+  // collapsed "Answered shelf" headed by the running count (a testimony
+  // jar, not a streak). Explicit filters (active/ongoing/answered) keep
+  // their flat behavior.
+  if(_prMineFilter === 'all'){
+    const unanswered = items.filter(p => !p.answered);
+    const answeredItems = items.filter(p => p.answered);
+    let html = unanswered.map(_prCardHtml).join('');
+    if(answeredItems.length){
+      const collapsed = _prAnsweredOpen === null ? (answeredItems.length > 5) : !_prAnsweredOpen;
+      html += `<div class="pr-answered-shelf">
+        <button type="button" class="pr-answered-head" aria-expanded="${collapsed ? 'false' : 'true'}" onclick="prToggleAnsweredShelf()">
+          <span class="pr-answered-count">${answeredItems.length} answered prayer${answeredItems.length === 1 ? '' : 's'} and counting</span>
+          <span class="pr-answered-chev">${collapsed ? '▾' : '▴'}</span>
+        </button>
+        ${collapsed ? '' : `<div class="pr-answered-list">${answeredItems.map(_prCardHtml).join('')}</div>`}
+      </div>`;
+    }
+    el.innerHTML = html;
+    return;
+  }
+  el.innerHTML = items.map(_prCardHtml).join('');
+}
+
+// One prayer card. Answered cards carry an id so the answered-moment
+// lift can target the exact card after re-render.
+function _prCardHtml(p){
+  const status   = p.answered ? 'answered' : (p.status === 'ongoing' ? 'ongoing' : 'active');
+  const cat      = p.category || 'self';
+  const created  = (p.date || '').slice(0,10);
+  const ansDate  = (p.answeredAt || p.answeredDate || '').slice(0,10);
+  const title    = p.title ? escapeHtml(p.title) : '';
+  const idAttr   = p.answered ? ` id="pr-answered-${p.id}"` : '';
+  return `<div class="pr-mine-card ${status}"${idAttr}>
       <div class="pr-mine-hdr">
         <span class="pr-mine-status ${status}">${status === 'answered' ? '✓ Answered' : status}</span>
         <span class="pr-mine-cat">${escapeHtml(cat)}</span>
@@ -4698,7 +4725,14 @@ function renderMyPrayersList(){
         <button class="pr-mine-btn del" onclick="deletePrayerItem(${p.id})">🗑 Delete</button>
       </div>
     </div>`;
-  }).join('');
+}
+
+var _prAnsweredOpen = null;   // null = default (auto-collapse past 5)
+function prToggleAnsweredShelf(){
+  const answeredN = ((D && D.prayers) || []).filter(p => p && p.answered).length;
+  const currentlyOpen = _prAnsweredOpen === null ? (answeredN <= 5) : _prAnsweredOpen;
+  _prAnsweredOpen = !currentlyOpen;
+  renderMyPrayersList();
 }
 
 function prFilterMine(filter, btn){
@@ -4849,13 +4883,32 @@ function confirmPrayerAnswered(){
   if(typeof logActivity === 'function') logActivity('faith', 'Prayer answered');
   if(typeof renderFaithJourney === 'function') renderFaithJourney();
   if(typeof renderFaithHome === 'function') renderFaithHome();
+  var justAnsweredId = p.id;
+  // Force the Answered shelf OPEN before re-render so the freshly
+  // answered card actually mounts — otherwise, past 5 answered, the
+  // shelf auto-collapses and the green-lift target never exists, so
+  // the reward silently never plays (post-build review BLOCKING).
+  _prAnsweredOpen = true;
   renderMyPrayersPane();
   closePrayerAnswer();
-  // 🎉 confetti + toast
+  // Win-LITE, not a quiz score (Wave 2 §2b + post-build ruling): the
+  // small side-confetti stays, but the "+5 XP" toast + point write are
+  // GONE — gamifying "God answered this" with a score contradicts the
+  // register. The card gets a 2s GREEN lift (the pane's answered
+  // color; gold would fight the established identity), and the count
+  // is a testimony jar that only goes up.
   if(typeof launchSideConfetti === 'function') launchSideConfetti();
-  if(typeof showToast === 'function') showToast('Prayer answered! 🎉 +5 XP');
-  D.scrPoints = (D.scrPoints || 0) + 5;
-  save();
+  var answeredN = ((D && D.prayers) || []).filter(function(x){ return x && x.answered; }).length;
+  if(typeof showToast === 'function') showToast('🙏 Answered — ' + answeredN + ' answered prayer' + (answeredN === 1 ? '' : 's') + ' and counting.');
+  // The card just marked answered lifts once it re-renders.
+  setTimeout(function(){
+    var card = document.getElementById('pr-answered-' + justAnsweredId);
+    if(card){
+      var reduced = false;
+      try { reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch(_e){}
+      if(!reduced) card.classList.add('pr-lift');
+    }
+  }, 60);
 }
 
 // ── Prayer Wall pane (Supabase prayer_requests, privacy='community') ──
@@ -5007,6 +5060,11 @@ async function prSubmitWallPost(){
 
 // ── How to Pray pane (ACTS + 8 types + Lectio Divina) ─────────
 function renderHowToPrayPane(){
+  // ACTS Journey launcher (Wave 2 §2a) — the guided walk sits above the
+  // static framework grid ("learn it, then walk it"). Preserves an
+  // in-progress walk across a pane re-render.
+  if(typeof renderActsLauncher === 'function' && _actsBeatActive()){ /* walk live — leave it */ }
+  else if(typeof renderActsLauncher === 'function') renderActsLauncher();
   // ACTS framework — horizontal sequence with step numbers + connecting arrows
   const actsEl = document.getElementById('prActsGrid');
   const acts = (typeof window !== 'undefined' && window.ACTS_FRAMEWORK) || [];
