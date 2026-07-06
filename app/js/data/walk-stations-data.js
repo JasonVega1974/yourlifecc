@@ -62,42 +62,7 @@ const WALK_STATIONS = [
   human:'Curiosity grows best in conversation. Is there one person you know who genuinely follows Jesus? Ask them how it started for them.'
 },
 {
-  id:'gospel', chapter:'coming-home', order:2, icon:'💛',
-  name:'Understand the Gospel', tagline:'What Jesus actually did — and why it\'s for you.',
-  pastorReview:true,
-  welcome:'"Gospel" just means good news. Before you can say yes to it, you deserve to actually understand it.',
-  what:'This step is grasping the heart of Christianity in plain language: God made you, loves you, and wants you — but something is broken between us and Him, and Jesus came to fix what we never could.',
-  understand:[
-    'Start here: you were made on purpose, by a God who loves you. But every one of us has broken things — we\'ve hurt people, lied, chosen ourselves. The Bible calls that sin, and it separates us from a perfect God the way a wall separates two rooms.',
-    'Here\'s the part people miss: God didn\'t respond to that wall with a to-do list. He responded with a rescue. Jesus — God Himself, in person — lived the perfect life we couldn\'t, then died on a cross taking the penalty our sin earned. The innocent one traded places with the guilty ones. That\'s the exchange at the center of everything.',
-    'Then He rose from the dead — not as a metaphor, as an event with eyewitnesses — proving the payment worked and death doesn\'t get the last word.',
-    'So the good news is not "try harder and God might accept you." It\'s "it is finished — will you receive it?" Grace means it\'s a gift. You can\'t earn a gift. You can only take it or leave it.'
-  ],
-  verses:[
-    { ref:'John 3:16', text:'For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.' },
-    { ref:'Romans 5:8', text:'God demonstrates his own love for us in this: While we were still sinners, Christ died for us.' },
-    { ref:'Ephesians 2:8-9', text:'For it is by grace you have been saved, through faith — and this is not from yourselves, it is the gift of God — not by works, so that no one can boast.' }
-  ],
-  step:{
-    title:'Tell the gospel back in your own words',
-    how:'Open your journal and write the good news as if explaining it to a friend in four sentences: God made me and loves me. My sin built a wall. Jesus died and rose to tear it down. It\'s a gift I can receive. If you can say it, you understand it.'
-  },
-  markers:[
-    'You can explain the gospel simply, without churchy words.',
-    'You understand it\'s a rescue to receive, not a standard to reach.',
-    'It has started to feel less like information and more like an invitation.'
-  ],
-  tools:[
-    { icon:'📖', label:'Story Mode: the whole story', route:'story' },
-    { icon:'🎓', label:'Faith Academy basics', route:'academy' },
-    { icon:'🃏', label:'Convince Me cards', route:'convince' }
-  ],
-  reflect:'Which half is harder for you to believe — that you needed rescuing, or that God wanted to rescue you? Why?',
-  pray:'Jesus, I\'m starting to see what You did — for me, specifically. Help me understand it all the way down. Amen.',
-  human:'Ask a pastor or a Christian you trust: "What does the gospel mean to you, personally?" Their answer will teach you something a page can\'t.'
-},
-{
-  id:'accepted', chapter:'coming-home', order:3, icon:'🕊️',
+  id:'accepted', chapter:'coming-home', order:2, icon:'🕊️',
   name:'Saying Yes to Jesus', tagline:'The most important step on the whole path.',
   pastorReview:true,
   welcome:'Everything before this was learning about Him. This step is meeting Him.',
@@ -134,6 +99,40 @@ const WALK_STATIONS = [
   human:'Tell one person today — a pastor, a believing friend, a family member. Saying it out loud to a real human makes it real in a whole new way. (And they will want to celebrate you.)'
 },
 {
+  id:'baptism', chapter:'coming-home', order:3, icon:'🌊',
+  name:'Baptism', tagline:'Going public with your new life.',
+  pastorReview:true,
+  welcome:'You said yes in your heart. Baptism is saying it with your whole body, in front of witnesses.',
+  what:'Baptism is a public picture of what already happened inside you: going under the water portrays being buried with Christ; coming up portrays rising with Him into new life. It doesn\'t save you — Jesus did that. It announces it.',
+  understand:[
+    'Jesus Himself was baptized, and He told His followers to baptize everyone who follows Him (Matthew 28:19). In the book of Acts, baptism follows belief so quickly it\'s almost breathless — the Ethiopian official sees water from his chariot and says, "What can stand in the way of my being baptized?" (Acts 8:36).',
+    'Think of it like a wedding ring. The ring doesn\'t make you married — the covenant does. But you wear the ring because you want the world to know. Baptism is your ring: a soaked, smiling, public "I\'m His."',
+    'Nervous about being up front? Almost everyone is. But something happens when you declare it with witnesses — the private decision gets roots. Churches that follow Jesus in this will walk you through every detail; the timing and details are a conversation with your pastor.'
+  ],
+  verses:[
+    { ref:'Romans 6:4', text:'We were therefore buried with him through baptism into death in order that, just as Christ was raised from the dead through the glory of the Father, we too may live a new life.' },
+    { ref:'Matthew 28:19', text:'Go and make disciples of all nations, baptizing them in the name of the Father and of the Son and of the Holy Spirit.' },
+    { ref:'Acts 8:36', text:'"Look, here is water. What can stand in the way of my being baptized?"' }
+  ],
+  step:{
+    title:'Have the baptism conversation',
+    how:'Talk to a pastor at your church this month and say the words: "I\'ve accepted Christ and I want to be baptized." That one sentence sets everything in motion. If you don\'t have a church yet, the Finding Your Church Family station will help — the two steps often happen together.'
+  },
+  markers:[
+    'You\'ve told a pastor you want to be baptized (or you\'re already scheduled).',
+    'You understand it\'s a declaration of grace received, not a graduation earned.',
+    'You\'ve thought about who you want watching from the front row.'
+  ],
+  tools:[
+    { icon:'📔', label:'Log it as a Faith Journey milestone', route:'journey' },
+    { icon:'⛪', label:'Finding Your Church Family station', route:'church' },
+    { icon:'🎓', label:'Faith Academy: baptism lesson', route:'academy' }
+  ],
+  reflect:'Who do you want to witness your baptism — and who might God be planning to reach through watching you go public?',
+  pray:'Jesus, You went into the water for me; I\'ll go into the water for You. Give me courage to declare You out loud. Amen.',
+  human:'This entire step runs through a real church and a real pastor — that\'s by design. Faith was never meant to be announced to an empty room.'
+},
+{
   id:'assurance', chapter:'coming-home', order:4, icon:'🪞',
   name:'Assurance & New Identity', tagline:'Knowing you\'re saved — and who you are now.',
   pastorReview:true,
@@ -167,42 +166,43 @@ const WALK_STATIONS = [
   pray:'Father, when my feelings argue with Your Word, help me side with Your Word. I am Yours because You said so. Amen.',
   human:'Share your hardest doubt with a mature believer. Watch how un-shocked they are — every strong Christian you admire has stood exactly where you\'re standing.'
 },
-
-/* ── CHAPTER 2 · FIRST STEPS ─────────────────────────────── */
 {
-  id:'baptism', chapter:'first-steps', order:5, icon:'🌊',
-  name:'Baptism', tagline:'Going public with your new life.',
+  id:'gospel', chapter:'coming-home', order:5, icon:'💛',
+  name:'Understand the Gospel', tagline:'What Jesus actually did — and why it\'s for you.',
   pastorReview:true,
-  welcome:'You said yes in your heart. Baptism is saying it with your whole body, in front of witnesses.',
-  what:'Baptism is a public picture of what already happened inside you: going under the water portrays being buried with Christ; coming up portrays rising with Him into new life. It doesn\'t save you — Jesus did that. It announces it.',
+  welcome:'"Gospel" just means good news. Before you can say yes to it, you deserve to actually understand it.',
+  what:'This step is grasping the heart of Christianity in plain language: God made you, loves you, and wants you — but something is broken between us and Him, and Jesus came to fix what we never could.',
   understand:[
-    'Jesus Himself was baptized, and He told His followers to baptize everyone who follows Him (Matthew 28:19). In the book of Acts, baptism follows belief so quickly it\'s almost breathless — the Ethiopian official sees water from his chariot and says, "What can stand in the way of my being baptized?" (Acts 8:36).',
-    'Think of it like a wedding ring. The ring doesn\'t make you married — the covenant does. But you wear the ring because you want the world to know. Baptism is your ring: a soaked, smiling, public "I\'m His."',
-    'Nervous about being up front? Almost everyone is. But something happens when you declare it with witnesses — the private decision gets roots. Churches that follow Jesus in this will walk you through every detail; the timing and details are a conversation with your pastor.'
+    'Start here: you were made on purpose, by a God who loves you. But every one of us has broken things — we\'ve hurt people, lied, chosen ourselves. The Bible calls that sin, and it separates us from a perfect God the way a wall separates two rooms.',
+    'Here\'s the part people miss: God didn\'t respond to that wall with a to-do list. He responded with a rescue. Jesus — God Himself, in person — lived the perfect life we couldn\'t, then died on a cross taking the penalty our sin earned. The innocent one traded places with the guilty ones. That\'s the exchange at the center of everything.',
+    'Then He rose from the dead — not as a metaphor, as an event with eyewitnesses — proving the payment worked and death doesn\'t get the last word.',
+    'So the good news is not "try harder and God might accept you." It\'s "it is finished — will you receive it?" Grace means it\'s a gift. You can\'t earn a gift. You can only take it or leave it.'
   ],
   verses:[
-    { ref:'Romans 6:4', text:'We were therefore buried with him through baptism into death in order that, just as Christ was raised from the dead through the glory of the Father, we too may live a new life.' },
-    { ref:'Matthew 28:19', text:'Go and make disciples of all nations, baptizing them in the name of the Father and of the Son and of the Holy Spirit.' },
-    { ref:'Acts 8:36', text:'"Look, here is water. What can stand in the way of my being baptized?"' }
+    { ref:'John 3:16', text:'For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.' },
+    { ref:'Romans 5:8', text:'God demonstrates his own love for us in this: While we were still sinners, Christ died for us.' },
+    { ref:'Ephesians 2:8-9', text:'For it is by grace you have been saved, through faith — and this is not from yourselves, it is the gift of God — not by works, so that no one can boast.' }
   ],
   step:{
-    title:'Have the baptism conversation',
-    how:'Talk to a pastor at your church this month and say the words: "I\'ve accepted Christ and I want to be baptized." That one sentence sets everything in motion. If you don\'t have a church yet, the Finding Your Church Family station will help — the two steps often happen together.'
+    title:'Tell the gospel back in your own words',
+    how:'Open your journal and write the good news as if explaining it to a friend in four sentences: God made me and loves me. My sin built a wall. Jesus died and rose to tear it down. It\'s a gift I can receive. If you can say it, you understand it.'
   },
   markers:[
-    'You\'ve told a pastor you want to be baptized (or you\'re already scheduled).',
-    'You understand it\'s a declaration of grace received, not a graduation earned.',
-    'You\'ve thought about who you want watching from the front row.'
+    'You can explain the gospel simply, without churchy words.',
+    'You understand it\'s a rescue to receive, not a standard to reach.',
+    'It has started to feel less like information and more like an invitation.'
   ],
   tools:[
-    { icon:'📔', label:'Log it as a Faith Journey milestone', route:'journey' },
-    { icon:'⛪', label:'Finding Your Church Family station', route:'church' },
-    { icon:'🎓', label:'Faith Academy: baptism lesson', route:'academy' }
+    { icon:'📖', label:'Story Mode: the whole story', route:'story' },
+    { icon:'🎓', label:'Faith Academy basics', route:'academy' },
+    { icon:'🃏', label:'Convince Me cards', route:'convince' }
   ],
-  reflect:'Who do you want to witness your baptism — and who might God be planning to reach through watching you go public?',
-  pray:'Jesus, You went into the water for me; I\'ll go into the water for You. Give me courage to declare You out loud. Amen.',
-  human:'This entire step runs through a real church and a real pastor — that\'s by design. Faith was never meant to be announced to an empty room.'
+  reflect:'Which half is harder for you to believe — that you needed rescuing, or that God wanted to rescue you? Why?',
+  pray:'Jesus, I\'m starting to see what You did — for me, specifically. Help me understand it all the way down. Amen.',
+  human:'Ask a pastor or a Christian you trust: "What does the gospel mean to you, personally?" Their answer will teach you something a page can\'t.'
 },
+
+/* ── CHAPTER 2 · FIRST STEPS ─────────────────────────────── */
 {
   id:'prayer-learn', chapter:'first-steps', order:6, icon:'🙏',
   name:'Learning to Pray', tagline:'Actually talking with God — not performing.',
