@@ -101,21 +101,23 @@ const WALK_STATIONS = [
   name:'Saying Yes to Jesus', tagline:'The most important step on the whole path.',
   pastorReview:true,
   welcome:'Everything before this was learning about Him. This step is meeting Him.',
-  what:'Accepting Christ means personally receiving the gift — telling God you believe Jesus died and rose for you, turning from running your own life, and inviting Him to lead it. It\'s not a ritual. It\'s a decision, made in honest words.',
+  what:'Accepting Christ means personally receiving the gift — telling God you believe Jesus, the Son of God, died for your sins, was buried, and rose again. It means turning from running your own life and inviting Him to lead it. It\'s not a ritual. It\'s a decision, made in honest words, resting on the most important fact in history.',
   understand:[
+    'The heart of the gospel is a historical fact: Jesus Christ, the Son of God, died on the cross for your sins — taking the punishment you deserved. He was buried. And on the third day He rose from the dead, conquering death forever. This is not a metaphor. The resurrection is the central claim of Christianity — Paul says if it didn\'t happen, \'your faith is futile\' (1 Corinthians 15:17). But it did happen. And because it did, His death counts for you, and His life is available to you.',
     'The Bible makes the doorway surprisingly simple: "If you declare with your mouth, \'Jesus is Lord,\' and believe in your heart that God raised him from the dead, you will be saved" (Romans 10:9). Believe. Receive. Say it.',
     'Two honest words describe what happens. Repent — which isn\'t groveling, it\'s a U-turn: I stop steering and hand Jesus the wheel. And believe — I trust that His death counts for me and His resurrection is my future.',
     'There\'s no magic script. God listens to hearts, not scripts. But if you want words to lean on, the prayer below has carried millions of people through this doorway.',
     'And know this: heaven does not shrug at this moment. Jesus said there is joy in the presence of the angels of God over one sinner who repents (Luke 15:10). One. You.'
   ],
   verses:[
+    { ref:'1 Corinthians 15:3-4', text:'Christ died for our sins according to the Scriptures, and that he was buried, and that he was raised on the third day according to the Scriptures.' },
     { ref:'Romans 10:9', text:'If you declare with your mouth, "Jesus is Lord," and believe in your heart that God raised him from the dead, you will be saved.' },
     { ref:'John 1:12', text:'To all who did receive him, to those who believed in his name, he gave the right to become children of God.' },
     { ref:'Revelation 3:20', text:'Here I am! I stand at the door and knock. If anyone hears my voice and opens the door, I will come in.' }
   ],
   step:{
     title:'Pray and mean it',
-    how:'Find a quiet moment. Pray something like this, out loud if you can: "Jesus, I believe You are the Son of God. I believe You died for my sins and rose again. Forgive me. I turn from going my own way. Come into my life — I\'m Yours. Amen." If you prayed that and meant it, mark this step. Today is Day One.'
+    how:'Find a quiet moment. Pray something like this, out loud if you can: "Jesus, I believe You are the Son of God. I believe You died on the cross for my sins, that You were buried, and that You rose from the dead on the third day. Forgive me for going my own way. I turn from that now and I trust You with my life. Come in — I\'m Yours. Amen." If you prayed that and meant it, mark this step. Today is Day One.'
   },
   markers:[
     'You\'ve prayed to receive Christ — in your words or the ones above.',
