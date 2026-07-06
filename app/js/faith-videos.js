@@ -121,10 +121,17 @@
     else panel.appendChild(node);
   }
 
-  // ── tap → lazy iframe (never before) ─────────────────────
+  // ── tap → full-screen player (video-player.js) ───────────
   function fvPlay(videoId, posterEl){
     var v=_byId(videoId);
-    if(!v || !posterEl || !posterEl.parentNode) return;
+    if(!v) return;
+    // Preferred: hand off to the full-screen player overlay.
+    if(typeof window.openVideoPlayer==='function'){
+      window.openVideoPlayer(v.youtubeId, v.title, v.source);
+      return;
+    }
+    // Fallback (player module absent): the original inline embed.
+    if(!posterEl || !posterEl.parentNode) return;
     var ifr=document.createElement('iframe');
     ifr.className='fv-iframe';
     // youtube-nocookie: privacy-first (no tracking cookie until play) —

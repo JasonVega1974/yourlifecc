@@ -54,7 +54,7 @@
     var thumb='https://img.youtube.com/vi/'+encodeURIComponent(ytid)+'/mqdefault.jpg';
     var watch='https://www.youtube.com/watch?v='+encodeURIComponent(ytid);
     return '<div class="va-card" data-va-id="'+_esc(ytid)+'">'+
-      '<button type="button" class="va-poster" onclick="vaPlay(\''+_esc(ytid)+'\', this)" aria-label="Play '+title+'">'+
+      '<button type="button" class="va-poster" data-va-title="'+title+'" onclick="vaPlay(\''+_esc(ytid)+'\', this)" aria-label="Play '+title+'">'+
         '<img class="va-thumb" src="'+thumb+'" alt="" loading="lazy" decoding="async">'+
         '<span class="va-play" aria-hidden="true"><span class="va-play-tri"></span></span>'+
         (v.duration?('<span class="va-dur">'+_esc(v.duration)+'</span>'):'')+
@@ -127,7 +127,15 @@
 
   // ── tap -> lazy iframe (only on tap) ─────────────────────
   function vaPlay(youtubeId, posterEl){
-    if(!youtubeId || !posterEl || !posterEl.parentNode) return;
+    if(!youtubeId) return;
+    var title = (posterEl && posterEl.getAttribute) ? (posterEl.getAttribute('data-va-title')||'') : '';
+    // Preferred: hand off to the full-screen player overlay.
+    if(typeof window.openVideoPlayer==='function'){
+      window.openVideoPlayer(youtubeId, title, 'The Bible Project');
+      return;
+    }
+    // Fallback (player module absent): the original inline embed.
+    if(!posterEl || !posterEl.parentNode) return;
     var ifr=document.createElement('iframe');
     ifr.className='va-iframe';
     ifr.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(youtubeId)+'?autoplay=1&rel=0&modestbranding=1';
