@@ -182,6 +182,12 @@ const DEF = {
   // so the cloud-synced blob stays lean. Surfaced in the Prayer sub-tab
   // history strip and used by Session 3 traits to award Wisdom + Gratitude.
   nightReflections:[],
+  // Night Player (Wave 2 §4a/§4b, 2026-07-05) — sleep-story session
+  // log: [{storyId, ts, completed, end:'natural'|'timer'|'manual',
+  // duration}] capped 30. Quiet telemetry only — never surfaces as
+  // celebratory UI (rest is not a performance). DISTINCT from the
+  // Health module's D.sleepLog (bed/wake hours — do not merge).
+  sleepStoryLog:[],
   // V1 Rebuild · Session 3 — Identity Traits. 7 keys: courage,
   // discipline, compassion, wisdom, integrity, gratitude, faith.
   // Stored as accumulated XP points; getTraitLevel() in traits.js

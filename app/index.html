@@ -9789,6 +9789,90 @@
          holds a mid scale and the stars stop twinkling. */
       #breathPrayerOverlay .bp-ring{ transition:none !important; transform:scale(1.35) !important; }
       #breathPrayerOverlay .bp-star{ animation:none !important; opacity:.3; }
+
+      /* ── Night Player (Wave 2 §4a/§4b, 2026-07-05) ───────────────
+         The one surface DESIGNED for a dark room — dimmer than every
+         other night scene. Scene-layer theme exemption (hardcoded
+         hex, both themes). Auto-dim floors (chrome 12% / play 35%)
+         are a documented exception to the §8 3:1 non-text minimum:
+         the whole point is a screen that stops lighting the room. */
+      #sleepStoryOverlay.np-overlay{
+        position:fixed; inset:0; z-index:100060; overflow:hidden;
+        display:flex; flex-direction:column;
+        background:linear-gradient(180deg,#04040c 0%,#020209 60%,#010107 100%);
+      }
+      /* The fade cover — pure black, ramped IN by the JS fade so the
+         screen resolves to black, never transparent. No CSS transition:
+         the 150ms interval drives opacity tick-for-tick with the audio. */
+      .np-fadecover{ position:absolute; inset:0; background:#000; opacity:0; pointer-events:none; z-index:9; }
+      .np-stars{ position:absolute; inset:0; overflow:hidden; pointer-events:none; }
+      .np-star{ position:absolute; border-radius:50%; background:#f1e9d5; opacity:.15; animation:npTwinkle 7s ease-in-out infinite; }
+      @keyframes npTwinkle{ 0%,100%{ opacity:.06; } 50%{ opacity:.4; } }
+      .np-chrome{ position:relative; transition:opacity .8s ease; }
+      .np-head{
+        display:flex; align-items:center; gap:.6rem;
+        padding:max(env(safe-area-inset-top),.85rem) 1.1rem .4rem;
+      }
+      .np-x{
+        min-width:44px; min-height:44px; border-radius:10px; cursor:pointer;
+        background:rgba(241,233,213,.05); border:1px solid rgba(241,233,213,.18);
+        color:rgba(241,233,213,.6); font-size:.82rem; font-family:var(--fm);
+      }
+      .np-head-title{ flex:1; text-align:center; font-family:var(--fm); font-size:.74rem; font-weight:600; color:rgba(241,233,213,.45); }
+      .np-head-dur{ font-family:var(--fm); font-size:.62rem; color:rgba(241,233,213,.22); }
+      .np-body{ flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:.6rem 1.5rem; overflow:hidden; }
+      #npChrome{ flex:1; display:flex; flex-direction:column; min-height:0; }
+      .np-icon{ font-size:2.2rem; margin-bottom:.9rem; opacity:.25; }
+      .np-verse{
+        font-family:Georgia,'Times New Roman',serif; font-style:italic;
+        font-size:1.05rem; line-height:1.9; color:rgba(241,233,213,.55);
+        text-align:center; max-width:440px; transition:opacity .8s; opacity:1;
+      }
+      .np-play{
+        position:relative; align-self:center; flex-shrink:0; margin:.4rem 0;
+        width:84px; height:84px; border-radius:50%; cursor:pointer;
+        background:rgba(241,233,213,.05); border:1px solid rgba(241,233,213,.28);
+        color:rgba(241,233,213,.7); font-size:1.35rem; font-family:var(--fm);
+        box-shadow:0 0 26px rgba(148,163,255,.1);
+        transition:opacity .8s ease;
+      }
+      .np-foot{ padding:.5rem 1.1rem max(env(safe-area-inset-bottom),1rem); }
+      .np-chips{ display:flex; flex-wrap:wrap; gap:.45rem; justify-content:center; margin-bottom:.6rem; }
+      .np-chip{
+        min-height:44px; padding:.4rem .75rem; border-radius:999px; cursor:pointer;
+        background:transparent; border:1px solid rgba(241,233,213,.2);
+        color:rgba(241,233,213,.55); font-family:var(--fm); font-size:.72rem; font-weight:700;
+      }
+      .np-chip.on{ background:rgba(241,233,213,.1); border-color:rgba(241,233,213,.5); color:rgba(241,233,213,.9); }
+      .np-amb-row{ display:flex; align-items:center; justify-content:center; gap:.55rem; margin-bottom:.65rem; }
+      .np-amb-label{ font-family:var(--fm); font-size:.58rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:rgba(241,233,213,.3); }
+      .np-amb-btn{
+        min-height:44px; min-width:64px; border-radius:999px; cursor:pointer;
+        background:transparent; border:1px solid rgba(241,233,213,.2);
+        color:rgba(241,233,213,.5); font-family:var(--fm); font-size:.7rem; font-weight:700;
+      }
+      .np-amb-btn.on{ background:rgba(56,189,248,.1); border-color:rgba(56,189,248,.4); color:#7dd3fc; }
+      .np-dimbar{ display:flex; align-items:center; gap:.7rem; }
+      .np-count{ font-family:var(--fm); font-size:.6rem; color:rgba(241,233,213,.25); white-space:nowrap; }
+      .np-prog{ flex:1; height:2px; border-radius:99px; background:rgba(241,233,213,.08); overflow:hidden; }
+      .np-prog-fill{ display:block; height:100%; width:0%; background:rgba(241,233,213,.3); border-radius:99px; }
+      /* Two-tier auto-dim: decorative chrome nearly disappears; the
+         one control a groggy hand needs keeps a findable floor. The
+         play floor is set as ABSOLUTE alphas (not opacity multiplying
+         an already-translucent ring down to ~1.8:1) so it stays a real
+         ~3:1 target in the dark (review SHOULD). */
+      .np-dim .np-chrome{ opacity:.12; }
+      .np-dim .np-play{
+        opacity:1;
+        color:rgba(241,233,213,.5); border-color:rgba(241,233,213,.42);
+        background:rgba(241,233,213,.03); box-shadow:none;
+      }
+      .np-x:focus-visible, .np-play:focus-visible, .np-chip:focus-visible,
+      .np-amb-btn:focus-visible{ outline:2px solid rgba(241,233,213,.6); outline-offset:2px; }
+      @media (prefers-reduced-motion: reduce){
+        .np-star{ animation:none !important; opacity:.18; }
+        .np-chrome, .np-play, #sleepStoryOverlay.np-overlay{ transition:none !important; }
+      }
       #breathPrayerOverlay .bp-line{ transition:opacity .001s !important; transform:none !important; }
     }
   </style>

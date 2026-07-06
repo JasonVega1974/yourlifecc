@@ -14104,10 +14104,32 @@ function renderSleepStoriesCard(){
     html += '</div>';
   });
   html += '</div>';
-  html += '<div style="margin-top:.85rem;background:rgba(15,10,40,.4);border:1px solid rgba(167,139,250,.08);border-radius:10px;padding:.6rem .85rem;font-size:.7rem;color:var(--tx3);line-height:1.5;">💡 Use headphones at bedtime. Audio fades out at the end — no need to stop it. Screen stays on.</div>';
+  html += '<div style="margin-top:.85rem;background:rgba(15,10,40,.4);border:1px solid rgba(167,139,250,.08);border-radius:10px;padding:.6rem .85rem;font-size:.7rem;color:var(--tx3);line-height:1.5;">💡 Pick a sleep timer on the player — audio fades out gently, no need to stop it. The screen dims itself after a few seconds.</div>';
   html += '</div>';
   root.innerHTML = html;
 }
+
+// ── Night Player (Wave 2 §4a + §4b, 2026-07-05) ─────────────────
+// Scene-dark overlay player + sleep timer + 30s equal-power fade.
+// Register: rest is not a performance — no XP, no streak, no
+// confetti; settle bell ONLY on natural completion, silence on a
+// timer kill (the listener may be asleep). Rebuild also fixes three
+// latent legacy gaps: pause never paused the MP3 (only the TTS
+// chain), the fade only ramped the TTS fallback volume, and
+// repeatCount was never decremented (Psalm 23 looped forever).
+var _ssAu = null;            // PERSISTENT segment Audio (pause/fade/stop all real now)
+var _ssVol = 1;              // master narration volume — the fade ramps this
+var _ssTimerMin = 0;         // 0 = Full story (default — fewest decisions for a tired user)
+var _ssTimerIv = null;       // countdown repaint (30s ticks, minutes only — no bright clock)
+var _ssDimTimer = null;      // auto-dim arm (20s untouched)
+var _ssDimmed = false;
+var _ssFadeIv = null;        // the 30s fade ramp
+var _ssProgIv = null;        // progress line repaint (5s ticks)
+var _ssStartTs = 0;
+var _ssRepeatLeft = 1;
+var _ssEnded = false;        // guards double logging/close
+var _ssVisHandler = null;
+var _ssAmbientOn = false;    // ambience is OPT-IN (design-system §6: first-run never plays a sound it wasn't asked for)
 
 function startSleepStory(storyId){
   if(typeof SLEEP_STORIES==='undefined') return;
@@ -14116,7 +14138,9 @@ function startSleepStory(storyId){
   _ssClose();
   if(typeof stopAllAudio === 'function') stopAllAudio();
   if('pushState' in history){ history.pushState({ylccSS:true},''); _ssPushedState = true; }
-  _ssId = storyId; _ssIdx = 0; _ssPaused = false; _ssTtsVol = 1.0;
+  _ssId = storyId; _ssIdx = 0; _ssPaused = false; _ssTtsVol = 1.0; _ssVol = 1;
+  _ssStartTs = Date.now(); _ssEnded = false; _ssTimerMin = 0; _ssAmbientOn = false;
+  _ssRepeatLeft = story.repeatCount || 1;
   if(story.verses && story.verses.length){
     _ssSegments = story.verses.slice();
   } else if(story.content){
@@ -14124,75 +14148,231 @@ function startSleepStory(storyId){
   } else {
     _ssSegments = [story.title];
   }
+  // Wake lock: segment advance is a JS chain (onended → timer → new
+  // Audio) that browsers throttle when backgrounded, so the screen
+  // stays awake — the auto-dim below is the dark-room mitigation.
   _ssRequestWakeLock();
   var overlay = document.createElement('div');
   overlay.id = 'sleepStoryOverlay';
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9600;background:#020209;display:flex;flex-direction:column;overflow:hidden;';
-  overlay.addEventListener('click', function(e){ if(e.target === overlay) _ssClose(); });
+  overlay.className = 'np-overlay';
+  // No backdrop-tap-to-close: a groggy reach in the dark must never
+  // kill the story. Close = ✕ / Stop / Escape only.
   document.body.appendChild(overlay);
   document.body.style.overflow = 'hidden';
   _ssEscHandler = function(e){ if(e.key === 'Escape') _ssClose(); };
   document.addEventListener('keydown', _ssEscHandler);
   _ssRenderPlayer(story);
+  // Two-stage restore (dark-room safety): the first tap on a dimmed
+  // player ONLY restores brightness and swallows the event — never
+  // an accidental pause/close. Capture phase so it wins.
+  overlay.addEventListener('pointerdown', function(e){
+    if(_ssDimmed){
+      e.stopPropagation(); e.preventDefault();
+      _ssUndim();
+    } else {
+      _ssArmDim();
+    }
+  }, true);
+  _ssMediaSession(story, true);
+  // visibilitychange: re-acquire the wake lock (auto-released when
+  // the tab hides) and reconcile the play icon with true state.
+  _ssVisHandler = function(){
+    if(document.visibilityState === 'visible' && _ssId){
+      _ssRequestWakeLock();
+      _ssSyncPlayBtn();
+    }
+  };
+  document.addEventListener('visibilitychange', _ssVisHandler);
   _ssPlaySegment(story, 0);
+  _ssArmDim();
+  _ssProgIv = setInterval(function(){ _ssPaintProgress(story); }, 5000);
   _checkAudioStopBtn();
-  var fadeMs = (story.fadeOutAt||story.duration)*60000;
-  _ssFadeTimer = setTimeout(function(){ _ssFadeOut(story); }, fadeMs);
 }
 
 function _ssRenderPlayer(story){
   var overlay = document.getElementById('sleepStoryOverlay');
   if(!overlay) return;
   var seg = _ssSegments[_ssIdx]||'';
-  var ssAmbientSrc = 'https://www.youtube-nocookie.com/embed/'+story.ambientYouTube
-    + '?autoplay=1&mute=0&loop=1&playlist='+story.ambientYouTube
-    + '&controls=0&modestbranding=1&playsinline=1&rel=0&enablejsapi=1&origin='+encodeURIComponent(location.origin);
+  // Starfield — the bp-star idiom, dimmer: this is the one surface
+  // DESIGNED for a dark room.
+  var stars = '';
+  for(var i = 0; i < 36; i++){
+    var sz = (Math.random() * 1.5 + 0.6).toFixed(1);
+    stars += '<span class="np-star" style="left:' + (Math.random() * 100).toFixed(1) + '%;top:' +
+      (Math.random() * 100).toFixed(1) + '%;width:' + sz + 'px;height:' + sz + 'px;animation-delay:' +
+      (Math.random() * 7).toFixed(1) + 's;"></span>';
+  }
+  // Timer chips: Full story pre-selected (fewest decisions at 10pm).
+  var chips = [[0,'Full story'],[10,'10m'],[20,'20m'],[30,'30m'],[45,'45m']].map(function(c){
+    return '<button type="button" class="np-chip' + (c[0] === _ssTimerMin ? ' on' : '') + '" data-min="' + c[0] + '" onclick="npSetTimer(' + c[0] + ')">' + c[1] + '</button>';
+  }).join('');
   overlay.innerHTML = [
-    '<div style="display:flex;align-items:center;justify-content:space-between;padding:max(env(safe-area-inset-top),.85rem) 1.1rem .4rem;flex-shrink:0;">',
-    '<button type="button" onclick="_ssClose()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);border-radius:8px;padding:.38rem .85rem;font-size:.78rem;cursor:pointer;font-family:var(--fm);min-width:44px;min-height:44px;">✕</button>',
-    '<span style="font-size:.7rem;color:rgba(255,255,255,.4);font-weight:600;">'+escapeHtml(story.title)+'</span>',
-    '<span style="font-size:.62rem;color:rgba(255,255,255,.25);">'+story.duration+' min</span>',
+    '<div class="np-stars" aria-hidden="true">' + stars + '</div>',
+    // Fade cover: an always-opaque BLACK layer the fade ramps IN, so
+    // the screen resolves to pure black — never to transparent (which
+    // would reveal the app behind it, bright in light mode). Fading
+    // the overlay's own opacity was the review BLOCKING bug.
+    '<div class="np-fadecover" id="npFadeCover" aria-hidden="true"></div>',
+    '<div class="np-chrome" id="npChrome">',
+    '<div class="np-head">',
+    '<button type="button" class="np-x" onclick="_ssClose()" aria-label="Close">✕</button>',
+    '<span class="np-head-title">' + escapeHtml(story.title) + '</span>',
+    '<span class="np-head-dur">' + story.duration + ' min</span>',
     '</div>',
-    '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:1rem 1.5rem;overflow:hidden;">',
-    '<div style="font-size:2.4rem;margin-bottom:1rem;opacity:.3;">'+story.icon+'</div>',
-    '<div id="ssVerseText" style="font-family:Georgia,serif;font-size:1.05rem;line-height:1.9;color:rgba(255,255,255,.58);text-align:center;font-style:italic;max-width:440px;transition:opacity .8s;opacity:1;">'+escapeHtml(seg)+'</div>',
-    '<div id="ssVerseNum" style="margin-top:1.1rem;font-size:.6rem;color:rgba(255,255,255,.16);letter-spacing:.1em;">'+(_ssIdx+1)+' / '+_ssSegments.length+'</div>',
+    '<div class="np-body">',
+    '<div class="np-icon" aria-hidden="true">' + story.icon + '</div>',
+    '<div id="ssVerseText" class="np-verse">' + escapeHtml(seg) + '</div>',
     '</div>',
-    '<div style="padding:.35rem 1.1rem .5rem;flex-shrink:0;">',
-    '<div style="display:flex;align-items:center;gap:.5rem;">',
-    '<span style="font-size:.52rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);flex:1;">🎵 Ambient music</span>',
-    '<button type="button" id="ssAmbientMuteBtn" onclick="_ssMuteToggle()" style="background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.3);color:#38bdf8;border-radius:8px;padding:.28rem .6rem;font-size:.68rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🔊 Audio on</button>',
     '</div>',
-    '<iframe id="ssAmbientIframe" src="'+ssAmbientSrc+'" frameborder="0" allow="autoplay;encrypted-media" style="width:0;height:0;position:absolute;border:none;pointer-events:none;top:0;left:0;" title="Ambient audio"></iframe>',
+    '<button type="button" class="np-play" id="npPlayBtn" onclick="_ssTogglePause()" aria-label="Pause">❚❚</button>',
+    '<div class="np-chrome np-foot" id="npFoot">',
+    '<div class="np-chips" id="npTimerRow" role="group" aria-label="Sleep timer">' + chips + '</div>',
+    '<div class="np-amb-row">',
+    '<span class="np-amb-label">Ambience</span>',
+    '<button type="button" class="np-amb-btn" id="npAmbBtn" onclick="npToggleAmbience()" aria-pressed="false">Off</button>',
     '</div>',
-    '<div style="padding:.35rem 1.1rem 1rem;flex-shrink:0;display:flex;justify-content:center;gap:.55rem;">',
-    '<button type="button" id="ssPauseBtn" onclick="_ssTogglePause()" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.65);border-radius:10px;padding:.5rem 1.2rem;font-size:.82rem;cursor:pointer;font-family:var(--fm);min-width:44px;min-height:44px;">⏸</button>',
-    '<button type="button" onclick="_ssClose()" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.65);border-radius:10px;padding:.5rem 1.2rem;font-size:.82rem;cursor:pointer;font-family:var(--fm);min-width:44px;min-height:44px;">✕ Stop</button>',
+    '<div class="np-dimbar">',
+    '<span class="np-count" id="npCountdown">plays to the end</span>',
+    '<span class="np-prog"><span class="np-prog-fill" id="npProgFill"></span></span>',
     '</div>',
-    '<div style="padding:0 1rem .55rem;text-align:center;font-size:.58rem;color:rgba(255,255,255,.12);">Fades out at '+story.duration+' min · Tap anywhere outside content to close</div>'
+    '</div>'
   ].join('');
 }
 
-function _ssMuteToggle(){
-  var iframe = document.getElementById('ssAmbientIframe');
-  var btn = document.getElementById('ssAmbientMuteBtn');
-  if(!iframe || !btn) return;
-  var muted = iframe.src.includes('&mute=1');
-  var newSrc = muted
-    ? iframe.src.replace('&mute=1', '&mute=0')
-    : iframe.src.replace('&mute=0', '&mute=1');
-  if(newSrc === iframe.src) newSrc += (muted ? '&mute=0' : '&mute=1');
-  iframe.src = newSrc;
-  btn.textContent = muted ? '🔊 Audio on' : '🔇 Audio off';
-  btn.style.background = muted ? 'rgba(56,189,248,.12)' : 'rgba(255,255,255,.06)';
-  btn.style.border = '1px solid ' + (muted ? 'rgba(56,189,248,.3)' : 'rgba(255,255,255,.12)');
-  btn.style.color = muted ? '#38bdf8' : 'rgba(255,255,255,.4)';
+// Sleep timer (§4b). min=0 → Full story (no cutoff — the story's own
+// natural end closes the player).
+function npSetTimer(min){
+  _ssTimerMin = min;
+  // A chip tap during the fade cancels it — the tap reads as "wait,
+  // not yet" (review SHOULD; the old code only cleared the PENDING
+  // timer, never the active ramp).
+  var wasFading = _ssCancelFade();
+  if(_ssFadeTimer){ clearTimeout(_ssFadeTimer); _ssFadeTimer = null; }
+  if(_ssTimerIv){ clearInterval(_ssTimerIv); _ssTimerIv = null; }
+  if(wasFading && _ssPaused){ _ssTogglePause(); }   // resume if the fade had it drifting
+  var row = document.getElementById('npTimerRow');
+  if(row && row.querySelectorAll){
+    row.querySelectorAll('.np-chip').forEach(function(b){
+      b.classList.toggle('on', parseInt(b.getAttribute('data-min'), 10) === min);
+    });
+  }
+  var count = document.getElementById('npCountdown');
+  if(min === 0){
+    if(count) count.textContent = 'plays to the end';
+    return;
+  }
+  var endAt = Date.now() + min * 60000;
+  var paint = function(){
+    var left = Math.max(0, Math.round((endAt - Date.now()) / 60000));
+    var el = document.getElementById('npCountdown');
+    // Minutes only — a ticking clock is an attention magnet in a
+    // dark room. NOT aria-live: volume/countdown must never chatter
+    // through a screen reader at bedtime.
+    if(el) el.textContent = 'fades in ~' + left + ' min';
+  };
+  paint();
+  _ssTimerIv = setInterval(paint, 30000);
+  _ssFadeTimer = setTimeout(function(){ _ssBeginFade('timer'); }, min * 60000);
+}
+
+// Ambience is opt-in (design-system §6). The YouTube iframe can't be
+// volume-ramped or Media-Session'd — it exists only on explicit tap;
+// local ambient loop files are the logged follow-up that retires it.
+function npToggleAmbience(){
+  var btn = document.getElementById('npAmbBtn');
+  var story = (typeof SLEEP_STORIES !== 'undefined') ? SLEEP_STORIES.find(function(s){ return s.id === _ssId; }) : null;
+  if(!story) return;
+  _ssAmbientOn = !_ssAmbientOn;
+  var old = document.getElementById('ssAmbientIframe');
+  if(old) old.remove();
+  if(_ssAmbientOn && story.ambientYouTube){
+    var src = 'https://www.youtube-nocookie.com/embed/' + story.ambientYouTube
+      + '?autoplay=1&mute=0&loop=1&playlist=' + story.ambientYouTube
+      + '&controls=0&modestbranding=1&playsinline=1&rel=0&enablejsapi=1&origin=' + encodeURIComponent(location.origin);
+    var f = document.createElement('iframe');
+    f.id = 'ssAmbientIframe'; f.src = src; f.title = 'Ambient audio';
+    f.setAttribute('frameborder', '0'); f.setAttribute('allow', 'autoplay;encrypted-media');
+    f.style.cssText = 'width:0;height:0;position:absolute;border:none;pointer-events:none;top:0;left:0;';
+    var foot = document.getElementById('npFoot');
+    if(foot) foot.appendChild(f);
+  }
+  if(btn){
+    btn.textContent = _ssAmbientOn ? 'On' : 'Off';
+    btn.setAttribute('aria-pressed', _ssAmbientOn ? 'true' : 'false');
+    btn.classList.toggle('on', _ssAmbientOn);
+  }
+}
+
+// ── Auto-dim: the screen shouldn't light the room ────────────────
+// Two-tier floor (documented design-system exception): chrome →
+// 12%, the play/pause ring → 35% so a groggy hand can still find it.
+function _ssArmDim(){
+  if(_ssDimTimer) clearTimeout(_ssDimTimer);
+  _ssDimTimer = setTimeout(function(){
+    var o = document.getElementById('sleepStoryOverlay');
+    if(o){ o.classList.add('np-dim'); _ssDimmed = true; }
+  }, 20000);
+}
+function _ssUndim(){
+  var o = document.getElementById('sleepStoryOverlay');
+  if(o) o.classList.remove('np-dim');
+  _ssDimmed = false;
+  _ssArmDim();
+}
+
+function _ssPaintProgress(story){
+  var fill = document.getElementById('npProgFill');
+  if(!fill) return;
+  var p;
+  // Repeat-driven stories (Psalm 23 ×3): wall-clock against a single
+  // `duration` field can't be trusted to match 3× the segment runtime
+  // (review SHOULD — segment durations aren't recorded). Drive
+  // progress off segment position instead, which is exact. Single/
+  // multi non-repeat stories stay on wall-clock — smoother, and a
+  // 1-segment story would otherwise jump 0→100.
+  var repeats = story.repeatCount || 1;
+  if(repeats > 1 && _ssSegments && _ssSegments.length){
+    var total = _ssSegments.length * repeats;
+    var doneReps = repeats - _ssRepeatLeft;
+    p = Math.min(1, (doneReps * _ssSegments.length + _ssIdx) / total);
+  } else {
+    if(!_ssStartTs) return;
+    p = Math.min(1, (Date.now() - _ssStartTs) / (story.duration * 60000));
+  }
+  fill.style.width = (p * 100).toFixed(1) + '%';
+}
+
+// Media Session — lock-screen title/artwork/transport. Typeof-guarded.
+function _ssMediaSession(story, playing){
+  try {
+    if(!('mediaSession' in navigator)) return;
+    if(story && typeof MediaMetadata === 'function'){
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: story.title,
+        artist: 'YourLife CC · Sleep Stories',
+        artwork: [{ src: '/app/icons/icon-192.png', sizes: '192x192', type: 'image/png' }]
+      });
+      navigator.mediaSession.setActionHandler('play', function(){ if(_ssPaused) _ssTogglePause(); });
+      navigator.mediaSession.setActionHandler('pause', function(){ if(!_ssPaused) _ssTogglePause(); });
+    }
+    navigator.mediaSession.playbackState = playing ? 'playing' : 'paused';
+  } catch(_e){}
+}
+
+function _ssSyncPlayBtn(){
+  var btn = document.getElementById('npPlayBtn');
+  if(!btn) return;
+  btn.textContent = _ssPaused ? '▶' : '❚❚';
+  btn.setAttribute('aria-label', _ssPaused ? 'Play' : 'Pause');
 }
 
 function _ssPlaySegment(story, idx){
   if(!_ssSegments || idx>=_ssSegments.length){
-    if(story.repeatCount && story.repeatCount>1){ _ssPlaySegment(story,0); return; }
-    _ssClose(); return;
+    // repeatCount now DECREMENTS (legacy read it but never counted it
+    // down — Psalm 23 looped forever). Exhausted → natural completion.
+    _ssRepeatLeft--;
+    if(_ssRepeatLeft > 0){ _ssPlaySegment(story, 0); return; }
+    _ssComplete('natural'); return;
   }
   _ssIdx = idx;
   var seg = _ssSegments[idx];
@@ -14209,9 +14389,11 @@ function _ssPlaySegment(story, idx){
     var idxRef = idx;
     var ssAudioUrl = story.segmentAudioUrls && story.segmentAudioUrls[idx];
     if(ssAudioUrl){
-      // Pre-rendered OpenAI TTS MP3
-      console.log('[AUDIO] Sleep story MP3:', ssAudioUrl);
-      var _ssAu = new Audio(ssAudioUrl);
+      // Pre-rendered OpenAI TTS MP3 — held in MODULE state (not a
+      // local) so pause, the fade ramp, and teardown are all real.
+      if(_ssAu){ try{ _ssAu.pause(); }catch(_e){} }
+      _ssAu = new Audio(ssAudioUrl);
+      _ssAu.volume = _ssVol;
       _ssAu.onended = function(){ _ssSegTimer = setTimeout(function(){ if(!_ssPaused) _ssPlaySegment(storyRef,idxRef+1); }, 800); };
       _ssAu.onerror = function(e){
         console.warn('[AUDIO] Sleep MP3 error for', ssAudioUrl, '— falling back to Web Speech');
@@ -14263,44 +14445,123 @@ function _ssPlaySegment(story, idx){
 function _ssTogglePause(){
   if(_ssPaused){
     _ssPaused = false;
-    if('speechSynthesis' in window) window.speechSynthesis.resume();
-    var btn = document.getElementById('ssPauseBtn');
-    if(btn) btn.innerHTML = '⏸';
-    var story = (typeof SLEEP_STORIES!=='undefined')?SLEEP_STORIES.find(function(s){return s.id===_ssId;}):null;
-    if(story) _ssPlaySegment(story, _ssIdx);
+    if('speechSynthesis' in window){ try{ window.speechSynthesis.resume(); }catch(_e){} }
+    if(_ssAu && _ssAu.src && !_ssAu.ended){
+      // Real resume — the MP3 continues mid-segment.
+      _ssAu.play().catch(function(){});
+    } else {
+      var story = (typeof SLEEP_STORIES!=='undefined')?SLEEP_STORIES.find(function(s){return s.id===_ssId;}):null;
+      if(story) _ssPlaySegment(story, _ssIdx);
+    }
   } else {
     _ssPaused = true;
     if(_ssSegTimer){ clearTimeout(_ssSegTimer); _ssSegTimer = null; }
-    if('speechSynthesis' in window) window.speechSynthesis.cancel();
-    var btn2 = document.getElementById('ssPauseBtn');
-    if(btn2) btn2.innerHTML = '▶';
+    // Real pause — legacy only stopped the TTS chain; the MP3 kept
+    // playing through "pause".
+    if(_ssAu){ try{ _ssAu.pause(); }catch(_e){} }
+    if('speechSynthesis' in window){ try{ window.speechSynthesis.pause(); }catch(_e){} }
   }
+  _ssSyncPlayBtn();
+  _ssMediaSession(null, !_ssPaused);
+  _ssArmDim();
+}
+
+// The 30-second fade (§4b). ONE routine ramps every active source —
+// the segment MP3 and the TTS fallback volume — on 150ms ticks with
+// an equal-power curve (cos²: loudness is logarithmic; a linear ramp
+// sounds like nothing then a cliff). The overlay dims to black on
+// the same window so sound and screen resolve to nothing together.
+function _ssBeginFade(reason){
+  if(_ssFadeIv || _ssEnded) return;
+  var startVol = _ssVol;
+  var t0 = Date.now();
+  var DUR = 30000;
+  var cover = document.getElementById('npFadeCover');
+  _ssFadeIv = setInterval(function(){
+    var p = Math.min(1, (Date.now() - t0) / DUR);
+    var v = Math.cos(p * Math.PI / 2);
+    _ssVol = startVol * v * v;
+    _ssTtsVol = _ssVol;
+    if(_ssAu){ try{ _ssAu.volume = _ssVol; }catch(_e){} }
+    // Ramp the black cover IN (0→1) — the JS interval drives it
+    // tick-for-tick, no CSS transition to smear the curve.
+    if(cover) cover.style.opacity = String(p);
+    if(p >= 1){
+      clearInterval(_ssFadeIv); _ssFadeIv = null;
+      _ssComplete(reason);
+    }
+  }, 150);
+}
+
+// Abort an in-progress fade — restore volume + clear the black cover
+// and resume normal playback. A listener who changes their mind in
+// the 30s window gets back in.
+function _ssCancelFade(){
+  if(!_ssFadeIv) return false;
+  clearInterval(_ssFadeIv); _ssFadeIv = null;
+  _ssVol = 1; _ssTtsVol = 1;
+  if(_ssAu){ try{ _ssAu.volume = 1; }catch(_e){} }
+  var cover = document.getElementById('npFadeCover');
+  if(cover) cover.style.opacity = '0';
+  return true;
+}
+
+// Completion — settle register AT MOST. Natural end: one low bell.
+// Timer kill: SILENT (the listener may be asleep). Manual close:
+// silent. No confetti, no XP, no streak — rest is not a performance.
+function _ssLogSession(reason){
+  if(typeof D === 'undefined' || !D || !_ssStartTs) return;
+  if(!Array.isArray(D.sleepStoryLog)) D.sleepStoryLog = [];
+  D.sleepStoryLog.push({
+    storyId: _ssId,
+    ts: new Date().toISOString(),
+    completed: reason === 'natural',
+    end: reason,
+    duration: Math.max(1, Math.round((Date.now() - _ssStartTs) / 60000))
+  });
+  while(D.sleepStoryLog.length > 30) D.sleepStoryLog.shift();
+  if(typeof save === 'function') save();
+}
+
+function _ssComplete(reason){
+  if(_ssEnded) return;
+  _ssEnded = true;
+  _ssLogSession(reason);
+  if(reason === 'natural'){
+    if(window.sfx && typeof window.sfx.settle === 'function') window.sfx.settle();
+  }
+  _ssClose();
 }
 
 function _ssClose(){
+  // A live session closed by hand (✕ / Stop / Esc / stopAllAudio)
+  // still logs — quietly.
+  if(_ssStartTs && !_ssEnded){
+    _ssEnded = true;
+    _ssLogSession('manual');
+  }
   if(_ssSegTimer){ clearTimeout(_ssSegTimer); _ssSegTimer = null; }
   if(_ssFadeTimer){ clearTimeout(_ssFadeTimer); _ssFadeTimer = null; }
-  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  if(_ssFadeIv){ clearInterval(_ssFadeIv); _ssFadeIv = null; }
+  if(_ssTimerIv){ clearInterval(_ssTimerIv); _ssTimerIv = null; }
+  if(_ssProgIv){ clearInterval(_ssProgIv); _ssProgIv = null; }
+  if(_ssDimTimer){ clearTimeout(_ssDimTimer); _ssDimTimer = null; }
+  if(_ssAu){ try{ _ssAu.pause(); }catch(_e){} _ssAu = null; }
+  if('speechSynthesis' in window){ try{ window.speechSynthesis.cancel(); }catch(_e){} }
   _ssReleaseWakeLock();
   if(_ssEscHandler){ document.removeEventListener('keydown', _ssEscHandler); _ssEscHandler = null; }
+  if(_ssVisHandler){ document.removeEventListener('visibilitychange', _ssVisHandler); _ssVisHandler = null; }
+  try { if('mediaSession' in navigator){ navigator.mediaSession.playbackState = 'none'; } } catch(_e){}
   var overlay = document.getElementById('sleepStoryOverlay');
   if(overlay) overlay.remove();
   document.body.style.overflow = '';
   _ssId = null; _ssIdx = 0; _ssPaused = false; _ssTtsVol = 1.0; _ssSegments = [];
+  _ssVol = 1; _ssTimerMin = 0; _ssDimmed = false; _ssStartTs = 0; _ssEnded = false; _ssAmbientOn = false;
   if(_ssPushedState){
     _ssPushedState = false;
     try{ if(window.history.state && window.history.state.ylccSS) history.back(); }catch(e){}
   }
   _checkAudioStopBtn();
-}
-
-function _ssFadeOut(story){
-  var steps = 10, i = 0;
-  var iv = setInterval(function(){
-    i++;
-    _ssTtsVol = Math.max(0, 1.0-(i/steps));
-    if(i>=steps){ clearInterval(iv); _ssClose(); }
-  }, 3000);
 }
 
 async function _ssRequestWakeLock(){
