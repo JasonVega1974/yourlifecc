@@ -54,7 +54,7 @@
     var thumb='https://img.youtube.com/vi/'+encodeURIComponent(ytid)+'/mqdefault.jpg';
     var watch='https://www.youtube.com/watch?v='+encodeURIComponent(ytid);
     return '<div class="va-card" data-va-id="'+_esc(ytid)+'">'+
-      '<button type="button" class="va-poster" data-va-title="'+title+'" onclick="vaPlay(\''+_esc(ytid)+'\', this)" aria-label="Play '+title+'">'+
+      '<button type="button" class="va-poster" data-va-id="'+_esc(ytid)+'" data-va-title="'+title+'" aria-label="Play '+title+'">'+
         '<img class="va-thumb" src="'+thumb+'" alt="" loading="lazy" decoding="async">'+
         '<span class="va-play" aria-hidden="true"><span class="va-play-tri"></span></span>'+
         (v.duration?('<span class="va-dur">'+_esc(v.duration)+'</span>'):'')+
@@ -250,6 +250,20 @@
     st.id='va-css';
     st.textContent=css;
     (document.head||document.documentElement).appendChild(st);
+  }
+
+  // ── tap delegation ───────────────────────────────────────
+  // One document-level listener so a poster tap reaches the player even
+  // though cards are (re)built via innerHTML across renders — no reliance
+  // on an inline onclick surviving inside re-rendered markup.
+  if(typeof document!=='undefined' && document.addEventListener && !window._vaTapWired){
+    window._vaTapWired = true;
+    document.addEventListener('click', function(e){
+      var p = (e.target && e.target.closest) ? e.target.closest('.va-poster') : null;
+      if(!p) return;
+      var id = p.getAttribute('data-va-id');
+      if(id) vaPlay(id, p);
+    }, false);
   }
 
   // ── expose ───────────────────────────────────────────────

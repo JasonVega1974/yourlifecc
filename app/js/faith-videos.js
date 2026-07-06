@@ -61,7 +61,7 @@
     var sub=_esc(v.source||'')+(v.description?(' · '+_esc(v.description)):'');
     return ''+
       '<div class="fv-card" data-fv-id="'+_esc(v.id)+'">'+
-        '<button type="button" class="fv-poster" onclick="fvPlay(\''+_esc(v.id)+'\', this)" aria-label="Play '+_esc(v.title||'video')+'">'+
+        '<button type="button" class="fv-poster" data-fv-id="'+_esc(v.id)+'" aria-label="Play '+_esc(v.title||'video')+'">'+
           '<img class="fv-thumb" src="'+thumb+'" alt="" loading="lazy" decoding="async">'+
           '<span class="fv-play" aria-hidden="true"><span class="fv-play-tri"></span></span>'+
           (v.duration?('<span class="fv-dur">'+_esc(v.duration)+'</span>'):'')+
@@ -199,6 +199,20 @@
     st.id='fv-css';
     st.textContent=css;
     (document.head||document.documentElement).appendChild(st);
+  }
+
+  // ── tap delegation ───────────────────────────────────────
+  // One document-level listener so a poster tap reaches the player even
+  // though contextual cards are injected via innerHTML into varied hosts
+  // (walk sheets, faith panels) — no reliance on an inline onclick.
+  if(typeof document!=='undefined' && document.addEventListener && !window._fvTapWired){
+    window._fvTapWired = true;
+    document.addEventListener('click', function(e){
+      var p = (e.target && e.target.closest) ? e.target.closest('.fv-poster') : null;
+      if(!p) return;
+      var id = p.getAttribute('data-fv-id');
+      if(id) fvPlay(id, p);
+    }, false);
   }
 
   // ── expose ───────────────────────────────────────────────
