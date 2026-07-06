@@ -154,9 +154,11 @@
   function _showTop(){ var t=_top(); if(t) t.classList.remove('vp-hidden'); }
   function _hideTop(){ var t=_top(); if(t) t.classList.add('vp-hidden'); }
   function _armAutoHide(){
-    if(_reduced()) return;            // reduced motion: controls stay put
-    if(_hideTimer) clearTimeout(_hideTimer);
-    _hideTimer = setTimeout(_hideTop, 3000);
+    // Controls stay put — the video is a cross-origin YouTube iframe that
+    // swallows pointer events, so a tap on it can't restore auto-hidden
+    // controls; once hidden, the Back button would be permanently
+    // unreachable. Keep the top bar (Back / title / fullscreen) visible.
+    if(_hideTimer){ clearTimeout(_hideTimer); _hideTimer = null; }
   }
 
   function _toggleFs(){
@@ -218,8 +220,9 @@
     '.vp-stage{position:relative;flex:1;display:flex;align-items:center;justify-content:center;min-height:0;background:#05060c;}'+
     '.vp-frame-wrap{width:min(100%,960px);aspect-ratio:16/9;max-height:100%;background:#000;}'+
     '.vp-frame{width:100%;height:100%;border:0;display:block;background:#000;}'+
-    '.vp-top{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:.7rem;padding:.7rem .9rem;'+
-      'background:linear-gradient(180deg,rgba(5,6,12,.82) 0%,rgba(5,6,12,0) 100%);transition:opacity .3s ease;}'+
+    '.vp-top{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:.7rem;'+
+      'padding:max(.7rem,env(safe-area-inset-top,0px)) max(.9rem,env(safe-area-inset-right,0px)) .7rem max(.9rem,env(safe-area-inset-left,0px));'+
+      'background:linear-gradient(180deg,rgba(5,6,12,.9) 0%,rgba(5,6,12,0) 100%);transition:opacity .3s ease;}'+
     '.vp-top.vp-hidden{opacity:0;pointer-events:none;}'+
     '.vp-btn{flex-shrink:0;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.18);'+
       'background:rgba(255,255,255,.08);color:#f4f6fb;font-size:1.25rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;}'+
