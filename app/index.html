@@ -10186,8 +10186,8 @@
           </button>
         </div>
 
-        <!-- 2026-07-03 — LISTEN: the audio trio, all legacy bf-* photo keys. -->
-        <div class="fj-eyebrow">LISTEN</div>
+        <!-- 2026-07-03 — LISTEN: the audio trio + Bible Project Videos (2026-07-07). -->
+        <div class="fj-eyebrow">LISTEN &amp; WATCH</div>
         <div class="fj-grid3">
           <button type="button" class="fjp-card" data-fjdest="audio">
             <div class="fjp-hero">
@@ -10216,21 +10216,20 @@
             <div class="fjp-title">CREATE MEDITATION</div>
             <div class="fjp-sub">Build your own quiet time.</div>
           </button>
+          <!-- 2026-07-07 — Bible Project Videos now a proper LISTEN grid card
+               (was a standalone full-width tile with a 120px hero, so it didn't
+               match its siblings). Admin photo swaps via data-card-id bf-videos;
+               the 🎬 gradient placeholder shows until one is uploaded. -->
+          <button type="button" class="fjp-card" data-fjdest="videos">
+            <div class="fjp-hero">
+              <div class="fjp-ph" aria-hidden="true">🎬</div>
+              <img class="fjp-img" data-card-id="bf-videos" loading="lazy" alt="" onerror="this.style.display='none'">
+              <div class="fjp-shade" aria-hidden="true"></div>
+            </div>
+            <div class="fjp-title">BIBLE PROJECT VIDEOS</div>
+            <div class="fjp-sub">Animated Bible explainers.</div>
+          </button>
         </div>
-
-        <!-- 2026-07-06 — WATCH: Bible Project video archive (curated playlists
-             + optional live channel feed). Routes via data-fjdest -> bf-videos.
-             No src on the img so the 🎬 placeholder shows (no external dep). -->
-        <div class="fj-eyebrow">WATCH</div>
-        <button type="button" class="fjp-card" data-fjdest="videos">
-          <div class="fjp-hero" style="height:120px;">
-            <div class="fjp-ph" aria-hidden="true">🎬</div>
-            <img class="fjp-img" data-card-id="bf-videos" loading="lazy" alt="" onerror="this.style.display='none'">
-            <div class="fjp-shade" aria-hidden="true"></div>
-          </div>
-          <div class="fjp-title">BIBLE PROJECT VIDEOS</div>
-          <div class="fjp-sub">Curated animated Bible explainers.</div>
-        </button>
 
         <!-- 2026-07-03 — the MORE door is gone: its features get first-class
              photo cards below (GROW + CHURCH & YOU). Cards mapped to legacy
