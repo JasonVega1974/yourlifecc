@@ -24,6 +24,7 @@ const VIDEO_ARCHIVE = {
   playlists: [
     {
       eyebrow: 'GOSPEL & SALVATION',
+      photoKey: 'va-gospel',
       videos: [
         { title:'The Gospel',           youtubeId:'xrzq_X1NNaA', duration:'4:52' },
         { title:'Death & Resurrection', youtubeId:'Vb24Lk1Oh5M', duration:'6:01' },
@@ -32,12 +33,14 @@ const VIDEO_ARCHIVE = {
     },
     {
       eyebrow: 'WHO IS JESUS',
+      photoKey: 'va-jesus',
       videos: [
         { title:'Jesus the Messiah',    youtubeId:'p7XRPGzL6kk', duration:'7:14' }
       ]
     },
     {
       eyebrow: 'THE HOLY SPIRIT & PRAYER',
+      photoKey: 'va-spirit',
       videos: [
         { title:'Holy Spirit',          youtubeId:'oNNZO9i1Gjc', duration:'5:13' },
         { title:'Prayer',               youtubeId:'3-YlqQfKkKk', duration:'5:26' }
@@ -45,18 +48,21 @@ const VIDEO_ARCHIVE = {
     },
     {
       eyebrow: 'WHO YOU ARE',
+      photoKey: 'va-identity',
       videos: [
         { title:'Image of God',         youtubeId:'YbipxLDtY8c', duration:'4:48' }
       ]
     },
     {
       eyebrow: 'THE BIBLE',
+      photoKey: 'va-bible',
       videos: [
         { title:'The Bible',            youtubeId:'7_CGP-12AE0', duration:'6:42' }
       ]
     },
     {
       eyebrow: 'APOLOGETICS',
+      photoKey: 'va-apologetics',
       videos: [
         { title:'Resurrection',         youtubeId:'Vb24Lk1Oh5M', duration:'6:01' }
       ]

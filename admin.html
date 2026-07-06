@@ -1733,6 +1733,16 @@ const PM_INVENTORY = [
   {id:'jsy-ministry',    section:'Meet Jesus — The Story', title:'V · The Ministry (Galilee)',      defaultUrl:''},
   {id:'jsy-cross',       section:'Meet Jesus — The Story', title:'VI · The Cross (Jerusalem)',      defaultUrl:''},
   {id:'jsy-risen',       section:'Meet Jesus — The Story', title:'VII · Risen (Garden Tomb)',       defaultUrl:''},
+  // ── Video Archive (2026-07-06) — optional banner per playlist section on
+  // the Bible Project archive surface (video-archive.js reads
+  // window.CARD_PHOTO_OVERRIDES['va-*'] at render time). No defaults: each
+  // section shows its gold eyebrow alone until a photo is uploaded.
+  {id:'va-gospel',      section:'Video Archive', title:'Gospel & Salvation',   defaultUrl:''},
+  {id:'va-jesus',       section:'Video Archive', title:'Who Is Jesus',         defaultUrl:''},
+  {id:'va-spirit',      section:'Video Archive', title:'Holy Spirit & Prayer', defaultUrl:''},
+  {id:'va-identity',    section:'Video Archive', title:'Who You Are',          defaultUrl:''},
+  {id:'va-bible',       section:'Video Archive', title:'The Bible',            defaultUrl:''},
+  {id:'va-apologetics', section:'Video Archive', title:'Apologetics',          defaultUrl:''},
   // ── Main App Home (2026-07-03) — the Command Center photo-card home.
   // Same convention as the Faith Journey Home: ONLY cards with no legacy
   // equivalent get ah-* keys here. Seven cards reuse legacy keys managed
@@ -1938,7 +1948,7 @@ if (typeof PROOF_PROPHECY_DATA !== 'undefined' && Array.isArray(PROOF_PROPHECY_D
 }
 
 // Section display order — add new sections here to control their position.
-const PM_SECTION_ORDER = ['Main App Home','Faith Journey Home','Meet Jesus — The Story','Bible & Faith','Reading Plans','Proof & Prophecy','Faith Academy','Life Skills','School','Money Manager','Health & Wellness','Driving','Sports','Resume / Jobs'];
+const PM_SECTION_ORDER = ['Main App Home','Faith Journey Home','Meet Jesus — The Story','Bible & Faith','Reading Plans','Proof & Prophecy','Faith Academy','Video Archive','Life Skills','School','Money Manager','Health & Wellness','Driving','Sports','Resume / Jobs'];
 
 let PM_OVERRIDES = {};
 let PM_INITED    = false;

@@ -70,9 +70,26 @@
       '</div></div>';
   }
 
+  // Optional admin photo banner for a section — read at render time from
+  // window.CARD_PHOTO_OVERRIDES['va-*'] (same pattern as the journey/jsy
+  // cards). Additive decoration ABOVE the gold eyebrow, which always stays,
+  // so a missing/broken image never costs the section its header.
+  function _bannerHtml(pl){
+    var key = pl && pl.photoKey;
+    if(!key) return '';
+    var url='';
+    try{ url = (typeof window!=='undefined' && window.CARD_PHOTO_OVERRIDES) ? (window.CARD_PHOTO_OVERRIDES[key]||'') : ''; }catch(_e){}
+    if(!url) return '';
+    return '<div class="va-banner">'+
+      '<img class="va-banner-img" src="'+_esc(url)+'" alt="" loading="lazy" '+
+        'onerror="var p=this.closest(\'.va-banner\');if(p&&p.parentNode)p.parentNode.removeChild(p);">'+
+      '<div class="va-banner-shade" aria-hidden="true"></div>'+
+    '</div>';
+  }
+
   function _playlistHtml(pl){
     if(!pl || !Array.isArray(pl.videos) || !pl.videos.length) return '';
-    var h='<div class="va-plist"><div class="va-eyebrow">'+_esc(pl.eyebrow||'')+'</div><div class="va-grid">';
+    var h='<div class="va-plist">'+_bannerHtml(pl)+'<div class="va-eyebrow">'+_esc(pl.eyebrow||'')+'</div><div class="va-grid">';
     for(var i=0;i<pl.videos.length;i++){ h+=_cardHtml(pl.videos[i]); }
     h+='</div></div>';
     return h;
@@ -183,6 +200,10 @@
     '.va-visit:hover{background:rgba(251,191,36,.12);}'+
     '.va-intro{font-size:.78rem;line-height:1.45;color:rgba(233,236,246,.62);margin:.6rem 0 0;}'+
     '.va-plist{margin-bottom:1.15rem;}'+
+    '.va-banner{position:relative;width:100%;height:118px;border-radius:14px;overflow:hidden;margin-bottom:.55rem;background:#0a0d1a;}'+
+    '.va-banner-img{width:100%;height:100%;object-fit:cover;display:block;}'+
+    '.va-banner-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,13,26,.12) 0%,rgba(10,13,26,.58) 100%);}'+
+    '@media(min-width:720px){.va-banner{height:150px;}}'+
     '.va-eyebrow{font-family:\'Oswald\',system-ui,sans-serif;text-transform:uppercase;letter-spacing:.15em;font-size:.7rem;font-weight:600;color:#fbbf24;margin-bottom:.55rem;}'+
     /* Responsive grid — matches the app home photo cards: 1 col on mobile,
        2 up ≥480px, 3 up ≥720px (was auto-fill minmax(158px) → too many tiny columns). */
