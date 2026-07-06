@@ -116,8 +116,8 @@ Phase 0 maps the actual 15 lesson ids to tracks (content-driven; propose the map
 |---|---|---|---|
 | W3-1 | Memory Verses practice ladder | 6h | The mechanical transformation; the SM-2 engine finally gets real practice |
 | W3-2 | Devotionals: First Light | 4h | Cheap (reuses Pulse mechanics), daily-touch surface |
-| W3-3 | Reading Plans: path + grace + completion | 5h | Retention saver (grace) + payoff (ladder) |
-| W3-4 | Academy: tracks + diplomas + quiz polish | 6h | The showcase artifact (diploma) lands last, on ordered tracks |
+| W3-3 ✅ shipped 2026-07-05 (fbd6a1d) | Reading Plans: path + grace + completion | 5h | Retention saver (grace) + payoff (ladder) |
+| W3-4 ✅ shipped 2026-07-05 (de36895) | Academy: tracks + diplomas + quiz polish | 6h | The showcase artifact (diploma) lands last, on ordered tracks |
 
 ~21h. Numbering continues global increment count.
 
