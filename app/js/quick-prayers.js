@@ -74,30 +74,62 @@
     return _data().filter(function (p) { return savedIds[String(p.id)]; });
   }
 
+  // 2026-07-06 redesign: the 31 topics are grouped into 6 meaningful
+  // buckets rendered as CARDS (not a flat pill wall). Verified to cover
+  // all 31 topics exactly once, no orphans (Peace in the Chaos + When
+  // Life Feels Too Heavy included). Any topic present in the data but
+  // missing from a group is defensively appended to a fallback card so
+  // future data additions can't silently orphan a prayer.
+  var _QP_GROUPS = [
+    { label: 'Emotions & Inner Life', topics: ['Anxiety & Worry', 'Anger', 'Grief & Loss', 'Loneliness', 'Comparison & Jealousy', 'When Life Feels Too Heavy', 'Peace in the Chaos'] },
+    { label: 'Who I Am',             topics: ['Identity', 'Self-Worth', 'Purpose & Calling', 'Doubt', 'Hunger for More of God'] },
+    { label: 'Daily Life',           topics: ['Morning', 'Night', 'School & Tests', 'Breaking a Bad Habit', 'Patience'] },
+    { label: 'Relationships',        topics: ['Friendship', 'Family', 'Dating & Relationships', 'Praying for Someone Else'] },
+    { label: 'Character & Growth',   topics: ['Courage', 'Temptation', 'Forgiveness', 'Trust & Surrender', 'Wisdom', 'Gratitude', 'Joy'] },
+    { label: 'God & Faith',          topics: ['Guidance', 'Praise', 'Healing'] }
+  ];
+
+  // Now a grouped topic guide. Two full-width MODE chips (All / ★ Saved
+  // — modes, not topics) sit above 6 group CARDS; each card is a gold
+  // Oswald eyebrow over a list of topic rows. Every row is a 44px tap
+  // target wired to qpSetFilter(topic) via the delegated listener
+  // (data-qp-action="topic"). qpSetFilter is unchanged — a topic tap
+  // still scrolls to that topic's section in the browse body below.
   function _pillsHtml() {
-    var topics = _topics();
     var savedCount = _savedCount();
-    var html = '';
-    // Only All and ★ Saved carry an "active" state. Topic chips are
-    // navigation, not filters — clicking one scrolls to that section
-    // without changing the active mode.
-    //
-    // Chips are rendered with data-qp-action / data-qp-topic and wired
-    // through a single delegated listener (see below). The previous
-    // inline `onclick="qpSetFilter(' + JSON.stringify(t) + ')"` broke
-    // for every topic because JSON.stringify wraps the value in double
-    // quotes, which terminate the double-quoted onclick attribute and
-    // leave the handler as the incomplete expression `qpSetFilter(`.
     var allActive   = (_qpFilter !== 'saved');
     var savedActive = (_qpFilter === 'saved');
-    html += '<button type="button" class="qp-pill' + (allActive ? ' qp-pill-active' : '') + '" data-qp-action="all">All <span class="qp-pill-count">' + _data().length + '</span></button>';
-    html += '<button type="button" class="qp-pill qp-pill-saved' + (savedActive ? ' qp-pill-active' : '') + '" data-qp-action="saved">★ Saved <span class="qp-pill-count">' + savedCount + '</span></button>';
-    topics.forEach(function (t) {
-      var count = _data().filter(function (p) { return p.topic === t; }).length;
-      // _esc handles & " < > ' so the attribute survives all 31 topic
-      // names ("Comparison & Jealousy", "Self-Worth", etc.).
-      html += '<button type="button" class="qp-pill qp-pill-topic" data-qp-action="topic" data-qp-topic="' + _esc(t) + '">' + _esc(t) + ' <span class="qp-pill-count">' + count + '</span></button>';
-    });
+    var html = '';
+    html += '<div class="qp-mode-chips">';
+    html += '<button type="button" class="qp-mode-chip' + (allActive ? ' qp-mode-on' : '') + '" data-qp-action="all">All <span class="qp-pill-count">' + _data().length + '</span></button>';
+    html += '<button type="button" class="qp-mode-chip qp-mode-saved' + (savedActive ? ' qp-mode-on' : '') + '" data-qp-action="saved">★ Saved <span class="qp-pill-count">' + savedCount + '</span></button>';
+    html += '</div>';
+
+    // Only render topics that actually exist in the data, and catch any
+    // present-but-ungrouped topic in a fallback card (no silent orphan).
+    var present = {}; _topics().forEach(function (t) { present[t] = true; });
+    var grouped = {};
+    _QP_GROUPS.forEach(function (g) { g.topics.forEach(function (t) { grouped[t] = true; }); });
+    var groupHtml = function (label, topics) {
+      var rows = topics.filter(function (t) { return present[t]; });
+      if (!rows.length) return '';
+      var body = rows.map(function (t) {
+        // _esc handles & " < > ' so the attribute survives all 31 topic
+        // names ("Comparison & Jealousy", "Self-Worth", etc.).
+        return '<button type="button" class="qp-topic-row" data-qp-action="topic" data-qp-topic="' + _esc(t) + '">'
+             +   '<span class="qp-topic-row-name">' + _esc(t) + '</span>'
+             +   '<span class="qp-topic-row-arr" aria-hidden="true">→</span>'
+             + '</button>';
+      }).join('');
+      return '<div class="qp-group-card">'
+           +   '<div class="qp-group-eyebrow">' + _esc(String(label).toUpperCase()) + '</div>'
+           +   '<div class="qp-group-rows">' + body + '</div>'
+           + '</div>';
+    };
+
+    _QP_GROUPS.forEach(function (g) { html += groupHtml(g.label, g.topics); });
+    var ungrouped = _topics().filter(function (t) { return !grouped[t]; });
+    if (ungrouped.length) html += groupHtml('More', ungrouped);
     return html;
   }
 
@@ -199,14 +231,29 @@
       + '.qp-lib-eyebrow{font-family:var(--fm);font-size:.6rem;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:#a78bfa;}'
       + '.qp-lib-title-h{font-family:var(--fh,var(--fm));font-size:1.3rem;line-height:1.2;color:var(--tx);margin:0;font-weight:700;}'
       + '.qp-lib-subtitle{font-family:var(--fm);font-size:.84rem;color:var(--tx2);line-height:1.5;}'
-      + '.qp-lib-pills{display:flex;flex-wrap:wrap;gap:.4rem;margin:.4rem 0 .2rem;}'
-      + '.qp-pill{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:99px;padding:.4rem .8rem;font-size:.72rem;font-weight:700;cursor:pointer;font-family:var(--fm);transition:background .15s,border-color .15s,color .15s;}'
-      + '.qp-pill:hover{background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.32);}'
-      + '.qp-pill-active{background:#a78bfa;border-color:#a78bfa;color:#0b1220;}'
-      + '.qp-pill-saved{border-color:rgba(251,191,36,.35);color:#fbbf24;}'
-      + '.qp-pill-saved.qp-pill-active{background:#fbbf24;color:#0b1220;border-color:#fbbf24;}'
-      + '.qp-pill-count{opacity:.7;margin-left:.2rem;font-weight:800;}'
-      + '.qp-pill-active .qp-pill-count{opacity:.85;}'
+      // 2026-07-06 — grouped topic guide replaces the flat pill wall.
+      + '.qp-lib-pills{display:flex;flex-direction:column;gap:.7rem;margin:.4rem 0 .2rem;}'
+      // Two full-width mode chips (All / ★ Saved) — modes, not topics.
+      + '.qp-mode-chips{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}'
+      + '.qp-mode-chip{min-height:48px;display:flex;align-items:center;justify-content:center;gap:.3rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:12px;padding:.55rem .8rem;font-size:.82rem;font-weight:800;cursor:pointer;font-family:var(--fm);transition:background .15s,border-color .15s,color .15s;}'
+      + '.qp-mode-chip:hover{background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.32);}'
+      + '.qp-mode-on{background:#a78bfa;border-color:#a78bfa;color:#0b1220;}'
+      + '.qp-mode-saved{border-color:rgba(251,191,36,.35);color:#fbbf24;}'
+      + '.qp-mode-saved.qp-mode-on{background:#fbbf24;color:#0b1220;border-color:#fbbf24;}'
+      + '.qp-pill-count{opacity:.7;margin-left:.05rem;font-weight:800;}'
+      + '.qp-mode-on .qp-pill-count{opacity:.85;}'
+      // Group cards — night-sky card surface, gold hairline, 16px radius
+      // (the app card family). Gold Oswald eyebrow over topic rows.
+      + '.qp-group-card{background:var(--card-bg);border:1px solid rgba(251,191,36,.18);border-radius:16px;padding:.9rem 1rem 1rem;}'
+      + '.qp-group-eyebrow{font-family:\'Oswald\',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#fbbf24;margin-bottom:.5rem;}'
+      + '.qp-group-rows{display:flex;flex-direction:column;}'
+      + '.qp-topic-row{display:flex;align-items:center;justify-content:space-between;gap:.6rem;width:100%;min-height:44px;background:none;border:none;border-top:1px solid rgba(255,255,255,.06);color:var(--tx);cursor:pointer;font-family:var(--fm);padding:.5rem .1rem;text-align:left;transition:color .15s;}'
+      + '.qp-group-rows .qp-topic-row:first-child{border-top:none;}'
+      + '.qp-topic-row-name{font-size:.9rem;font-weight:600;line-height:1.3;}'
+      + '.qp-topic-row-arr{color:var(--tx3);font-size:.95rem;flex-shrink:0;transition:transform .15s,color .15s;}'
+      + '.qp-topic-row:hover{color:#c4b5fd;}'
+      + '.qp-topic-row:hover .qp-topic-row-arr{color:#a78bfa;transform:translateX(3px);}'
+      + '.qp-mode-chip:focus-visible,.qp-topic-row:focus-visible{outline:2px solid #fbbf24;outline-offset:2px;}'
       + '.qp-lib-body{display:flex;flex-direction:column;gap:1.4rem;}'
       // Topic section + header. scroll-margin-top reserves room above
       // the header for any sticky chrome (or just breathing space when
@@ -235,10 +282,17 @@
       + ':root.light .qp-lib-card{background:#fafaf9;border-color:rgba(124,58,237,.25);color:#1a1233;box-shadow:0 4px 14px rgba(15,23,42,.06);}'
       + ':root.light .qp-lib-text{color:#1a1233;}'
       + ':root.light .qp-lib-chip{background:rgba(124,58,237,.12);border-color:rgba(124,58,237,.3);color:#5b21b6;}'
-      + ':root.light .qp-pill{background:#f5f5f4;border-color:rgba(15,23,42,.12);color:#1a1233;}'
-      + ':root.light .qp-pill-active{background:#7c3aed;border-color:#7c3aed;color:#fff;}'
-      + ':root.light .qp-pill-saved{color:#b45309;border-color:rgba(180,83,9,.3);}'
-      + ':root.light .qp-pill-saved.qp-pill-active{background:#fbbf24;color:#0b1220;border-color:#fbbf24;}'
+      + ':root.light .qp-mode-chip{background:#f5f5f4;border-color:rgba(15,23,42,.12);color:#1a1233;}'
+      + ':root.light .qp-mode-on{background:#7c3aed;border-color:#7c3aed;color:#fff;}'
+      + ':root.light .qp-mode-saved{color:#b45309;border-color:rgba(180,83,9,.3);}'
+      + ':root.light .qp-mode-saved.qp-mode-on{background:#fbbf24;color:#0b1220;border-color:#fbbf24;}'
+      // Group cards flip to paper; eyebrow to amber-800; rows dark ink.
+      + ':root.light .qp-group-card{background:#ffffff;border-color:rgba(180,120,20,.28);box-shadow:0 4px 14px rgba(15,23,42,.05);}'
+      + ':root.light .qp-group-eyebrow{color:#92400e;}'
+      + ':root.light .qp-topic-row{color:#1a1233;border-top-color:rgba(15,23,42,.08);}'
+      + ':root.light .qp-topic-row-arr{color:#94a3b8;}'
+      + ':root.light .qp-topic-row:hover{color:#5b21b6;}'
+      + ':root.light .qp-topic-row:hover .qp-topic-row-arr{color:#7c3aed;}'
       + ':root.light .qp-lib-btn{background:#fff;border-color:rgba(15,23,42,.14);color:#1a1233;}';
     var tag = document.createElement('style');
     tag.id = 'qp-lib-styles';
