@@ -98,30 +98,36 @@
         '</div>'+
         '<p class="va-intro">Animated explainers of every book, theme, and idea in the Bible. Tap any card to watch in place, or open it on YouTube.</p>'+
       '</div>'+
-      '<div id="vaLiveRow" class="va-live" style="display:none;"></div>'+
-      body;
+      body+                                                                   // FEATURED (curated, offline)
+      '<div id="vaPlaylistRow" class="va-live" style="display:none;"></div>'+  // BIBLE PROJECT PLAYLIST (live)
+      '<div id="vaLiveRow" class="va-live" style="display:none;"></div>';      // NEW FROM BIBLE PROJECT (live)
     _loadLive();
   }
 
   // ── Part B: live feed (graceful) ─────────────────────────
+  // /api/youtube-feed returns { enabled, videos (channel latest),
+  // playlist (BibleProject playlist) }. Each section renders only if it
+  // has content; any miss (disabled, offline, error) is silent.
   function _loadLive(){
     if(typeof fetch!=='function') return; // very old engine — curated only
     fetch('/api/youtube-feed', { headers:{ 'Accept':'application/json' } })
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(dat){
-        if(!dat || !dat.enabled || !Array.isArray(dat.videos) || !dat.videos.length) return; // curated only
-        _renderLive(dat.videos);
+        if(!dat || !dat.enabled) return; // curated only
+        if(Array.isArray(dat.playlist) && dat.playlist.length) _renderSection('vaPlaylistRow', 'BIBLE PROJECT PLAYLIST', dat.playlist, 'grid');
+        if(Array.isArray(dat.videos)   && dat.videos.length)   _renderSection('vaLiveRow',     'NEW FROM BIBLE PROJECT', dat.videos,   'row');
       })
       .catch(function(){ /* offline / blocked / error — silent */ });
   }
-  function _renderLive(videos){
-    var row=document.getElementById('vaLiveRow');
+  function _renderSection(rowId, eyebrow, videos, layout){
+    var row=document.getElementById(rowId);
     if(!row) return;
     var cards=videos.map(function(v){
       return _cardHtml({ title:v.title, youtubeId:v.youtubeId, duration:'' });
     }).join('');
     if(!cards) return;
-    row.innerHTML='<div class="va-eyebrow">NEW FROM BIBLE PROJECT</div><div class="va-live-row">'+cards+'</div>';
+    var cls = (layout==='grid') ? 'va-grid' : 'va-live-row';
+    row.innerHTML='<div class="va-eyebrow">'+_esc(eyebrow)+'</div><div class="'+cls+'">'+cards+'</div>';
     row.style.display='';
   }
 

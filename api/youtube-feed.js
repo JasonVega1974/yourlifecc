@@ -16,7 +16,8 @@
 
 const https = require('https');
 
-const CHANNEL_ID = 'UCVfwlh9XpX2Y_tQfjeln9QA'; // BibleProject
+const CHANNEL_ID  = 'UCVfwlh9XpX2Y_tQfjeln9QA';                 // BibleProject
+const PLAYLIST_ID = 'PLH0Szn1yYNedhbJcKSQbpwGmmk7fhwTyL';       // BibleProject playlist
 
 module.exports = async (req, res) => {
   // Cache at the edge for 6h regardless of enabled/disabled, so the
@@ -27,41 +28,61 @@ module.exports = async (req, res) => {
   const key = process.env.YOUTUBE_API_KEY;
   if (!key) {
     // Part B not provisioned — client uses curated playlist only.
-    return res.status(200).json({ enabled: false, videos: [] });
+    return res.status(200).json({ enabled: false, videos: [], playlist: [] });
   }
 
-  try {
-    const url = 'https://www.googleapis.com/youtube/v3/search'
-      + '?key=' + encodeURIComponent(key)
-      + '&channelId=' + CHANNEL_ID
-      + '&part=snippet&order=date&type=video&maxResults=12';
-    const data = await getJson(url);
+  // Fetch the channel's latest uploads (search.list) and the playlist
+  // (playlistItems.list) in parallel. Each falls back to [] on failure,
+  // so one hiccup never blanks the whole surface.
+  const channelUrl = 'https://www.googleapis.com/youtube/v3/search'
+    + '?key=' + encodeURIComponent(key)
+    + '&channelId=' + CHANNEL_ID
+    + '&part=snippet&order=date&type=video&maxResults=12';
+  const playlistUrl = 'https://www.googleapis.com/youtube/v3/playlistItems'
+    + '?key=' + encodeURIComponent(key)
+    + '&playlistId=' + encodeURIComponent(PLAYLIST_ID)
+    + '&part=snippet&maxResults=25';
 
-    if (!data || !Array.isArray(data.items)) {
-      return res.status(200).json({ enabled: false, videos: [], error: 'bad_upstream' });
-    }
+  const results = await Promise.all([
+    getJson(channelUrl).then(mapSearch).catch(function () { return []; }),
+    getJson(playlistUrl).then(mapPlaylist).catch(function () { return []; })
+  ]);
 
-    const videos = data.items
-      .filter(function (it) { return it && it.id && it.id.videoId; })
-      .map(function (it) {
-        const sn = it.snippet || {};
-        const th = sn.thumbnails || {};
-        const pick = th.medium || th.high || th.default || {};
-        return {
-          youtubeId:   it.id.videoId,
-          title:       sn.title || '',
-          publishedAt: sn.publishedAt || '',
-          thumb:       pick.url || ''
-        };
-      });
-
-    return res.status(200).json({ enabled: true, videos: videos });
-  } catch (e) {
-    // On any upstream failure act like disabled — the client already
-    // treats that as "show curated only", so no error ever surfaces.
-    return res.status(200).json({ enabled: false, videos: [], error: 'fetch_failed' });
-  }
+  return res.status(200).json({ enabled: true, videos: results[0], playlist: results[1] });
 };
+
+// search.list items: id.videoId + snippet
+function mapSearch(data) {
+  if (!data || !Array.isArray(data.items)) return [];
+  return data.items
+    .filter(function (it) { return it && it.id && it.id.videoId; })
+    .map(function (it) { return shape(it.id.videoId, it.snippet); });
+}
+
+// playlistItems.list items: snippet.resourceId.videoId + snippet
+function mapPlaylist(data) {
+  if (!data || !Array.isArray(data.items)) return [];
+  return data.items
+    .filter(function (it) {
+      var rid = it && it.snippet && it.snippet.resourceId;
+      // Skip private/deleted entries YouTube leaves in playlists.
+      return rid && rid.videoId && (it.snippet.title || '').toLowerCase() !== 'private video'
+        && (it.snippet.title || '').toLowerCase() !== 'deleted video';
+    })
+    .map(function (it) { return shape(it.snippet.resourceId.videoId, it.snippet); });
+}
+
+function shape(videoId, sn) {
+  sn = sn || {};
+  var th = sn.thumbnails || {};
+  var pick = th.medium || th.high || th.default || {};
+  return {
+    youtubeId:   videoId,
+    title:       sn.title || '',
+    publishedAt: sn.publishedAt || '',
+    thumb:       pick.url || ''
+  };
+}
 
 function getJson(url) {
   return new Promise(function (resolve, reject) {
