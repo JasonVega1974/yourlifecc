@@ -76,6 +76,10 @@ const DEF = {
   // F2-D Bible reader annotations. Each entry is { id, book, chapter, verse, ... }.
   // Highlights carry color, notes carry text, bookmarks just mark the verse.
   faithHighlights:[], faithNotes:[], faithBookmarks:[],
+  // 📺 Contextual faith videos (faith-videos.js) — ids the user bookmarked
+  // via the "Watch later" control on a video card. DEF membership required
+  // so the list survives an offline localStorage reload.
+  savedVideos:[],
   // Per-user reader prefs (font size, line height, family). UI exposes these
   // in a collapsible Settings cog on the ESV reader.
   faithReaderSettings:{ fontSize:'medium', lineHeight:'normal', fontFamily:'serif' },

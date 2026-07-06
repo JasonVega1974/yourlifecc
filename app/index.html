@@ -22569,6 +22569,9 @@
 <!-- My Walk with God pathway data (WALK_STATIONS / WALK_CHAPTERS / WALK_HORIZON /
      WALK_QUESTS_POOL) — pure data, read by walk-path.js. -->
 <script defer src="/app/js/data/walk-stations-data.js"></script>
+<!-- Contextual faith videos (FAITH_VIDEOS) — pure data, read by faith-videos.js
+     renderer. YouTube anchors placed inside walk stations + faith surfaces. -->
+<script defer src="/app/js/data/faith-videos.js"></script>
 <!-- My Climb pathway data (L1) — pure data, read by life-path.js. -->
 <script defer src="/app/js/data/life-stations-data.js"></script>
 <!-- Leaflet (F3-B) — open-source map library, MIT-licensed. Only loads when used. -->
@@ -22593,6 +22596,10 @@
 <!-- The Odds Machine (Proof & Prophecy §4a) — probability stacker.
      After faith.js so oddsDoorToProphecy can call bfTab/ppSetCategory. -->
 <script defer src="/app/js/odds-machine.js"></script>
+<!-- Contextual video renderer — reads FAITH_VIDEOS, exposes videoSectionHtml
+     (walk-path.js station sheets) + fvInject (faith.js bf-<tab> panels).
+     Runtime-only calls, so load order vs. its hosts is not critical. -->
+<script defer src="/app/js/faith-videos.js"></script>
 <!-- Skeptic vs Evidence (Proof & Prophecy §4b) — after faith.js so the
      Open Full Proof door can call bfTab/ppOpenModal/ylccEnsureData. -->
 <script defer src="/app/js/skeptic-debates.js"></script>

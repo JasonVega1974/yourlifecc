@@ -872,6 +872,18 @@ function bfTab(tab, btn){
   if(tab==='sleepStories') renderSleepStoriesCard();
   if(tab==='createMeditation') renderCreateMeditationCard();
   if(tab==='dailyDevotional') renderDailyDevFull();
+
+  // 📺 Contextual video anchors (faith-videos.js) — additive, idempotent,
+  // safe if the module never loaded. Appends a "Watch" section to the
+  // stable bf-<tab> panel after its own render runs.
+  if(typeof window.fvInject==='function'){
+    try{
+      if(tab==='jesus')               window.fvInject('faith:jesus', 'bf-jesus', 'append');
+      else if(tab==='prayer')         window.fvInject('faith:prayer', 'bf-prayer', 'append');
+      else if(tab==='bible')          window.fvInject('faith:bible', 'bf-bible', 'append');
+      else if(tab==='proofProphecy')  window.fvInject('faith:proof', 'bf-proofProphecy', 'append');
+    }catch(_e){}
+  }
 }
 
 // ── FAITH HOME (F2-A) ────────────────────────────────────────

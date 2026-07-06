@@ -1,7 +1,7 @@
 // YourLifeCC Service Worker
 // Version bump this string whenever you deploy a major update
 // to force old caches to clear.
-const CACHE_NAME = 'yourlifecc-v483';
+const CACHE_NAME = 'yourlifecc-v484';
 
 // Core assets to pre-cache on install — the app shell + key Well modules
 // + the shared modal/save/share + prayer focus + Quick Prayer library
@@ -64,6 +64,9 @@ const PRECACHE_ASSETS = [
   '/app/js/data/walk-stations-data.js',
   '/app/js/walk-path.js',
   '/app/js/walk-story.js',
+  // Contextual faith videos — data + renderer.
+  '/app/js/data/faith-videos.js',
+  '/app/js/faith-videos.js',
   '/app/js/walk-quest-hooks.js',
   // My Climb pathway (dark launch) — precached for offline parity.
   '/app/js/data/life-stations-data.js',

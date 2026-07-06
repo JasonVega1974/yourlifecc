@@ -423,6 +423,12 @@ function walkOpenStation(id){
     h+='<div class="wk-sec"><div class="wk-sec-h">You\'re not alone</div><div class="wk-human">🫂 '+_esc(s.human)+'</div></div>';
   }
 
+  // 📺 Contextual video anchors (faith-videos.js) — additive; safe if the
+  // module never loaded. Slots after the teaching, before the CTA.
+  if(!horizon && typeof window.videoSectionHtml==='function'){
+    try{ h+=window.videoSectionHtml('station:'+id); }catch(_e){}
+  }
+
   if(horizon){
     h+='<button class="wk-cta wk-cta-done" onclick="walkCloseStation()">This one is never “done.” Keep walking ✨</button>';
   } else if(done){
