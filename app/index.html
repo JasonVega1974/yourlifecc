@@ -11666,6 +11666,7 @@
       <button data-bible-sub="read" onclick="_bfBibleSubTab('read')" class="active" style="flex:1;padding:.42rem .5rem;border-radius:9px;border:none;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);background:var(--cd-banner);color:var(--cd-banner-text);transition:all .15s;">📖 Read</button>
       <button data-bible-sub="listen" onclick="_bfBibleSubTab('listen')" style="flex:1;padding:.42rem .5rem;border-radius:9px;border:none;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);background:transparent;color:var(--tx2);transition:all .15s;">🎧 Listen</button>
       <button data-bible-sub="study" onclick="_bfBibleSubTab('study')" style="flex:1;padding:.42rem .5rem;border-radius:9px;border:none;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);background:transparent;color:var(--tx2);transition:all .15s;">🔍 Study</button>
+      <button data-bible-sub="shelf" onclick="_bfBibleSubTab('shelf')" style="flex:1;padding:.42rem .5rem;border-radius:9px;border:none;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);background:transparent;color:var(--tx2);transition:all .15s;">📚 My Reading</button>
     </div>
 
     <!-- Read sub-tab -->
@@ -11796,6 +11797,31 @@
     <!-- Listen sub-tab (Audio Bible) -->
     <div id="bibleSubTab_listen" style="display:none;">
       <div id="audioBibleRoot"></div>
+    </div>
+
+    <!-- My Reading / The Shelf sub-tab (Wave 2 §3c) — 66-book progress
+         grid over D.bibleRead. Interface-layer; theme-adapts. -->
+    <style>
+      #bf-bible .shelf-hdr{ text-align:center; margin:.4rem 0 1.1rem; }
+      #bf-bible .shelf-count{ font-family:'Bebas Neue',var(--fm); font-size:2rem; letter-spacing:.03em; color:var(--tx); line-height:1; }
+      #bf-bible .shelf-count b{ color:#fbbf24; }
+      #bf-bible .shelf-sub{ font-family:var(--fm); font-size:.74rem; color:var(--tx3); margin-top:.25rem; }
+      #bf-bible .shelf-testament{ font-family:var(--fm); font-size:.6rem; font-weight:800; letter-spacing:.18em; text-transform:uppercase; color:var(--tx3); margin:1.1rem 0 .6rem; }
+      #bf-bible .shelf-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(84px,1fr)); gap:.5rem; }
+      #bf-bible .shelf-book{ position:relative; border-radius:10px; overflow:hidden; border:1px solid var(--card-border); background:var(--card-bg); cursor:pointer; min-height:64px; padding:.45rem .5rem; display:flex; flex-direction:column; justify-content:flex-end; }
+      #bf-bible .shelf-fill{ position:absolute; left:0; bottom:0; right:0; background:linear-gradient(180deg, rgba(56,189,248,.16), rgba(34,197,94,.2)); transition:height .4s ease; z-index:0; }
+      #bf-bible .shelf-book.done{ border-color:rgba(251,191,36,.55); }
+      #bf-bible .shelf-book.done .shelf-fill{ background:linear-gradient(180deg, rgba(251,191,36,.28), rgba(251,191,36,.4)); }
+      #bf-bible .shelf-book.pulse{ animation:shelfPulse 1.4s ease-out 1; }
+      @keyframes shelfPulse{ 0%{ box-shadow:0 0 0 0 rgba(251,191,36,0); } 35%{ box-shadow:0 0 0 4px rgba(251,191,36,.45); } 100%{ box-shadow:0 0 0 0 rgba(251,191,36,0); } }
+      #bf-bible .shelf-name{ position:relative; z-index:1; font-family:var(--fm); font-size:.62rem; font-weight:700; color:var(--tx); line-height:1.15; }
+      #bf-bible .shelf-ch{ position:relative; z-index:1; font-family:var(--fm); font-size:.54rem; color:var(--tx3); margin-top:.1rem; }
+      #bf-bible .shelf-book.done .shelf-ch{ color:#b45309; font-weight:800; }
+      @media (prefers-reduced-motion: reduce){ #bf-bible .shelf-book.pulse{ animation:none !important; } #bf-bible .shelf-fill{ transition:none !important; } }
+      :root.light #bf-bible .shelf-book.done .shelf-ch{ color:#92400e; }
+    </style>
+    <div id="bibleSubTab_shelf" style="display:none;">
+      <div id="bibleShelfRoot"></div>
     </div>
 
     <!-- Study sub-tab -->
@@ -12041,12 +12067,34 @@
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;">
       <button onclick="vtmNote()" style="background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.3);color:#38bdf8;border-radius:10px;padding:.55rem;font-size:.72rem;font-weight:800;cursor:pointer;font-family:var(--fm);">📝 Note</button>
+      <button onclick="if(typeof mvAddFromVerse==='function')mvAddFromVerse()" style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);color:#fbbf24;border-radius:10px;padding:.55rem;font-size:.72rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🧠 Memorize</button>
       <button id="vtmBookmarkBtn" onclick="vtmBookmark()" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.3);color:#a78bfa;border-radius:10px;padding:.55rem;font-size:.72rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🔖 Bookmark</button>
       <button onclick="vtmShare()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:var(--tx);border-radius:10px;padding:.55rem;font-size:.72rem;font-weight:800;cursor:pointer;font-family:var(--fm);">↗ Share</button>
       <button onclick="vtmCopy()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:var(--tx);border-radius:10px;padding:.55rem;font-size:.72rem;font-weight:800;cursor:pointer;font-family:var(--fm);">📋 Copy</button>
       <button onclick="vtmExplain()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:var(--tx);border-radius:10px;padding:.55rem;font-size:.72rem;font-weight:800;cursor:pointer;font-family:var(--fm);">✨ Explain</button>
     </div>
   </div>
+
+  <!-- Bible Immersive / Focus mode (Wave 2 §3b) — exit bar + restyle.
+       Toggled by html.bible-immersive. Interface-layer; theme-adapts. -->
+  <div id="bibleFocusExit" onclick="if(typeof bibleFocusOff==='function')bibleFocusOff()" style="display:none;position:fixed;top:0;left:0;right:0;z-index:100065;align-items:center;justify-content:center;height:34px;background:rgba(10,8,4,.5);color:rgba(241,233,213,.6);font-family:var(--fm);font-size:.64rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);">↑ Tap to exit focus · Esc</div>
+  <style>
+    /* Immersive fades the reader chrome and gives the passage a calm
+       measure + warm ground. Scoped to the reader (#charModal). */
+    html.bible-immersive #charModal .esv-chrome{ display:none !important; }
+    html.bible-immersive #charModalHeader{ opacity:0; height:0; overflow:hidden; padding:0 !important; margin:0 !important; border:none !important; }
+    html.bible-immersive #charBody{ background:#12100b; padding-top:2.4rem; }
+    html.bible-immersive #esvPassageText{
+      max-width:65ch; margin:0 auto; font-family:'Georgia','Times New Roman',serif !important;
+      font-size:1.12rem !important; line-height:2.15 !important; color:#e8e0d0 !important;
+      letter-spacing:.005em;
+    }
+    html.bible-immersive #charModal{ background:#0c0a06 !important; }
+    :root.light.bible-immersive #charBody{ background:#f4ead6; }
+    :root.light.bible-immersive #esvPassageText{ color:#2a2418 !important; }
+    :root.light.bible-immersive #charModal{ background:#efe3cc !important; }
+    @media (prefers-reduced-motion: reduce){ #bibleFocusExit{ transition:none !important; } }
+  </style>
 
   <!-- ════ NOTE EDITOR MODAL (F2-D) ════ -->
   <div id="verseNoteModal" class="mo" onclick="if(event.target===this)closeVerseNote()">
@@ -13972,6 +14020,7 @@
       <div class="pp-actions">
         <button class="pp-convince-btn" onclick="ppOpenConvince()">⚖️ Convince Me</button>
         <button class="pp-convince-btn" onclick="if(typeof oddsOpen==='function')oddsOpen()">🎲 The Odds Machine</button>
+        <button class="pp-convince-btn" onclick="if(typeof skepticOpen==='function')skepticOpen()">🧑‍⚖️ Skeptic vs Evidence</button>
         <input class="pp-search" id="ppSearch" type="text" placeholder="Search 100 proofs…" oninput="ppRenderGrid()" />
       </div>
     </div>
@@ -14546,6 +14595,57 @@
   </style>
   <div id="oddsOverlay" style="display:none;position:fixed;inset:0;z-index:100055;background:linear-gradient(180deg,#0a0d1a 0%,#141129 100%);overflow-y:auto;-webkit-overflow-scrolling:touch;">
     <div id="oddsHost" class="odm-host"></div>
+  </div>
+
+  <!-- ════ SKEPTIC VS EVIDENCE (Proof & Prophecy §4b) ════
+       display:none when idle (0 flow height; body-level, isolated main
+       — cannot intrude on the sidebar). -->
+  <style>
+    #skepticOverlay{ display:none; position:fixed; inset:0; z-index:100055; background:linear-gradient(180deg,#0a0d1a 0%,#141129 100%); overflow-y:auto; -webkit-overflow-scrolling:touch; }
+    .sk-host{ position:relative; max-width:640px; margin:0 auto; padding:max(env(safe-area-inset-top),1rem) 1.2rem 2rem; min-height:100%; box-sizing:border-box; }
+    .sk-top{ display:flex; align-items:center; justify-content:flex-end; gap:.6rem; margin-bottom:.6rem; }
+    .sk-close{ width:44px; height:44px; border-radius:50%; cursor:pointer; background:rgba(241,233,213,.06); border:1px solid rgba(241,233,213,.2); color:rgba(241,233,213,.7); font-size:.9rem; font-family:var(--fm); }
+    .sk-count{ margin-right:auto; font-family:var(--fm); font-size:.72rem; font-weight:800; color:rgba(241,233,213,.5); letter-spacing:.05em; }
+    .sk-tabs{ display:flex; flex-wrap:wrap; gap:.4rem; justify-content:center; margin-bottom:1rem; }
+    .sk-tab{ min-height:40px; padding:.35rem .7rem; border-radius:999px; cursor:pointer; background:transparent; border:1px solid rgba(241,233,213,.18); color:rgba(241,233,213,.6); font-family:var(--fm); font-size:.72rem; font-weight:700; }
+    .sk-tab.on{ background:rgba(251,191,36,.12); border-color:rgba(251,191,36,.5); color:#fbbf24; }
+    .sk-tab-n{ opacity:.6; font-size:.9em; }
+    .sk-card{ background:rgba(9,9,20,.55); border:1px solid rgba(241,233,213,.12); border-radius:20px; padding:1.3rem 1.2rem; transition:transform .3s ease, opacity .3s ease; }
+    .sk-card.sk-fly-left{ transform:translateX(-120%) rotate(-7deg); opacity:0; }
+    .sk-card.sk-fly-right{ transform:translateX(120%) rotate(7deg); opacity:0; }
+    .sk-badges{ display:flex; gap:.5rem; margin-bottom:1rem; }
+    .sk-cat{ font-family:var(--fm); font-size:.58rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; padding:.2rem .55rem; border-radius:999px; }
+    .sk-cat--resurrection{ background:rgba(251,191,36,.14); color:#fbbf24; }
+    .sk-cat--manuscripts{ background:rgba(14,165,233,.14); color:#38bdf8; }
+    .sk-cat--historical{ background:rgba(251,146,60,.14); color:#fb923c; }
+    .sk-cat--philosophical{ background:rgba(167,139,250,.14); color:#a78bfa; }
+    .sk-diff{ font-family:var(--fm); font-size:.6rem; font-weight:700; color:rgba(241,233,213,.45); align-self:center; }
+    .sk-eyebrow{ font-family:var(--fm); font-size:.6rem; font-weight:800; letter-spacing:.2em; text-transform:uppercase; color:rgba(241,233,213,.5); margin-bottom:.5rem; }
+    .sk-eyebrow--ev{ color:#22c55e; }
+    .sk-side--ev{ margin-top:1.2rem; padding-top:1.1rem; border-top:1px solid rgba(241,233,213,.1); }
+    .sk-obj{ font-family:Georgia,'Times New Roman',serif; font-size:1.08rem; line-height:1.65; color:#f1e9d5; }
+    .sk-resp{ font-family:var(--fm); font-size:.95rem; line-height:1.65; color:rgba(241,233,213,.9); }
+    .sk-reveal{ display:block; width:100%; margin-top:1.2rem; min-height:48px; border-radius:12px; cursor:pointer; padding:.7rem 1.2rem; background:#fbbf24; color:#3a2a05; border:none; font-family:var(--fm); font-weight:800; font-size:.88rem; }
+    .sk-dig{ margin-top:.7rem; min-height:40px; background:transparent; border:none; color:#22c55e; font-family:var(--fm); font-weight:700; font-size:.78rem; cursor:pointer; }
+    .sk-detail{ margin-top:.5rem; text-align:left; }
+    .sk-detail p{ font-family:var(--fm); font-size:.86rem; line-height:1.7; color:rgba(241,233,213,.78); margin:0 0 .7rem; }
+    .sk-proof{ display:block; margin-top:.6rem; min-height:44px; border-radius:10px; cursor:pointer; padding:.55rem 1rem; background:transparent; border:1px solid rgba(251,191,36,.4); color:#fbbf24; font-family:var(--fm); font-weight:700; font-size:.8rem; }
+    .sk-hint{ text-align:center; font-family:Georgia,serif; font-style:italic; font-size:.82rem; color:rgba(241,233,213,.45); margin-top:1rem; }
+    .sk-verdict{ display:flex; gap:.6rem; margin-top:1.2rem; }
+    .sk-vbtn{ flex:1; min-height:52px; border-radius:12px; cursor:pointer; padding:.7rem .6rem; font-family:var(--fm); font-weight:700; font-size:.82rem; }
+    .sk-vbtn--skeptic{ background:rgba(241,233,213,.05); border:1px solid rgba(241,233,213,.25); color:rgba(241,233,213,.75); }
+    .sk-vbtn--ev{ background:rgba(34,197,94,.12); border:1px solid rgba(34,197,94,.4); color:#6ee7b7; }
+    .sk-summary{ text-align:center; padding-top:3rem; }
+    .sk-sum-big{ font-family:Georgia,serif; font-size:1.5rem; color:#fbbf24; margin:.4rem 0 .8rem; }
+    .sk-sum-sub{ font-family:var(--fm); font-size:.88rem; line-height:1.6; color:rgba(241,233,213,.7); max-width:32em; margin:0 auto 1.4rem; }
+    .sk-sum-actions{ display:flex; gap:.6rem; justify-content:center; flex-wrap:wrap; }
+    .sk-again{ min-height:48px; border-radius:12px; cursor:pointer; padding:.7rem 1.3rem; background:#fbbf24; color:#3a2a05; border:none; font-family:var(--fm); font-weight:800; font-size:.86rem; }
+    .sk-close-btn{ min-height:48px; border-radius:12px; cursor:pointer; padding:.7rem 1.3rem; background:transparent; border:1px solid rgba(241,233,213,.25); color:rgba(241,233,213,.7); font-family:var(--fm); font-weight:700; font-size:.86rem; }
+    .sk-close:focus-visible, .sk-tab:focus-visible, .sk-reveal:focus-visible, .sk-vbtn:focus-visible, .sk-proof:focus-visible, .sk-again:focus-visible{ outline:2px solid #fbbf24; outline-offset:2px; }
+    @media (prefers-reduced-motion: reduce){ .sk-card{ transition:none !important; } }
+  </style>
+  <div id="skepticOverlay">
+    <div id="skepticHost" class="sk-host"></div>
   </div>
   <div id="oddsShareModal" class="mo" onclick="if(event.target===this)oddsCloseShare()">
     <div class="md" style="max-width:520px;padding:0;">
@@ -22461,6 +22561,8 @@
 <!-- The Odds Machine (Proof & Prophecy §4a) — 8 messianic prophecies +
      conservative Stoner-style odds. Small static data. -->
 <script defer src="/app/js/data/odds-machine.js"></script>
+<!-- Skeptic vs Evidence (Proof & Prophecy §4b) — 12 debate cards. -->
+<script defer src="/app/js/data/skeptic-debates.js"></script>
 <script defer src="/app/js/data/podcasts.js"></script>
 <script defer src="/app/js/data/reading-plans.js"></script>
 <script defer src="/app/js/data/audio-content.js"></script>
@@ -22491,6 +22593,9 @@
 <!-- The Odds Machine (Proof & Prophecy §4a) — probability stacker.
      After faith.js so oddsDoorToProphecy can call bfTab/ppSetCategory. -->
 <script defer src="/app/js/odds-machine.js"></script>
+<!-- Skeptic vs Evidence (Proof & Prophecy §4b) — after faith.js so the
+     Open Full Proof door can call bfTab/ppOpenModal/ylccEnsureData. -->
+<script defer src="/app/js/skeptic-debates.js"></script>
 <script defer src="/app/js/faith-resources.js"></script>
 <!-- The Story scrollytelling (2026-07-05) — Who Is Jesus seven-chapter
      scroll journey over JESUS_DATA. bfTab('jesus') in faith.js calls

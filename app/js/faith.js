@@ -2343,6 +2343,7 @@ let _esvCurrentChapter = 0;
 let _esvSelectedVerse = 0;
 
 async function openEsvReader(){
+  if(typeof bibleFocusOff === 'function') bibleFocusOff();   // every fresh open starts un-focused
   const book = (document.getElementById('esvBook')||{}).value;
   const ch = (document.getElementById('esvChapter')||{}).value || '1';
   if(!book){ showToast('Please select a book first'); return; }
@@ -2381,15 +2382,16 @@ async function openEsvReader(){
     const prevDisabled = chNum<=1;
     const nextDisabled = chNum>=totalCh;
     const chapterOpts = Array.from({length:totalCh},(_,i)=>`<option value="${i+1}" ${i+1===chNum?'selected':''}>Chapter ${i+1}</option>`).join('');
-    const navHtml = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;gap:.5rem;">
+    const navHtml = `<div class="esv-chrome" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;gap:.5rem;">
       <button onclick="navigateEsvChapter('${book.replace(/'/g,"\\'")}',${chNum-1},${totalCh})" ${prevDisabled?'disabled style="opacity:.3;cursor:not-allowed;"':''} style="background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.28);color:#38bdf8;border-radius:8px;padding:.4rem .8rem;font-size:.75rem;font-weight:700;cursor:pointer;">‹ Prev</button>
       <select onchange="navigateEsvChapter('${book.replace(/'/g,"\\'")}',parseInt(this.value),${totalCh})" style="flex:1;margin:0 .4rem;padding:.3rem .5rem;border-radius:8px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);color:var(--tx);font-size:.75rem;text-align:center;">
         ${chapterOpts}
       </select>
       <button onclick="navigateEsvChapter('${book.replace(/'/g,"\\'")}',${chNum+1},${totalCh})" ${nextDisabled?'disabled style="opacity:.3;cursor:not-allowed;"':''} style="background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.3);color:#a78bfa;border-radius:8px;padding:.4rem .8rem;font-size:.75rem;font-weight:700;cursor:pointer;">Next ›</button>
     </div>
-    <div style="display:flex;gap:.4rem;margin-bottom:.6rem;flex-wrap:wrap;">
+    <div class="esv-chrome" style="display:flex;gap:.4rem;margin-bottom:.6rem;flex-wrap:wrap;">
       <button onclick="esvListenChapter('${book.replace(/'/g,"\\'")}',${chNum})" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);color:#38bdf8;border-radius:8px;padding:.35rem .7rem;font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fm);">🎧 Listen</button>
+      <button onclick="bibleFocusOn()" style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);color:#fbbf24;border-radius:8px;padding:.35rem .7rem;font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fm);">🕯️ Focus</button>
       <button onclick="openReaderSettings()" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--tx2);border-radius:8px;padding:.35rem .7rem;font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fm);">⚙️ Settings</button>
       <span style="margin-left:auto;font-size:.6rem;color:var(--tx3);font-weight:700;align-self:center;">Tap any verse to highlight, note, share</span>
     </div>`;
@@ -3060,6 +3062,9 @@ function esvMarkRead(book, chNum, btn){
   save();
   if(btn){ btn.textContent = 'Read ✓'; btn.classList.add('esv-read-btn--done'); btn.setAttribute('aria-pressed', 'true'); btn.disabled = true; }
   renderBibleResumeCard();
+  // The Shelf (§3c) — if this chapter just finished the whole book,
+  // fire the win-lite moment (Gospels get a named one).
+  if(typeof _shelfOnBookMaybeComplete === 'function') try { _shelfOnBookMaybeComplete(book); } catch(_e){}
 }
 
 function esvToggleReflect(){
@@ -13071,7 +13076,7 @@ var _plansSubTab = 'reading';
 function _bfBibleSubTab(tab){
   _bibleSubTab = tab;
   if(typeof _ylccUserKey === 'function') localStorage.setItem(_ylccUserKey('bible_active_subtab'), tab);
-  ['read','listen','study'].forEach(function(t){
+  ['read','listen','study','shelf'].forEach(function(t){
     var el = document.getElementById('bibleSubTab_'+t);
     if(el) el.style.display = t===tab ? '' : 'none';
     var btn = document.querySelector('[data-bible-sub="'+t+'"]');
@@ -13082,6 +13087,140 @@ function _bfBibleSubTab(tab){
   });
   if(tab === 'listen') renderAudioBibleCard();
   if(tab === 'read' && typeof renderBibleResumeCard === 'function') renderBibleResumeCard();
+  if(tab === 'shelf' && typeof renderBibleShelf === 'function') renderBibleShelf();
+}
+
+// ── The Shelf (Wave 2 §3c) — 66-book reading-progress grid over the
+// existing D.bibleRead map (written by Continue Reading). Each book
+// fills proportionally to chapters read; a finished book goes gold.
+// Reads D.bibleRead, never restructures it.
+var _GOSPELS = ['Matthew', 'Mark', 'Luke', 'John'];
+var _shelfPulseBook = null;   // transient — a just-finished book pulses once
+function _bookCh(name){
+  if(typeof BIBLE_BOOKS === 'undefined') return 0;
+  var b = BIBLE_BOOKS.find(function(x){ return x.name === name; });
+  return b ? b.ch : 0;
+}
+function _bookReadCount(name){
+  if(typeof D === 'undefined' || !D || !D.bibleRead) return 0;
+  var n = 0, ch = _bookCh(name);
+  for(var c = 1; c <= ch; c++){ if(D.bibleRead[name + '|' + c]) n++; }
+  return n;
+}
+function _shelfTotalRead(){
+  if(typeof BIBLE_BOOKS === 'undefined') return 0;
+  return BIBLE_BOOKS.reduce(function(s, b){ return s + _bookReadCount(b.name); }, 0);
+}
+
+function renderBibleShelf(){
+  var root = document.getElementById('bibleShelfRoot');
+  if(!root || typeof BIBLE_BOOKS === 'undefined'){ if(root) root.innerHTML = '<div style="padding:1rem;color:var(--tx2);">Loading…</div>'; return; }
+  var total = BIBLE_BOOKS.reduce(function(s, b){ return s + b.ch; }, 0);
+  var read = _shelfTotalRead();
+  var icons = (typeof ESV_ICONS !== 'undefined') ? ESV_ICONS : {};
+  var sections = (typeof ESV_BOOK_SECTIONS !== 'undefined') ? ESV_BOOK_SECTIONS : { ot: BIBLE_BOOKS.slice(0, 39).map(function(b){ return b.name; }), nt: BIBLE_BOOKS.slice(39).map(function(b){ return b.name; }) };
+  var cell = function(name){
+    var ch = _bookCh(name), rc = _bookReadCount(name);
+    var pct = ch ? Math.round((rc / ch) * 100) : 0;
+    var done = ch > 0 && rc >= ch;
+    var pulse = (_shelfPulseBook === name) ? ' pulse' : '';
+    return '<div class="shelf-book' + (done ? ' done' : '') + pulse + '" onclick="_shelfOpen(\'' + _shelfEsc(name) + '\')" title="' + _shelfEsc(name) + ' — ' + rc + ' of ' + ch + ' chapters">' +
+      '<span class="shelf-fill" style="height:' + pct + '%;"></span>' +
+      '<span class="shelf-name">' + (icons[name] ? icons[name] + ' ' : '') + _shelfEsc(name) + '</span>' +
+      '<span class="shelf-ch">' + (done ? '✓ done' : rc + '/' + ch) + '</span>' +
+    '</div>';
+  };
+  root.innerHTML =
+    '<div class="shelf-hdr">' +
+      '<div class="shelf-count"><b>' + read.toLocaleString() + '</b> of ' + total.toLocaleString() + ' chapters</div>' +
+      '<div class="shelf-sub">Every chapter you finish fills its book. No rush — it only ever goes up.</div>' +
+    '</div>' +
+    '<div class="shelf-testament">Old Testament</div>' +
+    '<div class="shelf-grid">' + (sections.ot || []).map(cell).join('') + '</div>' +
+    '<div class="shelf-testament">New Testament</div>' +
+    '<div class="shelf-grid">' + (sections.nt || []).map(cell).join('') + '</div>';
+  _shelfPulseBook = null;   // one-shot
+}
+function _shelfEsc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/'/g,'&#39;').replace(/"/g,'&quot;'); }
+// Tapping a book jumps the reader to it (chapter 1) via the existing
+// book-open path.
+function _shelfOpen(name){
+  try {
+    _bfBibleSubTab('read');
+    if(typeof quickOpenEsvBook === 'function') quickOpenEsvBook(name, _bookCh(name));
+  } catch(_e){}
+}
+
+// Fired from esvMarkRead when a chapter completes a book. Win-LITE
+// (finishing a book is achievement, unlike chapter reads which are
+// already credited at open). A Gospel gets a named moment.
+function _shelfOnBookMaybeComplete(book){
+  var ch = _bookCh(book);
+  if(!ch) return;
+  if(_bookReadCount(book) < ch) return;   // not complete
+  if(typeof D !== 'undefined' && D){
+    if(!D._shelfCelebrated || typeof D._shelfCelebrated !== 'object') D._shelfCelebrated = {};
+    if(D._shelfCelebrated[book]) return;  // already celebrated this book
+    D._shelfCelebrated[book] = true;
+    if(typeof save === 'function') save();
+  }
+  _shelfPulseBook = book;
+  var reduced = false;
+  try { reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch(_e){}
+  if(!reduced && typeof launchSideConfetti === 'function') launchSideConfetti();
+  var isGospel = _GOSPELS.indexOf(book) !== -1;
+  if(typeof showToast === 'function') showToast(isGospel ? ('📖 You finished ' + book + ' — a whole Gospel.') : ('📖 You finished ' + book + '!'));
+  if(typeof renderBibleShelf === 'function') try { renderBibleShelf(); } catch(_e){}
+}
+
+// ── Bible Immersive / Focus mode (Wave 2 §3b) — a root class fades
+// the reader chrome and restyles the passage to a calm reading measure.
+// Interface-layer (theme-adapts). Exit = tap the top bar or Esc. The
+// existing verse-tap menu (highlight/note/memorize/copy/share) works
+// unchanged in both modes — highlights reuse D.faithHighlights, so
+// they persist across modes (NOT a new D.bibleHighlights store).
+function bibleFocusOn(){
+  document.documentElement.classList.add('bible-immersive');
+  var bar = document.getElementById('bibleFocusExit');
+  if(bar) bar.style.display = 'flex';
+  if(!window._bibleFocusEsc){
+    window._bibleFocusEsc = function(e){ if(e.key === 'Escape') bibleFocusOff(); };
+    document.addEventListener('keydown', window._bibleFocusEsc);
+  }
+}
+function bibleFocusOff(){
+  document.documentElement.classList.remove('bible-immersive');
+  var bar = document.getElementById('bibleFocusExit');
+  if(bar) bar.style.display = 'none';
+}
+
+// Memorize the tapped verse — sends it to Memory Verses (the reader
+// had no add-from-verse path; mvAddFromLibrary/mvAddCustom don't take
+// an arbitrary ref+text). Pushes the same SM-2 shape the ladder reads.
+function mvAddFromVerse(){
+  if(typeof _esvCurrentBook === 'undefined' || !_esvCurrentBook || !_esvSelectedVerse) return;
+  var ref = _esvCurrentBook + ' ' + _esvCurrentChapter + ':' + _esvSelectedVerse;
+  var span = document.querySelector('.esv-v[data-verse="' + _esvSelectedVerse + '"]');
+  var text = span ? span.textContent.replace(/^\s*🔖?\s*\[\d+\]\s*/, '').replace(/📝/g, '').trim() : '';
+  if(typeof D === 'undefined' || !D) return;
+  if(!Array.isArray(D.memoryVerses)) D.memoryVerses = [];
+  if(D.memoryVerses.some(function(v){ return v && v.reference === ref; })){
+    if(typeof showToast === 'function') showToast('Already in your queue');
+    if(typeof closeVerseMenu === 'function') closeVerseMenu();
+    return;
+  }
+  var now = new Date().toISOString();
+  D.memoryVerses.push({
+    id: Date.now() + Math.floor(Math.random() * 1000),
+    reference: ref, text: text, category: 'bible',
+    ease: 2.5, intervalDays: 1,
+    nextDue: (typeof _mvTodayISO === 'function') ? _mvTodayISO() : now.slice(0, 10),
+    lastReviewed: null, mastered: false, masteredAt: null,
+    createdAt: now, totalReviews: 0, correctReviews: 0
+  });
+  if(typeof save === 'function') save();
+  if(typeof showToast === 'function') showToast('Added to Memory Verses ✨');
+  if(typeof closeVerseMenu === 'function') closeVerseMenu();
 }
 
 function _bfPlansSubTab(tab){
