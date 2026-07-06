@@ -210,7 +210,11 @@
     if(_cssDone || typeof document==='undefined') return;
     _cssDone = true;
     var css=
-    '.vp-ov{position:fixed;inset:0;z-index:12000;display:flex;flex-direction:column;background:#05060c;}'+
+    /* z-index must clear ALL app chrome — the top nav (#topQuickBtns 99990),
+       modals (99998/99999), Google Translate (999999). 12000 buried the
+       player under the nav bars, so it read as "not appearing". 9999998 sits
+       above every chrome layer, just below the subscription-block gate. */
+    '.vp-ov{position:fixed;inset:0;z-index:9999998;display:flex;flex-direction:column;background:#05060c;}'+
     '.vp-stage{position:relative;flex:1;display:flex;align-items:center;justify-content:center;min-height:0;background:#05060c;}'+
     '.vp-frame-wrap{width:min(100%,960px);aspect-ratio:16/9;max-height:100%;background:#000;}'+
     '.vp-frame{width:100%;height:100%;border:0;display:block;background:#000;}'+
