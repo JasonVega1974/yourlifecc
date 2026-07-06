@@ -184,11 +184,16 @@
     '.va-intro{font-size:.78rem;line-height:1.45;color:rgba(233,236,246,.62);margin:.6rem 0 0;}'+
     '.va-plist{margin-bottom:1.15rem;}'+
     '.va-eyebrow{font-family:\'Oswald\',system-ui,sans-serif;text-transform:uppercase;letter-spacing:.15em;font-size:.7rem;font-weight:600;color:#fbbf24;margin-bottom:.55rem;}'+
-    '.va-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:.7rem;}'+
-    '.va-live-row{display:flex;gap:.7rem;overflow-x:auto;padding-bottom:.35rem;-webkit-overflow-scrolling:touch;}'+
-    '.va-live-row .va-card{flex:0 0 208px;}'+
-    '.va-card{background:var(--card-bg,rgba(255,255,255,.03));border:1px solid rgba(251,191,36,.18);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;}'+
-    '.va-poster{position:relative;display:block;width:100%;padding:0;border:0;margin:0;aspect-ratio:16/9;cursor:pointer;background:#0a0d1a;overflow:hidden;}'+
+    /* Responsive grid — matches the app home photo cards: 1 col on mobile,
+       2 up ≥480px, 3 up ≥720px (was auto-fill minmax(158px) → too many tiny columns). */
+    '.va-grid{display:grid;grid-template-columns:1fr;gap:.85rem;}'+
+    '@media(min-width:480px){.va-grid{grid-template-columns:repeat(2,1fr);}}'+
+    '@media(min-width:720px){.va-grid{grid-template-columns:repeat(3,1fr);}}'+
+    '.va-live-row{display:flex;gap:.85rem;overflow-x:auto;padding-bottom:.35rem;-webkit-overflow-scrolling:touch;}'+
+    '.va-live-row .va-card{flex:0 0 240px;}'+
+    '.va-card{background:var(--card-bg,rgba(255,255,255,.03));border:1px solid rgba(251,191,36,.18);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;}'+
+    '.va-poster{position:relative;display:block;width:100%;padding:0;border:0;margin:0;aspect-ratio:16/9;min-height:160px;cursor:pointer;background:#0a0d1a;overflow:hidden;}'+
+    '@media(min-width:720px){.va-poster{min-height:200px;}}'+
     '.va-thumb{width:100%;height:100%;object-fit:cover;display:block;}'+
     '.va-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}'+
     '.va-play-tri{width:52px;height:52px;border-radius:50%;background:rgba(10,13,26,.6);border:2px solid rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;transition:transform .18s ease, background .18s ease;}'+
@@ -197,8 +202,8 @@
     '.va-dur{position:absolute;bottom:.4rem;right:.4rem;background:rgba(10,13,26,.82);color:#fff;font-size:.62rem;font-weight:600;padding:.11rem .38rem;border-radius:6px;}'+
     '.va-poster--soon{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a1233,#0a0d1a);}'+
     '.va-soon-ico{font-size:1.7rem;opacity:.5;}'+
-    '.va-meta{padding:.55rem .65rem .6rem;display:flex;flex-direction:column;gap:.4rem;flex:1;}'+
-    '.va-title{font-weight:700;font-size:.82rem;color:#e9ecf6;line-height:1.25;}'+
+    '.va-meta{padding:.7rem .8rem .8rem;display:flex;flex-direction:column;gap:.45rem;flex:1;}'+
+    '.va-title{font-weight:700;font-size:.9rem;color:#e9ecf6;line-height:1.28;}'+
     '.va-soon-note{font-size:.68rem;color:rgba(233,236,246,.45);font-style:italic;}'+
     '.va-actions{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-top:auto;}'+
     '.va-yt{font-size:.68rem;font-weight:600;color:#8ab4f8;text-decoration:none;}'+

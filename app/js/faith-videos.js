@@ -84,9 +84,9 @@
     var vids=getVideosForPlacement(placementKey);
     if(!vids.length) return '';
     var h='<div class="fv-section" data-fv-key="'+_esc(placementKey)+'">'+
-          '<div class="fv-eyebrow">📺 Watch</div>';
+          '<div class="fv-eyebrow">📺 Watch</div><div class="fv-grid">';
     for(var i=0;i<vids.length;i++){ h+=_cardHtml(vids[i]); }
-    h+='</div>';
+    h+='</div></div>';
     return h;
   }
   function videoSectionHtml(placementKey){
@@ -168,9 +168,13 @@
     _cssDone=true;
     var css=
     '.fv-section{margin:1.15rem 0 .3rem;}'+
+    /* Full width on mobile, 2-col grid on desktop — matches the app card standard. */
+    '.fv-grid{display:grid;grid-template-columns:1fr;gap:.75rem;}'+
+    '@media(min-width:720px){.fv-grid{grid-template-columns:repeat(2,1fr);}}'+
     '.fv-eyebrow{font-family:\'Oswald\',system-ui,sans-serif;text-transform:uppercase;letter-spacing:.15em;font-size:.7rem;font-weight:600;color:#fbbf24;margin-bottom:.55rem;}'+
-    '.fv-card{background:var(--card-bg,rgba(255,255,255,.03));border:1px solid rgba(251,191,36,.18);border-radius:16px;overflow:hidden;margin-bottom:.75rem;}'+
-    '.fv-poster{position:relative;display:block;width:100%;padding:0;border:0;margin:0;aspect-ratio:16/9;cursor:pointer;background:#0a0d1a;overflow:hidden;}'+
+    '.fv-card{background:var(--card-bg,rgba(255,255,255,.03));border:1px solid rgba(251,191,36,.18);border-radius:16px;overflow:hidden;}'+
+    '.fv-poster{position:relative;display:block;width:100%;padding:0;border:0;margin:0;aspect-ratio:16/9;min-height:160px;cursor:pointer;background:#0a0d1a;overflow:hidden;}'+
+    '@media(min-width:720px){.fv-poster{min-height:200px;}}'+
     '.fv-thumb{width:100%;height:100%;object-fit:cover;display:block;}'+
     '.fv-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}'+
     '.fv-play-tri{width:62px;height:62px;border-radius:50%;background:rgba(10,13,26,.6);border:2px solid rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;transition:transform .18s ease, background .18s ease;}'+
