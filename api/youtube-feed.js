@@ -1,108 +1,102 @@
 // api/youtube-feed.js
-// Live feed for the Bible Project video archive surface. Fetches the
-// channel's latest uploads (search.list) + a playlist (playlistItems.list)
-// via the YouTube Data API v3 and returns them as JSON.
+// Live feed for the Bible Project video archive surface.
+//   - Channel "latest uploads" via the CANONICAL channels.list -> uploads
+//     playlist -> playlistItems path (reliable + cheap: 1+1 quota units).
+//     This replaces search.list, which is 100 units AND can return empty
+//     for a valid channelId — a likely cause of the empty `videos` array.
+//   - A hand-picked BibleProject playlist via playlistItems.list.
 //
-// SELF-ENABLING: if YOUTUBE_API_KEY is not set in the Vercel env, returns
-// { enabled:false, videos:[], playlist:[] } with a 200 (never an error) so
-// the client silently shows the curated playlist only.
+// SELF-ENABLING: if YOUTUBE_API_KEY is unset, returns { enabled:false,
+// videos:[], playlist:[] } (200, never an error) so the client shows the
+// curated set only.
 //
-// CACHING (Fix 3): only a DATA-BEARING response is edge-cached for 6h. The
-// disabled/empty/error responses are 'no-store' — otherwise a stale
-// 'disabled' response cached while the key was missing could stick at the
-// edge for hours AFTER the key is added, which is exactly what kept the
-// live sections from appearing.
+// CACHING: only a data-bearing response is edge-cached 6h; empty/error
+// responses are 'no-store' so nothing stale gets pinned at the edge.
 //
-// DIAGNOSE: GET /api/youtube-feed?debug=1 adds a `diag` block exposing the
-// upstream error reason per source (e.g. an invalid/referrer-restricted key
-// or an exceeded quota) without ever leaking the key itself.
+// DIAGNOSE (raw YouTube state, no key leak):
+//   GET /api/youtube-feed?debug=1
+// adds a `diag` block with, per call: the API method, HTTP status, any
+// Google error message + reason, item count, and totalResults. That is the
+// raw signal needed to tell apart: wrong channel/playlist id (200 + 0
+// items / 404 playlistNotFound), a restricted key (403 + reason), and an
+// exceeded quota (403 quotaExceeded).
 //
-// Environment variable (Vercel → Settings → Environment Variables):
-//   YOUTUBE_API_KEY — a Google Cloud API key with "YouTube Data API v3"
-//   ENABLED (console.cloud.google.com) and NO HTTP-referrer restriction
-//   (server-side calls send no referrer; use "None" or an IP restriction).
-//   Changing env vars requires a redeploy to take effect.
+// KEY REQUIREMENTS (Google Cloud console): YouTube Data API v3 must be
+// ENABLED, and the key must NOT be HTTP-referrer-restricted (server calls
+// send no referrer — use "None" or an IP restriction), and if the key has
+// API restrictions, YouTube Data API v3 must be in the allow-list. Env-var
+// changes require a redeploy to take effect.
 //
 // CommonJS on purpose — this deploy has 502'd on ESM before.
 
 const https = require('https');
 
-const CHANNEL_ID  = 'UCVfwlh9XpX2Y_tQfjeln9QA';                 // BibleProject
-const PLAYLIST_ID = 'PLH0Szn1yYNedhbJcKSQbpwGmmk7fhwTyL';       // BibleProject playlist
+const CHANNEL_ID  = 'UCVfwlh9XpX2Y_tQfjeln9QA';           // BibleProject (verified)
+const PLAYLIST_ID = 'PLH0Szn1yYNedhbJcKSQbpwGmmk7fhwTyL'; // BibleProject playlist
 
 module.exports = async (req, res) => {
   res.setHeader('Content-Type', 'application/json');
+  const debug = !!(req && req.query && (req.query.debug === '1' || req.query.debug === 'true'));
 
   const key = process.env.YOUTUBE_API_KEY;
   if (!key) {
-    // Do NOT 6h-cache the disabled state — see the CACHING note above.
     res.setHeader('Cache-Control', 'no-store');
-    return res.status(200).json({ enabled: false, videos: [], playlist: [] });
+    return res.status(200).json({ enabled: false, videos: [], playlist: [], keyPresent: false });
   }
 
-  const channelUrl = 'https://www.googleapis.com/youtube/v3/search'
-    + '?key=' + encodeURIComponent(key)
-    + '&channelId=' + CHANNEL_ID
-    + '&part=snippet&order=date&type=video&maxResults=12';
-  const playlistUrl = 'https://www.googleapis.com/youtube/v3/playlistItems'
-    + '?key=' + encodeURIComponent(key)
-    + '&playlistId=' + encodeURIComponent(PLAYLIST_ID)
-    + '&part=snippet&maxResults=25';
-
-  // Both in parallel; each degrades to [] (with a captured reason) on error.
-  const results = await Promise.all([
-    fetchSource(channelUrl, mapSearch),
-    fetchSource(playlistUrl, mapPlaylist)
+  const [ch, pl] = await Promise.all([
+    fetchChannelUploads(key),
+    fetchPlaylist(key, PLAYLIST_ID)
   ]);
-  const videos   = results[0].items;
-  const playlist = results[1].items;
+  const videos   = ch.items;
+  const playlist = pl.items;
   const hasData  = videos.length > 0 || playlist.length > 0;
 
-  // Cache real data for 6h (playlistItems = 1 quota unit, search = 100, so a
-  // 6h cache keeps us well within quota). Empty/error responses stay fresh.
   res.setHeader('Cache-Control', hasData
     ? 's-maxage=21600, stale-while-revalidate=86400'
     : 'no-store');
 
   const body = { enabled: true, videos: videos, playlist: playlist };
-  if (req && req.query && (req.query.debug === '1' || req.query.debug === 'true')) {
-    body.diag = { videosError: results[0].error, playlistError: results[1].error, hasData: hasData };
-  }
+  if (debug) body.diag = { channel: ch.diag, playlist: pl.diag };
   return res.status(200).json(body);
 };
 
-// One source: fetch, detect HTTP/API errors, map on success, capture reason.
-async function fetchSource(url, mapFn) {
-  try {
-    const r = await getJson(url);
-    const d = r.data;
-    if (r.status !== 200 || (d && d.error)) {
-      const msg = (d && d.error && (d.error.message || d.error.status)) || ('http_' + r.status);
-      return { items: [], error: msg };
-    }
-    return { items: mapFn(d), error: null };
-  } catch (e) {
-    return { items: [], error: 'fetch_failed' };
-  }
+// channels.list -> relatedPlaylists.uploads -> playlistItems (latest first).
+async function fetchChannelUploads(key) {
+  const chUrl = api('channels', { id: CHANNEL_ID, part: 'contentDetails' }, key);
+  const ch = await getJson(chUrl);
+  const diag = diagOf('channels.list', ch);
+  if (ch.status !== 200 || errOf(ch)) return { items: [], diag: diag };
+
+  const uploads = path(ch.data, ['items', 0, 'contentDetails', 'relatedPlaylists', 'uploads']);
+  if (!uploads) { diag.note = 'channel returned no uploads playlist (check channel id)'; return { items: [], diag: diag }; }
+  diag.uploadsPlaylist = uploads;
+
+  const upUrl = api('playlistItems', { playlistId: uploads, part: 'snippet', maxResults: 12 }, key);
+  const up = await getJson(upUrl);
+  diag.uploads = diagOf('uploads.playlistItems', up);
+  if (up.status !== 200 || errOf(up)) return { items: [], diag: diag };
+  return { items: mapPlaylist(up.data), diag: diag };
 }
 
-// search.list items: id.videoId + snippet
-function mapSearch(data) {
-  if (!data || !Array.isArray(data.items)) return [];
-  return data.items
-    .filter(function (it) { return it && it.id && it.id.videoId; })
-    .map(function (it) { return shape(it.id.videoId, it.snippet); });
+async function fetchPlaylist(key, playlistId) {
+  const url = api('playlistItems', { playlistId: playlistId, part: 'snippet', maxResults: 25 }, key);
+  const r = await getJson(url);
+  const diag = diagOf('playlistItems', r);
+  diag.playlistId = playlistId;
+  if (r.status !== 200 || errOf(r)) return { items: [], diag: diag };
+  return { items: mapPlaylist(r.data), diag: diag };
 }
 
-// playlistItems.list items: snippet.resourceId.videoId + snippet
+// playlistItems.list items: snippet.resourceId.videoId + snippet.
 function mapPlaylist(data) {
   if (!data || !Array.isArray(data.items)) return [];
   return data.items
     .filter(function (it) {
       var rid = it && it.snippet && it.snippet.resourceId;
+      var title = (it && it.snippet && it.snippet.title || '').toLowerCase();
       // Skip private/deleted entries YouTube leaves in playlists.
-      return rid && rid.videoId && (it.snippet.title || '').toLowerCase() !== 'private video'
-        && (it.snippet.title || '').toLowerCase() !== 'deleted video';
+      return rid && rid.videoId && title !== 'private video' && title !== 'deleted video';
     })
     .map(function (it) { return shape(it.snippet.resourceId.videoId, it.snippet); });
 }
@@ -111,17 +105,42 @@ function shape(videoId, sn) {
   sn = sn || {};
   var th = sn.thumbnails || {};
   var pick = th.medium || th.high || th.default || {};
-  return {
-    youtubeId:   videoId,
-    title:       sn.title || '',
-    publishedAt: sn.publishedAt || '',
-    thumb:       pick.url || ''
-  };
+  return { youtubeId: videoId, title: sn.title || '', publishedAt: sn.publishedAt || '', thumb: pick.url || '' };
+}
+
+// ── helpers ──────────────────────────────────────────────
+function api(method, params, key) {
+  var qs = 'key=' + encodeURIComponent(key);
+  Object.keys(params).forEach(function (k) { qs += '&' + k + '=' + encodeURIComponent(params[k]); });
+  return 'https://www.googleapis.com/youtube/v3/' + method + '?' + qs;
+}
+
+function errOf(r) {
+  return (r.data && r.data.error) ? (r.data.error.message || r.data.error.status || 'api_error') : null;
+}
+
+// Compact, key-safe snapshot of one upstream call for ?debug=1.
+function diagOf(label, r) {
+  var d = { call: label, httpStatus: r.status, error: errOf(r) };
+  if (r.data) {
+    if (Array.isArray(r.data.items)) d.itemCount = r.data.items.length;
+    if (r.data.pageInfo && typeof r.data.pageInfo.totalResults === 'number') d.totalResults = r.data.pageInfo.totalResults;
+    var sample = path(r.data, ['items', 0, 'snippet', 'title']);
+    if (sample) d.sampleTitle = sample;
+    var reason = path(r.data, ['error', 'errors', 0, 'reason']);
+    if (reason) d.reason = reason;
+  }
+  return d;
+}
+
+function path(obj, keys) {
+  for (var i = 0; i < keys.length; i++) { if (obj == null) return undefined; obj = obj[keys[i]]; }
+  return obj;
 }
 
 // Resolve { status, data } so callers can see non-200 + Google error bodies.
 function getJson(url) {
-  return new Promise(function (resolve, reject) {
+  return new Promise(function (resolve) {
     https.get(url, function (r) {
       var body = '';
       r.on('data', function (c) { body += c; });
@@ -130,6 +149,6 @@ function getJson(url) {
         try { data = JSON.parse(body); } catch (_e) {}
         resolve({ status: r.statusCode, data: data });
       });
-    }).on('error', reject);
+    }).on('error', function () { resolve({ status: 0, data: null }); });
   });
 }
