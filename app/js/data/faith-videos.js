@@ -9,13 +9,9 @@
      - 'faith:<key>'   → a faith hub surface (faith.js bfTab)
      - 'story:<key>'   → a Story Mode beat (reserved; not yet wired)
 
-   ⚠ YOUTUBE IDS NEED VERIFICATION. These youtubeId values were
-   supplied from an external spec and may be stale — YouTube IDs
-   drift/expire and cannot be verified from the build environment.
-   Confirm each resolves to the intended Bible Project video before
-   relying on it in production. Known issue: vid-resurrection and
-   vid-gospel currently share the same id (G-2e9mMf7E8) — at least
-   one is almost certainly wrong.
+   YouTube IDs verified/corrected 2026-07-06 (owner-supplied). Each
+   youtubeId now resolves to its intended Bible Project video; the
+   earlier vid-gospel/vid-resurrection collision is resolved.
 ============================================================= */
 
 const FAITH_VIDEOS = [
@@ -23,7 +19,7 @@ const FAITH_VIDEOS = [
     id: 'vid-gospel',
     title: 'The Gospel',
     source: 'The Bible Project',
-    youtubeId: 'G-2e9mMf7E8',
+    youtubeId: 'xrzq_X1NNaA',
     duration: '4:52',
     placement: ['station:accepted', 'station:gospel'],
     description: 'What the gospel actually is — and why it changes everything.'
@@ -32,7 +28,7 @@ const FAITH_VIDEOS = [
     id: 'vid-baptism',
     title: 'Baptism',
     source: 'The Bible Project',
-    youtubeId: 'tZBm4vSdq40',
+    youtubeId: '0k4GbvZUPuo',
     duration: '5:24',
     placement: ['station:baptism'],
     description: 'What baptism means and why Jesus commanded it.'
@@ -41,7 +37,7 @@ const FAITH_VIDEOS = [
     id: 'vid-jesus-messiah',
     title: 'Jesus the Messiah',
     source: 'The Bible Project',
-    youtubeId: 'v9i2pSFWCiA',
+    youtubeId: 'p7XRPGzL6kk',
     duration: '7:14',
     placement: ['faith:jesus'],
     description: 'Who Jesus claimed to be — and why it matters.'
@@ -50,7 +46,7 @@ const FAITH_VIDEOS = [
     id: 'vid-resurrection',
     title: 'Death & Resurrection',
     source: 'The Bible Project',
-    youtubeId: 'G-2e9mMf7E8',
+    youtubeId: 'Vb24Lk1Oh5M',
     duration: '6:01',
     placement: ['faith:proof', 'story:cross'],
     description: 'The central claim of Christianity — examined.'
@@ -68,7 +64,7 @@ const FAITH_VIDEOS = [
     id: 'vid-prayer',
     title: 'Prayer',
     source: 'The Bible Project',
-    youtubeId: 'tYpRqKKJD0Q',
+    youtubeId: '3-YlqQfKkKk',
     duration: '5:26',
     placement: ['faith:prayer', 'station:prayer-learn'],
     description: 'What prayer actually is — and how to do it.'
@@ -86,7 +82,7 @@ const FAITH_VIDEOS = [
     id: 'vid-scripture',
     title: 'The Bible',
     source: 'The Bible Project',
-    youtubeId: 'ak06MSETeo4',
+    youtubeId: '7_CGP-12AE0',
     duration: '6:42',
     placement: ['station:word', 'faith:bible'],
     description: 'What the Bible is and how to read it.'
