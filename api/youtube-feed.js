@@ -1,16 +1,27 @@
 // api/youtube-feed.js
-// Live channel feed for the Bible Project video archive surface.
-// Fetches the latest 12 uploads from the BibleProject channel via the
-// YouTube Data API v3 and returns them as JSON, edge-cached for 6h.
+// Live feed for the Bible Project video archive surface. Fetches the
+// channel's latest uploads (search.list) + a playlist (playlistItems.list)
+// via the YouTube Data API v3 and returns them as JSON.
 //
-// SELF-ENABLING: if YOUTUBE_API_KEY is not set in the Vercel env, this
-// returns { enabled:false, videos:[] } with a 200 — never an error — so
-// the client silently falls back to the curated playlist. Add the key
-// later and the live row lights up with no code change.
+// SELF-ENABLING: if YOUTUBE_API_KEY is not set in the Vercel env, returns
+// { enabled:false, videos:[], playlist:[] } with a 200 (never an error) so
+// the client silently shows the curated playlist only.
 //
-// Environment variable (Vercel → Project → Settings → Environment
-// Variables): YOUTUBE_API_KEY — a Google Cloud API key with the
-// "YouTube Data API v3" enabled (console.cloud.google.com).
+// CACHING (Fix 3): only a DATA-BEARING response is edge-cached for 6h. The
+// disabled/empty/error responses are 'no-store' — otherwise a stale
+// 'disabled' response cached while the key was missing could stick at the
+// edge for hours AFTER the key is added, which is exactly what kept the
+// live sections from appearing.
+//
+// DIAGNOSE: GET /api/youtube-feed?debug=1 adds a `diag` block exposing the
+// upstream error reason per source (e.g. an invalid/referrer-restricted key
+// or an exceeded quota) without ever leaking the key itself.
+//
+// Environment variable (Vercel → Settings → Environment Variables):
+//   YOUTUBE_API_KEY — a Google Cloud API key with "YouTube Data API v3"
+//   ENABLED (console.cloud.google.com) and NO HTTP-referrer restriction
+//   (server-side calls send no referrer; use "None" or an IP restriction).
+//   Changing env vars requires a redeploy to take effect.
 //
 // CommonJS on purpose — this deploy has 502'd on ESM before.
 
@@ -20,20 +31,15 @@ const CHANNEL_ID  = 'UCVfwlh9XpX2Y_tQfjeln9QA';                 // BibleProject
 const PLAYLIST_ID = 'PLH0Szn1yYNedhbJcKSQbpwGmmk7fhwTyL';       // BibleProject playlist
 
 module.exports = async (req, res) => {
-  // Cache at the edge for 6h regardless of enabled/disabled, so the
-  // disabled state is cheap too and we stay well under the API quota.
-  res.setHeader('Cache-Control', 's-maxage=21600, stale-while-revalidate=86400');
   res.setHeader('Content-Type', 'application/json');
 
   const key = process.env.YOUTUBE_API_KEY;
   if (!key) {
-    // Part B not provisioned — client uses curated playlist only.
+    // Do NOT 6h-cache the disabled state — see the CACHING note above.
+    res.setHeader('Cache-Control', 'no-store');
     return res.status(200).json({ enabled: false, videos: [], playlist: [] });
   }
 
-  // Fetch the channel's latest uploads (search.list) and the playlist
-  // (playlistItems.list) in parallel. Each falls back to [] on failure,
-  // so one hiccup never blanks the whole surface.
   const channelUrl = 'https://www.googleapis.com/youtube/v3/search'
     + '?key=' + encodeURIComponent(key)
     + '&channelId=' + CHANNEL_ID
@@ -43,13 +49,42 @@ module.exports = async (req, res) => {
     + '&playlistId=' + encodeURIComponent(PLAYLIST_ID)
     + '&part=snippet&maxResults=25';
 
+  // Both in parallel; each degrades to [] (with a captured reason) on error.
   const results = await Promise.all([
-    getJson(channelUrl).then(mapSearch).catch(function () { return []; }),
-    getJson(playlistUrl).then(mapPlaylist).catch(function () { return []; })
+    fetchSource(channelUrl, mapSearch),
+    fetchSource(playlistUrl, mapPlaylist)
   ]);
+  const videos   = results[0].items;
+  const playlist = results[1].items;
+  const hasData  = videos.length > 0 || playlist.length > 0;
 
-  return res.status(200).json({ enabled: true, videos: results[0], playlist: results[1] });
+  // Cache real data for 6h (playlistItems = 1 quota unit, search = 100, so a
+  // 6h cache keeps us well within quota). Empty/error responses stay fresh.
+  res.setHeader('Cache-Control', hasData
+    ? 's-maxage=21600, stale-while-revalidate=86400'
+    : 'no-store');
+
+  const body = { enabled: true, videos: videos, playlist: playlist };
+  if (req && req.query && (req.query.debug === '1' || req.query.debug === 'true')) {
+    body.diag = { videosError: results[0].error, playlistError: results[1].error, hasData: hasData };
+  }
+  return res.status(200).json(body);
 };
+
+// One source: fetch, detect HTTP/API errors, map on success, capture reason.
+async function fetchSource(url, mapFn) {
+  try {
+    const r = await getJson(url);
+    const d = r.data;
+    if (r.status !== 200 || (d && d.error)) {
+      const msg = (d && d.error && (d.error.message || d.error.status)) || ('http_' + r.status);
+      return { items: [], error: msg };
+    }
+    return { items: mapFn(d), error: null };
+  } catch (e) {
+    return { items: [], error: 'fetch_failed' };
+  }
+}
 
 // search.list items: id.videoId + snippet
 function mapSearch(data) {
@@ -84,14 +119,16 @@ function shape(videoId, sn) {
   };
 }
 
+// Resolve { status, data } so callers can see non-200 + Google error bodies.
 function getJson(url) {
   return new Promise(function (resolve, reject) {
     https.get(url, function (r) {
-      let body = '';
+      var body = '';
       r.on('data', function (c) { body += c; });
       r.on('end', function () {
-        try { resolve(JSON.parse(body)); }
-        catch (err) { reject(err); }
+        var data = null;
+        try { data = JSON.parse(body); } catch (_e) {}
+        resolve({ status: r.statusCode, data: data });
       });
     }).on('error', reject);
   });
