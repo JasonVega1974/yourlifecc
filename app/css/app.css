@@ -192,7 +192,13 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 #sideOverlay.open{display:block;}
 
 /* ─── MAIN CONTENT ────────────────────────────── */
-#mainWrap{margin-left:220px;min-height:100vh;position:relative;width:calc(100vw - 220px);padding-top:44px;overflow-x:hidden;}
+/* isolation:isolate makes #mainWrap its own stacking context, so NO
+   content-column descendant (however tall, whatever its z-index) can
+   ever paint above or intrude on the fixed sidebar's hit region
+   (2026-07-06 sidebar-resilience hardening). Body-level modals/overlays
+   are unaffected — they're siblings of #mainWrap in the root context
+   at z 100000+, correctly above the sidebar. */
+#mainWrap{margin-left:220px;min-height:100vh;position:relative;isolation:isolate;width:calc(100vw - 220px);padding-top:44px;overflow-x:hidden;}
 #app{padding:1.6rem 1.8rem 6rem;max-width:100%;}
 
 /* ─── SECTIONS (SPA — only active shows) ─────── */

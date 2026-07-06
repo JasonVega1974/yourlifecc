@@ -1,7 +1,7 @@
 // YourLifeCC Service Worker
 // Version bump this string whenever you deploy a major update
 // to force old caches to clear.
-const CACHE_NAME = 'yourlifecc-v478';
+const CACHE_NAME = 'yourlifecc-v479';
 
 // Core assets to pre-cache on install — the app shell + key Well modules
 // + the shared modal/save/share + prayer focus + Quick Prayer library
@@ -54,6 +54,9 @@ const PRECACHE_ASSETS = [
   // ACTS Guided Prayer Journey (Wave 2 §2a) — module + starter data.
   '/app/js/acts-journey.js',
   '/app/js/data/acts-starters.js',
+  // The Odds Machine (Proof & Prophecy §4a) — module + data.
+  '/app/js/odds-machine.js',
+  '/app/js/data/odds-machine.js',
   // My Walk with God pathway (dark launch) — precached for offline parity.
   '/app/js/data/walk-stations-data.js',
   '/app/js/walk-path.js',

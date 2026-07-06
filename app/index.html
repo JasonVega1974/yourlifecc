@@ -13971,6 +13971,7 @@
       </div>
       <div class="pp-actions">
         <button class="pp-convince-btn" onclick="ppOpenConvince()">⚖️ Convince Me</button>
+        <button class="pp-convince-btn" onclick="if(typeof oddsOpen==='function')oddsOpen()">🎲 The Odds Machine</button>
         <input class="pp-search" id="ppSearch" type="text" placeholder="Search 100 proofs…" oninput="ppRenderGrid()" />
       </div>
     </div>
@@ -14481,6 +14482,84 @@
       <div style="padding:.65rem 1.2rem 1.1rem;display:flex;gap:.4rem;flex-wrap:wrap;">
         <button onclick="acDiplomaDownload()" style="flex:1;min-width:130px;min-height:44px;background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.6rem .85rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">⬇ Save image</button>
         <button onclick="acDiplomaShare()" style="flex:1;min-width:130px;min-height:44px;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.4);border-radius:10px;padding:.6rem .85rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Share</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ THE ODDS MACHINE (Proof & Prophecy §4a) ════
+       Full-screen interactive. display:none when idle (0 flow height).
+       The share-card canvas lives inside #oddsShareModal (.mo,
+       display:none) — the diploma containment pattern — so it NEVER
+       sits in document flow and can never intrude on the sidebar. -->
+  <style>
+    /* The Odds Machine — scene-dark navy/gold (Proof & Prophecy gold
+       register). Hardcoded scene hex, both themes (full-screen scene).
+       Interactive is body-level + display:none idle: 0 flow, no sidebar
+       intrusion. */
+    .odm-host{ position:relative; min-height:100%; max-width:640px; margin:0 auto; padding:max(env(safe-area-inset-top),1rem) 1.2rem 2rem; display:flex; flex-direction:column; justify-content:center; box-sizing:border-box; }
+    .odm-close{ position:absolute; top:.85rem; right:.85rem; width:44px; height:44px; border-radius:50%; cursor:pointer; background:rgba(241,233,213,.06); border:1px solid rgba(241,233,213,.2); color:rgba(241,233,213,.7); font-size:.9rem; font-family:var(--fm); z-index:2; }
+    .odm-pips{ display:flex; gap:.4rem; justify-content:center; margin:2.4rem 0 1.2rem; }
+    .odm-pip{ width:9px; height:9px; border-radius:50%; background:rgba(241,233,213,.14); border:1px solid rgba(241,233,213,.22); }
+    .odm-pip.on{ background:#fbbf24; border-color:#fbbf24; }
+    .odm-step, .odm-fin{ text-align:center; }
+    .odm-eyebrow{ font-family:var(--fm); font-size:.62rem; font-weight:800; letter-spacing:.24em; text-transform:uppercase; color:#fbbf24; margin-bottom:.5rem; }
+    .odm-ptitle{ font-family:Georgia,serif; font-size:1.35rem; color:#f1e9d5; margin-bottom:1rem; }
+    .odm-verse{ text-align:left; font-family:Georgia,'Times New Roman',serif; font-style:italic; font-size:.94rem; line-height:1.65; color:rgba(241,233,213,.9); background:rgba(241,233,213,.04); border-left:3px solid rgba(251,191,36,.5); border-radius:0 10px 10px 0; padding:.7rem .9rem; margin:0 auto .5rem; max-width:34em; }
+    .odm-verse.odm-nt{ border-left-color:#22c55e; }
+    .odm-vref{ display:block; font-family:var(--fm); font-style:normal; font-size:.62rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:rgba(251,191,36,.75); margin-bottom:.3rem; }
+    .odm-verse.odm-nt .odm-vref{ color:#6ee7b7; }
+    .odm-arrow{ font-family:var(--fm); font-size:.6rem; font-weight:800; letter-spacing:.2em; text-transform:uppercase; color:rgba(241,233,213,.4); margin:.15rem 0; }
+    .odm-odds{ font-family:var(--fm); font-size:.86rem; color:rgba(241,233,213,.75); margin:.9rem 0; }
+    .odm-odds strong{ color:#f1e9d5; }
+    .odm-multi{ background:rgba(9,9,20,.5); border:1px solid rgba(251,191,36,.22); border-radius:16px; padding:1.1rem; margin:.4rem auto 1.2rem; max-width:26em; }
+    .odm-multi-lbl{ font-family:var(--fm); font-size:.58rem; font-weight:800; letter-spacing:.2em; text-transform:uppercase; color:rgba(241,233,213,.5); margin-bottom:.4rem; }
+    .odm-multi-big{ font-family:'Bebas Neue',Georgia,serif; font-size:2.6rem; line-height:1; letter-spacing:.02em; color:#fbbf24; }
+    .odm-multi-big sup{ font-size:.5em; }
+    .odm-multi-big.odm-pulse{ animation:odmPulse .5s ease-out 1; }
+    @keyframes odmPulse{ 0%{ transform:scale(1); } 40%{ transform:scale(1.12); } 100%{ transform:scale(1); } }
+    .odm-multi-gloss{ font-family:Georgia,serif; font-style:italic; font-size:.8rem; color:rgba(241,233,213,.55); margin-top:.3rem; min-height:1em; }
+    .odm-cta{ min-height:48px; border-radius:12px; cursor:pointer; padding:.7rem 1.4rem; background:#fbbf24; color:#3a2a05; border:none; font-family:var(--fm); font-weight:800; font-size:.9rem; }
+    .odm-cta:hover{ filter:brightness(1.06); }
+    /* Finale */
+    .odm-fin-big{ font-family:'Bebas Neue',Georgia,serif; font-size:4rem; line-height:1; color:#fbbf24; margin:.3rem 0 .5rem; }
+    .odm-fin-big sup{ font-size:.5em; }
+    .odm-fin-sub{ font-family:var(--fm); font-size:.9rem; color:rgba(241,233,213,.7); line-height:1.55; max-width:30em; margin:0 auto 1.2rem; }
+    /* Silver-dollar Texas scene — a dense field of silver dots, one
+       marked gold coin. Geometric only; no imagery. */
+    .odm-tex{ position:relative; height:180px; border-radius:16px; overflow:hidden; border:1px solid rgba(241,233,213,.12); margin:0 auto .7rem; max-width:34em;
+      background-color:#0c1020;
+      background-image:radial-gradient(circle at center, rgba(226,232,240,.55) 1.6px, transparent 2px);
+      background-size:14px 14px; background-position:0 0; }
+    .odm-tex-field{ position:absolute; inset:0; background:radial-gradient(ellipse at 50% 120%, rgba(10,13,26,0), rgba(10,13,26,.7)); }
+    .odm-tex-mark{ position:absolute; left:64%; top:38%; width:12px; height:12px; border-radius:50%; background:#fbbf24; box-shadow:0 0 0 3px rgba(251,191,36,.3),0 0 16px 4px rgba(251,191,36,.6); }
+    .odm-tex-mark::after{ content:''; position:absolute; inset:0; border-radius:50%; animation:odmMarkPulse 2.4s ease-in-out infinite; box-shadow:0 0 0 6px rgba(251,191,36,.25); }
+    @keyframes odmMarkPulse{ 0%,100%{ box-shadow:0 0 0 4px rgba(251,191,36,.28); } 50%{ box-shadow:0 0 0 12px rgba(251,191,36,.05); } }
+    .odm-tex-cap{ font-family:Georgia,serif; font-style:italic; font-size:.86rem; line-height:1.6; color:rgba(241,233,213,.75); max-width:32em; margin:0 auto 1.2rem; }
+    .odm-fin-actions{ display:flex; flex-direction:column; gap:.6rem; align-items:center; }
+    .odm-door{ min-height:48px; border-radius:12px; cursor:pointer; padding:.7rem 1.2rem; background:transparent; border:1px solid rgba(251,191,36,.4); color:#fbbf24; font-family:var(--fm); font-weight:700; font-size:.82rem; }
+    .odm-door:hover{ background:rgba(251,191,36,.08); }
+    .odm-close:focus-visible, .odm-cta:focus-visible, .odm-door:focus-visible{ outline:2px solid #fbbf24; outline-offset:2px; }
+    @media (prefers-reduced-motion: reduce){
+      .odm-multi-big.odm-pulse{ animation:none !important; }
+      .odm-tex-mark::after{ animation:none !important; }
+    }
+  </style>
+  <div id="oddsOverlay" style="display:none;position:fixed;inset:0;z-index:100055;background:linear-gradient(180deg,#0a0d1a 0%,#141129 100%);overflow-y:auto;-webkit-overflow-scrolling:touch;">
+    <div id="oddsHost" class="odm-host"></div>
+  </div>
+  <div id="oddsShareModal" class="mo" onclick="if(event.target===this)oddsCloseShare()">
+    <div class="md" style="max-width:520px;padding:0;">
+      <div style="padding:1rem 1.2rem .65rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid rgba(255,255,255,.06);">
+        <span style="font-size:1.2rem;">🎲</span>
+        <span style="font-family:var(--fh,var(--fm));font-size:1rem;font-weight:800;letter-spacing:.04em;color:var(--tx);">Share the odds</span>
+        <button onclick="oddsCloseShare()" aria-label="Close" style="margin-left:auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:.82rem;font-weight:800;">✕</button>
+      </div>
+      <div style="padding:.85rem 1.2rem;display:flex;justify-content:center;">
+        <canvas id="oddsShareCanvas" style="width:100%;max-width:420px;aspect-ratio:1/1;border-radius:10px;background:rgba(0,0,0,.25);box-shadow:0 8px 30px rgba(0,0,0,.4);"></canvas>
+      </div>
+      <div style="padding:.65rem 1.2rem 1.1rem;display:flex;gap:.4rem;flex-wrap:wrap;">
+        <button onclick="oddsShareDownload()" style="flex:1;min-width:130px;min-height:44px;background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.6rem .85rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">⬇ Save image</button>
+        <button onclick="oddsShareShare()" style="flex:1;min-width:130px;min-height:44px;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.4);border-radius:10px;padding:.6rem .85rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);">Share</button>
       </div>
     </div>
   </div>
@@ -22379,6 +22458,9 @@
 <!-- ACTS Guided Prayer Journey (Wave 2 §2a) — starter phrases per
      movement. Small static data, eager with faith siblings. -->
 <script defer src="/app/js/data/acts-starters.js"></script>
+<!-- The Odds Machine (Proof & Prophecy §4a) — 8 messianic prophecies +
+     conservative Stoner-style odds. Small static data. -->
+<script defer src="/app/js/data/odds-machine.js"></script>
 <script defer src="/app/js/data/podcasts.js"></script>
 <script defer src="/app/js/data/reading-plans.js"></script>
 <script defer src="/app/js/data/audio-content.js"></script>
@@ -22406,6 +22488,9 @@
      After faith.js so renderHowToPrayPane can call renderActsLauncher
      typeof-guarded; functions are global. -->
 <script defer src="/app/js/acts-journey.js"></script>
+<!-- The Odds Machine (Proof & Prophecy §4a) — probability stacker.
+     After faith.js so oddsDoorToProphecy can call bfTab/ppSetCategory. -->
+<script defer src="/app/js/odds-machine.js"></script>
 <script defer src="/app/js/faith-resources.js"></script>
 <!-- The Story scrollytelling (2026-07-05) — Who Is Jesus seven-chapter
      scroll journey over JESUS_DATA. bfTab('jesus') in faith.js calls
