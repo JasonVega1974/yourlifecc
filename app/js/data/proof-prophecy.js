@@ -1,7 +1,7 @@
 /* =============================================================
-   proof-prophecy.js — 107 apologetics proof entries
+   proof-prophecy.js — 109 apologetics proof entries
    7 categories: archaeology (20), prophecy (20), manuscripts (15),
-   witnesses (15), science (15), resurrection (15), philosophy (7)
+   witnesses (15), science (17), resurrection (15), philosophy (7)
    Schema: { id, category, title, year, eyebrow, summary, scripture,
             source, impactScore, image, detail }
 ============================================================= */
@@ -2215,6 +2215,55 @@ The disciples did not gradually reorganize Jewish expectation. They asserted a r
     impactScore: 8,
     image: '',
     detail: 'In 2001, Dutch cardiologist Pim van Lommel published a study in The Lancet \u2014 one of the world\u2019s most rigorous medical journals \u2014 that made materialist neuroscience deeply uncomfortable. He had prospectively tracked 344 cardiac-arrest patients across ten hospitals: people whose hearts had stopped, whose brains showed no measurable activity. Eighteen percent returned reporting vivid, structured experiences from inside clinical death \u2014 overwhelming peace, a brilliant light that felt personal, deceased relatives, life reviews, and in several cases accurate awareness of what happened in the room while they were flat-lined. Van Lommel\u2019s clinical point was blunt: these experiences occurred when the brain, by every measure available, could not be producing them.\n\nThe pattern is the puzzle. Raymond Moody coined "near-death experience" in 1975, and in the fifty years since, thousands of documented cases have accumulated across every culture studied \u2014 American atheists, Indian Hindus, Japanese Buddhists, children too young to have absorbed religious expectations. The core elements repeat with uncanny consistency. Kenneth Ring\u2019s "Mindsight" research documented the strangest subset: people blind from birth \u2014 who do not even have visual dreams \u2014 reporting accurate VISUAL detail from their episodes. Sam Parnia\u2019s AWARE studies brought hospital-grade rigor, including a verified case of a patient accurately describing events during a fully monitored three-minute arrest.\n\nBe honest about the naturalistic candidates, because researchers have tested them hard. Oxygen starvation? Anoxia produces confusion and fragmented terror \u2014 NDEs are serially ordered, lucid, and described as "more real than real." Dying-brain chemistry, DMT, seizure activity in the temporal lobe? Each reproduces a fragment; none reproduces the package, the cross-cultural consistency, the verified out-of-body perceptions, or the blind who see. Expectation? Children\u2019s reports match adults\u2019, atheists\u2019 match believers\u2019, and many report the opposite of what their worldview predicted. The materialist explanations are not stupid \u2014 they are incomplete, and after fifty years the gap is not closing.\n\nA Christian should also say plainly what NDEs are NOT. They are not proof of the gospel; they are data points about consciousness, filtered through fallible human witnesses, and Scripture is notably reserved about tourist reports from beyond \u2014 Paul, describing his own experience of "the third heaven," said he heard "things that cannot be told" (2 Corinthians 12:4). Some reported experiences are distressing rather than peaceful, a detail popular books tend to omit and honesty should not. The doctrine of what lies beyond death rests on the resurrection of Jesus \u2014 a public, historical claim \u2014 not on private glimpses.\n\nBut here is what the research does do: it quietly breaks the confident materialist assumption that consciousness is nothing but neurons, and that when the neurons stop, you stop. Tens of thousands of ordinary people \u2014 surgeons, skeptics, kids \u2014 have stood at the border and come back describing the same country. Nearly all return with the same two changes: they are certain consciousness continues, and they have permanently lost their fear of death. "The dust returns to the earth as it was, and the spirit returns to God who gave it" (Ecclesiastes 12:7). When wildly different witnesses keep describing the same coastline, the mapmaker\u2019s job is not to shout them down. It is to wonder what they saw.'
+  },
+  // ════════════════════════════════════════════════════════════
+  // SCIENCE DEEP-DIVES (2) — 2026-07-05 install, completes the
+  // Convince Me deck at 20/20 (cm8 fine-tuning, cm9 DNA). Authored
+  // in-session (the referenced install file was missing) in the
+  // philosophy-batch register — flagged for editorial review.
+  // image:'' by design — styled placeholder, no hotlinked stock.
+  // ════════════════════════════════════════════════════════════
+  {
+    id: 'sci-fine-tuning',
+    category: 'science',
+    title: 'The Knife-Edge Universe',
+    year: 1999,
+    eyebrow: 'COSMOLOGY · THE FINE-TUNED CONSTANTS · REES, 1999',
+    summary: `The universe runs on a handful of numbers — the strength of gravity, the charge of the electron, the cosmological constant — and if almost any of them were different by a hair: no stars, no chemistry, no life. The atheist astronomers who discovered this are the ones who called it a problem.`,
+    scripture: 'Psalm 19:1; Isaiah 45:18; Job 38:4-7',
+    source: `Martin Rees, "Just Six Numbers" (1999); Fred Hoyle, "The Universe: Past and Present Reflections," Annual Review of Astronomy & Astrophysics (1982); Roger Penrose, "The Emperor's New Mind" (1989); Luke Barnes & Geraint Lewis, "A Fortunate Universe" (2016)`,
+    impactScore: 9,
+    image: '',
+    detail: `Martin Rees is no friend of religious apologetics — he is a former President of the Royal Society and Britain's Astronomer Royal. In 1999 he published "Just Six Numbers," showing that the entire structure of the cosmos hangs on six dimensionless constants. Nudge the nuclear binding constant from 0.007 to 0.006 and hydrogen never fuses — no stars. Nudge it to 0.008 and hydrogen burns away in the Big Bang — no water, no chemistry. The strength of gravity, the density parameter, the cosmological constant: each sits inside a window so narrow that the phrase physicists settled on is "fine-tuned."
+
+The most staggering single number belongs to Roger Penrose, the Nobel-winning mathematician. He calculated the odds of the universe beginning in a low-entropy state compatible with a life-permitting cosmos at one part in 10 to the power of 10^123 — a number with more zeroes than there are particles in the observable universe. Penrose is not a Christian; the number is not a preacher's flourish. It is the mainstream initial-conditions problem of modern cosmology.
+
+Fred Hoyle's story cuts deepest because of where he started. A committed atheist who coined "Big Bang" as a sneer, Hoyle discovered the carbon resonance — the precisely-placed nuclear energy level that lets stars forge the carbon every living thing is built from. The discovery shook him. His verdict, in a peer-reviewed astrophysics annual, not a sermon: "A common sense interpretation of the facts suggests that a superintellect has monkeyed with physics, as well as with chemistry and biology."
+
+Take the serious atheist answer seriously: the multiverse. If there are infinite universes with shuffled constants, someone had to win the lottery, and only winners get to wonder about it. It is a real hypothesis — and notice what it costs: an infinity of unobservable universes, posited without direct evidence, specifically to avoid a designer. Either way, the knife-edge is conceded — the debate is only about who or what set the blade.
+
+Three thousand years before anyone measured a constant, the psalmist wrote that "the heavens declare the glory of God" (Psalm 19:1), and Isaiah insisted the Creator "did not create it to be empty, but formed it to be inhabited" (Isaiah 45:18). Fine-tuning is not a proof that ends the argument. It is exactly what you would expect to measure if that were true — and a very strange thing to measure if it is not.`
+  },
+  {
+    id: 'sci-dna-information',
+    category: 'science',
+    title: 'The Library in Every Cell',
+    year: 1953,
+    eyebrow: 'MOLECULAR BIOLOGY · THE INFORMATION PROBLEM · DNA, 1953',
+    summary: `DNA is not LIKE a code — it is one: a four-letter alphabet storing assembly instructions, read by molecular machines, complete with error correction. In all of human experience, coded information has exactly one known source. The question is whether biology is the lone exception.`,
+    scripture: 'Psalm 139:13-16; Genesis 2:7; John 1:1-3',
+    source: `James Watson & Francis Crick, Nature 171 (1953); Francis Collins, "The Language of God" (2006); Bill Gates, "The Road Ahead" (1995); Leslie Orgel, "Prebiotic Chemistry and the Origin of the RNA World," Critical Reviews in Biochemistry (2004)`,
+    impactScore: 9,
+    image: '',
+    detail: `When Watson and Crick unwound the double helix in 1953, they expected chemistry. What they found was language: a four-character alphabet (A, T, C, G) arranged in three-letter words, storing the assembly instructions for every protein in your body — roughly three billion characters per cell, copied with proofreading enzymes that catch and repair typos. Bill Gates, who knows something about code, wrote that "DNA is like a computer program but far, far more advanced than any software ever created."
+
+The origin-of-life problem is not making the chemicals — amino acids form in lightning-flask experiments easily enough. The problem is the SEQUENCE. A protein is only useful if its parts are in functional order, exactly as a sentence is only meaningful if its letters are. The odds of one modest functional protein assembling by chance are commonly put around one in 10^77 — and a minimal self-replicating cell needs hundreds of them, plus the code that describes them, plus the machinery that reads the code, which is itself described BY the code. That loop — the reader written in the language it reads — is the hard part, and it is unsolved. Leslie Orgel, one of origin-of-life research's giants and no theist, wrote near the end of his life that the self-organization scenarios remain without experimental support.
+
+Be honest about what this is not: it is not "science can't explain it, therefore God." Chemists are working on RNA-world models, and Christians should cheer every experiment. The argument is an inference to the best explanation, and it runs on a uniform observation: every time we trace coded information — books, software, cuneiform — to its source, without exception, we find a mind. Biology asks us to believe in the one exception, on promissory credit.
+
+It is worth knowing who says otherwise from inside the lab. Francis Collins directed the Human Genome Project — he led the team that read all three billion letters — and titled his memoir "The Language of God," writing that the genome is "God's instruction book" and that his work felt like "a glimpse of the mind of God." The man who read the library concluded there was a Librarian. That settles nothing by authority — but it retires the claim that no serious scientist can look at DNA and see design.
+
+The psalmist, with no microscope, wrote: "You knit me together in my mother's womb... all the days ordained for me were written in your book before one of them came to be" (Psalm 139:13-16). Written. Ordained. A book. Three thousand years later, we opened the cell and found the writing.`
   }
 ];
 

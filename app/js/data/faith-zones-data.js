@@ -119,7 +119,7 @@ const CONVINCE_ME_DECK = [
       'Atheist physicists call this "the most disturbing observation in modern science."'
     ],
     closer:'A universe this calibrated either won the lottery a hundred times in a row — or someone calibrated it.',
-    proofId:null
+    proofId:'sci-fine-tuning'
   },
   {
     id:'cm9', cat:'Science', icon:'🔭',
@@ -132,7 +132,7 @@ const CONVINCE_ME_DECK = [
       'The mathematician Fred Hoyle (atheist) called it "a tornado building a 747."'
     ],
     closer:'Information this dense doesn\'t arise from noise. It arises from intent.',
-    proofId:null
+    proofId:'sci-dna-information'
   },
   {
     id:'cm10', cat:'Prophecy', icon:'📜',
