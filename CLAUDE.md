@@ -183,4 +183,4 @@ Five custom agents in `.claude/agents/`:
 - `competitor-researcher` — web research, writes to /docs/ only
 
 ## Visual & UI work
-Before designing, building, or restyling any UI, page, component, SVG, or cinematic scene, read .claude/skills/visual-design/SKILL.md in full and follow it. For any significant visual phase, run the ux-visual-reviewer agent before starting (capture its critique) and again after shipping (verify the work improved against its benchmarks).
+Before designing, building, or restyling any UI, page, component, SVG, or cinematic scene, read .claude/skills/visual-design/SKILL.md (general design principles) AND .claude/skills/yourlifecc-design/SKILL.md (this project's actual color/type/radius tokens and as-built rulings — see also `docs/design-system.md` for full detail) in full and follow both. For any significant visual phase, run the ux-visual-reviewer agent before starting (capture its critique) and again after shipping (verify the work improved against its benchmarks).
