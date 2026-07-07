@@ -3226,6 +3226,9 @@ function fjBackToHub(){
   if(!panel) return;
   var spokes = panel.querySelectorAll('.fjh-spoke');
   for(var i=0;i<spokes.length;i++) spokes[i].style.display = 'none';
+  // Restore the tab-level "← Back to Home" pill on the hub (it's hidden by
+  // the fj-in-spoke class while a spoke is open — see below).
+  panel.classList.remove('fj-in-spoke');
   var hub = document.getElementById('fjHub');
   if(hub) hub.style.display = '';
 }
@@ -3238,10 +3241,16 @@ function fjOpenSpoke(name){
   if(!panel) return;
   var hub = document.getElementById('fjHub');
   if(hub) hub.style.display = 'none';
-  var spokes = panel.querySelectorAll('.fjh-spoke');
+  var spokes = panel.querySelectorAll('.fjh-spoke'), opened = null;
   for(var i=0;i<spokes.length;i++){
-    spokes[i].style.display = (spokes[i].getAttribute('data-fj-spoke') === name) ? '' : 'none';
+    var on = spokes[i].getAttribute('data-fj-spoke') === name;
+    spokes[i].style.display = on ? '' : 'none';
+    if(on) opened = spokes[i];
   }
+  // In a spoke, the spoke's own gold "← Faith Journey" pill is the single
+  // back affordance — hide the tab-level cyan pill so they don't stack in
+  // two color languages. fjBackToHub removes the class (restores it).
+  panel.classList.add('fj-in-spoke');
   try{
     if(name === 'profile'){
       if(typeof renderFJProfile === 'function')      renderFJProfile();
@@ -3257,6 +3266,9 @@ function fjOpenSpoke(name){
       if(typeof renderFJDisciplines === 'function')  renderFJDisciplines();
     }
   }catch(_e){}
+  // Move focus into the new content for keyboard/SR users (preventScroll so
+  // it doesn't fight the land-at-top below).
+  try{ var b = opened && opened.querySelector('.fjh-back'); if(b && b.focus) b.focus({ preventScroll:true }); }catch(_e){}
   // Land the spoke at the top of the view, not wherever the hub was scrolled.
   try{ panel.scrollIntoView({ block:'start' }); }catch(_e){}
 }

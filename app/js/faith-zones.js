@@ -1754,7 +1754,11 @@ function fzOpenDest(dest){
     videos:'videos'
   };
   // Scroll target per DEST where it isn't simply 'bf-' + tab.
-  var _fzTabScrollId = { plans:'bf-plans', sermon:'sermonNotesList' };
+  var _fzTabScrollId = { plans:'bf-plans' };
+  // Journey deep links whose target is a hub-and-spoke spoke — open it
+  // directly. The section lives inside a display:none .fjh-spoke, so the old
+  // scroll-to-#sermonNotesList dead-ended on the hub. 2026-07-07.
+  var _fzJourneySpoke = { sermon:'sermon' };
   if (_fzTabAlias[dest]){
     if (D){
       D.faithLastDest = dest;
@@ -1762,10 +1766,15 @@ function fzOpenDest(dest){
     }
     var _fzTb = _fzTabAlias[dest];
     if (typeof bfTab === 'function') bfTab(_fzTb);
-    setTimeout(function(){
-      var p = document.getElementById(_fzTabScrollId[dest] || ('bf-' + _fzTb));
-      if (p) p.scrollIntoView({ behavior:'smooth', block:'start' });
-    }, 120);
+    var _spoke = _fzJourneySpoke[dest];
+    if (_spoke && typeof fjOpenSpoke === 'function'){
+      fjOpenSpoke(_spoke);   // opens the spoke + lands the view at its top
+    } else {
+      setTimeout(function(){
+        var p = document.getElementById(_fzTabScrollId[dest] || ('bf-' + _fzTb));
+        if (p) p.scrollIntoView({ behavior:'smooth', block:'start' });
+      }, 120);
+    }
     return;
   }
 
