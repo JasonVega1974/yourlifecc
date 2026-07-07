@@ -13,8 +13,11 @@
   :root{
     --bg:#050d1a;
     --card:rgba(255,255,255,.04);
-    --border:rgba(245,200,66,.16);
-    --gold:#f5c842;
+    --border:rgba(251,191,36,.16);
+    /* Faith gold register (docs/design-system.md:190) — the ESTABLISHED
+       accent for faith surfaces app-wide. Was #f5c842 (a fourth, unrelated
+       gold) — unified to match, not forked. */
+    --gold:#fbbf24;
     --tx:#f0f6ff;
     --tx2:rgba(240,246,255,.55);
     --tx3:rgba(240,246,255,.32);
@@ -35,8 +38,8 @@
     content:'';
     position:fixed; inset:0; z-index:0;
     background:
-      radial-gradient(ellipse 70% 45% at 22% 12%, rgba(245,200,66,.09) 0%, transparent 60%),
-      radial-gradient(ellipse 55% 40% at 82% 82%, rgba(245,200,66,.06) 0%, transparent 55%);
+      radial-gradient(ellipse 70% 45% at 22% 12%, rgba(251,191,36,.09) 0%, transparent 60%),
+      radial-gradient(ellipse 55% 40% at 82% 82%, rgba(251,191,36,.06) 0%, transparent 55%);
     pointer-events:none;
   }
 
@@ -54,20 +57,21 @@
   }
 
   /* ── PROGRESS DOTS (screens 2+3 only) ── */
-  #dots{
+  .dots-row{
     display:flex; justify-content:center; gap:.5rem;
     margin-bottom:1.8rem;
   }
-  #dots span{
+  .dots-row span{
     width:7px; height:7px; border-radius:50%;
     background:var(--tx3);
     transition:background .2s;
   }
-  #dots span.on{ background:var(--gold); }
+  .dots-row span.on{ background:var(--gold); }
 
   /* ── SCREEN 1 — WELCOME ── */
   #screen1{ text-align:center; }
-  .s1-cross{ font-size:2.6rem; margin-bottom:1rem; }
+  .s1-well{ margin-bottom:1rem; }
+  .s1-well svg{ width:76px; height:70px; }
   .s1-mark{
     font-family:var(--fh); font-weight:700;
     font-size:2.1rem; letter-spacing:.12em;
@@ -79,7 +83,7 @@
     padding:0 .5rem;
   }
   .s1-note{
-    font-size:.82rem; color:var(--tx3);
+    font-size:.82rem; color:var(--tx2);
     font-style:italic; margin-bottom:2.2rem;
   }
 
@@ -110,11 +114,15 @@
     color:var(--tx);
     font-family:inherit;
   }
-  .opt-card:hover{ border-color:rgba(245,200,66,.4); }
+  .opt-card:hover{ border-color:rgba(251,191,36,.4); }
   .opt-card:active{ transform:scale(.99); }
   .opt-card.selected{
     border-color:var(--gold);
-    background:rgba(245,200,66,.08);
+    background:rgba(251,191,36,.08);
+  }
+  .opt-card:focus-visible, .btn-primary:focus-visible,
+  .back-link:focus-visible, .explore-link:focus-visible{
+    outline:2px solid var(--gold); outline-offset:2px;
   }
   .opt-icon{ font-size:1.6rem; flex-shrink:0; }
   .opt-label{ font-size:.98rem; font-weight:700; margin-bottom:.15rem; }
@@ -123,7 +131,7 @@
   /* ── SCREEN 3 — recommendation card ── */
   .rec-card{
     background:var(--card);
-    border:1.5px solid rgba(245,200,66,.3);
+    border:1.5px solid rgba(251,191,36,.3);
     border-radius:20px;
     padding:2rem 1.6rem;
     text-align:center;
@@ -155,21 +163,28 @@
   .btn-primary:active{ transform:translateY(0); }
   .btn-primary:disabled{ opacity:.35; cursor:not-allowed; transform:none; }
 
-  /* ── SECONDARY LINK (screen 3, below the rec card) ── */
+  /* ── SECONDARY LINK (screen 3, below the rec card) ──
+     tx2 not tx3 — this is a functional CTA (bypass the recommendation),
+     not decorative meta-text; tx3 fails AA contrast on --bg. Padding
+     expands the tap target to 44px without growing the visual footprint
+     (docs/design-system.md:388). */
   .explore-link{
-    display:block; text-align:center;
-    font-size:.82rem; color:var(--tx3);
-    margin-top:1.1rem; text-decoration:none;
+    display:block; width:100%; text-align:center;
+    font-size:.82rem; color:var(--tx2);
+    margin-top:.6rem; padding:.85rem .5rem;
+    text-decoration:none;
     cursor:pointer; background:none; border:none;
     font-family:inherit;
   }
-  .explore-link:hover{ color:var(--tx2); }
+  .explore-link:hover{ color:var(--tx); }
+  .explore-link:disabled{ opacity:.5; cursor:not-allowed; }
 
-  /* ── BACK LINK (subtle, screen 2 only) ── */
+  /* ── BACK LINK (subtle, screens 2+3) ── */
   .back-link{
     display:inline-flex; align-items:center; gap:.3rem;
     font-size:.75rem; color:var(--tx3);
     cursor:pointer; margin-bottom:1rem;
+    padding:.6rem .3rem;
     background:none; border:none;
     transition:color .15s;
   }
@@ -195,7 +210,24 @@
 
   <!-- ══ SCREEN 1 — WELCOME TO THE WELL ══ -->
   <div class="screen" id="screen1">
-    <div class="s1-cross">✝️</div>
+    <!-- Line-art well motif (matches the in-app Well Onboarding overlay's
+         hero icon, app/js/init.js:2783-2795) — per docs/design-system.md's
+         codified faith-imagery rule, no crosses/religious clip-art on
+         faith surfaces. -->
+    <div class="s1-well" aria-hidden="true">
+      <svg viewBox="0 0 100 90" width="76" height="70" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M15 38 Q50 6 85 38" stroke="#fbbf24" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".85"/>
+        <rect x="13" y="35" width="7" height="45" rx="2" fill="#fbbf24" opacity=".4"/>
+        <rect x="80" y="35" width="7" height="45" rx="2" fill="#fbbf24" opacity=".4"/>
+        <rect x="19" y="32" width="62" height="5" rx="2.5" fill="#fbbf24" opacity=".55"/>
+        <rect x="26" y="50" width="48" height="30" rx="5" fill="#fbbf24" fill-opacity=".08" stroke="#fbbf24" stroke-width="1.5" stroke-opacity=".45"/>
+        <line x1="26" y1="62" x2="74" y2="62" stroke="#fbbf24" stroke-width="1" opacity=".2"/>
+        <line x1="26" y1="71" x2="74" y2="71" stroke="#fbbf24" stroke-width="1" opacity=".2"/>
+        <line x1="50" y1="37" x2="50" y2="56" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="3,2" opacity=".6"/>
+        <rect x="44" y="55" width="12" height="9" rx="2" fill="#fbbf24" fill-opacity=".5" stroke="#fbbf24" stroke-width="1" stroke-opacity=".88"/>
+        <ellipse cx="50" cy="80" rx="20" ry="3" fill="#38bdf8" opacity=".28"/>
+      </svg>
+    </div>
     <div class="s1-mark">THE WELL</div>
     <div class="s1-sub">A place to explore faith, pray, and discover who Jesus is.</div>
     <div class="s1-note">You don't need to have it all figured out.</div>
@@ -209,22 +241,22 @@
     <div class="screen-title">Where are you right now?</div>
     <div class="screen-sub">No wrong answer — this just helps us show you the right thing first.</div>
 
-    <button type="button" class="opt-card" data-stage="curious" onclick="selectStage(this,'curious')">
-      <span class="opt-icon">🔍</span>
+    <button type="button" class="opt-card" data-stage="curious" aria-pressed="false" onclick="selectStage(this,'curious')">
+      <span class="opt-icon" aria-hidden="true">🔍</span>
       <span>
         <div class="opt-label">Just curious</div>
         <div class="opt-sub">I'm exploring. No commitment yet.</div>
       </span>
     </button>
-    <button type="button" class="opt-card" data-stage="believer" onclick="selectStage(this,'believer')">
-      <span class="opt-icon">🙏</span>
+    <button type="button" class="opt-card" data-stage="believer" aria-pressed="false" onclick="selectStage(this,'believer')">
+      <span class="opt-icon" aria-hidden="true">🙏</span>
       <span>
         <div class="opt-label">I believe — I want to grow</div>
         <div class="opt-sub">I'm in. Show me what's next.</div>
       </span>
     </button>
-    <button type="button" class="opt-card" data-stage="questions" onclick="selectStage(this,'questions')">
-      <span class="opt-icon">💬</span>
+    <button type="button" class="opt-card" data-stage="questions" aria-pressed="false" onclick="selectStage(this,'questions')">
+      <span class="opt-icon" aria-hidden="true">💬</span>
       <span>
         <div class="opt-label">I have questions</div>
         <div class="opt-sub">I'm not sure what I think yet.</div>
@@ -237,13 +269,14 @@
   <!-- ══ SCREEN 3 — YOUR FIRST MOMENT ══ -->
   <div class="screen" id="screen3" style="display:none;">
     <div id="dots3" class="dots-row"></div>
+    <button class="back-link" onclick="goTo(2)">← Back</button>
     <div class="rec-card">
-      <div class="rec-icon" id="s3Icon"></div>
+      <div class="rec-icon" id="s3Icon" aria-hidden="true"></div>
       <div class="rec-title" id="s3Title"></div>
       <div class="rec-sub" id="s3Sub"></div>
       <button class="btn-primary" id="s3Btn" onclick="finishOnboarding()"></button>
     </div>
-    <button type="button" class="explore-link" onclick="finishOnboarding()">Explore everything →</button>
+    <button type="button" class="explore-link" id="exploreLink" onclick="finishOnboarding()">Explore everything →</button>
   </div>
 
 </div><!-- /app -->
@@ -270,31 +303,48 @@ function renderDots(active){
 }
 
 // ── NAVIGATION ─────────────────────────────────────────────
+function _reducedMotion(){
+  try { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+  catch(e){ return false; }
+}
 function goTo(step){
   var cur = document.getElementById('screen' + _currentScreen);
   var next = document.getElementById('screen' + step);
   if(!next) return;
+  var reduced = _reducedMotion();
 
   if(step === 3) populateScreen3();
 
   if(cur){
-    cur.classList.add('slide-out');
-    setTimeout(function(){ cur.style.display = 'none'; cur.classList.remove('slide-out'); }, 200);
+    if(reduced){ cur.style.display = 'none'; }
+    else {
+      cur.classList.add('slide-out');
+      setTimeout(function(){ cur.style.display = 'none'; cur.classList.remove('slide-out'); }, 200);
+    }
   }
   setTimeout(function(){
     next.style.display = 'block';
-    next.style.opacity = '0';
-    next.style.animation = 'fadeUp .45s forwards';
+    // The CSS-level fadeUp is neutralized under reduced motion (see the
+    // @media rule), but this inline assignment has higher specificity and
+    // would silently reintroduce the animation on every screen after the
+    // first — skip it entirely when reduced motion is on.
+    if(reduced){
+      next.style.opacity = '1';
+    } else {
+      next.style.opacity = '0';
+      next.style.animation = 'fadeUp .45s forwards';
+    }
     if(step >= 2) renderDots(step);
     _currentScreen = step;
     window.scrollTo(0,0);
-  }, cur ? 180 : 0);
+  }, (cur && !reduced) ? 180 : 0);
 }
 
 // ── SCREEN 2: SINGLE-SELECT ────────────────────────────────
 function selectStage(el, stage){
-  document.querySelectorAll('.opt-card').forEach(function(c){ c.classList.remove('selected'); });
+  document.querySelectorAll('.opt-card').forEach(function(c){ c.classList.remove('selected'); c.setAttribute('aria-pressed','false'); });
   el.classList.add('selected');
+  el.setAttribute('aria-pressed','true');
   STATE.faithStage = stage;
   document.getElementById('s2Btn').disabled = false;
 }
@@ -329,8 +379,13 @@ function populateScreen3(){
 }
 
 // ── ENTER KEY SUPPORT ──────────────────────────────────────
+// Skip when focus is already on a <button> — its native Enter-activates-
+// click behavior already fires the right handler; without this guard a
+// focused button's Enter keypress double-invokes goTo() (bubbles to this
+// document-level listener too).
 document.addEventListener('keydown', function(e){
   if(e.key !== 'Enter') return;
+  if(document.activeElement && document.activeElement.tagName === 'BUTTON') return;
   if(_currentScreen === 1) goTo(2);
   else if(_currentScreen === 2 && !document.getElementById('s2Btn').disabled) goTo(3);
 });
@@ -345,7 +400,9 @@ document.addEventListener('keydown', function(e){
 // home) — this is the hook point for that follow-up, not a bug.
 async function finishOnboarding(){
   var btn = document.getElementById('s3Btn');
+  var exploreBtn = document.getElementById('exploreLink');
   if(btn) btn.disabled = true;
+  if(exploreBtn) exploreBtn.disabled = true;
 
   try {
     var userId = STATE.userId || (typeof localStorage !== 'undefined' ? localStorage.getItem('ylcc_onboard_uid') : null);
@@ -358,11 +415,20 @@ async function finishOnboarding(){
       // too (matching api/faith-register.js's server-side path) since that pair
       // is what the Stripe-webhook guard checks before skipping a sync; see
       // docs/F0-followups.md for the incident this protects against.
+      //
+      // well_onboarded:true is ALSO required here — app/js/init.js's
+      // _checkWellOnboarding() (fired from renderFaithOnlyHero() the moment
+      // this user lands on /app as a faith_free account) shows its own
+      // separate 3-screen "Welcome to The Well" overlay unless this column
+      // is already true. Without it, completing THIS wizard would trigger
+      // that DIFFERENT one immediately afterward — this page's wizard is
+      // meant to satisfy both onboarding gates, not stack a second one.
       await supa.from('profiles').upsert({
         user_id: userId,
         email: email || '',
         plan_status: 'faith_free',
         faith_only: true,
+        well_onboarded: true,
         updated_at: new Date().toISOString()
       }, { onConflict: 'user_id' });
     }
