@@ -215,9 +215,17 @@ function cmFlip(){
     // builds Courage (asking the hard question) + Faith (sitting
     // with the answer). Only on FIRST flip of a given card so
     // re-flipping doesn't farm points.
-    if (firstFlip && typeof awardTrait === 'function'){
-      awardTrait('courage', 3);
-      awardTrait('faith',   2);
+    // Trait reward — now once per DAY (was once per new card, which let the
+    // deck cycle farm ~20x/day via cmNext). _hcOnce('cm_curious') is the
+    // daily guard; firstFlip keeps it tied to genuine new-card engagement.
+    // Award both traits SILENTLY, then ONE combined toast — the two separate
+    // trait toasts rendered at the same fixed spot and overlapped into a
+    // "doubled +5" notification.
+    if (firstFlip && typeof awardTrait === 'function'
+        && typeof _hcOnce === 'function' && _hcOnce('cm_curious')){
+      awardTrait('courage', 3, { silent:true });
+      awardTrait('faith',   2, { silent:true });
+      if (typeof showToast === 'function') showToast('🌱 +3 Courage · +2 Faith');
     }
     // V1 Rebuild · Session 4 — celebration FX on first flip only
     // (spam-protected so re-flips don't re-fire). Pre-flip glow

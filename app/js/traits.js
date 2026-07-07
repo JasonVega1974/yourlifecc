@@ -115,7 +115,7 @@ function _getGrowthStreak(){
   return streak;
 }
 
-function awardTrait(traitKey, amount){
+function awardTrait(traitKey, amount, opts){
   if (!_tEnsure()) return;
   if (!TRAITS[traitKey]) return;
   if (typeof amount !== 'number' || amount <= 0) return;
@@ -135,7 +135,10 @@ function awardTrait(traitKey, amount){
 
   var oldLevel = getTraitLevel(traitKey, prev);
   var newLevel = getTraitLevel(traitKey, next);
-  showTraitToast(traitKey, amount);
+  // opts.silent: grant without the per-trait toast so a caller awarding
+  // several traits at once (e.g. Today's Mystery) can show ONE combined
+  // toast instead of N overlapping ones. Level-up celebration still fires.
+  if (!(opts && opts.silent)) showTraitToast(traitKey, amount);
   if (newLevel > oldLevel) showTraitLevelUp(traitKey, newLevel);
   if (typeof save === 'function') save();
 
