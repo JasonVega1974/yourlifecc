@@ -1555,7 +1555,11 @@ function renderFaithJourneyHome(){
     // 2026-07-03 — GROW + CHURCH & YOU deep links (their bf-* panels live in
     // Zone 3 inside #fzHome). podcasts navigates to its own page and
     // reflect/growth/heart are dest takeovers — none of those belong here.
-    academy:1, plans:1, devotional:1, memorize:1, traditions:1, sermon:1,
+    // sermon moved to this same "dest takeover" bucket on 2026-07-07 when
+    // its journey-home card was removed (My Walk → My Faith Life is its
+    // only home now) — no data-fjdest="sermon" element exists to trigger
+    // this entry anymore, so it's cleaned up rather than left stale.
+    academy:1, plans:1, devotional:1, memorize:1, traditions:1,
     // 2026-07-03 — MEET JESUS + LISTEN (bf-* panels in Zone 3 too).
     jesus:1, audio:1, sleep:1, createmed:1 };
   try {
