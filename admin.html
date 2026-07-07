@@ -1733,16 +1733,20 @@ const PM_INVENTORY = [
   {id:'jsy-ministry',    section:'Meet Jesus — The Story', title:'V · The Ministry (Galilee)',      defaultUrl:''},
   {id:'jsy-cross',       section:'Meet Jesus — The Story', title:'VI · The Cross (Jerusalem)',      defaultUrl:''},
   {id:'jsy-risen',       section:'Meet Jesus — The Story', title:'VII · Risen (Garden Tomb)',       defaultUrl:''},
-  // ── My Faith Life hub tiles (2026-07-07, renamed from "Faith Journey
-  // Hub" when that tab was consolidated into My Walk's "My Faith Life"
-  // tab) — the 6 hub cards. Emoji placeholder shows until a photo is
-  // uploaded (img[data-card-id="fjh-*"], applied by loadCardPhotoOverrides).
-  {id:'fjh-profile',     section:'My Faith Life Hub', title:'My Faith Profile — Tile',     defaultUrl:''},
-  {id:'fjh-giving',      section:'My Faith Life Hub', title:'Giving — Tile',               defaultUrl:''},
-  {id:'fjh-verses',      section:'My Faith Life Hub', title:'My Verses — Tile',            defaultUrl:''},
-  {id:'fjh-sermon',      section:'My Faith Life Hub', title:'Sermon Notes — Tile',         defaultUrl:''},
-  {id:'fjh-disciplines', section:'My Faith Life Hub', title:'Spiritual Disciplines — Tile',defaultUrl:''},
-  {id:'fjh-growth',      section:'My Faith Life Hub', title:'Growth Profile — Tile',       defaultUrl:''},
+  // ── My Faith Life cards (2026-07-07, renamed from fjh-*/"My Faith Life
+  // Hub" — that section was never added to PM_SECTION_ORDER below, so it
+  // never actually rendered in the admin photo manager; fixed alongside
+  // this rename) — the 6 cards in My Walk's "My Faith Life" tab
+  // (app/js/my-walk-tabs.js). Emoji placeholder shows until a photo is
+  // uploaded (img[data-card-id="mfl-*"], applied by loadCardPhotoOverrides
+  // — generic match, no extra wiring needed beyond this id agreeing with
+  // the data-card-id values in my-walk-tabs.js).
+  {id:'mfl-profile',     section:'My Faith Life', title:'My Faith Profile',      defaultUrl:''},
+  {id:'mfl-giving',      section:'My Faith Life', title:'Giving',                defaultUrl:''},
+  {id:'mfl-verses',      section:'My Faith Life', title:'My Verses',             defaultUrl:''},
+  {id:'mfl-sermon',      section:'My Faith Life', title:'Sermon Notes',          defaultUrl:''},
+  {id:'mfl-disciplines', section:'My Faith Life', title:'Spiritual Disciplines', defaultUrl:''},
+  {id:'mfl-growth',      section:'My Faith Life', title:'Growth Profile',        defaultUrl:''},
   // ── Video Archive (2026-07-06) — optional banner per playlist section on
   // the Bible Project archive surface (video-archive.js reads
   // window.CARD_PHOTO_OVERRIDES['va-*'] at render time). No defaults: each
@@ -1959,7 +1963,7 @@ if (typeof PROOF_PROPHECY_DATA !== 'undefined' && Array.isArray(PROOF_PROPHECY_D
 }
 
 // Section display order — add new sections here to control their position.
-const PM_SECTION_ORDER = ['Main App Home','Faith Journey Home','Meet Jesus — The Story','Bible & Faith','Reading Plans','Proof & Prophecy','Faith Academy','Video Archive','Life Skills','School','Money Manager','Health & Wellness','Driving','Sports','Resume / Jobs'];
+const PM_SECTION_ORDER = ['Main App Home','Faith Journey Home','My Faith Life','Meet Jesus — The Story','Bible & Faith','Reading Plans','Proof & Prophecy','Faith Academy','Video Archive','Life Skills','School','Money Manager','Health & Wellness','Driving','Sports','Resume / Jobs'];
 
 let PM_OVERRIDES = {};
 let PM_INITED    = false;

@@ -196,32 +196,32 @@
         '</div>'+
         '<div class="mw-grid">'+
           '<button type="button" class="mw-card" onclick="mwOpenSpoke(\'profile\')">'+
-            '<div class="mw-hero"><div class="mw-ph" aria-hidden="true">👤</div><img class="mw-img" data-card-id="fjh-profile" loading="lazy" alt="" onerror="this.style.display=\'none\'"><div class="mw-shade" aria-hidden="true"></div></div>'+
+            '<div class="mw-hero"><div class="mw-ph" aria-hidden="true">👤</div><img class="mw-img" data-card-id="mfl-profile" loading="lazy" alt="" onerror="this.style.display=\'none\'"><div class="mw-shade" aria-hidden="true"></div></div>'+
             '<div class="mw-title">MY FAITH PROFILE</div>'+
             '<div class="mw-sub">Your identity, spiritual milestones, and the moments that mattered.</div>'+
           '</button>'+
           '<button type="button" class="mw-card" onclick="mwOpenSpoke(\'giving\')">'+
-            '<div class="mw-hero"><div class="mw-ph" aria-hidden="true">💝</div><img class="mw-img" data-card-id="fjh-giving" loading="lazy" alt="" onerror="this.style.display=\'none\'"><div class="mw-shade" aria-hidden="true"></div></div>'+
+            '<div class="mw-hero"><div class="mw-ph" aria-hidden="true">💝</div><img class="mw-img" data-card-id="mfl-giving" loading="lazy" alt="" onerror="this.style.display=\'none\'"><div class="mw-shade" aria-hidden="true"></div></div>'+
             '<div class="mw-title">GIVING</div>'+
             '<div class="mw-sub">Track your generosity over time.</div>'+
           '</button>'+
           '<button type="button" class="mw-card" onclick="mwOpenSpoke(\'verses\')">'+
-            '<div class="mw-hero"><div class="mw-ph" aria-hidden="true">💎</div><img class="mw-img" data-card-id="fjh-verses" loading="lazy" alt="" onerror="this.style.display=\'none\'"><div class="mw-shade" aria-hidden="true"></div></div>'+
+            '<div class="mw-hero"><div class="mw-ph" aria-hidden="true">💎</div><img class="mw-img" data-card-id="mfl-verses" loading="lazy" alt="" onerror="this.style.display=\'none\'"><div class="mw-shade" aria-hidden="true"></div></div>'+
             '<div class="mw-title">MY VERSES</div>'+
             '<div class="mw-sub">Verses worth keeping close.</div>'+
           '</button>'+
           '<button type="button" class="mw-card" onclick="mwOpenSpoke(\'sermon\')">'+
-            '<div class="mw-hero"><div class="mw-ph" aria-hidden="true">📝</div><img class="mw-img" data-card-id="fjh-sermon" loading="lazy" alt="" onerror="this.style.display=\'none\'"><div class="mw-shade" aria-hidden="true"></div></div>'+
+            '<div class="mw-hero"><div class="mw-ph" aria-hidden="true">📝</div><img class="mw-img" data-card-id="mfl-sermon" loading="lazy" alt="" onerror="this.style.display=\'none\'"><div class="mw-shade" aria-hidden="true"></div></div>'+
             '<div class="mw-title">SERMON NOTES</div>'+
             '<div class="mw-sub">Capture what you heard on Sunday.</div>'+
           '</button>'+
           '<button type="button" class="mw-card" onclick="mwOpenSpoke(\'disciplines\')">'+
-            '<div class="mw-hero"><div class="mw-ph" aria-hidden="true">🔥</div><img class="mw-img" data-card-id="fjh-disciplines" loading="lazy" alt="" onerror="this.style.display=\'none\'"><div class="mw-shade" aria-hidden="true"></div></div>'+
+            '<div class="mw-hero"><div class="mw-ph" aria-hidden="true">🔥</div><img class="mw-img" data-card-id="mfl-disciplines" loading="lazy" alt="" onerror="this.style.display=\'none\'"><div class="mw-shade" aria-hidden="true"></div></div>'+
             '<div class="mw-title">SPIRITUAL DISCIPLINES</div>'+
             '<div class="mw-sub">Build rhythms that grow your faith.</div>'+
           '</button>'+
           '<button type="button" class="mw-card" onclick="mwOpenSpoke(\'growth\')">'+
-            '<div class="mw-hero"><div class="mw-ph" aria-hidden="true">📊</div><img class="mw-img" data-card-id="fjh-growth" loading="lazy" alt="" onerror="this.style.display=\'none\'"><div class="mw-shade" aria-hidden="true"></div></div>'+
+            '<div class="mw-hero"><div class="mw-ph" aria-hidden="true">📊</div><img class="mw-img" data-card-id="mfl-growth" loading="lazy" alt="" onerror="this.style.display=\'none\'"><div class="mw-shade" aria-hidden="true"></div></div>'+
             '<div class="mw-title">GROWTH PROFILE</div>'+
             '<div class="mw-sub">See who you\'re becoming — all 7 traits.</div>'+
           '</button>'+
@@ -331,10 +331,20 @@
     if(_cssDone || typeof document === 'undefined') return;
     _cssDone = true;
     var css =
-    '.mw-tabs{ display:flex; gap:.4rem; margin:0 0 1rem; border-bottom:1px solid rgba(245,180,49,.16); }'+
-    '.mw-tab{ flex:1; display:flex; align-items:center; justify-content:center; min-height:44px; text-align:center; background:none; border:none; border-bottom:2px solid transparent; padding:.5rem; font:600 .82rem/1 Oswald,sans-serif; letter-spacing:.03em; color:rgba(233,236,246,.5); cursor:pointer; }'+
-    '.mw-tab.active{ color:#efe7d4; border-bottom-color:#f5b431; }'+
-    '.mw-tab:focus-visible{ outline:2px solid #f5b431; outline-offset:-2px; }'+
+    /* Filled-vs-outlined pill pair — same pattern as .pr-subtabs (Prayer
+       hub) and the Bible Hub sub-tabs: active = solid gold fill + dark
+       text; inactive = transparent + gold hairline border. Gold matches
+       this file's OWN established accent (#f5b431 / rgba(245,180,49,…)) —
+       every other gold usage in this component (.mw-card border/hero
+       glow, .mw-back) already uses this exact triplet, so the tabs use
+       it too rather than introduce a second, unrelated gold into the
+       same component. */
+    '.mw-tabs{ display:flex; gap:8px; padding:4px; margin:0 0 1rem; background:rgba(255,255,255,.04); border-radius:12px; }'+
+    '.mw-tab{ flex:1; display:flex; align-items:center; justify-content:center; min-height:44px; text-align:center; background:transparent; border:1px solid rgba(245,180,49,.3); border-radius:8px; padding:.5rem; font:600 .82rem/1 Oswald,sans-serif; letter-spacing:.03em; color:rgba(240,246,255,.45); cursor:pointer; transition:background .15s ease, border-color .15s ease, color .15s ease; }'+
+    '.mw-tab:hover, .mw-tab:focus-visible{ border-color:rgba(245,180,49,.6); }'+
+    '.mw-tab.active{ background:#f5b431; border-color:transparent; color:#0a0a0a; font-weight:700; }'+
+    '.mw-tab.active:hover{ border-color:transparent; }'+
+    '.mw-tab:focus-visible{ outline:2px solid #f5b431; outline-offset:2px; }'+
     /* Component owns its own width regardless of host — #fzDest has no
        max-width of its own (unlike #ccWalkOverlay's 560px content wrap),
        so without this the same card grid reads two different ways
@@ -355,8 +365,13 @@
     '.mw-back:focus-visible{ outline:2px solid #f5b431; outline-offset:2px; }'+
     '@media (prefers-reduced-motion: reduce){ .mw-card{ transition:none; } .mw-card:hover{ transform:none; } }'+
     /* light mode — paper */
-    ':root.light .mw-tab{ color:rgba(58,40,24,.5); }'+
-    ':root.light .mw-tab.active{ color:#1a1233; border-bottom-color:#b45309; }'+
+    ':root.light .mw-tabs{ background:rgba(0,0,0,.03); }'+
+    ':root.light .mw-tab{ color:rgba(58,40,24,.5); border-color:rgba(180,83,9,.3); }'+
+    ':root.light .mw-tab:hover, :root.light .mw-tab:focus-visible{ border-color:rgba(180,83,9,.6); }'+
+    // Guardrail: active tab STAYS gold-filled + dark text in light mode —
+    // not inverted. No override needed here; .mw-tab.active's dark-mode
+    // rule already reads correctly on a light page background.
+    ':root.light .mw-tab.active:hover{ border-color:transparent; }'+
     ':root.light .mw-card{ background:linear-gradient(158deg,#ffffff,#fbf7ee); border-color:rgba(146,64,14,.22); box-shadow:0 1px 3px rgba(26,18,51,.08); }'+
     ':root.light .mw-card:hover{ border-color:rgba(146,64,14,.4); box-shadow:0 4px 12px rgba(26,18,51,.1); }'+
     ':root.light .mw-ph{ background:linear-gradient(158deg,#efe8da,#e2d9c6); }'+
