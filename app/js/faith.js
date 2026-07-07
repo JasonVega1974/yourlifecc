@@ -3209,18 +3209,56 @@ const LEARN_BIBLE_LESSONS = [
     body:`<h4>The Story</h4><p>Acts is the sequel to Luke's Gospel — it picks up right where Jesus ascended into heaven and the disciples were left wondering what to do next. Then the Holy Spirit came at Pentecost and everything changed. 3,000 people believed in one day. The church was born.</p><h4>What Happened Next</h4><p>The early believers shared everything, met daily, performed miracles, and turned the known world upside down — with no buildings, no budgets, and no political power. Within 300 years, Christianity had spread to every corner of the Roman Empire and beyond.</p><h4>What It Means for Today</h4><p>Acts answers the question: what is the church supposed to look like? It looked like people in community, filled with the Spirit, fearless in sharing Jesus, generous with what they had, and willing to suffer for what they believed. That's still the blueprint. The same Spirit that powered the early church is available to every believer today.`},
 ];
 
-// ── FAITH JOURNEY ────────────────────────────────────────────
+// ── FAITH JOURNEY (hub-and-spoke) ────────────────────────────
+// The tab is a 5-card hub; each card opens ONE spoke showing only its
+// own content, with a "← Faith Journey" back pill. This replaced the old
+// everything-in-one-scrolling-pane (tapping Sermon Notes used to show
+// Profile + Milestones + Giving stacked above it). My Prayers was dropped
+// here — it lives fully in the Prayer hub (prSubTab('mine') + prOpenCompose).
+// Entering the tab always lands on the hub; sections render lazily on open.
 function renderFaithJourney(){
-  // Worker 2 — new sections at top of journey tab
-  renderFJProfile();
-  renderFJMilestones();
-  renderFJDonations();
-  renderFJDisciplines();
-  // Existing sections below
-  renderMyPrayersPane();
-  renderFaithMilestones();
-  renderFavVerses();
-  if(typeof renderSermonNotes === 'function') renderSermonNotes();
+  fjBackToHub();
+}
+
+// Show the hub grid, hide every spoke (clean return — no bleed).
+function fjBackToHub(){
+  var panel = document.getElementById('bf-journey');
+  if(!panel) return;
+  var spokes = panel.querySelectorAll('.fjh-spoke');
+  for(var i=0;i<spokes.length;i++) spokes[i].style.display = 'none';
+  var hub = document.getElementById('fjHub');
+  if(hub) hub.style.display = '';
+}
+
+// Open one spoke: hide the hub + all other spokes, show this one, and
+// lazily render just its section(s). Instant (no animation) — reduced-motion
+// safe by construction.
+function fjOpenSpoke(name){
+  var panel = document.getElementById('bf-journey');
+  if(!panel) return;
+  var hub = document.getElementById('fjHub');
+  if(hub) hub.style.display = 'none';
+  var spokes = panel.querySelectorAll('.fjh-spoke');
+  for(var i=0;i<spokes.length;i++){
+    spokes[i].style.display = (spokes[i].getAttribute('data-fj-spoke') === name) ? '' : 'none';
+  }
+  try{
+    if(name === 'profile'){
+      if(typeof renderFJProfile === 'function')      renderFJProfile();
+      if(typeof renderFJMilestones === 'function')   renderFJMilestones();
+      if(typeof renderFaithMilestones === 'function') renderFaithMilestones();
+    } else if(name === 'giving'){
+      if(typeof renderFJDonations === 'function')    renderFJDonations();
+    } else if(name === 'verses'){
+      if(typeof renderFavVerses === 'function')      renderFavVerses();
+    } else if(name === 'sermon'){
+      if(typeof renderSermonNotes === 'function')    renderSermonNotes();
+    } else if(name === 'disciplines'){
+      if(typeof renderFJDisciplines === 'function')  renderFJDisciplines();
+    }
+  }catch(_e){}
+  // Land the spoke at the top of the view, not wherever the hub was scrolled.
+  try{ panel.scrollIntoView({ block:'start' }); }catch(_e){}
 }
 
 function savePrayer(type){
