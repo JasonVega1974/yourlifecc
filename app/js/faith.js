@@ -8117,10 +8117,14 @@ function _bwInitMap(){
     zoomControl: true,
     scrollWheelZoom: false,  // avoid hijacking page scroll on mobile
   }).setView([31.78, 35.21], 6);
-  // CartoDB Voyager — clean, neutral basemap. MIT/free for non-commercial-ish use;
-  // swap to OpenStreetMap (https://tile.openstreetmap.org/{z}/{x}/{y}.png) if needed.
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap, &copy; CARTO',
+  // CartoDB Dark Matter (2026-07-07) — no API key, no CORS issues, works
+  // immediately (confirmed: the CSP's img-src already has a bare https:
+  // wildcard, so no CSP change was needed for this domain either). Was
+  // CartoDB Voyager (light) — swapped for the archaeology map's dark
+  // navy surround. Same hostname/subdomains as before, just a different
+  // tile path.
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
     maxZoom: 18,
     subdomains: 'abcd',
   }).addTo(_bwMap);
